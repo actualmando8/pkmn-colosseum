@@ -338,7 +338,7 @@ All four below have correct C and are in `tools/decomp_work/equivalent.txt`.
 | `fn_8012F150` / `fn_801171C8` | gs_field_world.c | W1 FP-register permutation tie-break | 99.07 / 98.56 | no (C active) | Phase V 2026-06-10. |
 | `fn_8012A1A4` | gs_field_world.c | W5 saved-first commutative OR canonicalization + scheduling | 94.88% | no (C active) | Phase V 2026-06-10. |
 | `fn_8011CBC8` | gs_field_world.c | W1 register-routing tie-break (idx r3 vs r5 → clrlslwi vs slwi) | 93.64% | no (C active) | Phase V 2026-06-10. |
-| fn_8011A280 quintuplet (+fn_8011A570/9EC/B50/FCC) + fn_8011B788/fn_8011A3E4 group | gs_field_world.c | base/idx register-coalescing + r3→r0→rN double-mr scheduling | 98.6 / 98.5 band | no (C active) | improved via authoritative-symbol renames; residual not C-controllable at opt4. Phase V 2026-06-10. |
+| fn_8011A280 quintuplet (+fn_8011A570/9EC/B50/FCC) + fn_8011B788/fn_8011A3E4 group | gs_field_world.c | base/idx register-coalescing + r3→r0→rN double-mr scheduling | 98.6 / 98.5 band | no (C active) | improved via authoritative-symbol renames; residual not C-controllable at opt4. Phase V 2026-06-10. RE-CONFIRMED 2026-06-18 (wrk1): clean band 98.60% all 4; tried decl-order swap (idx<base)→98.43, ED0-call-hoist-to-temp→97.30, #pragma scheduling off→97.30, scheduling on→97.30. All regress. Two divergences: P1 base via r0 (mr r0,r3;…;mr r27,r0 vs target mr r27,r3) + P2 idx/base saved-reg swap (target idx→r27/base→r28, ours keeps idx→r28/base→r27). Regional recoloring — WALL. Also tried no-temp-rmw-base-color (inline fn_80119F10 into statusGetStatus 1st arg, templess): 98.60→95.84 — removing the named base lets CW reorder the calls (ED0 before F10), breaking the E90→F10→ED0 order target needs. Root cause is call-arg SCHEDULING (base committed to r27 vs parked in r0 across the nested ED0 call), not array-base coloring; the gs_gfx lever does not transfer. True WALL. |
 | `fn_8021C0F4` / `fn_8021C308` / `fn_80212D6C` / `fn_8020DAD0` | colosseum_script.c ×3, colosseum_event.c | **DIV-IDIOM wall** (new class): CW 1.3 -O4 reciprocal-multiplies constant `/N`,`%N` and 3-instr `/2`; target uses real `divw`/`mullw` and 2-instr `srawi;addze` | 97.44 / 92.96 / 90.9 / 95.0 | no (C active) | Wave1-A 2026-06-10: not reachable at this opt level; cousin of the fn_8019C128 div-magic wall. |
 | `fn_80222ADC` / `fn_80228DAC` / `fn_8020E7AC` / `fn_8020E95C` / `fn_80227C40` / `fn_8023F8C0` | colosseum_script/event | W1 saved-band tie-break (fn_8023F8C0 = void-pseudo-register; real signature regresses) | 99.63 / 99.18 / 96.44 / 89.6 / 88.3 / 88.4 | no (C active) | Wave1-A sweep 2026-06-10. |
 | `fn_8020BFA0` / `fn_80211A78` / `fn_802077D4` | colosseum_event.c | W2 call-arg slot interleave / branch-shape / W3 stmw (body matches) | 95.15 / 98.45 / 87.9 | no (C active) | Wave1-A sweep 2026-06-10. |
@@ -581,3 +581,14 @@ worker reg-alloc cracks. See `tools/decomp_work/coordination/why_diff_retriage_j
   (`u8 bVar1` lever tested and regressed to 95.97 — the masked value is not bVar1).
 - `fn_80034DC0` (gs_npc_event.c, 95.27%): SCHEDULE class (`li r6,0x3CC8` hoist,
   5 same-insn blocks) -> routed to the permuter pragma sweep, not a worker.
+- `fn_8011A6D4` / `fn_8011A860` / `fn_8011ACB4` / `fn_8011AE40` (gs_field_world.c,
+  98.74%, wrk2/OPUS-2 2026-06-18): validate-then-act sudoku cluster. Cracked the
+  tail region 95.61->98.74 via lever `tail-call-inversion-u32-return-raw` (invert
+  `if(p!=NULL)act(p);return K` -> `if(p==NULL)return K;return act(p)` + retype the
+  tail-callee extern u16/u8 -> u32 so the raw return flows without clrlwi). RESIDUAL
+  WALL = two reg-alloc/scheduling artifacts: (1) block-1 base-save buffers through r0
+  (`mr r0,r3;mr r3,r31;mr r28,r0` vs target `mr r28,r3;mr r3,r31`) — scheduling,
+  block-2 with identical C does it right; scheduling-off fixes it but reorders the
+  prologue. (2) block-2 idx/base saved-reg coloring swap (target idx=r28/base=r29,
+  CW coalesces base=r28 across both blocks). 6 source levers tried (separate-vars,
+  hoist-ED0, scheduling-off, inline-arg1, decl-order-swap, peephole-off) ALL regress.

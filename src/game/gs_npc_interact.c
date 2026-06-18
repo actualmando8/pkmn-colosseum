@@ -2005,16 +2005,19 @@ void fn_8000FE38(u8* arg1) {
         *(s32*)(arg1 + 0x80) = flag_val;
     }
     if ((u8)fn_801F18DC(0) != 0) {
-        if ((u8)fn_801F1700(0) == 1 && (u8)fn_80265924() == 1) {
-            flag = 1;
-        } else if ((u16)fn_801EF634() == 1) {
-            flag = 1;
-        } else {
-            flag = 0;
+        if ((u8)fn_801F1700(0) == 1) {
+            if ((u8)fn_80265924() == 1) {
+                flag = 1;
+                goto got_flag;
+            }
         }
-    } else {
-        flag = 0;
+        if ((u16)fn_801EF634() == 1) {
+            flag = 1;
+            goto got_flag;
+        }
     }
+    flag = 0;
+got_flag:
     if (flag) {
         arg1[0x98] = 1;
         arg1[0x99] = 1;
@@ -2150,15 +2153,20 @@ asm void fn_80010588(void) {
 #pragma push
 #pragma peephole off
 void fn_80010588(u8* arg1, u8* arg2) {
-    extern void* fn_80103FE4(u8* a);
+    typedef struct {
+        u32 unk_00;
+        u32 value;
+        u32 unk_08;
+    } NpcInteractEntry;
+    extern NpcInteractEntry* fn_80103FE4(u8* a);
     extern void* fn_801040A0(u8* a);
     extern void fn_800FB680(s32 a, s32 b, s32 c, u32 d);
-    void* participant;
+    NpcInteractEntry* participant;
     void* npc_data;
     s32 idx;
     s16 npc_id;
-    u8* entry;
-    s32 result;
+    s32 offset;
+    u32 result;
     participant = fn_80103FE4(arg1);
     npc_data = fn_801040A0(arg1);
     npc_id = *(s16*)(arg2 + 6);
@@ -2181,11 +2189,12 @@ void fn_80010588(u8* arg1, u8* arg2) {
         fn_801040F0(0, 0, arg1, 0x49, 0);
         fn_801040F0(0, 0, arg1, 0x4A, 0);
     }
-    entry = (u8*)participant + idx * 0xc;
-    if (*(u32*)(entry + 4) != 0) {
-        fn_80132A38(0x37, *(u32*)(entry + 4));
-        result = (s32)menuSubCalcColor(arg1, arg2);
-        fn_800FB680(0, 0, result, 0xE7);
+    offset = idx * 0xc;
+    participant = (NpcInteractEntry*)((u32)participant + offset);
+    result = participant->value;
+    if (result != 0) {
+        fn_80132A38(0x37, result);
+        fn_800FB680(0, 0, (s32)menuSubCalcColor(arg1, arg2), 0xE7);
     }
 }
 #pragma pop
