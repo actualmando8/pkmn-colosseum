@@ -583,7 +583,7 @@ typedef s32 (*PeopleCmpFn)(u8* a, u8* b);
 extern void* sndBSearch(u8* key, u8* base, s32 count, u32 size, PeopleCmpFn cmp);
 extern u8 lbl_8043D6F8[];
 extern u32 lbl_8047AF98;
-extern u8 lbl_8047AF90[];
+extern u8 lbl_8047AF90[8];  /* true .sbss size 0x8 -> @sda21 (was unsized [] => band mis-measured 96.57%) */
 extern u8 lbl_8043DEF8[];
 extern u32 lbl_8047AF9C;
 extern u32 lbl_8047AF8C;
