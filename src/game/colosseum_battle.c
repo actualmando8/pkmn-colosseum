@@ -38210,22 +38210,33 @@ u32 fn_802613D4(u32 r3)
 int fn_802614B4(void)
 
 {
-    extern int fn_801F2B5C();
-  u32 uVar1;
-  u8 local_18;
-  u8 local_17;
-  u16 local_16;
-  u32 local_10;
-  
-  local_18 = 0;
-  local_17 = 0;
-  local_16 = 0;
-  local_10 = 0;
-  fn_801F2B5C(0,0x8026184c,&local_18,0);
-  uVar1 = (u32)local_16;
-  local_16 = 0;
-  fn_801F37B0(0,0x80261708,&local_18,0);
-  return uVar1 * 0x78 + (u32)local_16 * 0x7c + 0x48;
+    typedef struct BattleScanContext {
+        u8 collectEntries;
+        u8 consumeEntries;
+        u16 count;
+        u8 *entries;
+        u8 *nextEntry;
+    } BattleScanContext;
+    typedef u32 (*BattleScanCallback)(u32, u32, char *);
+    extern void fn_801F2B5C(u32, BattleScanCallback, void *, u32);
+    extern void fn_801F37B0(u32, BattleScanCallback, void *, u32);
+    extern u32 fn_80261708(u32, u32, char *);
+    extern u32 fn_8026184C(u32, u32, char *);
+    BattleScanContext scan;
+    u16 firstCount;
+    int total;
+
+    scan.collectEntries = 0;
+    scan.consumeEntries = 0;
+    scan.count = 0;
+    scan.nextEntry = 0;
+    fn_801F2B5C(0, fn_8026184C, &scan, 0);
+    firstCount = scan.count;
+    scan.count = 0;
+    fn_801F37B0(0, fn_80261708, &scan, 0);
+    total = firstCount * 0x78;
+    total += scan.count * 0x7C;
+    return total + 0x48;
 }
 
 /* Address: 0x8026153C | Size: 0xB8 | Ghidra import */
