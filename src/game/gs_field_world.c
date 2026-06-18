@@ -15620,36 +15620,28 @@ void fn_80125314(u8* ptr, u32 arg2) {
 /* 0x80125390 | 0x94 */
 #pragma push
 #pragma opt_propagation off
-#if 1
+#if 0
 asm void fn_80125390(void) {
 #include "src/game/gs_field_world_fn_80125390.inc"
 }
 #else
+/* w_sg2 2026-06-18: 100% byte-exact. Levers: inline a/b halves (correct emission order)
+   + `eight` as a named temp (forces shared register for the `^8` xor and the `8<<n` slw)
+   + declare `eight` BEFORE `lb` so it claims r3 (b's freed reg) while lb takes a fresh r6. */
 u32 fn_80125390(void* ctx) {
     extern u32 fn_8012640C(void* a, u32 b, u32 c, u32 d);
     u32 a;      /* r31 */
     u32 b;
-    u32 s;
-    u32 lo_a;
-    u32 hi_a;
-    u32 hi_b;
-    u32 lo_b;
-    u32 eight;  /* materialized once: xor operand AND slw operand */
+    u32 eight;  /* declared BEFORE lb so it claims r3 (b's freed reg); lb -> r6 */
+    u32 lb;
     if (ctx == NULL) {
         return 0;
     }
     a = fn_8012640C(ctx, 0, 0x75, 0);
     b = fn_8012640C(ctx, 0, 0x6F, 0);
-    lo_a = a & 0xFFFF;
-    hi_a = a >> 16;
-    hi_b = b >> 16;
-    lo_b = b & 0xFFFF;
-    s = hi_a ^ lo_a;
     eight = 8;
-    s = hi_b ^ s;
-    s = lo_b ^ s;
-    s = eight ^ s;
-    return (u32)(eight << __cntlzw(s)) >> 31;
+    lb = b & 0xFFFF;
+    return (u32)(eight << __cntlzw((a >> 16) ^ (a & 0xFFFF) ^ (b >> 16) ^ lb ^ eight)) >> 31;
 }
 #endif
 #pragma pop

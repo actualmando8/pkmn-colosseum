@@ -68,14 +68,16 @@ void fn_8019C6EC(u32 flags) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern u32 lbl_8047B294;
-#if 1
+extern volatile s32 lbl_8047B294;
+#if 0
 asm void fn_8019C6FC(void) {
 #include "src/hsd/hsd_initialize_fn_8019C6FC.inc"
 }
 #else
 void fn_8019C6FC(void) {
-    /* TODO: match -- 12 bytes at 0x8019C6FC -- sets CR0 to (lbl_8047B294 == 3), no r3 return */
+    if (lbl_8047B294 == HSD_RP_OFFSCREEN) {
+        return;
+    }
 }
 #endif
 #pragma pop
@@ -89,7 +91,7 @@ extern void fn_800BD07C(u32 a, u32 b);
 extern void fn_800B856C(void);
 extern void fn_800BB29C(void);
 extern u8 lbl_80466BC0[];
-extern u32 lbl_8047B294;
+extern volatile s32 lbl_8047B294;
 extern u32 lbl_80478C78;
 extern u32 lbl_8047B27C;
 #if 1
@@ -130,7 +132,7 @@ void fn_8019C708(u32 arg) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern u32 lbl_8047B294;
+extern volatile s32 lbl_8047B294;
 #if 0
 asm void fn_8019C7B0(void) {
 #include "src/hsd/hsd_initialize_fn_8019C7B0.inc"
