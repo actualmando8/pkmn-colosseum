@@ -370,6 +370,7 @@ extern u8    fn_801096F8(u8 val);
 extern u32   fn_800D3088(void);
 extern u8    lbl_80404B68[];  /* scratch table for fn_80107F38, fn_801081F8 */
 extern u8    lbl_80404B8C[];  /* scratch table for fn_801080CC */
+extern u8    lbl_8047AD10;     /* resource request gate byte (sda21) — authoritative decl, use as-is */
 
 /* 0x801019F8 | 0x30 */
 void fn_801019F8(void) {
@@ -1241,7 +1242,12 @@ void fn_80105E7C(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_80105FB0(void) {
-    /* TODO: match -- 72 bytes at 0x80105FB0 */
+#pragma peephole off
+#pragma scheduling off
+    if ((u8)fn_80102620(0x10C)) {
+        fn_80102568((void*)0x10C, 2, 0);
+    }
+    lbl_8047AD10 = 0;
 }
 #pragma pop
 
