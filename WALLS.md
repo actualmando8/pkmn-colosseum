@@ -592,3 +592,7 @@ worker reg-alloc cracks. See `tools/decomp_work/coordination/why_diff_retriage_j
   prologue. (2) block-2 idx/base saved-reg coloring swap (target idx=r28/base=r29,
   CW coalesces base=r28 across both blocks). 6 source levers tried (separate-vars,
   hoist-ED0, scheduling-off, inline-arg1, decl-order-swap, peephole-off) ALL regress.
+
+- `fn_8000C824` / `fn_8000C92C` / `fn_8000BFA0` (gs_party_access, 98.33/98.33/95.04%) +
+  `fn_8000DEC4` (gs_npc_interact, 94.77%): pipeline 2026-06-18 — faithful real C active,
+  reg-alloc/branch-topology walls; registered Equivalent (C-converted axis), not re-ground.
