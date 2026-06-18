@@ -199,7 +199,7 @@ extern void  fn_800B9404(u32 index, u32 param);
 extern void  fn_800B8DF4(void);
 extern void  fn_800B856C(void);
 extern void  fn_800EF5A4(void* model);
-extern void  fn_800D9B58(u32 param);
+extern void  fn_800D9B58(f32 a, f32 b, f32 c, f32 d);
 extern void  fn_800D9ED8(u32 param);
 
 /* Camera */
@@ -338,9 +338,9 @@ extern void  DCFlushRange(void* ptr, u32 size);
 /* _pachiruEffectCreateTexture__FP9GStextureP9GStextureUl: _billboardTransformMain (0x2DC bytes) */
 extern void fn_800E008C(void);
 extern void fn_800D6728(void);
-extern void fn_800D85D4(void);
+extern void fn_800D85D4(u32 a, void* b);
 extern void fn_800E0BA0(void);
-extern void fn_800D59B8(void);
+extern void fn_800D59B8(u32 a, f32 b, f32 c);
 extern void fn_800D7E5C(void);
 extern u32 lbl_8047D148;
 extern u32 lbl_8047D14C;
@@ -401,9 +401,9 @@ extern u32 fn_8013E470(void* ptr, u32 delta);
 extern u32 fn_8013E54C(void* ptr);
 extern u32  fn_8013E5AC(u8* p);
 extern u32 auraEffectStart(void* ptr);
-extern void fn_8013E6C4(void);
+extern u32 fn_8013E6C4(u8* ptr);
 extern void fn_8013E8A4(void);
-extern void fn_8013EA44(void);
+extern void fn_8013EA44();
 extern u32 fn_8013F078(void* ptr);
 extern void fn_8013F114(void);
 extern u16 distortionEffectStart(void);
@@ -1802,8 +1802,52 @@ extern u32 lbl_8047D2B0;
 extern u32 lbl_8047D2B4;
 extern u32 lbl_8047D2A8;
 #if 1
-asm void fn_8013E6C4(void) {
-#include "src/game/effect/effect_visual_fn_8013E6C4.inc"
+u32 fn_8013E6C4(u8* ptr)
+{
+    void* model;
+
+    if (ptr != NULL) {
+        model = *(void**)(ptr + 4);
+        if (model == NULL) {
+            return 0;
+        }
+        fn_8013EA44(ptr);
+        fn_800D9B58(*(f32*)&lbl_8047D2AC, *(f32*)&lbl_8047D2AC,
+                    *(f32*)&lbl_8047D2B0, *(f32*)&lbl_8047D2B4);
+        if (ptr[0x19] & 4) {
+            fn_800DA4C4(1, 6, 7);
+        } else {
+            fn_800DA4C4(1, 6, 1);
+        }
+        fn_800DA1E8(0, 7, 0);
+        fn_800DA2BC(1, 1, 0);
+        fn_800DA028(0);
+        fn_800D88DC(3);
+        fn_800D888C(4);
+        fn_800D7820(lbl_80314AE8);
+        fn_800D6A00(4);
+        fn_800D85D4(0, model);
+        fn_800D67BC(4);
+        fn_800D6680(*(f32*)&lbl_8047D2AC, *(f32*)&lbl_8047D2AC,
+                    *(f32*)&lbl_8047D2AC);
+        fn_800D5CB8(0, ptr[8], ptr[9], ptr[0xA], ptr[0xB]);
+        fn_800D59B8(0, *(f32*)&lbl_8047D2AC, *(f32*)&lbl_8047D2AC);
+        fn_800D6680(*(f32*)&lbl_8047D2B0, *(f32*)&lbl_8047D2AC,
+                    *(f32*)&lbl_8047D2AC);
+        fn_800D5CB8(0, ptr[8], ptr[9], ptr[0xA], ptr[0xB]);
+        fn_800D59B8(0, *(f32*)&lbl_8047D2A8, *(f32*)&lbl_8047D2AC);
+        fn_800D6680(*(f32*)&lbl_8047D2AC, *(f32*)&lbl_8047D2B4,
+                    *(f32*)&lbl_8047D2AC);
+        fn_800D5CB8(0, ptr[8], ptr[9], ptr[0xA], ptr[0xB]);
+        fn_800D59B8(0, *(f32*)&lbl_8047D2AC, *(f32*)&lbl_8047D2A8);
+        fn_800D6680(*(f32*)&lbl_8047D2B0, *(f32*)&lbl_8047D2B4,
+                    *(f32*)&lbl_8047D2AC);
+        fn_800D5CB8(0, ptr[8], ptr[9], ptr[0xA], ptr[0xB]);
+        fn_800D59B8(0, *(f32*)&lbl_8047D2A8, *(f32*)&lbl_8047D2A8);
+        fn_800D6728();
+        return 1;
+    }
+    return 0;
 }
 #else
 void fn_8013E6C4(void) { /* TODO */ }
