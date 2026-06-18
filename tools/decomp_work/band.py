@@ -227,6 +227,22 @@ def cmd_init(tag, srcname, config_from=None):
 
 
 STATUS_LOG = ROOT / "tools" / "decomp_work" / "coordination" / "status.md"
+EQUIV_FILE = HERE / "equivalent.txt"
+
+
+def _equivalent_fns():
+    """Functions registered in equivalent.txt (faithful real C, confirmed
+    C-uncontrollable wall). Agents must NOT spend attempts re-checking these —
+    band sections drops them and band check warns/skips. Returns a set of names."""
+    out = set()
+    try:
+        for line in EQUIV_FILE.read_text(encoding="utf-8", errors="replace").splitlines():
+            name = line.split("#", 1)[0].strip()
+            if name.startswith("fn_") or (name and not name.startswith("#")):
+                out.add(name)
+    except OSError:
+        pass
+    return out
 
 
 def _log_attempt(tag, fn, pct, src):
@@ -247,9 +263,13 @@ def _log_attempt(tag, fn, pct, src):
 def cmd_check(tag, fns):
     st = compile_band(tag)
     rows = _rows(tag, st)
+    equiv = _equivalent_fns()
     exact = sum(1 for v in rows.values() if v >= 100.0 - 1e-6)
     print(f"compile OK; {exact}/{len(rows)} byte-exact in scratch object")
     for fn in (fns or sorted(rows)):
+        if fn in equiv:
+            print(f"  {fn}  EQUIVALENT (already registered real C, confirmed wall) — SKIP, do not grind")
+            continue
         if fn in rows:
             mark = "MATCH" if rows[fn] >= 100.0 - 1e-6 else ""
             print(f"  {fn}  {rows[fn]:.2f}%  {mark}")
@@ -413,7 +433,14 @@ def cmd_sections(srcname, nbands):
     # Drop active asm-wrappers: they are byte-exact in ROM (sub-100% = reloc-name
     # artifacts only). Agents must not spend attempts on them.
     asm = active_asm_fns(src_path, {x["name"] for x in near})
-    pool = [x["name"] for x in near if x["name"] not in asm]
+    # Drop equivalent.txt fns: faithful real C, confirmed walls — already counted on
+    # the C-converted axis; re-grinding them is wasted attempts.
+    equiv = _equivalent_fns()
+    skipped_eq = [x["name"] for x in near if x["name"] in equiv and x["name"] not in asm]
+    pool = [x["name"] for x in near if x["name"] not in asm and x["name"] not in equiv]
+    if skipped_eq:
+        print(f"# skipping {len(skipped_eq)} Equivalent-registered fn(s) (already real C, hard-skip): "
+              + " ".join(sorted(skipped_eq)))
 
     if not pool:
         print(f"{rel}: all {len(funcs)} fn(s) byte-exact or active asm-wrapper "
