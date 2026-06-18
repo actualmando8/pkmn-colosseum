@@ -2602,11 +2602,11 @@ extern void cameraWaitSyncAnime(void);
 extern f32 sin(f32);
 extern f32 cos(f32);
 extern f32 lbl_8047B930;
-extern u8 lbl_8047A3D4[];
-extern u8 lbl_8047A3D0[];
-extern u8 lbl_8047A3CC[];
-extern u8 lbl_8047A3C8[];
-extern u8 lbl_8047A3C4[];
+extern u8 lbl_8047A3D4[4];
+extern u8 lbl_8047A3D0[4];
+extern u8 lbl_8047A3CC[4];
+extern u8 lbl_8047A3C8[4];
+extern u8 lbl_8047A3C4[4];
 extern u32 lbl_8047A3C0;
 extern u32 lbl_8047A3BC;
 extern u32 lbl_8047A3B8;
@@ -2651,11 +2651,11 @@ s32 fn_800281F4(u16 *existing_name, u8 *name_buf_in, void *arg2, void *arg3, s32
 
     /* lbl_* globals accessed in this function */
     extern f32  lbl_8047B930;       /* float constant 0.0f (stfs source)            */
-    extern u8 lbl_8047A3D4[];  /* canonical; per-site reinterpret cast */
-    extern u8 lbl_8047A3D0[];  /* canonical; per-site reinterpret cast */
-    extern u8 lbl_8047A3CC[];  /* canonical; per-site reinterpret cast */
-    extern u8 lbl_8047A3C8[];  /* canonical; per-site reinterpret cast */
-    extern u8 lbl_8047A3C4[];  /* canonical; per-site reinterpret cast */
+    extern u8 lbl_8047A3D4[4];  /* canonical; per-site reinterpret cast */
+    extern u8 lbl_8047A3D0[4];  /* canonical; per-site reinterpret cast */
+    extern u8 lbl_8047A3CC[4];  /* canonical; per-site reinterpret cast */
+    extern u8 lbl_8047A3C8[4];  /* canonical; per-site reinterpret cast */
+    extern u8 lbl_8047A3C4[4];  /* canonical; per-site reinterpret cast */
     extern u32  lbl_8047A3C0;       /* GS name-input descriptor field               */
     extern u32  lbl_8047A3BC;       /* GS name-input descriptor field               */
     extern u32  lbl_8047A3B8;       /* GS name-input descriptor field               */

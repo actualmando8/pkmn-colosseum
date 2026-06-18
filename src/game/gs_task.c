@@ -463,11 +463,11 @@ extern void fn_800C8520(void);
 extern void fn_800FAEF8(void);
 extern void fn_801906A0(void);
 extern u32 lbl_80478F98;
-extern u8 lbl_80478838[];
+extern u8 lbl_80478838[8];
 extern u8 lbl_803A19C8[];
 extern u8 lbl_80266688[];
 extern u32 lbl_80478F9C;
-extern u8 lbl_8047B6C8[];
+extern u8 lbl_8047B6C8[3];
 #if 1
 asm void fn_80008868(void) {
 #include "src/game/gs_task_fn_80008868.inc"
@@ -476,10 +476,10 @@ asm void fn_80008868(void) {
 void fn_80008868(void) {
     extern u8 lbl_80266688[];
     extern u8 lbl_803A19C8[];
-    extern u8 lbl_80478838[];
+    extern u8 lbl_80478838[8];
     extern u32 lbl_80478F98;
     extern u32 lbl_80478F9C;
-    extern u8 lbl_8047B6C8[];
+    extern u8 lbl_8047B6C8[3];
     extern void fn_8001E4B4();
     extern void fn_8001EA98();
     extern void fn_8005D9E4();

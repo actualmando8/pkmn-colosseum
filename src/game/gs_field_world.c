@@ -3542,7 +3542,7 @@ void GSfield_ObjectBatchUpdate(void) {
  * interaction zones, item pickups, etc.).
  * ================================================================== */
 void GSfield_ProcessTriggers(void) {
-    extern u8 lbl_80478AC0[];
+    extern u8 lbl_80478AC0[4];
     extern f32 lbl_8047D030;
     extern f32 lbl_8047D034;
     extern f32 lbl_8047D038;
@@ -12654,16 +12654,16 @@ u16 fn_8011F228(void* ctx, u32 p1) {
     return *(u16*)result;
 }
 /* 0x8011F260 | 0x1FC */
-extern u8 lbl_80478B58[];
-extern u8 lbl_80478B5C[];
+extern u8 lbl_80478B58[4];
+extern u8 lbl_80478B5C[4];
 #if 1
 asm void fn_8011F260(void) {
 #include "src/game/gs_field_world_fn_8011F260.inc"
 }
 #else
 void fn_8011F260(void) {
-    extern u8 lbl_80478B58[];
-    extern u8 lbl_80478B5C[];
+    extern u8 lbl_80478B58[4];
+    extern u8 lbl_80478B5C[4];
     extern void fn_8011F77C();
     u32 r0 = 0;
     u32 r3 = 0;
@@ -16511,14 +16511,14 @@ void* fn_80128E2C(void) {
 extern void fn_8013528C(void);
 extern void fn_800F9D04(void);
 extern void fn_80135030(void);
-extern u8 lbl_8047D028[];
+extern u8 lbl_8047D028[8];
 #if 1
 asm void fn_80128E38(void) {
 #include "src/game/gs_field_world_fn_80128E38.inc"
 }
 #else
 void fn_80128E38(u8* arg1, u8* arg2) {
-    extern u8 lbl_8047D028[];
+    extern u8 lbl_8047D028[8];
     extern u32 fn_800057A0(void);
     extern void fn_800F9D04(u8* dst, u8* src);
     extern void* fn_80128DEC(void* ptr);
@@ -17815,7 +17815,7 @@ extern f32 lbl_8047D038;
 extern f64 lbl_8047D048;
 extern f64 lbl_8047D050;
 extern f64 lbl_8047D058;
-extern u8 lbl_80478AC0[];
+extern u8 lbl_80478AC0[4];
 extern f32 lbl_8047D060;
 #if 1
 asm void fn_8012B19C(void) {
@@ -17823,7 +17823,7 @@ asm void fn_8012B19C(void) {
 }
 #else
 void fn_8012B19C(void) {
-    extern u8 lbl_80478AC0[];
+    extern u8 lbl_80478AC0[4];
     extern f32 lbl_8047D030;
     extern f32 lbl_8047D034;
     extern f32 lbl_8047D038;
@@ -18149,7 +18149,7 @@ asm void fn_8012B5E4(void) {
 }
 #else
 void fn_8012B5E4(void) {
-    extern u8 lbl_80478AC0[];
+    extern u8 lbl_80478AC0[4];
     extern f32 lbl_8047D030;
     extern f32 lbl_8047D034;
     extern f32 lbl_8047D038;
@@ -19523,7 +19523,7 @@ asm void fn_8012D39C(void) {
 }
 #else
 void fn_8012D39C(void) {
-    extern u8 lbl_80478AC0[];
+    extern u8 lbl_80478AC0[4];
     extern f32 lbl_8047D038;
     extern f64 lbl_8047D048;
     extern f64 lbl_8047D050;
@@ -19866,7 +19866,7 @@ asm void fn_8012D7F0(void) {
 }
 #else
 void fn_8012D7F0(void) {
-    extern u8 lbl_80478AC0[];
+    extern u8 lbl_80478AC0[4];
     extern f32 lbl_8047D030;
     extern f32 lbl_8047D034;
     extern f32 lbl_8047D038;
@@ -20352,7 +20352,7 @@ asm void fn_8012DE94(void) {
 }
 #else
 void fn_8012DE94(void) {
-    extern u8 lbl_80478AC0[];
+    extern u8 lbl_80478AC0[4];
     extern f32 lbl_8047D030;
     extern f32 lbl_8047D034;
     extern f32 lbl_8047D038;
@@ -20720,7 +20720,7 @@ asm void fn_8012E388(void) {
 }
 #else
 void fn_8012E388(void) {
-    extern u8 lbl_80478AC0[];
+    extern u8 lbl_80478AC0[4];
     extern f32 lbl_8047D030;
     extern f32 lbl_8047D034;
     extern f32 lbl_8047D038;
@@ -21060,7 +21060,7 @@ asm void fn_8012E7B8(void) {
 }
 #else
 void fn_8012E7B8(void) {
-    extern u8 lbl_80478AC0[];
+    extern u8 lbl_80478AC0[4];
     extern f32 lbl_8047D030;
     extern f32 lbl_8047D034;
     extern f32 lbl_8047D038;
@@ -26277,7 +26277,7 @@ asm void fn_8012CA84(void) {
 /* FUNCTIONAL decomp of fn_8012CA84
  * Field movement/heading processor — computes turn amount from direction input. */
 void fn_8012CA84(s32 playerIdx, f32* dirVec, f32* fwdVec) {
-    extern u8 lbl_80478AC0[];       /* sdata constant 0.0f */
+    extern u8 lbl_80478AC0[4];       /* sdata constant 0.0f */
     extern f32 lbl_8047D030;        /* handle pair [0] (read as u32 bits) */
     extern f32 lbl_8047D034;        /* handle pair [1] (read as u32 bits) */
     extern f32 lbl_8047D038;        /* 0.0f */

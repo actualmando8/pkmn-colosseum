@@ -3127,7 +3127,7 @@ extern u8 lbl_802E543C[];
 extern u8 lbl_80267180[];
 extern u32 lbl_8047BC9C;
 extern u32 lbl_8047BCCC;
-extern u8 lbl_804788D4[];
+extern u8 lbl_804788D4[4];
 extern f64 lbl_8047BCB0;
 #if 1
 asm void fn_80040308(void) {
@@ -3777,7 +3777,7 @@ extern f32 lbl_8047BC94;
 extern u32 lbl_8047BD50;
 extern u32 lbl_8047BD58;
 extern u32 lbl_8047BD60;
-extern u8 lbl_80478AC0[];
+extern u8 lbl_80478AC0[4];
 extern u32 lbl_8047BD68;
 extern u32 lbl_8047BD18;
 extern u8 lbl_802E5418[];
@@ -4117,8 +4117,8 @@ extern u32 lbl_8047BDA0;
 extern u32 lbl_8047BDF8;
 extern u32 lbl_8047BDF4;
 extern u32 lbl_8047BDA8;
-extern u8 lbl_8047A4FC[];
-extern u8 lbl_8047A4F8[];
+extern u8 lbl_8047A4FC[4];
+extern u8 lbl_8047A4F8[4];
 extern u32 lbl_8047BDFC;
 extern u32 lbl_8047BE00;
 #if 1

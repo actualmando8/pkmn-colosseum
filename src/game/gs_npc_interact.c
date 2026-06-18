@@ -1872,7 +1872,7 @@ extern u32 lbl_8047B710;
 extern u32 lbl_8047B700;
 extern u32 lbl_8047B704;
 extern u32 lbl_8047B708;
-extern u8 lbl_8047885C[];
+extern u8 lbl_8047885C[4];
 #if 1
 asm void fn_8000ED34(void) {
 #include "src/game/gs_npc_interact_fn_8000ED34.inc"
@@ -1935,7 +1935,7 @@ extern u32 lbl_8047B710;
 extern u32 lbl_8047B700;
 extern u32 lbl_8047B704;
 extern u32 lbl_8047B708;
-extern u8 lbl_80478858[];
+extern u8 lbl_80478858[4];
 #if 1
 asm void fn_8000F964(void) {
 #include "src/game/gs_npc_interact_fn_8000F964.inc"
@@ -2279,7 +2279,7 @@ void fn_80010844(void) { /* TODO */ }
 #endif
 
 /* fn_800109A0 - 0x800109A0 | size: 0x190 */
-extern u8 lbl_80478850[];
+extern u8 lbl_80478850[8];
 #if 1
 asm void fn_800109A0(void) {
 #include "src/game/gs_npc_interact_fn_800109A0.inc"

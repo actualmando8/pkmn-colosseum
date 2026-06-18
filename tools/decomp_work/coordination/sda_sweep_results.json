@@ -1,0 +1,281 @@
+[
+ {
+  "file": "src/hsd/hsd_jobj_display.c",
+  "verdict": "SKIP",
+  "applied": "baseline compile failed",
+  "fns": []
+ },
+ {
+  "file": "src/game/gs_field_world.c",
+  "verdict": "KEEP",
+  "applied": "sized 16 extern(s) in src/game/gs_field_world.c",
+  "fns": [
+   [
+    "fn_8011F260",
+    98.11,
+    100.0
+   ]
+  ]
+ },
+ {
+  "file": "src/game/gs_worldmap.c",
+  "verdict": "KEEP",
+  "applied": "sized 10 extern(s) in src/game/gs_worldmap.c",
+  "fns": [
+   [
+    "fn_800281F4",
+    95.54,
+    99.59
+   ]
+  ]
+ },
+ {
+  "file": "src/game/battle/battle_logic.c",
+  "verdict": "REVERT-REGRESS",
+  "applied": "sized 8 extern(s) in src/game/battle/battle_logic.c",
+  "fns": [
+   [
+    "fn_801E189C",
+    38.97,
+    38.91
+   ]
+  ]
+ },
+ {
+  "file": "src/hsd/hsd_render.c",
+  "verdict": "KEEP",
+  "applied": "sized 8 extern(s) in src/hsd/hsd_render.c",
+  "fns": [
+   [
+    "fn_80197400",
+    62.17,
+    73.64
+   ],
+   [
+    "fn_801974A8",
+    53.52,
+    57.84
+   ]
+  ]
+ },
+ {
+  "file": "src/crt/extras.c",
+  "verdict": "REVERT-NOCHANGE",
+  "applied": "sized 5 extern(s) in src/crt/extras.c",
+  "fns": []
+ },
+ {
+  "file": "src/game/colosseum_event.c",
+  "verdict": "REVERT-REGRESS",
+  "applied": "sized 4 extern(s) in src/game/colosseum_event.c",
+  "fns": [
+   [
+    "fn_8020A080",
+    100.0,
+    81.67
+   ],
+   [
+    "fn_8020A500",
+    100.0,
+    89.06
+   ],
+   [
+    "fn_8020A540",
+    100.0,
+    89.06
+   ],
+   [
+    "fn_8020A580",
+    100.0,
+    89.06
+   ]
+  ]
+ },
+ {
+  "file": "src/game/gs_dvd.c",
+  "verdict": "REVERT-NOCHANGE",
+  "applied": "sized 4 extern(s) in src/game/gs_dvd.c",
+  "fns": []
+ },
+ {
+  "file": "src/game/gs_task.c",
+  "verdict": "KEEP",
+  "applied": "sized 4 extern(s) in src/game/gs_task.c",
+  "fns": [
+   [
+    "fn_80008868",
+    98.54,
+    99.76
+   ],
+   [
+    "fn_80008C40",
+    99.64,
+    100.0
+   ]
+  ]
+ },
+ {
+  "file": "src/game/scene_init.c",
+  "verdict": "KEEP",
+  "applied": "sized 4 extern(s) in src/game/scene_init.c",
+  "fns": [
+   [
+    "fn_80040308",
+    97.73,
+    97.8
+   ],
+   [
+    "fn_8004B7EC",
+    96.77,
+    97.09
+   ]
+  ]
+ },
+ {
+  "file": "src/game/colosseum_script.c",
+  "verdict": "KEEP",
+  "applied": "sized 3 extern(s) in src/game/colosseum_script.c",
+  "fns": [
+   [
+    "fn_80213270",
+    84.78,
+    85.27
+   ],
+   [
+    "fn_80216A58",
+    71.43,
+    74.38
+   ]
+  ]
+ },
+ {
+  "file": "src/game/gs_npc_interact.c",
+  "verdict": "KEEP",
+  "applied": "sized 3 extern(s) in src/game/gs_npc_interact.c",
+  "fns": [
+   [
+    "fn_8000ED34",
+    96.64,
+    98.4
+   ],
+   [
+    "fn_8000F964",
+    96.0,
+    97.89
+   ],
+   [
+    "fn_800109A0",
+    98.8,
+    100.0
+   ]
+  ]
+ },
+ {
+  "file": "src/game/effect/effect_visual.c",
+  "verdict": "REVERT-NOCHANGE",
+  "applied": "sized 3 extern(s) in src/game/effect/effect_visual.c",
+  "fns": []
+ },
+ {
+  "file": "src/game/gs_particle.c",
+  "verdict": "REVERT-NOCHANGE",
+  "applied": "sized 2 extern(s) in src/game/gs_particle.c",
+  "fns": []
+ },
+ {
+  "file": "src/game/gs_render.c",
+  "verdict": "REVERT-NOCHANGE",
+  "applied": "sized 2 extern(s) in src/game/gs_render.c",
+  "fns": []
+ },
+ {
+  "file": "src/game/gs_title.c",
+  "verdict": "KEEP",
+  "applied": "sized 2 extern(s) in src/game/gs_title.c",
+  "fns": [
+   [
+    "fn_80022478",
+    35.34,
+    35.87
+   ]
+  ]
+ },
+ {
+  "file": "src/game/effect/effect_util.c",
+  "verdict": "SKIP",
+  "applied": "baseline compile failed",
+  "fns": []
+ },
+ {
+  "file": "src/hsd/hsd_fog.c",
+  "verdict": "KEEP",
+  "applied": "sized 2 extern(s) in src/hsd/hsd_fog.c",
+  "fns": [
+   [
+    "fn_8019BB78",
+    61.33,
+    69.09
+   ]
+  ]
+ },
+ {
+  "file": "src/dolphin/dvd/DVDFs.c",
+  "verdict": "REVERT-NOCHANGE",
+  "applied": "sized 1 extern(s) in src/dolphin/dvd/DVDFs.c",
+  "fns": []
+ },
+ {
+  "file": "src/game/gs_model.c",
+  "verdict": "REVERT-NOCHANGE",
+  "applied": "sized 1 extern(s) in src/game/gs_model.c",
+  "fns": []
+ },
+ {
+  "file": "src/game/gs_pcbox.c",
+  "verdict": "SKIP",
+  "applied": "baseline compile failed",
+  "fns": []
+ },
+ {
+  "file": "src/game/gs_thread.c",
+  "verdict": "REVERT-REGRESS",
+  "applied": "sized 1 extern(s) in src/game/gs_thread.c",
+  "fns": [
+   [
+    "fn_800F16C0",
+    70.38,
+    70.15
+   ]
+  ]
+ },
+ {
+  "file": "src/game/battle/battle_scene.c",
+  "verdict": "REVERT-NOCHANGE",
+  "applied": "sized 1 extern(s) in src/game/battle/battle_scene.c",
+  "fns": []
+ },
+ {
+  "file": "src/game/menu/menu_precine.c",
+  "verdict": "REVERT-NOCHANGE",
+  "applied": "sized 1 extern(s) in src/game/menu/menu_precine.c",
+  "fns": []
+ },
+ {
+  "file": "src/game/people/people.c",
+  "verdict": "REVERT-NOCHANGE",
+  "applied": "sized 1 extern(s) in src/game/people/people.c",
+  "fns": []
+ },
+ {
+  "file": "src/hsd/hsd_jobj.c",
+  "verdict": "REVERT-NOCHANGE",
+  "applied": "sized 1 extern(s) in src/hsd/hsd_jobj.c",
+  "fns": []
+ },
+ {
+  "file": "src/hsd/hsd_state.c",
+  "verdict": "REVERT-NOCHANGE",
+  "applied": "sized 1 extern(s) in src/hsd/hsd_state.c",
+  "fns": []
+ }
+]

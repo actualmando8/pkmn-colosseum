@@ -75,10 +75,10 @@ void fn_80197400(void) {
     extern u32 lbl_80478C64;
     extern u32 lbl_80478C68;
     extern u32 lbl_80478C6C;
-    extern u8 lbl_8047B24C[];
-    extern u8 lbl_8047B250[];
+    extern u8 lbl_8047B24C[4];
+    extern u8 lbl_8047B250[4];
     extern u32 lbl_8047B254;
-    extern u8 lbl_8047B258[];
+    extern u8 lbl_8047B258[4];
     extern u32 lbl_8047B25C;
     extern void HSD_MtxFree();
     extern void HSD_ObjFree();
@@ -135,10 +135,10 @@ void fn_801974A8(void) {
     extern u32 lbl_80478C64;
     extern u32 lbl_80478C68;
     extern u32 lbl_80478C6C;
-    extern u8 lbl_8047B24C[];
-    extern u8 lbl_8047B250[];
+    extern u8 lbl_8047B24C[4];
+    extern u8 lbl_8047B250[4];
     extern u32 lbl_8047B254;
-    extern u8 lbl_8047B258[];
+    extern u8 lbl_8047B258[4];
     extern u32 lbl_8047B25C;
     extern void HSD_CObjGetCurrent();
     extern void HSD_MtxFree();
@@ -327,8 +327,8 @@ void fn_80197784(void) {
     extern u32 lbl_8047B244;
     extern u32 lbl_8047B254;
     extern u32 lbl_8047B25C;
-    extern u8 lbl_8047D9E0[];
-    extern u8 lbl_8047D9E8[];
+    extern u8 lbl_8047D9E0[7];
+    extern u8 lbl_8047D9E8[5];
     extern void fn_800A2D64();
     extern void HSD_CObjGetCurrent();
     extern void __assert();

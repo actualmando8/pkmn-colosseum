@@ -18219,7 +18219,7 @@ void fn_80213270(void)
     extern void fn_80261B68();
     extern void fn_80261E7C();
     extern void fn_8026246C();
-    extern u8 lbl_80478D78[];
+    extern u8 lbl_80478D78[1];
     extern u32 lbl_8047B618;
   int iVar1;
   short sVar2;
@@ -20407,7 +20407,7 @@ void fn_80216A58(void)
     extern u32 fn_80205BE8();
     extern s8 fn_802062FC();
     extern s8 fn_80206A04();
-    extern u8 lbl_80478D78[];
+    extern u8 lbl_80478D78[1];
   u32 uVar1;
   u32 uVar2;
   u32 uVar3;
@@ -24394,7 +24394,7 @@ void fn_8021D224(void)
 /* 0x8021D40C | size: 0x27C | large */
 #pragma optimization_level 0
 void fn_8021D40C(void) {
-    extern u8 lbl_80478D78[];
+    extern u8 lbl_80478D78[1];
     extern u32 lbl_8047B64C;
     extern void fn_80123B5C();
     extern void fn_801F00D0();

@@ -2999,7 +2999,7 @@ extern s32 fn_80121ADC(s32, s32);
 extern s16 fn_80144574(void*, s32, s32, u16, s32);
 extern void fn_80166A50(s32, s32, s32, s32);
 extern void fn_8001D378(void);
-extern u8 lbl_80478890[];
+extern u8 lbl_80478890[8];
 extern u8 lbl_80266DB0[];
 extern u8 lbl_80266D78[];
 extern void fn_80023968(void);
@@ -3081,7 +3081,7 @@ void fn_8002217C(void) { /* TODO */ }
 
 /* fn_80022478 - 0x80022478 | size: 0x2a8 */
 extern void jumptable_802E4F00();
-extern u8 lbl_80478888[];
+extern u8 lbl_80478888[8];
 extern s32 fn_80023068(u32, u32*);
 extern void fn_800232F0(void);
 extern s32 fn_80023760(u32, u32*);
