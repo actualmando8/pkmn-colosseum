@@ -62,10 +62,20 @@ def classify(r):
     f1 = re.search(r"^\[1\] ([A-Z-]+): (.+)$", out, re.M)
     cat = f1.group(1) if f1 else "?"
     summ = f1.group(2)[:90] if f1 else ""
+    # capture the finding[1] detail block (t|/o| lines) to refine DIFFERENT-INSN
+    det = re.findall(r"^\s+([to])\| (.+)$", out, re.M)
+    tlines = " ".join(x for s, x in det if s == "t")
+    olines = " ".join(x for s, x in det if s == "o")
+    # SDA-reloc artifact: target uses r13/r2 small-data addressing (or @sda21),
+    # ours uses absolute @ha/@l -> section/reloc placement, NOT C-fixable.
+    sda = (("(r13)" in tlines or "(r2)" in tlines or "@sda21" in tlines)
+           and "(r13)" not in olines and "(r2)" not in olines)
     if our_insn >= 0 and our_insn <= 2 and tgt_insn > 10:
         bucket = "stub"
     elif cat == "MATCH":
         bucket = "reloc-wall"
+    elif cat == "DIFFERENT-INSN" and sda:
+        bucket = "reloc-wall"; summ = "SDA(r13) vs absolute: " + summ
     elif cat in ("SCHEDULE-SWAP", "REG-RENAME"):
         bucket = "permuter"
     elif cat in ("FRAME-SIZE", "SAVE-SET-DIFF", "SPILL-DIFF"):

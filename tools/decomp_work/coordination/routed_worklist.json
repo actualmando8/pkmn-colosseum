@@ -231,11 +231,11 @@
   "fn": "fn_80024DBC",
   "file": "gs_title.c",
   "src": "src/game/gs_title.c",
-  "bucket": "worker-ex",
+  "bucket": "reloc-wall",
   "cat": "DIFFERENT-INSN",
   "our_insn": 91,
   "tgt_insn": 92,
-  "why": "different instruction(s) @ target 5..6 / ours 5..6"
+  "why": "SDA(r13) vs absolute: different instruction(s) @ target 5..6 / ours 5..6"
  },
  {
   "match": 98.75,
@@ -245,11 +245,11 @@
   "fn": "fn_80024F2C",
   "file": "gs_title.c",
   "src": "src/game/gs_title.c",
-  "bucket": "worker-ex",
+  "bucket": "reloc-wall",
   "cat": "DIFFERENT-INSN",
   "our_insn": 91,
   "tgt_insn": 92,
-  "why": "different instruction(s) @ target 5..6 / ours 5..6"
+  "why": "SDA(r13) vs absolute: different instruction(s) @ target 5..6 / ours 5..6"
  },
  {
   "match": 98.75,
@@ -259,11 +259,11 @@
   "fn": "fn_8002509C",
   "file": "gs_title.c",
   "src": "src/game/gs_title.c",
-  "bucket": "worker-ex",
+  "bucket": "reloc-wall",
   "cat": "DIFFERENT-INSN",
   "our_insn": 91,
   "tgt_insn": 92,
-  "why": "different instruction(s) @ target 5..6 / ours 5..6"
+  "why": "SDA(r13) vs absolute: different instruction(s) @ target 5..6 / ours 5..6"
  },
  {
   "match": 98.75,
@@ -273,11 +273,11 @@
   "fn": "fn_8002520C",
   "file": "gs_title.c",
   "src": "src/game/gs_title.c",
-  "bucket": "worker-ex",
+  "bucket": "reloc-wall",
   "cat": "DIFFERENT-INSN",
   "our_insn": 91,
   "tgt_insn": 92,
-  "why": "different instruction(s) @ target 5..6 / ours 5..6"
+  "why": "SDA(r13) vs absolute: different instruction(s) @ target 5..6 / ours 5..6"
  },
  {
   "match": 98.66,
@@ -315,11 +315,11 @@
   "fn": "fn_80211A78",
   "file": "colosseum_event.c",
   "src": "src/game/colosseum_event.c",
-  "bucket": "worker-ex",
+  "bucket": "reloc-wall",
   "cat": "DIFFERENT-INSN",
   "our_insn": 70,
   "tgt_insn": 71,
-  "why": "different instruction(s) @ target 41..42 / ours 41..42"
+  "why": "SDA(r13) vs absolute: different instruction(s) @ target 41..42 / ours 41..42"
  },
  {
   "match": 98.41,
@@ -329,11 +329,11 @@
   "fn": "fn_8002537C",
   "file": "gs_title.c",
   "src": "src/game/gs_title.c",
-  "bucket": "worker-ex",
+  "bucket": "reloc-wall",
   "cat": "DIFFERENT-INSN",
   "our_insn": 68,
   "tgt_insn": 69,
-  "why": "different instruction(s) @ target 8..9 / ours 8..9"
+  "why": "SDA(r13) vs absolute: different instruction(s) @ target 8..9 / ours 8..9"
  },
  {
   "match": 98.41,
@@ -343,11 +343,11 @@
   "fn": "fn_80025490",
   "file": "gs_title.c",
   "src": "src/game/gs_title.c",
-  "bucket": "worker-ex",
+  "bucket": "reloc-wall",
   "cat": "DIFFERENT-INSN",
   "our_insn": 68,
   "tgt_insn": 69,
-  "why": "different instruction(s) @ target 8..9 / ours 8..9"
+  "why": "SDA(r13) vs absolute: different instruction(s) @ target 8..9 / ours 8..9"
  },
  {
   "match": 98.33,
@@ -357,11 +357,11 @@
   "fn": "fn_8000C824",
   "file": "gs_party_access.c",
   "src": "src/game/gs_party_access.c",
-  "bucket": "worker-ex",
+  "bucket": "reloc-wall",
   "cat": "DIFFERENT-INSN",
   "our_insn": 65,
   "tgt_insn": 66,
-  "why": "different instruction(s) @ target 7..8 / ours 7..8"
+  "why": "SDA(r13) vs absolute: different instruction(s) @ target 7..8 / ours 7..8"
  },
  {
   "match": 98.33,
@@ -371,11 +371,11 @@
   "fn": "fn_8000C92C",
   "file": "gs_party_access.c",
   "src": "src/game/gs_party_access.c",
-  "bucket": "worker-ex",
+  "bucket": "reloc-wall",
   "cat": "DIFFERENT-INSN",
   "our_insn": 65,
   "tgt_insn": 66,
-  "why": "different instruction(s) @ target 7..8 / ours 7..8"
+  "why": "SDA(r13) vs absolute: different instruction(s) @ target 7..8 / ours 7..8"
  },
  {
   "match": 98.33,
@@ -399,11 +399,11 @@
   "fn": "fn_8021C308",
   "file": "colosseum_script.c",
   "src": "src/game/colosseum_script.c",
-  "bucket": "worker-ex",
+  "bucket": "reloc-wall",
   "cat": "DIFFERENT-INSN",
   "our_insn": 98,
   "tgt_insn": 98,
-  "why": "different instruction(s) @ target 6..7 / ours 6..7"
+  "why": "SDA(r13) vs absolute: different instruction(s) @ target 6..7 / ours 6..7"
  },
  {
   "match": 98.21,
