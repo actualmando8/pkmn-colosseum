@@ -14558,18 +14558,17 @@ asm void fn_80123110(void) {
 #include "src/game/gs_field_world_fn_80123110.inc"
 }
 #else
-u16 fn_80123110(u8* ptr, u32 arg2, u8 flag) {
+u32 fn_80123110(u8* ptr, register u32 arg2, u8 flag) {
     extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
-    extern void fn_801254B4(u8* a, u32 b, u32 c, u32 d, u32 e);
-    u16 val;
+    extern void fn_801254B4(u8* a, u32 b, u32 c, u32 d, u16 e);
     if (ptr == NULL) { return 0; }
     if ((u8)flag == 0) {
-        val = (u16)fn_8012640C(ptr, 0, 0x82, 0);
+        arg2 = (u16)fn_8012640C(ptr, 0, 0x82, 0);
         fn_801254B4(ptr, 0, 0x82, 0, 0);
-        return val;
+    } else {
+        fn_801254B4(ptr, 0, 0x82, 0, arg2);
     }
-    fn_801254B4(ptr, 0, 0x82, 0, (u16)arg2);
-    return (u16)arg2;
+    return arg2;
 }
 #endif
 /* 0x801231A4 | 0x13C */
