@@ -1736,17 +1736,12 @@ void fn_8000DE24(u8* ptr) {
     extern u16 fn_801EF634(void);
     u8 flag;
     fn_80102ED4(ptr);
-    if ((u8)fn_801F18DC(0)) {
-        if ((u8)fn_801F1700(0) == 1 && (u8)fn_80265924() == 1) {
-            flag = 1;
-        } else if ((u16)fn_801EF634() == 1) {
-            flag = 1;
-        } else {
-            flag = 0;
-        }
-    } else {
-        flag = 0;
-    }
+    if (!(u8)fn_801F18DC(0)) goto _zero;
+    if ((u8)fn_801F1700(0) == 1 && (u8)fn_80265924() == 1) { flag = 1; goto _check; }
+    if ((u16)fn_801EF634() == 1) { flag = 1; goto _check; }
+    _zero:
+    flag = 0;
+    _check:
     if (flag) {
         ptr[0x98] = 1;
         ptr[0x99] = 1;

@@ -166,8 +166,18 @@ u32 fn_801D1470(void* entry) {
  * Address: 0x801D147C | Size: 0x44
  */
 s32 fn_801D147C(void* entry) {
-    if (entry == NULL) return -1;
-    return *(s32*)((u8*)entry + 0x0C);
+    s32 idx;
+    void* sequenceEntry;
+
+    idx = (s32)entry;
+    if (idx < 0 || (u32)idx >= *lbl_80478E98) {
+        sequenceEntry = NULL;
+    } else {
+        sequenceEntry = (void*)(lbl_80478E9C + (u32)idx * 0x2C);
+    }
+
+    if (sequenceEntry == NULL) return -1;
+    return *(s32*)((u8*)sequenceEntry + 0x28);
 }
 
 /**
