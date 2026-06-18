@@ -429,7 +429,33 @@ L_700_end:
 #pragma pop
 #endif
 
-/* fn_80026740 - 0x80026740 | size: 0x90 | WALL 50%: regalloc + fnmsubs fusion + clrlwi */
+/* fn_80026740 - 0x80026740 | size: 0x90 | WALL 85.69% (band w_wmap, 2026-06-18)
+ *
+ * The #else C below is FAITHFUL, byte-correct logic and measures 85.69% — but
+ * the asm wrapper (#if 1, this is the byte-exact ROM) measures 96.67% under
+ * objdiff (the 96.67 is a pure numeric-vs-named float-reloc disassembler
+ * artifact: the .inc emits `lfs f2,-0x7d68(r2)` while the target object carries
+ * `lbl_8047B938@sda21`; both resolve to the same sdata2 address). Since the C
+ * cannot beat the asm's measured ceiling, the asm stays active.
+ *
+ * Levers that DID land (took the draft 72% -> 85.69%):
+ *   - `#pragma fp_contract on`  -> `1.0 - 255.0*x` fuses to a single fnmsubs
+ *   - declaring `state`/`index` BEFORE `ctx` reserves r5 for `state`, pinning
+ *     ctx to r6 to match the target's whole-function allocation (+11%)
+ *   - if(state!=7){0}else{...} single trailing `return 0` -> one epilogue li r3,0
+ *   - dropping the (u8)/(s32) cast on the r4[0x67] store -> stb truncates with
+ *     no redundant clrlwi (peephole off keeps the (s16) extsh on the X store)
+ *   - `#pragma scheduling on` (off regresses to 71%)
+ *
+ * Residual WALL (3 CW reg-alloc / scheduler ties, not source-controllable):
+ *   1. table base/index scratch rotation: target keeps base in r3 + idx in r0
+ *      (`add r3,r3,r0`); CW emits base->r0 + idx->r3 (`add r3,r0,r3`).
+ *   2. X multiply result: target reuses freed r5 (`mulli r5,r0,0x1a`); CW keeps
+ *      it in r0 (`mulli r0,r0,0x1a`).
+ *   3. float const-load schedule: target interleaves lfs f2/f0 into the X-mul
+ *      load-delay slots; CW won't hoist them across the sth store.
+ * -> permuter territory. Same wall applies to siblings fn_800267D0/fn_80026860.
+ */
 extern f32 lbl_8047B938;
 extern f32 lbl_8047B934;
 #if 1
@@ -437,76 +463,40 @@ asm void fn_80026740(void) {
 #include "src/game/gs_worldmap_fn_80026740.inc"
 }
 #else
-/*
- * fn_80026740  GSmap_MoveCursor  (0x80026740, 0x90 bytes)
- *
- * Moves the world-map cursor: sets the X-axis scroll position (r4+0x50) and
- * the Y-axis byte (r4+0x67) based on the current state-machine entry.
- *
- * Entry selector 7 (GSmap_MoveCursor) is one of a triplet:
- *   fn_80026740 (this)  selector=7  ctx+0x48 base
- *   fn_800267D0         selector=8  ctx+0x44 base
- *   fn_80026860         selector=0xA ctx+0x40 base
- *
- * r3  = GS callback object (void*)
- * r4  = output byte buffer (u8*) — caller writes display params into it
- * Returns 0.
- */
+#pragma push
+#pragma peephole off
+#pragma scheduling on
+#pragma fp_contract on
+#pragma optimization_level 4
 s32 fn_80026740(void* r3, u8* r4)
 {
     extern u8  lbl_80266DD8[];   /* state-machine entry table: each entry 16 bytes */
-    extern f32 lbl_8047B938;     /* f32 constant (scale factor for float->Y) */
-    extern f32 lbl_8047B934;     /* f32 constant (Y offset base) */
+    s32  state;
+    s32  index;
+    void* ctx;
 
-    u8*  ctx;    /* ctx = *(void**)(r3+0x60) */
-    s32* entry;  /* pointer to 16-byte state-machine entry */
-    s32  r5;     /* entry[1] — state/selector value */
-    void* count_ptr; /* *(void**)(ctx+0x34) — pointer to item count */
-    s32  count;  /* item count (clamped below) */
-    void* base_ptr;  /* *(void**)(ctx+0x48) — base value source */
-    s32  base_val;   /* *(s32*)base_ptr */
-    s32  x_raw;  /* r5 * 26 + base_val, sign-extended to s16 */
-    f32* fptr;   /* *(f32**)(ctx+0x30) — pointer to float parameter */
-    f32  f1;     /* *fptr */
-    f32  f0;     /* lbl_8047B934 - lbl_8047B938 * f1 */
-    s32  y_int;  /* (s32)f0 via fctiwz (truncate toward zero) */
-
-    ctx = (u8*)(*(void**)((u8*)r3 + 0x60));
-
-    entry = (s32*)(lbl_80266DD8 + (*(s32*)(ctx + 0x1c) << 4));
-
-    r5 = entry[1];
-
-    if (r5 != 7) {
+    ctx = *(void**)((u8*)r3 + 0x60);
+    state = *(s32*)(lbl_80266DD8 + (*(s32*)((u8*)ctx + 0x1c) << 4) + 4);
+    if (state != 7) {
         r4[0x67] = 0;
-        return 0;
+    } else {
+        index = *(s32*)(*(s32**)((u8*)ctx + 0x34));
+        if (index >= state) {
+            index = state - 1;
+        }
+        *(s16*)(r4 + 0x50) = (s16)(index * 0x1a + *(s32*)(*(s32**)((u8*)ctx + 0x48)));
+        r4[0x67] = lbl_8047B934 - lbl_8047B938 * *(f32*)(*(f32**)((u8*)ctx + 0x30));
     }
-
-    /* Count from ctx+0x34 pointer; clamp so index <= r5-1 = 6 */
-    count_ptr = *(void**)(ctx + 0x34);
-    count = *(s32*)count_ptr;
-    if (count >= r5) {
-        count = r5 - 1; /* clamp to 6 */
-    }
-
-    /* X scroll: (count * 26 + base_val) sign-extended to s16 */
-    base_ptr = *(void**)(ctx + 0x48);
-    base_val = *(s32*)base_ptr;
-    x_raw = count * 26 + base_val;
-    *(s16*)(r4 + 0x50) = (s16)x_raw; /* ENDIAN-QA: extsh+sth == (s16) cast on x86 */
-
-    /* Y byte: truncated int of (lbl_8047B934 - lbl_8047B938 * *fptr) */
-    fptr = *(f32**)(ctx + 0x30);
-    f1 = *fptr;
-    f0 = lbl_8047B934 - lbl_8047B938 * f1;
-    y_int = (s32)f0; /* fctiwz = truncate-toward-zero, matches C cast */
-    r4[0x67] = (u8)y_int;
-
     return 0;
 }
+#pragma pop
 #endif
 
-/* fn_800267D0 - 0x800267D0 | size: 0x90 */
+/* fn_800267D0 - 0x800267D0 | size: 0x90 | WALL ~85.7% — sibling of fn_80026740.
+ * selector=8, base ptr ctx+0x44. asm (#if 1) is the byte-exact ROM (96.67% is
+ * the numeric-vs-named float-reloc artifact). See fn_80026740 for the full lever
+ * analysis + residual reg-alloc/scheduler ties. The #else is the cloned shape,
+ * staged for a future permuter attack. */
 extern f32 lbl_8047B938;
 extern f32 lbl_8047B934;
 #if 1
@@ -514,67 +504,41 @@ asm void fn_800267D0(void) {
 #include "src/game/gs_worldmap_fn_800267D0.inc"
 }
 #else
-/*
- * GSmap_AnimateCursor  0x800267D0  size: 0x90
- *
- * Called with the same two-arg dispatcher convention as its neighbours
- * (fn_80026740 / fn_80026860).  r3 = controller object, r4 = output u8 buffer.
- *
- * Looks up the current state-table entry via ctx->field_0x1c (index) into
- * lbl_80266DD8 (16-byte stride table).  Only active when entry[1] == 8.
- *
- * When active it:
- *   1. Reads a "count" value through ctx+0x34 (ptr-to-u32), clamped to [0..7].
- *   2. Computes a 16-bit frame offset:  (s16)(count * 26 + base)
- *      where base comes through ctx+0x44 (ptr-to-u32), writes to r4[0x50].
- *   3. Converts the phase float (*(f32*)(*(u32**)(ctx+0x30))) via
- *        intensity = (s32)(1.0f - 255.0f * phase)
- *      and stores the low byte to r4[0x67].
- *
- * fnmsubs / fctiwz / stfd+lwz(+0xc) are all absorbed into plain C casts.
- * lbl_8047B934 = 1.0f, lbl_8047B938 = 255.0f (confirmed from sdata2 binary).
- */
+#pragma push
+#pragma peephole off
+#pragma scheduling on
+#pragma fp_contract on
+#pragma optimization_level 4
 s32 fn_800267D0(void* r3, u8* r4)
 {
-    extern u8  lbl_80266DD8[];   /* 16-byte-stride state table                */
+    extern u8  lbl_80266DD8[];
+    s32  state;
+    s32  index;
+    void* ctx;
 
-    void*  ctx;
-    u8*    entry;
-    s32    state;
-    s32    count;
-    s32    offset;
-    f32    phase;
-    s32    intensity;
-
-    ctx   = *(void**)((u8*)r3 + 0x60);
-    entry = lbl_80266DD8 + (*(s32*)((u8*)ctx + 0x1c) << 4);
-    state = *(s32*)(entry + 0x4);   /* entry[1] */
-
+    ctx = *(void**)((u8*)r3 + 0x60);
+    state = *(s32*)(lbl_80266DD8 + (*(s32*)((u8*)ctx + 0x1c) << 4) + 4);
     if (state != 8) {
         r4[0x67] = 0;
-        return 0;
+    } else {
+        index = *(s32*)(*(s32**)((u8*)ctx + 0x34));
+        if (index >= state) {
+            index = state - 1;
+        }
+        *(s16*)(r4 + 0x50) = (s16)(index * 0x1a + *(s32*)(*(s32**)((u8*)ctx + 0x44)));
+        r4[0x67] = lbl_8047B934 - lbl_8047B938 * *(f32*)(*(f32**)((u8*)ctx + 0x30));
     }
-
-    /* count clamp: if count >= state(8), cap at state-1(7) */
-    count = *(s32*)(*(u32**)((u8*)ctx + 0x34));
-    if (count >= state) {
-        count = state - 1;   /* == 7 */
-    }
-
-    /* frame offset into sprite strip: each frame is 26 units wide */
-    offset = count * 0x1a + *(s32*)(*(u32**)((u8*)ctx + 0x44));
-    *(s16*)(r4 + 0x50) = (s16)offset;
-
-    /* phase -> intensity: 1.0f - 255.0f * phase, truncated to int, low byte */
-    phase     = *(f32*)(*(u32**)((u8*)ctx + 0x30));
-    intensity = (s32)(1.0f - 255.0f * phase);   /* mirrors fnmsubs+fctiwz */
-    r4[0x67]  = (u8)intensity;
-
     return 0;
 }
+#pragma pop
 #endif
 
 /* fn_80026860 - 0x80026860 | size: 0x90 */
+/* fn_80026860 - 0x80026860 | size: 0x90 | WALL ~85.7% — sibling of fn_80026740.
+ * selector=0xa, base ptr ctx+0x40. asm (#if 1) is the byte-exact ROM (96.67% is
+ * the numeric-vs-named float-reloc artifact). See fn_80026740 for the full lever
+ * analysis + residual reg-alloc/scheduler ties. The #else is the cloned shape,
+ * staged for a future permuter attack. */
 extern f32 lbl_8047B938;
 extern f32 lbl_8047B934;
 #if 1
@@ -582,85 +546,33 @@ asm void fn_80026860(void) {
 #include "src/game/gs_worldmap_fn_80026860.inc"
 }
 #else
-/*
- * GSmap_AnimateMarker  (0x80026860, size 0x90)
- *
- * One of three identical-shape animation-callback triplets:
- *   fn_80026740 MoveCursor   sentinel=7  phase_ptr=ctx+0x48
- *   fn_800267D0 AnimateCursor sentinel=8  phase_ptr=ctx+0x44
- *   fn_80026860 AnimateMarker sentinel=0xa phase_ptr=ctx+0x40  <-- this one
- *
- * Parameters (CW EABI, inferred from first read of r3/r4 before any write):
- *   r3 = self/wrapper object pointer  (r3+0x60 holds ctx)
- *   r4 = output byte-array (u8*)       written at [0x50..0x51] and [0x67]
- *
- * Returns 0 (r3=0 unconditionally).
- *
- * Logic:
- *   entry = lbl_80266DD8[ctx->field_0x1c * 16]   (16-byte stride table)
- *   if entry[1] != 10 -> r4[0x67]=0, done
- *   frame = *ctx->field_0x34_ptr   clamped to [0, 9]  (sentinel-1)
- *   phase = (s16)(frame * 26 + *ctx->field_0x40_ptr)
- *   r4[0x50] = phase  (sth = store halfword, so writes 2 bytes big-endian on GC,
- *                       but as s16 value it is portable)
- *   alpha  = (u8)(s32)(lbl_8047B934 - lbl_8047B938 * *ctx->field_0x30_ptr)
- *             (fctiwz = truncate-toward-zero; big-endian low-word extraction
- *              == plain (s32) cast on host)
- *   r4[0x67] = alpha
- */
-s32 fn_80026860(void* r3, u8* r4) {
-    extern u8  lbl_80266DD8[];   /* animation state table, 16-byte entries */
-    extern f32 lbl_8047B938;     /* float constant: scale factor */
-    extern f32 lbl_8047B934;     /* float constant: base alpha */
+#pragma push
+#pragma peephole off
+#pragma scheduling on
+#pragma fp_contract on
+#pragma optimization_level 4
+s32 fn_80026860(void* r3, u8* r4)
+{
+    extern u8  lbl_80266DD8[];
+    s32  state;
+    s32  index;
+    void* ctx;
 
-    u8*  ctx;
-    s32* entry;
-    s32  state_idx;
-    s32  sentinel;
-    s32  frame;
-    s32  phase_raw;
-    s32  phase_base;
-    s32  alpha_i;
-    f32  f_val;
-
-    /* ctx = self->field_0x60 */
-    ctx = *(u8**)((u8*)r3 + 0x60);
-
-    /* entry = &lbl_80266DD8[state_idx * 16] */
-    state_idx = *(s32*)(ctx + 0x1c);
-    entry     = (s32*)(lbl_80266DD8 + (state_idx << 4));
-
-    sentinel = entry[1];   /* lwz +0x4 into the entry */
-
-    if (sentinel != 0xa) {
-        /* not in the animated state: blank alpha */
+    ctx = *(void**)((u8*)r3 + 0x60);
+    state = *(s32*)(lbl_80266DD8 + (*(s32*)((u8*)ctx + 0x1c) << 4) + 4);
+    if (state != 0xa) {
         r4[0x67] = 0;
-        return 0;
+    } else {
+        index = *(s32*)(*(s32**)((u8*)ctx + 0x34));
+        if (index >= state) {
+            index = state - 1;
+        }
+        *(s16*)(r4 + 0x50) = (s16)(index * 0x1a + *(s32*)(*(s32**)((u8*)ctx + 0x40)));
+        r4[0x67] = lbl_8047B934 - lbl_8047B938 * *(f32*)(*(f32**)((u8*)ctx + 0x30));
     }
-
-    /* frame = **(ctx+0x34)  clamped to [0, sentinel-1] */
-    frame = *(s32*)(*(u32**)(ctx + 0x34));   /* lwz ctx+0x34 -> ptr, lwz +0 */
-    if (frame >= sentinel) {
-        frame = sentinel - 1;   /* subi r0, r5, 1 */
-    }
-
-    /* phase_raw = frame * 26 + **(ctx+0x40) */
-    phase_base = *(s32*)(*(u32**)(ctx + 0x40));   /* phase table ptr, offset 0x40 */
-    phase_raw  = frame * 0x1a + phase_base;
-
-    /* store as s16 (sth = store halfword; extsh sign-extends before store) */
-    *(s16*)(r4 + 0x50) = (s16)phase_raw;   /* ENDIAN-QA: sth is native s16 on host */
-
-    /* alpha = (s32)(lbl_8047B934 - lbl_8047B938 * **(ctx+0x30))
-     * fnmsubs f0,f2,f1,f0  =>  f0 = f0 - f2*f1  (f0=B934, f2=B938, f1=*ptr)
-     * fctiwz = truncate toward zero (same as C (s32) cast) */
-    f_val   = *(f32*)(*(u32**)(ctx + 0x30));
-    alpha_i = (s32)(lbl_8047B934 - lbl_8047B938 * f_val);
-
-    r4[0x67] = (u8)alpha_i;
-
     return 0;
 }
+#pragma pop
 #endif
 
 /* fn_800268F0 - 0x800268F0 | size: 0x254 */
