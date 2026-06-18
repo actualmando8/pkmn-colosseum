@@ -285,15 +285,45 @@ def cmd_json(tag):
     print(json.dumps(_rows(tag, st)))
 
 
+def _governing_toggle_pragmas(lines, start):
+    """on/off toggle pragmas (peephole / scheduling) active immediately before a fn def.
+    Agents place these right before the real-C body to crack a fn, but band save extracts
+    ONLY the def — so the win drops in canon (100% in scratch -> ~70% without the pragma).
+    Returns the toggles that govern the fn, so _extract can carry them. Matches the proven
+    canon wrap (battle_scene.c: '#pragma peephole off' / fn / '#pragma peephole on')."""
+    found = []
+    i = start - 1
+    while i >= 0:
+        s = lines[i].strip()
+        if not s:
+            i -= 1
+            continue
+        if s.startswith("#pragma "):
+            for kind in ("peephole", "scheduling"):
+                if s == f"#pragma {kind} off" and kind not in found:
+                    found.append(kind)
+            i -= 1
+            continue
+        break  # first non-blank, non-pragma line ends the governing block
+    return found
+
+
 def _extract(tag, fn):
-    """Return the verbatim top-level definition text for fn from the scratch."""
+    """Return the verbatim top-level definition text for fn from the scratch, wrapped
+    with any governing peephole/scheduling 'off' pragma + its 'on' restore so the win
+    holds after integration (band save otherwise strips the pragma -> win drops)."""
     raw = scratch_c(tag).read_bytes().decode("utf-8", errors="replace")
     nl = "\r\n" if "\r\n" in raw else "\n"
     lines = raw.split(nl)
     span = cs_splice.find_def_span(lines, fn)
     if span is None or isinstance(span, list):
         return None
-    return nl.join(lines[span[0]:span[1] + 1])
+    body = lines[span[0]:span[1] + 1]
+    toggles = _governing_toggle_pragmas(lines, span[0])
+    if toggles:
+        body = ([f"#pragma {k} off" for k in toggles] + body
+                + [f"#pragma {k} on" for k in reversed(toggles)])
+    return nl.join(body)
 
 
 def cmd_save(tag, fns):
