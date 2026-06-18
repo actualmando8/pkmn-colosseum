@@ -770,115 +770,106 @@ asm void fn_800F7758(void) {
 void fn_800F7758(void) { /* TODO */ }
 #endif
 extern u8 lbl_80401C10[];
-#if 1
+/* Shared 4-slot pad lookup. Defined BEFORE the readers so CW 1.3 inlines it:
+ * the inlined multi-`return pad` yields the target's un-inverted `bne;b` per
+ * slot (a flat goto/loop folds to `beq`), and the per-function
+ * `#pragma optimization_level 2` keeps the `nul` sentinel in its own register
+ * (`li rN,0` early + `mr` at miss) instead of folding to `li rPad,0`. Together
+ * these crack the whole input.c lwzu-search cluster (incl. the old W1 walls). */
+static inline u8* WI_FindPad(s32 padId) {
+    u8* pad = &lbl_80401C10[0];
+    u8* nul = NULL;
+    if (*(s32*)pad == padId) return pad;
+    if (*(s32*)(pad += 0x6c) == padId) return pad;
+    if (*(s32*)(pad += 0x6c) == padId) return pad;
+    if (*(s32*)(pad += 0x6c) == padId) return pad;
+    return nul;
+}
+#if 0
 asm void fn_800F7A08(void) {
 #include "src/game/input/input_fn_800F7A08.inc"
 }
 #else
+#pragma push
+#pragma optimization_level 2
 u32 fn_800F7A08(s32 key, s32 sel) {
-    u8* p;
-    u32 i;
-    p = &lbl_80401C10[0];
-    for (i = 0; i < 4; i++) {
-        if (*(s32*)p == key) goto found;
-        p += 0x6c;
-    }
-    p = NULL;
-found:
-    if (p == NULL) return 0;
-    if (sel == 1) return *(u8*)(p + 0x59);
-    return *(u8*)(p + 0x27);
+    u8* pad = WI_FindPad(key);
+    if (pad == NULL) return 0;
+    if (sel == 1) return *(u8*)(pad + 0x59);
+    return *(u8*)(pad + 0x27);
 }
+#pragma pop
 #endif
-#if 1
+#if 0
 asm void fn_800F7A7C(void) {
 #include "src/game/input/input_fn_800F7A7C.inc"
 }
 #else
-void fn_800F7A7C(void) { /* TODO */ }
+#pragma push
+#pragma optimization_level 2
+u32 fn_800F7A7C(s32 key, s32 sel) {
+    u8* pad = WI_FindPad(key);
+    if (pad == NULL) return 0;
+    if (sel == 1) return *(u8*)(pad + 0x58);
+    return *(u8*)(pad + 0x26);
+}
+#pragma pop
 #endif
-#if 1
+#if 0
 asm void fn_800F7AF0(void) {
 #include "src/game/input/input_fn_800F7AF0.inc"
 }
 #else
+#pragma push
+#pragma optimization_level 2
 u32 fn_800F7AF0(s32 padId) {
-    extern u8 lbl_80401C10[];
-    u8* pad = lbl_80401C10;
-
-    if (*(s32*)(pad + 0x00) == padId) { /* found at slot 0 */ }
-    else if (*(s32*)(pad + 0x6C) == padId) { /* found */ }
-    else if (*(s32*)(pad + 0x6C) == padId) { /* found */ }
-    else if (*(s32*)(pad + 0x6C) == padId) { /* found */ }
-    else { pad = NULL; }
-
-    if (pad == NULL) { return 0; }
-    return (u32)(*(u16*)(pad + 0x24)) ^ *(u32*)(pad + 0x30);
+    u8* pad = WI_FindPad(padId);
+    if (pad == NULL) return 0;
+    return (u32)*(u16*)(pad + 0x24) ^ *(u32*)(pad + 0x30);
 }
+#pragma pop
 #endif
-#if 1
+#if 0
 asm void fn_800F7B5C(void) {
 #include "src/game/input/input_fn_800F7B5C.inc"
 }
 #else
+#pragma push
+#pragma optimization_level 2
 u32 fn_800F7B5C(s32 padId) {
-    extern u8 lbl_80401C10[];
-    u8* pad;
-    u8* nul = NULL;
-    pad = (u8*)&lbl_80401C10[0];
-    do {
-        if (*(s32*)pad == padId) break;
-        pad += 0x6c;
-        if (*(s32*)pad == padId) break;
-        pad += 0x6c;
-        if (*(s32*)pad == padId) break;
-        pad += 0x6c;
-        if (*(s32*)pad == padId) break;
-        pad = nul;
-    } while (0);
+    u8* pad = WI_FindPad(padId);
     if (pad == NULL) return 0;
     return ~(u32)*(u16*)(pad + 0x24);
 }
+#pragma pop
 #endif
-#if 1
+#if 0
 asm void fn_800F7BC4(void) {
 #include "src/game/input/input_fn_800F7BC4.inc"
 }
 #else
 #pragma push
-#pragma optimization_level 3
+#pragma optimization_level 2
 u16 fn_800F7BC4(s32 padId) {
-    extern u8 lbl_80401C10[];
-    u8* pad = &lbl_80401C10[0];
-    u8* nul = NULL;
-    if (*(s32*)pad != padId) goto try1;
-    goto found;
-try1:
-    pad += 0x6c;
-    if (*(s32*)pad != padId) goto try2;
-    goto found;
-try2:
-    pad += 0x6c;
-    if (*(s32*)pad != padId) goto try3;
-    goto found;
-try3:
-    pad += 0x6c;
-    if (*(s32*)pad != padId) goto miss;
-    goto found;
-miss:
-    pad = nul;
-found:
+    u8* pad = WI_FindPad(padId);
     if (pad == NULL) return 0;
     return *(u16*)(pad + 0x24);
 }
 #pragma pop
 #endif
-#if 1
+#if 0
 asm void fn_800F7C28(void) {
 #include "src/game/input/input_fn_800F7C28.inc"
 }
 #else
-void fn_800F7C28(void) { /* TODO */ }
+#pragma push
+#pragma optimization_level 2
+u32 fn_800F7C28(s32 padId) {
+    u8* pad = WI_FindPad(padId);
+    if (pad == NULL) return 2;
+    return *(u32*)(pad + 0x4);
+}
+#pragma pop
 #endif
 extern u32 lbl_8047CCC8;
 #if 1
@@ -964,52 +955,61 @@ static inline u8* PADInput_FindPad(s32 padId) {
     if (*(s32*)(pad += 0x6c) == padId) return pad;
     return nul;
 }
-/* NOTE: asm-active (#if 1). The C below is correct & equivalent but does NOT
- * byte-match: CW 1.3 folds the not-found sentinel to `li r5,0` at the miss,
- * while the target keeps it in r6 (`li r6,0` early + `mr r5,r6`). Confirmed
- * W1 reg-alloc wall — see WALLS.md. lwzu in-place increment and a separate
- * sentinel register are mutually exclusive in this allocator. */
-#if 1
+#if 0
 asm void fn_800F7DE4(void) {
 #include "src/game/input/input_fn_800F7DE4.inc"
 }
 #else
+#pragma push
+#pragma optimization_level 2
 void fn_800F7DE4(s32 padId, u32 val) {
-    u8* pad = PADInput_FindPad(padId);
+    u8* pad = WI_FindPad(padId);
     if (pad == NULL) return;
     *(u32*)(pad + 0x14) = val;
 }
+#pragma pop
 #endif
-/* asm-active W1 wall (same class as fn_800F7DE4); equivalent C staged below. */
-#if 1
+#if 0
 asm void fn_800F7E40(void) {
 #include "src/game/input/input_fn_800F7E40.inc"
 }
 #else
+#pragma push
+#pragma optimization_level 2
 void fn_800F7E40(s32 padId, u8 val) {
-    u8* pad = PADInput_FindPad(padId);
+    u8* pad = WI_FindPad(padId);
     if (pad == NULL) return;
     *(u8*)(pad + 0x10) = val;
 }
+#pragma pop
 #endif
-/* asm-active W1 wall (same class as fn_800F7DE4); equivalent C staged below. */
-#if 1
+#if 0
 asm void fn_800F7E9C(void) {
 #include "src/game/input/input_fn_800F7E9C.inc"
 }
 #else
+#pragma push
+#pragma optimization_level 2
 void fn_800F7E9C(s32 padId, u32 val) {
-    u8* pad = PADInput_FindPad(padId);
+    u8* pad = WI_FindPad(padId);
     if (pad == NULL) return;
     *(u32*)(pad + 0x8) = val;
 }
+#pragma pop
 #endif
-#if 1
+#if 0
 asm void fn_800F7EF8(void) {
 #include "src/game/input/input_fn_800F7EF8.inc"
 }
 #else
-void fn_800F7EF8(void) { /* TODO */ }
+#pragma push
+#pragma optimization_level 2
+u8 fn_800F7EF8(s32 padId) {
+    u8* pad = WI_FindPad(padId);
+    if (pad == NULL) return 0;
+    return *(u32*)(pad + 0xc) == 0;
+}
+#pragma pop
 #endif
 extern void fn_800D3094(void);
 extern void fn_800AAD34(void);
