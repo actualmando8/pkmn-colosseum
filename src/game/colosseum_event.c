@@ -10054,7 +10054,7 @@ fn_80211170(void)
     extern void fn_802274F0();
     extern int fn_80232110();
     extern u32 lbl_80478D60;
-    extern u8 lbl_80478D78[];
+    extern u8 lbl_80478D78[1];
     extern u32 lbl_8047B610;
     extern u32 lbl_8047B618;
   u8 uVar1;
@@ -10256,7 +10256,7 @@ void fn_80211810(u8 enable) {
 
 /* 0x80211830 | size: 0xCC */
 void fn_80211830(void) {
-    extern u8 lbl_80478D78[];
+    extern u8 lbl_80478D78[1];
     extern u32 lbl_8047B62C;
     extern void fn_801F37B0();
     extern void* fn_801F47B4();

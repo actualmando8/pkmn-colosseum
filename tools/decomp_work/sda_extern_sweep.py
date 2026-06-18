@@ -70,12 +70,14 @@ def do_discover():
             print(f"   L{lineno}  {sym}  size=0x{size:X}")
     print(f"\nTOTAL {total} across {len(c)} files")
 
-def do_apply(target_rel):
+def do_apply(target_rel, only_sym=None):
     target_rel = target_rel.replace("\\", "/")
     c = candidates().get(target_rel)
     if not c:
         print(f"no candidates in {target_rel}")
         return 0
+    if only_sym:
+        c = [x for x in c if x[1] == only_sym]
     path = os.path.join(REPO, target_rel)
     lines = open(path, encoding="utf-8", errors="replace").read().splitlines(keepends=True)
     n = 0
@@ -95,6 +97,6 @@ if __name__ == "__main__":
     if len(sys.argv) >= 2 and sys.argv[1] == "discover":
         do_discover()
     elif len(sys.argv) >= 3 and sys.argv[1] == "apply":
-        do_apply(sys.argv[2])
+        do_apply(sys.argv[2], sys.argv[3] if len(sys.argv) >= 4 else None)
     else:
         sys.exit(__doc__)
