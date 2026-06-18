@@ -51,7 +51,21 @@ Honest buckets after SDA-wall detection: **7 permuter, 3 worker-ex, 2 worker-fr,
   fn_80040308, fn_8004B7EC (scene_init), fn_800DE128, fn_800E0790 (gs_render),
   fn_800109A0, fn_8000ED34, fn_8000F964 (gs_npc_interact).
 
-## HIGH-LEVERAGE FINDING — the @sda21 wall class is ONE build-level root cause
+## ⚠️ CORRECTION (verified against object relocations) — the SDA story below is WRONG
+Ground-truth `objdump -dr` on fn_80024DBC: the TARGET uses `R_PPC_ADDR16` (absolute
+symbol + explicit r13 base in the .inc), OURS uses `R_PPC_EMB_SDA21`. Both are encodings
+of the SAME `lwz r0,-0x64B0(r13)` and **resolve to identical LINKED bytes** — an
+object-level relocation-REPRESENTATION artifact, not a real byte diff. why_diff's
+"SDA(r13) vs absolute" flag (and my route_queue SDA heuristic) trips on this representation
+gap. The REAL residual on the gs_title twins is the human comment's note: **`@27` anonymous
+f64 int->double bias constants vs target's NAMED `lbl_8047B8B8@sda21`** = the conversion-
+literal `@nnn` artifact ([[feedback_fpr_web_conv_literal_artifact]]), a proven-uncrackable wall.
+NET: the reloc-wall BUCKET is still right (leave walled), but a BSS/sdata campaign would
+NOT crack them, and the per-fn "worker-ex" count is an UPPER bound — some worker-ex entries
+are really @nnn conversion-literal walls the heuristic didn't catch. **Do not pursue the
+BSS campaign below as a quick unlock.**
+
+## (RETRACTED) earlier hypothesis — kept for the record, see correction above
 10 of the 11 reloc-walls (whole gs_title cluster fn_80024DBC/F2C/509C/520C/537C/
 25490, gs_party_access fn_8000C824/C92C, colosseum fn_80211A78/fn_8021C308) are the
 SAME artifact: target reads a small global via `lwz rX, lbl@sda21(r13)`; ours emits
