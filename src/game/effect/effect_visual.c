@@ -2278,10 +2278,14 @@ asm void fn_801436F0(void) {
 #include "src/game/effect/effect_visual_fn_801436F0.inc"
 }
 #else
+#pragma peephole off
 u32 fn_801436F0(void* ptr) {
+    s32 v;
     if (ptr == NULL) return 0;
-    return !!(*(u8*)((u8*)ptr + 4) & 8);
+    v = !!((((u8*)ptr)[0x4] >> 3) & 1);
+    return v;
 }
+#pragma peephole on
 #endif
 
 #if 0
@@ -2325,10 +2329,14 @@ asm void fn_80143778(void) {
 #include "src/game/effect/effect_visual_fn_80143778.inc"
 }
 #else
+#pragma peephole off
 unsigned int fn_80143778(const void *ptr) {
+    s32 v;
     if (ptr == NULL) return 0;
-    return !!(*(u8*)((u8*)ptr + 4) & 0x10);
+    v = !!((((u8*)ptr)[0x4] >> 4) & 1);
+    return v;
 }
+#pragma peephole on
 #endif
 
 #if 0
