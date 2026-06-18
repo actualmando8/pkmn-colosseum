@@ -142,7 +142,9 @@ def main():
         print("no matching band wins files.")
         return 0
 
-    # Group wins by source file (each wins file carries its own _src key).
+    # Group wins by source file. A tag may hold wins from MULTIPLE files, so we
+    # group by PER-FUNCTION source recorded in `_srcs` (band.py save). Legacy
+    # single-`_src` files fall back to that for every fn.
     by_src = {}
     for wf in files:
         try:
@@ -150,15 +152,16 @@ def main():
         except ValueError:
             print(f"WARN: unparseable {wf.name}; skipping")
             continue
-        src_rel = d.get("_src")
-        if not src_rel:
-            print(f"WARN: {wf.name} has no _src key (old format?); skipping")
-            continue
-        bucket = by_src.setdefault(src_rel, {})
+        srcs = d.get("_srcs", {})            # per-fn source map (new format)
+        default_src = d.get("_src")          # legacy single source / fallback
         for fn, body in d.items():
-            if fn == "_src":
+            if fn.startswith("_"):           # _src, _srcs and any future metadata
                 continue
-            bucket[fn] = body  # bands are disjoint by design; last writer wins
+            src_rel = srcs.get(fn, default_src)
+            if not src_rel:
+                print(f"WARN: {wf.name}:{fn} has no source (old format?); skipping")
+                continue
+            by_src.setdefault(src_rel, {})[fn] = body  # disjoint by design
 
     rc = 0
     total_held = total_dropped = 0

@@ -284,15 +284,18 @@ def cmd_save(tag, fns):
             rejected.append(f"{fn} (EXTRACT FAILED)")
             continue
         data[fn] = body
+        # record THIS fn's source so one tag can hold wins from many files
+        # without losing them (band_integrate groups by per-fn _srcs).
+        data.setdefault("_srcs", {})[fn] = st["src"]
         saved.append(fn)
-    # remember which source this tag's wins belong to (for band_integrate)
+    # _src kept for backward-compat (last source); band_integrate prefers _srcs.
     data["_src"] = st["src"]
     out.write_bytes(json.dumps(data, indent=1).encode("utf-8"))
     _lock_renew_file(tag, st["src"])  # heartbeat: keep the file lock alive during long grinds
     print(f"SAVED {len(saved)}: {' '.join(saved) if saved else '-'}")
     if rejected:
         print(f"REJECTED (not 100%): {'; '.join(rejected)}")
-    nfn = len([k for k in data if k != "_src"])
+    nfn = len([k for k in data if not k.startswith("_")])
     print(f"wins file now holds {nfn} fn(s): {out.relative_to(ROOT)}")
 
 
