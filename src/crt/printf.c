@@ -332,33 +332,21 @@ void fn_800C8710(void) {
 }
 
 /* fn_800C87F8 - 0x800C87F8 | size: 0x6C */
-void fn_800C87F8(void) {
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+s32 fn_800C87F8(u8* ctx, const void* src, u32 count) {
+    extern void* memcpy(void* dst, const void* src, u32 n);
+    u32 pos;
+    u32 end;
+    u32 len;
 
-    r30 = r3;
-    r3 = *(u32*)((u8*)r3 + 0x8);
-    r6 = *(u32*)((u8*)r30 + 0x4);
-    tmp = r3 + r5;
-    r31 = r6 - r3;
-    if (tmp <= r6) {
-        r31 = r5;
+    pos = *(u32*)(ctx + 0x8);
+    end = *(u32*)(ctx + 0x4);
+    len = end - pos;
+    if (pos + count <= end) {
+        len = count;
     }
-    tmp = *(u32*)((u8*)r30 + 0x0);
-    r5 = r31;
-    r3 = tmp + r3;
-    memcpy((void*)r3, (const void*)r4, (u32)r5);
-    tmp = *(u32*)((u8*)r30 + 0x8);
-    r3 = 0x1;
-    tmp = tmp + r31;
-    *(u32*)((u8*)r30 + 0x8) = tmp;
-    return;
+    memcpy((void*)(*(u32*)ctx + pos), src, len);
+    *(u32*)(ctx + 0x8) += len;
+    return 1;
 }
 
 /* fn_800C974C - 0x800C974C | size: 0x12C */
