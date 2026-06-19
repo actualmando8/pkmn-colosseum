@@ -90,11 +90,13 @@ void TRKGetInput(void) {
  * 0x800BF14C | size: 0x50
  */
 void fn_800BF14C(s32 bufIdx) {
+    extern s32 TRKPostEvent(void* event);
     u8 eventBuf[0x10];
 
     fn_800BE464((void*)eventBuf, 2);
     ((s32*)lbl_803FE7B8)[0] = -1;
-    fn_800BE47C((void*)eventBuf);
+    *(s32*)(eventBuf + 0x8) = bufIdx;
+    TRKPostEvent((void*)eventBuf);
 }
 
 /*
