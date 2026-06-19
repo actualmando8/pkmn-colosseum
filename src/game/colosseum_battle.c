@@ -27104,38 +27104,21 @@ void fn_80256410(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x802564C8 | Size: 0x64 | Pattern: field_accessor */
-void fn_802564C8(void* ctx, u32 slot, u32 param) {
+u32 fn_802564C8(void* ctx, u32 slot, u32 param) {
     extern f32 lbl_8047E64C;
-    extern void fn_80235AA0();
-    extern void fn_802373B0();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f1 = 0.0f;
-    u32 r4 = slot;
-    u32 r5 = param;
+    extern u32 fn_80235AA0(void);
+    extern u32 fn_802373B0(void*, u32, s32, f32);
 
-    r30 = r3;
-    r31 = r4;
-    fn_80235AA0();
-    r0 = r3 & 0xFF;
-    if (r0 >= (u32)0xc) { r3 = 0x0; return; }
-    f1 = lbl_8047E64C;
-    r3 = r30;
-    r4 = r31;
-    r5 = -0x1;
-    fn_802373B0();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0xc) { r3 = 0x1; return; }
-
-    r3 = 0x0;
-    return;
-
-    r3 = 0x1;
-
-    return;
+    if ((fn_80235AA0() & 0xFF) >= 0xC) {
+        goto ret0;
+    }
+    if ((fn_802373B0(ctx, slot, -1, lbl_8047E64C) & 0xFF) == 0) {
+        goto ret1;
+    }
+ret0:
+    return 0;
+ret1:
+    return 1;
 }
 
 /* Address: 0x8025652C | Size: 0xB4 */
@@ -35189,59 +35172,30 @@ void fn_8025CAA8(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x8025CB3C | Size: 0xAC */
-void fn_8025CB3C(void* ctx, u32 param1, u32 param2) {
-    extern void fn_800E0C54();
-    extern void fn_80201248();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r31 = 0;
-    f32 f7 = 0.0f;
-    u32 r1 = (u32)sp;
-    u32 r4 = param1;
-    u32 r5 = param2;
+u16 fn_8025CB3C(void* ctx, u32 param1, u32 param2) {
+    extern u32 fn_800E0C54(void);
+    extern u32 fn_8012640C(u32, u32, u32, u32);
+    extern u8 fn_80201248(u32, u16*);
+    u16 choices[4];
+    u32 species;
+    s32 random;
+    s32 index;
+    u8 count;
 
-    r5 = 0xf7;
-    r6 = 0x0;
-    r31 = r4;
-    r4 = 0x0;
-    r3 = r31;
-    ((void(*)(void))fn_8012640C)();
-    r3 = r3 & 0xFFFF;
-    if ((s32)r0 != (s32)0) {
-        if (r3 != (u32)0x165) {
-            if (r3 != (u32)0xffff) {
-                r31 = *(u32*)(sp + 0x1C);
-                return;
+    species = fn_8012640C(param1, 0, 0xF7, 0) & 0xFFFF;
+    if ((species != 0) && (species != 0x165) && (species != 0xFFFF)) {
+        return species;
     }
+    count = fn_80201248(param1, choices);
+    if (count != 0) {
+        random = fn_800E0C54() & 0xFFFF;
+        index = random % (s32)(u8)count;
+        species = choices[(u8)index];
+        if ((species != 0) && (species != 0x165)) {
+            return species;
+        }
     }
-    }
-    r3 = r31;
-    r4 = (u32)sp + 0x8;
-    fn_80201248();
-    r0 = r3 & 0xFF;
-    r31 = r3;
-    if (r3 != (u32)0xffff) {
-        fn_800E0C54();
-        r5 = r3 & 0xFFFF;
-        r4 = r31 & 0xFF;
-        r0 = (s32)r5 / (s32)r4;
-        r3 = (u32)sp + 0x8;
-        r0 = r0 * r4;
-        r0 = r5 - r0;
-        r3 = *(u16*)(r3 + r0);
-        if (r3 != (u32)0x0) {
-            if (r3 != (u32)0x165) {
-                r31 = *(u32*)(sp + 0x1C);
-                return;
-    }
-    }
-    }
-    r3 = 0x0;
-
-    r31 = *(u32*)(sp + 0x1C);
-    return;
+    return 0;
 }
 
 /* Address: 0x8025CBE8 | Size: 0x48 | Pattern: field_accessor */
@@ -35301,47 +35255,25 @@ u32 fn_8025CC90(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x8025CCE0 | Size: 0x84 | Pattern: field_accessor */
-void fn_8025CCE0(void* ctx, u32 slot, u32 param) {
-    extern void fn_802062FC();
-    extern void fn_80236BFC();
-    extern void fn_80237F74();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = slot;
-    u32 r5 = param;
+u32 fn_8025CCE0(void* ctx, u32 slot, u32 param) {
+    extern u32 fn_802062FC(void);
+    extern u32 fn_80236BFC(u32, void*, u32);
+    extern u32 fn_80237F74(u32, u32, u32);
+    u32* args;
+    u32 a;
+    u32 b;
 
-    r29 = r3;
-    r31 = *(u32*)((u8*)r5 + 0x0);
-    r30 = *(u32*)((u8*)r5 + 0x4);
-    fn_802062FC();
-    r0 = r3 & 0xFF;
-    if ((s32)r0 == (s32)0) {
-        r3 = 0x1;
-        return;
+    args = (u32*)param;
+    a = args[0];
+    b = args[1];
+    if ((fn_802062FC() & 0xFF) == 0) {
+        return 1;
     }
-    r3 = r31;
-    r4 = r29;
-    r5 = 0xb;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r30;
-        r5 = 0x2b;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-        if (r0 == (u32)0x1) {
-            r3 = 0x0;
-            return;
+    if (((fn_80236BFC(a, ctx, 0xB) & 0xFF) == 1) &&
+        ((fn_80237F74(a, b, 0x2B) & 0xFF) == 0)) {
+        return 0;
     }
-    }
-    r3 = 0x1;
-
-    return;
+    return 1;
 }
 
 /* Address: 0x8025CD64 | Size: 0x54 | Pattern: field_accessor */
@@ -36104,41 +36036,22 @@ u32 fn_8025D744(void* ctx, u32 slot, u32 param) {
 
 /* Address: 0x8025D788 | Size: 0x80 | Pattern: field_accessor */
 void fn_8025D788(void* ctx, u32 slot, u32 param) {
-    extern void fn_8006B09C();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = slot;
-    u32 r5 = param;
+    typedef struct {
+        u32 words[0x2C6];
+    } BattleCopyBlock;
+    BattleCopyBlock* src;
+    s32 i;
+    BattleCopyBlock* dst;
 
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
-
-    r29 = 0x0;
-    r31 = 0x163;
+    i = 0;
     do {
-        r3 = r29;
-        fn_8006B09C();
-        r30 = r3 + 0xb44;
-        r3 = r29;
-        fn_8006B09C();
-        r3 = r3 + 0x2c;
-        if ((r30 != (u32)0x0) && (r3 != (u32)0x0)) {
-
-            ctr_fn = (void(*)(void))r31;
-            do {
-                r3 = *(u32*)((u8*)r4 + 0x4);
-                r0 = *(u32*)((u8*)r4 + 0x8);
-                *(u32*)((u8*)r5 + 0x4) = r3;
-                r5 += 8; *(u32*)r5 = r0;
-            } while (--ctr != 0);
+        src = (BattleCopyBlock*)((u8*)fn_8006B09C((void*)i) + 0xb44);
+        dst = (BattleCopyBlock*)((u8*)fn_8006B09C((void*)i) + 0x2c);
+        if ((src != NULL) && (dst != NULL)) {
+            *dst = *src;
         }
-        r29 = r29 + 0x1;
-    } while ((s32)r29 < (s32)0x4);
-    return;
+        i++;
+    } while ((s32)i < 4);
 }
 
 /* Address: 0x8025D808 | Size: 0x94 */
