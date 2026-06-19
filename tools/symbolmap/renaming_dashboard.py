@@ -6254,19 +6254,33 @@ HTML = r"""<!doctype html>
       if (Array.isArray(domain) && Number.isFinite(domain[0]) && Number.isFinite(domain[1]) && domain[1] > domain[0]) {
         minX = domain[0]; maxX = domain[1];
       }
-      const maxY = Math.max(100, Math.ceil((ys.length ? Math.max(...ys) : 0) / 10) * 10);
+      // Auto-zoom Y to the visible data range so the slope is readable (a fixed
+      // 0-100 axis flattens 40-60% lines). Use only the points inside the current
+      // [minX,maxX] window so panning/zooming re-fits the vertical scale too.
+      const yvis = [];
+      active.forEach(it => rows.forEach(r => {
+        const xv = (r.unix || 0) * 1000; if (xv < minX || xv > maxX) return;
+        const vv = Number(r[it.key]); if (Number.isFinite(vv) && vv > 0) yvis.push(vv);
+      }));
+      let dLo = yvis.length ? Math.min(...yvis) : 0;
+      let dHi = yvis.length ? Math.max(...yvis) : 100;
+      const span = Math.max(1, dHi - dLo);
+      const ystep = span > 40 ? 10 : span > 16 ? 5 : span > 6 ? 2 : span > 2 ? 1 : 0.5;
+      const padY = Math.max(ystep, span * 0.15);
+      let yLo = Math.max(0, Math.floor((dLo - padY) / ystep) * ystep);
+      let yHi = Math.min(100, Math.ceil((dHi + padY) / ystep) * ystep);
+      if (yHi - yLo < ystep) { yHi = Math.min(100, yLo + ystep * 2); }
       // Scale over the (possibly windowed) [minX,maxX]; clip drawing to the plot box.
       const x = v => pad.l + (w - pad.l - pad.r) * (v - minX) / Math.max(1, maxX - minX);
-      const y = v => h - pad.b - (h - pad.t - pad.b) * v / Math.max(1, maxY);
+      const y = v => h - pad.b - (h - pad.t - pad.b) * (v - yLo) / Math.max(0.001, yHi - yLo);
       // Y gridlines + percent labels at every step (read the % off the axis)
-      const ystep = maxY <= 100 ? 20 : (maxY <= 200 ? 25 : 50);
       ctx.lineWidth = 1;
-      for (let v = 0; v <= maxY + 0.01; v += ystep) {
+      for (let v = yLo; v <= yHi + 0.01; v += ystep) {
         const gy = y(v);
-        ctx.strokeStyle = v === 0 ? "#3a4a5e" : "#2d3a4b";
+        ctx.strokeStyle = "#2d3a4b";
         ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(w - pad.r, gy); ctx.stroke();
         ctx.fillStyle = "#8da0b8"; ctx.font = "11px Segoe UI, Arial"; ctx.textAlign = "right";
-        ctx.fillText(v + "%", pad.l - 6, gy + 4);
+        ctx.fillText((Number.isInteger(v) ? v : v.toFixed(1)) + "%", pad.l - 6, gy + 4);
       }
       // series lines + points -- break the line at gaps (NaN), don't plot 0.
       // Clip to the plot box so a zoomed/panned window doesn't draw past the axes.
@@ -6924,10 +6938,23 @@ HTML = r"""<!doctype html>
       squarify(items, 1, 1, w - 2, h - 2);
       ctx.font = "11px Consolas, 'Courier New', monospace";
       ctx.textBaseline = "top";
+      // Animation state: glow a tile when its byte-exact fn count rises (new match),
+      // and pulse a tile whose file an agent is actively working (from leases).
+      store.tmPrev = store.tmPrev || {};
+      store.tmGlow = store.tmGlow || {};
+      const nowMs = Date.now();
       for (const it of items) {
         const r = it._rect;
         if (!r || r.w < 0.5 || r.h < 0.5) continue;
         tm.rects.push({ x: r.x, y: r.y, w: r.w, h: r.h, item: it });
+        // detect a fresh match in this unit -> arm a 2.2s glow
+        if (it.kind === "unit" && it.ref) {
+          const nm = it.ref.name || it.label;
+          const cur = Number(it.ref.matched_functions || 0);
+          const prev = store.tmPrev[nm];
+          if (prev !== undefined && cur > prev) store.tmGlow[nm] = nowMs + 2200;
+          store.tmPrev[nm] = cur;
+        }
         ctx.fillStyle = tmColor(it.pct);
         ctx.fillRect(r.x, r.y, r.w, r.h);
         ctx.strokeStyle = "rgba(13,17,24,.75)";
@@ -6944,6 +6971,63 @@ HTML = r"""<!doctype html>
           if (r.h > 32) ctx.fillText(pctText(it.pct), r.x + 4, r.y + 16);
           ctx.restore();
         }
+        // --- match glow (green, fading) ---
+        const nm = it.ref && (it.ref.name || it.label);
+        const gExp = nm && store.tmGlow[nm];
+        if (gExp && nowMs < gExp) {
+          const a = (gExp - nowMs) / 2200;            // 1 -> 0
+          ctx.save();
+          ctx.strokeStyle = `rgba(110,231,168,${0.95 * a})`;
+          ctx.lineWidth = 3;
+          ctx.shadowColor = "rgba(110,231,168,0.95)";
+          ctx.shadowBlur = 18 * a;
+          ctx.strokeRect(r.x + 1.5, r.y + 1.5, Math.max(0, r.w - 3), Math.max(0, r.h - 3));
+          ctx.restore();
+        }
+        // --- active-agent pulse (blue, oscillating) + agent badge ---
+        const src = it.ref && String(it.ref.source || "").replace(/\\/g, "/");
+        const agent = src && store.tmAgents && store.tmAgents[src];
+        if (agent) {
+          const p = 0.5 + 0.5 * Math.sin(nowMs / 280);   // 0..1 pulse
+          ctx.save();
+          ctx.strokeStyle = `rgba(127,209,255,${0.40 + 0.5 * p})`;
+          ctx.lineWidth = 2.5;
+          ctx.strokeRect(r.x + 1.5, r.y + 1.5, Math.max(0, r.w - 3), Math.max(0, r.h - 3));
+          if (r.w > 44 && r.h > 14) {
+            ctx.fillStyle = `rgba(127,209,255,${0.7 + 0.3 * p})`;
+            ctx.font = "bold 10px Consolas, monospace";
+            ctx.textAlign = "right";
+            ctx.fillText("● " + agent, r.x + r.w - 4, r.y + r.h - 6);
+            ctx.textAlign = "left";
+          }
+          ctx.restore();
+        }
+        // --- permuter annealing (amber marching-ants, distinct from the agent pulse) ---
+        const pinfo = src && store.tmPermuter && store.tmPermuter[src];
+        if (pinfo) {
+          ctx.save();
+          ctx.strokeStyle = "rgba(255,176,72,0.95)";
+          ctx.lineWidth = 2.5;
+          ctx.setLineDash([6, 4]);
+          ctx.lineDashOffset = -((nowMs / 40) % 10);   // marching ants = annealing
+          ctx.strokeRect(r.x + 1.5, r.y + 1.5, Math.max(0, r.w - 3), Math.max(0, r.h - 3));
+          ctx.setLineDash([]);
+          if (r.w > 52 && r.h > 28) {
+            ctx.fillStyle = "rgba(255,176,72,0.96)";
+            ctx.font = "bold 10px Consolas, monospace";
+            ctx.textAlign = "left";
+            ctx.fillText("⚛ " + (pinfo.fn || "anneal") + " best " + (pinfo.best == null ? "?" : pinfo.best), r.x + 4, r.y + r.h - 6);
+          }
+          ctx.restore();
+        }
+      }
+      // keep animating while a glow is fading, an agent is working, or the permuter
+      // is annealing a tile (throttled ~11fps).
+      const glowing = Object.values(store.tmGlow).some(t => t > nowMs);
+      const working = store.tmAgents && Object.keys(store.tmAgents).length > 0;
+      const annealing = store.tmPermuter && Object.keys(store.tmPermuter).length > 0;
+      if ((glowing || working || annealing) && tm.level === "files" && !store._tmTimer) {
+        store._tmTimer = setTimeout(() => { store._tmTimer = 0; renderTreemap(); }, 90);
       }
     }
     function treemapHit(evt) {
@@ -8095,6 +8179,13 @@ HTML = r"""<!doctype html>
 
     function renderLeases(d) {
       store._leases = d || {};
+      // expose active leases to the treemap (source file -> agent) for the working-tile pulse
+      store.tmAgents = {};
+      for (const l of ((d && d.active) || [])) {
+        const f = String(l.active_src || l.file || "").replace(/\\/g, "/");
+        if (f) store.tmAgents[f] = l.owner || l.tag || "?";
+      }
+      if (store.tm && store.tm.level === "files" && typeof renderTreemap === "function") { try { renderTreemap(); } catch (e) {} }
       const aN = $("lease-active-n"), qN = $("lease-queued-n");
       if (aN) setText(aN, d.active_count || 0);
       if (qN) setText(qN, d.queued_count || 0);
@@ -8322,6 +8413,15 @@ HTML = r"""<!doctype html>
         setT("quantum-note", "idle"); return;
       }
       const s = d.state || {};
+      // expose the permuter's active anneal targets to the treemap (file -> {fn,iter,best})
+      // so the tile the swarm is currently cracking gets its own (amber) animation.
+      store.tmPermuter = {};
+      const pact = s.active || {};
+      for (const k in pact) {
+        const a = pact[k]; const f = String(a.file || "").replace(/\\/g, "/");
+        if (f) store.tmPermuter[f] = { fn: a.fn, iter: a.iter, best: a.best };
+      }
+      if (store.tm && store.tm.level === "files" && typeof renderTreemap === "function") { try { renderTreemap(); } catch (e) {} }
       // grind2.py writes: active_fn/active_file, iteration, score, best_score, queue,
       // workers, plus a per-worker `active` map. Lower score = closer (0 = exact match).
       setT("quantum-note", s.active_fn || s.fn || s["function"] || "permuter swarm");
