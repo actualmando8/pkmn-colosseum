@@ -11,11 +11,26 @@
 #   settings.toml — compiler_type=mwcc, func_name=<fn_name>, objdump_command
 set -euo pipefail
 
-REPO="/mnt/c/Users/douglaswhittingham/pkmn-colosseum"
+# Derive the repo root from this script's location (tools/decomp_work/permuter/
+# build_dir.sh -> three dirs up). No hardcoded /mnt/c, so the tree can live on
+# native ext4 or the Windows mount without editing this file.
+SELF="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO="$(cd "$SELF/../../.." && pwd)"
 PERM="$REPO/tools/decomp_work/refs/decomp-permuter"
 PDIR="$REPO/tools/decomp_work/permuter"
-MWCC="$REPO/tools/mwcc_compiler/GC/1.3/mwcceppc.exe"
+# Prefer the ext4 compiler cache (see compile.sh) to avoid 9p reads; fall back
+# to the in-repo copy.
+MWCC_CACHE="$HOME/.cache/decomp-mwcc/GC/1.3/mwcceppc.exe"
+if [ -f "$MWCC_CACHE" ]; then MWCC="$MWCC_CACHE"; else MWCC="$REPO/tools/mwcc_compiler/GC/1.3/mwcceppc.exe"; fi
 INCLUDE="$REPO/include"
+
+# wibo runs mwcceppc.exe natively under Linux (no WSL<->Windows interop).
+WIBO="${WIBO:-}"
+if [ -z "$WIBO" ]; then
+  if command -v wibo >/dev/null 2>&1; then WIBO="$(command -v wibo)"
+  elif [ -x "$HOME/.local/bin/wibo" ]; then WIBO="$HOME/.local/bin/wibo"
+  else echo "build_dir.sh: wibo not found on PATH or at ~/.local/bin/wibo" >&2; exit 127; fi
+fi
 
 FN="$1"
 SRC="$REPO/$2"              # e.g. src/game/gs_field_world.c
@@ -42,15 +57,12 @@ TMPSRC="$OUTDIR/_src.c"
 # a. select the target's C branch (no-op if it is already on the C branch).
 python3 "$PDIR/select_c_branch.py" "$SRC" "$FN" > "$TMPSRC"
 
-WIN_INC="$(wslpath -w "$INCLUDE")"
-WIN_TMPSRC="$(wslpath -w "$TMPSRC")"
-WIN_PP="$(wslpath -w "$PP")"
-# b. preprocess the temp copy. -I the original src dir so its relative
-#    "src/game/..._fn_*.inc" #includes still resolve (the inc files are only
-#    pulled in by asm wrappers we have de-selected, but keep the path valid).
-( cd "$REPO" && "$MWCC" -O4,p -nodefaults -proc gekko -fp hard -Cpp_exceptions off \
+# b. preprocess the temp copy via wibo (native, no interop, Linux paths).
+#    cd "$REPO" so relative "src/game/..._fn_*.inc" #includes still resolve
+#    (only referenced by the asm wrappers we have de-selected, but keep valid).
+( cd "$REPO" && "$WIBO" "$MWCC" -O4,p -nodefaults -proc gekko -fp hard -Cpp_exceptions off \
     -enum int -warn off -use_lmw_stmw on -sdata 8 -sdata2 8 \
-    -i "$WIN_INC" -E -o "$WIN_PP" "$WIN_TMPSRC" ) >/dev/null 2>&1 || true
+    -i "$INCLUDE" -E -o "$PP" "$TMPSRC" ) >/dev/null 2>&1 || true
 
 # c. Drop mwcc's "/* #line ... */" markers (confuse strip_other_fns / re-parse)
 sed -i '/^\/\* #line /d' "$PP"
