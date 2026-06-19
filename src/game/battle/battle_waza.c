@@ -530,14 +530,16 @@ void fn_801D228C(s32 seqHandle, f32 targetRot, f32 speed) {
  * Address: 0x801D23C0 | Size: 0x44
  */
 extern s32 lbl_80467390[];
+#pragma peephole off
 void fn_801D23C0(void) {
-    s32 handle;
+    u32 handle;
     lbl_80467390[1] = 0x258;
     handle = lbl_80467390[2];
     if (handle != 0) {
         fn_801669E4(handle, 0, 0);
     }
 }
+#pragma peephole on
 
 /**
  * fn_801D2404 - Waza effect complex transform.
@@ -575,12 +577,17 @@ void fn_801D29D8(s32 moveID, s32 hitCount) {
  * fn_801D2B08 - Waza register multi-hit callback and clear state.
  * Address: 0x801D2B08 | Size: 0x44
  */
+#pragma peephole off
 void fn_801D2B08(void) {
+    s32* state;
+
     heroMoveAddStepCallback(fn_801D29D8, 0);
-    lbl_80467390[0] = 0;
-    lbl_80467390[2] = 0;
-    lbl_80467390[3] = 0;
+    state = lbl_80467390;
+    state[0] = 0;
+    state[2] = 0;
+    state[3] = 0;
 }
+#pragma peephole on
 
 /**
  * fn_801D2B4C - Waza multi-hit advance.
