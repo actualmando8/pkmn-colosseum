@@ -29975,38 +29975,18 @@ void fn_802589B4(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x80258A64 | Size: 0x6C | Pattern: field_accessor */
-void fn_80258A64(void* ctx, u32 slot, u32 param) {
+u32 fn_80258A64(void* ctx, u32 slot, u32 param) {
+    extern u32 fn_80236BFC(void*, u32, u32);
+    extern u32 fn_802373B0(void*, u32, s32, f32);
     extern f32 lbl_8047E650;
-    extern void fn_80236BFC();
-    extern void fn_802373B0();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f1 = 0.0f;
-    u32 r4 = slot;
-    u32 r5 = param;
+    u32 result;
 
-    r5 = 0x14;
-    r30 = r3;
-    r31 = r4;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-    } else {
-
-        f1 = lbl_8047E650;
-        r3 = r30;
-        r4 = r31;
-        r5 = -0x1;
-        fn_802373B0();
-        r0 = r3 & 0xFF;
-        r3 = 0x1 - r0;
-        r3 = r3 - r0; /* -borrow */;
+    if ((fn_80236BFC(ctx, slot, 0x14) & 0xff) == 1) {
+        return 0;
     }
-    return;
+
+    result = fn_802373B0(ctx, slot, -1, lbl_8047E650) & 0xff;
+    return result != 1;
 }
 
 /* Address: 0x80258AD0 | Size: 0xB4 */
