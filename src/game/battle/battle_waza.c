@@ -537,6 +537,7 @@ extern s32 lbl_80467390[];
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 void fn_801D23C0(void) {
     u32 handle;
     lbl_80467390[1] = 0x258;
@@ -545,6 +546,7 @@ void fn_801D23C0(void) {
         fn_801669E4(handle, 0, 0);
     }
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
@@ -596,6 +598,7 @@ void fn_801D29D8(s32 moveID, s32 hitCount) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 void fn_801D2B08(void) {
     s32* state;
 
@@ -605,6 +608,7 @@ void fn_801D2B08(void) {
     state[2] = 0;
     state[3] = 0;
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
@@ -1265,7 +1269,27 @@ void* fn_801DA7AC(s32 effectType) {
  * Address: 0x801DA83C | Size: 0x88
  */
 void fn_801DA83C(void* effect) {
-    /* TODO: Free to effect pool (0x88 bytes) */
+    extern void fn_801DBB10(void* obj);
+    extern void fn_801DBDDC(void* obj);
+
+    void* cur;
+    void* next;
+
+    if (effect != NULL) {
+        cur = *(void**)((u8*)effect + 0x68);
+        if (*(u8*)((u8*)effect + 0x74) == 0) {
+            return;
+        }
+        while (cur != NULL) {
+            next = *(void**)((u8*)cur + 0x34);
+            if (*(u8*)((u8*)cur + 0x14) != 0) {
+                fn_801DBB10(cur);
+            }
+            fn_801DBDDC(cur);
+            cur = next;
+        }
+        *(void**)((u8*)effect + 0x68) = NULL;
+    }
 }
 
 /**
@@ -1644,8 +1668,28 @@ void fn_801DBB10(void* obj) {
  * fn_801DBC30 - Waza rendering cleanup.
  * Address: 0x801DBC30 | Size: 0x9C
  */
-void fn_801DBC30(void) {
-    /* TODO: Waza rendering cleanup (0x9C bytes) */
+void fn_801DBC30(void* obj) {
+    extern void fn_800E3CC8(s32, s32);
+    extern void fn_801D3034(void*);
+    extern void fn_801DEF0C(void*, s32, s32);
+
+    void* owner;
+    s32 kind;
+
+    if (obj != NULL) {
+        owner = *(void**)((u8*)obj + 0x3C);
+        if (*(u8*)((u8*)obj + 0x14) != 0 && *(void**)((u8*)owner + 0x6C) == obj) {
+            kind = *(s32*)((u8*)obj + 0xC);
+            if (kind >= 0xB || kind < 9) {
+                fn_801DEF0C(owner, 1, 0);
+            }
+            if (*(u8*)((u8*)obj + 0x16) != 0) {
+                fn_801D3034(owner);
+            }
+            fn_800E3CC8(*(s32*)((u8*)owner + 0x24), 0);
+            *(u32*)((u8*)owner + 0x6C) = 0;
+        }
+    }
 }
 
 /**

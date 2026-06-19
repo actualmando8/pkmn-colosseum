@@ -376,13 +376,13 @@ extern u32 fn_8013B558(void* ptr);
 extern u16 surfEffectStart(void);
 extern void fn_8013B85C(void);
 extern void fn_8013BA98(void* ptr);
-extern void fn_8013BC10(void);
+extern void fn_8013BC10(void* ptr, f32 t);
 extern void fn_8013BE04(void);
 extern void fn_8013C074(void);
 extern u32 fn_8013C614(void* ptr);
 extern u32 fn_8013C670(void* ptr);
 extern u16 seaEffectStart(void);
-extern void fn_8013CA48(void);
+extern u32 fn_8013CA48(void* ptr, u32 delta);
 extern void fn_8013CBF0(void);
 extern void fn_8013CE58(void* inner, void* ptr);
 extern void fn_8013D0A8(void);
@@ -390,13 +390,13 @@ extern u32 fn_8013D730(void* ptr);
 extern u32 fn_8013D7CC(void* ptr);
 extern u32 envMapEffectInit(void* ptr);
 extern u32 envMapEffectStart(void* ptr);
-extern void fn_8013D984(void);
+extern u32 fn_8013D984(void* ptr, u32 delta);
 extern u32 fn_8013DC94(void* ptr);
 extern u32 fn_8013DD10(void* ptr);
 extern u32 fn_8013DD7C(void* ptr);
 extern u32 blurEffectStart(void* ptr);
 extern void fn_8013DE6C(void);
-extern void fn_8013E258(void);
+extern u32 fn_8013E258(void* model, void* unused, void* state);
 extern u32 fn_8013E470(void* ptr, u32 delta);
 extern u32 fn_8013E54C(void* ptr);
 extern u32  fn_8013E5AC(u8* p);
@@ -1143,11 +1143,11 @@ extern u32 lbl_8047D214;
 extern u32 lbl_8047D218;
 extern u32 lbl_8047D21C;
 #if 1
-asm void fn_8013BC10(void) {
+asm void fn_8013BC10(void* ptr, f32 t) {
 #include "src/game/effect/effect_visual_fn_8013BC10.inc"
 }
 #else
-void fn_8013BC10(void) { /* TODO */ }
+void fn_8013BC10(void* ptr, f32 t) { /* TODO */ }
 #endif
 extern u32 lbl_8047D220;
 extern u32 lbl_8047D204;
@@ -1272,11 +1272,11 @@ extern u32 lbl_8047D240;
 extern u32 lbl_8047D244;
 extern u32 lbl_8047D250;
 #if 1
-asm void fn_8013CA48(void) {
+asm u32 fn_8013CA48(void* ptr, u32 delta) {
 #include "src/game/effect/effect_visual_fn_8013CA48.inc"
 }
 #else
-void fn_8013CA48(void) { /* TODO */ }
+u32 fn_8013CA48(void* ptr, u32 delta) { /* TODO */ }
 #endif
 extern u32 lbl_8047D23C;
 extern u32 lbl_8047D240;
@@ -1489,11 +1489,11 @@ extern void fn_800E60F0(void);
 extern u32 lbl_8047AEE0;
 extern u32 lbl_8047D260;
 #if 1
-asm void fn_8013D984(void) {
+asm u32 fn_8013D984(void* ptr, u32 delta) {
 #include "src/game/effect/effect_visual_fn_8013D984.inc"
 }
 #else
-void fn_8013D984(void) { /* TODO */ }
+u32 fn_8013D984(void* ptr, u32 delta) { /* TODO */ }
 #endif
 #if 0
 asm void fn_8013DB64(void* ptr, u32 val, f32 f1, f32 f2) {
@@ -1676,11 +1676,11 @@ extern u32 lbl_8047D2A0;
 extern u8 lbl_80314AE8[];
 extern u32 lbl_8047D280;
 #if 1
-asm void fn_8013E258(void) {
+asm u32 fn_8013E258(void* model, void* unused, void* state) {
 #include "src/game/effect/effect_visual_fn_8013E258.inc"
 }
 #else
-void fn_8013E258(void) { /* TODO */ }
+u32 fn_8013E258(void* model, void* unused, void* state) { /* TODO */ }
 #endif
 #if 0
 asm void fn_8013E470(void) {

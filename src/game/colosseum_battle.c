@@ -25309,8 +25309,8 @@ void fn_80254D4C(void* ctx, u32 param1, u32 param2) {
 u32 fn_80254E00(void)
 
 {
-    extern short fn_80236B98();
-  short sVar1;
+    extern u16 fn_80236B98();
+  u16 sVar1;
   
   sVar1 = fn_80236B98();
   return sVar1 != 0;
@@ -33878,8 +33878,8 @@ void fn_8025B918(void* ctx, u32 param1, u32 param2, u32 param3) {
 u32 fn_8025BA00(void)
 
 {
-    extern int fn_8025CB3C();
-  short sVar1;
+    extern u16 fn_8025CB3C();
+  u16 sVar1;
   
   sVar1 = fn_8025CB3C();
   return sVar1 != 0;
