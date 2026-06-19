@@ -532,6 +532,7 @@ void fn_801D228C(s32 seqHandle, f32 targetRot, f32 speed) {
 extern s32 lbl_80467390[];
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 void fn_801D23C0(void) {
     u32 handle;
     lbl_80467390[1] = 0x258;
@@ -540,6 +541,7 @@ void fn_801D23C0(void) {
         fn_801669E4(handle, 0, 0);
     }
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 
@@ -581,6 +583,7 @@ void fn_801D29D8(s32 moveID, s32 hitCount) {
  */
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 void fn_801D2B08(void) {
     s32* state;
 
@@ -590,6 +593,7 @@ void fn_801D2B08(void) {
     state[2] = 0;
     state[3] = 0;
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 
@@ -1058,7 +1062,12 @@ u8 fn_801D9E1C(void* obj) {
  * Address: 0x801D9E34 | Size: 0x58
  */
 void fn_801D9E34(void* obj) {
-    /* Cancel current Pokemon motion */
+    extern void fn_80118A68();
+
+    if (*(u32*)(lbl_80467CC0 + 0xC) != 0 && *(u32*)((u8*)obj + 0x84) != 0) {
+        fn_80118A68(*(u32*)((u8*)obj + 0x84), 1);
+        *(u32*)((u8*)obj + 0x84) = 0;
+    }
 }
 
 /* =========================================================================
@@ -1612,6 +1621,19 @@ void fn_801DBDDC(void* obj) {
  * Address: 0x801DBFB0 | Size: 0x64
  */
 s32 fn_801DBFB0(void) {
+    extern u16 fn_800E3534(u32 size);
+    extern void* fn_800E27B0(u16 handle);
+
+    u16 handle;
+    void* obj;
+
+    handle = fn_800E3534(0x40);
+    if (handle != 0) {
+        obj = fn_800E27B0(handle);
+        memset(obj, 0, 0x40);
+        *(u16*)((u8*)obj + 0x2A) = handle;
+        return (s32)obj;
+    }
     return 0;
 }
 
@@ -1911,6 +1933,15 @@ void fn_801DDEE4(s32 slot, s32 flashType) {
  * Address: 0x801DE164 | Size: 0x2C
  */
 BOOL fn_801DE164(s32 slot) {
+    void* obj;
+
+    obj = (void*)slot;
+    if (obj == NULL) {
+        return FALSE;
+    }
+    if (*(u8*)((u8*)obj + 0x75) != 0) {
+        return *(s32*)((u8*)obj + 0x78);
+    }
     return FALSE;
 }
 
@@ -1942,8 +1973,12 @@ void fn_801DE598(void) {
  * fn_801DE654 - Waza HP drain get active.
  * Address: 0x801DE654 | Size: 0x44
  */
-BOOL fn_801DE654(void) {
-    return FALSE;
+void fn_801DE654(s32 arg0, s32 arg1) {
+    extern void fn_801DE698();
+    extern void _eyeTexAnimEnded();
+
+    fn_801DE698();
+    _eyeTexAnimEnded(arg0, arg1);
 }
 
 /**
