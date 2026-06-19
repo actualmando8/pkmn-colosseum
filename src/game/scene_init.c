@@ -2369,11 +2369,25 @@ asm void fn_8003C24C(void) {
 #pragma optimization_level 4
 void fn_8003C24C(u8* ctx, u8* p) {
     s16 field6 = *(s16*)(p + 6);
-    if (field6 != 0x2e3 && field6 >= 0x2e2 && field6 < 0x2e5) {
-        ctx[0x8b] = (u8)(lbl_8047BAC0 * *(f32*)(lbl_803A6748 + 0x44));
-    } else {
-        fn_8003C2B8();
+    if (field6 == 0x2e3) {
+        goto call_fallback;
     }
+    if (field6 < 0x2e3) {
+        if (field6 >= 0x2e2) {
+            goto set_value;
+        }
+        goto call_fallback;
+    }
+    if (field6 >= 0x2e5) {
+        goto call_fallback;
+    }
+set_value:
+    {
+        ctx[0x8b] = (u8)(lbl_8047BAC0 * *(f32*)(lbl_803A6748 + 0x44));
+        return;
+    }
+call_fallback:
+    fn_8003C2B8();
 }
 #endif
 
