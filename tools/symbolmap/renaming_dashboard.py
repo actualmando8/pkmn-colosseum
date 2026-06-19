@@ -8322,14 +8322,18 @@ HTML = r"""<!doctype html>
         setT("quantum-note", "idle"); return;
       }
       const s = d.state || {};
-      setT("quantum-note", s.fn || s["function"] || "permuter swarm");
+      // grind2.py writes: active_fn/active_file, iteration, score, best_score, queue,
+      // workers, plus a per-worker `active` map. Lower score = closer (0 = exact match).
+      setT("quantum-note", s.active_fn || s.fn || s["function"] || "permuter swarm");
+      const num = (v, dp) => v != null ? (dp != null ? Number(v).toFixed(dp) : v) : "-";
+      const qn = Array.isArray(s.queue) ? s.queue.length : s.queue;
       const cells = [
-        ["best %", s.best != null ? Number(s.best).toFixed(2) : (s.best_pct != null ? Number(s.best_pct).toFixed(2) : "-")],
-        ["energy", s.energy != null ? Number(s.energy).toFixed(1) : "-"],
-        ["temp", s.temperature != null ? Number(s.temperature).toFixed(3) : (s.temp != null ? Number(s.temp).toFixed(3) : "-")],
-        ["iters", s.iterations != null ? s.iterations : (s.iters != null ? s.iters : "-")],
-        ["queue", Array.isArray(s.queue) ? s.queue.length : (s.queue != null ? s.queue : "-")],
-        ["workers", s.workers != null ? s.workers : "-"],
+        ["best score", num(s.best_score != null ? s.best_score : s.best)],
+        ["score", num(s.score != null ? s.score : s.energy)],
+        ["active", s.active_file ? String(s.active_file).split("/").pop() : "-"],
+        ["iters", num(s.iteration != null ? s.iteration : (s.iterations != null ? s.iterations : s.iters))],
+        ["queue", num(qn)],
+        ["workers", num(s.workers)],
       ];
       for (const [k, v] of cells) {
         const c = document.createElement("div"); c.className = "q-cell";
