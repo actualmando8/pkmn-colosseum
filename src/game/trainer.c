@@ -6863,22 +6863,25 @@ void fn_801FE91C(void) {
 /* 0x801FEC10 | size: 0xC4 */
 typedef struct { u8 data[0x154]; } CopyBlock_0x154;
 u32 fn_801FEC10(void* context) {
+    extern u32 fn_801254B4();
     CopyBlock_0x154* src;
     CopyBlock_0x154* dest;
+    register CopyBlock_0x154* dest2;
 
     if (context == NULL) {
         return 0;
     }
     src = (CopyBlock_0x154*)fn_8012640C(context, 0, 0xD5, 0);
     dest = (CopyBlock_0x154*)fn_8012640C(context, 0, 0xD7, 0);
+    dest2 = dest;
     if (src == NULL) {
         return 0;
     }
-    if (dest == NULL) {
+    if (dest2 == NULL) {
         return 0;
     }
-    *dest = *src;
-    fn_801254B4(context, 0, 0xD6, 0, 0);
+    *dest2 = *src;
+    fn_801254B4(context, 0, 0xD6, 0, (u32)dest2);
     return 1;
 }
 

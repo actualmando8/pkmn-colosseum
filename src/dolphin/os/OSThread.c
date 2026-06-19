@@ -909,15 +909,22 @@ OSThread* fn_800A1528(OSThread* thread, s32 priority) {
     return NULL;
 }
 #endif
+#pragma push
+#pragma optimization_level 2
 #if 1
-asm void fn_800A16E8(void) {
-#include "src/dolphin/os/OSThread_fn_800A16E8.inc"
+void fn_800A16E8(OSThread* thread, s32 priority) {
+loop:
+    if (thread->suspend > 0) return;
+    if (thread->priority <= priority) return;
+    thread = fn_800A1528(thread, priority);
+    if (thread != NULL) goto loop;
 }
 #else
 void fn_800A16E8(OSThread* thread, s32 priority) {
     /* TODO: match -- __OSPromoteThread duplicate at 0x800A16E8 */
 }
 #endif
+#pragma pop
 extern void fn_8009F958(OSThread* thread);
 #if 1
 asm void fn_800A1BB4(void) {
