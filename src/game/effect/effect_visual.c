@@ -357,10 +357,10 @@ extern void fn_80139074(void);
 extern void _leaffxGenerateLeafData(void* ptr, void* entry);
 extern u32 fn_80139898(void* ptr);
 extern u32 fn_801398E0(void* ptr);
-extern void fn_80139934(void);
+extern u32 fn_80139934(void* ptr);
 extern BOOL fn_80139AC4(void* ptr, u32 tick);
 extern u32 fn_80139D10(void* ptr);
-extern void fn_80139E80(void);
+extern void fn_80139E80(void* entry, void* parent, void* cameraPos, void* modelPos);
 extern void fn_8013A1D4(void* arg0, void* arg1, void* arg2, u32 arg3, f32 arg4);
 extern u32 fn_8013A49C(void* ptr);
 extern void fn_8013A520(void);
@@ -375,7 +375,7 @@ extern u32 fn_8013B504(void* ptr);
 extern u32 fn_8013B558(void* ptr);
 extern u16 surfEffectStart(void);
 extern void fn_8013B85C(void);
-extern void fn_8013BA98(void);
+extern void fn_8013BA98(void* ptr);
 extern void fn_8013BC10(void);
 extern void fn_8013BE04(void);
 extern void fn_8013C074(void);
@@ -402,13 +402,13 @@ extern u32 fn_8013E54C(void* ptr);
 extern u32  fn_8013E5AC(u8* p);
 extern u32 auraEffectStart(void* ptr);
 extern u32 fn_8013E6C4(u8* ptr);
-extern void fn_8013E8A4(void);
+extern u32 fn_8013E8A4(void* ptr, u32 delta);
 extern void fn_8013EA44();
 extern u32 fn_8013F078(void* ptr);
 extern void fn_8013F114(void);
 extern u16 distortionEffectStart(void);
 extern void fn_8013F410(void);
-extern void fn_8013F80C(void);
+extern u32 fn_8013F80C(void* ptr, u32 delta);
 extern void _distortionEffectUpdateMatrices(void);
 extern u32 fn_8013FC58(void* ptr);
 extern u32 fn_8013FCC4(void* ptr);
@@ -683,11 +683,11 @@ u32 fn_801398E0(void* ptr) {
 extern void fn_800EE7E0(void);
 extern u32 lbl_8047D190;
 #if 1
-asm void fn_80139934(void) {
+asm u32 fn_80139934(void* ptr) {
 #include "src/game/effect/effect_visual_fn_80139934.inc"
 }
 #else
-void fn_80139934(void) { /* TODO */ }
+u32 fn_80139934(void* ptr) { /* TODO */ }
 #endif
 extern u32 lbl_8047D198;
 extern u32 lbl_8047D1A0;
@@ -718,11 +718,11 @@ extern u32 lbl_8047D190;
 extern u32 lbl_8047D1AC;
 extern u32 lbl_8047D1B0;
 #if 1
-asm void fn_80139E80(void) {
+asm void fn_80139E80(void* entry, void* parent, void* cameraPos, void* modelPos) {
 #include "src/game/effect/effect_visual_fn_80139E80.inc"
 }
 #else
-void fn_80139E80(void) { /* TODO */ }
+void fn_80139E80(void* entry, void* parent, void* cameraPos, void* modelPos) { /* TODO */ }
 #endif
 extern u32 lbl_8047D1B4;
 extern u32 lbl_8047D190;
@@ -1130,11 +1130,11 @@ extern u8 lbl_8031554C[];
 extern u8 lbl_80315540[];
 extern u32 lbl_8047D200;
 #if 1
-asm void fn_8013BA98(void) {
+asm void fn_8013BA98(void* ptr) {
 #include "src/game/effect/effect_visual_fn_8013BA98.inc"
 }
 #else
-void fn_8013BA98(void) { /* TODO */ }
+void fn_8013BA98(void* ptr) { /* TODO */ }
 #endif
 extern void fn_800E0204(void);
 extern u32 lbl_8047D200;
@@ -1864,11 +1864,11 @@ extern u32 lbl_8047D2C8;
 extern u32 lbl_8047D2D0;
 extern u32 lbl_8047D2D4;
 #if 1
-asm void fn_8013E8A4(void) {
+asm u32 fn_8013E8A4(void* ptr, u32 delta) {
 #include "src/game/effect/effect_visual_fn_8013E8A4.inc"
 }
 #else
-void fn_8013E8A4(void) { /* TODO */ }
+u32 fn_8013E8A4(void* ptr, u32 delta) { /* TODO */ }
 #endif
 extern void __assert(void);
 extern void fn_800E3C5C(void);
@@ -2002,11 +2002,11 @@ extern u32 lbl_8047D310;
 extern u32 lbl_8047D300;
 extern u32 lbl_8047D308;
 #if 1
-asm void fn_8013F80C(void) {
+asm u32 fn_8013F80C(void* ptr, u32 delta) {
 #include "src/game/effect/effect_visual_fn_8013F80C.inc"
 }
 #else
-void fn_8013F80C(void) { /* TODO */ }
+u32 fn_8013F80C(void* ptr, u32 delta) { /* TODO */ }
 #endif
 extern void fn_800D7BF8(void);
 extern void GScameraGetLookAt(void);
@@ -2282,12 +2282,14 @@ asm void fn_801436F0(void) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 u32 fn_801436F0(void* ptr) {
     s32 v;
     if (ptr == NULL) return 0;
     v = !!((((u8*)ptr)[0x4] >> 3) & 1);
     return v;
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
@@ -2339,12 +2341,14 @@ asm void fn_80143778(void) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 unsigned int fn_80143778(const void *ptr) {
     s32 v;
     if (ptr == NULL) return 0;
     v = !!((((u8*)ptr)[0x4] >> 4) & 1);
     return v;
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
