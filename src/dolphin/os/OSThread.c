@@ -871,7 +871,8 @@ void fn_800A1484(OSThread* thread) {
     }
 
     if (!queue->head) {
-        RunQueueBits_8047A760 &= ~(1 << (31 - thread->priority));
+        u32 bit = 1 << (31 - thread->priority);
+        RunQueueBits_8047A760 = RunQueueBits_8047A760 & ~bit;
     }
     thread->queue = NULL;
 }
