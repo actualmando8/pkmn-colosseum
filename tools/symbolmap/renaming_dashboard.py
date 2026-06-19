@@ -4345,6 +4345,12 @@ HTML = r"""<!doctype html>
       gap: 8px;
       margin-bottom: 10px;
     }
+    .treemap-legend { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; font: 600 10px "Cascadia Mono", monospace; color: var(--muted); }
+    .treemap-legend .tm-leg { display: inline-flex; gap: 5px; align-items: center; }
+    .treemap-legend .sw { width: 11px; height: 11px; border-radius: 2px; display: inline-block; box-sizing: border-box; }
+    .treemap-legend .sw.glow { background: rgba(110,231,168,.85); box-shadow: 0 0 6px rgba(110,231,168,.9); }
+    .treemap-legend .sw.agent { border: 2px solid rgba(127,209,255,.95); }
+    .treemap-legend .sw.anneal { border: 2px dashed rgba(255,176,72,.95); }
     .treemap-controls {
       display: grid;
       grid-template-columns: minmax(160px, 1fr) minmax(150px, 210px) auto auto auto;
@@ -5545,6 +5551,11 @@ HTML = r"""<!doctype html>
             <h2>Match Progress Over Time</h2>
             <span class="panel-note" id="timeline-range"></span>
             <div class="range-group" id="history-range" role="group" aria-label="Time range">
+              <button class="range-btn" type="button" data-days="0.003472">5m</button>
+              <button class="range-btn" type="button" data-days="0.010417">15m</button>
+              <button class="range-btn" type="button" data-days="0.020833">30m</button>
+              <button class="range-btn" type="button" data-days="0.041667">1h</button>
+              <button class="range-btn" type="button" data-days="0.166667">4h</button>
               <button class="range-btn" type="button" data-days="1">24h</button>
               <button class="range-btn" type="button" data-days="3">3d</button>
               <button class="range-btn" type="button" data-days="7">7d</button>
@@ -5630,6 +5641,11 @@ HTML = r"""<!doctype html>
               <label class="area-toggle"><input id="decomp-area-fns" type="checkbox"> area by fn count</label>
               <button class="btn" id="decomp-near" type="button">Near Match</button>
               <button class="btn" id="decomp-clear" type="button">Clear</button>
+            </div>
+            <div class="treemap-legend" aria-label="treemap animation legend">
+              <span class="tm-leg"><i class="sw glow"></i>new match</span>
+              <span class="tm-leg"><i class="sw agent"></i>agent working</span>
+              <span class="tm-leg"><i class="sw anneal"></i>permuter annealing</span>
             </div>
           </div>
           <div class="treemap-shell">
@@ -6918,6 +6934,34 @@ HTML = r"""<!doctype html>
         tip: `<b>${fn.name || ""}</b><br>${pctText(fn.fuzzy_pct)} fuzzy | ${Number(fn.size || 0).toLocaleString()} bytes`
       }));
     }
+    // Wrap a tile label (file name / fn_XXXX, usually no spaces) to fit maxW: break
+    // after separators (_ . /) first, then hard-break by character so it never clips.
+    function wrapLabel(ctx, text, maxW) {
+      text = String(text || "");
+      if (maxW <= 4 || ctx.measureText(text).width <= maxW) return [text];
+      const toks = text.split(/(?<=[_./-])/);
+      const lines = []; let cur = "";
+      const pushChars = (tok) => {
+        let piece = "";
+        for (const ch of tok) {
+          if (piece && ctx.measureText(piece + ch).width > maxW) { lines.push(piece); piece = ch; }
+          else piece += ch;
+        }
+        return piece;
+      };
+      for (const tok of toks) {
+        if (!cur) {
+          cur = (ctx.measureText(tok).width > maxW) ? pushChars(tok) : tok;
+        } else if (ctx.measureText(cur + tok).width <= maxW) {
+          cur += tok;
+        } else {
+          lines.push(cur);
+          cur = (ctx.measureText(tok).width > maxW) ? pushChars(tok) : tok;
+        }
+      }
+      if (cur) lines.push(cur);
+      return lines;
+    }
     function renderTreemap() {
       const canvas = $("decomp-treemap");
       const decomp = (store.data || {}).decomp || {};
@@ -6968,15 +7012,20 @@ HTML = r"""<!doctype html>
         ctx.strokeStyle = "rgba(13,17,24,.75)";
         ctx.lineWidth = 1;
         ctx.strokeRect(r.x + 0.5, r.y + 0.5, Math.max(0, r.w - 1), Math.max(0, r.h - 1));
-        if (r.w > 46 && r.h > 18) {
+        if (r.w > 30 && r.h > 13) {
           ctx.save();
           ctx.beginPath();
-          ctx.rect(r.x + 6, r.y + 2, r.w - 9, r.h - 4);
+          ctx.rect(r.x + 4, r.y + 1, r.w - 7, r.h - 2);
           ctx.clip();
           // Light label on the bluer (low-pct) end, dark on the greener end.
           ctx.fillStyle = it.pct >= 55 ? "rgba(8,14,11,.92)" : "rgba(238,244,251,.96)";
-          ctx.fillText(it.label, r.x + 7, r.y + 4);
-          if (r.h > 32) ctx.fillText(pctText(it.pct), r.x + 7, r.y + 17);
+          const lineH = 12, maxW = r.w - 11;
+          const lines = wrapLabel(ctx, it.label, maxW);     // wrap, don't clip
+          const showPct = r.h > 26;
+          const avail = Math.max(1, Math.floor((r.h - 6) / lineH) - (showPct ? 1 : 0));
+          let ty = r.y + 4;
+          for (let i = 0; i < Math.min(lines.length, avail); i++) { ctx.fillText(lines[i], r.x + 6, ty); ty += lineH; }
+          if (showPct) ctx.fillText(pctText(it.pct), r.x + 6, ty);
           ctx.restore();
         }
         // --- match glow (green, fading) ---
