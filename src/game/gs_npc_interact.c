@@ -820,12 +820,20 @@ s32 fn_80011A1C(u8* obj, s32 a1, s32 a2) {
 /* 0x78 | fn_80011B4C | generic */
 extern u32 fn_80104704(u32 a);
 extern u32 fn_801040A0(u32 a);
-u32 fn_80011B4C(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
-    fn_80104704(arg1);
-    fn_801040A0(arg1);
-    _threadSwitch();
-    return 1;
+#pragma peephole off
+u32 fn_80011B4C(u32 arg1, u8 arg2) {
+    u32 r;
+    while (1) {
+        if (!(r = fn_80104704(arg1))) return 0;
+        if (*(s16*)((u8*)fn_801040A0(r) + 0xc) == 0) return 0;
+        if (arg2 != 0) {
+            _threadSwitch();
+        } else {
+            return 1;
+        }
+    }
 }
+#pragma peephole on
 
 /* 0x80011BC4 | 0xB4 */
 extern u32 fn_80103FE4(u32 a);
@@ -865,12 +873,20 @@ void fn_80011BC4(u32 arg1, u32 target) {
 #endif
 
 /* 0x78 | fn_80011C78 | generic */
-u32 fn_80011C78(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
-    fn_80104704(arg1);
-    fn_801040A0(arg1);
-    _threadSwitch();
-    return 1;
+#pragma peephole off
+u32 fn_80011C78(u32 arg1, u8 arg2) {
+    u32 r;
+    while (1) {
+        if (!(r = fn_80104704(arg1))) return 0;
+        if (*(s16*)((u8*)fn_801040A0(r) + 0x2) == 0) return 0;
+        if (arg2 != 0) {
+            _threadSwitch();
+        } else {
+            return 1;
+        }
+    }
 }
+#pragma peephole on
 
 /* 0x80011CF0 | 0xAC */
 #if 0
@@ -2318,62 +2334,60 @@ void fn_800109A0(void) { /* TODO */ }
 #endif
 
 /* fn_80010B30 - 0x80010B30 | size: 0x168 */
-#if 0
-asm void fn_80010B30(void) {
-#include "src/game/gs_npc_interact_fn_80010B30.inc"
-}
-#else
-#pragma push
-#pragma peephole off
 u32 fn_80010B30(u8* arg) {
     extern void* fn_80103FFC(u8* a, u32 size);
     extern void* fn_80103FE4(u8* a);
     extern s32 fn_801022B8(u32 val);
-    extern void fn_801046C8(u8* a, s32 id);
-    extern void fn_8005D8F8(s32 id);
+    extern u8* fn_801046C8(u8* a, s32 id);
+    extern void fn_8005D8F8(s32 id, s32 flag);
     void* entry;
     void* participant;
     s32 trainer_id;
+    u8* r;
     if ((s8)arg[1] == 0) {
         entry = fn_80103FFC(arg, 0x18);
         if (entry != NULL) {
             memcpy(entry, *(void**)(arg + 0x60), 0x18);
         }
         if (*(u8*)((u8*)entry + 0x16) != 0) {
-            fn_801046C8(arg, 0xB6);
-            *(s32*)(arg + 0x4C) = 0x13D;
-            fn_801046C8(arg, 0xB8);
-            *(s32*)(arg + 0x4C) = 0x140;
-            fn_8005D8F8(0xB8);
+            r = fn_801046C8(arg, 0xB6);
+            *(s32*)(r + 0x4C) = 0x13D;
+            r = fn_801046C8(arg, 0xB8);
+            *(s32*)(r + 0x4C) = 0x140;
+            fn_8005D8F8(0xB8, 1);
         } else {
-            fn_801046C8(arg, 0xB6);
-            *(s32*)(arg + 0x4C) = 0x13F;
-            fn_801046C8(arg, 0xB8);
-            *(s32*)(arg + 0x4C) = 0;
-            fn_8005D8F8(0xB8);
+            r = fn_801046C8(arg, 0xB6);
+            *(s32*)(r + 0x4C) = 0x13F;
+            r = fn_801046C8(arg, 0xB8);
+            *(s32*)(r + 0x4C) = 0;
+            fn_8005D8F8(0xB8, 0);
         }
     }
     participant = fn_80103FE4(arg);
     trainer_id = fn_801022B8(*(u32*)(arg + 4));
-    if (trainer_id == 0xB5) {
+    switch (trainer_id) {
+    case 0xB5:
         *(s32*)(arg + 0x80) = 0;
-    } else if (trainer_id == 0xB6) {
+        break;
+    case 0xB6:
         if (*(u8*)((u8*)participant + 0x16) != 0) {
             *(s32*)(arg + 0x80) = 1;
         } else {
             *(s32*)(arg + 0x80) = 3;
         }
-    } else if (trainer_id == 0xB7) {
+        break;
+    case 0xB7:
         *(s32*)(arg + 0x80) = 2;
-    } else if (trainer_id == 0xB8) {
+        break;
+    case 0xB8:
         *(s32*)(arg + 0x80) = 3;
-    } else {
+        break;
+    default:
         *(s32*)(arg + 0x80) = -1;
+        break;
     }
     return 0;
 }
-#pragma pop
-#endif
 
 /* fn_80010C98 - 0x80010C98 | size: 0x52c */
 extern void fn_80207BF4(void);
