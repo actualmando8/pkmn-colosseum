@@ -534,6 +534,7 @@ extern s32 lbl_80467390[];
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 void fn_801D23C0(void) {
     u32 handle;
     lbl_80467390[1] = 0x258;
@@ -542,6 +543,7 @@ void fn_801D23C0(void) {
         fn_801669E4(handle, 0, 0);
     }
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
@@ -587,6 +589,7 @@ void fn_801D29D8(s32 moveID, s32 hitCount) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 void fn_801D2B08(void) {
     s32* state;
 
@@ -596,6 +599,7 @@ void fn_801D2B08(void) {
     state[2] = 0;
     state[3] = 0;
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
@@ -1134,15 +1138,47 @@ u8 fn_801DA354(void* effect) {
  * Address: 0x801DA36C | Size: 0x60
  */
 void fn_801DA36C(void* effect, s32 trajType) {
-    /* Set trajectory type for effect */
+    extern void fn_801DCEA8();
+    extern void fn_801DCF84();
+    extern void fn_801DD028();
+
+    if (effect != NULL) {
+        switch ((u8)trajType) {
+        case 1:
+            fn_801DD028(effect);
+            return;
+        case 2:
+            fn_801DCF84(effect);
+            return;
+        case 3:
+            fn_801DCEA8(effect);
+            return;
+        }
+    }
 }
 
 /**
  * fn_801DA3CC - Waza effect set velocity.
  * Address: 0x801DA3CC | Size: 0x60
  */
-void fn_801DA3CC(void* effect, f32 vx, f32 vy, f32 vz) {
-    /* Set velocity vector for effect */
+void fn_801DA3CC(void* effect, s32 trajType) {
+    extern void fn_801DCF00();
+    extern void fn_801DCFD8();
+    extern void fn_801DD078();
+
+    if (effect != NULL) {
+        switch ((u8)trajType) {
+        case 1:
+            fn_801DD078(effect);
+            return;
+        case 2:
+            fn_801DCFD8(effect);
+            return;
+        case 3:
+            fn_801DCF00(effect);
+            return;
+        }
+    }
 }
 
 /**
@@ -1740,8 +1776,24 @@ s32 fn_801DCDCC(void* obj) {
  * fn_801DCE0C - Waza field effect render.
  * Address: 0x801DCE0C | Size: 0x9C
  */
-void fn_801DCE0C(void) {
-    /* TODO: Field effect render (0x9C bytes) */
+void fn_801DCE0C(void* obj) {
+    extern void fn_800E5E34();
+    extern void fn_800E5BE0();
+
+    s32 handle;
+
+    if (obj != NULL && *(u8*)((u8*)obj + 0x4F) == 0 && *(u8*)((u8*)obj + 0x4E) != 0) {
+        handle = *(s32*)((u8*)obj + 0x24);
+        if (*(u8*)((u8*)obj + 0x4C) != 0) {
+            fn_800E5E34(handle, *(s32*)((u8*)obj + 0x38), *(s32*)((u8*)obj + 0x3C),
+                        *(s32*)((u8*)obj + 0x40), *(s32*)((u8*)obj + 0x44));
+        }
+        if (*(u8*)((u8*)obj + 0x4D) != 0) {
+            *(u8*)((u8*)obj + 0x4B) = 0xFF;
+            fn_800E5BE0(handle, (u8*)obj + 0x48);
+        }
+        *(u8*)((u8*)obj + 0x4F) = 1;
+    }
 }
 
 /**
@@ -1879,7 +1931,24 @@ void fn_801DD23C(void* obj) {
  * Address: 0x801DD3E4 | Size: 0x78
  */
 void fn_801DD3E4(void* obj) {
-    /* Clear color filter */
+    extern void fn_801DBB10(void* obj);
+    extern void fn_801DBDDC(void* obj);
+
+    void* cur;
+    void* next;
+
+    if (obj != NULL) {
+        cur = *(void**)((u8*)obj + 0x68);
+        while (cur != NULL) {
+            next = *(void**)((u8*)cur + 0x34);
+            if (*(u8*)((u8*)cur + 0x14) != 0) {
+                fn_801DBB10(cur);
+            }
+            fn_801DBDDC(cur);
+            cur = next;
+        }
+        *(void**)((u8*)obj + 0x68) = NULL;
+    }
 }
 
 /**
