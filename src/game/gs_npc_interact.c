@@ -2334,6 +2334,8 @@ void fn_800109A0(void) { /* TODO */ }
 #endif
 
 /* fn_80010B30 - 0x80010B30 | size: 0x168 */
+#pragma push
+#pragma peephole off
 u32 fn_80010B30(u8* arg) {
     extern void* fn_80103FFC(u8* a, u32 size);
     extern void* fn_80103FE4(u8* a);
@@ -2388,6 +2390,7 @@ u32 fn_80010B30(u8* arg) {
     }
     return 0;
 }
+#pragma pop
 
 /* fn_80010C98 - 0x80010C98 | size: 0x52c */
 extern void fn_80207BF4(void);
