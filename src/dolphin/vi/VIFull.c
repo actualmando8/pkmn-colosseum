@@ -1646,10 +1646,10 @@ void fn_800AB5B4(s32 spec) {
     __PADSpec = 0;
     switch (spec) {
     case 0:
-        lbl_80478A1C = (u32)fn_800AB614;
+        lbl_80478A1C = (u32)SPEC0_MakeStatus;
         break;
     case 1:
-        lbl_80478A1C = (u32)fn_800AB788;
+        lbl_80478A1C = (u32)SPEC1_MakeStatus;
         break;
     case 2:
     case 3:
