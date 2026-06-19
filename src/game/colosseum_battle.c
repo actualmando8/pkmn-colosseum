@@ -26539,14 +26539,9 @@ int fn_80255D7C(void)
   return iVar2 - ((u32)(iVar2 == 0) + -(uVar1 & 0xff));
 }
 /* Address: 0x80255DB4 | Size: 0x44 | Pattern: field_accessor */
-u32 fn_80255DB4(void* ctx, u32 slot, u32 param) {
+u32 fn_80255DB4(void* ctx, u32 slot, u32 param, u32 arg3) {
     extern u32 fn_8025C808();
-    u32 r3 = (u32)ctx;
-    u32 r4 = slot;
-    u32 r5 = param;
-    u32 r6 = 0;
-    /* r3=ctx, r4=slot, r5=param, r6=? -> call(ctx, slot, ?, param, 0x10, 0x2, 0x41) */
-    u32 result = fn_8025C808(ctx, slot, 0, param, 0x10, 0x2, 0x41) & 0xFF;
+    u32 result = fn_8025C808(ctx, slot, arg3, param, 0x10, 0x2, 0x41) & 0xFF;
     return (result != 0) ? 1 : 0;
 }
 
@@ -27328,11 +27323,9 @@ int fn_80256748(void)
 
     extern u32 fn_80235B04();
   u32 uVar1;
-  int iVar2;
   
   uVar1 = fn_80235B04(r3,0,0);
-  iVar2 = -(uVar1 & 0xff) + 1;
-  return iVar2 - ((u32)(iVar2 == 0) + -(uVar1 & 0xff));
+  return (uVar1 & 0xff) != 1;
 }
 /* Address: 0x80256780 | Size: 0x38 | Ghidra import */
 int fn_80256780(void)
