@@ -28,6 +28,7 @@ import json
 import re
 import subprocess
 import sys
+import datetime
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -38,6 +39,38 @@ EQUIV_FILE = HERE / "equivalent.txt"
 WALLS_FILE = ROOT / "WALLS.md"
 PY = sys.executable
 M = 99.9999
+
+
+STATUS_LOG = HERE / "coordination" / "status.md"
+MATCHED_SEEN = ROOT / "build" / "matched_fns.txt"
+
+
+def _log_matches(fns, src_rel):
+    """Append a per-fn 'MATCH!' line to coordination/status.md so the dashboard
+    activity log lists the ACTUAL functions matched (not just a 'batch harvest'
+    commit message). Deduped via build/matched_fns.txt so re-gating the same wins
+    doesn't spam duplicate entries."""
+    if not fns:
+        return
+    seen = set()
+    try:
+        seen = set(MATCHED_SEEN.read_text(encoding="utf-8").split())
+    except OSError:
+        pass
+    new = [fn for fn in fns if fn not in seen]
+    if not new:
+        return
+    ts = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+    try:
+        with STATUS_LOG.open("a", encoding="utf-8") as f:
+            for fn in new:
+                f.write(f"- **{ts}** `gate` MATCH! {fn} 100.00% in {src_rel}\n")
+        MATCHED_SEEN.parent.mkdir(parents=True, exist_ok=True)
+        with MATCHED_SEEN.open("a", encoding="utf-8") as f:
+            for fn in new:
+                f.write(fn + "\n")
+    except OSError:
+        pass
 
 
 def _register_equivalent(equiv_fns, src_rel):
@@ -166,6 +199,7 @@ def integrate_source(src_rel, fn_bodies, apply, min_pct=M, equivalent=False):
     if apply and (held or equiv_held):
         canon.write_bytes(integrated.read_bytes())
         print(f"  APPLIED to {src_rel}")
+        _log_matches([fn for fn, _ in held], src_rel)   # per-fn MATCH! -> activity log
         if equiv_held:
             _register_equivalent(equiv_held, src_rel)
     return held + equiv_held, dropped

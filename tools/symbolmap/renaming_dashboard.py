@@ -6259,8 +6259,8 @@ HTML = r"""<!doctype html>
       // [minX,maxX] window so panning/zooming re-fits the vertical scale too.
       const yvis = [];
       active.forEach(it => rows.forEach(r => {
-        const xv = (r.unix || 0) * 1000; if (xv < minX || xv > maxX) return;
-        const vv = Number(r[it.key]); if (Number.isFinite(vv) && vv > 0) yvis.push(vv);
+        const xv = Number(r.unix || 0); if (xv < minX || xv > maxX) return;
+        const vv = _seriesVal(r, it.key); if (Number.isFinite(vv) && vv > 0) yvis.push(vv);
       }));
       let dLo = yvis.length ? Math.min(...yvis) : 0;
       let dHi = yvis.length ? Math.max(...yvis) : 100;
@@ -6971,12 +6971,12 @@ HTML = r"""<!doctype html>
         if (r.w > 46 && r.h > 18) {
           ctx.save();
           ctx.beginPath();
-          ctx.rect(r.x + 3, r.y + 2, r.w - 6, r.h - 4);
+          ctx.rect(r.x + 6, r.y + 2, r.w - 9, r.h - 4);
           ctx.clip();
           // Light label on the bluer (low-pct) end, dark on the greener end.
           ctx.fillStyle = it.pct >= 55 ? "rgba(8,14,11,.92)" : "rgba(238,244,251,.96)";
-          ctx.fillText(it.label, r.x + 4, r.y + 3);
-          if (r.h > 32) ctx.fillText(pctText(it.pct), r.x + 4, r.y + 16);
+          ctx.fillText(it.label, r.x + 7, r.y + 4);
+          if (r.h > 32) ctx.fillText(pctText(it.pct), r.x + 7, r.y + 17);
           ctx.restore();
         }
         // --- match glow (green, fading) ---
@@ -7014,7 +7014,7 @@ HTML = r"""<!doctype html>
             ctx.fillStyle = `rgba(127,209,255,${0.7 + 0.3 * p})`;
             ctx.font = "bold 10px Consolas, monospace";
             ctx.textAlign = "right";
-            ctx.fillText("● " + agent, r.x + r.w - 4, r.y + r.h - 6);
+            ctx.fillText("● " + agent, r.x + r.w - 6, r.y + r.h - 10);
             ctx.textAlign = "left";
           }
           ctx.restore();
@@ -7032,7 +7032,7 @@ HTML = r"""<!doctype html>
             ctx.fillStyle = "rgba(255,176,72,0.96)";
             ctx.font = "bold 10px Consolas, monospace";
             ctx.textAlign = "left";
-            ctx.fillText("⚛ " + (pinfo.fn || "anneal") + " best " + (pinfo.best == null ? "?" : pinfo.best), r.x + 4, r.y + r.h - 6);
+            ctx.fillText("⚛ " + (pinfo.fn || "anneal") + " best " + (pinfo.best == null ? "?" : pinfo.best), r.x + 7, r.y + r.h - 10);
           }
           ctx.restore();
         }
