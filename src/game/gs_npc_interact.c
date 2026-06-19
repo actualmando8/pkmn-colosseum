@@ -230,11 +230,15 @@ void fn_800111E8(u32 a, u32 b, u32 c) { fn_80089F78(a, b, c, 1); }
 #endif
 
 /* 0x7C | fn_8001120C | nullcheck_call_flag */
+#pragma peephole off
 u32 fn_8001120C(void* obj) {
-    if (fn_80102620() == 0) { return 255; }
-    fn_80102620(obj);
+    extern void fn_80102568();
+    if ((u8)fn_80102620(0xff) != 0) fn_80102568(0xff, 0, obj);
+    if ((u8)fn_80102620(0x104) != 0) fn_80102568(0x104, 0, obj);
+    fn_80102620(0x100);
     return 0;
 }
+#pragma peephole on
 
 /* 0x80011288 | 0x21C */
 extern void fn_8005D8F8();
@@ -766,11 +770,13 @@ L_800117F0:
 #endif
 
 /* 0x74 | fn_800119A8 | nullcheck_call_flag */
+#pragma peephole off
 u32 fn_800119A8(void* obj) {
-    if (fn_80102620() == 0) { return 75; }
-    fn_80102568(obj);
+    if ((u8)fn_80102620(0x4b) != 0) fn_80102568(0x4b, 0, obj);
+    if ((u8)fn_80102620(0xf6) != 0) fn_80102568(0xf6, 0, obj);
     return 0;
 }
+#pragma peephole on
 
 /* 0x80011A1C | 0x130 */
 #if 0
@@ -898,16 +904,21 @@ asm void fn_80011D9C(void) {
 #include "src/game/gs_npc_interact_fn_80011D9C.inc"
 }
 #else
+#pragma peephole off
 void fn_80011D9C(s32 id, s32 do_extra) {
-    s32 resolved;
+    u32 resolved;
     s32 kind;
+    kind = 0;
     resolved = fn_80104704(id);
     if (resolved == 0) return;
-    kind = 0;
-    if (id == 0x49) kind = 0x538;
-    else if (id >= 0x49) { if (id < 0x4b) kind = 0x540; }
-    else if (id >= 0x47) kind = 0x540;
-    else if (id >= 0x45) kind = 0x538;
+    switch (id) {
+    case 0x45: case 0x46: case 0x49:
+        kind = 0x538;
+        break;
+    case 0x47: case 0x48: case 0x4a:
+        kind = 0x540;
+        break;
+    }
     if (do_extra != 0) {
         fn_80103F74(resolved, kind, 1);
         fn_801081F8((void*)resolved, kind, 0x2d);
@@ -915,6 +926,7 @@ void fn_80011D9C(s32 id, s32 do_extra) {
         fn_80103F74(resolved, kind, 0);
     }
 }
+#pragma peephole on
 #endif
 
 /* 0x80011E68 | 0x3C */
