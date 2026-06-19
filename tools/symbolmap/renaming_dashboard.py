@@ -6280,9 +6280,11 @@ HTML = r"""<!doctype html>
       }));
       let dLo = yvis.length ? Math.min(...yvis) : 0;
       let dHi = yvis.length ? Math.max(...yvis) : 100;
-      const span = Math.max(1, dHi - dLo);
-      const ystep = span > 40 ? 10 : span > 16 ? 5 : span > 6 ? 2 : span > 2 ? 1 : 0.5;
-      const padY = Math.max(ystep, span * 0.15);
+      const span = Math.max(0.05, dHi - dLo);
+      // finer steps + tight padding so even a sub-1% move fills the chart vertically
+      const ystep = span > 40 ? 10 : span > 16 ? 5 : span > 6 ? 2 : span > 2 ? 1
+                  : span > 0.8 ? 0.5 : span > 0.3 ? 0.2 : span > 0.12 ? 0.1 : span > 0.05 ? 0.05 : 0.02;
+      const padY = Math.max(ystep * 0.5, span * 0.08);
       let yLo = Math.max(0, Math.floor((dLo - padY) / ystep) * ystep);
       let yHi = Math.min(100, Math.ceil((dHi + padY) / ystep) * ystep);
       if (yHi - yLo < ystep) { yHi = Math.min(100, yLo + ystep * 2); }
@@ -6290,13 +6292,14 @@ HTML = r"""<!doctype html>
       const x = v => pad.l + (w - pad.l - pad.r) * (v - minX) / Math.max(1, maxX - minX);
       const y = v => h - pad.b - (h - pad.t - pad.b) * (v - yLo) / Math.max(0.001, yHi - yLo);
       // Y gridlines + percent labels at every step (read the % off the axis)
+      const ydec = ystep < 0.1 ? 2 : ystep < 1 ? 1 : 0;
       ctx.lineWidth = 1;
-      for (let v = yLo; v <= yHi + 0.01; v += ystep) {
+      for (let v = yLo; v <= yHi + 0.001; v += ystep) {
         const gy = y(v);
         ctx.strokeStyle = "#2d3a4b";
         ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(w - pad.r, gy); ctx.stroke();
         ctx.fillStyle = "#8da0b8"; ctx.font = "11px Segoe UI, Arial"; ctx.textAlign = "right";
-        ctx.fillText((Number.isInteger(v) ? v : v.toFixed(1)) + "%", pad.l - 6, gy + 4);
+        ctx.fillText(v.toFixed(ydec) + "%", pad.l - 6, gy + 4);
       }
       // series lines + points -- break the line at gaps (NaN), don't plot 0.
       // Clip to the plot box so a zoomed/panned window doesn't draw past the axes.
