@@ -4555,10 +4555,20 @@ HTML = r"""<!doctype html>
     }
     .history-layout {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(320px, .72fr);
+      grid-template-columns: minmax(0, 1fr);
       gap: 12px;
       margin-bottom: 12px;
     }
+    /* right column of the treemap workspace: file-stats card + the moved
+       Selected File Progress chart, stacked vertically under each other. */
+    .decomp-side {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+    .decomp-side .detail-panel { position: static; top: auto; }
+    .decomp-side #file-progress-card { margin: 0; }
     /* ---- v9: decomp.me-style function reader ------------------------------ */
     .reader-overlay {
       display: none;
@@ -5565,13 +5575,6 @@ HTML = r"""<!doctype html>
           </div>
           <canvas id="history-chart" height="205"></canvas>
         </div>
-        <div class="panel chart-card">
-          <div class="panel-title">
-            <h2>Selected File Progress</h2>
-            <span class="panel-note" id="file-history-note"></span>
-          </div>
-          <canvas id="file-history-chart" height="205"></canvas>
-        </div>
       </section>
 
       <section class="leases-quantum">
@@ -5654,7 +5657,16 @@ HTML = r"""<!doctype html>
           </div>
         </div>
 
-        <aside class="detail-panel decomp-detail" id="decomp-details"></aside>
+        <div class="decomp-side">
+          <aside class="detail-panel decomp-detail" id="decomp-details"></aside>
+          <div class="panel chart-card" id="file-progress-card">
+            <div class="panel-title">
+              <h2>Selected File Progress</h2>
+              <span class="panel-note" id="file-history-note"></span>
+            </div>
+            <canvas id="file-history-chart" height="205"></canvas>
+          </div>
+        </div>
       </section>
 
       <div class="treemap-pin" id="treemap-pin" role="dialog" aria-label="Tile detail">
