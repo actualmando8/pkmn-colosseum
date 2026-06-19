@@ -121,6 +121,56 @@ def _scratch_json(tag, integrated_c, config_from):
     return json.loads(line[-1]), None
 
 
+# Signatures of the decl-order splice failure: a win body spliced into canon can
+# land ABOVE canon's file-scope extern / SDA decl block (band_integrate splices
+# function BODIES only, not the scratch's surrounding decls), so the first use of
+# an extern fn or lbl_* global precedes its declaration -> implicit-int, then a
+# redeclaration conflict, or a bare undefined-identifier.
+_DECLORDER_RE = re.compile(
+    r"implicit|undefined identifier|redeclared|was declared as|declared as:\s*'int",
+    re.IGNORECASE)
+# A single-line, column-0 (file-scope) extern declaration: `extern <...> name;`
+# or `extern <...> name(args);`. Anchored at start so INDENTED in-body externs
+# are left untouched; excludes `{` so it never grabs a definition.
+_EXTERN_DECL_RE = re.compile(r"^extern\b[^;{]*;\s*$")
+
+
+def _hoist_externs(path):
+    """Move every file-scope `extern ...;` declaration to a block right after the
+    file's #include section. externs emit no code (byte-neutral) and only need to
+    precede their first use, so hoisting them all to the top resolves the
+    decl-order class without touching codegen. Deduped, first-seen order.
+    Returns True iff it rewrote the file. Safe: only ever called on an
+    already-failed compile, so it can only recover or stay neutral."""
+    try:
+        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        return False
+    externs, rest = [], []
+    for ln in lines:
+        (externs if _EXTERN_DECL_RE.match(ln) else rest).append(ln)
+    if not externs:
+        return False
+    seen, uniq = set(), []
+    for e in externs:
+        key = " ".join(e.split())
+        if key not in seen:
+            seen.add(key)
+            uniq.append(e.rstrip())
+    ins = 0
+    for i, ln in enumerate(rest[:300]):
+        if ln.lstrip().startswith("#include"):
+            ins = i + 1
+    block = ["", "/* hoisted file-scope externs: decl-before-use for spliced wins */"]
+    block += uniq + [""]
+    out = rest[:ins] + block + rest[ins:]
+    try:
+        path.write_text("\n".join(out) + "\n", encoding="utf-8")
+    except OSError:
+        return False
+    return True
+
+
 def integrate_source(src_rel, fn_bodies, apply, min_pct=M, equivalent=False):
     """Splice fn_bodies into a fresh copy of src_rel, recompile, re-verify each
     fn. Byte-exact mode (default): keep only fns that re-measure >=100%.
@@ -143,6 +193,14 @@ def integrate_source(src_rel, fn_bodies, apply, min_pct=M, equivalent=False):
         return None, None
 
     newm, err = _scratch_json(stem, integrated, canon)
+    if newm is None and err and _DECLORDER_RE.search(err):
+        # Auto-recover from the decl-order splice failure (see _hoist_externs):
+        # a spliced win body landed above canon's file-scope extern/SDA block.
+        if _hoist_externs(integrated):
+            print("  decl-order abort detected -> hoisted file-scope externs, retrying compile ...")
+            newm, err = _scratch_json(stem, integrated, canon)
+            if newm is not None:
+                print("  recovered: hoisted externs resolved decl-before-use")
     if newm is None:
         print("  MEASURE FAILED:\n" + (err or ""))
         return None, None
