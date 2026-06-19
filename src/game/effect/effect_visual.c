@@ -2352,12 +2352,14 @@ asm void fn_801436F0(void) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 u32 fn_801436F0(void* ptr) {
     s32 v;
     if (ptr == NULL) return 0;
     v = !!((((u8*)ptr)[0x4] >> 3) & 1);
     return v;
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
@@ -2419,12 +2421,14 @@ asm void fn_80143778(void) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 unsigned int fn_80143778(const void *ptr) {
     s32 v;
     if (ptr == NULL) return 0;
     v = !!((((u8*)ptr)[0x4] >> 4) & 1);
     return v;
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on

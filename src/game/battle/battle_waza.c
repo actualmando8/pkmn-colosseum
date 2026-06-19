@@ -543,6 +543,7 @@ extern s32 lbl_80467390[];
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 void fn_801D23C0(void) {
     u32 handle;
     lbl_80467390[1] = 0x258;
@@ -551,6 +552,7 @@ void fn_801D23C0(void) {
         fn_801669E4(handle, 0, 0);
     }
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
@@ -614,6 +616,7 @@ void fn_801D29D8(s32 moveID, s32 hitCount) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 void fn_801D2B08(void) {
     s32* state;
 
@@ -623,6 +626,7 @@ void fn_801D2B08(void) {
     state[2] = 0;
     state[3] = 0;
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
@@ -1736,7 +1740,59 @@ void fn_801DBC30(void* obj) {
  * Address: 0x801DBCCC | Size: 0x110
  */
 void fn_801DBCCC(s32 blendType) {
-    /* TODO: Blend effect setup (0x110 bytes) */
+    extern void fn_801DBB10();
+    extern void fn_801DB864();
+    extern void fn_801DD100();
+    extern void fn_800E3C08(s32, s32);
+    extern void wazaSequencePokemonMotionStart();
+    extern void fn_801C2BE0();
+    extern void fn_801D30BC();
+    extern void wazaSequenceUpdate();
+
+    u8* obj;
+    u8* owner;
+    u8* node;
+    void* current;
+    s32 bit;
+    s32 handle;
+    u32 flags;
+
+    obj = (u8*)blendType;
+    if (*(u8*)(obj + 0x14) == 0) {
+        owner = *(u8**)(obj + 0x3C);
+        flags = *(u32*)(obj + 0x08);
+        current = *(void**)(owner + 0x6C);
+        flags = (flags >> 1) & 1;
+        node = *(u8**)(obj + 0x24);
+        handle = *(s32*)(owner + 0x24);
+        bit = flags;
+        if (current != NULL) {
+            fn_801DBB10(current);
+        }
+        if (*(u8*)(owner + 0x75) != 0 && *(u16*)(obj + 0x2E) == 2) {
+            fn_801DB864(owner);
+        }
+        fn_801DD100(owner, obj);
+        if ((*(u32*)(obj + 0x08) & 0x08000000) != 0) {
+            fn_800E3C08(handle, 0);
+        }
+        wazaSequencePokemonMotionStart(owner, bit);
+        *(u8**)(owner + 0x6C) = obj;
+        *(u8*)(obj + 0x14) = 1;
+        if ((*(u32*)(obj + 0x08) & 0x04000000) != 0) {
+            fn_801C2BE0(owner);
+        }
+        if (*(u8*)(obj + 0x16) != 0) {
+            fn_801D30BC(owner, obj);
+        }
+        while (node != NULL) {
+            *(u32*)(node + 0x6C) = 0;
+            node = *(u8**)(node + 0xA8);
+        }
+        *(u32*)(obj + 0x00) = 0;
+        *(u8*)(obj + 0x15) = 0;
+        wazaSequenceUpdate(obj);
+    }
 }
 
 /**
