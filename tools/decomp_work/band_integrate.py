@@ -171,6 +171,31 @@ def _hoist_externs(path):
     return True
 
 
+def _compilable_subset(canon, fn_bodies, stem):
+    """Fallback for a full-batch compile abort: splice each fn on its own and keep
+    only those whose lone splice compiles. One pathological win (a redundant
+    already-decompiled fn, a dropped in-body extern that triggers the implicit-decl
+    asm-block cascade, a malformed body) can then never sink the whole batch — it's
+    quarantined and the rest still gate. Returns (good_bodies, quarantined) where
+    quarantined is a list of (fn, reason)."""
+    good, quarantined = {}, []
+    ppatch = BUILD / f"band_{stem}_iso_patch.json"
+    pout = BUILD / f"band_{stem}_iso.c"
+    for fn, body in fn_bodies.items():
+        ppatch.write_bytes(json.dumps({fn: body}, indent=1).encode("utf-8"))
+        r = subprocess.run([PY, str(HERE / "cs_splice.py"), str(canon),
+                            str(ppatch), str(pout)], capture_output=True, text=True)
+        if r.returncode != 0:
+            quarantined.append((fn, "splice"))
+            continue
+        m, _ = _scratch_json(f"{stem}_iso", pout, canon)
+        if m is None:
+            quarantined.append((fn, "compile"))
+            continue
+        good[fn] = body
+    return good, quarantined
+
+
 def integrate_source(src_rel, fn_bodies, apply, min_pct=M, equivalent=False):
     """Splice fn_bodies into a fresh copy of src_rel, recompile, re-verify each
     fn. Byte-exact mode (default): keep only fns that re-measure >=100%.
@@ -201,6 +226,20 @@ def integrate_source(src_rel, fn_bodies, apply, min_pct=M, equivalent=False):
             newm, err = _scratch_json(stem, integrated, canon)
             if newm is not None:
                 print("  recovered: hoisted externs resolved decl-before-use")
+    if newm is None and len(fn_bodies) > 1:
+        # Isolation fallback (harden the splice plug): a single pathological fn can
+        # abort the whole integrated compile. Quarantine the offenders, gate the rest.
+        good, quarantined = _compilable_subset(canon, fn_bodies, stem)
+        if good and quarantined:
+            for fn, why in sorted(quarantined):
+                print(f"    QUARANTINE {fn}  (lone splice {why} abort — kept out of batch)")
+            patch.write_bytes(json.dumps(good, indent=1).encode("utf-8"))
+            subprocess.run([PY, str(HERE / "cs_splice.py"), str(canon), str(patch),
+                            str(integrated)], capture_output=True, text=True)
+            newm, err = _scratch_json(stem, integrated, canon)
+            if newm is not None:
+                print(f"  recovered: quarantined {len(quarantined)}, gating {len(good)} compilable fn(s)")
+                fn_bodies = dict(good)
     if newm is None:
         print("  MEASURE FAILED:\n" + (err or ""))
         return None, None

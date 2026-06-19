@@ -185,8 +185,25 @@ def main():
     targets.sort(key=lambda t: -t[0])
     for start, end, name, body in targets:
         body_lines = body.replace("\r\n", "\n").split("\n")
-        # strip a single trailing empty line if present
-        if body_lines and body_lines[-1] == "":
+        # strip leading/trailing blank lines from the replacement body
+        while body_lines and body_lines[0].strip() == "":
+            body_lines = body_lines[1:]
+        while body_lines and body_lines[-1].strip() == "":
+            body_lines = body_lines[:-1]
+        # De-dupe a `#pragma peephole` wrapper. Canon often already wraps this span
+        # with `#pragma peephole off` (line above) and `... on` (line below). If the
+        # replacement body carries its OWN copies, splicing would emit the pragma
+        # TWICE — and a doubled `#pragma peephole` corrupts CodeWarrior's parse of
+        # the NEXT asm block downstream (a "declaration syntax error" cascade on the
+        # adjacent `asm void fn(){#include .inc}` that aborts the whole batch). Drop
+        # the body's copy when canon already supplies the wrapper.
+        above = lines[start - 1].strip() if start > 0 else ""
+        below = lines[end + 1].strip() if end + 1 < len(lines) else ""
+        if (above.startswith("#pragma peephole off") and body_lines
+                and body_lines[0].strip().startswith("#pragma peephole off")):
+            body_lines = body_lines[1:]
+        if (below.startswith("#pragma peephole on") and body_lines
+                and body_lines[-1].strip().startswith("#pragma peephole on")):
             body_lines = body_lines[:-1]
         lines[start:end + 1] = body_lines
 
