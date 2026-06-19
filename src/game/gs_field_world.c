@@ -9230,8 +9230,47 @@ extern u32 lbl_8047ADAC;
 extern u16 lbl_8047ADA4;
 extern u32 lbl_8047ADA8;
 #if 1
-asm void fn_80119824(void) {
-#include "src/game/gs_field_world_fn_80119824.inc"
+void fn_80119824(u32 count1, u32 count2) {
+    extern u16 lbl_8047AD98;
+    extern u32 lbl_8047AD9C;
+    extern u32 lbl_8047ADA0;
+    extern u16 lbl_8047ADA4;
+    extern u32 lbl_8047ADA8;
+    extern u32 lbl_8047ADAC;
+    extern u16 fn_800E3534(u32 size);
+    extern void* fn_800E27B0(u16 handle);
+    extern void psInitParticle(s32 a);
+    extern void fn_80175DF0(s32 a);
+    extern void psInitAppSRT(s32 a, s32 b);
+    extern void fn_8019733C(void* fp);
+    extern void fn_8019D618(void* fp);
+    extern void fn_8019D610(void* fp);
+    extern void fn_80119BD0(void);
+    extern void psSetPointJObjNodup(void);
+    u32 h;
+    u32 i;
+    lbl_8047ADA0 = count1;
+    h = fn_800E3534(count1 * 0x108);
+    lbl_8047AD98 = (u16)h;
+    if ((u16)h == 0) { return; }
+    lbl_8047AD9C = (u32)fn_800E27B0((u16)h);
+    for (i = 0; i < lbl_8047ADA0; i++) {
+        *(u8*)(lbl_8047AD9C + i * 0x108) = 0;
+    }
+    lbl_8047ADAC = count2;
+    h = fn_800E3534(count2 * 0x74);
+    lbl_8047ADA4 = (u16)h;
+    if ((u16)h == 0) { return; }
+    lbl_8047ADA8 = (u32)fn_800E27B0((u16)h);
+    for (i = 0; i < lbl_8047ADAC; i++) {
+        *(u8*)(lbl_8047ADA8 + i * 0x74) = 0;
+    }
+    psInitParticle(0);
+    fn_80175DF0(0);
+    psInitAppSRT(0, 0x74);
+    fn_8019733C(fn_80119BD0);
+    fn_8019D618(fn_80119BD0);
+    fn_8019D610(psSetPointJObjNodup);
 }
 #else
 void fn_80119824(void) {
