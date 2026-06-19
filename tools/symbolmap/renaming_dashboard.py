@@ -6947,13 +6947,21 @@ HTML = r"""<!doctype html>
         const r = it._rect;
         if (!r || r.w < 0.5 || r.h < 0.5) continue;
         tm.rects.push({ x: r.x, y: r.y, w: r.w, h: r.h, item: it });
-        // detect a fresh match in this unit -> arm a 2.2s glow
-        if (it.kind === "unit" && it.ref) {
+        // detect fresh progress -> arm a glow. unit: byte-exact fn count rises;
+        // fn (drilled-in view): the function newly crosses to 100% byte-exact.
+        if (it.ref) {
           const nm = it.ref.name || it.label;
-          const cur = Number(it.ref.matched_functions || 0);
-          const prev = store.tmPrev[nm];
-          if (prev !== undefined && cur > prev) store.tmGlow[nm] = nowMs + 2200;
-          store.tmPrev[nm] = cur;
+          if (it.kind === "unit") {
+            const cur = Number(it.ref.matched_functions || 0);
+            const prev = store.tmPrev[nm];
+            if (prev !== undefined && cur > prev) store.tmGlow[nm] = nowMs + 2200;
+            store.tmPrev[nm] = cur;
+          } else {
+            const cur = Number(it.pct || 0);
+            const prev = store.tmPrev[nm];
+            if (prev !== undefined && cur >= 99.95 && prev < 99.95) store.tmGlow[nm] = nowMs + 2600;
+            store.tmPrev[nm] = cur;
+          }
         }
         ctx.fillStyle = tmColor(it.pct);
         ctx.fillRect(r.x, r.y, r.w, r.h);
@@ -6984,9 +6992,18 @@ HTML = r"""<!doctype html>
           ctx.strokeRect(r.x + 1.5, r.y + 1.5, Math.max(0, r.w - 3), Math.max(0, r.h - 3));
           ctx.restore();
         }
+        // resolve agent / permuter for this tile (unit -> by file, fn -> by fn name)
+        let agent, pinfo;
+        if (it.kind === "unit" && it.ref) {
+          const src = String(it.ref.source || "").replace(/\\/g, "/");
+          agent = store.tmAgents && store.tmAgents[src];
+          pinfo = store.tmPermuter && store.tmPermuter[src];
+        } else if (it.kind === "fn" && it.ref) {
+          agent = store.tmAgentFns && store.tmAgentFns[it.ref.name];
+          const pf = store.tmPermuterFns && store.tmPermuterFns[it.ref.name];
+          if (pf) pinfo = { fn: it.ref.name, iter: pf.iter, best: pf.best };
+        }
         // --- active-agent pulse (blue, oscillating) + agent badge ---
-        const src = it.ref && String(it.ref.source || "").replace(/\\/g, "/");
-        const agent = src && store.tmAgents && store.tmAgents[src];
         if (agent) {
           const p = 0.5 + 0.5 * Math.sin(nowMs / 280);   // 0..1 pulse
           ctx.save();
@@ -7003,7 +7020,6 @@ HTML = r"""<!doctype html>
           ctx.restore();
         }
         // --- permuter annealing (amber marching-ants, distinct from the agent pulse) ---
-        const pinfo = src && store.tmPermuter && store.tmPermuter[src];
         if (pinfo) {
           ctx.save();
           ctx.strokeStyle = "rgba(255,176,72,0.95)";
@@ -7026,7 +7042,7 @@ HTML = r"""<!doctype html>
       const glowing = Object.values(store.tmGlow).some(t => t > nowMs);
       const working = store.tmAgents && Object.keys(store.tmAgents).length > 0;
       const annealing = store.tmPermuter && Object.keys(store.tmPermuter).length > 0;
-      if ((glowing || working || annealing) && tm.level === "files" && !store._tmTimer) {
+      if ((glowing || working || annealing) && !store._tmTimer) {
         store._tmTimer = setTimeout(() => { store._tmTimer = 0; renderTreemap(); }, 90);
       }
     }
@@ -8179,13 +8195,16 @@ HTML = r"""<!doctype html>
 
     function renderLeases(d) {
       store._leases = d || {};
-      // expose active leases to the treemap (source file -> agent) for the working-tile pulse
-      store.tmAgents = {};
+      // expose active leases to the treemap: by file (file-level tiles) AND by fn
+      // (function-level tiles, after drilling into a file) for the working pulse.
+      store.tmAgents = {}; store.tmAgentFns = {};
       for (const l of ((d && d.active) || [])) {
+        const who = l.owner || l.tag || "?";
         const f = String(l.active_src || l.file || "").replace(/\\/g, "/");
-        if (f) store.tmAgents[f] = l.owner || l.tag || "?";
+        if (f) store.tmAgents[f] = who;
+        if (l.active_fn) store.tmAgentFns[l.active_fn] = who;
       }
-      if (store.tm && store.tm.level === "files" && typeof renderTreemap === "function") { try { renderTreemap(); } catch (e) {} }
+      if (store.tm && typeof renderTreemap === "function") { try { renderTreemap(); } catch (e) {} }
       const aN = $("lease-active-n"), qN = $("lease-queued-n");
       if (aN) setText(aN, d.active_count || 0);
       if (qN) setText(qN, d.queued_count || 0);
@@ -8415,13 +8434,14 @@ HTML = r"""<!doctype html>
       const s = d.state || {};
       // expose the permuter's active anneal targets to the treemap (file -> {fn,iter,best})
       // so the tile the swarm is currently cracking gets its own (amber) animation.
-      store.tmPermuter = {};
+      store.tmPermuter = {}; store.tmPermuterFns = {};
       const pact = s.active || {};
       for (const k in pact) {
         const a = pact[k]; const f = String(a.file || "").replace(/\\/g, "/");
         if (f) store.tmPermuter[f] = { fn: a.fn, iter: a.iter, best: a.best };
+        if (a.fn) store.tmPermuterFns[a.fn] = { iter: a.iter, best: a.best };
       }
-      if (store.tm && store.tm.level === "files" && typeof renderTreemap === "function") { try { renderTreemap(); } catch (e) {} }
+      if (store.tm && typeof renderTreemap === "function") { try { renderTreemap(); } catch (e) {} }
       // grind2.py writes: active_fn/active_file, iteration, score, best_score, queue,
       // workers, plus a per-worker `active` map. Lower score = closer (0 = exact match).
       setT("quantum-note", s.active_fn || s.fn || s["function"] || "permuter swarm");
