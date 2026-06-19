@@ -10,8 +10,8 @@
 cd "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../.." || exit 1
 source tools/decomp_work/tmux_control/panes.env 2>/dev/null
 export MSYS_NO_PATHCONV=1
-declare -A SEND=( [C1]=send-codex-safe [C2]=send-codex2-safe [C3]=send-codex3-safe [C4]=send-codex4-safe [C5]=send-codex5-safe [C6]=send-codex6-safe [C7]=send-codex7-safe [C8]=send-codex8-safe [SON]=send-sonnet-safe [OPUS]=send-worker-safe )
-declare -A PANE=( [C1]=$CODEX_PANE [C2]=$CODEX2_PANE [C3]=$CODEX3_PANE [C4]=$CODEX4_PANE [C5]=$CODEX5_PANE [C6]=$CODEX6_PANE [C7]=$CODEX7_PANE [C8]=$CODEX8_PANE [SON]=$SONNET_PANE [OPUS]=$WORKER_PANE )
+declare -A SEND=( [C1]=send-codex-safe [C2]=send-codex2-safe [C3]=send-codex3-safe [C4]=send-codex4-safe [C5]=send-codex5-safe [C6]=send-codex6-safe [C7]=send-codex7-safe [C8]=send-codex8-safe [SON]=send-sonnet-safe [OPUS]=send-worker-safe [GLM]=send-glm-safe )
+declare -A PANE=( [C1]=$CODEX_PANE [C2]=$CODEX2_PANE [C3]=$CODEX3_PANE [C4]=$CODEX4_PANE [C5]=$CODEX5_PANE [C6]=$CODEX6_PANE [C7]=$CODEX7_PANE [C8]=$CODEX8_PANE [SON]=$SONNET_PANE [OPUS]=$WORKER_PANE [GLM]=$GLM_PANE )
 is_idle() { local a b; a=$(tmux capture-pane -p -t "$1" 2>/dev/null | md5sum); sleep 2; b=$(tmux capture-pane -p -t "$1" 2>/dev/null | md5sum); [ "$a" = "$b" ]; }
 locked_files() { python tools/decomp_work/coordination/locks.py list 2>/dev/null | awk '{print $2}'; }
 
@@ -34,7 +34,7 @@ pick_line() {
   return 1
 }
 
-for name in ${ASM_LANES:-OPUS SON C1 C2 C3 C4 C5 C6 C7 C8}; do
+for name in ${ASM_LANES:-OPUS SON GLM C1 C2 C3 C4 C5 C6 C7 C8}; do
   is_idle "${PANE[$name]}" || continue
   LOCKS=$(locked_files)
   mode=crack; line=$(pick_line build/wall_queue.txt build/wall_assigned.txt)
