@@ -11,10 +11,10 @@ compiler that Genius Sonority used in 2003.
 
 | Metric | Value |
 |---|---|
-| Function match | ~59.7% (4016 / 6725 functions) |
-| Code match | ~39.1% (523,232 / 1,336,984 matched code bytes) |
+| Function match | ~60.5% (4,067 / 6,725 functions) |
+| Code match | ~37.9% (507,448 / 1,339,648 matched code bytes) |
 
-Last measured 2026-06-17 with `python tools/gen_decomp_report.py -o report.json`
+Last measured 2026-06-19 with `python tools/gen_decomp_report.py -o report.json`
 against the local ROM-extracted target/base objects, after a full `compile_check
 --all` rebuild and removing four duplicate measurement units that had double-counted
 real TUs (gs_field_world / gs_title were counted twice; gs_render_w2 / pokemon_boss2
