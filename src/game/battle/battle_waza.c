@@ -549,6 +549,7 @@ extern s32 lbl_80467390[];
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 void fn_801D23C0(void) {
     u32 handle;
     lbl_80467390[1] = 0x258;
@@ -557,6 +558,7 @@ void fn_801D23C0(void) {
         fn_801669E4(handle, 0, 0);
     }
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
@@ -632,6 +634,7 @@ void fn_801D29D8(s32 moveID, s32 hitCount) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 void fn_801D2B08(void) {
     s32* state;
 
@@ -641,6 +644,7 @@ void fn_801D2B08(void) {
     state[2] = 0;
     state[3] = 0;
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
@@ -702,7 +706,38 @@ u32 fn_801D2C6C(void) {
  * Address: 0x801D2C74 | Size: 0xB4
  */
 void fn_801D2C74(s32 moveID) {
-    /* TODO: Waza animation pre-check (0xB4 bytes) */
+    extern void fn_801D30BC();
+    extern void GSscene_SetMode(s32 arg);
+    extern void fn_80176AE4(void* arg);
+    extern void fn_801765F4(s32 arg);
+    extern s32  fn_800057A8(void);
+    extern u8   lbl_8047B3F4;
+    extern u32  lbl_8047B3F0;
+    extern u32  lbl_8047B3EC;
+
+    void* obj;
+
+    if (lbl_8047B3F4 != 0) {
+        obj = (void*)lbl_8047B3F0;
+        if (obj == NULL) {
+            if (lbl_8047B3EC != 0) {
+                if (obj == NULL) {
+                    GSscene_SetMode(8);
+                } else {
+                    if (*(u32*)((u8*)obj + 0x18) != 0 && *(u32*)((u8*)obj + 0x20) != 0) {
+                        fn_80176AE4(obj);
+                    }
+                    lbl_8047B3F0 = 0;
+                }
+                fn_801765F4(0);
+                lbl_8047B3EC = 0;
+                if (fn_800057A8() == 2) {
+                    GSscene_SetMode(2);
+                }
+            }
+            fn_801D30BC(moveID, 0);
+        }
+    }
 }
 
 /**
