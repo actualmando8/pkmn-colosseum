@@ -562,8 +562,34 @@ void fn_800A2478(OSThreadQueue* queue) {
 }
 #endif
 #if 1
-asm void fn_800A257C(void) {
-#include "src/dolphin/os/OSThread_fn_800A257C.inc"
+BOOL fn_800A257C(OSThread* thread, s32 priority) {
+#pragma peephole on
+    extern s32 fn_800A14EC(OSThread* thread);
+    extern OSThread* fn_800A1528(OSThread* thread, s32 priority);
+    OSThread* t;
+    BOOL enabled;
+    s32 eff;
+
+    if ((priority < 0) || (priority > 31)) {
+        return FALSE;
+    }
+    enabled = OSDisableInterrupts();
+
+    if (thread->base != priority) {
+        thread->base = priority;
+        t = thread;
+        do {
+            if (t->suspend > 0) break;
+            eff = fn_800A14EC(t);
+            if (t->priority == eff) break;
+            t = fn_800A1528(t, eff);
+        } while (t != NULL);
+        if (RunQueueHint_8047A764 != 0) {
+            SelectThread(0);
+        }
+    }
+    OSRestoreInterrupts(enabled);
+    return TRUE;
 }
 #else
 BOOL fn_800A257C(OSThread* thread, s32 priority) {
