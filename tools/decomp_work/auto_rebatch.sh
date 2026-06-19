@@ -36,9 +36,21 @@ pick_line() {
 
 # GLM omitted from the default set — weekly usage cap hit (out for the week).
 # It stays wired in SEND/PANE so it can be re-added via ASM_LANES once it resets.
-for name in ${ASM_LANES:-OPUS SON C1 C2 C3 C4 C5 C6 C7 C8}; do
-  is_idle "${PANE[$name]}" || continue
-  LOCKS=$(locked_files)
+LANES="${ASM_LANES:-OPUS SON C1 C2 C3 C4 C5 C6 C7 C8}"
+# BATCHED idle detection: snapshot every lane, wait ONCE, re-snapshot. A pane that
+# is byte-identical across the 2s window is idle. Doing all lanes in one 2s window
+# (instead of 2s sequentially per lane = ~20s) makes rebatch near-instant so
+# fast-finishing lanes don't sit idle between cycles.
+declare -A SNAP IDLE
+for name in $LANES; do SNAP[$name]=$(tmux capture-pane -p -t "${PANE[$name]}" 2>/dev/null | md5sum); done
+sleep 2
+for name in $LANES; do
+  b=$(tmux capture-pane -p -t "${PANE[$name]}" 2>/dev/null | md5sum)
+  [ "${SNAP[$name]}" = "$b" ] && IDLE[$name]=1
+done
+LOCKS=$(locked_files)
+for name in $LANES; do
+  [ "${IDLE[$name]:-0}" = 1 ] || continue
   mode=crack; line=$(pick_line build/wall_queue.txt build/wall_assigned.txt)
   if [ -z "$line" ]; then mode=scratch; line=$(pick_line build/asm_queue.txt build/asm_assigned.txt); fi
   if [ -z "$line" ]; then echo "QUEUE-EXHAUSTED — $name idle, no free unlocked target (both queues)"; continue; fi
