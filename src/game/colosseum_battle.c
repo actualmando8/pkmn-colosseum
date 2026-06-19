@@ -26495,6 +26495,7 @@ u32 fn_80255D3C(u32 r3_in, u32 r4)
 /* Address: 0x80255D7C | Size: 0x38 | Ghidra import */
 /* Address: 0x80255D7C | Size: 0x38 | Ghidra import */
 /* Address: 0x80255D7C | Size: 0x38 | Ghidra import */
+/* Address: 0x80255D7C | Size: 0x38 | Ghidra import */
 int fn_80255D7C(void)
 
 {
@@ -27591,8 +27592,9 @@ u32 fn_80256AE0(void)
 
   local_8[0] = 0;
   iVar1 = fn_801F8A18(r3, local_8);
-  return (iVar1 != 0) ? 1 : 0;
+  return (-iVar1 != 0) ? 1 : 0;
 }
+/* Address: 0x80256B18 | Size: 0xB4 */
 /* Address: 0x80256B18 | Size: 0xB4 */
 void fn_80256B18(void* ctx, u32 param1, u32 param2) {
     extern void fn_8023793C();
@@ -38981,16 +38983,19 @@ LAB_00262054:
 void fn_80265754(u32 r3,u32 r4)
 
 {
-  int iVar1;
+  typedef struct BattleStatusPair {
+      u32 unk0;
+      u16 unk4;
+  } BattleStatusPair;
+  extern void fn_801026A4(u32, u32, u32, u32, u32, u32, ...);
+  u32 iVar1;
   u32 uVar2;
-  s8 cVar6;
+  u8 cVar6;
   u16 uVar4;
-  short sVar5;
+  u16 sVar5;
   u32 uVar3;
-  u32 local_28;
-  u16 local_24;
-  u32 local_20;
-  u16 local_1c;
+  BattleStatusPair local_20;
+  BattleStatusPair local_28;
   
   iVar1 = fn_801F02AC(2,r3,r4);
   if (iVar1 == 0) {
@@ -39037,8 +39042,8 @@ void fn_80265754(u32 r3,u32 r4)
       }
     }
     fn_801F7954(r3,&local_28);
-    local_20 = local_28;
-    local_1c = local_24;
+    local_20.unk0 = local_28.unk0;
+    local_20.unk4 = local_28.unk4;
     fn_801026A4(uVar2,0,0,0,0,1,&local_20);
   }
   return;

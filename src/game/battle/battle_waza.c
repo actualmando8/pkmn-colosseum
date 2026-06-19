@@ -541,6 +541,7 @@ extern s32 lbl_80467390[];
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 void fn_801D23C0(void) {
     u32 handle;
     lbl_80467390[1] = 0x258;
@@ -549,6 +550,7 @@ void fn_801D23C0(void) {
         fn_801669E4(handle, 0, 0);
     }
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
@@ -608,6 +610,7 @@ void fn_801D29D8(s32 moveID, s32 hitCount) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 void fn_801D2B08(void) {
     s32* state;
 
@@ -617,6 +620,7 @@ void fn_801D2B08(void) {
     state[2] = 0;
     state[3] = 0;
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
@@ -1881,7 +1885,25 @@ void fn_801DCEA8(void* obj) {
  * Address: 0x801DCF00 | Size: 0x84
  */
 void fn_801DCF00(u32 color, f32 intensity) {
-    /* TODO: Lighting override set (0x84 bytes) */
+    extern u8 fn_800E6DC0(s32);
+    extern void fn_800E7290(s32, void*);
+    extern void fn_800E732C(s32, void*, s32, s32);
+    extern void fn_801DEF0C(void*, s32, s32);
+
+    void* obj;
+    u8 flags;
+
+    obj = (void*)color;
+    flags = *(u8*)((u8*)obj + 0x18);
+    if ((flags & 2) != 2) {
+        *(u8*)((u8*)obj + 0x18) = flags | 2;
+        if (fn_800E6DC0(*(s32*)((u8*)obj + 0x24)) != 0) {
+            fn_800E7290(*(s32*)((u8*)obj + 0x24), (u8*)obj + 0x5C);
+        } else {
+            fn_800E732C(*(s32*)((u8*)obj + 0x24), (u8*)obj + 0x5C, 0, 0);
+        }
+        fn_801DEF0C(obj, 1, 0);
+    }
 }
 
 /**

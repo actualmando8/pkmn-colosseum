@@ -377,14 +377,14 @@ extern u16 surfEffectStart(void);
 extern u32 fn_8013B85C(void* ptr, u32 delta);
 extern void fn_8013BA98(void* ptr);
 extern void fn_8013BC10(void* ptr, f32 t);
-extern void fn_8013BE04(void);
+extern void fn_8013BE04(void* ptr, void* mtx, u8* color, f32 x, f32 z, f32 scale);
 extern void fn_8013C074(void);
 extern u32 fn_8013C614(void* ptr);
 extern u32 fn_8013C670(void* ptr);
 extern u16 seaEffectStart(void);
 extern u32 fn_8013CA48(void* ptr, u32 delta);
-extern void fn_8013CBF0(void);
-extern void fn_8013CE58(void* inner, void* ptr);
+extern void fn_8013CBF0(void* ptr, void* mtx, u8* color, f32 x, f32 z, f32 scale);
+extern u32 fn_8013CE58(void* inner, void* ptr);
 extern void fn_8013D0A8(void);
 extern u32 fn_8013D730(void* ptr);
 extern u32 fn_8013D7CC(void* ptr);
@@ -1155,11 +1155,11 @@ extern u32 lbl_8047D228;
 extern u32 lbl_8047D21C;
 extern u32 lbl_8047D208;
 #if 1
-asm void fn_8013BE04(void) {
+asm void fn_8013BE04(void* ptr, void* mtx, u8* color, f32 x, f32 z, f32 scale) {
 #include "src/game/effect/effect_visual_fn_8013BE04.inc"
 }
 #else
-void fn_8013BE04(void) { /* TODO */ }
+void fn_8013BE04(void* ptr, void* mtx, u8* color, f32 x, f32 z, f32 scale) { /* TODO */ }
 #endif
 extern void fn_8019FF48(void);
 extern void HSD_MObjSetFlags(void);
@@ -1284,18 +1284,18 @@ extern u32 lbl_8047D258;
 extern u32 lbl_8047D250;
 extern u32 lbl_8047D248;
 #if 1
-asm void fn_8013CBF0(void) {
+asm void fn_8013CBF0(void* ptr, void* mtx, u8* color, f32 x, f32 z, f32 scale) {
 #include "src/game/effect/effect_visual_fn_8013CBF0.inc"
 }
 #else
-void fn_8013CBF0(void) { /* TODO */ }
+void fn_8013CBF0(void* ptr, void* mtx, u8* color, f32 x, f32 z, f32 scale) { /* TODO */ }
 #endif
 #if 1
-asm void fn_8013CE58(void* inner, void* ptr) {
+asm u32 fn_8013CE58(void* inner, void* ptr) {
 #include "src/game/effect/effect_visual_fn_8013CE58.inc"
 }
 #else
-void fn_8013CE58(void) { /* TODO */ }
+u32 fn_8013CE58(void* inner, void* ptr) { return 0; }
 #endif
 #if 1
 asm void fn_8013D0A8(void) {
