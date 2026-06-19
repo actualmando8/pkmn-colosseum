@@ -2753,6 +2753,53 @@ def load_quantum() -> dict:
     return {"available": True, "state": d, "generated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
 
 
+def load_buckets() -> dict:
+    """Wall-ledger bucket coverage: per-bucket totals + how many functions we've
+    ATTACKED (attempted), for the campaign progress bar chart."""
+    led_path = ROOT / "build" / "wall_ledger.json"
+    if not led_path.exists():
+        return {"available": False}
+    try:
+        led = json.loads(led_path.read_text(encoding="utf-8", errors="replace"))
+    except (OSError, ValueError) as exc:
+        return {"available": False, "error": str(exc)}
+    order = ["DONE", "EQUIV", "NEARWALL", "STRUCT", "ASM", "LOW"]
+    meta = {
+        "DONE": "byte-exact real C (achieved)",
+        "EQUIV": "correct C, wall-accepted",
+        "NEARWALL": "95-99.95% reg-alloc walls (crack targets)",
+        "STRUCT": "70-95% wrong-shape (rework)",
+        "ASM": "undecompiled asm-wrappers",
+        "LOW": "<70% early/wrong",
+    }
+    agg = {b: {"total": 0, "attempted": 0} for b in order}
+    for v in led.values():
+        if not isinstance(v, dict):
+            continue
+        b = v.get("bucket")
+        if b in agg:
+            agg[b]["total"] += 1
+            if v.get("attempted"):
+                agg[b]["attempted"] += 1
+    buckets = []
+    for b in order:
+        t, a = agg[b]["total"], agg[b]["attempted"]
+        if b in ("DONE", "EQUIV"):
+            # these are finished — the bar is "% complete" (100), not "% attacked".
+            buckets.append({"name": b, "total": t, "attempted": t, "remaining": 0,
+                            "pct": 100.0 if t else 0.0, "desc": meta[b]})
+        else:
+            buckets.append({"name": b, "total": t, "attempted": a, "remaining": t - a,
+                            "pct": round(100.0 * a / t, 1) if t else 0.0, "desc": meta[b]})
+    total = sum(agg[b]["total"] for b in order)
+    done = agg["DONE"]["total"] + agg["EQUIV"]["total"]
+    return {
+        "available": True, "buckets": buckets, "total_fns": total, "done_fns": done,
+        "overall_pct": round(100.0 * done / total, 1) if total else 0.0,
+        "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+
 def load_attack_matrix(decomp: dict[str, object]) -> dict[str, object]:
     """Rank work by unit so the dashboard directs the next attack, not just observes."""
     units = decomp.get("units") if isinstance(decomp, dict) else []
@@ -5144,6 +5191,15 @@ HTML = r"""<!doctype html>
     /* ---- leases + quantum center row ---- */
     .leases-quantum { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 12px; margin-bottom: 12px; }
     @media (max-width: 1000px) { .leases-quantum { grid-template-columns: 1fr; } }
+    .bucket-section { margin-bottom: 12px; }
+    .bucket-bars { display: flex; flex-direction: column; gap: 9px; padding: 4px 2px; }
+    .bucket-row { display: grid; grid-template-columns: 92px 1fr 120px; align-items: center; gap: 12px; }
+    .bucket-label { font: 700 12px "Cascadia Mono", monospace; color: #cbd5e3; letter-spacing: .3px; }
+    .bucket-track { position: relative; height: 20px; background: rgba(141,160,184,.14); border-radius: 5px; overflow: hidden; }
+    .bucket-fill { position: absolute; left: 0; top: 0; height: 100%; border-radius: 5px; transition: width .5s ease; min-width: 2px; }
+    .bucket-pct { position: absolute; right: 7px; top: 2px; font: 700 11px "Cascadia Mono", monospace; color: #e6edf5; text-shadow: 0 1px 2px rgba(0,0,0,.6); }
+    .bucket-counts { font: 600 11px "Cascadia Mono", monospace; color: #aebdd0; text-align: right; }
+    .bucket-counts .muted { color: #6b7a8d; }
     .lease-tabs { display: flex; gap: 4px; margin-left: auto; }
     .lease-tab { height: 24px; padding: 0 9px; border: 1px solid var(--line); background: transparent; color: var(--muted); border-radius: 3px; font: 700 10.5px "Cascadia Mono", monospace; text-transform: uppercase; letter-spacing: .04em; }
     .lease-tab.active { color: var(--accent); border-color: var(--accent-dim); background: rgba(63,185,80,.1); }
@@ -5574,6 +5630,16 @@ HTML = r"""<!doctype html>
             </div>
           </div>
           <canvas id="history-chart" height="205"></canvas>
+        </div>
+      </section>
+
+      <section class="bucket-section">
+        <div class="panel" id="bucket-panel">
+          <div class="panel-title">
+            <h2>Campaign Buckets — coverage</h2>
+            <span class="panel-note" id="bucket-note"></span>
+          </div>
+          <div id="bucket-bars" class="bucket-bars"></div>
         </div>
       </section>
 
@@ -8527,6 +8593,31 @@ HTML = r"""<!doctype html>
       }
     }
     function pollQuantum() { fetch("/api/quantum", { cache: "no-store" }).then(r => r.json()).then(renderQuantum).catch(() => {}); }
+
+    const BUCKET_COLORS = { DONE: "#38b995", EQUIV: "#7da0c4", NEARWALL: "#e0a93b", STRUCT: "#c77dff", ASM: "#5aa9e6", LOW: "#8da0b8" };
+    function renderBuckets(d) {
+      const el = document.getElementById("bucket-bars");
+      const note = document.getElementById("bucket-note");
+      if (!el) return;
+      if (!d || !d.available || !Array.isArray(d.buckets)) {
+        el.innerHTML = '<div class="bucket-counts">no ledger yet — run <code>wall_ledger.py build</code></div>';
+        if (note) note.textContent = "";
+        return;
+      }
+      if (note) note.textContent = `${d.done_fns.toLocaleString()}/${d.total_fns.toLocaleString()} decompiled (${d.overall_pct}%) · bar = % of bucket attacked`;
+      el.innerHTML = d.buckets.map(b => {
+        const c = BUCKET_COLORS[b.name] || "#5aa9e6";
+        return `<div class="bucket-row">
+          <div class="bucket-label" title="${b.desc}">${b.name}</div>
+          <div class="bucket-track">
+            <div class="bucket-fill" style="width:${b.pct}%;background:${c}"></div>
+            <span class="bucket-pct">${b.pct}%</span>
+          </div>
+          <div class="bucket-counts">${b.attempted.toLocaleString()}/${b.total.toLocaleString()} <span class="muted">(${b.remaining.toLocaleString()} left)</span></div>
+        </div>`;
+      }).join("");
+    }
+    function pollBuckets() { fetch("/api/buckets", { cache: "no-store" }).then(r => r.json()).then(renderBuckets).catch(() => {}); }
     // ---- v10: live attempt-log poll (independent of the slow /api/state) ----
     function pollLog() {
       fetch("/api/log?limit=1000", { cache: "no-store" })
@@ -9297,7 +9388,7 @@ HTML = r"""<!doctype html>
     pollKg();
     pollCrackJobs();
     pollLog();   // populate the attempt log immediately (independent of /api/state)
-    pollSync(); pollPrs(); pollShip(); pollLeases(); pollReports(); pollQuantum(); pollActiveWork();
+    pollSync(); pollPrs(); pollShip(); pollLeases(); pollReports(); pollQuantum(); pollActiveWork(); pollBuckets();
     const _gcBtn = $("locks-gc");
     if (_gcBtn) _gcBtn.addEventListener("click", () => lockAction("gc", {}));
 
@@ -9362,6 +9453,7 @@ HTML = r"""<!doctype html>
     store.leasesTimer = setInterval(pollLeases, 8000);
     store.activeWorkTimer = setInterval(pollActiveWork, 12000);   // #3/#4 live active-work poll
     store.reportsTimer = setInterval(pollReports, 12000);
+    store.bucketsTimer = setInterval(pollBuckets, 15000);
     store.syncTimer = setInterval(() => { pollSync(); pollShip(); }, 30000);
     store.prsTimer = setInterval(pollPrs, 60000);
     store.quantumTimer = setInterval(pollQuantum, 10000);
@@ -9629,6 +9721,9 @@ Serve only over the private tailnet. Not linked from the public dashboard UI.</p
             return
         if path == "/api/quantum":
             self.send_json(load_quantum())
+            return
+        if path == "/api/buckets":
+            self.send_json(load_buckets())
             return
         if path == "/api/tokens":
             try:
