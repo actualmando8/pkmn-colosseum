@@ -62,11 +62,15 @@ for name in $LANES; do
   RUN_PICKED="${RUN_PICKED}"$'\n'"${file}"   # claim it for this run so no other lane picks it
   if [ "$mode" = crack ]; then echo "$file" >> build/wall_assigned.txt; else echo "$file" >> build/asm_assigned.txt; fi
   for fn in $fns; do python tools/decomp_work/wall_ledger.py mark "$fn" "$name/$mode" >/dev/null 2>&1; done
-  ff=""; case "$name" in C1|C2|C3|C4) ff="If a fn resists after ~3 lever attempts, report WALL <fn> <%> with the residual diff and move on.";; esac
+  # MANDATORY WALL GATE: a fn may only be filed WALL after classify_residual.py says
+  # so. If it exits 0 (REG-COLORING) the residual is winnable (named locals + decl-order)
+  # and walling it is forbidden — this is what stalled fn_80200E00 at 97.92%.
+  gate="BEFORE any WALL you MUST run: python tools/decomp_work/classify_residual.py $tag <fn>. If it prints REG-COLORING (exit 0) you may NOT wall it — rewrite with NAMED locals (never raw rNN locals, they pin the coloring) + declaration-order lever until 100. Only RELOC/SCHEDULING/SHAPE verdicts may WALL/REWORK."
+  ff=""; case "$name" in C1|C2|C3|C4) ff="If a fn still resists after the classifier says REG-COLORING and ~4 decl-order attempts, leave it in scratch and report WALL <fn> <%> + the classifier verdict, then move on.";; esac
   if [ "$mode" = crack ]; then
-    prompt="CRACK (levers: read docs/CRACK_LEVERS.md). File: $file  TAG: $tag  fns: $fns. These are real C in canon <100% — band.py diff to size the miss (small=reg-alloc lever; large=m2c_draft reshape), fix scratch, band.py check, save at 100. Real C only (no asm/.inc). $ff SAVED <fn> 100.00 / WALL <fn> <%>."
+    prompt="CRACK (levers: read docs/CRACK_LEVERS.md). File: $file  TAG: $tag  fns: $fns. These are real C in canon <100%. For EACH fn: band.py diff, then classify_residual.py to pick the fix (REG-COLORING=named-locals+decl-order; SHAPE=m2c_draft reshape). Fix scratch, band.py check, save at 100. Real C only (no asm/.inc/rNN-locals). $gate $ff SAVED <fn> 100.00 / WALL <fn> <%>."
   else
-    prompt="FROM-SCRATCH asm->C (levers: docs/CRACK_LEVERS.md). File: $file  TAG: $tag  fns: $fns. m2c_draft each, write faithful REAL C (in-body externs), band.py check, save at 100. No asm/.inc fraud. $ff SAVED/WALL/SKIP per fn."
+    prompt="FROM-SCRATCH asm->C (levers: docs/CRACK_LEVERS.md). File: $file  TAG: $tag  fns: $fns. m2c_draft each, then REWRITE into faithful REAL C with NAMED locals (in-body externs) — do NOT leave raw rNN register-locals, they pin the coloring. band.py check, save at 100. No asm/.inc fraud. $gate $ff SAVED/WALL/SKIP per fn."
   fi
   ./tools/decomp_work/tmux_control/control.sh "${SEND[$name]}" "$prompt" >/dev/null 2>&1
   echo "REBATCH $name [$mode] -> $stem [$fns]"

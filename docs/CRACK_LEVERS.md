@@ -15,11 +15,34 @@ python tools/decomp_work/kg/kg.py q lever-targets <fn>        # which lever fits
 A SAVED body must be REAL C. `asm{}` / `asm void` / `#include "*.inc"` = INSTANT
 gate rejection + logged as fraud. NO vault-sync skill.
 
-## Diagnose by miss size (`band.py diff`)
-- **small (1-3 instr, reg numbering / scheduling)** → a reg-alloc lever below.
-- **large (wrong control-flow shape or types, fn is <95%)** → REWORK: run
+## Diagnose — run the classifier FIRST, every time
+```
+python tools/decomp_work/classify_residual.py <TAG> <fn>
+```
+It reads `band.py diff` and tells you which class the residual is + the exact fix.
+**You may NOT file `WALL` on a fn whose classifier verdict is REG-COLORING (exit 0).**
+That verdict means the instructions are already correct and only the register MAP
+differs — it is ALWAYS winnable with the levers below. Filing it as a wall is the
+#1 missed-win (fn_80200E00 sat at 97.92% this way).
+
+The classes:
+- **REG-COLORING** (same instrs, different register numbers, maybe a spare `mr`/`li`)
+  → keep grinding: NAMED locals + declaration-order lever. Never a wall.
+- **SCHEDULING** (same instr SET, reordered) → one scheduling-pragma / operand-order
+  try, else wall.
+- **RELOC** (`@nnn`-vs-`@named`, SDA-numeric, conversion-literal) → wall.
+- **SHAPE** (mnemonics differ / >15% of lines / fn <95%) → REWORK: run
   `python tools/decomp_work/m2c_draft.py <fn> <FILE>` for a faithful draft, fix the
-  shape/types to match, THEN apply levers.
+  shape/types to match, THEN re-diff and apply levers.
+
+## ⚠️ Raw-m2c register locals PIN the coloring — never leave them
+A draft that declares the CPU registers as locals (`u32 r27, r28, r29, r30; ...
+r28 = *(u16*)(r29 + r0);`) compiles and lands ~98%, but it *forces* CW into one
+register map that is usually one permutation off the target — and you can't move it,
+because you named the registers. The fix is ALWAYS to rewrite as faithful C with
+**named** locals (`msgId`, `basePtr`, `entry`, `result`) so the allocator is free,
+then steer it with declaration order. If your scratch has `rNN` locals, that is the
+bug, not a wall.
 
 ## Reg-alloc levers
 - **declaration ORDER** of co-surviving locals sets the r31-down register map — reorder them.
@@ -46,3 +69,6 @@ gate rejection + logged as fraud. NO vault-sync skill.
 ## FILE AS WALL IMMEDIATELY (not C-reachable — do not grind)
 pure scheduler reorderings, `beq;b`-vs-`bne`, `@nnn`-vs-`@named` reloc,
 SDA-numeric-vs-`@sda21` / conversion-literal artifacts. Report `WALL <fn> <%> <residual>`.
+**Before you type WALL, run `classify_residual.py <TAG> <fn>` — if it exits 0
+(REG-COLORING), you may not wall it.** Register-number differences are NOT in the
+wall list above; they are the most common *winnable* residual.
