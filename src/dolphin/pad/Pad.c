@@ -337,7 +337,10 @@ static void fn_800AC3E8(s32 chan, u32 error, OSContext* context) {
  * Returns the current PAD specification.
  */
 u32 fn_800AC404(void) {
-    return __PADSpec;
+    u32 value;
+
+    value = *(volatile u32*)0xCC006C04;
+    return value & 0xFF;
 }
 
 /*
@@ -616,7 +619,10 @@ void fn_800ACBCC(u32 mask) {
  * Returns the enabled controller bitmask.
  */
 u32 fn_800ACBEC(void) {
-    return EnabledBits;
+    u16 value;
+
+    value = *(volatile u16*)0xCC00500A;
+    return value & 0x20;
 }
 
 /*
