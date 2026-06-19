@@ -351,17 +351,17 @@ extern u32 lbl_8047D154;
 extern void fn_80138838(void* ptr, u32 b);
 extern u32 fn_80138B74(void* ptr);
 extern u32 fn_80138BBC(void* ptr);
-extern void fn_80138CCC(void);
+extern u32 fn_80138CCC(void* ptr);
 extern void fn_80138DE4(void);
 extern void fn_80139074(void);
-extern void _leaffxGenerateLeafData(void);
+extern void _leaffxGenerateLeafData(void* ptr, void* entry);
 extern u32 fn_80139898(void* ptr);
 extern u32 fn_801398E0(void* ptr);
 extern void fn_80139934(void);
 extern BOOL fn_80139AC4(void* ptr, u32 tick);
 extern u32 fn_80139D10(void* ptr);
 extern void fn_80139E80(void);
-extern void fn_8013A1D4(void);
+extern void fn_8013A1D4(void* arg0, void* arg1, void* arg2, u32 arg3, f32 arg4);
 extern u32 fn_8013A49C(void* ptr);
 extern void fn_8013A520(void);
 extern u32 fn_8013AA8C(void* ptr, u16 delta);
@@ -467,11 +467,11 @@ u32 fn_80138680(void* ptr) {
 #endif
 extern u8 lbl_80272B40[];
 #if 1
-asm void fn_801386DC(void) {
+asm u32 fn_801386DC(void* ptr) {
 #include "src/game/effect/effect_visual_fn_801386DC.inc"
 }
 #else
-void fn_801386DC(void) { /* TODO */ }
+u32 fn_801386DC(void* ptr) { /* TODO */ }
 #endif
 #if 0
 asm void fn_801387C0(void* ptr, u32 delta) {
@@ -501,7 +501,7 @@ fail:
 extern void fn_800E0BE4(void);
 extern void fn_800CDBE0(void);
 extern void fn_800CE148(void);
-extern void fn_800E01F4(void);
+extern void fn_800E01F4(void* dst, f32 x, f32 y, f32 z);
 extern void fn_800E01D0(void);
 extern void fn_800DFFCC(void);
 extern void fn_800E0718(void);
@@ -556,12 +556,12 @@ u32 fn_80138B74(void* ptr) {
 }
 #endif
 extern void fn_800E4014(void* a, u32 b);
-extern void fn_800E4BF4(void);
-extern void fn_800EE0E8(void);
+extern void fn_800E4BF4(void* entry);
+extern u32 fn_800EE0E8(void* entry);
 extern void* fn_800EE150(void* model, u32 mode);
-extern void fn_800EE758(void);
+extern s32 fn_800EE758(void* outerP);
 extern void* fn_800EE6B4(void* handle, u32 idx);
-extern void fn_800DF21C(void);
+extern void fn_800DF21C(void* obj, f32 val);
 extern void fn_800DF608(void* handle);
 extern void fn_800EE828(void* handle);
 extern u32 lbl_8047D160;
@@ -575,11 +575,11 @@ u32 fn_80138BBC(void* ptr) { /* TODO */ }
 extern u8 lbl_80272C30[];
 extern u8 lbl_80272C90[];
 #if 1
-asm void fn_80138CCC(void) {
+asm u32 fn_80138CCC(void* ptr) {
 #include "src/game/effect/effect_visual_fn_80138CCC.inc"
 }
 #else
-void fn_80138CCC(void) { /* TODO */ }
+u32 fn_80138CCC(void* ptr) { /* TODO */ }
 #endif
 extern void GSbezierCalculateVector(void);
 extern void fn_800E06B8(void);
@@ -618,11 +618,11 @@ extern u32 lbl_8047D180;
 extern u32 lbl_8047D184;
 extern u32 lbl_8047D188;
 #if 1
-asm void _leaffxGenerateLeafData(void) {
+asm void _leaffxGenerateLeafData(void* ptr, void* entry) {
 #include "src/game/effect/effect_visual__leaffxGenerateLeafData.inc"
 }
 #else
-void _leaffxGenerateLeafData(void) { /* TODO */ }
+void _leaffxGenerateLeafData(void* ptr, void* entry) { /* TODO */ }
 #endif
 #if 0
 asm void electronStartEffect(void) {
@@ -730,11 +730,11 @@ extern u32 lbl_8047D1A0;
 extern u32 lbl_8047D1A8;
 extern u32 lbl_8047D1AC;
 #if 1
-asm void fn_8013A1D4(void) {
+asm void fn_8013A1D4(void* arg0, void* arg1, void* arg2, u32 arg3, f32 arg4) {
 #include "src/game/effect/effect_visual_fn_8013A1D4.inc"
 }
 #else
-void fn_8013A1D4(void) { /* TODO */ }
+void fn_8013A1D4(void* arg0, void* arg1, void* arg2, u32 arg3, f32 arg4) { /* TODO */ }
 #endif
 #if 0
 asm void fn_8013A42C(void) {
@@ -2281,12 +2281,14 @@ asm void fn_801436F0(void) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 u32 fn_801436F0(void* ptr) {
     s32 v;
     if (ptr == NULL) return 0;
     v = !!((((u8*)ptr)[0x4] >> 3) & 1);
     return v;
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
@@ -2336,12 +2338,14 @@ asm void fn_80143778(void) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 unsigned int fn_80143778(const void *ptr) {
     s32 v;
     if (ptr == NULL) return 0;
     v = !!((((u8*)ptr)[0x4] >> 4) & 1);
     return v;
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on

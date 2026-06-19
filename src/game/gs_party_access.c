@@ -1226,10 +1226,12 @@ u32 fn_8000CE5C(void) {
 /* fn_8000CED0 - 0x8000CED0 | size: 0x28 */
 /* GSparty_IsAlive */
 #pragma peephole off
+#pragma peephole off
 s32 fn_8000CED0(void) {
     fn_800FF730(0x391);
     return 0;
 }
+#pragma peephole on
 #pragma peephole on
 
 /* fn_8000CEF8 - 0x8000CEF8 | size: 0x70 */
@@ -1358,6 +1360,8 @@ idx_done:
 #pragma peephole off
 #pragma push
 #pragma peephole off
+#pragma push
+#pragma peephole off
 s32 fn_8000D11C(void) {
     s32 v = *(s32*)(lbl_804673F8 + 0x874);
     if (v != 0) {
@@ -1367,9 +1371,12 @@ s32 fn_8000D11C(void) {
 }
 #pragma pop
 #pragma pop
+#pragma pop
 
 /* fn_8000D154 - 0x8000D154 | size: 0x70 */
 /* GSparty_GetAccuracy */
+#pragma push
+#pragma peephole off
 #pragma push
 #pragma peephole off
 #pragma push
@@ -1387,9 +1394,12 @@ s32 fn_8000D154(void) {
 }
 #pragma pop
 #pragma pop
+#pragma pop
 
 /* fn_8000D1C4 - 0x8000D1C4 | size: 0x70 */
 /* GSparty_GetEvasion */
+#pragma push
+#pragma peephole off
 #pragma push
 #pragma peephole off
 #pragma push
@@ -1407,9 +1417,12 @@ s32 fn_8000D1C4(void) {
 }
 #pragma pop
 #pragma pop
+#pragma pop
 
 /* fn_8000D234 - 0x8000D234 | size: 0x5c */
 /* GSparty_ResetStatStages */
+#pragma push
+#pragma peephole off
 #pragma push
 #pragma peephole off
 #pragma push
@@ -1426,6 +1439,7 @@ s32 fn_8000D234(void) {
     }
     return 0;
 }
+#pragma pop
 #pragma pop
 #pragma pop
 
