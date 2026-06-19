@@ -619,19 +619,43 @@ asm void fn_800A2478(void) {
 }
 #else
 void fn_800A2478(OSThreadQueue* queue) {
-    BOOL enabled = OSDisableInterrupts();
+    BOOL enabled;
+    OSThread* thread;
+    OSThread* next;
+    OSThreadQueue* runQueues;
+    OSThread* tail;
 
-    while (queue->head) {
-        OSThread* thread = queue->head;
+    enabled = OSDisableInterrupts();
+    runQueues = RunQueue_803FB898;
 
-        DEQUEUE_HEAD(thread, queue, link);
+    while ((thread = queue->head) != NULL) {
+        next = thread->link.next;
+        if (next == NULL) {
+            queue->tail = NULL;
+        } else {
+            next->link.prev = NULL;
+        }
+        queue->head = next;
 
         thread->state = 1;
         if (thread->suspend <= 0) {
-            SetRun(thread);
+            thread->queue = &runQueues[thread->priority];
+            tail = thread->queue->tail;
+            if (tail == NULL) {
+                thread->queue->head = thread;
+            } else {
+                tail->link.next = thread;
+            }
+            thread->link.prev = tail;
+            thread->link.next = NULL;
+            thread->queue->tail = thread;
+            RunQueueBits_8047A760 |= 1 << (31 - thread->priority);
+            RunQueueHint_8047A764 = 1;
         }
     }
-    __OSReschedule();
+    if (RunQueueHint_8047A764 != 0) {
+        SelectThread(0);
+    }
     OSRestoreInterrupts(enabled);
 }
 #endif
