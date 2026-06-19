@@ -370,11 +370,11 @@ extern void fn_8013AD9C(void);
 extern u32 fn_8013B034(void* ptr);
 extern u32 fn_8013B0A0(void* ptr);
 extern u16 filterStart(void* ptr);
-extern void fn_8013B268(void);
+extern void fn_8013B268(void* ptr, u8* color);
 extern u32 fn_8013B504(void* ptr);
 extern u32 fn_8013B558(void* ptr);
 extern u16 surfEffectStart(void);
-extern void fn_8013B85C(void);
+extern u32 fn_8013B85C(void* ptr, u32 delta);
 extern void fn_8013BA98(void* ptr);
 extern void fn_8013BC10(void* ptr, f32 t);
 extern void fn_8013BE04(void);
@@ -405,7 +405,7 @@ extern u32 fn_8013E6C4(u8* ptr);
 extern u32 fn_8013E8A4(void* ptr, u32 delta);
 extern void fn_8013EA44();
 extern u32 fn_8013F078(void* ptr);
-extern void fn_8013F114(void);
+extern u32 fn_8013F114(void* ptr);
 extern u16 distortionEffectStart(void);
 extern void fn_8013F410(void);
 extern u32 fn_8013F80C(void* ptr, u32 delta);
@@ -414,7 +414,7 @@ extern u32 fn_8013FC58(void* ptr);
 extern u32 fn_8013FCC4(void* ptr);
 extern u32 fn_8013FD68(void* ptr);
 extern u16 billboardEffectStart(void* ptr);
-extern void fn_8013FF0C(void);
+extern u32 fn_8013FF0C(void* ptr);
 
 #if 1
 asm void _lightningRenderMain(void) {
@@ -508,8 +508,8 @@ extern void fn_800E0718(void);
 extern void fn_800DFEEC(void);
 extern void fn_800E0518(void);
 extern void fn_800DFF98(void);
-extern void fn_800E013C(void);
-extern void fn_800E019C(void);
+extern void fn_800E013C(void* dst, void* src, f32 scale);
+extern void fn_800E019C(void* dst, void* srcA, void* srcB);
 extern u32 lbl_8047D154;
 extern u32 lbl_8047D15C;
 extern u32 lbl_8047D14C;
@@ -1023,17 +1023,17 @@ report_null:
     return 0;
 }
 #endif
-extern void fn_800E5B68(void);
+extern void fn_800E5B68(void* obj, void* param);
 extern u32 lbl_8047D1E8;
 extern u32 lbl_8047D1F8;
 extern u32 lbl_8047D1F0;
 extern u32 lbl_8047D1FC;
 #if 1
-asm void fn_8013B268(void) {
+asm void fn_8013B268(void* ptr, u8* color) {
 #include "src/game/effect/effect_visual_fn_8013B268.inc"
 }
 #else
-void fn_8013B268(void) { /* TODO */ }
+void fn_8013B268(void* ptr, u8* color) { /* TODO */ }
 #endif
 #if 0
 asm void fn_8013B490(void) {
@@ -1117,14 +1117,14 @@ asm u16 surfEffectStart(void) {
 #else
 u16 surfEffectStart(void) { /* TODO */ }
 #endif
-extern void fn_800E09E8(void);
+extern void fn_800E09E8(void* dst, void* src, u32 count);
 extern u32 lbl_8047D208;
 #if 1
-asm void fn_8013B85C(void) {
+asm u32 fn_8013B85C(void* ptr, u32 delta) {
 #include "src/game/effect/effect_visual_fn_8013B85C.inc"
 }
 #else
-void fn_8013B85C(void) { /* TODO */ }
+u32 fn_8013B85C(void* ptr, u32 delta) { /* TODO */ }
 #endif
 extern u8 lbl_8031554C[];
 extern u8 lbl_80315540[];
@@ -1871,7 +1871,7 @@ asm u32 fn_8013E8A4(void* ptr, u32 delta) {
 u32 fn_8013E8A4(void* ptr, u32 delta) { /* TODO */ }
 #endif
 extern void __assert(void);
-extern void fn_800E3C5C(void);
+extern void* fn_800E3C5C(void* model);
 extern void fn_800E4514(void);
 extern void fn_800E69C4(void);
 extern void fn_800E66B8(void);
@@ -1947,16 +1947,16 @@ u32 fn_8013F078(void* ptr) {
     return 1;
 }
 #endif
-extern void fn_800D7894(void);
-extern void fn_800D7868(void);
+extern void* fn_800D7894(void);
+extern void fn_800D7868(void* handle, u32 a, u32 b, u32 c, u32 d, u32 e, u32 f, u32 g);
 extern u32 lbl_8047AEE8;
 extern u32 lbl_8047AEEC;
 #if 1
-asm void fn_8013F114(void) {
+asm u32 fn_8013F114(void* ptr) {
 #include "src/game/effect/effect_visual_fn_8013F114.inc"
 }
 #else
-void fn_8013F114(void) { /* TODO */ }
+u32 fn_8013F114(void* ptr) { /* TODO */ }
 #endif
 extern u32 lbl_8047AEE8;
 extern u32 lbl_8047D300;
@@ -2009,7 +2009,7 @@ asm u32 fn_8013F80C(void* ptr, u32 delta) {
 u32 fn_8013F80C(void* ptr, u32 delta) { /* TODO */ }
 #endif
 extern void fn_800D7BF8(void);
-extern void GScameraGetLookAt(void);
+extern void GScameraGetLookAt(void* mtx, void* lookAt, void* eye);
 extern void fn_800E0628(void);
 extern void fn_800E0238(void);
 extern void fn_800D2DE8(void);
@@ -2179,13 +2179,13 @@ report_null:
     return 0;
 }
 #endif
-extern void fn_800CE220(void);
-extern void fn_80118DA8(void);
-extern void fn_80118F04(void);
-extern void fn_800EC954(void);
-extern void fn_800EC1C8(void);
-extern void fn_800E43A4(void);
-extern void fn_800E407C(void);
+extern f64 fn_800CE220(f64 x);
+extern u32 fn_80118DA8(void* ptr);
+extern void fn_80118F04(void* arg1, void* arg2);
+extern u8 fn_800EC954(void* model);
+extern u8 fn_800EC1C8(void* model);
+extern void fn_800E43A4(void* entry, void* param);
+extern void fn_800E407C(void* entry, void* param);
 extern u8 lbl_80273060[];
 extern u8 lbl_8027306C[];
 extern u32 lbl_8047D334;
@@ -2194,11 +2194,11 @@ extern u32 lbl_8047D330;
 extern u32 lbl_8047D338;
 extern u32 lbl_8047D32C;
 #if 1
-asm void fn_8013FF0C(void) {
+asm u32 fn_8013FF0C(void* ptr) {
 #include "src/game/effect/effect_visual_fn_8013FF0C.inc"
 }
 #else
-void fn_8013FF0C(void) { /* TODO */ }
+u32 fn_8013FF0C(void* ptr) { /* TODO */ }
 #endif
 #if 0
 asm void fn_80140138(void) {
@@ -2284,12 +2284,14 @@ asm void fn_801436F0(void) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 u32 fn_801436F0(void* ptr) {
     s32 v;
     if (ptr == NULL) return 0;
     v = !!((((u8*)ptr)[0x4] >> 3) & 1);
     return v;
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
@@ -2345,12 +2347,14 @@ asm void fn_80143778(void) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 unsigned int fn_80143778(const void *ptr) {
     s32 v;
     if (ptr == NULL) return 0;
     v = !!((((u8*)ptr)[0x4] >> 4) & 1);
     return v;
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on

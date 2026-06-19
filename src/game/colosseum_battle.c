@@ -26487,9 +26487,12 @@ u32 fn_80255D3C(u32 r3_in, u32 r4)
 {
     extern u32 fn_8012640C();
   u32 uVar1;
+  u8 result;
   uVar1 = fn_8012640C(r4, 0, 0xed, 0) & 0xFFFF;
-  return (uVar1 != 0) ? 1 : 0;
+  result = uVar1 != 0;
+  return result;
 }
+/* Address: 0x80255D7C | Size: 0x38 | Ghidra import */
 /* Address: 0x80255D7C | Size: 0x38 | Ghidra import */
 int fn_80255D7C(void)
 
@@ -32872,7 +32875,7 @@ u32 fn_8025ADFC(void)
 
 {
     extern int fn_8025C770();
-  s8 cVar1;
+  u8 cVar1;
   
   cVar1 = fn_8025C770();
   return cVar1 != 0;
@@ -36113,7 +36116,7 @@ u32 fn_8025D744(void* ctx, u32 slot, u32 param) {
     for (i = 0; i < 6; i++) {
         *(u32*)(base + 0x8 + i * 4) = (u32)-1;
     }
-    return 0;
+    return (u32)base;
 }
 
 /* Address: 0x8025D788 | Size: 0x80 | Pattern: field_accessor */

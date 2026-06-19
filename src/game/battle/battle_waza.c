@@ -539,6 +539,7 @@ extern s32 lbl_80467390[];
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 void fn_801D23C0(void) {
     u32 handle;
     lbl_80467390[1] = 0x258;
@@ -547,6 +548,7 @@ void fn_801D23C0(void) {
         fn_801669E4(handle, 0, 0);
     }
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
@@ -602,6 +604,7 @@ void fn_801D29D8(s32 moveID, s32 hitCount) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 void fn_801D2B08(void) {
     s32* state;
 
@@ -611,6 +614,7 @@ void fn_801D2B08(void) {
     state[2] = 0;
     state[3] = 0;
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
