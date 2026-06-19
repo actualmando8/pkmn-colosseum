@@ -173,7 +173,7 @@ extern void* fn_800F9318(u32 group, u32 model);
 /* Matrix / vector operations */
 extern void  fn_800E3D98(void* dst, void* src);
 extern void  fn_800D2248(void);
-extern void  GScameraGetActiveCamera(void);
+extern void* GScameraGetActiveCamera(void);
 extern void  GScameraGetPosition(void* mtx, void* vec);
 extern void  GScameraGetPerspective(void* mtx, void* rx, void* ry, void* rz, void* scale);
 extern void  fn_800E0040(void* vecA, void* vecB);
@@ -611,7 +611,7 @@ asm void fn_80139074(void) {
 void fn_80139074(void) { /* TODO */ }
 #endif
 extern void fn_800E4C98(void);
-extern void fn_800EE3BC(void);
+extern void fn_800EE3BC(void* obj, void* a, void* b, void* c);
 extern u8 lbl_80272CC4[];
 extern u32 lbl_8047D168;
 extern u32 lbl_8047D180;
@@ -680,11 +680,65 @@ u32 fn_801398E0(void* ptr) {
     return 1;
 }
 #endif
-extern void fn_800EE7E0(void);
+extern u32 fn_800EE7E0(void* obj);
 extern u32 lbl_8047D190;
 #if 1
-asm u32 fn_80139934(void* ptr) {
-#include "src/game/effect/effect_visual_fn_80139934.inc"
+u32 fn_80139934(void* ptr) {
+    f32 cameraPos[3];
+    f32 pos[3];
+    u8* p;
+    void* camera;
+    u16 i;
+    u16 count;
+    u8* entry;
+    void* model;
+    void* part;
+
+    if (ptr != NULL) {
+        p = ptr;
+        camera = GScameraGetActiveCamera();
+        count = *(u16*)(p + 0x44);
+        entry = *(void**)p;
+        model = fn_800F9318(*(u16*)(p + 0x4c), *(u16*)(p + 0x4e));
+        if (*(void**)(p + 0x58) == NULL) {
+            return 0;
+        }
+        fn_800D2248();
+        if (model != NULL) {
+            fn_800E3D98(model, pos);
+            if (*(s32*)(p + 0x50) > 0) {
+                part = fn_800EE150(model, *(u32*)(p + 0x50));
+                if (part != NULL) {
+                    if ((u8)fn_800EE7E0(part) != 0) {
+                        fn_800EE3BC(part, pos, NULL, NULL);
+                        fn_800EE828(part);
+                    }
+                }
+            }
+        } else {
+            fn_800E01F4(pos, *(f32*)&lbl_8047D190, *(f32*)&lbl_8047D190, *(f32*)&lbl_8047D190);
+        }
+        GScameraGetPosition(camera, cameraPos);
+        fn_800DA4C4(1, 6, 1);
+        fn_800DA2BC(1, 1, 0);
+        fn_800DA1E8(1, 1, 1);
+        fn_800DA028(0);
+        fn_800D88DC(3);
+        fn_800D888C(4);
+        fn_800D7820(*(void**)(p + 0x54));
+        fn_800D85D4(0, *(void**)(p + 0x58));
+        fn_800D6A00(6);
+        i = 0;
+        while (i < count) {
+            if (*(u16*)(entry + 0x12e0) != 0) {
+                fn_80139E80(entry, p, cameraPos, pos);
+            }
+            i++;
+            entry += 0x12e4;
+        }
+        return 1;
+    }
+    return 0;
 }
 #else
 u32 fn_80139934(void* ptr) { /* TODO */ }
@@ -2354,12 +2408,14 @@ asm void fn_801436F0(void) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 u32 fn_801436F0(void* ptr) {
     s32 v;
     if (ptr == NULL) return 0;
     v = !!((((u8*)ptr)[0x4] >> 3) & 1);
     return v;
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
@@ -2425,12 +2481,14 @@ asm void fn_80143778(void) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 unsigned int fn_80143778(const void *ptr) {
     s32 v;
     if (ptr == NULL) return 0;
     v = !!((((u8*)ptr)[0x4] >> 4) & 1);
     return v;
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on

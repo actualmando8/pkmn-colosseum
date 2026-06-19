@@ -545,6 +545,7 @@ extern s32 lbl_80467390[];
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 void fn_801D23C0(void) {
     u32 handle;
     lbl_80467390[1] = 0x258;
@@ -553,6 +554,7 @@ void fn_801D23C0(void) {
         fn_801669E4(handle, 0, 0);
     }
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
@@ -620,6 +622,7 @@ void fn_801D29D8(s32 moveID, s32 hitCount) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 void fn_801D2B08(void) {
     s32* state;
 
@@ -629,6 +632,7 @@ void fn_801D2B08(void) {
     state[2] = 0;
     state[3] = 0;
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
@@ -1708,7 +1712,53 @@ void wazaSequenceUpdate(void) {
  * Address: 0x801DBB10 | Size: 0x120
  */
 void fn_801DBB10(void* obj) {
-    /* TODO: Waza rendering update (0x120 bytes) */
+    extern void fn_800E3C08(s32, s32);
+    extern void fn_800E3CC8(s32, s32);
+    extern void fn_80118874();
+    extern void fn_801C2B2C(void);
+    extern void fn_801D3034();
+    extern void wazaSequenceEntryStop();
+    extern void fn_801DEF0C(void*, s32, s32);
+
+    u8* effect;
+    u8* owner;
+    void* node;
+
+    effect = (u8*)obj;
+    if (effect != NULL) {
+        owner = *(u8**)(effect + 0x3C);
+        if (*(u8*)(effect + 0x14) != 0) {
+            if (*(u8*)(effect + 0x16) != 0) {
+                fn_801D3034(owner);
+            }
+            if (*(u8*)(owner + 0x75) == 0) {
+                fn_801DEF0C(owner, 1, 0);
+            }
+            fn_800E3CC8(*(s32*)(owner + 0x24), 0);
+            if ((*(u32*)(effect + 0x8) & 0x08000000) != 0) {
+                fn_800E3C08(*(s32*)(owner + 0x24), *(s32*)(owner + 0x28));
+            }
+            if ((*(u32*)(effect + 0x8) & 0x04000000) != 0) {
+                fn_801C2B2C();
+            }
+            node = *(void**)(effect + 0x24);
+            while (node != NULL) {
+                wazaSequenceEntryStop(node, 1);
+                node = *(void**)((u8*)node + 0xA8);
+            }
+            node = *(void**)(effect + 0x24);
+            while (node != NULL) {
+                if (*(s32*)((u8*)node + 0x4) == 3 && *(s32*)((u8*)node + 0x18) == 0
+                    && *(u32*)((u8*)node + 0x88) != 0) {
+                    fn_80118874(*(u32*)((u8*)node + 0x88), 1);
+                }
+                node = *(void**)((u8*)node + 0xA8);
+            }
+            *(u32*)(owner + 0x6C) = 0;
+            *(u8*)(effect + 0x14) = 0;
+            *(u8*)(effect + 0x15) = 0;
+        }
+    }
 }
 
 /**

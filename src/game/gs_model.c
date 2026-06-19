@@ -1053,12 +1053,30 @@ void fn_801043A4(s32 param) {
 }
 #pragma pop
 
+/* shared model-table lookup, inlined by the find-and-act helpers below */
+static inline void* mdl_find(s32 param) {
+    void* r;
+    if (param <= 0) { return (void*)0; }
+    r = *(void**)((u8*)lbl_80404ACC + 0xc);
+    while (r != (void*)0) {
+        if (*(s32*)((u8*)r + 0x4) == param) { return r; }
+        r = *(void**)((u8*)r + 0x10);
+    }
+    return (void*)0;
+}
+
 /* 0x801044D0 | 0x60 */
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_801044D0(void) {
-    /* TODO: match -- 96 bytes at 0x801044D0 */
+s32 fn_801044D0(s32 param, u16* val) {
+#pragma optimization_level 2
+    void* node = mdl_find(param);
+    if (node != (void*)0) {
+        *(u16*)((u8*)node + 0x94) = *val;
+        return 1;
+    }
+    return 0;
 }
 #pragma pop
 
