@@ -350,7 +350,7 @@ extern u32 lbl_8047D154;
 /* Forward declarations for self-referencing asm blocks */
 extern void fn_80138838(void* ptr, u32 b);
 extern u32 fn_80138B74(void* ptr);
-extern void fn_80138BBC(void);
+extern u32 fn_80138BBC(void* ptr);
 extern void fn_80138CCC(void);
 extern void fn_80138DE4(void);
 extern void fn_80139074(void);
@@ -358,8 +358,8 @@ extern void _leaffxGenerateLeafData(void);
 extern u32 fn_80139898(void* ptr);
 extern u32 fn_801398E0(void* ptr);
 extern void fn_80139934(void);
-extern void fn_80139AC4(void);
-extern void fn_80139D10(void);
+extern BOOL fn_80139AC4(void* ptr, u32 tick);
+extern u32 fn_80139D10(void* ptr);
 extern void fn_80139E80(void);
 extern void fn_8013A1D4(void);
 extern u32 fn_8013A49C(void* ptr);
@@ -566,11 +566,11 @@ extern void fn_800DF608(void* handle);
 extern void fn_800EE828(void* handle);
 extern u32 lbl_8047D160;
 #if 1
-asm void fn_80138BBC(void) {
+asm u32 fn_80138BBC(void* ptr) {
 #include "src/game/effect/effect_visual_fn_80138BBC.inc"
 }
 #else
-void fn_80138BBC(void) { /* TODO */ }
+u32 fn_80138BBC(void* ptr) { /* TODO */ }
 #endif
 extern u8 lbl_80272C30[];
 extern u8 lbl_80272C90[];
@@ -692,21 +692,21 @@ void fn_80139934(void) { /* TODO */ }
 extern u32 lbl_8047D198;
 extern u32 lbl_8047D1A0;
 #if 1
-asm void fn_80139AC4(void) {
+asm BOOL fn_80139AC4(void* ptr, u32 tick) {
 #include "src/game/effect/effect_visual_fn_80139AC4.inc"
 }
 #else
-void fn_80139AC4(void) { /* TODO */ }
+BOOL fn_80139AC4(void* ptr, u32 tick) { /* TODO */ }
 #endif
 extern u8 lbl_80272D08[];
 extern u32 lbl_8047D190;
 extern u8 lbl_80272D54[];
 #if 1
-asm void fn_80139D10(void) {
+asm u32 fn_80139D10(void* ptr) {
 #include "src/game/effect/effect_visual_fn_80139D10.inc"
 }
 #else
-void fn_80139D10(void) { /* TODO */ }
+u32 fn_80139D10(void* ptr) { /* TODO */ }
 #endif
 extern void fn_800E0108(void);
 extern void fn_800E0560(void);
@@ -856,11 +856,11 @@ u32 fn_8013AB34(void* ptr) {
 extern u32 lbl_8047D1E8;
 extern u32 lbl_8047D1E0;
 #if 1
-asm void fn_8013AB60(void) {
+asm u32 fn_8013AB60(void* ptr, u8* src, u8* dst, u32 alpha) {
 #include "src/game/effect/effect_visual_fn_8013AB60.inc"
 }
 #else
-void fn_8013AB60(void) { /* TODO */ }
+u32 fn_8013AB60(void* ptr, u8* src, u8* dst, u32 alpha) { /* TODO */ }
 #endif
 #if 0
 asm u32 fn_8013AD68(void* ptr) {
