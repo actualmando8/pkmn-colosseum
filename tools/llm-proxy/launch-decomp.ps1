@@ -129,7 +129,7 @@ $P0 = ([string](& $tm list-panes -t $Session -F '#{pane_id}' | Select-Object -Fi
 # Layout (matches the cockpit diagram):
 #   col1: GLM proxy (top) / Stage-C permuter (mid) / GLM agent (below)
 #   col2: Opus worker (top) / Sonnet (below)
-#   middle: Opus orchestrator (full height)      right: 2x2 Codex (1 2 / 3 4)
+#   middle: Opus orchestrator (full height)      right: 2x4 Codex (8 lanes: 1-8)
 $REST     = SplitH $P0 66      # P0 = left group (~34%), REST = right (~66%)
 $RIGHT    = SplitH $REST 62    # REST = middle/orchestrator (~25%), RIGHT = codex group (~41%)
 $ORCH     = $REST
@@ -145,6 +145,11 @@ $CODEX2   = SplitH $RIGHT 50   # RIGHT = codex1 (TL), CODEX2 = codex2 (TR)
 $CODEX4   = SplitH $CODEXBL 50 # CODEXBL = codex3 (BL), CODEX4 = codex4 (BR)
 $CODEX1   = $RIGHT
 $CODEX3   = $CODEXBL
+# 4 more Codex lanes (CODEX5-8): split each of the 2x2 cells -> 2x4 Codex grid (8 lanes).
+$CODEX5   = SplitV $CODEX1 50
+$CODEX6   = SplitV $CODEX2 50
+$CODEX7   = SplitV $CODEX3 50
+$CODEX8   = SplitV $CODEX4 50
 Start-Sleep -Milliseconds 400
 
 # Launch each role in its captured pane.
@@ -157,6 +162,10 @@ Send $CODEX1   $codexCmd
 Send $CODEX2   $codexCmd
 Send $CODEX3   $codexCmd
 Send $CODEX4   $codexCmd
+Send $CODEX5   $codexCmd
+Send $CODEX6   $codexCmd
+Send $CODEX7   $codexCmd
+Send $CODEX8   $codexCmd
 Send $PERMUTER $permCmd
 
 # --- registry from CAPTURED ids (robust to layout/index shuffles) ---
@@ -164,7 +173,7 @@ if (-not $DryRun) {
   $reg = Join-Path $repo 'tools\decomp_work\tmux_control\panes.env'
   $regBody = @(
     '# panes.env - decomp cockpit registry (written by launch-decomp.ps1 from captured pane ids).',
-    '# claude=orchestrator Opus (self) | worker=Opus | sonnet=Sonnet | glm=GLM | codex/codex2..4=Codex',
+    '# claude=orchestrator Opus (self) | worker=Opus | sonnet=Sonnet | glm=GLM | codex/codex2..8=Codex (8 lanes)',
     ('CLAUDE_PANE="'  + $ORCH     + '"'),
     ('WORKER_PANE="'  + $OPUS     + '"'),
     ('SONNET_PANE="'  + $SONNET   + '"'),
@@ -173,6 +182,10 @@ if (-not $DryRun) {
     ('CODEX2_PANE="'  + $CODEX2   + '"'),
     ('CODEX3_PANE="'  + $CODEX3   + '"'),
     ('CODEX4_PANE="'  + $CODEX4   + '"'),
+    ('CODEX5_PANE="'  + $CODEX5   + '"'),
+    ('CODEX6_PANE="'  + $CODEX6   + '"'),
+    ('CODEX7_PANE="'  + $CODEX7   + '"'),
+    ('CODEX8_PANE="'  + $CODEX8   + '"'),
     ('PROXY_PANE="'   + $PROXY    + '"'),
     ('PERMUTER_PANE="' + $PERMUTER + '"')
   ) -join "`n"
