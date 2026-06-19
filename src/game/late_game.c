@@ -4632,31 +4632,19 @@ void fn_8009769C(void) {
 }
 
 /* 0x800979EC | size: 0x4C */
+#pragma scheduling off
 void fn_800979EC(void) {
-    extern void fn_8009769C();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
+    extern u32 fn_8009769C(u8, u32, u32, u16, u32, u32);
 
-    r3 = (u32)&lbl_803FB380;
-    r8 = (u32)&lbl_803FB380;
-    r3 = *(u8*)((u8*)r8 + 0x0);
-    r4 = *(u32*)((u8*)r8 + 0x8);
-    r5 = *(u32*)((u8*)r8 + 0xC);
-    r6 = *(u16*)((u8*)r8 + 0x18);
-    r7 = *(u32*)((u8*)r8 + 0x10);
-    r8 = *(u32*)((u8*)r8 + 0x14);
-    fn_8009769C();
-    r4 = (u32)&lbl_803FB380;
-    r4 = (u32)&lbl_803FB380;
-    *(u32*)((u8*)r4 + 0x4) = r3;
-    return;
+    *(u32*)(lbl_803FB380 + 4) = fn_8009769C(
+        lbl_803FB380[0],
+        *(u32*)(lbl_803FB380 + 8),
+        *(u32*)(lbl_803FB380 + 0xC),
+        *(u16*)(lbl_803FB380 + 0x18),
+        *(u32*)(lbl_803FB380 + 0x10),
+        *(u32*)(lbl_803FB380 + 0x14));
 }
+#pragma scheduling on
 
 /* 0x80097A38 | size: 0xCC */
 void fn_80097A38(void) {
