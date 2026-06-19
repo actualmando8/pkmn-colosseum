@@ -95,7 +95,56 @@ asm void fn_80056C54(void) { nofralloc
 }
 
 /* 0x80057270 | size: 0x150 */
-asm void fn_80057270(void) { nofralloc
-    #include "asm/GC6E01/nonmatching/menu_msgbox/fn_80057270.s"
+#pragma peephole off
+void* fn_80057270(void) {
+    extern s32 fn_80055194();
+    extern s32 fn_80056A78(void);
+    extern s32 fn_80058F08();
+    extern void* fn_80104704(s32 key);
+    extern u8 fn_80123FBC(void* ptr);
+    extern void* fn_8012A5B0(void* ptr, u32 selector, u32 idx);
+    extern void* fn_80134EF0(void* ptr, s32 slot, s32 idx);
+    extern u8 lbl_803A9768[];
+    u32 out;
+    s8* obj;
+    void* current;
+    void* candidate;
+
+    current = lbl_803A9768 + (*(u32*)(lbl_803A9768 + 0x278) * 0x138) + 8;
+    if (fn_80123FBC(current) != 0) {
+        return current;
+    }
+
+    obj = fn_80104704(0x94);
+    if (obj != 0) {
+        if (fn_80058F08(&out, obj[0x95]) != 0) {
+            return 0;
+        }
+        candidate = fn_8012A5B0(0, 3, (u16)out);
+        if (candidate == 0) {
+            return 0;
+        }
+        if (fn_80123FBC(candidate) != 0) {
+            return candidate;
+        }
+        return 0;
+    }
+
+    obj = fn_80104704(0x93);
+    if (obj == 0) {
+        return 0;
+    }
+    if (fn_80055194(&out, obj[0x95]) != 0) {
+        return 0;
+    }
+    candidate = fn_80134EF0(0, (s8)fn_80056A78(), (s8)out);
+    if (candidate == 0) {
+        return 0;
+    }
+    if (fn_80123FBC(candidate) != 0) {
+        return candidate;
+    }
+    return 0;
 }
+#pragma peephole on
 
