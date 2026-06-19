@@ -1019,8 +1019,27 @@ void fn_80104160(void* r3, void* r4, s16 r5, s16 r6, s32 r7, s32 r8, s32 r9, s32
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80104318(void) {
-    /* TODO: match -- 140 bytes at 0x80104318 */
+u8* fn_80104318(u8* arg) {
+#pragma optimization_level 4
+#pragma peephole off
+    void* node;
+    s32 idx;
+    { extern void* fn_8005DA18(void*); node = fn_8005DA18(*(void**)(arg + 0x4)); }
+    node = fn_8005D934(*(s16*)((u8*)node + 0x4));
+    idx = 0;
+    while (1) {
+        if (((u32)*(volatile u8*)node >> 7) & 1) {
+            if ((s8)*(s8*)(arg + 0x95) == idx) {
+                return (u8*)node;
+            }
+            idx = idx + 1;
+        }
+        if (((u32)*(volatile u8*)node >> 6) & 1) {
+            break;
+        }
+        node = fn_8005D934(*(s16*)((u8*)node + 0x18));
+    }
+    return (u8*)0;
 }
 #pragma pop
 

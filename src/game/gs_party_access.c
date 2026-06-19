@@ -1352,6 +1352,8 @@ idx_done:
 
 /* fn_8000D11C - 0x8000D11C | size: 0x38 */
 /* GSparty_GetCritRate -- conditional call based on global */
+#pragma push
+#pragma peephole off
 s32 fn_8000D11C(void) {
     s32 v = *(s32*)(lbl_804673F8 + 0x874);
     if (v != 0) {
@@ -1359,9 +1361,12 @@ s32 fn_8000D11C(void) {
     }
     return 0;
 }
+#pragma pop
 
 /* fn_8000D154 - 0x8000D154 | size: 0x70 */
 /* GSparty_GetAccuracy */
+#pragma push
+#pragma peephole off
 s32 fn_8000D154(void) {
     u32 r;
     r = fn_80102620(0xCF);
@@ -1373,9 +1378,12 @@ s32 fn_8000D154(void) {
     }
     return 0;
 }
+#pragma pop
 
 /* fn_8000D1C4 - 0x8000D1C4 | size: 0x70 */
 /* GSparty_GetEvasion */
+#pragma push
+#pragma peephole off
 s32 fn_8000D1C4(void) {
     u32 r;
     r = fn_80102620(0x78);
@@ -1387,9 +1395,12 @@ s32 fn_8000D1C4(void) {
     }
     return 0;
 }
+#pragma pop
 
 /* fn_8000D234 - 0x8000D234 | size: 0x5c */
 /* GSparty_ResetStatStages */
+#pragma push
+#pragma peephole off
 s32 fn_8000D234(void) {
     u32 r;
     r = fn_80102620(0x13);
@@ -1402,4 +1413,5 @@ s32 fn_8000D234(void) {
     }
     return 0;
 }
+#pragma pop
 
