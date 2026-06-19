@@ -264,15 +264,15 @@ asm void fn_800EE6B4(void) {
 void* fn_800EE6B4(void* outerP, u32 idx) {
     void** innerP;
     u32 flags;
-    void** sub;
-    u32 count;
+    register u32 count;
+    register void** sub;
     void** result;
     void** ret;
 
     innerP = *(void***)((u8*)outerP + 8);
     flags = *(u32*)((u8*)innerP + 0x14);
 
-    if (flags & 0x4020) {
+    if (((u32)__cntlzw(flags & 0x4020) >> 5) != 0) {
         sub = *(void***)((u8*)innerP + 0x18);
     } else {
         sub = NULL;
@@ -283,26 +283,25 @@ void* fn_800EE6B4(void* outerP, u32 idx) {
     }
 
     count = 0;
-    result = NULL;
     while (sub != NULL) {
-        if (count == idx) {
+        if (count++ == idx) {
             result = (void**)*(u32*)((u8*)sub + 8);
-            break;
+            goto got_result;
         }
-        count++;
         sub = (void**)*(u32*)((u8*)sub + 4);
     }
+    result = NULL;
 
+got_result:
     if (result == NULL) {
         return NULL;
     }
 
     ret = (void**)GSmaterialCreate();
-    if (ret == NULL) {
-        return NULL;
+    if (ret != NULL) {
+        *(u32*)((u8*)ret + 8) = (u32)result;
     }
 
-    *(u32*)((u8*)ret + 8) = (u32)result;
     return ret;
 }
 #endif
