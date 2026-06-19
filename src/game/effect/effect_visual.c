@@ -1952,8 +1952,73 @@ extern void fn_800D7868(void* handle, u32 a, u32 b, u32 c, u32 d, u32 e, u32 f, 
 extern u32 lbl_8047AEE8;
 extern u32 lbl_8047AEEC;
 #if 1
-asm u32 fn_8013F114(void* ptr) {
-#include "src/game/effect/effect_visual_fn_8013F114.inc"
+u32 fn_8013F114(void* ptr) {
+    u8* p;
+
+    p = ptr;
+    if (p != NULL) {
+        if (*(void**)(p + 0x4) == NULL) {
+            return 0;
+        }
+        if (lbl_8047AEE8 == 0) {
+            *(u16*)&lbl_8047AEEC = 0;
+            lbl_8047AEE8 = (u32)GStextureCreate(*(u16*)(lbl_80466BC0 + 4), *(u16*)(lbl_80466BC0 + 6), 0x45, 0, 0);
+            if (lbl_8047AEE8 == 0) {
+                if (p != NULL) {
+                    fn_800B8DF4();
+                    fn_800B856C();
+                    if (*(void**)(p + 0x4) != NULL) {
+                        fn_800EF5A4(*(void**)(p + 0x4));
+                        *(u32*)(p + 0x4) = 0;
+                    }
+                    if (*(void**)p != NULL) {
+                        fn_800D75F4(*(void**)p);
+                        *(u32*)p = 0;
+                    }
+                    if (lbl_8047AEE8 != 0) {
+                        *(u16*)&lbl_8047AEEC = *(u16*)&lbl_8047AEEC - 1;
+                        if (*(u16*)&lbl_8047AEEC == 0) {
+                            fn_800B8DF4();
+                            fn_800EF5A4((void*)lbl_8047AEE8);
+                            lbl_8047AEE8 = 0;
+                        }
+                    }
+                }
+                return 0;
+            }
+        }
+        *(u16*)&lbl_8047AEEC = *(u16*)&lbl_8047AEEC + 1;
+        *(void**)p = fn_800D7894();
+        if (*(void**)p == NULL) {
+            if (p != NULL) {
+                fn_800B8DF4();
+                fn_800B856C();
+                if (*(void**)(p + 0x4) != NULL) {
+                    fn_800EF5A4(*(void**)(p + 0x4));
+                    *(u32*)(p + 0x4) = 0;
+                }
+                if (*(void**)p != NULL) {
+                    fn_800D75F4(*(void**)p);
+                    *(u32*)p = 0;
+                }
+                if (lbl_8047AEE8 != 0) {
+                    *(u16*)&lbl_8047AEEC = *(u16*)&lbl_8047AEEC - 1;
+                    if (*(u16*)&lbl_8047AEEC == 0) {
+                        fn_800B8DF4();
+                        fn_800EF5A4((void*)lbl_8047AEE8);
+                        lbl_8047AEE8 = 0;
+                    }
+                }
+            }
+            return 0;
+        }
+        fn_800D7868(*(void**)p, 1, 0, 1, 4, 0, 0, 0);
+        fn_800D7868(*(void**)p, 4, 0, 5, 6, 0, 0, 0);
+        fn_800D7868(*(void**)p, 6, 0, 8, 4, 0, 0, 0);
+        fn_800D7868(*(void**)p, 7, 0, 8, 4, 0, 0, 0);
+        return 1;
+    }
+    return 0;
 }
 #else
 u32 fn_8013F114(void* ptr) { /* TODO */ }
@@ -2285,12 +2350,14 @@ asm void fn_801436F0(void) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 u32 fn_801436F0(void* ptr) {
     s32 v;
     if (ptr == NULL) return 0;
     v = !!((((u8*)ptr)[0x4] >> 3) & 1);
     return v;
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
@@ -2348,12 +2415,14 @@ asm void fn_80143778(void) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 unsigned int fn_80143778(const void *ptr) {
     s32 v;
     if (ptr == NULL) return 0;
     v = !!((((u8*)ptr)[0x4] >> 4) & 1);
     return v;
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
