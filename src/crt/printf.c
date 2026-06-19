@@ -240,37 +240,22 @@ void fn_800C8520(void) {
 }
 
 /* fn_800C8600 - 0x800C8600 | size: 0x78 */
-void fn_800C8600(void) {
-    extern void fn_800C87F8();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r31 = 0;
+s32 fn_800C8600(char* buf, const char* fmt, va_list args) {
+    extern s32 fn_800C87F8(void* data, s32 count, __FILE* file);
+    struct { char* p; s32 a; s32 b; } sf;
+    s32 n;
 
-    r6 = r5;
-    r5 = r4;
-    r7 = -0x1;
-    tmp = 0x0;
-    r4 = (u32)sp + 0x8;
-    r31 = r3;
-    r3 = (u32)fn_800C87F8;
-    r3 = (u32)fn_800C87F8;
-    *(u32*)(sp + 0x10) = tmp;
-    ((void(*)(void))__pformatter)();
-    if (r31 != 0) {
-        tmp = -0x1;
-        r4 = -0x2;
-        if (r3 < tmp) {
-            r4 = r3;
-        }
-        tmp = 0x0;
-        *(u8*)(r31 + r4) = tmp;
+    sf.p = buf;
+    sf.a = -1;
+    sf.b = 0;
+    n = __pformatter((WriteFunc)fn_800C87F8, (__FILE*)&sf, fmt, args);
+    if (buf != NULL) {
+        s32 idx = -2;
+        if ((u32)n < 0xFFFFFFFFU)
+            idx = n;
+        buf[idx] = 0;
     }
-    return;
+    return n;
 }
 
 /* fn_800C8710 - 0x800C8710 | size: 0xE8 */
