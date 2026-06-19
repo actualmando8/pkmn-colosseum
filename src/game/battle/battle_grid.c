@@ -116,7 +116,8 @@ void fn_801C021C(void* arg0, s32 arg1) {
  * Address: 0x801C0270 | Size: 0xC
  */
 s32 fn_801C0270(void) {
-    return 0;
+    extern u32 lbl_8047B388;
+    lbl_8047B388 = 0;
 }
 
 /**
@@ -615,7 +616,8 @@ void fn_801C2F00(void* data, u32 size) {
  * Address: 0x801C3108 | Size: 0xC
  */
 s32 fn_801C3108(void) {
-    return 0;
+    extern u8 lbl_80466DE8[];
+    return (s32)lbl_80466DE8;
 }
 
 /**
@@ -948,6 +950,8 @@ void fn_801C432C(f32 angle, f32 blend) {
  * Address: 0x801C43E4 | Size: 0x10
  */
 void* fn_801C43E4(void) {
+    extern u8 lbl_8047B3A8;
+    lbl_8047B3A8 = 1;
     return NULL;
 }
 
