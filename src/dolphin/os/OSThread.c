@@ -502,8 +502,41 @@ extern OSThread* fn_800A1528(OSThread* thread, s32 priority);
 extern s32 fn_800A14EC(OSThread* thread);
 extern void fn_800A1484(OSThread* thread);
 #if 1
-asm void fn_800A1E54(void) {
-#include "src/dolphin/os/OSThread_fn_800A1E54.inc"
+BOOL fn_800A1E54(OSThread* thread, void* val) {
+#pragma peephole on
+    extern void fn_800A238C(OSThreadQueue* queue);
+    BOOL enabled;
+    OSThread* active;
+    s32 isActive;
+
+    enabled = OSDisableInterrupts();
+    if (!(thread->attr & 1) && thread->state != 8 && thread->queueJoin.head == NULL) {
+        fn_800A238C(&thread->queueJoin);
+        if (thread->state == 0) {
+            isActive = 0;
+        } else {
+            for (active = ((OSThreadQueue*)0x800000DC)->head; active; active = active->linkActive.next) {
+                if (thread == active) { isActive = 1; goto chk; }
+            }
+            isActive = 0;
+          chk:;
+        }
+        if (isActive == 0) {
+            OSRestoreInterrupts(enabled);
+            return FALSE;
+        }
+    }
+    if (thread->state == 8) {
+        if (val) {
+            *(s32*)val = (s32)thread->val;
+        }
+        DEQUEUE_THREAD(thread, (OSThreadQueue*)0x800000DC, linkActive);
+        thread->state = 0;
+        OSRestoreInterrupts(enabled);
+        return TRUE;
+    }
+    OSRestoreInterrupts(enabled);
+    return FALSE;
 }
 #else
 void fn_800A1E54(void) { /* TODO */ }
@@ -516,8 +549,49 @@ asm void fn_800A1F94(void) {
 void fn_800A1F94(void) { /* TODO */ }
 #endif
 #if 1
-asm void fn_800A221C(void) {
-#include "src/dolphin/os/OSThread_fn_800A221C.inc"
+s32 fn_800A221C(OSThread* thread) {
+#pragma peephole on
+    extern void fn_800A1484(OSThread* thread);
+    extern s32 fn_800A14EC(OSThread* thread);
+    extern OSThread* fn_800A1528(OSThread* thread, s32 priority);
+    BOOL enabled;
+    s32 suspendCount;
+
+    enabled = OSDisableInterrupts();
+    suspendCount = thread->suspend++;
+    if (suspendCount == 0) {
+        switch (thread->state) {
+            case 2:
+                RunQueueHint_8047A764 = 1;
+                thread->state = 1;
+                break;
+            case 1:
+                fn_800A1484(thread);
+                break;
+            case 4: {
+                OSThread* t;
+                DEQUEUE_THREAD(thread, thread->queue, link);
+                thread->priority = 32;
+                ENQUEUE_THREAD(thread, thread->queue, link);
+                if (thread->mutex) {
+                    s32 eff;
+                    t = thread->mutex->thread;
+                    do {
+                        if (t->suspend > 0) break;
+                        eff = fn_800A14EC(t);
+                        if (t->priority == eff) break;
+                        t = fn_800A1528(t, eff);
+                    } while (t != NULL);
+                }
+                break;
+            }
+        }
+        if (RunQueueHint_8047A764 != 0) {
+            SelectThread(0);
+        }
+    }
+    OSRestoreInterrupts(enabled);
+    return suspendCount;
 }
 #else
 void fn_800A221C(void) { /* TODO */ }
@@ -610,8 +684,24 @@ BOOL fn_800A257C(OSThread* thread, s32 priority) {
 }
 #endif
 #if 1
-asm void fn_800A263C(void) {
-#include "src/dolphin/os/OSThread_fn_800A263C.inc"
+OSThread* fn_800A263C(void (*idleFunction)(void*), void* param, void* stack, u32 stackSize) {
+#pragma peephole on
+#pragma opt_common_subs off
+    extern BOOL fn_800A19CC(OSThread*, void* (*)(void*), void*, void*, u32, s32, u16);
+    extern s32 fn_800A1F94(OSThread*);
+    OSThreadQueue* rq = RunQueue_803FB898;
+#define IDLE (*(OSThread*)((u8*)rq + 0x100))
+    if (idleFunction != NULL) {
+        if (IDLE.state == 0) {
+            fn_800A19CC(&IDLE, (void* (*)(void*))idleFunction, param, stack, stackSize, 31, 1);
+            fn_800A1F94(&IDLE);
+            return &IDLE;
+        }
+    } else if (IDLE.state != 0) {
+        OSCancelThread(&IDLE);
+    }
+    return NULL;
+#undef IDLE
 }
 #else
 void fn_800A263C(void) { /* TODO */ }
