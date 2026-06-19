@@ -2793,9 +2793,20 @@ def load_buckets() -> dict:
                             "pct": round(100.0 * a / t, 1) if t else 0.0, "desc": meta[b]})
     total = sum(agg[b]["total"] for b in order)
     done = agg["DONE"]["total"] + agg["EQUIV"]["total"]
+    # also surface the ROM function-MATCH headline (report.json), which counts
+    # asm-wrappers that match the target bytes — so the two numbers are explained.
+    match_fns = match_total = 0
+    try:
+        m = json.loads(DECOMP_REPORT.read_text(encoding="utf-8", errors="replace")).get("measures", {})
+        match_fns = int(float(m.get("matched_functions", 0) or 0))
+        match_total = int(float(m.get("total_functions", 0) or 0))
+    except (OSError, ValueError, AttributeError):
+        pass
     return {
         "available": True, "buckets": buckets, "total_fns": total, "done_fns": done,
         "overall_pct": round(100.0 * done / total, 1) if total else 0.0,
+        "match_fns": match_fns, "match_total": match_total,
+        "match_pct": round(100.0 * match_fns / match_total, 1) if match_total else 0.0,
         "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
     }
 
@@ -8604,7 +8615,10 @@ HTML = r"""<!doctype html>
         if (note) note.textContent = "";
         return;
       }
-      if (note) note.textContent = `${d.done_fns.toLocaleString()}/${d.total_fns.toLocaleString()} decompiled (${d.overall_pct}%) · bar = % of bucket attacked`;
+      if (note) {
+        const rom = d.match_total ? `${d.match_pct}% ROM-match (${d.match_fns.toLocaleString()}/${d.match_total.toLocaleString()}, incl. asm-wrappers)` : "";
+        note.textContent = `${rom} · ${d.overall_pct}% decompiled to C (${d.done_fns.toLocaleString()}/${d.total_fns.toLocaleString()}) · bar = % of bucket attacked`;
+      }
       el.innerHTML = d.buckets.map(b => {
         const c = BUCKET_COLORS[b.name] || "#5aa9e6";
         return `<div class="bucket-row">
