@@ -22,6 +22,8 @@ fn_800E8EFC   # gs_material      — W2 prologue scheduling (addi via r0 vs dire
 fn_800E8FA0   # gs_material      — W-peephole bgtlr-fusion (ble @L; blr not reproducible); 88.9%, C is correct
 fightSideGetStatus	# pokemon.c 99.82%: instructions byte-exact; sole diff = CW anonymous local jumptable symbol vs target's named jumptable_8037564C (dtk-named). Unreachable from C.
 fn_800218BC   # gs_title.c    — W2 instruction scheduling (lfs f31 before li r31 at loop-init; CW issues SDA load first, target issues zero-init first); 98.35%, C is correct
+fn_8002537C   # gs_title.c    - W-branch-collapse: target keeps cmpw;bne increment;b found, CW emits cmpw;beq found; 97.1%, tested 2026-06-19; C is correct
+fn_80025490   # gs_title.c    - W-branch-collapse: sibling of fn_8002537C; same cmpw branch-pair wall; 97.1%, tested 2026-06-19; C is correct
 fn_800D13C8   # gs_render_util.c — W2 instruction scheduling (lis r4 between lis r3 / addi r6 in HSD_ForeachAnim call setup) + W-SDA-RELOC-C (lfd @sda21(r0) vs -27880(r2)); 99.4%, C is correct
 fn_80005E00   # main.c — W1 volatile-FPR rotation + anonymous conversion-literal reloc artifact; 99.39% parent-verified (2 independent agents), TaskRetraceMain C is correct
 fn_800A4C94   # DVDLow.c — W-operand-order: target emits `lis r3`(addr) before `li r0`(value) in the 0xCC006004 store; CW emits value-first across ALL 7 CW versions (1.1–2.0), ~20 phrasings swept; 71.4% parent-verified, DVDCBCallback read-and-clear getter C is correct (un-wrapped from codex's undocumented asm-flip 2708d871)

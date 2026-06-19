@@ -102,9 +102,45 @@ extern u8    lbl_803A9A18[];   /* Dialog window state B */
 
 
 /* 0x80057B34 | size: 0x168 */
-asm void fn_80057B34(void) { nofralloc
-    #include "asm/GC6E01/nonmatching/menu_dialog/fn_80057B34.s"
+#pragma peephole off
+u32 fn_80057B34(u32 arg0, u32 arg1) {
+    u32 result;
+    u8 flag;
+    s32* state;
+
+    flag = 0;
+    state = (s32*)lbl_803A9A08;
+
+    if ((state[0] != 0 ? (state[1] != 0 ? 1 : 0) : 2) != 2) {
+        state = (s32*)lbl_803A9A08;
+        flag = 1;
+        state[2] = 1;
+        while ((state[0] != 0 ? (state[1] != 0 ? 1 : 0) : 2) != 1) {
+            _threadSwitch();
+        }
+    }
+
+    fn_8017B1CC(0x70B);
+    fn_800F915C(0x70B);
+    fn_8017B3E4(0x670);
+    while (fn_8017B2CC(0x670) == 1) {
+        _threadSwitch();
+    }
+
+    result = fn_80029558(arg0, arg1);
+    fn_8017B1CC(0x670);
+    fn_800F915C(0x670);
+    fn_8017B3E4(0x70B);
+    while (fn_8017B2CC(0x70B) == 1) {
+        _threadSwitch();
+    }
+
+    if (flag != 0) {
+        ((s32*)lbl_803A9A08)[2] = 0;
+    }
+    return result;
 }
+#pragma peephole on
 
 /* 0x80059034 | size: 0x978 */
 asm void fn_80059034(void) { nofralloc
