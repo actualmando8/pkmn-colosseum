@@ -20,6 +20,23 @@ REPO = Path("/mnt/c/Users/douglaswhittingham/pkmn-colosseum")
 REPORT = REPO / "report.json"
 QUEUE = REPO / ".omc" / "permuter_queue.json"
 SRC = REPO / "src"
+EQUIV = REPO / "tools" / "decomp_work" / "equivalent.txt"
+
+
+def equivalent_fns():
+    """Functions registered Equivalent (faithful real C, confirmed C-uncontrollable
+    wall — jumptable/sdata2/reloc-name artifacts that score frame-0 in the permuter
+    but never byte-match the project objdiff). The annealer must NOT 'win' and stop on
+    these; exclude them from the queue so it keeps grinding genuinely-crackable fns."""
+    out = set()
+    try:
+        for line in EQUIV.read_text(encoding="utf-8", errors="replace").splitlines():
+            nm = line.split("#", 1)[0].strip()
+            if nm.startswith("fn_"):
+                out.add(nm)
+    except OSError:
+        pass
+    return out
 
 
 def opt(flag, default, cast=float):
@@ -94,10 +111,15 @@ def main():
                 fns[f["name"]] = {"fuzzy": fm, "size": int(f.get("size", 0))}
 
     real, asmw, fnfile = classify_sources()
+    equiv = equivalent_fns()
     cand = [(name, d, fnfile[name]) for name, d in fns.items()
-            if name in real and name not in asmw and name in fnfile and d["size"] >= min_bytes]
+            if name in real and name not in asmw and name in fnfile
+            and name not in equiv and d["size"] >= min_bytes]
     cand.sort(key=lambda x: -x[1]["fuzzy"])
 
+    n_eq = sum(1 for name in fns if name in equiv)
+    if n_eq:
+        print(f"(excluded {n_eq} Equivalent-registered fn(s) — reloc-name artifacts, not annealable)")
     print(f"{len(cand)} winnable real-C near-misses in [{lo},{hi})%, >={min_bytes}B — closest first:")
     for name, d, f in cand[:n]:
         print(f"  {name}  {d['fuzzy']:6.2f}%  {d['size']:>5}B  {f}")
