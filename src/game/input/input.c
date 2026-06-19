@@ -763,8 +763,36 @@ extern u8 lbl_80401BF8[];
 extern u8* lbl_80478B00;
 extern u8 lbl_802712E4[];
 #if 1
-asm void fn_800F7758(void) {
-#include "src/game/input/input_fn_800F7758.inc"
+s32 fn_800F7758(u32 count) {
+    extern void* memset(void* dst, int val, u32 size);
+    extern u16 fn_800E3534(u32 size);
+    extern void* fn_800E27B0(u16 handle);
+    extern void fn_800DD38C(const char* msg, ...);
+    extern u8 lbl_80401BF8[];
+    extern u8* lbl_80478B00;
+    extern u8 lbl_802712E4[];
+    s32 count16;
+    u8* item;
+    s32 i;
+
+    memset(lbl_80401BF8, 0, 0x14);
+    count16 = (u16)count;
+    lbl_80478B00 = lbl_80401BF8;
+    *(u16*)(lbl_80478B00 + 2) = fn_800E3534(count16 * 0x16c);
+    if (*(u16*)(lbl_80478B00 + 2) == 0) {
+        fn_800DD38C((const char*)lbl_802712E4);
+        return -1;
+    }
+
+    *(u32*)(lbl_80478B00 + 0xc) = (u32)fn_800E27B0(*(u16*)(lbl_80478B00 + 2));
+    item = *(u8**)(lbl_80478B00 + 0xc);
+    for (i = 0; i < count16; i++) {
+        *(u32*)(item + 0) = 0;
+        *(u8*)(item + 4) = 0;
+        item += 0x16c;
+    }
+    *(u16*)lbl_80478B00 = count;
+    return 0;
 }
 #else
 void fn_800F7758(void) { /* TODO */ }
@@ -1021,9 +1049,46 @@ extern void OSRestoreInterrupts();
 extern u32 lbl_8047AC4C;
 extern u32 lbl_8047AC50;
 #if 1
-asm void fn_800F7F64(void) {
-#include "src/game/input/input_fn_800F7F64.inc"
+#pragma push
+#pragma optimization_level 2
+u32 fn_800F7F64(s32 padId) {
+    extern u32 OSDisableInterrupts(void);
+    extern void OSRestoreInterrupts(u32);
+    extern u32 fn_800D3094(void);
+    extern void fn_800AAD34(u32);
+    extern void* memcpy(void* dst, const void* src, u32 n);
+    extern void fn_800F8654(u8*, u8, u8, u8*, u8*, u8*, u8*, f32*, f32*);
+    extern void fn_800F8A54(u8*);
+    extern u32 lbl_8047AC4C;
+    extern u32 lbl_8047AC50;
+    u8* pad;
+    u32 irq;
+    u32 token;
+
+    pad = WI_FindPad(padId);
+    if (pad == NULL) {
+        return 2;
+    }
+
+    *(u32*)(pad + 0x30) = *(u16*)(pad + 0x24);
+    irq = OSDisableInterrupts();
+    token = fn_800D3094();
+    if (*(volatile u32*)&lbl_8047AC4C != 0 && token != lbl_8047AC50) {
+        fn_800AAD34(*(volatile u32*)&lbl_8047AC4C);
+        lbl_8047AC50 = token;
+    }
+    memcpy(pad + 0x24, pad + 0x18, 0xc);
+    OSRestoreInterrupts(irq);
+    fn_800F8654(pad, *(u8*)(pad + 0x26), *(u8*)(pad + 0x27),
+                pad + 0x34, pad + 0x35, pad + 0x38, pad + 0x3c,
+                (f32*)(pad + 0x48), (f32*)(pad + 0x4c));
+    fn_800F8654(pad, *(u8*)(pad + 0x28), *(u8*)(pad + 0x29),
+                pad + 0x36, pad + 0x37, pad + 0x40, pad + 0x44,
+                (f32*)(pad + 0x50), (f32*)(pad + 0x54));
+    fn_800F8A54(pad);
+    return *(u32*)(pad + 0xc);
 }
+#pragma pop
 #else
 void fn_800F7F64(void) { /* TODO */ }
 #endif
