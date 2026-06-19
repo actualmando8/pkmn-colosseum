@@ -34,7 +34,9 @@ pick_line() {
   return 1
 }
 
-for name in ${ASM_LANES:-OPUS SON GLM C1 C2 C3 C4 C5 C6 C7 C8}; do
+# GLM omitted from the default set — weekly usage cap hit (out for the week).
+# It stays wired in SEND/PANE so it can be re-added via ASM_LANES once it resets.
+for name in ${ASM_LANES:-OPUS SON C1 C2 C3 C4 C5 C6 C7 C8}; do
   is_idle "${PANE[$name]}" || continue
   LOCKS=$(locked_files)
   mode=crack; line=$(pick_line build/wall_queue.txt build/wall_assigned.txt)
