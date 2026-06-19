@@ -211,7 +211,20 @@ def cmd_init(tag, srcname, config_from=None):
     if not target_o.exists():
         sys.exit(f"target object missing: {target_o}")
     SCRATCH.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(src_path, scratch_c(tag))
+    dst = scratch_c(tag)
+    # Non-destructive init: if a scratch with in-progress work already exists (differs
+    # from canon), back it up before overwriting. A post-compact / accidental re-init
+    # must NOT silently wipe an agent's drafts.
+    try:
+        if dst.exists() and dst.read_bytes() != src_path.read_bytes():
+            bdir = SCRATCH / "_backups"
+            bdir.mkdir(exist_ok=True)
+            ts = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+            shutil.copyfile(dst, bdir / f"band_{tag}.{ts}.c")
+            print(f"  (init: backed up existing scratch -> _backups/band_{tag}.{ts}.c)")
+    except OSError:
+        pass
+    shutil.copyfile(src_path, dst)
     state = {
         "src": str(src_path.relative_to(ROOT)).replace("\\", "/"),
         "src_abs": str(src_path),
