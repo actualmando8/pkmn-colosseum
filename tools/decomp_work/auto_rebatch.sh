@@ -36,9 +36,9 @@ pick_line() {
   return 1
 }
 
-# GLM omitted from the default set — weekly usage cap hit (out for the week).
-# It stays wired in SEND/PANE so it can be re-added via ASM_LANES once it resets.
-LANES="${ASM_LANES:-OPUS SON C1 C2 C3 C4 C5 C6 C7 C8}"
+# GLM omitted (weekly cap). C5-C8 idled 2026-06-19 ~13:34 to conserve the last ~5%
+# of Codex usage until it resets (~15:34); re-add them then via ASM_LANES default.
+LANES="${ASM_LANES:-OPUS SON C1 C2 C3 C4}"
 # BATCHED idle detection: snapshot every lane, wait ONCE, re-snapshot. A pane that
 # is byte-identical across the 2s window is idle. Doing all lanes in one 2s window
 # (instead of 2s sequentially per lane = ~20s) makes rebatch near-instant so
