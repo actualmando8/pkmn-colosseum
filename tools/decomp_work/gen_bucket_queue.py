@@ -14,8 +14,10 @@ QUEUE = os.path.join(ROOT, "build", "wall_queue.txt")
 ASSIGNED = os.path.join(ROOT, "build", "wall_assigned.txt")
 BAD = ("effect_util", "hsd_", "ui_core", "fsys_file", "gs_material", "pokemon", "gs_pokemon_summary")
 PRIORITY = ["NEARWALL", "STRUCT", "ASM", "LOW"]
-# per-bucket minimum match% (skip the truly-hopeless within a bucket)
-MINPCT = {"NEARWALL": 0.0, "STRUCT": 0.0, "ASM": 0.0, "LOW": 40.0}
+# per-bucket minimum match% (skip the truly-hopeless within a bucket). LOW kept at 0
+# so the file pool is deep enough to feed every lane (band locks per-file = one lane
+# per file); the bucket PRIORITY still works the higher-quality fns first.
+MINPCT = {"NEARWALL": 0.0, "STRUCT": 0.0, "ASM": 0.0, "LOW": 0.0}
 
 
 def fresh_by_file(led, bucket):
