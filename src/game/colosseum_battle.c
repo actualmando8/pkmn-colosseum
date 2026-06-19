@@ -24343,6 +24343,7 @@ int fn_80254180(void)
 /* Address: 0x802541B4 | Size: 0xB4 */
 /* Address: 0x802541B4 | Size: 0xB4 */
 /* Address: 0x802541B4 | Size: 0xB4 */
+/* Address: 0x802541B4 | Size: 0xB4 */
 void fn_802541B4(void* ctx, u32 param1, u32 param2) {
     extern void fn_8023793C();
     extern void fn_80239500();
@@ -25408,6 +25409,7 @@ int fn_80254F54(void)
   uVar1 = fn_80236BFC(r3, r4, 0x35);
   return (uVar1 & 0xFF) != 1;
 }
+/* Address: 0x80254F88 | Size: 0x78 | Pattern: field_accessor */
 /* Address: 0x80254F88 | Size: 0x78 | Pattern: field_accessor */
 /* Address: 0x80254F88 | Size: 0x78 | Pattern: field_accessor */
 /* Address: 0x80254F88 | Size: 0x78 | Pattern: field_accessor */
@@ -26502,6 +26504,7 @@ u32 fn_80255D3C(u32 r3_in, u32 r4)
   result = uVar1 != 0;
   return result;
 }
+/* Address: 0x80255D7C | Size: 0x38 | Ghidra import */
 /* Address: 0x80255D7C | Size: 0x38 | Ghidra import */
 /* Address: 0x80255D7C | Size: 0x38 | Ghidra import */
 /* Address: 0x80255D7C | Size: 0x38 | Ghidra import */
@@ -27609,6 +27612,7 @@ u32 fn_80256AE0(void)
   iVar1 = fn_801F8A18(r3, local_8);
   return (-iVar1 != 0) ? 1 : 0;
 }
+/* Address: 0x80256B18 | Size: 0xB4 */
 /* Address: 0x80256B18 | Size: 0xB4 */
 /* Address: 0x80256B18 | Size: 0xB4 */
 /* Address: 0x80256B18 | Size: 0xB4 */

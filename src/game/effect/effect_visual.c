@@ -407,7 +407,7 @@ extern void fn_8013EA44();
 extern u32 fn_8013F078(void* ptr);
 extern u32 fn_8013F114(void* ptr);
 extern u16 distortionEffectStart(void);
-extern void fn_8013F410(void);
+extern u32 fn_8013F410(void* ptr);
 extern u32 fn_8013F80C(void* ptr, u32 delta);
 extern void _distortionEffectUpdateMatrices(void);
 extern u32 fn_8013FC58(void* ptr);
@@ -1530,13 +1530,13 @@ log:
     return 0;
 }
 #endif
-extern void fn_800E3B3C(void);
-extern void fn_800D4604(void);
-extern void fn_800D377C(void);
-extern void fn_800D3410(void);
-extern void fn_800E3B08(void);
+extern s32 fn_800E3B3C(void);
+extern void fn_800D4604(u32 mode);
+extern void fn_800D377C(u32 a);
+extern void fn_800D3410(void* texture, u32 a);
+extern void* fn_800E3B08(u32 index);
 extern void fn_800E3C64(void);
-extern void fn_800E3760(void);
+extern void fn_800E3760(void* obj, u32 flags);
 extern void fn_800D3190(void);
 extern void fn_800E5FAC(void);
 extern void fn_800E60F0(void);
@@ -2087,34 +2087,124 @@ asm u16 distortionEffectStart(void) {
 #else
 u16 distortionEffectStart(void) { /* TODO */ }
 #endif
-extern void fn_800E3D08(void);
-extern void fn_80118104(void);
-extern void fn_800D848C(void);
-extern void fn_800E064C(void);
-extern void fn_800DC1D4(void);
-extern void fn_800DBA54(void);
-extern void fn_800DB9F0(void);
-extern void fn_800DB988(void);
-extern void fn_800DB900(void);
-extern void fn_800DBCE4(void);
-extern void fn_800DC224(void);
-extern void fn_800DC14C(void);
-extern void fn_800DC0D4(void);
-extern void fn_800DC04C(void);
-extern void fn_800DBFD4(void);
-extern void fn_800D5C18(void);
-extern void fn_800DBE5C(void);
+extern u8 fn_800E3D08(void* obj);
+extern void fn_80118104(u32 a, u32 b);
+extern void fn_800D848C(u32 a, u32 b, u32 c, void* d);
+extern void fn_800E064C(void* dst);
+extern void fn_800DC1D4(u32 a);
+extern void fn_800DBA54(u32 a);
+extern void fn_800DB9F0(u32 a, u32 b, u32 c);
+extern void fn_800DB988(u32 a, u32 b, u32 c);
+extern void fn_800DB900(u32 a, void* b, u32 c);
+extern void fn_800DBCE4(u32 a, u32 b, u32 c, u32 d, u32 e);
+extern void fn_800DC224(u32 a, u32 b, u32 c, u32 d, u32 e);
+extern void fn_800DC14C(u32 a, u32 b, u32 c, u32 d, u32 e, u32 f);
+extern void fn_800DC0D4(u32 a, u32 b, u32 c, u32 d, u32 e);
+extern void fn_800DC04C(u32 a, u32 b, u32 c, u32 d, u32 e, u32 f);
+extern void fn_800DBFD4(u32 a, u32 b, u32 c, u32 d, u32 e);
+extern void fn_800D5C18(u32 a, u32 r, u32 g, u32 b);
+extern void fn_800DBE5C(u32 a);
 extern u32 lbl_8047AEE8;
 extern u32 lbl_8047AEF0;
 extern u32 lbl_8047D304;
 extern u32 lbl_8047D300;
 extern u32 lbl_8047D308;
 #if 1
-asm void fn_8013F410(void) {
-#include "src/game/effect/effect_visual_fn_8013F410.inc"
+u32 fn_8013F410(void* ptr) {
+    f32 mtx[12];
+    u8* p;
+    s32 count;
+    s32 i;
+    void* obj;
+
+    if (ptr != NULL) {
+        p = ptr;
+        if (*(void**)(p + 0x4) == NULL || lbl_8047AEE8 == 0) {
+            return 0;
+        }
+        _distortionEffectUpdateMatrices();
+        if (lbl_8047AEE8 != 0) {
+            count = fn_800E3B3C();
+            if (count != 0) {
+                fn_800D4604(2);
+                fn_800D2248();
+                fn_800D377C(1);
+                fn_800D3410((void*)lbl_8047AEE8, 0);
+                for (i = 0; i < count; i++) {
+                    obj = fn_800E3B08(i);
+                    if (obj != NULL && fn_800E3D08(obj) != 0) {
+                        fn_800E3760(obj, 0x3010);
+                    }
+                }
+                if (*(u16*)(p + 0x28) != 0) {
+                    fn_80118104(0x2000, 0);
+                    fn_80118104(0x2000, 1);
+                }
+                fn_800D3190();
+                fn_800D4604(1);
+            }
+        }
+        fn_800DA1E8(0, 2, 0);
+        fn_800DA028(0);
+        fn_800D88DC(0x80000003);
+        fn_800D888C(4);
+        fn_800DA4C4(0, 6, 7);
+        fn_800D9ED8(1);
+        fn_800DA2BC(1, 1, 0);
+        fn_800D85D4(0, (void*)lbl_8047AEE8);
+        fn_800D85D4(1, *(void**)(p + 0x4));
+        fn_800D848C(0, 2, 4, p + 0x68);
+        fn_800E064C(mtx);
+        fn_800D848C(1, 2, 5, mtx);
+        fn_800DC1D4(1);
+        fn_800DBA54(1);
+        fn_800DB9F0(0, 1, 1);
+        fn_800DB988(0, lbl_8047AEF0, lbl_8047AEF0);
+        fn_800DB900(1, p + 0x98, 1);
+        fn_800DBCE4(0, 0, 1, 0, 1);
+        fn_800DC224(0, 0, 0, 0, 2);
+        fn_800DC14C(0, 0, 0, 0, 1, 0);
+        fn_800DC0D4(0, 0xf, 0xf, 0xf, 8);
+        fn_800DC04C(0, 0, 0, 0, 1, 0);
+        fn_800DBFD4(0, 7, 7, 7, 4);
+        fn_800D7820(*(void**)p);
+        fn_800D6A00(6);
+        fn_800D7F14(p + 0x38);
+        fn_800D67BC(4);
+
+        fn_800D6680(*(f32*)&lbl_8047D304, *(f32*)&lbl_8047D304, *(f32*)&lbl_8047D300);
+        fn_800D5C18(0, 0xff, 0xff, 0xff);
+        fn_800D59B8(0, *(f32*)&lbl_8047D300, *(f32*)&lbl_8047D300);
+        fn_800D59B8(1, *(f32*)&lbl_8047D300, *(f32*)&lbl_8047D300);
+
+        fn_800D6680(*(f32*)&lbl_8047D308, *(f32*)&lbl_8047D304, *(f32*)&lbl_8047D300);
+        fn_800D5C18(0, 0xff, 0xff, 0xff);
+        fn_800D59B8(0, *(f32*)&lbl_8047D308, *(f32*)&lbl_8047D300);
+        fn_800D59B8(1, *(f32*)&lbl_8047D308, *(f32*)&lbl_8047D300);
+
+        fn_800D6680(*(f32*)&lbl_8047D308, *(f32*)&lbl_8047D308, *(f32*)&lbl_8047D300);
+        fn_800D5C18(0, 0xff, 0xff, 0xff);
+        fn_800D59B8(0, *(f32*)&lbl_8047D308, *(f32*)&lbl_8047D308);
+        fn_800D59B8(1, *(f32*)&lbl_8047D308, *(f32*)&lbl_8047D308);
+
+        fn_800D6680(*(f32*)&lbl_8047D304, *(f32*)&lbl_8047D308, *(f32*)&lbl_8047D300);
+        fn_800D5C18(0, 0xff, 0xff, 0xff);
+        fn_800D59B8(0, *(f32*)&lbl_8047D300, *(f32*)&lbl_8047D308);
+        fn_800D59B8(1, *(f32*)&lbl_8047D300, *(f32*)&lbl_8047D308);
+
+        fn_800D6728();
+        fn_800D7E5C();
+        fn_800D848C(0, 2, 4, mtx);
+        fn_800DBE5C(0);
+        fn_800DBA54(0);
+        fn_800D888C(0x80000002);
+        fn_800D9ED8(0);
+        return 1;
+    }
+    return 0;
 }
 #else
-void fn_8013F410(void) { /* TODO */ }
+u32 fn_8013F410(void* ptr) { /* TODO */ }
 #endif
 extern u32 lbl_8047AEE8;
 extern u32 lbl_8047D310;
@@ -2410,12 +2500,14 @@ asm void fn_801436F0(void) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 u32 fn_801436F0(void* ptr) {
     s32 v;
     if (ptr == NULL) return 0;
     v = !!((((u8*)ptr)[0x4] >> 3) & 1);
     return v;
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
@@ -2485,12 +2577,14 @@ asm void fn_80143778(void) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 unsigned int fn_80143778(const void *ptr) {
     s32 v;
     if (ptr == NULL) return 0;
     v = !!((((u8*)ptr)[0x4] >> 4) & 1);
     return v;
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on

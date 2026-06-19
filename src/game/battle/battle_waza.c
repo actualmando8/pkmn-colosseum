@@ -547,6 +547,7 @@ extern s32 lbl_80467390[];
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 void fn_801D23C0(void) {
     u32 handle;
     lbl_80467390[1] = 0x258;
@@ -555,6 +556,7 @@ void fn_801D23C0(void) {
         fn_801669E4(handle, 0, 0);
     }
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
@@ -626,6 +628,7 @@ void fn_801D29D8(s32 moveID, s32 hitCount) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 void fn_801D2B08(void) {
     s32* state;
 
@@ -635,6 +638,7 @@ void fn_801D2B08(void) {
     state[2] = 0;
     state[3] = 0;
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
@@ -2146,7 +2150,85 @@ void fn_801DD158(void* obj) {
  * Address: 0x801DD23C | Size: 0x1A8
  */
 void fn_801DD23C(void* obj) {
-    /* TODO: Color filter transition (0x1A8 bytes) */
+    extern void fn_800E24B0(u16);
+    extern void fn_800E209C(u16);
+    extern void fn_800E5D40(u32);
+    extern void fn_800E5A74(u32);
+    extern void fn_800EC154();
+    extern void fn_801DA4E8();
+    extern void fn_801193BC(s32);
+    extern void fn_800F9210();
+    extern void fn_80140138(void*);
+    extern void fn_801DB1CC(void* obj);
+    extern void fn_801D9E34(void* obj);
+    extern void fn_801DA014(void* obj);
+
+    u8* data;
+    u16 id;
+    u8 enabled;
+    u32 handle;
+
+    data = (u8*)obj;
+    if (data != NULL) {
+        id = *(u16*)(data + 0x30);
+        if (id != 0) {
+            fn_800E24B0(id);
+            fn_800E209C(id);
+        }
+
+        if (data == NULL) {
+            enabled = 0;
+        } else if (*(u8*)(data + 0x77) == 0) {
+            enabled = 0;
+        } else if (*(u8*)(data + 0x4E) == 0) {
+            enabled = 0;
+        } else {
+            enabled = *(u8*)(data + 0x4F);
+        }
+
+        if (enabled != 0 && data != NULL && *(u8*)(data + 0x4F) != 0 && *(u8*)(data + 0x4E) != 0) {
+            handle = *(u32*)(data + 0x24);
+            if (*(u8*)(data + 0x4C) != 0) {
+                fn_800E5D40(handle);
+            }
+            if (*(u8*)(data + 0x4D) != 0) {
+                fn_800E5A74(handle);
+            }
+            *(u8*)(data + 0x4F) = 0;
+        }
+
+        if (*(u32*)(data + 0x24) != 0) {
+            fn_800EC154(*(u32*)(data + 0x24), 0, 0);
+        }
+
+        fn_801DA4E8(data, 0);
+
+        if (*(u32*)(data + 0x0C) != 0) {
+            fn_801193BC(*(s32*)(data + 0x28));
+            fn_800F9210(*(u32*)data, *(u32*)(data + 0x0C));
+        }
+
+        fn_80140138(data + 0x50);
+
+        if (*(u32*)data != 0) {
+            if (*(u32*)(data + 4) != 0) {
+                fn_800F9210(*(u32*)data, *(u32*)(data + 4));
+            }
+            if (*(u32*)(data + 8) != 0) {
+                fn_800F9210(*(u32*)data, *(u32*)(data + 8));
+            }
+            id = *(u16*)(data + 0x7C);
+            if (id != 0) {
+                fn_800E24B0(id);
+                fn_800E209C(id);
+            }
+        }
+
+        fn_801DB1CC(data);
+        fn_801D9E34(data);
+        fn_801DA014(data);
+        memset(data, 0, 0x8C);
+    }
 }
 
 /**
