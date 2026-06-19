@@ -21,13 +21,15 @@ locked_files() { python tools/decomp_work/coordination/locks.py list 2>/dev/null
 RUN_PICKED=""
 # pick_line <queue> <assigned-file> -> echoes the first line whose file is free+unlocked
 pick_line() {
-  local queue="$1" assigned="$2" line f
-  touch "$assigned"
+  local queue="$1" line f
+  # NOTE: no permanent assigned-list — a file is "taken" only while a lane holds its
+  # band LOCK (checked below). Once a lane finishes (lock released) the file is free
+  # to re-offer, so lanes never starve. Per-fn dedup is handled by the ledger (the
+  # queue is regenerated each cycle from fresh-unattempted fns).
   while IFS= read -r line; do
     [ -n "$line" ] || continue
     f=$(echo "$line" | awk '{print $1}')
-    grep -qxF "$f" "$assigned" && continue
-    echo "$LOCKS" | grep -qxF "$f" && continue
+    echo "$LOCKS" | grep -qxF "$f" && continue          # currently locked by a live lane
     printf '%s\n' "$RUN_PICKED" | grep -qxF "$f" && continue   # picked by another lane this run
     echo "$line"; return 0
   done < "$queue"
