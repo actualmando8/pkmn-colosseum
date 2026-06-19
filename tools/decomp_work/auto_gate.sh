@@ -44,10 +44,12 @@ for f in $FILES; do
 
 Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"; then
       echo "  $tag: COMMITTED +$held"; total=$((total+held)); committed=1
-      # mark committed fns attempted so the stale report.json doesn't re-offer them
-      for cfn in $($PY -c "import json;print(' '.join(k for k in json.load(open('$f')) if not k.startswith('_')))" 2>/dev/null); do
-        $PY tools/decomp_work/wall_ledger.py mark "$cfn" committed >/dev/null 2>&1
-      done
+      # The HELD fns are now byte-exact in canon. Mark them attempted AND bump them to
+      # 100% in report.json so the ledger/bucket queues stop re-offering finished work
+      # (instead of waiting hours for the dashboard's periodic report regen).
+      heldfns=$(echo "$out" | grep -oE "HELD[[:space:]]+fn_[0-9A-Fa-f]+" | awk '{print $2}' | tr '\n' ' ')
+      for cfn in $heldfns; do $PY tools/decomp_work/wall_ledger.py mark "$cfn" committed >/dev/null 2>&1; done
+      [ -n "$heldfns" ] && $PY tools/decomp_work/update_report.py $heldfns >/dev/null 2>&1
       break
     fi
     sleep 4   # transient .git/objects permission race (AV scan) — back off and retry
