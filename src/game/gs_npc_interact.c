@@ -829,24 +829,33 @@ asm void fn_80011BC4(void) {
 #include "src/game/gs_npc_interact_fn_80011BC4.inc"
 }
 #else
+#pragma peephole off
+#pragma peephole off
 void fn_80011BC4(u32 arg1, u32 target) {
     u32 ptr;
     u32 state;
     u32 data;
-    u32 current;
     u32 diff;
-    if (!(ptr = fn_80104704(arg1))) { return; }
+    s16 score;
+    ptr = fn_80104704(arg1);
+    if (!ptr) { return; }
     state = fn_80103FE4(ptr);
     data = fn_801040A0(ptr);
-    current = *(u32*)(state + 0x20);
-    diff = (target > current) ? target - current : current - target;
-    *(s16*)(data + 0xc) = (s16)(diff * 100 / *(u32*)(state + 0x1c));
+    if (target > *(u32*)(state + 0x20)) {
+        diff = target - *(u32*)(state + 0x20);
+    } else {
+        diff = *(u32*)(state + 0x20) - target;
+    }
+    score = diff * 100 / *(u32*)(state + 0x1c);
+    *(s16*)(data + 0xc) = score;
     if (*(s16*)(data + 0xc) < 0xf) { *(s16*)(data + 0xc) = 0xf; }
-    *(u32*)(data + 0x8) = current;
+    *(u32*)(data + 0x8) = *(u32*)(state + 0x20);
     *(u32*)(state + 0x20) = target;
     *(s16*)(data + 0xe) = 0;
     fn_80166A28(0x4d0);
 }
+#pragma peephole on
+#pragma peephole on
 #endif
 
 /* 0x78 | fn_80011C78 | generic */
@@ -1728,6 +1737,8 @@ asm void fn_8000DE24(void) {
 #else
 #pragma push
 #pragma peephole off
+#pragma peephole off
+#pragma peephole off
 void fn_8000DE24(u8* ptr) {
     extern void fn_80102ED4(u8* a);
     extern u8 fn_801F18DC(s32 a);
@@ -1747,6 +1758,8 @@ void fn_8000DE24(u8* ptr) {
         ptr[0x99] = 1;
     }
 }
+#pragma peephole on
+#pragma peephole on
 #pragma pop
 #endif
 
