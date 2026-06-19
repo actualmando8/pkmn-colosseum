@@ -1865,27 +1865,32 @@ u32 fn_801F8000(void* context) {
     extern u8* fn_801FBD58(u16 val);
     extern u32 fn_801FBD28(u8* ptr);
     extern u32 fn_800FA280(u32 val);
-    u8 valid;
+    int valid;
     void* result;
     u16 slot;
 
     if (context == NULL) {
         return 0;
     }
-    valid = 0;
-    if (context != NULL) {
-        if ((u16)fn_801EF634(context) != 1) {
-            if ((s32)fn_801FB1C0(context, 0, 0x43, 0) != 0) {
-                result = fn_801FB1C0(context, 0, 0x44, 0);
-                if (result != NULL) {
-                    if ((u8)fn_8012A130(result) != 0) {
-                        valid = 1;
-                    }
-                }
+    if (context == NULL) {
+        valid = 0;
+    } else {
+        if ((u16)fn_801EF634(context) == 1) {
+            valid = 0;
+        } else if ((s32)fn_801FB1C0(context, 0, 0x43, 0) == 0) {
+            valid = 0;
+        } else {
+            result = fn_801FB1C0(context, 0, 0x44, 0);
+            if (result == NULL) {
+                valid = 0;
+            } else if ((u8)fn_8012A130(result) == 0) {
+                valid = 0;
+            } else {
+                valid = 1;
             }
         }
     }
-    if (valid == 0) {
+    if ((u8)valid == 0) {
         return 0;
     }
     slot = (u16)(u32)fn_801FB1C0(context, 0, 0x43, 0);
@@ -1900,26 +1905,31 @@ void* fn_801F8100(void* context) {
     extern u8 fn_8012A130(void* ptr);
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 index);
     extern void* fn_8012A5B0(void* ptr, u32 param1, u32 param2);
-    u8 valid;
+    int valid;
     void* result;
 
     if (context == NULL) {
         return NULL;
     }
-    valid = 0;
-    if (context != NULL) {
-        if ((u16)fn_801EF634(context) != 1) {
-            if ((s32)fn_801FB1C0(context, 0, 0x43, 0) != 0) {
-                result = fn_801FB1C0(context, 0, 0x44, 0);
-                if (result != NULL) {
-                    if ((u8)fn_8012A130(result) != 0) {
-                        valid = 1;
-                    }
-                }
+    if (context == NULL) {
+        valid = 0;
+    } else {
+        if ((u16)fn_801EF634(context) == 1) {
+            valid = 0;
+        } else if ((s32)fn_801FB1C0(context, 0, 0x43, 0) == 0) {
+            valid = 0;
+        } else {
+            result = fn_801FB1C0(context, 0, 0x44, 0);
+            if (result == NULL) {
+                valid = 0;
+            } else if ((u8)fn_8012A130(result) == 0) {
+                valid = 0;
+            } else {
+                valid = 1;
             }
         }
     }
-    if (valid == 0) {
+    if ((u8)valid == 0) {
         return NULL;
     }
     result = fn_801FB1C0(context, 0, 0x44, 0);
