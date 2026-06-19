@@ -63,15 +63,19 @@ u32 wcstombs(char* dst, const wchar_t* src, u32 n) {
  * 0x800C80D0 | size: 0x4C
  */
 s32 fn_800C80D0(const wchar_t* s1, const wchar_t* s2, u32 n) {
-    u32 i;
-    for (i = 0; i < n; i++) {
-        u8 c1 = (u8)(s1[i] & 0xFF);
-        u8 c2 = (u8)(s2[i] & 0xFF);
-        if (c1 != c2) {
-            if (c1 >= c2) { return 1; }
-            return -1;
+    const u8* p1 = (const u8*)s1 - 1;
+    const u8* p2 = (const u8*)s2 - 1;
+    u32 count = n + 1;
+
+    while (--count != 0) {
+        if (*++p1 != *++p2) {
+            if (*p1 < *p2) {
+                return -1;
+            }
+            return 1;
         }
     }
+
     return 0;
 }
 
