@@ -35245,7 +35245,7 @@ void fn_8025CC30(void* ctx, u32 slot, u32 param) {
 /* Address: 0x8025CC90 | Size: 0x50 | Pattern: field_accessor */
 u32 fn_8025CC90(void* ctx, u32 slot, u32 param) {
     extern u32 fn_801F37B0();
-    extern void fn_8025CCE0();
+    extern u32 fn_8025CCE0();
     u32 buf[2];
     u32 r;
     buf[0] = (u32)ctx;
