@@ -179,7 +179,11 @@ def worker(work_q):
                 _state["wins"].append(fn)
             if os.path.isdir(POOL):
                 _state["pool"] = sorted(os.listdir(POOL))
+            nwin = len(_state["wins"]); ndone = len(_state["done"])
         write_state()
+        tag = "*** WIN ***" if won else "no-win"
+        print(f"[grind] {tag} {fn}  best-score={best_overall}  "
+              f"(cycle: {ndone} done, {nwin} WINS so far)", flush=True)
         work_q.task_done()
 
 
@@ -222,17 +226,30 @@ def main():
     for t in pool:
         t.start()
         time.sleep(STAGGER)   # stagger build_dir bursts so mwcc-via-WSL-interop doesn't choke
-    # update queue view + keep state fresh while workers run
+    # update queue view + keep state fresh while workers run; print a live progress
+    # line to stdout (the supervisor pane) so it's visibly annealing, not "stuck".
+    print(f"[grind] swarm live: {len(queue)} targets, {WORKERS} workers — "
+          f"annealing (per-fn budget {BUDGET}s) ...", flush=True)
+    tick = 0
     while any(t.is_alive() for t in pool):
         with _lock:
             running = {a["fn"] for a in _state["active"].values()}
             done = {d["fn"] for d in _state["done"]}
             _state["queue"] = [q[0] for q in queue if q[0] not in running and q[0] not in done]
+            active_snap = [(a["fn"], a.get("iter", 0), a.get("best")) for a in _state["active"].values()]
+            ndone = len(_state["done"]); nwin = len(_state["wins"]); nq = len(_state["queue"])
         write_state()
+        tick += 1
+        if tick % 8 == 0:   # ~every 16s
+            act = " | ".join(f"{fn}@iter{it} best={bs}" for fn, it, bs in active_snap) or "(spinning up)"
+            print(f"[grind] active: {act}  ||  queued {nq}, done {ndone}, WINS {nwin}", flush=True)
         time.sleep(2)
     with _lock:
         _state["active"] = {}
+        winlist = list(_state["wins"]); ndone = len(_state["done"])
     write_state()
+    print(f"[grind] CYCLE DONE — {ndone} annealed, {len(winlist)} WIN(s): "
+          f"{', '.join(winlist) or '(none this cycle)'}", flush=True)
 
 
 if __name__ == "__main__":
