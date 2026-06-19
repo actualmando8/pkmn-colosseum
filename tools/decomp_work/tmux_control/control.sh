@@ -66,6 +66,14 @@ case "$cmd" in
   send-codex3-safe)  CODEX_NAME=codex3 "$DIR/send_to_codex_tui.sh" --capture-first "$@" ;;
   send-codex4)       CODEX_NAME=codex4 "$DIR/send_to_codex_tui.sh" "$@" ;;
   send-codex4-safe)  CODEX_NAME=codex4 "$DIR/send_to_codex_tui.sh" --capture-first "$@" ;;
+  send-codex5)       CODEX_NAME=codex5 "$DIR/send_to_codex_tui.sh" "$@" ;;
+  send-codex5-safe)  CODEX_NAME=codex5 "$DIR/send_to_codex_tui.sh" --capture-first "$@" ;;
+  send-codex6)       CODEX_NAME=codex6 "$DIR/send_to_codex_tui.sh" "$@" ;;
+  send-codex6-safe)  CODEX_NAME=codex6 "$DIR/send_to_codex_tui.sh" --capture-first "$@" ;;
+  send-codex7)       CODEX_NAME=codex7 "$DIR/send_to_codex_tui.sh" "$@" ;;
+  send-codex7-safe)  CODEX_NAME=codex7 "$DIR/send_to_codex_tui.sh" --capture-first "$@" ;;
+  send-codex8)       CODEX_NAME=codex8 "$DIR/send_to_codex_tui.sh" "$@" ;;
+  send-codex8-safe)  CODEX_NAME=codex8 "$DIR/send_to_codex_tui.sh" --capture-first "$@" ;;
   codex2-capture)    "$DIR/codex_capture.sh" --pane codex2 "$@" 2>/dev/null || "$DIR/capture_pane.sh" codex2 "${1:-80}" ;;
   codex3-capture)    "$DIR/capture_pane.sh" codex3 "${1:-80}" ;;
   codex4-capture)    "$DIR/capture_pane.sh" codex4 "${1:-80}" ;;
