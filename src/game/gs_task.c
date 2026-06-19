@@ -1508,6 +1508,7 @@ asm void fn_80007708(void) {
 #include "src/game/gs_task_fn_80007708.inc"
 }
 #else
+#pragma peephole off
 s32 fn_80007708(void) {
     u16 tmp;
     u16 slot;
@@ -1516,6 +1517,7 @@ s32 fn_80007708(void) {
     if (fn_801EF63C() == 0) return -1;
     return fn_80051E38(slot);
 }
+#pragma peephole on
 #endif
 
 /* fn_80007778 - 0x80007778 | size: 0x20 */
