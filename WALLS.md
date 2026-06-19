@@ -596,3 +596,7 @@ worker reg-alloc cracks. See `tools/decomp_work/coordination/why_diff_retriage_j
 - `fn_8000C824` / `fn_8000C92C` / `fn_8000BFA0` (gs_party_access, 98.33/98.33/95.04%) +
   `fn_8000DEC4` (gs_npc_interact, 94.77%): pipeline 2026-06-18 — faithful real C active,
   reg-alloc/branch-topology walls; registered Equivalent (C-converted axis), not re-ground.
+
+- `fn_80138BBC` / `fn_80139AC4` / `fn_80139D10` / `fn_8013AB60` (effect_visual, 99.1-99.4%):
+  pipeline 2026-06-18 — corrected void(void) stub sigs to real; real C reaches 99% but walls
+  on an sdata2 relocation-name artifact (C-uncontrollable). Bodies in scratch; salvage-eligible.
