@@ -771,11 +771,13 @@ L_800117F0:
 
 /* 0x74 | fn_800119A8 | nullcheck_call_flag */
 #pragma peephole off
+#pragma peephole off
 u32 fn_800119A8(void* obj) {
     if ((u8)fn_80102620(0x4b) != 0) fn_80102568(0x4b, 0, obj);
     if ((u8)fn_80102620(0xf6) != 0) fn_80102568(0xf6, 0, obj);
     return 0;
 }
+#pragma peephole on
 #pragma peephole on
 
 /* 0x80011A1C | 0x130 */
@@ -821,6 +823,7 @@ s32 fn_80011A1C(u8* obj, s32 a1, s32 a2) {
 extern u32 fn_80104704(u32 a);
 extern u32 fn_801040A0(u32 a);
 #pragma peephole off
+#pragma peephole off
 u32 fn_80011B4C(u32 arg1, u8 arg2) {
     u32 r;
     while (1) {
@@ -834,6 +837,7 @@ u32 fn_80011B4C(u32 arg1, u8 arg2) {
     }
 }
 #pragma peephole on
+#pragma peephole on
 
 /* 0x80011BC4 | 0xB4 */
 extern u32 fn_80103FE4(u32 a);
@@ -843,6 +847,7 @@ asm void fn_80011BC4(void) {
 #include "src/game/gs_npc_interact_fn_80011BC4.inc"
 }
 #else
+#pragma peephole off
 #pragma peephole off
 #pragma peephole off
 void fn_80011BC4(u32 arg1, u32 target) {
@@ -870,9 +875,11 @@ void fn_80011BC4(u32 arg1, u32 target) {
 }
 #pragma peephole on
 #pragma peephole on
+#pragma peephole on
 #endif
 
 /* 0x78 | fn_80011C78 | generic */
+#pragma peephole off
 #pragma peephole off
 u32 fn_80011C78(u32 arg1, u8 arg2) {
     u32 r;
@@ -886,6 +893,7 @@ u32 fn_80011C78(u32 arg1, u8 arg2) {
         }
     }
 }
+#pragma peephole on
 #pragma peephole on
 
 /* 0x80011CF0 | 0xAC */
@@ -921,6 +929,7 @@ asm void fn_80011D9C(void) {
 }
 #else
 #pragma peephole off
+#pragma peephole off
 void fn_80011D9C(s32 id, s32 do_extra) {
     u32 resolved;
     s32 kind;
@@ -942,6 +951,7 @@ void fn_80011D9C(s32 id, s32 do_extra) {
         fn_80103F74(resolved, kind, 0);
     }
 }
+#pragma peephole on
 #pragma peephole on
 #endif
 
@@ -1767,6 +1777,7 @@ asm void fn_8000DE24(void) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 void fn_8000DE24(u8* ptr) {
     extern void fn_80102ED4(u8* a);
     extern u8 fn_801F18DC(s32 a);
@@ -1786,6 +1797,7 @@ void fn_8000DE24(u8* ptr) {
         ptr[0x99] = 1;
     }
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma pop
@@ -2336,6 +2348,7 @@ void fn_800109A0(void) { /* TODO */ }
 /* fn_80010B30 - 0x80010B30 | size: 0x168 */
 #pragma push
 #pragma peephole off
+#pragma peephole off
 u32 fn_80010B30(u8* arg) {
     extern void* fn_80103FFC(u8* a, u32 size);
     extern void* fn_80103FE4(u8* a);
@@ -2390,6 +2403,7 @@ u32 fn_80010B30(u8* arg) {
     }
     return 0;
 }
+#pragma peephole on
 #pragma pop
 
 /* fn_80010C98 - 0x80010C98 | size: 0x52c */
