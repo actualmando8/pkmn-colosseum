@@ -36,7 +36,7 @@ extern u8 gTRKState[];
 extern s32 TRK_mainError;
 extern u8 gTRKInterruptVectorTable[];
 extern u8 gTRKInterruptVectorTableEnd[];
-extern u32 lbl_803FED58;       /* exception table base address */
+extern u8 lbl_803FED58[];      /* exception table base address */
 extern u8 lbl_80313848[];      /* interrupt vector offsets table */
 
 /*
@@ -206,7 +206,7 @@ s32 TRKInitializeTarget(void) {
     *(u32*)&gTRKState[0x8C] = msr;
 
     /* Set exception table base to 0xE0000000 (physical) */
-    lbl_803FED58 = 0xE0000000;
+    *(u32*)lbl_803FED58 = 0xE0000000;
 
     return 0;
 }
@@ -677,12 +677,12 @@ void fn_800C3218(void) {
  * it falls within the TRK stack or hardware register range.
  */
 u32 fn_800C3344(u32 addr) {
-    u32 stackBase = *(u32*)&lbl_803FED58;
+    u32 stackBase = *(u32*)lbl_803FED58;
 
     /* Check if address is in the TRK stack (stackBase to stackBase+0x4000) */
     if (addr >= stackBase && addr < stackBase + 0x4000) {
         u32 msrBits = *(u32*)((u8*)gTRKCPUState + 0x238) & 0x3;
-        if (addr == msrBits) {
+        if (msrBits != 0) {
             return addr;
         }
     }
@@ -695,4 +695,3 @@ u32 fn_800C3344(u32 addr) {
     /* Convert physical address to virtual (cached) address */
     return (addr & 0x3FFFFFFF) | 0x80000000;
 }
-
