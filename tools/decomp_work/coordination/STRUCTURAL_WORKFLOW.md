@@ -40,6 +40,19 @@ this is what made the battle_waza wins abort the gate with implicit-int / undefi
 identifier (fn_801D2C74 landed above the extern block). The gate now auto-hoists
 file-scope externs as a fallback, but write self-contained functions — don't rely on it.
 
+## Toolchain — DO NOT use bare `bash` (it hits broken WSL)
+In a cmd.exe pane, bare `bash` resolves to `C:\Windows\System32\bash.exe` (the WSL
+launcher), which is broken here and blocks the whole band workflow. Two WSL-free ways
+to drive the band harness — use either, never `bash ... decomp.sh band`:
+
+- **Python-direct (preferred, zero bash):**
+    `python tools/decomp_work/band.py init  <tag> <src/file.c>`
+    `python tools/decomp_work/band.py check <tag> [fn ...]`
+    `python tools/decomp_work/band.py save  <tag> <fn> [fn ...]`
+- **Wrapper (pins Git Bash, for the full decomp.sh toolchain — measure/asm/where/walls):**
+    `tools\decomp_work\decomp.cmd band check <tag> <fn>`
+    `tools\decomp_work\decomp.cmd where <fn>`
+
 ## Per-function loop
 1. m2c first draft:
      python3 tools/decomp_work/m2c_draft.py <fn> src/game/gs_model.c
@@ -51,9 +64,9 @@ file-scope externs as a fallback, but write self-contained functions — don't r
 3. Rewrite the m2c draft into FAITHFUL real C in your band scratch — use the TU's
    REAL struct types from the headers (HSD_*, GSModel*, etc.), not m2c's raw
    `*(u32*)(x+0x4)` casts. The goal is C a human would have written.
-4. Measure:
-     tools/decomp_work/decomp.sh band check <tag> <fn>
-     tools/decomp_work/decomp.sh band diff  <tag> <fn>
+4. Measure (run the band harness PYTHON-DIRECT — see "Toolchain" below):
+     python tools/decomp_work/band.py check <tag> <fn>
+     python tools/decomp_work/band.py diff  <tag> <fn>
 5. Refine toward 100%. If you reach high-% faithful C but hit a reg-alloc/scheduling
    wall, LEAVE THE DRAFT IN scratch/band_<tag>.c (do not revert) and report the %
    so the next round can finish it. `band save` still only writes canon at 100.00.
