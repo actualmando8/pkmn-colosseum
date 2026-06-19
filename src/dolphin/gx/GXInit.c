@@ -6118,20 +6118,17 @@ tevfWrite:
 }
 
 /* fn_800BC8C8 - 0x800BC8C8 | size: 0x30 -- GX Light / material / TEV */
-asm void fn_800BC8C8(u32 arg0) {
-    nofralloc
-    lwz r4, gx(r13)
-    clrlwi r3, r3, 24
-    subi r0, r3, 1
-    lwz r3, 0x204(r4)
-    slwi r0, r0, 10
-    rlwinm r3, r3, 0, 22, 17
-    or r0, r3, r0
-    stw r0, 0x204(r4)
-    lwz r0, 0x4f4(r4)
-    ori r0, r0, 4
-    stw r0, 0x4f4(r4)
-    blr
+void fn_800BC8C8(u32 arg0) {
+    extern u8* gx;
+    u8* gxv;
+    u32 reg;
+
+    gxv = gx;
+    arg0 = (arg0 & 0xff) - 1;
+    reg = *(u32*)(gxv + 0x204);
+    reg = (reg & ~0x3c00) | (arg0 << 10);
+    *(u32*)(gxv + 0x204) = reg;
+    *(u32*)(gxv + 0x4f4) |= 4;
 }
 
 /* fn_800BC8F8 - 0x800BC8F8 | size: 0x21C -- GX Light / material / TEV */
