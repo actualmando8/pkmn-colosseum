@@ -542,6 +542,7 @@ extern s32 lbl_80467390[];
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 void fn_801D23C0(void) {
     u32 handle;
     lbl_80467390[1] = 0x258;
@@ -550,6 +551,7 @@ void fn_801D23C0(void) {
         fn_801669E4(handle, 0, 0);
     }
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
@@ -611,6 +613,7 @@ void fn_801D29D8(s32 moveID, s32 hitCount) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
+#pragma peephole off
 void fn_801D2B08(void) {
     s32* state;
 
@@ -620,6 +623,7 @@ void fn_801D2B08(void) {
     state[2] = 0;
     state[3] = 0;
 }
+#pragma peephole on
 #pragma peephole on
 #pragma peephole on
 #pragma peephole on
@@ -832,7 +836,26 @@ void fn_801D53D4(void) {
  * Address: 0x801D53D8 | Size: 0x8C
  */
 void fn_801D53D8(s32 slot, f32 zoom, f32 speed) {
-    /* TODO: Camera zoom helper (0x8C bytes) */
+    extern u8 lbl_804673F8[];
+    extern void fn_801D5464(s32 slot, s32 motionType);
+    extern void fn_801D58E4();
+    extern u32 fn_800F9318(s32, s32);
+    extern void fn_800E4014(s32, s32);
+    extern s32 GSthreadCreate(s32, s32, s32, s32, s32, void*);
+    extern s32 fn_800057A8(void);
+
+    u32 result;
+    s32 value;
+
+    fn_801DAEF8(8);
+    fn_801D58E4();
+    result = fn_800F9318(0, 0x64);
+    if (result != 0) {
+        fn_800E4014(result, 0);
+    }
+    *(s32*)(lbl_804673F8 + 0x66C) = GSthreadCreate(0x14, 0x58, 0x2000, 1, 0, fn_801D5464);
+    value = fn_800057A8();
+    *(u32*)lbl_804673F8 = (u32)((u32)((2 - value) | (value - 2)) >> 31);
 }
 
 /**
