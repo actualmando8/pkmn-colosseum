@@ -93,6 +93,11 @@ $glmCmd    = $cdRepo + ' && set "CLAUDE_CONFIG_DIR=' + $glmConfigDir + '" && set
 $sonnetCmd = $cdRepo + ' && claude --model "sonnet" --dangerously-skip-permissions'   # NOT sonnet[1m] — the 1m beta throws an API error on this account
 $workerCmd = $cdRepo + ' && claude --model "opus[1m]" --dangerously-skip-permissions'   # worker Opus (dispatched)
 $orchCmd   = $cdRepo + ' && claude --model "opus[1m]" --dangerously-skip-permissions'   # orchestrator Opus (you type here)
+# Stage-C permuter: continuous annealer swarm in WSL (native mwcceppc). Auto-refills
+# from the closest winnable near-misses; writes .omc/permuter_state.json -> dashboard
+# quantum panel. Runs under WSL because mwcc needs the Linux toolchain via interop.
+$repoWsl   = '/mnt/' + $repo.Substring(0,1).ToLower() + ($repo.Substring(2) -replace '\\','/')
+$permCmd   = 'wsl.exe bash -lc "bash ' + $repoWsl + '/tools/decomp_work/permuter/anneal_supervisor.sh"'
 
 if ($DryRun) {
   $proxyCmd  = 'echo [DRYRUN] pane0 = NODE PROXY'
@@ -101,6 +106,7 @@ if ($DryRun) {
   $sonnetCmd = 'echo [DRYRUN] pane6 = CLAUDE SONNET'
   $workerCmd = 'echo [DRYRUN] pane7 = CLAUDE OPUS worker'
   $orchCmd   = 'echo [DRYRUN] pane8 = CLAUDE OPUS orchestrator'
+  $permCmd   = 'echo [DRYRUN] pane9 = STAGE-C PERMUTER (WSL annealer swarm)'
 }
 
 # Explicit positioned splits to match the cockpit diagram (NOT tiled). We capture
@@ -121,14 +127,17 @@ Start-Sleep -Milliseconds 1300          # psmux server start race
 $P0 = ([string](& $tm list-panes -t $Session -F '#{pane_id}' | Select-Object -First 1)).Trim()
 
 # Layout (matches the cockpit diagram):
-#   col1: GLM proxy (top) / GLM agent (below)    col2: Opus worker (top) / Sonnet (below)
+#   col1: GLM proxy (top) / Stage-C permuter (mid) / GLM agent (below)
+#   col2: Opus worker (top) / Sonnet (below)
 #   middle: Opus orchestrator (full height)      right: 2x2 Codex (1 2 / 3 4)
 $REST     = SplitH $P0 66      # P0 = left group (~34%), REST = right (~66%)
 $RIGHT    = SplitH $REST 62    # REST = middle/orchestrator (~25%), RIGHT = codex group (~41%)
 $ORCH     = $REST
 $COL2     = SplitH $P0 48      # P0 = col1, COL2 = col2
-$GLMAGENT = SplitV $P0 84      # P0 = GLM proxy (top ~16%), GLMAGENT = GLM agent (bottom)
+$BELOW    = SplitV $P0 84      # P0 = GLM proxy (top ~16%), BELOW = rest of col1
 $PROXY    = $P0
+$GLMAGENT = SplitV $BELOW 55   # BELOW = permuter (top ~45%), GLMAGENT = GLM agent (bottom ~55%)
+$PERMUTER = $BELOW
 $SONNET   = SplitV $COL2 52    # COL2 = Opus worker (top), SONNET = Sonnet (bottom)
 $OPUS     = $COL2
 $CODEXBL  = SplitV $RIGHT 50   # RIGHT = top row, CODEXBL = bottom row
@@ -148,6 +157,7 @@ Send $CODEX1   $codexCmd
 Send $CODEX2   $codexCmd
 Send $CODEX3   $codexCmd
 Send $CODEX4   $codexCmd
+Send $PERMUTER $permCmd
 
 # --- registry from CAPTURED ids (robust to layout/index shuffles) ---
 if (-not $DryRun) {
@@ -163,7 +173,8 @@ if (-not $DryRun) {
     ('CODEX2_PANE="'  + $CODEX2   + '"'),
     ('CODEX3_PANE="'  + $CODEX3   + '"'),
     ('CODEX4_PANE="'  + $CODEX4   + '"'),
-    ('PROXY_PANE="'   + $PROXY    + '"')
+    ('PROXY_PANE="'   + $PROXY    + '"'),
+    ('PERMUTER_PANE="' + $PERMUTER + '"')
   ) -join "`n"
   [System.IO.File]::WriteAllText($reg, $regBody + "`n")
   Write-Host "Wrote control registry: $reg" -ForegroundColor DarkGray
@@ -173,7 +184,7 @@ if (-not $DryRun) {
 & $tm select-pane -t $ORCH 2>$null
 
 Write-Host ""
-Write-Host "decomp cockpit built — diagram layout (col1 glm-proxy/glm-agent | col2 opus/sonnet | mid orchestrator | right 2x2 codex):" -ForegroundColor Green
+Write-Host "decomp cockpit built — diagram layout (col1 glm-proxy/permuter/glm-agent | col2 opus/sonnet | mid orchestrator | right 2x2 codex):" -ForegroundColor Green
 & $tm list-panes -t $Session -F '  pane #{pane_index}: @#{pane_left},#{pane_top} #{pane_id} cmd=#{pane_current_command}'
 Write-Host ""
 
