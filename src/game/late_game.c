@@ -4619,6 +4619,7 @@ void fn_8009769C(void) {
 #pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
+#pragma scheduling off
 void fn_800979EC(void) {
     extern u32 fn_8009769C(u8, u32, u32, u16, u32, u32);
 
@@ -4630,6 +4631,7 @@ void fn_800979EC(void) {
         *(u32*)(lbl_803FB380 + 0x10),
         *(u32*)(lbl_803FB380 + 0x14));
 }
+#pragma scheduling on
 #pragma scheduling on
 #pragma scheduling on
 #pragma scheduling on
@@ -4747,6 +4749,7 @@ void fn_80097B04(void) {
 }
 
 /* 0x80097BBC | size: 0x114 */
+#pragma peephole off
 s32 fn_80097BBC(u8 chan) {
     extern void* fn_80129280();
     extern void* fn_8012AC08();
@@ -4768,7 +4771,7 @@ s32 fn_80097BBC(u8 chan) {
     if (entity == 0) {
         return -1;
     }
-    while ((u8)fn_8010B560()) {
+    while ((u8)fn_8010B560() != 0) {
         _threadSwitch();
     }
     memset(lbl_803FB380, 0, 0x44);
@@ -4785,9 +4788,9 @@ s32 fn_80097BBC(u8 chan) {
     }
     _threadSwitch();
     return *(s32*)(lbl_803FB380 + 0x4);
-
-    return;
 }
+#pragma peephole on
+#pragma peephole reset
 
 /* 0x80097CD0 | size: 0xC4 */
 void fn_80097CD0(void) {
