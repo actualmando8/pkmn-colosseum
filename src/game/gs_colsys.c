@@ -1757,9 +1757,12 @@ void fn_8010C224(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_8010C364(void) {
-    /* TODO: match -- 36 bytes at 0x8010C364 */
+#pragma scheduling off
+s32 fn_8010C364(void) {
+    fn_800EF5A4();
+    return 1;
 }
+#pragma scheduling on
 #pragma pop
 
 /* 0x8010C388 | 0x74 */
