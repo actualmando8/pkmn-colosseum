@@ -134,7 +134,7 @@ void fn_80078D5C(void);
 void fn_8007926C(void);
 void fn_800792D8(void);
 void fn_800798E8(void);
-void fn_80079C1C(void);
+u32 fn_80079C1C();
 void fn_80079EF4(void);
 void fn_8007A5E8(s32 r3, u8 *r4);
 void fn_8007A664(s32 r3, u8 *r4);
@@ -142,7 +142,7 @@ void fn_8007A6F0(void);
 s32 fn_8007A82C(void);
 void fn_8007A850(void);
 void fn_8007AA6C(void);
-void fn_8007AAA8(void);
+s32 fn_8007AAA8(void);
 void fn_8007AAFC(void);
 void fn_8007AB10(void);
 void fn_8007B090(u8 *r3);
@@ -523,7 +523,7 @@ void fn_8007926C(void) {
 
 /* 0x800792D8 | size: 0x610 */
 void fn_800792D8(void) {
-    extern void fn_80079C1C();
+    extern u32 fn_80079C1C();
     extern void fn_80079EF4();
     extern void fn_80176E0C();
     extern void GSscene_SetMode();
@@ -922,7 +922,7 @@ L_800798A0:
 
 /* 0x800798E8 | size: 0x334 */
 void fn_800798E8(void) {
-    extern void fn_80079C1C();
+    extern u32 fn_80079C1C();
     extern void fn_80079EF4();
     extern void fn_80134420();
     extern void fn_8013467C();
