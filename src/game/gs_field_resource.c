@@ -349,8 +349,6 @@ void* fn_80114714(void) {
 
 /* 0x801147D4 | 0x34 */
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 #pragma peephole off
 void* fn_801147D4(void) {
     void* result = fn_800F9318();
@@ -404,11 +402,17 @@ void fn_801149BC(void) {
 
 /* 0x80114A70 | 0x70 */
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80114A70(void) {
-    /* TODO: match -- 112 bytes at 0x80114A70 */
+#pragma peephole off
+void* fn_80114A70(void* owner, u32 param, u32 alloc_size) {
+    u32 total = ((alloc_size + 0x1F) & ~0x1F) + 0x60;
+    void* mem = fn_800F9418(total, 0x20, (u32)owner, param, (void*)0);
+    if (mem == (void*)0) {
+        fn_800DD970(lbl_80272460, total);
+        return (void*)0;
+    }
+    return (u8*)mem + 0x60;
 }
+#pragma peephole on
 #pragma pop
 
 /* 0x80114AE0 | 0x1C8 */
