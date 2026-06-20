@@ -32,6 +32,13 @@ extern void OSRegisterVersion(const char* id);
 extern u32 __PADFixBits;
 extern u32 __PADSpec;
 
+/* Scaffold for merged CARD library functions (CW GC/1.2.5n; see compile_config override) */
+typedef void (*CARDCallback)(s32 chan, s32 result);
+typedef void (*CARDApiCallback)(s32 chan, s32 result);
+extern s32 CARDCheckExAsync(s32 chan, s32* xferBytes, CARDCallback callback);
+extern int fn_80098944(s32 chan);
+extern u8 lbl_803FC620[];
+
 static const char* __PADVersion = "<< Dolphin SDK - PAD\trelease build: Aug 22 2002 04:07:42 (0x2301) >>";
 
 #define PAD_MOTOR_STOP      0
@@ -315,8 +322,8 @@ u32 fn_800ABF5C(u32 spec) {
  * 0x800AC3D8 | size: 0x10
  * Returns the controller type for the given channel.
  */
-u32 fn_800AC3D8(s32 chan) {
-    return PadType[chan];
+u32 fn_800AC3D8(void) {
+    return (*(volatile u32*)0xCC006C00 >> 1) & 1;
 }
 
 /*
@@ -844,13 +851,14 @@ void fn_800AF474(s32 chan, void* data, u32 size) {
 }
 
 /* fn_800AF51C - SISyncTransfer | 0x800AF51C | size: 0x84 */
-BOOL fn_800AF51C(s32 chan, void* output, u32 outputLen, void* input, u32 inputLen) {
-    BOOL result;
-    result = SITransfer(chan, output, outputLen, input, inputLen, NULL, OSMicrosecondsToTicks(65));
-    if (result) {
-        SISync();
+void fn_800AF51C(s32 chan) {
+    u8* block = lbl_803FC620 + chan * 0x110;
+    CARDApiCallback cb = *(CARDApiCallback*)(block + 0xdc);
+
+    if (cb != 0) {
+        *(CARDApiCallback*)(block + 0xdc) = 0;
+        cb(chan, fn_80098944(chan) != 0 ? 1 : -3);
     }
-    return result;
 }
 
 /* fn_800AF5A0 - SIPollController | 0x800AF5A0 | size: 0xC0 */
@@ -978,7 +986,19 @@ u32 fn_800B016C(void) {
 
 /* fn_800B0174 - SISetPollingRate | 0x800B0174 | size: 0x38 */
 u32 fn_800B0174(u32 msec) {
-    return SISetSamplingRate(msec);
+    u8* base;
+    u32 value;
+
+    base = lbl_803FC620;
+    if (msec != 0) {
+        value = msec;
+    } else {
+        value = (u32)(base + 0x220);
+    }
+    *(u32*)(base + 0x10C) = value;
+    msec = (msec != 0) ? msec : (u32)(base + 0x220);
+    *(u32*)(base + 0x21C) = msec;
+    return msec;
 }
 
 /* fn_800B01AC - SIDisablePollingHelper | 0x800B01AC | size: 0x18 */
@@ -1014,9 +1034,11 @@ void fn_800B02F4(s32 chan) {
 }
 
 /* fn_800B0358 - SISendCommand | 0x800B0358 | size: 0x30 */
-void fn_800B0358(s32 chan, u32 command) {
-    SISetCommand(chan, command);
-    SITransferCommands();
+s32 fn_800B0358(s32 chan) {
+    if ((chan < 0) || (chan >= 2)) {
+        return -0x80;
+    }
+    return *(s32*)(lbl_803FC620 + chan * 0x110 + 4);
 }
 
 /* fn_800B0388 - SIConfigurePolling | 0x800B0388 | size: 0x150 */
@@ -1178,8 +1200,9 @@ void fn_800B29F4(void) {
 }
 
 /* fn_800B2F84 - 0x800B2F84 | size: 0x28 */
-void fn_800B2F84(void) {
-    /* Medium function (0x28 bytes) */
+s32 fn_800B2F84(s32 chan, CARDCallback callback) {
+    s32 xferBytes;
+    return CARDCheckExAsync(chan, &xferBytes, callback);
 }
 
 /* fn_800B2FAC - 0x800B2FAC | size: 0xCC */
@@ -1243,8 +1266,14 @@ void fn_800B4270(void) {
 }
 
 /* fn_800B4308 - 0x800B4308 | size: 0x30 */
-void fn_800B4308(void) {
-    /* Medium function (0x30 bytes) */
+s32 fn_800B4308(u8* ent) {
+    if (ent[0] == 0xff) {
+        return -4;
+    }
+    if (ent[0x34] & 4) {
+        return 0;
+    }
+    return -10;
 }
 
 /* fn_800B4338 - 0x800B4338 | size: 0x150 */
