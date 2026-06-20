@@ -4617,6 +4617,7 @@ void fn_8009769C(void) {
 #pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
+#pragma scheduling off
 void fn_800979EC(void) {
     extern u32 fn_8009769C(u8, u32, u32, u16, u32, u32);
 
@@ -4628,6 +4629,7 @@ void fn_800979EC(void) {
         *(u32*)(lbl_803FB380 + 0x10),
         *(u32*)(lbl_803FB380 + 0x14));
 }
+#pragma scheduling on
 #pragma scheduling on
 #pragma scheduling on
 #pragma scheduling on
