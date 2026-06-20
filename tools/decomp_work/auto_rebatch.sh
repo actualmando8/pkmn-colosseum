@@ -48,8 +48,13 @@ declare -A SNAP IDLE
 for name in $LANES; do SNAP[$name]=$(tmux capture-pane -p -t "${PANE[$name]}" 2>/dev/null | md5sum); done
 sleep 2
 for name in $LANES; do
-  b=$(tmux capture-pane -p -t "${PANE[$name]}" 2>/dev/null | md5sum)
-  [ "${SNAP[$name]}" = "$b" ] && IDLE[$name]=1
+  cap=$(tmux capture-pane -p -t "${PANE[$name]}" 2>/dev/null)
+  # A lane RUNNING a turn shows "esc to interrupt" (both Claude & Codex TUIs). Never treat
+  # such a pane as idle even if its screen was briefly static (slow compile / thinking) —
+  # that false-positive made the driver fire a 2nd prompt onto an already-working lane.
+  # Idle = NO interrupt indicator AND byte-static over the 2s window.
+  if echo "$cap" | tr -d ' ' | grep -qiE "esctoint"; then IDLE[$name]=0; continue; fi
+  [ "${SNAP[$name]}" = "$(echo "$cap" | md5sum)" ] && IDLE[$name]=1
 done
 LOCKS=$(locked_files)
 for name in $LANES; do

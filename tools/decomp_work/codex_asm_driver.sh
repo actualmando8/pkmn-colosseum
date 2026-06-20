@@ -39,8 +39,13 @@ while true; do
   for n in $LANES; do SNAP[$n]=$(tmux capture-pane -p -t "${PANE[$n]}" 2>/dev/null | md5sum); done
   sleep 2
   for n in $LANES; do
-    b=$(tmux capture-pane -p -t "${PANE[$n]}" 2>/dev/null | md5sum)
-    [ "${SNAP[$n]}" = "$b" ] && IDLE[$n]=1 || IDLE[$n]=0
+    cap=$(tmux capture-pane -p -t "${PANE[$n]}" 2>/dev/null)
+    # A lane RUNNING a turn shows "esc to interrupt" (both Claude & Codex TUIs). Never
+    # treat such a pane as idle even if its screen was briefly static (slow compile /
+    # thinking) — that false-positive is what made the driver fire a 2nd prompt onto a
+    # working lane. Idle = NO interrupt indicator AND byte-static over the 2s window.
+    if echo "$cap" | tr -d ' ' | grep -qiE "esctoint"; then IDLE[$n]=0; continue; fi
+    [ "${SNAP[$n]}" = "$(echo "$cap" | md5sum)" ] && IDLE[$n]=1 || IDLE[$n]=0
   done
   for n in $LANES; do
     [ "${IDLE[$n]:-0}" = 1 ] || continue
