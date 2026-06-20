@@ -25511,41 +25511,22 @@ void fn_802550F0(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x802551A4 | Size: 0x74 | Pattern: field_accessor */
-void fn_802551A4(void* ctx, u32 slot, u32 param) {
-    extern void fn_80236BFC();
-    extern void fn_8025C264();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = slot;
-    u32 r5 = param;
+u32 fn_802551A4(void* ctx, u32 slot, u32 param, u32 param3) {
+    extern u32 fn_80236BFC(void*, u32, u32);
+    extern u32 fn_8025C264(void*, u32, u32, u32, u32);
+    u32 result;
 
-    r7 = 0x0;
-    r29 = r3;
-    r30 = r6;
-    fn_8025C264();
-    r31 = r3;
-    r3 = r29;
-    r4 = r30;
-    r5 = 0x30;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    result = fn_8025C264(ctx, slot, param, param3, 0);
+    if ((fn_80236BFC(ctx, param3, 0x30) & 0xff) == 1) {
+        return 0;
     }
-    if ((s32)r31 == (s32)0x0) {
-        r3 = 0x0;
-        return;
+    if ((s32)result == 0) {
+        return 0;
     }
-    r3 = 0x1;
-
-    return;
+    if ((s32)result == -1) {
+        return 1;
+    }
+    return 1;
 }
 
 /* Address: 0x80255220 | Size: 0xA8 */
@@ -26173,41 +26154,22 @@ L_802559DC:
 }
 
 /* Address: 0x80255A38 | Size: 0x74 | Pattern: field_accessor */
-void fn_80255A38(void* ctx, u32 slot, u32 param) {
-    extern void fn_80236BFC();
-    extern void fn_8025C264();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = slot;
-    u32 r5 = param;
+u32 fn_80255A38(void* ctx, u32 slot, u32 param, u32 param3) {
+    extern u32 fn_80236BFC(void*, u32, u32);
+    extern u32 fn_8025C264(void*, u32, u32, u32, u32);
+    u32 result;
 
-    r7 = 0x0;
-    r29 = r3;
-    r30 = r6;
-    fn_8025C264();
-    r31 = r3;
-    r3 = r29;
-    r4 = r30;
-    r5 = 0x1b;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    result = fn_8025C264(ctx, slot, param, param3, 0);
+    if ((fn_80236BFC(ctx, param3, 0x1b) & 0xff) == 1) {
+        return 0;
     }
-    if ((s32)r31 == (s32)0x0) {
-        r3 = 0x0;
-        return;
+    if ((s32)result == 0) {
+        return 0;
     }
-    r3 = 0x1;
-
-    return;
+    if ((s32)result == -1) {
+        return 1;
+    }
+    return 1;
 }
 
 /* Address: 0x80255AAC | Size: 0x38 | Ghidra import */
