@@ -9,6 +9,15 @@
 cd "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../.." || exit 1
 source tools/decomp_work/tmux_control/panes.env 2>/dev/null
 export MSYS_NO_PATHCONV=1
+# SINGLETON GUARD: TaskStop kills the Monitor's grep but NOT this bash loop, so naive
+# restarts pile up zombie drivers that all dispatch onto the same panes at once (this
+# caused 5 concurrent codex drivers). Refuse to start a 2nd instance. Stale pidfile
+# (after SIGKILL) is harmless — kill -0 on a dead pid returns false.
+PIDF="build/.codex_asm_driver.pid"
+if [ -f "$PIDF" ] && kill -0 "$(cat "$PIDF" 2>/dev/null)" 2>/dev/null; then
+  echo "[codex_asm_driver] another instance ($(cat "$PIDF")) already running — exiting"; exit 0
+fi
+echo $$ > "$PIDF"; trap 'rm -f "$PIDF"' EXIT
 INTERVAL="${INTERVAL:-45}"
 LANES="${CODEX_ASM_LANES:-C1 C2 C3 C4}"
 QUEUE="build/asm_codex_queue.txt"

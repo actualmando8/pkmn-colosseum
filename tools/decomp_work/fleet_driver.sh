@@ -9,6 +9,14 @@
 # Default lanes "OPUS SON"; GLM stays out (out of commission).
 cd "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../.." || exit 1
 export MSYS_NO_PATHCONV=1
+# SINGLETON GUARD: TaskStop kills the Monitor's grep but NOT this bash loop, so naive
+# restarts pile up zombie drivers that all dispatch at once. Refuse to start a 2nd
+# instance. Stale pidfile (after SIGKILL) is harmless — kill -0 on a dead pid is false.
+PIDF="build/.fleet_driver.pid"
+if [ -f "$PIDF" ] && kill -0 "$(cat "$PIDF" 2>/dev/null)" 2>/dev/null; then
+  echo "[fleet_driver] another instance ($(cat "$PIDF")) already running — exiting"; exit 0
+fi
+echo $$ > "$PIDF"; trap 'rm -f "$PIDF"' EXIT
 INTERVAL="${INTERVAL:-30}"
 GATE_EVERY="${GATE_EVERY:-5}"
 LANEFILE="build/fleet_lanes.txt"
