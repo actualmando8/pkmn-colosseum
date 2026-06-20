@@ -580,95 +580,39 @@ void fn_800C3098(void) {
 
 /* fn_800C3218 - 0x800C3218 | size: 0x12C */
 void fn_800C3218(void) {
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+    extern void fn_80003488(void*, const void*, u32);
+    extern void fn_800C0D70(u32, u32);
+    u32 stackBase;
+    u32 base;
+    u32 handler;
+    u32 dest;
+    u32 mask;
+    s32 i;
 
-    r3 = (u32)&lbl_803FED58;
-    r3 = (u32)&lbl_803FED58;
-    r3 = *(u32*)((u8*)r3 + 0x0);
-    if (r3 <= 0x44 && (r3 + 0x4000) > 0x44) {
-        r3 = (u32)gTRKCPUState;
-        r3 = (u32)gTRKCPUState;
-        tmp = *(u32*)((u8*)r3 + 0x238);
-        tmp = tmp & 0x3;
-        if (tmp != 0x44) {
-            r5 = 0x44;
-        } else {
-            r3 = 0x80000000;
-            r5 = r3 + 0x44;
-        }
+    stackBase = *(u32*)lbl_803FED58;
+    if (0x44 >= stackBase && 0x44 < stackBase + 0x4000 &&
+        (*(u32*)(gTRKCPUState + 0x238) & 3)) {
+        base = 0x44;
     } else {
-        /* L_800C3264 */
-        r3 = 0x80000000;
-        r5 = r3 + 0x44;
+        base = 0x80000044;
     }
-    /* L_800C326C */
-    r4 = (u32)&lbl_80313848;
-    r3 = (u32)gTRKCPUState;
-    r29 = *(u32*)((u8*)r5 + 0x0);
-    r31 = (u32)&lbl_80313848;
-    r28 = (u32)gTRKCPUState;
-    r30 = 0x0;
-    do {
-        /* L_800C3284 */
-        tmp = 0x1;
-        tmp = tmp << r30;
-        /* and. tmp, r29, tmp */;
-        if (tmp != 0x44 && (s32)r30 != 4) {
-            r3 = (u32)&lbl_803FED58;
-            r6 = *(u32*)((u8*)r31 + 0x0);
-            r3 = (u32)&lbl_803FED58;
-            r3 = *(u32*)((u8*)r3 + 0x0);
-            if (r6 >= r3 && r6 < r3 + 0x4000) {
-                tmp = *(u32*)((u8*)r28 + 0x238);
-                tmp = tmp & 0x3;
-                if (r6 != tmp) {
-                    r27 = r6;
-                } else {
-                    tmp = 0x7E000000;
-                    if (r6 >= tmp && r6 <= (u32)0x80000000) {
-                        r27 = r6;
-                    } else {
-                        tmp = r6 & 0x3FFFFFFF;
-                        r27 = tmp | (0x8000 << 16);
-                    }
-                }
+    mask = *(u32*)base;
+    for (i = 0; i <= 14; i++) {
+        if ((mask & (1 << i)) && i != 4) {
+            handler = ((u32*)lbl_80313848)[i];
+            stackBase = *(u32*)lbl_803FED58;
+            if (handler >= stackBase && handler < stackBase + 0x4000 &&
+                (*(u32*)(gTRKCPUState + 0x238) & 3)) {
+                dest = handler;
+            } else if (handler >= 0x7E000000 && handler <= 0x80000000) {
+                dest = handler;
             } else {
-                /* L_800C32D4 */
-                tmp = 0x7E000000;
-                if (r6 >= tmp && r6 <= (u32)0x80000000) {
-                    r27 = r6;
-                } else {
-                    /* L_800C32F4 */
-                    tmp = r6 & 0x3FFFFFFF;
-                    r27 = tmp | (0x8000 << 16);
-                }
+                dest = (handler & 0x3FFFFFFF) | 0x80000000;
             }
-            /* L_800C32FC */
-            r4 = (u32)gTRKInterruptVectorTable;
-            r3 = r27;
-            tmp = (u32)gTRKInterruptVectorTable;
-            r5 = 0x100;
-            r4 = tmp + r6;
-            ((void(*)(void))fn_80003488)();
-            r3 = r27;
-            r4 = 0x100;
-            ((void(*)(void))fn_800C0D70)();
+            fn_80003488((void*)dest, (const void*)(gTRKInterruptVectorTable + handler), 0x100);
+            fn_800C0D70(dest, 0x100);
         }
-        /* L_800C3320 */
-        r30 = r30 + 0x1;
-        r31 = r31 + 0x4;
-    } while ((s32)r30 <= 0xe);
-    return;
+    }
 }
 
 /* fn_800C3344 - 0x800C3344 | size: 0x58
