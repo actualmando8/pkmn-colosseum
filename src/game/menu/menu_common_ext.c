@@ -60,7 +60,7 @@ void fn_8007109C(void);
 void fn_80071104(void);
 void fn_80071160(void);
 void fn_80071208(void);
-void fn_80071318(void);
+void fn_80071318(u8* dst, u8* src);
 void fn_80071344(void);
 void fn_80071398(void);
 void fn_800714C8(void);
@@ -255,8 +255,26 @@ void fn_80071208(void) {
 }
 
 /* 0x80071318 | size: 0x2C */
-void fn_80071318(void) {
+#pragma optimization_level 2
+void fn_80071318(u8* dst, u8* src) {
+    s16 upperX;
+    s16 upperY;
+    u32 entryWord;
+    s16 lowerX;
+    s16 lowerY;
+
+    upperX = *(s16*)(src + 0xC);
+    upperY = *(s16*)(src + 0xE);
+    *(s16*)(dst + 0x54) = upperX;
+    entryWord = *(u32*)(src + 0x10);
+    *(s16*)(dst + 0x56) = upperY;
+    lowerX = *(s16*)(src + 0x8);
+    *(u32*)(dst + 0x58) = entryWord;
+    lowerY = *(s16*)(src + 0xA);
+    *(s16*)(dst + 0x5C) = lowerX;
+    *(s16*)(dst + 0x5E) = lowerY;
 }
+#pragma optimization_level 4
 
 /* 0x80071344 | size: 0x54 */
 void fn_80071344(void) {
@@ -1839,4 +1857,3 @@ L_800729BC:
     r3 = r16;
     return;
 }
-
