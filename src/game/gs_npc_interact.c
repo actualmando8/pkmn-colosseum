@@ -405,7 +405,7 @@ extern void fn_80102568();
 extern void fn_801F02AC();
 extern void fn_802062FC();
 extern void fn_802656AC();
-extern void fn_80010C98();
+extern u32 fn_80010C98(void* npc, u32 warpId, u32 variant);
 extern void fn_80011288();
 extern s32 fn_801026A4(s32, ...);
 #if 1
@@ -414,7 +414,7 @@ asm void fn_800114A4(void) {
 }
 #else
 void fn_800114A4(void) {
-    extern void fn_80010C98();
+    extern u32 fn_80010C98(void* npc, u32 warpId, u32 variant);
     extern void fn_80011288();
     extern void fn_8001BD80();
     extern void fn_80102568();
@@ -1897,8 +1897,8 @@ void fn_8000E28C(void) {}
 #endif
 
 /* fn_8000EA10 - 0x8000EA10 | size: 0x324 */
-extern void fn_801F2A7C(void);
-extern void fn_801F986C(void);
+extern u32 fn_801F2A7C(s32 arg);
+extern u32 fn_801F986C(u32 warpId, u16 variant);
 extern void fn_8012640C(void);
 extern void fn_80123FBC(void);
 extern void fn_8001D624(void);
@@ -2407,18 +2407,111 @@ u32 fn_80010B30(u8* arg) {
 #pragma pop
 
 /* fn_80010C98 - 0x80010C98 | size: 0x52c */
-extern void fn_80207BF4(void);
-extern void fn_801F8C00(void);
-extern void fn_80203848(void);
-extern void fn_800DD970(void);
+extern u32 fn_80207BF4(void* arg);
+extern u8 fn_801F8C00(u32 warpId, u32 arg);
+extern s32 fn_80203848(u32 arg);
+extern void fn_800DD970(const char* fmt, ...);
 extern u8 lbl_80266788[];
 extern u8 lbl_802E4B78[];
-#if 1
+#if 0
 asm void fn_80010C98(void) {
 #include "src/game/gs_npc_interact_fn_80010C98.inc"
 }
 #else
-void fn_80010C98(void) { /* TODO */ }
+#pragma peephole off
+u32 fn_80010C98(void* npc, u32 warpId, u32 variant) {
+#define WAIT_FOR_DIALOG(waitLabel, checkLabel, haveLabel, doneLabel) \
+    goto checkLabel; \
+waitLabel: \
+    advance = fn_801F18DC(0); \
+    if (advance != 0) { \
+        if ((fn_801F1700(0) == 1) && (fn_80265924() == 1)) { \
+            advance = 1; \
+            goto haveLabel; \
+        } else if (fn_801EF634() == 1) { \
+            advance = 1; \
+            goto haveLabel; \
+        } \
+    } \
+    advance = 0; \
+haveLabel: \
+    if (advance != 0) { \
+        goto doneLabel; \
+    } \
+    _threadSwitch(); \
+checkLabel: \
+    inputFlags = fn_800F7AF0(1); \
+    maskedFlags = fn_800F7BC4(1); \
+    maskedFlags &= inputFlags; \
+    if ((maskedFlags & 0x300) == 0) { \
+        goto waitLabel; \
+    } \
+doneLabel:
+
+    void* linkedNpc;
+    u32 inputFlags;
+    u32 maskedFlags;
+    u8 relation;
+    u8 advance;
+    u8 kind;
+
+    relation = fn_801F2020(0, npc, &linkedNpc);
+    if (relation == 1) {
+        fn_80132A38(0xD, (s32)fn_802037DC(npc));
+        fn_80106D3C(1, 0x76FB, 1, 0);
+        WAIT_FOR_DIALOG(waitRelationOne, checkRelationOne, haveRelationOne, doneRelationOne);
+        fn_801069FC(1);
+        return 0;
+    }
+    if (relation == 2) {
+        fn_801F4C14(0, 0, 0x57, 0, (u16)fn_80207BF4(linkedNpc));
+        fn_80132A38(0xD, (s32)fn_802037DC(linkedNpc));
+        fn_80132A38(0xE, (s32)fn_802037DC(npc));
+        fn_80106D3C(1, 0x761F, 1, 0);
+        WAIT_FOR_DIALOG(waitRelationTwo, checkRelationTwo, haveRelationTwo, doneRelationTwo);
+        fn_801069FC(1);
+        return 0;
+    }
+    if (warpId == 0) {
+        warpId = fn_801F2A7C(0);
+    }
+    if (warpId == 0) {
+        return 0;
+    }
+    variant = fn_801F986C(warpId, (u16)variant);
+    if (variant == 0) {
+        return 0;
+    }
+    kind = fn_801F8C00(warpId, variant);
+    if (kind == 1) {
+        fn_80132A38(0xD, fn_80203848(variant));
+        fn_80106D3C(1, 0x76FE, 1, 0);
+        WAIT_FOR_DIALOG(waitKindOne, checkKindOne, haveKindOne, doneKindOne);
+        fn_801069FC(1);
+        return 0;
+    }
+    if (kind == 2) {
+        fn_80132A38(0xD, fn_80203848(variant));
+        fn_80106D3C(1, 0x76FC, 1, 0);
+        WAIT_FOR_DIALOG(waitKindTwo, checkKindTwo, haveKindTwo, doneKindTwo);
+        fn_801069FC(1);
+        return 0;
+    }
+    if (kind == 3) {
+        fn_80132A38(0xD, fn_80203848(variant));
+        fn_80106D3C(1, 0x76FD, 1, 0);
+        WAIT_FOR_DIALOG(waitKindThree, checkKindThree, haveKindThree, doneKindThree);
+        fn_801069FC(1);
+        return 0;
+    }
+    if (kind == 0) {
+        return 1;
+    }
+    fn_800DD970((const char*)lbl_80266788, (const char*)lbl_802E4B78);
+#undef WAIT_FOR_DIALOG
+    return 0;
+}
+#pragma peephole on
 #endif
 
 /* fn_8001120C - 0x8001120C | size: 0x7c -- already decompiled above */
