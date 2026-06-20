@@ -80,12 +80,21 @@ extern const char lbl_8027255C[]; /* "floorReadFontPreFunc(): can't alloc..." */
 extern const char lbl_80272594[]; /* "floorReadMsgPreFunc(): can't alloc..." */
 extern const char lbl_802725CC[]; /* "floorReadNormalPreFunc(): can't alloc..." */
 extern const char lbl_802722AC[]; /* "scene_data" */
+extern const char lbl_80272328[]; /* "floorReadWZXPreFunc(): can't alloc..." (overlap) */
+extern const char lbl_80272460[]; /* "floorReadCameraPreFunc: can't alloc..." (map) */
 
 /* ===== BSS / global state ===== */
 extern u32 lbl_8047B0B0;  /* sound buffer size limit */
 
 /* ===== Internal callbacks referenced by pre-funcs ===== */
 extern void fn_80115094(void);  /* GFL resource completion callback */
+extern void fn_801150B8(void);  /* sound resource completion callback */
+
+extern void* fn_800F9318();        /* GSres simple alloc */
+extern void* fn_800F9378();        /* GSres install loader */
+extern void  fn_8010CFE4();        /* PKX overlap setup */
+extern u32   fn_800EFD3C();        /* WZX overlap check */
+extern void* fn_801195AC();        /* node lookup */
 
 /* ==================================================================
  * fn_8011432C -- floorReadGFLPreFunc
@@ -321,9 +330,13 @@ void fn_80114714(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_801147D4(void) {
-    /* TODO: match -- 52 bytes at 0x801147D4 */
+#pragma peephole off
+void* fn_801147D4(void) {
+    void* result = fn_800F9318();
+    fn_8010CFE4();
+    return result;
 }
+#pragma peephole on
 #pragma pop
 
 /* 0x80114808 | 0x74 */

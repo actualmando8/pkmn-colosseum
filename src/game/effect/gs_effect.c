@@ -739,56 +739,55 @@ u16 GSEffectAllocSlot(void* callbacks, u16 dataSize) {
  * Address: 0x80130CE0, Size: 0x224
  * ======================================================================= */
 void fn_80130CE0(u16 maxEffects) {
-    u32 tableSize;
-    u16 memHandle;
+    u32 memHandle;
     GSEffectInstance* table;
     GSEffectInstance* entry;
     u16 cnt;
-    GSEffectGlobals* g = (GSEffectGlobals*)(void*)lbl_803635C0;
+    extern u16 fn_800E3534(u32);
+    extern void* fn_800E27B0(u16);
+    extern u32 fn_800FE834(u32, u32, u32, void*);
 
-    tableSize = (u32)maxEffects * sizeof(GSEffectInstance);
+    memHandle = fn_800E3534((int)maxEffects * sizeof(GSEffectInstance));
+    gsEffectGlobals.memHandle = memHandle;
 
-    memHandle = GSmemAllocRaw(tableSize);
-    g->memHandle = memHandle;
+    if (memHandle != 0) {
+        table = (GSEffectInstance*)fn_800E27B0(memHandle);
+        gsEffectGlobals.instanceTable = table;
+        memset(table, 0, (int)maxEffects * sizeof(GSEffectInstance));
 
-    if (memHandle == 0) {
-        g->instanceTable = NULL;
-        g->freeListHead = NULL;
-        g->maxEffects = 0;
-    } else {
-        table = (GSEffectInstance*)GSmemGetPtr(memHandle);
-        g->instanceTable = table;
-        memset(table, 0, tableSize);
+        gsEffectGlobals.freeListHead = table;
 
-        g->freeListHead = table;
+        table->prev = NULL;
+        table->next = table + 1;
+        table->id = 1;
 
-        table[0].prev = NULL;
-        table[0].next = &table[1];
-        table[0].id = 1;
-
+        entry = table + 1;
         for (cnt = 1; cnt < maxEffects - 1; cnt++) {
-            entry = &table[cnt];
-            entry->prev = &table[cnt - 1];
-            entry->next = &table[cnt + 1];
+            entry->prev = entry - 1;
+            entry->next = entry + 1;
             entry->id = cnt + 1;
+            entry++;
         }
 
-        entry = &table[maxEffects - 1];
-        entry->prev = &table[maxEffects - 2];
+        entry->prev = entry - 1;
         entry->next = NULL;
         entry->id = maxEffects;
         entry->state = GSEFFECT_STATE_UNINIT;
 
-        g->maxEffects = (u32)maxEffects;
+        *(volatile u32*)&gsEffectGlobals.maxEffects = (u32)maxEffects;
+    } else {
+        gsEffectGlobals.instanceTable = NULL;
+        gsEffectGlobals.freeListHead = NULL;
+        gsEffectGlobals.maxEffects = 0;
     }
 
-    g->activeListHead = NULL;
+    gsEffectGlobals.activeListHead = NULL;
 
-    lbl_8047ADC0 = GStaskRegister(1, 0x7F, 0, (void*)fn_80130F68);
+    lbl_8047ADC0 = fn_800FE834(1, 0x7F, 0, (void*)fn_80130F68);
 
     fn_801E12A0();
 
-    GStaskRegister(1, 0x80, 0, (void*)fn_80130F04);
+    fn_800FE834(1, 0x80, 0, (void*)fn_80130F04);
 }
 
 /* =======================================================================
