@@ -3030,7 +3030,7 @@ s32 fn_80028830(void* r3) {
 #endif
 
 /* fn_80028948 - 0x80028948 | size: 0x674 */
-extern void fn_800E0BE4(void);
+extern f32 fn_800E0BE4(void);
 extern f32 lbl_8047B958;
 extern f32 lbl_8047B95C;
 extern f32 lbl_8047B960;
@@ -3119,7 +3119,7 @@ s32 fn_80028948(void* r3)
                     ov->x = lbl_8047B95C * fn_800E0BE4();
                     ov->y = lbl_8047B960 * fn_800E0BE4();
                     ov->scale = lbl_8047B964;
-                    ov->baseScale = lbl_8047B968 * fn_800E0BE4() + lbl_8047B964;
+                    ov->unused10 = lbl_8047B968 * fn_800E0BE4() + lbl_8047B964;
                     ov->color = 0xFFFFFF00u;
                     ov->alpha = 0x80;
                     ov->timer = lbl_8047B930;
@@ -3137,7 +3137,7 @@ s32 fn_80028948(void* r3)
                         ov->active = 0;
                     }
                     ratio = ov->timer / ov->lifetime;
-                    ov->scale = ov->baseScale * ratio;
+                    ov->scale = ov->unused10 * ratio;
                     ov->alpha = (u8)(s32)(lbl_8047B954 * (lbl_8047B934 - ratio));
                 }
             }
@@ -3161,7 +3161,7 @@ s32 fn_80028948(void* r3)
                 ov->x = lbl_8047B95C * fn_800E0BE4();
                 ov->y = lbl_8047B960 * fn_800E0BE4();
                 ov->scale = lbl_8047B964;
-                ov->baseScale = lbl_8047B968 * fn_800E0BE4() + lbl_8047B964;
+                ov->unused10 = lbl_8047B968 * fn_800E0BE4() + lbl_8047B964;
                 ov->color = 0xFFFFFF00u;
                 ov->alpha = 0x80;
                 ov->timer = lbl_8047B930;
@@ -3179,7 +3179,7 @@ s32 fn_80028948(void* r3)
                     ov->active = 0;
                 }
                 ratio = ov->timer / ov->lifetime;
-                ov->scale = ov->baseScale * ratio;
+                ov->scale = ov->unused10 * ratio;
                 ov->alpha = (u8)(s32)(lbl_8047B954 * (lbl_8047B934 - ratio));
             }
         }
@@ -4694,9 +4694,9 @@ end:
 
 /* fn_8002B1A0 - 0x8002B1A0 | size: 0x26c */
 extern void fn_800FE38C(void);
-extern void fn_80144088(void);
-extern void fn_80143FFC(void);
-extern void fn_80143FE4(void);
+extern u32 fn_80144088(void);
+extern u32 fn_80143FFC(void);
+extern u32 fn_80143FE4(void);
 extern void fn_800FE35C(void);
 extern f32 lbl_8047B980;
 #if 1
@@ -4716,9 +4716,9 @@ asm void fn_8002B1A0(void) {
 void fn_8002B1A0(void* arg0, u8* arg1)
 {
     extern void fn_800FE38C(s32, s32, s32, s32);
-    extern void fn_80144088(void);
-    extern void fn_80143FFC(void);
-    extern void fn_80143FE4(void);
+    extern u32 fn_80144088(void);
+    extern u32 fn_80143FFC(void);
+    extern u32 fn_80143FE4(void);
     extern void fn_800FE35C(void);
     extern f32  lbl_8047B980;
 
@@ -4729,23 +4729,49 @@ void fn_8002B1A0(void* arg0, u8* arg1)
 
     extern u8   lbl_802EF0A8[];
 
+    s16 key;
+    u8* tbl;
+    u8* entry;
+    s16 ref_x1;
+    s16 ref_y1;
+    s16 ref_x2;
+    s16 ref_y2;
+    s16 entry_x;
+    s16 entry_y;
+    u8* ctx;
+    s32 slot_count;
+    s8 slot_i;
+    s32 loop_lim;
+    s32 dir_off;
+    s32 scroll_px;
+    s32 w_0xdb;
+    s32 w_0x14f;
+    s32 y_base;
+    s32 x_mid;
+    f32 scroll_f;
+    u32* scroll_flag;
+    s32 x_acc;
+    s32 loop_i;
+    s32 trailing_tx;
+    u32 btn_id;
+
     /* ---- decode layout rect from the fixed entries in lbl_802EF0A8 ---- */
-    s16  key        = *(s16*)(arg1 + 0x6);
-    u8*  tbl        = lbl_802EF0A8;
-    u8*  entry      = tbl + (s32)key * 0x1c;   /* indexed element */
+    key        = *(s16*)(arg1 + 0x6);
+    tbl        = lbl_802EF0A8;
+    entry      = tbl + (s32)key * 0x1c;   /* indexed element */
 
     /* fixed reference rect corners stored at absolute byte offsets in the table */
-    s16  ref_x1     = *(s16*)(tbl + 0x492e);   /* reference left   */
-    s16  ref_y1     = *(s16*)(tbl + 0x4930);   /* reference top    */
-    s16  ref_x2     = *(s16*)(tbl + 0x4932);   /* reference right  */
-    s16  ref_y2     = *(s16*)(tbl + 0x4934);   /* reference bottom */
+    ref_x1     = *(s16*)(tbl + 0x492e);   /* reference left   */
+    ref_y1     = *(s16*)(tbl + 0x4930);   /* reference top    */
+    ref_x2     = *(s16*)(tbl + 0x4932);   /* reference right  */
+    ref_y2     = *(s16*)(tbl + 0x4934);   /* reference bottom */
 
-    s16  entry_x    = *(s16*)(entry + 0x2);    /* per-entry x adjustment */
-    s16  entry_y    = *(s16*)(entry + 0x4);    /* per-entry y adjustment */
+    entry_x    = *(s16*)(entry + 0x2);    /* per-entry x adjustment */
+    entry_y    = *(s16*)(entry + 0x4);    /* per-entry y adjustment */
 
     /* context block hanging off arg0+0x60 (same layout as all sibling fns) */
-    u8*  ctx        = *(u8**)(( u8*)arg0 + 0x60);
-    s32  slot_count = *(s32*)(ctx + 0x8);      /* total number of slots */
+    ctx        = *(u8**)(( u8*)arg0 + 0x60);
+    slot_count = *(s32*)(ctx + 0x8);      /* total number of slots */
 
     /* ---- draw the border rect ---- */
     fn_800FE38C((s32)(ref_x1 - entry_x),
@@ -4754,27 +4780,27 @@ void fn_8002B1A0(void* arg0, u8* arg1)
                 (s32)ref_y2);
 
     /* ---- set up per-frame counters ---- */
-    s8   slot_i  = (s8)(( u8*)arg0)[0x94];     /* starting slot index (signed) */
-    s32  loop_lim = 10;                         /* r23: visual column limit */
-    s32  dir_off  = 0;                          /* r24: scroll direction bias (-1/0) */
-    s32  scroll_px = 0;                         /* r22: scroll pixel offset */
+    slot_i  = (s8)(( u8*)arg0)[0x94];     /* starting slot index (signed) */
+    loop_lim = 10;                         /* r23: visual column limit */
+    dir_off  = 0;                          /* r24: scroll direction bias (-1/0) */
+    scroll_px = 0;                         /* r22: scroll pixel offset */
 
     /* ---- format-print arg: max possible value (0x270f = 9999) ---- */
     fn_80132A38(0x50, (void*)0x270f);
 
     /* ---- measure two reference strings to compute the text x-centre ---- */
-    s32  w_0xdb  = (s32)(fn_800FA444(0xdb)  >> 16);
-    s32  w_0x14f = (s32)(fn_800FA444(0x14f) >> 16);
+    w_0xdb  = (s32)(fn_800FA444(0xdb)  >> 16);
+    w_0x14f = (s32)(fn_800FA444(0x14f) >> 16);
 
     /* y-base for item text: from sprite descriptor */
-    s32  y_base = (s32)*(s16*)(arg1 + 0x54);
-    s32  x_mid  = (y_base - w_0xdb) - w_0x14f;  /* r28, used as text x-anchor */
+    y_base = (s32)*(s16*)(arg1 + 0x54);
+    x_mid  = (y_base - w_0xdb) - w_0x14f;  /* r28, used as text x-anchor */
 
     /* ---- scroll / animation state ---- */
-    f32  scroll_f = *(f32*)(*(u32*)(ctx + 0xc)); /* current scroll float */
+    scroll_f = *(f32*)(*(u32*)(ctx + 0xc)); /* current scroll float */
 
     if (scroll_f != lbl_8047B980) {              /* != 0.0f: scrolling active */
-        u32* scroll_flag = *(u32**)(ctx + 0x14);
+        scroll_flag = *(u32**)(ctx + 0x14);
         if (scroll_flag != (u32*)0 && *scroll_flag != 0) {
             if (scroll_f < lbl_8047B980) {       /* < 0.0f: scrolling left */
                 slot_i  -= 1;
@@ -4788,8 +4814,8 @@ void fn_8002B1A0(void* arg0, u8* arg1)
     }
 
     /* ---- loop setup ---- */
-    s32  x_acc  = dir_off * 0x1f;   /* r30: pixel x accumulator (31 px/slot) */
-    s32  loop_i = dir_off;          /* r26: visual column index */
+    x_acc  = dir_off * 0x1f;   /* r30: pixel x accumulator (31 px/slot) */
+    loop_i = dir_off;          /* r26: visual column index */
 
     /* loop: render one visual column per iteration */
     while (loop_i < loop_lim && slot_i < slot_count) {
@@ -4860,9 +4886,9 @@ next_slot:
 
     /* ---- trailing "add/locked" button if visual columns remain ---- */
     if (loop_i < loop_lim) {
-        s32  tx     = (loop_i * 0x1f) - scroll_px;
-        u32  btn_id = (ctx[0x1d] & 1) ? 0x2b47u : 0x2b2cu;
-        fn_800FB680(0, tx, -1, btn_id);
+        trailing_tx = (loop_i * 0x1f) - scroll_px;
+        btn_id = (ctx[0x1d] & 1) ? 0x2b47u : 0x2b2cu;
+        fn_800FB680(0, trailing_tx, -1, btn_id);
     }
 
     fn_800FE35C();
@@ -8537,12 +8563,250 @@ extern void fn_80102138(void);
 extern void fn_801022B8(void);
 extern u32 lbl_8047A410;
 extern u32 lbl_8047A42C;
-extern u8 lbl_80266E90[];
+extern const u8 lbl_80266E90[];
 extern u32 lbl_8047A428;
 #if 1
-asm void fn_8002F284(void) {
-#include "src/game/gs_worldmap_fn_8002F284.inc"
+#pragma peephole off
+void fn_8002F284(void)
+{
+    /* --- UI item-enable dispatcher: fn_8005D8F8(u32 elementId, u32 val) --- */
+    extern void fn_8005D8F8(u32 id, u32 val);
+    /* --- party-collection accessor + per-member predicates --- */
+    extern void* fn_8012AC08(u8* base, u16 idx);   /* idx-th party member object */
+    extern u32   fn_8011E850(u8* mon);             /* eligibility predicate A */
+    extern u32   fn_80123FBC(u8* mon);             /* eligibility predicate B */
+    extern u32   fn_80075FEC(u8* mon);             /* global-state gate (==1) */
+    /* --- scene/object (id 0xD9) management (gs_model.c family) --- */
+    extern s32   fn_801023E4(void* p);             /* present? (>=0) / -1 absent */
+    extern s32   fn_80102138(void* p, u32 param);  /* lazy load -> handle/result */
+    extern void  fn_801021F8(void* p, u32 val);    /* set visibility on subtree */
+    extern u8    fn_80103CC0(u8 mode);             /* push render mode, ret old */
+    extern u32   fn_801046B8(void);                /* current context handle */
+    extern void  fn_801026A4(void* p, u32 a, ...); /* submit/build */
+    extern void* fn_80104704(s32 p);               /* resolve node by id */
+    extern void* fn_801046C8(void* head, s32 key); /* find child node by key */
+    extern void  fn_80109220(void* node, u32 enable); /* enable flag on node */
+    extern void  fn_801045A8(void* p, u8 flags);   /* show/commit object */
+    extern s32   fn_80102004(void);                /* arrival/joint-count query */
+    extern void  fn_80106D3C(s32 a, s32 b, s32 c, s32 d); /* trigger arrival fx */
+    extern void  fn_80102510(s32 p);               /* unload/release object */
+    extern s32   fn_801043A4(s32 param);           /* dest id */
+    extern s32   fn_801022B8(s32 p);               /* map key */
+
+    /* --- small-data globals --- */
+    extern u32 lbl_8047A410;  /* canonical; per-site reinterpret cast */
+    extern u32 lbl_8047A428;  /* canonical; per-site reinterpret cast */
+    extern u32 lbl_8047A42C;  /* canonical; per-site reinterpret cast */
+    /* --- party base + destination table --- */
+    extern u8  lbl_803A2688[]; /* party / context base block */
+    extern const u8 lbl_80266E90[]; /* destination table, 12 * 0x12-byte entries */
+
+    u8*  partyBase;
+    void* mon;
+    void* lastMon;
+    s32  eligible;
+    s32  local8;          /* frame local at 0x8(sp); fn_80102138 result / flag */
+    void* node;
+    void* child;
+    s32  destId;          /* fn_801043A4 result (treated as s32) */
+    s32  mapKey;          /* fn_801022B8 result (table lookup key) */
+    s32  resolvedMapId;   /* table-scan result, default 0 */
+    s32  stateValue;
+    u32  predicate;
+    register const u8* ent;
+    s32  e;
+
+    local8 = 0;
+    partyBase = lbl_803A2688;
+
+    /* Re-enable the six fixed world-map menu element IDs. */
+    fn_8005D8F8(0x1005, 0);
+    fn_8005D8F8(0x1002, 0);
+    fn_8005D8F8(0x1004, 0);
+    fn_8005D8F8(0x1001, 0);
+    fn_8005D8F8(0x1003, 0);
+    fn_8005D8F8(0x1000, 0);
+
+    /* Slot 0: eligibility -> menu element 0xFFF. */
+    mon = fn_8012AC08(partyBase, 0);
+    predicate = (u8)fn_8011E850((u8*)mon);
+    if (predicate > 0U) {
+        eligible = 1;
+    } else {
+        predicate = (u8)fn_80123FBC((u8*)mon);
+        if (predicate > 0U && (u8)fn_80075FEC((u8*)mon) == 1) {
+            eligible = 1;
+        } else {
+            eligible = 0;
+        }
+    }
+    fn_8005D8F8(0xFFF, (u32)eligible);
+
+    /* Slot 1 -> menu element 0xFFC. */
+    mon = fn_8012AC08(partyBase, 1);
+    predicate = (u8)fn_8011E850((u8*)mon);
+    if (predicate > 0U) {
+        eligible = 1;
+    } else {
+        predicate = (u8)fn_80123FBC((u8*)mon);
+        if (predicate > 0U && (u8)fn_80075FEC((u8*)mon) == 1) {
+            eligible = 1;
+        } else {
+            eligible = 0;
+        }
+    }
+    fn_8005D8F8(0xFFC, (u32)eligible);
+
+    /* Slot 2 -> menu element 0xFFE. */
+    mon = fn_8012AC08(partyBase, 2);
+    predicate = (u8)fn_8011E850((u8*)mon);
+    if (predicate > 0U) {
+        eligible = 1;
+    } else {
+        predicate = (u8)fn_80123FBC((u8*)mon);
+        if (predicate > 0U && (u8)fn_80075FEC((u8*)mon) == 1) {
+            eligible = 1;
+        } else {
+            eligible = 0;
+        }
+    }
+    fn_8005D8F8(0xFFE, (u32)eligible);
+
+    /* Slot 3 -> menu element 0xFFB. */
+    mon = fn_8012AC08(partyBase, 3);
+    predicate = (u8)fn_8011E850((u8*)mon);
+    if (predicate > 0U) {
+        eligible = 1;
+    } else {
+        predicate = (u8)fn_80123FBC((u8*)mon);
+        if (predicate > 0U && (u8)fn_80075FEC((u8*)mon) == 1) {
+            eligible = 1;
+        } else {
+            eligible = 0;
+        }
+    }
+    fn_8005D8F8(0xFFB, (u32)eligible);
+
+    /* Slot 4 -> menu element 0xFFD. */
+    mon = fn_8012AC08(partyBase, 4);
+    predicate = (u8)fn_8011E850((u8*)mon);
+    if (predicate > 0U) {
+        eligible = 1;
+    } else {
+        predicate = (u8)fn_80123FBC((u8*)mon);
+        if (predicate > 0U && (u8)fn_80075FEC((u8*)mon) == 1) {
+            eligible = 1;
+        } else {
+            eligible = 0;
+        }
+    }
+    fn_8005D8F8(0xFFD, (u32)eligible);
+
+    /* Slot 5 -> menu element 0xFFA. */
+    lastMon = fn_8012AC08(partyBase, 5);
+    predicate = (u8)fn_8011E850((u8*)lastMon);
+    if (predicate > 0U) {
+        eligible = 1;
+    } else {
+        predicate = (u8)fn_80123FBC((u8*)lastMon);
+        if (predicate > 0U && (u8)fn_80075FEC((u8*)lastMon) == 1) {
+            eligible = 1;
+        } else {
+            eligible = 0;
+        }
+    }
+    fn_8005D8F8(0xFFA, (u32)eligible);
+
+    /* Ensure destination object 0xD9 is loaded.  Lazy-load when either the
+     * "already initialized" flag is set, or the object is not yet present. */
+    if ((*(u8*)&lbl_8047A410) != 0 || fn_801023E4((void*)0xD9) == 0) {
+        local8 = fn_80102138((void*)0xD9, 0xFFF);
+        (*(u8*)&lbl_8047A410) = 0;
+    }
+
+    fn_801021F8((void*)0xD9, 1);
+    fn_80103CC0(2);
+
+    /* Build/submit the object; the nonzero-local path passes &local8. */
+    if (local8 != 0) {
+        fn_801026A4((void*)0xD9, fn_801046B8(), &local8, 0, (void*)0, 0);
+    } else {
+        fn_801026A4((void*)0xD9, fn_801046B8(), (void*)0, 0, (void*)0, 0);
+    }
+
+    /* Resolve the object node and poke its child (key 0x10B2). */
+    node = fn_80104704(0xD9);
+    child = fn_801046C8(node, 0x10B2);
+    if (node != (void*)0 && child != (void*)0) {
+        fn_80109220(child, 1);
+        *(u32*)((u8*)child + 0x4C) = 0x43D9;
+    }
+
+    fn_801045A8((void*)0xD9, 1);
+    fn_80103CC0(1);
+
+    /* Early "already arrived" branch. */
+    if (fn_80102004() == 1) {
+        fn_80106D3C(2, 0x4448, 1, 0);
+        fn_80102510(0xD9);
+        (*(s32*)&lbl_8047A42C) = 0;
+        return;
+    }
+
+    /* Otherwise resolve the chosen destination id. */
+    destId = fn_801043A4(0xD9);
+    resolvedMapId = 0;
+
+    /* Scan the 12-entry destination table for the map key returned by
+     * fn_801022B8(0xD9).  Each entry is 0x12 bytes: key halfword at +0x10,
+     * resolved map id byte at +0x01. */
+    mapKey = fn_801022B8(0xD9);
+    for (e = 0; e < 12; e++) {
+        if (mapKey == (s32)*(u16*)(lbl_80266E90 + (e * 0x12) + 0x10)) {  /* ENDIAN-QA */
+            resolvedMapId = (s32)*(u8*)(lbl_80266E90 + (e * 0x12) + 0x01);
+        }
+    }
+
+    /* Special-case: travel key 0xFF9 maps to internal id 0x3E8. */
+    if (fn_801022B8(0xD9) == 0xFF9) {
+        resolvedMapId = 0x3E8;
+    }
+
+    /* destId == -1 forces the "invalid" sentinel result. */
+    stateValue = resolvedMapId;
+    if (destId == -1) {
+        stateValue = -1;
+    }
+
+    (*(s32*)&lbl_8047A428) = -1;
+
+    if (stateValue == 0x3E8) {
+        goto high_sentinel;
+    }
+    if (stateValue >= 0x3E8) {
+        goto valid_destination;
+    }
+    switch (stateValue) {
+    case -1:
+        goto invalid_sentinel;
+    default:
+        break;
+    }
+    goto valid_destination;
+
+invalid_sentinel:
+    (*(s32*)&lbl_8047A42C) = 9;
+    return;
+
+high_sentinel:
+    (*(s32*)&lbl_8047A42C) = 9;
+    return;
+
+valid_destination:
+    (*(s32*)&lbl_8047A428) = stateValue;
+    (*(s32*)&lbl_8047A42C) = 8;
 }
+#pragma peephole on
 #else
 /* fn_8002F284 - GSmap_LoadDestination (0x8002F284, 0x518 bytes)
  *
