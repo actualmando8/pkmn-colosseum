@@ -860,9 +860,19 @@ void fn_801C3FBC(s32 slot) {
  * fn_801C4078 - Get grid slot model pointer.
  * Address: 0x801C4078 | Size: 0x24
  */
+#pragma peephole off
 void* fn_801C4078(s32 slot) {
-    return NULL;
+    extern u8 lbl_80466E30[];
+    volatile u8* gridState = lbl_80466E30;
+
+    if (gridState[0] == 4) {
+        gridState[1] = 0;
+        gridState[0] = 0;
+    }
+
+    return (void*)gridState;
 }
+#pragma peephole on
 
 /**
  * fn_801C409C - Set grid slot occupied state.
@@ -901,36 +911,61 @@ void fn_801C41C8(s32 mode) {
 }
 
 /**
- * fn_801C423C - Camera view update with interpolation.
+ * fn_801C423C - Battle grid callback/state transition.
  * Address: 0x801C423C | Size: 0xE0
  */
-void fn_801C423C(f32 targetAngle, f32 speed) {
-    u8* cam = (u8*)lbl_80467030;
-    f32 currentAngle = *(f32*)(cam + 0x00);
-    f32 diff;
+#pragma peephole off
+void* fn_801C423C(void (*callback)(void), u8 mode, u32 arg, f32 value) {
+    extern u8 lbl_80466E30[];
+    extern volatile const f32 lbl_8047DFB8;
+    extern u32 fn_80109710(void);
+    extern void fn_800EF5A4(void* texture);
+    extern void fn_801C432C();
+    void* previous;
+    void (*savedCallback)(void);
+    u8* gridState;
+    u32 modeByte;
+    u32 argHalf;
 
-    /* Interpolate camera angle towards target */
-    diff = targetAngle - currentAngle;
+    savedCallback = callback;
+    if (callback == NULL) {
+        return *(void**)(lbl_80466E30 + 0xC);
+    }
 
-    /* Wrap angle difference to [-180, 180] */
-    while (diff > 180.0f) diff -= 360.0f;
-    while (diff < -180.0f) diff += 360.0f;
+    modeByte = (u8)mode;
+    argHalf = arg & 0xFFFF;
+    gridState = lbl_80466E30;
+    *(volatile u8*)(gridState + 1) = 1;
+    *(volatile u16*)(gridState + 2) = argHalf;
+    *(volatile f32*)(gridState + 0x14) = value;
+    *(volatile f32*)(gridState + 0x18) = lbl_8047DFB8;
+    *(volatile u8*)gridState = 0;
+    previous = *(void* volatile *)(gridState + 0xC);
+    *(void* volatile *)(gridState + 0xC) = NULL;
 
-    currentAngle += diff * speed;
+    if (modeByte == 1) {
+        fn_801C432C();
+    } else if (*(void* volatile *)(gridState + 0x10) != NULL) {
+        if (*(u32 volatile *)(lbl_80466E30 + 0x10) != fn_80109710()) {
+            fn_800EF5A4(*(void* volatile *)(lbl_80466E30 + 0x10));
+        }
+        *(void* volatile *)(lbl_80466E30 + 0x10) = NULL;
+    }
 
-    /* Wrap result to [0, 360] */
-    while (currentAngle >= 360.0f) currentAngle -= 360.0f;
-    while (currentAngle < 0.0f) currentAngle += 360.0f;
-
-    *(f32*)(cam + 0x00) = currentAngle;
+    fn_801C6928();
+    savedCallback();
+    return previous;
 }
+#pragma peephole on
 
 /**
  * fn_801C431C - Get camera current angle.
  * Address: 0x801C431C | Size: 0x10
  */
-f32 fn_801C431C(void) {
-    return 0.0f;
+void fn_801C431C(s32 arg0) {
+    extern u8 lbl_80466E30[];
+
+    *(s32*)(lbl_80466E30 + 0xC) = arg0;
 }
 
 /**
@@ -1003,9 +1038,13 @@ f32 fn_801C483C(s32 slot) {
  * fn_801C4864 - Grid get slot Z position.
  * Address: 0x801C4864 | Size: 0x28
  */
+#pragma scheduling off
 f32 fn_801C4864(s32 slot) {
-    return 0.0f;
+    extern f32 fn_801C54FC(void);
+
+    fn_801C431C((s32)fn_801C54FC);
 }
+#pragma scheduling on
 
 /**
  * fn_801C488C - Grid set slot X position.
@@ -1043,9 +1082,13 @@ void fn_801C4904(s32 slot, f32 x, f32 y, f32 z) {
  * fn_801C4974 - Grid get slot rotation.
  * Address: 0x801C4974 | Size: 0x28
  */
+#pragma scheduling off
 f32 fn_801C4974(s32 slot) {
-    return 0.0f;
+    extern f32 fn_801C5898(void);
+
+    fn_801C431C((s32)fn_801C5898);
 }
+#pragma scheduling on
 
 /**
  * fn_801C499C - Grid set slot rotation.
@@ -1059,9 +1102,13 @@ void fn_801C499C(s32 slot, f32 rotation) {
  * fn_801C49F4 - Grid get slot scale.
  * Address: 0x801C49F4 | Size: 0x28
  */
+#pragma scheduling off
 f32 fn_801C49F4(s32 slot) {
-    return 1.0f;
+    extern f32 fn_801C5ED0(void);
+
+    fn_801C431C((s32)fn_801C5ED0);
 }
+#pragma scheduling on
 
 /**
  * fn_801C4A1C - Grid set slot scale.
