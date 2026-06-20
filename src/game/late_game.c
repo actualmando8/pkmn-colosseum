@@ -4752,16 +4752,14 @@ s32 fn_80097BBC(u8 chan) {
     extern void* fn_8012AC08();
     extern int fn_80123FBC();
     extern int fn_8010B560();
-    s32 c;
     void* entity;
     void* mgr;
 
-    c = chan;
     entity = NULL;
-    if (c < 6) {
+    if (chan < 6) {
         mgr = fn_80129280(0, 2);
         if (mgr != 0) {
-            entity = fn_8012AC08(mgr, c);
+            entity = fn_8012AC08(mgr, chan);
             if ((u8)fn_80123FBC() == 0) {
                 entity = NULL;
             }
