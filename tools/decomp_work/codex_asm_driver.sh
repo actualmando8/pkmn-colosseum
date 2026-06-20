@@ -55,10 +55,12 @@ while true; do
     sf=$(cat "$STATE/$n.file" 2>/dev/null)
     [ -n "$sf" ] && RUN_PICKED="${RUN_PICKED}"$'\n'"${sf}"
   done
-  for n in $LANES; do SNAP[$n]=$(tmux capture-pane -p -t "${PANE[$n]}" 2>/dev/null | md5sum); done
+  # timeout-guard captures: an unbounded capture that hangs (degraded tmux) freezes the
+  # whole loop indefinitely. A timed-out capture just skips that lane this cycle.
+  for n in $LANES; do SNAP[$n]=$(timeout 8 tmux capture-pane -p -t "${PANE[$n]}" 2>/dev/null | md5sum); done
   sleep 2
   for n in $LANES; do
-    cap=$(tmux capture-pane -p -t "${PANE[$n]}" 2>/dev/null)
+    cap=$(timeout 8 tmux capture-pane -p -t "${PANE[$n]}" 2>/dev/null)
     # A lane RUNNING a turn shows "esc to interrupt" (both Claude & Codex TUIs). Never
     # treat such a pane as idle even if its screen was briefly static (slow compile /
     # thinking) — that false-positive is what made the driver fire a 2nd prompt onto a

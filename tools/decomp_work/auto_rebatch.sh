@@ -47,10 +47,13 @@ LANES="${ASM_LANES:-OPUS SON C1 C2}"
 # (instead of 2s sequentially per lane = ~20s) makes rebatch near-instant so
 # fast-finishing lanes don't sit idle between cycles.
 declare -A SNAP IDLE
-for name in $LANES; do SNAP[$name]=$(tmux capture-pane -p -t "${PANE[$name]}" 2>/dev/null | md5sum); done
+# timeout-guard EVERY tmux capture: an unbounded capture that hangs (degraded tmux) would
+# freeze the whole driver loop indefinitely (caused a 4h stall). A timed-out capture just
+# skips that lane this cycle.
+for name in $LANES; do SNAP[$name]=$(timeout 8 tmux capture-pane -p -t "${PANE[$name]}" 2>/dev/null | md5sum); done
 sleep 2
 for name in $LANES; do
-  cap=$(tmux capture-pane -p -t "${PANE[$name]}" 2>/dev/null)
+  cap=$(timeout 8 tmux capture-pane -p -t "${PANE[$name]}" 2>/dev/null)
   # A lane RUNNING a turn shows "esc to interrupt" (both Claude & Codex TUIs). Never treat
   # such a pane as idle even if its screen was briefly static (slow compile / thinking) —
   # that false-positive made the driver fire a 2nd prompt onto an already-working lane.
