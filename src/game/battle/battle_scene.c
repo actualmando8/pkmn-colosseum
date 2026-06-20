@@ -827,8 +827,8 @@ void fn_801CA358(s32 effectType, s32 slot) {
  * fn_801CA4D8 - Scene effect get active count.
  * Address: 0x801CA4D8 | Size: 0x20
  */
-s32 fn_801CA4D8(void) {
-    return 0;
+void fn_801CA4D8(void) {
+    fn_800E0C04();
 }
 
 /**
@@ -890,8 +890,8 @@ s32 fn_801CA728(s32 arg0) {
  * fn_801CA7AC - Scene get render frame count.
  * Address: 0x801CA7AC | Size: 0x20
  */
-u32 fn_801CA7AC(void) {
-    return 0;
+void fn_801CA7AC(s32 arg) {
+    fn_8006ADB4(arg);
 }
 
 /**
@@ -988,8 +988,11 @@ s32 fn_801CA9F0(void) {
  * fn_801CA9F8 - Scene set global state flag.
  * Address: 0x801CA9F8 | Size: 0x10
  */
-void fn_801CA9F8(u8 flag) {
-    /* Set global scene state flag */
+s32 fn_801CA9F8(s32 flag) {
+    extern u32 lbl_80478CB0;
+    s32 old = lbl_80478CB0;
+    lbl_80478CB0 = flag;
+    return old;
 }
 
 /* =========================================================================
@@ -1074,7 +1077,8 @@ void fn_801CADA8(s32 slot, s32 animA, s32 animB, f32 blend) {
  * Address: 0x801CAE80 | Size: 0x20
  */
 f32 fn_801CAE80(s32 slot) {
-    return 0.0f;
+    extern f32 fn_801E0F78(void);
+    return fn_801E0F78();
 }
 
 /**
@@ -1189,7 +1193,8 @@ void fn_801CB3B8(s32 slot, u8 visible) {
  * Address: 0x801CB3DC | Size: 0x20
  */
 u8 fn_801CB3DC(s32 slot) {
-    return 1;
+    extern u8 fn_800F7274(void);
+    return fn_800F7274();
 }
 
 /**
@@ -1550,16 +1555,16 @@ s32 fn_801D046C(void) {
  * fn_801D04D0 - Scene model pool clear entry.
  * Address: 0x801D04D0 | Size: 0x18
  */
-void fn_801D04D0(s32 idx) {
-    /* Clear model pool entry */
+u8 fn_801D04D0(void) {
+    return (*(u32*)(lbl_8047B3D4 + 0xc) == 0x31);
 }
 
 /**
  * fn_801D04E8 - Scene model pool get entry.
  * Address: 0x801D04E8 | Size: 0xC
  */
-void* fn_801D04E8(s32 idx) {
-    return NULL;
+u8 fn_801D04E8(void) {
+    return ((u8*)lbl_8047B3D4)[0x41];
 }
 
 /**
