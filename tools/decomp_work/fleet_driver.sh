@@ -7,6 +7,12 @@
 # clean Monitor stream. The lane list is read from build/fleet_lanes.txt EACH cycle,
 # so lanes can be added/removed live (e.g. bring Codex up at reset) without a restart.
 # Default lanes "OPUS SON"; GLM stays out (out of commission).
+#
+# TMUX-FREE (2026-06-20): this loop never runs a psmux client. Idle detection and
+# prompt delivery are owned by pane_io.sh (the sole tmux owner) via build/hb/*.state
+# and build/dispatch/*.req. REQUIRES pane_io.sh to be running — launch both detached
+# with tools/decomp_work/fleet_up.ps1, stop with fleet_down.ps1. Every python/git call
+# below is timeout-guarded so a stuck subprocess can never freeze the loop.
 cd "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../.." || exit 1
 export MSYS_NO_PATHCONV=1
 # SINGLETON GUARD: TaskStop kills the Monitor's grep but NOT this bash loop, so naive
@@ -27,20 +33,22 @@ while true; do
   i=$((i+1))
   lanes=$(tr -d '\r' < "$LANEFILE" | tr '\n' ' ' | sed 's/  */ /g')
   [ -n "$(echo "$lanes" | tr -d ' ')" ] || lanes="OPUS SON"
-  python tools/decomp_work/gen_bucket_queue.py >/tmp/fleet_q.txt 2>&1
+  timeout 40 python tools/decomp_work/gen_bucket_queue.py >/tmp/fleet_q.txt 2>&1
   bucket=$(grep -oE "ACTIVE-BUCKET=[A-Z]+ files=[0-9]+" /tmp/fleet_q.txt | head -1)
-  rb=$(ASM_LANES="$lanes" bash tools/decomp_work/auto_rebatch.sh 2>/dev/null | grep -c "^REBATCH")
+  # auto_rebatch is now TMUX-FREE (reads build/hb state, writes build/dispatch reqs);
+  # the timeout is a belt-and-braces backstop on its python sub-calls only.
+  rb=$(timeout 90 bash -c "ASM_LANES='$lanes' bash tools/decomp_work/auto_rebatch.sh" 2>/dev/null | grep -c "^REBATCH")
   gatemsg=""
   if [ $((i % GATE_EVERY)) -eq 0 ]; then
     # Detect commits by HEAD change — robust to auto_gate's output format. auto_gate
     # only gates files not currently band-locked, so a lane camping a file delays its
     # wins until the lock releases; gating every GATE_EVERY cycles catches them then.
-    before=$(git rev-parse HEAD 2>/dev/null)
-    g=$(bash tools/decomp_work/auto_gate.sh 2>&1)
-    after=$(git rev-parse HEAD 2>/dev/null)
+    before=$(timeout 10 git rev-parse HEAD 2>/dev/null)
+    g=$(timeout 240 bash tools/decomp_work/auto_gate.sh 2>&1)
+    after=$(timeout 10 git rev-parse HEAD 2>/dev/null)
     nfraud=$(echo "$g" | grep -ciE "fraud|reject")
     if [ -n "$before" ] && [ "$before" != "$after" ]; then
-      nc=$(git rev-list --count "$before..$after" 2>/dev/null)
+      nc=$(timeout 10 git rev-list --count "$before..$after" 2>/dev/null)
       nbe=$(echo "$g" | grep -oE "\+[0-9]+ byte-exact" | grep -oE "[0-9]+" | awk '{s+=$1} END{if(s)print s}')
       session=$((session + ${nc:-1}))
       gatemsg=" | GATED ${nc} commit(s) ${nbe:+(+${nbe} byte-exact)}"
