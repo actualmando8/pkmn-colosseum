@@ -1758,10 +1758,12 @@ void fn_8010C224(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #pragma scheduling off
+#pragma scheduling off
 s32 fn_8010C364(void) {
     fn_800EF5A4();
     return 1;
 }
+#pragma scheduling on
 #pragma scheduling on
 #pragma pop
 
