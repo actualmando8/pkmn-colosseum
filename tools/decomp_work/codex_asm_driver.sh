@@ -24,6 +24,16 @@ file_complete() {  # <stem> <fns...>
   local fn; for fn in "$@"; do grep -q "$fn" "$wins" 2>/dev/null || return 1; done
   return 0
 }
+# echo only fns NOT already saved in band_wins for this stem — so we never hand an agent
+# already-matched work to re-verify (token waste). Empty output => the whole file is done.
+pending_fns() {  # <stem> <fns...>
+  local stem="$1"; shift; local wins="build/band_wins/pl_${stem}.json" fn out=""
+  for fn in "$@"; do
+    [ -f "$wins" ] && grep -q "$fn" "$wins" 2>/dev/null && continue
+    out="$out $fn"
+  done
+  echo "${out# }"
+}
 echo "[codex_asm_driver] up — lanes:[$LANES] from $QUEUE, interval ${INTERVAL}s, sticky (cap ${CONT_CAP}) from-scratch asm->C"
 while true; do
   if [ ! -s "$QUEUE" ]; then echo "[$(date +%H:%M)] ASM queue empty — regenerate build/asm_codex_queue.txt"; sleep "$INTERVAL"; continue; fi
@@ -45,6 +55,11 @@ while true; do
     # thinking) — that false-positive is what made the driver fire a 2nd prompt onto a
     # working lane. Idle = NO interrupt indicator AND byte-static over the 2s window.
     if echo "$cap" | tr -d ' ' | grep -qiE "esctoint"; then IDLE[$n]=0; continue; fi
+    # A RATE-LIMITED / usage-capped pane is "idle" (no turn running) but CANNOT do work —
+    # dispatching onto it just queues dead prompts that retry forever. Skip such lanes.
+    if echo "$cap" | grep -qiE "rate.?limit|usage limit|limit reached|too many request|try again (in|at|later)|resets? (at|in)|reached your|x402|429 "; then
+      echo "[$(date +%H:%M)] RATE-LIMITED $n — skipping (no dispatch)"; IDLE[$n]=0; continue
+    fi
     [ "${SNAP[$n]}" = "$(echo "$cap" | md5sum)" ] && IDLE[$n]=1 || IDLE[$n]=0
   done
   for n in $LANES; do
@@ -61,23 +76,27 @@ while true; do
       else
         cnt=$((cnt+1)); echo "$cnt" > "$STATE/$n.cnt"
         RUN_PICKED="${RUN_PICKED}"$'\n'"${curfile}"
-        prompt="CONTINUE iterating $curfile (TAG $tag). Your prior C in the band scratch is PRESERVED — build ON it, do NOT re-draft from m2c. band.py check to see current per-fn match%; for each fn below not yet 100%, diff the residual, run classify_residual.py $tag <fn>, apply the lever, and push the EXISTING scratch higher (named locals, no rNN). Each turn must raise the %, not reset it. At 100% band.py save. fns: $curfns. Report SAVED/WALL/SKIP per fn; say FILE-DONE when all resolved."
+        pend=$(pending_fns "$stem" $curfns)   # drop already-saved fns from the ask
+        prompt="CONTINUE iterating $curfile (TAG $tag). Your prior C in the band scratch is PRESERVED — build ON it, do NOT re-draft from m2c. band.py check to see current per-fn match%; for each fn below not yet 100%, diff the residual, run classify_residual.py $tag <fn>, apply the lever, and push the EXISTING scratch higher (named locals, no rNN). Each turn must raise the %, not reset it. At 100% band.py save. fns (NOT-yet-saved only): $pend. Report SAVED/WALL/SKIP per fn; say FILE-DONE when all resolved."
         ./tools/decomp_work/tmux_control/control.sh "${SEND[$n]}" "$prompt" >/dev/null 2>&1
         echo "[$(date +%H:%M)] ASM-CONTINUE $n -> $stem (turn $cnt/$CONT_CAP)"
         continue
       fi
     fi
-    # assign a NEW file (lane has none, or just rotated off)
-    line=""
+    # assign a NEW file (lane has none, or just rotated off). Skip files whose target fns
+    # are ALL already saved (band_wins) — re-handing matched work just burns tokens.
+    file=""; fns=""
     while IFS= read -r l; do
       [ -n "$l" ] || continue
       f=$(echo "$l" | awk '{print $1}')
       echo "$LOCKS" | grep -qxF "$f" && continue
       printf '%s\n' "$RUN_PICKED" | grep -qxF "$f" && continue
-      line="$l"; break
+      cstem=$(basename "$f" .c); cand=$(echo "$l" | cut -d' ' -f2-)
+      pend=$(pending_fns "$cstem" $cand)
+      [ -z "$pend" ] && continue          # whole file already saved -> skip
+      file="$f"; fns="$pend"; break
     done < "$QUEUE"
-    [ -n "$line" ] || { echo "[$(date +%H:%M)] ASM-QUEUE: $n idle, all files locked/taken"; continue; }
-    file=$(echo "$line" | awk '{print $1}'); fns=$(echo "$line" | cut -d' ' -f2-)
+    [ -n "$file" ] || { echo "[$(date +%H:%M)] ASM-QUEUE: $n idle, no file with unsaved fns (locked/done)"; continue; }
     stem=$(basename "$file" .c); tag="pl_${stem}"
     RUN_PICKED="${RUN_PICKED}"$'\n'"${file}"
     echo "$file" > "$STATE/$n.file"; echo "$fns" > "$STATE/$n.fns"; echo 0 > "$STATE/$n.cnt"

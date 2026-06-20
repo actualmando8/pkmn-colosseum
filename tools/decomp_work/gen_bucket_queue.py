@@ -6,10 +6,30 @@ when a bucket is fully attempted. Run before each auto_rebatch pass.
 
 Priority (value-descending): NEARWALL -> STRUCT -> ASM -> LOW
 """
-import json, os, sys
+import json, os, re, sys
 from collections import defaultdict
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 LED = os.path.join(ROOT, "build", "wall_ledger.json")
+WINS_DIR = os.path.join(ROOT, "build", "band_wins")
+_FN_RE = re.compile(r"fn_[0-9A-Fa-f]{8}")
+
+
+def load_saved():
+    """Every fn already SAVED (>=100%) lands in build/band_wins/<tag>.json. Excluding
+    these stops the queue from re-handing already-matched work to agents (which burns
+    tokens re-verifying done fns). Structure-agnostic: scan the JSON text for fn ids."""
+    saved = set()
+    if os.path.isdir(WINS_DIR):
+        for f in os.listdir(WINS_DIR):
+            if f.endswith(".json"):
+                try:
+                    saved.update(_FN_RE.findall(open(os.path.join(WINS_DIR, f), encoding="utf-8").read()))
+                except OSError:
+                    pass
+    return saved
+
+
+SAVED = load_saved()
 QUEUE = os.path.join(ROOT, "build", "wall_queue.txt")
 ASSIGNED = os.path.join(ROOT, "build", "wall_assigned.txt")
 BAD = ("effect_util", "hsd_", "ui_core", "fsys_file", "gs_material", "pokemon", "gs_pokemon_summary")
@@ -24,6 +44,8 @@ def fresh_by_file(led, bucket):
     bf = defaultdict(list)
     for fn, v in led.items():
         if v["attempted"] or v["bucket"] != bucket:
+            continue
+        if fn in SAVED:            # already byte-exact (saved) — don't re-dispatch it
             continue
         if any(b in v["file"] for b in BAD):
             continue
