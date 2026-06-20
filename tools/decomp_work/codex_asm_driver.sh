@@ -29,6 +29,13 @@ while true; do
   if [ ! -s "$QUEUE" ]; then echo "[$(date +%H:%M)] ASM queue empty — regenerate build/asm_codex_queue.txt"; sleep "$INTERVAL"; continue; fi
   LOCKS=$(python tools/decomp_work/coordination/locks.py list 2>/dev/null | awk '{print $2}')
   declare -A SNAP IDLE; RUN_PICKED=""
+  # Protect EVERY lane's currently-owned file (busy lanes included) so an idle lane
+  # can't grab a file another lane is mid-conversion on (would clobber the shared band
+  # scratch). Seed the dedup set from all persisted lane state before any assignment.
+  for n in $LANES; do
+    sf=$(cat "$STATE/$n.file" 2>/dev/null)
+    [ -n "$sf" ] && RUN_PICKED="${RUN_PICKED}"$'\n'"${sf}"
+  done
   for n in $LANES; do SNAP[$n]=$(tmux capture-pane -p -t "${PANE[$n]}" 2>/dev/null | md5sum); done
   sleep 2
   for n in $LANES; do
