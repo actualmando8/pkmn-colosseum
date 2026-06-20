@@ -274,11 +274,16 @@ u32 fn_801143A0(void) { return 0; }
 
 /* 0x801143EC | 0x70 */
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801143EC(void) {
-    /* TODO: match -- 112 bytes at 0x801143EC */
+#pragma peephole off
+void* fn_801143EC(u32 resId, u32 param) {
+    void* result = fn_800F9318(resId, (param & 0x7FFF0000) | 0x400);
+    void* node = fn_801195AC(result);
+    if (node != (void*)0) {
+        fn_800F9378(node, resId, param, (void*)fn_801150B8);
+    }
+    return result;
 }
+#pragma peephole on
 #pragma pop
 
 /* 0x8011445C | 0x74 */
@@ -301,29 +306,45 @@ void fn_801145C0(void) {
 
 /* 0x80114634 | 0x70 */
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80114634(void) {
-    /* TODO: match -- 112 bytes at 0x80114634 */
+#pragma peephole off
+void* fn_80114634(u32 resId, u32 loadMode, u32 dataSize) {
+    void* buf;
+    u32 alignedSize = (dataSize + 0x1F) & ~0x1F;
+    buf = fn_800F9418(alignedSize, 0x20, resId, loadMode, (void*)0);
+    if (buf == (void*)0) {
+        fn_800DD970(lbl_802722B8, alignedSize);
+    }
+    return buf;
 }
+#pragma peephole on
 #pragma pop
 
 /* 0x801146A4 | 0x70 */
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801146A4(void) {
-    /* TODO: match -- 112 bytes at 0x801146A4 */
+#pragma peephole off
+void* fn_801146A4(u32 resId, u32 loadMode, u32 dataSize) {
+    void* buf;
+    u32 alignedSize = (dataSize + 0x1F) & ~0x1F;
+    buf = fn_800F9418(alignedSize, 0x20, resId, loadMode, (void*)0);
+    if (buf == (void*)0) {
+        fn_800DD970(lbl_802722F0, alignedSize);
+    }
+    return buf;
 }
+#pragma peephole on
 #pragma pop
 
 /* 0x80114714 | 0x4C */
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80114714(void) {
-    /* TODO: match -- 76 bytes at 0x80114714 */
+#pragma peephole off
+void* fn_80114714(void) {
+    void* result = fn_800F9318();
+    if (fn_800EFD3C(result) == 0) {
+        fn_800DD970(lbl_80272328);
+    }
+    return result;
 }
+#pragma peephole on
 #pragma pop
 
 /* 0x801147D4 | 0x34 */
