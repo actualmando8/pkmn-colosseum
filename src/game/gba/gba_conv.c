@@ -5670,6 +5670,12 @@ void fn_80088EA8(u8* p) {
 
 /* 0x80088F58 | size: 0x1C */
 s32 fn_80088F58(void) {
+    u32 count;
+
+    count = *(volatile u32*)&lbl_8047A66C;
+    count++;
+    *(volatile u32*)&lbl_8047A66C = count;
+    *(volatile u32*)&lbl_8047A668 = 0;
     return 0;
 }
 
