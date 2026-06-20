@@ -1,5 +1,5 @@
-<#
-  launch-decomp.ps1 — build the "decomp" tmux (psmux) cockpit, 9 panes:
+﻿<#
+  launch-decomp.ps1 - build the "decomp" tmux (psmux) cockpit, 9 panes:
 
      +-----------+-----------+-----------+-----------+
      | 0 PROXY   | 1 CODEX-1 | 2 CODEX-2 | 3 CODEX-3 |
@@ -9,13 +9,13 @@
      | 8 OPUS ORCHESTRATOR (you type here)          |
      +----------------------------------------------+
 
-  Fleet (codex-heavy — we have far more Codex headroom than Claude):
-  - pane 0  proxy    — local router (tools/llm-proxy/proxy.js); only GLM routes through it.
-  - panes 1-4 codex  — 4x Codex CLI (gpt-5.5). The workhorses.
-  - pane 5  glm      — Claude Code via the proxy, pinned glm-5.2[1m] (isolated config + key).
-  - pane 6  sonnet   — Claude Code Sonnet (DIRECT; Max bypasses the proxy — see note).
-  - pane 7  worker   — a 2nd Opus the orchestrator dispatches hard structural work to.
-  - pane 8  orch.    — the orchestrator Opus; the pane you're dropped into on attach.
+  Fleet (codex-heavy - we have far more Codex headroom than Claude):
+  - pane 0  proxy    - local router (tools/llm-proxy/proxy.js); only GLM routes through it.
+  - panes 1-4 codex  - 4x Codex CLI (gpt-5.5). The workhorses.
+  - pane 5  glm      - Claude Code via the proxy, pinned glm-5.2[1m] (isolated config + key).
+  - pane 6  sonnet   - Claude Code Sonnet (DIRECT; Max bypasses the proxy - see note).
+  - pane 7  worker   - a 2nd Opus the orchestrator dispatches hard structural work to.
+  - pane 8  orch.    - the orchestrator Opus; the pane you're dropped into on attach.
 
   NOTE (auth): Claude Max-subscription traffic ignores ANTHROPIC_BASE_URL and goes
   straight to claude.ai, so the Opus/Sonnet panes CANNOT be proxied and run DIRECT.
@@ -65,7 +65,7 @@ if ($glmKey) {
 # --- GLM isolated CLAUDE config dir ---
 # The GLM pane runs Claude Code in API-key mode pointed at the proxy. If it shares
 # the normal ~/.claude config it ALSO sees the claude.ai OAuth login, and Claude
-# warns "Both claude.ai and ANTHROPIC_API_KEY set · auth may not work" then throws
+# warns "Both claude.ai and ANTHROPIC_API_KEY set - auth may not work" then throws
 # 400 Authentication Failed (the dual-auth conflict, which also triggers a retry
 # storm that trips z.ai's rate limit). Fix: give GLM its OWN config dir with NO
 # .credentials.json, so it has a distinct identity and uses only the proxy key.
@@ -90,7 +90,7 @@ $codexCmd  = $cdRepo + ' && codex'
 $glmCmd    = $cdRepo + ' && set "CLAUDE_CONFIG_DIR=' + $glmConfigDir + '" && set "ANTHROPIC_BASE_URL=http://127.0.0.1:' + $Port + '" && set "ANTHROPIC_API_KEY=zai-proxy" && claude --model "glm-5.2[1m]" --dangerously-skip-permissions'
 # Sonnet + Opus run DIRECT (Max OAuth ignores the proxy; routing them through it is
 # pointless and risks the dual-auth conflict). Default ~/.claude config = Max login.
-$sonnetCmd = $cdRepo + ' && claude --model "sonnet" --dangerously-skip-permissions'   # NOT sonnet[1m] — the 1m beta throws an API error on this account
+$sonnetCmd = $cdRepo + ' && claude --model "sonnet" --dangerously-skip-permissions'   # NOT sonnet[1m] - the 1m beta throws an API error on this account
 $workerCmd = $cdRepo + ' && claude --model "opus[1m]" --dangerously-skip-permissions'   # worker Opus (dispatched)
 $orchCmd   = $cdRepo + ' && claude --model "opus[1m]" --dangerously-skip-permissions'   # orchestrator Opus (you type here)
 # Stage-C permuter: continuous annealer swarm in WSL (native mwcceppc). Auto-refills
@@ -193,11 +193,22 @@ if (-not $DryRun) {
   Write-Host "Wrote control registry: $reg" -ForegroundColor DarkGray
 }
 
+# auto-start the decomp fleet driver once the agents have booted. fleet_up.ps1 brings up
+# the wedge-proof tmux control (sole-owner pane_io + tmux-free driver); it only dispatches
+# to panes that read as idle, so a ~75s delay lets the agent TUIs finish booting first.
+if (-not $DryRun) {
+  Start-Process powershell -WindowStyle Hidden -ArgumentList @(
+    '-NoProfile','-ExecutionPolicy','Bypass','-Command',
+    "Start-Sleep 75; & '$repo\tools\decomp_work\fleet_up.ps1'"
+  )
+  Write-Host "Scheduled fleet_up (decomp driver) to start in ~75s" -ForegroundColor Cyan
+}
+
 # land the user in the orchestrator pane (captured id)
 & $tm select-pane -t $ORCH 2>$null
 
 Write-Host ""
-Write-Host "decomp cockpit built — diagram layout (col1 glm-proxy/permuter/glm-agent | col2 opus/sonnet | mid orchestrator | right 2x2 codex):" -ForegroundColor Green
+Write-Host "decomp cockpit built - diagram layout (col1 glm-proxy/permuter/glm-agent | col2 opus/sonnet | mid orchestrator | right 2x2 codex):" -ForegroundColor Green
 & $tm list-panes -t $Session -F '  pane #{pane_index}: @#{pane_left},#{pane_top} #{pane_id} cmd=#{pane_current_command}'
 Write-Host ""
 
