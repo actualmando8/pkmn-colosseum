@@ -10,8 +10,10 @@
 cd "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../.." || exit 1
 source tools/decomp_work/tmux_control/panes.env 2>/dev/null
 export MSYS_NO_PATHCONV=1
-declare -A SEND=( [C1]=send-codex-safe [C2]=send-codex2-safe [C3]=send-codex3-safe [C4]=send-codex4-safe [C5]=send-codex5-safe [C6]=send-codex6-safe [C7]=send-codex7-safe [C8]=send-codex8-safe [SON]=send-sonnet-safe [OPUS]=send-worker-safe [GLM]=send-glm-safe )
-declare -A PANE=( [C1]=$CODEX_PANE [C2]=$CODEX2_PANE [C3]=$CODEX3_PANE [C4]=$CODEX4_PANE [C5]=$CODEX5_PANE [C6]=$CODEX6_PANE [C7]=$CODEX7_PANE [C8]=$CODEX8_PANE [SON]=$SONNET_PANE [OPUS]=$WORKER_PANE [GLM]=$GLM_PANE )
+# NOTE: SON pane (%8) and OPUS2/OPUS3 are now OPUS workers (Sonnet retired 2026-06-20).
+# OPUS3 reuses the freed C3 pane (%9) via its send-codex3-safe sender (model-agnostic).
+declare -A SEND=( [C1]=send-codex-safe [C2]=send-codex2-safe [C3]=send-codex3-safe [C4]=send-codex4-safe [C5]=send-codex5-safe [C6]=send-codex6-safe [C7]=send-codex7-safe [C8]=send-codex8-safe [SON]=send-sonnet-safe [OPUS]=send-worker-safe [OPUS3]=send-codex3-safe [GLM]=send-glm-safe )
+declare -A PANE=( [C1]=$CODEX_PANE [C2]=$CODEX2_PANE [C3]=$CODEX3_PANE [C4]=$CODEX4_PANE [C5]=$CODEX5_PANE [C6]=$CODEX6_PANE [C7]=$CODEX7_PANE [C8]=$CODEX8_PANE [SON]=$SONNET_PANE [OPUS]=$WORKER_PANE [OPUS3]=$CODEX3_PANE [GLM]=$GLM_PANE )
 is_idle() { local a b; a=$(tmux capture-pane -p -t "$1" 2>/dev/null | md5sum); sleep 2; b=$(tmux capture-pane -p -t "$1" 2>/dev/null | md5sum); [ "$a" = "$b" ]; }
 locked_files() { python tools/decomp_work/coordination/locks.py list 2>/dev/null | awk '{print $2}'; }
 
