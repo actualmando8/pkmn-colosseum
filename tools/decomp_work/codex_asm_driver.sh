@@ -56,7 +56,7 @@ while true; do
       else
         cnt=$((cnt+1)); echo "$cnt" > "$STATE/$n.cnt"
         RUN_PICKED="${RUN_PICKED}"$'\n'"${curfile}"
-        prompt="CONTINUE converting $curfile (TAG $tag). For EACH target fn below not yet at 100%: refine the band scratch into faithful REAL C with NAMED locals (no rNN register-locals), band.py check; before any WALL run python tools/decomp_work/classify_residual.py $tag <fn>; at 100% band.py save. fns: $curfns. Report SAVED/WALL/SKIP per fn; when ALL are SAVED or conclusively WALL/SKIP say FILE-DONE."
+        prompt="CONTINUE iterating $curfile (TAG $tag). Your prior C in the band scratch is PRESERVED — build ON it, do NOT re-draft from m2c. band.py check to see current per-fn match%; for each fn below not yet 100%, diff the residual, run classify_residual.py $tag <fn>, apply the lever, and push the EXISTING scratch higher (named locals, no rNN). Each turn must raise the %, not reset it. At 100% band.py save. fns: $curfns. Report SAVED/WALL/SKIP per fn; say FILE-DONE when all resolved."
         ./tools/decomp_work/tmux_control/control.sh "${SEND[$n]}" "$prompt" >/dev/null 2>&1
         echo "[$(date +%H:%M)] ASM-CONTINUE $n -> $stem (turn $cnt/$CONT_CAP)"
         continue
@@ -77,7 +77,7 @@ while true; do
     RUN_PICKED="${RUN_PICKED}"$'\n'"${file}"
     echo "$file" > "$STATE/$n.file"; echo "$fns" > "$STATE/$n.fns"; echo 0 > "$STATE/$n.cnt"
     for fn in $fns; do python tools/decomp_work/wall_ledger.py mark "$fn" "$n/asm" >/dev/null 2>&1; done
-    prompt="FROM-SCRATCH asm->C (read docs/CRACK_LEVERS.md). File: $file  TAG: $tag  fns: $fns. These are active asm-wrappers (#if1 asm + #include .inc) needing a real C body. For EACH fn: run python tools/decomp_work/m2c_draft.py <fn> $file, then REWRITE the draft into faithful REAL C with NAMED locals + in-body externs — NEVER leave raw rNN register-locals (they pin the coloring). band.py init/check to measure; before filing any WALL run python tools/decomp_work/classify_residual.py $tag <fn>; at 100% band.py save (integrates by flipping #if1->#if0). NO asm{}/asm void/#include .inc fraud — a win must be real C. Stay on THIS file across turns until all targets are done. Report SAVED/WALL/SKIP per fn; say FILE-DONE when all targets are resolved."
+    prompt="ASM->C (read docs/CRACK_LEVERS.md). File: $file  TAG: $tag  fns: $fns. Run python tools/decomp_work/band.py init $tag $file — it is RESUME-SAFE: any prior C already in the scratch is PRESERVED (not wiped), so you build on accumulated progress across visits. Then band.py check $tag for current per-fn match%. For EACH target fn: if the scratch fn is still the raw asm-wrapper (~0%), m2c_draft + write faithful REAL C with NAMED locals + in-body externs (no rNN register-locals, no asm/.inc fraud); if it ALREADY has partial C (>0%), ITERATE it toward 100% — diff the residual, run classify_residual.py $tag <fn>, apply the lever. Every turn must RAISE the scratch %, never restart it. At 100% band.py save (flips #if1->#if0). Report SAVED/WALL/SKIP per fn; say FILE-DONE when all targets resolved."
     ./tools/decomp_work/tmux_control/control.sh "${SEND[$n]}" "$prompt" >/dev/null 2>&1
     echo "[$(date +%H:%M)] ASM-DISPATCH $n -> $stem (${fns%% *} +$(($(echo $fns | wc -w)-1)) more)"
   done

@@ -192,7 +192,7 @@ def _rows(tag, st):
     j = objdiff_json(tag, st)
     rows = {}
     for s in j.get("right", {}).get("symbols", []):
-        if s.get("kind") == "SYMBOL_FUNCTION" and s.get("name", "").startswith("fn_"):
+        if s.get("kind") == "SYMBOL_FUNCTION":
             rows[s["name"]] = float(s.get("match_percent") or 0.0)
     return rows
 
@@ -200,7 +200,7 @@ def _rows(tag, st):
 # --------------------------------------------------------------------------- #
 # Commands                                                                     #
 # --------------------------------------------------------------------------- #
-def cmd_init(tag, srcname, config_from=None):
+def cmd_init(tag, srcname, config_from=None, reset=False):
     src_path = resolve_source(srcname)
     # Flags/version/target come from `config_from` when given (e.g. integrating a
     # build/band_*_integrated.c temp file whose stem isn't in compile_config.json —
@@ -212,19 +212,24 @@ def cmd_init(tag, srcname, config_from=None):
         sys.exit(f"target object missing: {target_o}")
     SCRATCH.mkdir(parents=True, exist_ok=True)
     dst = scratch_c(tag)
-    # Non-destructive init: if a scratch with in-progress work already exists (differs
-    # from canon), back it up before overwriting. A post-compact / accidental re-init
-    # must NOT silently wipe an agent's drafts.
-    try:
-        if dst.exists() and dst.read_bytes() != src_path.read_bytes():
+    # RESUME-SAFE init: if a scratch with in-progress work already exists (differs from
+    # canon), PRESERVE it and only refresh the state/lock/config below — so a lane
+    # returning to a file keeps its accumulated C and iterates it toward 100% instead of
+    # restarting from the raw asm-wrapper every visit. Pass --reset to force a fresh copy
+    # from canon. A timestamped backup is always taken before either path.
+    has_progress = dst.exists() and dst.read_bytes() != src_path.read_bytes()
+    if has_progress:
+        try:
             bdir = SCRATCH / "_backups"
             bdir.mkdir(exist_ok=True)
             ts = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
             shutil.copyfile(dst, bdir / f"band_{tag}.{ts}.c")
-            print(f"  (init: backed up existing scratch -> _backups/band_{tag}.{ts}.c)")
-    except OSError:
-        pass
-    shutil.copyfile(src_path, dst)
+        except OSError:
+            pass
+    if has_progress and not reset:
+        print(f"  (init: PRESERVING in-progress scratch — iterate it; use --reset for fresh)")
+    else:
+        shutil.copyfile(src_path, dst)
     state = {
         "src": str(src_path.relative_to(ROOT)).replace("\\", "/"),
         "src_abs": str(src_path),
@@ -233,7 +238,8 @@ def cmd_init(tag, srcname, config_from=None):
         "compiler": version,
     }
     state_path(tag).write_text(json.dumps(state, indent=1), encoding="utf-8")
-    print(f"created {scratch_c(tag).relative_to(ROOT)} from {state['src']}")
+    verb = "resumed" if (has_progress and not reset) else "created"
+    print(f"{verb} {scratch_c(tag).relative_to(ROOT)} from {state['src']}")
     print(f"  compiler GC/{version}  target {Path(target_o).name}")
     print(f"  cflags: {' '.join(cflags)}")
     _lock_acquire_file(tag, state["src"])
@@ -534,12 +540,13 @@ def main():
     tag = sys.argv[2]
     if cmd == "init":
         if len(sys.argv) < 4:
-            sys.exit("usage: band.py init <tag> <src/file.c> [--config-from <src>]")
+            sys.exit("usage: band.py init <tag> <src/file.c> [--config-from <src>] [--reset]")
         config_from = None
         if "--config-from" in sys.argv:
             i = sys.argv.index("--config-from")
             config_from = sys.argv[i + 1] if i + 1 < len(sys.argv) else None
-        cmd_init(tag, sys.argv[3], config_from)
+        reset = "--reset" in sys.argv
+        cmd_init(tag, sys.argv[3], config_from, reset=reset)
     elif cmd == "check":
         cmd_check(tag, sys.argv[3:])
     elif cmd == "json":
