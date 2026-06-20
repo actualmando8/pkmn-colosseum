@@ -138,7 +138,7 @@ extern u8 lbl_803B6D68[];
 
 /* ===== Forward declarations ===== */
 void fn_80069C0C(void);
-void fn_8006A65C(void);
+u16 fn_8006A65C(void);
 void fn_8006A718(void);
 u8 fn_8006A76C(void);
 void fn_8006A79C(u8* p);
@@ -197,7 +197,7 @@ void fn_8006CCC0(void);
 void fn_8006D550(void);
 void fn_8006D940(void);
 void fn_8006D98C(void);
-void fn_8006DAE4(void);
+void fn_8006DAE4(void* arg0);
 void fn_8006DC28(void);
 void fn_8006E0CC(void);
 u32 fn_8006E128(u8* p);
@@ -963,58 +963,31 @@ void fn_80069C0C(void) {
 
 
 /* 0x8006A65C | size: 0xBC */
-void fn_8006A65C(void) {
-    extern void fn_80069C0C();
-    extern void fn_80129280();
-    extern void fn_801657D0();
-    extern void fn_801906A0();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r31 = 0;
+#pragma scheduling off
+u16 fn_8006A65C(void) {
+    extern void* fn_80129280(int, int);
+    extern void fn_801657D0(int);
+    extern void fn_80088EA8(void*);
+    extern u32 fn_801906A0(int);
+    extern void fn_80069C0C(void*);
+    extern void fn_800FF730(int);
+    extern void _threadSwitch(void);
+    void* menuPtr;
+    u32 x;
 
-    
-    r3 = 0x0;
-    r4 = 0xe;
-    fn_80129280();
-    r31 = r3 + (0x1 << 16);
-    r3 = 0x3e8;
-    /* subi r31, r31, 0x3658 */;
-    fn_801657D0();
-    r3 = r31;
-    ((void(*)(void))fn_80088EA8)();
-    r3 = 0xb59;
-    fn_801906A0();
-    r31 = r3;
-    r3 = 0x0;
-    r4 = 0xe;
-    fn_80129280();
-    *(u32*)((u8*)r3 + 0x14) = r31;
-    r31 = 0x6;
-    r3 = 0x0;
-    r4 = 0xe;
-    fn_80129280();
-    *(u32*)((u8*)r3 + 0xC) = r31;
-    r31 = 0x1;
-    r3 = 0x0;
-    r4 = 0xe;
-    fn_80129280();
-    *(u32*)((u8*)r3 + 0x0) = r31;
-    r3 = 0x0;
-    r4 = 0xe;
-    fn_80129280();
-    fn_80069C0C();
-    r3 = 0x397;
-    ((void(*)(void))fn_800FF730)();
-    ((void(*)(void))_threadSwitch)();
-    r3 = 0x0;
-    r4 = 0xe;
-    fn_80129280();
-    r0 = *(u32*)((u8*)r3 + 0x20);
-    r3 = r0 & 0xFFFF;
-    return;
+    menuPtr = (u8*)fn_80129280(0, 0xe) + 0xC9A8;
+    fn_801657D0(0x3e8);
+    fn_80088EA8(menuPtr);
+    x = fn_801906A0(0xb59);
+    *(u32*)((u8*)fn_80129280(0, 0xe) + 0x14) = x;
+    *(u32*)((u8*)fn_80129280(0, 0xe) + 0xc) = 6;
+    *(u32*)((u8*)fn_80129280(0, 0xe) + 0x0) = 1;
+    fn_80069C0C(fn_80129280(0, 0xe));
+    fn_800FF730(0x397);
+    _threadSwitch();
+    return (u16) * (u32*)((u8*)fn_80129280(0, 0xe) + 0x20);
 }
+#pragma scheduling reset
 
 
 /* 0x8006A718 | size: 0x54 */
@@ -4652,97 +4625,50 @@ void fn_8006D98C(void) {
 
 
 /* 0x8006DAE4 | size: 0x144 */
-void fn_8006DAE4(void) {
-    extern void fn_80070D84();
-    extern void fn_80109220();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+#pragma peephole off
+void fn_8006DAE4(void* arg0) {
+    extern void* fn_801040D0(void*, int);
+    extern void* fn_801046C8(void*, int);
+    extern void fn_80102868(int, int, s16);
+    extern u32 fn_800FA444(void*);
+    extern void fn_80109220(void*, int);
+    extern void fn_80070D84(void*, void*, int);
+    void* a;
+    void* b;
+    void* c;
+    void* slot;
+    s32 d29;
+    s32 d27;
+    s16 cmp;
 
-    
-    r31 = r3;
-    r0 = *(u8*)((u8*)r31 + 0x2);
-    r0 = (s8)r0;
-    do {
-        if ((s32)r0 != (s32)0x0) break;
-        r0 = *(u8*)((u8*)r31 + 0x1);
-        r0 = (s8)r0;
-        if ((s32)r0 != (s32)0x0) {
-            break;
+    if ((s8)*(s8*)((u8*)arg0 + 0x2) == 0) {
+        if ((s8)*(s8*)((u8*)arg0 + 0x1) == 0) {
+            a = fn_801040D0(arg0, 0);
+            b = fn_801040D0(arg0, 1);
+            c = fn_801040D0(arg0, 2);
+            fn_80102868(0xd6, 0, (s16)(s32)fn_801040D0(arg0, 3));
+            slot = fn_801046C8(arg0, 0xe8c);
+            *(u32*)((u8*)slot + 0x4c) = (u32)a;
+            slot = fn_801046C8(arg0, 0xe8d);
+            *(u32*)((u8*)slot + 0x4c) = (u32)b;
+            cmp = (s16)(u16)fn_800FA444(c);
+            d29 = 0;
+            d27 = 0;
+            if (cmp > 0x32) {
+                d29 = -0x14;
+                d27 = -0xa;
+            }
+            slot = fn_801046C8(arg0, 0xe8a);
+            *(u32*)((u8*)slot + 0x4c) = (u32)c;
+            *(s16*)((u8*)slot + 0x52) = *(s16*)((u8*)slot + 0x52) + d29;
+            slot = fn_801046C8(arg0, 0xe87);
+            fn_80109220(slot, c != 0);
+            *(s16*)((u8*)slot + 0x52) = *(s16*)((u8*)slot + 0x52) + d27;
         }
-        r4 = 0x0;
-        ((void(*)(void))fn_801040D0)();
-        r29 = r3;
-        r3 = r31;
-        r4 = 0x1;
-        ((void(*)(void))fn_801040D0)();
-        r30 = r3;
-        r3 = r31;
-        r4 = 0x2;
-        ((void(*)(void))fn_801040D0)();
-        r0 = r3;
-        r3 = r31;
-        r28 = r0;
-        r4 = 0x3;
-        ((void(*)(void))fn_801040D0)();
-        r5 = (s16)r3;
-        r3 = 0xd6;
-        r4 = 0x0;
-        ((void(*)(void))fn_80102868)();
-        r3 = r31;
-        r4 = 0xe8c;
-        ((void(*)(void))fn_801046C8)();
-        *(u32*)((u8*)r3 + 0x4C) = r29;
-        r3 = r31;
-        r4 = 0xe8d;
-        ((void(*)(void))fn_801046C8)();
-        *(u32*)((u8*)r3 + 0x4C) = r30;
-        r3 = r28;
-        ((void(*)(void))fn_800FA444)();
-        r0 = r3 & 0xFFFF;
-        r29 = 0x0;
-        r0 = (s16)r0;
-        r27 = 0x0;
-        if ((s32)r0 > (s32)0x32) {
-            r29 = -0x14;
-            r27 = -0xa;
-        }
-        r3 = r31;
-        r4 = 0xe8a;
-        ((void(*)(void))fn_801046C8)();
-        *(u32*)((u8*)r3 + 0x4C) = r28;
-        r4 = 0xe87;
-        r0 = *(s16*)((u8*)r3 + 0x52);
-        r0 = r0 + r29;
-        r0 = (s16)r0;
-        *(u16*)((u8*)r3 + 0x52) = r0;
-        r3 = r31;
-        ((void(*)(void))fn_801046C8)();
-        r0 = -r28;
-        r30 = r3;
-        r0 = r0 | r28;
-        r4 = (u32)r0 >> 31;
-        fn_80109220();
-        r0 = *(s16*)((u8*)r30 + 0x52);
-        r0 = r0 + r27;
-        r0 = (s16)r0;
-        *(u16*)((u8*)r30 + 0x52) = r0;
-    } while (0);
-    r4 = (u32)&lbl_8026860C;
-    r3 = r31;
-    r4 = (u32)&lbl_8026860C;
-    r5 = 0x8;
-    fn_80070D84();
-    return;
+    }
+    fn_80070D84(arg0, lbl_8026860C, 8);
 }
+#pragma peephole reset
 
 
 /* 0x8006DC28 | size: 0x4A4 */
