@@ -30,6 +30,23 @@ def load_saved():
 
 
 SAVED = load_saved()
+
+
+def load_codex_files():
+    """Files the Codex ASM lanes own (build/asm_codex_queue.txt). Exclude them from the
+    Claude queue so an Opus lane never lands on a file a Codex lane is converting (they
+    share the per-tag band scratch -> would clobber each other)."""
+    p = os.path.join(ROOT, "build", "asm_codex_queue.txt")
+    files = set()
+    if os.path.exists(p):
+        for ln in open(p, encoding="utf-8"):
+            ln = ln.strip()
+            if ln:
+                files.add(ln.split()[0])
+    return files
+
+
+CODEX_FILES = load_codex_files()
 QUEUE = os.path.join(ROOT, "build", "wall_queue.txt")
 ASSIGNED = os.path.join(ROOT, "build", "wall_assigned.txt")
 BAD = ("effect_util", "hsd_", "ui_core", "fsys_file", "gs_material", "pokemon", "gs_pokemon_summary")
@@ -52,6 +69,8 @@ def fresh_by_file(led, bucket):
         if v["pct"] < MINPCT.get(bucket, 0.0):
             continue
         src = "src/" + v["file"] + ".c"
+        if src in CODEX_FILES:        # owned by a Codex ASM lane -> don't double-assign
+            continue
         if os.path.exists(os.path.join(ROOT, src)):
             bf[src].append((v["pct"], fn))
     return bf
