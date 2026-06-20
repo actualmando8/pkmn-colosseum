@@ -747,20 +747,17 @@ void fn_80130CE0(u16 maxEffects) {
     extern void* fn_800E27B0(u16);
     extern u32 fn_800FE834(u32, u32, u32, void*);
 
-    memHandle = fn_800E3534((int)maxEffects * sizeof(GSEffectInstance));
+    memHandle = fn_800E3534(maxEffects * sizeof(GSEffectInstance));
     gsEffectGlobals.memHandle = memHandle;
 
     if (memHandle != 0) {
         table = (GSEffectInstance*)fn_800E27B0(memHandle);
         gsEffectGlobals.instanceTable = table;
-        memset(table, 0, (int)maxEffects * sizeof(GSEffectInstance));
-
+        memset(table, 0, maxEffects * sizeof(GSEffectInstance));
         gsEffectGlobals.freeListHead = table;
-
         table->prev = NULL;
         table->next = table + 1;
         table->id = 1;
-
         entry = table + 1;
         for (cnt = 1; cnt < maxEffects - 1; cnt++) {
             entry->prev = entry - 1;
@@ -768,25 +765,19 @@ void fn_80130CE0(u16 maxEffects) {
             entry->id = cnt + 1;
             entry++;
         }
-
         entry->prev = entry - 1;
         entry->next = NULL;
         entry->id = maxEffects;
         entry->state = GSEFFECT_STATE_UNINIT;
-
         *(volatile u32*)&gsEffectGlobals.maxEffects = (u32)maxEffects;
     } else {
         gsEffectGlobals.instanceTable = NULL;
         gsEffectGlobals.freeListHead = NULL;
         gsEffectGlobals.maxEffects = 0;
     }
-
     gsEffectGlobals.activeListHead = NULL;
-
     lbl_8047ADC0 = fn_800FE834(1, 0x7F, 0, (void*)fn_80130F68);
-
     fn_801E12A0();
-
     fn_800FE834(1, 0x80, 0, (void*)fn_80130F04);
 }
 
