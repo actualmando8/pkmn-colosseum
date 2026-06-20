@@ -15354,55 +15354,35 @@ asm void fn_801ED680(void) {
 #include "src/game/battle/battle_logic_fn_801ED680.inc"
 }
 #else
-void fn_801ED680(void) {
-    extern u8 lbl_8046D630[];
+void fn_801ED680(void *arg0) {
+    extern u32 lbl_8046D630[];
     extern u8 lbl_8047B5C0;
-    extern u32 lbl_8047B5C4;
-    extern u32 lbl_8047B5C8;
-    extern void fn_800EFD3C();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f0 = 0.0f;
+    extern void *lbl_8047B5C4;
+    extern u8 *lbl_8047B5C8;
+    extern void *fn_800EFD3C(void *);
+    s32 i;
+    u8 *entry;
+    u8 *records;
+    void *res;
 
-    r28 = r3;
-    lbl_8047B5C4 = r28;
-    r3 = *(u32*)((u8*)r3 + 0x0);
-    /* subis tmp, r3, 0x7b1e */;
-    if (tmp == 0xe3f0) {
-        r4 = r28 + 0x1c;
-        r3 = (u32)lbl_8046D630;
-        lbl_8047B5C8 = r4;
-        r31 = (u32)lbl_8046D630;
-        r30 = 0x0;
-        tmp = *(u16*)((u8*)r28 + 0x6);
-        tmp = tmp * 0xc;
-        r29 = r4 + tmp;
-        while (1) {
-            r3 = lbl_8047B5C4;
-            tmp = *(u16*)((u8*)r3 + 0x4);
-            if ((s32)r30 >= (s32)tmp) break;
-            tmp = *(u32*)((u8*)r29 + 0x4);
-            tmp = tmp + r28;
-            *(u32*)((u8*)r29 + 0x4) = tmp;
-            r3 = *(u32*)((u8*)r29 + 0x4);
-            fn_800EFD3C();
-            if (r3 == 0) break;
-            tmp = *(u16*)((u8*)r29 + 0x0);
-            r29 = r29 + 0x8;
-            r30 = r30 + 0x1;
-            tmp = tmp << 2;
-            *(u32*)(r31 + tmp) = r3;
+    lbl_8047B5C4 = arg0;
+    if (*(u32 *)arg0 == 0x7B1EE3F0) {
+        records = (u8 *)arg0 + 0x1C;
+        lbl_8047B5C8 = records;
+        i = 0;
+        entry = records + *(u16 *)((u8 *)arg0 + 6) * 0xC;
+        while (i < *(u16 *)((u8 *)lbl_8047B5C4 + 4)) {
+            *(u32 *)(entry + 4) += (u32)arg0;
+            res = fn_800EFD3C(*(void **)(entry + 4));
+            if (res == 0) {
+                break;
+            }
+            lbl_8046D630[*(u16 *)entry] = (u32)res;
+            entry += 8;
+            i++;
         }
     }
-    tmp = 0x1;
-    lbl_8047B5C0 = tmp;
-    return;
+    lbl_8047B5C0 = 1;
 }
 #endif
 

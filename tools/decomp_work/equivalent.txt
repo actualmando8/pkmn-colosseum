@@ -65,3 +65,5 @@ fn_8000C824   # gs_party_access — branch-topology (bge call;b) wall; 98.33% re
 fn_8000C92C   # gs_party_access — same branch-topology wall; 98.33% real C, salvaged 2026-06-18
 fn_8000BFA0   # gs_party_access — reg/scheduling wall; 95.04% real C, salvaged 2026-06-18
 fn_8000DEC4   # gs_npc_interact — reg-alloc wall; 94.77% real C, salvaged 2026-06-18
+fn_80200E00   # pl_trainer - W-param-coalesce-r28 wall; 97.98% real C, 2026-06-19
+fn_80200B10   # pl_trainer - W-param-coalesce-r28 wall; 97.87% real C, 2026-06-19
