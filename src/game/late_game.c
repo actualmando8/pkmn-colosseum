@@ -63,7 +63,7 @@ extern void fn_801026A4();
 extern void fn_80103484();
 extern void fn_801040F0();
 extern void fn_80104160();
-extern void fn_80104704();
+extern u8* fn_80104704(u32);
 extern void fn_80105624();
 extern void fn_801069FC();
 extern void fn_80106D3C();
@@ -117,7 +117,7 @@ void fn_80093F64(void);
 void fn_80094650(void);
 void fn_8009567C(void);
 void fn_800965C8(void);
-void fn_80096C48(void);
+void fn_80096C48(u32 unused, u8* dst);
 void fn_80096D54(void);
 void fn_80096FA0(void);
 void fn_800973EC(void);
@@ -3718,69 +3718,50 @@ do {
 }
 
 /* 0x80096C48 | size: 0x10C */
-void fn_80096C48(void) {
-    u8 sp[0x50];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r11 = 0;
-    u32 r12 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f0 = 0.0f;
+#pragma peephole off
+void fn_80096C48(u32 unused, u8* dst) {
+    typedef struct {
+        f32 x;
+        f32 y;
+        f32 z;
+    } ColorTriple;
 
-    r31 = r4;
-    r4 = (u32)&lbl_8026F5C0;
-    r3 = 0x53;
-    r12 = (u32)&lbl_8026F5C0;
-    r11 = *(u32*)((u8*)r12 + 0x0);
-    r10 = *(u32*)((u8*)r12 + 0x4);
-    r9 = *(u32*)((u8*)r12 + 0x8);
-    r8 = *(u32*)((u8*)r12 + 0xC);
-    r7 = *(u32*)((u8*)r12 + 0x10);
-    r6 = *(u32*)((u8*)r12 + 0x14);
-    r5 = *(u32*)((u8*)r12 + 0x18);
-    r4 = *(u32*)((u8*)r12 + 0x1C);
-    tmp = *(u32*)((u8*)r12 + 0x20);
-    *(u32*)(sp + 0x10) = tmp;
-    ((void(*)(void))fn_80104704)();
-    if (r3 == 0) return;
-    tmp = *(u8*)((u8*)r3 + 0x95);
-    tmp = (s8)tmp;
-    if ((s32)tmp != 1) {
-        if ((s32)tmp < 1) {
-            if ((s32)tmp < 0) {
-                goto L_80096D00;
-            }
-            if ((s32)tmp >= 3) goto L_80096D00;
-            goto L_80096CFC;
-            }
-        r30 = (u32)sp + 0x20;
-        goto L_80096D00;
+    ColorTriple state0;
+    ColorTriple state1;
+    ColorTriple state2;
+    register u8* out;
+    register ColorTriple* triple;
+    u8* obj;
+    s32 state;
+
+    out = dst;
+    state0 = *(ColorTriple*)(lbl_8026F5C0 + 0x00);
+    state1 = *(ColorTriple*)(lbl_8026F5C0 + 0x0C);
+    state2 = *(ColorTriple*)(lbl_8026F5C0 + 0x18);
+
+    obj = fn_80104704(0x53);
+    if (obj == NULL) {
+        return;
     }
-    r30 = (u32)sp + 0x14;
-    goto L_80096D00;
-L_80096CFC:
-    r30 = (u32)sp + 0x8;
-L_80096D00:
-    f0 = *(f32*)((u8*)r30 + 0x0);
-    f0 = (f64)(s32)f0;
-    *(u8*)((u8*)r31 + 0x64) = tmp;
-    f0 = *(f32*)((u8*)r30 + 0x4);
-    f0 = (f64)(s32)f0;
-    *(u8*)((u8*)r31 + 0x65) = tmp;
-    f0 = *(f32*)((u8*)r30 + 0x8);
-    f0 = (f64)(s32)f0;
-    *(u8*)((u8*)r31 + 0x66) = tmp;
 
-    return;
+    state = (s8)obj[0x95];
+    switch (state) {
+    case 0:
+        triple = &state0;
+        break;
+    case 1:
+        triple = &state1;
+        break;
+    case 2:
+        triple = &state2;
+        break;
+    }
+
+    out[0x64] = triple->x;
+    out[0x65] = triple->y;
+    out[0x66] = triple->z;
 }
+#pragma peephole on
 
 /* 0x80096D54 | size: 0x24C */
 void fn_80096D54(void) {
