@@ -100,7 +100,8 @@ extern void* memcpy(void* dst, const void* src, u32 n);
 /* Matrix / vector math helpers */
 extern void  fn_800A37CC(void* mtxDst, void* vecSrc, void* vecDst);  /* MTXMultVec3 */
 extern void  fn_800A3A78(void* vecA, void* scale, void* vecOut);     /* VEC scale */
-extern void  fn_800A3A9C(void* vecOut, void* vecIn, f32 scale);     /* VEC normalize */
+extern void  fn_800A3A9C(void* a, void* b, void* out);             /* VEC diff/setup */
+extern f32   fn_800A3B38(void* vec);                                /* VEC magnitude */
 extern void  fn_800A3AC0(void* curve, void* paramOut, f32 t);       /* VEC lerp */
 
 /* GScolsys2 functions */
@@ -316,13 +317,13 @@ void fn_8010F5A4(void) {
 #pragma pop
 
 /* 0x8010F6A0 | 0x7C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8010F6A0(void) {
-    /* TODO: match -- 124 bytes at 0x8010F6A0 */
+void fn_8010F6A0(void* arg0, void* arg1, void* arg2, f32 t) {
+    f32 v[3];
+
+    fn_800A3A9C(arg2, arg1, v);
+    fn_800A3AC0(v, v, t / fn_800A3B38(v));
+    fn_800A3A78(v, arg1, arg0);
 }
-#pragma pop
 
 /* 0x8010FA54 | 0xA0 */
 #pragma push
@@ -481,9 +482,17 @@ void fn_80112700(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
+#pragma peephole off
 void fn_8011274C(void) {
-    /* TODO: match -- 52 bytes at 0x8011274C */
+    extern void fn_801C40F0(s32);
+    extern void fn_800D3074(s32);
+    extern u8 lbl_80478DD0;
+
+    fn_801C40F0(1);
+    lbl_80478DD0 = 0;
+    fn_800D3074(1);
 }
+#pragma peephole on
 #pragma pop
 
 /* 0x80112780 | 0x3C */
@@ -546,10 +555,20 @@ void fn_801129AC(void) {
 
 /* 0x80112F8C | 0x60 */
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+#pragma peephole off
 void fn_80112F8C(void) {
-    /* TODO: match -- 96 bytes at 0x80112F8C */
+    extern void* fn_801157B0(void);
+    extern u32 fn_800FF560(void);
+    extern void GSthreadCreate(s32 a, u32 b, u32 c, u32 d, u32 e, void* f);
+    extern void fn_800FF0A0(void (*callback)(void));
+    void* obj;
+
+    obj = fn_801157B0();
+    if (obj == (void*)0) {
+        return;
+    }
+    GSthreadCreate(1, fn_800FF560(), 0x4000, 1, 1, obj);
+    fn_800FF0A0(fn_80112F8C);
 }
 #pragma pop
 
@@ -591,11 +610,20 @@ void fn_80113778(void) {
 
 /* 0x80113828 | 0x64 */
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80113828(void) {
-    /* TODO: match -- 100 bytes at 0x80113828 */
+#pragma peephole off
+void fn_80113828(u32 arg0, s32 arg1) {
+    extern u32 fn_800FF56C(void);
+    extern void fn_800FF58C(s32);
+
+    if (arg0 != 0) {
+        *(u32*)(lbl_80408378 + 0x0) = fn_800FF56C();
+        *(s32*)(lbl_80408378 + 0x4) = arg0;
+        *(u8*)(lbl_80408378 + 0x8) = 1;
+        *(s32*)(lbl_80408378 + 0xC) = arg1;
+        fn_800FF58C(arg0);
+    }
 }
+#pragma peephole on
 #pragma pop
 
 /* 0x8011388C | 0xA0 */
@@ -661,9 +689,16 @@ void fn_8011396C(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
+#pragma scheduling off
 void fn_801139BC(void) {
-    /* TODO: match -- 80 bytes at 0x801139BC */
+    extern void fn_8018B76C(s32, s32, s32, s32, s32);
+    extern void fn_80117154(void);
+
+    fn_8018B76C(0, 0x64, 1, 0, 1);
+    fn_8018B76C(0, 0x65, 1, 0, 1);
+    fn_80117154();
 }
+#pragma scheduling on
 #pragma pop
 
 /* 0x80113A0C | 0x178 */
