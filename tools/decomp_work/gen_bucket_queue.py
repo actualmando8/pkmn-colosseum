@@ -50,7 +50,10 @@ CODEX_FILES = load_codex_files()
 QUEUE = os.path.join(ROOT, "build", "wall_queue.txt")
 ASSIGNED = os.path.join(ROOT, "build", "wall_assigned.txt")
 BAD = ("effect_util", "hsd_", "ui_core", "fsys_file", "gs_material", "pokemon", "gs_pokemon_summary")
-PRIORITY = ["NEARWALL", "STRUCT", "ASM", "LOW"]
+# Goal order (2026-06-21): finish LOW, then work back UP the value ladder starting at ASM.
+# (Was NEARWALL,STRUCT,ASM,LOW — but NEARWALL/STRUCT near-miss pools are exhausted, so the
+# directive is grind LOW out, then re-attack ASM (from-scratch asm->C), then STRUCT, NEARWALL.)
+PRIORITY = ["LOW", "ASM", "STRUCT", "NEARWALL"]
 # per-bucket minimum match% (skip the truly-hopeless within a bucket). LOW kept at 0
 # so the file pool is deep enough to feed every lane (band locks per-file = one lane
 # per file); the bucket PRIORITY still works the higher-quality fns first.

@@ -59,33 +59,25 @@ classify() {  # classify <name> <pane> ; echoes idle|busy|rate|capfail and updat
   if [ "$cap" = "$prev" ]; then echo idle; else echo busy; fi
 }
 
-drain_one() {  # drain_one <name> <pane> : send a queued prompt if present
-  local name="$1" pane="$2" req="$REQ/$name.req" prompt
+drain_one() {  # drain_one <name> <pane> : point the agent at a task FILE (no long-prompt send)
+  local name="$1" pane="$2" req="$REQ/$name.req" task="$REQ/$name.task"
   [ -f "$req" ] || return 0
-  prompt=$(cat "$req")
-  [ -z "$prompt" ] && { rm -f "$req"; return 0; }
+  [ -s "$req" ] || { rm -f "$req"; return 0; }
   if [ "$NOSEND" = 1 ]; then echo "[pane_io] (--no-send) would dispatch -> $name"; return 0; fi
-  # RELIABLE delivery on native psmux (verified 2026-06-20):
-  #   - send-keys -l drops chars mid-stream on long prompts -> corrupted fragment at agent.
-  #   - paste-buffer delivers the whole prompt atomically, BUT -t <pane-id> is IGNORED: it
-  #     pastes into the ACTIVE pane (this dumped every prompt into the orchestrator %3).
-  # Fix: load the prompt, make the TARGET active (select-pane DOES honor %ids), paste into
-  # it, submit, then restore focus to whatever was active. Full prompt lands in the target;
-  # orchestrator untouched. Native psmux needs a WINDOWS path for load-buffer (cygpath).
-  # Mutex held ONCE for the whole dispatch.
-  local win prev; win=$(cygpath -w "$req" 2>/dev/null)
+  # Long-prompt delivery on native psmux is fundamentally unreliable under load:
+  #   - send-keys -l truncates (drops the head, leaving "...AVED <fn> <%>" fragments).
+  #   - paste-buffer -t is ignored (hits the active pane) AND truncates when the loaded
+  #     server makes the paste slower than the SIGKILL timeout.
+  # So DON'T send the prompt at all: stage the full task in a file and send a SHORT, reliable
+  # command (~50 chars, well under any truncation threshold) telling the agent to read it.
+  mv -f "$req" "$task" 2>/dev/null || { cp -f "$req" "$task" && rm -f "$req"; }
+  local cmd="Read build/dispatch/$name.task and do exactly what it says."
   _txk_acquire
-  prev=$(timeout -s KILL "$TXK_T" "$TMUX_BIN" display-message -t decomp -p '#{pane_id}' 2>/dev/null)
-  timeout -s KILL "$TXK_T" "$TMUX_BIN" load-buffer -b "ds_$name" "$win" 2>/dev/null
-  timeout -s KILL "$TXK_T" "$TMUX_BIN" select-pane -t "$pane" 2>/dev/null
-  timeout -s KILL "$TXK_T" "$TMUX_BIN" send-keys -t "$pane" C-u 2>/dev/null   # clear any stale/truncated input first
-  timeout -s KILL "$TXK_T" "$TMUX_BIN" paste-buffer -d -b "ds_$name" -t "$pane" 2>/dev/null
+  timeout -s KILL 10 "$TMUX_BIN" send-keys -t "$pane" C-u 2>/dev/null            # clear stale/truncated input
+  timeout -s KILL 10 "$TMUX_BIN" send-keys -t "$pane" -l "$cmd" 2>/dev/null
   sleep 0.3
-  timeout -s KILL "$TXK_T" "$TMUX_BIN" send-keys -t "$pane" Enter 2>/dev/null
-  [ -n "$prev" ] && [ "$prev" != "$pane" ] && timeout -s KILL "$TXK_T" "$TMUX_BIN" select-pane -t "$prev" 2>/dev/null
+  timeout -s KILL 10 "$TMUX_BIN" send-keys -t "$pane" Enter 2>/dev/null
   _txk_release
-  mv -f "$req" "$REQ/sent/$name.$(date +%s)" 2>/dev/null || rm -f "$req"
-  # force busy so the next driver tick won't re-dispatch before the TUI repaints
   echo "busy $(date +%s)" > "$HB/$name.state"; rm -f "$HB/$name.prev"
   echo "[pane_io] dispatched -> $name"
 }
