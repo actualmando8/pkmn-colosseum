@@ -294,7 +294,7 @@ typedef struct TypeMatchup {
 /* fn_801C01C8 */ void fn_801C01C8(void* arg0, s32 arg1);
 /* fn_801C021C */ void fn_801C021C(void* arg0, s32 arg1);
 /* fn_801C0270 */ s32  fn_801C0270(void);
-/* fn_801C027C */ void* fn_801C027C(void);
+/* fn_801C027C */ void fn_801C027C(void* obj, f32 frame);
 /* fn_801C028C */ void fn_801C028C(void* ctx);                   /* 0xC94 pre-grid state machine */
 /* fn_801C0F20 */ void fn_801C0F20(void* ctx);                   /* 0x354 pre-grid anim update */
 /* fn_801C1274 */ void fn_801C1274(void* ctx, s32 slot);         /* 0x59C pre-grid model placement */
@@ -303,14 +303,14 @@ typedef struct TypeMatchup {
 /* fn_801C25E4 */ void fn_801C25E4(void* ctx, s32 mode);
 /* fn_801C2670 */ void fn_801C2670(void* ctx, s32 objType, s32 param);
 /* fn_801C27F4 */ void fn_801C27F4(void* ctx, f32 posX, f32 posZ);
-/* fn_801C29C4 */ void fn_801C29C4(s32 slot, s32 enable);
-/* fn_801C2A04 */ void fn_801C2A04(s32 slot, f32 x, f32 z);
+/* fn_801C29C4 */ void fn_801C29C4(void* obj, f32 value);
+/* fn_801C2A04 */ void fn_801C2A04(void);
 /* fn_801C2A60 */ s32  fn_801C2A60(void);
 /* fn_801C2A74 */ s32  fn_801C2A74(s32 slot);
 /* fn_801C2A90 */ s32  fn_801C2A90(s32 slot);
-/* fn_801C2AAC */ u8   fn_801C2AAC(void);
+/* fn_801C2AAC */ void* fn_801C2AAC(void);
 /* fn_801C2AB8 */ void fn_801C2AB8(s32 slot, s32 animState);
-/* fn_801C2AE8 */ void fn_801C2AE8(s32 slot, f32 scale);
+/* fn_801C2AE8 */ u16 fn_801C2AE8(u32 id);
 /* fn_801C2B2C */ void fn_801C2B2C(void);
 /* fn_801C2Be0 */ void fn_801C2Be0(void* ctx, s32 arg1);
 
@@ -336,14 +336,14 @@ typedef struct TypeMatchup {
 /* fn_801C3D64 */ void fn_801C3D64(void* model);                 /* battleGridReplacePokemon */
 /* fn_801C3E3C */ void fn_801C3E3C(s32 slot, s32 animType);
 /* fn_801C3F10 */ void fn_801C3F10(void* model);                 /* battleGridReplaceTrainer */
-/* fn_801C3FBC */ void fn_801C3FBC(s32 slot);
+/* fn_801C3FBC */ void fn_801C3FBC(u8* slot, u8 arg1, u8 arg2);
 /* fn_801C4078 */ void* fn_801C4078(s32 slot);
-/* fn_801C409C */ void fn_801C409C(s32 slot, u8 occupied);
+/* fn_801C409C */ void fn_801C409C(void);
 /* fn_801C40F0 */ void fn_801C40F0(s32 flag);                    /* grid set rendering flag */
-/* fn_801C4164 */ void fn_801C4164(s32 mode);
+/* fn_801C4164 */ void fn_801C4164(s32 mode, void* callback, s32 flags, f32 a, f32 b);
 /* fn_801C41C8 */ void fn_801C41C8(s32 mode);                    /* battle camera init */
-/* fn_801C423C */ void fn_801C423C(f32 targetAngle, f32 speed);
-/* fn_801C431C */ f32  fn_801C431C(void);
+/* fn_801C423C */ void* fn_801C423C(void (*callback)(void), u8 mode, u32 arg, f32 value);
+/* fn_801C431C */ void fn_801C431C(s32 arg0);
 /* fn_801C432C */ void fn_801C432C(f32 angle, f32 blend);
 /* fn_801C43E4 */ void* fn_801C43E4(void);
 /* fn_801C43F4 */ void fn_801C43F4(s32 seqType, f32 param1, f32 param2); /* 0x3DC */
@@ -360,7 +360,7 @@ typedef struct TypeMatchup {
 /* fn_801C49F4 */ f32  fn_801C49F4(s32 slot);
 /* fn_801C4A1C */ void fn_801C4A1C(s32 slot, f32 scale);
 /* fn_801C4A44 */ void fn_801C4A44(s32 slot, f32 x, f32 y, f32 z, f32 rot, f32 scale);
-/* fn_801C4C98 */ BOOL fn_801C4C98(s32 slot);
+/* fn_801C4C98 */ f32  fn_801C4C98(void);
 /* fn_801C4CB8 */ void fn_801C4CB8(void);                        /* grid full render 0x704 */
 
 /* =========================================================================

@@ -27,6 +27,32 @@ C and move on.** This file is how we *stop re-grinding* them.
 Walls live in the gap between C-converted and byte-exact-C. Logging them keeps the
 gap *honest and intentional* instead of an open backlog we keep re-attacking.
 
+## 2026-06-19 - gs_title.c fn_8002537C / fn_80025490 (W-branch-collapse)
+
+`fn_8002537C` and `fn_80025490` are sibling single-axis title/menu position writers with
+real, active C. Both are confirmed **W-branch-collapse** walls at the list-walk counter
+match check. Live parent measurement:
+
+```
+C:\Users\douglaswhittingham\AppData\Local\Programs\Python\Python312\python.exe tools\match_scan_file.py src/game/gs_title.c fn_8002537C fn_80025490
+  97.1%  fn_8002537C
+  97.1%  fn_80025490
+```
+
+Residual is identical in both siblings: target keeps the unfused branch pair
+`cmpw r28,r30; bne <increment>; b <found>`, while CW 1.3 emits the canonical single
+branch `cmpw r28,r30; beq <found>` and falls through to the increment. Tested and did
+not improve: direct `if (!=) { ++counter; } else { goto found; }`, explicit two-goto
+shape, explicit after-label shape, equality `switch` (regressed to 93.1%), post-increment
+compare (regressed to 91.5%), whole-function `#pragma peephole on` (regressed to 80.6%),
+narrow branch-block peephole pragmas (inert), and temporary removal of the TU's
+`-opt nopeephole` flag (inert). Prior relay notes also tested do/while wrappers,
+temporary match variables, scheduling pragmas, and goto-pair variants.
+
+The remaining branch pair is semantically equivalent and not steerable from clean C
+without inline PPC assembly or post-link patching. Hard-skip unless a new branch-layout
+compiler lever appears.
+
 ## 2026-06-17 — GXInit.c fn_800BD91C (W-rmw-temp-r0 + schedule; the 145th fn, TU stays 144/145)
 
 Packet `cmpB` — "GXInit is 144/145, crack `fn_800BD91C` (94.90%) and the TU is DONE."
@@ -600,3 +626,73 @@ worker reg-alloc cracks. See `tools/decomp_work/coordination/why_diff_retriage_j
 - `fn_80138BBC` / `fn_80139AC4` / `fn_80139D10` / `fn_8013AB60` (effect_visual, 99.1-99.4%):
   pipeline 2026-06-18 — corrected void(void) stub sigs to real; real C reaches 99% but walls
   on an sdata2 relocation-name artifact (C-uncontrollable). Bodies in scratch; salvage-eligible.
+
+## 2026-06-19 - pl_trainer.c fn_80200E00 + fn_80200B10 (W-param-coalesce-r28)
+
+3-priority trainer-message loop siblings (byte-identical body shape, different key
+source/count). Faithful real C active, 97.98% / 97.87%. Residual = a complete
+arg<->entry non-volatile **coloring swap** the classifier flags REG-COLORING-winnable,
+but which is **C-uncontrollable**: the `void* arg` parameter is immovably pinned to
+**r28**; the target requires it in **r30** (`mr. r30,r3` at entry vs ours `mr. r28,r3`),
+with `entry` (the cached `lhzx` key) correspondingly swapped r30<->r28. base=r29,
+result=r27, i=r31 all match. CW coalesces the param copy (`msgArg=arg`) back onto the
+parameter's fixed r28 slot and ranks it **below** the early locals base/entry, so
+`entry` can never reach r28. Same family as the gs_title `mr r0,r3` / "CW coalesces
+base=r28" wall above; also carries the identical spare `mr r0` round-trip on the kept
+`fn_8012640C` result.
+
+**Sweep that did NOT move it (per policy #1):**
+- 24 declaration-order permutations of the 5 survivors {i,arg,base,entry,result}:
+  `arg=r28` in **all 24**; `entry` only ever r29/r30, never r28.
+- 3 param-alias placements (top / before-loop / overlap-with-null-check to defeat
+  coalescing): `arg=r28` in all; CW still fuses `mr. r28,r3` and coalesces.
+- pragma sweep {scheduling off, peephole off, opt_common_subs off, optimization_level
+  1/2/3}: no change, `arg=r28`, 34 mismatches throughout.
+- direct-param form (no alias) and sibling fn_80200B10 independently sit at the same floor.
+
+Conclusion: regalloc wall floor (no legal equivalent C maps to the target allocation
+under mwcc 1.x). The recipe's decl-order-named-locals hypothesis and direct-assign
+round-trip fix are both empirically falsified for this function. Hard-skip; bodies are
+real correct C (registered Equivalent). The classifier's REG-COLORING verdict is a
+heuristic false-positive here — it counts register-number mismatches but cannot test
+reachability of the coloring.
+
+## 2026-06-20 - battle_grid.c fn_801C3E3C (W-block-layout / bne-blr vs beqlr)
+
+**Score:** 97.17% | **classify_residual:** rc:9 shape:2 (SHAPE exit-1) | **pl:** pl_battle_grid
+
+**Root cause:** CW peephole fuses `bne L; blr` → `beqlr` only when the taken body is
+within ~8 instructions of the `blr`. The TARGET layout places the slot-NULL check body
+0x28 bytes (10 instructions) BEFORE the final `blr`, keeping them UN-FUSED (`bne
+0x1be87c; blr`). Our layout places the body immediately before `blr`, so CW fuses to
+`beqlr`. This is a CW block-placement BUILD ARTIFACT — the C equivalents that produce
+either form are degenerate (early-return vs late-return) and CW picks the layout
+independently of source order. Ripples into r3/r5 cascade (state=1 store scheduled
+before vs after the `add` for the member address).
+
+**Levers exhausted:** if/else rewrite, ternary, goto, early-return forms, #pragma peephole
+off, #pragma scheduling off — none can force the block distance that prevents fusion.
+
+**Classifier note:** SHAPE exit-1 (shape:2). Real wall, not a false-positive.
+
+## 2026-06-20 - battle_grid.c fn_801C31EC (W-scheduling / SHAPE)
+
+**Score:** 89.72% | **classify_residual:** rc:25 sched:2 shape:12 (SHAPE exit-1) | **pl:** pl_battle_grid
+
+**Root cause:** SHAPE build artifact — rc:25 mismatches + sched:2 + shape:12. The
+function has a complex scheduling residual plus structural shape differences not
+reachable from C.
+
+**Classifier:** SHAPE exit-1. Wall permitted.
+
+## 2026-06-20 - battle_grid.c fn_801C0F20 (W-jt-reloc / SHAPE)
+
+**Score:** 78.77% | **classify_residual:** reloc:6 shape:33 (SHAPE exit-1) | **pl:** pl_battle_grid
+
+**Root cause:** Switch jumptable RELOC wall. The function contains switch statements
+that compile to jumptables (`jumptable_803*` named relocs in target vs `@NNN` anonymous
+relocs in ours). Named jumptable relocs are a CW build-artifact tied to the ORIGINAL
+compilation unit context — not reproducible from C without the exact original TU.
+reloc:6 + shape:33 confirms this is a RELOC/SHAPE wall, not a code logic issue.
+
+**Classifier:** SHAPE exit-1. Wall permitted.
