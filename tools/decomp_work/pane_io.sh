@@ -65,7 +65,15 @@ drain_one() {  # drain_one <name> <pane> : send a queued prompt if present
   prompt=$(cat "$req")
   [ -z "$prompt" ] && { rm -f "$req"; return 0; }
   if [ "$NOSEND" = 1 ]; then echo "[pane_io] (--no-send) would dispatch -> $name"; return 0; fi
-  txk send-keys -t "$pane" -l "$prompt"
+  # ATOMIC paste: a long `send-keys -l` floods the native-PE psmux console and drops chars
+  # under the burst — only a corrupted fragment of the prompt reaches the agent (observed
+  # 2026-06-20). load-buffer+paste-buffer injects the whole prompt in ONE operation, no
+  # flood. Native psmux needs a WINDOWS path for the file (cygpath; MSYS /-paths fail with
+  # "system cannot find the file"). The req has no trailing newline so paste won't submit;
+  # send-keys Enter does. -d frees the buffer after paste.
+  local win; win=$(cygpath -w "$req" 2>/dev/null)
+  txk load-buffer -b "ds_$name" "$win"
+  txk paste-buffer -d -b "ds_$name" -t "$pane"
   sleep 0.3
   txk send-keys -t "$pane" Enter
   mv -f "$req" "$REQ/sent/$name.$(date +%s)" 2>/dev/null || rm -f "$req"
@@ -76,16 +84,18 @@ drain_one() {  # drain_one <name> <pane> : send a queued prompt if present
 
 pass() {
   local name pane st
+  echo "$(date +%s)" > "$HB/.alive"
   for name in "${!PANE[@]}"; do
     pane="${PANE[$name]}"; [ -n "$pane" ] || continue
     st=$(classify "$name" "$pane")
     echo "$st $(date +%s)" > "$HB/$name.state"
+    echo "$(date +%s)" > "$HB/.alive"      # keep heartbeat fresh during the capture loop
   done
   for name in "${!PANE[@]}"; do
     pane="${PANE[$name]}"; [ -n "$pane" ] || continue
     drain_one "$name" "$pane"
+    echo "$(date +%s)" > "$HB/.alive"      # ...and during (slower) dispatch drains
   done
-  echo "$(date +%s)" > "$HB/.alive"
 }
 
 echo "[pane_io] up — sole tmux owner, interval ${INTERVAL}s, txk_kill=${TXK_T}s$([ "$NOSEND" = 1 ] && echo ' [NO-SEND]')"
