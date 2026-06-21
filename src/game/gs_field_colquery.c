@@ -702,6 +702,7 @@ void fn_8011396C(void) {
 #pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
+#pragma scheduling off
 void fn_801139BC(void) {
     extern void fn_8018B76C(s32, s32, s32, s32, s32);
     extern void fn_80117154(void);
@@ -710,6 +711,7 @@ void fn_801139BC(void) {
     fn_8018B76C(0, 0x65, 1, 0, 1);
     fn_80117154();
 }
+#pragma scheduling on
 #pragma scheduling on
 #pragma scheduling on
 #pragma scheduling on
