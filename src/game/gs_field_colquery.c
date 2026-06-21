@@ -401,19 +401,25 @@ void fn_8011163C(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80111864(void) {
+s32 fn_80111864(void* a, void* b, void* c) {
     /* TODO: match -- 824 bytes at 0x80111864 */
+    return 0;
 }
 #pragma pop
 
 /* 0x80111B9C | 0x88 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80111B9C(void) {
-    /* TODO: match -- 136 bytes at 0x80111B9C */
+s32 fn_80111B9C(void* arg0, void* arg1, void* arg2) {
+    extern f32 fn_800A3C00(void* a, void* b);
+    extern f32 lbl_8047CF60;
+
+    if (fn_8010CBC0() == 0) {
+        return 0;
+    }
+    if (fn_800A3C00(arg1, arg0) <= lbl_8047CF60) {
+        return 0;
+    }
+    return fn_80111864(arg0, arg1, arg2);
 }
-#pragma pop
 
 /* 0x80111C24 | 0x1D4 */
 #pragma push
