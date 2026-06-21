@@ -89,6 +89,8 @@ extern u32 lbl_8047B0B0;  /* sound buffer size limit */
 /* ===== Internal callbacks referenced by pre-funcs ===== */
 extern void fn_80115094(void);  /* GFL resource completion callback */
 extern void fn_801150B8(void);  /* sound resource completion callback */
+extern void fn_80115208(void);  /* resource completion callback (Tex/...) */
+extern const char lbl_80272394[]; /* "floorRead...PreFunc(): can't alloc..." */
 
 extern void* fn_800F9318();        /* GSres simple alloc */
 extern void* fn_800F9378();        /* GSres install loader */
@@ -262,11 +264,19 @@ void* floorReadCameraPreFunc_Pseudocode(u32 resId, u32 loadMode, u32 dataSize) {
 
 /* 0x8011432C | 0x74 */
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8011432C(void) {
-    /* TODO: match -- 116 bytes at 0x8011432C */
+#pragma peephole off
+void* fn_8011432C(u32 resId, u32 loadMode, u32 dataSize) {
+    void* buf;
+    u32 alignedSize;
+
+    alignedSize = (dataSize + 0x1F) & ~0x1F;
+    buf = fn_800F9418(alignedSize, 0x20, resId, loadMode, (void*)fn_80115094);
+    if (buf == (void*)0) {
+        fn_800DD970(lbl_80272200, dataSize);
+    }
+    return buf;
 }
+#pragma peephole on
 #pragma pop
 
 /* 0x801143A0 | 0x8 | return_const */
@@ -288,20 +298,36 @@ void* fn_801143EC(u32 resId, u32 param) {
 
 /* 0x8011445C | 0x74 */
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8011445C(void) {
-    /* TODO: match -- 116 bytes at 0x8011445C */
+#pragma peephole off
+void* fn_8011445C(u32 resId, u32 loadMode, u32 dataSize) {
+    void* buf;
+    u32 alignedSize;
+
+    alignedSize = (dataSize + 0x1F) & ~0x1F;
+    buf = fn_800F9418(alignedSize, 0x20, resId, (loadMode & 0x7FFF0000) | 0x400, (void*)0);
+    if (buf == (void*)0) {
+        fn_800DD970(lbl_80272270, alignedSize);
+    }
+    return buf;
 }
+#pragma peephole on
 #pragma pop
 
 /* 0x801145C0 | 0x74 */
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801145C0(void) {
-    /* TODO: match -- 116 bytes at 0x801145C0 */
+#pragma peephole off
+void* fn_801145C0(u32 resId, u32 loadMode, u32 dataSize) {
+    void* buf;
+    u32 alignedSize;
+
+    alignedSize = (dataSize + 0x1F) & ~0x1F;
+    buf = fn_800F9418(alignedSize, 0x20, resId, (loadMode & 0x7FFF0000) | 0x400, (void*)0);
+    if (buf == (void*)0) {
+        fn_800DD970(lbl_80272270, alignedSize);
+    }
+    return buf;
 }
+#pragma peephole on
 #pragma pop
 
 /* 0x80114634 | 0x70 */
@@ -360,11 +386,19 @@ void* fn_801147D4(void) {
 
 /* 0x80114808 | 0x74 */
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80114808(void) {
-    /* TODO: match -- 116 bytes at 0x80114808 */
+#pragma peephole off
+void* fn_80114808(u32 resId, u32 loadMode, u32 dataSize) {
+    void* buf;
+    u32 alignedSize;
+
+    alignedSize = (dataSize + 0x1F) & ~0x1F;
+    buf = fn_800F9418(alignedSize, 0x20, resId, loadMode, (void*)fn_80115208);
+    if (buf == (void*)0) {
+        fn_800DD970(lbl_80272394, alignedSize);
+    }
+    return buf;
 }
+#pragma peephole on
 #pragma pop
 
 /* 0x8011487C | 0xCC */
@@ -393,11 +427,38 @@ void* floorReadCameraPreFunc(void* owner, u32 param, u32 alloc_size) {
 
 /* 0x801149BC | 0xB4 */
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801149BC(void) {
-    /* TODO: match -- 180 bytes at 0x801149BC */
+#pragma peephole off
+void* fn_801149BC(u32 resId, u32 loadMode, u32 arg2) {
+    extern void* fn_800F9318(void);
+    extern void HSD_ArchiveParse(void* archive, void* buf, u32 size);
+    extern void* HSD_ArchiveGetPublicAddress(void* archive, const char* sym);
+    extern void fn_800F9378(void* entry, u32 resId, u32 flags, u32 cb);
+    void* model;
+    void* pub;
+    void* entry;
+    u32 flags;
+    u32 offset;
+    u32 counter;
+
+    counter = 0;
+    model = fn_800F9318();
+    HSD_ArchiveParse(model, (u8*)model + 0x60, arg2);
+    pub = HSD_ArchiveGetPublicAddress(model, lbl_802722AC);
+    if (pub == (void*)0) {
+        return (void*)0;
+    }
+    flags = (loadMode & 0x7FFF0000) | 0x1000;
+    if (*(u32*)pub != 0) {
+        offset = 0;
+        while ((entry = *(void**)(*(u8**)pub + offset)) != 0) {
+            fn_800F9378(entry, resId, flags | counter, 0);
+            offset += 4;
+            counter++;
+        }
+    }
+    return pub;
 }
+#pragma peephole on
 #pragma pop
 
 /* 0x80114A70 | 0x70 */
