@@ -1231,8 +1231,27 @@ void fn_800B373C(void) {
 }
 
 /* fn_800B38DC - 0x800B38DC | size: 0x9C */
-void fn_800B38DC(void) {
-    /* SI/PAD helper (0x9C bytes) */
+void fn_800B38DC(s32 chan, s32 arg1) {
+    extern u8 lbl_803FC620[];
+    extern int OSDisableInterrupts(void);
+    extern void OSRestoreInterrupts(int);
+    extern void fn_8009870C(s32, s32);
+    extern void fn_80098AE8(s32);
+    extern void OSCancelAlarm(void*);
+    u8* card;
+    int enabled;
+
+    card = lbl_803FC620 + chan * 0x110;
+    enabled = OSDisableInterrupts();
+    if (*(s32*)card != 0) {
+        fn_8009870C(chan, 0);
+        fn_80098AE8(chan);
+        OSCancelAlarm(card + 0xE0);
+        *(s32*)card = 0;
+        *(s32*)(card + 0x4) = arg1;
+        *(s32*)(card + 0x24) = 0;
+    }
+    OSRestoreInterrupts(enabled);
 }
 
 /* fn_800B3978 - 0x800B3978 | size: 0xAC */
@@ -1392,9 +1411,25 @@ void fn_800B5BE4(void) {
 }
 
 /* fn_800B5C5C - 0x800B5C5C | size: 0x7C */
-void fn_800B5C5C(void) {
-    /* Medium function (0x7C bytes) */
+#pragma peephole off
+void* fn_800B5C5C(void* obj, int id) {
+    extern u8* gx;
+    extern s32 fn_800BAE5C();
+    s32 fmt = fn_800BAE5C(obj);
+
+    if (fmt != 8 && fmt != 9 && fmt != 10) {
+        u32* g = (u32*)gx;
+        u32 c = g[0xB2];
+        g[0xB2] = c + 1;
+        return (u8*)g + ((c & 7) << 4) + 0x208;
+    } else {
+        u32* g = (u32*)gx;
+        u32 c = g[0xB3];
+        g[0xB3] = c + 1;
+        return (u8*)g + ((c & 3) << 4) + 0x288;
+    }
 }
+#pragma peephole reset
 
 /* fn_800B5CD8 - 0x800B5CD8 | size: 0x24 */
 void fn_800B5CD8(void) {
