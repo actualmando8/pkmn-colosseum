@@ -1050,17 +1050,25 @@ f32 fn_801C4864(s32 slot) {
  * fn_801C488C - Grid set slot X position.
  * Address: 0x801C488C | Size: 0x28
  */
+#pragma scheduling off
 void fn_801C488C(s32 slot, f32 x) {
-    /* Set slot X position */
+    extern void fn_801C5530(void);
+
+    fn_801C431C((s32)fn_801C5530);
 }
+#pragma scheduling on
 
 /**
  * fn_801C48B4 - Grid set slot Y position.
  * Address: 0x801C48B4 | Size: 0x28
  */
+#pragma scheduling off
 void fn_801C48B4(s32 slot, f32 y) {
-    /* Set slot Y position */
+    extern void fn_801C4C98(void);
+
+    fn_801C431C((s32)fn_801C4C98);
 }
+#pragma scheduling on
 
 /**
  * fn_801C48DC - Grid set slot Z position.
