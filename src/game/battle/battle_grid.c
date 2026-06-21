@@ -121,11 +121,13 @@ s32 fn_801C0270(void) {
 }
 
 /**
- * fn_801C027C - Get grid context pointer.
+ * fn_801C027C - Set JObj animation frame.
  * Address: 0x801C027C | Size: 0x10
  */
-void* fn_801C027C(void) {
-    return (void*)lbl_80466E50;
+void fn_801C027C(void* obj, f32 frame) {
+    if (obj != NULL) {
+        *(f32*)((u8*)obj + 0x10) = frame;
+    }
 }
 
 /**
@@ -413,19 +415,37 @@ void fn_801C27F4(void* ctx, f32 posX, f32 posZ) {
 }
 
 /**
- * fn_801C29C4 - Pre-grid slot enable.
+ * fn_801C29C4 - Set JObj animation frame value.
  * Address: 0x801C29C4 | Size: 0x40
  */
-void fn_801C29C4(s32 slot, s32 enable) {
-    /* Enable/disable a pre-grid slot */
+void fn_801C29C4(void* obj, f32 value) {
+    extern void HSD_FObjReqAnimAll(void* jobj);
+
+    if (obj == NULL) {
+        return;
+    }
+    *(f32*)((u8*)obj + 4) = value;
+    *(u32*)obj = (*(u32*)obj & ~0x40000000) | 0x08000000;
+    HSD_FObjReqAnimAll(*(void**)((u8*)obj + 0x14));
 }
 
 /**
- * fn_801C2A04 - Pre-grid slot position set.
+ * fn_801C2A04 - Run pre-grid node callbacks.
  * Address: 0x801C2A04 | Size: 0x5C
  */
-void fn_801C2A04(s32 slot, f32 x, f32 z) {
-    /* Set position for a pre-grid slot */
+void fn_801C2A04(void) {
+    extern s32 lbl_8047B390;
+    extern s32 lbl_8047B38C;
+    extern u8* lbl_8047B388;
+    u8* node;
+
+    if (lbl_8047B390 != 0 && lbl_8047B38C == 0) {
+        node = lbl_8047B388;
+        while (node != NULL) {
+            (*(void (**)(void))(node + 0x4))();
+            node = *(u8**)node;
+        }
+    }
 }
 
 /**
@@ -453,11 +473,12 @@ s32 fn_801C2A90(s32 slot) {
 }
 
 /**
- * fn_801C2AAC - Get pre-grid active flag.
+ * fn_801C2AAC - Get grid group base pointer.
  * Address: 0x801C2AAC | Size: 0xC
  */
-u8 fn_801C2AAC(void) {
-    return 0;
+void* fn_801C2AAC(void) {
+    extern u8 lbl_80466DB8[];
+    return lbl_80466DB8;
 }
 
 /**
@@ -465,15 +486,26 @@ u8 fn_801C2AAC(void) {
  * Address: 0x801C2AB8 | Size: 0x30
  */
 void fn_801C2AB8(s32 slot, s32 animState) {
-    /* Set animation state for pre-grid slot */
+    extern u8 lbl_80466DB8[];
+    extern void fn_801AA35C(void*, u32, u32);
+    fn_801AA35C(lbl_80466DB8, 0x1c, 4);
 }
 
 /**
- * fn_801C2AE8 - Pre-grid model scale set.
+ * fn_801C2AE8 - Get grid group member count by owner ID.
  * Address: 0x801C2AE8 | Size: 0x44
  */
-void fn_801C2AE8(s32 slot, f32 scale) {
-    /* Set model scale for pre-grid slot */
+u16 fn_801C2AE8(u32 id) {
+    extern u8 lbl_80466DE8[];
+    u8* group = lbl_80466DE8;
+    u16 i;
+
+    for (i = 0; i < 4; i++, group += 0x10) {
+        if (*(u32*)group == id) {
+            return *(u16*)(group + 0xC);
+        }
+    }
+    return 0;
 }
 
 /**
@@ -838,22 +870,39 @@ void battleGridReplaceTrainer(void* model) {
 }
 
 /**
- * fn_801C3FBC - Grid slot model finalize.
+ * fn_801C3FBC - Add slot to grid group.
  * Address: 0x801C3FBC | Size: 0xBC
  */
-void fn_801C3FBC(s32 slot) {
-    u8* state = (u8*)lbl_80466E50;
-    u8* slotData;
+void fn_801C3FBC(u8* slot, u8 arg1, u8 arg2) {
+    extern u8 lbl_80466DE8[];
+    u8* group;
+    s8 state;
 
-    if (slot < 0 || slot >= BATTLE_TOTAL_POKEMON) {
-        return;
+    if (*(u16*)(lbl_80466DE8 + 0x40) < 4) {
+        group = lbl_80466DE8;
+        if (*(u32*)group != 0) {
+            group = lbl_80466DE8 + 0x10;
+            if (*(u32*)group != 0) {
+                group += 0x10;
+                if (*(u32*)group != 0) {
+                    group += 0x10;
+                    if (*(u32*)group != 0) {
+                        group += 0x10;
+                    }
+                }
+            }
+        }
+        memset(group, 0, 0x10);
+        *(u8**)group = slot;
+        state = 1;
+        group[0xE] = arg1;
+        group[0xF] = arg2;
+        if (arg1 != 0) {
+            state = -1;
+        }
+        slot[0x76] = state;
+        *(u16*)(lbl_80466DE8 + 0x40) = *(u16*)(lbl_80466DE8 + 0x40) + 1;
     }
-
-    slotData = state + 0x20 + (slot * 0x70);
-
-    /* Finalize model in slot: apply final transforms and mark ready */
-    fn_801C3C98(slot);
-    *(s32*)(slotData + 0x5C) = 1; /* model finalized */
 }
 
 /**
@@ -875,12 +924,23 @@ void* fn_801C4078(s32 slot) {
 #pragma peephole on
 
 /**
- * fn_801C409C - Set grid slot occupied state.
+ * fn_801C409C - Trigger grid slot update callback.
  * Address: 0x801C409C | Size: 0x54
  */
-void fn_801C409C(s32 slot, u8 occupied) {
-    /* Set slot occupied flag */
+#pragma peephole off
+void fn_801C409C(void) {
+    extern u8 lbl_80466E30[];
+    extern const f32 lbl_8047DFB0;
+    extern const f32 lbl_8047DFB4;
+    extern f32 fn_801C4814(s32 slot);
+    extern void fn_80166A28(s32 arg0);
+
+    if (*(u8*)lbl_80466E30 == 0) {
+        fn_801C4164(9, (void*)fn_801C4814, 0, lbl_8047DFB0, lbl_8047DFB4);
+        fn_80166A28(0x54);
+    }
 }
+#pragma peephole on
 
 /**
  * fn_801C40F0 - Set grid rendering flag.
@@ -892,11 +952,10 @@ void fn_801C40F0(s32 flag) {
 }
 
 /**
- * fn_801C4164 - Grid rendering mode switch.
+ * fn_801C4164 - Schedule grid update callback with arguments.
  * Address: 0x801C4164 | Size: 0x64
  */
-void fn_801C4164(s32 mode) {
-    /* Switch grid rendering mode (opaque/transparent/shadow) */
+void fn_801C4164(s32 mode, void* callback, s32 flags, f32 a, f32 b) {
 }
 
 /**
@@ -1014,30 +1073,59 @@ void fn_801C43F4(s32 seqType, f32 param1, f32 param2) {
  * fn_801C47D0 - Camera get current mode.
  * Address: 0x801C47D0 | Size: 0x44
  */
+#pragma peephole off
 s32 fn_801C47D0(void) {
-    return 0;
+    extern u8 lbl_80466E30[];
+    extern volatile const f32 lbl_8047DFB8;
+    u8* base = lbl_80466E30;
+
+    *(volatile u8*)(base + 0) = 0;
+    *(volatile u8*)(base + 1) = 0;
+    *(volatile u16*)(base + 2) = 0;
+    *(volatile f32*)(base + 4) = lbl_8047DFB8;
+    *(volatile f32*)(base + 8) = lbl_8047DFB8;
+    *(volatile u32*)(base + 0xc) = 0;
+    *(volatile u32*)(base + 0x10) = 0;
+    *(volatile f32*)(base + 0x14) = lbl_8047DFB8;
+    *(volatile f32*)(base + 0x18) = lbl_8047DFB8;
+    return (s32)base;
 }
+#pragma peephole on
 
 /**
  * fn_801C4814 - Grid get slot X position.
  * Address: 0x801C4814 | Size: 0x28
  */
+#pragma scheduling off
+#pragma scheduling off
 f32 fn_801C4814(s32 slot) {
-    return 0.0f;
+    extern void fn_801C4A44();
+
+    fn_801C431C((s32)fn_801C4A44);
 }
+#pragma scheduling on
+#pragma scheduling on
 
 /**
  * fn_801C483C - Grid get slot Y position.
  * Address: 0x801C483C | Size: 0x28
  */
+#pragma scheduling off
+#pragma scheduling off
 f32 fn_801C483C(s32 slot) {
-    return 0.0f;
+    extern void fn_801C4CB8(void);
+
+    fn_801C431C((s32)fn_801C4CB8);
 }
+#pragma scheduling on
+#pragma scheduling on
 
 /**
  * fn_801C4864 - Grid get slot Z position.
  * Address: 0x801C4864 | Size: 0x28
  */
+#pragma scheduling off
+#pragma scheduling off
 #pragma scheduling off
 f32 fn_801C4864(s32 slot) {
     extern f32 fn_801C54FC(void);
@@ -1045,11 +1133,15 @@ f32 fn_801C4864(s32 slot) {
     fn_801C431C((s32)fn_801C54FC);
 }
 #pragma scheduling on
+#pragma scheduling on
+#pragma scheduling on
 
 /**
  * fn_801C488C - Grid set slot X position.
  * Address: 0x801C488C | Size: 0x28
  */
+#pragma scheduling off
+#pragma scheduling off
 #pragma scheduling off
 void fn_801C488C(s32 slot, f32 x) {
     extern void fn_801C5530(void);
@@ -1057,17 +1149,23 @@ void fn_801C488C(s32 slot, f32 x) {
     fn_801C431C((s32)fn_801C5530);
 }
 #pragma scheduling on
+#pragma scheduling on
+#pragma scheduling on
 
 /**
  * fn_801C48B4 - Grid set slot Y position.
  * Address: 0x801C48B4 | Size: 0x28
  */
 #pragma scheduling off
+#pragma scheduling off
+#pragma scheduling off
 void fn_801C48B4(s32 slot, f32 y) {
-    extern void fn_801C4C98(void);
+    extern f32 fn_801C4C98(void);
 
     fn_801C431C((s32)fn_801C4C98);
 }
+#pragma scheduling on
+#pragma scheduling on
 #pragma scheduling on
 
 /**
@@ -1075,11 +1173,15 @@ void fn_801C48B4(s32 slot, f32 y) {
  * Address: 0x801C48DC | Size: 0x28
  */
 #pragma scheduling off
+#pragma scheduling off
+#pragma scheduling off
 void fn_801C48DC(s32 slot, f32 z) {
     extern void fn_801C55D8(void);
 
     fn_801C431C((s32)fn_801C55D8);
 }
+#pragma scheduling on
+#pragma scheduling on
 #pragma scheduling on
 
 /**
@@ -1095,25 +1197,48 @@ void fn_801C4904(s32 slot, f32 x, f32 y, f32 z) {
  * Address: 0x801C4974 | Size: 0x28
  */
 #pragma scheduling off
+#pragma scheduling off
+#pragma scheduling off
 f32 fn_801C4974(s32 slot) {
     extern f32 fn_801C5898(void);
 
     fn_801C431C((s32)fn_801C5898);
 }
 #pragma scheduling on
+#pragma scheduling on
+#pragma scheduling on
 
 /**
  * fn_801C499C - Grid set slot rotation.
  * Address: 0x801C499C | Size: 0x58
  */
+#pragma scheduling off
+#pragma scheduling off
 void fn_801C499C(s32 slot, f32 rotation) {
-    /* Set rotation for slot */
+    extern s32 fn_801C6908(s32);
+    extern void fn_801C431C(s32);
+    extern void fn_801C5F6C(void);
+    extern void fn_801C5ED0(void);
+    s32 result = fn_801C6908(2);
+    switch (result) {
+    case 0:
+        fn_801C431C((s32)fn_801C5F6C);
+        break;
+    case 1:
+    default:
+        fn_801C431C((s32)fn_801C5ED0);
+        break;
+    }
 }
+#pragma scheduling on
+#pragma scheduling on
 
 /**
  * fn_801C49F4 - Grid get slot scale.
  * Address: 0x801C49F4 | Size: 0x28
  */
+#pragma scheduling off
+#pragma scheduling off
 #pragma scheduling off
 f32 fn_801C49F4(s32 slot) {
     extern f32 fn_801C5ED0(void);
@@ -1121,17 +1246,23 @@ f32 fn_801C49F4(s32 slot) {
     fn_801C431C((s32)fn_801C5ED0);
 }
 #pragma scheduling on
+#pragma scheduling on
+#pragma scheduling on
 
 /**
  * fn_801C4A1C - Grid set slot scale.
  * Address: 0x801C4A1C | Size: 0x28
  */
 #pragma scheduling off
+#pragma scheduling off
+#pragma scheduling off
 void fn_801C4A1C(s32 slot, f32 scale) {
     extern void fn_801C5F6C(void);
 
     fn_801C431C((s32)fn_801C5F6C);
 }
+#pragma scheduling on
+#pragma scheduling on
 #pragma scheduling on
 
 /**
@@ -1167,11 +1298,11 @@ void fn_801C4A44(s32 slot, f32 x, f32 y, f32 z, f32 rot, f32 scale) {
 }
 
 /**
- * fn_801C4C98 - Grid validate slot index.
+ * fn_801C4C98 - Get grid rotation callback.
  * Address: 0x801C4C98 | Size: 0x20
  */
-BOOL fn_801C4C98(s32 slot) {
-    return (slot >= 0 && slot < BATTLE_TOTAL_POKEMON);
+f32 fn_801C4C98(void) {
+    return fn_801C5F6C();
 }
 
 /**
