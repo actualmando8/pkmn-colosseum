@@ -1066,9 +1066,13 @@ void fn_801C48B4(s32 slot, f32 y) {
  * fn_801C48DC - Grid set slot Z position.
  * Address: 0x801C48DC | Size: 0x28
  */
+#pragma scheduling off
 void fn_801C48DC(s32 slot, f32 z) {
-    /* Set slot Z position */
+    extern void fn_801C55D8(void);
+
+    fn_801C431C((s32)fn_801C55D8);
 }
+#pragma scheduling on
 
 /**
  * fn_801C4904 - Grid set slot full position.
@@ -1114,9 +1118,13 @@ f32 fn_801C49F4(s32 slot) {
  * fn_801C4A1C - Grid set slot scale.
  * Address: 0x801C4A1C | Size: 0x28
  */
+#pragma scheduling off
 void fn_801C4A1C(s32 slot, f32 scale) {
-    /* Set scale for slot */
+    extern void fn_801C5F6C(void);
+
+    fn_801C431C((s32)fn_801C5F6C);
 }
+#pragma scheduling on
 
 /**
  * fn_801C4A44 - Grid complex slot update (position + rotation + scale).

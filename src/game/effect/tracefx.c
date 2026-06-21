@@ -58,6 +58,36 @@ extern void  fn_8010147C(u32 memOffset, u32 resId,
 extern void  fn_801013A0(u32 memOffset, u32 size,
                           u32 data, u32 handle);         /* GSfloor load data */
 extern void  memset(void* dst, u32 val, u32 size);
+extern void  fn_800B8DF4(void);
+extern void  fn_800B856C(void);
+extern void  fn_800EF5A4(void* p);
+extern void* fn_80131428(void* owner, u32 size);
+extern void  fn_80131200();
+extern void  fn_8013139C(void* obj, u32 flag);
+
+/* ===== GS immediate-mode render API (used by tracefxUpdate) ===== */
+extern void  fn_800D2248(void);
+extern void  fn_800DA4C4(s32 a, s32 b, s32 c);
+extern void  fn_800DA2BC(s32 a, s32 b, s32 c);
+extern void  fn_800DA1E8(s32 a, s32 b, s32 c);
+extern void  fn_800DA028(s32 a);
+extern void  fn_800D88DC(s32 a);
+extern void  fn_800D888C(s32 a);
+extern void  fn_800D7820(void* p);
+extern void  fn_800D85D4(s32 a, void* p);
+extern void  fn_800D6A00(s32 a);
+extern void  fn_800D67BC(s32 a);
+extern void  fn_800D6680(f32 x, f32 y, f32 z);
+extern void  fn_800D5CB8(s32 a, u8 r, u8 g, u8 b, u8 al);
+extern void  fn_800D59B8(s32 a, f32 s, f32 t);
+extern void  fn_800D6728(void);
+
+/* ===== Forward declarations (vtable callbacks) ===== */
+BOOL  fn_801379E4(u8* w);
+BOOL  fn_80137A2C(u8* w);
+void  fn_80137D14(void);
+int   fn_80137F58(u8* w);
+BOOL  tracefxStartEffect(u8* w);
 
 /* ===== String constants (rodata) ===== */
 extern const char lbl_80272B08[]; /* "tracefxStartEffect: Could not start trail effect!" */
@@ -625,28 +655,53 @@ void fn_80137780(void) {
 
 /* 0x8013796C | 0x78 */
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8013796C(void) {
-    /* TODO: match -- 120 bytes at 0x8013796C */
+#pragma optimization_level 4
+void* fn_8013796C(void* owner) {
+    void* obj = fn_80131428(owner, 0x2C);
+    if (obj != (void*)0) {
+        fn_80131200(obj, 0, fn_801379E4, tracefxStartEffect, fn_80137A2C, 0,
+                    fn_80137D14, fn_80137F58);
+        fn_8013139C(obj, 0);
+    }
+    return obj;
 }
 #pragma pop
 
 /* 0x801379E4 | 0x48 */
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801379E4(void) {
-    /* TODO: match -- 72 bytes at 0x801379E4 */
+#pragma optimization_level 4
+BOOL fn_801379E4(u8* w) {
+    if (w != (void*)0) {
+        fn_800B8DF4();
+        fn_800B856C();
+        if (*(void**)(w + 0x14) != (void*)0) {
+            fn_800EF5A4(*(void**)(w + 0x14));
+        }
+    }
+    return TRUE;
 }
 #pragma pop
 
 /* 0x80137A2C | 0x78 */
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80137A2C(void) {
-    /* TODO: match -- 120 bytes at 0x80137A2C */
+#pragma optimization_level 4
+BOOL fn_80137A2C(u8* w) {
+    u16 handle;
+    if (w != (void*)0) {
+        fn_800B8DF4();
+        fn_800B856C();
+        handle = *(u16*)(w + 0x0C);
+        if (handle != 0) {
+            fn_800E24B0(handle);
+            fn_800E209C(handle);
+        }
+        handle = *(u16*)(w + 0x0E);
+        if (handle != 0) {
+            fn_800E24B0(handle);
+            fn_800E209C(handle);
+        }
+    }
+    return TRUE;
 }
 #pragma pop
 
@@ -772,9 +827,49 @@ void fn_80137D14(void) {
 
 /* 0x80137F58 | 0x17C */
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80137F58(void) {
-    /* TODO: match -- 380 bytes at 0x80137F58 */
+#pragma optimization_level 4
+int fn_80137F58(u8* w) {
+    u16 count1;
+    u16 count2;
+    u8* node;
+    u8* weight;
+    u32 i;
+
+    count1 = *(u16*)(w + 0x1C);
+    count2 = *(u16*)(w + 0x1E);
+    if (*(void**)(w + 0x14) == (void*)0) {
+        return 0;
+    }
+    if (count1 <= 1) goto ret0;
+    if (count2 <= 1) goto ret0;
+
+    fn_800D2248();
+    fn_800DA4C4(1, 6, 7);
+    fn_800DA2BC(1, 1, 0);
+    fn_800DA1E8(1, 2, 1);
+    fn_800DA028(0);
+    fn_800D88DC(3);
+    fn_800D888C(4);
+    fn_800D7820(*(void**)(w + 0x10));
+    fn_800D85D4(0, *(void**)(w + 0x14));
+    fn_800D6A00(4);
+    fn_800D67BC((count2 & 0x7FFF) << 1);
+
+    node = *(u8**)(w + 0x00);
+    weight = *(u8**)(w + 0x08) + (*(u16*)(w + 0x22) - count2) * 16;
+    for (i = 0; (u16)i < count2; i++) {
+        fn_800D6680(*(f32*)(node + 0x00), *(f32*)(node + 0x04), *(f32*)(node + 0x08));
+        fn_800D5CB8(0, w[0x18], w[0x19], w[0x1A], w[0x1B]);
+        fn_800D59B8(0, *(f32*)(weight + 0x00), *(f32*)(weight + 0x04));
+        fn_800D6680(*(f32*)(node + 0x0C), *(f32*)(node + 0x10), *(f32*)(node + 0x14));
+        fn_800D5CB8(0, w[0x18], w[0x19], w[0x1A], w[0x1B]);
+        fn_800D59B8(0, *(f32*)(weight + 0x08), *(f32*)(weight + 0x0C));
+        node = *(u8**)(node + 0x1C);
+        weight += 0x10;
+    }
+    fn_800D6728();
+    return 1;
+ret0:
+    return 0;
 }
 #pragma pop
