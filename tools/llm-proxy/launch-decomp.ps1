@@ -38,7 +38,9 @@ param(
   [switch]$NoAttach,
   [switch]$DryRun,          # build the layout with harmless echo placeholders
   [int]$Port = 8788,        # proxy listen port (8787 is taken by openbb-workspace-mcp)
-  [string]$Session = "decomp"
+  [string]$Session = "decomp",
+  [switch]$NoDashboard,     # skip auto-starting the renaming/symbolmap web dashboard
+  [switch]$NoCadence        # skip auto-starting the report_cadence publish loop
 )
 
 $ErrorActionPreference = "Continue"
@@ -209,6 +211,39 @@ if (-not $DryRun) {
     "Start-Sleep 75; & '$repo\tools\decomp_work\fleet_up.ps1'"
   )
   Write-Host "Scheduled fleet_up (decomp driver) to start in ~75s" -ForegroundColor Cyan
+}
+
+# Renaming/symbolmap web dashboard. open_renaming_dashboard.ps1 starts the python
+# server hidden, health-checks it, and opens the browser. Port = proxy port + 1 (the
+# proxy owns $Port) so it lands on 8789 without the collision-probe dance. Skip with
+# -NoDashboard. Failure here is non-fatal — the cockpit is already up.
+if (-not $DryRun -and -not $NoDashboard) {
+  try {
+    & (Join-Path $repo 'tools\symbolmap\open_renaming_dashboard.ps1') -Port ($Port + 1)
+  } catch {
+    Write-Host "WARNING: renaming dashboard failed to start: $_" -ForegroundColor Yellow
+  }
+}
+
+# report_cadence: the hourly loop that recomputes the PUBLISHED report.json
+# (compile_check --all + gen_decomp_report), syncs the README, and pushes — so decomp.dev
+# and the README never freeze. fleet_up does NOT start this; without it the headline number
+# stalls (it sat dead ~25h once while real matches kept landing). Launched via Git bash so
+# python + git are on PATH (report_cadence shells out to both). Idempotent: kill any
+# existing loop first so relaunches don't stack. Skip with -NoCadence.
+if (-not $DryRun -and -not $NoCadence) {
+  New-Item -ItemType Directory -Force -Path (Join-Path $repo 'build\logs') | Out-Null
+  Get-CimInstance Win32_Process | Where-Object {
+    $_.CommandLine -match 'report_cadence\.py'
+  } | ForEach-Object { try { Stop-Process -Id $_.ProcessId -Force } catch {} }
+  $bashExe = 'C:\Program Files\Git\bin\bash.exe'
+  if (Test-Path $bashExe) {
+    $cadArg = "-l -c `"cd '$repo' && exec python tools/decomp_work/report_cadence.py >> build/logs/report_cadence.log 2>&1`""
+    Start-Process -FilePath $bashExe -WindowStyle Hidden -ArgumentList $cadArg
+    Write-Host "Started report_cadence publish loop (hourly report.json/README + push)" -ForegroundColor Cyan
+  } else {
+    Write-Host "WARNING: git bash not found; report_cadence not started" -ForegroundColor Yellow
+  }
 }
 
 # land the user in the orchestrator pane (captured id)
