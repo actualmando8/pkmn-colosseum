@@ -32,6 +32,31 @@ def load_saved():
 SAVED = load_saved()
 
 
+def load_reground():
+    """auto_rebatch appends every fn in a dispatched packet to build/wall_attempts.txt on
+    EACH dispatch (via `wall_ledger.py mark`). A fn appearing >=2 times has therefore been
+    RE-dispatched — we already attempted it (almost always to a wall) and are burning tokens
+    grinding it again. The wall_ledger.json `attempted` flag the queue reads is only
+    refreshed by a full `wall_ledger.py build` (which doesn't run each cycle), so the queue
+    re-offers these walls every session (e.g. gs_model.c / SI.c fns dispatched 6x). Exclude
+    anything dispatched >=2 times. A count of 1 stays in the pool — that's a fn's legitimate
+    single attempt (or one merely bundled into a packet but never worked), so this does NOT
+    starve the queue the way excluding every-ever-dispatched fn would. To force a re-attempt
+    after a NEW lever appears, delete the fn's lines from build/wall_attempts.txt."""
+    from collections import Counter
+    p = os.path.join(ROOT, "build", "wall_attempts.txt")
+    c = Counter()
+    if os.path.exists(p):
+        try:
+            c.update(_FN_RE.findall(open(p, encoding="utf-8", errors="replace").read()))
+        except OSError:
+            pass
+    return {fn for fn, n in c.items() if n >= 2}
+
+
+REGROUND = load_reground()
+
+
 def load_codex_files():
     """Files the Codex ASM lanes own (build/asm_codex_queue.txt). Exclude them from the
     Claude queue so an Opus lane never lands on a file a Codex lane is converting (they
@@ -70,7 +95,7 @@ def fresh_by_file(led, bucket):
     for fn, v in led.items():
         if v["attempted"] or v["bucket"] != bucket:
             continue
-        if fn in SAVED:            # already byte-exact (saved) — don't re-dispatch it
+        if fn in SAVED or fn in REGROUND:   # already matched, or already re-dispatched (>=2x) — don't re-grind
             continue
         if any(b in v["file"] for b in BAD):
             continue
