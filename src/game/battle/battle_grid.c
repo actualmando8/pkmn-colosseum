@@ -1100,11 +1100,13 @@ s32 fn_801C47D0(void) {
 #pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
+#pragma scheduling off
 f32 fn_801C4814(s32 slot) {
     extern void fn_801C4A44();
 
     fn_801C431C((s32)fn_801C4A44);
 }
+#pragma scheduling on
 #pragma scheduling on
 #pragma scheduling on
 #pragma scheduling on
@@ -1116,6 +1118,7 @@ f32 fn_801C4814(s32 slot) {
 #pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
+#pragma scheduling off
 f32 fn_801C483C(s32 slot) {
     extern void fn_801C4CB8(void);
 
@@ -1124,11 +1127,13 @@ f32 fn_801C483C(s32 slot) {
 #pragma scheduling on
 #pragma scheduling on
 #pragma scheduling on
+#pragma scheduling on
 
 /**
  * fn_801C4864 - Grid get slot Z position.
  * Address: 0x801C4864 | Size: 0x28
  */
+#pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
@@ -1142,11 +1147,13 @@ f32 fn_801C4864(s32 slot) {
 #pragma scheduling on
 #pragma scheduling on
 #pragma scheduling on
+#pragma scheduling on
 
 /**
  * fn_801C488C - Grid set slot X position.
  * Address: 0x801C488C | Size: 0x28
  */
+#pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
@@ -1160,11 +1167,13 @@ void fn_801C488C(s32 slot, f32 x) {
 #pragma scheduling on
 #pragma scheduling on
 #pragma scheduling on
+#pragma scheduling on
 
 /**
  * fn_801C48B4 - Grid set slot Y position.
  * Address: 0x801C48B4 | Size: 0x28
  */
+#pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
@@ -1178,6 +1187,7 @@ void fn_801C48B4(s32 slot, f32 y) {
 #pragma scheduling on
 #pragma scheduling on
 #pragma scheduling on
+#pragma scheduling on
 
 /**
  * fn_801C48DC - Grid set slot Z position.
@@ -1187,11 +1197,13 @@ void fn_801C48B4(s32 slot, f32 y) {
 #pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
+#pragma scheduling off
 void fn_801C48DC(s32 slot, f32 z) {
     extern void fn_801C55D8(void);
 
     fn_801C431C((s32)fn_801C55D8);
 }
+#pragma scheduling on
 #pragma scheduling on
 #pragma scheduling on
 #pragma scheduling on
@@ -1213,6 +1225,7 @@ void fn_801C4904(s32 slot, f32 x, f32 y, f32 z) {
 #pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
+#pragma scheduling off
 f32 fn_801C4974(s32 slot) {
     extern f32 fn_801C5898(void);
 
@@ -1222,11 +1235,13 @@ f32 fn_801C4974(s32 slot) {
 #pragma scheduling on
 #pragma scheduling on
 #pragma scheduling on
+#pragma scheduling on
 
 /**
  * fn_801C499C - Grid set slot rotation.
  * Address: 0x801C499C | Size: 0x58
  */
+#pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
@@ -1249,11 +1264,13 @@ void fn_801C499C(s32 slot, f32 rotation) {
 #pragma scheduling on
 #pragma scheduling on
 #pragma scheduling on
+#pragma scheduling on
 
 /**
  * fn_801C49F4 - Grid get slot scale.
  * Address: 0x801C49F4 | Size: 0x28
  */
+#pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
@@ -1267,6 +1284,7 @@ f32 fn_801C49F4(s32 slot) {
 #pragma scheduling on
 #pragma scheduling on
 #pragma scheduling on
+#pragma scheduling on
 
 /**
  * fn_801C4A1C - Grid set slot scale.
@@ -1276,11 +1294,13 @@ f32 fn_801C49F4(s32 slot) {
 #pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
+#pragma scheduling off
 void fn_801C4A1C(s32 slot, f32 scale) {
     extern void fn_801C5F6C(void);
 
     fn_801C431C((s32)fn_801C5F6C);
 }
+#pragma scheduling on
 #pragma scheduling on
 #pragma scheduling on
 #pragma scheduling on

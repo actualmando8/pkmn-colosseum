@@ -1764,10 +1764,12 @@ void fn_8010C224(void) {
 #pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
+#pragma scheduling off
 s32 fn_8010C364(void) {
     fn_800EF5A4();
     return 1;
 }
+#pragma scheduling on
 #pragma scheduling on
 #pragma scheduling on
 #pragma scheduling on
@@ -1799,8 +1801,11 @@ void fn_8010C3FC(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_8010C46C(void) {
-    /* TODO: match -- 52 bytes at 0x8010C46C */
+u16 fn_8010C46C(u16 typeIndex) {
+    if (typeIndex >= lbl_80478B38) {
+        return 0;
+    }
+    return *(u16*)((u8*)(lbl_8035B500 + typeIndex) + 2);
 }
 #pragma pop
 
@@ -1808,8 +1813,11 @@ void fn_8010C46C(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_8010C4A0(void) {
-    /* TODO: match -- 52 bytes at 0x8010C4A0 */
+u8 fn_8010C4A0(u16 typeIndex) {
+    if (typeIndex >= lbl_80478B38) {
+        return 0;
+    }
+    return *(u8*)((u8*)(lbl_8035B500 + typeIndex) + 0);
 }
 #pragma pop
 
@@ -1817,8 +1825,11 @@ void fn_8010C4A0(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_8010C4D4(void) {
-    /* TODO: match -- 52 bytes at 0x8010C4D4 */
+u32 fn_8010C4D4(u16 typeIndex) {
+    if (typeIndex >= lbl_80478B38) {
+        return 0;
+    }
+    return *(u32*)((u8*)(lbl_8035B500 + typeIndex) + 4);
 }
 #pragma pop
 
@@ -1826,8 +1837,10 @@ void fn_8010C4D4(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_8010C508(void) {
+u16 fn_8010C508(u32 typeA, u32 typeB) {
     /* TODO: match -- 68 bytes at 0x8010C508 */
+    (void)typeA; (void)typeB;
+    return 0;
 }
 #pragma pop
 
@@ -1835,8 +1848,50 @@ void fn_8010C508(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_8010C54C(void) {
-    /* TODO: match -- 260 bytes at 0x8010C54C */
+s32 fn_8010C54C(u16 param1, u8 mode) {
+    u16 i;
+    u16 code1;
+    u16 code2;
+    u16 result;
+    s32 score = 0;
+
+    for (i = 0; i < lbl_80478B38; i++) {
+        if (i == 9) {
+            continue;
+        }
+        if (mode == 1) {
+            code1 = fn_8010C508((u32)param1, (u32)i);
+            result = code1;
+            if (result == 0x43) {
+                score -= 10;
+                continue;
+            }
+            if (result == 0x42) {
+                score -= 10;
+                continue;
+            }
+            if (result == 0x41) {
+                score += 10;
+                continue;
+            }
+        } else {
+            code2 = fn_8010C508((u32)i, (u32)param1);
+            result = code2;
+            if (result == 0x43) {
+                score += 10;
+                continue;
+            }
+            if (result == 0x42) {
+                score += 10;
+                continue;
+            }
+            if (result == 0x41) {
+                score -= 10;
+                continue;
+            }
+        }
+    }
+    return score;
 }
 #pragma pop
 
@@ -1844,8 +1899,42 @@ void fn_8010C54C(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_8010C650(void) {
-    /* TODO: match -- 252 bytes at 0x8010C650 */
+u16 fn_8010C650(u16 typeA, u16* arr, u16 count) {
+    u16 i;
+    u16 countA = 0;
+    u16 countB = 0;
+    u16 e;
+    u16 code;
+    u16 result;
+
+    for (i = 0; i < count; i++) {
+        if (i == 9) {
+            continue;
+        }
+        e = arr[i];
+        code = fn_8010C508((u32)typeA, (u32)e);
+        result = code;
+        if (result == 0x43) {
+            return 0x43;
+        }
+        if (result == 0x41) {
+            countA++;
+            continue;
+        }
+        if (result == 0x42) {
+            countB++;
+        }
+    }
+    if (countA == 0 && countB == 0) {
+        return 0x3f;
+    }
+    if (countA == countB) {
+        return 0x3f;
+    }
+    if (countA > countB) {
+        return 0x41;
+    }
+    return 0x42;
 }
 #pragma pop
 
@@ -1853,8 +1942,8 @@ void fn_8010C650(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_8010C74C(void) {
-    /* TODO: match -- 48 bytes at 0x8010C74C */
+u16 fn_8010C74C(u16 typeA, u16 typeB) {
+    return fn_8010C508((u32)typeA, (u32)typeB);
 }
 #pragma pop
 
@@ -1868,22 +1957,67 @@ void fn_8010C77C(void) {
 #pragma pop
 
 /* 0x8010C7BC | 0x88 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8010C7BC(void) {
-    /* TODO: match -- 136 bytes at 0x8010C7BC */
+s32 fn_8010C7BC(s32 triIndex, u32* outResult) {
+    u8* base = (u8*)COL_STATE;
+    void* wzx = COL_WZX;
+    u8* entry;
+    s32 result;
+
+    if (wzx == NULL) {
+        result = 1;
+    } else if (triIndex < 0 || triIndex >= *(u32*)((u8*)wzx + 4)) {
+        result = 2;
+    } else {
+        u8* t = base + COL_LAYER_IDX * GSCOLSYS_LAYER_SIZE;
+        t = t + 4;
+        t = t + triIndex * GSCOLSYS_TRI_ENTRY_SIZE;
+        entry = t;
+        result = 0;
+    }
+    if (result != 0) {
+        return result;
+    }
+    if (*(u16*)(entry + 0x24) & 1) {
+        *outResult = 0;
+    } else {
+        *outResult = 1;
+    }
+    return 0;
 }
-#pragma pop
 
 /* 0x8010C844 | 0x8C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8010C844(void) {
-    /* TODO: match -- 140 bytes at 0x8010C844 */
+s32 fn_8010C844(s32 triIndex, s32 visible) {
+    u8* base = (u8*)COL_STATE;
+    void* wzx = COL_WZX;
+    u8* entry;
+    u16 flags;
+    s32 result;
+
+    if (wzx == NULL) {
+        result = 1;
+    } else if (triIndex < 0 || triIndex >= *(u32*)((u8*)wzx + 4)) {
+        result = 2;
+    } else {
+        u8* t = base + COL_LAYER_IDX * GSCOLSYS_LAYER_SIZE;
+        t = t + 4;
+        t = t + triIndex * GSCOLSYS_TRI_ENTRY_SIZE;
+        entry = t;
+        result = 0;
+    }
+    if (result != 0) {
+        return result;
+    }
+    if (visible != 0) {
+        flags = *(u16*)(entry + 0x24);
+        flags &= 0xFFFE;
+        *(u16*)(entry + 0x24) = flags;
+    } else {
+        flags = *(u16*)(entry + 0x24);
+        flags |= 1;
+        *(u16*)(entry + 0x24) = flags;
+    }
+    return 0;
 }
-#pragma pop
 
 /* 0x8010C8D0 | 0x160 */
 #pragma push
