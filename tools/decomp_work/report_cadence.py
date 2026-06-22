@@ -18,6 +18,7 @@ Run (Windows python, from repo root):
   python tools/decomp_work/report_cadence.py --once     # single cycle
 """
 import json
+import os
 import re
 import subprocess
 import sys
@@ -97,7 +98,9 @@ def cycle() -> None:
             break
         log(f"commit retry {attempt+1}: {c.stderr.strip()[:120]}")
         time.sleep(5)
-    p = run(["git", "push", "origin", "master"])
+    # The pre-push hook blocks direct master pushes unless this is set; the cadence is
+    # the intended automated publisher (report.json + README only), so opt in explicitly.
+    p = run(["git", "push", "origin", "master"], env={**os.environ, "ALLOW_MASTER_PUSH": "1"})
     log(f"PUBLISHED {old} -> {new}/{total} ({fnp:.2f}%), code {codep:.2f}% "
         f"(push rc={p.returncode})")
 
