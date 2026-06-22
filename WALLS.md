@@ -27,6 +27,23 @@ C and move on.** This file is how we *stop re-grinding* them.
 Walls live in the gap between C-converted and byte-exact-C. Logging them keeps the
 gap *honest and intentional* instead of an open backlog we keep re-attacking.
 
+## 2026-06-22 — two exhausted clusters re-logged to stop the fleet re-grinding them
+
+The bucket queue was re-handing these every cycle (they are not in SAVED, and the ledger
+JSON's `attempted` flag is only refreshed on `wall_ledger.py build`), which burned Opus
+budget *and* drove the `pl_battle_grid` gate-churn (a lane re-saving them re-touched the
+band-win file each pass). Logged here = `attempted` on the next ledger build, hard-skipped now.
+
+- **math_longlong.c — `fn_800C4C50` / `fn_800C4C74` / `fn_800C4C98`** (W-asm-only). These are
+  the MWCC 64-bit shift runtime helpers `__shl2i` / `__shr2u` / `__shr2i` — asm-only library
+  routines (r8/r9/r10 scratch + `subic` + in-place `r3:r4`, no u64 rebuild from C). `0 SAVED /
+  3 WALL`, ceiling 55–61%; every C signature / union / return form exhausted. Not C-reachable.
+- **battle_grid.c — `fn_801C2F00` / `fn_801C0F20` / `fn_801C3E3C` / `fn_801C3B80` /
+  `fn_801C31EC` / `fn_801C2670`** (W-shape / W-reg-coloring, exhausted). The 6 residual
+  battle_grid walls after 10 sessions + 8 cumulative saves: `2F00` 99.15 / `3B80` 95.57
+  reg-coloring materialization-mr near-misses (12+ levers, escape-clause); `0F20` 78.77 /
+  `3E3C` 97.17 / `31EC` 89.72 / `2670` 86.70 SHAPE. Hard-skip — do not re-grind.
+
 ## 2026-06-19 - gs_title.c fn_8002537C / fn_80025490 (W-branch-collapse)
 
 `fn_8002537C` and `fn_80025490` are sibling single-axis title/menu position writers with

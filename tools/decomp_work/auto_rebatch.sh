@@ -39,14 +39,32 @@ for name in $LANES; do
 done
 
 LOCKS=$(locked_files)
+# Spawn-tax-immune contention guard: files already owned by another busy/pending lane.
+# locks.py (python+sqlite) is slow / times out under the MSYS process-spawn tax, so its
+# list silently empties and two lanes draw the same file. This pure-file check is the
+# reliable backstop: derive each lane's file from its pending .req or active .task
+# ("File: <path>"), count it taken only while that lane is busy or has an unsent req
+# (an idle lane's last file is finished and free to reassign).
+BUSY_FILES=""
+for _o in $LANES; do
+  _of=""
+  for _f in "$REQ/$_o.req" "$REQ/$_o.task"; do
+    [ -f "$_f" ] || continue
+    _of=$(sed -n 's/.*File: \([^ ]*\).*/\1/p' "$_f" | head -1); [ -n "$_of" ] && break
+  done
+  [ -n "$_of" ] || continue
+  read -r _ost _ < "$HB/$_o.state" 2>/dev/null || _ost=""
+  if [ "$_ost" = busy ] || [ -f "$REQ/$_o.req" ]; then BUSY_FILES="${BUSY_FILES}"$'\n'"${_of}"; fi
+done
 RUN_PICKED=""
-pick_line() {  # pick_line <queue> -> first line whose file is free + unlocked + unpicked-this-run
+pick_line() {  # pick_line <queue> -> first line whose file is free + unlocked + unowned + unpicked-this-run
   local queue="$1" line f
   [ -f "$queue" ] || return 1
   while IFS= read -r line; do
     [ -n "$line" ] || continue
     f=$(echo "$line" | awk '{print $1}')
     echo "$LOCKS" | grep -qxF "$f" && continue
+    printf '%s\n' "$BUSY_FILES" | grep -qxF "$f" && continue   # owned by another busy/pending lane
     printf '%s\n' "$RUN_PICKED" | grep -qxF "$f" && continue
     echo "$line"; return 0
   done < "$queue"

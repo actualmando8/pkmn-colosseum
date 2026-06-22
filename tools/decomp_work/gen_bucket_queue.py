@@ -49,7 +49,12 @@ def load_codex_files():
 CODEX_FILES = load_codex_files()
 QUEUE = os.path.join(ROOT, "build", "wall_queue.txt")
 ASSIGNED = os.path.join(ROOT, "build", "wall_assigned.txt")
-BAD = ("effect_util", "hsd_", "ui_core", "fsys_file", "gs_material", "pokemon", "gs_pokemon_summary")
+BAD = ("effect_util", "hsd_", "ui_core", "fsys_file", "gs_material", "pokemon", "gs_pokemon_summary",
+       # 2026-06-22: mega Ghidra-import TUs whose remaining fns are hard LOW drafts (need
+       # from-scratch reshape, NOT near-miss CRACK levers). They flooded the queue top and
+       # lanes punted "no action / unchanged" on them in a tight loop. Excluded from the
+       # auto-queue; work them via explicit from-scratch packets, not the CRACK rebatcher.
+       "colosseum_battle", "gba_misc")
 # Goal order (2026-06-21): finish LOW, then work back UP the value ladder starting at ASM.
 # (Was NEARWALL,STRUCT,ASM,LOW — but NEARWALL/STRUCT near-miss pools are exhausted, so the
 # directive is grind LOW out, then re-attack ASM (from-scratch asm->C), then STRUCT, NEARWALL.)

@@ -15,6 +15,14 @@ MARK=build/.last_gate
 if [ -f "$MARK" ]; then FILES=$(find build/band_wins -name 'pl_*.json' -newer "$MARK" 2>/dev/null)
 else FILES=$(find build/band_wins -name 'pl_*.json' -mmin -180 2>/dev/null); fi
 touch "$MARK"
+# LOCK-AWARE GATING (the driver's documented intent, now actually implemented).
+# Never commit a file a lane is still band-locked on: that gate-vs-lane race is what
+# produced the repeated byte-identical "+N byte-exact" churn commits — the gate kept
+# re-applying a lane's in-flight file every pass. Held file-locks are read once per pass;
+# a tag whose changed file is locked is reverted + skipped, leaving the win banked to
+# gate cleanly the first cycle the lock is released. timeout-guarded: if locks.py is slow
+# the list is empty and we fall back to the old (lock-blind) behaviour rather than stall.
+LOCKED_FILES=$(timeout 20 $PY tools/decomp_work/coordination/locks.py list --scope file 2>/dev/null | awk '{print $2}')
 for f in $FILES; do
   [ -f "$f" ] || continue
   tag=$(basename "$f" .json)
@@ -26,6 +34,15 @@ for f in $FILES; do
   # changed src files from the accumulated applies, minus the WIP trio
   changed=$(git diff --name-only -- src/ 2>/dev/null | grep -vE "$WIP_RE")
   [ -n "$changed" ] || { echo "  $tag: redundant no-op (already in canon)"; continue; }
+  # anti-churn: if a lane still band-locks any changed file, don't race it — revert the
+  # speculative apply for the locked file(s) and skip; the win stays banked for a later pass.
+  raced=""
+  for src in $changed; do printf '%s\n' "$LOCKED_FILES" | grep -qxF "$src" && raced="$raced $src"; done
+  if [ -n "$raced" ]; then
+    echo "  $tag: LOCKED ($raced) -> revert+skip, will gate when lane releases"
+    for src in $raced; do git checkout -- "$src" 2>/dev/null; done
+    continue
+  fi
   # fraud guard: reject if any added line is asm storage / inline asm / .inc include
   fraud=0
   for src in $changed; do

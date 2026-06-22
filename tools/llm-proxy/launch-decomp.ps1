@@ -1,18 +1,18 @@
 ﻿<#
-  launch-decomp.ps1 - build the "decomp" tmux (psmux) cockpit, 9 panes:
+  launch-decomp.ps1 - build the "decomp" tmux (psmux) cockpit:
 
-     +-----------+-----------+-----------+-----------+
-     | 0 PROXY   | 1 CODEX-1 | 2 CODEX-2 | 3 CODEX-3 |
-     +-----------+-----------+-----------+-----------+
-     | 4 CODEX-4 | 5 GLM     | 6 SONNET  | 7 OPUS wk |
-     +-----------+-----------+-----------+-----------+
-     | 8 OPUS ORCHESTRATOR (you type here)          |
-     +----------------------------------------------+
+     +-----------+-----------+-----------+
+     | col1      | OPUS wk   | C1 | C2   |
+     | proxy     +-----------+----+------+
+     | permuter  | SONNET    | C3 | C4   |
+     | glm       +-----------+----+------+
+     |           | OPUS ORCHESTRATOR     |
+     +-----------+-----------+-----------+
 
-  Fleet (codex-heavy - we have far more Codex headroom than Claude):
-  - pane 0  proxy    - local router (tools/llm-proxy/proxy.js); only GLM routes through it.
-  - panes 1-4 codex  - 4x Codex CLI (gpt-5.5). The workhorses.
-  - pane 5  glm      - Claude Code via the proxy, pinned glm-5.2[1m] (isolated config + key).
+  Fleet (2026-06-22: 8 Codex/gpt-5.5 lanes were cut to 4 Opus worker lanes C1-C4):
+  - pane    proxy    - local router (tools/llm-proxy/proxy.js); only GLM routes through it.
+  - C1-C4   lanes    - 4x Claude Opus (opus[1m]). The workhorses (were Codex gpt-5.5).
+  - pane    glm      - Claude Code via the proxy, pinned glm-5.2[1m] (isolated config + key).
   - pane 6  sonnet   - Claude Code Sonnet (DIRECT; Max bypasses the proxy - see note).
   - pane 7  worker   - a 2nd Opus the orchestrator dispatches hard structural work to.
   - pane 8  orch.    - the orchestrator Opus; the pane you're dropped into on attach.
@@ -86,6 +86,10 @@ if (Test-Path $glmCreds) { Remove-Item -Force $glmCreds }
 $cdRepo = 'cd /d "' + $repo + '"'
 
 $proxyCmd  = $cdRepo + ' && set "PORT=' + $Port + '" && node "tools\llm-proxy\proxy.js"'
+# 2026-06-22: the 8 Codex/gpt-5.5 lanes were retired in favour of 4 Opus worker lanes
+# (C1-C4). They run the same opus[1m] CLI as the worker/orchestrator and pick up the
+# fleet's CRACK/scratch packets. The old codex command is kept here for reference only.
+$laneCmd   = $cdRepo + ' && claude --model "opus[1m]" --dangerously-skip-permissions'
 $codexCmd  = $cdRepo + ' && codex'
 $glmCmd    = $cdRepo + ' && set "CLAUDE_CONFIG_DIR=' + $glmConfigDir + '" && set "ANTHROPIC_BASE_URL=http://127.0.0.1:' + $Port + '" && set "ANTHROPIC_API_KEY=zai-proxy" && claude --model "glm-5.2[1m]" --dangerously-skip-permissions'
 # Sonnet + Opus run DIRECT (Max OAuth ignores the proxy; routing them through it is
@@ -101,6 +105,7 @@ $permCmd   = 'wsl.exe bash -lc "bash ' + $repoWsl + '/tools/decomp_work/permuter
 
 if ($DryRun) {
   $proxyCmd  = 'echo [DRYRUN] pane0 = NODE PROXY'
+  $laneCmd   = 'echo [DRYRUN] pane = OPUS LANE'
   $codexCmd  = 'echo [DRYRUN] pane = CODEX'
   $glmCmd    = 'echo [DRYRUN] pane5 = CLAUDE GLM glm-5.2[1m]'
   $sonnetCmd = 'echo [DRYRUN] pane6 = CLAUDE SONNET'
@@ -145,11 +150,8 @@ $CODEX2   = SplitH $RIGHT 50   # RIGHT = codex1 (TL), CODEX2 = codex2 (TR)
 $CODEX4   = SplitH $CODEXBL 50 # CODEXBL = codex3 (BL), CODEX4 = codex4 (BR)
 $CODEX1   = $RIGHT
 $CODEX3   = $CODEXBL
-# 4 more Codex lanes (CODEX5-8): split each of the 2x2 cells -> 2x4 Codex grid (8 lanes).
-$CODEX5   = SplitV $CODEX1 50
-$CODEX6   = SplitV $CODEX2 50
-$CODEX7   = SplitV $CODEX3 50
-$CODEX8   = SplitV $CODEX4 50
+# Right side is now a clean 2x2 of 4 Opus worker lanes (C1-C4). The old 2x4 Codex grid
+# (CODEX5-8) was removed when the 8 Codex lanes were cut to 4 Opus.
 Start-Sleep -Milliseconds 400
 
 # Launch each role in its captured pane.
@@ -158,14 +160,10 @@ Send $GLMAGENT $glmCmd
 Send $OPUS     $workerCmd
 Send $SONNET   $sonnetCmd
 Send $ORCH     $orchCmd
-Send $CODEX1   $codexCmd
-Send $CODEX2   $codexCmd
-Send $CODEX3   $codexCmd
-Send $CODEX4   $codexCmd
-Send $CODEX5   $codexCmd
-Send $CODEX6   $codexCmd
-Send $CODEX7   $codexCmd
-Send $CODEX8   $codexCmd
+Send $CODEX1   $laneCmd
+Send $CODEX2   $laneCmd
+Send $CODEX3   $laneCmd
+Send $CODEX4   $laneCmd
 Send $PERMUTER $permCmd
 
 # --- registry from CAPTURED ids (robust to layout/index shuffles) ---
@@ -173,7 +171,9 @@ if (-not $DryRun) {
   $reg = Join-Path $repo 'tools\decomp_work\tmux_control\panes.env'
   $regBody = @(
     '# panes.env - decomp cockpit registry (written by launch-decomp.ps1 from captured pane ids).',
-    '# claude=orchestrator Opus (self) | worker=Opus | sonnet=Sonnet | glm=GLM | codex/codex2..8=Codex (8 lanes)',
+    '# claude=orchestrator Opus (self) | worker=Opus | sonnet=Sonnet | glm=GLM',
+    '# CODEX_PANE..CODEX4_PANE are now the 4 Opus worker lanes C1-C4 (converted from Codex).',
+    '# CODEX5-8 were cut (8 GPT lanes -> 4 Opus) and are blanked so pane_io skips them.',
     ('CLAUDE_PANE="'  + $ORCH     + '"'),
     ('WORKER_PANE="'  + $OPUS     + '"'),
     ('SONNET_PANE="'  + $SONNET   + '"'),
@@ -182,15 +182,22 @@ if (-not $DryRun) {
     ('CODEX2_PANE="'  + $CODEX2   + '"'),
     ('CODEX3_PANE="'  + $CODEX3   + '"'),
     ('CODEX4_PANE="'  + $CODEX4   + '"'),
-    ('CODEX5_PANE="'  + $CODEX5   + '"'),
-    ('CODEX6_PANE="'  + $CODEX6   + '"'),
-    ('CODEX7_PANE="'  + $CODEX7   + '"'),
-    ('CODEX8_PANE="'  + $CODEX8   + '"'),
+    'CODEX5_PANE=""',
+    'CODEX6_PANE=""',
+    'CODEX7_PANE=""',
+    'CODEX8_PANE=""',
     ('PROXY_PANE="'   + $PROXY    + '"'),
     ('PERMUTER_PANE="' + $PERMUTER + '"')
   ) -join "`n"
   [System.IO.File]::WriteAllText($reg, $regBody + "`n")
   Write-Host "Wrote control registry: $reg" -ForegroundColor DarkGray
+
+  # Seed the fleet lane list so the driver feeds the 4 Opus lanes (+ worker + sonnet) on
+  # boot. Without this, fleet_driver defaults to just "OPUS SON" and C1-C4 sit idle.
+  $lanesFile = Join-Path $repo 'build\fleet_lanes.txt'
+  New-Item -ItemType Directory -Force -Path (Split-Path $lanesFile) | Out-Null
+  [System.IO.File]::WriteAllText($lanesFile, "OPUS SON C1 C2 C3 C4`n")
+  Write-Host "Wrote fleet lanes: OPUS SON C1 C2 C3 C4" -ForegroundColor DarkGray
 }
 
 # auto-start the decomp fleet driver once the agents have booted. fleet_up.ps1 brings up
