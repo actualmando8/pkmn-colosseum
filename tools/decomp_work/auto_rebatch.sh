@@ -73,8 +73,17 @@ pick_line() {  # pick_line <queue> -> first line whose file is free + unlocked +
 
 for name in $LANES; do
   [ "${IDLE[$name]:-0}" = 1 ] || continue
-  mode=crack; line=$(pick_line build/wall_queue.txt)
-  if [ -z "$line" ]; then mode=scratch; line=$(pick_line build/asm_queue.txt); fi
+  # Mode order: crack (wall_queue, real-C near-misses) first by default. When build/.scratch_first
+  # exists, do from-scratch ASM (asm_queue) FIRST instead — set when the near-miss crack pool is
+  # mined out and the fleet should grind asm-wrappers into C. Either mode falls back to the other
+  # when its queue is empty, so a lane is never left idle while work of any kind remains.
+  if [ -f build/.scratch_first ]; then
+    mode=scratch; line=$(pick_line build/asm_queue.txt)
+    [ -z "$line" ] && { mode=crack; line=$(pick_line build/wall_queue.txt); }
+  else
+    mode=crack; line=$(pick_line build/wall_queue.txt)
+    [ -z "$line" ] && { mode=scratch; line=$(pick_line build/asm_queue.txt); }
+  fi
   if [ -z "$line" ]; then echo "QUEUE-EXHAUSTED — $name idle, no free unlocked target"; continue; fi
   file=$(echo "$line" | awk '{print $1}'); fns=$(echo "$line" | cut -d' ' -f2-)
   stem=$(basename "$file" .c); tag="pl_${stem}"

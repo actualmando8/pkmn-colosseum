@@ -80,10 +80,16 @@ BAD = ("effect_util", "hsd_", "ui_core", "fsys_file", "gs_material", "pokemon", 
        # lanes punted "no action / unchanged" on them in a tight loop. Excluded from the
        # auto-queue; work them via explicit from-scratch packets, not the CRACK rebatcher.
        "colosseum_battle", "gba_misc")
-# Goal order (2026-06-21): finish LOW, then work back UP the value ladder starting at ASM.
-# (Was NEARWALL,STRUCT,ASM,LOW — but NEARWALL/STRUCT near-miss pools are exhausted, so the
-# directive is grind LOW out, then re-attack ASM (from-scratch asm->C), then STRUCT, NEARWALL.)
-PRIORITY = ["LOW", "ASM", "STRUCT", "NEARWALL"]
+# For the ASM (from-scratch) queue the crack-tuned BAD list is too broad — it drops EVERY
+# remaining ASM target. Exclude only files that genuinely can't be band-decompiled: the
+# W-SDA-WRAPPER TUs (hsd_*) and the 3 WIP files auto_gate never commits. Everything else
+# (ui_core, effect_util, gs_material, pokemon, ...) is valid from-scratch ASM work.
+ASM_BAD = ("hsd_", "fsys_file", "gs_pokemon_summary")
+# Goal order for the CRACK queue (wall_queue.txt). ASM is intentionally NOT here:
+# asm-wrappers have no real C to "crack" — they need from-scratch decomp (scratch mode), so
+# they go to build/asm_queue.txt via write_asm_queue(), not the crack queue. wall_queue holds
+# only real-C near-miss CRACK targets (LOW/STRUCT/NEARWALL).
+PRIORITY = ["LOW", "STRUCT", "NEARWALL"]
 # per-bucket minimum match% (skip the truly-hopeless within a bucket). LOW kept at 0
 # so the file pool is deep enough to feed every lane (band locks per-file = one lane
 # per file); the bucket PRIORITY still works the higher-quality fns first.
@@ -109,6 +115,31 @@ def fresh_by_file(led, bucket):
     return bf
 
 
+def write_asm_queue(led):
+    """Emit build/asm_queue.txt — the from-scratch (asm-wrapper) targets auto_rebatch
+    dispatches in 'scratch' mode. Fresh ASM-bucket fns only (not attempted / SAVED / reground
+    / BAD). Nothing else regenerates this file, so without this it stayed days-stale and the
+    scratch fallback re-ground a dead list. CODEX_FILES are NOT excluded here: the fleet is
+    all-Opus now (the Codex ASM lanes were retired), so those files are valid Opus work."""
+    bf = defaultdict(list)
+    for fn, v in led.items():
+        if v["attempted"] or v["bucket"] != "ASM":
+            continue
+        if fn in SAVED or fn in REGROUND:
+            continue
+        if any(b in v["file"] for b in ASM_BAD):
+            continue
+        src = "src/" + v["file"] + ".c"
+        if os.path.exists(os.path.join(ROOT, src)):
+            bf[src].append((v.get("size", 0), fn))
+    lines = []
+    for src, fns in sorted(bf.items(), key=lambda kv: -len(kv[1])):
+        names = [fn for _, fn in sorted(fns, reverse=True)][:6]
+        lines.append(src + " " + " ".join(names))
+    open(os.path.join(ROOT, "build", "asm_queue.txt"), "w").write("\n".join(lines) + "\n")
+    return len(lines)
+
+
 # Need enough DISTINCT files to feed every lane (band locks per-file = one lane per
 # file). With ~14 lanes a single concentrated bucket (e.g. STRUCT in 2 files) would
 # starve most lanes, so we fill the queue with the current bucket's files FIRST and
@@ -118,6 +149,7 @@ MIN_FILES = int(os.environ.get("BUCKET_MIN_FILES", "16"))
 
 def main():
     led = json.load(open(LED))
+    asm_n = write_asm_queue(led)   # keep the from-scratch (scratch-mode) queue fresh each cycle
     active = None
     lines = []
     seen = set()
@@ -140,7 +172,7 @@ def main():
             break   # enough files to feed the lanes; current bucket is prioritized at the top
     if not active:
         open(QUEUE, "w").write("")
-        print("ALL-BUCKETS-COMPLETE")
+        print(f"ALL-BUCKETS-COMPLETE (crack queue empty; asm_queue files={asm_n})")
         return
     open(QUEUE, "w").write("\n".join(lines) + "\n")
     marker = os.path.join(ROOT, "build", ".active_bucket")
@@ -148,7 +180,7 @@ def main():
     if prev != active:
         open(ASSIGNED, "w").write("")
         open(marker, "w").write(active)
-    print(f"ACTIVE-BUCKET={active} files={len(lines)} (>=current bucket first, overflow as needed)")
+    print(f"ACTIVE-BUCKET={active} files={len(lines)} | asm_queue files={asm_n} (scratch)")
 
 
 if __name__ == "__main__":
