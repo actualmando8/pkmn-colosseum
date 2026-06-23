@@ -2772,14 +2772,36 @@ def load_buckets() -> dict:
         "ASM": "undecompiled asm-wrappers",
         "LOW": "<70% early/wrong",
     }
+    # "Attacked" must be LIVE: the ledger `attempted` flag only refreshes on a full
+    # `wall_ledger.py build` (which doesn't run each cycle), so recompute the same way the
+    # queue (gen_bucket_queue) decides a fn is no longer fresh — attempted OR already SAVED
+    # (band_wins) OR re-ground (dispatched >=2x in wall_attempts.txt). Recomputed every call
+    # so the bars track reality instead of freezing at the last build.
+    _FN = re.compile(r"fn_[0-9A-Fa-f]+")
+    saved: set = set()
+    _bw = ROOT / "build" / "band_wins"
+    if _bw.is_dir():
+        for _f in _bw.glob("*.json"):
+            try:
+                saved.update(_FN.findall(_f.read_text(encoding="utf-8", errors="replace")))
+            except OSError:
+                pass
+    reground: set = set()
+    _wap = ROOT / "build" / "wall_attempts.txt"
+    if _wap.exists():
+        try:
+            _c = Counter(_FN.findall(_wap.read_text(encoding="utf-8", errors="replace")))
+            reground = {fn for fn, n in _c.items() if n >= 2}
+        except OSError:
+            pass
     agg = {b: {"total": 0, "attempted": 0} for b in order}
-    for v in led.values():
+    for fn, v in led.items():
         if not isinstance(v, dict):
             continue
         b = v.get("bucket")
         if b in agg:
             agg[b]["total"] += 1
-            if v.get("attempted"):
+            if v.get("attempted") or fn in saved or fn in reground:
                 agg[b]["attempted"] += 1
     buckets = []
     for b in order:
