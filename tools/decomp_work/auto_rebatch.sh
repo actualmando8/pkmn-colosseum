@@ -17,6 +17,12 @@ HB=build/hb; REQ=build/dispatch; mkdir -p "$HB" "$REQ"
 
 LANES="${ASM_LANES:-OPUS SON C1 C2}"
 FRESH="${HB_FRESH:-45}"   # a state/alive file older than this many seconds is not trusted
+# Dispatch cooldown: after a lane is tasked, do not re-task it for this many seconds even if
+# it reads idle. A freshly-prompted agent briefly looks idle while it starts (one static
+# pane_io pass, no "esc to interrupt"); without this it gets re-prompted before finishing its
+# first assignment. An actively-working agent reads busy well within this window, so the only
+# cost is a lane that genuinely finished fast waiting a bit for its next packet.
+COOLDOWN="${DISPATCH_COOLDOWN:-150}"
 
 # The tmux owner must be alive and recently active, else states are stale and reqs we
 # write would never be sent. Refuse to dispatch — safer than queuing into the void.
@@ -33,6 +39,13 @@ declare -A IDLE
 for name in $LANES; do
   IDLE[$name]=0
   [ -f "$REQ/$name.req" ] && continue                       # a prompt is already queued/unsent
+  # cooldown: skip a lane that was tasked within the last COOLDOWN seconds (its .task mtime is
+  # the last-dispatch time) so we never re-prompt an agent still starting/working its packet.
+  tf="$REQ/$name.task"
+  if [ -f "$tf" ]; then
+    tmt=$(stat -c %Y "$tf" 2>/dev/null || echo 0)
+    [ $(( now - ${tmt:-0} )) -lt "$COOLDOWN" ] && continue
+  fi
   read -r st ts _ < "$HB/$name.state" 2>/dev/null || continue
   [ "$st" = idle ] || continue
   [ $(( now - ${ts:-0} )) -le "$FRESH" ] && IDLE[$name]=1
@@ -92,9 +105,9 @@ for name in $LANES; do
   gate="BEFORE any WALL you MUST run: python tools/decomp_work/classify_residual.py $tag <fn>. If it prints REG-COLORING (exit 0) you may NOT wall it — rewrite with NAMED locals (never raw rNN locals, they pin the coloring) + declaration-order lever until 100. Only RELOC/SCHEDULING/SHAPE verdicts may WALL/REWORK."
   ff=""; case "$name" in C1|C2|C3|C4) ff="If a fn still resists after the classifier says REG-COLORING and ~4 decl-order attempts, leave it in scratch and report WALL <fn> <%> + the classifier verdict, then move on.";; esac
   if [ "$mode" = crack ]; then
-    prompt="CRACK (levers: read docs/CRACK_LEVERS.md). File: $file  TAG: $tag  fns: $fns. These are real C in canon <100%. For EACH fn: band.py diff, then classify_residual.py to pick the fix (REG-COLORING=named-locals+decl-order; SHAPE=m2c_draft reshape). Fix scratch, band.py check, save at 100. Real C only (no asm/.inc/rNN-locals). KG: kg.py q lever-targets <fn> BEFORE each fn; kg.py record-crack <fn> <lever-slug> AFTER each save. $gate $ff SAVED <fn> 100.00 / WALL <fn> <%>."
+    prompt="CRACK (levers: read docs/CRACK_LEVERS.md). File: $file  TAG: $tag  fns: $fns. These are real C in canon <100%. For EACH fn: band.py diff, then classify_residual.py to pick the fix (REG-COLORING=named-locals+decl-order; SHAPE=m2c_draft reshape). Fix scratch, band.py check, save at 100. Real C only (no asm/.inc/rNN-locals). KG (shared lever memory): BEFORE each fn run python tools/decomp_work/kg/kg.py q lever-targets <fn> for proven levers; AFTER each save run python tools/decomp_work/kg/kg.py record-crack <fn> <lever-slug> (and python tools/decomp_work/kg/kg.py record-lever <slug> --title \"...\" --desc \"...\" if you found a NEW lever) so every lane reuses it. $gate $ff SAVED <fn> 100.00 / WALL <fn> <%>."
   else
-    prompt="FROM-SCRATCH asm->C (levers: docs/CRACK_LEVERS.md). File: $file  TAG: $tag  fns: $fns. m2c_draft each, then REWRITE into faithful REAL C with NAMED locals (in-body externs) — no raw rNN register-locals. band.py check, save at 100. No asm/.inc fraud. $gate $ff SAVED/WALL/SKIP per fn."
+    prompt="FROM-SCRATCH asm->C (levers: docs/CRACK_LEVERS.md). File: $file  TAG: $tag  fns: $fns. m2c_draft each, then REWRITE into faithful REAL C with NAMED locals (in-body externs) — no raw rNN register-locals. band.py check, save at 100. No asm/.inc fraud. KG (shared lever memory): BEFORE each fn run python tools/decomp_work/kg/kg.py q lever-targets <fn> for proven levers; AFTER each save run python tools/decomp_work/kg/kg.py record-crack <fn> <lever-slug> (and python tools/decomp_work/kg/kg.py record-lever <slug> --title \"...\" --desc \"...\" if you found a NEW lever) so every lane reuses it. $gate $ff SAVED/WALL/SKIP per fn."
   fi
   printf '%s' "$prompt" > "$REQ/$name.req"        # pane_io sends this; never touch tmux here
   echo "REBATCH $name [$mode] -> $stem [$fns]"

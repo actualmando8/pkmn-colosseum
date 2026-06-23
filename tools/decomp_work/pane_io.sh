@@ -74,6 +74,18 @@ drain_one() {  # drain_one <name> <pane> : point the agent at a task FILE (no lo
   local cmd="Read build/dispatch/$name.task and do exactly what it says."
   _txk_acquire
   timeout -s KILL 10 "$TMUX_BIN" send-keys -t "$pane" C-u 2>/dev/null            # clear stale/truncated input
+  # /clear the agent's context BEFORE each new task so every assignment starts fresh (no
+  # carryover bloat across tasks). The KG (tools/decomp_work/kg/kg.db) is the durable shared
+  # memory, so cracked levers survive the clear; the band scratch on disk is resume-safe too.
+  # Only reached when the lane is idle (cooldown + idle-gated by auto_rebatch), so this never
+  # wipes an in-progress task. Set NO_CLEAR_ON_DISPATCH=1 to skip.
+  if [ "${NO_CLEAR_ON_DISPATCH:-0}" != 1 ]; then
+    timeout -s KILL 10 "$TMUX_BIN" send-keys -t "$pane" -l "/clear" 2>/dev/null
+    sleep 0.3
+    timeout -s KILL 10 "$TMUX_BIN" send-keys -t "$pane" Enter 2>/dev/null
+    sleep 1.0                                                                     # let /clear take effect
+    timeout -s KILL 10 "$TMUX_BIN" send-keys -t "$pane" C-u 2>/dev/null          # clear residual input post-/clear
+  fi
   timeout -s KILL 10 "$TMUX_BIN" send-keys -t "$pane" -l "$cmd" 2>/dev/null
   sleep 0.3
   timeout -s KILL 10 "$TMUX_BIN" send-keys -t "$pane" Enter 2>/dev/null
