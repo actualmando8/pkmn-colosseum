@@ -16,7 +16,11 @@ export MSYS_NO_PATHCONV=1
 HB=build/hb; REQ=build/dispatch; mkdir -p "$HB" "$REQ"
 
 LANES="${ASM_LANES:-OPUS SON C1 C2}"
-FRESH="${HB_FRESH:-45}"   # a state/alive file older than this many seconds is not trusted
+FRESH="${HB_FRESH:-300}"  # a state/alive file older than this many seconds is not trusted.
+# Raised 45->300: under heavy host load pane_io's capture pass can take minutes (observed
+# ~234s), so 45s rejected every lane as "stale" and the fleet stopped dispatching entirely.
+# The dispatch cooldown below still prevents re-tasking a lane too soon, so a looser window
+# is safe; it just lets the driver keep working through a sluggish control loop.
 # Dispatch cooldown: after a lane is tasked, do not re-task it for this many seconds even if
 # it reads idle. A freshly-prompted agent briefly looks idle while it starts (one static
 # pane_io pass, no "esc to interrupt"); without this it gets re-prompted before finishing its
