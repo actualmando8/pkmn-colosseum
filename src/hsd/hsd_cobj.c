@@ -838,21 +838,26 @@ f32 fn_80194510(u8* ptr) {
 
 /* 0x801945B0 | 0xA4 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 1
 #pragma optimizewithasm off
 #if 0
 asm void fn_801945B0(void) {
 #include "src/hsd/hsd_cobj_fn_801945B0.inc"
 }
 #else
-/* NEAR (W1 reg-permutation in tan-result FP chain): case1 keeps tan in f1, decomp evacuates to f3. */
+/* MATCH 100% (opt1 + case1 split into inner/x44 temps: -x38*tan accumulates in f0, x44 loaded
+ * after into f2, final fmuls written x44*inner). */
 f32 fn_801945B0(u8* ptr) {
     if (ptr == NULL) {
         return lbl_8047D978;
     }
     switch (ptr[0x50]) {
     case 1:
-        return *(f32*)(ptr + 0x44) * (-*(f32*)(ptr + 0x38) * (f32) fn_800CE220(lbl_8047D97C * (lbl_8047D980 * *(f32*)(ptr + 0x40))));
+    {
+        f32 inner = -*(f32*)(ptr + 0x38) * (f32) fn_800CE220(lbl_8047D97C * (lbl_8047D980 * *(f32*)(ptr + 0x40)));
+        f32 x44 = *(f32*)(ptr + 0x44);
+        return x44 * inner;
+    }
     case 2:
         return *(f32*)(ptr + 0x48);
     case 3:
@@ -893,7 +898,7 @@ f32 fn_80194654(u8* ptr) {
 
 /* 0x801946F0 | 0x98 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
 asm void fn_801946F0(void) {
@@ -2557,7 +2562,7 @@ void fn_8019733C(u32 val) { extern u32 lbl_8047B240; lbl_8047B240 = val; }
 
 /* 0x801975FC | 0x54 */
 #pragma push
-#pragma optimization_level 4
+#pragma optimization_level 1
 #pragma optimizewithasm off
 extern u32 fn_80197650(u32, u32, u32);
 #if 0
@@ -2571,10 +2576,8 @@ void fn_801975FC(void) {
     extern u32 lbl_8047B254;
     extern u32 lbl_8047B258;
     extern u32 lbl_8047B25C;
-    u32 tmp;
     if (lbl_8047B248 == 0) return;
-    tmp = fn_80197650(lbl_8047B250, lbl_8047B254, 0x3c);
-    lbl_8047B250 = tmp;
+    lbl_8047B250 = fn_80197650(lbl_8047B250, lbl_8047B254, 0x3c);
     lbl_8047B258 = fn_80197650(lbl_8047B258, lbl_8047B25C, 0x40);
 }
 #endif
