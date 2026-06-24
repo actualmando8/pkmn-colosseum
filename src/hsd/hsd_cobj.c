@@ -1718,16 +1718,18 @@ int fn_80195A6C(HSD_CObj* cobj)
     if (cobj == NULL) {
         return 0;
     }
+    ortho_flag = 0;
     mode = fn_8019C7B0();
     fn_80197400();
     lbl_8047B234 = (u32) cobj; /* current = cobj */
 
     switch (mode) {
-    case 3:
+    case 3: {
         /* direct path: viewport/scissor used verbatim */
         ((void (*)(int, f32, f32, f32, f32, f32, f32)) lbl_80478C58)(
             0,
-            cobj->viewport.xmin, cobj->viewport.ymin,
+            *(volatile f32*)&cobj->viewport.xmin,
+            *(volatile f32*)&cobj->viewport.ymin,
             cobj->viewport.xmax - cobj->viewport.xmin,
             cobj->viewport.ymax - cobj->viewport.ymin,
             lbl_8047D978, lbl_8047D9B0);
@@ -1767,11 +1769,12 @@ int fn_80195A6C(HSD_CObj* cobj)
         fn_800BD2E0(&mtx[0][0], ortho_flag);
         ok = 1;
         break;
+    }
     case 0: {
         /* sub-screen path: scale viewport/scissor through the EFB dimensions */
         int has_off = (lbl_80466BC0[0x18] != 0);
-        f64 sx = (f64)(u32) *(u16*)(lbl_80466BC0 + 4) / (f64)(u32) lbl_80478C50;
         f64 sy = (f64)(u32) *(u16*)(lbl_80466BC0 + 6) / (f64)(u32) lbl_80478C54;
+        f64 sx = (f64)(u32) *(u16*)(lbl_80466BC0 + 4) / (f64)(u32) lbl_80478C50;
         f32 vy = (f32)(cobj->viewport.ymin * sy);
         f32 vx = (f32)(cobj->viewport.xmin * sx);
         f32 xmax_sx = (f32)(cobj->viewport.xmax * sx);

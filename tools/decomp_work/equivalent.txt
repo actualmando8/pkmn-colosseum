@@ -99,3 +99,6 @@ fn_801D2080   # battle_waza — real C (waza seq start: clip seqH u16→r30, mai
 
 # OSMemory.c — OSProtectRange, CW1.2.5n MMIO base-fold (2026-06-22, same class as SI.c 04D0 / fn_800A4C94)
 fn_8009F488   # OSMemory — OSProtectRange real C (78.92); CW1.2.5n MMIO 0xCC004000 base-fold (target lis 0xcc00;addi 0x4000 reused vs ours subis/disp) not-C-steerable + linked frame -0x30/-0x38 + param r27<->r30 coloring. asm stays active.
+
+# hsd_cobj.c — fn_80195A6C camera set-current/program-GX dispatcher (2026-06-23)
+fn_80195A6C   # hsd_cobj — real C (HSD camera set-current: mode-dispatch viewport/scissor/projection, 273 instr); 79.81% (0%→79.81% via 2 workflow rounds). W1 4-vs-5 FPR coloring (5th f27 unreachable) cascading into W6 conv-literal (EFB int→double magic lands anon @926 vs named lbl_8047D9C0). See WALLS.md 2026-06-23. asm stays #if 0 / C active.

@@ -27,6 +27,35 @@ C and move on.** This file is how we *stop re-grinding* them.
 Walls live in the gap between C-converted and byte-exact-C. Logging them keeps the
 gap *honest and intentional* instead of an open backlog we keep re-attacking.
 
+## 2026-06-23 — hsd_cobj.c fn_80195A6C (W1+W6 stacked, ceiling 79.81%)
+
+**`fn_80195A6C` — WALL, 79.81%** (real, correct C — add to `equivalent.txt`). The HSD camera
+"set current / program GX" dispatcher (273 instr, 5 non-vol FPR + stmw r27 frame). Converted
+from a 0.00% asm stub to faithful C via two multi-agent workflow rounds; the structural levers
+that worked are **direct calls** (kill fn-ptr casts → `bl`, +17%), **`#pragma optimization_level
+4`**, **switch-case reorder to 3/0/1/2/default** (block-emission order, +33%), **named near/far-Z
+consts** `lbl_8047D978`/`lbl_8047D9B0`, **`ortho_flag` assigned inside the projection-case bodies**
+(forces `stmw r27` / 5 GPRs + cobj→r30, the big GPR win to 79.33%), **f64 EFB scales**, **has_off
+if/else split** (two callback sites), and **volatile-cast-reload** on the case-3 viewport fields.
+
+Residual (12 agents × ~16 attempts each, two rounds — all reverted):
+- **R1 / W1** — CW firmly **4-colors** the case-0 float block; the 5th non-vol FPR (`f27`, frame
+  `-0x110`) is unreachable. Scissor/viewport precompute reaches 4 FPRs but net-regresses the body
+  (76–73%) by reshuffling the fmul/fsub region off the target schedule. `optimize_for_size off`
+  does not raise the count.
+- **R2 / W6 (conv-literal)** — the EFB int→double magic is *structurally* matchable with `(f64)(s32)`
+  (emits the exact `xoris 0x8000` + signed-bias magic) but the constant lands **anonymous** (`@926`/
+  `@928`) vs target **named** `lbl_8047D9C0`/`lbl_8047D970`; named-vs-anon pool placement is the
+  position-independent FPR-web artifact → net regress (77.5%). Not C-steerable.
+- **R3 / W1** — mode wants r28 / ortho_flag wants r27; disjoint live ranges, coupled to R1's missing
+  f27/f28 interference. Decl-order / init-placement / retyping all inert.
+- **R4 / W2** — `mr. r30,r3` record-form null test is achievable only via global `#pragma peephole on`,
+  which costs ~5.7% elsewhere (74%). Net negative.
+- **R5 / W2** — case-3 viewport f1/f2 within-expression FPR numbering + scissor `lhz` order are
+  scheduling artifacts (peephole already off); int-temp precompute collapses to identical code.
+
+HARD-SKIP. Real C is in canon; ceiling 79.81% is W1 (4-vs-5 FPR coloring) cascading into W6 conv-literal.
+
 ## 2026-06-22 — two exhausted clusters re-logged to stop the fleet re-grinding them
 
 The bucket queue was re-handing these every cycle (they are not in SAVED, and the ledger
