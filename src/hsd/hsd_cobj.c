@@ -311,7 +311,7 @@ void fn_80193CD0(u8* ptr) {
 
 /* 0x80193D30 | 0x198 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 1
 #pragma optimizewithasm off
 extern void __assert(const char*, u32, const char*);
 extern void HSD_MtxFree(void);
@@ -346,7 +346,7 @@ void fn_80193D30(HSD_CObj* cobj) {
 
 /* 0x80193EC8 | 0x7C */
 #pragma push
-#pragma optimization_level 4
+#pragma optimization_level 1
 #pragma optimizewithasm off
 #if 0
 asm void fn_80193EC8(void) {
@@ -373,7 +373,7 @@ int fn_80193EC8(HSD_CObj* cobj) {
 
 /* 0x80193F44 | 0xCC */
 #pragma push
-#pragma optimization_level 4
+#pragma optimization_level 1
 #pragma optimizewithasm off
 extern HSD_ClassInfo* fn_80193748(const char*);
 extern void* fn_80193828(void*);
@@ -425,7 +425,7 @@ return_null:
 
 /* 0x80194010 | 0x248 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 1
 #pragma optimizewithasm off
 extern void HSD_WObjInit(HSD_WObj*, HSD_WObjDesc*);
 extern void fn_801947C8(HSD_CObj*, f32);   /* wrk8: typed-C takes (HSD_CObj*, f32) */
@@ -513,7 +513,7 @@ int fn_80194010(HSD_CObj* cobj, HSD_CObjDesc* desc)
 
 /* 0x80194258 | 0x60 */
 #pragma push
-#pragma optimization_level 4
+#pragma optimization_level 1
 #pragma optimizewithasm off
 #if 0
 asm void fn_80194258(void) {
@@ -700,7 +700,7 @@ void HSD_CObjSetViewportfx4(HSD_CObj* cobj, f32 f1, f32 f2, f32 f3, f32 f4) {
 
 /* 0x80194400 | 0xA4 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 1
 #pragma optimizewithasm off
 #if 0
 asm void fn_80194400(void) {
@@ -806,7 +806,7 @@ f32 HSD_CObjGetNear(HSD_CObj* cobj) {
 
 /* 0x80194510 | 0xA0 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 1
 #pragma optimizewithasm off
 extern double fn_800CE220(f32);
 extern f32 lbl_8047D978;
@@ -960,7 +960,7 @@ void HSD_CObjSetFov(HSD_CObj* cobj, f32 val)
 
 /* 0x801947C8 | 0x464 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 2
 #pragma optimizewithasm off
 extern void OSReport(const char* fmt, ...);
 extern void fn_800A3244(void);
@@ -1103,7 +1103,7 @@ void fn_801947C8(HSD_CObj* cobj, f32 roll)
 
 /* 0x80194C2C | 0x98 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 2
 #pragma optimizewithasm off
 extern f32 lbl_80478AC8;
 extern void fn_800A3ADC(void);
@@ -1218,7 +1218,7 @@ void HSD_CObjSetMtxDirty(HSD_CObj* ptr) { *(u32*)((u8*) ptr + 0x8) |= 0xC0000000
 
 /* 0x80194DA4 | 0x32C */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 3
 #pragma optimizewithasm off
 extern void OSReport(const char* fmt, ...);
 extern void fn_800A3244(void);
@@ -1374,7 +1374,7 @@ int HSD_CObjGetUpVector(HSD_CObj* cobj, f32* up)
 
 /* 0x8019513C | 0x454 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 2
 #pragma optimizewithasm off
 extern void fn_800A3820(void);
 extern void fn_800A3A9C(void*, void*, void*);
@@ -1461,7 +1461,7 @@ int fn_8019513C(HSD_CObj* cobj, f32 roll, f32* out)
 
 /* 0x80195590 | 0x204 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 3
 #pragma optimizewithasm off
 extern f32 fn_800A3B38(void*);
 extern void __assert(const char*, u32, const char*);
@@ -1858,7 +1858,7 @@ int fn_80195A6C(HSD_CObj* cobj)
 
 /* 0x80195F0C | 0x1B8 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 1
 #pragma optimizewithasm off
 extern int HSD_CObjGetUpVector(HSD_CObj*, f32*);   /* wrk8: real sig (was `void (void)`) */
 extern void __assert(const char*, u32, const char*);
@@ -1919,7 +1919,7 @@ void fn_80195F0C(HSD_CObj* cobj) {
 
 /* 0x801960C4 | 0x31C */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 3
 #pragma optimizewithasm off
 #if 0
 asm void fn_801960C4(void) {
@@ -2038,7 +2038,7 @@ int fn_801960C4(HSD_CObj* cobj)
 
 /* 0x801963E0 | 0x2B8 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
 asm void fn_801963E0(void) {
@@ -2183,7 +2183,7 @@ void HSD_CObjAnim(HSD_CObj* cobj) {
 
 /* 0x8019674C | 0x3C4 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
 asm void fn_8019674C(void) {
@@ -2365,7 +2365,7 @@ void fn_80196C3C(u8* ptr) {
 
 /* 0x80196C54 | 0x8C */
 #pragma push
-#pragma optimization_level 4
+#pragma optimization_level 1
 #pragma optimizewithasm off
 extern void _savefpr_26(void);
 extern void _restfpr_26(void);
@@ -2457,7 +2457,7 @@ void __assert(const char* file, u32 line, const char* expr) {
 
 /* 0x80196EB4 | 0x44 */
 #pragma push
-#pragma optimization_level 4
+#pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
 asm void fn_80196EB4(void) {
@@ -2529,7 +2529,7 @@ void fn_80196EF8(void) { /* TODO */ }
 
 /* 0x8019731C | 0x20 */
 #pragma push
-#pragma optimization_level 4
+#pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
 asm void fn_8019731C(void) {
