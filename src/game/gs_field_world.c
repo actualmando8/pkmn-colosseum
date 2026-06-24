@@ -17164,6 +17164,7 @@ s32 fn_80129E20(u8* ptr, void* buf, u8 flag) {
     extern u32 fn_80134BC0(u32 a, void* b, s32 c);
     u8 local_buf[0x138];
     u8 i;
+    s16 ret;
     void* val;
 
     if (buf == NULL) { return 6; }
@@ -17178,11 +17179,12 @@ s32 fn_80129E20(u8* ptr, void* buf, u8 flag) {
     }
     i = 6;
 after_loop:
+    ret = (s16)(u8)i;
     if ((u8)i >= 6) {
         if ((u8)flag == 0) { return -2; }
         return (fn_80134BC0(0, local_buf, -1) == 1) ? -1 : -2;
     }
-    return (s16)(u8)i;
+    return ret;
 }
 #endif
 /* 0x80129F20 | 0x16C */
