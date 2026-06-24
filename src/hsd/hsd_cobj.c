@@ -314,11 +314,19 @@ void fn_80193CD0(u8* ptr) {
 #pragma optimization_level 1
 #pragma optimizewithasm off
 extern void __assert(const char*, u32, const char*);
-extern void HSD_MtxFree(void);
-extern void fn_801C25E4(void);
 extern HSD_CObjInfo lbl_8036C678;
 extern char lbl_8047D958;
 extern char lbl_8047D960;
+static inline BOOL ref_DEC_v(void* o)
+{
+    BOOL ret;
+    if ((ret = (HSD_OBJ(o)->ref_count == HSD_OBJ_NOREF))) {
+        return ret;
+    }
+    ret = (*(volatile u16*)&HSD_OBJ(o)->ref_count == 0);
+    HSD_OBJ(o)->ref_count--;
+    return ret;
+}
 #if 0
 asm void fn_80193D30(void) {
 #include "src/hsd/hsd_cobj_fn_80193D30.inc"
@@ -328,13 +336,29 @@ asm void fn_80193D30(void) {
    removes its anim, releases the eye/interest WObjs (ref-counted), frees the
    projection matrix, then chains to the parent class destroy method. */
 void fn_80193D30(HSD_CObj* cobj) {
-    ((void (*)(HSD_AObj*)) fn_801C25E4)(cobj->aobj);
+    extern void fn_801C25E4(void*);
+    extern void HSD_MtxFree(void*);
+    HSD_WObj* eyepos;
+    HSD_WObj* interest;
+    fn_801C25E4(cobj->aobj);
     if (cobj == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
-    HSD_WObjUnref(cobj->eyepos);
+    eyepos = cobj->eyepos;
+    if (eyepos != NULL) {
+        if (ref_DEC_v(eyepos) && eyepos != NULL) {
+            HSD_OBJECT_METHOD(eyepos)->release((HSD_Class*)eyepos);
+            HSD_OBJECT_METHOD(eyepos)->destroy((HSD_Class*)eyepos);
+        }
+    }
     if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
-    HSD_WObjUnref(cobj->interest);
+    interest = cobj->interest;
+    if (interest != NULL) {
+        if (ref_DEC_v(interest) && interest != NULL) {
+            HSD_OBJECT_METHOD(interest)->release((HSD_Class*)interest);
+            HSD_OBJECT_METHOD(interest)->destroy((HSD_Class*)interest);
+        }
+    }
     if (cobj->proj_mtx != NULL) {
-        ((void (*)(f32*)) HSD_MtxFree)(cobj->proj_mtx);
+        HSD_MtxFree(cobj->proj_mtx);
     }
     {
         u32 class_info = *(u32*)((u8*)&lbl_8036C678 + 0x14);
@@ -396,11 +420,14 @@ void* fn_80193F44(u8* ptr) {
         if (info != 0) goto do_alloc_from_info;
     }
 default_alloc:
-    if (lbl_8047B230 != 0) {
-        alloc_arg = (void*)lbl_8047B230;
-    } else {
-        alloc_arg = (void*)&lbl_8036C678;
+    if (lbl_8047B230 == 0) {
+        goto use_default;
     }
+    alloc_arg = (void*)lbl_8047B230;
+    goto have_arg;
+use_default:
+    alloc_arg = (void*)&lbl_8036C678;
+have_arg:
     cobj_result = fn_80193828(alloc_arg);
     if (cobj_result == NULL) {
         __assert(&lbl_8047D958, 0x7a4, &lbl_8047D960);
@@ -515,6 +542,7 @@ int fn_80194010(HSD_CObj* cobj, HSD_CObjDesc* desc)
 #pragma push
 #pragma optimization_level 1
 #pragma optimizewithasm off
+#pragma peephole off
 #if 0
 asm void fn_80194258(void) {
 #include "src/hsd/hsd_cobj_fn_80194258.inc"
@@ -522,13 +550,14 @@ asm void fn_80194258(void) {
 #else
 void* fn_80194258(void) {
     extern u32 lbl_8047B230;
+    extern HSD_CObjInfo lbl_8036C678;
     extern char lbl_8047D958;
     extern char lbl_8047D960;
-    typedef void* (*fn_80193828_t)(void*);
-    typedef void (*__assert_t)(const char*, int, const char*);
-    void* arg = lbl_8047B230 != 0 ? (void*)lbl_8047B230 : (void*)0x8037C678;
-    void* result = ((fn_80193828_t)fn_80193828)(arg);
-    if (result == NULL) ((__assert_t)__assert)(&lbl_8047D958, 0x7A4, &lbl_8047D960);
+    void* result;
+    result = fn_80193828(lbl_8047B230 != 0 ? (void*)lbl_8047B230 : (void*)&lbl_8036C678);
+    if (result == NULL) {
+        __assert(&lbl_8047D958, 0x7a4, &lbl_8047D960);
+    }
     return result;
 }
 #endif
@@ -1878,17 +1907,29 @@ void fn_80195F0C(HSD_CObj* cobj) {
     f32 up[3];
     f32 interest[3];
     int update;
+    int interest_dirty;
 
     if (cobj->flags & 0x2) {
         return;
     }
+    interest_dirty = 1;
     update = 1;
     if (!(cobj->flags & 0x40000000)) {
-        int eye_dirty =
-            (cobj->eyepos != NULL) && (cobj->eyepos->flags & 0x2);
-        int interest_dirty =
-            (cobj->interest != NULL) && (cobj->interest->flags & 0x2);
-        update = eye_dirty || interest_dirty;
+        int eye_dirty = 0;
+        if (cobj->eyepos != NULL && (cobj->eyepos->flags & 0x2)) {
+            eye_dirty = 1;
+        }
+        if (eye_dirty) {
+            interest_dirty = 1;
+        } else {
+            interest_dirty = 0;
+            if (cobj->interest != NULL && (cobj->interest->flags & 0x2)) {
+                interest_dirty = 1;
+            }
+        }
+    }
+    if (!interest_dirty) {
+        update = 0;
     }
     if (!update) {
         return;
@@ -1896,19 +1937,26 @@ void fn_80195F0C(HSD_CObj* cobj) {
     if (cobj == NULL) __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
     if (cobj == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
     fn_80191688(cobj->eyepos, eye);
-    if (((int (*)(HSD_CObj*, f32*)) HSD_CObjGetUpVector)(cobj, up) == 0) {
-        up[0] = 0.0f;
-        up[1] = 1.0f;
-        up[2] = 0.0f;
+    if (HSD_CObjGetUpVector(cobj, up) == 0) {
+        extern f32 lbl_8047D978;   /* 0.0f named SDA2 constant */
+        extern f32 lbl_8047D9B0;   /* 1.0f named SDA2 constant */
+        up[0] = lbl_8047D978;
+        up[1] = lbl_8047D9B0;
+        up[2] = lbl_8047D978;
     }
     if (cobj == NULL) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
     if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
     fn_80191688(cobj->interest, interest);
     C_MTXLookAt(cobj->view_mtx, eye, up, interest);
-    cobj->eyepos->flags &= ~0x2;
-    cobj->interest->flags &= ~0x2;
+    {
+        HSD_WObj* w;
+        w = cobj->eyepos;
+        w->flags = w->flags & ~0x2;
+        w = cobj->interest;
+        w->flags = w->flags & ~0x2;
+    }
     if (cobj != NULL) {
-        cobj->flags &= ~0x40000000;
+        cobj->flags = cobj->flags & ~0x40000000;
     }
     if (cobj != NULL) {
         cobj->flags |= 0x80000000;
