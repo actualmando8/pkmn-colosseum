@@ -177,7 +177,8 @@ typedef s32 (*DrawHandlerFn)(u8*, u8*, s16*);
 s32 fn_80015050(u8* src, u8* param) {
     DrawHandlerFn fp;
     u16 tmp;
-    u8* entry = (u8*)sSummaryPageEntries + (s32)(s8)src[0x95] * 0x4C;
+    u8* entry = (u8*)sSummaryPageEntries;
+    entry += (s32)(s8)src[0x95] * 0x4C;
     fp = *(DrawHandlerFn*)(entry + 0x18);
     if (fp != NULL) {
         tmp = fn_80103E68((u16)*(u32*)(entry + 0x1C)) >> 16;

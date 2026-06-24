@@ -4928,6 +4928,7 @@ asm s32 fn_800F670C(void* obj) {
 #else
 #pragma optimization_level 4
 s32 fn_800F670C(u8* ptr) {
+    volatile u32 cond;
     volatile u32 val;
     s32 count = *(s32*)(ptr + 0x28);
     if (count <= 0) {
@@ -4938,7 +4939,7 @@ s32 fn_800F670C(u8* ptr) {
         *(s32*)(ptr + 0x28) = count;
         val = ((u32*)(ptr + 0x6c))[count];
     }
-    if ((s32)val != 0) {
+    if ((s32)(cond = val) != 0) {
         *(u32*)(ptr + 0x14) = *(u32*)(ptr + 0x14) + 4;
     } else {
         *(u32*)(ptr + 0x14) = *(u32*)ptr + **(u32**)(ptr + 0x14);

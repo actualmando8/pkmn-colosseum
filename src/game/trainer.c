@@ -6612,13 +6612,16 @@ void fn_801FE55C(void* self, void* other, u32 offset) {
     extern void fn_801FD07C(void* ptr, u32 val);
     void* data;
     void* result;
+    u32 val;
 
     if (self != NULL) {
         if (other != NULL) {
             if (self != other) {
                 data = fn_8012640C(other, 0, 0x122, 0);
                 if ((result = fn_8020E57C(data, 4, self)) != NULL) {
-                    fn_801FD07C(result, fn_801FD0BC(result) + offset);
+                    val = fn_801FD0BC(result);
+                    val += offset;
+                    fn_801FD07C(result, val);
                 }
             }
         }
