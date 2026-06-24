@@ -17276,11 +17276,13 @@ void fn_8012A1A4(u8* ptr, u32 arg2, u8 arg3) {
     extern void fn_8012A450(u8* ptr, u32 a, u32 b);
     extern u32 fn_800FA280(u32 val);
     u32 lo;
+    u32 hi;
     fn_8012A248(ptr);
     lo = fn_800E0C54() & 0xFFFF;
-    fn_8012A450(ptr, 2, (fn_800E0C54() << 16) | lo);
+    hi = fn_800E0C54() << 16;
+    fn_8012A450(ptr, 2, hi | lo);
     fn_8012A450(ptr, 1, arg2);
-    fn_8012A450(ptr, 0xb, (u8)arg3);
+    fn_8012A450(ptr, 0xb, arg3);
     fn_8012A450(ptr, 0x17, fn_800FA280(0xfa2));
 }
 #endif
