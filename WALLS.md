@@ -713,3 +713,176 @@ compilation unit context — not reproducible from C without the exact original 
 reloc:6 + shape:33 confirms this is a RELOC/SHAPE wall, not a code logic issue.
 
 **Classifier:** SHAPE exit-1. Wall permitted.
+
+## 2026-06-22 — gs_model.c six model-ID dispatchers (W6 jumptable-NAME-only)
+
+**pl:** pl_gs_model | **classify_residual:** all six = `reg-coloring:0 scheduling:2 reloc:0 shape:0` (verdict SCHEDULING exit-0; NOT reg-coloring — wall permitted). The 2 "scheduling" lines are the jumptable `lis;addi` symbol operand, i.e. RELOC, not a real schedule diff.
+
+Five were TODO stubs, now reconstructed to real correct C; fn_80106934 was already
+reconstructed in scratch. All six are **byte-identical except the jumptable symbol**:
+CW emits an anonymous local jumptable (`@NNN`) in isolated-band compile vs the target's
+named `jumptable_8035Bxxx`. Bytes link identical in the full ROM — same W6 class as
+fn_80129280 / fn_80132A38 / fn_80065A48 / fightSideGetStatus. Not band.py-saveable
+(isolated objdiff refuses <100%); registered in equivalent.txt as real C.
+
+| function | best% | jumptable | shape |
+|---|---|---|---|
+| `fn_80105C68` | 99.82 | `@591` vs `jumptable_8035B0F8` | `void f(u8)`: flag-gated, switch→id, fn_80102620/fn_80102568, reset idx=-1 |
+| `fn_80106080` | 99.82 | `@634` vs `jumptable_8035B170` | sibling of C68, `jumptable_8035B170` |
+| `fn_801065B8` | 99.82 | `@712` vs `jumptable_8035B238` | sibling of C68, `jumptable_8035B238` |
+| `fn_801064E0` | 99.81 | `@692` vs `jumptable_8035B210` | `s8 f(void)`: switch→id, fn_80104704, 4-way status -1/0/0/1 via shared extsb |
+| `fn_80106160` | 99.82 | `@659` vs `jumptable_8035B198` | `u8 f(void)`: same core, returns `(s8)status >= 0` |
+| `fn_80106934` | 99.80 | `@740` vs `jumptable_8035B2B0` | `s32 f(void)`: switch→id, fn_80104704, returns `[0x99]==0` (cntlzw idiom) |
+
+**Levers:** switch over `(s8)lbl_80478B30` (cases 0–9) emits the jumptable; `#pragma
+peephole off` (default -O4,p) generates the table form (NOT `optimization_level 0`,
+which produces an if-chain). Pattern A param `u8` → caller `mr r5,r30` no-mask (callee
+masks `clrlwi r0,r31,24`); local decl `extern s8 lbl_80478B30` so the `= -1` reset
+emits `li r0,-1` not `li r0,0xff`. Status-variable (not early-return) form forces the
+explicit 4-way branch + shared `extsb r3,r0` on 064E0/160 (early-return collapses to
+the cntlzw `==0` idiom, which is what 80106934 actually wants).
+
+**Classifier:** SCHEDULING exit-0 (jumptable-name reloc). Wall permitted (not reg-coloring).
+
+## 2026-06-22 — gs_field_resource.c fn_80114AE0 (W1 reg-coloring + base-remat)
+
+**Score:** 94.55% | **classify_residual:** reg-coloring:46 scheduling:1 shape:4 (VERDICT SHAPE) | **pl:** pl_gs_field_resource
+
+Stub (0.88%) reconstructed to real correct C — the big sibling of fn_801149BC (100%):
+HSD archive loader (fn_800F9318 alloc → HSD_ArchiveParse → HSD_ArchiveGetPublicAddress)
++ two resource-registration loops (pub->unk0[] via fn_800F9378; pub->unk8[] via
+fn_800DCE4C+fn_800F9378 with error logging) + validate-then-act on pub->unk4
+(fn_800D27FC) + pub->unkC->field0 register. Logic verified vs the 100% sibling, m2c
+draft, and full target trace. Signature `void* f(u32 resId, u32 loadMode, u32 arg2)`.
+
+**Wall:** 8-saved-reg coloring fixed globally by CW and NOT decl-steerable — the
+register map was BYTE-IDENTICAL across 6 source variants (decl-order ×4, model/pub
+merge, param-alias): params land r27/r28 (target r29/r30), base r31 (target r27),
+model/pub split r25/r30 (target coalesces to r26). Plus a `base + 0xAC`
+rematerialization (lis;addi;addi vs target's `addi r4,r27,0xac` reuse) — a CW
+scheduling artifact at the first pre-loop use of the hoisted constant pointer (later
+uses at 0x298/0x2d0/0x1cc/0x200 DO reuse the held base reg). Same class as the
+gfw a280 cluster ("decl-order sets initial map only, can't force mid-fn split").
+
+**Classifier:** SHAPE (exit 0). Wall permitted. → equivalent.txt (correct C, C-uncontrollable).
+
+## 2026-06-22 — trainer.c fn_801FEF74 (W-scheduling/peephole branch tie)
+
+**Score:** 99.25% | **classify_residual:** reloc:2 shape:1 (VERDICT RELOC, scheduling-off state) | **pl:** pl_trainer (-O4,s)
+
+Stub (0.68%) reconstructed to real correct C — a scene-dispatch handler:
+`u8 f(void* trainer)` that queries the current scene via repeated `fn_80119ED0(0x14)`
+(==0x7C/0xC8/0xCD/0xD8), resolves party/pokemon via fn_8012640C, computes a status
+(fn_80121ADC / fn_8011B67C), and on status==1 performs an action (fn_80121574 /
+fn_8011A3E4). Logic verified vs m2c draft + full target trace. Levers that landed it:
+`extern u16 fn_80119ED0(s32)` in-scope (the (u16) mask `clrlwi;cmplwi` — without it
+`cmpwi`, 81→97%); block2 action paths fall through to a single shared `return 0`
+(explicit `return 0` only on dead scene-mismatch paths); separate obj/obj2+target/target2
+per block (fixes block2 obj r31→r30 live-range split); `#pragma scheduling off`.
+
+**Wall:** genuine scheduling↔peephole tie. With scheduling ON, CW interleaves
+`li r3,0x14` into the obj-save → round-trip `mr r0,r3; li; mr r30,r0` (vs target
+`mr r30,r3`) = reg-coloring, 98.32%. With scheduling OFF the round-trip is gone (99.25%)
+but CW's peephole drops the redundant `b end` branch-to-next that the target's
+scheduler keeps at the final action path (3 residual lines: 1 missing branch + 2
+displacement-shifted `b end`). The two artifacts are controlled by the SAME scheduling
+pragma in opposite directions; peephole-off restores the branch but breaks the entry
+`mr.` record-form fusion (98.46%). Not simultaneously satisfiable from C.
+
+**Classifier:** RELOC (scheduling-off state). Wall permitted. → equivalent.txt (correct C).
+
+## 2026-06-22 — tracefx.c fn_8013735C / fn_80137114 (W-src-dup reg-coloring + W6 float-const reloc)
+
+**pl:** pl_tracefx (-O4,p)
+
+**fn_8013735C (tracefxInit) — 86.32%, real correct C, ported to canon+equivalent.txt.** Field-copy
+init: `u32 f(void* work, void* params, u32 frames)` — memset 0xac, switch on params[0x3c]
+(1→memOffset=-4, else copy params[0x40]), copy ~20 float/byte/u16 fields work<-params, the
+`(s16)((f32)frames*(f32)GSgfxGetFrameCount()/60.0f)` calc, then arena =
+`((u32)params+memOffset+0x63)&~0x1f` + two fn_801DB060/fn_800F9318 alloc calls, return arena.
+Logic verified vs target trace. Lever: move the arena base computation BEFORE the fn_801DB060
+block (82.28→86.32, gets arena into a saved reg). **Wall = the same src-dup 5-reg stmw
+reg-coloring as sibling fn_8013757C (95.66):** target saves r27-r31 (`stmw r27`, frame -0x40)
+and copies `params` (r29) into r31 (`mr r31,r29`) so the read-pointer persists while r29 is
+reused as arena; CW's coalescer in this compile merges p with params and folds memOffset into
+arena → only 4 saved regs (`stw`, frame -0x30), cascading into 66 reg-coloring lines. Forcing
+the copy is not C-reachable (arena-early / arena-diverge / separate-vars all stay 4 regs) —
+exactly the documented un-crackable tracefx src-dup. PLUS the W6 float-const band-isolation
+reloc (`lfd @21@sda21` vs named `lbl_8047D128`, the int→float magic double) — dedupes in
+band_integrate only, never in isolated band. classify SHAPE (rc:66/shape:11/reloc:5).
+
+**fn_80137114 — 0.68% STUB, NOT reconstructed.** Verified structure (full target trace): a
+3-case switch on params[0x4] (1/2/3) with per-item loops calling the variadic-float fn_8013DB64,
+all using the SAME float magic (`lfd lbl_8047D128` int→float + `/lbl_8047D118` 60.0f +
+`lbl_8047D11C`) → guaranteed W6 float-const band-isolation reloc, same un-saveable class.
+Intricate variadic-float arg matching (calls pass 4/5/6 floats) + the float-const ceiling make
+it a sub-100 wall; not reconstructed this pass (large effort, guaranteed not band-saveable).
+
+**Classifier:** both SHAPE. Walls permitted. fn_8013735C → equivalent.txt.
+
+## 2026-06-22 — DVDLow.c fn_800A47AC / fn_800A42C4 (W-operand-order / addi-vs-mr, same class as fn_800A4C94)
+
+**pl:** pl_DVDLow (CW 1.2.5n, -O4,p) | **classify:** both SHAPE (47A C rc8/reloc8/shape12; 42C4 rc9/sched3/reloc9/shape15)
+
+Two DVD low-level command drivers, real correct C (hardware-register writes to the DI block
+0xCC006000). asm wrappers stay ACTIVE in canon (byte-match preserved); C is the Equivalent
+reference (#else) — registered in equivalent.txt.
+
+- **fn_800A47AC 56.88%** — DVDLowReadDiskID-style: set Callback/StopAtNextInt, write DI cmd
+  0xA8000040 + length 0x20 + DMA addr to DICMDBUF/DILENGTH/DIDMA, DICR=3, create+set a
+  (BUS_CLOCK/4)*10 timeout alarm, return TRUE.
+- **fn_800A42C4 72.15%** — DVDLowRead: cmd 0xA8000000, offset>>2, length, DMA addr/len,
+  DICR=3, then a `length > 0xA00000 ? *20 : *10` timeout-alarm branch.
+
+**Wall (same as the already-registered fn_800A4C94 71.4%):** every instruction is correct but
+CW 1.2.5n's codegen ORDER/FORM differs version-pervasively and is not C-reachable:
+(1) **addi-vs-mr** — target moves params/args with `addi rD,rS,0`; CW here emits `mr rD,rS`;
+(2) **constant-hoist** — target hoists all `li`/`lis` value+base materializations above the
+prologue; CW emits them inline at use; (3) **two-base DI materialize** — target keeps both
+0xCC000000 (first store, +0x6008) and 0xCC006000 (rest, small offsets); CW uses one base with
+large offsets. Explicit-base-local lever inert (56.88→56.71). fn_800A4C94 swept ~20 phrasings
+across CW 1.1–2.0 and stuck → confirmed un-crackable DVDLow class. classify SHAPE → wall.
+
+## 2026-06-22 — battle_waza.c fn_801D5328 / fn_801DA5C4 / fn_801DA9E8 (pl_battle_waza)
+
+### fn_801D5328 99.88% — RELOC (branch address)
+
+**Score:** 99.88% | **classify_residual:** reloc:1 (RELOC exit-1) | **pl:** pl_battle_waza
+
+Single mismatch: `bne 0x1cfdd0` (target DOL absolute) vs `bne 0xaf0` (band-relative). Code is byte-correct; the branch target resolves identically in the full DOL. Standard objdiff-band reloc artifact — not C-reachable. classify SHAPE/RELOC → wall.
+
+### fn_801DA5C4 83.40% — SHAPE
+
+**Score:** 83.40% | **classify_residual:** SHAPE exit-1 | **pl:** pl_battle_waza
+
+Large do-while loop visiting an array of entries from `lbl_80467CC0`. Multiple shape mismatches from branch layout and scheduler decisions. Real C active; body is correct semantically but scheduling+branch forms differ from target in a CW-internal way. classify SHAPE → wall.
+
+### fn_801DA9E8 99.29% — REG-COLORING escape-clause (entry/count swap PINNED)
+
+**Score:** 99.29% | **classify_residual:** rc:6 (REG-COLORING exit-0) | **pl:** pl_battle_waza
+
+6 mismatches, all register-number only: `entry` pointer (r29 mine vs r31 target) and `count` u16 (r31 mine vs r29 target) are swapped throughout; `counter` s32 is correct at r30 in both.
+
+**Sweep that did NOT move it:**
+- All 6 declaration-order permutations of {counter, entry, count}: count always r31, entry always r29 regardless of decl order. `counter` only swaps with entry (not count).
+- 2 initialization-order variants (count-first, entry-first): same floor, different counter/entry mapping but count still r31.
+- Levers tried: none of the standard decl-reorder permutations can place count below entry.
+
+**Root cause:** CW's O4 live-range allocator assigns count (u16, loaded via `lhz`) to the highest available non-volatile (r31) regardless of declaration order. The allocation is pinned — not entry-priority or use-frequency driven in a way reachable from C. Real correct C registered as Equivalent; classifier REG-COLORING verdict is a heuristic false-positive (reachability unverified).
+
+## 2026-06-22 — OSMemory.c fn_8009F488 (OSProtectRange, W-MMIO-base-fold, = SI.c 04D0)
+
+**Score:** 78.92% | **classify:** reg-coloring:12 reloc:8 shape:10 (VERDICT SHAPE) | **pl:** pl_OSMemory (CW 1.2.5n, -O4,p)
+
+Faithful real C (active #else; no asm/.inc fraud): OSProtectRange — for chan<4, align addr
+to 0x400, DCFlushRange, OSDisableInterrupts, __OSMaskInterrupts(0x80000000>>chan), write MI
+protection regs `mi=(volatile u16*)0xCC004000; mi[chan*2]=startAligned>>10; mi[chan*2+1]=
+endAligned>>10; mi[8]=(mi[8]&~(3<<chan*2))|protFlags<<chan*2`, conditional __OSUnmaskInterrupts,
+OSRestoreInterrupts. Logic verified.
+
+**Wall (same not-C-steerable class as SI.c 04D0 and the DVDLow operand-order walls):** CW 1.2.5n
+materializes the `0xCC004000` MMIO base differently — target `lis r3,0xcc00; addi r5,r3,0x4000`
+ONCE then reuses r5 (`add r3,r5,r3`/`addi r4,r5,0x10`); ours emits `subis r4,r3,0x3400` + a
+separate `lis r5,0xcc00`. The `volatile u16*` base-local does not force the held-base form.
+Plus a linked frame (-0x30 vs -0x38) and param r27<->r30 coloring. classify SHAPE → wall.
+asm wrapper stays #if 1 active in canon (byte-match); C = equivalent-tier. → equivalent.txt.

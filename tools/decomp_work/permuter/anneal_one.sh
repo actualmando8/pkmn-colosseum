@@ -14,14 +14,25 @@ FN="$1"; SRC="$2"; BUDGET="${3:-360}"; JOBS="${4:-2}"
 DIR="$PDIR/dirs/$FN"
 mkdir -p "$PDIR/wins" "$PDIR/logs"
 
+run_lowprio() {
+  local -a cmd=("$@")
+  if command -v ionice >/dev/null 2>&1; then
+    cmd=(ionice -c3 "${cmd[@]}")
+  fi
+  if [ "${GRIND_NICE:-0}" != "0" ] && command -v nice >/dev/null 2>&1; then
+    cmd=(nice -n "$GRIND_NICE" "${cmd[@]}")
+  fi
+  "${cmd[@]}"
+}
+
 # 1. build the dir (preprocess + isolate + assemble target.o + settings)
-if ! bash "$PDIR/build_dir.sh" "$FN" "$SRC" > "$PDIR/logs/build_$FN.log" 2>&1; then
+if ! run_lowprio bash "$PDIR/build_dir.sh" "$FN" "$SRC" > "$PDIR/logs/build_$FN.log" 2>&1; then
   echo "FAIL $FN build_dir"; exit 0
 fi
 [ -f "$DIR/base.c" ] && [ -f "$DIR/target.o" ] || { echo "FAIL $FN missing_base_or_target"; exit 0; }
 
 # 2. run the permuter (time-boxed). --stop-on-zero halts on exact match.
-( cd "$DIR" && timeout "$BUDGET" python3 "$PERM/permuter.py" . -j "$JOBS" \
+( cd "$DIR" && run_lowprio timeout "$BUDGET" python3 "$PERM/permuter.py" . -j "$JOBS" \
     --stop-on-zero --best-only > "$PDIR/logs/run_$FN.log" 2>&1 )
 
 # 3. harvest: a score-0 match is normally saved by the permuter as

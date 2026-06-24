@@ -67,3 +67,35 @@ fn_8000BFA0   # gs_party_access — reg/scheduling wall; 95.04% real C, salvaged
 fn_8000DEC4   # gs_npc_interact — reg-alloc wall; 94.77% real C, salvaged 2026-06-18
 fn_80200E00   # pl_trainer - W-param-coalesce-r28 wall; 97.98% real C, 2026-06-19
 fn_80200B10   # pl_trainer - W-param-coalesce-r28 wall; 97.87% real C, 2026-06-19
+
+# gs_model.c — six model-ID dispatchers, W6 jumptable-NAME-only (2026-06-22)
+# Real correct C; bytes link identical in ROM. CW anonymous local jumptable (@NNN)
+# vs target named jumptable_8035Bxxx. Not band.py-saveable. See WALLS.md 2026-06-22.
+fn_80105C68   # gs_model — W6 jumptable NAME only (@591 vs jumptable_8035B0F8); 99.82%
+fn_80106080   # gs_model — W6 jumptable NAME only (@634 vs jumptable_8035B170); 99.82%
+fn_801065B8   # gs_model — W6 jumptable NAME only (@712 vs jumptable_8035B238); 99.82%
+fn_801064E0   # gs_model — W6 jumptable NAME only (@692 vs jumptable_8035B210); 99.81%
+fn_80106160   # gs_model — W6 jumptable NAME only (@659 vs jumptable_8035B198); 99.82%
+fn_80106934   # gs_model — W6 jumptable NAME only (@740 vs jumptable_8035B2B0); 99.80%
+
+# gs_field_resource.c — archive loader, W1 reg-coloring + base-remat (2026-06-22)
+fn_80114AE0   # gs_field_resource — real C (sibling of 100% fn_801149BC); 94.55%; 8-reg coloring not decl-steerable (6 variants identical map) + base+0xAC remat scheduling artifact
+
+# trainer.c — scene-dispatch handler, scheduling/peephole branch tie (2026-06-22)
+fn_801FEF74   # trainer — real C (0.68%->99.25%); round-trip(sched-on) vs redundant-branch(sched-off) opposed by same pragma; u16 fn_80119ED0 mask + shared-return + separate obj/obj2 levers
+
+# tracefx.c — tracefxInit, src-dup reg-coloring + W6 float-const reloc (2026-06-22)
+fn_8013735C   # tracefx — real C (82->86.32); src-dup 5-reg stmw coloring (sibling of 95.66 fn_8013757C) not C-forceable + float-const band-isolation reloc (lbl_8047D128 @nn, integrate-only)
+
+# DVDLow.c — DVD command drivers, W-operand-order/addi-vs-mr (2026-06-22, same class as fn_800A4C94)
+fn_800A47AC   # DVDLow — real C (DVDLowReadDiskID-style: DI regs 0xCC006008-601c + timeout alarm); 56.88%; CW 1.2.5n hoists const materializations + emits mr (vs target addi rD,rS,0) for param/arg moves + two-base DI materialize. asm stays active.
+fn_800A42C4   # DVDLow — real C (DVDLowRead: cmd 0xA8000000, offset>>2, length, DMA + >0xA00000 timeout branch); 72.15%; same addi-vs-mr + const-hoist + two-base operand-order artifacts. asm stays active.
+
+# battle_waza.c — entry/count reg-coloring pinned + shape walls (2026-06-22)
+fn_801DA9E8   # battle_waza — real C (waza sound effect play, do-while over lbl_80467CC0 entries); 99.29%; entry r29↔r31 count r31↔r29 swap PINNED (6 decl perms + 2 init orders exhausted). asm stays active.
+fn_801DA5C4   # battle_waza — real C (waza state check, do-while + arg0 branch); 83.40%; SHAPE build artifact. asm stays active.
+fn_801D1FA8   # battle_waza — real C (memset + sth 0xff fill loop 16×32, void fn_801D2B08); 89.91%; SHAPE (classify_residual shape:2 reg-coloring:35) fill→r0 vs r3, ptr→r3 vs r4 PINNED (named-fill, O2-pragma, pre-memset-fill, 4 decl orders exhausted). asm stays active.
+fn_801D2080   # battle_waza — real C (waza seq start: clip seqH u16→r30, mailGetReceiveNumber, lbl_80467390 guard, fn_8016557C audioHandle); 98.22%; W2 scheduling: CW hoists lis r3,0x1 after bl fn_8016557C filling load-use latency→mr r0,r3;mr r30,r0 instead of direct mr r30,r3. scheduling off fixes audioHandle but breaks epilogue (li r0 vs li r4 + lwz restore order). Opposing constraints not C-steerable.
+
+# OSMemory.c — OSProtectRange, CW1.2.5n MMIO base-fold (2026-06-22, same class as SI.c 04D0 / fn_800A4C94)
+fn_8009F488   # OSMemory — OSProtectRange real C (78.92); CW1.2.5n MMIO 0xCC004000 base-fold (target lis 0xcc00;addi 0x4000 reused vs ours subis/disp) not-C-steerable + linked frame -0x30/-0x38 + param r27<->r30 coloring. asm stays active.

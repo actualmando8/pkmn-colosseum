@@ -29,18 +29,34 @@ DEFAULT_QUEUE = [
     ["fn_80012D20", "src/game/gs_event_exec.c"],
 ]
 
+def _env_int(name, default, minimum=1):
+    try:
+        value = int(os.environ.get(name, default))
+    except (TypeError, ValueError):
+        value = int(default)
+    return max(minimum, value)
+
+
 try:
     NCORE = os.cpu_count() or 8
 except Exception:
     NCORE = 8
-JOBS = int(os.environ.get("GRIND_JOBS","1"))
-WORKERS = int(os.environ.get("GRIND_WORKERS","2"))
-STAGGER = 6                           # seconds between worker starts (avoid simultaneous build_dir mwcc bursts)
-REPLICAS = 1                         # one annealer per function (distinct fns run concurrently)
-BUDGET = 600
+
+PROFILE = os.environ.get("GRIND_PROFILE", "").strip().lower()
+DESKTOP_PROFILE = PROFILE in {"desktop", "low", "low-impact", "friendly"}
+DEFAULT_WORKERS = 1 if DESKTOP_PROFILE else 2
+DEFAULT_JOBS = 1
+DEFAULT_STAGGER = 15 if DESKTOP_PROFILE else 6
+
+JOBS = _env_int("GRIND_JOBS", DEFAULT_JOBS)
+WORKERS = _env_int("GRIND_WORKERS", DEFAULT_WORKERS)
+STAGGER = _env_int("GRIND_STAGGER", DEFAULT_STAGGER, minimum=0)  # seconds between worker starts
+REPLICAS = _env_int("GRIND_REPLICAS", 1)                         # one annealer per function by default
+BUDGET = _env_int("GRIND_BUDGET", 600)
 
 _lock = threading.Lock()
-_state = {"mode": "swarm", "cores": NCORE, "workers": WORKERS, "jobs": JOBS,
+_state = {"mode": "swarm", "profile": PROFILE or "default",
+          "cores": NCORE, "workers": WORKERS, "jobs": JOBS,
           "active": {}, "queue": [], "done": [], "wins": [], "pool": [],
           "started": time.time()}
 

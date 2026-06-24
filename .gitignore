@@ -157,6 +157,8 @@ tools/decomp_work/permuter/wins/
 tools/decomp_work/permuter/scratch/
 tools/decomp_work/permuter/*.prag.c
 tools/decomp_work/permuter/*_pp.c
+# m2c first-draft generator output (drafts + .s/.ctx intermediates are regenerable)
+tools/decomp_work/m2c_out/
 
 # ─── Fleet scratch / agent state (added 2026-06-06; keeps multi-GB junk out) ───
 # Orchestrator + agent state dirs (1.7GB+). Curated tracked files stay tracked.
@@ -222,3 +224,8 @@ tools/decomp_work/decomp_work/
 tools/decomp_work/scratch/
 opencode.json
 opencode.config.json
+
+# decomp KG (local shared mind; rebuildable via tools/decomp_work/kg/kg.py backfill)
+tools/decomp_work/kg/kg.db
+tools/decomp_work/kg/kg.db-wal
+tools/decomp_work/kg/kg.db-shm

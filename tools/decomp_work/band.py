@@ -192,7 +192,8 @@ def _rows(tag, st):
     j = objdiff_json(tag, st)
     rows = {}
     for s in j.get("right", {}).get("symbols", []):
-        if s.get("kind") == "SYMBOL_FUNCTION":
+        kind = s.get("kind")
+        if kind is None or kind == "SYMBOL_FUNCTION":
             rows[s["name"]] = float(s.get("match_percent") or 0.0)
     return rows
 
@@ -305,12 +306,22 @@ def cmd_json(tag):
 
 
 def _governing_toggle_pragmas(lines, start):
-    """on/off toggle pragmas (peephole / scheduling) active immediately before a fn def.
+    """on/off toggle pragmas active immediately before a fn def.
     Agents place these right before the real-C body to crack a fn, but band save extracts
     ONLY the def — so the win drops in canon (100% in scratch -> ~70% without the pragma).
-    Returns the toggles that govern the fn, so _extract can carry them. Matches the proven
-    canon wrap (battle_scene.c: '#pragma peephole off' / fn / '#pragma peephole on')."""
+    Returns (open, restore) pragma-line pairs that govern the fn, so _extract can carry
+    them. Matches the proven canon wrap (battle_scene.c: '#pragma peephole off' / fn /
+    '#pragma peephole on'). Handles both polarities: peephole/scheduling are cracked with
+    'off' (restored 'on'); fp_contract is cracked with 'on' (restored 'off', e.g. the
+    fmadd-chain dot products in gs_colsys.c)."""
+    # (kind, crack-state, restore-state)
+    KINDS = (
+        ("peephole", "off", "on"),
+        ("scheduling", "off", "on"),
+        ("fp_contract", "on", "off"),
+    )
     found = []
+    seen = set()
     i = start - 1
     while i >= 0:
         s = lines[i].strip()
@@ -318,9 +329,10 @@ def _governing_toggle_pragmas(lines, start):
             i -= 1
             continue
         if s.startswith("#pragma "):
-            for kind in ("peephole", "scheduling"):
-                if s == f"#pragma {kind} off" and kind not in found:
-                    found.append(kind)
+            for kind, crack, restore in KINDS:
+                if s == f"#pragma {kind} {crack}" and kind not in seen:
+                    seen.add(kind)
+                    found.append((f"#pragma {kind} {crack}", f"#pragma {kind} {restore}"))
             i -= 1
             continue
         break  # first non-blank, non-pragma line ends the governing block
@@ -340,8 +352,8 @@ def _extract(tag, fn):
     body = lines[span[0]:span[1] + 1]
     toggles = _governing_toggle_pragmas(lines, span[0])
     if toggles:
-        body = ([f"#pragma {k} off" for k in toggles] + body
-                + [f"#pragma {k} on" for k in reversed(toggles)])
+        body = ([open_ for open_, _ in toggles] + body
+                + [restore for _, restore in reversed(toggles)])
     return nl.join(body)
 
 

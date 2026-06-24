@@ -5,6 +5,28 @@
 # (refill_queue.py) and relaunches the swarm, so it never stays dead.
 cd /mnt/c/Users/douglaswhittingham/pkmn-colosseum || exit 1
 
+GRIND_PROFILE="${GRIND_PROFILE:-default}"
+if [ "$GRIND_PROFILE" = "desktop" ] || [ "$GRIND_PROFILE" = "low" ] || \
+   [ "$GRIND_PROFILE" = "low-impact" ] || [ "$GRIND_PROFILE" = "friendly" ]; then
+  export GRIND_WORKERS="${GRIND_WORKERS:-1}"
+  export GRIND_JOBS="${GRIND_JOBS:-1}"
+  export GRIND_STAGGER="${GRIND_STAGGER:-15}"
+  GRIND_NICE="${GRIND_NICE:-15}"
+else
+  GRIND_NICE="${GRIND_NICE:-0}"
+fi
+
+run_lowprio() {
+  local -a cmd=("$@")
+  if command -v ionice >/dev/null 2>&1; then
+    cmd=(ionice -c3 "${cmd[@]}")
+  fi
+  if [ "${GRIND_NICE:-0}" != "0" ] && command -v nice >/dev/null 2>&1; then
+    cmd=(nice -n "$GRIND_NICE" "${cmd[@]}")
+  fi
+  "${cmd[@]}"
+}
+
 # ---- pretty, width-aware output -------------------------------------------
 # Recompute width each draw so resizing the pane reflows the frame. Clamp to a
 # sane band so a giant or tiny terminal still looks right.
@@ -78,7 +100,7 @@ while true; do
   python3 tools/decomp_work/permuter/refill_queue.py --n 24 --min 90 --max 99.999 2>&1 | sed "s/^/   ${C_DIM}│${C_RST} /"
   step "$C_GRN" "▶" "launching grind2 swarm ..."
   rule "·"
-  python3 tools/decomp_work/permuter/grind2.py 2>&1
+  run_lowprio python3 tools/decomp_work/permuter/grind2.py 2>&1
   rule "·"
   step "$C_YEL" "■" "cycle ${cycle} finished — refill + restart in 5s"
   sleep 5
