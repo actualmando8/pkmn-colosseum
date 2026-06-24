@@ -112,3 +112,8 @@ fn_800DF140   # gs_render — real C 77.17%; conv-literal ((f32)(u8) magic @1832
 # gs_worldmap.c — fresh-but-walled near-misses (surgical round 2026-06-24, wz1ckmhxh)
 fn_800265C0   # gs_worldmap — real C 96.88%; reg-permutation family wall (GSmap state-table lookup: ctx r3-vs-r5 + lbl_80266DD8 materialize order). Family: 26600/26640/26680/266C0/26700. SKIP
 fn_8002AE9C   # gs_worldmap — real C ~96.9%; same reg-permutation/scheduling family. SKIP
+
+# colosseum_battle.c / battle_logic.c — fresh-but-walled near-misses (surgical round 2026-06-24, wlv0va5d0)
+fn_80261CBC   # colosseum_battle — real C 99.42%; reg-permutation wall (two u32 params home to nonvol in incoming order; sibling fn_80261D8C identical). SKIP
+fn_801E11F0   # battle_logic — real C 93.85%; W-scheduling prologue tie (lis/addi base-ptr split across r31 save; addi->r0 before save vs ->r31 after). SKIP
+fn_801E1FF8   # battle_logic — real C 98.64%; conv-literal wall ((f32) cast magic-double bias anon @947 vs named lbl_8047E4A0). SKIP

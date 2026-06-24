@@ -21048,12 +21048,12 @@ u16 fn_80252894(void* ctx, u32 p1, u32 p2, u32 p3) { return (u16)fn_802376EC(ctx
 u32 fn_802528DC(void* ctx, u32 param1, u32 param2, u32 param3) { return fn_80211170(ctx, param2, param1, param3, 0, 0, 0, 0); }
 
 /* Address: 0x80252918 | Size: 0x54 | Pattern: field_accessor */
-u32 fn_80252918(void* ctx, u32 slot, u32 param) {
+u32 fn_80252918(void* ctx, u32 slot, u32 arg2, u32 param) {
     extern u32 fn_802376EC();
     u32 val1, val2, avg;
     val1 = fn_802376EC(ctx, slot) & 0xFFFF;
-    val2 = fn_802376EC(ctx, slot) & 0xFFFF;
-    avg = (s32)(val1 + val2) >> 1;
+    val2 = fn_802376EC(ctx, param) & 0xFFFF;
+    avg = (s32)(val1 + val2) / 2;
     return val2 - avg;
 }
 
@@ -34033,6 +34033,9 @@ void fn_8025DCBC(int *param)
 }
 
 /* Address: 0x8025DD14 | Size: 0x98 | Ghidra import */
+#pragma push
+#pragma use_lmw_stmw off
+#pragma optimize_for_size off
 void fn_8025DD14(int *r3)
 {
     extern int fn_801653BC();
@@ -34062,6 +34065,7 @@ void fn_8025DD14(int *r3)
     r3[2] = iVar2;
     r3[3] = iVar4;
 }
+#pragma pop
 
 /* Address: 0x8025DDAC | Size: 0x48 | Ghidra import */
 void fn_8025DDAC(u32 *r3,u32 r4)
@@ -34284,6 +34288,8 @@ static inline u32 *validptr_8025E1BC(u32 *p) {
 
 }
 
+#pragma push
+#pragma optimize_for_size off
 void fn_8025E1BC(float f1, float f2, float f3, float f4, float f5, float f6) {
   extern u32 lbl_8047B658;
   extern u16 lbl_80478DA0;
@@ -34331,6 +34337,7 @@ void fn_8025E1BC(float f1, float f2, float f3, float f4, float f5, float f6) {
   }
   fn_801DAC90();
 }
+#pragma pop
 
 /* Address: 0x8025E534 | Size: 0xC0 | Ghidra import */
 void fn_8025E534(void)
