@@ -162,7 +162,7 @@ typedef struct GSFloorResource {
 typedef struct GSFloorDataEntry {
     /* 0x00 */ u8   data[0x40];      /**< Floor-specific data (area config, etc.) */
     /* 0x40 */ u32  fsysFileHandle;  /**< FSYS archive file handle */
-    /* 0x44 */ u32  refCount;        /**< Reference count: 0 = free, >0 = in use */
+    /* 0x44 */ s32  refCount;        /**< Reference count: 0 = free, >0 = in use */
 } GSFloorDataEntry;
 
 /**

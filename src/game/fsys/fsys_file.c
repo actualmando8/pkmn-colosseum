@@ -1225,17 +1225,46 @@ FSYSFileHandle* fn_8017D68C(FSYSSlot* slot) {
 #endif
 
 /* 0x8017D800 | 0xF8 */
-extern void fn_8017DEA4(void);
-extern void fn_8017DF4C(void);
-extern void fn_8017DFF4(void);
-extern void fn_8017E09C(void);
+extern void fn_8017DEA4();
+extern void fn_8017DF4C();
+extern void fn_8017DFF4();
+extern void fn_8017E09C();
 extern u32 lbl_8047B1B4;
-#if 1
+#if 0
 asm void fn_8017D800(void) {
 #include "src/game/fsys/fsys_file_fn_8017D800.inc"
 }
 #else
-void fn_8017D800(void) { /* TODO: match -- 248 bytes at 0x8017D800 */ }
+void fn_8017D800(void) {
+    u32 i;
+    FSYSSlot* slot;
+
+    slot = (FSYSSlot*)lbl_8047B1B4;
+    for (i = 0; i < *(u32*)lbl_80453FEC; i++) {
+        if ((s32)slot->status == FSYS_STATUS_PENDING) {
+            switch (slot->loadMode) {
+                case 0:
+                    fn_8017E09C(slot, slot->fileHandle, slot->callbackA,
+                                slot->callbackB, slot->callbackC);
+                    return;
+                case 1:
+                    fn_8017DEA4(slot, slot->fileHandle, slot->callbackA,
+                                slot->callbackB, slot->callbackC);
+                    return;
+                case 2:
+                    fn_8017DFF4(slot, slot->fileHandle, slot->callbackA,
+                                slot->callbackB, slot->callbackC);
+                    break;
+                case 7:
+                    fn_8017DF4C(slot, slot->fileHandle, slot->callbackA,
+                                slot->callbackB, slot->callbackC);
+                    break;
+            }
+        } else {
+            slot++;
+        }
+    }
+}
 #endif
 
 /* 0x8017D8F8 | 0x34 */

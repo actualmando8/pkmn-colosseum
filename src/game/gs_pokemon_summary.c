@@ -392,12 +392,46 @@ extern u32 lbl_8047A2E8;
 extern u32 lbl_8047A2C8;
 extern u32 lbl_8047A2D0;
 extern u32 lbl_8047A2D8;
-#if 1
+#if 0
 asm void fn_80016F14(void) {
 #include "src/game/gs_pokemon_summary_fn_80016F14.inc"
 }
 #else
-void fn_80016F14(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+s32 fn_80016F14(u8* src, u8* dst) {
+    u16 tmp;
+    s32 v;
+    s32 col;
+    tmp = (u16)(fn_80103E68((u16)*(u32*)(&sSummaryPageEntries[(s32)(s8)src[0x95] * 0x4C + 0x1C])) >> 16);
+    if ((s32)lbl_8047A2E8 >= 0) {
+        v = ((s32)lbl_8047A2E8 - (s32)(s8)*(u8*)&tmp) * 0x1f + 0x95;
+        if ((s32)lbl_8047A2C8 != 0) {
+            v -= (s32)*(f32*)&lbl_8047A2D0;
+        }
+        if (v + (s32)*(s16*)(dst + 0x56) < 0x95) {
+            col = 0;
+        } else if (v < 0x18d) {
+            col = 0xff;
+        } else {
+            col = 0;
+        }
+    } else {
+        v = (s32)(s8)*((u8*)&tmp + 1) * 0x1f + 0x95;
+        if ((s32)lbl_8047A2C8 == 0) {
+            v += (s32)*(f32*)&lbl_8047A2D0;
+        }
+        if ((s32)lbl_8047A2D8 == -1) {
+            col = 0x72;
+        } else {
+            col = 0xff;
+        }
+    }
+    *(s16*)(dst + 0x52) = (s16)v;
+    dst[0x67] = col;
+    return 0;
+}
+#pragma pop
 #endif
 
 /* fn_80017028 - 0x80017028 | size: 0x73c */

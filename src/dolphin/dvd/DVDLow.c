@@ -201,7 +201,43 @@ asm void fn_800A42C4(void) {
 #include "src/dolphin/dvd/DVDLow_fn_800A42C4.inc"
 }
 #else
-void fn_800A42C4(void) {}
+void fn_800A42C4(void* addr, u32 length, u32 offset, DVDCBCallback callback) {
+    extern s64 __OSGetSystemTime(void);
+    extern void OSCreateAlarm(OSAlarm* alarm);
+    extern void OSSetAlarm(OSAlarm* alarm, s64 tick, OSAlarmHandler handler);
+    extern WACommand CommandList_803FC290[];
+    extern u32 lbl_8047A7C0;
+    extern u32 lbl_8047A7BC;
+    extern u32 lbl_8047A7B8;
+    extern u32 lbl_8047A784;
+
+    OSAlarm* alarm;
+    u32 timeout;
+
+    StopAtNextInt_8047A780 = 0;
+    Callback_8047A788 = callback;
+    alarm = (OSAlarm*)((u8*)CommandList_803FC290 + 0x68);
+    lbl_8047A7C0 = 1;
+    *(s64*)&lbl_8047A7B8 = __OSGetSystemTime();
+
+    DVD_CMD = 0xA8000000;
+    DVD_OFFSET_LO = offset >> 2;
+    DVD_LENGTH = length;
+    DVD_DMA_ADDR = (u32)addr;
+    DVD_DMA_LEN = length;
+    lbl_8047A784 = length;
+    DVD_CONTROL = 3;
+
+    if (length > 0xA00000) {
+        timeout = (BUS_CLOCK / 4) * 20;
+        OSCreateAlarm(alarm);
+        OSSetAlarm(alarm, (s64)timeout, AlarmHandlerForTimeout);
+    } else {
+        timeout = (BUS_CLOCK / 4) * 10;
+        OSCreateAlarm(alarm);
+        OSSetAlarm(alarm, (s64)timeout, AlarmHandlerForTimeout);
+    }
+}
 #endif
 
 /* fn_800A43D4 - 0x800A43D4 | size: 0x80 */
@@ -256,7 +292,29 @@ asm void fn_800A47AC(void) {
 #include "src/dolphin/dvd/DVDLow_fn_800A47AC.inc"
 }
 #else
-void fn_800A47AC(void) {}
+BOOL fn_800A47AC(void* addr, DVDCBCallback callback) {
+    extern void OSCreateAlarm(OSAlarm* alarm);
+    extern void OSSetAlarm(OSAlarm* alarm, s64 tick, OSAlarmHandler handler);
+    extern OSAlarm AlarmForTimeout_803FC2F8;
+
+    u32 timeout;
+
+    Callback_8047A788 = callback;
+    StopAtNextInt_8047A780 = 0;
+
+    DVD_CMD = 0xA8000040;
+    DVD_OFFSET_LO = 0;
+    DVD_LENGTH = 0x20;
+    DVD_DMA_ADDR = (u32)addr;
+    DVD_DMA_LEN = 0x20;
+    DVD_CONTROL = 3;
+
+    timeout = (BUS_CLOCK / 4) * 10;
+    OSCreateAlarm(&AlarmForTimeout_803FC2F8);
+    OSSetAlarm(&AlarmForTimeout_803FC2F8, (s64)timeout, AlarmHandlerForTimeout);
+
+    return TRUE;
+}
 #endif
 
 /* fn_800A48DC - 0x800A48DC | size: 0x8C */

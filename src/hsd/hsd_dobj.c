@@ -739,12 +739,134 @@ HSD_FObj* HSD_FObjAlloc(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void fn_80199A84(void* list, void* data);
-#if 1
+#if 0
 asm void fn_80199794(void) {
 #include "src/hsd/hsd_dobj_fn_80199794.inc"
 }
 #else
-void fn_80199794(void) { /* TODO */ }
+#pragma optimization_level 4
+extern void* HSD_ObjAlloc(void* list);
+extern void* memset(void* dst, int val, u32 size);
+extern char lbl_8047DA30;
+extern char lbl_8047DA38;
+
+/* HSD_FObjLoadDesc: explicit 4-level unroll (compiler-truth match).
+ * Levels 0-2: inlined HSD_FObjAlloc body (ObjAlloc + assert + memset).
+ * Level 3:    same + fn_80199A84(alloc_data, lbl_80274758) no-op hook.
+ * Level 4:    real HSD_FObjAlloc() call + real recursion + field copy. */
+HSD_FObj* fn_80199794(HSD_FObjDesc* desc0)
+{
+    HSD_FObj* fobj1;
+    HSD_FObjDesc* desc2;
+    HSD_FObjDesc* desc3;
+    HSD_FObjDesc* desc1;
+    HSD_FObj* fobj0;
+    HSD_FObj* fobj2;
+    HSD_FObj* fobj4;
+    HSD_FObjDesc* desc4;
+    HSD_FObj* fobj3;
+
+    if (desc0 == NULL) {
+        goto ret_null;
+    }
+    fobj0 = HSD_ObjAlloc(lbl_80465378);
+    if (fobj0 == NULL) {
+        __assert(&lbl_8047DA30, 0x2F3, &lbl_8047DA38);
+    }
+    memset(fobj0, 0, 0x30);
+    desc1 = desc0->next;
+    if (desc1 == NULL) {
+        goto set_fobj1;
+    }
+    fobj1 = HSD_ObjAlloc(lbl_80465378);
+    if (fobj1 == NULL) {
+        __assert(&lbl_8047DA30, 0x2F3, &lbl_8047DA38);
+    }
+    memset(fobj1, 0, 0x30);
+    desc2 = desc1->next;
+    if (desc2 == NULL) {
+        goto set_fobj2;
+    }
+    fobj2 = HSD_ObjAlloc(lbl_80465378);
+    if (fobj2 == NULL) {
+        __assert(&lbl_8047DA30, 0x2F3, &lbl_8047DA38);
+    }
+    memset(fobj2, 0, 0x30);
+    desc3 = desc2->next;
+    if (desc3 == NULL) {
+        goto set_fobj3;
+    }
+    fobj3 = HSD_ObjAlloc(lbl_80465378);
+    fn_80199A84(lbl_80465378, lbl_80274758);
+    if (fobj3 == NULL) {
+        __assert(&lbl_8047DA30, 0x2F3, &lbl_8047DA38);
+    }
+    memset(fobj3, 0, 0x30);
+    desc4 = desc3->next;
+    if (desc4 == NULL) {
+        goto set_fobj4;
+    }
+    fobj4 = HSD_FObjAlloc();
+    fobj4->next = fn_80199794(desc4->next);
+    fobj4->startframe = (s16) desc4->startframe;
+    fobj4->obj_type = desc4->type;
+    fobj4->frac_value = desc4->frac_value;
+    fobj4->frac_slope = desc4->frac_slope;
+    fobj4->ad_head = desc4->ad;
+    fobj4->length = desc4->length;
+    fobj4->flags = 0;
+    goto fill3;
+set_fobj4:
+    fobj4 = NULL;
+fill3:
+    fobj3->next = fobj4;
+    fobj3->startframe = (s16) desc3->startframe;
+    fobj3->obj_type = desc3->type;
+    fobj3->frac_value = desc3->frac_value;
+    fobj3->frac_slope = desc3->frac_slope;
+    fobj3->ad_head = desc3->ad;
+    fobj3->length = desc3->length;
+    fobj3->flags = 0;
+    goto fill2;
+set_fobj3:
+    fobj3 = NULL;
+fill2:
+    fobj2->next = fobj3;
+    fobj2->startframe = (s16) desc2->startframe;
+    fobj2->obj_type = desc2->type;
+    fobj2->frac_value = desc2->frac_value;
+    fobj2->frac_slope = desc2->frac_slope;
+    fobj2->ad_head = desc2->ad;
+    fobj2->length = desc2->length;
+    fobj2->flags = 0;
+    goto fill1;
+set_fobj2:
+    fobj2 = NULL;
+fill1:
+    fobj1->next = fobj2;
+    fobj1->startframe = (s16) desc1->startframe;
+    fobj1->obj_type = desc1->type;
+    fobj1->frac_value = desc1->frac_value;
+    fobj1->frac_slope = desc1->frac_slope;
+    fobj1->ad_head = desc1->ad;
+    fobj1->length = desc1->length;
+    fobj1->flags = 0;
+    goto fill0;
+set_fobj1:
+    fobj1 = NULL;
+fill0:
+    fobj0->next = fobj1;
+    fobj0->startframe = (s16) desc0->startframe;
+    fobj0->obj_type = desc0->type;
+    fobj0->frac_value = desc0->frac_value;
+    fobj0->frac_slope = desc0->frac_slope;
+    fobj0->ad_head = desc0->ad;
+    fobj0->length = desc0->length;
+    fobj0->flags = 0;
+    return fobj0;
+ret_null:
+    return NULL;
+}
 #endif
 #pragma pop
 

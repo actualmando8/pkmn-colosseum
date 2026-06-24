@@ -110,6 +110,45 @@ void fn_8004BE0C(void) {
 #pragma pop
 
 /* 0x8004C120 | size: 0x1B8 */
+/*
+ * WALL @ 90.86% (band scratch). Faithful real C kept below for reference; the
+ * build uses the asm-include so it stays byte-exact.
+ *
+ * classify_residual verdict: SHAPE (33 reg-coloring + 5 shape lines).
+ * Residual is a register PERMUTATION (count<->buf == r28<->r31) coupled with a
+ * case2/case3 temp permutation and a loop block-rotation idiom (CW emits the
+ * conditional branch as the back-edge; target emits an unconditional back-edge
+ * with a forward exit). Jointly invariant to: for/do-while/goto/while-cond loop
+ * reshapes, 4+ declaration orders, chained `buf = lbl = fn()` assignment,
+ * #pragma peephole off, #pragma scheduling on. Same class as colquery E64
+ * (register-permutation + loop-idiom, not budget-crackable).
+ *
+ * void fn_8004C120(void) {
+ *     u16* buf;
+ *     s32 page = 0;
+ *     void* heap;
+ *     s32 count = fn_801D1F7C();
+ *     s32 ret;
+ *     if (count > 0) {
+ *         heap = fn_800E3534(count * 2);
+ *         buf = lbl_8047A500 = fn_800E27B0();
+ *         switch (fn_801D1B4C()) {
+ *         case 1: { s32 i; for (i = 0; i < fn_801D1F7C(); i++) *buf++ = fn_801D1F0C(i); break; }
+ *         case 2: { u16* p = buf; s32 n = fn_801D1F7C(); s32 j;
+ *                   for (j = 0; j < n; j++) *p++ = fn_801D1F0C(j);
+ *                   fn_800CA620(buf, n, 2, fn_8004BF20); break; }
+ *         case 3: { u16* p = buf; s32 n = fn_801D1F7C(); s32 j;
+ *                   for (j = 0; j < n; j++) *p++ = fn_801D1F0C(j);
+ *                   fn_800CA620(buf, n, 2, fn_8004BE90); break; }
+ *         default: { s32 k; for (k = fn_801D1F7C() - 1; k >= 0; k--) *buf++ = fn_801D1F0C(k); break; }
+ *         }
+ *     } else {
+ *         lbl_8047A500 = 0;
+ *     }
+ *     while ((ret = fn_8004D34C(page)) >= 0) page = fn_8004D9C0(ret);
+ *     if (count > 0) { fn_800E24B0(heap); fn_800E209C(heap); }
+ * }
+ */
 asm void fn_8004C120(void) { nofralloc
     #include "asm/GC6E01/nonmatching/poke_detail/fn_8004C120.s"
 }

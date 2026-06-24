@@ -626,12 +626,79 @@ void fn_80137114(void) {
 }
 #pragma pop
 
-/* 0x8013735C | 0x220 */
+/* 0x8013735C | 0x220  tracefxInit */
+/* 86.32%: real correct C. Documented src-dup 5-reg stmw reg-coloring (target copies
+ * params->r31 so r29 reuses for arena; CW coalescer keeps 4 regs) + float-const
+ * band-isolation reloc (lbl_8047D118 @nn) = un-saveable in isolated band. equivalent.txt */
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8013735C(void) {
-    /* TODO: match -- 544 bytes at 0x8013735C */
+#pragma optimization_level 4
+u32 fn_8013735C(void* work, void* params, u32 frames) {
+    u8* w = (u8*)work;
+    u8* p = (u8*)params;
+    u32 arena;
+    s32 memOffset;
+    void* model;
+
+    memset(w, 0, 0xac);
+
+    switch (*(u32*)(p + 0x3c)) {
+    case 1:
+        *(u32*)(w + 0xa8) = 0;
+        memOffset = -4;
+        break;
+    case 2:
+    default:
+        *(u32*)(w + 0xa8) = *(u32*)(p + 0x40);
+        memOffset = 0;
+        break;
+    }
+
+    *(s16*)(w + 0xa6) =
+        (s16)(((f32)(s32)frames * (f32)(s32)fn_800D37CC()) / lbl_8047D118);
+
+    *(f32*)(w + 0x48) = *(f32*)(p + 0x00);
+    *(f32*)(w + 0x4c) = *(f32*)(p + 0x04);
+    *(f32*)(w + 0x50) = *(f32*)(p + 0x08);
+
+    *(s8*)(w + 0x63) = (s8)(*(s32*)(p + 0x0c) >> 24);
+    *(u8*)(w + 0x62) = (u8)(*(u32*)(p + 0x0c) >> 16);
+    *(u8*)(w + 0x61) = (u8)(*(u32*)(p + 0x0c) >> 8);
+    *(s8*)(w + 0x60) = (s8)(*(u32*)(p + 0x0c));
+
+    *(f32*)(w + 0x64) = *(f32*)(p + 0x10);
+    *(f32*)(w + 0x68) = *(f32*)(p + 0x14);
+    *(f32*)(w + 0x6c) = *(f32*)(p + 0x18);
+
+    *(u16*)(w + 0x70) = (u16)*(u32*)(p + 0x1c);
+    *(u16*)(w + 0x72) = (u16)*(u32*)(p + 0x20);
+    if (*(u16*)(w + 0x70) % 2 == 0) {
+        *(u16*)(w + 0x70) += 1;
+    }
+    if (*(u16*)(w + 0x72) % 2 == 0) {
+        *(u16*)(w + 0x72) += 1;
+    }
+
+    *(f32*)(w + 0x90) = *(f32*)(p + 0x24);
+    *(f32*)(w + 0x94) = *(f32*)(p + 0x28);
+    *(f32*)(w + 0x98) = *(f32*)(p + 0x2c);
+    *(f32*)(w + 0x9c) = *(f32*)(p + 0x30);
+    *(f32*)(w + 0xa0) = *(f32*)(p + 0x34);
+
+    arena = (((u32)params + memOffset) + 0x63) & ~0x1f;
+
+    *(u32*)(w + 0x74) = 0x4e20;
+    *(u32*)(w + 0x7c) = fn_801DB060();
+    *(u32*)(w + 0x78) = fn_801DB060();
+
+    fn_8010147C(arena, *(u32*)(p + 0x38), 0x4e20, *(u32*)(w + 0x7c));
+    model = fn_800F9318(0x4e20, *(u32*)(w + 0x7c));
+    fn_801013A0((u32)model, 0x4e20, 0, *(u32*)(w + 0x78));
+    model = fn_800F9318(0x4e20, *(u32*)(w + 0x78));
+    if (model != NULL) {
+        fn_800E4014(model, 0);
+    }
+    arena += (*(u32*)(p + 0x38) + 0x1f) & ~0x1f;
+    return arena;
 }
 #pragma pop
 
