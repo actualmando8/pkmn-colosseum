@@ -1666,19 +1666,21 @@ void fn_80195A48(void) { fn_801975FC(); fn_801974A8(); }
 
 /* 0x80195A6C | 0x4A0 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-extern void fn_800A3874(void);
+#pragma optimize_for_size on
+#pragma peephole off
+extern void fn_800A3874(f32*, f32, f32, f32, f32, f32, f32);
 extern void fn_800A3910(void);
-extern void fn_800A39E0(void);
-extern void fn_800BD2E0(void);
-extern void fn_800BD7A0(void);
-extern void fn_800C46B0(void);
-extern int fn_801960C4();   /* wrk7: was `void (void)`; typed-C returns int, takes HSD_CObj* */
-extern int fn_801963E0();   /* wrk7: was `void (void)`; typed-C returns int, takes HSD_CObj* */
+extern void fn_800A39E0(f32*, f32, f32, f32, f32, f32, f32);
+extern void fn_800BD2E0(f32*, int);
+extern void fn_800BD7A0(int, int, int, int);
+extern int fn_800C46B0(f32);
+extern int fn_801960C4(HSD_CObj*);   /* wrk7: was `void (void)`; typed-C returns int, takes HSD_CObj* */
+extern int fn_801963E0(HSD_CObj*);   /* wrk7: was `void (void)`; typed-C returns int, takes HSD_CObj* */
 extern void HSD_Panic(const char*, u32, const char*);
 extern void fn_80197400(void);
-extern void fn_8019C7B0(void);
+extern int fn_8019C7B0(void);
 #if 0
 asm void fn_80195A6C(void) {
 #include "src/hsd/hsd_cobj_fn_80195A6C.inc"
@@ -1706,76 +1708,21 @@ int fn_80195A6C(HSD_CObj* cobj)
     extern s32 lbl_80478C54;     /* EFB-relative y denominator */
     extern char lbl_8047D958;
     extern char lbl_80274680[];  /* HSD_Panic message: bad camera mode — INFERRED name */
+    extern f32 lbl_8047D978;     /* 0.0f (GX near Z) — named SDA2 constant */
+    extern f32 lbl_8047D9B0;     /* 1.0f (GX far Z)  — named SDA2 constant */
     int mode;
     int ok;
-    f32 mtx[3][4];
     int ortho_flag;
+    f32 mtx[3][4];
 
     if (cobj == NULL) {
         return 0;
     }
-    mode = ((int (*)(void)) fn_8019C7B0)();
+    mode = fn_8019C7B0();
     fn_80197400();
     lbl_8047B234 = (u32) cobj; /* current = cobj */
 
     switch (mode) {
-    case 0: {
-        /* sub-screen path: scale viewport/scissor through the EFB dimensions */
-        f32 sx = (f32)(u16) *(u16*)(lbl_80466BC0 + 4) / (f32)(s32) lbl_80478C50;
-        f32 sy = (f32)(u16) *(u16*)(lbl_80466BC0 + 6) / (f32)(s32) lbl_80478C54;
-        int has_off = (lbl_80466BC0[0x18] != 0);
-        ((void (*)(int, f32, f32, f32, f32, f32, f32)) lbl_80478C58)(
-            has_off,
-            cobj->viewport.xmin * sx,
-            cobj->viewport.ymin * sy,
-            (cobj->viewport.xmax - cobj->viewport.xmin) * sx,
-            (cobj->viewport.ymax - cobj->viewport.ymin) * sy,
-            0.0f, 1.0f);
-        ((void (*)(int, int, int, int)) fn_800BD7A0)(
-            ((int (*)(f32)) fn_800C46B0)((f32)(u16) cobj->scissor.left * sx),
-            ((int (*)(f32)) fn_800C46B0)((f32)(u16) cobj->scissor.top * sy),
-            ((int (*)(f32)) fn_800C46B0)(
-                ((f32)(u16) cobj->scissor.right - (f32)(u16) cobj->scissor.left) * sx),
-            ((int (*)(f32)) fn_800C46B0)(
-                ((f32)(u16) cobj->scissor.bottom - (f32)(u16) cobj->scissor.top) * sy));
-        ortho_flag = 0;
-        switch (cobj->projection_type) {
-        case PROJ_PERSPECTIVE:
-            C_MTXPerspective(&mtx[0][0],
-                             cobj->projection_param.perspective.fov,
-                             cobj->projection_param.perspective.aspect,
-                             cobj->near, cobj->far);
-            break;
-        case PROJ_FRUSTUM:
-            ((void (*)(f32*, f32, f32, f32, f32, f32, f32)) fn_800A3874)(
-                &mtx[0][0],
-                cobj->projection_param.frustum.top,
-                cobj->projection_param.frustum.bottom,
-                cobj->projection_param.frustum.left,
-                cobj->projection_param.frustum.right,
-                cobj->near, cobj->far);
-            break;
-        case PROJ_ORTHO:
-            ortho_flag = 1;
-            ((void (*)(f32*, f32, f32, f32, f32, f32, f32)) fn_800A39E0)(
-                &mtx[0][0],
-                cobj->projection_param.ortho.top,
-                cobj->projection_param.ortho.bottom,
-                cobj->projection_param.ortho.left,
-                cobj->projection_param.ortho.right,
-                cobj->near, cobj->far);
-            break;
-        }
-        ((void (*)(f32*, int)) fn_800BD2E0)(&mtx[0][0], ortho_flag);
-        ok = 1;
-        break;
-    }
-    case 1:
-        ok = ((int (*)(HSD_CObj*)) fn_801963E0)(cobj);
-        break;
-    case 2:
-        ok = ((int (*)(HSD_CObj*)) fn_801960C4)(cobj);
-        break;
     case 3:
         /* direct path: viewport/scissor used verbatim */
         ((void (*)(int, f32, f32, f32, f32, f32, f32)) lbl_80478C58)(
@@ -1783,21 +1730,22 @@ int fn_80195A6C(HSD_CObj* cobj)
             cobj->viewport.xmin, cobj->viewport.ymin,
             cobj->viewport.xmax - cobj->viewport.xmin,
             cobj->viewport.ymax - cobj->viewport.ymin,
-            0.0f, 1.0f);
-        ((void (*)(int, int, int, int)) fn_800BD7A0)(
+            lbl_8047D978, lbl_8047D9B0);
+        fn_800BD7A0(
             cobj->scissor.left, cobj->scissor.top,
             cobj->scissor.right - cobj->scissor.left,
             cobj->scissor.bottom - cobj->scissor.top);
-        ortho_flag = 0;
         switch (cobj->projection_type) {
         case PROJ_PERSPECTIVE:
+            ortho_flag = 0;
             C_MTXPerspective(&mtx[0][0],
                              cobj->projection_param.perspective.fov,
                              cobj->projection_param.perspective.aspect,
                              cobj->near, cobj->far);
             break;
         case PROJ_FRUSTUM:
-            ((void (*)(f32*, f32, f32, f32, f32, f32, f32)) fn_800A3874)(
+            ortho_flag = 0;
+            fn_800A3874(
                 &mtx[0][0],
                 cobj->projection_param.frustum.top,
                 cobj->projection_param.frustum.bottom,
@@ -1807,7 +1755,7 @@ int fn_80195A6C(HSD_CObj* cobj)
             break;
         case PROJ_ORTHO:
             ortho_flag = 1;
-            ((void (*)(f32*, f32, f32, f32, f32, f32, f32)) fn_800A39E0)(
+            fn_800A39E0(
                 &mtx[0][0],
                 cobj->projection_param.ortho.top,
                 cobj->projection_param.ortho.bottom,
@@ -1816,8 +1764,75 @@ int fn_80195A6C(HSD_CObj* cobj)
                 cobj->near, cobj->far);
             break;
         }
-        ((void (*)(f32*, int)) fn_800BD2E0)(&mtx[0][0], ortho_flag);
+        fn_800BD2E0(&mtx[0][0], ortho_flag);
         ok = 1;
+        break;
+    case 0: {
+        /* sub-screen path: scale viewport/scissor through the EFB dimensions */
+        int has_off = (lbl_80466BC0[0x18] != 0);
+        f64 sx = (f64)(u32) *(u16*)(lbl_80466BC0 + 4) / (f64)(u32) lbl_80478C50;
+        f64 sy = (f64)(u32) *(u16*)(lbl_80466BC0 + 6) / (f64)(u32) lbl_80478C54;
+        f32 vy = (f32)(cobj->viewport.ymin * sy);
+        f32 vx = (f32)(cobj->viewport.xmin * sx);
+        f32 xmax_sx = (f32)(cobj->viewport.xmax * sx);
+        f32 ymax_sy = (f32)(cobj->viewport.ymax * sy);
+        /* viewport.* are f32; scissor.* are u16 (lhz) */
+        if (has_off) {
+            ((void (*)(int, f32, f32, f32, f32, f32, f32)) lbl_80478C58)(
+                1, vx, vy, xmax_sx - vx, ymax_sy - vy, lbl_8047D978, lbl_8047D9B0);
+        } else {
+            ((void (*)(int, f32, f32, f32, f32, f32, f32)) lbl_80478C58)(
+                0, vx, vy, xmax_sx - vx, ymax_sy - vy, lbl_8047D978, lbl_8047D9B0);
+        }
+        {
+            f32 sl = (f32)((f64)(u32) cobj->scissor.left   * sx);
+            f32 st = (f32)((f64)(u32) cobj->scissor.top    * sy);
+            f32 sr = (f32)((f64)(u32) cobj->scissor.right  * sx);
+            f32 sb = (f32)((f64)(u32) cobj->scissor.bottom * sy);
+            fn_800BD7A0(
+                fn_800C46B0(sl),
+                fn_800C46B0(st),
+                fn_800C46B0(sr - sl),
+                fn_800C46B0(sb - st));
+        }
+        switch (cobj->projection_type) {
+        case PROJ_PERSPECTIVE:
+            ortho_flag = 0;
+            C_MTXPerspective(&mtx[0][0],
+                             cobj->projection_param.perspective.fov,
+                             cobj->projection_param.perspective.aspect,
+                             cobj->near, cobj->far);
+            break;
+        case PROJ_FRUSTUM:
+            ortho_flag = 0;
+            fn_800A3874(
+                &mtx[0][0],
+                cobj->projection_param.frustum.top,
+                cobj->projection_param.frustum.bottom,
+                cobj->projection_param.frustum.left,
+                cobj->projection_param.frustum.right,
+                cobj->near, cobj->far);
+            break;
+        case PROJ_ORTHO:
+            ortho_flag = 1;
+            fn_800A39E0(
+                &mtx[0][0],
+                cobj->projection_param.ortho.top,
+                cobj->projection_param.ortho.bottom,
+                cobj->projection_param.ortho.left,
+                cobj->projection_param.ortho.right,
+                cobj->near, cobj->far);
+            break;
+        }
+        fn_800BD2E0(&mtx[0][0], ortho_flag);
+        ok = 1;
+        break;
+    }
+    case 1:
+        ok = fn_801963E0(cobj);
+        break;
+    case 2:
+        ok = fn_801960C4(cobj);
         break;
     default:
         HSD_Panic(&lbl_8047D958, 0x2ab, lbl_80274680);
