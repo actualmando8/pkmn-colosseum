@@ -88,7 +88,7 @@ extern void* fn_8005D934(s16 idx); /* node by index */
 extern void* fn_8005D7F8(s32);
 extern u16   fn_8005D798(void*, s32);
 extern void* fn_8005D858(s32);
-extern void  fn_80166A28(void);
+extern int   fn_80166A28(u16);
 extern s32   fn_800F037C(void);    /* poll/yield -- 0 if pending */
 extern void  _threadSwitch(void);    /* yield */
 extern u32   fn_800BE31C(void);    /* rand or tick */
@@ -807,8 +807,11 @@ void fn_80103484(void* p, void* q) {
     void* r3 = fn_8005DA18();
     void* r3c = fn_8005D7F8((s32)(*(u8*)((u8*)r3 + 0x0) & 0x7));
     if (r3c == (void*)0) { return; }
-    if (fn_8005D798(r3c, r31) == 0) { return; }
-    fn_80166A28();
+    {
+        u32 v = (u32)(u16)fn_8005D798(r3c, r31);
+        if (v == 0) { return; }
+        fn_80166A28((u16)v);
+    }
 }
 #pragma pop
 
@@ -870,6 +873,8 @@ void fn_80103CD8(void) {
 #pragma pop
 
 /* 0x80103E68 | 0x44 -- read and maybe lookup from table */
+#pragma push
+#pragma peephole off
 u32 fn_80103E68(u16 idx) {
     struct { volatile u16 a; u8 _pad[2]; volatile u16 b; } sp;
     u16 r3 = lbl_8047CDE4;
@@ -881,23 +886,27 @@ u32 fn_80103E68(u16 idx) {
     }
     return (u32)sp.b << 16;
 }
+#pragma pop
 
 /* 0x80103EAC | 0x48 */
+#pragma push
+#pragma peephole off
 u32 fn_80103EAC(u16 idx, u16* out) {
-    u16 r3 = lbl_8047CDE0;
-    volatile u16 scratch_b;
-    volatile u16 scratch_a;
-    scratch_b = r3;
-    if (idx >= 0xc) {
-        return (u32)r3 << 16;
+    u16 g = lbl_8047CDE0;
+    u32 n = idx & 0xFFFFu;
+    volatile u16 sp[3];
+    sp[2] = g;
+    if (n >= 0xc) {
+        return (u32)g << 16;
     }
     {
-        u16 old = ((u16*)lbl_80404A98)[idx];
-        scratch_a = old;
-        ((u16*)lbl_80404A98)[idx] = *out;
+        u16 old = ((u16*)lbl_80404A98)[n];
+        sp[0] = old;
+        ((u16*)lbl_80404A98)[n] = *out;
         return (u32)old << 16;
     }
 }
+#pragma pop
 
 /* 0x80103EF4 | 0x80 */
 void fn_80103EF4(void) {
