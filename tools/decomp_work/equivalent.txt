@@ -101,3 +101,14 @@ fn_8009F488   # OSMemory — OSProtectRange real C (78.92); CW1.2.5n MMIO 0xCC00
 
 # hsd_cobj.c — fn_80195A6C camera set-current/program-GX dispatcher (2026-06-23)
 fn_80195A6C   # hsd_cobj — real C (HSD camera set-current: mode-dispatch viewport/scissor/projection, 273 instr); 79.81% (0%→79.81% via 2 workflow rounds). W1 4-vs-5 FPR coloring (5th f27 unreachable) cascading into W6 conv-literal (EFB int→double magic lands anon @926 vs named lbl_8047D9C0). See WALLS.md 2026-06-23. asm stays #if 0 / C active.
+
+# gs_render.c — fresh-but-walled near-misses (surgical round 2026-06-24, w4fycokd3) — register as EQUIVALENT to stop re-grinding
+fn_800DB758   # gs_render — real C 99.55%; conv-literal/named-jumptable wall (CW emits anon @1311 vs named jumptable_80315364) + tail r3/r4 reg-perm. SKIP
+fn_800D7B80   # gs_render — real C 86.50%; li-vs-mr zero-coalescing wall (const-0 store value: target mr r4,r5 from off-zero reg, CW const-folds to li r4,0). SKIP
+fn_800DF854   # gs_render — real C 86.33%; scheduling/coalescing wall (off=0 li hoist above SDA store + mr-vs-li const-0 store value). SKIP
+fn_800DD0B8   # gs_render — real C 85.54%; register-coloring/copy-prop wall (mr r4,r5 vs li r4,0 for loop-invariant const-0 store). SKIP
+fn_800DF140   # gs_render — real C 77.17%; conv-literal ((f32)(u8) magic @1832 vs named lbl_8047CAD0) + scheduling tie. SKIP
+
+# gs_worldmap.c — fresh-but-walled near-misses (surgical round 2026-06-24, wz1ckmhxh)
+fn_800265C0   # gs_worldmap — real C 96.88%; reg-permutation family wall (GSmap state-table lookup: ctx r3-vs-r5 + lbl_80266DD8 materialize order). Family: 26600/26640/26680/266C0/26700. SKIP
+fn_8002AE9C   # gs_worldmap — real C ~96.9%; same reg-permutation/scheduling family. SKIP
