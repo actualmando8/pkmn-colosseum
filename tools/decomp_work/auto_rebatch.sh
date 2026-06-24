@@ -98,16 +98,21 @@ for name in $LANES; do
     [ -z "$line" ] && { mode=scratch; line=$(pick_line build/asm_queue.txt); }
   fi
   if [ -z "$line" ]; then echo "QUEUE-EXHAUSTED — $name idle, no free unlocked target"; continue; fi
-  file=$(echo "$line" | awk '{print $1}'); fns=$(echo "$line" | cut -d' ' -f2-)
+  file=$(echo "$line" | awk '{print $1}')
+  # Small packets (default 2 fns) keep each agent turn short so it CANNOT grind one packet for
+  # hours (we saw 3h / 290k-token single turns). A fn that resists is re-offered on a later
+  # cycle rather than burning a marathon turn; combined with the hard-stop prompt below.
+  fns=$(echo "$line" | cut -d' ' -f2-$(( ${PACKET_FNS:-2} + 1 )))
   stem=$(basename "$file" .c); tag="pl_${stem}"
   RUN_PICKED="${RUN_PICKED}"$'\n'"${file}"
   for fn in $fns; do timeout 10 python tools/decomp_work/wall_ledger.py mark "$fn" "$name/$mode" >/dev/null 2>&1; done
   gate="BEFORE any WALL you MUST run: python tools/decomp_work/classify_residual.py $tag <fn>. If it prints REG-COLORING (exit 0) you may NOT wall it — rewrite with NAMED locals (never raw rNN locals, they pin the coloring) + declaration-order lever until 100. Only RELOC/SCHEDULING/SHAPE verdicts may WALL/REWORK."
   ff=""; case "$name" in C1|C2|C3|C4) ff="If a fn still resists after the classifier says REG-COLORING and ~4 decl-order attempts, leave it in scratch and report WALL <fn> <%> + the classifier verdict, then move on.";; esac
+  hardstop="HARD STOP — do NOT over-grind: at most ~4 attempts / ~15 min PER FN. If a fn still resists, report WALL <fn> <%> and MOVE ON immediately. Do ONLY this packet ($fns) then END YOUR TURN — do not chain to other files or keep iterating a wall for hours."
   if [ "$mode" = crack ]; then
-    prompt="CRACK (levers: read docs/CRACK_LEVERS.md). File: $file  TAG: $tag  fns: $fns. These are real C in canon <100%. For EACH fn: band.py diff, then classify_residual.py to pick the fix (REG-COLORING=named-locals+decl-order; SHAPE=m2c_draft reshape). Fix scratch, band.py check, save at 100. Real C only (no asm/.inc/rNN-locals). KG (shared lever memory): BEFORE each fn run python tools/decomp_work/kg/kg.py q lever-targets <fn> for proven levers; AFTER each save run python tools/decomp_work/kg/kg.py record-crack <fn> <lever-slug> (and python tools/decomp_work/kg/kg.py record-lever <slug> --title \"...\" --desc \"...\" if you found a NEW lever) so every lane reuses it. $gate $ff SAVED <fn> 100.00 / WALL <fn> <%>."
+    prompt="CRACK (levers: read docs/CRACK_LEVERS.md). File: $file  TAG: $tag  fns: $fns. These are real C in canon <100%. For EACH fn: band.py diff, then classify_residual.py to pick the fix (REG-COLORING=named-locals+decl-order; SHAPE=m2c_draft reshape). Fix scratch, band.py check, save at 100. Real C only (no asm/.inc/rNN-locals). KG (shared lever memory): BEFORE each fn run python tools/decomp_work/kg/kg.py q lever-targets <fn> for proven levers; AFTER each save run python tools/decomp_work/kg/kg.py record-crack <fn> <lever-slug> (and python tools/decomp_work/kg/kg.py record-lever <slug> --title \"...\" --desc \"...\" if you found a NEW lever) so every lane reuses it. $gate $ff $hardstop SAVED <fn> 100.00 / WALL <fn> <%>."
   else
-    prompt="FROM-SCRATCH asm->C (levers: docs/CRACK_LEVERS.md). File: $file  TAG: $tag  fns: $fns. m2c_draft each, then REWRITE into faithful REAL C with NAMED locals (in-body externs) — no raw rNN register-locals. band.py check, save at 100. No asm/.inc fraud. KG (shared lever memory): BEFORE each fn run python tools/decomp_work/kg/kg.py q lever-targets <fn> for proven levers; AFTER each save run python tools/decomp_work/kg/kg.py record-crack <fn> <lever-slug> (and python tools/decomp_work/kg/kg.py record-lever <slug> --title \"...\" --desc \"...\" if you found a NEW lever) so every lane reuses it. $gate $ff SAVED/WALL/SKIP per fn."
+    prompt="FROM-SCRATCH asm->C (levers: docs/CRACK_LEVERS.md). File: $file  TAG: $tag  fns: $fns. m2c_draft each, then REWRITE into faithful REAL C with NAMED locals (in-body externs) — no raw rNN register-locals. band.py check, save at 100. No asm/.inc fraud. KG (shared lever memory): BEFORE each fn run python tools/decomp_work/kg/kg.py q lever-targets <fn> for proven levers; AFTER each save run python tools/decomp_work/kg/kg.py record-crack <fn> <lever-slug> (and python tools/decomp_work/kg/kg.py record-lever <slug> --title \"...\" --desc \"...\" if you found a NEW lever) so every lane reuses it. $gate $ff $hardstop SAVED/WALL/SKIP per fn."
   fi
   printf '%s' "$prompt" > "$REQ/$name.req"        # pane_io sends this; never touch tmux here
   echo "REBATCH $name [$mode] -> $stem [$fns]"

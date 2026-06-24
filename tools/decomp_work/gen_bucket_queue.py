@@ -51,7 +51,7 @@ def load_reground():
             c.update(_FN_RE.findall(open(p, encoding="utf-8", errors="replace").read()))
         except OSError:
             pass
-    return {fn for fn, n in c.items() if n >= 2}
+    return {fn for fn, n in c.items() if n >= int(os.environ.get("REGROUND_MIN", "4"))}
 
 
 REGROUND = load_reground()
