@@ -16,6 +16,9 @@ export MSYS_NO_PATHCONV=1
 HB=build/hb; REQ=build/dispatch; mkdir -p "$HB" "$REQ"
 
 LANES="${ASM_LANES:-OPUS SON C1 C2}"
+# Lanes that run Sonnet/Haiku (weaker/cheaper models): they get the SMALL-fn sonnet_queue
+# instead of the hard-grind crack/scratch queues. One name per line in build/sonnet_lanes.txt.
+SONNET_LANES=$(tr -d '\r' < build/sonnet_lanes.txt 2>/dev/null | tr '\n' ' ' | sed 's/  */ /g')
 FRESH="${HB_FRESH:-300}"  # a state/alive file older than this many seconds is not trusted.
 # Raised 45->300: under heavy host load pane_io's capture pass can take minutes (observed
 # ~234s), so 45s rejected every lane as "stale" and the fleet stopped dispatching entirely.
@@ -94,7 +97,12 @@ for name in $LANES; do
   # exists, do from-scratch ASM (asm_queue) FIRST instead — set when the near-miss crack pool is
   # mined out and the fleet should grind asm-wrappers into C. Either mode falls back to the other
   # when its queue is empty, so a lane is never left idle while work of any kind remains.
-  if [ -f build/.scratch_first ]; then
+  if printf '%s\n' $SONNET_LANES | grep -qxF "$name"; then
+    # Sonnet/Haiku lane: SMALL real-C fns only (capability-matched). Fall back to the crack
+    # queue only if the small-fn queue is dry.
+    mode=crack; line=$(pick_line build/sonnet_queue.txt)
+    [ -z "$line" ] && line=$(pick_line build/wall_queue.txt)
+  elif [ -f build/.scratch_first ]; then
     mode=scratch; line=$(pick_line build/asm_queue.txt)
     [ -z "$line" ] && { mode=crack; line=$(pick_line build/wall_queue.txt); }
   else

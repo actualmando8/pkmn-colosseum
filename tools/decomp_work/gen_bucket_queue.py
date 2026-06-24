@@ -146,10 +146,52 @@ def write_asm_queue(led):
 # overflow into the next bucket(s) — in priority order — only as far as needed.
 MIN_FILES = int(os.environ.get("BUCKET_MIN_FILES", "16"))
 
+# Max function size (bytes; 4 bytes/instr) for the Sonnet/Haiku queue. These weaker/cheaper
+# models choke on the big hard-grind targets, so they get SMALL functions only — small
+# near-misses, small LOW/STRUCT drafts, small ASM wrappers — capability-matched, smallest-first.
+SONNET_MAX_BYTES = int(os.environ.get("SONNET_MAX_BYTES", "320"))
+
+
+def _isize(x):
+    try:
+        return int(x)
+    except (TypeError, ValueError):
+        return 0
+
+
+def write_sonnet_queue(led):
+    """Emit build/sonnet_queue.txt — SMALL functions (<= SONNET_MAX_BYTES) for the Sonnet/Haiku
+    lanes. Excludes SAVED / re-ground (>=REGROUND_MIN) / BAD; any work bucket. Smallest-first so
+    the cheap models knock out trivial stubs and 1-instruction near-misses instead of grinding
+    the marathon targets the Opus lanes handle."""
+    bf = defaultdict(list)
+    for fn, v in led.items():
+        # real-C buckets only (LOW/STRUCT/NEARWALL) — ASM wrappers need from-scratch, which
+        # stays on the Opus/GLM scratch lanes; these get the CRACK prompt.
+        if v["bucket"] not in ("LOW", "STRUCT", "NEARWALL"):
+            continue
+        if fn in SAVED or fn in REGROUND:
+            continue
+        if any(b in v["file"] for b in BAD):
+            continue
+        sz = _isize(v.get("size", 0))
+        if sz == 0 or sz > SONNET_MAX_BYTES:
+            continue
+        src = "src/" + v["file"] + ".c"
+        if os.path.exists(os.path.join(ROOT, src)):
+            bf[src].append((sz, fn))
+    lines = []
+    for src, fns in sorted(bf.items(), key=lambda kv: -len(kv[1])):
+        names = [fn for _, fn in sorted(fns)][:6]   # smallest fns first
+        lines.append(src + " " + " ".join(names))
+    open(os.path.join(ROOT, "build", "sonnet_queue.txt"), "w").write("\n".join(lines) + "\n")
+    return len(lines)
+
 
 def main():
     led = json.load(open(LED))
     asm_n = write_asm_queue(led)   # keep the from-scratch (scratch-mode) queue fresh each cycle
+    son_n = write_sonnet_queue(led)   # small-fn queue for the Sonnet/Haiku lanes
     active = None
     lines = []
     seen = set()
@@ -172,7 +214,7 @@ def main():
             break   # enough files to feed the lanes; current bucket is prioritized at the top
     if not active:
         open(QUEUE, "w").write("")
-        print(f"ALL-BUCKETS-COMPLETE (crack queue empty; asm_queue files={asm_n})")
+        print(f"ALL-BUCKETS-COMPLETE (crack queue empty; asm_queue files={asm_n}; sonnet_queue files={son_n})")
         return
     open(QUEUE, "w").write("\n".join(lines) + "\n")
     marker = os.path.join(ROOT, "build", ".active_bucket")
@@ -180,7 +222,7 @@ def main():
     if prev != active:
         open(ASSIGNED, "w").write("")
         open(marker, "w").write(active)
-    print(f"ACTIVE-BUCKET={active} files={len(lines)} | asm_queue files={asm_n} (scratch)")
+    print(f"ACTIVE-BUCKET={active} files={len(lines)} | asm_queue files={asm_n} | sonnet_queue files={son_n}")
 
 
 if __name__ == "__main__":
