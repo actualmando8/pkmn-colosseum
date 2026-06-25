@@ -117,6 +117,11 @@ for name in $LANES; do
   else
     mode=crack; line=$(pick_line build/wall_queue.txt)
     [ -z "$line" ] && { mode=scratch; line=$(pick_line build/asm_queue.txt); }
+    # Final fallback for crack lanes: the SMALL real-C fn queue (fresh, capability-safe,
+    # never a walled-TU re-grind). Without this, once the pins/crack/asm queues drain the
+    # 4 non-SON lanes (OPUS GLM C3 C4) hit QUEUE-EXHAUSTED and idle overnight — only SON
+    # could reach sonnet_queue. Crack lanes are at least as capable on these small fns.
+    [ -z "$line" ] && { mode=crack; line=$(pick_line build/sonnet_queue.txt); }
   fi
   if [ -z "$line" ]; then echo "QUEUE-EXHAUSTED — $name idle, no free unlocked target"; continue; fi
   file=$(echo "$line" | awk '{print $1}')
