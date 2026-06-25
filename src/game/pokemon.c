@@ -2214,33 +2214,34 @@ u32 fn_801F2A7C(u32 ctx) {
     extern u32 fn_801F54A4(u32 poke, u32 b, u32 field, u32 d);
     extern u32 fn_801FB8F8(u32 mon);
     extern u32 fn_801F7258(u32, u32);
-    u32 r26 = ctx;
-    u32 r27;
-    u32 r28;
-    u32 r29;
-    u32 r30;
-    u32 r31;
-    fn_801F54A4(r26, 0, 0x14, 0);
-    r28 = (u16)fn_801F54A4(r26, 0, 0x16, 0);
-    r29 = 0;
-    while ((u16)r29 < 2) {
-        r31 = fn_801F54A4(r26, 0, 0x35, r29);
-        if ((u8)fn_801F7404(r31) == 0) {
-            r31 = 0;
+    u32 pokemon = ctx;
+    u32 partyMon;
+    u32 moveIndex;
+    u32 partyIndex;
+    u16 moveCount;
+    u32 moveMon;
+
+    fn_801F54A4(pokemon, 0, 0x14, 0);
+    moveCount = (u16)fn_801F54A4(pokemon, 0, 0x16, 0);
+    partyIndex = 0;
+    while ((u16)partyIndex < 2) {
+        partyMon = fn_801F54A4(pokemon, 0, 0x35, partyIndex);
+        if ((u8)fn_801F7404(partyMon) == 0) {
+            partyMon = 0;
         }
-        if (r31 != 0) {
-            r30 = 0;
-            while ((u16)r30 < r28) {
-                r27 = fn_801F7258(r31, r30);
-                if (r27 != 0) {
-                    if ((u8)fn_801FB8F8(r27) == 1) {
-                        return r27;
+        if (partyMon != 0) {
+            moveIndex = 0;
+            while ((u16)moveIndex < moveCount) {
+                moveMon = fn_801F7258(partyMon, moveIndex);
+                if (moveMon != 0) {
+                    if ((u8)fn_801FB8F8(moveMon) == 1) {
+                        return moveMon;
                     }
                 }
-                r30++;
+                moveIndex++;
             }
         }
-        r29++;
+        partyIndex++;
     }
     return 0;
 }
