@@ -2,20 +2,19 @@
   launch-decomp.ps1 - build the "decomp" tmux (psmux) cockpit:
 
      +-----------+-----------+-----------+
-     | col1      | OPUS wk   | C1 | C2   |
-     | proxy     +-----------+----+------+
-     | permuter  | SONNET    | C3 | C4   |
-     | glm       +-----------+----+------+
-     |           | OPUS ORCHESTRATOR     |
+     | col1      |           | OPUS | SON  |
+     | proxy     | OPUS      +------+------+
+     | permuter  | ORCH      | C3cx | C4cx |
+     | glm       |           |      |      |
      +-----------+-----------+-----------+
 
-  Fleet (2026-06-22: 8 Codex/gpt-5.5 lanes were cut to 4 Opus worker lanes C1-C4):
+  Fleet (2026-06-24: C1/C2 retired; right grid is now OPUS+SONNET over 2 Codex lanes):
   - pane    proxy    - local router (tools/llm-proxy/proxy.js); only GLM routes through it.
-  - C1-C4   lanes    - 4x Claude Opus (opus[1m]). The workhorses (were Codex gpt-5.5).
+  - C3-C4   lanes    - 2x Codex (gpt-5.5), reverted to Codex when limits reset.
   - pane    glm      - Claude Code via the proxy, pinned glm-5.2[1m] (isolated config + key).
-  - pane 6  sonnet   - Claude Code Sonnet (DIRECT; Max bypasses the proxy - see note).
-  - pane 7  worker   - a 2nd Opus the orchestrator dispatches hard structural work to.
-  - pane 8  orch.    - the orchestrator Opus; the pane you're dropped into on attach.
+  - sonnet           - Claude Code Sonnet (DIRECT; Max bypasses the proxy - see note); top-right of grid.
+  - worker (OPUS)    - a 2nd Opus the orchestrator dispatches hard structural work to; top-left of grid.
+  - orch.            - the orchestrator Opus; the pane you're dropped into on attach (middle, full height).
 
   NOTE (auth): Claude Max-subscription traffic ignores ANTHROPIC_BASE_URL and goes
   straight to claude.ai, so the Opus/Sonnet panes CANNOT be proxied and run DIRECT.
@@ -88,11 +87,11 @@ if (Test-Path $glmCreds) { Remove-Item -Force $glmCreds }
 $cdRepo = 'cd /d "' + $repo + '"'
 
 $proxyCmd  = $cdRepo + ' && set "PORT=' + $Port + '" && node "tools\llm-proxy\proxy.js"'
-# 2026-06-22: the 8 Codex/gpt-5.5 lanes were retired in favour of 4 Opus worker lanes
-# (C1-C4). They run the same opus[1m] CLI as the worker/orchestrator and pick up the
-# fleet's CRACK/scratch packets. The old codex command is kept here for reference only.
+# 2026-06-24: right grid = OPUS worker + SONNET (top row) over 2 Codex lanes C3/C4
+# (bottom row). C1/C2 were retired. $laneCmd (opus worker lane) is kept for reference.
+# codex.cmd is NOT on the cmd PATH in a fresh pane, so launch it by full npm-global path.
 $laneCmd   = $cdRepo + ' && claude --model "opus[1m]" --dangerously-skip-permissions'
-$codexCmd  = $cdRepo + ' && codex'
+$codexCmd  = $cdRepo + ' && "%APPDATA%\npm\codex.cmd"'
 $glmCmd    = $cdRepo + ' && set "CLAUDE_CONFIG_DIR=' + $glmConfigDir + '" && set "ANTHROPIC_BASE_URL=http://127.0.0.1:' + $Port + '" && set "ANTHROPIC_API_KEY=zai-proxy" && claude --model "glm-5.2[1m]" --dangerously-skip-permissions'
 # Sonnet + Opus run DIRECT (Max OAuth ignores the proxy; routing them through it is
 # pointless and risks the dual-auth conflict). Default ~/.claude config = Max login.
@@ -134,26 +133,24 @@ Start-Sleep -Milliseconds 1300          # psmux server start race
 $P0 = ([string](& $tm list-panes -t $Session -F '#{pane_id}' | Select-Object -First 1)).Trim()
 
 # Layout (matches the cockpit diagram):
-#   col1: GLM proxy (top) / Stage-C permuter (mid) / GLM agent (below)
-#   col2: Opus worker (top) / Sonnet (below)
-#   middle: Opus orchestrator (full height)      right: 2x4 Codex (8 lanes: 1-8)
-$REST     = SplitH $P0 66      # P0 = left group (~34%), REST = right (~66%)
-$RIGHT    = SplitH $REST 62    # REST = middle/orchestrator (~25%), RIGHT = codex group (~41%)
+#   col1:   GLM proxy (top) / Stage-C permuter (mid) / GLM agent (below)
+#   middle: Opus orchestrator (full height)
+#   right:  2x2 grid — OPUS worker | SONNET (top row), Codex C3 | C4 (bottom row)
+$REST     = SplitH $P0 72      # P0 = left col (~28%), REST = right (~72%)
+$RIGHT    = SplitH $REST 58    # REST = middle/orchestrator, RIGHT = 2x2 grid (~42%)
 $ORCH     = $REST
-$COL2     = SplitH $P0 48      # P0 = col1, COL2 = col2
 $BELOW    = SplitV $P0 84      # P0 = GLM proxy (top ~16%), BELOW = rest of col1
 $PROXY    = $P0
 $GLMAGENT = SplitV $BELOW 55   # BELOW = permuter (top ~45%), GLMAGENT = GLM agent (bottom ~55%)
 $PERMUTER = $BELOW
-$SONNET   = SplitV $COL2 52    # COL2 = Opus worker (top), SONNET = Sonnet (bottom)
-$OPUS     = $COL2
-$CODEXBL  = SplitV $RIGHT 50   # RIGHT = top row, CODEXBL = bottom row
-$CODEX2   = SplitH $RIGHT 50   # RIGHT = codex1 (TL), CODEX2 = codex2 (TR)
-$CODEX4   = SplitH $CODEXBL 50 # CODEXBL = codex3 (BL), CODEX4 = codex4 (BR)
-$CODEX1   = $RIGHT
-$CODEX3   = $CODEXBL
-# Right side is now a clean 2x2 of 4 Opus worker lanes (C1-C4). The old 2x4 Codex grid
-# (CODEX5-8) was removed when the 8 Codex lanes were cut to 4 Opus.
+# Right 2x2: top row = OPUS worker (TL) + SONNET (TR); bottom row = Codex C3 (BL) + C4 (BR).
+$BOTROW   = SplitV $RIGHT 50   # RIGHT = top row, BOTROW = bottom row
+$SONNET   = SplitH $RIGHT 50   # RIGHT = OPUS worker (TL), SONNET = (TR)
+$OPUS     = $RIGHT
+$CODEX4   = SplitH $BOTROW 50  # BOTROW = C3 codex (BL), CODEX4 = C4 codex (BR)
+$CODEX3   = $BOTROW
+# C1/C2 lanes retired (2026-06-24): the old top row of opus worker lanes was replaced by
+# the OPUS worker + SONNET agents; only C3/C4 remain as (Codex) lanes.
 Start-Sleep -Milliseconds 400
 
 # Launch each role in its captured pane.
@@ -162,10 +159,8 @@ Send $GLMAGENT $glmCmd
 Send $OPUS     $workerCmd
 Send $SONNET   $sonnetCmd
 Send $ORCH     $orchCmd
-Send $CODEX1   $laneCmd
-Send $CODEX2   $laneCmd
-Send $CODEX3   $laneCmd
-Send $CODEX4   $laneCmd
+Send $CODEX3   $codexCmd
+Send $CODEX4   $codexCmd
 Send $PERMUTER $permCmd
 
 # --- registry from CAPTURED ids (robust to layout/index shuffles) ---
@@ -174,14 +169,14 @@ if (-not $DryRun) {
   $regBody = @(
     '# panes.env - decomp cockpit registry (written by launch-decomp.ps1 from captured pane ids).',
     '# claude=orchestrator Opus (self) | worker=Opus | sonnet=Sonnet | glm=GLM',
-    '# CODEX_PANE..CODEX4_PANE are now the 4 Opus worker lanes C1-C4 (converted from Codex).',
-    '# CODEX5-8 were cut (8 GPT lanes -> 4 Opus) and are blanked so pane_io skips them.',
+    '# Lane mix (2026-06-24): C3-C4 = Codex (gpt-5.5); C1-C2 retired (blanked so pane_io skips).',
+    '# The right 2x2 top row is now the OPUS worker + SONNET agents, not lanes C1/C2.',
     ('CLAUDE_PANE="'  + $ORCH     + '"'),
     ('WORKER_PANE="'  + $OPUS     + '"'),
     ('SONNET_PANE="'  + $SONNET   + '"'),
     ('GLM_PANE="'     + $GLMAGENT + '"'),
-    ('CODEX_PANE="'   + $CODEX1   + '"'),
-    ('CODEX2_PANE="'  + $CODEX2   + '"'),
+    'CODEX_PANE=""',
+    'CODEX2_PANE=""',
     ('CODEX3_PANE="'  + $CODEX3   + '"'),
     ('CODEX4_PANE="'  + $CODEX4   + '"'),
     'CODEX5_PANE=""',
@@ -194,12 +189,12 @@ if (-not $DryRun) {
   [System.IO.File]::WriteAllText($reg, $regBody + "`n")
   Write-Host "Wrote control registry: $reg" -ForegroundColor DarkGray
 
-  # Seed the fleet lane list so the driver feeds the 4 Opus lanes (+ worker + sonnet) on
-  # boot. Without this, fleet_driver defaults to just "OPUS SON" and C1-C4 sit idle.
+  # Seed the fleet lane list so the driver feeds OPUS + SONNET + the 2 Codex lanes on
+  # boot. Without this, fleet_driver defaults to just "OPUS SON" and C3/C4 sit idle.
   $lanesFile = Join-Path $repo 'build\fleet_lanes.txt'
   New-Item -ItemType Directory -Force -Path (Split-Path $lanesFile) | Out-Null
-  [System.IO.File]::WriteAllText($lanesFile, "OPUS SON C1 C2 C3 C4`n")
-  Write-Host "Wrote fleet lanes: OPUS SON C1 C2 C3 C4" -ForegroundColor DarkGray
+  [System.IO.File]::WriteAllText($lanesFile, "OPUS SON C3 C4`n")
+  Write-Host "Wrote fleet lanes: OPUS SON C3 C4" -ForegroundColor DarkGray
 }
 
 # auto-start the decomp fleet driver once the agents have booted. fleet_up.ps1 brings up
@@ -250,7 +245,7 @@ if (-not $DryRun -and -not $NoCadence) {
 & $tm select-pane -t $ORCH 2>$null
 
 Write-Host ""
-Write-Host "decomp cockpit built - diagram layout (col1 glm-proxy/permuter/glm-agent | col2 opus/sonnet | mid orchestrator | right 2x2 codex):" -ForegroundColor Green
+Write-Host "decomp cockpit built - diagram layout (col1 glm-proxy/permuter/glm-agent | mid orchestrator | right 2x2: OPUS|SONNET / Codex C3|C4):" -ForegroundColor Green
 & $tm list-panes -t $Session -F '  pane #{pane_index}: @#{pane_left},#{pane_top} #{pane_id} cmd=#{pane_current_command}'
 Write-Host ""
 
