@@ -212,6 +212,10 @@ def main():
             seen.add(parts[0])
             lines.append(ln)
             n_pin += 1
+    # TU-focus (build/.low_focus): order the LOW bucket FEWEST-fresh-fns-first so the
+    # fleet closes out near-finished TUs one at a time (the queue auto-advances as a TU's
+    # fns get SAVED and drop out of fresh_by_file). Other buckets keep highest-quality-first.
+    low_focus = os.path.exists(os.path.join(ROOT, "build", ".low_focus"))
     total_fresh = 0
     for bucket in PRIORITY:
         bf = fresh_by_file(led, bucket)
@@ -221,7 +225,11 @@ def main():
         if active is None:
             active = bucket
         total_fresh += nfn
-        for src, fns in sorted(bf.items(), key=lambda kv: (-max(f[0] for f in kv[1]), -len(kv[1]))):
+        if low_focus and bucket == "LOW":
+            order = sorted(bf.items(), key=lambda kv: (len(kv[1]), -max(f[0] for f in kv[1])))
+        else:
+            order = sorted(bf.items(), key=lambda kv: (-max(f[0] for f in kv[1]), -len(kv[1])))
+        for src, fns in order:
             if src in seen:
                 continue
             seen.add(src)
@@ -240,7 +248,7 @@ def main():
         if prev != active:
             open(ASSIGNED, "w").write("")
             open(marker, "w").write(active)
-    print(f"ACTIVE-BUCKET={active or 'PINS-ONLY'} files={len(lines)} pins={n_pin} | asm_queue files={asm_n} | sonnet_queue files={son_n}")
+    print(f"ACTIVE-BUCKET={active or 'PINS-ONLY'} files={len(lines)} pins={n_pin}{' low-focus' if low_focus else ''} | asm_queue files={asm_n} | sonnet_queue files={son_n}")
 
 
 if __name__ == "__main__":
