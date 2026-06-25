@@ -45,6 +45,7 @@ TMUX_CONTROL = DECOMP_WORK / "tmux_control"
 LOCKS_DB = Path(os.environ.get("DECOMP_LOCKS_DB", COORD_DIR / "locks.db"))
 AGENT_TOKENS_JSON = ROOT / ".omc" / "agent_tokens.json"
 AGENT_LIMITS_JSON = DECOMP_WORK / "agent_limits.json"
+PROXY_USAGE_LIMITS_JSON = ROOT / "tools" / "llm-proxy" / "usage_limits.json"
 OPENCODE_STORAGE = Path(
     os.environ.get(
         "OPENCODE_STORAGE",
@@ -61,11 +62,20 @@ HISTORY_CAP = 2000
 UNIT_HISTORY_CAP = 300
 FN_HISTORY_CAP = 200
 STATE_CACHE_TTL_SECONDS = 1.8
-DASHBOARD_VERSION = 13
+DASHBOARD_VERSION = 14
 # --- v10: token-history collector sources ----------------------------------------
 CLAUDE_PROJECT_DIR = (
     Path.home()
     / ".claude"
+    / "projects"
+    / "C--Users-douglaswhittingham-pkmn-colosseum"
+)
+# GLM runs Claude Code under an isolated config dir (~/.claude-glm) via the proxy,
+# so its session journals (same JSONL `usage` schema) are NOT under ~/.claude — they
+# must be collected separately to attribute GLM tokens.
+GLM_PROJECT_DIR = (
+    Path.home()
+    / ".claude-glm"
     / "projects"
     / "C--Users-douglaswhittingham-pkmn-colosseum"
 )
@@ -3173,7 +3183,7 @@ def prepare_handoff() -> dict:
 # Aggregated buckets persist to tools/decomp_work/token_history.json so the   #
 # chart survives a source rotating; refreshed by the background auto-loop.    #
 # =========================================================================== #
-SOURCE_KEYS = ("claude", "opencode", "codex")
+SOURCE_KEYS = ("claude", "opencode", "codex", "glm")
 # Model -> chart source bucket. Anything unmatched falls through to "opencode"
 # (every model in the WSL db is an opencode-run worker).
 _OPENCODE_MODEL_TAGS = ("mimo", "deepseek", "glm", "qwen", "kimi", "nemotron")
@@ -3188,6 +3198,7 @@ def _new_bucket() -> dict[str, float]:
     b["claude_cache_read"] = 0.0
     b["codex_cache_read"] = 0.0
     b["codex_events"] = 0.0
+    b["glm_cache_read"] = 0.0
     return b
 
 
@@ -3228,6 +3239,50 @@ def _collect_claude(buckets: dict[int, dict[str, float]], cutoff: float,
                     b["claude"] += inp + out
                     b["claude_cache_read"] += cr
                     by_model[str(msg.get("model") or "?")] += inp + out
+                    total += inp + out
+        except OSError:
+            continue
+    return {"available": total > 0, "files": files, "total": total}
+
+
+def _collect_glm(buckets: dict[int, dict[str, float]], cutoff: float,
+                 by_model: dict[str, float]) -> dict[str, object]:
+    """Same as _collect_claude but for the GLM lane's isolated config dir
+    (~/.claude-glm). GLM is Claude Code pinned to glm-5.2 via the proxy, so its
+    journals use the identical JSONL `usage` schema. Bucketed into the `glm` source."""
+    if not GLM_PROJECT_DIR.exists():
+        return {"available": False, "files": 0, "total": 0,
+                "reason": f"glm dir not found: {GLM_PROJECT_DIR}"}
+    files = 0
+    total = 0
+    for path in GLM_PROJECT_DIR.rglob("*.jsonl"):
+        files += 1
+        try:
+            with open(path, encoding="utf-8", errors="replace") as fh:
+                for line in fh:
+                    if '"usage"' not in line:
+                        continue
+                    try:
+                        d = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    msg = d.get("message")
+                    if not isinstance(msg, dict):
+                        continue
+                    usage = msg.get("usage")
+                    if not isinstance(usage, dict):
+                        continue
+                    ts = _parse_iso(d.get("timestamp"))
+                    if not ts or ts < cutoff:
+                        continue
+                    inp = int(usage.get("input_tokens") or 0)
+                    out = int(usage.get("output_tokens") or 0)
+                    cr = int(usage.get("cache_read_input_tokens") or 0)
+                    hour = int(ts // 3600) * 3600
+                    b = buckets.setdefault(hour, _new_bucket())
+                    b["glm"] += inp + out
+                    b["glm_cache_read"] += cr
+                    by_model[str(msg.get("model") or "glm")] += inp + out
                     total += inp + out
         except OSError:
             continue
@@ -3462,6 +3517,7 @@ def collect_tokens(hours: int = 168) -> dict[str, object]:
     claude_meta = _collect_claude(buckets, cutoff, by_model)
     opencode_meta = _collect_opencode(buckets, cutoff, by_model)
     codex_meta = _collect_codex(buckets, cutoff, by_model)
+    glm_meta = _collect_glm(buckets, cutoff, by_model)
 
     series = []
     for hour in sorted(buckets):
@@ -3469,16 +3525,20 @@ def collect_tokens(hours: int = 168) -> dict[str, object]:
         claude = int(b["claude"])
         opencode = int(b["opencode"])
         codex = int(b["codex"])
+        glm = int(b["glm"])
         codex_ev = int(b["codex_events"])
-        total = claude + opencode + codex
+        total = claude + opencode + codex + glm
         series.append({
             "unix": hour,
-            "by_source": {"claude": claude, "opencode": opencode, "codex": codex},
+            "by_source": {"claude": claude, "opencode": opencode, "codex": codex, "glm": glm},
             "claude": claude,
             "opencode": opencode,
             "codex": codex,
+            "glm": glm,
             "codex_events": codex_ev,
             "cache_read": int(b["claude_cache_read"]),
+            "codex_cache_read": int(b["codex_cache_read"]),
+            "glm_cache_read": int(b["glm_cache_read"]),
             "input": total,   # legacy field for older clients
             "output": 0,
             "total": total,
@@ -3488,11 +3548,13 @@ def collect_tokens(hours: int = 168) -> dict[str, object]:
         "claude": int(claude_meta.get("total", 0)),
         "opencode": int(opencode_meta.get("total", 0)),
         "codex": int(codex_meta.get("total", 0)),
+        "glm": int(glm_meta.get("total", 0)),
         "codex_events": int(codex_meta.get("events", 0)),
         "all_tokens": (
             int(claude_meta.get("total", 0))
             + int(opencode_meta.get("total", 0))
             + int(codex_meta.get("total", 0))
+            + int(glm_meta.get("total", 0))
         ),
     }
     # agent_tokens.json cumulative fallback (per-agent lifetime totals).
@@ -3515,6 +3577,7 @@ def collect_tokens(hours: int = 168) -> dict[str, object]:
             "claude": claude_meta,
             "opencode": opencode_meta,
             "codex": codex_meta,
+            "glm": glm_meta,
         },
         "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
     }
@@ -3717,6 +3780,105 @@ def load_limits() -> dict[str, object]:
         "source": str(AGENT_LIMITS_JSON),
         "agents": out,
         "now_unix": int(now),
+    }
+
+
+def _rolling_token_sum(buckets: list, provider: str, window_seconds: float, now: float) -> int:
+    """Sum a provider's tokens across the hourly buckets within the rolling window."""
+    cut = now - window_seconds
+    total = 0
+    for b in buckets:
+        if not isinstance(b, dict):
+            continue
+        if int_value(b.get("unix")) < cut:
+            continue
+        total += int_value(b.get(provider))
+    return total
+
+
+def load_agent_usage() -> dict[str, object]:
+    """Per-provider (claude / codex / glm) token spend in the rolling 5h and weekly
+    windows vs optional caps (agent_limits.json cap_tokens), plus reset countdown and
+    any live proxy rate-limit status. Backs the 'Agent limits' panel — at a glance,
+    who is approaching a 5h / weekly cap."""
+    now = time.time()
+    tokens = load_tokens(hours=24 * 7 + 1)  # cover the weekly window; reuses the cached collector
+    buckets = tokens.get("buckets", []) if isinstance(tokens, dict) else []
+
+    # cap + reset info keyed by (provider, window) from agent_limits.json
+    lim = _load_json_obj(AGENT_LIMITS_JSON)
+    agents_in = lim.get("agents", []) if isinstance(lim.get("agents"), list) else []
+    cap_by: dict[tuple[str, str], dict[str, object]] = {}
+    for a in agents_in:
+        if not isinstance(a, dict):
+            continue
+        prov = str(a.get("provider") or "").lower()
+        win = str(a.get("window") or "").lower()
+        if not prov or not win:
+            continue
+        next_unix = _parse_iso(a.get("next_reset"))
+        if not next_unix:
+            interval = a.get("reset_interval_hours")
+            last = _parse_iso(a.get("last_reset"))
+            if isinstance(interval, (int, float)) and interval and last:
+                step = interval * 3600
+                k = max(0, int((now - last) // step) + 1)
+                next_unix = last + k * step
+        cap_raw = a.get("cap_tokens")
+        cap_by[(prov, win)] = {
+            "cap": int_value(cap_raw) if cap_raw else None,
+            "next_reset_unix": int(next_unix) if next_unix else 0,
+            "seconds_until": int(next_unix - now) if next_unix else 0,
+            "note": a.get("note", ""),
+            "assumed": bool(a.get("assumed", False)),
+        }
+
+    live = _load_json_obj(PROXY_USAGE_LIMITS_JSON)
+    WINDOWS = {"5h": 5 * 3600, "weekly": 7 * 24 * 3600}
+    LIVE_KEY = {"glm": "GLM", "claude": "Anthropic", "codex": "Codex"}
+    LABEL = {"claude": "Claude", "codex": "Codex", "glm": "GLM"}
+
+    providers = []
+    for prov in ("claude", "codex", "glm"):
+        windows = {}
+        for win, secs in WINDOWS.items():
+            meta = cap_by.get((prov, win))
+            # GLM's plan only defines a 5h reset window, but still show its rolling
+            # weekly token sum (no configured cap/reset) so its usage is visible.
+            used = _rolling_token_sum(buckets, prov, secs, now)
+            # Codex re-reads its full (cached) context each turn, so the raw sum is
+            # dominated by cached input. Subtract cached_input to get a billable-ish
+            # figure comparable to Claude/GLM (which already exclude cache reads).
+            if prov == "codex":
+                used = max(0, used - _rolling_token_sum(buckets, "codex_cache_read", secs, now))
+            cap = (meta or {}).get("cap")
+            pct = round(100.0 * used / cap, 1) if cap else None
+            windows[win] = {
+                "used": used,
+                "cap": cap,
+                "pct": pct,
+                "next_reset_unix": (meta or {}).get("next_reset_unix", 0),
+                "seconds_until": (meta or {}).get("seconds_until", 0),
+                "assumed": (meta or {}).get("assumed", False),
+            }
+        status = None
+        if isinstance(live, dict):
+            ent = live.get(LIVE_KEY.get(prov, ""))
+            if isinstance(ent, dict):
+                hdrs = ent.get("headers") if isinstance(ent.get("headers"), dict) else {}
+                status = hdrs.get("anthropic-ratelimit-unified-status") or ent.get("status")
+        providers.append({
+            "provider": prov,
+            "label": LABEL[prov],
+            "windows": windows,
+            "live_status": status,
+        })
+
+    return {
+        "available": bool(buckets),
+        "now_unix": int(now),
+        "providers": providers,
+        "source": str(TOKEN_HISTORY_FILE),
     }
 
 
@@ -6063,6 +6225,14 @@ HTML = r"""<!doctype html>
             <tbody id="locks-body"></tbody>
           </table>
         </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">
+          <h2>Agent Token Usage</h2>
+          <span class="panel-note" id="agent-usage-note"></span>
+        </div>
+        <div class="bucket-bars" id="agent-usage-bars"></div>
       </div>
 
       <div class="panel">
@@ -8744,6 +8914,54 @@ HTML = r"""<!doctype html>
       fetch("/api/limits", { cache: "no-store" })
         .then(r => r.json()).then(renderLimits).catch(() => {});
     }
+    // ---- per-agent token usage vs 5h/weekly caps ----------------------------
+    function fmtTok(n) {
+      n = Number(n) || 0;
+      if (n >= 1e6) return (n / 1e6).toFixed(n >= 1e7 ? 0 : 1) + "M";
+      if (n >= 1e3) return (n / 1e3).toFixed(0) + "k";
+      return String(n);
+    }
+    function usageColor(pct) {
+      if (pct == null) return "#5aa9e6";          // no cap configured -> neutral
+      if (pct >= 90) return "#e05a5a";             // red
+      if (pct >= 70) return "#e0a93b";             // amber
+      return "#38b995";                            // green
+    }
+    function renderAgentUsage(d) {
+      const el = $("agent-usage-bars"); if (!el) return;
+      const provs = (d && d.providers) || [];
+      if (!provs.length) {
+        el.innerHTML = '<div class="bucket-counts">no token data yet</div>';
+        setText($("agent-usage-note"), ""); return;
+      }
+      setText($("agent-usage-note"), "5h / weekly rolling");
+      const rows = [];
+      for (const p of provs) {
+        const live = p.live_status ? ` &middot; <span class="muted">live: ${p.live_status}</span>` : "";
+        rows.push(`<div class="bucket-counts" style="margin-top:8px;font-weight:600">${p.label}${live}</div>`);
+        for (const win of ["5h", "weekly"]) {
+          const w = p.windows && p.windows[win]; if (!w) continue;
+          const pct = w.pct;
+          const fillW = pct != null ? Math.min(100, pct) : 8;  // neutral sliver when no cap
+          const c = usageColor(pct);
+          const capTxt = w.cap ? ` / ${fmtTok(w.cap)} (${pct}%)` : "";
+          const reset = w.seconds_until > 0 ? `resets ${fmtCountdown(w.seconds_until)}` : "";
+          rows.push(`<div class="bucket-row">
+            <div class="bucket-label">${win}</div>
+            <div class="bucket-track">
+              <div class="bucket-fill" style="width:${fillW}%;background:${c}"></div>
+              <span class="bucket-pct">${fmtTok(w.used)}${capTxt}</span>
+            </div>
+            <div class="bucket-counts muted">${reset}</div>
+          </div>`);
+        }
+      }
+      el.innerHTML = rows.join("");
+    }
+    function pollAgentUsage() {
+      fetch("/api/agent_usage", { cache: "no-store" })
+        .then(r => r.json()).then(renderAgentUsage).catch(() => {});
+    }
     // ---- v10: token-expense STACKED bar chart, per-source colors ------------
     const TOKEN_SOURCES = [
       { key: "claude", label: "Claude", color: "#38b995" },
@@ -9420,6 +9638,7 @@ HTML = r"""<!doctype html>
     pollAgents();
     pollLocks();
     pollLimits();
+    pollAgentUsage();
     pollTokens();
     pollKg();
     pollCrackJobs();
@@ -9494,6 +9713,7 @@ HTML = r"""<!doctype html>
     store.prsTimer = setInterval(pollPrs, 60000);
     store.quantumTimer = setInterval(pollQuantum, 10000);
     store.limitsTimer = setInterval(pollLimits, 60000);
+    store.agentUsageTimer = setInterval(pollAgentUsage, 60000);
     store.kgTimer = setInterval(pollKg, 30000);
     store.crackTimer = setInterval(pollCrackJobs, 15000);
     store.logTimer = setInterval(pollLog, 15000);   // live attempt-log refresh
@@ -9767,6 +9987,9 @@ Serve only over the private tailnet. Not linked from the public dashboard UI.</p
             except (TypeError, ValueError):
                 hours = 168
             self.send_json(load_tokens(max(1, min(hours, 24 * 30))))
+            return
+        if path == "/api/agent_usage":
+            self.send_json(load_agent_usage())
             return
         if path == "/api/log":
             raw = (query.get("limit") or ["1000"])[0]
