@@ -452,7 +452,7 @@ void fn_800638F4(void);
 void fn_80063AD4(void);
 void fn_80063D10(void);
 void fn_80063D14(void);
-void fn_80064378(void* ctx, void* msg);
+void fn_80064378(u8* ctx, u8* arg1);
 void fn_800643D4();
 void fn_80065628(void);
 void fn_80065730(void);
@@ -9696,14 +9696,21 @@ asm void fn_80064378(void) {
 #include "src/game/ui/ui_core_fn_80064378.inc"
 }
 #else
-void fn_80064378(void* ctx, void* msg) {
-    s32 value;
+void fn_80064378(u8* ctx, u8* arg1) {
+    unsigned long long new_var;
+    s16 value;
+    int new_var2;
 
-    value = *(s16*)((u8*)msg + 0x6);
-    if (value == 0xA9E) {
-        fn_800FB680(0, 0, *(u8*)((u8*)ctx + 0x8B) | -0x100, 0x3C1A);
-    } else if (value == 0xA88) {
+    value = *((s16*)(arg1 + 6));
+    switch (value) {
+    case 0xA9E:
+        new_var2 = ctx[0x8b] | (new_var = -0x100);
+        fn_800FB680(0, 0, new_var2, 0x3C1A);
+        break;
+
+    case 0xA88:
         fn_80063AD4();
+        break;
     }
 }
 #endif
