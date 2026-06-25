@@ -55,6 +55,12 @@ OPENCODE_STORAGE = Path(
 HISTORY_FILE = ROOT / ".omx" / "state" / "renaming_dashboard_history.json"
 UNIT_HISTORY_FILE = ROOT / ".omx" / "state" / "renaming_dashboard_unit_history.json"
 FN_HISTORY_FILE = ROOT / ".omx" / "state" / "renaming_dashboard_fn_history.json"
+# Per-function token ledger (Phase 2): pane_io appends one JSONL row per completed
+# task to FN_TOKEN_LEDGER; update_fn_token_history() folds new rows into a per-fn
+# time-series (offset-tracked so rows are ingested exactly once).
+FN_TOKEN_HISTORY_FILE = ROOT / ".omx" / "state" / "renaming_dashboard_fn_token_history.json"
+FN_TOKEN_LEDGER = ROOT / "build" / "hb" / "token_by_fn.jsonl"
+FN_TOKEN_HISTORY_CAP = 200
 HISTORY_INTERVAL_SECONDS = 60
 # Ring cap for the global match-progress history. Raised from 500 -> 2000 so the
 # months-long git backfill (one row per report.json commit) is not evicted.
@@ -62,7 +68,7 @@ HISTORY_CAP = 2000
 UNIT_HISTORY_CAP = 300
 FN_HISTORY_CAP = 200
 STATE_CACHE_TTL_SECONDS = 1.8
-DASHBOARD_VERSION = 14
+DASHBOARD_VERSION = 15
 # --- v10: token-history collector sources ----------------------------------------
 CLAUDE_PROJECT_DIR = (
     Path.home()
@@ -1086,6 +1092,103 @@ def update_fn_history(decomp: dict[str, object]) -> None:
             dirty = True
     if dirty:
         _write_json_obj(FN_HISTORY_FILE, store)
+
+
+def update_fn_token_history() -> None:
+    """Fold newly-appended rows of the pane_io token ledger (FN_TOKEN_LEDGER) into a
+    per-function token time-series. Offset-tracked so each row is ingested once; resets
+    if the ledger is rotated/truncated. Each fn keeps the last FN_TOKEN_HISTORY_CAP rows."""
+    try:
+        if not FN_TOKEN_LEDGER.exists():
+            return
+        size = FN_TOKEN_LEDGER.stat().st_size
+    except OSError:
+        return
+    store = _load_json_obj(FN_TOKEN_HISTORY_FILE)
+    fns = store.get("fns") if isinstance(store.get("fns"), dict) else {}
+    off = int_value(store.get("_offset"))
+    if off > size:
+        off = 0  # ledger rotated/truncated -> re-read from start
+    try:
+        with open(FN_TOKEN_LEDGER, "rb") as fh:
+            fh.seek(off)
+            chunk = fh.read()
+    except OSError:
+        return
+    last_nl = chunk.rfind(b"\n")
+    if last_nl < 0:
+        return  # no complete line yet (mid-write)
+    complete = chunk[:last_nl + 1]
+    new_off = off + len(complete)
+    dirty = False
+    for line in complete.decode("utf-8", "replace").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            r = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        ts = int_value(r.get("ts"))
+        prov = str(r.get("provider") or "")
+        tin = int_value(r.get("tokens_in"))
+        tout = int_value(r.get("tokens_out"))
+        row_fns = r.get("fns") if isinstance(r.get("fns"), list) else []
+        for fn in row_fns:
+            fn = str(fn)
+            if not fn:
+                continue
+            rows = fns.get(fn)
+            if not isinstance(rows, list):
+                rows = []
+            rows.append({"unix": ts, "provider": prov, "in": tin, "out": tout,
+                         "tag": r.get("tag", ""), "file": r.get("file", "")})
+            fns[fn] = rows[-FN_TOKEN_HISTORY_CAP:]
+            dirty = True
+    store["fns"] = fns
+    store["_offset"] = new_off
+    if dirty or new_off != off:
+        _write_json_obj(FN_TOKEN_HISTORY_FILE, store)
+
+
+def load_fn_token_history(name: str) -> dict[str, object]:
+    """Per-function token time-series for one fn (backs /api/history/fn_tokens)."""
+    store = _load_json_obj(FN_TOKEN_HISTORY_FILE)
+    fns = store.get("fns") if isinstance(store.get("fns"), dict) else {}
+    rows = fns.get(name) if isinstance(fns.get(name), list) else []
+    return {"available": bool(rows), "fn": name, "rows": rows}
+
+
+def load_fn_token_summary(limit: int = 100) -> dict[str, object]:
+    """Aggregate per-fn token totals (by provider) for the 'Token spend by function'
+    table — sorted by total tokens desc."""
+    store = _load_json_obj(FN_TOKEN_HISTORY_FILE)
+    fns = store.get("fns") if isinstance(store.get("fns"), dict) else {}
+    out = []
+    for fn, rows in fns.items():
+        if not isinstance(rows, list) or not rows:
+            continue
+        by_prov: dict[str, int] = {}
+        total = 0
+        last_ts = 0
+        tag = ""
+        file = ""
+        for r in rows:
+            prov = str(r.get("provider") or "?")
+            tok = int_value(r.get("in")) + int_value(r.get("out"))
+            by_prov[prov] = by_prov.get(prov, 0) + tok
+            total += tok
+            ts = int_value(r.get("unix"))
+            if ts >= last_ts:
+                last_ts = ts
+                tag = r.get("tag", "") or tag
+                file = r.get("file", "") or file
+        out.append({
+            "fn": fn, "total": total, "by_provider": by_prov,
+            "tasks": len(rows), "last_ts": last_ts, "tag": tag, "file": file,
+        })
+    out.sort(key=lambda x: -x["total"])
+    return {"available": bool(out), "count": len(out), "fns": out[:max(1, limit)]}
 
 
 def load_unit_functions(source: str) -> dict[str, object]:
@@ -6002,6 +6105,14 @@ HTML = r"""<!doctype html>
         <canvas id="tokens-chart" height="205"></canvas>
       </section>
 
+      <section class="panel">
+        <div class="panel-title">
+          <h2>Token Spend by Function</h2>
+          <span class="panel-note" id="fn-tokens-note"></span>
+        </div>
+        <div id="fn-tokens-body"></div>
+      </section>
+
       <section class="kg-layout">
         <div class="panel chart-card">
           <div class="panel-title">
@@ -8962,6 +9073,62 @@ HTML = r"""<!doctype html>
       fetch("/api/agent_usage", { cache: "no-store" })
         .then(r => r.json()).then(renderAgentUsage).catch(() => {});
     }
+    // ---- per-function token spend table (Phase 2) ---------------------------
+    const FN_TOK_COLORS = { codex: "#a98ee6", claude: "#38b995", glm: "#5c91df", other: "#8da0b8" };
+    function renderFnTokens(d) {
+      const el = $("fn-tokens-body"); if (!el) return;
+      const fns = (d && d.fns) || [];
+      setText($("fn-tokens-note"), d && d.available ? `${d.count} fns tracked` : "no ledger yet");
+      if (!fns.length) {
+        el.innerHTML = '<div class="bucket-counts">no per-function token data yet — pane_io logs a row as each task completes</div>';
+        return;
+      }
+      const cell = (bp, p) => {
+        const v = bp[p] || 0;
+        return `<td class="mono" style="text-align:right;color:${v ? FN_TOK_COLORS[p] : '#566'}">${v ? fmtTok(v) : '·'}</td>`;
+      };
+      let h = '<table style="width:100%;border-collapse:collapse;font-size:12px">'
+        + '<thead><tr style="text-align:left;color:#8da0b8">'
+        + '<th style="padding:3px 6px">fn</th><th>file</th>'
+        + '<th style="text-align:right">codex</th><th style="text-align:right">claude</th>'
+        + '<th style="text-align:right">glm</th><th style="text-align:right">total</th>'
+        + '<th style="text-align:right">tasks</th></tr></thead><tbody>';
+      for (const f of fns) {
+        const bp = f.by_provider || {};
+        const file = (f.file || "").split("/").pop();
+        h += `<tr class="fn-tok-row" data-fn="${f.fn}" style="cursor:pointer;border-top:1px solid #1f2733">`
+          + `<td class="mono" style="padding:3px 6px">${f.fn}</td>`
+          + `<td class="muted" title="${f.file || ''}">${file}</td>`
+          + cell(bp, "codex") + cell(bp, "claude") + cell(bp, "glm")
+          + `<td class="mono" style="text-align:right;font-weight:600">${fmtTok(f.total)}</td>`
+          + `<td class="mono" style="text-align:right">${f.tasks}</td></tr>`
+          + `<tr class="fn-tok-detail" data-detail="${f.fn}" style="display:none">`
+          + `<td colspan="7" style="padding:2px 6px 8px"><span class="muted">loading…</span></td></tr>`;
+      }
+      h += "</tbody></table>";
+      el.innerHTML = h;
+      el.querySelectorAll(".fn-tok-row").forEach(tr =>
+        tr.addEventListener("click", () => toggleFnTokDetail(tr.getAttribute("data-fn"))));
+    }
+    function toggleFnTokDetail(fn) {
+      const det = document.querySelector(`.fn-tok-detail[data-detail="${fn}"]`); if (!det) return;
+      if (det.style.display !== "none") { det.style.display = "none"; return; }
+      det.style.display = "";
+      fetch(`/api/history/fn_tokens?name=${encodeURIComponent(fn)}`, { cache: "no-store" })
+        .then(r => r.json()).then(d => {
+          const rows = (d && d.rows) || [];
+          const td = det.querySelector("td");
+          if (!rows.length) { td.innerHTML = '<span class="muted">no history</span>'; return; }
+          td.innerHTML = rows.map(r => {
+            const t = r.unix ? new Date(r.unix * 1000).toLocaleString() : "?";
+            return `<span class="muted" style="margin-right:14px">${t} · ${r.provider} · in ${fmtTok(r.in)} / out ${fmtTok(r.out)}</span>`;
+          }).join("");
+        }).catch(() => {});
+    }
+    function pollFnTokens() {
+      fetch("/api/fn_tokens", { cache: "no-store" })
+        .then(r => r.json()).then(renderFnTokens).catch(() => {});
+    }
     // ---- v10: token-expense STACKED bar chart, per-source colors ------------
     const TOKEN_SOURCES = [
       { key: "claude", label: "Claude", color: "#38b995" },
@@ -9639,6 +9806,7 @@ HTML = r"""<!doctype html>
     pollLocks();
     pollLimits();
     pollAgentUsage();
+    pollFnTokens();
     pollTokens();
     pollKg();
     pollCrackJobs();
@@ -9714,6 +9882,7 @@ HTML = r"""<!doctype html>
     store.quantumTimer = setInterval(pollQuantum, 10000);
     store.limitsTimer = setInterval(pollLimits, 60000);
     store.agentUsageTimer = setInterval(pollAgentUsage, 60000);
+    store.fnTokensTimer = setInterval(pollFnTokens, 30000);
     store.kgTimer = setInterval(pollKg, 30000);
     store.crackTimer = setInterval(pollCrackJobs, 15000);
     store.logTimer = setInterval(pollLog, 15000);   // live attempt-log refresh
@@ -9915,6 +10084,7 @@ Serve only over the private tailnet. Not linked from the public dashboard UI.</p
             if isinstance(decomp, dict):
                 update_unit_history(decomp)
                 update_fn_history(decomp)
+            update_fn_token_history()  # fold in any new per-task token ledger rows
             self.send_json(state)
             return
         if path == "/api/unit":
@@ -9936,6 +10106,13 @@ Serve only over the private tailnet. Not linked from the public dashboard UI.</p
         if path == "/api/history/fn":
             name = (query.get("name") or [""])[0]
             self.send_json(load_fn_history(name))
+            return
+        if path == "/api/history/fn_tokens":
+            name = (query.get("name") or [""])[0]
+            self.send_json(load_fn_token_history(name))
+            return
+        if path == "/api/fn_tokens":
+            self.send_json(load_fn_token_summary())
             return
         if path == "/api/asm":
             source = (query.get("source") or [""])[0]
