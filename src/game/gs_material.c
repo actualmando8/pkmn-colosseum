@@ -256,7 +256,7 @@ extern void  fn_8019D620(void* mobj);                  /* HSD MObj color update 
 extern void  fn_801A6FF0(void* obj);                   /* HSD object update */
 extern void  fn_801A7CFC(void* classDesc);             /* HSD class register */
 extern u32   HSD_MObjGetFlags(void* mobj);             /* HSD MObj flag query */
-extern void  fn_801B25C4(u32 priority);                /* HSD render priority */
+extern void  HSD_StateInvalidate(u32 priority);        /* HSD render priority */
 extern void  fn_801B6DC0(void* obj, u32 a, u32 b, u32 c, u32 d); /* HSD TEV config */
 extern u32   fn_801B6F5C(void* desc, u32 a, u32 b, u32 c); /* HSD TEV stage */
 extern void* fn_801B707C(void* stage);                 /* HSD TEV resolve */
@@ -772,7 +772,7 @@ void fn_800E3604(u32 flags, u8 slot) {
     s32 shadowFlag;
     u32 i;
 
-    fn_801B25C4(0x7f);
+    HSD_StateInvalidate(0x7f);
     if ((mobj = GScameraGetActiveCamera()) != NULL) {
         if (fn_80195A6C(*(void**)((u8*)mobj + 0xc)) != 0) {
             GSlightSetupLights(*(void**)((u8*)mobj + 0xc));
@@ -826,7 +826,7 @@ asm void fn_800E3760(void) {
 #else
 void fn_800E3760(void* entry, u32 r4) {
     if (!(*(u32*)entry & 1)) return;
-    fn_801B25C4(0x7f);
+    HSD_StateInvalidate(0x7f);
     {
         void* r31 = GScameraGetActiveCamera();
         if (r31 != NULL) {
