@@ -197,6 +197,14 @@ def _rows(tag, st):
         kind = s.get("kind")
         if kind is None or kind == "SYMBOL_FUNCTION":
             rows[s["name"]] = float(s.get("match_percent") or 0.0)
+    # FRESH source-of-truth: record every measurement so the dashboard/queues read the
+    # latest pct instead of the periodically-rebuilt (stale) ledger/report.json. Wrapped
+    # so a measure_db hiccup can NEVER break a measurement. Skips build/ integrate temps.
+    try:
+        import measure_db
+        measure_db.record(st.get("src", ""), rows, st.get("compiler", ""))
+    except Exception:
+        pass
     return rows
 
 

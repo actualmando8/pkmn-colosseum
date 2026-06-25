@@ -3013,6 +3013,50 @@ def load_quantum() -> dict:
     return {"available": True, "state": d, "generated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
 
 
+MEASURE_CACHE = ROOT / "build" / "measure_cache.jsonl"
+
+
+def load_measure_cache():
+    """FRESH per-fn pct from build/measure_cache.jsonl (band.py appends every measurement).
+    Folds the append-only log to the latest line per src. Returns ({fn: pct}, newest_ts).
+    This is the single fresh source that lets buckets reflect reality between the slow
+    `wall_ledger.py build` rebuilds (the staleness that froze the DONE count this session)."""
+    latest = {}
+    try:
+        with open(MEASURE_CACHE, encoding="utf-8", errors="replace") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    rec = json.loads(line)
+                except ValueError:
+                    continue
+                s = rec.get("src")
+                if s and (s not in latest or rec.get("ts", 0) >= latest[s].get("ts", 0)):
+                    latest[s] = rec
+    except OSError:
+        return {}, 0.0
+    fresh, newest = {}, 0.0
+    for rec in latest.values():
+        ts = rec.get("ts", 0.0)
+        newest = max(newest, ts)
+        for fn, pct in (rec.get("pcts") or {}).items():
+            if fn not in fresh or ts >= fresh[fn][1]:
+                fresh[fn] = (float(pct), ts)
+    return {fn: p for fn, (p, _ts) in fresh.items()}, newest
+
+
+def _pct_bucket(p):
+    if p >= 99.95:
+        return "DONE"
+    if p >= 95.0:
+        return "NEARWALL"
+    if p >= 70.0:
+        return "STRUCT"
+    return "LOW"
+
+
 def load_buckets() -> dict:
     """Wall-ledger bucket coverage: per-bucket totals + how many functions we've
     ATTACKED (attempted), for the campaign progress bar chart."""
@@ -3054,6 +3098,7 @@ def load_buckets() -> dict:
             reground = {fn for fn, n in _c.items() if n >= 2}
         except OSError:
             pass
+    fresh, fresh_ts = load_measure_cache()
     agg = {b: {"total": 0, "attempted": 0} for b in order}
     for fn, v in led.items():
         if not isinstance(v, dict):
@@ -3062,12 +3107,20 @@ def load_buckets() -> dict:
         # LIVE re-bucketing of wins: a fn with a band_wins record is a byte-exact 100%
         # real-C win, so it belongs in DONE even when the ledger's stored bucket (which
         # only refreshes on a full `wall_ledger.py build`) still lists it under its
-        # pre-win bucket. Without this the DONE count freezes between rebuilds and the
-        # hundreds of already-won fns look permanently stuck in NEARWALL/STRUCT/LOW, which
-        # reads as "the buckets never update". Recomputed every poll, so a new win lands on
-        # the dashboard within one poll of its band_wins file appearing.
+        # pre-win bucket. Without this the DONE count freezes between rebuilds and
+        # hundreds of already-won fns look stuck in NEARWALL/STRUCT/LOW.
         if fn in saved and b in agg and b not in ("DONE", "EQUIV"):
             b = "DONE"
+        elif b in ("NEARWALL", "STRUCT", "LOW") and fn in fresh:
+            # FRESH re-bucket from the measure cache (band.py writes every measurement):
+            # reflect the BEST measured pct (committed OR latest scratch) immediately
+            # instead of waiting for the next ledger rebuild. Up-only (max) so a transient
+            # mid-edit scratch dip never regresses the display; a >=99.95% scratch that is
+            # NOT a confirmed saved win caps at NEARWALL — only a band_win earns DONE, so
+            # unsaved/transient 100%s can't inflate the headline.
+            best = max(float(v.get("pct") or 0.0), fresh[fn])
+            nb = _pct_bucket(best)
+            b = "NEARWALL" if (nb == "DONE" and fn not in saved) else nb
         if b in agg:
             agg[b]["total"] += 1
             if v.get("attempted") or fn in saved or fn in reground:
@@ -3098,6 +3151,8 @@ def load_buckets() -> dict:
         "overall_pct": round(100.0 * done / total, 1) if total else 0.0,
         "match_fns": match_fns, "match_total": match_total,
         "match_pct": round(100.0 * match_fns / match_total, 1) if match_total else 0.0,
+        "measure_fresh_age": round(time.time() - fresh_ts) if fresh_ts else None,
+        "measure_fresh_fns": len(fresh),
         "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
     }
 
@@ -9076,7 +9131,9 @@ HTML = r"""<!doctype html>
       }
       if (note) {
         const rom = d.match_total ? `${d.match_pct}% ROM-match (${d.match_fns.toLocaleString()}/${d.match_total.toLocaleString()}, incl. asm-wrappers)` : "";
-        note.textContent = `${rom} · ${d.overall_pct}% decompiled to C (${d.done_fns.toLocaleString()}/${d.total_fns.toLocaleString()}) · bar = % of bucket attacked`;
+        const fresh = (d.measure_fresh_age == null) ? "" :
+          ` · live measures: ${(d.measure_fresh_fns||0).toLocaleString()} fns, ${d.measure_fresh_age < 120 ? "fresh" : Math.round(d.measure_fresh_age/60)+"m old"}`;
+        note.textContent = `${rom} · ${d.overall_pct}% decompiled to C (${d.done_fns.toLocaleString()}/${d.total_fns.toLocaleString()}) · bar = % of bucket attacked${fresh}`;
       }
       el.innerHTML = d.buckets.map(b => {
         const c = BUCKET_COLORS[b.name] || "#5aa9e6";
