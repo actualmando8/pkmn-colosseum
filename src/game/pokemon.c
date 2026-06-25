@@ -120,6 +120,7 @@ extern struct Pokemon* fn_801F61BC(void);
 extern s8 fn_802050F4(struct Pokemon* pokemon);
 
 /* Forward declarations for fn_801F54A4 asm wrapper */
+extern u32 jumptable_803754AC[];
 extern void fn_80119ED0(void);
 extern void fn_8011B444(void);
 extern void fn_8011B67C(void);
