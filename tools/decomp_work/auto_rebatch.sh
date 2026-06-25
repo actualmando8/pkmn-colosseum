@@ -19,6 +19,10 @@ LANES="${ASM_LANES:-OPUS SON C1 C2}"
 # Lanes that run Sonnet/Haiku (weaker/cheaper models): they get the SMALL-fn sonnet_queue
 # instead of the hard-grind crack/scratch queues. One name per line in build/sonnet_lanes.txt.
 SONNET_LANES=$(tr -d '\r' < build/sonnet_lanes.txt 2>/dev/null | tr '\n' ' ' | sed 's/  */ /g')
+# Farming lanes: draw from build/farm_queue.txt and get a PORT-FROM-MELEE packet (port
+# matched C from decomp-refs/melee for shared SDK/HSD TUs) instead of grind-from-scratch.
+# One lane name per line in build/farm_lanes.txt; ramp up by adding lanes.
+FARM_LANES=$(tr -d '\r' < build/farm_lanes.txt 2>/dev/null | tr '\n' ' ' | sed 's/  */ /g')
 FRESH="${HB_FRESH:-300}"  # a state/alive file older than this many seconds is not trusted.
 # Raised 45->300: under heavy host load pane_io's capture pass can take minutes (observed
 # ~234s), so 45s rejected every lane as "stale" and the fleet stopped dispatching entirely.
@@ -97,7 +101,12 @@ for name in $LANES; do
   # exists, do from-scratch ASM (asm_queue) FIRST instead — set when the near-miss crack pool is
   # mined out and the fleet should grind asm-wrappers into C. Either mode falls back to the other
   # when its queue is empty, so a lane is never left idle while work of any kind remains.
-  if printf '%s\n' $SONNET_LANES | grep -qxF "$name"; then
+  if printf '%s\n' $FARM_LANES | grep -qxF "$name"; then
+    # Farming lane: port matched C from decomp-refs/melee for shared SDK/HSD TUs.
+    # Falls back to the crack queue when the farm queue is dry.
+    mode=farm; line=$(pick_line build/farm_queue.txt)
+    [ -z "$line" ] && { mode=crack; line=$(pick_line build/wall_queue.txt); }
+  elif printf '%s\n' $SONNET_LANES | grep -qxF "$name"; then
     # Sonnet/Haiku lane: SMALL real-C fns only (capability-matched). Fall back to the crack
     # queue only if the small-fn queue is dry.
     mode=crack; line=$(pick_line build/sonnet_queue.txt)
@@ -121,7 +130,9 @@ for name in $LANES; do
   gate="BEFORE any WALL you MUST run: python tools/decomp_work/classify_residual.py $tag <fn>. If it prints REG-COLORING (exit 0) you may NOT wall it — rewrite with NAMED locals (never raw rNN locals, they pin the coloring) + declaration-order lever until 100. Only RELOC/SCHEDULING/SHAPE verdicts may WALL/REWORK."
   ff=""; case "$name" in C1|C2|C3|C4) ff="If a fn still resists after the classifier says REG-COLORING and ~4 decl-order attempts, leave it in scratch and report WALL <fn> <%> + the classifier verdict, then move on.";; esac
   hardstop="HARD STOP — do NOT over-grind: at most ~4 attempts / ~15 min PER FN. If a fn still resists, report WALL <fn> <%> and MOVE ON immediately. Do ONLY this packet ($fns) then END YOUR TURN — do not chain to other files or keep iterating a wall for hours."
-  if [ "$mode" = crack ]; then
+  if [ "$mode" = farm ]; then
+    prompt="FARM (port matched C from the Melee decomp; read tools/decomp_work/SDK_FARMING.md). File: $file  TAG: $tag  fns: $fns. These are shared SDK/HSD functions already decompiled upstream. RECIPE (proven on hsd_mtx): (1) for EACH fn, dump its target asm and list its bl-targets; MAP it to the matching function in decomp-refs/melee (HSD: decomp-refs/melee/src/sysdolphin/baselib/*.c ; Dolphin SDK: decomp-refs/melee/extern/dolphin/src/dolphin/*.c) by call-fingerprint + signature. DISTRUST the existing stub comments — they are often wrong. (2) Port melee's C verbatim, naming the fn by its canonical symbol (HSD_*/OS*/GX*/etc., NOT fn_), and add a LOCAL typedef preamble for any missing types (e.g. 'typedef f32 Mtx[3][4];' a 3-f32 Vec3, math/MTX/VEC externs by name) — do NOT #include melee headers. (3) Measure: python tools/compile_check.py $file --compiler-version 1.2.5n --diff --symbols <canonical names>. HSD compiles at 1.2.5n; if a fn near-misses on prologue/epilogue, retry --compiler-version 1.2.5. (4) If a fn is NOT present in melee's matching source (aggregated from another upstream TU), report NOT-FARMABLE <fn> and MOVE ON — do not grind it. Real C only (no asm/.inc/rNN-locals); git diff must touch only .c/.h. AFTER each match run python tools/decomp_work/kg/kg.py record-crack <fn> sdk-farm-melee. $hardstop SAVED <fn> 100.00 / NOT-FARMABLE <fn>."
+  elif [ "$mode" = crack ]; then
     prompt="CRACK (levers: read docs/CRACK_LEVERS.md). File: $file  TAG: $tag  fns: $fns. These are real C in canon <100%. For EACH fn: band.py diff, then classify_residual.py to pick the fix (REG-COLORING=named-locals+decl-order; SHAPE=m2c_draft reshape). Fix scratch, band.py check, save at 100. Real C only (no asm/.inc/rNN-locals). KG (shared lever memory): BEFORE each fn run python tools/decomp_work/kg/kg.py q lever-targets <fn> for proven levers; AFTER each save run python tools/decomp_work/kg/kg.py record-crack <fn> <lever-slug> (and python tools/decomp_work/kg/kg.py record-lever <slug> --title \"...\" --desc \"...\" if you found a NEW lever) so every lane reuses it. $gate $ff $hardstop SAVED <fn> 100.00 / WALL <fn> <%>."
   else
     prompt="FROM-SCRATCH asm->C (levers: docs/CRACK_LEVERS.md). File: $file  TAG: $tag  fns: $fns. m2c_draft each, then REWRITE into faithful REAL C with NAMED locals (in-body externs) — no raw rNN register-locals. band.py check, save at 100. No asm/.inc fraud. KG (shared lever memory): BEFORE each fn run python tools/decomp_work/kg/kg.py q lever-targets <fn> for proven levers; AFTER each save run python tools/decomp_work/kg/kg.py record-crack <fn> <lever-slug> (and python tools/decomp_work/kg/kg.py record-lever <slug> --title \"...\" --desc \"...\" if you found a NEW lever) so every lane reuses it. $gate $ff $hardstop SAVED/WALL/SKIP per fn."
