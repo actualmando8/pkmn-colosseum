@@ -33,7 +33,10 @@ FRESH="${HB_FRESH:-300}"  # a state/alive file older than this many seconds is n
 # pane_io pass, no "esc to interrupt"); without this it gets re-prompted before finishing its
 # first assignment. An actively-working agent reads busy well within this window, so the only
 # cost is a lane that genuinely finished fast waiting a bit for its next packet.
-COOLDOWN="${DISPATCH_COOLDOWN:-150}"
+COOLDOWN="${DISPATCH_COOLDOWN:-45}"   # was 150: a lane finishing fast then idled the rest
+# of the window for no reason. 45s still covers the dispatch->busy race (pane_io marks a lane
+# busy within ~8-16s of the agent showing its first work marker), with the IDLE_MIN debounce
+# as backstop, so we never re-prompt an agent that is merely still starting its packet.
 
 # The tmux owner must be alive and recently active, else states are stale and reqs we
 # write would never be sent. Refuse to dispatch — safer than queuing into the void.

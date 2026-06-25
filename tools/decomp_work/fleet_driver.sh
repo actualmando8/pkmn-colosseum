@@ -23,7 +23,7 @@ if [ -f "$PIDF" ] && kill -0 "$(cat "$PIDF" 2>/dev/null)" 2>/dev/null; then
   echo "[fleet_driver] another instance ($(cat "$PIDF")) already running — exiting"; exit 0
 fi
 echo $$ > "$PIDF"; trap 'rm -f "$PIDF"' EXIT
-INTERVAL="${INTERVAL:-30}"
+INTERVAL="${INTERVAL:-15}"   # was 30: tighter cycle so a finished lane is refilled sooner
 GATE_EVERY="${GATE_EVERY:-5}"
 # Rebuild the wall-ledger (bucket membership/totals) every LEDGER_EVERY cycles so the
 # campaign bucket counts on the dashboard stay current. The ledger's `attempted` overlay
