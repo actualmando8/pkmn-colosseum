@@ -321,17 +321,23 @@ void fn_801A6CA4(void* obj) {
 #endif
 
 /* 0x801A6D08 | 0x54 */
-#if 1
+#if 0
 asm void fn_801A6D08(void) {
 #include "src/hsd/hsd_mobj_fn_801A6D08.inc"
 }
 #else
+#pragma push
+#pragma optimization_level 1
 void fn_801A6D08(HSD_MObj* mobj) {
+    HSD_ClassInfo* info;
     if (mobj != NULL) {
-        HSD_CLASS_METHOD(mobj)->release((HSD_Class*) mobj);
-        HSD_CLASS_METHOD(mobj)->destroy((HSD_Class*) mobj);
+        info = HSD_CLASS_METHOD(mobj);
+        info->release((HSD_Class*) mobj);
+        info = HSD_CLASS_METHOD(mobj);
+        info->destroy((HSD_Class*) mobj);
     }
 }
+#pragma pop
 #endif
 
 /* 0x801A6D5C | 0x44 */
