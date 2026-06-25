@@ -85,6 +85,12 @@ BAD = ("effect_util", "hsd_", "ui_core", "fsys_file", "gs_material", "pokemon", 
 # W-SDA-WRAPPER TUs (hsd_*) and the 3 WIP files auto_gate never commits. Everything else
 # (ui_core, effect_util, gs_material, pokemon, ...) is valid from-scratch ASM work.
 ASM_BAD = ("hsd_", "fsys_file", "gs_pokemon_summary")
+# For the RESHAPE queue (LOW <70% real-C DRAFTS that need structural rework, not near-miss
+# CRACK levers) exclude only the genuinely un-decompilable: effect_util (band-unmeasurable —
+# its .inc overflows the harness) and hsd_ (W-SDA-WRAPPER). The mega-Ghidra LOW drafts
+# (colosseum_battle, gba_misc, gs_material, ...) ARE the target here — the crack rebatcher
+# punts on them, so they get from-scratch m2c-draft reshape packets instead.
+RESHAPE_BAD = ("effect_util", "hsd_")
 # Goal order for the CRACK queue (wall_queue.txt). ASM is intentionally NOT here:
 # asm-wrappers have no real C to "crack" — they need from-scratch decomp (scratch mode), so
 # they go to build/asm_queue.txt via write_asm_queue(), not the crack queue. wall_queue holds
@@ -140,6 +146,32 @@ def write_asm_queue(led):
     return len(lines)
 
 
+def write_reshape_queue(led):
+    """Emit build/reshape_queue.txt — LOW (<70%) real-C DRAFTS that need STRUCTURAL reshape
+    (m2c-draft -> faithful real C: correct control-flow / types / signature), NOT near-miss
+    CRACK levers. These are the mega-Ghidra-import drafts (colosseum_battle, gba_misc,
+    gs_material, ...) the crack rebatcher punts on (it tries reg-coloring/decl-order levers on
+    fns that need a whole reshape). Fresh LOW only (not attempted / SAVED / reground /
+    RESHAPE_BAD-unmeasurable), grouped by file, MOST-fns-first so a TU gets closed out."""
+    bf = defaultdict(list)
+    for fn, v in led.items():
+        if v["attempted"] or v["bucket"] != "LOW":
+            continue
+        if fn in SAVED or fn in REGROUND:
+            continue
+        if any(b in v["file"] for b in RESHAPE_BAD):
+            continue
+        src = "src/" + v["file"] + ".c"
+        if os.path.exists(os.path.join(ROOT, src)):
+            bf[src].append((v.get("size", 0), fn))
+    lines = []
+    for src, fns in sorted(bf.items(), key=lambda kv: -len(kv[1])):
+        names = [fn for _, fn in sorted(fns, reverse=True)][:6]
+        lines.append(src + " " + " ".join(names))
+    open(os.path.join(ROOT, "build", "reshape_queue.txt"), "w").write("\n".join(lines) + "\n")
+    return len(lines)
+
+
 # Need enough DISTINCT files to feed every lane (band locks per-file = one lane per
 # file). With ~14 lanes a single concentrated bucket (e.g. STRUCT in 2 files) would
 # starve most lanes, so we fill the queue with the current bucket's files FIRST and
@@ -192,6 +224,7 @@ def main():
     led = json.load(open(LED))
     asm_n = write_asm_queue(led)   # keep the from-scratch (scratch-mode) queue fresh each cycle
     son_n = write_sonnet_queue(led)   # small-fn queue for the Sonnet/Haiku lanes
+    rs_n = write_reshape_queue(led)   # LOW real-C drafts needing structural reshape (reshape mode)
     active = None
     lines = []
     seen = set()
@@ -248,7 +281,7 @@ def main():
         if prev != active:
             open(ASSIGNED, "w").write("")
             open(marker, "w").write(active)
-    print(f"ACTIVE-BUCKET={active or 'PINS-ONLY'} files={len(lines)} pins={n_pin}{' low-focus' if low_focus else ''} | asm_queue files={asm_n} | sonnet_queue files={son_n}")
+    print(f"ACTIVE-BUCKET={active or 'PINS-ONLY'} files={len(lines)} pins={n_pin}{' low-focus' if low_focus else ''} | asm_queue files={asm_n} | sonnet_queue files={son_n} | reshape_queue files={rs_n}")
 
 
 if __name__ == "__main__":
