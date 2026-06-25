@@ -116,7 +116,10 @@ classify() {  # classify <name> <pane> ; echoes idle|busy|rate|capfail
   # RELIABLE "still working" signals (spinner gerund "… for Ns", elapsed "(Nm Ns ·",
   # "esc to interrupt", "thinking"); a genuinely idle prompt shows none of them. A
   # working agent always shows one, so it's never misread as idle and /cleared mid-task.
-  if printf '%s' "$cap" | tr -d ' ' | grep -qiE "esctoint|interrupt|thinking|for[0-9]+s|[0-9]+s·|\([0-9]+m[0-9]+s"; then
+  # NB: use "esctoint" (= "esc to interrupt", the ACTIVE indicator), NOT bare "interrupt"
+  # — codex's idle "Conversation interrupted" message contains "interrupt" and would
+  # falsely pin the lane busy forever.
+  if printf '%s' "$cap" | tr -d ' ' | grep -qiE "esctoint|thinking|workingfor|for[0-9]+s|[0-9]+s·|\([0-9]+m[0-9]+s"; then
     echo 0 > "$HB/$name.scount"; echo busy; return
   fi
   # Codex prints a benign welcome line "You have N usage limit reset available. Run /usage"
