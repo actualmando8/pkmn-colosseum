@@ -202,6 +202,14 @@ pass() {
   done
   for name in "${!PANE[@]}"; do
     pane="${PANE[$name]}"; [ -n "$pane" ] || continue
+    # CRITICAL: only drain (send /clear + task) when the lane is CURRENTLY idle. A .req is
+    # written by auto_rebatch from a PRIOR pass's classification; if the lane has since gone
+    # busy (started its next task, or was briefly misclassified idle), draining now would
+    # /clear a WORKING agent and wipe its in-progress task. Re-check the state just written
+    # above (this pass's classification). If busy/rate, leave the .req queued for a later
+    # pass when the lane is genuinely idle.
+    cur=$(cut -d' ' -f1 < "$HB/$name.state" 2>/dev/null)
+    [ "$cur" = idle ] || continue
     drain_one "$name" "$pane"
     echo "$(date +%s)" > "$HB/.alive"      # ...and during (slower) dispatch drains
   done
