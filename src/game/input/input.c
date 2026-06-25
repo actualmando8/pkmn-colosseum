@@ -1092,12 +1092,38 @@ u32 fn_800F7F64(s32 padId) {
 #else
 void fn_800F7F64(void) { /* TODO */ }
 #endif
-#if 1
+#if 0
 asm void fn_800F80B0(void) {
 #include "src/game/input/input_fn_800F80B0.inc"
 }
 #else
-void fn_800F80B0(void) { /* TODO */ }
+s32 fn_800F80B0(u32 padIdx) {
+    extern u8 lbl_80401C10[];
+    u8* pad = &lbl_80401C10[0];
+    u8* nul = NULL;
+
+    if (*(s32*)pad == 0) goto found;
+    pad += 0x6C;
+    if (*(s32*)pad == 0) goto found;
+    pad += 0x6C;
+    if (*(s32*)pad == 0) goto found;
+    pad += 0x6C;
+    if (*(s32*)pad == 0) goto found;
+    pad = nul;
+found:
+    if (pad == NULL) {
+        return 4;
+    }
+    if (padIdx >= 5) {
+        return 1;
+    }
+    if (padIdx < 1) {
+        return 1;
+    }
+
+    *(u32*)pad = padIdx;
+    return 0;
+}
 #endif
 extern void fn_800ABCF4(void);
 extern void fn_800AAF38(void);

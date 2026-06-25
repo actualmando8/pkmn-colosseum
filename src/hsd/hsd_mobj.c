@@ -234,7 +234,7 @@ extern void fn_80193AF0(void* obj, s32 size);
 extern void fn_801BBE60(HSD_TObj* tobj);
 extern void fn_801B42C0(void* node);
 extern void fn_801B7178(HSD_TObj* tobj, u32 map_id, u32 coord_id);
-#if 1
+#if 0
 asm void fn_801A6B8C(void) {
 #include "src/hsd/hsd_mobj_fn_801A6B8C.inc"
 }
@@ -247,7 +247,7 @@ void fn_801A6B8C(HSD_MObj* mobj) {
         fn_801B42C0(mobj->tevdesc);
     }
     if (mobj->texp != NULL) {
-        fn_801B42C0(mobj->texp);
+        fn_801B7178((HSD_TObj*)mobj->texp, 7, 1);
     }
     if (mobj->pe != NULL) {
         fn_80193AF0(mobj->pe, 0xc);
@@ -321,7 +321,7 @@ void fn_801A6CA4(void* obj) {
 #endif
 
 /* 0x801A6D08 | 0x54 */
-#if 1
+#if 0
 asm void fn_801A6D08(void) {
 #include "src/hsd/hsd_mobj_fn_801A6D08.inc"
 }
@@ -504,7 +504,7 @@ extern HSD_MObj* fn_80193828(HSD_ClassInfo* info);
 extern void fn_801B4300(void* a, void* b);
 extern void fn_801BC33C(void* tobj);
 extern u32 lbl_8047DC30;
-#if 1
+#if 0
 asm void fn_801A7B24(void) {
 #include "src/hsd/hsd_mobj_fn_801A7B24.inc"
 }
@@ -548,7 +548,7 @@ call_setup:
         mobj->tevdesc = NULL;
     }
     if (mobj->texp != NULL) {
-        fn_801B42C0(mobj->texp);
+        fn_801B7178((HSD_TObj*)mobj->texp, 7, 1);
         mobj->texp = NULL;
     }
     tobj_slot = (u32)mobj->tobj;
@@ -582,7 +582,7 @@ extern void* fn_80193B10(s32 size);
 extern void* memcpy(void* dst, const void* src, u32 n);
 extern u32 lbl_8047DC28;
 extern f32 lbl_8047DC2C;
-#if 1
+#if 0
 asm void fn_801A7D58(void) {
 #include "src/hsd/hsd_mobj_fn_801A7D58.inc"
 }
