@@ -34,6 +34,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
 WINS = ROOT / "build" / "band_wins"
+NEARMISS = ROOT / "build" / "band_nearmiss"   # real-C near-misses banked by band.py bank
 BUILD = ROOT / "build"
 EQUIV_FILE = HERE / "equivalent.txt"
 WALLS_FILE = ROOT / "WALLS.md"
@@ -196,11 +197,17 @@ def _compilable_subset(canon, fn_bodies, stem):
     return good, quarantined
 
 
-def integrate_source(src_rel, fn_bodies, apply, min_pct=M, equivalent=False):
+def integrate_source(src_rel, fn_bodies, apply, min_pct=M, equivalent=False,
+                     bank=False, committed=None):
     """Splice fn_bodies into a fresh copy of src_rel, recompile, re-verify each
     fn. Byte-exact mode (default): keep only fns that re-measure >=100%.
     Equivalent mode (min_pct<100): also keep faithful real-C fns that re-measure
-    >=min_pct (they get registered in equivalent.txt). Returns (held, dropped)."""
+    >=min_pct (they get registered in equivalent.txt). Bank mode (bank=True,
+    committed=<fn->pct>): keep faithful real-C near-misses in [min_pct,100) that
+    STRICTLY BEAT the committed src pct (no-regress — protects byte-matching asm
+    wrappers, whose committed pct is higher than any <100 real-C) and apply them
+    WITHOUT registering Equivalent, so refill_queue still queues them for the
+    permuter. Returns (held, dropped)."""
     canon = ROOT / src_rel
     if not canon.exists():
         print(f"  SKIP: canonical source missing: {src_rel}")
@@ -253,7 +260,8 @@ def integrate_source(src_rel, fn_bodies, apply, min_pct=M, equivalent=False):
     # `asm` wrapper, and must never be re-saved as a "win" either.)
     ASM_FN = re.compile(r"\basm\b\s+[\w*]+\s+" + r"\w+\s*\(")   # `asm <type> fn(`
     ASM_BLOCK = re.compile(r"\basm\b\s*\{|__asm\b|#include\s+\"[^\"]*\.inc\"")
-    held, equiv_held, dropped, rejected = [], [], [], []
+    held, equiv_held, bank_held, dropped, rejected = [], [], [], [], []
+    committed = committed or {}
     for fn in fn_bodies:
         body = fn_bodies[fn] or ""
         if ASM_FN.search(body) or ASM_BLOCK.search(body):
@@ -262,6 +270,12 @@ def integrate_source(src_rel, fn_bodies, apply, min_pct=M, equivalent=False):
         pct = newm.get(fn, 0.0)
         if pct >= M:
             held.append((fn, pct))
+        elif bank:
+            cm = committed.get(fn, 0.0)
+            if min_pct <= pct < M and pct > cm + 1e-6:
+                bank_held.append((fn, pct))   # real-C improvement -> bank + keep permuter-eligible
+            else:
+                dropped.append((fn, pct))     # below floor OR would regress committed src
         elif equivalent and pct >= min_pct:
             equiv_held.append((fn, pct))      # faithful real C, salvaged
         else:
@@ -271,15 +285,18 @@ def integrate_source(src_rel, fn_bodies, apply, min_pct=M, equivalent=False):
         print(f"  !! REJECTED {len(rejected)} inline-asm/wrapper 'wins' (NOT real C — fraud):")
         for fn, pct in sorted(rejected):
             print(f"    REJECT-ASM  {fn}  {pct:.2f}%  (inline assembly, not decompilation)")
-    print(f"  re-verified: {len(held)} byte-exact, {len(equiv_held)} equivalent, {len(dropped)} dropped")
+    print(f"  re-verified: {len(held)} byte-exact, {len(equiv_held)} equivalent, "
+          f"{len(bank_held)} banked near-miss, {len(dropped)} dropped")
     for fn, pct in sorted(held):
         print(f"    HELD   {fn}  {pct:.2f}%  (byte-exact)")
     for fn, pct in sorted(equiv_held):
         print(f"    EQUIV  {fn}  {pct:.2f}%  (functional real C -> Equivalent)")
+    for fn, pct in sorted(bank_held):
+        print(f"    BANK   {fn}  {pct:.2f}%  (real-C improvement -> canon + permuter)")
     for fn, pct in sorted(dropped):
-        print(f"    DROP   {fn}  {pct:.2f}%  (kept out of canon)")
+        print(f"    DROP   {fn}  {pct:.2f}%  (below floor or would regress committed)")
 
-    keep_set = dict(held + equiv_held)
+    keep_set = dict(held + equiv_held + bank_held)
     if dropped or rejected:
         # Re-splice with only the kept fns so the integrated file is clean
         # (excludes sub-threshold drops and rejected inline-asm/wrapper fraud).
@@ -293,13 +310,15 @@ def integrate_source(src_rel, fn_bodies, apply, min_pct=M, equivalent=False):
             integrated.write_bytes(canon.read_bytes())
 
     print(f"  integrated -> {integrated.relative_to(ROOT)}")
-    if apply and (held or equiv_held):
+    if apply and (held or equiv_held or bank_held):
         canon.write_bytes(integrated.read_bytes())
         print(f"  APPLIED to {src_rel}")
         _log_matches([fn for fn, _ in held], src_rel)   # per-fn MATCH! -> activity log
         if equiv_held:
             _register_equivalent(equiv_held, src_rel)
-    return held + equiv_held, dropped
+        # bank_held are deliberately NOT registered Equivalent: they are unfinished
+        # real-C improvements the permuter (refill_queue) should still pick up.
+    return held + equiv_held + bank_held, dropped
 
 
 def main():
