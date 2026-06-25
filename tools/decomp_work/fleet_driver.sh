@@ -25,6 +25,11 @@ fi
 echo $$ > "$PIDF"; trap 'rm -f "$PIDF"' EXIT
 INTERVAL="${INTERVAL:-30}"
 GATE_EVERY="${GATE_EVERY:-5}"
+# Rebuild the wall-ledger (bucket membership/totals) every LEDGER_EVERY cycles so the
+# campaign bucket counts on the dashboard stay current. The ledger's `attempted` overlay
+# is recomputed live by the dashboard, but bucket MEMBERSHIP only refreshes on a full
+# `wall_ledger.py build` — without this it freezes at the last manual build.
+LEDGER_EVERY="${LEDGER_EVERY:-20}"
 LANEFILE="build/fleet_lanes.txt"
 [ -f "$LANEFILE" ] || echo "OPUS SON" > "$LANEFILE"
 i=0; session=0
@@ -54,6 +59,14 @@ while true; do
       gatemsg=" | GATED ${nc} commit(s) ${nbe:+(+${nbe} byte-exact)}"
     fi
     [ "$nfraud" -gt 0 ] && gatemsg="$gatemsg | fraud $nfraud"
+  fi
+  # periodic wall-ledger rebuild (backgrounded + locked so it never blocks a dispatch
+  # cycle and concurrent builds can't stack/corrupt the ledger).
+  if [ $((i % LEDGER_EVERY)) -eq 0 ] && [ ! -f build/.ledger_building ]; then
+    ( touch build/.ledger_building
+      timeout 240 python tools/decomp_work/wall_ledger.py build >/tmp/fleet_ledger.txt 2>&1
+      rm -f build/.ledger_building ) &
+    gatemsg="$gatemsg | ledger-rebuild"
   fi
   ts=$(date +%H:%M)
   if [ "$rb" -gt 0 ] || [ -n "$gatemsg" ]; then
