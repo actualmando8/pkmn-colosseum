@@ -107,35 +107,31 @@ finalize_task() {  # <name> : append a ledger row for the just-completed task
   rm -f "$meta" "$HB/$name.tok.last"
 }
 
-classify() {  # classify <name> <pane> ; echoes idle|busy|rate|capfail and updates .prev
-  local name="$1" pane="$2" cap rc prev scount
+classify() {  # classify <name> <pane> ; echoes idle|busy|rate|capfail
+  local name="$1" pane="$2" cap rc streak
   cap=$(txk capture-pane -p -t "$pane" 2>/dev/null); rc=$?
   if [ $rc -ne 0 ] || [ -z "$cap" ]; then echo capfail; return; fi
   printf '%s' "$cap" > "$HB/$name.live"
-  # Track the consecutive-static-screen streak BEFORE any early return so the idle
-  # debounce below is based on real screen stability, not a single 8s snapshot.
-  prev=""; [ -f "$HB/$name.prev" ] && prev=$(cat "$HB/$name.prev")
-  printf '%s' "$cap" > "$HB/$name.prev"
-  scount=0; [ -f "$HB/$name.scount" ] && scount=$(cat "$HB/$name.scount" 2>/dev/null)
-  if [ "$cap" = "$prev" ]; then scount=$((scount + 1)); else scount=0; fi
-  echo "$scount" > "$HB/$name.scount"
-  # ACTIVE-WORK markers -> busy immediately. Covers the claude/codex/glm working
-  # indicators (spinner gerund "… for Ns", elapsed "(Nm Ns ·", "esc to interrupt",
-  # "thinking") so a still-working agent is NEVER misread as idle and dispatched —
-  # which /clears it mid-task and burns the tokens it already spent.
+  # ACTIVE-WORK markers -> busy immediately, and reset the idle streak. These are the
+  # RELIABLE "still working" signals (spinner gerund "… for Ns", elapsed "(Nm Ns ·",
+  # "esc to interrupt", "thinking"); a genuinely idle prompt shows none of them. A
+  # working agent always shows one, so it's never misread as idle and /cleared mid-task.
   if printf '%s' "$cap" | tr -d ' ' | grep -qiE "esctoint|interrupt|thinking|for[0-9]+s|[0-9]+s·|\([0-9]+m[0-9]+s"; then
-    echo busy; return
+    echo 0 > "$HB/$name.scount"; echo busy; return
   fi
   # Codex prints a benign welcome line "You have N usage limit reset available. Run /usage"
   # at startup — NOT a rate-limit. Strip it before the rate check so codex lanes aren't
-  # falsely gated as rate-limited and skipped by the dispatcher (they'd sit idle forever,
-  # never getting a task to scroll the banner off-screen).
+  # falsely gated as rate-limited and skipped by the dispatcher.
   if printf '%s' "$cap" | grep -ivE "usage limit reset|run /usage" | grep -qiE "rate.?limit|usage limit|limit reached|too many request|try again (in|at|later)|resets? (at|in)|reached your|429 "; then
-    echo rate; return
+    echo 0 > "$HB/$name.scount"; echo rate; return
   fi
-  # Idle only after the screen is byte-static for IDLE_MIN consecutive passes (debounce):
-  # a brief inter-step pause must not trigger a premature dispatch + /clear.
-  if [ "$scount" -ge "${IDLE_MIN:-3}" ]; then echo idle; else echo busy; fi
+  # No busy/rate markers -> idle prompt. Debounce IDLE_MIN passes (guards a momentary
+  # marker gap between tool calls) before declaring idle. We do NOT require a byte-static
+  # screen — the TUI footer's token counter/cursor changes every pass, which would
+  # otherwise keep a genuinely-idle lane "busy" forever and starve it of dispatch.
+  streak=0; [ -f "$HB/$name.scount" ] && streak=$(cat "$HB/$name.scount" 2>/dev/null)
+  streak=$((streak + 1)); echo "$streak" > "$HB/$name.scount"
+  if [ "$streak" -ge "${IDLE_MIN:-2}" ]; then echo idle; else echo busy; fi
 }
 
 drain_one() {  # drain_one <name> <pane> : point the agent at a task FILE (no long-prompt send)
