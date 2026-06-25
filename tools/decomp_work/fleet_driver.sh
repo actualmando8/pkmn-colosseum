@@ -38,6 +38,30 @@ while true; do
   i=$((i+1))
   lanes=$(tr -d '\r' < "$LANEFILE" | tr '\n' ' ' | sed 's/  */ /g')
   [ -n "$(echo "$lanes" | tr -d ' ')" ] || lanes="OPUS SON"
+  # --- pane_io wedge-watchdog --------------------------------------------------
+  # pane_io can wedge under heavy host load: it keeps refreshing build/hb/.alive (so
+  # a naive liveness check still passes) yet stops completing the capture/classify
+  # loop, so every lane state freezes and idle lanes are never re-dispatched. Detect
+  # it by lane-state STALENESS: if the freshest of ALL lane states is older than
+  # WEDGE_STALE while .alive is fresh, pane_io is alive-but-stuck -> kill + relaunch
+  # detached. Rate-limited to one restart per WEDGE_COOLDOWN so a slow first pass on
+  # the fresh loop can't trigger a restart storm.
+  WEDGE_STALE="${WEDGE_STALE:-75}"; WEDGE_COOLDOWN="${WEDGE_COOLDOWN:-120}"
+  _now=$(date +%s); _alive=$(cat build/hb/.alive 2>/dev/null || echo 0); _fresh=0
+  for _l in $lanes; do
+    _ts=$(awk '{print $2}' "build/hb/$_l.state" 2>/dev/null || echo 0)
+    [ "${_ts:-0}" -gt "$_fresh" ] && _fresh=$_ts
+  done
+  _lastwd=$(cat build/.pane_io_wd.ts 2>/dev/null || echo 0)
+  if [ $(( _now - ${_alive:-0} )) -le 30 ] && [ "$_fresh" -gt 0 ] \
+     && [ $(( _now - _fresh )) -gt "$WEDGE_STALE" ] \
+     && [ $(( _now - ${_lastwd:-0} )) -gt "$WEDGE_COOLDOWN" ]; then
+    echo "[$(date +%H:%M)] WATCHDOG: pane_io wedged (freshest lane state $(( _now - _fresh ))s old, .alive $(( _now - _alive ))s) — restarting pane_io"
+    echo "$_now" > build/.pane_io_wd.ts
+    _pid=$(cat build/.pane_io.pid 2>/dev/null); [ -n "$_pid" ] && kill -9 "$_pid" 2>/dev/null
+    pkill -9 -f pane_io.sh 2>/dev/null; rm -f build/.pane_io.pid
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools/decomp_work/spawn_pane_io.ps1 >/dev/null 2>&1
+  fi
   timeout 40 python tools/decomp_work/gen_bucket_queue.py >/tmp/fleet_q.txt 2>&1
   bucket=$(grep -oE "ACTIVE-BUCKET=[A-Z]+ files=[0-9]+" /tmp/fleet_q.txt | head -1)
   # auto_rebatch is now TMUX-FREE (reads build/hb state, writes build/dispatch reqs);
