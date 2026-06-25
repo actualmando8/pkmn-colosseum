@@ -123,7 +123,13 @@ for name in $LANES; do
   # Small packets (default 2 fns) keep each agent turn short so it CANNOT grind one packet for
   # hours (we saw 3h / 290k-token single turns). A fn that resists is re-offered on a later
   # cycle rather than burning a marathon turn; combined with the hard-stop prompt below.
-  fns=$(echo "$line" | cut -d' ' -f2-$(( ${PACKET_FNS:-2} + 1 )))
+  # Crack/scratch use small 2-fn packets (short turns). Farming ports a whole TU from
+  # melee in one read, so a farm lane gets ALL of its TU's fns.
+  if [ "$mode" = farm ]; then
+    fns=$(echo "$line" | cut -d' ' -f2-)
+  else
+    fns=$(echo "$line" | cut -d' ' -f2-$(( ${PACKET_FNS:-2} + 1 )))
+  fi
   stem=$(basename "$file" .c); tag="pl_${stem}"
   RUN_PICKED="${RUN_PICKED}"$'\n'"${file}"
   for fn in $fns; do timeout 10 python tools/decomp_work/wall_ledger.py mark "$fn" "$name/$mode" >/dev/null 2>&1; done
