@@ -139,12 +139,10 @@ u32* fn_801B00E0(volatile u32* node, u32 type, u32 subtype) {
         if ((node[1] & 0x70000000) != type) {
             continue;
         }
-        if (subtype == 0) {
-            return (u32*)node;
+        if ((subtype != 0) && (subtype != (node[1] & 0x0FFFFFFF))) {
+            continue;
         }
-        if (subtype == (node[1] & 0x0FFFFFFF)) {
-            return (u32*)node;
-        }
+        return (u32*)node;
     }
     return NULL;
 }
