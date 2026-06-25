@@ -1350,5 +1350,45 @@ void fn_800F0470(void) { /* TODO */ }
 void fn_800F0494(void) { /* TODO */ }
 u8 fn_800F04BC(u8* p) { return p[0x14]; }
 void fn_800F04C4(void) { /* TODO */ }
-void fn_800F05A0(void) { /* TODO */ }
+extern u32 lbl_8047AC00;
+extern u32 lbl_8047AC04;
+extern u32 lbl_8047AC08;
+extern u32 lbl_8047AC0C;
+extern void fn_800E209C(u16 handle); /* GSmemFree */
+/* 0x800F05A0 | 0xA8 */
+/*
+ * fn_800F05A0 -- destroy / unregister a cooperative thread (GSThread).
+ *
+ * If @p thr is the current thread (lbl_8047AC00) or the run thread
+ * (lbl_8047AC04) it cannot be torn down in place, so a destroy-pending
+ * flag at offset 0x15 is raised instead; when it is the run thread the
+ * global reschedule flag (lbl_8047AC0C) is set so the dispatcher re-enters.
+ *
+ * Otherwise the thread is unlinked from the doubly-linked thread list,
+ * the list head (lbl_8047AC08) is fixed up if it pointed at this thread,
+ * and both the stack and context GSmem handles are released via
+ * fn_800E209C (GSmemFree).
+ */
+void fn_800F05A0(GSThread* thr) {
+    if (thr == (GSThread*)lbl_8047AC00 || thr == (GSThread*)lbl_8047AC04) {
+        thr->pad1 = 1;
+        if (thr == (GSThread*)lbl_8047AC04) {
+            *(u8*)&lbl_8047AC0C = 1;
+        }
+    } else {
+        thr->pad0 = 0;
+        thr->active = 0;
+        if (thr->prev != NULL) {
+            thr->prev->next = thr->next;
+        }
+        if (thr->next != NULL) {
+            thr->next->prev = thr->prev;
+        }
+        if ((GSThread*)lbl_8047AC08 == thr) {
+            lbl_8047AC08 = (u32)thr->next;
+        }
+        fn_800E209C(thr->stackHandle);
+        fn_800E209C(thr->ctxHandle);
+    }
+}
 void fn_800F0654(void) { /* TODO */ }
