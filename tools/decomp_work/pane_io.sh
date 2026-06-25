@@ -87,8 +87,9 @@ parse_tokens() {  # <name> -> "IN OUT" (best-effort from $HB/<name>.live; 0 0 if
 finalize_task() {  # <name> : append a ledger row for the just-completed task
   local name="$1" meta="$HB/$name.curtask"
   [ -f "$meta" ] || return 0
-  local ts tag file fns prov tin tout
+  local ts tstart tag file fns prov tin tout
   ts=$(date +%s)
+  tstart=$(sed -n 's/^tstart=//p' "$meta"); [ -n "$tstart" ] || tstart=0
   tag=$(sed -n 's/^tag=//p' "$meta")
   file=$(sed -n 's/^file=//p' "$meta")
   fns=$(sed -n 's/^fns=//p' "$meta")
@@ -99,8 +100,10 @@ finalize_task() {  # <name> : append a ledger row for the just-completed task
   fns_json=$(printf '%s' "$fns" | tr ' ' '\n' | grep -E '^fn_' \
     | awk 'BEGIN{ORS="";print "["} {printf "%s\"%s\"",(NR>1?",":""),$0} END{print "]"}')
   [ -n "$fns_json" ] || fns_json="[]"
-  printf '{"ts":%s,"lane":"%s","provider":"%s","tag":"%s","file":"%s","fns":%s,"tokens_in":%s,"tokens_out":%s}\n' \
-    "$ts" "$name" "$prov" "$tag" "$file" "$fns_json" "$tin" "$tout" >> "$LEDGER"
+  # ts = task end, tstart = dispatch time -> the [tstart,ts] window for journal-based
+  # token attribution (footer counts are lossy on narrow panes / absent for codex).
+  printf '{"ts":%s,"tstart":%s,"lane":"%s","provider":"%s","tag":"%s","file":"%s","fns":%s,"tokens_in":%s,"tokens_out":%s}\n' \
+    "$ts" "$tstart" "$name" "$prov" "$tag" "$file" "$fns_json" "$tin" "$tout" >> "$LEDGER"
   rm -f "$meta" "$HB/$name.tok.last"
 }
 
@@ -140,6 +143,7 @@ drain_one() {  # drain_one <name> <pane> : point the agent at a task FILE (no lo
   # /clear below resets the agent's token footer, so the next busy->idle window
   # measures exactly this task's spend (finalized in pass()).
   {
+    echo "tstart=$(date +%s)"
     echo "prov=$(lane_provider "$name")"
     echo "tag=$(grep -oiE 'TAG:[[:space:]]*[A-Za-z0-9_]+' "$task" | head -1 | sed -E 's/.*[Tt][Aa][Gg]:[[:space:]]*//')"
     echo "file=$(grep -oiE 'File:[[:space:]]*[^[:space:]]+' "$task" | head -1 | sed -E 's/.*[Ff]ile:[[:space:]]*//')"
