@@ -120,3 +120,9 @@ fn_801E1FF8   # battle_logic — real C 98.64%; conv-literal wall ((f32) cast ma
 
 # pokemon.c - fn_801F4C14 PokemonSet W6 jump-table-name wall (2026-06-25)
 fn_801F4C14   # pokemon.c - W6 jumptable NAME only (@2020 vs jumptable_80375330); 99.97%, real C active, classifier RELOC
+
+# pokemon.c — fresh-but-walled near-misses (surgical round 2026-06-25, w30z7nx8y); fleet pre-cracked during conversion, residuals are hard walls
+fn_801F6B54   # pokemon — real C 99.60%; reg-permutation wall (inner/outer count clrlwi r30<->r31 + extsh r0-vs-r7, allocator tiebreak). SKIP
+fn_801F3430   # pokemon — real C 98.89%; 2-param register-permutation wall (param_1 referenced before buf pins it to r30 first; target wants inverse). SKIP
+fn_801F4220   # pokemon — real C 98.57%; un-inverted loop-match branch-fold wall (people-findloop family; CW folds !=/== to beq + elides redundant found-test). SKIP
+fn_801F4718   # pokemon — real C 98.46%; li-vs-mr zero-copy peephole wall (1-instr: redundant zero-materialize li r4,0 vs mr r4,r5). SKIP

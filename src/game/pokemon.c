@@ -4589,21 +4589,22 @@ void fn_801F72B0(u32 param_1, u16 param_2, u16 param_3, s8* param_4, u8* param_5
 }
 
 /* 0x801F7388 | size: 0x7C | small */
+#pragma scheduling off
 u8 fn_801F7388(u32 param_1) {
     extern u32 fn_801F78D4(u32, u32);
     extern u8 fn_801FA524(u32);
     u32 uVar2;
     u8 cVar3;
-    u8 bVar4;
+    u32 bVar4;
     u8 cVar1;
 
-    bVar4 = 0;
     cVar1 = 0;
+    bVar4 = 0;
     while ((u8)bVar4 < 2) {
         if (param_1 == 0) {
             uVar2 = 0;
         } else {
-            uVar2 = fn_801F78D4(param_1, bVar4);
+            uVar2 = fn_801F78D4(param_1, (u8)bVar4);
         }
         cVar3 = fn_801FA524(uVar2);
         if ((u8)cVar3 != 0) {
@@ -4613,6 +4614,7 @@ u8 fn_801F7388(u32 param_1) {
     }
     return cVar1;
 }
+#pragma scheduling on
 
 /* 0x801F7404 | size: 0x7C | small */
 u32 fn_801F7404(u32 param_1) {
