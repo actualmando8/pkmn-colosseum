@@ -42,7 +42,7 @@ while true; do
   bucket=$(grep -oE "ACTIVE-BUCKET=[A-Z]+ files=[0-9]+" /tmp/fleet_q.txt | head -1)
   # auto_rebatch is now TMUX-FREE (reads build/hb state, writes build/dispatch reqs);
   # the timeout is a belt-and-braces backstop on its python sub-calls only.
-  rb=$(timeout 90 bash -c "ASM_LANES='$lanes' bash tools/decomp_work/auto_rebatch.sh" 2>/dev/null | grep -c "^REBATCH")
+  rb=$(timeout 180 bash -c "ASM_LANES='$lanes' bash tools/decomp_work/auto_rebatch.sh" 2>/dev/null | grep -c "^REBATCH")
   gatemsg=""
   if [ $((i % GATE_EVERY)) -eq 0 ]; then
     # Detect commits by HEAD change — robust to auto_gate's output format. auto_gate

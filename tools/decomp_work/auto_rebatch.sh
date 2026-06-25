@@ -137,7 +137,12 @@ for name in $LANES; do
   fi
   stem=$(basename "$file" .c); tag="pl_${stem}"
   RUN_PICKED="${RUN_PICKED}"$'\n'"${file}"
-  for fn in $fns; do timeout 10 python tools/decomp_work/wall_ledger.py mark "$fn" "$name/$mode" >/dev/null 2>&1; done
+  # Background the ledger marks: under the MSYS python-spawn tax (~8s/spawn observed under
+  # full load) a synchronous per-fn mark loop blows past the driver's auto_rebatch timeout,
+  # so the dispatch is KILLED before any .req is written and idle lanes never refill. The
+  # marks only need to land before the next cycle's gen (~30s), so fire-and-forget keeps the
+  # .req write — the thing that actually feeds the lane — off the slow critical path.
+  ( for fn in $fns; do timeout 10 python tools/decomp_work/wall_ledger.py mark "$fn" "$name/$mode" >/dev/null 2>&1; done ) &
   gate="BEFORE any WALL you MUST run: python tools/decomp_work/classify_residual.py $tag <fn>. If it prints REG-COLORING (exit 0) you may NOT wall it — rewrite with NAMED locals (never raw rNN locals, they pin the coloring) + declaration-order lever until 100. Only RELOC/SCHEDULING/SHAPE verdicts may WALL/REWORK."
   ff=""; case "$name" in C1|C2|C3|C4) ff="If a fn still resists after the classifier says REG-COLORING and ~4 decl-order attempts, leave it in scratch and report WALL <fn> <%> + the classifier verdict, then move on.";; esac
   hardstop="HARD STOP — do NOT over-grind: at most ~4 attempts / ~15 min PER FN. If a fn still resists, report WALL <fn> <%> and MOVE ON immediately. Do ONLY this packet ($fns) then END YOUR TURN — do not chain to other files or keep iterating a wall for hours."
