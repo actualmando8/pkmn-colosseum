@@ -388,107 +388,13 @@ void fn_800A1990(void) {
 extern void fn_8009BD84(void);
 extern OSErrorHandler __OSErrorTable[];
 extern s32 lbl_80478990;
-extern void fn_800A1BB4(void* val);
-#if 0
+extern void fn_800A1BB4(void);
+#if 1
 asm void fn_800A19CC(void) {
 #include "src/dolphin/os/OSThread_fn_800A19CC.inc"
 }
 #else
-BOOL fn_800A19CC(OSThread* thread, void* (*func)(void*), void* param,
-                 void* stack, u32 stackSize, s32 priority, u16 attr) {
-    BOOL enabled;
-    u32 sp;
-    u32* fp;
-    u32* ps;
-    s32 i;
-    OSThread* active;
-
-    if ((priority < 0) || (priority > 31)) {
-        return FALSE;
-    }
-
-    thread->state = 1;
-    thread->attr = attr & 1;
-    sp = (u32)stack & ~7;
-    thread->base = priority;
-    thread->priority = priority;
-    thread->suspend = 1;
-    thread->val = (u32)-1;
-    thread->queueMutex.head = NULL;
-    thread->queueJoin.tail = NULL;
-    thread->queueJoin.head = NULL;
-    thread->mutex = NULL;
-    thread->queueMutex.tail = NULL;
-    ((u32*)sp)[-2] = 0;
-    ((u32*)sp)[-1] = 0;
-    OSInitContext(&thread->context, (u32)func, sp - 8);
-    thread->context.lr = (u32)fn_800A1BB4;
-    thread->context.gpr[3] = (u32)param;
-    thread->stackBase = (u32*)stack;
-    thread->stackEnd = (u32*)((u32)stack - stackSize);
-    *thread->stackEnd = 0xDEADBABE;
-    *(u32*)((u8*)thread + 0x30C) = 0;
-    *(u32*)((u8*)thread + 0x310) = 0;
-    *(u32*)((u8*)thread + 0x314) = 0;
-
-    enabled = OSDisableInterrupts();
-    if (__OSErrorTable[OS_ERROR_FPE] != NULL) {
-        thread->context.srr1 |= 0x900;
-        thread->context.state |= OS_CONTEXT_STATE_FPSAVED;
-        *(u32*)((u8*)thread + 0x194) = (lbl_80478990 & 0xF8) | 4;
-
-        fp = (u32*)((u8*)thread + 0x90);
-        ps = (u32*)((u8*)thread + 0x1C8);
-        for (i = 0; i < 4; i++) {
-            fp[1] = (u32)-1;
-            fp[0] = (u32)-1;
-            ps[1] = (u32)-1;
-            ps[0] = (u32)-1;
-            fp[3] = (u32)-1;
-            fp[2] = (u32)-1;
-            ps[3] = (u32)-1;
-            ps[2] = (u32)-1;
-            fp[5] = (u32)-1;
-            fp[4] = (u32)-1;
-            ps[5] = (u32)-1;
-            ps[4] = (u32)-1;
-            fp[7] = (u32)-1;
-            fp[6] = (u32)-1;
-            ps[7] = (u32)-1;
-            ps[6] = (u32)-1;
-            fp[9] = (u32)-1;
-            fp[8] = (u32)-1;
-            ps[9] = (u32)-1;
-            ps[8] = (u32)-1;
-            fp[11] = (u32)-1;
-            fp[10] = (u32)-1;
-            ps[11] = (u32)-1;
-            ps[10] = (u32)-1;
-            fp[13] = (u32)-1;
-            fp[12] = (u32)-1;
-            ps[13] = (u32)-1;
-            ps[12] = (u32)-1;
-            fp[15] = (u32)-1;
-            fp[14] = (u32)-1;
-            ps[15] = (u32)-1;
-            ps[14] = (u32)-1;
-            fp += 16;
-            ps += 16;
-        }
-    }
-
-    active = __OSActiveThreadQueue->tail;
-    if (active == NULL) {
-        __OSActiveThreadQueue->head = thread;
-    } else {
-        active->linkActive.next = thread;
-    }
-    thread->linkActive.prev = active;
-    thread->linkActive.next = NULL;
-    __OSActiveThreadQueue->tail = thread;
-    OSRestoreInterrupts(enabled);
-    return TRUE;
-}
+void fn_800A19CC(void) { /* TODO */ }
 #endif
 
 void OSYieldThread(void) {
@@ -635,82 +541,12 @@ BOOL fn_800A1E54(OSThread* thread, void* val) {
 #else
 void fn_800A1E54(void) { /* TODO */ }
 #endif
-#if 0
+#if 1
 asm void fn_800A1F94(void) {
 #include "src/dolphin/os/OSThread_fn_800A1F94.inc"
 }
 #else
-s32 fn_800A1F94(OSThread* thread) {
-    BOOL enabled;
-    s32 suspendCount;
-
-    enabled = OSDisableInterrupts();
-    suspendCount = thread->suspend--;
-    if (thread->suspend < 0) {
-        thread->suspend = 0;
-    } else if (thread->suspend == 0) {
-        switch (thread->state) {
-            case 1: {
-                OSMutex* mutex;
-                s32 priority;
-
-                priority = thread->base;
-                for (mutex = thread->queueMutex.head; mutex != NULL; mutex = mutex->link.next) {
-                    OSThread* blocked = mutex->queue.head;
-                    if (blocked != NULL && blocked->priority < priority) {
-                        priority = blocked->priority;
-                    }
-                }
-
-                thread->priority = priority;
-                thread->queue = &RunQueue_803FB898[thread->priority];
-                ENQUEUE_THREAD(thread, thread->queue, link);
-                RunQueueBits_8047A760 |= 1 << (31 - thread->priority);
-                RunQueueHint_8047A764 = 1;
-                break;
-            }
-
-            case 4: {
-                OSMutex* mutex;
-                s32 priority;
-
-                DEQUEUE_THREAD(thread, thread->queue, link);
-                priority = thread->base;
-                for (mutex = thread->queueMutex.head; mutex != NULL; mutex = mutex->link.next) {
-                    OSThread* blocked = mutex->queue.head;
-                    if (blocked != NULL && blocked->priority < priority) {
-                        priority = blocked->priority;
-                    }
-                }
-
-                thread->priority = priority;
-                ENQUEUE_THREAD_PRIO(thread, thread->queue, link);
-                if (thread->mutex != NULL) {
-                    OSThread* owner = thread->mutex->thread;
-                    do {
-                        s32 effective;
-
-                        if (owner->suspend > 0) {
-                            break;
-                        }
-                        effective = fn_800A14EC(owner);
-                        if (owner->priority == effective) {
-                            break;
-                        }
-                        owner = fn_800A1528(owner, effective);
-                    } while (owner != NULL);
-                }
-                break;
-            }
-        }
-
-        if (RunQueueHint_8047A764 != 0) {
-            SelectThread(0);
-        }
-    }
-    OSRestoreInterrupts(enabled);
-    return suspendCount;
-}
+void fn_800A1F94(void) { /* TODO */ }
 #endif
 #if 1
 s32 fn_800A221C(OSThread* thread) {
@@ -1204,36 +1040,13 @@ s32 fn_800A14EC(OSThread* thread) {
     return priority;
 }
 #endif
-#if 0
+#if 1
 asm OSThread* fn_800A1528(OSThread* thread, s32 priority) {
 #include "src/dolphin/os/OSThread_fn_800A1528.inc"
 }
 #else
 OSThread* fn_800A1528(OSThread* thread, s32 priority) {
-    switch (thread->state) {
-        case 1:
-            fn_800A1484(thread);
-            thread->priority = priority;
-            thread->queue = &RunQueue_803FB898[thread->priority];
-            ENQUEUE_THREAD(thread, thread->queue, link);
-            RunQueueBits_8047A760 |= 1 << (31 - thread->priority);
-            RunQueueHint_8047A764 = 1;
-            break;
-
-        case 4:
-            DEQUEUE_THREAD(thread, thread->queue, link);
-            thread->priority = priority;
-            ENQUEUE_THREAD_PRIO(thread, thread->queue, link);
-            if (thread->mutex != NULL) {
-                return thread->mutex->thread;
-            }
-            break;
-
-        case 2:
-            RunQueueHint_8047A764 = 1;
-            thread->priority = priority;
-            break;
-    }
+    /* TODO: match -- SetEffectivePriority duplicate at 0x800A1528 */
     return NULL;
 }
 #endif
@@ -1254,7 +1067,7 @@ void fn_800A16E8(OSThread* thread, s32 priority) {
 #endif
 #pragma pop
 extern void fn_8009F958(OSThread* thread);
-#if 0
+#if 1
 asm void fn_800A1BB4(void) {
 #include "src/dolphin/os/OSThread_fn_800A1BB4.inc"
 }
@@ -1268,20 +1081,7 @@ void fn_800A1BB4(void* val) {
 
     OSClearContext(&thread->context);
     if (thread->attr & 1) {
-        OSThread* next = thread->linkActive.next;
-        OSThread* prev = thread->linkActive.prev;
-
-        if (next == NULL) {
-            __OSActiveThreadQueue->tail = prev;
-        } else {
-            next->linkActive.prev = prev;
-        }
-
-        if (prev == NULL) {
-            __OSActiveThreadQueue->head = next;
-        } else {
-            prev->linkActive.next = next;
-        }
+        DEQUEUE_THREAD(thread, __OSActiveThreadQueue, linkActive);
         thread->state = 0;
     } else {
         thread->state = 8;
