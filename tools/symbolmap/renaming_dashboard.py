@@ -3059,6 +3059,15 @@ def load_buckets() -> dict:
         if not isinstance(v, dict):
             continue
         b = v.get("bucket")
+        # LIVE re-bucketing of wins: a fn with a band_wins record is a byte-exact 100%
+        # real-C win, so it belongs in DONE even when the ledger's stored bucket (which
+        # only refreshes on a full `wall_ledger.py build`) still lists it under its
+        # pre-win bucket. Without this the DONE count freezes between rebuilds and the
+        # hundreds of already-won fns look permanently stuck in NEARWALL/STRUCT/LOW, which
+        # reads as "the buckets never update". Recomputed every poll, so a new win lands on
+        # the dashboard within one poll of its band_wins file appearing.
+        if fn in saved and b in agg and b not in ("DONE", "EQUIV"):
+            b = "DONE"
         if b in agg:
             agg[b]["total"] += 1
             if v.get("attempted") or fn in saved or fn in reground:
