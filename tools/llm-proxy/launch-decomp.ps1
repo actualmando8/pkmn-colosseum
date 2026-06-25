@@ -189,12 +189,12 @@ if (-not $DryRun) {
   [System.IO.File]::WriteAllText($reg, $regBody + "`n")
   Write-Host "Wrote control registry: $reg" -ForegroundColor DarkGray
 
-  # Seed the fleet lane list so the driver feeds OPUS + SONNET + the 2 Codex lanes on
-  # boot. Without this, fleet_driver defaults to just "OPUS SON" and C3/C4 sit idle.
+  # Seed the fleet lane list so the driver feeds OPUS + SONNET + GLM + the 2 Codex lanes
+  # on boot. Without this, fleet_driver defaults to just "OPUS SON" and the rest sit idle.
   $lanesFile = Join-Path $repo 'build\fleet_lanes.txt'
   New-Item -ItemType Directory -Force -Path (Split-Path $lanesFile) | Out-Null
-  [System.IO.File]::WriteAllText($lanesFile, "OPUS SON C3 C4`n")
-  Write-Host "Wrote fleet lanes: OPUS SON C3 C4" -ForegroundColor DarkGray
+  [System.IO.File]::WriteAllText($lanesFile, "OPUS SON GLM C3 C4`n")
+  Write-Host "Wrote fleet lanes: OPUS SON GLM C3 C4" -ForegroundColor DarkGray
 }
 
 # auto-start the decomp fleet driver once the agents have booted. fleet_up.ps1 brings up
