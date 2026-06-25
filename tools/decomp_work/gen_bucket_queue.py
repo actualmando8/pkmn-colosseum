@@ -195,6 +195,23 @@ def main():
     active = None
     lines = []
     seen = set()
+    # Pinned targets (build/pin_queue.txt) are forced to the FRONT of the crack queue
+    # regardless of bucket / attempted / reground state, so an operator can task the fleet
+    # on specific closeouts. Picked first as lanes go idle (never interrupting an in-flight
+    # task). Format per line: "src/file.c fn_X [fn_Y ...]"; '#' / blank lines ignored.
+    n_pin = 0
+    pin_path = os.path.join(ROOT, "build", "pin_queue.txt")
+    if os.path.exists(pin_path):
+        for ln in open(pin_path, encoding="utf-8", errors="replace"):
+            ln = ln.strip()
+            if not ln or ln.startswith("#"):
+                continue
+            parts = ln.split()
+            if len(parts) < 2 or parts[0] in seen:
+                continue
+            seen.add(parts[0])
+            lines.append(ln)
+            n_pin += 1
     total_fresh = 0
     for bucket in PRIORITY:
         bf = fresh_by_file(led, bucket)
@@ -212,17 +229,18 @@ def main():
             lines.append(src + " " + " ".join(names))
         if len(lines) >= MIN_FILES:
             break   # enough files to feed the lanes; current bucket is prioritized at the top
-    if not active:
+    if not active and not lines:
         open(QUEUE, "w").write("")
         print(f"ALL-BUCKETS-COMPLETE (crack queue empty; asm_queue files={asm_n}; sonnet_queue files={son_n})")
         return
     open(QUEUE, "w").write("\n".join(lines) + "\n")
-    marker = os.path.join(ROOT, "build", ".active_bucket")
-    prev = open(marker).read().strip() if os.path.exists(marker) else ""
-    if prev != active:
-        open(ASSIGNED, "w").write("")
-        open(marker, "w").write(active)
-    print(f"ACTIVE-BUCKET={active} files={len(lines)} | asm_queue files={asm_n} | sonnet_queue files={son_n}")
+    if active:
+        marker = os.path.join(ROOT, "build", ".active_bucket")
+        prev = open(marker).read().strip() if os.path.exists(marker) else ""
+        if prev != active:
+            open(ASSIGNED, "w").write("")
+            open(marker, "w").write(active)
+    print(f"ACTIVE-BUCKET={active or 'PINS-ONLY'} files={len(lines)} pins={n_pin} | asm_queue files={asm_n} | sonnet_queue files={son_n}")
 
 
 if __name__ == "__main__":
