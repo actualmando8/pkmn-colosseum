@@ -1094,10 +1094,149 @@ def update_fn_history(decomp: dict[str, object]) -> None:
         _write_json_obj(FN_HISTORY_FILE, store)
 
 
+# --- Phase 3: journal-window token attribution -------------------------------
+# Footer scraping is lossy (narrow panes truncate claude's in/out) and absent for
+# codex (its TUI shows duration, not tokens). The accurate source is each agent's
+# session journal, which records exact per-message token usage + timestamps. Each
+# journal FILE belongs to one lane — identifiable by the dispatch marker pane_io
+# sends ("Read build/dispatch/<LANE>.task ..."). So a ledger row's [tstart, ts]
+# window summed over that lane's journal gives accurate per-task tokens.
+_JFILE_LANE_CACHE: dict[str, tuple[int, str]] = {}
+_DISPATCH_MARKER = re.compile(r"dispatch/([A-Za-z0-9]+)\.task")
+
+
+def _journal_file_lane(path: Path) -> str:
+    """Which lane owns this journal file (via the dispatch-command marker). Cached
+    by (path, size); files only grow so size is a sufficient invalidation key."""
+    try:
+        size = path.stat().st_size
+    except OSError:
+        return ""
+    key = str(path)
+    cached = _JFILE_LANE_CACHE.get(key)
+    if cached and cached[0] == size:
+        return cached[1]
+    lane = ""
+    try:
+        with open(path, encoding="utf-8", errors="replace") as fh:
+            for line in fh:
+                if "dispatch/" not in line:
+                    continue
+                m = _DISPATCH_MARKER.search(line)
+                if m:
+                    lane = m.group(1)
+                    break
+    except OSError:
+        lane = ""
+    _JFILE_LANE_CACHE[key] = (size, lane)
+    return lane
+
+
+def _claude_glm_window(root: Path, lane: str, t0: float, t1: float,
+                       lane_filter: bool = True) -> tuple[int, int]:
+    """Sum input+output tokens from a Claude-format journal (Claude or GLM) over
+    [t0, t1]. lane_filter restricts to the lane's files via the dispatch marker —
+    needed when lanes share a config dir (OPUS/SON in ~/.claude); skip it for the
+    single-lane GLM dir (~/.claude-glm has no dispatch marker and one owner)."""
+    tin = tout = 0
+    if not root.exists():
+        return (0, 0)
+    for path in root.rglob("*.jsonl"):
+        try:
+            if path.stat().st_mtime < t0:
+                continue
+        except OSError:
+            continue
+        if lane_filter and _journal_file_lane(path) != lane:
+            continue
+        try:
+            with open(path, encoding="utf-8", errors="replace") as fh:
+                for line in fh:
+                    if '"usage"' not in line:
+                        continue
+                    try:
+                        d = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    msg = d.get("message")
+                    if not isinstance(msg, dict):
+                        continue
+                    u = msg.get("usage")
+                    if not isinstance(u, dict):
+                        continue
+                    ts = _parse_iso(d.get("timestamp"))
+                    if not ts or ts < t0 or ts > t1:
+                        continue
+                    tin += int_value(u.get("input_tokens"))
+                    tout += int_value(u.get("output_tokens"))
+        except OSError:
+            continue
+    return (tin, tout)
+
+
+def _codex_window(lane: str, t0: float, t1: float) -> tuple[int, int]:
+    """Sum codex tokens for the lane's rollout files over [t0, t1]. Per turn the
+    billable count is output + (input - cached_input), excluding the reused context."""
+    tin = tout = 0
+    if not CODEX_SESSIONS_DIR.exists():
+        return (0, 0)
+    for path in CODEX_SESSIONS_DIR.rglob("*.jsonl"):
+        try:
+            if path.stat().st_mtime < t0 - 86400:
+                continue
+        except OSError:
+            continue
+        if _journal_file_lane(path) != lane:
+            continue
+        try:
+            with open(path, encoding="utf-8", errors="replace") as fh:
+                for line in fh:
+                    if '"last_token_usage"' not in line:
+                        continue
+                    try:
+                        d = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    payload = d.get("payload")
+                    if not isinstance(payload, dict):
+                        continue
+                    info = payload.get("info")
+                    if not isinstance(info, dict):
+                        continue
+                    u = info.get("last_token_usage")
+                    if not isinstance(u, dict):
+                        continue
+                    ts = _parse_iso(d.get("timestamp"))
+                    if not ts or ts < t0 or ts > t1:
+                        continue
+                    inp = int_value(u.get("input_tokens"))
+                    cached = int_value(u.get("cached_input_tokens"))
+                    tin += max(0, inp - cached)
+                    tout += int_value(u.get("output_tokens"))
+        except OSError:
+            continue
+    return (tin, tout)
+
+
+def journal_window_tokens(provider: str, lane: str, t0: float, t1: float) -> tuple[int, int]:
+    """Accurate (in, out) tokens for a task's [t0, t1] window from the lane's journal."""
+    if t0 <= 0 or t1 <= 0 or t1 < t0 or not lane:
+        return (0, 0)
+    if provider == "claude":
+        return _claude_glm_window(CLAUDE_PROJECT_DIR, lane, t0, t1, lane_filter=True)
+    if provider == "glm":
+        return _claude_glm_window(GLM_PROJECT_DIR, lane, t0, t1, lane_filter=False)
+    if provider == "codex":
+        return _codex_window(lane, t0, t1)
+    return (0, 0)
+
+
 def update_fn_token_history() -> None:
     """Fold newly-appended rows of the pane_io token ledger (FN_TOKEN_LEDGER) into a
     per-function token time-series. Offset-tracked so each row is ingested once; resets
-    if the ledger is rotated/truncated. Each fn keeps the last FN_TOKEN_HISTORY_CAP rows."""
+    if the ledger is rotated/truncated. Each fn keeps the last FN_TOKEN_HISTORY_CAP rows.
+    Token counts come from the lane's journal over [tstart, ts] (accurate), falling back
+    to the row's footer counts when the journal join yields nothing."""
     try:
         if not FN_TOKEN_LEDGER.exists():
             return
@@ -1130,9 +1269,17 @@ def update_fn_token_history() -> None:
         except json.JSONDecodeError:
             continue
         ts = int_value(r.get("ts"))
+        tstart = int_value(r.get("tstart"))
         prov = str(r.get("provider") or "")
+        lane = str(r.get("lane") or "")
         tin = int_value(r.get("tokens_in"))
         tout = int_value(r.get("tokens_out"))
+        src = "footer"
+        # Prefer accurate journal-window tokens; fall back to footer counts.
+        if tstart > 0:
+            jin, jout = journal_window_tokens(prov, lane, tstart, ts)
+            if jin + jout > 0:
+                tin, tout, src = jin, jout, "journal"
         row_fns = r.get("fns") if isinstance(r.get("fns"), list) else []
         for fn in row_fns:
             fn = str(fn)
@@ -1142,7 +1289,7 @@ def update_fn_token_history() -> None:
             if not isinstance(rows, list):
                 rows = []
             rows.append({"unix": ts, "provider": prov, "in": tin, "out": tout,
-                         "tag": r.get("tag", ""), "file": r.get("file", "")})
+                         "src": src, "tag": r.get("tag", ""), "file": r.get("file", "")})
             fns[fn] = rows[-FN_TOKEN_HISTORY_CAP:]
             dirty = True
     store["fns"] = fns
@@ -9116,7 +9263,8 @@ HTML = r"""<!doctype html>
           if (!rows.length) { td.innerHTML = '<span class="muted">no history</span>'; return; }
           td.innerHTML = rows.map(r => {
             const t = r.unix ? new Date(r.unix * 1000).toLocaleString() : "?";
-            return `<span class="muted" style="margin-right:14px">${t} · ${r.provider} · in ${fmtTok(r.in)} / out ${fmtTok(r.out)}</span>`;
+            const srcTag = r.src === "footer" ? ' <span style="color:#7a5">~footer</span>' : "";
+            return `<span class="muted" style="margin-right:14px">${t} · ${r.provider} · in ${fmtTok(r.in)} / out ${fmtTok(r.out)}${srcTag}</span>`;
           }).join("");
         }).catch(() => {});
     }
