@@ -85,6 +85,12 @@ BAD = ("effect_util", "hsd_", "ui_core", "fsys_file", "gs_material", "pokemon", 
 # W-SDA-WRAPPER TUs (hsd_*) and the 3 WIP files auto_gate never commits. Everything else
 # (ui_core, effect_util, gs_material, pokemon, ...) is valid from-scratch ASM work.
 ASM_BAD = ("hsd_", "fsys_file", "gs_pokemon_summary")
+# For the RESHAPE queue (LOW <70% real-C DRAFTS that need structural rework, not near-miss
+# CRACK levers) exclude only the genuinely un-decompilable: effect_util (band-unmeasurable —
+# its .inc overflows the harness) and hsd_ (W-SDA-WRAPPER). The mega-Ghidra LOW drafts
+# (colosseum_battle, gba_misc, gs_material, ...) ARE the target here — the crack rebatcher
+# punts on them, so they get from-scratch m2c-draft reshape packets instead.
+RESHAPE_BAD = ("effect_util", "hsd_")
 # Goal order for the CRACK queue (wall_queue.txt). ASM is intentionally NOT here:
 # asm-wrappers have no real C to "crack" — they need from-scratch decomp (scratch mode), so
 # they go to build/asm_queue.txt via write_asm_queue(), not the crack queue. wall_queue holds
@@ -140,6 +146,32 @@ def write_asm_queue(led):
     return len(lines)
 
 
+def write_reshape_queue(led):
+    """Emit build/reshape_queue.txt — LOW (<70%) real-C DRAFTS that need STRUCTURAL reshape
+    (m2c-draft -> faithful real C: correct control-flow / types / signature), NOT near-miss
+    CRACK levers. These are the mega-Ghidra-import drafts (colosseum_battle, gba_misc,
+    gs_material, ...) the crack rebatcher punts on (it tries reg-coloring/decl-order levers on
+    fns that need a whole reshape). Fresh LOW only (not attempted / SAVED / reground /
+    RESHAPE_BAD-unmeasurable), grouped by file, MOST-fns-first so a TU gets closed out."""
+    bf = defaultdict(list)
+    for fn, v in led.items():
+        if v["attempted"] or v["bucket"] != "LOW":
+            continue
+        if fn in SAVED or fn in REGROUND:
+            continue
+        if any(b in v["file"] for b in RESHAPE_BAD):
+            continue
+        src = "src/" + v["file"] + ".c"
+        if os.path.exists(os.path.join(ROOT, src)):
+            bf[src].append((v.get("size", 0), fn))
+    lines = []
+    for src, fns in sorted(bf.items(), key=lambda kv: -len(kv[1])):
+        names = [fn for _, fn in sorted(fns, reverse=True)][:6]
+        lines.append(src + " " + " ".join(names))
+    open(os.path.join(ROOT, "build", "reshape_queue.txt"), "w").write("\n".join(lines) + "\n")
+    return len(lines)
+
+
 # Need enough DISTINCT files to feed every lane (band locks per-file = one lane per
 # file). With ~14 lanes a single concentrated bucket (e.g. STRUCT in 2 files) would
 # starve most lanes, so we fill the queue with the current bucket's files FIRST and
@@ -192,9 +224,31 @@ def main():
     led = json.load(open(LED))
     asm_n = write_asm_queue(led)   # keep the from-scratch (scratch-mode) queue fresh each cycle
     son_n = write_sonnet_queue(led)   # small-fn queue for the Sonnet/Haiku lanes
+    rs_n = write_reshape_queue(led)   # LOW real-C drafts needing structural reshape (reshape mode)
     active = None
     lines = []
     seen = set()
+    # Pinned targets (build/pin_queue.txt) are forced to the FRONT of the crack queue
+    # regardless of bucket / attempted / reground state, so an operator can task the fleet
+    # on specific closeouts. Picked first as lanes go idle (never interrupting an in-flight
+    # task). Format per line: "src/file.c fn_X [fn_Y ...]"; '#' / blank lines ignored.
+    n_pin = 0
+    pin_path = os.path.join(ROOT, "build", "pin_queue.txt")
+    if os.path.exists(pin_path):
+        for ln in open(pin_path, encoding="utf-8", errors="replace"):
+            ln = ln.strip()
+            if not ln or ln.startswith("#"):
+                continue
+            parts = ln.split()
+            if len(parts) < 2 or parts[0] in seen:
+                continue
+            seen.add(parts[0])
+            lines.append(ln)
+            n_pin += 1
+    # TU-focus (build/.low_focus): order the LOW bucket FEWEST-fresh-fns-first so the
+    # fleet closes out near-finished TUs one at a time (the queue auto-advances as a TU's
+    # fns get SAVED and drop out of fresh_by_file). Other buckets keep highest-quality-first.
+    low_focus = os.path.exists(os.path.join(ROOT, "build", ".low_focus"))
     total_fresh = 0
     for bucket in PRIORITY:
         bf = fresh_by_file(led, bucket)
@@ -204,7 +258,11 @@ def main():
         if active is None:
             active = bucket
         total_fresh += nfn
-        for src, fns in sorted(bf.items(), key=lambda kv: (-max(f[0] for f in kv[1]), -len(kv[1]))):
+        if low_focus and bucket == "LOW":
+            order = sorted(bf.items(), key=lambda kv: (len(kv[1]), -max(f[0] for f in kv[1])))
+        else:
+            order = sorted(bf.items(), key=lambda kv: (-max(f[0] for f in kv[1]), -len(kv[1])))
+        for src, fns in order:
             if src in seen:
                 continue
             seen.add(src)
@@ -212,17 +270,18 @@ def main():
             lines.append(src + " " + " ".join(names))
         if len(lines) >= MIN_FILES:
             break   # enough files to feed the lanes; current bucket is prioritized at the top
-    if not active:
+    if not active and not lines:
         open(QUEUE, "w").write("")
         print(f"ALL-BUCKETS-COMPLETE (crack queue empty; asm_queue files={asm_n}; sonnet_queue files={son_n})")
         return
     open(QUEUE, "w").write("\n".join(lines) + "\n")
-    marker = os.path.join(ROOT, "build", ".active_bucket")
-    prev = open(marker).read().strip() if os.path.exists(marker) else ""
-    if prev != active:
-        open(ASSIGNED, "w").write("")
-        open(marker, "w").write(active)
-    print(f"ACTIVE-BUCKET={active} files={len(lines)} | asm_queue files={asm_n} | sonnet_queue files={son_n}")
+    if active:
+        marker = os.path.join(ROOT, "build", ".active_bucket")
+        prev = open(marker).read().strip() if os.path.exists(marker) else ""
+        if prev != active:
+            open(ASSIGNED, "w").write("")
+            open(marker, "w").write(active)
+    print(f"ACTIVE-BUCKET={active or 'PINS-ONLY'} files={len(lines)} pins={n_pin}{' low-focus' if low_focus else ''} | asm_queue files={asm_n} | sonnet_queue files={son_n} | reshape_queue files={rs_n}")
 
 
 if __name__ == "__main__":

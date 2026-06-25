@@ -86,6 +86,8 @@ def _lock_renew_file(tag, src_rel):
         pass
 
 WINS = ROOT / "build" / "band_wins"
+NEARMISS = ROOT / "build" / "band_nearmiss"   # real-C near-misses (banked, fed to permuter)
+BANK_FLOOR = 90.0                              # min pct to bank a near-miss
 SCRATCH = ROOT / "tools" / "decomp_work" / "scratch"
 
 # Tool resolution is platform-aware so the SAME harness runs on the Windows
@@ -195,6 +197,14 @@ def _rows(tag, st):
         kind = s.get("kind")
         if kind is None or kind == "SYMBOL_FUNCTION":
             rows[s["name"]] = float(s.get("match_percent") or 0.0)
+    # FRESH source-of-truth: record every measurement so the dashboard/queues read the
+    # latest pct instead of the periodically-rebuilt (stale) ledger/report.json. Wrapped
+    # so a measure_db hiccup can NEVER break a measurement. Skips build/ integrate temps.
+    try:
+        import measure_db
+        measure_db.record(st.get("src", ""), rows, st.get("compiler", ""))
+    except Exception:
+        pass
     return rows
 
 
@@ -344,8 +354,8 @@ def _extract(tag, fn):
     with any governing peephole/scheduling 'off' pragma + its 'on' restore so the win
     holds after integration (band save otherwise strips the pragma -> win drops)."""
     raw = scratch_c(tag).read_bytes().decode("utf-8", errors="replace")
-    nl = "\r\n" if "\r\n" in raw else "\n"
-    lines = raw.split(nl)
+    nl = cs_splice.detect_newline(raw)
+    lines = raw.splitlines()
     span = cs_splice.find_def_span(lines, fn)
     if span is None or isinstance(span, list):
         return None
@@ -400,6 +410,73 @@ def cmd_save(tag, fns):
         print(f"REJECTED (not 100%): {'; '.join(rejected)}")
     nfn = len([k for k in data if not k.startswith("_")])
     print(f"wins file now holds {nfn} fn(s): {out.relative_to(ROOT)}")
+
+
+def cmd_bank(tag, fns):
+    """Persist real-C NEAR-MISS (BANK_FLOOR <= pct < 100) fn bodies to
+    build/band_nearmiss/<tag>.json. Unlike `save` (100%-only), this captures the
+    close-but-not-exact real C that would otherwise be DISCARDED when the scratch is
+    reused — so band_integrate --bank can splice the improvement into canon (strict
+    no-regress) and the permuter (refill_queue) can finish the last 1-10%. Records the
+    measured pct per fn so the integrator can enforce no-regress vs committed src."""
+    if not fns:
+        sys.exit("usage: band.py bank <tag> <fn> [<fn> ...]")
+    st = compile_band(tag)
+    rows = _rows(tag, st)
+    NEARMISS.mkdir(parents=True, exist_ok=True)
+    out = NEARMISS / f"{tag}.json"
+    data = {}
+    if out.exists():
+        try:
+            data = json.loads(out.read_text(encoding="utf-8"))
+        except ValueError:
+            data = {}
+    banked, rejected = [], []
+    for fn in fns:
+        pct = rows.get(fn)
+        if pct is None:
+            rejected.append(f"{fn} (NOT FOUND)")
+            continue
+        if pct >= 100.0 - 1e-6:
+            rejected.append(f"{fn} ({pct:.2f}% — use `save`)")
+            continue
+        if pct < BANK_FLOOR:
+            rejected.append(f"{fn} ({pct:.2f}% < {BANK_FLOOR:.0f}% floor)")
+            continue
+        body = _extract(tag, fn)
+        if not body:
+            rejected.append(f"{fn} (EXTRACT FAILED)")
+            continue
+        data[fn] = body
+        data.setdefault("_srcs", {})[fn] = st["src"]
+        data.setdefault("_pct", {})[fn] = round(pct, 4)
+        banked.append(f"{fn} ({pct:.2f}%)")
+    data["_src"] = st["src"]
+    out.write_bytes(json.dumps(data, indent=1).encode("utf-8"))
+    print(f"BANKED {len(banked)}: {' '.join(banked) if banked else '-'}")
+    if rejected:
+        print(f"REJECTED: {'; '.join(rejected)}")
+    nfn = len([k for k in data if not k.startswith("_")])
+    print(f"near-miss bank now holds {nfn} fn(s): {out.relative_to(ROOT)}")
+
+
+def cmd_bank_file(tag):
+    """Snapshot the WHOLE scratch file into build/band_nearmiss/<tag>.file.c (+ .src).
+    For RESHAPE near-misses whose gains span the file (added file-scope externs / helper
+    types / sibling edits), a single-fn splice loses that context and collapses; the whole
+    file must move together. bank_nearmiss.py --files later re-measures the snapshot vs canon
+    and commits it ONLY if every fn is no-regress (so a stale snapshot that would revert a
+    concurrent change is caught) and at least one fn improves. Cheap: just copies the file."""
+    st = load_state(tag)
+    sc = scratch_c(tag)
+    if not sc.exists():
+        sys.exit(f"scratch file missing for {tag}; run band.py init {tag} {st.get('src','<src>')} first")
+    NEARMISS.mkdir(parents=True, exist_ok=True)
+    snap = NEARMISS / f"{tag}.file.c"
+    snap.write_bytes(sc.read_bytes())
+    (NEARMISS / f"{tag}.file.src").write_text(st["src"], encoding="utf-8")
+    print(f"FILE-BANKED snapshot: {snap.relative_to(ROOT)} (src {st['src']})")
+    print("bank_nearmiss.py --files will no-regress-verify the whole file and commit if it holds")
 
 
 def cmd_diff(tag, fn):
@@ -565,6 +642,10 @@ def main():
         cmd_json(tag)
     elif cmd == "save":
         cmd_save(tag, sys.argv[3:])
+    elif cmd == "bank":
+        cmd_bank(tag, sys.argv[3:])
+    elif cmd == "bank-file":
+        cmd_bank_file(tag)
     elif cmd == "diff":
         if len(sys.argv) < 4:
             sys.exit("usage: band.py diff <tag> <fn>")

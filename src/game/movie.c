@@ -724,4 +724,3 @@ asm void fn_800366A8(void) {
 #else
 void fn_800366A8(void) { /* TODO */ }
 #endif
-

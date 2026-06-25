@@ -45,6 +45,7 @@ TMUX_CONTROL = DECOMP_WORK / "tmux_control"
 LOCKS_DB = Path(os.environ.get("DECOMP_LOCKS_DB", COORD_DIR / "locks.db"))
 AGENT_TOKENS_JSON = ROOT / ".omc" / "agent_tokens.json"
 AGENT_LIMITS_JSON = DECOMP_WORK / "agent_limits.json"
+PROXY_USAGE_LIMITS_JSON = ROOT / "tools" / "llm-proxy" / "usage_limits.json"
 OPENCODE_STORAGE = Path(
     os.environ.get(
         "OPENCODE_STORAGE",
@@ -54,6 +55,12 @@ OPENCODE_STORAGE = Path(
 HISTORY_FILE = ROOT / ".omx" / "state" / "renaming_dashboard_history.json"
 UNIT_HISTORY_FILE = ROOT / ".omx" / "state" / "renaming_dashboard_unit_history.json"
 FN_HISTORY_FILE = ROOT / ".omx" / "state" / "renaming_dashboard_fn_history.json"
+# Per-function token ledger (Phase 2): pane_io appends one JSONL row per completed
+# task to FN_TOKEN_LEDGER; update_fn_token_history() folds new rows into a per-fn
+# time-series (offset-tracked so rows are ingested exactly once).
+FN_TOKEN_HISTORY_FILE = ROOT / ".omx" / "state" / "renaming_dashboard_fn_token_history.json"
+FN_TOKEN_LEDGER = ROOT / "build" / "hb" / "token_by_fn.jsonl"
+FN_TOKEN_HISTORY_CAP = 200
 HISTORY_INTERVAL_SECONDS = 60
 # Ring cap for the global match-progress history. Raised from 500 -> 2000 so the
 # months-long git backfill (one row per report.json commit) is not evicted.
@@ -61,11 +68,20 @@ HISTORY_CAP = 2000
 UNIT_HISTORY_CAP = 300
 FN_HISTORY_CAP = 200
 STATE_CACHE_TTL_SECONDS = 1.8
-DASHBOARD_VERSION = 13
+DASHBOARD_VERSION = 15
 # --- v10: token-history collector sources ----------------------------------------
 CLAUDE_PROJECT_DIR = (
     Path.home()
     / ".claude"
+    / "projects"
+    / "C--Users-douglaswhittingham-pkmn-colosseum"
+)
+# GLM runs Claude Code under an isolated config dir (~/.claude-glm) via the proxy,
+# so its session journals (same JSONL `usage` schema) are NOT under ~/.claude — they
+# must be collected separately to attribute GLM tokens.
+GLM_PROJECT_DIR = (
+    Path.home()
+    / ".claude-glm"
     / "projects"
     / "C--Users-douglaswhittingham-pkmn-colosseum"
 )
@@ -1076,6 +1092,250 @@ def update_fn_history(decomp: dict[str, object]) -> None:
             dirty = True
     if dirty:
         _write_json_obj(FN_HISTORY_FILE, store)
+
+
+# --- Phase 3: journal-window token attribution -------------------------------
+# Footer scraping is lossy (narrow panes truncate claude's in/out) and absent for
+# codex (its TUI shows duration, not tokens). The accurate source is each agent's
+# session journal, which records exact per-message token usage + timestamps. Each
+# journal FILE belongs to one lane — identifiable by the dispatch marker pane_io
+# sends ("Read build/dispatch/<LANE>.task ..."). So a ledger row's [tstart, ts]
+# window summed over that lane's journal gives accurate per-task tokens.
+_JFILE_LANE_CACHE: dict[str, tuple[int, str]] = {}
+_DISPATCH_MARKER = re.compile(r"dispatch/([A-Za-z0-9]+)\.task")
+
+
+def _journal_file_lane(path: Path) -> str:
+    """Which lane owns this journal file (via the dispatch-command marker). Cached
+    by (path, size); files only grow so size is a sufficient invalidation key."""
+    try:
+        size = path.stat().st_size
+    except OSError:
+        return ""
+    key = str(path)
+    cached = _JFILE_LANE_CACHE.get(key)
+    if cached and cached[0] == size:
+        return cached[1]
+    lane = ""
+    try:
+        with open(path, encoding="utf-8", errors="replace") as fh:
+            for line in fh:
+                if "dispatch/" not in line:
+                    continue
+                m = _DISPATCH_MARKER.search(line)
+                if m:
+                    lane = m.group(1)
+                    break
+    except OSError:
+        lane = ""
+    _JFILE_LANE_CACHE[key] = (size, lane)
+    return lane
+
+
+def _claude_glm_window(root: Path, lane: str, t0: float, t1: float,
+                       lane_filter: bool = True) -> tuple[int, int]:
+    """Sum input+output tokens from a Claude-format journal (Claude or GLM) over
+    [t0, t1]. lane_filter restricts to the lane's files via the dispatch marker —
+    needed when lanes share a config dir (OPUS/SON in ~/.claude); skip it for the
+    single-lane GLM dir (~/.claude-glm has no dispatch marker and one owner)."""
+    tin = tout = 0
+    if not root.exists():
+        return (0, 0)
+    for path in root.rglob("*.jsonl"):
+        try:
+            if path.stat().st_mtime < t0:
+                continue
+        except OSError:
+            continue
+        if lane_filter and _journal_file_lane(path) != lane:
+            continue
+        try:
+            with open(path, encoding="utf-8", errors="replace") as fh:
+                for line in fh:
+                    if '"usage"' not in line:
+                        continue
+                    try:
+                        d = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    msg = d.get("message")
+                    if not isinstance(msg, dict):
+                        continue
+                    u = msg.get("usage")
+                    if not isinstance(u, dict):
+                        continue
+                    ts = _parse_iso(d.get("timestamp"))
+                    if not ts or ts < t0 or ts > t1:
+                        continue
+                    tin += int_value(u.get("input_tokens"))
+                    tout += int_value(u.get("output_tokens"))
+        except OSError:
+            continue
+    return (tin, tout)
+
+
+def _codex_window(lane: str, t0: float, t1: float) -> tuple[int, int]:
+    """Sum codex tokens for the lane's rollout files over [t0, t1]. Per turn the
+    billable count is output + (input - cached_input), excluding the reused context."""
+    tin = tout = 0
+    if not CODEX_SESSIONS_DIR.exists():
+        return (0, 0)
+    for path in CODEX_SESSIONS_DIR.rglob("*.jsonl"):
+        try:
+            if path.stat().st_mtime < t0 - 86400:
+                continue
+        except OSError:
+            continue
+        if _journal_file_lane(path) != lane:
+            continue
+        try:
+            with open(path, encoding="utf-8", errors="replace") as fh:
+                for line in fh:
+                    if '"last_token_usage"' not in line:
+                        continue
+                    try:
+                        d = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    payload = d.get("payload")
+                    if not isinstance(payload, dict):
+                        continue
+                    info = payload.get("info")
+                    if not isinstance(info, dict):
+                        continue
+                    u = info.get("last_token_usage")
+                    if not isinstance(u, dict):
+                        continue
+                    ts = _parse_iso(d.get("timestamp"))
+                    if not ts or ts < t0 or ts > t1:
+                        continue
+                    inp = int_value(u.get("input_tokens"))
+                    cached = int_value(u.get("cached_input_tokens"))
+                    tin += max(0, inp - cached)
+                    tout += int_value(u.get("output_tokens"))
+        except OSError:
+            continue
+    return (tin, tout)
+
+
+def journal_window_tokens(provider: str, lane: str, t0: float, t1: float) -> tuple[int, int]:
+    """Accurate (in, out) tokens for a task's [t0, t1] window from the lane's journal."""
+    if t0 <= 0 or t1 <= 0 or t1 < t0 or not lane:
+        return (0, 0)
+    if provider == "claude":
+        return _claude_glm_window(CLAUDE_PROJECT_DIR, lane, t0, t1, lane_filter=True)
+    if provider == "glm":
+        return _claude_glm_window(GLM_PROJECT_DIR, lane, t0, t1, lane_filter=False)
+    if provider == "codex":
+        return _codex_window(lane, t0, t1)
+    return (0, 0)
+
+
+def update_fn_token_history() -> None:
+    """Fold newly-appended rows of the pane_io token ledger (FN_TOKEN_LEDGER) into a
+    per-function token time-series. Offset-tracked so each row is ingested once; resets
+    if the ledger is rotated/truncated. Each fn keeps the last FN_TOKEN_HISTORY_CAP rows.
+    Token counts come from the lane's journal over [tstart, ts] (accurate), falling back
+    to the row's footer counts when the journal join yields nothing."""
+    try:
+        if not FN_TOKEN_LEDGER.exists():
+            return
+        size = FN_TOKEN_LEDGER.stat().st_size
+    except OSError:
+        return
+    store = _load_json_obj(FN_TOKEN_HISTORY_FILE)
+    fns = store.get("fns") if isinstance(store.get("fns"), dict) else {}
+    off = int_value(store.get("_offset"))
+    if off > size:
+        off = 0  # ledger rotated/truncated -> re-read from start
+    try:
+        with open(FN_TOKEN_LEDGER, "rb") as fh:
+            fh.seek(off)
+            chunk = fh.read()
+    except OSError:
+        return
+    last_nl = chunk.rfind(b"\n")
+    if last_nl < 0:
+        return  # no complete line yet (mid-write)
+    complete = chunk[:last_nl + 1]
+    new_off = off + len(complete)
+    dirty = False
+    for line in complete.decode("utf-8", "replace").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            r = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        ts = int_value(r.get("ts"))
+        tstart = int_value(r.get("tstart"))
+        prov = str(r.get("provider") or "")
+        lane = str(r.get("lane") or "")
+        tin = int_value(r.get("tokens_in"))
+        tout = int_value(r.get("tokens_out"))
+        src = "footer"
+        # Prefer accurate journal-window tokens; fall back to footer counts.
+        if tstart > 0:
+            jin, jout = journal_window_tokens(prov, lane, tstart, ts)
+            if jin + jout > 0:
+                tin, tout, src = jin, jout, "journal"
+        row_fns = r.get("fns") if isinstance(r.get("fns"), list) else []
+        for fn in row_fns:
+            fn = str(fn)
+            if not fn:
+                continue
+            rows = fns.get(fn)
+            if not isinstance(rows, list):
+                rows = []
+            rows.append({"unix": ts, "provider": prov, "in": tin, "out": tout,
+                         "src": src, "tag": r.get("tag", ""), "file": r.get("file", "")})
+            fns[fn] = rows[-FN_TOKEN_HISTORY_CAP:]
+            dirty = True
+    store["fns"] = fns
+    store["_offset"] = new_off
+    if dirty or new_off != off:
+        _write_json_obj(FN_TOKEN_HISTORY_FILE, store)
+
+
+def load_fn_token_history(name: str) -> dict[str, object]:
+    """Per-function token time-series for one fn (backs /api/history/fn_tokens)."""
+    store = _load_json_obj(FN_TOKEN_HISTORY_FILE)
+    fns = store.get("fns") if isinstance(store.get("fns"), dict) else {}
+    rows = fns.get(name) if isinstance(fns.get(name), list) else []
+    return {"available": bool(rows), "fn": name, "rows": rows}
+
+
+def load_fn_token_summary(limit: int = 100) -> dict[str, object]:
+    """Aggregate per-fn token totals (by provider) for the 'Token spend by function'
+    table — sorted by total tokens desc."""
+    store = _load_json_obj(FN_TOKEN_HISTORY_FILE)
+    fns = store.get("fns") if isinstance(store.get("fns"), dict) else {}
+    out = []
+    for fn, rows in fns.items():
+        if not isinstance(rows, list) or not rows:
+            continue
+        by_prov: dict[str, int] = {}
+        total = 0
+        last_ts = 0
+        tag = ""
+        file = ""
+        for r in rows:
+            prov = str(r.get("provider") or "?")
+            tok = int_value(r.get("in")) + int_value(r.get("out"))
+            by_prov[prov] = by_prov.get(prov, 0) + tok
+            total += tok
+            ts = int_value(r.get("unix"))
+            if ts >= last_ts:
+                last_ts = ts
+                tag = r.get("tag", "") or tag
+                file = r.get("file", "") or file
+        out.append({
+            "fn": fn, "total": total, "by_provider": by_prov,
+            "tasks": len(rows), "last_ts": last_ts, "tag": tag, "file": file,
+        })
+    out.sort(key=lambda x: -x["total"])
+    return {"available": bool(out), "count": len(out), "fns": out[:max(1, limit)]}
 
 
 def load_unit_functions(source: str) -> dict[str, object]:
@@ -2753,6 +3013,50 @@ def load_quantum() -> dict:
     return {"available": True, "state": d, "generated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
 
 
+MEASURE_CACHE = ROOT / "build" / "measure_cache.jsonl"
+
+
+def load_measure_cache():
+    """FRESH per-fn pct from build/measure_cache.jsonl (band.py appends every measurement).
+    Folds the append-only log to the latest line per src. Returns ({fn: pct}, newest_ts).
+    This is the single fresh source that lets buckets reflect reality between the slow
+    `wall_ledger.py build` rebuilds (the staleness that froze the DONE count this session)."""
+    latest = {}
+    try:
+        with open(MEASURE_CACHE, encoding="utf-8", errors="replace") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    rec = json.loads(line)
+                except ValueError:
+                    continue
+                s = rec.get("src")
+                if s and (s not in latest or rec.get("ts", 0) >= latest[s].get("ts", 0)):
+                    latest[s] = rec
+    except OSError:
+        return {}, 0.0
+    fresh, newest = {}, 0.0
+    for rec in latest.values():
+        ts = rec.get("ts", 0.0)
+        newest = max(newest, ts)
+        for fn, pct in (rec.get("pcts") or {}).items():
+            if fn not in fresh or ts >= fresh[fn][1]:
+                fresh[fn] = (float(pct), ts)
+    return {fn: p for fn, (p, _ts) in fresh.items()}, newest
+
+
+def _pct_bucket(p):
+    if p >= 99.95:
+        return "DONE"
+    if p >= 95.0:
+        return "NEARWALL"
+    if p >= 70.0:
+        return "STRUCT"
+    return "LOW"
+
+
 def load_buckets() -> dict:
     """Wall-ledger bucket coverage: per-bucket totals + how many functions we've
     ATTACKED (attempted), for the campaign progress bar chart."""
@@ -2794,11 +3098,29 @@ def load_buckets() -> dict:
             reground = {fn for fn, n in _c.items() if n >= 2}
         except OSError:
             pass
+    fresh, fresh_ts = load_measure_cache()
     agg = {b: {"total": 0, "attempted": 0} for b in order}
     for fn, v in led.items():
         if not isinstance(v, dict):
             continue
         b = v.get("bucket")
+        # LIVE re-bucketing of wins: a fn with a band_wins record is a byte-exact 100%
+        # real-C win, so it belongs in DONE even when the ledger's stored bucket (which
+        # only refreshes on a full `wall_ledger.py build`) still lists it under its
+        # pre-win bucket. Without this the DONE count freezes between rebuilds and
+        # hundreds of already-won fns look stuck in NEARWALL/STRUCT/LOW.
+        if fn in saved and b in agg and b not in ("DONE", "EQUIV"):
+            b = "DONE"
+        elif b in ("NEARWALL", "STRUCT", "LOW") and fn in fresh:
+            # FRESH re-bucket from the measure cache (band.py writes every measurement):
+            # reflect the BEST measured pct (committed OR latest scratch) immediately
+            # instead of waiting for the next ledger rebuild. Up-only (max) so a transient
+            # mid-edit scratch dip never regresses the display; a >=99.95% scratch that is
+            # NOT a confirmed saved win caps at NEARWALL — only a band_win earns DONE, so
+            # unsaved/transient 100%s can't inflate the headline.
+            best = max(float(v.get("pct") or 0.0), fresh[fn])
+            nb = _pct_bucket(best)
+            b = "NEARWALL" if (nb == "DONE" and fn not in saved) else nb
         if b in agg:
             agg[b]["total"] += 1
             if v.get("attempted") or fn in saved or fn in reground:
@@ -2829,6 +3151,8 @@ def load_buckets() -> dict:
         "overall_pct": round(100.0 * done / total, 1) if total else 0.0,
         "match_fns": match_fns, "match_total": match_total,
         "match_pct": round(100.0 * match_fns / match_total, 1) if match_total else 0.0,
+        "measure_fresh_age": round(time.time() - fresh_ts) if fresh_ts else None,
+        "measure_fresh_fns": len(fresh),
         "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
     }
 
@@ -3173,7 +3497,7 @@ def prepare_handoff() -> dict:
 # Aggregated buckets persist to tools/decomp_work/token_history.json so the   #
 # chart survives a source rotating; refreshed by the background auto-loop.    #
 # =========================================================================== #
-SOURCE_KEYS = ("claude", "opencode", "codex")
+SOURCE_KEYS = ("claude", "opencode", "codex", "glm")
 # Model -> chart source bucket. Anything unmatched falls through to "opencode"
 # (every model in the WSL db is an opencode-run worker).
 _OPENCODE_MODEL_TAGS = ("mimo", "deepseek", "glm", "qwen", "kimi", "nemotron")
@@ -3188,6 +3512,7 @@ def _new_bucket() -> dict[str, float]:
     b["claude_cache_read"] = 0.0
     b["codex_cache_read"] = 0.0
     b["codex_events"] = 0.0
+    b["glm_cache_read"] = 0.0
     return b
 
 
@@ -3228,6 +3553,50 @@ def _collect_claude(buckets: dict[int, dict[str, float]], cutoff: float,
                     b["claude"] += inp + out
                     b["claude_cache_read"] += cr
                     by_model[str(msg.get("model") or "?")] += inp + out
+                    total += inp + out
+        except OSError:
+            continue
+    return {"available": total > 0, "files": files, "total": total}
+
+
+def _collect_glm(buckets: dict[int, dict[str, float]], cutoff: float,
+                 by_model: dict[str, float]) -> dict[str, object]:
+    """Same as _collect_claude but for the GLM lane's isolated config dir
+    (~/.claude-glm). GLM is Claude Code pinned to glm-5.2 via the proxy, so its
+    journals use the identical JSONL `usage` schema. Bucketed into the `glm` source."""
+    if not GLM_PROJECT_DIR.exists():
+        return {"available": False, "files": 0, "total": 0,
+                "reason": f"glm dir not found: {GLM_PROJECT_DIR}"}
+    files = 0
+    total = 0
+    for path in GLM_PROJECT_DIR.rglob("*.jsonl"):
+        files += 1
+        try:
+            with open(path, encoding="utf-8", errors="replace") as fh:
+                for line in fh:
+                    if '"usage"' not in line:
+                        continue
+                    try:
+                        d = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    msg = d.get("message")
+                    if not isinstance(msg, dict):
+                        continue
+                    usage = msg.get("usage")
+                    if not isinstance(usage, dict):
+                        continue
+                    ts = _parse_iso(d.get("timestamp"))
+                    if not ts or ts < cutoff:
+                        continue
+                    inp = int(usage.get("input_tokens") or 0)
+                    out = int(usage.get("output_tokens") or 0)
+                    cr = int(usage.get("cache_read_input_tokens") or 0)
+                    hour = int(ts // 3600) * 3600
+                    b = buckets.setdefault(hour, _new_bucket())
+                    b["glm"] += inp + out
+                    b["glm_cache_read"] += cr
+                    by_model[str(msg.get("model") or "glm")] += inp + out
                     total += inp + out
         except OSError:
             continue
@@ -3462,6 +3831,7 @@ def collect_tokens(hours: int = 168) -> dict[str, object]:
     claude_meta = _collect_claude(buckets, cutoff, by_model)
     opencode_meta = _collect_opencode(buckets, cutoff, by_model)
     codex_meta = _collect_codex(buckets, cutoff, by_model)
+    glm_meta = _collect_glm(buckets, cutoff, by_model)
 
     series = []
     for hour in sorted(buckets):
@@ -3469,16 +3839,20 @@ def collect_tokens(hours: int = 168) -> dict[str, object]:
         claude = int(b["claude"])
         opencode = int(b["opencode"])
         codex = int(b["codex"])
+        glm = int(b["glm"])
         codex_ev = int(b["codex_events"])
-        total = claude + opencode + codex
+        total = claude + opencode + codex + glm
         series.append({
             "unix": hour,
-            "by_source": {"claude": claude, "opencode": opencode, "codex": codex},
+            "by_source": {"claude": claude, "opencode": opencode, "codex": codex, "glm": glm},
             "claude": claude,
             "opencode": opencode,
             "codex": codex,
+            "glm": glm,
             "codex_events": codex_ev,
             "cache_read": int(b["claude_cache_read"]),
+            "codex_cache_read": int(b["codex_cache_read"]),
+            "glm_cache_read": int(b["glm_cache_read"]),
             "input": total,   # legacy field for older clients
             "output": 0,
             "total": total,
@@ -3488,11 +3862,13 @@ def collect_tokens(hours: int = 168) -> dict[str, object]:
         "claude": int(claude_meta.get("total", 0)),
         "opencode": int(opencode_meta.get("total", 0)),
         "codex": int(codex_meta.get("total", 0)),
+        "glm": int(glm_meta.get("total", 0)),
         "codex_events": int(codex_meta.get("events", 0)),
         "all_tokens": (
             int(claude_meta.get("total", 0))
             + int(opencode_meta.get("total", 0))
             + int(codex_meta.get("total", 0))
+            + int(glm_meta.get("total", 0))
         ),
     }
     # agent_tokens.json cumulative fallback (per-agent lifetime totals).
@@ -3515,6 +3891,7 @@ def collect_tokens(hours: int = 168) -> dict[str, object]:
             "claude": claude_meta,
             "opencode": opencode_meta,
             "codex": codex_meta,
+            "glm": glm_meta,
         },
         "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
     }
@@ -3717,6 +4094,105 @@ def load_limits() -> dict[str, object]:
         "source": str(AGENT_LIMITS_JSON),
         "agents": out,
         "now_unix": int(now),
+    }
+
+
+def _rolling_token_sum(buckets: list, provider: str, window_seconds: float, now: float) -> int:
+    """Sum a provider's tokens across the hourly buckets within the rolling window."""
+    cut = now - window_seconds
+    total = 0
+    for b in buckets:
+        if not isinstance(b, dict):
+            continue
+        if int_value(b.get("unix")) < cut:
+            continue
+        total += int_value(b.get(provider))
+    return total
+
+
+def load_agent_usage() -> dict[str, object]:
+    """Per-provider (claude / codex / glm) token spend in the rolling 5h and weekly
+    windows vs optional caps (agent_limits.json cap_tokens), plus reset countdown and
+    any live proxy rate-limit status. Backs the 'Agent limits' panel — at a glance,
+    who is approaching a 5h / weekly cap."""
+    now = time.time()
+    tokens = load_tokens(hours=24 * 7 + 1)  # cover the weekly window; reuses the cached collector
+    buckets = tokens.get("buckets", []) if isinstance(tokens, dict) else []
+
+    # cap + reset info keyed by (provider, window) from agent_limits.json
+    lim = _load_json_obj(AGENT_LIMITS_JSON)
+    agents_in = lim.get("agents", []) if isinstance(lim.get("agents"), list) else []
+    cap_by: dict[tuple[str, str], dict[str, object]] = {}
+    for a in agents_in:
+        if not isinstance(a, dict):
+            continue
+        prov = str(a.get("provider") or "").lower()
+        win = str(a.get("window") or "").lower()
+        if not prov or not win:
+            continue
+        next_unix = _parse_iso(a.get("next_reset"))
+        if not next_unix:
+            interval = a.get("reset_interval_hours")
+            last = _parse_iso(a.get("last_reset"))
+            if isinstance(interval, (int, float)) and interval and last:
+                step = interval * 3600
+                k = max(0, int((now - last) // step) + 1)
+                next_unix = last + k * step
+        cap_raw = a.get("cap_tokens")
+        cap_by[(prov, win)] = {
+            "cap": int_value(cap_raw) if cap_raw else None,
+            "next_reset_unix": int(next_unix) if next_unix else 0,
+            "seconds_until": int(next_unix - now) if next_unix else 0,
+            "note": a.get("note", ""),
+            "assumed": bool(a.get("assumed", False)),
+        }
+
+    live = _load_json_obj(PROXY_USAGE_LIMITS_JSON)
+    WINDOWS = {"5h": 5 * 3600, "weekly": 7 * 24 * 3600}
+    LIVE_KEY = {"glm": "GLM", "claude": "Anthropic", "codex": "Codex"}
+    LABEL = {"claude": "Claude", "codex": "Codex", "glm": "GLM"}
+
+    providers = []
+    for prov in ("claude", "codex", "glm"):
+        windows = {}
+        for win, secs in WINDOWS.items():
+            meta = cap_by.get((prov, win))
+            # GLM's plan only defines a 5h reset window, but still show its rolling
+            # weekly token sum (no configured cap/reset) so its usage is visible.
+            used = _rolling_token_sum(buckets, prov, secs, now)
+            # Codex re-reads its full (cached) context each turn, so the raw sum is
+            # dominated by cached input. Subtract cached_input to get a billable-ish
+            # figure comparable to Claude/GLM (which already exclude cache reads).
+            if prov == "codex":
+                used = max(0, used - _rolling_token_sum(buckets, "codex_cache_read", secs, now))
+            cap = (meta or {}).get("cap")
+            pct = round(100.0 * used / cap, 1) if cap else None
+            windows[win] = {
+                "used": used,
+                "cap": cap,
+                "pct": pct,
+                "next_reset_unix": (meta or {}).get("next_reset_unix", 0),
+                "seconds_until": (meta or {}).get("seconds_until", 0),
+                "assumed": (meta or {}).get("assumed", False),
+            }
+        status = None
+        if isinstance(live, dict):
+            ent = live.get(LIVE_KEY.get(prov, ""))
+            if isinstance(ent, dict):
+                hdrs = ent.get("headers") if isinstance(ent.get("headers"), dict) else {}
+                status = hdrs.get("anthropic-ratelimit-unified-status") or ent.get("status")
+        providers.append({
+            "provider": prov,
+            "label": LABEL[prov],
+            "windows": windows,
+            "live_status": status,
+        })
+
+    return {
+        "available": bool(buckets),
+        "now_unix": int(now),
+        "providers": providers,
+        "source": str(TOKEN_HISTORY_FILE),
     }
 
 
@@ -5840,6 +6316,14 @@ HTML = r"""<!doctype html>
         <canvas id="tokens-chart" height="205"></canvas>
       </section>
 
+      <section class="panel">
+        <div class="panel-title">
+          <h2>Token Spend by Function</h2>
+          <span class="panel-note" id="fn-tokens-note"></span>
+        </div>
+        <div id="fn-tokens-body"></div>
+      </section>
+
       <section class="kg-layout">
         <div class="panel chart-card">
           <div class="panel-title">
@@ -6063,6 +6547,14 @@ HTML = r"""<!doctype html>
             <tbody id="locks-body"></tbody>
           </table>
         </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">
+          <h2>Agent Token Usage</h2>
+          <span class="panel-note" id="agent-usage-note"></span>
+        </div>
+        <div class="bucket-bars" id="agent-usage-bars"></div>
       </div>
 
       <div class="panel">
@@ -8639,7 +9131,9 @@ HTML = r"""<!doctype html>
       }
       if (note) {
         const rom = d.match_total ? `${d.match_pct}% ROM-match (${d.match_fns.toLocaleString()}/${d.match_total.toLocaleString()}, incl. asm-wrappers)` : "";
-        note.textContent = `${rom} · ${d.overall_pct}% decompiled to C (${d.done_fns.toLocaleString()}/${d.total_fns.toLocaleString()}) · bar = % of bucket attacked`;
+        const fresh = (d.measure_fresh_age == null) ? "" :
+          ` · live measures: ${(d.measure_fresh_fns||0).toLocaleString()} fns, ${d.measure_fresh_age < 120 ? "fresh" : Math.round(d.measure_fresh_age/60)+"m old"}`;
+        note.textContent = `${rom} · ${d.overall_pct}% decompiled to C (${d.done_fns.toLocaleString()}/${d.total_fns.toLocaleString()}) · bar = % of bucket attacked${fresh}`;
       }
       el.innerHTML = d.buckets.map(b => {
         const c = BUCKET_COLORS[b.name] || "#5aa9e6";
@@ -8743,6 +9237,106 @@ HTML = r"""<!doctype html>
     function pollLimits() {
       fetch("/api/limits", { cache: "no-store" })
         .then(r => r.json()).then(renderLimits).catch(() => {});
+    }
+    // ---- per-agent token usage vs 5h/weekly caps ----------------------------
+    // (token formatting reuses the existing `fmtTok` defined with the token chart)
+    function usageColor(pct) {
+      if (pct == null) return "#5aa9e6";          // no cap configured -> neutral
+      if (pct >= 90) return "#e05a5a";             // red
+      if (pct >= 70) return "#e0a93b";             // amber
+      return "#38b995";                            // green
+    }
+    function renderAgentUsage(d) {
+      const el = $("agent-usage-bars"); if (!el) return;
+      const provs = (d && d.providers) || [];
+      if (!provs.length) {
+        el.innerHTML = '<div class="bucket-counts">no token data yet</div>';
+        setText($("agent-usage-note"), ""); return;
+      }
+      setText($("agent-usage-note"), "5h / weekly rolling");
+      const rows = [];
+      for (const p of provs) {
+        const live = p.live_status ? ` &middot; <span class="muted">live: ${p.live_status}</span>` : "";
+        rows.push(`<div class="bucket-counts" style="margin-top:8px;font-weight:600">${p.label}${live}</div>`);
+        for (const win of ["5h", "weekly"]) {
+          const w = p.windows && p.windows[win]; if (!w) continue;
+          const pct = w.pct;
+          const fillW = pct != null ? Math.min(100, pct) : 8;  // neutral sliver when no cap
+          const c = usageColor(pct);
+          const capTxt = w.cap ? ` / ${fmtTok(w.cap)} (${pct}%)` : "";
+          const reset = w.seconds_until > 0 ? `resets ${fmtCountdown(w.seconds_until)}` : "";
+          rows.push(`<div class="bucket-row">
+            <div class="bucket-label">${win}</div>
+            <div class="bucket-track">
+              <div class="bucket-fill" style="width:${fillW}%;background:${c}"></div>
+              <span class="bucket-pct">${fmtTok(w.used)}${capTxt}</span>
+            </div>
+            <div class="bucket-counts muted">${reset}</div>
+          </div>`);
+        }
+      }
+      el.innerHTML = rows.join("");
+    }
+    function pollAgentUsage() {
+      fetch("/api/agent_usage", { cache: "no-store" })
+        .then(r => r.json()).then(renderAgentUsage).catch(() => {});
+    }
+    // ---- per-function token spend table (Phase 2) ---------------------------
+    const FN_TOK_COLORS = { codex: "#a98ee6", claude: "#38b995", glm: "#5c91df", other: "#8da0b8" };
+    function renderFnTokens(d) {
+      const el = $("fn-tokens-body"); if (!el) return;
+      const fns = (d && d.fns) || [];
+      setText($("fn-tokens-note"), d && d.available ? `${d.count} fns tracked` : "no ledger yet");
+      if (!fns.length) {
+        el.innerHTML = '<div class="bucket-counts">no per-function token data yet — pane_io logs a row as each task completes</div>';
+        return;
+      }
+      const cell = (bp, p) => {
+        const v = bp[p] || 0;
+        return `<td class="mono" style="text-align:right;color:${v ? FN_TOK_COLORS[p] : '#566'}">${v ? fmtTok(v) : '·'}</td>`;
+      };
+      let h = '<table style="width:100%;border-collapse:collapse;font-size:12px">'
+        + '<thead><tr style="text-align:left;color:#8da0b8">'
+        + '<th style="padding:3px 6px">fn</th><th>file</th>'
+        + '<th style="text-align:right">codex</th><th style="text-align:right">claude</th>'
+        + '<th style="text-align:right">glm</th><th style="text-align:right">total</th>'
+        + '<th style="text-align:right">tasks</th></tr></thead><tbody>';
+      for (const f of fns) {
+        const bp = f.by_provider || {};
+        const file = (f.file || "").split("/").pop();
+        h += `<tr class="fn-tok-row" data-fn="${f.fn}" style="cursor:pointer;border-top:1px solid #1f2733">`
+          + `<td class="mono" style="padding:3px 6px">${f.fn}</td>`
+          + `<td class="muted" title="${f.file || ''}">${file}</td>`
+          + cell(bp, "codex") + cell(bp, "claude") + cell(bp, "glm")
+          + `<td class="mono" style="text-align:right;font-weight:600">${fmtTok(f.total)}</td>`
+          + `<td class="mono" style="text-align:right">${f.tasks}</td></tr>`
+          + `<tr class="fn-tok-detail" data-detail="${f.fn}" style="display:none">`
+          + `<td colspan="7" style="padding:2px 6px 8px"><span class="muted">loading…</span></td></tr>`;
+      }
+      h += "</tbody></table>";
+      el.innerHTML = h;
+      el.querySelectorAll(".fn-tok-row").forEach(tr =>
+        tr.addEventListener("click", () => toggleFnTokDetail(tr.getAttribute("data-fn"))));
+    }
+    function toggleFnTokDetail(fn) {
+      const det = document.querySelector(`.fn-tok-detail[data-detail="${fn}"]`); if (!det) return;
+      if (det.style.display !== "none") { det.style.display = "none"; return; }
+      det.style.display = "";
+      fetch(`/api/history/fn_tokens?name=${encodeURIComponent(fn)}`, { cache: "no-store" })
+        .then(r => r.json()).then(d => {
+          const rows = (d && d.rows) || [];
+          const td = det.querySelector("td");
+          if (!rows.length) { td.innerHTML = '<span class="muted">no history</span>'; return; }
+          td.innerHTML = rows.map(r => {
+            const t = r.unix ? new Date(r.unix * 1000).toLocaleString() : "?";
+            const srcTag = r.src === "footer" ? ' <span style="color:#7a5">~footer</span>' : "";
+            return `<span class="muted" style="margin-right:14px">${t} · ${r.provider} · in ${fmtTok(r.in)} / out ${fmtTok(r.out)}${srcTag}</span>`;
+          }).join("");
+        }).catch(() => {});
+    }
+    function pollFnTokens() {
+      fetch("/api/fn_tokens", { cache: "no-store" })
+        .then(r => r.json()).then(renderFnTokens).catch(() => {});
     }
     // ---- v10: token-expense STACKED bar chart, per-source colors ------------
     const TOKEN_SOURCES = [
@@ -9420,6 +10014,8 @@ HTML = r"""<!doctype html>
     pollAgents();
     pollLocks();
     pollLimits();
+    pollAgentUsage();
+    pollFnTokens();
     pollTokens();
     pollKg();
     pollCrackJobs();
@@ -9494,6 +10090,8 @@ HTML = r"""<!doctype html>
     store.prsTimer = setInterval(pollPrs, 60000);
     store.quantumTimer = setInterval(pollQuantum, 10000);
     store.limitsTimer = setInterval(pollLimits, 60000);
+    store.agentUsageTimer = setInterval(pollAgentUsage, 60000);
+    store.fnTokensTimer = setInterval(pollFnTokens, 30000);
     store.kgTimer = setInterval(pollKg, 30000);
     store.crackTimer = setInterval(pollCrackJobs, 15000);
     store.logTimer = setInterval(pollLog, 15000);   // live attempt-log refresh
@@ -9695,6 +10293,7 @@ Serve only over the private tailnet. Not linked from the public dashboard UI.</p
             if isinstance(decomp, dict):
                 update_unit_history(decomp)
                 update_fn_history(decomp)
+            update_fn_token_history()  # fold in any new per-task token ledger rows
             self.send_json(state)
             return
         if path == "/api/unit":
@@ -9716,6 +10315,13 @@ Serve only over the private tailnet. Not linked from the public dashboard UI.</p
         if path == "/api/history/fn":
             name = (query.get("name") or [""])[0]
             self.send_json(load_fn_history(name))
+            return
+        if path == "/api/history/fn_tokens":
+            name = (query.get("name") or [""])[0]
+            self.send_json(load_fn_token_history(name))
+            return
+        if path == "/api/fn_tokens":
+            self.send_json(load_fn_token_summary())
             return
         if path == "/api/asm":
             source = (query.get("source") or [""])[0]
@@ -9767,6 +10373,9 @@ Serve only over the private tailnet. Not linked from the public dashboard UI.</p
             except (TypeError, ValueError):
                 hours = 168
             self.send_json(load_tokens(max(1, min(hours, 24 * 30))))
+            return
+        if path == "/api/agent_usage":
+            self.send_json(load_agent_usage())
             return
         if path == "/api/log":
             raw = (query.get("limit") or ["1000"])[0]

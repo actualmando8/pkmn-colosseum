@@ -234,11 +234,13 @@ extern void fn_80193AF0(void* obj, s32 size);
 extern void fn_801BBE60(HSD_TObj* tobj);
 extern void fn_801B42C0(void* node);
 extern void fn_801B7178(HSD_TObj* tobj, u32 map_id, u32 coord_id);
-#if 1
+#if 0
 asm void fn_801A6B8C(void) {
 #include "src/hsd/hsd_mobj_fn_801A6B8C.inc"
 }
 #else
+#pragma push
+#pragma optimization_level 1
 void fn_801A6B8C(HSD_MObj* mobj) {
     fn_801C25E4(mobj->aobj);
     fn_80193AF0(mobj->mat, 0x14);
@@ -247,13 +249,14 @@ void fn_801A6B8C(HSD_MObj* mobj) {
         fn_801B42C0(mobj->tevdesc);
     }
     if (mobj->texp != NULL) {
-        fn_801B42C0(mobj->texp);
+        fn_801B7178((HSD_TObj*)mobj->texp, 7, 1);
     }
     if (mobj->pe != NULL) {
         fn_80193AF0(mobj->pe, 0xc);
     }
-    HSD_PARENT_INFO((HSD_MObjInfo*)lbl_8036CB30)->init((HSD_Class*)mobj);
+    HSD_PARENT_INFO((HSD_MObjInfo*)lbl_8036CB30)->release((HSD_Class*)mobj);
 }
+#pragma pop
 #endif
 
 /* 0x801A6C34 | 0x70 */
@@ -321,17 +324,23 @@ void fn_801A6CA4(void* obj) {
 #endif
 
 /* 0x801A6D08 | 0x54 */
-#if 1
+#if 0
 asm void fn_801A6D08(void) {
 #include "src/hsd/hsd_mobj_fn_801A6D08.inc"
 }
 #else
+#pragma push
+#pragma optimization_level 1
 void fn_801A6D08(HSD_MObj* mobj) {
+    HSD_ClassInfo* info;
     if (mobj != NULL) {
-        HSD_CLASS_METHOD(mobj)->release((HSD_Class*) mobj);
-        HSD_CLASS_METHOD(mobj)->destroy((HSD_Class*) mobj);
+        info = HSD_CLASS_METHOD(mobj);
+        info->release((HSD_Class*) mobj);
+        info = HSD_CLASS_METHOD(mobj);
+        info->destroy((HSD_Class*) mobj);
     }
 }
+#pragma pop
 #endif
 
 /* 0x801A6D5C | 0x44 */
@@ -582,26 +591,32 @@ extern void* fn_80193B10(s32 size);
 extern void* memcpy(void* dst, const void* src, u32 n);
 extern u32 lbl_8047DC28;
 extern f32 lbl_8047DC2C;
-#if 1
+#if 0
 asm void fn_801A7D58(void) {
 #include "src/hsd/hsd_mobj_fn_801A7D58.inc"
 }
 #else
+#pragma push
+#pragma optimization_level 1
 s32 fn_801A7D58(void* arg0, void* arg1) {
     HSD_Material* mat;
+    u32 converted_format;
+    u32 mat_addr;
 
     *(u32*)((u8*)arg0 + 4) = *(u32*)((u8*)arg1 + 4);
-    *(u32*)((u8*)arg0 + 8) = fn_801BE4CC(*(u32*)((u8*)arg1 + 8));
+    converted_format = fn_801BE4CC(*(u32*)((u8*)arg1 + 8));
+    *(u32*)((u8*)arg0 + 8) = converted_format;
     mat = (HSD_Material*)fn_80193B10(0x14);
     if (mat == NULL) {
         __assert(&lbl_8047DC18, 0x466, &lbl_8047DC28);
     }
     memset(mat, 0, 0x14);
     mat->alpha = lbl_8047DC2C;
-    *(HSD_Material**)((u8*)arg0 + 0xc) = mat;
+    mat_addr = (u32)mat;
+    *(u32*)((u8*)arg0 + 0xc) = mat_addr;
     memcpy(*(HSD_Material**)((u8*)arg0 + 0xc),
            *(HSD_Material**)((u8*)arg1 + 0xc), 0x14);
-    *(u32*)((u8*)arg0 + 4) |= 0x1000;
+    *(u32*)((u8*)arg0 + 4) |= 0x1000u;
     if (*(u32*)((u8*)arg1 + 0x14) != 0) {
         *(void**)((u8*)arg0 + 0x10) = fn_80193B10(0xc);
         memcpy(*(void**)((u8*)arg0 + 0x10),
@@ -610,6 +625,7 @@ s32 fn_801A7D58(void* arg0, void* arg1) {
     *(u32*)((u8*)arg0 + 0x14) = 0;
     return 0;
 }
+#pragma pop
 #endif
 
 /* 0x801A7E3C | 0x48 */

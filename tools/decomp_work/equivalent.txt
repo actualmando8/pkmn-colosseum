@@ -117,3 +117,6 @@ fn_8002AE9C   # gs_worldmap — real C ~96.9%; same reg-permutation/scheduling f
 fn_80261CBC   # colosseum_battle — real C 99.42%; reg-permutation wall (two u32 params home to nonvol in incoming order; sibling fn_80261D8C identical). SKIP
 fn_801E11F0   # battle_logic — real C 93.85%; W-scheduling prologue tie (lis/addi base-ptr split across r31 save; addi->r0 before save vs ->r31 after). SKIP
 fn_801E1FF8   # battle_logic — real C 98.64%; conv-literal wall ((f32) cast magic-double bias anon @947 vs named lbl_8047E4A0). SKIP
+
+# pokemon.c - fn_801F4C14 PokemonSet W6 jump-table-name wall (2026-06-25)
+fn_801F4C14   # pokemon.c - W6 jumptable NAME only (@2020 vs jumptable_80375330); 99.97%, real C active, classifier RELOC

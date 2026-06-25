@@ -2563,6 +2563,7 @@ extern void fn_800BCEBC(void);
 extern void fn_800BD4B4(void);
 extern void fn_800BD554(void);
 extern void fn_801B25C4(void);
+extern void HSD_StateInvalidate(void);
 extern u8 lbl_8036C720[];
 extern u8 lbl_8036CBC0[];
 extern u8 lbl_80478C60;

@@ -120,6 +120,7 @@ extern struct Pokemon* fn_801F61BC(void);
 extern s8 fn_802050F4(struct Pokemon* pokemon);
 
 /* Forward declarations for fn_801F54A4 asm wrapper */
+extern u32 jumptable_803754AC[];
 extern void fn_80119ED0(void);
 extern void fn_8011B444(void);
 extern void fn_8011B67C(void);
@@ -1495,9 +1496,9 @@ void fn_801F17B0(void* obj) {
     void* a;
     void* b;
     void* c;
-    u32 i;
     u32 j;
     u32 k;
+    u32 i;
 
     i = 0;
     while ((i & 0xFFFF) < 2) {
@@ -2214,33 +2215,34 @@ u32 fn_801F2A7C(u32 ctx) {
     extern u32 fn_801F54A4(u32 poke, u32 b, u32 field, u32 d);
     extern u32 fn_801FB8F8(u32 mon);
     extern u32 fn_801F7258(u32, u32);
-    u32 r26 = ctx;
-    u32 r27;
-    u32 r28;
-    u32 r29;
-    u32 r30;
-    u32 r31;
-    fn_801F54A4(r26, 0, 0x14, 0);
-    r28 = (u16)fn_801F54A4(r26, 0, 0x16, 0);
-    r29 = 0;
-    while ((u16)r29 < 2) {
-        r31 = fn_801F54A4(r26, 0, 0x35, r29);
-        if ((u8)fn_801F7404(r31) == 0) {
-            r31 = 0;
+    u32 pokemon = ctx;
+    u32 partyMon;
+    u32 moveIndex;
+    u32 partyIndex;
+    u16 moveCount;
+    u32 moveMon;
+
+    fn_801F54A4(pokemon, 0, 0x14, 0);
+    moveCount = (u16)fn_801F54A4(pokemon, 0, 0x16, 0);
+    partyIndex = 0;
+    while ((u16)partyIndex < 2) {
+        partyMon = fn_801F54A4(pokemon, 0, 0x35, partyIndex);
+        if ((u8)fn_801F7404(partyMon) == 0) {
+            partyMon = 0;
         }
-        if (r31 != 0) {
-            r30 = 0;
-            while ((u16)r30 < r28) {
-                r27 = fn_801F7258(r31, r30);
-                if (r27 != 0) {
-                    if ((u8)fn_801FB8F8(r27) == 1) {
-                        return r27;
+        if (partyMon != 0) {
+            moveIndex = 0;
+            while ((u16)moveIndex < moveCount) {
+                moveMon = fn_801F7258(partyMon, moveIndex);
+                if (moveMon != 0) {
+                    if ((u8)fn_801FB8F8(moveMon) == 1) {
+                        return moveMon;
                     }
                 }
-                r30++;
+                moveIndex++;
             }
         }
-        r29++;
+        partyIndex++;
     }
     return 0;
 }
@@ -3251,12 +3253,14 @@ s16 fn_801F4804(void* obj) {
 void fn_801F4860(void* obj, u32 param2) {
     extern u32 fn_801F54A4(void*, int, int, int);
     extern void fn_8011B950(u32, u32);
-    extern void fn_801F4C14(void*, int, int, int, int);
+    extern void fn_801F4C14(void*, int, int, int, u16);
     extern void fn_801F7530(u32, u32);
-    u32 tmp, i, fill;
+    u32 tmp;
+    u32 fill;
     u32* zarr;
     CopyBuf buf;
     u16* tbl;
+    u32 i;
     if (!obj) return;
     tmp = fn_801F54A4(obj, 0, 9, 0);
     fn_8011B950(tmp, 1);
@@ -3289,7 +3293,7 @@ void fn_801F4860(void* obj, u32 param2) {
         }
     }
     fn_801F4C14(obj, 0, 0x5b, 0, 0);
-    fn_801F4C14(obj, 0, 0xd, 0, (u16)param2);
+    fn_801F4C14(obj, 0, 0xd, 0, param2);
     fn_801F4C14(obj, 0, 0xc, 0, 1);
 }
 
@@ -3527,7 +3531,11 @@ u8 fn_801F4C14(u32 p1, u16 p2, u32 p3, u16 p4, u32 p5) {
         break;
     case 0x43:
         fn_801F4C14(p1, 0, 0x42, 0, p5);
-        fn_801F4C14(p1, 0, 0x40, 0, (u32)(u16)fn_801F0134(p5, (u16)tmp));
+        {
+            u32 species;
+            species = fn_801F0134(p5, (u16)tmp);
+            fn_801F4C14(p1, 0, 0x40, 0, (u32)(u16)species);
+        }
         break;
     case 0x44:
         fn_801F687C(p1, p5);
@@ -3565,7 +3573,9 @@ u8 fn_801F4C14(u32 p1, u16 p2, u32 p3, u16 p4, u32 p5) {
         break;
     case 0x49:
         if (p5 != 0 && (u8)fn_80206780(p5) == 0x1) {
-            fn_801F4C14(p1, 0, 0x56, 0, (u32)(u16)fn_802040E8(p5));
+            u32 species;
+            species = fn_802040E8(p5);
+            fn_801F4C14(p1, 0, 0x56, 0, (u32)(u16)species);
         }
         fn_801F641C(p1, p5);
         break;
@@ -4230,33 +4240,34 @@ void fn_801F6B54(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5
     extern u8 fn_802062FC(u32);
     extern u32 fn_8012640C(u32, u32, u16, u32);
     extern void fn_801FAA58(u32, u32, u16, u32);
-    u16 uBound4;
-    u32 uVar6;
-    u32 uVar1;
-    u32 uVar2;
-    u32 uVar4;
-    u16 uBound5;
-    u32 uVar5;
+    u32 outerObj;
+    u32 innerObj;
+    u32 outerIndex;
+    s32 status;
+    u16 outerCount;
 
-    uBound4 = param_4;
-    uVar6 = 0;
-    for (; (uVar6 & 0xFFFF) < (uBound4 & 0xFFFF); uVar6 = uVar6 + 1) {
+    outerCount = (u16)param_4;
+    outerIndex = 0;
+    for (; (outerIndex & 0xFFFF) < (outerCount & 0xFFFF); outerIndex = outerIndex + 1) {
         if (param_1 == 0) {
-            uVar1 = 0;
+            outerObj = 0;
         } else {
-            uVar1 = fn_801F78D4(param_1, uVar6);
+            outerObj = fn_801F78D4(param_1, outerIndex);
         }
-        uVar4 = fn_801FA634(uVar1);
-        if (uVar4 != 0) {
-            uBound5 = param_5;
-            uVar5 = 0;
-            for (; (uVar5 & 0xFFFF) < (uBound5 & 0xFFFF); uVar5 = uVar5 + 1) {
-                uVar2 = fn_801FB1C0(uVar1, 0, 0x46, uVar5);
-                uVar4 = fn_802062FC(uVar2);
-                if (uVar4 != 0) {
-                    uVar2 = fn_8012640C(uVar2, 0, 0xD5, 0);
-                    uVar4 = fn_8012640C(uVar2, 0, 0xCE, 0);
-                    if ((s16)uVar4 >= 0) {
+        status = fn_801FA634(outerObj);
+        if (status != 0) {
+            u16 innerCount;
+            u32 innerIndex;
+
+            innerCount = param_5;
+            innerIndex = 0;
+            for (; (innerIndex & 0xFFFF) < (innerCount & 0xFFFF); innerIndex = innerIndex + 1) {
+                innerObj = fn_801FB1C0(outerObj, 0, 0x46, innerIndex);
+                status = fn_802062FC(innerObj);
+                if (status != 0) {
+                    innerObj = fn_8012640C(innerObj, 0, 0xD5, 0);
+                    status = fn_8012640C(innerObj, 0, 0xCE, 0);
+                    if ((s16)status >= 0) {
                         fn_801FAA58(param_2, 0, 0x57, 0);
                     }
                 }
@@ -4482,42 +4493,46 @@ s32 fn_801F7174(u32 param_1, u32 param_2, u32 param_3) {
     extern u32 fn_80205BE8(u32);
     extern u8 fn_80206608(u32);
     extern u32 fn_8012640C(u32, u32, u16, u32);
-    u16 uBound2;
-    s32 iVar8;
-    u32 uVar7;
-    u32 uVar1;
-    u32 iVar2;
-    u32 iVar3;
-    u32 uVar4;
-    u16 uBound3;
-    u32 uVar6;
+    int total;
+    u32 innerLimit;
+    u32 baseObj;
+    u32 outerObj;
+    u32 innerObj;
+    u32 statObj;
+    u32 status;
+    u16 outerCount;
+    u32 outerIndex;
 
-    uBound2 = param_2;
-    iVar8 = 0;
-    uVar7 = 0;
-    for (; (uVar7 & 0xFFFF) < (uBound2 & 0xFFFF); uVar7 = uVar7 + 1) {
-        if (param_1 == 0) {
-            uVar1 = 0;
+    total = 0;
+    baseObj = param_1;
+    innerLimit = param_3;
+    outerCount = param_2;
+    outerIndex = 0;
+    for (; (outerIndex & 0xFFFF) < (outerCount & 0xFFFF); outerIndex = outerIndex + 1) {
+        if (baseObj == 0) {
+            outerObj = 0;
         } else {
-            uVar1 = fn_801F78D4(param_1, uVar7);
+            outerObj = fn_801F78D4(baseObj, outerIndex);
         }
-        uVar4 = fn_801FA634(uVar1);
-        if (uVar4 != 0) {
-            uBound3 = param_3;
-            uVar6 = 0;
-            for (; (uVar6 & 0xFFFF) < (uBound3 & 0xFFFF); uVar6 = uVar6 + 1) {
-                iVar2 = fn_801F986C(uVar1, uVar6);
-                if (iVar2 != 0) {
-                    iVar3 = fn_80205BE8(iVar2);
-                    if ((iVar3 != 0) && (uVar4 = fn_80206608(iVar2), uVar4 != 0)) {
-                        uVar4 = fn_8012640C(iVar3, 0, 0x83, 0);
-                        iVar8 = iVar8 + (uVar4 & 0xFFFF);
+        status = fn_801FA634(outerObj);
+        if (status != 0) {
+            u16 innerCount;
+            u32 innerIndex;
+
+            innerCount = innerLimit;
+            innerIndex = 0;
+            for (; (innerIndex & 0xFFFF) < (innerCount & 0xFFFF); innerIndex = innerIndex + 1) {
+                innerObj = fn_801F986C(outerObj, innerIndex);
+                if (innerObj != 0) {
+                    statObj = fn_80205BE8(innerObj);
+                    if ((statObj != 0) && (status = fn_80206608(innerObj), status != 0)) {
+                        total = total + (fn_8012640C(statObj, 0, 0x83, 0) & 0xFFFF);
                     }
                 }
             }
         }
     }
-    return iVar8;
+    return total;
 }
 
 /* 0x801F7258 | size: 0x58 | small */

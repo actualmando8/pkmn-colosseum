@@ -111,42 +111,51 @@ void fn_8004BE0C(void) {
 
 /* 0x8004C120 | size: 0x1B8 */
 /*
- * WALL @ 90.86% (band scratch). Faithful real C kept below for reference; the
- * build uses the asm-include so it stays byte-exact.
+ * WALL @ 99.32% (band scratch, jun24). classify_residual verdict: REG-COLORING
+ * (winnable per classifier, but decl-order space is provably exhausted — see
+ * below). Build uses the asm-include so it stays byte-exact. Faithful real C
+ * that reaches 99.32% is kept below for reference and lives in
+ * tools/decomp_work/scratch/band_pl_poke_detail.c.
  *
- * classify_residual verdict: SHAPE (33 reg-coloring + 5 shape lines).
- * Residual is a register PERMUTATION (count<->buf == r28<->r31) coupled with a
- * case2/case3 temp permutation and a loop block-rotation idiom (CW emits the
- * conditional branch as the back-edge; target emits an unconditional back-edge
- * with a forward exit). Jointly invariant to: for/do-while/goto/while-cond loop
- * reshapes, 4+ declaration orders, chained `buf = lbl = fn()` assignment,
- * #pragma peephole off, #pragma scheduling on. Same class as colquery E64
- * (register-permutation + loop-idiom, not budget-crackable).
+ * Progress this session: prior note claimed SHAPE/90.86%/not-winnable — that was
+ * stale. With NAMED locals (no rNN), the residual is pure register-coloring:
+ *   - Function-scope decl order [page, handle, count, ptr] fixes page=r30,
+ *     handle=r29 and lands the block temps; raised 90.86 -> 97.95%.
+ *   - case2/case3 block-temp decl order [w, i, n] (i in the middle -> r26 in
+ *     both; 1st/3rd swap positionally so case2 w=r27/n=r25, case3 w=r25/n=r27)
+ *     fixed the "case2/3 temp permutation"; raised 97.95 -> 99.32%.
+ *
+ * Remaining residual (the ONLY diff): a count<->ptr non-volatile swap. OURS gets
+ * count=r31, ptr=r28; target wants ptr=r31 (heavily used in the switch),
+ * count=r28 (lightly used). Across 3 measured declaration orders, `count` (the
+ * first call-defined survivor) is PINNED to r31 and the other three survivors
+ * fill r30/r29/r28 in decl order — so NO declaration order can put ptr in r31
+ * while count exists. The definition-form / chained `ptr = lbl = fn()` lever
+ * produced identical codegen (no effect). This is a register-PERMUTATION wall
+ * (same family as colquery E64), not currently steerable by the source levers.
  *
  * void fn_8004C120(void) {
- *     u16* buf;
- *     s32 page = 0;
- *     void* heap;
- *     s32 count = fn_801D1F7C();
- *     s32 ret;
+ *     s32 page; u16 handle; s32 count; u16* ptr;       // decl order matters
+ *     page = 0;
+ *     count = fn_801D1F7C();
  *     if (count > 0) {
- *         heap = fn_800E3534(count * 2);
- *         buf = lbl_8047A500 = fn_800E27B0();
+ *         handle = fn_800E3534(count * 2);
+ *         ptr = (u16*)(lbl_8047A500 = fn_800E27B0(handle));
  *         switch (fn_801D1B4C()) {
- *         case 1: { s32 i; for (i = 0; i < fn_801D1F7C(); i++) *buf++ = fn_801D1F0C(i); break; }
- *         case 2: { u16* p = buf; s32 n = fn_801D1F7C(); s32 j;
- *                   for (j = 0; j < n; j++) *p++ = fn_801D1F0C(j);
- *                   fn_800CA620(buf, n, 2, fn_8004BF20); break; }
- *         case 3: { u16* p = buf; s32 n = fn_801D1F7C(); s32 j;
- *                   for (j = 0; j < n; j++) *p++ = fn_801D1F0C(j);
- *                   fn_800CA620(buf, n, 2, fn_8004BE90); break; }
- *         default: { s32 k; for (k = fn_801D1F7C() - 1; k >= 0; k--) *buf++ = fn_801D1F0C(k); break; }
+ *         case 1: { s32 i; for (i = 0; i < fn_801D1F7C(); i++) { *ptr = (u16)fn_801D1F0C(i); ptr++; } break; }
+ *         case 2: { u16* w; s32 i; s32 n; n = fn_801D1F7C(); w = ptr;
+ *                   for (i = 0; i < n; i++) { *w = (u16)fn_801D1F0C(i); w++; }
+ *                   fn_800CA620(ptr, n, 2, fn_8004BF20); break; }
+ *         case 3: { u16* w; s32 i; s32 n; n = fn_801D1F7C(); w = ptr;
+ *                   for (i = 0; i < n; i++) { *w = (u16)fn_801D1F0C(i); w++; }
+ *                   fn_800CA620(ptr, n, 2, fn_8004BE90); break; }
+ *         case 0: default: { s32 j; for (j = fn_801D1F7C() - 1; j >= 0; j--) { *ptr = (u16)fn_801D1F0C(j); ptr++; } break; }
  *         }
  *     } else {
- *         lbl_8047A500 = 0;
+ *         lbl_8047A500 = NULL;
  *     }
- *     while ((ret = fn_8004D34C(page)) >= 0) page = fn_8004D9C0(ret);
- *     if (count > 0) { fn_800E24B0(heap); fn_800E209C(heap); }
+ *     for (;;) { if (fn_8004D34C(page) < 0) break; page = fn_8004D9C0(); }
+ *     if (count > 0) { fn_800E24B0(handle); fn_800E209C(handle); }
  * }
  */
 asm void fn_8004C120(void) { nofralloc

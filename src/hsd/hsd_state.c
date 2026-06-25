@@ -17,7 +17,7 @@ void fn_80199AF8(HSD_FObj* fobj, void* obj, HSD_ObjUpdateFunc obj_update, f32 ra
 extern f32 lbl_8047DA3C; /* 0.0f */
 extern f64 lbl_8047DA40; /* 0.0  */
 extern f64 lbl_8047DA48; /* spline numerator */
-extern f32 fn_801B2560(f32 step, f32 time, f32 p0, f32 p1, f32 d0, f32 d1);
+extern f32 splGetHelmite(f32 step, f32 time, f32 p0, f32 p1, f32 d0, f32 d1);
 
 /* 0x80199A84 | 0x4 */
 void fn_80199A84(void) {
@@ -85,7 +85,7 @@ static inline void FObjLaunchKeyData(HSD_FObj* fobj) {
             case HSD_A_OP_SPL:                                                 \
             case HSD_A_OP_SLP:                                                 \
                 if (fobj->fterm != 0) {                                        \
-                    value.fv = fn_801B2560(                                    \
+                    value.fv = splGetHelmite(                                  \
                         (f32)(lbl_8047DA48 / (f32)fobj->fterm), fobj->time,    \
                         fobj->p0, fobj->p1, fobj->d0, fobj->d1);               \
                 } else {                                                       \

@@ -466,12 +466,39 @@ u32 fn_80138680(void* ptr) {
 }
 #endif
 extern u8 lbl_80272B40[];
-#if 1
+#if 0
 asm u32 fn_801386DC(void* ptr) {
 #include "src/game/effect/effect_visual_fn_801386DC.inc"
 }
 #else
-u32 fn_801386DC(void* ptr) { /* TODO */ }
+u32 fn_801386DC(void* ptr) {
+    u8* p;
+    u16 handle;
+
+    if (ptr == NULL) {
+        fn_800DD970((const char*)lbl_80272B40 + 0xB0);
+        return 0;
+    }
+
+    p = ptr;
+    if (fn_800F9318(*(u16*)(p + 0xA), *(u16*)(p + 0xC)) == NULL) {
+        fn_800DD970((const char*)lbl_80272B40, *(u16*)(p + 0xA), *(u16*)(p + 0xC));
+        return 0;
+    }
+
+    handle = fn_800E3534(*(u16*)(p + 0x8) * 0x97C);
+    *(u16*)p = handle;
+    if (handle == 0) {
+        fn_800DD970((const char*)lbl_80272B40 + 0x60);
+        return 0;
+    }
+
+    *(void**)(p + 4) = fn_800E27B0(handle);
+    memset(*(void**)(p + 4), 0, *(u16*)(p + 0x8) * 0x97C);
+    fn_80138838(p, 1);
+    *(u16*)(p + 0x10) = 0;
+    return 1;
+}
 #endif
 #if 0
 asm void fn_801387C0(void* ptr, u32 delta) {
