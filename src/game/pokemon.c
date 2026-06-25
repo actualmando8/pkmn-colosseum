@@ -1496,9 +1496,9 @@ void fn_801F17B0(void* obj) {
     void* a;
     void* b;
     void* c;
-    u32 i;
     u32 j;
     u32 k;
+    u32 i;
 
     i = 0;
     while ((i & 0xFFFF) < 2) {
