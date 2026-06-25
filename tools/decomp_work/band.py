@@ -452,6 +452,25 @@ def cmd_bank(tag, fns):
     print(f"near-miss bank now holds {nfn} fn(s): {out.relative_to(ROOT)}")
 
 
+def cmd_bank_file(tag):
+    """Snapshot the WHOLE scratch file into build/band_nearmiss/<tag>.file.c (+ .src).
+    For RESHAPE near-misses whose gains span the file (added file-scope externs / helper
+    types / sibling edits), a single-fn splice loses that context and collapses; the whole
+    file must move together. bank_nearmiss.py --files later re-measures the snapshot vs canon
+    and commits it ONLY if every fn is no-regress (so a stale snapshot that would revert a
+    concurrent change is caught) and at least one fn improves. Cheap: just copies the file."""
+    st = load_state(tag)
+    sc = scratch_c(tag)
+    if not sc.exists():
+        sys.exit(f"scratch file missing for {tag}; run band.py init {tag} {st.get('src','<src>')} first")
+    NEARMISS.mkdir(parents=True, exist_ok=True)
+    snap = NEARMISS / f"{tag}.file.c"
+    snap.write_bytes(sc.read_bytes())
+    (NEARMISS / f"{tag}.file.src").write_text(st["src"], encoding="utf-8")
+    print(f"FILE-BANKED snapshot: {snap.relative_to(ROOT)} (src {st['src']})")
+    print("bank_nearmiss.py --files will no-regress-verify the whole file and commit if it holds")
+
+
 def cmd_diff(tag, fn):
     st = compile_band(tag)
     j = objdiff_json(tag, st)
@@ -617,6 +636,8 @@ def main():
         cmd_save(tag, sys.argv[3:])
     elif cmd == "bank":
         cmd_bank(tag, sys.argv[3:])
+    elif cmd == "bank-file":
+        cmd_bank_file(tag)
     elif cmd == "diff":
         if len(sys.argv) < 4:
             sys.exit("usage: band.py diff <tag> <fn>")
