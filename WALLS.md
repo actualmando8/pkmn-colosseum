@@ -915,3 +915,9 @@ ONCE then reuses r5 (`add r3,r5,r3`/`addi r4,r5,0x10`); ours emits `subis r4,r3,
 separate `lis r5,0xcc00`. The `volatile u16*` base-local does not force the held-base form.
 Plus a linked frame (-0x30 vs -0x38) and param r27<->r30 coloring. classify SHAPE → wall.
 asm wrapper stays #if 1 active in canon (byte-match); C = equivalent-tier. → equivalent.txt.
+
+## 2026-06-25 - pokemon.c fn_801F4C14 (PokemonSet, W6 jumptable-name wall)
+
+**Score:** 99.97% in `pl_pokemon` scratch after replacing two nested call arguments with short-lived named temporaries. `classify_residual.py pl_pokemon fn_801F4C14` reports `VERDICT: RELOC`.
+
+Residual is only CW's anonymous local jump-table symbol (`@2020`) versus the target's named `jumptable_80375330` relocation, plus display-only branch-target differences caused by the same local-label artifact. The instruction stream and control-flow shape are otherwise correct. This is the same W6 class as other named jump-table walls; not reachable from C. Real C remains active in `src/game/pokemon.c`; registered in `tools/decomp_work/equivalent.txt` and hard-skipped unless a new jump-table naming lever appears.

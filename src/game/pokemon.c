@@ -3527,7 +3527,11 @@ u8 fn_801F4C14(u32 p1, u16 p2, u32 p3, u16 p4, u32 p5) {
         break;
     case 0x43:
         fn_801F4C14(p1, 0, 0x42, 0, p5);
-        fn_801F4C14(p1, 0, 0x40, 0, (u32)(u16)fn_801F0134(p5, (u16)tmp));
+        {
+            u32 species;
+            species = fn_801F0134(p5, (u16)tmp);
+            fn_801F4C14(p1, 0, 0x40, 0, (u32)(u16)species);
+        }
         break;
     case 0x44:
         fn_801F687C(p1, p5);
@@ -3565,7 +3569,9 @@ u8 fn_801F4C14(u32 p1, u16 p2, u32 p3, u16 p4, u32 p5) {
         break;
     case 0x49:
         if (p5 != 0 && (u8)fn_80206780(p5) == 0x1) {
-            fn_801F4C14(p1, 0, 0x56, 0, (u32)(u16)fn_802040E8(p5));
+            u32 species;
+            species = fn_802040E8(p5);
+            fn_801F4C14(p1, 0, 0x56, 0, (u32)(u16)species);
         }
         fn_801F641C(p1, p5);
         break;
