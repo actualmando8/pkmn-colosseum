@@ -108,23 +108,34 @@ finalize_task() {  # <name> : append a ledger row for the just-completed task
 }
 
 classify() {  # classify <name> <pane> ; echoes idle|busy|rate|capfail and updates .prev
-  local name="$1" pane="$2" cap rc
+  local name="$1" pane="$2" cap rc prev scount
   cap=$(txk capture-pane -p -t "$pane" 2>/dev/null); rc=$?
   if [ $rc -ne 0 ] || [ -z "$cap" ]; then echo capfail; return; fi
   printf '%s' "$cap" > "$HB/$name.live"
-  if printf '%s' "$cap" | tr -d ' ' | grep -qiE "esctoint"; then
-    printf '%s' "$cap" > "$HB/$name.prev"; echo busy; return
+  # Track the consecutive-static-screen streak BEFORE any early return so the idle
+  # debounce below is based on real screen stability, not a single 8s snapshot.
+  prev=""; [ -f "$HB/$name.prev" ] && prev=$(cat "$HB/$name.prev")
+  printf '%s' "$cap" > "$HB/$name.prev"
+  scount=0; [ -f "$HB/$name.scount" ] && scount=$(cat "$HB/$name.scount" 2>/dev/null)
+  if [ "$cap" = "$prev" ]; then scount=$((scount + 1)); else scount=0; fi
+  echo "$scount" > "$HB/$name.scount"
+  # ACTIVE-WORK markers -> busy immediately. Covers the claude/codex/glm working
+  # indicators (spinner gerund "… for Ns", elapsed "(Nm Ns ·", "esc to interrupt",
+  # "thinking") so a still-working agent is NEVER misread as idle and dispatched —
+  # which /clears it mid-task and burns the tokens it already spent.
+  if printf '%s' "$cap" | tr -d ' ' | grep -qiE "esctoint|interrupt|thinking|for[0-9]+s|[0-9]+s·|\([0-9]+m[0-9]+s"; then
+    echo busy; return
   fi
   # Codex prints a benign welcome line "You have N usage limit reset available. Run /usage"
   # at startup — NOT a rate-limit. Strip it before the rate check so codex lanes aren't
   # falsely gated as rate-limited and skipped by the dispatcher (they'd sit idle forever,
   # never getting a task to scroll the banner off-screen).
   if printf '%s' "$cap" | grep -ivE "usage limit reset|run /usage" | grep -qiE "rate.?limit|usage limit|limit reached|too many request|try again (in|at|later)|resets? (at|in)|reached your|429 "; then
-    printf '%s' "$cap" > "$HB/$name.prev"; echo rate; return
+    echo rate; return
   fi
-  local prev=""; [ -f "$HB/$name.prev" ] && prev=$(cat "$HB/$name.prev")
-  printf '%s' "$cap" > "$HB/$name.prev"
-  if [ "$cap" = "$prev" ]; then echo idle; else echo busy; fi
+  # Idle only after the screen is byte-static for IDLE_MIN consecutive passes (debounce):
+  # a brief inter-step pause must not trigger a premature dispatch + /clear.
+  if [ "$scount" -ge "${IDLE_MIN:-3}" ]; then echo idle; else echo busy; fi
 }
 
 drain_one() {  # drain_one <name> <pane> : point the agent at a task FILE (no long-prompt send)
