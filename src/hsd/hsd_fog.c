@@ -612,7 +612,7 @@ void* HSD_IDGetDataFromTable(u32* table, u32 key, u32* found) {
 #pragma optimizewithasm off
 extern void HSD_ObjFree(void* list, void* data);
 extern u8 lbl_8046553C[];
-#if 0
+#if 1
 asm void fn_8019C1B0(void) {
 #include "src/hsd/hsd_fog_fn_8019C1B0.inc"
 }

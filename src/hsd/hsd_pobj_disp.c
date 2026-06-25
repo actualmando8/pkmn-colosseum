@@ -95,25 +95,18 @@ extern u8 lbl_8036CCD0[];
 extern u8 lbl_80465678[];
 extern u8 lbl_80465688[];
 
-/* mtx_mark[2] view onto bss at lbl_80465678 */
-typedef struct { void* obj; u32 mark; } MtxMark;
-#define mtx_mark ((MtxMark*)lbl_80465678)
-#define mtx_mark_v ((volatile MtxMark*)lbl_80465678)
-
 /* sdata2 string constants */
-extern const char lbl_8047DC98;
+extern const char lbl_8047DC98[];
 extern const char lbl_8047DCA0;
-extern const char lbl_8047DCA8;
-extern const char lbl_8047DCB0;
-extern const char lbl_8047DCB8;
-extern const char lbl_8047DCC4;
-extern const char lbl_8047DCCC;
-extern const char lbl_8047DCE0;
-extern const char lbl_8047DCE4;
-extern const char lbl_8047DCD8;
-extern const char lbl_8047DD10;
-extern const char lbl_8047DD50;
-extern const char lbl_8047DD58;
+extern const char lbl_8047DCA8[];
+extern const char lbl_8047DCB0[];
+extern const char lbl_8047DCB8[];
+extern const char lbl_8047DCC4[];
+extern const char lbl_8047DCCC[];
+extern const char lbl_8047DCD8[];
+extern const char lbl_8047DD10[];
+extern const char lbl_8047DD50[];
+extern const char lbl_8047DD58[];
 
 /* sdata2 float constants */
 extern const f32 lbl_8047DCC0;
@@ -141,22 +134,6 @@ extern u8 lbl_8027506C[];
 extern u8 lbl_80275084[];
 extern u8 lbl_802750B4[];
 
-/* GX enum constants (local, values per Dolphin SDK GXEnum.h) */
-#define GX_VA_POS        9
-#define GX_VA_NRM        10
-#define GX_VA_NBT        25
-#define GX_NONE          0
-#define GX_DIRECT        1
-#define GX_INDEX8        2
-#define GX_INDEX16       3
-#define GX_POS_XYZ       1
-#define GX_NRM_XYZ       0
-#define GX_U8            0
-#define GX_S8            1
-#define GX_U16           2
-#define GX_S16           3
-#define GX_F32           4
-
 /* forward declarations */
 void fn_801AA788(void* pobj, void* vmtx, void* pmtx, u32 rendermode);
 void fn_801AA6D0(void* pobj);
@@ -172,10 +149,9 @@ void fn_801AB67C(void* pobj);
 void fn_801AA35C(void* list, u32 size, u32 alignment)
 {
     void* p = list;
-    const char* file = (const char*)lbl_80274E90;
 
     if (p == NULL) {
-        __assert(file, 0x1ae, &lbl_8047DC98);
+        __assert((const char*)lbl_80274E90, 0x1ae, lbl_8047DC98);
     }
 
     if (lbl_8047B2E0 != NULL) {
@@ -183,9 +159,9 @@ void fn_801AA35C(void* list, u32 size, u32 alignment)
         while (*slot != NULL) {
             if (*slot == p) {
                 *slot = *(void**)((u8*)*slot + 0x28);
-            } else {
-                slot = (void**)((u8*)*slot + 0x28);
+                break;
             }
+            slot = (void**)((u8*)*slot + 0x28);
         }
     } else {
         lbl_8047B2E0 = NULL;
@@ -196,17 +172,18 @@ void fn_801AA35C(void* list, u32 size, u32 alignment)
     *(u32*)((u8*)p + 0x18) = 0;
     *(s32*)((u8*)p + 0x1c) = -1;
 
-    if (alignment > 0x20) {
-        __assert(file, 0x1b9, file + 0xc);
+    if (size > 0x20) {
+        __assert((const char*)lbl_80274E90, 0x1b9,
+                    (const char*)lbl_80274E90 + 0xc);
     }
-    fn_801BF138(alignment);
-    if (fn_801BF138(alignment) != 1) {
-        __assert(file, 0x1ba, file + 0x18);
+    fn_801BF138(size);
+    if (fn_801BF138(size) != 1) {
+        __assert((const char*)lbl_80274E90, 0x1ba,
+                    (const char*)lbl_80274E90 + 0x18);
     }
 
-    *(u32*)((u8*)p + 0x24) = alignment;
-    *(u32*)((u8*)p + 0x20) = (size + *(u32*)((u8*)p + 0x24) - 1) &
-                             ~(*(u32*)((u8*)p + 0x24) - 1);
+    *(u32*)((u8*)p + 0x24) = size;
+    *(u32*)((u8*)p + 0x20) = (size + alignment - 1) & ~(alignment - 1);
     *(void**)((u8*)p + 0x28) = lbl_8047B2E0;
     lbl_8047B2E0 = p;
 }
@@ -281,7 +258,7 @@ void fn_801AA5AC(s32 idx)
 {
     s32 i = idx;
     if (i >= 0x20) {
-        __assert(&lbl_8047DCA8, 0xa4, &lbl_8047DCB0);
+        __assert(lbl_8047DCA8, 0xa4, lbl_8047DCB0);
     }
     {
         u32* entry = (u32*)((u8*)lbl_8036CC40 + (u32)i * 4);
@@ -475,22 +452,15 @@ void fn_801AB270(void* pobj, void* vmtx, void* pmtx, u32 rendermode)
  * 0x801AB538 | size: 0xC0  -- Set entry in 2-slot array
  * fn_801AB538(idx, ptr1, ptr2)
  * ========================================================================= */
-void fn_801AB538(s32 idx, void** obj, u32* mark)
+void fn_801AB538(s32 idx, void* ptr1, void* ptr2)
 {
-    if (obj == NULL) {
-        __assert(&lbl_8047DCB8, 0x663, &lbl_8047DCE0);
-    }
-    if (mark == NULL) {
-        __assert(&lbl_8047DCB8, 0x664, &lbl_8047DCE4);
-    }
-
-    if (idx < 0 || 2 <= idx) {
-        *obj = NULL;
-        *mark = 0;
-    } else {
-        *obj = mtx_mark[idx].obj;
-        *mark = mtx_mark[idx].mark;
-    }
+    s32 i = idx;
+    if (i >= 2) return;
+    if (i < 0) goto do_store;
+    if (i < 2) return;
+do_store:
+    *(void**)((u8*)lbl_80465678 + (u32)i * 8 + 0x0) = ptr1;
+    *(void**)((u8*)lbl_80465678 + (u32)i * 8 + 0x4) = ptr2;
 }
 
 /* =========================================================================
@@ -512,17 +482,15 @@ do_store:
  * 0x801AB63C | size: 0x40  -- Init all 2 entries in array
  * fn_801AB63C(ptr, val)
  * ========================================================================= */
-#pragma push
-#pragma optimization_level 2
-void fn_801AB63C(void* obj, u32 mark)
+void fn_801AB63C(void* ptr, s32 val)
 {
-    int i;
-    for (i = 0; i < 2; i++) {
-        *(void**)((u8*)lbl_80465678 + i * 8 + 0) = obj;
-        *(u32*)((u8*)lbl_80465678 + i * 8 + 4) = mark;
-    }
+    s32 i = 0;
+    do {
+        *(void**)((u8*)lbl_80465678 + (u32)i * 8 + 0x0) = ptr;
+        *(s32*)  ((u8*)lbl_80465678 + (u32)i * 8 + 0x4) = val;
+        i++;
+    } while (i < 2);
 }
-#pragma pop
 
 /* =========================================================================
  * 0x801AB67C | size: 0x758  -- PObj shape animation display
@@ -540,65 +508,11 @@ void fn_801ABDD4(void)
 }
 
 /* =========================================================================
- * 0x801AC1F8 | size: 0x2C4  -- get_shape_nbt_xyz
+ * 0x801AC1F8 | size: 0x2C4
  * ========================================================================= */
-#pragma push
-#pragma optimize_for_size on
-void fn_801AC1F8(HSD_ShapeSet* shape_set, int shape_id, int arrayidx,
-                 f32* dst)
+void fn_801AC1F8(void)
 {
-    u8* index_array = shape_set->normal_idx_list[shape_id];
-    int i, idx;
-    void* src_base;
-
-    if ((int)shape_set->normal_desc->attr != GX_VA_NBT)
-        __assert(&lbl_8047DCB8, 0x4b1, (const char*)(lbl_80274EE0 + 0x130));
-
-    if ((int)shape_set->normal_desc->attr_type == GX_INDEX16) {
-        idx = index_array[arrayidx * 2];
-        idx = (idx << 8) + index_array[arrayidx * 2 + 1];
-    } else {
-        idx = index_array[arrayidx];
-    }
-
-    if ((int)shape_set->normal_desc->comp_cnt != GX_NRM_XYZ)
-        __assert(&lbl_8047DCB8, 0x4ba, (const char*)(lbl_80274EE0 + 0x15c));
-
-    src_base = ((u8*)shape_set->normal_desc->vertex) +
-               idx * shape_set->normal_desc->stride;
-
-    if ((int)shape_set->normal_desc->comp_type == GX_F32) {
-        memcpy(dst, src_base, sizeof(f32[9]));
-    } else {
-        int decimal_point = 1 << shape_set->normal_desc->frac;
-        switch ((int)shape_set->normal_desc->comp_type) {
-        case GX_U8:
-            for (i = 0; i < 9; i++) {
-                dst[i] = (f32)((u8*)src_base)[i] / decimal_point;
-            }
-            break;
-        case GX_S8:
-            for (i = 0; i < 9; i++) {
-                dst[i] = (f32)((s8*)src_base)[i] / decimal_point;
-            }
-            break;
-        case GX_U16:
-            for (i = 0; i < 9; i++) {
-                dst[i] = (f32)((u16*)src_base)[i] / decimal_point;
-            }
-            break;
-        case GX_S16:
-            for (i = 0; i < 9; i++) {
-                dst[i] = (f32)((s16*)src_base)[i] / decimal_point;
-            }
-            break;
-        default:
-            HSD_Panic(&lbl_8047DCB8, 0x4d9,
-                      (const char*)(lbl_80274EE0 + 0x18c));
-        }
-    }
 }
-#pragma pop
 
 /* =========================================================================
  * 0x801AC4BC | size: 0x460
@@ -608,59 +522,10 @@ void get_shape_normal_xyz(void)
 }
 
 /* =========================================================================
- * 0x801AC91C | size: 0x460  -- get_shape_vertex_xyz
+ * 0x801AC91C | size: 0x460
  * ========================================================================= */
-void fn_801AC91C(HSD_ShapeSet* shape_set, int shape_id, int arrayidx,
-                 f32 dst[3])
+void fn_801AC91C(void)
 {
-    u8* index_array = shape_set->vertex_idx_list[shape_id];
-    int idx;
-    void* src_base;
-
-    if (shape_set->vertex_desc->attr_type == GX_INDEX16) {
-        idx = index_array[arrayidx * 2];
-        idx = (idx << 8) + index_array[arrayidx * 2 + 1];
-    } else {
-        idx = index_array[arrayidx];
-    }
-
-    HSD_ASSERT(1102, shape_set->vertex_desc->comp_cnt == GX_POS_XYZ);
-    src_base = ((u8*)shape_set->vertex_desc->vertex) +
-               idx * shape_set->vertex_desc->stride;
-
-    if (shape_set->vertex_desc->comp_type == GX_F32) {
-        memcpy(dst, src_base, sizeof(f32[3]));
-    } else {
-        int decimal_point = 1 << shape_set->vertex_desc->frac;
-        switch (shape_set->vertex_desc->comp_type) {
-        case GX_U8: {
-            u8* src = src_base;
-            dst[0] = (f32)src[0] / decimal_point;
-            dst[1] = (f32)src[1] / decimal_point;
-            dst[2] = (f32)src[2] / decimal_point;
-        } break;
-        case GX_S8: {
-            s8* src = src_base;
-            dst[0] = (f32)src[0] / decimal_point;
-            dst[1] = (f32)src[1] / decimal_point;
-            dst[2] = (f32)src[2] / decimal_point;
-        } break;
-        case GX_U16: {
-            u16* src = src_base;
-            dst[0] = (f32)src[0] / decimal_point;
-            dst[1] = (f32)src[1] / decimal_point;
-            dst[2] = (f32)src[2] / decimal_point;
-        } break;
-        case GX_S16: {
-            s16* src = src_base;
-            dst[0] = (f32)src[0] / decimal_point;
-            dst[1] = (f32)src[1] / decimal_point;
-            dst[2] = (f32)src[2] / decimal_point;
-        } break;
-        default:
-            HSD_Panic(&lbl_8047DCB8, 1145, &lbl_8047DCC4);
-        }
-    }
 }
 
 /* =========================================================================
@@ -719,34 +584,38 @@ void HSD_PObjRemoveAll(HSD_PObj* pobj)
 void* fn_801AD288(void* desc)
 {
     void* d = desc;
+    void* p;
 
-    if (d != NULL) {
-        void* p;
-        void* info;
-
-        if (*(volatile u32*)d == 0 ||
-            (info = fn_80193748((const char*)*(volatile u32*)d)) == NULL) {
-            p = fn_80193828((*(void* volatile*)&lbl_8047B2E8) != NULL
-                                ? (*(void* volatile*)&lbl_8047B2E8)
-                                : (void*)lbl_8036CCD0);
-            if (p == NULL) {
-                __assert(&lbl_8047DCB8, 0x2a9, &lbl_8047DD10);
-            }
-        } else {
-            p = fn_80193828(info);
-            if (p == NULL) {
-                __assert(&lbl_8047DCB8, 0x247, &lbl_8047DD10);
-            }
-        }
-
-        {
-            void** vtbl = *(void***)p;
-            ((void(*)(void*, void*))vtbl[0x44 / 4])(p, d);
-        }
-        return p;
-    } else {
+    if (d == NULL) {
         return NULL;
     }
+
+    if (*(u32*)d != 0) {
+        void* info = fn_80193748((const char*)*(u32*)d);
+        if (info != NULL) {
+            p = fn_80193828(info);
+            if (p == NULL) {
+                __assert(lbl_8047DCB8, 0x2a9, lbl_8047DD10);
+            }
+            goto load;
+        }
+    }
+
+    if (lbl_8047B2E8 != NULL) {
+        p = lbl_8047B2E8;
+    } else {
+        p = fn_80193828(lbl_8036CCD0);
+        if (p == NULL) {
+            __assert(lbl_8047DCB8, 0x247, lbl_8047DD10);
+        }
+    }
+
+load:
+    {
+        void** vtbl = *(void***)p;
+        ((void(*)(void*, void*))vtbl[0x44 / 4])(p, d);
+    }
+    return p;
 }
 
 /* =========================================================================
@@ -836,23 +705,22 @@ void HSD_PObjReqAnimAllByFlags(f32 val, void* pobj, u32 flags)
  * ========================================================================= */
 void fn_801AD738(void* pobj, void* animlist)
 {
-    void* p;
-    void* al;
+    void* p = pobj;
+    void* al = animlist;
 
-    if (pobj == NULL || animlist == NULL) {
-        return;
-    }
+    if (p == NULL || al == NULL) return;
 
-    for (p = pobj, al = animlist; p != NULL;
-         p = *(void**)((u8*)p + 0x4),
-         al = (al != NULL ? *(void**)al : NULL)) {
-        if (p != NULL) {
-            if (*(void* volatile*)((u8*)p + 0x18) != NULL) {
-                fn_801C25E4((void*)*(void* volatile*)((u8*)p + 0x18));
-            }
-            *(void**)((u8*)p + 0x18) =
-                fn_801C2670(*(void**)((u8*)al + 0x4));
+    while (p != NULL) {
+        if (*(void**)((u8*)p + 0x18) != NULL) {
+            fn_801C25E4(*(void**)((u8*)p + 0x18));
         }
+        *(void**)((u8*)p + 0x18) = fn_801C2670(*(void**)((u8*)al + 0x4));
+        if (al == NULL) {
+            al = NULL;
+        } else {
+            al = *(void**)al;
+        }
+        p = *(void**)((u8*)p + 0x4);
     }
 }
 

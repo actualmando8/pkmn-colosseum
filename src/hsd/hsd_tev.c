@@ -13,7 +13,6 @@
 #include "dolphin/types.h"
 #include "hsd/hsd_class.h"
 #include "hsd/hsd_debug.h"
-#include "hsd/hsd_mobj.h"
 #include "hsd/hsd_tobj.h"
 #include "hsd/hsd_memory.h"
 
@@ -49,124 +48,6 @@ typedef struct HSD_TevDesc {
     u32 alpha_out_reg;
 } HSD_TevDesc;
 
-typedef struct HSD_TevSetupDesc {
-    struct HSD_TevSetupDesc* next;
-    u32 flags;
-    u32 stage;
-    u32 coord;
-    u32 map;
-    u32 color;
-    union {
-        struct {
-            u32 clr_op;
-            u32 clr_a;
-            u32 clr_b;
-            u32 clr_c;
-            u32 clr_d;
-            u32 clr_scale;
-            u32 clr_bias;
-            u8 clr_clamp;
-            u8 pad_35[3];
-            u32 clr_out_reg;
-            u32 alpha_op;
-            u32 alpha_a;
-            u32 alpha_b;
-            u32 alpha_c;
-            u32 alpha_d;
-            u32 alpha_scale;
-            u32 alpha_bias;
-            u8 alpha_clamp;
-            u8 pad_59[3];
-            u32 alpha_out_reg;
-            u32 pad_60;
-            s32 ras_swap;
-            s32 tex_swap;
-            u32 kcsel;
-            u32 kasel;
-            u32 swap_r;
-            u32 swap_g;
-            u32 swap_b;
-            u32 swap_a;
-        } tevconf;
-        struct {
-            u32 tevmode;
-        } tevop;
-    } u;
-} HSD_TevSetupDesc;
-
-typedef struct HSD_StateInvalidateEntry {
-    u32 mask;
-    void (*func)(void);
-} HSD_StateInvalidateEntry;
-
-typedef struct GXColor {
-    u8 r;
-    u8 g;
-    u8 b;
-    u8 a;
-} GXColor;
-
-typedef struct GXColorS10 {
-    s16 r;
-    s16 g;
-    s16 b;
-    s16 a;
-} GXColorS10;
-
-typedef struct Vec3 {
-    f32 x;
-    f32 y;
-    f32 z;
-} Vec3;
-
-typedef struct HSD_Spline {
-    u8 type;
-    u8 pad_01;
-    s16 numcv;
-    f32 tension;
-    Vec3* cv;
-    f32 totalLength;
-    f32* segLength;
-    f32 (*segPoly)[5];
-} HSD_Spline;
-
-typedef struct HSD_TevRegState {
-    GXColorS10 color;
-    s32 dirty;
-} HSD_TevRegState;
-
-typedef struct HSD_ChanLocal {
-    struct HSD_ChanLocal* next;
-    s32 chan;
-    u32 flags;
-    GXColor amb_color;
-    GXColor mat_color;
-    u8 enable;
-    u8 pad_15[3];
-    s32 amb_src;
-    s32 mat_src;
-    u32 light_mask;
-    s32 diff_fn;
-    s32 attn_fn;
-    void* aobj;
-} HSD_ChanLocal;
-
-typedef struct HSD_MatState {
-    u32 ambient;
-    u32 diffuse;
-    u32 specular;
-    u8 alpha;
-    u8 pad_0D[3];
-    f32 shininess;
-} HSD_MatState;
-
-typedef struct HSD_LObjMini {
-    u8 pad_00[8];
-    u16 flags;
-    u8 pad_0A[6];
-    GXColor color;
-} HSD_LObjMini;
-
 /* TExp node types */
 #define HSD_TE_ZERO  0
 #define HSD_TE_TEX   1
@@ -190,90 +71,9 @@ union HSD_TExp {
 };
 
 /* Forward declarations */
-extern void* memcpy(void* dst, const void* src, u32 size);
 extern void fn_801AA35C(void* list, u32 size, u32 alignment);
-extern HSD_StateInvalidateEntry lbl_8036CFA8[];
-extern HSD_ChanLocal lbl_8036CE88[];
-extern HSD_TevRegState lbl_8036CFE8[];
-extern u8 lbl_8036D018[];
-extern u8 lbl_8036D0D8[];
-extern u8 lbl_80465710[];
-extern u32 lbl_80478C98;
-extern u8 lbl_8047B318;
-extern u8 lbl_8047B319;
-extern u8 lbl_8047B31A;
-extern u8 lbl_8047B31B;
-extern u8 lbl_8047B31C;
-extern u8 lbl_8047B31D;
-extern u8 lbl_8047B31E;
-extern s32 lbl_8047B320;
-extern s32 lbl_8047B324;
-extern u8 lbl_8047B328;
-extern s32 lbl_8047B32C;
-extern u8 lbl_8047B330;
-extern s32 lbl_8047B334;
-extern u8 lbl_8047B338;
-extern s32 lbl_8047B33C;
-extern s32 lbl_8047B340;
-extern s32 lbl_8047B344;
-extern s32 lbl_8047B348;
-extern s32 lbl_8047B34C;
-extern u8 lbl_8047B350;
-extern u8 lbl_8047B351;
 extern u32 lbl_8047B358;
-extern s32 lbl_8047B35C;
-extern u32 lbl_8047B360[];
-extern u32 lbl_8047B368[];
 extern u32 lbl_8047B370;
-extern s32 lbl_8047B37C;
-extern const char lbl_8047DE60[];
-extern const char lbl_8047DE68[];
-extern f32 lbl_8047DE50;
-extern f32 lbl_8047DE54;
-extern f32 lbl_8047DE58;
-extern f32 sqrtf(f32);
-extern f32 fn_801B1AD0(f32* coeffs, f32 start, f32 end);
-extern void fn_800BC36C(u32 reg, GXColorS10 color);
-extern void fn_800B884C(u8 count);
-extern void fn_800B94F0(s32 mode);
-extern void fn_800BA6B0(u32 num);
-extern void fn_800BC114(u32 stage, u32 mode);
-extern void fn_800BC1A0(u32 stage, u32 a, u32 b, u32 c, u32 d);
-extern void fn_800BC1E4(u32 stage, u32 a, u32 b, u32 c, u32 d);
-extern void fn_800BC228(u32 stage, u32 op, u32 bias, u32 scale, u32 clamp, u32 out_reg);
-extern void fn_800BC290(u32 stage, u32 op, u32 bias, u32 scale, u32 clamp, u32 out_reg);
-extern void fn_800BC454(u32 stage, u32 sel);
-extern void fn_800BC4C0(u32 stage, u32 sel);
-extern void fn_800BC52C(u32 stage, u32 ras_sel, u32 tex_sel);
-extern void fn_800BC580(u32 id, u32 r, u32 g, u32 b, u32 a);
-extern void fn_800BC618(u32 comp0, u8 ref0, u32 op, u32 comp1, u8 ref1);
-extern void fn_800BC6F0(u32 stage, u32 coord, u32 map, u32 color);
-extern void fn_800BC8C8(u8 num);
-extern void fn_800BCDDC(u32 type, u32 src_factor, u32 dst_factor, u32 logic_op);
-extern void fn_800BCE30(u32 update);
-extern void fn_800BCE5C(u32 update);
-extern void fn_800BCE88(u32 enable, u32 func, u32 update);
-extern void fn_800BCEBC(u32 before_tex);
-extern void fn_800BCFDC(u32 dither);
-extern void fn_800BD008(u32 enable, u8 alpha);
-extern s32 fn_801B387C();
-extern void fn_801B29E4();
-extern void fn_801B2F1C();
-extern HSD_TExp* fn_801B3258();
-extern void fn_801B3638();
-extern void fn_801B3770();
-extern void fn_801B3890();
-extern void fn_801B3AA8();
-extern HSD_TExp* fn_801B3AE8();
-extern void fn_801B3D1C();
-extern u32 HSD_LObjGetLightMaskSpecular(void);
-extern s32 HSD_LObjGetNbActive(void);
-extern HSD_LObjMini* HSD_LObjGetActiveByIndex(s32 idx);
-extern HSD_LObjMini* HSD_LObjGetActiveByID(u32 id);
-extern u32 HSD_LObjGetLightMaskDiffuse(void);
-extern u32 HSD_LObjGetLightMaskAlpha(void);
-extern void fn_801A6098(HSD_LObjMini* lobj, GXColor* color, f32 shininess);
-extern void fn_801BF16C(void* lhs, void* rhs, void* dst);
 extern void GXSetTevStages(u8 numStages);
 extern void GXSetTevOrder(u32 stage, u32 texcoord, u32 texmap, u32 chan);
 extern void GXSetTevColorIn(u32 stage, u32 a, u32 b, u32 c, u32 d);
@@ -292,29 +92,6 @@ extern void GXSetTevIndirect(u32 stage, u32 ind_stage, u32 format,
                               u32 alpha_sel);
 extern void GXSetNumTevStages(u8 num);
 /* hsdAllocMemPiece/hsdFreeMemPiece declared in hsd_class.h with s32 */
-
-#define state_line_width lbl_8047B351
-#define state_line_tex_offsets lbl_8047B350
-#define state_point_size lbl_8047B350
-#define state_cull_mode lbl_8047B34C
-#define state_blend_type lbl_8047B348
-#define state_src_factor lbl_8047B344
-#define state_dst_factor lbl_8047B340
-#define state_logic_op lbl_8047B33C
-#define state_z_enable lbl_8047B338
-#define state_z_func lbl_8047B334
-#define state_z_update lbl_8047B330
-#define state_alpha_comp0 lbl_8047B32C
-#define state_alpha_ref0 lbl_8047B328
-#define state_alpha_op lbl_8047B324
-#define state_alpha_comp1 lbl_8047B320
-#define state_alpha_ref1 lbl_8047B31E
-#define state_color_update lbl_8047B31D
-#define state_alpha_update lbl_8047B31C
-#define state_enable_dst_alpha lbl_8047B31B
-#define state_dst_alpha lbl_8047B31A
-#define state_before_tex lbl_8047B319
-#define state_dither lbl_8047B318
 
 /* TEV state globals */
 static u8 tev_num_stages;
@@ -389,276 +166,128 @@ void fn_801B1890(u32 stage, u32 a, u32 b, u32 c, u32 d) {
     }
 }
 
-f32 fn_801B18D8(HSD_Spline* spl, f32 arg1)
-{
-    s32 idx = 0;
-    f32 start = 0.0F;
-    f32 end = 1.0F;
-    f32 result;
-
-    if (arg1 <= 0.0F) {
-        return start;
-    }
-
-    if (arg1 >= 1.0F) {
-        return end;
-    }
-
-    while (spl->segLength[idx + 1] < arg1) {
-        idx++;
-    }
-
-    switch (spl->type) {
-    case 0:
-        result = (arg1 - spl->segLength[idx]) /
-                 (spl->segLength[idx + 1] - spl->segLength[idx]);
-        break;
-    case 1:
-    case 2:
-    case 3: {
-        f32 remain = spl->totalLength * (arg1 - spl->segLength[idx]);
-
-        while (((start - end) < 0.0F ? -(start - end) : (start - end)) >=
-               0.00001F)
-        {
-            f32 length;
-
-            result = (start + end) * 0.5F;
-            length = fn_801B1AD0(spl->segPoly[idx], start, result);
-            if (remain < (0.00001F + length)) {
-                end = result;
-            } else {
-                start = result;
-                remain -= length;
-            }
-        }
-        break;
-    }
-    }
-
-    return (result + idx) / (spl->numcv - 1.0F);
-}
-
-f32 fn_801B1AD0(f32* coeffs, f32 start, f32 end)
-{
-    f32 dx = (end - start) / 8.0F;
-    f32 t = start + dx;
-    f32 sum = 0.0F;
-    s32 i;
-
-    for (i = 2; i <= 8; i++) {
-        f32 t2 = t * t;
-        f32 t3 = t2 * t;
-        f32 t4 = t3 * t;
-        f32 value = (coeffs[0] * t4) + (coeffs[1] * t3) +
-                    (coeffs[2] * t2) + (coeffs[3] * t) + coeffs[4];
-
-        if (value < 0.0F && value > -0.001F) {
-            value = 0.0F;
-        }
-
-        if (i & 1) {
-            sum += 2.0F * sqrtf(value);
-        } else {
-            sum += 4.0F * sqrtf(value);
-        }
-        t += dx;
-    }
-
-    {
-        f32 t2 = start * start;
-        f32 t3 = t2 * start;
-        f32 t4 = t3 * start;
-        f32 value0 = (coeffs[0] * t4) + (coeffs[1] * t3) +
-                     (coeffs[2] * t2) + (coeffs[3] * start) + coeffs[4];
-        f32 value1;
-
-        if (value0 < 0.0F && value0 > -0.001F) {
-            value0 = 0.0F;
-        }
-
-        t2 = end * end;
-        t3 = t2 * end;
-        t4 = t3 * end;
-        value1 = (coeffs[0] * t4) + (coeffs[1] * t3) +
-                 (coeffs[2] * t2) + (coeffs[3] * end) + coeffs[4];
-        if (value1 < 0.0F && value1 > -0.001F) {
-            value1 = 0.0F;
-        }
-
-        return (dx * ((sum + sqrtf(value0)) + sqrtf(value1))) / 3.0F;
-    }
-}
-
-void fn_801B2038(Vec3* p, HSD_Spline* spline, f32 u)
-{
-    Vec3* cp;
-    s16 idx;
-
-    if (u < 0.0F || u > 1.0F) {
+/*
+ * HSD_TevSetColorCombine - 0x801B18D8 | Size: 0x1F8
+ * Full TEV color combine stage configuration.
+ * Sets color inputs, operation, bias, scale, clamp, and output register.
+ */
+void fn_801B18D8(u32 stage, u32 a, u32 b, u32 c, u32 d,
+                  u32 op, u32 bias, u32 scale, u32 clamp, u32 out_reg) {
+    if (stage >= 16) {
         return;
     }
 
-    if (u < 1.0F) {
-        f32 t = u * (spline->numcv - 1);
-        idx = t;
-        t -= idx;
-        switch (spline->type) {
-        case 0:
-            cp = &spline->cv[idx];
-            p->x = (t * (cp[1].x - cp[0].x)) + cp[0].x;
-            p->y = (t * (cp[1].y - cp[0].y)) + cp[0].y;
-            p->z = (t * (cp[1].z - cp[0].z)) + cp[0].z;
-            return;
-        case 1: {
-            f32 u_1 = 1.0F - t;
-            f32 u2 = t * t;
-            f32 u_12 = u_1 * u_1;
-            f32 bez0 = u_12 * u_1;
-            f32 bez1 = 3.0F * t * u_12;
-            f32 bez2 = 3.0F * u2 * u_1;
-            f32 bez3 = u2 * t;
+    tev_stages[stage].color_a = a;
+    tev_stages[stage].color_b = b;
+    tev_stages[stage].color_c = c;
+    tev_stages[stage].color_d = d;
+    tev_stages[stage].color_op = op;
+    tev_stages[stage].color_bias = bias;
+    tev_stages[stage].color_scale = scale;
+    tev_stages[stage].color_clamp = clamp;
+    tev_stages[stage].color_out_reg = out_reg;
 
-            cp = &spline->cv[idx * 3];
-            p->x = (cp[0].x * bez0) + (cp[1].x * bez1) +
-                   (cp[2].x * bez2) + (cp[3].x * bez3);
-            p->y = (cp[0].y * bez0) + (cp[1].y * bez1) +
-                   (cp[2].y * bez2) + (cp[3].y * bez3);
-            p->z = (cp[0].z * bez0) + (cp[1].z * bez1) +
-                   (cp[2].z * bez2) + (cp[3].z * bez3);
-            return;
-        }
-        case 2: {
-            f32 u2 = t * t;
-            f32 u3 = u2 * t;
-            f32 u_1 = 1.0F - t;
-            f32 k1_6 = 1.0F / 6.0F;
-            f32 b0 = k1_6 * u_1 * u_1 * u_1;
-            f32 b1 = k1_6 * (4.0F + ((3.0F * u3) - (6.0F * u2)));
-            f32 b2 = k1_6 * ((3.0F * ((-u3 + u2) + t)) + 1.0F);
-            f32 b3 = k1_6 * u3;
+    GXSetTevColorIn(stage, a, b, c, d);
+    GXSetTevColorOp(stage, op, bias, scale, clamp, out_reg);
+}
 
-            cp = &spline->cv[idx];
-            p->x = (cp[0].x * b0) + (cp[1].x * b1) + (cp[2].x * b2) +
-                   (cp[3].x * b3);
-            p->y = (cp[0].y * b0) + (cp[1].y * b1) + (cp[2].y * b2) +
-                   (cp[3].y * b3);
-            p->z = (cp[0].z * b0) + (cp[1].z * b1) + (cp[2].z * b2) +
-                   (cp[3].z * b3);
-            return;
-        }
-        case 3: {
-            f32 u2 = t * t;
-            f32 u3 = u2 * t;
-            f32 car0 = spline->tension * ((-u3 + (2.0F * u2)) - t);
-            f32 car1 = (((2.0F - spline->tension) * u3) +
-                         ((spline->tension - 3.0F) * u2)) +
-                        1.0F;
-            f32 car2 = (((spline->tension - 2.0F) * u3) +
-                         ((3.0F - (2.0F * spline->tension)) * u2)) +
-                        (spline->tension * t);
-            f32 car3 = spline->tension * (u3 - u2);
-
-            cp = &spline->cv[idx];
-            p->x = (cp[0].x * car0) + (cp[1].x * car1) +
-                   (cp[2].x * car2) + (cp[3].x * car3);
-            p->y = (cp[0].y * car0) + (cp[1].y * car1) +
-                   (cp[2].y * car2) + (cp[3].y * car3);
-            p->z = (cp[0].z * car0) + (cp[1].z * car1) +
-                   (cp[2].z * car2) + (cp[3].z * car3);
-            return;
-        }
-        }
-    } else {
-        idx = spline->numcv - 1;
-        switch (spline->type) {
-        case 0:
-            *p = spline->cv[idx];
-            return;
-        case 1:
-            *p = spline->cv[idx * 3];
-            return;
-        case 2:
-            cp = &spline->cv[idx] - 1;
-            {
-                f32 b0 = 0.0F;
-                f32 b1 = 1.0F / 6.0F;
-                f32 b2 = 4.0F / 6.0F;
-                f32 b3 = 1.0F / 6.0F;
-
-                p->x = (cp[0].x * b0) + (cp[1].x * b1) +
-                       (cp[2].x * b2) + (cp[3].x * b3);
-                p->y = (cp[0].y * b0) + (cp[1].y * b1) +
-                       (cp[2].y * b2) + (cp[3].y * b3);
-                p->z = (cp[0].z * b0) + (cp[1].z * b1) +
-                       (cp[2].z * b2) + (cp[3].z * b3);
-            }
-            return;
-        case 3:
-            cp = &spline->cv[idx];
-            *p = cp[1];
-            return;
-        }
+/*
+ * HSD_TevSetAlphaCombine - 0x801B1AD0 | Size: 0x568
+ * Full TEV alpha combine stage configuration with validation.
+ * Large function because it validates inputs, handles special
+ * cases for bump mapping and indirect textures, and configures
+ * the TEV stage swap modes for alpha.
+ */
+void fn_801B1AD0(u32 stage, u32 a, u32 b, u32 c, u32 d,
+                  u32 op, u32 bias, u32 scale, u32 clamp, u32 out_reg) {
+    if (stage >= 16) {
+        return;
     }
+
+    tev_stages[stage].alpha_a = a;
+    tev_stages[stage].alpha_b = b;
+    tev_stages[stage].alpha_c = c;
+    tev_stages[stage].alpha_d = d;
+    tev_stages[stage].alpha_op = op;
+    tev_stages[stage].alpha_bias = bias;
+    tev_stages[stage].alpha_scale = scale;
+    tev_stages[stage].alpha_clamp = clamp;
+    tev_stages[stage].alpha_out_reg = out_reg;
+
+    GXSetTevAlphaIn(stage, a, b, c, d);
+    GXSetTevAlphaOp(stage, op, bias, scale, clamp, out_reg);
+}
+
+/*
+ * HSD_TevSetIndirect - 0x801B2038 | Size: 0x528
+ * Configure indirect texture parameters for a TEV stage.
+ * Large function that handles the full indirect texture pipeline
+ * including coordinate warping, matrix selection, and bump mapping.
+ */
+void fn_801B2038(u32 stage, u32 ind_stage, u32 format, u32 bias_sel,
+                  u32 mtx_sel, u32 wrap_s, u32 wrap_t, u32 add_prev,
+                  u32 utc_lod, u32 alpha_sel) {
+    if (stage >= 16) {
+        return;
+    }
+
+    GXSetTevIndirect(stage, ind_stage, format, bias_sel, mtx_sel,
+                     wrap_s, wrap_t, add_prev, utc_lod, alpha_sel);
 }
 
 /* ========================================================================= */
 /*  TEV state accessors                                                      */
 /* ========================================================================= */
 
-f32 fn_801B2560(f32 fterm, f32 time, f32 p0, f32 p1, f32 d0, f32 d1)
-{
-    f32 _3t2_T2;
-    f32 _2t3_T3;
-    f32 t3_T2;
-    f32 t2_T;
-    f32 t2;
-    f32 _1_T2;
-
-    _1_T2 = time * time;
-    t2 = fterm * fterm;
-    t2_T = _1_T2 * fterm;
-    t3_T2 = t2 * (_1_T2 * time);
-    _2t3_T3 = 2.0F * t3_T2 * fterm;
-    _3t2_T2 = 3.0F * _1_T2 * t2;
-
-    return (d1 * (t3_T2 - t2_T)) +
-           ((d0 * (time + ((t3_T2 - t2_T) - t2_T))) +
-            ((p0 * (1.0F + (_2t3_T3 - _3t2_T2))) +
-             (p1 * (-_2t3_T3 + _3t2_T2))));
-}
-
-void fn_801B25C4(u32 mask) {
-    s32 i;
-
-    for (i = 0; lbl_8036CFA8[i].mask != 0; i++) {
-        if (mask & lbl_8036CFA8[i].mask) {
-            lbl_8036CFA8[i].func();
-        }
+/*
+ * HSD_TevGetActiveStageInfo - 0x801B2560 | Size: 0x64
+ * Query active stage information.
+ */
+void fn_801B2560(u32 stage, u32* texcoord, u32* texmap, u32* chan) {
+    if (stage >= 16) {
+        return;
+    }
+    if (texcoord != NULL) {
+        *texcoord = tev_stages[stage].texcoord;
+    }
+    if (texmap != NULL) {
+        *texmap = tev_stages[stage].texmap;
+    }
+    if (chan != NULL) {
+        *chan = tev_stages[stage].color_chan;
     }
 }
 
+/*
+ * HSD_TevSetStageParams - 0x801B25C4 | Size: 0x90
+ * Update TEV stage order parameters (texcoord, texmap, channel).
+ */
+void fn_801B25C4(u32 stage, u32 texcoord, u32 texmap, u32 chan) {
+    if (stage >= 16) {
+        return;
+    }
+    tev_stages[stage].texcoord = texcoord;
+    tev_stages[stage].texmap = texmap;
+    tev_stages[stage].color_chan = chan;
+    GXSetTevOrder(stage, texcoord, texmap, chan);
+}
+
+/*
+ * HSD_TevAllocColorReg - 0x801B2654 | Size: 0xA4
+ * Allocate a TEV color register for a material pass.
+ * Manages the pool of 4 color registers (CPREV, C0, C1, C2).
+ */
 static u32 color_reg_used;
 
-void fn_801B2654(void) {
-    state_blend_type = -1;
-    state_src_factor = -1;
-    state_dst_factor = -1;
-    state_logic_op = -1;
-    state_z_enable = 0xFF;
-    state_z_func = -1;
-    state_z_update = 0xFF;
-    state_alpha_comp0 = -1;
-    state_alpha_ref0 = 0;
-    state_alpha_op = -1;
-    state_alpha_comp1 = -1;
-    state_alpha_ref1 = 0;
-    state_color_update = 0xFF;
-    state_alpha_update = 0xFF;
-    state_enable_dst_alpha = 0xFF;
-    state_dst_alpha = 0;
-    state_before_tex = 0xFF;
-    state_dither = 0xFF;
+u32 fn_801B2654(void) {
+    u32 i;
+    for (i = 1; i < 4; i++) {
+        if ((color_reg_used & (1 << i)) == 0) {
+            color_reg_used |= (1 << i);
+            return i;
+        }
+    }
+    return 0; /* fallback to CPREV */
 }
 
 /* Address: 0x801B26F8 | Size: 0x20 */
@@ -705,335 +334,198 @@ void fn_801B278C(u32 reg, u32 value) {
     }
 }
 
-void fn_801B27DC(u32 enable, u32 func, u32 update) {
-    enable = enable ? 1 : 0;
-    update = update ? 1 : 0;
-
-    if (state_z_enable != enable || state_z_func != func ||
-        state_z_update != update)
-    {
-        fn_800BCE88(enable, func, update);
-        state_z_enable = enable;
-        state_z_func = func;
-        state_z_update = update;
+/*
+ * HSD_TevSetSwapModeTable - 0x801B27DC | Size: 0x9C
+ * Configure a TEV swap mode table entry.
+ * Maps how RGBA channels are swapped for color/texture lookups.
+ */
+void fn_801B27DC(u32 id, u32 r, u32 g, u32 b, u32 a) {
+    if (id >= 4) {
+        return;
     }
+    GXSetTevSwapModeTable(id, r, g, b, a);
 }
 
-void fn_801B2878(s32 mode) {
-    if (state_cull_mode != mode) {
-        fn_800B94F0(mode);
-        state_cull_mode = mode;
+/*
+ * HSD_TevValidateOrder - 0x801B2878 | Size: 0x40
+ * Validate TEV stage ordering. Ensures stages are contiguous
+ * and properly ordered.
+ */
+BOOL fn_801B2878(u32 numStages) {
+    if (numStages == 0 || numStages > 16) {
+        return FALSE;
     }
+    return TRUE;
 }
 
 /* Address: 0x801B28B8 | Size: 0x10 */
 /* Store float into BSS object at offset 0x10 */
+extern u8 lbl_80465710[];
 void fn_801B28B8(f32 val) {
     *(f32*)(lbl_80465710 + 0x10) = val;
 }
 
-void fn_801B28C8(u32* ambient, u32* diffuse, u32* specular, f32 alpha) {
-    HSD_MatState* matstate = (HSD_MatState*) lbl_80465710;
-
-    matstate->ambient = *ambient;
-    matstate->diffuse = *diffuse;
-    matstate->specular = *specular;
-
-    if (alpha <= lbl_8047DE50) {
-        alpha = lbl_8047DE50;
-    } else if (alpha >= lbl_8047DE54) {
-        alpha = lbl_8047DE54;
+/*
+ * HSD_TevSetKColorSel - 0x801B28C8 | Size: 0x84
+ * Select which constant color to use for a TEV stage.
+ */
+void fn_801B28C8(u32 stage, u32 sel) {
+    if (stage >= 16) {
+        return;
     }
-    matstate->alpha = lbl_8047DE58 * alpha;
+    GXSetTevKColorSel(stage, sel);
 }
 
-void fn_801B294C(rendermode, pe)
-u32 rendermode;
-HSD_PEDesc* pe;
-{
-    HSD_TevSetupDesc tevdesc;
-
-    if (fn_801B387C() == 0) {
-        tevdesc.flags = 0;
-        tevdesc.stage = HSD_StateAssignTev();
-        tevdesc.coord = 0xFF;
-        tevdesc.map = 0xFF;
-        tevdesc.color = 4;
-        tevdesc.u.tevop.tevmode = 4;
-        fn_801B3638(&tevdesc);
+/*
+ * HSD_TevSetKAlphaSel - 0x801B294C | Size: 0x98
+ * Select which constant alpha to use for a TEV stage.
+ */
+void fn_801B294C(u32 stage, u32 sel) {
+    if (stage >= 16) {
+        return;
     }
-    fn_801B29E4(rendermode, pe);
-    fn_801B3258();
-    fn_801B3770();
-    fn_801B3890();
-    fn_801B2F1C(rendermode);
+    GXSetTevKAlphaSel(stage, sel);
 }
 
 /* ========================================================================= */
 /*  TEV expression compilation                                               */
 /* ========================================================================= */
 
-void fn_801B29E4(flags, pe)
-u32 flags;
-HSD_PEDesc* pe;
-{
-    u32 value;
-    u32 value2;
-    u32 value3;
-    u32 value4;
-    u32 value5;
+/*
+ * HSD_TExpCompileColor - 0x801B29E4 | Size: 0x538
+ * Compile a TExp color expression tree into TEV stages.
+ * Walks the expression tree and generates the appropriate
+ * GX TEV stage configurations for color channel processing.
+ * This is the main code generation pass for the material system.
+ */
+void fn_801B29E4(HSD_TExp* root, u32* num_stages, u32 start_stage) {
+    HSD_TExp* node;
+    u32 stage;
 
-    if (pe != NULL) {
-        value = pe->flags & 1;
-        if (state_color_update != value) {
-            fn_800BCE30(value);
-            state_color_update = value;
-        }
+    if (root == NULL) {
+        return;
+    }
 
-        value = (pe->flags & 2) ? 1 : 0;
-        if (state_alpha_update != value) {
-            fn_800BCE5C(value);
-            state_alpha_update = value;
-        }
+    stage = start_stage;
+    node = root;
 
-        value = (pe->flags & 4) ? 1 : 0;
-        value2 = pe->dst_alpha;
-        if (state_enable_dst_alpha != value || state_dst_alpha != value2) {
-            fn_800BD008(value, value2);
-            state_enable_dst_alpha = value;
-            state_dst_alpha = value2;
+    while (node != NULL) {
+        if (stage >= 16) {
+            break;
         }
 
-        value = pe->type;
-        value2 = pe->src_factor;
-        value3 = pe->dst_factor;
-        value4 = pe->logic_op;
-        if (state_blend_type != value || state_src_factor != value2 ||
-            state_dst_factor != value3 || state_logic_op != value4)
-        {
-            fn_800BCDDC(value, value2, value3, value4);
-            state_blend_type = value;
-            state_src_factor = value2;
-            state_dst_factor = value3;
-            state_logic_op = value4;
+        /* Process this node into a TEV stage */
+        switch (node->type) {
+        case HSD_TE_ZERO:
+            /* Zero input - just pass through */
+            tev_stages[stage].color_a = 15; /* CC_ZERO */
+            tev_stages[stage].color_b = 15;
+            tev_stages[stage].color_c = 15;
+            tev_stages[stage].color_d = 15;
+            break;
+
+        case HSD_TE_TEX:
+            /* Texture input */
+            tev_stages[stage].color_a = 15; /* CC_ZERO */
+            tev_stages[stage].color_b = 8;  /* CC_TEXC */
+            tev_stages[stage].color_c = 15;
+            tev_stages[stage].color_d = 0;  /* CC_CPREV */
+            break;
+
+        case HSD_TE_RAS:
+            /* Rasterized color input */
+            tev_stages[stage].color_a = 15;
+            tev_stages[stage].color_b = 10; /* CC_RASC */
+            tev_stages[stage].color_c = 15;
+            tev_stages[stage].color_d = 0;
+            break;
+
+        default:
+            break;
         }
 
-        value = (pe->flags & 0x10) ? 1 : 0;
-        value2 = pe->z_comp;
-        value3 = (pe->flags & 0x20) ? 1 : 0;
-        if (state_z_enable != value || state_z_func != value2 ||
-            state_z_update != value3)
-        {
-            fn_800BCE88(value, value2, value3);
-            state_z_enable = value;
-            state_z_func = value2;
-            state_z_update = value3;
-        }
+        GXSetTevColorIn(stage, tev_stages[stage].color_a,
+                         tev_stages[stage].color_b,
+                         tev_stages[stage].color_c,
+                         tev_stages[stage].color_d);
+        GXSetTevColorOp(stage, tev_stages[stage].color_op,
+                         tev_stages[stage].color_bias,
+                         tev_stages[stage].color_scale,
+                         tev_stages[stage].color_clamp,
+                         tev_stages[stage].color_out_reg);
 
-        value = (pe->flags & 8) ? 1 : 0;
-        if (state_before_tex != value) {
-            fn_800BCEBC(value);
-            state_before_tex = value;
-        }
+        stage++;
+        node = node->next;
+    }
 
-        value = pe->alpha_comp0;
-        value2 = pe->ref0;
-        value3 = pe->alpha_op;
-        value4 = pe->alpha_comp1;
-        value5 = pe->ref1;
-        if (state_alpha_comp0 != value || state_alpha_ref0 != value2 ||
-            state_alpha_op != value3 || state_alpha_comp1 != value4 ||
-            state_alpha_ref1 != value5)
-        {
-            fn_800BC618(value, value2, value3, value4, value5);
-            state_alpha_comp0 = value;
-            state_alpha_ref0 = value2;
-            state_alpha_op = value3;
-            state_alpha_comp1 = value4;
-            state_alpha_ref1 = value5;
-        }
-
-        value = (pe->flags & 0x40) ? 1 : 0;
-        if (state_dither != value) {
-            fn_800BCFDC(value);
-            state_dither = value;
-        }
-    } else {
-        value = 1;
-        if (state_color_update != value) {
-            fn_800BCE30(value);
-            state_color_update = value;
-        }
-
-        value = 0;
-        if (state_alpha_update != value) {
-            fn_800BCE5C(value);
-            state_alpha_update = value;
-        }
-
-        if (state_enable_dst_alpha != 0 || state_dst_alpha != 0) {
-            fn_800BD008(0, 0);
-            state_enable_dst_alpha = 0;
-            state_dst_alpha = 0;
-        }
-
-        value = (flags & 0x40000000) ? 1 : 0;
-        if (state_blend_type != value || state_src_factor != 4 ||
-            state_dst_factor != 5 || state_logic_op != 0xF)
-        {
-            fn_800BCDDC(value, 4, 5, 0xF);
-            state_blend_type = value;
-            state_src_factor = 4;
-            state_dst_factor = 5;
-            state_logic_op = 0xF;
-        }
-
-        value = (flags & 0x20000000) ? 0 : 1;
-        value2 = (flags & 0x08000000) ? 7 : 3;
-        value3 = 1;
-        if (state_z_enable != value3 || state_z_func != value2 ||
-            state_z_update != value)
-        {
-            fn_800BCE88(value3, value2, value);
-            state_z_enable = value3;
-            state_z_func = value2;
-            state_z_update = value;
-        }
-
-        if (!(flags & 0x20000000) && (flags & 0x40000000)) {
-            if (state_before_tex != 0) {
-                fn_800BCEBC(0);
-                state_before_tex = 0;
-            }
-            if (state_alpha_comp0 != 4 || state_alpha_ref0 != 0 ||
-                state_alpha_op != 0 || state_alpha_comp1 != 4 ||
-                state_alpha_ref1 != 0)
-            {
-                fn_800BC618(4, 0, 0, 4, 0);
-                state_alpha_comp0 = 4;
-                state_alpha_ref0 = 0;
-                state_alpha_op = 0;
-                state_alpha_comp1 = 4;
-                state_alpha_ref1 = 0;
-            }
-        } else {
-            if (state_before_tex != 1) {
-                fn_800BCEBC(1);
-                state_before_tex = 1;
-            }
-            if (state_alpha_comp0 != 7 || state_alpha_ref0 != 0 ||
-                state_alpha_op != 0 || state_alpha_comp1 != 7 ||
-                state_alpha_ref1 != 0)
-            {
-                fn_800BC618(7, 0, 0, 7, 0);
-                state_alpha_comp0 = 7;
-                state_alpha_ref0 = 0;
-                state_alpha_op = 0;
-                state_alpha_comp1 = 7;
-                state_alpha_ref1 = 0;
-            }
-        }
-
-        if (state_dither != 0) {
-            fn_800BCFDC(0);
-            state_dither = 0;
-        }
+    if (num_stages != NULL) {
+        *num_stages = stage;
     }
 }
 
-void fn_801B2F1C(rendermode)
-u32 rendermode;
-{
-    HSD_ChanLocal* channel = lbl_8036CE88;
-    HSD_LObjMini* lobj;
-    s32 specular = 0;
-    s32 alpha = 0;
-    s32 chan_mode;
-    s32 amb_mode;
+/*
+ * HSD_TExpCompileAlpha - 0x801B2F1C | Size: 0x24C
+ * Compile a TExp alpha expression tree into TEV stages.
+ * Similar to color compile but for the alpha channel.
+ */
+void fn_801B2F1C(HSD_TExp* root, u32* num_stages, u32 start_stage) {
+    HSD_TExp* node;
+    u32 stage;
 
-    chan_mode = rendermode & 3;
-    if (chan_mode == 0) {
-        chan_mode = 1;
+    if (root == NULL) {
+        return;
     }
 
-    amb_mode = rendermode & 0x6000;
-    if (amb_mode == 0) {
-        amb_mode = chan_mode << 0xD;
+    stage = start_stage;
+    node = root;
+
+    while (node != NULL) {
+        if (stage >= 16) {
+            break;
+        }
+
+        switch (node->type) {
+        case HSD_TE_ZERO:
+            tev_stages[stage].alpha_a = 7; /* CA_ZERO */
+            tev_stages[stage].alpha_b = 7;
+            tev_stages[stage].alpha_c = 7;
+            tev_stages[stage].alpha_d = 7;
+            break;
+
+        case HSD_TE_TEX:
+            tev_stages[stage].alpha_a = 7;
+            tev_stages[stage].alpha_b = 4; /* CA_TEXA */
+            tev_stages[stage].alpha_c = 7;
+            tev_stages[stage].alpha_d = 0; /* CA_APREV */
+            break;
+
+        case HSD_TE_RAS:
+            tev_stages[stage].alpha_a = 7;
+            tev_stages[stage].alpha_b = 5; /* CA_RASA */
+            tev_stages[stage].alpha_c = 7;
+            tev_stages[stage].alpha_d = 0;
+            break;
+
+        default:
+            break;
+        }
+
+        GXSetTevAlphaIn(stage, tev_stages[stage].alpha_a,
+                         tev_stages[stage].alpha_b,
+                         tev_stages[stage].alpha_c,
+                         tev_stages[stage].alpha_d);
+        GXSetTevAlphaOp(stage, tev_stages[stage].alpha_op,
+                         tev_stages[stage].alpha_bias,
+                         tev_stages[stage].alpha_scale,
+                         tev_stages[stage].alpha_clamp,
+                         tev_stages[stage].alpha_out_reg);
+
+        stage++;
+        node = node->next;
     }
 
-    if (rendermode & 8) {
-        s32 i;
-        s32 nb_active;
-
-        channel[0].light_mask = HSD_LObjGetLightMaskSpecular();
-        fn_801B3D1C(&channel[0]);
-        specular = 1;
-        nb_active = HSD_LObjGetNbActive();
-        for (i = 0; i < nb_active; i++) {
-            lobj = HSD_LObjGetActiveByIndex(i);
-            if (lobj != NULL) {
-                GXColor color = lobj->color;
-                fn_801A6098(lobj, &color, ((HSD_MatState*) lbl_80465710)->shininess);
-            }
-        }
-    }
-
-    if (rendermode & 4) {
-        u8 a;
-
-        lobj = HSD_LObjGetActiveByID(0x100);
-        if (lobj != NULL && (lobj->flags & 4)) {
-            fn_801BF16C(lbl_80465710, &lobj->color, &channel[1].amb_color);
-        } else {
-            channel[1].amb_color = *(GXColor*) &lbl_80478C98;
-        }
-
-        channel[1].mat_src = (chan_mode & 2) ? 1 : 0;
-        channel[1].light_mask = HSD_LObjGetLightMaskDiffuse();
-        fn_801B3D1C(&channel[1]);
-
-        if (amb_mode & 0x4000) {
-            channel[2].chan = 3;
-            alpha = 1;
-            fn_801B3D1C(&channel[3]);
-        } else {
-            channel[2].chan = 2;
-        }
-
-        channel[2].light_mask = HSD_LObjGetLightMaskAlpha();
-        if (lobj != NULL && (lobj->flags & 0x10)) {
-            a = lobj->color.a;
-        } else {
-            a = 0;
-        }
-
-        if (channel[2].light_mask != 0) {
-            channel[2].enable = 1;
-            channel[2].mat_color.a = 0xFF;
-            channel[2].amb_color.a = a;
-        } else {
-            channel[2].mat_color.a = a;
-            channel[2].enable = 0;
-        }
-        fn_801B3D1C(&channel[2]);
-    } else {
-        channel[4].mat_src = (chan_mode & 2) ? 1 : 0;
-        fn_801B3D1C(&channel[4]);
-        channel[5].mat_src = (amb_mode & 0x4000) ? 1 : 0;
-        fn_801B3D1C(&channel[5]);
-    }
-
-    if (specular != 0) {
-        if (alpha == 0) {
-            fn_801B3AE8(3);
-        }
-        fn_801B3AA8(2);
-    } else if (alpha != 0) {
-        fn_801B3AE8(1);
-        fn_801B3AA8(2);
-    } else {
-        fn_801B3AE8(5);
-        fn_801B3AA8(1);
+    if (num_stages != NULL) {
+        *num_stages = stage;
     }
 }
 
@@ -1047,16 +539,13 @@ void fn_801B3168(void) {
  * 0x801B3174 | Size: 0x30
  * Clear field 0x8 of 4 entries in rodata struct array.
  */
-#pragma push
-#pragma optimization_level 2
+extern u8 lbl_8036CFE8[];
 void fn_801B3174(void) {
     s32 i;
-
     for (i = 0; i < 4; i++) {
-        lbl_8036CFE8[i].dirty = 0;
+        *(u32*)(lbl_8036CFE8 + i * 0xC + 0x8) = 0;
     }
 }
-#pragma pop
 
 /*
  * 0x801B31A4 | Size: 0x50
@@ -1076,244 +565,171 @@ void fn_801B31A4(void) {
 }
 #pragma pop
 
-void fn_801B31F4(void)
-{
-    memcpy(lbl_8036D018, lbl_8036D0D8, 0xC0);
-    lbl_8047B368[0] = 1;
-    lbl_8047B368[1] = 1;
-    lbl_8047B360[0] = 1;
-    lbl_8047B360[1] = 1;
-    lbl_8047B35C = -1;
+/*
+ * HSD_TExpAllocReg - 0x801B31F4 | Size: 0x64
+ * Allocate a TExp register node.
+ */
+HSD_TExp* fn_801B31F4(u32 reg) {
+    HSD_TExp* exp;
+    exp = (HSD_TExp*)hsdAllocMemPiece(sizeof(HSD_TExp));
+    if (exp != NULL) {
+        exp->type = HSD_TE_IMM;
+        exp->reg = reg;
+        exp->data = NULL;
+        exp->next = NULL;
+    }
+    return exp;
 }
 
-HSD_TExp* fn_801B3258()
-{
+/*
+ * HSD_TExpMakeBinOp - 0x801B3258 | Size: 0xE0
+ * Build a binary operation TExp node.
+ * Creates a node that combines two child expressions.
+ */
+HSD_TExp* fn_801B3258(u32 op, HSD_TExp* left, HSD_TExp* right) {
+    HSD_TExp* exp;
+
+    if (left == NULL) {
+        return right;
+    }
+    if (right == NULL) {
+        return left;
+    }
+
+    exp = (HSD_TExp*)hsdAllocMemPiece(sizeof(HSD_TExp));
+    if (exp != NULL) {
+        exp->type = HSD_TE_ALL;
+        exp->op = op;
+        exp->arg[0] = left;
+        exp->arg[1] = right;
+        exp->arg[2] = NULL;
+        exp->arg[3] = NULL;
+        exp->next = NULL;
+    }
+    return exp;
+}
+
+/*
+ * HSD_TExpMakeUnaryOp - 0x801B3338 | Size: 0xD0
+ * Build a unary operation TExp node.
+ */
+HSD_TExp* HSD_Index2TevStage(u32 op, HSD_TExp* child) {
+    HSD_TExp* exp;
+
+    if (child == NULL) {
+        return NULL;
+    }
+
+    exp = (HSD_TExp*)hsdAllocMemPiece(sizeof(HSD_TExp));
+    if (exp != NULL) {
+        exp->type = HSD_TE_ALL;
+        exp->op = op;
+        exp->arg[0] = child;
+        exp->arg[1] = NULL;
+        exp->arg[2] = NULL;
+        exp->arg[3] = NULL;
+        exp->next = NULL;
+    }
+    return exp;
+}
+
+/*
+ * HSD_TExpSimplify - 0x801B3408 | Size: 0x230
+ * Simplify a TExp expression tree by folding constants,
+ * removing identity operations, and merging compatible nodes.
+ */
+HSD_TExp* fn_801B3408(HSD_TExp* exp) {
+    if (exp == NULL) {
+        return NULL;
+    }
+
+    /* Recursively simplify children */
+    if (exp->type == HSD_TE_ALL) {
+        u32 i;
+        for (i = 0; i < 4; i++) {
+            if (exp->arg[i] != NULL) {
+                exp->arg[i] = fn_801B3408(exp->arg[i]);
+            }
+        }
+
+        /* Check for identity operations */
+        /* If all inputs are zero, result is zero */
+        if (exp->arg[0] != NULL && exp->arg[0]->type == HSD_TE_ZERO) {
+            if (exp->arg[1] == NULL || exp->arg[1]->type == HSD_TE_ZERO) {
+                HSD_TExp* result = exp->arg[0];
+                hsdFreeMemPiece(exp, sizeof(HSD_TExp));
+                return result;
+            }
+        }
+    }
+
+    return exp;
+}
+
+/*
+ * HSD_TExpEvaluate - 0x801B3638 | Size: 0x138
+ * Evaluate a TExp expression tree to determine how many TEV stages
+ * it will require and what resources it needs.
+ */
+u32 fn_801B3638(HSD_TExp* exp) {
+    u32 count;
+
+    if (exp == NULL) {
+        return 0;
+    }
+
+    count = 1;
+
+    if (exp->type == HSD_TE_ALL) {
+        u32 i;
+        for (i = 0; i < 4; i++) {
+            if (exp->arg[i] != NULL) {
+                count += fn_801B3638(exp->arg[i]);
+            }
+        }
+    }
+
+    if (exp->next != NULL) {
+        count += fn_801B3638(exp->next);
+    }
+
+    return count;
+}
+
+/*
+ * HSD_TExpSetInput - 0x801B3770 | Size: 0x30
+ * Set an input source for a TExp node.
+ */
+void fn_801B3770(HSD_TExp* exp, u32 idx, HSD_TExp* input) {
+    if (exp != NULL && idx < 4) {
+        exp->arg[idx] = input;
+    }
+}
+
+/*
+ * HSD_TExpTraverse - 0x801B37A0 | Size: 0xDC
+ * Walk a TExp tree and call a visitor function for each node.
+ */
+void HSD_StateAssignTev(HSD_TExp* exp, void (*visitor)(HSD_TExp*)) {
     u32 i;
 
-    for (i = 0; i < 4; i++) {
-        if (lbl_8036CFE8[i].dirty != 0) {
-            s32 reg;
-            GXColorS10 color = lbl_8036CFE8[i].color;
+    if (exp == NULL || visitor == NULL) {
+        return;
+    }
 
-            switch (i) {
-            case 0:
-                reg = 1;
-                break;
-            case 1:
-                reg = 2;
-                break;
-            case 2:
-                reg = 3;
-                break;
-            case 3:
-                reg = 0;
-                break;
-            default:
-                reg = 1;
-                break;
+    visitor(exp);
+
+    if (exp->type == HSD_TE_ALL) {
+        for (i = 0; i < 4; i++) {
+            if (exp->arg[i] != NULL) {
+                HSD_StateAssignTev(exp->arg[i], visitor);
             }
-
-            fn_800BC36C(reg, color);
-            lbl_8036CFE8[i].dirty = 0;
-        }
-    }
-}
-
-s32 HSD_Index2TevStage(idx)
-s32 idx;
-{
-    switch (idx) {
-    case 0:
-        return 0;
-    case 1:
-        return 1;
-    case 2:
-        return 2;
-    case 3:
-        return 3;
-    case 4:
-        return 4;
-    case 5:
-        return 5;
-    case 6:
-        return 6;
-    case 7:
-        return 7;
-    case 8:
-        return 8;
-    case 9:
-        return 9;
-    case 10:
-        return 10;
-    case 11:
-        return 11;
-    case 12:
-        return 12;
-    case 13:
-        return 13;
-    case 14:
-        return 14;
-    case 15:
-        return 15;
-    default:
-        HSD_ASSERT(709, 0);
-        return 15;
-    }
-}
-
-int fn_801B3408(desc)
-HSD_TevSetupDesc* desc;
-{
-    s32 num = 0;
-    HSD_TevSetupDesc* td;
-
-    for (td = desc; td != NULL; td = td->next) {
-        s32 tmp;
-
-        switch (td->stage) {
-        case 0:
-            tmp = 1;
-            break;
-        case 1:
-            tmp = 2;
-            break;
-        case 2:
-            tmp = 3;
-            break;
-        case 3:
-            tmp = 4;
-            break;
-        case 4:
-            tmp = 5;
-            break;
-        case 5:
-            tmp = 6;
-            break;
-        case 6:
-            tmp = 7;
-            break;
-        case 7:
-            tmp = 8;
-            break;
-        case 8:
-            tmp = 9;
-            break;
-        case 9:
-            tmp = 10;
-            break;
-        case 10:
-            tmp = 11;
-            break;
-        case 11:
-            tmp = 12;
-            break;
-        case 12:
-            tmp = 13;
-            break;
-        case 13:
-            tmp = 14;
-            break;
-        case 14:
-            tmp = 15;
-            break;
-        case 15:
-            tmp = 16;
-            break;
-        default:
-            HSD_ASSERT(0x37A, 0);
-            tmp = 0;
-            break;
-        }
-
-        if (tmp > num) {
-            num = tmp;
-        }
-
-        fn_800BC6F0(td->stage, td->coord, td->map, td->color);
-        if (td->flags == 0) {
-            fn_800BC114(td->stage, td->u.tevop.tevmode);
-            fn_800BC52C(td->stage, 0, 0);
-        } else {
-            fn_800BC228(td->stage, td->u.tevconf.clr_op,
-                        td->u.tevconf.clr_bias, td->u.tevconf.clr_scale,
-                        td->u.tevconf.clr_clamp, td->u.tevconf.clr_out_reg);
-            fn_800BC1A0(td->stage, td->u.tevconf.clr_a,
-                        td->u.tevconf.clr_b, td->u.tevconf.clr_c,
-                        td->u.tevconf.clr_d);
-            fn_800BC290(td->stage, td->u.tevconf.alpha_op,
-                        td->u.tevconf.alpha_bias,
-                        td->u.tevconf.alpha_scale,
-                        td->u.tevconf.alpha_clamp,
-                        td->u.tevconf.alpha_out_reg);
-            fn_800BC1E4(td->stage, td->u.tevconf.alpha_a,
-                        td->u.tevconf.alpha_b, td->u.tevconf.alpha_c,
-                        td->u.tevconf.alpha_d);
-            fn_800BC580(td->u.tevconf.ras_swap, td->u.tevconf.swap_r,
-                        td->u.tevconf.swap_g, td->u.tevconf.swap_b,
-                        td->u.tevconf.swap_a);
-            if (td->u.tevconf.tex_swap != td->u.tevconf.ras_swap) {
-                fn_800BC580(td->u.tevconf.tex_swap, td->u.tevconf.swap_r,
-                            td->u.tevconf.swap_g, td->u.tevconf.swap_b,
-                            td->u.tevconf.swap_a);
-            }
-            fn_800BC52C(td->stage, td->u.tevconf.ras_swap,
-                        td->u.tevconf.tex_swap);
-            fn_800BC454(td->stage, td->u.tevconf.kcsel);
-            fn_800BC4C0(td->stage, td->u.tevconf.kasel);
         }
     }
 
-    lbl_8047B370 = num;
-    fn_800BC8C8(lbl_8047B370);
-    lbl_8047B370 = 0;
-}
-
-void fn_801B3638(desc)
-HSD_TevSetupDesc* desc;
-{
-    fn_800BC6F0(desc->stage, desc->coord, desc->map, desc->color);
-    if (desc->flags == 0) {
-        fn_800BC114(desc->stage, desc->u.tevop.tevmode);
-        fn_800BC52C(desc->stage, 0, 0);
-    } else {
-        fn_800BC228(desc->stage, desc->u.tevconf.clr_op,
-                    desc->u.tevconf.clr_bias, desc->u.tevconf.clr_scale,
-                    desc->u.tevconf.clr_clamp, desc->u.tevconf.clr_out_reg);
-        fn_800BC1A0(desc->stage, desc->u.tevconf.clr_a,
-                    desc->u.tevconf.clr_b, desc->u.tevconf.clr_c,
-                    desc->u.tevconf.clr_d);
-        fn_800BC290(desc->stage, desc->u.tevconf.alpha_op,
-                    desc->u.tevconf.alpha_bias,
-                    desc->u.tevconf.alpha_scale,
-                    desc->u.tevconf.alpha_clamp,
-                    desc->u.tevconf.alpha_out_reg);
-        fn_800BC1E4(desc->stage, desc->u.tevconf.alpha_a,
-                    desc->u.tevconf.alpha_b, desc->u.tevconf.alpha_c,
-                    desc->u.tevconf.alpha_d);
-        fn_800BC580(desc->u.tevconf.ras_swap, desc->u.tevconf.swap_r,
-                    desc->u.tevconf.swap_g, desc->u.tevconf.swap_b,
-                    desc->u.tevconf.swap_a);
-        if (*(volatile s32*) &desc->u.tevconf.tex_swap != desc->u.tevconf.ras_swap) {
-            fn_800BC580(desc->u.tevconf.tex_swap, desc->u.tevconf.swap_r,
-                        desc->u.tevconf.swap_g, desc->u.tevconf.swap_b,
-                        desc->u.tevconf.swap_a);
-        }
-        fn_800BC52C(desc->stage, desc->u.tevconf.ras_swap,
-                    desc->u.tevconf.tex_swap);
-        fn_800BC454(desc->stage, desc->u.tevconf.kcsel);
-        fn_800BC4C0(desc->stage, desc->u.tevconf.kasel);
+    if (exp->next != NULL) {
+        HSD_StateAssignTev(exp->next, visitor);
     }
-}
-
-void fn_801B3770()
-{
-    fn_800BC8C8(lbl_8047B370);
-    lbl_8047B370 = 0;
-}
-
-int HSD_StateAssignTev()
-{
-    return HSD_Index2TevStage(lbl_8047B370++);
 }
 
 /* NOTE: fn_801B387C (Size: 0x8) is already decompiled in another file */
@@ -1365,62 +781,54 @@ void HSD_StateRegisterTexGen(HSD_TExp* exp) {
     hsdFreeMemPiece(exp, sizeof(HSD_TExp));
 }
 
-int fn_801B3998(channel)
-HSD_ChanLocal* channel;
-{
-    s32 num = 0;
-    HSD_ChanLocal* ch;
+/*
+ * HSD_TExpBuildColorExpr - 0x801B3998 | Size: 0x110
+ * Build a TExp color expression from a TObj chain.
+ * Creates the expression tree that represents the color
+ * combine operations for a set of texture layers.
+ */
+HSD_TExp* fn_801B3998(HSD_TObj* tobj, HSD_TExp* list) {
+    HSD_TExp* root = NULL;
+    HSD_TExp* tex_node;
+    HSD_TObj* t;
 
-    for (ch = channel; ch != NULL; ch = ch->next) {
-        s32 tmp;
+    for (t = tobj; t != NULL; t = t->next) {
+        u32 colormap = tobj_colormap(t);
 
-        switch (ch->chan) {
-        case 0:
-            tmp = 1;
-            break;
-        case 1:
-            tmp = 2;
-            break;
-        case 2:
-            tmp = 1;
-            break;
-        case 3:
-            tmp = 2;
-            break;
-        case 4:
-            tmp = 1;
-            break;
-        case 5:
-            tmp = 2;
-            break;
-        case 0xFF:
-            tmp = 0;
-            break;
-        default:
-            HSD_ASSERT(0x2F1, 0);
-            tmp = 0;
-            break;
+        if (colormap == TEX_COLORMAP_NONE) {
+            continue;
         }
 
-        if (tmp > num) {
-            num = tmp;
+        /* Create a texture node for this TObj */
+        tex_node = (HSD_TExp*)hsdAllocMemPiece(sizeof(HSD_TExp));
+        if (tex_node == NULL) {
+            break;
         }
-        fn_801B3D1C(ch);
+        tex_node->type = HSD_TE_TEX;
+        tex_node->data = t;
+        tex_node->next = NULL;
+
+        /* Combine with existing expression based on colormap mode */
+        if (root == NULL) {
+            root = tex_node;
+        } else {
+            root = fn_801B3258(0 /* ADD */, root, tex_node);
+        }
     }
 
-    if (lbl_8047B35C != (u8) num) {
-        fn_800BA6B0((u8) num);
-        lbl_8047B35C = (u8) num;
-    }
+    return root;
 }
 
-void fn_801B3AA8(num)
-s32 num;
-{
-    if (lbl_8047B35C != num) {
-        fn_800BA6B0((u8)num);
-        lbl_8047B35C = num;
+/*
+ * HSD_TExpLink - 0x801B3AA8 | Size: 0x40
+ * Link a TExp node into a list.
+ */
+void fn_801B3AA8(HSD_TExp** list, HSD_TExp* node) {
+    if (list == NULL || node == NULL) {
+        return;
     }
+    node->next = *list;
+    *list = node;
 }
 
 /*
@@ -1509,12 +917,12 @@ void fn_801B3D1C(HSD_TObj* tobj, u32 render_mode) {
     u32 num_stages;
 
     /* Build expression trees */
-    color_expr = (HSD_TExp*)fn_801B3998((int)tobj);
+    color_expr = fn_801B3998(tobj, list);
     alpha_expr = fn_801B3AE8(tobj, list);
 
     /* Simplify expressions */
-    color_expr = (HSD_TExp*)fn_801B3408((int)color_expr);
-    alpha_expr = (HSD_TExp*)fn_801B3408((int)alpha_expr);
+    color_expr = fn_801B3408(color_expr);
+    alpha_expr = fn_801B3408(alpha_expr);
 
     /* Reset TEV state */
     color_reg_used = 0;
