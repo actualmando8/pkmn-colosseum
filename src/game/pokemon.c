@@ -4493,42 +4493,46 @@ s32 fn_801F7174(u32 param_1, u32 param_2, u32 param_3) {
     extern u32 fn_80205BE8(u32);
     extern u8 fn_80206608(u32);
     extern u32 fn_8012640C(u32, u32, u16, u32);
-    u16 uBound2;
-    s32 iVar8;
-    u32 uVar7;
-    u32 uVar1;
-    u32 iVar2;
-    u32 iVar3;
-    u32 uVar4;
-    u16 uBound3;
-    u32 uVar6;
+    int total;
+    u32 innerLimit;
+    u32 baseObj;
+    u32 outerObj;
+    u32 innerObj;
+    u32 statObj;
+    u32 status;
+    u16 outerCount;
+    u32 outerIndex;
 
-    uBound2 = param_2;
-    iVar8 = 0;
-    uVar7 = 0;
-    for (; (uVar7 & 0xFFFF) < (uBound2 & 0xFFFF); uVar7 = uVar7 + 1) {
-        if (param_1 == 0) {
-            uVar1 = 0;
+    total = 0;
+    baseObj = param_1;
+    innerLimit = param_3;
+    outerCount = param_2;
+    outerIndex = 0;
+    for (; (outerIndex & 0xFFFF) < (outerCount & 0xFFFF); outerIndex = outerIndex + 1) {
+        if (baseObj == 0) {
+            outerObj = 0;
         } else {
-            uVar1 = fn_801F78D4(param_1, uVar7);
+            outerObj = fn_801F78D4(baseObj, outerIndex);
         }
-        uVar4 = fn_801FA634(uVar1);
-        if (uVar4 != 0) {
-            uBound3 = param_3;
-            uVar6 = 0;
-            for (; (uVar6 & 0xFFFF) < (uBound3 & 0xFFFF); uVar6 = uVar6 + 1) {
-                iVar2 = fn_801F986C(uVar1, uVar6);
-                if (iVar2 != 0) {
-                    iVar3 = fn_80205BE8(iVar2);
-                    if ((iVar3 != 0) && (uVar4 = fn_80206608(iVar2), uVar4 != 0)) {
-                        uVar4 = fn_8012640C(iVar3, 0, 0x83, 0);
-                        iVar8 = iVar8 + (uVar4 & 0xFFFF);
+        status = fn_801FA634(outerObj);
+        if (status != 0) {
+            u16 innerCount;
+            u32 innerIndex;
+
+            innerCount = innerLimit;
+            innerIndex = 0;
+            for (; (innerIndex & 0xFFFF) < (innerCount & 0xFFFF); innerIndex = innerIndex + 1) {
+                innerObj = fn_801F986C(outerObj, innerIndex);
+                if (innerObj != 0) {
+                    statObj = fn_80205BE8(innerObj);
+                    if ((statObj != 0) && (status = fn_80206608(innerObj), status != 0)) {
+                        total = total + (fn_8012640C(statObj, 0, 0x83, 0) & 0xFFFF);
                     }
                 }
             }
         }
     }
-    return iVar8;
+    return total;
 }
 
 /* 0x801F7258 | size: 0x58 | small */
