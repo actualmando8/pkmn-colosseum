@@ -22,9 +22,19 @@ always-on premium model — they need a directed cheap agent or a search loop.
 
 ## Running a batch
 
+The workflow lives (tracked) at `tools/decomp_work/workflows/lever-crack-batch.js`.
+`.claude/workflows/` is gitignored, so to invoke it by name on a fresh machine (the Mac),
+install it once:
+
 ```
-# one self-fueling sweep (scout picks N closest near-misses NOT locked by the fleet):
+mkdir -p .claude/workflows && cp tools/decomp_work/workflows/lever-crack-batch.js .claude/workflows/
 Workflow({ name: 'lever-crack-batch', args: { n: 12 } })
+```
+
+Or run the tracked copy directly without installing:
+
+```
+Workflow({ scriptPath: 'tools/decomp_work/workflows/lever-crack-batch.js', args: { n: 12 } })
 ```
 
 Pipeline: **Scout** (`crack_batch_worklist.py` → closest unlocked near-misses) →
