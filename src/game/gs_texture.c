@@ -1345,16 +1345,68 @@ void fn_800F0438(u8* p) {
     p[0x9] = 1;
     *(u8*)&lbl_8047AC0C = 1;
 }
-void fn_800F0448(void) { /* TODO */ }
-void fn_800F0470(void) { /* TODO */ }
-void fn_800F0494(void) { /* TODO */ }
+extern void fn_800F0A74(u32 priority, u32 flag); /* thread wake/sleep dispatch */
+/* 0x800F0448 | 0x18 */
+void fn_800F0448(void) {
+    fn_800F0A74(0, 0);
+}
+/* 0x800F0470 | 0x18 */
+void fn_800F0470(u32 priority) {
+    fn_800F0A74(priority, 1);
+}
+/* 0x800F0494 | 0x24 */
+u32 fn_800F0494(GSThread* thr) {
+    u32 ret;
+    if (thr->autoStart == 1) {
+        return 0;
+    }
+    ret = thr->unused;
+    thr->active = 0;
+    return ret;
+}
 u8 fn_800F04BC(u8* p) { return p[0x14]; }
-void fn_800F04C4(void) { /* TODO */ }
 extern u32 lbl_8047AC00;
 extern u32 lbl_8047AC04;
 extern u32 lbl_8047AC08;
 extern u32 lbl_8047AC0C;
 extern void fn_800E209C(u16 handle); /* GSmemFree */
+/* 0x800F04C4 | 0xB4 */
+/*
+ * fn_800F04C4 -- destroy every thread whose priority == @p priority.
+ *
+ * Walks the global thread list (head lbl_8047AC08); for each matching
+ * thread it applies the same destroy/unlink logic as fn_800F05A0
+ * (inlined): current/run threads are deferred via the 0x15 pending flag
+ * (+ lbl_8047AC0C reschedule for the run thread); all others are
+ * unlinked from the list and have their stack/ctx GSmem handles freed.
+ */
+void fn_800F04C4(u32 priority) {
+    GSThread* thr;
+    for (thr = (GSThread*)lbl_8047AC08; thr != NULL; thr = thr->next) {
+        if (thr->priority == priority) {
+            if (thr == (GSThread*)lbl_8047AC00 || thr == (GSThread*)lbl_8047AC04) {
+                thr->pad1 = 1;
+                if (thr == (GSThread*)lbl_8047AC04) {
+                    *(u8*)&lbl_8047AC0C = 1;
+                }
+            } else {
+                thr->pad0 = 0;
+                thr->active = 0;
+                if (thr->prev != NULL) {
+                    thr->prev->next = thr->next;
+                }
+                if (thr->next != NULL) {
+                    thr->next->prev = thr->prev;
+                }
+                if ((GSThread*)lbl_8047AC08 == thr) {
+                    lbl_8047AC08 = (u32)thr->next;
+                }
+                fn_800E209C(thr->stackHandle);
+                fn_800E209C(thr->ctxHandle);
+            }
+        }
+    }
+}
 /* 0x800F05A0 | 0xA8 */
 /*
  * fn_800F05A0 -- destroy / unregister a cooperative thread (GSThread).
