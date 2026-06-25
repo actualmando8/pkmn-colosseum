@@ -9026,12 +9026,7 @@ HTML = r"""<!doctype html>
         .then(r => r.json()).then(renderLimits).catch(() => {});
     }
     // ---- per-agent token usage vs 5h/weekly caps ----------------------------
-    function fmtTok(n) {
-      n = Number(n) || 0;
-      if (n >= 1e6) return (n / 1e6).toFixed(n >= 1e7 ? 0 : 1) + "M";
-      if (n >= 1e3) return (n / 1e3).toFixed(0) + "k";
-      return String(n);
-    }
+    // (token formatting reuses the existing `fmtTok` defined with the token chart)
     function usageColor(pct) {
       if (pct == null) return "#5aa9e6";          // no cap configured -> neutral
       if (pct >= 90) return "#e05a5a";             // red
