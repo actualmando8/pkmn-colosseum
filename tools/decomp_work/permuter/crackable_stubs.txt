@@ -1,0 +1,40 @@
+# crackable_stubs.txt - ranked stub functions for the decomp-permuter farm.
+# Selection: TRUE stubs only (asm-wrapper #include in a LIVE #if-1 branch;
+#   functions already flipped to a #else C body are excluded). Excludes
+#   tools/decomp_work/equivalent.txt and documented MEMORY.md walls.
+# Crackable = SMALL + CONTEXT-INDEPENDENT: <=80 instr, no jumptable, few
+#   external bl calls, few float/FPR refs, few SDA(r13/r2) refs. Ranked by
+#   score = n_instr + 6*ext_calls + 4*float_refs + sda_refs (lower = better).
+# Pipeline VERIFIED on #1 fn_8017C39C: base.c compiles, permuter score 1075 (finite).
+# Columns: fn_name<TAB>src_tu<TAB>size_instr<TAB>ext_calls<TAB>float_refs  (sda/bytes in trailing comment)
+#
+fn_8017C39C	src/game/fsys/fsys_file.c	30	0	0  # bytes=120 sda=0
+fn_8017C008	src/game/fsys/fsys_file.c	27	1	0  # bytes=108 sda=0 calls=fn_80180C78
+fn_800F80B0	src/game/input/input.c	34	0	0  # bytes=136 sda=0
+fn_80064378	src/game/ui/ui_core.c	23	2	0  # bytes=92 sda=0 calls=fn_80063AD4,fn_800FB680
+fn_800F0030	src/game/gs_texture.c	36	0	0  # bytes=144 sda=1
+fn_800F015C	src/game/gs_texture.c	37	0	0  # bytes=148 sda=1
+fn_80196CE0	src/hsd/hsd_cobj.c	38	0	0  # bytes=152 sda=0
+fn_800A43D4	src/dolphin/dvd/DVDLow.c	32	1	0  # bytes=128 sda=2 calls=fn_800A46EC
+fn_80162E14	src/game/people/people_field.c	41	0	0  # bytes=164 sda=1
+fn_8017B2CC	src/game/fsys/fsys_file.c	41	0	0  # bytes=164 sda=1
+fn_800609B4	src/game/ui/ui_core.c	29	2	1  # bytes=116 sda=0 calls=fn_800FE4D4,fn_800FE6D0
+fn_800CEB64	src/dolphin/exi/EXI2.c	21	4	0  # bytes=84 sda=1 calls=__OSMaskInterrupts,__OSSetInterruptHandler,__OSUnmaskInterrupts
+fn_8015211C	src/game/people/people_field.c	35	1	0  # bytes=140 sda=5 calls=sndBSearch
+fn_800F6AB4	src/game/gs_thread.c	40	1	0  # bytes=160 sda=0 calls=fn_800DD38C
+fn_800A48DC	src/dolphin/dvd/DVDLow.c	35	2	0  # bytes=140 sda=2 calls=OSCreateAlarm,OSSetAlarm
+fn_800A4A9C	src/dolphin/dvd/DVDLow.c	35	2	0  # bytes=140 sda=2 calls=OSCreateAlarm,OSSetAlarm
+fn_801327E0	src/game/effect/effect_util.c	21	0	7  # bytes=84 sda=1
+fn_800A46EC	src/dolphin/dvd/DVDLow.c	37	2	0  # bytes=148 sda=2 calls=OSCreateAlarm,OSSetAlarm
+fn_8019C1B0	src/hsd/hsd_fog.c	45	1	0  # bytes=180 sda=0 calls=HSD_ObjFree
+fn_800F0308	src/game/gs_texture.c	25	3	0  # bytes=100 sda=9 calls=fn_800F0030,fn_800F015C,fn_800F01F0
+fn_800CEBB8	src/dolphin/exi/EXI2.c	30	3	0  # bytes=120 sda=4 calls=OSDisableInterrupts,OSRestoreInterrupts,__OSMaskInterrupts
+fn_800A4A04	src/dolphin/dvd/DVDLow.c	38	2	0  # bytes=152 sda=2 calls=OSCreateAlarm,OSSetAlarm
+fn_8005E690	src/game/ui/ui_core.c	40	2	0  # bytes=160 sda=0 calls=fn_80102ED4
+fn_800A4968	src/dolphin/dvd/DVDLow.c	39	2	0  # bytes=156 sda=2 calls=OSCreateAlarm,OSSetAlarm
+fn_800A4B28	src/dolphin/dvd/DVDLow.c	39	2	0  # bytes=156 sda=2 calls=OSCreateAlarm,OSSetAlarm
+fn_8017DAB8	src/game/fsys/fsys_file.c	47	1	0  # bytes=188 sda=0 calls=fn_8017D960
+fn_800ABCF4	src/dolphin/vi/VIFull.c	29	3	0  # bytes=116 sda=7 calls=OSDisableInterrupts,OSRestoreInterrupts,fn_800D0464
+fn_80026740	src/game/gs_worldmap.c	36	0	4  # bytes=144 sda=2
+fn_800267D0	src/game/gs_worldmap.c	36	0	4  # bytes=144 sda=2
+fn_80026860	src/game/gs_worldmap.c	36	0	4  # bytes=144 sda=2
