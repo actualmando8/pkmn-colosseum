@@ -4238,33 +4238,34 @@ void fn_801F6B54(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5
     extern u8 fn_802062FC(u32);
     extern u32 fn_8012640C(u32, u32, u16, u32);
     extern void fn_801FAA58(u32, u32, u16, u32);
-    u16 uBound4;
-    u32 uVar6;
-    u32 uVar1;
-    u32 uVar2;
-    u32 uVar4;
-    u16 uBound5;
-    u32 uVar5;
+    u32 outerObj;
+    u32 innerObj;
+    u32 outerIndex;
+    s32 status;
+    u16 outerCount;
 
-    uBound4 = param_4;
-    uVar6 = 0;
-    for (; (uVar6 & 0xFFFF) < (uBound4 & 0xFFFF); uVar6 = uVar6 + 1) {
+    outerCount = (u16)param_4;
+    outerIndex = 0;
+    for (; (outerIndex & 0xFFFF) < (outerCount & 0xFFFF); outerIndex = outerIndex + 1) {
         if (param_1 == 0) {
-            uVar1 = 0;
+            outerObj = 0;
         } else {
-            uVar1 = fn_801F78D4(param_1, uVar6);
+            outerObj = fn_801F78D4(param_1, outerIndex);
         }
-        uVar4 = fn_801FA634(uVar1);
-        if (uVar4 != 0) {
-            uBound5 = param_5;
-            uVar5 = 0;
-            for (; (uVar5 & 0xFFFF) < (uBound5 & 0xFFFF); uVar5 = uVar5 + 1) {
-                uVar2 = fn_801FB1C0(uVar1, 0, 0x46, uVar5);
-                uVar4 = fn_802062FC(uVar2);
-                if (uVar4 != 0) {
-                    uVar2 = fn_8012640C(uVar2, 0, 0xD5, 0);
-                    uVar4 = fn_8012640C(uVar2, 0, 0xCE, 0);
-                    if ((s16)uVar4 >= 0) {
+        status = fn_801FA634(outerObj);
+        if (status != 0) {
+            u16 innerCount;
+            u32 innerIndex;
+
+            innerCount = param_5;
+            innerIndex = 0;
+            for (; (innerIndex & 0xFFFF) < (innerCount & 0xFFFF); innerIndex = innerIndex + 1) {
+                innerObj = fn_801FB1C0(outerObj, 0, 0x46, innerIndex);
+                status = fn_802062FC(innerObj);
+                if (status != 0) {
+                    innerObj = fn_8012640C(innerObj, 0, 0xD5, 0);
+                    status = fn_8012640C(innerObj, 0, 0xCE, 0);
+                    if ((s16)status >= 0) {
                         fn_801FAA58(param_2, 0, 0x57, 0);
                     }
                 }
