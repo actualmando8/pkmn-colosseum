@@ -51,7 +51,11 @@ classify() {  # classify <name> <pane> ; echoes idle|busy|rate|capfail and updat
   if printf '%s' "$cap" | tr -d ' ' | grep -qiE "esctoint"; then
     printf '%s' "$cap" > "$HB/$name.prev"; echo busy; return
   fi
-  if printf '%s' "$cap" | grep -qiE "rate.?limit|usage limit|limit reached|too many request|try again (in|at|later)|resets? (at|in)|reached your|429 "; then
+  # Codex prints a benign welcome line "You have N usage limit reset available. Run /usage"
+  # at startup — NOT a rate-limit. Strip it before the rate check so codex lanes aren't
+  # falsely gated as rate-limited and skipped by the dispatcher (they'd sit idle forever,
+  # never getting a task to scroll the banner off-screen).
+  if printf '%s' "$cap" | grep -ivE "usage limit reset|run /usage" | grep -qiE "rate.?limit|usage limit|limit reached|too many request|try again (in|at|later)|resets? (at|in)|reached your|429 "; then
     printf '%s' "$cap" > "$HB/$name.prev"; echo rate; return
   fi
   local prev=""; [ -f "$HB/$name.prev" ] && prev=$(cat "$HB/$name.prev")
