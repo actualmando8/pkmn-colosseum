@@ -234,11 +234,13 @@ extern void fn_80193AF0(void* obj, s32 size);
 extern void fn_801BBE60(HSD_TObj* tobj);
 extern void fn_801B42C0(void* node);
 extern void fn_801B7178(HSD_TObj* tobj, u32 map_id, u32 coord_id);
-#if 1
+#if 0
 asm void fn_801A6B8C(void) {
 #include "src/hsd/hsd_mobj_fn_801A6B8C.inc"
 }
 #else
+#pragma push
+#pragma optimization_level 1
 void fn_801A6B8C(HSD_MObj* mobj) {
     fn_801C25E4(mobj->aobj);
     fn_80193AF0(mobj->mat, 0x14);
@@ -247,13 +249,14 @@ void fn_801A6B8C(HSD_MObj* mobj) {
         fn_801B42C0(mobj->tevdesc);
     }
     if (mobj->texp != NULL) {
-        fn_801B42C0(mobj->texp);
+        fn_801B7178((HSD_TObj*)mobj->texp, 7, 1);
     }
     if (mobj->pe != NULL) {
         fn_80193AF0(mobj->pe, 0xc);
     }
-    HSD_PARENT_INFO((HSD_MObjInfo*)lbl_8036CB30)->init((HSD_Class*)mobj);
+    HSD_PARENT_INFO((HSD_MObjInfo*)lbl_8036CB30)->release((HSD_Class*)mobj);
 }
+#pragma pop
 #endif
 
 /* 0x801A6C34 | 0x70 */
