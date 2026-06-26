@@ -4,13 +4,13 @@ import json, os, subprocess
 from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 os.chdir(ROOT)
-TARGET = r'build\GC6E01\obj\auto_01_800055E0_text.o'
-CLI = r'tools\objdiff-cli.exe'
+TARGET = str(ROOT / 'build' / 'GC6E01' / 'obj' / 'auto_01_800055E0_text.o')
+CLI = str(ROOT / 'tools' / ('objdiff-cli.exe' if os.name == 'nt' else 'objdiff-cli'))
 
 results = []
 for o in sorted(os.listdir('build/GC6E01/base/game')):
     if not o.endswith('.o'): continue
-    base = f'build\\GC6E01\\base\\game\\{o}'
+    base = str(ROOT / 'build' / 'GC6E01' / 'base' / 'game' / o)
     src_c = ROOT / 'src' / 'game' / (o[:-2] + '.c')
     if not src_c.exists():
         continue

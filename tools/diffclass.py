@@ -22,6 +22,7 @@ Reads the *currently compiled* base .o (run compile_check first, or pass
 --compile to build it here).
 """
 
+import os
 import argparse
 import json
 import re
@@ -31,7 +32,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 TARGET_O = ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"
-OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
+OBJDIFF = ROOT / "tools" / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")
 
 sys.path.insert(0, str(ROOT / "tools"))
 import compile_check  # noqa: E402

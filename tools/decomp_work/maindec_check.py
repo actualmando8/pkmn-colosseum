@@ -14,6 +14,7 @@ Output (measure mode):   <fn>\t<match% | NA | NOT FOUND>
 Output (--diff mode):    side-by-side instruction rows, '*' = mismatch.
 Orientation: TARGET = original (match this); YOURS = the compiled work copy.
 """
+import os
 import json
 import subprocess
 import sys
@@ -21,7 +22,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 MWCC = ROOT / "tools/mwcc_compiler/GC/1.3/mwcceppc.exe"
-OBJDIFF = ROOT / "tools/objdiff-cli.exe"
+OBJDIFF = ROOT / ("tools/objdiff-cli.exe" if os.name == "nt" else "tools/objdiff-cli")
 TARGET = ROOT / "build/GC6E01/obj/auto_01_800055E0_text.o"
 FLAGS = ("-O4,p -nodefaults -proc gekko -fp hard -Cpp_exceptions off "
          "-enum int -warn off -use_lmw_stmw on -sdata 8 -sdata2 8").split()

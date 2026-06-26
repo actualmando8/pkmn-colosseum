@@ -20,7 +20,7 @@ from pathlib import Path
 
 ROOT = Path("C:/Users/douglaswhittingham/pkmn-colosseum")
 TOOLS = ROOT / "tools"
-OBJDIFF = TOOLS / "objdiff-cli.exe"
+OBJDIFF = TOOLS / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")
 TARGET = ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"
 MWCC = TOOLS / "mwcc_compiler" / "GC"
 INCLUDE = ROOT / "include"
@@ -52,7 +52,7 @@ def compile_scratch(src, out_obj, rel_src):
     return True, ""
 
 
-DTK = ROOT / "tools" / "dtk.exe"
+DTK = ROOT / "tools" / ("dtk.exe" if os.name == "nt" else "dtk")
 
 
 def emit_asm(out_obj, fn):

@@ -1600,7 +1600,7 @@ try:  # imported lazily-safe: the reader endpoint degrades to an error payload
     import compile_check as _compile_check  # type: ignore
 except Exception:  # noqa: BLE001
     _compile_check = None
-_OBJDIFF_CLI = ROOT / "tools" / "objdiff-cli.exe"
+_OBJDIFF_CLI = ROOT / "tools" / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")
 
 # TTL cache keyed by (source, fn). The compile is slow (~seconds), so a hit
 # within the TTL or while the source file is unchanged returns instantly.

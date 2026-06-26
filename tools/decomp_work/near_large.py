@@ -7,12 +7,13 @@ Objdiffs every built base .o against the monolithic target text object, collects
 Usage: python tools/decomp_work/near_large.py [min_pct] [max_pct] [min_bytes]
   defaults: 88 99.99 0xC0  (>=192 bytes ~48 instr, 88%<=pct<100%)
 """
+import os
 import json
 import subprocess
 import sys
 from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent.parent
-OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
+OBJDIFF = ROOT / "tools" / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")
 TARGET = ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"
 BASE = ROOT / "build" / "GC6E01" / "base"
 

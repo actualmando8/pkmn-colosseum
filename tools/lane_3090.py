@@ -2,7 +2,8 @@
 """lane_3090.py - offload candidate-C generation to the local 3090 GPU.
 
 Architecture: remote generation, LOCAL gated verification. The 3090
-(Ollama @ 10.0.0.3, qwen2.5-coder:32b — the only model that produced
+(Ollama @ $DECOMP_GPU_HOST, default 192.168.50.101, qwen2.5-coder:32b — the
+only model that produced
 usable CW-matchable C on that box per the prior benchmark) generates a
 candidate C body for an undecompiled / low-% function. EVERYTHING after
 that is the same hardened pipeline used everywhere else:
@@ -26,6 +27,7 @@ Usage:
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
@@ -34,10 +36,12 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-OLLAMA = "http://10.0.0.3:11434/api/generate"
+OLLAMA_HOST = os.environ.get("DECOMP_GPU_HOST", "192.168.50.101")
+OLLAMA_PORT = os.environ.get("DECOMP_OLLAMA_PORT", "11434")
+OLLAMA = f"http://{OLLAMA_HOST}:{OLLAMA_PORT}/api/generate"
 MODEL = "qwen2.5-coder:32b"
 TARGET_O = ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"
-OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
+OBJDIFF = ROOT / "tools" / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")
 sys.path.insert(0, str(ROOT / "tools"))
 import automatch          # noqa: E402  find_fn_def/measure_isolated/read_src
 import compile_check      # noqa: E402

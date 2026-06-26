@@ -18,6 +18,7 @@ The symbol table is read from config/GC6E01/symbols.txt.
 Source file mappings come from objdiff.json and source file annotations.
 """
 
+import os
 import argparse
 import json
 import re
@@ -39,7 +40,7 @@ TOOLS_DIR = PROJECT_ROOT / "tools"
 REPORTS_DIR = PROJECT_ROOT / "tools" / "decomp_work" / "reports"
 
 SYMBOLS_TXT = CONFIG_DIR / "symbols.txt"
-OBJDIFF_CLI = TOOLS_DIR / "objdiff-cli.exe"
+OBJDIFF_CLI = TOOLS_DIR / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")
 OBJDIFF_JSON = PROJECT_ROOT / "objdiff.json"
 
 # Import compile_check for compilation

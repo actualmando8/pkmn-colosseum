@@ -19,13 +19,14 @@ Usage:
   python tools/decomp_work/flag_sweep.py src/game/gs_material.c --fns fn_800E3604
   python tools/decomp_work/flag_sweep.py <file> --variants baseline,lmw_off --only-changed
 """
+import os
 import argparse, json, sys, subprocess, tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 INCLUDE = ROOT / "include"
 TARGET_O = ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"
-OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
+OBJDIFF = ROOT / "tools" / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")
 MWCC_GC = ROOT / "tools" / "mwcc_compiler" / "GC"
 CONFIG = ROOT / "config" / "GC6E01" / "compile_config.json"
 

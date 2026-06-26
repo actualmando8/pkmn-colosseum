@@ -43,7 +43,7 @@ TOOLS_DIR = PROJECT_ROOT / "tools"
 MWCC_BASE = TOOLS_DIR / "mwcc_compiler"
 MWCC_DEFAULT = MWCC_BASE / "mwcceppc.exe"
 MWCC_GC_DIR = MWCC_BASE / "GC"
-OBJDIFF_CLI = TOOLS_DIR / "objdiff-cli.exe"
+OBJDIFF_CLI = TOOLS_DIR / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")
 OBJDIFF_JSON = PROJECT_ROOT / "objdiff.json"
 
 

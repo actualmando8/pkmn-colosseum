@@ -14,7 +14,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 TOOLS_DIR = PROJECT_ROOT / "tools"
 MWCC_BASE = TOOLS_DIR / "mwcc_compiler" / "GC"
-OBJDIFF_CLI = TOOLS_DIR / "objdiff-cli.exe"
+OBJDIFF_CLI = TOOLS_DIR / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")
 INCLUDE_DIR = PROJECT_ROOT / "include"
 SRC_DIR = PROJECT_ROOT / "src"
 BUILD_DIR = PROJECT_ROOT / "build" / "GC6E01"

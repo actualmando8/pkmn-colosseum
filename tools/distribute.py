@@ -43,7 +43,7 @@ INCLUDE_FILES = [
     "tools/quick_diff.py",
     "tools/assign_work.py",
     "tools/merge_results.py",
-    "tools/objdiff-cli.exe",
+    ("tools/objdiff-cli.exe" if os.name == "nt" else "tools/objdiff-cli"),
     "tools/mwcc_compiler/mwcceppc.exe",
     "tools/mwcc_compiler/mwasmeppc.exe",
     "tools/mwcc_compiler/mwldeppc.exe",

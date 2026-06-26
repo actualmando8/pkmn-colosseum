@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -22,7 +23,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
 COMPILE_CHECK = REPO / "tools" / "compile_check.py"
-OBJDIFF = REPO / "tools" / "objdiff-cli.exe"
+OBJDIFF = REPO / "tools" / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")
 
 
 def swap_else(stem: str, fn: str, c_body: str) -> tuple[bool, str]:

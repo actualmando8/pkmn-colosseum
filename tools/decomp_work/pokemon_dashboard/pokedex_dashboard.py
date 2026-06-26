@@ -227,7 +227,7 @@ _match_pct_cache = {}  # (target_path, base_path, target_mtime, base_mtime, fn) 
 
 # objdiff-cli path (same tool match_scan_file.py uses for accurate
 # instruction-level match%, including weighted register/imm tolerances).
-_OBJDIFF_CLI = os.path.join(REPO, 'tools', 'objdiff-cli.exe')
+_OBJDIFF_CLI = os.path.join(REPO, 'tools', ('objdiff-cli.exe' if os.name == "nt" else 'objdiff-cli'))
 
 def _c_block_match_percent(target_elf, base_elf, fn_name):
     """Count fn as 'matched' for dex if objdiff-cli reports ≥90% byte-match —

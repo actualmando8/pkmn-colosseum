@@ -8,6 +8,7 @@ Usage:
     python tools/extract_dol.py orig/GC6E01/game.iso
 """
 
+import os
 import hashlib
 import shutil
 import subprocess
@@ -22,7 +23,7 @@ TOOLS_DIR = PROJECT_ROOT / "tools"
 def find_dtk():
     """Locate the dtk binary."""
     # Check tools directory
-    for name in ("dtk", "dtk.exe"):
+    for name in ("dtk", ("dtk.exe" if os.name == "nt" else "dtk")):
         path = TOOLS_DIR / name
         if path.exists():
             return str(path)

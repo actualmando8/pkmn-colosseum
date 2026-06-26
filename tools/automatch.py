@@ -28,6 +28,7 @@ Safety:
   - Verifies whole-file matched-count is monotonic before accepting --apply.
 """
 
+import os
 import argparse
 import json
 import re
@@ -39,7 +40,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 TARGET_O = ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"
-OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
+OBJDIFF = ROOT / "tools" / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")
 
 
 def read_src(p):

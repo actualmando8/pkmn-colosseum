@@ -25,7 +25,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 TARGET = ROOT / "build/GC6E01/obj/auto_01_800055E0_text.o"
-ODCLI = ROOT / "tools/objdiff-cli.exe"
+ODCLI = ROOT / ("tools/objdiff-cli.exe" if os.name == "nt" else "tools/objdiff-cli")
 DECOMPCTX = ROOT / "tools/decompctx.py"
 FLAGS = "-O4,p -nodefaults -proc gekko -fp hard -Cpp_exceptions off -enum int -warn off -use_lmw_stmw on -sdata 8 -sdata2 8".split()
 

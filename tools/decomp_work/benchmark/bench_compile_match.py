@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
@@ -29,7 +30,10 @@ BENCH_DIR = Path(__file__).resolve().parent
 DEFAULT_SUITE = BENCH_DIR / "test_suite_cw_focus_compact.json"
 RESULTS_DIR = BENCH_DIR / "results"
 
-REMOTE_HOST = "douglaswhittingham@10.0.0.3"
+REMOTE_HOST = os.environ.get(
+    "DECOMP_GPU_SSH",
+    f"douglaswhittingham@{os.environ.get('DECOMP_GPU_HOST', '192.168.50.101')}",
+)
 REMOTE_REPO = "/storage/finetune/pkmn-colosseum"
 REMOTE_TMP_DIR = "/storage/finetune/tmp/compile_match_bench"
 

@@ -4,7 +4,7 @@ ROOT = r"C:\Users\douglaswhittingham\pkmn-colosseum"
 # Usage: extract_target_asm.py <symbol> [target_obj]
 sym = sys.argv[1]
 target = sys.argv[2] if len(sys.argv) > 2 else os.path.join(ROOT, "build/GC6E01/obj/auto_01_800055E0_text.o")
-exe = os.path.join(ROOT, "tools/objdiff-cli.exe")
+exe = os.path.join(ROOT, ("tools/objdiff-cli.exe" if os.name == "nt" else "tools/objdiff-cli"))
 base = os.path.join(ROOT, "build/GC6E01/base/crt/exit.o")
 out = subprocess.run([exe, "diff", "-1", target, "-2", base,
                       "-o", "-", "--format", "json",

@@ -7,6 +7,7 @@ symbol, and prints a side-by-side of mismatching slots only.
   -1 = ORIGINAL target (match it)  -> printed as TARGET
   -2 = YOUR compiled C             -> printed as YOURS
 """
+import os
 import json
 import subprocess
 import sys
@@ -14,7 +15,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 TARGET_O = ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"
-OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
+OBJDIFF = ROOT / "tools" / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")
 
 
 def main():

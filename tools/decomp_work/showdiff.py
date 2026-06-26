@@ -4,13 +4,14 @@
 Orientation: -1 = ORIGINAL TARGET (left, match this), -2 = MY compiled C (right).
 The objdiff JSON 'right.symbols[].instructions[]' carries both sides per row.
 """
+import os
 import json
 import subprocess
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-CLI = ROOT / "tools" / "objdiff-cli.exe"
+CLI = ROOT / "tools" / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")
 ORIG = ROOT / "build/GC6E01/obj/auto_01_800055E0_text.o"
 BASE = ROOT / "build/GC6E01/base/game/pokemon.o"
 

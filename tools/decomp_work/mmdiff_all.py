@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Show oriented target-vs-ours diffs for several functions in menu_middle."""
+import os
 import sys, json, itertools, subprocess
 from pathlib import Path
 
@@ -8,7 +9,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 from headless_subprocess import run as hrun
 TARGET = ROOT / "build/GC6E01/obj/auto_01_800055E0_text.o"
 BASE = ROOT / "build/GC6E01/base/game/menu/menu_middle.o"
-CLI = ROOT / "tools/objdiff-cli.exe"
+CLI = ROOT / ("tools/objdiff-cli.exe" if os.name == "nt" else "tools/objdiff-cli")
 
 fns = sys.argv[1:]
 for fn in fns:

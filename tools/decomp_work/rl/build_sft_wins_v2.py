@@ -26,7 +26,7 @@ from pathlib import Path
 ROOT = Path("C:/Users/douglaswhittingham/pkmn-colosseum")
 INCLUDE = ROOT / "include"
 TARGET = ROOT / "build/GC6E01/obj/auto_01_800055E0_text.o"
-DTK = ROOT / "tools/dtk.exe"
+DTK = ROOT / ("tools/dtk.exe" if os.name == "nt" else "tools/dtk")
 CACHE = Path(tempfile.gettempdir()) / "auto_01_disasm.txt"
 OUT = ROOT / "tools/decomp_work/rl/sft_wins_v2.jsonl"
 OUT.parent.mkdir(parents=True, exist_ok=True)

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Dump aligned target-vs-ours diffs for MANY symbols from ONE objdiff pass."""
+import os
 import json
 import subprocess
 import sys
@@ -7,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 TARGET = ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"
-OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
+OBJDIFF = ROOT / "tools" / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")
 
 
 def main():
