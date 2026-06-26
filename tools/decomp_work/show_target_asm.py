@@ -5,12 +5,13 @@ Prefers the clean sibling .inc; falls back to disassembling the canonical target
 object with dtk (cached) for functions that have no saved .inc. This is the asm
 your decompiled C must reproduce byte-for-byte.
 """
+import os
 import sys, subprocess, re, tempfile
 from pathlib import Path
 
 ROOT = Path("C:/Users/douglaswhittingham/pkmn-colosseum")
 TARGET = ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"
-DTK = ROOT / "tools" / "dtk.exe"
+DTK = ROOT / "tools" / ("dtk.exe" if os.name == "nt" else "dtk")
 CACHE = Path(tempfile.gettempdir()) / "auto_01_disasm.txt"
 
 

@@ -97,7 +97,7 @@ SCRATCH = ROOT / "tools" / "decomp_work" / "scratch"
 # Windows behaviour is unchanged.
 if os.name == "nt":
     MWCC_BASE = ROOT / "tools" / "mwcc_compiler" / "GC"
-    OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
+    OBJDIFF = ROOT / "tools" / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")
     WIBO = None
 else:
     MWCC_BASE = ROOT / "build" / "compilers" / "GC"     # configure.py: build/compilers/GC/<ver>/mwcceppc.exe

@@ -24,6 +24,7 @@ Usage:
     python tools/decomp_work/ra/walltriage.py            # default file set
     python tools/decomp_work/ra/walltriage.py --min-mm 8 --json out.json
 """
+import os
 import argparse
 import json
 import re
@@ -37,7 +38,7 @@ import compile_check  # noqa: E402
 from headless_subprocess import run as run_tool  # noqa: E402
 
 TARGET_O = ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"
-OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
+OBJDIFF = ROOT / "tools" / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")
 
 REG = re.compile(r"\b([rf])(\d+)\b")
 NUM = re.compile(r"-?0x[0-9A-Fa-f]+|-?\b\d+\b")

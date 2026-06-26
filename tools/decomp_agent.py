@@ -29,13 +29,20 @@ LOCK_DIR = WORK_DIR / "locks"
 PROMPTS_DIR = WORK_DIR / "prompts"
 RESULTS_DIR = WORK_DIR / "results"
 
-OLLAMA_HOST = "10.0.0.3"
-OLLAMA_PORT = 11434
+OLLAMA_HOST = os.environ.get("DECOMP_GPU_HOST", "192.168.50.101")
+OLLAMA_PORT = int(os.environ.get("DECOMP_OLLAMA_PORT", "11434"))
 OLLAMA_MODEL = "codestral:22b"  # Best benchmark: 100% structural, 5.4s/fn
 KIMI_URL = "https://api.moonshot.ai/v1/chat/completions"
 KIMI_MODEL = "kimi-k2-turbo-preview"
 
-CODEX_CMD = "C:/Users/douglaswhittingham/AppData/Roaming/npm/codex.cmd"
+# On macOS/Linux `codex` is on PATH; on Windows it's the .cmd shim. Override
+# with CODEX_CMD if installed elsewhere.
+CODEX_CMD = os.environ.get(
+    "CODEX_CMD",
+    "C:/Users/douglaswhittingham/AppData/Roaming/npm/codex.cmd"
+    if os.name == "nt"
+    else "codex",
+)
 
 
 def ensure_dirs():
@@ -380,7 +387,7 @@ def get_instruction_diff(fn_name, obj_path):
     diff_file = RESULTS_DIR / f"{fn_name}_diff.json"
     try:
         subprocess.run([
-            str(ROOT / "tools" / "objdiff-cli.exe"), "diff",
+            str(ROOT / "tools" / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")), "diff",
             "-1", str(ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"),
             "-2", str(ROOT / "build" / "GC6E01" / "base" / obj_path),
             "-o", str(diff_file), "--format", "json", fn_name

@@ -6,12 +6,13 @@ ChatML format, for QLoRA SFT of Qwen2.5-Coder-7B-Base.
 Asm is read from the one-time dtk disasm of the canonical target object (cached),
 with a per-fn .inc fallback. Only >=100% matches (everything in band_wins) are used.
 """
+import os
 import json, glob, re, subprocess, tempfile, statistics
 from pathlib import Path
 
 ROOT = Path("C:/Users/douglaswhittingham/pkmn-colosseum")
 TARGET = ROOT / "build/GC6E01/obj/auto_01_800055E0_text.o"
-DTK = ROOT / "tools/dtk.exe"
+DTK = ROOT / ("tools/dtk.exe" if os.name == "nt" else "tools/dtk")
 CACHE = Path(tempfile.gettempdir()) / "auto_01_disasm.txt"
 OUT = ROOT / "tools/decomp_work/rl/sft_wins.jsonl"
 OUT.parent.mkdir(parents=True, exist_ok=True)

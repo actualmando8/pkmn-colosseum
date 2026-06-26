@@ -26,6 +26,7 @@ Usage:
 Exit code 0 = clean, 1 = violation (prints what + why).
 """
 
+import os
 import argparse
 import json
 import re
@@ -35,7 +36,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 TARGET_O = ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"
-OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
+OBJDIFF = ROOT / "tools" / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")
 sys.path.insert(0, str(ROOT / "tools"))
 from headless_subprocess import run as run_tool  # noqa: E402
 

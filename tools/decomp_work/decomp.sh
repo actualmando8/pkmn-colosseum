@@ -11,7 +11,7 @@
 #   decomp.sh band    <args...>                 big-file parallel-agent band harness (-> band.py; see AGENT_ONBOARDING.md)
 #
 # Notes:
-#   * Uses the Windows Python explicitly (Git-Bash `python` may be a stub/WSL).
+#   * Uses PATH python3 by default; set $WINPY if your `python` is a stub/WSL shim.
 #   * Never edits *_fn_*.inc, #if0->#if1, or symbols.build.txt — read-only helpers.
 #   * `measure` is the ONE authoritative command; always re-measure, never self-assert a %.
 
@@ -21,11 +21,12 @@ set -uo pipefail
 SELF="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SELF/../.." && pwd)"
 
-# --- Windows python (override with $WINPY if your path differs) ---
-WINPY="${WINPY:-C:/Users/douglaswhittingham/AppData/Local/Programs/Python/Python312/python.exe}"
+# --- python interpreter: default to PATH python3/python (cross-platform).
+#     Override with $WINPY when PATH `python` is a stub/WSL shim (e.g. on Windows,
+#     point it at C:/.../Python312/python.exe). ---
+WINPY="${WINPY:-$(command -v python3 || command -v python || echo python3)}"
 if [ ! -x "$WINPY" ] && ! command -v "$WINPY" >/dev/null 2>&1; then
-  # fall back to PATH python if the hardcoded interpreter is absent
-  WINPY="$(command -v python || command -v python3 || echo python)"
+  WINPY="$(command -v python3 || command -v python || echo python3)"
 fi
 
 WALLS="$ROOT/WALLS.md"

@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
+import os
 import json, subprocess, sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
+OBJDIFF = ROOT / "tools" / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")
 TARGET = ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"
 BASE = ROOT / "build" / "GC6E01" / "base" / "game" / "effect" / "effect_util.o"
 CFG = "ppc.calculatePoolRelocations=false"

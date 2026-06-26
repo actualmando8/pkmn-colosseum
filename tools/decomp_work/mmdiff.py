@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """Show oriented target-vs-ours diff for one function in menu_middle."""
+import os
 import sys, json, itertools, subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 TARGET = ROOT / "build/GC6E01/obj/auto_01_800055E0_text.o"
 BASE = ROOT / "build/GC6E01/base/game/menu/menu_middle.o"
-CLI = ROOT / "tools/objdiff-cli.exe"
+CLI = ROOT / ("tools/objdiff-cli.exe" if os.name == "nt" else "tools/objdiff-cli")
 
 fn = sys.argv[1]
 r = subprocess.run([str(CLI), "diff", "-1", str(TARGET), "-2", str(BASE),

@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """Quick diff helper - extracts a single symbol's diff from objdiff-cli output."""
+import os
 import json
 import subprocess
 import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-OBJDIFF_CLI = PROJECT_ROOT / "tools" / "objdiff-cli.exe"
+OBJDIFF_CLI = PROJECT_ROOT / "tools" / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")
 
 def diff_symbol(target_obj, base_obj, symbol):
     cmd = [

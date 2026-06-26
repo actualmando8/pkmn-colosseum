@@ -11,12 +11,13 @@ Cuts a full-project progress scan from ~hundreds of objdiff spawns to
 only the objects that actually changed.
 """
 
+import os
 import json
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
+OBJDIFF = ROOT / "tools" / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")
 CACHE = ROOT / "build" / ".measure_cache.json"
 sys.path.insert(0, str(ROOT / "tools"))
 from headless_subprocess import run as run_tool  # noqa: E402

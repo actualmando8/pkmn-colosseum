@@ -4,11 +4,12 @@
 -1 = TARGET (original, aim-for), -2 = BASE (my compiled code).
 Prints rows where left=target, right=mine, marking mismatches with '*'.
 """
+import os
 import json, subprocess, sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-CLI = ROOT / "tools" / "objdiff-cli.exe"
+CLI = ROOT / "tools" / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")
 TARGET = ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"
 BASE = ROOT / "build" / "GC6E01" / "base" / "game" / "gs_render.o"
 

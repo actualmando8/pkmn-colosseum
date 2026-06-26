@@ -16,6 +16,7 @@ to a known location, then the README shield syntax becomes:
     [![Progress]](https://decomp.dev/<user>/<repo>.svg)
 """
 
+import os
 import argparse
 import json
 import re
@@ -29,7 +30,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 ROOT = Path(__file__).resolve().parent.parent
 TARGET_O = ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"
 BASE_DIR = ROOT / "build" / "GC6E01" / "base"
-OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
+OBJDIFF = ROOT / "tools" / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")
 SKIP_BASE_PREFIXES = ("pcport/",)
 # test_va*: host-only varargs probes. The remaining four are DUPLICATE measurement
 # units that double-count a real TU and inflated the published metric (gs_field_world

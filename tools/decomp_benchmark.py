@@ -29,8 +29,8 @@ SUITE_FILE = BENCH_DIR / "test_suite.json"
 RESULTS_DIR = BENCH_DIR / "results"
 FINETUNE_DIR = BENCH_DIR / "finetune"
 
-OLLAMA_HOST = "10.0.0.3"
-OLLAMA_PORT = 11434
+OLLAMA_HOST = os.environ.get("DECOMP_GPU_HOST", "192.168.50.101")
+OLLAMA_PORT = int(os.environ.get("DECOMP_OLLAMA_PORT", "11434"))
 
 SDA_BASE = 0x80480820
 SDA2_BASE = 0x804836A0
@@ -468,7 +468,7 @@ def cmd_export_finetune(args):
     print(f"  ChatML (JSONL): {jsonl_file} ({len(chatml_data)} examples)")
     print(f"  Alpaca (JSON):  {alpaca_file} ({len(alpaca_data)} examples)")
     print(f"\nTo fine-tune with LLMFit on the 3090:")
-    print(f"  1. Copy {FINETUNE_DIR} to 10.0.0.3:/storage/finetune/")
+    print(f"  1. Copy {FINETUNE_DIR} to {OLLAMA_HOST}:/storage/finetune/")
     print(f"  2. Run LLMFit with qwen2.5-coder:7b as base")
     print(f"  3. Train on decomp_train.jsonl")
     print(f"  4. Import the LoRA adapter back into Ollama")

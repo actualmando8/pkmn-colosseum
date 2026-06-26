@@ -18,6 +18,7 @@ Usage:
         --max-pct 40 --limit 20 --out G:/decomp-worktrees/seeds_cb.md
 """
 
+import os
 import argparse
 import json
 import re
@@ -28,7 +29,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / "build" / "ghidra_output" / "raw_decompilation.c"
 TARGET_O = ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"
-OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
+OBJDIFF = ROOT / "tools" / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")
 sys.path.insert(0, str(ROOT / "tools"))
 import compile_check          # noqa: E402
 from dol_addr import va_to_off  # noqa: E402

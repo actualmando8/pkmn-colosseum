@@ -261,7 +261,7 @@ def compute_instr_diff(stem: str, fn: str, max_rows: int = 60) -> str:
         return ""
     try:
         r = subprocess.run(
-            [str(REPO / "tools/objdiff-cli.exe"), "diff",
+            [str(REPO / ("tools/objdiff-cli.exe" if os.name == "nt" else "tools/objdiff-cli")), "diff",
              "-1", str(_OBJDIFF_TARGET), "-2", str(base_o),
              "-o", "-", "--format", "json",
              "-c", "ppc.calculatePoolRelocations=false", fn],

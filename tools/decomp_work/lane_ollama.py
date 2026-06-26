@@ -6,7 +6,9 @@ from pathlib import Path
 ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
 
-OLLAMA_GPU = "http://10.0.0.3:11434/api/generate"
+OLLAMA_GPU_HOST = os.environ.get("DECOMP_GPU_HOST", "192.168.50.101")
+OLLAMA_GPU_PORT = os.environ.get("DECOMP_OLLAMA_PORT", "11434")
+OLLAMA_GPU = f"http://{OLLAMA_GPU_HOST}:{OLLAMA_GPU_PORT}/api/generate"
 OLLAMA_LOCAL = "http://localhost:11434/api/generate"
 GPU_MODEL = "codestral:22b"
 LOCAL_MODEL = "qwen3:32b"
@@ -77,7 +79,7 @@ def main():
     print(f"{'='*60}")
     print(f"LANE 1: OLLAMA BULK GENERATION")
     print(f"Targets: {len(targets)} simple+medium functions")
-    print(f"GPU model: {GPU_MODEL} @ 10.0.0.3")
+    print(f"GPU model: {GPU_MODEL} @ {OLLAMA_GPU_HOST}")
     print(f"Kimi fallback: kimi-k2-turbo-preview")
     print(f"{'='*60}\n")
 

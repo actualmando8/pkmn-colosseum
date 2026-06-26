@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """List functions at 80-99.99% match, sorted by file. Easy-win candidates."""
+import os
 import json
 import sys
 from collections import defaultdict
@@ -8,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 TARGET = ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"
 BASE = ROOT / "build" / "GC6E01" / "base"
-OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
+OBJDIFF = ROOT / "tools" / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")
 sys.path.insert(0, str(ROOT / "tools"))
 from headless_subprocess import run as run_tool  # noqa: E402
 

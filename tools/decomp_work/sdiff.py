@@ -1,7 +1,7 @@
 import json, subprocess, sys, os
 
 ROOT = r"C:\Users\douglaswhittingham\pkmn-colosseum"
-CLI = os.path.join(ROOT, "tools", "objdiff-cli.exe")
+CLI = os.path.join(ROOT, "tools", ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli"))
 TARGET = os.path.join(ROOT, "build", "GC6E01", "obj", "auto_01_800055E0_text.o")
 BASE = os.path.join(ROOT, "build", "GC6E01", "base", "game", "battle", "battle_scene.o")
 
