@@ -13,12 +13,12 @@ SEED_SERVER="${SEED_SERVER:-http://$SEED_HOST:8780/gen}"
 
 alive_code() {
   local p
-  [ "$1" = seed ] && p="lane_seed.py" || p="lane_worker\.sh $1\$"
+  [ "$1" = seed ] && p="lane_seed.py" || p="(^|[[:space:]/])lane_worker\.sh $1($|[[:space:]])"
   pgrep -f "$p" >/dev/null 2>&1 && echo up || echo "--"
 }
 
 alive_data() {
-  pgrep -f "data_lane_worker\.sh $1\$" >/dev/null 2>&1 && echo up || echo "--"
+  pgrep -f "(^|[[:space:]/])data_lane_worker\.sh $1($|[[:space:]])" >/dev/null 2>&1 && echo up || echo "--"
 }
 
 json_summary() {
