@@ -19,8 +19,11 @@ Exit 0 = clean, 1 = violation.
 """
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
 
 # Keep this pattern in sync with tools/progress.py:SKIP_BASE_SCRATCH.
 SCRATCH = re.compile(
@@ -95,6 +98,21 @@ def main(argv: list[str]) -> int:
                 )
                 break
         by_sig.setdefault(sig, []).append((u.get("name", "?"), names))
+
+    # 4) If checking the committed root report, also require the README and
+    #    agent-lane progress.json to be synchronized with it.
+    if path.resolve() == (ROOT / "report.json").resolve():
+        sync = subprocess.run(
+            [sys.executable, "tools/sync_progress_metadata.py", "--check"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        if sync.returncode != 0:
+            problems.append(
+                "progress metadata is stale relative to report.json:\n"
+                + (sync.stdout + sync.stderr).strip()
+            )
 
     if problems:
         print("report-sanity: FAIL", file=sys.stderr)
