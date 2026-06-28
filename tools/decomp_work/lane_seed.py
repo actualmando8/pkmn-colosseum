@@ -39,6 +39,7 @@ REPAIR_N = int(os.environ.get("SEED_REPAIR_N", "2"))
 MAX_NEW = int(os.environ.get("SEED_MAX_NEW", "1200"))
 TEMP = float(os.environ.get("SEED_TEMP", "0.6"))
 REPAIR_TEMP = float(os.environ.get("SEED_REPAIR_TEMP", "0.35"))
+SERIAL_GEN = os.environ.get("SEED_SERIAL_GEN", "1") != "0"
 TRAIN = ROOT / "build" / "seed_training" / "attempts.jsonl"
 KG = ROOT / "tools" / "decomp_work" / "kg" / "kg.py"
 
@@ -102,6 +103,11 @@ def file_context(scratch_txt, fn_start, fn, residual):
 
 
 def gen(asm, fn, current, context, n=N_CAND, temp=TEMP, draft=None, diff=None):
+    if SERIAL_GEN and n > 1:
+        out = []
+        for _ in range(n):
+            out.extend(gen(asm, fn, current, context, n=1, temp=temp, draft=draft, diff=diff))
+        return out
     body = json.dumps({
         "asm": asm,
         "fn": fn,
