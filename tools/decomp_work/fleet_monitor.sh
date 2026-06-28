@@ -107,32 +107,36 @@ while :; do
   byte_exact=$(git log "${START_HEAD}..HEAD" --oneline 2>/dev/null | grep -oE '\+[0-9]+ byte-exact' | grep -oE '[0-9]+' | awk '{s+=$1} END{print s+0}')
 
   printf '\033[H'
-  printf '╔══ DECOMP FLEET ════════════════════════  %s  ══╗\n' "$(date +%H:%M:%S)"
-  printf '  branch %s · commits this monitor %s · byte-exact +%s · band_wins tags %s\n' \
-    "$(git branch --show-current 2>/dev/null)" "$commits" "$byte_exact" "$wins"
-  printf '  low-bucket queue: %s files total · %s claimed · %s remaining\n' "$total" "$claimed" "$((total - claimed))"
-  json_summary | sed 's/^/  /'
+  {
+    printf '╔══ DECOMP FLEET ════════════════════════  %s  ══╗\n' "$(date +%H:%M:%S)"
+    printf '  branch %s · commits this monitor %s · byte-exact +%s · band_wins tags %s\n' \
+      "$(git branch --show-current 2>/dev/null)" "$commits" "$byte_exact" "$wins"
+    printf '  low-bucket queue: %s files total · %s claimed · %s remaining\n' "$total" "$claimed" "$((total - claimed))"
+    json_summary | sed 's/^/  /'
 
-  printf '╠══ CODE LANES ══════════════════════════════════════════════╣\n'
-  for r in $LANES; do
-    file="$(for d in build/fleet_locks/*/; do [ -f "$d/owner" ] && [ "$(cat "$d/owner")" = "$r" ] && cat "$d/file"; done 2>/dev/null | tail -1)"
-    last="$(tail -1 "build/lane_$r.log" 2>/dev/null | cut -c1-86)"
-    printf '  %-7s [%2s] %-46s\n' "$r" "$(alive_code "$r")" "${file:-(idle)}"
-    printf '          └ %s\n' "${last:-...}"
+    printf '╠══ CODE LANES ══════════════════════════════════════════════╣\n'
+    for r in $LANES; do
+      file="$(for d in build/fleet_locks/*/; do [ -f "$d/owner" ] && [ "$(cat "$d/owner")" = "$r" ] && cat "$d/file"; done 2>/dev/null | tail -1)"
+      last="$(tail -1 "build/lane_$r.log" 2>/dev/null | cut -c1-86)"
+      printf '  %-7s [%2s] %-46s\n' "$r" "$(alive_code "$r")" "${file:-(idle)}"
+      printf '          └ %s\n' "${last:-...}"
+    done
+
+    printf '╠══ DATA LANES ══════════════════════════════════════════════╣\n'
+    for r in $DATA_LANES; do
+      claim="$(data_claim_for "$r")"
+      last="$(tail -1 "build/data_lane_$r.log" 2>/dev/null | cut -c1-86)"
+      printf '  %-7s [%2s] %-46s\n' "$r" "$(alive_data "$r")" "${claim:-(idle)}"
+      printf '          └ %s\n' "${last:-...}"
+    done
+
+    printf '╠══ RECENT GATE COMMITS ═════════════════════════════════════╣\n'
+    git log -6 --oneline 2>/dev/null | sed 's/^/  /' || true
+    printf '╚════════════════════════════════════════════════════════════╝\n'
+    printf '  refresh %ss · web dashboard 0.0.0.0:%s · stop fleet: tools/decomp_work/fleet_down_mac.sh\n' "$INTERVAL" "$DASH_PORT"
+  } | while IFS= read -r line; do
+    printf '\033[2K%s\n' "$line"
   done
-
-  printf '╠══ DATA LANES ══════════════════════════════════════════════╣\n'
-  for r in $DATA_LANES; do
-    claim="$(data_claim_for "$r")"
-    last="$(tail -1 "build/data_lane_$r.log" 2>/dev/null | cut -c1-86)"
-    printf '  %-7s [%2s] %-46s\n' "$r" "$(alive_data "$r")" "${claim:-(idle)}"
-    printf '          └ %s\n' "${last:-...}"
-  done
-
-  printf '╠══ RECENT GATE COMMITS ═════════════════════════════════════╣\n'
-  git log -6 --oneline 2>/dev/null | sed 's/^/  /' || true
-  printf '╚════════════════════════════════════════════════════════════╝\n'
-  printf '  refresh %ss · web dashboard 0.0.0.0:%s · stop fleet: tools/decomp_work/fleet_down_mac.sh\n' "$INTERVAL" "$DASH_PORT"
   printf '\033[J'
   sleep "$INTERVAL"
 done

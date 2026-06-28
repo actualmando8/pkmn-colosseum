@@ -129,11 +129,14 @@ except Exception as exc:
 
 alive = "up" if data.get("alive") else "--"
 targets = data.get("active_targets") or []
+def val(key):
+    value = data.get(key)
+    return "?" if value is None else value
 print(f"PERMUTER {name}  [{alive}]")
 print("=" * 72)
-print(f"workers {data.get('workers','?')}  jobs {data.get('jobs','?')}  slots {data.get('effective_slots','?')}  budget {data.get('budget','?')}s")
-print(f"active {data.get('active','?')}  queued {data.get('queued','?')}/{data.get('targets','?')}  done {data.get('done','?')}  wins {data.get('wins','?')}")
-print(f"processes grind={data.get('grind_processes','?')} permuter={data.get('permuter_processes','?')}  cores={data.get('cores','?')}")
+print(f"workers {val('workers')}  jobs {val('jobs')}  slots {val('effective_slots')}  budget {val('budget')}s")
+print(f"active {val('active')}  queued {val('queued')}/{val('targets')}  done {val('done')}  wins {val('wins')}")
+print(f"processes grind={val('grind_processes')} permuter={val('permuter_processes')}  cores={val('cores')}")
 print("")
 print("active targets:")
 for fn in targets[:12]:
