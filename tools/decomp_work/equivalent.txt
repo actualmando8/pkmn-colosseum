@@ -126,3 +126,16 @@ fn_801F6B54   # pokemon — real C 99.60%; reg-permutation wall (inner/outer cou
 fn_801F3430   # pokemon — real C 98.89%; 2-param register-permutation wall (param_1 referenced before buf pins it to r30 first; target wants inverse). SKIP
 fn_801F4220   # pokemon — real C 98.57%; un-inverted loop-match branch-fold wall (people-findloop family; CW folds !=/== to beq + elides redundant found-test). SKIP
 fn_801F4718   # pokemon — real C 98.46%; li-vs-mr zero-copy peephole wall (1-instr: redundant zero-materialize li r4,0 vs mr r4,r5). SKIP
+
+# gs_party_access.c — W2 dual-scheduling wall (2026-06-25, pl_sonnet)
+fn_8000CF68   # gs_party_access — real C 89.43%; W2 dual: block-copy prologue ordering + do-while CTR (CW 1.3 refuses bdnz for search loop with early exits). Struct block-copy + scheduling off is ceiling. SKIP
+
+# fsys_file.c — W-debug-frame wall (2026-06-25, pl_sonnet)
+fn_8017B5A4   # fsys_file — real C 27.86%; W-debug-frame: target is leaf-with-r31-frame compiled under -g; no per-function -g pragma; adding -g to TU regresses 9 neighbors (49→41 byte-exact). SKIP
+
+# OSInterrupt.c — address-mode reloc-name wall (2026-06-25, pl_glm)
+fn_8009E414   # OSInterrupt ExternalInterruptHandler — real C 99.48%; @ha/@l reloc-name wall. Struct extern + #pragma address produces the EXACT target instruction pattern (lis+addi+lwz/lhz split for non-zero member offsets on hardware registers) but objdiff in band mode cannot resolve the @ha/@l relocations to numeric values (symbols are undefined externs, not in target object). All 10 residual lines are lis/addi reloc-name-only mismatches; every lwz/lhz load instruction matches. Lever: #pragma address + struct extern (>8 bytes to avoid SDA) forces CW 1.2.5n to emit @ha/@l relocations with member-offset addressing instead of folding. In a full link these resolve to byte-exact.
+fn_80022B3C  # gs_title.c pl_opus: W1 reg-perm (arg0 r30/r31 pivot w/ table struct-copy), shape 100%, 94.24%
+
+# OSReset.c — W-MMIO-base-fold wall (2026-06-26, pl_glm); same class as OSMemory.c fn_8009F488
+fn_8009FFC0  # OSReset __OSDoHotReset — real C 91.06% (CW 1.2.5n + -opt noprop); W-MMIO-base-fold: CW folds 0xCC002000+2 into single large disp (lis; sth 0x2002) but target splits (lis; addi 0x2000; sth 0x2). 15+ C forms + 8 CW versions + 6 opt-flag combos all fold identically. Not C-reachable. SKIP

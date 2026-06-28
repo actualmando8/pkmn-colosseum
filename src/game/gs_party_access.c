@@ -1287,20 +1287,12 @@ asm void fn_8000CF68(void) {
 }
 #else
 #pragma peephole off
+#pragma scheduling off
 u32 fn_8000CF68(u32 arg) {
+    struct StatCopyBlk { u32 data[28]; };
     u32 local[28];
     u32 val;
-    {
-        u32 *s = lbl_80266700 - 1;
-        u32 *d = local - 1;
-        s32 ctr = 14;
-        do {
-            d[1] = s[1];
-            d[2] = s[2];
-            s += 2;
-            d += 2;
-        } while (--ctr != 0);
-    }
+    *(struct StatCopyBlk*)local = *(struct StatCopyBlk*)lbl_80266700;
     {
         u32 *p = local;
         u32 idx = 0;
@@ -1331,6 +1323,7 @@ u32 fn_8000CF68(u32 arg) {
     fn_8002DC6C(val);
     return 0;
 }
+#pragma scheduling reset
 #pragma peephole reset
 #endif
 
@@ -1402,6 +1395,8 @@ idx_done:
 #pragma peephole off
 #pragma push
 #pragma peephole off
+#pragma push
+#pragma peephole off
 s32 fn_8000D11C(void) {
     s32 v = *(s32*)(lbl_804673F8 + 0x874);
     if (v != 0) {
@@ -1422,9 +1417,12 @@ s32 fn_8000D11C(void) {
 #pragma pop
 #pragma pop
 #pragma pop
+#pragma pop
 
 /* fn_8000D154 - 0x8000D154 | size: 0x70 */
 /* GSparty_GetAccuracy */
+#pragma push
+#pragma peephole off
 #pragma push
 #pragma peephole off
 #pragma push
@@ -1475,9 +1473,12 @@ s32 fn_8000D154(void) {
 #pragma pop
 #pragma pop
 #pragma pop
+#pragma pop
 
 /* fn_8000D1C4 - 0x8000D1C4 | size: 0x70 */
 /* GSparty_GetEvasion */
+#pragma push
+#pragma peephole off
 #pragma push
 #pragma peephole off
 #pragma push
@@ -1528,9 +1529,12 @@ s32 fn_8000D1C4(void) {
 #pragma pop
 #pragma pop
 #pragma pop
+#pragma pop
 
 /* fn_8000D234 - 0x8000D234 | size: 0x5c */
 /* GSparty_ResetStatStages */
+#pragma push
+#pragma peephole off
 #pragma push
 #pragma peephole off
 #pragma push
@@ -1569,6 +1573,7 @@ s32 fn_8000D234(void) {
     }
     return 0;
 }
+#pragma pop
 #pragma pop
 #pragma pop
 #pragma pop
