@@ -11,8 +11,8 @@ compiler that Genius Sonority used in 2003.
 
 | Metric | Value |
 |---|---|
-| Function match | ~62.9% (4,277 / 6,795 functions) |
-| Code match | ~39.5% (541,268 / 1,368,604 matched code bytes) |
+| Function match | ~63.0% (4,283 / 6,795 functions) |
+| Code match | ~39.6% (541,304 / 1,368,604 matched code bytes) |
 
 Last updated 2026-06-28 from trust-gated per-function scans on top of the
 2026-06-25 `python tools/gen_decomp_report.py -o report.json` baseline,

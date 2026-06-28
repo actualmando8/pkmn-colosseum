@@ -246,6 +246,11 @@ extern u8 lbl_80478AC0[];
 extern u32 lbl_8047B3B8;
 extern u32 lbl_8047B3C0;
 extern u32 lbl_8047B3D4;
+
+typedef struct BattleSceneTransitionState {
+    u8 unk_00[0x3C];
+    u8 phase; /* 0x3C */
+} BattleSceneTransitionState;
 extern u32 lbl_8047B3E0;
 extern u32 lbl_8047DFE0;
 extern u32 lbl_8047DFF4;
@@ -1499,10 +1504,10 @@ void fn_801CFD08(void) {
  * Address: 0x801D0080 | Size: 0x10
  */
 s32 fn_801D0080(void) {
-    u8* ptr;
+    BattleSceneTransitionState* ptr;
 
-    ptr = (u8*)lbl_8047B3D4;
-    ptr[0x3c] = 1;
+    ptr = (BattleSceneTransitionState*)lbl_8047B3D4;
+    ptr->phase = 1;
     return (s32)ptr;
 }
 

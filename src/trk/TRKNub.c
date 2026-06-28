@@ -47,6 +47,14 @@ extern void TRK_board_display(const char* msg);
 /* gTRKBigEndian - endianness flag (1=big, 0=little) */
 extern u8 gTRKBigEndian[];
 
+typedef struct TRKMessageBuffer {
+    s32 mutex;       /* 0x00 */
+    s32 inUse;       /* 0x04 */
+    u32 length;      /* 0x08 */
+    u32 position;    /* 0x0C */
+    u8 data[0x880]; /* 0x10 */
+} TRKMessageBuffer;
+
 /* Event queue structure - 0x28 bytes at lbl_803FCDD8 */
 /* Offset 0x00: mutex (4 bytes)
  * Offset 0x04: count (4 bytes)
@@ -606,45 +614,45 @@ s32 fn_800BEC18(u8* buf, u32 unused, u32 w0, u32 w1) {
 }
 
 /* fn_800BED14 - 0x800BED14 | size: 0x8C */
-s32 fn_800BED14(u8* buf, u8* dst, u32 n) {
+s32 fn_800BED14(TRKMessageBuffer* buf, u8* dst, u32 n) {
     s32 err = 0;
     if (n == 0) {
         return 0;
     }
     {
-        u32 writepos = *(u32*)(buf + 0xC);
-        u32 endpos = *(u32*)(buf + 0x8);
-        u32 space = endpos - writepos;
+        u32 position = buf->position;
+        u32 length = buf->length;
+        u32 space = length - position;
         if (n > space) {
             err = 0x302;
             n = space;
         }
-        fn_80003488(dst, buf + writepos + 0x10, n);
-        *(u32*)(buf + 0xC) = *(u32*)(buf + 0xC) + n;
+        fn_80003488(dst, &buf->data[position], n);
+        buf->position += n;
     }
     return err;
 }
 
 /* fn_800BEDA0 - 0x800BEDA0 | size: 0xA4 */
-s32 fn_800BEDA0(u8* buf, u8* src, u32 n) {
+s32 fn_800BEDA0(TRKMessageBuffer* buf, u8* src, u32 n) {
     s32 err = 0;
     if (n == 0) {
         return 0;
     }
     {
-        u32 writepos = *(u32*)(buf + 0xC);
-        u32 space = 0x880 - writepos;
+        u32 position = buf->position;
+        u32 space = sizeof(buf->data) - position;
         if (space < n) {
             err = 0x301;
             n = space;
         }
         if (n == 1) {
-            buf[writepos + 0x10] = src[0];
+            buf->data[position] = src[0];
         } else {
-            fn_80003488(buf + writepos + 0x10, src, n);
+            fn_80003488(&buf->data[position], src, n);
         }
-        *(u32*)(buf + 0xC) = *(u32*)(buf + 0xC) + n;
-        *(u32*)(buf + 0x8) = *(u32*)(buf + 0xC);
+        buf->position += n;
+        buf->length = buf->position;
     }
     return err;
 }
@@ -662,4 +670,3 @@ void fn_800BEE74(u8* buf, s32 keepData) {
         fn_80003458(buf + 0x10, 0, 0x880);
     }
 }
-
