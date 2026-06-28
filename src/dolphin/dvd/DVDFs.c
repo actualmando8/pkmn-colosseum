@@ -24,6 +24,15 @@ static u32  MaxEntryNum_8047A7D4;    /* 0x8047A7D4 */
 
 extern u32 __DVDLongFileNameFlag;
 
+typedef struct DVDFstEntry {
+    u32 typeAndNameOffset;
+    u32 parentOrStart;
+    u32 nextOrLength;
+} DVDFstEntry;
+
+#define DVD_FST_TYPE_MASK 0xFF000000u
+#define DVD_FST_ENTRY(entrynum) (((DVDFstEntry*)FstStart_8047A7CC)[(entrynum)])
+
 /*
  * __DVDFSInit - Initialize the DVD filesystem
  * 0x800A4CF0 | size: 0x38
@@ -44,11 +53,10 @@ void __DVDFSInit(void) {
 
     if (FstStart_8047A7CC) {
         /* Root entry's third word contains the total number of entries */
-        MaxEntryNum_8047A7D4 = FstStart_8047A7CC[2];
+        MaxEntryNum_8047A7D4 = DVD_FST_ENTRY(0).nextOrLength;
 
         /* String table immediately follows the FST entries */
-        FstStringStart_8047A7D0 =
-            (u32*)((u8*)FstStart_8047A7CC + MaxEntryNum_8047A7D4 * 12);
+        FstStringStart_8047A7D0 = (u32*)&DVD_FST_ENTRY(MaxEntryNum_8047A7D4);
     }
 }
 
@@ -439,7 +447,7 @@ BOOL fn_800A5268(char* path, u32 maxlen) {
     {
         s32 isDir;
 
-        if ((FstStart_8047A7CC[currentDir * 3] & 0xFF000000) == 0) {
+        if ((DVD_FST_ENTRY(currentDir).typeAndNameOffset & DVD_FST_TYPE_MASK) == 0) {
             isDir = FALSE;
         } else {
             isDir = TRUE;
