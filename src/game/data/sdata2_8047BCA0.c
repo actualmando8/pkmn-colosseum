@@ -1,0 +1,63 @@
+#include "dolphin/types.h"
+
+#pragma section ".sdata2"
+#define SDATA2 __declspec(section ".sdata2")
+
+SDATA2 const f32 lbl_8047BCA0 = 255.0f;
+SDATA2 const f32 lbl_8047BCA4 = 3.1415927f;
+SDATA2 const f32 lbl_8047BCA8 = 2.0f;
+SDATA2 const f32 lbl_8047BCAC = 29.0f;
+SDATA2 const f64 lbl_8047BCB0 = 4.503601774854144e+15;
+SDATA2 const f32 lbl_8047BCB8 = 0.25f;
+SDATA2 const f32 lbl_8047BCBC = 1.0f;
+SDATA2 const f32 lbl_8047BCC0 = 0.8f;
+SDATA2 const f32 lbl_8047BCC4 = 10.0f;
+SDATA2 const f32 lbl_8047BCC8 = -20.0f;
+SDATA2 const f32 lbl_8047BCCC = 300.0f;
+SDATA2 const f32 lbl_8047BCD0 = 243.0f;
+SDATA2 const f32 lbl_8047BCD4 = 5.0f;
+SDATA2 const f64 lbl_8047BCD8 = 4.503599627370496e+15;
+SDATA2 const f32 lbl_8047BCE0 = 0.0078125f;
+SDATA2 const f32 lbl_8047BCE4 = 1.5707964f;
+SDATA2 const f32 lbl_8047BCE8 = -1.5707964f;
+SDATA2 const f32 lbl_8047BCEC = 3.0f;
+SDATA2 const f32 lbl_8047BCF0 = 1.5f;
+SDATA2 const f32 lbl_8047BCF4 = 27.0f;
+SDATA2 const f32 lbl_8047BCF8 = 270.0f;
+SDATA2 const f32 lbl_8047BCFC = 0.9599311f;
+SDATA2 const f32 lbl_8047BD00 = 2.1816616f;
+SDATA2 const f32 lbl_8047BD04 = 0.61086524f;
+SDATA2 const f32 lbl_8047BD08 = 2.5307274f;
+SDATA2 const f32 lbl_8047BD0C = 4.0f;
+SDATA2 const f32 lbl_8047BD10 = 256.0f;
+SDATA2 const f32 lbl_8047BD14 = 128.0f;
+SDATA2 const f32 lbl_8047BD18 = 0.5f;
+SDATA2 const f32 lbl_8047BD1C = 0.2f;
+SDATA2 const f32 lbl_8047BD20 = 233.0f;
+SDATA2 const f32 lbl_8047BD24 = 25.0f;
+SDATA2 const f32 lbl_8047BD28 = 50.0f;
+SDATA2 const f32 lbl_8047BD2C = 0.2265625f;
+SDATA2 const f32 lbl_8047BD30 = 35.0f;
+SDATA2 const f32 lbl_8047BD34 = 0.30543262f;
+SDATA2 const f32 lbl_8047BD38 = 0.2617994f;
+SDATA2 const f32 lbl_8047BD3C = 0.65625f;
+SDATA2 const f32 lbl_8047BD40 = 0.75f;
+SDATA2 const f32 lbl_8047BD44 = 1.05f;
+SDATA2 const f32 lbl_8047BD48 = 1.3499999f;
+SDATA2 const f32 lbl_8047BD4C = 1.6500001f;
+SDATA2 const f64 lbl_8047BD50 = 0.5;
+SDATA2 const f64 lbl_8047BD58 = 3.0;
+SDATA2 const f64 lbl_8047BD60 = 0.0;
+SDATA2 const f32 lbl_8047BD68[2] = { 0.017453292f, 0.0f };
+SDATA2 const s16 lbl_8047BD70[2] = { 0x0151, 0x0154 };
+SDATA2 const s16 lbl_8047BD74[2] = { 0x0153, 0x0152 };
+SDATA2 const s16 lbl_8047BD78[2] = { 0x0095, 0x00CD };
+SDATA2 const s16 lbl_8047BD7C[2] = { 0x0105, 0x013D };
+SDATA2 const s16 lbl_8047BD80[2] = { 0x0095, 0x013D };
+SDATA2 const s16 lbl_8047BD84[2] = { 0x00CD, 0x0105 };
+SDATA2 const s16 lbl_8047BD88[2] = { 0x0095, 0x00CD };
+SDATA2 const s16 lbl_8047BD8C[2] = { 0x0105, 0x013D };
+SDATA2 const s16 lbl_8047BD90[2] = { 0x0095, 0x013D };
+SDATA2 const s16 lbl_8047BD94[2] = { 0x00CD, 0x0105 };
+SDATA2 const s16 lbl_8047BD98[2] = { -30, -30 };
+SDATA2 const s16 lbl_8047BD9C[2] = { -30, -30 };

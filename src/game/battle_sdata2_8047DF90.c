@@ -1,0 +1,60 @@
+#include "dolphin/types.h"
+
+#pragma section ".sdata2"
+#define SDATA2 __declspec(section ".sdata2")
+
+SDATA2 const f32 lbl_8047DF90 = -1.5707964f;
+SDATA2 const f64 lbl_8047DF98 = 4.503601774854144e+15;
+SDATA2 const f32 lbl_8047DFA0[2] = { 1.71052635f, 0.0f };
+SDATA2 const u32 lbl_8047DFA8 = 0xFFFFFFFF;
+SDATA2 const u32 lbl_8047DFAC = 0x000000FF;
+SDATA2 const f32 lbl_8047DFB0 = 1.0f;
+SDATA2 const f32 lbl_8047DFB4 = 0.5f;
+SDATA2 const f32 lbl_8047DFB8 = 0.0f;
+SDATA2 const f32 lbl_8047DFBC = 255.0f;
+SDATA2 const f32 lbl_8047DFC0 = 640.0f;
+SDATA2 const f32 lbl_8047DFC4 = 480.0f;
+SDATA2 const f64 lbl_8047DFC8 = 4.503601774854144e+15;
+SDATA2 const f64 lbl_8047DFD0 = 4.503599627370496e+15;
+SDATA2 const u32 lbl_8047DFD8 = 0x1F0808FF;
+SDATA2 const f32 lbl_8047DFDC = 0.5f;
+SDATA2 const f32 lbl_8047DFE0 = 0.0f;
+SDATA2 const f32 lbl_8047DFE4 = 1.0f;
+SDATA2 const f32 lbl_8047DFE8 = 4.0f;
+SDATA2 const f32 lbl_8047DFEC = 2.0f;
+SDATA2 const f32 lbl_8047DFF0 = 255.0f;
+SDATA2 const f32 lbl_8047DFF4 = 640.0f;
+SDATA2 const f32 lbl_8047DFF8 = 480.0f;
+SDATA2 const f64 lbl_8047E000 = 4.503599627370496e+15;
+SDATA2 const f32 lbl_8047E008 = 320.0f;
+SDATA2 const f32 lbl_8047E00C = 240.0f;
+SDATA2 const f32 lbl_8047E010 = 150.0f;
+SDATA2 const f32 lbl_8047E014 = 128.0f;
+SDATA2 const f32 lbl_8047E018 = -128.0f;
+SDATA2 const f32 lbl_8047E01C = 0.1f;
+SDATA2 const f32 lbl_8047E020 = 16.0f;
+SDATA2 const f32 lbl_8047E024 = 0.25f;
+SDATA2 const f32 lbl_8047E028 = 32.0f;
+SDATA2 const f32 lbl_8047E02C = 0.7f;
+SDATA2 const f32 lbl_8047E030 = 0.001f;
+SDATA2 const f32 lbl_8047E034 = 20.0f;
+SDATA2 const f32 lbl_8047E038 = 15.0f;
+SDATA2 const f32 lbl_8047E03C = 6.25f;
+SDATA2 const f32 lbl_8047E040 = 8.0f;
+SDATA2 const f32 lbl_8047E044 = 33.75f;
+SDATA2 const f32 lbl_8047E048 = 23.75f;
+SDATA2 const f32 lbl_8047E04C = 360.0f;
+SDATA2 const f32 lbl_8047E050 = 804.24774f;
+SDATA2 const f32 lbl_8047E054 = 896.0f;
+SDATA2 const f32 lbl_8047E058 = -256.0f;
+SDATA2 const f64 lbl_8047E060 = 4.503601774854144e+15;
+SDATA2 const f32 lbl_8047E068 = 0.017453292f;
+SDATA2 const f32 lbl_8047E06C = 48.0f;
+SDATA2 const f32 lbl_8047E070 = 364.0f;
+SDATA2 const f32 lbl_8047E074 = 768.0f;
+SDATA2 const f32 lbl_8047E078 = 116.0f;
+SDATA2 const f32 lbl_8047E07C = 45.0f;
+SDATA2 const f32 lbl_8047E080 = 0.4f;
+SDATA2 const f32 lbl_8047E084 = 1.5f;
+SDATA2 const f32 lbl_8047E088 = -1.5f;
+SDATA2 const f32 lbl_8047E08C = 0.3f;
