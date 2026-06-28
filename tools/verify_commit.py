@@ -6,7 +6,9 @@ had to be caught by hand before cherry-picking:
 
   - editing `*_fn_*.inc` (the ROM-truth bytes objdiff measures against)
   - editing other truth files (symbols.txt / splits*.txt / target .o)
+  - adding `#include "*.inc"` or inline asm inside source
   - flipping `#if 0` -> `#if 1` to re-activate an asm wrapper and forge 100%
+  - adding raw cast-plus-offset pointer arithmetic as a "finished" decompilation
   - claiming a match% that does not re-measure on a clean build
 
 This makes that vigilance a one-shot tool. Run it before cherry-picking a
@@ -36,7 +38,20 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 TARGET_O = ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"
-OBJDIFF = ROOT / "tools" / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")
+_EXE = ".exe" if os.name == "nt" else ""
+
+
+def _first_existing(paths):
+    for path in paths:
+        if path.exists():
+            return path
+    return None
+
+
+OBJDIFF = _first_existing([
+    ROOT / "tools" / f"objdiff-cli{_EXE}",
+    ROOT / "build" / "tools" / f"objdiff-cli{_EXE}",
+]) or (ROOT / "tools" / f"objdiff-cli{_EXE}")
 sys.path.insert(0, str(ROOT / "tools"))
 from headless_subprocess import run as run_tool  # noqa: E402
 
@@ -148,6 +163,54 @@ def check_asm_wrapper_flip(diff, parent=None):
     return violations
 
 
+ADDED_INC_INCLUDE_RE = re.compile(r"^\+\s*#include\s+[<\"][^>\"]*\.inc[>\"]",
+                                  re.IGNORECASE)
+ADDED_INLINE_ASM_RE = re.compile(r"^\+.*\b(?:__asm|asm\s*\{|asm\s+void)\b")
+RAW_POINTER_OFFSET_RE = [
+    re.compile(
+        r"\*\s*\(\s*(?:volatile\s+|const\s+)*[A-Za-z_]\w*(?:\s*\*|\s+)\s*\)"
+        r"\s*\([^;\n]*\+\s*(?:0x[0-9A-Fa-f]+|\d+)"
+    ),
+    re.compile(
+        r"\(\s*(?:u8|s8|char|void)\s*\*\s*\)\s*[A-Za-z_]\w*"
+        r"\s*\+\s*(?:0x[0-9A-Fa-f]+|\d+)"
+    ),
+]
+
+
+def check_added_source_fraud(diff):
+    """Reject newly-added source lines that are not real readable C.
+
+    Existing debt is tracked separately; this gate only inspects added lines in
+    changed src/**/*.c files so it prevents new cheating/debt without making the
+    current project unmergeable.
+    """
+    path = None
+    violations = []
+    for ln in diff.splitlines():
+        if ln.startswith("+++ b/"):
+            path = ln[6:]
+            continue
+        if ln.startswith("+++ /dev/null"):
+            path = None
+            continue
+        if not (path and path.startswith("src/") and path.endswith(".c")):
+            continue
+        if not ln.startswith("+") or ln.startswith("+++"):
+            continue
+        body = ln[1:]
+        stripped = body.strip()
+        if not stripped or stripped.startswith("*") or stripped.startswith("//"):
+            continue
+        if ADDED_INC_INCLUDE_RE.match(ln):
+            violations.append(f"{path}: added .inc include: {stripped}")
+        elif ADDED_INLINE_ASM_RE.match(ln):
+            violations.append(f"{path}: added inline/asm wrapper code: {stripped}")
+        elif any(rx.search(body) for rx in RAW_POINTER_OFFSET_RE):
+            violations.append(f"{path}: added raw pointer-offset C: {stripped}")
+    return violations
+
+
 def remeasure(spec):
     """spec = 'src/path.c:fn_NAME:CLAIMED' -> (ok, msg)."""
     import compile_check
@@ -236,7 +299,7 @@ def main():
     g.add_argument("--range", help="git diff range (e.g. master..HEAD)")
     g.add_argument("--commit", help="single commit sha")
     ap.add_argument("--measure", action="append", default=[],
-                    help="src.c:fn:CLAIMED% — re-measure claim (repeatable)")
+                    help="src.c:fn:CLAIMED%% - re-measure claim (repeatable)")
     ap.add_argument("--no-regression-check", action="store_true",
                     help="skip the whole-file non-regression rebuild "
                          "(default: enabled — recompiles each changed .c)")
@@ -269,6 +332,11 @@ def main():
     if flips:
         violations.append("ASM-WRAPPER #if 0->#if 1 FLIP: "
                           + " | ".join(flips[:5]))
+
+    source_fraud = check_added_source_fraud(diff)
+    if source_fraud:
+        violations.append("SOURCE-FRAUD/READABILITY VIOLATION: "
+                          + " | ".join(source_fraud[:8]))
 
     for spec in args.measure:
         ok, msg = remeasure(spec)

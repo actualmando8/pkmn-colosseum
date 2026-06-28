@@ -40,6 +40,23 @@ def _load_set(path, pat=r"(fn_[0-9A-Fa-f]+)"):
     return s
 
 
+def _source_asm_set():
+    """Return active asm-wrapper symbols from the source classifier.
+
+    build/asmw.txt is a useful cache when it exists, but the dashboard should
+    not lose the ASM bucket just because that cache was not regenerated.
+    """
+    try:
+        sys.path.insert(0, os.path.dirname(__file__))
+        import progress2
+
+        _counts, fn2class = progress2.classify_all()
+        return {fn for fn, cls in fn2class.items() if cls == "ASM"}
+    except Exception as e:
+        print(f"(warning: source ASM scan unavailable: {e})", file=sys.stderr)
+        return set()
+
+
 def classify(pct, fn, asm):
     if fn in asm:
         return "ASM"
@@ -54,7 +71,7 @@ def classify(pct, fn, asm):
 
 def build():
     rep = json.load(open(REPORT, encoding="utf-8"))
-    asm = _load_set(ASMW)
+    asm = _source_asm_set() | _load_set(ASMW)
     equiv = _load_set(EQUIV)
     walls = _load_set(WALLS)
     attempted = _load_set(ATTEMPTS) | walls | equiv

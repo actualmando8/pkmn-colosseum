@@ -17,7 +17,20 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-OBJDIFF = ROOT / "tools" / ("objdiff-cli.exe" if os.name == "nt" else "objdiff-cli")
+_EXE = ".exe" if os.name == "nt" else ""
+
+
+def _first_existing(paths):
+    for path in paths:
+        if path.exists():
+            return path
+    return None
+
+
+OBJDIFF = _first_existing([
+    ROOT / "tools" / f"objdiff-cli{_EXE}",
+    ROOT / "build" / "tools" / f"objdiff-cli{_EXE}",
+]) or (ROOT / "tools" / f"objdiff-cli{_EXE}")
 CACHE = ROOT / "build" / ".measure_cache.json"
 sys.path.insert(0, str(ROOT / "tools"))
 from headless_subprocess import run as run_tool  # noqa: E402

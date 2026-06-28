@@ -23,11 +23,14 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 LEDGER = os.path.join(ROOT, "build", "wall_ledger.json")
+DEBT = os.path.join(ROOT, "build", "real_c_debt_audit.json")
 LOCKS = os.path.join(ROOT, "build", "fleet_locks")
 WINS = os.path.join(ROOT, "build", "band_wins")
+REPORT = os.path.join(ROOT, "report.json")
 LANES = os.environ.get("FLEET_LANES", "opus glm codex codex2 sonnet seed").split()
 _FN = re.compile(r"fn_[0-9A-Fa-f]{8}")
 START_HEAD = None  # set at startup so "this run" win counts are stable
+META_KEYS = {"_src", "_srcs", "_pct"}
 
 
 def sh(cmd, timeout=8):
@@ -55,6 +58,20 @@ def bucket_stats():
     return out
 
 
+def debt_stats():
+    try:
+        return json.load(open(DEBT)).get("totals", {})
+    except Exception:
+        return {}
+
+
+def permuter_status():
+    try:
+        return json.load(open(os.path.join(ROOT, "build", "permuter_status.json")))
+    except Exception:
+        return {}
+
+
 def saved_fns():
     """All fns saved >=100% to band_wins (this run's wins as they land)."""
     out = {}
@@ -63,10 +80,37 @@ def saved_fns():
             if f.endswith(".json"):
                 try:
                     d = json.load(open(os.path.join(WINS, f)))
-                    out[f[:-5]] = [k for k in d if not k.startswith("_")]
+                    out[f[:-5]] = [k for k in d if k not in META_KEYS]
                 except Exception:
                     pass
     return out
+
+
+def band_win_stats(wins=None):
+    """Local band_wins are scratch-bank entries, not necessarily committed wins."""
+    wins = wins if wins is not None else saved_fns()
+    keys = []
+    for fns in wins.values():
+        keys.extend(fns)
+    unique = set(keys)
+    report_pct = {}
+    try:
+        rep = json.load(open(REPORT))
+        for u in rep.get("units", []):
+            for f in u.get("functions") or []:
+                name = f.get("name")
+                if name:
+                    report_pct[name] = max(report_pct.get(name, -1.0),
+                                           float(f.get("fuzzy_match_percent") or 0))
+    except Exception:
+        pass
+    already_100 = sum(1 for fn in unique if report_pct.get(fn, -1.0) >= 99.95)
+    known_not_100 = sum(1 for fn in unique if 0 <= report_pct.get(fn, -1.0) < 99.95)
+    missing = sum(1 for fn in unique if fn not in report_pct)
+    return {"entries": len(keys), "unique": len(unique),
+            "duplicates": max(0, len(keys) - len(unique)),
+            "already_100": already_100, "not_100": known_not_100,
+            "not_in_report": missing}
 
 
 HISTORY = os.path.join(ROOT, "build", "bucket_history.jsonl")
@@ -153,9 +197,11 @@ def commits_this_run():
 
 def render():
     buckets = bucket_stats()
+    debt = debt_stats()
     series = snapshot_history(buckets)
     kg = kg_levers()
     wins = saved_fns()
+    win_stats = band_win_stats(wins)
     nwin_fns = sum(len(v) for v in wins.values())
     ncommit, clog = commits_this_run()
     branch = sh(["git", "branch", "--show-current"])
@@ -189,16 +235,19 @@ def render():
         </div>"""
 
     # permuter (Windows WSL) status, written by permuter_poll.sh
-    perm = {}
-    try:
-        perm = json.load(open(os.path.join(ROOT, "build", "permuter_status.json")))
-    except Exception:
-        pass
+    perm = permuter_status()
     pdot = "#3fb950" if perm.get("alive") else "#6e7681"
+    active_targets = ", ".join(perm.get("active_targets") or [])
     perm_html = (f'<span class="dot" style="background:{pdot}"></span>'
-                 f'<b>permuter</b> (Windows CPU) · workers <b>{perm.get("workers","?")}</b> · '
-                 f'queue <b>{perm.get("targets","?")}</b> targets'
-                 f'<div class="last">{html.escape(str(perm.get("last","(no poll yet — start tools/decomp_work/permuter_poll.sh)")))[:140]}</div>')
+                 f'<b>permuter</b> (Windows CPU) · cores <b>{perm.get("cores","?")}</b> · '
+                 f'target workers <b>{perm.get("workers","?")}</b> · '
+                 f'per-target -j <b>{perm.get("jobs","?")}</b> · '
+                 f'slots <b>{perm.get("effective_slots","?")}</b> · '
+                 f'budget <b>{perm.get("budget","?")}s</b> · '
+                 f'active <b>{perm.get("active","?")}</b> · '
+                 f'queued <b>{perm.get("queued","?")}/{perm.get("targets","?")}</b> · '
+                 f'done <b>{perm.get("done","?")}</b> · wins <b>{perm.get("wins","?")}</b>'
+                 f'<div class="last">{html.escape(active_targets or str(perm.get("last","(no poll yet - start tools/decomp_work/permuter_poll.sh)")))[:180]}</div>')
 
     # KG levers panel
     kg_rows = "".join(
@@ -244,7 +293,13 @@ def render():
 <div class=meta>branch <b>{branch}</b> · {time.strftime('%H:%M:%S')} · auto-refresh 5s</div>
 
 <div><span class=big>{ncommit}</span> commits this run &nbsp; · &nbsp;
-     <span class=big>{nwin_fns}</span> functions banked (band_wins)</div>
+     <span class=big>{nwin_fns}</span> saved entries (band_wins)</div>
+<div class=meta>band_wins scratch bank · unique <b>{win_stats['unique']}</b> ·
+     duplicate entries <b>{win_stats['duplicates']}</b> · already 100% in report <b>{win_stats['already_100']}</b> ·
+     still not 100% in report <b>{win_stats['not_100']}</b> · not in report <b>{win_stats['not_in_report']}</b></div>
+<div class=meta>source debt · asm wrappers <b>{debt.get('asm_wrapper_functions','?')}</b> ·
+     stubs <b>{debt.get('stub_functions','?')}</b> · .inc lines <b>{debt.get('inc_include_lines','?')}</b> ·
+     raw pointer-offset lines <b>{debt.get('raw_pointer_offset_lines','?')}</b></div>
 
 <div class=grid2>
  <div>
@@ -291,7 +346,10 @@ class H(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path.startswith("/api"):
             body = json.dumps({"buckets": bucket_stats(),
+                               "debt": debt_stats(),
+                               "permuter": permuter_status(),
                                "wins": saved_fns(),
+                               "win_stats": band_win_stats(),
                                "lanes": {r: lane_state(r) for r in LANES}}).encode()
             ctype = "application/json"
         else:

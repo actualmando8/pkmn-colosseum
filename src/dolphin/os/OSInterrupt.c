@@ -110,6 +110,8 @@ void __OSInterruptInit(void) {
 }
 
 u32 __OSMaskInterrupts(u32 global) {
+#pragma peephole off
+    extern u32 SetInterruptMask(u32 mask, u32 globalMask);
     BOOL enabled;
     u32 prev;
     u32 local;
@@ -124,7 +126,7 @@ u32 __OSMaskInterrupts(u32 global) {
     *(volatile u32*)0x800000C4 = global;
 
     while (mask) {
-        mask = __OSSetInterruptMask(mask, global | local);
+        mask = SetInterruptMask(mask, global | local);
     }
 
     OSRestoreInterrupts(enabled);
@@ -132,6 +134,8 @@ u32 __OSMaskInterrupts(u32 global) {
 }
 
 u32 __OSUnmaskInterrupts(u32 global) {
+#pragma peephole off
+    extern u32 SetInterruptMask(u32 mask, u32 globalMask);
     BOOL enabled;
     u32 prev;
     u32 local;
@@ -146,7 +150,7 @@ u32 __OSUnmaskInterrupts(u32 global) {
     *(volatile u32*)0x800000C4 = global;
 
     while (mask) {
-        mask = __OSSetInterruptMask(mask, global | local);
+        mask = SetInterruptMask(mask, global | local);
     }
 
     OSRestoreInterrupts(enabled);

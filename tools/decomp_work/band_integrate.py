@@ -40,6 +40,7 @@ EQUIV_FILE = HERE / "equivalent.txt"
 WALLS_FILE = ROOT / "WALLS.md"
 PY = sys.executable
 M = 99.9999
+META_KEYS = {"_src", "_srcs", "_pct"}
 
 
 STATUS_LOG = HERE / "coordination" / "status.md"
@@ -365,7 +366,7 @@ def main():
         srcs = d.get("_srcs", {})            # per-fn source map (new format)
         default_src = d.get("_src")          # legacy single source / fallback
         for fn, body in d.items():
-            if fn.startswith("_"):           # _src, _srcs and any future metadata
+            if fn in META_KEYS:
                 continue
             src_rel = srcs.get(fn, default_src)
             if not src_rel:

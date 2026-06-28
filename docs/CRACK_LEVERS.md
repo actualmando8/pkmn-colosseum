@@ -61,6 +61,8 @@ bug, not a wall.
 - **avoid `goto`** (worsens O4); null-checks should **FALL THROUGH** to the null case.
 - `?:` vs `if/else` codegen differs; cast-operator-KIND swap `(T*)x` vs `(T)x`.
 - toggle `const` on a primitive param (omitted from the mangled name — try both).
+- **direct-array-indexed-hoist** (scratch-only): use `lbl + indexed_offset` directly instead of a cached base pointer when target initializes induction first, then hoists `lis/addi`; before calling it done, retry as a typed array/struct access and gate that version.
+- **split-array-scalar-stack-order**: split an addressed local array into scalar locals, then order declarations to match target stack offsets and avoid saved element-address registers.
 
 ## Pragmas / opt
 - `#pragma peephole off/on`; `#pragma optimization_level N`; scheduling on/off;

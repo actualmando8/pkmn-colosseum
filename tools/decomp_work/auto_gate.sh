@@ -26,7 +26,7 @@ LOCKED_FILES=$(timeout 20 $PY tools/decomp_work/coordination/locks.py list --sco
 for f in $FILES; do
   [ -f "$f" ] || continue
   tag=$(basename "$f" .json)
-  nwins=$($PY -c "import json;print(sum(1 for k in json.load(open('$f')) if not k.startswith('_')))" 2>/dev/null || echo 0)
+  nwins=$($PY -c "import json;print(sum(1 for k in json.load(open('$f')) if k not in {'_src','_srcs','_pct'}))" 2>/dev/null || echo 0)
   [ "${nwins:-0}" -ge 1 ] || continue
   out=$($PY "$BI" "$tag" 2>&1)
   echo "$out" | grep -q "HELD" || { echo "  $tag: no-hold (walls/abort)"; continue; }

@@ -24,6 +24,21 @@ static u32  MaxEntryNum_8047A7D4;    /* 0x8047A7D4 */
 
 extern u32 __DVDLongFileNameFlag;
 
+typedef struct DVDFstEntry {
+    u32 typeAndNameOffset;
+    u32 parentOrStart;
+    u32 nextOrLength;
+} DVDFstEntry;
+
+#define DVD_FST_TYPE_MASK 0xFF000000u
+#define DVD_FST_ENTRY(entrynum) (((DVDFstEntry*)FstStart_8047A7CC)[(entrynum)])
+#define DVD_FST_WORD(entrynum, word) (FstStart_8047A7CC[(entrynum) * 3 + (word)])
+#define DVD_FST_TYPE_NAME(entrynum) DVD_FST_WORD((entrynum), 0)
+#define DVD_FST_PARENT_OR_START(entrynum) DVD_FST_WORD((entrynum), 1)
+#define DVD_FST_NEXT_OR_LENGTH(entrynum) DVD_FST_WORD((entrynum), 2)
+#define DVD_FST_NAME(entrynum) \
+    ((char*)FstStringStart_8047A7D0 + (DVD_FST_TYPE_NAME(entrynum) & 0xFFFFFF))
+
 /*
  * __DVDFSInit - Initialize the DVD filesystem
  * 0x800A4CF0 | size: 0x38
@@ -44,11 +59,10 @@ void __DVDFSInit(void) {
 
     if (FstStart_8047A7CC) {
         /* Root entry's third word contains the total number of entries */
-        MaxEntryNum_8047A7D4 = FstStart_8047A7CC[2];
+        MaxEntryNum_8047A7D4 = DVD_FST_ENTRY(0).nextOrLength;
 
         /* String table immediately follows the FST entries */
-        FstStringStart_8047A7D0 =
-            (u32*)((u8*)FstStart_8047A7CC + MaxEntryNum_8047A7D4 * 12);
+        FstStringStart_8047A7D0 = (u32*)&DVD_FST_ENTRY(MaxEntryNum_8047A7D4);
     }
 }
 
@@ -298,7 +312,7 @@ BOOL fn_800A501C(const char* path, DVDFileInfo* fileInfo) {
     {
         s32 isDir;
 
-        if ((FstStart_8047A7CC[entrynum * 3] & 0xFF000000) == 0) {
+        if ((DVD_FST_TYPE_NAME(entrynum) & DVD_FST_TYPE_MASK) == 0) {
             isDir = FALSE;
         } else {
             isDir = TRUE;
@@ -309,8 +323,8 @@ BOOL fn_800A501C(const char* path, DVDFileInfo* fileInfo) {
         }
     }
 
-    fileInfo->startAddr = FstStart_8047A7CC[entrynum * 3 + 1];
-    fileInfo->length = FstStart_8047A7CC[entrynum * 3 + 2];
+    fileInfo->startAddr = DVD_FST_PARENT_OR_START(entrynum);
+    fileInfo->length = DVD_FST_NEXT_OR_LENGTH(entrynum);
     fileInfo->callback = NULL;
     fileInfo->cb.state = 0;
 
@@ -343,9 +357,8 @@ u32 fn_800A5108(u32 entrynum, char* path, u32 maxlen) {
         return 0;
     }
 
-    name = (char*)FstStringStart_8047A7D0 +
-           (FstStart_8047A7CC[entrynum * 3] & 0xFFFFFF);
-    parent = FstStart_8047A7CC[entrynum * 3 + 1];
+    name = DVD_FST_NAME(entrynum);
+    parent = DVD_FST_PARENT_OR_START(entrynum);
 
     if (parent != 0) {
         goto hasParent;
@@ -355,9 +368,8 @@ u32 fn_800A5108(u32 entrynum, char* path, u32 maxlen) {
     goto afterParent;
 
 hasParent:
-    parentName = (char*)FstStringStart_8047A7D0 +
-                 (FstStart_8047A7CC[parent * 3] & 0xFFFFFF);
-    len = fn_800A5108(FstStart_8047A7CC[parent * 3 + 1], path, maxlen);
+    parentName = DVD_FST_NAME(parent);
+    len = fn_800A5108(DVD_FST_PARENT_OR_START(parent), path, maxlen);
 
     if (len != maxlen) {
     } else {
@@ -439,7 +451,7 @@ BOOL fn_800A5268(char* path, u32 maxlen) {
     {
         s32 isDir;
 
-        if ((FstStart_8047A7CC[currentDir * 3] & 0xFF000000) == 0) {
+        if ((DVD_FST_ENTRY(currentDir).typeAndNameOffset & DVD_FST_TYPE_MASK) == 0) {
             isDir = FALSE;
         } else {
             isDir = TRUE;

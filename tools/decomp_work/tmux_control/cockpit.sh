@@ -94,9 +94,9 @@ bootstrap() {
   command -v opencode >/dev/null || echo "cockpit: WARNING: opencode not on PATH (glm pane)"
   command -v codex    >/dev/null || echo "cockpit: WARNING: codex not on PATH (codex pane)"
 
-  # 6 panes in a tiled grid (opus | glm | codex | codex2 | sonnet | shell)
+  # 7 panes in a tiled grid (opus | glm | codex | codex2 | sonnet | seed | shell)
   "$TMUX" new-session -d -s "$SESSION" -n "$WINDOW" -c "$REPO" -x 250 -y 60
-  for _ in 1 2 3 4 5; do
+  for _ in 1 2 3 4 5 6; do
     "$TMUX" split-window -t "$SESSION:$WINDOW" -c "$REPO"
     "$TMUX" select-layout -t "$SESSION:$WINDOW" tiled >/dev/null 2>&1 || true
   done

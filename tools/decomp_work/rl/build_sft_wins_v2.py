@@ -187,7 +187,7 @@ for f in glob.glob(str(ROOT / "build/band_wins/*.json")):
     srcs = d.get("_srcs") or {}
     default_src = d.get("_src")
     for k, v in d.items():
-        if k.startswith("_"):
+        if k in {"_src", "_srcs", "_pct"}:
             continue
         if isinstance(v, str) and v.strip():
             if k not in wins:
