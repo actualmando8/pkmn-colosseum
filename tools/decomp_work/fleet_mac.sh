@@ -20,7 +20,7 @@ nfiles=$(grep -vcE '^\s*#|^\s*$' "$QUEUE" 2>/dev/null || echo 0)
 echo "[fleet] queue $QUEUE: $nfiles files"
 
 # fresh locks each run (a prior run's claims shouldn't block this one)
-rm -rf build/fleet_locks; mkdir -p build/fleet_locks build/band_wins
+rm -rf build/fleet_locks build/locks; mkdir -p build/fleet_locks build/band_wins
 
 echo "[fleet] bringing up cockpit (panes as shells)..."
 "$CK" kill >/dev/null 2>&1 || true

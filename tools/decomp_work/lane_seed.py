@@ -171,7 +171,7 @@ def main():
             continue
         src = (ROOT / f).resolve()
         print(f"[seed] ===== {f} ({len(fns)} fns) {time.strftime('%H:%M:%S')} =====", flush=True)
-        ic = band("init", TAG, f)
+        ic = band("init", TAG, f, "--reset")
         if ic.returncode != 0:
             print(f"[seed] init failed: {ic.stderr[:200]}", flush=True)
             continue

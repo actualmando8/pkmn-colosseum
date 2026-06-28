@@ -53,7 +53,7 @@ Do NOT edit any other file, do NOT touch *.inc, NEVER paste asm or flip #if (= f
   #   ^ a REG-COLORING verdict is NEVER a wall — keep grinding (named locals + decl order).
   python3 tools/decomp_work/kg/kg.py q top-levers               # which known levers are productive
   python3 tools/decomp_work/kg/kg.py q siblings <fn>            # same-TU propagation context
-  #   ^ `lever-targets` takes a LEVER SLUG, not a function name. Use it only after
+  #   ^ lever-targets takes a LEVER SLUG, not a function name. Use it only after
   #     choosing a plausible lever from classifier output/top-levers.
   python3 tools/decomp_work/band.py diff  $TAG <fn>             # exact instr miss
   #   ...apply that lever (from the cheat-sheet / CRACK_LEVERS.md) by editing
