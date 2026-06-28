@@ -120,7 +120,7 @@ while :; do
         printf '        %s\n' "${last:-...}"
       done
       printf 'commits: '
-      git log -3 --oneline 2>/dev/null | paste -sd ' | ' -
+      git log -3 --oneline 2>/dev/null | awk 'NR==1 {printf "%s", $0; next} {printf " | %s", $0} END {print ""}'
       printf '\nrefresh %ss · dashboard 0.0.0.0:%s · stop: tools/decomp_work/fleet_down_mac.sh\n' "$INTERVAL" "$DASH_PORT"
     }
   else
