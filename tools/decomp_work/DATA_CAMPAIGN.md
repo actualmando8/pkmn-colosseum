@@ -67,3 +67,15 @@ python3 tools/verify_data_progress.py
 python3 tools/check_report_sanity.py report.json
 python3 tools/decomp_work/snapshot_metrics.py
 ```
+
+## Fleet Lanes
+
+- Codex data lane: edit mode, one source-owned chunk at a time.
+- GLM data lane: research-only mode, writes evidence notes for training and later
+  Codex application.
+- Preferred next edit run: `sdata2-016,sdata2-017,sdata2-018`.
+
+```bash
+DATA_PREFER_IDS=sdata2-016,sdata2-017,sdata2-018 tools/decomp_work/data_lane_worker.sh codex
+DATA_MODE=research tools/decomp_work/data_lane_worker.sh glm
+```
