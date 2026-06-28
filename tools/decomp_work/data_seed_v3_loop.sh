@@ -42,7 +42,11 @@ import json, sys
 for line in sys.stdin:
     try:
         rec = json.loads(line.split(" ", 1)[1])
-        print(f"  {rec.get(\"chunk_id\", \"?\")} {rec.get(\"seconds\", \"?\")}s {rec.get(\"candidates\", \"?\")} cand")
+        print("  {0} {1}s {2} cand".format(
+            rec.get("chunk_id", "?"),
+            rec.get("seconds", "?"),
+            rec.get("candidates", "?"),
+        ))
     except Exception:
         print("  " + line.strip()[:70])
 ' || true

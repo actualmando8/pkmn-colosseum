@@ -108,7 +108,7 @@ while :; do
   pane_lines=$(tput lines 2>/dev/null || echo 24)
 
   printf '\033[H'
-  if [ "$pane_lines" -lt 24 ]; then
+  if [ "${FLEET_MONITOR_COMPACT:-0}" = "1" ] || [ "$pane_lines" -lt 24 ]; then
     {
       printf 'DECOMP FLEET %s · %s · data/data-lanes/permuters\n' "$(date +%H:%M:%S)" "$(git branch --show-current 2>/dev/null)"
       json_summary | sed 's/^/  /'

@@ -133,7 +133,7 @@ def val(key):
     value = data.get(key)
     return "?" if value is None else value
 print(f"PERMUTER {name}  [{alive}]")
-print("=" * 72)
+print("=" * 48)
 print(f"workers {val('workers')}  jobs {val('jobs')}  slots {val('effective_slots')}  budget {val('budget')}s")
 print(f"active {val('active')}  queued {val('queued')}/{val('targets')}  done {val('done')}  wins {val('wins')}")
 print(f"processes grind={val('grind_processes')} permuter={val('permuter_processes')}  cores={val('cores')}")
