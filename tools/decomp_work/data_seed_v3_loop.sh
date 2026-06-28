@@ -29,14 +29,18 @@ PY
 draw_header() {
   local chunk="$1"
   printf '\033[H'
-  printf 'SEEDCODER V3 DATA PROBE\n'
-  printf '=======================\n'
-  printf 'server  %s\n' "$SERVER"
-  printf 'chunk   %s\n' "${chunk:-(none)}"
-  printf 'policy  research-only; writes build/agent_training/data_research/*_seedv3.md\n'
-  printf 'sleep   %ss between probes\n' "$INTERVAL"
-  printf '\nrecent summaries:\n'
-  grep 'DATA_SEED_SUMMARY' "$LOG" 2>/dev/null | tail -6 || true
+  {
+    printf 'SEEDCODER V3 DATA PROBE\n'
+    printf '=======================\n'
+    printf 'server  %s\n' "$SERVER"
+    printf 'chunk   %s\n' "${chunk:-(none)}"
+    printf 'policy  research-only; writes build/agent_training/data_research/*_seedv3.md\n'
+    printf 'sleep   %ss between probes\n' "$INTERVAL"
+    printf '\nrecent summaries:\n'
+    grep 'DATA_SEED_SUMMARY' "$LOG" 2>/dev/null | tail -6 || true
+  } | while IFS= read -r line; do
+    printf '\033[2K%s\n' "$line"
+  done
   printf '\033[J'
 }
 
