@@ -34,10 +34,18 @@ draw_header() {
     printf '=======================\n'
     printf 'server  %s\n' "$SERVER"
     printf 'chunk   %s\n' "${chunk:-(none)}"
-    printf 'policy  research-only; writes build/agent_training/data_research/*_seedv3.md\n'
-    printf 'sleep   %ss between probes\n' "$INTERVAL"
+    printf 'policy  research-only; writes *_seedv3.md\n'
+    printf 'sleep   %ss\n' "$INTERVAL"
     printf '\nrecent summaries:\n'
-    grep 'DATA_SEED_SUMMARY' "$LOG" 2>/dev/null | tail -6 || true
+    grep 'DATA_SEED_SUMMARY' "$LOG" 2>/dev/null | tail -5 | python3 -c '
+import json, sys
+for line in sys.stdin:
+    try:
+        rec = json.loads(line.split(" ", 1)[1])
+        print(f"  {rec.get(\"chunk_id\", \"?\")} {rec.get(\"seconds\", \"?\")}s {rec.get(\"candidates\", \"?\")} cand")
+    except Exception:
+        print("  " + line.strip()[:70])
+' || true
   } | while IFS= read -r line; do
     printf '\033[2K%s\n' "$line"
   done

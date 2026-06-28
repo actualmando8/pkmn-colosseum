@@ -127,13 +127,7 @@ print(f"host {name}")
 print(f"workers {val('workers')}  jobs {val('jobs')}  slots {val('effective_slots')}  budget {val('budget')}s")
 print(f"active {val('active')}  queued {val('queued')}/{val('targets')}  done {val('done')}  wins {val('wins')}")
 print(f"processes grind={val('grind_processes')} permuter={val('permuter_processes')} seedv3={val('serve_v3_processes')}  cores={val('cores')}")
-print("")
-print("active targets:")
-for fn in targets[:14]:
-    print(f"  {fn}")
-if not targets:
-    print("  (none)")
-print("")
+print("targets " + (", ".join(targets[:5]) if targets else "(none)"))
 print(str(data.get("last", ""))[:240])
 PY
 }

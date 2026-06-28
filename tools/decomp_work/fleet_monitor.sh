@@ -105,9 +105,26 @@ while :; do
   wins=$(ls build/band_wins/pl_*.json 2>/dev/null | wc -l | tr -d ' ')
   commits=$(git rev-list --count "${START_HEAD}..HEAD" 2>/dev/null || echo 0)
   byte_exact=$(git log "${START_HEAD}..HEAD" --oneline 2>/dev/null | grep -oE '\+[0-9]+ byte-exact' | grep -oE '[0-9]+' | awk '{s+=$1} END{print s+0}')
+  pane_lines=$(tput lines 2>/dev/null || echo 24)
 
   printf '\033[H'
-  {
+  if [ "$pane_lines" -lt 24 ]; then
+    {
+      printf 'DECOMP FLEET %s · %s · data/data-lanes/permuters\n' "$(date +%H:%M:%S)" "$(git branch --show-current 2>/dev/null)"
+      json_summary | sed 's/^/  /'
+      printf 'data lanes:\n'
+      for r in $DATA_LANES; do
+        claim="$(data_claim_for "$r")"
+        last="$(tail -1 "build/data_lane_$r.log" 2>/dev/null | cut -c1-92)"
+        printf '  %-6s [%2s] %-42s\n' "$r" "$(alive_data "$r")" "${claim:-(idle)}"
+        printf '        %s\n' "${last:-...}"
+      done
+      printf 'commits: '
+      git log -3 --oneline 2>/dev/null | paste -sd ' | ' -
+      printf '\nrefresh %ss · dashboard 0.0.0.0:%s · stop: tools/decomp_work/fleet_down_mac.sh\n' "$INTERVAL" "$DASH_PORT"
+    }
+  else
+    {
     printf '╔══ DECOMP FLEET ════════════════════════  %s  ══╗\n' "$(date +%H:%M:%S)"
     printf '  branch %s · commits this monitor %s · byte-exact +%s · band_wins tags %s\n' \
       "$(git branch --show-current 2>/dev/null)" "$commits" "$byte_exact" "$wins"
@@ -134,7 +151,8 @@ while :; do
     git log -6 --oneline 2>/dev/null | sed 's/^/  /' || true
     printf '╚════════════════════════════════════════════════════════════╝\n'
     printf '  refresh %ss · web dashboard 0.0.0.0:%s · stop fleet: tools/decomp_work/fleet_down_mac.sh\n' "$INTERVAL" "$DASH_PORT"
-  } | while IFS= read -r line; do
+    }
+  fi | while IFS= read -r line; do
     printf '\033[2K%s\n' "$line"
   done
   printf '\033[J'
