@@ -35,7 +35,7 @@ do NOT modify that file.
 ## Progress Tracking
 
 After every 5 successful matches, update:
-- `tools/decomp_work/progress.json` — add to completed list
+- `python tools/sync_progress_metadata.py --sync` — sync README + `tools/decomp_work/progress.json` from `report.json`
 - Run `python tools/decomp_scheduler.py --status` to verify counts
 
 ## Commit Protocol

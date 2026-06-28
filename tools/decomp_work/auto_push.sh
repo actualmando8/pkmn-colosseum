@@ -9,9 +9,10 @@ export MSYS_NO_PATHCONV=1 ALLOW_MASTER_PUSH=1
 INTERVAL="${PUSH_INTERVAL:-900}"
 echo "[auto_push] up — README sync + master push every ${INTERVAL}s"
 while true; do
-  python tools/decomp_work/update_readme_progress.py "$(date +%Y-%m-%d)" >/dev/null 2>&1
-  if ! git diff --quiet -- README.md 2>/dev/null; then
-    git add README.md && git commit -q -m "docs: sync README progress [auto]" 2>/dev/null
+  python tools/sync_progress_metadata.py --sync >/dev/null 2>&1
+  if ! git diff --quiet -- README.md tools/decomp_work/progress.json 2>/dev/null; then
+    git add README.md tools/decomp_work/progress.json &&
+      git commit -q -m "progress: sync metadata [auto]" 2>/dev/null
   fi
   ahead=$(git rev-list --count origin/master..master 2>/dev/null)
   if [ "${ahead:-0}" -gt 0 ]; then

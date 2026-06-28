@@ -12,10 +12,12 @@ Usage: python tools/decomp_work/surgical_report_update.py <fns_file> [report.jso
   <fns_file> = newline-separated fn_ names that are now 100% byte-exact.
 """
 import json
+import subprocess
 import sys
 from pathlib import Path
 
 MATCH = 99.995  # treat >= as 100% matched
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def ci(v):  # code value -> int (schema stores as string)
@@ -92,6 +94,12 @@ def main():
     print(f"flipped {flipped} functions across {len(touched)} units: {sorted(touched)}")
     print(f"TOP: {mat_fns}/{tot_fns} fn ({T['matched_functions_percent']:.2f}%), "
           f"{T['matched_code_percent']:.2f}% code")
+    if Path(report).resolve() == (ROOT / "report.json").resolve():
+        subprocess.run(
+            [sys.executable, "tools/sync_progress_metadata.py", "--sync"],
+            cwd=ROOT,
+            check=True,
+        )
 
 
 if __name__ == "__main__":
