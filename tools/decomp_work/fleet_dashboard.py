@@ -26,6 +26,7 @@ LEDGER = os.path.join(ROOT, "build", "wall_ledger.json")
 DEBT = os.path.join(ROOT, "build", "real_c_debt_audit.json")
 LOCKS = os.path.join(ROOT, "build", "fleet_locks")
 WINS = os.path.join(ROOT, "build", "band_wins")
+REPORT = os.path.join(ROOT, "report.json")
 LANES = os.environ.get("FLEET_LANES", "opus glm codex codex2 sonnet seed").split()
 _FN = re.compile(r"fn_[0-9A-Fa-f]{8}")
 START_HEAD = None  # set at startup so "this run" win counts are stable
@@ -83,6 +84,33 @@ def saved_fns():
                 except Exception:
                     pass
     return out
+
+
+def band_win_stats(wins=None):
+    """Local band_wins are scratch-bank entries, not necessarily committed wins."""
+    wins = wins if wins is not None else saved_fns()
+    keys = []
+    for fns in wins.values():
+        keys.extend(fns)
+    unique = set(keys)
+    report_pct = {}
+    try:
+        rep = json.load(open(REPORT))
+        for u in rep.get("units", []):
+            for f in u.get("functions") or []:
+                name = f.get("name")
+                if name:
+                    report_pct[name] = max(report_pct.get(name, -1.0),
+                                           float(f.get("fuzzy_match_percent") or 0))
+    except Exception:
+        pass
+    already_100 = sum(1 for fn in unique if report_pct.get(fn, -1.0) >= 99.95)
+    known_not_100 = sum(1 for fn in unique if 0 <= report_pct.get(fn, -1.0) < 99.95)
+    missing = sum(1 for fn in unique if fn not in report_pct)
+    return {"entries": len(keys), "unique": len(unique),
+            "duplicates": max(0, len(keys) - len(unique)),
+            "already_100": already_100, "not_100": known_not_100,
+            "not_in_report": missing}
 
 
 HISTORY = os.path.join(ROOT, "build", "bucket_history.jsonl")
@@ -173,6 +201,7 @@ def render():
     series = snapshot_history(buckets)
     kg = kg_levers()
     wins = saved_fns()
+    win_stats = band_win_stats(wins)
     nwin_fns = sum(len(v) for v in wins.values())
     ncommit, clog = commits_this_run()
     branch = sh(["git", "branch", "--show-current"])
@@ -264,7 +293,10 @@ def render():
 <div class=meta>branch <b>{branch}</b> · {time.strftime('%H:%M:%S')} · auto-refresh 5s</div>
 
 <div><span class=big>{ncommit}</span> commits this run &nbsp; · &nbsp;
-     <span class=big>{nwin_fns}</span> functions banked (band_wins)</div>
+     <span class=big>{nwin_fns}</span> saved entries (band_wins)</div>
+<div class=meta>band_wins scratch bank · unique <b>{win_stats['unique']}</b> ·
+     duplicate entries <b>{win_stats['duplicates']}</b> · already 100% in report <b>{win_stats['already_100']}</b> ·
+     still not 100% in report <b>{win_stats['not_100']}</b> · not in report <b>{win_stats['not_in_report']}</b></div>
 <div class=meta>source debt · asm wrappers <b>{debt.get('asm_wrapper_functions','?')}</b> ·
      stubs <b>{debt.get('stub_functions','?')}</b> · .inc lines <b>{debt.get('inc_include_lines','?')}</b> ·
      raw pointer-offset lines <b>{debt.get('raw_pointer_offset_lines','?')}</b></div>
@@ -317,6 +349,7 @@ class H(BaseHTTPRequestHandler):
                                "debt": debt_stats(),
                                "permuter": permuter_status(),
                                "wins": saved_fns(),
+                               "win_stats": band_win_stats(),
                                "lanes": {r: lane_state(r) for r in LANES}}).encode()
             ctype = "application/json"
         else:
