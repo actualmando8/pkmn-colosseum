@@ -57,6 +57,8 @@ BUDGET = _env_int("GRIND_BUDGET", 600)
 _lock = threading.Lock()
 _state = {"mode": "swarm", "profile": PROFILE or "default",
           "cores": NCORE, "workers": WORKERS, "jobs": JOBS,
+          "replicas": REPLICAS, "budget": BUDGET,
+          "effective_slots": WORKERS * JOBS * REPLICAS,
           "active": {}, "queue": [], "done": [], "wins": [], "pool": [],
           "started": time.time()}
 

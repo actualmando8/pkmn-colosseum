@@ -23,6 +23,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 LEDGER = os.path.join(ROOT, "build", "wall_ledger.json")
+DEBT = os.path.join(ROOT, "build", "real_c_debt_audit.json")
 LOCKS = os.path.join(ROOT, "build", "fleet_locks")
 WINS = os.path.join(ROOT, "build", "band_wins")
 LANES = os.environ.get("FLEET_LANES", "opus glm codex codex2 sonnet seed").split()
@@ -54,6 +55,20 @@ def bucket_stats():
         if v.get("pct", 0) >= 100 or v.get("committed"):
             d["done"] += 1
     return out
+
+
+def debt_stats():
+    try:
+        return json.load(open(DEBT)).get("totals", {})
+    except Exception:
+        return {}
+
+
+def permuter_status():
+    try:
+        return json.load(open(os.path.join(ROOT, "build", "permuter_status.json")))
+    except Exception:
+        return {}
 
 
 def saved_fns():
@@ -154,6 +169,7 @@ def commits_this_run():
 
 def render():
     buckets = bucket_stats()
+    debt = debt_stats()
     series = snapshot_history(buckets)
     kg = kg_levers()
     wins = saved_fns()
@@ -190,16 +206,19 @@ def render():
         </div>"""
 
     # permuter (Windows WSL) status, written by permuter_poll.sh
-    perm = {}
-    try:
-        perm = json.load(open(os.path.join(ROOT, "build", "permuter_status.json")))
-    except Exception:
-        pass
+    perm = permuter_status()
     pdot = "#3fb950" if perm.get("alive") else "#6e7681"
+    active_targets = ", ".join(perm.get("active_targets") or [])
     perm_html = (f'<span class="dot" style="background:{pdot}"></span>'
-                 f'<b>permuter</b> (Windows CPU) · workers <b>{perm.get("workers","?")}</b> · '
-                 f'queue <b>{perm.get("targets","?")}</b> targets'
-                 f'<div class="last">{html.escape(str(perm.get("last","(no poll yet — start tools/decomp_work/permuter_poll.sh)")))[:140]}</div>')
+                 f'<b>permuter</b> (Windows CPU) · cores <b>{perm.get("cores","?")}</b> · '
+                 f'target workers <b>{perm.get("workers","?")}</b> · '
+                 f'per-target -j <b>{perm.get("jobs","?")}</b> · '
+                 f'slots <b>{perm.get("effective_slots","?")}</b> · '
+                 f'budget <b>{perm.get("budget","?")}s</b> · '
+                 f'active <b>{perm.get("active","?")}</b> · '
+                 f'queued <b>{perm.get("queued","?")}/{perm.get("targets","?")}</b> · '
+                 f'done <b>{perm.get("done","?")}</b> · wins <b>{perm.get("wins","?")}</b>'
+                 f'<div class="last">{html.escape(active_targets or str(perm.get("last","(no poll yet - start tools/decomp_work/permuter_poll.sh)")))[:180]}</div>')
 
     # KG levers panel
     kg_rows = "".join(
@@ -246,6 +265,9 @@ def render():
 
 <div><span class=big>{ncommit}</span> commits this run &nbsp; · &nbsp;
      <span class=big>{nwin_fns}</span> functions banked (band_wins)</div>
+<div class=meta>source debt · asm wrappers <b>{debt.get('asm_wrapper_functions','?')}</b> ·
+     stubs <b>{debt.get('stub_functions','?')}</b> · .inc lines <b>{debt.get('inc_include_lines','?')}</b> ·
+     raw pointer-offset lines <b>{debt.get('raw_pointer_offset_lines','?')}</b></div>
 
 <div class=grid2>
  <div>
@@ -292,6 +314,8 @@ class H(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path.startswith("/api"):
             body = json.dumps({"buckets": bucket_stats(),
+                               "debt": debt_stats(),
+                               "permuter": permuter_status(),
                                "wins": saved_fns(),
                                "lanes": {r: lane_state(r) for r in LANES}}).encode()
             ctype = "application/json"
