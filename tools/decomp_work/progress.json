@@ -3438,12 +3438,12 @@
   "metadata": {
     "source": "report.json",
     "policy": "completed = active REAL_C functions with fuzzy_match_percent >= 99.995; asm wrappers/stubs excluded",
-    "report_sha256": "3b21d2f26d58f9310f2459780158a054ad8359239f6080c27564d813f03a5008",
+    "report_sha256": "d1a559a270aae2b62f91cfe4603775815d33dd531d89ae82076fba7bed18c9eb",
     "report_matched_functions": 4308,
     "report_total_functions": 6795,
-    "report_matched_data": 0,
+    "report_matched_data": 516,
     "report_total_data": 1276195,
-    "report_complete_data": 0,
+    "report_complete_data": 516,
     "completed_real_c_functions": 3432
   }
 }

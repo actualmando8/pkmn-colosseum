@@ -27,6 +27,10 @@ DEBT = os.path.join(ROOT, "build", "real_c_debt_audit.json")
 LOCKS = os.path.join(ROOT, "build", "fleet_locks")
 WINS = os.path.join(ROOT, "build", "band_wins")
 REPORT = os.path.join(ROOT, "report.json")
+DATA_PROGRESS = os.path.join(ROOT, "config", "GC6E01", "data_progress.json")
+DATA_SDATA2_WORKLIST = os.path.join(ROOT, "tools", "decomp_work", "data_sdata2_worklist.json")
+DATA_CAMPAIGN_QUEUE = os.path.join(ROOT, "tools", "decomp_work", "data_campaign_queue.json")
+METRICS_HISTORY = os.path.join(ROOT, "tools", "decomp_work", "metrics_history.jsonl")
 LANES = os.environ.get("FLEET_LANES", "opus glm codex codex2 sonnet seed").split()
 _FN = re.compile(r"fn_[0-9A-Fa-f]{8}")
 START_HEAD = None  # set at startup so "this run" win counts are stable
@@ -70,6 +74,96 @@ def permuter_status():
         return json.load(open(os.path.join(ROOT, "build", "permuter_status.json")))
     except Exception:
         return {}
+
+
+def data_campaign_stats():
+    out = {
+        "matched": 0,
+        "total": 0,
+        "pct": 0.0,
+        "entries": 0,
+        "sdata2_chunks": 0,
+        "sdata2_chunks_done": 0,
+        "sdata2_chunks_total": 0,
+        "sdata2_bytes": 0,
+        "sdata2_symbols": 0,
+        "sdata2_padding": 0,
+        "queue_lanes": {},
+        "queue_top": [],
+    }
+    try:
+        rep = json.load(open(REPORT))
+        m = rep.get("measures", {}) or {}
+        out["matched"] = int(m.get("matched_data") or 0)
+        out["total"] = int(m.get("total_data") or 0)
+        out["pct"] = (100.0 * out["matched"] / out["total"]) if out["total"] else 0.0
+    except Exception:
+        pass
+    try:
+        prog = json.load(open(DATA_PROGRESS))
+        out["entries"] = len(prog.get("matched", []) or [])
+    except Exception:
+        pass
+    try:
+        work = json.load(open(DATA_SDATA2_WORKLIST))
+        meta = work.get("metadata", {}) or {}
+        remaining_chunks = int(meta.get("chunk_count") or 0)
+        out["sdata2_chunks"] = remaining_chunks
+        chunk_bytes = int(meta.get("chunk_bytes") or 256)
+        done_chunks = 0
+        try:
+            prog = json.load(open(DATA_PROGRESS))
+            section = meta.get("section") or ".sdata2"
+            for item in prog.get("matched", []) or []:
+                if item.get("section") != section:
+                    continue
+                size = int(item.get("size") or 0)
+                done_chunks += (size + chunk_bytes - 1) // chunk_bytes
+        except Exception:
+            pass
+        out["sdata2_chunks_done"] = done_chunks
+        out["sdata2_chunks_total"] = remaining_chunks + done_chunks
+        out["sdata2_bytes"] = int(meta.get("section_size") or 0)
+        out["sdata2_symbols"] = int(meta.get("symbol_count") or 0)
+        out["sdata2_padding"] = int(meta.get("unattributed_or_padding_bytes") or 0)
+    except Exception:
+        pass
+    try:
+        queue = json.load(open(DATA_CAMPAIGN_QUEUE))
+        out["queue_lanes"] = (queue.get("metadata", {}) or {}).get("lanes", {}) or {}
+        out["queue_top"] = [
+            {
+                "id": item.get("id"),
+                "lane": item.get("lane"),
+                "start": item.get("start"),
+                "end": item.get("end"),
+                "size": item.get("size"),
+                "score": item.get("priority_score"),
+            }
+            for item in (queue.get("queue", []) or [])[:8]
+        ]
+    except Exception:
+        pass
+    return out
+
+
+def metrics_history(limit=14):
+    rows = []
+    try:
+        for line in open(METRICS_HISTORY):
+            line = line.strip()
+            if line:
+                rows.append(json.loads(line))
+    except Exception:
+        return []
+    # Keep the latest snapshot per date; snapshot_metrics.py already writes
+    # this way by default, but this makes the dashboard robust to --append runs.
+    by_date = {}
+    for row in rows:
+        date = row.get("date")
+        if date:
+            by_date[date] = row
+    return [by_date[k] for k in sorted(by_date)[-limit:]]
 
 
 def saved_fns():
@@ -198,6 +292,8 @@ def commits_this_run():
 def render():
     buckets = bucket_stats()
     debt = debt_stats()
+    data_stats = data_campaign_stats()
+    history = metrics_history()
     series = snapshot_history(buckets)
     kg = kg_levers()
     wins = saved_fns()
@@ -255,6 +351,35 @@ def render():
         for (s, t, n) in kg["top"]) or '<tr><td colspan=2 class="none">kg.db not built</td></tr>'
     kg_recent = " ".join(f'<span class="wchip">{html.escape(a)}·{html.escape(lv)}</span>'
                          for (a, lv) in kg["recent"]) or '<span class="none">none yet</span>'
+    queue_lanes = data_stats.get("queue_lanes") or {}
+    queue_top = " ".join(
+        f'<span class="wchip">{html.escape(str(item.get("id")))} {html.escape(str(item.get("start")))} {html.escape(str(item.get("lane")))}</span>'
+        for item in data_stats.get("queue_top", [])
+    ) or '<span class="none">queue not generated</span>'
+
+    hist_rows = ""
+    for row in history:
+        rep = row.get("report", {}) or {}
+        src = row.get("source_debt", {}) or {}
+        dat = row.get("data_campaign", {}) or {}
+        hist_rows += (
+            f"<tr><td>{html.escape(str(row.get('date', '')))}</td>"
+            f"<td>{int(rep.get('matched_functions', 0)):,}/{int(rep.get('total_functions', 0)):,} "
+            f"({float(rep.get('matched_functions_percent', 0)):.1f}%)</td>"
+            f"<td>{int(rep.get('matched_code', 0)):,}/{int(rep.get('total_code', 0)):,} "
+            f"({float(rep.get('matched_code_percent', 0)):.1f}%)</td>"
+            f"<td>{int(dat.get('verified_bytes', 0)):,}/{int(dat.get('total_bytes', 0)):,} "
+            f"({float(dat.get('verified_percent', 0)):.4f}%)</td>"
+            f"<td>{int(rep.get('complete_units', 0)):,}/{int(rep.get('total_units', 0)):,} "
+            f"({float(rep.get('complete_units_percent', 0)):.1f}%)</td>"
+            f"<td>{int(src.get('real_c_functions', 0)):,}/{int(src.get('source_functions', 0)):,} "
+            f"({float(src.get('real_c_percent', 0)):.1f}%)</td>"
+            f"<td>{int(src.get('asm_wrapper_functions', 0)):,}</td>"
+            f"<td>{int(src.get('stub_functions', 0)):,}</td>"
+            f"<td>{int(dat.get('sdata2_chunks_done', 0)):,}/{int(dat.get('sdata2_chunks_total', 0)):,}</td></tr>"
+        )
+    if not hist_rows:
+        hist_rows = '<tr><td colspan=9 class="none">run tools/decomp_work/snapshot_metrics.py</td></tr>'
 
     # chart series (labels = HH:MM, one line per bucket attempted-count)
     labels = [time.strftime('%H:%M', time.localtime(p["t"])) for p in series]
@@ -300,6 +425,18 @@ def render():
 <div class=meta>source debt · asm wrappers <b>{debt.get('asm_wrapper_functions','?')}</b> ·
      stubs <b>{debt.get('stub_functions','?')}</b> · .inc lines <b>{debt.get('inc_include_lines','?')}</b> ·
      raw pointer-offset lines <b>{debt.get('raw_pointer_offset_lines','?')}</b></div>
+<div class=meta>data match · <b>{data_stats['matched']:,}/{data_stats['total']:,}</b> bytes
+     ({data_stats['pct']:.4f}%) · verified entries <b>{data_stats['entries']}</b> ·
+     .sdata2 <b>{data_stats['sdata2_chunks_done']}</b>/<b>{data_stats['sdata2_chunks_total']}</b> chunks /
+     remaining <b>{data_stats['sdata2_chunks']}</b> /
+     <b>{data_stats['sdata2_bytes']:,}</b> bytes /
+     <b>{data_stats['sdata2_symbols']:,}</b> symbols
+     ({data_stats['sdata2_padding']:,} padding/unattributed bytes) ·
+     lanes numeric <b>{int(queue_lanes.get('NUMERIC', 0))}</b> /
+     string <b>{int(queue_lanes.get('STRING', 0))}</b> /
+     layout <b>{int(queue_lanes.get('LAYOUT', 0))}</b> /
+     research <b>{int(queue_lanes.get('RESEARCH', 0))}</b></div>
+<div class=meta>next data chunks: {queue_top}</div>
 
 <div class=grid2>
  <div>
@@ -315,6 +452,12 @@ def render():
 
 <h2>Campaign bucket progress</h2>
 <table>{rows}</table>
+
+<h2>Daily metrics</h2>
+<table>
+ <tr class="sub"><td>Date</td><td>Functions</td><td>Code bytes</td><td>Data bytes</td><td>Complete units</td><td>Real C</td><td>ASM</td><td>Stubs</td><td>.sdata2</td></tr>
+ {hist_rows}
+</table>
 
 <h2>Lanes</h2>
 <div class=lanes>{lane_cards}</div>
@@ -347,6 +490,8 @@ class H(BaseHTTPRequestHandler):
         if self.path.startswith("/api"):
             body = json.dumps({"buckets": bucket_stats(),
                                "debt": debt_stats(),
+                               "data": data_campaign_stats(),
+                               "history": metrics_history(),
                                "permuter": permuter_status(),
                                "wins": saved_fns(),
                                "win_stats": band_win_stats(),

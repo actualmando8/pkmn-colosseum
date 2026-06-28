@@ -49,6 +49,7 @@ TARGET_O = ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"
 BASE_DIR = ROOT / "build" / "GC6E01" / "base"
 OBJDIFF_CFG = ROOT / "objdiff.json"
 BUILD_CFG = ROOT / "build" / "GC6E01" / "config.json"
+DATA_PROGRESS = ROOT / "config" / "GC6E01" / "data_progress.json"
 
 # objdiff report.proto version. Current schema is version 1.
 REPORT_VERSION = 1
@@ -171,6 +172,37 @@ def _loadable_data_size() -> int:
     return total
 
 
+def _data_progress() -> tuple[int, int]:
+    """Return (matched_data, complete_data) from the data progress manifest."""
+    try:
+        progress_data = json.loads(DATA_PROGRESS.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return 0, 0
+
+    matched = 0
+    complete = 0
+    seen = set()
+    for item in progress_data.get("matched", []):
+        key = (
+            item.get("section"),
+            item.get("start"),
+            item.get("object"),
+            item.get("source_path"),
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        try:
+            size = int(item.get("size", 0) or 0)
+        except (TypeError, ValueError):
+            size = 0
+        if size <= 0:
+            continue
+        matched += size
+        complete += size
+    return matched, complete
+
+
 def _unit_identity(rel: str, cfg_map: dict):
     """Return (unit_name, source_path) for a base .o rel path.
 
@@ -192,12 +224,7 @@ def _unit_identity(rel: str, cfg_map: dict):
 def build_report():
     cfg_map = _load_cfg_map()
     g_total_data = _loadable_data_size()
-    # The current split keeps data in generated section objects. Until data
-    # symbols are promoted into source-owned units and diffed, count only the
-    # denominator and keep matched/complete data at zero rather than fabricating
-    # progress.
-    g_matched_data = 0
-    g_complete_data = 0
+    g_matched_data, g_complete_data = _data_progress()
 
     units = []
     # running aggregate, computed from the SAME per-function data as the units
@@ -293,7 +320,8 @@ def build_report():
     total_units = len(units)
     g_code_fuzzy = (g_fuzzy_weighted / g_total_code) if g_total_code else 0.0
     g_fuzzy = (
-        g_fuzzy_weighted / (g_total_code + g_total_data)
+        (g_fuzzy_weighted + (100.0 * g_matched_data))
+        / (g_total_code + g_total_data)
         if (g_total_code + g_total_data) else 0.0
     )
 

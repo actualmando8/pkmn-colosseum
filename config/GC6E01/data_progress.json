@@ -1,0 +1,24 @@
+{
+  "matched": [
+    {
+      "name": "__destroy_global_chain_reference",
+      "section": ".dtors",
+      "start": "0x80266380",
+      "size": 4,
+      "object": "__init_cpp_exceptions.cpp",
+      "source_path": "src/crt_data/__init_cpp_exceptions.c"
+    },
+    {
+      "name": "crt_sdata2_math_8047C4A0",
+      "section": ".sdata2",
+      "start": "0x8047C4A0",
+      "size": 512,
+      "target_offset": 0,
+      "source_offset": 0,
+      "target_object": "build/GC6E01/obj/crt/sdata2_math.o",
+      "source_object": "build/GC6E01/src/crt/sdata2_math.o",
+      "source_path": "src/crt_data/sdata2_math.c",
+      "notes": "fdlibm-style asin, atan2, exp, log, and pow constants emitted as typed f64 source constants"
+    }
+  ]
+}

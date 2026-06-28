@@ -24,6 +24,9 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+DATA_PROGRESS = ROOT / "config" / "GC6E01" / "data_progress.json"
+DATA_VERIFIER = ROOT / "tools" / "verify_data_progress.py"
+OBJCOPY = ROOT / "build" / "binutils" / "powerpc-eabi-objcopy"
 
 # Keep this pattern in sync with tools/progress.py:SKIP_BASE_SCRATCH.
 SCRATCH = re.compile(
@@ -93,6 +96,52 @@ def main(argv: list[str]) -> int:
         problems.append(
             f"measures.complete_data ({complete_data}) exceeds total_data ({total_data})."
         )
+    if matched_data or complete_data:
+        if not DATA_PROGRESS.exists():
+            problems.append(
+                "report.json claims matched/complete data bytes but "
+                "config/GC6E01/data_progress.json is missing."
+            )
+        else:
+            try:
+                data_progress = json.loads(DATA_PROGRESS.read_text(encoding="utf-8"))
+                seen = set()
+                manifest_total = 0
+                for item in data_progress.get("matched", []) or []:
+                    key = (
+                        item.get("section"),
+                        item.get("start"),
+                        item.get("object"),
+                        item.get("source_path"),
+                    )
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    manifest_total += mint(item.get("size", 0))
+                if manifest_total != matched_data or manifest_total != complete_data:
+                    problems.append(
+                        "data_progress.json total does not match report.json "
+                        f"(manifest={manifest_total}, matched_data={matched_data}, "
+                        f"complete_data={complete_data})."
+                    )
+            except (OSError, ValueError) as exc:
+                problems.append(f"could not read data_progress.json: {exc}")
+
+            # Public CI generally lacks ROM-derived split objects. When the
+            # local verifier prerequisites are available, require byte/reloc
+            # proof for every manifest entry.
+            if OBJCOPY.exists() and DATA_VERIFIER.exists():
+                verify = subprocess.run(
+                    [sys.executable, "tools/verify_data_progress.py"],
+                    cwd=ROOT,
+                    capture_output=True,
+                    text=True,
+                )
+                if verify.returncode != 0:
+                    problems.append(
+                        "data progress byte/reloc verification failed:\n"
+                        + (verify.stdout + verify.stderr).strip()
+                    )
 
     # 3) Phantom double-count detection. A band/scratch phantom is a COPY of a real
     #    TU, so it carries BOTH the same (total, matched) counts AND (nearly) the same
