@@ -31,6 +31,27 @@ def pgrep_count(pattern):
     except Exception:
         return 0
 
+def pgrep_first(pattern):
+    try:
+        out = subprocess.check_output(["pgrep", "-fo", pattern], text=True).strip()
+        return int(out or "0")
+    except Exception:
+        return 0
+
+def read_environ(pid):
+    if not pid:
+        return {}
+    try:
+        raw = open(f"/proc/{pid}/environ", "rb").read().split(b"\0")
+    except Exception:
+        return {}
+    env = {}
+    for item in raw:
+        if b"=" in item:
+            k, v = item.split(b"=", 1)
+            env[k.decode(errors="replace")] = v.decode(errors="replace")
+    return env
+
 def load(path, default):
     try:
         with open(path, encoding="utf-8") as fh:
@@ -45,21 +66,33 @@ done = state.get("done") or []
 wins = state.get("wins") or []
 grind_processes = pgrep_count("grind2.py")
 permuter_processes = pgrep_count("permuter.py")
+grind_env = read_environ(pgrep_first("grind2.py"))
 alive = bool(grind_processes or permuter_processes)
 try:
     alive = alive or (int(now_s) - int(m_s) < 300)
 except Exception:
     pass
 active_targets = sorted({v.get("fn") for v in active.values() if v.get("fn")})
+workers = state.get("workers") or int(grind_env.get("GRIND_WORKERS") or grind_processes or 0)
+jobs = state.get("jobs") or int(grind_env.get("GRIND_JOBS") or 0)
+replicas = state.get("replicas") or int(grind_env.get("GRIND_REPLICAS") or 1)
+budget = state.get("budget") or grind_env.get("GRIND_BUDGET")
+try:
+    budget = int(budget) if budget is not None else None
+except Exception:
+    budget = None
+effective_slots = state.get("effective_slots")
+if effective_slots is None and workers and jobs and replicas:
+    effective_slots = workers * jobs * replicas
 summary = {
     "alive": alive,
     "cores": state.get("cores"),
     "profile": state.get("profile"),
-    "workers": state.get("workers", grind_processes),
-    "jobs": state.get("jobs"),
-    "replicas": state.get("replicas", 1),
-    "budget": state.get("budget"),
-    "effective_slots": state.get("effective_slots"),
+    "workers": workers,
+    "jobs": jobs,
+    "replicas": replicas,
+    "budget": budget,
+    "effective_slots": effective_slots,
     "active": len(active_targets),
     "active_targets": active_targets,
     "queued": len(state.get("queue") or []),
