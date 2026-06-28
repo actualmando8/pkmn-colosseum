@@ -25,7 +25,9 @@ Outputs (per source file):
 Exit 0 if every saved win re-verified (or was cleanly dropped); 1 on splice error.
 """
 import json
+import os
 import re
+import signal
 import subprocess
 import sys
 import datetime
@@ -41,10 +43,39 @@ WALLS_FILE = ROOT / "WALLS.md"
 PY = sys.executable
 M = 99.9999
 META_KEYS = {"_src", "_srcs", "_pct"}
+INTEGRATE_TIMEOUT_SECS = float(os.environ.get("BAND_INTEGRATE_TIMEOUT_SECS", "300"))
 
 
 STATUS_LOG = HERE / "coordination" / "status.md"
 MATCHED_SEEN = ROOT / "build" / "matched_fns.txt"
+
+
+def _run_capture(cmd, timeout=INTEGRATE_TIMEOUT_SECS):
+    """subprocess.run(..., capture_output=True) with process-group timeout."""
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                            text=True, start_new_session=True)
+    try:
+        out, err = proc.communicate(timeout=timeout)
+        return subprocess.CompletedProcess(cmd, proc.returncode, out, err)
+    except subprocess.TimeoutExpired:
+        try:
+            os.killpg(proc.pid, signal.SIGTERM)
+        except OSError:
+            pass
+        try:
+            out, err = proc.communicate(timeout=5)
+        except subprocess.TimeoutExpired:
+            try:
+                os.killpg(proc.pid, signal.SIGKILL)
+            except OSError:
+                pass
+            out, err = proc.communicate()
+        err = (err or "") + (
+            f"\nTIMEOUT after {timeout:g}s running: "
+            + " ".join(str(x) for x in cmd)
+            + "\n"
+        )
+        return subprocess.CompletedProcess(cmd, 124, out or "", err)
 
 
 def _log_matches(fns, src_rel):
@@ -112,11 +143,11 @@ def _scratch_json(tag, integrated_c, config_from):
     so without this it would fall back to default -O4,p and falsely drop wins on
     -O4,s TUs (trainer.c, pokemon.c, ...)."""
     inttag = f"_int_{tag}"
-    subprocess.run([PY, str(HERE / "band.py"), "init", inttag, str(integrated_c),
-                    "--config-from", str(config_from)],
-                   capture_output=True, text=True)
-    r = subprocess.run([PY, str(HERE / "band.py"), "json", inttag],
-                       capture_output=True, text=True)
+    init = _run_capture([PY, str(HERE / "band.py"), "init", inttag, str(integrated_c),
+                         "--config-from", str(config_from)])
+    if init.returncode == 124:
+        return None, init.stdout + init.stderr
+    r = _run_capture([PY, str(HERE / "band.py"), "json", inttag])
     line = [l for l in r.stdout.splitlines() if l.strip().startswith("{")]
     if not line:
         return None, (r.stdout + r.stderr)

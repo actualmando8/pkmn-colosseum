@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """fleet_dashboard.py — web dashboard for the Mac decomp fleet + bucket campaign.
 
-Serves a single auto-refreshing HTML page (no deps, stdlib only) bound to
+Serves a single live-updating HTML page (no deps, stdlib only) bound to
 0.0.0.0 so it's reachable from another machine over Tailscale, e.g. from Windows:
     http://<mac-tailscale-ip>:8770/
 
@@ -19,20 +19,36 @@ import re
 import sqlite3
 import subprocess
 import time
+from collections import deque
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 LEDGER = os.path.join(ROOT, "build", "wall_ledger.json")
 DEBT = os.path.join(ROOT, "build", "real_c_debt_audit.json")
 LOCKS = os.path.join(ROOT, "build", "fleet_locks")
+DATA_LOCKS = os.path.join(ROOT, "build", "data_fleet_locks")
 WINS = os.path.join(ROOT, "build", "band_wins")
+NEARWINS = os.path.join(ROOT, "build", "permuter_nearwins", "manifest.jsonl")
+MATCHED_FNS = os.path.join(ROOT, "build", "matched_fns.txt")
 REPORT = os.path.join(ROOT, "report.json")
+GATE_MARK = os.path.join(ROOT, "build", ".last_gate")
+GATE_LOG = os.path.join(ROOT, "build", "gate.log")
 DATA_PROGRESS = os.path.join(ROOT, "config", "GC6E01", "data_progress.json")
-DATA_SDATA2_WORKLIST = os.path.join(ROOT, "tools", "decomp_work", "data_sdata2_worklist.json")
-DATA_CAMPAIGN_QUEUE = os.path.join(ROOT, "tools", "decomp_work", "data_campaign_queue.json")
+DATA_SEED_STATE = os.path.join(ROOT, "build", "data_seed_v3_state.json")
+DATA_SDATA2_WORKLIST = os.environ.get(
+    "DATA_WORKLIST",
+    os.path.join(ROOT, "tools", "decomp_work", "data_sdata2_worklist.json"),
+)
+DATA_CAMPAIGN_QUEUE = os.environ.get(
+    "DATA_QUEUE",
+    os.path.join(ROOT, "tools", "decomp_work", "data_campaign_queue.json"),
+)
 METRICS_HISTORY = os.path.join(ROOT, "tools", "decomp_work", "metrics_history.jsonl")
 LANES = os.environ.get("FLEET_LANES", "opus glm codex codex2 sonnet seed").split()
+LANE_STREAM_LINES = max(10, int(os.environ.get("LANE_STREAM_LINES", "80")))
+DATA_LANE_ROLES = {"glm", "codex", "codex2"}
 _FN = re.compile(r"fn_[0-9A-Fa-f]{8}")
+_ANSI = re.compile(r"\x1b(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
 START_HEAD = None  # set at startup so "this run" win counts are stable
 META_KEYS = {"_src", "_srcs", "_pct"}
 
@@ -43,6 +59,27 @@ def sh(cmd, timeout=8):
                               timeout=timeout).stdout.strip()
     except Exception:
         return ""
+
+
+def fmt_age(seconds):
+    if seconds is None:
+        return "never"
+    seconds = max(0, int(seconds))
+    if seconds < 90:
+        return f"{seconds}s"
+    minutes = seconds // 60
+    if minutes < 90:
+        return f"{minutes}m"
+    hours = minutes // 60
+    if hours < 48:
+        return f"{hours}h"
+    return f"{hours // 24}d"
+
+
+def clean_log_line(line):
+    line = _ANSI.sub("", line.rstrip())
+    line = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", line)
+    return line.strip()
 
 
 def bucket_stats():
@@ -103,6 +140,9 @@ def data_campaign_stats():
         "sdata2_symbols": 0,
         "sdata2_padding": 0,
         "queue_lanes": {},
+        "queue_section": "",
+        "queue_total": 0,
+        "queue_sections": {},
         "queue_top": [],
     }
     try:
@@ -144,10 +184,20 @@ def data_campaign_stats():
         pass
     try:
         queue = json.load(open(DATA_CAMPAIGN_QUEUE))
-        out["queue_lanes"] = (queue.get("metadata", {}) or {}).get("lanes", {}) or {}
+        qmeta = (queue.get("metadata", {}) or {})
+        qitems = queue.get("queue", []) or []
+        out["queue_lanes"] = qmeta.get("lanes", {}) or {}
+        out["queue_section"] = qmeta.get("section") or ""
+        out["queue_total"] = int(qmeta.get("chunk_count") or len(qitems))
+        queue_sections = {}
+        for item in qitems:
+            section = item.get("section") or "?"
+            queue_sections[section] = queue_sections.get(section, 0) + 1
+        out["queue_sections"] = queue_sections
         out["queue_top"] = [
             {
                 "id": item.get("id"),
+                "section": item.get("section"),
                 "lane": item.get("lane"),
                 "start": item.get("start"),
                 "end": item.get("end"),
@@ -185,7 +235,7 @@ def saved_fns():
     out = {}
     if os.path.isdir(WINS):
         for f in os.listdir(WINS):
-            if f.endswith(".json"):
+            if f.startswith("pl_") and f.endswith(".json"):
                 try:
                     d = json.load(open(os.path.join(WINS, f)))
                     out[f[:-5]] = [k for k in d if k not in META_KEYS]
@@ -219,6 +269,93 @@ def band_win_stats(wins=None):
             "duplicates": max(0, len(keys) - len(unique)),
             "already_100": already_100, "not_100": known_not_100,
             "not_in_report": missing}
+
+
+def gate_status():
+    now = time.time()
+    try:
+        ps = sh(["ps", "-axo", "command"], timeout=3).splitlines()
+        running = any("auto_gate.sh" in line and "ps -axo" not in line for line in ps)
+    except Exception:
+        running = False
+    mark_mtime = None
+    try:
+        mark_mtime = os.path.getmtime(GATE_MARK)
+    except OSError:
+        pass
+    pending = []
+    if os.path.isdir(WINS):
+        for name in os.listdir(WINS):
+            if not (name.startswith("pl_") and name.endswith(".json")):
+                continue
+            path = os.path.join(WINS, name)
+            try:
+                if mark_mtime is None or os.path.getmtime(path) > mark_mtime:
+                    pending.append(name[:-5])
+            except OSError:
+                pass
+    last_line = ""
+    try:
+        for line in deque(open(GATE_LOG, errors="replace"), maxlen=20):
+            line = clean_log_line(line)
+            if line:
+                last_line = line
+    except Exception:
+        pass
+    return {
+        "running": running,
+        "last_gate_age": fmt_age(None if mark_mtime is None else now - mark_mtime),
+        "pending_tags": sorted(pending),
+        "pending_count": len(pending),
+        "last_line": last_line or "no gate log yet",
+    }
+
+
+def nearwin_stats(limit=8):
+    rows = []
+    try:
+        for line in open(NEARWINS, errors="replace"):
+            if line.strip():
+                rows.append(json.loads(line))
+    except Exception:
+        pass
+    by_fn = {}
+    for row in rows:
+        fn = row.get("fn")
+        if not fn:
+            continue
+        cur = by_fn.get(fn)
+        if cur is None or int(row.get("score", 999999)) < int(cur.get("score", 999999)):
+            by_fn[fn] = row
+    recent = rows[-limit:]
+    best = sorted(by_fn.values(), key=lambda r: int(r.get("score", 999999)))[:limit]
+    return {"entries": len(rows), "unique": len(by_fn), "recent": recent, "best": best}
+
+
+def verified_win_stats(data_stats=None):
+    data_stats = data_stats if data_stats is not None else data_campaign_stats()
+    matched_seen = set()
+    try:
+        matched_seen = {line.strip() for line in open(MATCHED_FNS) if line.strip()}
+    except Exception:
+        pass
+    report = {}
+    try:
+        report = json.load(open(REPORT)).get("measures", {}) or {}
+    except Exception:
+        pass
+    return {
+        "code_matches_total": int(float(report.get("matched_functions") or 0)),
+        "code_functions_total": int(float(report.get("total_functions") or 0)),
+        "code_matches_logged": len(matched_seen),
+        "code_match_percent": float(report.get("matched_functions_percent") or 0.0),
+        "code_bytes_matched": int(float(report.get("matched_code") or 0)),
+        "code_bytes_total": int(float(report.get("total_code") or 0)),
+        "data_bytes_matched": int(data_stats.get("matched") or 0),
+        "data_bytes_total": int(data_stats.get("total") or 0),
+        "data_entries": int(data_stats.get("entries") or 0),
+        "data_match_percent": float(data_stats.get("pct") or 0.0),
+    }
 
 
 HISTORY = os.path.join(ROOT, "build", "bucket_history.jsonl")
@@ -281,17 +418,62 @@ def lane_state(role):
                     cur = open(os.path.join(p, "file")).read().strip()
             except Exception:
                 pass
-    log = os.path.join(ROOT, "build", f"lane_{role}.log")
+    data_cur = ""
+    if role in DATA_LANE_ROLES and os.path.isdir(DATA_LOCKS):
+        claims = []
+        for d in os.listdir(DATA_LOCKS):
+            p = os.path.join(DATA_LOCKS, d)
+            try:
+                if open(os.path.join(p, "owner")).read().strip() != role:
+                    continue
+                item = json.load(open(os.path.join(p, "item.json")))
+                claims.append((os.path.getmtime(p), d, item))
+            except Exception:
+                pass
+        if claims:
+            _, d, item = sorted(claims)[-1]
+            data_cur = (
+                f"data:{item.get('id') or d} {item.get('section') or '?'} "
+                f"{item.get('lane') or '?'} {item.get('start') or '?'}..{item.get('end') or '?'}"
+            )
+    if data_cur:
+        cur = data_cur
+    if role == "seed" and bool(sh(["pgrep", "-f", "data_seed_v3_loop\\.sh"])):
+        try:
+            seed_state = json.load(open(DATA_SEED_STATE))
+            phase = seed_state.get("phase") or "data"
+            chunk = seed_state.get("chunk") or ""
+            cur = f"data-seed:{phase} {chunk}".strip()
+        except Exception:
+            cur = "data-seed"
+    data_log = os.path.join(ROOT, "build", f"data_lane_{role}.log")
+    seed_data_log = os.path.join(ROOT, "build", "data_seed_v3.log")
+    if role in DATA_LANE_ROLES and os.path.exists(data_log):
+        log = data_log
+    elif role == "seed" and bool(sh(["pgrep", "-f", "data_seed_v3_loop\\.sh"])) and os.path.exists(seed_data_log):
+        log = seed_data_log
+    else:
+        log = os.path.join(ROOT, "build", f"lane_{role}.log")
     last = ""
+    stream = []
     if os.path.exists(log):
         try:
-            lines = [l.rstrip() for l in open(log, errors="replace") if l.strip()]
+            lines = deque(maxlen=LANE_STREAM_LINES)
+            for line in open(log, errors="replace"):
+                line = clean_log_line(line)
+                if line.strip():
+                    lines.append(line)
+            stream = list(lines)
             last = lines[-1][:120] if lines else ""
         except Exception:
             pass
-    pat = "lane_seed.py" if role == "seed" else rf"lane_worker\.sh {role}$"
-    alive = bool(sh(["pgrep", "-f", pat]))
-    return {"file": cur, "last": last, "alive": alive}
+    if role == "seed":
+        alive = bool(sh(["pgrep", "-f", "lane_seed\\.py|data_seed_v3_loop\\.sh"]))
+    elif role in DATA_LANE_ROLES:
+        alive = bool(sh(["pgrep", "-f", rf"data_lane_worker\.sh {role}$|lane_worker\.sh {role}$"]))
+    else:
+        alive = bool(sh(["pgrep", "-f", rf"lane_worker\.sh {role}$"]))
+    return {"file": cur, "last": last, "stream": stream, "alive": alive}
 
 
 def commits_this_run():
@@ -312,6 +494,9 @@ def render():
     kg = kg_levers()
     wins = saved_fns()
     win_stats = band_win_stats(wins)
+    gate = gate_status()
+    near_stats = nearwin_stats()
+    verified = verified_win_stats(data_stats)
     nwin_fns = sum(len(v) for v in wins.values())
     ncommit, clog = commits_this_run()
     branch = sh(["git", "branch", "--show-current"])
@@ -335,33 +520,40 @@ def render():
         dot = "#3fb950" if s["alive"] else "#6e7681"
         wf = wins.get(f"pl_{r}", [])
         winlist = "".join(f'<span class="wchip">{html.escape(w)}</span>' for w in wf) or '<span class="none">no wins yet</span>'
+        stream = html.escape("\n".join(s["stream"]) or "(no lane log yet)")
         lane_cards += f"""
-        <div class="lane">
+        <div class="lane" id="lane-{html.escape(r)}" data-lane="{html.escape(r)}">
           <div class="lane-h"><span class="dot" style="background:{dot}"></span>
-            <b>{r}</b> <span class="file">{html.escape(s['file'] or '(idle)')}</span>
+            <b class="role">{html.escape(r)}</b> <span class="file">{html.escape(s['file'] or '(idle)')}</span>
             <span class="wn">{len(wf)} wins</span></div>
           <div class="wins">{winlist}</div>
-          <div class="last">{html.escape(s['last'])}</div>
+          <pre class="stream">{stream}</pre>
         </div>"""
 
     # remote permuter statuses, written by permuter_poll*.sh
     perm_html = ""
     for label, perm in permuter_statuses():
+        def pv(key):
+            value = perm.get(key)
+            return "?" if value is None else value
         pdot = "#3fb950" if perm.get("alive") else "#6e7681"
         active_targets = ", ".join(perm.get("active_targets") or [])
         gpu = ""
         if perm.get("gpu_mem_total"):
-            gpu = (f' · gpu <b>{perm.get("gpu_util","?")}%</b> '
-                   f'{perm.get("gpu_mem_used","?")}/{perm.get("gpu_mem_total","?")} MiB')
+            gpu = (f' · gpu <b>{pv("gpu_util")}%</b> '
+                   f'{pv("gpu_mem_used")}/{pv("gpu_mem_total")} MiB')
         perm_html += (f'<div class="lane"><span class="dot" style="background:{pdot}"></span>'
-                      f'<b>permuter</b> ({html.escape(label)}) · cores <b>{perm.get("cores","?")}</b> · '
-                      f'target workers <b>{perm.get("workers","?")}</b> · '
-                      f'per-target -j <b>{perm.get("jobs","?")}</b> · '
-                      f'slots <b>{perm.get("effective_slots","?")}</b> · '
-                      f'budget <b>{perm.get("budget","?")}s</b> · '
-                      f'active <b>{perm.get("active","?")}</b> · '
-                      f'queued <b>{perm.get("queued","?")}/{perm.get("targets","?")}</b> · '
-                      f'done <b>{perm.get("done","?")}</b> · wins <b>{perm.get("wins","?")}</b>{gpu}'
+                      f'<b>permuter</b> ({html.escape(label)}) · cores <b>{pv("cores")}</b> · '
+                      f'cpu <b>{pv("cpu_saturation_percent")}%</b> '
+                      f'(<b>{pv("cpu_process_percent")}%</b> proc) · '
+                      f'target workers <b>{pv("workers")}</b> · '
+                      f'per-target -j <b>{pv("jobs")}</b> · '
+                      f'slots <b>{pv("effective_slots")}</b> · '
+                      f'budget <b>{pv("budget")}s</b> · '
+                      f'active <b>{pv("active")}</b> · '
+                      f'queued <b>{pv("queued")}/{pv("targets")}</b> · '
+                      f'done <b>{pv("done")}</b> · score-0 wins <b>{pv("wins")}</b> · '
+                      f'near≤{pv("nearwin_score")} <b>{pv("nearwins")}</b>{gpu}'
                       f'<div class="last">{html.escape(active_targets or str(perm.get("last","(no poll yet)")))[:180]}</div></div>')
 
     # KG levers panel
@@ -372,9 +564,13 @@ def render():
                          for (a, lv) in kg["recent"]) or '<span class="none">none yet</span>'
     queue_lanes = data_stats.get("queue_lanes") or {}
     queue_top = " ".join(
-        f'<span class="wchip">{html.escape(str(item.get("id")))} {html.escape(str(item.get("start")))} {html.escape(str(item.get("lane")))}</span>'
+        f'<span class="wchip">{html.escape(str(item.get("id")))} {html.escape(str(item.get("section")))} {html.escape(str(item.get("lane")))} {html.escape(str(item.get("start")))}</span>'
         for item in data_stats.get("queue_top", [])
     ) or '<span class="none">queue not generated</span>'
+    queue_sections = " ".join(
+        f'<span class="wchip">{html.escape(str(section))} {count}</span>'
+        for section, count in sorted((data_stats.get("queue_sections") or {}).items())
+    ) or '<span class="none">none</span>'
 
     hist_rows = ""
     for row in history:
@@ -400,14 +596,31 @@ def render():
     if not hist_rows:
         hist_rows = '<tr><td colspan=9 class="none">run tools/decomp_work/snapshot_metrics.py</td></tr>'
 
+    near_html = "".join(
+        f'<span class="wchip">{html.escape(str(r.get("fn")))} score {html.escape(str(r.get("score")))} {html.escape(str(r.get("machine","")))}</span>'
+        for r in near_stats["best"]
+    ) or '<span class="none">none banked yet</span>'
+
     # chart series (labels = HH:MM, one line per bucket attempted-count)
     labels = [time.strftime('%H:%M', time.localtime(p["t"])) for p in series]
     chart = {b: [p.get(b, 0) for p in series] for b in ("LOW", "STRUCT", "NEARWALL", "ASM")}
     chart_json = json.dumps({"labels": labels, "data": chart})
+    daily_labels = [str(row.get("date", "")) for row in history]
+    daily = {
+        "function_matches": [int((row.get("report") or {}).get("matched_functions", 0)) for row in history],
+        "code_bytes": [int((row.get("report") or {}).get("matched_code", 0)) for row in history],
+        "data_bytes": [int((row.get("data_campaign") or {}).get("verified_bytes", 0)) for row in history],
+        "sdata2_chunks": [int((row.get("data_campaign") or {}).get("sdata2_chunks_done", 0)) for row in history],
+        "asm_wrappers": [int((row.get("source_debt") or {}).get("asm_wrapper_functions", 0)) for row in history],
+        "stubs": [int((row.get("source_debt") or {}).get("stub_functions", 0)) for row in history],
+        "pointer_offsets": [int((row.get("source_debt") or {}).get("raw_pointer_offset_lines", 0)) for row in history],
+        "real_c": [int((row.get("source_debt") or {}).get("real_c_functions", 0)) for row in history],
+    }
+    daily_json = json.dumps({"labels": daily_labels, "data": daily})
 
     commit_html = "<br>".join(html.escape(c) for c in clog) or "<i>none yet</i>"
+    lanes_json = json.dumps(LANES)
     return f"""<!doctype html><html><head><meta charset=utf-8>
-<meta http-equiv=refresh content=5>
 <title>Colosseum decomp fleet</title>
 <style>
  body{{background:#0d1117;color:#c9d1d9;font:14px/1.5 ui-monospace,Menlo,monospace;margin:0;padding:18px}}
@@ -426,6 +639,7 @@ def render():
  .wchip{{display:inline-block;background:#1f6feb22;color:#58a6ff;border:1px solid #1f6feb55;border-radius:3px;padding:0 5px;margin:1px 2px;font-size:11px}}
  .none{{color:#6e7681;font-size:11px}}
  .last{{color:#8b949e;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+ .stream{{height:13.8em;margin:7px 0 0;padding:7px;background:#0d1117;border:1px solid #30363d;border-radius:4px;color:#8b949e;font:11px/1.35 ui-monospace,Menlo,monospace;white-space:pre-wrap;overflow:auto;overflow-wrap:anywhere}}
  .big{{font-size:26px;color:#3fb950}}
  .grid2{{display:grid;grid-template-columns:2fr 1fr;gap:16px;align-items:start}}
  .lv{{font-size:12px}} .lvn{{text-align:right;color:#3fb950;width:40px}}
@@ -434,18 +648,30 @@ def render():
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 </head><body>
 <h1>🏟️ Pokémon Colosseum — decomp fleet</h1>
-<div class=meta>branch <b>{branch}</b> · {time.strftime('%H:%M:%S')} · auto-refresh 5s</div>
+<div class=meta>branch <b>{branch}</b> · <span id=live-status>live poll starting</span></div>
 
-<div><span class=big>{ncommit}</span> commits this run &nbsp; · &nbsp;
-     <span class=big>{nwin_fns}</span> saved entries (band_wins)</div>
-<div class=meta>band_wins scratch bank · unique <b>{win_stats['unique']}</b> ·
+<div><span class=big>{verified['code_matches_total']:,}</span> verified code matches &nbsp; · &nbsp;
+     <span class=big>{verified['data_bytes_matched']:,}</span> verified data bytes &nbsp; · &nbsp;
+     <span class=big>{ncommit}</span> commits this run</div>
+<div class=meta>verified means byte-exact score-0 code or data bytes accepted by <code>verify_data_progress.py</code>.
+     Code: <b>{verified['code_matches_total']:,}/{verified['code_functions_total']:,}</b>
+     ({verified['code_match_percent']:.2f}%) · data: <b>{verified['data_bytes_matched']:,}/{verified['data_bytes_total']:,}</b>
+     ({verified['data_match_percent']:.4f}%) · data entries <b>{verified['data_entries']}</b> · logged gate matches <b>{verified['code_matches_logged']}</b></div>
+<div class=meta>pending scratch bank · band_wins entries <b>{nwin_fns}</b> unique <b>{win_stats['unique']}</b> ·
      duplicate entries <b>{win_stats['duplicates']}</b> · already 100% in report <b>{win_stats['already_100']}</b> ·
      still not 100% in report <b>{win_stats['not_100']}</b> · not in report <b>{win_stats['not_in_report']}</b></div>
+<div class=meta>gate health · <b>{'running' if gate['running'] else 'stopped'}</b> ·
+     last pass <b>{gate['last_gate_age']}</b> ago · pending tags <b>{gate['pending_count']}</b>
+     {' '.join(f'<span class="wchip">{html.escape(t)}</span>' for t in gate['pending_tags'][:8]) or '<span class="none">none</span>'} ·
+     last verdict <b>{html.escape(gate['last_line'])}</b></div>
+<div class=meta>near-win recovery bank · entries <b>{near_stats['entries']}</b> · unique fns <b>{near_stats['unique']}</b> · {near_html}</div>
 <div class=meta>source debt · asm wrappers <b>{debt.get('asm_wrapper_functions','?')}</b> ·
      stubs <b>{debt.get('stub_functions','?')}</b> · .inc lines <b>{debt.get('inc_include_lines','?')}</b> ·
      raw pointer-offset lines <b>{debt.get('raw_pointer_offset_lines','?')}</b></div>
 <div class=meta>data match · <b>{data_stats['matched']:,}/{data_stats['total']:,}</b> bytes
      ({data_stats['pct']:.4f}%) · verified entries <b>{data_stats['entries']}</b> ·
+     active queue <b>{html.escape(str(data_stats.get('queue_section') or 'unknown'))}</b>
+     <b>{int(data_stats.get('queue_total') or 0)}</b> chunks · sections {queue_sections} ·
      .sdata2 <b>{data_stats['sdata2_chunks_done']}</b>/<b>{data_stats['sdata2_chunks_total']}</b> chunks /
      remaining <b>{data_stats['sdata2_chunks']}</b> /
      <b>{data_stats['sdata2_bytes']:,}</b> bytes /
@@ -461,6 +687,8 @@ def render():
  <div>
   <h2>Bucket progress over time</h2>
   <canvas id=chart height=110></canvas>
+  <h2>Daily code/data/debt metrics</h2>
+  <canvas id=daily height=150></canvas>
  </div>
  <div>
   <h2>Top levers (knowledge graph)</h2>
@@ -488,7 +716,58 @@ def render():
 <div class=last style="white-space:normal">{commit_html}</div>
 <script>
 const S={chart_json};
+const D={daily_json};
 const C={{LOW:'#3fb950',STRUCT:'#1f6feb',NEARWALL:'#d29922',ASM:'#bc8cff'}};
+const LANE_ROLES={lanes_json};
+function esc(s){{
+ return String(s ?? '').replace(/[&<>"']/g, ch => ({{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}}[ch]));
+}}
+function nearBottom(el){{
+ return (el.scrollHeight - el.scrollTop - el.clientHeight) < 14;
+}}
+function setStream(pre, lines){{
+ const text = (lines && lines.length) ? lines.join('\\n') : '(no lane log yet)';
+ if (pre.textContent === text) return;
+ const stick = nearBottom(pre);
+ const top = pre.scrollTop;
+ pre.textContent = text;
+ pre.scrollTop = stick ? pre.scrollHeight : top;
+}}
+function setLane(role, lane, wins){{
+ const card = document.getElementById(`lane-${{role}}`);
+ if (!card || !lane) return;
+ const dot = card.querySelector('.dot');
+ const file = card.querySelector('.file');
+ const wn = card.querySelector('.wn');
+ const winsBox = card.querySelector('.wins');
+ const stream = card.querySelector('.stream');
+ const wf = wins[`pl_${{role}}`] || [];
+ if (dot) dot.style.background = lane.alive ? '#3fb950' : '#6e7681';
+ if (file) file.textContent = lane.file || '(idle)';
+ if (wn) wn.textContent = `${{wf.length}} wins`;
+ if (winsBox) winsBox.innerHTML = wf.length
+   ? wf.map(w => `<span class="wchip">${{esc(w)}}</span>`).join('')
+   : '<span class="none">no wins yet</span>';
+ if (stream) setStream(stream, lane.stream || []);
+}}
+async function pollState(){{
+ try{{
+   const r = await fetch('/api/state', {{cache:'no-store'}});
+   if (!r.ok) throw new Error(`HTTP ${{r.status}}`);
+   const data = await r.json();
+   for (const role of LANE_ROLES) setLane(role, data.lanes && data.lanes[role], data.wins || {{}});
+   const status = document.getElementById('live-status');
+   if (status) status.textContent = `live poll ${{new Date().toLocaleTimeString()}}`;
+ }}catch(e){{
+   const status = document.getElementById('live-status');
+   if (status) status.textContent = `poll error: ${{e.message || e}}`;
+ }}
+}}
+window.addEventListener('load', () => {{
+ for (const pre of document.querySelectorAll('.stream')) pre.scrollTop = pre.scrollHeight;
+ pollState();
+ setInterval(pollState, 5000);
+}});
 if(window.Chart && S.labels.length){{
  new Chart(document.getElementById('chart'),{{type:'line',
   data:{{labels:S.labels,datasets:Object.keys(S.data).map(k=>({{label:k,data:S.data[k],
@@ -496,6 +775,27 @@ if(window.Chart && S.labels.length){{
   options:{{responsive:true,plugins:{{legend:{{labels:{{color:'#c9d1d9',boxWidth:12}}}}}},
     scales:{{x:{{ticks:{{color:'#8b949e',maxTicksLimit:8}},grid:{{color:'#21262d'}}}},
             y:{{ticks:{{color:'#8b949e'}},grid:{{color:'#21262d'}}}}}}}}}});
+}}
+if(window.Chart && D.labels.length){{
+ new Chart(document.getElementById('daily'),{{type:'line',
+  data:{{labels:D.labels,datasets:[
+    {{label:'function matches',data:D.data.function_matches,borderColor:'#3fb950',yAxisID:'count',pointRadius:2}},
+    {{label:'code bytes',data:D.data.code_bytes,borderColor:'#58a6ff',yAxisID:'bytes',pointRadius:2}},
+    {{label:'data bytes',data:D.data.data_bytes,borderColor:'#d29922',yAxisID:'bytes',pointRadius:2}},
+    {{label:'.sdata2 chunks',data:D.data.sdata2_chunks,borderColor:'#bc8cff',yAxisID:'count',pointRadius:2}},
+    {{label:'real C fns',data:D.data.real_c,borderColor:'#56d364',yAxisID:'count',pointRadius:2}},
+    {{label:'asm wrappers',data:D.data.asm_wrappers,borderColor:'#f85149',yAxisID:'debt',pointRadius:2}},
+    {{label:'stubs',data:D.data.stubs,borderColor:'#ff7b72',yAxisID:'debt',pointRadius:2}},
+    {{label:'pointer offsets',data:D.data.pointer_offsets,borderColor:'#a371f7',yAxisID:'debt',pointRadius:2}}
+  ]}},
+  options:{{responsive:true,interaction:{{mode:'index',intersect:false}},
+    plugins:{{legend:{{labels:{{color:'#c9d1d9',boxWidth:12}}}}}},
+    scales:{{
+      x:{{ticks:{{color:'#8b949e'}},grid:{{color:'#21262d'}}}},
+      count:{{type:'linear',position:'left',ticks:{{color:'#8b949e'}},grid:{{color:'#21262d'}}}},
+      bytes:{{type:'linear',position:'right',ticks:{{color:'#58a6ff'}},grid:{{drawOnChartArea:false}}}},
+      debt:{{type:'linear',display:false}}
+    }}}}}});
 }}
 </script>
 </body></html>"""
@@ -515,6 +815,9 @@ class H(BaseHTTPRequestHandler):
                                "permuters": dict(permuter_statuses()),
                                "wins": saved_fns(),
                                "win_stats": band_win_stats(),
+                               "gate": gate_status(),
+                               "nearwins": nearwin_stats(),
+                               "verified_wins": verified_win_stats(),
                                "lanes": {r: lane_state(r) for r in LANES}}).encode()
             ctype = "application/json"
         else:
