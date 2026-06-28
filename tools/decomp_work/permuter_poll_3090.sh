@@ -96,6 +96,43 @@ EOF
 B64=$(printf '%s' "$REMOTE" | base64 | tr -d '\n')
 
 echo "[permuter_poll_3090] polling $USER_HOST every ${INTERVAL}s -> $OUT"
+printf '\033[?25l\033[2J'
+cleanup() { printf '\033[?25h'; }
+trap cleanup EXIT
+trap 'cleanup; exit 130' INT TERM
+draw_status() {
+  python3 - "$OUT" "$USER_HOST" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+name = sys.argv[2]
+try:
+    data = json.loads(path.read_text(encoding="utf-8"))
+except Exception as exc:
+    data = {"alive": False, "last": f"status read failed: {exc}"}
+
+alive = "up" if data.get("alive") else "--"
+targets = data.get("active_targets") or []
+gpu = ""
+if data.get("gpu_mem_total"):
+    gpu = f"  gpu {data.get('gpu_util','?')}%  vram {data.get('gpu_mem_used','?')}/{data.get('gpu_mem_total','?')} MiB"
+print(f"PERMUTER {name}  [{alive}]{gpu}")
+print("=" * 72)
+print(f"workers {data.get('workers','?')}  jobs {data.get('jobs','?')}  slots {data.get('effective_slots','?')}  budget {data.get('budget','?')}s")
+print(f"active {data.get('active','?')}  queued {data.get('queued','?')}/{data.get('targets','?')}  done {data.get('done','?')}  wins {data.get('wins','?')}")
+print(f"processes grind={data.get('grind_processes','?')} permuter={data.get('permuter_processes','?')} seedv3={data.get('serve_v3_processes','?')}  cores={data.get('cores','?')}")
+print("")
+print("active targets:")
+for fn in targets[:14]:
+    print(f"  {fn}")
+if not targets:
+    print("  (none)")
+print("")
+print(str(data.get("last", ""))[:240])
+PY
+}
 while :; do
   quoted_repo=$(printf '%q' "$REPO")
   js=$(ssh -o ConnectTimeout=20 -o ServerAliveInterval=5 -i "$KEY" "$USER_HOST" \
@@ -105,5 +142,8 @@ while :; do
   else
     printf '{"machine":"3090","alive":false,"workers":0,"targets":0,"last":"(unreachable)"}\n' > "$OUT"
   fi
+  printf '\033[H'
+  draw_status
+  printf '\033[J'
   sleep "$INTERVAL"
 done

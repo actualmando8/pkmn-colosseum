@@ -110,6 +110,40 @@ EOF
 B64=$(printf '%s' "$REMOTE" | base64 | tr -d '\n')
 
 echo "[permuter_poll] polling $WIN every ${INTERVAL}s -> $OUT"
+printf '\033[?25l\033[2J'
+cleanup() { printf '\033[?25h'; }
+trap cleanup EXIT
+trap 'cleanup; exit 130' INT TERM
+draw_status() {
+  python3 - "$OUT" "$WIN" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+name = sys.argv[2]
+try:
+    data = json.loads(path.read_text(encoding="utf-8"))
+except Exception as exc:
+    data = {"alive": False, "last": f"status read failed: {exc}"}
+
+alive = "up" if data.get("alive") else "--"
+targets = data.get("active_targets") or []
+print(f"PERMUTER {name}  [{alive}]")
+print("=" * 72)
+print(f"workers {data.get('workers','?')}  jobs {data.get('jobs','?')}  slots {data.get('effective_slots','?')}  budget {data.get('budget','?')}s")
+print(f"active {data.get('active','?')}  queued {data.get('queued','?')}/{data.get('targets','?')}  done {data.get('done','?')}  wins {data.get('wins','?')}")
+print(f"processes grind={data.get('grind_processes','?')} permuter={data.get('permuter_processes','?')}  cores={data.get('cores','?')}")
+print("")
+print("active targets:")
+for fn in targets[:12]:
+    print(f"  {fn}")
+if not targets:
+    print("  (none)")
+print("")
+print(str(data.get("last", ""))[:220])
+PY
+}
 while :; do
   js=$(ssh -o ConnectTimeout=20 -o ServerAliveInterval=5 -i "$KEY" "$WIN" \
         "C:\\Windows\\System32\\wsl.exe -e bash -c \"echo $B64 | base64 -d | bash\"" 2>/dev/null | tail -1)
@@ -118,5 +152,8 @@ while :; do
   else
     printf '{"alive":false,"workers":0,"targets":0,"last":"(unreachable)"}\n' > "$OUT"
   fi
+  printf '\033[H'
+  draw_status
+  printf '\033[J'
   sleep "$INTERVAL"
 done

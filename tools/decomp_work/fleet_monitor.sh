@@ -10,6 +10,10 @@ INTERVAL="${MONITOR_INTERVAL:-8}"
 DASH_PORT="${DASH_PORT:-8770}"
 SEED_HOST="${DECOMP_GPU_HOST:-192.168.50.101}"
 SEED_SERVER="${SEED_SERVER:-http://$SEED_HOST:8780/gen}"
+printf '\033[?25l\033[2J'
+cleanup() { printf '\033[?25h'; }
+trap cleanup EXIT
+trap 'cleanup; exit 130' INT TERM
 
 alive_code() {
   local p
@@ -102,7 +106,7 @@ while :; do
   commits=$(git rev-list --count "${START_HEAD}..HEAD" 2>/dev/null || echo 0)
   byte_exact=$(git log "${START_HEAD}..HEAD" --oneline 2>/dev/null | grep -oE '\+[0-9]+ byte-exact' | grep -oE '[0-9]+' | awk '{s+=$1} END{print s+0}')
 
-  clear
+  printf '\033[H'
   printf '╔══ DECOMP FLEET ════════════════════════  %s  ══╗\n' "$(date +%H:%M:%S)"
   printf '  branch %s · commits this monitor %s · byte-exact +%s · band_wins tags %s\n' \
     "$(git branch --show-current 2>/dev/null)" "$commits" "$byte_exact" "$wins"
@@ -129,5 +133,6 @@ while :; do
   git log -6 --oneline 2>/dev/null | sed 's/^/  /' || true
   printf '╚════════════════════════════════════════════════════════════╝\n'
   printf '  refresh %ss · web dashboard 0.0.0.0:%s · stop fleet: tools/decomp_work/fleet_down_mac.sh\n' "$INTERVAL" "$DASH_PORT"
+  printf '\033[J'
   sleep "$INTERVAL"
 done
