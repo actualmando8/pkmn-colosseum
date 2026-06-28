@@ -140,3 +140,10 @@ fn_80022B3C  # gs_title.c pl_opus: W1 reg-perm (arg0 r30/r31 pivot w/ table stru
 
 # OSReset.c — W-MMIO-base-fold wall (2026-06-26, pl_glm); same class as OSMemory.c fn_8009F488
 fn_8009FFC0  # OSReset __OSDoHotReset — real C 91.06% (CW 1.2.5n + -opt noprop); W-MMIO-base-fold: CW folds 0xCC002000+2 into single large disp (lis; sth 0x2002) but target splits (lis; addi 0x2000; sth 0x2). 15+ C forms + 8 CW versions + 6 opt-flag combos all fold identically. Not C-reachable. SKIP
+
+# SI.c — W-MMIO-base-fold wall (2026-06-28, pl_glm); same class as fn_8009F488 / fn_8009FFC0
+fn_800D04D0  # SI SIGetResponseRaw — real C 94.77% (CW 1.2.5n); W-MMIO-base-fold: CW folds 0xCC006400+chan*12 into subis r,0x3400 + large disp but target splits (lis 0xcc00; addi 0x6400; add). callback-param-home-frame lever (3-param decl) fixed frame 0x20→0x28. Residual: MMIO fold + Packet_803FFFB0 vs bss.0 reloc-name. Not C-reachable. SKIP
+fn_800D05A4  # SI SIGetResponse — real C 94.35% (CW 1.2.5n); same W-MMIO-base-fold (subis vs lis+addi+add for __SIRegs[chan*3+1/2]). Frame already 0x28 via stmw r27. Same reloc-name (Packet_803FFFB0 vs bss.0). Not C-reachable. SKIP
+
+# hsd_cobj.c — PPC exception/debug context capture (2026-06-28)
+fn_80196CE0  # hsd_cobj — real C active, 0.0%; target saves live GPR/SPR/GQR/CR/LR/CTR/XER/SRR state into lbl_80465080 via PPC-only instructions then calls OSFillFPUContext. Portable C can only set the expressible context-state bit and call OSFillFPUContext; not C-reachable without inline asm.
