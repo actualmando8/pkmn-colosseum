@@ -29,7 +29,9 @@ import lane_glm as L          # noqa: E402  target_asm / find_fn_span
 import compile_check as cc    # noqa: E402
 
 SERVER = os.environ.get("SEED_SERVER", "http://192.168.50.101:8780/gen")
-QUEUE = ROOT / "build" / os.environ.get("FLEET_QUEUE", "low_attack_queue.txt").split("/")[-1]
+_queue_env = os.environ.get("FLEET_QUEUE", "build/low_attack_queue.txt")
+_queue_path = Path(_queue_env)
+QUEUE = _queue_path if _queue_path.is_absolute() else ROOT / _queue_path
 LOCKD = ROOT / "build" / "fleet_locks"
 TAG = "pl_seed"
 BAND = ROOT / "tools" / "decomp_work" / "band.py"

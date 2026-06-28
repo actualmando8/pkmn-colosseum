@@ -49,12 +49,28 @@ echo $! > build/.fleet_gate.pid
 
 echo "[fleet] starting web dashboard as a background daemon (port ${DASH_PORT:-8770}, 0.0.0.0)"
 pkill -f fleet_dashboard.py 2>/dev/null || true
-nohup python3 tools/decomp_work/fleet_dashboard.py --host 0.0.0.0 --port "${DASH_PORT:-8770}" >build/dashboard.log 2>&1 < /dev/null &
-echo $! > build/.fleet_dashboard.pid
+case " $LANES " in
+  *" sonnet "*)
+    nohup python3 tools/decomp_work/fleet_dashboard.py --host 0.0.0.0 --port "${DASH_PORT:-8770}" >build/dashboard.log 2>&1 < /dev/null &
+    echo $! > build/.fleet_dashboard.pid
+    ;;
+  *)
+    "$CK" send sonnet "python3 tools/decomp_work/fleet_dashboard.py --host 0.0.0.0 --port \"${DASH_PORT:-8770}\" 2>&1 | tee -a build/dashboard.log"
+    rm -f build/.fleet_dashboard.pid
+    ;;
+esac
 echo "[fleet] starting Windows permuter poller for dashboard status"
 pkill -f permuter_poll.sh 2>/dev/null || true
-nohup bash tools/decomp_work/permuter_poll.sh >build/permuter_poll.log 2>&1 < /dev/null &
-echo $! > build/.permuter_poll.pid
+case " $LANES " in
+  *" opus "*)
+    nohup bash tools/decomp_work/permuter_poll.sh >build/permuter_poll.log 2>&1 < /dev/null &
+    echo $! > build/.permuter_poll.pid
+    ;;
+  *)
+    "$CK" send opus "bash tools/decomp_work/permuter_poll.sh 2>&1 | tee -a build/permuter_poll.log"
+    rm -f build/.permuter_poll.pid
+    ;;
+esac
 # 6th pane: terminal monitor (local quick-glance; the web dashboard is the main view)
 "$CK" send shell "bash tools/decomp_work/fleet_monitor.sh"
 
