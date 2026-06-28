@@ -20,6 +20,7 @@ OUT.parent.mkdir(parents=True, exist_ok=True)
 SYS = ("You are a GameCube PowerPC decompiler. Convert the target CodeWarrior 1.3 "
        "PPC assembly to byte-matching C89. Use extern labels for SDA globals, never "
        "float literals for sdata2 returns. Output only the C function with any needed externs.")
+META_KEYS = {"_src", "_srcs", "_pct"}
 
 # 1) collect unique win functions {fn: C}
 wins = {}
@@ -29,7 +30,7 @@ for f in glob.glob(str(ROOT / "build/band_wins/*.json")):
     except Exception:
         continue
     for k, v in d.items():
-        if k.startswith("_"):
+        if k in META_KEYS:
             continue
         if isinstance(v, str) and v.strip():
             wins.setdefault(k, v)

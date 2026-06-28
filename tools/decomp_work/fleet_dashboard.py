@@ -28,6 +28,7 @@ WINS = os.path.join(ROOT, "build", "band_wins")
 LANES = os.environ.get("FLEET_LANES", "opus glm codex codex2 sonnet seed").split()
 _FN = re.compile(r"fn_[0-9A-Fa-f]{8}")
 START_HEAD = None  # set at startup so "this run" win counts are stable
+META_KEYS = {"_src", "_srcs", "_pct"}
 
 
 def sh(cmd, timeout=8):
@@ -63,7 +64,7 @@ def saved_fns():
             if f.endswith(".json"):
                 try:
                     d = json.load(open(os.path.join(WINS, f)))
-                    out[f[:-5]] = [k for k in d if not k.startswith("_")]
+                    out[f[:-5]] = [k for k in d if k not in META_KEYS]
                 except Exception:
                     pass
     return out

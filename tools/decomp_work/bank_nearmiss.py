@@ -131,7 +131,7 @@ def main():
         srcs = d.get("_srcs", {})
         default = d.get("_src")
         for fn, body in d.items():
-            if fn.startswith("_"):
+            if fn in bi.META_KEYS:
                 continue
             src = srcs.get(fn, default)
             if src:

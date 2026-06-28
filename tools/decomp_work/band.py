@@ -89,6 +89,7 @@ WINS = ROOT / "build" / "band_wins"
 NEARMISS = ROOT / "build" / "band_nearmiss"   # real-C near-misses (banked, fed to permuter)
 BANK_FLOOR = 90.0                              # min pct to bank a near-miss
 SCRATCH = ROOT / "tools" / "decomp_work" / "scratch"
+META_KEYS = {"_src", "_srcs", "_pct"}
 
 # Tool resolution is platform-aware so the SAME harness runs on the Windows
 # workstation AND a Linux cloud/CI env. On Linux, `configure.py`+`ninja` download
@@ -408,7 +409,7 @@ def cmd_save(tag, fns):
     print(f"SAVED {len(saved)}: {' '.join(saved) if saved else '-'}")
     if rejected:
         print(f"REJECTED (not 100%): {'; '.join(rejected)}")
-    nfn = len([k for k in data if not k.startswith("_")])
+    nfn = len([k for k in data if k not in META_KEYS])
     print(f"wins file now holds {nfn} fn(s): {out.relative_to(ROOT)}")
 
 
@@ -456,7 +457,7 @@ def cmd_bank(tag, fns):
     print(f"BANKED {len(banked)}: {' '.join(banked) if banked else '-'}")
     if rejected:
         print(f"REJECTED: {'; '.join(rejected)}")
-    nfn = len([k for k in data if not k.startswith("_")])
+    nfn = len([k for k in data if k not in META_KEYS])
     print(f"near-miss bank now holds {nfn} fn(s): {out.relative_to(ROOT)}")
 
 
