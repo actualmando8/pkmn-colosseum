@@ -1286,45 +1286,35 @@ asm void fn_8000CF68(void) {
 #include "src/game/gs_party_access_fn_8000CF68.inc"
 }
 #else
-#pragma peephole off
-#pragma scheduling off
 u32 fn_8000CF68(u32 arg) {
+#pragma peephole off
     struct StatCopyBlk { u32 data[28]; };
     u32 local[28];
     u32 val;
+    u32 *p;
+    u32 idx;
+    int i;
+    int j;
     *(struct StatCopyBlk*)local = *(struct StatCopyBlk*)lbl_80266700;
-    {
-        u32 *p = local;
-        u32 idx = 0;
-        u32 ctr = 2;
-        do {
-            if ((s32)arg == (s32)p[0]) { goto idx_done; }
+    p = local;
+    idx = 0;
+    for (i = 0; i < 2; i++) {
+        for (j = 0; j < 6; j++) {
+            if ((s32)arg == (s32)p[j * 2]) { goto idx_done; }
             idx++;
-            if ((s32)arg == (s32)p[2]) { goto idx_done; }
-            idx++;
-            if ((s32)arg == (s32)p[4]) { goto idx_done; }
-            idx++;
-            if ((s32)arg == (s32)p[6]) { goto idx_done; }
-            idx++;
-            if ((s32)arg == (s32)p[8]) { goto idx_done; }
-            idx++;
-            if ((s32)arg == (s32)p[10]) { goto idx_done; }
-            idx++;
-            if ((s32)arg == (s32)p[12]) { goto idx_done; }
-            p += 14;
-            idx++;
-        } while (--ctr != 0);
-    idx_done:
-        if ((s32)idx >= 14) {
-            return 0;
         }
-        val = local[idx * 2 + 1];
+        if ((s32)arg == (s32)p[12]) { goto idx_done; }
+        p += 14;
+        idx++;
     }
+idx_done:
+    if ((s32)idx >= 14) {
+        return 0;
+    }
+    val = local[idx * 2 + 1];
     fn_8002DC6C(val);
     return 0;
 }
-#pragma scheduling reset
-#pragma peephole reset
 #endif
 
 /* fn_8000D05C - 0x8000D05C | size: 0xc0 */

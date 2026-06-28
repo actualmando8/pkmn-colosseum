@@ -74,7 +74,7 @@ void fn_80131200(u32 effectId, GSEffectStartFunc startFunc,
                  GSEffectUpdateFunc updateFunc,
                  GSEffectRenderFunc renderFunc);
 void fn_80131268(u32 effectId);
-void fn_8013139C(u32 effectId);
+void fn_8013139C(u32 effectId, u32 param);
 u16 fn_80131428(void* callbacks, u16 dataSize);
 
 
@@ -1081,28 +1081,35 @@ _got_inst:
  * fn_8013139C / GSEffectResetState
  * Address: 0x8013139C, Size: 0x8C
  * ======================================================================= */
-void fn_8013139C(u32 effectId) {
+void fn_8013139C(u32 effectId, u32 param) {
     GSEffectInstance* inst;
     GSEffectGlobals* g;
+    GSEffectStartFunc startFunc;
 
+    inst = NULL;
     if (effectId == 0) {
-        return;
+        goto _null;
     }
     g = (GSEffectGlobals*)(void*)lbl_803635C0;
-    if (effectId <= g->maxEffects) {
-        inst = (GSEffectInstance*)((u8*)g->instanceTable +
-                                   (effectId - 1) * sizeof(GSEffectInstance));
-        if (inst->state != GSEFFECT_STATE_UNINIT) {
-            goto _got_inst;
-        }
+    if (effectId > g->maxEffects) {
+        goto _null;
     }
+    inst = (GSEffectInstance*)((u8*)g->instanceTable +
+                               (effectId - 1) * sizeof(GSEffectInstance));
+    switch (inst->state) {
+    case GSEFFECT_STATE_UNINIT:
+        goto _null;
+    }
+    goto _got_inst;
+_null:
     inst = NULL;
+_got_inst:
     if (inst == NULL) {
         return;
     }
-_got_inst:
-    if (inst->startFunc != NULL) {
-        ((GSEffectStopFunc)inst->startFunc)(inst->userData);
+    startFunc = inst->startFunc;
+    if (startFunc != NULL) {
+        startFunc(inst->userData, param);
     }
     inst->state = GSEFFECT_STATE_STOPPING;
 }
