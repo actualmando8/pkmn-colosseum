@@ -11,12 +11,13 @@ cd "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../.." || exit 1
 
 QUEUE="${DATA_QUEUE:-tools/decomp_work/data_campaign_queue.json}"
 LOCKD="build/data_fleet_locks"
+DONED="build/data_fleet_done"
 PROMPTD="build/agent_training/data_prompts"
 MODE="${DATA_MODE:-research}"
 if [ "$ROLE" = "codex" ] || [ "$ROLE" = "codex2" ]; then
   MODE="${DATA_MODE:-edit}"
 fi
-mkdir -p "$LOCKD" "$PROMPTD" build/agent_training/data_research
+mkdir -p "$LOCKD" "$DONED" "$PROMPTD" build/agent_training/data_research
 
 run_agent() {
   local task="$1"
@@ -28,7 +29,7 @@ run_agent() {
 }
 
 claim_chunk() {
-  python3 - "$QUEUE" "$LOCKD" "${DATA_PREFER_IDS:-}" <<'PY'
+  python3 - "$QUEUE" "$LOCKD" "$DONED" "$ROLE" "${DATA_PREFER_IDS:-}" <<'PY'
 import json
 import os
 import sys
@@ -36,7 +37,9 @@ from pathlib import Path
 
 queue_path = Path(sys.argv[1])
 lock_dir = Path(sys.argv[2])
-prefer = [item for item in sys.argv[3].split(",") if item]
+done_dir = Path(sys.argv[3])
+role = sys.argv[4]
+prefer = [item for item in sys.argv[5].split(",") if item]
 queue = json.loads(queue_path.read_text(encoding="utf-8")).get("queue", [])
 
 def score(item):
@@ -51,11 +54,14 @@ for item in sorted(queue, key=score):
     chunk_id = item.get("id")
     if not chunk_id:
         continue
+    if (done_dir / f"{chunk_id}.{role}").exists():
+        continue
     lock = lock_dir / chunk_id
     try:
         os.mkdir(lock)
     except FileExistsError:
         continue
+    (lock / "owner").write_text(role + "\n", encoding="utf-8")
     (lock / "item.json").write_text(json.dumps(item, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(item, separators=(",", ":")))
     raise SystemExit(0)
@@ -148,7 +154,13 @@ while :; do
   task="$(make_task "$item")"
   printf '%s\n' "$task" > "$prompt"
   echo "[$ROLE:data] ===== claim $chunk_id $(date +%H:%M:%S) prompt=$prompt ====="
-  run_agent "$task" 2>&1 || echo "[$ROLE:data] agent exited non-zero"
+  if run_agent "$task" 2>&1; then
+    rc=0
+  else
+    rc=$?
+    echo "[$ROLE:data] agent exited non-zero rc=$rc"
+  fi
+  touch "$DONED/$chunk_id.$ROLE"
   echo "[$ROLE:data] ===== done $chunk_id $(date +%H:%M:%S) ====="
   rm -rf "$LOCKD/$chunk_id"
 done

@@ -1,24 +1,22 @@
 #!/usr/bin/env bash
-# permuter_poll.sh — poll the Windows WSL permuter swarm over Tailscale and write
-# build/permuter_status.json for the dashboard. The permuter (anneal_supervisor +
-# grind2.py) runs on the Windows box's CPU; this just reports its liveness/load.
+# permuter_poll_3090.sh — poll the Linux 3090 permuter swarm and GPU state.
 set -uo pipefail
 cd "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../.." || exit 1
-WIN="${PERMUTER_HOST:-win}"
-KEY="${PERMUTER_KEY:-$HOME/.ssh/id_ed25519}"
-OUT="build/permuter_status.json"
-INTERVAL="${PERMUTER_POLL_INTERVAL:-60}"
+HOST="${PERMUTER_3090_HOST:-${DECOMP_GPU_HOST:-192.168.50.101}}"
+USER_HOST="${PERMUTER_3090_USER_HOST:-douglaswhittingham@$HOST}"
+KEY="${PERMUTER_3090_KEY:-$HOME/.ssh/id_ed25519}"
+REPO="${PERMUTER_3090_REPO:-/storage/finetune/pkmn-colosseum}"
+OUT="build/permuter_status_3090.json"
+INTERVAL="${PERMUTER_3090_POLL_INTERVAL:-60}"
 
-# remote status script (base64'd to dodge ssh/wsl/bash quoting)
 read -r -d '' REMOTE <<'EOF'
-cd /mnt/c/Users/douglaswhittingham/pkmn-colosseum 2>/dev/null || exit 0
+cd "${REPO:-/storage/finetune/pkmn-colosseum}" 2>/dev/null || exit 0
 LOG=tools/decomp_work/permuter/logs/anneal_supervisor.out
+[ -f "$LOG" ] || LOG=tools/decomp_work/permuter/logs/anneal_3090_grind2.out
 last=$(tail -1 "$LOG" 2>/dev/null | tr -d '"\\' | tr -s ' ')
-# liveness via log freshness (robust vs pgrep name quirks + the 5s inter-cycle gap)
 now=$(date +%s); m=$(stat -c %Y "$LOG" 2>/dev/null || echo 0)
 python3 - "$last" "$now" "$m" <<'PY'
 import json
-import os
 import subprocess
 import sys
 
@@ -31,33 +29,24 @@ def pgrep_count(pattern):
     except Exception:
         return 0
 
-def pgrep_first(pattern):
-    try:
-        out = subprocess.check_output(["pgrep", "-fo", pattern], text=True).strip()
-        return int(out or "0")
-    except Exception:
-        return 0
-
-def read_environ(pid):
-    if not pid:
-        return {}
-    try:
-        raw = open(f"/proc/{pid}/environ", "rb").read().split(b"\0")
-    except Exception:
-        return {}
-    env = {}
-    for item in raw:
-        if b"=" in item:
-            k, v = item.split(b"=", 1)
-            env[k.decode(errors="replace")] = v.decode(errors="replace")
-    return env
-
 def load(path, default):
     try:
         with open(path, encoding="utf-8") as fh:
             return json.load(fh)
     except Exception:
         return default
+
+def gpu_status():
+    try:
+        out = subprocess.check_output([
+            "nvidia-smi",
+            "--query-gpu=utilization.gpu,memory.used,memory.total",
+            "--format=csv,noheader,nounits",
+        ], text=True, timeout=5).strip().splitlines()[0]
+        util, used, total = [int(part.strip()) for part in out.split(",")[:3]]
+        return {"gpu_util": util, "gpu_mem_used": used, "gpu_mem_total": total}
+    except Exception:
+        return {}
 
 state = load(".omc/permuter_state.json", {})
 queue_file = load(".omc/permuter_queue.json", [])
@@ -66,33 +55,28 @@ done = state.get("done") or []
 wins = state.get("wins") or []
 grind_processes = pgrep_count("grind2.py")
 permuter_processes = pgrep_count("permuter.py")
-grind_env = read_environ(pgrep_first("grind2.py"))
+serve_v3_processes = pgrep_count("serve_v3.py")
 alive = bool(grind_processes or permuter_processes)
 try:
     alive = alive or (int(now_s) - int(m_s) < 300)
 except Exception:
     pass
 active_targets = sorted({v.get("fn") for v in active.values() if v.get("fn")})
-workers = state.get("workers") or int(grind_env.get("GRIND_WORKERS") or grind_processes or 0)
-jobs = state.get("jobs") or int(grind_env.get("GRIND_JOBS") or 0)
-replicas = state.get("replicas") or int(grind_env.get("GRIND_REPLICAS") or 1)
-budget = state.get("budget") or grind_env.get("GRIND_BUDGET")
-try:
-    budget = int(budget) if budget is not None else None
-except Exception:
-    budget = None
+workers = state.get("workers") or grind_processes
+jobs = state.get("jobs")
+replicas = state.get("replicas")
 effective_slots = state.get("effective_slots")
 if effective_slots is None and workers and jobs and replicas:
     effective_slots = workers * jobs * replicas
 summary = {
-    "machine": "windows",
+    "machine": "3090",
     "alive": alive,
     "cores": state.get("cores"),
     "profile": state.get("profile"),
     "workers": workers,
     "jobs": jobs,
     "replicas": replicas,
-    "budget": budget,
+    "budget": state.get("budget"),
     "effective_slots": effective_slots,
     "active": len(active_targets),
     "active_targets": active_targets,
@@ -102,21 +86,24 @@ summary = {
     "wins": len(wins),
     "grind_processes": grind_processes,
     "permuter_processes": permuter_processes,
+    "serve_v3_processes": serve_v3_processes,
     "last": last,
 }
+summary.update(gpu_status())
 print(json.dumps(summary, separators=(",", ":")))
 PY
 EOF
 B64=$(printf '%s' "$REMOTE" | base64 | tr -d '\n')
 
-echo "[permuter_poll] polling $WIN every ${INTERVAL}s -> $OUT"
+echo "[permuter_poll_3090] polling $USER_HOST every ${INTERVAL}s -> $OUT"
 while :; do
-  js=$(ssh -o ConnectTimeout=20 -o ServerAliveInterval=5 -i "$KEY" "$WIN" \
-        "C:\\Windows\\System32\\wsl.exe -e bash -c \"echo $B64 | base64 -d | bash\"" 2>/dev/null | tail -1)
+  quoted_repo=$(printf '%q' "$REPO")
+  js=$(ssh -o ConnectTimeout=20 -o ServerAliveInterval=5 -i "$KEY" "$USER_HOST" \
+        "export REPO=$quoted_repo; echo $B64 | base64 -d | bash" 2>/dev/null | tail -1)
   if printf '%s' "$js" | python3 -c "import sys,json;json.load(sys.stdin)" 2>/dev/null; then
-    printf '%s' "$js" > "$OUT"
+    printf '%s\n' "$js" > "$OUT"
   else
-    printf '{"alive":false,"workers":0,"targets":0,"last":"(unreachable)"}\n' > "$OUT"
+    printf '{"machine":"3090","alive":false,"workers":0,"targets":0,"last":"(unreachable)"}\n' > "$OUT"
   fi
   sleep "$INTERVAL"
 done

@@ -71,6 +71,10 @@ case " $LANES " in
     rm -f build/.permuter_poll.pid
     ;;
 esac
+echo "[fleet] starting 3090 permuter poller for dashboard status"
+pkill -f permuter_poll_3090.sh 2>/dev/null || true
+nohup bash tools/decomp_work/permuter_poll_3090.sh >build/permuter_poll_3090.log 2>&1 < /dev/null &
+echo $! > build/.permuter_poll_3090.pid
 # 6th pane: terminal monitor (local quick-glance; the web dashboard is the main view)
 "$CK" send shell "bash tools/decomp_work/fleet_monitor.sh"
 

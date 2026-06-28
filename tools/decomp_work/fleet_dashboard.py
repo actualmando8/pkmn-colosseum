@@ -76,6 +76,20 @@ def permuter_status():
         return {}
 
 
+def permuter_statuses():
+    out = []
+    for label, name in (
+        ("Windows CPU", "permuter_status.json"),
+        ("3090 GPU/CPU", "permuter_status_3090.json"),
+    ):
+        try:
+            data = json.load(open(os.path.join(ROOT, "build", name)))
+        except Exception:
+            data = {}
+        out.append((label, data))
+    return out
+
+
 def data_campaign_stats():
     out = {
         "matched": 0,
@@ -330,20 +344,25 @@ def render():
           <div class="last">{html.escape(s['last'])}</div>
         </div>"""
 
-    # permuter (Windows WSL) status, written by permuter_poll.sh
-    perm = permuter_status()
-    pdot = "#3fb950" if perm.get("alive") else "#6e7681"
-    active_targets = ", ".join(perm.get("active_targets") or [])
-    perm_html = (f'<span class="dot" style="background:{pdot}"></span>'
-                 f'<b>permuter</b> (Windows CPU) · cores <b>{perm.get("cores","?")}</b> · '
-                 f'target workers <b>{perm.get("workers","?")}</b> · '
-                 f'per-target -j <b>{perm.get("jobs","?")}</b> · '
-                 f'slots <b>{perm.get("effective_slots","?")}</b> · '
-                 f'budget <b>{perm.get("budget","?")}s</b> · '
-                 f'active <b>{perm.get("active","?")}</b> · '
-                 f'queued <b>{perm.get("queued","?")}/{perm.get("targets","?")}</b> · '
-                 f'done <b>{perm.get("done","?")}</b> · wins <b>{perm.get("wins","?")}</b>'
-                 f'<div class="last">{html.escape(active_targets or str(perm.get("last","(no poll yet - start tools/decomp_work/permuter_poll.sh)")))[:180]}</div>')
+    # remote permuter statuses, written by permuter_poll*.sh
+    perm_html = ""
+    for label, perm in permuter_statuses():
+        pdot = "#3fb950" if perm.get("alive") else "#6e7681"
+        active_targets = ", ".join(perm.get("active_targets") or [])
+        gpu = ""
+        if perm.get("gpu_mem_total"):
+            gpu = (f' · gpu <b>{perm.get("gpu_util","?")}%</b> '
+                   f'{perm.get("gpu_mem_used","?")}/{perm.get("gpu_mem_total","?")} MiB')
+        perm_html += (f'<div class="lane"><span class="dot" style="background:{pdot}"></span>'
+                      f'<b>permuter</b> ({html.escape(label)}) · cores <b>{perm.get("cores","?")}</b> · '
+                      f'target workers <b>{perm.get("workers","?")}</b> · '
+                      f'per-target -j <b>{perm.get("jobs","?")}</b> · '
+                      f'slots <b>{perm.get("effective_slots","?")}</b> · '
+                      f'budget <b>{perm.get("budget","?")}s</b> · '
+                      f'active <b>{perm.get("active","?")}</b> · '
+                      f'queued <b>{perm.get("queued","?")}/{perm.get("targets","?")}</b> · '
+                      f'done <b>{perm.get("done","?")}</b> · wins <b>{perm.get("wins","?")}</b>{gpu}'
+                      f'<div class="last">{html.escape(active_targets or str(perm.get("last","(no poll yet)")))[:180]}</div></div>')
 
     # KG levers panel
     kg_rows = "".join(
@@ -463,7 +482,7 @@ def render():
 <div class=lanes>{lane_cards}</div>
 
 <h2>Permuter (remote)</h2>
-<div class=lane>{perm_html}</div>
+<div class=lanes>{perm_html}</div>
 
 <h2>Recent committed wins</h2>
 <div class=last style="white-space:normal">{commit_html}</div>
@@ -493,6 +512,7 @@ class H(BaseHTTPRequestHandler):
                                "data": data_campaign_stats(),
                                "history": metrics_history(),
                                "permuter": permuter_status(),
+                               "permuters": dict(permuter_statuses()),
                                "wins": saved_fns(),
                                "win_stats": band_win_stats(),
                                "lanes": {r: lane_state(r) for r in LANES}}).encode()
