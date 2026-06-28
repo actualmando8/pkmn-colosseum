@@ -12,4 +12,4 @@ Sections:
 	.sbss2      type:bss align:4
 
 crt/sdata2_math.c:
-	.sdata2     start:0x8047C4A0 end:0x8047C6A0
+	.sdata2     start:0x8047C4A0 end:0x8047C7A0

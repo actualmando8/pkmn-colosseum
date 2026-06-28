@@ -4,7 +4,7 @@
     "section": ".sdata2",
     "target_objects": [
       "build/GC6E01/obj/auto_09_8047B6A0_sdata2.o",
-      "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o"
+      "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o"
     ],
     "section_start": "0x8047B6A0",
     "section_end": "0x8047E700",
@@ -22,7 +22,7 @@
       "unknown": 92
     },
     "chunk_bytes": 256,
-    "chunk_count": 47
+    "chunk_count": 46
   },
   "chunks": [
     {
@@ -4521,213 +4521,6 @@
       ]
     },
     {
-      "id": "sdata2-016",
-      "section": ".sdata2",
-      "start": "0x8047C6A0",
-      "end": "0x8047C7A0",
-      "size": 256,
-      "symbol_bytes": 256,
-      "gap_bytes": 0,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
-      "kind_counts": {
-        "double": 32
-      },
-      "symbols": [
-        {
-          "name": "lbl_8047C6A0",
-          "addr": "0x8047C6A0",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C6A8",
-          "addr": "0x8047C6A8",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C6B0",
-          "addr": "0x8047C6B0",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C6B8",
-          "addr": "0x8047C6B8",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C6C0",
-          "addr": "0x8047C6C0",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C6C8",
-          "addr": "0x8047C6C8",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C6D0",
-          "addr": "0x8047C6D0",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C6D8",
-          "addr": "0x8047C6D8",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C6E0",
-          "addr": "0x8047C6E0",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C6E8",
-          "addr": "0x8047C6E8",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C6F0",
-          "addr": "0x8047C6F0",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C6F8",
-          "addr": "0x8047C6F8",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C700",
-          "addr": "0x8047C700",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C708",
-          "addr": "0x8047C708",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C710",
-          "addr": "0x8047C710",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C718",
-          "addr": "0x8047C718",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C720",
-          "addr": "0x8047C720",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C728",
-          "addr": "0x8047C728",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C730",
-          "addr": "0x8047C730",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C738",
-          "addr": "0x8047C738",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C740",
-          "addr": "0x8047C740",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C748",
-          "addr": "0x8047C748",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C750",
-          "addr": "0x8047C750",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C758",
-          "addr": "0x8047C758",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C760",
-          "addr": "0x8047C760",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C768",
-          "addr": "0x8047C768",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C770",
-          "addr": "0x8047C770",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C778",
-          "addr": "0x8047C778",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C780",
-          "addr": "0x8047C780",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C788",
-          "addr": "0x8047C788",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C790",
-          "addr": "0x8047C790",
-          "size": 8,
-          "kind": "double"
-        },
-        {
-          "name": "lbl_8047C798",
-          "addr": "0x8047C798",
-          "size": 8,
-          "kind": "double"
-        }
-      ]
-    },
-    {
       "id": "sdata2-017",
       "section": ".sdata2",
       "start": "0x8047C7A0",
@@ -4735,7 +4528,7 @@
       "size": 256,
       "symbol_bytes": 256,
       "gap_bytes": 0,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "double": 32
       },
@@ -4942,7 +4735,7 @@
       "size": 252,
       "symbol_bytes": 248,
       "gap_bytes": 4,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "double": 29,
         "float": 4
@@ -5156,7 +4949,7 @@
       "size": 253,
       "symbol_bytes": 220,
       "gap_bytes": 33,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "double": 8,
         "float": 28,
@@ -5425,7 +5218,7 @@
       "size": 252,
       "symbol_bytes": 233,
       "gap_bytes": 19,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "double": 9,
         "float": 29,
@@ -5706,7 +5499,7 @@
       "size": 251,
       "symbol_bytes": 214,
       "gap_bytes": 37,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "double": 3,
         "float": 17,
@@ -5951,7 +5744,7 @@
       "size": 256,
       "symbol_bytes": 243,
       "gap_bytes": 13,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "4byte": 2,
         "double": 11,
@@ -6257,7 +6050,7 @@
       "size": 256,
       "symbol_bytes": 240,
       "gap_bytes": 16,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "2byte": 2,
         "4byte": 3,
@@ -6575,7 +6368,7 @@
       "size": 256,
       "symbol_bytes": 240,
       "gap_bytes": 16,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "2byte": 4,
         "4byte": 8,
@@ -6911,7 +6704,7 @@
       "size": 256,
       "symbol_bytes": 252,
       "gap_bytes": 4,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "4byte": 2,
         "double": 8,
@@ -7229,7 +7022,7 @@
       "size": 252,
       "symbol_bytes": 238,
       "gap_bytes": 14,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "double": 8,
         "float": 40,
@@ -7540,7 +7333,7 @@
       "size": 256,
       "symbol_bytes": 236,
       "gap_bytes": 20,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "double": 11,
         "float": 37
@@ -7844,7 +7637,7 @@
       "size": 252,
       "symbol_bytes": 230,
       "gap_bytes": 22,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "double": 7,
         "float": 37,
@@ -8143,7 +7936,7 @@
       "size": 256,
       "symbol_bytes": 224,
       "gap_bytes": 32,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "double": 14,
         "float": 26
@@ -8399,7 +8192,7 @@
       "size": 250,
       "symbol_bytes": 234,
       "gap_bytes": 16,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "4byte": 2,
         "double": 8,
@@ -8693,7 +8486,7 @@
       "size": 256,
       "symbol_bytes": 226,
       "gap_bytes": 30,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "double": 11,
         "float": 26,
@@ -8962,7 +8755,7 @@
       "size": 252,
       "symbol_bytes": 228,
       "gap_bytes": 24,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "double": 15,
         "float": 23,
@@ -9219,7 +9012,7 @@
       "size": 256,
       "symbol_bytes": 244,
       "gap_bytes": 12,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "double": 14,
         "float": 31,
@@ -9512,7 +9305,7 @@
       "size": 256,
       "symbol_bytes": 227,
       "gap_bytes": 29,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "double": 10,
         "float": 19,
@@ -9770,7 +9563,7 @@
       "size": 256,
       "symbol_bytes": 239,
       "gap_bytes": 17,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "double": 13,
         "float": 15,
@@ -10034,7 +9827,7 @@
       "size": 251,
       "symbol_bytes": 204,
       "gap_bytes": 47,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "double": 4,
         "float": 10,
@@ -10279,7 +10072,7 @@
       "size": 256,
       "symbol_bytes": 221,
       "gap_bytes": 35,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "double": 8,
         "float": 16,
@@ -10549,7 +10342,7 @@
       "size": 256,
       "symbol_bytes": 222,
       "gap_bytes": 34,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "double": 8,
         "float": 12,
@@ -10789,7 +10582,7 @@
       "size": 256,
       "symbol_bytes": 234,
       "gap_bytes": 22,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "double": 10,
         "float": 24,
@@ -11064,7 +10857,7 @@
       "size": 256,
       "symbol_bytes": 214,
       "gap_bytes": 42,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "double": 2,
         "float": 24,
@@ -11352,7 +11145,7 @@
       "size": 256,
       "symbol_bytes": 244,
       "gap_bytes": 12,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "4byte": 3,
         "double": 5,
@@ -11699,7 +11492,7 @@
       "size": 256,
       "symbol_bytes": 242,
       "gap_bytes": 14,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "2byte": 1,
         "4byte": 3,
@@ -12012,7 +11805,7 @@
       "size": 256,
       "symbol_bytes": 244,
       "gap_bytes": 12,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "double": 10,
         "float": 40
@@ -12328,7 +12121,7 @@
       "size": 256,
       "symbol_bytes": 247,
       "gap_bytes": 9,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "2byte": 1,
         "byte": 1,
@@ -12695,7 +12488,7 @@
       "size": 256,
       "symbol_bytes": 230,
       "gap_bytes": 26,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "4byte": 4,
         "double": 6,
@@ -13001,7 +12794,7 @@
       "size": 200,
       "symbol_bytes": 192,
       "gap_bytes": 8,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "2byte": 2,
         "4byte": 3,
@@ -13231,7 +13024,7 @@
       "size": 256,
       "symbol_bytes": 248,
       "gap_bytes": 8,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "2byte": 1,
         "4byte": 3,
@@ -13383,7 +13176,7 @@
       "size": 168,
       "symbol_bytes": 162,
       "gap_bytes": 6,
-      "target_object": "build/GC6E01/obj/auto_09_8047C6A0_sdata2.o",
+      "target_object": "build/GC6E01/obj/auto_09_8047C7A0_sdata2.o",
       "kind_counts": {
         "2byte": 1,
         "double": 5,
