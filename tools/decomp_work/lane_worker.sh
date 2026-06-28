@@ -64,6 +64,11 @@ Do NOT edit any other file, do NOT touch *.inc, NEVER paste asm or flip #if (= f
 Write only real, idiomatic C89 (declarations first, named locals NOT rNN, no float
 literals, correct signed/unsigned, block scope for repeated r13 loads). Save every fn
 that hits 100% and record its lever so the next lane reuses it. Stop when done or walled.
+
+Before exit, print one single-line JSON record prefixed with TRAINING_SUMMARY:
+  role, file, attempted_fns, saved_fns, best_pct_by_fn, levers_tried, residual_classes,
+  useful_observations, and blockers. Keep it concise; include reasoning summaries,
+  not hidden chain-of-thought. This log is mined later to train the local 3090 model.
 EOF
 }
 
@@ -86,7 +91,14 @@ while :; do
     echo "[$ROLE] queue drained — idle 90s"; sleep 90; continue
   fi
   echo "[$ROLE] ===== grind $claimed ($(printf '%s' "$cfns" | wc -w | tr -d ' ') fns)  $(date +%H:%M:%S) ====="
+  train_dir="build/agent_training/prompts"
+  mkdir -p "$train_dir"
+  prompt_file="$train_dir/$(date -u +%Y%m%dT%H%M%SZ)_${ROLE}_$(basename "$claimed" .c).md"
+  task="$(make_task "$claimed" "$cfns")"
+  printf '%s\n' "$task" > "$prompt_file"
+  echo "[$ROLE] TRAINING_PROMPT $prompt_file"
   # stream the agent's work live into the pane (no tail buffering)
-  run_agent "$(make_task "$claimed" "$cfns")" 2>&1 || echo "[$ROLE] agent exited non-zero"
+  run_agent "$task" 2>&1 || echo "[$ROLE] agent exited non-zero"
+  echo "[$ROLE] TRAINING_LOG build/lane_$ROLE.log prompt=$prompt_file"
   echo "[$ROLE] ===== done $claimed  $(date +%H:%M:%S) ====="
 done

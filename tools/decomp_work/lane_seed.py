@@ -35,6 +35,12 @@ TAG = "pl_seed"
 BAND = ROOT / "tools" / "decomp_work" / "band.py"
 SCRATCH = ROOT / "tools" / "decomp_work" / "scratch" / f"band_{TAG}.c"
 N_CAND = int(os.environ.get("SEED_N", "4"))
+REPAIR_N = int(os.environ.get("SEED_REPAIR_N", "2"))
+MAX_NEW = int(os.environ.get("SEED_MAX_NEW", "1200"))
+TEMP = float(os.environ.get("SEED_TEMP", "0.6"))
+REPAIR_TEMP = float(os.environ.get("SEED_REPAIR_TEMP", "0.35"))
+TRAIN = ROOT / "build" / "seed_training" / "attempts.jsonl"
+KG = ROOT / "tools" / "decomp_work" / "kg" / "kg.py"
 
 
 def band(*args, timeout=180):
@@ -51,8 +57,62 @@ def measure():
         return {}
 
 
-def gen(asm, n=N_CAND, temp=0.6):
-    body = json.dumps({"asm": asm, "n": n, "temp": temp}).encode()
+def _clip(text, limit):
+    text = text or ""
+    if len(text) <= limit:
+        return text
+    return text[-limit:]
+
+
+def _run_text(args, timeout=60):
+    try:
+        r = subprocess.run(args, cwd=str(ROOT), capture_output=True, text=True, timeout=timeout)
+    except Exception as e:
+        return f"(tool error: {e})"
+    out = (r.stdout or "") + (("\n" + r.stderr) if r.stderr else "")
+    return out.strip()
+
+
+def kg_levers():
+    out = _run_text([sys.executable, str(KG), "q", "top-levers"], timeout=30)
+    lines = [ln for ln in out.splitlines() if ln.strip()]
+    return "\n".join(lines[:34])
+
+
+TOP_LEVERS = kg_levers()
+
+
+def residual_hint(fn):
+    return _clip(_run_text([sys.executable, "tools/decomp_work/classify_residual.py", TAG, fn],
+                           timeout=120), 2200)
+
+
+def file_context(scratch_txt, fn_start, fn, residual):
+    """Small, grounded context for serve_v3.py. Keep <=5k because the server caps it."""
+    top = scratch_txt[:3200]
+    before = scratch_txt[max(0, fn_start - 1600):fn_start]
+    parts = [
+        "PROJECT RULES: real C only; no inline asm; no .inc includes; C89 declarations first.",
+        "KG TOP LEVERS:\n" + TOP_LEVERS,
+        f"RESIDUAL CLASSIFIER FOR {fn}:\n{residual}",
+        "FILE PRELUDE / DECLARATIONS:\n" + top,
+        "LOCAL PRECEDING CONTEXT:\n" + before,
+    ]
+    return _clip("\n\n".join(parts), 5000)
+
+
+def gen(asm, fn, current, context, n=N_CAND, temp=TEMP, draft=None, diff=None):
+    body = json.dumps({
+        "asm": asm,
+        "fn": fn,
+        "current": current,
+        "context": context,
+        "draft": draft,
+        "diff": diff,
+        "n": n,
+        "temp": temp,
+        "max_new": MAX_NEW,
+    }).encode()
     req = urllib.request.Request(SERVER, data=body,
                                  headers={"Content-Type": "application/json"})
     with urllib.request.urlopen(req, timeout=400) as r:
@@ -71,6 +131,12 @@ def rename_def(c, fn):
 def _hash(s):
     import hashlib
     return hashlib.md5(s.encode()).hexdigest()
+
+
+def log_attempt(rec):
+    TRAIN.parent.mkdir(parents=True, exist_ok=True)
+    with TRAIN.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(rec, ensure_ascii=True) + "\n")
 
 
 def claim_file():
@@ -125,25 +191,53 @@ def main():
             if not asm:
                 print(f"[seed]   {fn}: no asm, skip", flush=True)
                 continue
-            try:
-                cands = gen(asm)
-            except Exception as e:
-                print(f"[seed]   {fn}: server error {e}", flush=True)
-                continue
             scratch_txt = SCRATCH.read_text(encoding="latin-1")
             span = L.find_fn_span(scratch_txt, fn)
             if not span:
                 continue
             s0, e0, _ = span
+            current_c = scratch_txt[s0:e0]
+            residual = residual_hint(fn)
+            context = file_context(scratch_txt, s0, fn, residual)
+            try:
+                cands = gen(asm, fn, current_c, context)
+            except Exception as e:
+                print(f"[seed]   {fn}: server error {e}", flush=True)
+                log_attempt({"ts": time.time(), "role": "seed", "src": f, "fn": fn,
+                             "before": cur, "error": str(e), "residual": residual})
+                continue
             best_pct, best_txt = cur, None
-            for c in cands:
+            scored = []
+            for i, c in enumerate(cands):
                 rc = rename_def(c, fn)
                 if not rc:
+                    scored.append({"idx": i, "pct": None, "error": "no function definition", "body": c})
                     continue
                 SCRATCH.write_text(scratch_txt[:s0] + rc + scratch_txt[e0:], encoding="latin-1")
                 pct = measure().get(fn, 0.0)
+                scored.append({"idx": i, "pct": pct, "body": rc})
                 if pct > best_pct:
                     best_pct, best_txt = pct, rc
+            if best_txt is not None and best_pct < 100.0 and REPAIR_N > 0:
+                SCRATCH.write_text(scratch_txt[:s0] + best_txt + scratch_txt[e0:], encoding="latin-1")
+                diff = _clip(band("diff", TAG, fn, timeout=180).stdout, 4200)
+                try:
+                    repairs = gen(asm, fn, current_c, context, n=REPAIR_N,
+                                  temp=REPAIR_TEMP, draft=best_txt, diff=diff)
+                except Exception as e:
+                    repairs = []
+                    scored.append({"idx": "repair-error", "pct": None, "error": str(e)})
+                for i, c in enumerate(repairs):
+                    rc = rename_def(c, fn)
+                    if not rc:
+                        scored.append({"idx": f"repair-{i}", "pct": None,
+                                       "error": "no function definition", "body": c})
+                        continue
+                    SCRATCH.write_text(scratch_txt[:s0] + rc + scratch_txt[e0:], encoding="latin-1")
+                    pct = measure().get(fn, 0.0)
+                    scored.append({"idx": f"repair-{i}", "pct": pct, "body": rc})
+                    if pct > best_pct:
+                        best_pct, best_txt = pct, rc
             # commit the best draft into the scratch (or restore baseline)
             if best_txt is not None:
                 SCRATCH.write_text(scratch_txt[:s0] + best_txt + scratch_txt[e0:], encoding="latin-1")
@@ -155,6 +249,26 @@ def main():
             else:
                 SCRATCH.write_text(scratch_txt, encoding="latin-1")
                 print(f"[seed]   {fn}: {cur:.1f}% (no improvement from {len(cands)} drafts)", flush=True)
+            log_attempt({
+                "ts": time.time(),
+                "role": "seed",
+                "server": SERVER,
+                "src": f,
+                "fn": fn,
+                "before": cur,
+                "after": best_pct,
+                "n": N_CAND,
+                "repair_n": REPAIR_N,
+                "temp": TEMP,
+                "repair_temp": REPAIR_TEMP,
+                "max_new": MAX_NEW,
+                "residual": residual,
+                "kg_top_levers": TOP_LEVERS,
+                "current": current_c,
+                "asm": asm,
+                "candidates": scored,
+                "selected": best_txt,
+            })
         print(f"[seed] ===== done {f} {time.strftime('%H:%M:%S')} =====", flush=True)
 
 
