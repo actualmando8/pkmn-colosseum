@@ -51,7 +51,10 @@ Do NOT edit any other file, do NOT touch *.inc, NEVER paste asm or flip #if (= f
   python3 tools/decomp_work/band.py check $TAG <fn>             # current match%
   python3 tools/decomp_work/classify_residual.py $TAG <fn>      # REG-COLORING/SCHED/RELOC/SHAPE
   #   ^ a REG-COLORING verdict is NEVER a wall — keep grinding (named locals + decl order).
-  python3 tools/decomp_work/kg/kg.py q lever-targets <fn>       # which KNOWN lever fits this fn
+  python3 tools/decomp_work/kg/kg.py q top-levers               # which known levers are productive
+  python3 tools/decomp_work/kg/kg.py q siblings <fn>            # same-TU propagation context
+  #   ^ `lever-targets` takes a LEVER SLUG, not a function name. Use it only after
+  #     choosing a plausible lever from classifier output/top-levers.
   python3 tools/decomp_work/band.py diff  $TAG <fn>             # exact instr miss
   #   ...apply that lever (from the cheat-sheet / CRACK_LEVERS.md) by editing
   #      tools/decomp_work/scratch/band_$TAG.c; re-check until 100% byte-exact...
