@@ -16,6 +16,22 @@
 
 /* NOTE: fn_801B06D4 is already in hsd_pobj.c as a simple getter */
 
+typedef struct HSDShadowOwner {
+    u8 unk_00[0x8];
+    struct HSDShadowObject* object; /* 0x08 */
+} HSDShadowOwner;
+
+typedef struct HSDShadowObject {
+    u8 unk_00[0x58];
+    struct HSDShadowData* shadow; /* 0x58 */
+} HSDShadowObject;
+
+typedef struct HSDShadowData {
+    u8 unk_00[0x4];
+    u16 width;  /* 0x04 */
+    u16 height; /* 0x06 */
+} HSDShadowData;
+
 /* ========================================================================= */
 /*  Shadow setup functions                                                   */
 /* ========================================================================= */
@@ -124,14 +140,14 @@ void fn_801B16C0(void* arg0) {
     extern char lbl_8047DDCC;
     extern void fn_800B962C(u32, u32, u32, u32);
     extern void fn_800B96F8(u32, u32, u32, u32);
-    void* obj;
-    u8* shadow;
+    HSDShadowObject* obj;
+    HSDShadowData* shadow;
 
     if (arg0 == NULL) {
         __assert(lbl_802752C0, 0x10C, &lbl_8047DDCC);
     }
-    obj = *(void**)((u8*)arg0 + 8);
-    shadow = *(u8**)((u8*)obj + 0x58);
-    fn_800B962C(0, 0, *(u16*)(shadow + 4), *(u16*)(shadow + 6));
-    fn_800B96F8(*(u16*)(shadow + 4), *(u16*)(shadow + 6), 0x20, 0);
+    obj = ((HSDShadowOwner*)arg0)->object;
+    shadow = obj->shadow;
+    fn_800B962C(0, 0, shadow->width, shadow->height);
+    fn_800B96F8(shadow->width, shadow->height, 0x20, 0);
 }

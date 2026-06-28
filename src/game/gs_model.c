@@ -76,6 +76,15 @@ extern u8 lbl_80402518[];  /* model resource table -- 0x2400 bytes */
 /* Global model system state block */
 extern u8 lbl_80404ACC[];
 
+typedef struct GSModelStateHeader {
+    u16 count;          /* 0x00 */
+    u16 entryHandle;    /* 0x02 */
+    u32 unk_04;         /* 0x04 */
+    void* entries;      /* 0x08 */
+} GSModelStateHeader;
+
+#define GS_MODEL_STATE ((GSModelStateHeader*)lbl_80404ACC)
+
 /* Resource index table */
 extern u32 lbl_80478B20;   /* max resource index (sda21) */
 extern u8  lbl_80315690[]; /* resource table, 8-byte entries */
@@ -1244,13 +1253,13 @@ void fn_80105410(u16 count) {
     memset(lbl_80404ACC, 0, 0x9c);
     size = (u16)count * 0xb4;
     handle = fn_800E3534(size);
-    *(u16*)(lbl_80404ACC + 0x2) = handle;
+    GS_MODEL_STATE->entryHandle = handle;
     if ((u16)handle == 0) {
         fn_800DD970((const char*)lbl_80271EC4);
     } else {
         ptr = fn_800E27B0((u16)handle);
-        *(void**)(lbl_80404ACC + 0x8) = ptr;
-        *(u16*)(lbl_80404ACC + 0x0) = count;
+        GS_MODEL_STATE->entries = ptr;
+        GS_MODEL_STATE->count = count;
         memset(ptr, 0, size);
         fn_80109358();
     }

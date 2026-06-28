@@ -7555,9 +7555,14 @@ void fn_8011791C(void) {
     return;
 }
 #endif
+typedef struct GSFieldWorldResourceState {
+    u8 unk_00[0x10];
+    u32 field_10; /* 0x10 */
+} GSFieldWorldResourceState;
+
 /* 0x80117AD4 | 16 bytes | global_getter */
 u32 fn_80117AD4(void) {
-    return *(u32*)(lbl_804083D0 + 0x10);
+    return ((GSFieldWorldResourceState*)lbl_804083D0)->field_10;
 }
 /* 0x80117AE4 | 0x1A0 */
 extern void fn_800E5550(void);
