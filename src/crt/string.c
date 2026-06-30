@@ -85,12 +85,13 @@ int strncmp(const char* str1, const char* str2, size_t n) {
 int fn_800CA7FC(const char* str1, const char* str2) {
     register u8* left = (u8*)str1;
     register u8* right = (u8*)str2;
-    u32 align, l1, r1, x;
+    u32 align, r1, l1, x;
 
     l1 = *left;
     r1 = *right;
-    if (l1 - r1) {
-        return l1 - r1;
+    x = l1 - r1;
+    if (x) {
+        return x;
     }
 
     if ((align = ((int)left & 3)) != ((int)right & 3)) {
@@ -104,8 +105,9 @@ int fn_800CA7FC(const char* str1, const char* str2) {
         for (align = 3 - align; align; align--) {
             l1 = *(++left);
             r1 = *(++right);
-            if (l1 - r1) {
-                return l1 - r1;
+            x = l1 - r1;
+            if (x) {
+                return x;
             }
             if (l1 == 0) {
                 return 0;
@@ -131,16 +133,18 @@ int fn_800CA7FC(const char* str1, const char* str2) {
         }
     }
 
+    x = -1;
     if (l1 > r1) {
-        return 1;
+        x = 1;
     }
-    return -1;
+    return x;
 
 adjust:
     l1 = *left;
     r1 = *right;
-    if (l1 - r1) {
-        return l1 - r1;
+    x = l1 - r1;
+    if (x) {
+        return x;
     }
 
 bytecopy:
@@ -149,15 +153,18 @@ bytecopy:
     }
 
     do {
-        l1 = *(++left);
+        {
+            u32 tmp = *(++left);
+            l1 = tmp;
+        }
         r1 = *(++right);
-        if (l1 - r1) {
-            return l1 - r1;
+        x = l1 - r1;
+        if (x) {
+            return x;
         }
-        if (l1 == 0) {
-            return 0;
-        }
-    } while (1);
+    } while (l1 != 0);
+
+    return 0;
 }
 
 
