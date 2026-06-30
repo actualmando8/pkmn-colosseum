@@ -313,6 +313,71 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
+                "dolphin/vi/VI_fn_800AA280.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/vi/VI_fn_800AA498.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/gx/GX_fn_800B71F0.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/gx/GX_fn_800B770C.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/gx/GX_fn_800B7714.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/gx/GX_fn_800B856C.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/gx/GX_fn_800BA198.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/gx/GX_fn_800BA414.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/gx/GX_fn_800BA424.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/gx/GX_fn_800BA440.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/gx/GX_fn_800BAE5C.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/gx/GX_fn_800BB2E4.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/gx/GX_fn_800BB2F8.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
                 "dolphin/os/PPCArch.c",
                 progress_category="sdk",
             ),
@@ -363,7 +428,27 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
+                "dolphin/si/SI_fn_800CF708.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/si/SI_fn_800CF728.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
                 "dolphin/si/SITypeDecode.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/si/SI_fn_800D0F44.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/si/SI_fn_800D104C.c",
                 progress_category="sdk",
             ),
             Object(

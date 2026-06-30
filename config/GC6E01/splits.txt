@@ -212,6 +212,45 @@ dolphin/dvd/DVDFsExtras.c:
 dolphin/dvd/DVDError.c:
 	.text       start:0x800A80FC end:0x800A8178
 
+dolphin/vi/VI_fn_800AA280.c:
+	.text       start:0x800AA280 end:0x800AA288
+
+dolphin/vi/VI_fn_800AA498.c:
+	.text       start:0x800AA498 end:0x800AA4D4
+
+dolphin/gx/GX_fn_800B71F0.c:
+	.text       start:0x800B71F0 end:0x800B71FC
+
+dolphin/gx/GX_fn_800B770C.c:
+	.text       start:0x800B770C end:0x800B7714
+
+dolphin/gx/GX_fn_800B7714.c:
+	.text       start:0x800B7714 end:0x800B771C
+
+dolphin/gx/GX_fn_800B856C.c:
+	.text       start:0x800B856C end:0x800B857C
+
+dolphin/gx/GX_fn_800BA198.c:
+	.text       start:0x800BA198 end:0x800BA1B4
+
+dolphin/gx/GX_fn_800BA414.c:
+	.text       start:0x800BA414 end:0x800BA424
+
+dolphin/gx/GX_fn_800BA424.c:
+	.text       start:0x800BA424 end:0x800BA440
+
+dolphin/gx/GX_fn_800BA440.c:
+	.text       start:0x800BA440 end:0x800BA44C
+
+dolphin/gx/GX_fn_800BAE5C.c:
+	.text       start:0x800BAE5C end:0x800BAE64
+
+dolphin/gx/GX_fn_800BB2E4.c:
+	.text       start:0x800BB2E4 end:0x800BB2F8
+
+dolphin/gx/GX_fn_800BB2F8.c:
+	.text       start:0x800BB2F8 end:0x800BB30C
+
 trk/TRKConstructEvent.c:
 	.text       start:0x800BE464 end:0x800BE47C
 
@@ -275,8 +314,20 @@ crt/string.c:
 dolphin/exi/EXI2Stubs.c:
 	.text       start:0x800CE79C end:0x800CE7DC
 
+dolphin/si/SI_fn_800CF708.c:
+	.text       start:0x800CF708 end:0x800CF728
+
+dolphin/si/SI_fn_800CF728.c:
+	.text       start:0x800CF728 end:0x800CF764
+
 dolphin/si/SITypeDecode.c:
 	.text       start:0x800D0DF8 end:0x800D0F44
+
+dolphin/si/SI_fn_800D0F44.c:
+	.text       start:0x800D0F44 end:0x800D0F68
+
+dolphin/si/SI_fn_800D104C.c:
+	.text       start:0x800D104C end:0x800D1070
 
 game/sound/sound.c:
 	.text       start:0x801653BC end:0x801653CC
