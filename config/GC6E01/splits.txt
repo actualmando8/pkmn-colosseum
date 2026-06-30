@@ -164,20 +164,158 @@ __init_cpp_exceptions.cpp:
 game/menu/menu_bag.c:
 	.text       start:0x8004EADC end:0x80051710
 
+dolphin/os/PPCArch.c:
+	.text       start:0x800980E0 end:0x80098108
+
+dolphin/os/OSArena.c:
+	.text       start:0x8009AFB0 end:0x8009AFD0
+
+dolphin/os/OSEXI_fn_8009E7A8.c:
+	.text       start:0x8009E7A8 end:0x8009E7AC
+
+dolphin/os/OSEXI_fn_8009E7AC.c:
+	.text       start:0x8009E7AC end:0x8009E7B0
+
+dolphin/os/OSReboot_fn_800A064C.c:
+	.text       start:0x800A064C end:0x800A06AC
+
+dolphin/os/OSReboot_WriteSram.c:
+	.text       start:0x800A06AC end:0x800A07C4
+
 dolphin/os/OSTime.c:
 	.text       start:0x800A27FC end:0x800A2B9C
+
+dolphin/db/DBInit.c:
+	.text       start:0x800A2C30 end:0x800A2C58
+
+dolphin/db/DBGetFirstCallback.c:
+	.text       start:0x800A2C58 end:0x800A2C74
+
+dolphin/db/DBIsExceptionMarked.c:
+	.text       start:0x800A2CCC end:0x800A2CE8
+
+dolphin/dvd/DVDLowInitWA.c:
+	.text       start:0x800A3EB0 end:0x800A3EF0
+
+dolphin/dvd/DVDLowSetWAType.c:
+	.text       start:0x800A4CAC end:0x800A4CF0
+
+dolphin/dvd/DVDFs.c:
+	.text       start:0x800A4CF0 end:0x800A4D28
+
+dolphin/dvd/DVDQueue.c:
+	.text       start:0x800A7F28 end:0x800A7F80
 
 dolphin/dvd/DVDFsExtras.c:
 	.text       start:0x800A7F80 end:0x800A7FE0
 
+dolphin/dvd/DVDError.c:
+	.text       start:0x800A80FC end:0x800A8178
+
+dolphin/vi/VI_fn_800AA280.c:
+	.text       start:0x800AA280 end:0x800AA288
+
+dolphin/vi/VI_fn_800AA498.c:
+	.text       start:0x800AA498 end:0x800AA4D4
+
+dolphin/gx/GX_fn_800B71F0.c:
+	.text       start:0x800B71F0 end:0x800B71FC
+
+dolphin/gx/GX_fn_800B770C.c:
+	.text       start:0x800B770C end:0x800B7714
+
+dolphin/gx/GX_fn_800B7714.c:
+	.text       start:0x800B7714 end:0x800B771C
+
+dolphin/gx/GX_fn_800B856C.c:
+	.text       start:0x800B856C end:0x800B857C
+
+dolphin/gx/GX_fn_800BA198.c:
+	.text       start:0x800BA198 end:0x800BA1B4
+
+dolphin/gx/GX_fn_800BA414.c:
+	.text       start:0x800BA414 end:0x800BA424
+
+dolphin/gx/GX_fn_800BA424.c:
+	.text       start:0x800BA424 end:0x800BA440
+
+dolphin/gx/GX_fn_800BA440.c:
+	.text       start:0x800BA440 end:0x800BA44C
+
+dolphin/gx/GX_fn_800BAE5C.c:
+	.text       start:0x800BAE5C end:0x800BAE64
+
+dolphin/gx/GX_fn_800BB2E4.c:
+	.text       start:0x800BB2E4 end:0x800BB2F8
+
+dolphin/gx/GX_fn_800BB2F8.c:
+	.text       start:0x800BB2F8 end:0x800BB30C
+
+trk/TRKConstructEvent.c:
+	.text       start:0x800BE464 end:0x800BE47C
+
+trk/TRKBufferReset.c:
+	.text       start:0x800BEE44 end:0x800BEE74
+
+trk/TRKGetBuffer.c:
+	.text       start:0x800BEF18 end:0x800BEF44
+
+trk/TRKTerminateSerialHandler.c:
+	.text       start:0x800BF080 end:0x800BF088
+
 trk/TRKSerial.c:
-	.text       start:0x800BF14C end:0x800BF3C4
+	.text       start:0x800BF14C end:0x800BF338
+
+trk/usr_put_initialize.c:
+	.text       start:0x800BF338 end:0x800BF33C
+
+trk/TRKDispatchInit.c:
+	.text       start:0x800BF534 end:0x800BF53C
+
+trk/TRKDispatchConnected.c:
+	.text       start:0x800C04E8 end:0x800C0504
+
+trk/TRKDispatchMutex.c:
+	.text       start:0x800C0CC0 end:0x800C0CD8
+
+trk/TRKTargetState.c:
+	.text       start:0x800C1300 end:0x800C1310
+
+trk/TRKTargetStopped.c:
+	.text       start:0x800C1328 end:0x800C1348
 
 trk/TRKBoard.c:
 	.text       start:0x800C3588 end:0x800C3630
 
+trk/TRKCommState.c:
+	.text       start:0x800C39A0 end:0x800C39BC
+
 trk/TRKComm.c:
-	.text       start:0x800C39A0 end:0x800C3BB8
+	.text       start:0x800C39BC end:0x800C3BB8
+
+trk/udp_cc.c:
+	.text       start:0x800C3BB8 end:0x800C3C00
+
+trk/ddh_cc_close.c:
+	.text       start:0x800C3E88 end:0x800C3E90
+
+trk/ddh_cc_shutdown.c:
+	.text       start:0x800C3EB4 end:0x800C3EBC
+
+trk/circle_buffer_count.c:
+	.text       start:0x800C41A4 end:0x800C41AC
+
+trk/gdev_cc_close.c:
+	.text       start:0x800C443C end:0x800C4444
+
+trk/gdev_cc_shutdown.c:
+	.text       start:0x800C4468 end:0x800C4470
+
+crt/mwtrace_helpers.c:
+	.text       start:0x800C459C end:0x800C45A0
+
+crt/critical_regions.c:
+	.text       start:0x800C754C end:0x800C7558
 
 crt/wchar.c:
 	.text       start:0x800C80D0 end:0x800C811C
@@ -185,11 +323,68 @@ crt/wchar.c:
 crt/mem.c:
 	.text       start:0x800C8174 end:0x800C8510
 
+crt/stdio_atexit.c:
+	.text       start:0x800C8510 end:0x800C8520
+
 crt/string.c:
 	.text       start:0x800CA7FC end:0x800CAA58
+
+dolphin/exi/EXI2Stubs.c:
+	.text       start:0x800CE79C end:0x800CE7DC
+
+dolphin/si/SI_fn_800CF708.c:
+	.text       start:0x800CF708 end:0x800CF728
+
+dolphin/si/SI_fn_800CF728.c:
+	.text       start:0x800CF728 end:0x800CF764
+
+dolphin/si/SITypeDecode.c:
+	.text       start:0x800D0DF8 end:0x800D0F44
+
+dolphin/si/SI_fn_800D0F44.c:
+	.text       start:0x800D0F44 end:0x800D0F68
+
+dolphin/si/SI_fn_800D104C.c:
+	.text       start:0x800D104C end:0x800D1070
 
 game/sound/sound.c:
 	.text       start:0x801653BC end:0x801653CC
 
+hsd/hsd_mobj_clear_flags.c:
+	.text       start:0x801A8428 end:0x801A8440
+
+hsd/hsd_mobj_set_flags.c:
+	.text       start:0x801A8440 end:0x801A8458
+
+hsd/hsd_mobj_get_flags.c:
+	.text       start:0x801A8458 end:0x801A8470
+
+hsd/hsd_mobj_set_current.c:
+	.text       start:0x801A8470 end:0x801A8478
+
+hsd/hsd_mtx_get_alloc_data.c:
+	.text       start:0x801A84A8 end:0x801A84B4
+
+hsd/hsd_vec_get_alloc_data.c:
+	.text       start:0x801A84E4 end:0x801A84F0
+
+hsd/hsd_mtx_scaled_add.c:
+	.text       start:0x801A85F0 end:0x801A86B4
+
 hsd/hsd_pobj.c:
 	.text       start:0x801AE000 end:0x801AE008
+
+hsd/hsd_pobj_empty.c:
+	.text       start:0x801AEBE0 end:0x801AEBE4
+
+hsd/hsd_robj_update_func.c:
+	.text       start:0x801B009C end:0x801B00E0
+
+hsd/hsd_robj_find_by_type.c:
+	.text       start:0x801B00E0 end:0x801B0140
+
+hsd/hsd_robj_get_alloc_data.c:
+	.text       start:0x801B0140 end:0x801B014C
+
+hsd/hsd_robj_get_alloc_data2.c:
+	.text       start:0x801B014C end:0x801B0158
