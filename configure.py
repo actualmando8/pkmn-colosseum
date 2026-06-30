@@ -288,6 +288,16 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
+                "dolphin/dvd/DVDQueue.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/dvd/DVDError.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
                 "dolphin/dvd/DVDLowInitWA.c",
                 progress_category="sdk",
             ),
@@ -309,6 +319,26 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "dolphin/os/OSArena.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/os/OSEXI_fn_8009E7A8.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/os/OSEXI_fn_8009E7AC.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/os/OSReboot_fn_800A064C.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/os/OSReboot_WriteSram.c",
                 progress_category="sdk",
             ),
             Object(
@@ -338,12 +368,62 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
+                "hsd/hsd_mobj_clear_flags.c",
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_mobj_set_flags.c",
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_mobj_get_flags.c",
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_mobj_set_current.c",
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_mtx_get_alloc_data.c",
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_vec_get_alloc_data.c",
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
                 "hsd/hsd_mtx_scaled_add.c",
                 progress_category="game",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_pobj_empty.c",
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_robj_update_func.c",
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_robj_find_by_type.c",
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_robj_get_alloc_data.c",
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_robj_get_alloc_data2.c",
                 progress_category="game",
             ),
             Object(

@@ -170,6 +170,18 @@ dolphin/os/PPCArch.c:
 dolphin/os/OSArena.c:
 	.text       start:0x8009AFB0 end:0x8009AFD0
 
+dolphin/os/OSEXI_fn_8009E7A8.c:
+	.text       start:0x8009E7A8 end:0x8009E7AC
+
+dolphin/os/OSEXI_fn_8009E7AC.c:
+	.text       start:0x8009E7AC end:0x8009E7B0
+
+dolphin/os/OSReboot_fn_800A064C.c:
+	.text       start:0x800A064C end:0x800A06AC
+
+dolphin/os/OSReboot_WriteSram.c:
+	.text       start:0x800A06AC end:0x800A07C4
+
 dolphin/os/OSTime.c:
 	.text       start:0x800A27FC end:0x800A2B9C
 
@@ -182,8 +194,14 @@ dolphin/dvd/DVDLowSetWAType.c:
 dolphin/dvd/DVDFs.c:
 	.text       start:0x800A4CF0 end:0x800A4D28
 
+dolphin/dvd/DVDQueue.c:
+	.text       start:0x800A7F28 end:0x800A7F80
+
 dolphin/dvd/DVDFsExtras.c:
 	.text       start:0x800A7F80 end:0x800A7FE0
+
+dolphin/dvd/DVDError.c:
+	.text       start:0x800A80FC end:0x800A8178
 
 trk/TRKSerial.c:
 	.text       start:0x800BF14C end:0x800BF338
@@ -242,6 +260,24 @@ dolphin/si/SITypeDecode.c:
 game/sound/sound.c:
 	.text       start:0x801653BC end:0x801653CC
 
+hsd/hsd_mobj_clear_flags.c:
+	.text       start:0x801A8428 end:0x801A8440
+
+hsd/hsd_mobj_set_flags.c:
+	.text       start:0x801A8440 end:0x801A8458
+
+hsd/hsd_mobj_get_flags.c:
+	.text       start:0x801A8458 end:0x801A8470
+
+hsd/hsd_mobj_set_current.c:
+	.text       start:0x801A8470 end:0x801A8478
+
+hsd/hsd_mtx_get_alloc_data.c:
+	.text       start:0x801A84A8 end:0x801A84B4
+
+hsd/hsd_vec_get_alloc_data.c:
+	.text       start:0x801A84E4 end:0x801A84F0
+
 hsd/hsd_mtx_scaled_add.c:
 	.text       start:0x801A85F0 end:0x801A86B4
 
@@ -250,3 +286,15 @@ hsd/hsd_pobj.c:
 
 hsd/hsd_pobj_empty.c:
 	.text       start:0x801AEBE0 end:0x801AEBE4
+
+hsd/hsd_robj_update_func.c:
+	.text       start:0x801B009C end:0x801B00E0
+
+hsd/hsd_robj_find_by_type.c:
+	.text       start:0x801B00E0 end:0x801B0140
+
+hsd/hsd_robj_get_alloc_data.c:
+	.text       start:0x801B0140 end:0x801B014C
+
+hsd/hsd_robj_get_alloc_data2.c:
+	.text       start:0x801B014C end:0x801B0158
