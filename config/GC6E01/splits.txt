@@ -167,8 +167,23 @@ game/menu/menu_bag.c:
 dolphin/os/PPCArch.c:
 	.text       start:0x800980E0 end:0x80098108
 
+dolphin/os/OSGetExceptionHandler.c:
+	.text       start:0x8009A0E0 end:0x8009A0F4
+
+dolphin/os/OSAlarmCreate.c:
+	.text       start:0x8009A2C8 end:0x8009A2D8
+
 dolphin/os/OSArena.c:
 	.text       start:0x8009AFB0 end:0x8009AFD0
+
+dolphin/os/OSContextCurrent.c:
+	.text       start:0x8009BBC4 end:0x8009BBD0
+
+dolphin/os/OSContextClear.c:
+	.text       start:0x8009BD60 end:0x8009BD84
+
+dolphin/os/OSInterruptHandlers.c:
+	.text       start:0x8009DF88 end:0x8009DFB8
 
 dolphin/os/OSEXI_fn_8009E7A8.c:
 	.text       start:0x8009E7A8 end:0x8009E7AC
@@ -176,11 +191,17 @@ dolphin/os/OSEXI_fn_8009E7A8.c:
 dolphin/os/OSEXI_fn_8009E7AC.c:
 	.text       start:0x8009E7AC end:0x8009E7B0
 
+dolphin/os/OSState_fn_8009FAEC.c:
+	.text       start:0x8009FAEC end:0x8009FAF8
+
 dolphin/os/OSReboot_fn_800A064C.c:
 	.text       start:0x800A064C end:0x800A06AC
 
 dolphin/os/OSReboot_WriteSram.c:
 	.text       start:0x800A06AC end:0x800A07C4
+
+dolphin/os/OSThreadQueue.c:
+	.text       start:0x800A13E8 end:0x800A1404
 
 dolphin/os/OSTime.c:
 	.text       start:0x800A27FC end:0x800A2B9C
@@ -193,6 +214,9 @@ dolphin/db/DBGetFirstCallback.c:
 
 dolphin/db/DBIsExceptionMarked.c:
 	.text       start:0x800A2CCC end:0x800A2CE8
+
+dolphin/db/DBPrintf.c:
+	.text       start:0x800A2CE8 end:0x800A2D38
 
 dolphin/dvd/DVDLowInitWA.c:
 	.text       start:0x800A3EB0 end:0x800A3EF0

@@ -383,7 +383,32 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
+                "dolphin/os/OSGetExceptionHandler.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/os/OSAlarmCreate.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
                 "dolphin/os/OSArena.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/os/OSContextCurrent.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/os/OSContextClear.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/os/OSInterruptHandlers.c",
                 progress_category="sdk",
             ),
             Object(
@@ -398,12 +423,22 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
+                "dolphin/os/OSState_fn_8009FAEC.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
                 "dolphin/os/OSReboot_fn_800A064C.c",
                 progress_category="sdk",
             ),
             Object(
                 CodeCandidate,
                 "dolphin/os/OSReboot_WriteSram.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/os/OSThreadQueue.c",
                 progress_category="sdk",
             ),
             Object(
@@ -424,6 +459,11 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "dolphin/db/DBIsExceptionMarked.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/db/DBPrintf.c",
                 progress_category="sdk",
             ),
             Object(
