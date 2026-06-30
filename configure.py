@@ -288,6 +288,11 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
+                "dolphin/os/PPCArch.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
                 "dolphin/os/OSArena.c",
                 progress_category="sdk",
             ),
