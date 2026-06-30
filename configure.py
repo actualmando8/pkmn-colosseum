@@ -268,6 +268,11 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
+                "dolphin/os/OSArena.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
                 "dolphin/os/OSTime.c",
                 progress_category="sdk",
             ),
@@ -294,6 +299,11 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "trk/TRKComm.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "trk/udp_cc.c",
                 progress_category="sdk",
             ),
             Object(

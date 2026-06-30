@@ -164,6 +164,9 @@ __init_cpp_exceptions.cpp:
 game/menu/menu_bag.c:
 	.text       start:0x8004EADC end:0x80051710
 
+dolphin/os/OSArena.c:
+	.text       start:0x8009AFB0 end:0x8009AFD0
+
 dolphin/os/OSTime.c:
 	.text       start:0x800A27FC end:0x800A2B9C
 
@@ -178,6 +181,9 @@ trk/TRKBoard.c:
 
 trk/TRKComm.c:
 	.text       start:0x800C39A0 end:0x800C3BB8
+
+trk/udp_cc.c:
+	.text       start:0x800C3BB8 end:0x800C3C00
 
 crt/wchar.c:
 	.text       start:0x800C80D0 end:0x800C811C
