@@ -263,6 +263,21 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
+                "crt/mwtrace_helpers.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "crt/critical_regions.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "crt/stdio_atexit.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
                 "dolphin/dvd/DVDFsExtras.c",
                 progress_category="sdk",
             ),
@@ -333,6 +348,41 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
+                "trk/TRKSerial.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "trk/usr_put_initialize.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "trk/TRKDispatchInit.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "trk/TRKDispatchConnected.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "trk/TRKDispatchMutex.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "trk/TRKTargetState.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "trk/TRKTargetStopped.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
                 "trk/TRKBoard.c",
                 progress_category="sdk",
             ),
@@ -344,11 +394,6 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "trk/udp_cc.c",
-                progress_category="sdk",
-            ),
-            Object(
-                CodeCandidate,
-                "trk/TRKSerial.c",
                 progress_category="sdk",
             ),
             Object(

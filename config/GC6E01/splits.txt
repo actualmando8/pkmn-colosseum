@@ -186,7 +186,25 @@ dolphin/dvd/DVDFsExtras.c:
 	.text       start:0x800A7F80 end:0x800A7FE0
 
 trk/TRKSerial.c:
-	.text       start:0x800BF14C end:0x800BF3C4
+	.text       start:0x800BF14C end:0x800BF338
+
+trk/usr_put_initialize.c:
+	.text       start:0x800BF338 end:0x800BF33C
+
+trk/TRKDispatchInit.c:
+	.text       start:0x800BF534 end:0x800BF53C
+
+trk/TRKDispatchConnected.c:
+	.text       start:0x800C04E8 end:0x800C0504
+
+trk/TRKDispatchMutex.c:
+	.text       start:0x800C0CC0 end:0x800C0CD8
+
+trk/TRKTargetState.c:
+	.text       start:0x800C1300 end:0x800C1310
+
+trk/TRKTargetStopped.c:
+	.text       start:0x800C1328 end:0x800C1348
 
 trk/TRKBoard.c:
 	.text       start:0x800C3588 end:0x800C3630
@@ -197,11 +215,20 @@ trk/TRKComm.c:
 trk/udp_cc.c:
 	.text       start:0x800C3BB8 end:0x800C3C00
 
+crt/mwtrace_helpers.c:
+	.text       start:0x800C459C end:0x800C45A0
+
+crt/critical_regions.c:
+	.text       start:0x800C754C end:0x800C7558
+
 crt/wchar.c:
 	.text       start:0x800C80D0 end:0x800C811C
 
 crt/mem.c:
 	.text       start:0x800C8174 end:0x800C8510
+
+crt/stdio_atexit.c:
+	.text       start:0x800C8510 end:0x800C8520
 
 crt/string.c:
 	.text       start:0x800CA7FC end:0x800CAA58
