@@ -170,6 +170,12 @@ dolphin/os/OSArena.c:
 dolphin/os/OSTime.c:
 	.text       start:0x800A27FC end:0x800A2B9C
 
+dolphin/dvd/DVDLowInitWA.c:
+	.text       start:0x800A3EB0 end:0x800A3EF0
+
+dolphin/dvd/DVDLowSetWAType.c:
+	.text       start:0x800A4CAC end:0x800A4CF0
+
 dolphin/dvd/DVDFs.c:
 	.text       start:0x800A4CF0 end:0x800A4D28
 
@@ -196,6 +202,12 @@ crt/mem.c:
 
 crt/string.c:
 	.text       start:0x800CA7FC end:0x800CAA58
+
+dolphin/exi/EXI2Stubs.c:
+	.text       start:0x800CE79C end:0x800CE7DC
+
+dolphin/si/SITypeDecode.c:
+	.text       start:0x800D0DF8 end:0x800D0F44
 
 game/sound/sound.c:
 	.text       start:0x801653BC end:0x801653CC

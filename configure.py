@@ -273,12 +273,32 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
+                "dolphin/dvd/DVDLowInitWA.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/dvd/DVDLowSetWAType.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/exi/EXI2Stubs.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
                 "dolphin/os/OSArena.c",
                 progress_category="sdk",
             ),
             Object(
                 CodeCandidate,
                 "dolphin/os/OSTime.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/si/SITypeDecode.c",
                 progress_category="sdk",
             ),
             Object(
