@@ -642,7 +642,10 @@ void fn_800FF58C(u32 floorId) {
             }
             resource++;
         }
-        currentFloor->isActive = 5;
+        {
+            u32 activeVal = 5;
+            currentFloor->isActive = activeVal;
+        }
         *(volatile u32*)&lbl_80478B18 = (u32)-1;
     }
     *(volatile u32*)&lbl_8047ACDC = 3;

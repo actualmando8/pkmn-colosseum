@@ -1416,14 +1416,14 @@ asm void fn_800D6A80(void) {
 #include "src/game/gs_render_fn_800D6A80.inc"
 }
 #else
-void fn_800D6A80(u16 vertCount, s32 type, u32* totalVerts, u32* totalPrims) {
-    *totalVerts += vertCount;
+void fn_800D6A80(u32 vertCount, s32 type, u32* totalVerts, u32* totalPrims) {
+    *totalVerts += (u16)vertCount;
     switch (type) {
-        case 3: *totalPrims += vertCount / 3; break;
+        case 3: *totalPrims += (u16)vertCount / 3; break;
         case 4:
-        case 5: *totalPrims += vertCount - 2; break;
+        case 5: *totalPrims += (u16)vertCount - 2; break;
         case 6:
-        case 7: *totalPrims += (vertCount >> 1); break;
+        case 7: *totalPrims += (vertCount >> 1) & 0x7FFF; break;
     }
 }
 #endif
@@ -1803,7 +1803,9 @@ asm void fn_800D75F4(void) {
 }
 #else
 void fn_800D75F4(u8* obj) {
-    if (*(u32*)(lbl_8047AA80 + 0x24) == (u32)obj) *(u32*)(lbl_8047AA80 + 0x24) = 0;
+    u32 base;
+    base = lbl_8047AA80;
+    if (*(u32*)(base + 0x24) == (u32)obj) *(u32*)(base + 0x24) = 0;
     obj[0x008] = 0; obj[0x024] = 0; obj[0x040] = 0; obj[0x05c] = 0;
     obj[0x078] = 0; obj[0x094] = 0; obj[0x0b0] = 0; obj[0x0cc] = 0;
     obj[0x0e8] = 0; obj[0x104] = 0; obj[0x120] = 0; obj[0x13c] = 0;
@@ -1816,7 +1818,9 @@ asm void fn_800D7650(void) {
 }
 #else
 void fn_800D7650(u8* obj) {
-    if (*(u32*)(lbl_8047AA80 + 0x24) == (u32)obj) *(u32*)(lbl_8047AA80 + 0x24) = 0;
+    u32 base;
+    base = lbl_8047AA80;
+    if (*(u32*)(base + 0x24) == (u32)obj) *(u32*)(base + 0x24) = 0;
     obj[0x008] = 0; obj[0x024] = 0; obj[0x040] = 0; obj[0x05c] = 0;
     obj[0x078] = 0; obj[0x094] = 0; obj[0x0b0] = 0; obj[0x0cc] = 0;
     obj[0x0e8] = 0; obj[0x104] = 0; obj[0x120] = 0; obj[0x13c] = 0;
