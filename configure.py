@@ -59,10 +59,16 @@ parser.add_argument(
     help="base build directory (default: build)",
 )
 parser.add_argument(
+    "--binutils",
+    metavar="DIR",
+    type=Path,
+    help="path to binutils (optional)",
+)
+parser.add_argument(
     "--compilers",
     metavar="DIR",
     type=Path,
-    help="path to compilers (default: tools/mwcc_compiler)",
+    help="path to compilers (optional)",
 )
 parser.add_argument(
     "--map",
@@ -92,6 +98,12 @@ parser.add_argument(
     metavar="BINARY | DIR",
     type=Path,
     help="path to objdiff-cli binary or source (default: tools/objdiff-cli.exe)",
+)
+parser.add_argument(
+    "--sjiswrap",
+    metavar="EXE",
+    type=Path,
+    help="path to sjiswrap.exe (optional)",
 )
 parser.add_argument(
     "--ninja",
@@ -142,18 +154,16 @@ config.objdiff_tag = "v3.6.1"
 config.sjiswrap_tag = "v1.2.2"
 config.wibo_tag = "1.0.3"
 
-# Prefer the binaries already vendored in tools/ over downloading.
-def _local(path: Path) -> Path:
-    return path if path.exists() else None
-
 # dtk, objdiff-cli and the Metrowerks compilers are all left unset so project.py
 # downloads the pinned, PLATFORM-APPROPRIATE binaries (dtk_tag / objdiff_tag /
 # compilers_tag) into build/ — the canonical dtk-template behavior, and what makes
 # the Linux CI work from the same config as Windows. --dtk/--objdiff/--compilers
 # override with a local copy.
+config.binutils_path = args.binutils
 config.dtk_path = args.dtk
 config.objdiff_path = args.objdiff
 config.compilers_path = args.compilers
+config.sjiswrap_path = args.sjiswrap
 
 # Project
 config.config_path = Path("config") / config.version / "config.yml"
@@ -165,17 +175,11 @@ config.asflags = [
     f"-I build/{config.version}/include",
     f"--defsym BUILD_VERSION={version_num}",
 ]
-# Match the proven byte-match link (tools/decomp_work/build_dol.sh): a bare
-# `mwldeppc -o main.elf -lcf <ldscript> <objs>` with no extra flags. Adding
-# -fp/-nodefaults perturbs the output away from the original DOL.
+# The retail DOL matches when linked with the project linker-script override and
+# no extra mwldeppc flags.
 config.ldflags = []
 if args.map:
     config.ldflags.append("-mapunused")
-
-# The original DOL uses _db_stack_addr = _stack_addr + 0x8000 (dtk's generated
-# ldscript defaults to 0x2000). project.py applies config.ldscript_template if set;
-# otherwise the dtk-generated ldscript is patched post-split (see tools/project.py
-# integration / docs). Tracked so the byte-match link stays correct.
 
 # Use for any additional files that should cause a re-configure when modified
 config.reconfig_deps = []
@@ -213,6 +217,8 @@ else:
 Matching = True                   # Object matches and should be linked
 NonMatching = False               # Object does not match and should not be linked
 Equivalent = config.non_matching  # Linked only when configured with --non-matching
+DataCandidate = NonMatching       # Compared by objdiff, but not linked yet
+CodeCandidate = NonMatching       # Compared by objdiff, but not linked yet
 
 
 def GameLib(lib_name: str, mw_version: str, objects: List[Object]) -> Dict[str, Any]:
@@ -235,277 +241,311 @@ config.libs = [
         "GC/1.2.5n",
         [
             Object(
-                Matching,
+                NonMatching,
                 "__init_cpp_exceptions.cpp",
                 source="crt_data/__init_cpp_exceptions.c",
                 progress_category="sdk",
-                postprocess={
-                    "rename_sections": [".dtors$10=.dtors"],
-                    "metadata_from": "build/GC6E01/obj/__init_cpp_exceptions.o",
-                    "copy_sections": [".comment", ".note.split"],
-                },
             ),
             Object(
-                Matching,
+                CodeCandidate,
+                "crt/mem.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "crt/string.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "crt/wchar.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/dvd/DVDFsExtras.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/os/OSTime.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "game/menu/menu_bag.c",
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/sound/sound.c",
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_pobj.c",
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "trk/TRKBoard.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "trk/TRKComm.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "trk/TRKSerial.c",
+                progress_category="sdk",
+            ),
+            Object(
+                DataCandidate,
                 "crt/sdata2_math.c",
                 source="crt_data/sdata2_math.c",
                 progress_category="sdk",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/rodata_80267060.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/rodata_80266BD8.c",
                 progress_category="game",
-                postprocess={
-                    "set_section_alignments": [".rodata=4"],
-                    "metadata_from": "build/GC6E01/obj/game/data/rodata_80266BD8.o",
-                },
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/rodata_80266C7C.c",
                 progress_category="game",
-                postprocess={
-                    "set_section_alignments": [".rodata=4"],
-                    "metadata_from": "build/GC6E01/obj/game/data/rodata_80266C7C.o",
-                },
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/rodata_80267350.c",
                 progress_category="game",
-                postprocess={
-                    "set_section_alignments": [".rodata=4"],
-                    "metadata_from": "build/GC6E01/obj/game/data/rodata_80267350.o",
-                },
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/rodata_80268424.c",
                 progress_category="game",
-                postprocess={
-                    "set_section_alignments": [".rodata=4"],
-                    "metadata_from": "build/GC6E01/obj/game/data/rodata_80268424.o",
-                },
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/sdata2_8047B6A0.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/sdata2_8047B7A0.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/sdata2_8047B8A0.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/sdata2_8047B9A0.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/sdata2_8047BAA0.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/sdata2_8047BBA0.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/sdata2_8047BCA0.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/sdata2_8047BDA0.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/sdata2_8047BEA0.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/sdata2_8047BFA0.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/sdata2_8047C0A0.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/sdata2_8047C1A0.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/sdata2_8047C2A0.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/sdata2_8047C3A0.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "crt/sdata2_math_8047C8A0.c",
                 source="crt_data/sdata2_math_8047C8A0.c",
                 progress_category="sdk",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/gs_render_util_sdata2.c",
                 source="game/gs_render_util_sdata2.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/sdata2_8047C9A0.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/sdata2_8047CAA0.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/sdata2_8047CBE0.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/sdata2_8047CC98.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/gs_model_sdata2_8047CD98.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/sdata2_8047CE98.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/sdata2_8047CF98.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/sdata2_8047D098.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/effect/effect_visual_sdata2_8047D198.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/effect/effect_visual_sdata2_8047D298.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/sdata2_8047D398.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/sdata2_8047D498.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/sdata2_8047D690.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/people/people_sdata2_8047D790.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/sdata2_8047D890.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "hsd/hsd_sdata2_8047D990.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "hsd/hsd_sdata2_8047DA90.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "hsd/hsd_sdata2_8047DB90.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "hsd/hsd_sdata2_8047DC90.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "hsd/hsd_sdata2_8047DD90.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "hsd/hsd_sdata2_8047DE90.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/battle_sdata2_8047DF90.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/battle_sdata2_8047E090.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/battle_sdata2_8047E190.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/battle_waza_sdata2_8047E290.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/sdata2_8047E390.c",
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/colosseum_battle_sdata2.c",
                 progress_category="game",
             ),
@@ -519,26 +559,8 @@ config.progress_categories = [
 ]
 config.progress_each_module = args.verbose
 
-# The ninja `progress`/`report` target runs `objdiff-cli report generate` against
-# the canonical generated objdiff graph. This project keeps a curated objdiff.json
-# for per-function reporting, and many of those source-built base objects are not
-# built by the DOL link graph. Keep the default target on the SHA gate; public
-# report/progress JSON are generated by tools/gen_decomp_report.py.
-config.progress = False
-
 if args.mode == "configure":
-    # Preserve the curated decomp-tracking objdiff.json. It maps the per-file
-    # target objects used by the objdiff GUI, tools/gen_decomp_report.py and the
-    # decomp.dev report. The canonical generator would overwrite it with the
-    # all-asm section units (config.libs is empty here — see the interleaved-TU
-    # note), which carry no per-function progress. Snapshot + restore around
-    # generate_build; configure.py is also the ninja reconfigure command, so the
-    # curated file survives `ninja` re-runs too.
-    _objdiff = Path("objdiff.json")
-    _curated = _objdiff.read_bytes() if _objdiff.is_file() else None
     generate_build(config)
-    if _curated is not None:
-        _objdiff.write_bytes(_curated)
 elif args.mode == "progress":
     calculate_progress(config)
 else:

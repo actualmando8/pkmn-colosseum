@@ -1,0 +1,26 @@
+{
+  "completed": [
+    "fn_800A27FC",
+    "fn_800A7F80",
+    "fn_800C39A0",
+    "fn_800C39B0",
+    "fn_800CAA3C",
+    "fn_801653BC",
+    "fn_801653C4",
+    "fn_801AE000",
+    "strlen"
+  ],
+  "failed": [],
+  "in_progress": [],
+  "metadata": {
+    "source": "report.json",
+    "policy": "completed = active REAL_C functions with fuzzy_match_percent >= 99.995; asm wrappers/stubs excluded",
+    "report_sha256": "0e9da41b1b2d29ac759cf96819b0d7e2a4a12383ad0bda6f823f4ad9d7f9c8c8",
+    "report_matched_functions": 9,
+    "report_total_functions": 8603,
+    "report_matched_data": 12364,
+    "report_total_data": 2196256,
+    "report_complete_data": 0,
+    "completed_real_c_functions": 9
+  }
+}
