@@ -348,6 +348,21 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
+                "dolphin/db/DBInit.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/db/DBGetFirstCallback.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/db/DBIsExceptionMarked.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
                 "dolphin/si/SITypeDecode.c",
                 progress_category="sdk",
             ),
@@ -428,6 +443,21 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
+                "trk/TRKConstructEvent.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "trk/TRKGetBuffer.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "trk/TRKTerminateSerialHandler.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
                 "trk/TRKSerial.c",
                 progress_category="sdk",
             ),
@@ -464,6 +494,11 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "trk/TRKBoard.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "trk/TRKCommState.c",
                 progress_category="sdk",
             ),
             Object(

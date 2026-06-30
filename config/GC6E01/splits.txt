@@ -185,6 +185,15 @@ dolphin/os/OSReboot_WriteSram.c:
 dolphin/os/OSTime.c:
 	.text       start:0x800A27FC end:0x800A2B9C
 
+dolphin/db/DBInit.c:
+	.text       start:0x800A2C30 end:0x800A2C58
+
+dolphin/db/DBGetFirstCallback.c:
+	.text       start:0x800A2C58 end:0x800A2C74
+
+dolphin/db/DBIsExceptionMarked.c:
+	.text       start:0x800A2CCC end:0x800A2CE8
+
 dolphin/dvd/DVDLowInitWA.c:
 	.text       start:0x800A3EB0 end:0x800A3EF0
 
@@ -202,6 +211,15 @@ dolphin/dvd/DVDFsExtras.c:
 
 dolphin/dvd/DVDError.c:
 	.text       start:0x800A80FC end:0x800A8178
+
+trk/TRKConstructEvent.c:
+	.text       start:0x800BE464 end:0x800BE47C
+
+trk/TRKGetBuffer.c:
+	.text       start:0x800BEF18 end:0x800BEF44
+
+trk/TRKTerminateSerialHandler.c:
+	.text       start:0x800BF080 end:0x800BF088
 
 trk/TRKSerial.c:
 	.text       start:0x800BF14C end:0x800BF338
@@ -227,8 +245,11 @@ trk/TRKTargetStopped.c:
 trk/TRKBoard.c:
 	.text       start:0x800C3588 end:0x800C3630
 
+trk/TRKCommState.c:
+	.text       start:0x800C39A0 end:0x800C39BC
+
 trk/TRKComm.c:
-	.text       start:0x800C39A0 end:0x800C3BB8
+	.text       start:0x800C39BC end:0x800C3BB8
 
 trk/udp_cc.c:
 	.text       start:0x800C3BB8 end:0x800C3C00
