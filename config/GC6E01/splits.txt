@@ -215,5 +215,11 @@ dolphin/si/SITypeDecode.c:
 game/sound/sound.c:
 	.text       start:0x801653BC end:0x801653CC
 
+hsd/hsd_mtx_scaled_add.c:
+	.text       start:0x801A85F0 end:0x801A86B4
+
 hsd/hsd_pobj.c:
 	.text       start:0x801AE000 end:0x801AE008
+
+hsd/hsd_pobj_empty.c:
+	.text       start:0x801AEBE0 end:0x801AEBE4

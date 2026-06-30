@@ -323,6 +323,16 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
+                "hsd/hsd_mtx_scaled_add.c",
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_pobj_empty.c",
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
                 "trk/TRKBoard.c",
                 progress_category="sdk",
             ),
