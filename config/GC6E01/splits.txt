@@ -170,6 +170,9 @@ dolphin/os/OSArena.c:
 dolphin/os/OSTime.c:
 	.text       start:0x800A27FC end:0x800A2B9C
 
+dolphin/dvd/DVDFs.c:
+	.text       start:0x800A4CF0 end:0x800A4D28
+
 dolphin/dvd/DVDFsExtras.c:
 	.text       start:0x800A7F80 end:0x800A7FE0
 

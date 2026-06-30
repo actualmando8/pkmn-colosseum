@@ -268,6 +268,11 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
+                "dolphin/dvd/DVDFs.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
                 "dolphin/os/OSArena.c",
                 progress_category="sdk",
             ),
