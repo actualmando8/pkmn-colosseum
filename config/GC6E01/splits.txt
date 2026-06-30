@@ -254,6 +254,9 @@ dolphin/gx/GX_fn_800BB2F8.c:
 trk/TRKConstructEvent.c:
 	.text       start:0x800BE464 end:0x800BE47C
 
+trk/TRKBufferReset.c:
+	.text       start:0x800BEE44 end:0x800BEE74
+
 trk/TRKGetBuffer.c:
 	.text       start:0x800BEF18 end:0x800BEF44
 
@@ -292,6 +295,21 @@ trk/TRKComm.c:
 
 trk/udp_cc.c:
 	.text       start:0x800C3BB8 end:0x800C3C00
+
+trk/ddh_cc_close.c:
+	.text       start:0x800C3E88 end:0x800C3E90
+
+trk/ddh_cc_shutdown.c:
+	.text       start:0x800C3EB4 end:0x800C3EBC
+
+trk/circle_buffer_count.c:
+	.text       start:0x800C41A4 end:0x800C41AC
+
+trk/gdev_cc_close.c:
+	.text       start:0x800C443C end:0x800C4444
+
+trk/gdev_cc_shutdown.c:
+	.text       start:0x800C4468 end:0x800C4470
 
 crt/mwtrace_helpers.c:
 	.text       start:0x800C459C end:0x800C45A0

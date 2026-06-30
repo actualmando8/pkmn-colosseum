@@ -533,6 +533,11 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
+                "trk/TRKBufferReset.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
                 "trk/TRKGetBuffer.c",
                 progress_category="sdk",
             ),
@@ -594,6 +599,31 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "trk/udp_cc.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "trk/ddh_cc_close.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "trk/ddh_cc_shutdown.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "trk/circle_buffer_count.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "trk/gdev_cc_close.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "trk/gdev_cc_shutdown.c",
                 progress_category="sdk",
             ),
             Object(
