@@ -286,10 +286,13 @@ u32 fn_801143A0(void) { return 0; }
 #pragma push
 #pragma peephole off
 void* fn_801143EC(u32 resId, u32 param) {
-    void* result = fn_800F9318(resId, (param & 0x7FFF0000) | 0x400);
-    void* node = fn_801195AC(result);
-    if (node != (void*)0) {
-        fn_800F9378(node, resId, param, (void*)fn_801150B8);
+    void* result;
+    void* node;
+
+    result = fn_800F9318(resId, (param & 0x7FFF0000) | 0x400);
+    node = fn_801195AC(result);
+    if (node) {
+        fn_800F9378(node, resId, param, fn_801150B8);
     }
     return result;
 }

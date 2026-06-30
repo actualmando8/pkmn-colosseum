@@ -37,8 +37,8 @@ extern void __end_critical_region(s32 region);
 extern s32  fwide(__FILE* file, s32 mode);
 extern u32  fwrite(const void* ptr, u32 size, u32 count, __FILE* file);
 
-/* Forward declarations for internal format helpers */
-static s32 __pformatter(WriteFunc writefunc, __FILE* file,
+/* Forward declaration for __pformatter - defined later in this TU */
+extern s32 __pformatter(WriteFunc writefunc, __FILE* file,
                         const char* fmt, va_list args);
 
 /* Forward declaration for __FileWrite (defined below vprintf) */
@@ -83,33 +83,6 @@ s32 __FileWrite(void* data, s32 count, __FILE* file) {
         return requested;
     }
 
-    return 0;
-}
-
-/*
- * __pformatter - Core printf format string processor.
- *
- * Parses the format string and calls the write function for each
- * formatted output segment. Handles all standard printf specifiers:
- * %d, %i, %u, %x, %X, %o, %s, %c, %p, %f, %e, %g, %n, %%, etc.
- *
- * This is a very large function (0x774 bytes in the original binary).
- * A full matching implementation requires careful register allocation
- * to match the MetroWerks compiler output.
- *
- * NOTE: This is a simplified stub. The full implementation at
- * 0x800C88BC (size 0x774) needs asm-level matching.
- */
-static s32 __pformatter(WriteFunc writefunc, __FILE* file,
-                        const char* fmt, va_list args) {
-    /* Stub - the full implementation is 0x774 bytes of complex
-     * format parsing and number conversion logic. It calls:
-     *   - long2str for integer formatting
-     *   - longlong2str for 64-bit integer formatting
-     *   - float2str for floating point
-     *   - double2hex for %a/%A
-     *   - parse_format for format specifier parsing
-     */
     return 0;
 }
 
@@ -535,3 +508,15 @@ void fn_800CA620(void) {
     return;
 }
 
+/*
+ * __pformatter - Core printf format string processor (1908 bytes at 0x800C88BC).
+ *
+ * Kept as a nonmatching stub while the extern declaration at the top
+ * keeps callers using the target call shape.
+ * FIXME: Replace with matching implementation.
+ */
+s32 __pformatter(WriteFunc writefunc, __FILE* file,
+                 const char* fmt, va_list args) {
+    /* stub */
+    return 0;
+}
