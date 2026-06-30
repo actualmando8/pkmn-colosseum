@@ -10,13 +10,30 @@ A matching decompilation project for the GameCube game **Pokémon Colosseum**
 
 | Metric | Value |
 |---|---|
-| Function match | ~0.1% (9 / 8,603 functions) |
-| Code match | ~0.0% (616 / 2,495,108 matched code bytes) |
+| Function match | ~1.3% (110 / 8,603 functions) |
+| Code match | ~0.1% (3,496 / 2,495,108 matched code bytes) |
 | Data match | ~0.6% (12,364 / 2,196,256 matched data bytes) |
 
 These numbers come from the canonical dtk/objdiff report generated at
 `build/GC6E01/report.json`. Old campaign metrics and helper reports are archived
 under `archive/previous_campaign/` and are not used for the published progress.
+
+The published denominator is frozen in
+`config/GC6E01/object_map.freeze.json`. After changing `splits.txt`,
+`symbols.txt`, or object declarations, rebuild the report and run:
+
+```bash
+python3 tools/check_object_map_freeze.py
+```
+
+The check locks total code bytes, data bytes, function count, and unit section
+topology. Progress counters may rise without updating the freeze. Intentional
+split/topology changes must update the freeze in the same change with
+`python3 tools/check_object_map_freeze.py --update` and a clear reason. The
+current topology still includes auto-generated units; those are visible
+placeholders to retire deliberately, not hidden progress. Named extracted units
+without a source path are object-map progress only; they are not counted as
+decompiled source matches.
 
 ## Requirements
 

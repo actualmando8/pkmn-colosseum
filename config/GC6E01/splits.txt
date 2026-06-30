@@ -179,11 +179,17 @@ dolphin/os/OSArena.c:
 dolphin/os/OSContextCurrent.c:
 	.text       start:0x8009BBC4 end:0x8009BBD0
 
+dolphin/os/OSContext.c:
+	.text       start:0x8009BBD0 end:0x8009BD60
+
 dolphin/os/OSContextClear.c:
 	.text       start:0x8009BD60 end:0x8009BD84
 
 dolphin/os/OSInterruptHandlers.c:
 	.text       start:0x8009DF88 end:0x8009DFB8
+
+dolphin/os/OSInterrupt.c:
+	.text       start:0x8009DFB8 end:0x8009E7A8
 
 dolphin/os/OSEXI_fn_8009E7A8.c:
 	.text       start:0x8009E7A8 end:0x8009E7AC
@@ -203,6 +209,12 @@ dolphin/os/OSReboot_WriteSram.c:
 dolphin/os/OSThreadQueue.c:
 	.text       start:0x800A13E8 end:0x800A1404
 
+dolphin/os/OSThread.c:
+	.text       start:0x800A1404 end:0x800A2778
+
+dolphin/os/OSTime_range_800A2778.c:
+	.text       start:0x800A2778 end:0x800A27FC
+
 dolphin/os/OSTime.c:
 	.text       start:0x800A27FC end:0x800A2B9C
 
@@ -212,6 +224,9 @@ dolphin/db/DBInit.c:
 dolphin/db/DBGetFirstCallback.c:
 	.text       start:0x800A2C58 end:0x800A2C74
 
+dolphin/db/DB.c:
+	.text       start:0x800A2C74 end:0x800A2CCC
+
 dolphin/db/DBIsExceptionMarked.c:
 	.text       start:0x800A2CCC end:0x800A2CE8
 
@@ -220,6 +235,9 @@ dolphin/db/DBPrintf.c:
 
 dolphin/dvd/DVDLowInitWA.c:
 	.text       start:0x800A3EB0 end:0x800A3EF0
+
+dolphin/dvd/DVDLow.c:
+	.text       start:0x800A3EF0 end:0x800A4CAC
 
 dolphin/dvd/DVDLowSetWAType.c:
 	.text       start:0x800A4CAC end:0x800A4CF0
@@ -232,6 +250,9 @@ dolphin/dvd/DVDQueue.c:
 
 dolphin/dvd/DVDFsExtras.c:
 	.text       start:0x800A7F80 end:0x800A7FE0
+
+dolphin/dvd/DVDError_ErrorCode2Num.c:
+	.text       start:0x800A7FE0 end:0x800A80FC
 
 dolphin/dvd/DVDError.c:
 	.text       start:0x800A80FC end:0x800A8178
@@ -278,14 +299,26 @@ dolphin/gx/GX_fn_800BB2F8.c:
 trk/TRKConstructEvent.c:
 	.text       start:0x800BE464 end:0x800BE47C
 
+trk/TRKNub_range_800BE47C.c:
+	.text       start:0x800BE47C end:0x800BEE44
+
 trk/TRKBufferReset.c:
 	.text       start:0x800BEE44 end:0x800BEE74
+
+trk/TRKNub_range_800BEE74.c:
+	.text       start:0x800BEE74 end:0x800BEF18
 
 trk/TRKGetBuffer.c:
 	.text       start:0x800BEF18 end:0x800BEF44
 
+trk/TRKBuffer.c:
+	.text       start:0x800BEF44 end:0x800BF080
+
 trk/TRKTerminateSerialHandler.c:
 	.text       start:0x800BF080 end:0x800BF088
+
+trk/TRKSerial_range_800BF088.c:
+	.text       start:0x800BF088 end:0x800BF14C
 
 trk/TRKSerial.c:
 	.text       start:0x800BF14C end:0x800BF338
@@ -296,20 +329,53 @@ trk/usr_put_initialize.c:
 trk/TRKDispatchInit.c:
 	.text       start:0x800BF534 end:0x800BF53C
 
+trk/TRKDispatch_range_800BF53C.c:
+	.text       start:0x800BF53C end:0x800C04E8
+
 trk/TRKDispatchConnected.c:
 	.text       start:0x800C04E8 end:0x800C0504
+
+trk/TRKDispatch_range_800C0504.c:
+	.text       start:0x800C0504 end:0x800C0CC0
 
 trk/TRKDispatchMutex.c:
 	.text       start:0x800C0CC0 end:0x800C0CD8
 
+trk/TRKDispatch_range_800C0CD8.c:
+	.text       start:0x800C0CD8 end:0x800C0EAC
+
+trk/TRKInterrupt.c:
+	.text       start:0x800C0EAC end:0x800C1300
+
 trk/TRKTargetState.c:
 	.text       start:0x800C1300 end:0x800C1310
+
+trk/TRKTarget_range_800C1310.c:
+	.text       start:0x800C1310 end:0x800C1328
 
 trk/TRKTargetStopped.c:
 	.text       start:0x800C1328 end:0x800C1348
 
+trk/TRKTarget_range_800C1348.c:
+	.text       start:0x800C1348 end:0x800C2A10
+
+trk/TRKSaveState.c:
+	.text       start:0x800C2A10 end:0x800C2D80
+
+trk/TRKInit.c:
+	.text       start:0x800C2D80 end:0x800C33BC
+
+trk/TRKBoard_range_800C33BC.c:
+	.text       start:0x800C33BC end:0x800C3588
+
 trk/TRKBoard.c:
 	.text       start:0x800C3588 end:0x800C3630
+
+trk/TRKBoard_range_800C3630.c:
+	.text       start:0x800C3630 end:0x800C3678
+
+trk/TRKComm_range_800C3678.c:
+	.text       start:0x800C3678 end:0x800C39A0
 
 trk/TRKCommState.c:
 	.text       start:0x800C39A0 end:0x800C39BC
@@ -320,8 +386,14 @@ trk/TRKComm.c:
 trk/udp_cc.c:
 	.text       start:0x800C3BB8 end:0x800C3C00
 
+trk/ddh_cc_range_800C3C00.c:
+	.text       start:0x800C3C00 end:0x800C3E88
+
 trk/ddh_cc_close.c:
 	.text       start:0x800C3E88 end:0x800C3E90
+
+trk/ddh_cc_range_800C3E90.c:
+	.text       start:0x800C3E90 end:0x800C3EB4
 
 trk/ddh_cc_shutdown.c:
 	.text       start:0x800C3EB4 end:0x800C3EBC
@@ -329,8 +401,14 @@ trk/ddh_cc_shutdown.c:
 trk/circle_buffer_count.c:
 	.text       start:0x800C41A4 end:0x800C41AC
 
+trk/gdev_cc_range_800C41AC.c:
+	.text       start:0x800C41AC end:0x800C443C
+
 trk/gdev_cc_close.c:
 	.text       start:0x800C443C end:0x800C4444
+
+trk/gdev_cc_range_800C4444.c:
+	.text       start:0x800C4444 end:0x800C4468
 
 trk/gdev_cc_shutdown.c:
 	.text       start:0x800C4468 end:0x800C4470
@@ -341,14 +419,29 @@ crt/mwtrace_helpers.c:
 crt/critical_regions.c:
 	.text       start:0x800C754C end:0x800C7558
 
+crt/stdio_range_800C7558.c:
+	.text       start:0x800C7558 end:0x800C7FB8
+
+crt/wchar_range_800C7FB8.c:
+	.text       start:0x800C7FB8 end:0x800C80D0
+
 crt/wchar.c:
 	.text       start:0x800C80D0 end:0x800C811C
+
+crt/mem_range_800C811C.c:
+	.text       start:0x800C811C end:0x800C8174
 
 crt/mem.c:
 	.text       start:0x800C8174 end:0x800C8510
 
 crt/stdio_atexit.c:
 	.text       start:0x800C8510 end:0x800C8520
+
+crt/printf.c:
+	.text       start:0x800C8520 end:0x800CA78C
+
+crt/string_range_800CA78C.c:
+	.text       start:0x800CA78C end:0x800CA7FC
 
 crt/string.c:
 	.text       start:0x800CA7FC end:0x800CAA58
@@ -368,6 +461,9 @@ dolphin/si/SITypeDecode.c:
 dolphin/si/SI_fn_800D0F44.c:
 	.text       start:0x800D0F44 end:0x800D0F68
 
+dolphin/si/SI_range_800D0F68.c:
+	.text       start:0x800D0F68 end:0x800D104C
+
 dolphin/si/SI_fn_800D104C.c:
 	.text       start:0x800D104C end:0x800D1070
 
@@ -386,20 +482,41 @@ hsd/hsd_mobj_get_flags.c:
 hsd/hsd_mobj_set_current.c:
 	.text       start:0x801A8470 end:0x801A8478
 
+hsd/hsd_mobj_range_801A8478.c:
+	.text       start:0x801A8478 end:0x801A84A8
+
 hsd/hsd_mtx_get_alloc_data.c:
 	.text       start:0x801A84A8 end:0x801A84B4
+
+hsd/hsd_mobj_range_801A84B4.c:
+	.text       start:0x801A84B4 end:0x801A84E4
 
 hsd/hsd_vec_get_alloc_data.c:
 	.text       start:0x801A84E4 end:0x801A84F0
 
+hsd/hsd_mobj_range_801A84F0.c:
+	.text       start:0x801A84F0 end:0x801A85F0
+
 hsd/hsd_mtx_scaled_add.c:
 	.text       start:0x801A85F0 end:0x801A86B4
+
+hsd/hsd_mobj_range_801A86B4.c:
+	.text       start:0x801A86B4 end:0x801AA608
+
+hsd/hsd_pobj_range_801AA608.c:
+	.text       start:0x801AA608 end:0x801AE000
 
 hsd/hsd_pobj.c:
 	.text       start:0x801AE000 end:0x801AE008
 
+hsd/hsd_pobj_range_801AE008.c:
+	.text       start:0x801AE008 end:0x801AEBE0
+
 hsd/hsd_pobj_empty.c:
 	.text       start:0x801AEBE0 end:0x801AEBE4
+
+hsd/hsd_pobj_range_801AEBE4.c:
+	.text       start:0x801AEBE4 end:0x801B009C
 
 hsd/hsd_robj_update_func.c:
 	.text       start:0x801B009C end:0x801B00E0
