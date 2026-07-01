@@ -961,22 +961,30 @@ void fn_80005E00(void) {
     void* mixer;
     f32 vol;
     f32 v;
+    u32 pressed;
+    u32 held;
 
     fn_80101B90(0xFF);
 
-    if (fn_800F7BC4(1) & fn_800F7AF0(1) & 0x10) {
+    pressed = fn_800F7AF0(1);
+    held = fn_800F7BC4(1);
+    if (held & pressed & 0x10) {
         fn_8000C0DC();
     }
 
     if (fn_801E11E8()) {
-        if (fn_800F7BC4(1) & fn_800F7AF0(1) & 0x40) {
+        pressed = fn_800F7AF0(1);
+        held = fn_800F7BC4(1);
+        if (held & pressed & 0x40) {
             if (fn_801E11E0() == 2) {
                 fn_801E11B0();
             } else {
                 fn_801E119C();
             }
         }
-        if (fn_800F7BC4(1) & fn_800F7AF0(1) & 0x20) {
+        pressed = fn_800F7AF0(1);
+        held = fn_800F7BC4(1);
+        if (held & pressed & 0x20) {
             fn_801E118C();
         }
     }
