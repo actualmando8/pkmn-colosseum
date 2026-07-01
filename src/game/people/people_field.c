@@ -113,7 +113,9 @@ extern void fn_801621BC(u32* ptr);  /* peopleFieldUtilDispatch - same-TU asm wra
  * implementation until each function is individually decompiled.
  * =================================================================== */
 
-extern void fn_8015210C(void);
+s32 maccmp(u16* a, u16* b) {
+    return (s32)(a[2]) - (s32)(b[2]);
+}
 typedef s32 (*PeopleCmpFn)(u8* a, u8* b);
 extern void* sndBSearch(u8* key, u8* base, s32 count, u32 size, PeopleCmpFn cmp);
 extern u8 lbl_8043D6F8[];
@@ -151,7 +153,7 @@ u32 fn_8015211C(u32 key) {
     sub = *(u16*)(p + 2);
     *(u16*)(lbl_8047AF90 + 4) = (u16)key;
     lbl_8047AF9C = sub;
-    result = sndBSearch(lbl_8047AF90, lbl_8043DEF8 + sub * 8, count, 8, fn_8015210C);
+    result = sndBSearch(lbl_8047AF90, lbl_8043DEF8 + sub * 8, count, 8, maccmp);
     lbl_8047AF8C = (u32)result;
     if (result != NULL) { return *(u32*)result; }
     return 0;
@@ -188,6 +190,7 @@ asm void fn_801521B8(void) {
 #else
 u32 fn_801521B8(u16 key, u32* out) {
     void* result;
+    u8* header;
     u8* table;
     u32 i;
 
@@ -197,8 +200,9 @@ u32 fn_801521B8(u16 key, u32* out) {
         result = sndBSearch(lbl_80445EF8, *(u8**)table, *(u16*)(table + 8), 0x20, (PeopleCmpFn)fn_801521A8);
         lbl_8047AF88 = (u32)result;
         if (result != NULL && *(u16*)((u8*)result + 2) != 0xFFFF) {
-            lbl_8047AF84 = (u32)((u8*)result + 0xC);
-            out[0] = *(u32*)((u8*)result + 0xC);
+            header = (u8*)result + 0xC;
+            lbl_8047AF84 = (u32)header;
+            out[0] = *(u32*)header;
             out[1] = *(u32*)((u8*)result + 8);
             out[3] = 0;
             out[5] = *(u32*)((u8*)result + 0x14);
@@ -274,11 +278,11 @@ extern u8 lbl_804380F8[];
 extern u16 lbl_8047AFA4;
 extern u32 lbl_8047AF68;
 #if 0
-asm void fn_801523B8(void) {
+asm void dataGetLayer(void) {
 #include "src/game/people/people_field_fn_801523B8.inc"
 }
 #else
-u32 fn_801523B8(u16 arg, u16* out) {
+u32 dataGetLayer(u16 arg, u16* out) {
     extern void* sndBSearch(u8* a, u8* b, u16 c, u32 d, void* e);
     void* result;
     *(u16*)(lbl_80445F18 + 4) = arg;
@@ -292,34 +296,84 @@ u32 fn_801523B8(u16 arg, u16* out) {
 }
 #endif
 
+extern u16 lbl_8047AFA0;
+extern u16 lbl_8047AFA2;
+extern u8 lbl_8043D2F8[];
+extern u8 lbl_80445F24[];
+#if 0
+asm void fxcmp(void) {
+#include "src/game/people/people_field_fn_80152434.inc"
+}
+#else
+s32 fxcmp(u16* a, u16* b) {
+    return (s32)(a[0]) - (s32)(b[0]);
+}
+#endif
+#if 0
+asm void dataGetFX(void) {
+#include "src/game/people/people_field_fn_80152444.inc"
+}
+#else
+u32 dataGetFX(u16 key) {
+    extern void* sndBSearch(u8* a, u8* b, u16 c, u32 d, void* e);
+    void* result;
+    u8* table;
+    s32 i;
+
+    *(u16*)lbl_80445F24 = key;
+    for (i = 0; i < lbl_8047AFA0; i++) {
+        table = lbl_8043D2F8 + i * 8;
+        result = sndBSearch(lbl_80445F24, *(u8**)(table + 4), *(u16*)(table + 2), 0xA, fxcmp);
+        if (result != NULL) { return (u32)result; }
+    }
+    return 0;
+}
+#endif
+#if 0
+asm void dataInit(void) {
+#include "src/game/people/people_field_dataInit.inc"
+}
+#else
+typedef struct { u16 num; u16 subTabIndex; } DataMacMainEntry;
+
+void dataInit(u32 smpBase, u32 smpLength) {
+    extern void fn_8016300C(u32 a, u32 b);
+    s32 i;
+
+    lbl_8047AFAA = 0;
+    lbl_8047AFA8 = 0;
+    lbl_8047AFA6 = 0;
+    lbl_8047AFA4 = 0;
+    lbl_8047AFA0 = 0;
+    lbl_8047AFA2 = 0;
+    for (i = 0; i < 0x200; i++) {
+        ((DataMacMainEntry*)lbl_8043D6F8)[i].num = 0;
+        ((DataMacMainEntry*)lbl_8043D6F8)[i].subTabIndex = 0;
+    }
+    fn_8016300C(smpBase, smpLength);
+}
+#endif
+
 #undef fn_80162118
-extern void fn_80160F10(void* dst, u32 lowByte, s32 value, u32 repeat, u32 hasUpperByte, u32 upperByte);
+extern void fn_80160F10(void* dst, u32 lowByte, s32 value, u32 repeat, u32 hasUpperByte);
 #define PF_DEFINE_MOTION_SETTER(name, initMask, dataOffset, doneMask) \
 void name(u8* ctx, u32* cmd) {                                       \
-    s32 base;                                                        \
-    s32 delta;                                                       \
-    u32 repeat;                                                      \
-    u32 word0;                                                       \
-    u32 word1;                                                       \
-    u32 upperByte;                                                   \
+    u32 comb;                                                        \
+    s32 scale;                                                       \
                                                                       \
-    word0 = cmd[0];                                                  \
-    word1 = cmd[1];                                                  \
-    if ((*(u32*)(ctx + 0x118) & (initMask)) == 0) {                  \
-        *(u32*)(ctx + 0x118) |= (initMask);                          \
-        repeat = 0;                                                  \
+    if ((*(u64*)(ctx + 0x114) & (initMask)) == 0) {                  \
+        *(u64*)(ctx + 0x114) |= (initMask);                          \
+        comb = 0;                                                    \
     } else {                                                         \
-        repeat = word1 & 0xFF;                                       \
+        comb = cmd[1] & 0xFF;                                        \
     }                                                               \
-    base = (s32)(word0 & 0xFFFF0000) / 100;                          \
-    delta = ((s8)((word1 >> 16) & 0xFF) << 8) / 100;                 \
-    if (base < 0) {                                                  \
-        base -= delta;                                               \
+    scale = (s32)(cmd[0] & 0xFFFF0000) / 100;                        \
+    if (scale < 0) {                                                 \
+        scale -= ((s8)(cmd[1] >> 0x10) << 8) / 100;                  \
     } else {                                                         \
-        base += delta;                                               \
+        scale += ((s8)(cmd[1] >> 0x10) << 8) / 100;                  \
     }                                                               \
-    upperByte = (word1 >> 8) & 0xFF;                                 \
-    fn_80160F10(ctx + (dataOffset), (word0 >> 8) & 0xFF, base, repeat, upperByte != 0, upperByte); \
+    fn_80160F10(ctx + (dataOffset), (cmd[0] >> 8) & 0xFF, scale, comb, ((cmd[1] >> 8) & 0xFF) != 0); \
     *(u32*)(ctx + 0x214) |= (doneMask);                              \
 }
 #if 0
@@ -327,77 +381,77 @@ asm void fn_80153FEC(void) {
 #include "src/game/people/people_field_fn_80153FEC.inc"
 }
 #else
-PF_DEFINE_MOTION_SETTER(fn_80153FEC, 0x00100000u, 0x23C, 0x0002u)
+PF_DEFINE_MOTION_SETTER(fn_80153FEC, 0x00100000ULL, 0x23C, 0x0002u)
 #endif
 #if 0
 asm void fn_801540F0(void) {
 #include "src/game/people/people_field_fn_801540F0.inc"
 }
 #else
-PF_DEFINE_MOTION_SETTER(fn_801540F0, 0x00200000u, 0x284, 0x0008u)
+PF_DEFINE_MOTION_SETTER(fn_801540F0, 0x00200000ULL, 0x284, 0x0008u)
 #endif
 #if 0
 asm void fn_801541F4(void) {
 #include "src/game/people/people_field_fn_801541F4.inc"
 }
 #else
-PF_DEFINE_MOTION_SETTER(fn_801541F4, 0x00400000u, 0x2CC, 0x0020u)
+PF_DEFINE_MOTION_SETTER(fn_801541F4, 0x00400000ULL, 0x2CC, 0x0020u)
 #endif
 #if 0
 asm void fn_801542F8(void) {
 #include "src/game/people/people_field_fn_801542F8.inc"
 }
 #else
-PF_DEFINE_MOTION_SETTER(fn_801542F8, 0x02000000u, 0x2F0, 0x0040u)
+PF_DEFINE_MOTION_SETTER(fn_801542F8, 0x02000000ULL, 0x2F0, 0x0040u)
 #endif
 #if 0
 asm void fn_801543FC(void) {
 #include "src/game/people/people_field_fn_801543FC.inc"
 }
 #else
-PF_DEFINE_MOTION_SETTER(fn_801543FC, 0x01000000u, 0x314, 0x0080u)
+PF_DEFINE_MOTION_SETTER(fn_801543FC, 0x01000000ULL, 0x314, 0x0080u)
 #endif
 #if 0
 asm void fn_80154500(void) {
 #include "src/game/people/people_field_fn_80154500.inc"
 }
 #else
-PF_DEFINE_MOTION_SETTER(fn_80154500, 0x00800000u, 0x35C, 0x0200u)
+PF_DEFINE_MOTION_SETTER(fn_80154500, 0x00800000ULL, 0x35C, 0x0200u)
 #endif
 #if 0
 asm void fn_80154604(void) {
 #include "src/game/people/people_field_fn_80154604.inc"
 }
 #else
-PF_DEFINE_MOTION_SETTER(fn_80154604, 0x20000000u, 0x338, 0x0100u)
+PF_DEFINE_MOTION_SETTER(fn_80154604, 0x20000000ULL, 0x338, 0x0100u)
 #endif
 #if 0
 asm void fn_80154708(void) {
 #include "src/game/people/people_field_fn_80154708.inc"
 }
 #else
-PF_DEFINE_MOTION_SETTER(fn_80154708, 0x40000000u, 0x380, 0x0400u)
+PF_DEFINE_MOTION_SETTER(fn_80154708, 0x40000000ULL, 0x380, 0x0400u)
 #endif
 #if 0
 asm void fn_8015480C(void) {
 #include "src/game/people/people_field_fn_8015480C.inc"
 }
 #else
-PF_DEFINE_MOTION_SETTER(fn_8015480C, 0x80000000u, 0x3A4, 0x0800u)
+PF_DEFINE_MOTION_SETTER(fn_8015480C, 0x80000000ULL, 0x3A4, 0x0800u)
 #endif
 #if 0
 asm void fn_80154910(void) {
 #include "src/game/people/people_field_fn_80154910.inc"
 }
 #else
-PF_DEFINE_MOTION_SETTER(fn_80154910, 0x04000000u, 0x260, 0x0004u)
+PF_DEFINE_MOTION_SETTER(fn_80154910, 0x04000000ULL, 0x260, 0x0004u)
 #endif
 #if 0
 asm void fn_80154A14(void) {
 #include "src/game/people/people_field_fn_80154A14.inc"
 }
 #else
-PF_DEFINE_MOTION_SETTER(fn_80154A14, 0x08000000u, 0x2A8, 0x0010u)
+PF_DEFINE_MOTION_SETTER(fn_80154A14, 0x08000000ULL, 0x2A8, 0x0010u)
 #endif
 #undef PF_DEFINE_MOTION_SETTER
 
@@ -637,7 +691,7 @@ u32 fn_80161D20(u32 r3) {
 #pragma pop
 extern void fn_80160BDC(void);
 extern void fn_801603C0(u32 ctrl, u32 bank, u32 channel, u32 value);
-extern u32  salInitDspCtrl(u32 a, u32 b, u32 c);
+extern u32  salInitDspCtrl(u8 a, u8 b, u8 c);
 extern void salExitDspCtrl(void);
 #pragma push
 #pragma optimization_level 0
@@ -715,7 +769,7 @@ void fn_80161E8C(u8* obj, u32 ctrl, s32 value) {
 #pragma pop
 extern u32 lbl_80478BF0;
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
 asm void fn_80162070(void) {
@@ -825,7 +879,7 @@ extern void fn_8014A280(void);
 extern void fn_80158CD4(void);
 extern void salActivateStudio(void);
 extern void fn_8015AAA0(void);
-extern void salActivateVoice(u8* ptr);
+extern void salActivateVoice(u8* ptr, u8 unused2);
 extern void fn_8015D4EC(void);
 extern void fn_8015D54C(u8* ptr);
 extern void fn_8015D5F4(u8* ptr);
@@ -887,14 +941,14 @@ void sndConvertTicks(u32* ptr, u32 divisor) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_80162370(void) {
+asm void hwInit(void) {
 #include "src/game/people/people_field_fn_80162370.inc"
 }
 #else
 extern u8  lbl_8047B05E;
 extern u8  lbl_8047B05F;
 extern u32 snd_handle_irq(void);
-u32 fn_80162370(u32 a, u8 b, u8 c, u32 d) {
+u32 hwInit(u32 a, u16 b, u32 c, u32 d) {
     extern u32 lbl_8047B028;
     hwInitIrq();
     lbl_8047B05F = 0;
@@ -1313,14 +1367,14 @@ void fn_801628B4(u32 index, u8 val) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_801628C8(void) {
+asm void hwStart(void) {
 #include "src/game/people/people_field_fn_801628C8.inc"
 }
 #else
-void fn_801628C8(u32 index) {
+void hwStart(u32 index, u8 unused2) {
 #define PF (*(PeopleFieldMoveSlot* volatile*)&lbl_8047B024)
     PF[index].field_D4 = lbl_8047B050;
-    salActivateVoice((u8*)&PF[index]);
+    salActivateVoice((u8*)&PF[index], unused2);
 #undef PF
 }
 #endif
@@ -1655,28 +1709,22 @@ u32 fn_80162E14(u32 idx) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_80162EB8(void) {
+asm void hwFlushStream(void) {
 #include "src/game/people/people_field_fn_80162EB8.inc"
 }
 #else
-void fn_80162EB8(u8* dstBase, u32 srcOffset, u32 size, u32 streamIndex, u32 arg7, u32 arg8) {
+void hwFlushStream(u8* dstBase, u32 srcOffset, u32 size, u32 streamIndex, u32 arg7, u32 arg8) {
     u32 unusedOut;
-    register u8* dstBaseReg = dstBase;
-    register u32 srcOffsetReg = srcOffset;
-    register u32 sizeReg = size;
-    register u32 arg7Reg = arg7;
-    register u32 arg8Reg = arg8;
     u8* srcBase = (u8*)fn_80163DB0(streamIndex, &unusedOut);
-    u32 unaligned = srcOffsetReg & 0x1F;
-    u32 alignedOffset = srcOffsetReg & ~0x1F;
-    u32 alignedSize;
     u8* dst;
-    sizeReg += unaligned;
-    dst = dstBaseReg + alignedOffset;
-    alignedSize = (sizeReg + 0x1F) & ~0x1F;
 
-    fn_8009B300(dst, alignedSize);
-    aramUploadData(dst, srcBase + alignedOffset, alignedSize, 1, arg7Reg, arg8Reg);
+    size += srcOffset & 0x1F;
+    srcOffset &= ~0x1F;
+    dst = dstBase + srcOffset;
+    size = (size + 0x1F) & ~0x1F;
+
+    fn_8009B300(dst, size);
+    aramUploadData(dst, srcBase + srcOffset, size, 1, arg7, arg8);
 }
 #endif
 #pragma pop
@@ -1730,7 +1778,7 @@ void fn_80162FAC(void) {}
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_80162FB0(void) {
+asm void hwFrq2Pitch(void) {
 #include "src/game/people/people_field_fn_80162FB0.inc"
 }
 #else
@@ -1738,10 +1786,10 @@ typedef struct PeopleFieldMoveScale {
     u32 divisor; /* 0x00 */
 } PeopleFieldMoveScale;
 
-u32 fn_80162FB0(u32 value) {
+u32 hwFrq2Pitch(u32 value) {
     PeopleFieldMoveScale* scale = (PeopleFieldMoveScale*)lbl_80434C50;
 
-    return fn_800C46B0(((f32)value * lbl_8047D4E0) / (f32)scale->divisor);
+    return fn_800C46B0((lbl_8047D4E0 * (f32)value) / (f32)scale->divisor);
 }
 #endif
 #pragma pop
@@ -1864,10 +1912,10 @@ extern u32 lbl_8047B054;
 extern u32 lbl_8047B058;
 extern u32 lbl_8047B014;
 #pragma push
-void fn_801631AC(u32* src) {
-    u32 a = src[0], b = src[1];
-    lbl_8047B054 = a;
-    lbl_8047B058 = b;
+typedef struct { u32 a; u32 b; } fn_801631AC_Pair;
+
+void fn_801631AC(fn_801631AC_Pair* src) {
+    *(fn_801631AC_Pair*)&lbl_8047B054 = *src;
 }
 #pragma push
 #pragma optimization_level 0
@@ -2002,7 +2050,7 @@ void fn_801632B4(u8* dst, u8* src, u32 size, u32 priority, u32 callbackArg0, u32
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
 extern u8 lbl_8044FB90[];
 #if 0
