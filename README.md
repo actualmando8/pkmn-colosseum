@@ -10,13 +10,22 @@ A matching decompilation project for the GameCube game **Pokémon Colosseum**
 
 | Metric | Value |
 |---|---|
-| Function match | ~1.3% (110 / 8,603 functions) |
-| Code match | ~0.1% (3,496 / 2,495,108 matched code bytes) |
-| Data match | ~0.6% (12,364 / 2,196,256 matched data bytes) |
+| Fuzzy match | 22.19% |
+| Function match | 38.53% (3,315 / 8,603 functions) |
+| Code match | 10.02% (249,968 / 2,495,108 matched code bytes) |
+| Data match | 0.56% (12,364 / 2,196,256 matched data bytes) |
 
 These numbers come from the canonical dtk/objdiff report generated at
 `build/GC6E01/report.json`. Old campaign metrics and helper reports are archived
 under `archive/previous_campaign/` and are not used for the published progress.
+After rebuilding the report, refresh the table with:
+
+```bash
+python3 tools/update_readme_progress.py
+```
+
+Use `python3 tools/update_readme_progress.py --check` to verify that the README
+matches the current report.
 
 The published denominator is frozen in
 `config/GC6E01/object_map.freeze.json`. After changing `splits.txt`,
