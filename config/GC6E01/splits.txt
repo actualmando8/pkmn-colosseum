@@ -479,6 +479,9 @@ dolphin/si/SI_fn_800D104C.c:
 game/gs_model.c:
 	.text       start:0x801019F8 end:0x80109C88
 
+game/gs_field_world.c:
+	.text       start:0x80114D6C end:0x80130CE0
+
 game/effect/gs_effect.c:
 	.text       start:0x80130CE0 end:0x8013151C
 

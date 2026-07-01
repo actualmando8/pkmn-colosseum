@@ -6,24 +6,24 @@
     "total_code": 2495108,
     "total_data": 2196256,
     "total_functions": 8603,
-    "total_units": 242
+    "total_units": 243
   },
   "topology_status": {
     "auto_units": 56,
-    "named_units": 186,
-    "source_backed_units": 166,
-    "auto_code": 1938724,
+    "named_units": 187,
+    "source_backed_units": 167,
+    "auto_code": 1824176,
     "auto_data": 2182883,
-    "auto_functions": 6083
+    "auto_functions": 5349
   },
   "baseline_progress": {
-    "matched_code": "90208",
-    "matched_code_percent": 3.6153946,
+    "matched_code": "163088",
+    "matched_code_percent": 6.53631,
     "matched_data": "12364",
     "matched_data_percent": 0.56295806,
-    "matched_functions": 1452,
-    "matched_functions_percent": 16.877832,
-    "fuzzy_match_percent": 7.3115745
+    "matched_functions": 2091,
+    "matched_functions_percent": 24.305475,
+    "fuzzy_match_percent": 11.707951
   },
   "unit_topology": [
     {
@@ -2670,13 +2670,26 @@
       "sections": [
         {
           "name": ".text",
-          "size": 159832,
+          "size": 45284,
           "virtual_address": 2148572296
         }
       ],
-      "total_code": 159832,
+      "total_code": 45284,
       "total_data": 0,
-      "total_functions": 872
+      "total_functions": 138
+    },
+    {
+      "name": "main/game/gs_field_world",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 114548,
+          "virtual_address": 2148617580
+        }
+      ],
+      "total_code": 114548,
+      "total_data": 0,
+      "total_functions": 734
     },
     {
       "name": "main/game/effect/gs_effect",
