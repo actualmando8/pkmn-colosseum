@@ -126,7 +126,7 @@ extern void  threadSaveGPRRegisters(void);                /* GSthread context in
 extern void  fn_800F01F0(void);                           /* GSthread FPU context init */
 /* renamed symbols referenced by asm incs (symbolmap port) */
 extern void GSscratchFree(void*);
-extern void cos();   /* MSL trig (renamed fn_800CDBE0) — referenced by asm incs */
+extern void cos();   /* MSL trig (renamed fn_800CDBE0) - referenced by asm incs */
 
 /* ===== String constants (rodata references) ===== */
 extern const char lbl_80271008[]; /* "GSthreadCreate. Warning: 'usesFPU==FALE' OK?\n" */
@@ -7088,7 +7088,7 @@ s32 fn_800F67C8(void* obj) {
         val1 = *(u32*)(stackPtr + 0x6C);
     }
 
-    /* Pop 2 (into val2) → store to obj->0x1C */
+    /* Pop 2 (into val2) -> store to obj->0x1C */
     count = *(s32*)(p + 0x28);
     if ((s32)count <= 0) {
         fn_800DD38C((const char*)lbl_8027107C);
@@ -7101,7 +7101,7 @@ s32 fn_800F67C8(void* obj) {
     }
     *(u32*)(p + 0x1C) = val2;
 
-    /* Pop 3 (return address) → store to obj->0x14 */
+    /* Pop 3 (return address) -> store to obj->0x14 */
     count = *(s32*)(p + 0x28);
     if ((s32)count <= 0) {
         fn_800DD38C((const char*)lbl_8027107C);
