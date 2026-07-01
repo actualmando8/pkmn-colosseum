@@ -582,3 +582,110 @@ Validation result:
 - `fn_801C43F4` stayed `2.3765182%`.
 - `main/game/battle/battle_grid` stayed at `13.071283%` fuzzy and
   `5.4287167%` matched code.
+
+## Whole-Source Subagent Audit Campaign, 2026-07-01
+
+Purpose: cover the active source tree for typed-readability candidates, then
+feed reviewed candidates back into small matching-preserving batches.
+
+Rules for all lanes:
+
+- Read-only audit first; no edits, staging, commits, `.inc` changes, symbol
+  renames, or split changes.
+- Use `build/GC6E01/report.json` as the score source.
+- Return candidates with priority, file/function, fuzzy score, offset evidence,
+  proposed struct/fields, risk, and validation command.
+- Classify walls explicitly when inline asm, wrappers, compiler ordering, or
+  insufficient evidence makes typed conversion risky.
+
+Active lanes:
+
+- `Ohm` (`019f200c-5399-7ab2-a10d-ad7bb268fab7`): `src/game/battle/*.c` and
+  `src/game/effect/*.c`.
+- `Schrodinger` (`019f200c-542f-7e91-b879-3a25a02c6ef7`): field, render,
+  world, model, task/thread, texture, title, scene, and floor systems.
+- `Popper` (`019f200c-548d-7d21-a56f-224162b5560a`): high-level gameplay,
+  events, NPC, party, PC box, Pokemon, trainer, people, and menu files.
+- `Halley` (`019f200c-550b-79e1-ad1f-7433f36ed139`): HSD/sysdolphin source and
+  headers.
+- `Bernoulli` (`019f200c-557f-7d81-8452-ceca3dbc5646`): Dolphin, TRK, CRT,
+  FSYS, GBA, DVD, input, movie, sound, and main support files.
+
+Mechanical scan baseline:
+
+- Highest raw-offset density: `gs_render.c`, `gs_thread.c`,
+  `gs_thread_hi.c`, `gs_worldmap.c`, `gs_field_world.c`,
+  `menu_carde_matrix.c`, `gba_misc.c`, `effect_visual.c`, and `gs_pcbox.c`.
+- Largest function-count files: `gs_field_world.c` (734),
+  `colosseum_battle.c` (675), `trainer.c` (388), `colosseum_event.c` (385),
+  `people_field.c` (350), `gs_render.c` (277), `effect_util.c` (207), and
+  `pokemon.c` (200).
+
+Integration policy:
+
+- Main agent reviews every candidate before patching.
+- Prefer exact helpers and repeated local layout evidence first.
+- Preserve readable names even when a raw form is needed for codegen; document
+  rejected conversions with the score delta.
+- Validate each accepted batch with `python3 configure.py --no-progress`,
+  `ninja all_source build/GC6E01/report.json`, `ninja`,
+  `python3 configure.py progress`, `python3 tools/update_readme_progress.py
+  --check`, and `git diff --check`.
+
+Audit coverage:
+
+- Active source report functions covered by the lane split: 5757.
+- No lane made source edits. All outputs are candidate ledgers only.
+
+Immediate patch queue:
+
+1. `battle_grid.c`: introduce `BattleGridSceneWork` and `BattleGridSceneSlot`
+   for the `0x70` slot stride (`active`, `jobj`, position, rotation, scale,
+   `animType`, `blend`, group state). Start with `fn_801C3114`,
+   `fn_801C3A64`, `fn_801C3B80`, `fn_801C3C98`, and `fn_801C3E3C`.
+2. `battle_waza.c`: strengthen the existing `WazaEntry`/scratch payloads for
+   the entry accessor cluster and party scratch block. Favor exact helpers
+   before touching larger sequence bodies.
+3. `gs_render_util.c`: recover `GSRenderCamera` / `GSCameraSnapshot` around the
+   `0x128` camera pool stride and vector/matrix fields.
+4. `gs_field_colquery.c`: recover WZX triangle/reservation/transition structs
+   in the exact helpers first.
+5. `colosseum_event.c`: type the exact 6-byte and `0x18` event row helpers.
+6. `hsd_lobj.c`, `hsd_pobj_range_801AA608.c`, `hsd_shadow.c`: use existing HSD
+   headers for exact helper clusters before larger matrix/render code.
+
+Medium campaigns:
+
+- `effect_util.c`: `EffectScriptCtx`, allocator owner/slot rows, and remaining
+  `EffectParamBlock` field names.
+- `effect_visual.c`: lightning, filter/color list, and timed-float node work
+  blocks. Treat leaf/electron/surf/sea as later passes.
+- `gs_render.c`: material pool `GSMaterialExt` first; defer broad GX global
+  state until smaller helpers are exhausted.
+- `gs_model.c`: `GSModelNode` and motion scratch around the `0x78` node pool.
+- `gs_worldmap.c`: travel context, route rows, destination rows, sprite packet.
+- `gs_field_world.c`: resource rows, particle app/node, and party output
+  structs.
+- `gs_pcbox.c`: list payload, layout row, and pane structs.
+- `pokemon.c` and `trainer.c`: accessor overlay structs first; avoid the large
+  get/set dispatchers until the field groups are proven.
+- `fsys_file.c`: archive header, TOC entries, and slot fields. High value but
+  many pragmas/asm fallbacks, so keep patches small.
+- `input.c`, `gba_misc.c`, and TRK serial/comm files: fixed layout candidates
+  with moderate scheduling/codegen risk.
+- `hsd_cobj.c`, `hsd_wobj.c`, `hsd_fog.c`, `hsd_displayfunc.c`: existing HSD
+  structs/hash/list layouts can reduce raw offsets, but matrix/float paths need
+  full validation.
+
+Walls / defer:
+
+- `.inc`, inline asm, and asm-wrapper bodies remain off-limits.
+- Large TODO/state-machine bodies in `battle_waza.c`, `effect_visual.c`,
+  `colosseum_battle.c`, `gs_pcbox.c`, `gs_dvd.c`, `gs_floor.c`,
+  `gs_title.c`, `hsd_texp.c`, and TRK target/dispatch files are not first-pass
+  type-recovery wins.
+- Hardware/cache/reset/printf/stdio/string code is mostly toolchain or
+  handwritten-PPC sensitive; do not prioritize it for typed game-structure
+  recovery.
+- `fn_801C423C` remains a known caution: typed transition-state access looked
+  cleaner but reduced fuzzy score from `90.83929%` to `90.21429%`.
