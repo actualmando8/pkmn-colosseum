@@ -6,24 +6,24 @@
     "total_code": 2495108,
     "total_data": 2196256,
     "total_functions": 8603,
-    "total_units": 228
+    "total_units": 229
   },
   "topology_status": {
     "auto_units": 51,
-    "named_units": 177,
-    "source_backed_units": 157,
-    "auto_code": 2358736,
+    "named_units": 178,
+    "source_backed_units": 158,
+    "auto_code": 2326108,
     "auto_data": 2182883,
-    "auto_functions": 7805
+    "auto_functions": 7605
   },
   "baseline_progress": {
-    "matched_code": "24656",
-    "matched_code_percent": 0.98817366,
+    "matched_code": "34124",
+    "matched_code_percent": 1.3676362,
     "matched_data": "12364",
     "matched_data_percent": 0.56295806,
-    "matched_functions": 529,
-    "matched_functions_percent": 6.149018,
-    "fuzzy_match_percent": 1.3891647
+    "matched_functions": 673,
+    "matched_functions_percent": 7.8228526,
+    "fuzzy_match_percent": 2.546907
   },
   "unit_topology": [
     {
@@ -2943,13 +2943,26 @@
       "sections": [
         {
           "name": ".text",
-          "size": 294440,
+          "size": 261812,
           "virtual_address": 2149253464
         }
       ],
-      "total_code": 294440,
+      "total_code": 261812,
       "total_data": 0,
-      "total_functions": 886
+      "total_functions": 686
+    },
+    {
+      "name": "main/game/pokemon",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 32628,
+          "virtual_address": 2149515276
+        }
+      ],
+      "total_code": 32628,
+      "total_data": 0,
+      "total_functions": 200
     },
     {
       "name": "main/game/trainer",

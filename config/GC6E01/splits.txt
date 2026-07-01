@@ -539,5 +539,8 @@ hsd/hsd_robj_get_alloc_data.c:
 hsd/hsd_robj_get_alloc_data2.c:
 	.text       start:0x801B014C end:0x801B0158
 
+game/pokemon.c:
+	.text       start:0x801F000C end:0x801F7F80
+
 game/trainer.c:
 	.text       start:0x801F7F80 end:0x80201764
