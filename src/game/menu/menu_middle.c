@@ -2707,11 +2707,18 @@ void fn_8006BB34(void) {
 
 /* 0x8006C018 | size: 0xC4 */
 void fn_8006C018(void) {
+    /* Conservative view of the object returned by fn_80105624: only the
+     * flags field at offset 0x4 is exercised by this function. */
+    typedef struct {
+        u8 unk0[4];
+        u16 flags; /* 0x4 */
+    } unk_menustate_8006C018;
+
     u8 sp[0x10];
     u32 r0 = 0;
     u32 r3 = 0;
     u32 r30 = 0;
-    u32 r31 = 0;
+    unk_menustate_8006C018* r31 = 0;
 
     r30 = r3;
     r0 = *(u8*)((u8*)r30 + 0x1);
@@ -2720,34 +2727,29 @@ void fn_8006C018(void) {
         return;
     }
     ((void(*)(void))fn_80105624)();
-    r31 = r3;
+    r31 = (unk_menustate_8006C018*)r3;
     r3 = *(u32*)((u8*)r30 + 0x4);
     ((void(*)(void))fn_801022B8)();
-    if ((s32)r3 < (s32)0xa0e) {
+    do {
+        if ((s32)r3 >= (s32)0xe35) break;
+        if ((s32)r3 >= (s32)0xa0e) {
+            if ((s32)r3 < (s32)0xe33) break;
+            r0 = r31->flags & 0x30;
+            if ((s32)r0 == (s32)0x0) break;
+            return;
+        }
         if ((s32)r3 < (s32)0x9fc) {
-            if ((s32)r3 < (s32)0x9f7) {
-                goto L_8006C0BC;
-            }
-            if ((s32)r3 < (s32)0xa0c) {
-                goto L_8006C0BC;
-            }
-            if ((s32)r3 < (s32)0xe35) {
-            }
-            if ((s32)r3 < (s32)0xe33) {
-            }
-            goto L_8006C0BC;
-                }
-        r0 = *(u16*)((u8*)r31 + 0x4);
-        r0 = r0 & 0x00000010;
-        if ((s32)r0 != (s32)0x0) return;
+            if ((s32)r3 < (s32)0x9f7) break;
+            r0 = r31->flags & 0x10;
+            if ((s32)r0 == (s32)0x0) break;
+            return;
+        }
+        if ((s32)r3 < (s32)0xa0c) break;
+        r0 = r31->flags & 0x30;
+        if ((s32)r0 == (s32)0x0) break;
+        return;
+    } while (0);
 
-            }
-    r0 = *(u16*)((u8*)r31 + 0x4);
-    r0 = r0 & 0x00000030;
-    if ((s32)r0 != (s32)0x0) return;
-
-    return;
-    L_8006C0BC: ;
     r3 = r30;
     ((void(*)(void))fn_80102ED4)();
 
@@ -4603,24 +4605,40 @@ void fn_8006DAE4(void* arg0) {
     extern u32 fn_800FA444(void*);
     extern void fn_80109220(void*, int);
     extern void fn_80070D84(void*, void*, int);
+
+    typedef struct {
+        u8 unk0;
+        s8 unk1;
+        s8 unk2;
+    } arg_state_DAE4;
+
+    typedef struct {
+        u8 unk0[0x4c];
+        u32 field_4c;
+        u8 pad50[2];
+        s16 field_52;
+    } slot_obj_DAE4;
+
     void* a;
     void* b;
     void* c;
-    void* slot;
+    slot_obj_DAE4* slot;
     s32 d29;
     s32 d27;
     s16 cmp;
 
-    if ((s8)*(s8*)((u8*)arg0 + 0x2) == 0) {
-        if ((s8)*(s8*)((u8*)arg0 + 0x1) == 0) {
+    if (((arg_state_DAE4*)arg0)->unk2 == 0) {
+        switch (((arg_state_DAE4*)arg0)->unk1) {
+        case 0:
+        {
             a = fn_801040D0(arg0, 0);
             b = fn_801040D0(arg0, 1);
             c = fn_801040D0(arg0, 2);
             fn_80102868(0xd6, 0, (s16)(s32)fn_801040D0(arg0, 3));
-            slot = fn_801046C8(arg0, 0xe8c);
-            *(u32*)((u8*)slot + 0x4c) = (u32)a;
-            slot = fn_801046C8(arg0, 0xe8d);
-            *(u32*)((u8*)slot + 0x4c) = (u32)b;
+            slot = (slot_obj_DAE4*)fn_801046C8(arg0, 0xe8c);
+            slot->field_4c = (u32)a;
+            slot = (slot_obj_DAE4*)fn_801046C8(arg0, 0xe8d);
+            slot->field_4c = (u32)b;
             cmp = (s16)(u16)fn_800FA444(c);
             d29 = 0;
             d27 = 0;
@@ -4628,12 +4646,14 @@ void fn_8006DAE4(void* arg0) {
                 d29 = -0x14;
                 d27 = -0xa;
             }
-            slot = fn_801046C8(arg0, 0xe8a);
-            *(u32*)((u8*)slot + 0x4c) = (u32)c;
-            *(s16*)((u8*)slot + 0x52) = *(s16*)((u8*)slot + 0x52) + d29;
-            slot = fn_801046C8(arg0, 0xe87);
+            slot = (slot_obj_DAE4*)fn_801046C8(arg0, 0xe8a);
+            slot->field_4c = (u32)c;
+            slot->field_52 = slot->field_52 + d29;
+            slot = (slot_obj_DAE4*)fn_801046C8(arg0, 0xe87);
             fn_80109220(slot, c != 0);
-            *(s16*)((u8*)slot + 0x52) = *(s16*)((u8*)slot + 0x52) + d27;
+            slot->field_52 = slot->field_52 + d27;
+            break;
+        }
         }
     }
     fn_80070D84(arg0, lbl_8026860C, 8);

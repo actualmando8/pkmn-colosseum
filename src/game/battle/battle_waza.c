@@ -38,6 +38,25 @@
 #include "game/battle/battle.h"
 
 /* =========================================================================
+ * Waza Entry Structure (temporary - based on 0x2C byte size)
+ * ========================================================================= */
+
+typedef struct WazaEntry {
+    /* 0x00 */ s32 type;           /* WAZA_ENTRY_* type */
+    /* 0x04 */ f32 startFrame;     /* Frame when entry should start */
+    /* 0x08 */ f32 duration;       /* Duration of the entry */
+    /* 0x0C */ u32 field_0C;       /* Unknown field */
+    /* 0x10 */ u32 field_10;       /* Unknown field */
+    /* 0x14 */ f32 posY;          /* Position Y */
+    /* 0x18 */ f32 posZ;          /* Position Z */
+    /* 0x1C */ f32 scale;         /* Scale */
+    /* 0x20 */ f32 rotation;      /* Rotation */
+    /* 0x24 */ s32 field_24;      /* Field being accessed by fn_801D14C0 */
+    /* 0x28 */ s32 resourceID;    /* Resource ID */
+    /* 0x2C */ /* end of struct */
+} WazaEntry;
+
+/* =========================================================================
  * External function declarations
  * ========================================================================= */
 
@@ -167,26 +186,35 @@ u32 fn_801D1470(void* entry) {
  */
 s32 fn_801D147C(void* entry) {
     s32 idx;
-    void* sequenceEntry;
+    WazaEntry* sequenceEntry;
 
     idx = (s32)entry;
     if (idx < 0 || (u32)idx >= *lbl_80478E98) {
         sequenceEntry = NULL;
     } else {
-        sequenceEntry = (void*)(lbl_80478E9C + (u32)idx * 0x2C);
+        sequenceEntry = (WazaEntry*)(lbl_80478E9C + (u32)idx * sizeof(WazaEntry));
     }
 
     if (sequenceEntry == NULL) return -1;
-    return *(s32*)((u8*)sequenceEntry + 0x28);
+    return sequenceEntry->resourceID;
 }
 
 /**
- * fn_801D14C0 - Waza get entry position X.
+ * fn_801D14C0 - Waza get entry field 0x24 by index.
  * Address: 0x801D14C0 | Size: 0x44
+ * Bounds-checks idx against lbl_80478E98->count, then
+ * returns entry[idx*0x2C + 0x24] from lbl_80478E9C.
  */
-f32 fn_801D14C0(void* entry) {
-    if (entry == NULL) return 0.0f;
-    return *(f32*)((u8*)entry + 0x10);
+s32 fn_801D14C0(s32 idx) {
+    WazaEntry* entry;
+    if (idx < 0 || (u32)idx >= *lbl_80478E98) {
+        entry = NULL;
+    } else {
+        entry = (WazaEntry*)(lbl_80478E9C + (u32)idx * sizeof(WazaEntry));
+    }
+
+    if (entry == NULL) return -1;
+    return entry->field_24;
 }
 
 /**
@@ -2145,24 +2173,32 @@ void fn_801DD078(void* obj) {
     }
 }
 
+typedef struct WazaFxNode {
+    u8 pad_00[0x2C];
+    u16 field_2C;
+    u16 field_2E;
+    u8 pad_30[0x04];
+    struct WazaFxNode* next;
+} WazaFxNode;
+
+typedef struct WazaFxOwner {
+    u8 pad_00[0x68];
+    WazaFxNode* first_child;
+} WazaFxOwner;
+
 /**
  * fn_801DD0C8 - Waza lighting reset.
  * Address: 0x801DD0C8 | Size: 0x38
  */
-void* fn_801DD0C8(obj, arg1, arg2)
-void* obj;
-s32 arg1;
-s32 arg2;
+void* fn_801DD0C8(void* obj, s32 search_key1, s32 search_key2)
 {
-    void* cur = *(void**)((u8*)obj + 0x68);
-    u32 b = (u16)arg2;
-    u32 a = (u16)arg1;
+    WazaFxNode* cur = ((WazaFxOwner*)obj)->first_child;
 
     while (cur != NULL) {
-        if (*(u16*)((u8*)cur + 0x2C) == a && *(u16*)((u8*)cur + 0x2E) == b) {
+        if (cur->field_2C == (u16)search_key1 && cur->field_2E == (u16)search_key2) {
             return cur;
         }
-        cur = *(void**)((u8*)cur + 0x34);
+        cur = cur->next;
     }
 
     return cur;

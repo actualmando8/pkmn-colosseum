@@ -202,6 +202,15 @@ typedef s32 (*EffectUtilCountFunc)(void);
 typedef u8* (*EffectUtilEntryFunc)(s32);
 typedef s32 (*EffectUtilEntryCallback)(s32, s32);
 
+typedef struct EffectStatusTableEntry {
+    u8 statusKind;
+    u8 mode;
+    u16 statusSub;
+    u16 linkedIndex;
+    s16 amount;
+    s16 divisor;
+} EffectStatusTableEntry;
+
 #if 0
 asm void fn_801316A8(void) {
 #include "src/game/effect/effect_util_fn_801316A8.inc"
@@ -3549,75 +3558,82 @@ u32 fn_80135F58(u32 index, u32 sub) {
 #endif
 
 /* 0x80135F90 | 0x2C */
-/* Get the u16 at offset 0x4 in an effect table entry (stride 0xA). */
+/* Get the linked effect index from the effect status table. */
+#pragma scheduling on
 u32 fn_80135F90(u32 index) {
-    extern u8 lbl_80363B18[];
+    extern EffectStatusTableEntry lbl_80363B18[];
     extern u32 lbl_80478B88;
 
     if (index > lbl_80478B88) {
         return 0;
     }
-    return *(u16*)(lbl_80363B18 + index * 0xA + 0x4);
+    return lbl_80363B18[index].linkedIndex;
 }
+#pragma scheduling off
 
 /* 0x80135FBC | 0x3C
- * Get a s16 value from the effect table at offset 0x6 + subIndex*2.
- * Returns 0 if index or subIndex is out of range.
+ * Get a signed status parameter from the effect status table.
  */
 #pragma scheduling on
 #pragma push
 #pragma scheduling on
 #pragma fp_contract on
 s32 fn_80135FBC(u32 index, u32 subIndex) {
-    extern u8 lbl_80363B18[];
+    extern EffectStatusTableEntry lbl_80363B18[];
     extern u32 lbl_80478B88;
+    s16* effectParams;
 
     if (index > lbl_80478B88 || subIndex > 2) {
         return 0;
     }
-    return *(s16*)(lbl_80363B18 + index * 0xA + subIndex * 2 + 0x6);
+    /* subIndex 2 is valid in the original table and reads the next signed halfword. */
+    effectParams = &lbl_80363B18[index].amount;
+    return effectParams[subIndex];
 }
 #pragma pop
 #pragma scheduling off
 
-/* 0x80135FF8 | 0x2C
- * Get the u8 at offset 0x1 in an effect table entry (stride 0xA).
- */
+/* 0x80135FF8 | 0x2C */
+/* Get the status update mode from the effect status table. */
+#pragma scheduling on
 u32 fn_80135FF8(u32 index) {
-    extern u8 lbl_80363B18[];
+    extern EffectStatusTableEntry lbl_80363B18[];
     extern u32 lbl_80478B88;
 
     if (index > lbl_80478B88) {
         return 0;
     }
-    return *(u8*)(lbl_80363B18 + index * 0xA + 0x1);
+    return lbl_80363B18[index].mode;
 }
+#pragma scheduling off
 
-/* 0x80136024 | 0x2C
- * Get the u16 at offset 0x2 in an effect table entry (stride 0xA).
- */
+/* 0x80136024 | 0x2C */
+/* Get the status sub-type from the effect status table. */
+#pragma scheduling on
 u32 fn_80136024(u32 index) {
-    extern u8 lbl_80363B18[];
+    extern EffectStatusTableEntry lbl_80363B18[];
     extern u32 lbl_80478B88;
 
     if (index > lbl_80478B88) {
         return 0;
     }
-    return *(u16*)(lbl_80363B18 + index * 0xA + 0x2);
+    return lbl_80363B18[index].statusSub;
 }
+#pragma scheduling off
 
-/* 0x80136050 | 0x28
- * Get the u8 at offset 0x0 in an effect table entry (stride 0xA).
- */
+/* 0x80136050 | 0x28 */
+/* Get the status kind from the effect status table. */
+#pragma scheduling on
 u32 fn_80136050(u32 index) {
-    extern u8 lbl_80363B18[];
+    extern EffectStatusTableEntry lbl_80363B18[];
     extern u32 lbl_80478B88;
 
     if (index > lbl_80478B88) {
         return 0;
     }
-    return *(u8*)(lbl_80363B18 + index * 0xA);
+    return lbl_80363B18[index].statusKind;
 }
+#pragma scheduling off
 
 /* 0x80136078 | 0xC4 */
 #if 0

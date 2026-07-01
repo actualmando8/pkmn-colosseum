@@ -982,10 +982,9 @@ void fn_80112F8C(void) {
     void* obj;
 
     obj = fn_801157B0();
-    if (obj == (void*)0) {
-        return;
+    if (obj != NULL) {
+        GSthreadCreate(1, fn_800FF560(), 0x4000, 1, 1, obj);
     }
-    GSthreadCreate(1, fn_800FF560(), 0x4000, 1, 1, obj);
     fn_800FF0A0(fn_80112F8C);
 }
 #pragma pop

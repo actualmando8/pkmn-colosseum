@@ -1,0 +1,430 @@
+# Fable 5 Type Recovery Campaign
+
+This document is the operating guide for using Fable 5 on hard
+decompilation targets. The goal is to turn wall functions into engineering
+work: recover types, structs, callbacks, flags, and tables first; then use
+that recovered model to match smaller functions and eventually larger ones.
+
+The first campaign is the people / field people system because the active
+tree already contains useful recovery scaffolding in `include/game/people/`.
+
+## Non-Negotiable Rules
+
+- Do not add, edit, stage, or commit `.inc` files.
+- Do not count asm wrappers, inline asm, or included assembly as progress.
+- Do not bulk-import archived campaign material into the active tree.
+- Do not rename symbols, change splits, or flip object status without a
+  concrete build/report reason.
+- Preserve address traceability. Keep `fn_XXXXXXXX` in comments or adjacent
+  declarations until the semantic name is well proven.
+- Treat generated or historical `build/band_*` patches as evidence only. They
+  are not accepted source of truth until revalidated against current source,
+  headers, symbols, and report output.
+- Before touching source, check `git status --short` and avoid unrelated dirty
+  files.
+
+## Baseline Workflow
+
+Each Fable pass starts by refreshing local context from current repo truth:
+
+```bash
+git status --short
+python3 configure.py --no-progress
+ninja all_source build/GC6E01/report.json
+```
+
+Use `build/GC6E01/report.json` as the active progress source. Do not use old
+campaign metrics as current truth.
+
+Useful read-only inputs:
+
+- `config/GC6E01/symbols.txt`
+- `config/GC6E01/splits.txt`
+- `build/GC6E01/report.json`
+- `build/GC6E01/asm/...` generated assembly
+- committed headers under `include/`
+- active source under `src/`
+- historical `build/band_*` JSON files, only as untrusted hints
+- archived material, only for comparison and attribution evidence
+
+## Evidence Hierarchy
+
+Use the strongest available evidence first:
+
+1. Direct stores/loads in init, reset, copy, and allocator functions.
+2. Callsite argument types and return value usage across multiple functions.
+3. Strings, asserts, debug messages, and known SDK/HSD naming patterns.
+4. Repeated stride/index patterns proving array element size.
+5. Known external tools or community data, with the source named in a comment.
+6. Historical patches or decompiler guesses, only after current evidence agrees.
+
+Confidence levels:
+
+- `A`: Proven by init/reset/copy plus at least one independent use.
+- `B`: Proven by repeated callsites or a decisive string/assert/table.
+- `C`: Likely shape/type, but semantic name is not proven.
+- `D`: Placeholder only. Keep `field_XX`, `unk_XX`, or padding.
+
+Only promote a field from `field_XX` to a semantic name at `A` or strong `B`.
+For `C` and `D`, keep conservative names and record the uncertainty.
+
+## Audit Ledger Format
+
+Every type audit should produce a ledger before source changes. Keep it in the
+Fable response or a follow-up doc section if the campaign is long-running.
+
+Use this table format:
+
+```markdown
+| Struct | Size | Offset | Type | Name | Confidence | Evidence | Notes |
+| --- | ---: | ---: | --- | --- | --- | --- | --- |
+| PeopleFieldWork | 0x404 | 0x0F4 | s32 | entityID | A | fn_8014D000, fn_801557EC | -1 means free/unassigned |
+```
+
+For functions/prototypes:
+
+```markdown
+| Address | Proposed name | Prototype | Confidence | Evidence | Callers |
+| --- | --- | --- | --- | --- | --- |
+| fn_80144574 | peopleFieldSpawnMain | void (*)(PeopleFieldEntry*) | C | stores into PeopleFieldWork | TBD |
+```
+
+For enums/flags:
+
+```markdown
+| Name | Value/Mask | Confidence | Evidence | Meaning |
+| --- | ---: | --- | --- | --- |
+| PEOPLE_STATE_IDLE | 0 | B | switches on +0x54 | idle/default state |
+```
+
+## Fable Prompt: Type Audit
+
+Use this prompt before asking Fable to match hard functions:
+
+```text
+You are auditing types, not trying to force a byte match yet.
+
+Target:
+- File:
+- Function/address:
+- Related headers:
+- Related report unit:
+
+Rules:
+- Do not add asm, .inc files, or asm wrappers.
+- Do not claim progress from wrappers or included assembly.
+- Do not rename symbols or split ranges unless there is a concrete report reason.
+- Preserve address traceability in comments.
+- Treat build/band_* patches as untrusted hints only.
+
+Tasks:
+1. List every struct-like base pointer used by the target.
+2. Build an offset table for each base pointer.
+3. Identify init/reset/copy/allocation functions that prove field types.
+4. Identify callbacks, function-pointer fields, enums, flags, tables, and strides.
+5. Propose minimal typedef/prototype/header changes.
+6. Keep unknown fields as field_XX or unk_XX unless semantic evidence is strong.
+7. List smaller functions that should become easier after these types.
+8. List open questions and the evidence needed to answer them.
+```
+
+## Fable Prompt: Implement Proven Types
+
+Use this only after an audit ledger is reviewed:
+
+```text
+Implement only the proven type/prototype changes from this ledger.
+
+Constraints:
+- Keep edits scoped to headers and source needed by the audited subsystem.
+- Keep field names conservative unless confidence is A or strong B.
+- Preserve address comments for renamed functions.
+- Do not edit .inc files.
+- Do not add inline asm or wrappers.
+- Do not touch unrelated dirty files.
+
+After changes:
+- Run python3 configure.py --no-progress.
+- Run ninja all_source build/GC6E01/report.json.
+- Run git diff --check.
+- Summarize report impact and any remaining unmatched targets.
+```
+
+## Fable Prompt: Matching After Type Recovery
+
+Use this only for small or near-miss targets:
+
+```text
+Use the recovered structs/types to match this function.
+
+Target:
+- File:
+- Function/address:
+- Size:
+- Current fuzzy percent:
+
+Rules:
+- Prefer readable C using recovered types.
+- No asm wrappers, inline asm, or .inc includes.
+- Do not broaden the patch beyond this target unless a prototype/header fix is
+  required by the recovered type model.
+- If the match appears blocked by an unproven field or bad prototype, stop and
+  return a type-audit note instead of guessing.
+
+Validation:
+- Build the smallest target available.
+- Then run ninja all_source build/GC6E01/report.json.
+- Report exact command failures if any.
+```
+
+## People-First Campaign
+
+Primary files:
+
+- `include/game/people/people.h`
+- `include/game/people/people_field.h`
+- `src/game/people/people_data.c`
+- `src/game/people/people_field.c`
+
+Supporting files:
+
+- `include/game/script/script.h`
+- `include/game/gs_thread.h`
+- `include/game/gs_model.h`
+- `include/game/world/gs_field.h`
+- `config/GC6E01/symbols.txt`
+- `build/GC6E01/asm/game/people/people_field.s`
+
+Primary recovered structs to audit:
+
+- `PeopleEntry`, size `0xDC`
+- `PeopleOpenWork`
+- `PeopleFieldEntry`, size `0x28`
+- `PeopleFieldWork`, expected size `0x404`
+
+First audit functions:
+
+- `fn_80144574` / `peopleFieldSpawnMain`: large spawn/setup function.
+- `fn_8014D000` / `peopleFieldSystemInit`: allocation/init evidence.
+- `fn_801557EC` / `peopleFieldResetState`: reset/default field evidence.
+- `fn_8015B250` / `peopleFieldScriptMain`: script state and command evidence.
+- `fn_801603C0` / `peopleFieldMotionUpdate`: motion field evidence.
+- `fn_80162A58` / `peopleFieldMoveApply`: position/motion arguments.
+- `fn_80164DD0` / `peopleFieldAnimInterp`: animation interpolation fields.
+
+Do not start by rewriting `fn_80144574` or `fn_8015B250`. Start by extracting
+field evidence from them.
+
+### People Pass 1: Confirm Layouts
+
+For each people struct:
+
+- Confirm total size from allocation stride, array indexing, or memset/copy.
+- Confirm pointer fields by callsite use.
+- Confirm scalar width by load/store instruction width.
+- Confirm signedness only when comparisons, sign-extension, or API use proves it.
+- Confirm float fields only when used by float ops or passed to float APIs.
+- Split padding from unknown fields only when access boundaries prove it.
+
+Expected outputs:
+
+- Updated ledger for `PeopleEntry`.
+- Updated ledger for `PeopleFieldEntry`.
+- Updated ledger for `PeopleFieldWork`.
+- List of fields whose current names are overconfident and should be demoted.
+- List of fields whose semantic names are now justified.
+
+### People Pass 2: Prototypes and Callbacks
+
+Audit function signatures around the people system:
+
+- Identify which functions take `PeopleEntry*`, `PeopleFieldEntry*`, or
+  `PeopleFieldWork*`.
+- Identify callback fields and their call signatures.
+- Identify script command handlers and command byte/enums.
+- Identify model, motion, floor, and script API boundaries.
+
+Expected outputs:
+
+- Prototype ledger.
+- Callback signature ledger.
+- Minimal header changes required before matching.
+
+### People Pass 3: Tables, Flags, and Enums
+
+Audit:
+
+- state fields
+- motion type fields
+- animation bank/slot fields
+- flags and bitmasks
+- script command values
+- array/table strides
+- global pointers and counts
+
+Use conservative enum names until strings or clear behavior justify stronger
+names.
+
+Expected outputs:
+
+- Enum/flag ledger.
+- Table/stride ledger.
+- Candidate constants for headers.
+
+### People Pass 4: Small Matching Targets
+
+Only after the relevant types are audited, attack small targets first.
+
+Initial people-field candidates from the current report snapshot:
+
+- `fn_801631AC`: 20 bytes, high fuzzy.
+- `fn_801628C8`: 60 bytes, high fuzzy.
+- `fn_80162FB0`: 92 bytes, high fuzzy.
+- `fn_80162EB8`: 144 bytes, high fuzzy.
+- `fn_80162370`: 184 bytes, high fuzzy.
+
+Also consider `people_data.c` accessors/allocation helpers once `PeopleEntry`
+and `PeopleFieldEntry` are validated, because they have many callers and help
+propagate types.
+
+Avoid these until later:
+
+- `fn_80144574`
+- `fn_801557EC`
+- `fn_8015B250`
+- `fn_801603C0`
+
+Those are evidence sources first and matching targets later.
+
+## General Hard-Function Campaign Order
+
+After people-first has produced usable types, apply the same pattern to other
+walls:
+
+1. `people_field`: runtime NPC/work/script state.
+2. `colosseum_event`: high fuzzy, many functions, likely benefits from event
+   context and table recovery.
+3. `pokemon` and `trainer`: high fuzzy and many data-table relationships.
+4. `gs_field_world`: large but many matched functions; needs world/floor
+   context structs.
+5. `gs_render` and HSD render objects: type-heavy, best after HSD headers are
+   audited.
+6. `battle_waza` and `colosseum_battle`: defer until battle Pokemon, move,
+   effect, and script data models are stronger.
+7. `hsd_texp`: defer unless doing a dedicated HSD texture expression campaign.
+
+## Source Change Rules
+
+When implementing recovered types:
+
+- Prefer updating existing headers over adding local duplicate typedefs.
+- If a type is only proven locally, keep it local until multiple files need it.
+- Keep unknown bytes explicit as padding or `field_XX`.
+- Do not change struct packing assumptions without size evidence.
+- Do not rename a function unless it improves callsite clarity and evidence is
+  recorded.
+- Keep function address comments on nontrivial renames.
+- Avoid sweeping formatting or unrelated cleanup.
+
+When matching:
+
+- Prefer one function or a small family of repeated functions per patch.
+- If a match requires a speculative field name, keep the field generic.
+- If a match requires a questionable prototype, stop and audit the prototype.
+- If a patch only works with inline asm or wrappers, reject it as progress.
+
+## Validation Gates
+
+For documentation-only changes:
+
+```bash
+git diff --check
+```
+
+For type/header/source changes:
+
+```bash
+python3 configure.py --no-progress
+ninja all_source build/GC6E01/report.json
+git diff --check
+```
+
+For matching/source progress:
+
+```bash
+python3 configure.py --no-progress
+ninja all_source build/GC6E01/report.json
+ninja
+python3 configure.py progress
+git diff --check
+```
+
+If any command cannot run, report the exact command and why.
+
+## Acceptance Criteria
+
+A type audit pass is successful when:
+
+- It produces a ledger with confidence levels and evidence functions.
+- It identifies at least one smaller matching target enabled by the recovered
+  type information.
+- It avoids speculative semantic names.
+- It does not edit `.inc` files or add assembly wrappers.
+
+A source/type implementation pass is successful when:
+
+- The report regenerates.
+- The edited types are used by real source or unlock clear follow-up targets.
+- The patch is scoped to the audited subsystem.
+- Existing unrelated dirty files are untouched.
+
+A hard-function campaign is successful when:
+
+- Raw pointer arithmetic decreases over time.
+- Shared prototypes become more accurate.
+- Small functions start matching before giant functions are attempted.
+- The work produces reusable type knowledge even when a specific function does
+  not match immediately.
+
+## Fable Handoff Format
+
+Each Fable pass should end with:
+
+```markdown
+## Summary
+- What was audited or matched.
+
+## Proven
+- Fields, prototypes, enums, flags, or tables now proven.
+
+## Changed Files
+- Files changed, or "none" for audit-only.
+
+## Validation
+- Commands run and results.
+
+## Next Targets
+- Specific functions or structs for the next pass.
+
+## Open Questions
+- Unknowns blocking the next match.
+```
+
+## Current First Task For Fable
+
+Start with an audit-only pass:
+
+```text
+Audit `PeopleFieldWork` in `include/game/people/people_field.h`.
+
+Use these evidence functions:
+- fn_8014D000 / peopleFieldSystemInit
+- fn_801557EC / peopleFieldResetState
+- fn_8015B250 / peopleFieldScriptMain
+- fn_801603C0 / peopleFieldMotionUpdate
+
+Do not edit source yet.
+Return a field-offset ledger for PeopleFieldWork, identify overconfident field
+names, identify fields safe to promote, and list the smallest people_field
+functions that should be tried after the type audit.
+```
