@@ -70,6 +70,30 @@ typedef struct EffectTraceEntry {
     u8 pad_06[6];
 } EffectTraceEntry;
 
+typedef union EffectParamFirstWord {
+    struct {
+        u8 field_00;
+        u8 field_01;
+        u8 field_02;
+        u8 field_03;
+    } byte;
+    u32 word;
+} EffectParamFirstWord;
+
+typedef struct EffectParamBlock {
+    EffectParamFirstWord word0;
+    u32 field_04;
+    u32 field_08;
+    u32 field_0C;
+    u32 field_10;
+    u32 field_14;
+    f32 field_18;
+    u32 field_1C;
+    u8 field_20;
+    u8 field_21;
+    u8 field_22;
+} EffectParamBlock;
+
 /* ===== Index lookup globals ===== */
 extern GSEffectGlobals lbl_803635C0;  /* effect globals (BSS) */
 extern EffectTraceFxEntry lbl_80363B88[];  /* trace fx table (BSS) */
@@ -3183,49 +3207,49 @@ u8 fn_80135938(void* ptr, u16 effect_type) {
 /* 0x80135A30 | 0x10 | nc_setter */
 void fn_80135A30(void* ptr, u8 val) {
     if (ptr == NULL) { return; }
-    *(u8*)((u8*)ptr + 0x3) = val;
+    ((EffectParamBlock*)ptr)->word0.byte.field_03 = val;
 }
 
 /* 0x80135A40 | 0x10 | nc_setter */
 void fn_80135A40(void* ptr, u8 val) {
     if (ptr == NULL) { return; }
-    *(u8*)((u8*)ptr + 0x2) = val;
+    ((EffectParamBlock*)ptr)->word0.byte.field_02 = val;
 }
 
 /* 0x80135A50 | 0x10 | nc_setter */
 void fn_80135A50(void* ptr, u8 val) {
     if (ptr == NULL) { return; }
-    *(u8*)((u8*)ptr + 0x1) = val;
+    ((EffectParamBlock*)ptr)->word0.byte.field_01 = val;
 }
 
 /* 0x80135A60 | 0x10 | nc_setter */
 void fn_80135A60(void* ptr, u8 val) {
     if (ptr == NULL) { return; }
-    *(u8*)((u8*)ptr + 0x0) = val;
+    ((EffectParamBlock*)ptr)->word0.byte.field_00 = val;
 }
 
 /* 0x80135A70 | 0x18 | nc_getter */
 u8 fn_80135A70(void* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)((u8*)ptr + 0x3);
+    return ((EffectParamBlock*)ptr)->word0.byte.field_03;
 }
 
 /* 0x80135A88 | 0x18 | nc_getter */
 u8 fn_80135A88(void* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)((u8*)ptr + 0x2);
+    return ((EffectParamBlock*)ptr)->word0.byte.field_02;
 }
 
 /* 0x80135AA0 | 0x18 | nc_getter */
 u8 fn_80135AA0(void* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)((u8*)ptr + 0x1);
+    return ((EffectParamBlock*)ptr)->word0.byte.field_01;
 }
 
 /* 0x80135AB8 | 0x18 | nc_getter */
 u8 fn_80135AB8(void* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)((u8*)ptr + 0x0);
+    return ((EffectParamBlock*)ptr)->word0.byte.field_00;
 }
 
 /* 0x80135AD0 | 0x1C */
@@ -3260,43 +3284,43 @@ u32 fn_80135B0C(void* ptr) {
 /* 0x80135B1C | 0x10 | nc_setter */
 void fn_80135B1C(void* ptr, u8 val) {
     if (ptr == NULL) { return; }
-    *(u8*)((u8*)ptr + 0x22) = val;
+    ((EffectParamBlock*)ptr)->field_22 = val;
 }
 
 /* 0x80135B2C | 0x10 | nc_setter */
 void fn_80135B2C(void* ptr, u8 val) {
     if (ptr == NULL) { return; }
-    *(u8*)((u8*)ptr + 0x21) = val;
+    ((EffectParamBlock*)ptr)->field_21 = val;
 }
 
 /* 0x80135B3C | 0x10 | nc_setter */
 void fn_80135B3C(void* ptr, u8 val) {
     if (ptr == NULL) { return; }
-    *(u8*)((u8*)ptr + 0x20) = val;
+    ((EffectParamBlock*)ptr)->field_20 = val;
 }
 
 /* 0x80135B4C | 0x10 | nc_setter */
 void fn_80135B4C(void* ptr, u32 val) {
     if (ptr == NULL) { return; }
-    *(u32*)((u8*)ptr + 0x1C) = val;
+    ((EffectParamBlock*)ptr)->field_1C = val;
 }
 
 /* 0x80135B5C | 0x10 | nc_setter_f */
 void fn_80135B5C(void* ptr, f32 val) {
     if (ptr == NULL) { return; }
-    *(f32*)((u8*)ptr + 0x18) = val;
+    ((EffectParamBlock*)ptr)->field_18 = val;
 }
 
 /* 0x80135B6C | 0x10 | nc_setter */
 void fn_80135B6C(void* ptr, u32 val) {
     if (ptr == NULL) { return; }
-    *(u32*)((u8*)ptr + 0x14) = val;
+    ((EffectParamBlock*)ptr)->field_14 = val;
 }
 
 /* 0x80135B7C | 0x10 | nc_setter */
 void fn_80135B7C(void* ptr, u32 val) {
     if (ptr == NULL) { return; }
-    *(u32*)((u8*)ptr + 0x8) = val;
+    ((EffectParamBlock*)ptr)->field_08 = val;
 }
 
 /* 0x80135B8C | 0x14 */
@@ -3308,21 +3332,21 @@ asm void fn_80135B8C(void) {
 #pragma optimization_level 4
 void fn_80135B8C(void* ptr, u32 unused, u32 a, u32 b) {
     if (ptr == 0) return;
-    *(u32*)((u8*)ptr + 0x4) = b;
-    *(u32*)((u8*)ptr + 0x0) = a;
+    ((EffectParamBlock*)ptr)->field_04 = b;
+    ((EffectParamBlock*)ptr)->word0.word = a;
 }
 #endif
 
 /* 0x80135BA0 | 0x10 | nc_setter */
 void fn_80135BA0(void* ptr, u32 val) {
     if (ptr == NULL) { return; }
-    *(u32*)((u8*)ptr + 0xC) = val;
+    ((EffectParamBlock*)ptr)->field_0C = val;
 }
 
 /* 0x80135BB0 | 24 bytes | beq_default_getter */
 u8 fn_80135BB0(void* ptr) {
     if (ptr == NULL) goto _ret0;
-    return *(u8*)((u8*)ptr + 0x22);
+    return ((EffectParamBlock*)ptr)->field_22;
 _ret0:
     return 0;
 }
@@ -3330,7 +3354,7 @@ _ret0:
 /* 0x80135BC8 | 24 bytes | beq_default_getter */
 u8 fn_80135BC8(void* ptr) {
     if (ptr == NULL) goto _ret0;
-    return *(u8*)((u8*)ptr + 0x21);
+    return ((EffectParamBlock*)ptr)->field_21;
 _ret0:
     return 0;
 }
@@ -3338,7 +3362,7 @@ _ret0:
 /* 0x80135BE0 | 24 bytes | beq_default_getter */
 u8 fn_80135BE0(void* ptr) {
     if (ptr == NULL) goto _ret0;
-    return *(u8*)((u8*)ptr + 0x20);
+    return ((EffectParamBlock*)ptr)->field_20;
 _ret0:
     return 0;
 }
@@ -3346,7 +3370,7 @@ _ret0:
 /* 0x80135BF8 | 24 bytes | beq_default_getter */
 u32 fn_80135BF8(void* ptr) {
     if (ptr == NULL) goto _ret0;
-    return *(u32*)((u8*)ptr + 0x1C);
+    return ((EffectParamBlock*)ptr)->field_1C;
 _ret0:
     return 0;
 }
@@ -3360,7 +3384,7 @@ asm f32 fn_80135C10(void* ptr) {
 #else
 f32 fn_80135C10(void* ptr) {
     if (ptr != NULL) {
-        return *(f32*)((u8*)ptr + 0x18);
+        return ((EffectParamBlock*)ptr)->field_18;
     }
     return lbl_8047D110;
 }
@@ -3369,7 +3393,7 @@ f32 fn_80135C10(void* ptr) {
 /* 0x80135C28 | 24 bytes | beq_default_getter */
 u32 fn_80135C28(void* ptr) {
     if (ptr == NULL) goto _ret0;
-    return *(u32*)((u8*)ptr + 0x14);
+    return ((EffectParamBlock*)ptr)->field_14;
 _ret0:
     return 0;
 }
@@ -3377,7 +3401,7 @@ _ret0:
 /* 0x80135C40 | 24 bytes | beq_default_getter */
 u32 fn_80135C40(void* ptr) {
     if (ptr == NULL) goto _ret0;
-    return *(u32*)((u8*)ptr + 0x8);
+    return ((EffectParamBlock*)ptr)->field_08;
 _ret0:
     return 0;
 }
@@ -3399,7 +3423,7 @@ u64 fn_80135C58(u32* p) {
 /* 0x80135C78 | 24 bytes | beq_default_getter */
 u32 fn_80135C78(void* ptr) {
     if (ptr == NULL) goto _ret0;
-    return *(u32*)((u8*)ptr + 0xC);
+    return ((EffectParamBlock*)ptr)->field_0C;
 _ret0:
     return 0;
 }

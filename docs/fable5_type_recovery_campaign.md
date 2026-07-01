@@ -488,3 +488,21 @@ Validation result:
 
 - All six focused objdiff checks stayed `100.0%`.
 - `main/game/effect/effect_util` unit metrics stayed unchanged.
+
+## Subagent Extrapolation Batch 3, 2026-07-01
+
+Applied after local review:
+
+- `effect_util.c`: introduced `EffectParamBlock` with conservative `field_XX`
+  names for the compact parameter block used by the `fn_80135A30` through
+  `fn_80135C78` accessor cluster.
+- Replaced raw offset reads/writes at `0x00..0x03`, `0x08`, `0x0C`, `0x14`,
+  `0x18`, `0x1C`, and `0x20..0x22` with field access. The first word remains a
+  union because some functions treat it as individual bytes and another stores a
+  whole word.
+
+Validation result:
+
+- Focused objdiff for the exact-match setters/getters stayed `100.0%`.
+- Lower-match default getters stayed at their previous report percentages.
+- `main/game/effect/effect_util` unit metrics stayed unchanged.
