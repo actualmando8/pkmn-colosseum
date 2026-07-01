@@ -6,24 +6,24 @@
     "total_code": 2495108,
     "total_data": 2196256,
     "total_functions": 8603,
-    "total_units": 237
+    "total_units": 239
   },
   "topology_status": {
-    "auto_units": 54,
-    "named_units": 183,
-    "source_backed_units": 163,
-    "auto_code": 2035960,
+    "auto_units": 55,
+    "named_units": 184,
+    "source_backed_units": 164,
+    "auto_code": 2002536,
     "auto_data": 2182883,
-    "auto_functions": 6400
+    "auto_functions": 6274
   },
   "baseline_progress": {
-    "matched_code": "75292",
-    "matched_code_percent": 3.0175848,
+    "matched_code": "79956",
+    "matched_code_percent": 3.2045107,
     "matched_data": "12364",
     "matched_data_percent": 0.56295806,
-    "matched_functions": 1292,
-    "matched_functions_percent": 15.018018,
-    "fuzzy_match_percent": 6.0493684
+    "matched_functions": 1353,
+    "matched_functions_percent": 15.727072,
+    "fuzzy_match_percent": 6.3127494
   },
   "unit_topology": [
     {
@@ -2618,13 +2618,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 392304,
+          "size": 199048,
           "virtual_address": 2148339824
         }
       ],
-      "total_code": 392304,
+      "total_code": 199048,
       "total_data": 0,
-      "total_functions": 1718
+      "total_functions": 720
+    },
+    {
+      "name": "main/game/gs_model",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 33424,
+          "virtual_address": 2148538872
+        }
+      ],
+      "total_code": 33424,
+      "total_data": 0,
+      "total_functions": 126
+    },
+    {
+      "name": "main/auto_01_80109C88_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 159832,
+          "virtual_address": 2148572296
+        }
+      ],
+      "total_code": 159832,
+      "total_data": 0,
+      "total_functions": 872
     },
     {
       "name": "main/game/effect/gs_effect",
