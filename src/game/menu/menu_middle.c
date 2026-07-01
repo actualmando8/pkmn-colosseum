@@ -4605,24 +4605,40 @@ void fn_8006DAE4(void* arg0) {
     extern u32 fn_800FA444(void*);
     extern void fn_80109220(void*, int);
     extern void fn_80070D84(void*, void*, int);
+
+    typedef struct {
+        u8 unk0;
+        s8 unk1;
+        s8 unk2;
+    } arg_state_DAE4;
+
+    typedef struct {
+        u8 unk0[0x4c];
+        u32 field_4c;
+        u8 pad50[2];
+        s16 field_52;
+    } slot_obj_DAE4;
+
     void* a;
     void* b;
     void* c;
-    void* slot;
+    slot_obj_DAE4* slot;
     s32 d29;
     s32 d27;
     s16 cmp;
 
-    if ((s8)*(s8*)((u8*)arg0 + 0x2) == 0) {
-        if ((s8)*(s8*)((u8*)arg0 + 0x1) == 0) {
+    if (((arg_state_DAE4*)arg0)->unk2 == 0) {
+        switch (((arg_state_DAE4*)arg0)->unk1) {
+        case 0:
+        {
             a = fn_801040D0(arg0, 0);
             b = fn_801040D0(arg0, 1);
             c = fn_801040D0(arg0, 2);
             fn_80102868(0xd6, 0, (s16)(s32)fn_801040D0(arg0, 3));
-            slot = fn_801046C8(arg0, 0xe8c);
-            *(u32*)((u8*)slot + 0x4c) = (u32)a;
-            slot = fn_801046C8(arg0, 0xe8d);
-            *(u32*)((u8*)slot + 0x4c) = (u32)b;
+            slot = (slot_obj_DAE4*)fn_801046C8(arg0, 0xe8c);
+            slot->field_4c = (u32)a;
+            slot = (slot_obj_DAE4*)fn_801046C8(arg0, 0xe8d);
+            slot->field_4c = (u32)b;
             cmp = (s16)(u16)fn_800FA444(c);
             d29 = 0;
             d27 = 0;
@@ -4630,12 +4646,14 @@ void fn_8006DAE4(void* arg0) {
                 d29 = -0x14;
                 d27 = -0xa;
             }
-            slot = fn_801046C8(arg0, 0xe8a);
-            *(u32*)((u8*)slot + 0x4c) = (u32)c;
-            *(s16*)((u8*)slot + 0x52) = *(s16*)((u8*)slot + 0x52) + d29;
-            slot = fn_801046C8(arg0, 0xe87);
+            slot = (slot_obj_DAE4*)fn_801046C8(arg0, 0xe8a);
+            slot->field_4c = (u32)c;
+            slot->field_52 = slot->field_52 + d29;
+            slot = (slot_obj_DAE4*)fn_801046C8(arg0, 0xe87);
             fn_80109220(slot, c != 0);
-            *(s16*)((u8*)slot + 0x52) = *(s16*)((u8*)slot + 0x52) + d27;
+            slot->field_52 = slot->field_52 + d27;
+            break;
+        }
         }
     }
     fn_80070D84(arg0, lbl_8026860C, 8);
