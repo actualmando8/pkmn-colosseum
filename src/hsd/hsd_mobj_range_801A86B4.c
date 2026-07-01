@@ -81,7 +81,7 @@ void HSD_ObjSetHeap(void* a, void* b)
 
 /* Address: 0x801AA568 | Size: 0x44  -- PObj class info init (small)
  * (from backup hsd_pobj_disp.c) */
-void ObjInfoInit_802596A4(void)
+void ObjInfoInit_801AA568(void)
 {
     hsdInitClassInfo((void*) lbl_8036CC00,
                      (void*) lbl_8036C638, (char*) lbl_80274EC8,

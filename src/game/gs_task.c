@@ -37,7 +37,7 @@
  *   fn_8000725C  GStask_LoadSlot3           -- archive load helper, slot 3
  *   fn_800072B4  GStask_LoadSlot4           -- archive load helper, slot 4
  *   fn_8000730C  GStask_LoadSlot5           -- archive load helper, slot 5
- *   _dbgMenuFightFightPokemonSelectSub  GStask_InitSceneResources  -- 0x2F8 bytes, resource init
+ *   menuFightPokemonSelectSub  GStask_InitSceneResources  -- 0x2F8 bytes, resource init
  *   fn_8000765C  GStask_ShutdownResources   -- resource cleanup
  *   fn_80007708  GStask_UpdateLoadState     -- resource loading state machine
  *   fn_80007778  GStask_GetLoadFlag0        -- small accessor (0x20 bytes)
@@ -306,7 +306,7 @@ s32 GStask_LoadBattleMenu(void) {
  *   Six nearly identical functions that load archives for slots 0-5,
  *   each following the same load/activate/commit pattern.
  *
- * _dbgMenuFightFightPokemonSelectSub (GStask_InitSceneResources):
+ * menuFightPokemonSelectSub (GStask_InitSceneResources):
  *   0x2F8 bytes. Initializes the resource table for a new scene,
  *   setting up all model/texture/script entries.
  *
@@ -1228,8 +1228,8 @@ s32 fn_80007110(void) {
 #pragma pop
 #endif
 
-/* fn_80007154 - 0x80007154 | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl _dbgMenuFightFightPokemonSelectSub vs bl _dbgMenuFightFightPokemonSelectSub (same addr) */
-extern s32  _dbgMenuFightFightPokemonSelectSub(void);
+/* fn_80007154 - 0x80007154 | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl menuFightPokemonSelectSub vs bl menuFightPokemonSelectSub (same addr) */
+extern s32  menuFightPokemonSelectSub(void);
 extern u32  fn_801F986C(u32 ptr, s32 slot);
 extern u32  lbl_8047A278;
 extern u32  lbl_8047A27C;
@@ -1244,12 +1244,12 @@ s32 fn_80007154(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A27C = fn_801F986C(lbl_8047A278, 5);
     if (lbl_8047A27C == 0) return -1;
-    return _dbgMenuFightFightPokemonSelectSub();
+    return menuFightPokemonSelectSub();
 }
 #pragma pop
 #endif
 
-/* fn_800071AC - 0x800071AC | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl _dbgMenuFightFightPokemonSelectSub vs bl _dbgMenuFightFightPokemonSelectSub (same addr) */
+/* fn_800071AC - 0x800071AC | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl menuFightPokemonSelectSub vs bl menuFightPokemonSelectSub (same addr) */
 #if 0
 asm void fn_800071AC(void) {
 #include "src/game/gs_task_fn_800071AC.inc"
@@ -1261,12 +1261,12 @@ s32 fn_800071AC(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A27C = fn_801F986C(lbl_8047A278, 4);
     if (lbl_8047A27C == 0) return -1;
-    return _dbgMenuFightFightPokemonSelectSub();
+    return menuFightPokemonSelectSub();
 }
 #pragma pop
 #endif
 
-/* fn_80007204 - 0x80007204 | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl _dbgMenuFightFightPokemonSelectSub vs bl _dbgMenuFightFightPokemonSelectSub (same addr) */
+/* fn_80007204 - 0x80007204 | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl menuFightPokemonSelectSub vs bl menuFightPokemonSelectSub (same addr) */
 #if 0
 asm void fn_80007204(void) {
 #include "src/game/gs_task_fn_80007204.inc"
@@ -1278,12 +1278,12 @@ s32 fn_80007204(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A27C = fn_801F986C(lbl_8047A278, 3);
     if (lbl_8047A27C == 0) return -1;
-    return _dbgMenuFightFightPokemonSelectSub();
+    return menuFightPokemonSelectSub();
 }
 #pragma pop
 #endif
 
-/* fn_8000725C - 0x8000725C | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl _dbgMenuFightFightPokemonSelectSub vs bl _dbgMenuFightFightPokemonSelectSub (same addr) */
+/* fn_8000725C - 0x8000725C | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl menuFightPokemonSelectSub vs bl menuFightPokemonSelectSub (same addr) */
 #if 0
 asm void fn_8000725C(void) {
 #include "src/game/gs_task_fn_8000725C.inc"
@@ -1295,12 +1295,12 @@ s32 fn_8000725C(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A27C = fn_801F986C(lbl_8047A278, 2);
     if (lbl_8047A27C == 0) return -1;
-    return _dbgMenuFightFightPokemonSelectSub();
+    return menuFightPokemonSelectSub();
 }
 #pragma pop
 #endif
 
-/* fn_800072B4 - 0x800072B4 | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl _dbgMenuFightFightPokemonSelectSub vs bl _dbgMenuFightFightPokemonSelectSub (same addr) */
+/* fn_800072B4 - 0x800072B4 | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl menuFightPokemonSelectSub vs bl menuFightPokemonSelectSub (same addr) */
 #if 0
 asm void fn_800072B4(void) {
 #include "src/game/gs_task_fn_800072B4.inc"
@@ -1312,12 +1312,12 @@ s32 fn_800072B4(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A27C = fn_801F986C(lbl_8047A278, 1);
     if (lbl_8047A27C == 0) return -1;
-    return _dbgMenuFightFightPokemonSelectSub();
+    return menuFightPokemonSelectSub();
 }
 #pragma pop
 #endif
 
-/* fn_8000730C - 0x8000730C | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl _dbgMenuFightFightPokemonSelectSub vs bl _dbgMenuFightFightPokemonSelectSub (same addr) */
+/* fn_8000730C - 0x8000730C | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl menuFightPokemonSelectSub vs bl menuFightPokemonSelectSub (same addr) */
 #if 0
 asm void fn_8000730C(void) {
 #include "src/game/gs_task_fn_8000730C.inc"
@@ -1329,12 +1329,12 @@ s32 fn_8000730C(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A27C = fn_801F986C(lbl_8047A278, 0);
     if (lbl_8047A27C == 0) return -1;
-    return _dbgMenuFightFightPokemonSelectSub();
+    return menuFightPokemonSelectSub();
 }
 #pragma pop
 #endif
 
-/* _dbgMenuFightFightPokemonSelectSub - 0x80007364 | size: 0x2f8 */
+/* menuFightPokemonSelectSub - 0x80007364 | size: 0x2f8 */
 extern void* fn_801F54A4(s32 a, u16 b, s32 c, s32 d);
 extern void* fn_80205BE8(u32 ctx);
 extern void* fn_801F4460(s32 a, u32 ctx);
@@ -1365,13 +1365,13 @@ extern void fn_80207B5C(void* ptr, u8 a, u16 b);
 extern void fn_80265754(void* ptr, u16 a);
 #if 1
 #if 0
-asm s32 _dbgMenuFightFightPokemonSelectSub(void) {
-#include "src/game/gs_task__dbgMenuFightFightPokemonSelectSub.inc"
+asm s32 menuFightPokemonSelectSub(void) {
+#include "src/game/gs_task_menuFightPokemonSelectSub.inc"
 }
 #endif
 #else
 #pragma peephole off
-s32 _dbgMenuFightFightPokemonSelectSub(u32 ctx) {
+s32 menuFightPokemonSelectSub(u32 ctx) {
     u32 savedId;
     u8 prevLevel;
     void* archive;

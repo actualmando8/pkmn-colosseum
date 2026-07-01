@@ -339,7 +339,7 @@ void tracefxUpdate(void* work);
  *
  * @param gen  Pointer to the generator work structure.
  *
- * Corresponds to generateParticle_801947D4 (5,344 bytes -- one of the largest functions).
+ * Corresponds to generateParticle_8017424C (5,344 bytes -- one of the largest functions).
  * Source file confirmed by rodata string: "generator.c"
  */
 void generatorMain(void* gen);
