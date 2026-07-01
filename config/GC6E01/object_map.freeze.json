@@ -6,24 +6,24 @@
     "total_code": 2495108,
     "total_data": 2196256,
     "total_functions": 8603,
-    "total_units": 230
+    "total_units": 232
   },
   "topology_status": {
-    "auto_units": 51,
-    "named_units": 179,
-    "source_backed_units": 159,
-    "auto_code": 2302564,
+    "auto_units": 52,
+    "named_units": 180,
+    "source_backed_units": 160,
+    "auto_code": 2240628,
     "auto_data": 2182883,
-    "auto_functions": 7398
+    "auto_functions": 7013
   },
   "baseline_progress": {
-    "matched_code": "41024",
-    "matched_code_percent": 1.6441773,
+    "matched_code": "62332",
+    "matched_code_percent": 2.4981685,
     "matched_data": "12364",
     "matched_data_percent": 0.56295806,
-    "matched_functions": 821,
-    "matched_functions_percent": 9.543182,
-    "fuzzy_match_percent": 3.1088755
+    "matched_functions": 1095,
+    "matched_functions_percent": 12.728117,
+    "fuzzy_match_percent": 5.202396
   },
   "unit_topology": [
     {
@@ -2995,13 +2995,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 412664,
+          "size": 4268,
           "virtual_address": 2149586788
         }
       ],
-      "total_code": 412664,
+      "total_code": 4268,
       "total_data": 0,
-      "total_functions": 1550
+      "total_functions": 14
+    },
+    {
+      "name": "main/game/colosseum_event",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 61936,
+          "virtual_address": 2149591056
+        }
+      ],
+      "total_code": 61936,
+      "total_data": 0,
+      "total_functions": 385
+    },
+    {
+      "name": "main/auto_01_80211A00_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 346460,
+          "virtual_address": 2149652992
+        }
+      ],
+      "total_code": 346460,
+      "total_data": 0,
+      "total_functions": 1151
     },
     {
       "name": "main/auto_00_80003100_init",

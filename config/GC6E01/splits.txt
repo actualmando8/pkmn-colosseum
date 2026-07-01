@@ -547,3 +547,6 @@ game/pokemon.c:
 
 game/trainer.c:
 	.text       start:0x801F7F80 end:0x80201764
+
+game/colosseum_event.c:
+	.text       start:0x80202810 end:0x80211A00
