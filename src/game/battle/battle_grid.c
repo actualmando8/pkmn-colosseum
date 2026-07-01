@@ -106,6 +106,16 @@ typedef struct BattleGridTransitionState {
     f32 timer;
 } BattleGridTransitionState;
 
+typedef struct BattleGridCameraWork {
+    u8 pad_00[4];
+    f32 angle;
+    f32 blend;
+    s32 sequenceType;
+    f32 sequenceParam1;
+    f32 sequenceParam2;
+    f32 sequenceTimer;
+} BattleGridCameraWork;
+
 /* =========================================================================
  * NOTE: 0x801C01C8-0x801C0F20 (incl. the real, variadic HSD_ForeachAnim at
  * 0x801C028C) is HSD library code, split into hsd/hsd_aobj_range_801C01C8.c
@@ -921,11 +931,11 @@ void fn_801C431C(s32 arg0) {
  * Address: 0x801C432C | Size: 0xB8
  */
 void fn_801C432C(f32 angle, f32 blend) {
-    u8* cam = (u8*)lbl_80467030;
+    BattleGridCameraWork* cam = (BattleGridCameraWork*)lbl_80467030;
 
     /* Calculate camera position from angle and blend factor */
-    *(f32*)(cam + 0x04) = angle;
-    *(f32*)(cam + 0x08) = blend;
+    cam->angle = angle;
+    cam->blend = blend;
 }
 
 /**
@@ -943,7 +953,7 @@ void* fn_801C43E4(void) {
  * Address: 0x801C43F4 | Size: 0x3DC
  */
 void fn_801C43F4(s32 seqType, f32 param1, f32 param2) {
-    u8* cam = (u8*)lbl_80467030;
+    BattleGridCameraWork* cam = (BattleGridCameraWork*)lbl_80467030;
 
     /* Camera complex movement sequence:
      * seqType 0: Pan to position (param1=angle, param2=speed)
@@ -952,10 +962,10 @@ void fn_801C43F4(s32 seqType, f32 param1, f32 param2) {
      * seqType 3: Shake/vibration (param1=amplitude, param2=frequency)
      * seqType 4: Custom path (param1=pathID, param2=speed)
      */
-    *(s32*)(cam + 0x0C) = seqType;
-    *(f32*)(cam + 0x10) = param1;
-    *(f32*)(cam + 0x14) = param2;
-    *(f32*)(cam + 0x18) = 0.0f; /* reset sequence timer */
+    cam->sequenceType = seqType;
+    cam->sequenceParam1 = param1;
+    cam->sequenceParam2 = param2;
+    cam->sequenceTimer = 0.0f;
 }
 
 /**

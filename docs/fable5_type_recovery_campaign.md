@@ -566,3 +566,19 @@ Validation result:
   prior raw volatile offset form.
 - `main/game/battle/battle_grid` stayed at `13.071283%` fuzzy and
   `5.4287167%` matched code.
+
+## Battle Grid Camera Batch 7, 2026-07-01
+
+Applied after local review:
+
+- `battle_grid.c`: introduced `BattleGridCameraWork` for the camera work block
+  rooted at `lbl_80467030`.
+- Converted `fn_801C432C` and `fn_801C43F4` from raw camera offsets to named
+  `angle`, `blend`, sequence parameter, and sequence timer fields.
+
+Validation result:
+
+- `fn_801C432C` stayed `8.26087%`.
+- `fn_801C43F4` stayed `2.3765182%`.
+- `main/game/battle/battle_grid` stayed at `13.071283%` fuzzy and
+  `5.4287167%` matched code.
