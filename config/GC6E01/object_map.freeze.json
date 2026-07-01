@@ -6,24 +6,24 @@
     "total_code": 2495108,
     "total_data": 2196256,
     "total_functions": 8603,
-    "total_units": 243
+    "total_units": 250
   },
   "topology_status": {
-    "auto_units": 56,
-    "named_units": 187,
-    "source_backed_units": 167,
-    "auto_code": 1824176,
+    "auto_units": 59,
+    "named_units": 191,
+    "source_backed_units": 171,
+    "auto_code": 1645096,
     "auto_data": 2182883,
-    "auto_functions": 5349
+    "auto_functions": 4562
   },
   "baseline_progress": {
-    "matched_code": "163088",
-    "matched_code_percent": 6.53631,
+    "matched_code": "191348",
+    "matched_code_percent": 7.6689267,
     "matched_data": "12364",
     "matched_data_percent": 0.56295806,
-    "matched_functions": 2091,
-    "matched_functions_percent": 24.305475,
-    "fuzzy_match_percent": 11.707951
+    "matched_functions": 2445,
+    "matched_functions_percent": 28.420317,
+    "fuzzy_match_percent": 14.50334
   },
   "unit_topology": [
     {
@@ -850,13 +850,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 300284,
+          "size": 29780,
           "virtual_address": 2147505632
         }
       ],
-      "total_code": 300284,
+      "total_code": 29780,
       "total_data": 0,
-      "total_functions": 756
+      "total_functions": 129
+    },
+    {
+      "name": "main/game/gs_party_access",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2140,
+          "virtual_address": 2147535412
+        }
+      ],
+      "total_code": 2140,
+      "total_data": 0,
+      "total_functions": 25
+    },
+    {
+      "name": "main/auto_01_8000D290_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 268364,
+          "virtual_address": 2147537552
+        }
+      ],
+      "total_code": 268364,
+      "total_data": 0,
+      "total_functions": 602
     },
     {
       "name": "main/game/menu/menu_bag",
@@ -3073,13 +3099,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 135960,
+          "size": 65816,
           "virtual_address": 2149253464
         }
       ],
-      "total_code": 135960,
+      "total_code": 65816,
       "total_data": 0,
-      "total_functions": 338
+      "total_functions": 135
+    },
+    {
+      "name": "main/game/battle/battle_grid",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 19016,
+          "virtual_address": 2149319280
+        }
+      ],
+      "total_code": 19016,
+      "total_data": 0,
+      "total_functions": 61
+    },
+    {
+      "name": "main/auto_01_801C4CB8_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 51128,
+          "virtual_address": 2149338296
+        }
+      ],
+      "total_code": 51128,
+      "total_data": 0,
+      "total_functions": 142
     },
     {
       "name": "main/game/battle/battle_waza",
@@ -3099,13 +3151,26 @@
       "sections": [
         {
           "name": ".text",
-          "size": 72052,
+          "size": 67988,
           "virtual_address": 2149443224
         }
       ],
-      "total_code": 72052,
+      "total_code": 67988,
       "total_data": 0,
-      "total_functions": 188
+      "total_functions": 162
+    },
+    {
+      "name": "main/game/battle/battle_main",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 4064,
+          "virtual_address": 2149511212
+        }
+      ],
+      "total_code": 4064,
+      "total_data": 0,
+      "total_functions": 26
     },
     {
       "name": "main/game/pokemon",
@@ -3164,13 +3229,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 346460,
+          "size": 191424,
           "virtual_address": 2149652992
         }
       ],
-      "total_code": 346460,
+      "total_code": 191424,
       "total_data": 0,
-      "total_functions": 1151
+      "total_functions": 470
+    },
+    {
+      "name": "main/game/colosseum_battle",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 153860,
+          "virtual_address": 2149844416
+        }
+      ],
+      "total_code": 153860,
+      "total_data": 0,
+      "total_functions": 675
+    },
+    {
+      "name": "main/auto_01_80265EC4_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1176,
+          "virtual_address": 2149998276
+        }
+      ],
+      "total_code": 1176,
+      "total_data": 0,
+      "total_functions": 6
     },
     {
       "name": "main/auto_00_80003100_init",

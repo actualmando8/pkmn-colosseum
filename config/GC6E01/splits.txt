@@ -161,6 +161,9 @@ game/data/rodata_80268424.c:
 __init_cpp_exceptions.cpp:
 	.dtors      start:0x80266380 end:0x80266384
 
+game/gs_party_access.c:
+	.text       start:0x8000CA34 end:0x8000D290
+
 game/menu/menu_bag.c:
 	.text       start:0x8004EADC end:0x80051710
 
@@ -560,8 +563,14 @@ hsd/hsd_robj_get_alloc_data.c:
 hsd/hsd_robj_get_alloc_data2.c:
 	.text       start:0x801B014C end:0x801B0158
 
+game/battle/battle_grid.c:
+	.text       start:0x801C0270 end:0x801C4CB8
+
 game/battle/battle_waza.c:
 	.text       start:0x801D1470 end:0x801DE698
+
+game/battle/battle_main.c:
+	.text       start:0x801EF02C end:0x801F000C
 
 game/pokemon.c:
 	.text       start:0x801F000C end:0x801F7F80
@@ -571,3 +580,6 @@ game/trainer.c:
 
 game/colosseum_event.c:
 	.text       start:0x80202810 end:0x80211A00
+
+game/colosseum_battle.c:
+	.text       start:0x802405C0 end:0x80265EC4
