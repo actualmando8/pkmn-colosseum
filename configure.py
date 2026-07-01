@@ -323,6 +323,16 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
+                "dolphin/vi/VI_fn_800AB5B4.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/exi/EXI2_range_800CEA3C.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
                 "dolphin/gx/GX_fn_800B71F0.c",
                 progress_category="sdk",
             ),
