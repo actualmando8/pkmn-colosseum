@@ -332,7 +332,7 @@ asm void fn_80193D30(void) {
 #include "src/hsd/hsd_cobj_fn_80193D30.inc"
 }
 #else
-/* decompiled wrk5: functional (TU not byte-measurable) — CObj destructor:
+/* decompiled wrk5: functional (TU not byte-measurable) - CObj destructor:
    removes its anim, releases the eye/interest WObjs (ref-counted), frees the
    projection matrix, then chains to the parent class destroy method. */
 void fn_80193D30(HSD_CObj* cobj) {
@@ -426,7 +426,8 @@ default_alloc:
     alloc_arg = (void*)lbl_8047B230;
     goto have_arg;
 use_default:
-    alloc_arg = (void*)&lbl_8036C678;
+    info = HSD_CLASS_INFO(&lbl_8036C678);
+    alloc_arg = info;
 have_arg:
     cobj_result = fn_80193828(alloc_arg);
     if (cobj_result == NULL) {
@@ -463,7 +464,7 @@ asm void fn_80194010(void) {
 #include "src/hsd/hsd_cobj_fn_80194010.inc"
 }
 #else
-/* decompiled wrk6: functional (TU not byte-measurable) — CObj class `load`:
+/* decompiled wrk6: functional (TU not byte-measurable) - CObj class `load`:
    initialises a CObj from its descriptor. Copies flags, viewport (s16->f32),
    scissor and near/far; binds the eye/interest WObjs; sets the orientation
    from either an explicit up vector or a roll angle; then installs the
@@ -846,14 +847,17 @@ asm void fn_80194510(void) {
 #include "src/hsd/hsd_cobj_fn_80194510.inc"
 }
 #else
-/* NEAR (W1 reg-permutation in tan-result FP chain): case1 keeps tan in f1, decomp evacuates to f2. */
 f32 fn_80194510(u8* ptr) {
     if (ptr == NULL) {
         return lbl_8047D978;
     }
     switch (ptr[0x50]) {
     case 1:
-        return *(f32*)(ptr + 0x44) * (*(f32*)(ptr + 0x38) * (f32) fn_800CE220(lbl_8047D97C * (lbl_8047D980 * *(f32*)(ptr + 0x40))));
+    {
+        f32 inner = *(f32*)(ptr + 0x38) * (f32) fn_800CE220(lbl_8047D97C * (lbl_8047D980 * *(f32*)(ptr + 0x40)));
+        f32 x44 = *(f32*)(ptr + 0x44);
+        return x44 * inner;
+    }
     case 2:
         return *(f32*)(ptr + 0x4C);
     case 3:
@@ -1009,24 +1013,24 @@ asm void fn_801947C8(void) {
 #include "src/hsd/hsd_cobj_fn_801947C8.inc"
 }
 #else
-/* decompiled wrk8 2026-06-16: functional (TU not byte-measurable) — HSD_CObjSetRoll.
+/* decompiled wrk8 2026-06-16: functional (TU not byte-measurable) - HSD_CObjSetRoll.
    In plain roll mode (flags&1 clear) it just records the roll and marks the
    matrices dirty if it changed. In up-vector mode (flags&1 set) it rebuilds the
-   up-vector that corresponds to `roll` — the same horizon-perp + rotate-about-dir
-   construction as fn_8019513C — then commits it through the (inlined)
+   up-vector that corresponds to `roll` - the same horizon-perp + rotate-about-dir
+   construction as fn_8019513C - then commits it through the (inlined)
    HSD_CObjSetUpVector store logic. The trailing flags&1==0 sub-path is structurally
    dead given the up-vector entry condition but is reproduced faithfully from the asm.
    INFERRED: the near-vertical threshold and the sqrt-degenerate fallback are
    anonymous SDA2 doubles reconstructed by value; lbl_80274654 (up-path assert msg)
-   is an anonymous SDA2 string — all flagged for review. */
+   is an anonymous SDA2 string - all flagged for review. */
 void fn_801947C8(HSD_CObj* cobj, f32 roll)
 {
-    extern f32 lbl_80478AC0;   /* sqrt-degenerate fallback (anonymous SDA2, ~0.0f) — INFERRED */
+    extern f32 lbl_80478AC0;   /* sqrt-degenerate fallback (anonymous SDA2, ~0.0f) - INFERRED */
     extern f32 lbl_80478AC8;   /* degenerate-vector epsilon */
     extern char lbl_8047D958;
     extern char lbl_8047D960;
     extern char lbl_8027464C;  /* OSReport fmt: up-vector degenerate warning */
-    extern char lbl_80274654;  /* up-path __assert message (anonymous SDA2) — INFERRED */
+    extern char lbl_80274654;  /* up-path __assert message (anonymous SDA2) - INFERRED */
     extern f32 sqrtf(f32);
     f32 eye[3];        /* sp+0x14 */
     f32 interest[3];   /* sp+0x20 */
@@ -1063,7 +1067,7 @@ void fn_801947C8(HSD_CObj* cobj, f32 roll)
         }
         if (ok) {
             f32 absy = ((f32 (*)(f32)) fn_800CE59C)(dir[1]); /* fabsf */
-            if (1.0f - absy >= 1e-4f /* near-1 eps — INFERRED */) {
+            if (1.0f - absy >= 1e-4f /* near-1 eps - INFERRED */) {
                 f32 q = dir[0] * dir[0] + dir[2] * dir[2];
                 f32 len = (q > 0.0f) ? sqrtf(q) : lbl_80478AC0;
                 f32 s = -dir[1] / len;
@@ -1264,7 +1268,7 @@ asm void fn_80194DA4(void) {
 #include "src/hsd/hsd_cobj_fn_80194DA4.inc"
 }
 #else
-/* decompiled wrk7: functional (TU not byte-measurable) — HSD_CObjSetUpVector,
+/* decompiled wrk7: functional (TU not byte-measurable) - HSD_CObjSetUpVector,
    the storage twin of the getter fn_80195590. Sets the camera up-vector / roll
    from `up` (r4, a 3-float Vec; inferred f32*).
    - Explicit-up mode (flags & 1 set): guard `up` against the degenerate epsilon
@@ -1281,7 +1285,7 @@ void fn_80194DA4(HSD_CObj* cobj, f32* up)
     extern f32 lbl_8036C6BC[];  /* look-at reference eye vector (shared with fn_80195590) */
     extern f32 lbl_8036C6C8[];  /* look-at reference up vector  (shared with fn_80195590) */
     extern char lbl_8027464C;   /* OSReport fmt: up-vector degenerate warning */
-    extern char lbl_80274654;   /* up-path __assert message (SDA2 r2-23864) — INFERRED name */
+    extern char lbl_80274654;   /* up-path __assert message (SDA2 r2-23864) - INFERRED name */
     f32 epsilon = lbl_80478AC8;
 
     if (cobj == NULL) {
@@ -1384,7 +1388,7 @@ asm void HSD_CObjGetUpVector(void) {
    (flag bit 0 set), copy its x/y/z out and return 1; otherwise derive the up
    vector from the stored roll angle via fn_8019513C and return its result.
    Returns 0 when cobj or the output pointer is NULL.
-   `up` is a 3-float Vec (no Vec type in these headers — inferred f32[3]). */
+   `up` is a 3-float Vec (no Vec type in these headers - inferred f32[3]). */
 int HSD_CObjGetUpVector(HSD_CObj* cobj, f32* up)
 {
     if (cobj == NULL || up == NULL) {
@@ -1413,7 +1417,7 @@ asm void fn_8019513C(void) {
 #include "src/hsd/hsd_cobj_fn_8019513C.inc"
 }
 #else
-/* decompiled wrk8 2026-06-16: functional (TU not byte-measurable) — derives the
+/* decompiled wrk8 2026-06-16: functional (TU not byte-measurable) - derives the
    camera up-vector that corresponds to a roll angle. Builds the eye->interest
    direction; returns 0 if it is degenerate. Otherwise builds a horizon up-vector
    perpendicular to dir (Gram-Schmidt of a world axis against dir, choosing the
@@ -1423,7 +1427,7 @@ asm void fn_8019513C(void) {
    fallback are anonymous SDA2 doubles reconstructed by value (flagged). */
 int fn_8019513C(HSD_CObj* cobj, f32 roll, f32* out)
 {
-    extern f32 lbl_80478AC0;   /* sqrt-degenerate fallback (anonymous SDA2, ~0.0f) — INFERRED */
+    extern f32 lbl_80478AC0;   /* sqrt-degenerate fallback (anonymous SDA2, ~0.0f) - INFERRED */
     extern f32 lbl_80478AC8;   /* degenerate-vector epsilon */
     extern char lbl_8047D958;
     extern char lbl_8047D960;
@@ -1462,7 +1466,7 @@ int fn_8019513C(HSD_CObj* cobj, f32 roll, f32* out)
 
     /* horizon up-vector perpendicular to dir, picking the world axis that
        avoids gimbal lock near a vertical direction. */
-    if (1.0f - (dir[1] < 0.0f ? -dir[1] : dir[1]) >= 1e-4f /* near-1 eps — INFERRED */) {
+    if (1.0f - (dir[1] < 0.0f ? -dir[1] : dir[1]) >= 1e-4f /* near-1 eps - INFERRED */) {
         /* dir not near-vertical: project world up (0,1,0) onto plane perp to dir */
         f32 q = dir[0] * dir[0] + dir[2] * dir[2];
         f32 len = (q > 0.0f) ? sqrtf(q) : lbl_80478AC0;
@@ -1514,11 +1518,11 @@ asm void fn_80195590(void) {
 #include "src/hsd/hsd_cobj_fn_80195590.inc"
 }
 #else
-/* decompiled wrk5: functional (TU not byte-measurable) — computes a roll/twist
+/* decompiled wrk5: functional (TU not byte-measurable) - computes a roll/twist
    angle for the camera. Builds the eye->interest direction; bails (returns 0)
    if it is degenerate (near-zero length, or nearly parallel to `arg`). Otherwise
    builds a reference look-at frame and returns the twist angle of `arg` about it.
-   INFERRED: `arg` (r4) typed as f32* (matrix/vector — exact type uncertain);
+   INFERRED: `arg` (r4) typed as f32* (matrix/vector - exact type uncertain);
    the +/-PI/2 constants below are anonymous SDA2 float literals (r2-0x5CDC /
    r2-0x5CD8) reconstructed by value. Both flagged for orchestrator review. */
 f32 fn_80195590(HSD_CObj* cobj, f32* arg) {
@@ -1735,12 +1739,12 @@ asm void fn_80195A6C(void) {
 #include "src/hsd/hsd_cobj_fn_80195A6C.inc"
 }
 #else
-/* decompiled wrk8 2026-06-16: functional (TU not byte-measurable) — the camera
+/* decompiled wrk8 2026-06-16: functional (TU not byte-measurable) - the camera
    "set current / program GX" dispatcher. Stores `current` (lbl_8047B234), queries
    the active render/projection mode (fn_8019C7B0) and ticks fn_80197400, then
    programs the GX viewport + scissor + projection matrix one of four ways:
      mode 0 : viewport/scissor scaled through the active EFB dims (lbl_80466BC0)
-              and per-axis denominators (lbl_80478C50/C54) — sub-screen render.
+              and per-axis denominators (lbl_80478C50/C54) - sub-screen render.
      mode 1 : delegate to fn_801963E0 (plain EFB-clamped viewport).
      mode 2 : delegate to fn_801960C4 (scissor-box + ratio variant).
      mode 3 : viewport/scissor used directly (no EFB scaling).
@@ -1756,9 +1760,9 @@ int fn_80195A6C(HSD_CObj* cobj)
     extern s32 lbl_80478C50;     /* EFB-relative x denominator */
     extern s32 lbl_80478C54;     /* EFB-relative y denominator */
     extern char lbl_8047D958;
-    extern char lbl_80274680[];  /* HSD_Panic message: bad camera mode — INFERRED name */
-    extern f32 lbl_8047D978;     /* 0.0f (GX near Z) — named SDA2 constant */
-    extern f32 lbl_8047D9B0;     /* 1.0f (GX far Z)  — named SDA2 constant */
+    extern char lbl_80274680[];  /* HSD_Panic message: bad camera mode - INFERRED name */
+    extern f32 lbl_8047D978;     /* 0.0f (GX near Z) - named SDA2 constant */
+    extern f32 lbl_8047D9B0;     /* 1.0f (GX far Z)  - named SDA2 constant */
     int mode;
     int ok;
     int ortho_flag;
@@ -1914,7 +1918,7 @@ asm void fn_80195F0C(u8* ptr) {
 #include "src/hsd/hsd_cobj_fn_80195F0C.inc"
 }
 #else
-/* decompiled wrk5: functional (TU not byte-measurable) — recomputes the camera
+/* decompiled wrk5: functional (TU not byte-measurable) - recomputes the camera
    viewing matrix via C_MTXLookAt when it (or its eye/interest WObjs) is dirty.
    flags: 0x2 = up-to-date, 0x40000000 = force-recompute, 0x80000000 = updated. */
 void fn_80195F0C(HSD_CObj* cobj) {
@@ -1989,7 +1993,7 @@ asm void fn_801960C4(void) {
 #include "src/hsd/hsd_cobj_fn_801960C4.inc"
 }
 #else
-/* decompiled wrk7: functional (TU not byte-measurable) — near-twin of fn_801963E0
+/* decompiled wrk7: functional (TU not byte-measurable) - near-twin of fn_801963E0
    that ALSO programs the GX scissor box. Reads the GX render-mode scan height
    (lbl_80466BC0 + 6, u16) and a guard band `vfilter = height - 8`; returns 0 if the
    viewport bottom is above the band. Clamps cobj->scissor (u16 left/right/top/
@@ -2108,7 +2112,7 @@ asm void fn_801963E0(void) {
 #include "src/hsd/hsd_cobj_fn_801963E0.inc"
 }
 #else
-/* decompiled wrk7: functional (TU not byte-measurable) — programs the camera's
+/* decompiled wrk7: functional (TU not byte-measurable) - programs the camera's
    GX viewport and projection matrix for the frame (the CObj setup path).
    Returns 0 if the viewport is clipped past the EFB top (viewport.ymin >= EFB
    height); otherwise sets the GX viewport (fn_800BD7A0), invokes the viewport
@@ -2253,18 +2257,18 @@ asm void fn_8019674C(void) {
 #include "src/hsd/hsd_cobj_fn_8019674C.inc"
 }
 #else
-/* decompiled wrk7: functional (TU not byte-measurable) — the CObj `update` method
+/* decompiled wrk7: functional (TU not byte-measurable) - the CObj `update` method
    installed by CObjInfoInit. Dispatches on an animation channel `type` (jumptable
    jumptable_8036C6E0, valid 0..0xC) and applies *(f32*)value to the matching
    camera property. Index->case mapping taken from the jumptable .data dump; bodies
-   match the .inc faithfully. NOTE: interest channels 5/6/7 all overwrite component
-   0 in the original asm (eye channels 1/2/3 write X/Y/Z) — reproduced verbatim,
+   match the recovered instruction flow. NOTE: interest channels 5/6/7 all overwrite
+   component 0 (eye channels 1/2/3 write X/Y/Z) - reproduced verbatim,
    FLAGGED for review (likely an original-game copy/paste artefact). */
 void fn_8019674C(HSD_CObj* cobj, u32 type, void* value)
 {
     f32 v[3];
 
-    if (cobj == NULL || type > 0xC) {
+    if (cobj == NULL) {
         return;
     }
     switch (type) {
@@ -2323,23 +2327,32 @@ void fn_8019674C(HSD_CObj* cobj, u32 type, void* value)
         HSD_WObjSetPosition(cobj->interest, v);
         break;
     case 9: /* roll */
-        ((void (*)(HSD_CObj*, f32)) fn_801947C8)(cobj, *(f32*)value);
+        fn_801947C8(cobj, *(f32*)value);
         break;
     case 10: /* field of view (perspective only) */
+    {
+        f32 temp = *(f32*)value;
         if (cobj != NULL && cobj->projection_type == PROJ_PERSPECTIVE) {
-            cobj->projection_param.perspective.fov = *(f32*)value;
+            cobj->projection_param.perspective.fov = temp;
         }
         break;
+    }
     case 11: /* near clip plane */
+    {
+        f32 temp = *(f32*)value;
         if (cobj != NULL) {
-            cobj->near = *(f32*)value;
+            cobj->near = temp;
         }
         break;
+    }
     case 12: /* far clip plane */
+    {
+        f32 temp = *(f32*)value;
         if (cobj != NULL) {
-            cobj->far = *(f32*)value;
+            cobj->far = temp;
         }
         break;
+    }
     default: /* 0, 4, 8: no-op */
         break;
     }
