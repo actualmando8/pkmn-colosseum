@@ -102,6 +102,16 @@ extern f32   fn_801C4814(s32 slot);                        /* get slot X */
 extern f32   fn_801C483C(s32 slot);                        /* get slot Y */
 extern f32   fn_801C4864(s32 slot);                        /* get slot Z */
 
+/* Waza effect functions (engine callbacks) */
+extern s32   fn_801190DC(s32, s32, s32);
+extern void  fn_80118C88(s32, s32);
+extern void* fn_800EE150(s32, s32);
+extern void  fn_800E01F4(void*, f32, f32);
+extern void  fn_80118FB0(s32, s32, s32, s32, s32, s32);
+extern void  fn_80118D18(s32, s32);
+extern void  fn_80118DE0(s32, void*, s32, s32);
+extern void  fn_800EE828(s32);
+
 /* Forward declarations for converted functions */
 void fn_801D349C(void);
 void fn_801D3F7C(void);
@@ -1220,12 +1230,81 @@ void fn_801D9E34(void* obj) {
  * WAZA EFFECT HELPERS (0x801D9E8C - 0x801DAC78)
  * ========================================================================= */
 
+/* Waza effect data table entry (stride 0xD4) */
+typedef struct WazaEffectTblEntry {
+    /* 0x00 */ u8 pad_00[0x50];
+    /* 0x50 */ s32 val_idx;
+    /* 0x54 */ u8 pad_54[0x80];
+} WazaEffectTblEntry;
+
+/* Waza battle effect object (size 0x8C) */
+typedef struct WazaEffect {
+    /* 0x00 */ u8 pad_00[0x10];
+    /* 0x10 */ s32 scale_selector;          /* selects scale value */
+    /* 0x14 */ u8 pad_14[0x04];
+    /* 0x18 */ u8 flags;                     /* trajectory/flags byte */
+    /* 0x19 */ u8 pad_19[0x0B];
+    /* 0x24 */ s32 handle;                   /* owner handle */
+    /* 0x28 */ u8 pad_28[0x04];
+    /* 0x2C */ WazaEffectTblEntry* table;   /* effect data table */
+    /* 0x30 */ u8 pad_30[0x02];
+    /* 0x32 */ u16 index;                    /* table index */
+    /* 0x34 */ u8 pad_34[0x50];
+    /* 0x84 */ s32 effect_handle;            /* effect handle */
+    /* 0x88 */ u8 pad_88[0x04];
+} WazaEffect;
+
 /**
  * fn_801D9E8C - Waza effect interpolation (position lerp).
  * Address: 0x801D9E8C | Size: 0x188
  */
 void fn_801D9E8C(void* effect) {
-    /* TODO: Effect position lerp (0x188 bytes) */
+    WazaEffect* fx;
+    void* target;
+    s32 ctx;
+    f32 val;
+    u8 scale_buf[4];
+
+    if (effect == NULL) return;
+    fx = (WazaEffect*)effect;
+    ctx = *(s32*)(lbl_80467CC0 + 0xC);
+    if (ctx == 0) return;
+    if (fx->effect_handle != 0) return;
+
+    fx->effect_handle = fn_801190DC(ctx, 0, 0);
+    if (fx->effect_handle == 0) return;
+
+    if ((fx->flags & 1) != 1) {
+        fn_80118C88(fx->effect_handle, 0);
+    }
+
+    {
+        s32 val_idx = fx->table[fx->index].val_idx;
+        if (val_idx > 0) {
+            target = fn_800EE150(fx->handle, val_idx);
+        } else {
+            target = NULL;
+        }
+    }
+
+    if (target == NULL) return;
+
+    switch (fx->scale_selector) {
+    case -2: val = 0.5f;    break;
+    case -1: val = 0.75f;   break;
+    case 0:  val = 1.0f;    break;
+    case 1:  val = 1.3333f; break;
+    case 2:  val = 2.0f;    break;
+    case 3:  val = 3.25f;   break;
+    default: val = 1.0f;    break;
+    }
+
+    fn_800E01F4(scale_buf, val, val);
+
+    fn_80118FB0(fx->effect_handle, (s32)target, 4, 0, 1, 0);
+    fn_80118D18(fx->effect_handle, 1);
+    fn_80118DE0(fx->effect_handle, scale_buf, 1, 0);
+    fn_800EE828((s32)target);
 }
 
 /**

@@ -3581,50 +3581,82 @@ u32 fn_800DADB4(void) {
 extern u16 fn_800E2C04(u32, u32);
 extern u32 lbl_8047AAD8;
 extern u32 lbl_8047AAD4;
-/* fn_800DAF60 @ 98.53: for(count=lbl;count!=0;count--)+goto gives the
- * target's mtctr/bdnz free-slot scan. Residual = entry `ble` vs `beq`
- * (target's signed `> 0` guard conflicts with the unsigned bdnz the same
- * counter needs ? (s32)count>0 regresses) + the loop-body branch fusion
- * (target `bne tail; b found` vs CW's fused `beq found`). Both
- * compiler-internal; not jointly C-controllable. */
+typedef struct GSgfxDLCapture {
+    u8 active;
+    u8 overflow;
+    u16 handle;
+    u32 data;
+    u32 size;
+    u32 pipeline;
+    u32 totalVerts;
+    u32 totalPrims;
+} GSgfxDLCapture;
+
+typedef struct GSgfxCaptureState {
+    u8 pad_000[0x47e];
+    u8 captureActive;
+    u8 pad_47f;
+    GSgfxDLCapture* currentCapture;
+    u32 writePtr;
+    u8 pad_488[0x17];
+    u8 pending;
+} GSgfxCaptureState;
+
+static inline GSgfxDLCapture* GSgfxFindFreeDLCapture(GSgfxDLCapture* capture) {
+    u32 i;
+
+    for (i = 0; i < lbl_8047AAD8; i++) {
+        if (capture->active == 0) {
+            return capture;
+        }
+        capture++;
+    }
+    return 0;
+}
+
+/* fn_800DAF60: inlined free-capture helper preserves target mtctr/bdnz
+ * slot scan and the un-fused found/not-found branch shape. */
 #if 0
 asm void fn_800DAF60(void) {
 #include "src/game/gs_render_fn_800DAF60.inc"
 }
 #else
 u32 fn_800DAF60(u32 a, u32 b) {
-    u32 r29; u32 r30; u32 r31;
-    u32 count;
+    u32 r29; u32 r30;
+    GSgfxDLCapture* r31;
     r29 = a; r30 = b;
     {
-        u32 s = lbl_8047AA80;
-        if (*(u8*)(s + 0x47e) == 1) { return 0; }
-        if (*(u8*)(s + 0x49f) == 1) { return 0; }
+        GSgfxCaptureState* s = (GSgfxCaptureState*)lbl_8047AA80;
+        if (s->captureActive == 1) { return 0; }
+        if (s->pending == 1) { return 0; }
     }
-    r31 = lbl_8047AAD4;
-    for (count = lbl_8047AAD8; count != 0; count--) {
-        if (*(u8*)r31 == 0) { goto _found; }
-        r31 += 0x18;
-    }
-    r31 = 0;
-_found:
+    r31 = GSgfxFindFreeDLCapture((GSgfxDLCapture*)lbl_8047AAD4);
     if (r31 == 0) { return 0; }
-    *(u8*)(r31 + 0x0) = 1;
-    *(u8*)(r31 + 0x1) = 0;
-    *(u32*)(r31 + 0x10) = 0;
-    *(u32*)(r31 + 0x14) = 0;
-    *(u16*)(r31 + 0x2) = fn_800E2C04(r30, 0x20);
-    if (*(u16*)(r31 + 0x2) == 0) { return 0; }
-    *(u32*)(r31 + 0x8) = r30;
-    *(u32*)(r31 + 0x4) = (u32)fn_800E27B0(*(u16*)(r31 + 0x2));
-    if (*(u32*)(r31 + 0x4) == 0) {
-        fn_800E209C(*(u16*)(r31 + 0x2));
+    r31->active = 1;
+    r31->overflow = 0;
+    r31->totalVerts = 0;
+    r31->totalPrims = 0;
+    r31->handle = fn_800E2C04(r30, 0x20);
+    if (r31->handle == 0) { return 0; }
+    r31->size = r30;
+    r31->data = (u32)fn_800E27B0(r31->handle);
+    if (r31->data == 0) {
+        fn_800E209C(r31->handle);
         return 0;
     }
-    *(u32*)(r31 + 0xc) = r29;
-    { u32 s = lbl_8047AA80; *(u8*)(s + 0x47e) = 1; }
-    { u32 s = lbl_8047AA80; *(u32*)(s + 0x480) = r31; }
-    { u32 s = lbl_8047AA80; *(u32*)(s + 0x484) = *(u32*)(r31 + 0x4); }
+    r31->pipeline = r29;
+    {
+        GSgfxCaptureState* s = (GSgfxCaptureState*)lbl_8047AA80;
+        s->captureActive = 1;
+    }
+    {
+        GSgfxCaptureState* s = (GSgfxCaptureState*)lbl_8047AA80;
+        s->currentCapture = r31;
+    }
+    {
+        GSgfxCaptureState* s = (GSgfxCaptureState*)lbl_8047AA80;
+        s->writePtr = r31->data;
+    }
     return 1;
 }
 #endif
