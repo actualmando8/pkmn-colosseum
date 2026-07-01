@@ -6,24 +6,24 @@
     "total_code": 2495108,
     "total_data": 2196256,
     "total_functions": 8603,
-    "total_units": 241
+    "total_units": 242
   },
   "topology_status": {
     "auto_units": 56,
-    "named_units": 185,
-    "source_backed_units": 165,
-    "auto_code": 1972696,
+    "named_units": 186,
+    "source_backed_units": 166,
+    "auto_code": 1938724,
     "auto_data": 2182883,
-    "auto_functions": 6174
+    "auto_functions": 6083
   },
   "baseline_progress": {
-    "matched_code": "81748",
-    "matched_code_percent": 3.276331,
+    "matched_code": "90208",
+    "matched_code_percent": 3.6153946,
     "matched_data": "12364",
     "matched_data_percent": 0.56295806,
-    "matched_functions": 1400,
-    "matched_functions_percent": 16.273394,
-    "fuzzy_match_percent": 6.789346
+    "matched_functions": 1452,
+    "matched_functions_percent": 16.877832,
+    "fuzzy_match_percent": 7.3115745
   },
   "unit_topology": [
     {
@@ -2709,13 +2709,26 @@
       "sections": [
         {
           "name": ".text",
-          "size": 38004,
+          "size": 4032,
           "virtual_address": 2148757780
         }
       ],
-      "total_code": 38004,
+      "total_code": 4032,
       "total_data": 0,
-      "total_functions": 101
+      "total_functions": 10
+    },
+    {
+      "name": "main/game/effect/effect_visual",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 33972,
+          "virtual_address": 2148761812
+        }
+      ],
+      "total_code": 33972,
+      "total_data": 0,
+      "total_functions": 91
     },
     {
       "name": "main/game/people/people_data",
