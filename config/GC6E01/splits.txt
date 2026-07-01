@@ -476,6 +476,9 @@ dolphin/si/SI_fn_800D104C.c:
 game/effect/gs_effect.c:
 	.text       start:0x80130CE0 end:0x8013151C
 
+game/effect/effect_util.c:
+	.text       start:0x8013151C end:0x80137114
+
 game/sound/sound.c:
 	.text       start:0x801653BC end:0x801653CC
 

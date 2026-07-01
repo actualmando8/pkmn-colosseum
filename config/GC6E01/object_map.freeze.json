@@ -6,24 +6,24 @@
     "total_code": 2495108,
     "total_data": 2196256,
     "total_functions": 8603,
-    "total_units": 229
+    "total_units": 230
   },
   "topology_status": {
     "auto_units": 51,
-    "named_units": 178,
-    "source_backed_units": 158,
-    "auto_code": 2326108,
+    "named_units": 179,
+    "source_backed_units": 159,
+    "auto_code": 2302564,
     "auto_data": 2182883,
-    "auto_functions": 7605
+    "auto_functions": 7398
   },
   "baseline_progress": {
-    "matched_code": "34124",
-    "matched_code_percent": 1.3676362,
+    "matched_code": "41024",
+    "matched_code_percent": 1.6441773,
     "matched_data": "12364",
     "matched_data_percent": 0.56295806,
-    "matched_functions": 673,
-    "matched_functions_percent": 7.8228526,
-    "fuzzy_match_percent": 2.546907
+    "matched_functions": 821,
+    "matched_functions_percent": 9.543182,
+    "fuzzy_match_percent": 3.1088755
   },
   "unit_topology": [
     {
@@ -2640,17 +2640,30 @@
       "total_functions": 10
     },
     {
-      "name": "main/auto_01_8013151C_text",
+      "name": "main/game/effect/effect_util",
       "sections": [
         {
           "name": ".text",
-          "size": 212640,
+          "size": 23544,
           "virtual_address": 2148734236
         }
       ],
-      "total_code": 212640,
+      "total_code": 23544,
       "total_data": 0,
-      "total_functions": 762
+      "total_functions": 207
+    },
+    {
+      "name": "main/auto_01_80137114_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 189096,
+          "virtual_address": 2148757780
+        }
+      ],
+      "total_code": 189096,
+      "total_data": 0,
+      "total_functions": 555
     },
     {
       "name": "main/game/sound/sound",
