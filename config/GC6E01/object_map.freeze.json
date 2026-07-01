@@ -6,24 +6,24 @@
     "total_code": 2495108,
     "total_data": 2196256,
     "total_functions": 8603,
-    "total_units": 220
+    "total_units": 226
   },
   "topology_status": {
-    "auto_units": 47,
-    "named_units": 173,
-    "source_backed_units": 134,
-    "auto_code": 2400120,
+    "auto_units": 50,
+    "named_units": 176,
+    "source_backed_units": 156,
+    "auto_code": 2397620,
     "auto_data": 2182883,
-    "auto_functions": 8206
+    "auto_functions": 8193
   },
   "baseline_progress": {
-    "matched_code": "3496",
-    "matched_code_percent": 0.14011417,
+    "matched_code": "11444",
+    "matched_code_percent": 0.4586575,
     "matched_data": "12364",
     "matched_data_percent": 0.56295806,
-    "matched_functions": 110,
-    "matched_functions_percent": 1.2786237,
-    "fuzzy_match_percent": 0.37823454
+    "matched_functions": 184,
+    "matched_functions_percent": 2.1387887,
+    "fuzzy_match_percent": 0.65501136
   },
   "unit_topology": [
     {
@@ -1487,13 +1487,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 52508,
+          "size": 4320,
           "virtual_address": 2148181204
         }
       ],
-      "total_code": 52508,
+      "total_code": 4320,
       "total_data": 0,
-      "total_functions": 166
+      "total_functions": 11
+    },
+    {
+      "name": "main/dolphin/vi/VI_fn_800AB5B4",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 96,
+          "virtual_address": 2148185524
+        }
+      ],
+      "total_code": 96,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_800AB614_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 48092,
+          "virtual_address": 2148185620
+        }
+      ],
+      "total_code": 48092,
+      "total_data": 0,
+      "total_functions": 154
     },
     {
       "name": "main/dolphin/gx/GX_fn_800B71F0",
@@ -2462,13 +2488,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 3884,
+          "size": 608,
           "virtual_address": 2148329436
         }
       ],
-      "total_code": 3884,
+      "total_code": 608,
       "total_data": 0,
-      "total_functions": 16
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/exi/EXI2_range_800CEA3C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 296,
+          "virtual_address": 2148330044
+        }
+      ],
+      "total_code": 296,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/auto_01_800CEB64_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2980,
+          "virtual_address": 2148330340
+        }
+      ],
+      "total_code": 2980,
+      "total_data": 0,
+      "total_functions": 13
     },
     {
       "name": "main/dolphin/si/SI_fn_800CF708",
@@ -2566,13 +2618,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 607052,
+          "size": 392304,
           "virtual_address": 2148339824
         }
       ],
-      "total_code": 607052,
+      "total_code": 392304,
       "total_data": 0,
-      "total_functions": 2490
+      "total_functions": 1718
+    },
+    {
+      "name": "main/game/effect/gs_effect",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2108,
+          "virtual_address": 2148732128
+        }
+      ],
+      "total_code": 2108,
+      "total_data": 0,
+      "total_functions": 10
+    },
+    {
+      "name": "main/auto_01_8013151C_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 212640,
+          "virtual_address": 2148734236
+        }
+      ],
+      "total_code": 212640,
+      "total_data": 0,
+      "total_functions": 762
     },
     {
       "name": "main/game/sound/sound",
