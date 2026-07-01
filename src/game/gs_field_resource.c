@@ -98,6 +98,11 @@ extern void  fn_8010CFE4();        /* PKX overlap setup */
 extern u32   fn_800EFD3C();        /* WZX overlap check */
 extern void* fn_801195AC();        /* node lookup */
 
+typedef struct HSDArchiveBuffer {
+    u8 header[0x60];
+    u8 payload[1];
+} HSDArchiveBuffer;
+
 /* ==================================================================
  * fn_8011432C -- floorReadGFLPreFunc
  *
@@ -412,7 +417,7 @@ void* fn_8011487C(u32 resId, u32 loadMode, u32 dataSize) {
     extern void fn_800F9378(void* entry, u32 resId, u32 loadMode, void* callback);
     extern u32 fn_801150DC(void);
     const u8* strings;
-    void* archive;
+    HSDArchiveBuffer* archive;
     void* pub;
     void* entry;
     u32 flags;
@@ -420,7 +425,7 @@ void* fn_8011487C(u32 resId, u32 loadMode, u32 dataSize) {
     flags = loadMode & 0x7FFF0000;
     strings = (const u8*)lbl_80272200;
     archive = fn_800F9318(resId, flags | 0x400);
-    HSD_ArchiveParse(archive, (u8*)archive + 0x60, dataSize);
+    HSD_ArchiveParse(archive, archive->payload, dataSize);
     pub = HSD_ArchiveGetPublicAddress(archive, (const char*)(strings + 0xAC));
     if (pub == (void*)0) {
         fn_800DD970((const char*)(strings + 0x1CC));
@@ -443,24 +448,24 @@ void* fn_8011487C(u32 resId, u32 loadMode, u32 dataSize) {
 #pragma peephole off
 void* floorReadCameraPreFunc(void* owner, u32 param, u32 alloc_size) {
     u32 total = ((alloc_size + 0x1F) & ~0x1F) + 0x60;
-    void* mem = fn_800F9418(total, 0x20, (u32)owner, (param & 0x7FFF0000) | 0x400, (void*)0);
-    if (mem == (void*)0) {
+    HSDArchiveBuffer* archive = fn_800F9418(total, 0x20, (u32)owner, (param & 0x7FFF0000) | 0x400, (void*)0);
+    if (archive == (void*)0) {
         fn_800DD970(lbl_80272428, total);
         return (void*)0;
     }
-    return (u8*)mem + 0x60;
+    return archive->payload;
 }
 #pragma pop
 
 /* 0x801149BC | 0xB4 */
 #pragma push
 #pragma peephole off
-void* fn_801149BC(u32 resId, u32 loadMode, u32 arg2) {
+void* fn_801149BC(u32 resId, u32 loadMode, u32 dataSize) {
     extern void* fn_800F9318(void);
     extern void HSD_ArchiveParse(void* archive, void* buf, u32 size);
     extern void* HSD_ArchiveGetPublicAddress(void* archive, const char* sym);
     extern void fn_800F9378(void* entry, u32 resId, u32 flags, u32 cb);
-    void* model;
+    HSDArchiveBuffer* archive;
     void* pub;
     void* entry;
     u32 flags;
@@ -468,9 +473,9 @@ void* fn_801149BC(u32 resId, u32 loadMode, u32 arg2) {
     u32 counter;
 
     counter = 0;
-    model = fn_800F9318();
-    HSD_ArchiveParse(model, (u8*)model + 0x60, arg2);
-    pub = HSD_ArchiveGetPublicAddress(model, lbl_802722AC);
+    archive = fn_800F9318();
+    HSD_ArchiveParse(archive, archive->payload, dataSize);
+    pub = HSD_ArchiveGetPublicAddress(archive, lbl_802722AC);
     if (pub == (void*)0) {
         return (void*)0;
     }
@@ -493,12 +498,12 @@ void* fn_801149BC(u32 resId, u32 loadMode, u32 arg2) {
 #pragma peephole off
 void* fn_80114A70(void* owner, u32 param, u32 alloc_size) {
     u32 total = ((alloc_size + 0x1F) & ~0x1F) + 0x60;
-    void* mem = fn_800F9418(total, 0x20, (u32)owner, param, (void*)0);
-    if (mem == (void*)0) {
+    HSDArchiveBuffer* archive = fn_800F9418(total, 0x20, (u32)owner, param, (void*)0);
+    if (archive == (void*)0) {
         fn_800DD970(lbl_80272460, total);
         return (void*)0;
     }
-    return (u8*)mem + 0x60;
+    return archive->payload;
 }
 #pragma peephole on
 #pragma pop

@@ -428,3 +428,26 @@ Return a field-offset ledger for PeopleFieldWork, identify overconfident field
 names, identify fields safe to promote, and list the smallest people_field
 functions that should be tried after the type audit.
 ```
+
+## Subagent Audit Pilot, 2026-07-01
+
+Four low-cost audit agents checked independent files for mechanical type-recovery
+targets. Their output is audit evidence, not automatic approval. Apply only the
+rows marked safe after a local review and focused build/report validation.
+
+| Area | Target | Action | Confidence | Notes |
+| --- | --- | --- | --- | --- |
+| `gs_field_resource.c` | archive buffers with payload at `+0x60` | Applied locally as `HSDArchiveBuffer` with `payload` field | B | Removes repeated archive payload pointer arithmetic; touched functions remained 100% matched. |
+| `people_data.c` | `PeopleFieldEntry` table, stride `0x28` | Safe next | B | Existing typedef and comments already prove the shape; use typed indexing and `sizeof(PeopleFieldEntry)` where raw slot math remains. |
+| `people_data.c` | `ItemParamConvertEntry`, stride `0x10` | Already typed | B | No source change needed from this audit. |
+| `gs_party_access.c` | local evolution call payload | Safe next | B | Name the anonymous local struct and fields while preserving layout. |
+| `gs_party_access.c` | scene key/value table copies | Safe next | B | Use pair structs for the `lbl_80266700` and `lbl_802666E0` stack copies; names should stay generic key/value unless stronger evidence appears. |
+| `effect_util.c` | `gsEffectGlobals.instanceTable` access | Safe next | B | Header already defines `GSEffectGlobals` and `GSEffectInstance`; replace hand-walked `0x34` instance math in `fn_8013151C`. |
+| `effect_util.c` | small trace/link tables | Queue after callsite review | C | Shapes are plausible, but field names should stay generic (`links`, `kind`, `value0`) until more consumers are checked. |
+| `gs_field_resource.c` | `scene_data` root walk | Defer | C | Needs a second pass to prove whether the entries share one layout. |
+| `people_data.c` | unknown `0x10` and `0x20` stride tables | Defer | D | Keep raw wrappers or byte arrays until field accesses prove meaning. |
+| `effect_util.c` | scene slot / entry blocks | Defer | D | Nested `0x24a4` and `0x138` structures are high leverage but too broad for a mechanical patch. |
+
+Pilot rule: subagents may collect candidate structs, strides, and evidence in
+parallel, but a main pass must still review names, apply the patch, and validate
+with the standard report before committing.
