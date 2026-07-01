@@ -176,6 +176,9 @@ game/menu/menu_bag.c:
 game/menu/menu_middle.c:
 	.text       start:0x80069C0C end:0x8007109C
 
+game/menu/menu_carde_matrix.c:
+	.text       start:0x8007C300 end:0x8007FD64
+
 game/gba/gba_conv.c:
 	.text       start:0x80088428 end:0x80089048
 
@@ -193,6 +196,9 @@ dolphin/os/OSAlarmCreate.c:
 
 dolphin/os/OSArena.c:
 	.text       start:0x8009AFB0 end:0x8009AFD0
+
+dolphin/os/OSCache.c:
+	.text       start:0x8009B290 end:0x8009B914
 
 dolphin/os/OSContextCurrent.c:
 	.text       start:0x8009BBC4 end:0x8009BBD0
@@ -217,6 +223,9 @@ dolphin/os/OSEXI_fn_8009E7AC.c:
 
 dolphin/os/OSState_fn_8009FAEC.c:
 	.text       start:0x8009FAEC end:0x8009FAF8
+
+dolphin/os/OSReset.c:
+	.text       start:0x8009FAF8 end:0x800A03B4
 
 dolphin/os/OSReboot_fn_800A064C.c:
 	.text       start:0x800A064C end:0x800A06AC
@@ -262,6 +271,9 @@ dolphin/dvd/DVDLowSetWAType.c:
 
 dolphin/dvd/DVDFs.c:
 	.text       start:0x800A4CF0 end:0x800A4D28
+
+dolphin/dvd/DVD.c:
+	.text       start:0x800A5624 end:0x800A7820
 
 dolphin/dvd/DVDQueue.c:
 	.text       start:0x800A7F28 end:0x800A7F80
@@ -437,6 +449,12 @@ trk/gdev_cc_shutdown.c:
 crt/mwtrace_helpers.c:
 	.text       start:0x800C459C end:0x800C45A0
 
+crt/global_destructor_chain.c:
+	.text       start:0x800C4668 end:0x800C470C
+
+crt/exit.c:
+	.text       start:0x800C4E44 end:0x800C5458
+
 crt/critical_regions.c:
 	.text       start:0x800C754C end:0x800C7558
 
@@ -494,6 +512,12 @@ dolphin/si/SI_fn_800D104C.c:
 game/gs_render_util.c:
 	.text       start:0x800D13C4 end:0x800D3074
 
+game/gs_floor_data.c:
+	.text       start:0x800FF0A0 end:0x800FF788
+
+game/gs_floor.c:
+	.text       start:0x800FF788 end:0x80101910
+
 game/gs_model.c:
 	.text       start:0x801019F8 end:0x80109C88
 
@@ -515,6 +539,9 @@ game/effect/gs_effect.c:
 game/effect/effect_util.c:
 	.text       start:0x8013151C end:0x80137114
 
+game/effect/tracefx.c:
+	.text       start:0x80137114 end:0x801380D4
+
 game/effect/effect_visual.c:
 	.text       start:0x801380D4 end:0x80140588
 
@@ -526,6 +553,9 @@ game/people/people_field.c:
 
 game/sound/sound.c:
 	.text       start:0x801653BC end:0x801653CC
+
+game/gs_dvd.c:
+	.text       start:0x80167040 end:0x80168C64
 
 hsd/hsd_mobj_clear_flags.c:
 	.text       start:0x801A8428 end:0x801A8440
@@ -586,6 +616,12 @@ hsd/hsd_robj_get_alloc_data.c:
 
 hsd/hsd_robj_get_alloc_data2.c:
 	.text       start:0x801B014C end:0x801B0158
+
+hsd/hsd_shadow.c:
+	.text       start:0x801B019C end:0x801B1730
+
+hsd/hsd_texp.c:
+	.text       start:0x801B1730 end:0x801BBAC8
 
 game/battle/battle_grid.c:
 	.text       start:0x801C0270 end:0x801C4CB8

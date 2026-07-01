@@ -6,24 +6,24 @@
     "total_code": 2495108,
     "total_data": 2196256,
     "total_functions": 8603,
-    "total_units": 266
+    "total_units": 285
   },
   "topology_status": {
-    "auto_units": 67,
-    "named_units": 199,
-    "source_backed_units": 179,
-    "auto_code": 1572620,
+    "auto_units": 74,
+    "named_units": 211,
+    "source_backed_units": 191,
+    "auto_code": 1474356,
     "auto_data": 2182883,
-    "auto_functions": 4304
+    "auto_functions": 4035
   },
   "baseline_progress": {
-    "matched_code": "210412",
-    "matched_code_percent": 8.4329815,
+    "matched_code": "215516",
+    "matched_code_percent": 8.637543,
     "matched_data": "12364",
     "matched_data_percent": 0.56295806,
-    "matched_functions": 2613,
-    "matched_functions_percent": 30.373127,
-    "fuzzy_match_percent": 15.928293
+    "matched_functions": 2664,
+    "matched_functions_percent": 30.965942,
+    "fuzzy_match_percent": 16.548517
   },
   "unit_topology": [
     {
@@ -980,13 +980,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 95116,
+          "size": 45668,
           "virtual_address": 2147946652
         }
       ],
-      "total_code": 95116,
+      "total_code": 45668,
       "total_data": 0,
-      "total_functions": 167
+      "total_functions": 124
+    },
+    {
+      "name": "main/game/menu/menu_carde_matrix",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 14948,
+          "virtual_address": 2147992320
+        }
+      ],
+      "total_code": 14948,
+      "total_data": 0,
+      "total_functions": 15
+    },
+    {
+      "name": "main/auto_01_8007FD64_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 34500,
+          "virtual_address": 2148007268
+        }
+      ],
+      "total_code": 34500,
+      "total_data": 0,
+      "total_functions": 28
     },
     {
       "name": "main/game/gba/gba_conv",
@@ -1136,13 +1162,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 3060,
+          "size": 704,
           "virtual_address": 2148118480
         }
       ],
-      "total_code": 3060,
+      "total_code": 704,
       "total_data": 0,
-      "total_functions": 27
+      "total_functions": 3
+    },
+    {
+      "name": "main/dolphin/os/OSCache",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1668,
+          "virtual_address": 2148119184
+        }
+      ],
+      "total_code": 1668,
+      "total_data": 0,
+      "total_functions": 20
+    },
+    {
+      "name": "main/auto_01_8009B914_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 688,
+          "virtual_address": 2148120852
+        }
+      ],
+      "total_code": 688,
+      "total_data": 0,
+      "total_functions": 4
     },
     {
       "name": "main/dolphin/os/OSContextCurrent",
@@ -1275,17 +1327,30 @@
       "total_functions": 1
     },
     {
-      "name": "main/auto_01_8009FAF8_text",
+      "name": "main/dolphin/os/OSReset",
       "sections": [
         {
           "name": ".text",
-          "size": 2900,
+          "size": 2236,
           "virtual_address": 2148137720
         }
       ],
-      "total_code": 2900,
+      "total_code": 2236,
       "total_data": 0,
-      "total_functions": 9
+      "total_functions": 8
+    },
+    {
+      "name": "main/auto_01_800A03B4_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 664,
+          "virtual_address": 2148139956
+        }
+      ],
+      "total_code": 664,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/dolphin/os/OSReboot_fn_800A064C",
@@ -1526,13 +1591,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 12800,
+          "size": 2300,
           "virtual_address": 2148158760
         }
       ],
-      "total_code": 12800,
+      "total_code": 2300,
       "total_data": 0,
-      "total_functions": 61
+      "total_functions": 12
+    },
+    {
+      "name": "main/dolphin/dvd/DVD",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8700,
+          "virtual_address": 2148161060
+        }
+      ],
+      "total_code": 8700,
+      "total_data": 0,
+      "total_functions": 38
+    },
+    {
+      "name": "main/auto_01_800A7820_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1800,
+          "virtual_address": 2148169760
+        }
+      ],
+      "total_code": 1800,
+      "total_data": 0,
+      "total_functions": 11
     },
     {
       "name": "main/dolphin/dvd/DVDQueue",
@@ -2475,13 +2566,65 @@
       "sections": [
         {
           "name": ".text",
-          "size": 12204,
+          "size": 200,
           "virtual_address": 2148287904
         }
       ],
-      "total_code": 12204,
+      "total_code": 200,
       "total_data": 0,
-      "total_functions": 29
+      "total_functions": 1
+    },
+    {
+      "name": "main/crt/global_destructor_chain",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 164,
+          "virtual_address": 2148288104
+        }
+      ],
+      "total_code": 164,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/auto_01_800C470C_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1848,
+          "virtual_address": 2148288268
+        }
+      ],
+      "total_code": 1848,
+      "total_data": 0,
+      "total_functions": 13
+    },
+    {
+      "name": "main/crt/exit",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1556,
+          "virtual_address": 2148290116
+        }
+      ],
+      "total_code": 1556,
+      "total_data": 0,
+      "total_functions": 6
+    },
+    {
+      "name": "main/auto_01_800C5458_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8436,
+          "virtual_address": 2148291672
+        }
+      ],
+      "total_code": 8436,
+      "total_data": 0,
+      "total_functions": 7
     },
     {
       "name": "main/crt/critical_regions",
@@ -2800,13 +2943,52 @@
       "sections": [
         {
           "name": ".text",
-          "size": 190852,
+          "size": 180268,
           "virtual_address": 2148348020
         }
       ],
-      "total_code": 190852,
+      "total_code": 180268,
       "total_data": 0,
-      "total_functions": 680
+      "total_functions": 655
+    },
+    {
+      "name": "main/game/gs_floor_data",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1768,
+          "virtual_address": 2148528288
+        }
+      ],
+      "total_code": 1768,
+      "total_data": 0,
+      "total_functions": 15
+    },
+    {
+      "name": "main/game/gs_floor",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8584,
+          "virtual_address": 2148530056
+        }
+      ],
+      "total_code": 8584,
+      "total_data": 0,
+      "total_functions": 9
+    },
+    {
+      "name": "main/auto_01_80101910_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 232,
+          "virtual_address": 2148538640
+        }
+      ],
+      "total_code": 232,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/game/gs_model",
@@ -2952,7 +3134,7 @@
       "total_functions": 207
     },
     {
-      "name": "main/auto_01_80137114_text",
+      "name": "main/game/effect/tracefx",
       "sections": [
         {
           "name": ".text",
@@ -3034,13 +3216,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 274524,
+          "size": 7284,
           "virtual_address": 2148946892
         }
       ],
-      "total_code": 274524,
+      "total_code": 7284,
       "total_data": 0,
-      "total_functions": 794
+      "total_functions": 57
+    },
+    {
+      "name": "main/game/gs_dvd",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 7204,
+          "virtual_address": 2148954176
+        }
+      ],
+      "total_code": 7204,
+      "total_data": 0,
+      "total_functions": 55
+    },
+    {
+      "name": "main/auto_01_80168C64_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 260036,
+          "virtual_address": 2148961380
+        }
+      ],
+      "total_code": 260036,
+      "total_data": 0,
+      "total_functions": 682
     },
     {
       "name": "main/hsd/hsd_mobj_clear_flags",
@@ -3307,13 +3515,52 @@
       "sections": [
         {
           "name": ".text",
-          "size": 65816,
+          "size": 68,
           "virtual_address": 2149253464
         }
       ],
-      "total_code": 65816,
+      "total_code": 68,
       "total_data": 0,
-      "total_functions": 135
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_shadow",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 5524,
+          "virtual_address": 2149253532
+        }
+      ],
+      "total_code": 5524,
+      "total_data": 0,
+      "total_functions": 14
+    },
+    {
+      "name": "main/hsd/hsd_texp",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 41880,
+          "virtual_address": 2149259056
+        }
+      ],
+      "total_code": 41880,
+      "total_data": 0,
+      "total_functions": 77
+    },
+    {
+      "name": "main/auto_01_801BBAC8_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 18344,
+          "virtual_address": 2149300936
+        }
+      ],
+      "total_code": 18344,
+      "total_data": 0,
+      "total_functions": 43
     },
     {
       "name": "main/game/battle/battle_grid",
