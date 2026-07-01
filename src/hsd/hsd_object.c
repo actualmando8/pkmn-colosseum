@@ -1,0 +1,332 @@
+/**
+ * @file hsd_object.c
+ * @brief HSD base object class initialization.
+ *
+ * Colosseum address: part of HSD library section (0x80190E34+)
+ * Adapted from doldecomp/melee src/sysdolphin/baselib/object.c
+ */
+
+#include "hsd/hsd_object.h"
+#include "hsd/hsd_class.h"
+
+HSD_ClassInfo hsdObj = { ObjInfoInit };
+extern HSD_ClassInfo hsdClass;
+
+/* Internal bounding box structure used by fn_80191358 and fn_80191460-8019147C */
+typedef struct {
+    u8 field0;     /* 0x00 */
+    u8 init_flag;  /* 0x01: non-zero if uninitialized (reset to 0 on first expand) */
+    u8 pad[2];     /* 0x02-0x03 */
+    void* field4;  /* 0x04 */
+    void* field8;  /* 0x08 */
+    void* fieldC;  /* 0x0C */
+    f32 min[3];    /* 0x10-0x18 */
+    f32 max[3];    /* 0x1C-0x24 */
+    f32 field28[3];/* 0x28-0x30 */
+} HSD_BBox;
+
+typedef struct {
+    u8 unk_00[4];
+    f32* scale;       /* 0x04 */
+    f32* rotate;      /* 0x08 */
+    f32* translate;   /* 0x0C */
+    f32 corner0[3];   /* 0x10 */
+    f32 corner1[3];   /* 0x1C */
+} HSD_ObjectTransformData;
+
+void ObjInfoInit(void)
+{
+    hsdInitClassInfo(&hsdObj, &hsdClass, "sysdolphin_base_library", "hsd_obj",
+                     sizeof(HSD_ObjInfo), sizeof(HSD_Obj));
+}
+
+/* 0x80190E60 | 0x2B8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void fn_800E053C(void* dst, f32 angle);
+extern void fn_800E0518(void* dst, f32 angle);
+extern void fn_800E04F4(void* dst, f32 angle);
+extern void fn_800E048C(void* dst, f32 x, f32 y, f32 z);
+extern void fn_800E0560(void* dst, f32* src);
+extern void fn_800E0290(void* dst, void* lhs, void* rhs);
+extern void fn_800DFF98(void* dst, void* mtx, void* vec);
+extern void fn_800D2248(void);
+extern void fn_800D88DC(s32 mode);
+extern void fn_800D888C(s32 mode);
+extern void fn_800DA028(s32 mode);
+extern void fn_800DA4C4(s32 a, s32 b, s32 c);
+extern void fn_800D7820(void* handle);
+extern void fn_800D6A00(s32 prim_type);
+extern void fn_800D67BC(s32 count);
+extern void fn_800D6680(f32 x, f32 y, f32 z);
+extern void fn_800D5CB8(s32 idx, s32 r, s32 g, s32 b, s32 a);
+extern void fn_800D6728(void);
+extern u8 lbl_80314638[];
+#if 0
+asm void fn_80190E60(void) {
+#include "src/hsd/hsd_object_fn_80190E60.inc"
+}
+#else
+#pragma optimization_level 4
+void fn_80190E60(HSD_ObjectTransformData* data) {
+    f32 corner0[3];
+    f32 corner1[3];
+    f32 mtx_scale[3][4];
+    f32 mtx_translate[3][4];
+    f32 mtx_z[3][4];
+    f32 mtx_y[3][4];
+    f32 mtx[3][4];
+
+    fn_800E053C(mtx, data->rotate[0]);
+    fn_800E0518(mtx_y, data->rotate[1]);
+    fn_800E04F4(mtx_z, data->rotate[2]);
+    fn_800E048C(mtx_translate, data->translate[0], data->translate[1],
+                data->translate[2]);
+    fn_800E0560(mtx_scale, data->scale);
+    fn_800E0290(mtx, mtx_y, mtx);
+    fn_800E0290(mtx, mtx_z, mtx);
+    fn_800E0290(mtx, mtx_translate, mtx);
+    fn_800E0290(mtx, mtx_scale, mtx);
+    fn_800DFF98(corner0, mtx, data->corner0);
+    fn_800DFF98(corner1, mtx, data->corner1);
+
+    fn_800D2248();
+    fn_800D88DC(1);
+    fn_800D888C(6);
+    fn_800DA028(0);
+    fn_800DA4C4(1, 6, 7);
+    fn_800D7820(lbl_80314638);
+    fn_800D6A00(4);
+    fn_800D67BC(10);
+
+    fn_800D6680(corner0[0], corner0[1], corner0[2]);
+    fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, 0x80);
+    fn_800D6680(corner0[0], corner1[1], corner0[2]);
+    fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, 0x80);
+    fn_800D6680(corner1[0], corner0[1], corner0[2]);
+    fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, 0x80);
+    fn_800D6680(corner1[0], corner1[1], corner0[2]);
+    fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, 0x80);
+    fn_800D6680(corner1[0], corner0[1], corner1[2]);
+    fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, 0x80);
+    fn_800D6680(corner1[0], corner1[1], corner1[2]);
+    fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, 0x80);
+    fn_800D6680(corner0[0], corner0[1], corner1[2]);
+    fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, 0x80);
+    fn_800D6680(corner0[0], corner1[1], corner1[2]);
+    fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, 0x80);
+    fn_800D6680(corner0[0], corner0[1], corner0[2]);
+    fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, 0x80);
+    fn_800D6680(corner0[0], corner1[1], corner0[2]);
+    fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, 0x80);
+    fn_800D6728();
+}
+#endif
+#pragma pop
+
+/* 0x80191118 | 0x240 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern s32 fn_800D2F34(void* pos, void* out);
+extern const f32 lbl_8047D8B8;
+extern const f32 lbl_8047D8BC;
+extern const f32 lbl_8047D8C0;
+#if 0
+asm void fn_80191118(void) {
+#include "src/hsd/hsd_object_fn_80191118.inc"
+}
+#else
+#pragma optimization_level 4
+s32 fn_80191118(HSD_ObjectTransformData* data) {
+    f32 corner0[3];
+    f32 corner1[3];
+    f32 screen0[3];
+    f32 screen1[3];
+    f32 mtx_scale[3][4];
+    f32 mtx_translate[3][4];
+    f32 mtx_z[3][4];
+    f32 mtx_y[3][4];
+    f32 mtx[3][4];
+    s32 result0;
+    s32 result1;
+
+    fn_800E053C(mtx, data->rotate[0]);
+    fn_800E0518(mtx_y, data->rotate[1]);
+    fn_800E04F4(mtx_z, data->rotate[2]);
+    fn_800E048C(mtx_translate, data->translate[0], data->translate[1],
+                data->translate[2]);
+    fn_800E0560(mtx_scale, data->scale);
+    fn_800E0290(mtx, mtx_y, mtx);
+    fn_800E0290(mtx, mtx_z, mtx);
+    fn_800E0290(mtx, mtx_translate, mtx);
+    fn_800E0290(mtx, mtx_scale, mtx);
+    fn_800DFF98(corner0, mtx, data->corner0);
+    fn_800DFF98(corner1, mtx, data->corner1);
+
+    result0 = fn_800D2F34(corner0, screen0);
+    result1 = fn_800D2F34(corner1, screen1);
+    if (result0 == 0 || result1 == 0) {
+        return 2;
+    }
+    if (result0 == 1 && result1 == 1) {
+        return 0;
+    }
+    if (screen0[0] < lbl_8047D8B8 && screen1[0] < lbl_8047D8B8) {
+        return 0;
+    }
+    if (screen0[0] > lbl_8047D8BC && screen1[0] > lbl_8047D8BC) {
+        return 0;
+    }
+    if (screen0[1] < lbl_8047D8B8 && screen1[1] < lbl_8047D8B8) {
+        return 0;
+    }
+    if (screen0[1] > lbl_8047D8C0 && screen1[1] > lbl_8047D8C0) {
+        return 0;
+    }
+    if (result0 == 1 || result1 == 1) {
+        return 1;
+    }
+    if (screen0[0] < lbl_8047D8B8 || screen1[0] < lbl_8047D8B8) {
+        return 1;
+    }
+    if (screen0[0] > lbl_8047D8BC || screen1[0] > lbl_8047D8BC) {
+        return 1;
+    }
+    if (screen0[1] < lbl_8047D8B8 || screen1[1] < lbl_8047D8B8) {
+        return 1;
+    }
+    if (screen0[1] > lbl_8047D8C0 || screen1[1] > lbl_8047D8C0) {
+        return 1;
+    }
+    return 2;
+}
+#endif
+#pragma pop
+
+/* 0x80191358 | 0x108 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void fn_800E01F4(void* vec, f32 x, f32 y, f32 z);
+extern void fn_800E0168(void* dst, void* max, void* min);
+#if 0
+asm void fn_80191358(void) {
+#include "src/hsd/hsd_object_fn_80191358.inc"
+}
+#else
+#pragma optimization_level 4
+void fn_80191358(HSD_BBox* bbox, f32 x, f32 y, f32 z) {
+    if (bbox->init_flag != 0) {
+        bbox->init_flag = 0;
+        fn_800E01F4(bbox->min, x, y, z);
+        fn_800E01F4(bbox->max, x, y, z);
+    } else {
+        if (x < bbox->min[0]) { bbox->min[0] = x; }
+        if (y < bbox->min[1]) { bbox->min[1] = y; }
+        if (z < bbox->min[2]) { bbox->min[2] = z; }
+        if (x > bbox->max[0]) { bbox->max[0] = x; }
+        if (y > bbox->max[1]) { bbox->max[1] = y; }
+        if (z > bbox->max[2]) { bbox->max[2] = z; }
+    }
+    fn_800E0168(bbox->field28, bbox->max, bbox->min);
+}
+#endif
+#pragma pop
+
+/* 0x80191460 | 0xC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 0
+asm void fn_80191460(void) {
+#include "src/hsd/hsd_object_fn_80191460.inc"
+}
+#else
+#pragma optimization_level 4
+void fn_80191460(HSD_BBox* bbox) {
+    bbox->init_flag = 1;
+}
+#endif
+#pragma pop
+
+/* 0x8019146C | 0x8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 0
+asm void fn_8019146C(void) {
+#include "src/hsd/hsd_object_fn_8019146C.inc"
+}
+#else
+#pragma optimization_level 4
+void fn_8019146C(HSD_BBox* bbox, void* val) {
+    bbox->fieldC = val;
+}
+#endif
+#pragma pop
+
+/* 0x80191474 | 0x8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 0
+asm void fn_80191474(void) {
+#include "src/hsd/hsd_object_fn_80191474.inc"
+}
+#else
+#pragma optimization_level 4
+void fn_80191474(HSD_BBox* bbox, void* val) {
+    bbox->field8 = val;
+}
+#endif
+#pragma pop
+
+/* 0x8019147C | 0x8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 0
+asm void fn_8019147C(void) {
+#include "src/hsd/hsd_object_fn_8019147C.inc"
+}
+#else
+#pragma optimization_level 4
+void fn_8019147C(HSD_BBox* bbox, void* val) {
+    bbox->field4 = val;
+}
+#endif
+#pragma pop
+
+/* 0x80191484 | 0x70 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern u32   fn_800E3534(u32 size);   /* GSmemAllocRaw (returns u16 handle) */
+extern void* fn_800E27B0(u16 handle); /* GSmemGetPtr */
+extern u16  lbl_8047B208; /* GSmem handle for object instance pool */
+extern void* lbl_8047B20C; /* resolved pointer to object instance pool */
+extern u32  lbl_8047B210; /* object instance count */
+#if 0
+asm void fn_80191484(void) {
+#include "src/hsd/hsd_object_fn_80191484.inc"
+}
+#else
+#pragma optimization_level 4
+void fn_80191484(u32 count) {
+    u32 handle;
+    u32 i;
+
+    lbl_8047B210 = count;
+    handle = fn_800E3534(count * 0x34);
+    lbl_8047B208 = handle;
+    if ((u16)handle != 0) {
+        lbl_8047B20C = fn_800E27B0((u16)handle);
+        for (i = 0; i < lbl_8047B210; i++) {
+            ((u8*)lbl_8047B20C)[i * 0x34] = 0;
+        }
+    }
+}
+#endif
+#pragma pop

@@ -240,6 +240,25 @@ config.libs = [
         "Runtime.PPCEABI.H",
         "GC/1.2.5n",
         [
+            Object(CodeCandidate, "trk/ddh_cc_range_800C3E90.c", mw_version="GC/1.3", progress_category="sdk"),  # CALIB_TRK
+            Object(CodeCandidate, "hsd/hsd_mobj_range_801A8478.c", mw_version="GC/1.3", progress_category="sdk"),  # CALIB_HSD1
+            Object(CodeCandidate, "hsd/hsd_mobj_range_801A84B4.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_HSD_VECINIT
+            Object(CodeCandidate, "hsd/hsd_mobj_range_801A84F0.c", mw_version="GC/1.3", progress_category="sdk"),  # CALIB_HSD2
+            Object(CodeCandidate, "crt/stdio_range_800C7558.c", mw_version="GC/1.3", progress_category="sdk"),  # CALIB_CRT
+            Object(CodeCandidate, "trk/ddh_cc_range_800C3C00.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK
+            Object(CodeCandidate, "trk/gdev_cc_range_800C41AC.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK
+            Object(CodeCandidate, "trk/gdev_cc_range_800C4444.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK
+            Object(CodeCandidate, "hsd/hsd_mobj_range_801A86B4.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_HSD
+            Object(CodeCandidate, "hsd/hsd_pobj_range_801AA608.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_HSD_POBJ
+            Object(CodeCandidate, "trk/TRKTarget_range_800C1310.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK2
+            Object(CodeCandidate, "trk/TRKComm_range_800C3678.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK3
+            Object(CodeCandidate, "trk/TRKNub_range_800BE47C.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK3
+            Object(CodeCandidate, "trk/TRKNub_range_800BEE74.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK3
+            Object(CodeCandidate, "trk/TRKDispatch_range_800C0CD8.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK3
+            Object(CodeCandidate, "trk/TRKTarget_range_800C1348.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK3
+            Object(CodeCandidate, "trk/TRKInit.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK3
+            Object(CodeCandidate, "trk/TRKBoard_range_800C33BC.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK3
+            Object(CodeCandidate, "crt/printf.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_CRT_PRINTF
             Object(
                 NonMatching,
                 "__init_cpp_exceptions.cpp",
@@ -249,11 +268,13 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "crt/mem.c",
+                mw_version="GC/2.0",
                 progress_category="sdk",
             ),
             Object(
                 CodeCandidate,
                 "crt/string.c",
+                mw_version="GC/1.3",
                 progress_category="sdk",
             ),
             Object(
@@ -319,6 +340,16 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "dolphin/vi/VI_fn_800AA498.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/vi/VI_fn_800AB5B4.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/exi/EXI2_range_800CEA3C.c",
                 progress_category="sdk",
             ),
             Object(
@@ -500,6 +531,425 @@ config.libs = [
                 CodeCandidate,
                 "game/sound/sound.c",
                 progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/effect/gs_effect.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/effect/effect_util.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/effect/effect_visual.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/people/people_field.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/people/people_data.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/trainer.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/pokemon.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/colosseum_event.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/battle/battle_waza.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_model.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_field_world.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/colosseum_battle.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/battle/battle_main.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/battle/battle_grid.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_party_access.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gba/gba_misc.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gba/gba_conv.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_field_colquery.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_colsys.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_field_resource.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_render_util.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_event_exec.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_npc_interact.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/menu/menu_middle.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_thread.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_thread_hi.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_task.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_npc_event.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_pokemon_summary.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/main.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_texture.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/input/input.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/movie.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_gfx.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_dobj.c",
+                mw_version="GC/1.3",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_wobj.c",
+                mw_version="GC/1.3",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_fog.c",
+                mw_version="GC/1.3",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_initialize.c",
+                mw_version="GC/1.3",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_class.c",
+                mw_version="GC/1.3",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_object.c",
+                mw_version="GC/1.3",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_displayfunc.c",
+                mw_version="GC/1.3",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/os/OSMemory.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_render.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_worldmap.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_title.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8", "-opt nopeephole"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_scene.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/fsys/fsys_file.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_pcbox.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_cobj.c",
+                mw_version="GC/1.3",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_jobj.c",
+                mw_version="GC/1.3",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_lobj.c",
+                mw_version="GC/1.3",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_dvd.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_floor_data.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/menu/menu_carde_matrix.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_floor.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/effect/tracefx.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_shadow.c",
+                mw_version="GC/1.3",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_texp.c",
+                mw_version="GC/1.3",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/os/OSCache.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/dvd/DVD.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/os/OSReset.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "crt/exit.c",
+                mw_version="GC/1.3.2",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "crt/global_destructor_chain.c",
+                mw_version="GC/1.3",
+                progress_category="sdk",
             ),
             Object(
                 CodeCandidate,

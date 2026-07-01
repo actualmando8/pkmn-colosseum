@@ -1,0 +1,4164 @@
+{
+  "schema": 1,
+  "target": "GC6E01",
+  "purpose": "Freeze the dtk/objdiff denominator and object topology used for published GC6E01 progress. Progress counters may increase without updating this file.",
+  "invariants": {
+    "total_code": 2495108,
+    "total_data": 2196256,
+    "total_functions": 8603,
+    "total_units": 318
+  },
+  "topology_status": {
+    "auto_units": 80,
+    "named_units": 238,
+    "source_backed_units": 218,
+    "auto_code": 1084616,
+    "auto_data": 2182883,
+    "auto_functions": 2740
+  },
+  "baseline_progress": {
+    "matched_code": "280964",
+    "matched_code_percent": 11.260594,
+    "matched_data": "12364",
+    "matched_data_percent": 0.56295806,
+    "matched_functions": 3341,
+    "matched_functions_percent": 38.83529,
+    "fuzzy_match_percent": 24.434902
+  },
+  "unit_topology": [
+    {
+      "name": "main/auto_10_8047E700_sbss2",
+      "sections": [
+        {
+          "name": ".sbss2",
+          "size": 56,
+          "virtual_address": 2152195840
+        }
+      ],
+      "total_code": 0,
+      "total_data": 56,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047B6A0",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152183456
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047B7A0",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152183712
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047B8A0",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152183968
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047B9A0",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 252,
+          "virtual_address": 2152184224
+        }
+      ],
+      "total_code": 0,
+      "total_data": 252,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047BAA0",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 254,
+          "virtual_address": 2152184480
+        }
+      ],
+      "total_code": 0,
+      "total_data": 254,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047BBA0",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152184736
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047BCA0",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152184992
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047BDA0",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 252,
+          "virtual_address": 2152185248
+        }
+      ],
+      "total_code": 0,
+      "total_data": 252,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047BEA0",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152185504
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047BFA0",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152185760
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047C0A0",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 255,
+          "virtual_address": 2152186016
+        }
+      ],
+      "total_code": 0,
+      "total_data": 255,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047C1A0",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152186272
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047C2A0",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152186528
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047C3A0",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152186784
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/crt/sdata2_math",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 1024,
+          "virtual_address": 2152187040
+        }
+      ],
+      "total_code": 0,
+      "total_data": 1024,
+      "total_functions": 0
+    },
+    {
+      "name": "main/crt/sdata2_math_8047C8A0",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 240,
+          "virtual_address": 2152188064
+        }
+      ],
+      "total_code": 0,
+      "total_data": 240,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/gs_render_util_sdata2",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 12,
+          "virtual_address": 2152188304
+        }
+      ],
+      "total_code": 0,
+      "total_data": 12,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047C9A0",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 253,
+          "virtual_address": 2152188320
+        }
+      ],
+      "total_code": 0,
+      "total_data": 253,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047CAA0",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 320,
+          "virtual_address": 2152188576
+        }
+      ],
+      "total_code": 0,
+      "total_data": 320,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047CBE0",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 184,
+          "virtual_address": 2152188896
+        }
+      ],
+      "total_code": 0,
+      "total_data": 184,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047CC98",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152189080
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/gs_model_sdata2_8047CD98",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152189336
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047CE98",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152189592
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047CF98",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152189848
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047D098",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 252,
+          "virtual_address": 2152190104
+        }
+      ],
+      "total_code": 0,
+      "total_data": 252,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/effect/effect_visual_sdata2_8047D198",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152190360
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/effect/effect_visual_sdata2_8047D298",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 252,
+          "virtual_address": 2152190616
+        }
+      ],
+      "total_code": 0,
+      "total_data": 252,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047D398",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152190872
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047D498",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 504,
+          "virtual_address": 2152191128
+        }
+      ],
+      "total_code": 0,
+      "total_data": 504,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047D690",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152191632
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/people/people_sdata2_8047D790",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152191888
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047D890",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152192144
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/hsd/hsd_sdata2_8047D990",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152192400
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/hsd/hsd_sdata2_8047DA90",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 251,
+          "virtual_address": 2152192656
+        }
+      ],
+      "total_code": 0,
+      "total_data": 251,
+      "total_functions": 0
+    },
+    {
+      "name": "main/hsd/hsd_sdata2_8047DB90",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152192912
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/hsd/hsd_sdata2_8047DC90",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152193168
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/hsd/hsd_sdata2_8047DD90",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152193424
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/hsd/hsd_sdata2_8047DE90",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152193680
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/battle_sdata2_8047DF90",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152193936
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/battle_sdata2_8047E090",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152194192
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/battle_sdata2_8047E190",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152194448
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/battle_waza_sdata2_8047E290",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152194704
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047E390",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 256,
+          "virtual_address": 2152194960
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/auto_09_8047E490_sdata2",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 456,
+          "virtual_address": 2152195216
+        }
+      ],
+      "total_code": 0,
+      "total_data": 456,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/colosseum_battle_sdata2",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 168,
+          "virtual_address": 2152195672
+        }
+      ],
+      "total_code": 0,
+      "total_data": 168,
+      "total_functions": 0
+    },
+    {
+      "name": "main/auto_08_80478DC0_sbss",
+      "sections": [
+        {
+          "name": ".sbss",
+          "size": 6664,
+          "virtual_address": 2152172992
+        }
+      ],
+      "total_code": 0,
+      "total_data": 6664,
+      "total_functions": 0
+    },
+    {
+      "name": "main/auto_08_8047A7C8_sbss",
+      "sections": [
+        {
+          "name": ".sbss",
+          "size": 3772,
+          "virtual_address": 2152179656
+        }
+      ],
+      "total_code": 0,
+      "total_data": 3772,
+      "total_functions": 0
+    },
+    {
+      "name": "main/auto_07_80478820_sdata",
+      "sections": [
+        {
+          "name": ".sdata",
+          "size": 1428,
+          "virtual_address": 2152171552
+        }
+      ],
+      "total_code": 0,
+      "total_data": 1428,
+      "total_functions": 0
+    },
+    {
+      "name": "main/auto_06_8039A700_bss",
+      "sections": [
+        {
+          "name": ".bss",
+          "size": 909600,
+          "virtual_address": 2151261952
+        }
+      ],
+      "total_code": 0,
+      "total_data": 909600,
+      "total_functions": 0
+    },
+    {
+      "name": "main/auto_05_8027A500_data",
+      "sections": [
+        {
+          "name": ".data",
+          "size": 1180123,
+          "virtual_address": 2150081792
+        }
+      ],
+      "total_code": 0,
+      "total_data": 1180123,
+      "total_functions": 0
+    },
+    {
+      "name": "main/auto_04_802663A0_rodata",
+      "sections": [
+        {
+          "name": ".rodata",
+          "size": 2104,
+          "virtual_address": 2149999520
+        }
+      ],
+      "total_code": 0,
+      "total_data": 2104,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/rodata_80266BD8",
+      "sections": [
+        {
+          "name": ".rodata",
+          "size": 164,
+          "virtual_address": 2150001624
+        }
+      ],
+      "total_code": 0,
+      "total_data": 164,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/rodata_80266C7C",
+      "sections": [
+        {
+          "name": ".rodata",
+          "size": 252,
+          "virtual_address": 2150001788
+        }
+      ],
+      "total_code": 0,
+      "total_data": 252,
+      "total_functions": 0
+    },
+    {
+      "name": "main/auto_04_80266D78_rodata",
+      "sections": [
+        {
+          "name": ".rodata",
+          "size": 744,
+          "virtual_address": 2150002040
+        }
+      ],
+      "total_code": 0,
+      "total_data": 744,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/rodata_80267060",
+      "sections": [
+        {
+          "name": ".rodata",
+          "size": 496,
+          "virtual_address": 2150002784
+        }
+      ],
+      "total_code": 0,
+      "total_data": 496,
+      "total_functions": 0
+    },
+    {
+      "name": "main/auto_04_80267250_rodata",
+      "sections": [
+        {
+          "name": ".rodata",
+          "size": 256,
+          "virtual_address": 2150003280
+        }
+      ],
+      "total_code": 0,
+      "total_data": 256,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/rodata_80267350",
+      "sections": [
+        {
+          "name": ".rodata",
+          "size": 72,
+          "virtual_address": 2150003536
+        }
+      ],
+      "total_code": 0,
+      "total_data": 72,
+      "total_functions": 0
+    },
+    {
+      "name": "main/auto_04_80267398_rodata",
+      "sections": [
+        {
+          "name": ".rodata",
+          "size": 4236,
+          "virtual_address": 2150003608
+        }
+      ],
+      "total_code": 0,
+      "total_data": 4236,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/rodata_80268424",
+      "sections": [
+        {
+          "name": ".rodata",
+          "size": 488,
+          "virtual_address": 2150007844
+        }
+      ],
+      "total_code": 0,
+      "total_data": 488,
+      "total_functions": 0
+    },
+    {
+      "name": "main/auto_04_8026860C_rodata",
+      "sections": [
+        {
+          "name": ".rodata",
+          "size": 30796,
+          "virtual_address": 2150008332
+        }
+      ],
+      "total_code": 0,
+      "total_data": 30796,
+      "total_functions": 0
+    },
+    {
+      "name": "main/auto_04_8026FE58_rodata",
+      "sections": [
+        {
+          "name": ".rodata",
+          "size": 42648,
+          "virtual_address": 2150039128
+        }
+      ],
+      "total_code": 0,
+      "total_data": 42648,
+      "total_functions": 0
+    },
+    {
+      "name": "main/__init_cpp_exceptions",
+      "sections": [
+        {
+          "name": ".dtors",
+          "size": 4,
+          "virtual_address": 2149999488
+        }
+      ],
+      "total_code": 0,
+      "total_data": 4,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/main",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 4176,
+          "virtual_address": 2147505632
+        }
+      ],
+      "total_code": 4176,
+      "total_data": 0,
+      "total_functions": 23
+    },
+    {
+      "name": "main/game/gs_task",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 11080,
+          "virtual_address": 2147509808
+        }
+      ],
+      "total_code": 11080,
+      "total_data": 0,
+      "total_functions": 65
+    },
+    {
+      "name": "main/auto_01_80009178_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 14524,
+          "virtual_address": 2147520888
+        }
+      ],
+      "total_code": 14524,
+      "total_data": 0,
+      "total_functions": 41
+    },
+    {
+      "name": "main/game/gs_party_access",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2140,
+          "virtual_address": 2147535412
+        }
+      ],
+      "total_code": 2140,
+      "total_data": 0,
+      "total_functions": 25
+    },
+    {
+      "name": "main/auto_01_8000D290_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2072,
+          "virtual_address": 2147537552
+        }
+      ],
+      "total_code": 2072,
+      "total_data": 0,
+      "total_functions": 4
+    },
+    {
+      "name": "main/game/gs_npc_interact",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 17404,
+          "virtual_address": 2147539624
+        }
+      ],
+      "total_code": 17404,
+      "total_data": 0,
+      "total_functions": 52
+    },
+    {
+      "name": "main/auto_01_80011EA4_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 3708,
+          "virtual_address": 2147557028
+        }
+      ],
+      "total_code": 3708,
+      "total_data": 0,
+      "total_functions": 4
+    },
+    {
+      "name": "main/game/gs_event_exec",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8956,
+          "virtual_address": 2147560736
+        }
+      ],
+      "total_code": 8956,
+      "total_data": 0,
+      "total_functions": 28
+    },
+    {
+      "name": "main/game/gs_pokemon_summary",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 12712,
+          "virtual_address": 2147569692
+        }
+      ],
+      "total_code": 12712,
+      "total_data": 0,
+      "total_functions": 26
+    },
+    {
+      "name": "main/game/gs_pcbox",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 33124,
+          "virtual_address": 2147582404
+        }
+      ],
+      "total_code": 33124,
+      "total_data": 0,
+      "total_functions": 65
+    },
+    {
+      "name": "main/game/gs_title",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 24648,
+          "virtual_address": 2147615528
+        }
+      ],
+      "total_code": 24648,
+      "total_data": 0,
+      "total_functions": 80
+    },
+    {
+      "name": "main/game/gs_worldmap",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 40448,
+          "virtual_address": 2147640176
+        }
+      ],
+      "total_code": 40448,
+      "total_data": 0,
+      "total_functions": 98
+    },
+    {
+      "name": "main/game/gs_npc_event",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 12552,
+          "virtual_address": 2147680624
+        }
+      ],
+      "total_code": 12552,
+      "total_data": 0,
+      "total_functions": 33
+    },
+    {
+      "name": "main/auto_01_80033278_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 11148,
+          "virtual_address": 2147693176
+        }
+      ],
+      "total_code": 11148,
+      "total_data": 0,
+      "total_functions": 20
+    },
+    {
+      "name": "main/game/movie",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2664,
+          "virtual_address": 2147704324
+        }
+      ],
+      "total_code": 2664,
+      "total_data": 0,
+      "total_functions": 21
+    },
+    {
+      "name": "main/auto_01_8003686C_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 98928,
+          "virtual_address": 2147706988
+        }
+      ],
+      "total_code": 98928,
+      "total_data": 0,
+      "total_functions": 171
+    },
+    {
+      "name": "main/game/menu/menu_bag",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 11316,
+          "virtual_address": 2147805916
+        }
+      ],
+      "total_code": 11316,
+      "total_data": 0,
+      "total_functions": 6
+    },
+    {
+      "name": "main/auto_01_80051710_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 99580,
+          "virtual_address": 2147817232
+        }
+      ],
+      "total_code": 99580,
+      "total_data": 0,
+      "total_functions": 208
+    },
+    {
+      "name": "main/game/menu/menu_middle",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 29840,
+          "virtual_address": 2147916812
+        }
+      ],
+      "total_code": 29840,
+      "total_data": 0,
+      "total_functions": 100
+    },
+    {
+      "name": "main/auto_01_8007109C_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 45668,
+          "virtual_address": 2147946652
+        }
+      ],
+      "total_code": 45668,
+      "total_data": 0,
+      "total_functions": 124
+    },
+    {
+      "name": "main/game/menu/menu_carde_matrix",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 14948,
+          "virtual_address": 2147992320
+        }
+      ],
+      "total_code": 14948,
+      "total_data": 0,
+      "total_functions": 15
+    },
+    {
+      "name": "main/auto_01_8007FD64_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 34500,
+          "virtual_address": 2148007268
+        }
+      ],
+      "total_code": 34500,
+      "total_data": 0,
+      "total_functions": 28
+    },
+    {
+      "name": "main/game/gba/gba_conv",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 3104,
+          "virtual_address": 2148041768
+        }
+      ],
+      "total_code": 3104,
+      "total_data": 0,
+      "total_functions": 16
+    },
+    {
+      "name": "main/auto_01_80089048_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1648,
+          "virtual_address": 2148044872
+        }
+      ],
+      "total_code": 1648,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/game/gba/gba_misc",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 12536,
+          "virtual_address": 2148046520
+        }
+      ],
+      "total_code": 12536,
+      "total_data": 0,
+      "total_functions": 37
+    },
+    {
+      "name": "main/auto_01_8008C7B0_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 47408,
+          "virtual_address": 2148059056
+        }
+      ],
+      "total_code": 47408,
+      "total_data": 0,
+      "total_functions": 84
+    },
+    {
+      "name": "main/dolphin/os/PPCArch",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 40,
+          "virtual_address": 2148106464
+        }
+      ],
+      "total_code": 40,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_80098108_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8152,
+          "virtual_address": 2148106504
+        }
+      ],
+      "total_code": 8152,
+      "total_data": 0,
+      "total_functions": 32
+    },
+    {
+      "name": "main/dolphin/os/OSGetExceptionHandler",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 20,
+          "virtual_address": 2148114656
+        }
+      ],
+      "total_code": 20,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_8009A0F4_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 468,
+          "virtual_address": 2148114676
+        }
+      ],
+      "total_code": 468,
+      "total_data": 0,
+      "total_functions": 6
+    },
+    {
+      "name": "main/dolphin/os/OSAlarmCreate",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 16,
+          "virtual_address": 2148115144
+        }
+      ],
+      "total_code": 16,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_8009A2D8_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 3288,
+          "virtual_address": 2148115160
+        }
+      ],
+      "total_code": 3288,
+      "total_data": 0,
+      "total_functions": 13
+    },
+    {
+      "name": "main/dolphin/os/OSArena",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 32,
+          "virtual_address": 2148118448
+        }
+      ],
+      "total_code": 32,
+      "total_data": 0,
+      "total_functions": 4
+    },
+    {
+      "name": "main/auto_01_8009AFD0_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 704,
+          "virtual_address": 2148118480
+        }
+      ],
+      "total_code": 704,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/dolphin/os/OSCache",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1668,
+          "virtual_address": 2148119184
+        }
+      ],
+      "total_code": 1668,
+      "total_data": 0,
+      "total_functions": 20
+    },
+    {
+      "name": "main/auto_01_8009B914_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 688,
+          "virtual_address": 2148120852
+        }
+      ],
+      "total_code": 688,
+      "total_data": 0,
+      "total_functions": 4
+    },
+    {
+      "name": "main/dolphin/os/OSContextCurrent",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 12,
+          "virtual_address": 2148121540
+        }
+      ],
+      "total_code": 12,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/os/OSContext",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 400,
+          "virtual_address": 2148121552
+        }
+      ],
+      "total_code": 400,
+      "total_data": 0,
+      "total_functions": 4
+    },
+    {
+      "name": "main/dolphin/os/OSContextClear",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 36,
+          "virtual_address": 2148121952
+        }
+      ],
+      "total_code": 36,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_8009BD84_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8708,
+          "virtual_address": 2148121988
+        }
+      ],
+      "total_code": 8708,
+      "total_data": 0,
+      "total_functions": 21
+    },
+    {
+      "name": "main/dolphin/os/OSInterruptHandlers",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 48,
+          "virtual_address": 2148130696
+        }
+      ],
+      "total_code": 48,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/dolphin/os/OSInterrupt",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2032,
+          "virtual_address": 2148130744
+        }
+      ],
+      "total_code": 2032,
+      "total_data": 0,
+      "total_functions": 6
+    },
+    {
+      "name": "main/dolphin/os/OSEXI_fn_8009E7A8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 4,
+          "virtual_address": 2148132776
+        }
+      ],
+      "total_code": 4,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/os/OSEXI_fn_8009E7AC",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 4,
+          "virtual_address": 2148132780
+        }
+      ],
+      "total_code": 4,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_8009E7B0_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2568,
+          "virtual_address": 2148132784
+        }
+      ],
+      "total_code": 2568,
+      "total_data": 0,
+      "total_functions": 6
+    },
+    {
+      "name": "main/dolphin/os/OSMemory",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1476,
+          "virtual_address": 2148135352
+        }
+      ],
+      "total_code": 1476,
+      "total_data": 0,
+      "total_functions": 12
+    },
+    {
+      "name": "main/auto_01_8009F77C_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 880,
+          "virtual_address": 2148136828
+        }
+      ],
+      "total_code": 880,
+      "total_data": 0,
+      "total_functions": 8
+    },
+    {
+      "name": "main/dolphin/os/OSState_fn_8009FAEC",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 12,
+          "virtual_address": 2148137708
+        }
+      ],
+      "total_code": 12,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/os/OSReset",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2236,
+          "virtual_address": 2148137720
+        }
+      ],
+      "total_code": 2236,
+      "total_data": 0,
+      "total_functions": 8
+    },
+    {
+      "name": "main/auto_01_800A03B4_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 664,
+          "virtual_address": 2148139956
+        }
+      ],
+      "total_code": 664,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/os/OSReboot_fn_800A064C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 96,
+          "virtual_address": 2148140620
+        }
+      ],
+      "total_code": 96,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/os/OSReboot_WriteSram",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 280,
+          "virtual_address": 2148140716
+        }
+      ],
+      "total_code": 280,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_800A07C4_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 3108,
+          "virtual_address": 2148140996
+        }
+      ],
+      "total_code": 3108,
+      "total_data": 0,
+      "total_functions": 19
+    },
+    {
+      "name": "main/dolphin/os/OSThreadQueue",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 28,
+          "virtual_address": 2148144104
+        }
+      ],
+      "total_code": 28,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/dolphin/os/OSThread",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 4980,
+          "virtual_address": 2148144132
+        }
+      ],
+      "total_code": 4980,
+      "total_data": 0,
+      "total_functions": 20
+    },
+    {
+      "name": "main/dolphin/os/OSTime_range_800A2778",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 132,
+          "virtual_address": 2148149112
+        }
+      ],
+      "total_code": 132,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/dolphin/os/OSTime",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 928,
+          "virtual_address": 2148149244
+        }
+      ],
+      "total_code": 928,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/auto_01_800A2B9C_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 148,
+          "virtual_address": 2148150172
+        }
+      ],
+      "total_code": 148,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/dolphin/db/DBInit",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 40,
+          "virtual_address": 2148150320
+        }
+      ],
+      "total_code": 40,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/db/DBGetFirstCallback",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 28,
+          "virtual_address": 2148150360
+        }
+      ],
+      "total_code": 28,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/db/DB",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 88,
+          "virtual_address": 2148150388
+        }
+      ],
+      "total_code": 88,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/dolphin/db/DBIsExceptionMarked",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 28,
+          "virtual_address": 2148150476
+        }
+      ],
+      "total_code": 28,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/db/DBPrintf",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 80,
+          "virtual_address": 2148150504
+        }
+      ],
+      "total_code": 80,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_800A2D38_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 4472,
+          "virtual_address": 2148150584
+        }
+      ],
+      "total_code": 4472,
+      "total_data": 0,
+      "total_functions": 37
+    },
+    {
+      "name": "main/dolphin/dvd/DVDLowInitWA",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 64,
+          "virtual_address": 2148155056
+        }
+      ],
+      "total_code": 64,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/dvd/DVDLow",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 3516,
+          "virtual_address": 2148155120
+        }
+      ],
+      "total_code": 3516,
+      "total_data": 0,
+      "total_functions": 18
+    },
+    {
+      "name": "main/dolphin/dvd/DVDLowSetWAType",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 68,
+          "virtual_address": 2148158636
+        }
+      ],
+      "total_code": 68,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/dvd/DVDFs",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 56,
+          "virtual_address": 2148158704
+        }
+      ],
+      "total_code": 56,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_800A4D28_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2300,
+          "virtual_address": 2148158760
+        }
+      ],
+      "total_code": 2300,
+      "total_data": 0,
+      "total_functions": 12
+    },
+    {
+      "name": "main/dolphin/dvd/DVD",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8700,
+          "virtual_address": 2148161060
+        }
+      ],
+      "total_code": 8700,
+      "total_data": 0,
+      "total_functions": 38
+    },
+    {
+      "name": "main/auto_01_800A7820_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1800,
+          "virtual_address": 2148169760
+        }
+      ],
+      "total_code": 1800,
+      "total_data": 0,
+      "total_functions": 11
+    },
+    {
+      "name": "main/dolphin/dvd/DVDQueue",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 88,
+          "virtual_address": 2148171560
+        }
+      ],
+      "total_code": 88,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/dvd/DVDFsExtras",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 96,
+          "virtual_address": 2148171648
+        }
+      ],
+      "total_code": 96,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/dvd/DVDError_ErrorCode2Num",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 284,
+          "virtual_address": 2148171744
+        }
+      ],
+      "total_code": 284,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/dvd/DVDError",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 124,
+          "virtual_address": 2148172028
+        }
+      ],
+      "total_code": 124,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_800A8178_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8456,
+          "virtual_address": 2148172152
+        }
+      ],
+      "total_code": 8456,
+      "total_data": 0,
+      "total_functions": 20
+    },
+    {
+      "name": "main/dolphin/vi/VI_fn_800AA280",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8,
+          "virtual_address": 2148180608
+        }
+      ],
+      "total_code": 8,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_800AA288_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 528,
+          "virtual_address": 2148180616
+        }
+      ],
+      "total_code": 528,
+      "total_data": 0,
+      "total_functions": 4
+    },
+    {
+      "name": "main/dolphin/vi/VI_fn_800AA498",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 60,
+          "virtual_address": 2148181144
+        }
+      ],
+      "total_code": 60,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_800AA4D4_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 4320,
+          "virtual_address": 2148181204
+        }
+      ],
+      "total_code": 4320,
+      "total_data": 0,
+      "total_functions": 11
+    },
+    {
+      "name": "main/dolphin/vi/VI_fn_800AB5B4",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 96,
+          "virtual_address": 2148185524
+        }
+      ],
+      "total_code": 96,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_800AB614_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 48092,
+          "virtual_address": 2148185620
+        }
+      ],
+      "total_code": 48092,
+      "total_data": 0,
+      "total_functions": 154
+    },
+    {
+      "name": "main/dolphin/gx/GX_fn_800B71F0",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 12,
+          "virtual_address": 2148233712
+        }
+      ],
+      "total_code": 12,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_800B71FC_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1296,
+          "virtual_address": 2148233724
+        }
+      ],
+      "total_code": 1296,
+      "total_data": 0,
+      "total_functions": 10
+    },
+    {
+      "name": "main/dolphin/gx/GX_fn_800B770C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8,
+          "virtual_address": 2148235020
+        }
+      ],
+      "total_code": 8,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/gx/GX_fn_800B7714",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8,
+          "virtual_address": 2148235028
+        }
+      ],
+      "total_code": 8,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_800B771C_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 3664,
+          "virtual_address": 2148235036
+        }
+      ],
+      "total_code": 3664,
+      "total_data": 0,
+      "total_functions": 9
+    },
+    {
+      "name": "main/dolphin/gx/GX_fn_800B856C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 16,
+          "virtual_address": 2148238700
+        }
+      ],
+      "total_code": 16,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_800B857C_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 7196,
+          "virtual_address": 2148238716
+        }
+      ],
+      "total_code": 7196,
+      "total_data": 0,
+      "total_functions": 47
+    },
+    {
+      "name": "main/dolphin/gx/GX_fn_800BA198",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 28,
+          "virtual_address": 2148245912
+        }
+      ],
+      "total_code": 28,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_800BA1B4_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 608,
+          "virtual_address": 2148245940
+        }
+      ],
+      "total_code": 608,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/dolphin/gx/GX_fn_800BA414",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 16,
+          "virtual_address": 2148246548
+        }
+      ],
+      "total_code": 16,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/gx/GX_fn_800BA424",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 28,
+          "virtual_address": 2148246564
+        }
+      ],
+      "total_code": 28,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/gx/GX_fn_800BA440",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 12,
+          "virtual_address": 2148246592
+        }
+      ],
+      "total_code": 12,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_800BA44C_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2576,
+          "virtual_address": 2148246604
+        }
+      ],
+      "total_code": 2576,
+      "total_data": 0,
+      "total_functions": 11
+    },
+    {
+      "name": "main/dolphin/gx/GX_fn_800BAE5C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8,
+          "virtual_address": 2148249180
+        }
+      ],
+      "total_code": 8,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_800BAE64_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1152,
+          "virtual_address": 2148249188
+        }
+      ],
+      "total_code": 1152,
+      "total_data": 0,
+      "total_functions": 7
+    },
+    {
+      "name": "main/dolphin/gx/GX_fn_800BB2E4",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 20,
+          "virtual_address": 2148250340
+        }
+      ],
+      "total_code": 20,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/gx/GX_fn_800BB2F8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 20,
+          "virtual_address": 2148250360
+        }
+      ],
+      "total_code": 20,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_800BB30C_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 12632,
+          "virtual_address": 2148250380
+        }
+      ],
+      "total_code": 12632,
+      "total_data": 0,
+      "total_functions": 68
+    },
+    {
+      "name": "main/trk/TRKConstructEvent",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 24,
+          "virtual_address": 2148263012
+        }
+      ],
+      "total_code": 24,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/trk/TRKNub_range_800BE47C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2504,
+          "virtual_address": 2148263036
+        }
+      ],
+      "total_code": 2504,
+      "total_data": 0,
+      "total_functions": 15
+    },
+    {
+      "name": "main/trk/TRKBufferReset",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 48,
+          "virtual_address": 2148265540
+        }
+      ],
+      "total_code": 48,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/trk/TRKNub_range_800BEE74",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 164,
+          "virtual_address": 2148265588
+        }
+      ],
+      "total_code": 164,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/trk/TRKGetBuffer",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 44,
+          "virtual_address": 2148265752
+        }
+      ],
+      "total_code": 44,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/trk/TRKBuffer",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 316,
+          "virtual_address": 2148265796
+        }
+      ],
+      "total_code": 316,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/trk/TRKTerminateSerialHandler",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8,
+          "virtual_address": 2148266112
+        }
+      ],
+      "total_code": 8,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/trk/TRKSerial_range_800BF088",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 196,
+          "virtual_address": 2148266120
+        }
+      ],
+      "total_code": 196,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/trk/TRKSerial",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 492,
+          "virtual_address": 2148266316
+        }
+      ],
+      "total_code": 492,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/trk/usr_put_initialize",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 4,
+          "virtual_address": 2148266808
+        }
+      ],
+      "total_code": 4,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_800BF33C_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 504,
+          "virtual_address": 2148266812
+        }
+      ],
+      "total_code": 504,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/trk/TRKDispatchInit",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8,
+          "virtual_address": 2148267316
+        }
+      ],
+      "total_code": 8,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/trk/TRKDispatch_range_800BF53C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 4012,
+          "virtual_address": 2148267324
+        }
+      ],
+      "total_code": 4012,
+      "total_data": 0,
+      "total_functions": 14
+    },
+    {
+      "name": "main/trk/TRKDispatchConnected",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 28,
+          "virtual_address": 2148271336
+        }
+      ],
+      "total_code": 28,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/trk/TRKDispatch_range_800C0504",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1980,
+          "virtual_address": 2148271364
+        }
+      ],
+      "total_code": 1980,
+      "total_data": 0,
+      "total_functions": 6
+    },
+    {
+      "name": "main/trk/TRKDispatchMutex",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 24,
+          "virtual_address": 2148273344
+        }
+      ],
+      "total_code": 24,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/trk/TRKDispatch_range_800C0CD8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 468,
+          "virtual_address": 2148273368
+        }
+      ],
+      "total_code": 468,
+      "total_data": 0,
+      "total_functions": 6
+    },
+    {
+      "name": "main/trk/TRKInterrupt",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1108,
+          "virtual_address": 2148273836
+        }
+      ],
+      "total_code": 1108,
+      "total_data": 0,
+      "total_functions": 7
+    },
+    {
+      "name": "main/trk/TRKTargetState",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 16,
+          "virtual_address": 2148274944
+        }
+      ],
+      "total_code": 16,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/trk/TRKTarget_range_800C1310",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 24,
+          "virtual_address": 2148274960
+        }
+      ],
+      "total_code": 24,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/trk/TRKTargetStopped",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 32,
+          "virtual_address": 2148274984
+        }
+      ],
+      "total_code": 32,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/trk/TRKTarget_range_800C1348",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 5832,
+          "virtual_address": 2148275016
+        }
+      ],
+      "total_code": 5828,
+      "total_data": 0,
+      "total_functions": 19
+    },
+    {
+      "name": "main/trk/TRKSaveState",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 880,
+          "virtual_address": 2148280848
+        }
+      ],
+      "total_code": 880,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/trk/TRKInit",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1596,
+          "virtual_address": 2148281728
+        }
+      ],
+      "total_code": 1592,
+      "total_data": 0,
+      "total_functions": 8
+    },
+    {
+      "name": "main/trk/TRKBoard_range_800C33BC",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 460,
+          "virtual_address": 2148283324
+        }
+      ],
+      "total_code": 460,
+      "total_data": 0,
+      "total_functions": 7
+    },
+    {
+      "name": "main/trk/TRKBoard",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 168,
+          "virtual_address": 2148283784
+        }
+      ],
+      "total_code": 168,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/trk/TRKBoard_range_800C3630",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 72,
+          "virtual_address": 2148283952
+        }
+      ],
+      "total_code": 72,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/trk/TRKComm_range_800C3678",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 808,
+          "virtual_address": 2148284024
+        }
+      ],
+      "total_code": 808,
+      "total_data": 0,
+      "total_functions": 4
+    },
+    {
+      "name": "main/trk/TRKCommState",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 28,
+          "virtual_address": 2148284832
+        }
+      ],
+      "total_code": 28,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/trk/TRKComm",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 508,
+          "virtual_address": 2148284860
+        }
+      ],
+      "total_code": 508,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/trk/udp_cc",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 72,
+          "virtual_address": 2148285368
+        }
+      ],
+      "total_code": 72,
+      "total_data": 0,
+      "total_functions": 9
+    },
+    {
+      "name": "main/trk/ddh_cc_range_800C3C00",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 648,
+          "virtual_address": 2148285440
+        }
+      ],
+      "total_code": 648,
+      "total_data": 0,
+      "total_functions": 6
+    },
+    {
+      "name": "main/trk/ddh_cc_close",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8,
+          "virtual_address": 2148286088
+        }
+      ],
+      "total_code": 8,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/trk/ddh_cc_range_800C3E90",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 36,
+          "virtual_address": 2148286096
+        }
+      ],
+      "total_code": 36,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/trk/ddh_cc_shutdown",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8,
+          "virtual_address": 2148286132
+        }
+      ],
+      "total_code": 8,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_800C3EBC_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 744,
+          "virtual_address": 2148286140
+        }
+      ],
+      "total_code": 744,
+      "total_data": 0,
+      "total_functions": 4
+    },
+    {
+      "name": "main/trk/circle_buffer_count",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8,
+          "virtual_address": 2148286884
+        }
+      ],
+      "total_code": 8,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/trk/gdev_cc_range_800C41AC",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 656,
+          "virtual_address": 2148286892
+        }
+      ],
+      "total_code": 656,
+      "total_data": 0,
+      "total_functions": 6
+    },
+    {
+      "name": "main/trk/gdev_cc_close",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8,
+          "virtual_address": 2148287548
+        }
+      ],
+      "total_code": 8,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/trk/gdev_cc_range_800C4444",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 36,
+          "virtual_address": 2148287556
+        }
+      ],
+      "total_code": 36,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/trk/gdev_cc_shutdown",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8,
+          "virtual_address": 2148287592
+        }
+      ],
+      "total_code": 8,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_800C4470_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 300,
+          "virtual_address": 2148287600
+        }
+      ],
+      "total_code": 300,
+      "total_data": 0,
+      "total_functions": 4
+    },
+    {
+      "name": "main/crt/mwtrace_helpers",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 4,
+          "virtual_address": 2148287900
+        }
+      ],
+      "total_code": 4,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_800C45A0_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 200,
+          "virtual_address": 2148287904
+        }
+      ],
+      "total_code": 200,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/crt/global_destructor_chain",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 164,
+          "virtual_address": 2148288104
+        }
+      ],
+      "total_code": 164,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/auto_01_800C470C_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1848,
+          "virtual_address": 2148288268
+        }
+      ],
+      "total_code": 1848,
+      "total_data": 0,
+      "total_functions": 13
+    },
+    {
+      "name": "main/crt/exit",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1556,
+          "virtual_address": 2148290116
+        }
+      ],
+      "total_code": 1556,
+      "total_data": 0,
+      "total_functions": 6
+    },
+    {
+      "name": "main/auto_01_800C5458_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8436,
+          "virtual_address": 2148291672
+        }
+      ],
+      "total_code": 8436,
+      "total_data": 0,
+      "total_functions": 7
+    },
+    {
+      "name": "main/crt/critical_regions",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 12,
+          "virtual_address": 2148300108
+        }
+      ],
+      "total_code": 12,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/crt/stdio_range_800C7558",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2656,
+          "virtual_address": 2148300120
+        }
+      ],
+      "total_code": 2656,
+      "total_data": 0,
+      "total_functions": 8
+    },
+    {
+      "name": "main/crt/wchar_range_800C7FB8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 280,
+          "virtual_address": 2148302776
+        }
+      ],
+      "total_code": 280,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/crt/wchar",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 76,
+          "virtual_address": 2148303056
+        }
+      ],
+      "total_code": 76,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/crt/mem_range_800C811C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 88,
+          "virtual_address": 2148303132
+        }
+      ],
+      "total_code": 88,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/crt/mem",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 924,
+          "virtual_address": 2148303220
+        }
+      ],
+      "total_code": 924,
+      "total_data": 0,
+      "total_functions": 5
+    },
+    {
+      "name": "main/crt/stdio_atexit",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 16,
+          "virtual_address": 2148304144
+        }
+      ],
+      "total_code": 16,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/crt/printf",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8812,
+          "virtual_address": 2148304160
+        }
+      ],
+      "total_code": 8812,
+      "total_data": 0,
+      "total_functions": 14
+    },
+    {
+      "name": "main/crt/string_range_800CA78C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 112,
+          "virtual_address": 2148312972
+        }
+      ],
+      "total_code": 112,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/crt/string",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 604,
+          "virtual_address": 2148313084
+        }
+      ],
+      "total_code": 604,
+      "total_data": 0,
+      "total_functions": 5
+    },
+    {
+      "name": "main/auto_01_800CAA58_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 15684,
+          "virtual_address": 2148313688
+        }
+      ],
+      "total_code": 15684,
+      "total_data": 0,
+      "total_functions": 40
+    },
+    {
+      "name": "main/dolphin/exi/EXI2Stubs",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 64,
+          "virtual_address": 2148329372
+        }
+      ],
+      "total_code": 64,
+      "total_data": 0,
+      "total_functions": 11
+    },
+    {
+      "name": "main/auto_01_800CE7DC_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 608,
+          "virtual_address": 2148329436
+        }
+      ],
+      "total_code": 608,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/exi/EXI2_range_800CEA3C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 296,
+          "virtual_address": 2148330044
+        }
+      ],
+      "total_code": 296,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/auto_01_800CEB64_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2980,
+          "virtual_address": 2148330340
+        }
+      ],
+      "total_code": 2980,
+      "total_data": 0,
+      "total_functions": 13
+    },
+    {
+      "name": "main/dolphin/si/SI_fn_800CF708",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 32,
+          "virtual_address": 2148333320
+        }
+      ],
+      "total_code": 32,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/si/SI_fn_800CF728",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 60,
+          "virtual_address": 2148333352
+        }
+      ],
+      "total_code": 60,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_800CF764_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 5780,
+          "virtual_address": 2148333412
+        }
+      ],
+      "total_code": 5780,
+      "total_data": 0,
+      "total_functions": 20
+    },
+    {
+      "name": "main/dolphin/si/SITypeDecode",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 332,
+          "virtual_address": 2148339192
+        }
+      ],
+      "total_code": 332,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/si/SI_fn_800D0F44",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 36,
+          "virtual_address": 2148339524
+        }
+      ],
+      "total_code": 36,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/si/SI_range_800D0F68",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 228,
+          "virtual_address": 2148339560
+        }
+      ],
+      "total_code": 228,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/si/SI_fn_800D104C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 36,
+          "virtual_address": 2148339788
+        }
+      ],
+      "total_code": 36,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_800D1070_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 852,
+          "virtual_address": 2148339824
+        }
+      ],
+      "total_code": 852,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/gs_render_util",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 7344,
+          "virtual_address": 2148340676
+        }
+      ],
+      "total_code": 7344,
+      "total_data": 0,
+      "total_functions": 39
+    },
+    {
+      "name": "main/game/gs_gfx",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 3544,
+          "virtual_address": 2148348020
+        }
+      ],
+      "total_code": 3544,
+      "total_data": 0,
+      "total_functions": 14
+    },
+    {
+      "name": "main/game/gs_render",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 57824,
+          "virtual_address": 2148351564
+        }
+      ],
+      "total_code": 57824,
+      "total_data": 0,
+      "total_functions": 277
+    },
+    {
+      "name": "main/auto_01_800E202C_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 53356,
+          "virtual_address": 2148409388
+        }
+      ],
+      "total_code": 53356,
+      "total_data": 0,
+      "total_functions": 189
+    },
+    {
+      "name": "main/game/gs_texture",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 5904,
+          "virtual_address": 2148462744
+        }
+      ],
+      "total_code": 5904,
+      "total_data": 0,
+      "total_functions": 38
+    },
+    {
+      "name": "main/game/gs_thread",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 28244,
+          "virtual_address": 2148468648
+        }
+      ],
+      "total_code": 28244,
+      "total_data": 0,
+      "total_functions": 47
+    },
+    {
+      "name": "main/game/input/input",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 3180,
+          "virtual_address": 2148496892
+        }
+      ],
+      "total_code": 3180,
+      "total_data": 0,
+      "total_functions": 22
+    },
+    {
+      "name": "main/game/gs_thread_hi",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 28216,
+          "virtual_address": 2148500072
+        }
+      ],
+      "total_code": 28216,
+      "total_data": 0,
+      "total_functions": 68
+    },
+    {
+      "name": "main/game/gs_floor_data",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1768,
+          "virtual_address": 2148528288
+        }
+      ],
+      "total_code": 1768,
+      "total_data": 0,
+      "total_functions": 15
+    },
+    {
+      "name": "main/game/gs_floor",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8584,
+          "virtual_address": 2148530056
+        }
+      ],
+      "total_code": 8584,
+      "total_data": 0,
+      "total_functions": 9
+    },
+    {
+      "name": "main/auto_01_80101910_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 232,
+          "virtual_address": 2148538640
+        }
+      ],
+      "total_code": 232,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/gs_model",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 33424,
+          "virtual_address": 2148538872
+        }
+      ],
+      "total_code": 33424,
+      "total_data": 0,
+      "total_functions": 126
+    },
+    {
+      "name": "main/auto_01_80109C88_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 9948,
+          "virtual_address": 2148572296
+        }
+      ],
+      "total_code": 9948,
+      "total_data": 0,
+      "total_functions": 19
+    },
+    {
+      "name": "main/game/gs_colsys",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2156,
+          "virtual_address": 2148582244
+        }
+      ],
+      "total_code": 2156,
+      "total_data": 0,
+      "total_functions": 16
+    },
+    {
+      "name": "main/auto_01_8010CBD0_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 10960,
+          "virtual_address": 2148584400
+        }
+      ],
+      "total_code": 10960,
+      "total_data": 0,
+      "total_functions": 22
+    },
+    {
+      "name": "main/game/gs_field_colquery",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 19004,
+          "virtual_address": 2148595360
+        }
+      ],
+      "total_code": 19004,
+      "total_data": 0,
+      "total_functions": 53
+    },
+    {
+      "name": "main/auto_01_801140DC_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 592,
+          "virtual_address": 2148614364
+        }
+      ],
+      "total_code": 592,
+      "total_data": 0,
+      "total_functions": 8
+    },
+    {
+      "name": "main/game/gs_field_resource",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1972,
+          "virtual_address": 2148614956
+        }
+      ],
+      "total_code": 1972,
+      "total_data": 0,
+      "total_functions": 17
+    },
+    {
+      "name": "main/auto_01_80114AE0_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 652,
+          "virtual_address": 2148616928
+        }
+      ],
+      "total_code": 652,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/game/gs_field_world",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 114548,
+          "virtual_address": 2148617580
+        }
+      ],
+      "total_code": 114548,
+      "total_data": 0,
+      "total_functions": 734
+    },
+    {
+      "name": "main/game/effect/gs_effect",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2108,
+          "virtual_address": 2148732128
+        }
+      ],
+      "total_code": 2108,
+      "total_data": 0,
+      "total_functions": 10
+    },
+    {
+      "name": "main/game/effect/effect_util",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 23544,
+          "virtual_address": 2148734236
+        }
+      ],
+      "total_code": 23544,
+      "total_data": 0,
+      "total_functions": 207
+    },
+    {
+      "name": "main/game/effect/tracefx",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 4032,
+          "virtual_address": 2148757780
+        }
+      ],
+      "total_code": 4032,
+      "total_data": 0,
+      "total_functions": 10
+    },
+    {
+      "name": "main/game/effect/effect_visual",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 33972,
+          "virtual_address": 2148761812
+        }
+      ],
+      "total_code": 33972,
+      "total_data": 0,
+      "total_functions": 91
+    },
+    {
+      "name": "main/game/people/people_data",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 16364,
+          "virtual_address": 2148795784
+        }
+      ],
+      "total_code": 16364,
+      "total_data": 0,
+      "total_functions": 103
+    },
+    {
+      "name": "main/game/people/people_field",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 134504,
+          "virtual_address": 2148812148
+        }
+      ],
+      "total_code": 134504,
+      "total_data": 0,
+      "total_functions": 350
+    },
+    {
+      "name": "main/auto_01_801652DC_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 224,
+          "virtual_address": 2148946652
+        }
+      ],
+      "total_code": 224,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/sound/sound",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 16,
+          "virtual_address": 2148946876
+        }
+      ],
+      "total_code": 16,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/auto_01_801653CC_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 7284,
+          "virtual_address": 2148946892
+        }
+      ],
+      "total_code": 7284,
+      "total_data": 0,
+      "total_functions": 57
+    },
+    {
+      "name": "main/game/gs_dvd",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 7204,
+          "virtual_address": 2148954176
+        }
+      ],
+      "total_code": 7204,
+      "total_data": 0,
+      "total_functions": 55
+    },
+    {
+      "name": "main/auto_01_80168C64_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 51912,
+          "virtual_address": 2148961380
+        }
+      ],
+      "total_code": 51912,
+      "total_data": 0,
+      "total_functions": 74
+    },
+    {
+      "name": "main/game/gs_scene",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 20176,
+          "virtual_address": 2149013292
+        }
+      ],
+      "total_code": 20176,
+      "total_data": 0,
+      "total_functions": 77
+    },
+    {
+      "name": "main/auto_01_8017A5FC_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2688,
+          "virtual_address": 2149033468
+        }
+      ],
+      "total_code": 2688,
+      "total_data": 0,
+      "total_functions": 9
+    },
+    {
+      "name": "main/game/fsys/fsys_file",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 16968,
+          "virtual_address": 2149036156
+        }
+      ],
+      "total_code": 16968,
+      "total_data": 0,
+      "total_functions": 68
+    },
+    {
+      "name": "main/auto_01_8017F2C4_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 72560,
+          "virtual_address": 2149053124
+        }
+      ],
+      "total_code": 72560,
+      "total_data": 0,
+      "total_functions": 166
+    },
+    {
+      "name": "main/hsd/hsd_object",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1728,
+          "virtual_address": 2149125684
+        }
+      ],
+      "total_code": 1728,
+      "total_data": 0,
+      "total_functions": 9
+    },
+    {
+      "name": "main/hsd/hsd_wobj",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 3056,
+          "virtual_address": 2149127412
+        }
+      ],
+      "total_code": 3056,
+      "total_data": 0,
+      "total_functions": 16
+    },
+    {
+      "name": "main/auto_01_801920E4_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 6168,
+          "virtual_address": 2149130468
+        }
+      ],
+      "total_code": 6168,
+      "total_data": 0,
+      "total_functions": 4
+    },
+    {
+      "name": "main/hsd/hsd_class",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 808,
+          "virtual_address": 2149136636
+        }
+      ],
+      "total_code": 808,
+      "total_data": 0,
+      "total_functions": 9
+    },
+    {
+      "name": "main/hsd/hsd_cobj",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 15936,
+          "virtual_address": 2149137444
+        }
+      ],
+      "total_code": 15936,
+      "total_data": 0,
+      "total_functions": 69
+    },
+    {
+      "name": "main/hsd/hsd_displayfunc",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 5400,
+          "virtual_address": 2149153380
+        }
+      ],
+      "total_code": 5400,
+      "total_data": 0,
+      "total_functions": 7
+    },
+    {
+      "name": "main/hsd/hsd_dobj",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 10308,
+          "virtual_address": 2149158780
+        }
+      ],
+      "total_code": 10308,
+      "total_data": 0,
+      "total_functions": 26
+    },
+    {
+      "name": "main/hsd/hsd_fog",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 3792,
+          "virtual_address": 2149169088
+        }
+      ],
+      "total_code": 3792,
+      "total_data": 0,
+      "total_functions": 15
+    },
+    {
+      "name": "main/hsd/hsd_initialize",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1984,
+          "virtual_address": 2149172880
+        }
+      ],
+      "total_code": 1984,
+      "total_data": 0,
+      "total_functions": 12
+    },
+    {
+      "name": "main/hsd/hsd_jobj",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 29104,
+          "virtual_address": 2149174864
+        }
+      ],
+      "total_code": 29104,
+      "total_data": 0,
+      "total_functions": 63
+    },
+    {
+      "name": "main/hsd/hsd_lobj",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 10688,
+          "virtual_address": 2149203968
+        }
+      ],
+      "total_code": 10688,
+      "total_data": 0,
+      "total_functions": 35
+    },
+    {
+      "name": "main/auto_01_801A69C0_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 6760,
+          "virtual_address": 2149214656
+        }
+      ],
+      "total_code": 6760,
+      "total_data": 0,
+      "total_functions": 23
+    },
+    {
+      "name": "main/hsd/hsd_mobj_clear_flags",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 24,
+          "virtual_address": 2149221416
+        }
+      ],
+      "total_code": 24,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_mobj_set_flags",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 24,
+          "virtual_address": 2149221440
+        }
+      ],
+      "total_code": 24,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_mobj_get_flags",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 24,
+          "virtual_address": 2149221464
+        }
+      ],
+      "total_code": 24,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_mobj_set_current",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8,
+          "virtual_address": 2149221488
+        }
+      ],
+      "total_code": 8,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_mobj_range_801A8478",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 48,
+          "virtual_address": 2149221496
+        }
+      ],
+      "total_code": 48,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_mtx_get_alloc_data",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 12,
+          "virtual_address": 2149221544
+        }
+      ],
+      "total_code": 12,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_mobj_range_801A84B4",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 48,
+          "virtual_address": 2149221556
+        }
+      ],
+      "total_code": 48,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_vec_get_alloc_data",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 12,
+          "virtual_address": 2149221604
+        }
+      ],
+      "total_code": 12,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_mobj_range_801A84F0",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 256,
+          "virtual_address": 2149221616
+        }
+      ],
+      "total_code": 256,
+      "total_data": 0,
+      "total_functions": 4
+    },
+    {
+      "name": "main/hsd/hsd_mtx_scaled_add",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 196,
+          "virtual_address": 2149221872
+        }
+      ],
+      "total_code": 196,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_mobj_range_801A86B4",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8020,
+          "virtual_address": 2149222068
+        }
+      ],
+      "total_code": 8020,
+      "total_data": 0,
+      "total_functions": 15
+    },
+    {
+      "name": "main/hsd/hsd_pobj_range_801AA608",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 14840,
+          "virtual_address": 2149230088
+        }
+      ],
+      "total_code": 14840,
+      "total_data": 0,
+      "total_functions": 35
+    },
+    {
+      "name": "main/hsd/hsd_pobj",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8,
+          "virtual_address": 2149244928
+        }
+      ],
+      "total_code": 8,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_pobj_range_801AE008",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 3032,
+          "virtual_address": 2149244936
+        }
+      ],
+      "total_code": 3032,
+      "total_data": 0,
+      "total_functions": 4
+    },
+    {
+      "name": "main/hsd/hsd_pobj_empty",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 4,
+          "virtual_address": 2149247968
+        }
+      ],
+      "total_code": 4,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_pobj_range_801AEBE4",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 5304,
+          "virtual_address": 2149247972
+        }
+      ],
+      "total_code": 5304,
+      "total_data": 0,
+      "total_functions": 11
+    },
+    {
+      "name": "main/hsd/hsd_robj_update_func",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 68,
+          "virtual_address": 2149253276
+        }
+      ],
+      "total_code": 68,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_robj_find_by_type",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 96,
+          "virtual_address": 2149253344
+        }
+      ],
+      "total_code": 96,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_robj_get_alloc_data",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 12,
+          "virtual_address": 2149253440
+        }
+      ],
+      "total_code": 12,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_robj_get_alloc_data2",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 12,
+          "virtual_address": 2149253452
+        }
+      ],
+      "total_code": 12,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_01_801B0158_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 68,
+          "virtual_address": 2149253464
+        }
+      ],
+      "total_code": 68,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_shadow",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 5524,
+          "virtual_address": 2149253532
+        }
+      ],
+      "total_code": 5524,
+      "total_data": 0,
+      "total_functions": 14
+    },
+    {
+      "name": "main/hsd/hsd_texp",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 41880,
+          "virtual_address": 2149259056
+        }
+      ],
+      "total_code": 41880,
+      "total_data": 0,
+      "total_functions": 77
+    },
+    {
+      "name": "main/auto_01_801BBAC8_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 18344,
+          "virtual_address": 2149300936
+        }
+      ],
+      "total_code": 18344,
+      "total_data": 0,
+      "total_functions": 43
+    },
+    {
+      "name": "main/game/battle/battle_grid",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 19016,
+          "virtual_address": 2149319280
+        }
+      ],
+      "total_code": 19016,
+      "total_data": 0,
+      "total_functions": 61
+    },
+    {
+      "name": "main/auto_01_801C4CB8_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 51128,
+          "virtual_address": 2149338296
+        }
+      ],
+      "total_code": 51128,
+      "total_data": 0,
+      "total_functions": 142
+    },
+    {
+      "name": "main/game/battle/battle_waza",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 53800,
+          "virtual_address": 2149389424
+        }
+      ],
+      "total_code": 53800,
+      "total_data": 0,
+      "total_functions": 160
+    },
+    {
+      "name": "main/auto_01_801DE698_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 67988,
+          "virtual_address": 2149443224
+        }
+      ],
+      "total_code": 67988,
+      "total_data": 0,
+      "total_functions": 162
+    },
+    {
+      "name": "main/game/battle/battle_main",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 4064,
+          "virtual_address": 2149511212
+        }
+      ],
+      "total_code": 4064,
+      "total_data": 0,
+      "total_functions": 26
+    },
+    {
+      "name": "main/game/pokemon",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 32628,
+          "virtual_address": 2149515276
+        }
+      ],
+      "total_code": 32628,
+      "total_data": 0,
+      "total_functions": 200
+    },
+    {
+      "name": "main/game/trainer",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 38884,
+          "virtual_address": 2149547904
+        }
+      ],
+      "total_code": 38884,
+      "total_data": 0,
+      "total_functions": 388
+    },
+    {
+      "name": "main/auto_01_80201764_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 4268,
+          "virtual_address": 2149586788
+        }
+      ],
+      "total_code": 4268,
+      "total_data": 0,
+      "total_functions": 14
+    },
+    {
+      "name": "main/game/colosseum_event",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 61936,
+          "virtual_address": 2149591056
+        }
+      ],
+      "total_code": 61936,
+      "total_data": 0,
+      "total_functions": 385
+    },
+    {
+      "name": "main/auto_01_80211A00_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 191424,
+          "virtual_address": 2149652992
+        }
+      ],
+      "total_code": 191424,
+      "total_data": 0,
+      "total_functions": 470
+    },
+    {
+      "name": "main/game/colosseum_battle",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 153860,
+          "virtual_address": 2149844416
+        }
+      ],
+      "total_code": 153860,
+      "total_data": 0,
+      "total_functions": 675
+    },
+    {
+      "name": "main/auto_01_80265EC4_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1176,
+          "virtual_address": 2149998276
+        }
+      ],
+      "total_code": 1176,
+      "total_data": 0,
+      "total_functions": 6
+    },
+    {
+      "name": "main/auto_00_80003100_init",
+      "sections": [
+        {
+          "name": ".init",
+          "size": 9284,
+          "virtual_address": 2147496192
+        }
+      ],
+      "total_code": 1296,
+      "total_data": 0,
+      "total_functions": 14
+    }
+  ]
+}

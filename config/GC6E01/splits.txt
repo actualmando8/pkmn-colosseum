@@ -161,8 +161,53 @@ game/data/rodata_80268424.c:
 __init_cpp_exceptions.cpp:
 	.dtors      start:0x80266380 end:0x80266384
 
+game/main.c:
+	.text       start:0x800055E0 end:0x80006630
+
+game/gs_task.c:
+	.text       start:0x80006630 end:0x80009178
+
+game/gs_party_access.c:
+	.text       start:0x8000CA34 end:0x8000D290
+
+game/gs_npc_interact.c:
+	.text       start:0x8000DAA8 end:0x80011EA4
+
+game/gs_event_exec.c:
+	.text       start:0x80012D20 end:0x8001501C
+
+game/gs_pokemon_summary.c:
+	.text       start:0x8001501C end:0x800181C4
+
+game/gs_pcbox.c:
+	.text       start:0x800181C4 end:0x80020328
+
+game/gs_title.c:
+	.text       start:0x80020328 end:0x80026370
+
+game/gs_worldmap.c:
+	.text       start:0x80026370 end:0x80030170
+
+game/gs_npc_event.c:
+	.text       start:0x80030170 end:0x80033278
+
+game/movie.c:
+	.text       start:0x80035E04 end:0x8003686C
+
 game/menu/menu_bag.c:
 	.text       start:0x8004EADC end:0x80051710
+
+game/menu/menu_middle.c:
+	.text       start:0x80069C0C end:0x8007109C
+
+game/menu/menu_carde_matrix.c:
+	.text       start:0x8007C300 end:0x8007FD64
+
+game/gba/gba_conv.c:
+	.text       start:0x80088428 end:0x80089048
+
+game/gba/gba_misc.c:
+	.text       start:0x800896B8 end:0x8008C7B0
 
 dolphin/os/PPCArch.c:
 	.text       start:0x800980E0 end:0x80098108
@@ -176,8 +221,14 @@ dolphin/os/OSAlarmCreate.c:
 dolphin/os/OSArena.c:
 	.text       start:0x8009AFB0 end:0x8009AFD0
 
+dolphin/os/OSCache.c:
+	.text       start:0x8009B290 end:0x8009B914
+
 dolphin/os/OSContextCurrent.c:
 	.text       start:0x8009BBC4 end:0x8009BBD0
+
+dolphin/os/OSContext.c:
+	.text       start:0x8009BBD0 end:0x8009BD60
 
 dolphin/os/OSContextClear.c:
 	.text       start:0x8009BD60 end:0x8009BD84
@@ -185,14 +236,23 @@ dolphin/os/OSContextClear.c:
 dolphin/os/OSInterruptHandlers.c:
 	.text       start:0x8009DF88 end:0x8009DFB8
 
+dolphin/os/OSInterrupt.c:
+	.text       start:0x8009DFB8 end:0x8009E7A8
+
 dolphin/os/OSEXI_fn_8009E7A8.c:
 	.text       start:0x8009E7A8 end:0x8009E7AC
 
 dolphin/os/OSEXI_fn_8009E7AC.c:
 	.text       start:0x8009E7AC end:0x8009E7B0
 
+dolphin/os/OSMemory.c:
+	.text       start:0x8009F1B8 end:0x8009F77C
+
 dolphin/os/OSState_fn_8009FAEC.c:
 	.text       start:0x8009FAEC end:0x8009FAF8
+
+dolphin/os/OSReset.c:
+	.text       start:0x8009FAF8 end:0x800A03B4
 
 dolphin/os/OSReboot_fn_800A064C.c:
 	.text       start:0x800A064C end:0x800A06AC
@@ -203,6 +263,12 @@ dolphin/os/OSReboot_WriteSram.c:
 dolphin/os/OSThreadQueue.c:
 	.text       start:0x800A13E8 end:0x800A1404
 
+dolphin/os/OSThread.c:
+	.text       start:0x800A1404 end:0x800A2778
+
+dolphin/os/OSTime_range_800A2778.c:
+	.text       start:0x800A2778 end:0x800A27FC
+
 dolphin/os/OSTime.c:
 	.text       start:0x800A27FC end:0x800A2B9C
 
@@ -211,6 +277,9 @@ dolphin/db/DBInit.c:
 
 dolphin/db/DBGetFirstCallback.c:
 	.text       start:0x800A2C58 end:0x800A2C74
+
+dolphin/db/DB.c:
+	.text       start:0x800A2C74 end:0x800A2CCC
 
 dolphin/db/DBIsExceptionMarked.c:
 	.text       start:0x800A2CCC end:0x800A2CE8
@@ -221,17 +290,26 @@ dolphin/db/DBPrintf.c:
 dolphin/dvd/DVDLowInitWA.c:
 	.text       start:0x800A3EB0 end:0x800A3EF0
 
+dolphin/dvd/DVDLow.c:
+	.text       start:0x800A3EF0 end:0x800A4CAC
+
 dolphin/dvd/DVDLowSetWAType.c:
 	.text       start:0x800A4CAC end:0x800A4CF0
 
 dolphin/dvd/DVDFs.c:
 	.text       start:0x800A4CF0 end:0x800A4D28
 
+dolphin/dvd/DVD.c:
+	.text       start:0x800A5624 end:0x800A7820
+
 dolphin/dvd/DVDQueue.c:
 	.text       start:0x800A7F28 end:0x800A7F80
 
 dolphin/dvd/DVDFsExtras.c:
 	.text       start:0x800A7F80 end:0x800A7FE0
+
+dolphin/dvd/DVDError_ErrorCode2Num.c:
+	.text       start:0x800A7FE0 end:0x800A80FC
 
 dolphin/dvd/DVDError.c:
 	.text       start:0x800A80FC end:0x800A8178
@@ -241,6 +319,9 @@ dolphin/vi/VI_fn_800AA280.c:
 
 dolphin/vi/VI_fn_800AA498.c:
 	.text       start:0x800AA498 end:0x800AA4D4
+
+dolphin/vi/VI_fn_800AB5B4.c:
+	.text       start:0x800AB5B4 end:0x800AB614
 
 dolphin/gx/GX_fn_800B71F0.c:
 	.text       start:0x800B71F0 end:0x800B71FC
@@ -278,14 +359,26 @@ dolphin/gx/GX_fn_800BB2F8.c:
 trk/TRKConstructEvent.c:
 	.text       start:0x800BE464 end:0x800BE47C
 
+trk/TRKNub_range_800BE47C.c:
+	.text       start:0x800BE47C end:0x800BEE44
+
 trk/TRKBufferReset.c:
 	.text       start:0x800BEE44 end:0x800BEE74
+
+trk/TRKNub_range_800BEE74.c:
+	.text       start:0x800BEE74 end:0x800BEF18
 
 trk/TRKGetBuffer.c:
 	.text       start:0x800BEF18 end:0x800BEF44
 
+trk/TRKBuffer.c:
+	.text       start:0x800BEF44 end:0x800BF080
+
 trk/TRKTerminateSerialHandler.c:
 	.text       start:0x800BF080 end:0x800BF088
+
+trk/TRKSerial_range_800BF088.c:
+	.text       start:0x800BF088 end:0x800BF14C
 
 trk/TRKSerial.c:
 	.text       start:0x800BF14C end:0x800BF338
@@ -296,20 +389,53 @@ trk/usr_put_initialize.c:
 trk/TRKDispatchInit.c:
 	.text       start:0x800BF534 end:0x800BF53C
 
+trk/TRKDispatch_range_800BF53C.c:
+	.text       start:0x800BF53C end:0x800C04E8
+
 trk/TRKDispatchConnected.c:
 	.text       start:0x800C04E8 end:0x800C0504
+
+trk/TRKDispatch_range_800C0504.c:
+	.text       start:0x800C0504 end:0x800C0CC0
 
 trk/TRKDispatchMutex.c:
 	.text       start:0x800C0CC0 end:0x800C0CD8
 
+trk/TRKDispatch_range_800C0CD8.c:
+	.text       start:0x800C0CD8 end:0x800C0EAC
+
+trk/TRKInterrupt.c:
+	.text       start:0x800C0EAC end:0x800C1300
+
 trk/TRKTargetState.c:
 	.text       start:0x800C1300 end:0x800C1310
+
+trk/TRKTarget_range_800C1310.c:
+	.text       start:0x800C1310 end:0x800C1328
 
 trk/TRKTargetStopped.c:
 	.text       start:0x800C1328 end:0x800C1348
 
+trk/TRKTarget_range_800C1348.c:
+	.text       start:0x800C1348 end:0x800C2A10
+
+trk/TRKSaveState.c:
+	.text       start:0x800C2A10 end:0x800C2D80
+
+trk/TRKInit.c:
+	.text       start:0x800C2D80 end:0x800C33BC
+
+trk/TRKBoard_range_800C33BC.c:
+	.text       start:0x800C33BC end:0x800C3588
+
 trk/TRKBoard.c:
 	.text       start:0x800C3588 end:0x800C3630
+
+trk/TRKBoard_range_800C3630.c:
+	.text       start:0x800C3630 end:0x800C3678
+
+trk/TRKComm_range_800C3678.c:
+	.text       start:0x800C3678 end:0x800C39A0
 
 trk/TRKCommState.c:
 	.text       start:0x800C39A0 end:0x800C39BC
@@ -320,8 +446,14 @@ trk/TRKComm.c:
 trk/udp_cc.c:
 	.text       start:0x800C3BB8 end:0x800C3C00
 
+trk/ddh_cc_range_800C3C00.c:
+	.text       start:0x800C3C00 end:0x800C3E88
+
 trk/ddh_cc_close.c:
 	.text       start:0x800C3E88 end:0x800C3E90
+
+trk/ddh_cc_range_800C3E90.c:
+	.text       start:0x800C3E90 end:0x800C3EB4
 
 trk/ddh_cc_shutdown.c:
 	.text       start:0x800C3EB4 end:0x800C3EBC
@@ -329,8 +461,14 @@ trk/ddh_cc_shutdown.c:
 trk/circle_buffer_count.c:
 	.text       start:0x800C41A4 end:0x800C41AC
 
+trk/gdev_cc_range_800C41AC.c:
+	.text       start:0x800C41AC end:0x800C443C
+
 trk/gdev_cc_close.c:
 	.text       start:0x800C443C end:0x800C4444
+
+trk/gdev_cc_range_800C4444.c:
+	.text       start:0x800C4444 end:0x800C4468
 
 trk/gdev_cc_shutdown.c:
 	.text       start:0x800C4468 end:0x800C4470
@@ -338,11 +476,26 @@ trk/gdev_cc_shutdown.c:
 crt/mwtrace_helpers.c:
 	.text       start:0x800C459C end:0x800C45A0
 
+crt/global_destructor_chain.c:
+	.text       start:0x800C4668 end:0x800C470C
+
+crt/exit.c:
+	.text       start:0x800C4E44 end:0x800C5458
+
 crt/critical_regions.c:
 	.text       start:0x800C754C end:0x800C7558
 
+crt/stdio_range_800C7558.c:
+	.text       start:0x800C7558 end:0x800C7FB8
+
+crt/wchar_range_800C7FB8.c:
+	.text       start:0x800C7FB8 end:0x800C80D0
+
 crt/wchar.c:
 	.text       start:0x800C80D0 end:0x800C811C
+
+crt/mem_range_800C811C.c:
+	.text       start:0x800C811C end:0x800C8174
 
 crt/mem.c:
 	.text       start:0x800C8174 end:0x800C8510
@@ -350,11 +503,20 @@ crt/mem.c:
 crt/stdio_atexit.c:
 	.text       start:0x800C8510 end:0x800C8520
 
+crt/printf.c:
+	.text       start:0x800C8520 end:0x800CA78C
+
+crt/string_range_800CA78C.c:
+	.text       start:0x800CA78C end:0x800CA7FC
+
 crt/string.c:
 	.text       start:0x800CA7FC end:0x800CAA58
 
 dolphin/exi/EXI2Stubs.c:
 	.text       start:0x800CE79C end:0x800CE7DC
+
+dolphin/exi/EXI2_range_800CEA3C.c:
+	.text       start:0x800CEA3C end:0x800CEB64
 
 dolphin/si/SI_fn_800CF708.c:
 	.text       start:0x800CF708 end:0x800CF728
@@ -368,11 +530,113 @@ dolphin/si/SITypeDecode.c:
 dolphin/si/SI_fn_800D0F44.c:
 	.text       start:0x800D0F44 end:0x800D0F68
 
+dolphin/si/SI_range_800D0F68.c:
+	.text       start:0x800D0F68 end:0x800D104C
+
 dolphin/si/SI_fn_800D104C.c:
 	.text       start:0x800D104C end:0x800D1070
 
+game/gs_render_util.c:
+	.text       start:0x800D13C4 end:0x800D3074
+
+game/gs_gfx.c:
+	.text       start:0x800D3074 end:0x800D3E4C
+
+game/gs_render.c:
+	.text       start:0x800D3E4C end:0x800E202C
+
+game/gs_texture.c:
+	.text       start:0x800EF098 end:0x800F07A8
+
+game/gs_thread.c:
+	.text       start:0x800F07A8 end:0x800F75FC
+
+game/input/input.c:
+	.text       start:0x800F75FC end:0x800F8268
+
+game/gs_thread_hi.c:
+	.text       start:0x800F8268 end:0x800FF0A0
+
+game/gs_floor_data.c:
+	.text       start:0x800FF0A0 end:0x800FF788
+
+game/gs_floor.c:
+	.text       start:0x800FF788 end:0x80101910
+
+game/gs_model.c:
+	.text       start:0x801019F8 end:0x80109C88
+
+game/gs_colsys.c:
+	.text       start:0x8010C364 end:0x8010CBD0
+
+game/gs_field_colquery.c:
+	.text       start:0x8010F6A0 end:0x801140DC
+
+game/gs_field_resource.c:
+	.text       start:0x8011432C end:0x80114AE0
+
+game/gs_field_world.c:
+	.text       start:0x80114D6C end:0x80130CE0
+
+game/effect/gs_effect.c:
+	.text       start:0x80130CE0 end:0x8013151C
+
+game/effect/effect_util.c:
+	.text       start:0x8013151C end:0x80137114
+
+game/effect/tracefx.c:
+	.text       start:0x80137114 end:0x801380D4
+
+game/effect/effect_visual.c:
+	.text       start:0x801380D4 end:0x80140588
+
+game/people/people_data.c:
+	.text       start:0x80140588 end:0x80144574
+
+game/people/people_field.c:
+	.text       start:0x80144574 end:0x801652DC
+
 game/sound/sound.c:
 	.text       start:0x801653BC end:0x801653CC
+
+game/gs_dvd.c:
+	.text       start:0x80167040 end:0x80168C64
+
+game/gs_scene.c:
+	.text       start:0x8017572C end:0x8017A5FC
+
+game/fsys/fsys_file.c:
+	.text       start:0x8017B07C end:0x8017F2C4
+
+hsd/hsd_object.c:
+	.text       start:0x80190E34 end:0x801914F4
+
+hsd/hsd_wobj.c:
+	.text       start:0x801914F4 end:0x801920E4
+
+hsd/hsd_class.c:
+	.text       start:0x801938FC end:0x80193C24
+
+hsd/hsd_cobj.c:
+	.text       start:0x80193C24 end:0x80197A64
+
+hsd/hsd_displayfunc.c:
+	.text       start:0x80197A64 end:0x80198F7C
+
+hsd/hsd_dobj.c:
+	.text       start:0x80198F7C end:0x8019B7C0
+
+hsd/hsd_fog.c:
+	.text       start:0x8019B7C0 end:0x8019C690
+
+hsd/hsd_initialize.c:
+	.text       start:0x8019C690 end:0x8019CE50
+
+hsd/hsd_jobj.c:
+	.text       start:0x8019CE50 end:0x801A4000
+
+hsd/hsd_lobj.c:
+	.text       start:0x801A4000 end:0x801A69C0
 
 hsd/hsd_mobj_clear_flags.c:
 	.text       start:0x801A8428 end:0x801A8440
@@ -386,20 +650,41 @@ hsd/hsd_mobj_get_flags.c:
 hsd/hsd_mobj_set_current.c:
 	.text       start:0x801A8470 end:0x801A8478
 
+hsd/hsd_mobj_range_801A8478.c:
+	.text       start:0x801A8478 end:0x801A84A8
+
 hsd/hsd_mtx_get_alloc_data.c:
 	.text       start:0x801A84A8 end:0x801A84B4
+
+hsd/hsd_mobj_range_801A84B4.c:
+	.text       start:0x801A84B4 end:0x801A84E4
 
 hsd/hsd_vec_get_alloc_data.c:
 	.text       start:0x801A84E4 end:0x801A84F0
 
+hsd/hsd_mobj_range_801A84F0.c:
+	.text       start:0x801A84F0 end:0x801A85F0
+
 hsd/hsd_mtx_scaled_add.c:
 	.text       start:0x801A85F0 end:0x801A86B4
+
+hsd/hsd_mobj_range_801A86B4.c:
+	.text       start:0x801A86B4 end:0x801AA608
+
+hsd/hsd_pobj_range_801AA608.c:
+	.text       start:0x801AA608 end:0x801AE000
 
 hsd/hsd_pobj.c:
 	.text       start:0x801AE000 end:0x801AE008
 
+hsd/hsd_pobj_range_801AE008.c:
+	.text       start:0x801AE008 end:0x801AEBE0
+
 hsd/hsd_pobj_empty.c:
 	.text       start:0x801AEBE0 end:0x801AEBE4
+
+hsd/hsd_pobj_range_801AEBE4.c:
+	.text       start:0x801AEBE4 end:0x801B009C
 
 hsd/hsd_robj_update_func.c:
 	.text       start:0x801B009C end:0x801B00E0
@@ -412,3 +697,30 @@ hsd/hsd_robj_get_alloc_data.c:
 
 hsd/hsd_robj_get_alloc_data2.c:
 	.text       start:0x801B014C end:0x801B0158
+
+hsd/hsd_shadow.c:
+	.text       start:0x801B019C end:0x801B1730
+
+hsd/hsd_texp.c:
+	.text       start:0x801B1730 end:0x801BBAC8
+
+game/battle/battle_grid.c:
+	.text       start:0x801C0270 end:0x801C4CB8
+
+game/battle/battle_waza.c:
+	.text       start:0x801D1470 end:0x801DE698
+
+game/battle/battle_main.c:
+	.text       start:0x801EF02C end:0x801F000C
+
+game/pokemon.c:
+	.text       start:0x801F000C end:0x801F7F80
+
+game/trainer.c:
+	.text       start:0x801F7F80 end:0x80201764
+
+game/colosseum_event.c:
+	.text       start:0x80202810 end:0x80211A00
+
+game/colosseum_battle.c:
+	.text       start:0x802405C0 end:0x80265EC4

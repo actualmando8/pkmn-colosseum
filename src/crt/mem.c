@@ -367,9 +367,10 @@ void fn_800C82EC(void* dst, const void* src, size_t n) {
 /* MSL mem.c/mem_funcs.c (zeldaret/tww); CW 2.0. Verified 100%. */
 void fn_800C83AC(void* dst, const void* src, size_t n) {
     u32 i;
+    u32 v1, v2;
 
-    cps = ((u8*)src) + n;
     cpd = ((u8*)dst) + n;
+    cps = ((u8*)src) + n;
 
     i = ((u32)cpd) & 3;
 
@@ -385,14 +386,22 @@ void fn_800C83AC(void* dst, const void* src, size_t n) {
 
     if (i)
         do {
-            *--lpd = *--lps;
-            *--lpd = *--lps;
-            *--lpd = *--lps;
-            *--lpd = *--lps;
-            *--lpd = *--lps;
-            *--lpd = *--lps;
-            *--lpd = *--lps;
-            *--lpd = *--lps;
+            v1 = *--lps;
+            v2 = *--lps;
+            *--lpd = v1;
+            v1 = *--lps;
+            *--lpd = v2;
+            v2 = *--lps;
+            *--lpd = v1;
+            v1 = *--lps;
+            *--lpd = v2;
+            v2 = *--lps;
+            *--lpd = v1;
+            v1 = *--lps;
+            *--lpd = v2;
+            v2 = *--lps;
+            *--lpd = v1;
+            *--lpd = v2;
         } while (--i);
 
     i = (n & 31) >> 2;

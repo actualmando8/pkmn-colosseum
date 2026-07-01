@@ -127,6 +127,8 @@ s32 fn_8004EADC(void) {
 /* 0x80050844 | size: 0xECC */
 s32 fn_80050844(void) {
 #pragma peephole off
+    s32 dummy1;
+    s32 dummy0;
     s32 value24;
     s32 value23;
     s32 value22;
