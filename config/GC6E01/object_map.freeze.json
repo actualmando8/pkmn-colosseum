@@ -6,24 +6,24 @@
     "total_code": 2495108,
     "total_data": 2196256,
     "total_functions": 8603,
-    "total_units": 318
+    "total_units": 319
   },
   "topology_status": {
     "auto_units": 80,
-    "named_units": 238,
-    "source_backed_units": 218,
-    "auto_code": 1084616,
+    "named_units": 239,
+    "source_backed_units": 219,
+    "auto_code": 1084448,
     "auto_data": 2182883,
-    "auto_functions": 2740
+    "auto_functions": 2738
   },
   "baseline_progress": {
-    "matched_code": "280964",
-    "matched_code_percent": 11.260594,
+    "matched_code": "253024",
+    "matched_code_percent": 10.140803,
     "matched_data": "12364",
     "matched_data_percent": 0.56295806,
-    "matched_functions": 3341,
-    "matched_functions_percent": 38.83529,
-    "fuzzy_match_percent": 24.434902
+    "matched_functions": 3332,
+    "matched_functions_percent": 38.730675,
+    "fuzzy_match_percent": 22.27867
   },
   "unit_topology": [
     {
@@ -1886,7 +1886,7 @@
       "total_functions": 11
     },
     {
-      "name": "main/dolphin/vi/VI_fn_800AB5B4",
+      "name": "main/dolphin/pad/PAD_fn_800AB5B4",
       "sections": [
         {
           "name": ".text",
@@ -3983,26 +3983,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 18344,
+          "size": 18176,
           "virtual_address": 2149300936
         }
       ],
-      "total_code": 18344,
+      "total_code": 18176,
       "total_data": 0,
-      "total_functions": 43
+      "total_functions": 41
+    },
+    {
+      "name": "main/hsd/hsd_aobj_range_801C01C8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 3416,
+          "virtual_address": 2149319112
+        }
+      ],
+      "total_code": 3416,
+      "total_data": 0,
+      "total_functions": 5
     },
     {
       "name": "main/game/battle/battle_grid",
       "sections": [
         {
           "name": ".text",
-          "size": 19016,
-          "virtual_address": 2149319280
+          "size": 15768,
+          "virtual_address": 2149322528
         }
       ],
-      "total_code": 19016,
+      "total_code": 15768,
       "total_data": 0,
-      "total_functions": 61
+      "total_functions": 58
     },
     {
       "name": "main/auto_01_801C4CB8_text",

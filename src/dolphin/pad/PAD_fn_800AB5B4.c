@@ -5,9 +5,9 @@ extern u32 lbl_80478A18;
 extern u32 __PADSpec;
 extern void SPEC0_MakeStatus(void);
 extern void SPEC1_MakeStatus(void);
-extern void fn_800AB8FC(void);
+extern void SPEC2_MakeStatus(void);
 
-void fn_800AB5B4(s32 spec) {
+void PADSetSpec(s32 spec) {
     __PADSpec = 0;
     switch (spec) {
     case 0:
@@ -20,7 +20,7 @@ void fn_800AB5B4(s32 spec) {
     case 3:
     case 4:
     case 5:
-        lbl_80478A1C = (u32)fn_800AB8FC;
+        lbl_80478A1C = (u32)SPEC2_MakeStatus;
         break;
     }
     lbl_80478A18 = spec;

@@ -3,7 +3,7 @@
  * @brief Battle grid system -- scene layout, field positions, camera setup,
  *        Pokemon/trainer model placement, and grid state management.
  *
- * Address range: 0x801C01C8 - 0x801C53BC (64 functions)
+ * Address range: 0x801C0F20 - 0x801C4CB8 (58 functions)
  *
  * This file covers the battle grid subsystem responsible for:
  *   - Pre-grid initialization (camera context, field positions)
@@ -75,154 +75,10 @@ extern u8    lbl_8046AC60[0x100]; /* battle transfer context */
 extern void* lbl_8046D500;        /* battle state machine context ptr */
 
 /* =========================================================================
- * PRE-GRID FUNCTIONS (0x801C01C8 - 0x801C3108)
- *
- * These functions manage the camera/field setup that occurs before
- * the main battle grid is initialized. Many are large float-heavy
- * animation or state machine functions.
+ * NOTE: 0x801C01C8-0x801C0F20 (incl. the real, variadic HSD_ForeachAnim at
+ * 0x801C028C) is HSD library code, split into hsd/hsd_aobj_range_801C01C8.c
+ * (audit 2026-07-01). Fictional "pre-grid state machine" C removed.
  * ========================================================================= */
-
-/**
- * fn_801C01C8 - Pre-grid camera setup helper A.
- * Address: 0x801C01C8 | Size: 0x54
- */
-void fn_801C01C8(void* arg0, s32 arg1) {
-    u8* ctx = (u8*)arg0;
-    if (ctx == NULL) {
-        return;
-    }
-    /* Store camera mode in context */
-    *(s32*)(ctx + 0x10) = arg1;
-    /* Reset camera animation timer */
-    *(f32*)(ctx + 0x14) = 0.0f;
-}
-
-/**
- * fn_801C021C - Pre-grid camera setup helper B.
- * Address: 0x801C021C | Size: 0x54
- */
-void fn_801C021C(void* arg0, s32 arg1) {
-    u8* ctx = (u8*)arg0;
-    if (ctx == NULL) {
-        return;
-    }
-    /* Store camera transition target in context */
-    *(s32*)(ctx + 0x18) = arg1;
-    *(f32*)(ctx + 0x1C) = 0.0f;
-}
-
-/**
- * fn_801C0270 - Return grid state flag.
- * Address: 0x801C0270 | Size: 0xC
- */
-s32 fn_801C0270(void) {
-    extern u32 lbl_8047B388;
-    lbl_8047B388 = 0;
-}
-
-/**
- * fn_801C027C - Set JObj animation frame.
- * Address: 0x801C027C | Size: 0x10
- */
-void fn_801C027C(void* obj, f32 frame) {
-    if (obj != NULL) {
-        *(f32*)((u8*)obj + 0x10) = frame;
-    }
-}
-
-/**
- * HSD_ForeachAnim - Main pre-grid state machine.
- * Address: 0x801C028C | Size: 0xC94
- * This is a massive state machine controlling the pre-battle field setup.
- * It handles camera transitions, model loading, and initial animations
- * before the battle grid is ready.
- */
-void HSD_ForeachAnim(void* ctx) {
-    u8* state = (u8*)ctx;
-    s32 phase;
-
-    if (state == NULL) {
-        return;
-    }
-
-    phase = *(s32*)(state + 0x00);
-
-    /* Pre-grid state machine:
-     * Phase 0: Initialize field geometry and camera
-     * Phase 1: Load trainer models into pre-grid slots
-     * Phase 2: Play encounter entrance animation
-     * Phase 3: Transition camera to battle viewpoint
-     * Phase 4: Load Pokemon models
-     * Phase 5: Play Pokemon entrance animations
-     * Phase 6: Wait for animations to complete
-     * Phase 7: Signal grid ready
-     */
-    switch (phase) {
-    case 0:
-        /* Initialize field geometry */
-        memset(lbl_80466E50, 0, 0x1E0);
-        memset(lbl_80467030, 0, 0x20);
-        *(s32*)(state + 0x00) = 1;
-        break;
-
-    case 1:
-        /* Load trainer models */
-        fn_801C1274(ctx, 0);
-        fn_801C1274(ctx, 1);
-        fn_801C1274(ctx, 2);
-        fn_801C1274(ctx, 3);
-        *(s32*)(state + 0x00) = 2;
-        break;
-
-    case 2:
-        /* Encounter entrance animation part 1 */
-        fn_801C1810(ctx);
-        *(s32*)(state + 0x00) = 3;
-        break;
-
-    case 3:
-        /* Camera transition */
-        fn_801C25E4(ctx, 0);
-        *(s32*)(state + 0x00) = 4;
-        break;
-
-    case 4:
-        /* Encounter entrance animation part 2 */
-        fn_801C1F00(ctx);
-        *(s32*)(state + 0x00) = 5;
-        break;
-
-    case 5:
-        /* Pre-grid animation update */
-        fn_801C0F20(ctx);
-        /* Check if animations are complete */
-        {
-            f32 timer = *(f32*)(state + 0x08);
-            timer += 1.0f;
-            *(f32*)(state + 0x08) = timer;
-            if (timer >= 60.0f) {
-                *(s32*)(state + 0x00) = 6;
-            }
-        }
-        break;
-
-    case 6:
-        /* Wait for animations */
-        {
-            f32 timer = *(f32*)(state + 0x08);
-            timer += 1.0f;
-            *(f32*)(state + 0x08) = timer;
-            if (timer >= 120.0f) {
-                *(s32*)(state + 0x00) = 7;
-            }
-        }
-        break;
-
-    case 7:
-        /* Grid ready */
-        break;
-    }
-}
 
 /**
  * fn_801C0F20 - Pre-grid animation update.

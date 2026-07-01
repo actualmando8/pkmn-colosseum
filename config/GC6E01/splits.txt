@@ -320,7 +320,7 @@ dolphin/vi/VI_fn_800AA280.c:
 dolphin/vi/VI_fn_800AA498.c:
 	.text       start:0x800AA498 end:0x800AA4D4
 
-dolphin/vi/VI_fn_800AB5B4.c:
+dolphin/pad/PAD_fn_800AB5B4.c:
 	.text       start:0x800AB5B4 end:0x800AB614
 
 dolphin/gx/GX_fn_800B71F0.c:
@@ -704,8 +704,11 @@ hsd/hsd_shadow.c:
 hsd/hsd_texp.c:
 	.text       start:0x801B1730 end:0x801BBAC8
 
+hsd/hsd_aobj_range_801C01C8.c:
+	.text       start:0x801C01C8 end:0x801C0F20
+
 game/battle/battle_grid.c:
-	.text       start:0x801C0270 end:0x801C4CB8
+	.text       start:0x801C0F20 end:0x801C4CB8
 
 game/battle/battle_waza.c:
 	.text       start:0x801D1470 end:0x801DE698
