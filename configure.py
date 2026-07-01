@@ -242,12 +242,14 @@ config.libs = [
         [
             Object(CodeCandidate, "trk/ddh_cc_range_800C3E90.c", mw_version="GC/1.3", progress_category="sdk"),  # CALIB_TRK
             Object(CodeCandidate, "hsd/hsd_mobj_range_801A8478.c", mw_version="GC/1.3", progress_category="sdk"),  # CALIB_HSD1
+            Object(CodeCandidate, "hsd/hsd_mobj_range_801A84B4.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_HSD_VECINIT
             Object(CodeCandidate, "hsd/hsd_mobj_range_801A84F0.c", mw_version="GC/1.3", progress_category="sdk"),  # CALIB_HSD2
             Object(CodeCandidate, "crt/stdio_range_800C7558.c", mw_version="GC/1.3", progress_category="sdk"),  # CALIB_CRT
             Object(CodeCandidate, "trk/ddh_cc_range_800C3C00.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK
             Object(CodeCandidate, "trk/gdev_cc_range_800C41AC.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK
             Object(CodeCandidate, "trk/gdev_cc_range_800C4444.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK
             Object(CodeCandidate, "hsd/hsd_mobj_range_801A86B4.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_HSD
+            Object(CodeCandidate, "hsd/hsd_pobj_range_801AA608.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_HSD_POBJ
             Object(CodeCandidate, "trk/TRKTarget_range_800C1310.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK2
             Object(CodeCandidate, "crt/printf.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_CRT_PRINTF
             Object(
