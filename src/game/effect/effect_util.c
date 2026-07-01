@@ -51,10 +51,29 @@ extern u32 lbl_8047AE9C;
 extern u16 lbl_8047AEA2;
 extern u8 lbl_8047AED0;
 
+typedef struct EffectLinkedStatusRow {
+    u16 links[8];
+} EffectLinkedStatusRow;
+
+typedef struct EffectTraceFxEntry {
+    u8 kind;
+    u8 pad_01[7];
+    u32 effectId;
+    u8 pad_0C[0xC];
+} EffectTraceFxEntry;
+
+typedef struct EffectTraceEntry {
+    u8 kind;
+    u8 pad_01;
+    u16 value0;
+    u16 value1;
+    u8 pad_06[6];
+} EffectTraceEntry;
+
 /* ===== Index lookup globals ===== */
 extern GSEffectGlobals lbl_803635C0;  /* effect globals (BSS) */
-extern u8 lbl_80363B88[];  /* trace fx table (BSS) */
-extern u8 lbl_80363C00[];  /* trace table (BSS) */
+extern EffectTraceFxEntry lbl_80363B88[];  /* trace fx table (BSS) */
+extern EffectTraceEntry lbl_80363C00[];  /* trace table (BSS) */
 extern u32 lbl_80478B98;  /* effect count (SDA) */
 extern u32 lbl_80478BA0;  /* trace count (SDA) */
 
@@ -3542,7 +3561,7 @@ u32 fn_80135E44(u32 kind, u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
 
 /* 0x80135F58 | 0x38 */
 extern u32 lbl_80478B90;
-extern u8 lbl_80363B78[];
+extern EffectLinkedStatusRow lbl_80363B78[];
 #if 0
 asm void fn_80135F58(void) {
 #include "src/game/effect/effect_util_fn_80135F58.inc"
@@ -3553,7 +3572,7 @@ u32 fn_80135F58(u32 index, u32 sub) {
     if (index > lbl_80478B90 || sub > 8) {
         return 0;
     }
-    return *(u16*)(lbl_80363B78 + index * 0x10 + sub * 2);
+    return lbl_80363B78[index].links[sub];
 }
 #pragma scheduling off
 #endif
@@ -5014,16 +5033,16 @@ asm void fn_80136368(void) {
 #else
 #pragma scheduling on
 u32 fn_80136368(u16 index) {
-    u8* entry;
+    EffectTraceFxEntry* entry;
     if ((u32)index > lbl_80478B98) {
         entry = NULL;
     } else {
-        entry = (u8*)lbl_80363B88 + (u32)index * 0x18;
+        entry = &lbl_80363B88[index];
     }
     if (entry == NULL) {
         return 0;
     }
-    return *(u32*)(entry + 0x8);
+    return entry->effectId;
 }
 #pragma scheduling off
 #endif
@@ -5035,16 +5054,16 @@ asm void fn_801363A8(void) {
 #else
 #pragma scheduling on
 u32 fn_801363A8(u16 index) {
-    u8* entry;
+    EffectTraceFxEntry* entry;
     if ((u32)index > lbl_80478B98) {
         entry = NULL;
     } else {
-        entry = (u8*)lbl_80363B88 + (u32)index * 0x18;
+        entry = &lbl_80363B88[index];
     }
     if (entry == NULL) {
         return 0;
     }
-    return *(u8*)(entry + 0x0);
+    return entry->kind;
 }
 #pragma scheduling off
 #endif
@@ -5056,16 +5075,16 @@ asm void fn_801363E8(void) {
 #else
 #pragma scheduling on
 u32 fn_801363E8(u16 index) {
-    u8* entry;
+    EffectTraceEntry* entry;
     if ((u32)index > lbl_80478BA0) {
         entry = NULL;
     } else {
-        entry = (u8*)lbl_80363C00 + (u32)index * 0xC;
+        entry = &lbl_80363C00[index];
     }
     if (entry == NULL) {
         return 0;
     }
-    return *(u16*)(entry + 0x4);
+    return entry->value1;
 }
 #pragma scheduling off
 #endif
@@ -5077,16 +5096,16 @@ asm void fn_80136428(void) {
 #else
 #pragma scheduling on
 u32 fn_80136428(u16 index) {
-    u8* entry;
+    EffectTraceEntry* entry;
     if ((u32)index > lbl_80478BA0) {
         entry = NULL;
     } else {
-        entry = (u8*)lbl_80363C00 + (u32)index * 0xC;
+        entry = &lbl_80363C00[index];
     }
     if (entry == NULL) {
         return 0;
     }
-    return *(u8*)(entry + 0x0);
+    return entry->kind;
 }
 #pragma scheduling off
 #endif
@@ -5098,16 +5117,16 @@ asm void fn_80136468(void) {
 #else
 #pragma scheduling on
 u32 fn_80136468(u16 index) {
-    u8* entry;
+    EffectTraceEntry* entry;
     if ((u32)index > lbl_80478BA0) {
         entry = NULL;
     } else {
-        entry = (u8*)lbl_80363C00 + (u32)index * 0xC;
+        entry = &lbl_80363C00[index];
     }
     if (entry == NULL) {
         return 0;
     }
-    return *(u16*)(entry + 0x2);
+    return entry->value0;
 }
 #pragma scheduling off
 #endif

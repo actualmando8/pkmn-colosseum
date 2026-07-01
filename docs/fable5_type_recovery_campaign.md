@@ -472,3 +472,19 @@ Rejected from this batch:
 - `fn_8000D05C` pair-struct rewrite. It made the C more readable but changed
   instruction ordering, so keep the raw `u32 table[8]` form until a better
   matching-preserving structure is found.
+
+## Subagent Extrapolation Batch 2, 2026-07-01
+
+Applied after local review:
+
+- `effect_util.c`: added conservative local row types for the linked status
+  table and trace lookup tables: `EffectLinkedStatusRow`,
+  `EffectTraceFxEntry`, and `EffectTraceEntry`.
+- Converted `fn_80135F58`, `fn_80136368`, `fn_801363A8`, `fn_801363E8`,
+  `fn_80136428`, and `fn_80136468` from byte-stride pointer math to typed
+  table indexing and field access.
+
+Validation result:
+
+- All six focused objdiff checks stayed `100.0%`.
+- `main/game/effect/effect_util` unit metrics stayed unchanged.
