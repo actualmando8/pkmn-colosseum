@@ -1177,8 +1177,14 @@ asm void fn_8000CD50(void) {
 }
 #else
 void testEvolution__Fv(void) {
+    typedef struct {
+        u32 work[5];
+        u16 left;
+        u16 right;
+    } GSpartyEvolutionArgs;
+
     u32 val1, val2;
-    struct { u32 buf[5]; u16 a; u16 b; } locals;
+    GSpartyEvolutionArgs locals;
 
     val1 = fn_8012A5B0(NULL, 3, 0);
     if ((u8)fn_80123FBC(val1) == 0) { return; }
@@ -1186,9 +1192,9 @@ void testEvolution__Fv(void) {
     if ((u8)fn_80123FBC(val2) == 0) { return; }
     fn_801C41C8(3, lbl_8047B6E8);
     fn_801C40F0(1);
-    locals.a = 1;
-    locals.b = 2;
-    fn_8026132C(val1, val2, 1, &locals.a, 2, locals.buf);
+    locals.left = 1;
+    locals.right = 2;
+    fn_8026132C(val1, val2, 1, &locals.left, 2, locals.work);
     fn_801C41C8(2, lbl_8047B6E8);
     fn_801C40F0(1);
 }
@@ -1288,10 +1294,14 @@ asm void fn_8000CF68(void) {
 #else
 u32 fn_8000CF68(u32 arg) {
 #pragma peephole off
-    struct StatCopyBlk { u32 data[28]; };
-    u32 local[28];
+    typedef struct {
+        u32 key;
+        u32 value;
+    } GSpartyKeyValuePair;
+    struct StatCopyBlk { GSpartyKeyValuePair data[14]; };
+    GSpartyKeyValuePair local[14];
     u32 val;
-    u32 *p;
+    GSpartyKeyValuePair *p;
     u32 idx;
     int i;
     int j;
@@ -1300,18 +1310,18 @@ u32 fn_8000CF68(u32 arg) {
     idx = 0;
     for (i = 0; i < 2; i++) {
         for (j = 0; j < 6; j++) {
-            if ((s32)arg == (s32)p[j * 2]) { goto idx_done; }
+            if ((s32)arg == (s32)p[j].key) { goto idx_done; }
             idx++;
         }
-        if ((s32)arg == (s32)p[12]) { goto idx_done; }
-        p += 14;
+        if ((s32)arg == (s32)p[6].key) { goto idx_done; }
+        p += 7;
         idx++;
     }
 idx_done:
     if ((s32)idx >= 14) {
         return 0;
     }
-    val = local[idx * 2 + 1];
+    val = local[idx].value;
     fn_8002DC6C(val);
     return 0;
 }
@@ -1577,4 +1587,3 @@ s32 fn_8000D234(void) {
 #pragma pop
 #pragma pop
 #pragma pop
-

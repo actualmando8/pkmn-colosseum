@@ -6,6 +6,7 @@
  */
 
 #include "dolphin/types.h"
+#include "game/effect/gs_effect.h"
 
 /* ===================================================================
  * Generated: 59 pattern-matched + 148 stubs
@@ -51,7 +52,7 @@ extern u16 lbl_8047AEA2;
 extern u8 lbl_8047AED0;
 
 /* ===== Index lookup globals ===== */
-extern u8 lbl_803635C0[];  /* effect table (BSS) */
+extern GSEffectGlobals lbl_803635C0;  /* effect globals (BSS) */
 extern u8 lbl_80363B88[];  /* trace fx table (BSS) */
 extern u8 lbl_80363C00[];  /* trace table (BSS) */
 extern u32 lbl_80478B98;  /* effect count (SDA) */
@@ -67,19 +68,19 @@ s32 fn_80133E6C(void* obj, s32 offset);
 
 /* 0x58 | fn_8013151C | leaf_multi_output */
 void* fn_8013151C(u32 arg) {
-    void* entry;
-    u32* tbl;
+    GSEffectInstance* entry;
+    GSEffectGlobals* globals;
     if (arg == 0) goto _ret0;
-    tbl = (u32*)lbl_803635C0;
-    if (arg > tbl[0]) goto _ret0;
-    entry = (u8*)tbl[3] + (arg - 1) * 0x34;
-    if (*(s32*)((u8*)entry + 0x4) == -1) goto _ret0;
+    globals = &lbl_803635C0;
+    if (arg > globals->maxEffects) goto _ret0;
+    entry = &((GSEffectInstance*)globals->instanceTable)[arg - 1];
+    if (entry->state == GSEFFECT_STATE_UNINIT) goto _ret0;
     goto _compute;
 _ret0:
     entry = 0;
 _compute:
     if (entry == 0) goto _null_ret;
-    return *(void**)((u8*)entry + 0x24);
+    return entry->userData;
 _null_ret:
     return 0;
 }

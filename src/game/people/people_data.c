@@ -110,7 +110,7 @@
  *       if (index >= gPeopleFieldCount) return NULL;
  *       slot = gPeopleFieldLookup[index];
  *       if (slot >= gMaxSlotCount) return NULL;
- *       return &gPeopleFieldArray[slot * 0x28];
+ *       return &gPeopleFieldArray[slot];
  *
  * Global data:
  *   lbl_80478BD8 (sbss) -- u32 gPeopleFieldCount (max index count)
@@ -189,7 +189,7 @@ typedef struct PeopleFieldEntry {
 extern u32 lbl_80478BD8;   /* gPeopleFieldCount */
 extern u32 lbl_80478BB0;   /* gPeopleFieldMaxSlots */
 extern u16 lbl_803681E8[]; /* gPeopleFieldLookup */
-extern u8  lbl_80363CE8[]; /* gPeopleFieldArray base */
+extern PeopleFieldEntry lbl_80363CE8[]; /* gPeopleFieldArray */
 
 PeopleFieldEntry* peopleFieldGetByIndex(u16 index) {
     u16 slot;
@@ -203,7 +203,7 @@ PeopleFieldEntry* peopleFieldGetByIndex(u16 index) {
         return NULL;
     }
 
-    return (PeopleFieldEntry*)(&lbl_80363CE8[slot * 0x28]);
+    return &lbl_80363CE8[slot];
 }
 
 /* ===================================================================

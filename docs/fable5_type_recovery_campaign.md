@@ -451,3 +451,24 @@ rows marked safe after a local review and focused build/report validation.
 Pilot rule: subagents may collect candidate structs, strides, and evidence in
 parallel, but a main pass must still review names, apply the patch, and validate
 with the standard report before committing.
+
+## Subagent Extrapolation Batch 1, 2026-07-01
+
+Applied after local review:
+
+- `effect_util.c`: `fn_8013151C` now uses `GSEffectGlobals` and
+  `GSEffectInstance` for the effect instance table instead of raw `0x34` slot
+  math. Focused match stayed `95.0%`.
+- `people_data.c`: `peopleFieldGetByIndex` now returns from a typed
+  `PeopleFieldEntry[]` global instead of `slot * 0x28` byte indexing. Unit
+  metrics stayed unchanged.
+- `gs_party_access.c`: `testEvolution__Fv` now names its call payload
+  `GSpartyEvolutionArgs`; `fn_8000CF68` now uses conservative `key`/`value`
+  pairs for the scene resource lookup. Focused matches stayed `95.84%` and
+  `100.0%`.
+
+Rejected from this batch:
+
+- `fn_8000D05C` pair-struct rewrite. It made the C more readable but changed
+  instruction ordering, so keep the raw `u32 table[8]` form until a better
+  matching-preserving structure is found.
