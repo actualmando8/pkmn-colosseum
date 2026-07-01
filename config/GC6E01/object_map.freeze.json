@@ -6,24 +6,24 @@
     "total_code": 2495108,
     "total_data": 2196256,
     "total_functions": 8603,
-    "total_units": 285
+    "total_units": 300
   },
   "topology_status": {
-    "auto_units": 74,
-    "named_units": 211,
-    "source_backed_units": 191,
-    "auto_code": 1474356,
+    "auto_units": 80,
+    "named_units": 220,
+    "source_backed_units": 200,
+    "auto_code": 1225440,
     "auto_data": 2182883,
-    "auto_functions": 4035
+    "auto_functions": 3203
   },
   "baseline_progress": {
-    "matched_code": "215516",
-    "matched_code_percent": 8.637543,
+    "matched_code": "259444",
+    "matched_code_percent": 10.398107,
     "matched_data": "12364",
     "matched_data_percent": 0.56295806,
-    "matched_functions": 2664,
-    "matched_functions_percent": 30.965942,
-    "fuzzy_match_percent": 16.548517
+    "matched_functions": 3122,
+    "matched_functions_percent": 36.289665,
+    "fuzzy_match_percent": 21.35365
   },
   "unit_topology": [
     {
@@ -928,13 +928,65 @@
       "sections": [
         {
           "name": ".text",
-          "size": 236224,
+          "size": 12712,
           "virtual_address": 2147569692
         }
       ],
-      "total_code": 236224,
+      "total_code": 12712,
       "total_data": 0,
-      "total_functions": 514
+      "total_functions": 26
+    },
+    {
+      "name": "main/game/gs_pcbox",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 33124,
+          "virtual_address": 2147582404
+        }
+      ],
+      "total_code": 33124,
+      "total_data": 0,
+      "total_functions": 65
+    },
+    {
+      "name": "main/game/gs_title",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 24648,
+          "virtual_address": 2147615528
+        }
+      ],
+      "total_code": 24648,
+      "total_data": 0,
+      "total_functions": 80
+    },
+    {
+      "name": "main/game/gs_worldmap",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 40448,
+          "virtual_address": 2147640176
+        }
+      ],
+      "total_code": 40448,
+      "total_data": 0,
+      "total_functions": 98
+    },
+    {
+      "name": "main/auto_01_80030170_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 125292,
+          "virtual_address": 2147680624
+        }
+      ],
+      "total_code": 125292,
+      "total_data": 0,
+      "total_functions": 245
     },
     {
       "name": "main/game/menu/menu_bag",
@@ -2943,13 +2995,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 180268,
+          "size": 3544,
           "virtual_address": 2148348020
         }
       ],
-      "total_code": 180268,
+      "total_code": 3544,
       "total_data": 0,
-      "total_functions": 655
+      "total_functions": 14
+    },
+    {
+      "name": "main/game/gs_render",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 57824,
+          "virtual_address": 2148351564
+        }
+      ],
+      "total_code": 57824,
+      "total_data": 0,
+      "total_functions": 277
+    },
+    {
+      "name": "main/auto_01_800E202C_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 118900,
+          "virtual_address": 2148409388
+        }
+      ],
+      "total_code": 118900,
+      "total_data": 0,
+      "total_functions": 364
     },
     {
       "name": "main/game/gs_floor_data",
@@ -3242,13 +3320,130 @@
       "sections": [
         {
           "name": ".text",
-          "size": 260036,
+          "size": 51912,
           "virtual_address": 2148961380
         }
       ],
-      "total_code": 260036,
+      "total_code": 51912,
       "total_data": 0,
-      "total_functions": 682
+      "total_functions": 74
+    },
+    {
+      "name": "main/game/gs_scene",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 20176,
+          "virtual_address": 2149013292
+        }
+      ],
+      "total_code": 20176,
+      "total_data": 0,
+      "total_functions": 77
+    },
+    {
+      "name": "main/auto_01_8017A5FC_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2688,
+          "virtual_address": 2149033468
+        }
+      ],
+      "total_code": 2688,
+      "total_data": 0,
+      "total_functions": 9
+    },
+    {
+      "name": "main/game/fsys/fsys_file",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 16968,
+          "virtual_address": 2149036156
+        }
+      ],
+      "total_code": 16968,
+      "total_data": 0,
+      "total_functions": 68
+    },
+    {
+      "name": "main/auto_01_8017F2C4_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 84320,
+          "virtual_address": 2149053124
+        }
+      ],
+      "total_code": 84320,
+      "total_data": 0,
+      "total_functions": 204
+    },
+    {
+      "name": "main/hsd/hsd_cobj",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 15936,
+          "virtual_address": 2149137444
+        }
+      ],
+      "total_code": 15936,
+      "total_data": 0,
+      "total_functions": 69
+    },
+    {
+      "name": "main/auto_01_80197A64_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 21484,
+          "virtual_address": 2149153380
+        }
+      ],
+      "total_code": 21484,
+      "total_data": 0,
+      "total_functions": 60
+    },
+    {
+      "name": "main/hsd/hsd_jobj",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 29104,
+          "virtual_address": 2149174864
+        }
+      ],
+      "total_code": 29104,
+      "total_data": 0,
+      "total_functions": 63
+    },
+    {
+      "name": "main/hsd/hsd_lobj",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 10688,
+          "virtual_address": 2149203968
+        }
+      ],
+      "total_code": 10688,
+      "total_data": 0,
+      "total_functions": 35
+    },
+    {
+      "name": "main/auto_01_801A69C0_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 6760,
+          "virtual_address": 2149214656
+        }
+      ],
+      "total_code": 6760,
+      "total_data": 0,
+      "total_functions": 23
     },
     {
       "name": "main/hsd/hsd_mobj_clear_flags",
