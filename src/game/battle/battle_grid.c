@@ -74,6 +74,38 @@ extern u8    lbl_80467030[0x20];  /* BattleCameraState */
 extern u8    lbl_8046AC60[0x100]; /* battle transfer context */
 extern void* lbl_8046D500;        /* battle state machine context ptr */
 
+typedef void (*BattleGridCallback)(void);
+
+typedef struct BattleGridCallbackNode {
+    struct BattleGridCallbackNode* next;
+    BattleGridCallback callback;
+} BattleGridCallbackNode;
+
+typedef struct BattleGridGroupEntry {
+    u8* slot;
+    u8 pad_04[8];
+    u16 memberCount;
+    u8 arg1;
+    u8 arg2;
+} BattleGridGroupEntry;
+
+typedef struct BattleGridGroupTable {
+    BattleGridGroupEntry entries[4];
+    u16 count;
+} BattleGridGroupTable;
+
+typedef struct BattleGridTransitionState {
+    u8 mode;
+    u8 pending;
+    u16 arg;
+    f32 startValue;
+    f32 endValue;
+    void* callbackArg;
+    void* texture;
+    f32 value;
+    f32 timer;
+} BattleGridTransitionState;
+
 /* =========================================================================
  * NOTE: 0x801C01C8-0x801C0F20 (incl. the real, variadic HSD_ForeachAnim at
  * 0x801C028C) is HSD library code, split into hsd/hsd_aobj_range_801C01C8.c
@@ -292,14 +324,14 @@ void fn_801C29C4(void* obj, f32 value) {
 void fn_801C2A04(void) {
     extern s32 lbl_8047B390;
     extern s32 lbl_8047B38C;
-    extern u8* lbl_8047B388;
-    u8* node;
+    extern BattleGridCallbackNode* lbl_8047B388;
+    BattleGridCallbackNode* node;
 
     if (lbl_8047B390 != 0 && lbl_8047B38C == 0) {
         node = lbl_8047B388;
         while (node != NULL) {
-            (*(void (**)(void))(node + 0x4))();
-            node = *(u8**)node;
+            node->callback();
+            node = node->next;
         }
     }
 }
@@ -352,13 +384,13 @@ void fn_801C2AB8(s32 slot, s32 animState) {
  * Address: 0x801C2AE8 | Size: 0x44
  */
 u16 fn_801C2AE8(u32 id) {
-    extern u8 lbl_80466DE8[];
-    u8* group = lbl_80466DE8;
+    extern BattleGridGroupEntry lbl_80466DE8[];
+    BattleGridGroupEntry* group = lbl_80466DE8;
     u16 i;
 
-    for (i = 0; i < 4; i++, group += 0x10) {
-        if (*(u32*)group == id) {
-            return *(u16*)(group + 0xC);
+    for (i = 0; i < 4; i++, group++) {
+        if ((u32)group->slot == id) {
+            return group->memberCount;
         }
     }
     return 0;
@@ -730,34 +762,34 @@ void battleGridReplaceTrainer(void* model) {
  * Address: 0x801C3FBC | Size: 0xBC
  */
 void fn_801C3FBC(u8* slot, u8 arg1, u8 arg2) {
-    extern u8 lbl_80466DE8[];
-    u8* group;
+    extern BattleGridGroupTable lbl_80466DE8;
+    BattleGridGroupEntry* group;
     s8 state;
 
-    if (*(u16*)(lbl_80466DE8 + 0x40) < 4) {
-        group = lbl_80466DE8;
-        if (*(u32*)group != 0) {
-            group = lbl_80466DE8 + 0x10;
-            if (*(u32*)group != 0) {
-                group += 0x10;
-                if (*(u32*)group != 0) {
-                    group += 0x10;
-                    if (*(u32*)group != 0) {
-                        group += 0x10;
+    if (lbl_80466DE8.count < 4) {
+        group = &lbl_80466DE8.entries[0];
+        if (group->slot != NULL) {
+            group = &lbl_80466DE8.entries[1];
+            if (group->slot != NULL) {
+                group++;
+                if (group->slot != NULL) {
+                    group++;
+                    if (group->slot != NULL) {
+                        group++;
                     }
                 }
             }
         }
-        memset(group, 0, 0x10);
-        *(u8**)group = slot;
+        memset(group, 0, sizeof(*group));
+        group->slot = slot;
         state = 1;
-        group[0xE] = arg1;
-        group[0xF] = arg2;
+        group->arg1 = arg1;
+        group->arg2 = arg2;
         if (arg1 != 0) {
             state = -1;
         }
         slot[0x76] = state;
-        *(u16*)(lbl_80466DE8 + 0x40) = *(u16*)(lbl_80466DE8 + 0x40) + 1;
+        lbl_80466DE8.count = lbl_80466DE8.count + 1;
     }
 }
 
@@ -767,12 +799,12 @@ void fn_801C3FBC(u8* slot, u8 arg1, u8 arg2) {
  */
 #pragma peephole off
 void* fn_801C4078(s32 slot) {
-    extern u8 lbl_80466E30[];
-    volatile u8* gridState = lbl_80466E30;
+    extern BattleGridTransitionState lbl_80466E30;
+    volatile BattleGridTransitionState* gridState = &lbl_80466E30;
 
-    if (gridState[0] == 4) {
-        gridState[1] = 0;
-        gridState[0] = 0;
+    if (gridState->mode == 4) {
+        gridState->pending = 0;
+        gridState->mode = 0;
     }
 
     return (void*)gridState;
@@ -785,13 +817,13 @@ void* fn_801C4078(s32 slot) {
  */
 #pragma peephole off
 void fn_801C409C(void) {
-    extern u8 lbl_80466E30[];
+    extern BattleGridTransitionState lbl_80466E30;
     extern const f32 lbl_8047DFB0;
     extern const f32 lbl_8047DFB4;
     extern f32 fn_801C4814(s32 slot);
     extern void fn_80166A28(s32 arg0);
 
-    if (*(u8*)lbl_80466E30 == 0) {
+    if (lbl_80466E30.mode == 0) {
         fn_801C4164(9, (void*)fn_801C4814, 0, lbl_8047DFB0, lbl_8047DFB4);
         fn_80166A28(0x54);
     }
@@ -879,9 +911,9 @@ void* fn_801C423C(void (*callback)(void), u8 mode, u32 arg, f32 value) {
  * Address: 0x801C431C | Size: 0x10
  */
 void fn_801C431C(s32 arg0) {
-    extern u8 lbl_80466E30[];
+    extern BattleGridTransitionState lbl_80466E30;
 
-    *(s32*)(lbl_80466E30 + 0xC) = arg0;
+    lbl_80466E30.callbackArg = (void*)arg0;
 }
 
 /**
@@ -932,19 +964,19 @@ void fn_801C43F4(s32 seqType, f32 param1, f32 param2) {
  */
 #pragma peephole off
 s32 fn_801C47D0(void) {
-    extern u8 lbl_80466E30[];
+    extern BattleGridTransitionState lbl_80466E30;
     extern volatile const f32 lbl_8047DFB8;
-    u8* base = lbl_80466E30;
+    volatile BattleGridTransitionState* base = &lbl_80466E30;
 
-    *(volatile u8*)(base + 0) = 0;
-    *(volatile u8*)(base + 1) = 0;
-    *(volatile u16*)(base + 2) = 0;
-    *(volatile f32*)(base + 4) = lbl_8047DFB8;
-    *(volatile f32*)(base + 8) = lbl_8047DFB8;
-    *(volatile u32*)(base + 0xc) = 0;
-    *(volatile u32*)(base + 0x10) = 0;
-    *(volatile f32*)(base + 0x14) = lbl_8047DFB8;
-    *(volatile f32*)(base + 0x18) = lbl_8047DFB8;
+    base->mode = 0;
+    base->pending = 0;
+    base->arg = 0;
+    base->startValue = lbl_8047DFB8;
+    base->endValue = lbl_8047DFB8;
+    base->callbackArg = NULL;
+    base->texture = NULL;
+    base->value = lbl_8047DFB8;
+    base->timer = lbl_8047DFB8;
     return (s32)base;
 }
 #pragma peephole on

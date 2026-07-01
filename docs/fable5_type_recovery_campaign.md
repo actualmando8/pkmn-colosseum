@@ -542,3 +542,27 @@ Validation result:
   `fn_80133E6C` `56.521053%`, and `_dbgMenuGetLink__Fl` `91.42857%`.
 - `main/game/effect/effect_util` reports `59.56558%` fuzzy and `29.867481%`
   matched code.
+
+## Battle Grid Table Batch 6, 2026-07-01
+
+Applied after local review:
+
+- `battle_grid.c`: introduced `BattleGridCallbackNode` for the callback list
+  rooted at `lbl_8047B388`.
+- Introduced `BattleGridGroupEntry` and `BattleGridGroupTable` for the
+  four-entry table rooted at `lbl_80466DE8`, naming the slot pointer,
+  `memberCount`, per-entry args, and table count.
+- Introduced a narrow `BattleGridTransitionState` view for exact-match helpers
+  that touch `lbl_80466E30`, naming the mode, pending flag, argument, callback
+  storage, texture slot, and float state fields.
+
+Validation result:
+
+- Focused exact helpers `fn_801C2A04`, `fn_801C2AE8`, `fn_801C3FBC`,
+  `fn_801C4078`, `fn_801C409C`, `fn_801C431C`, and `fn_801C47D0` stayed
+  `100.0%`.
+- `fn_801C423C` was tested with the transition-state struct but rejected for
+  now because it moved from `90.83929%` to `90.21429%`; it remains in the
+  prior raw volatile offset form.
+- `main/game/battle/battle_grid` stayed at `13.071283%` fuzzy and
+  `5.4287167%` matched code.
