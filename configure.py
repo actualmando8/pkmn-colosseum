@@ -249,6 +249,7 @@ config.libs = [
             Object(CodeCandidate, "trk/gdev_cc_range_800C4444.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK
             Object(CodeCandidate, "hsd/hsd_mobj_range_801A86B4.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_HSD
             Object(CodeCandidate, "trk/TRKTarget_range_800C1310.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK2
+            Object(CodeCandidate, "crt/printf.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_CRT_PRINTF
             Object(
                 NonMatching,
                 "__init_cpp_exceptions.cpp",
@@ -258,11 +259,13 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "crt/mem.c",
+                mw_version="GC/2.0",
                 progress_category="sdk",
             ),
             Object(
                 CodeCandidate,
                 "crt/string.c",
+                mw_version="GC/1.3",
                 progress_category="sdk",
             ),
             Object(
