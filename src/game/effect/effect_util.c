@@ -243,8 +243,17 @@ extern void fn_80135CE8(void*);
 extern void _koukaOneExec__FUlPvPvPl(u32 index, void* arg1, void* arg2, s32* out);
 
 typedef s32 (*EffectUtilCountFunc)(void);
-typedef u8* (*EffectUtilEntryFunc)(s32);
 typedef s32 (*EffectUtilEntryCallback)(s32, s32);
+
+typedef struct EffectUtilEntry {
+    u8 flags;
+    u8 pad_01;
+    s16 link;
+    u32 value;
+    EffectUtilEntryCallback callback;
+} EffectUtilEntry;
+
+typedef EffectUtilEntry* (*EffectUtilEntryFunc)(s32);
 
 typedef struct EffectStatusTableEntry {
     u8 statusKind;
@@ -1954,7 +1963,7 @@ s32 fn_801338A4(s32 offset) {
     s32 callbackResult;
     s32* outValue;
     u8* obj;
-    u8* entry;
+    EffectUtilEntry* entry;
     EffectUtilCountFunc countFunc;
     EffectUtilEntryFunc entryFunc;
     EffectUtilEntryCallback callback;
@@ -1995,7 +2004,7 @@ retry:
             entryFunc = (EffectUtilEntryFunc)lbl_80478F8C;
             entry = entryFunc != NULL ? entryFunc(valueIndex) : NULL;
             if (entry != NULL) {
-                link = *(s16*)(entry + 0x2);
+                link = entry->link;
             }
             if (link > 0) {
                 countFunc = (EffectUtilCountFunc)lbl_80478F88;
@@ -2011,7 +2020,7 @@ retry:
     if ((s16)link != 0) {
         entryFunc = (EffectUtilEntryFunc)lbl_80478F8C;
         entry = entryFunc != NULL ? entryFunc(valueIndex) : NULL;
-        callback = entry != NULL ? *(EffectUtilEntryCallback*)(entry + 0x8) : NULL;
+        callback = entry != NULL ? entry->callback : NULL;
         if (callback != NULL) {
             callbackResult = callback(valueIndex, (s8)obj[0x94] + (s8)obj[0x95]);
         } else {
@@ -2033,7 +2042,7 @@ retry:
     fn_80102510(lbl_80478848);
     entryFunc = (EffectUtilEntryFunc)lbl_80478F8C;
     entry = entryFunc != NULL ? entryFunc(valueIndex) : NULL;
-    callback = entry != NULL ? *(EffectUtilEntryCallback*)(entry + 0x8) : NULL;
+    callback = entry != NULL ? entry->callback : NULL;
     if (callback != NULL) {
         callback(valueIndex, (s8)obj[0x94] + (s8)obj[0x95]);
     }
@@ -2087,7 +2096,7 @@ s32 fn_80133C3C(s32 key) {
     s32 index;
     s32 selected;
     u8* obj;
-    u8* entry;
+    EffectUtilEntry* entry;
     EffectUtilCountFunc countFunc;
     EffectUtilEntryFunc entryFunc;
 
@@ -2099,7 +2108,7 @@ s32 fn_80133C3C(s32 key) {
             if (countFunc != NULL && countFunc() > selected) {
                 entryFunc = (EffectUtilEntryFunc)lbl_80478F8C;
                 entry = entryFunc != NULL ? entryFunc(selected) : NULL;
-                selected = entry != NULL ? *(s16*)(entry + 0x2) : 0;
+                selected = entry != NULL ? entry->link : 0;
                 if (selected > 0) {
                     countFunc = (EffectUtilCountFunc)lbl_80478F88;
                     if (countFunc == NULL || countFunc() <= selected) {
@@ -2118,7 +2127,7 @@ s32 fn_80133C3C(s32 key) {
         for (index = 0; index < (s16)selected; index++) {
             entryFunc = (EffectUtilEntryFunc)lbl_80478F8C;
             entry = entryFunc != NULL ? entryFunc(index) : NULL;
-            if (entry == NULL || (entry[0] & 0x80)) {
+            if (entry == NULL || (entry->flags & 0x80)) {
                 count++;
             }
         }
@@ -2127,7 +2136,7 @@ s32 fn_80133C3C(s32 key) {
         for (index = 0; index < (s32)fn_80134274(); index++) {
             entryFunc = (EffectUtilEntryFunc)lbl_80478F8C;
             entry = entryFunc != NULL ? entryFunc(index) : NULL;
-            if (entry == NULL || (entry[0] & 0x80)) {
+            if (entry == NULL || (entry->flags & 0x80)) {
                 count++;
             }
         }
@@ -2154,7 +2163,7 @@ s32 fn_80133E6C(void* obj, s32 offset) {
     u8* prior;
     EffectUtilCountFunc countFunc;
     EffectUtilEntryFunc entryFunc;
-    u8* entry;
+    EffectUtilEntry* entry;
 
     rel = fn_80134258(obj);
     if (rel < 0) {
@@ -2212,7 +2221,7 @@ s32 fn_80133E6C(void* obj, s32 offset) {
         if (countFunc != NULL && countFunc() > value) {
             entryFunc = (EffectUtilEntryFunc)lbl_80478F8C;
             entry = entryFunc != NULL ? entryFunc(value) : NULL;
-            value = entry != NULL ? *(s16*)(entry + 0x2) : 0;
+            value = entry != NULL ? entry->link : 0;
             if ((s16)value > 0) {
                 countFunc = (EffectUtilCountFunc)lbl_80478F88;
                 if (countFunc != NULL && countFunc() > (s16)value) {
@@ -2236,7 +2245,7 @@ asm void _dbgMenuGetLink__Fl(void) {
 #else
 s32 _dbgMenuGetLink__Fl(s32 idx) {
     s32 count;
-    u8* result;
+    EffectUtilEntry* result;
 
     if (idx <= 0) { return 0; }
 
@@ -2247,10 +2256,10 @@ s32 _dbgMenuGetLink__Fl(s32 idx) {
     if (count <= idx) { return 0; }
 
     {
-        u8* (*fp)(s32) = (u8* (*)(s32))lbl_80478F8C;
+        EffectUtilEntryFunc fp = (EffectUtilEntryFunc)lbl_80478F8C;
         if (fp == NULL) { result = NULL; } else { result = fp(idx); }
     }
-    if (result == NULL) { idx = 0; } else { idx = *(s16*)(result + 0x2); }
+    if (result == NULL) { idx = 0; } else { idx = result->link; }
 
     if ((s16)idx <= 0) {
         idx = 0;
@@ -4923,11 +4932,11 @@ asm u8 fn_80133BE4(void) {
 }
 #else
 u32 fn_80133BE4(void* obj, s32 offset) {
-    u8* result;
+    EffectUtilEntry* result;
     u32 ret;
     s32 index = fn_80133E6C(obj, offset);
     {
-        u8* (*fp)(s32) = (u8* (*)(s32))lbl_80478F8C;
+        EffectUtilEntryFunc fp = (EffectUtilEntryFunc)lbl_80478F8C;
         if (fp == NULL) {
             result = NULL;
         } else {
@@ -4937,7 +4946,7 @@ u32 fn_80133BE4(void* obj, s32 offset) {
     if (result == NULL) {
         ret = 1;
     } else {
-        ret = (*result >> 7) & 1;
+        ret = (result->flags >> 7) & 1;
     }
     return (u8)ret;
 }
@@ -4950,10 +4959,10 @@ asm void fn_80133E1C(void) {
 #else
 #pragma peephole off
 u32 fn_80133E1C(void* obj, s32 offset) {
-    u8* result;
+    EffectUtilEntry* result;
     s32 index = fn_80133E6C(obj, offset);
     {
-        u8* (*fp)(s32) = (u8* (*)(s32))lbl_80478F8C;
+        EffectUtilEntryFunc fp = (EffectUtilEntryFunc)lbl_80478F8C;
         if (fp == NULL) {
             result = NULL;
         } else {
@@ -4963,7 +4972,7 @@ u32 fn_80133E1C(void* obj, s32 offset) {
     if (result == NULL) {
         return 0;
     }
-    return *(u32*)(result + 0x4);
+    return result->value;
 }
 #pragma peephole on
 #endif
@@ -4998,8 +5007,8 @@ asm void fn_801342B8(void) {
 }
 #else
 s32 fn_801342B8(s32 idx) {
-    u8* (*fp)(s32) = (u8* (*)(s32))lbl_80478F8C;
-    u8* result;
+    EffectUtilEntryFunc fp = (EffectUtilEntryFunc)lbl_80478F8C;
+    EffectUtilEntry* result;
     if (fp == NULL) {
         result = NULL;
     } else {
@@ -5008,7 +5017,7 @@ s32 fn_801342B8(s32 idx) {
     if (result == NULL) {
         return 0;
     }
-    return *(s16*)(result + 0x2);
+    return result->link;
 }
 #endif
 #if 0

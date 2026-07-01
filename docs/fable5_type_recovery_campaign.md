@@ -521,3 +521,24 @@ Validation result:
 
 - Focused objdiff for all six touched functions stayed `100.0%`.
 - `main/game/gs_party_access` unit metrics stayed unchanged.
+
+## EffectUtilEntry Batch 5, 2026-07-01
+
+Applied after local review:
+
+- `effect_util.c`: introduced `EffectUtilEntry` for the table returned through
+  `lbl_80478F8C`, naming the repeated entry fields at `0x00`, `0x02`, `0x04`,
+  and `0x08` as `flags`, `link`, `value`, and `callback`.
+- Converted the local access sites in `fn_801338A4`, `fn_80133C3C`,
+  `fn_80133E6C`, `_dbgMenuGetLink__Fl`, `fn_80133BE4`, `fn_80133E1C`, and
+  `fn_801342B8` from byte pointer arithmetic to typed field access.
+
+Validation result:
+
+- Exact-match helpers `fn_80133BE4`, `fn_80133E1C`, and `fn_801342B8` stayed
+  `100.0%`.
+- Lower-match users stayed at their prior report percentages:
+  `fn_801338A4` `74.549706%`, `fn_80133C3C` `60.291668%`,
+  `fn_80133E6C` `56.521053%`, and `_dbgMenuGetLink__Fl` `91.42857%`.
+- `main/game/effect/effect_util` reports `59.56558%` fuzzy and `29.867481%`
+  matched code.
