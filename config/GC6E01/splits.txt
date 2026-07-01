@@ -164,6 +164,9 @@ __init_cpp_exceptions.cpp:
 game/main.c:
 	.text       start:0x800055E0 end:0x80006630
 
+game/gs_task.c:
+	.text       start:0x80006630 end:0x80009178
+
 game/gs_party_access.c:
 	.text       start:0x8000CA34 end:0x8000D290
 
@@ -545,8 +548,14 @@ game/gs_render.c:
 game/gs_texture.c:
 	.text       start:0x800EF098 end:0x800F07A8
 
+game/gs_thread.c:
+	.text       start:0x800F07A8 end:0x800F75FC
+
 game/input/input.c:
 	.text       start:0x800F75FC end:0x800F8268
+
+game/gs_thread_hi.c:
+	.text       start:0x800F8268 end:0x800FF0A0
 
 game/gs_floor_data.c:
 	.text       start:0x800FF0A0 end:0x800FF788

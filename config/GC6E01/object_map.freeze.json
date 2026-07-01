@@ -6,24 +6,24 @@
     "total_code": 2495108,
     "total_data": 2196256,
     "total_functions": 8603,
-    "total_units": 317
+    "total_units": 318
   },
   "topology_status": {
-    "auto_units": 82,
-    "named_units": 235,
-    "source_backed_units": 215,
-    "auto_code": 1152156,
+    "auto_units": 80,
+    "named_units": 238,
+    "source_backed_units": 218,
+    "auto_code": 1084616,
     "auto_data": 2182883,
-    "auto_functions": 2920
+    "auto_functions": 2740
   },
   "baseline_progress": {
-    "matched_code": "275184",
-    "matched_code_percent": 11.028942,
+    "matched_code": "280964",
+    "matched_code_percent": 11.260594,
     "matched_data": "12364",
     "matched_data_percent": 0.56295806,
-    "matched_functions": 3269,
-    "matched_functions_percent": 37.99837,
-    "fuzzy_match_percent": 23.006548
+    "matched_functions": 3341,
+    "matched_functions_percent": 38.83529,
+    "fuzzy_match_percent": 24.434902
   },
   "unit_topology": [
     {
@@ -859,17 +859,30 @@
       "total_functions": 23
     },
     {
-      "name": "main/auto_01_80006630_text",
+      "name": "main/game/gs_task",
       "sections": [
         {
           "name": ".text",
-          "size": 25604,
+          "size": 11080,
           "virtual_address": 2147509808
         }
       ],
-      "total_code": 25604,
+      "total_code": 11080,
       "total_data": 0,
-      "total_functions": 106
+      "total_functions": 65
+    },
+    {
+      "name": "main/auto_01_80009178_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 14524,
+          "virtual_address": 2147520888
+        }
+      ],
+      "total_code": 14524,
+      "total_data": 0,
+      "total_functions": 41
     },
     {
       "name": "main/game/gs_party_access",
@@ -3121,7 +3134,7 @@
       "total_functions": 38
     },
     {
-      "name": "main/auto_01_800F07A8_text",
+      "name": "main/game/gs_thread",
       "sections": [
         {
           "name": ".text",
@@ -3147,7 +3160,7 @@
       "total_functions": 22
     },
     {
-      "name": "main/auto_01_800F8268_text",
+      "name": "main/game/gs_thread_hi",
       "sections": [
         {
           "name": ".text",
