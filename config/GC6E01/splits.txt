@@ -161,6 +161,9 @@ game/data/rodata_80268424.c:
 __init_cpp_exceptions.cpp:
 	.dtors      start:0x80266380 end:0x80266384
 
+game/main.c:
+	.text       start:0x800055E0 end:0x80006630
+
 game/gs_party_access.c:
 	.text       start:0x8000CA34 end:0x8000D290
 
@@ -170,6 +173,9 @@ game/gs_npc_interact.c:
 game/gs_event_exec.c:
 	.text       start:0x80012D20 end:0x8001501C
 
+game/gs_pokemon_summary.c:
+	.text       start:0x8001501C end:0x800181C4
+
 game/gs_pcbox.c:
 	.text       start:0x800181C4 end:0x80020328
 
@@ -178,6 +184,12 @@ game/gs_title.c:
 
 game/gs_worldmap.c:
 	.text       start:0x80026370 end:0x80030170
+
+game/gs_npc_event.c:
+	.text       start:0x80030170 end:0x80033278
+
+game/movie.c:
+	.text       start:0x80035E04 end:0x8003686C
 
 game/menu/menu_bag.c:
 	.text       start:0x8004EADC end:0x80051710
@@ -229,6 +241,9 @@ dolphin/os/OSEXI_fn_8009E7A8.c:
 
 dolphin/os/OSEXI_fn_8009E7AC.c:
 	.text       start:0x8009E7AC end:0x8009E7B0
+
+dolphin/os/OSMemory.c:
+	.text       start:0x8009F1B8 end:0x8009F77C
 
 dolphin/os/OSState_fn_8009FAEC.c:
 	.text       start:0x8009FAEC end:0x8009FAF8
@@ -521,8 +536,17 @@ dolphin/si/SI_fn_800D104C.c:
 game/gs_render_util.c:
 	.text       start:0x800D13C4 end:0x800D3074
 
+game/gs_gfx.c:
+	.text       start:0x800D3074 end:0x800D3E4C
+
 game/gs_render.c:
 	.text       start:0x800D3E4C end:0x800E202C
+
+game/gs_texture.c:
+	.text       start:0x800EF098 end:0x800F07A8
+
+game/input/input.c:
+	.text       start:0x800F75FC end:0x800F8268
 
 game/gs_floor_data.c:
 	.text       start:0x800FF0A0 end:0x800FF788
@@ -575,8 +599,29 @@ game/gs_scene.c:
 game/fsys/fsys_file.c:
 	.text       start:0x8017B07C end:0x8017F2C4
 
+hsd/hsd_object.c:
+	.text       start:0x80190E34 end:0x801914F4
+
+hsd/hsd_wobj.c:
+	.text       start:0x801914F4 end:0x801920E4
+
+hsd/hsd_class.c:
+	.text       start:0x801938FC end:0x80193C24
+
 hsd/hsd_cobj.c:
 	.text       start:0x80193C24 end:0x80197A64
+
+hsd/hsd_displayfunc.c:
+	.text       start:0x80197A64 end:0x80198F7C
+
+hsd/hsd_dobj.c:
+	.text       start:0x80198F7C end:0x8019B7C0
+
+hsd/hsd_fog.c:
+	.text       start:0x8019B7C0 end:0x8019C690
+
+hsd/hsd_initialize.c:
+	.text       start:0x8019C690 end:0x8019CE50
 
 hsd/hsd_jobj.c:
 	.text       start:0x8019CE50 end:0x801A4000
