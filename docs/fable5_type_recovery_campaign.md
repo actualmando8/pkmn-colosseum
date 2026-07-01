@@ -506,3 +506,18 @@ Validation result:
 - Focused objdiff for the exact-match setters/getters stayed `100.0%`.
 - Lower-match default getters stayed at their previous report percentages.
 - `main/game/effect/effect_util` unit metrics stayed unchanged.
+
+## Subagent Extrapolation Batch 4, 2026-07-01
+
+Applied after local review:
+
+- `gs_party_access.c`: introduced a narrow opaque `BattleAnimState` view for
+  the known fields of `lbl_804673F8`: the mode flag byte at `0x08` and
+  `activeFlag` at `0x874`.
+- Converted the four mode-flag toggles plus `fn_8000D11C` and `fn_8000D234`
+  from raw global offsets to named field access.
+
+Validation result:
+
+- Focused objdiff for all six touched functions stayed `100.0%`.
+- `main/game/gs_party_access` unit metrics stayed unchanged.

@@ -1031,6 +1031,13 @@ typedef struct {
     s8 b02 : 1;
     s8 b01 : 1;
 } PartyFlags8;
+
+typedef struct {
+    u8 pad_00[0x08];
+    PartyFlags8 modeFlags;
+    u8 pad_09[0x86B];
+    s32 activeFlag;
+} BattleAnimState;
 #endif
 
 #pragma push
@@ -1041,7 +1048,7 @@ s32 fn_8000CAA4(void) {
 #ifdef PCPORT
     lbl_804673F8[8] ^= 0x10;
 #else
-    PartyFlags8* p = (PartyFlags8*)(lbl_804673F8 + 8);
+    PartyFlags8* p = &((BattleAnimState*)lbl_804673F8)->modeFlags;
     p->b10 ^= 1;
 #endif
     return 0;
@@ -1052,7 +1059,7 @@ s32 fn_8000CAD0(void) {
 #ifdef PCPORT
     lbl_804673F8[8] ^= 0x20;
 #else
-    PartyFlags8* p = (PartyFlags8*)(lbl_804673F8 + 8);
+    PartyFlags8* p = &((BattleAnimState*)lbl_804673F8)->modeFlags;
     p->b20 ^= 1;
 #endif
     return 0;
@@ -1063,7 +1070,7 @@ s32 fn_8000CAFC(void) {
 #ifdef PCPORT
     lbl_804673F8[8] ^= 0x40;
 #else
-    PartyFlags8* p = (PartyFlags8*)(lbl_804673F8 + 8);
+    PartyFlags8* p = &((BattleAnimState*)lbl_804673F8)->modeFlags;
     p->b40 ^= 1;
 #endif
     return 0;
@@ -1074,7 +1081,7 @@ s32 fn_8000CB28(void) {
 #ifdef PCPORT
     lbl_804673F8[8] ^= 0x80;
 #else
-    PartyFlags8* p = (PartyFlags8*)(lbl_804673F8 + 8);
+    PartyFlags8* p = &((BattleAnimState*)lbl_804673F8)->modeFlags;
     p->b80 ^= 1;
 #endif
     return 0;
@@ -1398,7 +1405,7 @@ idx_done:
 #pragma push
 #pragma peephole off
 s32 fn_8000D11C(void) {
-    s32 v = *(s32*)(lbl_804673F8 + 0x874);
+    s32 v = ((BattleAnimState*)lbl_804673F8)->activeFlag;
     if (v != 0) {
         fn_800FF660();
     }
@@ -1567,7 +1574,7 @@ s32 fn_8000D234(void) {
     if ((u8)r != 0) {
         fn_80102510(0x13);
     }
-    if (*(s32*)(lbl_804673F8 + 0x874) == 0) {
+    if (((BattleAnimState*)lbl_804673F8)->activeFlag == 0) {
         fn_800FF730(0x3E7);
         _threadSwitch();
     }
