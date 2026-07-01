@@ -6,24 +6,24 @@
     "total_code": 2495108,
     "total_data": 2196256,
     "total_functions": 8603,
-    "total_units": 239
+    "total_units": 241
   },
   "topology_status": {
-    "auto_units": 55,
-    "named_units": 184,
-    "source_backed_units": 164,
-    "auto_code": 2002536,
+    "auto_units": 56,
+    "named_units": 185,
+    "source_backed_units": 165,
+    "auto_code": 1972696,
     "auto_data": 2182883,
-    "auto_functions": 6274
+    "auto_functions": 6174
   },
   "baseline_progress": {
-    "matched_code": "79956",
-    "matched_code_percent": 3.2045107,
+    "matched_code": "81748",
+    "matched_code_percent": 3.276331,
     "matched_data": "12364",
     "matched_data_percent": 0.56295806,
-    "matched_functions": 1353,
-    "matched_functions_percent": 15.727072,
-    "fuzzy_match_percent": 6.3127494
+    "matched_functions": 1400,
+    "matched_functions_percent": 16.273394,
+    "fuzzy_match_percent": 6.789346
   },
   "unit_topology": [
     {
@@ -876,13 +876,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 289232,
+          "size": 99580,
           "virtual_address": 2147817232
         }
       ],
-      "total_code": 289232,
+      "total_code": 99580,
       "total_data": 0,
-      "total_functions": 615
+      "total_functions": 208
+    },
+    {
+      "name": "main/game/menu/menu_middle",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 29840,
+          "virtual_address": 2147916812
+        }
+      ],
+      "total_code": 29840,
+      "total_data": 0,
+      "total_functions": 100
+    },
+    {
+      "name": "main/auto_01_8007109C_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 159812,
+          "virtual_address": 2147946652
+        }
+      ],
+      "total_code": 159812,
+      "total_data": 0,
+      "total_functions": 307
     },
     {
       "name": "main/dolphin/os/PPCArch",

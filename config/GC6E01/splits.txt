@@ -164,6 +164,9 @@ __init_cpp_exceptions.cpp:
 game/menu/menu_bag.c:
 	.text       start:0x8004EADC end:0x80051710
 
+game/menu/menu_middle.c:
+	.text       start:0x80069C0C end:0x8007109C
+
 dolphin/os/PPCArch.c:
 	.text       start:0x800980E0 end:0x80098108
 
