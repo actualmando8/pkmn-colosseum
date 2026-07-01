@@ -6,24 +6,24 @@
     "total_code": 2495108,
     "total_data": 2196256,
     "total_functions": 8603,
-    "total_units": 235
+    "total_units": 237
   },
   "topology_status": {
-    "auto_units": 53,
-    "named_units": 182,
-    "source_backed_units": 162,
-    "auto_code": 2089760,
+    "auto_units": 54,
+    "named_units": 183,
+    "source_backed_units": 163,
+    "auto_code": 2035960,
     "auto_data": 2182883,
-    "auto_functions": 6560
+    "auto_functions": 6400
   },
   "baseline_progress": {
-    "matched_code": "70324",
-    "matched_code_percent": 2.818475,
+    "matched_code": "75292",
+    "matched_code_percent": 3.0175848,
     "matched_data": "12364",
     "matched_data_percent": 0.56295806,
-    "matched_functions": 1232,
-    "matched_functions_percent": 14.320585,
-    "fuzzy_match_percent": 5.8141356
+    "matched_functions": 1292,
+    "matched_functions_percent": 15.018018,
+    "fuzzy_match_percent": 6.0493684
   },
   "unit_topology": [
     {
@@ -2995,13 +2995,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 261812,
+          "size": 135960,
           "virtual_address": 2149253464
         }
       ],
-      "total_code": 261812,
+      "total_code": 135960,
       "total_data": 0,
-      "total_functions": 686
+      "total_functions": 338
+    },
+    {
+      "name": "main/game/battle/battle_waza",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 53800,
+          "virtual_address": 2149389424
+        }
+      ],
+      "total_code": 53800,
+      "total_data": 0,
+      "total_functions": 160
+    },
+    {
+      "name": "main/auto_01_801DE698_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 72052,
+          "virtual_address": 2149443224
+        }
+      ],
+      "total_code": 72052,
+      "total_data": 0,
+      "total_functions": 188
     },
     {
       "name": "main/game/pokemon",

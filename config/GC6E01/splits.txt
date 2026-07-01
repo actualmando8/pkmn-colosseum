@@ -548,6 +548,9 @@ hsd/hsd_robj_get_alloc_data.c:
 hsd/hsd_robj_get_alloc_data2.c:
 	.text       start:0x801B014C end:0x801B0158
 
+game/battle/battle_waza.c:
+	.text       start:0x801D1470 end:0x801DE698
+
 game/pokemon.c:
 	.text       start:0x801F000C end:0x801F7F80
 
