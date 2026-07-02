@@ -1,0 +1,1114 @@
+[
+  {
+    "fn": "fn_80190E34",
+    "addr": "0x80190E34",
+    "unit": "hsd/hsd_object.c",
+    "proposedName": "ObjInfoInit",
+    "confidence": "A",
+    "evidence": "First function in the whole HSD .text strata; local source already writes this exact function body under the literal name ObjInfoInit(void), which calls hsdInitClassInfo(&hsdObj, &hsdClass, \"sysdolphin_base_library\", \"hsd_obj\", sizeof(HSD_ObjInfo), sizeof(HSD_Obj)) -- byte-identical in structure to melee object.c's only function, ObjInfoInit. Size 44 bytes is plausible for a single-call setup function. Name not used elsewhere in symbols.txt."
+  },
+  {
+    "fn": "fn_80191688",
+    "addr": "0x80191688",
+    "unit": "hsd/hsd_wobj.c",
+    "proposedName": "HSD_WObjGetPosition",
+    "confidence": "A",
+    "evidence": "Body: null-checks wobj/position, resolves animated position via a jobj setup-matrix + mtx-mult-vec macro (WOBJ_RESOLVE_ANIM_POSITION calling fn_8019D9DC on the jobj then fn_800A37CC to transform), then copies wobj->pos_x/y/z into the output vec. Matches melee HSD_WObjGetPosition(HSD_WObj*, Vec3*) exactly: checks flags&1, calls HSD_JObjSetupMatrix + MTXMultVec when dirty, copies wobj->pos to *vec. fn_8019D9DC is very likely HSD_JObjSetupMatrix and fn_800A37CC is very likely MTXMultVec (GC SDK). Name not used elsewhere."
+  },
+  {
+    "fn": "fn_80193A1C",
+    "addr": "0x80193A1C",
+    "unit": "hsd/hsd_class.c",
+    "proposedName": "_hsdClassAmnesia",
+    "confidence": "A",
+    "evidence": "Body: info->head.nb_exist=0; info->head.nb_peak=0; if (info == <hsdClass-like singleton>) reset a couple of file-static globals to 0. Matches melee's _hsdClassAmnesia(HSD_ClassInfo* info) exactly in shape (resets nb_exist/nb_peak, and when info==&hsdClass also resets the static memory_list/nb_memory_list bookkeeping). lbl_8036C638 plausibly = &hsdClass. Name not used elsewhere."
+  },
+  {
+    "fn": "fn_80193A58",
+    "addr": "0x80193A58",
+    "unit": "hsd/hsd_class.c",
+    "proposedName": "_hsdClassDestroy",
+    "confidence": "B",
+    "evidence": "Body: gets cls->class_info, decrements info->head.nb_exist, then calls fn_801A6960(cls). Matches melee's _hsdClassDestroy(HSD_Class* cls) shape (decrement nb_exist, then hsdFreeMemPiece(cls, info->head.obj_size)) but fn_801A6960 is only called with 1 arg here vs melee's 2-arg hsdFreeMemPiece(mem,size) -- likely a Colosseum-side single-arg wrapper that derives size internally, so not a byte-for-byte callee-signature match. Downgraded from A to B for that residual ambiguity. Name not used elsewhere in symbols.txt."
+  },
+  {
+    "fn": "fn_80193A88",
+    "addr": "0x80193A88",
+    "unit": "hsd/hsd_class.c",
+    "proposedName": "_hsdClassRelease",
+    "confidence": "A",
+    "evidence": "Body is a literal empty no-op: void fn_80193A88(HSD_Class* cls) {}. Exact match for melee's void _hsdClassRelease(HSD_Class* cls) {} (also an intentional no-op default release). Size 4 bytes (blr only) confirms. Name not used elsewhere."
+  },
+  {
+    "fn": "fn_80193A8C",
+    "addr": "0x80193A8C",
+    "unit": "hsd/hsd_class.c",
+    "proposedName": "_hsdClassInit",
+    "confidence": "A",
+    "evidence": "Body: int fn_80193A8C(HSD_Class* cls) { return 0; }. Exact match for melee's int _hsdClassInit(HSD_Class* arg0) { return 0; } (default init stub). Size 8 bytes matches a trivial return-0 function. Name not used elsewhere."
+  },
+  {
+    "fn": "fn_80193A94",
+    "addr": "0x80193A94",
+    "unit": "hsd/hsd_class.c",
+    "proposedName": "_hsdClassAlloc",
+    "confidence": "A",
+    "evidence": "Body: allocates info->head.obj_size bytes via fn_801A6928, and on success increments info->head.nb_exist and updates nb_peak if exceeded. Matches melee's _hsdClassAlloc(HSD_ClassInfo* info) exactly (hsdAllocMemPiece(info->head.obj_size) then nb_exist/nb_peak bookkeeping). fn_801A6928 is very likely hsdAllocMemPiece. Name not used elsewhere."
+  },
+  {
+    "fn": "fn_80193CD0",
+    "addr": "0x80193CD0",
+    "unit": "hsd/hsd_cobj.c",
+    "proposedName": "CObjAmnesia",
+    "confidence": "A",
+    "evidence": "Param is a ClassInfo* compared against default_class and against &lbl_8036C678 (== hsdCObj, confirmed by 'extern HSD_CObjInfo lbl_8036C678'); on match clears the corresponding static, then tail-calls parent vtable slot +0x38. Matches melee CObjAmnesia(HSD_ClassInfo* info) body verbatim: 'if (info==HSD_CLASS_INFO(default_class)) default_class=NULL; if (info==HSD_CLASS_INFO(&hsdCObj)) current=NULL; parent->amnesia(info);'. Size 0x60 fits a 3-branch+tailcall trampoline."
+  },
+  {
+    "fn": "fn_80193D30",
+    "addr": "0x80193D30",
+    "unit": "hsd/hsd_cobj.c",
+    "proposedName": "CObjRelease",
+    "confidence": "A",
+    "evidence": "Existing prose comment already describes it: removes anim, releases+destroys ref-counted eyepos/interest WObjs, frees proj_mtx, chains to parent vtable slot +0x30. Matches melee CObjRelease(HSD_Class* o) line-for-line: HSD_AObjRemove(cobj->aobj); ref_DEC(eyepos)+release+destroy; ref_DEC(interest)+release+destroy; HSD_MtxFree(cobj->proj_mtx); HSD_OBJECT_PARENT_INFO(&hsdCObj)->release(o). fn_801C25E4=HSD_AObjRemove, ref_DEC_v local helper mirrors melee's ref_DEC."
+  },
+  {
+    "fn": "fn_80193EC8",
+    "addr": "0x80193EC8",
+    "unit": "hsd/hsd_cobj.c",
+    "proposedName": "CObjInit",
+    "confidence": "A",
+    "evidence": "Calls parent->init via class-info head chain, then on success sets cobj->flags |= 0xC0000000 (== inlined HSD_CObjSetMtxDirty, which sets bits 30+31), then allocates eyepos/interest via HSD_WObjAlloc(). Matches melee's static int CObjInit(HSD_Class* o) exactly: parent->init(o); HSD_CObjSetMtxDirty(cobj); cobj->eyepos=HSD_WObjAlloc(); cobj->interest=HSD_WObjAlloc(); return 0."
+  },
+  {
+    "fn": "fn_80193F44",
+    "addr": "0x80193F44",
+    "unit": "hsd/hsd_cobj.c",
+    "proposedName": "HSD_CObjLoadDesc",
+    "confidence": "A",
+    "evidence": "desc->class_name (*ptr) resolved via fn_80193748 (hsdSearchClassInfo-shaped, takes const char*) to pick ClassInfo, else falls back to default_class or &hsdCObj (inlining HSD_CObjAlloc's own logic) via fn_80193828 (hsdNew-shaped alloc), then tail-calls the resulting object's vtable+0x3C ('load' slot) with the descriptor. Matches melee HSD_CObjLoadDesc(HSD_CObjDesc* desc): hsdSearchClassInfo(desc->class_name) -> hsdNew(info) or HSD_CObjAlloc(); HSD_COBJ_METHOD(cobj)->load(cobj, desc); return cobj. Declared in cobj.h as public API."
+  },
+  {
+    "fn": "fn_80194010",
+    "addr": "0x80194010",
+    "unit": "hsd/hsd_cobj.c",
+    "proposedName": "CObjLoad",
+    "confidence": "A",
+    "evidence": "Existing prose comment already IDs it as the CObj class 'load': copies flags, viewport s16->f32, scissor, near/far, binds eye/interest WObjs, sets orientation from up-vector-or-roll, installs projection params per type with ASSERT on unknown type, returns 0. Matches melee static int CObjLoad(HSD_CObj*, HSD_CObjDesc*) field-for-field, including the up_vector-or-default-Vec3{0,1,0} branch and PROJ_PERSPECTIVE/FRUSTUM/ORTHO switch with HSD_ASSERT(...,0) default."
+  },
+  {
+    "fn": "fn_80194258",
+    "addr": "0x80194258",
+    "unit": "hsd/hsd_cobj.c",
+    "proposedName": "HSD_CObjAlloc",
+    "confidence": "A",
+    "evidence": "Body: hsdNew(default_class!=0 ? default_class : &hsdCObj) with HSD_ASSERT on the result. Exact match for melee's public HSD_CObj* HSD_CObjAlloc(void) { return hsdNew(default_class ? default_class : &hsdCObj.parent.parent); HSD_ASSERT(...,cobj); }. fn_80193828 (hsdNew-shaped) also called identically from fn_80193F44's inlined default-alloc path."
+  },
+  {
+    "fn": "fn_80194400",
+    "addr": "0x80194400",
+    "unit": "hsd/hsd_cobj.c",
+    "proposedName": "HSD_CObjSetViewport",
+    "confidence": "A",
+    "evidence": "Existing comment: sets cobj->viewport.{xmin,xmax,ymin,ymax} from an s16 rect via (f32)(s16) cast. Exact structural/field match to melee void HSD_CObjSetViewport(HSD_CObj*, HSD_RectS16* viewport), which is declared taking HSD_RectS16* exactly as here."
+  },
+  {
+    "fn": "fn_80194510",
+    "addr": "0x80194510",
+    "unit": "hsd/hsd_cobj.c",
+    "proposedName": "HSD_CObjGetRight",
+    "confidence": "A",
+    "evidence": "switch(ptr[0x50]==projection_type): case PERSPECTIVE returns aspect(+0x44)*(near(+0x38)*tan(halfFovRad)); case FRUSTUM/ORTHO return field at +0x4C (frustum.right/ortho.right per cobj.h layout). Exact match to melee HSD_CObjGetRight: aspect*(near*tanf(0.5*DegToRad(fov))) / frustum.right / ortho.right, default 0."
+  },
+  {
+    "fn": "fn_801945B0",
+    "addr": "0x801945B0",
+    "unit": "hsd/hsd_cobj.c",
+    "proposedName": "HSD_CObjGetLeft",
+    "confidence": "A",
+    "evidence": "Same shape as fn_80194510/HSD_CObjGetRight but negated: case PERSPECTIVE returns aspect*(-near*tan(halfFovRad)); case FRUSTUM/ORTHO return field at +0x48 (frustum.left/ortho.left). Exact match to melee HSD_CObjGetLeft. File comment on fn_80194510 already calls this pair out as twins."
+  },
+  {
+    "fn": "fn_80194654",
+    "addr": "0x80194654",
+    "unit": "hsd/hsd_cobj.c",
+    "proposedName": "HSD_CObjGetBottom",
+    "confidence": "A",
+    "evidence": "case PERSPECTIVE returns -near*tan(halfFovRad) (no aspect factor); case FRUSTUM/ORTHO return field at +0x44 (frustum.bottom/ortho.bottom). Exact match to melee HSD_CObjGetBottom. Adjacent fn_801946F0 already documents itself as this function's 'top' twin."
+  },
+  {
+    "fn": "fn_801946F0",
+    "addr": "0x801946F0",
+    "unit": "hsd/hsd_cobj.c",
+    "proposedName": "HSD_CObjGetTop",
+    "confidence": "A",
+    "evidence": "Existing comment already states: 'Get the top extent of the view frustum, twin of fn_80194654 (bottom)'. case PERSPECTIVE returns near*tan(halfFovRad); FRUSTUM/ORTHO return the +0x40 field. Exact match to melee HSD_CObjGetTop (perspective.fov and frustum.top/ortho.top alias the same +0x40 union offset, matching melee's odd reuse of the '.perspective.fov' field name for FRUSTUM/ORTHO cases)."
+  },
+  {
+    "fn": "fn_801947C8",
+    "addr": "0x801947C8",
+    "unit": "hsd/hsd_cobj.c",
+    "proposedName": "HSD_CObjSetRoll",
+    "confidence": "A",
+    "evidence": "Existing wrk8 comment already IDs it as HSD_CObjSetRoll. flags&1==0: stores roll directly, marks matrices dirty if changed (matches melee's plain-roll branch). flags&1!=0: rebuilds up-vector via horizon-perp+rotate-about-dir construction matching melee's roll2upvec exactly, then commits via inlined HSD_CObjSetUpVector logic. melee: void HSD_CObjSetRoll(HSD_CObj*, float roll) { if(flags&1){roll2upvec(...); HSD_CObjSetUpVector(...);} else {...cobj->u.roll=roll;} }. Called (as fn_801947C8) from case 9 of fn_8019674C/CObjUpdateFunc, matching melee's CObjUpdateFunc case 9: HSD_CObjSetRoll(cobj, val->fv)."
+  },
+  {
+    "fn": "fn_80194C2C",
+    "addr": "0x80194C2C",
+    "unit": "hsd/hsd_cobj.c",
+    "proposedName": "vec_normalize_check",
+    "confidence": "A",
+    "evidence": "int(f32* vec, void* out): if all 3 components' abs value <= epsilon return -1 (degenerate), else call fn_800A3ADC(vec,out) (normalize) and return 0. Fetched melee util.h (static inline int vec_normalize_check(Vec3* src, Vec3* dst)): identical epsilon-on-all-3-components guard against FLT_MIN, calls PSVECNormalize(src,dst), returns -1/0. Being 'static inline' in melee's header, MWCC may not have inlined it here (opt_level 2 pragma on this TU), leaving a real out-of-line static copy local to hsd_cobj.c's TU - matches non-HSD_-prefixed static-helper naming guidance. Immediately follows HSD_CObjSetRoll (0x801947C8+0x464==0x80194C2C) and is called by it plus reused (inlined again) inside fn_80194DA4/fn_8019513C/fn_80195590's own eye/interest normalize steps."
+  },
+  {
+    "fn": "fn_80194DA4",
+    "addr": "0x80194DA4",
+    "unit": "hsd/hsd_cobj.c",
+    "proposedName": "HSD_CObjSetUpVector",
+    "confidence": "A",
+    "evidence": "Existing wrk7 comment already IDs it as HSD_CObjSetUpVector, 'storage twin of getter fn_80195590' (=upvec2roll). Explicit-up path: guards `up` against degenerate epsilon, OSReport+__assert warns, else normalizes and marks matrices dirty on change, storing into cobj->u.up - matches melee HSD_CObjSetUpVector's flags&1 branch (vec_normalize_check guard, HSD_CObjSetMtxDirty on change). Roll-mode (structurally-dead) path reproduces melee's upvec2roll algorithm inline then calls fn_801947C8 (=HSD_CObjSetRoll) - matches melee's else-branch: HSD_CObjSetRoll(cobj, upvec2roll(cobj, up))."
+  },
+  {
+    "fn": "fn_8019513C",
+    "addr": "0x8019513C",
+    "unit": "hsd/hsd_cobj.c",
+    "proposedName": "roll2upvec",
+    "confidence": "A",
+    "evidence": "int(HSD_CObj* cobj, f32 roll, f32* out): builds normalized eye->interest direction (degenerate guard -> return 0), builds a horizon-perpendicular vector via gimbal-avoiding Gram-Schmidt (branches on near-vertical dir, exactly mirroring melee's eye.y-near-1 test), rotates it about dir by -roll (fn_800A3244~PSMTXRotAxisRad), transforms (fn_800A3820~PSMTXMultVecSR), normalizes into out, returns 1. Matches melee static int roll2upvec(HSD_CObj*, Vec3* up, float roll) essentially verbatim (with HSD_CObjGetEyeVector's eye/interest-diff+normalize inlined). Existing comment already flags it as 'exact-twin of the roll path inlined inside fn_801947C8'."
+  },
+  {
+    "fn": "fn_80195590",
+    "addr": "0x80195590",
+    "unit": "hsd/hsd_cobj.c",
+    "proposedName": "upvec2roll",
+    "confidence": "A",
+    "evidence": "f32(HSD_CObj* cobj, f32* arg): builds normalized eye->interest dir (degenerate guard -> return default), rejects if `arg` nearly parallel to dir, builds reference look-at frame via C_MTXLookAt(mtx, refEye, refUp, dir) then transforms arg through it and returns atan2f(-out[0], out[1]) (with a +-PI/2 fallback when out[1]==0). Matches melee static float upvec2roll(HSD_CObj* cobj, Vec3* up) essentially verbatim (HSD_CObjGetEyeVector inlined for the eye vector build). fn_801947C8 calls this exact function (as fn_80195590) in its structurally-dead roll-mode fallback branch, matching melee's HSD_CObjSetUpVector else-branch calling upvec2roll."
+  },
+  {
+    "fn": "fn_80195A6C",
+    "addr": "0x80195A6C",
+    "unit": "hsd/hsd_cobj.c",
+    "proposedName": "HSD_CObjSetCurrent",
+    "confidence": "A",
+    "evidence": "Stores `current`=cobj, queries active render/projection mode, dispatches to 4 handlers: mode3 = viewport/scissor used verbatim (inlines melee's tiny static setupOffscreenCamera body exactly); mode0 = viewport/scissor scaled by fbWidth/viWidth & efbHeight/viHeight ratios with a field-rendering(jitter) flag (inlines melee's static setupNormalCamera exactly, matching its x_scale/y_scale/field_rendering logic); mode1 delegates to fn_801963E0 (=setupTopHalfCamera); mode2 delegates to fn_801960C4 (=setupBottomHalfCamera); default panics via HSD_Panic. On success recomputes the viewing matrix via fn_80195F0C and returns 1. Matches melee bool HSD_CObjSetCurrent(HSD_CObj*) structurally: render_pass switch across {OFFSCREEN,SCREEN,TOPHALF,BOTTOMHALF} -> setup*Camera() -> HSD_Panic on default -> HSD_CObjSetupViewingMtx(cobj) on success."
+  },
+  {
+    "fn": "fn_80195F0C",
+    "addr": "0x80195F0C",
+    "unit": "hsd/hsd_cobj.c",
+    "proposedName": "HSD_CObjSetupViewingMtx",
+    "confidence": "A",
+    "evidence": "Existing comment already describes it: recomputes cobj->view_mtx via C_MTXLookAt(eye,up,interest) when cobj (or its eye/interest WObjs) is dirty, then clears the per-WObj dirty flag(2), clears CObj flag 0x40000000, sets flag 0x80000000. This is melee's dirty-check-and-rebuild block, which appears 3x verbatim in melee (HSD_CObjSetupViewingMtx, HSD_CObjGetViewingMtxPtr, HSD_CObjGetInvViewingMtxPtr) but was factored into one shared subroutine here. Strongest evidence: called as the LAST step of fn_80195A6C/HSD_CObjSetCurrent, exactly matching melee's `HSD_CObjSetupViewingMtx(cobj)` tail-call in HSD_CObjSetCurrent; also called from the already-named HSD_CObjGetViewingMtxPtr (0x80194CC4). Alternate framing: could instead be viewed as a merged body of all 3 melee call sites, but HSD_CObjSetupViewingMtx is the best single canonical name since it is the one melee function whose ENTIRE body is exactly this logic."
+  },
+  {
+    "fn": "fn_801960C4",
+    "addr": "0x801960C4",
+    "unit": "hsd/hsd_cobj.c",
+    "proposedName": "setupBottomHalfCamera",
+    "confidence": "A",
+    "evidence": "Guard: vfilter=efbHeight-8; return 0 if viewport.ymax < vfilter (exact match to melee's `screen_top=rmode->efbHeight-8; if (cobj->viewport.ymax < screen_top) return 0;`). Clamps scissor/viewport to the guard band, computes ratio=visible_h/height, then for PERSPECTIVE builds t=near*tan(halfFov), off=2*ratio-1 (matches melee's `t=b*(2*hscale-1)`), passing (nt*off, -nt, ...) to the frustum builder - matches melee's MTXFrustum(p, t, -b, -w, w, near, far) exactly. Non-static-inline; the caller fn_80195A6C dispatches mode2 to this exact function where melee's HSD_CObjSetCurrent calls setupBottomHalfCamera for HSD_RP_BOTTOMHALF."
+  },
+  {
+    "fn": "fn_801963E0",
+    "addr": "0x801963E0",
+    "unit": "hsd/hsd_cobj.c",
+    "proposedName": "setupTopHalfCamera",
+    "confidence": "A",
+    "evidence": "Guard: `if (cobj->viewport.ymin >= efb_h) return 0;` matches melee's setupTopHalfCamera exactly. Clamps viewport.ymax to efb_h, computes ratio=vheight/height, for PERSPECTIVE builds off=1-2*ratio (matches melee's `b=t*-(2*h_scale-1)`), passes (nt, nt*off, -(nt*aspect), nt*aspect,...) to the frustum builder matching melee's MTXFrustum(p,t,b,-w,w,near,far). Also installed as the CObjInfo `load`/`update` fallback function pointers near top of file (ASPIRATIONAL placeholder region, not authoritative) but its real role per this address is confirmed by fn_80195A6C's mode1 dispatch, matching melee's HSD_RP_TOPHALF -> setupTopHalfCamera(cobj)."
+  },
+  {
+    "fn": "fn_8019674C",
+    "addr": "0x8019674C",
+    "unit": "hsd/hsd_cobj.c",
+    "proposedName": "CObjUpdateFunc",
+    "confidence": "A",
+    "evidence": "Existing comment already flags the case-5/6/7 bug (all three interest channels overwrite v[0] instead of x/y/z respectively) as 'likely an original-game copy/paste artefact'. This EXACT bug is present in melee's static void CObjUpdateFunc(void*,int,HSD_ObjData*) source (case 5/6/7 all do `vec.x = val->fv`), a byte-for-byte confirming fingerprint, not just a structural coincidence. Full case list (1/2/3 eye x/y/z, 5/6/7 interest, 9 roll, 10 fov, 11 near, 12 far) matches melee's switch(type) exactly, dispatched from the CObjInfo update slot (installed for fn_8019674C in the ASPIRATIONAL CObjInfoInit placeholder, and genuinely invoked via HSD_COBJ_METHOD(cobj)->update from the already-named HSD_CObjAnim at 0x801966FC)."
+  },
+  {
+    "fn": "fn_80196EF8",
+    "addr": "0x80196EF8",
+    "unit": "hsd/hsd_cobj.c",
+    "proposedName": "HSD_EraseRect",
+    "confidence": "A",
+    "evidence": "s32 arg0/arg1/arg2 (color/alpha/depth enable flags) + f32 f1..f5 (left/top/right/bottom/z by GX vertex order), early-outs if all three flags are 0, branches on depth-enable to set up a Z8 depth texture (matches melee's `if(enable_depth){GXInitTexObj(...,GX_TF_Z8,...); GXSetZTexture(...);}`), draws a GX_QUADS rect with 4 vertices at (left,top,z)/(right,top,z)/(right,bottom,z)/(left,bottom,z) with texcoords (0,0)/(1,0)/(1,1)/(0,1) and color from lbl_80478C60 (a 4-byte RGBA struct) - byte-identical vertex order/texcoords to melee's HSD_EraseRect(f32 top,bottom,left,right,z,int enable_color,enable_alpha,enable_depth) in displayfunc.c. Called by HSD_CObjEraseScreen in melee's cobj.c (aspirational, unlinked in this file, but the real callsite is presumably elsewhere)."
+  },
+  {
+    "fn": "fn_8019731C",
+    "addr": "0x8019731C",
+    "unit": "hsd/hsd_cobj.c",
+    "proposedName": "HSD_SetEraseColor",
+    "confidence": "A",
+    "evidence": "void(u8 a,b,c,d): stores 4 bytes into lbl_80478C60[0..3] - the exact same static RGBA global consumed by fn_80196EF8/HSD_EraseRect (`color = erase_color` in melee). Matches melee's void HSD_SetEraseColor(u8 r,u8 g,u8 b,u8 a) { erase_color.r=r; erase_color.g=g; erase_color.b=b; erase_color.a=a; } in displayfunc.c exactly (trivial 4-byte struct-field store, size 0x20 fits)."
+  },
+  {
+    "fn": "fn_80198038",
+    "addr": "0x80198038",
+    "unit": "hsd/hsd_displayfunc.c",
+    "proposedName": "mkBillBoardMtx",
+    "confidence": "B",
+    "evidence": "Billboard basis-vector construction: default basis = lbl_802746D0 {0,0,1} (byte-identical to melee's file-scope 'Vec3 zOne = {0,0,1}' / 'zOne2'); when dobj->flags&0x2000 basis is instead derived from the translation column (position-driven), mirroring melee's JOBJ_PBILLBOARD branch; all three output columns (cross/col1Work/basis) are rescaled -- none preserved unscaled -- matching melee's plain mkBillBoardMtx (which rescales all of ax/ay/az), unlike mkV/mkH which preserve one axis at unit length. Called from HSD_DObjDisplayFunc2 for dobj-flags case 0x200 (of 0x200/0x400/0x600/0x800, i.e. an evenly-spaced 4-way billboard-type enum, not literally 'render passes' as the file's own header comment claims -- see caveats). Confidence B: DObj-level reimplementation (not JObj), degenerate-case fallback branch added versus melee, and static/local name so not independently verifiable via binary-wide grep. No collision in all_symbol_names.json."
+  },
+  {
+    "fn": "fn_801985E0",
+    "addr": "0x801985E0",
+    "unit": "hsd/hsd_displayfunc.c",
+    "proposedName": "mkHBillBoardMtx",
+    "confidence": "B",
+    "evidence": "Default basis = {0,1,0} (matches melee file-scope 'Vec3 yOne = {0,1,0}'); output column 0 stored UNSCALED (DISPLAYFUNC_STORE_COLUMN(...,0,col0,1.0f)) exactly like melee mkHBillBoardMtx's 'HSD_MtxSetColVec(dst,0,&ax)' (ax left unscaled while ay/az are rescaled). The dobj->flags&0x2000 branch computes flat={trans.x,0,trans.z}; len=mag(flat); scale=-trans.y/len; basis={trans.x*scale,len,trans.z*scale} -- this is precisely melee's PBILLBOARD uy computation (uy.y=sqrt(pos.x^2+pos.z^2); uy.x=-pos.y/uy.y*pos.x; uy.z=-pos.y/uy.y*pos.z). Very strong structural + constant match. Confidence B for the same reasons as mkBillBoardMtx (DObj- vs JObj-level, added epsilon/degenerate-fallback logic, static name). No collision in all_symbol_names.json."
+  },
+  {
+    "fn": "fn_80198B20",
+    "addr": "0x80198B20",
+    "unit": "hsd/hsd_displayfunc.c",
+    "proposedName": "mkVBillBoardMtx",
+    "confidence": "B",
+    "evidence": "Default basis = lbl_802746D0 {0,0,1} (zOne); output column 1 stored UNSCALED (DISPLAYFUNC_STORE_COLUMN(...,1,col1,1.0f)) exactly like melee mkVBillBoardMtx's 'HSD_MtxSetColVec(dst,1,&ay)' (ay left unscaled while ax/az are rescaled via cross products). dobj->flags&0x2000 branch derives basis from normalize(-trans), paralleling melee's PBILLBOARD 'ax=cross(pos,ay)' position-driven case. Dispatched from dobj-flags case 0x400. Confidence B for the same DObj-vs-JObj/added-fallback reasons as the sibling billboard functions. No collision in all_symbol_names.json."
+  },
+  {
+    "fn": "fn_80198F4C",
+    "addr": "0x80198F4C",
+    "unit": "hsd/hsd_displayfunc.c",
+    "proposedName": "HSD_ZListInitAllocData",
+    "confidence": "A",
+    "evidence": "Body is exactly fn_801AA35C(lbl_80465348, 0x48, 4) -- an ObjAllocInit(list, size, align) call. sizeof(melee HSD_ZList) = Mtx pmtx(0x30)+MtxPtr vmtx(4)+HSD_JObj* jobj(4)+u32 rendermode(4)+struct{texedge,xlu}(8)+next(4) = 0x48 bytes exactly, matching melee displayfunc.c's 'HSD_ZListInitAllocData(void){ HSD_ObjAllocInit(&zlist_alloc_data, sizeof(HSD_ZList), 4); }' byte for byte on the size argument. No collision in all_symbol_names.json."
+  },
+  {
+    "fn": "fn_8019905C",
+    "addr": "0x8019905C",
+    "unit": "hsd/hsd_dobj.c",
+    "proposedName": "DObjRelease",
+    "confidence": "A",
+    "evidence": "Body (dobj->mobj MObjRemove; dobj->pobj PObjRemoveAll; dobj->aobj AObjRemove; then PARENT_INFO(&hsdDObj)->release(o)) is a verbatim structural match to melee's static DObjRelease in dobj.c. Colosseum's own file already carries an unlinked/aspirational 'static void DObjRelease' at lines 222-229 with identical body shape, confirming intent; fn_8019905C is the real address-verified compiled instance (installed as the release vtable slot, consistent with DObjInfoInit setting ->release = DObjRelease). Static/file-scope name, no collision in all_symbol_names.json."
+  },
+  {
+    "fn": "fn_80199264",
+    "addr": "0x80199264",
+    "unit": "hsd/hsd_dobj.c",
+    "proposedName": "HSD_DObjRemoveAll",
+    "confidence": "A",
+    "evidence": "Walks dobj->next chain; for each node calls CLASS_METHOD->release then CLASS_METHOD->destroy. This is exactly melee's HSD_DObjRemoveAll with HSD_DObjRemove (hsdDelete = release+destroy) inlined by the compiler. Corroborated externally: src/hsd/hsd_jobj.c lines 372 and 700 already call 'HSD_DObjRemoveAll(jobj->u.dobj)' (unresolved to this address today), and include/hsd/hsd_dobj.h:97 already forward-declares 'void HSD_DObjRemoveAll(HSD_DObj* dobj);' -- i.e. the rest of the codebase already assumes this exact name/signature exists. No name collision in all_symbol_names.json."
+  },
+  {
+    "fn": "fn_801992D8",
+    "addr": "0x801992D8",
+    "unit": "hsd/hsd_dobj.c",
+    "proposedName": "HSD_DObjLoadDesc",
+    "confidence": "A",
+    "evidence": "Signature HSD_DObj* fn_801992D8(HSD_DObjDesc* desc): resolves class via fn_80193748 (hsdSearchClassInfo) else falls back to default_class/hsdDObj, allocates via fn_80193828 (hsdNew), asserts, then calls vtable slot 0x40 (->load) and returns. Matches melee's public HSD_DObjLoadDesc almost line-for-line (HSD_DObjAlloc() path is inlined). Caller corroboration: src/hsd/hsd_jobj.c:1899 'jobj->u.dobj = (HSD_DObj*) fn_801992D8(joint->u.dobjdesc);' is exactly the JObj-loads-a-DObjDesc idiom. No collision in all_symbol_names.json."
+  },
+  {
+    "fn": "fn_80199794",
+    "addr": "0x80199794",
+    "unit": "hsd/hsd_dobj.c",
+    "proposedName": "HSD_FObjLoadDesc",
+    "confidence": "A",
+    "evidence": "Recursive/unrolled builder over HSD_FObjDesc: each level allocates an FObj (HSD_ObjAlloc+assert+memset(0x30) = inlined HSD_FObjAlloc), sets next=recurse(desc->next), then copies startframe/obj_type/frac_value/frac_slope/ad_head/length/flags=0. This is an exact structural match to melee fobj.c's HSD_FObjLoadDesc (fobj->next = HSD_FObjLoadDesc(desc->next); fobj->startframe=...; ...; return fobj;), just manually 4-level unrolled by the compiler -- matching the file's own in-place comment claiming this identification. No collision in all_symbol_names.json."
+  },
+  {
+    "fn": "fn_8019B808",
+    "addr": "0x8019B808",
+    "unit": "hsd/hsd_fog.c",
+    "proposedName": "FogInfoInit",
+    "confidence": "A",
+    "evidence": "Calls hsdInitClassInfo(lbl_8036C7E8, lbl_8036CC00, lbl_802747B8, ..., 0x40, 0x20) then installs vtable slot 0x30=fn_8019B874 (release) and slot 0x3C=fn_8019B948 (interpret callback). Matches melee's static FogInfoInit(void){ hsdInitClassInfo(HSD_CLASS_INFO(&hsdFog), HSD_CLASS_INFO(&hsdObj), \"sysdolphin_base_library\",\"hsd_fog\", sizeof(HSD_FogInfo), sizeof(HSD_Fog)); HSD_CLASS_INFO(&hsdFog)->release=FogRelease; } (Colosseum's build additionally wires an interpret-anim vtable slot). This is the classinfo constructor referenced by 'static HSD_FogInfo hsdFog = { FogInfoInit };' already present (unlinked) at the top of hsd_fog.c. No collision in all_symbol_names.json."
+  },
+  {
+    "fn": "fn_8019B874",
+    "addr": "0x8019B874",
+    "unit": "hsd/hsd_fog.c",
+    "proposedName": "FogRelease",
+    "confidence": "A",
+    "evidence": "Body: fog_adj=o->fog_adj; if(fog_adj && ref_DEC(fog_adj)) hsdDelete(fog_adj); AObjRemove(o->aobj); PARENT_INFO(&hsdFog)->release(o). This matches melee's static FogRelease(HSD_Fog* fog) almost exactly (fog_adj refcount-decrement+delete, AObjRemove(fog->aobj), parent release). File's own in-place comment already identifies this as 'FogRelease virtual'. No collision in all_symbol_names.json."
+  },
+  {
+    "fn": "fn_8019B948",
+    "addr": "0x8019B948",
+    "unit": "hsd/hsd_fog.c",
+    "proposedName": "FogUpdateFunc",
+    "confidence": "A",
+    "evidence": "Interpret-callback dispatching on `type`: case 0/1 -> fog->start/end; cases 2-5 -> fog->color R/G/B/A (each clamped and scaled by 255); case 6 -> fog->fog_adj->center (clamped); case 7 -> fog->fog_adj->width (clamped). Matches melee's FogUpdateFunc(void* obj, enum_t type, HSD_ObjData* val) which writes fog->start/end (case1/2), color RGBA (case5-8), and fog_adj->center (case20) -- identical field set and ordering (start,end,R,G,B,A,center[,width]); only the numeric case IDs differ (Colosseum evidently uses a renumbered/game-specific attribute-type enum, and adds a 'width' case melee's version lacks). Installed as the fog classinfo's interpret vtable slot (0x3C) by FogInfoInit (fn_8019B808), matching how melee wires FogUpdateFunc via HSD_AObjInterpretAnim(fog->aobj, fog, FogUpdateFunc). No collision in all_symbol_names.json."
+  },
+  {
+    "fn": "fn_8019BB78",
+    "addr": "0x8019BB78",
+    "unit": "hsd/hsd_fog.c",
+    "proposedName": "HSD_FogLoadDesc",
+    "confidence": "A",
+    "evidence": "hsdNew's an HSD_Fog, copies type/start/end/color from desc (or synthesizes defaults from viewport/projection scratch when desc==NULL, matching melee's GXGetViewportv-based default path), then if desc->fogadjdesc != NULL hsdNew's an HSD_FogAdj and copies flags/center/width/mtx into it before assigning fog->fog_adj. This is exactly melee's public HSD_FogLoadDesc (HSD_FogAlloc+HSD_FogInit, then conditionally FogAdjLoadDesc/fog_adj assignment) with the sub-calls compiler-inlined into one monolithic function -- consistent with the file's own in-place comment already identifying this as 'the monolithic binary form of ... HSD_FogAlloc + HSD_FogInit (+ FogAdj alloc/init)'. No collision in all_symbol_names.json."
+  },
+  {
+    "fn": "fn_8019BD18",
+    "addr": "0x8019BD18",
+    "unit": "hsd/hsd_fog.c",
+    "proposedName": "HSD_FogSet",
+    "confidence": "A",
+    "evidence": "fog==NULL path calls GXSetFog(0,...,default color) and returns; otherwise fetches HSD_CObjGetCurrent() (panicking 'You must specify CObj first'-style message if NULL), calls GXSetFog(fog->type,fog->start,fog->end,near,far,fog->color), then conditionally builds a GXFogAdjTable via GXInitFogAdjTable+GXSetFogRangeAdj(1,center,&tbl) from fog->fog_adj bits, else GXSetFogRangeAdj(0,0,NULL). This is a precise structural match to melee's public HSD_FogSet(HSD_Fog* fog). No collision in all_symbol_names.json."
+  },
+  {
+    "fn": "fn_8019C1B0",
+    "addr": "0x8019C1B0",
+    "unit": "hsd/hsd_fog.c",
+    "proposedName": "HSD_IDRemoveByIDFromTable",
+    "confidence": "A",
+    "evidence": "hash = key % 101 (0x65 decimal, byte-identical to melee id.c's 'inline u32 hash(u32 id){ return id % 0x65; }'); walks table[hash] bucket, and on a matching id unlinks the node from the singly-linked list and frees it via HSD_ObjFree(lbl_8046553C, node). This is an exact match to melee's HSD_IDRemoveByIDFromTable(HSD_IDTable* table, u32 id) (unlink+IDEntryFree). Sits directly among already-correctly-named siblings in this unit (HSD_IDGetDataFromTable, HSD_IDInsertToTable, HSD_IDSetup) which is the remove/delete counterpart missing from that set. No collision in all_symbol_names.json."
+  },
+  {
+    "fn": "fn_8019C708",
+    "addr": "0x8019C708",
+    "unit": "hsd/hsd_initialize.c",
+    "proposedName": "HSD_StartRender",
+    "confidence": "B",
+    "evidence": "Stores arg into lbl_8047B294 (the same var read by fn_8019C7B0/HSD_GetCurrentRenderPass), then branches on a rendermode-object aa flag (p[0x19]) to call fn_800BCEF4(2,...) vs fn_800BCEF4(pixfmt,0) [[GXSetPixelFmt(GX_PF_RGB565_Z16,zfmt) vs GXSetPixelFmt(current_pix_fmt,GX_ZC_LINEAR)]], then fn_800BD07C(fieldRendering, xfbHeight<viHeight) [[GXSetFieldMode]] -- a precise match to melee's HSD_StartRender(HSD_RenderPass pass){ current_render_pass=pass; if(rmode->aa) GXSetPixelFmt(GX_PF_RGB565_Z16,current_z_fmt); else GXSetPixelFmt(current_pix_fmt,GX_ZC_LINEAR); GXSetFieldMode(rmode->field_rendering, rmode->xfbHeight<rmode->viHeight); }. Confidence B (not A) because Colosseum's version has an added tail block that conditionally calls two more functions (fn_800B856C/fn_800BB29C) gated by a separate flag var (lbl_8047B290, set by fn_8019C6EC) that has no melee counterpart in initialize.c -- a Colosseum-specific extension layered on top of the matched core. No collision in all_symbol_names.json."
+  },
+  {
+    "fn": "fn_8019C7B0",
+    "addr": "0x8019C7B0",
+    "unit": "hsd/hsd_initialize.c",
+    "proposedName": "HSD_GetCurrentRenderPass",
+    "confidence": "A",
+    "evidence": "Trivial getter: `return lbl_8047B294;`. Matches melee's HSD_GetCurrentRenderPass(void){ return current_render_pass; } exactly, and matches the unlinked/aspirational identical-named stub already at the top of hsd_initialize.c (lines 36-39) using the same clean 'current_render_pass' static var name -- fn_8019C7B0 is simply the real address-verified compiled instance of that same getter. No collision in all_symbol_names.json."
+  },
+  {
+    "fn": "fn_8019CF54",
+    "addr": "0x8019CF54",
+    "unit": "hsd/hsd_jobj.c",
+    "proposedName": "JObjAmnesia",
+    "confidence": "B",
+    "evidence": "Body exactly matches melee jobj.c JObjAmnesia (~line 1536): clear default_class (lbl_8047B298) if info matches it, clear ufc_callbacks/current_jobj (lbl_8047B29C/lbl_8047B2AC) if info == &hsdJObj (lbl_8036C8E0), then call parent classinfo->amnesia. NOTE: the identifier 'JObjAmnesia' is already used in this same file at line 387 for a simpler, non-matching body (only handles default_class/current_jobj, missing the ufc_callbacks field) that is NOT present in local_symbols.json/all_symbol_names.json at any confirmed address -- almost certainly an unverified/aspirational placeholder from an earlier pass. This fn_ is the byte-accurate real JObjAmnesia; the existing top-of-file one should be reconciled/removed before applying this rename."
+  },
+  {
+    "fn": "fn_8019CFBC",
+    "addr": "0x8019CFBC",
+    "unit": "hsd/hsd_jobj.c",
+    "proposedName": "JObjRelease",
+    "confidence": "B",
+    "evidence": "Body exactly matches melee jobj.c JObjRelease (~line 1518): call release_child(jobj), remove jobj->id from ID table if present (fn_8019C1B0 = HSD_IDRemoveByIDFromTable-equivalent), free scl (HSD_VecFree) and envelopemtx (HSD_MtxFree) if set, then call parent classinfo->release. NOTE: 'JObjRelease' is already used in this same file (line 362) for a shorter body missing the ID-table-removal and scl/envelopemtx-free steps; that name is not present in local_symbols.json/all_symbol_names.json at a confirmed address, so it looks like an earlier unverified placeholder. This fn_ is the byte-accurate real JObjRelease; flag the collision before applying."
+  },
+  {
+    "fn": "fn_8019D05C",
+    "addr": "0x8019D05C",
+    "unit": "hsd/hsd_jobj.c",
+    "proposedName": "JObjReleaseChild",
+    "confidence": "A",
+    "evidence": "Body matches melee jobj.c JObjReleaseChild (~line 1487) almost verbatim: detach/unref child list (JOBJ_INSTANCE branch uses HSD_JObjUnref vs else child->parent=NULL + HSD_JObjRemoveAll), detach jobj from its own parent, then release dobj/robj/aobj chains in same order. Registered as HSD_JOBJ_INFO->release_child, matching callers HSD_JOBJ_METHOD(jobj)->release_child(jobj) seen elsewhere in this file (e.g. fn_8019CFBC, fn_801A02B0, fn_801A0D94). No name collision in file or all_symbol_names.json."
+  },
+  {
+    "fn": "fn_8019D5A0",
+    "addr": "0x8019D5A0",
+    "unit": "hsd/hsd_jobj.c",
+    "proposedName": "JObjInit",
+    "confidence": "A",
+    "evidence": "Exact structural match to melee jobj.c JObjInit (~line 1473): calls parent classinfo->init, and on success (result>=0) sets flags=JOBJ_MTX_DIRTY and scale_x/y/z=1.0f, returns 0. lbl_8036C8E0 is the hsdJObj HSD_ClassInfo used throughout this file. No collision; not referenced anywhere else in the file (the existing JObjInfoInit in this file never assigns ->init, corroborating this stub is the real, currently-unwired JObjInit)."
+  },
+  {
+    "fn": "fn_8019DD00",
+    "addr": "0x8019DD00",
+    "unit": "hsd/hsd_jobj.c",
+    "proposedName": "resolveIKJoint2",
+    "confidence": "A",
+    "evidence": "Matches melee jobj.c resolveIKJoint2 (~line 1264): single-joint IK solve using jobj->parent's IKHint bone_length/rotate_x, effector via JObj_GetEffectorChecked(jobj->child), REFTYPE_LIMIT(5)/REFTYPE_LIMIT(6) angle clamp against parent's local X axis, bend axis from parent Z x target, writes result into jobj->mtx columns 0/1/2 + translation. Called from HSD_JObjSetupMatrixSub's JOBJ_JOINT2 case in melee. Distinctive body, unique match, no collision."
+  },
+  {
+    "fn": "fn_8019E460",
+    "addr": "0x8019E460",
+    "unit": "hsd/hsd_jobj.c",
+    "proposedName": "resolveIKJoint1",
+    "confidence": "A",
+    "evidence": "Matches melee jobj.c resolveIKJoint1 (~line 1110): two-bone IK solve, looks for a JOBJ_JOINT2 child via JObj_FindEffectType(jobj->child, JOBJ_JOINT2), computes first/second bone lengths from IKHint, effector target via HSD_RObj global position, law-of-cosines height/axial split, pole-vector via REFTYPE_JOBJ(3) hint or local Z, writes jobj->mtx + calls make_mtx/update on parent robj first. Long distinctive body (~3KB), unique match, no collision."
+  },
+  {
+    "fn": "fn_8019F01C",
+    "addr": "0x8019F01C",
+    "unit": "hsd/hsd_jobj.c",
+    "proposedName": "HSD_JObjGetCurrent",
+    "confidence": "B",
+    "evidence": "Trivial accessor `return lbl_8047B2AC;` where lbl_8047B2AC is the same global referenced/cleared by fn_8019CF54's JObjAmnesia match as 'current_jobj', matching melee's `HSD_JObj* HSD_JObjGetCurrent(void) { return current_jobj; }`. NOTE: name already used at lines 37-40 of this same file with identical semantics (return current_jobj) -- likely the same logical function duplicated/placeholder-drafted rather than truly distinct; not in local_symbols.json/all_symbol_names.json at a confirmed address. Flag collision before applying."
+  },
+  {
+    "fn": "fn_8019FF30",
+    "addr": "0x8019FF30",
+    "unit": "hsd/hsd_jobj.c",
+    "proposedName": "HSD_JObjGetFlags",
+    "confidence": "B",
+    "evidence": "Body `if (jobj != NULL) return jobj->flags; return 0;` matches melee jobj.c HSD_JObjGetFlags (~line 989) exactly, including the NULL-safe return-0 behavior (not an assert). NOTE: name already used at lines 46-50 of this file with a DIFFERENT body (HSD_ASSERT(0,jobj) instead of NULL-check) that does not match melee's real implementation and isn't in local_symbols.json/all_symbol_names.json at a confirmed address -- looks like the wrong/aspirational version. This fn_ is the byte-accurate match; flag collision before applying."
+  },
+  {
+    "fn": "fn_8019FF48",
+    "addr": "0x8019FF48",
+    "unit": "hsd/hsd_jobj.c",
+    "proposedName": "HSD_JObjGetDObj",
+    "confidence": "B",
+    "evidence": "Body (goto-based: NULL check, then union_type_dobj check, else return jobj->u.dobj) is logically identical to melee jobj.c HSD_JObjGetDObj (~line 935): `if (jobj==NULL || !union_type_dobj(jobj)) return NULL; return jobj->u.dobj;`. NOTE: name already used at lines 88-97 of this file with equivalent (but separately-written, two-if) logic; not confirmed in local_symbols.json/all_symbol_names.json at an address. Likely the same function duplicated between an earlier draft and this real compiled stub -- flag collision before applying."
+  },
+  {
+    "fn": "fn_801A015C",
+    "addr": "0x801A015C",
+    "unit": "hsd/hsd_jobj.c",
+    "proposedName": "HSD_JObjAddChild",
+    "confidence": "B",
+    "evidence": "Body matches melee jobj.c HSD_JObjAddChild (~line 832) fused with its helper UpdateParentTrspBits (~line 820): if jobj->child==NULL set directly else assert-and-append to tail of child list (OSReport+__assert mirror melee's HSD_ASSERTREPORT), then child->parent=jobj and climb the PARENT chain propagating (child->flags | child->flags<<10) & JOBJ_ROOT_MASK into ancestor->flags until a fixed point -- matching UpdateParentTrspBits's exact bit algebra, inlined. NOTE: name already used at lines 124-143 of this file for a much simpler body lacking any root-flag propagation, not confirmed in local_symbols.json/all_symbol_names.json -- likely an earlier incomplete placeholder. Flag collision before applying."
+  },
+  {
+    "fn": "fn_801A02B0",
+    "addr": "0x801A02B0",
+    "unit": "hsd/hsd_jobj.c",
+    "proposedName": "HSD_JObjRemove",
+    "confidence": "B",
+    "evidence": "Body matches melee jobj.c HSD_JObjRemove (~line 744) closely: single-child assert, next=child?:jobj->next, find prev via parent's child-list scan (HSD_Panic on failure mirrors melee's design), relink prev->next or parent->child, relink replacement's next/parent, clear jobj's parent/child/next, then unref jobj -- with HSD_JObjUnref's real body (ref_DEC, iref_CNT()-1<0 check, iref_INC, release_child, iref_DEC, release+destroy) fully inlined instead of called, matching melee's real HSD_JObjUnref (~line 720) term-for-term. NOTE: name already used at lines 195-226 of this file with a much simpler, non-matching body (plain ref_DEC then release+destroy, no iref_CNT/release_child path), not confirmed in local_symbols.json/all_symbol_names.json -- an earlier incomplete placeholder. Flag collision before applying."
+  },
+  {
+    "fn": "fn_801A053C",
+    "addr": "0x801A053C",
+    "unit": "hsd/hsd_jobj.c",
+    "proposedName": "HSD_JObjUnrefThis",
+    "confidence": "A",
+    "evidence": "Local helpers iref_DEC_indiv/ref_CNT_obj in this stub reimplement hsd_object.h's iref_DEC/ref_CNT (confirmed real names, see below). Body: if(obj) and iref_DEC(obj) and ref_CNT(obj)<0 then hsdDelete(obj) -- exact match to melee jobj.c HSD_JObjUnrefThis (~line 735): `if (jobj && iref_DEC(jobj) && ref_CNT(jobj) < 0) hsdDelete(jobj);`. No collision in file or all_symbol_names.json."
+  },
+  {
+    "fn": "fn_801A0C1C",
+    "addr": "0x801A0C1C",
+    "unit": "hsd/hsd_jobj.c",
+    "proposedName": "ref_INC",
+    "confidence": "A",
+    "evidence": "Body (obj->ref_count++; assert ref_count != HSD_OBJ_NOREF) is a byte-for-byte non-inlined instance of static inline ref_INC in include/hsd/hsd_object.h, which itself already matches melee's object.h ref_INC exactly. Out-of-line copies of static-inline object.h helpers are a normal decomp pattern (per-TU local duplicate symbols); no collision issue since these aren't declared as distinct globals elsewhere."
+  },
+  {
+    "fn": "fn_801A0C68",
+    "addr": "0x801A0C68",
+    "unit": "hsd/hsd_jobj.c",
+    "proposedName": "iref_DEC",
+    "confidence": "A",
+    "evidence": "Body (early-return BOOL if ref_count_individual==0, else --ref_count_individual and return ==0) matches hsd_object.h/melee object.h static inline iref_DEC exactly. Out-of-line per-TU copy, same rationale as ref_INC/fn_801A0C1C sibling entries."
+  },
+  {
+    "fn": "fn_801A0C9C",
+    "addr": "0x801A0C9C",
+    "unit": "hsd/hsd_jobj.c",
+    "proposedName": "iref_INC",
+    "confidence": "A",
+    "evidence": "Body (ref_count_individual++; assert != 0) matches hsd_object.h/melee object.h static inline iref_INC exactly (assert message string differs from ref_INC's, matching iref_INC's distinct assert line in the header). Out-of-line per-TU copy."
+  },
+  {
+    "fn": "fn_801A0CE8",
+    "addr": "0x801A0CE8",
+    "unit": "hsd/hsd_jobj.c",
+    "proposedName": "hsdDelete",
+    "confidence": "A",
+    "evidence": "Body (if obj != NULL: call classinfo->release then classinfo->destroy) is an exact out-of-line instance of static inline hsdDelete in include/hsd/hsd_class.h, itself already verified to match melee's class.h hsdDelete verbatim. No collision."
+  },
+  {
+    "fn": "fn_801A0D48",
+    "addr": "0x801A0D48",
+    "unit": "hsd/hsd_jobj.c",
+    "proposedName": "ref_DEC",
+    "confidence": "A",
+    "evidence": "Body (early-return true if ref_count==HSD_OBJ_NOREF, else ret=(ref_count==0), ref_count--, return ret) matches hsd_object.h/melee object.h static inline ref_DEC exactly. Out-of-line per-TU copy; ref_DEC(jobj) is called (inlined) elsewhere in this same file at lines 183/1393, confirming the header identifier is genuinely in scope here."
+  },
+  {
+    "fn": "fn_801A0D94",
+    "addr": "0x801A0D94",
+    "unit": "hsd/hsd_jobj.c",
+    "proposedName": "HSD_JObjResolveRefs",
+    "confidence": "A",
+    "evidence": "Matches melee jobj.c HSD_JObjResolveRefs (~line 686): resolves robj refs via RObjResolveRefsAll-equivalent (fn_801AEBE4), then for JOBJ_INSTANCE swaps jobj->child via HSD_IDGetDataFromTable + ref-count adjust, then resolves dobj refs when not spline/ptcl (Colosseum tests !(flags & (JOBJ_PTCL|JOBJ_SPLINE)) which is the concrete union_type_dobj condition). This is the per-node helper called in a loop by the already-anchored HSD_JObjResolveRefsAll (0x801A0744, which calls fn_801A0D94 directly). No collision."
+  },
+  {
+    "fn": "fn_801A0FBC",
+    "addr": "0x801A0FBC",
+    "unit": "hsd/hsd_jobj.c",
+    "proposedName": "HSD_JObjLoadJoint",
+    "confidence": "A",
+    "evidence": "Signature HSD_JObj*(HSD_Joint*) matches melee jobj.h/jobj.c HSD_JObjLoadJoint. Body: resolve class_info from joint->class_name (fn_80193748 = hsdSearchClassInfo) else default_class/hsdJObj, hsdNew (fn_80193828), dispatch vtable slot 0x3C (the 'load' method = JObjLoad, matching fn_801A1098 below), then call HSD_JObjResolveRefsAll(jobj, joint) and return jobj -- matching melee's HSD_JObjLoadJoint(arg0){ jobj=JObjLoadJointSub(arg0,0); HSD_JObjResolveRefsAll(jobj,arg0); return jobj; } with JObjLoadJointSub's class-lookup/hsdNew/load-dispatch inlined. No collision."
+  },
+  {
+    "fn": "fn_801A1098",
+    "addr": "0x801A1098",
+    "unit": "hsd/hsd_jobj.c",
+    "proposedName": "JObjLoad",
+    "confidence": "A",
+    "evidence": "Signature s32(HSD_JObj*, HSD_Joint*, HSD_JObj*) matches melee jobj.c static JObjLoad (~line 633), the class's `load` vtable method (called via vtable[0x3C/4] in fn_801A0FBC above). Body sets flags |= joint->flags, unions spline/ptcl/dobj by JOBJ_SPLINE/JOBJ_PTCL flag checks, loads robj, copies rotate/scale/translate, identity mtx (fn_800A2D38), scl=NULL, envelopemtx alloc+memcpy when joint->mtx set, HSD_IDInsertToTable + id=joint -- all matching JObjLoad field-by-field. Colosseum compiles the recursive per-child JObjLoadJointSub descent (melee) as an iterative while(child_joint) loop with manual child-list linking + root-flag propagation instead, a plausible -O4 restructuring of tail/sibling recursion. No collision."
+  },
+  {
+    "fn": "fn_801A4000",
+    "addr": "0x801A4000",
+    "unit": "hsd/hsd_lobj.c",
+    "proposedName": "LObjInfoInit",
+    "confidence": "A",
+    "evidence": "Calls hsdInitClassInfo(&hsdLObj,...) then stores fn_801A40F8->+0x30(release), fn_801A4098->+0x38(amnesia), fn_801A4440->+0x3c(load), LObjUpdateFunc->+0x40(update) into lbl_8036CA20 (hsdLObj). Exactly matches melee's static LObjInfoInit body field-for-field. NOTE: the C source already contains a same-named static 'LObjInfoInit' function (line ~212) but it is NOT at this address (no address comment, size doesn't fit) - it appears to be an unlinked/aspirational placeholder, not the real compiled function. The 3 static helper reconstructions (LObjRelease/LObjAmnesia/LObjInfoInit) and all '_Early'-suffixed accessors near the top of hsd_lobj.c are absent from the real disassembly (build/GC6E01/asm/hsd/hsd_lobj.s begins straight at fn_801A4000/fn_801A4098/fn_801A40F8) - treat those source blocks as placeholders, not ground truth."
+  },
+  {
+    "fn": "fn_801A4098",
+    "addr": "0x801A4098",
+    "unit": "hsd/hsd_lobj.c",
+    "proposedName": "LObjAmnesia",
+    "confidence": "A",
+    "evidence": "Confirmed via LObjInfoInit field store at +0x38 = amnesia. Body: if(param==lbl_8047B2B0) lbl_8047B2B0=NULL [default_class]; if(param==lbl_8036CA20) lbl_8047B2B4=NULL [current_lights]; then calls parent vtable+0x38 (amnesia). Exact structural match to melee lobj.c's static LObjAmnesia(HSD_ClassInfo*)."
+  },
+  {
+    "fn": "fn_801A40F8",
+    "addr": "0x801A40F8",
+    "unit": "hsd/hsd_lobj.c",
+    "proposedName": "LObjRelease",
+    "confidence": "A",
+    "evidence": "Confirmed via LObjInfoInit field store at +0x30 = release. Body: fn_801C25E4(lobj->aobj) [=HSD_AObjRemove], HSD_WObjUnref(position), HSD_WObjUnref(interest), then parent->release(lobj). Matches melee's static LObjRelease(HSD_Class*) exactly."
+  },
+  {
+    "fn": "fn_801A4344",
+    "addr": "0x801A4344",
+    "unit": "hsd/hsd_lobj.c",
+    "proposedName": "HSD_LObjLoadDesc",
+    "confidence": "A",
+    "evidence": "Loops over HSD_LightDesc chain: searches classinfo by ldesc->class_name (fn_80193748=hsdSearchClassInfo), falls back to default_class/hsdLObj else uses found info, allocs via fn_80193828 (hsdNew), calls lobj->load(lobj,ldesc) [maps to LObjLoad field], chains via ->next, returns head. Matches melee's HSD_LObjLoadDesc(HSD_LightDesc*) shape and role exactly."
+  },
+  {
+    "fn": "fn_801A4440",
+    "addr": "0x801A4440",
+    "unit": "hsd/hsd_lobj.c",
+    "proposedName": "LObjLoad",
+    "confidence": "A",
+    "evidence": "Confirmed via LObjInfoInit field store at +0x3c = load, and existing HSD_LObjInfo->load cast in LObjInfoInit's placeholder block. Body switches on ldesc->flags & LOBJ_TYPE_MASK (AMBIENT/INFINITE/POINT/SPOT), setting color/flags/position/interest/attn fields from the descriptor - matches melee's static int LObjLoad(HSD_LObj*, HSD_LightDesc*) statement-for-statement."
+  },
+  {
+    "fn": "fn_801A4A54",
+    "addr": "0x801A4A54",
+    "unit": "hsd/hsd_lobj.c",
+    "proposedName": "HSD_Index2LightID",
+    "confidence": "A",
+    "evidence": "switch(idx){0:0x1,1:0x2,2:0x4,3:0x8,4:0x10,5:0x20,6:0x40,7:0x80,8:0x100} - exact bit values of GX_LIGHT0..GX_LIGHT7,GX_MAX_LIGHT. Matches melee mtx/lobj's HSD_Index2LightID(u32) exactly (existing file comment already says 'GXLightIndex to GXLightID bitmask')."
+  },
+  {
+    "fn": "fn_801A4D20",
+    "addr": "0x801A4D20",
+    "unit": "hsd/hsd_lobj.c",
+    "proposedName": "HSD_LObjAddCurrent",
+    "confidence": "B",
+    "evidence": "For each lobj in the passed chain: removes any existing occurrence from lbl_8047B2B4 (current_lights, same removal logic as HSD_LObjDeleteCurrentAll's inner block incl. clearing LOBJ_ACTIVE_SLOT and ref_DEC/hsdDelete), increments ref_count with HSD_OBJ_NOREF assert, then inserts into current_lights sorted by ->priority. Matches melee's HSD_LObjAddCurrent's dedup+ref_INC+priority-sorted-insert algorithm; Colosseum's version appears to iterate the whole ->next chain rather than a single lobj (signature/behavior differs slightly from the melee snapshot), hence B not A."
+  },
+  {
+    "fn": "fn_801A620C",
+    "addr": "0x801A620C",
+    "unit": "hsd/hsd_lobj.c",
+    "proposedName": "HSD_LObjGetLightVector",
+    "confidence": "A",
+    "evidence": "Reads lobj->position/interest via fn_80191688 (WObj getter), computes fn_800A3A9C(interest,pos,out) [=PSVECSubtract(interest,position,dir)], then normalizes via fn_800A3ADC (=VECNormalize) or falls back to a default direction if near-zero. Matches melee's HSD_LObjGetLightVector(HSD_LObj*, Vec3*) exactly (GetPosition, GetInterest, PSVECSubtract, PSVECNormalize)."
+  },
+  {
+    "fn": "fn_801A6A34",
+    "addr": "0x801A6A34",
+    "unit": "hsd/hsd_range_801A69C0.c",
+    "proposedName": "MObjInfoInit",
+    "confidence": "A",
+    "evidence": "Calls hsdInitClassInfo(&hsdMObj,...) then stores fn_801A6B8C->+0x30(release), fn_801A6B24->+0x38(amnesia), HSD_MObjSetup->+0x3c(setup), fn_801A7D58->+0x40(load), fn_801A7128->+0x44(make_texp), MObjSetupTev->+0x48(setup_tev), MObjUpdateFunc->+0x4c(update), fn_801A6E00->+0x50(unset) into lbl_8036CB30 (hsdMObj class info). This single instruction sequence anchors 6 other unnamed functions below via direct field-offset evidence."
+  },
+  {
+    "fn": "fn_801A6B24",
+    "addr": "0x801A6B24",
+    "unit": "hsd/hsd_range_801A69C0.c",
+    "proposedName": "MObjAmnesia",
+    "confidence": "A",
+    "evidence": "Confirmed via MObjInfoInit field store at +0x38 = amnesia. Body has zero real bl calls (only a virtual/vtable tail-call to parent amnesia), consistent with melee's static MObjAmnesia checking default_class/hsdMObj equality and clearing tobj_toon/tobj_shadows before delegating to parent."
+  },
+  {
+    "fn": "fn_801A6B8C",
+    "addr": "0x801A6B8C",
+    "unit": "hsd/hsd_range_801A69C0.c",
+    "proposedName": "MObjRelease",
+    "confidence": "A",
+    "evidence": "Confirmed via MObjInfoInit field store at +0x30 = release. Calls fn_801C25E4 (=HSD_AObjRemove), fn_80193AF0 x2 (=hsdFreeMemPiece, once for mat once for pe), fn_801BBE60 (=HSD_TObjRemoveAll), fn_801B42C0+fn_801B7178 (=TExpFreeTevDesc/TExpFreeList). Matches melee's static MObjRelease(HSD_Class*) call sequence exactly."
+  },
+  {
+    "fn": "fn_801A6C34",
+    "addr": "0x801A6C34",
+    "unit": "hsd/hsd_range_801A69C0.c",
+    "proposedName": "HSD_MObjDeleteShadowTexture",
+    "confidence": "A",
+    "evidence": "if(param!=NULL): walk singly-linked list at lbl_8047B2DC (tobj_shadows) via field+8 (next), on match unlink and zero its next field, return; else advance cursor. if(param==NULL): loop through the whole list zeroing every node's next field. Matches melee's HSD_MObjDeleteShadowTexture(HSD_TObj*) exactly, both branches."
+  },
+  {
+    "fn": "fn_801A6CA4",
+    "addr": "0x801A6CA4",
+    "unit": "hsd/hsd_range_801A69C0.c",
+    "proposedName": "HSD_MObjAddShadowTexture",
+    "confidence": "A",
+    "evidence": "HSD_ASSERT(param!=NULL) via __assert call, then loops lbl_8047B2DC (tobj_shadows) via field+8 checking for existing occurrence (return if found), otherwise prepends: param->next=old_head; tobj_shadows=param. Matches melee's HSD_MObjAddShadowTexture(HSD_TObj*) exactly including the assert."
+  },
+  {
+    "fn": "fn_801A6D08",
+    "addr": "0x801A6D08",
+    "unit": "hsd/hsd_range_801A69C0.c",
+    "proposedName": "HSD_MObjRemove",
+    "confidence": "A",
+    "evidence": "if(param!=NULL): loads vtable, calls fn ptr at +0x30 (release) then fn ptr at +0x34 (destroy), both via mtctr/bctrl indirect calls (no bl, consistent with virtual dispatch). Exactly matches melee's HSD_MObjRemove: CLASS_METHOD(mobj)->release(...); CLASS_METHOD(mobj)->destroy(...)."
+  },
+  {
+    "fn": "fn_801A6DC4",
+    "addr": "0x801A6DC4",
+    "unit": "hsd/hsd_range_801A69C0.c",
+    "proposedName": "HSD_MObjGetTObj",
+    "confidence": "A",
+    "evidence": "if(param==NULL) return NULL; else return param->field_0x8 (tobj pointer). Matches melee's HSD_MObjGetTObj(HSD_MObj*) exactly."
+  },
+  {
+    "fn": "fn_801A6DDC",
+    "addr": "0x801A6DDC",
+    "unit": "hsd/hsd_range_801A69C0.c",
+    "proposedName": "HSD_MObjSetAlpha",
+    "confidence": "B",
+    "evidence": "if(mobj!=NULL) and mobj->field_0xc(mat)!=NULL: stores float arg f1 into mat->field_0xc (alpha). Matches melee's `mobj->mat->alpha = alpha;` field pattern; Colosseum's version adds null-guards not present in the melee snapshot (`void HSD_MObjSetAlpha(HSD_MObj*, f32){ mobj->mat->alpha=alpha; }` is unconditional there), hence B not A."
+  },
+  {
+    "fn": "fn_801A6E00",
+    "addr": "0x801A6E00",
+    "unit": "hsd/hsd_range_801A69C0.c",
+    "proposedName": "HSD_MObjUnset",
+    "confidence": "A",
+    "evidence": "Confirmed via MObjInfoInit field store at +0x50 = unset. Body is a single call: HSD_TObjSetup(NULL). Matches melee's HSD_MObjUnset(HSD_MObj*, u32) body `HSD_TObjSetup(NULL);` exactly."
+  },
+  {
+    "fn": "fn_801A6FF0",
+    "addr": "0x801A6FF0",
+    "unit": "hsd/hsd_range_801A69C0.c",
+    "proposedName": "HSD_MObjCompileTev",
+    "confidence": "A",
+    "evidence": "1 param (mobj). if(mobj->field_0x18 [tevdesc] != NULL): calls fn_801B42C0 (=HSD_TExpFreeTevDesc) then clears the field; same shared TExp-call-cluster (fn_801B42C0/7178/BC33C/4300) as the inlined tail of fn_801A7B24. Matches melee's HSD_MObjCompileTev(HSD_MObj*) exactly (FreeTevDesc/FreeList/TObjAssignResources/make_texp/TExpCompile)."
+  },
+  {
+    "fn": "fn_801A7128",
+    "addr": "0x801A7128",
+    "unit": "hsd/hsd_range_801A69C0.c",
+    "proposedName": "MObjMakeTExp",
+    "confidence": "A",
+    "evidence": "Confirmed via MObjInfoInit field store at +0x44 = make_texp. By far the largest function in this file (2556 bytes) with ~13 distinct repeatedly-called TExp/TObj helpers (fn_801B6E74/64EC/6F5C/6CD8/5F08/5E40/707C/7C60 etc) - matches melee's MObjMakeTExp, the largest and most complex function in mobj.c (builds the whole TEV expression tree from rendermode flags and tobj lightmap chains)."
+  },
+  {
+    "fn": "fn_801A7B24",
+    "addr": "0x801A7B24",
+    "unit": "hsd/hsd_range_801A69C0.c",
+    "proposedName": "HSD_MObjLoadDesc",
+    "confidence": "A",
+    "evidence": "Calls fn_80193748 (=hsdSearchClassInfo) then fn_80193828 (=hsdNew) + assert TWICE (once for the inlined default-class fallback matching HSD_MObjAlloc's own hsdNew+assert, once for the found-class branch) - explains the doubled hsdNew/assert pattern absent from a naive reading of melee's asymmetric if/else. Tail then reuses the same TExp-call cluster as fn_801A6FF0 (HSD_MObjCompileTev), consistent with CompileTev having been inlined into LoadDesc. Matches melee's HSD_MObjLoadDesc(HSD_MObjDesc*) dispatch+load+compile shape."
+  },
+  {
+    "fn": "fn_801A7CFC",
+    "addr": "0x801A7CFC",
+    "unit": "hsd/hsd_range_801A69C0.c",
+    "proposedName": "HSD_MObjSetDefaultClass",
+    "confidence": "A",
+    "evidence": "1 param (info). if(info!=NULL): calls fn_80193788(info,&lbl_8036CB30=hsdMObj) [=hsdIsDescendantOf] and asserts the result; unconditionally stores info into lbl_8047B2D0 (=default_class). Exact structural match to the confirmed sibling HSD_LObjSetDefaultClass in melee lobj.c (same idiom: assert descendant-of-self-class, then unconditional assignment to a static default_class)."
+  },
+  {
+    "fn": "fn_801A7D58",
+    "addr": "0x801A7D58",
+    "unit": "hsd/hsd_range_801A69C0.c",
+    "proposedName": "MObjLoad",
+    "confidence": "A",
+    "evidence": "Confirmed via MObjInfoInit field store at +0x40 = load. Calls fn_801BE4CC (likely HSD_TObjLoadDesc), fn_80193B10 (likely HSD_MaterialAlloc/hsdAllocMemPiece) x2, memset, memcpy x2 - matches melee's static MObjLoad(HSD_MObj*, HSD_MObjDesc*) which loads tobj chain, allocs+copies HSD_Material, optionally allocs+copies HSD_PEDesc."
+  },
+  {
+    "fn": "fn_801A7E3C",
+    "addr": "0x801A7E3C",
+    "unit": "hsd/hsd_range_801A69C0.c",
+    "proposedName": "HSD_MObjAnim",
+    "confidence": "A",
+    "evidence": "Calls fn_801C27F4 (=HSD_AObjInterpretAnim, cross-confirmed from its identical use in hsd_lobj.c's HSD_LObjAnimAll) then fn_801BE800 (=HSD_TObjAnimAll). Matches melee's HSD_MObjAnim(HSD_MObj*): HSD_AObjInterpretAnim(mobj->aobj, mobj, MObjUpdateFunc); HSD_TObjAnimAll(mobj->tobj); exactly (2 calls, no more)."
+  },
+  {
+    "fn": "fn_801A83BC",
+    "addr": "0x801A83BC",
+    "unit": "hsd/hsd_range_801A69C0.c",
+    "proposedName": "HSD_MObjAddAnim",
+    "confidence": "A",
+    "evidence": "Calls fn_801C25E4 (=HSD_AObjRemove, conditional) + fn_801C2670 (=HSD_AObjLoadDesc, cross-confirmed from identical use in hsd_lobj.c's HSD_LObjAddAnimAll) + fn_801BEEDC (=HSD_TObjAddAnimAll). Matches melee's HSD_MObjAddAnim(HSD_MObj*, HSD_MatAnim*) exactly (3 calls in the same shape)."
+  },
+  {
+    "fn": "fn_801A86B4",
+    "addr": "0x801A86B4",
+    "unit": "hsd/hsd_mobj_range_801A86B4.c",
+    "proposedName": "HSD_MtxSRTQuat",
+    "confidence": "A",
+    "evidence": "Uses all 5 argument registers r3-r7 (5 params). Calls fn_800A3334 (likely PSMTXTrans), PSMTXQuat, and PSMTXConcat, plus a divide-by-zero-guarded per-axis reciprocal-scale computation. This unique 5-param signature + Quat+Concat call combo is unique in mtx.c to HSD_MtxSRTQuat(Mtx,Vec3*,Quaternion*,Vec3*,Vec3*), which calls MTXScale/MTXQuat/MTXConcat/PSMTXTrans and reciprocal-scales by pivot vec4."
+  },
+  {
+    "fn": "fn_801A8884",
+    "addr": "0x801A8884",
+    "unit": "hsd/hsd_mobj_range_801A86B4.c",
+    "proposedName": "HSD_MtxSRT",
+    "confidence": "A",
+    "evidence": "Prologue reads from r5 (3rd param) and saves 9 float regs (f23-f31) + stmw r27, consistent with 4-5 Vec3* params and ~15 float temps. Calls sin/cos x3 pairs only, no MTXConcat/Quat calls (pure inline trig-based matrix construction). Matches melee's HSD_MtxSRT(Mtx,Vec3*,Vec3*,Vec3*,Vec3*) - computes matrix directly from sin/cos of 3 angles plus optional 1/vec4 reciprocal-scale, larger than HSD_MkRotationMtx due to the extra scale/pivot params and temps."
+  },
+  {
+    "fn": "fn_801A8B94",
+    "addr": "0x801A8B94",
+    "unit": "hsd/hsd_mobj_range_801A86B4.c",
+    "proposedName": "HSD_MkRotationMtx",
+    "confidence": "A",
+    "evidence": "Prologue uses only r3,r4 (2 params) and saves 6 float regs (f26-f31), matching HSD_MkRotationMtx(Mtx,Vec3*)'s simpler 6-temp (sinX/cosX/sinY/cosY/sinZ/cosZ) direct construction. Calls sin/cos x3 pairs only, identical call-shape to fn_801A8884 (HSD_MtxSRT) but smaller (392 vs 784 bytes) and 2 params vs 5, matching melee's simpler rotation-only variant."
+  },
+  {
+    "fn": "fn_801A8D1C",
+    "addr": "0x801A8D1C",
+    "unit": "hsd/hsd_mobj_range_801A86B4.c",
+    "proposedName": "HSD_MtxGetScale",
+    "confidence": "A",
+    "evidence": "Prologue uses only r3,r4 (2 params, matching Mtx+Vec3*). Calls exactly 6 distinct fn_800A3B2*/3AC*/3B7*/3A9*/3B9*/3B38 helpers repeatedly (27 calls total) - matches the 6 distinct PSVEC helpers melee's HSD_MtxGetScale(Mtx,Vec3*) calls repeatedly (VECMag, VECNormalize, VECDotProduct, VECScale, VECSubtract, VECCrossProduct)."
+  },
+  {
+    "fn": "fn_801AA350",
+    "addr": "0x801AA350",
+    "unit": "hsd/hsd_mobj_range_801A86B4.c",
+    "proposedName": "_HSD_ObjAllocForgetMemory",
+    "confidence": "A",
+    "evidence": "Already has a full C body in the local file: `void fn_801AA350(void) { lbl_8047B2E0 = 0; }`. lbl_8047B2E0 is confirmed (via fn_801AA35C, see below) to be the alloc_datas static list head. Matches melee objalloc.c's `void _HSD_ObjAllocForgetMemory(void* low, void* high) { alloc_datas = NULL; }` exactly (unused params elided in the decompiled signature)."
+  },
+  {
+    "fn": "fn_801AA35C",
+    "addr": "0x801AA35C",
+    "unit": "hsd/hsd_mobj_range_801A86B4.c",
+    "proposedName": "HSD_ObjAllocInit",
+    "confidence": "A",
+    "evidence": "3 params (data,size,align). Full disassembly matches melee objalloc.c's HSD_ObjAllocInit statement-for-statement: HSD_ASSERT(data) via __assert; if(data!=NULL) walk-and-unlink data from lbl_8047B2E0 (removeAll inlined) else lbl_8047B2E0=NULL; memset(data,0,0x2C) [0x2C == sizeof(HSD_ObjAllocData) per melee's STATIC_ASSERT]; data->num_limit=-1; data->heap_limit_size=0; data->heap_limit_num=-1; align validation; data->size=(size+align-1)&~(align-1); data->next=lbl_8047B2E0; lbl_8047B2E0=data."
+  },
+  {
+    "fn": "fn_801AA6D0",
+    "addr": "0x801AA6D0",
+    "unit": "hsd/hsd_pobj_range_801AA608.c",
+    "proposedName": "PObjAmnesia",
+    "confidence": "A",
+    "evidence": "Body checks `p == default_class` (clears it) and `p == &hsdPObj` (clears cached vertex/normal desc+count and display-list marker pairs), then calls `HSD_PARENT_INFO(&hsdPObj)->amnesia(p)` via `*(ClassInfo**)(&hsdPObj+0x14)` then `vtbl[0x38/4]`. Offsets 0x14=parent, 0x38=amnesia confirmed against include/hsd/hsd_class.h's HSD_ClassInfoHead/HSD_ClassInfo layout. Exact structural match to melee's static PObjAmnesia(HSD_ClassInfo* info), which also checks info==default_class then info==&hsdPObj before calling HSD_PARENT_INFO(&hsdPObj)->amnesia(info). Also directly assigned to the amnesia vtable slot (0x38) inside HSD_PObjInit per archive/previous_campaign/src/hsd/hsd_pobj_disp.c."
+  },
+  {
+    "fn": "fn_801AA788",
+    "addr": "0x801AA788",
+    "unit": "hsd/hsd_pobj_range_801AA608.c",
+    "proposedName": "PObjRelease",
+    "confidence": "A",
+    "evidence": "Assigned directly to the release vtable slot (offset 0x30) inside HSD_PObjInit. Body switches on `flags & 0x3000` (pobj_type): 0x0000 walks/frees a list matching POBJ_SKIN cleanup, 0x1000 (SHAPEANIM) calls fn_801A053C(shape_set), 0x2000 (ENVELOPE) walks/frees the envelope list, then all paths converge to call `HSD_PARENT_INFO(&hsdPObj)->release(p)` via vtbl[0x30/4] on the parent info. Matches melee's static PObjRelease(HSD_Class* o) exactly (switch on pobj_type calling HSD_ShapeSetRemove/HSD_EnvelopeListFree/HSD_JObjUnrefThis then HSD_PARENT_INFO(&hsdPObj)->release(o))."
+  },
+  {
+    "fn": "fn_801AA8BC",
+    "addr": "0x801AA8BC",
+    "unit": "hsd/hsd_pobj_range_801AA608.c",
+    "proposedName": "HSD_PObjDisp",
+    "confidence": "A",
+    "evidence": "Assigned directly to the disp vtable slot (offset 0x3C, first HSD_PObjInfo-specific field after the base HSD_ClassInfo) inside HSD_PObjInit. Body: (1) switches on flags bits for POBJ_CULLFRONT/POBJ_CULLBACK calling fn_801B2878(0/1/2) or early-return for both-set -- matches HSD_StateSetCullMode(GX_CULL_NONE/FRONT/BACK) cull switch; (2) calls `HSD_CLASS_METHOD(pobj)->[0x40/4](pobj,vmtx,pmtx,rendermode)` i.e. the setup_mtx vtable slot; (3) branches on pobj_type==SHAPEANIM to inline the array/vtx-desc setup + assert + `bl fn_801AB67C` (matches PObjDispShapeAnim's call into drawShapeAnim), else inlines the array/vtx-desc setup + GXCallDisplayList-style call fn_800BD0FC (matches PObjDispSimplePrimitive). This is HSD_PObjDisp with PObjDispShapeAnim/PObjDispSimplePrimitive inlined."
+  },
+  {
+    "fn": "fn_801AABB4",
+    "addr": "0x801AABB4",
+    "unit": "hsd/hsd_pobj_range_801AA608.c",
+    "proposedName": "PObjSetupMtx",
+    "confidence": "A",
+    "evidence": "Assigned directly to the setup_mtx vtable slot (offset 0x40) inside HSD_PObjInit. Body switches on pobj_type bits (18-19): case 0x0000 (SKIN) checks pobj->u.jobj (offset 0x14) -- if NULL falls into an inlined 'rigid mtx' block (HSD_JObjGetCurrent/mtx-mark-check/GXSetCurrentMtx/GXLoadPosMtxImm...), else calls fn_801AB270(pobj,vmtx,pmtx,rendermode); case 0x1000 (SHAPEANIM) falls into the SAME inlined rigid-mtx block a second time; case 0x2000 (ENVELOPE) calls fn_801AAEA8(pobj,vmtx,pmtx,rendermode). This exactly matches melee's static PObjSetupMtx's switch(pobj_type): SKIN->(jobj? SetupSharedVtxModelMtx : SetupRigidModelMtx), SHAPEANIM->SetupRigidModelMtx, ENVELOPE->SetupEnvelopeModelMtx, with the small SetupRigidModelMtx inlined at both of its call sites by the compiler."
+  },
+  {
+    "fn": "fn_801AAEA8",
+    "addr": "0x801AAEA8",
+    "unit": "hsd/hsd_pobj_range_801AA608.c",
+    "proposedName": "SetupEnvelopeModelMtx",
+    "confidence": "A",
+    "evidence": "Called only from PObjSetupMtx's (fn_801AABB4) POBJ_ENVELOPE case, matching melee's `SetupEnvelopeModelMtx(pobj, vmtx, pmtx, rendermode)` call site exactly. Largest of the three setup-mtx helpers (0x3C8 = 968 bytes), consistent with SetupEnvelopeModelMtx's envelope-list weighted-blend loop (up to 10 joints, HSD_MtxScaledAdd accumulation) being the most complex of the three in melee."
+  },
+  {
+    "fn": "fn_801AB270",
+    "addr": "0x801AB270",
+    "unit": "hsd/hsd_pobj_range_801AA608.c",
+    "proposedName": "SetupSharedVtxModelMtx",
+    "confidence": "A",
+    "evidence": "Called only from PObjSetupMtx's (fn_801AABB4) POBJ_SKIN branch when pobj->u.jobj != NULL, matching melee's `SetupSharedVtxModelMtx(pobj, vmtx, pmtx, rendermode)` call site exactly (the only other case, jobj==NULL, uses the inlined SetupRigidModelMtx). Function signature (pobj,vmtx,pmtx,rendermode) and 0x2C8 (712-byte) size consistent with SetupSharedVtxModelMtx's two-joint (JOINT0/JOINT1) mtx setup complexity in melee."
+  },
+  {
+    "fn": "fn_801AB67C",
+    "addr": "0x801AB67C",
+    "unit": "hsd/hsd_pobj_range_801AA608.c",
+    "proposedName": "drawShapeAnim",
+    "confidence": "A",
+    "evidence": "Called directly from HSD_PObjDisp (fn_801AA8BC) at the exact point matching PObjDispShapeAnim's `HSD_ASSERT(pobj->u.shape_set); drawShapeAnim(pobj);` (assert on pobj+0x14 non-null immediately precedes the call). Size 0x758 (1880 bytes) is by far the largest helper in the unit, consistent with drawShapeAnim being the largest/most complex function in melee's pobj.c (per-vertex/per-normal blend loops over shape_set with AVERAGE vs additive paths, NBT handling, calling interpretShapeAnimDisplayList)."
+  },
+  {
+    "fn": "fn_801AC91C",
+    "addr": "0x801AC91C",
+    "unit": "hsd/hsd_pobj_range_801AA608.c",
+    "proposedName": "get_shape_vertex_xyz",
+    "confidence": "A",
+    "evidence": "Immediately follows the already-named get_shape_normal_xyz (0x801AC4BC, size 0x460) and has the identical size 0x460 (1120 bytes) -- the melee-twin-function signature. Body accesses shape_set fields at offsets 0x8/0xC (vertex_desc/vertex_idx_list), not 0x14/0x18 (normal_desc/normal_idx_list) which get_shape_normal_xyz uses, confirming this is the vertex (not normal) variant. Matches melee's `get_shape_vertex_xyz(HSD_ShapeSet*, int shape_id, int arrayidx, f32 dst[3])` -- index-array decode (GX_INDEX16 vs u8), comp_cnt assert, then per-comp_type (U8/S8/U16/S16/F32) conversion loop, structurally identical to get_shape_normal_xyz but on the vertex fields."
+  },
+  {
+    "fn": "fn_801ACD7C",
+    "addr": "0x801ACD7C",
+    "unit": "hsd/hsd_pobj_range_801AA608.c",
+    "proposedName": "HSD_ClearVtxDesc",
+    "confidence": "A",
+    "evidence": "Body: calls fn_800B7D3C() then unconditionally zeroes lbl_8047B2FC (display-list marker, i.e. prev_vtxdesclist_array) and lbl_8047B300 (display-list end marker, i.e. prev_vtxdesc). Matches melee's `void HSD_ClearVtxDesc(void) { GXClearVtxDesc(); prev_vtxdesclist_array = 0; prev_vtxdesc = 0; }` exactly in shape and statics touched; fn_800B7D3C is called identically from other confirmed sites (e.g. inside HSD_PObjDisp's array/vtx-desc setup) in the role of GXClearVtxDesc. Declared in hsd/hsd_pobj.h so this is a public API name, not file-scope-static."
+  },
+  {
+    "fn": "fn_801AD044",
+    "addr": "0x801AD044",
+    "unit": "hsd/hsd_pobj_range_801AA608.c",
+    "proposedName": "HSD_PObjResolveRefsAll",
+    "confidence": "A",
+    "evidence": "Body loops `while (pobj && desc) { ...; pobj = pobj->next(+0x4); desc = desc->next(+0x4); }`, and for each pair inlines the switch(pobj_type): ENVELOPE (0x2000) walks pobj->u.envelope_list (+0x14) and desc->u.envelope_p (+0x14) in lockstep re-resolving joint refs via HSD_IDGetDataFromTable (matching resolveEnvelope's inner loop), and SKIN/default (0x0000) does a single unref+HSD_IDGetDataFromTable re-resolve on pobj->u.jobj (+0x14) vs desc->u.joint (+0x14). This is HSD_PObjResolveRefsAll with HSD_PObjResolveRefs and resolveEnvelope fully inlined (both are tiny/single-call-site statics in melee, consistent with them not having separate compiled addresses here)."
+  },
+  {
+    "fn": "fn_801AD288",
+    "addr": "0x801AD288",
+    "unit": "hsd/hsd_pobj_range_801AA608.c",
+    "proposedName": "HSD_PObjLoadDesc",
+    "confidence": "A",
+    "evidence": "Body: if desc==NULL return NULL; if desc->class_name (+0x0) is set, hsdSearchClassInfo(name) (fn_80193748) then hsdNew(info) (fn_80193828) with an assert; else falls back to default_class ? default_class : hsdNew(&hsdPObj) (matching HSD_PObjAlloc's own logic inlined); then calls `p->[load vtable slot 0x44](p, desc)` and returns p. Matches melee's `HSD_PObjLoadDesc(HSD_PObjDesc* pobjdesc)` control flow exactly (class_name lookup -> hsdNew(info) with HSD_ASSERT, else HSD_PObjAlloc(), then HSD_POBJ_METHOD(pobj)->load(pobj,pobjdesc))."
+  },
+  {
+    "fn": "fn_801AD354",
+    "addr": "0x801AD354",
+    "unit": "hsd/hsd_pobj_range_801AA608.c",
+    "proposedName": "PObjLoad",
+    "confidence": "A",
+    "evidence": "Assigned directly to the load vtable slot (offset 0x44) inside HSD_PObjInit. Body switches on pobj_type bits (18-19) with cases 0x1000/0x0000/0x2000 and a HSD_Panic default branch, inlining shape-set/envelope allocation (fn_80193B10/fn_801A6928 sized allocs) per case -- matching melee's static PObjLoad's `switch (pobj_type(pobj)) { case POBJ_SHAPEANIM: ... case POBJ_ENVELOPE: ... case POBJ_SKIN: break; default: HSD_Panic(__FILE__, 580, \"pobj: unexected type.\\n\"); }` with loadShapeSetDesc/loadEnvelopeDesc inlined (both are single-call-site file-scope statics in melee)."
+  },
+  {
+    "fn": "fn_801B00E0",
+    "addr": "0x801B00E0",
+    "unit": "hsd/hsd_robj_find_by_type.c",
+    "proposedName": "HSD_RObjGetByType",
+    "confidence": "A",
+    "evidence": "Body is a near-verbatim translation of melee robj.c HSD_RObjGetByType(HSD_RObj*,u32 type,u32 subtype): walks a singly-linked list via node[0] (== struct HSD_RObj::next, offset 0), checks node[1] (== ::flags, offset 4) for the 0x80000000 'has type' bit, masks 0x70000000 (ROBJ_TYPE_MASK) against `type`, and masks 0x0FFFFFFF against `subtype` (skipped when subtype==0) - identical to melee's `(curr->flags & ROBJ_TYPE_MASK) == type && (!subtype || subtype == (curr->flags & 0xFFFFFFF))`. Note: filename hint 'find_by_type' is close in spirit but the real melee name is HSD_RObjGetByType, not HSD_RObjFindByType (no such symbol exists in melee robj.c or robj.h); HSD_RObjFindByType is not in all_symbol_names.json either way. Confirmed HSD_RObjGetByType is not already used elsewhere (all_symbol_names.json)."
+  },
+  {
+    "fn": "fn_801B0140",
+    "addr": "0x801B0140",
+    "unit": "hsd/hsd_robj_get_alloc_data.c",
+    "proposedName": "HSD_RObjGetAllocData",
+    "confidence": "A",
+    "evidence": "12-byte function that just returns the address of a single static global (lbl_80465688), matching melee's `HSD_ObjAllocData* HSD_RObjGetAllocData(void) { return &robj_alloc_data; }` exactly (lis/addi/blr shape). Immediately precedes fn_801B014C which matches the sibling getter HSD_RvalueObjGetAllocData, and both sit right after HSD_RObjGetByType-equivalent fn_801B00E0 - consistent 3-function cluster from robj.c's allocator/getter section. Filename hint 'get_alloc_data' is correct. Not a duplicate name."
+  },
+  {
+    "fn": "fn_801B014C",
+    "addr": "0x801B014C",
+    "unit": "hsd/hsd_robj_get_alloc_data2.c",
+    "proposedName": "HSD_RvalueObjGetAllocData",
+    "confidence": "A",
+    "evidence": "12-byte function returning the address of a second, distinct static global (lbl_804656B4), immediately adjacent to fn_801B0140/HSD_RObjGetAllocData. Matches melee's `HSD_ObjAllocData* HSD_RvalueObjGetAllocData(void) { return &rvalue_alloc_data; }` - the paired allocator-data getter for HSD_Rvalue (robj.c declares both robj_alloc_data and rvalue_alloc_data as adjacent statics initialized together in HSD_RObjInitAllocData). Filename hint 'get_alloc_data2' correctly identified this as the sibling of get_alloc_data, though the real name differs from a literal '...2' suffix. Not a duplicate name."
+  },
+  {
+    "fn": "fn_801B03A0",
+    "addr": "0x801B03A0",
+    "unit": "hsd/hsd_shadow.c",
+    "proposedName": "HSD_ViewingRectCheck",
+    "confidence": "A",
+    "evidence": "Body checks *(f32*)(arg0+0x40) > *(f32*)(arg0+0x44) && *(f32*)(arg0+0x4C) > *(f32*)(arg0+0x48), returning 1 else 0. This matches melee shadow.h's HSD_ViewingRect layout exactly: origin(0x00,Vec3)+up_v(0x0C)+right_v(0x18)+eye_v(0x24)+eye_vn(0x30)+distance(0x3C) => top@0x40, bottom@0x44, left@0x48, right@0x4C. melee's `int HSD_ViewingRectCheck(HSD_ViewingRect* rect) { HSD_ASSERT(818, rect); return rect->top > rect->bottom && rect->right > rect->left; }` is byte-for-byte the same comparison at the same offsets. The file's 'Proposed: HSD_ShadowFunc2' placeholder is wrong/aspirational; real name is HSD_ViewingRectCheck. Not a duplicate."
+  },
+  {
+    "fn": "fn_801B16C0",
+    "addr": "0x801B16C0",
+    "unit": "hsd/hsd_shadow.c",
+    "proposedName": "HSD_ShadowInit",
+    "confidence": "A",
+    "evidence": "Calls fn_800B962C(0, 0, shadow->width, shadow->height) then fn_800B96F8(shadow->width, shadow->height, 0x20, 0). Cross-referenced archive/previous_campaign/src/game/gs_texture.c which calls the same two functions as `fn_800B962C(0, 0, copyW, copyH)` / `fn_800B96F8(copyW, copyH, gxFmt, mipFlag)` - i.e. GXSetTexCopySrc(left,top,width,height) and GXSetTexCopyDst(width,height,format,mipmap). This is an exact match to melee's `HSD_ShadowInit`: `GXSetTexCopySrc(0,0,imagedesc->width,imagedesc->height); GXSetTexCopyDst(imagedesc->width,imagedesc->height,0x20,0);` including the literal format constant 0x20 and mipmap=0. Caveat: Colosseum's version takes a wrapper 'owner' object and does obj=owner->object(+0x8); shadow=obj->shadow(+0x58) before use, rather than taking HSD_Shadow* directly as melee does - an extra indirection layer consistent with this file's local HSDShadowOwner/HSDShadowObject/HSDShadowData typedefs, but the core GX call fingerprint is unique and unambiguous. The file's 'Proposed: HSD_ShadowFunc10' placeholder is wrong/aspirational; this is HSD_ShadowInit, not a cleanup/finalize function. Not a duplicate name."
+  },
+  {
+    "fn": "fn_801B7C60",
+    "addr": "0x801B7C60",
+    "unit": "hsd/hsd_texp.c",
+    "proposedName": "HSD_TExpGetType",
+    "confidence": "A",
+    "evidence": "Body is an exact algorithmic match to melee texp.c HSD_TExpGetType: NULL -> 0 (HSD_TE_ZERO), pointer-value -1 sentinel -> 2 (HSD_TE_TEX), pointer-value -2 sentinel -> 3 (HSD_TE_RAS), else dereference *texp (the type field). Also declared in texp.h and independently corroborated: fn_801B8024 (see HSD_TExpMakeDag below) asserts fn_801B7C60(root)==1 at the same HSD_ASSERT line code (0xEE) that melee's HSD_TExpMakeDag uses for HSD_TExpGetType(root)==HSD_TE_TEV."
+  },
+  {
+    "fn": "fn_801B8024",
+    "addr": "0x801B8024",
+    "unit": "hsd/hsd_texp.c",
+    "proposedName": "HSD_TExpMakeDag",
+    "confidence": "A",
+    "evidence": "Matches melee src/sysdolphin/baselib/texpdag.c HSD_TExpMakeDag(HSD_TExp* root, HSD_TExpDag* list) exactly in shape: same HSD_ASSERT numeric code 0xEE guarding the root-type check; identical two-pass algorithm (BFS-collect unique c_in/a_in==TEV nodes into a node array, computer per-node dependency/nb_dep/nb_ref info into an HSD_TExpDag list[]), same field-offset pattern for c_in array (0x34 type / 0x38 exp per 8-byte HSD_TEArg) and a_in array (0x54/0x58), calls a distance-computation helper (fn_801B84A4, matched to CalcDistance) before sorting nodes by that distance -- mirrors melee calling CalcDistance then sorting/building the HSD_TExpDag list. Local variable/param shapes (u8* root, HSD_TExpDag* list, nodes[32], dist[32]) line up with melee's sp94[32]/sp14[32] locals and HSD_TEXP_MAX_NUM=32 constant."
+  },
+  {
+    "fn": "fn_801B84A4",
+    "addr": "0x801B84A4",
+    "unit": "hsd/hsd_texp.c",
+    "proposedName": "CalcDistance",
+    "confidence": "A",
+    "evidence": "Matches the static helper CalcDistance(HSD_TExp** tevs, int* dist, HSD_TExp* tev, int num, int depth) in melee texpdag.c: identical 5-param shape (u8** nodes, s32* dist, u8* root, s32 num, s32 val), identical semantics -- linear-scan nodes[] for root, skip if dist[idx] already >= depth, else set dist[idx]=depth and recurse into any c_in[i]/a_in[i] child whose type==1 (HSD_TE_TEV) with depth+1. The Colosseum compiled body manually unrolls the recursion 2 levels deep via gotos (level1/level2/level3 labels) before falling back to a genuine self-recursive call (fn_801B84A4(...)) for further depth, which explains why this compiles to 1304 bytes versus a naive recursive version -- internally consistent with its large size, unlike neighboring stub functions in this file. Called by fn_801B8024/HSD_TExpMakeDag exactly where melee's HSD_TExpMakeDag invokes CalcDistance."
+  },
+  {
+    "fn": "fn_801BBAC8",
+    "addr": "0x801BBAC8",
+    "unit": "hsd/hsd_range_801BBAC8.c",
+    "proposedName": "TObjInfoInit",
+    "confidence": "A",
+    "evidence": "Calls hsdInitClassInfo(&hsdTObj, &hsdObj, \"sysdolphin_base_library\", \"hsd_tobj\", 0x4c, 0xac) then stores 7 function pointers into the hsdTObj (lbl_8036D3F0) class-info vtable at offsets 0x2c/0x30/0x38/0x3c/0x40/0x44/0x48. Matches melee tobj.c's static TObjInfoInit exactly (hsdInitClassInfo call with class name \"hsd_tobj\", followed by release/amnesia/load/make_texp/make_mtx assignments). Confirmed by hsd_tobj.h's own header comment: 'Colosseum address range: 0x801BBAC8 (HSD_TObjInit)'. Sits immediately before HSD_ImageDescFree/HSD_ImageDescRemove/HSD_ImageDescAlloc/HSD_Index2TexMtx/HSD_TObjSetup, all already-confirmed real tobj.c symbols in local_symbols.json, proving this whole unit is tobj.c not aobj.c."
+  },
+  {
+    "fn": "fn_801BBBB4",
+    "addr": "0x801BBBB4",
+    "unit": "hsd/hsd_range_801BBAC8.c",
+    "proposedName": "TObjAmnesia",
+    "confidence": "A",
+    "evidence": "Checks if arg (r3) == current value of lbl_8047B378 (default_class), zeroing it if so; checks if arg == &lbl_8036D3F0 (&hsdTObj) zeroing lbl_8047B37C (tobj_head) if so; then loads hsdTObj->parent (offset 0x14 = HSD_ClassInfoHead.parent) and calls parent's amnesia method (offset 0x38 = HSD_ClassInfo.amnesia) via vtable. Exact match for melee's `static void TObjAmnesia(HSD_ClassInfo* info) { if (info==default_class) default_class=NULL; if (info==&hsdTObj) tobj_head=NULL; HSD_PARENT_INFO(&hsdTObj)->amnesia(info); }`. Stored into hsdTObj vtable offset 0x38 by fn_801BBAC8, matching HSD_ClassInfo.amnesia's real struct offset."
+  },
+  {
+    "fn": "fn_801BBC14",
+    "addr": "0x801BBC14",
+    "unit": "hsd/hsd_range_801BBAC8.c",
+    "proposedName": "TObjRelease",
+    "confidence": "A",
+    "evidence": "Loads tobj->aobj (offset 0x64) and calls fn_801C25E4 (HSD_AObjRemove, shown elsewhere to be a 1-arg remove taking an AObj*); then null-checks tobj->tlut (offset 0x5c) and frees it (size 0x10 = sizeof(HSD_Tlut)); then null-checks tobj->tev (offset 0xa8) and frees it (size 0x20 = sizeof(HSD_TObjTev)); then a tluttbl loop via fn_801A6960. Matches melee tobj.c's `static void TObjRelease(HSD_Class* o) { HSD_AObjRemove(tobj->aobj); HSD_TlutRemove(tobj->tlut); HSD_TObjTevRemove(tobj->tev); if(tobj->tluttbl){...} HSD_PARENT_INFO(&hsdTObj)->release(o); }` with the small Remove wrappers inlined. Stored into hsdTObj vtable offset 0x30 = HSD_ClassInfo.release."
+  },
+  {
+    "fn": "fn_801BBDDC",
+    "addr": "0x801BBDDC",
+    "unit": "hsd/hsd_range_801BBAC8.c",
+    "proposedName": "HSD_TObjAlloc",
+    "confidence": "A",
+    "evidence": "Branches on lbl_8047B378 (default_class): if non-zero uses its value, else uses &lbl_8036D3F0 (&hsdTObj) - i.e. HSD_TObjGetDefaultClass() inlined - then calls fn_80193828 (hsdNew) and asserts the result non-null. Exact match for melee's `HSD_TObj* HSD_TObjAlloc(void) { HSD_TObj* new = hsdNew((HSD_ClassInfo*) HSD_TObjGetDefaultClass()); HSD_ASSERT(2040, new); return new; }`."
+  },
+  {
+    "fn": "fn_801BBE60",
+    "addr": "0x801BBE60",
+    "unit": "hsd/hsd_range_801BBAC8.c",
+    "proposedName": "HSD_TObjRemoveAll",
+    "confidence": "A",
+    "evidence": "Loops over a linked list using offset 0x8 as 'next' (matches HSD_TObj.next, immediately after the 8-byte HSD_Obj parent), saving next before calling through vtable slots 0x30 (release) then 0x34 (destroy) on each node - i.e. hsdDelete() inlined in a loop. Matches melee's `void HSD_TObjRemoveAll(HSD_TObj* tobj) { while (tobj) { HSD_TObj* next = tobj->next; HSD_TObjRemove(tobj); tobj = next; } }` with HSD_TObjRemove/hsdDelete inlined."
+  },
+  {
+    "fn": "fn_801BBED4",
+    "addr": "0x801BBED4",
+    "unit": "hsd/hsd_range_801BBAC8.c",
+    "proposedName": "HSD_TObjRemove",
+    "confidence": "A",
+    "evidence": "Null-checks arg then calls through vtable slot 0x30 (release) then 0x34 (destroy) on the class_info at *(arg+0). This is exactly the `hsdDelete()` static inline from hsd_class.h. Matches melee's `void HSD_TObjRemove(HSD_TObj* tobj) { hsdDelete(tobj); }`."
+  },
+  {
+    "fn": "fn_801BC33C",
+    "addr": "0x801BC33C",
+    "unit": "hsd/hsd_range_801BBAC8.c",
+    "proposedName": "HSD_TObjAssignResources",
+    "confidence": "B",
+    "evidence": "Called directly by HSD_TObjSetup (0x801BBFE4, already-confirmed real symbol) before its main per-tobj loop, and its only external calls are HSD_Panic/__assert (no GX or matrix calls) - matches melee's HSD_TObjAssignResources, a pure-C function with three sequential list scans assigning texmap/texcoord indices, calling only HSD_ASSERT internally. Size (1408 bytes) is plausible for the triple-loop bump/toon resource-assignment logic. Not verified via exact field offsets, hence B."
+  },
+  {
+    "fn": "fn_801BC8BC",
+    "addr": "0x801BC8BC",
+    "unit": "hsd/hsd_range_801BBAC8.c",
+    "proposedName": "TObjMakeTExp",
+    "confidence": "A",
+    "evidence": "Structurally proven: fn_801BBAC8 (TObjInfoInit) stores this function's address into hsdTObj's HSD_TObjInfo.make_texp vtable slot (offset 0x44), which melee sets to `TObjMakeTExp` (`HSD_TOBJ_INFO(&hsdTObj)->make_texp = TObjMakeTExp;`). Calls 7 distinct helper addresses that are also called identically by fn_801BCF30 (see MakeColorGenTExp entry) - consistent with TObjMakeTExp's HSD_TExpTev/HSD_TExpOrder/HSD_TExpColorOp/HSD_TExpColorIn calls plus a conditional call into MakeColorGenTExp (matches the direct bl to fn_801BCF30)."
+  },
+  {
+    "fn": "fn_801BCF30",
+    "addr": "0x801BCF30",
+    "unit": "hsd/hsd_range_801BBAC8.c",
+    "proposedName": "MakeColorGenTExp",
+    "confidence": "A",
+    "evidence": "Called exclusively (via direct bl) from fn_801BC8BC (TObjMakeTExp candidate), matching melee's `MakeColorGenTExp` being called only from `TObjMakeTExp`. Shares the identical 7-callee set with its caller (HSD_TExpCnst/HSD_TExpTev/HSD_TExpOrder/HSD_TExpColorOp/HSD_TExpColorIn/HSD_TExpAlphaOp/HSD_TExpAlphaIn), matching MakeColorGenTExp's huge cascade of TEV-input-selection switch statements building color/alpha expression trees from tobj->tev fields."
+  },
+  {
+    "fn": "fn_801BD8D0",
+    "addr": "0x801BD8D0",
+    "unit": "hsd/hsd_range_801BBAC8.c",
+    "proposedName": "SetupEmbossBumpTev",
+    "confidence": "B",
+    "evidence": "Calls HSD_StateAssignTev and fn_801B3638 (likely HSD_SetupTevStage, given the surrounding TEV-setup functions in this vicinity). Matches melee's `static void SetupEmbossBumpTev(HSD_TObj* bump)`, which calls HSD_StateAssignTev()+HSD_SetupTevStage() twice each to configure two chained emboss-bump TEV stages from a static HSD_TevDesc template. Confidence B: callee set matches but exact field/constant usage not individually verified."
+  },
+  {
+    "fn": "fn_801BDA58",
+    "addr": "0x801BDA58",
+    "unit": "hsd/hsd_range_801BBAC8.c",
+    "proposedName": "setupTextureCoordGenBump",
+    "confidence": "B",
+    "evidence": "Calls HSD_LObjGetLightMaskDiffuse (unique call, only used for bump-mapping light selection in tobj.c) plus one further helper (fn_800B857C, likely GXSetTexCoordGen or HSD_TexCoordID2TexGenSrc). Matches melee's `static void setupTextureCoordGenBump(HSD_TObj* bump)` which calls HSD_LObjGetLightMaskDiffuse() to pick a GX_TG_BUMPn generator function and calls GXSetTexCoordGen. Confidence B: function size is larger than melee's fairly small source would suggest, so there is residual uncertainty about extra inlined content."
+  },
+  {
+    "fn": "fn_801BDD74",
+    "addr": "0x801BDD74",
+    "unit": "hsd/hsd_range_801BBAC8.c",
+    "proposedName": "TObjSetupMtx",
+    "confidence": "A",
+    "evidence": "Calls GXLoadTexMtxImm, HSD_CObjGetCurrent, HSD_CObjGetInvViewingMtxPtrDirect, HSD_CObjGetProjectionType, HSD_LObjGetCurrentByType, PSMTXConcat, C_MTXLightPerspective - this is exactly the set of calls used across melee's TObjSetupMtx TEX_COORD_REFLECTION/HILIGHT/SHADOW cases (HSD_LObjGetCurrentByType for hilight, HSD_CObjGetCurrent/HSD_CObjGetInvViewingMtxPtrDirect/PSMTXConcat for shadow, GXLoadTexMtxImm used in every case). Called from HSD_TObjSetup's per-tobj loop, matching TObjSetupMtx's call site."
+  },
+  {
+    "fn": "fn_801BE2B4",
+    "addr": "0x801BE2B4",
+    "unit": "hsd/hsd_range_801BBAC8.c",
+    "proposedName": "MakeTextureMtx",
+    "confidence": "A",
+    "evidence": "Structurally proven: fn_801BBAC8 (TObjInfoInit) stores this function's address into hsdTObj.make_mtx (offset 0x3c), matching melee's `hsdTObj.make_mtx = MakeTextureMtx;`. Body calls PSMTXConcat plus 3 helper addresses (fn_800A32B4, fn_800A3334, fn_801A8B94) consistent with PSMTXTrans/HSD_MkRotationMtx/MTXScale used to build tobj->mtx from scale/rotate/translate fields, matching melee's MakeTextureMtx exactly."
+  },
+  {
+    "fn": "fn_801BE490",
+    "addr": "0x801BE490",
+    "unit": "hsd/hsd_range_801BBAC8.c",
+    "proposedName": "_HSD_TObjGetCurrentByType",
+    "confidence": "A",
+    "evidence": "If arg0 (from) is NULL, starts at lbl_8047B37C (tobj_head); else starts at from->next (offset 0x8). Loops comparing (node->flags(offset 0x4c) & 0xF) [tobj_coord() masking TEX_COORD_MASK=0xF] against arg1 (mapping); returns match or NULL. Exact match for melee `HSD_TObj* _HSD_TObjGetCurrentByType(HSD_TObj* from, u32 mapping) { tp = from ? from->next : tobj_head; for(;tp;tp=tp->next) if(tobj_coord(tp)==mapping) return tp; return NULL; }`."
+  },
+  {
+    "fn": "fn_801BE4CC",
+    "addr": "0x801BE4CC",
+    "unit": "hsd/hsd_range_801BBAC8.c",
+    "proposedName": "HSD_TObjLoadDesc",
+    "confidence": "A",
+    "evidence": "Null-checks td; if td->class_name (offset 0) is set, calls fn_80193748 (hsdSearchClassInfo) and uses the result if non-null; otherwise falls back to the exact HSD_TObjAlloc-style default_class ternary (lbl_8047B378/&lbl_8036D3F0) feeding fn_80193828 (hsdNew) with an assert; finally loads *(tobj+0)->[0x40] (the 'load' vtable slot, matching TObjLoad's confirmed offset) and calls it via bctrl with (tobj, td). Exact structural match for melee's `HSD_TObj* HSD_TObjLoadDesc(HSD_TObjDesc* td) { if(!td) return NULL; if(!td->class_name || !(info=hsdSearchClassInfo(td->class_name))) tobj=HSD_TObjAlloc(); else { tobj=hsdNew(info); HSD_ASSERT(468,tobj);} HSD_TOBJ_METHOD(tobj)->load(tobj,td); return tobj; }`."
+  },
+  {
+    "fn": "fn_801BE598",
+    "addr": "0x801BE598",
+    "unit": "hsd/hsd_range_801BBAC8.c",
+    "proposedName": "TObjLoad",
+    "confidence": "A",
+    "evidence": "Structurally proven: fn_801BBAC8 (TObjInfoInit) stores this function's address into hsdTObj's HSD_TObjInfo.load vtable slot (offset 0x40), which per melee source is unconditionally set to `TObjLoad` (`HSD_TOBJ_INFO(&hsdTObj)->load = TObjLoad;`). Body also calls memcpy/memset/__assert consistent with HSD_TlutLoadDesc/HSD_TlutAlloc and HSD_TObjTevLoadDesc/HSD_TObjTevAlloc being inlined (both perform hsdAllocMemPiece+memset+memcpy), matching TObjLoad's two sub-desc-load calls."
+  },
+  {
+    "fn": "fn_801BE800",
+    "addr": "0x801BE800",
+    "unit": "hsd/hsd_range_801BBAC8.c",
+    "proposedName": "HSD_TObjStopAnimAll",
+    "confidence": "B",
+    "evidence": "Loops a TObj chain via offset 0x8 (next); for each node calls fn_801C27F4 with 3 arguments: node->aobj (offset 0x64, confirmed aobj field), the node itself, and a value loaded from node's class_info offset 0x48 (the same 'extra' vtable slot documented in TObjUpdateFunc). A 3-argument aobj call matches HSD_AObjStopAnim(HSD_AObj*, void* obj, HSD_ObjUpdateFunc func)'s signature (unlike the 1-arg HSD_AObjRemove). This parallels the established Foo/FooAll naming pairs already present in this exact TU (HSD_TObjRemoveAnim/All, HSD_TObjAddAnim/All, HSD_TObjReqAnim/All, HSD_TObjAnim/All) and mirrors aobj.c's HSD_AObjStopAnim. Confidence B: not directly attested in the fetched melee tobj.c revision (which has no StopAnimAll), likely a Colosseum/later-SDK addition alongside the extra vtable slot."
+  },
+  {
+    "fn": "fn_801BE85C",
+    "addr": "0x801BE85C",
+    "unit": "hsd/hsd_range_801BBAC8.c",
+    "proposedName": "TObjUpdateFunc",
+    "confidence": "B",
+    "evidence": "Stored by fn_801BBAC8 (TObjInfoInit) into an extra HSD_TObjInfo vtable slot at offset 0x48, immediately after make_mtx/load/make_texp (0x3c/0x40/0x44) - one method beyond what current local hsd_tobj.h documents, suggesting this Colosseum SDK revision widened HSD_TObjInfo (sizeof(HSD_TObjInfo)=0x4c is passed to hsdInitClassInfo, exactly accommodating a 4th 4-byte method). Body's only call is __assert (one single assert, no other bl targets) and is large (1548 bytes) - consistent with melee's `static void TObjUpdateFunc(void* obj, enum_t type, HSD_ObjData* val)`, a ~25-case switch over HSD_A_T_* animation-track ids doing simple field stores and 255.0*val->fv byte conversions with only one HSD_ASSERT. Confidence B because the vtable-slot placement (as opposed to melee's plain literal-pointer passing at call sites) is not attested in the fetched melee revision."
+  },
+  {
+    "fn": "fn_801BEEDC",
+    "addr": "0x801BEEDC",
+    "unit": "hsd/hsd_range_801BBAC8.c",
+    "proposedName": "HSD_TObjAddAnim",
+    "confidence": "B",
+    "evidence": "Calls __assert, fn_80193AF0/fn_80193B10 (hsdFreeMemPiece/hsdAllocMemPiece), fn_801A6928/fn_801A6960 (list helpers), fn_801C25E4 (HSD_AObjRemove, confirmed elsewhere), fn_801C2670 (likely HSD_AObjLoadDesc), plus memcpy/memset. This matches the complexity of melee's HSD_TObjAddAnim: looks up a texanim by id, removes+reloads tobj->aobj via HSD_AObjLoadDesc, frees the old tluttbl entries in a loop and allocates+fills a new tluttbl array via HSD_TlutLoadDesc. Confidence B: plausible but not verified via exact field offsets."
+  },
+  {
+    "fn": "fn_801BF138",
+    "addr": "0x801BF138",
+    "unit": "hsd/hsd_range_801BBAC8.c",
+    "proposedName": "HSD_GetNbBits",
+    "confidence": "A",
+    "evidence": "Loops i=0..31, tests bit i of arg (1<<i), increments a counter r4 on each set bit, returns the count. Exact match for melee util.c's `u32 HSD_GetNbBits(u32 c) { int ret=0; for(i=0;i<32;i++) if(c&(1<<i)) ret++; return ret; }`. Confirms util.c (3 tiny functions: HSD_Index2PosNrmMtx, HSD_GetNbBits, HSD_MulColor) is compiled immediately after tobj.c in this translation unit - HSD_Index2PosNrmMtx at 0x801BF098 is already a confirmed real symbol in local_symbols.json immediately preceding this function."
+  },
+  {
+    "fn": "fn_801BF16C",
+    "addr": "0x801BF16C",
+    "unit": "hsd/hsd_range_801BBAC8.c",
+    "proposedName": "HSD_MulColor",
+    "confidence": "A",
+    "evidence": "Loads 4 byte pairs from two source pointers (r3,r4), multiplies each pair, applies a mulhwu-by-reciprocal-of-255 fixed-point divide-by-255 trick, and stores each result byte into dest (r5) - i.e. componentwise RGBA multiply-and-normalize. Exact match for melee util.c's `void HSD_MulColor(GXColor* arg0, GXColor* arg1, GXColor* dest) { dest->r=(arg0->r*arg1->r)/255U; ... }` (r/g/b/a all divided by 255)."
+  },
+  {
+    "fn": "fn_801C0270",
+    "addr": "0x801C0270",
+    "unit": "hsd/hsd_aobj_range_801C01C8.c",
+    "proposedName": "_HSD_AObjForgetMemory",
+    "confidence": "A",
+    "evidence": "3-instruction function that zeroes a single BSS global (lbl_8047B388) and returns, ignoring its (unused, hence invisible in the recovered signature) arguments. Matches melee aobj.c's `void _HSD_AObjForgetMemory(void* low, void* high) { endcallback_list = NULL; }` - the two parameters (low, high) are genuinely unused in melee's body too, so MWCC would not reference r3/r4 at all, exactly matching the disassembly. lbl_8047B388 is proposed to be `endcallback_list` (the static HSD_SList* in aobj.c)."
+  },
+  {
+    "fn": "fn_801C027C",
+    "addr": "0x801C027C",
+    "unit": "hsd/hsd_aobj_range_801C01C8.c",
+    "proposedName": "HSD_AObjSetRate",
+    "confidence": "A",
+    "evidence": "`void fn_801C027C(void* obj, f32 frame) { if (obj != NULL) *(f32*)((u8*)obj + 0x10) = frame; }` - offset 0x10 is exactly HSD_AObj.framerate per hsd_aobj.h (flags@0,curr_frame@4,rewind_frame@8,end_frame@0xC,framerate@0x10). Exact match for melee aobj.c's `void HSD_AObjSetRate(HSD_AObj* aobj, f32 rate) { if (!aobj) return; aobj->framerate = rate; }`."
+  }
+]

@@ -493,7 +493,7 @@
 "addr": "0x80007FDC",
 "size": 56,
 "label": "gs-engine",
-"confidence": 1.89,
+"confidence": 1.9,
 "seed": null
 },
 {
@@ -1668,7 +1668,7 @@
 "name": "fn_80011D9C",
 "addr": "0x80011D9C",
 "size": 204,
-"label": "gs-engine",
+"label": "fight",
 "confidence": 1.9,
 "seed": null
 },
@@ -1676,7 +1676,7 @@
 "name": "fn_80011E68",
 "addr": "0x80011E68",
 "size": 60,
-"label": "gs-engine",
+"label": "fight",
 "confidence": 1.9,
 "seed": null
 },
@@ -13201,7 +13201,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800A4D28",
+"name": "DVDConvertPathToEntrynum",
 "addr": "0x800A4D28",
 "size": 756,
 "label": "dolphin-sdk",
@@ -13209,7 +13209,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800A501C",
+"name": "DVDOpen",
 "addr": "0x800A501C",
 "size": 200,
 "label": "dolphin-sdk",
@@ -16737,7 +16737,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800BEF44",
+"name": "TRKGetFreeBuffer",
 "addr": "0x800BEF44",
 "size": 200,
 "label": "dolphin-sdk",
@@ -16953,7 +16953,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800C0504",
+"name": "OutputData",
 "addr": "0x800C0504",
 "size": 168,
 "label": "dolphin-sdk",
@@ -19017,7 +19017,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800D00B0",
+"name": "__SITransfer",
 "addr": "0x800D00B0",
 "size": 524,
 "label": "dolphin-si",
@@ -43473,7 +43473,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80193EC8",
+"name": "CObjInit",
 "addr": "0x80193EC8",
 "size": 124,
 "label": "hsd",
@@ -43489,7 +43489,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80194010",
+"name": "CObjLoad",
 "addr": "0x80194010",
 "size": 584,
 "label": "hsd",
@@ -43577,7 +43577,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80194400",
+"name": "HSD_CObjSetViewport",
 "addr": "0x80194400",
 "size": 164,
 "label": "hsd",
@@ -43625,7 +43625,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80194510",
+"name": "HSD_CObjGetRight",
 "addr": "0x80194510",
 "size": 160,
 "label": "hsd",
@@ -43633,7 +43633,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801945B0",
+"name": "HSD_CObjGetLeft",
 "addr": "0x801945B0",
 "size": 164,
 "label": "hsd",
@@ -43641,7 +43641,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80194654",
+"name": "HSD_CObjGetBottom",
 "addr": "0x80194654",
 "size": 156,
 "label": "hsd",
@@ -43649,7 +43649,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801946F0",
+"name": "HSD_CObjGetTop",
 "addr": "0x801946F0",
 "size": 152,
 "label": "hsd",
@@ -43681,7 +43681,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80194C2C",
+"name": "vec_normalize_check",
 "addr": "0x80194C2C",
 "size": 152,
 "label": "hsd",
@@ -43737,7 +43737,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8019513C",
+"name": "roll2upvec",
 "addr": "0x8019513C",
 "size": 1108,
 "label": "hsd",
@@ -43745,7 +43745,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80195590",
+"name": "upvec2roll",
 "addr": "0x80195590",
 "size": 516,
 "label": "hsd",
@@ -43801,7 +43801,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80195A6C",
+"name": "HSD_CObjSetCurrent",
 "addr": "0x80195A6C",
 "size": 1184,
 "label": "hsd",
@@ -43809,7 +43809,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80195F0C",
+"name": "HSD_CObjSetupViewingMtx",
 "addr": "0x80195F0C",
 "size": 440,
 "label": "hsd",
@@ -43817,7 +43817,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801960C4",
+"name": "setupBottomHalfCamera",
 "addr": "0x801960C4",
 "size": 796,
 "label": "hsd",
@@ -43825,7 +43825,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801963E0",
+"name": "setupTopHalfCamera",
 "addr": "0x801963E0",
 "size": 696,
 "label": "hsd",
@@ -43849,7 +43849,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8019674C",
+"name": "CObjUpdateFunc",
 "addr": "0x8019674C",
 "size": 964,
 "label": "hsd",
@@ -43921,7 +43921,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80196EF8",
+"name": "HSD_EraseRect",
 "addr": "0x80196EF8",
 "size": 1060,
 "label": "hsd",
@@ -43929,7 +43929,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8019731C",
+"name": "HSD_SetEraseColor",
 "addr": "0x8019731C",
 "size": 32,
 "label": "hsd",
@@ -44049,7 +44049,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80198F4C",
+"name": "HSD_ZListInitAllocData",
 "addr": "0x80198F4C",
 "size": 48,
 "label": "hsd",
@@ -44289,7 +44289,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8019B948",
+"name": "FogUpdateFunc",
 "addr": "0x8019B948",
 "size": 560,
 "label": "hsd",
@@ -44305,7 +44305,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8019BD18",
+"name": "HSD_FogSet",
 "addr": "0x8019BD18",
 "size": 720,
 "label": "hsd",
@@ -44337,7 +44337,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8019C1B0",
+"name": "HSD_IDRemoveByIDFromTable",
 "addr": "0x8019C1B0",
 "size": 180,
 "label": "hsd",
@@ -44505,7 +44505,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8019D05C",
+"name": "JObjReleaseChild",
 "addr": "0x8019D05C",
 "size": 1348,
 "label": "hsd",
@@ -44513,7 +44513,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8019D5A0",
+"name": "JObjInit",
 "addr": "0x8019D5A0",
 "size": 112,
 "label": "hsd",
@@ -44561,7 +44561,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8019DD00",
+"name": "resolveIKJoint2",
 "addr": "0x8019DD00",
 "size": 1888,
 "label": "hsd",
@@ -44569,7 +44569,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8019E460",
+"name": "resolveIKJoint1",
 "addr": "0x8019E460",
 "size": 3004,
 "label": "hsd",
@@ -44689,7 +44689,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801A053C",
+"name": "HSD_JObjUnrefThis",
 "addr": "0x801A053C",
 "size": 176,
 "label": "hsd",
@@ -44777,7 +44777,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801A0D94",
+"name": "HSD_JObjResolveRefs",
 "addr": "0x801A0D94",
 "size": 552,
 "label": "hsd",
@@ -44793,7 +44793,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801A1098",
+"name": "JObjLoad",
 "addr": "0x801A1098",
 "size": 820,
 "label": "hsd",
@@ -45017,7 +45017,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801A4344",
+"name": "HSD_LObjLoadDesc",
 "addr": "0x801A4344",
 "size": 252,
 "label": "hsd",
@@ -45025,7 +45025,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801A4440",
+"name": "LObjLoad",
 "addr": "0x801A4440",
 "size": 1136,
 "label": "hsd",
@@ -45073,7 +45073,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801A4A54",
+"name": "HSD_Index2LightID",
 "addr": "0x801A4A54",
 "size": 112,
 "label": "hsd",
@@ -45129,7 +45129,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801A620C",
+"name": "HSD_LObjGetLightVector",
 "addr": "0x801A620C",
 "size": 356,
 "label": "hsd",
@@ -45273,7 +45273,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801A6A34",
+"name": "MObjInfoInit",
 "addr": "0x801A6A34",
 "size": 240,
 "label": "hsd",
@@ -45281,7 +45281,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801A6B24",
+"name": "MObjAmnesia",
 "addr": "0x801A6B24",
 "size": 104,
 "label": "hsd",
@@ -45289,7 +45289,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801A6B8C",
+"name": "MObjRelease",
 "addr": "0x801A6B8C",
 "size": 168,
 "label": "hsd",
@@ -45297,7 +45297,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801A6C34",
+"name": "HSD_MObjDeleteShadowTexture",
 "addr": "0x801A6C34",
 "size": 112,
 "label": "hsd",
@@ -45305,7 +45305,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801A6CA4",
+"name": "HSD_MObjAddShadowTexture",
 "addr": "0x801A6CA4",
 "size": 100,
 "label": "hsd",
@@ -45337,7 +45337,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801A6DC4",
+"name": "HSD_MObjGetTObj",
 "addr": "0x801A6DC4",
 "size": 24,
 "label": "hsd",
@@ -45353,7 +45353,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801A6E00",
+"name": "HSD_MObjUnset",
 "addr": "0x801A6E00",
 "size": 36,
 "label": "hsd",
@@ -45377,7 +45377,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801A6FF0",
+"name": "HSD_MObjCompileTev",
 "addr": "0x801A6FF0",
 "size": 312,
 "label": "hsd",
@@ -45385,7 +45385,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801A7128",
+"name": "MObjMakeTExp",
 "addr": "0x801A7128",
 "size": 2556,
 "label": "hsd",
@@ -45401,7 +45401,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801A7CFC",
+"name": "HSD_MObjSetDefaultClass",
 "addr": "0x801A7CFC",
 "size": 92,
 "label": "hsd",
@@ -45409,7 +45409,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801A7D58",
+"name": "MObjLoad",
 "addr": "0x801A7D58",
 "size": 228,
 "label": "hsd",
@@ -45553,7 +45553,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801A86B4",
+"name": "HSD_MtxSRTQuat",
 "addr": "0x801A86B4",
 "size": 464,
 "label": "hsd",
@@ -45561,7 +45561,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801A8884",
+"name": "HSD_MtxSRT",
 "addr": "0x801A8884",
 "size": 784,
 "label": "hsd",
@@ -45569,7 +45569,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801A8B94",
+"name": "HSD_MkRotationMtx",
 "addr": "0x801A8B94",
 "size": 392,
 "label": "hsd",
@@ -45577,7 +45577,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801A8D1C",
+"name": "HSD_MtxGetScale",
 "addr": "0x801A8D1C",
 "size": 2132,
 "label": "hsd",
@@ -45617,7 +45617,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801AA350",
+"name": "_HSD_ObjAllocForgetMemory",
 "addr": "0x801AA350",
 "size": 12,
 "label": "hsd",
@@ -45625,7 +45625,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801AA35C",
+"name": "HSD_ObjAllocInit",
 "addr": "0x801AA35C",
 "size": 316,
 "label": "hsd",
@@ -45697,7 +45697,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801AA8BC",
+"name": "HSD_PObjDisp",
 "addr": "0x801AA8BC",
 "size": 760,
 "label": "hsd",
@@ -45705,7 +45705,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801AABB4",
+"name": "PObjSetupMtx",
 "addr": "0x801AABB4",
 "size": 756,
 "label": "hsd",
@@ -45713,7 +45713,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801AAEA8",
+"name": "SetupEnvelopeModelMtx",
 "addr": "0x801AAEA8",
 "size": 968,
 "label": "hsd",
@@ -45721,7 +45721,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801AB270",
+"name": "SetupSharedVtxModelMtx",
 "addr": "0x801AB270",
 "size": 712,
 "label": "hsd",
@@ -45753,7 +45753,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801AB67C",
+"name": "drawShapeAnim",
 "addr": "0x801AB67C",
 "size": 1880,
 "label": "hsd",
@@ -45785,7 +45785,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801AC91C",
+"name": "get_shape_vertex_xyz",
 "addr": "0x801AC91C",
 "size": 1120,
 "label": "hsd",
@@ -45793,7 +45793,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801ACD7C",
+"name": "HSD_ClearVtxDesc",
 "addr": "0x801ACD7C",
 "size": 48,
 "label": "hsd",
@@ -46097,7 +46097,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801B00E0",
+"name": "HSD_RObjGetByType",
 "addr": "0x801B00E0",
 "size": 96,
 "label": "hsd",
@@ -46105,7 +46105,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801B0140",
+"name": "HSD_RObjGetAllocData",
 "addr": "0x801B0140",
 "size": 12,
 "label": "hsd",
@@ -46113,7 +46113,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801B014C",
+"name": "HSD_RvalueObjGetAllocData",
 "addr": "0x801B014C",
 "size": 12,
 "label": "hsd",
@@ -46137,7 +46137,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801B03A0",
+"name": "HSD_ViewingRectCheck",
 "addr": "0x801B03A0",
 "size": 104,
 "label": "hsd",
@@ -46233,7 +46233,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801B16C0",
+"name": "HSD_ShadowInit",
 "addr": "0x801B16C0",
 "size": 112,
 "label": "hsd",
@@ -46785,7 +46785,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801B84A4",
+"name": "CalcDistance",
 "addr": "0x801B84A4",
 "size": 1304,
 "label": "hsd",
@@ -46857,7 +46857,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801BBAC8",
+"name": "TObjInfoInit",
 "addr": "0x801BBAC8",
 "size": 236,
 "label": "hsd",
@@ -46865,7 +46865,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801BBBB4",
+"name": "TObjAmnesia",
 "addr": "0x801BBBB4",
 "size": 96,
 "label": "hsd",
@@ -46873,7 +46873,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801BBC14",
+"name": "TObjRelease",
 "addr": "0x801BBC14",
 "size": 204,
 "label": "hsd",
@@ -46913,7 +46913,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801BBDDC",
+"name": "HSD_TObjAlloc",
 "addr": "0x801BBDDC",
 "size": 96,
 "label": "hsd",
@@ -46929,7 +46929,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801BBE60",
+"name": "HSD_TObjRemoveAll",
 "addr": "0x801BBE60",
 "size": 116,
 "label": "hsd",
@@ -46937,7 +46937,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801BBED4",
+"name": "HSD_TObjRemove",
 "addr": "0x801BBED4",
 "size": 84,
 "label": "hsd",
@@ -46969,7 +46969,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801BC8BC",
+"name": "TObjMakeTExp",
 "addr": "0x801BC8BC",
 "size": 1652,
 "label": "hsd",
@@ -46977,7 +46977,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801BCF30",
+"name": "MakeColorGenTExp",
 "addr": "0x801BCF30",
 "size": 2464,
 "label": "hsd",
@@ -47001,7 +47001,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801BDD74",
+"name": "TObjSetupMtx",
 "addr": "0x801BDD74",
 "size": 1344,
 "label": "hsd",
@@ -47009,7 +47009,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801BE2B4",
+"name": "MakeTextureMtx",
 "addr": "0x801BE2B4",
 "size": 476,
 "label": "hsd",
@@ -47017,7 +47017,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801BE490",
+"name": "_HSD_TObjGetCurrentByType",
 "addr": "0x801BE490",
 "size": 60,
 "label": "hsd",
@@ -47025,7 +47025,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801BE4CC",
+"name": "HSD_TObjLoadDesc",
 "addr": "0x801BE4CC",
 "size": 204,
 "label": "hsd",
@@ -47033,7 +47033,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801BE598",
+"name": "TObjLoad",
 "addr": "0x801BE598",
 "size": 616,
 "label": "hsd",
@@ -47081,7 +47081,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801BF138",
+"name": "HSD_GetNbBits",
 "addr": "0x801BF138",
 "size": 52,
 "label": "hsd",
@@ -47089,7 +47089,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801BF16C",
+"name": "HSD_MulColor",
 "addr": "0x801BF16C",
 "size": 132,
 "label": "hsd",
@@ -47201,7 +47201,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801C0270",
+"name": "_HSD_AObjForgetMemory",
 "addr": "0x801C0270",
 "size": 12,
 "label": "hsd",
@@ -47209,7 +47209,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801C027C",
+"name": "HSD_AObjSetRate",
 "addr": "0x801C027C",
 "size": 16,
 "label": "hsd",
@@ -50204,7 +50204,7 @@
 "name": "fn_801E03D4",
 "addr": "0x801E03D4",
 "size": 904,
-"label": "field",
+"label": "gs-engine",
 "confidence": 1.9,
 "seed": null
 },
@@ -50212,7 +50212,7 @@
 "name": "fn_801E075C",
 "addr": "0x801E075C",
 "size": 644,
-"label": "field",
+"label": "gs-engine",
 "confidence": 1.9,
 "seed": null
 },
@@ -68943,10 +68943,16 @@
 "count": 1
 },
 {
-"label": "gs-engine",
+"label": "fight",
 "start": "0x80011D9C",
+"end": "0x80011ea4",
+"count": 2
+},
+{
+"label": "gs-engine",
+"start": "0x80011EA4",
 "end": "0x80012fb0",
-"count": 8
+"count": 6
 },
 {
 "label": "menu",
@@ -70565,14 +70571,14 @@
 {
 "label": "field",
 "start": "0x801DF790",
-"end": "0x801e09e0",
-"count": 4
+"end": "0x801e03d4",
+"count": 2
 },
 {
 "label": "gs-engine",
-"start": "0x801E09E0",
+"start": "0x801E03D4",
 "end": "0x801e11cc",
-"count": 7
+"count": 9
 },
 {
 "label": "particle",

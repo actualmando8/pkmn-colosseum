@@ -43,7 +43,7 @@ void fn_801B019C(void) {
 
 /* Address: 0x801B03A0 | Size: 0x68 | Proposed: HSD_ShadowFunc2 */
 /* Shadow texture coordinate generation */
-s32 fn_801B03A0(void* arg0) {
+s32 HSD_ViewingRectCheck(void* arg0) {
     extern char lbl_802752C0[];
     extern char lbl_8047DDB8;
     s32 result;
@@ -135,7 +135,7 @@ void fn_801B1524(void) {
 
 /* Address: 0x801B16C0 | Size: 0x70 | Proposed: HSD_ShadowFunc10 */
 /* Shadow finalize - restore render state after shadow pass */
-void fn_801B16C0(void* arg0) {
+void HSD_ShadowInit(void* arg0) {
     extern char lbl_802752C0[];
     extern char lbl_8047DDCC;
     extern void fn_800B962C(u32, u32, u32, u32);

@@ -1036,14 +1036,14 @@ void HSD_FObjRemove(HSD_FObj* data) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_801AA35C(void* list, u32 size, u32 alignment);
+extern void HSD_ObjAllocInit(void* list, u32 size, u32 alignment);
 #if 0
 asm void HSD_FObjInitAllocData(void) {
 #include "src/hsd/hsd_dobj_HSD_FObjInitAllocData.inc"
 }
 #else
 void HSD_FObjInitAllocData(void) {
-    fn_801AA35C(lbl_80465378, 0x30, 4);
+    HSD_ObjAllocInit(lbl_80465378, 0x30, 4);
 }
 #endif
 #pragma pop

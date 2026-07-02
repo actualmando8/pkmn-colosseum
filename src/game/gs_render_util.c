@@ -104,7 +104,7 @@ extern void HSD_CObjSetPerspective(void* jobj, f32 x, f32 y);
 extern void HSD_CObjSetNear(void* jobj, f32 z);
 extern void HSD_CObjSetFar(void* jobj, f32 w);
 extern void HSD_CObjSetScissorx4(void* jobj, u32 x0, u32 x1, u32 y0, u32 y1);
-extern void fn_80194400(void* jobj, void* rect);
+extern void HSD_CObjSetViewport(void* jobj, void* rect);
 extern void HSD_CObjGetPerspective(void* jobj, void* outA, void* outB);
 extern f32  HSD_CObjGetNear(void* jobj);
 extern f32  HSD_CObjGetFar(void* jobj);
@@ -114,7 +114,7 @@ extern void HSD_CObjRemoveAnim(void* jobj);
 extern void HSD_CObjAddAnim(void* jobj, void* ptr);
 extern void HSD_CObjReqAnim(void* jobj, f32 val);
 extern void HSD_CObjAnim(void* jobj);
-extern void fn_801C027C(void* jobj);
+extern void HSD_AObjSetRate(void* jobj);
 extern double lbl_8047C9B8;  /* SDA double constant for animation step */
 extern f32 lbl_8047C9B0;     /* SDA float: fov scaling constant */
 extern void HSD_ForeachAnim(void* jobj, u32 a, u32 b, void (*cb)(void*), ...);
@@ -156,7 +156,7 @@ extern void* fn_800D7BF8(u32 idx);
 extern void fn_800DFF98(void* out, void* sphere, void* ray);
 extern void GXProject(void* sphere, void* center, void* radii, f32 x, f32 y, f32 z, void* outA, void* outB, void* outC);
 extern void* fn_8019BB78(void* ctx);
-extern void fn_8019BD18(u32 zero);
+extern void HSD_FogSet(u32 zero);
 extern void fn_8016EA88(void);
 extern void fn_8016EB30(void);
 
@@ -327,16 +327,16 @@ void fn_800D13C8(void* dst, void* src) {
                 fov *= lbl_8047C9B0;
             }
             *(f32*)((u8*)dst + 0x118) = fov;
-            HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, *(f32*)((u8*)dst + 0x118), (u32)1);
+            HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, HSD_AObjSetRate, *(f32*)((u8*)dst + 0x118), (u32)1);
         }
         {
             f32 src_ac = *(f32*)((u8*)src + 0xac);
             if (*(u8*)((u8*)dst + 0x3) != 0) {
                 *(f32*)((u8*)dst + 0x11c) = src_ac;
-                HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
+                HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, HSD_AObjSetRate, lbl_8047C9B8, (u32)1);
                 HSD_CObjReqAnim(*(void**)((u8*)dst + 0xc), *(f32*)((u8*)dst + 0x11c));
                 HSD_CObjAnim(*(void**)((u8*)dst + 0xc));
-                HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, *(f32*)((u8*)dst + 0x118), (u32)1);
+                HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, HSD_AObjSetRate, *(f32*)((u8*)dst + 0x118), (u32)1);
             }
         }
         if (*(u8*)((u8*)dst + 0x3) == 0) { goto done; }
@@ -347,10 +347,10 @@ void fn_800D13C8(void* dst, void* src) {
             f32 dst_11c = *(f32*)((u8*)dst + 0x11c);
             if (*(u8*)((u8*)dst + 0x3) != 0) {
                 *(f32*)((u8*)dst + 0x11c) = dst_11c;
-                HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
+                HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, HSD_AObjSetRate, lbl_8047C9B8, (u32)1);
                 HSD_CObjReqAnim(*(void**)((u8*)dst + 0xc), *(f32*)((u8*)dst + 0x11c));
                 HSD_CObjAnim(*(void**)((u8*)dst + 0xc));
-                HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, *(f32*)((u8*)dst + 0x118), (u32)1);
+                HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, HSD_AObjSetRate, *(f32*)((u8*)dst + 0x118), (u32)1);
             }
         }
 done:
@@ -422,10 +422,10 @@ void GScameraStartAnimation(GSRenderCamera* camera) {
         speed = camera->animFrame;
         if (camera->hasAnimation != 0) {
             camera->animFrame = speed;
-            HSD_ForeachAnim(camera->cobj, (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
+            HSD_ForeachAnim(camera->cobj, (u32)2, (u32)0xffff, HSD_AObjSetRate, lbl_8047C9B8, (u32)1);
             HSD_CObjReqAnim(camera->cobj, camera->animFrame);
             HSD_CObjAnim(camera->cobj);
-            HSD_ForeachAnim(camera->cobj, (u32)2, (u32)0xffff, fn_801C027C, (double)camera->animRate, (u32)1);
+            HSD_ForeachAnim(camera->cobj, (u32)2, (u32)0xffff, HSD_AObjSetRate, (double)camera->animRate, (u32)1);
         }
     }
 }
@@ -446,10 +446,10 @@ void fn_800D1858(GSRenderCamera* camera, u32 val) {
 void GScameraSetAnimFrame(GSRenderCamera* camera, f32 frame) {
     if (camera->hasAnimation != 0) {
         camera->animFrame = frame;
-        HSD_ForeachAnim(camera->cobj, (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
+        HSD_ForeachAnim(camera->cobj, (u32)2, (u32)0xffff, HSD_AObjSetRate, lbl_8047C9B8, (u32)1);
         HSD_CObjReqAnim(camera->cobj, camera->animFrame);
         HSD_CObjAnim(camera->cobj);
-        HSD_ForeachAnim(camera->cobj, (u32)2, (u32)0xffff, fn_801C027C, (double)camera->animRate, (u32)1);
+        HSD_ForeachAnim(camera->cobj, (u32)2, (u32)0xffff, HSD_AObjSetRate, (double)camera->animRate, (u32)1);
     }
 }
 
@@ -464,7 +464,7 @@ void GScameraSetAnimRate(GSRenderCamera* camera, f32 rate) {
             rate *= lbl_8047C9B0;
         }
         camera->animRate = rate;
-        HSD_ForeachAnim(camera->cobj, (u32)2, (u32)0xffff, fn_801C027C, camera->animRate, (u32)1);
+        HSD_ForeachAnim(camera->cobj, (u32)2, (u32)0xffff, HSD_AObjSetRate, camera->animRate, (u32)1);
     }
 }
 
@@ -737,7 +737,7 @@ void GScameraSetViewport(GSRenderCamera* camera, u32 x0, u32 y0, u32 x1, u32 y1)
     rect[2] = (u16)y0;
     rect[1] = (u16)(x1 + 1);
     rect[3] = (u16)(y1 + 1);
-    fn_80194400(camera->cobj, rect);
+    HSD_CObjSetViewport(camera->cobj, rect);
 }
 
 /* ==================================================================
@@ -1137,7 +1137,7 @@ void fn_800D2B90(void* arg1) {
         lbl_8047AA8C = 0;
     }
     if (arg1 == 0) {
-        fn_8019BD18(0);
+        HSD_FogSet(0);
         fn_8016EA88();
         return;
     }

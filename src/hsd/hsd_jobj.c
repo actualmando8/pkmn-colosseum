@@ -439,7 +439,7 @@ void fn_8019CF54(void* info) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void* HSD_IDGetDataFromTable(void* table, u32 key, u32* found);
-extern void fn_8019C1B0(void* table, u32 key);
+extern void HSD_IDRemoveByIDFromTable(void* table, u32 key);
 extern void HSD_VecFree(void* data);
 extern void HSD_MtxFree(void* data);
 #if 0
@@ -452,7 +452,7 @@ void fn_8019CFBC(HSD_JObj* jobj) {
     HSD_JOBJ_METHOD(jobj)->release_child(jobj);
 
     if (HSD_IDGetDataFromTable(NULL, jobj->id, NULL) == jobj) {
-        fn_8019C1B0(NULL, jobj->id);
+        HSD_IDRemoveByIDFromTable(NULL, jobj->id);
     }
     if (((volatile HSD_JObj*) jobj)->scl != NULL) {
         HSD_VecFree(jobj->scl);
@@ -489,7 +489,7 @@ extern void fn_800A3A9C(JObjVec* a, JObjVec* b, JObjVec* dst);
 extern void fn_800A3B9C(JObjVec* a, JObjVec* b, JObjVec* dst);
 extern void fn_800A3244(f32 mtx[3][4], JObjVec* axis, f32 angle);
 extern void fn_800A37CC(f32 mtx[3][4], JObjVec* src, JObjVec* dst);
-extern HSD_RObj* fn_801B00E0(HSD_RObj* robj, u32 type, u32 subtype);
+extern HSD_RObj* HSD_RObjGetByType(HSD_RObj* robj, u32 type, u32 subtype);
 extern void fn_801AED88(HSD_RObj* robj, HSD_JObj* jobj,
                         HSD_ObjUpdateFunc update_func);
 extern s32 fn_801AFCAC(HSD_RObj* robj, u32 type, JObjVec* out);
@@ -588,7 +588,7 @@ static HSD_JObj* JObj_GetEffectorChecked(HSD_JObj* jobj)
         __assert(&lbl_8047DB20, 0x82D, &lbl_8047DB28);
         return NULL;
     }
-    if (fn_801B00E0(effector->robj, REFTYPE_JOBJ, 1) == NULL) {
+    if (HSD_RObjGetByType(effector->robj, REFTYPE_JOBJ, 1) == NULL) {
         return NULL;
     }
     return effector;
@@ -673,11 +673,11 @@ static BOOL JObj_IsDObjVisible(HSD_JObj* jobj)
 void fn_8019F1C4(HSD_JObj* jobj, s32* total_a, s32* total_b);
 
 #if 0
-asm void fn_8019D05C(void) {
+asm void JObjReleaseChild(void) {
 #include "src/hsd/hsd_jobj_fn_8019D05C.inc"
 }
 #else
-void fn_8019D05C(HSD_JObj* jobj) {
+void JObjReleaseChild(HSD_JObj* jobj) {
     /* decompiled cdx7: functional */
     HSD_JObj* child;
 
@@ -718,11 +718,11 @@ void fn_8019D05C(HSD_JObj* jobj) {
 #pragma push
 extern u32 lbl_8047DB30;
 #if 0
-asm void fn_8019D5A0(void) {
+asm void JObjInit(void) {
 #include "src/hsd/hsd_jobj_fn_8019D5A0.inc"
 }
 #else
-s32 fn_8019D5A0(HSD_JObj* jobj)
+s32 JObjInit(HSD_JObj* jobj)
 {
     s32 result = (s32) ((HSD_ClassInfo*) lbl_8036C8E0)->head.parent->init((HSD_Class*) jobj);
 
@@ -755,11 +755,11 @@ extern char lbl_8047DB6C;
 extern u32 lbl_8047DB74;
 extern u32 lbl_8047DB78;
 #if 0
-asm void fn_8019DD00(void) {
+asm void resolveIKJoint2(void) {
 #include "src/hsd/hsd_jobj_fn_8019DD00.inc"
 }
 #else
-void fn_8019DD00(HSD_JObj* jobj) {
+void resolveIKJoint2(HSD_JObj* jobj) {
     /* decompiled cdx7: functional */
     HSD_JObj* effector;
     HSD_JObj* parent;
@@ -798,7 +798,7 @@ void fn_8019DD00(HSD_JObj* jobj) {
         x_scale = parent->scl[0];
     }
 
-    hint = fn_801B00E0(parent->robj, REFTYPE_IKHINT, 0);
+    hint = HSD_RObjGetByType(parent->robj, REFTYPE_IKHINT, 0);
     if (hint == NULL) {
         __assert(&lbl_8047DB20, 0x905, &lbl_8047DB6C);
         return;
@@ -810,11 +810,11 @@ void fn_8019DD00(HSD_JObj* jobj) {
     fn_800A3A9C(&target_dir, &joint_pos, &target_dir);
     JObjVec_Normalize(&target_dir, &target_dir);
 
-    min_limit = fn_801B00E0(jobj->robj, REFTYPE_LIMIT, 5);
-    max_limit = fn_801B00E0(jobj->robj, REFTYPE_LIMIT, 6);
+    min_limit = HSD_RObjGetByType(jobj->robj, REFTYPE_LIMIT, 5);
+    max_limit = HSD_RObjGetByType(jobj->robj, REFTYPE_LIMIT, 6);
     if (min_limit != NULL || max_limit != NULL) {
         clamped = 0;
-        hint = fn_801B00E0(jobj->robj, REFTYPE_IKHINT, 0);
+        hint = HSD_RObjGetByType(jobj->robj, REFTYPE_IKHINT, 0);
         if (hint == NULL) {
             __assert(&lbl_8047DB20, 0x927, &lbl_8047DB6C);
             return;
@@ -876,11 +876,11 @@ extern u32 lbl_8047DB60;
 extern u32 lbl_8047DB84;
 extern u32 lbl_8047DB80;
 #if 0
-asm void fn_8019E460(void) {
+asm void resolveIKJoint1(void) {
 #include "src/hsd/hsd_jobj_fn_8019E460.inc"
 }
 #else
-void fn_8019E460(HSD_JObj* jobj) {
+void resolveIKJoint1(HSD_JObj* jobj) {
     /* decompiled cdx7: functional */
     HSD_JObj* joint2;
     HSD_JObj* effector;
@@ -917,7 +917,7 @@ void fn_8019E460(HSD_JObj* jobj) {
     JObjVec_SetZero(&origin);
     JObjVec_LoadScl(jobj, &scale);
 
-    hint = fn_801B00E0(jobj->robj, REFTYPE_IKHINT, 0);
+    hint = HSD_RObjGetByType(jobj->robj, REFTYPE_IKHINT, 0);
     if (hint == NULL) {
         __assert(&lbl_8047DB20, 0x85C, &lbl_8047DB3C);
         return;
@@ -928,7 +928,7 @@ void fn_8019E460(HSD_JObj* jobj) {
     flip = 0;
 
     if (joint2 != NULL) {
-        hint = fn_801B00E0(joint2->robj, REFTYPE_IKHINT, 0);
+        hint = HSD_RObjGetByType(joint2->robj, REFTYPE_IKHINT, 0);
         if (hint == NULL) {
             __assert(&lbl_8047DB20, 0x867, &lbl_8047DB3C);
             return;
@@ -944,7 +944,7 @@ void fn_8019E460(HSD_JObj* jobj) {
         return;
     }
 
-    if (fn_801B00E0(jobj->robj, REFTYPE_JOBJ, 3) == NULL &&
+    if (HSD_RObjGetByType(jobj->robj, REFTYPE_JOBJ, 3) == NULL &&
         jobj->robj != NULL)
     {
         update_func =
@@ -1414,7 +1414,7 @@ HSD_JObj* fn_801A02B0(HSD_JObj* jobj)
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_801A053C(void) {
+asm void HSD_JObjUnrefThis(void) {
 #include "src/hsd/hsd_jobj_fn_801A053C.inc"
 }
 #else
@@ -1433,7 +1433,7 @@ static inline s32 ref_CNT_obj(void* o) {
     }
     return HSD_OBJ(o)->ref_count;
 }
-void fn_801A053C(void* obj) {
+void HSD_JObjUnrefThis(void* obj) {
     HSD_ClassInfo* info;
 
     if (obj == NULL) {
@@ -1475,7 +1475,7 @@ extern void fn_801A0CE8(void*);
 extern s32 fn_801A0D3C();
 extern BOOL fn_801A0D48(void*);
 extern void fn_801A0744(HSD_JObj* jobj, HSD_Joint* joint);
-extern void fn_801A0D94(HSD_JObj* jobj, HSD_Joint* joint);
+extern void HSD_JObjResolveRefs(HSD_JObj* jobj, HSD_Joint* joint);
 extern void fn_801AEBE4(HSD_RObj* robj, HSD_RObjDesc* desc);
 #if 0
 asm void HSD_JObjResolveRefsAll(HSD_JObj* jobj, HSD_Joint* joint) {
@@ -1487,7 +1487,7 @@ void HSD_JObjResolveRefsAll(HSD_JObj* jobj, HSD_Joint* joint)
 {
     /* decompiled cdx6: functional */
     while (jobj != NULL && joint != NULL) {
-        fn_801A0D94(jobj, joint);
+        HSD_JObjResolveRefs(jobj, joint);
         if (!(jobj->flags & JOBJ_INSTANCE)) {
             HSD_JObjResolveRefsAll(jobj->child, joint->child);
         }
@@ -1665,12 +1665,12 @@ BOOL fn_801A0D48(void* o) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_801A0D94(void) {
+asm void HSD_JObjResolveRefs(void) {
 #include "src/hsd/hsd_jobj_fn_801A0D94.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_801A0D94(HSD_JObj* jobj, HSD_Joint* joint) {
+void HSD_JObjResolveRefs(HSD_JObj* jobj, HSD_Joint* joint) {
     /* decompiled cdx5: functional (non-byte-exact) */
     HSD_JObj* child;
     u8* base;
@@ -1861,12 +1861,12 @@ extern void HSD_IDInsertToTable(void* table, u32 key, u32 value);
 extern void* memcpy(void* dst, const void* src, u32 n);
 extern u32 lbl_8047B298;
 #if 0
-asm void fn_801A1098(void) {
+asm void JObjLoad(void) {
 #include "src/hsd/hsd_jobj_fn_801A1098.inc"
 }
 #else
 #pragma optimization_level 4
-s32 fn_801A1098(HSD_JObj* jobj, HSD_Joint* joint, HSD_JObj* parent)
+s32 JObjLoad(HSD_JObj* jobj, HSD_Joint* joint, HSD_JObj* parent)
 {
     /* decompiled cdx6: functional */
     HSD_JObj* child;

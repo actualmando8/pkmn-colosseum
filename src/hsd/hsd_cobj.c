@@ -17,8 +17,8 @@
 extern void C_MTXLookAt();
 extern void C_MTXPerspective();
 extern void OSFillFPUContext();
-extern int fn_801963E0();   /* wrk7: was `void` asm-wrapper decl; typed-C returns int */
-extern void fn_8019674C();
+extern int setupTopHalfCamera();   /* wrk7: was `void` asm-wrapper decl; typed-C returns int */
+extern void CObjUpdateFunc();
 extern char lbl_80465080[];
 
 static HSD_ClassInfo* default_class;
@@ -282,9 +282,9 @@ static void CObjInfoInit(void)
     HSD_CLASS_INFO(&hsdCObj)->release = CObjRelease;
     HSD_CLASS_INFO(&hsdCObj)->amnesia = CObjAmnesia;
     HSD_COBJ_INFO(&hsdCObj)->load =
-        (int (*)(HSD_CObj*, HSD_CObjDesc*)) fn_801963E0;
+        (int (*)(HSD_CObj*, HSD_CObjDesc*)) setupTopHalfCamera;
     HSD_COBJ_INFO(&hsdCObj)->update =
-        (void (*)(HSD_CObj*, u32, void*)) fn_8019674C;
+        (void (*)(HSD_CObj*, u32, void*)) CObjUpdateFunc;
 }
 
 /* 0x80193CD0 | 0x60 */
@@ -373,11 +373,11 @@ void fn_80193D30(HSD_CObj* cobj) {
 #pragma optimization_level 1
 #pragma optimizewithasm off
 #if 0
-asm void fn_80193EC8(void) {
+asm void CObjInit(void) {
 #include "src/hsd/hsd_cobj_fn_80193EC8.inc"
 }
 #else
-int fn_80193EC8(HSD_CObj* cobj) {
+int CObjInit(HSD_CObj* cobj) {
     extern HSD_CObjInfo lbl_8036C678;
     HSD_WObj* interest;
     int result;
@@ -460,7 +460,7 @@ extern void fn_801947C8(HSD_CObj*, f32);   /* wrk8: typed-C takes (HSD_CObj*, f3
 extern void fn_80194DA4();   /* wrk7: was `(void)`; typed-C takes (HSD_CObj*, f32*) */
 extern f32 lbl_8036C6D4[]; /* default up vector (Vec3) */
 #if 0
-asm void fn_80194010(void) {
+asm void CObjLoad(void) {
 #include "src/hsd/hsd_cobj_fn_80194010.inc"
 }
 #else
@@ -471,7 +471,7 @@ asm void fn_80194010(void) {
    projection parameters for perspective/frustum/ortho. Asserts on an unknown
    projection type. Returns 0 (success). The leading null-guards mirror the
    original's inlined HSD_ASSERT checks. */
-int fn_80194010(HSD_CObj* cobj, HSD_CObjDesc* desc)
+int CObjLoad(HSD_CObj* cobj, HSD_CObjDesc* desc)
 {
     /* flags: net effect is cobj->flags = desc->flags (the original also does a
        redundant top-2-bit-preserving rlwimi merge, a no-op for u16 flags). */
@@ -733,14 +733,14 @@ void HSD_CObjSetViewportfx4(HSD_CObj* cobj, f32 f1, f32 f2, f32 f3, f32 f4) {
 #pragma optimization_level 1
 #pragma optimizewithasm off
 #if 0
-asm void fn_80194400(void) {
+asm void HSD_CObjSetViewport(void) {
 #include "src/hsd/hsd_cobj_fn_80194400.inc"
 }
 #else
 /* decompiled wrk4 2026-06-16: functional (TU not byte-measurable).
  * Set the camera viewport from an s16 rect (signed lha + xoris/0x8000 magic
  * => (f32)(s16) on each of the four halfwords). */
-void fn_80194400(HSD_CObj* cobj, HSD_RectS16* rect) {
+void HSD_CObjSetViewport(HSD_CObj* cobj, HSD_RectS16* rect) {
     if (cobj == NULL) {
         return;
     }
@@ -843,11 +843,11 @@ extern f32 lbl_8047D978;
 extern f32 lbl_8047D97C;
 extern f32 lbl_8047D980;
 #if 0
-asm void fn_80194510(void) {
+asm void HSD_CObjGetRight(void) {
 #include "src/hsd/hsd_cobj_fn_80194510.inc"
 }
 #else
-f32 fn_80194510(u8* ptr) {
+f32 HSD_CObjGetRight(u8* ptr) {
     if (ptr == NULL) {
         return lbl_8047D978;
     }
@@ -874,13 +874,13 @@ f32 fn_80194510(u8* ptr) {
 #pragma optimization_level 1
 #pragma optimizewithasm off
 #if 0
-asm void fn_801945B0(void) {
+asm void HSD_CObjGetLeft(void) {
 #include "src/hsd/hsd_cobj_fn_801945B0.inc"
 }
 #else
 /* MATCH 100% (opt1 + case1 split into inner/x44 temps: -x38*tan accumulates in f0, x44 loaded
  * after into f2, final fmuls written x44*inner). */
-f32 fn_801945B0(u8* ptr) {
+f32 HSD_CObjGetLeft(u8* ptr) {
     if (ptr == NULL) {
         return lbl_8047D978;
     }
@@ -907,11 +907,11 @@ f32 fn_801945B0(u8* ptr) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_80194654(void) {
+asm void HSD_CObjGetBottom(void) {
 #include "src/hsd/hsd_cobj_fn_80194654.inc"
 }
 #else
-f32 fn_80194654(u8* ptr) {
+f32 HSD_CObjGetBottom(u8* ptr) {
     if (ptr == NULL) {
         return lbl_8047D978;
     }
@@ -934,15 +934,15 @@ f32 fn_80194654(u8* ptr) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_801946F0(void) {
+asm void HSD_CObjGetTop(void) {
 #include "src/hsd/hsd_cobj_fn_801946F0.inc"
 }
 #else
 /* decompiled wrk4 2026-06-16: functional (TU not byte-measurable).
- * Get the top extent of the view frustum. Twin of fn_80194654 (which returns
+ * Get the top extent of the view frustum. Twin of HSD_CObjGetBottom (which returns
  * the bottom, i.e. -near*tan); this returns +near*tan(D97C * D980 * fov) for
  * perspective, the +0x40 field for frustum/ortho, else the default. */
-f32 fn_801946F0(HSD_CObj* cobj) {
+f32 HSD_CObjGetTop(HSD_CObj* cobj) {
     extern f32 lbl_8047D978; /* default (no/invalid camera) */
     extern f32 lbl_8047D97C; /* deg->rad scale            */
     extern f32 lbl_8047D980; /* 0.5 (half-fov)            */
@@ -1002,10 +1002,10 @@ extern void fn_800A3A9C(void*, void*, void*);
 extern void fn_800A3ADC(void);
 extern void fn_800CE59C(void);
 extern void fn_800CE718(void);
-extern int fn_80194C2C(f32*, void*);   /* wrk8: real sig (was `void (void)`) */
+extern int vec_normalize_check(f32*, void*);   /* wrk8: real sig (was `void (void)`) */
 extern void HSD_CObjSetMtxDirty(HSD_CObj*);
-extern int fn_8019513C(HSD_CObj*, f32, f32*);   /* wrk8: typed-C returns int */
-extern f32 fn_80195590(HSD_CObj*, f32*);
+extern int roll2upvec(HSD_CObj*, f32, f32*);   /* wrk8: typed-C returns int */
+extern f32 upvec2roll(HSD_CObj*, f32*);
 extern void HSD_CObjGetEyePosition(HSD_CObj*, void*);
 extern void HSD_CObjGetInterest(HSD_CObj*, void*);
 #if 0
@@ -1017,7 +1017,7 @@ asm void fn_801947C8(void) {
    In plain roll mode (flags&1 clear) it just records the roll and marks the
    matrices dirty if it changed. In up-vector mode (flags&1 set) it rebuilds the
    up-vector that corresponds to `roll` - the same horizon-perp + rotate-about-dir
-   construction as fn_8019513C - then commits it through the (inlined)
+   construction as roll2upvec - then commits it through the (inlined)
    HSD_CObjSetUpVector store logic. The trailing flags&1==0 sub-path is structurally
    dead given the up-vector entry condition but is reproduced faithfully from the asm.
    INFERRED: the near-vertical threshold and the sqrt-degenerate fallback are
@@ -1063,7 +1063,7 @@ void fn_801947C8(HSD_CObj* cobj, f32 roll)
             HSD_CObjGetEyePosition(cobj, eye);
             HSD_CObjGetInterest(cobj, interest);
             fn_800A3A9C(interest, eye, dir);                 /* dir = interest - eye */
-            ok = (((int (*)(f32*, f32*)) fn_80194C2C)(dir, dir) == 0); /* normalize + guard */
+            ok = (((int (*)(f32*, f32*)) vec_normalize_check)(dir, dir) == 0); /* normalize + guard */
         }
         if (ok) {
             f32 absy = ((f32 (*)(f32)) fn_800CE59C)(dir[1]); /* fabsf */
@@ -1116,12 +1116,12 @@ void fn_801947C8(HSD_CObj* cobj, f32 roll)
     } else {
         /* structurally-dead given flags&1 entry; reproduced faithfully */
         f32 tmp[3];
-        roll = fn_80195590(cobj, newup);
+        roll = upvec2roll(cobj, newup);
         if (cobj == NULL) {
             return;
         }
         if (cobj->flags & 1) {
-            ((void (*)(HSD_CObj*, f32, f32*)) fn_8019513C)(cobj, roll, tmp);
+            ((void (*)(HSD_CObj*, f32, f32*)) roll2upvec)(cobj, roll, tmp);
             ((void (*)(HSD_CObj*, f32*)) fn_80194DA4)(cobj, tmp);
         } else {
             if (cobj->u.roll != roll) {
@@ -1141,7 +1141,7 @@ void fn_801947C8(HSD_CObj* cobj, f32 roll)
 extern f32 lbl_80478AC8;
 extern void fn_800A3ADC(void);
 #if 0
-asm void fn_80194C2C(void) {
+asm void vec_normalize_check(void) {
 #include "src/hsd/hsd_cobj_fn_80194C2C.inc"
 }
 #else
@@ -1150,7 +1150,7 @@ asm void fn_80194C2C(void) {
  * epsilon lbl_80478AC8 the direction is unusable -> return -1. Otherwise run
  * fn_800A3ADC on (vec,out) (the asm leaves r3=vec/r4=out live across the call,
  * inferred (f32*,void*) signature) and report success (0). */
-int fn_80194C2C(f32* vec, void* out) {
+int vec_normalize_check(f32* vec, void* out) {
     f32 epsilon = lbl_80478AC8;
     if (vec == NULL || out == NULL) {
         return -1;
@@ -1180,7 +1180,7 @@ extern void __assert(const char*, u32, const char*);
 #pragma push
 #pragma optimization_level 4
 #pragma optimizewithasm off
-extern void fn_80195F0C(HSD_CObj*);
+extern void HSD_CObjSetupViewingMtx(HSD_CObj*);
 #if 0
 asm void HSD_CObjGetViewingMtxPtr(void) {
 #include "src/hsd/hsd_cobj_HSD_CObjGetViewingMtxPtr.inc"
@@ -1188,7 +1188,7 @@ asm void HSD_CObjGetViewingMtxPtr(void) {
 #else
 f32* HSD_CObjGetViewingMtxPtr(HSD_CObj* cobj)
 {
-    fn_80195F0C(cobj);
+    HSD_CObjSetupViewingMtx(cobj);
     return cobj->view_mtx[0];
 }
 #endif
@@ -1269,21 +1269,21 @@ asm void fn_80194DA4(void) {
 }
 #else
 /* decompiled wrk7: functional (TU not byte-measurable) - HSD_CObjSetUpVector,
-   the storage twin of the getter fn_80195590. Sets the camera up-vector / roll
+   the storage twin of the getter upvec2roll. Sets the camera up-vector / roll
    from `up` (r4, a 3-float Vec; inferred f32*).
    - Explicit-up mode (flags & 1 set): guard `up` against the degenerate epsilon
      lbl_80478AC8; if degenerate, warn (OSReport + __assert); else normalize it and,
      when it differs from the stored cobj->u.up, mark the matrices dirty
      (flags |= 0xC0000000) and store it.
    - Roll mode (flags & 1 clear): rebuild the eye->interest direction and derive a
-     roll angle exactly as fn_80195590 does, then commit it via fn_801947C8.
+     roll angle exactly as upvec2roll does, then commit it via fn_801947C8.
    The +/-PI/2 results below are anonymous SDA2 literals reconstructed by value;
    flagged for orchestrator review. */
 void fn_80194DA4(HSD_CObj* cobj, f32* up)
 {
     extern f32 lbl_80478AC8;    /* degenerate-vector epsilon */
-    extern f32 lbl_8036C6BC[];  /* look-at reference eye vector (shared with fn_80195590) */
-    extern f32 lbl_8036C6C8[];  /* look-at reference up vector  (shared with fn_80195590) */
+    extern f32 lbl_8036C6BC[];  /* look-at reference eye vector (shared with upvec2roll) */
+    extern f32 lbl_8036C6C8[];  /* look-at reference up vector  (shared with upvec2roll) */
     extern char lbl_8027464C;   /* OSReport fmt: up-vector degenerate warning */
     extern char lbl_80274654;   /* up-path __assert message (SDA2 r2-23864) - INFERRED name */
     f32 epsilon = lbl_80478AC8;
@@ -1322,7 +1322,7 @@ void fn_80194DA4(HSD_CObj* cobj, f32* up)
             cobj->u.up.z = newup[2];
         }
     } else {
-        /* ---- roll path (twin of fn_80195590) ---- */
+        /* ---- roll path (twin of upvec2roll) ---- */
         f32 eye[3];
         f32 interest[3];
         f32 dir[3];
@@ -1377,7 +1377,7 @@ void fn_80194DA4(HSD_CObj* cobj, f32* up)
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern int fn_8019513C(HSD_CObj*, f32, f32*);   /* wrk8: typed-C returns int */
+extern int roll2upvec(HSD_CObj*, f32, f32*);   /* wrk8: typed-C returns int */
 #if 0
 asm void HSD_CObjGetUpVector(void) {
 #include "src/hsd/hsd_cobj_HSD_CObjGetUpVector.inc"
@@ -1386,7 +1386,7 @@ asm void HSD_CObjGetUpVector(void) {
 /* decompiled wrk6: functional (TU not byte-measurable).
    Returns the camera's up vector. If the CObj stores an explicit up vector
    (flag bit 0 set), copy its x/y/z out and return 1; otherwise derive the up
-   vector from the stored roll angle via fn_8019513C and return its result.
+   vector from the stored roll angle via roll2upvec and return its result.
    Returns 0 when cobj or the output pointer is NULL.
    `up` is a 3-float Vec (no Vec type in these headers - inferred f32[3]). */
 int HSD_CObjGetUpVector(HSD_CObj* cobj, f32* up)
@@ -1400,7 +1400,7 @@ int HSD_CObjGetUpVector(HSD_CObj* cobj, f32* up)
         up[2] = cobj->u.up.z;
         return 1;
     }
-    return ((int (*)(HSD_CObj*, f32, f32*)) fn_8019513C)(cobj, cobj->u.roll, up);
+    return ((int (*)(HSD_CObj*, f32, f32*)) roll2upvec)(cobj, cobj->u.roll, up);
 }
 #endif
 #pragma pop
@@ -1413,7 +1413,7 @@ extern void fn_800A3820(void);
 extern void fn_800A3A9C(void*, void*, void*);
 extern void fn_800A3ADC(void);
 #if 0
-asm void fn_8019513C(void) {
+asm void roll2upvec(void) {
 #include "src/hsd/hsd_cobj_fn_8019513C.inc"
 }
 #else
@@ -1425,7 +1425,7 @@ asm void fn_8019513C(void) {
    `out`, and returns 1. The exact-twin of the roll path inlined inside
    fn_801947C8. INFERRED: the near-vertical threshold and the sqrt-degenerate
    fallback are anonymous SDA2 doubles reconstructed by value (flagged). */
-int fn_8019513C(HSD_CObj* cobj, f32 roll, f32* out)
+int roll2upvec(HSD_CObj* cobj, f32 roll, f32* out)
 {
     extern f32 lbl_80478AC0;   /* sqrt-degenerate fallback (anonymous SDA2, ~0.0f) - INFERRED */
     extern f32 lbl_80478AC8;   /* degenerate-vector epsilon */
@@ -1504,7 +1504,6 @@ extern void fn_800A3ADC();
 extern void fn_800A3820();
 extern f32 fn_800A3B7C();
 extern f64 fn_800CE2D8();
-extern f32 lbl_80478AC8;
 extern f32 lbl_8047D978;
 extern f32 lbl_8047D9B0;
 extern f32 lbl_8047D9B4;
@@ -1514,7 +1513,7 @@ extern char lbl_8047D960;
 extern f32 lbl_8036C6BC[];
 extern f32 lbl_8036C6C8[];
 #if 0
-asm void fn_80195590(void) {
+asm void upvec2roll(void) {
 #include "src/hsd/hsd_cobj_fn_80195590.inc"
 }
 #else
@@ -1525,7 +1524,7 @@ asm void fn_80195590(void) {
    INFERRED: `arg` (r4) typed as f32* (matrix/vector - exact type uncertain);
    the +/-PI/2 constants below are anonymous SDA2 float literals (r2-0x5CDC /
    r2-0x5CD8) reconstructed by value. Both flagged for orchestrator review. */
-f32 fn_80195590(HSD_CObj* cobj, f32* arg) {
+f32 upvec2roll(HSD_CObj* cobj, f32* arg) {
     f32 out[3];        /* sp+0x2c */
     f32 dir[3];        /* sp+0x20 */
     f32 interest[3];   /* sp+0x14 */
@@ -1543,9 +1542,9 @@ f32 fn_80195590(HSD_CObj* cobj, f32* arg) {
         if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
         fn_80191688(cobj->interest, interest);
         fn_800A3A9C(interest, eye, dir);
-        if (__fabs(dir[0]) <= *(volatile f32*)&lbl_80478AC8 &&
-            __fabs(dir[1]) <= *(volatile f32*)&lbl_80478AC8 &&
-            __fabs(dir[2]) <= *(volatile f32*)&lbl_80478AC8) {
+        if (__fabs(dir[0]) <= lbl_80478AC8 &&
+            __fabs(dir[1]) <= lbl_80478AC8 &&
+            __fabs(dir[2]) <= lbl_80478AC8) {
             ok = -1; /* direction ~= 0: unusable */
         } else {
             fn_800A3ADC(dir, dir); /* normalize in place */
@@ -1560,7 +1559,7 @@ f32 fn_80195590(HSD_CObj* cobj, f32* arg) {
         f32 dot;
         dot = fn_800A3B7C(arg, dir);
         dot = __fabs(dot);
-        if (lbl_8047D9B0 - dot < *(volatile f32*)&lbl_80478AC8) {
+        if (lbl_8047D9B0 - dot < lbl_80478AC8) {
             return lbl_8047D978; /* dir nearly parallel to arg: unusable */
         }
     }
@@ -1729,13 +1728,13 @@ extern void fn_800A39E0(f32*, f32, f32, f32, f32, f32, f32);
 extern void fn_800BD2E0(f32*, int);
 extern void fn_800BD7A0(int, int, int, int);
 extern int fn_800C46B0(f32);
-extern int fn_801960C4(HSD_CObj*);   /* wrk7: was `void (void)`; typed-C returns int, takes HSD_CObj* */
-extern int fn_801963E0(HSD_CObj*);   /* wrk7: was `void (void)`; typed-C returns int, takes HSD_CObj* */
+extern int setupBottomHalfCamera(HSD_CObj*);   /* wrk7: was `void (void)`; typed-C returns int, takes HSD_CObj* */
+extern int setupTopHalfCamera(HSD_CObj*);   /* wrk7: was `void (void)`; typed-C returns int, takes HSD_CObj* */
 extern void HSD_Panic(const char*, u32, const char*);
 extern void fn_80197400(void);
 extern int fn_8019C7B0(void);
 #if 0
-asm void fn_80195A6C(void) {
+asm void HSD_CObjSetCurrent(void) {
 #include "src/hsd/hsd_cobj_fn_80195A6C.inc"
 }
 #else
@@ -1745,14 +1744,14 @@ asm void fn_80195A6C(void) {
    programs the GX viewport + scissor + projection matrix one of four ways:
      mode 0 : viewport/scissor scaled through the active EFB dims (lbl_80466BC0)
               and per-axis denominators (lbl_80478C50/C54) - sub-screen render.
-     mode 1 : delegate to fn_801963E0 (plain EFB-clamped viewport).
-     mode 2 : delegate to fn_801960C4 (scissor-box + ratio variant).
+     mode 1 : delegate to setupTopHalfCamera (plain EFB-clamped viewport).
+     mode 2 : delegate to setupBottomHalfCamera (scissor-box + ratio variant).
      mode 3 : viewport/scissor used directly (no EFB scaling).
-   On success it recomputes the viewing matrix (fn_80195F0C) and returns 1; an
+   On success it recomputes the viewing matrix (HSD_CObjSetupViewingMtx) and returns 1; an
    unknown mode panics and returns 0. The viewport callback's last two args are
    the GX near/far Z (0.0, 1.0). INFERRED: the projection/scaling constants and the
    panic message string are anonymous SDA2 literals reconstructed by value/name. */
-int fn_80195A6C(HSD_CObj* cobj)
+int HSD_CObjSetCurrent(HSD_CObj* cobj)
 {
     extern u32 lbl_8047B234;     /* `current` camera (SDA) */
     extern u8 lbl_80466BC0[];    /* GX render-mode global; +4/+6 = u16 EFB w/h, +0x18 = u8 offset flag */
@@ -1765,19 +1764,18 @@ int fn_80195A6C(HSD_CObj* cobj)
     extern f32 lbl_8047D9B0;     /* 1.0f (GX far Z)  - named SDA2 constant */
     int mode;
     int ok;
-    int ortho_flag;
-    f32 mtx[3][4];
 
     if (cobj == NULL) {
         return 0;
     }
-    ortho_flag = 0;
     mode = fn_8019C7B0();
     fn_80197400();
     lbl_8047B234 = (u32) cobj; /* current = cobj */
 
     switch (mode) {
     case 3: {
+        int ortho_flag;
+        f32 mtx[3][4];
         /* direct path: viewport/scissor used verbatim */
         ((void (*)(int, f32, f32, f32, f32, f32, f32)) lbl_80478C58)(
             0,
@@ -1824,32 +1822,34 @@ int fn_80195A6C(HSD_CObj* cobj)
         break;
     }
     case 0: {
+        int ortho_flag;
+        f32 mtx[3][4];
         /* sub-screen path: scale viewport/scissor through the EFB dimensions */
+        f64 sx = (f64)(u32) *(u16*)(lbl_80466BC0 + 4) / (f64) lbl_80478C50;
+        f64 sy = (f64)(u32) *(u16*)(lbl_80466BC0 + 6) / (f64) lbl_80478C54;
         int has_off = (lbl_80466BC0[0x18] != 0);
-        f64 sy = (f64)(u32) *(u16*)(lbl_80466BC0 + 6) / (f64)(u32) lbl_80478C54;
-        f64 sx = (f64)(u32) *(u16*)(lbl_80466BC0 + 4) / (f64)(u32) lbl_80478C50;
-        f32 vy = (f32)(cobj->viewport.ymin * sy);
         f32 vx = (f32)(cobj->viewport.xmin * sx);
-        f32 xmax_sx = (f32)(cobj->viewport.xmax * sx);
-        f32 ymax_sy = (f32)(cobj->viewport.ymax * sy);
+        f32 vy = (f32)(cobj->viewport.ymin * sy);
+        f32 vw = (f32)(cobj->viewport.xmax * sx) - vx;
+        f32 vh = (f32)(cobj->viewport.ymax * sy) - vy;
         /* viewport.* are f32; scissor.* are u16 (lhz) */
         if (has_off) {
             ((void (*)(int, f32, f32, f32, f32, f32, f32)) lbl_80478C58)(
-                1, vx, vy, xmax_sx - vx, ymax_sy - vy, lbl_8047D978, lbl_8047D9B0);
+                1, vx, vy, vw, vh, lbl_8047D978, lbl_8047D9B0);
         } else {
             ((void (*)(int, f32, f32, f32, f32, f32, f32)) lbl_80478C58)(
-                0, vx, vy, xmax_sx - vx, ymax_sy - vy, lbl_8047D978, lbl_8047D9B0);
+                0, vx, vy, vw, vh, lbl_8047D978, lbl_8047D9B0);
         }
         {
-            f32 sl = (f32)((f64)(u32) cobj->scissor.left   * sx);
-            f32 st = (f32)((f64)(u32) cobj->scissor.top    * sy);
-            f32 sr = (f32)((f64)(u32) cobj->scissor.right  * sx);
-            f32 sb = (f32)((f64)(u32) cobj->scissor.bottom * sy);
+            f32 sc_right = (f32)((f64)(u32) cobj->scissor.right * sx);
+            f32 sc_bottom = (f32)((f64)(u32) cobj->scissor.bottom * sy);
+            f32 sc_left = (f32)((f64)(u32) cobj->scissor.left * sx);
+            f32 sc_top = (f32)((f64)(u32) cobj->scissor.top * sy);
             fn_800BD7A0(
-                fn_800C46B0(sl),
-                fn_800C46B0(st),
-                fn_800C46B0(sr - sl),
-                fn_800C46B0(sb - st));
+                fn_800C46B0(sc_left),
+                fn_800C46B0(sc_top),
+                fn_800C46B0(sc_right - sc_left),
+                fn_800C46B0(sc_bottom - sc_top));
         }
         switch (cobj->projection_type) {
         case PROJ_PERSPECTIVE:
@@ -1885,10 +1885,10 @@ int fn_80195A6C(HSD_CObj* cobj)
         break;
     }
     case 1:
-        ok = fn_801963E0(cobj);
+        ok = setupTopHalfCamera(cobj);
         break;
     case 2:
-        ok = fn_801960C4(cobj);
+        ok = setupBottomHalfCamera(cobj);
         break;
     default:
         HSD_Panic(&lbl_8047D958, 0x2ab, lbl_80274680);
@@ -1898,7 +1898,7 @@ int fn_80195A6C(HSD_CObj* cobj)
     if (ok == 0) {
         return 0;
     }
-    fn_80195F0C(cobj);
+    HSD_CObjSetupViewingMtx(cobj);
     return 1;
 }
 #endif
@@ -1914,19 +1914,19 @@ extern void fn_80191688(HSD_WObj*, void*);
 extern char lbl_8047D958;
 extern char lbl_8047D960;
 #if 0
-asm void fn_80195F0C(u8* ptr) {
+asm void HSD_CObjSetupViewingMtx(u8* ptr) {
 #include "src/hsd/hsd_cobj_fn_80195F0C.inc"
 }
 #else
 /* decompiled wrk5: functional (TU not byte-measurable) - recomputes the camera
    viewing matrix via C_MTXLookAt when it (or its eye/interest WObjs) is dirty.
    flags: 0x2 = up-to-date, 0x40000000 = force-recompute, 0x80000000 = updated. */
-void fn_80195F0C(HSD_CObj* cobj) {
+void HSD_CObjSetupViewingMtx(HSD_CObj* cobj) {
     f32 eye[3];
     f32 up[3];
     f32 interest[3];
-    int update;
     int interest_dirty;
+    int update;
 
     if (cobj->flags & 0x2) {
         return;
@@ -1938,25 +1938,26 @@ void fn_80195F0C(HSD_CObj* cobj) {
         if (cobj->eyepos != NULL && (cobj->eyepos->flags & 0x2)) {
             eye_dirty = 1;
         }
-        if (eye_dirty) {
-            interest_dirty = 1;
-        } else {
+        if (eye_dirty == 0) {
             interest_dirty = 0;
-            if (cobj->interest != NULL && (cobj->interest->flags & 0x2)) {
-                interest_dirty = 1;
-            }
         }
     }
-    if (!interest_dirty) {
-        update = 0;
+    if (interest_dirty == 0) {
+        interest_dirty = 0;
+        if (cobj->interest != NULL && (cobj->interest->flags & 0x2)) {
+            interest_dirty = 1;
+        }
+        if (interest_dirty == 0) {
+            update = 0;
+        }
     }
-    if (!update) {
+    if (update == 0) {
         return;
     }
     if (cobj == NULL) __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
     if (cobj == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
     fn_80191688(cobj->eyepos, eye);
-    if (HSD_CObjGetUpVector(cobj, up) == 0) {
+    if (((int (*)(HSD_CObj*, f32*)) HSD_CObjGetUpVector)(cobj, up) == 0) {
         extern f32 lbl_8047D978;   /* 0.0f named SDA2 constant */
         extern f32 lbl_8047D9B0;   /* 1.0f named SDA2 constant */
         up[0] = lbl_8047D978;
@@ -1989,11 +1990,11 @@ void fn_80195F0C(HSD_CObj* cobj) {
 #pragma optimization_level 3
 #pragma optimizewithasm off
 #if 0
-asm void fn_801960C4(void) {
+asm void setupBottomHalfCamera(void) {
 #include "src/hsd/hsd_cobj_fn_801960C4.inc"
 }
 #else
-/* decompiled wrk7: functional (TU not byte-measurable) - near-twin of fn_801963E0
+/* decompiled wrk7: functional (TU not byte-measurable) - near-twin of setupTopHalfCamera
    that ALSO programs the GX scissor box. Reads the GX render-mode scan height
    (lbl_80466BC0 + 6, u16) and a guard band `vfilter = height - 8`; returns 0 if the
    viewport bottom is above the band. Clamps cobj->scissor (u16 left/right/top/
@@ -2005,7 +2006,7 @@ asm void fn_801960C4(void) {
    SDA2 constants resolved by address (see NOTES): lbl_8047D998/lbl_8047D9C8 are
    doubles (half-fov / deg->rad), lbl_8047D9D4/lbl_8047D9D0 the perspective
    recenter terms, lbl_8047D978/lbl_8047D9B0 the callback constants. */
-int fn_801960C4(HSD_CObj* cobj)
+int setupBottomHalfCamera(HSD_CObj* cobj)
 {
     extern u8 lbl_80466BC0[];   /* GX render-mode global; +6 = u16 scan/EFB height */
     extern u32 lbl_80478C58;    /* viewport/scissor callback (default fn_80196C54) */
@@ -2108,7 +2109,7 @@ int fn_801960C4(HSD_CObj* cobj)
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_801963E0(void) {
+asm void setupTopHalfCamera(void) {
 #include "src/hsd/hsd_cobj_fn_801963E0.inc"
 }
 #else
@@ -2122,7 +2123,7 @@ asm void fn_801963E0(void) {
    shrinks the frustum vertically to the visible fraction of a partially
    off-screen viewport. lbl_80466BC0 = active GX render-mode global (+6 = u16 EFB
    height). SDA2 constants resolved by address (see NOTES). */
-int fn_801963E0(HSD_CObj* cobj)
+int setupTopHalfCamera(HSD_CObj* cobj)
 {
     extern u8 lbl_80466BC0[];   /* GX render-mode global; +6 = u16 EFB height */
     extern u32 lbl_80478C58;    /* viewport/scissor callback (default fn_80196C54) */
@@ -2253,7 +2254,7 @@ void HSD_CObjAnim(HSD_CObj* cobj) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_8019674C(void) {
+asm void CObjUpdateFunc(void) {
 #include "src/hsd/hsd_cobj_fn_8019674C.inc"
 }
 #else
@@ -2264,7 +2265,7 @@ asm void fn_8019674C(void) {
    match the recovered instruction flow. NOTE: interest channels 5/6/7 all overwrite
    component 0 (eye channels 1/2/3 write X/Y/Z) - reproduced verbatim,
    FLAGGED for review (likely an original-game copy/paste artefact). */
-void fn_8019674C(HSD_CObj* cobj, u32 type, void* value)
+void CObjUpdateFunc(HSD_CObj* cobj, u32 type, void* value)
 {
     f32 v[3];
 
@@ -2600,11 +2601,11 @@ extern u8 lbl_8036C720[];
 extern u8 lbl_8036CBC0[];
 extern u8 lbl_80478C60;
 #if 0
-asm void fn_80196EF8(void) {
+asm void HSD_EraseRect(void) {
 #include "src/hsd/hsd_cobj_fn_80196EF8.inc"
 }
 #else
-void fn_80196EF8(s32 arg0, s32 arg1, s32 arg2, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5) {
+void HSD_EraseRect(s32 arg0, s32 arg1, s32 arg2, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5) {
     u8 texobj[0x20];
     u32 color_word;
     u8* color;
@@ -2708,11 +2709,11 @@ void fn_80196EF8(s32 arg0, s32 arg1, s32 arg2, f32 f1, f32 f2, f32 f3, f32 f4, f
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_8019731C(void) {
+asm void HSD_SetEraseColor(void) {
 #include "src/hsd/hsd_cobj_fn_8019731C.inc"
 }
 #else
-void fn_8019731C(u8 a, u8 b, u8 c, u8 d) {
+void HSD_SetEraseColor(u8 a, u8 b, u8 c, u8 d) {
     extern u8 lbl_80478C60;
     /* WALL: CW CSE collapses the repeated SDA base; target keeps r9/r8/r7 bases. */
     (&lbl_80478C60)[0] = a;

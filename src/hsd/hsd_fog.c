@@ -151,7 +151,7 @@ static void FogAdjInfoInit(void)
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void fn_8019B874(HSD_Fog* o);   /* inferred signature (glm5): FogRelease virtual */
-extern void fn_8019B948(HSD_Fog* fog, s32 type, f32* value);   /* inferred glm6: FogInterpretAnim vtable slot (0x3C) */
+extern void FogUpdateFunc(HSD_Fog* fog, s32 type, f32* value);   /* inferred glm6: FogInterpretAnim vtable slot (0x3C) */
 extern u8 lbl_8036C7E8[];
 extern u8 lbl_8036CC00[];
 extern u8 lbl_802747B8[];
@@ -161,7 +161,7 @@ void fn_8019B808(void) {
                      (HSD_ClassInfo*) lbl_8036CC00, (char*) lbl_802747B8,
                      (char*) &lbl_8047DA60, 0x40, 0x20);
     ((void**)lbl_8036C7E8)[0x30/4] = (void*)fn_8019B874;
-    ((void**)lbl_8036C7E8)[0x3c/4] = (void*)fn_8019B948;
+    ((void**)lbl_8036C7E8)[0x3c/4] = (void*)FogUpdateFunc;
 }
 
 /* 0x8019B874 | 0xD4 */
@@ -200,7 +200,7 @@ extern u32 lbl_8047DA68;
 extern u32 lbl_8047DA6C;
 extern u32 lbl_8047DA70;
 #if 0
-asm void fn_8019B948(void) {
+asm void FogUpdateFunc(void) {
 #include "src/hsd/hsd_fog_fn_8019B948.inc"
 }
 #else
@@ -210,7 +210,7 @@ asm void fn_8019B948(void) {
 /*
  * Fog AObj interpret callback. Writes one animated attribute (selected by
  * `type`, 0..0x15) into the fog object. Inferred signature:
- *   void fn_8019B948(HSD_Fog* fog, s32 type, f32* value)
+ *   void FogUpdateFunc(HSD_Fog* fog, s32 type, f32* value)
  *   0 start | 1 end | 2..5 color R/G/B/A | 6 fog_adj.center | 7 fog_adj.width
  *   8..0x15 are no-ops (jumptable falls through to the return).
  *
@@ -221,7 +221,7 @@ asm void fn_8019B948(void) {
  * FogAdj fields are therefore accessed by binary offset below so the code is
  * faithful; the header should be corrected separately.
  */
-void fn_8019B948(HSD_Fog* fog, s32 type, f32* value)
+void FogUpdateFunc(HSD_Fog* fog, s32 type, f32* value)
 {
     f32 fvalue;
     s32 ivalue;
@@ -350,7 +350,7 @@ asm void fn_8019BB78(void) {
  * copies type/start/end/color from the desc (or zero-inits defaults when the
  * desc is NULL), then hsdNew()s a FogAdj from desc->fogadjdesc and links it.
  *
- * HSD_FogAdj binary layout differs from the header (see fn_8019B948 note);
+ * HSD_FogAdj binary layout differs from the header (see FogUpdateFunc note);
  * FogAdj fields use binary offsets. HSD_FogAdjDesc binary layout is likewise
  *   flags@0x00  center@0x04  width@0x06  mtx[4][4]@0x08
  * (header has center@0x00/width@0x02/mtx@0x04, no flags).
@@ -425,7 +425,7 @@ extern void fn_800BCCDC(u32 enable, u32 center, void* table);   /* inferred glm6
 extern u32 lbl_8047E720;   /* default fog colour (read-only) */
 extern u8 lbl_802747DC[];  /* HSD_Panic message */
 #if 0
-asm void fn_8019BD18(void) {
+asm void HSD_FogSet(void) {
 #include "src/hsd/hsd_fog_fn_8019BD18.inc"
 }
 #else
@@ -435,17 +435,17 @@ asm void fn_8019BD18(void) {
 /*
  * Apply a fog object to the GPU: GXSetFog from the fog params, then optionally
  * configure fog-range adjustment (GXInitFogAdjTable + GXSetFogRangeAdj) from the
- * fog's HSD_FogAdj. Inferred signature: void fn_8019BD18(HSD_Fog* fog).
+ * fog's HSD_FogAdj. Inferred signature: void HSD_FogSet(HSD_Fog* fog).
  *
  * fn_800BD768 fills viewport/projection scratch (reads [0x00] and [0x08]).
  * HSD_FogAdj flags @0x08 select behaviour (master gate = any of bits 29..31):
  *   bit31 -> centre derived from fogadj->center, else centre = proj[0]+proj[8]/2
  *   bit30 -> width  from fogadj->width,  else width  = (s32)proj[8]
  *   bit29 -> matrix from fogadj->mtx,    else matrix rebuilt from fn_800BD454
- * FogAdj binary layout differs from the header (see fn_8019B948 note), so its
+ * FogAdj binary layout differs from the header (see FogUpdateFunc note), so its
  * fields are accessed by binary offset below.
  */
-void fn_8019BD18(HSD_Fog* fog)
+void HSD_FogSet(HSD_Fog* fog)
 {
     HSD_CObj* cobj;
     u32 color;
@@ -651,12 +651,12 @@ void* HSD_IDGetDataFromTable(u32* table, u32 key, u32* found) {
 extern void HSD_ObjFree(void* list, void* data);
 extern u8 lbl_8046553C[];
 #if 0
-asm void fn_8019C1B0(void) {
+asm void HSD_IDRemoveByIDFromTable(void) {
 #include "src/hsd/hsd_fog_fn_8019C1B0.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_8019C1B0(u32* table, u32 key) {
+void HSD_IDRemoveByIDFromTable(u32* table, u32 key) {
     u32** bucket;
     u32** node;
     u32** prev;
@@ -752,14 +752,14 @@ void HSD_IDSetup(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_801AA35C(void* list, u32 size, u32 alignment);
+extern void HSD_ObjAllocInit(void* list, u32 size, u32 alignment);
 #if 0
 asm void HSD_IDInitAllocData(void) {
 #include "src/hsd/hsd_fog_HSD_IDInitAllocData.inc"
 }
 #else
 void HSD_IDInitAllocData(void) {
-    fn_801AA35C(lbl_8046553C, 0xC, 4);
+    HSD_ObjAllocInit(lbl_8046553C, 0xC, 4);
 }
 #endif
 #pragma pop

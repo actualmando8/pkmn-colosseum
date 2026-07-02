@@ -415,8 +415,8 @@ void* fn_801C2AAC(void) {
  */
 void fn_801C2AB8(s32 slot, s32 animState) {
     extern u8 lbl_80466DB8[];
-    extern void fn_801AA35C(void*, u32, u32);
-    fn_801AA35C(lbl_80466DB8, 0x1c, 4);
+    extern void HSD_ObjAllocInit(void*, u32, u32);
+    HSD_ObjAllocInit(lbl_80466DB8, 0x1c, 4);
 }
 
 /**

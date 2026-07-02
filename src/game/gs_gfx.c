@@ -647,8 +647,8 @@ extern void fn_800E3928(void* a);
 extern void fn_801183EC(void* a);
 extern void fn_800E8684(void);
 extern void fn_8019C708(s32 a);
-extern void fn_8019731C(u8 a, u8 b, u8 c, u8 d);
-extern void fn_80196EF8(s32 a, s32 b, s32 c, f32 d, f32 e, f32 f, f32 g, f32 h);
+extern void HSD_SetEraseColor(u8 a, u8 b, u8 c, u8 d);
+extern void HSD_EraseRect(s32 a, s32 b, s32 c, f32 d, f32 e, f32 f, f32 g, f32 h);
 extern u32 lbl_8047AA80;
 extern u8 lbl_8047AA90;
 extern f32 lbl_8047CA00;
@@ -734,13 +734,13 @@ void fn_800D3410(void* arg0, u8 arg1) {
         fn_8019C708(0);
 
         if (((u8*)lbl_8047AA80)[0x19] != 0) {
-            fn_8019731C(
+            HSD_SetEraseColor(
                 ((u8*)lbl_8047AA80)[0x1C],
                 ((u8*)lbl_8047AA80)[0x1D],
                 ((u8*)lbl_8047AA80)[0x1E],
                 ((u8*)lbl_8047AA80)[0x1F]
             );
-            fn_80196EF8(1, 1, 0,
+            HSD_EraseRect(1, 1, 0,
                 lbl_8047CA00,
                 lbl_8047CA08,
                 lbl_8047CA00,

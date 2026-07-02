@@ -14,7 +14,7 @@
 #include "hsd/hsd_wobj.h"
 
 static void LObjInfoInit(void);
-extern s32 fn_801A4440(HSD_LObj* lobj, HSD_LightDesc* ldesc);
+extern s32 LObjLoad(HSD_LObj* lobj, HSD_LightDesc* ldesc);
 extern void LObjUpdateFunc(HSD_LObj* lobj, u32 type, void* value);
 
 HSD_LObjInfo hsdLObj = { LObjInfoInit };
@@ -217,7 +217,7 @@ static void LObjInfoInit(void)
     HSD_CLASS_INFO(&hsdLObj)->release = LObjRelease;
     HSD_CLASS_INFO(&hsdLObj)->amnesia = LObjAmnesia;
     HSD_LOBJ_INFO(&hsdLObj)->load =
-        (int (*)(HSD_LObj*, HSD_LightDesc*)) fn_801A4440;
+        (int (*)(HSD_LObj*, HSD_LightDesc*)) LObjLoad;
     HSD_LOBJ_INFO(&hsdLObj)->update =
         (void (*)(HSD_LObj*, u32, void*)) LObjUpdateFunc;
 }
@@ -309,11 +309,11 @@ extern char lbl_8047DBB8;
 extern char lbl_8047DBC0;
 extern char lbl_8047DBC4;
 #if 0
-asm void fn_801A4344(void) {
+asm void HSD_LObjLoadDesc(void) {
 #include "src/hsd/hsd_lobj_fn_801A4344.inc"
 }
 #else
-HSD_LObj* fn_801A4344(HSD_LightDesc* ldesc)
+HSD_LObj* HSD_LObjLoadDesc(HSD_LightDesc* ldesc)
 {
     HSD_LObj* first;
     HSD_LObj** nextp;
@@ -362,11 +362,11 @@ extern void GXInitLightDistAttn(void* light, f32 ref_dist, f32 ref_br,
 extern u8 lbl_80274D94[];
 extern char lbl_8047DBC8;
 #if 0
-asm void fn_801A4440(void) {
+asm void LObjLoad(void) {
 #include "src/hsd/hsd_lobj_fn_801A4440.inc"
 }
 #else
-s32 fn_801A4440(HSD_LObj* lobj, HSD_LightDesc* ldesc)
+s32 LObjLoad(HSD_LObj* lobj, HSD_LightDesc* ldesc)
 {
     HSD_WObj* wobj;
 
@@ -535,11 +535,11 @@ void HSD_LObjSetColor(HSD_LObj* lobj, u32* color) {
 extern void jumptable_8036CA64();
 /* GXLightIndex to GXLightID bitmask */
 #if 0
-asm void fn_801A4A54(void) {
+asm void HSD_Index2LightID(void) {
 #include "src/hsd/hsd_lobj_fn_801A4A54.inc"
 }
 #else
-u32 fn_801A4A54(u32 idx) {
+u32 HSD_Index2LightID(u32 idx) {
     switch (idx) {
     case 0: return 0x1;
     case 1: return 0x2;
@@ -918,7 +918,7 @@ void HSD_LObjSetup(void* setup)
                 }
 
                 LOBJ_ACTIVE_SLOT(slot) = lobj;
-                lobj->id = fn_801A4A54(slot);
+                lobj->id = HSD_Index2LightID(slot);
                 light_slot = lbl_8047B2B8;
                 lobj->spec_id = 0;
 
@@ -1051,7 +1051,7 @@ void HSD_LObjSetup(void* setup)
                 (lobj->flags & LOBJ_TYPE_MASK) == LOBJ_AMBIENT &&
                 (lobj->flags & (LOBJ_DIFFUSE | LOBJ_ALPHA))) {
                 LOBJ_ACTIVE_SLOT(8) = lobj;
-                lobj->id = fn_801A4A54(8);
+                lobj->id = HSD_Index2LightID(8);
                 break;
             }
             node = node->next;
@@ -1064,7 +1064,7 @@ void HSD_LObjSetup(void* setup)
         if (lobj != NULL &&
             (lobj->flags & LOBJ_SPECULAR) &&
             (lobj->flags & (LOBJ_DIFFUSE | LOBJ_ALPHA))) {
-            LOBJ_SETUP_SPECULAR(lobj, view_mtx, fn_801A4A54(light_slot));
+            LOBJ_SETUP_SPECULAR(lobj, view_mtx, HSD_Index2LightID(light_slot));
             light_slot++;
         }
     }
@@ -1098,11 +1098,11 @@ void fn_801A6098(HSD_LObj* lobj, u32* color, f32 shininess)
 extern f32 lbl_8047DBE8;
 extern f32 lbl_8047DBE4;
 #if 0
-asm void fn_801A620C(void) {
+asm void HSD_LObjGetLightVector(void) {
 #include "src/hsd/hsd_lobj_fn_801A620C.inc"
 }
 #else
-void fn_801A620C(HSD_LObj* lobj, f32* out)
+void HSD_LObjGetLightVector(HSD_LObj* lobj, f32* out)
 {
     u32 pos[3];
     u32 interest[3];

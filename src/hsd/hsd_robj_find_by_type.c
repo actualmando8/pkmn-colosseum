@@ -1,6 +1,6 @@
 #include "dolphin/types.h"
 
-u32* fn_801B00E0(volatile u32* node, u32 type, u32 subtype)
+u32* HSD_RObjGetByType(volatile u32* node, u32 type, u32 subtype)
 {
     if (node == NULL) {
         return NULL;

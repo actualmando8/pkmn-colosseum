@@ -2,7 +2,7 @@
 
 extern u8 lbl_80465688[];
 
-void* fn_801B0140(void)
+void* HSD_RObjGetAllocData(void)
 {
     return lbl_80465688;
 }

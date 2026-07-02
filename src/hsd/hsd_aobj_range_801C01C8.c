@@ -10,17 +10,17 @@
 #include "dolphin/types.h"
 
 /**
- * fn_801C0270 - Address: 0x801C0270 | Size: 0xC
+ * _HSD_AObjForgetMemory - Address: 0x801C0270 | Size: 0xC
  */
-s32 fn_801C0270(void) {
+s32 _HSD_AObjForgetMemory(void) {
     extern u32 lbl_8047B388;
     lbl_8047B388 = 0;
 }
 
 /**
- * fn_801C027C - Address: 0x801C027C | Size: 0x10
+ * HSD_AObjSetRate - Address: 0x801C027C | Size: 0x10
  */
-void fn_801C027C(void* obj, f32 frame) {
+void HSD_AObjSetRate(void* obj, f32 frame) {
     if (obj != NULL) {
         *(f32*)((u8*)obj + 0x10) = frame;
     }

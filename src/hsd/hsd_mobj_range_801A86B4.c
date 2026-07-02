@@ -3,7 +3,7 @@
 /* =========================================================================
  * Partial banked source for reserved split unit 0x801A86B4 - 0x801AA608.
  * Only the functions that byte-match under GC/1.3 are provided; the rest of
- * the range (including the five float-heavy matrix routines fn_801A8884 /
+ * the range (including the five float-heavy matrix routines HSD_MtxSRT /
  * 8B94 / 8D1C / 98CC / 9DF0, which are 16-62% source-refinement fleet
  * targets, and the empty-stub dispatchers) stay as extracted asm.
  * ========================================================================= */
@@ -30,7 +30,7 @@ void HSD_MtxGetTranslate(f32 mtx[3][4], f32* vec) {
 }
 
 /* Address: 0x801AA350 | Size: 0xC  -- already-banked (GC/1.3, calibration) */
-void fn_801AA350(void) {
+void _HSD_ObjAllocForgetMemory(void) {
     lbl_8047B2E0 = 0;
 }
 

@@ -633,7 +633,7 @@ typedef struct HSD_TExpDag {
 } HSD_TExpDag;
 
 extern s32 fn_801B7C60(u8* texp);
-extern void fn_801B84A4(u8** nodes, s32* dist, u8* root, s32 num, s32 val);
+extern void CalcDistance(u8** nodes, s32* dist, u8* root, s32 num, s32 val);
 
 /*
  * HSD_TExpMakeDag - 0x801B8024 | Size: 0x480
@@ -696,7 +696,7 @@ s32 fn_801B8024(u8* root, HSD_TExpDag* list) {
         dist[i] = -1;
     }
 
-    fn_801B84A4(nodes, dist, nodes[0], saved_num, 0);
+    CalcDistance(nodes, dist, nodes[0], saved_num, 0);
 
     for (i = 0; i < saved_num; i++) {
         for (j = i + 1; j < saved_num; j++) {
@@ -770,11 +770,11 @@ s32 fn_801B8024(u8* root, HSD_TExpDag* list) {
 }
 
 /*
- * fn_801B84A4 - 0x801B84A4 | Size: 0x518
+ * CalcDistance - 0x801B84A4 | Size: 0x518
  * TExp DAG distance computation helper.
  * 3-level unrolled recursive depth assignment.
  */
-void fn_801B84A4(u8** nodes, s32* dist, u8* root, s32 num, s32 val) {
+void CalcDistance(u8** nodes, s32* dist, u8* root, s32 num, s32 val) {
     s32 i, j, k;
     u8* exp1;
     u8* exp2;
@@ -831,7 +831,7 @@ level2_c_in_check:
 level3_c_in_check:
             if (k >= 4) goto level2_c_in_a_in;
             if (*(u8*)(exp2 + 0x34 + k * 8) == 1) {
-                fn_801B84A4(nodes, dist, *(u8**)(exp2 + 0x38 + k * 8), num, val2);
+                CalcDistance(nodes, dist, *(u8**)(exp2 + 0x38 + k * 8), num, val2);
             }
             k++;
             goto level3_c_in_check;
@@ -856,7 +856,7 @@ level2_c_in_a_in:
 level3_a_in_check:
             if (k >= 4) goto level2_a_in_next;
             if (*(u8*)(exp2 + 0x54 + k * 8) == 1) {
-                fn_801B84A4(nodes, dist, *(u8**)(exp2 + 0x58 + k * 8), num, val2);
+                CalcDistance(nodes, dist, *(u8**)(exp2 + 0x58 + k * 8), num, val2);
             }
             k++;
             goto level3_a_in_check;
@@ -904,7 +904,7 @@ level2a_c_in_check:
 level3a_c_in_check:
             if (k >= 4) goto level2a_c_in_a_in;
             if (*(u8*)(exp2 + 0x34 + k * 8) == 1) {
-                fn_801B84A4(nodes, dist, *(u8**)(exp2 + 0x38 + k * 8), num, val2);
+                CalcDistance(nodes, dist, *(u8**)(exp2 + 0x38 + k * 8), num, val2);
             }
             k++;
             goto level3a_c_in_check;
@@ -929,7 +929,7 @@ level2a_c_in_a_in:
 level3a_a_in_check:
             if (k >= 4) goto level2a_a_in_next;
             if (*(u8*)(exp2 + 0x54 + k * 8) == 1) {
-                fn_801B84A4(nodes, dist, *(u8**)(exp2 + 0x58 + k * 8), num, val2);
+                CalcDistance(nodes, dist, *(u8**)(exp2 + 0x58 + k * 8), num, val2);
             }
             k++;
             goto level3a_a_in_check;
@@ -1111,7 +1111,7 @@ void fn_801B9320(void) {
     gobj_next_id = 1;
 
     /* Main loop processing is handled by per-frame calls to:
-     * - fn_801B84A4 (process callbacks)
+     * - CalcDistance (process callbacks)
      * - fn_801B9048 (render dispatch)
      */
 }

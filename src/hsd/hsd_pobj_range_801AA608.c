@@ -69,7 +69,7 @@ void fn_801AA6D0(void* pobj)
 /* Address: 0x801ACD7C | Size: 0x30  -- Draw sync + clear display list state */
 #pragma push
 #pragma optimization_level 1
-void fn_801ACD7C(void)
+void HSD_ClearVtxDesc(void)
 {
     fn_800B7D3C();
     lbl_8047B2FC = 0;

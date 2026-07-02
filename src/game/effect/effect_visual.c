@@ -1868,7 +1868,7 @@ void fn_8013BE04(void* ptr, void* mtx, u8* color, f32 x, f32 z, f32 scale) {
 #endif
 extern void* fn_8019FF48(void* model);
 extern void HSD_MObjSetFlags(void);
-extern void fn_801A6FF0(void);
+extern void HSD_MObjCompileTev(void);
 #if 0
 asm void fn_8013C074(void) {
 #include "src/game/effect/effect_visual_fn_8013C074.inc"

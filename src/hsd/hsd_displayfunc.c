@@ -330,16 +330,16 @@ void fn_80198B20(void* dobj, void* mtx, void* renderState)
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_801AA35C(void* list, u32 size, u32 alignment);
+extern void HSD_ObjAllocInit(void* list, u32 size, u32 alignment);
 extern u8 lbl_80465348[];
 #if 0
-asm void fn_80198F4C(void) {
+asm void HSD_ZListInitAllocData(void) {
 #include "src/hsd/hsd_displayfunc_fn_80198F4C.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_80198F4C(void) {
-    fn_801AA35C(lbl_80465348, 0x48, 4);
+void HSD_ZListInitAllocData(void) {
+    HSD_ObjAllocInit(lbl_80465348, 0x48, 4);
 }
 #endif
 #pragma pop
