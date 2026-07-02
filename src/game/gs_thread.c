@@ -115,6 +115,24 @@ typedef u8 M2C_UNK;
         } \
     } while (0)
 
+/* GS VM interpreter context -- named-field view of the layout addressed by
+ * the GS_VM_* macros above (ip @0x14, globals @0x18, frame @0x1C,
+ * stackCount @0x28, stack @0x6C). Used by the compare-opcode family
+ * (GE/GT/LE/LT/...) below in place of raw (u8*)ctx + offset arithmetic;
+ * the do{}while(0)-wrapped GS_VM_* macros interfere with this-compiler's
+ * cross-call CSE of the shared error-table base pointer, so those opcode
+ * handlers are written directly against these named fields instead. */
+typedef struct GSVMCtx {
+    /* 0x00 */ u8    unk00[0x14];
+    /* 0x14 */ u8*   ip;
+    /* 0x18 */ u32*  globals;
+    /* 0x1C */ s32   frame;
+    /* 0x20 */ u8    unk20[0x28 - 0x20];
+    /* 0x28 */ s32   stackCount;
+    /* 0x2C */ u8    unk2C[0x6C - 0x2C];
+    /* 0x6C */ u32   stack[0x41]; /* operand stack; GS_VM_PUSH guards depth > 0x40 */
+} GSVMCtx;
+
 /* ===== External SDK / engine functions ===== */
 extern void  fn_800DD970(const void* fmt, ...);          /* OSReport */
 extern u16   GSmemAllocRaw(u32 size);                    /* _toolentryAlloc__FUl */
@@ -131,7 +149,7 @@ extern void  threadSaveGPRRegisters(void);                /* GSthread context in
 extern void  threadSaveFPRRegisters(void);                           /* GSthread FPU context init */
 /* renamed symbols referenced by asm incs (symbolmap port) */
 extern void GSscratchFree(void*);
-extern void cos();   /* MSL trig (renamed fn_800CDBE0) — referenced by asm incs */
+extern void cos();   /* MSL trig (renamed fn_800CDBE0) -- referenced by asm incs */
 
 /* ===== String constants (rodata references) ===== */
 extern const char lbl_80271008[]; /* "GSthreadCreate. Warning: 'usesFPU==FALE' OK?\n" */
@@ -5083,204 +5101,196 @@ s32 fn_800F24F4(arg0)
 #endif
 
 /* 0x800F27D4 | 0x414 */
-extern u32 lbl_8047E710;
-extern u32 lbl_8047CCC0;
 #if 0
 asm void fn_800F27D4(void) {
 #include "src/game/gs_thread_fn_800F27D4.inc"
 }
 #else
-#pragma optimization_level 2
 s32 fn_800F27D4(void* obj) {
-    u8* p;
-    u8* r31;
-    u32 r28;
-    u32 r29;
-    u32 r30;
+    GSVMCtx* ctx;
+    u8* errBase;
+    u32 leftDesc;
+    u32 rightDesc;
+    u32 idx;
     u32 def;
-    u32 val1;
-    u32 val2;
+    u32 leftValue;
+    u32 rightValue;
     u32 result;
 
-    p = (u8*)obj;
-    r31 = (u8*)lbl_80271068;
+    ctx = (GSVMCtx*)obj;
+    errBase = (u8*)lbl_80271068;
     {
-        u8* sp = (u8*)*(u32*)(p+0x14);
-        r28 = (u32)*sp; sp++;
-        *(u32*)(p+0x14) = (u32)sp;
-        r29 = (u32)*sp; sp++;
-        *(u32*)(p+0x14) = (u32)sp;
+        u8* ip = ctx->ip;
+        leftDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
+        rightDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
     }
     def = lbl_8047E710;
-    if (r28 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r28 & 0xFFFF));
-        val1 = def;
+    if (leftDesc == 0) {
+        fn_800DD38C((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        leftValue = def;
     } else {
-        r30 = r28 & 0xFFFF;
-        if (r28 & 0x80) {
-            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val1 = *(u32*)(p+0x6C); }
-            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        idx = leftDesc & 0xFFFF;
+        if (leftDesc & 0x80) {
+            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
         } else {
-            u32 idx = r30 & 0x3F;
-            if (r30 & 0x20) {
-                if (r30 & 0x40) val1 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else val1 = *(u32*)(p+0x18) + idx*4;
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) leftValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else leftValue = (u32)&ctx->globals[fieldIdx];
             } else {
                 u32 rawptr;
-                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else rawptr = *(u32*)(p+0x18) + idx*4;
-                if (r30 & 0x100) val1 = rawptr;
-                else val1 = *(u32*)rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) leftValue = rawptr;
+                else leftValue = *(u32*)rawptr;
             }
         }
     }
     def = lbl_8047E710;
-    if (r29 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
-        val2 = def;
+    if (rightDesc == 0) {
+        fn_800DD38C((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        rightValue = def;
     } else {
-        r30 = r29 & 0xFFFF;
-        if (r29 & 0x80) {
-            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val2 = *(u32*)(p+0x6C); }
-            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val2 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        idx = rightDesc & 0xFFFF;
+        if (rightDesc & 0x80) {
+            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
         } else {
-            u32 idx = r30 & 0x3F;
-            if (r30 & 0x20) {
-                if (r30 & 0x40) val2 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else val2 = *(u32*)(p+0x18) + idx*4;
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) rightValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rightValue = (u32)&ctx->globals[fieldIdx];
             } else {
                 u32 rawptr;
-                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else rawptr = *(u32*)(p+0x18) + idx*4;
-                if (r30 & 0x100) val2 = rawptr;
-                else val2 = *(u32*)rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) rightValue = rawptr;
+                else rightValue = *(u32*)rawptr;
             }
         }
     }
     /* NEQ */
-    if ((r29 & 0x3F) == 2) {
-        if ((r28 & 0x3F) == 2) {
-            result = (val2 != val1) ? 1 : 0;
+    if ((rightDesc & 0x3F) == 2) {
+        if ((leftDesc & 0x3F) == 2) {
+            result = (rightValue != leftValue) ? 1 : 0;
         } else {
-            f32 f1 = (f32)(s32)val2; f32 f0 = *(f32*)&val1;
+            f32 f1 = (f32)(s32)rightValue; f32 f0 = *(f32*)&leftValue;
             result = (f1 != f0) ? 1 : 0;
         }
     } else {
-        if ((r28 & 0x3F) == 2) {
-            f32 f2 = *(f32*)&val2; f32 f0 = (f32)(s32)val1;
+        if ((leftDesc & 0x3F) == 2) {
+            f32 f2 = *(f32*)&rightValue; f32 f0 = (f32)(s32)leftValue;
             result = (f2 != f0) ? 1 : 0;
         } else {
-            f32 f1 = *(f32*)&val2; f32 f0 = *(f32*)&val1;
+            f32 f1 = *(f32*)&rightValue; f32 f0 = *(f32*)&leftValue;
             result = (f1 != f0) ? 1 : 0;
         }
     }
-    if (*(u32*)(p+0x28) > 0x40) { fn_800DD38C((const char*)r31); }
-    else { *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1; *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result; }
+    if (ctx->stackCount > 0x40) { fn_800DD38C((const char*)errBase); }
+    else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
 #endif
 
 /* 0x800F2BE8 | 0x410 */
-extern u32 lbl_8047E710;
-extern u32 lbl_8047CCC0;
 #if 0
 asm void fn_800F2BE8(void) {
 #include "src/game/gs_thread_fn_800F2BE8.inc"
 }
 #else
-#pragma optimization_level 2
 s32 fn_800F2BE8(void* obj) {
-    u8* p;
-    u8* r31;
-    u32 r28;
-    u32 r29;
-    u32 r30;
+    GSVMCtx* ctx;
+    u8* errBase;
+    u32 leftDesc;
+    u32 rightDesc;
+    u32 idx;
     u32 def;
-    u32 val1;
-    u32 val2;
+    u32 leftValue;
+    u32 rightValue;
     u32 result;
 
-    p = (u8*)obj;
-    r31 = (u8*)lbl_80271068;
+    ctx = (GSVMCtx*)obj;
+    errBase = (u8*)lbl_80271068;
     {
-        u8* sp = (u8*)*(u32*)(p+0x14);
-        r28 = (u32)*sp; sp++;
-        *(u32*)(p+0x14) = (u32)sp;
-        r29 = (u32)*sp; sp++;
-        *(u32*)(p+0x14) = (u32)sp;
+        u8* ip = ctx->ip;
+        leftDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
+        rightDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
     }
     def = lbl_8047E710;
-    if (r28 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r28 & 0xFFFF));
-        val1 = def;
+    if (leftDesc == 0) {
+        fn_800DD38C((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        leftValue = def;
     } else {
-        r30 = r28 & 0xFFFF;
-        if (r28 & 0x80) {
-            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val1 = *(u32*)(p+0x6C); }
-            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        idx = leftDesc & 0xFFFF;
+        if (leftDesc & 0x80) {
+            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
         } else {
-            u32 idx = r30 & 0x3F;
-            if (r30 & 0x20) {
-                if (r30 & 0x40) val1 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else val1 = *(u32*)(p+0x18) + idx*4;
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) leftValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else leftValue = (u32)&ctx->globals[fieldIdx];
             } else {
                 u32 rawptr;
-                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else rawptr = *(u32*)(p+0x18) + idx*4;
-                if (r30 & 0x100) val1 = rawptr;
-                else val1 = *(u32*)rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) leftValue = rawptr;
+                else leftValue = *(u32*)rawptr;
             }
         }
     }
     def = lbl_8047E710;
-    if (r29 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
-        val2 = def;
+    if (rightDesc == 0) {
+        fn_800DD38C((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        rightValue = def;
     } else {
-        r30 = r29 & 0xFFFF;
-        if (r29 & 0x80) {
-            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val2 = *(u32*)(p+0x6C); }
-            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val2 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        idx = rightDesc & 0xFFFF;
+        if (rightDesc & 0x80) {
+            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
         } else {
-            u32 idx = r30 & 0x3F;
-            if (r30 & 0x20) {
-                if (r30 & 0x40) val2 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else val2 = *(u32*)(p+0x18) + idx*4;
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) rightValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rightValue = (u32)&ctx->globals[fieldIdx];
             } else {
                 u32 rawptr;
-                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else rawptr = *(u32*)(p+0x18) + idx*4;
-                if (r30 & 0x100) val2 = rawptr;
-                else val2 = *(u32*)rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) rightValue = rawptr;
+                else rightValue = *(u32*)rawptr;
             }
         }
     }
     /* EQ */
-    if ((r29 & 0x3F) == 2) {
-        if ((r28 & 0x3F) == 2) {
-            result = (val2 == val1) ? 1 : 0;
+    if ((rightDesc & 0x3F) == 2) {
+        if ((leftDesc & 0x3F) == 2) {
+            result = (rightValue == leftValue) ? 1 : 0;
         } else {
-            f32 f1 = (f32)(s32)val2; f32 f0 = *(f32*)&val1;
+            f32 f1 = (f32)(s32)rightValue; f32 f0 = *(f32*)&leftValue;
             result = (f1 == f0) ? 1 : 0;
         }
     } else {
-        if ((r28 & 0x3F) == 2) {
-            f32 f2 = *(f32*)&val2; f32 f0 = (f32)(s32)val1;
+        if ((leftDesc & 0x3F) == 2) {
+            f32 f2 = *(f32*)&rightValue; f32 f0 = (f32)(s32)leftValue;
             result = (f2 == f0) ? 1 : 0;
         } else {
-            f32 f1 = *(f32*)&val2; f32 f0 = *(f32*)&val1;
+            f32 f1 = *(f32*)&rightValue; f32 f0 = *(f32*)&leftValue;
             result = (f1 == f0) ? 1 : 0;
         }
     }
-    if (*(u32*)(p+0x28) > 0x40) { fn_800DD38C((const char*)r31); }
-    else { *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1; *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result; }
+    if (ctx->stackCount > 0x40) { fn_800DD38C((const char*)errBase); }
+    else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
 #endif
 
 /* 0x800F2FF8 | 0x420 */
-extern u32 lbl_8047E710;
-extern u32 lbl_8047CCC0;
 #if 0
 asm void fn_800F2FF8(void) {
 #include "src/game/gs_thread_fn_800F2FF8.inc"
@@ -5288,939 +5298,862 @@ asm void fn_800F2FF8(void) {
 #else
 #pragma optimization_level 2
 s32 fn_800F2FF8(void* obj) {
-    u8* p;
-    u8* r31;
-    u32 r28;
-    u32 r29;
-    u32 r30;
+    GSVMCtx* ctx;
+    u8* errBase;
+    u32 leftDesc;
+    u32 rightDesc;
+    u32 idx;
     u32 def;
-    u32 val1;
-    u32 val2;
+    u32 leftValue;
+    u32 rightValue;
     u32 result;
 
-    p = (u8*)obj;
-    r31 = (u8*)lbl_80271068;
+    ctx = (GSVMCtx*)obj;
+    errBase = (u8*)lbl_80271068;
     {
-        u8* sp = (u8*)*(u32*)(p+0x14);
-        r28 = (u32)*sp; sp++;
-        *(u32*)(p+0x14) = (u32)sp;
-        r29 = (u32)*sp; sp++;
-        *(u32*)(p+0x14) = (u32)sp;
+        u8* ip = ctx->ip;
+        leftDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
+        rightDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
     }
     def = lbl_8047E710;
-    if (r28 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r28 & 0xFFFF));
-        val1 = def;
+    if (leftDesc == 0) {
+        fn_800DD38C((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        leftValue = def;
     } else {
-        r30 = r28 & 0xFFFF;
-        if (r28 & 0x80) {
-            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val1 = *(u32*)(p+0x6C); }
-            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        idx = leftDesc & 0xFFFF;
+        if (leftDesc & 0x80) {
+            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
         } else {
-            u32 idx = r30 & 0x3F;
-            if (r30 & 0x20) {
-                if (r30 & 0x40) val1 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else val1 = *(u32*)(p+0x18) + idx*4;
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) leftValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else leftValue = (u32)&ctx->globals[fieldIdx];
             } else {
                 u32 rawptr;
-                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else rawptr = *(u32*)(p+0x18) + idx*4;
-                if (r30 & 0x100) val1 = rawptr;
-                else val1 = *(u32*)rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) leftValue = rawptr;
+                else leftValue = *(u32*)rawptr;
             }
         }
     }
     def = lbl_8047E710;
-    if (r29 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
-        val2 = def;
+    if (rightDesc == 0) {
+        fn_800DD38C((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        rightValue = def;
     } else {
-        r30 = r29 & 0xFFFF;
-        if (r29 & 0x80) {
-            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val2 = *(u32*)(p+0x6C); }
-            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val2 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        idx = rightDesc & 0xFFFF;
+        if (rightDesc & 0x80) {
+            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
         } else {
-            u32 idx = r30 & 0x3F;
-            if (r30 & 0x20) {
-                if (r30 & 0x40) val2 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else val2 = *(u32*)(p+0x18) + idx*4;
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) rightValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rightValue = (u32)&ctx->globals[fieldIdx];
             } else {
                 u32 rawptr;
-                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else rawptr = *(u32*)(p+0x18) + idx*4;
-                if (r30 & 0x100) val2 = rawptr;
-                else val2 = *(u32*)rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) rightValue = rawptr;
+                else rightValue = *(u32*)rawptr;
             }
         }
     }
-    /* GE: result=1 when (s32)val2 >= (s32)val1 */
-    if ((r29 & 0x3F) == 2) {
-        if ((r28 & 0x3F) == 2) {
-            result = ((s32)val2 >= (s32)val1) ? 1 : 0;
+    /* GE: result=1 when (s32)rightValue >= (s32)leftValue */
+    if ((rightDesc & 0x3F) == 2) {
+        if ((leftDesc & 0x3F) == 2) {
+            result = ((s32)rightValue >= (s32)leftValue) ? 1 : 0;
         } else {
-            f32 f1 = (f32)(s32)val2; f32 f0 = *(f32*)&val1;
+            f32 f1 = (f32)(s32)rightValue; f32 f0 = *(f32*)&leftValue;
             result = (f1 >= f0) ? 1 : 0;
         }
     } else {
-        if ((r28 & 0x3F) == 2) {
-            f32 f2 = *(f32*)&val2; f32 f0 = (f32)(s32)val1;
+        if ((leftDesc & 0x3F) == 2) {
+            f32 f2 = *(f32*)&rightValue; f32 f0 = (f32)(s32)leftValue;
             result = (f2 >= f0) ? 1 : 0;
         } else {
-            f32 f1 = *(f32*)&val2; f32 f0 = *(f32*)&val1;
+            f32 f1 = *(f32*)&rightValue; f32 f0 = *(f32*)&leftValue;
             result = (f1 >= f0) ? 1 : 0;
         }
     }
-    if (*(u32*)(p+0x28) > 0x40) { fn_800DD38C((const char*)r31); }
-    else { *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1; *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result; }
+    if (ctx->stackCount > 0x40) { fn_800DD38C((const char*)errBase); }
+    else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
 #endif
 
 /* 0x800F3418 | 0x418 */
-extern u32 lbl_8047E710;
-extern u32 lbl_8047CCC0;
 #if 0
 asm void fn_800F3418(void) {
 #include "src/game/gs_thread_fn_800F3418.inc"
 }
 #else
-#pragma optimization_level 2
 s32 fn_800F3418(void* obj) {
-    u8* p;
-    u8* r31;
-    u32 r28;
-    u32 r29;
-    u32 r30;
+    GSVMCtx* ctx;
+    u8* errBase;
+    u32 leftDesc;
+    u32 rightDesc;
+    u32 idx;
     u32 def;
-    u32 val1;
-    u32 val2;
+    u32 leftValue;
+    u32 rightValue;
     u32 result;
 
-    p = (u8*)obj;
-    r31 = (u8*)lbl_80271068;
+    ctx = (GSVMCtx*)obj;
+    errBase = (u8*)lbl_80271068;
     {
-        u8* sp = (u8*)*(u32*)(p+0x14);
-        r28 = (u32)*sp; sp++;
-        *(u32*)(p+0x14) = (u32)sp;
-        r29 = (u32)*sp; sp++;
-        *(u32*)(p+0x14) = (u32)sp;
+        u8* ip = ctx->ip;
+        leftDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
+        rightDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
     }
     def = lbl_8047E710;
-    if (r28 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r28 & 0xFFFF));
-        val1 = def;
+    if (leftDesc == 0) {
+        fn_800DD38C((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        leftValue = def;
     } else {
-        r30 = r28 & 0xFFFF;
-        if (r28 & 0x80) {
-            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val1 = *(u32*)(p+0x6C); }
-            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        idx = leftDesc & 0xFFFF;
+        if (leftDesc & 0x80) {
+            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
         } else {
-            u32 idx = r30 & 0x3F;
-            if (r30 & 0x20) {
-                if (r30 & 0x40) val1 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else val1 = *(u32*)(p+0x18) + idx*4;
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) leftValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else leftValue = (u32)&ctx->globals[fieldIdx];
             } else {
                 u32 rawptr;
-                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else rawptr = *(u32*)(p+0x18) + idx*4;
-                if (r30 & 0x100) val1 = rawptr;
-                else val1 = *(u32*)rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) leftValue = rawptr;
+                else leftValue = *(u32*)rawptr;
             }
         }
     }
     def = lbl_8047E710;
-    if (r29 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
-        val2 = def;
+    if (rightDesc == 0) {
+        fn_800DD38C((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        rightValue = def;
     } else {
-        r30 = r29 & 0xFFFF;
-        if (r29 & 0x80) {
-            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val2 = *(u32*)(p+0x6C); }
-            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val2 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        idx = rightDesc & 0xFFFF;
+        if (rightDesc & 0x80) {
+            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
         } else {
-            u32 idx = r30 & 0x3F;
-            if (r30 & 0x20) {
-                if (r30 & 0x40) val2 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else val2 = *(u32*)(p+0x18) + idx*4;
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) rightValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rightValue = (u32)&ctx->globals[fieldIdx];
             } else {
                 u32 rawptr;
-                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else rawptr = *(u32*)(p+0x18) + idx*4;
-                if (r30 & 0x100) val2 = rawptr;
-                else val2 = *(u32*)rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) rightValue = rawptr;
+                else rightValue = *(u32*)rawptr;
             }
         }
     }
-    /* GT: result=1 when (s32)val2 > (s32)val1 */
-    if ((r29 & 0x3F) == 2) {
-        if ((r28 & 0x3F) == 2) {
-            result = ((s32)val2 > (s32)val1) ? 1 : 0;
+    /* GT: result=1 when (s32)rightValue > (s32)leftValue */
+    if ((rightDesc & 0x3F) == 2) {
+        if ((leftDesc & 0x3F) == 2) {
+            result = ((s32)rightValue > (s32)leftValue) ? 1 : 0;
         } else {
-            f32 f1 = (f32)(s32)val2; f32 f0 = *(f32*)&val1;
+            f32 f1 = (f32)(s32)rightValue; f32 f0 = *(f32*)&leftValue;
             result = (f1 > f0) ? 1 : 0;
         }
     } else {
-        if ((r28 & 0x3F) == 2) {
-            f32 f2 = *(f32*)&val2; f32 f0 = (f32)(s32)val1;
+        if ((leftDesc & 0x3F) == 2) {
+            f32 f2 = *(f32*)&rightValue; f32 f0 = (f32)(s32)leftValue;
             result = (f2 > f0) ? 1 : 0;
         } else {
-            f32 f1 = *(f32*)&val2; f32 f0 = *(f32*)&val1;
+            f32 f1 = *(f32*)&rightValue; f32 f0 = *(f32*)&leftValue;
             result = (f1 > f0) ? 1 : 0;
         }
     }
-    if (*(u32*)(p+0x28) > 0x40) { fn_800DD38C((const char*)r31); }
-    else { *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1; *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result; }
+    if (ctx->stackCount > 0x40) { fn_800DD38C((const char*)errBase); }
+    else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
 #endif
 
 /* 0x800F3830 | 0x420 */
-extern u32 lbl_8047E710;
-extern u32 lbl_8047CCC0;
 #if 0
 asm void fn_800F3830(void) {
 #include "src/game/gs_thread_fn_800F3830.inc"
 }
 #else
-#pragma optimization_level 2
 s32 fn_800F3830(void* obj) {
-    u8* p;
-    u8* r31;
-    u32 r28;
-    u32 r29;
-    u32 r30;
+    GSVMCtx* ctx;
+    u8* errBase;
+    u32 leftDesc;
+    u32 rightDesc;
+    u32 idx;
     u32 def;
-    u32 val1;
-    u32 val2;
+    u32 leftValue;
+    u32 rightValue;
     u32 result;
 
-    p = (u8*)obj;
-    r31 = (u8*)lbl_80271068;
+    ctx = (GSVMCtx*)obj;
+    errBase = (u8*)lbl_80271068;
     {
-        u8* sp = (u8*)*(u32*)(p+0x14);
-        r28 = (u32)*sp; sp++;
-        *(u32*)(p+0x14) = (u32)sp;
-        r29 = (u32)*sp; sp++;
-        *(u32*)(p+0x14) = (u32)sp;
+        u8* ip = ctx->ip;
+        leftDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
+        rightDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
     }
     def = lbl_8047E710;
-    if (r28 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r28 & 0xFFFF));
-        val1 = def;
+    if (leftDesc == 0) {
+        fn_800DD38C((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        leftValue = def;
     } else {
-        r30 = r28 & 0xFFFF;
-        if (r28 & 0x80) {
-            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val1 = *(u32*)(p+0x6C); }
-            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        idx = leftDesc & 0xFFFF;
+        if (leftDesc & 0x80) {
+            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
         } else {
-            u32 idx = r30 & 0x3F;
-            if (r30 & 0x20) {
-                if (r30 & 0x40) val1 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else val1 = *(u32*)(p+0x18) + idx*4;
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) leftValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else leftValue = (u32)&ctx->globals[fieldIdx];
             } else {
                 u32 rawptr;
-                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else rawptr = *(u32*)(p+0x18) + idx*4;
-                if (r30 & 0x100) val1 = rawptr;
-                else val1 = *(u32*)rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) leftValue = rawptr;
+                else leftValue = *(u32*)rawptr;
             }
         }
     }
     def = lbl_8047E710;
-    if (r29 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
-        val2 = def;
+    if (rightDesc == 0) {
+        fn_800DD38C((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        rightValue = def;
     } else {
-        r30 = r29 & 0xFFFF;
-        if (r29 & 0x80) {
-            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val2 = *(u32*)(p+0x6C); }
-            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val2 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        idx = rightDesc & 0xFFFF;
+        if (rightDesc & 0x80) {
+            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
         } else {
-            u32 idx = r30 & 0x3F;
-            if (r30 & 0x20) {
-                if (r30 & 0x40) val2 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else val2 = *(u32*)(p+0x18) + idx*4;
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) rightValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rightValue = (u32)&ctx->globals[fieldIdx];
             } else {
                 u32 rawptr;
-                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else rawptr = *(u32*)(p+0x18) + idx*4;
-                if (r30 & 0x100) val2 = rawptr;
-                else val2 = *(u32*)rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) rightValue = rawptr;
+                else rightValue = *(u32*)rawptr;
             }
         }
     }
-    /* LE: result=1 when (s32)val2 <= (s32)val1 */
-    if ((r29 & 0x3F) == 2) {
-        if ((r28 & 0x3F) == 2) {
-            result = ((s32)val2 <= (s32)val1) ? 1 : 0;
+    /* LE: result=1 when (s32)rightValue <= (s32)leftValue */
+    if ((rightDesc & 0x3F) == 2) {
+        if ((leftDesc & 0x3F) == 2) {
+            result = ((s32)rightValue <= (s32)leftValue) ? 1 : 0;
         } else {
-            f32 f1 = (f32)(s32)val2; f32 f0 = *(f32*)&val1;
+            f32 f1 = (f32)(s32)rightValue; f32 f0 = *(f32*)&leftValue;
             result = (f1 <= f0) ? 1 : 0;
         }
     } else {
-        if ((r28 & 0x3F) == 2) {
-            f32 f2 = *(f32*)&val2; f32 f0 = (f32)(s32)val1;
+        if ((leftDesc & 0x3F) == 2) {
+            f32 f2 = *(f32*)&rightValue; f32 f0 = (f32)(s32)leftValue;
             result = (f2 <= f0) ? 1 : 0;
         } else {
-            f32 f1 = *(f32*)&val2; f32 f0 = *(f32*)&val1;
+            f32 f1 = *(f32*)&rightValue; f32 f0 = *(f32*)&leftValue;
             result = (f1 <= f0) ? 1 : 0;
         }
     }
-    if (*(u32*)(p+0x28) > 0x40) { fn_800DD38C((const char*)r31); }
-    else { *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1; *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result; }
+    if (ctx->stackCount > 0x40) { fn_800DD38C((const char*)errBase); }
+    else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
 #endif
 
 /* 0x800F3C50 | 0x418 */
-extern u32 lbl_8047E710;
-extern u32 lbl_8047CCC0;
 #if 0
 asm void fn_800F3C50(void) {
 #include "src/game/gs_thread_fn_800F3C50.inc"
 }
 #else
-#pragma optimization_level 2
 s32 fn_800F3C50(void* obj) {
-    u8* p;
-    u8* r31;
-    u32 r28;
-    u32 r29;
-    u32 r30;
+    GSVMCtx* ctx;
+    u8* errBase;
+    u32 leftDesc;
+    u32 rightDesc;
+    u32 idx;
     u32 def;
-    u32 val1;
-    u32 val2;
+    u32 leftValue;
+    u32 rightValue;
     u32 result;
 
-    p = (u8*)obj;
-    r31 = (u8*)lbl_80271068;
+    ctx = (GSVMCtx*)obj;
+    errBase = (u8*)lbl_80271068;
     {
-        u8* sp = (u8*)*(u32*)(p+0x14);
-        r28 = (u32)*sp; sp++;
-        *(u32*)(p+0x14) = (u32)sp;
-        r29 = (u32)*sp; sp++;
-        *(u32*)(p+0x14) = (u32)sp;
+        u8* ip = ctx->ip;
+        leftDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
+        rightDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
     }
     def = lbl_8047E710;
-    if (r28 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r28 & 0xFFFF));
-        val1 = def;
+    if (leftDesc == 0) {
+        fn_800DD38C((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        leftValue = def;
     } else {
-        r30 = r28 & 0xFFFF;
-        if (r28 & 0x80) {
-            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val1 = *(u32*)(p+0x6C); }
-            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        idx = leftDesc & 0xFFFF;
+        if (leftDesc & 0x80) {
+            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
         } else {
-            u32 idx = r30 & 0x3F;
-            if (r30 & 0x20) {
-                if (r30 & 0x40) val1 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else val1 = *(u32*)(p+0x18) + idx*4;
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) leftValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else leftValue = (u32)&ctx->globals[fieldIdx];
             } else {
                 u32 rawptr;
-                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else rawptr = *(u32*)(p+0x18) + idx*4;
-                if (r30 & 0x100) val1 = rawptr;
-                else val1 = *(u32*)rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) leftValue = rawptr;
+                else leftValue = *(u32*)rawptr;
             }
         }
     }
     def = lbl_8047E710;
-    if (r29 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
-        val2 = def;
+    if (rightDesc == 0) {
+        fn_800DD38C((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        rightValue = def;
     } else {
-        r30 = r29 & 0xFFFF;
-        if (r29 & 0x80) {
-            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val2 = *(u32*)(p+0x6C); }
-            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val2 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        idx = rightDesc & 0xFFFF;
+        if (rightDesc & 0x80) {
+            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
         } else {
-            u32 idx = r30 & 0x3F;
-            if (r30 & 0x20) {
-                if (r30 & 0x40) val2 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else val2 = *(u32*)(p+0x18) + idx*4;
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) rightValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rightValue = (u32)&ctx->globals[fieldIdx];
             } else {
                 u32 rawptr;
-                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else rawptr = *(u32*)(p+0x18) + idx*4;
-                if (r30 & 0x100) val2 = rawptr;
-                else val2 = *(u32*)rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) rightValue = rawptr;
+                else rightValue = *(u32*)rawptr;
             }
         }
     }
-    /* LT: result=1 when (s32)val2 < (s32)val1 */
-    if ((r29 & 0x3F) == 2) {
-        if ((r28 & 0x3F) == 2) {
-            result = ((s32)val2 < (s32)val1) ? 1 : 0;
+    /* LT: result=1 when (s32)rightValue < (s32)leftValue */
+    if ((rightDesc & 0x3F) == 2) {
+        if ((leftDesc & 0x3F) == 2) {
+            result = ((s32)rightValue < (s32)leftValue) ? 1 : 0;
         } else {
-            f32 f1 = (f32)(s32)val2; f32 f0 = *(f32*)&val1;
+            f32 f1 = (f32)(s32)rightValue; f32 f0 = *(f32*)&leftValue;
             result = (f1 < f0) ? 1 : 0;
         }
     } else {
-        if ((r28 & 0x3F) == 2) {
-            f32 f2 = *(f32*)&val2; f32 f0 = (f32)(s32)val1;
+        if ((leftDesc & 0x3F) == 2) {
+            f32 f2 = *(f32*)&rightValue; f32 f0 = (f32)(s32)leftValue;
             result = (f2 < f0) ? 1 : 0;
         } else {
-            f32 f1 = *(f32*)&val2; f32 f0 = *(f32*)&val1;
+            f32 f1 = *(f32*)&rightValue; f32 f0 = *(f32*)&leftValue;
             result = (f1 < f0) ? 1 : 0;
         }
     }
-    if (*(u32*)(p+0x28) > 0x40) { fn_800DD38C((const char*)r31); }
-    else { *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1; *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result; }
+    if (ctx->stackCount > 0x40) { fn_800DD38C((const char*)errBase); }
+    else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
 #endif
 
 /* 0x800F4068 | 0x3D8 */
-extern u32 lbl_8047E710;
-extern u32 lbl_8047CCC0;
 #if 0
 asm void fn_800F4068(void) {
 #include "src/game/gs_thread_fn_800F4068.inc"
 }
 #else
-#pragma optimization_level 2
 s32 fn_800F4068(void* obj) {
-    u8* p;
-    u8* r31;
-    u32 r28;
-    u32 r29;
-    u32 r30;
+    GSVMCtx* ctx;
+    u8* errBase;
+    u32 leftDesc;
+    u32 rightDesc;
+    u32 idx;
     u32 def;
-    u32 val1;
-    u32 val2;
+    u32 leftValue;
+    u32 rightValue;
     u32 result;
 
-    p = (u8*)obj;
-    r31 = (u8*)lbl_80271068;
+    ctx = (GSVMCtx*)obj;
+    errBase = (u8*)lbl_80271068;
     {
-        u8* sp = (u8*)*(u32*)(p+0x14);
-        r28 = (u32)*sp; sp++;
-        *(u32*)(p+0x14) = (u32)sp;
-        r29 = (u32)*sp; sp++;
-        *(u32*)(p+0x14) = (u32)sp;
+        u8* ip = ctx->ip;
+        leftDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
+        rightDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
     }
     def = lbl_8047E710;
-    if (r28 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r28 & 0xFFFF));
-        val1 = def;
+    if (leftDesc == 0) {
+        fn_800DD38C((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        leftValue = def;
     } else {
-        r30 = r28 & 0xFFFF;
-        if (r28 & 0x80) {
-            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val1 = *(u32*)(p+0x6C); }
-            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        idx = leftDesc & 0xFFFF;
+        if (leftDesc & 0x80) {
+            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
         } else {
-            u32 idx = r30 & 0x3F;
-            if (r30 & 0x20) {
-                if (r30 & 0x40) val1 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else val1 = *(u32*)(p+0x18) + idx*4;
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) leftValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else leftValue = (u32)&ctx->globals[fieldIdx];
             } else {
                 u32 rawptr;
-                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else rawptr = *(u32*)(p+0x18) + idx*4;
-                if (r30 & 0x100) val1 = rawptr;
-                else val1 = *(u32*)rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) leftValue = rawptr;
+                else leftValue = *(u32*)rawptr;
             }
         }
     }
     def = lbl_8047E710;
-    if (r29 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
-        val2 = def;
+    if (rightDesc == 0) {
+        fn_800DD38C((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        rightValue = def;
     } else {
-        r30 = r29 & 0xFFFF;
-        if (r29 & 0x80) {
-            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val2 = *(u32*)(p+0x6C); }
-            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val2 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        idx = rightDesc & 0xFFFF;
+        if (rightDesc & 0x80) {
+            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
         } else {
-            u32 idx = r30 & 0x3F;
-            if (r30 & 0x20) {
-                if (r30 & 0x40) val2 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else val2 = *(u32*)(p+0x18) + idx*4;
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) rightValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rightValue = (u32)&ctx->globals[fieldIdx];
             } else {
                 u32 rawptr;
-                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else rawptr = *(u32*)(p+0x18) + idx*4;
-                if (r30 & 0x100) val2 = rawptr;
-                else val2 = *(u32*)rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) rightValue = rawptr;
+                else rightValue = *(u32*)rawptr;
             }
         }
     }
-    /* SUB: op2 - op1 */
-    if ((r29 & 0x3F) == 2) {
-        if ((r28 & 0x3F) == 2) {
-            result = val2 - val1;
+    /* SUB: rightValue - leftValue */
+    if ((rightDesc & 0x3F) == 2) {
+        if ((leftDesc & 0x3F) == 2) {
+            u32 tmp = rightValue - leftValue;
+            result = tmp;
         } else {
-            f32 f1 = (f32)(s32)val2; f32 f0 = *(f32*)&val1;
+            f32 f1 = (f32)(s32)rightValue; f32 f0 = *(f32*)&leftValue;
             f32 tmp = f1 - f0; result = *(u32*)&tmp;
         }
     } else {
-        if ((r28 & 0x3F) == 2) {
-            f32 f2 = *(f32*)&val2; f32 f0 = (f32)(s32)val1;
+        if ((leftDesc & 0x3F) == 2) {
+            f32 f2 = *(f32*)&rightValue; f32 f0 = (f32)(s32)leftValue;
             f32 tmp = f2 - f0; result = *(u32*)&tmp;
         } else {
-            f32 f1 = *(f32*)&val2; f32 f0 = *(f32*)&val1;
+            f32 f1 = *(f32*)&rightValue; f32 f0 = *(f32*)&leftValue;
             f32 tmp = f1 - f0; result = *(u32*)&tmp;
         }
     }
-    if (*(u32*)(p+0x28) > 0x40) { fn_800DD38C((const char*)r31); }
-    else { *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1; *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result; }
+    if (ctx->stackCount > 0x40) { fn_800DD38C((const char*)errBase); }
+    else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
 #endif
 
 /* 0x800F4440 | 0x3D8 */
-extern u32 lbl_8047E710;
-extern u32 lbl_8047CCC0;
 #if 0
 asm void fn_800F4440(void) {
 #include "src/game/gs_thread_fn_800F4440.inc"
 }
 #else
-#pragma optimization_level 2
 s32 fn_800F4440(void* obj) {
-    u8* p;
-    u8* r31;
-    u32 r28;
-    u32 r29;
-    u32 r30;
-    u32 r4;
+    GSVMCtx* ctx;
+    u8* errBase;
+    u32 leftDesc;
+    u32 rightDesc;
+    u32 idx;
     u32 def;
-    u32 val1;
-    u32 val2;
+    u32 leftValue;
+    u32 rightValue;
     u32 result;
 
-    p = (u8*)obj;
-    r31 = (u8*)lbl_80271068;
-
-    /* read 2 operand bytes */
+    ctx = (GSVMCtx*)obj;
+    errBase = (u8*)lbl_80271068;
     {
-        u8* sp = (u8*)*(u32*)(p+0x14);
-        r28 = (u32)*sp;
-        sp++;
-        *(u32*)(p+0x14) = (u32)sp;
-        r29 = (u32)*sp;
-        sp++;
-        *(u32*)(p+0x14) = (u32)sp;
+        u8* ip = ctx->ip;
+        leftDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
+        rightDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
     }
     def = lbl_8047E710;
-
-    /* resolve op1 (r28) */
-    if (r28 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r28 & 0xFFFF));
-        val1 = def;
+    if (leftDesc == 0) {
+        fn_800DD38C((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        leftValue = def;
     } else {
-        r30 = r28 & 0xFFFF;
-        if (r28 & 0x80) {
-            if (*(u32*)(p+0x28) <= 0) {
-                fn_800DD38C((const char*)(r31+0x14));
-                val1 = *(u32*)(p+0x6C);
-            } else {
-                *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
-                val1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4);
-            }
+        idx = leftDesc & 0xFFFF;
+        if (leftDesc & 0x80) {
+            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
         } else {
-            u32 idx = r30 & 0x3F;
-            if (r30 & 0x20) {
-                if (r30 & 0x40) {
-                    val1 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                } else {
-                    val1 = *(u32*)(p+0x18) + idx*4;
-                }
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) leftValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else leftValue = (u32)&ctx->globals[fieldIdx];
             } else {
                 u32 rawptr;
-                if (r30 & 0x40) {
-                    rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                } else {
-                    rawptr = *(u32*)(p+0x18) + idx*4;
-                }
-                if (r30 & 0x100) {
-                    val1 = rawptr;
-                } else {
-                    val1 = *(u32*)rawptr;
-                }
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) leftValue = rawptr;
+                else leftValue = *(u32*)rawptr;
             }
         }
     }
-
-    /* resolve op2 (r29) */
     def = lbl_8047E710;
-    if (r29 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
-        val2 = def;
+    if (rightDesc == 0) {
+        fn_800DD38C((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        rightValue = def;
     } else {
-        r30 = r29 & 0xFFFF;
-        if (r29 & 0x80) {
-            if (*(u32*)(p+0x28) <= 0) {
-                fn_800DD38C((const char*)(r31+0x14));
-                val2 = *(u32*)(p+0x6C);
-            } else {
-                *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
-                val2 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4);
-            }
+        idx = rightDesc & 0xFFFF;
+        if (rightDesc & 0x80) {
+            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
         } else {
-            u32 idx = r30 & 0x3F;
-            if (r30 & 0x20) {
-                if (r30 & 0x40) {
-                    val2 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                } else {
-                    val2 = *(u32*)(p+0x18) + idx*4;
-                }
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) rightValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rightValue = (u32)&ctx->globals[fieldIdx];
             } else {
                 u32 rawptr;
-                if (r30 & 0x40) {
-                    rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                } else {
-                    rawptr = *(u32*)(p+0x18) + idx*4;
-                }
-                if (r30 & 0x100) {
-                    val2 = rawptr;
-                } else {
-                    val2 = *(u32*)rawptr;
-                }
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) rightValue = rawptr;
+                else rightValue = *(u32*)rawptr;
             }
         }
     }
-
-    /* compute: ADD */
-    if ((r29 & 0x3F) == 2) {
-        if ((r28 & 0x3F) == 2) {
-            /* int + int */
-            result = val2 + val1;
+    /* ADD: rightValue + leftValue */
+    if ((rightDesc & 0x3F) == 2) {
+        if ((leftDesc & 0x3F) == 2) {
+            u32 tmp = rightValue + leftValue;
+            result = tmp;
         } else {
-            /* int val2 + float val1 */
-            f32 f1 = (f32)(s32)val2;
-            f32 f0 = *(f32*)&val1;
-            result = *(u32*)&(f32){f0 + f1}; /* fix */
-            {
-                f32 tmp = f0 + f1;
-                result = *(u32*)&tmp;
-            }
+            f32 f1 = (f32)(s32)rightValue; f32 f0 = *(f32*)&leftValue;
+            f32 tmp = f0 + f1; result = *(u32*)&tmp;
         }
     } else {
-        if ((r28 & 0x3F) == 2) {
-            /* float val2 + int val1 */
-            f32 f0 = *(f32*)&val2;
-            f32 f1 = (f32)(s32)val1;
-            f32 tmp = f0 + f1;
-            result = *(u32*)&tmp;
+        if ((leftDesc & 0x3F) == 2) {
+            f32 f2 = *(f32*)&rightValue; f32 f0 = (f32)(s32)leftValue;
+            f32 tmp = f2 + f0; result = *(u32*)&tmp;
         } else {
-            /* float + float */
-            f32 f1 = *(f32*)&val2;
-            f32 f0 = *(f32*)&val1;
-            f32 tmp = f1 + f0;
-            result = *(u32*)&tmp;
+            f32 f1 = *(f32*)&rightValue; f32 f0 = *(f32*)&leftValue;
+            f32 tmp = f1 + f0; result = *(u32*)&tmp;
         }
     }
-
-    /* push result */
-    if (*(u32*)(p+0x28) > 0x40) {
-        fn_800DD38C((const char*)r31);
-    } else {
-        *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1;
-        *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result;
-    }
+    if (ctx->stackCount > 0x40) { fn_800DD38C((const char*)errBase); }
+    else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
 #endif
 
 /* 0x800F4818 | 0x420 */
 extern void fn_800CE318(void);
-extern u32 lbl_8047E710;
-extern u32 lbl_8047CCC0;
 #if 0
 asm void fn_800F4818(void) {
 #include "src/game/gs_thread_fn_800F4818.inc"
 }
 #else
-#pragma optimization_level 2
 s32 fn_800F4818(void* obj) {
-    u8* p;
-    u8* r31;
-    u32 r28;
-    u32 r29;
-    u32 r30;
+    GSVMCtx* ctx;
+    u8* errBase;
+    u32 leftDesc;
+    u32 rightDesc;
+    u32 idx;
     u32 def;
-    u32 val1;
-    u32 val2;
+    u32 leftValue;
+    u32 rightValue;
     u32 result;
 
-    p = (u8*)obj;
-    r31 = (u8*)lbl_80271068;
+    ctx = (GSVMCtx*)obj;
+    errBase = (u8*)lbl_80271068;
     {
-        u8* sp = (u8*)*(u32*)(p+0x14);
-        r28 = (u32)*sp; sp++;
-        *(u32*)(p+0x14) = (u32)sp;
-        r29 = (u32)*sp; sp++;
-        *(u32*)(p+0x14) = (u32)sp;
+        u8* ip = ctx->ip;
+        leftDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
+        rightDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
     }
     def = lbl_8047E710;
-    if (r28 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r28 & 0xFFFF));
-        val1 = def;
+    if (leftDesc == 0) {
+        fn_800DD38C((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        leftValue = def;
     } else {
-        r30 = r28 & 0xFFFF;
-        if (r28 & 0x80) {
-            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val1 = *(u32*)(p+0x6C); }
-            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        idx = leftDesc & 0xFFFF;
+        if (leftDesc & 0x80) {
+            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
         } else {
-            u32 idx = r30 & 0x3F;
-            if (r30 & 0x20) {
-                if (r30 & 0x40) val1 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else val1 = *(u32*)(p+0x18) + idx*4;
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) leftValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else leftValue = (u32)&ctx->globals[fieldIdx];
             } else {
                 u32 rawptr;
-                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else rawptr = *(u32*)(p+0x18) + idx*4;
-                if (r30 & 0x100) val1 = rawptr;
-                else val1 = *(u32*)rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) leftValue = rawptr;
+                else leftValue = *(u32*)rawptr;
             }
         }
     }
     def = lbl_8047E710;
-    if (r29 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
-        val2 = def;
+    if (rightDesc == 0) {
+        fn_800DD38C((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        rightValue = def;
     } else {
-        r30 = r29 & 0xFFFF;
-        if (r29 & 0x80) {
-            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val2 = *(u32*)(p+0x6C); }
-            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val2 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        idx = rightDesc & 0xFFFF;
+        if (rightDesc & 0x80) {
+            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
         } else {
-            u32 idx = r30 & 0x3F;
-            if (r30 & 0x20) {
-                if (r30 & 0x40) val2 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else val2 = *(u32*)(p+0x18) + idx*4;
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) rightValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rightValue = (u32)&ctx->globals[fieldIdx];
             } else {
                 u32 rawptr;
-                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else rawptr = *(u32*)(p+0x18) + idx*4;
-                if (r30 & 0x100) val2 = rawptr;
-                else val2 = *(u32*)rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) rightValue = rawptr;
+                else rightValue = *(u32*)rawptr;
             }
         }
     }
-    /* MOD: op2 % op1, op1 must be nonzero */
-    if (val1 == 0) {
-        fn_800DD38C((const char*)(r31+0xD8));
+    /* MOD: rightValue % leftValue, leftValue must be nonzero */
+    if (leftValue == 0) {
+        fn_800DD38C((const char*)(errBase+0xD8));
         result = 0;
     } else {
-        if ((r29 & 0x3F) == 2) {
-            if ((r28 & 0x3F) == 2) {
-                result = (u32)((s32)val2 % (s32)val1);
+        if ((rightDesc & 0x3F) == 2) {
+            if ((leftDesc & 0x3F) == 2) {
+                result = (u32)((s32)rightValue % (s32)leftValue);
             } else {
-                f32 f2 = (f32)(s32)val2; f32 f0 = *(f32*)&val1;
+                f32 f2 = (f32)(s32)rightValue; f32 f0 = *(f32*)&leftValue;
                 fn_800CE318();
                 result = *(u32*)&f0;
             }
         } else {
-            f32 f2 = (f32)(s32)val2; f32 f0 = *(f32*)&val1;
+            f32 f2 = (f32)(s32)rightValue; f32 f0 = *(f32*)&leftValue;
             fn_800CE318();
             result = *(u32*)&f0;
         }
     }
-    if (*(u32*)(p+0x28) > 0x40) { fn_800DD38C((const char*)r31); }
-    else { *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1; *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result; }
+    if (ctx->stackCount > 0x40) { fn_800DD38C((const char*)errBase); }
+    else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
 #endif
 
 /* 0x800F4C38 | 0x3F4 */
-extern u32 lbl_8047E710;
-extern u32 lbl_8047CCC0;
 #if 0
 asm void fn_800F4C38(void) {
 #include "src/game/gs_thread_fn_800F4C38.inc"
 }
 #else
-#pragma optimization_level 2
 s32 fn_800F4C38(void* obj) {
-    u8* p;
-    u8* r31;
-    u32 r28;
-    u32 r29;
-    u32 r30;
+    GSVMCtx* ctx;
+    u8* errBase;
+    u32 leftDesc;
+    u32 rightDesc;
+    u32 idx;
     u32 def;
-    u32 val1;
-    u32 val2;
+    u32 leftValue;
+    u32 rightValue;
     u32 result;
 
-    p = (u8*)obj;
-    r31 = (u8*)lbl_80271068;
+    ctx = (GSVMCtx*)obj;
+    errBase = (u8*)lbl_80271068;
     {
-        u8* sp = (u8*)*(u32*)(p+0x14);
-        r28 = (u32)*sp; sp++;
-        *(u32*)(p+0x14) = (u32)sp;
-        r29 = (u32)*sp; sp++;
-        *(u32*)(p+0x14) = (u32)sp;
+        u8* ip = ctx->ip;
+        leftDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
+        rightDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
     }
     def = lbl_8047E710;
-    if (r28 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r28 & 0xFFFF));
-        val1 = def;
+    if (leftDesc == 0) {
+        fn_800DD38C((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        leftValue = def;
     } else {
-        r30 = r28 & 0xFFFF;
-        if (r28 & 0x80) {
-            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val1 = *(u32*)(p+0x6C); }
-            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        idx = leftDesc & 0xFFFF;
+        if (leftDesc & 0x80) {
+            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
         } else {
-            u32 idx = r30 & 0x3F;
-            if (r30 & 0x20) {
-                if (r30 & 0x40) val1 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else val1 = *(u32*)(p+0x18) + idx*4;
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) leftValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else leftValue = (u32)&ctx->globals[fieldIdx];
             } else {
                 u32 rawptr;
-                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else rawptr = *(u32*)(p+0x18) + idx*4;
-                if (r30 & 0x100) val1 = rawptr;
-                else val1 = *(u32*)rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) leftValue = rawptr;
+                else leftValue = *(u32*)rawptr;
             }
         }
     }
     def = lbl_8047E710;
-    if (r29 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
-        val2 = def;
+    if (rightDesc == 0) {
+        fn_800DD38C((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        rightValue = def;
     } else {
-        r30 = r29 & 0xFFFF;
-        if (r29 & 0x80) {
-            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val2 = *(u32*)(p+0x6C); }
-            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val2 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        idx = rightDesc & 0xFFFF;
+        if (rightDesc & 0x80) {
+            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
         } else {
-            u32 idx = r30 & 0x3F;
-            if (r30 & 0x20) {
-                if (r30 & 0x40) val2 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else val2 = *(u32*)(p+0x18) + idx*4;
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) rightValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rightValue = (u32)&ctx->globals[fieldIdx];
             } else {
                 u32 rawptr;
-                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else rawptr = *(u32*)(p+0x18) + idx*4;
-                if (r30 & 0x100) val2 = rawptr;
-                else val2 = *(u32*)rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) rightValue = rawptr;
+                else rightValue = *(u32*)rawptr;
             }
         }
     }
-    /* DIV: op2 / op1, op1 must be nonzero */
-    if (val1 == 0) {
-        fn_800DD38C((const char*)(r31+0xD8));
+    /* DIV: rightValue / leftValue, leftValue must be nonzero */
+    if (leftValue == 0) {
+        fn_800DD38C((const char*)(errBase+0xD8));
         result = 0;
     } else {
-        if ((r29 & 0x3F) == 2) {
-            if ((r28 & 0x3F) == 2) {
-                result = (u32)((s32)val2 / (s32)val1);
+        if ((rightDesc & 0x3F) == 2) {
+            if ((leftDesc & 0x3F) == 2) {
+                u32 tmp = (u32)((s32)rightValue / (s32)leftValue);
+                result = tmp;
             } else {
-                f32 f1 = (f32)(s32)val2; f32 f0 = *(f32*)&val1;
+                f32 f1 = (f32)(s32)rightValue; f32 f0 = *(f32*)&leftValue;
                 f32 tmp = f1 / f0; result = *(u32*)&tmp;
             }
         } else {
-            if ((r28 & 0x3F) == 2) {
-                f32 f2 = *(f32*)&val2; f32 f0 = (f32)(s32)val1;
+            if ((leftDesc & 0x3F) == 2) {
+                f32 f2 = *(f32*)&rightValue; f32 f0 = (f32)(s32)leftValue;
                 f32 tmp = f2 / f0; result = *(u32*)&tmp;
             } else {
-                f32 f1 = *(f32*)&val2; f32 f0 = *(f32*)&val1;
+                f32 f1 = *(f32*)&rightValue; f32 f0 = *(f32*)&leftValue;
                 f32 tmp = f1 / f0; result = *(u32*)&tmp;
             }
         }
     }
-    if (*(u32*)(p+0x28) > 0x40) { fn_800DD38C((const char*)r31); }
-    else { *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1; *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result; }
+    if (ctx->stackCount > 0x40) { fn_800DD38C((const char*)errBase); }
+    else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
 #endif
 
 /* 0x800F502C | 0x3D8 */
-extern u32 lbl_8047E710;
-extern u32 lbl_8047CCC0;
 #if 0
 asm void fn_800F502C(void) {
 #include "src/game/gs_thread_fn_800F502C.inc"
 }
 #else
-#pragma optimization_level 2
 s32 fn_800F502C(void* obj) {
-    u8* p;
-    u8* r31;
-    u32 r28;
-    u32 r29;
-    u32 r30;
+    GSVMCtx* ctx;
+    u8* errBase;
+    u32 leftDesc;
+    u32 rightDesc;
+    u32 idx;
     u32 def;
-    u32 val1;
-    u32 val2;
+    u32 leftValue;
+    u32 rightValue;
     u32 result;
 
-    p = (u8*)obj;
-    r31 = (u8*)lbl_80271068;
+    ctx = (GSVMCtx*)obj;
+    errBase = (u8*)lbl_80271068;
     {
-        u8* sp = (u8*)*(u32*)(p+0x14);
-        r28 = (u32)*sp; sp++;
-        *(u32*)(p+0x14) = (u32)sp;
-        r29 = (u32)*sp; sp++;
-        *(u32*)(p+0x14) = (u32)sp;
+        u8* ip = ctx->ip;
+        leftDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
+        rightDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
     }
     def = lbl_8047E710;
-    if (r28 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r28 & 0xFFFF));
-        val1 = def;
+    if (leftDesc == 0) {
+        fn_800DD38C((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        leftValue = def;
     } else {
-        r30 = r28 & 0xFFFF;
-        if (r28 & 0x80) {
-            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val1 = *(u32*)(p+0x6C); }
-            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        idx = leftDesc & 0xFFFF;
+        if (leftDesc & 0x80) {
+            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
         } else {
-            u32 idx = r30 & 0x3F;
-            if (r30 & 0x20) {
-                if (r30 & 0x40) val1 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else val1 = *(u32*)(p+0x18) + idx*4;
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) leftValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else leftValue = (u32)&ctx->globals[fieldIdx];
             } else {
                 u32 rawptr;
-                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else rawptr = *(u32*)(p+0x18) + idx*4;
-                if (r30 & 0x100) val1 = rawptr;
-                else val1 = *(u32*)rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) leftValue = rawptr;
+                else leftValue = *(u32*)rawptr;
             }
         }
     }
     def = lbl_8047E710;
-    if (r29 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
-        val2 = def;
+    if (rightDesc == 0) {
+        fn_800DD38C((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        rightValue = def;
     } else {
-        r30 = r29 & 0xFFFF;
-        if (r29 & 0x80) {
-            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val2 = *(u32*)(p+0x6C); }
-            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val2 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        idx = rightDesc & 0xFFFF;
+        if (rightDesc & 0x80) {
+            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
         } else {
-            u32 idx = r30 & 0x3F;
-            if (r30 & 0x20) {
-                if (r30 & 0x40) val2 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else val2 = *(u32*)(p+0x18) + idx*4;
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) rightValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rightValue = (u32)&ctx->globals[fieldIdx];
             } else {
                 u32 rawptr;
-                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else rawptr = *(u32*)(p+0x18) + idx*4;
-                if (r30 & 0x100) val2 = rawptr;
-                else val2 = *(u32*)rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) rightValue = rawptr;
+                else rightValue = *(u32*)rawptr;
             }
         }
     }
-    /* MUL: op2 * op1 */
-    if ((r29 & 0x3F) == 2) {
-        if ((r28 & 0x3F) == 2) {
-            result = (u32)((s32)val2 * (s32)val1);
+    /* MUL: rightValue * leftValue */
+    if ((rightDesc & 0x3F) == 2) {
+        if ((leftDesc & 0x3F) == 2) {
+            u32 tmp = (u32)((s32)rightValue * (s32)leftValue);
+            result = tmp;
         } else {
-            f32 f1 = (f32)(s32)val2; f32 f0 = *(f32*)&val1;
+            f32 f1 = (f32)(s32)rightValue; f32 f0 = *(f32*)&leftValue;
             f32 tmp = f1 * f0; result = *(u32*)&tmp;
         }
     } else {
-        if ((r28 & 0x3F) == 2) {
-            f32 f2 = *(f32*)&val2; f32 f0 = (f32)(s32)val1;
+        if ((leftDesc & 0x3F) == 2) {
+            f32 f2 = *(f32*)&rightValue; f32 f0 = (f32)(s32)leftValue;
             f32 tmp = f2 * f0; result = *(u32*)&tmp;
         } else {
-            f32 f1 = *(f32*)&val2; f32 f0 = *(f32*)&val1;
+            f32 f1 = *(f32*)&rightValue; f32 f0 = *(f32*)&leftValue;
             f32 tmp = f1 * f0; result = *(u32*)&tmp;
         }
     }
-    if (*(u32*)(p+0x28) > 0x40) { fn_800DD38C((const char*)r31); }
-    else { *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1; *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result; }
+    if (ctx->stackCount > 0x40) { fn_800DD38C((const char*)errBase); }
+    else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
 #endif
@@ -6476,189 +6409,187 @@ s32 fn_800F5CA0(arg0)
 #endif
 
 /* 0x800F5EEC | 0x3D0 */
-extern u32 lbl_8047E710;
 #if 0
 asm void fn_800F5EEC(void) {
 #include "src/game/gs_thread_fn_800F5EEC.inc"
 }
 #else
-#pragma optimization_level 2
 s32 fn_800F5EEC(void* obj) {
-    u8* p;
-    u8* r31;
-    u32 r28;
-    u32 r29;
-    u32 r30;
+    GSVMCtx* ctx;
+    u8* errBase;
+    u32 leftDesc;
+    u32 rightDesc;
+    u32 idx;
     u32 def;
-    u32 val1;
-    u32 val2;
+    u32 leftValue;
+    u32 rightValue;
     u32 result;
 
-    p = (u8*)obj;
-    r31 = (u8*)lbl_80271068;
+    ctx = (GSVMCtx*)obj;
+    errBase = (u8*)lbl_80271068;
     {
-        u8* sp = (u8*)*(u32*)(p+0x14);
-        r28 = (u32)*sp; sp++;
-        *(u32*)(p+0x14) = (u32)sp;
-        r29 = (u32)*sp; sp++;
-        *(u32*)(p+0x14) = (u32)sp;
+        u8* ip = ctx->ip;
+        leftDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
+        rightDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
     }
     def = lbl_8047E710;
-    if (r28 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r28 & 0xFFFF));
-        val1 = def;
+    if (leftDesc == 0) {
+        fn_800DD38C((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        leftValue = def;
     } else {
-        r30 = r28 & 0xFFFF;
-        if (r28 & 0x80) {
-            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val1 = *(u32*)(p+0x6C); }
-            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        idx = leftDesc & 0xFFFF;
+        if (leftDesc & 0x80) {
+            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
         } else {
-            u32 idx = r30 & 0x3F;
-            if (r30 & 0x20) {
-                if (r30 & 0x40) val1 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else val1 = *(u32*)(p+0x18) + idx*4;
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) leftValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else leftValue = (u32)&ctx->globals[fieldIdx];
             } else {
                 u32 rawptr;
-                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else rawptr = *(u32*)(p+0x18) + idx*4;
-                if (r30 & 0x100) val1 = rawptr;
-                else val1 = *(u32*)rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) leftValue = rawptr;
+                else leftValue = *(u32*)rawptr;
             }
         }
     }
     def = lbl_8047E710;
-    if (r29 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
-        val2 = def;
+    if (rightDesc == 0) {
+        fn_800DD38C((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        rightValue = def;
     } else {
-        r30 = r29 & 0xFFFF;
-        if (r29 & 0x80) {
-            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val2 = *(u32*)(p+0x6C); }
-            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val2 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        idx = rightDesc & 0xFFFF;
+        if (rightDesc & 0x80) {
+            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
         } else {
-            u32 idx = r30 & 0x3F;
-            if (r30 & 0x20) {
-                if (r30 & 0x40) val2 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else val2 = *(u32*)(p+0x18) + idx*4;
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) rightValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rightValue = (u32)&ctx->globals[fieldIdx];
             } else {
                 u32 rawptr;
-                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else rawptr = *(u32*)(p+0x18) + idx*4;
-                if (r30 & 0x100) val2 = rawptr;
-                else val2 = *(u32*)rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) rightValue = rawptr;
+                else rightValue = *(u32*)rawptr;
             }
         }
     }
     /* OR */
-    if ((r29 & 0x3F) == 2) {
-        if ((r28 & 0x3F) == 2) {
-            result = val2 | val1;
+    if ((rightDesc & 0x3F) == 2) {
+        if ((leftDesc & 0x3F) == 2) {
+            u32 tmp = rightValue | leftValue;
+            result = tmp;
         } else {
-            result = val2 | (u32)(s32)*(f32*)&val1;
+            result = rightValue | (u32)(s32)*(f32*)&leftValue;
         }
     } else {
-        if ((r28 & 0x3F) == 2) {
-            result = (u32)(s32)*(f32*)&val2 | val1;
+        if ((leftDesc & 0x3F) == 2) {
+            result = (u32)(s32)*(f32*)&rightValue | leftValue;
         } else {
-            result = (u32)(s32)*(f32*)&val2 | (u32)(s32)*(f32*)&val1;
+            result = (u32)(s32)*(f32*)&rightValue | (u32)(s32)*(f32*)&leftValue;
         }
     }
-    if (*(u32*)(p+0x28) > 0x40) { fn_800DD38C((const char*)r31); }
-    else { *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1; *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result; }
+    if (ctx->stackCount > 0x40) { fn_800DD38C((const char*)errBase); }
+    else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
 #endif
 
 /* 0x800F62BC | 0x3D0 */
-extern u32 lbl_8047E710;
 #if 0
 asm void fn_800F62BC(void) {
 #include "src/game/gs_thread_fn_800F62BC.inc"
 }
 #else
-#pragma optimization_level 2
 s32 fn_800F62BC(void* obj) {
-    u8* p;
-    u8* r31;
-    u32 r28;
-    u32 r29;
-    u32 r30;
+    GSVMCtx* ctx;
+    u8* errBase;
+    u32 leftDesc;
+    u32 rightDesc;
+    u32 idx;
     u32 def;
-    u32 val1;
-    u32 val2;
+    u32 leftValue;
+    u32 rightValue;
     u32 result;
 
-    p = (u8*)obj;
-    r31 = (u8*)lbl_80271068;
+    ctx = (GSVMCtx*)obj;
+    errBase = (u8*)lbl_80271068;
     {
-        u8* sp = (u8*)*(u32*)(p+0x14);
-        r28 = (u32)*sp; sp++;
-        *(u32*)(p+0x14) = (u32)sp;
-        r29 = (u32)*sp; sp++;
-        *(u32*)(p+0x14) = (u32)sp;
+        u8* ip = ctx->ip;
+        leftDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
+        rightDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
     }
     def = lbl_8047E710;
-    if (r28 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r28 & 0xFFFF));
-        val1 = def;
+    if (leftDesc == 0) {
+        fn_800DD38C((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        leftValue = def;
     } else {
-        r30 = r28 & 0xFFFF;
-        if (r28 & 0x80) {
-            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val1 = *(u32*)(p+0x6C); }
-            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        idx = leftDesc & 0xFFFF;
+        if (leftDesc & 0x80) {
+            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
         } else {
-            u32 idx = r30 & 0x3F;
-            if (r30 & 0x20) {
-                if (r30 & 0x40) val1 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else val1 = *(u32*)(p+0x18) + idx*4;
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) leftValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else leftValue = (u32)&ctx->globals[fieldIdx];
             } else {
                 u32 rawptr;
-                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else rawptr = *(u32*)(p+0x18) + idx*4;
-                if (r30 & 0x100) val1 = rawptr;
-                else val1 = *(u32*)rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) leftValue = rawptr;
+                else leftValue = *(u32*)rawptr;
             }
         }
     }
     def = lbl_8047E710;
-    if (r29 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
-        val2 = def;
+    if (rightDesc == 0) {
+        fn_800DD38C((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        rightValue = def;
     } else {
-        r30 = r29 & 0xFFFF;
-        if (r29 & 0x80) {
-            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val2 = *(u32*)(p+0x6C); }
-            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val2 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        idx = rightDesc & 0xFFFF;
+        if (rightDesc & 0x80) {
+            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
         } else {
-            u32 idx = r30 & 0x3F;
-            if (r30 & 0x20) {
-                if (r30 & 0x40) val2 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else val2 = *(u32*)(p+0x18) + idx*4;
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) rightValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rightValue = (u32)&ctx->globals[fieldIdx];
             } else {
                 u32 rawptr;
-                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
-                else rawptr = *(u32*)(p+0x18) + idx*4;
-                if (r30 & 0x100) val2 = rawptr;
-                else val2 = *(u32*)rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) rightValue = rawptr;
+                else rightValue = *(u32*)rawptr;
             }
         }
     }
     /* AND */
-    if ((r29 & 0x3F) == 2) {
-        if ((r28 & 0x3F) == 2) {
-            result = val2 & val1;
+    if ((rightDesc & 0x3F) == 2) {
+        if ((leftDesc & 0x3F) == 2) {
+            u32 tmp = rightValue & leftValue;
+            result = tmp;
         } else {
-            result = val2 & (u32)(s32)*(f32*)&val1;
+            result = rightValue & (u32)(s32)*(f32*)&leftValue;
         }
     } else {
-        if ((r28 & 0x3F) == 2) {
-            result = (u32)(s32)*(f32*)&val2 & val1;
+        if ((leftDesc & 0x3F) == 2) {
+            result = (u32)(s32)*(f32*)&rightValue & leftValue;
         } else {
-            result = (u32)(s32)*(f32*)&val2 & (u32)(s32)*(f32*)&val1;
+            result = (u32)(s32)*(f32*)&rightValue & (u32)(s32)*(f32*)&leftValue;
         }
     }
-    if (*(u32*)(p+0x28) > 0x40) { fn_800DD38C((const char*)r31); }
-    else { *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1; *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result; }
+    if (ctx->stackCount > 0x40) { fn_800DD38C((const char*)errBase); }
+    else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
 #endif
@@ -6764,7 +6695,7 @@ s32 fn_800F67C8(void* obj) {
         val1 = *((u32*)(p + 0x6C) + count);
     }
 
-    /* Pop 2 (into val2) → store to obj->0x1C */
+    /* Pop 2 (into val2) -> store to obj->0x1C */
     count = *(s32*)(p + 0x28);
     if ((s32)count <= 0) {
         fn_800DD38C((const char*)lbl_8027107C);
@@ -6776,7 +6707,7 @@ s32 fn_800F67C8(void* obj) {
     }
     *(u32*)(p + 0x1C) = val2;
 
-    /* Pop 3 (return address) → store to obj->0x14 */
+    /* Pop 3 (return address) -> store to obj->0x14 */
     count = *(s32*)(p + 0x28);
     if ((s32)count <= 0) {
         fn_800DD38C((const char*)lbl_8027107C);
