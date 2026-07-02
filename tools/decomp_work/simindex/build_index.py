@@ -2,8 +2,12 @@
 """Build/refresh the asm-similarity index into build/simindex/index.pkl.
 
 Usage: python3 tools/decomp_work/simindex/build_index.py
+       python3 tools/decomp_work/simindex/build_index.py \
+           --ext-corpus ~/decomp-corpus/mariopartyrd-marioparty4.pairs.jsonl \
+           --ext-corpus ~/decomp-corpus/zcanann-SFA-Decomp.pairs.jsonl
 """
 
+import argparse
 import os
 import sys
 import time
@@ -58,7 +62,46 @@ def ingest(corpus, asm_root, report, functions):
     return len(best)
 
 
+def ingest_ext(path, functions):
+    """Ingest one external-corpus pairs.jsonl (or directory of them).
+    Each record already identifies a byte-exact-matched function from
+    another same-compiler-family GC decomp; every record becomes a
+    corpus='ext' function tagged with its own game/repo/src_path."""
+    n = 0
+    for rec in lib.iter_ext_pairs(path):
+        insns = [tuple(x) for x in rec["insns"]]
+        if not insns:
+            continue
+        labels = rec.get("labels") or {}
+        norm = lib.normalize(insns, labels)
+        functions.append({
+            "id": len(functions),
+            "corpus": "ext",
+            "name": rec["fn_name"],
+            "addr": rec.get("addr"),
+            "size": rec.get("size") or 4 * len(insns),
+            "n_insns": len(insns),
+            "asm_file": None,
+            "unit": rec.get("unit"),
+            "src_path": rec.get("src_path"),
+            "fuzzy": rec.get("fuzzy", 100.0),
+            "game": rec.get("game"),
+            "repo": rec.get("repo"),
+            "mwcc_version": rec.get("mwcc_version"),
+            "norm": norm,
+        })
+        n += 1
+    return n
+
+
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--ext-corpus", action="append", default=[],
+                     metavar="PATH",
+                     help="path to a *.pairs.jsonl file, or a directory "
+                          "containing them; repeatable")
+    args = ap.parse_args()
+
     t0 = time.time()
     report = lib.load_report()
     print("report.json: %d functions with match status" % len(report))
@@ -68,6 +111,12 @@ def main():
     print("colo: %d functions parsed (%.1fs)" % (n_colo, time.time() - t0))
     n_xd = ingest("xd", lib.XD_ASM_DIR, None, functions)
     print("xd:   %d functions parsed (%.1fs)" % (n_xd, time.time() - t0))
+
+    n_ext = 0
+    for ext_path in args.ext_corpus:
+        n_ext += ingest_ext(ext_path, functions)
+    if args.ext_corpus:
+        print("ext:  %d functions parsed (%.1fs)" % (n_ext, time.time() - t0))
 
     # minhash signatures
     sigs = np.empty((len(functions), lib.N_PERMS), dtype=np.uint64)
@@ -100,7 +149,7 @@ def main():
         "lsh": lsh,
         "by_name": by_name,
         "by_addr": by_addr,
-        "stats": {"colo": n_colo, "xd": n_xd, "colo_matched": matched,
+        "stats": {"colo": n_colo, "xd": n_xd, "ext": n_ext, "colo_matched": matched,
                   "colo_no_report_status": no_status},
     }
     lib.save_index(index)

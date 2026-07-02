@@ -4,6 +4,9 @@ asm-similarity retrieval index (v0, structural).
 Corpora:
   colo: build/GC6E01/asm/**/*.s      (dtk disassembly of the full DOL)
   xd:   tools/symbolmap/xd_ref/GXXE01/_xdsplit/asm/**/*.s
+  ext:  ~/decomp-corpus/<repo>.pairs.jsonl (matched fns from external
+        same-compiler-family GC decomps; each record carries its own
+        game/repo/unit/src_path/mwcc_version -- see load_ext_pairs()).
 
 Matched-status comes from build/GC6E01/report.json (fuzzy_match_percent).
 """
@@ -22,6 +25,7 @@ XD_ASM_DIR = os.path.join(REPO, "tools", "symbolmap", "xd_ref", "GXXE01", "_xdsp
 REPORT_JSON = os.path.join(REPO, "build", "GC6E01", "report.json")
 INDEX_DIR = os.path.join(REPO, "build", "simindex")
 INDEX_PATH = os.path.join(INDEX_DIR, "index.pkl")
+EXT_CORPUS_DIR = os.path.join(os.path.expanduser("~"), "decomp-corpus")
 
 # ---------------------------------------------------------------- parser ---
 
@@ -193,6 +197,34 @@ def iter_asm_files(root):
         for fname in sorted(files):
             if fname.endswith(".s"):
                 yield os.path.join(dirpath, fname)
+
+
+def iter_ext_pairs(path):
+    """Yield raw pair dicts from a *.pairs.jsonl file, or from every
+    *.pairs.jsonl file found (recursively) under a directory.
+
+    Each record is a matched external-corpus function:
+      {game, repo, unit, src_path, fn_name, mwcc_version, addr, size,
+       insns: [[mnemonic, operands_str], ...], labels: {label: insn_idx}}
+    (insns/labels mirror parse_dtk_asm()'s per-function shape, so the same
+    normalize() runs over ext and colo/xd functions.)
+    """
+    if os.path.isdir(path):
+        paths = []
+        for dirpath, _dirs, files in os.walk(path):
+            for fname in sorted(files):
+                if fname.endswith(".pairs.jsonl"):
+                    paths.append(os.path.join(dirpath, fname))
+        paths.sort()
+    else:
+        paths = [path]
+    for p in paths:
+        with open(p, "r", errors="replace") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                yield json.loads(line)
 
 
 def save_index(index, path=INDEX_PATH):

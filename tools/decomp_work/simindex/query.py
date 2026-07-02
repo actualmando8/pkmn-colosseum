@@ -3,10 +3,11 @@
 
 Usage:
   python3 tools/decomp_work/simindex/query.py <addr-or-name> [-k 5]
-         [--corpus colo|xd|all] [--matched-only]
+         [--corpus colo|xd|ext|all] [--matched-only]
 
---matched-only restricts results to Colosseum functions with
-fuzzy_match_percent == 100 (byte-exact C exists), i.e. usable exemplars.
+--matched-only restricts results to functions known to have byte-exact C:
+Colosseum functions with fuzzy_match_percent == 100, or any 'ext' corpus
+function (external-repo matched fns are byte-exact by construction).
 """
 
 import argparse
@@ -35,7 +36,9 @@ def top_similar(index, qid, k=5, corpus="all", matched_only=False,
         f = fns[fid]
         if corpus != "all" and f["corpus"] != corpus:
             continue
-        if matched_only and not (f["corpus"] == "colo" and (f["fuzzy"] or 0) >= 100.0):
+        if matched_only and not (
+                f["corpus"] == "ext"
+                or (f["corpus"] == "colo" and (f["fuzzy"] or 0) >= 100.0)):
             continue
         checked += 1
         if checked > n_candidates:
@@ -51,15 +54,20 @@ def top_similar(index, qid, k=5, corpus="all", matched_only=False,
 def fmt(f):
     fuzzy = "%.1f%%" % f["fuzzy"] if f["fuzzy"] is not None else "-"
     src = f["src_path"] or ""
-    return "%-4s 0x%08X %-50s sz=%-5d match=%-7s %s" % (
-        f["corpus"], f["addr"], f["name"], f["size"], fuzzy, src)
+    label = f["corpus"]
+    if f["corpus"] == "ext" and f.get("game"):
+        label = "ext:" + f["game"]
+        src = "%s [%s]" % (src, f["unit"] or "")
+    addr = f["addr"] if f["addr"] is not None else 0
+    return "%-14s 0x%08X %-50s sz=%-5d match=%-7s %s" % (
+        label, addr, f["name"], f["size"], fuzzy, src)
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("query", help="address (0x...) or function name")
     ap.add_argument("-k", type=int, default=5)
-    ap.add_argument("--corpus", choices=["colo", "xd", "all"], default="all")
+    ap.add_argument("--corpus", choices=["colo", "xd", "ext", "all"], default="all")
     ap.add_argument("--matched-only", action="store_true")
     ap.add_argument("--index", default=lib.INDEX_PATH)
     args = ap.parse_args()
