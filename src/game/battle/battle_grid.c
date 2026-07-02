@@ -26,6 +26,16 @@
  */
 
 #include "dolphin/types.h"
+#include "hsd/hsd_cobj.h"
+#include "hsd/hsd_debug.h"
+#include "hsd/hsd_dobj.h"
+#include "hsd/hsd_jobj.h"
+#include "hsd/hsd_lobj.h"
+#include "hsd/hsd_mobj.h"
+#include "hsd/hsd_object.h"
+#include "hsd/hsd_robj.h"
+#include "hsd/hsd_tobj.h"
+#include "hsd/hsd_wobj.h"
 
 #define BATTLE_POS_ENEMY_LEFT    2
 #define BATTLE_TOTAL_POKEMON     4
@@ -149,131 +159,272 @@ typedef struct BattleGridSceneWork {
 /* =========================================================================
  * NOTE: 0x801C01C8-0x801C0F20 (incl. the real, variadic HSD_ForeachAnim at
  * 0x801C028C) is HSD library code, split into hsd/hsd_aobj_range_801C01C8.c
- * (audit 2026-07-01). Fictional "pre-grid state machine" C removed.
+ * (audit 2026-07-01).
+ *
+ * fn_801C0F20/fn_801C1274/fn_801C1810/fn_801C1F00 are also HSD library
+ * code: the per-object-kind "ForeachAnim" family (doldecomp/melee
+ * src/sysdolphin/baselib/aobj.c) that HSD_ForeachAnim dispatches into by
+ * HSD_Type. MWCC fully inlined the shared "callbackForeachFunc" 12-way
+ * argument-marshaling switch (see HSD_FOREACH_INVOKE below) plus the
+ * leaf RObj/WObj/MObj/TObj/PObj walkers into each of these four, which is
+ * why each is a single large function with several duplicated jump
+ * tables rather than a tree of small calls. Confirmed against XD's
+ * matched JObjForeachAnim/DObjForeachAnim/LObjForeachAnim/
+ * CObjForeachAnim (near-identical sizes) and against every mask-bit and
+ * type-constant used below (each equals MASK_OF(x) / HSD_Type from
+ * include/hsd/hsd_object.h).
  * ========================================================================= */
 
+/* HSD_ForeachAnim's internal argument-shape tag. Colosseum's ordering
+ * differs from melee's AObj_Arg_Type (AOT moved next to AO instead of
+ * after AOU); order below is reverse-engineered from the jump tables. */
+typedef enum HSD_ForeachArgType {
+    HSD_FOREACH_A,
+    HSD_FOREACH_AF,
+    HSD_FOREACH_AV,
+    HSD_FOREACH_AU,
+    HSD_FOREACH_AO,
+    HSD_FOREACH_AOT,
+    HSD_FOREACH_AOF,
+    HSD_FOREACH_AOV,
+    HSD_FOREACH_AOU,
+    HSD_FOREACH_AOTF,
+    HSD_FOREACH_AOTV,
+    HSD_FOREACH_AOTU
+} HSD_ForeachArgType;
+
+typedef union HSD_ForeachArg {
+    f32 f;
+    u32 d;
+    void* v;
+} HSD_ForeachArg;
+
+/* Assert strings already matched in src/hsd/hsd_sdata2_8047DE90.c:
+ * lbl_8047DF40 = "aobj.c", lbl_8047DF48 = "obj" (HSD_ASSERT(0x2CB, obj)
+ * inside the original aobj.c, i.e. HSD_ASSERT's __FILE__ from that TU). */
+extern const u8 lbl_8047DF40[];
+extern const u8 lbl_8047DF48[];
+
+/* Colosseum's HSD_PObj carries a direct HSD_AObj* immediately after the
+ * payload union that include/hsd/hsd_pobj.h (melee-derived) models only
+ * up to; that trailing field is what DObjForeachAnim's PObj sub-loop
+ * walks (pobj+0x18, matching pobj->next chaining at pobj+0x4). Modeled
+ * locally (mirroring HSD_PObj's field layout by hand) rather than
+ * editing the shared header, and to avoid pulling in hsd_pobj.h's
+ * transitive HSD_AObj* prototypes which conflict with the generic
+ * void*-typed HSD_AObj functions already matched elsewhere in this file. */
+typedef struct BattleGridPObjAnim {
+    void* classInfo;                /* 0x00 */
+    struct BattleGridPObjAnim* next; /* 0x04 */
+    void* verts;                     /* 0x08 */
+    u16 flags;                       /* 0x0C */
+    u16 nDisplay;                    /* 0x0E */
+    void* display;                   /* 0x10 */
+    void* payload;                   /* 0x14 (jobj / shape_set / envelope_list) */
+    HSD_AObj* aobj;                  /* 0x18 */
+} BattleGridPObjAnim;
+
+/* Shared 12-way argument-shape dispatch, inlined at every call site
+ * (matches the repeated jumptable_XXXX blocks in each ForeachAnim). */
+#define HSD_FOREACH_INVOKE(aobj_, obj_, type_, func_, argType_, arg_) \
+    do { \
+        switch (argType_) { \
+        case HSD_FOREACH_A: \
+            ((void (*)(HSD_AObj*))(func_))(aobj_); \
+            break; \
+        case HSD_FOREACH_AF: \
+            ((void (*)(HSD_AObj*, f32))(func_))(aobj_, (arg_)->f); \
+            break; \
+        case HSD_FOREACH_AV: \
+            ((void (*)(HSD_AObj*, void*))(func_))(aobj_, (arg_)->v); \
+            break; \
+        case HSD_FOREACH_AU: \
+            ((void (*)(HSD_AObj*, u32))(func_))(aobj_, (arg_)->d); \
+            break; \
+        case HSD_FOREACH_AO: \
+            ((void (*)(HSD_AObj*, void*))(func_))(aobj_, (obj_)); \
+            break; \
+        case HSD_FOREACH_AOT: \
+            ((void (*)(HSD_AObj*, void*, s32))(func_))(aobj_, (obj_), (type_)); \
+            break; \
+        case HSD_FOREACH_AOF: \
+            ((void (*)(HSD_AObj*, void*, f32))(func_))(aobj_, (obj_), (arg_)->f); \
+            break; \
+        case HSD_FOREACH_AOV: \
+            ((void (*)(HSD_AObj*, void*, void*))(func_))(aobj_, (obj_), (arg_)->v); \
+            break; \
+        case HSD_FOREACH_AOU: \
+            ((void (*)(HSD_AObj*, void*, u32))(func_))(aobj_, (obj_), (arg_)->d); \
+            break; \
+        case HSD_FOREACH_AOTF: \
+            ((void (*)(HSD_AObj*, void*, s32, f32))(func_))(aobj_, (obj_), (type_), (arg_)->f); \
+            break; \
+        case HSD_FOREACH_AOTV: \
+            ((void (*)(HSD_AObj*, void*, s32, void*))(func_))(aobj_, (obj_), (type_), (arg_)->v); \
+            break; \
+        case HSD_FOREACH_AOTU: \
+            ((void (*)(HSD_AObj*, void*, s32, u32))(func_))(aobj_, (obj_), (type_), (arg_)->d); \
+            break; \
+        } \
+    } while (0)
+
+void fn_801C1274(HSD_DObj* dobj, HSD_TypeMask mask, void* func,
+                  HSD_ForeachArgType argType, HSD_ForeachArg* arg);
+
 /**
- * fn_801C0F20 - Pre-grid animation update.
+ * fn_801C0F20 - HSD_JObj ForeachAnim (JObjForeachAnim).
  * Address: 0x801C0F20 | Size: 0x354
  */
-void fn_801C0F20(void* ctx) {
-    BattleGridSceneWork* state = (BattleGridSceneWork*)ctx;
-    s32 i;
+void fn_801C0F20(HSD_JObj* obj, HSD_TypeMask mask, void* func,
+                  HSD_ForeachArgType argType, HSD_ForeachArg* arg) {
+    HSD_RObj* robj;
 
-    if (state == NULL) {
-        return;
+    (obj != NULL) ? (void)0
+                  : __assert((const char*)lbl_8047DF40, 0x2CB,
+                             (const char*)lbl_8047DF48);
+
+    if ((mask & JOBJ_MASK) && obj->aobj != NULL) {
+        HSD_FOREACH_INVOKE(obj->aobj, obj, JOBJ_TYPE, func, argType, arg);
     }
 
-    /* Update all active pre-grid slot animations */
-    for (i = 0; i < BATTLE_TOTAL_POKEMON; i++) {
-        BattleGridSceneSlot* slot = &state->slots[i];
-        s32 active = slot->active;
+    if (union_type_dobj(obj)) {
+        fn_801C1274(obj->u.dobj, mask, func, argType, arg);
+    }
 
-        if (active == 0) {
-            continue;
+    for (robj = obj->robj; robj != NULL; robj = robj->next) {
+        if ((mask & ROBJ_MASK) && robj->aobj != NULL) {
+            HSD_FOREACH_INVOKE(robj->aobj, robj, ROBJ_TYPE, func, argType, arg);
         }
+    }
 
-        /* Update model animation */
-        {
-            void* jobj = slot->jobj;
-            if (jobj != NULL) {
-                fn_80362D0C(jobj); /* HSD_JObjAnimAll */
-            }
-        }
-
-        /* Update position interpolation */
-        {
-            f32 blend = slot->blend;
-            if (blend < 1.0f) {
-                blend += 0.02f;
-                if (blend > 1.0f) {
-                    blend = 1.0f;
-                }
-                slot->blend = blend;
-            }
+    if (!(obj->flags & JOBJ_INSTANCE)) {
+        for (obj = obj->child; obj != NULL; obj = obj->next) {
+            fn_801C0F20(obj, mask, func, argType, arg);
         }
     }
 }
 
 /**
- * fn_801C1274 - Pre-grid model placement.
+ * fn_801C1274 - HSD_DObj ForeachAnim (DObjForeachAnim).
  * Address: 0x801C1274 | Size: 0x59C
  */
-void fn_801C1274(void* ctx, s32 slot) {
-    BattleGridSceneWork* state = (BattleGridSceneWork*)ctx;
-    BattleGridSceneSlot* slotData;
-
-    if (state == NULL || slot < 0 || slot >= BATTLE_TOTAL_POKEMON) {
-        return;
-    }
-
-    slotData = &state->slots[slot];
-
-    /* Load model for this slot based on battle data */
-    /* Determine if this is a player or enemy slot */
-    if (slot < BATTLE_POS_ENEMY_LEFT) {
-        /* Player side */
-        /* Load trainer model or Pokemon model based on battle phase */
-    } else {
-        /* Enemy side */
-        /* Load opponent trainer or Pokemon model */
-    }
-
-    /* Set initial position based on slot index */
-    {
-        f32 posX, posZ;
-        /* Default double-battle positions */
-        switch (slot) {
-        case 0: posX = -3.0f; posZ = -5.0f; break;
-        case 1: posX =  3.0f; posZ = -5.0f; break;
-        case 2: posX = -3.0f; posZ =  5.0f; break;
-        case 3: posX =  3.0f; posZ =  5.0f; break;
-        default: posX = 0.0f; posZ = 0.0f; break;
+void fn_801C1274(HSD_DObj* dobj, HSD_TypeMask mask, void* func,
+                  HSD_ForeachArgType argType, HSD_ForeachArg* arg) {
+    for (; dobj != NULL; dobj = dobj->next) {
+        if ((mask & DOBJ_MASK) && dobj->aobj != NULL) {
+            HSD_FOREACH_INVOKE(dobj->aobj, dobj, DOBJ_TYPE, func, argType, arg);
         }
-        slotData->posX = posX;
-        slotData->posY = 0.0f;
-        slotData->posZ = posZ;
-    }
 
-    /* Mark slot as active */
-    slotData->active = 1;
+        {
+            HSD_MObj* mobj = dobj->mobj;
+            if (mobj != NULL) {
+                HSD_TObj* tobj;
+
+                if ((mask & MOBJ_MASK) && mobj->aobj != NULL) {
+                    HSD_FOREACH_INVOKE(mobj->aobj, mobj, MOBJ_TYPE, func, argType, arg);
+                }
+
+                for (tobj = mobj->tobj; tobj != NULL; tobj = tobj->next) {
+                    if ((mask & TOBJ_MASK) && tobj->aobj != NULL) {
+                        HSD_FOREACH_INVOKE(tobj->aobj, tobj, TOBJ_TYPE, func, argType, arg);
+                    }
+                }
+            }
+        }
+
+        {
+            BattleGridPObjAnim* pobj;
+
+            for (pobj = (BattleGridPObjAnim*)dobj->pobj; pobj != NULL;
+                 pobj = pobj->next) {
+                if ((mask & POBJ_MASK) && pobj->aobj != NULL) {
+                    HSD_FOREACH_INVOKE(pobj->aobj, pobj, POBJ_TYPE, func, argType, arg);
+                }
+            }
+        }
+    }
 }
 
 /**
- * fn_801C1810 - Pre-grid encounter sequence part 1.
+ * fn_801C1810 - HSD_LObj ForeachAnim (LObjForeachAnim).
  * Address: 0x801C1810 | Size: 0x6F0
  */
-void fn_801C1810(void* ctx) {
-    u8* state = (u8*)ctx;
-    if (state == NULL) {
-        return;
+void fn_801C1810(HSD_LObj* lobj, HSD_TypeMask mask, void* func,
+                  HSD_ForeachArgType argType, HSD_ForeachArg* arg) {
+    HSD_WObj* wobj;
+    HSD_RObj* robj;
+
+    for (; lobj != NULL; lobj = lobj->next) {
+        if ((mask & LOBJ_MASK) && lobj->aobj != NULL) {
+            HSD_FOREACH_INVOKE(lobj->aobj, lobj, LOBJ_TYPE, func, argType, arg);
+        }
+
+        wobj = lobj->position;
+        if (wobj != NULL) {
+            if ((mask & WOBJ_MASK) && wobj->aobj != NULL) {
+                HSD_FOREACH_INVOKE(wobj->aobj, wobj, WOBJ_TYPE, func, argType, arg);
+            }
+            for (robj = wobj->robj; robj != NULL; robj = robj->next) {
+                if ((mask & ROBJ_MASK) && robj->aobj != NULL) {
+                    HSD_FOREACH_INVOKE(robj->aobj, robj, ROBJ_TYPE, func, argType, arg);
+                }
+            }
+        }
+
+        wobj = lobj->interest;
+        if (wobj != NULL) {
+            if ((mask & WOBJ_MASK) && wobj->aobj != NULL) {
+                HSD_FOREACH_INVOKE(wobj->aobj, wobj, WOBJ_TYPE, func, argType, arg);
+            }
+            for (robj = wobj->robj; robj != NULL; robj = robj->next) {
+                if ((mask & ROBJ_MASK) && robj->aobj != NULL) {
+                    HSD_FOREACH_INVOKE(robj->aobj, robj, ROBJ_TYPE, func, argType, arg);
+                }
+            }
+        }
     }
-    /* Pre-grid encounter sequence part 1:
-     * Handles the initial camera sweep and trainer entrance animation.
-     * Steps through sub-phases for each part of the entrance:
-     * 1. Camera zooms out to field view
-     * 2. Player trainer slides in from left
-     * 3. Enemy trainer slides in from right
-     * 4. Camera settles to battle position
-     */
 }
 
 /**
- * fn_801C1F00 - Pre-grid encounter sequence part 2.
+ * fn_801C1F00 - HSD_CObj ForeachAnim (CObjForeachAnim).
  * Address: 0x801C1F00 | Size: 0x6E4
  */
-void fn_801C1F00(void* ctx) {
-    u8* state = (u8*)ctx;
-    if (state == NULL) {
+void fn_801C1F00(HSD_CObj* cobj, HSD_TypeMask mask, void* func,
+                  HSD_ForeachArgType argType, HSD_ForeachArg* arg) {
+    HSD_WObj* wobj;
+    HSD_RObj* robj;
+
+    if (cobj == NULL) {
         return;
     }
-    /* Pre-grid encounter sequence part 2:
-     * Handles Pokemon entrance animations:
-     * 1. Pokeball throw animation
-     * 2. Pokemon materialize effect
-     * 3. Pokemon entrance cry
-     * 4. Camera adjusts to show all combatants
-     */
+
+    if ((mask & COBJ_MASK) && cobj->aobj != NULL) {
+        HSD_FOREACH_INVOKE(cobj->aobj, cobj, COBJ_TYPE, func, argType, arg);
+    }
+
+    wobj = cobj->eyepos;
+    if (wobj != NULL) {
+        if ((mask & WOBJ_MASK) && wobj->aobj != NULL) {
+            HSD_FOREACH_INVOKE(wobj->aobj, wobj, WOBJ_TYPE, func, argType, arg);
+        }
+        for (robj = wobj->robj; robj != NULL; robj = robj->next) {
+            if ((mask & ROBJ_MASK) && robj->aobj != NULL) {
+                HSD_FOREACH_INVOKE(robj->aobj, robj, ROBJ_TYPE, func, argType, arg);
+            }
+        }
+    }
+
+    wobj = cobj->interest;
+    if (wobj != NULL) {
+        if ((mask & WOBJ_MASK) && wobj->aobj != NULL) {
+            HSD_FOREACH_INVOKE(wobj->aobj, wobj, WOBJ_TYPE, func, argType, arg);
+        }
+        for (robj = wobj->robj; robj != NULL; robj = robj->next) {
+            if ((mask & ROBJ_MASK) && robj->aobj != NULL) {
+                HSD_FOREACH_INVOKE(robj->aobj, robj, ROBJ_TYPE, func, argType, arg);
+            }
+        }
+    }
 }
 
 /**
