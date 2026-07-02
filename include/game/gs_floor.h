@@ -22,7 +22,10 @@
  * bytes each, mapping resource type IDs to load/size callbacks.
  *
  * Address range: 0x800FF788 - 0x80110000 (GSfloor core, ~199 functions)
- *                0x8011432C - 0x80114CA8 (Floor resource read pre-functions)
+ *
+ * Note: the floorRead*PreFunc resource handler family (0x8011432C+) is a
+ * separate unit declared in game/world/gs_field.h and defined across
+ * gs_field_resource.c / gs_field_world.c; it is not part of this header.
  *
  * Debug strings:
  *   "GSfloorOpen: cannot find floor %d"
@@ -338,67 +341,5 @@ u32 GSfloorGetCurrentId(void);
  * Corresponds to lbl_8047ACC8 read (gsFloorCurrent).
  */
 GSFloorContext* GSfloorGetContext(void);
-
-/* ===================================================================
- * Floor resource read pre-functions (floorRead*PreFunc)
- * These are registered as resource handlers and called during floor
- * loading to process specific resource types from the FSYS archive.
- *
- * ATTRIBUTION NOTE (2026-07-01 scaffold-reconciliation pass on
- * gs_field_resource.c): the three prototypes below are declared with
- * `(void)` and are consumed exclusively by src/game/gs_floor_data.c,
- * which defines matching `(void)`-signature bodies for these same names
- * at 0x800FF0A0-0x800FF788 (per splits.txt) -- an unrelated, separately
- * unverified attribution pass, NOT the real 0x8011432C-0x80114AE0
- * floorRead*PreFunc family in gs_field_resource.c (which includes
- * "game/world/gs_field.h", not this header, and whose real signature is
- * `void* name(u32 resId, u32 loadMode, u32 dataSize)`, confirmed by
- * string-proven, address-verified decompilation).
- *
- * Changing these prototypes to the real signature was attempted and
- * confirmed (via a real compile) to break gs_floor_data.c with
- * "redeclared ... was declared as void*(ulong,ulong,ulong), now declared
- * as void()" errors for all three names, since that file's definitions
- * would then conflict with the corrected prototype. gs_floor_data.c is
- * out of scope for this pass, so the signatures below are left as-is;
- * fixing them properly requires reconciling gs_floor_data.c's own
- * (likely also-wrong) attribution in a follow-up pass.
- * =================================================================== */
-
-/**
- * floorReadGFLPreFunc -- Pre-process GFL (model) resource data.
- * Allocates memory for the model and queues it for loading.
- * String: "floorReadGFLPreFunc(): can't alloc %d bytes of memory"
- * NOTE: this declaration belongs to gs_floor_data.c's (void) stub, not to
- * the real, string-proven floorReadGFLPreFunc in gs_field_resource.c
- * (0x8011432C), whose signature is
- * `void* floorReadGFLPreFunc(u32 resId, u32 loadMode, u32 dataSize)`.
- */
-void floorReadGFLPreFunc(void);
-
-/**
- * floorReadSoundPreFunc -- Pre-process sound resource data.
- * Validates sound buffer sizes and registers sound resources.
- * String: "ERROR: Over Sound Buffer! snd_res_id=%d buffer size=%d"
- * NOTE: this declaration belongs to gs_floor_data.c's (void) stub
- * (comment there claims fn_8011487C, itself unproven). It does not
- * correspond to any function actually named floorReadSoundPreFunc in
- * gs_field_resource.c -- the two sound-family candidates there
- * (fn_801143A8, fn_801144D0) remain unproven and unmatched.
- */
-void floorReadSoundPreFunc(void);
-
-/**
- * floorReadParticlePreFunc -- Pre-process particle resource data.
- * Allocates particle buffers and queues particle data for loading.
- * String: "floorReadParticlePreFunc(): can't alloc %d bytes of memory"
- * NOTE: this declaration belongs to gs_floor_data.c's (void) stub
- * (comment there claims fn_80114AE0, which is actually the start of the
- * *next* unit, field_range_80114AE0.c, not this function). The real,
- * string-proven floorReadParticlePreFunc lives in gs_field_resource.c at
- * 0x8011445C with signature
- * `void* floorReadParticlePreFunc(u32 resId, u32 loadMode, u32 dataSize)`.
- */
-void floorReadParticlePreFunc(void);
 
 #endif /* GS_FLOOR_H */
