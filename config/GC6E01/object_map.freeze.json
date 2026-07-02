@@ -6,24 +6,24 @@
     "total_code": 2495108,
     "total_data": 2196256,
     "total_functions": 8603,
-    "total_units": 319
+    "total_units": 320
   },
   "topology_status": {
     "auto_units": 80,
-    "named_units": 239,
-    "source_backed_units": 219,
-    "auto_code": 1084448,
+    "named_units": 240,
+    "source_backed_units": 220,
+    "auto_code": 1015664,
     "auto_data": 2182883,
-    "auto_functions": 2738
+    "auto_functions": 2583
   },
   "baseline_progress": {
-    "matched_code": "253024",
-    "matched_code_percent": 10.140803,
+    "matched_code": "256708",
+    "matched_code_percent": 10.288452,
     "matched_data": "12364",
     "matched_data_percent": 0.56295806,
-    "matched_functions": 3332,
-    "matched_functions_percent": 38.730675,
-    "fuzzy_match_percent": 22.27867
+    "matched_functions": 3367,
+    "matched_functions_percent": 39.13751,
+    "fuzzy_match_percent": 22.571846
   },
   "unit_topology": [
     {
@@ -1873,43 +1873,30 @@
       "total_functions": 1
     },
     {
-      "name": "main/auto_01_800AA4D4_text",
+      "name": "main/dolphin/pad/PAD",
       "sections": [
         {
           "name": ".text",
-          "size": 4320,
+          "size": 7000,
           "virtual_address": 2148181204
         }
       ],
-      "total_code": 4320,
+      "total_code": 7000,
       "total_data": 0,
-      "total_functions": 11
+      "total_functions": 20
     },
     {
-      "name": "main/dolphin/pad/PAD_fn_800AB5B4",
+      "name": "main/auto_01_800AC02C_text",
       "sections": [
         {
           "name": ".text",
-          "size": 96,
-          "virtual_address": 2148185524
+          "size": 45508,
+          "virtual_address": 2148188204
         }
       ],
-      "total_code": 96,
+      "total_code": 45508,
       "total_data": 0,
-      "total_functions": 1
-    },
-    {
-      "name": "main/auto_01_800AB614_text",
-      "sections": [
-        {
-          "name": ".text",
-          "size": 48092,
-          "virtual_address": 2148185620
-        }
-      ],
-      "total_code": 48092,
-      "total_data": 0,
-      "total_functions": 154
+      "total_functions": 146
     },
     {
       "name": "main/dolphin/gx/GX_fn_800B71F0",
@@ -3515,13 +3502,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 72560,
+          "size": 6580,
           "virtual_address": 2149053124
         }
       ],
-      "total_code": 72560,
+      "total_code": 6580,
       "total_data": 0,
-      "total_functions": 166
+      "total_functions": 21
+    },
+    {
+      "name": "main/game/people/people",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 61880,
+          "virtual_address": 2149059704
+        }
+      ],
+      "total_code": 61880,
+      "total_data": 0,
+      "total_functions": 136
+    },
+    {
+      "name": "main/auto_01_8018FE30_text",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 4100,
+          "virtual_address": 2149121584
+        }
+      ],
+      "total_code": 4100,
+      "total_data": 0,
+      "total_functions": 9
     },
     {
       "name": "main/hsd/hsd_object",

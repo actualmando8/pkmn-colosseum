@@ -608,6 +608,9 @@ game/gs_scene.c:
 game/fsys/fsys_file.c:
 	.text       start:0x8017B07C end:0x8017F2C4
 
+game/people/people.c:
+	.text       start:0x80180C78 end:0x8018FE30
+
 hsd/hsd_object.c:
 	.text       start:0x80190E34 end:0x801914F4
 
