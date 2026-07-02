@@ -65,10 +65,10 @@ void fn_8018E1C4(PeopleEntry* entry, void* spawnData, u32 motionId, u32 param);
 void fn_8018FB60(PeopleEntry* entry, u8 animId);
 void fn_8018FB2C(PeopleEntry* entry, u8 animId);
 void fn_8018FC2C(PeopleEntry* entry);
-void fn_8018FC74(PeopleEntry* entry);
+void fn_8018FC74(PeopleEntry* entry, void* vec);
 void fn_8018FC98(PeopleEntry* entry, void* pos);
 void* fn_8018FCBC(PeopleEntry* entry);
-void fn_8018FC08(PeopleEntry* entry);
+void fn_8018FC08(PeopleEntry* entry, void* vec);
 void* peopleInfoBiosGetPtr(void* scriptObj);
 
 /* ===== External SDK / engine functions ===== */
@@ -191,7 +191,10 @@ PeopleEntry* peopleInit(u32 maxPeople)
  *
  * Return the maximum number of people slots.
  * Frequently called in loops as the upper bound.
- * ======================================================================= */
+ *
+ * Called via `bl` at every call site in the target binary (never inlined,
+ * despite being trivially small) -- pragma'd not-inline to match. */
+#pragma dont_inline on
 s32 peopleGetMaxCount(void)
 {
     return gPeopleMaxCount;
@@ -205,7 +208,9 @@ s32 peopleGetMaxCount(void)
  *
  * r3 = index
  * Returns: PeopleEntry* or NULL
- * ======================================================================= */
+ *
+ * Called via `bl` at every call site in the target binary (never inlined) --
+ * pragma'd not-inline to match. */
 PeopleEntry* peopleGetEntry(s32 index)
 {
     if (index < 0 || gPeopleMaxCount <= index) {
@@ -213,6 +218,7 @@ PeopleEntry* peopleGetEntry(s32 index)
     }
     return (PeopleEntry*)((u8*)gPeopleArray + index * PEOPLE_ENTRY_SIZE);
 }
+#pragma dont_inline reset
 
 /* =======================================================================
  * fn_8018FCE0 -- peopleAlloc
@@ -283,6 +289,10 @@ s32 peopleFree(PeopleEntry* entry)
  * r3 = PeopleEntry*
  * Returns: modelHandle (offset 0x08)
  * ======================================================================= */
+/* These small accessors are called via `bl` at every observed call site in
+ * the target binary (loop bodies throughout the people/*.c family never get
+ * them inlined) -- pragma'd not-inline site-wide to match. */
+#pragma dont_inline on
 void* peopleGetModel(PeopleEntry* entry)
 {
     return entry->modelHandle;
@@ -359,6 +369,7 @@ void* peopleGetTransform(PeopleEntry* entry)
 {
     return (u8*)entry + 0x9C;
 }
+#pragma dont_inline reset
 
 /* =======================================================================
  * fn_80181224 -- peopleFloorInit
@@ -490,12 +501,12 @@ void fn_8018A44C(void) {
 #endif
 
 /* 0x8018A700 | 0x3CC */
-extern void fn_800E008C(void);
+extern f32 fn_800E008C(void* param);
 extern void fn_800E013C(void);
 extern void fn_800E019C(void);
 extern u32 lbl_8047D800;
-extern u32 lbl_8047D7A0;
-extern u32 lbl_8047D79C;
+extern f32 lbl_8047D7A0;
+extern f32 lbl_8047D79C;
 #if 0
 asm void fn_8018A700(void) {
 #include "src/game/people/people_fn_8018A700.inc"
@@ -508,7 +519,7 @@ void fn_8018A700(void) {
 
 /* 0x8018AEC0 | 0x1BC */
 extern void _threadSwitch(void);
-extern u32 lbl_8047D79C;
+extern f32 lbl_8047D79C;
 extern u8 lbl_80274008[];
 extern u8 lbl_8036C510[];
 #if 0
@@ -530,30 +541,27 @@ asm void fn_8018B220(void) {
 #else
 void fn_8018B220(u32 groupId, u32 index) {
     PeopleEntry* found;
+    PeopleEntry* entry;
     s32 i;
     s32 j;
-    PeopleEntry* entry;
-
-    found = NULL;
 
     /* Loop 1: search by groupId + index */
     for (i = 0; i < peopleGetMaxCount(); i++) {
-        entry = (PeopleEntry*)peopleGetEntry(i);
-        if (*(u8*)entry == 0) continue;
-        if (*(u32*)((u8*)entry + 0x28) != groupId) continue;
-        if (*(u32*)((u8*)entry + 0x2C) != index) continue;
-        found = *(PeopleEntry**)((u8*)entry + 0x04);
+        entry = peopleGetEntry(i);
+        if (!entry->active) continue;
+        if (entry->groupId != groupId) continue;
+        if (entry->index != index) continue;
+        found = entry->selfPtr;
         goto loop3;
     }
 
     /* Loop 2: fallback search by index only */
     for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = (PeopleEntry*)peopleGetEntry(j);
-        found = entry;
-        if (*(u8*)entry == 0) continue;
-        if (*(u32*)((u8*)found + 0x2C) != index) continue;
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->index != index) continue;
         fn_800DD970((const char*)lbl_80273FD8, groupId, index);
-        found = *(PeopleEntry**)((u8*)found + 0x04);
+        found = entry->selfPtr;
         goto loop3;
     }
     found = NULL;
@@ -561,9 +569,9 @@ void fn_8018B220(u32 groupId, u32 index) {
 loop3:
     /* Loop 3: search by selfPtr */
     for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = (PeopleEntry*)peopleGetEntry(j);
-        if (*(u8*)entry == 0) continue;
-        if (*(u32*)((u8*)entry + 0x04) != (u32)found) continue;
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->selfPtr != found) continue;
         goto found_entry;
     }
     entry = NULL;
@@ -580,7 +588,7 @@ found_entry:
 
 /* 0x8018B368 | 0x1F0 */
 extern void fn_800EC990(void);
-extern u32 lbl_8047D7A0;
+extern f32 lbl_8047D7A0;
 extern u32 lbl_8047D7C8;
 extern u32 lbl_8047D7A4;
 #if 0
@@ -599,8 +607,8 @@ extern void GSmodelSetBlendFactor(void);
 extern void GSmodelGetFrameCount(void);
 extern void fn_800EC8C8(void);
 extern u32 lbl_8047D7D0;
-extern u32 lbl_8047D79C;
-extern u32 lbl_8047D7A0;
+extern f32 lbl_8047D79C;
+extern f32 lbl_8047D7A0;
 extern u32 lbl_8047D834;
 #if 0
 asm void fn_8018B558(void) {
@@ -613,28 +621,70 @@ void fn_8018B558(void) {
 #endif
 
 /* 0x8018BC88 | 0x16C */
-extern void fn_800EE150(void);
-extern void GSpartGetTransform(void);
-extern void fn_800EE828(void);
-#if 0
-asm void fn_8018BC88(void) {
-#include "src/game/people/people_fn_8018BC88.inc"
+extern void* fn_800EE150(void* modelHandle, s32 motionId);
+extern void GSpartGetTransform(void* part, void* mtxOut, u32 param3, u32 param4);
+extern void fn_800EE828(void* part);
+
+/* Find a people entry by (groupId, index) and either copy its world
+ * transform into *target (motionId < 0), or fetch the transform of a
+ * specific model part (motionId >= 0) via the GS "part" API. */
+void fn_8018BC88(u32 groupId, u32 index, s32 motionId, void* target) {
+    s32 i;
+    s32 j;
+    PeopleEntry* found;
+    PeopleEntry* entry;
+    void* part;
+
+    for (i = 0; i < peopleGetMaxCount(); i++) {
+        entry = peopleGetEntry(i);
+        if (!entry->active) continue;
+        if (entry->groupId != groupId) continue;
+        if (entry->index != index) continue;
+        found = entry->selfPtr;
+        goto loop3;
+    }
+
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->index != index) continue;
+        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        found = entry->selfPtr;
+        goto loop3;
+    }
+    found = NULL;
+
+loop3:
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->selfPtr != found) continue;
+        goto found_entry;
+    }
+    entry = NULL;
+
+found_entry:
+    if (entry == NULL) {
+        return;
+    }
+    if (motionId >= 0) {
+        part = fn_800EE150(entry->modelHandle, motionId);
+        GSpartGetTransform(part, target, 0, 0);
+        fn_800EE828(part);
+    } else {
+        fn_800E01D0(target, fn_8018FCBC(entry));
+    }
 }
-#else
-void fn_8018BC88(void) {
-    /* TODO: match -- 364 bytes at 0x8018BC88 */
-}
-#endif
 
 /* 0x8018D680 | 0x150 */
 extern void fn_800CE2D8(void);
-extern void fn_800CE318(void);
+extern f64 fn_800CE318(f64 angle);
 extern void fn_800E0718(void);
 extern void fn_800DFEEC(void);
 extern void fn_800E0040(void);
 extern u32 lbl_8047D7A4;
-extern u32 lbl_8047D7A0;
-extern u32 lbl_8047D7F0;
+extern f32 lbl_8047D7A0;
+extern f64 lbl_8047D7F0;
 extern u32 lbl_8047D7A8;
 extern u32 lbl_8047D820;
 extern u8 lbl_8031554C[];
@@ -690,7 +740,7 @@ extern u32 lbl_8047D890;
 extern const f32 lbl_8047D7EC;
 extern u32 lbl_8047D894;
 extern u32 lbl_8047D800;
-extern u32 lbl_8047D7A0;
+extern f32 lbl_8047D7A0;
 /* renamed symbols referenced by asm incs (symbolmap port) */
 extern void heroMoveSetEventList();
 extern void sin();   /* MSL trig (renamed) — referenced by asm incs */
@@ -710,8 +760,8 @@ void fn_8018E9B4(void) {
 
 /* 0x8018ECEC | 0x3A0 */
 extern void fn_800D3088(void);
-extern u32 lbl_8047D7A0;
-extern u32 lbl_8047D7F0;
+extern f32 lbl_8047D7A0;
+extern f64 lbl_8047D7F0;
 extern u32 lbl_8047D7A8;
 extern u32 lbl_8047D820;
 extern u32 lbl_8047D898;
@@ -731,7 +781,7 @@ void fn_8018ECEC(void) {
 /* WP-0010 stubs */
 
 /* 0x80181478 | 0x3D8 */
-extern u32 lbl_8047D7A0;
+extern f32 lbl_8047D7A0;
 extern u32 lbl_8047D7A4;
 #if 0
 asm void fn_80181478(void) {
@@ -759,7 +809,7 @@ void fn_80181EB0(void) { /* TODO: match -- 776 bytes at 0x80181EB0 */ }
 
 /* 0x801821B8 | 0xE60 */
 extern u32 lbl_8047D7D8;
-extern u32 lbl_8047D7A0;
+extern f32 lbl_8047D7A0;
 extern u32 lbl_8047D7A4;
 extern u32 lbl_8047D7D0;
 extern u32 lbl_8047D7E0;
@@ -797,8 +847,8 @@ void fn_80183958(void) {
 #endif
 
 /* 0x801839A0 | 0x1A4 */
-extern u32 lbl_8047D7A0;
-extern u32 lbl_8047D79C;
+extern f32 lbl_8047D7A0;
+extern f32 lbl_8047D79C;
 #if 0
 asm void fn_801839A0(void) {
 #include "src/game/people/people_fn_801839A0.inc"
@@ -808,10 +858,10 @@ void fn_801839A0(void) { /* TODO: match -- 420 bytes at 0x801839A0 */ }
 #endif
 
 /* 0x80183B44 | 0x19C */
-extern u32 lbl_8047D7A0;
+extern f32 lbl_8047D7A0;
 extern u32 lbl_8047D7E8;
 extern const f32 lbl_8047D7EC;
-extern u32 lbl_8047D79C;
+extern f32 lbl_8047D79C;
 #if 0
 asm void fn_80183B44(void) {
 #include "src/game/people/people_fn_80183B44.inc"
@@ -829,15 +879,58 @@ asm void fn_80183CE0(void) {
 void fn_80183CE0(void) { /* TODO: match -- 380 bytes at 0x80183CE0 */ }
 #endif
 
-/* 0x80183E5C | 0x168 */
-extern u32 lbl_8047D79C;
-#if 0
-asm void fn_80183E5C(void) {
-#include "src/game/people/people_fn_80183E5C.inc"
+/* 0x80183E5C | 0x168 -- find a people entry by (groupId, index) and kick off
+ * a special motion/interact state: resets a u16 field at +0x6A, sets
+ * moveSpeed to 1.0, and enters state 3 (flag set) or state 2 (flag clear). */
+BOOL fn_80183E5C(u32 groupId, u32 index, u8 flag) {
+    s32 i;
+    s32 j;
+    void* found;
+    PeopleEntry* entry;
+
+    for (i = 0; i < peopleGetMaxCount(); i++) {
+        entry = peopleGetEntry(i);
+        if (!entry->active) continue;
+        if (entry->groupId != groupId) continue;
+        if (entry->index != index) continue;
+        found = entry->selfPtr;
+        goto loop3;
+    }
+
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->index != index) continue;
+        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        found = entry->selfPtr;
+        goto loop3;
+    }
+    found = NULL;
+
+loop3:
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->selfPtr != found) continue;
+        goto found_entry;
+    }
+    entry = NULL;
+
+found_entry:
+    if (entry == NULL) {
+        return 0;
+    }
+    entry->subState = 0;
+    *(u16*)((u8*)entry + 0x6A) = 0;
+    entry->moveSpeed = lbl_8047D79C;
+    entry->subState = 1;
+    if (flag) {
+        entry->state = 3;
+    } else {
+        entry->state = 2;
+    }
+    return 1;
 }
-#else
-void fn_80183E5C(void) { /* TODO: match -- 360 bytes at 0x80183E5C */ }
-#endif
 
 /* 0x80183FC4 | 0x1CC */
 extern u8 lbl_8027404C[];
@@ -880,8 +973,8 @@ void fn_80184948(void) { /* TODO: match -- 328 bytes at 0x80184948 */ }
 #endif
 
 /* 0x80184A90 | 0x2F0 */
-extern u32 lbl_8047D7A0;
-extern u32 lbl_8047D7F0;
+extern f32 lbl_8047D7A0;
+extern f64 lbl_8047D7F0;
 extern u32 lbl_8047D7F8;
 extern u32 lbl_8047D7A8;
 extern u32 lbl_8047D7FC;
@@ -907,16 +1000,16 @@ extern void fn_800CE148(void);
 extern void fn_800CDBE0(void);
 extern void fn_800E0BA0(void);
 extern u8 lbl_80273FC0[];
-extern u32 lbl_8047D7A0;
+extern f32 lbl_8047D7A0;
 extern u32 lbl_8047D7C8;
 extern u32 lbl_8047D7D0;
-extern u32 lbl_8047D7C4;
+extern f32 lbl_8047D7C4;
 extern u32 lbl_8047D818;
-extern u32 lbl_8047D7F0;
+extern f64 lbl_8047D7F0;
 extern u32 lbl_8047D7A8;
 extern u32 lbl_8047D820;
 extern u32 lbl_8047D7C0;
-extern u32 lbl_8047D79C;
+extern f32 lbl_8047D79C;
 #if 0
 asm void fn_80184D80(void) {
 #include "src/game/people/people_fn_80184D80.inc"
@@ -926,14 +1019,14 @@ void fn_80184D80(void) { /* TODO: match -- 1228 bytes at 0x80184D80 */ }
 #endif
 
 /* 0x8018524C | 0x678 */
-extern u32 lbl_8047D7A0;
-extern u32 lbl_8047D7F0;
+extern f32 lbl_8047D7A0;
+extern f64 lbl_8047D7F0;
 extern u32 lbl_8047D7A8;
 extern u32 lbl_8047D820;
 extern u32 lbl_8047D7C0;
 extern u32 lbl_8047D7C8;
-extern u32 lbl_8047D79C;
-extern u32 lbl_8047D7C4;
+extern f32 lbl_8047D79C;
+extern f32 lbl_8047D7C4;
 #if 0
 asm void fn_8018524C(void) {
 #include "src/game/people/people_fn_8018524C.inc"
@@ -962,9 +1055,9 @@ void fn_80185AAC(void) { /* TODO: match -- 228 bytes at 0x80185AAC */ }
 #endif
 
 /* 0x80185B90 | 0x358 */
-extern u32 lbl_8047D7A0;
+extern f32 lbl_8047D7A0;
 extern u32 lbl_8047D7D0;
-extern u32 lbl_8047D79C;
+extern f32 lbl_8047D79C;
 extern u32 lbl_8047D830;
 extern u32 lbl_8047D834;
 extern u32 lbl_8047D7A4;
@@ -978,7 +1071,7 @@ void fn_80185B90(void) { /* TODO: match -- 856 bytes at 0x80185B90 */ }
 
 /* 0x80185F44 | 0x1B4 */
 extern u32 lbl_8047D814;
-extern u32 lbl_8047D7F0;
+extern f64 lbl_8047D7F0;
 #if 0
 asm void fn_80185F44(void) {
 #include "src/game/people/people_fn_80185F44.inc"
@@ -1008,7 +1101,7 @@ void fn_80186254(u32 a, u32 b) {
 extern void fn_8010F188(void);
 extern u32 lbl_8047D83C;
 extern u32 lbl_8047D800;
-extern u32 lbl_8047D7F0;
+extern f64 lbl_8047D7F0;
 extern u32 lbl_8047D7A8;
 extern u32 lbl_8047D820;
 extern u32 lbl_8047D814;
@@ -1044,8 +1137,8 @@ extern u32 lbl_8047D840;
 extern u8 lbl_80314638[];
 extern u32 lbl_8047D844;
 extern u32 lbl_8047D83C;
-extern u32 lbl_8047D7A0;
-extern u32 lbl_8047D79C;
+extern f32 lbl_8047D7A0;
+extern f32 lbl_8047D79C;
 extern u32 lbl_8047D848;
 #if 0
 asm void fn_80186620(void) {
@@ -1062,12 +1155,12 @@ extern void fn_80176684(void);
 extern u8 lbl_80273FB4[];
 extern u32 lbl_8047D7C8;
 extern u32 lbl_8047D84C;
-extern u32 lbl_8047D7A0;
+extern f32 lbl_8047D7A0;
 extern u32 lbl_8047D850;
 extern u32 lbl_8047D858;
 extern u32 lbl_8047D860;
 extern u8 lbl_80478AC0[];
-extern u32 lbl_8047D7C4;
+extern f32 lbl_8047D7C4;
 extern u32 lbl_8047D868;
 extern u32 lbl_8047D86C;
 extern u32 lbl_8047D7E8;
@@ -1075,7 +1168,7 @@ extern u32 lbl_8047D870;
 extern u32 lbl_8047D818;
 extern u32 lbl_8047D830;
 extern u32 lbl_8047D7A4;
-extern u32 lbl_8047D79C;
+extern f32 lbl_8047D79C;
 extern u32 lbl_8047D874;
 extern u32 lbl_8047D7D0;
 #if 0
@@ -1092,7 +1185,7 @@ extern void fn_8010FA54(void);
 extern void PSVECSquareDistance(void);
 extern void fn_8010F71C(void);
 extern u32 lbl_8047D844;
-extern u32 lbl_8047D7A0;
+extern f32 lbl_8047D7A0;
 #if 0
 asm void fn_801870E8(void) {
 #include "src/game/people/people_fn_801870E8.inc"
@@ -1122,14 +1215,62 @@ asm void fn_80187A60(void) {
 void fn_80187A60(void) { /* TODO: match -- 744 bytes at 0x80187A60 */ }
 #endif
 
-/* 0x80188984 | 0x170 */
-#if 0
-asm void fn_80188984(void) {
-#include "src/game/people/people_fn_80188984.inc"
+/* 0x80188984 | 0x170 -- find a people entry by (groupId, index) and busy-wait
+ * (optionally, if flag != 0) until its collision position converges onto its
+ * target position (field_0C/field_0x10 vs field_B4/field_B8, all really f32
+ * despite the placeholder u32 typing in the header). Returns 0 once
+ * converged or if the entry isn't found; returns 1 immediately if not
+ * converged and flag == 0 (caller opted out of waiting). */
+BOOL fn_80188984(u32 groupId, u32 index, u8 flag) {
+    s32 i;
+    s32 j;
+    void* found;
+    PeopleEntry* entry;
+
+    for (i = 0; i < peopleGetMaxCount(); i++) {
+        entry = peopleGetEntry(i);
+        if (!entry->active) continue;
+        if (entry->groupId != groupId) continue;
+        if (entry->index != index) continue;
+        found = entry->selfPtr;
+        goto loop3;
+    }
+
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->index != index) continue;
+        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        found = entry->selfPtr;
+        goto loop3;
+    }
+    found = NULL;
+
+loop3:
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->selfPtr != found) continue;
+        goto found_entry;
+    }
+    entry = NULL;
+
+found_entry:
+    if (entry == NULL) {
+        return 0;
+    }
+    for (;;) {
+        if (*(f32*)((u8*)entry + 0xC) == *(f32*)((u8*)entry + 0xB4) &&
+            *(f32*)((u8*)entry + 0x10) == *(f32*)((u8*)entry + 0xB8)) {
+            return 0;
+        }
+        if (flag) {
+            _threadSwitch();
+            continue;
+        }
+        return 1;
+    }
 }
-#else
-void fn_80188984(void) { /* TODO: match -- 368 bytes at 0x80188984 */ }
-#endif
 
 /* SDA data labels referenced by asm incs (symbolmap port), typed by load width */
 extern f32 lbl_8047D8A0;
@@ -1340,9 +1481,60 @@ void fn_801812C4(PeopleEntry* entry) {
 
 }
 
-/* fn_801812E8 = peopleFindAndInteract (see people.h) -- not recovered, gap in archive campaign */
+/* fn_801812E8 = peopleFindAndInteract (see people.h) -- find a people entry
+ * by (groupId, index) and toggle it in/out of the "interacting" state
+ * (saving/restoring the previous state around states 4-5). */
 s32 fn_801812E8(u32 groupId, u32 index, u8 doInteract) {
-    return 0;
+    s32 i;
+    s32 j;
+    void* found;
+    PeopleEntry* entry;
+
+    for (i = 0; i < peopleGetMaxCount(); i++) {
+        entry = peopleGetEntry(i);
+        if (!entry->active) continue;
+        if (entry->groupId != groupId) continue;
+        if (entry->index != index) continue;
+        found = entry->selfPtr;
+        goto loop3;
+    }
+
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->index != index) continue;
+        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        found = entry->selfPtr;
+        goto loop3;
+    }
+    found = NULL;
+
+loop3:
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->selfPtr != found) continue;
+        goto found_entry;
+    }
+    entry = NULL;
+
+found_entry:
+    if (entry == NULL) {
+        return 0;
+    }
+    if (doInteract) {
+        entry->prevState = entry->state;
+        if ((s32)entry->state < 6 && (s32)entry->state >= 4) {
+            entry->state = 0;
+        }
+    } else {
+        if ((s32)entry->prevState < 6 && (s32)entry->prevState >= 4) {
+            entry->state = entry->prevState;
+            entry->animBlendFactor = lbl_8047D79C;
+            entry->subState = 0;
+        }
+    }
+    return 1;
 }
 
 /* fn_80183018 -- not recovered, gap in archive campaign (size 0x338) */
@@ -1405,8 +1597,69 @@ void fn_80188214(void) {
 void fn_801885C4(void) {
 }
 
-/* fn_801887D8 -- not recovered, gap in archive campaign (size 0x1AC) */
-void fn_801887D8(void) {
+/* fn_801887D8 -- find a people entry by (groupId, index) and compute an
+ * animation blend ratio against entry->field_34/field_38 (float time range)
+ * for a caller-supplied time-source object (param3, fed to fn_800E008C). */
+f32 fn_801887D8(u32 groupId, u32 index, void* param3) {
+    s32 i;
+    s32 j;
+    void* found;
+    PeopleEntry* entry;
+    f32 result;
+    f32 t;
+    f32 startTime;
+    f32 endTime;
+
+    result = lbl_8047D7A0;
+
+    for (i = 0; i < peopleGetMaxCount(); i++) {
+        entry = peopleGetEntry(i);
+        if (!entry->active) continue;
+        if (entry->groupId != groupId) continue;
+        if (entry->index != index) continue;
+        found = entry->selfPtr;
+        goto loop3;
+    }
+
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->index != index) continue;
+        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        found = entry->selfPtr;
+        goto loop3;
+    }
+    found = NULL;
+
+loop3:
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->selfPtr != found) continue;
+        goto found_entry;
+    }
+    entry = NULL;
+
+found_entry:
+    if (entry == NULL) {
+        goto end;
+    }
+    t = fn_800E008C(param3);
+    endTime = *(f32*)&entry->field_38;
+    if (endTime <= t) {
+        result = lbl_8047D7C4;
+    } else {
+        startTime = *(f32*)&entry->field_34;
+        if (startTime <= t) {
+            if (endTime != lbl_8047D7A0) {
+                result = lbl_8047D79C + (t - startTime) / (endTime - startTime);
+            }
+        } else if (startTime != lbl_8047D7A0) {
+            result = t / startTime;
+        }
+    }
+end:
+    return result;
 }
 
 /* fn_80188AF4 = fn_80188AF4 (see people.h) -- not recovered, gap in archive campaign */
@@ -1428,8 +1681,55 @@ void fn_80188FA0(u32 groupId, u32 index, u32 pathId, u32 pathParam) {
 
 }
 
-/* fn_80189328 -- not recovered, gap in archive campaign (size 0x168) */
-void fn_80189328(void) {
+/* fn_80189328 -- find a people entry by (groupId, index); read its current
+ * PEOPLE_FLAG_TALKABLE state, set or clear that flag per 'enable', and
+ * return the *previous* state. Returns 0 if the entry isn't found. */
+BOOL fn_80189328(u32 groupId, u32 index, u8 enable) {
+    s32 i;
+    s32 j;
+    void* found;
+    PeopleEntry* entry;
+    BOOL wasTalkable;
+
+    for (i = 0; i < peopleGetMaxCount(); i++) {
+        entry = peopleGetEntry(i);
+        if (!entry->active) continue;
+        if (entry->groupId != groupId) continue;
+        if (entry->index != index) continue;
+        found = entry->selfPtr;
+        goto loop3;
+    }
+
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->index != index) continue;
+        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        found = entry->selfPtr;
+        goto loop3;
+    }
+    found = NULL;
+
+loop3:
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->selfPtr != found) continue;
+        goto found_entry;
+    }
+    entry = NULL;
+
+found_entry:
+    if (entry == NULL) {
+        return 0;
+    }
+    wasTalkable = peopleTestFlags(entry, PEOPLE_FLAG_TALKABLE);
+    if (enable) {
+        peopleSetFlags(entry, PEOPLE_FLAG_TALKABLE);
+    } else {
+        peopleClearFlags(entry, PEOPLE_FLAG_TALKABLE);
+    }
+    return wasTalkable;
 }
 
 /* fn_80189490 -- not recovered, gap in archive campaign (size 0x500) */
@@ -1440,7 +1740,16 @@ void fn_80189490(void) {
 void fn_80189990(void) {
 }
 
-/* peopleMoveCheck -- not recovered, gap in archive campaign (size 0x1CC) */
+/* peopleMoveCheck -- PARKED (family #10 sweep): this is a member of the
+ * (groupId, index) triple-search template family (same shape as
+ * fn_801812E8/fn_80183E5C/etc. in this file -- see those for the recovered
+ * template), but people.h:303 declares `void peopleMoveCheck(void)` while
+ * the real disassembly (0x8018A280, asm/game/people/people.s) takes 3
+ * args in r3-r5 (groupId, index, u8 waitFlag) after the search: spins on
+ * entry->state/entry->field_0x22/fn_800F7108(entry->flagId) via
+ * _threadSwitch() while waitFlag is set. Fixing this requires correcting
+ * the people.h prototype, which is outside this pass's file-ownership
+ * scope (people.c only) -- left as a stub pending a people.h edit. */
 void peopleMoveCheck(void) {
 }
 
@@ -1460,44 +1769,359 @@ void fn_8018B76C(void) {
 void fn_8018BA04(void) {
 }
 
-/* fn_8018BDF4 -- not recovered, gap in archive campaign (size 0x130) */
-void fn_8018BDF4(void) {
+/* fn_8018BDF4 -- find a people entry by (groupId, index) and set its
+ * position. No-op if pos is NULL (search is skipped entirely). */
+void fn_8018BDF4(u32 groupId, u32 index, void* pos) {
+    s32 i;
+    s32 j;
+    PeopleEntry* found;
+    PeopleEntry* entry;
+
+    if (pos == NULL) {
+        return;
+    }
+
+    for (i = 0; i < peopleGetMaxCount(); i++) {
+        entry = peopleGetEntry(i);
+        if (!entry->active) continue;
+        if (entry->groupId != groupId) continue;
+        if (entry->index != index) continue;
+        found = entry->selfPtr;
+        goto loop3;
+    }
+
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->index != index) continue;
+        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        found = entry->selfPtr;
+        goto loop3;
+    }
+    found = NULL;
+
+loop3:
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->selfPtr != found) continue;
+        goto found_entry;
+    }
+    entry = NULL;
+
+found_entry:
+    if (entry != NULL) {
+        fn_8018FC98(entry, pos);
+    }
 }
 
-/* fn_8018BF24 -- not recovered, gap in archive campaign (size 0x184) */
-void fn_8018BF24(void) {
+/* fn_8018BF24 -- find a people entry by (groupId, index), angle-wrap a
+ * caller-supplied Vec3 of angles in place, then feed it to fn_8018FC08 and
+ * stash the Y component into entry->field_40. */
+void fn_8018BF24(u32 groupId, u32 index, f32* vec) {
+    s32 i;
+    s32 j;
+    PeopleEntry* found;
+    PeopleEntry* entry;
+
+    for (i = 0; i < peopleGetMaxCount(); i++) {
+        entry = peopleGetEntry(i);
+        if (!entry->active) continue;
+        if (entry->groupId != groupId) continue;
+        if (entry->index != index) continue;
+        found = entry->selfPtr;
+        goto loop3;
+    }
+
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->index != index) continue;
+        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        found = entry->selfPtr;
+        goto loop3;
+    }
+    found = NULL;
+
+loop3:
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->selfPtr != found) continue;
+        goto found_entry;
+    }
+    entry = NULL;
+
+found_entry:
+    if (entry != NULL) {
+        vec[0] = (f32)fn_800CE318(lbl_8047D7F0 + vec[0]);
+        vec[1] = (f32)fn_800CE318(lbl_8047D7F0 + vec[1]);
+        vec[2] = (f32)fn_800CE318(lbl_8047D7F0 + vec[2]);
+        fn_8018FC08(entry, vec);
+        *(f32*)&entry->field_40 = vec[1];
+    }
 }
 
-/* fn_8018C0A8 -- not recovered, gap in archive campaign (size 0x140) */
-void fn_8018C0A8(void) {
+/* fn_8018C0A8 -- find a people entry by (groupId, index), fetch its scale
+ * into *vec, then copy vec into the entry's transform. */
+void fn_8018C0A8(u32 groupId, u32 index, void* vec) {
+    s32 i;
+    s32 j;
+    PeopleEntry* found;
+    PeopleEntry* entry;
+
+    for (i = 0; i < peopleGetMaxCount(); i++) {
+        entry = peopleGetEntry(i);
+        if (!entry->active) continue;
+        if (entry->groupId != groupId) continue;
+        if (entry->index != index) continue;
+        found = entry->selfPtr;
+        goto loop3;
+    }
+
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->index != index) continue;
+        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        found = entry->selfPtr;
+        goto loop3;
+    }
+    found = NULL;
+
+loop3:
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->selfPtr != found) continue;
+        goto found_entry;
+    }
+    entry = NULL;
+
+found_entry:
+    if (entry != NULL) {
+        fn_8018FC74(entry, vec);
+        peopleSetTransform(entry, vec);
+    }
 }
 
 /* fn_8018C1E8 -- not recovered, gap in archive campaign (size 0x23C) */
 void fn_8018C1E8(void) {
 }
 
-/* fn_8018C424 -- not recovered, gap in archive campaign (size 0x134) */
-void fn_8018C424(void) {
+/* fn_8018C424 -- find a people entry by (groupId, index) and test flags.
+ * Returns 0 if no matching entry is found. */
+BOOL fn_8018C424(u32 groupId, u32 index, u32 mask) {
+    s32 i;
+    s32 j;
+    PeopleEntry* found;
+    PeopleEntry* entry;
+
+    for (i = 0; i < peopleGetMaxCount(); i++) {
+        entry = peopleGetEntry(i);
+        if (!entry->active) continue;
+        if (entry->groupId != groupId) continue;
+        if (entry->index != index) continue;
+        found = entry->selfPtr;
+        goto loop3;
+    }
+
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->index != index) continue;
+        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        found = entry->selfPtr;
+        goto loop3;
+    }
+    found = NULL;
+
+loop3:
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->selfPtr != found) continue;
+        goto found_entry;
+    }
+    entry = NULL;
+
+found_entry:
+    if (entry == NULL) {
+        return 0;
+    }
+    return peopleTestFlags(entry, mask);
 }
 
 /* fn_8018C558 -- not recovered, gap in archive campaign (size 0x144) */
 void fn_8018C558(void) {
 }
 
-/* fn_8018C69C -- not recovered, gap in archive campaign (size 0x12C) */
-void fn_8018C69C(void) {
+/* fn_8018C69C -- find a people entry by (groupId, index) and clear flags. */
+void fn_8018C69C(u32 groupId, u32 index, u32 mask) {
+    s32 i;
+    s32 j;
+    PeopleEntry* found;
+    PeopleEntry* entry;
+
+    for (i = 0; i < peopleGetMaxCount(); i++) {
+        entry = peopleGetEntry(i);
+        if (!entry->active) continue;
+        if (entry->groupId != groupId) continue;
+        if (entry->index != index) continue;
+        found = entry->selfPtr;
+        goto loop3;
+    }
+
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->index != index) continue;
+        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        found = entry->selfPtr;
+        goto loop3;
+    }
+    found = NULL;
+
+loop3:
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->selfPtr != found) continue;
+        goto found_entry;
+    }
+    entry = NULL;
+
+found_entry:
+    if (entry != NULL) {
+        peopleClearFlags(entry, mask);
+    }
 }
 
-/* fn_8018C7C8 -- not recovered, gap in archive campaign (size 0x12C) */
-void fn_8018C7C8(void) {
+/* fn_8018C7C8 -- find a people entry by (groupId, index) and set flags. */
+void fn_8018C7C8(u32 groupId, u32 index, u32 mask) {
+    s32 i;
+    s32 j;
+    PeopleEntry* found;
+    PeopleEntry* entry;
+
+    for (i = 0; i < peopleGetMaxCount(); i++) {
+        entry = peopleGetEntry(i);
+        if (!entry->active) continue;
+        if (entry->groupId != groupId) continue;
+        if (entry->index != index) continue;
+        found = entry->selfPtr;
+        goto loop3;
+    }
+
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->index != index) continue;
+        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        found = entry->selfPtr;
+        goto loop3;
+    }
+    found = NULL;
+
+loop3:
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->selfPtr != found) continue;
+        goto found_entry;
+    }
+    entry = NULL;
+
+found_entry:
+    if (entry != NULL) {
+        peopleSetFlags(entry, mask);
+    }
 }
 
-/* fn_8018C8F4 -- not recovered, gap in archive campaign (size 0x12C) */
-void fn_8018C8F4(void) {
+/* fn_8018C8F4 -- find a people entry by (groupId, index) and overwrite flags. */
+void fn_8018C8F4(u32 groupId, u32 index, u32 flags) {
+    s32 i;
+    s32 j;
+    PeopleEntry* found;
+    PeopleEntry* entry;
+
+    for (i = 0; i < peopleGetMaxCount(); i++) {
+        entry = peopleGetEntry(i);
+        if (!entry->active) continue;
+        if (entry->groupId != groupId) continue;
+        if (entry->index != index) continue;
+        found = entry->selfPtr;
+        goto loop3;
+    }
+
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->index != index) continue;
+        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        found = entry->selfPtr;
+        goto loop3;
+    }
+    found = NULL;
+
+loop3:
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->selfPtr != found) continue;
+        goto found_entry;
+    }
+    entry = NULL;
+
+found_entry:
+    if (entry != NULL) {
+        peopleWriteFlags(entry, flags);
+    }
 }
 
-/* fn_8018CA20 -- not recovered, gap in archive campaign (size 0x13C) */
-void fn_8018CA20(void) {
+/* fn_8018CA20 -- find a people entry by (groupId, index) and set its shadow
+ * animation, forcing 0 unless the entry already has an animId set. */
+void fn_8018CA20(u32 groupId, u32 index, u8 animId) {
+    s32 i;
+    s32 j;
+    PeopleEntry* found;
+    PeopleEntry* entry;
+
+    for (i = 0; i < peopleGetMaxCount(); i++) {
+        entry = peopleGetEntry(i);
+        if (!entry->active) continue;
+        if (entry->groupId != groupId) continue;
+        if (entry->index != index) continue;
+        found = entry->selfPtr;
+        goto loop3;
+    }
+
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->index != index) continue;
+        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        found = entry->selfPtr;
+        goto loop3;
+    }
+    found = NULL;
+
+loop3:
+    for (j = 0; j < peopleGetMaxCount(); j++) {
+        entry = peopleGetEntry(j);
+        if (!entry->active) continue;
+        if (entry->selfPtr != found) continue;
+        goto found_entry;
+    }
+    entry = NULL;
+
+found_entry:
+    if (entry != NULL) {
+        if (entry->animId == 0) {
+            animId = 0;
+        }
+        fn_8018FB2C(entry, animId);
+    }
 }
 
 /* fn_8018CB5C -- not recovered, gap in archive campaign (size 0x1AC) */
@@ -1589,8 +2213,10 @@ void fn_8018FB60(PeopleEntry* entry, u8 animId) {
 
 }
 
-/* fn_8018FC08 = fn_8018FC08 (see people.h) -- not recovered, gap in archive campaign */
-void fn_8018FC08(PeopleEntry* entry) {
+/* fn_8018FC08 = fn_8018FC08 (see people.h) -- not recovered, gap in archive campaign
+ * (2-arg signature corrected from caller fn_8018BF24's disassembly: r3=entry,
+ * r4=vec -- the 1-arg forward decl was a placeholder). */
+void fn_8018FC08(PeopleEntry* entry, void* vec) {
 
 }
 
@@ -1599,8 +2225,9 @@ void fn_8018FC2C(PeopleEntry* entry) {
 
 }
 
-/* fn_8018FC74 = fn_8018FC74 (see people.h) -- not recovered, gap in archive campaign */
-void fn_8018FC74(PeopleEntry* entry) {
+/* fn_8018FC74 = fn_8018FC74 (see people.h) -- not recovered, gap in archive campaign
+ * (2-arg signature corrected from caller fn_8018C0A8's disassembly). */
+void fn_8018FC74(PeopleEntry* entry, void* vec) {
 
 }
 
