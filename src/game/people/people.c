@@ -1749,8 +1749,9 @@ void fn_80189990(void) {
  * entry->state/entry->field_0x22/fn_800F7108(entry->flagId) via
  * _threadSwitch() while waitFlag is set. Fixing this requires correcting
  * the people.h prototype, which is outside this pass's file-ownership
- * scope (people.c only) -- left as a stub pending a people.h edit. */
-void peopleMoveCheck(void) {
+ * scope (people.c only) -- header now fixed to the real 3-arg ABI;
+ * body still pending implementation. */
+void peopleMoveCheck(u32 groupId, u32 index, u8 waitFlag) {
 }
 
 /* fn_8018AACC -- not recovered, gap in archive campaign (size 0x3F4) */

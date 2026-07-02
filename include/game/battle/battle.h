@@ -296,10 +296,10 @@ typedef struct TypeMatchup {
 /* fn_801C0270 */ s32  fn_801C0270(void);
 /* fn_801C027C */ void fn_801C027C(void* obj, f32 frame);
 /* fn_801C028C */ void fn_801C028C(void* ctx);                   /* 0xC94 pre-grid state machine */
-/* fn_801C0F20 */ void fn_801C0F20(void* ctx);                   /* 0x354 pre-grid anim update */
-/* fn_801C1274 */ void fn_801C1274(void* ctx, s32 slot);         /* 0x59C pre-grid model placement */
-/* fn_801C1810 */ void fn_801C1810(void* ctx);                   /* 0x6F0 encounter seq part 1 */
-/* fn_801C1F00 */ void fn_801C1F00(void* ctx);                   /* 0x6E4 encounter seq part 2 */
+/* 0x801C0F20-0x801C25E4: the HSD sysdolphin ForeachAnim dispatch family
+ * (JObj/DObj/LObj/CObjForeachAnim), NOT battle-grid code. Real signatures
+ * use HSD_TypeMask/HSD_ForeachArgType/HSD_ForeachArg, currently local to
+ * battle_grid.c; declare there. Old "pre-grid" descriptions were fiction. */
 /* fn_801C25E4 */ void fn_801C25E4(void* ctx, s32 mode);
 /* fn_801C2670 */ void fn_801C2670(void* ctx, s32 objType, s32 param);
 /* fn_801C27F4 */ void fn_801C27F4(void* ctx, f32 posX, f32 posZ);

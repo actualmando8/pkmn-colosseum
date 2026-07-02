@@ -161,7 +161,7 @@ typedef struct BattleGridSceneWork {
  * 0x801C028C) is HSD library code, split into hsd/hsd_aobj_range_801C01C8.c
  * (audit 2026-07-01).
  *
- * fn_801C0F20/fn_801C1274/fn_801C1810/fn_801C1F00 are also HSD library
+ * JObjForeachAnim/DObjForeachAnim/LObjForeachAnim/CObjForeachAnim are also HSD library
  * code: the per-object-kind "ForeachAnim" family (doldecomp/melee
  * src/sysdolphin/baselib/aobj.c) that HSD_ForeachAnim dispatches into by
  * HSD_Type. MWCC fully inlined the shared "callbackForeachFunc" 12-way
@@ -268,14 +268,14 @@ typedef struct BattleGridPObjAnim {
         } \
     } while (0)
 
-void fn_801C1274(HSD_DObj* dobj, HSD_TypeMask mask, void* func,
+void DObjForeachAnim(HSD_DObj* dobj, HSD_TypeMask mask, void* func,
                   HSD_ForeachArgType argType, HSD_ForeachArg* arg);
 
 /**
- * fn_801C0F20 - HSD_JObj ForeachAnim (JObjForeachAnim).
+ * JObjForeachAnim - HSD_JObj ForeachAnim (JObjForeachAnim).
  * Address: 0x801C0F20 | Size: 0x354
  */
-void fn_801C0F20(HSD_JObj* obj, HSD_TypeMask mask, void* func,
+void JObjForeachAnim(HSD_JObj* obj, HSD_TypeMask mask, void* func,
                   HSD_ForeachArgType argType, HSD_ForeachArg* arg) {
     HSD_RObj* robj;
 
@@ -288,7 +288,7 @@ void fn_801C0F20(HSD_JObj* obj, HSD_TypeMask mask, void* func,
     }
 
     if (union_type_dobj(obj)) {
-        fn_801C1274(obj->u.dobj, mask, func, argType, arg);
+        DObjForeachAnim(obj->u.dobj, mask, func, argType, arg);
     }
 
     for (robj = obj->robj; robj != NULL; robj = robj->next) {
@@ -299,16 +299,16 @@ void fn_801C0F20(HSD_JObj* obj, HSD_TypeMask mask, void* func,
 
     if (!(obj->flags & JOBJ_INSTANCE)) {
         for (obj = obj->child; obj != NULL; obj = obj->next) {
-            fn_801C0F20(obj, mask, func, argType, arg);
+            JObjForeachAnim(obj, mask, func, argType, arg);
         }
     }
 }
 
 /**
- * fn_801C1274 - HSD_DObj ForeachAnim (DObjForeachAnim).
+ * DObjForeachAnim - HSD_DObj ForeachAnim (DObjForeachAnim).
  * Address: 0x801C1274 | Size: 0x59C
  */
-void fn_801C1274(HSD_DObj* dobj, HSD_TypeMask mask, void* func,
+void DObjForeachAnim(HSD_DObj* dobj, HSD_TypeMask mask, void* func,
                   HSD_ForeachArgType argType, HSD_ForeachArg* arg) {
     for (; dobj != NULL; dobj = dobj->next) {
         if ((mask & DOBJ_MASK) && dobj->aobj != NULL) {
@@ -346,10 +346,10 @@ void fn_801C1274(HSD_DObj* dobj, HSD_TypeMask mask, void* func,
 }
 
 /**
- * fn_801C1810 - HSD_LObj ForeachAnim (LObjForeachAnim).
+ * LObjForeachAnim - HSD_LObj ForeachAnim (LObjForeachAnim).
  * Address: 0x801C1810 | Size: 0x6F0
  */
-void fn_801C1810(HSD_LObj* lobj, HSD_TypeMask mask, void* func,
+void LObjForeachAnim(HSD_LObj* lobj, HSD_TypeMask mask, void* func,
                   HSD_ForeachArgType argType, HSD_ForeachArg* arg) {
     HSD_WObj* wobj;
     HSD_RObj* robj;
@@ -386,10 +386,10 @@ void fn_801C1810(HSD_LObj* lobj, HSD_TypeMask mask, void* func,
 }
 
 /**
- * fn_801C1F00 - HSD_CObj ForeachAnim (CObjForeachAnim).
+ * CObjForeachAnim - HSD_CObj ForeachAnim (CObjForeachAnim).
  * Address: 0x801C1F00 | Size: 0x6E4
  */
-void fn_801C1F00(HSD_CObj* cobj, HSD_TypeMask mask, void* func,
+void CObjForeachAnim(HSD_CObj* cobj, HSD_TypeMask mask, void* func,
                   HSD_ForeachArgType argType, HSD_ForeachArg* arg) {
     HSD_WObj* wobj;
     HSD_RObj* robj;

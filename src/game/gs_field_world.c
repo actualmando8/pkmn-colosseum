@@ -1890,7 +1890,7 @@ extern void fn_800EE150(void);
 extern void GSpartGetTransform(void);
 extern void fn_800EE828();
 extern void fn_8018AACC(void);
-extern void peopleMoveCheck(void);
+extern void peopleMoveCheck(u32 groupId, u32 index, u8 waitFlag);
 extern void fn_8018805C(void);
 extern void fn_80184470(void);
 extern void fn_8018C0A8(void);
@@ -8796,6 +8796,7 @@ s32 fn_8012F150(s32 idx) {
         if (*(u16*)(lbl_80426BD0 + (u32)i * 0x20 + 4) & 1) {
             if ((s32)*(u32*)lbl_80426BD0 != i) {
                 *(f32*)(lbl_80426BD0 + (u32)i * 0x20 + 8) = f2;
+                f2 = lbl_8047D0D4;
                 f2 = f2 + f2;
             }
         }
