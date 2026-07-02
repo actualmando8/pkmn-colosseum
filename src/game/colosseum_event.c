@@ -94,6 +94,29 @@
 #include "game/trainer.h"
 #include "game/pokemon.h"
 
+typedef struct ColosseumEventRow6 {
+    u8 mode;
+    u8 field_01;
+    u16 eventIndex;
+    u16 nextIndex;
+} ColosseumEventRow6;
+
+typedef struct ColosseumEventSubRow {
+    u8 valueMode;
+    u8 scaleMode;
+    s16 scaleNumerator;
+    s16 scaleDenominator;
+    u16 minValue;
+    u16 maxValue;
+} ColosseumEventSubRow;
+
+typedef struct ColosseumEventPairRow {
+    u8 resultFuncId;
+    u8 field_01;
+    u16 firstLinkIndex;
+    ColosseumEventSubRow slots[2];
+} ColosseumEventPairRow;
+
 /* =========================================================================
  * External declarations
  * ========================================================================= */
@@ -111,7 +134,9 @@ extern void  fn_8011BEB4(void);
 
 /* SDA table pointers for event data arrays */
 extern u32 lbl_80478D38;   /* Event table count */
-extern u8  lbl_80478D30[];   /* Event table base (6 bytes per entry) */
+extern ColosseumEventRow6 lbl_80478D30[]; /* Event table base (6 bytes per entry) */
+extern u32 lbl_80478D28; /* Pair-row table count */
+extern ColosseumEventPairRow lbl_80375A08[]; /* 0x18-byte pair rows */
 
 /* Forward declarations for converted functions */
 
@@ -6014,217 +6039,201 @@ void fn_8020A478(void* r3)
 #pragma pop
 /* 0x8020A500 | size: 0x40 */
 u32 fn_8020A500(u16 idx) {
-    u8* entry;
+    ColosseumEventRow6* entry;
     idx = idx;
     if (idx >= lbl_80478D38) {
         entry = NULL;
     } else {
-        entry = lbl_80478D30 + idx * 6;
+        entry = &lbl_80478D30[idx];
     }
     if (entry == NULL) { return 0; }
-    return *(u16*)(entry + 4);
+    return entry->nextIndex;
 }
 
 /* 0x8020A540 | size: 0x40 */
 u32 fn_8020A540(u16 idx) {
-    u8* entry;
+    ColosseumEventRow6* entry;
     idx = idx;
     if (idx >= lbl_80478D38) {
         entry = NULL;
     } else {
-        entry = lbl_80478D30 + idx * 6;
+        entry = &lbl_80478D30[idx];
     }
     if (entry == NULL) { return 0; }
-    return *(u16*)(entry + 2);
+    return entry->eventIndex;
 }
 
 /* 0x8020A580 | size: 0x40 */
 u32 fn_8020A580(u16 idx) {
-    u8* entry;
+    ColosseumEventRow6* entry;
     idx = idx;
     if (idx >= lbl_80478D38) {
         entry = NULL;
     } else {
-        entry = lbl_80478D30 + idx * 6;
+        entry = &lbl_80478D30[idx];
     }
     if (entry == NULL) { return 0; }
-    return entry[0];
+    return entry->mode;
 }
 
 /* 0x8020A5C0 | size: 0x70 */
 s16 fn_8020A5C0(u16 index, u16 slot) {
-    extern u8 lbl_80375A08[];
-    extern u32 lbl_80478D28;
-    u8* entry;
-    u8* sub;
+    ColosseumEventPairRow* entry;
+    ColosseumEventSubRow* sub;
     if (index >= lbl_80478D28) {
         entry = NULL;
     } else {
-        entry = &lbl_80375A08[index * 0x18];
+        entry = &lbl_80375A08[index];
     }
     if (entry == NULL) {
         sub = NULL;
     } else if (slot >= 2) {
         sub = NULL;
     } else {
-        sub = entry + (slot * 0xA) + 0x4;
+        sub = &entry->slots[slot];
     }
     if (sub == NULL) {
         return 0;
     }
-    return *(s16*)(sub + 0x4);
+    return sub->scaleDenominator;
 }
 
 /* 0x8020A630 | size: 0x70 */
 s16 fn_8020A630(u16 index, u16 slot) {
-    extern u8 lbl_80375A08[];
-    extern u32 lbl_80478D28;
-    u8* entry;
-    u8* sub;
+    ColosseumEventPairRow* entry;
+    ColosseumEventSubRow* sub;
     if (index >= lbl_80478D28) {
         entry = NULL;
     } else {
-        entry = &lbl_80375A08[index * 0x18];
+        entry = &lbl_80375A08[index];
     }
     if (entry == NULL) {
         sub = NULL;
     } else if (slot >= 2) {
         sub = NULL;
     } else {
-        sub = entry + (slot * 0xA) + 0x4;
+        sub = &entry->slots[slot];
     }
     if (sub == NULL) {
         return 0;
     }
-    return *(s16*)(sub + 0x2);
+    return sub->scaleNumerator;
 }
 
 /* 0x8020A6A0 | size: 0x70 */
 u8 fn_8020A6A0(u16 index, u16 slot) {
-    extern u8 lbl_80375A08[];
-    extern u32 lbl_80478D28;
-    u8* entry;
-    u8* sub;
+    ColosseumEventPairRow* entry;
+    ColosseumEventSubRow* sub;
     if (index >= lbl_80478D28) {
         entry = NULL;
     } else {
-        entry = &lbl_80375A08[index * 0x18];
+        entry = &lbl_80375A08[index];
     }
     if (entry == NULL) {
         sub = NULL;
     } else if (slot >= 2) {
         sub = NULL;
     } else {
-        sub = entry + (slot * 0xA) + 0x4;
+        sub = &entry->slots[slot];
     }
     if (sub == NULL) {
         return 0;
     }
-    return sub[1];
+    return sub->scaleMode;
 }
 
 /* 0x8020A710 | size: 0x70 */
 u16 fn_8020A710(u16 index, u16 slot) {
-    extern u8 lbl_80375A08[];
-    extern u32 lbl_80478D28;
-    u8* entry;
-    u8* sub;
+    ColosseumEventPairRow* entry;
+    ColosseumEventSubRow* sub;
     if (index >= lbl_80478D28) {
         entry = NULL;
     } else {
-        entry = &lbl_80375A08[index * 0x18];
+        entry = &lbl_80375A08[index];
     }
     if (entry == NULL) {
         sub = NULL;
     } else if (slot >= 2) {
         sub = NULL;
     } else {
-        sub = entry + (slot * 0xA) + 0x4;
+        sub = &entry->slots[slot];
     }
     if (sub == NULL) {
         return 0;
     }
-    return *(u16*)(sub + 0x8);
+    return sub->maxValue;
 }
 
 /* 0x8020A780 | size: 0x70 */
 u16 fn_8020A780(u16 index, u16 slot) {
-    extern u8 lbl_80375A08[];
-    extern u32 lbl_80478D28;
-    u8* entry;
-    u8* sub;
+    ColosseumEventPairRow* entry;
+    ColosseumEventSubRow* sub;
     if (index >= lbl_80478D28) {
         entry = NULL;
     } else {
-        entry = &lbl_80375A08[index * 0x18];
+        entry = &lbl_80375A08[index];
     }
     if (entry == NULL) {
         sub = NULL;
     } else if (slot >= 2) {
         sub = NULL;
     } else {
-        sub = entry + (slot * 0xA) + 0x4;
+        sub = &entry->slots[slot];
     }
     if (sub == NULL) {
         return 0;
     }
-    return *(u16*)(sub + 0x6);
+    return sub->minValue;
 }
 
 /* 0x8020A7F0 | size: 0x70 */
 u8 fn_8020A7F0(u16 index, u16 slot) {
-    extern u8 lbl_80375A08[];
-    extern u32 lbl_80478D28;
-    u8* entry;
-    u8* sub;
+    ColosseumEventPairRow* entry;
+    ColosseumEventSubRow* sub;
     if (index >= lbl_80478D28) {
         entry = NULL;
     } else {
-        entry = &lbl_80375A08[index * 0x18];
+        entry = &lbl_80375A08[index];
     }
     if (entry == NULL) {
         sub = NULL;
     } else if (slot >= 2) {
         sub = NULL;
     } else {
-        sub = entry + (slot * 0xA) + 0x4;
+        sub = &entry->slots[slot];
     }
     if (sub == NULL) {
         return 0;
     }
-    return sub[0];
+    return sub->valueMode;
 }
 
 /* fn_8020A860 | Size: 0x40 | Look up u16 field at offset 2 in 0x18-byte table */
 u16 fn_8020A860(u16 index) {
-    extern u8 lbl_80375A08[];
-    extern u32 lbl_80478D28;
-    u8* entry;
+    ColosseumEventPairRow* entry;
     if (index >= lbl_80478D28) {
         entry = NULL;
     } else {
-        entry = &lbl_80375A08[index * 0x18];
+        entry = &lbl_80375A08[index];
     }
     if (entry == NULL) {
         return 0;
     }
-    return *(u16*)(entry + 0x2);
+    return entry->firstLinkIndex;
 }
 
 /* fn_8020A8A0 | Size: 0x40 | Look up u8 field at offset 0 in 0x18-byte table */
 u8 fn_8020A8A0(u16 index) {
-    extern u8 lbl_80375A08[];
-    extern u32 lbl_80478D28;
-    u8* entry;
+    ColosseumEventPairRow* entry;
     if (index >= lbl_80478D28) {
         entry = NULL;
     } else {
-        entry = &lbl_80375A08[index * 0x18];
+        entry = &lbl_80375A08[index];
     }
     if (entry == NULL) {
         return 0;
     }
-    return entry[0];
+    return entry->resultFuncId;
 }
 
 /* Address: 0x8020A8E0 | Size: 0x424 | Ghidra import */

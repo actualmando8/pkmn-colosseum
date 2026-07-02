@@ -1,4 +1,5 @@
 #include "dolphin/types.h"
+#include "hsd/hsd_pobj.h"
 
 /* =========================================================================
  * Partial banked source for reserved split unit 0x801AA608 - 0x801AE000.
@@ -79,13 +80,13 @@ void fn_801ACD7C(void)
 /* Address: 0x801AD214 | Size: 0x74  -- Walk pobj list, vtable[0x30] + [0x34] */
 #pragma push
 #pragma peephole off
-void HSD_PObjRemoveAll(void* pobj)
+void HSD_PObjRemoveAll(HSD_PObj* pobj)
 {
-    void* next;
-    void* cur = pobj;
+    HSD_PObj* next;
+    HSD_PObj* cur = pobj;
 
     while (cur != NULL) {
-        next = *(void**)((u8*)cur + 0x4);
+        next = cur->next;
         if (cur != NULL) {
             void** vtbl = *(void***)cur;
             ((void(*)(void*))vtbl[0x30 / 4])(cur);
@@ -98,9 +99,9 @@ void HSD_PObjRemoveAll(void* pobj)
 #pragma pop
 
 /* Address: 0x801AD61C | Size: 0x5C  -- Walk pobj list, call reqAnim */
-void HSD_PObjAnimAll(void* pobj)
+void HSD_PObjAnimAll(HSD_PObj* pobj)
 {
-    void* cur;
+    HSD_PObj* cur;
 
     if (pobj == NULL) {
         return;
@@ -112,41 +113,35 @@ void HSD_PObjAnimAll(void* pobj)
             void** vtbl = *(void***)cur;
             fn_801C27F4(*(void**)((u8*)cur + 0x18), cur, vtbl[0x48 / 4]);
         }
-        cur = *(void**)((u8*)cur + 0x4);
+        cur = cur->next;
     }
 }
 
 /* Address: 0x801AD678 | Size: 0x4C  -- Set shape blend weight */
-void PObjUpdateFunc(void* pobj, s32 idx, f32* weight_ptr)
+void PObjUpdateFunc(HSD_PObj* pobj, s32 idx, f32* weight_ptr)
 {
-    void* p = pobj;
+    HSD_PObj* p = pobj;
+    HSD_ShapeSet* shapeset;
 
     if (p == NULL) return;
 
-    {
-        u16 flags = *(u16*)((u8*)p + 0xc);
-        if ((flags & 0x3000) != 0x1000) return;
-    }
+    if ((p->flags & 0x3000) != 0x1000) return;
 
-    {
-        void* shapeset = *(void**)((u8*)p + 0x14);
-        u16 ssflags = *(u16*)shapeset;
+    shapeset = p->u.shape_set;
 
-        if (ssflags & 0x2) {
-            f32* arr = *(f32**)((u8*)shapeset + 0x1c);
-            arr[idx - 2] = *weight_ptr;
-        } else {
-            *(f32*)((u8*)shapeset + 0x1c) = *weight_ptr;
-        }
+    if (shapeset->flags & 0x2) {
+        shapeset->blend.bp[idx - 2] = *weight_ptr;
+    } else {
+        shapeset->blend.bl = *weight_ptr;
     }
 }
 
 /* Address: 0x801AD6C4 | Size: 0x74  -- Request PObj animation by flags */
 #pragma push
 #pragma optimization_level 1
-void HSD_PObjReqAnimAllByFlags(f32 val, void* pobj, u32 flags)
+void HSD_PObjReqAnimAllByFlags(f32 val, HSD_PObj* pobj, u32 flags)
 {
-    void* cur;
+    HSD_PObj* cur;
 
     if (pobj == NULL) {
         return;
@@ -159,7 +154,7 @@ void HSD_PObjReqAnimAllByFlags(f32 val, void* pobj, u32 flags)
                 fn_801C29C4(val, *(void**)((u8*)cur + 0x18));
             }
         }
-        cur = *(void**)((u8*)cur + 0x4);
+        cur = cur->next;
     }
 }
 #pragma pop

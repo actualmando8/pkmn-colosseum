@@ -737,3 +737,67 @@ Validation result:
   `fn_801D15D0` at `26.666666%`; `fn_801D167C` at `88.888885%`.
 - `main/game/battle/battle_waza` stayed at `11.662305%` fuzzy and
   `9.613382%` matched code.
+
+## Colosseum Event Row Batch 10, 2026-07-01
+
+Applied after local review:
+
+- `colosseum_event.c`: introduced `ColosseumEventRow6` for the 6-byte row at
+  `lbl_80478D30`, naming the callsite-supported fields `mode`, `eventIndex`,
+  and `nextIndex`.
+- Introduced `ColosseumEventSubRow` and `ColosseumEventPairRow` for the
+  `lbl_80375A08` table: a 0x18-byte row with `resultFuncId`,
+  `firstLinkIndex`, and two 0x0A-byte value/scale subrows.
+- Converted the exact getter cluster `fn_8020A500`, `fn_8020A540`,
+  `fn_8020A580`, `fn_8020A5C0`, `fn_8020A630`, `fn_8020A6A0`,
+  `fn_8020A710`, `fn_8020A780`, `fn_8020A7F0`, `fn_8020A860`, and
+  `fn_8020A8A0` from raw byte offsets to typed field access.
+
+Validation result:
+
+- All touched helper rows stayed `100.0%`.
+- `main/game/colosseum_event` stayed at `84.3419%` fuzzy and `34.919918%`
+  matched code.
+- Rejected conversions: none.
+
+## GS Render Camera API Batch 11, 2026-07-01
+
+Applied after local review:
+
+- `gs_render_util.c`: introduced `GSRenderCamera`, `GSRenderCameraDesc`,
+  `GSRenderVec3`, and `GSRenderMtx` for the `0x128`-byte camera record owned by
+  `lbl_8047AA6C` / `lbl_8047AA74`.
+- Converted the small camera API helpers from raw offsets to named fields:
+  animation frame/rate/index helpers, position/rotation/look-at helpers,
+  perspective/scissor/viewport helpers, and the projection matrix helper.
+- Preserved raw offsets in the larger transform/update loops and snapshot
+  restore/save pair until their scheduling constraints are isolated.
+
+Validation result:
+
+- `main/game/gs_render_util` stayed at `87.26525%` fuzzy and `48.366013%`
+  matched code.
+- Rejected conversion: typed `GSCameraSnapshot` save/restore compiled, but
+  dropped `gs_render_util` to `29/39` matched functions and `39.052288%`
+  matched code, so it was restored to raw offsets.
+
+## HSD Exact Helper Batch 12, 2026-07-01
+
+Applied after local review:
+
+- `hsd_lobj.c`: replaced raw LObj `aobj`, `interest`, and `position` offsets
+  with typed field names while retaining volatile field-address checks needed
+  for exact codegen.
+- `hsd_pobj_range_801AA608.c`: included `hsd/hsd_pobj.h` and converted PObj
+  list traversal, flags, shapeset, and blend-weight access to named fields in
+  exact helpers.
+
+Validation result:
+
+- `main/hsd/hsd_lobj` stayed at `61.72081%` fuzzy and `14.446108%` matched
+  code.
+- `main/hsd/hsd_pobj_range_801AA608` stayed at `5.0134773%` fuzzy and
+  `5.013477%` matched code.
+- Rejected conversions: plain non-volatile LObj checks regressed exact rows;
+  PObj `+0x18` aobj access remains raw because the current public `HSD_PObj`
+  header does not model that field.

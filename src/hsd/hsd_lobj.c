@@ -286,7 +286,7 @@ void HSD_LObjAddAnimAll(HSD_LObj* lobj, HSD_LightAnim* lanim)
     a = lanim;
     while (l != NULL) {
         if (l != NULL && a != NULL) {
-            if (*(volatile u32*)((u8*)l + 0x48) != 0) {
+            if (*(HSD_AObj* volatile*) &l->aobj != NULL) {
                 fn_801C25E4(l->aobj);
             }
             l->aobj = fn_801C2670(a->aobjdesc);
@@ -447,8 +447,8 @@ extern void fn_80191688();
 /* HSD_LObjGetInterest */
 s32 HSD_LObjGetInterest(HSD_LObj* lobj, void* out) {
     if (lobj != NULL) {
-        if (*(volatile u32*)((u8*)lobj + 0x1C) != 0) {
-            fn_80191688(*(void**)((u8*)lobj + 0x1C), out);
+        if (*(HSD_WObj* volatile*) &lobj->interest != NULL) {
+            fn_80191688(lobj->interest, out);
             return 1;
         }
     }
@@ -490,8 +490,8 @@ asm void HSD_LObjGetPosition(void) {
 #else
 s32 HSD_LObjGetPosition(HSD_LObj* lobj, void* out) {
     if (lobj != NULL) {
-        if (*(volatile u32*)((u8*)lobj + 0x18) != 0) {
-            fn_80191688(*(void**)((u8*)lobj + 0x18), out);
+        if (*(HSD_WObj* volatile*) &lobj->position != NULL) {
+            fn_80191688(lobj->position, out);
             return 1;
         }
     }

@@ -12,6 +12,47 @@
 
 #include "dolphin/types.h"
 
+typedef struct GSRenderVec3 {
+    f32 x;
+    f32 y;
+    f32 z;
+} GSRenderVec3;
+
+typedef f32 GSRenderMtx[3][4];
+
+typedef struct GSRenderCameraDesc {
+    void* cobjDesc;
+    void** animations;
+} GSRenderCameraDesc;
+
+typedef struct GSRenderCamera {
+    u8 active;
+    u8 useLookAt;
+    u8 dirty;
+    u8 hasAnimation;
+    u8 isAnimating;
+    u8 pad_05[3];
+    GSRenderCameraDesc* desc;
+    void* cobj;
+    u8 unk_10[0x60];
+    GSRenderVec3 eye;
+    GSRenderVec3 prevEye;
+    GSRenderVec3 rotation;
+    GSRenderMtx viewMtx;
+    GSRenderMtx projectionMtx;
+    GSRenderVec3 upVector;
+    GSRenderVec3 interest;
+    s32 animMode;
+    u32 animCount;
+    u32 animIndex;
+    f32 animRate;
+    f32 animFrame;
+    f32 animEndFrame;
+    s8 animEnded;
+    s8 animDirection;
+    u8 pad_126[2];
+} GSRenderCamera;
+
 /* ===== External references ===== */
 extern void fn_800DD970(const char* fmt, ...);
 extern void SISetSamplingRate(u32 rate);
@@ -342,28 +383,28 @@ void fn_800D1674(void* src, void* dst) {
  * GScameraGetAnimFrame - GS render: get object speed float (field_0x11c)
  * Address: 0x800D172C, Size: 0x8
  * ================================================================== */
-f32 GScameraGetAnimFrame(void* obj) {
-    return *(f32*)((u8*)obj + 0x11c);
+f32 GScameraGetAnimFrame(GSRenderCamera* camera) {
+    return camera->animFrame;
 }
 
 /* ==================================================================
  * GScameraHasAnimationEnded - GS render: get object signed field_0x124
  * Address: 0x800D1734, Size: 0xC
  * ================================================================== */
-s8 GScameraHasAnimationEnded(void* obj) {
-    return *(s8*)((u8*)obj + 0x124);
+s8 GScameraHasAnimationEnded(GSRenderCamera* camera) {
+    return camera->animEnded;
 }
 
 /* ==================================================================
  * GScameraStopAnimation - GS render: init object animation state
  * Address: 0x800D173C, Size: 0x5C
  * ================================================================== */
-void GScameraStopAnimation(void* obj) {
-    *(u8*)((u8*)obj + 0x4) = 0;
-    *(u8*)((u8*)obj + 0x1) = 1;
-    HSD_CObjGetEyePosition(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
-    HSD_CObjGetUpVector(*(void**)((u8*)obj + 0xc), (u8*)obj + 0xf4);
-    HSD_CObjGetInterest(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x100);
+void GScameraStopAnimation(GSRenderCamera* camera) {
+    camera->isAnimating = 0;
+    camera->useLookAt = 1;
+    HSD_CObjGetEyePosition(camera->cobj, &camera->eye);
+    HSD_CObjGetUpVector(camera->cobj, &camera->upVector);
+    HSD_CObjGetInterest(camera->cobj, &camera->interest);
 }
 
 /* ==================================================================
@@ -372,19 +413,19 @@ void GScameraStopAnimation(void* obj) {
  * ================================================================== */
 #pragma push
 #pragma scheduling on
-void GScameraStartAnimation(void* obj) {
-    if (*(u8*)((u8*)obj + 0x3) != 0) {
+void GScameraStartAnimation(GSRenderCamera* camera) {
+    if (camera->hasAnimation != 0) {
         f32 speed;
-        *(u8*)((u8*)obj + 0x4) = 1;
-        *(u8*)((u8*)obj + 0x124) = 0;
-        *(u8*)((u8*)obj + 0x125) = 1;
-        speed = *(f32*)((u8*)obj + 0x11c);
-        if (*(u8*)((u8*)obj + 0x3) != 0) {
-            *(f32*)((u8*)obj + 0x11c) = speed;
-            HSD_ForeachAnim(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
-            HSD_CObjReqAnim(*(void**)((u8*)obj + 0xc), *(f32*)((u8*)obj + 0x11c));
-            HSD_CObjAnim(*(void**)((u8*)obj + 0xc));
-            HSD_ForeachAnim(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_801C027C, (double)(*(f32*)((u8*)obj + 0x118)), (u32)1);
+        camera->isAnimating = 1;
+        camera->animEnded = 0;
+        camera->animDirection = 1;
+        speed = camera->animFrame;
+        if (camera->hasAnimation != 0) {
+            camera->animFrame = speed;
+            HSD_ForeachAnim(camera->cobj, (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
+            HSD_CObjReqAnim(camera->cobj, camera->animFrame);
+            HSD_CObjAnim(camera->cobj);
+            HSD_ForeachAnim(camera->cobj, (u32)2, (u32)0xffff, fn_801C027C, (double)camera->animRate, (u32)1);
         }
     }
 }
@@ -394,21 +435,21 @@ void GScameraStartAnimation(void* obj) {
  * fn_800D1858 - GS render: set object fields 0x10c and 0x114
  * Address: 0x800D1858, Size: 0xC
  * ================================================================== */
-void fn_800D1858(void* obj, u32 val) {
-    *(u32*)((u8*)obj + 0x10c) = val;
+void fn_800D1858(GSRenderCamera* camera, u32 val) {
+    camera->animMode = val;
 }
 
 /* ==================================================================
  * GScameraSetAnimFrame - GS render: set object anim speed (field 0x11c) and advance
  * Address: 0x800D1860, Size: 0x9C
  * ================================================================== */
-void GScameraSetAnimFrame(void* obj, f32 speed) {
-    if (*(u8*)((u8*)obj + 0x3) != 0) {
-        *(f32*)((u8*)obj + 0x11c) = speed;
-        HSD_ForeachAnim(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
-        HSD_CObjReqAnim(*(void**)((u8*)obj + 0xc), *(f32*)((u8*)obj + 0x11c));
-        HSD_CObjAnim(*(void**)((u8*)obj + 0xc));
-        HSD_ForeachAnim(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_801C027C, (double)(*(f32*)((u8*)obj + 0x118)), (u32)1);
+void GScameraSetAnimFrame(GSRenderCamera* camera, f32 frame) {
+    if (camera->hasAnimation != 0) {
+        camera->animFrame = frame;
+        HSD_ForeachAnim(camera->cobj, (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
+        HSD_CObjReqAnim(camera->cobj, camera->animFrame);
+        HSD_CObjAnim(camera->cobj);
+        HSD_ForeachAnim(camera->cobj, (u32)2, (u32)0xffff, fn_801C027C, (double)camera->animRate, (u32)1);
     }
 }
 
@@ -416,14 +457,14 @@ void GScameraSetAnimFrame(void* obj, f32 speed) {
  * GScameraSetAnimRate - GS render: set object fov angle (field 0x118)
  * Address: 0x800D18FC, Size: 0x88
  * ================================================================== */
-void GScameraSetAnimRate(void* obj, f32 fov) {
-    if (*(u8*)((u8*)obj + 0x3) != 0) {
+void GScameraSetAnimRate(GSRenderCamera* camera, f32 rate) {
+    if (camera->hasAnimation != 0) {
         s32 mode = fn_800D37CC();
         if (mode == 0x32) {
-            fov *= lbl_8047C9B0;
+            rate *= lbl_8047C9B0;
         }
-        *(f32*)((u8*)obj + 0x118) = fov;
-        HSD_ForeachAnim(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_801C027C, *(f32*)((u8*)obj + 0x118), (u32)1);
+        camera->animRate = rate;
+        HSD_ForeachAnim(camera->cobj, (u32)2, (u32)0xffff, fn_801C027C, camera->animRate, (u32)1);
     }
 }
 
@@ -433,17 +474,16 @@ void GScameraSetAnimRate(void* obj, f32 fov) {
  * ================================================================== */
 #pragma push
 #pragma scheduling on
-void GScameraSetAnimIndex(void* obj, u32 frame_idx) {
-    if (*(u8*)((u8*)obj + 0x3) != 0) {
-        HSD_CObjRemoveAnim(*(void**)((u8*)obj + 0xc));
-        if (frame_idx <= *(u32*)((u8*)obj + 0x110)) {
-            *(u32*)((u8*)obj + 0x114) = frame_idx;
-            HSD_CObjAddAnim(*(void**)((u8*)obj + 0xc),
-                (*(void***)((u8*)*(void**)((u8*)obj + 0x8) + 4))[*(u32*)((u8*)obj + 0x114)]);
-            HSD_CObjReqAnim(*(void**)((u8*)obj + 0xc), lbl_8047C998);
+void GScameraSetAnimIndex(GSRenderCamera* camera, u32 animIndex) {
+    if (camera->hasAnimation != 0) {
+        HSD_CObjRemoveAnim(camera->cobj);
+        if (animIndex <= camera->animCount) {
+            camera->animIndex = animIndex;
+            HSD_CObjAddAnim(camera->cobj, camera->desc->animations[camera->animIndex]);
+            HSD_CObjReqAnim(camera->cobj, lbl_8047C998);
             lbl_8047AA78 = lbl_8047C998;
-            HSD_ForeachAnim(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_800D2B44, (u32)0);
-            *(f32*)((u8*)obj + 0x120) = lbl_8047AA78;
+            HSD_ForeachAnim(camera->cobj, (u32)2, (u32)0xffff, fn_800D2B44, (u32)0);
+            camera->animEndFrame = lbl_8047AA78;
         }
     }
 }
@@ -453,16 +493,16 @@ void GScameraSetAnimIndex(void* obj, u32 frame_idx) {
  * GScameraIsAnimating - GS render: get object active flag (field_0x4)
  * Address: 0x800D1A38, Size: 0x8
  * ================================================================== */
-u8 GScameraIsAnimating(void* obj) {
-    return *(u8*)((u8*)obj + 0x4);
+u8 GScameraIsAnimating(GSRenderCamera* camera) {
+    return camera->isAnimating;
 }
 
 /* ==================================================================
  * GScameraGetDistanceVector - GS render: get object angles (field_0x70, 0x100)
  * Address: 0x800D1A40, Size: 0x30
  * ================================================================== */
-void GScameraGetDistanceVector(void* obj, void* dest) {
-    fn_800E0168(dest, (u8*)obj + 0x70, (u8*)obj + 0x100);
+void GScameraGetDistanceVector(GSRenderCamera* camera, void* dest) {
+    fn_800E0168(dest, &camera->eye, &camera->interest);
 }
 
 /* ==================================================================
@@ -473,15 +513,15 @@ void GScameraGetDistanceVector(void* obj, void* dest) {
  * ================================================================== */
 #pragma push
 #pragma scheduling on
-void* GScameraGetProjMatrixPtr(void* lightSet) {
+void* GScameraGetProjMatrixPtr(GSRenderCamera* camera) {
     f32 x, z;
     f32 out3, out2, out1, out0;
-    void* jobj = *(void**)((u8*)lightSet + 0xc);
-    if (*(u8*)((u8*)jobj + 0x50) == 1) {
+    void* jobj = camera->cobj;
+    if (*(u8*)((u8*)camera->cobj + 0x50) == 1) {
         f32 w, h;
         HSD_CObjGetPerspective(jobj, &x, &z);
-        w = HSD_CObjGetNear(*(void**)((u8*)lightSet + 0xc));
-        h = HSD_CObjGetFar(*(void**)((u8*)lightSet + 0xc));
+        w = HSD_CObjGetNear(camera->cobj);
+        h = HSD_CObjGetFar(camera->cobj);
         fn_800E0678(lbl_804001B0, x, z, w, h);
     } else {
         HSD_CObjGetOrtho(jobj, &out2, &out0, &out3, &out1);
@@ -594,100 +634,100 @@ void fn_800D1D00(void* obj) {
  * GScameraGetLookAt - GS render: get translation and scale data
  * Address: 0x800D1EB8, Size: 0x4C
  * ================================================================== */
-void GScameraGetLookAt(void* obj, void* dest1, void* dest2) {
-    fn_800E01D0(dest1, (u8*)obj + 0xf4);
-    fn_800E01D0(dest2, (u8*)obj + 0x100);
+void GScameraGetLookAt(GSRenderCamera* camera, void* dest1, void* dest2) {
+    fn_800E01D0(dest1, &camera->upVector);
+    fn_800E01D0(dest2, &camera->interest);
 }
 
 /* ==================================================================
  * GScameraLookAt - GS render: set translation and scale data
  * Address: 0x800D1F04, Size: 0x54
  * ================================================================== */
-void GScameraLookAt(void* obj, void* src1, void* src2) {
-    fn_800E01D0((u8*)obj + 0xf4, src1);
-    fn_800E01D0((u8*)obj + 0x100, src2);
-    *(u8*)((u8*)obj + 0x2) = 1;
-    *(u8*)((u8*)obj + 0x1) = 1;
+void GScameraLookAt(GSRenderCamera* camera, void* src1, void* src2) {
+    fn_800E01D0(&camera->upVector, src1);
+    fn_800E01D0(&camera->interest, src2);
+    camera->dirty = 1;
+    camera->useLookAt = 1;
 }
 
 /* ==================================================================
  * GScameraGetRotation - GS render: set object rotation data (field_0x88)
  * Address: 0x800D1F58, Size: 0x2C
  * ================================================================== */
-void GScameraGetRotation(void* obj, void* anim) {
-    fn_800E01D0(anim, (u8*)obj + 0x88);
+void GScameraGetRotation(GSRenderCamera* camera, void* dest) {
+    fn_800E01D0(dest, &camera->rotation);
 }
 
 /* ==================================================================
  * GScameraGetPosition - GS render: get position data, optionally update JObj
  * Address: 0x800D1F84, Size: 0x58
  * ================================================================== */
-void GScameraGetPosition(void* obj, void* dest) {
-    if (*(u8*)((u8*)obj + 0x4) != 0) {
-        HSD_CObjGetEyePosition(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
+void GScameraGetPosition(GSRenderCamera* camera, void* dest) {
+    if (camera->isAnimating != 0) {
+        HSD_CObjGetEyePosition(camera->cobj, &camera->eye);
     }
-    fn_800E01D0(dest, (u8*)obj + 0x70);
+    fn_800E01D0(dest, &camera->eye);
 }
 
 /* ==================================================================
  * GScameraGetPerspective - GS render: get object scissor rect extents
  * Address: 0x800D1FDC, Size: 0x60
  * ================================================================== */
-void GScameraGetPerspective(void* obj, void* a, void* b, f32* outA, f32* outB) {
-    HSD_CObjGetPerspective(*(void**)((u8*)obj + 0xc), a, b);
-    *outA = HSD_CObjGetNear(*(void**)((u8*)obj + 0xc));
-    *outB = HSD_CObjGetFar(*(void**)((u8*)obj + 0xc));
+void GScameraGetPerspective(GSRenderCamera* camera, void* a, void* b, f32* outA, f32* outB) {
+    HSD_CObjGetPerspective(camera->cobj, a, b);
+    *outA = HSD_CObjGetNear(camera->cobj);
+    *outB = HSD_CObjGetFar(camera->cobj);
 }
 
 /* ==================================================================
  * GScameraSetRotation - GS render: set rotation data, mark dirty
  * Address: 0x800D203C, Size: 0x40
  * ================================================================== */
-void GScameraSetRotation(void* obj, void* src) {
-    fn_800E01D0((u8*)obj + 0x88, src);
-    *(u8*)((u8*)obj + 0x2) = 1;
-    *(u8*)((u8*)obj + 0x1) = 0;
+void GScameraSetRotation(GSRenderCamera* camera, void* src) {
+    fn_800E01D0(&camera->rotation, src);
+    camera->dirty = 1;
+    camera->useLookAt = 0;
 }
 
 /* ==================================================================
  * GScameraSetPosition - GS render: set position data, mark dirty
  * Address: 0x800D207C, Size: 0x50
  * ================================================================== */
-void GScameraSetPosition(void* obj, void* src) {
-    HSD_CObjSetEyePosition(*(void**)((u8*)obj + 0xc));
-    fn_800E01D0((u8*)obj + 0x70, src);
-    *(u8*)((u8*)obj + 0x2) = 1;
+void GScameraSetPosition(GSRenderCamera* camera, void* src) {
+    HSD_CObjSetEyePosition(camera->cobj);
+    fn_800E01D0(&camera->eye, src);
+    camera->dirty = 1;
 }
 
 /* ==================================================================
  * GScameraSetPerspective - GS render: set object transform params
  * Address: 0x800D20CC, Size: 0x84
  * ================================================================== */
-void GScameraSetPerspective(void* obj, f32 x, f32 y, f32 z, f32 w) {
-    HSD_CObjSetProjectionType(*(void**)((u8*)obj + 0xc), 1, x, y, z, w);
-    HSD_CObjSetPerspective(*(void**)((u8*)obj + 0xc), x, y);
-    HSD_CObjSetNear(*(void**)((u8*)obj + 0xc), z);
-    HSD_CObjSetFar(*(void**)((u8*)obj + 0xc), w);
-    *(u8*)((u8*)obj + 0x2) = 1;
+void GScameraSetPerspective(GSRenderCamera* camera, f32 x, f32 y, f32 z, f32 w) {
+    HSD_CObjSetProjectionType(camera->cobj, 1, x, y, z, w);
+    HSD_CObjSetPerspective(camera->cobj, x, y);
+    HSD_CObjSetNear(camera->cobj, z);
+    HSD_CObjSetFar(camera->cobj, w);
+    camera->dirty = 1;
 }
 
 /* ==================================================================
  * fn_800D2150 - GS render: set scissor rect (clamped)
  * Address: 0x800D2150, Size: 0x78
  * ================================================================== */
-void fn_800D2150(void* obj, u32 x0, u32 y0, u32 x1, u32 y1) {
+void fn_800D2150(GSRenderCamera* camera, u32 x0, u32 y0, u32 x1, u32 y1) {
     if ((u16)x0 > 0x27e) x0 = 0x27e;
     if ((u16)y0 > 0x1de) y0 = 0x1de;
     if ((u16)x1 > 0x27f) x1 = 0x27f;
     if ((u16)y1 > 0x1df) y1 = 0x1df;
-    HSD_CObjSetScissorx4(*(void**)((u8*)obj + 0xc), x0, (u16)(x1 + 1), y0, (u16)(y1 + 1));
+    HSD_CObjSetScissorx4(camera->cobj, x0, (u16)(x1 + 1), y0, (u16)(y1 + 1));
 }
 
 /* ==================================================================
  * GScameraSetViewport - GS render: set viewport rect (clamped, packed)
  * Address: 0x800D21C8, Size: 0x80
  * ================================================================== */
-void GScameraSetViewport(void* obj, u32 x0, u32 y0, u32 x1, u32 y1) {
+void GScameraSetViewport(GSRenderCamera* camera, u32 x0, u32 y0, u32 x1, u32 y1) {
     u16 rect[4];
     if ((u16)x0 > 0x27e) x0 = 0x27e;
     if ((u16)y0 > 0x1de) y0 = 0x1de;
@@ -697,7 +737,7 @@ void GScameraSetViewport(void* obj, u32 x0, u32 y0, u32 x1, u32 y1) {
     rect[2] = (u16)y0;
     rect[1] = (u16)(x1 + 1);
     rect[3] = (u16)(y1 + 1);
-    fn_80194400(*(void**)((u8*)obj + 0xc), rect);
+    fn_80194400(camera->cobj, rect);
 }
 
 /* ==================================================================
