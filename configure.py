@@ -344,7 +344,7 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
-                "dolphin/pad/PAD_fn_800AB5B4.c",
+                "dolphin/pad/PAD.c",
                 progress_category="sdk",
             ),
             Object(

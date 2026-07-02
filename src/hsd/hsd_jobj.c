@@ -1674,6 +1674,7 @@ void fn_801A0D94(HSD_JObj* jobj, HSD_Joint* joint) {
     /* decompiled cdx5: functional (non-byte-exact) */
     HSD_JObj* child;
     u8* base;
+    BOOL dec;
 
     base = lbl_80274AA0;
     if (jobj == NULL || joint == NULL) {
@@ -1684,16 +1685,31 @@ void fn_801A0D94(HSD_JObj* jobj, HSD_Joint* joint) {
     if (jobj->flags & JOBJ_INSTANCE) {
         child = jobj->child;
         if (child != NULL) {
-            if (ref_DEC(child) != 0) {
-                if (child->object.ref_count_individual < 1) {
+            dec = (child->object.ref_count == HSD_OBJ_NOREF);
+            if (dec != 0) {
+            } else {
+                dec = (child->object.ref_count == 0);
+                child->object.ref_count--;
+            }
+            if (dec != 0) {
+                if (((s32) child->object.ref_count_individual - 1) < 0) {
                     if (child != NULL) {
                         HSD_CLASS_METHOD(child)->release((HSD_Class*) child);
                         HSD_CLASS_METHOD(child)->destroy((HSD_Class*) child);
                     }
                 } else {
-                    iref_INC(child);
+                    (*(volatile u16*) &child->object.ref_count_individual)++;
+                    if (!(child->object.ref_count_individual != 0)) {
+                        __assert(base + 0x54, 0x9E, base + 0x60);
+                    }
                     HSD_JOBJ_METHOD(child)->release_child(child);
-                    if (iref_DEC(child) != 0) {
+                    dec = (*(volatile u16*) &child->object.ref_count_individual == 0);
+                    if (dec != 0) {
+                    } else {
+                        child->object.ref_count_individual--;
+                        dec = (*(volatile u16*) &child->object.ref_count_individual == 0);
+                    }
+                    if (dec != 0) {
                         if (child != NULL) {
                             HSD_CLASS_METHOD(child)->release((HSD_Class*) child);
                             HSD_CLASS_METHOD(child)->destroy((HSD_Class*) child);
@@ -1708,12 +1724,17 @@ void fn_801A0D94(HSD_JObj* jobj, HSD_Joint* joint) {
         if (jobj->child == NULL) {
             __assert(&lbl_8047DB20, 0x45F, base + 0x210);
         }
-        if (jobj->child != NULL) {
-            HSD_JObjRef(jobj->child);
+        child = jobj->child;
+        if (child != NULL) {
+            child->object.ref_count++;
+            if (!(child->object.ref_count != HSD_OBJ_NOREF)) {
+                __assert(base + 0x54, 0x5D, base + 0xC4);
+            }
         }
     }
 
-    if (!union_type_ptcl(jobj) && !union_type_spline(jobj)) {
+    dec = (((volatile HSD_JObj*) jobj)->flags & (JOBJ_PTCL | JOBJ_SPLINE)) == 0;
+    if (dec != 0) {
         HSD_DObjResolveRefsAll(jobj->u.dobj, joint->u.dobjdesc);
     }
 }

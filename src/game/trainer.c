@@ -121,6 +121,10 @@ extern void fn_801FE7EC(void* trainer, u32 eventId, u32 param1, u32 param2);
 extern u8   fn_801FECD4(void* trainer);
 extern void fn_801FE710(void* trainer, u32 eventId, u32 param);
 
+/* Item/Pokemon field access helpers used by battle item flow. */
+u8 fn_80121574(void* obj, s32 arg);
+u8 fn_8011A3E4(void* obj, s32 arg);
+
 /* SDA table pointers for trainer data arrays */
 extern u32* lbl_80478F08;  /* Party config header */
 extern u8*  lbl_80478F0C;  /* Party config data */
@@ -6529,31 +6533,46 @@ void fn_801FE55C(void* self, void* other, u32 offset) {
 
 /* 0x801FE5D4 | size: 0x13C */
 typedef struct { u16 fields[18]; } FieldTable18;
+static inline void* fn_801FE5D4_getSrcSlot(void* context)
+{
+    return fn_8012640C(context, 0, 0xD5, 0);
+}
+
+static inline void* fn_801FE5D4_getPokemon(void* slot)
+{
+    return fn_8012640C(slot, 0, 0xCC, 0);
+}
+
 void fn_801FE5D4(void* context) {
-    extern FieldTable18 lbl_80279CE4;
-    FieldTable18 table;
-    void* srcSlot;
-    void* destSlot;
-    void* srcPokemon;
     void* destPokemon;
+    FieldTable18 table;
+    extern FieldTable18 lbl_80279CE4;
+    void* srcPokemon;
     u16 fieldId;
+    void* destSlot;
+    void* srcSlot;
     u8 i;
 
     table = lbl_80279CE4;
     for (i = 0; i < 18; i++) {
         fieldId = table.fields[i];
-        srcSlot = fn_8012640C(context, 0, 0xD5, 0);
+        srcSlot = fn_801FE5D4_getSrcSlot(context);
         destSlot = fn_8012640C(context, 0, 0xD7, 0);
         if (srcSlot != NULL && destSlot != NULL) {
             if (srcSlot == NULL) {
                 srcPokemon = NULL;
             } else {
-                srcPokemon = fn_8012640C(srcSlot, 0, 0xCC, 0);
+                {
+                    void* tmp = fn_8012640C(srcSlot, 0, 0xCC, 0);
+                    srcPokemon = tmp;
+                }
             }
             if (destSlot == NULL) {
+                if (context != 0) {
+                }
                 destPokemon = NULL;
             } else {
-                destPokemon = fn_8012640C(destSlot, 0, 0xCC, 0);
+                destPokemon = fn_801FE5D4_getPokemon(destSlot);
             }
             fn_801254B4(destPokemon, 0, fieldId, 0, (u32)fn_8012640C(srcPokemon, 0, fieldId, 0));
         }
@@ -6962,8 +6981,6 @@ u8 fn_801FEF74(void* trainer) {
     extern u16 fn_80119ED0(s32 id);
     extern u8 fn_8011B67C(void* obj, s32 arg);
     extern u8 fn_80121ADC(void* obj, u32 field);
-    extern void fn_80121574(void* obj, s32 arg);
-    extern void fn_8011A3E4(void* obj, s32 arg);
     void* obj;
     void* target;
     void* obj2;
@@ -7001,16 +7018,16 @@ u8 fn_801FEF74(void* trainer) {
                 } else {
                     target2 = fn_8012640C(obj2, 0, 0xCC, 0);
                 }
-                fn_80121574(target2, 0x14);
+                return fn_80121574(target2, 0x14);
             } else if (fn_80119ED0(0x14) != 0xCD) {
                 return 0;
             } else {
-                fn_8011A3E4(obj2, 0x14);
+                return fn_8011A3E4(obj2, 0x14);
             }
         } else if (fn_80119ED0(0x14) != 0xD8) {
             return 0;
         } else {
-            fn_8011A3E4(trainer, 0x14);
+            return fn_8011A3E4(trainer, 0x14);
         }
     }
     return 0;

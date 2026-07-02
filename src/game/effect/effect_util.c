@@ -13,7 +13,12 @@
  * Range: 0x8013151C - 0x80137114
  * =================================================================== */
 
-extern u32 lbl_803635D8;
+typedef struct EffectUtilByteEntry {
+    u8 value;
+    u8 pad[7];
+} EffectUtilByteEntry;
+
+extern EffectUtilByteEntry lbl_803635D8[];
 
 extern u32 lbl_8047ADC8;
 extern u32 lbl_8047ADCC;
@@ -130,7 +135,7 @@ _null_ret:
 
 /* 0x80131574 | 20 bytes | indexed_lookup */
 u8 fn_80131574(u32 idx) {
-    return ((u8*)lbl_803635D8)[idx];
+    return lbl_803635D8[(u16)idx].value;
 }
 
 /* 0x80131630 | 0x30 -- read byte from stream, store extsb to obj+0x43 if flag set */
@@ -263,6 +268,15 @@ typedef struct EffectStatusTableEntry {
     s16 amount;
     s16 divisor;
 } EffectStatusTableEntry;
+
+typedef struct EffectUtilCommandObj {
+    u8 field_00;
+    u8 activeFlag;
+    u8 field_02[0x1E];
+    u16 commandValue;
+    u8 field_22[0xE];
+    u8* stream;
+} EffectUtilCommandObj;
 
 #if 0
 asm void fn_801316A8(void) {
@@ -1151,7 +1165,6 @@ u32 fn_80132428(void) {
     fn_80129280(0, 2);
     return fn_8012AC54();
 }
-#pragma peephole on
 
 /* 0x801324CC | 0xA4 -- read color index from stream, look up RGBA, apply */
 void fn_801324CC(void* obj) {
@@ -1181,14 +1194,22 @@ void fn_801324CC(void* obj) {
     *(u32*)((u8*)obj + 0x30) = *(u32*)((u8*)obj + 0x30) + 1;
 }
 
-/* 0x68 | fn_801325C4 | two_call_arg_check */
-void fn_801325C4(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
-    if (arg1 != 0) { return; }
-    fn_800FA1BC();
-    /* store u16 to offset 0x20 */
-    /* store u16 to offset 0x20 */
-    /* store u32 to offset 0x30 */
-    fn_800FA1BC();
+/* 0x801325C4 | 0x68 -- read byte command into u16 field and apply */
+s32 fn_801325C4(EffectUtilCommandObj* obj) {
+    u8* stream;
+
+    if (obj->activeFlag == 0) {
+        stream = obj->stream;
+        obj->commandValue = stream[0];
+        fn_800FA1BC(obj);
+    } else {
+        stream = obj->stream;
+        obj->commandValue = stream[0];
+        fn_800FA1BC(obj);
+    }
+    stream = obj->stream;
+    obj->stream = stream + 1;
+    return 0;
 }
 
 /* 0x8013262C | 16 bytes | set_field_return */

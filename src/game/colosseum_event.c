@@ -1784,20 +1784,24 @@ void fn_80203198(void* ctx, u32 param) {
 /* 0x802032E4 | size: 0x138 */
 #pragma push
 #pragma scheduling off
+static inline void* fn_802032E4_getCC(void* ctx) {
+    return fn_8012640C(ctx, 0, 0xCC, 0);
+}
+
 void fn_802032E4(void* ctx, u32 param) {
     extern u16 fn_80119ED0();
     extern u8 fn_8011B67C();
     extern u8 fn_80121ADC();
     extern void fn_80122370();
     extern u32 fn_80123090();
-    void* ccData;
     void* ccCtx;
+    void* ccData;
     u8 result;
     u32 value;
 
-    if (ctx == 0) { ccData = 0; } else { ccData = fn_8012640C(ctx, 0, 0xCC, 0); }
+    if (ctx == 0) { ccData = 0; } else { ccData = fn_802032E4_getCC(ctx); }
     if (ccData == NULL) { return; }
-    if (ctx == 0) { ccCtx = 0; } else { ccCtx = fn_8012640C(ctx, 0, 0xCC, 0); }
+    if (ctx == 0) { ccCtx = 0; } else { ccCtx = fn_802032E4_getCC(ctx); }
     if (ccCtx == NULL) {
         value = 0;
     } else {
@@ -1825,6 +1829,16 @@ void fn_802032E4(void* ctx, u32 param) {
 /* 0x8020341C | size: 0x140 */
 #pragma push
 #pragma scheduling off
+static inline void* fn_8020341C_resolveCcData(void* ctx)
+{
+    return fn_8012640C(ctx, 0, 0xCC, 0);
+}
+
+static inline void* fn_8020341C_resolveCcCtx(void* ctx)
+{
+    return fn_8012640C(ctx, 0, 0xCC, 0);
+}
+
 void fn_8020341C(void* ctx, u32 param1, u32 param2) {
     extern u16 fn_80119ED0();
     extern u8 fn_8011B67C();
@@ -1836,9 +1850,9 @@ void fn_8020341C(void* ctx, u32 param1, u32 param2) {
     u8 result;
     u32 value;
 
-    if (ctx == 0) { ccData = 0; } else { ccData = fn_8012640C(ctx, 0, 0xCC, 0); }
+    if (ctx == 0) { ccData = 0; } else { ccData = fn_8020341C_resolveCcData(ctx); }
     if (ccData == NULL) { return; }
-    if (ctx == 0) { ccCtx = 0; } else { ccCtx = fn_8012640C(ctx, 0, 0xCC, 0); }
+    if (ctx == 0) { ccCtx = 0; } else { ccCtx = fn_8020341C_resolveCcCtx(ctx); }
     if (ccCtx == NULL) {
         value = 0;
     } else {

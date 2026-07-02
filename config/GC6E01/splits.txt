@@ -320,8 +320,8 @@ dolphin/vi/VI_fn_800AA280.c:
 dolphin/vi/VI_fn_800AA498.c:
 	.text       start:0x800AA498 end:0x800AA4D4
 
-dolphin/pad/PAD_fn_800AB5B4.c:
-	.text       start:0x800AB5B4 end:0x800AB614
+dolphin/pad/PAD.c:
+	.text       start:0x800AA4D4 end:0x800AC02C
 
 dolphin/gx/GX_fn_800B71F0.c:
 	.text       start:0x800B71F0 end:0x800B71FC
