@@ -763,3 +763,825 @@ s32 fightSeqGetItemType(u16 itemId) {
     return (fn_80143990(p) == 1) ? 6 : 7;
 }
 #pragma optimize_for_size reset
+
+/*
+ * fn_802358AC (0x802358AC)
+ *
+ * Trainer-data lookup helper: reads TrainerDataGet field 0x43 off ctx
+ * (masked to u16), forwards that value into a second TrainerDataGet
+ * call (result discarded -- side effect only), then returns field 0xeb
+ * of the caller-supplied object via fn_8012640C. Part of a 100-byte
+ * template family (0x802358AC-0x80236BFC) that differs only in the
+ * final field constant.
+ */
+extern u32 fn_801FB1C0();
+/* Called via `bl` at every call site in the target binary despite being
+ * trivially small (each is a single-use accessor consumed by exactly one
+ * fightTrainerAiWazaValue* caller below) -- pragma'd not-inline to match. */
+#pragma dont_inline on
+u8 fn_802358AC(u32 ctx, u32 obj) {
+    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
+    fn_801FB1C0(0, tmp, 2, 0);
+    return (u8)fn_8012640C(obj, 0, 0xeb, 0);
+}
+
+/* fn_80235910 (0x80235910): same shape as fn_802358AC, field 0xea. */
+u8 fn_80235910(u32 ctx, u32 obj) {
+    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
+    fn_801FB1C0(0, tmp, 2, 0);
+    return (u8)fn_8012640C(obj, 0, 0xea, 0);
+}
+
+/* fn_80235974 (0x80235974): same shape as fn_802358AC, field 0xe9. */
+u8 fn_80235974(u32 ctx, u32 obj) {
+    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
+    fn_801FB1C0(0, tmp, 2, 0);
+    return (u8)fn_8012640C(obj, 0, 0xe9, 0);
+}
+
+/* fn_802359D8 (0x802359D8): same shape as fn_802358AC, field 0xe8. */
+u8 fn_802359D8(u32 ctx, u32 obj) {
+    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
+    fn_801FB1C0(0, tmp, 2, 0);
+    return (u8)fn_8012640C(obj, 0, 0xe8, 0);
+}
+
+/* fn_80235A3C (0x80235A3C): same shape as fn_802358AC, field 0xe7. */
+u8 fn_80235A3C(u32 ctx, u32 obj) {
+    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
+    fn_801FB1C0(0, tmp, 2, 0);
+    return (u8)fn_8012640C(obj, 0, 0xe7, 0);
+}
+
+/* fn_80235AA0 (0x80235AA0): same shape as fn_802358AC, field 0xe6. */
+u8 fn_80235AA0(u32 ctx, u32 obj) {
+    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
+    fn_801FB1C0(0, tmp, 2, 0);
+    return (u8)fn_8012640C(obj, 0, 0xe6, 0);
+}
+
+/* fn_80236458 (0x80236458): same shape as fn_802358AC, field 0xef,
+ * but the return value is masked to u16 rather than u8. */
+u16 fn_80236458(u32 ctx, u32 obj) {
+    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
+    fn_801FB1C0(0, tmp, 2, 0);
+    return (u16)fn_8012640C(obj, 0, 0xef, 0);
+}
+
+/* fn_802364BC (0x802364BC): same shape as fn_80236458, field 0xf0. */
+u16 fn_802364BC(u32 ctx, u32 obj) {
+    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
+    fn_801FB1C0(0, tmp, 2, 0);
+    return (u16)fn_8012640C(obj, 0, 0xf0, 0);
+}
+
+/* fn_80236520 (0x80236520): same shape as fn_80236458, field 0xf1. */
+u16 fn_80236520(u32 ctx, u32 obj) {
+    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
+    fn_801FB1C0(0, tmp, 2, 0);
+    return (u16)fn_8012640C(obj, 0, 0xf1, 0);
+}
+
+/* fn_80236B98 (0x80236B98): same shape as fn_80236458, field 0xfa. */
+u16 fn_80236B98(u32 ctx, u32 obj) {
+    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
+    fn_801FB1C0(0, tmp, 2, 0);
+    return (u16)fn_8012640C(obj, 0, 0xfa, 0);
+}
+
+/*
+ * fn_802391E0 (0x802391E0)
+ *
+ * Same TrainerDataGet lookup shape as fn_802358AC, but the third call
+ * goes through fn_8011BEB4 (field accessor) instead of fn_8012640C.
+ */
+extern s32 fn_8011BEB4();
+u8 fn_802391E0(u32 ctx, u32 obj) {
+    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
+    fn_801FB1C0(0, tmp, 2, 0);
+    return (u8)fn_8011BEB4(0, obj, 2, 0);
+}
+
+/* fn_80239244 (0x80239244): same shape as fn_802391E0, field 0x5. */
+u8 fn_80239244(u32 ctx, u32 obj) {
+    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
+    fn_801FB1C0(0, tmp, 2, 0);
+    return (u8)fn_8011BEB4(0, obj, 5, 0);
+}
+
+/*
+ * fn_80239500 (0x80239500): same shape as fn_802391E0, field 0x7, but
+ * the result is sign-extended to s16 rather than masked to u8.
+ */
+s16 fn_80239500(u32 ctx, u32 obj) {
+    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
+    fn_801FB1C0(0, tmp, 2, 0);
+    return (s16)fn_8011BEB4(0, obj, 7, 0);
+}
+
+/* fn_80239564 (0x80239564): same shape as fn_802391E0, field 0xc. */
+u8 fn_80239564(u32 ctx, u32 obj) {
+    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
+    fn_801FB1C0(0, tmp, 2, 0);
+    return (u8)fn_8011BEB4(0, obj, 0xc, 0);
+}
+
+/*
+ * fn_80239498 (0x80239498)
+ *
+ * Same TrainerDataGet lookup shape, but takes a third parameter (val)
+ * that is threaded through to the final fn_8011BEB4 call as the write
+ * value at field 0x1a.
+ */
+u8 fn_80239498(u32 ctx, u32 obj, u8 val) {
+    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
+    fn_801FB1C0(0, tmp, 2, 0);
+    return (u8)fn_8011BEB4(0, obj, 0x1a, val);
+}
+#pragma dont_inline reset
+
+/*
+ * fightTrainerAiWazaValueMeisou (0x8023D94C)
+ *
+ * FightSeq "held-item effect trigger" helper for the 588-byte family
+ * (0x8023D94C-0x8023EDF8, message-id block base 0x208-0x213, stepping
+ * -4 per member going up in address). ctx/poke/msgArg are threaded
+ * through unchanged; a persistent "message accumulator" (acc) is
+ * chained across up to three gated fn_80239984+fn_80239EE8 calls that
+ * queue FightSeq messages, keyed by:
+ *   - whether fn_80235714(ctx, poke) reads 0 (message base+0)
+ *   - a scan over ctx's active-effect list (fn_801F1C18) for any
+ *     entry whose flag list (fn_802367CC) contains flag 0x10a
+ *     (message base+1)
+ *   - whether fn_80235714(ctx, poke) reads 1 (message base+2)
+ * Finally, a "count" derived from field byte v (clamped >=0 at 6,
+ * scaled by fn_801FB1C0(0, base+3, 0x3e, 0)) is resolved through
+ * fightTrainerAiAddValue (the actual return value) and fn_80239CCC (side effect
+ * only, message base+3).
+ */
+extern u8   fn_80235714();
+extern u32  fn_802367CC();
+extern u8   fn_802357CC();
+extern u32  fn_801F1C18();
+extern u32  fn_80239984();
+extern void fn_80239EE8();
+extern u32  fightTrainerAiAddValue();
+extern void fn_80239CCC();
+
+u32 fightTrainerAiWazaValueMeisou(u32 ctx, u32 poke, u32 msgArg) {
+    u8 v = fn_80235974(ctx, poke);
+    u32 acc = 0;
+    u16 scanBuf[16];
+    u32 stackArr[8];
+    u16 count, i;
+    u8 found;
+
+    if ((u8)fn_80235714(ctx, poke) == 0) {
+        acc = fn_80239984(acc, ctx, 0x208);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x208);
+    }
+
+    count = (u16)fn_801F1C18(0, ctx, stackArr, 1, 1);
+    for (i = 0; i < count; i++) {
+        if (stackArr[i] != poke) {
+            u16 n = (u16)fn_802367CC(ctx, stackArr[i], scanBuf, 0, 1);
+            if (n != 0) {
+                u16 j;
+                for (j = 0; j < n; j++) {
+                    if (scanBuf[j] == 0x10a) {
+                        found = 1;
+                        goto after_scan;
+                    }
+                }
+            }
+        }
+    }
+    found = 0;
+after_scan:
+
+    if (found == 1) {
+        acc = fn_80239984(acc, ctx, 0x209);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x209);
+    }
+
+    if ((u8)fn_80235714(ctx, poke) == 1) {
+        acc = fn_80239984(acc, ctx, 0x20a);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x20a);
+    }
+
+    {
+        s32 count2 = (u8)v - 6;
+        u32 scale;
+        u32 result;
+
+        if (count2 < 0) {
+            count2 = 0;
+        }
+        scale = fn_801FB1C0(0, 0x20b, 0x3e, 0);
+        count2 = count2 * scale;
+        result = fightTrainerAiAddValue(acc, count2);
+        fn_80239CCC(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x20b, count2);
+        return result;
+    }
+}
+
+/* fightTrainerAiWazaValueRyuunomai (0x8023DB98): same 588-byte family shape as
+ * fightTrainerAiWazaValueMeisou, accessor fn_80235910, message-id block
+ * 0x204-0x207. */
+u32 fightTrainerAiWazaValueRyuunomai(u32 ctx, u32 poke, u32 msgArg) {
+    u8 v = fn_80235910(ctx, poke);
+    u32 acc = 0;
+    u16 scanBuf[16];
+    u32 stackArr[8];
+    u16 count, i;
+    u8 found;
+
+    if ((u8)fn_80235714(ctx, poke) == 0) {
+        acc = fn_80239984(acc, ctx, 0x204);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x204);
+    }
+
+    count = (u16)fn_801F1C18(0, ctx, stackArr, 1, 1);
+    for (i = 0; i < count; i++) {
+        if (stackArr[i] != poke) {
+            u16 n = (u16)fn_802367CC(ctx, stackArr[i], scanBuf, 0, 1);
+            if (n != 0) {
+                u16 j;
+                for (j = 0; j < n; j++) {
+                    if (scanBuf[j] == 0x10a) {
+                        found = 1;
+                        goto after_scan_ryuunomai;
+                    }
+                }
+            }
+        }
+    }
+    found = 0;
+after_scan_ryuunomai:
+
+    if (found == 1) {
+        acc = fn_80239984(acc, ctx, 0x205);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x205);
+    }
+
+    if ((u8)fn_80235714(ctx, poke) == 1) {
+        acc = fn_80239984(acc, ctx, 0x206);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x206);
+    }
+
+    {
+        s32 count2 = (u8)v - 6;
+        u32 scale;
+        u32 result;
+
+        if (count2 < 0) {
+            count2 = 0;
+        }
+        scale = fn_801FB1C0(0, 0x207, 0x3e, 0);
+        count2 = count2 * scale;
+        result = fightTrainerAiAddValue(acc, count2);
+        fn_80239CCC(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x207, count2);
+        return result;
+    }
+}
+
+/* fightTrainerAiWazaValueBirudoAppu (0x8023DDE4): same 588-byte family shape as
+ * fightTrainerAiWazaValueMeisou, accessor fn_80235AA0, message-id block
+ * 0x200-0x203. */
+u32 fightTrainerAiWazaValueBirudoAppu(u32 ctx, u32 poke, u32 msgArg) {
+    u8 v = fn_80235AA0(ctx, poke);
+    u32 acc = 0;
+    u16 scanBuf[16];
+    u32 stackArr[8];
+    u16 count, i;
+    u8 found;
+
+    if ((u8)fn_80235714(ctx, poke) == 0) {
+        acc = fn_80239984(acc, ctx, 0x200);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x200);
+    }
+
+    count = (u16)fn_801F1C18(0, ctx, stackArr, 1, 1);
+    for (i = 0; i < count; i++) {
+        if (stackArr[i] != poke) {
+            u16 n = (u16)fn_802367CC(ctx, stackArr[i], scanBuf, 0, 1);
+            if (n != 0) {
+                u16 j;
+                for (j = 0; j < n; j++) {
+                    if (scanBuf[j] == 0x10a) {
+                        found = 1;
+                        goto after_scan_birudoappu;
+                    }
+                }
+            }
+        }
+    }
+    found = 0;
+after_scan_birudoappu:
+
+    if (found == 1) {
+        acc = fn_80239984(acc, ctx, 0x201);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x201);
+    }
+
+    if ((u8)fn_80235714(ctx, poke) == 1) {
+        acc = fn_80239984(acc, ctx, 0x202);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x202);
+    }
+
+    {
+        s32 count2 = (u8)v - 6;
+        u32 scale;
+        u32 result;
+
+        if (count2 < 0) {
+            count2 = 0;
+        }
+        scale = fn_801FB1C0(0, 0x203, 0x3e, 0);
+        count2 = count2 * scale;
+        result = fightTrainerAiAddValue(acc, count2);
+        fn_80239CCC(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x203, count2);
+        return result;
+    }
+}
+
+/* fightTrainerAiWazaValueKosumopawaa (0x8023E030): same 588-byte family shape as
+ * fightTrainerAiWazaValueMeisou, accessor fn_80235974, message-id block
+ * 0x1fc-0x1ff. */
+u32 fightTrainerAiWazaValueKosumopawaa(u32 ctx, u32 poke, u32 msgArg) {
+    u8 v = fn_80235974(ctx, poke);
+    u32 acc = 0;
+    u16 scanBuf[16];
+    u32 stackArr[8];
+    u16 count, i;
+    u8 found;
+
+    if ((u8)fn_80235714(ctx, poke) == 0) {
+        acc = fn_80239984(acc, ctx, 0x1fc);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1fc);
+    }
+
+    count = (u16)fn_801F1C18(0, ctx, stackArr, 1, 1);
+    for (i = 0; i < count; i++) {
+        if (stackArr[i] != poke) {
+            u16 n = (u16)fn_802367CC(ctx, stackArr[i], scanBuf, 0, 1);
+            if (n != 0) {
+                u16 j;
+                for (j = 0; j < n; j++) {
+                    if (scanBuf[j] == 0x10a) {
+                        found = 1;
+                        goto after_scan_kosumopawaa;
+                    }
+                }
+            }
+        }
+    }
+    found = 0;
+after_scan_kosumopawaa:
+
+    if (found == 1) {
+        acc = fn_80239984(acc, ctx, 0x1fd);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1fd);
+    }
+
+    if ((u8)fn_80235714(ctx, poke) == 1) {
+        acc = fn_80239984(acc, ctx, 0x1fe);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1fe);
+    }
+
+    {
+        s32 count2 = (u8)v - 6;
+        u32 scale;
+        u32 result;
+
+        if (count2 < 0) {
+            count2 = 0;
+        }
+        scale = fn_801FB1C0(0, 0x1ff, 0x3e, 0);
+        count2 = count2 * scale;
+        result = fightTrainerAiAddValue(acc, count2);
+        fn_80239CCC(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1ff, count2);
+        return result;
+    }
+}
+
+/* fightTrainerAiWazaValueKaihirituAppu (0x8023E27C): same 588-byte family shape as
+ * fightTrainerAiWazaValueMeisou, accessor fn_802357CC, message-id block
+ * 0x1f8-0x1fb. */
+u32 fightTrainerAiWazaValueKaihirituAppu(u32 ctx, u32 poke, u32 msgArg) {
+    u8 v = fn_802357CC(ctx, poke);
+    u32 acc = 0;
+    u16 scanBuf[16];
+    u32 stackArr[8];
+    u16 count, i;
+    u8 found;
+
+    if ((u8)fn_80235714(ctx, poke) == 0) {
+        acc = fn_80239984(acc, ctx, 0x1f8);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1f8);
+    }
+
+    count = (u16)fn_801F1C18(0, ctx, stackArr, 1, 1);
+    for (i = 0; i < count; i++) {
+        if (stackArr[i] != poke) {
+            u16 n = (u16)fn_802367CC(ctx, stackArr[i], scanBuf, 0, 1);
+            if (n != 0) {
+                u16 j;
+                for (j = 0; j < n; j++) {
+                    if (scanBuf[j] == 0x10a) {
+                        found = 1;
+                        goto after_scan_kaihirituappu;
+                    }
+                }
+            }
+        }
+    }
+    found = 0;
+after_scan_kaihirituappu:
+
+    if (found == 1) {
+        acc = fn_80239984(acc, ctx, 0x1f9);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1f9);
+    }
+
+    if ((u8)fn_80235714(ctx, poke) == 1) {
+        acc = fn_80239984(acc, ctx, 0x1fa);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1fa);
+    }
+
+    {
+        s32 count2 = (u8)v - 6;
+        u32 scale;
+        u32 result;
+
+        if (count2 < 0) {
+            count2 = 0;
+        }
+        scale = fn_801FB1C0(0, 0x1fb, 0x3e, 0);
+        count2 = count2 * scale;
+        result = fightTrainerAiAddValue(acc, count2);
+        fn_80239CCC(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1fb, count2);
+        return result;
+    }
+}
+
+/* fightTrainerAiWazaValueDowasure (0x8023E4C8): same 588-byte family shape as
+ * fightTrainerAiWazaValueMeisou, accessor fn_80235974, message-id block
+ * 0x1f4-0x1f7. */
+u32 fightTrainerAiWazaValueDowasure(u32 ctx, u32 poke, u32 msgArg) {
+    u8 v = fn_80235974(ctx, poke);
+    u32 acc = 0;
+    u16 scanBuf[16];
+    u32 stackArr[8];
+    u16 count, i;
+    u8 found;
+
+    if ((u8)fn_80235714(ctx, poke) == 0) {
+        acc = fn_80239984(acc, ctx, 0x1f4);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1f4);
+    }
+
+    count = (u16)fn_801F1C18(0, ctx, stackArr, 1, 1);
+    for (i = 0; i < count; i++) {
+        if (stackArr[i] != poke) {
+            u16 n = (u16)fn_802367CC(ctx, stackArr[i], scanBuf, 0, 1);
+            if (n != 0) {
+                u16 j;
+                for (j = 0; j < n; j++) {
+                    if (scanBuf[j] == 0x10a) {
+                        found = 1;
+                        goto after_scan_dowasure;
+                    }
+                }
+            }
+        }
+    }
+    found = 0;
+after_scan_dowasure:
+
+    if (found == 1) {
+        acc = fn_80239984(acc, ctx, 0x1f5);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1f5);
+    }
+
+    if ((u8)fn_80235714(ctx, poke) == 1) {
+        acc = fn_80239984(acc, ctx, 0x1f6);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1f6);
+    }
+
+    {
+        s32 count2 = (u8)v - 6;
+        u32 scale;
+        u32 result;
+
+        if (count2 < 0) {
+            count2 = 0;
+        }
+        scale = fn_801FB1C0(0, 0x1f7, 0x3e, 0);
+        count2 = count2 * scale;
+        result = fightTrainerAiAddValue(acc, count2);
+        fn_80239CCC(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1f7, count2);
+        return result;
+    }
+}
+
+/* fightTrainerAiWazaValueTokukouAppu (0x8023E714): same 588-byte family shape as
+ * fightTrainerAiWazaValueMeisou, accessor fn_802359D8, message-id block
+ * 0x1f0-0x1f3. */
+u32 fightTrainerAiWazaValueTokukouAppu(u32 ctx, u32 poke, u32 msgArg) {
+    u8 v = fn_802359D8(ctx, poke);
+    u32 acc = 0;
+    u16 scanBuf[16];
+    u32 stackArr[8];
+    u16 count, i;
+    u8 found;
+
+    if ((u8)fn_80235714(ctx, poke) == 0) {
+        acc = fn_80239984(acc, ctx, 0x1f0);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1f0);
+    }
+
+    count = (u16)fn_801F1C18(0, ctx, stackArr, 1, 1);
+    for (i = 0; i < count; i++) {
+        if (stackArr[i] != poke) {
+            u16 n = (u16)fn_802367CC(ctx, stackArr[i], scanBuf, 0, 1);
+            if (n != 0) {
+                u16 j;
+                for (j = 0; j < n; j++) {
+                    if (scanBuf[j] == 0x10a) {
+                        found = 1;
+                        goto after_scan_tokukouappu;
+                    }
+                }
+            }
+        }
+    }
+    found = 0;
+after_scan_tokukouappu:
+
+    if (found == 1) {
+        acc = fn_80239984(acc, ctx, 0x1f1);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1f1);
+    }
+
+    if ((u8)fn_80235714(ctx, poke) == 1) {
+        acc = fn_80239984(acc, ctx, 0x1f2);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1f2);
+    }
+
+    {
+        s32 count2 = (u8)v - 6;
+        u32 scale;
+        u32 result;
+
+        if (count2 < 0) {
+            count2 = 0;
+        }
+        scale = fn_801FB1C0(0, 0x1f3, 0x3e, 0);
+        count2 = count2 * scale;
+        result = fightTrainerAiAddValue(acc, count2);
+        fn_80239CCC(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1f3, count2);
+        return result;
+    }
+}
+
+/* fightTrainerAiWazaValueKousokuidou (0x8023E960): same 588-byte family shape as
+ * fightTrainerAiWazaValueMeisou, accessor fn_80235910, message-id block
+ * 0x1ec-0x1ef. */
+u32 fightTrainerAiWazaValueKousokuidou(u32 ctx, u32 poke, u32 msgArg) {
+    u8 v = fn_80235910(ctx, poke);
+    u32 acc = 0;
+    u16 scanBuf[16];
+    u32 stackArr[8];
+    u16 count, i;
+    u8 found;
+
+    if ((u8)fn_80235714(ctx, poke) == 0) {
+        acc = fn_80239984(acc, ctx, 0x1ec);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1ec);
+    }
+
+    count = (u16)fn_801F1C18(0, ctx, stackArr, 1, 1);
+    for (i = 0; i < count; i++) {
+        if (stackArr[i] != poke) {
+            u16 n = (u16)fn_802367CC(ctx, stackArr[i], scanBuf, 0, 1);
+            if (n != 0) {
+                u16 j;
+                for (j = 0; j < n; j++) {
+                    if (scanBuf[j] == 0x10a) {
+                        found = 1;
+                        goto after_scan_kousokuidou;
+                    }
+                }
+            }
+        }
+    }
+    found = 0;
+after_scan_kousokuidou:
+
+    if (found == 1) {
+        acc = fn_80239984(acc, ctx, 0x1ed);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1ed);
+    }
+
+    if ((u8)fn_80235714(ctx, poke) == 1) {
+        acc = fn_80239984(acc, ctx, 0x1ee);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1ee);
+    }
+
+    {
+        s32 count2 = (u8)v - 6;
+        u32 scale;
+        u32 result;
+
+        if (count2 < 0) {
+            count2 = 0;
+        }
+        scale = fn_801FB1C0(0, 0x1ef, 0x3e, 0);
+        count2 = count2 * scale;
+        result = fightTrainerAiAddValue(acc, count2);
+        fn_80239CCC(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1ef, count2);
+        return result;
+    }
+}
+
+/* fightTrainerAiWazaValueBougyoAppu (0x8023EBAC): same 588-byte family shape as
+ * fightTrainerAiWazaValueMeisou, accessor fn_80235A3C, message-id block
+ * 0x1e8-0x1eb. */
+u32 fightTrainerAiWazaValueBougyoAppu(u32 ctx, u32 poke, u32 msgArg) {
+    u8 v = fn_80235A3C(ctx, poke);
+    u32 acc = 0;
+    u16 scanBuf[16];
+    u32 stackArr[8];
+    u16 count, i;
+    u8 found;
+
+    if ((u8)fn_80235714(ctx, poke) == 0) {
+        acc = fn_80239984(acc, ctx, 0x1e8);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1e8);
+    }
+
+    count = (u16)fn_801F1C18(0, ctx, stackArr, 1, 1);
+    for (i = 0; i < count; i++) {
+        if (stackArr[i] != poke) {
+            u16 n = (u16)fn_802367CC(ctx, stackArr[i], scanBuf, 0, 1);
+            if (n != 0) {
+                u16 j;
+                for (j = 0; j < n; j++) {
+                    if (scanBuf[j] == 0x10a) {
+                        found = 1;
+                        goto after_scan_bougyoappu;
+                    }
+                }
+            }
+        }
+    }
+    found = 0;
+after_scan_bougyoappu:
+
+    if (found == 1) {
+        acc = fn_80239984(acc, ctx, 0x1e9);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1e9);
+    }
+
+    if ((u8)fn_80235714(ctx, poke) == 1) {
+        acc = fn_80239984(acc, ctx, 0x1ea);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1ea);
+    }
+
+    {
+        s32 count2 = (u8)v - 6;
+        u32 scale;
+        u32 result;
+
+        if (count2 < 0) {
+            count2 = 0;
+        }
+        scale = fn_801FB1C0(0, 0x1eb, 0x3e, 0);
+        count2 = count2 * scale;
+        result = fightTrainerAiAddValue(acc, count2);
+        fn_80239CCC(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1eb, count2);
+        return result;
+    }
+}
+
+/* fightTrainerAiWazaValueKougekiAppu (0x8023EDF8): same 588-byte family shape as
+ * fightTrainerAiWazaValueMeisou, accessor fn_80235AA0, message-id block
+ * 0x1e4-0x1e7. */
+u32 fightTrainerAiWazaValueKougekiAppu(u32 ctx, u32 poke, u32 msgArg) {
+    u8 v = fn_80235AA0(ctx, poke);
+    u32 acc = 0;
+    u16 scanBuf[16];
+    u32 stackArr[8];
+    u16 count, i;
+    u8 found;
+
+    if ((u8)fn_80235714(ctx, poke) == 0) {
+        acc = fn_80239984(acc, ctx, 0x1e4);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1e4);
+    }
+
+    count = (u16)fn_801F1C18(0, ctx, stackArr, 1, 1);
+    for (i = 0; i < count; i++) {
+        if (stackArr[i] != poke) {
+            u16 n = (u16)fn_802367CC(ctx, stackArr[i], scanBuf, 0, 1);
+            if (n != 0) {
+                u16 j;
+                for (j = 0; j < n; j++) {
+                    if (scanBuf[j] == 0x10a) {
+                        found = 1;
+                        goto after_scan_kougekiappu;
+                    }
+                }
+            }
+        }
+    }
+    found = 0;
+after_scan_kougekiappu:
+
+    if (found == 1) {
+        acc = fn_80239984(acc, ctx, 0x1e5);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1e5);
+    }
+
+    if ((u8)fn_80235714(ctx, poke) == 1) {
+        acc = fn_80239984(acc, ctx, 0x1e6);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1e6);
+    }
+
+    {
+        s32 count2 = (u8)v - 6;
+        u32 scale;
+        u32 result;
+
+        if (count2 < 0) {
+            count2 = 0;
+        }
+        scale = fn_801FB1C0(0, 0x1e7, 0x3e, 0);
+        count2 = count2 * scale;
+        result = fightTrainerAiAddValue(acc, count2);
+        fn_80239CCC(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x1e7, count2);
+        return result;
+    }
+}
+
+/*
+ * fightTrainerAiWazaValueHaradaiko (0x8023D510)
+ *
+ * The 572-byte outlier of the WazaValue family: same opening
+ * (fn_80235714-gated message 0x210, active-effect-list scan for flag
+ * 0x10a -> message 0x211, fn_80235714==1 -> message 0x212) but the
+ * closing block replaces the clamp+scale+fightTrainerAiAddValue tail
+ * with a fourth plain gated message (fn_802373B0(ctx, poke, -1,
+ * lbl_8047E630) == 1 -> message 0x213), returning the accumulator
+ * directly.
+ */
+extern f32 lbl_8047E630;
+extern u8  fn_802373B0(u32 ctx, u32 poke, s32 val, f32 f);
+u32 fightTrainerAiWazaValueHaradaiko(u32 ctx, u32 poke, u32 msgArg) {
+    u32 acc = 0;
+    u16 scanBuf[16];
+    u32 stackArr[8];
+    u16 count, i;
+    u8 found;
+
+    if ((u8)fn_80235714(ctx, poke) == 0) {
+        acc = fn_80239984(acc, ctx, 0x210);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x210);
+    }
+
+    count = (u16)fn_801F1C18(0, ctx, stackArr, 1, 1);
+    for (i = 0; i < count; i++) {
+        if (stackArr[i] != poke) {
+            u16 n = (u16)fn_802367CC(ctx, stackArr[i], scanBuf, 0, 1);
+            if (n != 0) {
+                u16 j;
+                for (j = 0; j < n; j++) {
+                    if (scanBuf[j] == 0x10a) {
+                        found = 1;
+                        goto after_scan_haradaiko;
+                    }
+                }
+            }
+        }
+    }
+    found = 0;
+after_scan_haradaiko:
+
+    if (found == 1) {
+        acc = fn_80239984(acc, ctx, 0x211);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x211);
+    }
+
+    if ((u8)fn_80235714(ctx, poke) == 1) {
+        acc = fn_80239984(acc, ctx, 0x212);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x212);
+    }
+
+    if ((u8)fn_802373B0(ctx, poke, -1, lbl_8047E630) == 1) {
+        acc = fn_80239984(acc, ctx, 0x213);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(poke), 0, 0, msgArg, 0, 0x213);
+    }
+
+    return acc;
+}
