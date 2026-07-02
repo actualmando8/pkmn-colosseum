@@ -74,7 +74,7 @@ extern void  fn_800F0494(void* handle);                  /* Model free */
 /* Floor subsystem inits */
 extern void  fn_801123D4(u32 floorDataEntry, u32 loadMode); /* Floor resource init */
 extern s32   floorCheckFightKind(u32 floorId);                   /* Floor check ready */
-extern void  fn_8011274C(void);                          /* Floor finalize load */
+extern void  floorCheckFade(void);                          /* Floor finalize load */
 extern void  fn_80112780(void);                          /* Floor begin transition */
 extern void  fn_80117C84(void);                          /* Floor camera update */
 extern void  fn_80115A38(u32 floorDataEntry);            /* Floor res set active */
@@ -539,7 +539,7 @@ void GSfloorThreadMain(void)
             /* Check floor readiness and finalize */
             floorDataEntry = (u32)ctx->floorDataEntry;
             if (floorCheckFightKind(gsFloorCurrentId) == 0) {
-                fn_8011274C();
+                floorCheckFade();
             }
 
             /* Update field camera */

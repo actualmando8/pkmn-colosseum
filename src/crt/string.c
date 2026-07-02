@@ -82,7 +82,7 @@ int strncmp(const char* str1, const char* str2, size_t n) {
 
 
 /* strcmp @ 0x800CA7FC (size 0x128). MSL_C/MSL_Common/Src/string.c (zeldaret/tww); CW 1.3. Verified 100%. */
-int fn_800CA7FC(const char* str1, const char* str2) {
+int strcmp(const char* str1, const char* str2) {
     register u8* left = (u8*)str1;
     register u8* right = (u8*)str2;
     u32 align, r1, l1, x;

@@ -22,8 +22,8 @@ extern s32 fwide(__FILE* file, s32 mode);
 extern s32 __pformatter(WriteFunc writefunc, __FILE* file, const char* fmt, va_list args);
 extern s32 __FileWrite(void* data, s32 count, __FILE* file);
 
-/* fn_800C8600 - 0x800C8600 | size: 0x78 */
-s32 fn_800C8600(char* buf, const char* fmt, va_list args) {
+/* vsprintf - 0x800C8600 | size: 0x78 */
+s32 vsprintf(char* buf, const char* fmt, va_list args) {
     extern s32 __StringWrite(void* data, s32 count, __FILE* file);
     struct { char* p; s32 a; s32 b; } sf;
     s32 n;

@@ -1245,7 +1245,7 @@ u32 fn_8013A49C(void* ptr) {
     return 0;
 }
 #endif
-extern void fn_800C46B0(void);
+extern void __cvt_fp2unsigned(void);
 extern u32 lbl_8047D1B8;
 extern u32 lbl_8047D1BC;
 extern u32 lbl_8047D1C0;
@@ -3349,7 +3349,7 @@ report_null:
     return 0;
 }
 #endif
-extern f64 fn_800CE220(f64 x);
+extern f64 tan(f64 x);
 extern u32 fn_80118DA8(void* ptr);
 extern void fn_80118F04(void* arg1, void* arg2);
 extern u8 fn_800EC954(void* model);

@@ -140,7 +140,7 @@ extern void  fn_800E209C(void* model, u32 param);
 extern void  fn_800E01F4(void* dst, void* src);
 extern void  fn_800E01D0(void* dst, void* src);
 extern void  fn_800E019C(void* model, void* param);
-extern void  fn_800C46B0(void* param1, void* param2);
+extern void  __cvt_fp2unsigned(void* param1, void* param2);
 
 /* Floor resource system */
 extern void* fn_800F9318(u16 group, u16 model, u16 param);

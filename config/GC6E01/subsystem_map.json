@@ -493,7 +493,7 @@
 "addr": "0x80007FDC",
 "size": 56,
 "label": "gs-engine",
-"confidence": 1.9,
+"confidence": 1.89,
 "seed": null
 },
 {
@@ -17473,7 +17473,7 @@
 "seed": null
 },
 {
-"name": "fn_800C3630",
+"name": "EnableEXI2Interrupts",
 "addr": "0x800C3630",
 "size": 72,
 "label": "trk",
@@ -17865,7 +17865,7 @@
 "seed": null
 },
 {
-"name": "fn_800C46B0",
+"name": "__cvt_fp2unsigned",
 "addr": "0x800C46B0",
 "size": 92,
 "label": "gs-engine",
@@ -17985,7 +17985,7 @@
 "seed": null
 },
 {
-"name": "fn_800C4F34",
+"name": "free",
 "addr": "0x800C4F34",
 "size": 112,
 "label": "dolphin-sdk",
@@ -17993,7 +17993,7 @@
 "seed": null
 },
 {
-"name": "fn_800C4FA4",
+"name": "__pool_free",
 "addr": "0x800C4FA4",
 "size": 88,
 "label": "dolphin-sdk",
@@ -18001,7 +18001,7 @@
 "seed": null
 },
 {
-"name": "fn_800C4FFC",
+"name": "deallocate_from_fixed_pools",
 "addr": "0x800C4FFC",
 "size": 344,
 "label": "dolphin-sdk",
@@ -18009,7 +18009,7 @@
 "seed": null
 },
 {
-"name": "fn_800C5154",
+"name": "deallocate_from_var_pools",
 "addr": "0x800C5154",
 "size": 660,
 "label": "dolphin-sdk",
@@ -18017,7 +18017,7 @@
 "seed": null
 },
 {
-"name": "fn_800C53E8",
+"name": "__flush_all",
 "addr": "0x800C53E8",
 "size": 112,
 "label": "dolphin-sdk",
@@ -18201,7 +18201,7 @@
 "seed": null
 },
 {
-"name": "fn_800C8174",
+"name": "memmove",
 "addr": "0x800C8174",
 "size": 204,
 "label": "dolphin-sdk",
@@ -18209,7 +18209,7 @@
 "seed": null
 },
 {
-"name": "fn_800C8240",
+"name": "__copy_longs_rev_unaligned",
 "addr": "0x800C8240",
 "size": 172,
 "label": "dolphin-sdk",
@@ -18217,7 +18217,7 @@
 "seed": null
 },
 {
-"name": "fn_800C82EC",
+"name": "__copy_longs_unaligned",
 "addr": "0x800C82EC",
 "size": 192,
 "label": "dolphin-sdk",
@@ -18225,7 +18225,7 @@
 "seed": null
 },
 {
-"name": "fn_800C83AC",
+"name": "__copy_longs_rev_aligned",
 "addr": "0x800C83AC",
 "size": 168,
 "label": "dolphin-sdk",
@@ -18233,7 +18233,7 @@
 "seed": null
 },
 {
-"name": "fn_800C8454",
+"name": "__copy_longs_aligned",
 "addr": "0x800C8454",
 "size": 188,
 "label": "dolphin-sdk",
@@ -18249,7 +18249,7 @@
 "seed": null
 },
 {
-"name": "fn_800C8520",
+"name": "sprintf",
 "addr": "0x800C8520",
 "size": 224,
 "label": "gs-engine",
@@ -18257,7 +18257,7 @@
 "seed": null
 },
 {
-"name": "fn_800C8600",
+"name": "vsprintf",
 "addr": "0x800C8600",
 "size": 120,
 "label": "gs-engine",
@@ -18273,7 +18273,7 @@
 "seed": null
 },
 {
-"name": "fn_800C8710",
+"name": "printf",
 "addr": "0x800C8710",
 "size": 232,
 "label": "dolphin-sdk",
@@ -18377,7 +18377,7 @@
 "seed": null
 },
 {
-"name": "fn_800CA7FC",
+"name": "strcmp",
 "addr": "0x800CA7FC",
 "size": 296,
 "label": "dolphin-sdk",
@@ -18601,7 +18601,7 @@
 "seed": null
 },
 {
-"name": "fn_800CE220",
+"name": "tan",
 "addr": "0x800CE220",
 "size": 120,
 "label": "hsd",
@@ -18937,7 +18937,7 @@
 "seed": "prefix"
 },
 {
-"name": "fn_800CF47C",
+"name": "InitializeUART",
 "addr": "0x800CF47C",
 "size": 112,
 "label": "dolphin-sdk",
@@ -18957,23 +18957,23 @@
 "addr": "0x800CF708",
 "size": 32,
 "label": "dolphin-sdk",
-"confidence": 1.9,
+"confidence": 1.45,
 "seed": null
 },
 {
-"name": "fn_800CF728",
+"name": "SIIsChanBusy",
 "addr": "0x800CF728",
 "size": 60,
-"label": "dolphin-sdk",
-"confidence": 1.9,
-"seed": null
+"label": "dolphin-si",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "CompleteTransfer",
 "addr": "0x800CF764",
 "size": 764,
-"label": "dolphin-sdk",
-"confidence": 1.45,
+"label": "dolphin-si",
+"confidence": 1.9,
 "seed": null
 },
 {
@@ -19025,7 +19025,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800D02BC",
+"name": "SIGetStatus",
 "addr": "0x800D02BC",
 "size": 124,
 "label": "dolphin-si",
@@ -19057,7 +19057,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800D03C8",
+"name": "SIEnablePolling",
 "addr": "0x800D03C8",
 "size": 156,
 "label": "dolphin-si",
@@ -19065,7 +19065,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800D0464",
+"name": "SIDisablePolling",
 "addr": "0x800D0464",
 "size": 108,
 "label": "dolphin-si",
@@ -19081,7 +19081,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800D05A4",
+"name": "SIGetResponse",
 "addr": "0x800D05A4",
 "size": 196,
 "label": "dolphin-si",
@@ -19089,7 +19089,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800D0668",
+"name": "AlarmHandler_800D0668",
 "addr": "0x800D0668",
 "size": 140,
 "label": "dolphin-si",
@@ -22665,7 +22665,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EA7E4",
+"name": "_modelParseJObjDisp__FP9_HSD_JObjP5GSmtx12HSD_TrspMaskbPFP9_HSD_PObjP5GSmtxP5GSmtxP5GSmtxPv_vPv_800EA7E4",
 "addr": "0x800EA7E4",
 "size": 60,
 "label": "gs-engine",
@@ -26556,17 +26556,17 @@
 "name": "fn_80112700",
 "addr": "0x80112700",
 "size": 76,
-"label": "gs-engine",
+"label": "field",
 "confidence": 1.9,
 "seed": null
 },
 {
-"name": "fn_8011274C",
+"name": "floorCheckFade",
 "addr": "0x8011274C",
 "size": 52,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "field",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_80112780",
@@ -69977,14 +69977,14 @@
 {
 "label": "dolphin-sdk",
 "start": "0x800CF47C",
-"end": "0x800cfa60",
-"count": 5
+"end": "0x800cf728",
+"count": 3
 },
 {
 "label": "dolphin-si",
-"start": "0x800CFA60",
+"start": "0x800CF728",
 "end": "0x800d1070",
-"count": 23
+"count": 25
 },
 {
 "label": "gs-engine",
@@ -70001,8 +70001,20 @@
 {
 "label": "gs-engine",
 "start": "0x801123D4",
+"end": "0x80112700",
+"count": 1
+},
+{
+"label": "field",
+"start": "0x80112700",
+"end": "0x80112780",
+"count": 2
+},
+{
+"label": "gs-engine",
+"start": "0x80112780",
 "end": "0x80112fec",
-"count": 11
+"count": 8
 },
 {
 "label": "people",

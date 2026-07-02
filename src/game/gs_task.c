@@ -459,7 +459,7 @@ u8 fn_8000817C(void) {
 extern void fn_8005D9E4(void);
 extern void fn_8001EA98(void);
 extern void fn_8001E4B4(void);
-extern void fn_800C8520(void);
+extern void sprintf(void);
 extern void fn_800FAEF8(void);
 extern void fn_801906A0(void);
 extern u32 lbl_80478F98;
@@ -485,7 +485,7 @@ void fn_80008868(void) {
     extern void fn_8001E4B4();
     extern void fn_8001EA98();
     extern void fn_8005D9E4();
-    extern void fn_800C8520();
+    extern void sprintf();
     extern void fn_800FAEF8();
     extern void fn_801906A0();
     u8 sp[0x30];
@@ -648,7 +648,7 @@ void fn_80008868(void) {
     r3 = r29;
     r4 = r30;
     r6 = tmp & 0xFFFF;
-    fn_800C8520();
+    sprintf();
     r4 = r25;
     r5 = r24;
     r6 = r29;

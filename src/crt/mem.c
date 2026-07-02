@@ -15,10 +15,10 @@
 #define deref_auto_inc(p) *++(p)
 
 /* MSL mem_funcs.c word-copy helpers (memmove dispatches to these by address). */
-void fn_800C8240(void* dst, const void* src, size_t n); /* __copy_longs_rev_unaligned */
-void fn_800C82EC(void* dst, const void* src, size_t n); /* __copy_longs_unaligned */
-void fn_800C83AC(void* dst, const void* src, size_t n); /* __copy_longs_rev_aligned */
-void fn_800C8454(void* dst, const void* src, size_t n); /* __copy_longs_aligned */
+void __copy_longs_rev_unaligned(void* dst, const void* src, size_t n); /* __copy_longs_rev_unaligned */
+void __copy_longs_unaligned(void* dst, const void* src, size_t n); /* __copy_longs_unaligned */
+void __copy_longs_rev_aligned(void* dst, const void* src, size_t n); /* __copy_longs_rev_aligned */
+void __copy_longs_aligned(void* dst, const void* src, size_t n); /* __copy_longs_aligned */
 
 void __fill_mem(void* dest, int val, u32 count);
 
@@ -199,9 +199,9 @@ void* memchr(const void* src, int val, u32 count) {
 /* Stub functions for coverage - TODO: decompile              */
 /* ========================================================== */
 
-/* fn_800C8174 - 0x800C8174 | size: 0xCC */
+/* memmove - 0x800C8174 | size: 0xCC */
 /* MSL mem.c/mem_funcs.c (zeldaret/tww); CW 2.0. Verified 100%. */
-void* fn_800C8174(void* dst, const void* src, size_t n) {
+void* memmove(void* dst, const void* src, size_t n) {
     u8* csrc;
     u8* cdst;
 
@@ -210,15 +210,15 @@ void* fn_800C8174(void* dst, const void* src, size_t n) {
     if (n >= 32) {
         if (((u32)dst ^ (u32)src) & 3) {
             if (!reverse) {
-                fn_800C82EC(dst, src, n);
+                __copy_longs_unaligned(dst, src, n);
             } else {
-                fn_800C8240(dst, src, n);
+                __copy_longs_rev_unaligned(dst, src, n);
             }
         } else {
             if (!reverse) {
-                fn_800C8454(dst, src, n);
+                __copy_longs_aligned(dst, src, n);
             } else {
-                fn_800C83AC(dst, src, n);
+                __copy_longs_rev_aligned(dst, src, n);
             }
         }
 
@@ -247,9 +247,9 @@ void* fn_800C8174(void* dst, const void* src, size_t n) {
 }
 
 
-/* fn_800C8240 - 0x800C8240 | size: 0xAC */
+/* __copy_longs_rev_unaligned - 0x800C8240 | size: 0xAC */
 /* MSL mem.c/mem_funcs.c (zeldaret/tww); CW 2.0. Verified 100%. */
-void fn_800C8240(void* dst, const void* src, size_t n) {
+void __copy_longs_rev_unaligned(void* dst, const void* src, size_t n) {
     u32 i, v1, v2;
     u32 src_offset, left_shift, right_shift;
 
@@ -302,9 +302,9 @@ void fn_800C8240(void* dst, const void* src, size_t n) {
 }
 
 
-/* fn_800C82EC - 0x800C82EC | size: 0xC0 */
+/* __copy_longs_unaligned - 0x800C82EC | size: 0xC0 */
 /* MSL mem.c/mem_funcs.c (zeldaret/tww); CW 2.0. Verified 100%. */
-void fn_800C82EC(void* dst, const void* src, size_t n) {
+void __copy_longs_unaligned(void* dst, const void* src, size_t n) {
     u32 i, v1, v2;
     u32 src_offset, left_shift, right_shift;
 
@@ -363,9 +363,9 @@ void fn_800C82EC(void* dst, const void* src, size_t n) {
 }
 
 
-/* fn_800C83AC - 0x800C83AC | size: 0xA8 */
+/* __copy_longs_rev_aligned - 0x800C83AC | size: 0xA8 */
 /* MSL mem.c/mem_funcs.c (zeldaret/tww); CW 2.0. Verified 100%. */
-void fn_800C83AC(void* dst, const void* src, size_t n) {
+void __copy_longs_rev_aligned(void* dst, const void* src, size_t n) {
     u32 i;
     u32 v1, v2;
 
@@ -422,9 +422,9 @@ void fn_800C83AC(void* dst, const void* src, size_t n) {
 }
 
 
-/* fn_800C8454 - 0x800C8454 | size: 0xBC */
+/* __copy_longs_aligned - 0x800C8454 | size: 0xBC */
 /* MSL mem.c/mem_funcs.c (zeldaret/tww); CW 2.0. Verified 100%. */
-void fn_800C8454(void* dst, const void* src, size_t n) {
+void __copy_longs_aligned(void* dst, const void* src, size_t n) {
     u32 i;
 
     i = (-(u32)dst) & 3;

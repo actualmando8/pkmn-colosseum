@@ -136,7 +136,7 @@ extern void fn_80168638(u32 numSlots);                   /* Floor/scene loader i
 extern void fn_80130CE0(u32 maxEffects);                 /* 3D model/effect loader */
 extern u32  fn_800E0DDC(void);                           /* OSGetFreeMemSize-like */
 extern void fn_800DD970(const char* fmt, ...);           /* OSReport / debug printf */
-extern f32 fn_800C46B0(f32 volume);                     /* volume clamp/process */
+extern f32 __cvt_fp2unsigned(f32 volume);                     /* volume clamp/process */
 
 /* --- Game main loop (fn_80005AAC) and its helpers --- */
 void fn_80005AAC(void);
@@ -347,10 +347,10 @@ typedef __va_list_struct va_list[1];
 #define va_start(ap, last) ((void)last, __builtin_va_info(&ap))
 #define va_end(ap)         ((void)0)
 
-/* fn_800C8600 = vsprintf */
-extern int  fn_800C8600(char* buf, const char* fmt, va_list ap);
-/* fn_800C8520 = sprintf */
-extern int  fn_800C8520(char* buf, const char* fmt, ...);
+/* vsprintf = vsprintf */
+extern int  vsprintf(char* buf, const char* fmt, va_list ap);
+/* sprintf = sprintf */
+extern int  sprintf(char* buf, const char* fmt, ...);
 
 /* OSGetStackPointer (0x8009BD28) */
 extern u32 OSGetStackPointer(void);
@@ -512,7 +512,7 @@ f32 fn_80005748(void) {
         volume = lbl_8047B6A0; /* 0.0f */
     }
 
-    return fn_800C46B0(volume); /* Some processing/clamping of the volume value */
+    return __cvt_fp2unsigned(volume); /* Some processing/clamping of the volume value */
 }
 
 /* =========================================================================
@@ -1225,20 +1225,20 @@ s32 fn_800064C4(void) {
     u32* sp;
     s32 len;
 
-    n = fn_800C8520((char*)lbl_803A0700, lbl_8047B6C0,
+    n = sprintf((char*)lbl_803A0700, lbl_8047B6C0,
                     ((char**)lbl_802E2888)[lbl_8047A260]);
-    len = n + fn_800C8520((char*)lbl_803A0700 + n, strs + 0x1CC,
+    len = n + sprintf((char*)lbl_803A0700 + n, strs + 0x1CC,
                        *(u32*)(lbl_803A1700 + 0x84), *(u32*)(lbl_803A1700 + 0x80));
-    len += fn_800C8520((char*)lbl_803A0700 + len, strs + 0x1EC,
+    len += sprintf((char*)lbl_803A0700 + len, strs + 0x1EC,
                        *(u32*)(lbl_803A1700 + 0x198), *(u32*)(lbl_803A1700 + 0x19C));
-    len += fn_800C8520((char*)lbl_803A0700 + len, strs + 0x20C,
+    len += sprintf((char*)lbl_803A0700 + len, strs + 0x20C,
                        lbl_8047A264, lbl_8047A268);
-    len += fn_800C8520((char*)lbl_803A0700 + len, strs + 0x190);
+    len += sprintf((char*)lbl_803A0700 + len, strs + 0x190);
 
     i = 0;
     sp = (u32*)*(u32*)(lbl_803A1700 + 0x4);
     while (sp != NULL && (u32)sp != 0xFFFFFFFF && i++ < 0x20) {
-        len += fn_800C8520((char*)lbl_803A0700 + len, strs + 0x1B4,
+        len += sprintf((char*)lbl_803A0700 + len, strs + 0x1B4,
                            sp, sp[0], sp[1]);
         sp = (u32*)sp[0];
     }
@@ -1267,11 +1267,11 @@ void fn_800060F0(const char* file, s32 line, const char* fmt, ...) {
     u32 table = (u32)lbl_80266448;
 
     va_start(ap, fmt);
-    len = fn_800C8600((char*)lbl_803A0700, fmt, ap);
-    pos = len + fn_800C8520((char*)lbl_803A0700 + len, (const char*)(table + 0x178), file, line);
-    pos += fn_800C8520((char*)lbl_803A0700 + pos, (const char*)(table + 0x190));
+    len = vsprintf((char*)lbl_803A0700, fmt, ap);
+    pos = len + sprintf((char*)lbl_803A0700 + len, (const char*)(table + 0x178), file, line);
+    pos += sprintf((char*)lbl_803A0700 + pos, (const char*)(table + 0x190));
     for (i = 0, p = (u32*)OSGetStackPointer(); p && (u32)p != 0xFFFFFFFF && i++ < 0x20; p = (u32*)*p) {
-        pos += fn_800C8520((char*)lbl_803A0700 + pos, (const char*)(table + 0x1B4), p, p[0], p[1]);
+        pos += sprintf((char*)lbl_803A0700 + pos, (const char*)(table + 0x1B4), p, p[0], p[1]);
     }
     fn_800060F0(lbl_8047B6B8, 0x196, (char*)lbl_803A0700);
 }

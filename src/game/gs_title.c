@@ -2068,7 +2068,7 @@ s32 fn_80025F74(void) {
  *   7. Start BGM via fn_80176E0C, then run two timing delay loops
  *      (_threadSwitch + fn_800D3088 accumulator vs 1 or 0xAE target).
  *   8. Store title origin coords to lbl_803A2040[0..2] and start the final
- *      fade-in loop using fn_800C46B0 for FP-to-int conversion.
+ *      fade-in loop using __cvt_fp2unsigned for FP-to-int conversion.
  *
  * Status: 99.1% matched (#pragma optimization_level 2). Remaining diffs:
  * register allocation (frame_a/b in table section, first timing loop delay),
@@ -2088,7 +2088,7 @@ extern void fn_801CB61C(void);
 extern void fn_801CB834(void);
 extern void fn_80165A20(void);
 extern void fn_80176E0C(void);
-extern void fn_800C46B0(void);
+extern void __cvt_fp2unsigned(void);
 extern u8 lbl_8047A380;
 extern u32 lbl_8047A384;
 extern u32 lbl_8047A394;
@@ -2133,7 +2133,7 @@ void fn_80025F84(void) {
     extern f32 lbl_8047B900;
     extern f32 lbl_8047B914;
     extern f32 lbl_8047B918;
-    extern u32 fn_800C46B0(f64);
+    extern u32 __cvt_fp2unsigned(f64);
     extern u32 fn_800D3088(void);
     extern s32 fn_800D37CC(void);
     extern void GSgfxBeginBackFBCapture(u32, void*, s32);
@@ -2223,7 +2223,7 @@ void fn_80025F84(void) {
         delay = 1;
         tick = fn_800D37CC();
         if (tick == 0x32) {
-            delay = fn_800C46B0((f64)lbl_8047B914);
+            delay = __cvt_fp2unsigned((f64)lbl_8047B914);
             if (delay < 1) delay = 1;
         }
         for (elapsed = 0; elapsed < delay; elapsed = elapsed + tick) {
@@ -2234,7 +2234,7 @@ void fn_80025F84(void) {
         delay = 0xae;
         tick = fn_800D37CC();
         if (tick == 0x32) {
-            delay = fn_800C46B0((f64)lbl_8047B918);
+            delay = __cvt_fp2unsigned((f64)lbl_8047B918);
             if (delay < 1) delay = 1;
         }
         for (elapsed = 0; elapsed < delay; elapsed = elapsed + tick) {
@@ -2249,11 +2249,11 @@ void fn_80025F84(void) {
     lbl_8047A39C = fn_800F9318(fn_80113F48(), lbl_8047A384);
     lbl_8047A3A4 = lbl_8047B8A8;
 
-    delay = 0x78 - fn_800C46B0((f64)((f32)fn_800D37CC() * lbl_8047B8E4));
+    delay = 0x78 - __cvt_fp2unsigned((f64)((f32)fn_800D37CC() * lbl_8047B8E4));
     if (delay != 0) {
         tick = fn_800D37CC();
         if (tick == 0x32) {
-            delay = fn_800C46B0((f64)((f32)delay / lbl_8047B900));
+            delay = __cvt_fp2unsigned((f64)((f32)delay / lbl_8047B900));
             if (delay < 1) delay = 1;
         }
     }

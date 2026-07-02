@@ -755,7 +755,7 @@ extern void fn_8017B370(u32 arg);
 extern void fn_8003686C(void);
 extern void fn_80102510(u32 sceneId);
 extern s32 fn_800D37CC(void);
-extern u16 fn_800C46B0(f32 value);
+extern u16 __cvt_fp2unsigned(f32 value);
 extern void fn_800A0FC8(u32 arg);
 extern void fn_800D37D4(u32 a, u32 b, u32 c, u32 d, u32 e, u16 size);
 extern f32 lbl_8047BA4C;
@@ -803,7 +803,7 @@ void fn_800366A8(void) {
     fn_80102510(0x85);
 
     if (lbl_804788B8 != (u32)-1) {
-        size = fn_800C46B0(lbl_8047BA50[0] * (f32)fn_800D37CC());
+        size = __cvt_fp2unsigned(lbl_8047BA50[0] * (f32)fn_800D37CC());
         fn_800A0FC8(lbl_804788B8);
         if (lbl_804788B8 == 1) {
             fn_800D37D4(1, 2, 0, 2, 1, size);

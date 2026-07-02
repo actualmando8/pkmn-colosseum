@@ -1,6 +1,6 @@
 #include "dolphin/types.h"
 
-extern void fn_800C3630(void); /* EnableEXI2Interrupts */
+extern void EnableEXI2Interrupts(void); /* EnableEXI2Interrupts */
 
 extern u8 gTRKCPUState[];
 extern u8 lbl_803FED58[]; /* exception table base */
@@ -25,5 +25,5 @@ u32 TRKTargetTranslate(u32 addr) {
 
 /* EnableMetroTRKInterrupts - 0x800C339C | size 0x20 | scope global */
 void EnableMetroTRKInterrupts(void) {
-    fn_800C3630();
+    EnableEXI2Interrupts();
 }

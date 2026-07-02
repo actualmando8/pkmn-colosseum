@@ -678,7 +678,7 @@ void HSD_WObjRemoveAnim(HSD_WObj* wobj) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern int fn_800CA7FC(void* entry, void* key);
+extern int strcmp(void* entry, void* key);
 typedef struct {
     u32 field00;
     u32 field04;
@@ -706,7 +706,7 @@ asm void HSD_ArchiveGetPublicAddress(void) {
 void* HSD_ArchiveGetPublicAddress(WObjTable* table, void* key) {
     u32 i;
     for (i = 0; i < table->count; i++) {
-        if (fn_800CA7FC(table->data + ((WObjTablePair*) table->pairs)[i].key_offset,
+        if (strcmp(table->data + ((WObjTablePair*) table->pairs)[i].key_offset,
                         key) == 0) {
             return table->base + ((WObjTablePair*) table->pairs)[i].result_offset;
         }

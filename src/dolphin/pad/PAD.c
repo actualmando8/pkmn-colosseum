@@ -34,14 +34,14 @@ extern u16 __OSWirelessPadFixMode; /* absolute address 0x800030E0 */
 
 /* SI library helpers not yet recovered by name (unassigned SI unit). */
 extern void fn_800D0338(s32 chan, u32 command);       /* SISetCommand */
-extern u32 fn_800D03C8(u32 poll);                       /* SIEnablePolling */
-extern u32 fn_800D0464(u32 poll);                        /* SIDisablePolling */
-extern BOOL fn_800D05A4(s32 chan, void *data);            /* SIGetResponse */
+extern u32 SIEnablePolling(u32 poll);                       /* SIEnablePolling */
+extern u32 SIDisablePolling(u32 poll);                        /* SIDisablePolling */
+extern BOOL SIGetResponse(s32 chan, void *data);            /* SIGetResponse */
 extern void fn_800D034C(void);                             /* SITransferCommands */
 extern void SIGetTypeAsync(s32 chan, SITypeAndStatusCallback cb);
 extern BOOL fn_800CF708(void);
-extern BOOL fn_800CF728(s32 chan);
-extern u32 fn_800D02BC(s32 chan);
+extern BOOL SIIsChanBusy(s32 chan);
+extern u32 SIGetStatus(s32 chan);
 extern u32 __shr2i(u32 hi, u32 lo, u32 shift);
 extern void fn_800D104C(void);
 extern void OSRegisterVersion(char *version);
@@ -279,9 +279,9 @@ static void PADOriginCallback(s32 chan, u32 error, OSContext *context) {
     if (!(error & 0xF)) {
         UpdateOrigin(lbl_80478A0C);
         lbl_8047A8A4 |= (0x80000000u >> lbl_80478A0C);
-        fn_800D05A4(lbl_80478A0C, context);
+        SIGetResponse(lbl_80478A0C, context);
         fn_800D0338(lbl_80478A0C, lbl_80478A14 | 0x400000);
-        fn_800D03C8(lbl_8047A8A4);
+        SIEnablePolling(lbl_8047A8A4);
     }
 
     /* DoReset() */
@@ -323,9 +323,9 @@ static void fn_800AA73C(s32 chan, u32 error, OSContext *context) {
 static void PADProbeCallback(s32 chan, u32 error, OSContext *context) {
     if (!(error & 0xF)) {
         lbl_8047A8A4 |= (0x80000000u >> lbl_80478A0C);
-        fn_800D05A4(lbl_80478A0C, context);
+        SIGetResponse(lbl_80478A0C, context);
         fn_800D0338(lbl_80478A0C, lbl_80478A14 | 0x400000);
-        fn_800D03C8(lbl_8047A8A4);
+        SIEnablePolling(lbl_8047A8A4);
         lbl_8047A8B0 |= (0x80000000u >> lbl_80478A0C);
     }
 
@@ -379,9 +379,9 @@ static void PADTypeAndStatusCallback(s32 chan, u32 type) {
 
     if (lbl_80478A18 < 2) {
         lbl_8047A8A4 |= (0x80000000u >> chan);
-        fn_800D05A4(chan, 0);
+        SIGetResponse(chan, 0);
         fn_800D0338(chan, lbl_80478A14 | 0x400000);
-        fn_800D03C8(lbl_8047A8A4);
+        SIEnablePolling(lbl_8047A8A4);
 
         /* DoReset() */
         lbl_80478A0C = __cntlzw(lbl_8047A8A8);
@@ -458,7 +458,7 @@ BOOL fn_800AAD34(u32 mask) {
     if (lbl_80478A18 == 4) {
         lbl_8047A8AC |= mask;
     }
-    fn_800D0464(lbl_8047A8A8);
+    SIDisablePolling(lbl_8047A8A8);
 
     if (lbl_80478A0C == 0x20) {
         lbl_80478A0C = __cntlzw(lbl_8047A8A8);
@@ -487,7 +487,7 @@ BOOL fn_800AAE34(u32 mask) {
     lbl_8047A8A8 |= mask;
     lbl_8047A8A4 &= ~mask;
     lbl_8047A8AC |= mask;
-    fn_800D0464(lbl_8047A8A8);
+    SIDisablePolling(lbl_8047A8A8);
 
     if (lbl_80478A0C == 0x20) {
         lbl_80478A0C = __cntlzw(lbl_8047A8A8);
@@ -556,14 +556,14 @@ BOOL fn_800AB150(PADStatus *status) {
             memset(status, 0, 0xA);
             continue;
         }
-        if (!fn_800CF728(chan)) {
+        if (!SIIsChanBusy(chan)) {
             status->err = -3;
             memset(status, 0, 0xA);
             continue;
         }
-        if (fn_800D02BC(chan) & 0x8) {
+        if (SIGetStatus(chan) & 0x8) {
             OSContext ctx;
-            fn_800D05A4(chan, &ctx);
+            SIGetResponse(chan, &ctx);
             if (lbl_8047A8B0 & chanBit) {
                 status->err = 0;
                 memset(status, 0, 0xA);
@@ -592,7 +592,7 @@ BOOL fn_800AB150(PADStatus *status) {
             rumble |= chanBit;
         }
 
-        if (!fn_800D05A4(chan, 0)) {
+        if (!SIGetResponse(chan, 0)) {
             status->err = -3;
             memset(status, 0, 0xA);
             continue;
@@ -664,7 +664,7 @@ void fn_800ABCF4(s32 mode) {
     lbl_8047A8B0 = ~0u & lbl_8047A8B0;
     lbl_8047A8B4 = 0;
 
-    fn_800D0464(oldEnabled);
+    SIDisablePolling(oldEnabled);
 
     OSRestoreInterrupts(enabled);
 }
@@ -697,7 +697,7 @@ BOOL fn_800ABD68(BOOL final) {
             lbl_8047A8A8 |= mask;
             lbl_8047A8A4 &= ~mask;
             lbl_8047A8AC |= mask;
-            fn_800D0464(lbl_8047A8A8);
+            SIDisablePolling(lbl_8047A8A8);
 
             if (lbl_80478A0C == 0x20) {
                 lbl_80478A0C = __cntlzw(lbl_8047A8A8);

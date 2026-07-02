@@ -64,7 +64,7 @@ extern u16   _toolentryAlloc__FUl(u32 size);                    /* GSmemAllocRaw
 extern void* fn_800E27B0(u16 handle);                  /* GSmemGetPtr */
 extern void* fn_800E2C04(u32 size, u32 align);         /* GSmemAllocAligned */
 extern void  fn_800EF5A4(void);                        /* GStexture trigger */
-extern void  fn_800C8710(const char* fmt, ...);         /* OSPanic / printf */
+extern void  printf(const char* fmt, ...);         /* OSPanic / printf */
 
 /* Matrix / vector math helpers */
 extern void  PSMTXIdentity(void);                         /* MTXIdentity or push */
@@ -1230,7 +1230,7 @@ void* GScolsys2_Draw(void)
 
     /* Allocate display list buffer (512KB) */
     if (fn_800DAF60((void*)COL_GFX_HANDLE, 0x80000) == 0) {
-        fn_800C8710(lbl_80272050);
+        printf(lbl_80272050);
         return NULL;
     }
 

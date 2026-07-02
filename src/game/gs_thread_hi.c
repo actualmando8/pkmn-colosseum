@@ -175,7 +175,7 @@ extern void fn_80166A28(void);
 extern void fn_800D59B8(void);
 extern void fn_800D5BA0(void);
 extern void fn_800D9D68(u16 a, u16 b, u16 c, u16 d);
-extern f64 fn_800CE220(void);
+extern f64 tan(void);
 extern void fn_800D7FE4(void* mtx);
 extern void fn_800D834C(void);
 extern void fn_800D9BD0(f32 a, f32 b, f32 c, f32 d);
@@ -4396,7 +4396,7 @@ void fn_800FE4D4(void) {
     sy = lbl_8047CD5C / *(f32*)&lbl_80478B14;
     x = sx * lbl_8047CD60;
     y = sy * lbl_8047CD60;
-    t = (f32)fn_800CE220();
+    t = (f32)tan();
     z = y / t;
 
     fn_800E01F4(v0,
@@ -5120,7 +5120,7 @@ s32 fn_800F13D0(void* obj) {
 #endif
 
 /* 0x800F16C0 | 0x34C */
-extern s32 fn_800C8520(u8* buf, const char* fmt, ...);
+extern s32 sprintf(u8* buf, const char* fmt, ...);
 extern u8 lbl_80401AB8[];
 extern u8 lbl_80401A78[];
 extern u8 lbl_8047CCB8[];
@@ -5192,17 +5192,17 @@ s32 fn_800F16C0(void* obj) {
                 sch = (s8)ch;
                 if (sch == 'd' || sch == 'x' || sch == 'c') {
                     lbl_80401A78[fmtLen] = 0;
-                    r29 = fn_800C8520(r26, (const char*)lbl_80401A78, argVal);
+                    r29 = sprintf(r26, (const char*)lbl_80401A78, argVal);
                     r26 += r29;
                     break;
                 } else if (sch == 'f') {
                     lbl_80401A78[fmtLen] = 0;
-                    r29 = fn_800C8520(r26, (const char*)lbl_80401A78, *(f32*)&argVal);
+                    r29 = sprintf(r26, (const char*)lbl_80401A78, *(f32*)&argVal);
                     r26 += r29;
                     break;
                 } else if (sch == 's') {
                     lbl_80401A78[fmtLen] = 0;
-                    r29 = fn_800C8520(r26, (const char*)lbl_80401A78, argVal);
+                    r29 = sprintf(r26, (const char*)lbl_80401A78, argVal);
                     r26 += r29;
                     break;
                 } else if (sch == 0) {
@@ -5212,7 +5212,7 @@ s32 fn_800F16C0(void* obj) {
             }
         } else if (sch == 0x5C) { /* '\' */
             if ((s8)r27[1] == 'n') {
-                r29 = fn_800C8520(r26, (const char*)lbl_8047CCB8);
+                r29 = sprintf(r26, (const char*)lbl_8047CCB8);
                 r27++;
                 r26 += r29;
             } else {

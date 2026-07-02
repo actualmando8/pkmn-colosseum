@@ -984,7 +984,7 @@ extern void fn_800D67BC();
 extern void fn_800D61E4();
 extern void fn_800D5BA0();
 extern void fn_800D6728();
-extern void fn_800C46B0();
+extern void __cvt_fp2unsigned();
 extern f64 lbl_8047B730;
 extern f32 lbl_8047B720;
 extern f64 lbl_8047B738;
@@ -1010,7 +1010,7 @@ void fn_80011EA4(void) {
     extern f64 lbl_8047B730;
     extern f64 lbl_8047B738;
     extern void fn_8001DACC();
-    extern void fn_800C46B0();
+    extern void __cvt_fp2unsigned();
     extern void fn_800D5BA0();
     extern void fn_800D61E4();
     extern void fn_800D6728();
@@ -1517,7 +1517,7 @@ L_80012680:
         f1 = f1 - f2;
         f0 = f0 - f2;
         f1 = f3 * f1 + f0;
-        fn_800C46B0();
+        __cvt_fp2unsigned();
     } else {
 
         r3 = *(u32*)((u8*)r30 + 0x20);

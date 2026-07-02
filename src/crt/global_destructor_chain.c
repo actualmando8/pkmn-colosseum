@@ -74,7 +74,7 @@ void __destroy_global_chain(void) {
  * comparisons, so the exact target bytes are not C-reachable from any available CW
  * version. This is correct, real C left active (Equivalent), not byte-exact.
  */
-u32 fn_800C46B0(f64 val) {
+u32 __cvt_fp2unsigned(f64 val) {
     extern f64 lbl_8026FE58[];
     u32 result;
     f64 tmp;

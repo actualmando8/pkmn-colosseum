@@ -40,7 +40,7 @@ extern void  fn_80167ED0(u32 fileInfo, void* buf, u32 len, u32 offset);
 extern void  DCFlushRange(void* addr, u32 len);
 
 /* sprintf-like */
-extern void  fn_800C8520(char* dst, const char* fmt, ...);
+extern void  sprintf(char* dst, const char* fmt, ...);
 
 /* Memory read (heap-to-ptr with DMA) */
 extern void* fn_800F9418(u32 size, u32 priority, u32 alignment, u32 fileID, u32 param);
@@ -507,7 +507,7 @@ void FSYSBeginLoad(FSYSSlot* slot, u32 fileHandle,
     }
 
     /* Format the filename as "%s.fsys" */
-    fn_800C8520(nameBuf, "%s.fsys", tocName);
+    sprintf(nameBuf, "%s.fsys", tocName);
     strcpy(slot->filename, nameBuf);
 
     /* Check if another slot is already actively loading */
@@ -572,7 +572,7 @@ state_loaded:
     }
 
     /* Format filename and set up for re-load */
-    fn_800C8520(nameBuf, "%s.fsys", tocName);
+    sprintf(nameBuf, "%s.fsys", tocName);
     strcpy(slot->filename, nameBuf);
 
     /* Check if loading is blocked */

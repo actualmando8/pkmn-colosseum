@@ -154,7 +154,7 @@ extern void fn_800BE464(TRKEvent* event, s32 type);  /* TRKConstructEvent */
 extern TRKResult fn_800BE47C(TRKEvent* event);        /* TRKPostEvent */
 
 extern void fn_800C3600(void);         /* comm helper */
-extern void fn_800C3630(void);         /* EnableEXI2Interrupts */
+extern void EnableEXI2Interrupts(void);         /* EnableEXI2Interrupts */
 
 extern void Hu_IsStub(void);
 extern void AMC_IsStub(void);

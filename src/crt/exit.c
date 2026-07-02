@@ -153,15 +153,15 @@ void usr_put_initialize(void) {
 /* Stub functions for coverage - TODO: decompile              */
 /* ========================================================== */
 
-/* fn_800C4F34 - 0x800C4F34 | size: 0x70
+/* free - 0x800C4F34 | size: 0x70
  * atexit - Register an exit handler function.
  * On first call, initializes the handler table (0x34 bytes).
- * Then adds the function via fn_800C4FA4.
+ * Then adds the function via __pool_free.
  */
-void fn_800C4F34(void* handler) {
+void free(void* handler) {
     extern u8 lbl_803FFBB8[];
     extern u8 lbl_8047AA08;
-    extern void fn_800C4FA4(u8* table, void* handler);
+    extern void __pool_free(u8* table, void* handler);
 
     __begin_critical_region(1);
 
@@ -170,16 +170,16 @@ void fn_800C4F34(void* handler) {
         lbl_8047AA08 = 1;
     }
 
-    fn_800C4FA4(lbl_803FFBB8, handler);
+    __pool_free(lbl_803FFBB8, handler);
     __end_critical_region(1);
 }
 
 /* ----------------------------------------------------------------
  * MSL MSL_C alloc.c — variable / fixed pool deallocator.
  * Genuine MetroWerks Standard Library source, wired to Colosseum's
- * own symbol names (fn_800C4FA4 = __pool_free,
- * fn_800C4FFC = deallocate_from_fixed_pools,
- * fn_800C5154 = deallocate_from_var_pools, __sys_free = __sys_free).
+ * own symbol names (__pool_free = __pool_free,
+ * deallocate_from_fixed_pools = deallocate_from_fixed_pools,
+ * deallocate_from_var_pools = deallocate_from_var_pools, __sys_free = __sys_free).
  * ---------------------------------------------------------------- */
 
 typedef struct Block {
@@ -359,11 +359,11 @@ static inline Block* __unlink(__mem_pool_obj* pool_obj, Block* bp) {
     return result;
 }
 
-void fn_800C4FFC(__mem_pool_obj* pool_obj, void* ptr, unsigned long size);
-void fn_800C5154(__mem_pool_obj* pool_obj, void* ptr);
+void deallocate_from_fixed_pools(__mem_pool_obj* pool_obj, void* ptr, unsigned long size);
+void deallocate_from_var_pools(__mem_pool_obj* pool_obj, void* ptr);
 
-/* fn_800C4FA4 - 0x800C4FA4 | size: 0x58 — __pool_free */
-void fn_800C4FA4(void* pool, void* ptr) {
+/* __pool_free - 0x800C4FA4 | size: 0x58 — __pool_free */
+void __pool_free(void* pool, void* ptr) {
     __mem_pool_obj* pool_obj;
     unsigned long size;
 
@@ -375,14 +375,14 @@ void fn_800C4FA4(void* pool, void* ptr) {
     size = __msize_inline(ptr);
 
     if (size <= 68) {
-        fn_800C4FFC(pool_obj, ptr, size);
+        deallocate_from_fixed_pools(pool_obj, ptr, size);
     } else {
-        fn_800C5154(pool_obj, ptr);
+        deallocate_from_var_pools(pool_obj, ptr);
     }
 }
 
-/* fn_800C4FFC - 0x800C4FFC | size: 0x158 — deallocate_from_fixed_pools */
-void fn_800C4FFC(__mem_pool_obj* pool_obj, void* ptr, unsigned long size) {
+/* deallocate_from_fixed_pools - 0x800C4FFC | size: 0x158 — deallocate_from_fixed_pools */
+void deallocate_from_fixed_pools(__mem_pool_obj* pool_obj, void* ptr, unsigned long size) {
     unsigned long i = 0;
     FixSubBlock* p;
     FixBlock* b;
@@ -434,12 +434,12 @@ void fn_800C4FFC(__mem_pool_obj* pool_obj, void* ptr, unsigned long size) {
             fs->tail_ = 0;
         }
 
-        fn_800C5154(pool_obj, b);
+        deallocate_from_var_pools(pool_obj, b);
     }
 }
 
-/* fn_800C5154 - 0x800C5154 | size: 0x294 — deallocate_from_var_pools */
-void fn_800C5154(__mem_pool_obj* pool_obj, void* ptr) {
+/* deallocate_from_var_pools - 0x800C5154 | size: 0x294 — deallocate_from_var_pools */
+void deallocate_from_var_pools(__mem_pool_obj* pool_obj, void* ptr) {
     SubBlock* sb = SubBlock_from_pointer(ptr);
     SubBlock* _sb;
 
@@ -502,8 +502,8 @@ typedef struct _MSL_FILE {
 extern MSL_FILE __files;        /* &__files._stdin == &__files */
 extern int fflush(MSL_FILE* file);
 
-/* fn_800C53E8 - 0x800C53E8 | size: 0x70 — __flush_all */
-unsigned int fn_800C53E8(void) {
+/* __flush_all - 0x800C53E8 | size: 0x70 — __flush_all */
+unsigned int __flush_all(void) {
     unsigned int ret = 0;
     MSL_FILE* file = &__files;
 

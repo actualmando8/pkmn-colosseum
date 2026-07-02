@@ -90,7 +90,7 @@ extern void  fn_800E019C(void* model, void* param);
 extern void  fn_800E0BA0(void* param);
 extern void  fn_800E0BE4(void* param);
 extern void  fn_800E013C(void* param);
-extern u32   fn_800C46B0(f64 val);
+extern u32   __cvt_fp2unsigned(f64 val);
 
 /* Floor/field system */
 extern void* fn_800F9318(u16 group, u16 model, u16 param);
@@ -1792,7 +1792,7 @@ typedef struct PeopleFieldMoveScale {
 u32 hwFrq2Pitch(u32 value) {
     PeopleFieldMoveScale* scale = (PeopleFieldMoveScale*)lbl_80434C50;
 
-    return fn_800C46B0((lbl_8047D4E0 * (f32)value) / (f32)scale->divisor);
+    return __cvt_fp2unsigned((lbl_8047D4E0 * (f32)value) / (f32)scale->divisor);
 }
 #endif
 #pragma pop
