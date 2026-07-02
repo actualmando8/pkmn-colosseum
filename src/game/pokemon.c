@@ -1807,11 +1807,11 @@ u32 _fightFloorCheckHuuinWazaFightOutPokemonSub__FPvUsPv(void* obj, u32 slot, vo
     extern void* fn_80205B8C(void*);
     extern s32 fn_80123B5C(void*, u32);
     struct { void* mon; u32 waza; u32 result; }* s = data;
-    void* mon;
     u32 waza;
+    void* mon;
 
-    mon = s->mon;
     waza = (u16)s->waza;
+    mon = s->mon;
     if ((u8)fn_802062FC() == 0)
         return 1;
     if ((u8)fn_80202B88(obj, mon) != 0) goto _ret1;

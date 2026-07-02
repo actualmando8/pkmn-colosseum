@@ -30828,6 +30828,42 @@ void fn_8025BA2C(void* ctx, u32 param1, u32 param2, u32 param3) {
     return;
 }
 
+/*
+ * fightTrainerAiWazaHit008 (0x8025BA2C)
+ *
+ * Same WazaHitNNN veto template as fightTrainerAiWazaHit007, minus the
+ * fn_801F1A6C flinch-count check: instead gates on two fn_80236BFC flag
+ * checks (0x14, 0x8), then the shared fn_8025C264 tri-state gate / 0x43
+ * type-immunity check.
+ */
+s32 fightTrainerAiWazaHit008(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_802395C8(void* ctx, u32 param2, u32 param1);
+    extern u8 fn_80236BFC(void* ctx, u32 param3, u32 flag);
+    extern u32 fn_80239500(void* ctx, u32 param2);
+    extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
+    extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    u32 v1 = fn_802395C8(ctx, param2, param1);
+    s32 gate;
+
+    if (fn_80236BFC(ctx, param3, 0x14) == 1) {
+        return 0;
+    }
+    if (!fn_80236BFC(ctx, param3, 0x8)) {
+        return 0;
+    }
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
+        return 0;
+    }
+    if (gate == 0) {
+        return 0;
+    }
+    if (gate == -1) {
+        return 1;
+    }
+    return 1;
+}
+
 /* Address: 0x8025BB20 | Size: 0x108 (264 bytes) */
 void fn_8025BB20(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fn_801F1A6C();
@@ -30910,6 +30946,49 @@ void fn_8025BB20(void* ctx, u32 param1, u32 param2, u32 param3) {
     r3 = 0x1;
 
     return;
+}
+
+/*
+ * fightTrainerAiWazaHit007 (0x8025BB20)
+ *
+ * Per-move AI evaluator gate: vetoes the move (returns 0) if any of 4
+ * checks trip -- (1) already-flinched-ish tri-state via fn_8022967C +
+ * fn_801F1A6C's flag-count buffer, (2) fn_8025CBE8(ctx), (3) fn_8023793C
+ * type/immunity check == 0x43, (4) fn_8025C264's tri-state gate == 0.
+ * Otherwise returns 1. Shares its template with the WazaHitNNN family
+ * (see fn_8025BA2C aka fightTrainerAiWazaHit008, same shape minus the
+ * fn_801F1A6C flinch-count check).
+ */
+s32 fightTrainerAiWazaHit007(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_802395C8(void* ctx, u32 param2, u32 param1);
+    extern u32 fn_801F1A6C(u32 zero, void* ctx, void* buf, u32 one1, u32 one2);
+    extern u8 fn_8022967C(u32 param2);
+    extern u8 fn_8025CBE8(void* ctx);
+    extern u32 fn_80239500(void* ctx, u32 param2);
+    extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
+    extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    u8 buf[0x60];
+    u32 v1 = fn_802395C8(ctx, param2, param1);
+    u32 flinchCount = fn_801F1A6C(0, ctx, buf, 1, 1);
+    s32 gate;
+
+    if (fn_8022967C(param2) == 1 && (u16)flinchCount <= 1) {
+        return 0;
+    }
+    if (fn_8025CBE8(ctx) == 1) {
+        return 0;
+    }
+    if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
+        return 0;
+    }
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    if (gate == 0) {
+        return 0;
+    }
+    if (gate == -1) {
+        return 1;
+    }
+    return 1;
 }
 
 /* Address: 0x8025BC28 | Size: 0xB4 */
@@ -31622,6 +31701,43 @@ void fn_8025C6BC(void* ctx, u32 param1, u32 param2) {
 
     return;
 }
+
+/* fightTrainerAiCheckHorobinoutaSub's counter context: field0 (id passed to the
+ * 3 gate checks below) at 0x0, running counter at 0x4. */
+typedef struct HorobinoutaCtx {
+    u32 field0;
+    u32 counter;
+} HorobinoutaCtx;
+
+/*
+ * _fightTrainerAiCheckHorobinoutaSub (0x8025C6BC)
+ *
+ * Perish Song (Horobinouta) counter callback, invoked per-floor-slot via
+ * fn_801F37B0 (see fn_8025C674). Runs 3 chained gate checks against
+ * ctx->field0/floor/idx; only when ALL 3 fail does it increment
+ * ctx->counter. Always returns 1 (the enumeration driver doesn't use the
+ * return value -- the counter in ctx is the real output).
+ */
+#pragma optimize_for_size on
+s32 _fightTrainerAiCheckHorobinoutaSub(void* floor, u16 idx, HorobinoutaCtx* ctx) {
+    extern u8 fn_802062FC(void* floor, u16 idx, HorobinoutaCtx* ctx);
+    extern u8 fn_801F8424(u32 fieldA, void* floor, u16 idx);
+    extern u8 fn_80236BFC(u32 fieldA, void* floor, u32 flag);
+    extern u8 fn_80237F74(u32 fieldA, void* floor, u32 flag);
+    u32 fieldA = ctx->field0;
+
+    if (!fn_802062FC(floor, idx, ctx)) {
+        return 1;
+    }
+    if (fn_801F8424(fieldA, floor, idx) == 1) {
+        return 1;
+    }
+    if (fn_80236BFC(fieldA, floor, 0x1e) != 1 && fn_80237F74(fieldA, floor, 0x2b) != 1) {
+        ctx->counter++;
+    }
+    return 1;
+}
+#pragma optimize_for_size reset
 
 /* Address: 0x8025C770 | Size: 0x98 */
 void fn_8025C770(void* ctx, u32 param1, u32 param2) {
