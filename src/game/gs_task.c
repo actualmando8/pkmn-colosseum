@@ -91,7 +91,7 @@ extern void  GSscene_SetMode(s32 mode);               /* GSscene_SetMode */
 
 /* FSYS archive loading */
 extern void* fn_801FB1C0(s32 slot, u16 sceneId, s32 priority, s32 group);
-extern s32   fn_80106394(s32 slot, s32 active);
+extern s32   fn_80106394(void* handle, s32 a, s32 b);
 extern s32   fn_80106080(s32 slot);
 
 /* Event dispatch */
@@ -158,10 +158,13 @@ extern void* gEncounterTable;   /* lbl_80478F00 : .sbss -- encounter difficulty 
  * Simple wrapper that calls GSscene_CameraSetPosition to reset the
  * camera, then returns 0. Called at the start of scene transitions.
  * ========================================================================= */
+#pragma push
+#pragma scheduling off
 s32 fn_80006630(void) {
     fn_801794F0();
     return 0;
 }
+#pragma pop
 
 /* =========================================================================
  * Function: fn_80006654 (orphan fiction "GStask_LoadTopMenu" renamed --
@@ -173,6 +176,9 @@ s32 fn_80006630(void) {
  * Otherwise, dispatches a new archive load for the top menu FSYS with
  * default parameters and sets up the viewport at (0x14, 0x104).
  * ========================================================================= */
+#pragma push
+#pragma scheduling off
+#pragma peephole off
 s32 fn_80006654(void) {
     if (fn_80102620(6) != 0) {
         fn_80102510(6);
@@ -182,6 +188,7 @@ s32 fn_80006654(void) {
     }
     return 0;
 }
+#pragma pop
 
 /* =========================================================================
  * Function: dbgMenuCameraSetType (orphan fiction "GStask_SetSceneType"
@@ -198,16 +205,24 @@ s32 fn_80006654(void) {
  *   mode 2:        type 6 (cutscene)
  * Always returns 0.
  * ========================================================================= */
+#pragma push
+#pragma scheduling off
 s32 dbgMenuCameraSetType(void* unused, s32 mode) {
-    if (mode == 1) {
+    switch (mode) {
+    case 1:
         GSscene_SetMode(5);
-    } else if (mode == 2) {
+        break;
+    case 2:
         GSscene_SetMode(6);
-    } else {
+        break;
+    case 0:
+    default:
         GSscene_SetMode(0);
+        break;
     }
     return 0;
 }
+#pragma pop
 
 /* =========================================================================
  * Function: fn_80006724 (orphan fiction "GStask_LoadPDAMenu" renamed --
@@ -219,6 +234,8 @@ s32 dbgMenuCameraSetType(void* unused, s32 mode) {
  * Uses the current scene ID from lbl_8047A288 as a context parameter.
  * On success, activates the archive and returns 1; on failure returns -1.
  * ========================================================================= */
+#pragma push
+#pragma scheduling off
 s32 fn_80006724(void) {
     void* result;
 
@@ -226,7 +243,7 @@ s32 fn_80006724(void) {
     if (result == NULL) {
         return -1;
     }
-    fn_80106394(1, 1);
+    fn_80106394(result, 1, 1);
     fn_80106080(1);
     return 1;
 }
@@ -247,7 +264,7 @@ s32 fn_8000677C(void) {
     if (result == NULL) {
         return -1;
     }
-    fn_80106394(1, 1);
+    fn_80106394(result, 1, 1);
     fn_80106080(1);
     return 1;
 }
@@ -267,7 +284,7 @@ s32 fn_800067D4(void) {
     if (result == NULL) {
         return -1;
     }
-    fn_80106394(1, 1);
+    fn_80106394(result, 1, 1);
     fn_80106080(1);
     return 1;
 }
@@ -287,10 +304,11 @@ s32 fn_8000682C(void) {
     if (result == NULL) {
         return -1;
     }
-    fn_80106394(1, 1);
+    fn_80106394(result, 1, 1);
     fn_80106080(1);
     return 1;
 }
+#pragma pop
 
 /* =========================================================================
  * Remaining functions in this module (0x80006884 - 0x80009178) are not
@@ -1483,7 +1501,7 @@ s32 menuFightPokemonSelectSub(u32 ctx) {
 #endif
 
 /* fn_8000765C - 0x8000765C | size: 0xac */
-extern void* _dbgMenuFightGetFightTrainerPokemonPartDataIdSub(u16 id);
+extern void* _dbgMenuFightGetFightTrainerPokemonPartDataIdSub(u32 id);
 extern void fn_80051710(u16 id);
 extern u16 lbl_80478830;
 extern u32 lbl_80478F08;
@@ -1804,7 +1822,6 @@ s32 fn_80007B30(void) {
     u8 save_field;
     u8 save_stereo;
     s32 evt;
-    u32 tmp;
 
     save_vol = lbl_80478828;
     save_stereo = lbl_8047A271;
@@ -1857,6 +1874,7 @@ s32 fn_80007B30(void) {
 
         if (evt == 0x59) {
             u8 ret;
+            u32 tmp;
             ret = fn_8001E224(lbl_80478828, &tmp, 1, 0x32, 0x32, 0);
             if (ret == 0) {
                 fn_8001E200();
@@ -1885,10 +1903,8 @@ s32 fn_80007B30(void) {
         }
 
         if (evt == 0x5d) {
-            u8 curVal;
             s8 r;
-            curVal = fn_802117FC();
-            r = menuSubOpenYesNo(0x7f, -1, -1, curVal == 0);
+            r = menuSubOpenYesNo(0x7f, -1, -1, fn_802117FC() == 0);
             if (r == 0) {
                 fn_80211810(1);
             } else if (r == 1) {
@@ -1943,10 +1959,11 @@ s32 fn_80007B30(void) {
 
         if (evt == 0x77a) {
             if (fn_801EF63C() != 0) {
-                s16 sid;
                 s32 maxVal;
-                sid = (s16)lbl_8047A282;
+                s32 sid;
+                u32 tmp;
                 maxVal = 0x162;
+                sid = lbl_8047A282;
                 for (;;) {
                     if (fn_8001E304((u16)sid, &tmp, _dbgMenuFightGetWazaDataIdSub) == 0) {
                         sid = -1;
@@ -1955,7 +1972,7 @@ s32 fn_80007B30(void) {
                             tmp = (u32)maxVal;
                         }
                         fn_8001E200();
-                        sid = (s16)tmp;
+                        sid = tmp;
                     }
                     if (sid < 0) break;
                     if (fightSeqCheckYubiwohuruWazaDataId((u16)sid) == 1) {
@@ -2147,6 +2164,17 @@ void* _dbgMenuFightGetFightTrainerAiAddsubValueDataIdSub(u32 id) {
 }
 #pragma peephole on
 #endif
+
+/* _dbgMenuFightGetFightTrainerPokemonPartDataIdSub - 0x80008390 | size: 0x6c */
+extern u32 lbl_80478F08;
+#pragma push
+#pragma peephole off
+void* _dbgMenuFightGetFightTrainerPokemonPartDataIdSub(u32 id) {
+    if (id == 0) return fn_800FA280(0xEB63);
+    if (id >= *(u32*)(void*)lbl_80478F08) return fn_800FA280(0xEB63);
+    return fn_800FA280((u32)fn_801FB1C0(0, (u16)id, 0xb, 0));
+}
+#pragma pop
 
 /* _dbgMenuFightGetWazaDataIdSub - 0x800083FC | size: 0x64 */
 extern void* fn_8011BEB4(s32 a, u16 b, s32 c, s32 d);
