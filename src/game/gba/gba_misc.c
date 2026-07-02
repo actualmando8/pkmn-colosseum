@@ -3641,7 +3641,7 @@ void fn_8008C6FC(void) {
 void GbaMisc_RunFlagDispatch(void) {
     extern s32 fn_80113F48(void);
     extern s32 fn_801906A0(s32);
-    extern void fn_8019075C(s32, s32);
+    extern void _flagSet(s32, s32);
     s32 arg;
     u32 state;
     u32 offset;
@@ -3660,7 +3660,7 @@ void GbaMisc_RunFlagDispatch(void) {
     if ((u32)nextState >= 0x1f) {
         nextState = 0;
     }
-    fn_8019075C(0xb5d, nextState);
+    _flagSet(0xb5d, nextState);
 }
 #pragma pop
 

@@ -3832,13 +3832,13 @@ u32 fn_80205C24(int r3,char r4)
 #pragma peephole on
 void fn_802062A8(void* param_1, u32 param_2, u32 param_3) {
     extern u32 fn_8011BEB4();
-    extern void fn_801F00D0();
+    extern void fightTargetGetRelativeHostSideFightTargetIdToTragetPtr();
     void* uVar1;
     u16 uVar2;
 
     uVar1 = fn_8012640C(param_1, 0, 0xF8, 0);
     uVar2 = (u16)fn_8011BEB4(uVar1, 0, 0x29, 0);
-    fn_801F00D0(uVar2, param_3);
+    fightTargetGetRelativeHostSideFightTargetIdToTragetPtr(uVar2, param_3);
 }
 #pragma pop
 
@@ -4532,7 +4532,7 @@ void fn_802078F0(void* r3)
 #pragma push
 #pragma peephole on
 u32 fn_802079DC(void* ctx, void* battleCtx, u32* outSlots) {
-    extern u16 fn_8010C74C(void*, u16);
+    extern u16 zokuseiGetWazaJoutai(void*, u16);
     u16 i;
     int outCount;
     u16 slot0;
@@ -4555,7 +4555,7 @@ u32 fn_802079DC(void* ctx, void* battleCtx, u32* outSlots) {
             isPlayerSlot = 0;
         }
         if (isPlayerSlot == 1) { continue; }
-        result = fn_8010C74C(battleCtx, i);
+        result = zokuseiGetWazaJoutai(battleCtx, i);
         if (result == 0x42 || result == 0x43) {
             outSlots[(u16)outCount] = i;
             outCount++;
@@ -6718,7 +6718,7 @@ u32 fn_8020B72C(void* ctx)
 {
     extern void fn_8011BBD8();
     extern u32 fn_8011BEB4();
-    extern u32 fn_801F00D0();
+    extern u32 fightTargetGetRelativeHostSideFightTargetIdToTragetPtr();
     extern void fn_801F4C14();
     extern u32 fn_801F54A4();
     extern u16 fn_80205224();
@@ -6746,7 +6746,7 @@ u32 fn_8020B72C(void* ctx)
         uVar1 = 0;
     } else {
         uVar7 = fn_8011BEB4((void*)uVar2, 0, 0x29, 0);
-        uVar2 = fn_801F00D0(uVar7, uVar6);
+        uVar2 = fightTargetGetRelativeHostSideFightTargetIdToTragetPtr(uVar7, uVar6);
         fn_801F4C14(0, 0, 0x36, 0, uVar1);
         fn_801F4C14(0, 0, 0x42, 0, uVar2);
         uVar2 = fn_80205B8C(uVar1);
@@ -6774,7 +6774,7 @@ u32 fn_8020B72C(void* ctx)
 #pragma push
 #pragma peephole on
 u32 fn_8020B910(void* ctx) {
-    extern u32 fn_801F00D0();
+    extern u32 fightTargetGetRelativeHostSideFightTargetIdToTragetPtr();
     extern void fn_801F4C14();
     extern u16 fn_801F54A4();
     extern u32 fn_8020D908();
@@ -6792,7 +6792,7 @@ u32 fn_8020B910(void* ctx) {
     field1E = (u16)itemGetStatus((u32)e5Data, 0, 0x1E, 0);
     slotType = (u8)itemGetStatus(0, field1E, 0x2, 0);
     if (slotType == 1) {
-        finalVal = (u32)fn_801F00D0((u16)itemGetStatus((u32)e5Data, 0, 0x1F, 0), partyCount);
+        finalVal = (u32)fightTargetGetRelativeHostSideFightTargetIdToTragetPtr((u16)itemGetStatus((u32)e5Data, 0, 0x1F, 0), partyCount);
     } else {
         finalVal = d908val;
     }
@@ -8766,7 +8766,7 @@ void fn_8020ECE0(void* ctx, u16 count) {
 /* 0x8020EDBC | size: 0x60 */
 #pragma push
 #pragma peephole on
-void fn_8020EDBC(void* ctx) {
+void fightTrainerEnemyPokemonInitFightOutStatus(void* ctx) {
     extern void fn_801FBD84();
     extern void fn_801FBD94();
     extern void fn_801FBDA4();
@@ -9121,7 +9121,7 @@ void fn_8020F74C(void* p1, void* p2, u32 unused1, u32 unused2, u32 p3) {
 /* 0x8020F7B8 | size: 0x114 */
 void fn_8020F7B8(void* p1, void* p2, u32 p3, u32 p4) {
     extern u16 fn_8011BEB4();
-    extern void fn_801F00D0();
+    extern void fightTargetGetRelativeHostSideFightTargetIdToTragetPtr();
     extern void* fn_801F0204();
     extern void* fn_801F0234();
     extern void* fn_801F02AC();
@@ -9138,7 +9138,7 @@ void fn_8020F7B8(void* p1, void* p2, u32 p3, u32 p4) {
     partyCount = fn_801F54A4(0, 0, 0x14, 0);
     d9Data = fn_8012640C(p2, 0, 0xD9, 0);
     field29 = fn_8011BEB4(d9Data, 0, 0x29, 0);
-    fn_801F00D0(field29, partyCount);
+    fightTargetGetRelativeHostSideFightTargetIdToTragetPtr(field29, partyCount);
     resolved = fn_801F02AC(0xE, p2, partyCount);
     fn_80208750(p2, p1, 1, p4);
     fn_80208750(resolved, p1, 3, p4);
@@ -9299,7 +9299,7 @@ void fn_8020FB38(void)
 }
 /* Address: 0x8020FC04 | Size: 0x6c | Ghidra import */
 
-u32 fn_8020FC04(void)
+u32 fightWazaWzxVariationFuncWeatherHP(void)
 
 {
     extern int fn_801F453C();
@@ -10279,7 +10279,7 @@ void fn_80211830(void) {
     extern void fn_801F37B0();
     extern void* fn_801F47B4();
     extern void fn_801F6EEC();
-    extern s32 fn_802118FC();
+    extern s32 _fightSeqInitSubFightOutPokemon__FPvUsPv();
     extern s32 fn_80213558();
     extern s32 fn_802136A4();
     u8 localBuf[0x10];
@@ -10299,13 +10299,13 @@ void fn_80211830(void) {
         lbl_80478D78[i] = 0;
     }
     lbl_8047B62C = 0;
-    fn_801F37B0(0, (u32)fn_802118FC, 0, 0);
+    fn_801F37B0(0, (u32)_fightSeqInitSubFightOutPokemon__FPvUsPv, 0, 0);
 }
 
-/* fn_802118FC | Size: 0x4C | Check state and optionally trigger event 0x11 */
+/* _fightSeqInitSubFightOutPokemon__FPvUsPv | Size: 0x4C | Check state and optionally trigger event 0x11 */
 #pragma push
 #pragma peephole on
-s32 fn_802118FC(void* ctx) {
+s32 _fightSeqInitSubFightOutPokemon__FPvUsPv(void* ctx) {
     extern u8 fn_802062FC(void);
     extern void fn_80202810(void* ctx, u32 eventId);
     if (!fn_802062FC()) {

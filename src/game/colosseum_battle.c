@@ -22553,7 +22553,7 @@ int fn_80254EE8(void)
 }
 /* Address: 0x80254F1C | Size: 0x38 | Ghidra import */
 /* Address: 0x80254F1C | Size: 0x38 | Ghidra import */
-u32 fn_80254F1C(u32 r3, u32 r4)
+u32 fightTrainerAiWazaHit180(u32 r3, u32 r4)
 {
     extern u32 fn_80215008();
     u8 auStack_38[0x38];
@@ -23275,7 +23275,7 @@ s32 fightTrainerAiWazaHit161(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x80255C18 | Size: 0x74 | Pattern: field_accessor */
-u32 fn_80255C18(void* ctx, u32 slot, u32 param) {
+u32 fightTrainerAiWazaHit160(void* ctx, u32 slot, u32 param) {
     extern u8 fn_80236BFC(void* ctx, u32 slot, u32 param);
     extern u32 fn_80202360(u32 slot, u32 param);
     extern u8 fn_80119DD0(u32 param);
@@ -23389,7 +23389,7 @@ int fn_80255D7C(void)
   return iVar2 - ((u32)(iVar2 == 0) + -(uVar1 & 0xff));
 }
 /* Address: 0x80255DB4 | Size: 0x44 | Pattern: field_accessor */
-u32 fn_80255DB4(void* ctx, u32 slot, u32 param, u32 arg3) {
+u32 fightTrainerAiWazaHit156(void* ctx, u32 slot, u32 param, u32 arg3) {
     extern u32 fn_8025C808();
     u32 result = fn_8025C808(ctx, slot, arg3, param, 0x10, 0x2, 0x41) & 0xFF;
     return (result != 0) ? 1 : 0;
@@ -23954,7 +23954,7 @@ void fn_80256410(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x802564C8 | Size: 0x64 | Pattern: field_accessor */
-u32 fn_802564C8(void* ctx, u32 slot, u32 param) {
+u32 fightTrainerAiWazaHit142(void* ctx, u32 slot, u32 param) {
     extern f32 lbl_8047E64C;
     extern u32 fn_80235AA0(void);
     extern u32 fn_802373B0(void*, u32, s32, f32);
@@ -24377,7 +24377,7 @@ u32 fightTrainerAiWazaHit128(void* ctx, u32 a, u32 b, u32 c) {
 }
 
 /* Address: 0x80256AE0 | Size: 0x38 | Ghidra import */
-u32 fn_80256AE0(void)
+u32 fightTrainerAiWazaHit127(void)
 {
     extern int fn_801F8A18();
   u32 r3;
@@ -25137,7 +25137,7 @@ int fn_80257474(void)
   return iVar2 - ((u32)(iVar2 == 0) + -(uVar1 & 0xff) + 2);
 }
 /* Address: 0x802574AC | Size: 0x5C | Pattern: field_accessor */
-u32 fn_802574AC(void* ctx, u32 slot, u32 param, u32 arg3) {
+u32 fightTrainerAiWazaHit114(void* ctx, u32 slot, u32 param, u32 arg3) {
     extern u32 fn_80229934();
     extern u32 fightTrainerAiCheckHorobinouta();
 
@@ -25767,7 +25767,7 @@ void fn_80257DF8(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x80257EAC | Size: 0x38 | Ghidra import */
-int fn_80257EAC(u32 arg0, u32 arg1, u32 arg2, u32 arg3)
+int fightTrainerAiWazaHit098(u32 arg0, u32 arg1, u32 arg2, u32 arg3)
 {
     extern u32 fn_80229934();
 

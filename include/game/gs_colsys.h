@@ -277,7 +277,7 @@ u32 GScolsys2_GetSurfaceEnabled(u16 surfaceIndex);
  * @param surfaceIndex  Surface type index (u16).
  * @return              Data pointer, or 0 if out of range.
  *
- * Corresponds to fn_8010C3FC.
+ * Corresponds to _menuFaceBiosGetPtr__FUs.
  */
 void* GScolsys2_GetSurfaceData(u16 surfaceIndex);
 

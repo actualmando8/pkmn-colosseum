@@ -337,7 +337,7 @@ s32 menuCB_Common_GetStackDepth(void);
 BOOL menuCB_Common_IsTransitioning(void);
 
 /**
- * fn_80071398: Pushes a new menu onto the stack.
+ * _menuPop_80071398: Pushes a new menu onto the stack.
  * Assert: "_menuPush(int eMenuID):stack over." (file: "menuCB_Common.c")
  * Size: 0x130
  */

@@ -5272,7 +5272,7 @@ extern u32 fn_80115170();  /* K&R: asm void wrapper, used as function pointer */
 extern u32 fn_801151BC();  /* K&R: asm void wrapper, used as function pointer */
 #pragma push
 #pragma peephole off
-void* fn_80114D6C(void* owner, u32 param, u32 alloc_size) {
+void* floorReadScriptPreFunc(void* owner, u32 param, u32 alloc_size) {
     void* mem;
     if ((u8)fn_800FF548() != 0) { return NULL; }
     alloc_size = (alloc_size + 0x1F) & ~0x1F;
@@ -5283,7 +5283,7 @@ void* fn_80114D6C(void* owner, u32 param, u32 alloc_size) {
     return mem;
 }
 /* 0x80114E78 | 0xA0 */
-void* fn_80114E78(void* owner, u32 param, u32 alloc_size) {
+void* floorReadFontPreFunc(void* owner, u32 param, u32 alloc_size) {
     void* mem;
     if ((u8)fn_800FF548() != 0) { return NULL; }
     alloc_size = (alloc_size + 0x1F) & ~0x1F;
@@ -5294,7 +5294,7 @@ void* fn_80114E78(void* owner, u32 param, u32 alloc_size) {
     return mem;
 }
 /* 0x80114F84 | 0xA0 */
-void* fn_80114F84(void* owner, u32 param, u32 alloc_size) {
+void* floorReadMsgPreFunc(void* owner, u32 param, u32 alloc_size) {
     void* mem;
     if ((u8)fn_800FF548() != 0) { return NULL; }
     alloc_size = (alloc_size + 0x1F) & ~0x1F;
@@ -5712,7 +5712,7 @@ extern void fn_8018B76C(void);
 extern void fn_8018C7C8(void);
 extern void fn_801902E0(void);
 extern void fn_80166A28(void);
-extern void fn_8018B07C(void);
+extern void peopleWaitSyncMotion(void);
 extern void fn_80190528(void);
 extern u32 lbl_80478EBC;
 extern u32 lbl_80478EB8;
@@ -8297,15 +8297,15 @@ void fn_8011CEF0(u8* ptr, u16 idx, u16 val) {
     *(u16*)(&ptr[0x74]) = val;
 }
 /* 0x8011CF44 | 0x2C */
-extern void fn_8019075C(u32);
+extern void _flagSet(u32);
 void fn_8011CF44(u8* ptr) {
     if (ptr == NULL) { return; }
-    fn_8019075C(*(u32*)(&ptr[0x28]));
+    _flagSet(*(u32*)(&ptr[0x28]));
 }
 /* 0x8011CF70 | 0x2C */
 void fn_8011CF70(u8* ptr) {
     if (ptr == NULL) { return; }
-    fn_8019075C(*(u32*)(&ptr[0x24]));
+    _flagSet(*(u32*)(&ptr[0x24]));
 }
 /* 0x40 | fn_8011CFEC | compound_indexed_setter */
 void fn_8011CFEC(u8* ptr, u16 idx, u8 val) {
@@ -12970,14 +12970,14 @@ void* fn_80114F18(u32 a, u32 b) {
 #pragma pop
 #endif
 #if 0
-asm void fn_80115024(void) {
+asm void floorReadNormalPreFunc(void) {
 #include "src/game/gs_field_world_fn_80115024.inc"
 }
 #else
 #pragma push
 #pragma peephole off
 #pragma optimization_level 4
-void* fn_80115024(u32 a, u32 b, u32 size) {
+void* floorReadNormalPreFunc(u32 a, u32 b, u32 size) {
     void* result;
 
     result = fn_800F9418((size + 0x1F) & ~0x1F, 0x20, a, b, 0);

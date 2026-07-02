@@ -2131,7 +2131,7 @@ BOOL fightTrainerIsAllyFightTargetPtr(void* arg0, void* arg1, u32 arg2) {
 void fn_801F849C(void* arg0, u32 arg1) {
     extern void* fn_801FB1C0(void*, u32, u32, u32);
     extern u32 fn_8020ECA4(void*);
-    extern void fn_8020EDBC(void*);
+    extern void fightTrainerEnemyPokemonInitFightOutStatus(void*);
     u32 mode;
     void* pokemon;
     u8 i;
@@ -2144,7 +2144,7 @@ void fn_801F849C(void* arg0, u32 arg1) {
     while (i < 12) {
         pokemon = fn_801FB1C0(arg0, 0, 0x4e, i);
         if (mode != 1 || (u8)fn_8020ECA4(pokemon)) {
-            fn_8020EDBC(pokemon);
+            fightTrainerEnemyPokemonInitFightOutStatus(pokemon);
         }
         i++;
     }
@@ -4191,7 +4191,7 @@ void fn_801FAA58(void) {
     extern void fn_8020E7AC();
     extern void fn_8020E95C();
     extern void fn_8020EBA8();
-    extern void fn_8020EDBC();
+    extern void fightTrainerEnemyPokemonInitFightOutStatus();
     extern u8 jumptable_80375670[];
     u8 sp[0x20];
     u32 r0 = 0;
@@ -4645,7 +4645,7 @@ void fn_801FAA58(void) {
     }
     }
     if (r3 == (u32)0x0) return;
-    fn_8020EDBC();
+    fightTrainerEnemyPokemonInitFightOutStatus();
 
     return;
 }

@@ -868,7 +868,7 @@ have_item:
 extern void fn_801440A0(u16);
 extern u8   itemDataBiosGetHidenMachineNo(void);
 extern u8   fn_80144014(void);
-extern s32  fn_8001BCEC(u8, u8, s32, s32);
+extern s32  menuPokemonOpenItemGive(u8, u8, s32, s32);
 extern void fn_8001B184(void);
 #pragma push
 #pragma peephole off
@@ -913,7 +913,7 @@ after:
     fn_801440A0(idx);
     x = (u8)fn_80144014();
     fn_80102568(0x59, 0, 1);
-    lbl_8047A2EC = fn_8001BCEC((u8)x, (u8)target_n, idx, 0);
+    lbl_8047A2EC = menuPokemonOpenItemGive((u8)x, (u8)target_n, idx, 0);
     fn_8001B184();
     if ((s32)lbl_8047A2EC < 0) {
         return 3;

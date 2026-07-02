@@ -1448,8 +1448,8 @@ void fn_8018A280(void) {
 void fn_8018AACC(void) {
 }
 
-/* fn_8018B07C -- not recovered, gap in archive campaign (size 0x1A4) */
-void fn_8018B07C(void) {
+/* peopleWaitSyncMotion -- not recovered, gap in archive campaign (size 0x1A4) */
+void peopleWaitSyncMotion(void) {
 }
 
 /* fn_8018B76C -- not recovered, gap in archive campaign (size 0x298) */

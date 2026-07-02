@@ -34,14 +34,14 @@
  *   fn_8000E290  GSnpc_TrainerBattle         -- 0x780 bytes, initiate trainer battle
  *   fn_8000EA10  GSnpc_PostBattleReward      -- 0x324 bytes, prize money & items
  *   fn_8000ED34  GSnpc_QuestUpdate           -- 0x5DC bytes, quest progression
- *   fn_8000F310  GSnpc_GetQuestState         -- 0x4C bytes
+ *   menuFightCtrlSecretPokemonTop  GSnpc_GetQuestState         -- 0x4C bytes
  *   fn_8000F35C  GSnpc_SetQuestState         -- 0xA4 bytes
  *   fn_8000F400  GSnpc_HealParty             -- 0x368 bytes, Pokemon Center heal
  *   fn_8000F768  GSnpc_FadeTransition        -- 0x1FC bytes, screen fade during dialog
  *   fn_8000F964  GSnpc_PokemonTrade          -- 0x474 bytes, in-game trade event
- *   fn_8000FDD8  GSnpc_MoveTutor             -- 0x60 bytes, move tutor intro
+ *   menuFightCtrlSecretWazaTop  GSnpc_MoveTutor             -- 0x60 bytes, move tutor intro
  *   fn_8000FE38  GSnpc_MoveTutorTeach        -- 0x118 bytes, teach move
- *   fn_8000FF50  GSnpc_NameRater             -- 0x58 bytes, name rater check
+ *   menuFightCtrlSecretMain  GSnpc_NameRater             -- 0x58 bytes, name rater check
  *   fn_8000FFA8  GSnpc_NameRaterRename       -- 0x118 bytes, rename Pokemon
  *   menuFightCtrlBall  GSnpc_DaycareDeposit        -- 0x68 bytes, daycare deposit
  *   _menuFightIsUse__FP16MENU_WAZA_STATUSUs  GSnpc_DaycareWithdraw       -- 0x16C bytes, daycare withdraw
@@ -400,7 +400,7 @@ void fn_80011288(void) {
 /* 0x800114A4 | 0x25C */
 extern void fn_8020E204();
 extern void fn_8020E1A4();
-extern void fn_8001BD80();
+extern void menuPokemonOpenFight();
 extern void fn_80102568();
 extern void fn_801F02AC();
 extern void fn_802062FC();
@@ -416,7 +416,7 @@ asm void fn_800114A4(void) {
 void fn_800114A4(void) {
     extern u32 menuPokemonCheckPokemonChange();
     extern void fn_80011288();
-    extern void fn_8001BD80();
+    extern void menuPokemonOpenFight();
     extern void fn_80102568();
     extern void fn_80102620();
     extern void fn_801026A4();
@@ -460,7 +460,7 @@ void fn_800114A4(void) {
         r4 = r27;
         r5 = r24;
         r6 = r25;
-        fn_8001BD80();
+        menuPokemonOpenFight();
         r29 = r3;
         r3 = r29;
         return;
@@ -2383,14 +2383,14 @@ void fn_8000ED34(u8* ctx) {
 #pragma pop
 #endif
 
-/* fn_8000F310 - 0x8000F310 | size: 0x4c */
+/* menuFightCtrlSecretPokemonTop - 0x8000F310 | size: 0x4c */
 #if 0
-asm void fn_8000F310(void) {
+asm void menuFightCtrlSecretPokemonTop(void) {
 #include "src/game/gs_npc_interact_fn_8000F310.inc"
 }
 #else
 #pragma peephole off
-u32 fn_8000F310(u32 arg) {
+u32 menuFightCtrlSecretPokemonTop(u32 arg) {
     fn_801040D0((void*)arg, 0);
     fn_801040D0((void*)arg, 1);
     fn_801040D0((void*)arg, 2);
@@ -2698,16 +2698,16 @@ void fn_8000F964(u8* ctx) {
 #pragma pop
 #endif
 
-/* fn_8000FDD8 - 0x8000FDD8 | size: 0x60 */
+/* menuFightCtrlSecretWazaTop - 0x8000FDD8 | size: 0x60 */
 extern void fn_80103FFC(void);
 extern void* memcpy(void* dst, const void* src, u32 n);
 #if 0
-asm void fn_8000FDD8(void) {
+asm void menuFightCtrlSecretWazaTop(void) {
 #include "src/game/gs_npc_interact_fn_8000FDD8.inc"
 }
 #else
 #pragma peephole off
-u32 fn_8000FDD8(u8* ptr) {
+u32 menuFightCtrlSecretWazaTop(u8* ptr) {
     extern void* fn_80103FFC(u8* a, u32 size);
     extern void fn_80103FE4(u8* a);
     if ((s8)ptr[1] == 0) {
@@ -2780,14 +2780,14 @@ got_flag:
 #pragma pop
 #endif
 
-/* fn_8000FF50 - 0x8000FF50 | size: 0x58 */
+/* menuFightCtrlSecretMain - 0x8000FF50 | size: 0x58 */
 #if 0
-asm void fn_8000FF50(void) {
+asm void menuFightCtrlSecretMain(void) {
 #include "src/game/gs_npc_interact_fn_8000FF50.inc"
 }
 #else
 #pragma peephole off
-u32 fn_8000FF50(u8* ptr) {
+u32 menuFightCtrlSecretMain(u8* ptr) {
     extern void* fn_80103FFC(u8* a, u32 size);
     if ((s8)ptr[1] == 0) {
         void* dst = fn_80103FFC(ptr, 0x18);

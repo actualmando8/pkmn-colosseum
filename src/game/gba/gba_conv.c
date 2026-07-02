@@ -5126,7 +5126,7 @@ void fn_800886D0(void) {
     extern void heroAddPokecoupon();
     extern void fn_801902E0();
     extern void fn_80190528();
-    extern void fn_8019075C();
+    extern void _flagSet();
     extern void fn_801CADA8();
     extern void fn_801D0748();
     extern void fn_801EE398();
@@ -5257,7 +5257,7 @@ L_80088824:
         *(u8*)((u8*)r3 + 0x1C) = r31;
         r3 = 0x8ae;
         r4 = 0x0;
-        fn_8019075C();
+        _flagSet();
         r3 = 0x4;
         r4 = 0x2;
         r5 = 0x0;
@@ -5325,7 +5325,7 @@ void fn_800889E4(void) {
     extern void fn_8012D2BC();
     extern void fn_8012D32C();
     extern void fn_801906A0();
-    extern void fn_8019075C();
+    extern void _flagSet();
     extern void __assert();
     extern void fn_801D0748();
     u8 sp[0x40];
@@ -5465,7 +5465,7 @@ L_80088B48:
     *(u8*)((u8*)r3 + 0x1C) = r30;
     r3 = 0x8ae;
     r4 = 0x0;
-    fn_8019075C();
+    _flagSet();
     r3 = 0x6;
     r4 = 0x2;
     r5 = 0x0;
@@ -5495,7 +5495,7 @@ L_80088C38:
 void fn_80088C60(void) {
     extern void fn_80128E24();
     extern void fn_80129280();
-    extern void fn_8019075C();
+    extern void _flagSet();
     extern void fn_801D0748();
     u8 sp[0x20];
     u32 tmp = 0;
@@ -5545,7 +5545,7 @@ void fn_80088C60(void) {
     *(u8*)((u8*)r3 + 0x1C) = r31;
     r3 = 0x8ae;
     r4 = 0x0;
-    fn_8019075C();
+    _flagSet();
     r3 = 0x6;
     r4 = 0x2;
     r5 = 0x0;
@@ -5570,7 +5570,7 @@ void fn_80088C60(void) {
 void fn_80088D84(void) {
     extern void fn_80128E24();
     extern void fn_80129280();
-    extern void fn_8019075C();
+    extern void _flagSet();
     extern void fn_801D0748();
     u8 sp[0x20];
     u32 tmp = 0;
@@ -5620,7 +5620,7 @@ void fn_80088D84(void) {
     *(u8*)((u8*)r3 + 0x1C) = r31;
     r3 = 0x8ae;
     r4 = 0x0;
-    fn_8019075C();
+    _flagSet();
     r3 = 0x6;
     r4 = 0x2;
     r5 = 0x0;

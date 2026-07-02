@@ -869,7 +869,7 @@ u32 fightTargetIsHostSide(u32 param1, u32 param2) {
 }
 
 /* 0x801F00D0 | size: 0x64 | small */
-u32 fn_801F00D0(u32 param1, u32 param2) {
+u32 fightTargetGetRelativeHostSideFightTargetIdToTragetPtr(u32 param1, u32 param2) {
     extern u32 fn_801F02AC();
     u32 slot;
     u32 result;
@@ -2057,7 +2057,7 @@ u32 fn_801F2598(u32 param_1, u32 param_2, u32 param_3, u32 param_4) {
 }
 
 /* 0x801F2654 | size: 0x54 | small -- 100% MATCH */
-u16 fn_801F2654(u32 param_1, u8 param_2, u32 param_3, u8 param_4) {
+u16 fightFloorGetValidFightOutPokemonCount(u32 param_1, u8 param_2, u32 param_3, u8 param_4) {
     extern u32 fn_801F26A8(u32, u32, u32*);
     extern u16 fn_801F37B0(u32 ctx, void* fn, u32* data, u32 d);
     u32 data[4];

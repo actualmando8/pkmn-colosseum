@@ -7,14 +7,14 @@
  *   fn_8010C224 (GScolsys2_AllocBuffers)
  *   fn_8010C364 (texture trigger helper -- returns 1)
  *   fn_8010C388 (GScolsys2_GetSurfaceEnabled)
- *   fn_8010C3FC (GScolsys2_GetSurfaceData)
+ *   _menuFaceBiosGetPtr__FUs (GScolsys2_GetSurfaceData)
  *   fn_8010C46C (GScolsys2_GetTypeId)
  *   fn_8010C4A0 (GScolsys2_GetTypeFlags)
  *   fn_8010C4D4 (GScolsys2_GetTypeParam)
  *   fn_8010C508 (GScolsys2_GetTypeInteraction)
  *   fn_8010C54C (GScolsys2_CalcAdvantage)
  *   fn_8010C650 (GScolsys2_CalcGroupResult)
- *   fn_8010C74C (wrapper for GetTypeInteraction)
+ *   zokuseiGetWazaJoutai (wrapper for GetTypeInteraction)
  *   GScolsy2UtilGetSidePlanePoint (GScolsys2_DotPlaneEdge)
  *   fn_8010C7BC (GScolsys2_QueryTriVisible)
  *   fn_8010C844 (GScolsys2_SetTriVisible)
@@ -271,7 +271,7 @@ u32 GScolsys2_GetSurfaceEnabled(u16 surfaceIndex)
 }
 
 /* ===================================================================
- * fn_8010C3FC -- GScolsys2_GetSurfaceData
+ * _menuFaceBiosGetPtr__FUs -- GScolsys2_GetSurfaceData
  *
  * Returns the data pointer (word at offset +0x04) for a given surface
  * index from the collision entry data array.
@@ -480,7 +480,7 @@ u16 GScolsys2_CalcGroupResult(u16 targetType, u16* typeArray, u16 arrayCount)
 }
 
 /* ===================================================================
- * fn_8010C74C -- wrapper for GetTypeInteraction
+ * zokuseiGetWazaJoutai -- wrapper for GetTypeInteraction
  *
  * Thin wrapper that normalizes both arguments to u16 before calling
  * GScolsys2_GetTypeInteraction. Used by script system and menu code.
@@ -1792,7 +1792,7 @@ void fn_8010C388(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_8010C3FC(void) {
+void _menuFaceBiosGetPtr__FUs(void) {
     /* TODO: match -- 112 bytes at 0x8010C3FC */
 }
 #pragma pop
@@ -1946,7 +1946,7 @@ u16 fn_8010C650(u16 typeA, u16* arr, u16 count) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-u16 fn_8010C74C(u16 typeA, u16 typeB) {
+u16 zokuseiGetWazaJoutai(u16 typeA, u16 typeB) {
     return fn_8010C508((u32)typeA, (u32)typeB);
 }
 #pragma pop

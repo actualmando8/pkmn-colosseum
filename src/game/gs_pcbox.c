@@ -45,9 +45,9 @@
  *   fn_8001B184  GSpcbox_GetPartySlotState    -- 0x68 bytes, get party slot info
  *   fn_8001B1EC  GSpcbox_MainStateMachine     -- 0x8D8 bytes, main PC box state machine
  *   fn_8001BAC4  GSpcbox_TransitionState      -- 0x228 bytes, state transition handler
- *   fn_8001BCEC  GSpcbox_CheckCanDeposit      -- 0x50 bytes, validate deposit allowed
+ *   menuPokemonOpenItemGive  GSpcbox_CheckCanDeposit      -- 0x50 bytes, validate deposit allowed
  *   fn_8001BD3C  GSpcbox_CheckCanWithdraw     -- 0x44 bytes, validate withdraw allowed
- *   fn_8001BD80  GSpcbox_CheckPartySpace      -- 0x74 bytes, check party has room
+ *   menuPokemonOpenFight  GSpcbox_CheckPartySpace      -- 0x74 bytes, check party has room
  *   menuPokemonOpen  GSpcbox_CheckLastPokemon     -- 0x44 bytes, prevent depositing last mon
  *   fn_8001BE38  GSpcbox_ShowConfirmDialog    -- 0x84 bytes, confirmation prompt
  *   fn_8001BEBC  GSpcbox_Init                 -- 0x1A8 bytes, full initialization
@@ -4980,7 +4980,7 @@ void fn_80018F54(u32 a, u32 b, u32 c) {
 
 /* fn_80018F88 - 0x80018F88 | size: 0xdc */
 extern u32 fn_801FCEAC();
-extern void fn_8019075C();
+extern void _flagSet();
 extern void fn_800FF730();
 extern u32 lbl_8047A2F4;
 extern u32 lbl_8047A2F8;
@@ -5012,7 +5012,7 @@ u32 fn_80018F88(s32 mode, s32* ptr, u32 val) {
     }
     lbl_8047A2E0 = mode;
     lbl_8047A2E4 = 1;
-    fn_8019075C(1, 0);
+    _flagSet(1, 0);
     fn_800FF730(0x38f);
     fn_8011288C(0, 0);
     _threadSwitch();
@@ -6718,7 +6718,7 @@ asm void fn_8001BAC4(void) {
 u32 fn_8001BAC4(u32 a0, u8 a1, u8 a2, u16 a3, u32 a4, u8 a5) {
     extern u8 lbl_803A1D40[];
     extern u32 fn_800D37CC(void);
-    extern void fn_8019075C();
+    extern void _flagSet();
     extern void fn_800FF730();
     extern void fn_8011288C();
     extern void _threadSwitch();
@@ -6776,7 +6776,7 @@ BBDC:
     *(u8*)(lbl_803A1D40 + 0x3) = 2;
 BC20:
     if (*(u8*)(lbl_803A1D40 + 0x2) == 1) {
-        fn_8019075C(1, 1);
+        _flagSet(1, 1);
         fn_800FF730(0x38f);
         if (*(u8*)(lbl_803A1D40 + 0x3) != 1) {
             fn_8011288C(0, 0);
@@ -6794,16 +6794,16 @@ BC20:
 #pragma pop
 #endif
 
-/* fn_8001BCEC - 0x8001BCEC | size: 0x50 */
+/* menuPokemonOpenItemGive - 0x8001BCEC | size: 0x50 */
 #if 0
-asm void fn_8001BCEC(void) {
+asm void menuPokemonOpenItemGive(void) {
 #include "src/game/gs_pcbox_fn_8001BCEC.inc"
 }
 #else
 #pragma push
 #pragma optimization_level 4
 #pragma peephole off
-void fn_8001BCEC(u32 a, u32 b, u32 c, u32 d) {
+void menuPokemonOpenItemGive(u32 a, u32 b, u32 c, u32 d) {
     extern u8 lbl_803A1D40[];
     extern void fn_8001BAC4(u32, u32, u32, u32, u32, u32);
     *(u8*)(lbl_803A1D40 + 0x4) = 0x1;
@@ -6830,16 +6830,16 @@ void fn_8001BD3C(u32 a, u32 b, u32 c, u32 d) {
 #pragma pop
 #endif
 
-/* fn_8001BD80 - 0x8001BD80 | size: 0x74 */
+/* menuPokemonOpenFight - 0x8001BD80 | size: 0x74 */
 #if 0
-asm void fn_8001BD80(void) {
+asm void menuPokemonOpenFight(void) {
 #include "src/game/gs_pcbox_fn_8001BD80.inc"
 }
 #else
 #pragma push
 #pragma optimization_level 4
 #pragma peephole off
-void fn_8001BD80(u8 a, u8 b, u32 c, u32 d) {
+void menuPokemonOpenFight(u8 a, u8 b, u32 c, u32 d) {
     extern u8 lbl_803A1D40[];
     extern void fn_8001BAC4(u32, u32, u32, u32, u32, u32);
     if (a == 0x1) {

@@ -7340,7 +7340,7 @@ void fn_8002D91C(u32 arg0)
 extern void mailMainReceiveTerminate(void);
 extern u32 fn_800D37CC(void);
 extern void fn_8010206C(f32);
-extern void fn_8019075C(s32, s32);
+extern void _flagSet(s32, s32);
 extern void menuReleaseOffScreen(f32);
 extern f64 lbl_8047B998;
 extern f32 lbl_8047B9CC;
@@ -7368,7 +7368,7 @@ void fn_8002DC6C(u32 flag)
     extern void mailMainReceiveTerminate(void);
     extern u32  fn_800D37CC(void);
     extern void fn_8010206C(f32);
-    extern void fn_8019075C(s32, s32);
+    extern void _flagSet(s32, s32);
     extern void fn_800FF730(s32);
     extern void fn_8011288C(s32, u32);
     extern void _threadSwitch(void);
@@ -7396,7 +7396,7 @@ void fn_8002DC6C(u32 flag)
     lbl_8047A3FC = flag;
     *(&lbl_8047A3FC + 1) = 1u;   /* lbl_8047A3FC+4 */
 
-    fn_8019075C(1, 2);
+    _flagSet(1, 2);
     fn_800FF730(0x38f);
     fn_8011288C(0, 0);
     _threadSwitch();   /* GSthreadYield / vsync yield */

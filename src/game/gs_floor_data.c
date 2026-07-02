@@ -16,7 +16,7 @@
  *   fn_80101A4C             (GSfloorLoadDataCallback)
  *   kaisuuBiosGetMax - fn_80101B88 (floor data accessors)
  *   fn_80101B90             (GSfloorRegisterResHandlers)
- *   fn_8011432C             (floorReadGFLPreFunc)
+ *   floorReadGFLPreFunc             (floorReadGFLPreFunc)
  *   fn_8011487C             (floorReadSoundPreFunc)
  *   fn_80114AE0             (floorReadParticlePreFunc)
  *   fn_801143A0 - floorReadMapPreFunc (additional floorRead*PreFunc variants)
@@ -276,7 +276,7 @@ void GSfloorRegisterResHandlers(void)
 }
 
 /* =======================================================================
- *  floorReadGFLPreFunc / fn_8011432C
+ *  floorReadGFLPreFunc / floorReadGFLPreFunc
  *  Address: 0x8011432C, Size: 0x74
  *
  *  Pre-processes GFL (model) resource data during floor loading.
@@ -288,7 +288,7 @@ void GSfloorRegisterResHandlers(void)
 void floorReadGFLPreFunc(void)
 {
     /*
-     * Assembly analysis (fn_8011432C):
+     * Assembly analysis (floorReadGFLPreFunc):
      *   - Reads the GFL header to determine model data size
      *   - Calls GSmemAllocRaw to allocate a buffer
      *   - If allocation fails, logs error via fn_800DD970
@@ -384,7 +384,7 @@ void floorReadPKXPreFunc(void)
     /* Reads PKX data -- possibly Pokemon spawn or encounter data. */
 }
 
-/** fn_8011445C -- floorReadTexPreFunc (texture data)
+/** floorReadParticlePreFunc -- floorReadTexPreFunc (texture data)
  *  Debug string: "floorReadTexPreFunc()" */
 void floorReadTexPreFunc(void)
 {
@@ -399,7 +399,7 @@ void floorReadCameraPreFunc_Pseudocode(void)
      * configures the field camera for this floor. */
 }
 
-/** fn_801145C0 -- floorReadMapPreFunc (map geometry)
+/** floorReadParticlePreFunc_801145C0 -- floorReadMapPreFunc (map geometry)
  *  Debug string: "floorReadMapPreFunc" */
 void floorReadMapPreFunc(void)
 {
@@ -407,14 +407,14 @@ void floorReadMapPreFunc(void)
      * registers with the rendering system. */
 }
 
-/** fn_80114634 -- floorReadScriptPreFunc (script bytecode)
+/** floorReadWZXPreFunc -- floorReadScriptPreFunc (script bytecode)
  *  Debug string: "floorReadScriptPreFunc()" */
 void floorReadScriptPreFunc(void)
 {
     /* Reads script bytecode and registers with psinterpret. */
 }
 
-/** fn_801146A4 -- floorReadFontPreFunc (font data)
+/** floorReadPKXPreFunc -- floorReadFontPreFunc (font data)
  *  Debug string: "floorReadFontPreFunc()" */
 void floorReadFontPreFunc(void)
 {
