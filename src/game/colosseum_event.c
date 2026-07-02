@@ -8819,13 +8819,13 @@ void fn_8020EE1C(void)
 #pragma push
 #pragma peephole on
 extern u8 lbl_8047B600;
-u8 fn_8020EEC0(void) { return (u8)(lbl_8047B600 == 1); }
+u8 fightWazaWzxVariationFuncOiuchi(void) { return (u8)(lbl_8047B600 == 1); }
 #pragma pop
 
 /* Address: 0x8020EED4 | Size: 0x22c | Ghidra import */
 #pragma push
 #pragma peephole on
-void fn_8020EED4(void* ctx1, void* ctx2, u32 p5, u32 p6, void* p7)
+void fightWazaWzxTypeFuncHuuin(void* ctx1, void* ctx2, u32 p5, u32 p6, void* p7)
 {
     extern u32 fn_801F0204();
     extern void fn_801F0234();
@@ -8875,7 +8875,7 @@ void fn_8020EED4(void* ctx1, void* ctx2, u32 p5, u32 p6, void* p7)
 }
 #pragma pop
 /* 0x8020F108 | size: 0x128 */
-void fn_8020F108(void* battleCtx, void* ctx) {
+void fightWazaWzxTypeFuncMigawari(void* battleCtx, void* ctx) {
     extern void fn_8011BEB4();
     extern void fn_801C3430();
     extern void battleGridReplacePokemon();
@@ -8907,7 +8907,7 @@ void fn_8020F108(void* battleCtx, void* ctx) {
 }
 
 /* 0x8020F238 | size: 0x128 */
-void fn_8020F238(void* battleCtx, void* ctx) {
+void fightWazaWzxTypeFuncHensin(void* battleCtx, void* ctx) {
     extern void fn_8011BEB4();
     extern void fn_801C3430();
     extern void battleGridReplacePokemon();
@@ -8939,7 +8939,7 @@ void fn_8020F238(void* battleCtx, void* ctx) {
 }
 
 /* Address: 0x8020F368 | Size: 0x80 | Ghidra import */
-void fn_8020F368(void)
+void fightWazaWzxTypeFuncMagiccort(void)
 
 {
     u32 r3;
@@ -8993,7 +8993,7 @@ void fn_8020F3F0(void)
 }
 /* Address: 0x8020F494 | Size: 0x84 | Ghidra import */
 
-u32 fn_8020F494(void)
+u32 fightWazaWzxVariationFuncWeatherBall(void)
 
 {
     extern int fn_801F453C();
@@ -9052,7 +9052,7 @@ void fn_8020F518(void)
 /* Address: 0x8020F5BC | Size: 0x8c | Ghidra import */
 #pragma push
 #pragma peephole on
-u32 fn_8020F5BC(u32 unused, void* typeObj)
+u32 fightWazaWzxVariationFuncIceball(u32 unused, void* typeObj)
 
 {
     extern int fn_80202360();
@@ -9075,7 +9075,7 @@ u32 fn_8020F5BC(u32 unused, void* typeObj)
 }
 #pragma pop
 /* Address: 0x8020F648 | Size: 0xa4 | Ghidra import */
-void fn_8020F648(void)
+void fightWazaWzxTypeFuncKawarawari(void)
 
 {
     u32 r3;
@@ -9101,7 +9101,7 @@ void fn_8020F648(void)
   return;
 }
 /* 0x8020F6EC | size: 0x60 | small */
-s32 fn_8020F6EC(void) {
+s32 fightWazaWzxVariationFuncKawarawari(void) {
     extern u8 lbl_80379F58[];
     u32 val;
     val = *(u8*)((u8*)lbl_80379F58 + (0x1 << 16) + 0x6002);
@@ -9115,7 +9115,7 @@ s32 fn_8020F6EC(void) {
 }
 
 /* 0x8020F74C | size: 0x64 */
-void fn_8020F74C(void* p1, void* p2, u32 unused1, u32 unused2, u32 p3) {
+void fightWazaWzxTypeFuncNegaigoto(void* p1, void* p2, u32 unused1, u32 unused2, u32 p3) {
     extern u32 fn_801F0204();
     extern void fn_801F0234();
     extern void fn_802085C4();
@@ -9128,7 +9128,7 @@ void fn_8020F74C(void* p1, void* p2, u32 unused1, u32 unused2, u32 p3) {
 }
 
 /* 0x8020F7B8 | size: 0x114 */
-void fn_8020F7B8(void* p1, void* p2, u32 p3, u32 p4) {
+void fightWazaWzxTypeFuncTedasuke(void* p1, void* p2, u32 p3, u32 p4) {
     extern u16 fn_8011BEB4();
     extern void fightTargetGetRelativeHostSideFightTargetIdToTragetPtr();
     extern void* fn_801F0204();
@@ -9203,8 +9203,8 @@ void fn_8020F938(void)
   fn_802085C4(r4,r3,3,0,uVar1);
   return;
 }
-/* fn_8020F99C | Size: 0x40 | Check if byte at fixed address equals 3 */
-BOOL fn_8020F99C(void) {
+/* fightWazaWzxVariationFuncNomikomu | Size: 0x40 | Check if byte at fixed address equals 3 */
+BOOL fightWazaWzxVariationFuncNomikomu(void) {
     extern u8 lbl_80379F58[];
     u8 val = *(u8*)((u8*)lbl_80379F58 + 0x16002);
     switch (val) {
@@ -9244,8 +9244,8 @@ void fn_8020F9DC(void)
   fn_802085C4(r5,r3,2,0,uVar1);
   return;
 }
-/* fn_8020FA80 | Size: 0x40 | Check if byte at fixed address equals 3 */
-BOOL fn_8020FA80(void) {
+/* fightWazaWzxVariationFuncHakidasu | Size: 0x40 | Check if byte at fixed address equals 3 */
+BOOL fightWazaWzxVariationFuncHakidasu(void) {
     extern u8 lbl_80379F58[];
     u8 val = *(u8*)((u8*)lbl_80379F58 + 0x16002);
     switch (val) {
@@ -9262,7 +9262,7 @@ BOOL fn_8020FA80(void) {
 /* 0x8020FAC0 | size: 0x70 */
 #pragma push
 #pragma peephole on
-void fn_8020FAC0(void* p1, void* p2, u32 unused1, u16 flag, u32 p4) {
+void fightWazaWzxTypeFuncAtt(void* p1, void* p2, u32 unused1, u16 flag, u32 p4) {
     extern u32 fn_801F0204();
     extern void fn_801F0234();
     extern void fn_802085C4();
@@ -9276,7 +9276,7 @@ void fn_8020FAC0(void* p1, void* p2, u32 unused1, u16 flag, u32 p4) {
 #pragma pop
 
 /* Address: 0x8020FB38 | Size: 0xc4 | Ghidra import */
-void fn_8020FB38(void)
+void fightWazaWzxTypeFuncItamiwake(void)
 
 {
     u32 r3;
@@ -9355,7 +9355,7 @@ void fn_8020FC70(void* p1, void* p2, void* p3, u16 mode, u32 p5) {
 #pragma pop
 
 /* Address: 0x8020FD8C | Size: 0xb4 | Ghidra import */
-u32 fn_8020FD8C(void)
+u32 fightWazaWzxVariationFuncMagnitude(void)
 
 {
     u32 r3;
@@ -9425,7 +9425,7 @@ void fn_8020FE40(void)
   return;
 }
 /* Address: 0x8020FEE4 | Size: 0x78 | Ghidra import */
-char fn_8020FEE4()
+char fightWazaWzxVariationFuncYatuatari()
 
 {
     u32 r3;
@@ -9478,7 +9478,7 @@ void fn_8020FF5C(void)
   return;
 }
 /* Address: 0x80210000 | Size: 0x74 | Ghidra import */
-u32 fn_80210000(void)
+u32 fightWazaWzxVariationFuncPresent(void)
 
 {
     u32 r3;
@@ -9530,7 +9530,7 @@ void fn_80210074(void)
   return;
 }
 /* Address: 0x80210118 | Size: 0x78 | Ghidra import */
-int fn_80210118(void)
+int fightWazaWzxVariationFuncOngaesi(void)
 
 {
     u32 r3;
@@ -9618,7 +9618,7 @@ void fn_802102B8(void)
 /* Address: 0x8021035C | Size: 0x8c | Ghidra import */
 #pragma push
 #pragma peephole on
-u32 fn_8021035C(u32 unused, void* typeObj)
+u32 fightWazaWzxVariationFuncKorogaru(u32 unused, void* typeObj)
 
 {
     extern int fn_80202360();
@@ -9664,7 +9664,7 @@ void fn_802103E8(void* p1, void* p2, void* p3, u16 mode, u32 p5) {
 #pragma pop
 
 /* Address: 0x802104E8 | Size: 0x84 | Ghidra import */
-u32 fn_802104E8(void)
+u32 fightWazaWzxVariationFuncTripleKick(void)
 
 {
     u32 r3;
@@ -9718,8 +9718,8 @@ void fn_8021056C(void)
   fn_802085C4(r5,r3,2,0,uVar1);
   return;
 }
-/* fn_80210610 | Size: 0x48 | Get level category from fn_80203E0C result */
-u32 fn_80210610(void* unused, void* param) {
+/* fightWazaWzxVariationFuncTikyuunage | Size: 0x48 | Get level category from fn_80203E0C result */
+u32 fightWazaWzxVariationFuncTikyuunage(void* unused, void* param) {
     extern u8 fn_80203E0C(void* param);
     u8 val = fn_80203E0C(param);
     if (val < 0x21) {
@@ -9758,7 +9758,7 @@ void fn_80210658(void)
   return;
 }
 /* Address: 0x802106FC | Size: 0xc0 | Ghidra import */
-u32 fn_802106FC(void)
+u32 fightWazaWzxVariationFuncKetaguri(void)
 
 {
     u32 r3;
@@ -9799,7 +9799,7 @@ u32 fn_802106FC(void)
 /* 0x802107BC | size: 0xC4 */
 #pragma push
 #pragma peephole on
-void fn_802107BC(void* p1, void* p2, void* p3, u16 mode, u32 p5) {
+void fightWazaWzxTypeFuncAttDef(void* p1, void* p2, void* p3, u16 mode, u32 p5) {
     extern void* fn_801F0204();
     extern void* fn_801F0234();
     extern void fn_802085C4();
@@ -9819,7 +9819,7 @@ void fn_802107BC(void* p1, void* p2, void* p3, u16 mode, u32 p5) {
 /* 0x80210888 | size: 0x108 */
 #pragma push
 #pragma peephole on
-void fn_80210888(void* p1, void* p2, u32 p3, u32 unused, u32 p4) {
+void fightWazaWzxTypeFuncAllAlly(void* p1, void* p2, u32 p3, u32 unused, u32 p4) {
     extern void* fn_801F0204();
     extern void* fn_801F0234();
     extern void* fn_801F02AC();
@@ -9846,7 +9846,7 @@ void fn_80210888(void* p1, void* p2, u32 p3, u32 unused, u32 p4) {
 /* 0x80210998 | size: 0x168 */
 #pragma push
 #pragma peephole on
-void fn_80210998(void* p1, void* p2, void* p3, u32 unused, u32 p4) {
+void fightWazaWzxTypeFuncAllEnemy(void* p1, void* p2, void* p3, u32 unused, u32 p4) {
     extern void* fn_801F0204();
     extern void* fn_801F0234();
     extern void* fn_801F02AC();
@@ -9899,7 +9899,7 @@ void fn_80210B08(void* p1, void* p2, void* p3, u16 mode, u32 p5) {
 /* 0x80210BF8 | size: 0x104 */
 #pragma push
 #pragma peephole on
-void fn_80210BF8(void* p1, void* p2, void* p3, u16 mode, u32 p5) {
+void fightWazaWzxTypeFuncAttDefSpc(void* p1, void* p2, void* p3, u16 mode, u32 p5) {
     extern void* fn_801F0204();
     extern void* fn_801F0234();
     extern void fn_802085C4();
@@ -9921,7 +9921,7 @@ void fn_80210BF8(void* p1, void* p2, void* p3, u16 mode, u32 p5) {
 /* 0x80210D04 | size: 0x150 */
 #pragma push
 #pragma peephole on
-void fn_80210D04(void* p1, void* p2, void* p3, u16 mode, u32 p5) {
+void fightWazaWzxTypeFuncVampire(void* p1, void* p2, void* p3, u16 mode, u32 p5) {
     extern s32 fn_8011BEB4();
     extern void* fn_801F0204();
     extern void* fn_801F0234();
@@ -9973,7 +9973,7 @@ void fn_80210E5C(void)
   return;
 }
 /* Address: 0x80210EC8 | Size: 0x170 | Ghidra import */
-void fn_80210EC8(void)
+void fightWazaWzxTypeFuncTame(void)
 
 {
     u32 r3;

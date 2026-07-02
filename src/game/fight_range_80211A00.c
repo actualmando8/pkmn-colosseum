@@ -94,13 +94,13 @@ extern u32 lbl_8047B610;
 extern u32 lbl_8047B618;
 
 /*
- * fn_80215300 (0x80215300)
+ * WS_ONNEN (0x80215300)
  *
  * FightSeq opcode handler: if event-state 0x28 on the ctx from slot
  * 0x11 reads 2, clears it back to 0 and advances the PC past this
  * instruction (+5); otherwise takes the script-embedded jump.
  */
-void fn_80215300(void) {
+void WS_ONNEN(void) {
     u32 ctx = fn_801F025C(0x11, 0);
 
     if (fn_802025B8(ctx, 0x28) == 2) {
@@ -111,9 +111,9 @@ void fn_80215300(void) {
     }
 }
 
-/* fn_802161F0 (0x802161F0): same FightSeq opcode-handler shape as
- * fn_80215300, slot 0x12 / event-state id 0x30. */
-void fn_802161F0(void) {
+/* WS_CHOUHATSU (0x802161F0): same FightSeq opcode-handler shape as
+ * WS_ONNEN, slot 0x12 / event-state id 0x30. */
+void WS_CHOUHATSU(void) {
     u32 ctx = fn_801F025C(0x12, 0);
 
     if (fn_802025B8(ctx, 0x30) != 2) {
@@ -124,8 +124,8 @@ void fn_802161F0(void) {
     }
 }
 
-/* fn_802162F0 (0x802162F0): same shape, slot 0x12 / event-state id 0x1b. */
-void fn_802162F0(void) {
+/* WS_ICHAMON (0x802162F0): same shape, slot 0x12 / event-state id 0x1b. */
+void WS_ICHAMON(void) {
     u32 ctx = fn_801F025C(0x12, 0);
 
     if (fn_802025B8(ctx, 0x1b) != 2) {
@@ -136,8 +136,8 @@ void fn_802162F0(void) {
     }
 }
 
-/* fn_80215A78 (0x80215A78): same shape, slot 0x11 / event-state id 0x25. */
-void fn_80215A78(void) {
+/* WS_NEWOHARU (0x80215A78): same shape, slot 0x11 / event-state id 0x25. */
+void WS_NEWOHARU(void) {
     u32 ctx = fn_801F025C(0x11, 0);
 
     if (fn_802025B8(ctx, 0x25) != 2) {
@@ -148,11 +148,11 @@ void fn_80215A78(void) {
     }
 }
 
-/* fn_802158D0 (0x802158D0): variant shape -- both state==2 AND
+/* WS_AKUBI (0x802158D0): variant shape -- both state==2 AND
  * fn_80203CCC(ctx) must hold to take the SetEventState+advance path;
  * otherwise the script-embedded jump (deref) is taken. */
 extern u8 fn_80203CCC();
-void fn_802158D0(void) {
+void WS_AKUBI(void) {
     u32 ctx = fn_801F025C(0x12, 0);
 
     if (fn_802025B8(ctx, 0x26) != 2) {
@@ -170,13 +170,13 @@ plus5:
 }
 
 /*
- * fn_80216804 (0x80216804)
+ * WS_CHIISAKUNARU (0x80216804)
  *
  * Gated variant: the SetEventState side effect only runs when flag bit
  * 0x2000000 of lbl_8047B618 is set; the PC always just advances by 1
  * (this handler has no script-embedded jump operand).
  */
-void fn_80216804(void) {
+void WS_CHIISAKUNARU(void) {
     u32 ctx = fn_801F025C(0x11, 0);
 
     if ((lbl_8047B618 & 0x2000000) != 0) {
@@ -219,7 +219,7 @@ void fn_80215808(void) {
 #pragma optimize_for_size reset
 
 /*
- * fn_80216874 (0x80216874)
+ * WS_KIERUTAME_AFTAR (0x80216874)
  *
  * FightSeq opcode handler dispatching on the current move-effect id
  * (fn_80205184): move ids 0x13/0x154 share flag 0x1f, 0x5b uses flag
@@ -229,7 +229,7 @@ void fn_80215808(void) {
  */
 extern u16 fn_80205184();
 extern void fn_80202810();
-void fn_80216874(void) {
+void WS_KIERUTAME_AFTAR(void) {
     u32 ctx = fn_801F025C(0x11, 0);
     u16 moveId = fn_80205184(ctx);
 
@@ -310,14 +310,14 @@ check2:
 }
 
 /*
- * fn_80216960 (0x80216960)
+ * WS_KIERUTAME (0x80216960)
  *
- * Same move-id dispatch table as fn_80216874 (0x13/0x154 -> flag
+ * Same move-id dispatch table as WS_KIERUTAME_AFTAR (0x13/0x154 -> flag
  * 0x1f, 0x5b -> flag 0x20, 0x123 -> flag 0x21), but using the
  * GetEventState==2 / SetEventState(...,0) idiom instead of
  * CheckEventFlag/fn_80202810. PC always advances by 1.
  */
-void fn_80216960(void) {
+void WS_KIERUTAME(void) {
     u32 ctx = fn_801F025C(0x11, 0);
     u16 moveId = fn_80205184(ctx);
 

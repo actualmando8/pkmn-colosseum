@@ -1,0 +1,9 @@
+{
+ "status": "PARKED: Colosseum split these XD shared functions into per-move variants; per-variant evidence needed",
+ "names": [
+  "fightWazaWzxTypeFuncNormal",
+  "fightWazaWzxTypeFuncNormal2",
+  "fightWazaWzxTypeFuncSpc",
+  "fightWazaWzxVariationFuncNormal"
+ ]
+}

@@ -493,7 +493,7 @@
 "addr": "0x80007FDC",
 "size": 56,
 "label": "gs-engine",
-"confidence": 1.89,
+"confidence": 1.9,
 "seed": null
 },
 {
@@ -47225,7 +47225,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801C0F20",
+"name": "JObjForeachAnim",
 "addr": "0x801C0F20",
 "size": 852,
 "label": "hsd",
@@ -47233,28 +47233,28 @@
 "seed": null
 },
 {
-"name": "fn_801C1274",
+"name": "DObjForeachAnim",
 "addr": "0x801C1274",
 "size": 1436,
 "label": "hsd",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_801C1810",
+"name": "LObjForeachAnim",
 "addr": "0x801C1810",
 "size": 1776,
 "label": "hsd",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_801C1F00",
+"name": "CObjForeachAnim",
 "addr": "0x801C1F00",
 "size": 1764,
 "label": "hsd",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_801C25E4",
@@ -58913,7 +58913,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020EEC0",
+"name": "fightWazaWzxVariationFuncOiuchi",
 "addr": "0x8020EEC0",
 "size": 20,
 "label": "fight",
@@ -58921,7 +58921,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020EED4",
+"name": "fightWazaWzxTypeFuncHuuin",
 "addr": "0x8020EED4",
 "size": 556,
 "label": "fight",
@@ -58937,7 +58937,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020F108",
+"name": "fightWazaWzxTypeFuncMigawari",
 "addr": "0x8020F108",
 "size": 296,
 "label": "fight",
@@ -58953,7 +58953,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020F238",
+"name": "fightWazaWzxTypeFuncHensin",
 "addr": "0x8020F238",
 "size": 296,
 "label": "fight",
@@ -58969,7 +58969,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020F368",
+"name": "fightWazaWzxTypeFuncMagiccort",
 "addr": "0x8020F368",
 "size": 128,
 "label": "fight",
@@ -58993,7 +58993,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020F494",
+"name": "fightWazaWzxVariationFuncWeatherBall",
 "addr": "0x8020F494",
 "size": 132,
 "label": "fight",
@@ -59009,7 +59009,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020F5BC",
+"name": "fightWazaWzxVariationFuncIceball",
 "addr": "0x8020F5BC",
 "size": 140,
 "label": "fight",
@@ -59017,7 +59017,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020F648",
+"name": "fightWazaWzxTypeFuncKawarawari",
 "addr": "0x8020F648",
 "size": 164,
 "label": "fight",
@@ -59025,7 +59025,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020F6EC",
+"name": "fightWazaWzxVariationFuncKawarawari",
 "addr": "0x8020F6EC",
 "size": 96,
 "label": "fight",
@@ -59033,7 +59033,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020F74C",
+"name": "fightWazaWzxTypeFuncNegaigoto",
 "addr": "0x8020F74C",
 "size": 100,
 "label": "fight",
@@ -59049,7 +59049,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020F7B8",
+"name": "fightWazaWzxTypeFuncTedasuke",
 "addr": "0x8020F7B8",
 "size": 276,
 "label": "fight",
@@ -59081,7 +59081,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020F99C",
+"name": "fightWazaWzxVariationFuncNomikomu",
 "addr": "0x8020F99C",
 "size": 64,
 "label": "fight",
@@ -59097,7 +59097,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020FA80",
+"name": "fightWazaWzxVariationFuncHakidasu",
 "addr": "0x8020FA80",
 "size": 64,
 "label": "fight",
@@ -59105,7 +59105,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020FAC0",
+"name": "fightWazaWzxTypeFuncAtt",
 "addr": "0x8020FAC0",
 "size": 112,
 "label": "fight",
@@ -59121,7 +59121,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020FB38",
+"name": "fightWazaWzxTypeFuncItamiwake",
 "addr": "0x8020FB38",
 "size": 196,
 "label": "fight",
@@ -59153,7 +59153,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020FD8C",
+"name": "fightWazaWzxVariationFuncMagnitude",
 "addr": "0x8020FD8C",
 "size": 180,
 "label": "fight",
@@ -59169,7 +59169,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020FEE4",
+"name": "fightWazaWzxVariationFuncYatuatari",
 "addr": "0x8020FEE4",
 "size": 120,
 "label": "fight",
@@ -59185,7 +59185,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80210000",
+"name": "fightWazaWzxVariationFuncPresent",
 "addr": "0x80210000",
 "size": 116,
 "label": "fight",
@@ -59201,7 +59201,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80210118",
+"name": "fightWazaWzxVariationFuncOngaesi",
 "addr": "0x80210118",
 "size": 120,
 "label": "fight",
@@ -59233,7 +59233,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8021035C",
+"name": "fightWazaWzxVariationFuncKorogaru",
 "addr": "0x8021035C",
 "size": 140,
 "label": "fight",
@@ -59249,7 +59249,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802104E8",
+"name": "fightWazaWzxVariationFuncTripleKick",
 "addr": "0x802104E8",
 "size": 132,
 "label": "fight",
@@ -59265,7 +59265,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80210610",
+"name": "fightWazaWzxVariationFuncTikyuunage",
 "addr": "0x80210610",
 "size": 72,
 "label": "fight",
@@ -59281,7 +59281,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802106FC",
+"name": "fightWazaWzxVariationFuncKetaguri",
 "addr": "0x802106FC",
 "size": 192,
 "label": "fight",
@@ -59289,7 +59289,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802107BC",
+"name": "fightWazaWzxTypeFuncAttDef",
 "addr": "0x802107BC",
 "size": 196,
 "label": "fight",
@@ -59305,7 +59305,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80210888",
+"name": "fightWazaWzxTypeFuncAllAlly",
 "addr": "0x80210888",
 "size": 264,
 "label": "fight",
@@ -59321,7 +59321,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80210998",
+"name": "fightWazaWzxTypeFuncAllEnemy",
 "addr": "0x80210998",
 "size": 360,
 "label": "fight",
@@ -59353,7 +59353,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80210BF8",
+"name": "fightWazaWzxTypeFuncAttDefSpc",
 "addr": "0x80210BF8",
 "size": 260,
 "label": "fight",
@@ -59369,7 +59369,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80210D04",
+"name": "fightWazaWzxTypeFuncVampire",
 "addr": "0x80210D04",
 "size": 336,
 "label": "fight",
@@ -59401,7 +59401,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80210EC8",
+"name": "fightWazaWzxTypeFuncTame",
 "addr": "0x80210EC8",
 "size": 368,
 "label": "fight",
@@ -59609,7 +59609,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802136C8",
+"name": "WS_STATUS_SET32",
 "addr": "0x802136C8",
 "size": 136,
 "label": "fight",
@@ -59617,7 +59617,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80213750",
+"name": "WS_STATUS_SET16",
 "addr": "0x80213750",
 "size": 136,
 "label": "fight",
@@ -59625,7 +59625,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802137D8",
+"name": "WS_STATUS_SET8",
 "addr": "0x802137D8",
 "size": 136,
 "label": "fight",
@@ -59633,7 +59633,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80213860",
+"name": "WS_STATUS_GET32",
 "addr": "0x80213860",
 "size": 144,
 "label": "fight",
@@ -59641,7 +59641,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802138F0",
+"name": "WS_STATUS_GET16",
 "addr": "0x802138F0",
 "size": 144,
 "label": "fight",
@@ -59649,7 +59649,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80213980",
+"name": "WS_STATUS_GET8",
 "addr": "0x80213980",
 "size": 144,
 "label": "fight",
@@ -59657,7 +59657,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80213A10",
+"name": "WS_GETEND",
 "addr": "0x80213A10",
 "size": 12,
 "label": "fight",
@@ -59665,7 +59665,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80213A1C",
+"name": "WS_ITEMEND",
 "addr": "0x80213A1C",
 "size": 12,
 "label": "fight",
@@ -59809,7 +59809,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80214B68",
+"name": "WS_HIMITUNOTIKARA",
 "addr": "0x80214B68",
 "size": 76,
 "label": "fight",
@@ -59897,7 +59897,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80215300",
+"name": "WS_ONNEN",
 "addr": "0x80215300",
 "size": 116,
 "label": "fight",
@@ -59945,7 +59945,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802158D0",
+"name": "WS_AKUBI",
 "addr": "0x802158D0",
 "size": 132,
 "label": "fight",
@@ -59961,7 +59961,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80215A78",
+"name": "WS_NEWOHARU",
 "addr": "0x80215A78",
 "size": 116,
 "label": "fight",
@@ -59977,7 +59977,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80215C70",
+"name": "WS_NARIKIRI",
 "addr": "0x80215C70",
 "size": 128,
 "label": "fight",
@@ -60009,7 +60009,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802161F0",
+"name": "WS_CHOUHATSU",
 "addr": "0x802161F0",
 "size": 116,
 "label": "fight",
@@ -60025,7 +60025,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802162F0",
+"name": "WS_ICHAMON",
 "addr": "0x802162F0",
 "size": 116,
 "label": "fight",
@@ -60049,7 +60049,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80216550",
+"name": "WS_JUUDEN",
 "addr": "0x80216550",
 "size": 100,
 "label": "fight",
@@ -60081,7 +60081,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80216804",
+"name": "WS_CHIISAKUNARU",
 "addr": "0x80216804",
 "size": 112,
 "label": "fight",
@@ -60089,7 +60089,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80216874",
+"name": "WS_KIERUTAME_AFTAR",
 "addr": "0x80216874",
 "size": 236,
 "label": "fight",
@@ -60097,7 +60097,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80216960",
+"name": "WS_KIERUTAME",
 "addr": "0x80216960",
 "size": 248,
 "label": "fight",
@@ -60153,7 +60153,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802171BC",
+"name": "WS_MARUKUNARU",
 "addr": "0x802171BC",
 "size": 100,
 "label": "fight",
@@ -60169,7 +60169,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802173D4",
+"name": "WS_JIKOANJI",
 "addr": "0x802173D4",
 "size": 96,
 "label": "fight",
@@ -60289,7 +60289,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80218270",
+"name": "WS_MIYABURU",
 "addr": "0x80218270",
 "size": 100,
 "label": "fight",
@@ -60353,7 +60353,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80218C74",
+"name": "WS_MICHIDURE",
 "addr": "0x80218C74",
 "size": 176,
 "label": "fight",
@@ -60569,7 +60569,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8021AB18",
+"name": "WS_WEATHER_CHANGE",
 "addr": "0x8021AB18",
 "size": 132,
 "label": "fight",
@@ -60649,7 +60649,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8021B70C",
+"name": "WS_ABARERU",
 "addr": "0x8021B70C",
 "size": 84,
 "label": "fight",
@@ -60665,7 +60665,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8021B830",
+"name": "WS_KUROIKIRI",
 "addr": "0x8021B830",
 "size": 64,
 "label": "fight",
@@ -60769,7 +60769,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8021C704",
+"name": "WS_NEKODAMASHI",
 "addr": "0x8021C704",
 "size": 88,
 "label": "fight",
@@ -60961,7 +60961,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8021DEC8",
+"name": "WS_KORAERU_CHECK",
 "addr": "0x8021DEC8",
 "size": 52,
 "label": "fight",
@@ -60969,7 +60969,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8021DEFC",
+"name": "WS_SCA_END_SET",
 "addr": "0x8021DEFC",
 "size": 64,
 "label": "fight",
@@ -61049,7 +61049,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8021E6FC",
+"name": "WS_SWITCH_A_D",
 "addr": "0x8021E6FC",
 "size": 72,
 "label": "fight",
@@ -61097,7 +61097,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8021EC00",
+"name": "WS_WAZAOBOE_CHECK",
 "addr": "0x8021EC00",
 "size": 248,
 "label": "fight",
@@ -61313,7 +61313,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802223D4",
+"name": "WS_ALERTEND",
 "addr": "0x802223D4",
 "size": 12,
 "label": "fight",
@@ -61345,7 +61345,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802224D0",
+"name": "WS_SPEABIEND",
 "addr": "0x802224D0",
 "size": 12,
 "label": "fight",
@@ -61353,7 +61353,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802224DC",
+"name": "WS_SEQEND",
 "addr": "0x802224DC",
 "size": 12,
 "label": "fight",
@@ -61361,7 +61361,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802224E8",
+"name": "WS_WAZAEND",
 "addr": "0x802224E8",
 "size": 12,
 "label": "fight",
@@ -61369,7 +61369,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802224F4",
+"name": "WS_SEQRET",
 "addr": "0x802224F4",
 "size": 12,
 "label": "fight",
@@ -61593,7 +61593,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80223A24",
+"name": "WS_CHECK_TYPE",
 "addr": "0x80223A24",
 "size": 100,
 "label": "fight",
@@ -61601,7 +61601,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80223A88",
+"name": "WS_WAZAKOUKA_CHECK",
 "addr": "0x80223A88",
 "size": 108,
 "label": "fight",
@@ -61617,7 +61617,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80223C74",
+"name": "WS_SIDECONDITION_CHECK",
 "addr": "0x80223C74",
 "size": 116,
 "label": "fight",
@@ -61641,7 +61641,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80223E40",
+"name": "WS_CONDITION_CHECK",
 "addr": "0x80223E40",
 "size": 220,
 "label": "fight",
@@ -61681,7 +61681,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802247D0",
+"name": "WS_TSUIKA_INDIRECT_ACT",
 "addr": "0x802247D0",
 "size": 40,
 "label": "fight",
@@ -61689,7 +61689,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802247F8",
+"name": "WS_TSUIKA_DIRECT_ACT",
 "addr": "0x802247F8",
 "size": 40,
 "label": "fight",
@@ -61809,7 +61809,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80227178",
+"name": "WS_DAMAGE_LOSS_ONLY",
 "addr": "0x80227178",
 "size": 52,
 "label": "fight",
@@ -61817,7 +61817,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802271AC",
+"name": "WS_DAMAGE_LOSS",
 "addr": "0x802271AC",
 "size": 52,
 "label": "fight",
@@ -61841,7 +61841,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802274C0",
+"name": "WS_TYPE_CHECK",
 "addr": "0x802274C0",
 "size": 48,
 "label": "fight",
@@ -61873,7 +61873,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80227DB8",
+"name": "WS_CRITICAL_CHECK",
 "addr": "0x80227DB8",
 "size": 724,
 "label": "fight",
@@ -61969,7 +61969,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80229E54",
+"name": "WS_HITCHECK",
 "addr": "0x80229E54",
 "size": 1712,
 "label": "fight",
@@ -63009,7 +63009,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023CB60",
+"name": "fightTrainerAiWazaValueYumekui",
 "addr": "0x8023CB60",
 "size": 320,
 "label": "fight",
@@ -63017,7 +63017,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023CCA0",
+"name": "fightTrainerAiWazaValueKawarawari",
 "addr": "0x8023CCA0",
 "size": 300,
 "label": "fight",
@@ -63025,7 +63025,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023CDCC",
+"name": "fightTrainerAiWazaValueTeiryouDameeji",
 "addr": "0x8023CDCC",
 "size": 148,
 "label": "fight",
@@ -63033,7 +63033,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023CE60",
+"name": "fightTrainerAiWazaValueHikarinokabe",
 "addr": "0x8023CE60",
 "size": 380,
 "label": "fight",
@@ -63041,7 +63041,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023CFDC",
+"name": "fightTrainerAiWazaValueRihurekutaa",
 "addr": "0x8023CFDC",
 "size": 380,
 "label": "fight",
@@ -63049,7 +63049,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023D158",
+"name": "fightTrainerAiWazaValueOnibi",
 "addr": "0x8023D158",
 "size": 460,
 "label": "fight",
@@ -63057,7 +63057,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023D324",
+"name": "fightTrainerAiWazaValueDoku",
 "addr": "0x8023D324",
 "size": 348,
 "label": "fight",
@@ -63065,7 +63065,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023D480",
+"name": "fightTrainerAiWazaValueBatontatti",
 "addr": "0x8023D480",
 "size": 144,
 "label": "fight",
@@ -63073,7 +63073,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023D510",
+"name": "fightTrainerAiWazaValueHaradaiko",
 "addr": "0x8023D510",
 "size": 572,
 "label": "fight",
@@ -63081,7 +63081,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023D74C",
+"name": "fightTrainerAiWazaValueMarukunaru",
 "addr": "0x8023D74C",
 "size": 512,
 "label": "fight",
@@ -63089,7 +63089,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023D94C",
+"name": "fightTrainerAiWazaValueMeisou",
 "addr": "0x8023D94C",
 "size": 588,
 "label": "fight",
@@ -63097,7 +63097,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023DB98",
+"name": "fightTrainerAiWazaValueRyuunomai",
 "addr": "0x8023DB98",
 "size": 588,
 "label": "fight",
@@ -63105,7 +63105,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023DDE4",
+"name": "fightTrainerAiWazaValueBirudoAppu",
 "addr": "0x8023DDE4",
 "size": 588,
 "label": "fight",
@@ -63113,7 +63113,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023E030",
+"name": "fightTrainerAiWazaValueKosumopawaa",
 "addr": "0x8023E030",
 "size": 588,
 "label": "fight",
@@ -63121,7 +63121,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023E27C",
+"name": "fightTrainerAiWazaValueKaihirituAppu",
 "addr": "0x8023E27C",
 "size": 588,
 "label": "fight",
@@ -63129,7 +63129,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023E4C8",
+"name": "fightTrainerAiWazaValueDowasure",
 "addr": "0x8023E4C8",
 "size": 588,
 "label": "fight",
@@ -63137,7 +63137,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023E714",
+"name": "fightTrainerAiWazaValueTokukouAppu",
 "addr": "0x8023E714",
 "size": 588,
 "label": "fight",
@@ -63145,7 +63145,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023E960",
+"name": "fightTrainerAiWazaValueKousokuidou",
 "addr": "0x8023E960",
 "size": 588,
 "label": "fight",
@@ -63153,7 +63153,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023EBAC",
+"name": "fightTrainerAiWazaValueBougyoAppu",
 "addr": "0x8023EBAC",
 "size": 588,
 "label": "fight",
@@ -63161,7 +63161,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023EDF8",
+"name": "fightTrainerAiWazaValueKougekiAppu",
 "addr": "0x8023EDF8",
 "size": 588,
 "label": "fight",
@@ -63169,7 +63169,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023F044",
+"name": "fightTrainerAiWazaValuetorikku",
 "addr": "0x8023F044",
 "size": 256,
 "label": "fight",
@@ -63177,7 +63177,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023F144",
+"name": "fightTrainerAiWazaValueSukirusuwappu",
 "addr": "0x8023F144",
 "size": 308,
 "label": "fight",
@@ -63185,7 +63185,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023F278",
+"name": "fightTrainerAiWazaValueMamoru",
 "addr": "0x8023F278",
 "size": 1608,
 "label": "fight",
@@ -63193,7 +63193,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023F8C0",
+"name": "fightTrainerAiWazaValueTakuwaeru",
 "addr": "0x8023F8C0",
 "size": 348,
 "label": "fight",
@@ -63201,7 +63201,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023FA1C",
+"name": "fightTrainerAiWazaValueJyuuden",
 "addr": "0x8023FA1C",
 "size": 320,
 "label": "fight",
@@ -63209,7 +63209,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023FB5C",
+"name": "fightTrainerAiWazaValueNemuriKoudou",
 "addr": "0x8023FB5C",
 "size": 488,
 "label": "fight",
@@ -63217,7 +63217,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023FD44",
+"name": "fightTrainerAiWazaValueMigawari",
 "addr": "0x8023FD44",
 "size": 152,
 "label": "fight",
@@ -63225,7 +63225,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8023FDDC",
+"name": "fightTrainerAiWazaValueSawagu",
 "addr": "0x8023FDDC",
 "size": 764,
 "label": "fight",
@@ -63233,7 +63233,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802400D8",
+"name": "fightTrainerAiWazaValueOomugaesi",
 "addr": "0x802400D8",
 "size": 108,
 "label": "fight",
@@ -63241,7 +63241,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80240144",
+"name": "fightTrainerAiWazaValueRandamuSentaku",
 "addr": "0x80240144",
 "size": 172,
 "label": "fight",
@@ -63249,7 +63249,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802401F0",
+"name": "fightTrainerAiWazaValueHurahuradansu",
 "addr": "0x802401F0",
 "size": 612,
 "label": "fight",
@@ -63257,7 +63257,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80240454",
+"name": "fightTrainerAiWazaValueMakibisi",
 "addr": "0x80240454",
 "size": 364,
 "label": "fight",
@@ -63265,7 +63265,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802405C0",
+"name": "fightTrainerAiWazaValueRisaikuru",
 "addr": "0x802405C0",
 "size": 140,
 "label": "fight",
@@ -63273,7 +63273,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024064C",
+"name": "fightTrainerAiWazaValueSiroikiri",
 "addr": "0x8024064C",
 "size": 316,
 "label": "fight",
@@ -63281,7 +63281,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80240788",
+"name": "fightTrainerAiWazaValueJikoanji",
 "addr": "0x80240788",
 "size": 1096,
 "label": "fight",
@@ -63289,7 +63289,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80240BD0",
+"name": "fightTrainerAiWazaValueKuroikiri",
 "addr": "0x80240BD0",
 "size": 2704,
 "label": "fight",
@@ -63297,7 +63297,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80241660",
+"name": "fightTrainerAiWazaValueTedasuke",
 "addr": "0x80241660",
 "size": 1296,
 "label": "fight",
@@ -63305,7 +63305,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80241B70",
+"name": "fightTrainerAiWazaValueKyouseikoutai",
 "addr": "0x80241B70",
 "size": 632,
 "label": "fight",
@@ -63313,7 +63313,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80241DE8",
+"name": "fightTrainerAiWazaValueYokodori",
 "addr": "0x80241DE8",
 "size": 508,
 "label": "fight",
@@ -63321,7 +63321,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80241FE4",
+"name": "fightTrainerAiWazaValueKonoyubitomare",
 "addr": "0x80241FE4",
 "size": 680,
 "label": "fight",
@@ -63329,7 +63329,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024228C",
+"name": "fightTrainerAiWazaValueKoukanKinsi",
 "addr": "0x8024228C",
 "size": 956,
 "label": "fight",
@@ -63337,7 +63337,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80242648",
+"name": "fightTrainerAiWazaValueKanasibari",
 "addr": "0x80242648",
 "size": 232,
 "label": "fight",
@@ -63345,7 +63345,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80242730",
+"name": "fightTrainerAiWazaValueMitizure",
 "addr": "0x80242730",
 "size": 368,
 "label": "fight",
@@ -63353,7 +63353,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802428A0",
+"name": "fightTrainerAiWazaValueUrami",
 "addr": "0x802428A0",
 "size": 308,
 "label": "fight",
@@ -63361,7 +63361,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802429D4",
+"name": "fightTrainerAiWazaValueOdareru",
 "addr": "0x802429D4",
 "size": 380,
 "label": "fight",
@@ -63369,7 +63369,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80242B50",
+"name": "fightTrainerAiWazaValueIbaru",
 "addr": "0x80242B50",
 "size": 380,
 "label": "fight",
@@ -63377,7 +63377,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80242CCC",
+"name": "fightTrainerAiWazaValueAnkooru",
 "addr": "0x80242CCC",
 "size": 228,
 "label": "fight",
@@ -63385,7 +63385,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80242DB0",
+"name": "fightTrainerAiWazaValueIkarinomaeba",
 "addr": "0x80242DB0",
 "size": 156,
 "label": "fight",
@@ -63393,7 +63393,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80242E4C",
+"name": "fightTrainerAiWazaValueKusuguruDaun",
 "addr": "0x80242E4C",
 "size": 416,
 "label": "fight",
@@ -63401,7 +63401,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80242FEC",
+"name": "fightTrainerAiWazaValueKaihiDaun",
 "addr": "0x80242FEC",
 "size": 248,
 "label": "fight",
@@ -63409,7 +63409,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802430E4",
+"name": "fightTrainerAiWazaValueMeityuuDaun",
 "addr": "0x802430E4",
 "size": 148,
 "label": "fight",
@@ -63417,7 +63417,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80243178",
+"name": "fightTrainerAiWazaValueTokubouDaun",
 "addr": "0x80243178",
 "size": 268,
 "label": "fight",
@@ -63425,7 +63425,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80243284",
+"name": "fightTrainerAiWazaValueBougyoDaun",
 "addr": "0x80243284",
 "size": 268,
 "label": "fight",
@@ -63433,7 +63433,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80243390",
+"name": "fightTrainerAiWazaValueKougekiDaun",
 "addr": "0x80243390",
 "size": 268,
 "label": "fight",
@@ -63441,7 +63441,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024349C",
+"name": "fightTrainerAiWazaValueSubayasaDaun",
 "addr": "0x8024349C",
 "size": 312,
 "label": "fight",
@@ -63449,7 +63449,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802435D4",
+"name": "fightTrainerAiWazaValueGamusyara",
 "addr": "0x802435D4",
 "size": 184,
 "label": "fight",
@@ -63457,7 +63457,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024368C",
+"name": "fightTrainerAiWazaValueItamiwake",
 "addr": "0x8024368C",
 "size": 428,
 "label": "fight",
@@ -63465,7 +63465,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80243838",
+"name": "fightTrainerAiWazaValueAkumu",
 "addr": "0x80243838",
 "size": 148,
 "label": "fight",
@@ -63473,7 +63473,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802438CC",
+"name": "fightTrainerAiWazaValueRokkuon",
 "addr": "0x802438CC",
 "size": 320,
 "label": "fight",
@@ -63481,7 +63481,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80243A0C",
+"name": "fightTrainerAiWazaValueNoroi",
 "addr": "0x80243A0C",
 "size": 592,
 "label": "fight",
@@ -63497,7 +63497,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80243CD8",
+"name": "fightTrainerAiWazaValueKoraeru",
 "addr": "0x80243CD8",
 "size": 1600,
 "label": "fight",
@@ -63505,7 +63505,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80244318",
+"name": "fightTrainerAiWazaValueMiyaburu",
 "addr": "0x80244318",
 "size": 352,
 "label": "fight",
@@ -63513,7 +63513,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80244478",
+"name": "fightTrainerAiWazaValueMajikkukooto",
 "addr": "0x80244478",
 "size": 156,
 "label": "fight",
@@ -63521,7 +63521,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80244514",
+"name": "fightTrainerAiWazaValueMiraakooto",
 "addr": "0x80244514",
 "size": 396,
 "label": "fight",
@@ -63529,7 +63529,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802446A0",
+"name": "fightTrainerAiWazaValueKauntaa",
 "addr": "0x802446A0",
 "size": 396,
 "label": "fight",
@@ -63537,7 +63537,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024482C",
+"name": "fightTrainerAiWazaValueAroma",
 "addr": "0x8024482C",
 "size": 212,
 "label": "fight",
@@ -63545,7 +63545,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80244900",
+"name": "fightTrainerAiWazaValueRihuressyu",
 "addr": "0x80244900",
 "size": 140,
 "label": "fight",
@@ -63553,7 +63553,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024498C",
+"name": "fightTrainerAiWazaValueSunaarasi",
 "addr": "0x8024498C",
 "size": 792,
 "label": "fight",
@@ -63561,7 +63561,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80244CA4",
+"name": "fightTrainerAiWazaValueArare",
 "addr": "0x80244CA4",
 "size": 708,
 "label": "fight",
@@ -63569,7 +63569,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80244F68",
+"name": "fightTrainerAiWazaValueNihonbare",
 "addr": "0x80244F68",
 "size": 600,
 "label": "fight",
@@ -63577,7 +63577,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802451C0",
+"name": "fightTrainerAiWazaValueAmagoi",
 "addr": "0x802451C0",
 "size": 600,
 "label": "fight",
@@ -63585,7 +63585,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80245418",
+"name": "fightTrainerAiWazaValueNemurare",
 "addr": "0x80245418",
 "size": 352,
 "label": "fight",
@@ -63593,7 +63593,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80245578",
+"name": "fightTrainerAiWazaValueNemuru",
 "addr": "0x80245578",
 "size": 416,
 "label": "fight",
@@ -63601,7 +63601,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80245718",
+"name": "fightTrainerAiWazaValueKaihuku2",
 "addr": "0x80245718",
 "size": 152,
 "label": "fight",
@@ -63609,7 +63609,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802457B0",
+"name": "fightTrainerAiWazaValueKaihuku1",
 "addr": "0x802457B0",
 "size": 360,
 "label": "fight",
@@ -63617,7 +63617,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80245918",
+"name": "fightTrainerAiWazaValueKituke",
 "addr": "0x80245918",
 "size": 152,
 "label": "fight",
@@ -63625,7 +63625,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802459B0",
+"name": "fightTrainerAiWazaValueOiuti",
 "addr": "0x802459B0",
 "size": 1100,
 "label": "fight",
@@ -63633,7 +63633,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80245DFC",
+"name": "fightTrainerAiWazaValueUezaabooru",
 "addr": "0x80245DFC",
 "size": 332,
 "label": "fight",
@@ -63641,7 +63641,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80245F48",
+"name": "fightTrainerAiWazaValueSizennotikara",
 "addr": "0x80245F48",
 "size": 124,
 "label": "fight",
@@ -63649,7 +63649,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80245FC4",
+"name": "fightTrainerAiWazaValueHimitunotikara",
 "addr": "0x80245FC4",
 "size": 4228,
 "label": "fight",
@@ -63657,7 +63657,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80247048",
+"name": "fightTrainerAiWazaValueItigekihissatu",
 "addr": "0x80247048",
 "size": 124,
 "label": "fight",
@@ -63665,7 +63665,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802470C4",
+"name": "fightTrainerAiWazaValueZennouryokuappu",
 "addr": "0x802470C4",
 "size": 236,
 "label": "fight",
@@ -63673,7 +63673,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802471B0",
+"name": "fightTrainerAiWazaValueTuikaKougekiAppu",
 "addr": "0x802471B0",
 "size": 296,
 "label": "fight",
@@ -63681,7 +63681,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802472D8",
+"name": "fightTrainerAiWazaValueHaganenotubasa",
 "addr": "0x802472D8",
 "size": 220,
 "label": "fight",
@@ -63697,7 +63697,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802474F8",
+"name": "fightTrainerAiWazaValueOobaahiito",
 "addr": "0x802474F8",
 "size": 424,
 "label": "fight",
@@ -63705,7 +63705,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802476A0",
+"name": "fightTrainerAiWazaValueHatakiotosu",
 "addr": "0x802476A0",
 "size": 272,
 "label": "fight",
@@ -63713,7 +63713,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802477B0",
+"name": "fightTrainerAiWazaValueDouguUbau",
 "addr": "0x802477B0",
 "size": 344,
 "label": "fight",
@@ -63721,7 +63721,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80247908",
+"name": "fightTrainerAiWazaValueSooraabiimu",
 "addr": "0x80247908",
 "size": 448,
 "label": "fight",
@@ -63729,7 +63729,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80247AC8",
+"name": "fightTrainerAiWazaValueToraiatakku",
 "addr": "0x80247AC8",
 "size": 404,
 "label": "fight",
@@ -63737,7 +63737,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80247C5C",
+"name": "fightTrainerAiWazaValueDokudokunokiba",
 "addr": "0x80247C5C",
 "size": 388,
 "label": "fight",
@@ -63745,7 +63745,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80247DE0",
+"name": "fightTrainerAiWazaValuePoizunteeru",
 "addr": "0x80247DE0",
 "size": 448,
 "label": "fight",
@@ -63753,7 +63753,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80247FA0",
+"name": "fightTrainerAiWazaValueTuikaDoku",
 "addr": "0x80247FA0",
 "size": 464,
 "label": "fight",
@@ -63761,7 +63761,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80248170",
+"name": "fightTrainerAiWazaValueHandou",
 "addr": "0x80248170",
 "size": 336,
 "label": "fight",
@@ -63769,7 +63769,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802482C0",
+"name": "fightTrainerAiWazaValueBakuretuPanti",
 "addr": "0x802482C0",
 "size": 416,
 "label": "fight",
@@ -63777,7 +63777,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80248460",
+"name": "fightTrainerAiWazaValueDenjihou",
 "addr": "0x80248460",
 "size": 556,
 "label": "fight",
@@ -63785,7 +63785,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024868C",
+"name": "fightTrainerAiWazaValueTuikaMahi",
 "addr": "0x8024868C",
 "size": 464,
 "label": "fight",
@@ -63793,7 +63793,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024885C",
+"name": "fightTrainerAiWazaValueTuikaKoori",
 "addr": "0x8024885C",
 "size": 704,
 "label": "fight",
@@ -63801,7 +63801,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80248B1C",
+"name": "fightTrainerAiWazaValueBureizukikku",
 "addr": "0x80248B1C",
 "size": 544,
 "label": "fight",
@@ -63809,7 +63809,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80248D3C",
+"name": "fightTrainerAiWazaValueJikokaitou",
 "addr": "0x80248D3C",
 "size": 648,
 "label": "fight",
@@ -63817,7 +63817,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80248FC4",
+"name": "fightTrainerAiWazaValueHonoonouzu",
 "addr": "0x80248FC4",
 "size": 1180,
 "label": "fight",
@@ -63825,7 +63825,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80249460",
+"name": "fightTrainerAiWazaValueIryokuHonoo",
 "addr": "0x80249460",
 "size": 536,
 "label": "fight",
@@ -63833,7 +63833,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80249678",
+"name": "fightTrainerAiWazaValueTuikouKonran",
 "addr": "0x80249678",
 "size": 584,
 "label": "fight",
@@ -63841,7 +63841,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802498C0",
+"name": "fightTrainerAiWazaValueDorokake",
 "addr": "0x802498C0",
 "size": 500,
 "label": "fight",
@@ -63849,7 +63849,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80249AB4",
+"name": "fightTrainerAiWazaValueTuikouMeityuuDaun",
 "addr": "0x80249AB4",
 "size": 632,
 "label": "fight",
@@ -63857,7 +63857,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80249D2C",
+"name": "fightTrainerAiWazaValueTuikouTokubouDaun",
 "addr": "0x80249D2C",
 "size": 604,
 "label": "fight",
@@ -63865,7 +63865,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80249F88",
+"name": "fightTrainerAiWazaValueTuikouTokukouDaun",
 "addr": "0x80249F88",
 "size": 488,
 "label": "fight",
@@ -63873,7 +63873,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024A170",
+"name": "fightTrainerAiWazaValueKogoerukaze",
 "addr": "0x8024A170",
 "size": 696,
 "label": "fight",
@@ -63881,7 +63881,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024A428",
+"name": "fightTrainerAiWazaValueKanarazuSubayasaDaun",
 "addr": "0x8024A428",
 "size": 572,
 "label": "fight",
@@ -63889,7 +63889,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024A664",
+"name": "fightTrainerAiWazaValueTuikouSubayasaDaun",
 "addr": "0x8024A664",
 "size": 704,
 "label": "fight",
@@ -63897,7 +63897,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024A924",
+"name": "fightTrainerAiWazaValueTuikouBougyoDaun",
 "addr": "0x8024A924",
 "size": 604,
 "label": "fight",
@@ -63905,7 +63905,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024AB80",
+"name": "fightTrainerAiWazaValueOororabiimu",
 "addr": "0x8024AB80",
 "size": 516,
 "label": "fight",
@@ -63913,7 +63913,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024AD84",
+"name": "fightTrainerAiWazaValueNekodamasi",
 "addr": "0x8024AD84",
 "size": 364,
 "label": "fight",
@@ -63921,7 +63921,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024AEF0",
+"name": "fightTrainerAiWazaValueGoddobaado",
 "addr": "0x8024AEF0",
 "size": 212,
 "label": "fight",
@@ -63929,7 +63929,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024AFC4",
+"name": "fightTrainerAiWazaValueTuikaHirumi",
 "addr": "0x8024AFC4",
 "size": 1200,
 "label": "fight",
@@ -63937,7 +63937,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024B474",
+"name": "fightTrainerAiWazaValueJisin",
 "addr": "0x8024B474",
 "size": 1488,
 "label": "fight",
@@ -63945,7 +63945,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024BA44",
+"name": "fightTrainerAiWazaValueSokubaku",
 "addr": "0x8024BA44",
 "size": 1080,
 "label": "fight",
@@ -63953,7 +63953,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024BE7C",
+"name": "fightTrainerAiWazaValueKorogaru",
 "addr": "0x8024BE7C",
 "size": 324,
 "label": "fight",
@@ -63961,7 +63961,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024BFC0",
+"name": "fightTrainerAiWazaValueJibaku",
 "addr": "0x8024BFC0",
 "size": 1532,
 "label": "fight",
@@ -63969,7 +63969,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024C5BC",
+"name": "fightTrainerAiWazaValueTobihaneru",
 "addr": "0x8024C5BC",
 "size": 2332,
 "label": "fight",
@@ -63977,7 +63977,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024CED8",
+"name": "fightTrainerAiWazaValueSorawotobu",
 "addr": "0x8024CED8",
 "size": 2368,
 "label": "fight",
@@ -63985,7 +63985,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024D818",
+"name": "fightTrainerAiWazaValueAbareru",
 "addr": "0x8024D818",
 "size": 320,
 "label": "fight",
@@ -63993,7 +63993,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024D958",
+"name": "fightTrainerAiWazaValueKyuusyuu",
 "addr": "0x8024D958",
 "size": 420,
 "label": "fight",
@@ -64001,7 +64001,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024DAFC",
+"name": "fightTrainerAiWazaValueRokettoZutuki",
 "addr": "0x8024DAFC",
 "size": 192,
 "label": "fight",
@@ -64009,7 +64009,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024DBBC",
+"name": "fightTrainerAiWazaValueKamaitati",
 "addr": "0x8024DBBC",
 "size": 192,
 "label": "fight",
@@ -64017,7 +64017,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024DC7C",
+"name": "fightTrainerAiWazaValueKiaipanti",
 "addr": "0x8024DC7C",
 "size": 528,
 "label": "fight",
@@ -64025,7 +64025,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024DE8C",
+"name": "fightTrainerAiWazaValueAteminage",
 "addr": "0x8024DE8C",
 "size": 312,
 "label": "fight",
@@ -64033,7 +64033,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024DFC4",
+"name": "fightTrainerAiWazaValueRibenji",
 "addr": "0x8024DFC4",
 "size": 264,
 "label": "fight",
@@ -64041,7 +64041,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024E0CC",
+"name": "fightTrainerAiWazaValueTokubetuYuusen",
 "addr": "0x8024E0CC",
 "size": 124,
 "label": "fight",
@@ -64049,7 +64049,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024E148",
+"name": "fightTrainerAiWazaValueKouPuraioritii",
 "addr": "0x8024E148",
 "size": 236,
 "label": "fight",
@@ -64065,7 +64065,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024E320",
+"name": "fightTrainerAiWazaValueHittyuu",
 "addr": "0x8024E320",
 "size": 356,
 "label": "fight",
@@ -64073,7 +64073,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8024E484",
+"name": "fightTrainerAiWazaValueTuujouIryoku",
 "addr": "0x8024E484",
 "size": 168,
 "label": "fight",
@@ -64145,7 +64145,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80250980",
+"name": "fightTrainerAiWazaDamage213",
 "addr": "0x80250980",
 "size": 8,
 "label": "fight",
@@ -64153,7 +64153,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80250988",
+"name": "fightTrainerAiWazaDamage212",
 "addr": "0x80250988",
 "size": 8,
 "label": "fight",
@@ -64161,7 +64161,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80250990",
+"name": "fightTrainerAiWazaDamage211",
 "addr": "0x80250990",
 "size": 8,
 "label": "fight",
@@ -64169,7 +64169,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80250998",
+"name": "fightTrainerAiWazaDamage210",
 "addr": "0x80250998",
 "size": 8,
 "label": "fight",
@@ -64177,7 +64177,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802509A0",
+"name": "fightTrainerAiWazaDamage209",
 "addr": "0x802509A0",
 "size": 132,
 "label": "fight",
@@ -64185,7 +64185,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80250A24",
+"name": "fightTrainerAiWazaDamage208",
 "addr": "0x80250A24",
 "size": 8,
 "label": "fight",
@@ -64193,7 +64193,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80250A2C",
+"name": "fightTrainerAiWazaDamage207",
 "addr": "0x80250A2C",
 "size": 132,
 "label": "fight",
@@ -64201,7 +64201,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80250AB0",
+"name": "fightTrainerAiWazaDamage206",
 "addr": "0x80250AB0",
 "size": 8,
 "label": "fight",
@@ -64209,7 +64209,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80250AB8",
+"name": "fightTrainerAiWazaDamage205",
 "addr": "0x80250AB8",
 "size": 8,
 "label": "fight",
@@ -64217,7 +64217,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80250AC0",
+"name": "fightTrainerAiWazaDamage204",
 "addr": "0x80250AC0",
 "size": 132,
 "label": "fight",
@@ -64241,7 +64241,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80250C64",
+"name": "fightTrainerAiWazaDamage202",
 "addr": "0x80250C64",
 "size": 132,
 "label": "fight",
@@ -64249,7 +64249,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80250CE8",
+"name": "fightTrainerAiWazaDamage201",
 "addr": "0x80250CE8",
 "size": 8,
 "label": "fight",
@@ -64257,7 +64257,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80250CF0",
+"name": "fightTrainerAiWazaDamage200",
 "addr": "0x80250CF0",
 "size": 132,
 "label": "fight",
@@ -64265,7 +64265,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80250D74",
+"name": "fightTrainerAiWazaDamage199",
 "addr": "0x80250D74",
 "size": 8,
 "label": "fight",
@@ -64273,7 +64273,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80250D7C",
+"name": "fightTrainerAiWazaDamage198",
 "addr": "0x80250D7C",
 "size": 132,
 "label": "fight",
@@ -64281,7 +64281,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80250E00",
+"name": "fightTrainerAiWazaDamage197",
 "addr": "0x80250E00",
 "size": 132,
 "label": "fight",
@@ -64289,7 +64289,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80250E84",
+"name": "fightTrainerAiWazaDamage196",
 "addr": "0x80250E84",
 "size": 64,
 "label": "fight",
@@ -64305,7 +64305,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80250F54",
+"name": "fightTrainerAiWazaDamage195",
 "addr": "0x80250F54",
 "size": 8,
 "label": "fight",
@@ -64313,7 +64313,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80250F5C",
+"name": "fightTrainerAiWazaDamage194",
 "addr": "0x80250F5C",
 "size": 8,
 "label": "fight",
@@ -64321,7 +64321,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80250F64",
+"name": "fightTrainerAiWazaDamage193",
 "addr": "0x80250F64",
 "size": 8,
 "label": "fight",
@@ -64329,7 +64329,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80250F6C",
+"name": "fightTrainerAiWazaDamage192",
 "addr": "0x80250F6C",
 "size": 8,
 "label": "fight",
@@ -64337,7 +64337,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80250F74",
+"name": "fightTrainerAiWazaDamage191",
 "addr": "0x80250F74",
 "size": 8,
 "label": "fight",
@@ -64345,7 +64345,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80250F7C",
+"name": "fightTrainerAiWazaDamage190",
 "addr": "0x80250F7C",
 "size": 64,
 "label": "fight",
@@ -64361,7 +64361,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251070",
+"name": "fightTrainerAiWazaDamage189",
 "addr": "0x80251070",
 "size": 92,
 "label": "fight",
@@ -64369,7 +64369,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802510CC",
+"name": "fightTrainerAiWazaDamage188",
 "addr": "0x802510CC",
 "size": 132,
 "label": "fight",
@@ -64377,7 +64377,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251150",
+"name": "fightTrainerAiWazaDamage187",
 "addr": "0x80251150",
 "size": 8,
 "label": "fight",
@@ -64385,7 +64385,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251158",
+"name": "fightTrainerAiWazaDamage186",
 "addr": "0x80251158",
 "size": 60,
 "label": "fight",
@@ -64393,7 +64393,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251194",
+"name": "fightTrainerAiWazaDamage185",
 "addr": "0x80251194",
 "size": 60,
 "label": "fight",
@@ -64401,7 +64401,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802511D0",
+"name": "fightTrainerAiWazaDamage184",
 "addr": "0x802511D0",
 "size": 8,
 "label": "fight",
@@ -64409,7 +64409,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802511D8",
+"name": "fightTrainerAiWazaDamage183",
 "addr": "0x802511D8",
 "size": 8,
 "label": "fight",
@@ -64417,7 +64417,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802511E0",
+"name": "fightTrainerAiWazaDamage182",
 "addr": "0x802511E0",
 "size": 132,
 "label": "fight",
@@ -64425,7 +64425,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251264",
+"name": "fightTrainerAiWazaDamage181",
 "addr": "0x80251264",
 "size": 8,
 "label": "fight",
@@ -64433,7 +64433,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025126C",
+"name": "fightTrainerAiWazaDamage180",
 "addr": "0x8025126C",
 "size": 8,
 "label": "fight",
@@ -64441,7 +64441,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251274",
+"name": "fightTrainerAiWazaDamage179",
 "addr": "0x80251274",
 "size": 8,
 "label": "fight",
@@ -64449,7 +64449,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025127C",
+"name": "fightTrainerAiWazaDamage178",
 "addr": "0x8025127C",
 "size": 8,
 "label": "fight",
@@ -64457,7 +64457,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251284",
+"name": "fightTrainerAiWazaDamage177",
 "addr": "0x80251284",
 "size": 8,
 "label": "fight",
@@ -64465,7 +64465,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025128C",
+"name": "fightTrainerAiWazaDamage176",
 "addr": "0x8025128C",
 "size": 8,
 "label": "fight",
@@ -64473,7 +64473,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251294",
+"name": "fightTrainerAiWazaDamage175",
 "addr": "0x80251294",
 "size": 8,
 "label": "fight",
@@ -64481,7 +64481,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025129C",
+"name": "fightTrainerAiWazaDamage174",
 "addr": "0x8025129C",
 "size": 8,
 "label": "fight",
@@ -64489,7 +64489,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802512A4",
+"name": "fightTrainerAiWazaDamage173",
 "addr": "0x802512A4",
 "size": 172,
 "label": "fight",
@@ -64497,7 +64497,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251350",
+"name": "fightTrainerAiWazaDamage172",
 "addr": "0x80251350",
 "size": 8,
 "label": "fight",
@@ -64505,7 +64505,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251358",
+"name": "fightTrainerAiWazaDamage171",
 "addr": "0x80251358",
 "size": 120,
 "label": "fight",
@@ -64513,7 +64513,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802513D0",
+"name": "fightTrainerAiWazaDamage170",
 "addr": "0x802513D0",
 "size": 132,
 "label": "fight",
@@ -64521,7 +64521,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251454",
+"name": "fightTrainerAiWazaDamage169",
 "addr": "0x80251454",
 "size": 112,
 "label": "fight",
@@ -64529,7 +64529,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802514C4",
+"name": "fightTrainerAiWazaDamage168",
 "addr": "0x802514C4",
 "size": 8,
 "label": "fight",
@@ -64537,7 +64537,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802514CC",
+"name": "fightTrainerAiWazaDamage167",
 "addr": "0x802514CC",
 "size": 8,
 "label": "fight",
@@ -64545,7 +64545,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802514D4",
+"name": "fightTrainerAiWazaDamage166",
 "addr": "0x802514D4",
 "size": 8,
 "label": "fight",
@@ -64553,7 +64553,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802514DC",
+"name": "fightTrainerAiWazaDamage165",
 "addr": "0x802514DC",
 "size": 8,
 "label": "fight",
@@ -64561,7 +64561,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802514E4",
+"name": "fightTrainerAiWazaDamage164",
 "addr": "0x802514E4",
 "size": 8,
 "label": "fight",
@@ -64569,7 +64569,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802514EC",
+"name": "fightTrainerAiWazaDamage162",
 "addr": "0x802514EC",
 "size": 152,
 "label": "fight",
@@ -64577,7 +64577,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251584",
+"name": "fightTrainerAiWazaDamage161",
 "addr": "0x80251584",
 "size": 136,
 "label": "fight",
@@ -64585,7 +64585,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025160C",
+"name": "fightTrainerAiWazaDamage160",
 "addr": "0x8025160C",
 "size": 8,
 "label": "fight",
@@ -64593,7 +64593,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251614",
+"name": "fightTrainerAiWazaDamage159",
 "addr": "0x80251614",
 "size": 60,
 "label": "fight",
@@ -64601,7 +64601,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251650",
+"name": "fightTrainerAiWazaDamage158",
 "addr": "0x80251650",
 "size": 8,
 "label": "fight",
@@ -64609,7 +64609,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251658",
+"name": "fightTrainerAiWazaDamage157",
 "addr": "0x80251658",
 "size": 40,
 "label": "fight",
@@ -64617,7 +64617,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251680",
+"name": "fightTrainerAiWazaDamage156",
 "addr": "0x80251680",
 "size": 8,
 "label": "fight",
@@ -64625,7 +64625,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251688",
+"name": "fightTrainerAiWazaDamage155",
 "addr": "0x80251688",
 "size": 60,
 "label": "fight",
@@ -64633,7 +64633,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802516C4",
+"name": "fightTrainerAiWazaDamage154",
 "addr": "0x802516C4",
 "size": 212,
 "label": "fight",
@@ -64641,7 +64641,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251798",
+"name": "fightTrainerAiWazaDamage153",
 "addr": "0x80251798",
 "size": 8,
 "label": "fight",
@@ -64649,7 +64649,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802517A0",
+"name": "fightTrainerAiWazaDamage152",
 "addr": "0x802517A0",
 "size": 132,
 "label": "fight",
@@ -64657,7 +64657,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251824",
+"name": "fightTrainerAiWazaDamage151",
 "addr": "0x80251824",
 "size": 60,
 "label": "fight",
@@ -64665,7 +64665,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251860",
+"name": "fightTrainerAiWazaDamage150",
 "addr": "0x80251860",
 "size": 120,
 "label": "fight",
@@ -64673,7 +64673,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802518D8",
+"name": "fightTrainerAiWazaDamage149",
 "addr": "0x802518D8",
 "size": 120,
 "label": "fight",
@@ -64681,7 +64681,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251950",
+"name": "fightTrainerAiWazaDamage148",
 "addr": "0x80251950",
 "size": 188,
 "label": "fight",
@@ -64689,7 +64689,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251A0C",
+"name": "fightTrainerAiWazaDamage147",
 "addr": "0x80251A0C",
 "size": 120,
 "label": "fight",
@@ -64697,7 +64697,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251A84",
+"name": "fightTrainerAiWazaDamage146",
 "addr": "0x80251A84",
 "size": 120,
 "label": "fight",
@@ -64705,7 +64705,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251AFC",
+"name": "fightTrainerAiWazaDamage145",
 "addr": "0x80251AFC",
 "size": 60,
 "label": "fight",
@@ -64713,7 +64713,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251B38",
+"name": "fightTrainerAiWazaDamage144",
 "addr": "0x80251B38",
 "size": 8,
 "label": "fight",
@@ -64721,7 +64721,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251B40",
+"name": "fightTrainerAiWazaDamage143",
 "addr": "0x80251B40",
 "size": 8,
 "label": "fight",
@@ -64729,7 +64729,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251B48",
+"name": "fightTrainerAiWazaDamage142",
 "addr": "0x80251B48",
 "size": 8,
 "label": "fight",
@@ -64737,7 +64737,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251B50",
+"name": "fightTrainerAiWazaDamage140",
 "addr": "0x80251B50",
 "size": 132,
 "label": "fight",
@@ -64745,7 +64745,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251BD4",
+"name": "fightTrainerAiWazaDamage139",
 "addr": "0x80251BD4",
 "size": 132,
 "label": "fight",
@@ -64753,7 +64753,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251C58",
+"name": "fightTrainerAiWazaDamage138",
 "addr": "0x80251C58",
 "size": 132,
 "label": "fight",
@@ -64761,7 +64761,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251CDC",
+"name": "fightTrainerAiWazaDamage137",
 "addr": "0x80251CDC",
 "size": 8,
 "label": "fight",
@@ -64769,7 +64769,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251CE4",
+"name": "fightTrainerAiWazaDamage136",
 "addr": "0x80251CE4",
 "size": 8,
 "label": "fight",
@@ -64777,7 +64777,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251CEC",
+"name": "fightTrainerAiWazaDamage135",
 "addr": "0x80251CEC",
 "size": 64,
 "label": "fight",
@@ -64793,7 +64793,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251DB4",
+"name": "fightTrainerAiWazaDamage134",
 "addr": "0x80251DB4",
 "size": 144,
 "label": "fight",
@@ -64801,7 +64801,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251E44",
+"name": "fightTrainerAiWazaDamage133",
 "addr": "0x80251E44",
 "size": 144,
 "label": "fight",
@@ -64809,7 +64809,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251ED4",
+"name": "fightTrainerAiWazaDamage132",
 "addr": "0x80251ED4",
 "size": 144,
 "label": "fight",
@@ -64817,7 +64817,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251F64",
+"name": "fightTrainerAiWazaDamage130",
 "addr": "0x80251F64",
 "size": 8,
 "label": "fight",
@@ -64825,7 +64825,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251F6C",
+"name": "fightTrainerAiWazaDamage129",
 "addr": "0x80251F6C",
 "size": 132,
 "label": "fight",
@@ -64833,7 +64833,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80251FF0",
+"name": "fightTrainerAiWazaDamage128",
 "addr": "0x80251FF0",
 "size": 64,
 "label": "fight",
@@ -64841,7 +64841,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252030",
+"name": "fightTrainerAiWazaDamage127",
 "addr": "0x80252030",
 "size": 8,
 "label": "fight",
@@ -64849,7 +64849,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252038",
+"name": "fightTrainerAiWazaDamage126",
 "addr": "0x80252038",
 "size": 64,
 "label": "fight",
@@ -64865,7 +64865,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802520BC",
+"name": "fightTrainerAiWazaDamage125",
 "addr": "0x802520BC",
 "size": 132,
 "label": "fight",
@@ -64873,7 +64873,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252140",
+"name": "fightTrainerAiWazaDamage124",
 "addr": "0x80252140",
 "size": 8,
 "label": "fight",
@@ -64881,7 +64881,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252148",
+"name": "fightTrainerAiWazaDamage123",
 "addr": "0x80252148",
 "size": 64,
 "label": "fight",
@@ -64897,7 +64897,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252208",
+"name": "fightTrainerAiWazaDamage122",
 "addr": "0x80252208",
 "size": 64,
 "label": "fight",
@@ -64913,7 +64913,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025228C",
+"name": "fightTrainerAiWazaDamage121",
 "addr": "0x8025228C",
 "size": 64,
 "label": "fight",
@@ -64929,7 +64929,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025234C",
+"name": "fightTrainerAiWazaDamage120",
 "addr": "0x8025234C",
 "size": 8,
 "label": "fight",
@@ -64937,7 +64937,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252354",
+"name": "fightTrainerAiWazaDamage119",
 "addr": "0x80252354",
 "size": 60,
 "label": "fight",
@@ -64945,7 +64945,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252390",
+"name": "fightTrainerAiWazaDamage118",
 "addr": "0x80252390",
 "size": 8,
 "label": "fight",
@@ -64953,7 +64953,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252398",
+"name": "fightTrainerAiWazaDamage117",
 "addr": "0x80252398",
 "size": 64,
 "label": "fight",
@@ -64969,7 +64969,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252468",
+"name": "fightTrainerAiWazaDamage116",
 "addr": "0x80252468",
 "size": 8,
 "label": "fight",
@@ -64977,7 +64977,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252470",
+"name": "fightTrainerAiWazaDamage115",
 "addr": "0x80252470",
 "size": 8,
 "label": "fight",
@@ -64985,7 +64985,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252478",
+"name": "fightTrainerAiWazaDamage114",
 "addr": "0x80252478",
 "size": 8,
 "label": "fight",
@@ -64993,7 +64993,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252480",
+"name": "fightTrainerAiWazaDamage113",
 "addr": "0x80252480",
 "size": 8,
 "label": "fight",
@@ -65001,7 +65001,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252488",
+"name": "fightTrainerAiWazaDamage112",
 "addr": "0x80252488",
 "size": 8,
 "label": "fight",
@@ -65009,7 +65009,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252490",
+"name": "fightTrainerAiWazaDamage111",
 "addr": "0x80252490",
 "size": 8,
 "label": "fight",
@@ -65017,7 +65017,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252498",
+"name": "fightTrainerAiWazaDamage109",
 "addr": "0x80252498",
 "size": 8,
 "label": "fight",
@@ -65025,7 +65025,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802524A0",
+"name": "fightTrainerAiWazaDamage108",
 "addr": "0x802524A0",
 "size": 8,
 "label": "fight",
@@ -65033,7 +65033,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802524A8",
+"name": "fightTrainerAiWazaDamage107",
 "addr": "0x802524A8",
 "size": 8,
 "label": "fight",
@@ -65041,7 +65041,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802524B0",
+"name": "fightTrainerAiWazaDamage106",
 "addr": "0x802524B0",
 "size": 8,
 "label": "fight",
@@ -65049,7 +65049,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802524B8",
+"name": "fightTrainerAiWazaDamage105",
 "addr": "0x802524B8",
 "size": 132,
 "label": "fight",
@@ -65089,7 +65089,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802526BC",
+"name": "fightTrainerAiWazaDamage103",
 "addr": "0x802526BC",
 "size": 132,
 "label": "fight",
@@ -65097,7 +65097,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252740",
+"name": "fightTrainerAiWazaDamage102",
 "addr": "0x80252740",
 "size": 8,
 "label": "fight",
@@ -65105,7 +65105,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252748",
+"name": "fightTrainerAiWazaDamage101",
 "addr": "0x80252748",
 "size": 116,
 "label": "fight",
@@ -65113,7 +65113,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802527BC",
+"name": "fightTrainerAiWazaDamage100",
 "addr": "0x802527BC",
 "size": 8,
 "label": "fight",
@@ -65121,7 +65121,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802527C4",
+"name": "fightTrainerAiWazaDamage099",
 "addr": "0x802527C4",
 "size": 64,
 "label": "fight",
@@ -65137,7 +65137,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252894",
+"name": "fightTrainerAiWazaDamage098",
 "addr": "0x80252894",
 "size": 40,
 "label": "fight",
@@ -65145,7 +65145,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802528BC",
+"name": "fightTrainerAiWazaDamage097",
 "addr": "0x802528BC",
 "size": 8,
 "label": "fight",
@@ -65153,7 +65153,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802528C4",
+"name": "fightTrainerAiWazaDamage095",
 "addr": "0x802528C4",
 "size": 8,
 "label": "fight",
@@ -65161,7 +65161,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802528CC",
+"name": "fightTrainerAiWazaDamage094",
 "addr": "0x802528CC",
 "size": 8,
 "label": "fight",
@@ -65169,7 +65169,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802528D4",
+"name": "fightTrainerAiWazaDamage093",
 "addr": "0x802528D4",
 "size": 8,
 "label": "fight",
@@ -65177,7 +65177,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802528DC",
+"name": "fightTrainerAiWazaDamage092",
 "addr": "0x802528DC",
 "size": 60,
 "label": "fight",
@@ -65185,7 +65185,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252918",
+"name": "fightTrainerAiWazaDamage091",
 "addr": "0x80252918",
 "size": 84,
 "label": "fight",
@@ -65193,7 +65193,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025296C",
+"name": "fightTrainerAiWazaDamage090",
 "addr": "0x8025296C",
 "size": 8,
 "label": "fight",
@@ -65201,7 +65201,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252974",
+"name": "fightTrainerAiWazaDamage089",
 "addr": "0x80252974",
 "size": 8,
 "label": "fight",
@@ -65209,7 +65209,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025297C",
+"name": "fightTrainerAiWazaDamage088",
 "addr": "0x8025297C",
 "size": 36,
 "label": "fight",
@@ -65217,7 +65217,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802529A0",
+"name": "fightTrainerAiWazaDamage087",
 "addr": "0x802529A0",
 "size": 36,
 "label": "fight",
@@ -65225,7 +65225,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802529C4",
+"name": "fightTrainerAiWazaDamage086",
 "addr": "0x802529C4",
 "size": 8,
 "label": "fight",
@@ -65233,7 +65233,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802529CC",
+"name": "fightTrainerAiWazaDamage085",
 "addr": "0x802529CC",
 "size": 8,
 "label": "fight",
@@ -65241,7 +65241,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802529D4",
+"name": "fightTrainerAiWazaDamage084",
 "addr": "0x802529D4",
 "size": 8,
 "label": "fight",
@@ -65249,7 +65249,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802529DC",
+"name": "fightTrainerAiWazaDamage083",
 "addr": "0x802529DC",
 "size": 8,
 "label": "fight",
@@ -65257,7 +65257,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802529E4",
+"name": "fightTrainerAiWazaDamage082",
 "addr": "0x802529E4",
 "size": 8,
 "label": "fight",
@@ -65265,7 +65265,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802529EC",
+"name": "fightTrainerAiWazaDamage081",
 "addr": "0x802529EC",
 "size": 8,
 "label": "fight",
@@ -65273,7 +65273,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802529F4",
+"name": "fightTrainerAiWazaDamage080",
 "addr": "0x802529F4",
 "size": 132,
 "label": "fight",
@@ -65281,7 +65281,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252A78",
+"name": "fightTrainerAiWazaDamage079",
 "addr": "0x80252A78",
 "size": 8,
 "label": "fight",
@@ -65289,7 +65289,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252A80",
+"name": "fightTrainerAiWazaDamage078",
 "addr": "0x80252A80",
 "size": 132,
 "label": "fight",
@@ -65297,7 +65297,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252B04",
+"name": "fightTrainerAiWazaDamage077",
 "addr": "0x80252B04",
 "size": 64,
 "label": "fight",
@@ -65305,7 +65305,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252B44",
+"name": "fightTrainerAiWazaDamage076",
 "addr": "0x80252B44",
 "size": 132,
 "label": "fight",
@@ -65313,7 +65313,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252BC8",
+"name": "fightTrainerAiWazaDamage075",
 "addr": "0x80252BC8",
 "size": 60,
 "label": "fight",
@@ -65321,7 +65321,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252C04",
+"name": "fightTrainerAiWazaDamage073",
 "addr": "0x80252C04",
 "size": 132,
 "label": "fight",
@@ -65329,7 +65329,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252C88",
+"name": "fightTrainerAiWazaDamage072",
 "addr": "0x80252C88",
 "size": 132,
 "label": "fight",
@@ -65337,7 +65337,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252D0C",
+"name": "fightTrainerAiWazaDamage071",
 "addr": "0x80252D0C",
 "size": 132,
 "label": "fight",
@@ -65345,7 +65345,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252D90",
+"name": "fightTrainerAiWazaDamage070",
 "addr": "0x80252D90",
 "size": 132,
 "label": "fight",
@@ -65353,7 +65353,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252E14",
+"name": "fightTrainerAiWazaDamage069",
 "addr": "0x80252E14",
 "size": 132,
 "label": "fight",
@@ -65361,7 +65361,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252E98",
+"name": "fightTrainerAiWazaDamage068",
 "addr": "0x80252E98",
 "size": 132,
 "label": "fight",
@@ -65369,7 +65369,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252F1C",
+"name": "fightTrainerAiWazaDamage067",
 "addr": "0x80252F1C",
 "size": 8,
 "label": "fight",
@@ -65377,7 +65377,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252F24",
+"name": "fightTrainerAiWazaDamage066",
 "addr": "0x80252F24",
 "size": 8,
 "label": "fight",
@@ -65385,7 +65385,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252F2C",
+"name": "fightTrainerAiWazaDamage065",
 "addr": "0x80252F2C",
 "size": 8,
 "label": "fight",
@@ -65393,7 +65393,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252F34",
+"name": "fightTrainerAiWazaDamage062",
 "addr": "0x80252F34",
 "size": 8,
 "label": "fight",
@@ -65401,7 +65401,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252F3C",
+"name": "fightTrainerAiWazaDamage060",
 "addr": "0x80252F3C",
 "size": 8,
 "label": "fight",
@@ -65409,7 +65409,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252F44",
+"name": "fightTrainerAiWazaDamage059",
 "addr": "0x80252F44",
 "size": 8,
 "label": "fight",
@@ -65417,7 +65417,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252F4C",
+"name": "fightTrainerAiWazaDamage058",
 "addr": "0x80252F4C",
 "size": 8,
 "label": "fight",
@@ -65425,7 +65425,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252F54",
+"name": "fightTrainerAiWazaDamage057",
 "addr": "0x80252F54",
 "size": 8,
 "label": "fight",
@@ -65433,7 +65433,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252F5C",
+"name": "fightTrainerAiWazaDamage054",
 "addr": "0x80252F5C",
 "size": 8,
 "label": "fight",
@@ -65441,7 +65441,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252F64",
+"name": "fightTrainerAiWazaDamage053",
 "addr": "0x80252F64",
 "size": 8,
 "label": "fight",
@@ -65449,7 +65449,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252F6C",
+"name": "fightTrainerAiWazaDamage052",
 "addr": "0x80252F6C",
 "size": 8,
 "label": "fight",
@@ -65457,7 +65457,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252F74",
+"name": "fightTrainerAiWazaDamage051",
 "addr": "0x80252F74",
 "size": 8,
 "label": "fight",
@@ -65465,7 +65465,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252F7C",
+"name": "fightTrainerAiWazaDamage050",
 "addr": "0x80252F7C",
 "size": 8,
 "label": "fight",
@@ -65473,7 +65473,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80252F84",
+"name": "fightTrainerAiWazaDamage049",
 "addr": "0x80252F84",
 "size": 8,
 "label": "fight",
@@ -65489,7 +65489,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253010",
+"name": "fightTrainerAiWazaDamage047",
 "addr": "0x80253010",
 "size": 8,
 "label": "fight",
@@ -65497,7 +65497,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253018",
+"name": "fightTrainerAiWazaDamage046",
 "addr": "0x80253018",
 "size": 8,
 "label": "fight",
@@ -65505,7 +65505,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253020",
+"name": "fightTrainerAiWazaDamage045",
 "addr": "0x80253020",
 "size": 132,
 "label": "fight",
@@ -65513,7 +65513,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802530A4",
+"name": "fightTrainerAiWazaDamage044",
 "addr": "0x802530A4",
 "size": 64,
 "label": "fight",
@@ -65521,7 +65521,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802530E4",
+"name": "fightTrainerAiWazaDamage043",
 "addr": "0x802530E4",
 "size": 132,
 "label": "fight",
@@ -65529,7 +65529,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253168",
+"name": "fightTrainerAiWazaDamage042",
 "addr": "0x80253168",
 "size": 136,
 "label": "fight",
@@ -65537,7 +65537,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802531F0",
+"name": "fightTrainerAiWazaDamage041",
 "addr": "0x802531F0",
 "size": 8,
 "label": "fight",
@@ -65545,7 +65545,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802531F8",
+"name": "fightTrainerAiWazaDamage040",
 "addr": "0x802531F8",
 "size": 60,
 "label": "fight",
@@ -65553,7 +65553,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253234",
+"name": "fightTrainerAiWazaDamage039",
 "addr": "0x80253234",
 "size": 60,
 "label": "fight",
@@ -65561,7 +65561,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253270",
+"name": "fightTrainerAiWazaDamage038",
 "addr": "0x80253270",
 "size": 40,
 "label": "fight",
@@ -65569,7 +65569,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253298",
+"name": "fightTrainerAiWazaDamage037",
 "addr": "0x80253298",
 "size": 40,
 "label": "fight",
@@ -65577,7 +65577,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802532C0",
+"name": "fightTrainerAiWazaDamage036",
 "addr": "0x802532C0",
 "size": 132,
 "label": "fight",
@@ -65585,7 +65585,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253344",
+"name": "fightTrainerAiWazaDamage035",
 "addr": "0x80253344",
 "size": 8,
 "label": "fight",
@@ -65593,7 +65593,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025334C",
+"name": "fightTrainerAiWazaDamage034",
 "addr": "0x8025334C",
 "size": 132,
 "label": "fight",
@@ -65601,7 +65601,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802533D0",
+"name": "fightTrainerAiWazaDamage033",
 "addr": "0x802533D0",
 "size": 8,
 "label": "fight",
@@ -65609,7 +65609,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802533D8",
+"name": "fightTrainerAiWazaDamage032",
 "addr": "0x802533D8",
 "size": 40,
 "label": "fight",
@@ -65617,7 +65617,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253400",
+"name": "fightTrainerAiWazaDamage031",
 "addr": "0x80253400",
 "size": 132,
 "label": "fight",
@@ -65625,7 +65625,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253484",
+"name": "fightTrainerAiWazaDamage030",
 "addr": "0x80253484",
 "size": 8,
 "label": "fight",
@@ -65633,7 +65633,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025348C",
+"name": "fightTrainerAiWazaDamage029",
 "addr": "0x8025348C",
 "size": 64,
 "label": "fight",
@@ -65641,7 +65641,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802534CC",
+"name": "fightTrainerAiWazaDamage028",
 "addr": "0x802534CC",
 "size": 8,
 "label": "fight",
@@ -65649,7 +65649,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802534D4",
+"name": "fightTrainerAiWazaDamage027",
 "addr": "0x802534D4",
 "size": 60,
 "label": "fight",
@@ -65657,7 +65657,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253510",
+"name": "fightTrainerAiWazaDamage026",
 "addr": "0x80253510",
 "size": 8,
 "label": "fight",
@@ -65665,7 +65665,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253518",
+"name": "fightTrainerAiWazaDamage025",
 "addr": "0x80253518",
 "size": 8,
 "label": "fight",
@@ -65673,7 +65673,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253520",
+"name": "fightTrainerAiWazaDamage024",
 "addr": "0x80253520",
 "size": 8,
 "label": "fight",
@@ -65681,7 +65681,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253528",
+"name": "fightTrainerAiWazaDamage023",
 "addr": "0x80253528",
 "size": 8,
 "label": "fight",
@@ -65689,7 +65689,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253530",
+"name": "fightTrainerAiWazaDamage020",
 "addr": "0x80253530",
 "size": 8,
 "label": "fight",
@@ -65697,7 +65697,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253538",
+"name": "fightTrainerAiWazaDamage019",
 "addr": "0x80253538",
 "size": 8,
 "label": "fight",
@@ -65705,7 +65705,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253540",
+"name": "fightTrainerAiWazaDamage018",
 "addr": "0x80253540",
 "size": 8,
 "label": "fight",
@@ -65713,7 +65713,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253548",
+"name": "fightTrainerAiWazaDamage017",
 "addr": "0x80253548",
 "size": 132,
 "label": "fight",
@@ -65721,7 +65721,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802535CC",
+"name": "fightTrainerAiWazaDamage016",
 "addr": "0x802535CC",
 "size": 8,
 "label": "fight",
@@ -65729,7 +65729,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802535D4",
+"name": "fightTrainerAiWazaDamage013",
 "addr": "0x802535D4",
 "size": 8,
 "label": "fight",
@@ -65737,7 +65737,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802535DC",
+"name": "fightTrainerAiWazaDamage011",
 "addr": "0x802535DC",
 "size": 8,
 "label": "fight",
@@ -65745,7 +65745,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802535E4",
+"name": "fightTrainerAiWazaDamage010",
 "addr": "0x802535E4",
 "size": 8,
 "label": "fight",
@@ -65753,7 +65753,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802535EC",
+"name": "fightTrainerAiWazaDamage009",
 "addr": "0x802535EC",
 "size": 8,
 "label": "fight",
@@ -65761,7 +65761,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802535F4",
+"name": "fightTrainerAiWazaDamage008",
 "addr": "0x802535F4",
 "size": 60,
 "label": "fight",
@@ -65769,7 +65769,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253630",
+"name": "fightTrainerAiWazaDamage007",
 "addr": "0x80253630",
 "size": 60,
 "label": "fight",
@@ -65777,7 +65777,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025366C",
+"name": "fightTrainerAiWazaDamage006",
 "addr": "0x8025366C",
 "size": 132,
 "label": "fight",
@@ -65785,7 +65785,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802536F0",
+"name": "fightTrainerAiWazaDamage005",
 "addr": "0x802536F0",
 "size": 132,
 "label": "fight",
@@ -65793,7 +65793,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253774",
+"name": "fightTrainerAiWazaDamage004",
 "addr": "0x80253774",
 "size": 132,
 "label": "fight",
@@ -65801,7 +65801,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802537F8",
+"name": "fightTrainerAiWazaDamage003",
 "addr": "0x802537F8",
 "size": 60,
 "label": "fight",
@@ -65809,7 +65809,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253834",
+"name": "fightTrainerAiWazaDamage002",
 "addr": "0x80253834",
 "size": 132,
 "label": "fight",
@@ -65817,7 +65817,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802538B8",
+"name": "fightTrainerAiWazaDamage001",
 "addr": "0x802538B8",
 "size": 8,
 "label": "fight",
@@ -65825,7 +65825,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802538C0",
+"name": "fightTrainerAiWazaDamage000",
 "addr": "0x802538C0",
 "size": 136,
 "label": "fight",
@@ -65841,7 +65841,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253950",
+"name": "fightTrainerAiWazaHit213",
 "addr": "0x80253950",
 "size": 108,
 "label": "fight",
@@ -65849,7 +65849,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802539BC",
+"name": "fightTrainerAiWazaHit212",
 "addr": "0x802539BC",
 "size": 196,
 "label": "fight",
@@ -65857,7 +65857,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253A80",
+"name": "fightTrainerAiWazaHit211",
 "addr": "0x80253A80",
 "size": 196,
 "label": "fight",
@@ -65865,7 +65865,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253B44",
+"name": "fightTrainerAiWazaHit210",
 "addr": "0x80253B44",
 "size": 52,
 "label": "fight",
@@ -65873,7 +65873,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253B78",
+"name": "fightTrainerAiWazaHit209",
 "addr": "0x80253B78",
 "size": 180,
 "label": "fight",
@@ -65881,7 +65881,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253C2C",
+"name": "fightTrainerAiWazaHit208",
 "addr": "0x80253C2C",
 "size": 196,
 "label": "fight",
@@ -65889,7 +65889,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253CF0",
+"name": "fightTrainerAiWazaHit207",
 "addr": "0x80253CF0",
 "size": 180,
 "label": "fight",
@@ -65897,7 +65897,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253DA4",
+"name": "fightTrainerAiWazaHit206",
 "addr": "0x80253DA4",
 "size": 196,
 "label": "fight",
@@ -66209,7 +66209,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802555F8",
+"name": "fightTrainerAiWazaHit167",
 "addr": "0x802555F8",
 "size": 552,
 "label": "fight",
@@ -66217,7 +66217,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80255820",
+"name": "fightTrainerAiWazaHit166",
 "addr": "0x80255820",
 "size": 536,
 "label": "fight",
@@ -66225,7 +66225,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80255A38",
+"name": "fightTrainerAiWazaHit165",
 "addr": "0x80255A38",
 "size": 116,
 "label": "fight",
@@ -66233,7 +66233,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80255AAC",
+"name": "fightTrainerAiWazaHit164",
 "addr": "0x80255AAC",
 "size": 56,
 "label": "fight",
@@ -66241,7 +66241,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80255AE4",
+"name": "fightTrainerAiWazaHit162",
 "addr": "0x80255AE4",
 "size": 104,
 "label": "fight",
@@ -66409,7 +66409,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025652C",
+"name": "fightTrainerAiWazaHit140",
 "addr": "0x8025652C",
 "size": 180,
 "label": "fight",
@@ -66417,7 +66417,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802565E0",
+"name": "fightTrainerAiWazaHit139",
 "addr": "0x802565E0",
 "size": 180,
 "label": "fight",
@@ -66425,7 +66425,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80256694",
+"name": "fightTrainerAiWazaHit138",
 "addr": "0x80256694",
 "size": 180,
 "label": "fight",
@@ -66433,7 +66433,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80256748",
+"name": "fightTrainerAiWazaHit137",
 "addr": "0x80256748",
 "size": 56,
 "label": "fight",
@@ -66441,7 +66441,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80256780",
+"name": "fightTrainerAiWazaHit136",
 "addr": "0x80256780",
 "size": 56,
 "label": "fight",
@@ -66457,7 +66457,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025685C",
+"name": "fightTrainerAiWazaHit134",
 "addr": "0x8025685C",
 "size": 56,
 "label": "fight",
@@ -66465,7 +66465,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80256894",
+"name": "fightTrainerAiWazaHit133",
 "addr": "0x80256894",
 "size": 56,
 "label": "fight",
@@ -66473,7 +66473,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802568CC",
+"name": "fightTrainerAiWazaHit132",
 "addr": "0x802568CC",
 "size": 56,
 "label": "fight",
@@ -66481,7 +66481,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80256904",
+"name": "fightTrainerAiWazaHit130",
 "addr": "0x80256904",
 "size": 176,
 "label": "fight",
@@ -66489,7 +66489,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802569B4",
+"name": "fightTrainerAiWazaHit129",
 "addr": "0x802569B4",
 "size": 180,
 "label": "fight",
@@ -66633,7 +66633,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802575C0",
+"name": "fightTrainerAiWazaHit111",
 "addr": "0x802575C0",
 "size": 8,
 "label": "fight",
@@ -66857,7 +66857,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80258904",
+"name": "fightTrainerAiWazaHit081",
 "addr": "0x80258904",
 "size": 176,
 "label": "fight",
@@ -66865,7 +66865,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802589B4",
+"name": "fightTrainerAiWazaHit080",
 "addr": "0x802589B4",
 "size": 176,
 "label": "fight",
@@ -66873,7 +66873,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80258A64",
+"name": "fightTrainerAiWazaHit079",
 "addr": "0x80258A64",
 "size": 108,
 "label": "fight",
@@ -66881,7 +66881,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80258AD0",
+"name": "fightTrainerAiWazaHit078",
 "addr": "0x80258AD0",
 "size": 180,
 "label": "fight",
@@ -66889,7 +66889,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80258B84",
+"name": "fightTrainerAiWazaHit077",
 "addr": "0x80258B84",
 "size": 180,
 "label": "fight",
@@ -66897,7 +66897,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80258C38",
+"name": "fightTrainerAiWazaHit076",
 "addr": "0x80258C38",
 "size": 180,
 "label": "fight",
@@ -66905,7 +66905,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80258CEC",
+"name": "fightTrainerAiWazaHit075",
 "addr": "0x80258CEC",
 "size": 180,
 "label": "fight",
@@ -66913,7 +66913,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80258DA0",
+"name": "fightTrainerAiWazaHit073",
 "addr": "0x80258DA0",
 "size": 180,
 "label": "fight",
@@ -66921,7 +66921,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80258E54",
+"name": "fightTrainerAiWazaHit072",
 "addr": "0x80258E54",
 "size": 180,
 "label": "fight",
@@ -66929,7 +66929,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80258F08",
+"name": "fightTrainerAiWazaHit071",
 "addr": "0x80258F08",
 "size": 180,
 "label": "fight",
@@ -66937,7 +66937,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80258FBC",
+"name": "fightTrainerAiWazaHit070",
 "addr": "0x80258FBC",
 "size": 180,
 "label": "fight",
@@ -66945,7 +66945,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80259070",
+"name": "fightTrainerAiWazaHit069",
 "addr": "0x80259070",
 "size": 180,
 "label": "fight",
@@ -66953,7 +66953,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80259124",
+"name": "fightTrainerAiWazaHit068",
 "addr": "0x80259124",
 "size": 180,
 "label": "fight",
@@ -66961,7 +66961,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802591D8",
+"name": "fightTrainerAiWazaHit067",
 "addr": "0x802591D8",
 "size": 608,
 "label": "fight",
@@ -66969,7 +66969,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80259438",
+"name": "fightTrainerAiWazaHit066",
 "addr": "0x80259438",
 "size": 624,
 "label": "fight",
@@ -66977,7 +66977,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802596A8",
+"name": "fightTrainerAiWazaHit065",
 "addr": "0x802596A8",
 "size": 60,
 "label": "fight",
@@ -66985,7 +66985,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802596E4",
+"name": "fightTrainerAiWazaHit062",
 "addr": "0x802596E4",
 "size": 232,
 "label": "fight",
@@ -66993,7 +66993,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802597CC",
+"name": "fightTrainerAiWazaHit060",
 "addr": "0x802597CC",
 "size": 232,
 "label": "fight",
@@ -67001,7 +67001,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802598B4",
+"name": "fightTrainerAiWazaHit059",
 "addr": "0x802598B4",
 "size": 232,
 "label": "fight",
@@ -67009,7 +67009,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025999C",
+"name": "fightTrainerAiWazaHit058",
 "addr": "0x8025999C",
 "size": 232,
 "label": "fight",
@@ -67017,7 +67017,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80259A84",
+"name": "fightTrainerAiWazaHit057",
 "addr": "0x80259A84",
 "size": 104,
 "label": "fight",
@@ -67025,7 +67025,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80259AEC",
+"name": "fightTrainerAiWazaHit054",
 "addr": "0x80259AEC",
 "size": 232,
 "label": "fight",
@@ -67033,7 +67033,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80259BD4",
+"name": "fightTrainerAiWazaHit053",
 "addr": "0x80259BD4",
 "size": 232,
 "label": "fight",
@@ -67041,7 +67041,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80259CBC",
+"name": "fightTrainerAiWazaHit052",
 "addr": "0x80259CBC",
 "size": 232,
 "label": "fight",
@@ -67049,7 +67049,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80259DA4",
+"name": "fightTrainerAiWazaHit051",
 "addr": "0x80259DA4",
 "size": 232,
 "label": "fight",
@@ -67057,7 +67057,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80259E8C",
+"name": "fightTrainerAiWazaHit050",
 "addr": "0x80259E8C",
 "size": 232,
 "label": "fight",
@@ -67065,7 +67065,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80259F74",
+"name": "fightTrainerAiWazaHit049",
 "addr": "0x80259F74",
 "size": 504,
 "label": "fight",
@@ -67081,7 +67081,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025A220",
+"name": "fightTrainerAiWazaHit047",
 "addr": "0x8025A220",
 "size": 52,
 "label": "fight",
@@ -67089,7 +67089,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025A254",
+"name": "fightTrainerAiWazaHit046",
 "addr": "0x8025A254",
 "size": 60,
 "label": "fight",
@@ -67097,7 +67097,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025A290",
+"name": "fightTrainerAiWazaHit045",
 "addr": "0x8025A290",
 "size": 176,
 "label": "fight",
@@ -67105,7 +67105,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025A340",
+"name": "fightTrainerAiWazaHit044",
 "addr": "0x8025A340",
 "size": 180,
 "label": "fight",
@@ -67113,7 +67113,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025A3F4",
+"name": "fightTrainerAiWazaHit043",
 "addr": "0x8025A3F4",
 "size": 180,
 "label": "fight",
@@ -67121,7 +67121,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025A4A8",
+"name": "fightTrainerAiWazaHit042",
 "addr": "0x8025A4A8",
 "size": 180,
 "label": "fight",
@@ -67129,7 +67129,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025A55C",
+"name": "fightTrainerAiWazaHit041",
 "addr": "0x8025A55C",
 "size": 176,
 "label": "fight",
@@ -67137,7 +67137,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025A60C",
+"name": "fightTrainerAiWazaHit040",
 "addr": "0x8025A60C",
 "size": 176,
 "label": "fight",
@@ -67145,7 +67145,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025A6BC",
+"name": "fightTrainerAiWazaHit039",
 "addr": "0x8025A6BC",
 "size": 180,
 "label": "fight",
@@ -67241,7 +67241,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025AFB8",
+"name": "fightTrainerAiWazaHit027",
 "addr": "0x8025AFB8",
 "size": 176,
 "label": "fight",
@@ -67249,7 +67249,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025B068",
+"name": "fightTrainerAiWazaHit026",
 "addr": "0x8025B068",
 "size": 180,
 "label": "fight",
@@ -67257,7 +67257,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025B11C",
+"name": "fightTrainerAiWazaHit025",
 "addr": "0x8025B11C",
 "size": 8,
 "label": "fight",
@@ -67265,7 +67265,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025B124",
+"name": "fightTrainerAiWazaHit024",
 "addr": "0x8025B124",
 "size": 232,
 "label": "fight",
@@ -67273,7 +67273,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025B20C",
+"name": "fightTrainerAiWazaHit023",
 "addr": "0x8025B20C",
 "size": 232,
 "label": "fight",
@@ -67281,7 +67281,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025B2F4",
+"name": "fightTrainerAiWazaHit020",
 "addr": "0x8025B2F4",
 "size": 232,
 "label": "fight",
@@ -67289,7 +67289,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025B3DC",
+"name": "fightTrainerAiWazaHit019",
 "addr": "0x8025B3DC",
 "size": 232,
 "label": "fight",
@@ -67297,7 +67297,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025B4C4",
+"name": "fightTrainerAiWazaHit018",
 "addr": "0x8025B4C4",
 "size": 232,
 "label": "fight",
@@ -67305,7 +67305,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025B5AC",
+"name": "fightTrainerAiWazaHit017",
 "addr": "0x8025B5AC",
 "size": 180,
 "label": "fight",
@@ -67313,7 +67313,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025B660",
+"name": "fightTrainerAiWazaHit016",
 "addr": "0x8025B660",
 "size": 232,
 "label": "fight",
@@ -67321,7 +67321,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025B748",
+"name": "fightTrainerAiWazaHit013",
 "addr": "0x8025B748",
 "size": 232,
 "label": "fight",
@@ -67329,7 +67329,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025B830",
+"name": "fightTrainerAiWazaHit011",
 "addr": "0x8025B830",
 "size": 232,
 "label": "fight",
@@ -67337,7 +67337,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025B918",
+"name": "fightTrainerAiWazaHit010",
 "addr": "0x8025B918",
 "size": 232,
 "label": "fight",
@@ -67345,7 +67345,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025BA00",
+"name": "fightTrainerAiWazaHit009",
 "addr": "0x8025BA00",
 "size": 44,
 "label": "fight",
@@ -67369,7 +67369,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025BC28",
+"name": "fightTrainerAiWazaHit006",
 "addr": "0x8025BC28",
 "size": 180,
 "label": "fight",
@@ -67377,7 +67377,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025BCDC",
+"name": "fightTrainerAiWazaHit005",
 "addr": "0x8025BCDC",
 "size": 180,
 "label": "fight",
@@ -67385,7 +67385,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025BD90",
+"name": "fightTrainerAiWazaHit004",
 "addr": "0x8025BD90",
 "size": 180,
 "label": "fight",
@@ -67393,7 +67393,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025BE44",
+"name": "fightTrainerAiWazaHit003",
 "addr": "0x8025BE44",
 "size": 180,
 "label": "fight",
@@ -67401,7 +67401,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025BEF8",
+"name": "fightTrainerAiWazaHit002",
 "addr": "0x8025BEF8",
 "size": 180,
 "label": "fight",
@@ -67409,7 +67409,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025BFAC",
+"name": "fightTrainerAiWazaHit001",
 "addr": "0x8025BFAC",
 "size": 512,
 "label": "fight",
@@ -67417,7 +67417,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025C1AC",
+"name": "fightTrainerAiWazaHit000",
 "addr": "0x8025C1AC",
 "size": 176,
 "label": "fight",
