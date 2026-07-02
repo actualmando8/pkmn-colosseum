@@ -487,7 +487,7 @@ extern void fn_801046B8(void);
 extern void fn_801026A4(void);
 extern void fn_80104704(void);
 extern void fn_801046C8(void);
-extern void fn_801045A8(void);
+extern void windowCheckCursor(void);
 extern void fn_801043A4(void);
 extern void fn_801023E4(void);
 extern void fn_80102510(void);
@@ -505,7 +505,7 @@ extern void fn_80106D3C(s32, s32, s32, s32);
 extern void fn_8002EA5C(void);
 extern void fn_8002E460(void);
 extern void fn_8010264C(void);
-extern void fn_8010A5BC(void);
+extern void menuModelInit(void);
 extern void fn_80109C88(void);
 extern void fn_801069FC(s32);
 extern void fn_8002E26C(void);
@@ -581,7 +581,7 @@ void fn_80031B4C(void) {
     extern void fn_801026A4();
     extern void fn_80103CC0();
     extern void fn_801043A4();
-    extern void fn_801045A8();
+    extern void windowCheckCursor();
     extern void fn_801046B8();
     extern void fn_801046C8();
     extern void fn_80104704();
@@ -590,7 +590,7 @@ void fn_80031B4C(void) {
     extern void fn_80109220();
     extern void fn_80109C88();
     extern void fn_8010A420();
-    extern void fn_8010A5BC();
+    extern void menuModelInit();
     extern void fn_80113828();
     extern void fn_8011394C();
     extern void fn_8011D904();
@@ -695,7 +695,7 @@ void fn_80031B4C(void) {
                 }
                 r3 = 0xe3;
                 r4 = 0x1;
-                fn_801045A8();
+                windowCheckCursor();
                 r3 = 0xe3;
                 fn_801043A4();
                 r29 = r3;
@@ -772,7 +772,7 @@ void fn_80031B4C(void) {
                 }
                 r3 = 0xe3;
                 r4 = 0x1;
-                fn_801045A8();
+                windowCheckCursor();
                 r3 = 0xe3;
                 fn_801043A4();
                 r29 = r3;

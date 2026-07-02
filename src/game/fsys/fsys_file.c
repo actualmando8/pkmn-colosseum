@@ -429,7 +429,7 @@ s32 FSYSProcessEntry(FSYSSlot* slot) {
 }
 
 /* ===================================================================
- * fn_8017EB6C: FSYSBeginLoad
+ * _fsysGetFilename: FSYSBeginLoad
  *
  * Implements the FSYS archive load state machine. This function is
  * called to initiate or continue loading an archive, and handles
@@ -2029,7 +2029,7 @@ void fn_8017DB74(FSYSSlot* slot) {
 #endif
 
 /* 0x8017DEA4 | 0xA8 */
-extern void fn_8017EB6C(void);
+extern void _fsysGetFilename(void);
 extern void fn_80167DD8();
 #if 0
 asm void fn_8017DEA4(void) {

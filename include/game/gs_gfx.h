@@ -90,7 +90,7 @@ typedef struct GSgfxState {
  * hardware via VIConfigure / GXInit, sets up the matrix stack and
  * viewport, and registers a VBlank callback.
  *
- * Corresponds to fn_800D39E0.
+ * Corresponds to GSgfxInit__FP15_GSgfxInitParms.
  */
 void GSgfxInit(u32 memSize, u32 fifoSize, u32 mtxDepth,
                u32 lightCount, u32 numBufs, u32 dlSize);

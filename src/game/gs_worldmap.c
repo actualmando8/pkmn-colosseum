@@ -3252,7 +3252,7 @@ s32 fn_80028948(void* r3)
 extern void fn_8011F4F0(void);
 extern void fn_80134A98(void);
 extern void fn_8005D934(void);
-extern void fn_8010A5BC(void);
+extern void menuModelInit(void);
 extern void fn_8010A010(void);
 extern void fn_8018F6F4(void);
 extern void fn_8018F4C8(void);
@@ -3318,7 +3318,7 @@ void fn_80028FBC(void) {
     extern u32  fn_80134A98(s32 a, s32 b);
     extern void fn_800F9E70(void* dst, u8* src);           /* copy/build name struct    */
     extern void* fn_8005D934(s32 id);                      /* returns struct ptr        */
-    extern void fn_8010A5BC(void* handle, s16 a, s16 b);
+    extern void menuModelInit(void* handle, s16 a, s16 b);
     extern void fn_8010A010(void* handle, s32 v);
     extern void fn_8018F6F4(s32 v);
     extern void fn_8018F4C8(s32 a, s32* outA, s32* outB);
@@ -3421,7 +3421,7 @@ void fn_80028FBC(void) {
 
     /* Fetch the model descriptor (0xd3a for mode 2, else 0xd39) and pose it. */
     mdl = fn_8005D934((mode == 2) ? 0xd3a : 0xd39);
-    fn_8010A5BC(lbl_803A2094, *(s16*)((u8*)mdl + 0x6), *(s16*)((u8*)mdl + 0x8));
+    menuModelInit(lbl_803A2094, *(s16*)((u8*)mdl + 0x6), *(s16*)((u8*)mdl + 0x8));
 
     /* --- Per-mode model setup. --- */
     switch (mode) {
@@ -7643,7 +7643,7 @@ asm void fn_8002DF10(void) {
  *   3. Wait for trainer anim (fn_801CB9D8)
  *   4. Yield one frame (_threadSwitch)
  *   5. Spawn/configure encounter objects (fn_8012805C)
- *   6. Re-anchor NPC handles (fn_80109C88, fn_8010A5BC)
+ *   6. Re-anchor NPC handles (fn_80109C88, menuModelInit)
  *   7. Scene-load BGM/scene (fn_80176E0C, fn_801CBA0C, fn_800F9318)
  *   8. Restore people state (GSscene_SetMode)
  *   9. Mark availability flag and advance state (lbl_8047A42C = 0x12)
@@ -7685,8 +7685,8 @@ void fn_8002DF10(void)
     extern void _threadSwitch(void);
     /* fn_8012805C - encounter trigger dispatcher */
     extern s32 fn_8012805C(u8 *world, u32 npc, u16 key, u8 *type_out, u8 *team, s32 memo, s32 arg6, s32 audio);
-    /* fn_8010A5BC - model set bounds (u8* obj, s32 w, s32 h) */
-    extern void fn_8010A5BC(u8 *obj, s32 w, s32 h);
+    /* menuModelInit - model set bounds (u8* obj, s32 w, s32 h) */
+    extern void menuModelInit(u8 *obj, s32 w, s32 h);
     /* fn_80109C88 - model set NPC handle (u8* obj, u8* npc_handle) */
     extern void fn_80109C88(u8 *obj, u8 *npc_handle);
     /* fn_80176E0C - scene render/BGM start (s32 scene_id, u32 color_key, s32 a, s32 b) */
@@ -7808,8 +7808,8 @@ void fn_8002DF10(void)
     {
         u8 *npc_b2 = fn_8012A5B0(base + 0x170, 3, (u16)lbl_8047A420); /* r29 */
 
-        fn_8010A5BC(base + 0xd18, 0xe8, 0x11c);
-        fn_8010A5BC(base + 0xcd0, 0xe8, 0x11c);
+        menuModelInit(base + 0xd18, 0xe8, 0x11c);
+        menuModelInit(base + 0xcd0, 0xe8, 0x11c);
 
         fn_80109C88(base + 0xd18, npc_b);
         fn_80109C88(base + 0xcd0, npc_b2);
@@ -7897,7 +7897,7 @@ void fn_8002E26C(void)
     extern void fn_80112260(s32 flag);
     extern void fn_801CB834(u32 a1, s32 a2, s32 a3, s32 a4);
     extern void cameraWaitSyncAnime(s32 arg);
-    extern void fn_8010A5BC(void *widget, s32 x, s32 y);
+    extern void menuModelInit(void *widget, s32 x, s32 y);
     extern void fn_80109C88(void *widget, void *obj);
     extern void fn_8010264C(s32 id, s32 flag);
     extern u32  fn_8012A5B0(u8 *ptr, u32 selector, u32 idx);
@@ -7953,8 +7953,8 @@ void fn_8002E26C(void)
     fn_80112260(0);
 
     /* --- Position and bind the UI widget slots --- */
-    fn_8010A5BC(base + 0xd18, 0xe8, 0x11c);
-    fn_8010A5BC(base + 0xcd0, 0xe8, 0x11c);
+    menuModelInit(base + 0xd18, 0xe8, 0x11c);
+    menuModelInit(base + 0xcd0, 0xe8, 0x11c);
 
     fn_80109C88(base + 0xd18, obj_a);
     fn_80109C88(base + 0xcd0, obj_b);
@@ -8024,7 +8024,7 @@ void fn_8002E460(void* mapCtx)
     extern f32 lbl_8047B9D0;            /* camera transition param (0.0f) */
 
     extern u8*  fn_8012A5B0(void* obj, u32 selector, u32 idx);   /* interaction getter -> handle */
-    extern void fn_8010A5BC(void* widget, s32 a, s32 b);         /* list-widget init */
+    extern void menuModelInit(void* widget, s32 a, s32 b);         /* list-widget init */
     extern void fn_80109C88(void* widget, void* item);          /* bind item to widget */
     extern void fn_8010A420(void* widget);                      /* destroy widget */
     extern void fn_8010264C(s32 menuId, s32 flag);              /* menu open */
@@ -8062,8 +8062,8 @@ void fn_8002E460(void* mapCtx)
     handleA = fn_8012A5B0((void*)0, 3, lbl_8047A424 & 0xFFFF);
     handleB = fn_8012A5B0(state + 0x170, 3, lbl_8047A420 & 0xFFFF);
 
-    fn_8010A5BC(state + 0xD18, 0xE4, 0x8F);
-    fn_8010A5BC(state + 0xCD0, 0xE4, 0x8F);
+    menuModelInit(state + 0xD18, 0xE4, 0x8F);
+    menuModelInit(state + 0xCD0, 0xE4, 0x8F);
     fn_80109C88(state + 0xD18, handleA);
     fn_80109C88(state + 0xCD0, handleB);
 
@@ -8438,7 +8438,7 @@ void fn_8002EA5C(void)
 
 /* fn_8002EE74 - 0x8002EE74 | size: 0x410 */
 extern void fn_80103CC0(void);
-extern void fn_801045A8(void);
+extern void windowCheckCursor(void);
 extern void fn_801043A4(void);
 extern void fn_801023E4(void);
 extern void fn_80102004(void);
@@ -8489,7 +8489,7 @@ void fn_8002EE74(void)
     extern void  fn_80103CC0(s32 mode);
     extern void  fn_801026A4(void* p, u32 r4, s32 r5, s32 r6, void* r7, s32 r8, ...);
     extern u32   fn_801046B8(void);
-    extern void  fn_801045A8(void* p, u8 flags);
+    extern void  windowCheckCursor(void* p, u8 flags);
     extern s32   fn_801043A4(s32 key);
     extern s32   fn_801023E4(void* p);
     extern void  fn_80102510(s32 p);
@@ -8596,7 +8596,7 @@ void fn_8002EE74(void)
             *(u32*)((u8*)child + 0x4c) = 0x43e5;
         }
 
-        fn_801045A8((void*)0xe3, 1);
+        windowCheckCursor((void*)0xe3, 1);
         branchResult = fn_801043A4(0xe3);
         destResult   = fn_801023E4((void*)0xe3);
         fn_80102510(0xe3);
@@ -8658,7 +8658,7 @@ void fn_8002F284(void)
     extern void* fn_80104704(s32 p);               /* resolve node by id */
     extern void* fn_801046C8(void* head, s32 key); /* find child node by key */
     extern void  fn_80109220(void* node, u32 enable); /* enable flag on node */
-    extern void  fn_801045A8(void* p, u8 flags);   /* show/commit object */
+    extern void  windowCheckCursor(void* p, u8 flags);   /* show/commit object */
     extern s32   fn_80102004(void);                /* arrival/joint-count query */
     extern void  fn_80106D3C(s32 a, s32 b, s32 c, s32 d); /* trigger arrival fx */
     extern void  fn_80102510(s32 p);               /* unload/release object */
@@ -8814,7 +8814,7 @@ void fn_8002F284(void)
         *(u32*)((u8*)child + 0x4C) = 0x43D9;
     }
 
-    fn_801045A8((void*)0xD9, 1);
+    windowCheckCursor((void*)0xD9, 1);
     fn_80103CC0(1);
 
     /* Early "already arrived" branch. */
@@ -8920,7 +8920,7 @@ void fn_8002F284(void)
     extern void* fn_80104704(s32 p);               /* resolve node by id */
     extern void* fn_801046C8(void* head, s32 key); /* find child node by key */
     extern void  fn_80109220(void* node, u32 enable); /* enable flag on node */
-    extern void  fn_801045A8(void* p, u8 flags);   /* show/commit object */
+    extern void  windowCheckCursor(void* p, u8 flags);   /* show/commit object */
     extern s32   fn_80102004(void);                /* arrival/joint-count query */
     extern void  fn_80106D3C(s32 a, s32 b, s32 c, s32 d); /* trigger arrival fx */
     extern void  fn_80102510(s32 p);               /* unload/release object */
@@ -9050,7 +9050,7 @@ void fn_8002F284(void)
         *(u32*)((u8*)child + 0x4C) = 0x43D9;
     }
 
-    fn_801045A8((void*)0xD9, 1);
+    windowCheckCursor((void*)0xD9, 1);
     fn_80103CC0(1);
 
     /* Early "already arrived" branch. */

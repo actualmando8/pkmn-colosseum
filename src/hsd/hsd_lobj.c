@@ -632,17 +632,17 @@ void HSD_LObjDeleteCurrentAll(HSD_LObj* lobj)
 #endif
 
 /* 0x801A4D20 | 0x234 */
-extern HSD_SList* fn_801A3EB4(HSD_SList* next, void* data);
+extern HSD_SList* HSD_SListPrepend(HSD_SList* next, void* data);
 extern u8 lbl_80274DD8[];
 extern u8 lbl_80274DE4[];
 extern char lbl_8047DBD4;
 extern char lbl_8047DBD8;
 #if 0
-asm void fn_801A4D20(void) {
+asm void HSD_LObjAddCurrentAll(void) {
 #include "src/hsd/hsd_lobj_fn_801A4D20.inc"
 }
 #else
-void fn_801A4D20(HSD_LObj* lobj)
+void HSD_LObjAddCurrentAll(HSD_LObj* lobj)
 {
     HSD_LObj* cur;
     HSD_LObj* listed;
@@ -693,7 +693,7 @@ void fn_801A4D20(HSD_LObj* lobj)
             }
             pp = &(*pp)->next;
         }
-        *pp = fn_801A3EB4(*pp, cur);
+        *pp = HSD_SListPrepend(*pp, cur);
     }
 }
 #endif

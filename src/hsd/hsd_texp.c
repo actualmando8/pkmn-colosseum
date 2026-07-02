@@ -99,7 +99,7 @@ void fn_801B42C0(u8* node) {
  * Compile pass 1 - collect all texture inputs referenced
  * by the expression tree and map them to GX texture stages.
  */
-void fn_801B4300(u8* root, u32* tex_count, u32* ras_count) {
+void HSD_TExpCompile(u8* root, u32* tex_count, u32* ras_count) {
     u32 t_count = 0;
     u32 r_count = 0;
 
@@ -145,7 +145,7 @@ BOOL fn_801B45A4(u8* root) {
  * from the validated expression tree. Maps expression nodes
  * to TEV stages, assigns texture coordinates and maps.
  */
-void fn_801B4614(u8* root, u32 start_stage) {
+void HSD_TExpSetReg(u8* root, u32 start_stage) {
     u32 stage;
     u8* node;
 
@@ -173,7 +173,7 @@ void fn_801B4614(u8* root, u32 start_stage) {
  * Merges stages where possible, removes redundant operations,
  * and minimizes register usage.
  */
-void fn_801B4B5C(u32 num_stages) {
+void TExp2TevDesc(u32 num_stages) {
     u32 i;
 
     if (num_stages <= 1) {
@@ -483,7 +483,7 @@ void fn_801B6E74(HSD_TObj* tobj, u32 coord_id) {
  * HSD_TObjTexMtxCompute - 0x801B6F5C | Size: 0x120
  * Compute and load texture transformation matrix.
  */
-void fn_801B6F5C(HSD_TObj* tobj) {
+void HSD_TExpCnst(HSD_TObj* tobj) {
     if (tobj == NULL) {
         return;
     }
@@ -533,7 +533,7 @@ void fn_801B7178(HSD_TObj* tobj, u32 map_id, u32 coord_id) {
 
     /* 3. Compute texture matrix if dirty */
     if (tobj->flags & TEX_MTX_DIRTY) {
-        fn_801B6F5C(tobj);
+        HSD_TExpCnst(tobj);
     }
 }
 

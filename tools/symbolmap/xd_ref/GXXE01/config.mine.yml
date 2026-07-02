@@ -1,0 +1,15 @@
+# Template: minimal dtk config to emit XD (GXXE01) asm for string-xref mining.
+# Copy into the xd-decomp refs tree as config/GXXE01/config.mine.yml, then:
+#   cd tools/decomp_work/refs/xd-decomp
+#   ../../../dtk.exe dol split config/GXXE01/config.mine.yml _xdsplit
+#
+# No `splits:` key on purpose -> dtk auto-splits and writes asm for EVERY
+# function (named from symbols.txt), without needing XD's compiled objects.
+object_base: orig/GXXE01
+object: sys/main.dol
+hash: ff9e752ead9914af0b363ae6c831a34ccce189d2
+symbols: config/GXXE01/symbols.txt
+detect_objects: true
+detect_strings: true
+write_asm: true
+quick_analysis: false

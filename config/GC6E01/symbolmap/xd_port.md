@@ -9,6 +9,6 @@ Source: `/Users/douglaswhittingham/pkmn-colosseum/archive/previous_campaign/conf
 | already-conflict | 0 |
 | address-not-found | 0 |
 
-`xd_port.json` now holds 0 `ported` entries (0 newly merged from salvage) and 25 `corroborated` entries.
+`xd_port.json` now holds 134 `ported` entries (0 newly merged from salvage) and 27 `corroborated` entries.
 
 `xd_vocabulary.json` (XD names grouped by engine prefix) was copied through unchanged - it has no address dependency.

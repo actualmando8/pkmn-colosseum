@@ -1,6 +1,16 @@
 {
  "match": [
   {
+   "range": "0x8005344c",
+   "end": "0x80069c0c",
+   "status": "KNOWN",
+   "assigned": "game/menu/menuCB_Battle.c",
+   "votes": {
+    "menuCB_Battle.c": 1
+   },
+   "note": ""
+  },
+  {
    "range": "0x8007109c",
    "end": "0x8007c260",
    "status": "GAP",
@@ -31,6 +41,46 @@
    "assigned": "game/menu/menu_carde_matrix.c",
    "votes": {
     "menuCardE_Matrix.c": 4
+   },
+   "note": ""
+  },
+  {
+   "range": "0x8007fd64",
+   "end": "0x80088428",
+   "status": "KNOWN",
+   "assigned": "game/menu/cardesavedata.c",
+   "votes": {
+    "cardesavedata.c": 11
+   },
+   "note": ""
+  },
+  {
+   "range": "0x80089048",
+   "end": "0x800896b8",
+   "status": "KNOWN",
+   "assigned": "game/pokeconv.c",
+   "votes": {
+    "pokeconv.c": 2
+   },
+   "note": ""
+  },
+  {
+   "range": "0x8008c7b0",
+   "end": "0x800980e0",
+   "status": "KNOWN",
+   "assigned": "game/gbaCommunication.c",
+   "votes": {
+    "gbaCommunication.c": 6
+   },
+   "note": ""
+  },
+  {
+   "range": "0x800a4d28",
+   "end": "0x800a5624",
+   "status": "GAP",
+   "assigned": "dolphin/dvd/dvdfs_range_800A4D28.c",
+   "votes": {
+    "dvdfs.c": 5
    },
    "note": ""
   },
@@ -80,7 +130,7 @@
    "status": "KNOWN",
    "assigned": "hsd/hsd_cobj.c",
    "votes": {
-    "cobj.c": 18
+    "cobj.c": 24
    },
    "note": ""
   },
@@ -110,7 +160,77 @@
    "status": "KNOWN",
    "assigned": "hsd/hsd_lobj.c",
    "votes": {
-    "lobj.c": 7
+    "lobj.c": 9
+   },
+   "note": ""
+  },
+  {
+   "range": "0x801a69c0",
+   "end": "0x801a6ca4",
+   "status": "KNOWN",
+   "assigned": "hsd/hsd_memory.c",
+   "votes": {
+    "memory.c": 1
+   },
+   "note": ""
+  },
+  {
+   "range": "0x801a6ca4",
+   "end": "0x801a8428",
+   "status": "KNOWN",
+   "assigned": "hsd/hsd_mobj.c",
+   "votes": {
+    "mobj.c": 10
+   },
+   "note": ""
+  },
+  {
+   "range": "0x801a84f0",
+   "end": "0x801a85f0",
+   "status": "KNOWN",
+   "assigned": "hsd/hsd_mtx.c",
+   "votes": {
+    "mtx.c": 2
+   },
+   "note": ""
+  },
+  {
+   "range": "0x801aa608",
+   "end": "0x801add48",
+   "status": "GAP",
+   "assigned": "hsd/hsd_pobj_range_801AA608.c",
+   "votes": {
+    "pobj.c": 14
+   },
+   "note": ""
+  },
+  {
+   "range": "0x801add48",
+   "end": "0x801ae000",
+   "status": "GAP",
+   "assigned": "hsd/hsd_robj_range_801ADD48.c",
+   "votes": {
+    "robj.c": 3
+   },
+   "note": ""
+  },
+  {
+   "range": "0x801ae008",
+   "end": "0x801aebe0",
+   "status": "GAP",
+   "assigned": "hsd/hsd_robj_range_801AE008.c",
+   "votes": {
+    "robj.c": 3
+   },
+   "note": ""
+  },
+  {
+   "range": "0x801aebe4",
+   "end": "0x801b009c",
+   "status": "GAP",
+   "assigned": "hsd/hsd_robj_range_801AEBE4.c",
+   "votes": {
+    "robj.c": 6
    },
    "note": ""
   },
@@ -121,6 +241,36 @@
    "assigned": "hsd/hsd_shadow.c",
    "votes": {
     "shadow.c": 10
+   },
+   "note": ""
+  },
+  {
+   "range": "0x801bbac8",
+   "end": "0x801bf098",
+   "status": "KNOWN",
+   "assigned": "hsd/hsd_tobj.c",
+   "votes": {
+    "tobj.c": 21
+   },
+   "note": ""
+  },
+  {
+   "range": "0x801bf098",
+   "end": "0x801bf6ac",
+   "status": "KNOWN",
+   "assigned": "hsd/hsd_util.c",
+   "votes": {
+    "util.c": 1
+   },
+   "note": ""
+  },
+  {
+   "range": "0x801bf6ac",
+   "end": "0x801c01c8",
+   "status": "KNOWN",
+   "assigned": "hsd/hsd_video.c",
+   "votes": {
+    "video.c": 3
    },
    "note": ""
   },
@@ -157,64 +307,14 @@
    "note": "assigned gs_range_80033278.c but code is menuCardE.c"
   },
   {
-   "range": "0x8005344c",
-   "end": "0x80069c0c",
-   "status": "GAP",
-   "assigned": "game/gs_range_8005344C.c",
-   "votes": {
-    "menuCB_Battle.c": 1
-   },
-   "note": "assigned gs_range_8005344C.c but code is menuCB_Battle.c"
-  },
-  {
-   "range": "0x8007fd64",
-   "end": "0x80088428",
-   "status": "GAP",
-   "assigned": "game/gs_range_8007FD64.c",
-   "votes": {
-    "cardesavedata.c": 11
-   },
-   "note": "assigned gs_range_8007FD64.c but code is cardesavedata.c"
-  },
-  {
-   "range": "0x80089048",
-   "end": "0x800896b8",
-   "status": "GAP",
-   "assigned": "game/field_range_80089048.c",
-   "votes": {
-    "pokeconv.c": 2
-   },
-   "note": "assigned field_range_80089048.c but code is pokeconv.c"
-  },
-  {
-   "range": "0x8008c7b0",
-   "end": "0x800980e0",
-   "status": "GAP",
-   "assigned": "game/gs_range_8008C7B0.c",
-   "votes": {
-    "gbaCommunication.c": 6
-   },
-   "note": "assigned gs_range_8008C7B0.c but code is gbaCommunication.c"
-  },
-  {
-   "range": "0x800a4d28",
-   "end": "0x800a5624",
-   "status": "GAP",
-   "assigned": "dolphin/sdk_range_800A4D28.c",
-   "votes": {
-    "dvdfs.c": 4
-   },
-   "note": "assigned sdk_range_800A4D28.c but code is dvdfs.c"
-  },
-  {
    "range": "0x800a8178",
    "end": "0x800aa280",
    "status": "GAP",
-   "assigned": "dolphin/sdk_range_800A8178.c",
+   "assigned": "dolphin/vi/VI_range_800A8178.c",
    "votes": {
     "vi.c": 1
    },
-   "note": "assigned sdk_range_800A8178.c but code is vi.c"
+   "note": "assigned VI_range_800A8178.c but code is vi.c"
   },
   {
    "range": "0x800e202c",
@@ -227,16 +327,6 @@
    "note": "assigned gs_range_800E202C.c but code is parse.c"
   },
   {
-   "range": "0x801a84f0",
-   "end": "0x801a85f0",
-   "status": "GAP",
-   "assigned": "hsd/hsd_mobj_range_801A84F0.c",
-   "votes": {
-    "mtx.c": 2
-   },
-   "note": "assigned hsd_mobj_range_801A84F0.c but code is mtx.c"
-  },
-  {
    "range": "0x801a86b4",
    "end": "0x801aa608",
    "status": "GAP",
@@ -245,26 +335,6 @@
     "perf.c": 1
    },
    "note": "assigned hsd_mobj_range_801A86B4.c but code is perf.c"
-  },
-  {
-   "range": "0x801ae008",
-   "end": "0x801aebe0",
-   "status": "GAP",
-   "assigned": "hsd/hsd_pobj_range_801AE008.c",
-   "votes": {
-    "robj.c": 3
-   },
-   "note": "assigned hsd_pobj_range_801AE008.c but code is robj.c"
-  },
-  {
-   "range": "0x801aebe4",
-   "end": "0x801b009c",
-   "status": "GAP",
-   "assigned": "hsd/hsd_pobj_range_801AEBE4.c",
-   "votes": {
-    "robj.c": 6
-   },
-   "note": "assigned hsd_pobj_range_801AEBE4.c but code is robj.c"
   },
   {
    "range": "0x801c0f20",
@@ -307,7 +377,7 @@
    "status": "KNOWN",
    "assigned": "hsd/hsd_fog.c",
    "votes": {
-    "fog.c": 2,
+    "fog.c": 3,
     "hash.c": 1,
     "id.c": 1
    },
@@ -319,32 +389,10 @@
    "status": "KNOWN",
    "assigned": "hsd/hsd_jobj.c",
    "votes": {
-    "jobj.c": 13,
+    "jobj.c": 18,
     "list.c": 2
    },
    "note": "also holds: list.c"
-  },
-  {
-   "range": "0x801a69c0",
-   "end": "0x801a8428",
-   "status": "GAP",
-   "assigned": "hsd/hsd_range_801A69C0.c",
-   "votes": {
-    "memory.c": 1,
-    "mobj.c": 6
-   },
-   "note": "also holds: memory.c, mobj.c"
-  },
-  {
-   "range": "0x801aa608",
-   "end": "0x801ae000",
-   "status": "GAP",
-   "assigned": "hsd/hsd_pobj_range_801AA608.c",
-   "votes": {
-    "pobj.c": 10,
-    "robj.c": 3
-   },
-   "note": "also holds: robj.c"
   },
   {
    "range": "0x801b1730",
@@ -356,41 +404,29 @@
     "texp.c": 15
    },
    "note": "also holds: tev.c"
-  },
-  {
-   "range": "0x801bbac8",
-   "end": "0x801c01c8",
-   "status": "GAP",
-   "assigned": "hsd/hsd_range_801BBAC8.c",
-   "votes": {
-    "tobj.c": 14,
-    "util.c": 1,
-    "video.c": 3
-   },
-   "note": "also holds: tobj.c, util.c, video.c"
   }
  ],
  "gap_attribution": [
   {
-   "cfile": "tobj.c",
+   "cfile": "pobj.c",
    "count": 14,
-   "lo": "0x801bbd84",
-   "hi": "0x801beedc",
+   "lo": "0x801aa8bc",
+   "hi": "0x801ad354",
    "fns": [
-    "HSD_ImageDescAlloc",
-    "fn_801BBDDC",
-    "HSD_Index2TexMtx",
-    "HSD_TObjSetup",
-    "fn_801BC33C",
-    "fn_801BC8BC",
-    "fn_801BCF30",
-    "fn_801BDA58",
-    "fn_801BDD74",
-    "fn_801BE2B4",
-    "fn_801BE4CC",
-    "fn_801BE598",
-    "fn_801BE85C",
-    "fn_801BEEDC"
+    "HSD_PObjDisp",
+    "fn_801AA8BC",
+    "SetupEnvelopeModelMtx",
+    "fn_801AAEA8",
+    "fn_801AB538",
+    "drawShapeAnim",
+    "fn_801AB67C",
+    "fn_801AC1F8",
+    "get_shape_normal_xyz",
+    "fn_801AC91C",
+    "get_shape_vertex_xyz",
+    "fn_801AD044",
+    "fn_801AD288",
+    "fn_801AD354"
    ]
   },
   {
@@ -414,71 +450,6 @@
    ]
   },
   {
-   "cfile": "cardesavedata.c",
-   "count": 11,
-   "lo": "0x80082650",
-   "hi": "0x800836ac",
-   "fns": [
-    "fn_80082650",
-    "fn_80082738",
-    "fn_80082960",
-    "fn_80082A88",
-    "fn_80082BA4",
-    "fn_80082CF0",
-    "fn_80082EA4",
-    "fn_80082FE4",
-    "fn_800830A4",
-    "fn_800832C8",
-    "fn_800836AC"
-   ]
-  },
-  {
-   "cfile": "pobj.c",
-   "count": 10,
-   "lo": "0x801aa8bc",
-   "hi": "0x801ad354",
-   "fns": [
-    "fn_801AA8BC",
-    "fn_801AAEA8",
-    "fn_801AB538",
-    "fn_801AB67C",
-    "fn_801AC1F8",
-    "get_shape_normal_xyz",
-    "fn_801AC91C",
-    "fn_801AD044",
-    "fn_801AD288",
-    "fn_801AD354"
-   ]
-  },
-  {
-   "cfile": "gbaCommunication.c",
-   "count": 6,
-   "lo": "0x80092c90",
-   "hi": "0x80093698",
-   "fns": [
-    "fn_80092C90",
-    "fn_80092E38",
-    "fn_80092FC8",
-    "fn_80093160",
-    "fn_800932F0",
-    "fn_80093698"
-   ]
-  },
-  {
-   "cfile": "mobj.c",
-   "count": 6,
-   "lo": "0x801a6ca4",
-   "hi": "0x801a7d58",
-   "fns": [
-    "fn_801A6CA4",
-    "MObjSetupTev",
-    "fn_801A7128",
-    "fn_801A7B24",
-    "fn_801A7CFC",
-    "fn_801A7D58"
-   ]
-  },
-  {
    "cfile": "menuCB_Common.c",
    "count": 5,
    "lo": "0x8007109c",
@@ -492,6 +463,19 @@
    ]
   },
   {
+   "cfile": "dvdfs.c",
+   "count": 5,
+   "lo": "0x800a4d28",
+   "hi": "0x800a5558",
+   "fns": [
+    "DVDConvertPathToEntrynum",
+    "fn_800A4D28",
+    "fn_800A532C",
+    "fn_800A541C",
+    "fn_800A5558"
+   ]
+  },
+  {
    "cfile": "menuCB_Rule.c",
    "count": 4,
    "lo": "0x800767b8",
@@ -501,39 +485,6 @@
     "fn_800772AC",
     "fn_800774D4",
     "fn_800776E4"
-   ]
-  },
-  {
-   "cfile": "dvdfs.c",
-   "count": 4,
-   "lo": "0x800a4d28",
-   "hi": "0x800a5558",
-   "fns": [
-    "fn_800A4D28",
-    "fn_800A532C",
-    "fn_800A541C",
-    "fn_800A5558"
-   ]
-  },
-  {
-   "cfile": "video.c",
-   "count": 3,
-   "lo": "0x801bf6ac",
-   "hi": "0x801bff18",
-   "fns": [
-    "fn_801BF6AC",
-    "fn_801BFA1C",
-    "fn_801BFF18"
-   ]
-  },
-  {
-   "cfile": "pokeconv.c",
-   "count": 2,
-   "lo": "0x80089048",
-   "hi": "0x80089380",
-   "fns": [
-    "fn_80089048",
-    "fn_80089380"
    ]
   },
   {
@@ -557,31 +508,12 @@
    ]
   },
   {
-   "cfile": "mtx.c",
-   "count": 2,
-   "lo": "0x801a8524",
-   "hi": "0x801a85a4",
-   "fns": [
-    "HSD_MtxAlloc",
-    "HSD_VecAlloc"
-   ]
-  },
-  {
    "cfile": "menuCardE.c",
    "count": 1,
    "lo": "0x80033278",
    "hi": "0x80033278",
    "fns": [
     "fn_80033278"
-   ]
-  },
-  {
-   "cfile": "menuCB_Battle.c",
-   "count": 1,
-   "lo": "0x80069a60",
-   "hi": "0x80069a60",
-   "fns": [
-    "fn_80069A60"
    ]
   },
   {
@@ -639,30 +571,12 @@
    ]
   },
   {
-   "cfile": "memory.c",
-   "count": 1,
-   "lo": "0x801a69c0",
-   "hi": "0x801a69c0",
-   "fns": [
-    "_HSD_MemSetCallbacks"
-   ]
-  },
-  {
    "cfile": "perf.c",
    "count": 1,
    "lo": "0x801aa5ac",
    "hi": "0x801aa5ac",
    "fns": [
     "fn_801AA5AC"
-   ]
-  },
-  {
-   "cfile": "util.c",
-   "count": 1,
-   "lo": "0x801bf098",
-   "hi": "0x801bf098",
-   "fns": [
-    "HSD_Index2PosNrmMtx"
    ]
   },
   {

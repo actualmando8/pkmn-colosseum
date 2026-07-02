@@ -865,7 +865,7 @@ extern void fn_800FD348();
 extern void fn_800FD69C();
 extern u16 * _msgGetCodeInfo__FP13MSG_TASK_WORKUsPP12tagFONT_INFO();
 extern s32 fn_800FDFE4(const void* str);
-extern s32 fn_800FE010();
+extern s32 _msgGetSize__FPCUs();
 extern void fn_800FE35C(void);
 extern void fn_800FE38C(s32 x1, s32 y1, s32 x2, s32 y2);
 extern void fn_800FE4D4(void);
@@ -2029,7 +2029,7 @@ void* fn_800F9D24(u16* dst, u16* src, s32 maxlen) {
     s32 i;
 
     if (maxlen <= 0) return dst;
-    r = (fn_800FE010(src) + 1) >> 1;
+    r = (_msgGetSize__FPCUs(src) + 1) >> 1;
     if (r >= maxlen) r = maxlen - 1;
     memcpy(dst, src, r * 2);
     i = r;
@@ -2057,10 +2057,10 @@ asm void fn_800F9E70(void) {
 #else
 #pragma peephole off
 u8* fn_800F9E70(u8* dst, u8* src) {
-    extern u32 fn_800FE010(u8* a);
+    extern u32 _msgGetSize__FPCUs(u8* a);
     if (dst == NULL) { return NULL; }
     if (src == NULL) { *(u16*)dst = 0; }
-    else { memcpy(dst, src, fn_800FE010(src)); }
+    else { memcpy(dst, src, _msgGetSize__FPCUs(src)); }
     return dst;
 }
 #pragma peephole on
@@ -4150,7 +4150,7 @@ asm s32 fn_800FDFE4(const void* str) {
 #pragma optimization_level 4
 s32 fn_800FDFE4(const void* str) {
     s32 r;
-    r = fn_800FE010(str);
+    r = _msgGetSize__FPCUs(str);
     return ((u32)(r + 1) >> 1) - 1;
 }
 #endif
@@ -4161,13 +4161,13 @@ s32 fn_800FDFE4(const void* str) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm s32 fn_800FE010(str)
+asm s32 _msgGetSize__FPCUs(str)
     const void* str;
 {
 #include "src/game/gs_thread_fn_800FE010.inc"
 }
 #else
-s32 fn_800FE010(arg0)
+s32 _msgGetSize__FPCUs(arg0)
     u16 *arg0;
 {
     u8 *work;

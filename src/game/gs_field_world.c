@@ -5728,7 +5728,7 @@ extern void fn_800EC990(void);
 extern void _threadSwitch(void);
 extern void fn_800EC960(void);
 extern void fn_800EE150(void);
-extern void fn_800EE3BC(void);
+extern void GSpartGetTransform(void);
 extern void fn_800EE828();
 extern void fn_8018AACC(void);
 extern void fn_8018A280(void);
@@ -6325,7 +6325,7 @@ extern void fn_800D9AF0();
 extern void fn_800D258C();
 extern void fn_800D9D68();
 extern void fn_800D9C24();
-extern void fn_800D2248(void);
+extern void _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID(void);
 extern void fn_800E3760();
 extern void fn_800D3190(void);
 extern u32 lbl_8047AD88;
@@ -6371,14 +6371,14 @@ void fn_80117D14(void)
             fn_800D9C24(0, 0,
                         (u16)(*(u16*)(size + 0) - 1),
                         (u16)(*(u16*)(size + 2) - 1));
-            fn_800D2248();
+            _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
             fn_800E3760(lbl_8047AD90, 0x3010);
             fn_800D3190();
             fn_800D377C(1);
             fn_800D258C(saved);
             fn_800D9D68(a0, a1, a2, a3);
             fn_800D9C24(b0, b1, b2, b3);
-            fn_800D2248();
+            _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
             fn_800D4604(1);
         }
     }

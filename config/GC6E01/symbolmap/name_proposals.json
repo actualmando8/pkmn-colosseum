@@ -550,6 +550,39 @@
   "collision": false
  },
  {
+  "fn": "DVDConvertPathToEntrynum",
+  "addr": "800A4D28",
+  "proposed": "DVDConvertEntrynumToPath",
+  "kind": "call",
+  "confidence": "MED",
+  "already_named": "yes",
+  "evidence": "DVDConvertEntrynumToPath(possibly DVDOpen or DVDChangeDir or DVDOpenDir): specif",
+  "alt": [],
+  "collision": true
+ },
+ {
+  "fn": "DVDOpen",
+  "addr": "800A501C",
+  "proposed": "DVDOpen",
+  "kind": "call",
+  "confidence": "MED",
+  "already_named": "yes",
+  "evidence": "Warning: DVDOpen(): file '%s' was not found under %s.\\n",
+  "alt": [],
+  "collision": true
+ },
+ {
+  "fn": "HSD_MObjSetDefaultClass",
+  "addr": "801A7CFC",
+  "proposed": "hsdIsDescendantOf",
+  "kind": "call",
+  "confidence": "MED",
+  "already_named": "yes",
+  "evidence": "hsdIsDescendantOf(info, &hsdMObj)",
+  "alt": [],
+  "collision": true
+ },
+ {
   "fn": "TRKTargetInterrupt",
   "addr": "800C17CC",
   "proposed": "TargetDoStep",
@@ -624,7 +657,7 @@
   "already_named": "",
   "evidence": "DVDConvertEntrynumToPath(possibly DVDOpen or DVDChangeDir or DVDOpenDir): specif",
   "alt": [],
-  "collision": false
+  "collision": true
  },
  {
   "fn": "fn_800A501C",
@@ -635,7 +668,7 @@
   "already_named": "",
   "evidence": "Warning: DVDOpen(): file '%s' was not found under %s.\\n",
   "alt": [],
-  "collision": false
+  "collision": true
  },
  {
   "fn": "fn_800A532C",
@@ -901,7 +934,7 @@
   "already_named": "",
   "evidence": "hsdIsDescendantOf(info, &hsdMObj)",
   "alt": [],
-  "collision": false
+  "collision": true
  },
  {
   "fn": "fn_801D91EC",

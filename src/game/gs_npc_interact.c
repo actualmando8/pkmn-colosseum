@@ -52,7 +52,7 @@
  *   fn_80010844  GSnpc_GBALinkPrompt         -- 0x15C bytes, GBA link cable prompt
  *   fn_800109A0  GSnpc_ColosseumSignup       -- 0x190 bytes, colosseum registration
  *   fn_80010B30  GSnpc_MtBattleEntry         -- 0x168 bytes, Mt. Battle entry
- *   fn_80010C98  GSnpc_WarpToLocation        -- 0x52C bytes, warp/teleport handler
+ *   menuPokemonCheckPokemonChange  GSnpc_WarpToLocation        -- 0x52C bytes, warp/teleport handler
  *
  * The dialog state machine (fn_8000D3AC) has 5 states:
  *   State 0: Init -- load NPC dialog data, set up text box
@@ -76,7 +76,7 @@
  *   - Uses a jump table (jumptable_802E4BB8) to handle different
  *     battle outcome types (win, lose, flee, draw)
  *
- * fn_80010C98 (GSnpc_WarpToLocation) handles map transitions:
+ * menuPokemonCheckPokemonChange (GSnpc_WarpToLocation) handles map transitions:
  *   - Checks warp destination validity via fn_801F2020
  *   - Gets the destination map name via fn_802037DC
  *   - Loads string message 0x76FB for the warp confirmation dialog
@@ -405,7 +405,7 @@ extern void fn_80102568();
 extern void fn_801F02AC();
 extern void fn_802062FC();
 extern void fn_802656AC();
-extern u32 fn_80010C98();
+extern u32 menuPokemonCheckPokemonChange();
 extern void fn_80011288();
 extern s32 fn_801026A4(s32, ...);
 #if 0
@@ -414,7 +414,7 @@ asm void fn_800114A4(void) {
 }
 #else
 void fn_800114A4(void) {
-    extern u32 fn_80010C98();
+    extern u32 menuPokemonCheckPokemonChange();
     extern void fn_80011288();
     extern void fn_8001BD80();
     extern void fn_80102568();
@@ -495,7 +495,7 @@ L_80011500:
     r3 = r25;
     r4 = r24;
     r5 = r29;
-    fn_80010C98();
+    menuPokemonCheckPokemonChange();
     tmp = r3 & 0xFF;
     if (tmp == 0) goto L_80011500;
     tmp = r27 & 0xFF;
@@ -3356,7 +3356,7 @@ u32 fn_80010B30(u8* arg) {
 #pragma peephole on
 #pragma pop
 
-/* fn_80010C98 - 0x80010C98 | size: 0x52c */
+/* menuPokemonCheckPokemonChange - 0x80010C98 | size: 0x52c */
 extern u32 fn_80207BF4(void* arg);
 extern u8 fn_801F8C00(u32 warpId, u32 arg);
 extern s32 fn_80203848(u32 arg);
@@ -3364,12 +3364,12 @@ extern void fn_800DD970(const char* fmt, ...);
 extern u8 lbl_80266788[];
 extern u8 lbl_802E4B78[];
 #if 0
-asm void fn_80010C98(void) {
+asm void menuPokemonCheckPokemonChange(void) {
 #include "src/game/gs_npc_interact_fn_80010C98.inc"
 }
 #else
 #pragma peephole off
-u32 fn_80010C98(void* npc, u32 warpId, u32 variant) {
+u32 menuPokemonCheckPokemonChange(void* npc, u32 warpId, u32 variant) {
 #define WAIT_FOR_DIALOG(waitLabel, checkLabel, haveLabel, doneLabel) \
     goto checkLabel; \
 waitLabel: \

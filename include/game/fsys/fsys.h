@@ -269,7 +269,7 @@ extern FSYSDecompContext gLZSSContext;
 /* --- fsys_load.c --- */
 
 /*
- * fn_8017AC40: FSYSInit
+ * _fsysInitTOC: FSYSInit
  * Master initialization of the FSYS subsystem.
  * Allocates slot array, file handle table, DVD buffer pools, loads the
  * "gsfsys.toc" table-of-contents, and starts the load manager thread.
@@ -363,7 +363,7 @@ s32 FSYSRequestFile(u32 fileHandle, u32 requestID);
 s32 FSYSProcessEntry(FSYSSlot* slot);
 
 /*
- * fn_8017EB6C: FSYSBeginLoad
+ * _fsysGetFilename: FSYSBeginLoad
  * Initiates or continues loading an FSYS archive. Implements a state
  * machine that transitions through PENDING -> LOADING -> LOADED.
  *

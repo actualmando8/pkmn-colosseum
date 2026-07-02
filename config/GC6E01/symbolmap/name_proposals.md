@@ -1,6 +1,6 @@
 # Function-name proposals from log/assert strings
 
-84 candidate(s); 0 HIGH-confidence & currently unnamed.
+87 candidate(s); 0 HIGH-confidence & currently unnamed.
 Advisory only — review before applying. Never written to asm.
 
 | fn | addr | proposed | conf | via | evidence |
@@ -55,14 +55,17 @@ Advisory only — review before applying. Never written to asm.
 | `wazaSequenceEntryUpdate` ⟨named⟩ | 801D81CC | **wazaSequenceEntryUpdate** | HIGH | leading | `wazaSequenceEntryUpdate: Invalid Data Type!\n` |
 | `wazaSequencePokemonMotionStart` ⟨named⟩ | 801D9C1C | **wazaSequencePokemonMotionStart** | HIGH | leading | `wazaSequencePokemonMotionStart: Failed to start pokemon motion!\n` |
 | `wazaSequenceUpdate` ⟨named⟩ | 801DB988 | **wazaSequenceUpdate** | HIGH | leading | `wazaSequenceUpdate: Could not start sequence entry!\n` |
+| `DVDConvertPathToEntrynum` ⟨named⟩ ⟨shared-prefix⟩ | 800A4D28 | DVDConvertEntrynumToPath | MED | call | `DVDConvertEntrynumToPath(possibly DVDOpen or DVDChangeDir or DVDOpenDir): specif` |
+| `DVDOpen` ⟨named⟩ ⟨shared-prefix⟩ | 800A501C | DVDOpen | MED | call | `Warning: DVDOpen(): file '%s' was not found under %s.\n` |
+| `HSD_MObjSetDefaultClass` ⟨named⟩ ⟨shared-prefix⟩ | 801A7CFC | hsdIsDescendantOf | MED | call | `hsdIsDescendantOf(info, &hsdMObj)` |
 | `TRKTargetInterrupt` ⟨named⟩ ⟨shared-prefix⟩ | 800C17CC | TargetDoStep | MED | call | `TargetDoStep()\n` |
 | `TRKTargetSingleStep` ⟨named⟩ ⟨shared-prefix⟩ | 800C1610 | TargetDoStep | MED | call | `TargetDoStep()\n` |
 | `TRKTargetStepOutOfRange` ⟨named⟩ ⟨shared-prefix⟩ | 800C1558 | TargetDoStep | MED | call | `TargetDoStep()\n` |
 | `fn_80071398` ⟨shared-prefix⟩ | 80071398 | _menuPop | MED | call | `0 < _CBC.m_nMenuStackDepth &&\"_menuPop():stack under.\"` |
 | `fn_800714C8` ⟨shared-prefix⟩ | 800714C8 | _menuPop | MED | call | `0 < _CBC.m_nMenuStackDepth &&\"_menuPop():stack under.\"` |
 | `fn_800715BC` | 800715BC | _menuPush | MED | call | `0 &&\"_menuPush(int eMenuID):stack over.\"` |
-| `fn_800A4D28` | 800A4D28 | DVDConvertEntrynumToPath | MED | call | `DVDConvertEntrynumToPath(possibly DVDOpen or DVDChangeDir or DVDOpenDir): specif` |
-| `fn_800A501C` | 800A501C | DVDOpen | MED | call | `Warning: DVDOpen(): file '%s' was not found under %s.\n` |
+| `fn_800A4D28` ⟨shared-prefix⟩ | 800A4D28 | DVDConvertEntrynumToPath | MED | call | `DVDConvertEntrynumToPath(possibly DVDOpen or DVDChangeDir or DVDOpenDir): specif` |
+| `fn_800A501C` ⟨shared-prefix⟩ | 800A501C | DVDOpen | MED | call | `Warning: DVDOpen(): file '%s' was not found under %s.\n` |
 | `fn_800A532C` | 800A532C | DVDReadAsync | MED | call | `DVDReadAsync(): specified area is out of the file  ` |
 | `fn_800A541C` | 800A541C | DVDRead | MED | call | `DVDRead(): specified area is out of the file  ` |
 | `fn_800A5558` | 800A5558 | DVDSeek | MED | call | `DVDSeek(): offset is out of the file  ` |
@@ -86,6 +89,6 @@ Advisory only — review before applying. Never written to asm.
 | `fn_80114F84` | 80114F84 | floorReadMsgPreFunc | MED | call | `floorReadMsgPreFunc(): can't alloc %d bytes of memory\n` |
 | `fn_80115024` | 80115024 | floorReadNormalPreFunc | MED | call | `floorReadNormalPreFunc(): can't alloc %d bytes of memory\n` |
 | `fn_8013A49C` | 8013A49C | electronStartEffect | MED | leading | `electronStartEffect: Could not start electron effect - invalid model: groupRes %` |
-| `fn_801A7CFC` | 801A7CFC | hsdIsDescendantOf | MED | call | `hsdIsDescendantOf(info, &hsdMObj)` |
+| `fn_801A7CFC` ⟨shared-prefix⟩ | 801A7CFC | hsdIsDescendantOf | MED | call | `hsdIsDescendantOf(info, &hsdMObj)` |
 | `fn_801D91EC` | 801D91EC | _wazaSequenceModelEntryStart | MED | leading | `_wazaSequenceModelEntryStart: Some error occured here\n` |
 | `stateReadingFST` ⟨named⟩ ⟨shared-prefix⟩ | 800A56F0 | DVDChangeDisk | MED | call | `DVDChangeDisk(): FST in the new disc is too big.   ` |

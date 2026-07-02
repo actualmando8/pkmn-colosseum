@@ -3,7 +3,7 @@
  * @brief GSgfx -- Genius Sonority graphics subsystem.
  *
  * Decompiled from:
- *   fn_800D39E0 (GSgfxInit)
+ *   GSgfxInit__FP15_GSgfxInitParms (GSgfxInit)
  *   fn_800D37D4 (GSgfxSetVideoMode)
  *   fn_800D3074 (GSgfxEnableRendering)
  *   fn_800D30F0 (GSgfxSwapBuffers)
@@ -238,7 +238,7 @@ void GSgfxSetVideoMode(u32 mode, u32 tvFormat, u32 field0,
 }
 
 /* =======================================================================
- *  GSgfxInit / fn_800D39E0
+ *  GSgfxInit / GSgfxInit__FP15_GSgfxInitParms
  *  Address: 0x800D39E0, Size: 0x468
  *
  *  Master graphics initialisation.  This is the largest function in the
@@ -476,7 +476,7 @@ void fn_800D37D4(u32 mode, u32 tvFormat, u32 field0,
                  u32 field1, u32 xfbMode, u32 aaMode) {
     GSgfxSetVideoMode(mode, tvFormat, field0, field1, xfbMode, aaMode);
 }
-void fn_800D39E0(u32 memSize, u32 fifoSize, u32 mtxDepth,
+void GSgfxInit__FP15_GSgfxInitParms(u32 memSize, u32 fifoSize, u32 mtxDepth,
                  u32 lightCount, u32 numBufs, u32 dlSize) {
     GSgfxInit(memSize, fifoSize, mtxDepth, lightCount, numBufs, dlSize);
 }
@@ -645,7 +645,7 @@ extern void fn_800D13C4(void* a);
 extern void fn_800DC874(void* a);
 extern void fn_800E3928(void* a);
 extern void fn_801183EC(void* a);
-extern void fn_800E8684(void);
+extern void modelShadowRender__FP10GSgfxLayer(void);
 extern void fn_8019C708(s32 a);
 extern void HSD_SetEraseColor(u8 a, u8 b, u8 c, u8 d);
 extern void HSD_EraseRect(s32 a, s32 b, s32 c, f32 d, f32 e, f32 f, f32 g, f32 h);
@@ -727,7 +727,7 @@ void fn_800D3410(void* arg0, u8 arg1) {
 
     if (arg0 == 0) {
         startTick = OSGetTick();
-        fn_800E8684();
+        modelShadowRender__FP10GSgfxLayer();
         tick = OSGetTick();
         ((u32*)&lbl_804001F0)[0x3C / 4] = tick - startTick;
 

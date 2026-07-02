@@ -741,10 +741,10 @@ void GScameraSetViewport(GSRenderCamera* camera, u32 x0, u32 y0, u32 x1, u32 y1)
 }
 
 /* ==================================================================
- * fn_800D2248 - GS render: main render loop (uses lbl_8047AA74 list)
+ * _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID - GS render: main render loop (uses lbl_8047AA74 list)
  * Address: 0x800D2248, Size: 0x33C
  * ================================================================== */
-void fn_800D2248(void) {
+void _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID(void) {
     void* obj = (void*)lbl_8047AA74;
     void* jobj;
     if (obj == 0) {

@@ -614,7 +614,7 @@ void fn_8018B558(void) {
 
 /* 0x8018BC88 | 0x16C */
 extern void fn_800EE150(void);
-extern void fn_800EE3BC(void);
+extern void GSpartGetTransform(void);
 extern void fn_800EE828(void);
 #if 0
 asm void fn_8018BC88(void) {
@@ -1024,7 +1024,7 @@ void fn_80186284(u32 a, u32 b, f32 x, s32 c, s32 d, f32 y) { /* TODO: match -- 9
 /* 0x80186620 | 0x53C */
 extern void fn_801779EC(void);
 extern void fn_800D258C(void);
-extern void fn_800D2248(void);
+extern void _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID(void);
 extern void fn_800DA028(void);
 extern void fn_800D7820(void);
 extern void fn_800D88DC(void);

@@ -2723,7 +2723,7 @@ extern void fn_80128E38(void);
 extern void fn_800056E4(void);
 extern void fn_800056EC(void);
 extern void fn_80130054(void);
-extern void fn_8010A5BC(void);
+extern void menuModelInit(void);
 extern void fn_8010A010(void);
 extern void fn_8018F6F4(void);
 extern void fn_8018F4C8(void);

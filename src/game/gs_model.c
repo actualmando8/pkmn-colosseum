@@ -363,7 +363,7 @@ extern void* fn_80104704(s32 param);
 extern s32   fn_80109884(void);
 extern void  fn_80109220(void* node, u32 enable);
 extern void  fn_801043A4(s32 param);
-extern void  fn_801045A8(void* p, u8 flags);
+extern void  windowCheckCursor(void* p, u8 flags);
 extern void  fn_80104160(void* r3, void* r4, s16 r5, s16 r6, s32 r7, s32 r8, s32 r9, s32 r10);
 extern u8    fn_80109664(u8 param);
 extern void  fn_801096AC(f32 f1, f32 f2);
@@ -1111,7 +1111,7 @@ void fn_80104530(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_801045A8(void* p, u8 flags) {
+void windowCheckCursor(void* p, u8 flags) {
     /* TODO: match -- 272 bytes at 0x801045A8 */
     (void)p; (void)flags;
 }
@@ -2134,7 +2134,7 @@ void fn_8010A420(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_8010A5BC(void) {
+void menuModelInit(void) {
     /* TODO: match -- 720 bytes at 0x8010A5BC */
 }
 #pragma pop

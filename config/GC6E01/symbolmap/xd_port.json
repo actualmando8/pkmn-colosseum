@@ -1,147 +1,160 @@
 {
  "corroborated": [
   {
-   "fn": "fn_8009E7B0",
-   "addr": "8009E7B0",
-   "proposed": "OSLink",
-   "kind": "leading",
-   "confidence": "HIGH",
-   "already_named": "",
-   "evidence": "OSLink: unknown relocation type %3d\\n",
-   "alt": [],
-   "collision": false,
-   "in_xd": true,
-   "salvaged": true
-  },
-  {
-   "fn": "fn_8009EDAC",
-   "addr": "8009EDAC",
-   "proposed": "OSUnlink",
-   "kind": "leading",
-   "confidence": "HIGH",
-   "already_named": "",
-   "evidence": "OSUnlink: unknown relocation type %3d\\n",
-   "alt": [],
-   "collision": false,
-   "in_xd": true,
-   "salvaged": true
-  },
-  {
-   "fn": "fn_800DF498",
-   "addr": "800DF498",
-   "proposed": "GSmaterialSetPEdescr",
-   "kind": "leading",
-   "confidence": "HIGH",
-   "already_named": "",
-   "evidence": "GSmaterialSetPEdescr: Warning: already using a custom description!\\n",
-   "alt": [],
-   "collision": false,
-   "in_xd": true,
-   "salvaged": true
-  },
-  {
-   "fn": "fn_800F07A8",
-   "addr": "800F07A8",
-   "proposed": "GSthreadCreate",
-   "kind": "leading",
-   "confidence": "HIGH",
-   "already_named": "",
-   "evidence": "GSthreadCreate. Warning: 'usesFPU==FALE' OK?\\n",
-   "alt": [],
-   "collision": false,
-   "in_xd": true,
-   "salvaged": true
-  },
-  {
-   "fn": "fn_8010D3C8",
+   "fn": "GScolsys2Draw",
    "addr": "8010D3C8",
    "proposed": "GScolsys2Draw",
    "kind": "leading",
    "confidence": "HIGH",
-   "already_named": "",
+   "already_named": "yes",
    "evidence": "GScolsys2Draw : can't alloc display list memory.\\n",
    "alt": [],
    "collision": false,
-   "in_xd": true,
-   "salvaged": true
+   "in_xd": true
   },
   {
-   "fn": "fn_80114948",
-   "addr": "80114948",
-   "proposed": "floorReadCameraPreFunc",
+   "fn": "GSmaterialSetPEdescr",
+   "addr": "800DF498",
+   "proposed": "GSmaterialSetPEdescr",
    "kind": "leading",
    "confidence": "HIGH",
-   "already_named": "",
-   "evidence": "floorReadCameraPreFunc: can't alloc %d bytes of memory\\n",
+   "already_named": "yes",
+   "evidence": "GSmaterialSetPEdescr: Warning: already using a custom description!\\n",
    "alt": [],
    "collision": false,
-   "in_xd": true,
-   "salvaged": true
+   "in_xd": true
   },
   {
-   "fn": "fn_80114CA8",
-   "addr": "80114CA8",
-   "proposed": "floorReadMapPreFunc",
+   "fn": "GSthreadCreate",
+   "addr": "800F07A8",
+   "proposed": "GSthreadCreate",
    "kind": "leading",
    "confidence": "HIGH",
-   "already_named": "",
-   "evidence": "floorReadMapPreFunc: can't alloc %d bytes of memory\\n",
+   "already_named": "yes",
+   "evidence": "GSthreadCreate. Warning: 'usesFPU==FALE' OK?\\n",
    "alt": [],
    "collision": false,
-   "in_xd": true,
-   "salvaged": true
+   "in_xd": true
   },
   {
-   "fn": "fn_80117514",
-   "addr": "80117514",
-   "proposed": "floorUpdateFieldCamera",
-   "kind": "leading",
-   "confidence": "HIGH",
-   "already_named": "",
-   "evidence": "floorUpdateFieldCamera: error updating field camera - divide by zero!",
-   "alt": [],
-   "collision": false,
-   "in_xd": true,
-   "salvaged": true
-  },
-  {
-   "fn": "fn_801657F8",
-   "addr": "801657F8",
-   "proposed": "soundStop",
-   "kind": "leading",
-   "confidence": "HIGH",
-   "already_named": "",
-   "evidence": "soundStop: Warning! BGM cannot be stopped.(snd_id=%d)\\n",
-   "alt": [],
-   "collision": false,
-   "in_xd": true,
-   "salvaged": true
-  },
-  {
-   "fn": "fn_80191F64",
+   "fn": "HSD_ArchiveParse",
    "addr": "80191F64",
    "proposed": "HSD_ArchiveParse",
    "kind": "leading",
    "confidence": "HIGH",
-   "already_named": "",
+   "already_named": "yes",
    "evidence": "HSD_ArchiveParse: byte-order mismatch! Please check data format\\n",
    "alt": [],
    "collision": false,
-   "in_xd": true,
-   "salvaged": true
+   "in_xd": true
   },
   {
-   "fn": "fn_801C3D64",
+   "fn": "OSLink",
+   "addr": "8009E7B0",
+   "proposed": "OSLink",
+   "kind": "leading",
+   "confidence": "HIGH",
+   "already_named": "yes",
+   "evidence": "OSLink: unknown relocation type %3d\\n",
+   "alt": [],
+   "collision": false,
+   "in_xd": true
+  },
+  {
+   "fn": "OSUnlink",
+   "addr": "8009EDAC",
+   "proposed": "OSUnlink",
+   "kind": "leading",
+   "confidence": "HIGH",
+   "already_named": "yes",
+   "evidence": "OSUnlink: unknown relocation type %3d\\n",
+   "alt": [],
+   "collision": false,
+   "in_xd": true
+  },
+  {
+   "fn": "battleGridReplacePokemon",
    "addr": "801C3D64",
    "proposed": "battleGridReplacePokemon",
    "kind": "leading",
    "confidence": "HIGH",
-   "already_named": "",
+   "already_named": "yes",
    "evidence": "battleGridReplacePokemon: NULL argument",
    "alt": [],
    "collision": false,
-   "in_xd": true,
-   "salvaged": true
+   "in_xd": true
+  },
+  {
+   "fn": "floorReadCameraPreFunc",
+   "addr": "80114948",
+   "proposed": "floorReadCameraPreFunc",
+   "kind": "leading",
+   "confidence": "HIGH",
+   "already_named": "yes",
+   "evidence": "floorReadCameraPreFunc: can't alloc %d bytes of memory\\n",
+   "alt": [],
+   "collision": false,
+   "in_xd": true
+  },
+  {
+   "fn": "floorReadMapPreFunc",
+   "addr": "80114CA8",
+   "proposed": "floorReadMapPreFunc",
+   "kind": "leading",
+   "confidence": "HIGH",
+   "already_named": "yes",
+   "evidence": "floorReadMapPreFunc: can't alloc %d bytes of memory\\n",
+   "alt": [],
+   "collision": false,
+   "in_xd": true
+  },
+  {
+   "fn": "floorUpdateFieldCamera",
+   "addr": "80117514",
+   "proposed": "floorUpdateFieldCamera",
+   "kind": "leading",
+   "confidence": "HIGH",
+   "already_named": "yes",
+   "evidence": "floorUpdateFieldCamera: error updating field camera - divide by zero!",
+   "alt": [],
+   "collision": false,
+   "in_xd": true
+  },
+  {
+   "fn": "soundStop",
+   "addr": "801657F8",
+   "proposed": "soundStop",
+   "kind": "leading",
+   "confidence": "HIGH",
+   "already_named": "yes",
+   "evidence": "soundStop: Warning! BGM cannot be stopped.(snd_id=%d)\\n",
+   "alt": [],
+   "collision": false,
+   "in_xd": true
+  },
+  {
+   "fn": "DVDOpen",
+   "addr": "800A501C",
+   "proposed": "DVDOpen",
+   "kind": "call",
+   "confidence": "MED",
+   "already_named": "yes",
+   "evidence": "Warning: DVDOpen(): file '%s' was not found under %s.\\n",
+   "alt": [],
+   "collision": true,
+   "in_xd": true
+  },
+  {
+   "fn": "HSD_MObjSetDefaultClass",
+   "addr": "801A7CFC",
+   "proposed": "hsdIsDescendantOf",
+   "kind": "call",
+   "confidence": "MED",
+   "already_named": "yes",
+   "evidence": "hsdIsDescendantOf(info, &hsdMObj)",
+   "alt": [],
+   "collision": true,
+   "in_xd": true
   },
   {
    "fn": "fn_800A501C",
@@ -152,9 +165,8 @@
    "already_named": "",
    "evidence": "Warning: DVDOpen(): file '%s' was not found under %s.\\n",
    "alt": [],
-   "collision": false,
-   "in_xd": true,
-   "salvaged": true
+   "collision": true,
+   "in_xd": true
   },
   {
    "fn": "fn_8011432C",
@@ -166,8 +178,7 @@
    "evidence": "floorReadGFLPreFunc(): can't alloc %d bytes of memory\\n",
    "alt": [],
    "collision": true,
-   "in_xd": true,
-   "salvaged": true
+   "in_xd": true
   },
   {
    "fn": "fn_8011445C",
@@ -179,8 +190,7 @@
    "evidence": "floorReadParticlePreFunc(): can't alloc %d bytes of memory\\n",
    "alt": [],
    "collision": true,
-   "in_xd": true,
-   "salvaged": true
+   "in_xd": true
   },
   {
    "fn": "fn_801145C0",
@@ -192,8 +202,7 @@
    "evidence": "floorReadParticlePreFunc(): can't alloc %d bytes of memory\\n",
    "alt": [],
    "collision": true,
-   "in_xd": true,
-   "salvaged": true
+   "in_xd": true
   },
   {
    "fn": "fn_80114634",
@@ -205,8 +214,7 @@
    "evidence": "floorReadWZXPreFunc(): can't alloc %d bytes of memory\\n",
    "alt": [],
    "collision": false,
-   "in_xd": true,
-   "salvaged": true
+   "in_xd": true
   },
   {
    "fn": "fn_801146A4",
@@ -218,8 +226,7 @@
    "evidence": "floorReadPKXPreFunc(): can't alloc %d bytes of memory\\n",
    "alt": [],
    "collision": false,
-   "in_xd": true,
-   "salvaged": true
+   "in_xd": true
   },
   {
    "fn": "fn_80114760",
@@ -231,8 +238,7 @@
    "evidence": "floorReadTexPreFunc(): can't alloc %d bytes of memory \\n",
    "alt": [],
    "collision": false,
-   "in_xd": true,
-   "salvaged": true
+   "in_xd": true
   },
   {
    "fn": "fn_8011487C",
@@ -244,8 +250,7 @@
    "evidence": "floorReadGFLPreFunc(): can't alloc %d bytes of memory\\n",
    "alt": [],
    "collision": true,
-   "in_xd": true,
-   "salvaged": true
+   "in_xd": true
   },
   {
    "fn": "fn_80114AE0",
@@ -257,8 +262,7 @@
    "evidence": "floorReadGFLPreFunc(): can't alloc %d bytes of memory\\n",
    "alt": [],
    "collision": true,
-   "in_xd": true,
-   "salvaged": true
+   "in_xd": true
   },
   {
    "fn": "fn_80114D6C",
@@ -270,8 +274,7 @@
    "evidence": "floorReadScriptPreFunc(): can't alloc %d bytes of memory\\n",
    "alt": [],
    "collision": false,
-   "in_xd": true,
-   "salvaged": true
+   "in_xd": true
   },
   {
    "fn": "fn_80114E78",
@@ -283,8 +286,7 @@
    "evidence": "floorReadFontPreFunc(): can't alloc %d bytes of memory\\n",
    "alt": [],
    "collision": false,
-   "in_xd": true,
-   "salvaged": true
+   "in_xd": true
   },
   {
    "fn": "fn_80114F84",
@@ -296,8 +298,7 @@
    "evidence": "floorReadMsgPreFunc(): can't alloc %d bytes of memory\\n",
    "alt": [],
    "collision": false,
-   "in_xd": true,
-   "salvaged": true
+   "in_xd": true
   },
   {
    "fn": "fn_80115024",
@@ -309,8 +310,7 @@
    "evidence": "floorReadNormalPreFunc(): can't alloc %d bytes of memory\\n",
    "alt": [],
    "collision": false,
-   "in_xd": true,
-   "salvaged": true
+   "in_xd": true
   },
   {
    "fn": "fn_801A7CFC",
@@ -321,10 +321,1722 @@
    "already_named": "",
    "evidence": "hsdIsDescendantOf(info, &hsdMObj)",
    "alt": [],
-   "collision": false,
-   "in_xd": true,
-   "salvaged": true
+   "collision": true,
+   "in_xd": true
   }
  ],
- "ported": []
+ "ported": [
+  {
+   "fn": "fn_80010C98",
+   "xd_fn": "menuPokemonCheckPokemonChange",
+   "name": "menuPokemonCheckPokemonChange",
+   "score": 1.0,
+   "shared": [
+    "menuPokemonCheckPokemonChange"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_80033278",
+   "xd_fn": "_sysvarsProcessData__FP16sysvarsFuncEntryPc",
+   "name": "_sysvarsProcessData__FP16sysvarsFuncEntryPc",
+   "score": 1.0,
+   "shared": [
+    "false"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "menuPokeCouponInit",
+   "xd_fn": "menuPokeCouponInit",
+   "name": "menuPokeCouponInit",
+   "score": 2.0,
+   "shared": [
+    "POKECOUPONREFER_INVALID != _menuPokeCouponWork.m_eRefer",
+    "menuPokeCoupon.c"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "HIGH"
+  },
+  {
+   "fn": "OSInit",
+   "xd_fn": "OSInit",
+   "name": "OSInit",
+   "score": 1.0,
+   "shared": [
+    "%08x\\n"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "__OSContextInit",
+   "xd_fn": "__OSContextInit",
+   "name": "__OSContextInit",
+   "score": 1.0,
+   "shared": [
+    "FPU-unavailable handler installed\\n"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "__OSUnhandledException",
+   "xd_fn": "__OSUnhandledException",
+   "name": "__OSUnhandledException",
+   "score": 1.25,
+   "shared": [
+    " in \\\"%s\\\" on line %d.\\n",
+    "\\n"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "OSLink",
+   "xd_fn": "Relocate",
+   "name": "Relocate",
+   "score": 1.0,
+   "shared": [
+    "OSLink: unknown relocation type %3d\\n"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "OSUnlink",
+   "xd_fn": "Undo",
+   "name": "Undo",
+   "score": 1.0,
+   "shared": [
+    "OSUnlink: unknown relocation type %3d\\n"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "__DBExceptionDestinationAux",
+   "xd_fn": "__DBExceptionDestinationAux",
+   "name": "__DBExceptionDestinationAux",
+   "score": 1.0,
+   "shared": [
+    "DBExceptionDestination\\n"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_800A4D28",
+   "xd_fn": "DVDConvertPathToEntrynum",
+   "name": "DVDConvertPathToEntrynum",
+   "score": 1.25,
+   "shared": [
+    "DVDConvertEntrynumToPath(possibly DVDOpen or DVDChangeDir or DVDOpenDir): specified directory or file (%s) doesn't match standard 8.3 format. This is a temporary restriction and will be removed soon\\n",
+    "dvdfs.c"
+   ],
+   "ambiguous": true,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_800A501C",
+   "xd_fn": "DVDOpen",
+   "name": "DVDOpen",
+   "score": 1.0,
+   "shared": [
+    "Warning: DVDOpen(): file '%s' was not found under %s.\\n"
+   ],
+   "ambiguous": true,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_800A532C",
+   "xd_fn": "DVDReadAsyncPrio",
+   "name": "DVDReadAsyncPrio",
+   "score": 1.25,
+   "shared": [
+    "DVDReadAsync(): specified area is out of the file  ",
+    "dvdfs.c"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_800A541C",
+   "xd_fn": "DVDReadPrio",
+   "name": "DVDReadPrio",
+   "score": 1.25,
+   "shared": [
+    "DVDRead(): specified area is out of the file  ",
+    "dvdfs.c"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_800A5558",
+   "xd_fn": "DVDSeekAsyncPrio",
+   "name": "DVDSeekAsyncPrio",
+   "score": 1.25,
+   "shared": [
+    "DVDSeek(): offset is out of the file  ",
+    "dvdfs.c"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "DVDInit",
+   "xd_fn": "DVDInit",
+   "name": "DVDInit",
+   "score": 1.0,
+   "shared": [
+    "load fst\\n"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "__fstLoad",
+   "xd_fn": "__fstLoad",
+   "name": "__fstLoad",
+   "score": 3.25,
+   "shared": [
+    "  Game Name ... %c%c%c%c\\n",
+    "OFF",
+    "ON"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "HIGH"
+  },
+  {
+   "fn": "fn_800A94AC",
+   "xd_fn": "VIConfigure",
+   "name": "VIConfigure",
+   "score": 1.0,
+   "shared": [
+    "vi.c"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "TRKNubWelcome",
+   "xd_fn": "TRKNubWelcome",
+   "name": "TRKNubWelcome",
+   "score": 1.0,
+   "shared": [
+    "MetroTRK for GAMECUBE v2.6"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "TRKInitializeNub",
+   "xd_fn": "TRKInitializeNub",
+   "name": "TRKInitializeNub",
+   "score": 1.0,
+   "shared": [
+    "Initialize NUB\\n"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "MessageSend",
+   "xd_fn": "TRKMessageSend",
+   "name": "TRKMessageSend",
+   "score": 1.0,
+   "shared": [
+    "MessageSend : cc_write returned %ld\\n"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_800BEF44",
+   "xd_fn": "TRKGetFreeBuffer",
+   "name": "TRKGetFreeBuffer",
+   "score": 1.0,
+   "shared": [
+    "ERROR : No buffer available\\n"
+   ],
+   "ambiguous": true,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "TRKDispatchMessage",
+   "xd_fn": "TRKDispatchMessage",
+   "name": "TRKDispatchMessage",
+   "score": 2.0,
+   "shared": [
+    "Dispatch command 0x%08x\\n",
+    "Dispatch complete err = %ld\\n"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "HIGH"
+  },
+  {
+   "fn": "SendACK",
+   "xd_fn": "TRKDoWriteRegisters",
+   "name": "TRKDoWriteRegisters",
+   "score": 1.0,
+   "shared": [
+    "SendACK : Calling MessageSend\\n"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_800C0504",
+   "xd_fn": "OutputData",
+   "name": "OutputData",
+   "score": 1.25,
+   "shared": [
+    "%02x ",
+    "\\n"
+   ],
+   "ambiguous": true,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "TRK_main",
+   "xd_fn": "TRK_main",
+   "name": "TRK_main",
+   "score": 1.0,
+   "shared": [
+    "TRK_Main \\n"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "__sys_free",
+   "xd_fn": "__sys_free",
+   "name": "__sys_free",
+   "score": 2.0,
+   "shared": [
+    "GCN_Mem_Alloc.c : InitDefaultHeap. No Heap Available\\n",
+    "Metrowerks CW runtime library initializing default heap\\n"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "HIGH"
+  },
+  {
+   "fn": "fn_800D2248",
+   "xd_fn": "_cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID",
+   "name": "_cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID",
+   "score": 1.0,
+   "shared": [
+    "cobj",
+    "cobj.h"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_800D39E0",
+   "xd_fn": "GSgfxInit__FP15_GSgfxInitParms",
+   "name": "GSgfxInit__FP15_GSgfxInitParms",
+   "score": 1.0,
+   "shared": [
+    "GSgfx: Init OK, state located at %08Xh (size=%d)\\n"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_800E8684",
+   "xd_fn": "modelShadowRender__FP10GSgfxLayer",
+   "name": "modelShadowRender__FP10GSgfxLayer",
+   "score": 1.0,
+   "shared": [
+    "shadow",
+    "shadow.h"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_800EE3BC",
+   "xd_fn": "GSpartGetTransform",
+   "name": "GSpartGetTransform",
+   "score": 1.0,
+   "shared": [
+    "GSpart: child node too deep\\n",
+    "jobj",
+    "jobj.h"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "GStextureCreate",
+   "xd_fn": "GStextureCreate",
+   "name": "GStextureCreate",
+   "score": 2.0,
+   "shared": [
+    "GStexture: invalid texture format\\n",
+    "GStexture: warning -- texture size adjusted from [%d,%d] to [%d,%d]\\n"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "HIGH"
+  },
+  {
+   "fn": "GSthreadCreate",
+   "xd_fn": "GSthreadCreate",
+   "name": "GSthreadCreate",
+   "score": 1.0,
+   "shared": [
+    "GSthreadCreate. Warning: 'usesFPU==FALE' OK?\\n"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "GSthread",
+   "xd_fn": "GSthreadInit",
+   "name": "GSthreadInit",
+   "score": 1.0,
+   "shared": [
+    "GSthread: Init OK, maximum of %d threads\\n"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_800FE010",
+   "xd_fn": "_msgGetSize__FPCUs",
+   "name": "_msgGetSize__FPCUs",
+   "score": 1.0,
+   "shared": [
+    "_msgCallCtrlFunc",
+    "_msgGetSize() failed.\\n"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_8010A5BC",
+   "xd_fn": "menuModelInit",
+   "name": "menuModelInit",
+   "score": 1.0,
+   "shared": [
+    "menuModelInit"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "floorEventChangeTresure",
+   "xd_fn": "floorEventChangeTresure",
+   "name": "floorEventChangeTresure",
+   "score": 1.0,
+   "shared": [
+    "floorEventChangeTresure"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "floorUpdateFieldCamera",
+   "xd_fn": "_floorFieldCameraCalculateBlendParams__FP5GSvecPfPfPfPf",
+   "name": "_floorFieldCameraCalculateBlendParams__FP5GSvecPfPfPfPf",
+   "score": 1.0,
+   "shared": [
+    "floorUpdateFieldCamera: error updating field camera - divide by zero!"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_80132FD8",
+   "xd_fn": "GSmoviePlay",
+   "name": "GSmoviePlay",
+   "score": 1.0,
+   "shared": [
+    "movie"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "_leaffxGenerateLeafData",
+   "xd_fn": "GenerateLeafData__10leafEffectFP8leafData",
+   "name": "GenerateLeafData__10leafEffectFP8leafData",
+   "score": 1.0,
+   "shared": [
+    "_leaffxGenerateLeafData: Could not create leaf clone model.\\n"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "filterStart",
+   "xd_fn": "_start__12filterEffectFv",
+   "name": "_start__12filterEffectFv",
+   "score": 1.0,
+   "shared": [
+    "filterStart: Could not start filter effect - invalid filter!\\n"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "_pachiruEffectCreateTexture__FP9GStextureP9GStextureUl",
+   "xd_fn": "_pachiruEffectCreateTexture__FP9GStextureP9GStextureUl",
+   "name": "_pachiruEffectCreateTexture__FP9GStextureP9GStextureUl",
+   "score": 1.0,
+   "shared": [
+    "Failed to create Patchiru texture\\n"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "soundStop",
+   "xd_fn": "soundStop",
+   "name": "soundStop",
+   "score": 1.0,
+   "shared": [
+    "soundStop: Warning! BGM cannot be stopped.(snd_id=%d)\\n"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "_sndCheckSndWorkALL",
+   "xd_fn": "_sndCheckSndWorkALL",
+   "name": "_sndCheckSndWorkALL",
+   "score": 2.0,
+   "shared": [
+    "_sndCheckSndWorkALL:End\\n",
+    "_sndCheckSndWorkALL:Start\\n"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "HIGH"
+  },
+  {
+   "fn": "psInterpretParticles",
+   "xd_fn": "psInterpretParticles",
+   "name": "psInterpretParticles",
+   "score": 2.0,
+   "shared": [
+    "lastPP",
+    "psinterpret.c"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "HIGH"
+  },
+  {
+   "fn": "fn_8017AC40",
+   "xd_fn": "_fsysInitTOC",
+   "name": "_fsysInitTOC",
+   "score": 1.0,
+   "shared": [
+    "gsfsys.toc"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_8017EB6C",
+   "xd_fn": "_fsysGetFilename",
+   "name": "_fsysGetFilename",
+   "score": 1.0,
+   "shared": [
+    "%s.fsys"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_801821B8",
+   "xd_fn": "peopleWaitSyncMotion",
+   "name": "peopleWaitSyncMotion",
+   "score": 1.0,
+   "shared": [
+    "peopleWaitSyncMotion"
+   ],
+   "ambiguous": true,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_8018B07C",
+   "xd_fn": "peopleWaitSyncMotion",
+   "name": "peopleWaitSyncMotion",
+   "score": 1.0,
+   "shared": [
+    "peopleWaitSyncMotion"
+   ],
+   "ambiguous": true,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_8018FE30",
+   "xd_fn": "_flagSet",
+   "name": "_flagSet",
+   "score": 2.0,
+   "shared": [
+    "ERROR[GSflagSet]:Initialization has not finished.\\n",
+    "ERROR[GSflagSet]:Overflow BitValue FlagID=%d Value=%d (%d BitLength=%d)>(Limit=%dBit).\\n"
+   ],
+   "ambiguous": true,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_801903B0",
+   "xd_fn": "_flagSet",
+   "name": "_flagSet",
+   "score": 2.0,
+   "shared": [
+    "ERROR[GSflagSet]:Initialization has not finished.\\n",
+    "ERROR[GSflagSet]:Overflow BitValue FlagID=%d Value=%d (%d BitLength=%d)>(Limit=%dBit).\\n"
+   ],
+   "ambiguous": true,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_80190528",
+   "xd_fn": "_flagSet",
+   "name": "_flagSet",
+   "score": 2.0,
+   "shared": [
+    "ERROR[GSflagSet]:Initialization has not finished.\\n",
+    "ERROR[GSflagSet]:Overflow BitValue FlagID=%d Value=%d (%d BitLength=%d)>(Limit=%dBit).\\n"
+   ],
+   "ambiguous": true,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_8019075C",
+   "xd_fn": "_flagSet",
+   "name": "_flagSet",
+   "score": 2.0,
+   "shared": [
+    "ERROR[GSflagSet]:Initialization has not finished.\\n",
+    "ERROR[GSflagSet]:Overflow BitValue FlagID=%d Value=%d (%d BitLength=%d)>(Limit=%dBit).\\n"
+   ],
+   "ambiguous": true,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "GSflagInitBitPos",
+   "xd_fn": "_flagSet",
+   "name": "_flagSet",
+   "score": 1.0,
+   "shared": [
+    "ERROR[GSflagSet]:Initialization has not finished.\\n"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "WObjUpdateFunc",
+   "xd_fn": "WObjUpdateFunc",
+   "name": "WObjUpdateFunc",
+   "score": 2.83,
+   "shared": [
+    "jobj",
+    "jobj.h",
+    "jp"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "HIGH"
+  },
+  {
+   "fn": "HSD_ArchiveParse",
+   "xd_fn": "HSD_ArchiveParse",
+   "name": "HSD_ArchiveParse",
+   "score": 1.0,
+   "shared": [
+    "HSD_ArchiveParse: byte-order mismatch! Please check data format\\n"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_801920E4",
+   "xd_fn": "HSD_ByteCodeEval",
+   "name": "HSD_ByteCodeEval",
+   "score": 1.0,
+   "shared": [
+    "stack"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "hsdInitClassInfo",
+   "xd_fn": "hsdInitClassInfo",
+   "name": "hsdInitClassInfo",
+   "score": 3.0,
+   "shared": [
+    "class.c",
+    "class_info->head.info_size >= parent_info->head.info_size",
+    "class_info->head.obj_size >= parent_info->head.obj_size"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "HIGH"
+  },
+  {
+   "fn": "HSD_CObjGetEyeDistance",
+   "xd_fn": "HSD_CObjGetEyeDistance",
+   "name": "HSD_CObjGetEyeDistance",
+   "score": 2.0,
+   "shared": [
+    "cobj",
+    "cobj->eyepos",
+    "cobj->interest"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "HIGH"
+  },
+  {
+   "fn": "__assert",
+   "xd_fn": "__assert",
+   "name": "__assert",
+   "score": 1.5,
+   "shared": [
+    "%s in %s on line %d.\\n",
+    "assertion \\\"%s\\\" failed"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_80197A64",
+   "xd_fn": "_HSD_mkEnvelopeModelNodeMtx",
+   "name": "_HSD_mkEnvelopeModelNodeMtx",
+   "score": 1.5,
+   "shared": [
+    "displayfunc.c",
+    "jobj",
+    "x"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_80197B6C",
+   "xd_fn": "HSD_JObjMakePositionMtx",
+   "name": "HSD_JObjMakePositionMtx",
+   "score": 1.5,
+   "shared": [
+    "displayfunc.c",
+    "unkown type of billboard.\\n"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "DObjLoad",
+   "xd_fn": "DObjLoad",
+   "name": "DObjLoad",
+   "score": 2.0,
+   "shared": [
+    "dobj",
+    "dobj.c",
+    "mobj has unexpected blending flags (0x%x)."
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "HIGH"
+  },
+  {
+   "fn": "fn_80199794",
+   "xd_fn": "HSD_FObjLoadDesc",
+   "name": "HSD_FObjLoadDesc",
+   "score": 1.25,
+   "shared": [
+    "fobj.c",
+    "fobj: alloc",
+    "new"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_80199AF8",
+   "xd_fn": "HSD_FObjInterpretAnim",
+   "name": "HSD_FObjInterpretAnim",
+   "score": 1.25,
+   "shared": [
+    "fobj.c",
+    "st == FOBJ_LOAD_WAIT"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_8019A24C",
+   "xd_fn": "FObjLoadData",
+   "name": "FObjLoadData",
+   "score": 1.25,
+   "shared": [
+    "fobj.c",
+    "st == FOBJ_LOAD_DATA0 || st == FOBJ_LOAD_DATA"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_FObjRemoveAll",
+   "xd_fn": "HSD_FObjRemoveAll",
+   "name": "HSD_FObjRemoveAll",
+   "score": 1.0,
+   "shared": [
+    "fobj: free"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_8019BB78",
+   "xd_fn": "HSD_FogSet",
+   "name": "HSD_FogSet",
+   "score": 1.0,
+   "shared": [
+    "fog.c"
+   ],
+   "ambiguous": true,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_8019BD18",
+   "xd_fn": "HSD_FogSet",
+   "name": "HSD_FogSet",
+   "score": 2.0,
+   "shared": [
+    "You must specify CObj first.\\n",
+    "fog.c"
+   ],
+   "ambiguous": true,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_HashSearch",
+   "xd_fn": "HSD_HashSearch",
+   "name": "HSD_HashSearch",
+   "score": 2.0,
+   "shared": [
+    "hash.c",
+    "idx < hash->table_size"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "HIGH"
+  },
+  {
+   "fn": "HSD_IDInsertToTable",
+   "xd_fn": "HSD_IDInsertToTable",
+   "name": "HSD_IDInsertToTable",
+   "score": 2.0,
+   "shared": [
+    "entry",
+    "id.c"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "HIGH"
+  },
+  {
+   "fn": "_HSD_MemAllocDefaultCB",
+   "xd_fn": "_HSD_MemAllocDefaultCB",
+   "name": "_HSD_MemAllocDefaultCB",
+   "score": 1.33,
+   "shared": [
+    "addr",
+    "initialize.c"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_8019FF74",
+   "xd_fn": "HSD_JObjAddNext",
+   "name": "HSD_JObjAddNext",
+   "score": 1.33,
+   "shared": [
+    "can not find specified jobj. maybe jobj tree is broken.\\n",
+    "jobj.c",
+    "prev"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_801A39AC",
+   "xd_fn": "HSD_JObjWalkTree0",
+   "name": "HSD_JObjWalkTree0",
+   "score": 1.0,
+   "shared": [
+    "jobj->parent",
+    "jobj.c"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_801A3EB4",
+   "xd_fn": "HSD_SListPrepend",
+   "name": "HSD_SListPrepend",
+   "score": 1.17,
+   "shared": [
+    "list",
+    "list.c",
+    "prev"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_801A4344",
+   "xd_fn": "HSD_LObjLoadDesc",
+   "name": "HSD_LObjLoadDesc",
+   "score": 1.0,
+   "shared": [
+    "*p",
+    "lobj.c",
+    "new"
+   ],
+   "ambiguous": true,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_801A4440",
+   "xd_fn": "LObjLoad",
+   "name": "LObjLoad",
+   "score": 1.0,
+   "shared": [
+    "lobj.c",
+    "unexpected lightdesc flags (%x)\\n"
+   ],
+   "ambiguous": true,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_LObjSetInterest",
+   "xd_fn": "HSD_LObjSetInterest",
+   "name": "HSD_LObjSetInterest",
+   "score": 1.25,
+   "shared": [
+    "lobj",
+    "lobj->interest",
+    "lobj.c"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_LObjSetPosition",
+   "xd_fn": "HSD_LObjSetPosition",
+   "name": "HSD_LObjSetPosition",
+   "score": 1.25,
+   "shared": [
+    "lobj",
+    "lobj->position",
+    "lobj.c"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_801A4D20",
+   "xd_fn": "HSD_LObjAddCurrentAll",
+   "name": "HSD_LObjAddCurrentAll",
+   "score": 1.25,
+   "shared": [
+    "HSD_OBJ(o)->ref_count != HSD_OBJ_NOREF",
+    "lobj",
+    "lobj.h"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "_HSD_MemSetCallbacks",
+   "xd_fn": "_HSD_MemSetCallbacks",
+   "name": "_HSD_MemSetCallbacks",
+   "score": 2.0,
+   "shared": [
+    "memory.c",
+    "size == sizeof(__mem_cb)"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "HIGH"
+  },
+  {
+   "fn": "MObjSetupTev",
+   "xd_fn": "MObjSetupTev",
+   "name": "MObjSetupTev",
+   "score": 1.0,
+   "shared": [
+    "mobj->tevdesc",
+    "mobj.c"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_801A7B24",
+   "xd_fn": "HSD_MObjLoadDesc",
+   "name": "HSD_MObjLoadDesc",
+   "score": 1.0,
+   "shared": [
+    "mobj",
+    "mobj.c"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_801A7CFC",
+   "xd_fn": "HSD_MObjSetDefaultClass",
+   "name": "HSD_MObjSetDefaultClass",
+   "score": 1.0,
+   "shared": [
+    "hsdIsDescendantOf(info, &hsdMObj)",
+    "mobj.c"
+   ],
+   "ambiguous": true,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_801A7D58",
+   "xd_fn": "MObjLoad",
+   "name": "MObjLoad",
+   "score": 1.0,
+   "shared": [
+    "mat",
+    "mobj.c"
+   ],
+   "ambiguous": true,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_VecAlloc",
+   "xd_fn": "HSD_VecAlloc",
+   "name": "HSD_VecAlloc",
+   "score": 1.5,
+   "shared": [
+    "mtx.c",
+    "vec"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_801AA35C",
+   "xd_fn": "HSD_ObjAllocInit",
+   "name": "HSD_ObjAllocInit",
+   "score": 1.0,
+   "shared": [
+    "data"
+   ],
+   "ambiguous": true,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_801AB538",
+   "xd_fn": "HSD_PObjGetMtxMark",
+   "name": "HSD_PObjGetMtxMark",
+   "score": 1.33,
+   "shared": [
+    "mark",
+    "obj",
+    "pobj.c"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "get_shape_normal_xyz",
+   "xd_fn": "get_shape_normal_xyz",
+   "name": "get_shape_normal_xyz",
+   "score": 2.0,
+   "shared": [
+    "pobj.c",
+    "shape_set->normal_desc->comp_cnt == GX_NRM_XYZ",
+    "unexpected normal type."
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "HIGH"
+  },
+  {
+   "fn": "fn_801AC91C",
+   "xd_fn": "get_shape_vertex_xyz",
+   "name": "get_shape_vertex_xyz",
+   "score": 1.0,
+   "shared": [
+    "pobj.c",
+    "shape_set->vertex_desc->comp_cnt == GX_POS_XYZ"
+   ],
+   "ambiguous": true,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_801AE5E8",
+   "xd_fn": "HSD_RObjLoadDesc",
+   "name": "HSD_RObjLoadDesc",
+   "score": 1.25,
+   "shared": [
+    "new",
+    "robj.c",
+    "robj: alloc"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_801B4300",
+   "xd_fn": "HSD_TExpCompile",
+   "name": "HSD_TExpCompile",
+   "score": 1.5,
+   "shared": [
+    "tevdesc",
+    "texp.c",
+    "texp_list"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_801B4614",
+   "xd_fn": "HSD_TExpSetReg",
+   "name": "HSD_TExpSetReg",
+   "score": 1.0,
+   "shared": [
+    "clist->type == HSD_TE_CNST",
+    "texp.c"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_801B4B5C",
+   "xd_fn": "TExp2TevDesc",
+   "name": "TExp2TevDesc",
+   "score": 1.0,
+   "shared": [
+    "desc",
+    "texp",
+    "texp.c"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_801B6F5C",
+   "xd_fn": "HSD_TExpCnst",
+   "name": "HSD_TExpCnst",
+   "score": 1.0,
+   "shared": [
+    "texp",
+    "texp->cnst.ctype == type",
+    "texp.c"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_801B8024",
+   "xd_fn": "HSD_TExpMakeDag",
+   "name": "HSD_TExpMakeDag",
+   "score": 1.0,
+   "shared": [
+    "l < num"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_ImageDescAlloc",
+   "xd_fn": "HSD_ImageDescAlloc",
+   "name": "HSD_ImageDescAlloc",
+   "score": 1.0,
+   "shared": [
+    "idesc",
+    "tobj.c"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_Index2TexMtx",
+   "xd_fn": "HSD_Index2TexMtx",
+   "name": "HSD_Index2TexMtx",
+   "score": 1.0,
+   "shared": [
+    "texmtx index exceed hardware limit (%d).\\n",
+    "tobj.c"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_TObjSetup",
+   "xd_fn": "HSD_TObjSetup",
+   "name": "HSD_TObjSetup",
+   "score": 2.25,
+   "shared": [
+    "0",
+    "imagedesc",
+    "imagedesc->image_ptr"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "HIGH"
+  },
+  {
+   "fn": "fn_801BC33C",
+   "xd_fn": "HSD_TObjAssignResources",
+   "name": "HSD_TObjAssignResources",
+   "score": 1.0,
+   "shared": [
+    "0",
+    "tobj.c",
+    "unexpected texmap id.\\n"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_801BE2B4",
+   "xd_fn": "MakeTextureMtx",
+   "name": "MakeTextureMtx",
+   "score": 1.0,
+   "shared": [
+    "tobj->repeat_s && tobj->repeat_t",
+    "tobj.c"
+   ],
+   "ambiguous": true,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_801BE598",
+   "xd_fn": "TObjLoad",
+   "name": "TObjLoad",
+   "score": 1.58,
+   "shared": [
+    "new",
+    "tev",
+    "tlut"
+   ],
+   "ambiguous": true,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_Index2PosNrmMtx",
+   "xd_fn": "HSD_Index2PosNrmMtx",
+   "name": "HSD_Index2PosNrmMtx",
+   "score": 1.0,
+   "shared": [
+    "0",
+    "util.c"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_ForeachAnim",
+   "xd_fn": "HSD_ForeachAnim",
+   "name": "HSD_ForeachAnim",
+   "score": 2.33,
+   "shared": [
+    "aobj.c",
+    "unexpected argument format.\\n",
+    "unexpected type of object.\\n"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "HIGH"
+  },
+  {
+   "fn": "fn_801C71B0",
+   "xd_fn": "fadeFluidInit",
+   "name": "fadeFluidInit",
+   "score": 1.0,
+   "shared": [
+    "Warning: fadeFluid c parm. Limit Over!! -> 0.0f < %f < %f\\n"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "_vtrTexDispFunc__Fv",
+   "xd_fn": "_vtrTexDispFunc__Fv",
+   "name": "_vtrTexDispFunc__Fv",
+   "score": 4.33,
+   "shared": [
+    "???",
+    "Pause",
+    "Play"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "HIGH"
+  },
+  {
+   "fn": "tableResBiosGetResPtr",
+   "xd_fn": "tableResBiosGetResPtr",
+   "name": "tableResBiosGetResPtr",
+   "score": 1.0,
+   "shared": [
+    "tableResBiosGetResPtr"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "DVDConvertPathToEntrynum",
+   "xd_fn": "DVDConvertPathToEntrynum",
+   "name": "DVDConvertPathToEntrynum",
+   "score": 1.25,
+   "shared": [
+    "DVDConvertEntrynumToPath(possibly DVDOpen or DVDChangeDir or DVDOpenDir): specified directory or file (%s) doesn't match standard 8.3 format. This is a temporary restriction and will be removed soon\\n",
+    "dvdfs.c"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "DVDOpen",
+   "xd_fn": "DVDOpen",
+   "name": "DVDOpen",
+   "score": 1.0,
+   "shared": [
+    "Warning: DVDOpen(): file '%s' was not found under %s.\\n"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "battleGridReplacePokemon",
+   "xd_fn": "battleGridReplacePokemon",
+   "name": "battleGridReplacePokemon",
+   "score": 1.0,
+   "shared": [
+    "battleGridReplacePokemon: NULL argument"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_801EF374",
+   "xd_fn": "_fightFinalize__FUi14FloorEnterMode",
+   "name": "_fightFinalize__FUi14FloorEnterMode",
+   "score": 1.0,
+   "shared": [
+    "---------- fight end !! ---------- \\n"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_801EF4B0",
+   "xd_fn": "_fightInitialize__FUi14FloorEnterMode",
+   "name": "_fightInitialize__FUi14FloorEnterMode",
+   "score": 1.0,
+   "shared": [
+    "---------- fight start !! ---------- \\n"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_8010C388",
+   "xd_fn": "_menuFaceBiosGetPtr__FUs",
+   "name": "_menuFaceBiosGetPtr__FUs",
+   "score": 1.0,
+   "shared": [
+    "_menuFaceBiosGetPtr"
+   ],
+   "ambiguous": true,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_8010C3FC",
+   "xd_fn": "_menuFaceBiosGetPtr__FUs",
+   "name": "_menuFaceBiosGetPtr__FUs",
+   "score": 1.0,
+   "shared": [
+    "_menuFaceBiosGetPtr"
+   ],
+   "ambiguous": true,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_80113248",
+   "xd_fn": "_floorInitCharacters__FP11GSfloor_dd_",
+   "name": "_floorInitCharacters__FP11GSfloor_dd_",
+   "score": 1.0,
+   "shared": [
+    "_floorInitCharacters"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_801134E4",
+   "xd_fn": "floorInitMap",
+   "name": "floorInitMap",
+   "score": 1.0,
+   "shared": [
+    "floorInitMap"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_80113D58",
+   "xd_fn": "floorOpenObject",
+   "name": "floorOpenObject",
+   "score": 1.0,
+   "shared": [
+    "floorOpenObject"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "menuCloseSync",
+   "xd_fn": "menuCloseSync",
+   "name": "menuCloseSync",
+   "score": 1.0,
+   "shared": [
+    "menuCloseSync"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_80102568",
+   "xd_fn": "menuCloseSync",
+   "name": "menuCloseSync",
+   "score": 1.0,
+   "shared": [
+    "menuCloseSync"
+   ],
+   "ambiguous": true,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_801026A4",
+   "xd_fn": "menuCloseSync",
+   "name": "menuCloseSync",
+   "score": 1.0,
+   "shared": [
+    "menuCloseSync"
+   ],
+   "ambiguous": true,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_801045A8",
+   "xd_fn": "windowCheckCursor",
+   "name": "windowCheckCursor",
+   "score": 1.0,
+   "shared": [
+    "windowCheckCursor"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fn_800DDF54",
+   "xd_fn": "GSlogInit",
+   "name": "GSlogInit",
+   "score": 1.0,
+   "shared": [
+    "0123456789ABCDEF"
+   ],
+   "ambiguous": false,
+   "col_named": false,
+   "confidence": "MED"
+  },
+  {
+   "fn": "GSmaterialSetPEdescr",
+   "xd_fn": "GSmaterialSetPEdescr",
+   "name": "GSmaterialSetPEdescr",
+   "score": 1.0,
+   "shared": [
+    "GSmaterialSetPEdescr: Warning: already using a custom description!\\n"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "_matGSmatEnableEnvMapExt",
+   "xd_fn": "_matGSmatEnableEnvMapExt",
+   "name": "_matGSmatEnableEnvMapExt",
+   "score": 2.0,
+   "shared": [
+    "GSmaterial: Error creating environment map: no texture defined!\\n",
+    "GSmaterial: Unsupported texture format for environment map!\\n"
+   ],
+   "ambiguous": false,
+   "col_named": true,
+   "confidence": "HIGH"
+  },
+  {
+   "fn": "HSD_FogSet",
+   "xd_fn": "HSD_FogSet",
+   "name": "HSD_FogSet",
+   "score": 2.0,
+   "shared": [
+    "You must specify CObj first.\\n",
+    "fog.c"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_LObjLoadDesc",
+   "xd_fn": "HSD_LObjLoadDesc",
+   "name": "HSD_LObjLoadDesc",
+   "score": 1.0,
+   "shared": [
+    "*p",
+    "lobj.c",
+    "new"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "LObjLoad",
+   "xd_fn": "LObjLoad",
+   "name": "LObjLoad",
+   "score": 1.0,
+   "shared": [
+    "lobj.c",
+    "unexpected lightdesc flags (%x)\\n"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_MObjSetDefaultClass",
+   "xd_fn": "HSD_MObjSetDefaultClass",
+   "name": "HSD_MObjSetDefaultClass",
+   "score": 1.0,
+   "shared": [
+    "hsdIsDescendantOf(info, &hsdMObj)",
+    "mobj.c"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "MObjLoad",
+   "xd_fn": "MObjLoad",
+   "name": "MObjLoad",
+   "score": 1.0,
+   "shared": [
+    "mat",
+    "mobj.c"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_ObjAllocInit",
+   "xd_fn": "HSD_ObjAllocInit",
+   "name": "HSD_ObjAllocInit",
+   "score": 1.0,
+   "shared": [
+    "data"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "get_shape_vertex_xyz",
+   "xd_fn": "get_shape_vertex_xyz",
+   "name": "get_shape_vertex_xyz",
+   "score": 1.0,
+   "shared": [
+    "pobj.c",
+    "shape_set->vertex_desc->comp_cnt == GX_POS_XYZ"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "MakeTextureMtx",
+   "xd_fn": "MakeTextureMtx",
+   "name": "MakeTextureMtx",
+   "score": 1.0,
+   "shared": [
+    "tobj->repeat_s && tobj->repeat_t",
+    "tobj.c"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "TObjLoad",
+   "xd_fn": "TObjLoad",
+   "name": "TObjLoad",
+   "score": 1.58,
+   "shared": [
+    "new",
+    "tev",
+    "tlut"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "TRKGetFreeBuffer",
+   "xd_fn": "TRKGetFreeBuffer",
+   "name": "TRKGetFreeBuffer",
+   "score": 1.0,
+   "shared": [
+    "ERROR : No buffer available\\n"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "OutputData",
+   "xd_fn": "OutputData",
+   "name": "OutputData",
+   "score": 1.25,
+   "shared": [
+    "%02x ",
+    "\\n"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  }
+ ]
 }

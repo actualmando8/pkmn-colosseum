@@ -1905,7 +1905,7 @@ void fn_8001D834(void) {
 /* 0x8001D8E8 | 0xAC */
 extern void fn_801046B8();
 extern void fn_80102868(void);
-extern void fn_801045A8(void);
+extern void windowCheckCursor(void);
 extern void fn_801043A4(void);
 #if 0
 asm void fn_8001D8E8(void) {
@@ -1917,7 +1917,7 @@ void fn_8001D8E8(void) {
     extern void fn_801026A4();
     extern void fn_80102868();
     extern void fn_801043A4();
-    extern void fn_801045A8();
+    extern void windowCheckCursor();
     extern void fn_801046B8();
     u8 sp[0x30];
     u32 tmp = 0;
@@ -1956,7 +1956,7 @@ void fn_8001D8E8(void) {
     fn_80102868();
     r3 = 0xe7;
     r4 = 0x1;
-    fn_801045A8();
+    windowCheckCursor();
     r3 = 0xe7;
     fn_801043A4();
     tmp = r3;
@@ -2429,7 +2429,7 @@ s32 fn_8001E3E0(void* a, u32* b) {
     extern void fn_801026A4(s32, ...);
     extern void fn_80102868();
     extern void fn_801043A4();
-    extern void fn_801045A8();
+    extern void windowCheckCursor();
     extern u8* fn_80104704();
     extern void fn_80102510();
     void* r4_tmp;
@@ -2441,7 +2441,7 @@ s32 fn_8001E3E0(void* a, u32* b) {
     a_save = a;
     fn_801026A4(0x2, r4_tmp, 0, 0, 0, 0x3, a_save, 0x1, 0);
     fn_80102868(0x2, 0x32, 0x3c);
-    fn_801045A8(0x2, 0x1);
+    windowCheckCursor(0x2, 0x1);
     fn_801043A4(0x2);
     r3 = fn_80104704(0x2);
     if (r3 != 0) {
@@ -6400,7 +6400,7 @@ void fn_8001B184(void) {
 
 /* fn_8001B1EC - 0x8001B1EC | size: 0x8d8 */
 extern void fn_8010B01C();
-extern u32 fn_80010C98();
+extern u32 menuPokemonCheckPokemonChange();
 extern void fn_80097E58();
 extern f32 fn_8011FC14();
 extern u32 fn_8010B560();
@@ -6557,7 +6557,7 @@ s32 fn_8001B1EC() {
                     break;
                 }
                 if (action == 0) {
-                    if ((u8)fn_80010C98(*(void**)(ctx + 0x18), *(u32*)(ctx + 0xC), (s8)selection) != 0) {
+                    if ((u8)menuPokemonCheckPokemonChange(*(void**)(ctx + 0x18), *(u32*)(ctx + 0xC), (s8)selection) != 0) {
                         action = -1;
                     } else {
                         action = 1;
@@ -7092,7 +7092,7 @@ s8 fn_8001E074(u8 arg1, s16 arg2, s16 arg3, u32 arg4) {
     extern void* fn_801046B8();
     extern s32 fn_801026A4(s32, ...);
     extern void fn_80102868(s32, s16, s16);
-    extern void fn_801045A8(s32, s32);
+    extern void windowCheckCursor(s32, s32);
     extern u32 fn_801043A4(s32);
     extern void fn_80102568(s32, s32, s32);
     u32 sp8;
@@ -7106,7 +7106,7 @@ s8 fn_8001E074(u8 arg1, s16 arg2, s16 arg3, u32 arg4) {
     r31 = r30;
     fn_801026A4((s32)r31, fn_801046B8(), &sp8, 0, 0, 0);
     if (arg2 >= 0 && arg3 >= 0) fn_80102868((s32)r31, arg2, arg3);
-    fn_801045A8((s32)r31, 0x1);
+    windowCheckCursor((s32)r31, 0x1);
     r30 = (s8)fn_801043A4((s32)r31);
     fn_80102568((s32)r31, 0x0, 0x1);
     return (s8)r30;
@@ -7125,14 +7125,14 @@ asm void fn_8001E184(void) {
 s32 fn_8001E184(void) {
     extern void* fn_801046B8();
     extern void fn_801026A4(s32, ...);
-    extern void fn_801045A8();
+    extern void windowCheckCursor();
     extern u32 fn_801043A4();
     extern void fn_80102568();
     u32 sp8;
     s8 r31;
     sp8 = 0;
     fn_801026A4(0x12, fn_801046B8(), &sp8, 0, 0, 0);
-    fn_801045A8(0x12, 0x1);
+    windowCheckCursor(0x12, 0x1);
     r31 = (s8)fn_801043A4(0x12);
     fn_80102568(0x12, 0x0, 0x1);
     return r31;
@@ -7168,7 +7168,7 @@ s32 fn_8001E224(void* a, u32* b, u8 c, void* d, void* e, u8 f) {
     extern void* fn_801046B8();
     extern void fn_801026A4(s32, ...);
     extern void fn_80102868();
-    extern void fn_801045A8();
+    extern void windowCheckCursor();
     extern void fn_801043A4();
     extern u8* fn_80104704();
     extern void fn_80102510();
@@ -7181,7 +7181,7 @@ s32 fn_8001E224(void* a, u32* b, u8 c, void* d, void* e, u8 f) {
     c_val = c;
     fn_801026A4(0x2, r4, 0, 0, 0, 0x3, a, c_val, 0);
     fn_80102868(0x2, d, e);
-    fn_801045A8(0x2, 0x1);
+    windowCheckCursor(0x2, 0x1);
     fn_801043A4(0x2);
     r3 = fn_80104704(0x2);
     if (r3 != 0) {
@@ -7206,7 +7206,7 @@ s32 fn_8001E304(void* a, u32* b, void* c) {
     extern void* fn_801046B8();
     extern void fn_801026A4(s32, ...);
     extern void fn_80102868();
-    extern void fn_801045A8();
+    extern void windowCheckCursor();
     extern void fn_801043A4();
     extern u8* fn_80104704();
     extern void fn_80102510();
@@ -7217,7 +7217,7 @@ s32 fn_8001E304(void* a, u32* b, void* c) {
     r4_tmp = fn_801046B8();
     fn_801026A4(0x2, r4_tmp, 0, 0, 0, 0x3, a, 0x1, c);
     fn_80102868(0x2, 0x32, 0x3c);
-    fn_801045A8(0x2, 0x1);
+    windowCheckCursor(0x2, 0x1);
     fn_801043A4(0x2);
     r3 = fn_80104704(0x2);
     if (r3 != 0) {

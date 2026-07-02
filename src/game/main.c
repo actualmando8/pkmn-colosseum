@@ -72,7 +72,7 @@ extern void fn_800AE5C0(void);                          /* DVDFSInit or DVDSetAu
 extern void fn_800AC440(void* arAddr);   /* ARInit / ARQInit */
 
 /* --- Graphics init --- */
-extern void fn_800DDF54(u32 xfbSize, u32 numXfbs);   /* GXInit or framebuffer setup */
+extern void GSlogInit(u32 xfbSize, u32 numXfbs);   /* GXInit or framebuffer setup */
 extern void fn_800EEDF8(u32 unused);                   /* VI init */
 
 /* --- Game-specific init called from main --- */
@@ -84,7 +84,7 @@ void fn_800057B0(void);
 
 /* --- Subsystem init functions called from fn_800057B0 --- */
 extern void GSthread(u32 numFrames);              /* VIFrameInit or render timing */
-extern void fn_800D39E0(u32 memSize, u32 a, u32 b,   /* GSgfx init */
+extern void GSgfxInit__FP15_GSgfxInitParms(u32 memSize, u32 a, u32 b,   /* GSgfx init */
                          u32 c, u32 d, u32 e);
 extern u32  fn_800A0F58(void);                         /* OSGetResetSwitchState (checks warm boot) */
 extern void fn_800D37D4(u32, u32, u32, u32, u32, u32);/* GSgfx video mode config */
@@ -415,7 +415,7 @@ int main(int argc, char** argv) {
     AIInit((void*)(lbl_8039A700 + 0x3FF8));
 
     /* Initialize XFB (external framebuffer): 0x10000 bytes, 1 buffer */
-    fn_800DDF54(0x10000, 1);
+    GSlogInit(0x10000, 1);
 
     /* Initialize scratch allocator */
     GSscratchInit(0);
@@ -561,7 +561,7 @@ void fn_800057B0(void) {
      *   memSize = 0x6DDD0 (450000 bytes)
      *   fifoSize = 16, matrixStackDepth = 8, lightCount = 32,
      *   useDoubleBuf = 1, displayListSize = 0x1E0 */
-    fn_800D39E0(0x6DDD0, 0x10, 0x8, 0x20, 0x1, 0x1E0);
+    GSgfxInit__FP15_GSgfxInitParms(0x6DDD0, 0x10, 0x8, 0x20, 0x1, 0x1E0);
 
     isWarmBoot = 0;
 

@@ -115,7 +115,7 @@
  *   fn_8013139C (GSEffectResetState) -- re-trigger effect
  *   fn_800F9318 (floor resource lookup)
  *   fn_800E3D98 (GSmem / resource helper)
- *   fn_800D2248, GScameraGetActiveCamera, GScameraGetPosition, GScameraGetPerspective -- matrix/vector ops
+ *   _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID, GScameraGetActiveCamera, GScameraGetPosition, GScameraGetPerspective -- matrix/vector ops
  *   fn_800DA4C4, fn_800DA2BC, fn_800DA1E8, fn_800DA028 -- GX TEV/material setup
  *   fn_800D88DC, fn_800D888C -- GX blend/alpha mode
  *   fn_800D7820 -- GX draw begin
@@ -172,7 +172,7 @@ extern void* fn_800F9318(u32 group, u32 model);
 
 /* Matrix / vector operations */
 extern void  fn_800E3D98(void* dst, void* src);
-extern void  fn_800D2248(void);
+extern void  _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID(void);
 extern void* GScameraGetActiveCamera(void);
 extern void  GScameraGetPosition(void* mtx, void* vec);
 extern void  GScameraGetPerspective(void* mtx, void* rx, void* ry, void* rz, void* scale);
@@ -444,7 +444,7 @@ u32 _lightningRenderMain(void* ptr) {
     }
 
     fn_800E3D98(model, modelPos);
-    fn_800D2248();
+    _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
     fn_800DA4C4(1, 6, 1);
     fn_800DA2BC(1, 1, 1);
     fn_800DA1E8(1, 1, 1);
@@ -863,7 +863,7 @@ void fn_80139074(void* entry, void* parent) {
 }
 #endif
 extern void* fn_800E4C98(void* model);
-extern void fn_800EE3BC(void* obj, void* a, void* b, void* c);
+extern void GSpartGetTransform(void* obj, void* a, void* b, void* c);
 extern u8 lbl_80272CC4[];
 extern u32 lbl_8047D168;
 extern u32 lbl_8047D180;
@@ -986,14 +986,14 @@ u32 fn_80139934(void* ptr) {
         if (*(void**)(p + 0x58) == NULL) {
             return 0;
         }
-        fn_800D2248();
+        _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
         if (model != NULL) {
             fn_800E3D98(model, pos);
             if (*(s32*)(p + 0x50) > 0) {
                 part = fn_800EE150(model, *(u32*)(p + 0x50));
                 if (part != NULL) {
                     if ((u8)fn_800EE7E0(part) != 0) {
-                        fn_800EE3BC(part, pos, NULL, NULL);
+                        GSpartGetTransform(part, pos, NULL, NULL);
                         fn_800EE828(part);
                     }
                 }
@@ -1273,7 +1273,7 @@ u32 fn_8013A520(void* ptr) {
         return 0;
     }
 
-    fn_800D2248();
+    _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
     fn_800DA4C4(1, 6, 1);
     fn_800DA2BC(1, 1, 0);
     fn_800DA1E8(1, 1, 1);
@@ -2546,7 +2546,7 @@ u32 fn_8013DE6C(void* ptr) {
     }
 
     fn_800D4604(1);
-    fn_800D2248();
+    _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
     if (model != NULL) {
         fn_800E4014(model, 1);
         fn_800E3760(model, 0);
@@ -2842,7 +2842,7 @@ void fn_8013EA44(void* ptr) {
         return;
     }
 
-    fn_800D2248();
+    _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
     *(f32*)(p + 0x1C) = *(f32*)(p + 0x20);
     *(f32*)(p + 0x20) = *(f32*)(p + 0x24);
     *(f32*)(p + 0x24) = *(f32*)(p + 0x28);
@@ -3001,7 +3001,7 @@ u16 distortionEffectStart(void* ptr) {
 
     part = fn_800EE150(*(void**)(p + 0x8), *(u32*)(p + 0xC));
     if (part != NULL) {
-        fn_800EE3BC(part, p + 0x2C, NULL, NULL);
+        GSpartGetTransform(part, p + 0x2C, NULL, NULL);
         fn_800EE828(part);
     } else {
         fn_800E3D98(*(void**)(p + 0x8), p + 0x2C);
@@ -3049,7 +3049,7 @@ u32 fn_8013F410(void* ptr) {
             count = fn_800E3B3C();
             if (count != 0) {
                 fn_800D4604(2);
-                fn_800D2248();
+                _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
                 fn_800D377C(1);
                 fn_800D3410((void*)lbl_8047AEE8, 0);
                 for (i = 0; i < count; i++) {
@@ -3154,7 +3154,7 @@ u32 fn_8013F80C(void* ptr, u32 delta) {
     if (*(void**)(p + 0x4) != NULL) {
         part = fn_800EE150(*(void**)(p + 0x4), *(u32*)(p + 0xC));
         if (part != NULL) {
-            fn_800EE3BC(part, p + 0x2C, NULL, NULL);
+            GSpartGetTransform(part, p + 0x2C, NULL, NULL);
             fn_800EE828(part);
         }
     }
@@ -3194,7 +3194,7 @@ void _distortionEffectUpdateMatrices(void* ptr) {
     }
 
     camera = GScameraGetActiveCamera();
-    fn_800D2248();
+    _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
     fn_800E064C((u8*)ptr + 0x38);
     if (camera != NULL) {
         GScameraGetLookAt(camera, lookAt, eye);
@@ -3382,7 +3382,7 @@ u32 fn_8013FF0C(void* ptr) {
     model = *(void**)(p + 0x10);
     camera = fn_801779EC();
     if (camera != NULL) {
-        fn_800D2248();
+        _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
         GScameraGetPosition(camera, p + 0x38);
         GScameraGetLookAt(camera, p + 0x44, p + 0x50);
         fn_800E0168(p + 0x5C, p + 0x44, p + 0x38);

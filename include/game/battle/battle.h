@@ -399,7 +399,7 @@ typedef struct TypeMatchup {
 /* fn_801C6EE4 */ void fn_801C6EE4(s32 slot, void* modelData);
 /* fn_801C7090 */ s32  fn_801C7090(void);
 /* fn_801C70FC */ void fn_801C70FC(s32 slot, u8 visible);
-/* fn_801C71B0 */ void fn_801C71B0(void);                        /* updateAnimations 0x43C */
+/* fadeFluidInit */ void fadeFluidInit(void);                        /* updateAnimations 0x43C */
 /* fn_801C75EC */ void fn_801C75EC(s32 slot);
 /* fn_801C7630 */ f32  fn_801C7630(s32 slot);
 /* fn_801C766C */ void fn_801C766C(s32 slot, f32 frame);
@@ -485,9 +485,9 @@ typedef struct TypeMatchup {
 /* fn_801EF080 */ void battle_ResetSlotAnimations(void);
 /* fn_801EF0D4 */ void battle_ResetSlotEffects(void);
 /* fn_801EF128 */ void battle_SetupParty(void* partyData);
-/* fn_801EF374 */ void battle_FightEnd(void);   /* "---------- fight end !! ----------" */
+/* _fightFinalize__FUi14FloorEnterMode */ void battle_FightEnd(void);   /* "---------- fight end !! ----------" */
 /* fn_801EF488 */ void battle_FightCleanup(void);
-/* fn_801EF4B0 */ void battle_FightStart(void); /* "---------- fight start !! ----------" */
+/* _fightInitialize__FUi14FloorEnterMode */ void battle_FightStart(void); /* "---------- fight start !! ----------" */
 /* fn_801EF5C0 */ void battle_FightReset(void);
 /* fn_801EF61C */ void battle_SetResult(u16 result);
 /* fn_801EF624 */ u16  battle_GetResult(void);

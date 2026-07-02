@@ -5,8 +5,8 @@
  * Address range: 0x801EF02C - 0x801F000C (26 functions)
  * Key functions:
  *   fn_801EFA08 (battle_MainLoop)   - Main battle thread loop, 0x5BC bytes
- *   fn_801EF4B0 (battle_FightStart) - Initializes battle, spawns main loop thread
- *   fn_801EF374 (battle_FightEnd)   - Cleans up after battle, releases resources
+ *   _fightInitialize__FUi14FloorEnterMode (battle_FightStart) - Initializes battle, spawns main loop thread
+ *   _fightFinalize__FUi14FloorEnterMode (battle_FightEnd)   - Cleans up after battle, releases resources
  *
  * The battle system entry point is battle_FightStart, which:
  *   1. Checks if a battle is already running (fn_800FF548)
@@ -237,7 +237,7 @@ void battle_FightReset(void) {
 
 /**
  * battle_FightEnd - Clean up after a battle ends.
- * fn_801EF374 at 0x801EF374 (0x114 bytes)
+ * _fightFinalize__FUi14FloorEnterMode at 0x801EF374 (0x114 bytes)
  *
  * Iterates through all 21 battle scene objects and releases any
  * that are still active, then restores the pre-battle engine state.
@@ -306,7 +306,7 @@ void battle_FightCleanup(void) {
 
 /**
  * battle_FightStart - Initialize and start a new battle.
- * fn_801EF4B0 at 0x801EF4B0 (0x110 bytes)
+ * _fightInitialize__FUi14FloorEnterMode at 0x801EF4B0 (0x110 bytes)
  *
  * This is the main entry point for starting a battle. It checks
  * if a floor/scene is already loaded, and if not, sets up the
@@ -594,9 +594,9 @@ void fn_801EF2D4(void) {
     }
 }
 
-/* fn_801EF374 (battle_FightEnd) - already decompiled above */
+/* _fightFinalize__FUi14FloorEnterMode (battle_FightEnd) - already decompiled above */
 /* fn_801EF488 (battle_FightCleanup) - already decompiled above */
-/* fn_801EF4B0 (battle_FightStart) - already decompiled above */
+/* _fightInitialize__FUi14FloorEnterMode (battle_FightStart) - already decompiled above */
 /* fn_801EF5C0 (battle_FightReset) - already decompiled above */
 
 /* 0x801EF644 | size: 0xB8 | medium */

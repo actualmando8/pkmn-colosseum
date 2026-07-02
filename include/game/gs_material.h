@@ -547,7 +547,7 @@ void GSmaterialLerpDiffuse(GSmaterialEntry* entry, void* param);
  * channels, attenuation, and material color sources for the GX
  * hardware lighting pipeline.
  *
- * Corresponds to fn_800E8684. Size: 0x878.
+ * Corresponds to modelShadowRender__FP10GSgfxLayer. Size: 0x878.
  */
 
 /* ===================================================================

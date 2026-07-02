@@ -3,8 +3,8 @@
  * @brief HSD displayfunc.c -- Billboard and render pass dispatch functions.
  *
  * Decompiled from:
- *   fn_80197A64 (HSD_DObjDisplayFunc1 -- billboard model-view setup)
- *   fn_80197B6C (HSD_DObjDisplayFunc2 -- render pass dispatch)
+ *   _HSD_mkEnvelopeModelNodeMtx (HSD_DObjDisplayFunc1 -- billboard model-view setup)
+ *   HSD_JObjMakePositionMtx (HSD_DObjDisplayFunc2 -- render pass dispatch)
  *
  * Source file reference: "displayfunc.c" (rodata string at lbl_802746DC)
  *
@@ -345,7 +345,7 @@ void HSD_ZListInitAllocData(void) {
 #pragma pop
 
 /* =======================================================================
- *  HSD_DObjDisplayFunc1 / fn_80197A64
+ *  HSD_DObjDisplayFunc1 / _HSD_mkEnvelopeModelNodeMtx
  *  Address: 0x80197A64, Size: 0x108
  *
  *  Billboard model-view matrix setup for DObj rendering.
@@ -437,7 +437,7 @@ void* HSD_DObjDisplayFunc1(void* dobj, void* outputMtx) {
 }
 
 /* =======================================================================
- *  HSD_DObjDisplayFunc2 / fn_80197B6C
+ *  HSD_DObjDisplayFunc2 / HSD_JObjMakePositionMtx
  *  Address: 0x80197B6C, Size: 0x104
  *
  *  Render pass dispatch for DObj rendering.

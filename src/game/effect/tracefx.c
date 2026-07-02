@@ -41,7 +41,7 @@ extern void  fn_800DD970(const char* fmt, ...);          /* OSReport / GSlog */
 extern u32   GSgfxGetFrameCount(void);                   /* fn_800D37CC */
 extern void* fn_800F9318(u32 group, u32 model);         /* GSfloor model load */
 extern void* fn_800EE150(void* model, u16 partIdx);     /* GSpart get sub-part */
-extern void  fn_800EE3BC(void* part, void* outPos,
+extern void  GSpartGetTransform(void* part, void* outPos,
                           void* a, void* b);             /* GSpart get position */
 extern void  fn_800EE828(void* part);                    /* GSpart commit */
 extern void  fn_800E01D0(void* dst, void* src);         /* Vec3 copy */
@@ -66,7 +66,7 @@ extern void  fn_80131200();
 extern void  fn_8013139C(void* obj, u32 flag);
 
 /* ===== GS immediate-mode render API (used by tracefxUpdate) ===== */
-extern void  fn_800D2248(void);
+extern void  _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID(void);
 extern void  fn_800DA4C4(s32 a, s32 b, s32 c);
 extern void  fn_800DA2BC(s32 a, s32 b, s32 c);
 extern void  fn_800DA1E8(s32 a, s32 b, s32 c);
@@ -291,7 +291,7 @@ u32 tracefxInit(TraceFXWork* work, void* params, u32 frames) {
  *    cmplwi r3, 0 -> goto fail
  *    -- Get sub-parts and positions --
  *    bl fn_800EE150 (GSpart get sub-part)
- *    bl fn_800EE3BC (GSpart get position)
+ *    bl GSpartGetTransform (GSpart get position)
  *    bl fn_800EE828 (GSpart commit)
  *    -- Build initial segment list --
  *    -- If trail has interpolation flag set: --
@@ -352,7 +352,7 @@ BOOL tracefxStartEffect_Draft(void* work, void* params, u32 frames) {
     }
 
     /* Get position from start part */
-    fn_800EE3BC(startPart, startPos, NULL, NULL);
+    GSpartGetTransform(startPart, startPos, NULL, NULL);
     fn_800EE828(startPart);
 
     /* Get sub-part for end position */
@@ -363,7 +363,7 @@ BOOL tracefxStartEffect_Draft(void* work, void* params, u32 frames) {
     }
 
     /* Get position from end part */
-    fn_800EE3BC(endPart, endPos, NULL, NULL);
+    GSpartGetTransform(endPart, endPos, NULL, NULL);
     fn_800EE828(endPart);
 
     /* Build initial segment chain */
@@ -403,7 +403,7 @@ BOOL tracefxStartEffect_Draft(void* work, void* params, u32 frames) {
  *    lhz r3, 0x24(r30); lhz r4, 0x26(r30)
  *    bl fn_800F9318
  *    bl fn_800EE150          ; get sub-part
- *    bl fn_800EE3BC          ; get position
+ *    bl GSpartGetTransform          ; get position
  *    bl fn_800EE828          ; commit
  *    -- Check interpolation flag --
  *    lhz r0, 0x1C(r30)
@@ -465,7 +465,7 @@ BOOL tracefxAddSegment(void* work, u32 numSegs) {
     }
 
     /* Sample new start position */
-    fn_800EE3BC(part, newStartPos, NULL, NULL);
+    GSpartGetTransform(part, newStartPos, NULL, NULL);
     fn_800EE828(part);
 
     /* Get end sub-part */
@@ -475,7 +475,7 @@ BOOL tracefxAddSegment(void* work, u32 numSegs) {
     }
 
     /* Sample new end position */
-    fn_800EE3BC(part, newEndPos, NULL, NULL);
+    GSpartGetTransform(part, newEndPos, NULL, NULL);
     fn_800EE828(part);
 
     /* Walk to the current tail of the segment chain */
@@ -910,7 +910,7 @@ int fn_80137F58(u8* w) {
     if (count1 <= 1) goto ret0;
     if (count2 <= 1) goto ret0;
 
-    fn_800D2248();
+    _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
     fn_800DA4C4(1, 6, 7);
     fn_800DA2BC(1, 1, 0);
     fn_800DA1E8(1, 2, 1);

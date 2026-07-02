@@ -499,7 +499,7 @@ void menuPokeCoupon_ValidateRefer(void);
  * ========================================================================= */
 
 /**
- * fn_80033278: Card e-Reader menu main handler.
+ * _sysvarsProcessData__FP16sysvarsFuncEntryPc: Card e-Reader menu main handler.
  * Assert: "_CARDE.card_type == CARDE_CARDTYPE_TRAINER"
  * File: "menuCardE.c"
  * Size: 0x1008 (4104 bytes - large state machine)

@@ -51,7 +51,7 @@ extern void fn_800E048C(void* dst, f32 x, f32 y, f32 z);
 extern void fn_800E0560(void* dst, f32* src);
 extern void fn_800E0290(void* dst, void* lhs, void* rhs);
 extern void fn_800DFF98(void* dst, void* mtx, void* vec);
-extern void fn_800D2248(void);
+extern void _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID(void);
 extern void fn_800D88DC(s32 mode);
 extern void fn_800D888C(s32 mode);
 extern void fn_800DA028(s32 mode);
@@ -91,7 +91,7 @@ void fn_80190E60(HSD_ObjectTransformData* data) {
     fn_800DFF98(corner0, mtx, data->corner0);
     fn_800DFF98(corner1, mtx, data->corner1);
 
-    fn_800D2248();
+    _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
     fn_800D88DC(1);
     fn_800D888C(6);
     fn_800DA028(0);
