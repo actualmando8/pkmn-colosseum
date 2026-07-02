@@ -334,7 +334,7 @@
    "shared": [
     "menuPokemonCheckPokemonChange"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -346,7 +346,7 @@
    "shared": [
     "false"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -470,7 +470,7 @@
     "DVDReadAsync(): specified area is out of the file  ",
     "dvdfs.c"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -483,7 +483,7 @@
     "DVDRead(): specified area is out of the file  ",
     "dvdfs.c"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -496,7 +496,7 @@
     "DVDSeek(): offset is out of the file  ",
     "dvdfs.c"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -534,7 +534,7 @@
    "shared": [
     "vi.c"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -658,7 +658,7 @@
     "cobj",
     "cobj.h"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -670,7 +670,7 @@
    "shared": [
     "GSgfx: Init OK, state located at %08Xh (size=%d)\\n"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -683,7 +683,7 @@
     "shadow",
     "shadow.h"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -697,7 +697,7 @@
     "jobj",
     "jobj.h"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -747,7 +747,7 @@
     "_msgCallCtrlFunc",
     "_msgGetSize() failed.\\n"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -759,7 +759,7 @@
    "shared": [
     "menuModelInit"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -795,7 +795,7 @@
    "shared": [
     "movie"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -881,7 +881,7 @@
    "shared": [
     "gsfsys.toc"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -893,7 +893,7 @@
    "shared": [
     "%s.fsys"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -1019,7 +1019,7 @@
    "shared": [
     "stack"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -1074,7 +1074,7 @@
     "jobj",
     "x"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -1087,7 +1087,7 @@
     "displayfunc.c",
     "unkown type of billboard.\\n"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -1115,7 +1115,7 @@
     "fobj: alloc",
     "new"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -1128,7 +1128,7 @@
     "fobj.c",
     "st == FOBJ_LOAD_WAIT"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -1141,7 +1141,7 @@
     "fobj.c",
     "st == FOBJ_LOAD_DATA0 || st == FOBJ_LOAD_DATA"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -1231,7 +1231,7 @@
     "jobj.c",
     "prev"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -1244,7 +1244,7 @@
     "jobj->parent",
     "jobj.c"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -1258,7 +1258,7 @@
     "list.c",
     "prev"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -1327,7 +1327,7 @@
     "lobj",
     "lobj.h"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -1366,7 +1366,7 @@
     "mobj",
     "mobj.c"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -1431,7 +1431,7 @@
     "obj",
     "pobj.c"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -1472,7 +1472,7 @@
     "robj.c",
     "robj: alloc"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -1486,7 +1486,7 @@
     "texp.c",
     "texp_list"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -1499,7 +1499,7 @@
     "clist->type == HSD_TE_CNST",
     "texp.c"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -1513,7 +1513,7 @@
     "texp",
     "texp.c"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -1527,7 +1527,7 @@
     "texp->cnst.ctype == type",
     "texp.c"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -1539,7 +1539,7 @@
    "shared": [
     "l < num"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -1593,7 +1593,7 @@
     "tobj.c",
     "unexpected texmap id.\\n"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -1659,7 +1659,7 @@
    "shared": [
     "Warning: fadeFluid c parm. Limit Over!! -> 0.0f < %f < %f\\n"
    ],
-   "ambiguous": false,
+   "ambiguous": true,
    "col_named": false,
    "confidence": "MED"
   },
@@ -1715,6 +1715,57 @@
    "confidence": "MED"
   },
   {
+   "fn": "DVDReadAsync",
+   "xd_fn": "DVDReadAsyncPrio",
+   "name": "DVDReadAsyncPrio",
+   "score": 1.25,
+   "shared": [
+    "DVDReadAsync(): specified area is out of the file  ",
+    "dvdfs.c"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "DVDRead",
+   "xd_fn": "DVDReadPrio",
+   "name": "DVDReadPrio",
+   "score": 1.25,
+   "shared": [
+    "DVDRead(): specified area is out of the file  ",
+    "dvdfs.c"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "DVDSeekAsyncPrio",
+   "xd_fn": "DVDSeekAsyncPrio",
+   "name": "DVDSeekAsyncPrio",
+   "score": 1.25,
+   "shared": [
+    "DVDSeek(): offset is out of the file  ",
+    "dvdfs.c"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "VIConfigure",
+   "xd_fn": "VIConfigure",
+   "name": "VIConfigure",
+   "score": 1.0,
+   "shared": [
+    "vi.c"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
    "fn": "battleGridReplacePokemon",
    "xd_fn": "battleGridReplacePokemon",
    "name": "battleGridReplacePokemon",
@@ -1727,7 +1778,7 @@
    "confidence": "MED"
   },
   {
-   "fn": "fn_801EF374",
+   "fn": "_fightFinalize__FUi14FloorEnterMode",
    "xd_fn": "_fightFinalize__FUi14FloorEnterMode",
    "name": "_fightFinalize__FUi14FloorEnterMode",
    "score": 1.0,
@@ -1735,11 +1786,11 @@
     "---------- fight end !! ---------- \\n"
    ],
    "ambiguous": false,
-   "col_named": false,
+   "col_named": true,
    "confidence": "MED"
   },
   {
-   "fn": "fn_801EF4B0",
+   "fn": "_fightInitialize__FUi14FloorEnterMode",
    "xd_fn": "_fightInitialize__FUi14FloorEnterMode",
    "name": "_fightInitialize__FUi14FloorEnterMode",
    "score": 1.0,
@@ -1747,7 +1798,43 @@
     "---------- fight start !! ---------- \\n"
    ],
    "ambiguous": false,
-   "col_named": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "GSmoviePlay",
+   "xd_fn": "GSmoviePlay",
+   "name": "GSmoviePlay",
+   "score": 1.0,
+   "shared": [
+    "movie"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "fadeFluidInit",
+   "xd_fn": "fadeFluidInit",
+   "name": "fadeFluidInit",
+   "score": 1.0,
+   "shared": [
+    "Warning: fadeFluid c parm. Limit Over!! -> 0.0f < %f < %f\\n"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "_fsysGetFilename",
+   "xd_fn": "_fsysGetFilename",
+   "name": "_fsysGetFilename",
+   "score": 1.0,
+   "shared": [
+    "%s.fsys"
+   ],
+   "ambiguous": true,
+   "col_named": true,
    "confidence": "MED"
   },
   {
@@ -1775,7 +1862,7 @@
    "confidence": "MED"
   },
   {
-   "fn": "fn_80113248",
+   "fn": "_floorInitCharacters__FP11GSfloor_dd_",
    "xd_fn": "_floorInitCharacters__FP11GSfloor_dd_",
    "name": "_floorInitCharacters__FP11GSfloor_dd_",
    "score": 1.0,
@@ -1783,11 +1870,11 @@
     "_floorInitCharacters"
    ],
    "ambiguous": false,
-   "col_named": false,
+   "col_named": true,
    "confidence": "MED"
   },
   {
-   "fn": "fn_801134E4",
+   "fn": "floorInitMap",
    "xd_fn": "floorInitMap",
    "name": "floorInitMap",
    "score": 1.0,
@@ -1795,11 +1882,11 @@
     "floorInitMap"
    ],
    "ambiguous": false,
-   "col_named": false,
+   "col_named": true,
    "confidence": "MED"
   },
   {
-   "fn": "fn_80113D58",
+   "fn": "floorOpenObject",
    "xd_fn": "floorOpenObject",
    "name": "floorOpenObject",
    "score": 1.0,
@@ -1807,7 +1894,19 @@
     "floorOpenObject"
    ],
    "ambiguous": false,
-   "col_named": false,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "GSgfxInit__FP15_GSgfxInitParms",
+   "xd_fn": "GSgfxInit__FP15_GSgfxInitParms",
+   "name": "GSgfxInit__FP15_GSgfxInitParms",
+   "score": 1.0,
+   "shared": [
+    "GSgfx: Init OK, state located at %08Xh (size=%d)\\n"
+   ],
+   "ambiguous": true,
+   "col_named": true,
    "confidence": "MED"
   },
   {
@@ -1847,7 +1946,7 @@
    "confidence": "MED"
   },
   {
-   "fn": "fn_801045A8",
+   "fn": "windowCheckCursor",
    "xd_fn": "windowCheckCursor",
    "name": "windowCheckCursor",
    "score": 1.0,
@@ -1855,11 +1954,86 @@
     "windowCheckCursor"
    ],
    "ambiguous": false,
-   "col_named": false,
+   "col_named": true,
    "confidence": "MED"
   },
   {
-   "fn": "fn_800DDF54",
+   "fn": "menuPokemonCheckPokemonChange",
+   "xd_fn": "menuPokemonCheckPokemonChange",
+   "name": "menuPokemonCheckPokemonChange",
+   "score": 1.0,
+   "shared": [
+    "menuPokemonCheckPokemonChange"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "_sysvarsProcessData__FP16sysvarsFuncEntryPc",
+   "xd_fn": "_sysvarsProcessData__FP16sysvarsFuncEntryPc",
+   "name": "_sysvarsProcessData__FP16sysvarsFuncEntryPc",
+   "score": 1.0,
+   "shared": [
+    "false"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "modelShadowRender__FP10GSgfxLayer",
+   "xd_fn": "modelShadowRender__FP10GSgfxLayer",
+   "name": "modelShadowRender__FP10GSgfxLayer",
+   "score": 1.0,
+   "shared": [
+    "shadow",
+    "shadow.h"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "GSpartGetTransform",
+   "xd_fn": "GSpartGetTransform",
+   "name": "GSpartGetTransform",
+   "score": 1.0,
+   "shared": [
+    "GSpart: child node too deep\\n",
+    "jobj",
+    "jobj.h"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "menuModelInit",
+   "xd_fn": "menuModelInit",
+   "name": "menuModelInit",
+   "score": 1.0,
+   "shared": [
+    "menuModelInit"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "_fsysInitTOC",
+   "xd_fn": "_fsysInitTOC",
+   "name": "_fsysInitTOC",
+   "score": 1.0,
+   "shared": [
+    "gsfsys.toc"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "GSlogInit",
    "xd_fn": "GSlogInit",
    "name": "GSlogInit",
    "score": 1.0,
@@ -1867,7 +2041,7 @@
     "0123456789ABCDEF"
    ],
    "ambiguous": false,
-   "col_named": false,
+   "col_named": true,
    "confidence": "MED"
   },
   {
@@ -1896,6 +2070,111 @@
    "confidence": "HIGH"
   },
   {
+   "fn": "_cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID",
+   "xd_fn": "_cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID",
+   "name": "_cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID",
+   "score": 1.0,
+   "shared": [
+    "cobj",
+    "cobj.h"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "_msgGetSize__FPCUs",
+   "xd_fn": "_msgGetSize__FPCUs",
+   "name": "_msgGetSize__FPCUs",
+   "score": 1.0,
+   "shared": [
+    "_msgCallCtrlFunc",
+    "_msgGetSize() failed.\\n"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "_HSD_mkEnvelopeModelNodeMtx",
+   "xd_fn": "_HSD_mkEnvelopeModelNodeMtx",
+   "name": "_HSD_mkEnvelopeModelNodeMtx",
+   "score": 1.5,
+   "shared": [
+    "displayfunc.c",
+    "jobj",
+    "x"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_JObjMakePositionMtx",
+   "xd_fn": "HSD_JObjMakePositionMtx",
+   "name": "HSD_JObjMakePositionMtx",
+   "score": 1.5,
+   "shared": [
+    "displayfunc.c",
+    "unkown type of billboard.\\n"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_FObjLoadDesc",
+   "xd_fn": "HSD_FObjLoadDesc",
+   "name": "HSD_FObjLoadDesc",
+   "score": 1.25,
+   "shared": [
+    "fobj.c",
+    "fobj: alloc",
+    "new"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_FObjInterpretAnim",
+   "xd_fn": "HSD_FObjInterpretAnim",
+   "name": "HSD_FObjInterpretAnim",
+   "score": 1.25,
+   "shared": [
+    "fobj.c",
+    "st == FOBJ_LOAD_WAIT"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "FObjLoadData",
+   "xd_fn": "FObjLoadData",
+   "name": "FObjLoadData",
+   "score": 1.25,
+   "shared": [
+    "fobj.c",
+    "st == FOBJ_LOAD_DATA0 || st == FOBJ_LOAD_DATA"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_FogLoadDesc",
+   "xd_fn": "HSD_FogSet",
+   "name": "HSD_FogSet",
+   "score": 1.0,
+   "shared": [
+    "fog.c"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
    "fn": "HSD_FogSet",
    "xd_fn": "HSD_FogSet",
    "name": "HSD_FogSet",
@@ -1903,6 +2182,47 @@
    "shared": [
     "You must specify CObj first.\\n",
     "fog.c"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_JObjAddNext",
+   "xd_fn": "HSD_JObjAddNext",
+   "name": "HSD_JObjAddNext",
+   "score": 1.33,
+   "shared": [
+    "can not find specified jobj. maybe jobj tree is broken.\\n",
+    "jobj.c",
+    "prev"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_JObjWalkTree0",
+   "xd_fn": "HSD_JObjWalkTree0",
+   "name": "HSD_JObjWalkTree0",
+   "score": 1.0,
+   "shared": [
+    "jobj->parent",
+    "jobj.c"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_SListPrepend",
+   "xd_fn": "HSD_SListPrepend",
+   "name": "HSD_SListPrepend",
+   "score": 1.17,
+   "shared": [
+    "list",
+    "list.c",
+    "prev"
    ],
    "ambiguous": true,
    "col_named": true,
@@ -1930,6 +2250,33 @@
    "shared": [
     "lobj.c",
     "unexpected lightdesc flags (%x)\\n"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_LObjAddCurrentAll",
+   "xd_fn": "HSD_LObjAddCurrentAll",
+   "name": "HSD_LObjAddCurrentAll",
+   "score": 1.25,
+   "shared": [
+    "HSD_OBJ(o)->ref_count != HSD_OBJ_NOREF",
+    "lobj",
+    "lobj.h"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_MObjLoadDesc",
+   "xd_fn": "HSD_MObjLoadDesc",
+   "name": "HSD_MObjLoadDesc",
+   "score": 1.0,
+   "shared": [
+    "mobj",
+    "mobj.c"
    ],
    "ambiguous": true,
    "col_named": true,
@@ -1974,6 +2321,20 @@
    "confidence": "MED"
   },
   {
+   "fn": "HSD_PObjGetMtxMark",
+   "xd_fn": "HSD_PObjGetMtxMark",
+   "name": "HSD_PObjGetMtxMark",
+   "score": 1.33,
+   "shared": [
+    "mark",
+    "obj",
+    "pobj.c"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
    "fn": "get_shape_vertex_xyz",
    "xd_fn": "get_shape_vertex_xyz",
    "name": "get_shape_vertex_xyz",
@@ -1981,6 +2342,18 @@
    "shared": [
     "pobj.c",
     "shape_set->vertex_desc->comp_cnt == GX_POS_XYZ"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_ByteCodeEval",
+   "xd_fn": "HSD_ByteCodeEval",
+   "name": "HSD_ByteCodeEval",
+   "score": 1.0,
+   "shared": [
+    "stack"
    ],
    "ambiguous": true,
    "col_named": true,
@@ -2008,6 +2381,101 @@
     "new",
     "tev",
     "tlut"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_RObjLoadDesc",
+   "xd_fn": "HSD_RObjLoadDesc",
+   "name": "HSD_RObjLoadDesc",
+   "score": 1.25,
+   "shared": [
+    "new",
+    "robj.c",
+    "robj: alloc"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_TExpCompile",
+   "xd_fn": "HSD_TExpCompile",
+   "name": "HSD_TExpCompile",
+   "score": 1.5,
+   "shared": [
+    "tevdesc",
+    "texp.c",
+    "texp_list"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_TExpSetReg",
+   "xd_fn": "HSD_TExpSetReg",
+   "name": "HSD_TExpSetReg",
+   "score": 1.0,
+   "shared": [
+    "clist->type == HSD_TE_CNST",
+    "texp.c"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "TExp2TevDesc",
+   "xd_fn": "TExp2TevDesc",
+   "name": "TExp2TevDesc",
+   "score": 1.0,
+   "shared": [
+    "desc",
+    "texp",
+    "texp.c"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_TExpCnst",
+   "xd_fn": "HSD_TExpCnst",
+   "name": "HSD_TExpCnst",
+   "score": 1.0,
+   "shared": [
+    "texp",
+    "texp->cnst.ctype == type",
+    "texp.c"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_TExpMakeDag",
+   "xd_fn": "HSD_TExpMakeDag",
+   "name": "HSD_TExpMakeDag",
+   "score": 1.0,
+   "shared": [
+    "l < num"
+   ],
+   "ambiguous": true,
+   "col_named": true,
+   "confidence": "MED"
+  },
+  {
+   "fn": "HSD_TObjAssignResources",
+   "xd_fn": "HSD_TObjAssignResources",
+   "name": "HSD_TObjAssignResources",
+   "score": 1.0,
+   "shared": [
+    "0",
+    "tobj.c",
+    "unexpected texmap id.\\n"
    ],
    "ambiguous": true,
    "col_named": true,

@@ -108,7 +108,8 @@ void HSD_WObjSetPosition_Early(HSD_WObj* wobj, f32 x, f32 y, f32 z);
 void HSD_WObjSetPositionX(HSD_WObj* wobj, f32 val);
 void HSD_WObjSetPositionY(HSD_WObj* wobj, f32 val);
 void HSD_WObjSetPositionZ(HSD_WObj* wobj, f32 val);
-void HSD_WObjGetPosition(HSD_WObj* wobj, f32* x, f32* y, f32* z);
+void HSD_WObjGetPosition(HSD_WObj* wobj, void* position);
+void HSD_WObjGetPosition_Early(HSD_WObj* wobj, f32* x, f32* y, f32* z);
 HSD_WObj* HSD_WObjAlloc(void);
 void HSD_WObjSetDefaultClass(HSD_ClassInfo* info);
 

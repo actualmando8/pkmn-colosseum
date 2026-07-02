@@ -142,17 +142,6 @@ void HSD_JObjAddChild(HSD_JObj* jobj, HSD_JObj* child)
     HSD_JObjSetMtxDirty(child);
 }
 
-void HSD_JObjAddNext(HSD_JObj* jobj, HSD_JObj* next)
-{
-    HSD_ASSERT(0, jobj);
-    HSD_ASSERT(0, next);
-
-    next->parent = jobj->parent;
-    next->next = jobj->next;
-    jobj->next = next;
-    HSD_JObjSetMtxDirty(next);
-}
-
 void HSD_JObjAddDObj(HSD_JObj* jobj, HSD_DObj* dobj)
 {
     HSD_DObj* d;
@@ -180,7 +169,7 @@ void HSD_JObjUnref(HSD_JObj* jobj)
     if (jobj == NULL) {
         return;
     }
-    if (ref_DEC(jobj) != 0) {
+    if (ref_DEC_801A0D48(jobj) != 0) {
         if (jobj != NULL) {
             ((HSD_ClassInfo*)jobj->object.parent.class_info)->release((HSD_Class*) jobj);
             ((HSD_ClassInfo*)jobj->object.parent.class_info)->destroy((HSD_Class*) jobj);
@@ -486,9 +475,9 @@ extern f32 fn_800A3B7C(JObjVec* a, JObjVec* b);
 extern void fn_800A3AC0(JObjVec* src, JObjVec* dst, f32 scale);
 extern void fn_800A3A78(JObjVec* a, JObjVec* b, JObjVec* dst);
 extern void fn_800A3A9C(JObjVec* a, JObjVec* b, JObjVec* dst);
-extern void fn_800A3B9C(JObjVec* a, JObjVec* b, JObjVec* dst);
+extern void PSVECCrossProduct(JObjVec* a, JObjVec* b, JObjVec* dst);
 extern void fn_800A3244(f32 mtx[3][4], JObjVec* axis, f32 angle);
-extern void fn_800A37CC(f32 mtx[3][4], JObjVec* src, JObjVec* dst);
+extern void PSMTXMultVec(f32 mtx[3][4], JObjVec* src, JObjVec* dst);
 extern HSD_RObj* HSD_RObjGetByType(HSD_RObj* robj, u32 type, u32 subtype);
 extern void fn_801AED88(HSD_RObj* robj, HSD_JObj* jobj,
                         HSD_ObjUpdateFunc update_func);
@@ -843,14 +832,14 @@ void resolveIKJoint2(HSD_JObj* jobj) {
         if (clamped != 0) {
             JObjMtx_LoadColumn(parent, 2, &parent_z);
             fn_800A3244(rot_mtx, &parent_z, angle);
-            fn_800A37CC(rot_mtx, &parent_x, &target_dir);
+            PSMTXMultVec(rot_mtx, &parent_x, &target_dir);
         }
     }
 
     JObjMtx_LoadColumn(parent, 2, &parent_z);
-    fn_800A3B9C(&parent_z, &target_dir, &bend_axis);
+    PSVECCrossProduct(&parent_z, &target_dir, &bend_axis);
     JObjVec_Normalize(&bend_axis, &bend_axis);
-    fn_800A3B9C(&target_dir, &bend_axis, &side_axis);
+    PSVECCrossProduct(&target_dir, &bend_axis, &side_axis);
 
     JObjMtx_StoreScaledColumn(jobj, 0, &target_dir, scale.x);
     JObjMtx_StoreScaledColumn(jobj, 1, &bend_axis, scale.y);
@@ -978,14 +967,14 @@ void resolveIKJoint1(HSD_JObj* jobj) {
             fn_800A3A9C(&pole_hint, &origin, &pole_hint);
             if (rotate_x != 0.0f) {
                 fn_800A3244(rot_mtx, &target, rotate_x);
-                fn_800A37CC(rot_mtx, &pole_hint, &pole_hint);
+                PSMTXMultVec(rot_mtx, &pole_hint, &pole_hint);
             }
-            fn_800A3B9C(&target, &pole_hint, &normal_axis);
-            fn_800A3B9C(&normal_axis, &target, &pole_hint);
+            PSVECCrossProduct(&target, &pole_hint, &normal_axis);
+            PSVECCrossProduct(&normal_axis, &target, &pole_hint);
         } else {
             JObjMtx_LoadColumn(jobj, 2, &normal_axis);
-            fn_800A3B9C(&normal_axis, &target, &pole_hint);
-            fn_800A3B9C(&target, &pole_hint, &normal_axis);
+            PSVECCrossProduct(&normal_axis, &target, &pole_hint);
+            PSVECCrossProduct(&target, &pole_hint, &normal_axis);
         }
 
         JObjVec_Normalize(&normal_axis, &normal_axis);
@@ -1019,7 +1008,7 @@ void resolveIKJoint1(HSD_JObj* jobj) {
     fn_800A3AC0(&tmp, &tmp, norm_scale);
 
     JObjMtx_StoreScaledColumn(jobj, 0, &tmp, scale.x);
-    fn_800A3B9C(&normal_axis, &tmp, &column);
+    PSVECCrossProduct(&normal_axis, &tmp, &column);
     JObjMtx_StoreScaledColumn(jobj, 1, &column, scale.y);
     JObjMtx_StoreScaledColumn(jobj, 2, &normal_axis, scale.z);
     JObjMtx_StoreTranslation(jobj, &origin);
@@ -1175,12 +1164,12 @@ ok:
 #pragma optimizewithasm off
 extern u8 lbl_80274B28[];
 #if 0
-asm void fn_8019FF74(void) {
+asm void HSD_JObjAddNext(void) {
 #include "src/hsd/hsd_jobj_fn_8019FF74.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_8019FF74(HSD_JObj* jobj, HSD_JObj* next) {
+void HSD_JObjAddNext(HSD_JObj* jobj, HSD_JObj* next) {
     /* decompiled cdx5: functional (non-byte-exact) */
     HSD_JObj* old_next;
     HSD_JObj* prev;
@@ -1390,12 +1379,12 @@ HSD_JObj* fn_801A02B0(HSD_JObj* jobj)
     jobj->child = NULL;
     jobj->next = NULL;
 
-    if (ref_DEC(jobj) != 0) {
+    if (ref_DEC_801A0D48(jobj) != 0) {
         if (jobj->object.ref_count_individual < 1) {
             HSD_CLASS_METHOD(jobj)->release((HSD_Class*) jobj);
             HSD_CLASS_METHOD(jobj)->destroy((HSD_Class*) jobj);
         } else {
-            iref_INC(jobj);
+            iref_INC_801A0C9C(jobj);
             HSD_JOBJ_METHOD(jobj)->release_child(jobj);
             if (iref_DEC(jobj) != 0) {
                 HSD_CLASS_METHOD(jobj)->release((HSD_Class*) jobj);
@@ -1468,12 +1457,7 @@ extern void HSD_JObjRef(HSD_JObj* jobj);
 extern void* HSD_IDGetData(u32 key, u32* found);
 extern void fn_801A0B9C(HSD_JObj* jobj);
 extern void* fn_801A0BF0(u32 key, u32* found);
-extern void fn_801A0C1C();
-extern BOOL fn_801A0C68(HSD_Obj*);
-extern void iref_INC_801A0C9C();
-extern void hsdDelete_801A0CE8(void*);
 extern s32 fn_801A0D3C();
-extern BOOL ref_DEC_801A0D48(void*);
 extern void fn_801A0744(HSD_JObj* jobj, HSD_Joint* joint);
 extern void HSD_JObjResolveRefs(HSD_JObj* jobj, HSD_Joint* joint);
 extern void fn_801AEBE4(HSD_RObj* robj, HSD_RObjDesc* desc);
@@ -1537,89 +1521,13 @@ void* HSD_IDGetData(u32 key, u32* found) {
 #endif
 #pragma pop
 
-/* 0x801A0C1C | 0x4C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 0
-asm void fn_801A0C1C(void) {
-#include "src/hsd/hsd_jobj_fn_801A0C1C.inc"
-}
-#else
-#pragma optimization_level 4
-void fn_801A0C1C(HSD_Obj* obj) {
-    obj->ref_count++;
-    if (!(obj->ref_count != HSD_OBJ_NOREF)) {
-        __assert(lbl_80274AF4, 0x5d, lbl_80274B64);
-    }
-}
-#endif
-#pragma pop
-
-/* 0x801A0C68 | 0x34 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 0
-asm void fn_801A0C68(void) {
-#include "src/hsd/hsd_jobj_fn_801A0C68.inc"
-}
-#else
-#pragma optimization_level 4
-BOOL fn_801A0C68(HSD_Obj* obj) {
-    BOOL ret;
-
-    if ((ret = (*(volatile u16*)&obj->ref_count_individual == 0))) {
-        return ret;
-    }
-    obj->ref_count_individual--;
-    return obj->ref_count_individual == 0;
-}
-#endif
-#pragma pop
-
-/* 0x801A0C9C | 0x4C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-extern u8 lbl_80274B00[];
-#if 0
-asm void iref_INC_801A0C9C(void) {
-#include "src/hsd/hsd_jobj_fn_801A0C9C.inc"
-}
-#else
-#pragma optimization_level 4
-void iref_INC_801A0C9C(HSD_Obj* obj) {
-    obj->ref_count_individual++;
-    if (!(obj->ref_count_individual != 0)) {
-        __assert(lbl_80274AF4, 0x9e, lbl_80274B00);
-    }
-}
-#endif
-#pragma pop
-
-/* 0x801A0CE8 | 0x54 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 0
-asm void hsdDelete_801A0CE8(void) {
-#include "src/hsd/hsd_jobj_fn_801A0CE8.inc"
-}
-#else
-#pragma optimization_level 1
-void hsdDelete_801A0CE8(void* obj) {
-    HSD_ClassInfo* info;
-
-    if (obj != NULL) {
-        info = HSD_CLASS_METHOD(obj);
-        info->release((HSD_Class*)obj);
-        info = HSD_CLASS_METHOD(obj);
-        info->destroy((HSD_Class*)obj);
-    }
-}
-#endif
-#pragma pop
+/* NOTE: ref_INC/iref_DEC/iref_INC_801A0C9C/hsdDelete_801A0CE8 (0x801A0C1C-0x801A0D48 minus
+ * 0x801A0D3C) are provided as `static inline` from hsd_object.h/hsd_class.h.
+ * Colosseum's linker folds the out-of-lined instances from every TU that
+ * calls them into a single physical copy; a duplicate top-level definition
+ * here would only collide with the header's declarations. See melee
+ * baselib/object.h for the reference: these are never standalone functions
+ * in jobj.c either. */
 
 /* 0x801A0D3C | 0xC */
 #pragma push
@@ -1637,28 +1545,8 @@ s32 fn_801A0D3C(HSD_Obj* obj) {
 #endif
 #pragma pop
 
-/* 0x801A0D48 | 0x4C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 0
-asm void ref_DEC_801A0D48(void) {
-#include "src/hsd/hsd_jobj_fn_801A0D48.inc"
-}
-#else
-#pragma optimization_level 1
-BOOL ref_DEC_801A0D48(void* o) {
-    BOOL ret;
-
-    if ((ret = (*(volatile u16*)&HSD_OBJ(o)->ref_count == HSD_OBJ_NOREF))) {
-        return ret;
-    }
-    ret = (*(volatile u16*)&HSD_OBJ(o)->ref_count == 0);
-    HSD_OBJ(o)->ref_count--;
-    return ret;
-}
-#endif
-#pragma pop
+/* NOTE: ref_DEC_801A0D48 (0x801A0D48) is `static inline` from hsd_object.h; see note
+ * above the 0x801A0C1C block. */
 
 /* 0x801A0D94 | 0x228 */
 #pragma push
@@ -1749,7 +1637,7 @@ extern HSD_ClassInfo* fn_80193748(const char*);
 extern HSD_JObj* fn_80193828(HSD_ClassInfo*);
 extern u32 lbl_8047B298;
 #if 1
-HSD_JObj* fn_801A0FBC(HSD_Joint* joint)
+HSD_JObj* HSD_JObjLoadJoint(HSD_Joint* joint)
 {
 #pragma optimization_level 1
     HSD_JObj* jobj;
@@ -1802,7 +1690,7 @@ done:
 }
 #else
 #pragma optimization_level 1
-HSD_JObj* fn_801A0FBC(HSD_Joint* joint)
+HSD_JObj* HSD_JObjLoadJoint(HSD_Joint* joint)
 {
     HSD_JObj* jobj;
     HSD_ClassInfo* info;
@@ -1853,9 +1741,9 @@ done:
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern HSD_DObj* fn_801992D8(HSD_DObjDesc* desc);
-extern HSD_RObj* fn_801AE5E8(HSD_RObjDesc* desc);
-extern void fn_800A2D38(f32 mtx[3][4]);
+extern HSD_DObj* HSD_DObjLoadDesc(HSD_DObjDesc* desc);
+extern HSD_RObj* HSD_RObjLoadDesc(HSD_RObjDesc* desc);
+extern void PSMTXIdentity(f32 mtx[3][4]);
 extern f32* HSD_MtxAlloc(void);
 extern void HSD_IDInsertToTable(void* table, u32 key, u32 value);
 extern void* memcpy(void* dst, const void* src, u32 n);
@@ -1896,10 +1784,10 @@ s32 JObjLoad(HSD_JObj* jobj, HSD_Joint* joint, HSD_JObj* parent)
             ptcl = ptcl->next;
         }
     } else {
-        jobj->u.dobj = (HSD_DObj*) fn_801992D8(joint->u.dobjdesc);
+        jobj->u.dobj = (HSD_DObj*) HSD_DObjLoadDesc(joint->u.dobjdesc);
     }
 
-    jobj->robj = (HSD_RObj*) fn_801AE5E8(joint->robjdesc);
+    jobj->robj = (HSD_RObj*) HSD_RObjLoadDesc(joint->robjdesc);
     jobj->rotate_x = joint->rotation_x;
     jobj->rotate_y = joint->rotation_y;
     jobj->rotate_z = joint->rotation_z;
@@ -1909,7 +1797,7 @@ s32 JObjLoad(HSD_JObj* jobj, HSD_Joint* joint, HSD_JObj* parent)
     jobj->translate_x = joint->position_x;
     jobj->translate_y = joint->position_y;
     jobj->translate_z = joint->position_z;
-    fn_800A2D38(jobj->mtx);
+    PSMTXIdentity(jobj->mtx);
     jobj->scl = NULL;
 
     if (joint->mtx != NULL) {

@@ -221,7 +221,7 @@ game/menu/menu_bag.c:
 game/fight_range_80051710.c:
 	.text       start:0x80051710 end:0x8005344C
 
-game/gs_range_8005344C.c:
+game/menu/menuCB_Battle.c:
 	.text       start:0x8005344C end:0x80069C0C
 
 game/menu/menu_middle.c:
@@ -236,19 +236,19 @@ game/menu/menu_poke_coupon.c:
 game/menu/menu_carde_matrix.c:
 	.text       start:0x8007C300 end:0x8007FD64
 
-game/gs_range_8007FD64.c:
+game/menu/cardesavedata.c:
 	.text       start:0x8007FD64 end:0x80088428
 
 game/gba/gba_conv.c:
 	.text       start:0x80088428 end:0x80089048
 
-game/field_range_80089048.c:
+game/pokeconv.c:
 	.text       start:0x80089048 end:0x800896B8
 
 game/gba/gba_misc.c:
 	.text       start:0x800896B8 end:0x8008C7B0
 
-game/gs_range_8008C7B0.c:
+game/gbaCommunication.c:
 	.text       start:0x8008C7B0 end:0x800980E0
 
 dolphin/os/PPCArch.c:
@@ -377,7 +377,7 @@ dolphin/dvd/DVDLowSetWAType.c:
 dolphin/dvd/DVDFs.c:
 	.text       start:0x800A4CF0 end:0x800A4D28
 
-dolphin/sdk_range_800A4D28.c:
+dolphin/dvd/dvdfs_range_800A4D28.c:
 	.text       start:0x800A4D28 end:0x800A5624
 
 dolphin/dvd/DVD.c:
@@ -398,7 +398,7 @@ dolphin/dvd/DVDError_ErrorCode2Num.c:
 dolphin/dvd/DVDError.c:
 	.text       start:0x800A80FC end:0x800A8178
 
-dolphin/sdk_range_800A8178.c:
+dolphin/vi/VI_range_800A8178.c:
 	.text       start:0x800A8178 end:0x800AA280
 
 dolphin/vi/VI_fn_800AA280.c:
@@ -827,8 +827,11 @@ hsd/hsd_jobj.c:
 hsd/hsd_lobj.c:
 	.text       start:0x801A4000 end:0x801A69C0
 
-hsd/hsd_range_801A69C0.c:
-	.text       start:0x801A69C0 end:0x801A8428
+hsd/hsd_memory.c:
+	.text       start:0x801A69C0 end:0x801A6CA4
+
+hsd/hsd_mobj.c:
+	.text       start:0x801A6CA4 end:0x801A8428
 
 hsd/hsd_mobj_clear_flags.c:
 	.text       start:0x801A8428 end:0x801A8440
@@ -854,7 +857,7 @@ hsd/hsd_mobj_range_801A84B4.c:
 hsd/hsd_vec_get_alloc_data.c:
 	.text       start:0x801A84E4 end:0x801A84F0
 
-hsd/hsd_mobj_range_801A84F0.c:
+hsd/hsd_mtx.c:
 	.text       start:0x801A84F0 end:0x801A85F0
 
 hsd/hsd_mtx_scaled_add.c:
@@ -864,18 +867,21 @@ hsd/hsd_mobj_range_801A86B4.c:
 	.text       start:0x801A86B4 end:0x801AA608
 
 hsd/hsd_pobj_range_801AA608.c:
-	.text       start:0x801AA608 end:0x801AE000
+	.text       start:0x801AA608 end:0x801ADD48
+
+hsd/hsd_robj_range_801ADD48.c:
+	.text       start:0x801ADD48 end:0x801AE000
 
 hsd/hsd_pobj.c:
 	.text       start:0x801AE000 end:0x801AE008
 
-hsd/hsd_pobj_range_801AE008.c:
+hsd/hsd_robj_range_801AE008.c:
 	.text       start:0x801AE008 end:0x801AEBE0
 
 hsd/hsd_pobj_empty.c:
 	.text       start:0x801AEBE0 end:0x801AEBE4
 
-hsd/hsd_pobj_range_801AEBE4.c:
+hsd/hsd_robj_range_801AEBE4.c:
 	.text       start:0x801AEBE4 end:0x801B009C
 
 hsd/hsd_robj_update_func.c:
@@ -899,8 +905,14 @@ hsd/hsd_shadow.c:
 hsd/hsd_texp.c:
 	.text       start:0x801B1730 end:0x801BBAC8
 
-hsd/hsd_range_801BBAC8.c:
-	.text       start:0x801BBAC8 end:0x801C01C8
+hsd/hsd_tobj.c:
+	.text       start:0x801BBAC8 end:0x801BF098
+
+hsd/hsd_util.c:
+	.text       start:0x801BF098 end:0x801BF6AC
+
+hsd/hsd_video.c:
+	.text       start:0x801BF6AC end:0x801C01C8
 
 hsd/hsd_aobj_range_801C01C8.c:
 	.text       start:0x801C01C8 end:0x801C0F20

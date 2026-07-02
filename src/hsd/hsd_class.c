@@ -18,9 +18,9 @@
 #include "hsd/hsd_object.h"
 
 /* Forward declaration */
-static void _hsdClassInfoInit(void);
+static void fn_801938FC(void);
 
-HSD_ClassInfo hsdClass = { _hsdClassInfoInit };
+HSD_ClassInfo hsdClass = { fn_801938FC };
 
 static HSD_MemoryEntry** memory_list;
 static s32 nb_memory_list;
@@ -211,52 +211,33 @@ void hsdFreeMemPiece(void* mem, s32 size)
 
 /* ========================================================================= */
 /*  Class lifecycle functions                                                */
+/*                                                                            */
+/*  NOTE: bodies live in the address-scaffolded section below (they are      */
+/*  real disassembled targets at 0x80193A1C-0x80193AF0); only prototypes     */
+/*  (from hsd_class.h) are needed here to wire up hsdClass's vtable.         */
 /* ========================================================================= */
-
-HSD_Class* _hsdClassAlloc(HSD_ClassInfo* info)
-{
-    HSD_Class* mem_piece = hsdAllocMemPiece(info->head.obj_size);
-    if (mem_piece != NULL) {
-        info->head.nb_exist += 1;
-        if (info->head.nb_exist > info->head.nb_peak) {
-            info->head.nb_peak = info->head.nb_exist;
-        }
-    }
-    return mem_piece;
-}
-
-int _hsdClassInit(HSD_Class* arg0)
-{
-    return 0;
-}
-
-void _hsdClassRelease(HSD_Class* cls) {}
-
-void _hsdClassDestroy(HSD_Class* cls)
-{
-    HSD_ClassInfo* info = cls->class_info;
-    info->head.nb_exist -= 1;
-    hsdFreeMemPiece(cls, info->head.obj_size);
-}
-
-void _hsdClassAmnesia(HSD_ClassInfo* info)
-{
-    info->head.nb_exist = 0;
-    info->head.nb_peak = 0;
-    if (info == &hsdClass) {
-        nb_memory_list = 0;
-        memory_list = NULL;
-    }
-}
 
 /* ========================================================================= */
 /*  Class info initialization                                                */
+/*                                                                            */
+/*  NOTE: this is hsdInitClassInfo() with parent_info == NULL fully inlined  */
+/*  at its one call site (target has no `bl hsdInitClassInfo` here), plus    */
+/*  the 5 vtable slots. See melee baselib/class.c ClassInfoInit for the      */
+/*  un-inlined equivalent.                                                   */
 /* ========================================================================= */
 
-static void _hsdClassInfoInit(void)
+static void fn_801938FC(void)
 {
-    hsdInitClassInfo(&hsdClass, NULL, "sysdolphin_base_library", "hsd_class",
-                     sizeof(HSD_ClassInfo), sizeof(HSD_Class));
+    hsdClass.head.flags = 1;
+    hsdClass.head.library_name = "sysdolphin_base_library";
+    hsdClass.head.class_name = "hsd_class";
+    hsdClass.head.obj_size = (s16) sizeof(HSD_Class);
+    hsdClass.head.info_size = (s16) sizeof(HSD_ClassInfo);
+    hsdClass.head.parent = NULL;
+    hsdClass.head.next = NULL;
+    hsdClass.head.child = NULL;
+    hsdClass.head.nb_exist = 0;
+    hsdClass.head.nb_peak = 0;
     hsdClass.alloc = _hsdClassAlloc;
     hsdClass.init = _hsdClassInit;
     hsdClass.release = _hsdClassRelease;

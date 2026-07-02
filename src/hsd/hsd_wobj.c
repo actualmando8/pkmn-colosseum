@@ -181,7 +181,7 @@ void HSD_WObjSetPositionZ(HSD_WObj* wobj, f32 val)
     }
 }
 
-void HSD_WObjGetPosition(HSD_WObj* wobj, f32* x, f32* y, f32* z)
+void HSD_WObjGetPosition_Early(HSD_WObj* wobj, f32* x, f32* y, f32* z)
 {
     if (wobj == NULL) {
         return;
@@ -376,7 +376,7 @@ asm void HSD_WObjGetPosition(void) {
 #include "src/hsd/hsd_wobj_fn_80191688.inc"
 }
 #else
-void HSD_WObjGetPosition(HSD_WObj* wobj, WObjVec* position)
+void HSD_WObjGetPosition(HSD_WObj* wobj, void* position)
 {
     if (wobj == NULL) {
         return;
@@ -462,7 +462,6 @@ HSD_WObj* HSD_WObjLoadDesc(HSD_WObjDesc* desc)
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void* HSD_RObjLoadDesc(void* desc);
 extern void fn_801AEBE4(void* robj, void* desc);
 #if 0
 asm void HSD_WObjInit(HSD_WObj* wobj, HSD_WObjDesc* desc) {

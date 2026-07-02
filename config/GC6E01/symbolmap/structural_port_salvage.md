@@ -6,8 +6,8 @@ No live XD asm is available in this tree, so this evidence was not re-mined - on
 
 | status | count | meaning |
 |---|---|---|
-| still-open | 589 | live REVIEW-band lead - function is still `fn_`/`lbl_` today |
-| already-applied | 539 | independently confirmed - already renamed to match (or `name_ADDR` variant) |
+| still-open | 49 | live REVIEW-band lead - function is still `fn_`/`lbl_` today |
+| already-applied | 1079 | independently confirmed - already renamed to match (or `name_ADDR` variant) |
 | already-conflict | 4 | already renamed, but to a DIFFERENT name (see samples) |
 | address-not-found | 0 | no function symbol at that address anymore |
 | skip (non-address fn) | 13 | archived `fn` was already a real name at archive time |
@@ -18,16 +18,16 @@ No live XD asm is available in this tree, so this evidence was not re-mined - on
 
 | fn | addr | -> xd_name | n | confidence | shared strings |
 |---|---|---|---|---|---|
-| `fn_800C5A58` | 0x800C5A58 | **__two_exp_800DCCB8** | 1505 | MED | `` |
-| `fn_800C1FB0` | 0x800C1FB0 | **TRKTargetAccessFP** | 323 | MED | `` |
-| `fn_800C1A08` | 0x800C1A08 | **TRKTargetAccessExtended2** | 270 | MED | `` |
-| `fn_800C56A4` | 0x800C56A4 | **__num2dec_internal** | 237 | MED | `` |
-| `fn_8009E414` | 0x8009E414 | **__OSDispatchInterrupt** | 209 | MED | `` |
-| `fn_800C2748` | 0x800C2748 | **TRKValidMemory32** | 169 | MED | `` |
-| `fn_800A4454` | 0x800A4454 | **DVDLowRead** | 166 | MED | `` |
-| `fn_800CEFBC` | 0x800CEFBC | **DBGEXIImm** | 166 | MED | `` |
-| `fn_800C5154` | 0x800C5154 | **deallocate_from_var_pools** | 165 | MED | `` |
-| `fn_800A1F94` | 0x800A1F94 | **OSResumeThread** | 162 | MED | `` |
+| `fn_8009EFE4` | 0x8009EFE4 | **OSUnlink** | 117 | MED | `` |
+| `fn_800A5268` | 0x800A5268 | **DVDGetCurrentDir** | 49 | MED | `` |
+| `fn_8001BD80` | 0x8001BD80 | **menuPokemonOpenFight** | 29 | MED | `` |
+| `fn_80255C18` | 0x80255C18 | **fightTrainerAiWazaHit160** | 29 | MED | `` |
+| `fn_8020FC04` | 0x8020FC04 | **fightWazaWzxVariationFuncWeatherHP** | 27 | MED | `` |
+| `fn_802400D8` | 0x802400D8 | **fightTrainerAiWazaValueOomugaesi** | 27 | MED | `` |
+| `fn_80258A64` | 0x80258A64 | **fightTrainerAiWazaHit079** | 27 | MED | `` |
+| `fn_80255AE4` | 0x80255AE4 | **fightTrainerAiWazaHit162** | 26 | MED | `` |
+| `fn_80259A84` | 0x80259A84 | **fightTrainerAiWazaHit057** | 26 | MED | `` |
+| `fn_801F00D0` | 0x801F00D0 | **fightTargetGetRelativeHostSideFightTargetIdToTragetPtr** | 25 | MED | `` |
 
 ## Sample: already-applied (QA confirmation, no action needed)
 

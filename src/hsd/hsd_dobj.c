@@ -119,33 +119,8 @@ static int DObjLoad_Early(HSD_DObj* dobj, HSD_DObjDesc* desc)
     return 0;
 }
 
-HSD_DObj* HSD_DObjLoadDesc(HSD_DObjDesc* desc)
-{
-    HSD_DObj* dobj = NULL;
-    HSD_DObj* first = NULL;
-    HSD_DObj* prev = NULL;
-    HSD_DObjDesc* d;
-
-    for (d = desc; d != NULL; d = d->next) {
-        HSD_ClassInfo* info;
-        if (d->class_name == NULL ||
-            !(info = hsdSearchClassInfo(d->class_name)))
-        {
-            dobj = HSD_DObjAlloc();
-        } else {
-            dobj = hsdNew(info);
-            HSD_ASSERT(0, dobj);
-        }
-        HSD_DOBJ_METHOD(dobj)->load(dobj, d);
-        if (prev != NULL) {
-            prev->next = dobj;
-        } else {
-            first = dobj;
-        }
-        prev = dobj;
-    }
-    return first;
-}
+/* NOTE: HSD_DObjLoadDesc's real body lives in the address-scaffolded
+ * section below (0x801992D8); that's the disassembled target. */
 
 /* ========================================================================= */
 /*  Resolve refs                                                             */
@@ -184,15 +159,8 @@ void HSD_DObjRemove(HSD_DObj* dobj)
     }
 }
 
-void HSD_DObjRemoveAll(HSD_DObj* dobj)
-{
-    HSD_DObj* next;
-    while (dobj != NULL) {
-        next = dobj->next;
-        HSD_DObjRemove(dobj);
-        dobj = next;
-    }
-}
+/* NOTE: HSD_DObjRemoveAll's real body lives in the address-scaffolded
+ * section below (0x80199264); that's the disassembled target. */
 
 /* ========================================================================= */
 /*  Alloc                                                                    */
@@ -219,14 +187,10 @@ void HSD_DObjSetDefaultClass(HSD_ClassInfo* info)
 /*  Class lifecycle                                                          */
 /* ========================================================================= */
 
-static void DObjRelease(HSD_Class* o)
-{
-    HSD_DObj* dobj = (HSD_DObj*) o;
-    HSD_MObjRemove(dobj->mobj);
-    HSD_PObjRemoveAll(dobj->pobj);
-    HSD_AObjRemove(dobj->aobj);
-    HSD_PARENT_INFO(&hsdDObj)->release(o);
-}
+/* NOTE: DObjRelease's real body lives in the address-scaffolded section
+ * below (0x8019905C); that's the disassembled target. Forward-declared
+ * here so DObjInfoInit() can wire it into the vtable. */
+static void DObjRelease(HSD_Class* o);
 
 static void DObjAmnesia(HSD_ClassInfo* info)
 {
@@ -481,7 +445,6 @@ HSD_DObj* HSD_DObjLoadDesc(HSD_DObjDesc* desc)
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void OSReport(const char* fmt, ...);
-extern HSD_MObj* HSD_MObjLoadDesc(void* mobjdesc);
 extern HSD_PObj* fn_801AD288(void* pobjdesc);
 extern void HSD_Panic(const char* file, s32 line, const char* msg);
 extern HSD_ClassInfo* lbl_8047B260;
@@ -627,7 +590,6 @@ void HSD_DObjReqAnimAllByFlags(HSD_DObj* dobj, f32 val, void* arg) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void HSD_MObjAddAnim(HSD_MObj* mobj, void* arg);
 extern void fn_801AD738(HSD_PObj* pobj, void* arg);
 #if 0
 asm void HSD_DObjAddAnimAll(void) {

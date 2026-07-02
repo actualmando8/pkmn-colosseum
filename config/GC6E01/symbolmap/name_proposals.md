@@ -1,6 +1,6 @@
 # Function-name proposals from log/assert strings
 
-87 candidate(s); 0 HIGH-confidence & currently unnamed.
+98 candidate(s); 0 HIGH-confidence & currently unnamed.
 Advisory only — review before applying. Never written to asm.
 
 | fn | addr | proposed | conf | via | evidence |
@@ -36,12 +36,9 @@ Advisory only — review before applying. Never written to asm.
 | `floorReadCameraPreFunc` ⟨named⟩ | 80114948 | **floorReadCameraPreFunc** | HIGH | leading | `floorReadCameraPreFunc: can't alloc %d bytes of memory\n` |
 | `floorReadMapPreFunc` ⟨named⟩ | 80114CA8 | **floorReadMapPreFunc** | HIGH | leading | `floorReadMapPreFunc: can't alloc %d bytes of memory\n` |
 | `floorUpdateFieldCamera` ⟨named⟩ | 80117514 | **floorUpdateFieldCamera** | HIGH | leading | `floorUpdateFieldCamera: error updating field camera - divide by zero!` |
-| `fn_800D39E0` ⟨shared-prefix⟩ | 800D39E0 | **GSgfx** | HIGH | leading | `GSgfx: unable to allocate gsgfx state!\n` |
 | `fn_800D7E5C` ⟨shared-prefix⟩ | 800D7E5C | **GSgfx** | HIGH | leading | `GSgfx: matrix stack underflow!\n` |
 | `fn_800E2DB0` ⟨shared-prefix⟩ | 800E2DB0 | **GSmem** | HIGH | leading | `GSmem: Warning -- memory loss of %d bytes due to no block before allocation poin` |
-| `fn_800E3568` ⟨shared-prefix⟩ | 800E3568 | **GSmem** | HIGH | leading | `GSmem: Init OK, using area %08Xh -> %08Xh\n` |
 | `fn_800EE2C8` ⟨shared-prefix⟩ | 800EE2C8 | **GSpart** | HIGH | leading | `GSpart: part is already registered for rotation\n` |
-| `fn_800EE3BC` ⟨shared-prefix⟩ | 800EE3BC | **GSpart** | HIGH | leading | `GSpart: child node too deep\n` |
 | `fn_80138CCC` ⟨shared-prefix⟩ | 80138CCC | **leaffxStartEffect** | HIGH | leading | `leaffxStartEffect: Could not start leaf effect - invalid leaf model: groupRes %d` |
 | `fn_80139D10` ⟨shared-prefix⟩ | 80139D10 | **leaffxStartEffect** | HIGH | leading | `leaffxStartEffect: Could not start lightning effect - not enough memory!\n` |
 | `gdev_cc_read` ⟨named⟩ ⟨shared-prefix⟩ | 800C4348 | **cc_read** | HIGH | leading | `cc_read : error reading bytes from EXI2 %ld\n` |
@@ -55,27 +52,40 @@ Advisory only — review before applying. Never written to asm.
 | `wazaSequenceEntryUpdate` ⟨named⟩ | 801D81CC | **wazaSequenceEntryUpdate** | HIGH | leading | `wazaSequenceEntryUpdate: Invalid Data Type!\n` |
 | `wazaSequencePokemonMotionStart` ⟨named⟩ | 801D9C1C | **wazaSequencePokemonMotionStart** | HIGH | leading | `wazaSequencePokemonMotionStart: Failed to start pokemon motion!\n` |
 | `wazaSequenceUpdate` ⟨named⟩ | 801DB988 | **wazaSequenceUpdate** | HIGH | leading | `wazaSequenceUpdate: Could not start sequence entry!\n` |
+| `DVDChangeDisk` ⟨named⟩ ⟨shared-prefix⟩ | 800A61E8 | DVDChangeDisk | MED | call | `DVDChangeDisk(): FST in the new disc is too big.   ` |
 | `DVDConvertPathToEntrynum` ⟨named⟩ ⟨shared-prefix⟩ | 800A4D28 | DVDConvertEntrynumToPath | MED | call | `DVDConvertEntrynumToPath(possibly DVDOpen or DVDChangeDir or DVDOpenDir): specif` |
 | `DVDOpen` ⟨named⟩ ⟨shared-prefix⟩ | 800A501C | DVDOpen | MED | call | `Warning: DVDOpen(): file '%s' was not found under %s.\n` |
+| `DVDRead` ⟨named⟩ ⟨shared-prefix⟩ | 800A541C | DVDRead | MED | call | `DVDRead(): specified area is out of the file  ` |
+| `DVDReadAsync` ⟨named⟩ ⟨shared-prefix⟩ | 800A532C | DVDReadAsync | MED | call | `DVDReadAsync(): specified area is out of the file  ` |
+| `DVDSeekAsyncPrio` ⟨named⟩ ⟨shared-prefix⟩ | 800A5558 | DVDSeek | MED | call | `DVDSeek(): offset is out of the file  ` |
+| `GSgfxInit__FP15_GSgfxInitParms` ⟨named⟩ ⟨shared-prefix⟩ | 800D39E0 | GSgfx | MED | leading | `GSgfx: unable to allocate gsgfx state!\n` |
+| `GSmemInit` ⟨named⟩ ⟨shared-prefix⟩ | 800E3568 | GSmem | MED | leading | `GSmem: Init OK, using area %08Xh -> %08Xh\n` |
+| `GSpartGetTransform` ⟨named⟩ ⟨shared-prefix⟩ | 800EE3BC | GSpart | MED | leading | `GSpart: child node too deep\n` |
 | `HSD_MObjSetDefaultClass` ⟨named⟩ ⟨shared-prefix⟩ | 801A7CFC | hsdIsDescendantOf | MED | call | `hsdIsDescendantOf(info, &hsdMObj)` |
 | `TRKTargetInterrupt` ⟨named⟩ ⟨shared-prefix⟩ | 800C17CC | TargetDoStep | MED | call | `TargetDoStep()\n` |
 | `TRKTargetSingleStep` ⟨named⟩ ⟨shared-prefix⟩ | 800C1610 | TargetDoStep | MED | call | `TargetDoStep()\n` |
 | `TRKTargetStepOutOfRange` ⟨named⟩ ⟨shared-prefix⟩ | 800C1558 | TargetDoStep | MED | call | `TargetDoStep()\n` |
+| `_menuPop` ⟨named⟩ ⟨shared-prefix⟩ | 800714C8 | _menuPop | MED | call | `0 < _CBC.m_nMenuStackDepth &&\"_menuPop():stack under.\"` |
+| `_menuPush` ⟨named⟩ ⟨shared-prefix⟩ | 800715BC | _menuPush | MED | call | `0 &&\"_menuPush(int eMenuID):stack over.\"` |
+| `_msgGetSize__FPCUs` ⟨named⟩ ⟨shared-prefix⟩ | 800FE010 | _msgGetSize | MED | call | `_msgGetSize() failed.\n` |
+| `_wazaSequenceModelEntryStart` ⟨named⟩ ⟨shared-prefix⟩ | 801D91EC | _wazaSequenceModelEntryStart | MED | leading | `_wazaSequenceModelEntryStart: Some error occured here\n` |
 | `fn_80071398` ⟨shared-prefix⟩ | 80071398 | _menuPop | MED | call | `0 < _CBC.m_nMenuStackDepth &&\"_menuPop():stack under.\"` |
 | `fn_800714C8` ⟨shared-prefix⟩ | 800714C8 | _menuPop | MED | call | `0 < _CBC.m_nMenuStackDepth &&\"_menuPop():stack under.\"` |
-| `fn_800715BC` | 800715BC | _menuPush | MED | call | `0 &&\"_menuPush(int eMenuID):stack over.\"` |
+| `fn_800715BC` ⟨shared-prefix⟩ | 800715BC | _menuPush | MED | call | `0 &&\"_menuPush(int eMenuID):stack over.\"` |
 | `fn_800A4D28` ⟨shared-prefix⟩ | 800A4D28 | DVDConvertEntrynumToPath | MED | call | `DVDConvertEntrynumToPath(possibly DVDOpen or DVDChangeDir or DVDOpenDir): specif` |
 | `fn_800A501C` ⟨shared-prefix⟩ | 800A501C | DVDOpen | MED | call | `Warning: DVDOpen(): file '%s' was not found under %s.\n` |
-| `fn_800A532C` | 800A532C | DVDReadAsync | MED | call | `DVDReadAsync(): specified area is out of the file  ` |
-| `fn_800A541C` | 800A541C | DVDRead | MED | call | `DVDRead(): specified area is out of the file  ` |
-| `fn_800A5558` | 800A5558 | DVDSeek | MED | call | `DVDSeek(): offset is out of the file  ` |
+| `fn_800A532C` ⟨shared-prefix⟩ | 800A532C | DVDReadAsync | MED | call | `DVDReadAsync(): specified area is out of the file  ` |
+| `fn_800A541C` ⟨shared-prefix⟩ | 800A541C | DVDRead | MED | call | `DVDRead(): specified area is out of the file  ` |
+| `fn_800A5558` ⟨shared-prefix⟩ | 800A5558 | DVDSeek | MED | call | `DVDSeek(): offset is out of the file  ` |
 | `fn_800A61E8` ⟨shared-prefix⟩ | 800A61E8 | DVDChangeDisk | MED | call | `DVDChangeDisk(): FST in the new disc is too big.   ` |
+| `fn_800D39E0` ⟨shared-prefix⟩ | 800D39E0 | GSgfx | MED | leading | `GSgfx: unable to allocate gsgfx state!\n` |
 | `fn_800D7D10` ⟨shared-prefix⟩ | 800D7D10 | GSgfx | MED | leading | `GSgfx: invalid matrix index\n` |
 | `fn_800D7D90` ⟨shared-prefix⟩ | 800D7D90 | GSgfx | MED | leading | `GSgfx: invalid matrix index\n` |
 | `fn_800D7F14` ⟨shared-prefix⟩ | 800D7F14 | GSgfx | MED | leading | `GSgfx: matrix stack overflow!\n` |
 | `fn_800D8088` ⟨shared-prefix⟩ | 800D8088 | GSgfx | MED | leading | `GSgfx: matrix stack overflow!\n` |
-| `fn_800FE010` | 800FE010 | _msgGetSize | MED | call | `_msgGetSize() failed.\n` |
-| `fn_80101244` | 80101244 | loadParticle | MED | call | `loadParticle(): loading...\n` |
+| `fn_800E3568` ⟨shared-prefix⟩ | 800E3568 | GSmem | MED | leading | `GSmem: Init OK, using area %08Xh -> %08Xh\n` |
+| `fn_800EE3BC` ⟨shared-prefix⟩ | 800EE3BC | GSpart | MED | leading | `GSpart: child node too deep\n` |
+| `fn_800FE010` ⟨shared-prefix⟩ | 800FE010 | _msgGetSize | MED | call | `_msgGetSize() failed.\n` |
 | `fn_8011432C` ⟨shared-prefix⟩ | 8011432C | floorReadGFLPreFunc | MED | call | `floorReadGFLPreFunc(): can't alloc %d bytes of memory\n` |
 | `fn_8011445C` ⟨shared-prefix⟩ | 8011445C | floorReadParticlePreFunc | MED | call | `floorReadParticlePreFunc(): can't alloc %d bytes of memory\n` |
 | `fn_801145C0` ⟨shared-prefix⟩ | 801145C0 | floorReadParticlePreFunc | MED | call | `floorReadParticlePreFunc(): can't alloc %d bytes of memory\n` |
@@ -90,5 +100,6 @@ Advisory only — review before applying. Never written to asm.
 | `fn_80115024` | 80115024 | floorReadNormalPreFunc | MED | call | `floorReadNormalPreFunc(): can't alloc %d bytes of memory\n` |
 | `fn_8013A49C` | 8013A49C | electronStartEffect | MED | leading | `electronStartEffect: Could not start electron effect - invalid model: groupRes %` |
 | `fn_801A7CFC` ⟨shared-prefix⟩ | 801A7CFC | hsdIsDescendantOf | MED | call | `hsdIsDescendantOf(info, &hsdMObj)` |
-| `fn_801D91EC` | 801D91EC | _wazaSequenceModelEntryStart | MED | leading | `_wazaSequenceModelEntryStart: Some error occured here\n` |
+| `fn_801D91EC` ⟨shared-prefix⟩ | 801D91EC | _wazaSequenceModelEntryStart | MED | leading | `_wazaSequenceModelEntryStart: Some error occured here\n` |
+| `loadParticle` ⟨named⟩ | 80101244 | loadParticle | MED | call | `loadParticle(): loading...\n` |
 | `stateReadingFST` ⟨named⟩ ⟨shared-prefix⟩ | 800A56F0 | DVDChangeDisk | MED | call | `DVDChangeDisk(): FST in the new disc is too big.   ` |

@@ -243,7 +243,7 @@ config.libs = [
             Object(CodeCandidate, "trk/ddh_cc_range_800C3E90.c", mw_version="GC/1.3", progress_category="sdk"),  # CALIB_TRK
             Object(CodeCandidate, "hsd/hsd_mobj_range_801A8478.c", mw_version="GC/1.3", progress_category="sdk"),  # CALIB_HSD1
             Object(CodeCandidate, "hsd/hsd_mobj_range_801A84B4.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_HSD_VECINIT
-            Object(CodeCandidate, "hsd/hsd_mobj_range_801A84F0.c", mw_version="GC/1.3", progress_category="sdk"),  # CALIB_HSD2
+            Object(CodeCandidate, "hsd/hsd_mtx.c", mw_version="GC/1.3", progress_category="sdk"),  # CALIB_HSD2
             Object(CodeCandidate, "crt/stdio_range_800C7558.c", mw_version="GC/1.3", progress_category="sdk"),  # CALIB_CRT
             Object(CodeCandidate, "trk/ddh_cc_range_800C3C00.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK
             Object(CodeCandidate, "trk/gdev_cc_range_800C41AC.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK
@@ -639,21 +639,21 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
-                "game/gs_range_8007FD64.c",
+                "game/menu/cardesavedata.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
             Object(
                 CodeCandidate,
-                "game/field_range_80089048.c",
+                "game/pokeconv.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
             Object(
                 CodeCandidate,
-                "game/gs_range_8008C7B0.c",
+                "game/gbaCommunication.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
@@ -726,7 +726,7 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
-                "dolphin/sdk_range_800A4D28.c",
+                "dolphin/dvd/dvdfs_range_800A4D28.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
             ),
@@ -738,7 +738,7 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
-                "dolphin/sdk_range_800A8178.c",
+                "dolphin/vi/VI_range_800A8178.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
             ),
@@ -943,7 +943,7 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
-                "hsd/hsd_range_801A69C0.c",
+                "hsd/hsd_memory.c",
                 mw_version="GC/1.3",
                 progress_category="sdk",
             ),
@@ -955,7 +955,7 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
-                "hsd/hsd_range_801BBAC8.c",
+                "hsd/hsd_tobj.c",
                 mw_version="GC/1.3",
                 progress_category="sdk",
             ),
@@ -1003,7 +1003,7 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
-                "game/gs_range_8005344C.c",
+                "game/menu/menuCB_Battle.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
@@ -1443,6 +1443,30 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "hsd/hsd_shadow.c",
+                mw_version="GC/1.3",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_util.c",
+                mw_version="GC/1.3",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_video.c",
+                mw_version="GC/1.3",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_mobj.c",
+                mw_version="GC/1.3",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_robj_range_801ADD48.c",
                 mw_version="GC/1.3",
                 progress_category="sdk",
             ),

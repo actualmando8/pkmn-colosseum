@@ -71,18 +71,8 @@ void HSD_FogInit(HSD_Fog* fog, HSD_FogDesc* desc)
     fog->fog_adj = HSD_FogAdjLoadDesc(desc->fogadjdesc);
 }
 
-HSD_Fog* HSD_FogLoadDesc(HSD_FogDesc* desc)
-{
-    HSD_Fog* fog;
-
-    if (desc == NULL) {
-        return NULL;
-    }
-
-    fog = HSD_FogAlloc();
-    HSD_FogInit(fog, desc);
-    return fog;
-}
+/* NOTE: HSD_FogLoadDesc's real body lives in the address-scaffolded section
+ * below (0x8019BB78); that's the disassembled target. */
 
 HSD_Fog* HSD_FogAlloc(void)
 {
@@ -111,20 +101,9 @@ void HSD_FogInterpretAnim(HSD_Fog* fog)
 /*  Class init                                                               */
 /* ========================================================================= */
 
-static void FogRelease(HSD_Class* o)
-{
-    HSD_Fog* fog = (HSD_Fog*) o;
-    HSD_AObjRemove(fog->aobj);
-    HSD_OBJECT_PARENT_INFO(&hsdFog)->release(o);
-}
-
-static void FogInfoInit(void)
-{
-    hsdInitClassInfo(HSD_CLASS_INFO(&hsdFog), HSD_CLASS_INFO(&hsdObj),
-                     "sysdolphin_base_library", "hsd_fog",
-                     sizeof(HSD_FogInfo), sizeof(HSD_Fog));
-    HSD_CLASS_INFO(&hsdFog)->release = FogRelease;
-}
+/* NOTE: FogRelease/FogInfoInit's real bodies live in the address-scaffolded
+ * section below (0x8019B874 / 0x8019B808); those are the disassembled
+ * targets (FogInfoInit also wires the FogUpdateFunc vtable slot). */
 
 static void FogAdjRelease(HSD_Class* o)
 {
@@ -156,7 +135,7 @@ extern u8 lbl_8036C7E8[];
 extern u8 lbl_8036CC00[];
 extern u8 lbl_802747B8[];
 extern u8 lbl_8047DA60;
-void FogInfoInit(void) {
+static void FogInfoInit(void) {
     hsdInitClassInfo((HSD_ClassInfo*) lbl_8036C7E8,
                      (HSD_ClassInfo*) lbl_8036CC00, (char*) lbl_802747B8,
                      (char*) &lbl_8047DA60, 0x40, 0x20);

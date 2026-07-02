@@ -16,7 +16,7 @@
    "status": "GAP",
    "assigned": "game/menu/menu_range_8007109C.c",
    "votes": {
-    "menuCB_Common.c": 5,
+    "menuCB_Common.c": 7,
     "menuToolBattle.c": 1,
     "menuCB_Rule.c": 4,
     "menuExDiscShrine.c": 1,
@@ -80,7 +80,7 @@
    "status": "GAP",
    "assigned": "dolphin/dvd/dvdfs_range_800A4D28.c",
    "votes": {
-    "dvdfs.c": 5
+    "dvdfs.c": 8
    },
    "note": ""
   },
@@ -90,7 +90,7 @@
    "status": "KNOWN",
    "assigned": "dolphin/dvd/DVD.c",
    "votes": {
-    "dvd.c": 2
+    "dvd.c": 3
    },
    "note": ""
   },
@@ -130,7 +130,7 @@
    "status": "KNOWN",
    "assigned": "hsd/hsd_cobj.c",
    "votes": {
-    "cobj.c": 24
+    "cobj.c": 29
    },
    "note": ""
   },
@@ -140,7 +140,7 @@
    "status": "KNOWN",
    "assigned": "hsd/hsd_displayfunc.c",
    "votes": {
-    "displayfunc.c": 2
+    "displayfunc.c": 4
    },
    "note": ""
   },
@@ -180,7 +180,7 @@
    "status": "KNOWN",
    "assigned": "hsd/hsd_mobj.c",
    "votes": {
-    "mobj.c": 10
+    "mobj.c": 11
    },
    "note": ""
   },
@@ -200,7 +200,7 @@
    "status": "GAP",
    "assigned": "hsd/hsd_pobj_range_801AA608.c",
    "votes": {
-    "pobj.c": 14
+    "pobj.c": 15
    },
    "note": ""
   },
@@ -220,7 +220,7 @@
    "status": "GAP",
    "assigned": "hsd/hsd_robj_range_801AE008.c",
    "votes": {
-    "robj.c": 3
+    "robj.c": 4
    },
    "note": ""
   },
@@ -250,7 +250,7 @@
    "status": "KNOWN",
    "assigned": "hsd/hsd_tobj.c",
    "votes": {
-    "tobj.c": 21
+    "tobj.c": 22
    },
    "note": ""
   },
@@ -302,7 +302,7 @@
    "status": "GAP",
    "assigned": "game/gs_range_80033278.c",
    "votes": {
-    "menuCardE.c": 1
+    "menuCardE.c": 2
    },
    "note": "assigned gs_range_80033278.c but code is menuCardE.c"
   },
@@ -312,7 +312,7 @@
    "status": "GAP",
    "assigned": "dolphin/vi/VI_range_800A8178.c",
    "votes": {
-    "vi.c": 1
+    "vi.c": 2
    },
    "note": "assigned VI_range_800A8178.c but code is vi.c"
   },
@@ -366,8 +366,8 @@
    "status": "KNOWN",
    "assigned": "hsd/hsd_dobj.c",
    "votes": {
-    "dobj.c": 2,
-    "fobj.c": 4
+    "dobj.c": 3,
+    "fobj.c": 7
    },
    "note": "also holds: fobj.c"
   },
@@ -377,7 +377,7 @@
    "status": "KNOWN",
    "assigned": "hsd/hsd_fog.c",
    "votes": {
-    "fog.c": 3,
+    "fog.c": 4,
     "hash.c": 1,
     "id.c": 1
    },
@@ -389,8 +389,8 @@
    "status": "KNOWN",
    "assigned": "hsd/hsd_jobj.c",
    "votes": {
-    "jobj.c": 18,
-    "list.c": 2
+    "jobj.c": 21,
+    "list.c": 3
    },
    "note": "also holds: list.c"
   },
@@ -401,7 +401,7 @@
    "assigned": "hsd/hsd_texp.c",
    "votes": {
     "tev.c": 5,
-    "texp.c": 15
+    "texp.c": 19
    },
    "note": "also holds: tev.c"
   }
@@ -409,7 +409,7 @@
  "gap_attribution": [
   {
    "cfile": "pobj.c",
-   "count": 14,
+   "count": 15,
    "lo": "0x801aa8bc",
    "hi": "0x801ad354",
    "fns": [
@@ -417,6 +417,7 @@
     "fn_801AA8BC",
     "SetupEnvelopeModelMtx",
     "fn_801AAEA8",
+    "HSD_PObjGetMtxMark",
     "fn_801AB538",
     "drawShapeAnim",
     "fn_801AB67C",
@@ -431,7 +432,7 @@
   },
   {
    "cfile": "robj.c",
-   "count": 12,
+   "count": 13,
    "lo": "0x801add48",
    "hi": "0x801afcac",
    "fns": [
@@ -440,6 +441,7 @@
     "fn_801ADF54",
     "fn_801AE008",
     "fn_801AE4B0",
+    "HSD_RObjLoadDesc",
     "fn_801AE5E8",
     "fn_801AEBE4",
     "fn_801AED88",
@@ -450,29 +452,34 @@
    ]
   },
   {
+   "cfile": "dvdfs.c",
+   "count": 8,
+   "lo": "0x800a4d28",
+   "hi": "0x800a5558",
+   "fns": [
+    "DVDConvertPathToEntrynum",
+    "fn_800A4D28",
+    "DVDReadAsync",
+    "fn_800A532C",
+    "DVDRead",
+    "fn_800A541C",
+    "DVDSeekAsyncPrio",
+    "fn_800A5558"
+   ]
+  },
+  {
    "cfile": "menuCB_Common.c",
-   "count": 5,
+   "count": 7,
    "lo": "0x8007109c",
    "hi": "0x800715bc",
    "fns": [
     "fn_8007109C",
     "fn_80071104",
     "fn_80071398",
+    "_menuPop",
     "fn_800714C8",
+    "_menuPush",
     "fn_800715BC"
-   ]
-  },
-  {
-   "cfile": "dvdfs.c",
-   "count": 5,
-   "lo": "0x800a4d28",
-   "hi": "0x800a5558",
-   "fns": [
-    "DVDConvertPathToEntrynum",
-    "fn_800A4D28",
-    "fn_800A532C",
-    "fn_800A541C",
-    "fn_800A5558"
    ]
   },
   {
@@ -485,6 +492,26 @@
     "fn_800772AC",
     "fn_800774D4",
     "fn_800776E4"
+   ]
+  },
+  {
+   "cfile": "menuCardE.c",
+   "count": 2,
+   "lo": "0x80033278",
+   "hi": "0x80033278",
+   "fns": [
+    "_sysvarsProcessData__FP16sysvarsFuncEntryPc",
+    "fn_80033278"
+   ]
+  },
+  {
+   "cfile": "vi.c",
+   "count": 2,
+   "lo": "0x800a94ac",
+   "hi": "0x800a94ac",
+   "fns": [
+    "VIConfigure",
+    "fn_800A94AC"
    ]
   },
   {
@@ -505,15 +532,6 @@
    "fns": [
     "generateParticle_8017424C",
     "generateParticle_801947D4"
-   ]
-  },
-  {
-   "cfile": "menuCardE.c",
-   "count": 1,
-   "lo": "0x80033278",
-   "hi": "0x80033278",
-   "fns": [
-    "fn_80033278"
    ]
   },
   {
@@ -541,15 +559,6 @@
    "hi": "0x800792d8",
    "fns": [
     "fn_800792D8"
-   ]
-  },
-  {
-   "cfile": "vi.c",
-   "count": 1,
-   "lo": "0x800a94ac",
-   "hi": "0x800a94ac",
-   "fns": [
-    "fn_800A94AC"
    ]
   },
   {
