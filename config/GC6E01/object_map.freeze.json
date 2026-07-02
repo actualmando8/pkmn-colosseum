@@ -9,21 +9,21 @@
     "total_units": 320
   },
   "topology_status": {
-    "auto_units": 80,
-    "named_units": 240,
-    "source_backed_units": 220,
-    "auto_code": 1015664,
+    "auto_units": 79,
+    "named_units": 241,
+    "source_backed_units": 221,
+    "auto_code": 824240,
     "auto_data": 2182883,
-    "auto_functions": 2583
+    "auto_functions": 2113
   },
   "baseline_progress": {
-    "matched_code": "256708",
-    "matched_code_percent": 10.288452,
+    "matched_code": "257164",
+    "matched_code_percent": 10.306728,
     "matched_data": "12364",
     "matched_data_percent": 0.56295806,
-    "matched_functions": 3367,
-    "matched_functions_percent": 39.13751,
-    "fuzzy_match_percent": 22.571846
+    "matched_functions": 3370,
+    "matched_functions_percent": 39.172382,
+    "fuzzy_match_percent": 22.649708
   },
   "unit_topology": [
     {
@@ -4135,7 +4135,7 @@
       "total_functions": 385
     },
     {
-      "name": "main/auto_01_80211A00_text",
+      "name": "main/game/fight_range_80211A00",
       "sections": [
         {
           "name": ".text",

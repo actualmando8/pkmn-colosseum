@@ -728,5 +728,8 @@ game/trainer.c:
 game/colosseum_event.c:
 	.text       start:0x80202810 end:0x80211A00
 
+game/fight_range_80211A00.c:
+	.text       start:0x80211A00 end:0x802405C0
+
 game/colosseum_battle.c:
 	.text       start:0x802405C0 end:0x80265EC4
