@@ -302,11 +302,11 @@ void gba_LinkInit(void);
 /* fn_800716C8 */ extern void  GSthread_Register(s32 channel, void* threadData);
 /* fn_8009F77C */ extern void  SI_Setup(void* ctx);
 /* fn_8009F9C8 */ extern void  SI_SetupCallback(void* callbackData);
-/* fn_800A19CC */ extern void  OSCreateThread(void* thread, void* func,
+/* OSCreateThread */ extern void  OSCreateThread(void* thread, void* func,
                                               void* arg, void* stackBase,
                                               u32 stackSize, u32 priority,
                                               u32 detached);
-/* fn_800A1F94 */ extern void  OSResumeThread(void* thread);
+/* OSResumeThread */ extern void  OSResumeThread(void* thread);
 /* fn_8009F7B4 */ extern void  SI_BeginTransfer(void* ctx);
 /* fn_8009F890 */ extern void  SI_EndTransfer(void* ctx);
 /* fn_800A257C */ extern void  SI_SetPriority(void* thread, u32 priority);

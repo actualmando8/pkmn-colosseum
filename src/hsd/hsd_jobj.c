@@ -1175,12 +1175,12 @@ ok:
 #pragma optimizewithasm off
 extern u8 lbl_80274B28[];
 #if 0
-asm void fn_8019FF74(void) {
+asm void HSD_JObjAddNext(void) {
 #include "src/hsd/hsd_jobj_fn_8019FF74.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_8019FF74(HSD_JObj* jobj, HSD_JObj* next) {
+void HSD_JObjAddNext(HSD_JObj* jobj, HSD_JObj* next) {
     /* decompiled cdx5: functional (non-byte-exact) */
     HSD_JObj* old_next;
     HSD_JObj* prev;
@@ -1468,12 +1468,12 @@ extern void HSD_JObjRef(HSD_JObj* jobj);
 extern void* HSD_IDGetData(u32 key, u32* found);
 extern void fn_801A0B9C(HSD_JObj* jobj);
 extern void* fn_801A0BF0(u32 key, u32* found);
-extern void fn_801A0C1C();
-extern BOOL fn_801A0C68(HSD_Obj*);
-extern void fn_801A0C9C();
-extern void fn_801A0CE8(void*);
+extern void ref_INC();
+extern BOOL iref_DEC(HSD_Obj*);
+extern void iref_INC();
+extern void hsdDelete(void*);
 extern s32 fn_801A0D3C();
-extern BOOL fn_801A0D48(void*);
+extern BOOL ref_DEC(void*);
 extern void fn_801A0744(HSD_JObj* jobj, HSD_Joint* joint);
 extern void HSD_JObjResolveRefs(HSD_JObj* jobj, HSD_Joint* joint);
 extern void fn_801AEBE4(HSD_RObj* robj, HSD_RObjDesc* desc);
@@ -1542,12 +1542,12 @@ void* HSD_IDGetData(u32 key, u32* found) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_801A0C1C(void) {
+asm void ref_INC(void) {
 #include "src/hsd/hsd_jobj_fn_801A0C1C.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_801A0C1C(HSD_Obj* obj) {
+void ref_INC(HSD_Obj* obj) {
     obj->ref_count++;
     if (!(obj->ref_count != HSD_OBJ_NOREF)) {
         __assert(lbl_80274AF4, 0x5d, lbl_80274B64);
@@ -1561,12 +1561,12 @@ void fn_801A0C1C(HSD_Obj* obj) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_801A0C68(void) {
+asm void iref_DEC(void) {
 #include "src/hsd/hsd_jobj_fn_801A0C68.inc"
 }
 #else
 #pragma optimization_level 4
-BOOL fn_801A0C68(HSD_Obj* obj) {
+BOOL iref_DEC(HSD_Obj* obj) {
     BOOL ret;
 
     if ((ret = (*(volatile u16*)&obj->ref_count_individual == 0))) {
@@ -1584,12 +1584,12 @@ BOOL fn_801A0C68(HSD_Obj* obj) {
 #pragma optimizewithasm off
 extern u8 lbl_80274B00[];
 #if 0
-asm void fn_801A0C9C(void) {
+asm void iref_INC(void) {
 #include "src/hsd/hsd_jobj_fn_801A0C9C.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_801A0C9C(HSD_Obj* obj) {
+void iref_INC(HSD_Obj* obj) {
     obj->ref_count_individual++;
     if (!(obj->ref_count_individual != 0)) {
         __assert(lbl_80274AF4, 0x9e, lbl_80274B00);
@@ -1603,12 +1603,12 @@ void fn_801A0C9C(HSD_Obj* obj) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_801A0CE8(void) {
+asm void hsdDelete(void) {
 #include "src/hsd/hsd_jobj_fn_801A0CE8.inc"
 }
 #else
 #pragma optimization_level 1
-void fn_801A0CE8(void* obj) {
+void hsdDelete(void* obj) {
     HSD_ClassInfo* info;
 
     if (obj != NULL) {
@@ -1642,12 +1642,12 @@ s32 fn_801A0D3C(HSD_Obj* obj) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_801A0D48(void) {
+asm void ref_DEC(void) {
 #include "src/hsd/hsd_jobj_fn_801A0D48.inc"
 }
 #else
 #pragma optimization_level 1
-BOOL fn_801A0D48(void* o) {
+BOOL ref_DEC(void* o) {
     BOOL ret;
 
     if ((ret = (*(volatile u16*)&HSD_OBJ(o)->ref_count == HSD_OBJ_NOREF))) {
@@ -1749,7 +1749,7 @@ extern HSD_ClassInfo* fn_80193748(const char*);
 extern HSD_JObj* fn_80193828(HSD_ClassInfo*);
 extern u32 lbl_8047B298;
 #if 1
-HSD_JObj* fn_801A0FBC(HSD_Joint* joint)
+HSD_JObj* HSD_JObjLoadJoint(HSD_Joint* joint)
 {
 #pragma optimization_level 1
     HSD_JObj* jobj;
@@ -1802,7 +1802,7 @@ done:
 }
 #else
 #pragma optimization_level 1
-HSD_JObj* fn_801A0FBC(HSD_Joint* joint)
+HSD_JObj* HSD_JObjLoadJoint(HSD_Joint* joint)
 {
     HSD_JObj* jobj;
     HSD_ClassInfo* info;
@@ -1853,8 +1853,8 @@ done:
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern HSD_DObj* fn_801992D8(HSD_DObjDesc* desc);
-extern HSD_RObj* fn_801AE5E8(HSD_RObjDesc* desc);
+extern HSD_DObj* HSD_DObjLoadDesc(HSD_DObjDesc* desc);
+extern HSD_RObj* HSD_RObjLoadDesc(HSD_RObjDesc* desc);
 extern void PSMTXIdentity(f32 mtx[3][4]);
 extern f32* HSD_MtxAlloc(void);
 extern void HSD_IDInsertToTable(void* table, u32 key, u32 value);
@@ -1896,10 +1896,10 @@ s32 JObjLoad(HSD_JObj* jobj, HSD_Joint* joint, HSD_JObj* parent)
             ptcl = ptcl->next;
         }
     } else {
-        jobj->u.dobj = (HSD_DObj*) fn_801992D8(joint->u.dobjdesc);
+        jobj->u.dobj = (HSD_DObj*) HSD_DObjLoadDesc(joint->u.dobjdesc);
     }
 
-    jobj->robj = (HSD_RObj*) fn_801AE5E8(joint->robjdesc);
+    jobj->robj = (HSD_RObj*) HSD_RObjLoadDesc(joint->robjdesc);
     jobj->rotate_x = joint->rotation_x;
     jobj->rotate_y = joint->rotation_y;
     jobj->rotate_z = joint->rotation_z;

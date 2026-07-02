@@ -150,17 +150,17 @@ static void FogAdjInfoInit(void)
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_8019B874(HSD_Fog* o);   /* inferred signature (glm5): FogRelease virtual */
+extern void FogRelease(HSD_Fog* o);   /* inferred signature (glm5): FogRelease virtual */
 extern void FogUpdateFunc(HSD_Fog* fog, s32 type, f32* value);   /* inferred glm6: FogInterpretAnim vtable slot (0x3C) */
 extern u8 lbl_8036C7E8[];
 extern u8 lbl_8036CC00[];
 extern u8 lbl_802747B8[];
 extern u8 lbl_8047DA60;
-void fn_8019B808(void) {
+void FogInfoInit(void) {
     hsdInitClassInfo((HSD_ClassInfo*) lbl_8036C7E8,
                      (HSD_ClassInfo*) lbl_8036CC00, (char*) lbl_802747B8,
                      (char*) &lbl_8047DA60, 0x40, 0x20);
-    ((void**)lbl_8036C7E8)[0x30/4] = (void*)fn_8019B874;
+    ((void**)lbl_8036C7E8)[0x30/4] = (void*)FogRelease;
     ((void**)lbl_8036C7E8)[0x3c/4] = (void*)FogUpdateFunc;
 }
 
@@ -170,13 +170,13 @@ void fn_8019B808(void) {
 #pragma optimizewithasm off
 extern void fn_801C25E4(HSD_AObj* aobj);   /* inferred == HSD_AObjRemove */
 #if 0
-asm void fn_8019B874(void) {
+asm void FogRelease(void) {
 #include "src/hsd/hsd_fog_fn_8019B874.inc"
 }
 #else
 /* decompiled glm5: functional (TU not byte-measurable) */
 /* FogRelease virtual (vtable 0x30). Signature inferred: arg0 is the HSD_Fog. */
-void fn_8019B874(HSD_Fog* o)
+void FogRelease(HSD_Fog* o)
 {
     HSD_FogAdj* fog_adj = o->fog_adj;
 
@@ -334,7 +334,7 @@ extern char lbl_8047DA74;   /* "fog.c" */
 extern u8 lbl_8047DA80[4];   /* "fog"  */
 extern u8 lbl_8047DA7C[4];   /* "adj"  */
 #if 0
-asm void fn_8019BB78(void) {
+asm void HSD_FogLoadDesc(void) {
 #include "src/hsd/hsd_fog_fn_8019BB78.inc"
 }
 #else
@@ -343,7 +343,7 @@ asm void fn_8019BB78(void) {
  * unattainable, so faithful readable C is the target) */
 /*
  * Allocate and initialise an HSD_Fog (plus its HSD_FogAdj) from a descriptor.
- * Inferred signature: HSD_Fog* fn_8019BB78(HSD_FogDesc* desc).
+ * Inferred signature: HSD_Fog* HSD_FogLoadDesc(HSD_FogDesc* desc).
  *
  * This is the monolithic binary form of what the reference code above splits
  * into HSD_FogAlloc + HSD_FogInit (+ FogAdj alloc/init): it hsdNew()s the fog,
@@ -355,7 +355,7 @@ asm void fn_8019BB78(void) {
  *   flags@0x00  center@0x04  width@0x06  mtx[4][4]@0x08
  * (header has center@0x00/width@0x02/mtx@0x04, no flags).
  */
-HSD_Fog* fn_8019BB78(HSD_FogDesc* desc)
+HSD_Fog* HSD_FogLoadDesc(HSD_FogDesc* desc)
 {
     HSD_Fog* fog;
     HSD_FogAdj* adj;

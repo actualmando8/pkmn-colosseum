@@ -871,9 +871,9 @@ extern void fn_8015B250(u32, u32);
 extern u32 ReverbHICreate(u8* obj, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6);
 extern u32 ReverbHIModify(u8* obj, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6);
 extern void ReverbHICallback(u32 a, u32 b, u32 c, u8* d);
-extern void fn_8009B300(void* addr, u32 nBytes);
+extern void DCStoreRange(void* addr, u32 nBytes);
 extern void fn_800AC02C(u32 a);
-extern void fn_800AC070(u8* ptr, u32 size);
+extern void AIInitDMA(u8* ptr, u32 size);
 extern u32  fn_800ACB44(void);
 extern u32  fn_800ACB4C(void);
 extern void fn_800AE630(void);
@@ -1726,7 +1726,7 @@ void hwFlushStream(u8* dstBase, u32 srcOffset, u32 size, u32 streamIndex, u32 ar
     dst = dstBase + srcOffset;
     size = (size + 0x1F) & ~0x1F;
 
-    fn_8009B300(dst, size);
+    DCStoreRange(dst, size);
     aramUploadData(dst, srcBase + srcOffset, size, 1, arg7, arg8);
 }
 #endif
@@ -2411,7 +2411,7 @@ void fn_80163EE0(void) {
     int counter = ((int)lbl_8047B0A0 + 1) % 4;
     u8* ptr = (u8*)(lbl_8047B09C + 0x80000000u) + (u8)counter * 0x280;
     lbl_8047B0A0 = counter;
-    fn_800AC070(ptr, 0x280);
+    AIInitDMA(ptr, 0x280);
     lbl_8047B08C = OSGetTick();
     if (lbl_8047B098 != 0) {
         if (lbl_8047B090 == 0) {
@@ -2483,7 +2483,7 @@ u32 salInitAi(u32(*fnptr)(void), u32 d, u32 a) {
         lbl_8047B090 = 0;
         lbl_8047B0A4 = (u32)fnptr;
         fn_800AC02C((u32)salCallback);
-        fn_800AC070((u8*)(lbl_8047B09C + 0x80000000u) + (u32)lbl_8047B0A0 * 0x280, 0x280);
+        AIInitDMA((u8*)(lbl_8047B09C + 0x80000000u) + (u32)lbl_8047B0A0 * 0x280, 0x280);
         ((u32*)lbl_80434C50)[1] = 0x20;
         *(u32*)a = 0x7D00;
         return 1;

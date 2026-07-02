@@ -509,7 +509,7 @@ void fn_800D30AC(void) {
 }
 #endif
 extern void GXSetDrawDone(void);
-extern void fn_800A1990(void);
+extern void OSYieldThread(void);
 extern void fn_8019C6FC(void);
 extern void fn_800DC560(void);
 extern void fn_801BF8A0(s32 a);
@@ -517,7 +517,7 @@ extern void fn_801E16F0(void);
 extern void fn_801BF6AC(void);
 extern void fn_800EF1E8(void* a, s32 b);
 extern void fn_800B8E74(void);
-extern void fn_800BB29C(void);
+extern void GXInvalidateTexAll(void);
 extern void fn_800D1070(void* a);
 extern void fn_800DC6D8(void* a);
 extern void fn_800E3884(void* a, s32 b);
@@ -558,7 +558,7 @@ void fn_800D3190(void) {
     r30 = 1;
 
     while (lbl_8047AA91 == 0) {
-        fn_800A1990();
+        OSYieldThread();
         if (lbl_8047AA91 == 0) {
             tick = OSGetTick();
             div = (tick - startTick) / (r31ptr[0xF8 / 4] >> 2);
@@ -591,7 +591,7 @@ void fn_800D3190(void) {
             if (r29b != 0) {
                 fn_800B8E74();
                 if (*(u32*)((u8*)lbl_8047AA80 + 0xC) != 0) {
-                    fn_800BB29C();
+                    GXInvalidateTexAll();
                 }
             }
         }
@@ -693,7 +693,7 @@ void fn_800D3410(void* arg0, u8 arg1) {
                 if (r30 != 0) {
                     fn_800B8E74();
                     if (*(u32*)((u8*)lbl_8047AA80 + 0xC) != 0) {
-                        fn_800BB29C();
+                        GXInvalidateTexAll();
                     }
                 }
             }

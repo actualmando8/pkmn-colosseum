@@ -303,7 +303,7 @@ typedef struct TypeMatchup {
 /* fn_801C25E4 */ void fn_801C25E4(void* ctx, s32 mode);
 /* fn_801C2670 */ void fn_801C2670(void* ctx, s32 objType, s32 param);
 /* fn_801C27F4 */ void fn_801C27F4(void* ctx, f32 posX, f32 posZ);
-/* fn_801C29C4 */ void fn_801C29C4(void* obj, f32 value);
+/* HSD_AObjReqAnim */ void HSD_AObjReqAnim(void* obj, f32 value);
 /* HSD_AObjInvokeCallBacks */ void HSD_AObjInvokeCallBacks(void);
 /* fn_801C2A60 */ s32  fn_801C2A60(void);
 /* fn_801C2A74 */ s32  fn_801C2A74(s32 slot);
@@ -464,7 +464,7 @@ typedef struct TypeMatchup {
 /* fn_801D84F4 */ void fn_801D84F4(void);                        /* wazaSequenceEntryStart */
 /* fn_801D87B0 */ void fn_801D87B0(void* entry, s32 type);       /* wazaSequenceStartEntry */
 /* fn_801D8B38 */ void fn_801D8B38(void* entry);                 /* _wazaSequenceParticleEntryStart */
-/* fn_801D91EC */ void fn_801D91EC(void* entry);                 /* _wazaSequenceModelEntryStart */
+/* _wazaSequenceModelEntryStart */ void _wazaSequenceModelEntryStart(void* entry);                 /* _wazaSequenceModelEntryStart */
 /* fn_801D9950 */ void fn_801D9950(s32 slot, s32 motionType);    /* wazaSequencePokemonMotionStart */
 
 /* Waza system lifecycle */

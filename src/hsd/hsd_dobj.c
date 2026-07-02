@@ -275,19 +275,19 @@ static void DObjDestroy(HSD_Class* o)
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_801A6D08(HSD_MObj* mobj);
+extern void HSD_MObjRemove(HSD_MObj* mobj);
 extern void HSD_PObjRemoveAll(HSD_PObj* pobj);
 extern void fn_801C25E4(HSD_AObj* aobj);
 #if 0
-asm void fn_8019905C(void) {
+asm void DObjRelease(void) {
 #include "src/hsd/hsd_dobj_fn_8019905C.inc"
 }
 #else
 #pragma optimization_level 4
-static void fn_8019905C(HSD_Class* o)
+static void DObjRelease(HSD_Class* o)
 {
     HSD_DObj* dobj = HSD_DOBJ(o);
-    fn_801A6D08(dobj->mobj);
+    HSD_MObjRemove(dobj->mobj);
     HSD_PObjRemoveAll(dobj->pobj);
     fn_801C25E4(dobj->aobj);
     HSD_PARENT_INFO(&hsdDObj)->release(o);
@@ -393,7 +393,7 @@ void HSD_DObjResolveRefsAll(HSD_DObj* dobj, HSD_DObjDesc* desc) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_80199264(void) {
+asm void HSD_DObjRemoveAll(void) {
 #include "src/hsd/hsd_dobj_fn_80199264.inc"
 }
 #else
@@ -406,7 +406,7 @@ extern HSD_DObjInfo lbl_8036C7A0;
 extern u8 lbl_80465378[];
 extern HSD_ClassInfo* lbl_8047B260;
 
-void fn_80199264(HSD_DObj* dobj) {
+void HSD_DObjRemoveAll(HSD_DObj* dobj) {
     HSD_DObj* next;
     HSD_DObj* d;
     d = dobj;
@@ -431,14 +431,14 @@ extern void* fn_80193828(HSD_ClassInfo* info);
 extern char lbl_8047DA18;
 extern char lbl_8047DA20;
 #if 0
-asm void fn_801992D8(void) {
+asm void HSD_DObjLoadDesc(void) {
 #include "src/hsd/hsd_dobj_fn_801992D8.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma push
 #pragma optimization_level 4
-HSD_DObj* fn_801992D8(HSD_DObjDesc* desc)
+HSD_DObj* HSD_DObjLoadDesc(HSD_DObjDesc* desc)
 {
     HSD_DObj* dobj;
     HSD_ClassInfo* info;
@@ -481,7 +481,7 @@ HSD_DObj* fn_801992D8(HSD_DObjDesc* desc)
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void OSReport(const char* fmt, ...);
-extern HSD_MObj* fn_801A7B24(void* mobjdesc);
+extern HSD_MObj* HSD_MObjLoadDesc(void* mobjdesc);
 extern HSD_PObj* fn_801AD288(void* pobjdesc);
 extern void HSD_Panic(const char* file, s32 line, const char* msg);
 extern HSD_ClassInfo* lbl_8047B260;
@@ -532,7 +532,7 @@ static int DObjLoad(HSD_DObj* dobj_arg, HSD_DObjDesc* desc_arg)
         }
     }
     dobj->next = sub;
-    dobj->mobj = fn_801A7B24(desc->mobjdesc);
+    dobj->mobj = HSD_MObjLoadDesc(desc->mobjdesc);
     dobj->pobj = fn_801AD288(desc->pobjdesc);
 
     if (dobj->mobj != NULL) {
@@ -570,7 +570,7 @@ static int DObjLoad(HSD_DObj* dobj_arg, HSD_DObjDesc* desc_arg)
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_801A7E3C(HSD_MObj* mobj);
+extern void HSD_MObjAnim(HSD_MObj* mobj);
 extern void HSD_PObjAnimAll(HSD_PObj* pobj);
 extern void fn_801C27F4(HSD_AObj* aobj, HSD_DObj* dobj, void* method);
 #if 0
@@ -589,7 +589,7 @@ void HSD_DObjAnimAll(HSD_DObj* dobj) {
             fn_801C27F4(d->aobj, d,
                         (void*) HSD_DOBJ_METHOD(d)->update);
             HSD_PObjAnimAll(d->pobj);
-            fn_801A7E3C(d->mobj);
+            HSD_MObjAnim(d->mobj);
         }
     }
 }
@@ -627,7 +627,7 @@ void HSD_DObjReqAnimAllByFlags(HSD_DObj* dobj, f32 val, void* arg) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_801A83BC(HSD_MObj* mobj, void* arg);
+extern void HSD_MObjAddAnim(HSD_MObj* mobj, void* arg);
 extern void fn_801AD738(HSD_PObj* pobj, void* arg);
 #if 0
 asm void HSD_DObjAddAnimAll(void) {
@@ -656,7 +656,7 @@ void HSD_DObjAddAnimAll(HSD_DObj* dobj, void* matanim, void* shapeanim) {
                 shapeargl = NULL;
             }
             fn_801AD738(pobj, shapeargl);
-            fn_801A83BC(d->mobj, ma);
+            HSD_MObjAddAnim(d->mobj, ma);
         }
         d = d->next;
         if (ma != NULL) {
@@ -740,7 +740,7 @@ HSD_FObj* HSD_FObjAlloc(void) {
 #pragma optimizewithasm off
 extern void fn_80199A84(void* list, void* data);
 #if 0
-asm void fn_80199794(void) {
+asm void HSD_FObjLoadDesc(void) {
 #include "src/hsd/hsd_dobj_fn_80199794.inc"
 }
 #else
@@ -754,7 +754,7 @@ extern char lbl_8047DA38;
  * Levels 0-2: inlined HSD_FObjAlloc body (ObjAlloc + assert + memset).
  * Level 3:    same + fn_80199A84(alloc_data, lbl_80274758) no-op hook.
  * Level 4:    real HSD_FObjAlloc() call + real recursion + field copy. */
-HSD_FObj* fn_80199794(HSD_FObjDesc* desc0)
+HSD_FObj* HSD_FObjLoadDesc(HSD_FObjDesc* desc0)
 {
     HSD_FObj* fobj1;
     HSD_FObjDesc* desc2;
@@ -807,7 +807,7 @@ HSD_FObj* fn_80199794(HSD_FObjDesc* desc0)
         goto set_fobj4;
     }
     fobj4 = HSD_FObjAlloc();
-    fobj4->next = fn_80199794(desc4->next);
+    fobj4->next = HSD_FObjLoadDesc(desc4->next);
     fobj4->startframe = (s16) desc4->startframe;
     fobj4->obj_type = desc4->type;
     fobj4->frac_value = desc4->frac_value;

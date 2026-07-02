@@ -89,7 +89,7 @@ void fn_8019C6FC(void) {
 extern void fn_800BCEF4(u32 a, u32 b);
 extern void fn_800BD07C(u32 a, u32 b);
 extern void fn_800B856C(void);
-extern void fn_800BB29C(void);
+extern void GXInvalidateTexAll(void);
 extern u8 lbl_80466BC0[];
 extern volatile s32 lbl_8047B294;
 extern u32 lbl_80478C78;
@@ -118,7 +118,7 @@ void fn_8019C708(u32 arg) {
             fn_800B856C();
         }
         if (lbl_8047B290 & 2) {
-            fn_800BB29C();
+            GXInvalidateTexAll();
         }
         lbl_8047B290 = 0;
     }
@@ -132,11 +132,11 @@ void fn_8019C708(u32 arg) {
 #pragma optimizewithasm off
 extern volatile s32 lbl_8047B294;
 #if 0
-asm void fn_8019C7B0(void) {
+asm void HSD_GetCurrentRenderPass(void) {
 #include "src/hsd/hsd_initialize_fn_8019C7B0.inc"
 }
 #else
-u32 fn_8019C7B0(void) {
+u32 HSD_GetCurrentRenderPass(void) {
     return lbl_8047B294;
 }
 #endif

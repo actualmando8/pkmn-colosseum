@@ -600,8 +600,8 @@ void fn_80036360(void) {
 
 /* fn_800363BC - 0x800363BC | size: 0xac */
 extern s32 _menuSoundReadWaveThread__FPv(u32* arg);
-extern void fn_800A19CC(void* thread, void* callback, void* arg, void* stack, u32 stackSize, u32 priority, u32 attr);
-extern void fn_800A1F94(void* thread);
+extern void OSCreateThread(void* thread, void* callback, void* arg, void* stack, u32 stackSize, u32 priority, u32 attr);
+extern void OSResumeThread(void* thread);
 extern u8 lbl_803A3E58[];
 extern u32 lbl_8047A460;
 #if 0
@@ -624,8 +624,8 @@ void fn_800363BC(void) {
     args[2] = 0;
     args[3] = 0;
 
-    fn_800A19CC(ctx + 0x1328, (void*)_menuSoundReadWaveThread__FPv, args, ctx + 0x263C, 0x1000, 0x10, 1);
-    fn_800A1F94(ctx + 0x1328);
+    OSCreateThread(ctx + 0x1328, (void*)_menuSoundReadWaveThread__FPv, args, ctx + 0x263C, 0x1000, 0x10, 1);
+    OSResumeThread(ctx + 0x1328);
 
     while (lbl_8047A460 != 0) {
         _threadSwitch();
@@ -676,8 +676,8 @@ void fn_800364C8(void) {
     args[2] = 6;
     args[3] = 0;
 
-    fn_800A19CC(ctx + 0x1328, (void*)_menuSoundReadWaveThread__FPv, args, ctx + 0x263C, 0x1000, 0x10, 1);
-    fn_800A1F94(ctx + 0x1328);
+    OSCreateThread(ctx + 0x1328, (void*)_menuSoundReadWaveThread__FPv, args, ctx + 0x263C, 0x1000, 0x10, 1);
+    OSResumeThread(ctx + 0x1328);
 
     while (lbl_8047A460 != 0) {
         _threadSwitch();
@@ -777,8 +777,8 @@ void fn_800366A8(void) {
     fadeSet(2, lbl_8047BA4C);
 
     if (lbl_8047A464 != 1) {
-        fn_800A19CC(ctx, (void*)fn_8003708C, NULL, ctx + 0x1314, 0x1000, 0x10, 1);
-        fn_800A1F94(ctx);
+        OSCreateThread(ctx, (void*)fn_8003708C, NULL, ctx + 0x1314, 0x1000, 0x10, 1);
+        OSResumeThread(ctx);
     }
 
     while (lbl_8047A464 == 0) {
@@ -795,8 +795,8 @@ void fn_800366A8(void) {
     args[1] = 0;
     args[2] = 0;
     args[3] = 0;
-    fn_800A19CC(ctx + 0x1328, (void*)_menuSoundReadWaveThread__FPv, args, ctx + 0x263C, 0x1000, 0x10, 1);
-    fn_800A1F94(ctx + 0x1328);
+    OSCreateThread(ctx + 0x1328, (void*)_menuSoundReadWaveThread__FPv, args, ctx + 0x263C, 0x1000, 0x10, 1);
+    OSResumeThread(ctx + 0x1328);
 
     fadeSet(3, lbl_8047BA4C);
     fadeCheck(1);

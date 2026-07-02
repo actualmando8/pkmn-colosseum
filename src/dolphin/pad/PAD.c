@@ -653,9 +653,9 @@ void fn_800AB4FC(const u32 *commandArray) {
 }
 
 /*
- * fn_800ABCF4 = PADSetAnalogMode (unmatched attempt)
+ * PADSetAnalogMode = PADSetAnalogMode (unmatched attempt)
  */
-void fn_800ABCF4(s32 mode) {
+void PADSetAnalogMode(s32 mode) {
     BOOL enabled = OSDisableInterrupts();
     u32 oldEnabled = lbl_8047A8A4;
 

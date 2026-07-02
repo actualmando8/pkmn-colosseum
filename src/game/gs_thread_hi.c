@@ -117,7 +117,7 @@ extern void* GSmemGetPtr(u16 handle);                    /* fn_800E27B0 */
 extern void* GSmemLock(u16 handle);                      /* fn_800E24B0 */
 extern void  GSmemFree(u16 handle);                      /* fn_800E209C */
 extern u16   GSmemAlloc(u32 alignment, u32 size);        /* fn_800E2C04 */
-extern void  fn_800A263C(void* func, void* arg,
+extern void  OSSetIdleFunction(void* func, void* arg,
                           void* stackTop, u32 stackSize); /* OSCreateFiber-like */
 extern void  OSDisableInterrupts(void);
 extern void  OSRestoreInterrupts(void);
@@ -325,7 +325,7 @@ static void*     gsThreadCurrentCtx;  /* lbl_8047AC1C : current thread context p
  *  Address: 0x800FE9B0, Size: 0xC4
  *
  *  Allocates the task array and scheduler stack from GSmem.
- *  Sets up the internal scheduler thread using fn_800A263C.
+ *  Sets up the internal scheduler thread using OSSetIdleFunction.
  *
  *  r3 = numTasks (normal-priority), r4 = numQueues (deferred)
  *
@@ -344,7 +344,7 @@ static void*     gsThreadCurrentCtx;  /* lbl_8047AC1C : current thread context p
  *    stackHandle = GSmemAllocRaw(0x2000)
  *    gsTaskStackHandle = stackHandle
  *    gsTaskStackPtr = GSmemGetPtr(stackHandle)
- *    fn_800A263C(GStaskSchedulerThread, NULL, stackTop, 0x1FFC)
+ *    OSSetIdleFunction(GStaskSchedulerThread, NULL, stackTop, 0x1FFC)
  *    fn_800D30A0(GStaskSwapCallback)
  * ======================================================================= */
 void GStaskInit(u32 numTasks, u32 numQueues) {
@@ -392,7 +392,7 @@ void GStaskInit(u32 numTasks, u32 numQueues) {
      * arg   = NULL
      * stack = gsTaskStackPtr + 0x1FFC (top of 8KB stack)
      * size  = 0x1FFC */
-    fn_800A263C((void*)GStaskSchedulerThread, NULL,
+    OSSetIdleFunction((void*)GStaskSchedulerThread, NULL,
                 (void*)((u32)gsTaskStackPtr + 0x1FFC), 0x1FFC);
 
     /* Register the swap-buffer callback with GSgfx */
@@ -824,7 +824,7 @@ static void GStaskSchedulerThread(void) {
         }
 
         /* Yield back to the main fibre (implementation is via
-         * the cooperative switch in fn_800A263C -- effectively
+         * the cooperative switch in OSSetIdleFunction -- effectively
          * a longjmp back to the caller's context). */
     }
 }
@@ -4696,7 +4696,7 @@ void fn_800FE9B0(numTasks, numQueues)
     handle = GSmemAllocRaw(0x2000);
     lbl_8047AC8C = handle;
     lbl_8047AC90 = (u32)GSmemGetPtr(handle);
-    fn_800A263C((void*)fn_800FEA74, NULL,
+    OSSetIdleFunction((void*)fn_800FEA74, NULL,
                 (void*)(lbl_8047AC90 + 0x1FFC), 0x1FFC);
     fn_800D30A0((void*)fn_800FEBA0);
 }

@@ -1112,7 +1112,7 @@ found:
     return 0;
 }
 #endif
-extern void fn_800ABCF4(void);
+extern void PADSetAnalogMode(void);
 extern void fn_800AAF38(void);
 extern void fn_800AB4FC(void);
 extern void fn_800AAE34(void);
@@ -1136,7 +1136,7 @@ void fn_800F8138(void) {
     extern u32 lbl_8047CCD0;
     extern u32 lbl_8047AC4C;
     extern u32 lbl_8047AC50;
-    extern void fn_800ABCF4(s32);
+    extern void PADSetAnalogMode(s32);
     extern void fn_800AAF38(void);
     extern void fn_800AB4FC(void*);
     extern void fn_800AAE34(u32);
@@ -1184,7 +1184,7 @@ void fn_800F8138(void) {
         *arr1b0++ = 0;
     }
 
-    fn_800ABCF4(0);
+    PADSetAnalogMode(0);
     fn_800AAF38();
     fn_800AB4FC(base + 0x1c0);
     fn_800AAE34(lbl_8047AC4C);

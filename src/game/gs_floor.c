@@ -8,7 +8,7 @@
  *   fn_800FF828 (GSfloorInit)
  *   fn_800FF970 (GSfloorThreadMain)
  *   fn_80100B24 (GSfloorUpdate)
- *   fn_80101244 (GSfloorLoadParticle)
+ *   loadParticle (GSfloorLoadParticle)
  *   fn_801012E8 (GSfloorFindAndOpen)
  *   fn_801013A0 (GSfloorLoadData)
  *   fn_8010147C (GSfloorLoadMain)
@@ -928,7 +928,7 @@ u8 GSfloorUpdate(GSFloorContext* ctx)
 }
 
 /* =======================================================================
- *  GSfloorLoadParticle / fn_80101244
+ *  GSfloorLoadParticle / loadParticle
  *  Address: 0x80101244, Size: 0xA4
  *
  *  Loads particle data for the current floor. Allocates a 32-byte-aligned
@@ -1268,7 +1268,7 @@ void fn_80100B24(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80101244(void) {
+void loadParticle(void) {
     /* TODO: match -- 164 bytes at 0x80101244 */
 }
 #pragma pop

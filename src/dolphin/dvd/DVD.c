@@ -622,7 +622,7 @@ DVDDiskID* DVDGetCurrentDiskID(void) {
  */
 
 /*
- * fn_800A61E8 - 0x800A61E8 | size: 0xE4
+ * DVDChangeDisk - 0x800A61E8 | size: 0xE4
  * DVD state machine callback (cover closed command)
  * TODO: Full decompilation
  */

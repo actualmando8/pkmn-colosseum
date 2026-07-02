@@ -270,7 +270,7 @@ u8 GSfloorUpdate(GSFloorContext* ctx);
  * @param callback    Completion callback.
  * @param callbackArg Argument to the callback.
  *
- * Corresponds to fn_80101244.
+ * Corresponds to loadParticle.
  */
 void GSfloorLoadParticle(void* dst, u32 size, void* callback, void* callbackArg);
 

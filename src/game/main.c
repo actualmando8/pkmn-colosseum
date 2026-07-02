@@ -55,7 +55,7 @@ s32 fn_800064C4(void);
 void fn_800060F0(const char* file, s32 line, const char* fmt, ...);
 
 /* --- Heap / memory init (around 0x800E3560) --- */
-extern void  fn_800E3568(u32 heapId, void* start, void* end); /* GSmem heap init */
+extern void  GSmemInit(u32 heapId, void* start, void* end); /* GSmem heap init */
 extern void  fn_800E3560(u32 heapId);                          /* GSmem set default heap */
 
 /* --- Heap allocator (around 0x8009AB60) --- */
@@ -66,7 +66,7 @@ extern void fn_800ACA80(void* dvdInfo, u32 priority);  /* DVDInit-related */
 extern u32  ARInit(void* stack_index_addr, u32 num_entries);
 extern void AIInit(void* stack);
 extern void GSscratchInit(u32 arg);
-extern void fn_800AE5C0(void);                          /* DVDFSInit or DVDSetAutoInvalidation */
+extern void ARQInit(void);                          /* DVDFSInit or DVDSetAutoInvalidation */
 
 /* --- ARAM / audio memory --- */
 extern void fn_800AC440(void* arAddr);   /* ARInit / ARQInit */
@@ -209,12 +209,12 @@ extern int  OSGetResetButtonState(void); /* real symtab name (signed return -> c
 extern void VIFlush(void);               /* real symtab name for fn_800AA068 call site */
 extern void fn_80166E44(void);    /* Screen fade to black */
 extern void fn_800AAE34(u32 mask);/* VISetBlack / video blank */
-extern void fn_800AA204(u32 flag);/* VIFlush */
+extern void VISetBlack(u32 flag);/* VIFlush */
 extern void fn_800AA068(void);    /* VIWaitForRetrace */
 extern void fn_800A880C(u32 a);   /* AISetDSPSampleRate */
 extern void fn_800A8850(u32 a);   /* AIStopDMA */
-extern void fn_800A263C(u32 a, u32 b, u32 c, u32 d); /* OSClearStack or thread cleanup */
-extern void fn_800A8FE4(void);    /* AIReset */
+extern void OSSetIdleFunction(u32 a, u32 b, u32 c, u32 d); /* OSClearStack or thread cleanup */
+extern void VIWaitForRetrace(void);    /* AIReset */
 
 extern void fn_800F0448(void);    /* GSthread begin frame */
 extern u8   fn_8000DAA8(void);    /* IsLanguageJapanese or locale check */
@@ -326,12 +326,12 @@ extern void fn_8009F488(u32 region, u32 addr, u32 size, u32 perm);
 /* fn_800A2C58 = __DBIsExceptionMarked or similar */
 extern s32  fn_800A2C58(void);
 
-/* fn_800A19CC = OSCreateThread */
-extern void fn_800A19CC(void* thread, void* func, void* arg,
+/* OSCreateThread = OSCreateThread */
+extern void OSCreateThread(void* thread, void* func, void* arg,
                          void* stackBase, u32 stackSize,
                          u32 priority, u32 detached);
-/* fn_800A1F94 = OSResumeThread */
-extern void fn_800A1F94(void* thread);
+/* OSResumeThread = OSResumeThread */
+extern void OSResumeThread(void* thread);
 /* fn_800A1E54 = OSSetThreadPriority */
 extern void fn_800A1E54(void* thread, u32 prio);
 
@@ -396,7 +396,7 @@ int main(int argc, char** argv) {
     heapStart = (void*)((u32)arenaLo + 0x00E80000);
 
     /* Initialize the GS memory allocator with heap region [arenaLo, heapStart) */
-    fn_800E3568(0, arenaLo, heapStart);
+    GSmemInit(0, arenaLo, heapStart);
 
     /* Set heap 0 as the default allocation heap */
     fn_800E3560(0);
@@ -409,7 +409,7 @@ int main(int argc, char** argv) {
     ARInit(&lbl_80478DC0, 2);
 
     /* Initialize DVD filesystem */
-    fn_800AE5C0();
+    ARQInit();
 
     /* Initialize AI with stack at lbl_8039A700 + 0x3FF8 */
     AIInit((void*)(lbl_8039A700 + 0x3FF8));
@@ -850,12 +850,12 @@ void fn_80005C3C(void) {
             if (lbl_80478DC9 == 1) {
                 fn_80166E44();           /* Fade screen to black */
                 fn_800AAE34(0xF0000000); /* VISetBlack */
-                fn_800AA204(1);          /* VIFlush */
+                VISetBlack(1);          /* VIFlush */
                 VIFlush();               /* real symtab: VIFlush (was fn_800AA068) */
                 fn_800A880C(0);          /* Stop DSP sample rate */
                 fn_800A8850(0);          /* Stop DMA */
-                fn_800A263C(0, 0, 0, 0); /* Clean up threads */
-                fn_800A8FE4();           /* Reset audio */
+                OSSetIdleFunction(0, 0, 0, 0); /* Clean up threads */
+                VIWaitForRetrace();           /* Reset audio */
                 OSResetSystem(0, 0, 1);  /* Reset to system menu */
             }
         }
@@ -1186,8 +1186,8 @@ void fn_80006378(u32 error, void* context, ...) {
     lbl_8047A260 = (u16)error;
     __OSSetExceptionHandler(8, fn_800064A0);
     OSEnableScheduler();
-    fn_800A19CC(&thread, fn_800064C4, NULL, lbl_8039E700 + 0x1FFC, 0x2000, 1, 0);
-    fn_800A1F94(&thread);
+    OSCreateThread(&thread, fn_800064C4, NULL, lbl_8039E700 + 0x1FFC, 0x2000, 1, 0);
+    OSResumeThread(&thread);
     fn_800A1E54(&thread, 0);
 }
 #pragma pop

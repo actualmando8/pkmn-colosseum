@@ -155,7 +155,7 @@ extern u32 lbl_80270350[4]; /* .rodata array */
 extern void* fn_800D7BF8(u32 idx);
 extern void fn_800DFF98(void* out, void* sphere, void* ray);
 extern void GXProject(void* sphere, void* center, void* radii, f32 x, f32 y, f32 z, void* outA, void* outB, void* outC);
-extern void* fn_8019BB78(void* ctx);
+extern void* HSD_FogLoadDesc(void* ctx);
 extern void HSD_FogSet(u32 zero);
 extern void fn_8016EA88(void);
 extern void fn_8016EB30(void);
@@ -1142,7 +1142,7 @@ void fn_800D2B90(void* arg1) {
         return;
     }
     {
-        void* state = fn_8019BB78(arg1);
+        void* state = HSD_FogLoadDesc(arg1);
         lbl_8047AA8C = (u32)state;
     }
     fn_8016EB30();

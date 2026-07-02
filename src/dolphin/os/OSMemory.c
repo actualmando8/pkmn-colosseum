@@ -299,8 +299,8 @@ BOOL fn_8009F230(u8* queue, u32 msg, u32 flags) {
         s32 head;
         s32 count;
     } OSMessageQueue;
-    extern void fn_800A238C(u8* queue);
-    extern void fn_800A2478(u8* queue);
+    extern void OSSleepThread(u8* queue);
+    extern void OSWakeupThread(u8* queue);
     OSMessageQueue* mq;
     s32 blocking;
     BOOL enabled;
@@ -315,13 +315,13 @@ BOOL fn_8009F230(u8* queue, u32 msg, u32 flags) {
             OSRestoreInterrupts(enabled);
             return FALSE;
         }
-        fn_800A238C(queue);
+        OSSleepThread(queue);
     }
 
     mq->buffer[(mq->head + mq->count) % mq->capacity] = msg;
     mq->count++;
 
-    fn_800A2478(mq->recvQueue);
+    OSWakeupThread(mq->recvQueue);
     OSRestoreInterrupts(enabled);
     return TRUE;
 }
@@ -333,8 +333,8 @@ BOOL fn_8009F230(u8* queue, u32 msg, u32 flags) {
  * Returns TRUE on success, FALSE if non-blocking and queue is empty.
  */
 BOOL fn_8009F2F8(u8* queue, u32* msgOut, u32 flags) {
-    extern void fn_800A238C(u8* condvar);
-    extern void fn_800A2478(u8* queue);
+    extern void OSSleepThread(u8* condvar);
+    extern void OSWakeupThread(u8* queue);
     BOOL enabled;
     u32 count;
     u32 head;
@@ -352,7 +352,7 @@ BOOL fn_8009F2F8(u8* queue, u32* msgOut, u32 flags) {
             OSRestoreInterrupts(enabled);
             return FALSE;
         }
-        fn_800A238C(queue + 0x8);
+        OSSleepThread(queue + 0x8);
     }
 
     if (msgOut != NULL) {
@@ -368,7 +368,7 @@ BOOL fn_8009F2F8(u8* queue, u32* msgOut, u32 flags) {
     head = (head + 1) % capacity;
     *(u32*)(queue + 0x18) = head;
     *(u32*)(queue + 0x1C) = head;  /* Note: original stores head back to count field */
-    fn_800A2478(queue);
+    OSWakeupThread(queue);
     OSRestoreInterrupts(enabled);
     return TRUE;
 }

@@ -63,7 +63,7 @@ typedef struct GSmemEntry {
  * free block covering the full region, and initialises the entry table
  * at the top of the region.
  *
- * Corresponds to fn_800E3568.
+ * Corresponds to GSmemInit.
  */
 void GSmemInit(u32 heapId, void* start, void* end);
 

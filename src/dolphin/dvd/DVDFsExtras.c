@@ -22,18 +22,18 @@
  *   fn_800A8894 (0xA0) - DVDReadAsyncPrio
  *   fn_800A8934 (0x200) - DVDRead (synchronous)
  *   fn_800A8B34 (0x4B0) - DVDReadDir / DVDOpenDir
- *   fn_800A8FE4 (0x54) - DVDCloseDir
+ *   VIWaitForRetrace (0x54) - DVDCloseDir
  *   fn_800A9038 (0x2D4) - DVDGetFSTLocation
  *   fn_800A930C (0x1A0) - Internal FST traversal
- *   fn_800A94AC (0x828) - DVDConvertPathToEntrynum (full)
+ *   VIConfigure (0x828) - DVDConvertPathToEntrynum (full)
  *   fn_800A9CD4 (0x394) - Additional path conversion
  *   fn_800AA068 (0x130) - CARD module stub or DVD state helper
  *   VISetNextFrameBuffer (0x6C)  - __DVDCheckDevice
- *   fn_800AA204 (0x7C)  - __DVDCheckDisk
+ *   VISetBlack (0x7C)  - __DVDCheckDisk
  *   fn_800AA280 (0x08)  - stub
  *   getCurrentFieldEvenOdd (0x68)  - __DVDGetCoverStatus
  *   fn_800AA2F0 (0xA8)  - __DVDPrepareReset
- *   fn_800AA398 (0x98)  - __DVDPrepareResetAsync
+ *   VIGetCurrentLine (0x98)  - __DVDPrepareResetAsync
  */
 
 extern void* memcpy(void* dest, const void* src, u32 n);

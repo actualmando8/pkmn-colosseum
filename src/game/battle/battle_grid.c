@@ -343,10 +343,10 @@ void fn_801C27F4(void* ctx, f32 posX, f32 posZ) {
 }
 
 /**
- * fn_801C29C4 - Set JObj animation frame value.
+ * HSD_AObjReqAnim - Set JObj animation frame value.
  * Address: 0x801C29C4 | Size: 0x40
  */
-void fn_801C29C4(void* obj, f32 value) {
+void HSD_AObjReqAnim(void* obj, f32 value) {
     extern void HSD_FObjReqAnimAll(void* jobj);
 
     if (obj == NULL) {

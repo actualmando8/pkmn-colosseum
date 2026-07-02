@@ -273,11 +273,11 @@ s32 fn_8009FEBC(s32 final) {
     return 1;
 }
 
-/* fn_8009FFC0 - 0x8009FFC0 | size: 0x48
+/* __OSDoHotReset - 0x8009FFC0 | size: 0x48
  * __OSDoHotReset variant - disables interrupts, blanks video,
  * flushes instruction cache, and triggers hardware reset.
  */
-void fn_8009FFC0(u32 resetCode) {
+void __OSDoHotReset(u32 resetCode) {
     volatile u16* viRegs = (volatile u16*)0xCC002000;
 
     OSDisableInterrupts();

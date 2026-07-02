@@ -586,7 +586,7 @@ void fn_801B7BD4(HSD_GObj* gobj, s32 pass) {
  * otherwise returns the type field from the expression.
  */
 #pragma optimization_level 1
-s32 fn_801B7C60(u8* texp) {
+s32 HSD_TExpGetType(u8* texp) {
     if (texp == NULL) {
         return 0;
     }
@@ -632,7 +632,7 @@ typedef struct HSD_TExpDag {
     struct HSD_TExpDag* depend[8];
 } HSD_TExpDag;
 
-extern s32 fn_801B7C60(u8* texp);
+extern s32 HSD_TExpGetType(u8* texp);
 extern void CalcDistance(u8** nodes, s32* dist, u8* root, s32 num, s32 val);
 
 /*
@@ -640,7 +640,7 @@ extern void CalcDistance(u8** nodes, s32* dist, u8* root, s32 num, s32 val);
  * Build a DAG from a texture expression tree.
  * Returns the number of nodes in the DAG.
  */
-s32 fn_801B8024(u8* root, HSD_TExpDag* list) {
+s32 HSD_TExpMakeDag(u8* root, HSD_TExpDag* list) {
     u8* nodes[32];
     s32 dist[32];
     s32 num, saved_num, i, j, k, l, m, last;
@@ -649,7 +649,7 @@ s32 fn_801B8024(u8* root, HSD_TExpDag* list) {
     u8 type;
     HSD_TExpDag* dag;
 
-    HSD_ASSERT(0xEE, fn_801B7C60(root) == 1);
+    HSD_ASSERT(0xEE, HSD_TExpGetType(root) == 1);
 
     num = 0;
     nodes[num] = root;

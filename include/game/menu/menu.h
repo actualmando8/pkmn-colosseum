@@ -344,14 +344,14 @@ BOOL menuCB_Common_IsTransitioning(void);
 void _menuPush(s32 eMenuID);
 
 /**
- * fn_800714C8: Pops the current menu from the stack.
+ * _menuPop: Pops the current menu from the stack.
  * Assert: "_menuPop():stack under." (file: "menuCB_Common.c")
  * Size: 0xF4
  */
 void _menuPop(void);
 
 /**
- * fn_800715BC: Validates menu state post-transition.
+ * _menuPush: Validates menu state post-transition.
  * Assert: uses "menuCB_Common.c" source reference
  * Size: 0x70
  */

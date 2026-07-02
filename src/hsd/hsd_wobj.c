@@ -372,11 +372,11 @@ extern void PSMTXMultVec(f32 mtx[3][4], WObjVec* src, WObjVec* dst);
     } while (0)
 
 #if 0
-asm void fn_80191688(void) {
+asm void HSD_WObjGetPosition(void) {
 #include "src/hsd/hsd_wobj_fn_80191688.inc"
 }
 #else
-void fn_80191688(HSD_WObj* wobj, WObjVec* position)
+void HSD_WObjGetPosition(HSD_WObj* wobj, WObjVec* position)
 {
     if (wobj == NULL) {
         return;
@@ -462,7 +462,7 @@ HSD_WObj* HSD_WObjLoadDesc(HSD_WObjDesc* desc)
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void* fn_801AE5E8(void* desc);
+extern void* HSD_RObjLoadDesc(void* desc);
 extern void fn_801AEBE4(void* robj, void* desc);
 #if 0
 asm void HSD_WObjInit(HSD_WObj* wobj, HSD_WObjDesc* desc) {
@@ -487,7 +487,7 @@ void HSD_WObjInit(HSD_WObj* wobj, HSD_WObjDesc* desc) {
     if (wobj->robj != NULL) {
         fn_801AE50C(wobj->robj);
     }
-    wobj->robj = (HSD_RObj*) fn_801AE5E8(desc->robjdesc);
+    wobj->robj = (HSD_RObj*) HSD_RObjLoadDesc(desc->robjdesc);
     fn_801AEBE4(wobj->robj, desc->robjdesc);
 }
 #endif
@@ -515,7 +515,7 @@ int WObjLoad(HSD_WObj* wobj, HSD_WObjDesc* desc)
     if (wobj->robj != NULL) {
         fn_801AE50C(wobj->robj);
     }
-    wobj->robj = (HSD_RObj*) fn_801AE5E8(desc->robjdesc);
+    wobj->robj = (HSD_RObj*) HSD_RObjLoadDesc(desc->robjdesc);
     fn_801AEBE4(wobj->robj, desc->robjdesc);
     return 0;
 }
@@ -642,12 +642,12 @@ void HSD_WObjAddAnim(HSD_WObj* wobj, HSD_WObjAnim* desc) {
 /* 0x80191E38 | 0x50 */
 #pragma push
 extern void fn_801AFEFC(void* robj, f32 frame);
-extern void fn_801C29C4(void* aobj, f32 frame);
+extern void HSD_AObjReqAnim(void* aobj, f32 frame);
 #pragma push
 #pragma optimization_level 1
 void HSD_WObjReqAnim(HSD_WObj* wobj, f32 frame) {
     if (wobj != NULL) {
-        fn_801C29C4(wobj->aobj, frame);
+        HSD_AObjReqAnim(wobj->aobj, frame);
         fn_801AFEFC(wobj->robj, frame);
     }
 }

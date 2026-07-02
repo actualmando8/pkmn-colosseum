@@ -457,7 +457,7 @@ extern u8 lbl_8036C638[64];
 #pragma push
 #pragma optimization_level 1
 #pragma optimizewithasm off
-void fn_80193A1C(HSD_ClassInfo* info) {
+void _hsdClassAmnesia(HSD_ClassInfo* info) {
     info->head.nb_exist = 0;
     info->head.nb_peak = 0;
     if (info == (HSD_ClassInfo*)lbl_8036C638) {
@@ -474,12 +474,12 @@ void fn_80193A1C(HSD_ClassInfo* info) {
 #pragma optimizewithasm off
 extern void fn_801A6960(void* cls);
 #if 0
-asm void fn_80193A58(void) {
+asm void _hsdClassDestroy(void) {
 #include "src/hsd/hsd_class_fn_80193A58.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_80193A58(HSD_Class* cls) {
+void _hsdClassDestroy(HSD_Class* cls) {
     HSD_ClassInfo* info = cls->class_info;
     info->head.nb_exist -= 1;
     fn_801A6960(cls);
@@ -492,12 +492,12 @@ void fn_80193A58(HSD_Class* cls) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_80193A88(void) {
+asm void _hsdClassRelease(void) {
 #include "src/hsd/hsd_class_fn_80193A88.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_80193A88(HSD_Class* cls) {}
+void _hsdClassRelease(HSD_Class* cls) {}
 #endif
 #pragma pop
 
@@ -506,12 +506,12 @@ void fn_80193A88(HSD_Class* cls) {}
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_80193A8C(void) {
+asm void _hsdClassInit(void) {
 #include "src/hsd/hsd_class_fn_80193A8C.inc"
 }
 #else
 #pragma optimization_level 4
-int fn_80193A8C(HSD_Class* cls) { return 0; }
+int _hsdClassInit(HSD_Class* cls) { return 0; }
 #endif
 #pragma pop
 
@@ -521,12 +521,12 @@ int fn_80193A8C(HSD_Class* cls) { return 0; }
 #pragma optimizewithasm off
 extern void* fn_801A6928(s32 size);
 #if 0
-asm void fn_80193A94(void) {
+asm void _hsdClassAlloc(void) {
 #include "src/hsd/hsd_class_fn_80193A94.inc"
 }
 #else
 #pragma optimization_level 4
-HSD_Class* fn_80193A94(HSD_ClassInfo* info) {
+HSD_Class* _hsdClassAlloc(HSD_ClassInfo* info) {
     HSD_Class* result = (HSD_Class*) fn_801A6928((s32) info->head.obj_size);
     if (result != NULL) {
         info->head.nb_exist += 1;

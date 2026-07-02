@@ -41,7 +41,7 @@ extern void  GSmemFree(u16 handle);                    /* fn_800E209C */
 extern u16   GSmemAlloc(u32 alignment, u32 size);      /* fn_800E2C04 */
 extern void  DCFlushRange(void* addr, u32 len);
 extern void  memcpy(void* dst, const void* src, u32 len);
-extern void  fn_800BB29C(void);                        /* GXInvalidateTexAll */
+extern void  GXInvalidateTexAll(void);                        /* GXInvalidateTexAll */
 extern void  fn_800BB050(void* gxTlutObj, void* data, u32 format); /* GXInitTlutObj */
 extern void  fn_800BA9E4(void* gxTexObj, void* data,
                           u16 width, u16 height, u32 gxFmt,
@@ -49,7 +49,7 @@ extern void  fn_800BA9E4(void* gxTexObj, void* data,
 extern void  fn_800B962C(u32 a, u32 b, u16 width, u16 height); /* GXSetScissor or viewport */
 extern void  fn_800B96F8(u16 width, u16 height, u32 fmt,
                           u32 mipFlag);                /* GXSetCopyTexSrc */
-extern void  fn_800BCE88(u32 a, u32 b, u32 c);        /* GX copy / capture */
+extern void  GXSetZMode(u32 a, u32 b, u32 c);        /* GX copy / capture */
 extern void  fn_800B9FE4(void* data, void* srcBuf);   /* GXCopyTex */
 extern void  fn_800B8E74(void);                        /* GXPixModeSync */
 
@@ -240,7 +240,7 @@ void GStextureFree(GStextureHandle* tex) {
  * ======================================================================= */
 void GStextureFlush(GStextureHandle* tex) {
     DCFlushRange(tex->data, tex->totalSize);
-    fn_800BB29C();  /* GXInvalidateTexAll */
+    GXInvalidateTexAll();  /* GXInvalidateTexAll */
 
     tex->refCount--;
 }
@@ -705,7 +705,7 @@ void GStextureConvertCI(GStextureHandle* tex) {
 
     /* Flush and invalidate */
     DCFlushRange(tex->data, tex->totalSize);
-    fn_800BB29C();
+    GXInvalidateTexAll();
 
     /* Clean up temporary allocation */
     tex->refCount--;
@@ -783,17 +783,17 @@ u32 GStextureUploadFromBuffer(GStextureHandle* tex, void* srcBuffer) {
         fn_800B96F8(copyW, copyH, gxFmt, mipFlag);
     }
 
-    fn_800BCE88(1, 3, 1);
+    GXSetZMode(1, 3, 1);
 
     /* Copy data from src to texture */
     fn_800B9FE4(tex->data, srcBuffer);
 
     fn_800B8E74();     /* GXPixModeSync */
-    fn_800BB29C();     /* GXInvalidateTexAll */
+    GXInvalidateTexAll();     /* GXInvalidateTexAll */
 
     /* Flush and invalidate */
     DCFlushRange(tex->data, tex->totalSize);
-    fn_800BB29C();
+    GXInvalidateTexAll();
 
     tex->refCount--;
 

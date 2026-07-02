@@ -33131,8 +33131,8 @@ void fn_8025F70C(int r3,u32 r4,u32 r5)
 void __GBASyncCallback(int r3)
 
 {
-    extern int fn_800A2478();
-  fn_800A2478(r3 * 0x100 + -0x7fb87bfc);
+    extern int OSWakeupThread();
+  OSWakeupThread(r3 * 0x100 + -0x7fb87bfc);
   return;
 }
 
@@ -33142,14 +33142,14 @@ u32 __GBASync(int r3)
 {
     extern u32 fn_8009DF3C();
     extern int fn_8009DF64();
-    extern int fn_800A238C();
+    extern int OSSleepThread();
   u32 uVar1;
   u32 uVar2;
   
   r3 = r3 * 0x100;
   uVar1 = fn_8009DF3C();
   while (*(int *)(r3 + -0x7fb87c04) != 0) {
-    fn_800A238C(r3 + -0x7fb87bfc);
+    OSSleepThread(r3 + -0x7fb87bfc);
   }
   uVar2 = *(u32 *)(r3 + -0x7fb87c00);
   fn_8009DF64(uVar1);
@@ -35473,7 +35473,7 @@ u32 fn_80264D58(u32 r3,u32 r4,u32 r5)
 
 /* Address: 0x802612D0 | Size: 0x5C | Ghidra import */
 
-void fn_802612D0(void)
+void evolution(void)
 {
     extern u32 lbl_804787E0[];
     extern u32 fn_80260EBC();
