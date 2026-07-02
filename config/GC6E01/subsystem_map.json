@@ -493,7 +493,7 @@
 "addr": "0x80007FDC",
 "size": 56,
 "label": "gs-engine",
-"confidence": 1.89,
+"confidence": 1.9,
 "seed": null
 },
 {
@@ -1409,12 +1409,12 @@
 "seed": null
 },
 {
-"name": "fn_8000F310",
+"name": "menuFightCtrlSecretPokemonTop",
 "addr": "0x8000F310",
 "size": 76,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_8000F35C",
@@ -1449,35 +1449,35 @@
 "seed": null
 },
 {
-"name": "fn_8000FDD8",
+"name": "menuFightCtrlSecretWazaTop",
 "addr": "0x8000FDD8",
 "size": 96,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_8000FE38",
 "addr": "0x8000FE38",
 "size": 280,
-"label": "fight",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
 {
-"name": "fn_8000FF50",
+"name": "menuFightCtrlSecretMain",
 "addr": "0x8000FF50",
 "size": 88,
-"label": "fight",
-"confidence": 0.95,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_8000FFA8",
 "addr": "0x8000FFA8",
 "size": 280,
 "label": "menu",
-"confidence": 1.0,
+"confidence": 1.9,
 "seed": null
 },
 {
@@ -1588,7 +1588,7 @@
 "name": "fn_80011288",
 "addr": "0x80011288",
 "size": 540,
-"label": "fight",
+"label": "gs-engine",
 "confidence": 1.9,
 "seed": null
 },
@@ -1596,7 +1596,7 @@
 "name": "fn_800114A4",
 "addr": "0x800114A4",
 "size": 604,
-"label": "fight",
+"label": "gs-engine",
 "confidence": 1.9,
 "seed": null
 },
@@ -1788,7 +1788,7 @@
 "name": "fn_80013DFC",
 "addr": "0x80013DFC",
 "size": 388,
-"label": "gs-engine",
+"label": "item",
 "confidence": 1.9,
 "seed": null
 },
@@ -2393,28 +2393,28 @@
 "seed": null
 },
 {
-"name": "fn_8001BCEC",
+"name": "menuPokemonOpenItemGive",
 "addr": "0x8001BCEC",
 "size": 80,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_8001BD3C",
 "addr": "0x8001BD3C",
 "size": 68,
-"label": "gs-engine",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
 {
-"name": "fn_8001BD80",
+"name": "menuPokemonOpenFight",
 "addr": "0x8001BD80",
 "size": 116,
-"label": "gs-engine",
-"confidence": 1.42,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "menuPokemonOpen",
@@ -8609,12 +8609,12 @@
 "seed": null
 },
 {
-"name": "fn_80071398",
+"name": "_menuPop_80071398",
 "addr": "0x80071398",
 "size": 304,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "_menuPop",
@@ -13233,7 +13233,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800A5268",
+"name": "DVDGetCurrentDir",
 "addr": "0x800A5268",
 "size": 196,
 "label": "dolphin-sdk",
@@ -13609,7 +13609,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800A7830",
+"name": "DVDResume",
 "addr": "0x800A7830",
 "size": 80,
 "label": "dolphin-sdk",
@@ -26097,7 +26097,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8010C3FC",
+"name": "_menuFaceBiosGetPtr__FUs",
 "addr": "0x8010C3FC",
 "size": 112,
 "label": "gs-engine",
@@ -26153,7 +26153,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8010C74C",
+"name": "zokuseiGetWazaJoutai",
 "addr": "0x8010C74C",
 "size": 48,
 "label": "gs-engine",
@@ -42489,7 +42489,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8018B07C",
+"name": "peopleWaitSyncMotion",
 "addr": "0x8018B07C",
 "size": 420,
 "label": "people",
@@ -43113,7 +43113,7 @@
 "seed": null
 },
 {
-"name": "fn_8019075C",
+"name": "_flagSet",
 "addr": "0x8019075C",
 "size": 376,
 "label": "gs-engine",
@@ -44745,7 +44745,7 @@
 "seed": "range"
 },
 {
-"name": "iref_INC",
+"name": "iref_INC_801A0C9C",
 "addr": "0x801A0C9C",
 "size": 76,
 "label": "hsd",
@@ -44753,7 +44753,7 @@
 "seed": "range"
 },
 {
-"name": "hsdDelete",
+"name": "hsdDelete_801A0CE8",
 "addr": "0x801A0CE8",
 "size": 84,
 "label": "hsd",
@@ -44769,7 +44769,7 @@
 "seed": "range"
 },
 {
-"name": "ref_DEC",
+"name": "ref_DEC_801A0D48",
 "addr": "0x801A0D48",
 "size": 76,
 "label": "hsd",
@@ -44993,7 +44993,7 @@
 "seed": "range"
 },
 {
-"name": "LObjAmnesia",
+"name": "LObjAmnesia_801A4098",
 "addr": "0x801A4098",
 "size": 96,
 "label": "hsd",
@@ -45001,7 +45001,7 @@
 "seed": "range"
 },
 {
-"name": "LObjRelease",
+"name": "LObjRelease_801A40F8",
 "addr": "0x801A40F8",
 "size": 372,
 "label": "hsd",
@@ -48289,7 +48289,7 @@
 "seed": null
 },
 {
-"name": "fn_801CAAC8",
+"name": "scriptGetItem",
 "addr": "0x801CAAC8",
 "size": 44,
 "label": "field",
@@ -51625,12 +51625,12 @@
 "seed": "prefix"
 },
 {
-"name": "fn_801F00D0",
+"name": "fightTargetGetRelativeHostSideFightTargetIdToTragetPtr",
 "addr": "0x801F00D0",
 "size": 100,
 "label": "fight",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_801F0134",
@@ -51961,7 +51961,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F2654",
+"name": "fightFloorGetValidFightOutPokemonCount",
 "addr": "0x801F2654",
 "size": 84,
 "label": "fight",
@@ -58897,7 +58897,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020EDBC",
+"name": "fightTrainerEnemyPokemonInitFightOutStatus",
 "addr": "0x8020EDBC",
 "size": 96,
 "label": "fight",
@@ -59137,7 +59137,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020FC04",
+"name": "fightWazaWzxVariationFuncWeatherHP",
 "addr": "0x8020FC04",
 "size": 108,
 "label": "fight",
@@ -59481,7 +59481,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802118FC",
+"name": "_fightSeqInitSubFightOutPokemon__FPvUsPv",
 "addr": "0x802118FC",
 "size": 76,
 "label": "fight",
@@ -66105,7 +66105,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80254F1C",
+"name": "fightTrainerAiWazaHit180",
 "addr": "0x80254F1C",
 "size": 56,
 "label": "fight",
@@ -66257,7 +66257,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80255C18",
+"name": "fightTrainerAiWazaHit160",
 "addr": "0x80255C18",
 "size": 116,
 "label": "fight",
@@ -66289,7 +66289,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80255DB4",
+"name": "fightTrainerAiWazaHit156",
 "addr": "0x80255DB4",
 "size": 68,
 "label": "fight",
@@ -66401,7 +66401,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802564C8",
+"name": "fightTrainerAiWazaHit142",
 "addr": "0x802564C8",
 "size": 100,
 "label": "fight",
@@ -66505,7 +66505,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80256AE0",
+"name": "fightTrainerAiWazaHit127",
 "addr": "0x80256AE0",
 "size": 56,
 "label": "fight",
@@ -66609,7 +66609,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802574AC",
+"name": "fightTrainerAiWazaHit114",
 "addr": "0x802574AC",
 "size": 92,
 "label": "fight",
@@ -66729,7 +66729,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80257EAC",
+"name": "fightTrainerAiWazaHit098",
 "addr": "0x80257EAC",
 "size": 56,
 "label": "fight",
@@ -68915,20 +68915,26 @@
 {
 "label": "gs-engine",
 "start": "0x8000DEC4",
-"end": "0x8000fe38",
-"count": 13
-},
-{
-"label": "fight",
-"start": "0x8000FE38",
-"end": "0x8000ffa8",
-"count": 2
+"end": "0x8000f310",
+"count": 7
 },
 {
 "label": "menu",
-"start": "0x8000FFA8",
+"start": "0x8000F310",
+"end": "0x8000f35c",
+"count": 1
+},
+{
+"label": "gs-engine",
+"start": "0x8000F35C",
+"end": "0x8000fdd8",
+"count": 4
+},
+{
+"label": "menu",
+"start": "0x8000FDD8",
 "end": "0x80010294",
-"count": 3
+"count": 6
 },
 {
 "label": "gs-engine",
@@ -68945,8 +68951,14 @@
 {
 "label": "fight",
 "start": "0x800111C4",
+"end": "0x80011288",
+"count": 3
+},
+{
+"label": "gs-engine",
+"start": "0x80011288",
 "end": "0x80011700",
-"count": 5
+"count": 2
 },
 {
 "label": "menu",
@@ -68999,14 +69011,14 @@
 {
 "label": "gs-engine",
 "start": "0x80013A18",
-"end": "0x80013f80",
-"count": 2
+"end": "0x80013dfc",
+"count": 1
 },
 {
 "label": "item",
-"start": "0x80013F80",
+"start": "0x80013DFC",
 "end": "0x80014110",
-"count": 2
+"count": 3
 },
 {
 "label": "field",
@@ -69077,14 +69089,14 @@
 {
 "label": "gs-engine",
 "start": "0x80019F6C",
-"end": "0x8001bdf4",
-"count": 11
+"end": "0x8001bcec",
+"count": 8
 },
 {
 "label": "menu",
-"start": "0x8001BDF4",
+"start": "0x8001BCEC",
 "end": "0x8001be38",
-"count": 1
+"count": 4
 },
 {
 "label": "gs-engine",
@@ -69509,14 +69521,14 @@
 {
 "label": "gs-engine",
 "start": "0x8006B8E8",
-"end": "0x800714c8",
-"count": 63
+"end": "0x80071398",
+"count": 62
 },
 {
 "label": "menu",
-"start": "0x800714C8",
+"start": "0x80071398",
 "end": "0x800716c8",
-"count": 5
+"count": 6
 },
 {
 "label": "dolphin-sdk",
