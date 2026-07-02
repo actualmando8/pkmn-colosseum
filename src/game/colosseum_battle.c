@@ -19911,8 +19911,8 @@ s32 fightTrainerAiWazaHit203(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
     u8 state = fn_80235B04(ctx, 0, 1);
-    u32 v1;
     s32 gate;
+    u32 v1;
 
     if (state == 2) {
         v1 = 0xb;
@@ -22352,7 +22352,7 @@ s32 fightTrainerAiWazaHit109(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
 
-    if (c == 0 && a >= 0xc && b >= 0xc) {
+    if (((c == 0) && (a >= 0xc)) && (b >= 0xc)) {
         return 0;
     }
     if (fn_8025C808(ctx, param1, param3, param2, 0x90, 3, 0x41) != 0) {
@@ -22364,11 +22364,12 @@ s32 fightTrainerAiWazaHit109(void* ctx, u32 param1, u32 param2, u32 param3) {
     if (fn_8025C808(ctx, param1, param3, param2, 0x10, 2, 0x41) != 0) {
         goto ret1;
     }
+ret0:
+    return 0, 0;
+
     return 0;
 ret1:
     return 1;
-ret0:
-    return 0;
 }
 
 /* Address: 0x80257750 | Size: 0xE8 (232 bytes) */
