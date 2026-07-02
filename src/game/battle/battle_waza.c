@@ -796,7 +796,7 @@ void fn_801D2C74(s32 moveID) {
  * fn_801D2D28 - Waza animation setup from move data.
  * Address: 0x801D2D28 | Size: 0x26C
  */
-void fn_801D2D28(s32 moveID, s32 attackerSlot, s32 targetSlot) {
+void fn_801D2D28() {
     /* TODO: Waza animation setup (0x26C bytes) */
 }
 
@@ -1274,7 +1274,9 @@ typedef struct WazaEffect {
     };
     /* 0x30 */ u8 pad_30[0x02];
     /* 0x32 */ u16 index;                    /* table index */
-    /* 0x34 */ u8 pad_34[0x50];
+    /* 0x34 */ u8 pad_34[0x40];
+    /* 0x74 */ u8 active;
+    /* 0x75 */ u8 pad_75[0x0F];
     /* 0x84 */ u32 effect_handle;            /* effect handle */
     /* 0x88 */ u8 pad_88[0x04];
 } WazaEffect;
@@ -1734,18 +1736,24 @@ BOOL fn_801DB060(void) {
  */
 void fn_801DB088(void) {
     u8* pool = lbl_80467CC0;
-    u8* entry = *(u8**)pool;
-    u16 count = *(u16*)(pool + 4);
-    s32 i;
+    s32 i = 0;
+    WazaEffect* entry;
+    u16 count;
 
-    for (i = 0; i < count; i++, entry += 0x8C) {
-        if (*(u8*)(entry + 0x74) != 0) {
+    entry = *(WazaEffect**)pool;
+    count = *(u16*)(pool + 4);
+
+    for (; i < count; i++, entry++) {
+        if (entry->active != 0) {
             fn_801DD158(entry);
             fn_801DF1D0(entry);
         }
     }
 
-    ((void (*)())fn_801D2D28)();
+    {
+        void fn_801D2D28();
+        fn_801D2D28();
+    }
 }
 
 /**

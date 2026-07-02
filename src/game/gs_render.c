@@ -2107,9 +2107,9 @@ void fn_800D7A70(u32 obj) {
     u8* entry;
     u32 attr;
 
-    for (i = 0; i < 14; i++) {
+    for (i = 0; (s32)i < 14; i++) {
         entry = (u8*)(obj + i * 0x1c);
-        if (entry[0x8] != 0 && i != 0) {
+        if (entry[0x8] != 0 && (s32)i != 0) {
             attr = ((u32*)lbl_80314370)[i];
             fn_800B7D74(*(u32*)(obj + 0x4), attr,
                         ((u32*)lbl_803143B4)[*(u32*)(entry + 0x10)],
@@ -2120,13 +2120,12 @@ void fn_800D7A70(u32 obj) {
 
     fn_800B7D3C();
 
-    for (i = 0; i < 14; i++) {
+    for (i = 0; (s32)i < 14; i++) {
         entry = (u8*)(obj + i * 0x1c);
         if (entry[0x8] != 0) {
-            attr = ((u32*)lbl_80314370)[i];
-            fn_800B7874(attr, ((u32*)lbl_803143A8)[*(u32*)(entry + 0xc)]);
+            fn_800B7874(((u32*)lbl_80314370)[i], ((u32*)lbl_803143A8)[*(u32*)(entry + 0xc)]);
             if (*(u32*)(entry + 0x1c) != 0) {
-                fn_800B84E0(attr, *(u32*)(entry + 0x1c), entry[0x20]);
+                fn_800B84E0(((u32*)lbl_80314370)[i], *(u32*)(entry + 0x1c), entry[0x20]);
             }
         }
     }
@@ -2899,7 +2898,7 @@ void fn_800D9D68(u16 x1, u16 y1, u16 x2, u16 y2) {
     }
 }
 #endif
-extern void fn_8019BD18(u32);
+extern void HSD_FogSet(u32);
 extern u32 lbl_8047AA8C;
 #if 0
 asm void fn_800D9E4C(void) {
@@ -2917,9 +2916,9 @@ void fn_800D9E4C(s32 val) {
             *(u8*)(state + 0x5d) = 0;
         }
         if (*(u8*)(lbl_8047AA80 + 0x5d) == 1) {
-            fn_8019BD18(lbl_8047AA8C);
+            HSD_FogSet(lbl_8047AA8C);
         } else {
-            fn_8019BD18(0);
+            HSD_FogSet(0);
         }
     }
 }
@@ -3096,7 +3095,7 @@ void fn_800DA4C4(s32 a, s32 b, s32 c) {
 }
 #endif
 typedef struct GSgfxVtxDescList {
-    u32 attr;
+    s32 attr;
     u32 attr_type;
     u32 comp_cnt;
     u32 comp_type;
@@ -3187,12 +3186,12 @@ asm void _dlParseSurface__F13GSgfxPrimTypeP16_HSD_VtxDescListPUcUsP22GSgfxParseC
 u8* _dlParseSurface__F13GSgfxPrimTypeP16_HSD_VtxDescListPUcUsP22GSgfxParseCallbackListPv_802B1590(s32 prim, GSgfxVtxDescList* desc, u8* ptr, u16 count, GSgfxParseCallbackList* callbacks, void* user) {
     GSgfxVtxDescList* it;
     u32 mask;
-    u16 remaining;
+    s32 attr;
 
     mask = 0;
     it = desc;
-    while (it->attr != 0xff) {
-        switch (it->attr) {
+    while ((attr = it->attr) != 0xff) {
+        switch (attr) {
         case 0:
             mask |= 1;
             break;
@@ -3246,8 +3245,7 @@ u8* _dlParseSurface__F13GSgfxPrimTypeP16_HSD_VtxDescListPUcUsP22GSgfxParseCallba
         callbacks->begin(prim, count, mask, user);
     }
 
-    remaining = count;
-    while (remaining-- != 0) {
+    while (count-- != 0) {
         if (callbacks->beginVertex != 0) {
             callbacks->beginVertex(user);
         }
@@ -4184,7 +4182,7 @@ extern void HSD_LObjRemoveAnimAll(void*);
 extern void HSD_LObjAddAnimAll(void*, void*);
 extern void HSD_ForeachAnim(void*, u32, u32, void*, u32, ...);
 extern s32 fn_800D37CC(void);
-extern void fn_801C027C(void);
+extern void HSD_AObjSetRate(void);
 extern f32 lbl_8047CA78;
 extern f32 lbl_8047AAF4;
 extern f32 lbl_8047CA88;
@@ -4209,7 +4207,7 @@ void fn_800DC878(u8* obj, u8* snapshot) {
             speed *= lbl_8047CA88;
         }
         *(f32*)(obj + 0x64) = speed;
-        HSD_ForeachAnim(*(void**)(obj + 0xc), 7, 0xffff, (void*)fn_801C027C,
+        HSD_ForeachAnim(*(void**)(obj + 0xc), 7, 0xffff, (void*)HSD_AObjSetRate,
                         1, *(f32*)(obj + 0x64));
     }
 
@@ -4290,7 +4288,7 @@ void fn_800DCAF0(u8* obj, f32 speed) {
         speed *= lbl_8047CA88;
     }
     *(f32*)(obj + 0x64) = speed;
-    HSD_ForeachAnim((void*)*(u32*)(obj + 0xc), 7, 0xFFFF, (void*)fn_801C027C, 1, *(f32*)(obj + 0x64));
+    HSD_ForeachAnim((void*)*(u32*)(obj + 0xc), 7, 0xFFFF, (void*)HSD_AObjSetRate, 1, *(f32*)(obj + 0x64));
 }
 #endif
 extern f32 lbl_8047CA78;
@@ -4425,7 +4423,7 @@ void fn_800DCD98(u8* r3arg) {
     *(u8*)(r30 + 0x0) = 0;
 }
 #endif
-extern u32 fn_801A4344(void*);
+extern u32 HSD_LObjLoadDesc(void*);
 extern u32 lbl_8047AAF0;
 extern u32 lbl_8047AAEC;
 extern f32 lbl_8047CA70;
@@ -4452,7 +4450,7 @@ u8* fn_800DCE4C(void* data) {
     }
 
     *(void**)(obj + 0x8) = data;
-    *(u32*)(obj + 0xc) = fn_801A4344(*(void**)data);
+    *(u32*)(obj + 0xc) = HSD_LObjLoadDesc(*(void**)data);
     obj[0] = 1;
     obj[1] = 0;
     obj[3] = 0;
@@ -4521,7 +4519,7 @@ u8* fn_800DCFBC(void) {
     *(u32*)(obj + 0x4c) = (u32)(obj + 0x24);
     *(u32*)(obj + 0x50) = (u32)(obj + 0x54);
     *(f32*)(obj + 0x54) = *(f32*)&lbl_8047CA8C;
-    *(u32*)(obj + 0xc) = fn_801A4344(obj + 0x38);
+    *(u32*)(obj + 0xc) = HSD_LObjLoadDesc(obj + 0x38);
     obj[0] = 1;
     obj[1] = 0;
     return obj;
@@ -4977,8 +4975,8 @@ asm void fn_800DF240(void) {
 #else
 u16 fn_800DF240(u8* obj) { return *(u16*)((u8*)obj + 0x2); }
 #endif
-extern void fn_801BBED4(void*);
-extern void fn_801A6FF0(void*);
+extern void HSD_TObjRemove(void*);
+extern void HSD_MObjCompileTev(void*);
 #if 0
 asm void fn_800DF248(void) {
 #include "src/game/gs_render_fn_800DF248.inc"
@@ -5026,7 +5024,7 @@ void fn_800DF248(u8* obj, u32 flags) {
             HSD_ImageDescFree(desc);
         }
         if (image != 0) {
-            fn_801BBED4(image);
+            HSD_TObjRemove(image);
         }
         *(u32*)(obj + 0x28) = 0;
     }
@@ -5036,7 +5034,7 @@ void fn_800DF248(u8* obj, u32 flags) {
         *(u32*)(mobj + 0x20) = 0;
     }
     if (mobj != 0) {
-        fn_801A6FF0(mobj);
+        HSD_MObjCompileTev(mobj);
     }
 }
 #endif
@@ -5056,7 +5054,7 @@ void fn_800DF384(u8* obj, u32 flags) {
     *(u8**)(ptr + 0x20) = obj;
     if (new_bits & (1 << 2)) _matGSmatEnableEnvMapExt(obj);
     *(u16*)(obj + 0x2) = *(u16*)(obj + 0x2) | new_bits;
-    fn_801A6FF0(ptr);
+    HSD_MObjCompileTev(ptr);
 }
 #endif
 extern u32 HSD_MObjGetFlags(void*);
@@ -5115,7 +5113,7 @@ asm void fn_800DF504(void) {
 void fn_800DF504(u8* obj) {
     HSD_MObjClearFlags(*(void**)(obj + 0x8), 0x4000600f);
     HSD_MObjSetFlags(*(void**)(obj + 0x8), *(void**)(obj + 0x4));
-    fn_801A6FF0(*(void**)(obj + 0x8));
+    HSD_MObjCompileTev(*(void**)(obj + 0x8));
 }
 #endif
 #if 0
@@ -5136,7 +5134,7 @@ void GSmaterialSetFlags(u8* obj, u32 flags) {
     if (flags & 0x20) r4 |= 0x2000;
     if (flags & 0x40) r4 |= 0x4000;
     HSD_MObjSetFlags(*(void**)(obj + 8), (void*)r4);
-    fn_801A6FF0(*(void**)(obj + 8));
+    HSD_MObjCompileTev(*(void**)(obj + 8));
 }
 #endif
 #if 0
@@ -5210,7 +5208,7 @@ u8* GSmaterialCreate(void) {
     return p;
 }
 #endif
-extern void fn_801A7CFC(void*);
+extern void HSD_MObjSetDefaultClass(void*);
 extern u32 lbl_8047AB20;
 extern u16 lbl_8047AB18;
 extern u32 lbl_8047AB1C;
@@ -5232,7 +5230,7 @@ void fn_800DF854(u32 count) {
         for (off = 0, i = 0; i < lbl_8047AB20; i++, off += 0x40) {
             *(u8*)(lbl_8047AB1C + off) = 0;
         }
-        fn_801A7CFC(lbl_80315490);
+        HSD_MObjSetDefaultClass(lbl_80315490);
     }
 }
 #endif
@@ -5290,8 +5288,8 @@ u32 fn_800DF930(void* obj, void* a, void* b, void* c, void* d) {
 }
 #endif
 extern void HSD_ImageDescRemove(void);
-extern void fn_801BE4CC(void);
-extern void fn_801A6DC4(void);
+extern void HSD_TObjLoadDesc(void);
+extern void HSD_MObjGetTObj(void);
 extern void HSD_MObjAddTObjNext(void);
 extern void fn_801A6DA0(void);
 extern u8 lbl_803154E4[];
@@ -5318,7 +5316,7 @@ void _matGSmatEnableEnvMapExt(u8* obj) {
     *(u32*)(obj + 0x20) = image;
     *(u32*)(obj + 0x24) = 0;
     fn_800EF504((void*)image);
-    fn_801A6FF0(*(void**)(obj + 0x8));
+    HSD_MObjCompileTev(*(void**)(obj + 0x8));
 }
 #endif
 #if 0
@@ -5789,28 +5787,30 @@ asm void fn_800E0790(void) {
 #include "src/game/gs_render_fn_800E0790.inc"
 }
 #else
-#pragma push
-#pragma peephole off
-void fn_800E0790(void) {
-    __asm {
-        li r3, 0x4
-        stw r0, 0x14(r1)
-        oris r3, r3, 0x4
-        mtspr GQR2, r3
-        li r3, 0x5
-        oris r3, r3, 0x5
-        mtspr GQR3, r3
-        li r3, 0x6
-        oris r3, r3, 0x6
-        mtspr GQR4, r3
-        li r3, 0x7
-        oris r3, r3, 0x7
-        mtspr GQR5, r3
-    }
-    fn_800E0C78();
-    GSmathInitCosTable();
+asm void fn_800E0790(void) {
+    nofralloc
+    stwu    r1, -0x10(r1)
+    mflr    r0
+    li      r3, 0x4
+    stw     r0, 0x14(r1)
+    oris    r3, r3, 0x4
+    mtspr   GQR2, r3
+    li      r3, 0x5
+    oris    r3, r3, 0x5
+    mtspr   GQR3, r3
+    li      r3, 0x6
+    oris    r3, r3, 0x6
+    mtspr   GQR4, r3
+    li      r3, 0x7
+    oris    r3, r3, 0x7
+    mtspr   GQR5, r3
+    bl      fn_800E0C78
+    bl      GSmathInitCosTable
+    lwz     r0, 0x14(r1)
+    mtlr    r0
+    addi    r1, r1, 0x10
+    blr
 }
-#pragma pop
 #endif
 extern u32 lbl_8047CAE4;
 extern u32 lbl_8047CAE0;

@@ -103,6 +103,8 @@ extern void  fn_800A3A78(void* vecA, void* scale, void* vecOut);     /* VEC scal
 extern void  fn_800A3A9C(void* a, void* b, void* out);             /* VEC diff/setup */
 extern f32   fn_800A3B38(void* vec);                                /* VEC magnitude */
 extern void  fn_800A3AC0(void* curve, void* paramOut, f32 t);       /* VEC lerp */
+f32   fn_800A3B7C(void* a, void* b);
+f32   fn_800A3BD8(void* a, void* b);
 
 /* GScolsys2 functions */
 extern void* fn_8010CBC0(void);                         /* GScolsys2_GetWZXData */
@@ -111,6 +113,43 @@ extern void  fn_8010CA30(void* mtxOut, u32 layerIdx);   /* GScolsys2_BuildInvers
 extern void  fn_8010C8D0(void* mtxOut, u32 layerIdx);   /* GScolsys2_BuildTransform */
 extern s32   fn_8010DEF0(void* result, void* origin,
                           void* verts, void* normal);    /* GScolsys2_TriangleBoundsCheck */
+f32   fn_8010C77C(void* normal, void* p1, void* p2);
+void  GScolsy2UtilGetCpPlanePoint(void* out, void* normal, void* verts, void* point);
+f32   GScolsys2UtilGetCpLinePoint(void* out, void* start, void* end, void* point);
+s32   GScolsy2UtilChkInTri(void* point, void* verts, void* normal);
+
+/* Collision triangle/query record layouts used by this module. */
+typedef struct GScolsys2Vec3 {
+    f32 x;
+    f32 y;
+    f32 z;
+} GScolsys2Vec3;
+
+typedef struct GScolsys2Triangle {
+    GScolsys2Vec3 verts[3];      /* 0x00 */
+    GScolsys2Vec3 normal;        /* 0x24 */
+    u16 flags;                   /* 0x30 */
+    u16 id;                      /* 0x32 */
+} GScolsys2Triangle;
+
+typedef struct GScolsys2TriangleList {
+    GScolsys2Triangle* triangles; /* 0x00 */
+    u32 count;                    /* 0x04 */
+} GScolsys2TriangleList;
+
+typedef struct GSfieldQueryTriangle {
+    GScolsys2Vec3 verts[3];      /* 0x00 */
+    GScolsys2Vec3 normal;        /* 0x24 */
+    u16 id;                      /* 0x30 */
+    u16 pad_32;                  /* 0x32 */
+} GSfieldQueryTriangle;
+
+typedef struct GSfieldEdgeMasks {
+    u16 values[3];
+} GSfieldEdgeMasks;
+
+extern const GSfieldEdgeMasks lbl_8047CF48;
+extern const GSfieldEdgeMasks lbl_8047CF50;
 
 /* ===== String constants (rodata) ===== */
 extern const char lbl_802720B0[]; /* "scene_data" */
@@ -517,10 +556,201 @@ found:
 
 /* 0x80110E64 | 0x60C */
 #pragma push
-#pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80110E64(void) {
-    /* TODO: match -- 1548 bytes at 0x80110E64 */
+s32 fn_80110E64(GScolsys2Vec3* point, GScolsys2Vec3* dirVec, f32 radius,
+                GScolsys2TriangleList* triList, void* mtxInv, void* mtxFwd,
+                GSfieldQueryTriangle* outTris) {
+    GScolsys2Triangle* tri;
+    GSfieldQueryTriangle* out;
+    s32 outCount;
+    s32 triIdx;
+    GSfieldQueryTriangle* scan;
+    s32 scanIdx;
+    s32 vertIdx;
+    GScolsys2Vec3* vdst;
+    GScolsys2Vec3* vsrc;
+    s32 hit;
+    f32 radiusSq;
+    GSfieldEdgeMasks edgeMasksA;
+    GSfieldEdgeMasks edgeMasksB;
+    GScolsys2Vec3 planePoint;
+    GScolsys2Vec3 cp;
+    GScolsys2Vec3 lineCp;
+    GScolsys2Vec3 verts[3];
+    f32 lineT;
+    u16 flags;
+
+    radiusSq = radius * radius;
+    tri = triList->triangles;
+    out = outTris;
+    outCount = 0;
+    triIdx = 0;
+    while ((u32)triIdx < triList->count && outCount < 4) {
+        scan = outTris;
+        for (scanIdx = 0; scanIdx < outCount; scanIdx++, scan++) {
+            if (tri->id == scan->id) {
+                break;
+            }
+        }
+        if (scanIdx >= outCount) {
+            fn_800A37CC(mtxFwd, &tri->normal, &planePoint);
+            if (fn_800A3B7C(&planePoint, dirVec) < 0.0f) {
+                vdst = verts;
+                vsrc = tri->verts;
+                vertIdx = 0;
+                do {
+                    fn_800A37CC(mtxInv, vsrc, vdst);
+                    vertIdx++;
+                    vsrc++;
+                    vdst++;
+                } while (vertIdx < 3);
+                if (fn_8010C77C(&planePoint, verts, point) < 0.0f) {
+                    hit = 0;
+                } else {
+                    GScolsy2UtilGetCpPlanePoint(&cp, &planePoint, verts, point);
+                    if (fn_800A3BD8(&cp, point) >= radiusSq) {
+                        hit = 0;
+                    } else if (GScolsy2UtilChkInTri(&cp, verts, &planePoint) == 0) {
+                        hit = 0;
+                    } else {
+                        hit = 1;
+                    }
+                }
+                if (hit != 0) {
+                    out->id = tri->id;
+                    out->verts[0] = verts[0];
+                    out->verts[1] = verts[1];
+                    out->verts[2] = verts[2];
+                    out->normal = planePoint;
+                    outCount++;
+                    out++;
+                }
+            }
+        }
+        triIdx++;
+        tri++;
+    }
+
+    tri = triList->triangles;
+    triIdx = 0;
+    out = outTris + outCount;
+    while ((u32)triIdx < triList->count && outCount < 4) {
+        if ((tri->flags & 7) != 0) {
+            scan = outTris;
+            for (scanIdx = 0; scanIdx < outCount; scanIdx++, scan++) {
+                if (tri->id == scan->id) {
+                    break;
+                }
+            }
+            if (scanIdx >= outCount) {
+                fn_800A37CC(mtxFwd, &tri->normal, &planePoint);
+                if (fn_800A3B7C(&planePoint, dirVec) < 0.0f) {
+                    vdst = verts;
+                    vsrc = tri->verts;
+                    vertIdx = 0;
+                    do {
+                        fn_800A37CC(mtxInv, vsrc, vdst);
+                        vertIdx++;
+                        vsrc++;
+                        vdst++;
+                    } while (vertIdx < 3);
+                    edgeMasksA = lbl_8047CF48;
+                    flags = tri->flags;
+                    if (fn_8010C77C(&planePoint, verts, point) < 0.0f) {
+                        hit = 0;
+                    } else {
+                        vsrc = verts;
+                        hit = 0;
+                        for (vertIdx = 0; vertIdx < 3; vertIdx++, vsrc++) {
+                            if ((flags & edgeMasksA.values[vertIdx]) != 0) {
+                                s32 next = vertIdx + 1;
+                                if (next >= 3) {
+                                    next = 0;
+                                }
+                                lineT = GScolsys2UtilGetCpLinePoint(&lineCp, vsrc, &verts[next], point);
+                                if (lineT >= 0.0f && lineT <= 1.0f
+                                    && fn_800A3BD8(&lineCp, point) < radiusSq) {
+                                    hit = 1;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (hit != 0) {
+                        out->id = tri->id;
+                        out->verts[0] = verts[0];
+                        out->verts[1] = verts[1];
+                        out->verts[2] = verts[2];
+                        out->normal = planePoint;
+                        outCount++;
+                        out++;
+                    }
+                }
+            }
+        }
+        triIdx++;
+        tri++;
+    }
+
+    tri = triList->triangles;
+    triIdx = 0;
+    out = outTris + outCount;
+    while ((u32)triIdx < triList->count && outCount < 4) {
+        if ((tri->flags & 7) != 0) {
+            scan = outTris;
+            for (scanIdx = 0; scanIdx < outCount; scanIdx++, scan++) {
+                if (tri->id == scan->id) {
+                    break;
+                }
+            }
+            if (scanIdx >= outCount) {
+                fn_800A37CC(mtxFwd, &tri->normal, &planePoint);
+                if (fn_800A3B7C(&planePoint, dirVec) < 0.0f) {
+                    vdst = verts;
+                    vsrc = tri->verts;
+                    vertIdx = 0;
+                    do {
+                        fn_800A37CC(mtxInv, vsrc, vdst);
+                        vertIdx++;
+                        vsrc++;
+                        vdst++;
+                    } while (vertIdx < 3);
+                    edgeMasksB = lbl_8047CF50;
+                    flags = tri->flags;
+                    if (fn_8010C77C(&planePoint, verts, point) < 0.0f) {
+                        hit = 0;
+                    } else {
+                        vsrc = verts;
+                        hit = 0;
+                        for (vertIdx = 0; vertIdx < 3; vertIdx++, vsrc++) {
+                            s32 next = vertIdx + 2;
+                            if (next >= 3) {
+                                next -= 3;
+                            }
+                            if ((flags & edgeMasksB.values[vertIdx]) != 0 && (flags & edgeMasksB.values[next]) != 0) {
+                                if (fn_800A3BD8(vsrc, point) < radiusSq) {
+                                    hit = 1;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (hit != 0) {
+                        out->id = tri->id;
+                        out->verts[0] = verts[0];
+                        out->verts[1] = verts[1];
+                        out->verts[2] = verts[2];
+                        out->normal = planePoint;
+                        outCount++;
+                        out++;
+                    }
+                }
+            }
+        }
+        triIdx++;
+        tri++;
+    }
+    return outCount;
 }
 #pragma pop
 
@@ -602,7 +832,7 @@ s32 fn_80111864(void* a, void* b, void* c) {
                     if (tempCount > 0) {
                         do {
                             if (*(u16*)(tri + 0x30) == *(u16*)(scan + 0x30)) {
-                                goto test_triangle;
+                                break;
                             }
                             scan += 0x34;
                             scanIdx++;
@@ -611,7 +841,6 @@ s32 fn_80111864(void* a, void* b, void* c) {
                     if (scanIdx < tempCount) {
                         goto next_triangle;
                     }
-                test_triangle:
                     fn_800A37CC(mtxFwd, tri + 0x24, planePoint);
                     if (fn_800A3B7C(planePoint, dirVec) >= lbl_8047CF60) {
                         goto next_triangle;
@@ -653,7 +882,7 @@ s32 fn_80111864(void* a, void* b, void* c) {
                     triIdx++;
                     tri += 0x34;
                     if (tempCount >= 4) {
-                        return 0;
+                        break;
                     }
                 }
                 tempRead = temp;
@@ -664,7 +893,7 @@ s32 fn_80111864(void* a, void* b, void* c) {
                     if (outCount > 0) {
                         do {
                             if (*(u16*)(scan + 0x30) == *(u16*)(tempRead + 0x30)) {
-                                goto copy_result;
+                                break;
                             }
                             scan += 0x34;
                             scanIdx++;
@@ -673,7 +902,6 @@ s32 fn_80111864(void* a, void* b, void* c) {
                     if (scanIdx < outCount) {
                         goto next_temp;
                     }
-                copy_result:
                     out = (u8*)c + outOffset;
                     *(u32*)(out + 0x00) = *(u32*)(tempRead + 0x00);
                     *(u32*)(out + 0x04) = *(u32*)(tempRead + 0x04);

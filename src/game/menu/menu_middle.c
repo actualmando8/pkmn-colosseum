@@ -137,7 +137,7 @@ extern u8 lbl_80314E08[];
 extern u8 lbl_803B6D68[];
 
 /* ===== Forward declarations ===== */
-void fn_80069C0C(void);
+void fn_80069C0C(void* arg0);
 u16 fn_8006A65C(void);
 void fn_8006A718(void);
 u8 fn_8006A76C(void);
@@ -242,7 +242,7 @@ void fn_80070D84(void);
 
 
 /* 0x80069C0C | size: 0xA50 */
-void fn_80069C0C(void) {
+void fn_80069C0C(void* arg0) {
     extern void fn_8006A7E0();
     extern void fn_8006A7F0();
     extern void fn_8006A81C();
@@ -273,7 +273,7 @@ void fn_80069C0C(void) {
     extern void fn_8020DFA0();
     extern void fn_8020DFB0();
     extern void fn_8020E0F8();
-    u8 sp[0xBC0];
+    u8 sp[0xB90];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
     u32 r3 = 0;
@@ -289,26 +289,20 @@ void fn_80069C0C(void) {
     u32 r31 = 0;
 
     
-    r31 = r3;
+    r31 = (u32)arg0;
     r0 = *(u32*)((u8*)r31 + 0x4);
     r3 = (u32)&lbl_80267C18;
     r29 = (u32)&lbl_80267C18;
     r25 = 0x0;
-    if ((s32)r0 != (s32)0x1) {
-        if ((s32)r0 < (s32)0x1) {
-            if ((s32)r0 < (s32)0x0) {
-                goto L_80069C68;
-            }
-            if ((s32)r0 >= (s32)0x3) goto L_80069C68;
-            goto L_80069C64;
-            }
-        r25 = 0x20a;
-        goto L_80069C68;
+    if ((s32)r0 == (s32)0x1) {
+        r25 = 0x20b;
+    } else if ((s32)r0 < (s32)0x1) {
+        if ((s32)r0 >= (s32)0x0) {
+            r25 = 0x20a;
+        }
+    } else if ((s32)r0 < (s32)0x3) {
+        r25 = 0x20c;
     }
-    r25 = 0x20b;
-    goto L_80069C68;
-    L_80069C64: ;
-    r25 = 0x20c;
     L_80069C68: ;
     r0 = r25 & 0xFFFF;
     if (r0 == (u32)0x0) {
@@ -362,8 +356,9 @@ void fn_80069C0C(void) {
     } else if (r0 < (u32)0x63) {
         r4 = 0x18;
 
+    } else {
+        r4 = 0x3d5;
     }
-    r4 = 0x3d5;
     goto L_80069D7C;
     L_80069D48: ;
     r5 = *(u32*)&lbl_8047A5D8;
@@ -397,8 +392,9 @@ void fn_80069C0C(void) {
         } else if (r0 < (u32)0x63) {
             r4 = 0x2a;
 
+        } else {
+            r4 = 0x2e;
         }
-        r4 = 0x2e;
         goto L_80069E08;
     } while (0);
 

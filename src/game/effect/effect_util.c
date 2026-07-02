@@ -851,10 +851,10 @@ void fn_80131F04(void) {
     extern u32 fn_802037DC(u32);
     extern void fn_80132A38(u32, u32);
     extern void fn_800FA280(u32);
+    u32 result;
     u32 val = lbl_8047AE10;
-    u32 result = fn_801F4354(0, val);
-    u32 flag = fn_801F18DC(0) & 0xFF;
-    if (flag == 1 && result != 0) {
+    result = fn_801F4354(0, val);
+    if (((u8)fn_801F18DC(0) == 1) && result != 0) {
         fn_80132A38(0x4D, fn_801F8100(result));
         fn_80132A38(0x57, fn_802037DC(val));
         fn_800FA280(0x7721);
@@ -3671,14 +3671,11 @@ u32 fn_80135F90(u32 index) {
 s32 fn_80135FBC(u32 index, u32 subIndex) {
     extern EffectStatusTableEntry lbl_80363B18[];
     extern u32 lbl_80478B88;
-    s16* effectParams;
-
     if (index > lbl_80478B88 || subIndex > 2) {
         return 0;
     }
     /* subIndex 2 is valid in the original table and reads the next signed halfword. */
-    effectParams = &lbl_80363B18[index].amount;
-    return effectParams[subIndex];
+    return (&lbl_80363B18[index].amount)[subIndex];
 }
 #pragma pop
 #pragma scheduling off
