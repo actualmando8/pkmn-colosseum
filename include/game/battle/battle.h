@@ -351,14 +351,14 @@ typedef struct TypeMatchup {
 /* fn_801C4814 */ f32  fn_801C4814(s32 slot);
 /* fn_801C483C */ f32  fn_801C483C(s32 slot);
 /* fn_801C4864 */ f32  fn_801C4864(s32 slot);
-/* fn_801C488C */ void fn_801C488C(s32 slot, f32 x);
-/* fn_801C48B4 */ void fn_801C48B4(s32 slot, f32 y);
-/* fn_801C48DC */ void fn_801C48DC(s32 slot, f32 z);
+/* fadeEffectHookFunction_fadeout_in_Init */ void fadeEffectHookFunction_fadeout_in_Init(s32 slot, f32 x);
+/* fadeEffectHookFunction_carde_Init */ void fadeEffectHookFunction_carde_Init(s32 slot, f32 y);
+/* fadeEffectHookFunction_boss_Init */ void fadeEffectHookFunction_boss_Init(s32 slot, f32 z);
 /* fadeEffectHookFunction_yoko_or_tate_or_ball_Init */ void fadeEffectHookFunction_yoko_or_tate_or_ball_Init(s32 slot, f32 x, f32 y, f32 z);
-/* fn_801C4974 */ f32  fn_801C4974(s32 slot);
+/* fadeEffectHookFunction_ball_Init */ f32  fadeEffectHookFunction_ball_Init(s32 slot);
 /* fadeEffectHookFunction_yoko_or_tate_Init */ void fadeEffectHookFunction_yoko_or_tate_Init(s32 slot, f32 rotation);
-/* fn_801C49F4 */ f32  fn_801C49F4(s32 slot);
-/* fn_801C4A1C */ void fn_801C4A1C(s32 slot, f32 scale);
+/* fadeEffectHookFunction_tate_Init */ f32  fadeEffectHookFunction_tate_Init(s32 slot);
+/* fadeEffectHookFunction_yoko_Init */ void fadeEffectHookFunction_yoko_Init(s32 slot, f32 scale);
 /* fn_801C4A44 */ void fn_801C4A44(s32 slot, f32 x, f32 y, f32 z, f32 rot, f32 scale);
 /* fn_801C4C98 */ f32  fn_801C4C98(void);
 /* fn_801C4CB8 */ void fn_801C4CB8(void);                        /* grid full render 0x704 */

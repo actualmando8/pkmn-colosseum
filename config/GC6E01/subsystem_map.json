@@ -493,7 +493,7 @@
 "addr": "0x80007FDC",
 "size": 56,
 "label": "gs-engine",
-"confidence": 1.89,
+"confidence": 1.9,
 "seed": null
 },
 {
@@ -1588,7 +1588,7 @@
 "name": "fn_80011288",
 "addr": "0x80011288",
 "size": 540,
-"label": "fight",
+"label": "gs-engine",
 "confidence": 1.9,
 "seed": null
 },
@@ -1596,7 +1596,7 @@
 "name": "fn_800114A4",
 "addr": "0x800114A4",
 "size": 604,
-"label": "fight",
+"label": "gs-engine",
 "confidence": 1.9,
 "seed": null
 },
@@ -47609,28 +47609,28 @@
 "seed": null
 },
 {
-"name": "fn_801C488C",
+"name": "fadeEffectHookFunction_fadeout_in_Init",
 "addr": "0x801C488C",
 "size": 40,
 "label": "fade",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_801C48B4",
+"name": "fadeEffectHookFunction_carde_Init",
 "addr": "0x801C48B4",
 "size": 40,
 "label": "fade",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_801C48DC",
+"name": "fadeEffectHookFunction_boss_Init",
 "addr": "0x801C48DC",
 "size": 40,
 "label": "fade",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fadeEffectHookFunction_yoko_or_tate_or_ball_Init",
@@ -47641,12 +47641,12 @@
 "seed": "prefix"
 },
 {
-"name": "fn_801C4974",
+"name": "fadeEffectHookFunction_ball_Init",
 "addr": "0x801C4974",
 "size": 40,
 "label": "fade",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fadeEffectHookFunction_yoko_or_tate_Init",
@@ -47657,20 +47657,20 @@
 "seed": "prefix"
 },
 {
-"name": "fn_801C49F4",
+"name": "fadeEffectHookFunction_tate_Init",
 "addr": "0x801C49F4",
 "size": 40,
 "label": "fade",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_801C4A1C",
+"name": "fadeEffectHookFunction_yoko_Init",
 "addr": "0x801C4A1C",
 "size": 40,
 "label": "fade",
-"confidence": 1.42,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_801C4A44",
@@ -50212,7 +50212,7 @@
 "name": "fn_801E075C",
 "addr": "0x801E075C",
 "size": 644,
-"label": "field",
+"label": "gs-engine",
 "confidence": 1.9,
 "seed": null
 },
@@ -57729,7 +57729,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020AE30",
+"name": "fightActionDispWazaKiaipantiPre",
 "addr": "0x8020AE30",
 "size": 8,
 "label": "fight",
@@ -57737,7 +57737,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020AE38",
+"name": "fightActionDispTenkouInit",
 "addr": "0x8020AE38",
 "size": 8,
 "label": "fight",
@@ -57745,7 +57745,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020AE40",
+"name": "fightActionDispHeijou",
 "addr": "0x8020AE40",
 "size": 8,
 "label": "fight",
@@ -57753,7 +57753,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020AE48",
+"name": "fightActionDispSyuuryouPost",
 "addr": "0x8020AE48",
 "size": 8,
 "label": "fight",
@@ -57761,7 +57761,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020AE50",
+"name": "fightActionDispSyuuryou",
 "addr": "0x8020AE50",
 "size": 8,
 "label": "fight",
@@ -57769,7 +57769,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020AE58",
+"name": "fightActionDispSyuuryouPre",
 "addr": "0x8020AE58",
 "size": 8,
 "label": "fight",
@@ -57777,7 +57777,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020AE60",
+"name": "fightActionDispFightOutPokemonOutWaza",
 "addr": "0x8020AE60",
 "size": 8,
 "label": "fight",
@@ -57785,7 +57785,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020AE68",
+"name": "fightActionDispFightTrainerUseItem",
 "addr": "0x8020AE68",
 "size": 8,
 "label": "fight",
@@ -57793,7 +57793,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020AE70",
+"name": "fightActionDispFightTrainerCall",
 "addr": "0x8020AE70",
 "size": 8,
 "label": "fight",
@@ -57801,7 +57801,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020AE78",
+"name": "fightActionDispFightOutPokemonIrekae",
 "addr": "0x8020AE78",
 "size": 8,
 "label": "fight",
@@ -57809,7 +57809,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020AE80",
+"name": "fightActionDispFightNigeru",
 "addr": "0x8020AE80",
 "size": 8,
 "label": "fight",
@@ -57817,7 +57817,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020AE88",
+"name": "fightActionDispOneTurnPost",
 "addr": "0x8020AE88",
 "size": 8,
 "label": "fight",
@@ -57825,7 +57825,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020AE90",
+"name": "fightActionDispAllFightOutPokemonDoFightAction",
 "addr": "0x8020AE90",
 "size": 8,
 "label": "fight",
@@ -57833,7 +57833,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020AE98",
+"name": "fightActionDispAllFightTrainerSelectFightAction",
 "addr": "0x8020AE98",
 "size": 8,
 "label": "fight",
@@ -57841,7 +57841,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020AEA0",
+"name": "fightActionDispKaisiPost",
 "addr": "0x8020AEA0",
 "size": 8,
 "label": "fight",
@@ -57849,7 +57849,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020AEA8",
+"name": "fightActionDispKaisiPre",
 "addr": "0x8020AEA8",
 "size": 8,
 "label": "fight",
@@ -57857,7 +57857,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020AEB0",
+"name": "fightActionDispKaisiNyuujouPokemon",
 "addr": "0x8020AEB0",
 "size": 8,
 "label": "fight",
@@ -57865,7 +57865,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020AEB8",
+"name": "fightActionDispKaisiNyuujouTrainer",
 "addr": "0x8020AEB8",
 "size": 8,
 "label": "fight",
@@ -57873,7 +57873,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020AEC0",
+"name": "fightActionDispKaijou",
 "addr": "0x8020AEC0",
 "size": 8,
 "label": "fight",
@@ -57881,7 +57881,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020AEC8",
+"name": "fightActionDispNullFunc",
 "addr": "0x8020AEC8",
 "size": 8,
 "label": "fight",
@@ -57889,7 +57889,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020AED0",
+"name": "fightActionFlowWazaKiaipantiPre",
 "addr": "0x8020AED0",
 "size": 96,
 "label": "fight",
@@ -57897,7 +57897,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020AF30",
+"name": "fightActionFlowTenkouInit",
 "addr": "0x8020AF30",
 "size": 196,
 "label": "fight",
@@ -57913,7 +57913,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020B050",
+"name": "fightActionFlowHeijou",
 "addr": "0x8020B050",
 "size": 8,
 "label": "fight",
@@ -57921,7 +57921,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020B058",
+"name": "fightActionFlowSyuuryouPost",
 "addr": "0x8020B058",
 "size": 728,
 "label": "fight",
@@ -57929,7 +57929,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020B330",
+"name": "fightActionFlowSyuuryou",
 "addr": "0x8020B330",
 "size": 932,
 "label": "fight",
@@ -57937,7 +57937,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020B6D4",
+"name": "fightActionFlowSyuuryouPre",
 "addr": "0x8020B6D4",
 "size": 88,
 "label": "fight",
@@ -57945,7 +57945,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020B72C",
+"name": "fightActionFlowFightOutPokemonOutWaza",
 "addr": "0x8020B72C",
 "size": 484,
 "label": "fight",
@@ -57953,7 +57953,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020B910",
+"name": "fightActionFlowFightTrainerUseItem",
 "addr": "0x8020B910",
 "size": 260,
 "label": "fight",
@@ -57961,7 +57961,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020BA14",
+"name": "fightActionFlowFightTrainerCall",
 "addr": "0x8020BA14",
 "size": 108,
 "label": "fight",
@@ -57969,7 +57969,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020BA80",
+"name": "fightActionFlowFightOutPokemonIrekae",
 "addr": "0x8020BA80",
 "size": 120,
 "label": "fight",
@@ -57977,7 +57977,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020BAF8",
+"name": "fightActionFlowFightNigeru",
 "addr": "0x8020BAF8",
 "size": 172,
 "label": "fight",
@@ -58009,7 +58009,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020BE38",
+"name": "fightActionFlowAllFightTrainerSelectFightAction",
 "addr": "0x8020BE38",
 "size": 264,
 "label": "fight",
@@ -58025,7 +58025,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020BFA0",
+"name": "fightActionFlowKaisiPost",
 "addr": "0x8020BFA0",
 "size": 288,
 "label": "fight",
@@ -58057,7 +58057,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020C15C",
+"name": "fightActionFlowKaisiPre",
 "addr": "0x8020C15C",
 "size": 1764,
 "label": "fight",
@@ -58073,7 +58073,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020CA98",
+"name": "fightActionFlowKaisiNyuujouPokemon",
 "addr": "0x8020CA98",
 "size": 1352,
 "label": "fight",
@@ -58089,7 +58089,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020D1FC",
+"name": "fightActionFlowKaisiNyuujouTrainer",
 "addr": "0x8020D1FC",
 "size": 1180,
 "label": "fight",
@@ -58097,7 +58097,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020D698",
+"name": "fightActionFlowKaijou",
 "addr": "0x8020D698",
 "size": 236,
 "label": "fight",
@@ -58105,7 +58105,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020D784",
+"name": "fightActionFlowNullFunc",
 "addr": "0x8020D784",
 "size": 8,
 "label": "fight",
@@ -68951,8 +68951,14 @@
 {
 "label": "fight",
 "start": "0x800111C4",
+"end": "0x80011288",
+"count": 3
+},
+{
+"label": "gs-engine",
+"start": "0x80011288",
 "end": "0x80011700",
-"count": 5
+"count": 2
 },
 {
 "label": "menu",
@@ -70703,14 +70709,14 @@
 {
 "label": "field",
 "start": "0x801DF790",
-"end": "0x801e09e0",
-"count": 4
+"end": "0x801e075c",
+"count": 3
 },
 {
 "label": "gs-engine",
-"start": "0x801E09E0",
+"start": "0x801E075C",
 "end": "0x801e11cc",
-"count": 7
+"count": 8
 },
 {
 "label": "particle",

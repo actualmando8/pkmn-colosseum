@@ -1118,7 +1118,7 @@ f32 fn_801C4864(s32 slot) {
 #pragma scheduling on
 
 /**
- * fn_801C488C - Grid set slot X position.
+ * fadeEffectHookFunction_fadeout_in_Init - Grid set slot X position.
  * Address: 0x801C488C | Size: 0x28
  */
 #pragma scheduling off
@@ -1130,7 +1130,7 @@ f32 fn_801C4864(s32 slot) {
 #pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
-void fn_801C488C(s32 slot, f32 x) {
+void fadeEffectHookFunction_fadeout_in_Init(s32 slot, f32 x) {
     extern void fn_801C5530(void);
 
     fn_801C431C((s32)fn_801C5530);
@@ -1146,7 +1146,7 @@ void fn_801C488C(s32 slot, f32 x) {
 #pragma scheduling on
 
 /**
- * fn_801C48B4 - Grid set slot Y position.
+ * fadeEffectHookFunction_carde_Init - Grid set slot Y position.
  * Address: 0x801C48B4 | Size: 0x28
  */
 #pragma scheduling off
@@ -1158,7 +1158,7 @@ void fn_801C488C(s32 slot, f32 x) {
 #pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
-void fn_801C48B4(s32 slot, f32 y) {
+void fadeEffectHookFunction_carde_Init(s32 slot, f32 y) {
     extern f32 fn_801C4C98(void);
 
     fn_801C431C((s32)fn_801C4C98);
@@ -1174,7 +1174,7 @@ void fn_801C48B4(s32 slot, f32 y) {
 #pragma scheduling on
 
 /**
- * fn_801C48DC - Grid set slot Z position.
+ * fadeEffectHookFunction_boss_Init - Grid set slot Z position.
  * Address: 0x801C48DC | Size: 0x28
  */
 #pragma scheduling off
@@ -1186,7 +1186,7 @@ void fn_801C48B4(s32 slot, f32 y) {
 #pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
-void fn_801C48DC(s32 slot, f32 z) {
+void fadeEffectHookFunction_boss_Init(s32 slot, f32 z) {
     extern void fn_801C55D8(void);
 
     fn_801C431C((s32)fn_801C55D8);
@@ -1210,7 +1210,7 @@ void fadeEffectHookFunction_yoko_or_tate_or_ball_Init(s32 slot, f32 x, f32 y, f3
 }
 
 /**
- * fn_801C4974 - Grid get slot rotation.
+ * fadeEffectHookFunction_ball_Init - Grid get slot rotation.
  * Address: 0x801C4974 | Size: 0x28
  */
 #pragma scheduling off
@@ -1222,7 +1222,7 @@ void fadeEffectHookFunction_yoko_or_tate_or_ball_Init(s32 slot, f32 x, f32 y, f3
 #pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
-f32 fn_801C4974(s32 slot) {
+f32 fadeEffectHookFunction_ball_Init(s32 slot) {
     extern f32 fn_801C5898(void);
 
     fn_801C431C((s32)fn_801C5898);
@@ -1275,7 +1275,7 @@ void fadeEffectHookFunction_yoko_or_tate_Init(s32 slot, f32 rotation) {
 #pragma scheduling on
 
 /**
- * fn_801C49F4 - Grid get slot scale.
+ * fadeEffectHookFunction_tate_Init - Grid get slot scale.
  * Address: 0x801C49F4 | Size: 0x28
  */
 #pragma scheduling off
@@ -1287,7 +1287,7 @@ void fadeEffectHookFunction_yoko_or_tate_Init(s32 slot, f32 rotation) {
 #pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
-f32 fn_801C49F4(s32 slot) {
+f32 fadeEffectHookFunction_tate_Init(s32 slot) {
     extern f32 fn_801C5ED0(void);
 
     fn_801C431C((s32)fn_801C5ED0);
@@ -1303,7 +1303,7 @@ f32 fn_801C49F4(s32 slot) {
 #pragma scheduling on
 
 /**
- * fn_801C4A1C - Grid set slot scale.
+ * fadeEffectHookFunction_yoko_Init - Grid set slot scale.
  * Address: 0x801C4A1C | Size: 0x28
  */
 #pragma scheduling off
@@ -1315,7 +1315,7 @@ f32 fn_801C49F4(s32 slot) {
 #pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
-void fn_801C4A1C(s32 slot, f32 scale) {
+void fadeEffectHookFunction_yoko_Init(s32 slot, f32 scale) {
     extern void fn_801C5F6C(void);
 
     fn_801C431C((s32)fn_801C5F6C);
