@@ -164,6 +164,10 @@ void HSD_JObjAddDObj(HSD_JObj* jobj, HSD_DObj* dobj)
 /*  Reference counting                                                       */
 /* ========================================================================= */
 
+void iref_INC_801A0C9C(void* o);
+void hsdDelete_801A0CE8(void* object);
+BOOL ref_DEC_801A0D48(void* o);
+
 void HSD_JObjUnref(HSD_JObj* jobj)
 {
     if (jobj == NULL) {
@@ -1521,13 +1525,24 @@ void* HSD_IDGetData(u32 key, u32* found) {
 #endif
 #pragma pop
 
-/* NOTE: ref_INC/iref_DEC/iref_INC_801A0C9C/hsdDelete_801A0CE8 (0x801A0C1C-0x801A0D48 minus
- * 0x801A0D3C) are provided as `static inline` from hsd_object.h/hsd_class.h.
- * Colosseum's linker folds the out-of-lined instances from every TU that
- * calls them into a single physical copy; a duplicate top-level definition
- * here would only collide with the header's declarations. See melee
- * baselib/object.h for the reference: these are never standalone functions
- * in jobj.c either. */
+/* 0x801A0C9C | 0x4C -- out-of-line emitted copy of hsd_object.h's iref_INC,
+ * folded here by Colosseum's linker (this TU is the canonical instance;
+ * suffix-named per the scope-local pairing convention). */
+void iref_INC_801A0C9C(void* o)
+{
+    HSD_OBJ(o)->ref_count_individual++;
+    HSD_ASSERT(158, HSD_OBJ(o)->ref_count_individual != 0);
+}
+
+/* 0x801A0CE8 | 0x54 -- out-of-line emitted copy of hsd_class.h's hsdDelete. */
+void hsdDelete_801A0CE8(void* object)
+{
+    HSD_Class* o;
+    if ((o = (HSD_Class*) object) != NULL) {
+        HSD_CLASS_METHOD(o)->release(o);
+        HSD_CLASS_METHOD(o)->destroy(o);
+    }
+}
 
 /* 0x801A0D3C | 0xC */
 #pragma push
@@ -1545,8 +1560,17 @@ s32 fn_801A0D3C(HSD_Obj* obj) {
 #endif
 #pragma pop
 
-/* NOTE: ref_DEC_801A0D48 (0x801A0D48) is `static inline` from hsd_object.h; see note
- * above the 0x801A0C1C block. */
+/* 0x801A0D48 | 0x4C -- out-of-line emitted copy of hsd_object.h's ref_DEC. */
+BOOL ref_DEC_801A0D48(void* o)
+{
+    BOOL ret;
+    if ((ret = (HSD_OBJ(o)->ref_count == HSD_OBJ_NOREF))) {
+        return ret;
+    }
+    ret = (HSD_OBJ(o)->ref_count == 0);
+    HSD_OBJ(o)->ref_count -= 1;
+    return ret;
+}
 
 /* 0x801A0D94 | 0x228 */
 #pragma push
