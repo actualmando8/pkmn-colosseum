@@ -4,7 +4,7 @@
  *
  * GSthread provides two layers:
  *   1. "Tasks" (lightweight callbacks) -- stored in a priority-sorted linked
- *      list.  Each frame, GStaskRun iterates the list and invokes every
+ *      list.  Each frame the scheduler iterates the list and invokes every
  *      active task whose state == 1 (ACTIVE) and pause flag == 0.
  *   2. "Threads" (heavier cooperative fibres) -- each thread owns a GSmem
  *      handle for its stack and a context block.  The scheduler walks a
@@ -13,8 +13,11 @@
  * Neither layer uses the Dolphin OS thread API for scheduling; they are
  * entirely cooperative (no preemption).
  *
- * Debug string: "GSthread: Init OK, maximum of %d threads"
- * Address range: 0x800F07A8 - 0x800FE9B0 (approx.)
+ * This header is shared by gs_thread.c (0x800F07A8-0x800F75FC) and
+ * gs_thread_hi.c (0x800F8268-0x800FF0A0, see config/GC6E01/splits.txt).
+ * The task-system entry points (init/create/run) are not yet decompiled
+ * under real names -- do not add fabricated GStask-family or GSthreadInit
+ * prototypes here without a symbols.txt match.
  */
 #ifndef GS_THREAD_H
 #define GS_THREAD_H
@@ -71,53 +74,18 @@ typedef struct GSThread {
  * Public API
  * ----------------------------------------------------------------------- */
 
-/**
- * GStaskInit -- Initialise the task system.
- *
- * @param numTasks   Maximum number of tasks.
- * @param numQueues  Number of deferred-task queues.
- *
- * Allocates the task array from GSmem and zeroes all entries.
- * Prints "GSthread: Init OK, maximum of %d threads".
- *
- * Corresponds to fn_800FE9B0.
+/*
+ * NOTE (orphan fiction removed): a prior recovery pass invented
+ * GStaskInit, GStaskCreate, GStaskRun, and GSthreadInit here (with matching
+ * fabricated bodies duplicated verbatim into both gs_thread.c and
+ * gs_thread_hi.c). None of those four names appear in
+ * config/GC6E01/symbols.txt, and both source files already contain the
+ * real (address-scaffolded) definitions for fn_800FE9B0, fn_800FE834,
+ * fn_800FE7A0 within gs_thread_hi.c's actual unit range -- the claimed
+ * addresses for these names never belonged to gs_thread.c's range at all
+ * (0x800F07A8-0x800F75FC). The four prototypes and their duplicated
+ * definitions have been removed as dead/fictional code.
  */
-void GStaskInit(u32 numTasks, u32 numQueues);
-
-/**
- * GStaskCreate -- Create and register a new task.
- *
- * @param state      Initial state (1 = ACTIVE, 2 = DEFERRED).
- * @param priority   Task priority (lower = runs first).
- * @param param      User parameter passed to callback.
- * @param func       Callback function pointer.
- * @return           1-based task ID, or 0 on failure.
- *
- * Tasks are inserted into the active list in priority order.
- * Corresponds to fn_800FE834.
- */
-u32 GStaskCreate(u32 state, u8 priority, void* param, void* func);
-
-/**
- * GStaskRun -- Execute all active tasks once.
- *
- * Walks the task linked list; for each task with state==1 and paused==0,
- * calls the callback with (taskId, param).  This is the cooperative
- * "yield" point called from the main loop.
- *
- * Corresponds to fn_800FE7A0.
- */
-void GStaskRun(void);
-
-/**
- * GSthreadInit -- Initialise the cooperative thread system.
- *
- * @param maxThreads  Maximum number of threads.
- *
- * Allocates the thread array and zeroes all entries.
- * Corresponds to GSthread.
- */
-void GSthreadInit(u32 maxThreads);
 
 /**
  * GSthreadCreate -- Create and start a cooperative thread.

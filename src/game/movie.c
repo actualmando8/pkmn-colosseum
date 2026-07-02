@@ -2,11 +2,18 @@
  * @file movie.c
  * @brief THP movie playback system for Pokemon Colosseum.
  *
- * Decompiled from:
- *   fn_80035EE4 (moviePlayOpeningDemo)
- *   fn_80035F34 (moviePlayAutoDemo -- fade setup portion)
- *   fn_80035F64 (moviePlayStaffRoll)
- *   fn_80035E04 (movieStopAndCleanup / movieWaitForFinish)
+ * fn_80035E04, fn_80035EE4, fn_80035F34, and fn_80035F64 (0x80035E04 -
+ * 0x800361C0, size/address confirmed against config/GC6E01/symbols.txt)
+ * implement movie stop/cleanup, opening-demo playback, auto-demo setup,
+ * and the staff-roll sequence respectively. Their "wait for THP playback
+ * to finish" loop (poll fn_801E1874, yield via _threadSwitch) is inlined
+ * at each call site in the retail binary -- there is no standalone helper
+ * function for it, so none is kept here either.
+ *
+ * An earlier campaign transplant had also left two invented functions,
+ * moviePlayGSLogo and moviePlayTPCLogo, duplicating logic that is really
+ * inlined into fn_800364C8 and fn_80036640 (both already 100%-scaffolded
+ * below); those had no callers anywhere in the tree and have been removed.
  *
  * Movie files referenced:
  *   "movie/openingdemo.thp" -- Opening cinematic
@@ -62,34 +69,7 @@ extern const char lbl_80267040[]; /* "movie/tpc.thp" */
 extern f32 lbl_8047BA30; /* 1.0f -- fade speed */
 
 /* =======================================================================
- *  movieWaitForFinish (internal helper)
- *
- *  Polls THPPlayerGetState in a loop. While state == THP_STATE_PLAYING,
- *  yields the current thread via _threadSwitch.
- *
- *  This pattern is used before starting a new movie or after requesting
- *  a stop -- ensures the THP player is idle before proceeding.
- *
- *  Assembly pattern (appears at multiple sites):
- *    .loop:
- *      bl _threadSwitch           ; yield
- *    .check:
- *      bl fn_801E1874           ; THPPlayerGetState
- *      clrlwi r0, r3, 24       ; mask to byte
- *      cmplwi r0, 1             ; == THP_STATE_PLAYING?
- *      beq .loop
- * ======================================================================= */
-void movieWaitForFinish(void) {
-    u8 state;
-
-    do {
-        _threadSwitch();  /* yield thread */
-        state = fn_801E1874();
-    } while ((state & 0xFF) == THP_STATE_PLAYING);
-}
-
-/* =======================================================================
- *  moviePlayOpeningDemo / fn_80035EE4
+ *  fn_80035EE4 (moviePlayOpeningDemo)
  *  Address: 0x80035EE4, Size: 0x50
  *
  *  Assembly:
@@ -108,7 +88,7 @@ void movieWaitForFinish(void) {
  *    bl fn_80165A20                  ; sndPlay(0x495, 0, 127) -- opening BGM
  *    blr
  * ======================================================================= */
-void moviePlayOpeningDemo(void) {
+void fn_80035EE4(void) {
     /* Set up screen fade: mode 2 (fade-in from black), speed 1.0 */
     fadeSet(2, lbl_8047BA30);
     fadeCheck(1);
@@ -121,7 +101,7 @@ void moviePlayOpeningDemo(void) {
 }
 
 /* =======================================================================
- *  moviePlayAutoDemo / fn_80035F34
+ *  fn_80035F34 (moviePlayAutoDemo)
  *  Address: 0x80035F34, Size: 0x30
  *
  *  Assembly:
@@ -136,13 +116,13 @@ void moviePlayOpeningDemo(void) {
  *  for autodemo01.thp happens in a separate call chain. The pattern
  *  of "open movie -> wait -> cleanup" is handled by the caller.
  * ======================================================================= */
-void moviePlayAutoDemo(void) {
+void fn_80035F34(void) {
     fadeSet(3, lbl_8047BA30);
     fadeCheck(1);
 }
 
 /* =======================================================================
- *  movieStopAndCleanup / fn_80035E04
+ *  fn_80035E04 (movieStopAndCleanup)
  *  Address: 0x80035E04, Size: 0xE0
  *
  *  Waits for THP playback to finish, then stops BGM, cleans up
@@ -178,9 +158,15 @@ void moviePlayAutoDemo(void) {
  *    addi r4, r4, 8
  *    bl fn_8011288C
  * ======================================================================= */
-void movieStopAndCleanup(void) {
-    /* Wait for any playing THP movie to finish */
-    movieWaitForFinish();
+void fn_80035E04(void) {
+    u8 state;
+
+    /* Wait for any playing THP movie to finish (inlined -- no standalone
+     * wait helper exists at this address range in the retail binary) */
+    do {
+        _threadSwitch();
+        state = fn_801E1874();
+    } while ((state & 0xFF) == THP_STATE_PLAYING);
 
     /* Stop BGM: group 1, fade 0, volume 127 */
     fn_80165A20(1, 0, 0x7F);
@@ -196,7 +182,7 @@ void movieStopAndCleanup(void) {
 }
 
 /* =======================================================================
- *  moviePlayStaffRoll / fn_80035F64
+ *  fn_80035F64 (moviePlayStaffRoll)
  *  Address: 0x80035F64, Size: 0x25C
  *
  *  The staff roll is the most complex movie function. It:
@@ -257,16 +243,20 @@ void movieStopAndCleanup(void) {
  *    bl fn_801E189C
  *    ...
  * ======================================================================= */
-void moviePlayStaffRoll(void) {
+void fn_80035F64(void) {
     u32 floorState;
     u8 flagVal;
     void* effectCtx;
     void* effectCtx2;
     s8 inputResult;
     void* savedCtx;
+    u8 state;
 
-    /* Step 1: Wait for any current THP playback */
-    movieWaitForFinish();
+    /* Step 1: Wait for any current THP playback (inlined) */
+    do {
+        _threadSwitch();
+        state = fn_801E1874();
+    } while ((state & 0xFF) == THP_STATE_PLAYING);
 
     /* Step 2: Stop BGM */
     fn_80165A20(1, 0, 0x7F);
@@ -383,8 +373,11 @@ openMovie:
     /* Open the staff roll THP movie */
     fn_801E189C(lbl_80267000, 0);
 
-    /* Wait for staff roll to finish playing */
-    movieWaitForFinish();
+    /* Wait for staff roll to finish playing (inlined) */
+    do {
+        _threadSwitch();
+        state = fn_801E1874();
+    } while ((state & 0xFF) == THP_STATE_PLAYING);
 
     /* Stop sound and restore state */
     fn_80165A20(1, 0, 0x7F);
@@ -399,26 +392,6 @@ cleanup:
     fn_80190528(0x08D0);
     fn_80113828(1, 0);
     fn_8011288C(0, 0x59608);
-}
-
-/* =======================================================================
- *  moviePlayGSLogo (call site near 0x80036568)
- *
- *  Opens "movie/gs_logo.thp" via THPPlayerOpen with loop=0.
- *  Called as part of the boot sequence logo display.
- * ======================================================================= */
-void moviePlayGSLogo(void) {
-    fn_801E189C(lbl_8026702C, 0);
-}
-
-/* =======================================================================
- *  moviePlayTPCLogo (call site near 0x80036668)
- *
- *  Opens "movie/tpc.thp" via THPPlayerOpen with loop=0.
- *  Called as part of the boot sequence logo display.
- * ======================================================================= */
-void moviePlayTPCLogo(void) {
-    fn_801E189C(lbl_80267040, 0);
 }
 
 /* No-op functions (6) */

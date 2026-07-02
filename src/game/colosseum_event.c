@@ -87,6 +87,16 @@
  *   lbl_80279F7C: Byte table {0x01,0xC8,0x04,0x96,...} - timing/difficulty curve
  *   lbl_80279FA0: Constant pairs - possibly UI element IDs
  *
+ * Note: fn_80203620 and fn_8020367C (described above) were previously
+ * defined under the invented names ResolveTrainerExtendedData and
+ * WriteTrainerExtendedData. Renamed to their fn_ addresses -- the
+ * unmatched target slots at those addresses have exactly matching
+ * sizes (0x5C / 0x58 bytes) and no other real implementation exists.
+ * fn_80205B8C and fn_80205BE8 (trainer -> party -> Pokemon navigation,
+ * matched 100%) are also implemented in this file; trainer.c previously
+ * carried unreferenced fictional duplicates of these under the names
+ * GetTrainerPokemonPtr/GetTrainerPokemonPtrSingle, now removed there.
+ *
  * =========================================================================
  */
 
@@ -141,10 +151,11 @@ extern ColosseumEventPairRow lbl_80375A08[]; /* 0x18-byte pair rows */
 /* Forward declarations for converted functions */
 
 /* =========================================================================
- * fn_80203620 - ResolveTrainerExtendedData
+ * fn_80203620
  *
  * Navigate from a trainer context through two data table hops to reach
- * extended Pokemon/trainer data.
+ * extended Pokemon/trainer data. Same fn_8012640C(..., 0xCC/0x79, ...)
+ * hop pattern as fn_8020355C/fn_802035BC above.
  *
  * Hop 1: fn_8012640C(ctx, 0, 0xCC, 0) -> intermediate pointer
  * Hop 2: fn_8012640C(intermediate, 0, 0x79, 0) -> extended data
@@ -154,7 +165,7 @@ extern ColosseumEventPairRow lbl_80375A08[]; /* 0x18-byte pair rows */
  * @param context  Trainer/party context
  * @return         Extended data pointer, or NULL
  * ========================================================================= */
-void* ResolveTrainerExtendedData(void* context) {
+void* fn_80203620(void* context) {
     void* intermediate;
     if (context == NULL) {
         return NULL;
@@ -169,7 +180,7 @@ void* ResolveTrainerExtendedData(void* context) {
 }
 
 /* =========================================================================
- * fn_8020367C - WriteTrainerExtendedData
+ * fn_8020367C
  *
  * Similar two-hop navigation, but the second call writes data via
  * fn_80125424 instead of reading it.
@@ -177,7 +188,7 @@ void* ResolveTrainerExtendedData(void* context) {
  * @param context  Trainer/party context
  * @param value    Value to write
  * ========================================================================= */
-void WriteTrainerExtendedData(void* context, u32 value) {
+void fn_8020367C(void* context, u32 value) {
     void* intermediate;
     if (context == NULL) {
         return;
@@ -1930,9 +1941,6 @@ void fn_802035BC(void* obj, u32 value) {
         fn_801254B4(intermediate, 0, 0x79, 0, value);
     }
 }
-
-/* fn_80203620 and fn_8020367C are implemented above as
-   ResolveTrainerExtendedData and WriteTrainerExtendedData */
 
 /* 0x802036D4 | size: 0x84 */
 u32 fn_802036D4(void* ctx) {

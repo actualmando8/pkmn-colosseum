@@ -15,25 +15,20 @@
  *   4. Register loaded resources with the engine subsystems
  *   5. Resume gameplay on the new floor
  *
- * The floor data table at lbl_80402518 stores 0x80 entries of 0x48 bytes each,
- * describing the FSYS archive file handle and reference count for each floor.
- *
  * The floor resource handler table at lbl_80404918 stores 0x18 entries of 0x10
- * bytes each, mapping resource type IDs to load/size callbacks.
+ * bytes each, mapping resource type IDs to load/size callbacks; it is used
+ * directly by gs_floor_data.c via GSFloorResHandler.
  *
- * Address range: 0x800FF788 - 0x80110000 (GSfloor core, ~199 functions)
+ * Address range: 0x800FF788 - 0x80110000 (GSfloor core, not yet decompiled
+ * beyond the stub scaffold in gs_floor.c)
  *
  * Note: the floorRead*PreFunc resource handler family (0x8011432C+) is a
  * separate unit declared in game/world/gs_field.h and defined across
  * gs_field_resource.c / gs_field_world.c; it is not part of this header.
  *
- * Debug strings:
- *   "GSfloorOpen: cannot find floor %d"
- *   "loadParticle(): loading..."
- *   "loadBGM(): loading [%s]..."
- *   "_floorGetFilesize(): can't open file [%s]"
- *   "_floorLoadFile(): can't open file [%s]"
- *   "_floorLoadFile(): error reading file [%s]"
+ * Note: lbl_80402518 is NOT this unit's floor data table -- it is
+ * gs_model.c's model resource table (see gs_model.c). An earlier pass
+ * mislabeled it; the struct/const comments below have been corrected.
  */
 #ifndef GS_FLOOR_H
 #define GS_FLOOR_H
@@ -152,15 +147,14 @@ typedef struct GSFloorResource {
 } GSFloorResource;
 
 /**
- * GSFloorDataEntry -- static floor table entry.
+ * GSFloorDataEntry -- speculative floor table entry layout (unverified).
  *
- * Size: 0x48 bytes (72 bytes).
- * Stored in the floor data table at lbl_80402518.
- * 0x80 entries total, describing each floor area the game can load.
- *
- * Fields recovered from fn_8010147C:
- *   0x40: u32  fsysFileHandle   -- FSYS archive file handle for this floor
- *   0x44: u32  refCount         -- reference count (0 = unused)
+ * Size: 0x48 bytes (72 bytes), 0x80 entries total.
+ * NOTE: lbl_80402518 (previously claimed as the backing storage for this
+ * table) is actually gs_model.c's model resource table, not a floor data
+ * table. No confirmed backing storage for this struct is currently known.
+ * This type is currently unused; kept only as a size/layout note pending
+ * real decompilation of fn_8010147C.
  */
 typedef struct GSFloorDataEntry {
     /* 0x00 */ u8   data[0x40];      /**< Floor-specific data (area config, etc.) */
@@ -193,153 +187,17 @@ typedef struct GSFloorResHandler {
 
 /* ===================================================================
  * Public API
+ *
+ * NOTE: a prior recovery pass invented a full named API here
+ * (GSfloorInit, GSfloorOpen, GSfloorSetFloorTable, GSfloorThreadMain,
+ * GSfloorUpdate, GSfloorLoadParticle, GSfloorFindAndOpen, GSfloorLoadData,
+ * GSfloorLoadMain, GSfloorGetCurrentId, GSfloorGetContext) with fabricated
+ * bodies in gs_floor.c. None of those names appear in
+ * config/GC6E01/symbols.txt and nothing else in the tree referenced them;
+ * the prototypes and their definitions have been removed. This unit is not
+ * yet meaningfully decompiled -- see gs_floor.c for the real stub scaffold.
+ * The structs above remain because gs_floor_data.c genuinely uses
+ * GSFloorResource / GSFloorResHandler.
  * =================================================================== */
-
-/**
- * GSfloorInit -- Initialize the floor system.
- *
- * Allocates resource arrays and the floor context pool from GSmem.
- * Creates the floor management thread using GSthreadCreate.
- *
- * @param maxFloors   Maximum floor index count (for floor data array sizing).
- * @param maxBase     Number of base resource slots.
- * @param maxExt1     Number of extended pool 1 resource slots.
- * @param maxExt2     Number of extended pool 2 resource slots.
- *
- * Corresponds to fn_800FF828.
- * Note: This was previously labeled "GSthreadPoolConfig" in gs_thread.h
- * before the floor system was fully analyzed. The function belongs to
- * the floor subsystem, not the thread subsystem.
- */
-void GSfloorInit(u32 maxFloors, u32 maxBase, u32 maxExt1, u32 maxExt2);
-
-/**
- * GSfloorOpen -- Request a floor to be loaded.
- *
- * Searches the floor data table for the given floor ID. If found,
- * stores it as the pending floor and sets the state to LOADING.
- * If not found, prints "GSfloorOpen: cannot find floor %d".
- *
- * @param floorId     Floor identifier (used as index into floor data array).
- *
- * Corresponds to fn_800FF788.
- */
-void GSfloorOpen(u32 floorId);
-
-/**
- * GSfloorSetFloorTable -- Set the floor data table pointer and count.
- *
- * @param tablePtr    Pointer to the floor data entry array.
- * @param count       Number of entries in the table.
- *
- * Corresponds to fn_800FF81C.
- */
-void GSfloorSetFloorTable(void* tablePtr, u32 count);
-
-/**
- * GSfloorThreadMain -- Main thread entry for the floor state machine.
- *
- * Runs as a cooperative GSthread, cycling through states:
- *   IDLE -> LOADING -> RUNNING -> UNLOADING -> TRANSITIONING -> IDLE
- *
- * This is the thread function passed to GSthreadCreate during init.
- *
- * Corresponds to fn_800FF970.
- */
-void GSfloorThreadMain(void);
-
-/**
- * GSfloorUpdate -- Per-frame update for the running floor.
- *
- * Called from GSfloorThreadMain while in RUNNING state.
- * Iterates active floor resources, invokes callbacks, checks for
- * model and texture loading completion.
- *
- * @param ctx         Pointer to the current GSFloorContext.
- * @return            1 if still loading (yield), 0 if all resources ready.
- *
- * Corresponds to fn_80100B24.
- */
-u8 GSfloorUpdate(GSFloorContext* ctx);
-
-/**
- * GSfloorLoadParticle -- Load particle data for the current floor.
- *
- * Allocates memory, reads particle data from the FSYS archive, and
- * copies it into the particle buffer.
- *
- * @param dst         Destination buffer for particle data.
- * @param size        Size of the particle data in bytes.
- * @param callback    Completion callback.
- * @param callbackArg Argument to the callback.
- *
- * Corresponds to loadParticle.
- */
-void GSfloorLoadParticle(void* dst, u32 size, void* callback, void* callbackArg);
-
-/**
- * GSfloorFindAndOpen -- Find a floor's FSYS data and request loading.
- *
- * Looks up the floor name in the FSYS TOC, resolves its file handle,
- * and calls the resource loader to begin reading the archive.
- *
- * @param archiveName Name of the FSYS archive (e.g. "s1_out.fsys").
- * @param floorId     Floor ID to associate with the loaded data.
- * @param loadParam   Additional load parameter.
- *
- * Corresponds to fn_801012E8.
- */
-void GSfloorFindAndOpen(const char* archiveName, u32 floorId, u32 loadParam);
-
-/**
- * GSfloorLoadData -- Load data from a named FSYS sub-file.
- *
- * Searches the archive's file list for the given name, allocates memory,
- * and begins loading the file data.
- *
- * @param archiveName  FSYS archive name string.
- * @param subFileIndex Index of the sub-file to load.
- * @param floorId      Associated floor ID.
- * @param loadParam    Load parameter / callback data.
- *
- * Corresponds to fn_801013A0.
- */
-void GSfloorLoadData(const char* archiveName, u32 subFileIndex,
-                     u32 floorId, u32 loadParam);
-
-/**
- * GSfloorLoadMain -- Main floor loading procedure.
- *
- * Called to load or reload a floor's FSYS archive. Manages the floor
- * data entry table, allocates a resource load thread, and registers
- * the floor in the static floor data table.
- *
- * @param fsysHandle    FSYS file handle for the floor's archive.
- * @param archiveName   Name of the archive (for lookup).
- * @param loadParam1    Load parameter 1.
- * @param loadParam2    Load parameter 2.
- *
- * Corresponds to fn_8010147C.
- */
-void GSfloorLoadMain(u32 fsysHandle, const char* archiveName,
-                     u32 loadParam1, u32 loadParam2);
-
-/**
- * GSfloorGetCurrentId -- Return the current active floor ID.
- *
- * @return  The current floor ID, or GSFLOOR_ID_INVALID if none.
- *
- * Corresponds to lbl_80478B18 read.
- */
-u32 GSfloorGetCurrentId(void);
-
-/**
- * GSfloorGetContext -- Return the current floor context pointer.
- *
- * @return  Pointer to GSFloorContext, or NULL if no floor active.
- *
- * Corresponds to lbl_8047ACC8 read (gsFloorCurrent).
- */
-GSFloorContext* GSfloorGetContext(void);
 
 #endif /* GS_FLOOR_H */

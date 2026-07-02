@@ -8,25 +8,42 @@
  *
  * Decompiled from 78 functions in range 0x8017572C - 0x8017A5FC.
  *
+ * Eleven addresses in this unit previously carried invented GSscene_*
+ * names from an old campaign transplant that collided with real,
+ * differently-named symbols.txt entries at the same address:
+ *   0x8017572C is really psKillAllGenerator (not GSscene_ProcessFreeList)
+ *   0x80175B94 is really psRemoveGenerator (not GSscene_SpawnObject)
+ *   0x80175F44 is really psGetNewIDNum (not GSscene_GetObjectCount)
+ *   0x80177A64, 0x80178AA8, 0x80179020, 0x80179FA4, 0x801765F4,
+ *     0x80176948, 0x8017697C, 0x801769B0 are still unnamed fn_ scaffolds
+ *     in symbols.txt (not GSscene_XFBCapture/CameraUpdate/
+ *     CameraInterpolate/Init/NopAccessor1/GetPositionX/Y/Z).
+ * All eleven were already honest "TODO: match" stubs (or, for
+ * fn_801765F4, a trivial "return NULL;"); only the names were fiction.
+ * They have been renamed to their real symbols.txt/fn_ identities;
+ * bodies are unchanged. The genuinely-matched GSscene_* names elsewhere
+ * in this file (GSscene_GetCameraRotationVector, GSscene_GetMode, etc.,
+ * all 100%) are real and untouched.
+ *
  * Selected functions:
- *   fn_8017572C (GSscene_ProcessFreeList)
+ *   psKillAllGenerator (0x8017572C)
  *   fn_801758D8 (GSscene_UpdateActive)
- *   fn_80175A1C (GSscene_SpawnObject)
+ *   psRemoveGenerator (0x80175B94)
  *   fn_80175B94 (GSscene_DespawnObject)
  *   psInitGenerator (GSscene_FindObject)
  *   genPosUpdate (GSscene_GetObjectByHandle)
- *   psGetNewIDNum (GSscene_GetObjectCount)
+ *   psGetNewIDNum (0x80175F44)
  *   fn_80175F6C (GSscene_SetObjectCallback)
  *   fn_801760C4 (GSscene_AttachToParent)
  *   fn_80176228 (GSscene_DetachFromParent)
- *   fn_801765F4 (GSscene_NopAccessor1)
+ *   fn_801765F4 (nop accessor, 0xC bytes)
  *   fn_80176600-80176690 (GSscene_Get/SetField accessors)
  *   fn_801766A8 (GSscene_SetPosition)
  *   fn_80176758 (GSscene_SetRotation)
  *   fn_801767E0 (GSscene_SetScale)
  *   fn_80176868 (GSscene_SetColor)
  *   fn_801768F0 (GSscene_GetTransform)
- *   fn_80176948-801769B0 (GSscene_Get X/Y/Z position)
+ *   fn_80176948-801769B0 (Get X/Y/Z position, still unnamed)
  *   cameraSetAnimeRate (GSscene_SetVisible)
  *   fn_80176A44 (GSscene_GetVisible)
  *   cameraStopAnime (GSscene_ComputeWorldTransform)
@@ -39,17 +56,17 @@
  *   fn_801773F4-80177670 (GSscene_Get/Set animation params)
  *   fn_80177760 (GSscene_PlayAnimation)
  *   0x80177830-0x801779EC (GSscene_Get/Set small accessors)
- *   fn_80177A64 (GSscene_XFBCapture -- 3064 bytes, HUGE)
+ *   fn_80177A64 (XFB capture -- 3064 bytes, HUGE, still unnamed)
  *   fn_8017865C (GSscene_XFBSetupCapture)
  *   fn_801786F4 (GSscene_XFBProcess)
- *   fn_80178AA8 (GSscene_CameraUpdate)
- *   fn_80179020 (GSscene_CameraInterpolate)
+ *   fn_80178AA8 (camera update, 1400 bytes, still unnamed)
+ *   fn_80179020 (camera interpolate, 996 bytes, still unnamed)
  *   fn_80179404 (GSscene_CameraSetTarget)
  *   fn_801794F0 (GSscene_CameraSetPosition)
  *   fn_80179748 (GSscene_EnvironmentUpdate)
  *   fn_80179A18 (GSscene_LightingUpdate)
  *   fn_80179BEC (GSscene_FogUpdate)
- *   fn_80179FA4 (GSscene_Init -- 1624 bytes)
+ *   fn_80179FA4 (scene init, 1624 bytes, still unnamed)
  *
  * The "gs%04d.xfb" string (lbl_80273A00) indicates this module can
  * capture the current framebuffer to numbered files, likely for
@@ -167,7 +184,9 @@ typedef struct GSSceneRenderEntry {
 } GSSceneRenderEntry;
 
 /* ==================================================================
- * fn_8017572C -- GSscene_ProcessFreeList
+ * psKillAllGenerator (0x8017572C) -- real name per symbols.txt.
+ * Previously mis-attributed as "GSscene_ProcessFreeList"; that name
+ * does not appear in symbols.txt and nothing in the tree calls it.
  *
  * Process the scene object free list. Iterates through the active
  * list, checks for objects that should be freed, and moves them
@@ -183,13 +202,15 @@ typedef struct GSSceneRenderEntry {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void GSscene_ProcessFreeList(void) {
+void psKillAllGenerator(void) {
     /* TODO: match -- 428 bytes at 0x8017572C */
 }
 #pragma pop
 
 /* ==================================================================
- * fn_80175B94 -- GSscene_SpawnObject
+ * psRemoveGenerator (0x80175B94) -- real name per symbols.txt.
+ * Previously mis-attributed as "GSscene_SpawnObject"; that name does
+ * not appear in symbols.txt and nothing in the tree calls it.
  *
  * Spawn a new scene object. Allocates from the free list, initializes
  * fields, and adds to the active list. 604 bytes.
@@ -197,13 +218,15 @@ void GSscene_ProcessFreeList(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void* GSscene_SpawnObject(u32 type, u32 param) {
+void* psRemoveGenerator(u32 type, u32 param) {
     /* TODO: match -- 604 bytes at 0x80175B94 */
 }
 #pragma pop
 
 /* ==================================================================
- * fn_80177A64 -- GSscene_XFBCapture
+ * fn_80177A64 -- still an unnamed scaffold in symbols.txt.
+ * Previously mis-attributed as "GSscene_XFBCapture"; that name does
+ * not appear in symbols.txt and nothing in the tree calls it.
  *
  * Capture the current framebuffer to a file. At 3064 bytes, this is
  * the largest function in the scene system. Uses the "gs%04d.xfb"
@@ -214,13 +237,15 @@ void* GSscene_SpawnObject(u32 type, u32 param) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void GSscene_XFBCapture(u32 captureIndex) {
+void fn_80177A64(u32 captureIndex) {
     /* TODO: match -- 3064 bytes at 0x80177A64 */
 }
 #pragma pop
 
 /* ==================================================================
- * fn_80178AA8 -- GSscene_CameraUpdate
+ * fn_80178AA8 -- still an unnamed scaffold in symbols.txt.
+ * Previously mis-attributed as "GSscene_CameraUpdate"; that name does
+ * not appear in symbols.txt and nothing in the tree calls it.
  *
  * Update the scene camera. Processes camera position, target,
  * interpolation, and constraint calculations. 1400 bytes.
@@ -235,26 +260,30 @@ void GSscene_XFBCapture(u32 captureIndex) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void GSscene_CameraUpdate(void* sceneObj) {
+void fn_80178AA8(void* sceneObj) {
     /* TODO: match -- 1400 bytes at 0x80178AA8 */
 }
 #pragma pop
 
 /* ==================================================================
- * fn_80179020 -- GSscene_CameraInterpolate
+ * fn_80179020 -- still an unnamed scaffold in symbols.txt.
+ * Previously mis-attributed as "GSscene_CameraInterpolate"; that name
+ * does not appear in symbols.txt and nothing in the tree calls it.
  *
  * Interpolate the camera between two states. 996 bytes.
  * ================================================================== */
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void GSscene_CameraInterpolate(void* camera) {
+void fn_80179020(void* camera) {
     /* TODO: match -- 996 bytes at 0x80179020 */
 }
 #pragma pop
 
 /* ==================================================================
- * fn_80179FA4 -- GSscene_Init
+ * fn_80179FA4 -- still an unnamed scaffold in symbols.txt.
+ * Previously mis-attributed as "GSscene_Init"; that name does not
+ * appear in symbols.txt and nothing in the tree calls it.
  *
  * Initialize the scene system. Second-largest function at 1624 bytes.
  * Sets up the object free list, active list, camera state, render
@@ -263,29 +292,36 @@ void GSscene_CameraInterpolate(void* camera) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void GSscene_Init(void) {
+void fn_80179FA4(void) {
     /* TODO: match -- 1624 bytes at 0x80179FA4 */
 }
 #pragma pop
 
 /* ===== Small accessor/setter functions ===== */
 
-/* fn_801765F4 -- nop accessor, 0xC bytes */
-void* GSscene_NopAccessor1(void) {
+/* fn_801765F4 -- nop accessor, 0xC bytes. Previously mis-attributed
+ * as "GSscene_NopAccessor1"; that name does not appear in symbols.txt
+ * and nothing in the tree calls it. */
+void* fn_801765F4(void) {
     return (void*)0;
 }
 
-/* psGetNewIDNum -- get object count, 0x28 bytes */
+/* psGetNewIDNum (0x80175F44) -- real name per symbols.txt, 0x28 bytes.
+ * Previously mis-attributed as "GSscene_GetObjectCount"; that name
+ * does not appear in symbols.txt and nothing in the tree calls it. */
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-u32 GSscene_GetObjectCount(void) {
+u32 psGetNewIDNum(void) {
     /* TODO: match -- 40 bytes at 0x80175F44 */
 }
 #pragma pop
 
 /* ==================================================================
- * Position accessors (fn_80176948-801769B0)
+ * Position accessors (fn_80176948-801769B0) -- still unnamed
+ * scaffolds in symbols.txt. Previously mis-attributed as
+ * "GSscene_GetPositionX/Y/Z"; those names do not appear in
+ * symbols.txt and nothing in the tree calls them.
  *
  * Three 0x34-byte functions that return X, Y, Z position of a scene
  * object. Pattern:
@@ -297,15 +333,15 @@ u32 GSscene_GetObjectCount(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 
-f32 GSscene_GetPositionX(void* obj) {
+f32 fn_80176948(void* obj) {
     /* TODO: match -- 52 bytes at 0x80176948 */
 }
 
-f32 GSscene_GetPositionY(void* obj) {
+f32 fn_8017697C(void* obj) {
     /* TODO: match -- 52 bytes at 0x8017697C */
 }
 
-f32 GSscene_GetPositionZ(void* obj) {
+f32 fn_801769B0(void* obj) {
     /* TODO: match -- 52 bytes at 0x801769B0 */
 }
 

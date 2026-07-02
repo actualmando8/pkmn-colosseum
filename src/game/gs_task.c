@@ -18,13 +18,14 @@
  *   4. Return 1 on success, -1 on failure
  *
  * Key functions:
- *   fn_80006630  GStask_InitCamera         -- calls GSscene_CameraSetPosition
- *   fn_80006654  GStask_LoadTopMenu         -- loads archive slot 6 (topmenu)
- *   dbgMenuCameraSetType  GStask_SetSceneType        -- dispatches to GSscene_SetMode based on mode
- *   fn_80006724  GStask_LoadPDAMenu         -- loads archive slot 6, priority 3 (pda_menu)
- *   fn_8000677C  GStask_LoadPocketMenu      -- loads archive slot 6, priority 2 (pocket_menu)
- *   fn_800067D4  GStask_LoadPCBoxMenu       -- loads archive slot 6, priority 1 (pcbox_menu)
- *   fn_8000682C  GStask_LoadBattleMenu      -- loads archive slot 6, priority 0 (battle)
+ *   fn_80006630  (calls GSscene_CameraSetPosition; decompiled under its real name below)
+ *   fn_80006654  (loads archive slot 6 / topmenu; decompiled under its real name below)
+ *   dbgMenuCameraSetType  (dispatches to GSscene_SetMode based on mode; decompiled below --
+ *                          retail symbol name is a reused debug-menu name)
+ *   fn_80006724  (loads archive slot 6, priority 3 / pda_menu; decompiled below)
+ *   fn_8000677C  (loads archive slot 6, priority 2 / pocket_menu; decompiled below)
+ *   fn_800067D4  (loads archive slot 6, priority 1 / pcbox_menu; decompiled below)
+ *   fn_8000682C  (loads archive slot 6, priority 0 / battle; decompiled below)
  *   fn_80006884  GStask_SelectRandomNPC     -- random NPC selection from scene data
  *   fn_80006908  GStask_ProcessSceneEvent   -- 0x6A4 bytes, large scene event dispatcher
  *   fn_80006FAC  GStask_ProcessEventResult  -- handles event return codes
@@ -147,20 +148,24 @@ extern void* gEncounterTable;   /* lbl_80478F00 : .sbss -- encounter difficulty 
 /* jumptable_802E28D0: Jump table for fn_80006908 scene event dispatch */
 
 /* =========================================================================
- * Function: GStask_InitCamera
+ * Function: fn_80006630 (orphan fiction "GStask_InitCamera" renamed --
+ *           address 0x80006630 / size 0x24 matches config/GC6E01/symbols.txt
+ *           exactly, and this was the only code in the tree covering that
+ *           address; the unmatched target had no other candidate)
  * Address:  0x80006630
  * Size:     0x24
  *
  * Simple wrapper that calls GSscene_CameraSetPosition to reset the
  * camera, then returns 0. Called at the start of scene transitions.
  * ========================================================================= */
-s32 GStask_InitCamera(void) {
+s32 fn_80006630(void) {
     fn_801794F0();
     return 0;
 }
 
 /* =========================================================================
- * Function: GStask_LoadTopMenu
+ * Function: fn_80006654 (orphan fiction "GStask_LoadTopMenu" renamed --
+ *           address/size match symbols.txt exactly)
  * Address:  0x80006654
  * Size:     0x70
  *
@@ -168,7 +173,7 @@ s32 GStask_InitCamera(void) {
  * Otherwise, dispatches a new archive load for the top menu FSYS with
  * default parameters and sets up the viewport at (0x14, 0x104).
  * ========================================================================= */
-s32 GStask_LoadTopMenu(void) {
+s32 fn_80006654(void) {
     if (fn_80102620(6) != 0) {
         fn_80102510(6);
     } else {
@@ -179,7 +184,10 @@ s32 GStask_LoadTopMenu(void) {
 }
 
 /* =========================================================================
- * Function: GStask_SetSceneType
+ * Function: dbgMenuCameraSetType (orphan fiction "GStask_SetSceneType"
+ *           renamed -- address 0x800066C4 / size 0x60 matches
+ *           config/GC6E01/symbols.txt exactly; the retail symbol name is a
+ *           reused debug-menu name, not this function's real purpose)
  * Address:  0x800066C4
  * Size:     0x60
  *
@@ -190,7 +198,7 @@ s32 GStask_LoadTopMenu(void) {
  *   mode 2:        type 6 (cutscene)
  * Always returns 0.
  * ========================================================================= */
-s32 GStask_SetSceneType(void* unused, s32 mode) {
+s32 dbgMenuCameraSetType(void* unused, s32 mode) {
     if (mode == 1) {
         GSscene_SetMode(5);
     } else if (mode == 2) {
@@ -202,7 +210,8 @@ s32 GStask_SetSceneType(void* unused, s32 mode) {
 }
 
 /* =========================================================================
- * Function: GStask_LoadPDAMenu
+ * Function: fn_80006724 (orphan fiction "GStask_LoadPDAMenu" renamed --
+ *           address/size match symbols.txt exactly)
  * Address:  0x80006724
  * Size:     0x58
  *
@@ -210,7 +219,7 @@ s32 GStask_SetSceneType(void* unused, s32 mode) {
  * Uses the current scene ID from lbl_8047A288 as a context parameter.
  * On success, activates the archive and returns 1; on failure returns -1.
  * ========================================================================= */
-s32 GStask_LoadPDAMenu(void) {
+s32 fn_80006724(void) {
     void* result;
 
     result = fn_801FB1C0(0, gCurrentSceneId, 8, 3);
@@ -223,14 +232,15 @@ s32 GStask_LoadPDAMenu(void) {
 }
 
 /* =========================================================================
- * Function: GStask_LoadPocketMenu
+ * Function: fn_8000677C (orphan fiction "GStask_LoadPocketMenu" renamed --
+ *           address/size match symbols.txt exactly)
  * Address:  0x8000677C
  * Size:     0x58
  *
  * Loads the pocket/bag menu archive (priority 2).
- * Same structure as GStask_LoadPDAMenu but with priority 2.
+ * Same structure as fn_80006724 but with priority 2.
  * ========================================================================= */
-s32 GStask_LoadPocketMenu(void) {
+s32 fn_8000677C(void) {
     void* result;
 
     result = fn_801FB1C0(0, gCurrentSceneId, 8, 2);
@@ -243,13 +253,14 @@ s32 GStask_LoadPocketMenu(void) {
 }
 
 /* =========================================================================
- * Function: GStask_LoadPCBoxMenu
+ * Function: fn_800067D4 (orphan fiction "GStask_LoadPCBoxMenu" renamed --
+ *           address/size match symbols.txt exactly)
  * Address:  0x800067D4
  * Size:     0x58
  *
  * Loads the PC box menu archive (priority 1).
  * ========================================================================= */
-s32 GStask_LoadPCBoxMenu(void) {
+s32 fn_800067D4(void) {
     void* result;
 
     result = fn_801FB1C0(0, gCurrentSceneId, 8, 1);
@@ -262,13 +273,14 @@ s32 GStask_LoadPCBoxMenu(void) {
 }
 
 /* =========================================================================
- * Function: GStask_LoadBattleMenu
+ * Function: fn_8000682C (orphan fiction "GStask_LoadBattleMenu" renamed --
+ *           address/size match symbols.txt exactly)
  * Address:  0x8000682C
  * Size:     0x58
  *
  * Loads the battle menu archive (priority 0 -- highest).
  * ========================================================================= */
-s32 GStask_LoadBattleMenu(void) {
+s32 fn_8000682C(void) {
     void* result;
 
     result = fn_801FB1C0(0, gCurrentSceneId, 8, 0);

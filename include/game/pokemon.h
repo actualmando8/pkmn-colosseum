@@ -163,9 +163,8 @@ u32 PokemonSlotLookup(u16 slotType, u32 index, u16 count);
  * fn_801F025C - PokemonSlotLookupDefault
  * Convenience wrapper that calls PokemonGet(0,0,0x14,0) to get the party
  * count, then calls PokemonSlotLookup with that count.
- * 438 call sites.
+ * 438 call sites. Implemented in pokemon.c as fn_801F025C (matched 100%).
  */
-u32 PokemonSlotLookupDefault(u16 slotType, u32 index);
 
 /**
  * fn_801F61BC - GetPokemonContext
@@ -183,9 +182,8 @@ struct Pokemon* GetCurrentPokemon(void);
 
 /**
  * fn_801F640C / fn_801F6414 - Set/Get global Pokemon state pointer
- * These store/load lbl_8047B5F0 (SDA21).
+ * These store/load lbl_8047B5F0 (SDA21). Implemented in pokemon.c
+ * (matched 100%).
  */
-void SetPokemonStatePtr(void* ptr);
-void* GetPokemonStatePtr(void);
 
 #endif /* GAME_POKEMON_H */

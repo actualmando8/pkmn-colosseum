@@ -18,6 +18,14 @@
  * and coordinate with the sound system (fn_80165A20) and flag system
  * (fn_801902E0, fn_80190528) for proper sequencing.
  *
+ * fn_80035E04, fn_80035EE4, fn_80035F34, and fn_80035F64 are the real,
+ * address/size-confirmed movie stop/cleanup, opening-demo, auto-demo, and
+ * staff-roll functions (defined directly in movie.c under those fn_ names,
+ * matching config/GC6E01/symbols.txt); nothing else in the tree calls them
+ * yet, so no prototypes are declared here. A prior campaign transplant's
+ * invented movieWaitForFinish/moviePlayGSLogo/moviePlayTPCLogo helpers had
+ * no real callers and have been removed.
+ *
  * Address range: 0x80035E04 - 0x800366D0 (approx.)
  */
 #ifndef GAME_MOVIE_H
@@ -44,89 +52,5 @@
 #define THP_STATE_PLAYING    1   /* currently playing a movie */
 #define THP_STATE_STOPPED    2   /* playback finished or stopped */
 #define THP_STATE_ERROR      3   /* an error occurred */
-
-/* ===================================================================
- * Public API
- * =================================================================== */
-
-/**
- * moviePlayOpeningDemo -- Play the opening demo cinematic.
- *
- * Sets up fade parameters, opens "movie/openingdemo.thp" via the
- * THP player, and triggers the associated BGM (sound ID 0x0495).
- *
- * Corresponds to fn_80035EE4.
- */
-void moviePlayOpeningDemo(void);
-
-/**
- * moviePlayStaffRoll -- Play the staff roll / credits sequence.
- *
- * The staff roll has special logic:
- *   1. Waits for any current THP playback to finish
- *   2. Stops BGM and sounds
- *   3. Checks game flags to determine if the special post-game
- *      credits variant should play
- *   4. Opens "movie/staffroll.thp"
- *   5. Manages battle/floor transitions around the movie
- *
- * Corresponds to fn_80035F64.
- */
-void moviePlayStaffRoll(void);
-
-/**
- * moviePlayAutoDemo -- Set up and play the auto-demo / attract mode.
- *
- * Sets the fade mode and opens "movie/autodemo01.thp" for the
- * title screen attract sequence. Called from the title screen
- * idle timer.
- *
- * Corresponds to fn_80035F34 (sets up fade) and related functions.
- */
-void moviePlayAutoDemo(void);
-
-/**
- * moviePlayGSLogo -- Play the Genius Sonority logo movie.
- *
- * Opens "movie/gs_logo.thp" for the boot-up logo sequence.
- * Called during the initial boot screen sequence.
- *
- * Corresponds to a call site near 0x80036568.
- */
-void moviePlayGSLogo(void);
-
-/**
- * moviePlayTPCLogo -- Play The Pokemon Company logo movie.
- *
- * Opens "movie/tpc.thp" for the boot-up logo sequence.
- * Called during the initial boot screen sequence.
- *
- * Corresponds to a call site near 0x80036668.
- */
-void moviePlayTPCLogo(void);
-
-/**
- * movieWaitForFinish -- Spin-wait until the current THP playback ends.
- *
- * Polls THPPlayerGetState (fn_801E1874) in a loop, yielding via
- * _threadSwitch (GStextureFlush / GSthread yield) each frame, until
- * the state is no longer THP_STATE_PLAYING.
- *
- * This pattern appears at multiple call sites in the movie code.
- *
- * Corresponds to the wait loops in fn_80035E04, fn_80035F64, etc.
- */
-void movieWaitForFinish(void);
-
-/**
- * movieStopAndCleanup -- Stop playback and release resources.
- *
- * Stops BGM (sound ID 1, volume 0, time 0x7F), cleans up any
- * floor/battle state that was modified for movie playback,
- * and restores normal game flow.
- *
- * Corresponds to the cleanup code in fn_80035E04 and fn_80035F64.
- */
-void movieStopAndCleanup(void);
 
 #endif /* GAME_MOVIE_H */

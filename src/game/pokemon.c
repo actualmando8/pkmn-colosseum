@@ -89,6 +89,13 @@
  * BSS STATE (SDA21-relative globals):
  *   lbl_8047B5F0 : void*, Pokemon system state pointer (fn_801F640C/14)
  *
+ * Note: this file previously carried four duplicate fictional
+ * definitions -- FrameWaitForDuration, PokemonSlotLookupDefault,
+ * SetPokemonStatePtr, GetPokemonStatePtr -- that shadowed fn_801F000C,
+ * fn_801F025C, fn_801F640C, and fn_801F6414, all of which are already
+ * implemented and matched at 100% elsewhere in this file (see the
+ * "coverage stubs" section). The fictional duplicates have been removed.
+ *
  * =========================================================================
  */
 
@@ -181,39 +188,9 @@ extern void fn_8020E470(void);
 extern void fn_8020E488(void);
 extern void fn_8020E4B4(void);
 
-/* =========================================================================
- * fn_801F000C - FrameWaitForDuration
- *
- * Waits for a specified number of frames by calling the frame-wait
- * and frame-delta functions in a loop.
- *
- * @param duration  Number of frame units to wait
- * ========================================================================= */
-void FrameWaitForDuration(u32 duration) {
-    /* fn_80008184 returns a context/flag; if non-zero, enter wait loop */
-    u32 target = fn_80008184();
-    if (target != 0) {
-        u32 elapsed = 0;
-        while (elapsed < target) {
-            _threadSwitch();
-            elapsed += fn_800D3088();
-        }
-    }
-}
-
-/* =========================================================================
- * fn_801F025C - PokemonSlotLookupDefault
- *
- * Gets the total party count via PokemonGet, then calls PokemonSlotLookup
- * to resolve the given slot type and index.
- *
- * r3 = slot type (POKE_SLOT_PARTY, etc.)
- * r4 = slot index
- * ========================================================================= */
-u32 PokemonSlotLookupDefault(u16 slotType, u32 index) {
-    u16 count = (u16)PokemonGet(NULL, 0, POKE_FIELD_IV_SPATK, 0); /* field 0x14 = party count */
-    return PokemonSlotLookup(slotType, index, count);
-}
+/* Note: fn_801F000C (frame-wait loop) and fn_801F025C (slot-lookup-default
+ * wrapper) are implemented below in the "coverage stubs" section, where
+ * they are matched at 100% under their fn_ names. */
 
 /* =========================================================================
  * fn_801F02AC - PokemonSlotLookup
@@ -282,15 +259,7 @@ u32 PokemonSlotLookupDefault(u16 slotType, u32 index) {
  * ========================================================================= */
 
 /* --- fn_801F640C / fn_801F6414: Global state pointer (lbl_8047B5F0) --- */
-void SetPokemonStatePtr(void* ptr) {
-    /* stw r3, lbl_8047B5F0@sda21(r0) */
-    /* Direct SDA write - handled by linker */
-}
-
-void* GetPokemonStatePtr(void) {
-    /* lwz r3, lbl_8047B5F0@sda21(r0) */
-    return NULL; /* Placeholder */
-}
+/* Implemented below in the "coverage stubs" section, matched at 100%. */
 
 /* --- fn_801F641C / fn_801F6430: Struct field at offset 0xA490 --- */
 /* TODO: Identify this field - possibly personality value or PID */

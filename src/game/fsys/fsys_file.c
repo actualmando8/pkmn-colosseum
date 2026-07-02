@@ -2,13 +2,29 @@
  * @file fsys_file.c
  * @brief FSYS file lookup, entry processing, and archive load state machine.
  *
- * Contains the core file lookup/check functions (FSYSCheckFileLoaded,
- * FSYSRequestFile), the per-entry processor (FSYSProcessEntry), the
- * multi-stage load state machine (FSYSBeginLoad), and the cache lookup
- * (FSYSCacheLookup).
+ * Contains the core file lookup/check functions (fn_8017B07C,
+ * fn_8017B13C), the per-entry processor (fn_8017E30C), and the
+ * multi-stage load state machine (_fsysGetFilename).
  *
- * Address range: 0x8017B07C - 0x8017B1CC, 0x8017E30C - 0x8017F108,
- *                0x8017F794 - 0x8017F928
+ * Address range: 0x8017B07C - 0x8017F2C4 (per splits.txt; confirmed
+ * correct for this unit).
+ *
+ * 2026-07-02 reconciliation: removed 2 orphan definitions whose names
+ * are not present in symbols.txt and never paired in objdiff:
+ *   - FSYSCacheLookup: claimed address 0x8017F794 is actually outside
+ *     this unit entirely (belongs to game/gs_range_8017F2C4.c per
+ *     splits.txt); its one caller in fn_8017E30C now calls the real,
+ *     not-yet-decompiled fn_8017F794 directly instead, matching how
+ *     the rest of this file already calls it.
+ *   - FSYSBeginLoad: renamed (not deleted) to its real name,
+ *     _fsysGetFilename - strong evidence from matching address/size
+ *     against this unit's own objdiff report AND ground-truth
+ *     disassembly of this unit's real matched wrapper functions, which
+ *     literally contain "bl _fsysGetFilename".
+ * The stale FSYSCheckFileLoaded/FSYSRequestFile/FSYSProcessEntry
+ * prototypes in include/game/fsys/fsys.h (for names a prior pass had
+ * already renamed to fn_8017B07C/fn_8017B13C/fn_8017E30C in this file)
+ * were also removed there.
  */
 
 #include "game/fsys/fsys.h"
@@ -73,9 +89,6 @@ extern u32 gDVDPoolState;
 /* lbl_8036C2A0 -- DecompPoolEntry base (used for cache searches) */
 extern DecompPoolEntry gDecompPoolBase[];
 
-/* lbl_80454038 -- head of the DVD cache linked list */
-extern void* gDVDCacheHead;
-
 /* lbl_80453FDC -- LZSS decompression context */
 extern FSYSDecompContext gLZSSContext;
 
@@ -88,7 +101,7 @@ static FSYSSubEntry* FSYSFileEntry_GetSubEntry(FSYSFileEntry* entry) {
 }
 
 /* ===================================================================
- * fn_8017B07C: FSYSCheckFileLoaded
+ * fn_8017B07C: fn_8017B07C
  *
  * Checks whether a specific file (identified by nameHash) within the
  * archive loaded at fileHandle is fully decompressed and available.
@@ -104,7 +117,7 @@ static FSYSSubEntry* FSYSFileEntry_GetSubEntry(FSYSFileEntry* entry) {
  * @param nameHash    The name hash / resource ID of the file to check
  * @return            1 if the file is fully loaded, 0 otherwise
  * =================================================================== */
-s32 FSYSCheckFileLoaded(u32 fileHandle, u32 nameHash) {
+s32 fn_8017B07C(u32 fileHandle, u32 nameHash) {
     FSYSSlot* slot;
     s32 found = 0;
     u32 i;
@@ -148,7 +161,7 @@ s32 FSYSCheckFileLoaded(u32 fileHandle, u32 nameHash) {
 }
 
 /* ===================================================================
- * fn_8017B13C: FSYSRequestFile
+ * fn_8017B13C: fn_8017B13C
  *
  * Requests loading of a file from an already-loaded archive.
  * Finds the slot, stores the request ID, then calls the extended
@@ -158,7 +171,7 @@ s32 FSYSCheckFileLoaded(u32 fileHandle, u32 nameHash) {
  * @param requestID   Resource name hash to load
  * @return            1 on success, 0 if no slot available
  * =================================================================== */
-s32 FSYSRequestFile(u32 fileHandle, u32 requestID) {
+s32 fn_8017B13C(u32 fileHandle, u32 requestID) {
     FSYSSlot* slot;
 
     slot = FSYSFindSlot(fileHandle, 3);
@@ -175,7 +188,7 @@ s32 FSYSRequestFile(u32 fileHandle, u32 requestID) {
 /* Note: numEntries is at offset 0x0C in the FSYSSlot struct, now a named field. */
 
 /* ===================================================================
- * fn_8017E30C: FSYSProcessEntry
+ * fn_8017E30C: fn_8017E30C
  *
  * Core archive entry processor. After an archive is loaded into memory,
  * this function processes each file entry within it:
@@ -200,7 +213,7 @@ s32 FSYSRequestFile(u32 fileHandle, u32 requestID) {
  * @param slot  The FSYSSlot containing the archive and request info
  * @return      1 on success, 0 if entry not found or allocation failed
  * =================================================================== */
-s32 FSYSProcessEntry(FSYSSlot* slot) {
+s32 fn_8017E30C(FSYSSlot* slot) {
     u32 i;
     s32 found = 0;
     FSYSFileEntry* fileEntry = NULL;
@@ -240,10 +253,16 @@ s32 FSYSProcessEntry(FSYSSlot* slot) {
         return 0;
     }
 
-    /* Try to find the data in the cache first */
-    allocatedBuf = FSYSCacheLookup(slot->fileHandle,
-                                    fileEntry->groupID,
-                                    fileEntry->nameHash);
+    /* Try to find the data in the cache first. fn_8017F794 (not yet
+     * decompiled; belongs to game/gs_range_8017F2C4.c per splits.txt)
+     * is called the same way throughout the rest of this file - see
+     * the 2026-07-02 note near FSYSCacheLookup's old location below. */
+    {
+        extern u32 fn_8017F794();
+        allocatedBuf = (void*)fn_8017F794(slot->fileHandle,
+                                           fileEntry->groupID,
+                                           fileEntry->nameHash);
+    }
     if (allocatedBuf == NULL) {
         return 0;
     }
@@ -429,7 +448,18 @@ s32 FSYSProcessEntry(FSYSSlot* slot) {
 }
 
 /* ===================================================================
- * _fsysGetFilename: FSYSBeginLoad
+ * _fsysGetFilename (0x8017EB6C, size 0x59C)
+ *
+ * 2026-07-02 reconciliation: this function was previously named/
+ * declared as the invented "FSYSBeginLoad" (an orphan - not present in
+ * symbols.txt, never paired in objdiff). Renamed to its real name,
+ * _fsysGetFilename, on strong evidence: the real target address
+ * (0x8017EB6C) and size (0x59C = 1436 bytes, matching the unmatched
+ * "_fsysGetFilename" slot in this unit's objdiff report) both line up,
+ * AND the ground-truth disassembly for the four real, matched wrapper
+ * functions below (fn_8017DEA4.inc, fn_8017DF4C.inc, fn_8017DFF4.inc,
+ * fn_8017E09C.inc) each literally contain "bl _fsysGetFilename" with
+ * the exact same r3-r8 argument setup this function's callers use.
  *
  * Implements the FSYS archive load state machine. This function is
  * called to initiate or continue loading an archive, and handles
@@ -451,7 +481,7 @@ s32 FSYSProcessEntry(FSYSSlot* slot) {
  * @param callbackC  Completion callback C (stored at slot+0x13C)
  * @param loadMode   Load mode (stored at slot+0x4C)
  * =================================================================== */
-void FSYSBeginLoad(FSYSSlot* slot, u32 fileHandle,
+void _fsysGetFilename(FSYSSlot* slot, u32 fileHandle,
                    u32 callbackA, u32 callbackB, u32 callbackC,
                    u32 loadMode) {
     FSYSManager* mgr = &gFSYSManager;
@@ -599,51 +629,15 @@ state_check_mode:
     return;
 }
 
-/* ===================================================================
- * fn_8017F794: FSYSCacheLookup
- *
- * Searches the DVD cache linked list (rooted at lbl_80454038) for a
- * previously loaded file matching the given (fileHandle, groupID,
- * nameHash) triple.
- *
- * The cache is a singly-linked list of nodes, each containing:
- *   +0x00: data pointer (returned on match)
- *   +0x04: (padding)
- *   +0x08: next pointer
- *   +0x10: fileHandle
- *   +0x14: groupID
- *   +0x18: nameHash
- *
- * @param fileHandle  DVD file handle
- * @param groupID     Archive group ID
- * @param nameHash    File resource ID
- * @return            Cached data pointer, or NULL if not in cache
- * =================================================================== */
-void* FSYSCacheLookup(u32 fileHandle, u32 groupID, u32 nameHash) {
-    typedef struct CacheNode {
-        void*  data;         /* 0x00 */
-        u32    pad04;        /* 0x04 */
-        struct CacheNode* next; /* 0x08 */
-        u32    pad0C;        /* 0x0C */
-        u32    fileHandle;   /* 0x10 */
-        u32    groupID;      /* 0x14 */
-        u32    nameHash;     /* 0x18 */
-        u32    refCount;     /* 0x1C */
-    } CacheNode;
-
-    CacheNode* node = (CacheNode*)gDVDCacheHead;
-
-    while (node != NULL) {
-        if (node->fileHandle == fileHandle &&
-            node->groupID == groupID &&
-            node->nameHash == nameHash) {
-            return node->data;
-        }
-        node = node->next;
-    }
-
-    return NULL;
-}
+/*
+ * FSYSCacheLookup - orphan removed (see file header). Not present in
+ * symbols.txt; its claimed address (0x8017F794) belongs to
+ * game/gs_range_8017F2C4.c per splits.txt, not this unit at all. The
+ * rest of this file already calls the real (not-yet-decompiled)
+ * function at that address correctly as `extern u32 fn_8017F794()`
+ * (see e.g. lines below and fn_8017E30C above, which was updated to do
+ * the same instead of calling this fictional wrapper).
+ */
 
 /* fn_80180320 is declared at the top of this file */
 
@@ -2029,7 +2023,6 @@ void fn_8017DB74(FSYSSlot* slot) {
 #endif
 
 /* 0x8017DEA4 | 0xA8 */
-extern void _fsysGetFilename(void);
 extern void fn_80167DD8();
 #if 0
 asm void fn_8017DEA4(void) {
@@ -2038,7 +2031,7 @@ asm void fn_8017DEA4(void) {
 #else
 void fn_8017DEA4(FSYSSlot* slot, u32 fileHandle, u32 callbackA,
                  u32 callbackB, u32 callbackC) {
-    FSYSBeginLoad(slot, fileHandle, callbackA, callbackB, callbackC, 1);
+    _fsysGetFilename(slot, fileHandle, callbackA, callbackB, callbackC, 1);
 
     if (gFSYSManager.activeSlot == slot) {
         if (FSYS_SLOT_FILE0(slot) == 0) {
@@ -2062,7 +2055,7 @@ asm void fn_8017DF4C(void) {
 #else
 void fn_8017DF4C(FSYSSlot* slot, u32 fileHandle, u32 callbackA,
                  u32 callbackB, u32 callbackC) {
-    FSYSBeginLoad(slot, fileHandle, callbackA, callbackB, callbackC, 7);
+    _fsysGetFilename(slot, fileHandle, callbackA, callbackB, callbackC, 7);
 
     if (gFSYSManager.activeSlot == slot) {
         if (FSYS_SLOT_FILE0(slot) == 0) {
@@ -2081,7 +2074,7 @@ asm void fn_8017DFF4(void) {
 #else
 void fn_8017DFF4(FSYSSlot* slot, u32 fileHandle, u32 callbackA,
                  u32 callbackB, u32 callbackC) {
-    FSYSBeginLoad(slot, fileHandle, callbackA, callbackB, callbackC, 2);
+    _fsysGetFilename(slot, fileHandle, callbackA, callbackB, callbackC, 2);
 
     if (gFSYSManager.activeSlot == slot) {
         if (FSYS_SLOT_FILE0(slot) == 0) {
@@ -2104,7 +2097,7 @@ void fn_8017E09C(FSYSSlot* slot, u32 fileHandle, u32 callbackA,
     u32 cached;
 
     readFromCache = 0;
-    FSYSBeginLoad(slot, fileHandle, callbackA, callbackB, callbackC, 0);
+    _fsysGetFilename(slot, fileHandle, callbackA, callbackB, callbackC, 0);
 
     if (gFSYSManager.activeSlot == slot) {
         if (slot->reloadFlag == 1) {

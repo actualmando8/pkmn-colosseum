@@ -328,42 +328,29 @@ s32 FSYSLoadArchiveEx(u32 fileHandle, u32 requestID,
  */
 void FSYSInitLoadManager(u32 maxRequests, u32 alignment, u32 poolSize);
 
-/* --- fsys_file.c --- */
-
-/*
- * fn_8017B07C: FSYSCheckFileLoaded
- * Checks whether a specific file within a loaded archive is fully loaded
- * and decompressed.
+/* --- fsys_file.c ---
  *
- * @param fileHandle  DVD file handle
- * @param nameHash    File name hash / resource ID within the archive
- * @return            1 if loaded and ready, 0 otherwise
+ * 2026-07-02 reconciliation: removed orphan prototypes (none of these
+ * names are present in symbols.txt, none paired in objdiff):
+ *   - FSYSCheckFileLoaded, FSYSRequestFile, FSYSProcessEntry: already
+ *     dead - src/game/fsys/fsys_file.c no longer defines anything under
+ *     these names (a prior pass already renamed the real bodies to
+ *     fn_8017B07C, fn_8017B13C, fn_8017E30C respectively; these
+ *     prototypes were stale leftovers with no matching definition).
+ *   - FSYSBeginLoad: its definition in fsys_file.c was renamed to
+ *     _fsysGetFilename (real name, confirmed by matching address/size
+ *     against the unit's objdiff report AND ground-truth disassembly
+ *     of that unit's real wrapper functions, which literally call
+ *     "bl _fsysGetFilename"). See fsys_file.c for the full evidence.
+ *   - FSYSCacheLookup: its definition in fsys_file.c was deleted
+ *     outright - its claimed address belonged to a different unit
+ *     entirely (game/gs_range_8017F2C4.c per splits.txt), and the rest
+ *     of fsys_file.c already calls that real, not-yet-decompiled
+ *     function correctly as `extern u32 fn_8017F794()`.
  */
-s32 FSYSCheckFileLoaded(u32 fileHandle, u32 nameHash);
 
 /*
- * fn_8017B13C: FSYSRequestFile
- * Requests a specific file from a loaded archive for decompression.
- *
- * @param fileHandle  DVD file handle
- * @param requestID   Resource ID / name hash
- * @return            1 on success, 0 on failure
- */
-s32 FSYSRequestFile(u32 fileHandle, u32 requestID);
-
-/*
- * fn_8017E30C: FSYSProcessEntry
- * Core function that processes a single file entry from an FSYS archive.
- * Handles memory allocation, DVD read, decompression (if compressed),
- * and cache flushing.
- *
- * @param slot   Pointer to the FSYSSlot being processed
- * @return       1 on success, 0 on failure
- */
-s32 FSYSProcessEntry(FSYSSlot* slot);
-
-/*
- * _fsysGetFilename: FSYSBeginLoad
+ * _fsysGetFilename (0x8017EB6C, size 0x59C)
  * Initiates or continues loading an FSYS archive. Implements a state
  * machine that transitions through PENDING -> LOADING -> LOADED.
  *
@@ -375,19 +362,8 @@ s32 FSYSProcessEntry(FSYSSlot* slot);
  * @param loadMode   Load mode / priority
  * @return           (void)
  */
-void FSYSBeginLoad(FSYSSlot* slot, u32 fileHandle,
+void _fsysGetFilename(FSYSSlot* slot, u32 fileHandle,
                    u32 callbackA, u32 callbackB, u32 callbackC, u32 loadMode);
-
-/*
- * fn_8017F794: FSYSCacheLookup
- * Searches the DVD pool cache for a previously loaded file.
- *
- * @param fileHandle  DVD file handle
- * @param groupID     Archive group ID
- * @param nameHash    File resource ID
- * @return            Cached buffer pointer, or NULL if not found
- */
-void* FSYSCacheLookup(u32 fileHandle, u32 groupID, u32 nameHash);
 
 /* --- fsys_decomp.c --- */
 

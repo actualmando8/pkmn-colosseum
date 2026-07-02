@@ -12,6 +12,12 @@
  * Address range: 0x80140588 - 0x80144574 (approximately 0x3FEC bytes)
  * Function count: ~100 functions (83 of which are tiny getters/setters)
  *
+ * Note: fn_801440A0 was previously defined here under the invented name
+ * "peopleFieldGetByIndex"; it has been renamed to match the unmatched
+ * fn_ slot it actually fills (address + exact size match, and the
+ * "peopleFieldGetByIndex" label is independently corroborated by a
+ * comment in people_field.c).
+ *
  * Key functions:
  *
  *   fn_80140588 (peopleFieldOpen)      -- 0x514 bytes
@@ -179,7 +185,8 @@ typedef struct PeopleFieldEntry {
 } PeopleFieldEntry;
 
 /* ===================================================================
- * DECOMPILED: fn_801440A0 -- peopleFieldGetByIndex
+ * DECOMPILED: fn_801440A0 (aka "peopleFieldGetByIndex" in cross-file
+ * comments, e.g. people_field.c)
  *
  * The most-called function in the entire range (48 external callers).
  * Looks up a PeopleFieldEntry by its u16 index.
@@ -191,7 +198,10 @@ extern u32 lbl_80478BB0;   /* gPeopleFieldMaxSlots */
 extern u16 lbl_803681E8[]; /* gPeopleFieldLookup */
 extern PeopleFieldEntry lbl_80363CE8[]; /* gPeopleFieldArray */
 
-PeopleFieldEntry* peopleFieldGetByIndex(u16 index) {
+/* Returns u8* (not PeopleFieldEntry*) to match the extern declaration
+ * used at this function's call sites elsewhere in this file (e.g. the
+ * fn_80142B24 dispatcher below). */
+u8* fn_801440A0(u16 index) {
     u16 slot;
 
     if (index >= lbl_80478BD8) {
@@ -203,7 +213,7 @@ PeopleFieldEntry* peopleFieldGetByIndex(u16 index) {
         return NULL;
     }
 
-    return &lbl_80363CE8[slot];
+    return (u8*)&lbl_80363CE8[slot];
 }
 
 /* ===================================================================

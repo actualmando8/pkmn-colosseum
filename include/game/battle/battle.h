@@ -139,7 +139,7 @@ struct BattlePokemon;
 #define WAZA_ENTRY_CAMERA    2
 #define WAZA_ENTRY_SOUND     3
 
-/* Scene object IDs referenced by battle_FightEnd (from lbl_80279B84 rodata table) */
+/* Scene object IDs used by battle fight-end cleanup (from lbl_80279B84 rodata table) */
 /* These are the 21 scene object indices cleaned up during fight end */
 #define BATTLE_SCENE_OBJ_COUNT  21
 
@@ -485,15 +485,6 @@ typedef struct TypeMatchup {
 /* fn_801EF080 */ void battle_ResetSlotAnimations(void);
 /* fn_801EF0D4 */ void battle_ResetSlotEffects(void);
 /* fn_801EF128 */ void battle_SetupParty(void* partyData);
-/* _fightFinalize__FUi14FloorEnterMode */ void battle_FightEnd(void);   /* "---------- fight end !! ----------" */
-/* fn_801EF488 */ void battle_FightCleanup(void);
-/* _fightInitialize__FUi14FloorEnterMode */ void battle_FightStart(void); /* "---------- fight start !! ----------" */
-/* fn_801EF5C0 */ void battle_FightReset(void);
-/* fn_801EF61C */ void battle_SetResult(u16 result);
-/* fn_801EF624 */ u16  battle_GetResult(void);
-/* fn_801EF62C */ void battle_SetStatusFlags(u16 flags);
-/* fn_801EF634 */ u16  battle_GetStatusFlags(void);
-/* fn_801EF63C */ u8   battle_IsFightInProgress(void);
 /* fn_801EFA08 */ void battle_MainLoop(void);   /* 0x5BC bytes - the main battle loop */
 
 /* =========================================================================

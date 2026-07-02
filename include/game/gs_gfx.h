@@ -2,22 +2,17 @@
  * @file gs_gfx.h
  * @brief GSgfx -- Genius Sonority graphics subsystem for Pokemon Colosseum.
  *
- * GSgfx wraps the GX (Graphics eXtension) hardware layer and provides:
- *   - Framebuffer / XFB management
- *   - Matrix stack (model-view, projection)
- *   - Render-state machine (draw modes, swap-buffer control)
- *   - Video-mode configuration (NTSC / PAL / progressive)
- *   - Light and texture management hooks
+ * The GSgfxState layout below documents the 0x5A0-byte state structure
+ * referenced (by raw offset, not by this typedef) from gs_gfx.c's real
+ * fn_ functions via lbl_8047AA80.
  *
- * The global state is kept in a 0x5A0-byte structure allocated from GSmem
- * and stored in lbl_8047AA80.
- *
- * Debug strings:
- *   "GSgfx: unable to allocate gsgfx state!"
- *   "GSgfx: Init OK, state located at %08Xh (size=%d)"
- *   "GSgfx: invalid matrix index"
- *   "GSgfx: matrix stack underflow!"
- *   "GSgfx: matrix stack overflow!"
+ * This header previously also declared a set of friendly-named wrapper
+ * functions (GSgfxInit, GSgfxSetVideoMode, GSgfxEnableRendering,
+ * GSgfxSwapBuffers, GSgfxSetDrawMode, GSgfxGetFrameCount,
+ * GSgfxGetTickCount) whose bodies lived in gs_gfx.c behind a dead
+ * `#ifdef PCPORT` (PCPORT is never defined anywhere in this build). None
+ * of those names appear in config/GC6E01/symbols.txt; the prototypes have
+ * been removed along with the dead definitions.
  *
  * Address range: 0x800D3074 - 0x800D3E4C (approx.)
  */
@@ -71,84 +66,5 @@ typedef struct GSgfxState {
 #define GSGFX_VMODE_PAL50      2
 #define GSGFX_VMODE_PAL60      3
 #define GSGFX_VMODE_PROGRESSIVE 4
-
-/* -----------------------------------------------------------------------
- * Public API
- * ----------------------------------------------------------------------- */
-
-/**
- * GSgfxInit -- Initialise the graphics state machine.
- *
- * @param memSize    Size of the internal rendering memory pool.
- * @param fifoSize   Number of GX command FIFO entries.
- * @param mtxDepth   Matrix stack depth.
- * @param lightCount Maximum number of active lights.
- * @param numBufs    Number of framebuffers (1 or 2).
- * @param dlSize     Display-list buffer size.
- *
- * Allocates a 0x5A0-byte GSgfxState from GSmem, initialises the GX
- * hardware via VIConfigure / GXInit, sets up the matrix stack and
- * viewport, and registers a VBlank callback.
- *
- * Corresponds to GSgfxInit__FP15_GSgfxInitParms.
- */
-void GSgfxInit(u32 memSize, u32 fifoSize, u32 mtxDepth,
-               u32 lightCount, u32 numBufs, u32 dlSize);
-
-/**
- * GSgfxSetVideoMode -- Reconfigure the video output mode.
- *
- * @param mode       Video mode (see GSGFX_VMODE_* constants).
- * @param tvFormat   TV format parameter.
- * @param field0     Interlace sub-parameter.
- * @param field1     Interlace sub-parameter.
- * @param xfbMode    XFB copy mode (0=single, 1=double).
- * @param aaMode     Anti-aliasing mode.
- *
- * Corresponds to fn_800D37D4.
- */
-void GSgfxSetVideoMode(u32 mode, u32 tvFormat, u32 field0,
-                        u32 field1, u32 xfbMode, u32 aaMode);
-
-/**
- * GSgfxEnableRendering -- Turn the rendering pipeline on or off.
- *
- * @param enable     1 = enable, 0 = disable.
- *
- * Corresponds to fn_800D3074.
- */
-void GSgfxEnableRendering(u32 enable);
-
-/**
- * GSgfxSwapBuffers -- Signal end-of-frame and swap framebuffers.
- *
- * @param flag       Swap control flag.
- *
- * Corresponds to fn_800D30F0.
- */
-void GSgfxSwapBuffers(u32 flag);
-
-/**
- * GSgfxSetDrawMode -- Set the per-frame draw mode.
- *
- * @param mode       Draw mode byte.
- *
- * Corresponds to fn_800D361C.
- */
-void GSgfxSetDrawMode(u8 mode);
-
-/**
- * GSgfxGetFrameCount -- Return the current frame counter value.
- *
- * Corresponds to fn_800D37CC.
- */
-u32 GSgfxGetFrameCount(void);
-
-/**
- * GSgfxGetTickCount -- Return the internal tick counter.
- *
- * Corresponds to fn_800D3088.
- */
-u32 GSgfxGetTickCount(void);
 
 #endif /* GS_GFX_H */

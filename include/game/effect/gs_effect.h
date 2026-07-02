@@ -150,122 +150,15 @@ typedef struct TraceFXWork {
 
 /* -----------------------------------------------------------------------
  * Public API -- Core effect manager (gs_effect.c)
- * ----------------------------------------------------------------------- */
-
-/**
- * GSEffectInit -- Initialise the effect system.
  *
- * Allocates the effect instance table from GSmem, builds the free list,
- * and registers per-frame update/render task callbacks.
- *
- * @param maxEffects  Number of effect slots to allocate.
- *
- * Corresponds to fn_80130CE0.
- */
-void GSEffectInit(u16 maxEffects);
-
-/**
- * GSeffect -- Trigger an effect by its 1-based ID.
- *
- * Looks up the effect in the instance table, calls the triggerFunc
- * callback, and transitions the effect to ACTIVE state.  If the trigger
- * fails, the stopFunc callback is invoked and the effect remains IDLE.
- *
- * @param effectId  1-based effect ID.
- * @return          1 on success, 0 on failure.
- *
- */
-BOOL GSeffect(u32 effectId);
-
-/**
- * GSEffectRegister -- Register callbacks for an effect slot.
- *
- * Sets the start, destroy, trigger, stop, extra-param, update, and
- * render function pointers for the given effect ID.  Does not
- * allocate memory or activate the effect.
- *
- * @param effectId     1-based effect ID.
- * @param startFunc    Start callback.
- * @param destroyFunc  Destroy/cleanup callback.
- * @param triggerFunc  Trigger callback (returns success).
- * @param stopFunc     Stop callback.
- * @param extraParam   Additional user parameter.
- * @param updateFunc   Per-frame update callback.
- * @param renderFunc   Per-frame render callback.
- *
- * Corresponds to fn_80131200.
- */
-void GSEffectRegister(u32 effectId, GSEffectStartFunc startFunc,
-                      GSEffectStopFunc destroyFunc,
-                      GSEffectStartFunc triggerFunc,
-                      GSEffectStopFunc stopFunc,
-                      void* extraParam,
-                      GSEffectUpdateFunc updateFunc,
-                      GSEffectRenderFunc renderFunc);
-
-/**
- * GSEffectStop -- Request an effect to stop.
- *
- * If the effect is active, transitions it to STOPPING state and calls
- * the stopFunc callback.
- *
- * @param effectId  1-based effect ID.
- *
- * Corresponds to fn_80131010.
- */
-void GSEffectStop(u32 effectId);
-
-/**
- * GSEffectFree -- Destroy and free an effect slot.
- *
- * Calls the destroy and stop callbacks, unlinks the effect from the
- * active list, and returns the slot to the free list.
- *
- * @param effectId  1-based effect ID.
- *
- * Corresponds to fn_80131268.
- */
-void GSEffectFree(u32 effectId);
-
-/**
- * GSEffectIsActive -- Check whether an effect is currently active.
- *
- * @param effectId  1-based effect ID.
- * @return          1 if the effect state is ACTIVE, 0 otherwise.
- *
- * Corresponds to fn_801310A8.
- */
-BOOL GSEffectIsActive(u32 effectId);
-
-/**
- * GSEffectAllocSlot -- Allocate a new effect slot from the free list.
- *
- * Removes an instance from the free list, allocates a user-data buffer
- * of the specified size from GSmem, initialises the slot, and inserts
- * it into the active list.
- *
- * @param callbacks  Pointer to callback data to copy into the slot.
- * @param dataSize   Size of the user-data block to allocate.
- * @return           The effect's 1-based ID (the slot's own index), or 0
- *                   if no free slots remain.
- *
- * Corresponds to fn_80131428.
- */
-u16 GSEffectAllocSlot(void* callbacks, u16 dataSize);
-
-/**
- * GSEffectResetState -- Re-trigger an effect that is already registered.
- *
- * Calls the effect's startFunc callback and transitions it to IDLE state.
- *
- * @param effectId  1-based effect ID.
- *
- * Corresponds to fn_8013139C.
- */
-void GSEffectResetState(u32 effectId);
-
-/* -----------------------------------------------------------------------
- * Public API -- TraceFX sub-module (tracefx.c)
+ * The manager's ten functions are all matched at 100% under their real
+ * fn_ names (fn_80130CE0, fn_80130F04, fn_80130F68, fn_80131010,
+ * fn_801310A8, GSeffect, fn_80131200, fn_80131268, fn_8013139C,
+ * fn_80131428 -- see gs_effect.c). Nothing outside gs_effect.c calls them
+ * yet, so no prototypes are declared here; effect_visual.c and tracefx.c
+ * extern-declare the fn_ names directly where they need them. A prior
+ * campaign transplant's invented "GSEffectXxx" wrapper API had no real
+ * callers and has been removed along with its prototypes.
  * ----------------------------------------------------------------------- */
 
 /**
@@ -280,45 +173,12 @@ void GSEffectResetState(u32 effectId);
  */
 BOOL tracefxStartEffect(u8* work);
 
-/**
- * tracefxInit -- Initialise the TraceFXWork structure.
- *
- * Zeroes the work area, copies parameters from the config block,
- * extracts RGBA colour components, and loads trail model data.
- *
- * @param work    TraceFXWork to initialise.
- * @param params  Configuration parameters.
- * @param frames  Duration in frames.
- * @return        Memory offset consumed.
- *
- * Corresponds to fn_8013735C.
- */
-u32 tracefxInit(TraceFXWork* work, void* params, u32 frames);
-
-/**
- * tracefxAddSegment -- Add trail segments to an active trace effect.
- *
- * Interpolates new segment positions between the start and end models,
- * updates segment counts and lifetime tracking.
- *
- * @param work       TraceFXWork instance.
- * @param numSegs    Number of segments to add.
- * @return           1 on success, 0 if the trail is full.
- *
- * Corresponds to fn_80137D14.
- */
-BOOL tracefxAddSegment(void* work, u32 numSegs);
-
-/**
- * tracefxUpdate -- Per-frame update for a trail effect.
- *
- * Updates trail geometry, fades alpha, and cleans up expired segments.
- *
- * @param work  TraceFXWork instance.
- *
- * Corresponds to fn_80137F58.
- */
-void tracefxUpdate(void* work);
+/* -----------------------------------------------------------------------
+ * tracefxInit, tracefxAddSegment, and tracefxUpdate (invented wrapper
+ * names for fn_8013735C, fn_80137D14, and fn_80137F58) were another
+ * unreferenced duplicate left by the same transplant and have been
+ * removed from tracefx.c; their prototypes are gone from here too.
+ * ----------------------------------------------------------------------- */
 
 /* -----------------------------------------------------------------------
  * Public API -- Generator sub-module (generator.c)

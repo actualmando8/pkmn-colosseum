@@ -10,7 +10,20 @@
  * Manages DVD command queue, state machine, and provides the
  * public API for reading discs and managing the DVD drive.
  *
- * Matches: 0x800A5624 - 0x800A7820
+ * Matches: 0x800A5624 - 0x800A7820 (per splits.txt; confirmed correct
+ * for this unit). Only DVDInit, DVDReadDiskID, DVDInquiryAsync,
+ * DVDReset, DVDGetDriveStatus, cbForStateError, AlarmHandler,
+ * DVDReadAbsAsyncPrio, DVDReadAbsAsyncForBS, DVDSeekAbsAsyncPrio,
+ * DVDGetCommandBlockStatus and DVDChangeDisk have real
+ * (name-paired) counterparts in objdiff; DVDReadDiskID and
+ * DVDInquiryAsync are byte-exact matches. 2026-07-02 reconciliation:
+ * removed DVDReadAsyncPrio, DVDGetTransferredSize,
+ * DVDGetCurrentDiskID, DVDPause, DVDSetAutoInvalidation, DVDFastOpen
+ * and DVDClose - none of these names exist in symbols.txt, none paired
+ * in objdiff (not even a fuzzy/positional pairing), and their bodies
+ * were invented fiction from a prior transplant pass. The remaining
+ * fn_XXXXXXXX / stateXxx-named gaps in this file are genuinely
+ * un-decompiled and still need real work.
  */
 
 /* DVD hardware registers */
@@ -344,25 +357,11 @@ BOOL DVDReadAbsAsyncPrio(DVDCommandBlock* block, void* addr, s32 length,
 }
 
 /*
- * DVDReadAsyncPrio - 0x800A5784 | size: 0x8C
- * Read from a DVD file with priority.
+ * DVDReadAsyncPrio - orphan removed (see file header). No symbols.txt
+ * entry ever paired to this definition; the body was invented fiction
+ * from a prior transplant pass and never matched anything in objdiff.
+ * Declaration removed from dolphin/dvd/dvd.h (no remaining callers).
  */
-BOOL DVDReadAsyncPrio(DVDFileInfo* fileInfo, void* addr, s32 length,
-                      s32 offset, DVDCBCallback callback, s32 prio) {
-    fileInfo->cb.command = 1;
-    fileInfo->cb.addr = addr;
-    fileInfo->cb.length = length;
-    fileInfo->cb.offset = fileInfo->startAddr + offset;
-    fileInfo->cb.transferredSize = 0;
-    fileInfo->cb.callback = callback;
-
-    if (autoInvalidation_804789CC) {
-        DCInvalidateRange(addr, (u32)length);
-    }
-
-    return DVDReadAbsAsyncPrio(&fileInfo->cb, addr, length,
-                               fileInfo->startAddr + offset, callback, prio);
-}
 
 /*
  * DVDCancel - 0x800A58BC | size: 0x34
@@ -588,20 +587,11 @@ static void cbForStateCoverClosed(u32 intType) {
 }
 
 /*
- * DVDGetTransferredSize - 0x800A5FC0 | size: 0x34
- * Return the number of bytes transferred for a DVD command block.
+ * DVDGetTransferredSize / DVDGetCurrentDiskID - orphans removed (see file
+ * header). Neither name is present in symbols.txt; both bodies were
+ * invented fiction that never paired in objdiff. Declarations removed
+ * from dolphin/dvd/dvd.h (no remaining callers).
  */
-s32 DVDGetTransferredSize(DVDCommandBlock* block) {
-    return block->transferredSize;
-}
-
-/*
- * DVDGetCurrentDiskID - 0x800A5FF4 | size: 0x34
- * Return a pointer to the current disk ID structure.
- */
-DVDDiskID* DVDGetCurrentDiskID(void) {
-    return (DVDDiskID*) BOOT_INFO;
-}
 
 /*
  * fn_800A6028 - 0x800A6028 | size: 0x74
@@ -628,18 +618,10 @@ DVDDiskID* DVDGetCurrentDiskID(void) {
  */
 
 /*
- * DVDPause - 0x800A62CC | size: 0xFC
- * Pause DVD processing. Pending commands remain queued
- * but no new commands will be dispatched.
+ * DVDPause - orphan removed (see file header). Not present in
+ * symbols.txt; body was invented fiction that never paired in objdiff.
+ * Declaration removed from dolphin/dvd/dvd.h (no remaining callers).
  */
-void DVDPause(void) {
-    BOOL enabled;
-
-    enabled = OSDisableInterrupts();
-    PauseFlag_8047A7F4 = TRUE;
-    PausingFlag_8047A7F8 = TRUE;
-    OSRestoreInterrupts(enabled);
-}
 
 /*
  * DVDResume - 0x800A640C | size: 0xCC
@@ -661,36 +643,20 @@ void DVDResume(void) {
 }
 
 /*
- * DVDSetAutoInvalidation - 0x800A64D8 | size: 0x30
- * Enable or disable automatic D-cache invalidation on DVD reads.
+ * DVDSetAutoInvalidation - orphan removed (see file header). Not present
+ * in symbols.txt; body was invented fiction that never paired in
+ * objdiff. Only reference elsewhere in-tree was a comment in
+ * src/game/main.c, not an actual call.
  */
-BOOL DVDSetAutoInvalidation(BOOL flag) {
-    BOOL prev = autoInvalidation_804789CC;
-    autoInvalidation_804789CC = flag;
-    return prev;
-}
 
 /*
- * DVDFastOpen - 0x800A6508 | size: 0x70
- * Open a file by entry number (fast path, no path resolution).
+ * DVDFastOpen / DVDClose - orphan bodies removed (see file header).
+ * Neither name is present in symbols.txt, and both were duplicated
+ * verbatim (with a *different* invented address/size) in
+ * dolphin/dvd/DVDFsExtras.c, which is itself fiction for this address
+ * range. Declarations remain in dolphin/dvd/dvd.h because DVDOpen()
+ * below still calls both; DVDOpen is out of scope for this pass.
  */
-BOOL DVDFastOpen(s32 entrynum, DVDFileInfo* fileInfo) {
-    /* Set up DVDFileInfo from the FST entry */
-    if (entrynum < 0) {
-        return FALSE;
-    }
-    return TRUE;
-}
-
-/*
- * DVDClose - 0x800A6578 | size: 0x28
- * Close a previously opened DVD file.
- */
-BOOL DVDClose(DVDFileInfo* fileInfo) {
-    /* Cancel any pending reads on this file */
-    fileInfo->cb.state = 0;
-    return TRUE;
-}
 
 /*
  * __DVDInterruptHandlerMain - 0x800A6BD4 | size: 0x638

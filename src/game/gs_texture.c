@@ -2,24 +2,48 @@
  * @file gs_texture.c
  * @brief GStexture -- Genius Sonority texture management system.
  *
- * Decompiled from:
- *   fn_800EFFC0 (GStextureInit)
- *   GStextureCreate (GStextureCreate)
- *   fn_800EF098 (GStextureConvertCI)
- *   fn_800EF1E8 (GStextureUploadFromBuffer)
- *   fn_800EF3E0 (GStextureGetGXFormat)
- *   fn_800EF4D4 (GStextureGetTLUTFormat)
- *   fn_800EF4DC (GStextureGetFormat)
- *   fn_800EF4E4 (GStextureGetMipCount)
- *   fn_800EF4F4 (GStextureGetHeight)
- *   fn_800EF4FC (GStextureGetWidth)
- *   GStextureUnlockImage (GStextureFlush)
- *   GStextureLockImage (GStextureGetMipData)
- *   fn_800EF578 (GStextureSetWrapMode)
- *   fn_800EF590 (GStextureSetFilterMode)
- *   fn_800EF5A4 (GStextureFree)
- *   fn_800EFD14 (GStextureBind)
- *   fn_800EFD3C (GStextureSetupFromTPL)
+ * This unit spans 0x800EF098 - 0x800F07A8 (38 functions). Only three
+ * addresses have confirmed real names and content today:
+ *   - GStextureCreate (0x800EF5FC, WIP, partially matched) -- the main
+ *     texture-allocation routine.
+ *   - GStextureUnlockImage (0x800EF504) and GStextureLockImage
+ *     (0x800EF548) -- both are real matched symbols in symbols.txt and
+ *     are referenced by name from gs_render.c's EFB-capture path
+ *     (`GStextureUnlockImage(image)` feeding `GXDrawDone`, and
+ *     `GStextureLockImage(image, 0)`). GStextureUnlockImage's return
+ *     value is used by the caller, so it returns the texture's post-
+ *     decrement refCount rather than void.
+ *   - Beyond fn_800F0284 (threadExecute and friends below) is the
+ *     GSthread cooperative-scheduler tail of this unit, unrelated to
+ *     textures; those functions are unaffected by this file's texture
+ *     housekeeping and are left as-is.
+ *
+ * The remaining fourteen addresses (0x800EF098, 0x800EF1E8, 0x800EF3E0,
+ * 0x800EF4D4-0x800EF4FC, 0x800EF578, 0x800EF590, 0x800EF5A4, 0x800EFD14,
+ * 0x800EFD3C, 0x800EFFC0) previously carried a fiction block from an old
+ * campaign transplant: invented "GStextureInit/GetWidth/GetHeight/
+ * GetFormat/GetTLUTFormat/GetMipCount/SetWrapMode/SetFilterMode/Free/
+ * Bind/GetGXFormat/ConvertCI/UploadFromBuffer/SetupFromTPL" bodies. None
+ * of those names appear in symbols.txt, none matched (fuzzy: None for
+ * all sixteen, i.e. not even paired for diffing), and none are called
+ * by that name from anywhere else in the tree. Worse, several directly
+ * contradict how other files already use these same fn_ addresses:
+ *   - fn_800EFFC0 is called from main.c as `fn_800EFFC0(0x10)` with the
+ *     comment "GX FIFO init", not a texture-pool initialiser.
+ *   - fn_800EF5A4 is called ~25 times from effect_visual.c, tracefx.c,
+ *     gs_field_world.c, gs_title.c, battle_grid.c and gs_colsys.c as a
+ *     generic `fn_800EF5A4(void* model)` "model release" helper, not a
+ *     GStextureHandle-specific free.
+ *   - fn_800EF590 is called as a bare no-argument procedure from three
+ *     independent files (gs_render.c, gs_pcbox.c, effect_util.c),
+ *     incompatible with the invented 3-argument SetFilterMode signature.
+ *   - fn_800EFD3C is used by gs_field_resource.c as a "WZX overlap
+ *     check" returning u32 from a single argument -- an unrelated
+ *     resource-loading routine, not a TPL texture setup helper.
+ * That fiction block has been removed. Each of the fourteen addresses
+ * is now an honest unmatched TODO stub under its real fn_ scaffold name
+ * (from symbols.txt) so the unit still compiles to the right function
+ * count without asserting an unverified identity.
  *
  * Debug strings:
  *   "GStexture: invalid texture format"
@@ -33,25 +57,17 @@
 #include "game/gs_thread.h"
 
 /* ===== External SDK / engine functions ===== */
-extern void  fn_800DD970(const char* fmt, ...);        /* OSReport */
 extern u16   GSmemAllocRaw(u32 size);                  /* _toolentryAlloc__FUl */
 extern void* GSmemGetPtr(u16 handle);                  /* fn_800E27B0 */
-extern void* GSmemLock(u16 handle);                    /* fn_800E24B0 */
 extern void  GSmemFree(u16 handle);                    /* fn_800E209C */
 extern u16   GSmemAlloc(u32 alignment, u32 size);      /* fn_800E2C04 */
 extern void  DCFlushRange(void* addr, u32 len);
-extern void  memcpy(void* dst, const void* src, u32 len);
 extern void  GXInvalidateTexAll(void);                        /* GXInvalidateTexAll */
+extern void  fn_800DD970(const char* fmt, ...);        /* OSReport */
 extern void  fn_800BB050(void* gxTlutObj, void* data, u32 format); /* GXInitTlutObj */
 extern void  fn_800BA9E4(void* gxTexObj, void* data,
                           u16 width, u16 height, u32 gxFmt,
                           u32 wrapS, u32 wrapT, u32 hasMips); /* GXInitTexObj */
-extern void  fn_800B962C(u32 a, u32 b, u16 width, u16 height); /* GXSetScissor or viewport */
-extern void  fn_800B96F8(u16 width, u16 height, u32 fmt,
-                          u32 mipFlag);                /* GXSetCopyTexSrc */
-extern void  GXSetZMode(u32 a, u32 b, u32 c);        /* GX copy / capture */
-extern void  fn_800B9FE4(void* data, void* srcBuf);   /* GXCopyTex */
-extern void  fn_800B8E74(void);                        /* GXPixModeSync */
 
 /* ===== String constants (rodata) ===== */
 extern const char lbl_80270F98[]; /* "GStexture: invalid texture format" */
@@ -65,206 +81,128 @@ extern u8 lbl_80466BC0[];  /* current display descriptor */
 static u32 gsTexMaxCount;               /* @sda21 lbl_8047ABF8 */
 /* lbl_8047ABF4 : GStextureHandle* -- base pointer to texture pool */
 static GStextureHandle* gsTexPool;       /* @sda21 lbl_8047ABF4 */
-/* lbl_8047ABF0 : u16 -- GSmem handle for texture pool */
-static u16 gsTexPoolHandle;              /* @sda21 lbl_8047ABF0 */
 
 /* =======================================================================
- *  GStextureInit / fn_800EFFC0
- *  Address: 0x800EFFC0, Size: 0x70
- *
- *  Allocates the texture pool from GSmem and zeroes all entries.
- *
- *  Assembly:
- *    stw r3, lbl_8047ABF8@sda21(r0)   ; store maxTextures
- *    slwi r3, r3, 7                   ; r3 = maxTextures * 0x80
- *    bl GSmemAllocRaw                 ; allocate pool
- *    sth r3, lbl_8047ABF0@sda21(r0)   ; store handle
- *    beq fail                         ; if handle == 0, bail
- *    bl GSmemGetPtr                   ; resolve to pointer
- *    stw r3, lbl_8047ABF4@sda21(r0)   ; store pool pointer
- *    ; loop: clear all entries' inUse byte (offset 0x06)
- *    for (i = 0; i < maxTextures; i++) {
- *        pool[i * 0x80 + 6] = 0;
- *    }
+ *  fn_800EF098 | 0x150
+ *  TODO: match -- no rodata/callers found for this address; the "CI to
+ *  direct colour" identity from the old fiction block is unverified.
  * ======================================================================= */
-void GStextureInit(u32 maxTextures) {
-    u16 handle;
-    u32 i;
-    u32 offset;
-
-    gsTexMaxCount = maxTextures;
-
-    /* Allocate pool: maxTextures * 0x80 bytes */
-    handle = GSmemAllocRaw(maxTextures << 7);
-    gsTexPoolHandle = handle;
-
-    if ((handle & 0xFFFF) == 0) {
-        return;
-    }
-
-    gsTexPool = (GStextureHandle*)GSmemGetPtr(handle);
-
-    /* Zero out all slots' inUse flag */
-    offset = 0;
-    for (i = 0; i < gsTexMaxCount; i++) {
-        u8* base = (u8*)gsTexPool;
-        base[offset + 6] = 0;  /* inUse = 0 */
-        offset += 0x80;
-    }
+void fn_800EF098(void) {
+    /* TODO: match -- 0x150 bytes at 0x800EF098 */
 }
 
 /* =======================================================================
- *  GStextureGetWidth / fn_800EF4FC
- *  Address: 0x800EF4FC, Size: 0x8
+ *  fn_800EF1E8 | 0x1F8
+ *  TODO: match -- callers disagree on shape (gs_render.c calls it with
+ *  zero args; gs_gfx.c calls fn_800EF1E8(sc, 1)), so no signature is
+ *  asserted here.
  * ======================================================================= */
-u16 GStextureGetWidth(GStextureHandle* tex) {
-    return tex->width;
+void fn_800EF1E8(void) {
+    /* TODO: match -- 0x1F8 bytes at 0x800EF1E8 */
 }
 
 /* =======================================================================
- *  GStextureGetHeight / fn_800EF4F4
- *  Address: 0x800EF4F4, Size: 0x8
+ *  fn_800EF3E0 | 0xF4
+ *  TODO: match -- gs_render.c calls fn_800EF3E0(image, 1) expecting a
+ *  pointer-ish return; kept unmatched rather than asserting the old
+ *  fictional GXTexFmt-lookup body.
  * ======================================================================= */
-u16 GStextureGetHeight(GStextureHandle* tex) {
-    return tex->height;
+void fn_800EF3E0(void) {
+    /* TODO: match -- 0xF4 bytes at 0x800EF3E0 */
 }
 
 /* =======================================================================
- *  GStextureGetFormat / fn_800EF4DC
- *  Address: 0x800EF4DC, Size: 0x8
+ *  fn_800EF4D4 | 0x8
  * ======================================================================= */
-u32 GStextureGetFormat(GStextureHandle* tex) {
-    return tex->format;
+void fn_800EF4D4(void) {
+    /* TODO: match -- 0x8 bytes at 0x800EF4D4 */
 }
 
 /* =======================================================================
- *  GStextureGetTLUTFormat / fn_800EF4D4
- *  Address: 0x800EF4D4, Size: 0x8
+ *  fn_800EF4DC | 0x8
+ *  TODO: match -- gs_render.c calls fn_800EF4DC() with zero args and
+ *  discards the result, incompatible with a GetFormat(tex) getter.
  * ======================================================================= */
-u32 GStextureGetTLUTFormat(GStextureHandle* tex) {
-    return tex->tlutFormat;
+void fn_800EF4DC(void) {
+    /* TODO: match -- 0x8 bytes at 0x800EF4DC */
 }
 
 /* =======================================================================
- *  GStextureGetMipCount / fn_800EF4E4
- *  Address: 0x800EF4E4, Size: 0x10
- *
- *  Assembly:
- *    lbz r3, 0x5(r3)     ; load mipLevels
- *    subi r0, r3, 0x1    ; subtract 1
- *    clrlwi r3, r0, 24   ; mask to byte
- *    blr
+ *  fn_800EF4E4 | 0x10
  * ======================================================================= */
-u8 GStextureGetMipCount(GStextureHandle* tex) {
-    return (u8)(tex->mipLevels - 1);
+void fn_800EF4E4(void) {
+    /* TODO: match -- 0x10 bytes at 0x800EF4E4 */
 }
 
 /* =======================================================================
- *  GStextureSetWrapMode / fn_800EF578
- *  Address: 0x800EF578, Size: 0x18
- *
- *  Assembly:
- *    stw r4, 0x18(r3)    ; wrapS
- *    li r0, 1
- *    stw r5, 0x1C(r3)    ; wrapT
- *    stw r6, 0x20(r3)    ; lodClamp
- *    stb r0, 0x07(r3)    ; dirty = 1
- *    blr
+ *  fn_800EF4F4 | 0x8
  * ======================================================================= */
-void GStextureSetWrapMode(GStextureHandle* tex, u32 wrapS, u32 wrapT,
-                           u32 lodClamp) {
-    tex->wrapS = wrapS;
-    tex->wrapT = wrapT;
-    tex->lodClamp = lodClamp;
-    tex->dirty = 1;
+void fn_800EF4F4(void) {
+    /* TODO: match -- 0x8 bytes at 0x800EF4F4 */
 }
 
 /* =======================================================================
- *  GStextureSetFilterMode / fn_800EF590
- *  Address: 0x800EF590, Size: 0x14
- *
- *  Assembly:
- *    stw r4, 0x10(r3)    ; minFilter
- *    li r0, 1
- *    stw r5, 0x14(r3)    ; magFilter
- *    stb r0, 0x07(r3)    ; dirty = 1
- *    blr
+ *  fn_800EF4FC | 0x8
  * ======================================================================= */
-void GStextureSetFilterMode(GStextureHandle* tex, u32 minFilt, u32 magFilt) {
-    tex->minFilter = minFilt;
-    tex->magFilter = magFilt;
-    tex->dirty = 1;
+void fn_800EF4FC(void) {
+    /* TODO: match -- 0x8 bytes at 0x800EF4FC */
 }
 
 /* =======================================================================
- *  GStextureFree / fn_800EF5A4
- *  Address: 0x800EF5A4, Size: 0x58
- *
- *  Assembly:
- *    lbz r0, 0x6(r3)       ; load inUse
- *    beq done               ; if 0, already free
- *    lhz r0, 0x24(r31)     ; load memHandle
- *    beq done               ; if 0, no allocation
- *    li r0, 0
- *    stb r0, 0x6(r31)      ; inUse = 0
- *    lhz r3, 0x24(r31)     ; load handle
- *    bl GSmemLock           ; lock it (for validation)
- *    lhz r3, 0x24(r31)     ; load handle again
- *    bl GSmemFree           ; free it
+ *  fn_800EF578 | 0x18
+ *  TODO: match -- gs_render.c calls fn_800EF578() with zero args,
+ *  incompatible with the old 4-argument SetWrapMode signature.
  * ======================================================================= */
-void GStextureFree(GStextureHandle* tex) {
-    if (tex->inUse == 0) {
-        return;
-    }
-    if (tex->memHandle == 0) {
-        return;
-    }
-
-    tex->inUse = 0;
-    GSmemLock(tex->memHandle);
-    GSmemFree(tex->memHandle);
+void fn_800EF578(void) {
+    /* TODO: match -- 0x18 bytes at 0x800EF578 */
 }
 
 /* =======================================================================
- *  GStextureFlush / GStextureUnlockImage
+ *  fn_800EF590 | 0x14
+ *  TODO: match -- gs_render.c, gs_pcbox.c and effect_util.c all call
+ *  fn_800EF590() with zero args, incompatible with the old 3-argument
+ *  SetFilterMode signature.
+ * ======================================================================= */
+void fn_800EF590(void) {
+    /* TODO: match -- 0x14 bytes at 0x800EF590 */
+}
+
+/* =======================================================================
+ *  fn_800EF5A4 | 0x58
+ *  TODO: match -- called ~25 times from effect_visual.c, tracefx.c,
+ *  gs_field_world.c, gs_title.c, battle_grid.c and gs_colsys.c as a
+ *  generic `fn_800EF5A4(void* model)` "model release" helper. That
+ *  usage is inconsistent with a GStextureHandle-specific free, so no
+ *  semantic name is asserted here.
+ * ======================================================================= */
+void fn_800EF5A4(void) {
+    /* TODO: match -- 0x58 bytes at 0x800EF5A4 */
+}
+
+/* =======================================================================
+ *  GStextureUnlockImage
  *  Address: 0x800EF504, Size: 0x44
  *
- *  Assembly:
- *    lwz r3, 0x28(r31)     ; data pointer
- *    lwz r4, 0x4C(r31)     ; totalSize
- *    bl DCFlushRange
- *    bl GXInvalidateTexAll
- *    lhz r3, 0x50(r31)     ; refCount
- *    subi r0, r3, 1
- *    sth r0, 0x50(r31)     ; refCount--
+ *  Real matched name (symbols.txt) referenced from gs_render.c as
+ *  `GXDrawDone(GStextureUnlockImage(image))`, so the return value is
+ *  used by the caller: returns the texture's refCount after decrement.
  * ======================================================================= */
-void GStextureFlush(GStextureHandle* tex) {
+u32 GStextureUnlockImage(GStextureHandle* tex) {
     DCFlushRange(tex->data, tex->totalSize);
-    GXInvalidateTexAll();  /* GXInvalidateTexAll */
+    GXInvalidateTexAll();
 
     tex->refCount--;
+    return tex->refCount;
 }
 
 /* =======================================================================
- *  GStextureGetMipData / GStextureLockImage
+ *  GStextureLockImage
  *  Address: 0x800EF548, Size: 0x30
  *
- *  Assembly:
- *    clrlwi r0, r4, 24     ; level &= 0xFF
- *    cmplwi r0, 8           ; if level >= 8
- *    blt ok
- *    li r3, 0               ; return NULL
- *    blr
- *  ok:
- *    lhz r5, 0x50(r3)      ; refCount
- *    slwi r0, r4, 2         ; level * 4
- *    add r4, r3, r0
- *    addi r0, r5, 1
- *    sth r0, 0x50(r3)      ; refCount++
- *    lwz r3, 0x28(r4)      ; data + mipOffsets[level]
- *    blr
+ *  Real matched name (symbols.txt) referenced from gs_render.c as
+ *  `GStextureLockImage(image, 0)`.
  * ======================================================================= */
-void* GStextureGetMipData(GStextureHandle* tex, u8 level) {
+void* GStextureLockImage(GStextureHandle* tex, u8 level) {
     if (level >= 8) {
         return NULL;
     }
@@ -274,84 +212,16 @@ void* GStextureGetMipData(GStextureHandle* tex, u8 level) {
 }
 
 /* =======================================================================
- *  GStextureBind / fn_800EFD14
- *  Address: 0x800EFD14, Size: 0x28
- *
- *  Assembly:
- *    cmplwi r3, 0           ; NULL check
- *    beqlr
- *    lbz r0, 0x6(r3)       ; check inUse
- *    beq set                ; if not in use, set it
- *    blr                    ; already in use, bail
- *  set:
- *    li r0, 1
- *    stb r0, 0x6(r3)       ; inUse = 1
- *    sth r4, 0x24(r3)      ; memHandle = handle
- *    blr
+ *  fn_800EFD14 | 0x28
+ *  TODO: match -- effect_util.c calls fn_800EFD14() with zero args,
+ *  incompatible with the old 2-argument Bind signature.
  * ======================================================================= */
-void GStextureBind(GStextureHandle* tex, u16 memHandle) {
-    if (tex == NULL) {
-        return;
-    }
-    if (tex->inUse != 0) {
-        return;  /* already bound */
-    }
-
-    tex->inUse = 1;
-    tex->memHandle = memHandle;
+void fn_800EFD14(void) {
+    /* TODO: match -- 0x28 bytes at 0x800EFD14 */
 }
 
 /* =======================================================================
- *  GStextureGetGXFormat / fn_800EF3E0
- *  Address: 0x800EF3E0, Size: 0xF4
- *
- *  Maps the GS internal format to the GXTexFmt hardware enum.
- *  Large switch statement on tex->format (offset 0x08).
- *
- *  Assembly (simplified switch):
- *    lwz r0, 0x8(r3)
- *    switch(r0):
- *      case 0x00: return 0x08  (GX_TF_I4)
- *      case 0x01: return 0x09  (GX_TF_I8)
- *      case 0x30: return 0x0A  (GX_TF_IA4)
- *      case 0x40: return 0x00  (GX_TF_I4... special)
- *      case 0x41: return 0x02  (GX_TF_RGB565)
- *      case 0x42: return 0x01  (GX_TF_RGB5A3)
- *      case 0x43: return 0x03  (GX_TF_RGBA8)
- *      case 0x44: return 0x04  (GX_TF_C4)
- *      case 0x45: return 0x06  (GX_TF_C14X2)
- *      case 0x90: return 0x05  (GX_TF_C8)
- *      case 0xA0: if alpha==0 return 0x27, else return 0x01
- *      case 0xB0: return 0x0E  (GX_TF_CMPR)
- *      default:   return -1
- * ======================================================================= */
-s32 GStextureGetGXFormat(GStextureHandle* tex, u8 alpha) {
-    u32 fmt = tex->format;
-
-    switch (fmt) {
-        case 0x00: return 0x08;   /* GX_TF_I4 */
-        case 0x01: return 0x09;   /* GX_TF_I8 */
-        case 0x30: return 0x0A;   /* GX_TF_IA4 */
-        case 0x40: return 0x00;   /* GX_TF_I4 variant */
-        case 0x41: return 0x02;   /* GX_TF_RGB565 */
-        case 0x42: return 0x01;   /* GX_TF_RGB5A3 */
-        case 0x43: return 0x03;   /* GX_TF_RGBA8 */
-        case 0x44: return 0x04;   /* GX_TF_C4 */
-        case 0x45: return 0x06;   /* GX_TF_C14X2 */
-        case 0x90: return 0x05;   /* GX_TF_C8 */
-        case 0xB0: return 0x0E;   /* GX_TF_CMPR */
-        case 0xA0:
-            if (alpha == 0) {
-                return 0x27;      /* special alpha-only format */
-            }
-            return 0x01;          /* GX_TF_RGB5A3 */
-        default:
-            return -1;
-    }
-}
-
-/* =======================================================================
- *  GStextureCreate / GStextureCreate
+ *  GStextureCreate
  *  Address: 0x800EF5FC, Size: 0x718
  *
  *  This is the main texture creation function. It:
@@ -626,271 +496,24 @@ GStextureHandle* GStextureCreate(u16 width, u16 height, u32 format,
 }
 
 /* =======================================================================
- *  GStextureConvertCI / fn_800EF098
- *  Address: 0x800EF098, Size: 0x150
- *
- *  Converts a CI (colour-indexed, format 0x44) texture to direct colour.
- *  Allocates a temporary buffer, unswizzles the CI data, copies back,
- *  flushes dcache, and frees the temporary buffer.
- *
- *  Only operates on format 0x44 (CI4) textures.
+ *  fn_800EFD3C | 0x284
+ *  TODO: match -- gs_field_resource.c calls fn_800EFD3C(result) as a
+ *  "WZX overlap check" returning u32 from a single argument; unrelated
+ *  to the old fictional TPL-texture-setup body, so no semantic name is
+ *  asserted here.
  * ======================================================================= */
-void GStextureConvertCI(GStextureHandle* tex) {
-    u32 fmt;
-    u16 pixelCount;
-    u32 bufSize;
-    u16 tmpHandle;
-    u8* tmpData;
-    u16 w;
-    u32 i;
-
-    fmt = tex->format;
-    if (fmt != 0x44) {
-        return;
-    }
-
-    /* Increment ref count to prevent eviction during conversion */
-    tex->refCount++;
-
-    tmpData = (u8*)tex->data;
-    if (tmpData == NULL) {
-        return;
-    }
-
-    w = tex->width;
-    pixelCount = (u16)(w * tex->height);
-    bufSize = (u32)pixelCount << 1;
-
-    /* Allocate temporary buffer */
-    tmpHandle = GSmemAllocRaw(bufSize);
-    if ((tmpHandle & 0xFFFF) == 0) {
-        return;
-    }
-
-    {
-        u8* dst = (u8*)GSmemGetPtr(tmpHandle);
-        u16* srcPalette = (u16*)tmpData;
-        u16 blockW = w >> 2;
-
-        /* Unswizzle CI4 data: iterate over all pixels, look up palette entries,
-         * and write direct-colour pixels to the temp buffer.
-         *
-         * The CI4 format stores 2 pixels per byte in 4x4 blocks.
-         * This loop reconstructs the unswizzled linear pixel order. */
-        for (i = 0; i < pixelCount; i++) {
-            u16 blockX, blockY, subX, subY;
-            u16 palEntry;
-            u32 srcIdx, dstIdx;
-
-            blockY = (u16)((i >> 4) / blockW);
-            blockX = (u16)((i >> 4) % blockW);
-            subY = (u16)((i >> 2) & 3);
-            subX = (u16)(i & 3);
-
-            /* Read palette index from source */
-            palEntry = srcPalette[i];
-
-            /* Compute destination position in linear layout */
-            dstIdx = (blockY * w + subY) + (blockX * 4 + subX);
-            dstIdx <<= 1;
-
-            /* Write to temp buffer */
-            dst[dstIdx]     = (u8)(palEntry >> 8);
-            dst[dstIdx + 1] = (u8)(palEntry & 0xFF);
-        }
-
-        /* Copy converted data back to original buffer */
-        memcpy(tmpData, dst, bufSize);
-    }
-
-    /* Flush and invalidate */
-    DCFlushRange(tex->data, tex->totalSize);
-    GXInvalidateTexAll();
-
-    /* Clean up temporary allocation */
-    tex->refCount--;
-    GSmemLock(tmpHandle);
-    GSmemFree(tmpHandle);
+void fn_800EFD3C(void) {
+    /* TODO: match -- 0x284 bytes at 0x800EFD3C */
 }
 
 /* =======================================================================
- *  GStextureUploadFromBuffer / fn_800EF1E8
- *  Address: 0x800EF1E8, Size: 0x1F8
- *
- *  Copies pixel data from srcBuffer into the texture via GX EFB capture.
- *  Only works for paletted/special formats: 0x40, 0x41-0x43, 0x90, 0xA0.
- *
- *  Steps:
- *    1. Validate format is supported
- *    2. Increment refCount
- *    3. Map internal format to GXTexFmt
- *    4. Read display descriptor for viewport clamp
- *    5. Set up GX scissor/copy state
- *    6. Copy from srcBuffer into the texture's pixel data
- *    7. Flush dcache and invalidate texture cache
- *    8. Decrement refCount
+ *  fn_800EFFC0 | 0x70
+ *  TODO: match -- main.c calls fn_800EFFC0(0x10) with the comment
+ *  "GX FIFO init", not a texture-pool initialiser, so no semantic name
+ *  is asserted here.
  * ======================================================================= */
-u32 GStextureUploadFromBuffer(GStextureHandle* tex, void* srcBuffer) {
-    u32 fmt;
-    s32 gxFmt;
-    u16 copyW, copyH;
-    u8* disp;
-
-    fmt = tex->format;
-
-    /* Only certain formats support EFB upload */
-    if (fmt != 0x90 && fmt != 0x40 && fmt != 0x41 && fmt != 0x42 &&
-        fmt != 0x43 && fmt != 0xA0) {
-        return 0;
-    }
-
-    tex->refCount++;
-
-    disp = (u8*)lbl_80466BC0;
-
-    /* Map format to GXTexFmt */
-    switch (fmt) {
-        case 0x00: gxFmt = 0x08; break;
-        case 0x01: gxFmt = 0x09; break;
-        case 0x30: gxFmt = 0x0A; break;
-        case 0x40: gxFmt = 0x00; break;
-        case 0x41: gxFmt = 0x02; break;
-        case 0x42: gxFmt = 0x01; break;
-        case 0x43: gxFmt = 0x03; break;
-        case 0x44: gxFmt = 0x04; break;
-        case 0x45: gxFmt = 0x06; break;
-        case 0x90: gxFmt = 0x05; break;
-        case 0xB0: gxFmt = 0x0E; break;
-        case 0xA0: gxFmt = 0x27; break;
-        default:   gxFmt = -1;   break;
-    }
-
-    /* Clamp copy dimensions to display size */
-    copyW = *(u16*)(disp + 4);
-    copyH = *(u16*)(disp + 6);
-    if (tex->width < copyW) {
-        copyW = tex->width;
-    }
-    if (tex->height < copyH) {
-        copyH = tex->height;
-    }
-
-    /* Set GX state for EFB copy */
-    fn_800B962C(0, 0, copyW, copyH);
-
-    {
-        u32 mipFlag = (tex->mipLevels == 1) ? 0 : 1;
-        fn_800B96F8(copyW, copyH, gxFmt, mipFlag);
-    }
-
-    GXSetZMode(1, 3, 1);
-
-    /* Copy data from src to texture */
-    fn_800B9FE4(tex->data, srcBuffer);
-
-    fn_800B8E74();     /* GXPixModeSync */
-    GXInvalidateTexAll();     /* GXInvalidateTexAll */
-
-    /* Flush and invalidate */
-    DCFlushRange(tex->data, tex->totalSize);
-    GXInvalidateTexAll();
-
-    tex->refCount--;
-
-    return 1;
-}
-
-/* =======================================================================
- *  GStextureSetupFromTPL / fn_800EFD3C
- *  Address: 0x800EFD3C, Size: 0x284
- *
- *  Sets up a texture from TPL (Texture Palette Library) data.
- *  Resolves relative pointers in the TPL data block to absolute
- *  pointers by adding the texture handle base address.
- *
- *  Steps:
- *    1. For each mip level (up to mipLevels), add the base address
- *       to the mip data offset to produce an absolute pointer.
- *    2. Zero out remaining mip offset slots.
- *    3. If TLUT offset is non-zero, add base to make absolute.
- *    4. Map format to GXTexFmt.
- *    5. Set up GXTlutObj if applicable.
- *    6. Set up GXTexObj with the resolved data pointer.
- *    7. Mark dirty = 1, clear memHandle to 0.
- * ======================================================================= */
-GStextureHandle* GStextureSetupFromTPL(GStextureHandle* tex) {
-    u32 i;
-    u32 level;
-    s32 gxFmt;
-    u32 hasMips;
-
-    /* Step 1: Resolve relative mip data offsets to absolute pointers */
-    for (level = 0; (s32)level < (s32)tex->mipLevels; level++) {
-        tex->mipOffsets[level] = (u32)tex + tex->mipOffsets[level];
-    }
-
-    /* Step 2: Zero out remaining mip slots (up to 8 total) */
-    for (i = tex->mipLevels; i < 8; i++) {
-        tex->mipOffsets[i] = 0;
-    }
-
-    /* Step 3: Resolve TLUT offset to absolute pointer */
-    if (tex->tlutOffset != 0) {
-        tex->tlutOffset = (u32)tex + tex->tlutOffset;
-    }
-
-    /* Step 4: Map format to GXTexFmt */
-    gxFmt = -1;
-    switch (tex->format) {
-        case 0x00: gxFmt = 0x08; break;
-        case 0x01: gxFmt = 0x09; break;
-        case 0x30: gxFmt = 0x0A; break;
-        case 0x40: gxFmt = 0x00; break;
-        case 0x41: gxFmt = 0x02; break;
-        case 0x42: gxFmt = 0x01; break;
-        case 0x43: gxFmt = 0x03; break;
-        case 0x44: gxFmt = 0x04; break;
-        case 0x45: gxFmt = 0x06; break;
-        case 0x90: gxFmt = 0x05; break;
-        case 0xB0: gxFmt = 0x0E; break;
-        case 0xA0: gxFmt = 0x01; break;
-        default:   gxFmt = -1;   break;
-    }
-
-    /* Step 5: Set up GXTlutObj if TLUT data exists */
-    if (tex->tlutOffset != 0) {
-        u32 palSize;
-        u32 tlutWrap;
-
-        palSize = 0;
-        switch (tex->format) {
-            case 0x00: palSize = 0x10;  break;
-            case 0x01: palSize = 0x100; break;
-            case 0x30: palSize = 0x400; break;
-            default:   break;
-        }
-
-        tlutWrap = 0;
-        switch (tex->tlutFormat) {
-            case 1: tlutWrap = 0; break;
-            case 2: tlutWrap = 1; break;
-            case 3: tlutWrap = 2; break;
-            default: break;
-        }
-
-        fn_800BB050(tex->gxTlutObj, (void*)tex->tlutOffset, tlutWrap);
-    }
-
-    /* Step 6: Set up GXTexObj */
-    hasMips = (tex->mipLevels == 1) ? 0 : 1;
-    fn_800BA9E4(tex->gxTexObj, tex->data, tex->width, tex->height,
-                gxFmt, 0, 0, hasMips);
-
-    /* Step 7: Mark dirty, clear memHandle */
-    tex->dirty = 1;
-    tex->memHandle = 0;
-
-    return tex;
+void fn_800EFFC0(void) {
+    /* TODO: match -- 0x70 bytes at 0x800EFFC0 */
 }
 
 /*

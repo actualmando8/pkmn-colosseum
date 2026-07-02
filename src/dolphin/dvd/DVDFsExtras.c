@@ -3,37 +3,28 @@
 #include "dolphin/os/OSCache.h"
 
 /*
- * DVDFsExtras.c - Additional DVD filesystem functions.
+ * DVDFsExtras.c - DVD filesystem helper (tiny unit).
  *
- * Contains DVD filesystem helpers, CARD module stubs, and additional
- * DVD file operations that sit between DVDError.c and VI.c in the
- * link order.
+ * Per config/GC6E01/splits.txt this unit's real address range is only
+ * 0x800A7F80 - 0x800A7FE0 (0x60 bytes), i.e. __DVDDequeueWaitingQueue
+ * below, which is a byte-exact match. The "Matches: 0x800A8178 -
+ * 0x800AA430" range previously claimed here (with fn_800A8178,
+ * VIConfigure, VIWaitForRetrace, VISetNextFrameBuffer, VISetBlack,
+ * getCurrentFieldEvenOdd, VIGetCurrentLine, etc. relabeled as DVD
+ * functions) actually belongs to dolphin/vi/VI_range_800A8178.c and
+ * dolphin/vi/VI_fn_800AA280.c - i.e. the VI (video interface) library,
+ * not DVD filesystem code at all. That block was invented fiction from
+ * a prior transplant pass.
  *
- * Matches: 0x800A8178 - 0x800AA430
- *   fn_800A8178 (0xF8) - DVDConvertPathToEntrynum (part 1)
- *   ShowMessage (0x8C) - __DVDConvertEntrynumToPath helper
- *   DVDSetAutoFatalMessaging (0x70) - DVDGetCurrentDir
- *   fn_800A836C (0x30) - DVDChangeDir
- *   cb          (0xD8) - callback for __fstLoad
- *   __fstLoad   (0x168) - Load FST from disc
- *   fn_800A85DC (0x230) - DVDOpen / DVDOpenFile
- *   fn_800A880C (0x44) - DVDClose / DVDCloseFile
- *   fn_800A8850 (0x44) - DVDReadPrio helper
- *   fn_800A8894 (0xA0) - DVDReadAsyncPrio
- *   fn_800A8934 (0x200) - DVDRead (synchronous)
- *   fn_800A8B34 (0x4B0) - DVDReadDir / DVDOpenDir
- *   VIWaitForRetrace (0x54) - DVDCloseDir
- *   fn_800A9038 (0x2D4) - DVDGetFSTLocation
- *   fn_800A930C (0x1A0) - Internal FST traversal
- *   VIConfigure (0x828) - DVDConvertPathToEntrynum (full)
- *   fn_800A9CD4 (0x394) - Additional path conversion
- *   fn_800AA068 (0x130) - CARD module stub or DVD state helper
- *   VISetNextFrameBuffer (0x6C)  - __DVDCheckDevice
- *   VISetBlack (0x7C)  - __DVDCheckDisk
- *   fn_800AA280 (0x08)  - stub
- *   getCurrentFieldEvenOdd (0x68)  - __DVDGetCoverStatus
- *   fn_800AA2F0 (0xA8)  - __DVDPrepareReset
- *   VIGetCurrentLine (0x98)  - __DVDPrepareResetAsync
+ * 2026-07-02 reconciliation: removed the fictional definitions of
+ * DVDFastOpen, DVDClose, DVDChangeDir, __DVDCheckDevice, __DVDCheckDisk,
+ * __DVDFsStub and __DVDGetCoverStatus, and the fictional body of
+ * __DVDPrepareReset (kept as an extern declaration; __DVDPrepareResetAsync
+ * below still calls it). DVDConvertPathToEntrynum, DVDOpen,
+ * DVDGetCurrentDir, cb and __DVDPrepareResetAsync were left untouched:
+ * their names DO exist in symbols.txt (so they are not "orphans" by this
+ * pass's definition), just at addresses in other units - a separate,
+ * out-of-scope wrong-unit-placement problem.
  */
 
 extern void* memcpy(void* dest, const void* src, u32 n);
@@ -171,29 +162,14 @@ s32 DVDConvertPathToEntrynum(const char* path) {
 }
 
 /*
- * DVDFastOpen - Open a file by entry number.
- * 0x800A85DC | size: 0x230
+ * DVDFastOpen - orphan removed (see file header). Not present in
+ * symbols.txt; this file's claimed address (0x800A85DC) actually
+ * belongs to dolphin/vi/VI_range_800A8178.c per splits.txt, not this
+ * unit. A second, differently-sized invented copy also lived in
+ * DVD.c (also removed). Declaration remains in dolphin/dvd/dvd.h
+ * because DVDOpen() below still calls it (declared via dolphin/dvd/dvd.h,
+ * included at the top of this file).
  */
-BOOL DVDFastOpen(s32 entrynum, DVDFileInfo* fileInfo) {
-    FSTEntry* fst;
-
-    if (entrynum < 0 || (u32)entrynum >= __FSTMaxEntries) {
-        return FALSE;
-    }
-
-    fst = __FSTStart;
-
-    /* Must be a file, not a directory */
-    if (fst[entrynum].isDirAndStringOff & 0xFF000000) {
-        return FALSE;
-    }
-
-    fileInfo->startAddr = fst[entrynum].file.fileOffset;
-    fileInfo->length = fst[entrynum].file.fileLength;
-    fileInfo->cb.state = 0;
-
-    return TRUE;
-}
 
 /*
  * DVDOpen - Open a file by path.
@@ -210,13 +186,13 @@ BOOL DVDOpen(const char* path, DVDFileInfo* fileInfo) {
 }
 
 /*
- * DVDClose - Close a file.
- * 0x800A880C | size: 0x44
+ * DVDClose - orphan removed (see file header). Not present in
+ * symbols.txt; claimed address (0x800A880C) belongs to
+ * dolphin/vi/VI_range_800A8178.c per splits.txt, not this unit. A
+ * second, differently-sized invented copy also lived in DVD.c (also
+ * removed). Declaration remains in dolphin/dvd/dvd.h because DVDOpen()
+ * below still calls it.
  */
-BOOL DVDClose(DVDFileInfo* fileInfo) {
-    DVDCancel(&fileInfo->cb);
-    return TRUE;
-}
 
 /*
  * DVDGetCurrentDir - Get the current directory entry number.
@@ -227,64 +203,29 @@ u32 DVDGetCurrentDir(void) {
 }
 
 /*
- * DVDChangeDir - Change the current directory.
- * 0x800A836C | size: 0x30
+ * DVDChangeDir, __DVDCheckDevice, __DVDCheckDisk, __DVDFsStub,
+ * __DVDGetCoverStatus, __DVDPrepareReset - orphans removed (see file
+ * header). None of these names are present in symbols.txt; all claimed
+ * addresses (0x800A836C, 0x800AA198-0x800AA398) actually belong to
+ * dolphin/vi/VI_range_800A8178.c and dolphin/vi/VI_fn_800AA280.c per
+ * splits.txt (this unit's real range is only 0x800A7F80-0x800A7FE0,
+ * i.e. __DVDDequeueWaitingQueue below). The DVDChangeDir prototype in
+ * dolphin/dvd/dvd.h had no remaining callers and was removed too.
+ * DVDChangeDir's real body called DVDConvertPathToEntrynum, which is
+ * unrelated and untouched.
+ *
+ * __DVDPrepareResetAsync below still calls __DVDPrepareReset; kept as
+ * a bare extern declaration so this TU still compiles.
  */
-BOOL DVDChangeDir(const char* path) {
-    s32 entrynum;
-
-    entrynum = DVDConvertPathToEntrynum(path);
-    if (entrynum < 0) {
-        return FALSE;
-    }
-
-    __DVDCurrentDir = (u32)entrynum;
-    return TRUE;
-}
+extern void __DVDPrepareReset(void);
 
 /*
- * __DVDCheckDevice - Check device status.
- * 0x800AA198 | size: 0x6C
- */
-BOOL __DVDCheckDevice(void) {
-    return TRUE;
-}
-
-/*
- * __DVDCheckDisk - Check disc presence.
- * 0x800AA204 | size: 0x7C
- */
-BOOL __DVDCheckDisk(void) {
-    return TRUE;
-}
-
-/*
- * fn_800AA280 - Stub.
- * 0x800AA280 | size: 0x08
- */
-void __DVDFsStub(void) {
-}
-
-/*
- * __DVDGetCoverStatus - Get the disc cover status.
- * 0x800AA288 | size: 0x68
- */
-u32 __DVDGetCoverStatus(void) {
-    volatile u32* diRegs = (volatile u32*)0xCC006000;
-    return diRegs[1] & 0x4;
-}
-
-/*
- * __DVDPrepareReset - Prepare the DVD subsystem for reset.
- * 0x800AA2F0 | size: 0xA8
- */
-void __DVDPrepareReset(void) {
-    /* Stop any in-progress DVD operations before reset */
-}
-
-/*
- * __DVDPrepareResetAsync - Async version of prepare reset.
- * 0x800AA398 | size: 0x98
+ * __DVDPrepareResetAsync - NOT removed (out of scope for this pass:
+ * not in the orphan worklist). The name IS present in symbols.txt, but
+ * at 0x800A7CCC - a different unit than this file, so it is a
+ * wrong-unit placement rather than a pure orphan; left untouched.
+ * Only its __DVDPrepareReset() callee (a listed orphan) was removed
+ * above.
  */
 void __DVDPrepareResetAsync(void (*callback)(void)) {
     __DVDPrepareReset();

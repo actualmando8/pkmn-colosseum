@@ -21,6 +21,14 @@
  *   "gs%04d.xfb"
  *
  * Address range: 0x8017572C - 0x8017A5FC (22KB, 78 functions)
+ *
+ * Eleven addresses previously declared here under invented GSscene_*
+ * names collided with real, differently-named symbols.txt entries
+ * (psKillAllGenerator, psRemoveGenerator, psGetNewIDNum) or are still
+ * unnamed fn_ scaffolds; those declarations have been corrected/removed
+ * below (see gs_scene.c's header comment for the full mapping). The
+ * genuinely-matched GSscene_* declarations (camera vectors, mode) are
+ * real and unchanged.
  */
 #ifndef GS_SCENE_H
 #define GS_SCENE_H
@@ -56,12 +64,12 @@ typedef struct GSSceneRenderEntry {
  * Public API
  * =================================================================== */
 
-/** fn_8017572C */ void   GSscene_ProcessFreeList(void);
-/** fn_80175B94 */ void*  GSscene_SpawnObject(u32 type, u32 param);
-/** psGetNewIDNum */ u32    GSscene_GetObjectCount(void);
-/** fn_80177A64 */ void   GSscene_XFBCapture(u32 captureIndex);
-/** fn_80178AA8 */ void   GSscene_CameraUpdate(u32 sceneObj);
-/** fn_80179020 */ void   GSscene_CameraInterpolate(u32 camera);
+/** real name (symbols.txt) */ void   psKillAllGenerator(void);
+/** real name (symbols.txt) */ void*  psRemoveGenerator(u32 type, u32 param);
+/** real name (symbols.txt) */ u32    psGetNewIDNum(void);
+/** unnamed scaffold */ void   fn_80177A64(u32 captureIndex);
+/** unnamed scaffold */ void   fn_80178AA8(void* sceneObj);
+/** unnamed scaffold */ void   fn_80179020(void* camera);
 /** 0x801778B4 */ void   GSscene_GetCameraDirectionVector(void* dst);
 /** 0x801778DC */ void   GSscene_SetCameraDirectionVector(void* src);
 /** 0x80177830 */ void   GSscene_GetCameraRotationVector(void* dst);
@@ -72,9 +80,9 @@ typedef struct GSSceneRenderEntry {
 /** 0x80177984 */ void   GSscene_SetCameraViewVector(void* src);
 /** 0x80177A38 */ u32    GSscene_GetMode(void);
 /** 0x80177A44 */ u32    GSscene_SetMode(u32 mode);
-/** fn_80179FA4 */ void   GSscene_Init(void);
-/** fn_80176948 */ f32    GSscene_GetPositionX(u32 obj);
-/** fn_8017697C */ f32    GSscene_GetPositionY(void* obj);
-/** fn_801769B0 */ f32    GSscene_GetPositionZ(void* obj);
+/** unnamed scaffold */ void   fn_80179FA4(void);
+/** unnamed scaffold */ f32    fn_80176948(void* obj);
+/** unnamed scaffold */ f32    fn_8017697C(void* obj);
+/** unnamed scaffold */ f32    fn_801769B0(void* obj);
 
 #endif /* GS_SCENE_H */

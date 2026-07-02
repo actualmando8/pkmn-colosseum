@@ -74,7 +74,7 @@
  * fn_801FB1C0 - TrainerDataGet
  * Read a field from a trainer or their party.
  *
- * @param pokemon  Pokemon context pointer (r3, can be from PokemonSlotLookupDefault)
+ * @param pokemon  Pokemon context pointer (r3, can be from fn_801F025C)
  * @param slot     Trainer slot/index (r4)
  * @param field    Trainer field ID (r5)
  * @param extra    Extra parameter for sub-indexed fields (r6)
@@ -99,28 +99,18 @@ u32 TrainerDataGet(void* pokemon, u32 slot, u16 field, u32 extra);
 u32 TrainerDataSet(void* pokemon, u32 slot, u16 field, u32 extra, u32 value);
 
 /**
- * fn_80205B8C - GetTrainerPokemonPtr
- * Navigate from a trainer/party context to a specific Pokemon's data pointer.
- * Calls fn_8012640C twice: first with field 0xD6, then with field 0xCC.
- * 668 call sites.
- *
- * @param context  Trainer/party context pointer
- * @return         Pokemon data pointer, or NULL
+ * fn_80205B8C / fn_80205BE8 - trainer -> party -> Pokemon pointer navigation
+ * (two-hop and single-hop). Implemented and matched at 100% in
+ * colosseum_event.c, not in this file.
  */
-void* GetTrainerPokemonPtr(void* context);
 
 /**
  * fn_80236BFC - CheckTrainerPokemonFlag
  * Query a boolean flag on a specific Pokemon owned by a trainer.
  * Calls TrainerDataGet three times to resolve trainer -> party -> Pokemon,
  * then checks a flag via fn_802026E4.
- * 272 call sites.
- *
- * @param trainerCtx  Trainer context
- * @param slotIndex   Party slot
- * @param flagId      Flag to check
- * @return            TRUE if flag is set
+ * 272 call sites. Not yet decompiled (no definition in this TU); the
+ * only prior "caller" was fictional and has been removed.
  */
-BOOL CheckTrainerPokemonFlag(void* trainerCtx, u32 slotIndex, u16 flagId);
 
 #endif /* GAME_TRAINER_H */

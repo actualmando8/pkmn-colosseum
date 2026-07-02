@@ -109,6 +109,14 @@
  *     Byte 0: opcode
  *     Bytes 1-4: optional 32-bit operand (jump target, value, etc.)
  *
+ * Note: this file previously carried two unreferenced fictional
+ * definitions -- ShadowPokemonCheck and CheckBattleCondition -- claiming
+ * addresses fn_8025A254 and fn_8025A220. Both addresses are actually
+ * implemented and matched at 100% elsewhere in this file (Ghidra-import
+ * block); the fictional duplicates have been removed. CheckTrainerPokemonFlag
+ * (fn_80236BFC) remains undecompiled -- its only caller was the removed
+ * CheckBattleCondition fiction.
+ *
  * =========================================================================
  */
 
@@ -2723,41 +2731,9 @@ void fn_8024E690(void* ctx, u32 param1, u32 param2, u32 param3) {
     return;
 }
 
-/* =========================================================================
- * fn_8025A254 - ShadowPokemonCheck
- *
- * Small helper (0x3C bytes) that checks if a Pokemon at a given
- * party index is a Shadow Pokemon. Demonstrates the data access pattern:
- *
- *   PokemonSlotLookupDefault(0x02) -> Pokemon pointer
- *   fn_801F6E44(pointer, 0x4C) -> shadow status
- *   return (status != 2)
- *
- * This is one of the few functions small enough to fully reconstruct:
- * ========================================================================= */
-BOOL ShadowPokemonCheck(void) {
-    void* pokemon;
-    u8 status;
-
-    pokemon = (void*)PokemonSlotLookupDefault(0x02, 0);
-    /* fn_801F6E44 reads a field at offset 0x4C, returning shadow status */
-    /* status = fn_801F6E44(pokemon, 0x4C); */
-    /* return (status != 2); */
-    return FALSE; /* Placeholder */
-}
-
-/* =========================================================================
- * fn_8025A220 - CheckBattleCondition
- *
- * Small helper (0x34 bytes) that checks a specific battle condition
- * via CheckTrainerPokemonFlag with flagId 0x0F.
- *
- * return (!CheckTrainerPokemonFlag(r3, r4, 0x0F));
- * ========================================================================= */
-BOOL CheckBattleCondition(void* context, u32 slot) {
-    BOOL flagSet = CheckTrainerPokemonFlag(context, slot, 0x0F);
-    return !flagSet;
-}
+/* Note: fn_8025A254 (Shadow Pokemon check) and fn_8025A220 (battle
+ * condition/flag check via fn_80236BFC) are implemented and matched at
+ * 100% further below in this file (Ghidra-import block), not here. */
 
 /* =========================================================================
  * fn_8025A290 - ProcessBattleResult
@@ -32100,8 +32076,14 @@ u32 fn_8025D9F0(void)
 }
 
 
-/* Address: 0x8025DA18 | Size: 0x24 | Pattern: null_check_getter */
-u32 fn_8025DA18(void* ctx) { if (ctx == NULL) return 0; return 0; /* stub */ }
+/* Address: 0x8025DA18 | Size: 0x24 | Pattern: accessor */
+u32 fn_8025DA18(void* ctx) {
+    extern void* fn_8006B09C(void*);
+    extern u32 fn_8006A7D8(void);
+
+    fn_8006B09C(ctx);
+    return fn_8006A7D8();
+}
 
 /* fn_8025DA3C | Size: 0x4C | Get battle party size based on mode */
 u32 fn_8025DA3C(void) {
@@ -33127,14 +33109,18 @@ void fn_8025F70C(int r3,u32 r4,u32 r5)
   return;
 }
 
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
 /* Address: 0x8025F7E8 | Size: 0x34 | Ghidra import */
 void __GBASyncCallback(int r3)
 
 {
     extern int OSWakeupThread();
-  OSWakeupThread(r3 * 0x100 + -0x7fb87bfc);
+  OSWakeupThread(lbl_804783E0 + r3 * 0x100 + 0x24);
   return;
 }
+#pragma pop
 
 /* Address: 0x8025F81C | Size: 0x6C | Ghidra import */
 u32 __GBASync(int r3)
@@ -34006,6 +33992,47 @@ LAB_0025e130:
   return uVar3;
 }
 
+/* Address: 0x8026132C | Size: 0x5C | Ghidra import */
+u32 evolutionOpen(u32 r3, u32 r4, u32 r5, u16 *r6, u32 r7, u8 *r8)
+{
+    extern u32 lbl_804787E0[];
+    extern void fn_800FF730(u32);
+    extern void fn_8011288C(u32, u32);
+    extern void _threadSwitch(void);
+    u32 *base;
+
+    base = lbl_804787E0;
+    base[0] = r3;
+    base[1] = r4;
+    base[2] = r5;
+    base[3] = r7;
+    base[4] = (u32)r6;
+    base[5] = (u32)r8;
+    fn_800FF730(0x386);
+    fn_8011288C(0, 0);
+    _threadSwitch();
+    return base[6];
+}
+
+/* Address: 0x80261388 | Size: 0x4C | Ghidra import */
+u32 charNameBiosSearchIndex(u32 value)
+{
+    extern u32 *lbl_80478F80;
+    extern u32 *lbl_80478F84;
+    u32 count;
+    u32 *table;
+    u16 i;
+
+    count = *lbl_80478F80;
+    table = lbl_80478F84;
+    for (i = 0; i < count; i++) {
+        if (table[(u32)i * 2 + 1] == value) {
+            return i;
+        }
+    }
+    return 0;
+}
+
 /* Address: 0x802613D4 | Size: 0x70 | Ghidra import */
 #pragma peephole off
 u32 fn_802613D4(u32 idx) {
@@ -34029,6 +34056,29 @@ u32 fn_802613D4(u32 idx) {
     return *(u32*)(entry + 4);
 }
 #pragma peephole on
+
+/* Address: 0x80261444 | Size: 0x70 | Ghidra import */
+u32 charNameBiosGetHearFlag(u32 idx)
+{
+    extern void* lbl_80478F80;
+    extern void* lbl_80478F84;
+    extern void fn_800DD970(char*, char*, ...);
+    extern char lbl_8027A4C8[];
+    extern char lbl_8039A6C8[];
+    u8* entry;
+    u16 i = (u16)idx;
+
+    if (i >= *(u32*)lbl_80478F80) {
+        fn_800DD970(lbl_8027A4C8, lbl_8039A6C8);
+        entry = NULL;
+    } else {
+        entry = (u8*)lbl_80478F84 + i * 8;
+    }
+    if (entry == NULL) {
+        return 0;
+    }
+    return *(u16*)entry;
+}
 
 /* Address: 0x802614B4 | Size: 0x88 | Ghidra import */
 int fn_802614B4(void)
@@ -34280,6 +34330,58 @@ LAB_0025e8fc:
   return 1;
 }
 
+/* Address: 0x80261AD0 | Size: 0x98 | Ghidra import */
+void fn_80261AD0(s8 timerMode)
+{
+    extern void fn_801F2B5C();
+    extern u32 fn_801F37B0();
+    extern u8 fn_801F1700(u32);
+    extern u8 fn_801F1758(u32);
+    extern void fn_8000DDE8(void);
+    extern void fn_8000DD5C(void);
+    extern u32 fn_80261D8C();
+    extern u32 fn_80262084();
+    u8 openStatus;
+
+    fn_801F2B5C(0, fn_80261D8C, 0, 0);
+    openStatus = 1;
+    fn_801F37B0(0, fn_80262084, &openStatus, 0);
+    if (timerMode < 0) {
+        if (fn_801F1700(0) == 1) {
+            fn_8000DDE8();
+        }
+    }
+    if (fn_801F1758(0) == 1) {
+        fn_8000DD5C();
+    }
+}
+
+/* Address: 0x80261B68 | Size: 0x84 | Ghidra import */
+void fightMenuAllFightTrainerCloseStatusMenu(u32 wait)
+{
+    extern void fn_801F2B5C();
+    extern void _threadSwitch(void);
+    extern u32 fn_80261BEC();
+    extern u32 fn_80261CBC();
+    u32 one;
+    u32 (*callback)();
+    u8 done;
+
+    fn_801F2B5C(0, fn_80261CBC, 0, 0);
+    if ((u8)wait == 1) {
+        one = 1;
+        callback = fn_80261BEC;
+        do {
+            done = one;
+            fn_801F2B5C(0, callback, &done, 0);
+            if (done == 1) {
+                break;
+            }
+            _threadSwitch();
+        } while (1);
+    }
+}
+
 /* Address: 0x80261BEC | Size: 0xD0 | Ghidra import */
 u32 fn_80261BEC(u32 r3,u32 r4,u8 *r5)
 
@@ -34395,7 +34497,28 @@ u32 fn_80261D8C(u32 r3, u32 r4)
     local_20 = local_28;
     local_1c = local_24;
     fn_801026A4(uVar5, 0, 0, 0, 0, 1, &local_20);
-    return 1;
+  return 1;
+}
+
+/* Address: 0x80261E7C | Size: 0x7C | Ghidra import */
+void fightMenuAllFightOutPokemonCloseStatusMenu(u32 wait)
+{
+    extern u32 fn_801F37B0();
+    extern void _threadSwitch(void);
+    extern u32 fn_80261EF8();
+    extern u32 fn_80261FB4();
+    u32 (*callback)();
+
+    fn_801F37B0(0, fn_80261FB4, 0, 0);
+    if ((u8)wait == 1) {
+        callback = fn_80261EF8;
+        do {
+            if ((u8)fn_801F37B0(0, callback, 0, 0) == 1) {
+                break;
+            }
+            _threadSwitch();
+        } while (1);
+    }
 }
 
 /* Address: 0x80261EF8 | Size: 0xBC | Ghidra import */
@@ -34543,6 +34666,126 @@ u32 fn_80262084(u32 r3,u32 r4,char *r5)
     fn_801026A4(uVar11,0xffffffff,0,0,0,1,local_48);
   }
   return 1;
+}
+
+/* Address: 0x802621C4 | Size: 0x30 | Ghidra import */
+void fightMenuOpenLevelUpStatusMenu(u8 *dst, u8 value)
+{
+    extern void fn_80105E7C(u8 *, u32);
+
+    if (dst != NULL) {
+        *dst = value;
+        fn_80105E7C(dst, 1);
+    }
+}
+
+/* Address: 0x802621F4 | Size: 0x7C | Ghidra import */
+void fightMenuSubMenuLvupStatus(s16 *current, s16 *previous, s16 *out)
+{
+    if (current == NULL) {
+        return;
+    }
+    if (previous == NULL) {
+        return;
+    }
+    if (out == NULL) {
+        return;
+    }
+    out[1] = current[1] - previous[1];
+    out[2] = current[2] - previous[2];
+    out[3] = current[3] - previous[3];
+    out[5] = current[5] - previous[5];
+    out[6] = current[6] - previous[6];
+    out[4] = current[4] - previous[4];
+}
+
+/* Address: 0x80262270 | Size: 0x74 | Ghidra import */
+s32 fightMenuWazaWasure(u32 r3, u32 r4)
+{
+    extern f32 lbl_8047E6C8;
+    extern s32 fn_80097A38(u32, u32);
+    s32 result;
+
+    fadeSet((double)lbl_8047E6C8, 3);
+    fadeCheck(1);
+    result = fn_80097A38(r3, r4);
+    if (result == 4) {
+        result = -1;
+    }
+    fadeSet((double)lbl_8047E6C8, 2);
+    fadeCheck(1);
+    return result;
+}
+
+/* Address: 0x802622E4 | Size: 0x24 | Ghidra import */
+void fn_802622E4(void)
+{
+    extern void fn_80105C68(u32);
+
+    fn_80105C68(1);
+}
+
+/* Address: 0x80262308 | Size: 0x2C | Ghidra import */
+u32 fn_80262308(void)
+{
+    extern s8 fn_8001E184(void);
+
+    return fn_8001E184() == 0;
+}
+
+/* Address: 0x80262334 | Size: 0x80 | Ghidra import */
+u32 fn_80262334(u32 msgId, u32 unused, u32 itemId)
+{
+    extern u32 itemGetStatus(u32, u32, u32, u32);
+    extern u32 fn_800FA280(u32);
+
+    fn_80132A38(0x10, msgId);
+    fn_80132A38(0x29, fn_800FA280(itemGetStatus(0, itemId, 1, 0)));
+    if (msgId != 0) {
+        fn_80106394(msgId, 1, 1);
+        return 1;
+    }
+    return 0;
+}
+
+/* Address: 0x802623B4 | Size: 0xB8 | Ghidra import */
+u32 fn_802623B4(u32 msgId, u32 pokemon)
+{
+    extern u32 fn_8011BEB4(u32, u32, u32, u32);
+    extern u32 fn_800FA280(u32);
+
+    fn_80132A38(0xf, msgId);
+    fn_80132A38(0xd, fn_800FA280(fn_8011BEB4(0, pokemon, 0xa, 0)));
+    fn_80132A38(0x28, fn_800FA280(fn_8011BEB4(0, pokemon, 1, 0)));
+    fn_80132A38(0xe, fn_800FA280(fn_8011BEB4(0, pokemon, 0xb, 0)));
+    fn_80106394(0x768d, 1, 1);
+    return 1;
+}
+
+/* Address: 0x8026246C | Size: 0x24 | Ghidra import */
+void fn_8026246C(void)
+{
+    fn_80106080(0);
+}
+
+/* Address: 0x80262490 | Size: 0x3C | Ghidra import */
+u32 fn_80262490(u32 msgId)
+{
+    if (msgId != 0) {
+        fn_80106244(msgId, 1, 1);
+        return 1;
+    }
+    return 0;
+}
+
+/* Address: 0x802624CC | Size: 0x3C | Ghidra import */
+u32 fn_802624CC(u32 msgId)
+{
+    if (msgId != 0) {
+        fn_80106394(msgId, 1, 1);
+        return 1;
+    }
+    return 0;
 }
 
 /* Address: 0x80264ADC | Size: 0x27C | Ghidra import */
@@ -34867,48 +35110,199 @@ void fn_80265754(u32 r3,u32 r4)
   return;
 }
 
-/* Address: 0x8026595C | Size: 0x48 | Ghidra import */
+typedef struct ColosseumBattleTimerState {
+  u8 done;
+  u8 forceDone;
+  u8 pad[2];
+  f32 elapsed;
+  f32 limit;
+  u32 thread;
+} ColosseumBattleTimerState;
 
-double fn_8026595C(void)
-
+/* Address: 0x802658C8 | Size: 0x5C | Ghidra import */
+void fn_802658C8(void)
 {
-    extern u32 DAT_80478801;
-    extern u32 _DAT_80478804;
-    extern u32 _DAT_80478808;
-    extern u32 _DAT_8047880c;
+    extern ColosseumBattleTimerState lbl_80478800;
+    extern f32 lbl_8047E6D8;
+    extern void fn_800F05A0(u32);
+    ColosseumBattleTimerState *state;
+
+    state = &lbl_80478800;
+    if (state->thread != 0) {
+        fn_800F05A0(state->thread);
+    }
+    state->done = 0;
+    state->thread = 0;
+    state->elapsed = lbl_8047E6D8;
+    state->limit = lbl_8047E6D8;
+    state->forceDone = 0;
+}
+
+/* Address: 0x80265924 | Size: 0x38 | Ghidra import */
+u32 fn_80265924(void)
+{
+    extern ColosseumBattleTimerState lbl_80478800;
+    ColosseumBattleTimerState *state;
+
+    state = &lbl_80478800;
+    if (state->forceDone == 1) {
+        return 0;
+    }
+    if (state->thread == 0) {
+        return 1;
+    }
+    return state->done;
+}
+
+/* Address: 0x8026595C | Size: 0x48 | Ghidra import */
+f32 fn_8026595C(void)
+{
+    extern ColosseumBattleTimerState lbl_80478800;
     extern f32 lbl_8047E6D8;
     extern f32 lbl_8047E6DC;
     extern f32 lbl_8047E6E8;
+    ColosseumBattleTimerState *state;
 
-  if (DAT_80478801 == '\x01') {
-    return (double)lbl_8047E6E8;
-  }
-  if (_DAT_8047880c == 0) {
-    return (double)lbl_8047E6D8;
-  }
-  return (double)(_DAT_80478808 - _DAT_80478804 / lbl_8047E6DC);
+    state = &lbl_80478800;
+    if (state->forceDone == 1) {
+        return lbl_8047E6E8;
+    }
+    if (state->thread == 0) {
+        return lbl_8047E6D8;
+    }
+    return state->limit - state->elapsed / lbl_8047E6DC;
+}
+
+/* Address: 0x802659A4 | Size: 0x54 | Ghidra import */
+u32 fn_802659A4(void)
+{
+    extern ColosseumBattleTimerState lbl_80478800;
+    extern void fn_800F0438(u32);
+    ColosseumBattleTimerState *state;
+
+    state = &lbl_80478800;
+    if (state->forceDone == 1) {
+        return 0;
+    }
+    if (state->thread == 0) {
+        return 0;
+    }
+    fn_800F0438(state->thread);
+    return 1;
+}
+
+/* Address: 0x802659F8 | Size: 0x74 | Ghidra import */
+void fn_802659F8(void)
+{
+    extern ColosseumBattleTimerState lbl_80478800;
+    extern u32 fn_800FF560(void);
+    extern u32 GSthreadCreate(u32, u32, u32, u32, u32, u32);
+    extern void fn_800F0654(u32, u32, ...);
+    extern void fn_80265DB0(u8 *);
+    ColosseumBattleTimerState *state;
+    u32 thread;
+
+    state = &lbl_80478800;
+    if (state->forceDone != 1) {
+        thread = GSthreadCreate(1, fn_800FF560(), 0x4000, 1, 0, (u32)fn_80265DB0);
+        if (thread != 0) {
+            state->thread = thread;
+            fn_800F0654(thread, 1);
+        }
+    }
+}
+
+/* Address: 0x80265B3C | Size: 0x38 | Ghidra import */
+u32 fn_80265B3C(void)
+{
+    extern ColosseumBattleTimerState lbl_80478810;
+    ColosseumBattleTimerState *state;
+
+    state = &lbl_80478810;
+    if (state->forceDone == 1) {
+        return 0;
+    }
+    if (state->thread == 0) {
+        return 1;
+    }
+    return state->done;
 }
 
 /* Address: 0x80265B74 | Size: 0x48 | Ghidra import */
-
-double fn_80265B74(void)
-
+f32 fn_80265B74(void)
 {
-    extern u32 DAT_80478811;
-    extern u32 _DAT_80478814;
-    extern u32 _DAT_80478818;
-    extern u32 _DAT_8047881c;
+    extern ColosseumBattleTimerState lbl_80478810;
     extern f32 lbl_8047E6D8;
     extern f32 lbl_8047E6DC;
     extern f32 lbl_8047E6E8;
+    ColosseumBattleTimerState *state;
 
-  if (DAT_80478811 == '\x01') {
-    return (double)lbl_8047E6E8;
-  }
-  if (_DAT_8047881c == 0) {
-    return (double)lbl_8047E6D8;
-  }
-  return (double)(_DAT_80478818 - _DAT_80478814 / lbl_8047E6DC);
+    state = &lbl_80478810;
+    if (state->forceDone == 1) {
+        return lbl_8047E6E8;
+    }
+    if (state->thread == 0) {
+        return lbl_8047E6D8;
+    }
+    return state->limit - state->elapsed / lbl_8047E6DC;
+}
+
+/* Address: 0x80265BBC | Size: 0x54 | Ghidra import */
+u32 fn_80265BBC(void)
+{
+    extern ColosseumBattleTimerState lbl_80478810;
+    extern void fn_800F0438(u32);
+    ColosseumBattleTimerState *state;
+
+    state = &lbl_80478810;
+    if (state->forceDone == 1) {
+        return 0;
+    }
+    if (state->thread == 0) {
+        return 0;
+    }
+    fn_800F0438(state->thread);
+    return 1;
+}
+
+/* Address: 0x80265C10 | Size: 0x74 | Ghidra import */
+void fn_80265C10(void)
+{
+    extern ColosseumBattleTimerState lbl_80478810;
+    extern u32 fn_800FF560(void);
+    extern u32 GSthreadCreate(u32, u32, u32, u32, u32, u32);
+    extern void fn_800F0654(u32, u32, ...);
+    extern void fn_80265DB0(u8 *);
+    ColosseumBattleTimerState *state;
+    u32 thread;
+
+    state = &lbl_80478810;
+    if (state->forceDone != 1) {
+        thread = GSthreadCreate(1, fn_800FF560(), 0x4000, 1, 0, (u32)fn_80265DB0);
+        if (thread != 0) {
+            state->thread = thread;
+            fn_800F0654(thread, 1);
+        }
+    }
+}
+
+/* Address: 0x80265D54 | Size: 0x5C | Ghidra import */
+void fn_80265D54(void)
+{
+    extern ColosseumBattleTimerState lbl_80478810;
+    extern f32 lbl_8047E6D8;
+    extern void fn_800F05A0(u32);
+    ColosseumBattleTimerState *state;
+
+    state = &lbl_80478810;
+    if (state->thread != 0) {
+        fn_800F05A0(state->thread);
+    }
+    state->done = 0;
+    state->thread = 0;
+    state->elapsed = lbl_8047E6D8;
+    state->limit = lbl_8047E6D8;
+    state->forceDone = 0;
 }
 
 /* Address: 0x80265E34 | Size: 0x48 | Ghidra import */

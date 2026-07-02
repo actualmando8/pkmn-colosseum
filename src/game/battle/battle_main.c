@@ -2,49 +2,23 @@
  * @file battle_main.c
  * @brief Main battle loop, fight start/end, and core fight flow control.
  *
- * Address range: 0x801EF02C - 0x801F000C (26 functions)
- * Key functions:
- *   fn_801EFA08 (battle_MainLoop)   - Main battle thread loop, 0x5BC bytes
- *   _fightInitialize__FUi14FloorEnterMode (battle_FightStart) - Initializes battle, spawns main loop thread
- *   _fightFinalize__FUi14FloorEnterMode (battle_FightEnd)   - Cleans up after battle, releases resources
+ * Address range: 0x801EF02C - 0x801F000C (26 functions), per
+ * config/GC6E01/splits.txt.
  *
- * The battle system entry point is battle_FightStart, which:
- *   1. Checks if a battle is already running (fn_800FF548)
- *   2. Prints "---------- fight start !! ----------" via GSlog
- *   3. Sets the fight-in-progress flag (lbl_8047B5DA)
- *   4. Saves current scene state (lbl_8047B5D4, lbl_8047B5D5)
- *   5. Initializes the battle scene (fn_801F108C)
- *   6. Loads waza (move animation) data (fn_801DAEF8)
- *   7. Saves People system state (GSscene_GetMode)
- *   8. Configures the battle grid camera objects via fn_801F0B00
- *   9. Spawns battle_MainLoop as a thread via GSthread (GSthreadCreate)
- *      with priority 0x14, stack size 0x4000
- *
- * battle_MainLoop runs on its own thread and:
- *   1. Starts a sound effect (fn_801659FC, BGM id 0x3E8)
- *   2. Initializes battle subsystems (fn_8020C840)
- *   3. Sets up the battle camera (fadeSet)
- *   4. Configures scene rendering passes via fn_801F0B00
- *   5. Enters a polling loop that:
- *      a. Saves/restores VSync state (fn_801337A0/fn_801337A8)
- *      b. Checks pad input for debug fast-forward (fn_80103BA8)
- *      c. Reads battle status flags (fn_801EF634)
- *      d. Calls battle_FightEnd or scene callbacks
- *   6. On fight end, transitions through multiple rendering passes
- *      to fade out the battle scene
- *
- * battle_FightEnd:
- *   1. Stops floor/world updates (fn_800FF560)
- *   2. Stops particle effects (fn_800F04C4)
- *   3. Iterates through 21 scene objects (from lbl_80279B84 rodata table)
- *      and releases each one via fn_80102568
- *   4. Restores People system state (GSscene_SetMode)
- *   5. Cleans up battle grid (fn_801C31EC)
- *   6. Cleans up waza system (fn_801DAC90)
- *   7. Stops any active sound (soundStop)
- *   8. Fades out battle music (fn_80165A20)
- *   9. Restores VSync mode (fn_801337A8)
- *   10. Prints "---------- fight end !! ----------" via GSlog
+ * A prior transplant pass had introduced nine fictional `battle_*` wrapper
+ * functions (battle_SetResult, battle_GetResult, battle_SetStatusFlags,
+ * battle_GetStatusFlags, battle_IsFightInProgress, battle_FightReset,
+ * battle_FightEnd, battle_FightCleanup, battle_FightStart). None of these
+ * names appear in config/GC6E01/symbols.txt. The first five duplicated the
+ * real, already-matched accessor scaffolds (fn_801EF61C/624/62C/634/63C).
+ * The remaining four claimed to be the bodies of real unmatched symbols
+ * (fn_801EF5C0, _fightFinalize__FUi14FloorEnterMode, fn_801EF488,
+ * _fightInitialize__FUi14FloorEnterMode) but used (void) signatures that
+ * contradict the mangled names' implied (u32, FloorEnterMode) parameters,
+ * referenced a nonexistent `battle_MainLoop` symbol, and had internally
+ * inconsistent bodies (e.g. filling a 3-entry config array but only
+ * passing count=2 to fn_800FF4D4) -- consistent with invented bodies
+ * rather than real decompilation. All nine have been removed.
  *
  * BSS state variables (SDA21-relative):
  *   lbl_8047B5D0 : u32, battle thread handle
@@ -168,235 +142,13 @@ extern const u32 lbl_80279B78[3]; /* function pointers for scene callbacks */
 
 /* =========================================================================
  * Implementation
+ *
+ * battle_FightStart (_fightInitialize__FUi14FloorEnterMode, 0x801EF4B0),
+ * battle_FightEnd (_fightFinalize__FUi14FloorEnterMode, 0x801EF374),
+ * battle_FightCleanup (fn_801EF488), battle_FightReset (fn_801EF5C0), and
+ * battle_MainLoop (fn_801EFA08's outline) remain undecompiled; see the
+ * file header for why the fictional bodies previously here were removed.
  * ========================================================================= */
-
-/**
- * battle_SetResult - Store the battle result code.
- * fn_801EF61C at 0x801EF61C (8 bytes)
- */
-void battle_SetResult(u16 result) {
-    lbl_8047B5D6 = result;
-}
-
-/**
- * battle_GetResult - Read the battle result code.
- * fn_801EF624 at 0x801EF624 (8 bytes)
- */
-u16 battle_GetResult(void) {
-    return lbl_8047B5D6;
-}
-
-/**
- * battle_SetStatusFlags - Store battle status flags.
- * fn_801EF62C at 0x801EF62C (8 bytes)
- */
-void battle_SetStatusFlags(u16 flags) {
-    lbl_8047B5D8 = flags;
-}
-
-/**
- * battle_GetStatusFlags - Read battle status flags.
- * fn_801EF634 at 0x801EF634 (8 bytes)
- */
-u16 battle_GetStatusFlags(void) {
-    return lbl_8047B5D8;
-}
-
-/**
- * battle_IsFightInProgress - Check if a battle is currently running.
- * fn_801EF63C at 0x801EF63C (8 bytes)
- */
-u8 battle_IsFightInProgress(void) {
-    return lbl_8047B5DA;
-}
-
-/**
- * battle_FightReset - Reset all fight state variables.
- * fn_801EF5C0 at 0x801EF5C0 (0x5C bytes)
- *
- * Copies the scene callback table (lbl_80279B78) to the stack,
- * clears the fight-in-progress flag, result code, status flags,
- * and thread handle, then calls fn_800FF4D4 to reset the floor
- * system with the callback configuration.
- */
-void battle_FightReset(void) {
-    extern void fn_800FF4D4(void* config, s32 count);
-
-    u32 config[3];
-
-    lbl_8047B5DA = 0;
-    config[0] = lbl_80279B78[0];
-    config[1] = lbl_80279B78[1];
-    config[2] = lbl_80279B78[2];
-    lbl_8047B5D8 = 0;
-    lbl_8047B5D6 = 0;
-    lbl_8047B5D0 = 0;
-
-    fn_800FF4D4(config, 2);
-}
-
-/**
- * battle_FightEnd - Clean up after a battle ends.
- * _fightFinalize__FUi14FloorEnterMode at 0x801EF374 (0x114 bytes)
- *
- * Iterates through all 21 battle scene objects and releases any
- * that are still active, then restores the pre-battle engine state.
- */
-void battle_FightEnd(void) {
-    u32 sceneObjTable[BATTLE_SCENE_OBJ_COUNT];
-    s32 i;
-    s32 objID;
-
-    /* Stop floor and particle systems */
-    fn_800FF560();
-    fn_800F04C4();
-    fn_800FF560();
-    fn_800F04C4();
-
-    /* Copy the scene object ID table to stack */
-    memcpy(sceneObjTable, lbl_80279B84, sizeof(sceneObjTable));
-
-    /* Release all active battle scene objects */
-    for (i = 0; i < BATTLE_SCENE_OBJ_COUNT; i++) {
-        objID = sceneObjTable[i];
-        if (fn_80102620(objID) == 1) {
-            fn_80102568(objID, 0, 0);
-        }
-    }
-
-    /* Restore NPC/People system state */
-    GSscene_SetMode(lbl_8047B5D4);
-
-    /* Clean up battle grid */
-    fn_801C31EC();
-
-    /* Clean up waza (move animation) system */
-    fn_801DAC90();
-
-    /* Stop any battle sound effects */
-    fn_801F54A4(0, 0, 0x12, 0);
-    /* result checked but not stored -- original code checks return != NULL
-       and calls soundStop to stop it */
-
-    /* Fade out battle music */
-    fn_80165A20(1, 0, 0xFF);
-
-    /* Restore VSync mode */
-    fn_801337A8(lbl_8047B5D5);
-
-    /* Clear fight-in-progress flag */
-    lbl_8047B5DA = 0;
-
-    /* Print debug message */
-    fn_800DD970("---------- fight end !! ---------- \n");
-}
-
-/**
- * battle_FightCleanup - Additional cleanup after fight end.
- * fn_801EF488 at 0x801EF488 (0x28 bytes)
- *
- * Clears the People system state, resets the battle grid,
- * and resets the waza system.
- */
-void battle_FightCleanup(void) {
-    fn_80177A64();
-    fn_801C2D80();
-    fn_801DB088();
-}
-
-/**
- * battle_FightStart - Initialize and start a new battle.
- * _fightInitialize__FUi14FloorEnterMode at 0x801EF4B0 (0x110 bytes)
- *
- * This is the main entry point for starting a battle. It checks
- * if a floor/scene is already loaded, and if not, sets up the
- * entire battle environment and spawns the battle main loop thread.
- *
- * The battle main loop thread (battle_MainLoop / fn_801EFA08) is
- * created via GSthread with:
- *   - Priority: 0x14 (20)
- *   - Stack size: 0x4000 (16KB)
- *   - Uses FPU: 1 (yes, for battle scene rendering)
- */
-void battle_FightStart(void) {
-    extern void* lbl_8046D730; /* secondary scene context */
-    extern void* lbl_80375CC8; /* scene render table */
-    u8 savedVSync;
-    void* parent;
-
-    /* Check if scene is already running */
-    if (fn_800FF548()) {
-        fn_801337E4();
-        fn_801337A8(0);
-        return;
-    }
-
-    /* Print debug message */
-    fn_800DD970("---------- fight start !! ---------- \n");
-
-    /* Set fight-in-progress flag */
-    lbl_8047B5DA = 1;
-
-    /* Save current VSync mode */
-    lbl_8047B5D5 = fn_801337A0();
-
-    /* Disable VSync for setup */
-    fn_801337E4();
-    fn_801337A8(0);
-
-    /* Initialize the battle scene */
-    fn_801F108C();
-
-    /* Initialize waza (move animation) system with 10 entries */
-    fn_801DAEF8(10);
-
-    /* Save People/NPC system state */
-    lbl_8047B5D4 = GSscene_GetMode();
-
-    /* Configure scene rendering passes (3 passes for battle) */
-    fn_801F0B00(&lbl_8046D730, 0, 0, 1, 0, &lbl_80375CC8);
-    fn_801F0B00(&lbl_8046D730, 0, 0, 3, 5, &lbl_80375CC8);
-    fn_801F0B00(&lbl_8046D730, 0, 0, 3, 4, &lbl_80375CC8);
-    fn_801F09D0();
-
-    /* Get parent thread for spawning battle loop */
-    parent = (void*)fn_800FF560();
-
-    /* Spawn battle_MainLoop as a new thread */
-    lbl_8047B5D0 = (u32)GSthreadCreate(0x14, parent, 0x4000, 1,
-                                      (void*)battle_MainLoop, 0);
-}
-
-/*
- * battle_MainLoop is defined below in outline form.
- * The full decompilation of fn_801EFA08 (0x5BC bytes) requires
- * matching all branch targets and call sequences. The function
- * is a large polling loop that drives the battle forward by:
- *
- * 1. Playing the battle BGM
- * 2. Initializing battle subsystems
- * 3. Setting up the battle camera
- * 4. Configuring 4 rendering passes for the battle scene:
- *    - Pass (0,2,0): Initial scene
- *    - Pass (0,4,5): Pokemon models
- *    - Pass (0,4,4): Effects/UI overlay
- *    - Pass (0,5,0): Final composite
- * 5. Polling in a loop:
- *    a. Save VSync state, pad reads for debug
- *    b. Check battle_GetStatusFlags() for completion
- *    c. If done, transition through fade-out passes
- *    d. Call fn_801F1758 to check scene state
- *    e. On specific states, trigger GBA link callbacks
- * 6. Loop until battle_GetStatusFlags() returns non-zero
- *
- * The loop body includes a sub-loop that reads 4 frames of
- * controller input (via fn_80103BA8) for debug fast-forward,
- * and accumulates frame counts via fn_800D3088.
- */
-
-/* The actual assembly-level loop cannot be fully decompiled without
- * matching all the branch targets. The structure above documents
- * the observed behavior from reading fn_801EFA08. */
 
 /* ===================================================================
  * AUTO-GENERATED accessor functions
@@ -593,11 +345,6 @@ void fn_801EF2D4(void) {
         }
     }
 }
-
-/* _fightFinalize__FUi14FloorEnterMode (battle_FightEnd) - already decompiled above */
-/* fn_801EF488 (battle_FightCleanup) - already decompiled above */
-/* _fightInitialize__FUi14FloorEnterMode (battle_FightStart) - already decompiled above */
-/* fn_801EF5C0 (battle_FightReset) - already decompiled above */
 
 /* 0x801EF644 | size: 0xB8 | medium */
 void fn_801EF644(s32 result) {

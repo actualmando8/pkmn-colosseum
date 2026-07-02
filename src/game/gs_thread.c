@@ -3,25 +3,30 @@
  * @brief GSthread -- Genius Sonority cooperative task / thread system.
  *
  * Decompiled from:
- *   fn_800FE9B0 (GStaskInit)
- *   fn_800FE834 (GStaskCreate)
- *   fn_800FE7A0 (GStaskRun)
- *   GSthread (GSthreadInit)
- *   GSthreadCreate (GSthreadCreate)
- *   fn_800FEA74 (GStaskSchedulerThread -- internal)
- *   fn_800FEBA0 (GStaskSwapCallback -- internal)
+ *   GSthreadCreate (GSthreadCreate) -- real, matches config/GC6E01/symbols.txt
  *
- * Debug strings:
- *   "GSthread: Init OK, maximum of %d threads"
- *   "GSthreadCreate. Warning: 'usesFPU==FALSE' OK?"
+ * A prior recovery pass invented GStaskInit, GStaskCreate, GStaskRun,
+ * GSthreadInit, and a private GStaskSchedulerThread helper in this file
+ * (claiming addresses fn_800FE9B0/fn_800FE834/fn_800FE7A0/fn_800FEA74),
+ * with the exact same fabricated bodies duplicated verbatim into
+ * gs_thread_hi.c. None of those four public names appear in symbols.txt,
+ * and the claimed addresses all fall in gs_thread_hi.c's real range
+ * (0x800F8268-0x800FF0A0), not this file's (0x800F07A8-0x800F75FC). They
+ * have been removed as dead/fictional code; see gs_thread_hi.c for the
+ * real (address-scaffolded, still largely unmatched) definitions of
+ * fn_800FE9B0/fn_800FE834/fn_800FE7A0/fn_800FEA74.
+ *
+ * This file's only genuinely decompiled/matched function is GSthreadCreate
+ * below (~74% fuzzy match). Everything after it is unrelated stub scaffold
+ * for the rest of this unit's .text range.
  *
  * The task system and thread system are two separate but related layers:
  *
  * 1. TASKS (lightweight):
  *    - Array of GSTask structs, each 0x18 (24) bytes.
  *    - Kept in a priority-sorted singly-linked list.
- *    - GStaskRun walks the list each frame and calls active callbacks.
  *    - Used for per-frame work: VBlank, pad polling, audio, reset.
+ *    - Not yet decompiled under a real name in this file (see note above).
  *
  * 2. THREADS (heavier cooperative fibres):
  *    - Array of GSThread structs, each 0x24 (36) bytes.
@@ -29,7 +34,7 @@
  *    - Managed in a priority-sorted doubly-linked list.
  *    - Used for the main game loop and long-running subsystems.
  *
- * Address range: 0x800F07A8 - 0x800FEBA0 (approx.)
+ * Address range: 0x800F07A8 - 0x800F75FC
  */
 
 #include "dolphin/types.h"
@@ -130,10 +135,8 @@ extern void cos();   /* MSL trig (renamed fn_800CDBE0) — referenced by asm inc
 
 /* ===== String constants (rodata references) ===== */
 extern const char lbl_80271008[]; /* "GSthreadCreate. Warning: 'usesFPU==FALE' OK?\n" */
-extern const char lbl_80271038[]; /* "GSthread: Init OK, maximum of %d threads\n" */
 
 /* ===== Forward declarations for internal functions ===== */
-static void GStaskSchedulerThread(void);  /* fn_800FEA74 */
 extern void fn_800FEBA0(void);            /* GStaskSwapCallback */
 extern void fn_800F0F4C(u32 arg);          /* GSthread trampoline / entry wrapper */
 extern void fn_800AB150(void* buf);
@@ -299,314 +302,26 @@ extern u32 lbl_8047AC9C;
 
 /* ===== Global state (sbss) ===== */
 
-/* --- Task system globals --- */
-static u32     gsTaskMaxNormal;     /* lbl_8047AC80 : max normal-priority tasks */
-static u32     gsTaskMaxDeferred;   /* lbl_8047AC84 : max deferred-queue tasks  */
-static u32     gsTaskTotal;         /* lbl_8047AC88 : total task slots           */
-static GSTask* gsTaskCurrentRun;    /* lbl_8047AC94 : task currently executing   */
-static GSTask* gsTaskListHead;      /* lbl_8047AC98 : head of active task list   */
-static GSTask* gsTaskDeferredHead;  /* lbl_8047AC9C : head of deferred list      */
-static u16     gsTaskArrayHandle;   /* lbl_8047AC78 : GSmem handle for task array */
-static GSTask* gsTaskArray;         /* lbl_8047AC7C : resolved pointer to tasks  */
-static u16     gsTaskStackHandle;   /* lbl_8047AC8C : GSmem handle for scheduler stack */
-static void*   gsTaskStackPtr;      /* lbl_8047AC90 : scheduler stack base       */
-
-/* --- Thread system globals --- */
+/* --- Thread system globals (used by the real GSthreadCreate below) --- */
 static u32       gsThreadMaxCount;    /* lbl_8047AC30 : maximum thread count */
-static u16       gsThreadArrayHandle; /* lbl_8047AC2C : GSmem handle for array */
 static GSThread* gsThreadArray;       /* lbl_8047AC28 : resolved pointer */
 static GSThread* gsThreadListHead;    /* lbl_8047AC08 : head of active thread list */
-static u32       gsThreadFrameCount;  /* lbl_8047AC00 : frame counter */
 static u8        gsThreadActive;      /* lbl_8047AC0C : flag indicating threads running */
 static void*     gsThreadCurrentCtx;  /* lbl_8047AC1C : current thread context pointer */
 
 /* =======================================================================
- *  GStaskInit / fn_800FE9B0
- *  Address: 0x800FE9B0, Size: 0xC4
- *
- *  Allocates the task array and scheduler stack from GSmem.
- *  Sets up the internal scheduler thread using OSSetIdleFunction.
- *
- *  r3 = numTasks (normal-priority), r4 = numQueues (deferred)
- *
- *  Assembly:
- *    total = r3 + r4
- *    allocSize = total * 0x18 (sizeof GSTask)
- *    gsTaskMaxNormal = r3
- *    gsTaskMaxDeferred = r4
- *    gsTaskTotal = total
- *    gsTaskCurrentRun = NULL
- *    handle = GSmemAllocRaw(allocSize)
- *    gsTaskArrayHandle = handle
- *    gsTaskArray = GSmemGetPtr(handle)
- *    // Zero all task slots: store 0 at offset 0x08 of each 0x18-byte entry
- *    // Allocate 0x2000-byte scheduler stack
- *    stackHandle = GSmemAllocRaw(0x2000)
- *    gsTaskStackHandle = stackHandle
- *    gsTaskStackPtr = GSmemGetPtr(stackHandle)
- *    OSSetIdleFunction(GStaskSchedulerThread, NULL, stackTop, 0x1FFC)
- *    fn_800D30A0(GStaskSwapCallback)
+ *  NOTE (orphan fiction removed): a prior recovery pass invented
+ *  GStaskInit, GStaskCreate, GStaskRun, GSthreadInit, and a private
+ *  GStaskSchedulerThread helper here, with bodies duplicated verbatim into
+ *  gs_thread_hi.c. None of the four public names appear in
+ *  config/GC6E01/symbols.txt, and their claimed addresses (fn_800FE9B0,
+ *  fn_800FE834, fn_800FE7A0, fn_800FEA74) fall outside this file's real
+ *  range (0x800F07A8-0x800F75FC per config/GC6E01/splits.txt) -- they
+ *  belong to gs_thread_hi.c's range (0x800F8268-0x800FF0A0), which already
+ *  contains the real stub scaffold for those addresses. The fictional
+ *  definitions, their exclusive "task system" globals, and the unused
+ *  GStaskSchedulerThread forward declaration have been removed.
  * ======================================================================= */
-void GStaskInit(u32 numTasks, u32 numQueues) {
-    u32 total;
-    u32 allocSize;
-    u16 handle;
-    s32 i;
-    s32 loopCount;
-    u32 offset;
-
-    total = numTasks + numQueues;
-
-    gsTaskMaxNormal   = numTasks;
-    gsTaskMaxDeferred = numQueues;
-    gsTaskTotal       = total;
-    gsTaskCurrentRun  = NULL;
-
-    /* Allocate task array: total * 24 bytes */
-    allocSize = total * sizeof(GSTask);
-    handle = GSmemAllocRaw(allocSize);
-    gsTaskArrayHandle = handle;
-
-    if ((handle & 0xFFFF) == 0) {
-        return; /* allocation failed */
-    }
-
-    gsTaskArray = (GSTask*)GSmemGetPtr(handle & 0xFFFF);
-
-    /* Zero the state field of every task slot */
-    offset = 0;
-    for (i = 0; i < total; i++) {
-        /* Store 0 at offset 0x08 (state field) of each task */
-        GSTask* task = (GSTask*)((u32)gsTaskArray + offset);
-        task->state = GSTASK_FREE;
-        offset += sizeof(GSTask);
-    }
-
-    /* Allocate a 0x2000-byte stack for the scheduler co-routine */
-    handle = GSmemAllocRaw(0x2000);
-    gsTaskStackHandle = handle;
-    gsTaskStackPtr = GSmemGetPtr(handle & 0xFFFF);
-
-    /* Create the scheduler fibre:
-     * entry = GStaskSchedulerThread
-     * arg   = NULL
-     * stack = gsTaskStackPtr + 0x1FFC (top of 8KB stack)
-     * size  = 0x1FFC */
-    OSSetIdleFunction((void*)GStaskSchedulerThread, NULL,
-                (void*)((u32)gsTaskStackPtr + 0x1FFC), 0x1FFC);
-
-    /* Register the swap-buffer callback with GSgfx */
-    fn_800D30A0((void*)fn_800FEBA0);
-}
-
-/* =======================================================================
- *  GStaskCreate / fn_800FE834
- *  Address: 0x800FE834, Size: 0x17C
- *
- *  Creates a task and inserts it into the appropriate list.
- *
- *  r3 = state, r4 = priority, r5 = param, r6 = func
- *
- *  If state == 2 (DEFERRED), search starts from the end of the array
- *  (deferred slots); otherwise search from the beginning (normal slots).
- *
- *  The function finds the first free slot (state == 0), initialises it,
- *  then inserts it into the linked list in priority order.
- *
- *  Returns a 1-based task ID (index = (task - gsTaskArray) / 24 + 1).
- * ======================================================================= */
-u32 GStaskCreate(u32 state, u8 priority, void* param, void* func) {
-    GSTask* task;
-    GSTask* search;
-    u32 count;
-    s32 i;
-    s32 loopCount;
-
-    /* Choose search range based on state */
-    if (state == GSTASK_DEFERRED) {
-        /* Deferred: start from the end of the normal region */
-        task = (GSTask*)((u32)gsTaskArray + gsTaskMaxNormal * sizeof(GSTask));
-        count = gsTaskMaxDeferred;
-    } else {
-        /* Normal: start from the beginning */
-        task = gsTaskArray;
-        count = gsTaskMaxNormal;
-    }
-
-    /* Find a free slot */
-    for (i = 0; i < count; i++) {
-        if (task->state == GSTASK_FREE) {
-            goto found;
-        }
-        task = (GSTask*)((u32)task + sizeof(GSTask));
-    }
-    /* No free slot */
-    return 0;
-
-found:
-    /* Initialise the task */
-    task->prev     = NULL;
-    task->next     = NULL;
-    task->state    = state;
-    task->priority = priority;
-    task->paused   = 0;
-    task->param    = param;
-    task->func     = (void (*)(u32, void*))func;
-
-    /* Insert into the appropriate linked list */
-    if (gsTaskListHead == NULL) {
-        /* First task in the list */
-        gsTaskListHead = task;
-    } else {
-        OSDisableInterrupts();
-
-        if (state == GSTASK_DEFERRED) {
-            /* Insert into deferred list */
-            task->next = gsTaskDeferredHead;
-            gsTaskDeferredHead = task;
-        } else {
-            /* Insert into active list in priority order */
-            GSTask* prev = NULL;
-            GSTask* curr = gsTaskListHead;
-
-            /* Walk until we find a task with priority >= ours */
-            while (curr->next != NULL) {
-                if (curr->priority >= task->priority) {
-                    break;
-                }
-                prev = curr;
-                curr = curr->next;
-            }
-
-            if (curr->next == NULL && curr->priority < task->priority) {
-                /* Append at the end */
-                task->prev = curr;
-                task->next = NULL;
-                curr->next = task;
-            } else {
-                /* Insert before curr */
-                GSTask* prevOfCurr = curr->prev;
-                if (prevOfCurr != NULL) {
-                    prevOfCurr->next = task;
-                }
-                task->prev = curr->prev;
-                task->next = curr;
-                curr->prev = task;
-
-                /* Update head if needed */
-                if (gsTaskListHead == curr) {
-                    gsTaskListHead = task;
-                }
-            }
-        }
-
-        OSRestoreInterrupts();
-    }
-
-    /* Compute 1-based task ID:
-     * id = ((task - gsTaskArray) / sizeof(GSTask)) + 1
-     * Assembly uses mulhwu with magic constant 0xAAAAAAAB for /24 */
-    {
-        u32 offset = (u32)task - (u32)gsTaskArray;
-        u32 id = (offset / sizeof(GSTask)) + 1;
-        return id;
-    }
-}
-
-/* =======================================================================
- *  GStaskRun / fn_800FE7A0
- *  Address: 0x800FE7A0, Size: 0x94
- *
- *  Iterates the active task list and invokes each active, non-paused
- *  task's callback function.  This is the main cooperative yield point.
- *
- *  For each task where state == 1 (ACTIVE) and paused == 0:
- *    1. Store current task in gsTaskCurrentRun.
- *    2. Compute taskId = ((task - gsTaskArray) / 24) + 1
- *    3. Call task->func(taskId, task->param)
- *  After all tasks, clear gsTaskCurrentRun to NULL.
- * ======================================================================= */
-void GStaskRun(void) {
-    GSTask* task;
-    GSTask* nextTask;
-
-    task = gsTaskListHead;
-    while (task != NULL) {
-        nextTask = task->next;
-
-        if (task->state == GSTASK_ACTIVE && task->paused == 0) {
-            u32 taskId;
-            u32 offset;
-
-            gsTaskCurrentRun = task;
-
-            /* Compute 1-based task ID */
-            offset = (u32)task - (u32)gsTaskArray;
-            taskId = (offset / sizeof(GSTask)) + 1;
-
-            /* Invoke the callback via function pointer */
-            task->func(taskId, task->param);
-        }
-
-        task = nextTask;
-    }
-
-    gsTaskCurrentRun = NULL;
-}
-
-/* =======================================================================
- *  GSthreadInit / GSthread
- *  Address: 0x800F09D8, Size: 0x9C
- *
- *  Allocates the thread array from GSmem and zeroes all entries.
- *
- *  r3 = maxThreads
- *
- *  Assembly:
- *    allocSize = maxThreads * 0x24 (sizeof GSThread)
- *    gsThreadMaxCount = maxThreads
- *    handle = GSmemAllocRaw(allocSize)
- *    gsThreadArrayHandle = handle
- *    gsThreadArray = GSmemGetPtr(handle)
- *    // Zero the 'active' byte at offset 0x08 of each 0x24-byte entry
- *    gsThreadFrameCount = 0
- *    gsThreadListHead = NULL
- *    Print "GSthread: Init OK, maximum of %d threads\n"
- * ======================================================================= */
-void GSthreadInit(u32 maxThreads) {
-    u32 allocSize;
-    u16 handle;
-    u32 i;
-    u32 offset;
-
-    gsThreadMaxCount = maxThreads;
-
-    /* Allocate thread array: maxThreads * 36 bytes */
-    allocSize = maxThreads * sizeof(GSThread);
-    handle = GSmemAllocRaw(allocSize);
-    gsThreadArrayHandle = handle;
-
-    if ((handle & 0xFFFF) == 0) {
-        return; /* allocation failed */
-    }
-
-    gsThreadArray = (GSThread*)GSmemGetPtr(handle & 0xFFFF);
-
-    /* Zero the 'active' field of every thread slot */
-    offset = 0;
-    for (i = 0; i < maxThreads; i++) {
-        GSThread* thr = (GSThread*)((u32)gsThreadArray + offset);
-        thr->active = 0;
-        offset += sizeof(GSThread);
-    }
-
-    /* Reset frame counter and thread list */
-    gsThreadFrameCount = 0;
-    gsThreadListHead   = NULL;
-
-    /* Print init message */
-    fn_800DD970(lbl_80271038, maxThreads);
-}
 
 /* =======================================================================
  *  GSthreadCreate / GSthreadCreate
@@ -790,43 +505,6 @@ found:
 
     gsThreadActive = 1;
     return thread;
-}
-
-/* =======================================================================
- *  GStaskSchedulerThread / fn_800FEA74  (INTERNAL)
- *  Address: 0x800FEA74, Size: 0x12C
- *
- *  The scheduler co-routine that runs inside the 8 KB scheduler stack.
- *  It loops forever, executing all active tasks each iteration (same
- *  logic as GStaskRun, but running as a fibre on its own stack).
- * ======================================================================= */
-static void GStaskSchedulerThread(void) {
-    GSTask* task;
-    GSTask* nextTask;
-
-    for (;;) {
-        task = gsTaskListHead;
-        while (task != NULL) {
-            nextTask = task->next;
-
-            if (task->state == GSTASK_DEFERRED && task->paused == 0) {
-                u32 taskId;
-                u32 offset;
-
-                gsTaskCurrentRun = task;
-                offset = (u32)task - (u32)gsTaskArray;
-                taskId = (offset / sizeof(GSTask)) + 1;
-
-                task->func(taskId, task->param);
-            }
-
-            task = nextTask;
-        }
-
-        /* Yield back to the main fibre (implementation is via
-         * the cooperative switch in OSSetIdleFunction -- effectively
-         * a longjmp back to the caller's context). */
-    }
 }
 
 /* ===================================================================

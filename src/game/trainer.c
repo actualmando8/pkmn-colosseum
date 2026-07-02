@@ -81,6 +81,12 @@
  *     This is read/written very frequently (lwz/stw with addi +1/+5)
  *     suggesting it's a script or event sequence counter.
  *
+ * Note: this file previously carried two fictional definitions --
+ * GetTrainerPokemonPtr and GetTrainerPokemonPtrSingle -- claiming to be
+ * fn_80205B8C and fn_80205BE8. Those two functions are actually
+ * implemented and matched at 100% in colosseum_event.c, not here; the
+ * fictional duplicates (which had no real callers) have been removed.
+ *
  * =========================================================================
  */
 
@@ -148,49 +154,9 @@ u8 fn_801FCCAC(u8* ptr);
 void fn_801FAA58(void);
 void fn_801FB1C0(void);
 
-/* =========================================================================
- * fn_80205B8C - GetTrainerPokemonPtr
- *
- * Navigate from a trainer/party context to a Pokemon data pointer.
- * This is the third most-called function in the range (668 calls).
- *
- * The function performs two hops through the data table system:
- *   1. context -> party list (table 0xD6)
- *   2. party list -> specific Pokemon (table 0xCC)
- *
- * @param context  Trainer or party context pointer
- * @return         Pokemon data pointer, or NULL if either hop fails
- * ========================================================================= */
-void* GetTrainerPokemonPtr(void* context) {
-    void* partyList;
-    if (context == 0) {
-        return NULL;
-    }
-
-    /* First hop: get party list from trainer context */
-    partyList = fn_8012640C(context, 0, 0xD6, 0);
-    if (partyList == 0) {
-        return NULL;
-    }
-
-    /* Second hop: get Pokemon from party list */
-    return fn_8012640C(partyList, 0, 0xCC, 0);
-}
-
-/* =========================================================================
- * fn_80205BE8 - GetTrainerPokemonPtrSingle
- *
- * Single-hop version of GetTrainerPokemonPtr. Only does the CC lookup.
- *
- * @param context  Party context pointer (already resolved to party level)
- * @return         Pokemon data pointer, or NULL
- * ========================================================================= */
-void* GetTrainerPokemonPtrSingle(void* context) {
-    if (context == 0) {
-        return NULL;
-    }
-    return fn_8012640C(context, 0, 0xCC, 0);
-}
+/* Note: fn_80205B8C and fn_80205BE8 (trainer -> party -> Pokemon pointer
+ * navigation, two-hop and single-hop) are actually defined and matched
+ * at 100% in colosseum_event.c, not in this file. */
 
 /* =========================================================================
  * fn_801FB1C0 - TrainerDataGet

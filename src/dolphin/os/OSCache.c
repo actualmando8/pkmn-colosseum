@@ -12,7 +12,18 @@
  * Provides cache enable/disable/flush/invalidate operations, the L2 cache
  * global invalidate procedure, the DMA error handler, and cache init.
  *
- * Matches: 0x8009B290 - 0x8009B914
+ * Matches: 0x8009B290 - 0x8009B914 (per splits.txt; confirmed correct
+ * for this unit).
+ *
+ * 2026-07-02 reconciliation: two orphan names (LCEnableNoInterrupts,
+ * LCLoadBlocks - neither present in symbols.txt, neither paired in
+ * objdiff) were renamed rather than deleted, on strong address/size
+ * evidence against this unit's own objdiff report plus a corroborating
+ * ground-truth "bl LCEnable" reference elsewhere in-tree:
+ *   - the big asm "LCEnable" became __LCEnable (0x8009B40C, 0xCC)
+ *   - the orphan "LCEnableNoInterrupts" became LCEnable (0x8009B4D8, 0x38)
+ *   - the orphan "LCLoadBlocks" became LCStoreData (0x8009B55C, 0xAC)
+ * See each function's own comment below for details.
  */
 
 #pragma push
@@ -350,7 +361,17 @@ _loop_dcz:
 #pragma pop
 
 /*
- * LCEnable - Enable the locked cache (L2 scratch area).
+ * __LCEnable - Enable the locked cache (L2 scratch area).
+ *
+ * 2026-07-02 reconciliation: this asm function was previously named
+ * "LCEnable" (an orphan - not present in symbols.txt, never paired in
+ * objdiff). Renamed to its real name, __LCEnable, on address/size
+ * evidence: symbols.txt has __LCEnable at this exact address (0x8009B40C)
+ * and size (0xCC), matching the unmatched "__LCEnable" slot in this
+ * unit's objdiff report; the *wrapper* below (formerly the orphan
+ * "LCEnableNoInterrupts") is symbols.txt's actual "LCEnable" and is
+ * renamed accordingly, matching a ground-truth "bl LCEnable" reference
+ * in src/game/gs_field_world_fn_800EEDF8.inc.
  *
  * Flushes the lower 32KB of cached memory, enables LC in HID2,
  * sets up DBAT3 for the LC address range 0xE0000000, and zeroes
@@ -361,7 +382,7 @@ _loop_dcz:
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-asm void LCEnable(void) {
+asm void __LCEnable(void) {
     nofralloc
     mfmsr   r5
     ori     r5, r5, 0x1000
@@ -420,17 +441,24 @@ _loop_lce_zero:
 #pragma pop
 
 /*
- * LCEnableNoInterrupts - Enable locked cache with interrupts disabled.
+ * LCEnable - Enable locked cache with interrupts disabled.
  *
- * Wraps __LCEnable (exported as LCEnable in asm) with interrupt disable/restore.
+ * 2026-07-02 reconciliation: renamed from the orphan "LCEnableNoInterrupts"
+ * (not present in symbols.txt) to its real name, LCEnable, on
+ * address/size evidence (symbols.txt: LCEnable @ 0x8009B4D8, size 0x38,
+ * matching the unmatched "LCEnable" slot in this unit's objdiff report)
+ * plus a ground-truth "bl LCEnable" reference in
+ * src/game/gs_field_world_fn_800EEDF8.inc.
+ *
+ * Wraps __LCEnable with interrupt disable/restore.
  *
  * 0x8009B4D8 | size: 0x38
  */
-void LCEnableNoInterrupts(void) {
+void LCEnable(void) {
     BOOL enabled;
 
     enabled = OSDisableInterrupts();
-    LCEnable();
+    __LCEnable();
     OSRestoreInterrupts(enabled);
 }
 
@@ -459,7 +487,18 @@ asm void LCLoadData(register void* destAddr, register void* srcAddr, register u3
 #pragma pop
 
 /*
- * LCLoadBlocks - Load multiple DMA blocks into the locked cache.
+ * LCStoreData - DMA-transfer multiple blocks via the locked cache.
+ *
+ * 2026-07-02 reconciliation: renamed from the orphan "LCLoadBlocks"
+ * (not present in symbols.txt) to its real name, LCStoreData, on
+ * address/size evidence: symbols.txt has LCStoreData at this exact
+ * address (0x8009B55C) and size (0xAC), matching the unmatched
+ * "LCStoreData" slot in this unit's objdiff report. src/game/gs_field_world.c
+ * also already declares `extern void LCStoreData();`, corroborating
+ * that this is the real, in-use name elsewhere in the tree. The
+ * "Load" vs "Store" naming mismatch with this body's current content
+ * (and with the LCLoadData() calls it makes) is a known oddity flagged
+ * here rather than silently resolved - not restructured this pass.
  *
  * Splits large transfers into 128-block (0x1000 byte) chunks,
  * calling LCLoadData for each chunk. Returns the number of
@@ -467,7 +506,7 @@ asm void LCLoadData(register void* destAddr, register void* srcAddr, register u3
  *
  * 0x8009B55C | size: 0xAC
  */
-u32 LCLoadBlocks(void* destAddr, void* srcAddr, u32 nBytes) {
+u32 LCStoreData(void* destAddr, void* srcAddr, u32 nBytes) {
     u32 dest = (u32)destAddr;
     u32 src = (u32)srcAddr;
     u32 blocks = (nBytes + 0x1F) >> 5;
