@@ -356,26 +356,29 @@ void dataInit(u32 smpBase, u32 smpLength) {
 
 #undef fn_80162118
 extern void fn_80160F10(void* dst, u32 lowByte, s32 value, u32 repeat, u32 hasUpperByte);
-#define PF_DEFINE_MOTION_SETTER(name, initMask, dataOffset, doneMask) \
-void name(u8* ctx, u32* cmd) {                                       \
-    u32 comb;                                                        \
-    s32 scale;                                                       \
-                                                                      \
-    if ((*(u64*)(ctx + 0x114) & (initMask)) == 0) {                  \
-        *(u64*)(ctx + 0x114) |= (initMask);                          \
-        comb = 0;                                                    \
-    } else {                                                         \
-        comb = cmd[1] & 0xFF;                                        \
-    }                                                               \
-    scale = (s32)(cmd[0] & 0xFFFF0000) / 100;                        \
-    if (scale < 0) {                                                 \
-        scale -= ((s8)(cmd[1] >> 0x10) << 8) / 100;                  \
-    } else {                                                         \
-        scale += ((s8)(cmd[1] >> 0x10) << 8) / 100;                  \
-    }                                                               \
-    fn_80160F10(ctx + (dataOffset), (cmd[0] >> 8) & 0xFF, scale, comb, ((cmd[1] >> 8) & 0xFF) != 0); \
-    *(u32*)(ctx + 0x214) |= (doneMask);                              \
+static void MotionSetterCommon(u8* ctx, u32* cmd, u64 initMask, u32 dataOffset, u32 doneMask) {
+    u32 comb;
+    s32 scale;
+    u8 upperByte;
+
+    if (!(*(u64*)(ctx + 0x114) & initMask)) {
+        comb = 0;
+        *(u64*)(ctx + 0x114) |= initMask;
+    } else {
+        comb = cmd[1] & 0xFF;
+    }
+    scale = ((s16)(cmd[0] >> 16) << 16) / 100;
+    if (scale < 0) {
+        scale -= ((s8)(cmd[1] >> 0x10) << 8) / 100;
+    } else {
+        scale += ((s8)(cmd[1] >> 0x10) << 8) / 100;
+    }
+    upperByte = (cmd[1] >> 8) & 0xFF;
+    fn_80160F10(ctx + dataOffset, (cmd[0] >> 8) & 0xFF, scale, comb, upperByte != 0);
+    *(u32*)(ctx + 0x214) |= doneMask;
 }
+#define PF_DEFINE_MOTION_SETTER(name, initMask, dataOffset, doneMask) \
+void name(u8* ctx, u32* cmd) { MotionSetterCommon(ctx, cmd, (initMask), (dataOffset), (doneMask)); }
 #if 0
 asm void fn_80153FEC(void) {
 #include "src/game/people/people_field_fn_80153FEC.inc"
