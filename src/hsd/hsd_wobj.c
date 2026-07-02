@@ -642,7 +642,6 @@ void HSD_WObjAddAnim(HSD_WObj* wobj, HSD_WObjAnim* desc) {
 /* 0x80191E38 | 0x50 */
 #pragma push
 extern void fn_801AFEFC(void* robj, f32 frame);
-extern void HSD_AObjReqAnim(void* aobj, f32 frame);
 #pragma push
 #pragma optimization_level 1
 void HSD_WObjReqAnim(HSD_WObj* wobj, f32 frame) {

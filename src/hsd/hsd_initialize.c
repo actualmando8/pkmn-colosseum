@@ -33,11 +33,6 @@ void HSD_SetHeap(s32 handle)
 /*  Render pass                                                              */
 /* ========================================================================= */
 
-HSD_RenderPass HSD_GetCurrentRenderPass(void)
-{
-    return current_render_pass;
-}
-
 void HSD_StartRender(HSD_RenderPass pass)
 {
     current_render_pass = pass;
@@ -136,8 +131,8 @@ asm void HSD_GetCurrentRenderPass(void) {
 #include "src/hsd/hsd_initialize_fn_8019C7B0.inc"
 }
 #else
-u32 HSD_GetCurrentRenderPass(void) {
-    return lbl_8047B294;
+HSD_RenderPass HSD_GetCurrentRenderPass(void) {
+    return (HSD_RenderPass)lbl_8047B294;
 }
 #endif
 #pragma pop

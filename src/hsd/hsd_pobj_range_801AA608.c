@@ -13,7 +13,6 @@
 extern s32   fn_801A6990(void* obj);
 extern void  fn_800B7D3C(void);
 extern void  fn_801C27F4(void* aobj, void* pobj, void* method);
-extern void  HSD_AObjReqAnim(f32 val, void* aobj);
 
 /* Data / global symbols (DTK names). */
 extern u8    lbl_8036CCD0[];         /* PObj class info (data)      */
@@ -151,7 +150,7 @@ void HSD_PObjReqAnimAllByFlags(f32 val, HSD_PObj* pobj, u32 flags)
     while (cur != NULL) {
         if (cur != NULL) {
             if (flags & 0x8) {
-                HSD_AObjReqAnim(val, *(void**)((u8*)cur + 0x18));
+                HSD_AObjReqAnim(*(void**)((u8*)cur + 0x18), val);
             }
         }
         cur = cur->next;

@@ -1157,7 +1157,6 @@ void HSD_LObjGetLightVector(HSD_LObj* lobj, f32* out)
 #endif
 
 /* 0x801A6370 | 0x98 */
-extern void HSD_AObjReqAnim();
 #if 0
 asm void HSD_LObjReqAnimAll(void) {
 #include "src/hsd/hsd_lobj_HSD_LObjReqAnimAll.inc"
