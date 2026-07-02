@@ -1,0 +1,1456 @@
+{
+ "table": "lbl_8027A00C (255-slot WazaSequence VM opcode dispatch; consumer fn_8022FE80, opcode byte from script cursor lbl_8047B610)",
+ "alignment": "4 changepoints vs XD 0x802F8AF8: xd[0] WS_BADGECHECK absent (no badge system); colo 187/200 = Colosseum-only twin opcodes; xd 238/239 WS_DARKREMOVE/WS_TELEPORT absent; elsewhere index-aligned per constrained DP (net indel +1)",
+ "status": "UNSURE name HYPOTHESES: positionally forced by neighbor anchors but bodies rewritten (Shadow/doubles logic). Use as semantic hints + XD reference bodies during per-fn matching; adopt the name when the byte-match or body semantics confirm it.",
+ "proposals": [
+  {
+   "fn": "fn_802284B0",
+   "index": 1,
+   "proposed": "WS_ATTACK_MESSAGE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 2300 vs xd 628 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802282D8",
+   "index": 2,
+   "proposed": "WS_ATTACK_MESSAGE2",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 472 vs xd 372 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8022808C",
+   "index": 3,
+   "proposed": "WS_PP_DEC",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 588 vs xd 412 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80227C40",
+   "index": 5,
+   "proposed": "WS_DAMAGE_CALC",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 376 vs xd 460 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80226FD4",
+   "index": 9,
+   "proposed": "WS_WAZA_EFFECT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 420 vs xd 296 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80226F0C",
+   "index": 10,
+   "proposed": "WS_EFFECT_WAIT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 200 vs xd 448 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80226914",
+   "index": 11,
+   "proposed": "WS_HP_DEC",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 1528 vs xd 1152 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802267E8",
+   "index": 12,
+   "proposed": "WS_HP_DEC_WAIT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 300 vs xd 276 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80226730",
+   "index": 13,
+   "proposed": "WS_CRITICAL_MESSAGE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 184 vs xd 124 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802266EC",
+   "index": 14,
+   "proposed": "WS_WAZAKOUKA_SE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 68 vs xd 260 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8022631C",
+   "index": 15,
+   "proposed": "WS_WAZAKOUKA_MESSAGE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 976 vs xd 872 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802262D0",
+   "index": 16,
+   "proposed": "WS_MESSAGE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 76 vs xd 48 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80226284",
+   "index": 17,
+   "proposed": "WS_ALERT_MESSAGE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 76 vs xd 48 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8022622C",
+   "index": 18,
+   "proposed": "WS_MESSAGE_WAIT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 88 vs xd 84 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802261B0",
+   "index": 19,
+   "proposed": "WS_MESSAGE_TBL",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 124 vs xd 84 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80226134",
+   "index": 20,
+   "proposed": "WS_ALERT_MESSAGE_TBL",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 124 vs xd 84 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80224820",
+   "index": 21,
+   "proposed": "WS_TSUIKA_CHECK",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 408 vs xd 432 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80224740",
+   "index": 24,
+   "proposed": "WS_SAKUJO",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 144 vs xd 140 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80224158",
+   "index": 25,
+   "proposed": "WS_KIZETSU_CHECK",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 1512 vs xd 972 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80224060",
+   "index": 26,
+   "proposed": "WS_KIZETSU",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 248 vs xd 256 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80223F1C",
+   "index": 27,
+   "proposed": "WS_KIZETSU_WAIT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 324 vs xd 140 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80223D64",
+   "index": 29,
+   "proposed": "WS_CONDITION2_CHECK",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 220 vs xd 32 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80223CE8",
+   "index": 30,
+   "proposed": "WS_SPEABI_CHECK",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 124 vs xd 140 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80223AF4",
+   "index": 32,
+   "proposed": "WS_CONDCHG_CHECK",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 384 vs xd 284 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802232F4",
+   "index": 35,
+   "proposed": "WS_GET_EXP",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 1840 vs xd 1808 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80222C44",
+   "index": 36,
+   "proposed": "WS_ZENMETSU_CHECK",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 684 vs xd 532 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80222BD8",
+   "index": 37,
+   "proposed": "WS_LOOP_INIT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 108 vs xd 76 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80222B7C",
+   "index": 38,
+   "proposed": "WS_LOOPCNT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 92 vs xd 84 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80222ADC",
+   "index": 39,
+   "proposed": "WS_LOOP",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 160 vs xd 132 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80222ACC",
+   "index": 40,
+   "proposed": "WS_JUMP",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 16 vs xd 40 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802229EC",
+   "index": 41,
+   "proposed": "WS_IF8",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 224 vs xd 292 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8022290C",
+   "index": 42,
+   "proposed": "WS_IF16",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 224 vs xd 292 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80222844",
+   "index": 43,
+   "proposed": "WS_IF32",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 200 vs xd 292 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802227D4",
+   "index": 44,
+   "proposed": "WS_IFWEQ",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 112 vs xd 136 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8022275C",
+   "index": 45,
+   "proposed": "WS_IFWNE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 120 vs xd 148 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8022273C",
+   "index": 46,
+   "proposed": "WS_SETVALUE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 32 vs xd 88 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80222714",
+   "index": 47,
+   "proposed": "WS_ADDVALUE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 40 vs xd 60 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802226EC",
+   "index": 48,
+   "proposed": "WS_SUBVALUE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 40 vs xd 60 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802226A4",
+   "index": 49,
+   "proposed": "WS_SETWORK",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 72 vs xd 92 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80222654",
+   "index": 50,
+   "proposed": "WS_SETWORKOFS",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 80 vs xd 100 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8022262C",
+   "index": 51,
+   "proposed": "WS_SET8BIT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 40 vs xd 60 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80222604",
+   "index": 52,
+   "proposed": "WS_SET16BIT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 40 vs xd 60 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802225DC",
+   "index": 53,
+   "proposed": "WS_SET32BIT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 40 vs xd 60 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802225B0",
+   "index": 54,
+   "proposed": "WS_RESET8BIT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 44 vs xd 64 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80222584",
+   "index": 55,
+   "proposed": "WS_RESET16BIT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 44 vs xd 64 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80222554",
+   "index": 56,
+   "proposed": "WS_RESET32BIT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 48 vs xd 68 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80222520",
+   "index": 57,
+   "proposed": "WS_WAIT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 52 vs xd 48 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80222510",
+   "index": 58,
+   "proposed": "WS_CLIENT_BIT_WAIT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 16 vs xd 40 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80222500",
+   "index": 59,
+   "proposed": "WS_HP_GAUGE_REDRAW",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 16 vs xd 40 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80229C90",
+   "index": 64,
+   "proposed": "WS_GUARDCHECK",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 452 vs xd 164 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80222494",
+   "index": 65,
+   "proposed": "WS_GOSUB",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 60 vs xd 48 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80222438",
+   "index": 66,
+   "proposed": "WS_MONS_TYPE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 92 vs xd 96 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802223E0",
+   "index": 67,
+   "proposed": "WS_SPEABI_HAVE_CHECK",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 88 vs xd 96 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80222370",
+   "index": 69,
+   "proposed": "WS_FIGHT_EFFECT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 100 vs xd 140 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802222F4",
+   "index": 70,
+   "proposed": "WS_FIGHT_EFFECT2",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 124 vs xd 164 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8022106C",
+   "index": 71,
+   "proposed": "WS_COND_CHG_WORK_SET",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 152 vs xd 180 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80220868",
+   "index": 72,
+   "proposed": "WS_COND_CHG_BIT_CHECK",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 804 vs xd 644 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021FAD4",
+   "index": 73,
+   "proposed": "WS_WKC_ACT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 3236 vs xd 2632 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80227490",
+   "index": 74,
+   "proposed": "WS_TYPE_CHECK_NO_HIT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 48 vs xd 56 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021F998",
+   "index": 75,
+   "proposed": "WS_MODOSU_EFFECT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 316 vs xd 328 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021F92C",
+   "index": 76,
+   "proposed": "WS_APPEAR_EFFECT_INIT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 108 vs xd 92 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021F664",
+   "index": 77,
+   "proposed": "WS_APPEAR_EFFECT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 712 vs xd 376 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021F458",
+   "index": 78,
+   "proposed": "WS_APPEAR_EFFECT_WAIT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 524 vs xd 616 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021F39C",
+   "index": 79,
+   "proposed": "WS_RESHUFFLE_CHECK",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 188 vs xd 180 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021F24C",
+   "index": 80,
+   "proposed": "WS_POKE_RESHUFFLE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 336 vs xd 276 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021F1CC",
+   "index": 81,
+   "proposed": "WS_POKE_RESHUFFLE_WAIT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 128 vs xd 124 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021EF24",
+   "index": 82,
+   "proposed": "WS_POKE_RESHUFFLE_END",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 680 vs xd 564 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021EF14",
+   "index": 83,
+   "proposed": "WS_TRAINER_APPEAR",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 16 vs xd 40 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021EED4",
+   "index": 84,
+   "proposed": "WS_SE_PLAY",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 64 vs xd 60 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021EE98",
+   "index": 85,
+   "proposed": "WS_ME_PLAY",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 60 vs xd 56 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021EE48",
+   "index": 86,
+   "proposed": "WS_VOICE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 80 vs xd 76 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021EE38",
+   "index": 87,
+   "proposed": "WS_END_FIGHT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 16 vs xd 40 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021ED70",
+   "index": 88,
+   "proposed": "WS_POKEDELACTOR",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 200 vs xd 208 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021EAE8",
+   "index": 90,
+   "proposed": "WS_WAZAWASURE_CHECK",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 280 vs xd 244 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021EA94",
+   "index": 91,
+   "proposed": "WS_WAZAAKIRAME_CHECK",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 84 vs xd 92 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021E9F4",
+   "index": 92,
+   "proposed": "WS_POKE_BLINK",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 160 vs xd 140 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021E754",
+   "index": 93,
+   "proposed": "WS_OKODUKAI_CALC",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 672 vs xd 540 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021E744",
+   "index": 94,
+   "proposed": "WS_WAZA_GET",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 16 vs xd 40 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021E6EC",
+   "index": 96,
+   "proposed": "WS_INC_RECORD",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 16 vs xd 40 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021E6DC",
+   "index": 97,
+   "proposed": "WS_BALL_GAUGE_SET",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 16 vs xd 40 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021E6CC",
+   "index": 98,
+   "proposed": "WS_BALL_GAUGE_OFF",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 16 vs xd 40 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021E600",
+   "index": 99,
+   "proposed": "WS_WAZASEQADRS",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 204 vs xd 164 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021E288",
+   "index": 100,
+   "proposed": "WS_STATUS_EFFECT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 888 vs xd 344 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021E04C",
+   "index": 101,
+   "proposed": "WS_STATUS_EFFECT2",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 572 vs xd 204 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021DF80",
+   "index": 102,
+   "proposed": "WS_STATUS_EFFECT_DIRECT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 204 vs xd 108 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021DF70",
+   "index": 103,
+   "proposed": "WS_YES_NO_WINDOW",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 16 vs xd 40 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021DE4C",
+   "index": 106,
+   "proposed": "WS_KILLITEM",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 124 vs xd 92 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021DE3C",
+   "index": 107,
+   "proposed": "WS_RESHUFFLE_NICKNAME",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 16 vs xd 40 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021DDD8",
+   "index": 108,
+   "proposed": "WS_STATUS_WINDOW",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 100 vs xd 112 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021DDC8",
+   "index": 109,
+   "proposed": "WS_EXPFLAG_CLEAR",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 16 vs xd 40 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021DDB8",
+   "index": 110,
+   "proposed": "WS_GET_RESHUFFLE_CLIENT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 16 vs xd 40 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021DD44",
+   "index": 111,
+   "proposed": "WS_VANISH_OFF",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 116 vs xd 64 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021DD34",
+   "index": 112,
+   "proposed": "WS_TOKUSYUNO_SET",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 16 vs xd 40 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021ECF8",
+   "index": 113,
+   "proposed": "WS_OBOEWAZANO_SET",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 120 vs xd 108 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021DD24",
+   "index": 114,
+   "proposed": "WS_ESCAPE_CHECK",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 16 vs xd 40 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021DB78",
+   "index": 115,
+   "proposed": "WS_POKE_HPMAX_RATE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 428 vs xd 424 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021D9C0",
+   "index": 116,
+   "proposed": "WS_POKE_HPDEC_RATE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 440 vs xd 436 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021D688",
+   "index": 117,
+   "proposed": "WS_STATUS_RECOVER",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 824 vs xd 388 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021D40C",
+   "index": 118,
+   "proposed": "WS_SUBROUTINE_CALL",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 636 vs xd 504 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021D224",
+   "index": 119,
+   "proposed": "WS_TOKUSEI_SET",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 488 vs xd 324 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021D090",
+   "index": 120,
+   "proposed": "WS_GUARD_SUCCESS_CHECK",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 404 vs xd 408 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021D010",
+   "index": 121,
+   "proposed": "WS_JIBAKU_INIT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 128 vs xd 448 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021CF3C",
+   "index": 122,
+   "proposed": "WS_JIBAKU",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 212 vs xd 92 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021CE60",
+   "index": 123,
+   "proposed": "WS_JIBAKU_LOOP",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 220 vs xd 200 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021CCE0",
+   "index": 124,
+   "proposed": "WS_KAIFUKU",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 384 vs xd 188 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021CC5C",
+   "index": 125,
+   "proposed": "WS_OUMU_CHECK",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 132 vs xd 428 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021CB58",
+   "index": 126,
+   "proposed": "WS_REFLEC",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 260 vs xd 236 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021CA00",
+   "index": 127,
+   "proposed": "WS_YADORIGI",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 344 vs xd 288 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021C900",
+   "index": 128,
+   "proposed": "WS_DAMAGE_CHG",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 256 vs xd 212 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021C75C",
+   "index": 129,
+   "proposed": "WS_NEMURU",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 420 vs xd 356 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021C6F4",
+   "index": 131,
+   "proposed": "WS_SAWAGU",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 16 vs xd 40 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021C588",
+   "index": 132,
+   "proposed": "WS_SAWAGU_CHECK",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 176 vs xd 148 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021C490",
+   "index": 133,
+   "proposed": "WS_TAKUWAERU",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 248 vs xd 236 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021C308",
+   "index": 134,
+   "proposed": "WS_HAKIDASU",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 392 vs xd 344 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021C190",
+   "index": 135,
+   "proposed": "WS_NOMIKOMU",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 376 vs xd 328 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021C0F4",
+   "index": 136,
+   "proposed": "WS_SUITORI",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 156 vs xd 108 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021B8B8",
+   "index": 137,
+   "proposed": "WS_CONDCHG",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 88 vs xd 80 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021B760",
+   "index": 139,
+   "proposed": "WS_GAMAN",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 208 vs xd 172 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021B628",
+   "index": 141,
+   "proposed": "WS_RENZOKU",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 228 vs xd 188 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021B610",
+   "index": 142,
+   "proposed": "WS_RENZOKU_NUM_INIT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 24 vs xd 48 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021B484",
+   "index": 143,
+   "proposed": "WS_HUKITOBASHI",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 396 vs xd 312 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021B1A4",
+   "index": 144,
+   "proposed": "WS_TEXTURE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 448 vs xd 212 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021B0B0",
+   "index": 145,
+   "proposed": "WS_KOBAN_CHECK",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 244 vs xd 188 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021AFAC",
+   "index": 146,
+   "proposed": "WS_HIKARINOKABE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 260 vs xd 236 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021AC1C",
+   "index": 147,
+   "proposed": "WS_ICHIGEKI",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 912 vs xd 732 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021AB9C",
+   "index": 148,
+   "proposed": "WS_HPHALF",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 128 vs xd 168 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021A984",
+   "index": 150,
+   "proposed": "WS_WEATHER_KEEP",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 404 vs xd 484 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021A878",
+   "index": 151,
+   "proposed": "WS_MEROMERO",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 268 vs xd 256 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021A80C",
+   "index": 152,
+   "proposed": "WS_CONDITION_GAUGE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 108 vs xd 92 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021A764",
+   "index": 153,
+   "proposed": "WS_SHIROIKIRI",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 168 vs xd 156 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021A6CC",
+   "index": 154,
+   "proposed": "WS_KIAIDAME",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 152 vs xd 140 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021A478",
+   "index": 155,
+   "proposed": "WS_HENSHIN",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 596 vs xd 520 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021A338",
+   "index": 156,
+   "proposed": "WS_MIGAWARI",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 320 vs xd 276 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021A054",
+   "index": 157,
+   "proposed": "WS_MONOMANE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 620 vs xd 444 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80219E10",
+   "index": 158,
+   "proposed": "WS_YUBIWOHURU",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 468 vs xd 320 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80219D98",
+   "index": 159,
+   "proposed": "WS_CHIKYUUNAGE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 120 vs xd 96 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80219CF4",
+   "index": 160,
+   "proposed": "WS_PSYCHOWAVE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 164 vs xd 140 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80219B2C",
+   "index": 161,
+   "proposed": "WS_COUNTER",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 456 vs xd 56 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80219964",
+   "index": 162,
+   "proposed": "WS_MIRRORCOAT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 456 vs xd 56 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80219838",
+   "index": 163,
+   "proposed": "WS_KANASHIBARI",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 300 vs xd 260 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802196A8",
+   "index": 164,
+   "proposed": "WS_ENCORE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 348 vs xd 288 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802195A0",
+   "index": 165,
+   "proposed": "WS_ITAMIWAKE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 264 vs xd 204 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80219354",
+   "index": 166,
+   "proposed": "WS_TEXTURE2",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 588 vs xd 432 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802192B4",
+   "index": 167,
+   "proposed": "WS_LOCKON",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 160 vs xd 148 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021908C",
+   "index": 168,
+   "proposed": "WS_SKETCH",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 484 vs xd 352 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80218D24",
+   "index": 169,
+   "proposed": "WS_NEGOTO",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 696 vs xd 512 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80218BD4",
+   "index": 171,
+   "proposed": "WS_MICHIDURE_CHECK",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 160 vs xd 44 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80218A6C",
+   "index": 172,
+   "proposed": "WS_JITABATA",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 256 vs xd 140 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80218824",
+   "index": 173,
+   "proposed": "WS_URAMI",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 584 vs xd 440 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021847C",
+   "index": 174,
+   "proposed": "WS_IYASHINOSUZU",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 936 vs xd 764 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802183BC",
+   "index": 175,
+   "proposed": "WS_NOROI",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 192 vs xd 168 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802182D4",
+   "index": 176,
+   "proposed": "WS_MAKIBISHI",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 232 vs xd 220 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80218018",
+   "index": 178,
+   "proposed": "WS_HOROBINOUTA",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 448 vs xd 200 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80217E20",
+   "index": 179,
+   "proposed": "WS_KOROGARU",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 504 vs xd 428 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80217D34",
+   "index": 180,
+   "proposed": "WS_IBARU",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 236 vs xd 156 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80217C04",
+   "index": 181,
+   "proposed": "WS_RENZOKUGIRI",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 304 vs xd 272 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80217AE4",
+   "index": 182,
+   "proposed": "WS_NATSUKI",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 236 vs xd 156 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_8021799C",
+   "index": 183,
+   "proposed": "WS_PRESENT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 328 vs xd 272 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802178F4",
+   "index": 184,
+   "proposed": "WS_SHINPINOMAMORI",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 168 vs xd 156 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802177E4",
+   "index": 185,
+   "proposed": "WS_MAGNITUDE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 272 vs xd 244 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802175A8",
+   "index": 186,
+   "proposed": "WS_OIUCHI_CHECK",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 572 vs xd 476 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80217524",
+   "index": 187,
+   "proposed": null,
+   "verdict": "UNSURE",
+   "evidence": "Colosseum-only opcode, no XD counterpart; near-identical twin of its table neighbor (only a literal ID const 0x52/0x53 differs) -> Colosseum-added state/animation-check opcode pair, semantics undetermined"
+  },
+  {
+   "fn": "fn_80217434",
+   "index": 188,
+   "proposed": "WS_HARADAIKO",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 240 vs xd 224 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80217220",
+   "index": 190,
+   "proposed": "WS_KOUSOKUSPIN",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 436 vs xd 356 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802170B4",
+   "index": 192,
+   "proposed": "WS_WEATHERKAIFUKU",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 264 vs xd 228 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80217018",
+   "index": 193,
+   "proposed": "WS_MEZAMERUPOWER",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 156 vs xd 120 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80216F50",
+   "index": 194,
+   "proposed": "WS_JISIN",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 200 vs xd 176 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80216D9C",
+   "index": 195,
+   "proposed": "WS_MIRAIYOCHI",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 436 vs xd 392 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80216A58",
+   "index": 196,
+   "proposed": "WS_HUKURODATAKI",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 672 vs xd 508 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80216780",
+   "index": 200,
+   "proposed": null,
+   "verdict": "UNSURE",
+   "evidence": "Colosseum-only opcode, no XD counterpart; near-identical twin of its table neighbor (only a literal ID const 0x52/0x53 differs) -> Colosseum-added state/animation-check opcode pair, semantics undetermined"
+  },
+  {
+   "fn": "fn_80216650",
+   "index": 201,
+   "proposed": "WS_OKIMIYAGE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 304 vs xd 280 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802165B4",
+   "index": 202,
+   "proposed": "WS_KONOYUBITOMARE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 156 vs xd 144 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80216410",
+   "index": 204,
+   "proposed": "WS_SHIZENNOCHIKARA",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 320 vs xd 236 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80216364",
+   "index": 205,
+   "proposed": "WS_REFLESH",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 172 vs xd 140 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80216264",
+   "index": 207,
+   "proposed": "WS_KIAIPUNCH",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 140 vs xd 112 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802160EC",
+   "index": 209,
+   "proposed": "WS_TEDASUKE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 260 vs xd 236 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80215CF0",
+   "index": 210,
+   "proposed": "WS_TRICK",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 856 vs xd 580 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80215AEC",
+   "index": 212,
+   "proposed": "WS_NEGAIGOTO",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 388 vs xd 316 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80215954",
+   "index": 214,
+   "proposed": "WS_REVENGE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 292 vs xd 216 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80215808",
+   "index": 216,
+   "proposed": "WS_GAMUSYARA",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 200 vs xd 152 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80215720",
+   "index": 217,
+   "proposed": "WS_HUNKA",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 232 vs xd 176 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80215614",
+   "index": 218,
+   "proposed": "WS_SKILLSWAP",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 268 vs xd 256 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80215374",
+   "index": 219,
+   "proposed": "WS_HUUIN",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 436 vs xd 184 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802151C0",
+   "index": 221,
+   "proposed": "WS_KETAGURI",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 232 vs xd 112 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80214F10",
+   "index": 222,
+   "proposed": "WS_NEKONOTE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 248 vs xd 224 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80214E50",
+   "index": 223,
+   "proposed": "WS_MAGICCORT",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 192 vs xd 168 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80214DB0",
+   "index": 224,
+   "proposed": "WS_YOKODORI",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 160 vs xd 148 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80214CB0",
+   "index": 225,
+   "proposed": "WS_IKAKU",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 76 vs xd 88 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80214C04",
+   "index": 226,
+   "proposed": "WS_SIZENKAIHUKU",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 172 vs xd 140 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80214BB4",
+   "index": 227,
+   "proposed": "WS_HP_CHECK",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 80 vs xd 88 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80214B58",
+   "index": 229,
+   "proposed": "WS_MONOHIROI",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 16 vs xd 40 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80214AFC",
+   "index": 230,
+   "proposed": "WS_TENKIYA",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 92 vs xd 88 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80214AB4",
+   "index": 231,
+   "proposed": "WS_TENKIYA_CHECK",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 72 vs xd 44 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802149B8",
+   "index": 232,
+   "proposed": "WS_ASOBI",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 252 vs xd 240 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80214864",
+   "index": 233,
+   "proposed": "WS_WEATHER_BALL",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 340 vs xd 252 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80214794",
+   "index": 234,
+   "proposed": "WS_RECYCLE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 208 vs xd 160 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802146C4",
+   "index": 235,
+   "proposed": "WS_HOGOSYOKU",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 208 vs xd 196 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802146B4",
+   "index": 236,
+   "proposed": "WS_HUKITOBASHI_OIUCHI",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 16 vs xd 40 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_802145C8",
+   "index": 237,
+   "proposed": "WS_YOKODORI_CLIENT_SET",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 236 vs xd 192 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80214450",
+   "index": 238,
+   "proposed": "WS_KAWARAWARI",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 376 vs xd 392 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80213E94",
+   "index": 239,
+   "proposed": "WS_BALL_THROW",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 1468 vs xd 1644 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80213A78",
+   "index": 240,
+   "proposed": "WS_ADD_POKE",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 1052 vs xd 520 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80213A68",
+   "index": 241,
+   "proposed": "WS_ZUKAN_CHECK",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 16 vs xd 40 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80213A58",
+   "index": 242,
+   "proposed": "WS_ZUKAN",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 16 vs xd 40 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80213A48",
+   "index": 243,
+   "proposed": "WS_NICKNAME",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 16 vs xd 40 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80213A38",
+   "index": 244,
+   "proposed": "WS_ITEM_HP_KAIFUKU",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 16 vs xd 40 (likely REWRITTEN)"
+  },
+  {
+   "fn": "fn_80213A28",
+   "index": 245,
+   "proposed": "WS_ITEM_CONDITION_RECOVER",
+   "verdict": "UNSURE",
+   "evidence": "positional only, forced by neighbor anchors; size 16 vs xd 40 (likely REWRITTEN)"
+  }
+ ]
+}
