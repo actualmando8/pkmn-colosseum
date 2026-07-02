@@ -1692,17 +1692,18 @@ done:
 
 /* 0x801096AC | 0x3C */
 void menuOffScreenFadeSet(f32 f1, f32 f2) {
-    f32 f3 = lbl_8047AD30;
     f32 f0 = lbl_8047CE50;
+    f32 f3 = lbl_8047AD30;
     lbl_8047AD24 = 1;
+    if (((!f2) && (!f2)) && (!f2)) {
+    }
     lbl_8047AD2C = f3;
     lbl_8047AD34 = f1;
-    lbl_8047AD30 = f0;
+    lbl_8047AD30 = (0, f0);
     lbl_8047AD38 = f2;
     lbl_8047AD3C = f0;
     if (f0 != f2) { return; }
-    lbl_8047AD38 = lbl_8047CE5C;
-    lbl_8047AD3C = lbl_8047CE5C;
+    lbl_8047AD3C = (lbl_8047AD38 = lbl_8047CE5C);
 }
 
 /* 0x801096E8 | 0x10 */

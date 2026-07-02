@@ -2551,10 +2551,11 @@ u16 fightFloorCheckFightOutPokemonPtrAryJoutaiDataId(void *param_1, u16 param_2)
 u32 _fightFloorCheckFightOutPokemonPtrAryJoutaiDataIdSub__FPvUsPv(void *param_1, u32 r4_unused, u32 *buf) {
     extern u32 fn_802062FC(void*);
     extern u32 fn_802026E4(void*, u16);
+    void *obj;
 
-    if (!(fn_802062FC(param_1) & 0xFF))
+    if (!(fn_802062FC(obj = param_1) & 0xFF))
         return 1;
-    if ((fn_802026E4(param_1, (u16)buf[0]) & 0xFF) == 1)
+    if ((fn_802026E4(obj, (u16)buf[0]) & 0xFF) == 1)
         buf[1]++;
     return 1;
 }

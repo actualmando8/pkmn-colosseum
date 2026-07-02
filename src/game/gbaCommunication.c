@@ -1174,6 +1174,11 @@ void fn_8008FBF4(u32 ctx) {
     fn_8011288C(0, 0);
 }
 
+static inline u32 fn_80090720_getHandle2(u32 ctx) {
+    extern u32 fn_800F9318(u32 ctx, u32 id);
+    return fn_800F9318(ctx, 0x0CE61004);
+}
+
 /* 0x80090720 | size: 0x2C4 */
 void fn_80090720(u32 ctx) {
     #pragma peephole off
@@ -1205,6 +1210,7 @@ void fn_80090720(u32 ctx) {
     u32 elapsed;
     GSmaterialEntry *material;
     f32 frame;
+    u32 new_var;
     u32 handle2;
     u32 iconHandle;
     u32 iconResult;
@@ -1215,7 +1221,7 @@ void fn_80090720(u32 ctx) {
     fn_800E8FA0(0x280, 0x1E0);
 
     frame = lbl_8047C1D4;
-    handle2 = fn_800F9318(ctx, 0x0CE61004);
+    handle2 = fn_80090720_getHandle2(ctx);
     fn_800ECCA8(handle2, 1);
     GSmodelGetFrameCount(handle2, &frame, 0);
     frame = frame - lbl_8047C1D8;
@@ -1263,13 +1269,14 @@ void fn_80090720(u32 ctx) {
     }
 
     finalResult = fn_801CBA0C(0x0CE91000);
-    fn_801845E4(ctx, iconHandle, ctx, finalResult, 0);
-    fn_801CB834(iconHandle, 1, 0, 0);
+    new_var = iconHandle;
+    fn_801845E4(ctx, new_var, ctx, finalResult, 0);
+    fn_801CB834(new_var, 1, 0, 0);
     fn_801CB834(0x0CE61004, 0, 0, 0);
     fn_801CB708(iconHandle, 1);
     fn_801CB834(iconHandle, 2, 0, 0);
-    fn_801CB708(iconHandle, 1);
-    fn_801CB834(iconHandle, 3, 0, 0);
+    fn_801CB708(new_var, 1);
+    fn_801CB834(new_var, 3, 0, 0);
 
     cameraWaitSyncAnime(1);
     fn_800FF58C(0x89);

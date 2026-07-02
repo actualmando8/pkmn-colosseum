@@ -391,8 +391,11 @@ asm void fn_800266C0(void) {
 s32 fn_800266C0(void* r3, u8* r4) {
     void* ctx;
     s32* entry;
+    u8* base;
     ctx = *(void**)((u8*)r3 + 0x60);
-    entry = (s32*)(lbl_80266DD8 + (*(s32*)((u8*)ctx + 0x1c) << 4));
+    base = lbl_80266DD8;
+    base = base + (*(s32*)((u8*)ctx + 0x1c) << 4);
+    entry = (s32*)base;
     if (entry[1] == 8) goto L_C0_then;
     r4[0x67] = 0;
     goto L_C0_end;
