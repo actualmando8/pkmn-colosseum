@@ -99,6 +99,31 @@ typedef struct EffectParamBlock {
     u8 field_22;
 } EffectParamBlock;
 
+typedef struct EffectUtilCommandObj {
+    /* 0x00 */ u8 field_00;
+    /* 0x01 */ u8 activeFlag;
+    /* 0x02 */ u8 field_02;
+    /* 0x03 */ u8 field_03;
+    /* 0x04 */ u8 pad_04[0x1C];
+    /* 0x20 */ u16 commandValue;
+    /* 0x22 */ u8 pad_22[2];
+    /* 0x24 */ u32 colorRgba;
+    /* 0x28 */ u8 pad_28[4];
+    /* 0x2C */ u8* savedStream;
+    /* 0x30 */ u8* stream;
+    /* 0x34 */ u8 pad_34[0x0D];
+    /* 0x41 */ u8 field_41;
+    /* 0x42 */ u8 field_42;
+    /* 0x43 */ u8 field_43;
+    /* 0x44 */ u8 flags;
+    /* 0x45 */ u8 pendingFlag;
+    /* 0x46 */ u8 doneFlag;
+    /* 0x47 */ u8 pad_47;
+    /* 0x48 */ s16 waitCounter;
+    /* 0x4A */ u8 alignMode;
+    /* 0x4B */ u8 field_4B;
+} EffectUtilCommandObj;
+
 /* ===== Index lookup globals ===== */
 extern GSEffectGlobals lbl_803635C0;  /* effect globals (BSS) */
 extern EffectTraceFxEntry lbl_80363B88[];  /* trace fx table (BSS) */
@@ -141,14 +166,14 @@ u8 fn_80131574(u32 idx) {
 /* 0x80131630 | 0x30 -- read byte from stream, store extsb to obj+0x43 if flag set */
 #pragma push
 #pragma optimization_level 2
-u32 fn_80131630(void* obj) {
+u32 fn_80131630(EffectUtilCommandObj* obj) {
     u8* stream;
-    if (*(u8*)((u8*)obj + 0x01) != 0) {
-        stream = *(u8**)((u8*)obj + 0x30);
-        *(u8*)((u8*)obj + 0x43) = (u8)(s8)*stream;
+    if (obj->activeFlag != 0) {
+        stream = obj->stream;
+        obj->field_43 = (u8)(s8)*stream;
     }
-    stream = *(u8**)((u8*)obj + 0x30);
-    *(u32*)((u8*)obj + 0x30) = (u32)(stream + 1);
+    stream = obj->stream;
+    obj->stream = stream + 1;
     return 0;
 }
 #pragma pop
@@ -156,21 +181,21 @@ u32 fn_80131630(void* obj) {
 /* 0x80131660 | 0x30 -- read byte from stream, store extsb to obj+0x42 if flag set */
 #pragma push
 #pragma optimization_level 2
-u32 fn_80131660(void* obj) {
+u32 fn_80131660(EffectUtilCommandObj* obj) {
     u8* stream;
-    if (*(u8*)((u8*)obj + 0x01) != 0) {
-        stream = *(u8**)((u8*)obj + 0x30);
-        *(u8*)((u8*)obj + 0x42) = (u8)(s8)*stream;
+    if (obj->activeFlag != 0) {
+        stream = obj->stream;
+        obj->field_42 = (u8)(s8)*stream;
     }
-    stream = *(u8**)((u8*)obj + 0x30);
-    *(u32*)((u8*)obj + 0x30) = (u32)(stream + 1);
+    stream = obj->stream;
+    obj->stream = stream + 1;
     return 0;
 }
 #pragma pop
 
 /* 0x80131690 | 16 bytes | set_field_return */
-u32 fn_80131690(void* obj) {
-    *(u8*)((u8*)obj + 0x41) = 1;
+u32 fn_80131690(EffectUtilCommandObj* obj) {
+    obj->field_41 = 1;
     return 0;
 }
 
@@ -269,15 +294,6 @@ typedef struct EffectStatusTableEntry {
     s16 divisor;
 } EffectStatusTableEntry;
 
-typedef struct EffectUtilCommandObj {
-    u8 field_00;
-    u8 activeFlag;
-    u8 field_02[0x1E];
-    u16 commandValue;
-    u8 field_22[0xE];
-    u8* stream;
-} EffectUtilCommandObj;
-
 #if 0
 asm void fn_801316A8(void) {
 #include "src/game/effect/effect_util_fn_801316A8.inc"
@@ -299,27 +315,27 @@ u32 fn_801316D8(void) { return lbl_8047AE9C; }
 u32 fn_801316E0(void) { return lbl_8047AE98; }
 
 /* 0x801316E8 | 0x2C -- read byte from stream, store to obj+0x03 if flag clear */
-u32 fn_801316E8(void* obj) {
+u32 fn_801316E8(EffectUtilCommandObj* obj) {
     u8* stream;
-    if (*(u8*)((u8*)obj + 0x01) == 0) {
-        stream = *(u8**)((u8*)obj + 0x30);
-        *(u8*)((u8*)obj + 0x03) = *stream;
+    if (obj->activeFlag == 0) {
+        stream = obj->stream;
+        obj->field_03 = *stream;
     }
-    stream = *(u8**)((u8*)obj + 0x30);
-    *(u32*)((u8*)obj + 0x30) = (u32)(stream + 1);
+    stream = obj->stream;
+    obj->stream = stream + 1;
     return 0;
 }
 
 /* 0x80131768 | 0x2C -- read byte from stream, store to obj+0x02 if flag set */
 extern void* fn_80132834(void* table, u32 stride, u32 count, u32 type);
-u32 fn_80131768(void* obj) {
+u32 fn_80131768(EffectUtilCommandObj* obj) {
     u8* stream;
-    if (*(u8*)((u8*)obj + 0x01) != 0) {
-        stream = *(u8**)((u8*)obj + 0x30);
-        *(u8*)((u8*)obj + 0x02) = *stream;
+    if (obj->activeFlag != 0) {
+        stream = obj->stream;
+        obj->field_02 = *stream;
     }
-    stream = *(u8**)((u8*)obj + 0x30);
-    *(u32*)((u8*)obj + 0x30) = (u32)(stream + 1);
+    stream = obj->stream;
+    obj->stream = stream + 1;
     return 0;
 }
 
@@ -1167,7 +1183,7 @@ u32 fn_80132428(void) {
 }
 
 /* 0x801324CC | 0xA4 -- read color index from stream, look up RGBA, apply */
-void fn_801324CC(void* obj) {
+void fn_801324CC(EffectUtilCommandObj* obj) {
     extern u32 lbl_80478E88;
     extern u32 lbl_80478E8C;
     extern void fn_800FA160(void*);
@@ -1176,22 +1192,22 @@ void fn_801324CC(void* obj) {
     u8* colorPtr;
     u32 maxIdx;
 
-    if (*(u8*)((u8*)obj + 0x1) != 0) {
-        stream = *(u8**)((u8*)obj + 0x30);
+    if (obj->activeFlag != 0) {
+        stream = obj->stream;
         idx = *stream;
         maxIdx = lbl_80478E88;
         if (idx >= maxIdx) {
             idx = 0;
         }
         colorPtr = (u8*)(lbl_80478E8C + (u32)idx * 4);
-        *(u32*)((u8*)obj + 0x24) = ((u32)colorPtr[0] << 24) |
-                                    ((u32)colorPtr[1] << 16) |
-                                    ((u32)colorPtr[2] << 8) |
-                                    (u32)colorPtr[3];
+        obj->colorRgba = ((u32)colorPtr[0] << 24) |
+                         ((u32)colorPtr[1] << 16) |
+                         ((u32)colorPtr[2] << 8) |
+                         (u32)colorPtr[3];
         fn_800FA160(obj);
     }
     /* Advance stream pointer */
-    *(u32*)((u8*)obj + 0x30) = *(u32*)((u8*)obj + 0x30) + 1;
+    obj->stream = obj->stream + 1;
 }
 
 /* 0x801325C4 | 0x68 -- read byte command into u16 field and apply */
@@ -1213,14 +1229,14 @@ s32 fn_801325C4(EffectUtilCommandObj* obj) {
 }
 
 /* 0x8013262C | 16 bytes | set_field_return */
-u32 fn_8013262C(void* obj) {
-    *(u8*)((u8*)obj + 0x4B) = 0;
+u32 fn_8013262C(EffectUtilCommandObj* obj) {
+    obj->field_4B = 0;
     return 0;
 }
 
 /* 0x8013263C | 16 bytes | set_field_return */
-u32 fn_8013263C(void* obj) {
-    *(u8*)((u8*)obj + 0x4B) = 2;
+u32 fn_8013263C(EffectUtilCommandObj* obj) {
+    obj->field_4B = 2;
     return 0;
 }
 
@@ -4641,15 +4657,14 @@ asm void fn_80131588(void) {
 #else
 #pragma peephole off
 #pragma scheduling on
-u32 fn_80131588(void* obj) {
-    u8* p = (u8*)obj;
-    if (p[0x01] == 0) {
+u32 fn_80131588(EffectUtilCommandObj* obj) {
+    if (obj->activeFlag == 0) {
         u16 handle = lbl_8047AEA4;
         if (handle == 0) {
             return 0;
         }
         if (fn_801666BC(handle) == 2) {
-            *(u32*)(p + 0x30) = *(u32*)(p + 0x30) - 3;
+            obj->stream = obj->stream - 3;
         }
     }
     return 1;
@@ -4665,8 +4680,8 @@ asm void fn_801315EC(void) {
 }
 #else
 #pragma peephole off
-u32 fn_801315EC(void* obj) {
-    if (*(u8*)((u8*)obj + 0x01) == 0) {
+u32 fn_801315EC(EffectUtilCommandObj* obj) {
+    if (obj->activeFlag == 0) {
         u16 handle = lbl_8047AEA4;
         if (handle != 0) {
             fn_80165A20(handle, 0, 0xFF);
@@ -4686,17 +4701,16 @@ asm void fn_80131714(void) {
 #pragma push
 #pragma peephole off
 #pragma scheduling on
-s32 fn_80131714(void* obj) {
+s32 fn_80131714(EffectUtilCommandObj* obj) {
     extern void GSmsgAdjustAlign(void*);
-    u8* p = (u8*)obj;
     u8* stream;
-    if (p[0x01] != 0) {
-        stream = *(u8**)(p + 0x30);
-        p[0x4a] = stream[0];
+    if (obj->activeFlag != 0) {
+        stream = obj->stream;
+        obj->alignMode = stream[0];
         GSmsgAdjustAlign(obj);
     }
-    stream = *(u8**)(p + 0x30);
-    *(u32*)(p + 0x30) = (u32)(stream + 1);
+    stream = obj->stream;
+    obj->stream = stream + 1;
     return 0;
 }
 #pragma scheduling off
@@ -4708,31 +4722,30 @@ asm void fn_80132454(void) {
 }
 #else
 #pragma optimization_level 4
-s32 fn_80132454(void* obj) {
-    u8* p = (u8*)obj;
+s32 fn_80132454(EffectUtilCommandObj* obj) {
     u8* stream;
     s16 counter;
-    if (p[0x01] != 0) {
-        stream = *(u8**)(p + 0x30);
-        *(u32*)(p + 0x30) = (u32)(stream + 1);
+    if (obj->activeFlag != 0) {
+        stream = obj->stream;
+        obj->stream = stream + 1;
         return 0;
     }
-    counter = *(s16*)(p + 0x48);
+    counter = obj->waitCounter;
     if (counter == 0) {
-        stream = *(u8**)(p + 0x30);
+        stream = obj->stream;
         counter = (s16)((s16)stream[0] + 1);
-        *(s16*)(p + 0x48) = counter;
+        obj->waitCounter = counter;
     }
     counter = (s16)(counter - 1);
-    *(s16*)(p + 0x48) = counter;
+    obj->waitCounter = counter;
     if (counter <= 0) {
-        *(s16*)(p + 0x48) = 0;
-        stream = *(u8**)(p + 0x30);
-        *(u32*)(p + 0x30) = (u32)(stream + 1);
+        obj->waitCounter = 0;
+        stream = obj->stream;
+        obj->stream = stream + 1;
         return 0;
     }
-    stream = *(u8**)(p + 0x30);
-    *(u32*)(p + 0x30) = (u32)(stream - 3);
+    stream = obj->stream;
+    obj->stream = stream - 3;
     return 1;
 }
 #endif
@@ -4746,17 +4759,16 @@ asm void fn_80132570(void) {
 #pragma push
 #pragma peephole off
 #pragma scheduling on
-s32 fn_80132570(void* obj) {
+s32 fn_80132570(EffectUtilCommandObj* obj) {
     extern void fn_800FA160(void*);
-    u8* p = (u8*)obj;
     u8* stream;
-    if (p[0x01] != 0) {
-        stream = *(u8**)(p + 0x30);
-        *(u32*)(p + 0x24) = *(u32*)stream;
+    if (obj->activeFlag != 0) {
+        stream = obj->stream;
+        obj->colorRgba = *(u32*)stream;
         fn_800FA160(obj);
     }
-    stream = *(u8**)(p + 0x30);
-    *(u32*)(p + 0x30) = (u32)(stream + 4);
+    stream = obj->stream;
+    obj->stream = stream + 4;
     return 0;
 }
 #pragma scheduling off
@@ -4772,13 +4784,12 @@ asm void fn_8013264C(void) {
 #pragma push
 #pragma peephole off
 #pragma scheduling on
-s32 fn_8013264C(void* obj) {
+s32 fn_8013264C(EffectUtilCommandObj* obj) {
     extern void fn_800FAA98(void*);
-    u8* p = (u8*)obj;
-    if (p[0x01] != 0) {
+    if (obj->activeFlag != 0) {
         fn_800FAA98(obj);
     }
-    p[0x4b] = 1;
+    obj->field_4B = 1;
     return 0;
 }
 #pragma scheduling off

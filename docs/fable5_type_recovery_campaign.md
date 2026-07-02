@@ -801,3 +801,39 @@ Validation result:
 - Rejected conversions: plain non-volatile LObj checks regressed exact rows;
   PObj `+0x18` aobj access remains raw because the current public `HSD_PObj`
   header does not model that field.
+
+## Effect Util Command Batch 13, 2026-07-01
+
+Applied after local review:
+
+- `effect_util.c`: expanded the local `EffectUtilCommandObj` view through
+  offset `0x4B`, naming the active flag, command value, stream pointers, color,
+  wait counter, alignment mode, and small command flags.
+- Converted small command-object helpers to field access, including byte-read
+  stream helpers, wait/color/alignment helpers, and exact flag setters.
+- Deferred the larger parser/control-flow bodies around `fn_80132690`,
+  `fn_8013275C`, `fn_801327E0`, and the broad setup regions.
+
+Validation result:
+
+- `main/game/effect/effect_util` stayed at `59.98641%` fuzzy and
+  `30.394156%` matched code.
+
+## GS Field Colquery WZX Batch 14, 2026-07-01
+
+Applied after local review:
+
+- `gs_field_colquery.c`: introduced local views for WZX region data, compact
+  triangle lists, reservation rows, and the colquery transition/material state.
+- Converted the exact WZX boundary-triangle scan and transition callback
+  helpers to named fields.
+- Kept reservation/material helper bodies raw where typed field access was
+  proven to regress exact codegen.
+
+Validation result:
+
+- `main/game/gs_field_colquery` stayed at `24.766365%` fuzzy and
+  `19.006525%` matched code.
+- Rejected conversions: typed reservation access regressed `fn_8010FFC4` and
+  `fn_80110084`; typed material/state access regressed `fn_801128A0`,
+  `fn_80113FE8`, and `fn_801140C8`.
