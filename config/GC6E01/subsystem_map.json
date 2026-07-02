@@ -493,7 +493,7 @@
 "addr": "0x80007FDC",
 "size": 56,
 "label": "gs-engine",
-"confidence": 1.9,
+"confidence": 1.89,
 "seed": null
 },
 {
@@ -1588,7 +1588,7 @@
 "name": "fn_80011288",
 "addr": "0x80011288",
 "size": 540,
-"label": "gs-engine",
+"label": "fight",
 "confidence": 1.9,
 "seed": null
 },
@@ -1596,7 +1596,7 @@
 "name": "fn_800114A4",
 "addr": "0x800114A4",
 "size": 604,
-"label": "gs-engine",
+"label": "fight",
 "confidence": 1.9,
 "seed": null
 },
@@ -26873,7 +26873,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011432C",
+"name": "floorReadGFLPreFunc",
 "addr": "0x8011432C",
 "size": 116,
 "label": "field",
@@ -26905,7 +26905,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011445C",
+"name": "floorReadParticlePreFunc",
 "addr": "0x8011445C",
 "size": 116,
 "label": "field",
@@ -26929,7 +26929,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80114634",
+"name": "floorReadWZXPreFunc",
 "addr": "0x80114634",
 "size": 112,
 "label": "field",
@@ -26937,7 +26937,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801146A4",
+"name": "floorReadPKXPreFunc",
 "addr": "0x801146A4",
 "size": 112,
 "label": "field",
@@ -26945,7 +26945,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80114714",
+"name": "floorReadTexPostFunc",
 "addr": "0x80114714",
 "size": 76,
 "label": "field",
@@ -26953,7 +26953,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80114760",
+"name": "floorReadTexPreFunc",
 "addr": "0x80114760",
 "size": 116,
 "label": "field",
@@ -26969,7 +26969,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80114808",
+"name": "floorReadColPreFunc",
 "addr": "0x80114808",
 "size": 116,
 "label": "field",
@@ -27001,7 +27001,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80114A70",
+"name": "floorReadObjPreFunc",
 "addr": "0x80114A70",
 "size": 112,
 "label": "field",
@@ -27033,7 +27033,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80114D6C",
+"name": "floorReadScriptPreFunc",
 "addr": "0x80114D6C",
 "size": 160,
 "label": "field",
@@ -27049,7 +27049,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80114E78",
+"name": "floorReadFontPreFunc",
 "addr": "0x80114E78",
 "size": 160,
 "label": "field",
@@ -27065,7 +27065,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80114F84",
+"name": "floorReadMsgPreFunc",
 "addr": "0x80114F84",
 "size": 160,
 "label": "field",
@@ -27073,7 +27073,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80115024",
+"name": "floorReadNormalPreFunc",
 "addr": "0x80115024",
 "size": 112,
 "label": "field",
@@ -68951,14 +68951,8 @@
 {
 "label": "fight",
 "start": "0x800111C4",
-"end": "0x80011288",
-"count": 3
-},
-{
-"label": "gs-engine",
-"start": "0x80011288",
 "end": "0x80011700",
-"count": 2
+"count": 5
 },
 {
 "label": "menu",
