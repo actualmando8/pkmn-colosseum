@@ -1588,7 +1588,7 @@
 "name": "fn_80011288",
 "addr": "0x80011288",
 "size": 540,
-"label": "gs-engine",
+"label": "fight",
 "confidence": 1.9,
 "seed": null
 },
@@ -1596,7 +1596,7 @@
 "name": "fn_800114A4",
 "addr": "0x800114A4",
 "size": 604,
-"label": "gs-engine",
+"label": "fight",
 "confidence": 1.9,
 "seed": null
 },
@@ -40785,7 +40785,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801768F0",
+"name": "cameraSetRotation",
 "addr": "0x801768F0",
 "size": 88,
 "label": "particle",
@@ -40825,7 +40825,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80176A44",
+"name": "cameraStartAnimation",
 "addr": "0x80176A44",
 "size": 80,
 "label": "particle",
@@ -40833,7 +40833,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80176A94",
+"name": "cameraStopAnimation",
 "addr": "0x80176A94",
 "size": 80,
 "label": "particle",
@@ -42449,7 +42449,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8018A280",
+"name": "peopleMoveCheck",
 "addr": "0x8018A280",
 "size": 460,
 "label": "people",
@@ -42481,7 +42481,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8018AEC0",
+"name": "peopleWaitSyncMotionBlend",
 "addr": "0x8018AEC0",
 "size": 444,
 "label": "people",
@@ -48089,7 +48089,7 @@
 "seed": null
 },
 {
-"name": "fn_801C9EDC",
+"name": "scriptSetMemoFlag",
 "addr": "0x801C9EDC",
 "size": 36,
 "label": "gs-engine",
@@ -48121,19 +48121,19 @@
 "seed": null
 },
 {
-"name": "fn_801CA4D8",
+"name": "fadeEffectGetRandom",
 "addr": "0x801CA4D8",
 "size": 32,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "fade",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_801CA4F8",
 "addr": "0x801CA4F8",
 "size": 204,
 "label": "gs-engine",
-"confidence": 1.9,
+"confidence": 1.5,
 "seed": null
 },
 {
@@ -48177,7 +48177,7 @@
 "seed": null
 },
 {
-"name": "fn_801CA7EC",
+"name": "scriptAddPokecoupon",
 "addr": "0x801CA7EC",
 "size": 108,
 "label": "field",
@@ -48225,7 +48225,7 @@
 "seed": null
 },
 {
-"name": "fn_801CA940",
+"name": "scriptAddPokedoru",
 "addr": "0x801CA940",
 "size": 80,
 "label": "field",
@@ -48337,7 +48337,7 @@
 "seed": null
 },
 {
-"name": "fn_801CAE80",
+"name": "scriptSetPokemonNakigoe",
 "addr": "0x801CAE80",
 "size": 32,
 "label": "field",
@@ -48441,7 +48441,7 @@
 "seed": null
 },
 {
-"name": "fn_801CB3FC",
+"name": "scriptExecTask",
 "addr": "0x801CB3FC",
 "size": 172,
 "label": "gs-engine",
@@ -50212,7 +50212,7 @@
 "name": "fn_801E075C",
 "addr": "0x801E075C",
 "size": 644,
-"label": "gs-engine",
+"label": "field",
 "confidence": 1.9,
 "seed": null
 },
@@ -68951,14 +68951,8 @@
 {
 "label": "fight",
 "start": "0x800111C4",
-"end": "0x80011288",
-"count": 3
-},
-{
-"label": "gs-engine",
-"start": "0x80011288",
 "end": "0x80011700",
-"count": 2
+"count": 5
 },
 {
 "label": "menu",
@@ -70583,8 +70577,20 @@
 {
 "label": "gs-engine",
 "start": "0x801C9F5C",
+"end": "0x801ca4d8",
+"count": 2
+},
+{
+"label": "fade",
+"start": "0x801CA4D8",
+"end": "0x801ca4f8",
+"count": 1
+},
+{
+"label": "gs-engine",
+"start": "0x801CA4F8",
 "end": "0x801ca5c4",
-"count": 4
+"count": 1
 },
 {
 "label": "fight",
@@ -70709,14 +70715,14 @@
 {
 "label": "field",
 "start": "0x801DF790",
-"end": "0x801e075c",
-"count": 3
+"end": "0x801e09e0",
+"count": 4
 },
 {
 "label": "gs-engine",
-"start": "0x801E075C",
+"start": "0x801E09E0",
 "end": "0x801e11cc",
-"count": 8
+"count": 7
 },
 {
 "label": "particle",

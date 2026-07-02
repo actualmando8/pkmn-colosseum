@@ -4077,9 +4077,9 @@ extern void fn_801662E8(void);
 extern void fn_80165A20(void);
 extern void fn_8017B1AC(void);
 extern void fn_800EC918(void);
-extern void fn_80176A94(void);
+extern void cameraStopAnimation(void);
 extern void fn_8016557C(void);
-extern void fn_80176A44(void);
+extern void cameraStartAnimation(void);
 extern void fn_80165548(void);
 extern void fn_800EC8DC(void);
 extern void fn_800ECCA8(void);
@@ -4149,8 +4149,8 @@ void fn_8001FD48(void) {
     extern void fn_8016557C();
     extern void fn_80165A20();
     extern void fn_801662E8();
-    extern void fn_80176A44();
-    extern void fn_80176A94();
+    extern void cameraStartAnimation();
+    extern void cameraStopAnimation();
     extern void fn_80176E0C();
     extern void fn_8017B1AC();
     extern void fadeCheck();
@@ -4220,7 +4220,7 @@ void fn_8001FD48(void) {
             tmp = lbl_8047A318;
             if ((s32)tmp == 0) {
                 fn_800EC918();
-                fn_80176A94();
+                cameraStopAnimation();
                 fn_8016557C();
                 tmp = 0x1;
                 lbl_8047A318 = tmp;
@@ -4230,7 +4230,7 @@ void fn_8001FD48(void) {
         }
         tmp = lbl_8047A318;
         if ((s32)tmp == 1) {
-            fn_80176A44();
+            cameraStartAnimation();
             r3 = 0x0;
             r4 = 0x406;
             fn_801662E8();
@@ -4243,7 +4243,7 @@ void fn_8001FD48(void) {
             tmp = lbl_8047A314;
             if ((s32)tmp == 0) {
                 fn_800EC918();
-                fn_80176A94();
+                cameraStopAnimation();
                 fn_8016557C();
                 tmp = 0x1;
                 lbl_8047A314 = tmp;
@@ -4253,7 +4253,7 @@ void fn_8001FD48(void) {
         }
         tmp = lbl_8047A314;
         if ((s32)tmp == 1) {
-            fn_80176A44();
+            cameraStartAnimation();
             r3 = 0x0;
             r4 = 0x406;
             fn_801662E8();

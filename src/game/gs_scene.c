@@ -42,10 +42,10 @@
  *   fn_80176758 (GSscene_SetRotation)
  *   fn_801767E0 (GSscene_SetScale)
  *   fn_80176868 (GSscene_SetColor)
- *   fn_801768F0 (GSscene_GetTransform)
+ *   cameraSetRotation (GSscene_GetTransform)
  *   fn_80176948-801769B0 (Get X/Y/Z position, still unnamed)
  *   cameraSetAnimeRate (GSscene_SetVisible)
- *   fn_80176A44 (GSscene_GetVisible)
+ *   cameraStartAnimation (GSscene_GetVisible)
  *   cameraStopAnime (GSscene_ComputeWorldTransform)
  *   fn_80176B48 (GSscene_UpdateTransformHierarchy)
  *   fn_80176C04 (GSscene_GetWorldPosition)
@@ -474,7 +474,7 @@ f32 fn_8017669C(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_80176A94(void) {
+asm void cameraStopAnimation(void) {
 #include "src/game/gs_scene_fn_80176A94.inc"
 }
 #pragma pop
@@ -482,7 +482,7 @@ asm void fn_80176A94(void) {
 #pragma pop
 #pragma push
 #pragma optimization_level 4
-void fn_80176A94(void) {
+void cameraStopAnimation(void) {
     void* p;
     void* r;
     p = lbl_80478C40;

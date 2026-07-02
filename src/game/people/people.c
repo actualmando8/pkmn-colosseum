@@ -512,11 +512,11 @@ extern u32 lbl_8047D79C;
 extern u8 lbl_80274008[];
 extern u8 lbl_8036C510[];
 #if 0
-asm void fn_8018AEC0(void) {
+asm void peopleWaitSyncMotionBlend(void) {
 #include "src/game/people/people_fn_8018AEC0.inc"
 }
 #else
-void fn_8018AEC0(void) {
+void peopleWaitSyncMotionBlend(void) {
     /* TODO: match -- 444 bytes at 0x8018AEC0 */
 }
 #endif
@@ -1440,8 +1440,8 @@ void fn_80189490(void) {
 void fn_80189990(void) {
 }
 
-/* fn_8018A280 -- not recovered, gap in archive campaign (size 0x1CC) */
-void fn_8018A280(void) {
+/* peopleMoveCheck -- not recovered, gap in archive campaign (size 0x1CC) */
+void peopleMoveCheck(void) {
 }
 
 /* fn_8018AACC -- not recovered, gap in archive campaign (size 0x3F4) */

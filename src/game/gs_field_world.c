@@ -1890,7 +1890,7 @@ extern void fn_800EE150(void);
 extern void GSpartGetTransform(void);
 extern void fn_800EE828();
 extern void fn_8018AACC(void);
-extern void fn_8018A280(void);
+extern void peopleMoveCheck(void);
 extern void fn_8018805C(void);
 extern void fn_80184470(void);
 extern void fn_8018C0A8(void);

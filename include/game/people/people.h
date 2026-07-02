@@ -298,8 +298,9 @@ void peopleMoveWalkPosition(u32 groupId, u32 index, u32 targetX, u32 targetY, u3
 /** Walk-list "add" handler (debug name: "peopleAddWalkList"). fn_80188AF4 */
 void peopleMoveAddWalkList(u32 groupId, u32 index);
 
-/** Check movement completion (debug name: "peopleMoveCheck"). fn_8018F4C8 */
-void peopleMoveCheck(void* entry, u8 param, s32* outNode, u8* outResult);
+/** Check movement completion (self-tag string lbl_8036C52C; scrCmd table
+ * index 62). 0x8018A280 -- the old fn_8018F4C8 attribution here was wrong. */
+void peopleMoveCheck(void);
 
 /** Proximity check -- is the player within talk range? fn_8018D680 */
 BOOL peopleIsWithinRange(u32 posA, u32 posB, u32 posC, f32 range);
