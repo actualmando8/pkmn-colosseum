@@ -9,21 +9,21 @@
     "total_units": 338
   },
   "topology_status": {
-    "auto_units": 11,
-    "named_units": 327,
-    "source_backed_units": 307,
+    "auto_units": 9,
+    "named_units": 329,
+    "source_backed_units": 309,
     "auto_code": 0,
-    "auto_data": 2181715,
+    "auto_data": 2179323,
     "auto_functions": 0
   },
   "baseline_progress": {
-    "matched_code": "290840",
-    "matched_code_percent": 11.656409,
-    "matched_data": "14541",
-    "matched_data_percent": 0.66208124,
-    "matched_functions": 3483,
-    "matched_functions_percent": 40.485878,
-    "fuzzy_match_percent": 25.71043
+    "matched_code": "296252",
+    "matched_code_percent": 11.873314,
+    "matched_data": "16933",
+    "matched_data_percent": 0.7709939,
+    "matched_functions": 3501,
+    "matched_functions_percent": 40.695107,
+    "fuzzy_match_percent": 25.821001
   },
   "unit_topology": [
     {
@@ -612,7 +612,7 @@
       "total_functions": 0
     },
     {
-      "name": "main/auto_09_8047E538_sdata2",
+      "name": "main/game/data/sdata2_8047E538",
       "sections": [
         {
           "name": ".sdata2",
@@ -703,7 +703,7 @@
       "total_functions": 0
     },
     {
-      "name": "main/auto_04_802663A0_rodata",
+      "name": "main/game/data/rodata_802663A0",
       "sections": [
         {
           "name": ".rodata",

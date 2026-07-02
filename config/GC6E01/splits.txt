@@ -143,8 +143,14 @@ game/data/sdata2_8047E390.c:
 game/data/sdata2_8047E490.c:
 	.sdata2     start:0x8047E490 end:0x8047E538
 
+game/data/sdata2_8047E538.c:
+	.sdata2     start:0x8047E538 end:0x8047E658
+
 game/colosseum_battle_sdata2.c:
 	.sdata2     start:0x8047E658 end:0x8047E700
+
+game/data/rodata_802663A0.c:
+	.rodata     start:0x802663A0 end:0x80266BD8
 
 game/data/rodata_80266BD8.c:
 	.rodata     start:0x80266BD8 end:0x80266C7C

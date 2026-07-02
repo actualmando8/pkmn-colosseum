@@ -1690,6 +1690,11 @@ config.libs = [
             ),
             Object(
                 DataCandidate,
+                "game/data/rodata_802663A0.c",
+                progress_category="game",
+            ),
+            Object(
+                DataCandidate,
                 "game/data/rodata_80266BD8.c",
                 progress_category="game",
             ),
@@ -1933,6 +1938,11 @@ config.libs = [
             Object(
                 DataCandidate,
                 "game/data/sdata2_8047E490.c",
+                progress_category="game",
+            ),
+            Object(
+                DataCandidate,
+                "game/data/sdata2_8047E538.c",
                 progress_category="game",
             ),
             Object(
