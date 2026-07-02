@@ -56,6 +56,14 @@ typedef struct WazaEntry {
     /* 0x2C */ /* end of struct */
 } WazaEntry;
 
+typedef struct WazaPartyScratch {
+    u16 seqIds[0x200];
+    u16 count;
+    u8 pad_402[0x40];
+    u8 selectedHandle;
+    u8 currentHandle;
+} WazaPartyScratch;
+
 /* =========================================================================
  * External function declarations
  * ========================================================================= */
@@ -232,8 +240,9 @@ s32 fn_801D14C0(s32 idx) {
  * Address: 0x801D1504 | Size: 0x44
  */
 f32 fn_801D1504(void* entry) {
-    if (entry == NULL) return 0.0f;
-    return *(f32*)((u8*)entry + 0x14);
+    WazaEntry* sequenceEntry = (WazaEntry*)entry;
+    if (sequenceEntry == NULL) return 0.0f;
+    return sequenceEntry->posY;
 }
 
 /**
@@ -241,8 +250,9 @@ f32 fn_801D1504(void* entry) {
  * Address: 0x801D1548 | Size: 0x44
  */
 f32 fn_801D1548(void* entry) {
-    if (entry == NULL) return 0.0f;
-    return *(f32*)((u8*)entry + 0x18);
+    WazaEntry* sequenceEntry = (WazaEntry*)entry;
+    if (sequenceEntry == NULL) return 0.0f;
+    return sequenceEntry->posZ;
 }
 
 /**
@@ -250,8 +260,9 @@ f32 fn_801D1548(void* entry) {
  * Address: 0x801D158C | Size: 0x44
  */
 f32 fn_801D158C(void* entry) {
-    if (entry == NULL) return 1.0f;
-    return *(f32*)((u8*)entry + 0x1C);
+    WazaEntry* sequenceEntry = (WazaEntry*)entry;
+    if (sequenceEntry == NULL) return 1.0f;
+    return sequenceEntry->scale;
 }
 
 /**
@@ -259,8 +270,9 @@ f32 fn_801D158C(void* entry) {
  * Address: 0x801D15D0 | Size: 0x48
  */
 f32 fn_801D15D0(void* entry) {
-    if (entry == NULL) return 0.0f;
-    return *(f32*)((u8*)entry + 0x20);
+    WazaEntry* sequenceEntry = (WazaEntry*)entry;
+    if (sequenceEntry == NULL) return 0.0f;
+    return sequenceEntry->rotation;
 }
 
 /**
@@ -300,9 +312,9 @@ u32 fn_801D1650(u32 idx) {
  */
 void fn_801D167C(u32 handle) {
     s32 slot = handle & 0xFF;
-    void* party = fn_80129280(0, 0x0A);
+    WazaPartyScratch* party = (WazaPartyScratch*)fn_80129280(0, 0x0A);
     if (slot < lbl_80478CB8) {
-        *(u8*)((u8*)party + 0x443) = (u8)handle;
+        party->currentHandle = (u8)handle;
     }
 }
 
@@ -312,8 +324,8 @@ void fn_801D167C(u32 handle) {
  */
 #pragma scheduling off
 u8 fn_801D16C4(void) {
-    void* party = fn_80129280(0, 0x0A);
-    return *(u8*)((u8*)party + 0x443);
+    WazaPartyScratch* party = (WazaPartyScratch*)fn_80129280(0, 0x0A);
+    return party->currentHandle;
 }
 #pragma scheduling on
 
@@ -322,14 +334,14 @@ u8 fn_801D16C4(void) {
  * Address: 0x801D16F0 | Size: 0x44
  */
 u32 fn_801D16F0(s32 idx) {
-    void* entry;
+    WazaEntry* entry;
     if (idx < 0 || (u32)idx >= *lbl_80478E98) {
         entry = NULL;
     } else {
-        entry = (void*)(lbl_80478E9C + (u32)idx * 0x2C);
+        entry = (WazaEntry*)(lbl_80478E9C + (u32)idx * sizeof(WazaEntry));
     }
     if (entry == NULL) return 0;
-    return *(u32*)((u8*)entry + 0x18);
+    return *(u32*)&entry->posZ;
 }
 
 /* =========================================================================
@@ -369,14 +381,14 @@ void fn_801D19A4(s32 seqHandle, f32 speed) {
  * returns entry[idx*0x2C + 0x14] from lbl_80478E9C.
  */
 u32 fn_801D1A44(s32 idx) {
-    void* entry;
+    WazaEntry* entry;
     if (idx < 0 || (u32)idx >= *lbl_80478E98) {
         entry = NULL;
     } else {
-        entry = (void*)(lbl_80478E9C + (u32)idx * 0x2C);
+        entry = (WazaEntry*)(lbl_80478E9C + (u32)idx * sizeof(WazaEntry));
     }
     if (entry == NULL) return 0;
-    return *(u32*)((u8*)entry + 0x14);
+    return *(u32*)&entry->posY;
 }
 
 /**
@@ -384,14 +396,14 @@ u32 fn_801D1A44(s32 idx) {
  * Address: 0x801D1A88 | Size: 0x44
  */
 u32 fn_801D1A88(s32 idx) {
-    void* entry;
+    WazaEntry* entry;
     if (idx < 0 || (u32)idx >= *lbl_80478E98) {
         entry = NULL;
     } else {
-        entry = (void*)(lbl_80478E9C + (u32)idx * 0x2C);
+        entry = (WazaEntry*)(lbl_80478E9C + (u32)idx * sizeof(WazaEntry));
     }
     if (entry == NULL) return 0;
-    return *(u32*)((u8*)entry + 0x0C);
+    return entry->field_0C;
 }
 
 /**
@@ -399,14 +411,14 @@ u32 fn_801D1A88(s32 idx) {
  * Address: 0x801D1ACC | Size: 0x44
  */
 u32 fn_801D1ACC(s32 idx) {
-    void* entry;
+    WazaEntry* entry;
     if (idx < 0 || (u32)idx >= *lbl_80478E98) {
         entry = NULL;
     } else {
-        entry = (void*)(lbl_80478E9C + (u32)idx * 0x2C);
+        entry = (WazaEntry*)(lbl_80478E9C + (u32)idx * sizeof(WazaEntry));
     }
     if (entry == NULL) return 0;
-    return *(u32*)((u8*)entry + 0x10);
+    return entry->field_10;
 }
 
 /**
@@ -417,8 +429,8 @@ u32 fn_801D1ACC(s32 idx) {
 #pragma push
 #pragma peephole off
 void fn_801D1B10(s32 handle) {
-    void* party = (void*)fn_80129280(0, 0x0A);
-    *(u8*)((u8*)party + 0x442) = (u8)handle;
+    WazaPartyScratch* party = (WazaPartyScratch*)fn_80129280(0, 0x0A);
+    party->selectedHandle = (u8)handle;
 }
 #pragma pop
 
@@ -428,8 +440,8 @@ void fn_801D1B10(s32 handle) {
  */
 #pragma scheduling off
 u8 fn_801D1B4C(void) {
-    void* party = (void*)fn_80129280(0, 0x0A);
-    return *(u8*)((u8*)party + 0x442);
+    WazaPartyScratch* party = (WazaPartyScratch*)fn_80129280(0, 0x0A);
+    return party->selectedHandle;
 }
 #pragma scheduling on
 
@@ -456,7 +468,7 @@ void fn_801D1C20(s32 seqHandle) {
 #pragma push
 #pragma peephole off
 BOOL fn_801D1CC4(s32 idx) {
-    void* party = fn_80129280(0, 0x0A);
+    WazaPartyScratch* party = (WazaPartyScratch*)fn_80129280(0, 0x0A);
     u16 count;
     s32 i;
     u16* entry;
@@ -465,8 +477,8 @@ BOOL fn_801D1CC4(s32 idx) {
         return FALSE;
     }
 
-    count = *(u16*)((u8*)party + 0x400);
-    entry = (u16*)party;
+    count = party->count;
+    entry = party->seqIds;
     for (i = 0; i < count; i++) {
         if (idx == *entry) {
             break;
@@ -507,16 +519,18 @@ BOOL fn_801D1E50(s32 seqHandle) {
 #pragma push
 #pragma peephole off
 s32 fn_801D1F0C(s32 idx) {
-    void* party;
+    WazaPartyScratch* party;
+    WazaPartyScratch* countParty;
     u16 count;
-    party = (void*)fn_80129280(0, 0x0A);
+    party = (WazaPartyScratch*)fn_80129280(0, 0x0A);
     if (idx < 0) goto neg1;
-    count = *(u16*)((u8*)(void*)fn_80129280(0, 0x0A) + 0x400);
+    countParty = (WazaPartyScratch*)fn_80129280(0, 0x0A);
+    count = countParty->count;
     if (idx < (s32)count) goto load;
 neg1:
     return -1;
 load:
-    return *(u16*)((u8*)party + idx * 2);
+    return party->seqIds[idx];
 }
 #pragma pop
 
@@ -526,8 +540,8 @@ load:
  */
 #pragma scheduling off
 u16 fn_801D1F7C(void) {
-    void* party = (void*)fn_80129280(0, 0x0A);
-    return *(u16*)((u8*)party + 0x400);
+    WazaPartyScratch* party = (WazaPartyScratch*)fn_80129280(0, 0x0A);
+    return party->count;
 }
 #pragma scheduling on
 

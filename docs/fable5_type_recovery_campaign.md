@@ -714,3 +714,26 @@ Validation result:
   `5.4287167%` matched code.
 - The remaining `0x70` slot arithmetic is in the full render loop and is
   intentionally deferred to a separate pass.
+
+## Battle Waza Entry Batch 9, 2026-07-01
+
+Applied after local review:
+
+- `battle_waza.c`: introduced `WazaPartyScratch` for the scratch payload
+  returned by `fn_80129280(0, 0x0A)`, naming the sequence ID array, `count`,
+  `selectedHandle`, and `currentHandle`.
+- Converted the entry field accessors around `fn_801D1504` through
+  `fn_801D1ACC` to use `WazaEntry` fields or field-address casts where the
+  public return type still treats a float-backed field as raw `u32`.
+- Converted the party scratch helpers `fn_801D167C`, `fn_801D16C4`,
+  `fn_801D1B10`, `fn_801D1B4C`, `fn_801D1CC4`, `fn_801D1F0C`, and
+  `fn_801D1F7C` to named scratch fields.
+
+Validation result:
+
+- All touched exact helpers stayed `100.0%`.
+- Lower-match entry getters stayed at their prior percentages:
+  `fn_801D1504`, `fn_801D1548`, and `fn_801D158C` at `28.235294%`;
+  `fn_801D15D0` at `26.666666%`; `fn_801D167C` at `88.888885%`.
+- `main/game/battle/battle_waza` stayed at `11.662305%` fuzzy and
+  `9.613382%` matched code.
