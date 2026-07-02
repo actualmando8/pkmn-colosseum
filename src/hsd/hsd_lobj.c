@@ -227,7 +227,7 @@ extern HSD_ClassInfo* lbl_8047B2B0;
 extern u8 lbl_8036CA20[];
 extern HSD_SList* lbl_8047B2B4;
 #if 0
-asm void LObjAmnesia(void) {
+asm void LObjAmnesia_801A4098(void) {
 #include "src/hsd/hsd_lobj_fn_801A4098.inc"
 }
 #else
@@ -235,7 +235,7 @@ asm void LObjAmnesia(void) {
 #pragma peephole off
 extern u8 lbl_8036CA20[];
 extern void fn_801C25E4(HSD_AObj*);
-void LObjAmnesia(void* param) {
+void LObjAmnesia_801A4098(void* param) {
     if (param == lbl_8047B2B0) {
         lbl_8047B2B0 = NULL;
     }
@@ -254,11 +254,11 @@ void LObjAmnesia(void* param) {
 
 /* 0x801A40F8 | 0x174 */
 #if 0
-asm void LObjRelease(void) {
+asm void LObjRelease_801A40F8(void) {
 #include "src/hsd/hsd_lobj_fn_801A40F8.inc"
 }
 #else
-void LObjRelease(HSD_LObj* lobj)
+void LObjRelease_801A40F8(HSD_LObj* lobj)
 {
     fn_801C25E4(lobj->aobj);
     HSD_WObjUnref(lobj != NULL ? lobj->position : NULL);
@@ -443,12 +443,12 @@ s32 LObjLoad(HSD_LObj* lobj, HSD_LightDesc* ldesc)
 #endif
 
 /* 0x801A48B0 | 0x44 */
-extern void HSD_WObjGetPosition();
+extern void fn_80191688();
 /* HSD_LObjGetInterest */
 s32 HSD_LObjGetInterest(HSD_LObj* lobj, void* out) {
     if (lobj != NULL) {
         if (*(HSD_WObj* volatile*) &lobj->interest != NULL) {
-            HSD_WObjGetPosition(lobj->interest, out);
+            fn_80191688(lobj->interest, out);
             return 1;
         }
     }
@@ -491,7 +491,7 @@ asm void HSD_LObjGetPosition(void) {
 s32 HSD_LObjGetPosition(HSD_LObj* lobj, void* out) {
     if (lobj != NULL) {
         if (*(HSD_WObj* volatile*) &lobj->position != NULL) {
-            HSD_WObjGetPosition(lobj->position, out);
+            fn_80191688(lobj->position, out);
             return 1;
         }
     }
@@ -699,16 +699,16 @@ void HSD_LObjAddCurrentAll(HSD_LObj* lobj)
 #endif
 
 /* 0x801A4F54 | 0xE78 */
-extern void PSMTXMultVec(void* mtx, void* src, void* dst);
+extern void fn_800A37CC(void* mtx, void* src, void* dst);
 extern void fn_800BA414(void* light, f32 x, f32 y, f32 z);
 extern void fn_800BA198(void* light, f32 a0, f32 a1, f32 a2,
                         f32 k0, f32 k1, f32 k2);
 extern void fn_800BA440(void* light, u32* color);
 extern void fn_800A3A9C(void* a, void* b, void* dst);
-extern void PSVECNormalize(void* src, void* dst);
-extern void PSMTXMultVecSR(void* mtx, void* src, void* dst);
+extern void fn_800A3ADC(void* src, void* dst);
+extern void fn_800A3820(void* mtx, void* src, void* dst);
 extern void fn_800BA424(void* light, f32 x, f32 y, f32 z);
-extern void GXLoadLightObjImm(void* light, u32 light_id);
+extern void fn_800BA44C(void* light, u32 light_id);
 extern void jumptable_8036CAD0();
 extern void jumptable_8036CAAC();
 extern void jumptable_8036CA88();
@@ -752,7 +752,7 @@ asm void HSD_LObjSetup(void* setup) {
             LOBJ_ABS((vec).z) <= lbl_80478AC8) {                            \
             LOBJ_DEFAULT_DIR(vec);                                          \
         } else {                                                            \
-            PSVECNormalize(&(vec), &(vec));                                    \
+            fn_800A3ADC(&(vec), &(vec));                                    \
         }                                                                   \
     } while (0)
 
@@ -764,10 +764,10 @@ asm void HSD_LObjSetup(void* setup) {
         LOBJ_COPY_VEC(lobj_pos, lbl_80274D58);                              \
         LOBJ_COPY_VEC(lobj_interest, lbl_80274D64);                         \
         if ((lobj)->position != NULL) {                                     \
-            HSD_WObjGetPosition((lobj)->position, &lobj_pos);                       \
+            fn_80191688((lobj)->position, &lobj_pos);                       \
         }                                                                   \
         if ((lobj)->interest != NULL) {                                     \
-            HSD_WObjGetPosition((lobj)->interest, &lobj_interest);                  \
+            fn_80191688((lobj)->interest, &lobj_interest);                  \
         }                                                                   \
         fn_800A3A9C(&lobj_interest, &lobj_pos, &(dst));                     \
         LOBJ_NORMALIZE_OR_DEFAULT(dst);                                     \
@@ -793,9 +793,9 @@ asm void HSD_LObjSetup(void* setup) {
             case LOBJ_POINT:                                                \
             case LOBJ_SPOT:                                                 \
                 if ((lobj)->position != NULL) {                             \
-                    HSD_WObjGetPosition((lobj)->position, &(lobj)->lvec_x);         \
+                    fn_80191688((lobj)->position, &(lobj)->lvec_x);         \
                 }                                                           \
-                PSMTXMultVec((mtx), &(lobj)->lvec_x, &(lobj)->lvec_x);       \
+                fn_800A37CC((mtx), &(lobj)->lvec_x, &(lobj)->lvec_x);       \
                 break;                                                      \
             case LOBJ_INFINITE: {                                           \
                 LObjVec lobj_dir;                                           \
@@ -804,8 +804,8 @@ asm void HSD_LObjSetup(void* setup) {
                 (lobj)->lvec_x = lobj_dir.x;                                \
                 (lobj)->lvec_y = lobj_dir.y;                                \
                 (lobj)->lvec_z = lobj_dir.z;                                \
-                PSMTXMultVecSR((mtx), &(lobj)->lvec_x, &(lobj)->lvec_x);       \
-                PSVECNormalize(&(lobj)->lvec_x, &(lobj)->lvec_x);              \
+                fn_800A3820((mtx), &(lobj)->lvec_x, &(lobj)->lvec_x);       \
+                fn_800A3ADC(&(lobj)->lvec_x, &(lobj)->lvec_x);              \
                 break;                                                      \
             }                                                               \
             default:                                                        \
@@ -844,7 +844,7 @@ asm void HSD_LObjSetup(void* setup) {
                         (lobj)->flags |= LOBJ_DIFF_DIRTY;                   \
                     }                                                       \
                     if ((lobj)->flags & LOBJ_DIFF_DIRTY) {                  \
-                        GXLoadLightObjImm(LOBJ_LIGHTOBJ(lobj), (lobj)->id);       \
+                        fn_800BA44C(LOBJ_LIGHTOBJ(lobj), (lobj)->id);       \
                         (lobj)->flags &= (u16) ~LOBJ_DIFF_DIRTY;            \
                     }                                                       \
                 }                                                           \
@@ -860,7 +860,7 @@ asm void HSD_LObjSetup(void* setup) {
                         (lobj)->flags |= LOBJ_SPEC_DIRTY;                   \
                     }                                                       \
                     if ((lobj)->flags & LOBJ_SPEC_DIRTY) {                  \
-                        GXLoadLightObjImm(LOBJ_SPEC_LIGHTOBJ(lobj),               \
+                        fn_800BA44C(LOBJ_SPEC_LIGHTOBJ(lobj),               \
                                     (lobj)->spec_id);                       \
                         (lobj)->flags &= (u16) ~LOBJ_SPEC_DIRTY;            \
                     }                                                       \
@@ -928,12 +928,12 @@ void HSD_LObjSetup(void* setup)
                     continue;
                 case LOBJ_INFINITE:
                     if (lobj->position != NULL) {
-                        HSD_WObjGetPosition(lobj->position, &pos);
+                        fn_80191688(lobj->position, &pos);
                     }
                     pos.x *= lbl_8047DBE0;
                     pos.y *= lbl_8047DBE0;
                     pos.z *= lbl_8047DBE0;
-                    PSMTXMultVec(view_mtx, &pos, &pos);
+                    fn_800A37CC(view_mtx, &pos, &pos);
                     if (lobj->flags & LOBJ_DIFFUSE) {
                         fn_800BA414(LOBJ_LIGHTOBJ(lobj), pos.x, pos.y, pos.z);
                         fn_800BA198(LOBJ_LIGHTOBJ(lobj), lbl_8047DBE4,
@@ -951,9 +951,9 @@ void HSD_LObjSetup(void* setup)
                     fn_800BA440(LOBJ_LIGHTOBJ(lobj), &color);
                     lobj->hw_color = color;
                     if (lobj->position != NULL) {
-                        HSD_WObjGetPosition(lobj->position, &pos);
+                        fn_80191688(lobj->position, &pos);
                     }
-                    PSMTXMultVec(view_mtx, &pos, &pos);
+                    fn_800A37CC(view_mtx, &pos, &pos);
                     fn_800BA414(LOBJ_LIGHTOBJ(lobj), pos.x, pos.y, pos.z);
                     fn_800BA414(LOBJ_SPEC_LIGHTOBJ(lobj), pos.x, pos.y,
                                 pos.z);
@@ -977,12 +977,12 @@ void HSD_LObjSetup(void* setup)
                 case LOBJ_SPOT:
                     LOBJ_COPY_VEC(pos, lbl_80274D58);
                     if (lobj->position != NULL) {
-                        HSD_WObjGetPosition(lobj->position, &pos);
+                        fn_80191688(lobj->position, &pos);
                     }
-                    PSMTXMultVec(view_mtx, &pos, &pos);
+                    fn_800A37CC(view_mtx, &pos, &pos);
                     LOBJ_LOAD_LIGHT_VECTOR(lobj, dir);
-                    PSMTXMultVecSR(view_mtx, &dir, &dir);
-                    PSVECNormalize(&dir, &dir);
+                    fn_800A3820(view_mtx, &dir, &dir);
+                    fn_800A3ADC(&dir, &dir);
                     fn_800BA414(LOBJ_LIGHTOBJ(lobj), pos.x, pos.y, pos.z);
                     fn_800BA414(LOBJ_SPEC_LIGHTOBJ(lobj), pos.x, pos.y,
                                 pos.z);
@@ -1117,10 +1117,10 @@ void HSD_LObjGetLightVector(HSD_LObj* lobj, f32* out)
 
     if (lobj != NULL) {
         if (lobj != NULL && *(volatile u32*)((u8*)lobj + 0x18) != 0) {
-            HSD_WObjGetPosition(lobj->position, pos);
+            fn_80191688(lobj->position, pos);
         }
         if (lobj != NULL && *(volatile u32*)((u8*)lobj + 0x1C) != 0) {
-            HSD_WObjGetPosition(lobj->interest, interest);
+            fn_80191688(lobj->interest, interest);
         }
         fn_800A3A9C(interest, pos, out);
 
@@ -1139,7 +1139,7 @@ void HSD_LObjGetLightVector(HSD_LObj* lobj, f32* out)
             __fabs(out[2]) <= *(volatile f32*)&lbl_80478AC8) {
             invalid = -1;
         } else {
-            PSVECNormalize(out, out);
+            fn_800A3ADC(out, out);
             invalid = 0;
         }
 
@@ -1157,6 +1157,7 @@ void HSD_LObjGetLightVector(HSD_LObj* lobj, f32* out)
 #endif
 
 /* 0x801A6370 | 0x98 */
+extern void fn_801C29C4();
 #if 0
 asm void HSD_LObjReqAnimAll(void) {
 #include "src/hsd/hsd_lobj_HSD_LObjReqAnimAll.inc"
@@ -1168,7 +1169,7 @@ void HSD_LObjReqAnimAll(HSD_LObj* lobj, f32 startframe) {
     if (lobj == NULL) return;
     for (l = lobj; l != NULL; l = l->next) {
         if (l == NULL) continue;
-        HSD_AObjReqAnim(l->aobj, startframe);
+        fn_801C29C4(l->aobj, startframe);
         HSD_WObjReqAnim(l != NULL ? l->position : NULL, startframe);
         HSD_WObjReqAnim(l != NULL ? l->interest : NULL, startframe);
     }
