@@ -556,7 +556,7 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "game/people/people_field.c",
-                mw_version="GC/1.3",
+                mw_version="GC/1.3.2",
                 extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),

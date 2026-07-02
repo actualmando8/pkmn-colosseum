@@ -231,11 +231,11 @@ extern u8 lbl_8047AF7C[8];
 extern u16 lbl_8047AFA8;
 extern u32 lbl_8047AF78;
 #if 0
-asm void fn_801522F0(void) {
-#include "src/game/people/people_field_fn_801522F0.inc"
+asm void dataGetCurve(void) {
+#include "src/game/people/people_field_dataGetCurve.inc"
 }
 #else
-u32 fn_801522F0(u16 arg) {
+u32 dataGetCurve(u16 arg) {
     extern void* sndBSearch(u8* a, u8* b, u16 c, u32 d, void* e);
     void* result;
     *(u16*)(lbl_8047AF7C + 4) = arg;
@@ -250,11 +250,11 @@ extern u8 lbl_8047AF70[8];
 extern u16 lbl_8047AFA6;
 extern u32 lbl_8047AF6C;
 #if 0
-asm void fn_8015234C(void) {
-#include "src/game/people/people_field_fn_8015234C.inc"
+asm void dataGetKeymap(void) {
+#include "src/game/people/people_field_dataGetKeymap.inc"
 }
 #else
-u32 fn_8015234C(u16 arg) {
+u32 dataGetKeymap(u16 arg) {
     extern void* sndBSearch(u8* a, u8* b, u16 c, u32 d, void* e);
     void* result;
     *(u16*)(lbl_8047AF70 + 4) = arg;
