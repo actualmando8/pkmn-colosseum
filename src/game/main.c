@@ -305,7 +305,7 @@ extern char lbl_8047B6C0[8];
 /* --- Data labels referenced by init code --- */
 extern u8 lbl_8039A700[];   /* ARAM base for ARInit */
 extern u8 lbl_802E1CF0[];   /* PAD mapping table */
-extern u8 lbl_80363778[];   /* GSfloor sound table */
+extern u8 msgctrlcode[];   /* GSfloor sound table */
 extern u8 lbl_8027A500[];   /* Floor/scene REL data (data section start) */
 extern u8 lbl_802BD260[];   /* Floor/scene REL data #2 */
 extern u8 lbl_802C0CB0[];   /* Floor/scene REL data #3 */
@@ -639,7 +639,7 @@ void fn_800057B0(void) {
     fn_800FC528(0x2, 0x5);
 
     /* Register floor sound table */
-    fn_800FC518(lbl_80363778);
+    fn_800FC518(msgctrlcode);
 
     /* Register floor REL data tables */
     fn_800FC39C(lbl_8027A500); /* Main scene data */
