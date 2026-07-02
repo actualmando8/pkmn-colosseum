@@ -112,7 +112,7 @@ typedef u8 M2C_UNK;
 
 /* ===== External SDK / engine functions ===== */
 extern void  fn_800DD970(const void* fmt, ...);          /* OSReport */
-extern u16   GSmemAllocRaw(u32 size);                    /* fn_800E3534 */
+extern u16   GSmemAllocRaw(u32 size);                    /* _toolentryAlloc__FUl */
 extern void* GSmemGetPtr(u16 handle);                    /* fn_800E27B0 */
 extern void* GSmemLock(u16 handle);                      /* fn_800E24B0 */
 extern void  GSmemFree(u16 handle);                      /* fn_800E209C */
@@ -123,7 +123,7 @@ extern void  OSDisableInterrupts(void);
 extern void  OSRestoreInterrupts(void);
 extern void  fn_800D30A0(void* callback);                 /* GSgfx register swap callback */
 extern void  threadSaveGPRRegisters(void);                /* GSthread context init */
-extern void  fn_800F01F0(void);                           /* GSthread FPU context init */
+extern void  threadSaveFPRRegisters(void);                           /* GSthread FPU context init */
 /* renamed symbols referenced by asm incs (symbolmap port) */
 extern void GSscratchFree(void*);
 extern void cos();   /* MSL trig (renamed fn_800CDBE0) — referenced by asm incs */
@@ -143,7 +143,7 @@ extern void fn_800E209C(u16 handle);
 extern void* fn_800E24B0(u16 handle);
 extern void* fn_800E27B0(u16 handle);
 extern u16 fn_800E2C04(u32 alignment, u32 size);
-extern u16 fn_800E3534(u32 size);
+extern u16 _toolentryAlloc__FUl(u32 size);
 extern void fn_80080ED8(void);
 extern void fn_800DBEB4(u32 a, void* b);
 extern void fn_800D5CB8(s32 a, s32 b, s32 c, s32 d, s32 e);
@@ -158,8 +158,8 @@ extern void fn_800D88DC(u32 mask);
 extern void fn_800D9ED8(void);
 extern void fn_800DC1D4(s32 a);
 extern void fn_800DE680(void);
-extern void fn_800EF504(void* ctx);
-extern void fn_800EF548(void);
+extern void GStextureUnlockImage(void* ctx);
+extern void GStextureLockImage(void);
 extern void fn_801669BC(u32 type);
 extern void* GStextureCreate(u16 width, u16 height, u32 format, u32 tlutFormat, u8 mipLevels);
 extern void fn_800CDBE0(void);
@@ -646,7 +646,7 @@ void GSthreadInit(u32 maxThreads) {
  *    gsThreadCurrentCtx = ctx
  *    // Init context
  *    threadSaveGPRRegisters()
- *    if (usesFPU) fn_800F01F0()
+ *    if (usesFPU) threadSaveFPRRegisters()
  *    // Set up stack frame
  *    ctx->stackPtr = stackSize - 8
  *    ctx->entryFunc = entryFunc
@@ -728,7 +728,7 @@ found:
     /* Initialise the thread's execution context */
     threadSaveGPRRegisters();
     if (usesFPU != 0) {
-        fn_800F01F0(); /* set up FPU save area */
+        threadSaveFPRRegisters(); /* set up FPU save area */
     }
 
     /* Set up the context's stack pointer and entry point:
@@ -844,7 +844,7 @@ extern void fn_800F9670(u32 count);
 extern u8 * fn_800F96E4();
 extern u32 fn_800F9AEC(void* outbuf, u16* src, s32 mode);
 extern void fn_800F9D04(void);
-extern u8* fn_800F9E70(u8* dst, u8* src);
+extern u8* GScharCpy(u8* dst, u8* src);
 extern void fn_800FA160(void* obj);
 extern s32 fn_800FA444();
 extern void fn_800FAA98();
@@ -853,7 +853,7 @@ extern s32 fn_800FB43C();
 extern s32 fn_800FB680();
 extern s32 fn_800FB8C8();
 extern s32 fn_800FBB34();
-extern void fn_800FBF10(void);
+extern void GSmsgDaemon(void);
 extern s32 fn_800FBF74();
 extern void fn_800FC2A4(void);
 extern u32 fn_800FC2A8(void* ptr);
@@ -864,7 +864,7 @@ extern s32 fn_800FC7E0();
 extern void fn_800FD348();
 extern void fn_800FD69C();
 extern u16 * _msgGetCodeInfo__FP13MSG_TASK_WORKUsPP12tagFONT_INFO();
-extern s32 fn_800FDFE4(const void* str);
+extern s32 _msgGetLength__FPCUs(const void* str);
 extern s32 _msgGetSize__FPCUs();
 extern void fn_800FE35C(void);
 extern void fn_800FE38C(s32 x1, s32 y1, s32 x2, s32 y2);
@@ -874,7 +874,7 @@ extern void fn_800FE6AC(s16* outA, s16* outB);
 extern void fn_800FE6D0(s32 a, s32 b);
 extern void fn_800FE6DC(u32 taskId);
 extern void fn_800FE6F8(u32 taskId);
-extern void fn_800FE714(u32 taskId);
+extern void GSgappTerminate(u32 taskId);
 extern void fn_800FE7A0(void);
 extern u32 fn_800FE834(s32 state, u8 priority, void* param, void* func);
 extern void fn_800FE9B0();
@@ -2051,12 +2051,12 @@ void* fn_800F9D24(u16* dst, u16* src, s32 maxlen) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800F9E70(void) {
+asm void GScharCpy(void) {
 #include "src/game/gs_thread_fn_800F9E70.inc"
 }
 #else
 #pragma peephole off
-u8* fn_800F9E70(u8* dst, u8* src) {
+u8* GScharCpy(u8* dst, u8* src) {
     extern u32 _msgGetSize__FPCUs(u8* a);
     if (dst == NULL) { return NULL; }
     if (src == NULL) { *(u16*)dst = 0; }
@@ -2087,8 +2087,8 @@ s32 fn_800F9EE4(void* str1, void* str2) {
     u16 c2;
     s32 n;
 
-    len1 = fn_800FDFE4(str1);
-    len2 = fn_800FDFE4(str2);
+    len1 = _msgGetLength__FPCUs(str1);
+    len2 = _msgGetLength__FPCUs(str2);
 
     if (len1 == len2) {
         p1 = (u16*)str1;
@@ -2351,7 +2351,7 @@ s32 fn_800FA314(u32 key) {
     u32 val;
     void* result;
 
-    if (key == 0) return fn_800FDFE4(NULL);
+    if (key == 0) return _msgGetLength__FPCUs(NULL);
 
     head = (u8*)lbl_80478B08;
     group = (u16)(key >> 20);
@@ -2371,7 +2371,7 @@ s32 fn_800FA314(u32 key) {
                 if (val == sub) {
                     u32 offset = *(u32*)(arr + mid * 8 + 4);
                     result = node + offset;
-                    return fn_800FDFE4(result);
+                    return _msgGetLength__FPCUs(result);
                 }
                 if (val < sub) lo = mid + 1;
                 else hi = mid;
@@ -2379,7 +2379,7 @@ s32 fn_800FA314(u32 key) {
         }
         node = (u8*)*(u32*)(node + 0x8);
     }
-    return fn_800FDFE4(NULL);
+    return _msgGetLength__FPCUs(NULL);
 }
 #endif
 #pragma pop
@@ -2389,12 +2389,12 @@ s32 fn_800FA314(u32 key) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800FA3D0(void) {
+asm void GSmsgIsCheck(void) {
 #include "src/game/gs_thread_fn_800FA3D0.inc"
 }
 #else
 #pragma optimization_level 2
-s32 fn_800FA3D0(u32 key) {
+s32 GSmsgIsCheck(u32 key) {
     u8* head;
     u32 count;
     u8* entry;
@@ -3451,19 +3451,19 @@ s32 fn_800FBE7C(u32 key, u32 r4arg) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800FBF10(void) {
+asm void GSmsgDaemon(void) {
 #include "src/game/gs_thread_fn_800FBF10.inc"
 }
 #else
-void fn_800FBF10(void) {
+void GSmsgDaemon(void) {
     extern u32 lbl_80478B08;
-    extern void fn_800EF504(u32 val);
+    extern void GStextureUnlockImage(u32 val);
     u8* ptr;
     s8 idx;
     ptr = (u8*)lbl_80478B08;
     idx = (s8)ptr[0x1d];
     ptr += (s32)idx * 4;
-    fn_800EF504(*(u32*)(ptr + 0xc));
+    GStextureUnlockImage(*(u32*)(ptr + 0xc));
     *(u16*)((u8*)lbl_80478B08 + 0x18) = 2;
     *(u16*)((u8*)lbl_80478B08 + 0x1a) = 1;
     ptr = (u8*)lbl_80478B08;
@@ -3586,12 +3586,12 @@ s32 fn_800FBF74(arg0, arg1, arg2)
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800FC1D0(void) {
+asm void GSmsgClose(void) {
 #include "src/game/gs_thread_fn_800FC1D0.inc"
 }
 #else
 #pragma optimization_level 2
-s32 fn_800FC1D0(u32* item) {
+s32 GSmsgClose(u32* item) {
     u32* head;
     u32* p;
 
@@ -3617,12 +3617,12 @@ s32 fn_800FC1D0(u32* item) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800FC244(void) {
+asm void GSmsgOpen(void) {
 #include "src/game/gs_thread_fn_800FC244.inc"
 }
 #else
 #pragma optimization_level 2
-void fn_800FC244(u32* item) {
+void GSmsgOpen(u32* item) {
     u32* head;
     u32* p;
 
@@ -4143,12 +4143,12 @@ loop_13:
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm s32 fn_800FDFE4(const void* str) {
+asm s32 _msgGetLength__FPCUs(const void* str) {
 #include "src/game/gs_thread_fn_800FDFE4.inc"
 }
 #else
 #pragma optimization_level 4
-s32 fn_800FDFE4(const void* str) {
+s32 _msgGetLength__FPCUs(const void* str) {
     s32 r;
     r = _msgGetSize__FPCUs(str);
     return ((u32)(r + 1) >> 1) - 1;
@@ -4517,11 +4517,11 @@ void fn_800FE6F8(u32 taskId) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800FE714(s32 taskId) {
+asm void GSgappTerminate(s32 taskId) {
 #include "src/game/gs_thread_fn_800FE714.inc"
 }
 #else
-void fn_800FE714(u32 taskId) {
+void GSgappTerminate(u32 taskId) {
     extern u32 lbl_8047AC7C;
     extern u32 lbl_8047AC98;
     extern u32 OSDisableInterrupts(void);

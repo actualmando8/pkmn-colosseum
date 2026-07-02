@@ -24,14 +24,14 @@ extern s32 __FileWrite(void* data, s32 count, __FILE* file);
 
 /* fn_800C8600 - 0x800C8600 | size: 0x78 */
 s32 fn_800C8600(char* buf, const char* fmt, va_list args) {
-    extern s32 fn_800C87F8(void* data, s32 count, __FILE* file);
+    extern s32 __StringWrite(void* data, s32 count, __FILE* file);
     struct { char* p; s32 a; s32 b; } sf;
     s32 n;
 
     sf.p = buf;
     sf.a = -1;
     sf.b = 0;
-    n = __pformatter((WriteFunc)fn_800C87F8, (__FILE*)&sf, fmt, args);
+    n = __pformatter((WriteFunc)__StringWrite, (__FILE*)&sf, fmt, args);
     if (buf != NULL) {
         s32 idx = -2;
         if ((u32)n < 0xFFFFFFFFU)
@@ -57,8 +57,8 @@ s32 vprintf(const char* fmt, va_list args) {
     return result;
 }
 
-/* fn_800C87F8 - 0x800C87F8 | size: 0x6C */
-s32 fn_800C87F8(u8* ctx, const void* src, u32 count) {
+/* __StringWrite - 0x800C87F8 | size: 0x6C */
+s32 __StringWrite(u8* ctx, const void* src, u32 count) {
     extern void* memcpy(void* dst, const void* src, u32 n);
     u32 pos;
     u32 end;

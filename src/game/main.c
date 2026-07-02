@@ -86,7 +86,7 @@ void fn_800057B0(void);
 extern void GSthread(u32 numFrames);              /* VIFrameInit or render timing */
 extern void GSgfxInit__FP15_GSgfxInitParms(u32 memSize, u32 a, u32 b,   /* GSgfx init */
                          u32 c, u32 d, u32 e);
-extern u32  fn_800A0F58(void);                         /* OSGetResetSwitchState (checks warm boot) */
+extern u32  OSGetProgressiveMode(void);                         /* OSGetResetSwitchState (checks warm boot) */
 extern void fn_800D37D4(u32, u32, u32, u32, u32, u32);/* GSgfx video mode config */
 extern void fn_800EFFC0(u32 numEntries);               /* GX FIFO init */
 extern void fn_80191484(u32 numSounds);                 /* Sound system init */
@@ -113,7 +113,7 @@ extern void fn_800F75FC(void* padTable);                 /* PAD set mapping tabl
 extern void fn_800FC528(u32 numFloors, u32 numLayers);  /* GSfloor system init */
 extern void fn_800FC518(void* sndTable);                 /* GSfloor sound table */
 extern void fn_800FC39C(void* relData);                  /* GSfloor register REL data */
-extern void fn_800FC244(void* relData);                  /* GSfloor register REL data (alt) */
+extern void GSmsgOpen(void* relData);                  /* GSfloor register REL data (alt) */
 extern void fn_800F76E4(void* relData);                  /* GSfloor register REL data (floor) */
 extern void fn_80167DC0(u32 a, u32 b, u32 c, u32 d, u32 e); /* Script/event system init */
 extern void fn_801E1300(void);                           /* Save/card system init */
@@ -130,8 +130,8 @@ extern void GSthreadCreate(u32 affinity, u32 priority,      /* GSthread create m
                          u32 stackSize, u32 usesFPU,
                          u32 autoStart, void* entry);
 
-extern void fn_801E12A0(void);                           /* Save system post-init */
-extern void fn_801C47D0(void);                           /* Script engine init */
+extern void GSvtrRegisterGSgapp(void);                           /* Save system post-init */
+extern void fadeInit(void);                           /* Script engine init */
 extern void fn_80168638(u32 numSlots);                   /* Floor/scene loader init */
 extern void fn_80130CE0(u32 maxEffects);                 /* 3D model/effect loader */
 extern u32  fn_800E0DDC(void);                           /* OSGetFreeMemSize-like */
@@ -241,7 +241,7 @@ extern void fn_801E119C(void);   /* Card system process other */
 extern void fn_801E118C(void);   /* Card system finalize */
 
 extern void fn_801028B0(void);   /* Particle system update */
-extern void fn_800FBF10(void);   /* GSthread sync / process tasks */
+extern void GSmsgDaemon(void);   /* GSthread sync / process tasks */
 
 extern u32  fn_801906A0(u32 evtId);  /* Event system check state */
 extern s32  fn_800D37CC(void);       /* GSgfx get frame counter */
@@ -566,7 +566,7 @@ void fn_800057B0(void) {
     isWarmBoot = 0;
 
     /* Check if this is a warm boot (reset from game) */
-    if (fn_800A0F58() == 1) {
+    if (OSGetProgressiveMode() == 1) {
         /* If reset code's top bit indicates "return to game" */
         BOOL isReset = ((OSGetResetCode() + 0x80000000) == 0) ? TRUE : FALSE;
         if (isReset == TRUE) {
@@ -645,7 +645,7 @@ void fn_800057B0(void) {
     fn_800FC39C(lbl_8027A500); /* Main scene data */
     fn_800FC39C(lbl_802BD260); /* Scene data #2 */
     fn_800FC39C(lbl_802C0CB0); /* Scene data #3 */
-    fn_800FC244(lbl_802CF810); /* Scene data #4 (alt registration) */
+    GSmsgOpen(lbl_802CF810); /* Scene data #4 (alt registration) */
 
     /* Initialize the script/event system with event ID ranges */
     fn_80167DC0(0x3BE8, 0x3BEA, 0x3BED, 0x3BEF, 0x3BF2);
@@ -687,7 +687,7 @@ void fn_800057B0(void) {
     fn_800FE834(1, 0x0A, 0, (void*)fn_80005FA8);
 
     /* Post-init for save system */
-    fn_801E12A0();
+    GSvtrRegisterGSgapp();
 
     /* Task 0xFD: Reset button countdown (fn_80005CE4) */
     fn_800FE834(1, 0xFD, 0, (void*)fn_80005CE4);
@@ -702,7 +702,7 @@ void fn_800057B0(void) {
     lbl_80478DC9 = 1;
 
     /* Initialize script engine */
-    fn_801C47D0();
+    fadeInit();
 
     /* Initialize floor/scene loader with 8 slots */
     fn_80168638(0x8);
@@ -780,7 +780,7 @@ void fn_80005AAC(void) {
      * tableResBiosGetResPtr loads a relocatable module by ID and returns a pointer
      * to its data, which is then registered with the floor system. */
     fn_800FC39C(tableResBiosGetResPtr(1));  /* REL 1 -> register scene data */
-    fn_800FC244(tableResBiosGetResPtr(4));  /* REL 4 -> register scene data (alt) */
+    GSmsgOpen(tableResBiosGetResPtr(4));  /* REL 4 -> register scene data (alt) */
     fn_800F76E4(tableResBiosGetResPtr(7));  /* REL 7 -> register floor data */
 
     /* Seed the RNG using the low bits of the OS tick counter.
@@ -990,7 +990,7 @@ void fn_80005E00(void) {
     }
 
     fn_801028B0();
-    fn_800FBF10();
+    GSmsgDaemon();
 
     if (fn_80128E24() != 0 && fn_80128E04() != 0) {
         mixer = fn_80135CD0();

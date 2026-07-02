@@ -13,9 +13,9 @@
  *   fn_801758D8 (GSscene_UpdateActive)
  *   fn_80175A1C (GSscene_SpawnObject)
  *   fn_80175B94 (GSscene_DespawnObject)
- *   fn_80175DF0 (GSscene_FindObject)
+ *   psInitGenerator (GSscene_FindObject)
  *   genPosUpdate (GSscene_GetObjectByHandle)
- *   fn_80175F44 (GSscene_GetObjectCount)
+ *   psGetNewIDNum (GSscene_GetObjectCount)
  *   fn_80175F6C (GSscene_SetObjectCallback)
  *   fn_801760C4 (GSscene_AttachToParent)
  *   fn_80176228 (GSscene_DetachFromParent)
@@ -27,9 +27,9 @@
  *   fn_80176868 (GSscene_SetColor)
  *   fn_801768F0 (GSscene_GetTransform)
  *   fn_80176948-801769B0 (GSscene_Get X/Y/Z position)
- *   fn_801769E4 (GSscene_SetVisible)
+ *   cameraSetAnimeRate (GSscene_SetVisible)
  *   fn_80176A44 (GSscene_GetVisible)
- *   fn_80176AE4 (GSscene_ComputeWorldTransform)
+ *   cameraStopAnime (GSscene_ComputeWorldTransform)
  *   fn_80176B48 (GSscene_UpdateTransformHierarchy)
  *   fn_80176C04 (GSscene_GetWorldPosition)
  *   fn_80176C78 (GSscene_Render)
@@ -84,7 +84,7 @@ extern void* memcpy(void* dst, const void* src, u32 n);
 extern void* memset(void* dst, int val, u32 size);
 
 /* GSmem */
-extern u16   fn_800E3534(u32 size);                     /* GSmemAllocRaw */
+extern u16   _toolentryAlloc__FUl(u32 size);                     /* GSmemAllocRaw */
 extern void* fn_800E27B0(u16 handle);                   /* GSmemGetPtr */
 extern void  fn_800E209C(u16 handle);                   /* GSmemFree */
 
@@ -275,7 +275,7 @@ void* GSscene_NopAccessor1(void) {
     return (void*)0;
 }
 
-/* fn_80175F44 -- get object count, 0x28 bytes */
+/* psGetNewIDNum -- get object count, 0x28 bytes */
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off

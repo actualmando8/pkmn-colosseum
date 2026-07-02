@@ -3,7 +3,7 @@
 extern u32 OSDisableInterrupts(void);
 extern void OSRestoreInterrupts(u32 interrupts);
 
-u32 fn_800AA498(void) {
+u32 VIGetDTVStatus(void) {
     u32 interrupts;
     u16 reg;
 

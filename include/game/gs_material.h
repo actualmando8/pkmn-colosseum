@@ -50,7 +50,7 @@
  * HSD integration (lbl_80315490):
  *   The GSmaterial class descriptor is registered with HSD's object system
  *   at lbl_80315490.  _GSmaterialObjInit_800EF33C installs the class info, render callback
- *   (fn_800DFE98), and setup callback (fn_800DF930) into this descriptor.
+ *   (_matGSmatObjLoad), and setup callback (fn_800DF930) into this descriptor.
  */
 #ifndef GS_MATERIAL_H
 #define GS_MATERIAL_H
@@ -111,7 +111,7 @@
  * PE descriptor sentinel value
  *
  * The material system uses 0xFEFDFEFE as a "no descriptor" sentinel.
- * fn_800DF470 checks addis r0, r6, 0x102 == 0xFEFE to detect this.
+ * GSmaterialResetPEdescr checks addis r0, r6, 0x102 == 0xFEFE to detect this.
  * =================================================================== */
 #define GSMAT_PE_NONE              0xFEFDFEFE
 
@@ -218,7 +218,7 @@ typedef struct GSmaterialEntry {
  *   - Name string "GSmaterial MObj"
  *   - Class descriptor from lbl_8036CB30
  *   - Entry size 0x54 with alignment 0x24
- *   - Render callback fn_800DFE98
+ *   - Render callback _matGSmatObjLoad
  *   - Setup callback fn_800DF930
  *
  * Corresponds to _GSmaterialObjInit_800EF33C.
@@ -337,7 +337,7 @@ GSmaterialEntry* GSmaterialFindByMObj(void* mobj);
  * Loads entry->texture (+0x144), and if non-NULL calls fn_80118874
  * with parameter 1.
  *
- * Corresponds to fn_800E3BC0. Size: 0x30.
+ * Corresponds to GSmodelDestroyLinkedParticles. Size: 0x30.
  */
 void GSmaterialGetGXTexGenSrc(GSmaterialEntry* entry);
 
@@ -848,7 +848,7 @@ void GSmaterialSetDistanceThreshold(f32 dist);
 /**
  * GSmaterialResetBlendMode -- Reset the GX blend mode to default.
  *
- * Corresponds to fn_800EE22C. Size: 0x5C.
+ * Corresponds to GSpartGetJObjIndex. Size: 0x5C.
  */
 
 /**

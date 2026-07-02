@@ -39,7 +39,7 @@
 
 /* ===== External SDK / engine functions ===== */
 extern void  fn_800DD970(const char* fmt, ...);          /* OSReport / GSlog */
-extern u16   GSmemAllocRaw(u32 size);                    /* fn_800E3534 */
+extern u16   GSmemAllocRaw(u32 size);                    /* _toolentryAlloc__FUl */
 extern void* GSmemGetPtr(u16 handle);                    /* fn_800E27B0 */
 extern void* GSmemLock(u16 handle);                      /* fn_800E24B0 */
 extern void  fn_800E24B0(u16 handle);                    /* GSmemLock (raw) */
@@ -48,7 +48,7 @@ extern void  fn_800E209C(u16 handle);                    /* GSmemFree (raw) */
 extern u32   GStaskRegister(u32 type, u32 priority,
                              void* param, void* func);   /* fn_800FE834 */
 extern u32   fn_800D3088(void);                          /* GSgfxGetTickCount */
-extern void  fn_801E12A0(void);                          /* battle VFX init */
+extern void  GSvtrRegisterGSgapp(void);                          /* battle VFX init */
 extern void  memset(void* dst, u32 val, u32 size);
 extern void  memcpy(void* dst, void* src, u32 size);
 
@@ -225,7 +225,7 @@ static void effectRenderTask(void) {
  * 12. Set globals+0x10 (activeListHead) = 0
  * 13. Register render task:  GStaskRegister(1, 0x7F, 0, effectRenderTask)
  *     Store returned handle at lbl_8047ADC0
- * 14. bl fn_801E12A0                ; battle VFX init
+ * 14. bl GSvtrRegisterGSgapp                ; battle VFX init
  * 15. Register update task:  GStaskRegister(1, 0x80, 0, effectUpdateTask)
  * ======================================================================= */
 void GSEffectInit(u16 maxEffects) {
@@ -287,7 +287,7 @@ void GSEffectInit(u16 maxEffects) {
     GStaskRegister(1, 0x7F, 0, (void*)effectRenderTask);
 
     /* Initialise battle VFX subsystem */
-    fn_801E12A0();
+    GSvtrRegisterGSgapp();
 
     /* Register the update task */
     GStaskRegister(1, 0x80, 0, (void*)effectUpdateTask);
@@ -743,11 +743,11 @@ void fn_80130CE0(u16 maxEffects) {
     GSEffectInstance* table;
     GSEffectInstance* entry;
     u16 cnt;
-    extern u16 fn_800E3534(u32);
+    extern u16 _toolentryAlloc__FUl(u32);
     extern void* fn_800E27B0(u16);
     extern u32 fn_800FE834(u32, u32, u32, void*);
 
-    memHandle = fn_800E3534(maxEffects * sizeof(GSEffectInstance));
+    memHandle = _toolentryAlloc__FUl(maxEffects * sizeof(GSEffectInstance));
     gsEffectGlobals.memHandle = memHandle;
 
     if (memHandle != 0) {
@@ -777,7 +777,7 @@ void fn_80130CE0(u16 maxEffects) {
     }
     gsEffectGlobals.activeListHead = NULL;
     lbl_8047ADC0 = fn_800FE834(1, 0x7F, 0, (void*)fn_80130F68);
-    fn_801E12A0();
+    GSvtrRegisterGSgapp();
     fn_800FE834(1, 0x80, 0, (void*)fn_80130F04);
 }
 
@@ -1127,7 +1127,7 @@ u16 fn_80131428(void* callbacks, u16 dataSize) {
     void* userData;
     u16 memHandle;
     GSEffectGlobals* ga;
-    extern u16 fn_800E3534(u32 size);
+    extern u16 _toolentryAlloc__FUl(u32 size);
     extern void* fn_800E27B0(u16 handle);
 
     globals = (GSEffectGlobals*)(void*)lbl_803635C0;
@@ -1139,7 +1139,7 @@ u16 fn_80131428(void* callbacks, u16 dataSize) {
     }
 
     savedId = slot->id;
-    memHandle = fn_800E3534((u32)cbSize);
+    memHandle = _toolentryAlloc__FUl((u32)cbSize);
     if (memHandle == 0) {
         return 0;
     }

@@ -5,8 +5,8 @@ extern void fn_800C3630(void); /* EnableEXI2Interrupts */
 extern u8 gTRKCPUState[];
 extern u8 lbl_803FED58[]; /* exception table base */
 
-/* fn_800C3344 - 0x800C3344 | size 0x58 | scope none */
-u32 fn_800C3344(u32 addr) {
+/* TRKTargetTranslate - 0x800C3344 | size 0x58 | scope none */
+u32 TRKTargetTranslate(u32 addr) {
     u32 stackBase = *(u32*)lbl_803FED58;
 
     if (addr >= stackBase && addr < stackBase + 0x4000) {

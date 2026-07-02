@@ -1,7 +1,7 @@
 #include "dolphin/types.h"
 
 /* Low-level GDEV hardware interface functions */
-extern void fn_800CEB64(void); /* GDEV_InitInterrupts */
+extern void DBInitInterrupts(void); /* GDEV_InitInterrupts */
 extern void fn_800CE7D8(void); /* GDEV_PostStop */
 extern void fn_800CE7D4(void); /* GDEV_PreContinue */
 
@@ -13,7 +13,7 @@ extern void fn_800CE7D4(void); /* GDEV_PreContinue */
 
 /* gdev_cc_initinterrupts - Enable GDEV interrupts for async reception. */
 s32 gdev_cc_initinterrupts(void) {
-    fn_800CEB64();
+    DBInitInterrupts();
     return 0;
 }
 

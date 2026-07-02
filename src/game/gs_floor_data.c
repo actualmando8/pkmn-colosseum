@@ -14,7 +14,7 @@
  *   fn_80101910             (GSfloorLoadCallback)
  *   fn_80101A28             (GSfloorFindAndOpenCallback)
  *   fn_80101A4C             (GSfloorLoadDataCallback)
- *   fn_80101A70 - fn_80101B88 (floor data accessors)
+ *   kaisuuBiosGetMax - fn_80101B88 (floor data accessors)
  *   fn_80101B90             (GSfloorRegisterResHandlers)
  *   fn_8011432C             (floorReadGFLPreFunc)
  *   fn_8011487C             (floorReadSoundPreFunc)
@@ -48,7 +48,7 @@
 
 /* ===== External engine functions ===== */
 extern void  fn_800DD970(const char* fmt, ...);         /* GSlog / OSReport */
-extern u16   GSmemAllocRaw(u32 size);                   /* fn_800E3534 */
+extern u16   GSmemAllocRaw(u32 size);                   /* _toolentryAlloc__FUl */
 extern void* GSmemGetPtr(u16 handle);                   /* fn_800E27B0 */
 extern void  GSmemFree(u16 handle);                     /* fn_800E209C */
 extern void  memcpy(void* dst, const void* src, u32 n);
@@ -158,7 +158,7 @@ void GSfloorLoadDataCallback(void)
 }
 
 /* =======================================================================
- *  GSfloorGetResourceCount / fn_80101A70
+ *  GSfloorGetResourceCount / kaisuuBiosGetMax
  *  Address: 0x80101A70, Size: 0x2C
  *
  *  Returns the total number of active resources for the current floor.
@@ -178,7 +178,7 @@ u32 GSfloorGetResourceCount(void)
 }
 
 /* =======================================================================
- *  GSfloorIsResourceActive / fn_80101A9C
+ *  GSfloorIsResourceActive / kaisuuBiosGetMin
  *  Address: 0x80101A9C, Size: 0x28
  *
  *  Checks whether a specific resource slot is active.

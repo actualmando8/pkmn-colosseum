@@ -146,23 +146,23 @@ extern u8  lbl_804782E0[];
 extern u8  lbl_804783E0[];
 
 /* Forward declarations for functions used as addresses in asm wrappers */
-void fn_8025F2FC(int r3);
-void fn_8025F524(int r3);
-void fn_8025F618(int r3);
-void fn_8025F7E8(int r3);
-u32  fn_8025F81C(int r3);
-u32  fn_8025F9AC(int r3, u32 r4, u32 r5, u32 r6);
+void ShortCommandProc(int r3);
+void ReadProc(int r3);
+void WriteProc(int r3);
+void __GBASyncCallback(int r3);
+u32  __GBASync(int r3);
+u32  __GBATransfer(int r3, u32 r4, u32 r5, u32 r6);
 
 /* Forward declarations for asm wrapper bl targets (use () form for compat) */
 extern void fn_800AE7E0();
 extern void fn_800E01F4();
-extern int  fn_800E0C04();
+extern int  _fadeEffectGetRandom__FUl();
 extern u32  fn_8011F520();
 extern u32  fn_8011F5B0();
 extern u16  fn_8011F5C8();
 extern u32  fn_80129280();
-extern int  fn_801C40F0();
-extern int  fn_801C41C8();
+extern int  fadeCheck();
+extern int  fadeSet();
 extern int  fn_801DAC90();
 extern int  fn_801DADC0();
 extern void OSRegisterResetFunction();
@@ -479,7 +479,7 @@ void fn_80245FC4(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fn_802384B4();
     extern void fn_80239564();
     extern void fn_80239984();
-    extern void fn_802399FC();
+    extern void fightTrainerAiAddValue();
     extern void fn_80239CCC();
     extern void fn_80239EE8();
     extern void fn_8024AFC4();
@@ -537,7 +537,7 @@ void fn_80245FC4(void* ctx, u32 param1, u32 param2, u32 param3) {
     r25 = (s32)r25 / (s32)r3;
     r3 = 0x0;
     r4 = r25;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r26 = r3;
     r3 = r29;
     fn_80205B8C();
@@ -607,7 +607,7 @@ void fn_80245FC4(void* ctx, u32 param1, u32 param2, u32 param3) {
         r24 = (s32)r24 / (s32)r3;
         r3 = r26;
         r4 = r24;
-        fn_802399FC();
+        fightTrainerAiAddValue();
         r26 = r3;
         r3 = r29;
         fn_80205B8C();
@@ -643,7 +643,7 @@ void fn_80245FC4(void* ctx, u32 param1, u32 param2, u32 param3) {
     r24 = (s32)r24 / (s32)r3;
     r3 = 0x0;
     r4 = r24;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r27 = r3;
     r3 = r29;
     fn_80205B8C();
@@ -686,7 +686,7 @@ void fn_80245FC4(void* ctx, u32 param1, u32 param2, u32 param3) {
                 r24 = (s32)r24 / (s32)r3;
                 r3 = r27;
                 r4 = r24;
-                fn_802399FC();
+                fightTrainerAiAddValue();
                 r27 = r3;
                 r3 = r29;
                 fn_80205B8C();
@@ -737,7 +737,7 @@ void fn_80245FC4(void* ctx, u32 param1, u32 param2, u32 param3) {
         r24 = (s32)r24 / (s32)r3;
         r3 = r27;
         r4 = r24;
-        fn_802399FC();
+        fightTrainerAiAddValue();
         r27 = r3;
         r3 = r29;
         fn_80205B8C();
@@ -766,7 +766,7 @@ void fn_80245FC4(void* ctx, u32 param1, u32 param2, u32 param3) {
     r24 = (s32)r24 / (s32)r3;
     r3 = 0x0;
     r4 = r24;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r27 = r3;
     r3 = r29;
     fn_80205B8C();
@@ -822,7 +822,7 @@ void fn_80245FC4(void* ctx, u32 param1, u32 param2, u32 param3) {
         r24 = (s32)r24 / (s32)r3;
         r3 = r27;
         r4 = r24;
-        fn_802399FC();
+        fightTrainerAiAddValue();
         r27 = r3;
         r3 = r29;
         fn_80205B8C();
@@ -875,7 +875,7 @@ void fn_80245FC4(void* ctx, u32 param1, u32 param2, u32 param3) {
         r24 = (s32)r24 / (s32)r3;
         r3 = r27;
         r4 = r24;
-        fn_802399FC();
+        fightTrainerAiAddValue();
         r27 = r3;
         r3 = r29;
         fn_80205B8C();
@@ -904,7 +904,7 @@ void fn_80245FC4(void* ctx, u32 param1, u32 param2, u32 param3) {
     r24 = (s32)r24 / (s32)r3;
     r3 = 0x0;
     r4 = r24;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r27 = r3;
     r3 = r29;
     fn_80205B8C();
@@ -960,7 +960,7 @@ void fn_80245FC4(void* ctx, u32 param1, u32 param2, u32 param3) {
         r24 = (s32)r24 / (s32)r3;
         r3 = r27;
         r4 = r24;
-        fn_802399FC();
+        fightTrainerAiAddValue();
         r27 = r3;
         r3 = r29;
         fn_80205B8C();
@@ -1006,7 +1006,7 @@ void fn_80245FC4(void* ctx, u32 param1, u32 param2, u32 param3) {
         r24 = (s32)r24 / (s32)r3;
         r3 = r27;
         r4 = r24;
-        fn_802399FC();
+        fightTrainerAiAddValue();
         r27 = r3;
         r3 = r29;
         fn_80205B8C();
@@ -1146,7 +1146,7 @@ void fn_80245FC4(void* ctx, u32 param1, u32 param2, u32 param3) {
     r24 = (s32)r24 / (s32)r3;
     r3 = 0x0;
     r4 = r24;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r27 = r3;
     r3 = r29;
     fn_80205B8C();
@@ -1225,7 +1225,7 @@ void fn_80245FC4(void* ctx, u32 param1, u32 param2, u32 param3) {
         r24 = (s32)r24 / (s32)r3;
         r3 = r27;
         r4 = r24;
-        fn_802399FC();
+        fightTrainerAiAddValue();
         r27 = r3;
         r3 = r29;
         fn_80205B8C();
@@ -1271,7 +1271,7 @@ void fn_80245FC4(void* ctx, u32 param1, u32 param2, u32 param3) {
         r24 = (s32)r24 / (s32)r3;
         r3 = r27;
         r4 = r24;
-        fn_802399FC();
+        fightTrainerAiAddValue();
         r27 = r3;
         r3 = r29;
         fn_80205B8C();
@@ -1300,7 +1300,7 @@ void fn_80245FC4(void* ctx, u32 param1, u32 param2, u32 param3) {
     r24 = (s32)r24 / (s32)r3;
     r3 = 0x0;
     r4 = r24;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r27 = r3;
     r3 = r29;
     fn_80205B8C();
@@ -1357,7 +1357,7 @@ void fn_80245FC4(void* ctx, u32 param1, u32 param2, u32 param3) {
         r24 = (s32)r24 / (s32)r3;
         r3 = r27;
         r4 = r24;
-        fn_802399FC();
+        fightTrainerAiAddValue();
         r27 = r3;
         r3 = r29;
         fn_80205B8C();
@@ -1396,7 +1396,7 @@ void fn_80245FC4(void* ctx, u32 param1, u32 param2, u32 param3) {
         r24 = (s32)r24 / (s32)r3;
         r3 = r27;
         r4 = r24;
-        fn_802399FC();
+        fightTrainerAiAddValue();
         r27 = r3;
         r3 = r29;
         fn_80205B8C();
@@ -1433,7 +1433,7 @@ void fn_80245FC4(void* ctx, u32 param1, u32 param2, u32 param3) {
     r24 = (s32)r24 / (s32)r3;
     r3 = 0x0;
     r4 = r24;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r25 = r3;
     r3 = r29;
     fn_80205B8C();
@@ -1503,7 +1503,7 @@ void fn_80245FC4(void* ctx, u32 param1, u32 param2, u32 param3) {
         r24 = (s32)r24 / (s32)r3;
         r3 = r25;
         r4 = r24;
-        fn_802399FC();
+        fightTrainerAiAddValue();
         r25 = r3;
         r3 = r29;
         fn_80205B8C();
@@ -1570,7 +1570,7 @@ void fn_8024E690(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fn_802397B8();
     extern void fn_802398E4();
     extern void fn_80239984();
-    extern void fn_802399FC();
+    extern void fightTrainerAiAddValue();
     extern void fn_80239A40();
     extern void fn_80239EE8();
     extern void fn_8023A118();
@@ -2642,7 +2642,7 @@ void fn_8024E690(void* ctx, u32 param1, u32 param2, u32 param3) {
                     r0 = *(u8*)(sp + 0x7F0);
                     r14 = r4 - r0;
                     r4 = r14;
-                    fn_802399FC();
+                    fightTrainerAiAddValue();
                     *(u32*)(r29 + r30) = r3;
                     r3 = r27;
                     fn_80205BE8();
@@ -3962,7 +3962,7 @@ void fn_80240144(void* ctx, u32 param1, u32 param2) {
     extern void fn_800E0C54();
     extern void fn_801FB1C0();
     extern void fn_80205B8C();
-    extern void fn_802399FC();
+    extern void fightTrainerAiAddValue();
     extern void fn_80239CCC();
     u8 sp[0x30];
     u32 r0 = 0;
@@ -3997,7 +3997,7 @@ void fn_80240144(void* ctx, u32 param1, u32 param2) {
     r0 = r0 * r4;
     r30 = r5 - r0;
     r4 = r30;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r0 = r3;
     r3 = r28;
     r31 = r0;
@@ -6474,7 +6474,7 @@ void fn_802435D4(void* ctx, u32 param1, u32 param2) {
     extern void fn_801FB1C0();
     extern void fn_80205B8C();
     extern void fn_802376EC();
-    extern void fn_802399FC();
+    extern void fightTrainerAiAddValue();
     extern void fn_80239CCC();
     u8 sp[0x30];
     u32 r0 = 0;
@@ -6512,7 +6512,7 @@ void fn_802435D4(void* ctx, u32 param1, u32 param2) {
     r30 = r30 * r3;
     r3 = 0x0;
     r4 = r30;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r0 = r3;
     r3 = r28;
     r31 = r0;
@@ -9331,7 +9331,7 @@ u32 fn_802471B0(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80205B8C(u32);
     extern u8 fn_80235AA0(void*, u32);
     extern u8 fn_80239564(void*, u32);
-    extern u32 fn_802399FC(u32, s32);
+    extern u32 fightTrainerAiAddValue(u32, s32);
     extern void fn_80239CCC(u32, void*, u32, u32, u32, u32, u32, u32, s32);
     u32 battleParam = param2;
     u32 trainerParam = param1;
@@ -9343,14 +9343,14 @@ u32 fn_802471B0(void* ctx, u32 param1, u32 param2, u32 param3) {
 
     statusValue = fn_80239564(battleCtx, battleParam);
     quotient = (s32)statusValue / fn_801FB1C0(0, 0x131, 0x3e, 0);
-    setupHandle = fn_802399FC(0, quotient);
+    setupHandle = fightTrainerAiAddValue(0, quotient);
     pokemonPtr = fn_80205B8C(trainerParam);
     fn_80239CCC(0xEC64, battleCtx, pokemonPtr, 0, 0, battleParam, 0, 0x131, quotient);
 
     if (fn_80235AA0(battleCtx, trainerParam) >= 0xcU) {
         statusValue = fn_80239564(battleCtx, battleParam);
         quotient = (s32)statusValue / fn_801FB1C0(0, 0x132, 0x3e, 0);
-        setupHandle = fn_802399FC(setupHandle, quotient);
+        setupHandle = fightTrainerAiAddValue(setupHandle, quotient);
         pokemonPtr = fn_80205B8C(trainerParam);
         fn_80239CCC(0xEC64, battleCtx, pokemonPtr, 0, 0, battleParam, 0, 0x132, quotient);
     }
@@ -10259,7 +10259,7 @@ void fn_80247FA0(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fn_80237F74();
     extern void fn_80239564();
     extern void fn_80239984();
-    extern void fn_802399FC();
+    extern void fightTrainerAiAddValue();
     extern void fn_80239CCC();
     extern void fn_80239EE8();
     u8 sp[0x30];
@@ -10294,7 +10294,7 @@ void fn_80247FA0(void* ctx, u32 param1, u32 param2, u32 param3) {
     r28 = (s32)r27 / (s32)r3;
     r3 = 0x0;
     r4 = r28;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r0 = r3;
     r3 = r30;
     r27 = r0;
@@ -10366,7 +10366,7 @@ void fn_80247FA0(void* ctx, u32 param1, u32 param2, u32 param3) {
     r28 = (s32)r28 / (s32)r3;
     r3 = r27;
     r4 = r28;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r0 = r3;
     r3 = r30;
     r27 = r0;
@@ -10497,7 +10497,7 @@ void fn_8024868C(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fn_80237F74();
     extern void fn_80239564();
     extern void fn_80239984();
-    extern void fn_802399FC();
+    extern void fightTrainerAiAddValue();
     extern void fn_80239CCC();
     extern void fn_80239EE8();
     u8 sp[0x30];
@@ -10532,7 +10532,7 @@ void fn_8024868C(void* ctx, u32 param1, u32 param2, u32 param3) {
     r28 = (s32)r27 / (s32)r3;
     r3 = 0x0;
     r4 = r28;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r0 = r3;
     r3 = r30;
     r27 = r0;
@@ -10604,7 +10604,7 @@ void fn_8024868C(void* ctx, u32 param1, u32 param2, u32 param3) {
     r28 = (s32)r28 / (s32)r3;
     r3 = r27;
     r4 = r28;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r0 = r3;
     r3 = r30;
     r27 = r0;
@@ -10634,7 +10634,7 @@ void fn_8024885C(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fn_802384B4();
     extern void fn_80239564();
     extern void fn_80239984();
-    extern void fn_802399FC();
+    extern void fightTrainerAiAddValue();
     extern void fn_80239CCC();
     extern void fn_80239EE8();
     u8 sp[0x90];
@@ -10680,7 +10680,7 @@ void fn_8024885C(void* ctx, u32 param1, u32 param2, u32 param3) {
     r25 = (s32)r25 / (s32)r3;
     r3 = 0x0;
     r4 = r25;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r0 = r3;
     r3 = r28;
     r31 = r0;
@@ -10751,7 +10751,7 @@ void fn_8024885C(void* ctx, u32 param1, u32 param2, u32 param3) {
                 r25 = (s32)r25 / (s32)r3;
                 r3 = r31;
                 r4 = r25;
-                fn_802399FC();
+                fightTrainerAiAddValue();
                 r0 = r3;
                 r3 = r28;
                 r31 = r0;
@@ -10803,7 +10803,7 @@ void fn_8024885C(void* ctx, u32 param1, u32 param2, u32 param3) {
     r25 = (s32)r25 / (s32)r3;
     r3 = r31;
     r4 = r25;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r0 = r3;
     r3 = r28;
     r31 = r0;
@@ -10983,7 +10983,7 @@ void fn_80248D3C(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fn_80237F74();
     extern void fn_80239564();
     extern void fn_80239984();
-    extern void fn_802399FC();
+    extern void fightTrainerAiAddValue();
     extern void fn_80239CCC();
     extern void fn_80239EE8();
     u8 sp[0x30];
@@ -11046,7 +11046,7 @@ void fn_80248D3C(void* ctx, u32 param1, u32 param2, u32 param3) {
     r26 = (s32)r26 / (s32)r3;
     r3 = r31;
     r4 = r26;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r31 = r3;
     r3 = r28;
     fn_80205B8C();
@@ -11139,7 +11139,7 @@ void fn_80248D3C(void* ctx, u32 param1, u32 param2, u32 param3) {
     r30 = (s32)r30 / (s32)r3;
     r3 = r31;
     r4 = r30;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r31 = r3;
     r3 = r28;
     fn_80205B8C();
@@ -11480,7 +11480,7 @@ void fn_80249460(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fn_80237F74();
     extern void fn_80239564();
     extern void fn_80239984();
-    extern void fn_802399FC();
+    extern void fightTrainerAiAddValue();
     extern void fn_80239CCC();
     extern void fn_80239EE8();
     u8 sp[0x30];
@@ -11515,7 +11515,7 @@ void fn_80249460(void* ctx, u32 param1, u32 param2, u32 param3) {
     r26 = (s32)r26 / (s32)r3;
     r3 = 0x0;
     r4 = r26;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r0 = r3;
     r3 = r28;
     r31 = r0;
@@ -11604,7 +11604,7 @@ void fn_80249460(void* ctx, u32 param1, u32 param2, u32 param3) {
     r30 = (s32)r30 / (s32)r3;
     r3 = r31;
     r4 = r30;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r0 = r3;
     r3 = r28;
     r31 = r0;
@@ -11632,7 +11632,7 @@ void fn_80249678(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fn_80237F74();
     extern void fn_80239564();
     extern void fn_80239984();
-    extern void fn_802399FC();
+    extern void fightTrainerAiAddValue();
     extern void fn_80239CCC();
     extern void fn_80239EE8();
     u8 sp[0x30];
@@ -11667,7 +11667,7 @@ void fn_80249678(void* ctx, u32 param1, u32 param2, u32 param3) {
     r26 = (s32)r26 / (s32)r3;
     r3 = 0x0;
     r4 = r26;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r0 = r3;
     r3 = r28;
     r31 = r0;
@@ -11726,7 +11726,7 @@ void fn_80249678(void* ctx, u32 param1, u32 param2, u32 param3) {
         r26 = (s32)r26 / (s32)r3;
         r3 = r31;
         r4 = r26;
-        fn_802399FC();
+        fightTrainerAiAddValue();
         r0 = r3;
         r3 = r28;
         r31 = r0;
@@ -11766,7 +11766,7 @@ void fn_80249678(void* ctx, u32 param1, u32 param2, u32 param3) {
     r26 = (s32)r30 / (s32)r3;
     r3 = r31;
     r4 = r26;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r0 = r3;
     r3 = r28;
     r31 = r0;
@@ -11933,7 +11933,7 @@ void fn_80249AB4(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fn_80237F74();
     extern void fn_80239564();
     extern void fn_80239984();
-    extern void fn_802399FC();
+    extern void fightTrainerAiAddValue();
     extern void fn_80239CCC();
     extern void fn_80239EE8();
     u8 sp[0x30];
@@ -11968,7 +11968,7 @@ void fn_80249AB4(void* ctx, u32 param1, u32 param2, u32 param3) {
     r26 = (s32)r26 / (s32)r3;
     r3 = 0x0;
     r4 = r26;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r0 = r3;
     r3 = r28;
     r31 = r0;
@@ -12026,7 +12026,7 @@ void fn_80249AB4(void* ctx, u32 param1, u32 param2, u32 param3) {
         r26 = (s32)r26 / (s32)r3;
         r3 = r31;
         r4 = r26;
-        fn_802399FC();
+        fightTrainerAiAddValue();
         r0 = r3;
         r3 = r28;
         r31 = r0;
@@ -12080,7 +12080,7 @@ void fn_80249AB4(void* ctx, u32 param1, u32 param2, u32 param3) {
     r26 = (s32)r30 / (s32)r3;
     r3 = r31;
     r4 = r26;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r0 = r3;
     r3 = r28;
     r31 = r0;
@@ -12108,7 +12108,7 @@ void fn_80249D2C(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fn_80237F74();
     extern void fn_80239564();
     extern void fn_80239984();
-    extern void fn_802399FC();
+    extern void fightTrainerAiAddValue();
     extern void fn_80239CCC();
     extern void fn_80239EE8();
     u8 sp[0x30];
@@ -12143,7 +12143,7 @@ void fn_80249D2C(void* ctx, u32 param1, u32 param2, u32 param3) {
     r26 = (s32)r26 / (s32)r3;
     r3 = 0x0;
     r4 = r26;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r0 = r3;
     r3 = r28;
     r31 = r0;
@@ -12201,7 +12201,7 @@ void fn_80249D2C(void* ctx, u32 param1, u32 param2, u32 param3) {
         r26 = (s32)r26 / (s32)r3;
         r3 = r31;
         r4 = r26;
-        fn_802399FC();
+        fightTrainerAiAddValue();
         r0 = r3;
         r3 = r28;
         r31 = r0;
@@ -12248,7 +12248,7 @@ void fn_80249D2C(void* ctx, u32 param1, u32 param2, u32 param3) {
     r26 = (s32)r30 / (s32)r3;
     r3 = r31;
     r4 = r26;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r0 = r3;
     r3 = r28;
     r31 = r0;
@@ -12782,7 +12782,7 @@ void fn_8024A664(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fn_80237F74();
     extern void fn_80239564();
     extern void fn_80239984();
-    extern void fn_802399FC();
+    extern void fightTrainerAiAddValue();
     extern void fn_80239CCC();
     extern void fn_80239EE8();
     u8 sp[0x30];
@@ -12817,7 +12817,7 @@ void fn_8024A664(void* ctx, u32 param1, u32 param2, u32 param3) {
     r26 = (s32)r26 / (s32)r3;
     r3 = 0x0;
     r4 = r26;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r0 = r3;
     r3 = r28;
     r31 = r0;
@@ -12899,7 +12899,7 @@ void fn_8024A664(void* ctx, u32 param1, u32 param2, u32 param3) {
         r26 = (s32)r26 / (s32)r3;
         r3 = r31;
         r4 = r26;
-        fn_802399FC();
+        fightTrainerAiAddValue();
         r0 = r3;
         r3 = r28;
         r31 = r0;
@@ -12946,7 +12946,7 @@ void fn_8024A664(void* ctx, u32 param1, u32 param2, u32 param3) {
     r26 = (s32)r30 / (s32)r3;
     r3 = r31;
     r4 = r26;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r0 = r3;
     r3 = r28;
     r31 = r0;
@@ -12974,7 +12974,7 @@ void fn_8024A924(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fn_80237F74();
     extern void fn_80239564();
     extern void fn_80239984();
-    extern void fn_802399FC();
+    extern void fightTrainerAiAddValue();
     extern void fn_80239CCC();
     extern void fn_80239EE8();
     u8 sp[0x30];
@@ -13009,7 +13009,7 @@ void fn_8024A924(void* ctx, u32 param1, u32 param2, u32 param3) {
     r26 = (s32)r26 / (s32)r3;
     r3 = 0x0;
     r4 = r26;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r0 = r3;
     r3 = r28;
     r31 = r0;
@@ -13067,7 +13067,7 @@ void fn_8024A924(void* ctx, u32 param1, u32 param2, u32 param3) {
         r26 = (s32)r26 / (s32)r3;
         r3 = r31;
         r4 = r26;
-        fn_802399FC();
+        fightTrainerAiAddValue();
         r0 = r3;
         r3 = r28;
         r31 = r0;
@@ -13114,7 +13114,7 @@ void fn_8024A924(void* ctx, u32 param1, u32 param2, u32 param3) {
     r26 = (s32)r30 / (s32)r3;
     r3 = r31;
     r4 = r26;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r0 = r3;
     r3 = r28;
     r31 = r0;
@@ -13458,7 +13458,7 @@ void fn_8024AFC4(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fn_80236D60();
     extern void fn_80239564();
     extern void fn_80239984();
-    extern void fn_802399FC();
+    extern void fightTrainerAiAddValue();
     extern void fn_80239CCC();
     extern void fn_80239EE8();
     u8 sp[0x30];
@@ -13498,7 +13498,7 @@ void fn_8024AFC4(void* ctx, u32 param1, u32 param2, u32 param3) {
         r26 = (s32)r26 / (s32)r3;
         r3 = 0x0;
         r4 = r26;
-        fn_802399FC();
+        fightTrainerAiAddValue();
         r0 = r3;
         r3 = r28;
         r31 = r0;
@@ -14448,7 +14448,7 @@ void fn_8024BE7C(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fn_80236BFC();
     extern void fn_802387C8();
     extern void fn_80239984();
-    extern void fn_802399FC();
+    extern void fightTrainerAiAddValue();
     extern void fn_80239CCC();
     extern void fn_80239EE8();
     u8 sp[0x30];
@@ -14506,7 +14506,7 @@ void fn_8024BE7C(void* ctx, u32 param1, u32 param2, u32 param3) {
     r28 = (s32)r30 / (s32)r3;
     r3 = r29;
     r4 = r28;
-    fn_802399FC();
+    fightTrainerAiAddValue();
     r30 = r3;
     r3 = r26;
     fn_80205B8C();
@@ -16179,7 +16179,7 @@ u32 fn_8024D958(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_802376EC();
     extern u32 fn_80237F74(void*, u32, u32);
     extern u32 fn_80239984(u32, void*, u32);
-    extern u32 fn_802399FC(u32, s32);
+    extern u32 fightTrainerAiAddValue(u32, s32);
     extern void fn_80239CCC(u32, void*, u32, u32, u32, u32, u32, u32, s32);
     extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
     extern s32 fn_8023C370(void*, u32, u32, u32, u32);
@@ -16192,7 +16192,7 @@ u32 fn_8024D958(void* ctx, u32 param1, u32 param2, u32 param3) {
     scale = fn_801FB1C0(0, 0x63, 0x3e, 0);
     score = (((score / 2) * 100) / (u16)handle) / scale;
     {
-        u32 nextHandle = fn_802399FC(0, score);
+        u32 nextHandle = fightTrainerAiAddValue(0, score);
         handle = nextHandle;
     }
     fn_80239CCC(0xEC64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x63, score);
@@ -18201,7 +18201,7 @@ void fn_80250AC0(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x80250B44 | Size: 0x78 | Pattern: field_accessor */
-void fn_80250B44(void* ctx, u32 slot, u32 param) {
+void fightTrainerAiWazaDamage203(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80235B04();
     extern void fn_80250BBC();
@@ -18490,7 +18490,7 @@ u32 fn_80250E84(u32 r3, u32 r4, u32 r5, u32 r6)
 /* Address: 0x80250EC4 | Size: 0x90 */
 void fn_80250EC4(void* ctx, u32 param1, u32 param2) {
     extern void fn_8011BBD8(u32, u32, u32, u32, u32);
-    extern u32 fn_802152A8(u32);
+    extern u32 fightSeqGetKetaguriIryoku(u32);
     extern u32 fn_802377E8(void*, u32);
     u32 sourceValue;
     u32 convertedValue;
@@ -18498,7 +18498,7 @@ void fn_80250EC4(void* ctx, u32 param1, u32 param2) {
 
     sourceValue = (u32)fn_8012640C(param2, 0, 0xd9, 0);
     convertedValue = fn_802377E8(ctx, param2);
-    scaledValue = fn_802152A8((u32)fn_8012640C(0, convertedValue, 0x5f, 0) & 0xffff);
+    scaledValue = fightSeqGetKetaguriIryoku((u32)fn_8012640C(0, convertedValue, 0x5f, 0) & 0xffff);
     fn_8011BBD8(sourceValue, 0, 0x2f, 0, scaledValue & 0xffff);
 }
 
@@ -22254,7 +22254,7 @@ void fn_80254B24(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fn_80237310();
     extern void fn_80237F74();
     extern void fn_8025C264();
-    extern void fn_8025CC90();
+    extern void fightTrainerAiCheckSawagu();
     u8 sp[0x20];
     u32 r0 = 0;
     u32 r3 = (u32)ctx;
@@ -22316,7 +22316,7 @@ void fn_80254B24(void* ctx, u32 param1, u32 param2, u32 param3) {
     r31 = r3;
     r3 = r28;
     r4 = r30;
-    fn_8025CC90();
+    fightTrainerAiCheckSawagu();
     r0 = r3 & 0xFF;
     if (r0 == (u32)0x1) {
         r3 = 0x0;
@@ -24366,7 +24366,7 @@ void fn_802569B4(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x80256A68 | Size: 0x78 | Pattern: field_accessor */
-u32 fn_80256A68(void* ctx, u32 a, u32 b, u32 c) {
+u32 fightTrainerAiWazaHit128(void* ctx, u32 a, u32 b, u32 c) {
     extern s32 fn_802395C8();
     extern s32 fn_80239500();
     extern s32 fn_8023793C();
@@ -25139,12 +25139,12 @@ int fn_80257474(void)
 /* Address: 0x802574AC | Size: 0x5C | Pattern: field_accessor */
 u32 fn_802574AC(void* ctx, u32 slot, u32 param, u32 arg3) {
     extern u32 fn_80229934();
-    extern u32 fn_8025C674();
+    extern u32 fightTrainerAiCheckHorobinouta();
 
     if ((u8)fn_80229934(param, slot, arg3) == 1) {
         return 0;
     }
-    return (u16)fn_8025C674(ctx) != 0;
+    return (u16)fightTrainerAiCheckHorobinouta(ctx) != 0;
 }
 
 /* Address: 0x80257508 | Size: 0x3c | Ghidra import */
@@ -25162,7 +25162,7 @@ u32 fn_80257508(u32 r3, u32 r4, u32 r5, u32 r6)
   return 1;
 }
 /* Address: 0x80257544 | Size: 0x7C | Pattern: field_accessor */
-void fn_80257544(void* ctx, u32 slot, u32 param) {
+void fightTrainerAiWazaHit112(void* ctx, u32 slot, u32 param) {
     extern void fn_80119DD0();
     extern void fn_801F025C();
     extern void fn_801F6D9C();
@@ -25247,7 +25247,7 @@ ret0:
 
 /* Address: 0x80257750 | Size: 0xE8 (232 bytes) */
 void fn_80257750(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_8021C034();
+    extern void fightSeqCondChgActParaIdToValue();
     extern void fn_80236BFC();
     extern void fn_8025C264();
     extern void fn_8025C808();
@@ -25271,7 +25271,7 @@ void fn_80257750(void* ctx, u32 param1, u32 param2, u32 param3) {
     r29 = r5;
     r30 = r6;
     r3 = 0x10;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if ((s32)r0 < (s32)0) {
         r3 = r27;
@@ -25305,7 +25305,7 @@ void fn_80257750(void* ctx, u32 param1, u32 param2, u32 param3) {
         return;
     }
     r3 = 0x10;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if (r0 < (u32)0x1) {
         if ((s32)r31 == (s32)0x0) {
@@ -25323,7 +25323,7 @@ void fn_80257750(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x80257838 | Size: 0x8C */
-void fn_80257838(void* ctx, u32 param1, u32 param2) {
+void fightTrainerAiWazaHit107(void* ctx, u32 param1, u32 param2) {
     extern void fn_80236BFC();
     u8 sp[0x10];
     u32 r0 = 0;
@@ -26235,7 +26235,7 @@ s32 fightTrainerAiWazaHit082(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_802364BC(void* ctx, u32 param3);
     extern u8 fn_80236BFC(void* ctx, u32 a, u32 type);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 one);
-    extern u8 fn_8021A2C0(u32 elem);
+    extern u8 fightSeqMonomaneNGCheck(u32 elem);
     u16 buf[0x10];
     u16 count = fn_802367CC(ctx, param1, buf, 0, 0);
     u32 targetVal = fn_802364BC(ctx, param3);
@@ -26247,7 +26247,7 @@ s32 fightTrainerAiWazaHit082(void* ctx, u32 param1, u32 param2, u32 param3) {
     }
     gate = fn_8025C264(ctx, param1, param2, param3, 0xFFFF);
     if (fn_80236BFC(ctx, param1, 0x10) == 1 ||
-        fn_8021A2C0(targetVal) != 0 ||
+        fightSeqMonomaneNGCheck(targetVal) != 0 ||
         targetVal == 0 || targetVal == 0xffff || targetVal == 0x165 || targetVal == 0x163) {
         return 0;
     }
@@ -27238,7 +27238,7 @@ u32 fn_802596A8(void)
 }
 /* Address: 0x802596E4 | Size: 0xE8 (232 bytes) */
 void fn_802596E4(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_8021C034();
+    extern void fightSeqCondChgActParaIdToValue();
     extern void fn_80236BFC();
     extern void fn_8025C264();
     extern void fn_8025C808();
@@ -27262,7 +27262,7 @@ void fn_802596E4(void* ctx, u32 param1, u32 param2, u32 param3) {
     r29 = r5;
     r30 = r6;
     r3 = 0xa0;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if ((s32)r0 < (s32)0) {
         r3 = r27;
@@ -27296,7 +27296,7 @@ void fn_802596E4(void* ctx, u32 param1, u32 param2, u32 param3) {
         return;
     }
     r3 = 0xa0;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if (r0 < (u32)0x1) {
         if ((s32)r31 == (s32)0x0) {
@@ -27315,7 +27315,7 @@ void fn_802596E4(void* ctx, u32 param1, u32 param2, u32 param3) {
 
 /* Address: 0x802597CC | Size: 0xE8 (232 bytes) */
 void fn_802597CC(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_8021C034();
+    extern void fightSeqCondChgActParaIdToValue();
     extern void fn_80236BFC();
     extern void fn_8025C264();
     extern void fn_8025C808();
@@ -27339,7 +27339,7 @@ void fn_802597CC(void* ctx, u32 param1, u32 param2, u32 param3) {
     r29 = r5;
     r30 = r6;
     r3 = 0xa0;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if ((s32)r0 < (s32)0) {
         r3 = r27;
@@ -27373,7 +27373,7 @@ void fn_802597CC(void* ctx, u32 param1, u32 param2, u32 param3) {
         return;
     }
     r3 = 0xa0;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if (r0 < (u32)0x1) {
         if ((s32)r31 == (s32)0x0) {
@@ -27392,7 +27392,7 @@ void fn_802597CC(void* ctx, u32 param1, u32 param2, u32 param3) {
 
 /* Address: 0x802598B4 | Size: 0xE8 (232 bytes) */
 void fn_802598B4(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_8021C034();
+    extern void fightSeqCondChgActParaIdToValue();
     extern void fn_80236BFC();
     extern void fn_8025C264();
     extern void fn_8025C808();
@@ -27416,7 +27416,7 @@ void fn_802598B4(void* ctx, u32 param1, u32 param2, u32 param3) {
     r29 = r5;
     r30 = r6;
     r3 = 0xa0;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if ((s32)r0 < (s32)0) {
         r3 = r27;
@@ -27450,7 +27450,7 @@ void fn_802598B4(void* ctx, u32 param1, u32 param2, u32 param3) {
         return;
     }
     r3 = 0xa0;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if (r0 < (u32)0x1) {
         if ((s32)r31 == (s32)0x0) {
@@ -27469,7 +27469,7 @@ void fn_802598B4(void* ctx, u32 param1, u32 param2, u32 param3) {
 
 /* Address: 0x8025999C | Size: 0xE8 (232 bytes) */
 void fn_8025999C(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_8021C034();
+    extern void fightSeqCondChgActParaIdToValue();
     extern void fn_80236BFC();
     extern void fn_8025C264();
     extern void fn_8025C808();
@@ -27493,7 +27493,7 @@ void fn_8025999C(void* ctx, u32 param1, u32 param2, u32 param3) {
     r29 = r5;
     r30 = r6;
     r3 = 0xa0;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if ((s32)r0 < (s32)0) {
         r3 = r27;
@@ -27527,7 +27527,7 @@ void fn_8025999C(void* ctx, u32 param1, u32 param2, u32 param3) {
         return;
     }
     r3 = 0xa0;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if (r0 < (u32)0x1) {
         if ((s32)r31 == (s32)0x0) {
@@ -27563,7 +27563,7 @@ success:
 
 /* Address: 0x80259AEC | Size: 0xE8 (232 bytes) */
 void fn_80259AEC(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_8021C034();
+    extern void fightSeqCondChgActParaIdToValue();
     extern void fn_80236BFC();
     extern void fn_8025C264();
     extern void fn_8025C808();
@@ -27587,7 +27587,7 @@ void fn_80259AEC(void* ctx, u32 param1, u32 param2, u32 param3) {
     r29 = r5;
     r30 = r6;
     r3 = 0x20;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if ((s32)r0 < (s32)0) {
         r3 = r27;
@@ -27621,7 +27621,7 @@ void fn_80259AEC(void* ctx, u32 param1, u32 param2, u32 param3) {
         return;
     }
     r3 = 0x20;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if (r0 < (u32)0x1) {
         if ((s32)r31 == (s32)0x0) {
@@ -27640,7 +27640,7 @@ void fn_80259AEC(void* ctx, u32 param1, u32 param2, u32 param3) {
 
 /* Address: 0x80259BD4 | Size: 0xE8 (232 bytes) */
 void fn_80259BD4(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_8021C034();
+    extern void fightSeqCondChgActParaIdToValue();
     extern void fn_80236BFC();
     extern void fn_8025C264();
     extern void fn_8025C808();
@@ -27664,7 +27664,7 @@ void fn_80259BD4(void* ctx, u32 param1, u32 param2, u32 param3) {
     r29 = r5;
     r30 = r6;
     r3 = 0x20;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if ((s32)r0 < (s32)0) {
         r3 = r27;
@@ -27698,7 +27698,7 @@ void fn_80259BD4(void* ctx, u32 param1, u32 param2, u32 param3) {
         return;
     }
     r3 = 0x20;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if (r0 < (u32)0x1) {
         if ((s32)r31 == (s32)0x0) {
@@ -27717,7 +27717,7 @@ void fn_80259BD4(void* ctx, u32 param1, u32 param2, u32 param3) {
 
 /* Address: 0x80259CBC | Size: 0xE8 (232 bytes) */
 void fn_80259CBC(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_8021C034();
+    extern void fightSeqCondChgActParaIdToValue();
     extern void fn_80236BFC();
     extern void fn_8025C264();
     extern void fn_8025C808();
@@ -27741,7 +27741,7 @@ void fn_80259CBC(void* ctx, u32 param1, u32 param2, u32 param3) {
     r29 = r5;
     r30 = r6;
     r3 = 0x20;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if ((s32)r0 < (s32)0) {
         r3 = r27;
@@ -27775,7 +27775,7 @@ void fn_80259CBC(void* ctx, u32 param1, u32 param2, u32 param3) {
         return;
     }
     r3 = 0x20;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if (r0 < (u32)0x1) {
         if ((s32)r31 == (s32)0x0) {
@@ -27794,7 +27794,7 @@ void fn_80259CBC(void* ctx, u32 param1, u32 param2, u32 param3) {
 
 /* Address: 0x80259DA4 | Size: 0xE8 (232 bytes) */
 void fn_80259DA4(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_8021C034();
+    extern void fightSeqCondChgActParaIdToValue();
     extern void fn_80236BFC();
     extern void fn_8025C264();
     extern void fn_8025C808();
@@ -27818,7 +27818,7 @@ void fn_80259DA4(void* ctx, u32 param1, u32 param2, u32 param3) {
     r29 = r5;
     r30 = r6;
     r3 = 0x20;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if ((s32)r0 < (s32)0) {
         r3 = r27;
@@ -27852,7 +27852,7 @@ void fn_80259DA4(void* ctx, u32 param1, u32 param2, u32 param3) {
         return;
     }
     r3 = 0x20;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if (r0 < (u32)0x1) {
         if ((s32)r31 == (s32)0x0) {
@@ -27871,7 +27871,7 @@ void fn_80259DA4(void* ctx, u32 param1, u32 param2, u32 param3) {
 
 /* Address: 0x80259E8C | Size: 0xE8 (232 bytes) */
 void fn_80259E8C(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_8021C034();
+    extern void fightSeqCondChgActParaIdToValue();
     extern void fn_80236BFC();
     extern void fn_8025C264();
     extern void fn_8025C808();
@@ -27895,7 +27895,7 @@ void fn_80259E8C(void* ctx, u32 param1, u32 param2, u32 param3) {
     r29 = r5;
     r30 = r6;
     r3 = 0x20;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if ((s32)r0 < (s32)0) {
         r3 = r27;
@@ -27929,7 +27929,7 @@ void fn_80259E8C(void* ctx, u32 param1, u32 param2, u32 param3) {
         return;
     }
     r3 = 0x20;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if (r0 < (u32)0x1) {
         if ((s32)r31 == (s32)0x0) {
@@ -28547,11 +28547,11 @@ s32 fightTrainerAiWazaHit038(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x8025A870 | Size: 0x8C */
-void fn_8025A870(void* ctx, u32 param1, u32 param2) {
+void fightTrainerAiWazaHit037(void* ctx, u32 param1, u32 param2) {
     extern f32 lbl_8047E648;
     extern void fn_80236BFC();
     extern void fn_802373B0();
-    extern void fn_8025CC90();
+    extern void fightTrainerAiCheckSawagu();
     u8 sp[0x10];
     u32 r0 = 0;
     u32 r3 = (u32)ctx;
@@ -28572,7 +28572,7 @@ void fn_8025A870(void* ctx, u32 param1, u32 param2) {
     }
     r3 = r30;
     r4 = r31;
-    fn_8025CC90();
+    fightTrainerAiCheckSawagu();
     r0 = r3 & 0xFF;
     if (r0 == (u32)0x1) {
         r3 = 0x0;
@@ -29082,7 +29082,7 @@ void fn_8025B068(void* ctx, u32 param1, u32 param2) {
 
 /* Address: 0x8025B124 | Size: 0xE8 (232 bytes) */
 void fn_8025B124(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_8021C034();
+    extern void fightSeqCondChgActParaIdToValue();
     extern void fn_80236BFC();
     extern void fn_8025C264();
     extern void fn_8025C808();
@@ -29106,7 +29106,7 @@ void fn_8025B124(void* ctx, u32 param1, u32 param2, u32 param3) {
     r29 = r5;
     r30 = r6;
     r3 = 0x90;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if ((s32)r0 < (s32)0) {
         r3 = r27;
@@ -29140,7 +29140,7 @@ void fn_8025B124(void* ctx, u32 param1, u32 param2, u32 param3) {
         return;
     }
     r3 = 0x90;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if (r0 < (u32)0x1) {
         if ((s32)r31 == (s32)0x0) {
@@ -29159,7 +29159,7 @@ void fn_8025B124(void* ctx, u32 param1, u32 param2, u32 param3) {
 
 /* Address: 0x8025B20C | Size: 0xE8 (232 bytes) */
 void fn_8025B20C(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_8021C034();
+    extern void fightSeqCondChgActParaIdToValue();
     extern void fn_80236BFC();
     extern void fn_8025C264();
     extern void fn_8025C808();
@@ -29183,7 +29183,7 @@ void fn_8025B20C(void* ctx, u32 param1, u32 param2, u32 param3) {
     r29 = r5;
     r30 = r6;
     r3 = 0x90;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if ((s32)r0 < (s32)0) {
         r3 = r27;
@@ -29217,7 +29217,7 @@ void fn_8025B20C(void* ctx, u32 param1, u32 param2, u32 param3) {
         return;
     }
     r3 = 0x90;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if (r0 < (u32)0x1) {
         if ((s32)r31 == (s32)0x0) {
@@ -29236,7 +29236,7 @@ void fn_8025B20C(void* ctx, u32 param1, u32 param2, u32 param3) {
 
 /* Address: 0x8025B2F4 | Size: 0xE8 (232 bytes) */
 void fn_8025B2F4(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_8021C034();
+    extern void fightSeqCondChgActParaIdToValue();
     extern void fn_80236BFC();
     extern void fn_8025C264();
     extern void fn_8025C808();
@@ -29260,7 +29260,7 @@ void fn_8025B2F4(void* ctx, u32 param1, u32 param2, u32 param3) {
     r29 = r5;
     r30 = r6;
     r3 = 0x90;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if ((s32)r0 < (s32)0) {
         r3 = r27;
@@ -29294,7 +29294,7 @@ void fn_8025B2F4(void* ctx, u32 param1, u32 param2, u32 param3) {
         return;
     }
     r3 = 0x90;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if (r0 < (u32)0x1) {
         if ((s32)r31 == (s32)0x0) {
@@ -29313,7 +29313,7 @@ void fn_8025B2F4(void* ctx, u32 param1, u32 param2, u32 param3) {
 
 /* Address: 0x8025B3DC | Size: 0xE8 (232 bytes) */
 void fn_8025B3DC(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_8021C034();
+    extern void fightSeqCondChgActParaIdToValue();
     extern void fn_80236BFC();
     extern void fn_8025C264();
     extern void fn_8025C808();
@@ -29337,7 +29337,7 @@ void fn_8025B3DC(void* ctx, u32 param1, u32 param2, u32 param3) {
     r29 = r5;
     r30 = r6;
     r3 = 0x90;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if ((s32)r0 < (s32)0) {
         r3 = r27;
@@ -29371,7 +29371,7 @@ void fn_8025B3DC(void* ctx, u32 param1, u32 param2, u32 param3) {
         return;
     }
     r3 = 0x90;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if (r0 < (u32)0x1) {
         if ((s32)r31 == (s32)0x0) {
@@ -29390,7 +29390,7 @@ void fn_8025B3DC(void* ctx, u32 param1, u32 param2, u32 param3) {
 
 /* Address: 0x8025B4C4 | Size: 0xE8 (232 bytes) */
 void fn_8025B4C4(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_8021C034();
+    extern void fightSeqCondChgActParaIdToValue();
     extern void fn_80236BFC();
     extern void fn_8025C264();
     extern void fn_8025C808();
@@ -29414,7 +29414,7 @@ void fn_8025B4C4(void* ctx, u32 param1, u32 param2, u32 param3) {
     r29 = r5;
     r30 = r6;
     r3 = 0x90;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if ((s32)r0 < (s32)0) {
         r3 = r27;
@@ -29448,7 +29448,7 @@ void fn_8025B4C4(void* ctx, u32 param1, u32 param2, u32 param3) {
         return;
     }
     r3 = 0x90;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if (r0 < (u32)0x1) {
         if ((s32)r31 == (s32)0x0) {
@@ -29526,7 +29526,7 @@ void fn_8025B5AC(void* ctx, u32 param1, u32 param2) {
 
 /* Address: 0x8025B660 | Size: 0xE8 (232 bytes) */
 void fn_8025B660(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_8021C034();
+    extern void fightSeqCondChgActParaIdToValue();
     extern void fn_80236BFC();
     extern void fn_8025C264();
     extern void fn_8025C808();
@@ -29550,7 +29550,7 @@ void fn_8025B660(void* ctx, u32 param1, u32 param2, u32 param3) {
     r29 = r5;
     r30 = r6;
     r3 = 0x10;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if ((s32)r0 < (s32)0) {
         r3 = r27;
@@ -29584,7 +29584,7 @@ void fn_8025B660(void* ctx, u32 param1, u32 param2, u32 param3) {
         return;
     }
     r3 = 0x10;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if (r0 < (u32)0x1) {
         if ((s32)r31 == (s32)0x0) {
@@ -29603,7 +29603,7 @@ void fn_8025B660(void* ctx, u32 param1, u32 param2, u32 param3) {
 
 /* Address: 0x8025B748 | Size: 0xE8 (232 bytes) */
 void fn_8025B748(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_8021C034();
+    extern void fightSeqCondChgActParaIdToValue();
     extern void fn_80236BFC();
     extern void fn_8025C264();
     extern void fn_8025C808();
@@ -29627,7 +29627,7 @@ void fn_8025B748(void* ctx, u32 param1, u32 param2, u32 param3) {
     r29 = r5;
     r30 = r6;
     r3 = 0x10;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if ((s32)r0 < (s32)0) {
         r3 = r27;
@@ -29661,7 +29661,7 @@ void fn_8025B748(void* ctx, u32 param1, u32 param2, u32 param3) {
         return;
     }
     r3 = 0x10;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if (r0 < (u32)0x1) {
         if ((s32)r31 == (s32)0x0) {
@@ -29680,7 +29680,7 @@ void fn_8025B748(void* ctx, u32 param1, u32 param2, u32 param3) {
 
 /* Address: 0x8025B830 | Size: 0xE8 (232 bytes) */
 void fn_8025B830(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_8021C034();
+    extern void fightSeqCondChgActParaIdToValue();
     extern void fn_80236BFC();
     extern void fn_8025C264();
     extern void fn_8025C808();
@@ -29704,7 +29704,7 @@ void fn_8025B830(void* ctx, u32 param1, u32 param2, u32 param3) {
     r29 = r5;
     r30 = r6;
     r3 = 0x10;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if ((s32)r0 < (s32)0) {
         r3 = r27;
@@ -29738,7 +29738,7 @@ void fn_8025B830(void* ctx, u32 param1, u32 param2, u32 param3) {
         return;
     }
     r3 = 0x10;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if (r0 < (u32)0x1) {
         if ((s32)r31 == (s32)0x0) {
@@ -29757,7 +29757,7 @@ void fn_8025B830(void* ctx, u32 param1, u32 param2, u32 param3) {
 
 /* Address: 0x8025B918 | Size: 0xE8 (232 bytes) */
 void fn_8025B918(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_8021C034();
+    extern void fightSeqCondChgActParaIdToValue();
     extern void fn_80236BFC();
     extern void fn_8025C264();
     extern void fn_8025C808();
@@ -29781,7 +29781,7 @@ void fn_8025B918(void* ctx, u32 param1, u32 param2, u32 param3) {
     r29 = r5;
     r30 = r6;
     r3 = 0x10;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if ((s32)r0 < (s32)0) {
         r3 = r27;
@@ -29815,7 +29815,7 @@ void fn_8025B918(void* ctx, u32 param1, u32 param2, u32 param3) {
         return;
     }
     r3 = 0x10;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if (r0 < (u32)0x1) {
         if ((s32)r31 == (s32)0x0) {
@@ -29962,7 +29962,7 @@ void fn_8025BB20(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fn_80239500();
     extern void fn_802395C8();
     extern void fn_8025C264();
-    extern void fn_8025CBE8();
+    extern void fightTrainerAiCheckSimerike();
     u8 sp[0x80];
     u32 r0 = 0;
     u32 r3 = (u32)ctx;
@@ -30004,7 +30004,7 @@ void fn_8025BB20(void* ctx, u32 param1, u32 param2, u32 param3) {
     }
     }
     r3 = r26;
-    fn_8025CBE8();
+    fightTrainerAiCheckSimerike();
     r0 = r3 & 0xFF;
     if (r0 == (u32)0x1) {
         r3 = 0x0;
@@ -30043,7 +30043,7 @@ void fn_8025BB20(void* ctx, u32 param1, u32 param2, u32 param3) {
  *
  * Per-move AI evaluator gate: vetoes the move (returns 0) if any of 4
  * checks trip -- (1) already-flinched-ish tri-state via fn_8022967C +
- * fn_801F1A6C's flag-count buffer, (2) fn_8025CBE8(ctx), (3) fn_8023793C
+ * fn_801F1A6C's flag-count buffer, (2) fightTrainerAiCheckSimerike(ctx), (3) fn_8023793C
  * type/immunity check == 0x43, (4) fn_8025C264's tri-state gate == 0.
  * Otherwise returns 1. Shares its template with the WazaHitNNN family
  * (see fn_8025BA2C aka fightTrainerAiWazaHit008, same shape minus the
@@ -30053,7 +30053,7 @@ s32 fightTrainerAiWazaHit007(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_802395C8(void* ctx, u32 param2, u32 param1);
     extern u32 fn_801F1A6C(u32 zero, void* ctx, void* buf, u32 one1, u32 one2);
     extern u8 fn_8022967C(u32 param2);
-    extern u8 fn_8025CBE8(void* ctx);
+    extern u8 fightTrainerAiCheckSimerike(void* ctx);
     extern u32 fn_80239500(void* ctx, u32 param2);
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
@@ -30065,7 +30065,7 @@ s32 fightTrainerAiWazaHit007(void* ctx, u32 param1, u32 param2, u32 param3) {
     if (fn_8022967C(param2) == 1 && (u16)flinchCount <= 1) {
         return 0;
     }
-    if (fn_8025CBE8(ctx) == 1) {
+    if (fightTrainerAiCheckSimerike(ctx) == 1) {
         return 0;
     }
     if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
@@ -30379,7 +30379,7 @@ void fn_8025BEF8(void* ctx, u32 param1, u32 param2) {
 /* Address: 0x8025BFAC | Size: 0x200 (512 bytes) */
 u32 fn_8025BFAC(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u8 fn_80236BFC(void* ctx, u32 a, u32 type);
-    extern u8 fn_8025CC90(void* ctx, u32 a);
+    extern u8 fightTrainerAiCheckSawagu(void* ctx, u32 a);
     extern u8 fn_80237310(void* ctx, u32 a);
     extern u8 fn_80237F74(void* ctx, u32 a, u32 type);
     extern s32 fn_8025C264(void* ctx, u32 p1, u32 p2, u32 p3, u32 z);
@@ -30390,7 +30390,7 @@ u32 fn_8025BFAC(void* ctx, u32 param1, u32 param2, u32 param3) {
 
     if (fn_80236BFC(ctx, param3, 0x14) == 1) return 0;
     if (fn_80236BFC(ctx, param3, 0x8) == 1) return 0;
-    if (fn_8025CC90(ctx, param3) == 1) return 0;
+    if (fightTrainerAiCheckSawagu(ctx, param3) == 1) return 0;
     if (fn_80237310(ctx, param3) == 0) return 0;
     if (fn_80237F74(ctx, param3, 0x11) == 1) goto ok1;
     if (fn_80237F74(ctx, param3, 0x14) == 1) goto ok1;
@@ -30725,7 +30725,7 @@ s32 fn_8025C5A4(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x8025C674 | Size: 0x48 | Pattern: field_accessor */
-u32 fn_8025C674(void* ctx, u32 slot, u32 param) {
+u32 fightTrainerAiCheckHorobinouta(void* ctx, u32 slot, u32 param) {
     extern u32 fn_801F37B0();
     extern void _fightTrainerAiCheckHorobinoutaSub();
     u32 result[2];
@@ -30737,7 +30737,7 @@ u32 fn_8025C674(void* ctx, u32 slot, u32 param) {
 
 /* Address: 0x8025C6BC | Size: 0xB4 */
 void fn_8025C6BC(void* ctx, u32 param1, u32 param2) {
-    extern void fn_801F8424();
+    extern void fightTrainerIsAllyFightTargetPtr();
     extern void fn_802062FC();
     extern void fn_80236BFC();
     extern void fn_80237F74();
@@ -30764,7 +30764,7 @@ void fn_8025C6BC(void* ctx, u32 param1, u32 param2) {
     r3 = r30;
     r4 = r31;
     r5 = r28;
-    fn_801F8424();
+    fightTrainerIsAllyFightTargetPtr();
     r0 = r3 & 0xFF;
     if (r0 == (u32)0x1) {
         r3 = 0x1;
@@ -30803,7 +30803,7 @@ typedef struct HorobinoutaCtx {
  * _fightTrainerAiCheckHorobinoutaSub (0x8025C6BC)
  *
  * Perish Song (Horobinouta) counter callback, invoked per-floor-slot via
- * fn_801F37B0 (see fn_8025C674). Runs 3 chained gate checks against
+ * fn_801F37B0 (see fightTrainerAiCheckHorobinouta). Runs 3 chained gate checks against
  * ctx->field0/floor/idx; only when ALL 3 fail does it increment
  * ctx->counter. Always returns 1 (the enumeration driver doesn't use the
  * return value -- the counter in ctx is the real output).
@@ -30811,7 +30811,7 @@ typedef struct HorobinoutaCtx {
 #pragma optimize_for_size on
 s32 _fightTrainerAiCheckHorobinoutaSub(void* floor, u16 idx, HorobinoutaCtx* ctx) {
     extern u8 fn_802062FC(void* floor, u16 idx, HorobinoutaCtx* ctx);
-    extern u8 fn_801F8424(u32 fieldA, void* floor, u16 idx);
+    extern u8 fightTrainerIsAllyFightTargetPtr(u32 fieldA, void* floor, u16 idx);
     extern u8 fn_80236BFC(u32 fieldA, void* floor, u32 flag);
     extern u8 fn_80237F74(u32 fieldA, void* floor, u32 flag);
     u32 fieldA = ctx->field0;
@@ -30819,7 +30819,7 @@ s32 _fightTrainerAiCheckHorobinoutaSub(void* floor, u16 idx, HorobinoutaCtx* ctx
     if (!fn_802062FC(floor, idx, ctx)) {
         return 1;
     }
-    if (fn_801F8424(fieldA, floor, idx) == 1) {
+    if (fightTrainerIsAllyFightTargetPtr(fieldA, floor, idx) == 1) {
         return 1;
     }
     if (fn_80236BFC(fieldA, floor, 0x1e) != 1 && fn_80237F74(fieldA, floor, 0x2b) != 1) {
@@ -30880,8 +30880,8 @@ void fn_8025C808(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fn_801F025C();
     extern void fn_801F6E98();
     extern void fn_801FB1C0();
-    extern void fn_8021C034();
-    extern void fn_8021C090();
+    extern void fightSeqCondChgActParaIdToValue();
+    extern void fightSeqCondChgActTypeToPokemonStatusId();
     extern void fn_80229C28();
     extern void fn_80237F74();
     u8 sp[0x40];
@@ -30935,7 +30935,7 @@ void fn_8025C808(void* ctx, u32 param1, u32 param2, u32 param3) {
         r27 = 0x1;
     }
     r3 = r26;
-    fn_8021C090();
+    fightSeqCondChgActTypeToPokemonStatusId();
     r0 = r3;
     r3 = r30;
     r29 = r0;
@@ -30945,7 +30945,7 @@ void fn_8025C808(void* ctx, u32 param1, u32 param2, u32 param3) {
     ((void(*)(void))fn_8012640C)();
     r26 = (s8)r3;
     r3 = r25;
-    fn_8021C034();
+    fightSeqCondChgActParaIdToValue();
     r0 = (s8)r3;
     if ((s32)r0 < (s32)0) {
         r3 = r21;
@@ -31148,20 +31148,20 @@ u16 fn_8025CB3C(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x8025CBE8 | Size: 0x48 | Pattern: field_accessor */
-u32 fn_8025CBE8(void* ctx, u32 slot, u32 param) {
+u32 fightTrainerAiCheckSimerike(void* ctx, u32 slot, u32 param) {
     extern u32 fn_801F37B0();
-    extern void fn_8025CC30();
+    extern void _fightTrainerAiSimerikeCheckSub();
     u32 buf[2];
     u32 r;
     u32 s;
     buf[0] = (u32)ctx;
-    r = fn_801F37B0(0, (u32)fn_8025CC30, (u32)buf, 0) & 0xFF;
+    r = fn_801F37B0(0, (u32)_fightTrainerAiSimerikeCheckSub, (u32)buf, 0) & 0xFF;
     s = 1 - r;
     return (s != 0) ? 1 : 0;
 }
 
 /* Address: 0x8025CC30 | Size: 0x60 | Pattern: field_accessor */
-u32 fn_8025CC30(void* ctx, u32 slot, u32* param) {
+u32 _fightTrainerAiSimerikeCheckSub(void* ctx, u32 slot, u32* param) {
     extern u32 fn_802062FC(void);
     extern u32 fn_80237F74(u32, void*, u32);
     u32 r31;
@@ -31178,19 +31178,19 @@ u32 fn_8025CC30(void* ctx, u32 slot, u32* param) {
 }
 
 /* Address: 0x8025CC90 | Size: 0x50 | Pattern: field_accessor */
-u32 fn_8025CC90(void* ctx, u32 slot, u32 param) {
+u32 fightTrainerAiCheckSawagu(void* ctx, u32 slot, u32 param) {
     extern u32 fn_801F37B0();
-    extern u32 fn_8025CCE0();
+    extern u32 _fightTrainerAiSawaguCheckSub();
     u32 buf[2];
     u32 r;
     buf[0] = (u32)ctx;
     buf[1] = slot;
-    r = fn_801F37B0(0, (u32)fn_8025CCE0, (u32)buf, 0) & 0xFF;
+    r = fn_801F37B0(0, (u32)_fightTrainerAiSawaguCheckSub, (u32)buf, 0) & 0xFF;
     return r != 1;
 }
 
 /* Address: 0x8025CCE0 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_8025CCE0(void* ctx, u32 slot, u32 param) {
+u32 _fightTrainerAiSawaguCheckSub(void* ctx, u32 slot, u32 param) {
     extern u32 fn_802062FC(void);
     extern u32 fn_80236BFC(u32, void*, u32);
     extern u32 fn_80237F74(u32, u32, u32);
@@ -31448,12 +31448,12 @@ u32 fn_8025D06C(void)
     extern u32 fn_8006ADEC();
     extern void fn_8006AFC4();
     extern void* fn_8006B5A8();
-    extern void fn_801293FC();
+    extern void heroAddPokecoupon();
     u32 uVar1;
   fn_8006B5A8();
   fn_8006AFC4();
   uVar1 = fn_8006ADEC();
-  fn_801293FC(0,uVar1);
+  heroAddPokecoupon(0,uVar1);
   return 0;
 }
 
@@ -31813,7 +31813,7 @@ void fn_8025D3F4(void* ctx, u32 param1, u32 param2, u32 param3) {
 u32 fn_8025D560(void* ctx) { return *(u32*)((u8*)fn_8006B09C(ctx) + 0x20); }
 
 /* Address: 0x8025D584 | Size: 0x5C | Pattern: field_accessor */
-void fn_8025D584(void* ctx, u32 slot, u32 param) {
+void toolentryTaisenDeleteEtnryPokemonOrder(void* ctx, u32 slot, u32 param) {
     extern void fn_8006B09C();
     u8 sp[0x10];
     u32 r0 = 0;
@@ -31841,7 +31841,7 @@ void fn_8025D584(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x8025D5E0 | Size: 0x64 | Pattern: field_accessor */
-u32 fn_8025D5E0(void* ctx, s32 count, u32* src) {
+u32 toolentryTaisenSetEtnryPokemonOrderGBA(void* ctx, s32 count, u32* src) {
     typedef struct BattleFieldAccessor {
         u8 unk_00[8];
         u32 values[6];
@@ -31941,7 +31941,7 @@ void fn_8025D644(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x8025D744 | Size: 0x44 | Pattern: field_accessor */
-u32 fn_8025D744(void* ctx, u32 slot, u32 param) {
+u32 toolentryTaisenInitPokemonOrder(void* ctx, u32 slot, u32 param) {
     extern void* fn_8006B09C();
     u8* base;
     u32 i;
@@ -32282,7 +32282,7 @@ void fn_8025DE54(u32 *r3,u16 *r4,int r5,int r6,int r7,
 
 {
     extern int _threadSwitch();
-    extern int fn_801C41C8();
+    extern int fadeSet();
     extern int fn_801DA4E8();
     extern int fn_801DA8C4();
     extern int fn_801DA914();
@@ -32295,7 +32295,7 @@ void fn_8025DE54(u32 *r3,u16 *r4,int r5,int r6,int r7,
   int iVar2;
 
   if (r7 == 1) {
-    fn_801C41C8((double)lbl_8047E670,2);
+    fadeSet((double)lbl_8047E670,2);
   }
   fn_801DA4E8(*r3,1);
   p = r4;
@@ -32321,14 +32321,14 @@ void fn_8025DE54(u32 *r3,u16 *r4,int r5,int r6,int r7,
 u32 fn_8025DF38(int *r3,u32 r4,u16 *r5,int r6)
 
 {
-    extern u32 fn_800E0C04();
-    extern int fn_800E3C94();
+    extern u32 _fadeEffectGetRandom__FUl();
+    extern int GSmodelSetBoundCheck();
     extern int fn_800E8FE8();
     extern int fn_800E900C();
     extern int fn_800E90C8();
     extern int fn_800E9108();
     extern u32 fn_800FF56C();
-    extern int fn_80113F6C();
+    extern int floorGetResource();
     extern int fn_80115280();
     extern u32 fn_8011538C();
     extern int fn_80115BD8();
@@ -32347,7 +32347,7 @@ u32 fn_8025DF38(int *r3,u32 r4,u16 *r5,int r6)
   int iVar10;
   int local_68 [17];
   
-  uVar2 = fn_800E0C04(0xffffffff);
+  uVar2 = _fadeEffectGetRandom__FUl(0xffffffff);
   iVar3 = fn_801DE190(r4,uVar2,0);
   *r3 = iVar3;
   if (iVar3 == 0) {
@@ -32374,7 +32374,7 @@ u32 fn_8025DF38(int *r3,u32 r4,u16 *r5,int r6)
           while (!bVar1) {
             uVar6 = fn_8011538C(iVar4,0);
             uVar7 = fn_800FF56C();
-            iVar5 = fn_80113F6C(uVar7,uVar6);
+            iVar5 = floorGetResource(uVar7,uVar6);
             if (iVar5 != 0) {
               *(int *)((int)local_68 + iVar10) = iVar5;
               iVar9 = iVar9 + 1;
@@ -32385,7 +32385,7 @@ u32 fn_8025DF38(int *r3,u32 r4,u16 *r5,int r6)
           fn_800E9108(iVar3,1);
           fn_800E8FE8(iVar3,uVar2);
           fn_800E900C(iVar3,iVar9,local_68);
-          fn_800E3C94(iVar3,1);
+          GSmodelSetBoundCheck(iVar3,1);
         }
       }
     }
@@ -32503,8 +32503,8 @@ void fn_8025E1BC(float f1, float f2, float f3, float f4, float f5, float f6) {
     }
     if (r31 != (u32 *)0 && *r31 != 0) {
       fn_8025DE54(r31, &lbl_80478DA0, 1, 0, 0, 1);
-      fn_801C41C8(5, lbl_8047E67C);
-      fn_801C40F0(1);
+      fadeSet(5, lbl_8047E67C);
+      fadeCheck(1);
     }
   }
   fn_801DAC90();
@@ -32520,7 +32520,7 @@ void fn_8025E534(void)
     extern int fn_80118A68();
     extern int fn_80118F04();
     extern u32 fn_801190DC();
-    extern int fn_8025DC2C();
+    extern int waitTime__Ff();
     extern u32 lbl_8047B660;
     extern u32 lbl_8047B664;
     extern f32 lbl_8047E684;
@@ -32546,7 +32546,7 @@ skip_cleanup:
     fn_80118F04(uVar2, local_buf);
     fVar1 = lbl_8047E684;
     lbl_8047B664 = 1;
-    fn_8025DC2C((double)fVar1);
+    waitTime__Ff((double)fVar1);
     if ((s32)lbl_8047B664 == 1) {
         fn_80118A68(lbl_8047B660, 1);
         lbl_8047B660 = 0;
@@ -32692,14 +32692,14 @@ void fn_8025EF58(void)
     extern u32 _DAT_804782bc;
     extern u32 _DAT_804782c0;
     extern u32 _DAT_804782c4;
-    extern u32 fn_8001BDF4();
+    extern u32 menuPokemonOpen();
     extern int fn_800FF730();
     extern int fn_801065B8();
     extern int fn_8011288C();
     extern int fn_8011EE40();
     extern s8 fn_80129B2C();
     extern u32 fn_8012A5B0();
-    extern int fn_801C40F0();
+    extern int fadeCheck();
     extern s8 fn_801EEC74();
     extern u32 lbl_8047B660;
     extern u32 lbl_8047B664;
@@ -32782,13 +32782,13 @@ void fn_8025EF58(void)
       _DAT_804782c0 = (int)fn_8012640C(uVar2,0,0x6e,0);
       _DAT_804782bc = 1;
       _DAT_804782c4 = lbl_8047B66C;
-      fn_801C41C8((double)lbl_8047E680,3);
-      fn_801C40F0(1);
+      fadeSet((double)lbl_8047E680,3);
+      fadeCheck(1);
       fn_800FF730(0x385);
       fn_8011288C(0,0);
       _threadSwitch();
-      fn_801C41C8((double)lbl_8047E68C,2);
-      fn_801C40F0(1);
+      fadeSet((double)lbl_8047E68C,2);
+      fadeCheck(1);
       fn_8025DCBC((int*)auStack_28);
     }
     else if (iVar1 == 4) {
@@ -32805,20 +32805,20 @@ void fn_8025EF58(void)
       else {
         fn_801067E8(0x3b0f,1,0);
         fn_801065B8(1);
-        uVar4 = fn_8001BDF4(7,0,0);
+        uVar4 = menuPokemonOpen(7,0,0);
         if (uVar4 != 0xffffffff) {
           uVar2 = fn_8012A5B0(0,3,uVar4 & 0xffff);
           _DAT_804782c0 = (int)fn_8012640C(uVar2,0,0x6e,0);
           _DAT_804782bc = 0;
           _DAT_804782c4 = uVar4;
-          fn_801C41C8((double)lbl_8047E680,3);
-          fn_801C40F0(1);
+          fadeSet((double)lbl_8047E680,3);
+          fadeCheck(1);
           fn_8025DD14((int*)auStack_28);
           fn_800FF730(0x385);
           fn_8011288C(0,0);
           _threadSwitch();
-          fn_801C41C8((double)lbl_8047E68C,2);
-          fn_801C40F0(1);
+          fadeSet((double)lbl_8047E68C,2);
+          fadeCheck(1);
           fn_8025DCBC((int*)auStack_28);
         }
       }
@@ -32866,12 +32866,12 @@ void fn_8025F2C0(int r3,u32 r4)
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_8025F2FC(void) {
+asm void ShortCommandProc(void) {
 #include "src/game/colosseum_battle_fn_8025F2FC.inc"
 }
 #endif
 #pragma pop
-void fn_8025F2FC(int r3) {
+void ShortCommandProc(int r3) {
   u8 *entry;
   u8 b7;
   entry = lbl_804783E0 + (r3 * 0x100);
@@ -32941,11 +32941,11 @@ u32 fn_8025F3F4(int r3, u32 r4) {
   } else {
     *(u8 *)(entry + 0x0) = 0;
     *(u32 *)(entry + 0x14) = r4;
-    *(u32 *)(entry + 0x1C) = (u32)fn_8025F7E8;
-    result = fn_8025F9AC(idx, 1, 3, (u32)fn_8025F2FC);
+    *(u32 *)(entry + 0x1C) = (u32)__GBASyncCallback;
+    result = __GBATransfer(idx, 1, 3, (u32)ShortCommandProc);
   }
   if (result == 0) {
-    result = fn_8025F81C(idx);
+    result = __GBASync(idx);
   }
   return result;
 }
@@ -32970,11 +32970,11 @@ u32 fn_8025F484(int r3, u32 r4) {
   } else {
     *(u8 *)(entry + 0x0) = 0xFF;
     *(u32 *)(entry + 0x14) = r4;
-    *(u32 *)(entry + 0x1C) = (u32)fn_8025F7E8;
-    result = fn_8025F9AC(idx, 1, 3, (u32)fn_8025F2FC);
+    *(u32 *)(entry + 0x1C) = (u32)__GBASyncCallback;
+    result = __GBATransfer(idx, 1, 3, (u32)ShortCommandProc);
   }
   if (result == 0) {
-    result = fn_8025F81C(idx);
+    result = __GBASync(idx);
   }
   return result;
 }
@@ -32996,7 +32996,7 @@ u32 fn_8025F514(void) {
 #pragma scheduling on
 
 /* Address: 0x8025F524 | Size: 0x60 | Ghidra import */
-void fn_8025F524(int r3)
+void ReadProc(int r3)
 
 {
     extern int fn_800054F4();
@@ -33012,12 +33012,12 @@ void fn_8025F524(int r3)
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_8025F584(void) {
+asm void GBARead(void) {
 #include "src/game/colosseum_battle_fn_8025F584.inc"
 }
 #endif
 #pragma pop
-u32 fn_8025F584(int r3, u32 r4, u32 r5) {
+u32 GBARead(int r3, u32 r4, u32 r5) {
   int idx;
   u8 *entry;
   u32 result;
@@ -33029,11 +33029,11 @@ u32 fn_8025F584(int r3, u32 r4, u32 r5) {
     *(u8 *)(entry + 0x0) = 0x14;
     *(u32 *)(entry + 0x18) = r4;
     *(u32 *)(entry + 0x14) = r5;
-    *(u32 *)(entry + 0x1C) = (u32)fn_8025F7E8;
-    result = fn_8025F9AC(idx, 1, 5, (u32)fn_8025F524);
+    *(u32 *)(entry + 0x1C) = (u32)__GBASyncCallback;
+    result = __GBATransfer(idx, 1, 5, (u32)ReadProc);
   }
   if (result == 0) {
-    result = fn_8025F81C(idx);
+    result = __GBASync(idx);
   }
   return result;
 }
@@ -33042,12 +33042,12 @@ u32 fn_8025F584(int r3, u32 r4, u32 r5) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_8025F618(void) {
+asm void WriteProc(void) {
 #include "src/game/colosseum_battle_fn_8025F618.inc"
 }
 #endif
 #pragma pop
-void fn_8025F618(int r3) {
+void WriteProc(int r3) {
   u8 *entry;
   entry = lbl_804783E0 + r3 * 0x100;
   if (*(s32 *)(entry + 0x20) != 0) return;
@@ -33080,11 +33080,11 @@ u32 fn_8025F648(int r3, u32 r4, u32 r5) {
     memcpy(entry + 1, (void *)r29, 4);
     *(u32 *)(entry + 0x18) = r29;
     *(u32 *)(entry + 0x14) = r30;
-    *(u32 *)(entry + 0x1C) = (u32)fn_8025F7E8;
-    result = fn_8025F9AC(idx, 5, 1, (u32)fn_8025F618);
+    *(u32 *)(entry + 0x1C) = (u32)__GBASyncCallback;
+    result = __GBATransfer(idx, 5, 1, (u32)WriteProc);
   }
   if (result == 0) {
-    result = fn_8025F81C(idx);
+    result = __GBASync(idx);
   }
   return result;
 }
@@ -33128,7 +33128,7 @@ void fn_8025F70C(int r3,u32 r4,u32 r5)
 }
 
 /* Address: 0x8025F7E8 | Size: 0x34 | Ghidra import */
-void fn_8025F7E8(int r3)
+void __GBASyncCallback(int r3)
 
 {
     extern int fn_800A2478();
@@ -33137,7 +33137,7 @@ void fn_8025F7E8(int r3)
 }
 
 /* Address: 0x8025F81C | Size: 0x6C | Ghidra import */
-u32 fn_8025F81C(int r3)
+u32 __GBASync(int r3)
 
 {
     extern u32 fn_8009DF3C();
@@ -33209,10 +33209,10 @@ void fn_8025F888(int r3,u32 r4)
 }
 
 /* Address: 0x8025F9AC | Size: 0x74 | Ghidra import */
-u32 fn_8025F9AC(int r3,u32 r4,u32 r5,u32 r6)
+u32 __GBATransfer(int r3,u32 r4,u32 r5,u32 r6)
 
 {
-    extern int fn_800D0CBC();
+    extern int SIGetTypeAsync();
   int iVar1;
   u32 uVar2;
   
@@ -33221,7 +33221,7 @@ u32 fn_8025F9AC(int r3,u32 r4,u32 r5,u32 r6)
   *(u32 *)(iVar1 + -0x7fb87be8) = r6;
   *(u32 *)(iVar1 + -0x7fb87c14) = r4;
   *(u32 *)(iVar1 + -0x7fb87c10) = r5;
-  fn_800D0CBC(r3,0x8025f888);
+  SIGetTypeAsync(r3,0x8025f888);
   fn_8009DF64(uVar2);
   return 0;
 }
@@ -33343,7 +33343,7 @@ void fn_8025FBCC(int r3)
       if ((puVar1[(uVar3 & 0xffff) * 6 + 2] & 0x3fff) != uVar4) {
         }
         puVar1[(u32)*puVar1 * 6 + 2] = uVar4 | 0x8000;
-        uVar2 = fn_800E0C04(0xffffffff);
+        uVar2 = _fadeEffectGetRandom__FUl(0xffffffff);
         *(u32 *)(puVar1 + (u32)*puVar1 * 6 + 6) = uVar2;
         *puVar1 = *puVar1 + 1;
       }
@@ -33358,7 +33358,7 @@ void fn_8025FBCC(int r3)
       if ((puVar1[(uVar3 & 0xffff) * 6 + 2] & 0x3fff) != uVar4) {
         }
         puVar1[(u32)*puVar1 * 6 + 2] = uVar4 | 0x8000;
-        uVar2 = fn_800E0C04(0xffffffff);
+        uVar2 = _fadeEffectGetRandom__FUl(0xffffffff);
         *(u32 *)(puVar1 + (u32)*puVar1 * 6 + 6) = uVar2;
         *puVar1 = *puVar1 + 1;
       }
@@ -33437,7 +33437,7 @@ u32 fn_8025FDDC(u16 *r3, u16 r4) {
 }
 
 /* Address: 0x8025FE84 | Size: 0x60 | Ghidra import */
-u16 fn_8025FE84(u16 *r3, u32 r4)
+u16 memoDataGetPokemonID(u16 *r3, u32 r4)
 {
     u16 res;
     extern void *fn_80129280();
@@ -33454,7 +33454,7 @@ u16 fn_8025FE84(u16 *r3, u32 r4)
 }
 
 /* Address: 0x8025FEE4 | Size: 0x34 | Ghidra import */
-u16 fn_8025FEE4(u16 *r3)
+u16 memoDataGetCount(u16 *r3)
 
 {
   if (r3 == (u16 *)0x0) {
@@ -33464,7 +33464,7 @@ u16 fn_8025FEE4(u16 *r3)
 }
 
 /* Address: 0x8025FF18 | Size: 0x84 | Ghidra import */
-u32 fn_8025FF18(u16 *r3)
+u32 memoDataSetMemoFlag(u16 *r3)
 
 {
   u32 uVar1;
@@ -33558,7 +33558,7 @@ void fn_80260070(u16 *r3) {
   for (i = 0; i < 0x1F4; i++) {
     entry = (u8 *)queue + off;
     *(u16 *)(entry + 4) = 0;
-    *(u32 *)(entry + 0xC) = fn_800E0C04(-1);
+    *(u32 *)(entry + 0xC) = _fadeEffectGetRandom__FUl(-1);
     off += 12;
   }
 }
@@ -33624,8 +33624,8 @@ int fn_8026045C(u32 r3,u32 r4,int r5)
   u32 local_2c;
   float local_28;
   
-  fn_801C41C8((double)lbl_8047E6C0,3);
-  fn_801C40F0(1);
+  fadeSet((double)lbl_8047E6C0,3);
+  fadeCheck(1);
   GSscene_GetCameraDirectionVector(&local_88);
   GSscene_GetCameraRotationVector(&local_7c);
   GSscene_GetCameraPositionVector(&local_70);
@@ -33697,8 +33697,8 @@ int fn_8026045C(u32 r3,u32 r4,int r5)
   GSscene_SetCameraPositionVector(&local_40);
   GSscene_SetCameraViewVector(&local_34);
   fn_801766A8((double)local_28);
-  fn_801C41C8((double)lbl_8047E6C0,2);
-  fn_801C40F0(1);
+  fadeSet((double)lbl_8047E6C0,2);
+  fadeCheck(1);
   return (int)(char)iVar2;
 }
 
@@ -33773,7 +33773,7 @@ int fn_802606D8(u32 *r3,int r4,int r5,u32 r6)
         if ((r6 & 2) != 0) {
           uVar6 = 2;
         }
-        fn_801C41C8((double)lbl_8047E6C0,uVar6);
+        fadeSet((double)lbl_8047E6C0,uVar6);
         r6 = r6 & 0xfffffff5;
       }
       cVar7 = fn_801DA94C(uVar9,uVar1,4);
@@ -33819,8 +33819,8 @@ int fn_802606D8(u32 *r3,int r4,int r5,u32 r6)
       if ((r6 & 4) != 0) {
         uVar6 = 3;
       }
-      fn_801C41C8((double)lbl_8047E6C0,uVar6);
-      fn_801C40F0(1);
+      fadeSet((double)lbl_8047E6C0,uVar6);
+      fadeCheck(1);
     }
     fn_801DA8C4(uVar9,uVar1,4);
     if (bVar2 == 0) {
@@ -33988,8 +33988,8 @@ LAB_0025e130:
         *r8 = local_188[0];
         r8 = r8 + 1;
       }
-      fn_801C41C8((double)lbl_8047E6C0,3);
-      fn_801C40F0(1);
+      fadeSet((double)lbl_8047E6C0,3);
+      fadeCheck(1);
       bVar2 = 1;
     }
     fn_801DAC90();
@@ -34973,8 +34973,8 @@ void fn_80265F94(int r3)
   fn_801DA4E8(uVar3,1);
   uVar1 = lbl_8047E6F8;
   fn_801DA9E8(uVar3,uVar1,4);
-  fn_801C41C8((double)lbl_8047E6FC,2);
-  while (cVar9 = fn_801C40F0(0), cVar9 != '\0') {
+  fadeSet((double)lbl_8047E6FC,2);
+  while (cVar9 = fadeCheck(0), cVar9 != '\0') {
     fn_801DB088();
     cVar9 = fn_801DA94C(uVar3,uVar1,4);
     if (cVar9 == '\0') {
@@ -35035,8 +35035,8 @@ void fn_80265F94(int r3)
     _threadSwitch();
   }
   fn_801065B8(1);
-  fn_801C41C8((double)lbl_8047E6FC,3);
-  while (cVar9 = fn_801C40F0(0), cVar9 != '\0') {
+  fadeSet((double)lbl_8047E6FC,3);
+  while (cVar9 = fadeCheck(0), cVar9 != '\0') {
     fn_801DB088();
     cVar9 = fn_801DA94C(uVar3,uVar1,4);
     if (cVar9 == '\0') {
@@ -35137,8 +35137,8 @@ int fn_8025E3B0(u32 r3,u32 r4)
   u32 local_1c;
   u32 local_18;
   
-  fn_801C41C8((double)lbl_8047E680,3);
-  fn_801C40F0(1);
+  fadeSet((double)lbl_8047E680,3);
+  fadeCheck(1);
   GSscene_GetCameraDirectionVector(&local_44);
   GSscene_GetCameraRotationVector(&local_38);
   GSscene_GetCameraPositionVector(&local_2c);
@@ -35167,7 +35167,7 @@ int fn_8025E3B0(u32 r3,u32 r4)
   fn_801DADC0(1);
   iVar3 = fn_8025E0B0((int*)auStack_58,r3,(u16*)lbl_80478DB0,1);
   if (iVar3 == 1) {
-    fn_801C41C8((double)lbl_8047E680,2);
+    fadeSet((double)lbl_8047E680,2);
     fn_8025DE54((u32*)auStack_58,(u16*)lbl_80478DB0,1,1,1,0);
   }
   return (int)(char)iVar2;
@@ -35244,15 +35244,15 @@ void fn_8025E9BC(u32 r3)
     if (iVar3 == 1) {
       uVar4 = fn_80128A64(uVar1,0,0,local_28,auStack_18);
       if (((uVar4 & 0xffff) != 0) && ((uVar4 & 0xffff) != 0xffff)) {
-        fn_801C41C8((double)lbl_8047E680,3);
-        fn_801C40F0(1);
+        fadeSet((double)lbl_8047E680,3);
+        fadeCheck(1);
         fn_801DAC90();
         iVar3 = fn_8012805C(uVar1,uVar4,local_28[0],auStack_18,0,1,1,0);
         if (iVar3 == 0) {
           fn_801DADC0(1);
           iVar3 = fn_8025E0B0((int*)auStack_1c,uVar1,(u16*)&lbl_80478DB0,1);
           if (iVar3 == 1) {
-            fn_801C41C8((double)lbl_8047E680,2);
+            fadeSet((double)lbl_8047E680,2);
             fn_8025DE54((u32*)auStack_1c,(u16*)&lbl_80478DB0,1,1,1,0);
           }
           uVar2 = fn_8011F4F0(uVar1);
@@ -35264,7 +35264,7 @@ void fn_8025E9BC(u32 r3)
           fn_801DADC0(1);
           iVar3 = fn_8025E0B0((int*)auStack_20,uVar1,(u16*)&lbl_80478DB0,1);
           if (iVar3 == 1) {
-            fn_801C41C8((double)lbl_8047E680,2);
+            fadeSet((double)lbl_8047E680,2);
             fn_8025DE54((u32*)auStack_20,(u16*)&lbl_80478DB0,1,1,1,0);
           }
         }
@@ -35277,14 +35277,14 @@ void fn_8025E9BC(u32 r3)
     cVar7 = fn_8001E184();
     if (cVar7 == '\0') {
       fn_801065B8(1);
-      fn_801C41C8((double)lbl_8047E680,3);
-      fn_801C40F0(1);
+      fadeSet((double)lbl_8047E680,3);
+      fadeCheck(1);
       fn_801DAC90();
       fn_80029660(2,r3);
       fn_801DADC0(1);
       iVar3 = fn_8025E0B0((int*)auStack_24,uVar1,(u16*)&lbl_80478DB0,1);
       if (iVar3 == 1) {
-        fn_801C41C8((double)lbl_8047E680,2);
+        fadeSet((double)lbl_8047E680,2);
         fn_8025DE54((u32*)auStack_24,(u16*)&lbl_80478DB0,1,1,1,0);
       }
     }
@@ -35360,8 +35360,8 @@ void fn_8025ED4C(void)
         fn_8025E9BC(_DAT_804782c4);
       }
     }
-    fn_801C41C8((double)lbl_8047E680,3);
-    fn_801C40F0(1);
+    fadeSet((double)lbl_8047E680,3);
+    fadeCheck(1);
     fn_801DAC90();
     _DAT_804782bc = -1;
     lbl_8047B668 = 0xffffffff;
@@ -35609,7 +35609,7 @@ LAB_0025d3c4:
 /* Address: 0x8025DC2C | Size: 0x90 | Ghidra import (PSQ removed) */
 
 
-void fn_8025DC2C(double r3)
+void waitTime__Ff(double r3)
 
 {
     extern f32 lbl_8047E660;
@@ -35723,8 +35723,8 @@ u32 fn_80260910(u32 *r3,int r4,int r5,int r6)
   do {
     if (0x239 < uVar12) {
 LAB_0025db60:
-      fn_801C41C8((double)lbl_8047E6C0,5);
-      while (cVar10 = fn_801C40F0(0), cVar10 != '\0') {
+      fadeSet((double)lbl_8047E6C0,5);
+      while (cVar10 = fadeCheck(0), cVar10 != '\0') {
         if (*(int *)(&DAT_8027a48c + r3[2] * 8) == 0) {
           uVar5 = *r3;
         }
@@ -35786,8 +35786,8 @@ LAB_0025db60:
         fn_80132A38(0x32,uVar5);
         fn_801067E8(0x43ff,1,0);
         fn_801065B8(1);
-        fn_801C41C8((double)lbl_8047E6C0,3);
-        fn_801C40F0(1);
+        fadeSet((double)lbl_8047E6C0,3);
+        fadeCheck(1);
         uVar5 = 0;
       }
       else {
@@ -35874,7 +35874,7 @@ LAB_0025db60:
       uVar11 = 1;
     }
     if (bVar3) {
-      fn_801C41C8((double)lbl_8047E6C0,2);
+      fadeSet((double)lbl_8047E6C0,2);
       bVar3 = 0;
     }
     _threadSwitch();
@@ -35898,7 +35898,7 @@ u32 fn_80264488(u32 r3,int r4,u32 r5)
     extern u32 fn_80018F88();
     extern u8 fn_80019064();
     extern u32 fn_800D37CC();
-    extern int fn_80102038();
+    extern int menuReleaseOffScreen();
     extern int fn_8010206C();
     extern s8 fn_80142CF4();
     extern int fn_801DA36C();
@@ -36059,7 +36059,7 @@ LAB_0026160c:
     uStack_64 = fn_800D37CC();
     uStack_64 = uStack_64 ^ 0x80000000;
     local_68 = 0x43300000;
-    fn_80102038((double)(float)(dVar12 / (double)(float)((double)(((u64)(0x43300000) << 32) | (u32)(uStack_64)) -
+    menuReleaseOffScreen((double)(float)(dVar12 / (double)(float)((double)(((u64)(0x43300000) << 32) | (u32)(uStack_64)) -
                                                          dVar11)));
     fn_801EFFC4(10);
     if ((uVar9 & 0xffff) != 0) {

@@ -42,7 +42,7 @@
 
 /* ===== External engine / SDK functions ===== */
 extern void  fn_800DD970(const char* fmt, ...);         /* GSlog / OSReport */
-extern u16   GSmemAllocRaw(u32 size);                   /* fn_800E3534 */
+extern u16   GSmemAllocRaw(u32 size);                   /* _toolentryAlloc__FUl */
 extern void* GSmemGetPtr(u16 handle);                   /* fn_800E27B0 */
 extern void* GSmemLock(u16 handle);                     /* fn_800E24B0 */
 extern void  GSmemFree(u16 handle);                     /* fn_800E209C */
@@ -73,7 +73,7 @@ extern void  fn_800F0494(void* handle);                  /* Model free */
 
 /* Floor subsystem inits */
 extern void  fn_801123D4(u32 floorDataEntry, u32 loadMode); /* Floor resource init */
-extern s32   fn_80112380(u32 floorId);                   /* Floor check ready */
+extern s32   floorCheckFightKind(u32 floorId);                   /* Floor check ready */
 extern void  fn_8011274C(void);                          /* Floor finalize load */
 extern void  fn_80112780(void);                          /* Floor begin transition */
 extern void  fn_80117C84(void);                          /* Floor camera update */
@@ -89,7 +89,7 @@ extern void  fn_800D2B90(u32 param);                     /* GS renderer set floo
 extern void  fn_800F915C(void);                          /* Particle cleanup */
 extern void  fn_80169DF8(void);                          /* Script cleanup */
 extern void  fn_80175B94(void);                          /* Generator cleanup */
-extern void  fn_8016AAAC(void);                          /* Script system reset */
+extern void  psRemoveAppSRT(void);                          /* Script system reset */
 extern void  fn_800E8EFC(void);                          /* Material cleanup */
 extern void  fn_8018DB04(u32 param);                     /* People system notify */
 
@@ -538,7 +538,7 @@ void GSfloorThreadMain(void)
 
             /* Check floor readiness and finalize */
             floorDataEntry = (u32)ctx->floorDataEntry;
-            if (fn_80112380(gsFloorCurrentId) == 0) {
+            if (floorCheckFightKind(gsFloorCurrentId) == 0) {
                 fn_8011274C();
             }
 
@@ -570,7 +570,7 @@ void GSfloorThreadMain(void)
             fn_800F915C();   /* Particle cleanup */
             fn_80169DF8();   /* Script cleanup */
             fn_80175B94();   /* Generator cleanup */
-            fn_8016AAAC();   /* Script system reset */
+            psRemoveAppSRT();   /* Script system reset */
             fn_800E8EFC();   /* Material cleanup */
 
             /* Clear fade flags */

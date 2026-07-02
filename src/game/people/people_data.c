@@ -129,7 +129,7 @@ extern void* memset(void* dst, int val, u32 size);
 extern void* memcpy(void* dst, const void* src, u32 size);
 
 /* GSmem allocator */
-extern u16   fn_800E3534(u32 size);
+extern u16   _toolentryAlloc__FUl(u32 size);
 extern void* fn_800E27B0(u16 handle);
 
 /* Model system */
@@ -298,10 +298,10 @@ PeopleFieldEntry* peopleFieldGetByIndex(u16 index) {
 /* fn_80143DFC: getField_ext10 */
 /* fn_80143E14: getField_ext11 */
 /* fn_80143E2C: setField_ext1 */
-/* fn_80143E60: setField_ext2 */
-/* fn_80143E88: setField_ext3 (0x68 bytes) */
-/* fn_80143EF0: setField_ext4 */
-/* fn_80143F24: setField_ext5 */
+/* itemDataBiosGetKinomiNo: setField_ext2 */
+/* itemDataBiosGetHidenMachineNo: setField_ext3 (0x68 bytes) */
+/* itemDataBiosGetWazaIDByWazaMachineNo: setField_ext4 */
+/* itemDataBiosGetWazaMachineNo: setField_ext5 */
 /* fn_80143F54: getField_ext12 */
 /* fn_80143F6C: getField_ext13 */
 /* fn_80143F84: getField_ext14 */

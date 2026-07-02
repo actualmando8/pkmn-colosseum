@@ -65,12 +65,12 @@ extern u32 lbl_8047AA74;  /* current render object */
 extern void* lbl_8047AA80; /* pointer to render state struct */
 
 /* Matrix/vector math */
-extern void fn_800A37CC(void* mtx, void* vecIn, void* vecOut); /* MTXMultVec3 */
+extern void PSMTXMultVec(void* mtx, void* vecIn, void* vecOut); /* MTXMultVec3 */
 extern void fn_800A38C0(void* mtxA, void* mtxB, void* mtxOut); /* MTXConcat */
 extern void fn_800A3544(void* mtx);                             /* MTXIdentity */
 extern void fn_800A35D0(void* mtxA, void* mtxB);               /* MTXCopy */
 extern void fn_800A3A9C(void* out, void* in, f32 scale);       /* VECNormalize */
-extern void fn_800A2D64(void* mtxA, void* mtxB);
+extern void PSMTXCopy(void* mtxA, void* mtxB);
 
 /* GX functions */
 extern void GXSetProjection(void* mtx, u32 type);
@@ -122,7 +122,7 @@ extern void __assert(const char* file, u32 line, const char* msg);
 extern f32 lbl_8047C990;     /* SDA float: animation step increment */
 extern char lbl_8047C9DC[] __attribute__((section(".sdata2")));  /* SDA2 string: assert filename */
 extern char lbl_8047C9E4[] __attribute__((section(".sdata2")));  /* SDA2 string: assert condition */
-extern u32 fn_800E3534(u32 size);   /* memory allocate, returns ptr as u32 */
+extern u32 _toolentryAlloc__FUl(u32 size);   /* memory allocate, returns ptr as u32 */
 extern u32 fn_800E27B0(u32 handle); /* map handle to object ptr */
 extern u16 lbl_8047AA68;  /* render obj array low16 tag */
 extern u32 lbl_8047AA6C;  /* render obj array base pointer */
@@ -824,7 +824,7 @@ void _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID(void) {
             __assert(lbl_8047C9C4, 0x1a2, lbl_8047C9CC);
         }
         *(u32*)((u8*)jobj + 0x8) |= 0x80000002u;
-        fn_800A2D64((u8*)obj + 0x94, (u8*)jobj + 0x54);
+        PSMTXCopy((u8*)obj + 0x94, (u8*)jobj + 0x54);
         HSD_CObjGetPerspective(*(void**)((u8*)obj + 0xc), &x, &z);
         w = HSD_CObjGetNear(*(void**)((u8*)obj + 0xc));
         h = HSD_CObjGetFar(*(void**)((u8*)obj + 0xc));
@@ -1073,7 +1073,7 @@ void fn_800D2AD4(u32 count) {
     u32 raw;
     u32 masked;
     lbl_8047AA70 = count;
-    raw = fn_800E3534(count * 0x128);
+    raw = _toolentryAlloc__FUl(count * 0x128);
     lbl_8047AA68 = (u16)raw;
     masked = (u16)raw;
     if (masked != 0) {

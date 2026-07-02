@@ -71,8 +71,8 @@ s64 __OSGetSystemTime(void) {
 /* Calendar conversion helpers                               */
 /* ========================================================== */
 
-/* fn_800A27FC - 0x800A27FC | size: 0x19C */
-void fn_800A27FC(s32 days, OSCalendarTime* td) {
+/* GetDates - 0x800A27FC | size: 0x19C */
+void GetDates(s32 days, OSCalendarTime* td) {
     extern int lbl_80311878[];
     extern int lbl_803118A8[];
     int year;
@@ -101,8 +101,8 @@ void fn_800A27FC(s32 days, OSCalendarTime* td) {
     td->mday = days - md[month] + 1;
 }
 
-/* fn_800A2998 - 0x800A2998 | size: 0x204 */
-void fn_800A2998(s64 ticks, OSCalendarTime* td) {
+/* OSTicksToCalendarTime - 0x800A2998 | size: 0x204 */
+void OSTicksToCalendarTime(s64 ticks, OSCalendarTime* td) {
     s32 seconds;
     s64 tickPart;
     s32 days;
@@ -122,7 +122,7 @@ void fn_800A2998(s64 ticks, OSCalendarTime* td) {
         seconds += 86400;
     }
 
-    fn_800A27FC(days, td);
+    GetDates(days, td);
 
     td->hour = (seconds / 60) / 60;
     td->min = (seconds / 60) % 60;

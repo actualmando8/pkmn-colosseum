@@ -48,7 +48,7 @@
  *   fn_8001BCEC  GSpcbox_CheckCanDeposit      -- 0x50 bytes, validate deposit allowed
  *   fn_8001BD3C  GSpcbox_CheckCanWithdraw     -- 0x44 bytes, validate withdraw allowed
  *   fn_8001BD80  GSpcbox_CheckPartySpace      -- 0x74 bytes, check party has room
- *   fn_8001BDF4  GSpcbox_CheckLastPokemon     -- 0x44 bytes, prevent depositing last mon
+ *   menuPokemonOpen  GSpcbox_CheckLastPokemon     -- 0x44 bytes, prevent depositing last mon
  *   fn_8001BE38  GSpcbox_ShowConfirmDialog    -- 0x84 bytes, confirmation prompt
  *   fn_8001BEBC  GSpcbox_Init                 -- 0x1A8 bytes, full initialization
  *
@@ -89,7 +89,7 @@
 /* Pokemon data */
 extern void  fn_80129BC8(void* pokeData, u8 fieldId, u16* outCount,
                           s32 p4, s32 p5, s32 p6);
-extern void  fn_801297D8(void* pokeData, u16* outCount, s32 p3, s32 p4, s32 p5);
+extern void  heroHizukiItemGetItemAryPtr(void* pokeData, u16* outCount, s32 p3, s32 p4, s32 p5);
 extern u8    fn_801429E8(void* fieldData);
 extern u16   fn_80143C50(void* fieldData);
 extern u16   fn_801440A0(u16 speciesId);
@@ -680,17 +680,17 @@ do {
 #endif
 
 /* 0x8001C7B8 | 0xBC0 */
-extern s32 fn_8010264C();
+extern s32 menuOpen();
 extern void fn_80102510();
 extern void fn_80102568();
-extern void fn_801C41C8();
-extern void fn_801C40F0();
+extern void fadeSet();
+extern void fadeCheck();
 extern void fn_80097F08(void);
 extern s32 fn_801026A4();
-extern u8* fn_80104704();
+extern u8* windowSearchID();
 extern s32 fn_801022B8();
 extern u32 _threadSwitch(void);
-extern void fn_801070F4(void);
+extern void winSeqCheckMove(void);
 extern void fn_80121BB4(void);
 extern s8 fn_8001E074(u8, s16, s16, u32);
 extern u32 fn_80019064(void);
@@ -719,10 +719,10 @@ void fn_8001C7B8(void) {
     extern void fn_801022B8();
     extern void fn_80102510();
     extern void fn_80102568();
-    extern void fn_8010264C();
+    extern void menuOpen();
     extern void fn_801026A4();
-    extern void fn_80104704();
-    extern void fn_801070F4();
+    extern void windowSearchID();
+    extern void winSeqCheckMove();
     extern void fn_8011FDC8();
     extern void fn_80120FE0();
     extern void fn_80121BB4();
@@ -731,8 +731,8 @@ void fn_8001C7B8(void) {
     extern void fn_80129280();
     extern void fn_8012AC08();
     extern void fn_801906A0();
-    extern void fn_801C40F0();
-    extern void fn_801C41C8();
+    extern void fadeCheck();
+    extern void fadeSet();
     extern void fn_801F2A7C();
     extern void fn_801F986C();
     extern void fn_801FB1C0();
@@ -769,7 +769,7 @@ void fn_8001C7B8(void) {
         if (r3 == 0) {
             r3 = 0x6b;
             r4 = 0x1;
-            fn_8010264C();
+            menuOpen();
             r23 = r3;
             r3 = 0x6b;
             fn_80102510();
@@ -777,7 +777,7 @@ void fn_8001C7B8(void) {
 
             r3 = 0x10f;
             r4 = 0x1;
-            fn_8010264C();
+            menuOpen();
             r23 = r3;
             r3 = 0x10f;
             fn_80102510();
@@ -906,9 +906,9 @@ void fn_8001C7B8(void) {
             } while (0);
                 f1 = lbl_8047B7C0;
                 r3 = 0x3;
-                fn_801C41C8();
+                fadeSet();
                 r3 = 0x1;
-                fn_801C40F0();
+                fadeCheck();
                 r4 = (u32)fn_80019D5C;
                 r3 = r24;
                 r4 = (u32)fn_80019D5C;
@@ -927,16 +927,16 @@ void fn_8001C7B8(void) {
                 r8 = 0x1;
                 fn_801026A4();
                 r3 = 0x63;
-                fn_80104704();
+                windowSearchID();
                 if (r3 != 0) {
                     tmp = 0x1;
                     *(u8*)((u8*)r3 + 0x98) = tmp;
                 }
                 f1 = lbl_8047B7C0;
                 r3 = 0x2;
-                fn_801C41C8();
+                fadeSet();
                 r3 = 0x1;
-                fn_801C40F0();
+                fadeCheck();
                 r26 = *(u8*)((u8*)r31 + 0x6);
                 r23 = 0x0;
                 break;
@@ -1221,7 +1221,7 @@ void fn_8001C7B8(void) {
                         r3 = r28;
                         ((void(*)(void))fn_8005D95C)();
                         r3 = r28;
-                        fn_801070F4();
+                        winSeqCheckMove();
                         tmp = r3 & 0xFF;
                         if (tmp == 0) break;
                         _threadSwitch();
@@ -1457,7 +1457,7 @@ void fn_8001C7B8(void) {
                         r3 = r24;
                         ((void(*)(void))fn_8005D95C)();
                         r3 = r24;
-                        fn_801070F4();
+                        winSeqCheckMove();
                         tmp = r3 & 0xFF;
                         if (tmp == 0) break;
                         _threadSwitch();
@@ -1472,7 +1472,7 @@ void fn_8001C7B8(void) {
             r3 = 0x6c;
             *(u8*)((u8*)r31 + 0x14) = tmp;
             r4 = 0x1;
-            fn_8010264C();
+            menuOpen();
             r24 = r3;
             r3 = 0x6c;
             fn_80102510();
@@ -1508,7 +1508,7 @@ void fn_8001C7B8(void) {
                 r8 = 0x1;
                 fn_801026A4();
                 r3 = 0x63;
-                fn_80104704();
+                windowSearchID();
                 if (r3 != 0) {
                     tmp = 0x1;
                     *(u8*)((u8*)r3 + 0x98) = tmp;
@@ -1817,11 +1817,11 @@ void fn_8001D718(void) {
 }
 #endif
 
-/* 0x50 | fn_8001D7E4 | multi_call_cond */
+/* 0x50 | menuSubKeyWait | multi_call_cond */
 extern u32 fn_800F7AF0(s32);
 extern u32 fn_800F7BC4(s32);
 #pragma peephole off
-u32 fn_8001D7E4(void) {
+u32 menuSubKeyWait(void) {
     u32 a;
     u32 b;
     u32 m;
@@ -2430,7 +2430,7 @@ s32 fn_8001E3E0(void* a, u32* b) {
     extern void fn_80102868();
     extern void fn_801043A4();
     extern void windowCheckCursor();
-    extern u8* fn_80104704();
+    extern u8* windowSearchID();
     extern void fn_80102510();
     void* r4_tmp;
     u8* r3;
@@ -2443,7 +2443,7 @@ s32 fn_8001E3E0(void* a, u32* b) {
     fn_80102868(0x2, 0x32, 0x3c);
     windowCheckCursor(0x2, 0x1);
     fn_801043A4(0x2);
-    r3 = fn_80104704(0x2);
+    r3 = windowSearchID(0x2);
     if (r3 != 0) {
         if (b != 0) *b = *(u32*)(r3 + 0x80);
         if (*(u8*)(r3 + 0x99) == 0) r31 = 1;
@@ -4139,7 +4139,7 @@ void fn_8001FD48(void) {
     extern void fn_800ECCA8();
     extern void _threadSwitch();
     extern void fn_800F92D4();
-    extern void fn_8010264C();
+    extern void menuOpen();
     extern void fn_801026A4();
     extern void fn_801046B8();
     extern void fn_80113828();
@@ -4153,8 +4153,8 @@ void fn_8001FD48(void) {
     extern void fn_80176A94();
     extern void fn_80176E0C();
     extern void fn_8017B1AC();
-    extern void fn_801C40F0();
-    extern void fn_801C41C8();
+    extern void fadeCheck();
+    extern void fadeSet();
     extern void fn_801D0748();
     u8 sp[0x30];
     u32 tmp = 0;
@@ -4209,7 +4209,7 @@ void fn_8001FD48(void) {
     }
     r3 = 0x15;
     r4 = 0x0;
-    fn_8010264C();
+    menuOpen();
     do {
     do {
         fn_8017B1AC();
@@ -4322,7 +4322,7 @@ void fn_8001FD48(void) {
                         fn_80176E0C();
                         f1 = lbl_8047B810;
                         r3 = 0x4;
-                        fn_801C41C8();
+                        fadeSet();
                         tmp = lbl_8047A31C;
                         if ((s32)tmp != 0) break;
                         tmp = 0x1;
@@ -4378,13 +4378,13 @@ void fn_8001FD48(void) {
                 }
             f1 = lbl_8047B810;
             r3 = 0x5;
-            fn_801C41C8();
+            fadeSet();
             tmp = 0x6;
             lbl_8047A31C = tmp;
             break;
         L_800200B0:
             r3 = 0x0;
-            fn_801C40F0();
+            fadeCheck();
             tmp = (s8)r3;
             if ((s32)tmp == 0) {
                 tmp = 0x6;
@@ -4433,9 +4433,9 @@ void fn_8001FD48(void) {
             fn_800ECB74();
             f1 = lbl_8047B810;
             r3 = 0x4;
-            fn_801C41C8();
+            fadeSet();
             r3 = 0x1;
-            fn_801C40F0();
+            fadeCheck();
             tmp = 0x1e;
             lbl_8047A31C = tmp;
             break;
@@ -4851,7 +4851,7 @@ u16 fn_80018A68(void) {
             if (fieldId >= 0) {
                 fieldData = ((u8* (*)())fn_80129BC8)((void*)lbl_8047A2F8, (u8)fieldId, &fieldCount, 0, 0, 0);
             } else {
-                fieldData = ((u8* (*)())fn_801297D8)((void*)lbl_8047A2F8, &fieldCount, 0, 0, 0);
+                fieldData = ((u8* (*)())heroHizukiItemGetItemAryPtr)((void*)lbl_8047A2F8, &fieldCount, 0, 0, 0);
             }
 
             occupied = 0;
@@ -4894,7 +4894,7 @@ u16 fn_80018A68(void) {
             if (fieldId >= 0) {
                 fieldData = ((u8* (*)())fn_80129BC8)((void*)lbl_8047A2F8, (u8)fieldId, &fieldCount, 0, 0, 0);
             } else {
-                fieldData = ((u8* (*)())fn_801297D8)((void*)lbl_8047A2F8, &fieldCount, 0, 0, 0);
+                fieldData = ((u8* (*)())heroHizukiItemGetItemAryPtr)((void*)lbl_8047A2F8, &fieldCount, 0, 0, 0);
             }
 
             activeIndex = -1;
@@ -5094,7 +5094,7 @@ void fn_800190D8(u16 species, u32 data) {
 #endif
 
 /* fn_80019118 - 0x80019118 | size: 0xec */
-extern void fn_80109220();
+extern void winSpriteSetDisp();
 extern u8 lbl_80266C10[];
 extern u32 lbl_8047B7A4;
 extern u32 lbl_8047A300;
@@ -5130,7 +5130,7 @@ s32 fn_80019118(u8* a, u8* b) {
     } else {
         r30 = 0;
     }
-    fn_80109220(b, r30);
+    winSpriteSetDisp(b, r30);
     if ((u8)r30 != 0) {
         *(u8*)(b + 0x67) = *(f32*)&lbl_8047B7A0 * (*(f32*)&lbl_8047B7A4 - *(f32*)&lbl_8047A300);
     }
@@ -5149,7 +5149,7 @@ asm void fn_80019204(void) {
 #pragma optimization_level 4
 s32 fn_80019204(u8* a, u8* b) {
 #pragma peephole off
-    extern void fn_80109220();
+    extern void winSpriteSetDisp();
     s32 table[4];
     u8* r5;
     s32 r8;
@@ -5170,7 +5170,7 @@ s32 fn_80019204(u8* a, u8* b) {
     } else {
         r4 = 0;
     }
-    fn_80109220(b, r4);
+    winSpriteSetDisp(b, r4);
     return 0;
 }
 #endif
@@ -5790,7 +5790,7 @@ u32 fn_80019D5C(u32 a, u32 b) {
 
 /* fn_80019F6C - 0x80019F6C | size: 0xa18 */
 extern s32 fn_801040D0(s32, s32);
-extern u32 fn_80143F24();
+extern u32 itemDataBiosGetWazaMachineNo();
 extern u32 fn_8011FC74();
 extern u32 fn_8011E2AC();
 extern void fn_800FBB34();
@@ -5856,7 +5856,7 @@ void fn_80019F6C(u8* ctx, u8* pane) {
         }
     }
 
-    fn_80109220(pane, visible);
+    winSpriteSetDisp(pane, visible);
     *(u32*)(pane + 0x64) = msg;
     if ((u8)visible == 0) {
         return;
@@ -5869,7 +5869,7 @@ void fn_80019F6C(u8* ctx, u8* pane) {
         species = fn_801440A0(*(u16*)(lbl_803A1D40 + 0x12));
         if ((u8)fn_80144014(species) == 4) {
             if (paneId == 0x3BC || paneId == 0x12A1) {
-                value = fn_80143F24(species);
+                value = itemDataBiosGetWazaMachineNo(species);
                 mon = NULL;
                 switch (*(s32*)(lbl_803A1D40 + 8)) {
                 case 0:
@@ -5918,7 +5918,7 @@ void fn_80019F6C(u8* ctx, u8* pane) {
                 fn_800FB680(0, -4, color, msg);
             }
             if (paneId == 0x3BE || paneId == 0x12A2) {
-                fn_80109220(pane, 0);
+                winSpriteSetDisp(pane, 0);
             }
         }
     }
@@ -5929,9 +5929,9 @@ void fn_80019F6C(u8* ctx, u8* pane) {
     case 0x129D:
     case 0x129E:
         if (entry[0x29] == 0) {
-            fn_80109220(pane, 1);
+            winSpriteSetDisp(pane, 1);
         } else {
-            fn_80109220(pane, 0);
+            winSpriteSetDisp(pane, 0);
         }
         break;
     case 0x3B8:
@@ -5940,13 +5940,13 @@ void fn_80019F6C(u8* ctx, u8* pane) {
     case 0x3C7:
     case 0x3C8:
         if (entry[0x29] == 0) {
-            fn_80109220(pane, 0);
+            winSpriteSetDisp(pane, 0);
         } else if (entry[0x29] == 1) {
-            fn_80109220(pane, 1);
+            winSpriteSetDisp(pane, 1);
         } else if (entry[0x29] == 2) {
             ratio = (f32)*(s16*)&lbl_8047A308 / *(f32*)&lbl_8047B7B0;
             fn_8001DACC(ctx, pane, ratio);
-            fn_80109220(pane, 0);
+            winSpriteSetDisp(pane, 0);
         }
         break;
     case 0x3BA:
@@ -5957,7 +5957,7 @@ void fn_80019F6C(u8* ctx, u8* pane) {
         break;
     case 0x3BB:
     case 0x3C9:
-        fn_80109220(pane, *(u16*)(entry + 0x2A) != 0);
+        winSpriteSetDisp(pane, *(u16*)(entry + 0x2A) != 0);
         break;
     case 0x3BF:
         fn_800FB680(0x2E, 0, color, 0x2BD4);
@@ -6020,9 +6020,9 @@ void fn_80019F6C(u8* ctx, u8* pane) {
     case 0x12A4:
         if ((s8)lbl_803A1D40[7] >= 0 && (s8)lbl_803A1D40[7] < 6) {
             base = lbl_802E4E58 + (s32)(s8)lbl_803A1D40[4] * 0x30 + (s32)(s8)lbl_803A1D40[7] * 8;
-            fn_80109220(pane, *(s16*)base == *(s32*)(ctx + 4));
+            winSpriteSetDisp(pane, *(s16*)base == *(s32*)(ctx + 4));
         } else {
-            fn_80109220(pane, 0);
+            winSpriteSetDisp(pane, 0);
         }
         break;
     case 0x542:
@@ -6030,7 +6030,7 @@ void fn_80019F6C(u8* ctx, u8* pane) {
         if ((s8)lbl_803A1D40[6] >= 0 && (s8)lbl_803A1D40[6] < 6) {
             base = lbl_802E4E58 + (s32)(s8)lbl_803A1D40[4] * 0x30 + (s32)(s8)lbl_803A1D40[6] * 8;
             if (*(s16*)base == *(s32*)(ctx + 4)) {
-                fn_80109220(pane, 1);
+                winSpriteSetDisp(pane, 1);
                 if (lbl_803A1D40[0x14] == 0 || lbl_803A1D40[0x14] == 2) {
                     if ((u8)fn_80107E78(ctx, *(u16*)(pane + 6), 0x2D) == 0) {
                         fn_801081F8(ctx, *(u16*)(pane + 6), 0x2D);
@@ -6041,18 +6041,18 @@ void fn_80019F6C(u8* ctx, u8* pane) {
                     }
                 }
             } else {
-                fn_80109220(pane, 0);
+                winSpriteSetDisp(pane, 0);
             }
         } else {
-            fn_80109220(pane, 0);
+            winSpriteSetDisp(pane, 0);
         }
         break;
     case 0x3B6:
     case 0x3B7:
         if (lbl_803A1D40[0x14] == 0 || lbl_803A1D40[0x14] == 2) {
-            fn_80109220(pane, 1);
+            winSpriteSetDisp(pane, 1);
         } else if (lbl_803A1D40[0x14] == 1 || lbl_803A1D40[0x14] == 3) {
-            fn_80109220(pane, 0);
+            winSpriteSetDisp(pane, 0);
         }
         break;
     }
@@ -6105,7 +6105,7 @@ void fn_8001A984(u8* a) {
 
 /* fn_8001AA98 - 0x8001AA98 | size: 0xd8 */
 extern void fn_80166A28(void);
-extern void fn_80102ED4(void);
+extern void menuButtonNormal(void);
 #if 0
 asm void fn_8001AA98(void) {
 #include "src/game/gs_pcbox_fn_8001AA98.inc"
@@ -6119,7 +6119,7 @@ void fn_8001AA98(u8* a) {
     extern u32 fn_80105624();
     extern u32 fn_801022B8();
     extern void fn_80166A28(u32);
-    extern void fn_80102ED4(u8*);
+    extern void menuButtonNormal(u8*);
     s32 r3;
     u32 r31;
     u32 r3b;
@@ -6145,7 +6145,7 @@ void fn_8001AA98(u8* a) {
         *(u8*)(a + 0x99) = 0x1;
         return;
     }
-    fn_80102ED4(a);
+    menuButtonNormal(a);
 }
 #pragma pop
 #endif
@@ -6545,10 +6545,10 @@ s32 fn_8001B1EC() {
             ctx[0x14] = 1;
             while (1) {
                 if (ctx[0x15] != 0) {
-                    action = fn_8010264C(0x6D, 1);
+                    action = menuOpen(0x6D, 1);
                     fn_80102510(0x6D);
                 } else {
-                    action = fn_8010264C(0x108, 1);
+                    action = menuOpen(0x108, 1);
                     fn_80102510(0x108);
                 }
 
@@ -6605,17 +6605,17 @@ s32 fn_8001B1EC() {
                     if (mon != NULL && (u8)fn_80123FBC(mon) == 0) {
                         mon = NULL;
                     }
-                    fn_801C41C8(3, lbl_8047B7C0);
-                    fn_801C40F0(1);
+                    fadeSet(3, lbl_8047B7C0);
+                    fadeCheck(1);
                     fn_80097E58(*(u32*)(ctx + 0xC), mon, entries + (s32)(s8)selection * 0x30, 0);
                     menuArg = (s32)(s8)ctx[6];
                     fn_801026A4(0x63, 0, &menuArg, 0, 0, 1, entries + (s32)(s8)selection * 0x30);
-                    mon = (u8*)fn_80104704(0x63);
+                    mon = (u8*)windowSearchID(0x63);
                     if (mon != NULL) {
                         mon[0x98] = 1;
                     }
-                    fn_801C41C8(2, lbl_8047B7C0);
-                    fn_801C40F0(1);
+                    fadeSet(2, lbl_8047B7C0);
+                    fadeCheck(1);
                     selection = (s8)ctx[6];
                     continue;
                 }
@@ -6705,7 +6705,7 @@ s32 fn_8001B1EC() {
 
 /* fn_8001BAC4 - 0x8001BAC4 | size: 0x228 */
 extern void fn_8010206C();
-extern void fn_80102038();
+extern void menuReleaseOffScreen();
 extern u32 lbl_8047B7B8;
 extern u32 lbl_8047B7C4;
 #if 0
@@ -6783,7 +6783,7 @@ BC20:
         }
         _threadSwitch();
         if (*(u8*)(lbl_803A1D40 + 0x3) == 2) {
-            fn_80102038(*(f32*)&lbl_8047B7C4 / (f32)(u32)fn_800D37CC());
+            menuReleaseOffScreen(*(f32*)&lbl_8047B7C4 / (f32)(u32)fn_800D37CC());
         }
     } else {
         fn_8001B1EC(a0, (u16)a3, a4);
@@ -6853,16 +6853,16 @@ void fn_8001BD80(u8 a, u8 b, u32 c, u32 d) {
 #pragma pop
 #endif
 
-/* fn_8001BDF4 - 0x8001BDF4 | size: 0x44 */
+/* menuPokemonOpen - 0x8001BDF4 | size: 0x44 */
 #if 0
-asm void fn_8001BDF4(void) {
+asm void menuPokemonOpen(void) {
 #include "src/game/gs_pcbox_fn_8001BDF4.inc"
 }
 #else
 #pragma push
 #pragma optimization_level 4
 #pragma peephole off
-void fn_8001BDF4(u32 a, u32 b, u32 c) {
+void menuPokemonOpen(u32 a, u32 b, u32 c) {
     extern u8 lbl_803A1D40[];
     extern void fn_8001BAC4(u32, u32, u32, u32, u32, u32);
     *(u8*)(lbl_803A1D40 + 0x4) = 0x1;
@@ -7057,17 +7057,17 @@ u16 fn_8001D624(void* a, u8 b) {
 #pragma pop
 #endif
 
-/* fn_8001D7E4 - 0x8001D7E4 | size: 0x50 -- already decompiled above */
+/* menuSubKeyWait - 0x8001D7E4 | size: 0x50 -- already decompiled above */
 
-/* fn_8001DA60 - 0x8001DA60 | size: 0x6c */
+/* menuSubGetPokemonSexForDisp - 0x8001DA60 | size: 0x6c */
 #if 0
-asm void fn_8001DA60(void) {
+asm void menuSubGetPokemonSexForDisp(void) {
 #include "src/game/gs_pcbox_fn_8001DA60.inc"
 }
 #else
 #pragma peephole off
 #pragma optimization_level 4
-s32 fn_8001DA60(void* a) {
+s32 menuSubGetPokemonSexForDisp(void* a) {
     extern u8 fn_80123FBC();
     extern u32 fn_8011F5C8();
     extern u32 fn_801231A4();
@@ -7170,7 +7170,7 @@ s32 fn_8001E224(void* a, u32* b, u8 c, void* d, void* e, u8 f) {
     extern void fn_80102868();
     extern void windowCheckCursor();
     extern void fn_801043A4();
-    extern u8* fn_80104704();
+    extern u8* windowSearchID();
     extern void fn_80102510();
     void* r4;
     u8* r3;
@@ -7183,7 +7183,7 @@ s32 fn_8001E224(void* a, u32* b, u8 c, void* d, void* e, u8 f) {
     fn_80102868(0x2, d, e);
     windowCheckCursor(0x2, 0x1);
     fn_801043A4(0x2);
-    r3 = fn_80104704(0x2);
+    r3 = windowSearchID(0x2);
     if (r3 != 0) {
         if (b != 0) *b = *(u32*)(r3 + 0x80);
         if (*(u8*)(r3 + 0x99) == 0) r31 = 1;
@@ -7208,7 +7208,7 @@ s32 fn_8001E304(void* a, u32* b, void* c) {
     extern void fn_80102868();
     extern void windowCheckCursor();
     extern void fn_801043A4();
-    extern u8* fn_80104704();
+    extern u8* windowSearchID();
     extern void fn_80102510();
     void* r4_tmp;
     u8* r3;
@@ -7219,7 +7219,7 @@ s32 fn_8001E304(void* a, u32* b, void* c) {
     fn_80102868(0x2, 0x32, 0x3c);
     windowCheckCursor(0x2, 0x1);
     fn_801043A4(0x2);
-    r3 = fn_80104704(0x2);
+    r3 = windowSearchID(0x2);
     if (r3 != 0) {
         if (b != 0) *b = *(u32*)(r3 + 0x80);
         if (*(u8*)(r3 + 0x99) == 0) r31 = 1;

@@ -47,18 +47,18 @@ extern void  fn_800EE828(void* part);                    /* GSpart commit */
 extern void  fn_800E01D0(void* dst, void* src);         /* Vec3 copy */
 extern void  fn_800E090C(void* dst, void* srcA,
                           void* srcB, f32 t);            /* Vec3 lerp */
-extern void  fn_800E4014(void* model, u32 flag);        /* GSpart set visibility */
-extern u16   fn_800E3534(u32 size);                     /* GSmemAllocRaw */
+extern void  GSmodelSetVisibility(void* model, u32 flag);        /* GSpart set visibility */
+extern u16   _toolentryAlloc__FUl(u32 size);                     /* GSmemAllocRaw */
 extern void* fn_800E27B0(u16 handle);                   /* GSmemGetPtr */
 extern void  fn_800E24B0(u16 handle);                   /* GSmemLock/free step */
 extern void  fn_800E209C(u16 handle);                   /* GSmemFree */
-extern u32   fn_801DB060(void);                          /* Random seed generator */
+extern u32   wazaSequenceSysGetResID(void);                          /* Random seed generator */
 extern void  fn_8010147C(u32 memOffset, u32 resId,
                           u32 size, u32 handle);         /* GSfloor load resource */
 extern void  fn_801013A0(u32 memOffset, u32 size,
                           u32 data, u32 handle);         /* GSfloor load data */
 extern void  memset(void* dst, u32 val, u32 size);
-extern void  fn_800B8DF4(void);
+extern void  GXDrawDone(void);
 extern void  fn_800B856C(void);
 extern void  fn_800EF5A4(void* p);
 extern void* fn_80131428(void* owner, u32 size);
@@ -161,15 +161,15 @@ extern f64 lbl_8047D140;   /* int-to-float magic (unsigned) */
  *    endScale(0x30->0x9C), fadeRate(0x34->0xA0)
  *    -- Generate random seeds --
  *    stw 20000, 0x74(r28)     ; randomSeed constant
- *    bl fn_801DB060; stw r3, 0x7C(r28)  ; random handle 1
- *    bl fn_801DB060; stw r3, 0x78(r28)  ; random handle 2
+ *    bl wazaSequenceSysGetResID; stw r3, 0x7C(r28)  ; random handle 1
+ *    bl wazaSequenceSysGetResID; stw r3, 0x78(r28)  ; random handle 2
  *    -- Load trail model resources --
  *    bl fn_8010147C(memOffset, resId, 20000, handle1)
  *    bl fn_800F9318(20000, handle1)
  *    bl fn_801013A0(memOffset, 20000, 0, handle2)
  *    bl fn_800F9318(20000, handle2)
  *    if model != NULL:
- *      fn_800E4014(model, 0)   ; hide model initially
+ *      GSmodelSetVisibility(model, 0)   ; hide model initially
  *    -- Calculate return value (memory consumed) --
  *    r29 = align32(resIdParam + 0x1F) + align32(memConsumed)
  *    return r29
@@ -245,8 +245,8 @@ u32 tracefxInit(TraceFXWork* work, void* params, u32 frames) {
 
     /* Initialise random seeds */
     work->randomSeed = 20000;
-    work->memHandle1 = fn_801DB060();
-    work->memHandle2 = fn_801DB060();
+    work->memHandle1 = wazaSequenceSysGetResID();
+    work->memHandle2 = wazaSequenceSysGetResID();
 
     /* Load trail model resources */
     resId = *(u32*)(p + 0x38);
@@ -260,7 +260,7 @@ u32 tracefxInit(TraceFXWork* work, void* params, u32 frames) {
 
     /* Hide the model initially */
     if (model != NULL) {
-        fn_800E4014(model, 0);
+        GSmodelSetVisibility(model, 0);
     }
 
     return consumed;
@@ -687,15 +687,15 @@ u32 fn_8013735C(void* work, void* params, u32 frames) {
     arena = (((u32)params + memOffset) + 0x63) & ~0x1f;
 
     *(u32*)(w + 0x74) = 0x4e20;
-    *(u32*)(w + 0x7c) = fn_801DB060();
-    *(u32*)(w + 0x78) = fn_801DB060();
+    *(u32*)(w + 0x7c) = wazaSequenceSysGetResID();
+    *(u32*)(w + 0x78) = wazaSequenceSysGetResID();
 
     fn_8010147C(arena, *(u32*)(p + 0x38), 0x4e20, *(u32*)(w + 0x7c));
     model = fn_800F9318(0x4e20, *(u32*)(w + 0x7c));
     fn_801013A0((u32)model, 0x4e20, 0, *(u32*)(w + 0x78));
     model = fn_800F9318(0x4e20, *(u32*)(w + 0x78));
     if (model != NULL) {
-        fn_800E4014(model, 0);
+        GSmodelSetVisibility(model, 0);
     }
     arena += (*(u32*)(p + 0x38) + 0x1f) & ~0x1f;
     return arena;
@@ -739,7 +739,7 @@ void* fn_8013796C(void* owner) {
 #pragma optimization_level 4
 BOOL fn_801379E4(u8* w) {
     if (w != (void*)0) {
-        fn_800B8DF4();
+        GXDrawDone();
         fn_800B856C();
         if (*(void**)(w + 0x14) != (void*)0) {
             fn_800EF5A4(*(void**)(w + 0x14));
@@ -755,7 +755,7 @@ BOOL fn_801379E4(u8* w) {
 BOOL fn_80137A2C(u8* w) {
     u16 handle;
     if (w != (void*)0) {
-        fn_800B8DF4();
+        GXDrawDone();
         fn_800B856C();
         handle = *(u16*)(w + 0x0C);
         if (handle != 0) {
@@ -826,7 +826,7 @@ BOOL tracefxStartEffect(u8* w) {
 
     node_bytes = (u16)count << 5;
     count32 = (u16)count;
-    handle = fn_800E3534(node_bytes);
+    handle = _toolentryAlloc__FUl(node_bytes);
     if (handle == 0) {
         return FALSE;
     }
@@ -851,7 +851,7 @@ BOOL tracefxStartEffect(u8* w) {
         }
     }
 
-    handle = fn_800E3534(count32 << 4);
+    handle = _toolentryAlloc__FUl(count32 << 4);
     if (handle == 0) {
         fn_800E24B0(*(u16*)(w + 0x0C));
         fn_800E209C(*(u16*)(w + 0x0C));

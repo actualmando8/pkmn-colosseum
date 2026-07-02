@@ -13,8 +13,8 @@
  *   fn_800EF4E4 (GStextureGetMipCount)
  *   fn_800EF4F4 (GStextureGetHeight)
  *   fn_800EF4FC (GStextureGetWidth)
- *   fn_800EF504 (GStextureFlush)
- *   fn_800EF548 (GStextureGetMipData)
+ *   GStextureUnlockImage (GStextureFlush)
+ *   GStextureLockImage (GStextureGetMipData)
  *   fn_800EF578 (GStextureSetWrapMode)
  *   fn_800EF590 (GStextureSetFilterMode)
  *   fn_800EF5A4 (GStextureFree)
@@ -34,7 +34,7 @@
 
 /* ===== External SDK / engine functions ===== */
 extern void  fn_800DD970(const char* fmt, ...);        /* OSReport */
-extern u16   GSmemAllocRaw(u32 size);                  /* fn_800E3534 */
+extern u16   GSmemAllocRaw(u32 size);                  /* _toolentryAlloc__FUl */
 extern void* GSmemGetPtr(u16 handle);                  /* fn_800E27B0 */
 extern void* GSmemLock(u16 handle);                    /* fn_800E24B0 */
 extern void  GSmemFree(u16 handle);                    /* fn_800E209C */
@@ -226,7 +226,7 @@ void GStextureFree(GStextureHandle* tex) {
 }
 
 /* =======================================================================
- *  GStextureFlush / fn_800EF504
+ *  GStextureFlush / GStextureUnlockImage
  *  Address: 0x800EF504, Size: 0x44
  *
  *  Assembly:
@@ -246,7 +246,7 @@ void GStextureFlush(GStextureHandle* tex) {
 }
 
 /* =======================================================================
- *  GStextureGetMipData / fn_800EF548
+ *  GStextureGetMipData / GStextureLockImage
  *  Address: 0x800EF548, Size: 0x30
  *
  *  Assembly:
@@ -1064,7 +1064,7 @@ extern u32 lbl_8047AC28;
 extern u32 lbl_8047AC30;
 extern u32 lbl_8047AC0C;
 #if 0
-asm void fn_800F0384(void) {
+asm void GSthreadUnblockGroup(void) {
 #include "src/game/gs_texture_fn_800F0384.inc"
 }
 #else
@@ -1074,7 +1074,7 @@ asm void fn_800F0384(void) {
  * lbl_8047AC28 = gsThreadArray, lbl_8047AC30 = gsThreadMaxCount
  * lbl_8047AC0C = gsThreadActive
  */
-void fn_800F0384(u32 priority) {
+void GSthreadUnblockGroup(u32 priority) {
     u32 i;
     u32 offset;
     GSThread* arr;
@@ -1108,14 +1108,14 @@ extern u32 lbl_8047AC28;
 extern u32 lbl_8047AC30;
 extern u32 lbl_8047AC0C;
 #if 0
-asm void fn_800F03D4(void) {
+asm void GSthreadBlockGroup(void) {
 #include "src/game/gs_texture_fn_800F03D4.inc"
 }
 #else
 /*
  * Loop over all threads; for each thread whose priority == arg, set sleeping = 1.
  */
-void fn_800F03D4(u32 priority) {
+void GSthreadBlockGroup(u32 priority) {
     u32 i;
     u32 offset;
     GSThread* arr;
@@ -1224,18 +1224,18 @@ void threadSaveGPRRegisters(void) {
 #endif
 extern u32 lbl_8047AC1C;
 #if 0
-asm void fn_800F01F0(void) {
+asm void threadSaveFPRRegisters(void) {
 #include "src/game/gs_texture_fn_800F01F0.inc"
 }
 #else
 /*
- * fn_800F01F0 -- Save all FPRs into the current context block.
+ * threadSaveFPRRegisters -- Save all FPRs into the current context block.
  *
  * Loads lbl_8047AC1C (GSThreadCtx*), adds 0x88 to get to the FPR
  * save area, then stores f0-f31 (stfd, 8 bytes each) to offsets
  * +0x0 through +0xF8.
  */
-void fn_800F01F0(u32 arg) {
+void threadSaveFPRRegisters(u32 arg) {
     GSThreadCtx* ctx = (GSThreadCtx*)lbl_8047AC1C;
     f64 src = *(f64*)&arg;
     ctx->f[0]  = src;
@@ -1300,7 +1300,7 @@ asm void _threadSwitch(void) {
  *   6. ctx->r3  = lbl_8047AC18 (func ptr)
  *   7. ctx->r5  = lbl_8047AC14 (arg)
  *   8. ctx->sp  = r1 (stack ptr)
- *   9. if lbl_8047AC10 != 0: call fn_800F01F0 (save FPRs)
+ *   9. if lbl_8047AC10 != 0: call threadSaveFPRRegisters (save FPRs)
  *  10. lbl_8047AC1C = lbl_8047AC24  (switch to "next" ctx)
  *  11. call threadLoadGPRRegisters (restore GPRs from next-ctx)
  *  12. Restore LR from ctx->lr, r5 from ctx->r5, r3 from ctx->r3, blr.
@@ -1323,7 +1323,7 @@ void _threadSwitch(void) {
     ctx->sp  = (u32)0; /* r1 */
 
     if (lbl_8047AC10 != 0) {
-        fn_800F01F0(0);
+        threadSaveFPRRegisters(0);
     }
 
     lbl_8047AC1C = lbl_8047AC24;

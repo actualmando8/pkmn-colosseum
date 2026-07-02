@@ -53,7 +53,7 @@
  *   fn_80022E54  GStitle_GetEffectCount       -- 0x90 bytes, count active particles
  *   fn_80022EE4  GStitle_SpawnEffect          -- 0x184 bytes, spawn new particle
  *   fn_80023068  GStitle_UpdateEffects        -- 0x20C bytes, update particle positions
- *   fn_80023274  GStitle_DestroyEffect        -- 0x7C bytes, remove expired particle
+ *   cbForgetWazaSelect__FP7PokemonUsl  GStitle_DestroyEffect        -- 0x7C bytes, remove expired particle
  *   fn_800232F0  GStitle_SoundScheduler       -- 0x470 bytes, title BGM/SE scheduling
  *   fn_80023760  GStitle_CrossfadeBGM         -- 0x208 bytes, BGM crossfade
  *   fn_80023968  GStitle_PlayTitleBGM         -- 0x234 bytes, play title music
@@ -172,7 +172,7 @@
  *     fn_80106D3C / fn_801069FC -- text print + wait
  *     fn_801902E0 -- config flag check (returns u8)
  *     fn_80165A20 / soundStop -- audio sequence control
- *     fn_801C40F0 / fn_801C41C8 -- BGM volume/fade
+ *     fadeCheck / fadeSet -- BGM volume/fade
  *
  * --------------------------------------------------------------------------
  */
@@ -294,7 +294,7 @@ void fn_80024438(u32 arg1, u32 arg2) {
     void* ctx = *(void**)&lbl_80478DDC;
     u32 result = (u32)fn_801902E0(*(void**)((u8*)ctx + 0x80));
     if ((result & 0xFF) == 0) {
-        fn_80109220(arg2, 0);
+        winSpriteSetDisp(arg2, 0);
     }
 }
 
@@ -304,7 +304,7 @@ void fn_80024484(u32 arg1, u32 arg2) {
     void* ctx = *(void**)&lbl_80478DDC;
     u32 result = (u32)fn_801902E0(*(void**)((u8*)ctx + 0x70));
     if ((result & 0xFF) == 0) {
-        fn_80109220(arg2, 0);
+        winSpriteSetDisp(arg2, 0);
     }
 }
 
@@ -314,7 +314,7 @@ void fn_800244D0(u32 arg1, u32 arg2) {
     void* ctx = *(void**)&lbl_80478DDC;
     u32 result = (u32)fn_801902E0(*(void**)((u8*)ctx + 0x60));
     if ((result & 0xFF) == 0) {
-        fn_80109220(arg2, 0);
+        winSpriteSetDisp(arg2, 0);
     }
 }
 
@@ -324,7 +324,7 @@ void fn_8002451C(u32 arg1, u32 arg2) {
     void* ctx = *(void**)&lbl_80478DDC;
     u32 result = (u32)fn_801902E0(*(void**)((u8*)ctx + 0x50));
     if ((result & 0xFF) == 0) {
-        fn_80109220(arg2, 0);
+        winSpriteSetDisp(arg2, 0);
     }
 }
 
@@ -334,7 +334,7 @@ void fn_80024568(u32 arg1, u32 arg2) {
     void* ctx = *(void**)&lbl_80478DDC;
     u32 result = (u32)fn_801902E0(*(void**)((u8*)ctx + 0x40));
     if ((result & 0xFF) == 0) {
-        fn_80109220(arg2, 0);
+        winSpriteSetDisp(arg2, 0);
     }
 }
 
@@ -344,7 +344,7 @@ void fn_800245B4(u32 arg1, u32 arg2) {
     void* ctx = *(void**)&lbl_80478DDC;
     u32 result = (u32)fn_801902E0(*(void**)((u8*)ctx + 0x30));
     if ((result & 0xFF) == 0) {
-        fn_80109220(arg2, 0);
+        winSpriteSetDisp(arg2, 0);
     }
 }
 
@@ -354,7 +354,7 @@ void fn_80024600(u32 arg1, u32 arg2) {
     void* ctx = *(void**)&lbl_80478DDC;
     u32 result = (u32)fn_801902E0(*(void**)((u8*)ctx + 0x20));
     if ((result & 0xFF) == 0) {
-        fn_80109220(arg2, 0);
+        winSpriteSetDisp(arg2, 0);
     }
 }
 
@@ -364,7 +364,7 @@ void fn_8002464C(u32 arg1, u32 arg2) {
     void* ctx = *(void**)&lbl_80478DDC;
     u32 result = (u32)fn_801902E0(*(void**)((u8*)ctx + 0x10));
     if ((result & 0xFF) == 0) {
-        fn_80109220(arg2, 0);
+        winSpriteSetDisp(arg2, 0);
     }
 }
 
@@ -1322,7 +1322,7 @@ LAB_80025564:
  *
  * fn_800255A4 -- title-screen audio/timing update driven by lbl_8047A384.
  *   IF title active (lbl_8047A384 != 0):
- *     fn_801C41C8(lbl_8047B8E4, 3)     -- set BGM volume fade target
+ *     fadeSet(lbl_8047B8E4, 3)     -- set BGM volume fade target
  *     soundStop(0x449, 0)            -- play SE cue
  *     while (accumulator < limit) {    -- time-based integration loop
  *       _threadSwitch();                 -- frame advance
@@ -1330,7 +1330,7 @@ LAB_80025564:
  *     }
  *     fn_801653C4(); fn_801656F8(0x7d0, 0)
  *   ELSE:
- *     fn_801C41C8(lbl_8047B8E8, 3)     -- different fade curve
+ *     fadeSet(lbl_8047B8E8, 3)     -- different fade curve
  *     fn_801653C4(); fn_801656F8(0x1f4, 0)
  *   Check sound channels 0xbd and 0xc3; stop them if still active.
  *   If lbl_8047A388/38C particle handles set, free them via fn_800EF5A4.
@@ -1344,12 +1344,12 @@ LAB_80025564:
  * explicit manual int-to-float idiom). Frame size 0x70 now correct.
  * fn_801653C4 chains into fn_801656F8 (3 args).
  */
-extern void fn_801C41C8(f32, s32);
+extern void fadeSet(f32, s32);
 extern void soundStop(void);
 extern void fn_800D37CC(void);
 extern void fn_801653C4(void);
 extern void fn_801656F8(void);
-extern void fn_801C40F0(s32);
+extern void fadeCheck(s32);
 extern void fn_80102620(void);
 extern void fn_80102510(void);
 extern void fn_800EF5A4(void);
@@ -1384,13 +1384,13 @@ void fn_800255A4(void) {
     extern u32 fn_801653C4(void);
     extern void fn_801656F8(u32, s32, s32);
     extern void soundStop(s32, s32);
-    extern void fn_801C40F0(s32);
-    extern void fn_801C41C8(f32, s32);
+    extern void fadeCheck(s32);
+    extern void fadeSet(f32, s32);
     f32 limit;
     f32 accum;
 
     if (lbl_8047A384 != 0) {
-        fn_801C41C8(lbl_8047B8E4, 3);
+        fadeSet(lbl_8047B8E4, 3);
         soundStop(0x449, 0);
         accum = lbl_8047B8AC;
         limit = lbl_8047B8B0;
@@ -1400,10 +1400,10 @@ void fn_800255A4(void) {
         }
         fn_801656F8(fn_801653C4(), 0x7d0, 0);
     } else {
-        fn_801C41C8(lbl_8047B8E8, 3);
+        fadeSet(lbl_8047B8E8, 3);
         fn_801656F8(fn_801653C4(), 0x1f4, 0);
     }
-    fn_801C40F0(1);
+    fadeCheck(1);
     if (fn_80102620(0xbd) == 1) fn_80102510(0xbd);
     if (fn_80102620(0xc3) == 1) fn_80102510(0xc3);
     if (lbl_8047A384 != 0) {
@@ -1420,7 +1420,7 @@ extern void fn_801026A4(void);
 extern void fn_8011394C(void);
 extern void fn_800D3074(void);
 extern void GStextureCreate(void);
-extern void fn_8010264C(void);
+extern void menuOpen(void);
 extern u32 lbl_80478DDC;
 extern u32 lbl_8047A368;
 extern u32 lbl_8047A390;
@@ -1448,7 +1448,7 @@ void fn_80025730(void) {
     extern void GSgfxBeginBackFBCapture();
     extern void GStextureCreate();
     extern void fn_80102510();
-    extern void fn_8010264C();
+    extern void menuOpen();
     extern void fn_801026A4();
     extern void fn_801046B8();
     extern void fn_8011394C();
@@ -1611,7 +1611,7 @@ L_80025910:
         }
         r3 = 0xc3;
         r4 = 0x0;
-        fn_8010264C();
+        menuOpen();
         r3 = 0xbd;
         fn_80102510();
         fn_80025F84();
@@ -2056,7 +2056,7 @@ s32 fn_80025F74(void) {
  *        else:     use 0xC6C1000 variant
  *      Load it via fn_801CBA0C + fn_801CB954(activate=0).
  *   3. Set up TEV/sprite chain via fn_80113F48 + fn_800F9318 composition:
- *        fn_800E3C94, fn_800E9108(2), fn_800E8FE8, fn_800E900C(1, &obj_c),
+ *        GSmodelSetBoundCheck, fn_800E9108(2), fn_800E8FE8, fn_800E900C(1, &obj_c),
  *        fn_800E8FA0(0x280, 0x1E0)  -- viewport 640x480
  *        fn_800E3C08, fn_800E3C00(4)
  *      Activates tex handle, binds 0xC6A1000 slot 0, pushes animation.
@@ -2077,7 +2077,7 @@ s32 fn_80025F74(void) {
 extern void fn_801CBA0C(void);
 extern void fn_80113F48(void);
 extern void fn_800F9318(void);
-extern void fn_800E3C94(void);
+extern void GSmodelSetBoundCheck(void);
 extern void fn_800E9108(void);
 extern void fn_800E8FE8(void);
 extern void fn_800E900C(void);
@@ -2139,7 +2139,7 @@ void fn_80025F84(void) {
     extern void GSgfxBeginBackFBCapture(u32, void*, s32);
     extern void fn_800E3C00(u32, s32);
     extern void fn_800E3C08(u32, u32);
-    extern void fn_800E3C94(u32, s32);
+    extern void GSmodelSetBoundCheck(u32, s32);
     extern void fn_800E8FA0(s32, s32);
     extern void fn_800E8FE8(u32, u32);
     extern void fn_800E900C(u32, s32, void*);
@@ -2177,7 +2177,7 @@ void fn_80025F84(void) {
     }
 
     obj_a = fn_800F9318(fn_80113F48(), tex);
-    fn_800E3C94(obj_a, 0);
+    GSmodelSetBoundCheck(obj_a, 0);
     obj_b = fn_800F9318(fn_80113F48(), tex);
     obj_c = fn_800F9318(fn_80113F48(), 0xC6A1002);
     obj_d = fn_800F9318(fn_80113F48(), 0xC6A1603);
@@ -2504,7 +2504,7 @@ void fn_80020BA0(void* arg0, u8* arg1) {
 #endif
 
 /* fn_80020C9C - 0x80020C9C | size: 0x200 */
-extern void fn_801070F4(void);
+extern void winSeqCheckMove(void);
 extern void fn_801D04E8(void);
 extern void fn_80106D3C(s32, s32, s32, s32);
 extern void fn_8001E074(void);
@@ -2524,11 +2524,11 @@ asm void fn_80020C9C(void) {
 #pragma optimization_level 4
 void fn_80020C9C(void) {
     extern void _threadSwitch(void);
-    extern u8 fn_801070F4(s32);
+    extern u8 winSeqCheckMove(s32);
     extern void fn_800205C0(s32);
     extern u32 fn_80166C74(void);
     extern s32 fn_80135168(s32, s32);
-    extern s32 fn_8010264C(s32, s32);
+    extern s32 menuOpen(s32, s32);
     extern void fn_80166CC0(u32);
     extern void fn_80135030(s32, s32, s32);
     extern u8 fn_801D04E8(void);
@@ -2546,7 +2546,7 @@ void fn_80020C9C(void) {
 
     state = 0;
     active = 1;
-    while (fn_801070F4(0xAA) != 0) {
+    while (winSeqCheckMove(0xAA) != 0) {
         _threadSwitch();
     }
     fn_800205C0(0);
@@ -2566,14 +2566,14 @@ void fn_80020C9C(void) {
         case 0:
             region = fn_80166C74();
             fmt = fn_80135168(0, 9);
-            fn_8010264C(0x7F, 0);
-            fn_8010264C(0x80, 0);
-            fn_8010264C(0x7C, 0);
-            fn_8010264C(0x7D, 0);
-            fn_8010264C(0x7E, 0);
+            menuOpen(0x7F, 0);
+            menuOpen(0x80, 0);
+            menuOpen(0x7C, 0);
+            menuOpen(0x7D, 0);
+            menuOpen(0x7E, 0);
             sp = (s32*)&lbl_803A1FC8;
             do {
-                if (fn_8010264C(0x7B, 1) < 0) {
+                if (menuOpen(0x7B, 1) < 0) {
                     fn_80166CC0(region);
                     fn_80135030(0, 9, fmt);
                     break;
@@ -2725,7 +2725,7 @@ extern void fn_800056EC(void);
 extern void fn_80130054(void);
 extern void menuModelInit(void);
 extern void fn_8010A010(void);
-extern void fn_8018F6F4(void);
+extern void peopleInfoBiosGetPtr(void);
 extern void fn_8018F4C8(void);
 extern void menuModelSetMotion(void);
 extern void fn_80005748(void);
@@ -3241,9 +3241,9 @@ s32 fn_80022720(u32 arg0, u32* arg1) {
 /* fn_80022834 - 0x80022834 | size: 0x308 */
 extern void fn_800232F0(void);
 extern void fn_801440A0(void);
-extern void fn_80143F24(void);
-extern void fn_80143EF0(void);
-extern void fn_80143E88(void);
+extern void itemDataBiosGetWazaMachineNo(void);
+extern void itemDataBiosGetWazaIDByWazaMachineNo(void);
+extern void itemDataBiosGetHidenMachineNo(void);
 extern void fn_8011F228(void);
 extern void fn_8011F5C8(s32);
 extern void fn_8011E778(void);
@@ -3261,9 +3261,9 @@ asm void fn_80022834(void) {
 #pragma optimization_level 4
 s32 fn_80022834(u32 arg0, u32* arg1) {
     extern void* fn_801440A0(u32);
-    extern u32 fn_80143F24(void*);
-    extern u32 fn_80143EF0(u32);
-    extern u32 fn_80143E88(void*);
+    extern u32 itemDataBiosGetWazaMachineNo(void*);
+    extern u32 itemDataBiosGetWazaIDByWazaMachineNo(u32);
+    extern u32 itemDataBiosGetHidenMachineNo(void*);
     extern s32 menuSubOpenYesNo(s32, s32, s32, s32);
     extern u32 fn_8011F228(s32, u32);
     extern void fn_8011F5C8(s32);
@@ -3273,7 +3273,7 @@ s32 fn_80022834(u32 arg0, u32* arg1) {
     extern void fn_80123D58(s32, u32, u32);
     extern u32 fn_80123090(s32);
     extern void fn_80122370(s32, u32, s32);
-    extern void fn_80023274(void);
+    extern void cbForgetWazaSelect__FP7PokemonUsl(void);
 
     s32 type_byte;
     s32 slot;
@@ -3293,10 +3293,10 @@ s32 fn_80022834(u32 arg0, u32* arg1) {
     u8 buf;
 
     handle = fn_801440A0((u16)arg0);
-    status = (u8)fn_80143F24(handle);
-    value16 = fn_80143EF0(status);
+    status = (u8)itemDataBiosGetWazaMachineNo(handle);
+    value16 = itemDataBiosGetWazaIDByWazaMachineNo(status);
     fn_80166A50(0x4CB, 0, 0xFF, 0);
-    type_byte = fn_80143E88(handle);
+    type_byte = itemDataBiosGetHidenMachineNo(handle);
     if ((u8)type_byte != 0xFF) {
         msg = 0x4260;
     } else {
@@ -3326,7 +3326,7 @@ s32 fn_80022834(u32 arg0, u32* arg1) {
             fn_801069FC(1);
             tmp = 0;
         } else {
-            v2 = fn_80143EF0(status);
+            v2 = itemDataBiosGetWazaIDByWazaMachineNo(status);
             for (i = 0; i < 4; i++) {
                 if ((u16)v2 == (u16)fn_8011F228(c, (u16)i)) {
                     break;
@@ -3347,7 +3347,7 @@ s32 fn_80022834(u32 arg0, u32* arg1) {
                     fn_801069FC(1);
                     tmp = 0;
                 } else {
-                    tmp = fn_802600E4(c, v2, &buf, 1, fn_80023274, 0);
+                    tmp = fn_802600E4(c, v2, &buf, 1, cbForgetWazaSelect__FP7PokemonUsl, 0);
                     if (tmp != 0) {
                         fn_80123D58(c, buf, (u16)v2);
                         fn_80122370(c, fn_80123090(c), 4);
@@ -3608,13 +3608,13 @@ s32 fn_80022EE4(u32 arg0, u32* arg1) {
 
     if (slot >= 0 && (s16)effect > 0) {
         effect = fn_80128A64(sc, 1, (u16)arg0, &sp8, &spC);
-        fn_801C41C8(lbl_8047B8A4, 3);
-        fn_801C40F0(1);
+        fadeSet(lbl_8047B8A4, 3);
+        fadeCheck(1);
         fn_801096F8(0);
         fn_8012805C(sc, effect, sp8, &spC, 0, 1, 0, 0);
         fn_801096F8(1);
-        fn_801C41C8(lbl_8047B8A4, 2);
-        fn_801C40F0(1);
+        fadeSet(lbl_8047B8A4, 2);
+        fadeCheck(1);
         *arg1 = 1;
         return 0;
     }
@@ -3713,27 +3713,27 @@ s32 fn_80023068(u32 arg0, u32* arg1) {
 }
 #endif
 
-/* fn_80023274 - 0x80023274 | size: 0x7c */
+/* cbForgetWazaSelect__FP7PokemonUsl - 0x80023274 | size: 0x7c */
 extern s32 fn_80097B04(s32, s32);
 extern f32 lbl_8047B8A4;
 #if 0
-asm void fn_80023274(void) {
+asm void cbForgetWazaSelect__FP7PokemonUsl(void) {
 #include "src/game/gs_title_fn_80023274.inc"
 }
 #else
 #pragma scheduling on
 #pragma optimization_level 4
-s32 fn_80023274(s32 r3, s32 r4) {
+s32 cbForgetWazaSelect__FP7PokemonUsl(s32 r3, s32 r4) {
     s32 result;
 
-    fn_801C41C8(lbl_8047B8A4, 3);
-    fn_801C40F0(1);
+    fadeSet(lbl_8047B8A4, 3);
+    fadeCheck(1);
     result = fn_80097B04(r3, r4);
     if (result >= 4) {
         result = -1;
     }
-    fn_801C41C8(lbl_8047B8A4, 2);
-    fn_801C40F0(1);
+    fadeSet(lbl_8047B8A4, 2);
+    fadeCheck(1);
     return (s8)result;
 }
 #pragma peephole on

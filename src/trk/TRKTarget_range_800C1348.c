@@ -3,8 +3,8 @@
 extern void MWTRACE(s32 level, const char* fmt, ...);
 extern void* memset(void* dst, int val, u32 len);
 
-extern s32  fn_800C25B0(u8* buf, u32 pc);
-extern void fn_800BEBB0(s32 a, void* buf, u32 len);
+extern s32  TRKTargetReadInstruction(u8* buf, u32 pc);
+extern void TRKAppendBuffer_ui8(s32 a, void* buf, u32 len);
 
 /* TRK state and CPU state structures */
 extern u8 gTRKState[];
@@ -85,8 +85,8 @@ s32 TRKTargetSingleStep(u32 count, s32 c) {
     return 0;
 }
 
-/* fn_800C16BC - 0x800C16BC | size 0x84 | scope none */
-void fn_800C16BC(s32 arg) {
+/* TRKTargetAddExceptionInfo - 0x800C16BC | size 0x84 | scope none */
+void TRKTargetAddExceptionInfo(s32 arg) {
     u8 buf[0x40];
     s32 result;
     u32 dataword;
@@ -96,14 +96,14 @@ void fn_800C16BC(s32 arg) {
     *(u32*)&buf[0x0] = 0x40;
     buf[0x4] = 0x91;
     *(u32*)&buf[0x8] = dataword;
-    fn_800C25B0((u8*)&result, dataword);
+    TRKTargetReadInstruction((u8*)&result, dataword);
     *(u32*)&buf[0xC] = result;
     *(u32*)&buf[0x10] = *(u16*)&gTRKExceptionStatus[0x8];
-    fn_800BEBB0(arg, buf, 0x40);
+    TRKAppendBuffer_ui8(arg, buf, 0x40);
 }
 
-/* fn_800C1740 - 0x800C1740 | size 0x8C | scope none */
-void fn_800C1740(s32 arg) {
+/* TRKTargetAddStopInfo - 0x800C1740 | size 0x8C | scope none */
+void TRKTargetAddStopInfo(s32 arg) {
     u8 buf[0x40];
     s32 result;
     u32 dataword;
@@ -113,8 +113,8 @@ void fn_800C1740(s32 arg) {
     *(u32*)&buf[0x0] = 0x40;
     buf[0x4] = 0x90;
     *(u32*)&buf[0x8] = dataword;
-    fn_800C25B0((u8*)&result, dataword);
+    TRKTargetReadInstruction((u8*)&result, dataword);
     *(u32*)&buf[0xC] = result;
     *(u32*)&buf[0x10] = *(u32*)&gTRKCPUState[0x2F8] & 0xFFFF;
-    fn_800BEBB0(arg, buf, 0x40);
+    TRKAppendBuffer_ui8(arg, buf, 0x40);
 }

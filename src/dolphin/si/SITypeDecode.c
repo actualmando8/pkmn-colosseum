@@ -1,6 +1,6 @@
 #include "dolphin/types.h"
 
-u32 fn_800D0DF8(u32 type) {
+u32 SIDecodeType(u32 type) {
     u32 error;
     u32 id;
     u32 masked;

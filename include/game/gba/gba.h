@@ -157,7 +157,7 @@ typedef struct ConvertedPokemon {
  * on each 32-bit word from the GBA source.
  *
  * When a save context (param 3) is provided, calls fn_8008AE18 to
- * extract additional data, then fills 11 ribbon bytes via fn_80265F14.
+ * extract additional data, then fills 11 ribbon bytes via exribbonGetNo.
  *
  * @param pDst     Destination buffer (GCN format, at work+0x4344)
  * @param pSrc     Source GBA Pokemon data
@@ -321,6 +321,6 @@ void gba_LinkInit(void);
 
 /* Data extraction */
 /* fn_8008AE18 */ extern void  pokemon_ExtractData(void* pSaveCtx, void* pDst);
-/* fn_80265F14 */ extern u8    ribbon_GetValue(s32 ribbonIdx);
+/* exribbonGetNo */ extern u8    ribbon_GetValue(s32 ribbonIdx);
 
 #endif /* GAME_GBA_H */

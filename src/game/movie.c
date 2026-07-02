@@ -33,8 +33,8 @@ extern void fn_801E189C(const char* path, u32 loop);  /* THPPlayerOpen */
 /* ===== GS Engine external functions ===== */
 extern void _threadSwitch(void);                        /* GSthread yield / step */
 extern void fn_80165A20(u32 sndId, u32 fade, u32 vol); /* sndPlay (BGM start) */
-extern void fn_801C41C8(u32 mode, f32 speed);         /* fade set mode+speed */
-extern void fn_801C40F0(u32 enable);                   /* fade enable */
+extern void fadeSet(u32 mode, f32 speed);         /* fade set mode+speed */
+extern void fadeCheck(u32 enable);                   /* fade enable */
 extern void fn_80190528(u32 flagId);                   /* GSflagSet (used for cutscene flags) */
 extern u32  fn_801902E0(u32 flagId);                   /* GSflagGet */
 extern void fn_80113828(u32 a, u32 b);                /* floor resource unload helper */
@@ -95,9 +95,9 @@ void movieWaitForFinish(void) {
  *  Assembly:
  *    lfs f1, lbl_8047BA30@sda21(r0)  ; f1 = 1.0
  *    li r3, 2
- *    bl fn_801C41C8                  ; fade mode 2 (fade-in), speed 1.0
+ *    bl fadeSet                  ; fade mode 2 (fade-in), speed 1.0
  *    li r3, 1
- *    bl fn_801C40F0                  ; enable fade
+ *    bl fadeCheck                  ; enable fade
  *    lis r3, lbl_80266FE8@ha
  *    li r4, 0
  *    addi r3, r3, lbl_80266FE8@l    ; "movie/openingdemo.thp"
@@ -110,8 +110,8 @@ void movieWaitForFinish(void) {
  * ======================================================================= */
 void moviePlayOpeningDemo(void) {
     /* Set up screen fade: mode 2 (fade-in from black), speed 1.0 */
-    fn_801C41C8(2, lbl_8047BA30);
-    fn_801C40F0(1);
+    fadeSet(2, lbl_8047BA30);
+    fadeCheck(1);
 
     /* Open and start the opening demo THP movie (no loop) */
     fn_801E189C(lbl_80266FE8, 0);
@@ -127,9 +127,9 @@ void moviePlayOpeningDemo(void) {
  *  Assembly:
  *    lfs f1, lbl_8047BA30@sda21(r0)  ; f1 = 1.0
  *    li r3, 3
- *    bl fn_801C41C8                  ; fade mode 3 (special), speed 1.0
+ *    bl fadeSet                  ; fade mode 3 (special), speed 1.0
  *    li r3, 1
- *    bl fn_801C40F0                  ; enable fade
+ *    bl fadeCheck                  ; enable fade
  *    blr
  *
  *  Note: This function only sets up the fade. The actual movie open
@@ -137,8 +137,8 @@ void moviePlayOpeningDemo(void) {
  *  of "open movie -> wait -> cleanup" is handled by the caller.
  * ======================================================================= */
 void moviePlayAutoDemo(void) {
-    fn_801C41C8(3, lbl_8047BA30);
-    fn_801C40F0(1);
+    fadeSet(3, lbl_8047BA30);
+    fadeCheck(1);
 }
 
 /* =======================================================================
@@ -487,8 +487,8 @@ asm void fn_800361C0(void) {
 #pragma push
 #pragma peephole off
 void fn_800361C0(void) {
-    fn_801C41C8(2, lbl_8047BA30);
-    fn_801C40F0(1);
+    fadeSet(2, lbl_8047BA30);
+    fadeCheck(1);
     fn_801E189C(lbl_80267000, 0);
     fn_80165A20(0x04C9, 0, 0x7F);
 }
@@ -504,8 +504,8 @@ asm void fn_80036210(void) {
 #pragma push
 #pragma peephole off
 void fn_80036210(void) {
-    fn_801C41C8(3, lbl_8047BA30);
-    fn_801C40F0(1);
+    fadeSet(3, lbl_8047BA30);
+    fadeCheck(1);
 }
 #pragma pop
 #endif
@@ -590,8 +590,8 @@ asm void fn_80036360(void) {
 #pragma push
 #pragma peephole off
 void fn_80036360(void) {
-    fn_801C41C8(2, lbl_8047BA30);
-    fn_801C40F0(1);
+    fadeSet(2, lbl_8047BA30);
+    fadeCheck(1);
     fn_801E189C(lbl_80267014, 0);
     fn_80165A20(0x0494, 0, 0x7F);
 }
@@ -599,7 +599,7 @@ void fn_80036360(void) {
 #endif
 
 /* fn_800363BC - 0x800363BC | size: 0xac */
-extern s32 fn_800370E0(u32* arg);
+extern s32 _menuSoundReadWaveThread__FPv(u32* arg);
 extern void fn_800A19CC(void* thread, void* callback, void* arg, void* stack, u32 stackSize, u32 priority, u32 attr);
 extern void fn_800A1F94(void* thread);
 extern u8 lbl_803A3E58[];
@@ -614,8 +614,8 @@ void fn_800363BC(void) {
     u32* args;
 
     ctx = lbl_803A3E58;
-    fn_801C41C8(3, lbl_8047BA30);
-    fn_801C40F0(1);
+    fadeSet(3, lbl_8047BA30);
+    fadeCheck(1);
 
     args = (u32*)(ctx + 0x1318);
     args[0] = 3;
@@ -624,7 +624,7 @@ void fn_800363BC(void) {
     args[2] = 0;
     args[3] = 0;
 
-    fn_800A19CC(ctx + 0x1328, (void*)fn_800370E0, args, ctx + 0x263C, 0x1000, 0x10, 1);
+    fn_800A19CC(ctx + 0x1328, (void*)_menuSoundReadWaveThread__FPv, args, ctx + 0x263C, 0x1000, 0x10, 1);
     fn_800A1F94(ctx + 0x1328);
 
     while (lbl_8047A460 != 0) {
@@ -676,15 +676,15 @@ void fn_800364C8(void) {
     args[2] = 6;
     args[3] = 0;
 
-    fn_800A19CC(ctx + 0x1328, (void*)fn_800370E0, args, ctx + 0x263C, 0x1000, 0x10, 1);
+    fn_800A19CC(ctx + 0x1328, (void*)_menuSoundReadWaveThread__FPv, args, ctx + 0x263C, 0x1000, 0x10, 1);
     fn_800A1F94(ctx + 0x1328);
 
     while (lbl_8047A460 != 0) {
         _threadSwitch();
     }
 
-    fn_801C41C8(2, lbl_8047BA30);
-    fn_801C40F0(1);
+    fadeSet(2, lbl_8047BA30);
+    fadeCheck(1);
     fn_801E189C(lbl_8026702C, 0);
     fn_80165A20(0x04D1, 0, 0x7F);
     memset((void*)0x80001805, 0, 0x17FB);
@@ -700,8 +700,8 @@ asm void fn_800365B0(void) {
 #pragma push
 #pragma peephole off
 void fn_800365B0(void) {
-    fn_801C41C8(3, lbl_8047BA30);
-    fn_801C40F0(1);
+    fadeSet(3, lbl_8047BA30);
+    fadeCheck(1);
 }
 #pragma pop
 #endif
@@ -740,8 +740,8 @@ asm void fn_80036640(void) {
 #pragma peephole off
 void fn_80036640(void) {
     lbl_8047A468 = 0;
-    fn_801C41C8(2, lbl_8047BA30);
-    fn_801C40F0(1);
+    fadeSet(2, lbl_8047BA30);
+    fadeCheck(1);
     fn_801E189C(lbl_80267040, 1);
     memset((void*)0x80001803, 0, 0x17FD);
 }
@@ -749,7 +749,7 @@ void fn_80036640(void) {
 #endif
 
 /* fn_800366A8 - 0x800366A8 | size: 0x1c4 */
-extern u32 fn_8010264C(u32 sceneId, u32 arg);
+extern u32 menuOpen(u32 sceneId, u32 arg);
 extern s32 fn_8003708C(void);
 extern void fn_8017B370(u32 arg);
 extern void fn_8003686C(void);
@@ -773,8 +773,8 @@ void fn_800366A8(void) {
     u16 size;
 
     ctx = lbl_803A3E58;
-    fn_8010264C(0x85, 0);
-    fn_801C41C8(2, lbl_8047BA4C);
+    menuOpen(0x85, 0);
+    fadeSet(2, lbl_8047BA4C);
 
     if (lbl_8047A464 != 1) {
         fn_800A19CC(ctx, (void*)fn_8003708C, NULL, ctx + 0x1314, 0x1000, 0x10, 1);
@@ -795,11 +795,11 @@ void fn_800366A8(void) {
     args[1] = 0;
     args[2] = 0;
     args[3] = 0;
-    fn_800A19CC(ctx + 0x1328, (void*)fn_800370E0, args, ctx + 0x263C, 0x1000, 0x10, 1);
+    fn_800A19CC(ctx + 0x1328, (void*)_menuSoundReadWaveThread__FPv, args, ctx + 0x263C, 0x1000, 0x10, 1);
     fn_800A1F94(ctx + 0x1328);
 
-    fn_801C41C8(3, lbl_8047BA4C);
-    fn_801C40F0(1);
+    fadeSet(3, lbl_8047BA4C);
+    fadeCheck(1);
     fn_80102510(0x85);
 
     if (lbl_804788B8 != (u32)-1) {

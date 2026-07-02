@@ -1864,7 +1864,7 @@ void* fn_801F7F80(void* context, u16 count) {
 /* 0x801F8000 | size: 0x100 */
 u32 fn_801F8000(void* context) {
     extern u16 fn_801EF634(void* ctx);
-    extern u8 fn_8012A130(void* ptr);
+    extern u8 heroCheckValid(void* ptr);
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 index);
     extern u8* fn_801FBD58(u16 val);
     extern u32 fn_801FBD28(u8* ptr);
@@ -1887,7 +1887,7 @@ u32 fn_801F8000(void* context) {
             result = fn_801FB1C0(context, 0, 0x44, 0);
             if (result == NULL) {
                 valid = 0;
-            } else if ((u8)fn_8012A130(result) == 0) {
+            } else if ((u8)heroCheckValid(result) == 0) {
                 valid = 0;
             } else {
                 valid = 1;
@@ -1906,7 +1906,7 @@ u32 fn_801F8000(void* context) {
 /* 0x801F8100 | size: 0xF8 */
 void* fn_801F8100(void* context) {
     extern u16 fn_801EF634(void* ctx);
-    extern u8 fn_8012A130(void* ptr);
+    extern u8 heroCheckValid(void* ptr);
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 index);
     extern void* fn_8012A5B0(void* ptr, u32 param1, u32 param2);
     int valid;
@@ -1926,7 +1926,7 @@ void* fn_801F8100(void* context) {
             result = fn_801FB1C0(context, 0, 0x44, 0);
             if (result == NULL) {
                 valid = 0;
-            } else if ((u8)fn_8012A130(result) == 0) {
+            } else if ((u8)heroCheckValid(result) == 0) {
                 valid = 0;
             } else {
                 valid = 1;
@@ -2114,7 +2114,7 @@ void fn_801F81F8(void) {
 }
 
 /* 0x801F8424 | size: 0x78 */
-BOOL fn_801F8424(void* arg0, void* arg1, u32 arg2) {
+BOOL fightTrainerIsAllyFightTargetPtr(void* arg0, void* arg1, u32 arg2) {
     u32 val0;
 
     if (arg0 == NULL) {
@@ -3154,7 +3154,7 @@ void* fn_801F9930(void* context, void* moveData) {
 void fn_801F99C8(void) {
     extern void fn_80123FBC();
     extern void fn_80124A60();
-    extern void fn_8012A130();
+    extern void heroCheckValid();
     extern void fn_8012A5B0();
     extern void fn_801EF634();
     extern void fn_801FB1C0();
@@ -3201,7 +3201,7 @@ void fn_801F99C8(void) {
             fn_801FB1C0();
     if (r3 != (u32)0x0) {
 
-                fn_8012A130();
+                heroCheckValid();
                 r0 = r3 & 0xFF;
     if (r3 != (u32)0x0) {
 
@@ -3972,7 +3972,7 @@ BOOL fn_801FA4B4(u32 arg0, s32 arg1) {
 /* 0x801FA524 | size: 0x110 */
 u32 fn_801FA524(void* context) {
     extern u16 fn_801EF634(void* ctx);
-    extern u8 fn_8012A130(void* ptr);
+    extern u8 heroCheckValid(void* ptr);
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 idx);
     extern u8 fn_80206608(void* ptr);
     u8 valid;
@@ -3984,7 +3984,7 @@ u32 fn_801FA524(void* context) {
         if ((u16)fn_801EF634(context) != 1) {
             if ((s32)fn_801FB1C0(context, 0, 0x43, 0) != 0) {
                 if (fn_801FB1C0(context, 0, 0x44, 0) != NULL) {
-                    if ((u8)fn_8012A130(fn_801FB1C0(context, 0, 0x44, 0)) != 0) {
+                    if ((u8)heroCheckValid(fn_801FB1C0(context, 0, 0x44, 0)) != 0) {
                         valid = 1;
                     }
                 }
@@ -4006,7 +4006,7 @@ u32 fn_801FA524(void* context) {
 /* 0x801FA634 | size: 0xA4 */
 u32 fn_801FA634(void* context) {
     extern u16 fn_801EF634(void* ctx);
-    extern u8 fn_8012A130(void* ptr);
+    extern u8 heroCheckValid(void* ptr);
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 idx);
     void* result;
 
@@ -4023,7 +4023,7 @@ u32 fn_801FA634(void* context) {
     if (result == NULL) {
         return 0;
     }
-    return (u8)fn_8012A130(result) != 0;
+    return (u8)heroCheckValid(result) != 0;
 }
 
 /* 0x801FA6D8 | size: 0x1F4 | medium */
@@ -9407,7 +9407,7 @@ u16 fn_8020147C(void* context, u16 moveId, u8 slot, u8 updateFlag) {
 
 /* 0x8020156C | size: 0x94 */
 typedef struct { u16 fields[7]; } FieldTable7;
-u32 fn_8020156C(void* context) {
+u32 fightOutPokemonGetAllAbiCnt(void* context) {
     extern FieldTable7 lbl_80279C80;
     FieldTable7 table;
     u8 i;

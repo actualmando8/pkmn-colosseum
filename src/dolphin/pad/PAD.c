@@ -38,18 +38,18 @@ extern u32 fn_800D03C8(u32 poll);                       /* SIEnablePolling */
 extern u32 fn_800D0464(u32 poll);                        /* SIDisablePolling */
 extern BOOL fn_800D05A4(s32 chan, void *data);            /* SIGetResponse */
 extern void fn_800D034C(void);                             /* SITransferCommands */
-extern void fn_800D0CBC(s32 chan, SITypeAndStatusCallback cb);
+extern void SIGetTypeAsync(s32 chan, SITypeAndStatusCallback cb);
 extern BOOL fn_800CF708(void);
 extern BOOL fn_800CF728(s32 chan);
 extern u32 fn_800D02BC(s32 chan);
-extern u32 fn_800C4C98(u32 hi, u32 lo, u32 shift);
+extern u32 __shr2i(u32 hi, u32 lo, u32 shift);
 extern void fn_800D104C(void);
 extern void OSRegisterVersion(char *version);
 
 static void SPEC0_MakeStatus(s32 chan, PADStatus *status, u32 data[2]);
 static void SPEC1_MakeStatus(s32 chan, PADStatus *status, u32 data[2]);
 static void SPEC2_MakeStatus(s32 chan, PADStatus *status, u32 data[2]);
-static void fn_800ABEFC(__OSInterrupt interrupt, OSContext *context);
+static void SamplingHandler(__OSInterrupt interrupt, OSContext *context);
 static void UpdateOrigin(s32 chan);
 static void PADOriginCallback(s32 chan, u32 error, OSContext *context);
 static void fn_800AA73C(s32 chan, u32 error, OSContext *context);
@@ -291,7 +291,7 @@ static void PADOriginCallback(s32 chan, u32 error, OSContext *context) {
         lbl_8047A8A8 &= ~chanBit;
         memset(&lbl_803FC5E0[lbl_80478A0C], 0, sizeof(PADStatus));
         lbl_803FC5D0[lbl_80478A0C] = 0;
-        fn_800D0CBC(lbl_80478A0C, (SITypeAndStatusCallback)PADTypeAndStatusCallback);
+        SIGetTypeAsync(lbl_80478A0C, (SITypeAndStatusCallback)PADTypeAndStatusCallback);
     }
 }
 
@@ -336,7 +336,7 @@ static void PADProbeCallback(s32 chan, u32 error, OSContext *context) {
         lbl_8047A8A8 &= ~chanBit;
         memset(&lbl_803FC5E0[lbl_80478A0C], 0, sizeof(PADStatus));
         lbl_803FC5D0[lbl_80478A0C] = 0;
-        fn_800D0CBC(lbl_80478A0C, (SITypeAndStatusCallback)PADTypeAndStatusCallback);
+        SIGetTypeAsync(lbl_80478A0C, (SITypeAndStatusCallback)PADTypeAndStatusCallback);
     }
 }
 
@@ -358,7 +358,7 @@ static void PADTypeAndStatusCallback(s32 chan, u32 type) {
         lbl_8047A8A8 &= ~chanBit;
         memset(&lbl_803FC5E0[lbl_80478A0C], 0, sizeof(PADStatus));
         lbl_803FC5D0[lbl_80478A0C] = 0;
-        fn_800D0CBC(lbl_80478A0C, (SITypeAndStatusCallback)PADTypeAndStatusCallback);
+        SIGetTypeAsync(lbl_80478A0C, (SITypeAndStatusCallback)PADTypeAndStatusCallback);
         return;
     }
 
@@ -373,7 +373,7 @@ static void PADTypeAndStatusCallback(s32 chan, u32 type) {
         lbl_8047A8A8 &= ~chanBit;
         memset(&lbl_803FC5E0[lbl_80478A0C], 0, sizeof(PADStatus));
         lbl_803FC5D0[lbl_80478A0C] = 0;
-        fn_800D0CBC(lbl_80478A0C, (SITypeAndStatusCallback)PADTypeAndStatusCallback);
+        SIGetTypeAsync(lbl_80478A0C, (SITypeAndStatusCallback)PADTypeAndStatusCallback);
         return;
     }
 
@@ -391,7 +391,7 @@ static void PADTypeAndStatusCallback(s32 chan, u32 type) {
         lbl_8047A8A8 &= ~chanBit;
         memset(&lbl_803FC5E0[lbl_80478A0C], 0, sizeof(PADStatus));
         lbl_803FC5D0[lbl_80478A0C] = 0;
-        fn_800D0CBC(lbl_80478A0C, (SITypeAndStatusCallback)PADTypeAndStatusCallback);
+        SIGetTypeAsync(lbl_80478A0C, (SITypeAndStatusCallback)PADTypeAndStatusCallback);
         return;
     }
 
@@ -467,7 +467,7 @@ BOOL fn_800AAD34(u32 mask) {
             lbl_8047A8A8 &= ~chanBit;
             memset(&lbl_803FC5E0[lbl_80478A0C], 0, sizeof(PADStatus));
             lbl_803FC5D0[lbl_80478A0C] = 0;
-            fn_800D0CBC(lbl_80478A0C, (SITypeAndStatusCallback)PADTypeAndStatusCallback);
+            SIGetTypeAsync(lbl_80478A0C, (SITypeAndStatusCallback)PADTypeAndStatusCallback);
         }
     }
 
@@ -496,7 +496,7 @@ BOOL fn_800AAE34(u32 mask) {
             lbl_8047A8A8 &= ~chanBit;
             memset(&lbl_803FC5E0[lbl_80478A0C], 0, sizeof(PADStatus));
             lbl_803FC5D0[lbl_80478A0C] = 0;
-            fn_800D0CBC(lbl_80478A0C, (SITypeAndStatusCallback)PADTypeAndStatusCallback);
+            SIGetTypeAsync(lbl_80478A0C, (SITypeAndStatusCallback)PADTypeAndStatusCallback);
         }
     }
 
@@ -518,7 +518,7 @@ BOOL fn_800AAF38(void) {
 
         if (lbl_8047AA58) {
             OSTime time = OSGetTime();
-            __OSWirelessPadFixMode = (u16)(fn_800C4C98((u32)(time >> 32), (u32)time, 0x30) & 0x3FFF);
+            __OSWirelessPadFixMode = (u16)(__shr2i((u32)(time >> 32), (u32)time, 0x30) & 0x3FFF);
             lbl_8047A8AC = 0xF0000000;
         }
 
@@ -569,7 +569,7 @@ BOOL fn_800AB150(PADStatus *status) {
                 memset(status, 0, 0xA);
                 if (!(lbl_8047A8B4 & chanBit)) {
                     lbl_8047A8B4 |= chanBit;
-                    fn_800D0CBC(chan, (SITypeAndStatusCallback)fn_800AAC00);
+                    SIGetTypeAsync(chan, (SITypeAndStatusCallback)fn_800AAC00);
                 }
                 continue;
             }
@@ -706,7 +706,7 @@ BOOL fn_800ABD68(BOOL final) {
                     lbl_8047A8A8 &= ~chanBit;
                     memset(&lbl_803FC5E0[lbl_80478A0C], 0, sizeof(PADStatus));
                     lbl_803FC5D0[lbl_80478A0C] = 0;
-                    fn_800D0CBC(lbl_80478A0C, (SITypeAndStatusCallback)PADTypeAndStatusCallback);
+                    SIGetTypeAsync(lbl_80478A0C, (SITypeAndStatusCallback)PADTypeAndStatusCallback);
                 }
             }
 
@@ -722,10 +722,10 @@ BOOL fn_800ABD68(BOOL final) {
 }
 
 /*
- * fn_800ABEFC - internal handler invoked from the SI polling interrupt to
+ * SamplingHandler - internal handler invoked from the SI polling interrupt to
  * dispatch the user PADSamplingCallback with a clean register/context state.
  */
-static void fn_800ABEFC(__OSInterrupt interrupt, OSContext *context) {
+static void SamplingHandler(__OSInterrupt interrupt, OSContext *context) {
     OSContext newContext;
     if (lbl_8047A8BC != NULL) {
         OSClearContext(&newContext);
@@ -743,9 +743,9 @@ PADSamplingCallback PADSetSamplingCallback(PADSamplingCallback callback) {
     PADSamplingCallback old = lbl_8047A8BC;
     lbl_8047A8BC = callback;
     if (callback != NULL) {
-        SIRegisterPollingHandler((__OSInterruptHandler)fn_800ABEFC);
+        SIRegisterPollingHandler((__OSInterruptHandler)SamplingHandler);
     } else {
-        SIUnregisterPollingHandler((__OSInterruptHandler)fn_800ABEFC);
+        SIUnregisterPollingHandler((__OSInterruptHandler)SamplingHandler);
     }
     return old;
 }

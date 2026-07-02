@@ -62,11 +62,11 @@ extern BOOL fn_800F9418(u32 bufSize, u32 align, u32 unused, u32 category,
 extern void fn_8014D598(u32 handle);
 extern BOOL fn_8014D5C8(u32 handle);
 extern void fn_8014D648(u32 handle);
-extern void fn_8014D6D8(u32 channel, u16 value, u32 handle, u32 flags);
+extern void sndSeqVolume(u32 channel, u16 value, u32 handle, u32 flags);
 extern void fn_8014D880(u32 handle);
 extern void fn_8014D8C0(void* callback);
-extern void fn_8014D8C8(u8 volume, u16 pan, u8 code);
-extern void fn_8014D928(u8 chorus, u16 reverb, u8 delay, u8 wet);
+extern void sndVolume(u8 volume, u16 pan, u8 code);
+extern void sndMasterVolume(u8 chorus, u16 reverb, u8 delay, u8 wet);
 extern void fn_8014D9BC(void);
 extern void fn_8014DAA8(u32 channel, void* callback, void* userData,
                         u32 volume, u32 pan, u32 r8, u32 r9, u32 r10);
@@ -80,16 +80,16 @@ extern s32  fn_8017B2CC(u32 fsysId);
 extern void fn_8017B370(u32 fsysId);
 
 /* Disc drive status */
-extern s32 fn_800A0E34(void);
+extern s32 OSGetSoundMode(void);
 extern void fn_800A0EB4(u32 enable);
 
 /* Sound 3D / listener layer (in the 0x8015E-0x80160 range) */
 extern void fn_801631AC(void* params);
 extern s32  fn_8015FE88(u32 maxVoices, u32 priority, u32 maxStreams,
                         u32 flag, u32 r7, u32 stackSize);
-extern BOOL fn_8015FFA0(void);
+extern BOOL sndQuit(void);
 extern BOOL fn_8015FFD4(void);
-extern void fn_8015ECA8(void* dst, void* pos, void* dir, u32 innerAngle,
+extern void sndAddEmitter(void* dst, void* pos, void* dir, u32 innerAngle,
                         u16 pad, u8 volume, u32 pan, u32 flags);
 extern BOOL fn_8015E890(void* jAudioParams);
 extern void fn_8015ED00(void* dst, void* pos, void* srcPos,
@@ -99,7 +99,7 @@ extern void fn_8015EF04(void* dst, void* pos, void* fwd, void* up,
 
 /* Sound internal helpers (in later part of sound.c / adjacent modules) */
 extern void fn_80166B3C(u32 sndId, u32 unused, u32 category); /* _sndBindWork */
-extern BOOL fn_80166BE0(u32 sndId, u32 flag, void* name,
+extern BOOL GSsndOpenWaveDVD(u32 sndId, u32 flag, void* name,
                         u32 r6, u32 r7, u32 r8, u32 r9); /* _sndOpenWaveInternal */
 extern void fn_80166670(u32 sndId, u32 fadeTime, u32 flags); /* _sndCheckSndWorkAll */
 extern void fn_80166084(u32 sndId);  /* _sndIsBgm (returns bool in r3) */
@@ -126,9 +126,9 @@ extern void fn_80166578(u32 sndId, void* pos, void* fwd,
 /* Sound internal memory management */
 extern void* fn_80167BB0(u32 size);  /* _sndAllocFromMaster */
 extern void  fn_80167A6C(void);      /* _sndInitBgmPool */
-extern void  fn_80167A44(void);      /* _sndInitSePool */
+extern void  _sndInitStack(void);      /* _sndInitSePool */
 extern void  fn_80167A14(void);      /* _sndInitListenerPool */
-extern void  fn_80167A9C(u32 groupId); /* _sndLoadGroup */
+extern void  _sndSetReverbParm(u32 groupId); /* _sndLoadGroup */
 extern void  sndAuxCallbackPrepareReverbHI(void* buffer);
 extern void  sndAuxCallbackUpdateSettingsReverbHI(void* buffer);
 
@@ -138,9 +138,9 @@ extern void  fn_80167118(u32 sndId, u32 flag, u32 name,
                          u32 r6, u32 r7, u32 r8, u32 r9,
                          u32 r10); /* _sndOpenWaveWorker */
 extern void  _sndCheckSndWorkALL(void);     /* _sndFlushAllWork */
-extern s32   fn_80167408(u32 sndId, u32 volume); /* _sndSetVolume */
-extern void  fn_80167490(u32 sndId, u32 fadeTime, u32 volume); /* _sndFadeBgmInternal */
-extern void  fn_80167508(u32 sndId, u32 fadeTime, u32 volume); /* _sndFadeSeInternal */
+extern s32   _sndSetVolumeWork(u32 sndId, u32 volume); /* _sndSetVolume */
+extern void  _sndStopSE(u32 sndId, u32 fadeTime, u32 volume); /* _sndFadeBgmInternal */
+extern void  _sndStopBGM(u32 sndId, u32 fadeTime, u32 volume); /* _sndFadeSeInternal */
 extern void  fn_8016758C(u32 sndId, u32 r4); /* _sndFadeBgmApply */
 extern void  fn_8016761C(u32 sndId, u32 fadeTime, u32 volume); /* _sndFadeSeApply */
 extern void  fn_80167768(u32 channel, u32 category); /* _sndFindHandleInternal */
@@ -150,7 +150,7 @@ extern void  fn_80167864(void);          /* _sndAllocListener */
 extern void  fn_801678E4(void);          /* _sndAllocListener4Point */
 extern void  fn_80167964(void);          /* _sndAllocSeSlot */
 extern void  fn_801679E4(void);          /* _sndInitListenerDefaults */
-extern void  fn_80167AF0(void* work, void* slot); /* _sndBindSlotToWork */
+extern void  _sndInitParms(void* work, void* slot); /* _sndBindSlotToWork */
 extern u32   fn_80167E5C(void* data);   /* _sndGetStreamLength */
 extern void  fn_80167E64(void* data);   /* _sndReleaseStreamHandle */
 extern s32   fn_80167ED0(void* handle, void* buffer, u32 size,
@@ -242,7 +242,7 @@ void sndWaveOpen(u32 waveId) {
     waveEntry = (u8*)g_sndWaveData + (waveId * 0x18);
 
     /* Call internal open with the wave's name string and parameters */
-    if (fn_80166BE0(waveId, 1, (void*)*(u32*)(waveEntry + 0x14),
+    if (GSsndOpenWaveDVD(waveId, 1, (void*)*(u32*)(waveEntry + 0x14),
                      *(u32*)(waveEntry + 0x04),
                      *(u32*)(waveEntry + 0x08),
                      *(u32*)(waveEntry + 0x0C),
@@ -1113,7 +1113,7 @@ BOOL sndInit(u32 numBgm, u32 numSe, u32 numBgmRes, u32 numSe3d,
     if (bgmPool == NULL) {
         return FALSE;
     }
-    fn_80167A44(); /* init SE pool defaults */
+    _sndInitStack(); /* init SE pool defaults */
 
     /* Step 3: Allocate SE pool */
     g_sndSeMax = numSe3d;
@@ -1148,7 +1148,7 @@ BOOL sndInit(u32 numBgm, u32 numSe, u32 numBgmRes, u32 numSe3d,
     }
 
     /* Step 6: Load sound bank table from lbl_80452500 */
-    fn_80167A9C(0); /* load group 0 */
+    _sndSetReverbParm(0); /* load group 0 */
     sndAuxCallbackPrepareReverbHI((void*)0x80452500);
 
     /* Step 7: Register the per-frame update callback */

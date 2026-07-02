@@ -62,7 +62,7 @@ void* fn_801B4258(void) {
  * HSD_TExpAllocNode - 0x801B4264 | Size: 0x5C
  * Allocate and initialize a new TExp node.
  */
-void* fn_801B4264(u32 type) {
+void* HSD_RenderInitAllocData(u32 type) {
     u8* node;
     node = (u8*)hsdAllocMemPiece(0x40);
     if (node != NULL) {
@@ -81,7 +81,7 @@ extern void fn_80193AF0(void* ptr, s32 size);
  * HSD_TExpFreeList - 0x801B42C0 | Size: 0x40
  * Walk a linked list of TExp nodes and free each one (size 0x88).
  */
-void fn_801B42C0(u8* node) {
+void HSD_TExpFreeTevDesc(u8* node) {
     u8* next;
     while (node != NULL) {
         next = *(u8**)node;
@@ -1062,7 +1062,7 @@ void fn_801B8D5C(HSD_GObj* gobj) {
  * GObj_SetHSDObj - 0x801B8FB8 | Size: 0x90
  * Set the HSD object (JObj/CObj/LObj) for a GObj.
  */
-void fn_801B8FB8(HSD_GObj* gobj, u32 obj_kind, void* hsd_obj) {
+void HSD_TExpSimplify(HSD_GObj* gobj, u32 obj_kind, void* hsd_obj) {
     if (gobj == NULL) {
         return;
     }

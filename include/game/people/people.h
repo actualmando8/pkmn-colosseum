@@ -349,7 +349,7 @@ void* peopleGetModelPosition(PeopleEntry* entry);
 /** Get model rotation. fn_8018FC08 */
 void peopleGetModelRotation(PeopleEntry* entry);
 
-/** Query script ref from a people entry's model. fn_8018F6F4 */
+/** Query script ref from a people entry's model. peopleInfoBiosGetPtr */
 void* peopleGetScriptRef(void* scriptObj);
 
 #endif /* GAME_PEOPLE_PEOPLE_H */

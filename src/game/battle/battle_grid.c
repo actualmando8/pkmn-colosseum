@@ -33,7 +33,7 @@
 void fn_801C3430(void);
 void fn_801C3A64(void);
 void fn_801C3B80(void);
-void fn_801C4164(s32 mode, void* callback, s32 flags, f32 a, f32 b);
+void fadeSetEX(s32 mode, void* callback, s32 flags, f32 a, f32 b);
 void fn_801C431C(s32 arg0);
 f32 fn_801C5F6C(void);
 
@@ -358,10 +358,10 @@ void fn_801C29C4(void* obj, f32 value) {
 }
 
 /**
- * fn_801C2A04 - Run pre-grid node callbacks.
+ * HSD_AObjInvokeCallBacks - Run pre-grid node callbacks.
  * Address: 0x801C2A04 | Size: 0x5C
  */
-void fn_801C2A04(void) {
+void HSD_AObjInvokeCallBacks(void) {
     extern s32 lbl_8047B390;
     extern s32 lbl_8047B38C;
     extern BattleGridCallbackNode* lbl_8047B388;
@@ -854,11 +854,11 @@ void* fn_801C4078(s32 slot) {
 #pragma peephole on
 
 /**
- * fn_801C409C - Trigger grid slot update callback.
+ * fadeEffectDokuStart - Trigger grid slot update callback.
  * Address: 0x801C409C | Size: 0x54
  */
 #pragma peephole off
-void fn_801C409C(void) {
+void fadeEffectDokuStart(void) {
     extern BattleGridTransitionState lbl_80466E30;
     extern const f32 lbl_8047DFB0;
     extern const f32 lbl_8047DFB4;
@@ -866,19 +866,19 @@ void fn_801C409C(void) {
     extern void fn_80166A28(s32 arg0);
 
     if (lbl_80466E30.mode == 0) {
-        fn_801C4164(9, (void*)fn_801C4814, 0, lbl_8047DFB0, lbl_8047DFB4);
+        fadeSetEX(9, (void*)fn_801C4814, 0, lbl_8047DFB0, lbl_8047DFB4);
         fn_80166A28(0x54);
     }
 }
 #pragma peephole on
 
 /**
- * fn_801C40F0 - Set grid rendering flag.
+ * fadeCheck - Set grid rendering flag.
  * Address: 0x801C40F0 | Size: 0x74
  * Referenced by battle_main.c as "battle grid set flag".
  */
 #pragma peephole off
-s32 fn_801C40F0(u8 flag) {
+s32 fadeCheck(u8 flag) {
     extern u8 lbl_80466E30[];
     u8* gridState;
 
@@ -896,20 +896,20 @@ s32 fn_801C40F0(u8 flag) {
 #pragma peephole on
 
 /**
- * fn_801C4164 - Schedule grid update callback with arguments.
+ * fadeSetEX - Schedule grid update callback with arguments.
  * Address: 0x801C4164 | Size: 0x64
  */
-void fn_801C4164(s32 mode, void* callback, s32 flags, f32 a, f32 b) {
+void fadeSetEX(s32 mode, void* callback, s32 flags, f32 a, f32 b) {
 }
 
 /**
- * fn_801C41C8 - Battle camera initialization.
+ * fadeSet - Battle camera initialization.
  * Address: 0x801C41C8 | Size: 0x74
  * Referenced by battle_main.c as "battle camera init".
  * Initializes the battle camera to the default overhead view
  * and configures the camera animation system.
  */
-void fn_801C41C8(s32 mode) {
+void fadeSet(s32 mode) {
     /* Initialize battle camera with specified mode */
 }
 
@@ -1015,11 +1015,11 @@ void fn_801C43F4(s32 seqType, f32 param1, f32 param2) {
 }
 
 /**
- * fn_801C47D0 - Camera get current mode.
+ * fadeInit - Camera get current mode.
  * Address: 0x801C47D0 | Size: 0x44
  */
 #pragma peephole off
-s32 fn_801C47D0(void) {
+s32 fadeInit(void) {
     extern BattleGridTransitionState lbl_80466E30;
     extern volatile const f32 lbl_8047DFB8;
     volatile BattleGridTransitionState* base = &lbl_80466E30;
@@ -1202,10 +1202,10 @@ void fn_801C48DC(s32 slot, f32 z) {
 #pragma scheduling on
 
 /**
- * fn_801C4904 - Grid set slot full position.
+ * fadeEffectHookFunction_yoko_or_tate_or_ball_Init - Grid set slot full position.
  * Address: 0x801C4904 | Size: 0x70
  */
-void fn_801C4904(s32 slot, f32 x, f32 y, f32 z) {
+void fadeEffectHookFunction_yoko_or_tate_or_ball_Init(s32 slot, f32 x, f32 y, f32 z) {
     /* Set full XYZ position for slot */
 }
 
@@ -1238,7 +1238,7 @@ f32 fn_801C4974(s32 slot) {
 #pragma scheduling on
 
 /**
- * fn_801C499C - Grid set slot rotation.
+ * fadeEffectHookFunction_yoko_or_tate_Init - Grid set slot rotation.
  * Address: 0x801C499C | Size: 0x58
  */
 #pragma scheduling off
@@ -1249,7 +1249,7 @@ f32 fn_801C4974(s32 slot) {
 #pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
-void fn_801C499C(s32 slot, f32 rotation) {
+void fadeEffectHookFunction_yoko_or_tate_Init(s32 slot, f32 rotation) {
     extern s32 fn_801C6908(s32);
     extern void fn_801C431C(s32);
     extern void fn_801C5F6C(void);

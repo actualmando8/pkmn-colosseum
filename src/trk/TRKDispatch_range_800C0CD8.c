@@ -1,7 +1,7 @@
 #include "dolphin/types.h"
 
-/* fn_800C0DA8 - 0x800C0DA8 | size 0xB8 | scope none (optimized memset-style fill) */
-void fn_800C0DA8(void* dest, int val, u32 count) {
+/* TRK_fill_mem_800D6430 - 0x800C0DA8 | size 0xB8 | scope none (optimized memset-style fill) */
+void TRK_fill_mem_800D6430(void* dest, int val, u32 count) {
     u8* dst;
     u32 v;
     u32* wp;

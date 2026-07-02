@@ -107,7 +107,7 @@ void fn_800BF14C(s32 bufIdx) {
  *
  * 0x800BF33C | size: 0x88
  */
-s32 fn_800BF33C(u8* str) {
+s32 usr_puts_serial(u8* str) {
     extern u32 fn_800C04F4(void);
     extern void fn_800C04E8(u32 state);
     extern void OSReport(const char* fmt);

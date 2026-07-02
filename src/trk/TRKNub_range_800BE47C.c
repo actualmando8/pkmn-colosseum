@@ -40,8 +40,8 @@ s32 MessageSend(u8* p) {
     return 0;
 }
 
-/* fn_800BEBB0 - 0x800BEBB0 | size 0x68 | scope none */
-s32 fn_800BEBB0(u8* buf, u8* src, s32 count) {
+/* TRKAppendBuffer_ui8 - 0x800BEBB0 | size 0x68 | scope none */
+s32 TRKAppendBuffer_ui8(u8* buf, u8* src, s32 count) {
     u8 b;
     s32 i = 0;
     s32 err = 0;
@@ -65,8 +65,8 @@ s32 fn_800BEBB0(u8* buf, u8* src, s32 count) {
     return err;
 }
 
-/* fn_800BEC18 - 0x800BEC18 | size 0xFC | scope none */
-s32 fn_800BEC18(u8* buf, u32 unused, u32 w0, u32 w1) {
+/* TRKAppendBuffer1_ui64 - 0x800BEC18 | size 0xFC | scope none */
+s32 TRKAppendBuffer1_ui64(u8* buf, u32 unused, u32 w0, u32 w1) {
     u8 swap[8];
     u8 raw[8];
     u8* src;
@@ -108,8 +108,8 @@ s32 fn_800BEC18(u8* buf, u32 unused, u32 w0, u32 w1) {
     return err;
 }
 
-/* fn_800BED14 - 0x800BED14 | size 0x8C | scope none */
-s32 fn_800BED14(TRKMessageBuffer* buf, u8* dst, u32 n) {
+/* TRKReadBuffer - 0x800BED14 | size 0x8C | scope none */
+s32 TRKReadBuffer(TRKMessageBuffer* buf, u8* dst, u32 n) {
     s32 err = 0;
     if (n == 0) {
         return 0;
@@ -128,8 +128,8 @@ s32 fn_800BED14(TRKMessageBuffer* buf, u8* dst, u32 n) {
     return err;
 }
 
-/* fn_800BEDA0 - 0x800BEDA0 | size 0xA4 | scope none */
-s32 fn_800BEDA0(TRKMessageBuffer* buf, u8* src, u32 n) {
+/* TRKAppendBuffer - 0x800BEDA0 | size 0xA4 | scope none */
+s32 TRKAppendBuffer(TRKMessageBuffer* buf, u8* src, u32 n) {
     s32 err = 0;
     if (n == 0) {
         return 0;

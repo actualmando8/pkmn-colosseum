@@ -216,7 +216,7 @@ void fn_800C39B0(u8 state) {
  *
  * 0x800C39BC | size: 0x84
  */
-u32 fn_800C39BC(u32 arg) {
+u32 __close_console(u32 arg) {
     extern s32 fn_800C04F4(void);
     extern u32 fn_800C2A00(u32 cmd, u32 param);
     s32 initOk;

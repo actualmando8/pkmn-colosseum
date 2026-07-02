@@ -11,8 +11,8 @@
  *
  * Matches: 0x800A8178 - 0x800AA430
  *   fn_800A8178 (0xF8) - DVDConvertPathToEntrynum (part 1)
- *   fn_800A8270 (0x8C) - __DVDConvertEntrynumToPath helper
- *   fn_800A82FC (0x70) - DVDGetCurrentDir
+ *   ShowMessage (0x8C) - __DVDConvertEntrynumToPath helper
+ *   DVDSetAutoFatalMessaging (0x70) - DVDGetCurrentDir
  *   fn_800A836C (0x30) - DVDChangeDir
  *   cb          (0xD8) - callback for __fstLoad
  *   __fstLoad   (0x168) - Load FST from disc
@@ -28,10 +28,10 @@
  *   fn_800A94AC (0x828) - DVDConvertPathToEntrynum (full)
  *   fn_800A9CD4 (0x394) - Additional path conversion
  *   fn_800AA068 (0x130) - CARD module stub or DVD state helper
- *   fn_800AA198 (0x6C)  - __DVDCheckDevice
+ *   VISetNextFrameBuffer (0x6C)  - __DVDCheckDevice
  *   fn_800AA204 (0x7C)  - __DVDCheckDisk
  *   fn_800AA280 (0x08)  - stub
- *   fn_800AA288 (0x68)  - __DVDGetCoverStatus
+ *   getCurrentFieldEvenOdd (0x68)  - __DVDGetCoverStatus
  *   fn_800AA2F0 (0xA8)  - __DVDPrepareReset
  *   fn_800AA398 (0x98)  - __DVDPrepareResetAsync
  */
@@ -335,12 +335,12 @@ void cb(s32 result, DVDCommandBlock* cmdBlock) {
     }
 }
 
-/* fn_800A7F80 - 0x800A7F80 | size: 0x60
+/* __DVDDequeueWaitingQueue - 0x800A7F80 | size: 0x60
  * Unlink a node from a doubly-linked list with interrupt protection.
  * node+0x00 = next, node+0x04 = prev.
  * Returns 1 if successfully unlinked, 0 if either link is NULL.
  */
-u32 fn_800A7F80(u8* node) {
+u32 __DVDDequeueWaitingQueue(u8* node) {
     BOOL enabled;
     u32 prev;
     u32 next;

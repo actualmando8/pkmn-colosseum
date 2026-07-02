@@ -37,11 +37,11 @@
 /* ===== GS Engine ===== */
 extern void  _threadSwitch(void);           /* GSthread yield */
 extern u32   fn_80102568(u32 a, u32 b, u32 c); /* scene load */
-extern s32   fn_8010264C(u32 a, u32 b);        /* scene query */
+extern s32   menuOpen(u32 a, u32 b);        /* scene query */
 extern s32   fn_801026A4(u32 sceneId, u32 a, u32 b, u32 c,
                          u32 d, u32 e, ...);
 extern u32   fn_801022B8(u32 a);                /* scene message get */
-extern void  fn_80109220(u32 obj, u8 visible);  /* model visibility */
+extern void  winSpriteSetDisp(u32 obj, u8 visible);  /* model visibility */
 extern void  fn_800FB680(u32 a, u32 b, s32 c, u32 d); /* sound trigger */
 extern void  fn_80132A38(u32 effectId, u32 param);
 
@@ -113,7 +113,7 @@ s32 fn_8004EADC(void) {
         }
 
         if (result == -2) {
-            if (fn_8010264C(0x44, 1) != 0) {
+            if (menuOpen(0x44, 1) != 0) {
                 fn_80102568(0x44, 0, 1);
             } else {
                 fn_80102568(0x44, 0, 1);
@@ -198,7 +198,7 @@ s32 fn_80050844(void) {
         }
 
         if (result == -2) {
-            if (fn_8010264C(0x44, 1) != 0) {
+            if (menuOpen(0x44, 1) != 0) {
                 fn_80102568(0x44, 0, 1);
                 continue;
             }

@@ -99,7 +99,7 @@ extern s32   fn_80102510(s32 slot);               /* Cancel active event */
 extern s32   fn_801026A4(s32 slot, ...);           /* Dispatch scene event */
 extern void  fn_80102568(s32 slot, s32 p1, s32 p2);  /* Event cleanup */
 extern s32   fn_801022B8(s32 slot);               /* Get event result code */
-extern s32   fn_8010264C(s32 slot, s32 p1);       /* Query event state */
+extern s32   menuOpen(s32 slot, s32 p1);       /* Query event state */
 extern void  fn_80102868(s32 slot, s32 p1, s32 p2);  /* Set event params */
 
 /* Resource management */
@@ -321,7 +321,7 @@ s32 GStask_LoadBattleMenu(void) {
 /* Accessor functions (0x80008390 - 0x80009178) follow a repeating pattern:
  *
  * fn_80008390 (size 0x6C) - Get party slot 0 species
- * fn_800083FC (size 0x64) - Get party slot 0 level
+ * _dbgMenuFightGetWazaDataIdSub (size 0x64) - Get party slot 0 level
  * fn_80008460 (size 0x60) - Get party slot 0 HP
  * fn_800084C0 (size 0x58) - Get party slot 0 status
  * fn_80008518 (size 0x64) - Get party slot 1 species
@@ -1724,7 +1724,7 @@ s32 fn_80007A4C(void) {
 /* fn_80007A84 - 0x80007A84 | size: 0xac | SYMBOL-NAME WALL 97.67%: bl dbgMenuFightWazaEditSub vs bl dbgMenuFightWazaEditSub (same addr) */
 extern void dbgMenuFightWazaEditSub(u16 id);
 extern u16 lbl_8047882A;
-extern void* fn_800083FC(u32 id);
+extern void* _dbgMenuFightGetWazaDataIdSub(u32 id);
 #if 0
 asm void fn_80007A84(void) {
 #include "src/game/gs_task_fn_80007A84.inc"
@@ -1740,7 +1740,7 @@ s32 fn_80007A84(void) {
     }
 
     for (;;) {
-        if (fn_8001E304(lbl_8047882A, &result, fn_800083FC) == 0) {
+        if (fn_8001E304(lbl_8047882A, &result, _dbgMenuFightGetWazaDataIdSub) == 0) {
             val = -1;
         } else {
             if (result >= 0x163) {
@@ -1824,7 +1824,7 @@ s32 fn_80007B30(void) {
             return -1;
         }
         if (evt == -2) {
-            if (fn_8010264C(0x44, 1) != 0) {
+            if (menuOpen(0x44, 1) != 0) {
                 fn_80102568(0x44, 0, 1);
                 continue;
             }
@@ -1936,7 +1936,7 @@ s32 fn_80007B30(void) {
                 sid = (s16)lbl_8047A282;
                 maxVal = 0x162;
                 for (;;) {
-                    if (fn_8001E304((u16)sid, &tmp, fn_800083FC) == 0) {
+                    if (fn_8001E304((u16)sid, &tmp, _dbgMenuFightGetWazaDataIdSub) == 0) {
                         sid = -1;
                     } else {
                         if (tmp >= 0x163) {
@@ -2136,16 +2136,16 @@ void* _dbgMenuFightGetFightTrainerAiAddsubValueDataIdSub(u32 id) {
 #pragma peephole on
 #endif
 
-/* fn_800083FC - 0x800083FC | size: 0x64 */
+/* _dbgMenuFightGetWazaDataIdSub - 0x800083FC | size: 0x64 */
 extern void* fn_8011BEB4(s32 a, u16 b, s32 c, s32 d);
 #if 0
-asm void fn_800083FC(void) {
+asm void _dbgMenuFightGetWazaDataIdSub(void) {
 #include "src/game/gs_task_fn_800083FC.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-void* fn_800083FC(u32 id) {
+void* _dbgMenuFightGetWazaDataIdSub(u32 id) {
     if (id == 0) return fn_800FA280(0xEB63);
     if (id >= 0x163) return fn_800FA280(0xEB63);
     return fn_800FA280((u32)fn_8011BEB4(0, (u16)id, 1, 0));

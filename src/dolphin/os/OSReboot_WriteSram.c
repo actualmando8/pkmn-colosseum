@@ -2,13 +2,13 @@
 #include "dolphin/types.h"
 
 extern BOOL fn_80098368(s32 chan, u8* buf, s32 len, s32 mode);
-extern void fn_800A064C(s32 chan, OSContext* context);
+extern void WriteSramCallback(s32 chan, OSContext* context);
 
 u32 WriteSram(u8* dst, u32 addr, u32 len) {
     u32 cmd;
     u32 err;
 
-    if (!EXILock(0, 1, fn_800A064C)) {
+    if (!EXILock(0, 1, WriteSramCallback)) {
         return 0;
     }
 

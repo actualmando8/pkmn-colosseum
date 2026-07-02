@@ -699,16 +699,16 @@ void HSD_LObjAddCurrentAll(HSD_LObj* lobj)
 #endif
 
 /* 0x801A4F54 | 0xE78 */
-extern void fn_800A37CC(void* mtx, void* src, void* dst);
+extern void PSMTXMultVec(void* mtx, void* src, void* dst);
 extern void fn_800BA414(void* light, f32 x, f32 y, f32 z);
 extern void fn_800BA198(void* light, f32 a0, f32 a1, f32 a2,
                         f32 k0, f32 k1, f32 k2);
 extern void fn_800BA440(void* light, u32* color);
 extern void fn_800A3A9C(void* a, void* b, void* dst);
-extern void fn_800A3ADC(void* src, void* dst);
-extern void fn_800A3820(void* mtx, void* src, void* dst);
+extern void PSVECNormalize(void* src, void* dst);
+extern void PSMTXMultVecSR(void* mtx, void* src, void* dst);
 extern void fn_800BA424(void* light, f32 x, f32 y, f32 z);
-extern void fn_800BA44C(void* light, u32 light_id);
+extern void GXLoadLightObjImm(void* light, u32 light_id);
 extern void jumptable_8036CAD0();
 extern void jumptable_8036CAAC();
 extern void jumptable_8036CA88();
@@ -752,7 +752,7 @@ asm void HSD_LObjSetup(void* setup) {
             LOBJ_ABS((vec).z) <= lbl_80478AC8) {                            \
             LOBJ_DEFAULT_DIR(vec);                                          \
         } else {                                                            \
-            fn_800A3ADC(&(vec), &(vec));                                    \
+            PSVECNormalize(&(vec), &(vec));                                    \
         }                                                                   \
     } while (0)
 
@@ -795,7 +795,7 @@ asm void HSD_LObjSetup(void* setup) {
                 if ((lobj)->position != NULL) {                             \
                     fn_80191688((lobj)->position, &(lobj)->lvec_x);         \
                 }                                                           \
-                fn_800A37CC((mtx), &(lobj)->lvec_x, &(lobj)->lvec_x);       \
+                PSMTXMultVec((mtx), &(lobj)->lvec_x, &(lobj)->lvec_x);       \
                 break;                                                      \
             case LOBJ_INFINITE: {                                           \
                 LObjVec lobj_dir;                                           \
@@ -804,8 +804,8 @@ asm void HSD_LObjSetup(void* setup) {
                 (lobj)->lvec_x = lobj_dir.x;                                \
                 (lobj)->lvec_y = lobj_dir.y;                                \
                 (lobj)->lvec_z = lobj_dir.z;                                \
-                fn_800A3820((mtx), &(lobj)->lvec_x, &(lobj)->lvec_x);       \
-                fn_800A3ADC(&(lobj)->lvec_x, &(lobj)->lvec_x);              \
+                PSMTXMultVecSR((mtx), &(lobj)->lvec_x, &(lobj)->lvec_x);       \
+                PSVECNormalize(&(lobj)->lvec_x, &(lobj)->lvec_x);              \
                 break;                                                      \
             }                                                               \
             default:                                                        \
@@ -844,7 +844,7 @@ asm void HSD_LObjSetup(void* setup) {
                         (lobj)->flags |= LOBJ_DIFF_DIRTY;                   \
                     }                                                       \
                     if ((lobj)->flags & LOBJ_DIFF_DIRTY) {                  \
-                        fn_800BA44C(LOBJ_LIGHTOBJ(lobj), (lobj)->id);       \
+                        GXLoadLightObjImm(LOBJ_LIGHTOBJ(lobj), (lobj)->id);       \
                         (lobj)->flags &= (u16) ~LOBJ_DIFF_DIRTY;            \
                     }                                                       \
                 }                                                           \
@@ -860,7 +860,7 @@ asm void HSD_LObjSetup(void* setup) {
                         (lobj)->flags |= LOBJ_SPEC_DIRTY;                   \
                     }                                                       \
                     if ((lobj)->flags & LOBJ_SPEC_DIRTY) {                  \
-                        fn_800BA44C(LOBJ_SPEC_LIGHTOBJ(lobj),               \
+                        GXLoadLightObjImm(LOBJ_SPEC_LIGHTOBJ(lobj),               \
                                     (lobj)->spec_id);                       \
                         (lobj)->flags &= (u16) ~LOBJ_SPEC_DIRTY;            \
                     }                                                       \
@@ -933,7 +933,7 @@ void HSD_LObjSetup(void* setup)
                     pos.x *= lbl_8047DBE0;
                     pos.y *= lbl_8047DBE0;
                     pos.z *= lbl_8047DBE0;
-                    fn_800A37CC(view_mtx, &pos, &pos);
+                    PSMTXMultVec(view_mtx, &pos, &pos);
                     if (lobj->flags & LOBJ_DIFFUSE) {
                         fn_800BA414(LOBJ_LIGHTOBJ(lobj), pos.x, pos.y, pos.z);
                         fn_800BA198(LOBJ_LIGHTOBJ(lobj), lbl_8047DBE4,
@@ -953,7 +953,7 @@ void HSD_LObjSetup(void* setup)
                     if (lobj->position != NULL) {
                         fn_80191688(lobj->position, &pos);
                     }
-                    fn_800A37CC(view_mtx, &pos, &pos);
+                    PSMTXMultVec(view_mtx, &pos, &pos);
                     fn_800BA414(LOBJ_LIGHTOBJ(lobj), pos.x, pos.y, pos.z);
                     fn_800BA414(LOBJ_SPEC_LIGHTOBJ(lobj), pos.x, pos.y,
                                 pos.z);
@@ -979,10 +979,10 @@ void HSD_LObjSetup(void* setup)
                     if (lobj->position != NULL) {
                         fn_80191688(lobj->position, &pos);
                     }
-                    fn_800A37CC(view_mtx, &pos, &pos);
+                    PSMTXMultVec(view_mtx, &pos, &pos);
                     LOBJ_LOAD_LIGHT_VECTOR(lobj, dir);
-                    fn_800A3820(view_mtx, &dir, &dir);
-                    fn_800A3ADC(&dir, &dir);
+                    PSMTXMultVecSR(view_mtx, &dir, &dir);
+                    PSVECNormalize(&dir, &dir);
                     fn_800BA414(LOBJ_LIGHTOBJ(lobj), pos.x, pos.y, pos.z);
                     fn_800BA414(LOBJ_SPEC_LIGHTOBJ(lobj), pos.x, pos.y,
                                 pos.z);
@@ -1139,7 +1139,7 @@ void HSD_LObjGetLightVector(HSD_LObj* lobj, f32* out)
             __fabs(out[2]) <= *(volatile f32*)&lbl_80478AC8) {
             invalid = -1;
         } else {
-            fn_800A3ADC(out, out);
+            PSVECNormalize(out, out);
             invalid = 0;
         }
 

@@ -304,7 +304,7 @@ typedef struct TypeMatchup {
 /* fn_801C2670 */ void fn_801C2670(void* ctx, s32 objType, s32 param);
 /* fn_801C27F4 */ void fn_801C27F4(void* ctx, f32 posX, f32 posZ);
 /* fn_801C29C4 */ void fn_801C29C4(void* obj, f32 value);
-/* fn_801C2A04 */ void fn_801C2A04(void);
+/* HSD_AObjInvokeCallBacks */ void HSD_AObjInvokeCallBacks(void);
 /* fn_801C2A60 */ s32  fn_801C2A60(void);
 /* fn_801C2A74 */ s32  fn_801C2A74(s32 slot);
 /* fn_801C2A90 */ s32  fn_801C2A90(s32 slot);
@@ -338,25 +338,25 @@ typedef struct TypeMatchup {
 /* fn_801C3F10 */ void fn_801C3F10(void* model);                 /* battleGridReplaceTrainer */
 /* fn_801C3FBC */ void fn_801C3FBC(u8* slot, u8 arg1, u8 arg2);
 /* fn_801C4078 */ void* fn_801C4078(s32 slot);
-/* fn_801C409C */ void fn_801C409C(void);
-/* fn_801C40F0 */ void fn_801C40F0(s32 flag);                    /* grid set rendering flag */
-/* fn_801C4164 */ void fn_801C4164(s32 mode, void* callback, s32 flags, f32 a, f32 b);
-/* fn_801C41C8 */ void fn_801C41C8(s32 mode);                    /* battle camera init */
+/* fadeEffectDokuStart */ void fadeEffectDokuStart(void);
+/* fadeCheck */ void fadeCheck(s32 flag);                    /* grid set rendering flag */
+/* fadeSetEX */ void fadeSetEX(s32 mode, void* callback, s32 flags, f32 a, f32 b);
+/* fadeSet */ void fadeSet(s32 mode);                    /* battle camera init */
 /* fn_801C423C */ void* fn_801C423C(void (*callback)(void), u8 mode, u32 arg, f32 value);
 /* fn_801C431C */ void fn_801C431C(s32 arg0);
 /* fn_801C432C */ void fn_801C432C(f32 angle, f32 blend);
 /* fn_801C43E4 */ void* fn_801C43E4(void);
 /* fn_801C43F4 */ void fn_801C43F4(s32 seqType, f32 param1, f32 param2); /* 0x3DC */
-/* fn_801C47D0 */ s32  fn_801C47D0(void);
+/* fadeInit */ s32  fadeInit(void);
 /* fn_801C4814 */ f32  fn_801C4814(s32 slot);
 /* fn_801C483C */ f32  fn_801C483C(s32 slot);
 /* fn_801C4864 */ f32  fn_801C4864(s32 slot);
 /* fn_801C488C */ void fn_801C488C(s32 slot, f32 x);
 /* fn_801C48B4 */ void fn_801C48B4(s32 slot, f32 y);
 /* fn_801C48DC */ void fn_801C48DC(s32 slot, f32 z);
-/* fn_801C4904 */ void fn_801C4904(s32 slot, f32 x, f32 y, f32 z);
+/* fadeEffectHookFunction_yoko_or_tate_or_ball_Init */ void fadeEffectHookFunction_yoko_or_tate_or_ball_Init(s32 slot, f32 x, f32 y, f32 z);
 /* fn_801C4974 */ f32  fn_801C4974(s32 slot);
-/* fn_801C499C */ void fn_801C499C(s32 slot, f32 rotation);
+/* fadeEffectHookFunction_yoko_or_tate_Init */ void fadeEffectHookFunction_yoko_or_tate_Init(s32 slot, f32 rotation);
 /* fn_801C49F4 */ f32  fn_801C49F4(s32 slot);
 /* fn_801C4A1C */ void fn_801C4A1C(s32 slot, f32 scale);
 /* fn_801C4A44 */ void fn_801C4A44(s32 slot, f32 x, f32 y, f32 z, f32 rot, f32 scale);
@@ -387,7 +387,7 @@ typedef struct TypeMatchup {
 /* fn_801C673C */ void fn_801C673C(void);
 /* fn_801C6760 */ void fn_801C6760(f32 intensity, f32 duration);
 /* fn_801C680C */ void fn_801C680C(s32 arg0);
-/* fn_801C68D4 */ u8   fn_801C68D4(void);
+/* _fadeEffect_AdjustParms__Fv */ u8   _fadeEffect_AdjustParms__Fv(void);
 /* fn_801C6908 */ void fn_801C6908(void);
 /* fn_801C6928 */ u8   fn_801C6928(void);
 
@@ -395,9 +395,9 @@ typedef struct TypeMatchup {
 /* fn_801C6934 */ void fn_801C6934(void* stageModel, f32 scale);
 /* fn_801C6AE8 */ void fn_801C6AE8(s32 row, s32 col, u8 type);
 /* fn_801C6D78 */ void fn_801C6D78(s32 slot, f32 x, f32 y, f32 z);
-/* fn_801C6E90 */ void* fn_801C6E90(s32 slot);
+/* _fadeFluidSetShockSub__FUlUlf */ void* _fadeFluidSetShockSub__FUlUlf(s32 slot);
 /* fn_801C6EE4 */ void fn_801C6EE4(s32 slot, void* modelData);
-/* fn_801C7090 */ s32  fn_801C7090(void);
+/* fadeFluidCalcParms */ s32  fadeFluidCalcParms(void);
 /* fn_801C70FC */ void fn_801C70FC(s32 slot, u8 visible);
 /* fadeFluidInit */ void fadeFluidInit(void);                        /* updateAnimations 0x43C */
 /* fn_801C75EC */ void fn_801C75EC(s32 slot);
@@ -406,7 +406,7 @@ typedef struct TypeMatchup {
 
 /* Pokemon model placement & animation */
 /* fn_801C7730 */ s32  fn_801C7730(s32 side, s32 slot);          /* PlacePokemon 0xDCC */
-/* fn_801C84FC */ s32  fn_801C84FC(s32 slot);
+/* _fnDistanceSortFunc__FPCvPCv */ s32  _fnDistanceSortFunc__FPCvPCv(s32 slot);
 /* fn_801C852C */ f32  fn_801C852C(s32 species);
 /* fn_801C8628 */ void fn_801C8628(s32 slot);
 /* fn_801C8688 */ void fn_801C8688(s32 slot, s32 animIdx);
@@ -471,7 +471,7 @@ typedef struct TypeMatchup {
 /* fn_801DAC90 */ void fn_801DAC90(void);                        /* waza system cleanup */
 /* fn_801DADC0 */ void fn_801DADC0(void);                        /* waza partial reset */
 /* fn_801DAEF8 */ void fn_801DAEF8(s32 count);                   /* waza system init */
-/* fn_801DB060 */ BOOL fn_801DB060(void);                        /* waza get initialized */
+/* wazaSequenceSysGetResID */ BOOL wazaSequenceSysGetResID(void);                        /* waza get initialized */
 /* fn_801DB088 */ void fn_801DB088(void);                        /* waza system reset */
 
 /* Waza extended functions */

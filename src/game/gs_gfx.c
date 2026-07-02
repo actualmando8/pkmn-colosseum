@@ -39,7 +39,7 @@ extern void GXCopyDisp(void* dest, u8 clear);
 
 /* ===== External SDK / engine functions ===== */
 extern void  fn_800DD970(const char* fmt, ...);        /* OSReport */
-extern u16   GSmemAllocRaw(u32 size);                  /* fn_800E3534 */
+extern u16   GSmemAllocRaw(u32 size);                  /* _toolentryAlloc__FUl */
 extern void* GSmemGetPtr(u16 handle);                  /* fn_800E27B0 */
 extern void  fn_800E0790(void);                        /* GSmem stats/check */
 extern void  fn_800EEC38(u32 slot, void* callback);    /* VI register retrace cb */
@@ -68,7 +68,7 @@ extern void  fn_800DA028(u32 a);                       /* GSgfx configure TEV mo
 extern void  fn_800D9F40(u32 a);                       /* GSgfx configure fog */
 
 /* Internal callbacks */
-extern void  fn_800D3E4C(void);   /* VBlank retrace callback */
+extern void  _gfxScratchNotify__F15GSscratchNotifyPvUc(void);   /* VBlank retrace callback */
 extern void  fn_800D3F5C(void);   /* Frame-end callback */
 extern void  fn_800D3F50(void);   /* Draw-done callback */
 extern void  fn_800D3EC4(void);   /* Pre-retrace callback */
@@ -250,7 +250,7 @@ void GSgfxSetVideoMode(u32 mode, u32 tvFormat, u32 field0,
  *  Assembly sequence (heavily abbreviated):
  *
  *  1. fn_800E0790()                    -- GSmem stats snapshot
- *  2. fn_800EEC38(3, fn_800D3E4C)      -- register VBlank retrace cb slot 3
+ *  2. fn_800EEC38(3, _gfxScratchNotify__F15GSscratchNotifyPvUc)      -- register VBlank retrace cb slot 3
  *  3. if (state already exists) goto skip_alloc
  *     handle = GSmemAllocRaw(0x5A0)    -- allocate state struct
  *     if (handle == 0):
@@ -320,7 +320,7 @@ void GSgfxInit(u32 memSize, u32 fifoSize, u32 mtxDepth,
     fn_800E0790();
 
     /* Step 2: Register VBlank retrace callback in slot 3 */
-    fn_800EEC38(3, (void*)fn_800D3E4C);
+    fn_800EEC38(3, (void*)_gfxScratchNotify__F15GSscratchNotifyPvUc);
 
     /* Step 3: Allocate or reuse the 0x5A0-byte state structure */
     if (gsGfxState == NULL) {
@@ -491,7 +491,7 @@ void fn_800D30A0(u32 val) {
     *(u32*)((u8*)lbl_8047AA80 + 0x48) = val;
 }
 extern void fn_800D4F98(s32 arg0, ...);
-extern void fn_800B8920(void);
+extern void GXFlush(void);
 extern u32 lbl_8047AA80;
 #if 0
 asm void fn_800D30AC(void) {
@@ -504,11 +504,11 @@ void fn_800D30AC(void) {
     if (*(s32*)(state + 0x0) == 1) {
         fn_800D4F98(4, 0);
     } else {
-        fn_800B8920();
+        GXFlush();
     }
 }
 #endif
-extern void fn_800B8D10(void);
+extern void GXSetDrawDone(void);
 extern void fn_800A1990(void);
 extern void fn_8019C6FC(void);
 extern void fn_800DC560(void);
@@ -551,8 +551,8 @@ void fn_800D3190(void) {
     }
 
     lbl_8047AA91 = 0;
-    fn_800B8920();
-    fn_800B8D10();
+    GXFlush();
+    GXSetDrawDone();
     startTick = OSGetTick();
     r31ptr = (u32*)0x80000000;
     r30 = 1;

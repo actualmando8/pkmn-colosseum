@@ -377,7 +377,7 @@ u16 GScolsys2_CalcGroupResult(u16 targetType, u16* typeArray, u16 arrayCount);
  * @param p2      Pointer to Vec3f edge point 2.
  * @return        Dot product result (f32).
  *
- * Corresponds to fn_8010C77C.
+ * Corresponds to GScolsy2UtilGetSidePlanePoint.
  */
 f32 GScolsys2_DotPlaneEdge(Vec3f* normal, Vec3f* p1, Vec3f* p2);
 
@@ -452,7 +452,7 @@ void* GScolsys2_GetWZXData(void);
  *
  * @return  Pointer to the active layer data, or NULL if no valid layer.
  *
- * Corresponds to fn_8010CBD0.
+ * Corresponds to GScolsys2GetCurFloor.
  */
 void* GScolsys2_GetActiveLayerPtr(void);
 
@@ -462,7 +462,7 @@ void* GScolsys2_GetActiveLayerPtr(void);
  * Clears the WZX data pointer and frees the cached debug display list
  * if one exists.
  *
- * Corresponds to fn_8010CC04.
+ * Corresponds to GScolsys2UnloadCCD.
  */
 void GScolsys2_Reset(void);
 

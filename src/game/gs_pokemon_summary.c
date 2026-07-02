@@ -78,7 +78,7 @@
 
 /* Pokemon data access */
 extern void* fn_80129BC8();
-extern void* fn_801297D8();
+extern void* heroHizukiItemGetItemAryPtr();
 extern u8    fn_801429E8(void* fieldData);    /* Check field validity */
 extern u16   fn_80143C50(void* fieldData);    /* Get field value */
 extern u16   fn_801440A0(u16 speciesId);      /* Get species data */
@@ -185,14 +185,14 @@ typedef s32 (*SummaryMenuCallback)(s32, s32, s32*);
 
 extern u32 fn_80143C68(void*);
 extern u32 fn_80144088(void);
-extern u32 fn_80143E60(u16);
-extern u32 fn_80143F24(void);
-extern u32 fn_80143E88(u32);
-extern u32 fn_80143EF0(u32);
+extern u32 itemDataBiosGetKinomiNo(u16);
+extern u32 itemDataBiosGetWazaMachineNo(void);
+extern u32 itemDataBiosGetHidenMachineNo(u32);
+extern u32 itemDataBiosGetWazaIDByWazaMachineNo(u32);
 extern u32 fn_80143F84(void);
 extern u32 fn_80143F9C(void);
 extern u32 fn_80143DCC(void);
-extern u32 fn_8011CA34(u16);
+extern u32 wazaDataBiosGetPtr(u16);
 extern u32 fn_8011CA1C(u32);
 extern u8* fn_80105624(void);
 extern void fn_80103EAC(u32, u16*);
@@ -273,7 +273,7 @@ s32 fn_800150E4(s32 x, s32 pageIndex, u16* packedRange) {
     if (dataSource >= 0) {
         list = fn_80129BC8((void*)lbl_8047A2F8, (u8)dataSource, &count, 0, 0, 0);
     } else {
-        list = fn_801297D8((void*)lbl_8047A2F8, &count, 0, 0, 0);
+        list = heroHizukiItemGetItemAryPtr((void*)lbl_8047A2F8, &count, 0, 0, 0);
     }
 
     validCount = 0;
@@ -316,7 +316,7 @@ s32 fn_800150E4(s32 x, s32 pageIndex, u16* packedRange) {
             if (dataSource >= 0) {
                 field = fn_80129BC8((void*)lbl_8047A2F8, (u8)dataSource, &itemCount, 0, 0, 0);
             } else {
-                field = fn_801297D8((void*)lbl_8047A2F8, &itemCount, 0, 0, 0);
+                field = heroHizukiItemGetItemAryPtr((void*)lbl_8047A2F8, &itemCount, 0, 0, 0);
             }
 
             value = 0;
@@ -384,7 +384,7 @@ s32 fn_80015374(s32 x, s32 pageIndex, u16* packedRange) {
     if (dataSource >= 0) {
         list = fn_80129BC8((void*)lbl_8047A2F8, (u8)dataSource, &count, 0, 0, 0);
     } else {
-        list = fn_801297D8((void*)lbl_8047A2F8, &count, 0, 0, 0);
+        list = heroHizukiItemGetItemAryPtr((void*)lbl_8047A2F8, &count, 0, 0, 0);
     }
 
     validCount = 0;
@@ -418,7 +418,7 @@ s32 fn_80015374(s32 x, s32 pageIndex, u16* packedRange) {
             if (dataSource >= 0) {
                 field = fn_80129BC8((void*)lbl_8047A2F8, (u8)dataSource, &itemCount, 0, 0, 0);
             } else {
-                field = fn_801297D8((void*)lbl_8047A2F8, &itemCount, 0, 0, 0);
+                field = heroHizukiItemGetItemAryPtr((void*)lbl_8047A2F8, &itemCount, 0, 0, 0);
             }
 
             value = 0;
@@ -492,7 +492,7 @@ s32 fn_800155B0(s32 x, s32 pageIndex, u16* packedRange) {
     if (dataSource >= 0) {
         list = fn_80129BC8((void*)lbl_8047A2F8, (u8)dataSource, &count, 0, 0, 0);
     } else {
-        list = fn_801297D8((void*)lbl_8047A2F8, &count, 0, 0, 0);
+        list = heroHizukiItemGetItemAryPtr((void*)lbl_8047A2F8, &count, 0, 0, 0);
     }
 
     validCount = 0;
@@ -529,7 +529,7 @@ s32 fn_800155B0(s32 x, s32 pageIndex, u16* packedRange) {
             if (dataSource >= 0) {
                 field = fn_80129BC8((void*)lbl_8047A2F8, (u8)dataSource, &itemCount, 0, 0, 0);
             } else {
-                field = fn_801297D8((void*)lbl_8047A2F8, &itemCount, 0, 0, 0);
+                field = heroHizukiItemGetItemAryPtr((void*)lbl_8047A2F8, &itemCount, 0, 0, 0);
             }
 
             species = 0;
@@ -544,7 +544,7 @@ s32 fn_800155B0(s32 x, s32 pageIndex, u16* packedRange) {
                 field = (u8*)field + 4;
             }
 
-            level = (u8)(fn_80143E60((u16)species) + 1);
+            level = (u8)(itemDataBiosGetKinomiNo((u16)species) + 1);
             if (level < 10) {
                 fn_80132A38(0x34, 0);
                 fn_800FB680(textX, y, -1, 0xCA);
@@ -566,7 +566,7 @@ s32 fn_800155B0(s32 x, s32 pageIndex, u16* packedRange) {
             if (dataSource >= 0) {
                 field = fn_80129BC8((void*)lbl_8047A2F8, (u8)dataSource, &itemCount, 0, 0, 0);
             } else {
-                field = fn_801297D8((void*)lbl_8047A2F8, &itemCount, 0, 0, 0);
+                field = heroHizukiItemGetItemAryPtr((void*)lbl_8047A2F8, &itemCount, 0, 0, 0);
             }
             value = 0;
             listIndex = -1;
@@ -637,7 +637,7 @@ s32 fn_800159BC(s32 x, s32 pageIndex, u16* packedRange) {
     if (dataSource >= 0) {
         list = fn_80129BC8((void*)lbl_8047A2F8, (u8)dataSource, &count, 0, 0, 0);
     } else {
-        list = fn_801297D8((void*)lbl_8047A2F8, &count, 0, 0, 0);
+        list = heroHizukiItemGetItemAryPtr((void*)lbl_8047A2F8, &count, 0, 0, 0);
     }
 
     validCount = 0;
@@ -671,7 +671,7 @@ s32 fn_800159BC(s32 x, s32 pageIndex, u16* packedRange) {
             if (dataSource >= 0) {
                 field = fn_80129BC8((void*)lbl_8047A2F8, (u8)dataSource, &itemCount, 0, 0, 0);
             } else {
-                field = fn_801297D8((void*)lbl_8047A2F8, &itemCount, 0, 0, 0);
+                field = heroHizukiItemGetItemAryPtr((void*)lbl_8047A2F8, &itemCount, 0, 0, 0);
             }
             species = 0;
             listIndex = -1;
@@ -686,8 +686,8 @@ s32 fn_800159BC(s32 x, s32 pageIndex, u16* packedRange) {
             }
 
             speciesData = fn_801440A0((u16)species);
-            rank = (u8)fn_80143F24();
-            subRank = (u8)fn_80143E88(speciesData);
+            rank = (u8)itemDataBiosGetWazaMachineNo();
+            subRank = (u8)itemDataBiosGetHidenMachineNo(speciesData);
             messageId = (subRank != 0xFF) ? 0x2B00 : 0x2AFF;
 
             fn_800FB680(x, y, -1, messageId);
@@ -707,7 +707,7 @@ s32 fn_800159BC(s32 x, s32 pageIndex, u16* packedRange) {
                 textX += (s32)(u16)(fn_800FA444(0xCA) >> 16);
             }
 
-            messageId = fn_8011CA1C(fn_8011CA34((u16)fn_80143EF0(rank)));
+            messageId = fn_8011CA1C(wazaDataBiosGetPtr((u16)itemDataBiosGetWazaIDByWazaMachineNo(rank)));
             fn_800FB680(textX + 9, y, -1, messageId);
 
             dataSource = SUMMARY_ENTRY_FIELD(entry);
@@ -719,7 +719,7 @@ s32 fn_800159BC(s32 x, s32 pageIndex, u16* packedRange) {
             if (dataSource >= 0) {
                 field = fn_80129BC8((void*)lbl_8047A2F8, (u8)dataSource, &itemCount, 0, 0, 0);
             } else {
-                field = fn_801297D8((void*)lbl_8047A2F8, &itemCount, 0, 0, 0);
+                field = heroHizukiItemGetItemAryPtr((void*)lbl_8047A2F8, &itemCount, 0, 0, 0);
             }
             value = 0;
             listIndex = -1;
@@ -786,7 +786,7 @@ s32 fn_80015E3C(s32 x, s32 pageIndex, u16* packedRange) {
     if (dataSource >= 0) {
         list = fn_80129BC8((void*)lbl_8047A2F8, (u8)dataSource, &count, 0, 0, 0);
     } else {
-        list = fn_801297D8((void*)lbl_8047A2F8, &count, 0, 0, 0);
+        list = heroHizukiItemGetItemAryPtr((void*)lbl_8047A2F8, &count, 0, 0, 0);
     }
 
     validCount = 0;
@@ -820,7 +820,7 @@ s32 fn_80015E3C(s32 x, s32 pageIndex, u16* packedRange) {
             if (dataSource >= 0) {
                 field = fn_80129BC8((void*)lbl_8047A2F8, (u8)dataSource, &itemCount, 0, 0, 0);
             } else {
-                field = fn_801297D8((void*)lbl_8047A2F8, &itemCount, 0, 0, 0);
+                field = heroHizukiItemGetItemAryPtr((void*)lbl_8047A2F8, &itemCount, 0, 0, 0);
             }
             value = 0;
             listIndex = -1;
@@ -848,7 +848,7 @@ s32 fn_80015E3C(s32 x, s32 pageIndex, u16* packedRange) {
             if (dataSource >= 0) {
                 field = fn_80129BC8((void*)lbl_8047A2F8, (u8)dataSource, &itemCount, 0, 0, 0);
             } else {
-                field = fn_801297D8((void*)lbl_8047A2F8, &itemCount, 0, 0, 0);
+                field = heroHizukiItemGetItemAryPtr((void*)lbl_8047A2F8, &itemCount, 0, 0, 0);
             }
             value = 0;
             listIndex = -1;
@@ -1034,7 +1034,7 @@ s32 fn_800164D0(u8* ctx, u8* item) {
     if (dataSource >= 0) {
         list = fn_80129BC8((void*)lbl_8047A2F8, (u8)dataSource, &count, 0, 0, 0);
     } else {
-        list = fn_801297D8((void*)lbl_8047A2F8, &count, 0, 0, 0);
+        list = heroHizukiItemGetItemAryPtr((void*)lbl_8047A2F8, &count, 0, 0, 0);
     }
 
     validCount = 0;
@@ -1422,7 +1422,7 @@ s32 fn_80017028(u8* ctx) {
     if (dataSource >= 0) {
         list = fn_80129BC8((void*)lbl_8047A2F8, (u8)dataSource, &count, 0, 0, 0);
     } else {
-        list = fn_801297D8((void*)lbl_8047A2F8, &count, 0, 0, 0);
+        list = heroHizukiItemGetItemAryPtr((void*)lbl_8047A2F8, &count, 0, 0, 0);
     }
 
     validCount = 0;
@@ -1562,7 +1562,7 @@ s32 fn_80017028(u8* ctx) {
         if (dataSource >= 0) {
             list = fn_80129BC8((void*)lbl_8047A2F8, (u8)dataSource, &count, 0, 0, 0);
         } else {
-            list = fn_801297D8((void*)lbl_8047A2F8, &count, 0, 0, 0);
+            list = heroHizukiItemGetItemAryPtr((void*)lbl_8047A2F8, &count, 0, 0, 0);
         }
         field = list;
         visibleIndex = -1;
@@ -1591,14 +1591,14 @@ s32 fn_80017028(u8* ctx) {
 #endif
 
 /* fn_80017764 - 0x80017764 | size: 0x2c */
-extern void fn_80102ED4(void);
+extern void menuButtonNormal(void);
 extern u32 lbl_8047A2E8;
 extern u32 lbl_8047A2E8;
-extern void fn_80102ED4(void);
+extern void menuButtonNormal(void);
 
 void fn_80017764(void) {
     if ((s32)lbl_8047A2E8 < 0) {
-        fn_80102ED4();
+        menuButtonNormal();
     }
 }
 
@@ -1762,7 +1762,7 @@ s32 fn_80017A0C(u8* ctx) {
             if (dataSource >= 0) {
                 list = fn_80129BC8((void*)lbl_8047A2F8, (u8)dataSource, &count, 0, 0, 0);
             } else {
-                list = fn_801297D8((void*)lbl_8047A2F8, &count, 0, 0, 0);
+                list = heroHizukiItemGetItemAryPtr((void*)lbl_8047A2F8, &count, 0, 0, 0);
             }
 
             field = list;
@@ -1870,7 +1870,7 @@ s32 fn_80017CB8(u8* outEntries, s32 maxEntries, s32 pageIndex, s32 selectedIndex
     if (dataSource >= 0) {
         list = fn_80129BC8((void*)lbl_8047A2F8, (u8)dataSource, &count, 0, 0, 0);
     } else {
-        list = fn_801297D8((void*)lbl_8047A2F8, &count, 0, 0, 0);
+        list = heroHizukiItemGetItemAryPtr((void*)lbl_8047A2F8, &count, 0, 0, 0);
     }
 
     field = list;
@@ -1964,7 +1964,7 @@ s32 fn_80017E8C(s32 pageIndex, u16 species, s16 slotIndex) {
         if (dataSource >= 0) {
             list = fn_80129BC8((void*)lbl_8047A2F8, (u8)dataSource, &count, 0, 0, 0);
         } else {
-            list = fn_801297D8((void*)lbl_8047A2F8, &count, 0, 0, 0);
+            list = heroHizukiItemGetItemAryPtr((void*)lbl_8047A2F8, &count, 0, 0, 0);
         }
 
         field = list;

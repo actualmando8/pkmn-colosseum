@@ -239,7 +239,7 @@ u16 GStextureGetWidth(GStextureHandle* tex);
  *
  * @param tex  Texture handle.
  *
- * Corresponds to fn_800EF504.
+ * Corresponds to GStextureUnlockImage.
  */
 void GStextureFlush(GStextureHandle* tex);
 
@@ -252,7 +252,7 @@ void GStextureFlush(GStextureHandle* tex);
  *
  * Increments the reference count on the texture.
  *
- * Corresponds to fn_800EF548.
+ * Corresponds to GStextureLockImage.
  */
 void* GStextureGetMipData(GStextureHandle* tex, u8 level);
 

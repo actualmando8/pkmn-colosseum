@@ -304,10 +304,10 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx);  /* fn_8016
  * ====================================================================== */
 
 /** Read a u16 value from the bytecode stream and advance the pointer. */
-void psReadU16(u8** streamPtr, u16* outValue);    /* fn_801735BC */
+void psReadU16(u8** streamPtr, u16* outValue);    /* getTime */
 
 /** Read a float value from the bytecode stream and advance the pointer. */
-u8* psReadFloat(u8* streamPtr, f32* outValue);    /* fn_801735EC */
+u8* psReadFloat(u8* streamPtr, f32* outValue);    /* getFloat */
 
 /** Spawn a new particle script by ID.
  *  Creates a new particle and starts executing the given script. */
@@ -359,7 +359,7 @@ void psGeneratorInit(PSParticle* gen, void* owner);   /* fn_80172930 */
 f32 psRandom(void);                              /* fn_801ADC7C */
 
 /** Clamp a color byte with random variation. */
-u8 psClampColorByte(u8 current);                  /* fn_801728B0 */
+u8 psClampColorByte(u8 current);                  /* U8ClampAdd */
 
 /** Update matrices for a people/NPC object. */
 void psPeopleUpdateMatrices(void* people);        /* genPosUpdate */

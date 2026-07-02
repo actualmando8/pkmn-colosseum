@@ -61,7 +61,7 @@
  *   fn_8000C358  GSparty_GetExperience        -- get current EXP
  *   fn_8000C3A4  GSparty_GetExpToNext         -- get EXP to next level
  *   fn_8000C3D4  GSparty_GetMoveData          -- 0xCC bytes, get all move data
- *   fn_8000C4A0  GSparty_SetMove              -- set move at index
+ *   dbgMenuMsgCheck  GSparty_SetMove              -- set move at index
  *   fn_8000C518  GSparty_GetMovePP            -- get PP for move N
  *   fn_8000C588  GSparty_GetMovePPMax         -- get max PP for move N
  *   fn_8000C624  GSparty_GetHeldItem          -- get held item ID
@@ -85,10 +85,10 @@
  *   fn_8000CCF8  GSparty_GetEncryptionKey     -- get encryption key
  *   fn_8000CD20  GSparty_GetFormData          -- get form/cosmetic data
  *   fn_8000CD50  GSparty_GetStatusFull        -- 0xC8 bytes, get full status struct
- *   fn_8000CE18  GSparty_CureStatus           -- cure status condition
+ *   dbgMenuMenuTestEvolution  GSparty_CureStatus           -- cure status condition
  *   fn_8000CE5C  GSparty_ApplyDamage          -- apply damage to HP
  *   fn_8000CED0  GSparty_IsAlive              -- check if HP > 0
- *   fn_8000CEF8  GSparty_FullHeal             -- restore HP to max
+ *   dbgMenuMenuTestPokemonMenu  GSparty_FullHeal             -- restore HP to max
  *   fn_8000CF68  GSparty_GetBattleStats       -- 0xF4 bytes, get computed battle stats
  *   fn_8000D05C  GSparty_CalcStatModifiers    -- 0xC0 bytes, apply stat stage modifiers
  *   fn_8000D11C  GSparty_GetCritRate          -- get critical hit rate
@@ -148,8 +148,8 @@ u32 fn_8000C320(void) { return 0; }
 /* ===== Phase 2 recovery stubs ===== */
 
 /* fn_8000BAB8 - 0x8000BAB8 | size: 0x48 */
-extern s32 fn_8010264C(u32 a, u32 b);
-extern void fn_801293FC(u32 a, s32 b);
+extern s32 menuOpen(u32 a, u32 b);
+extern void heroAddPokecoupon(u32 a, s32 b);
 #if 0
 asm void fn_8000BAB8(void) {
 #include "src/game/gs_party_access_fn_8000BAB8.inc"
@@ -157,16 +157,16 @@ asm void fn_8000BAB8(void) {
 #else
 #pragma peephole off
 u32 fn_8000BAB8(void) {
-    s32 val = fn_8010264C(2, 1);
+    s32 val = menuOpen(2, 1);
     if (val == -1) { return 0; }
-    fn_801293FC(0, val);
+    heroAddPokecoupon(0, val);
     return 0;
 }
 #pragma peephole on
 #endif
 
 /* fn_8000BB00 - 0x8000BB00 | size: 0x48 */
-extern void fn_801294C4(u32 a, s32 b);
+extern void heroAddPokedoru(u32 a, s32 b);
 #if 0
 asm void fn_8000BB00(void) {
 #include "src/game/gs_party_access_fn_8000BB00.inc"
@@ -174,9 +174,9 @@ asm void fn_8000BB00(void) {
 #else
 #pragma peephole off
 u32 fn_8000BB00(void) {
-    s32 val = fn_8010264C(2, 1);
+    s32 val = menuOpen(2, 1);
     if (val == -1) { return 0; }
-    fn_801294C4(0, val);
+    heroAddPokedoru(0, val);
     return 0;
 }
 #pragma peephole on
@@ -639,8 +639,8 @@ u32 fn_8000C3A4(void) {
 #endif
 
 /* fn_8000C3D4 - 0x8000C3D4 | size: 0xcc */
-extern void fn_801C41C8(u32 a, f32 b);
-extern void fn_801C40F0(u32 a);
+extern void fadeSet(u32 a, f32 b);
+extern void fadeCheck(u32 a);
 extern void fn_80105FF8(u32 a, u32 b, u32 c);
 extern void fn_80106080(u32 a);
 extern void fn_80105FB0(u32 a);
@@ -655,12 +655,12 @@ asm void fn_8000C3D4(void) {
 s32 fn_8000C3D4(u32 arg1, u32 type) {
     switch (type) {
     case 0:
-        fn_801C41C8(3, lbl_8047B6E0);
-        fn_801C40F0(1);
+        fadeSet(3, lbl_8047B6E0);
+        fadeCheck(1);
         fn_80105FF8(0x44c5, 1, 0);
         fn_801069FC(1);
-        fn_801C41C8(2, lbl_8047B6E0);
-        fn_801C40F0(1);
+        fadeSet(2, lbl_8047B6E0);
+        fadeCheck(1);
         break;
     case 1:
         fn_80106080(1);
@@ -683,24 +683,24 @@ s32 fn_8000C3D4(u32 arg1, u32 type) {
 #pragma peephole on
 #endif
 
-/* fn_8000C4A0 - 0x8000C4A0 | size: 0x78 */
+/* dbgMenuMsgCheck - 0x8000C4A0 | size: 0x78 */
 extern u32 fn_800F7BC4(u32 a);
 extern u32 fn_8001E3E0(u32 a, u32* b);
 extern void fn_801067E8(u32 a, u32 b, u32 c);
-extern void fn_8001D7E4(void);
+extern void menuSubKeyWait(void);
 extern void fn_801065B8(u32 a);
 #pragma peephole off
 #if 0
-asm void fn_8000C4A0(void) {
+asm void dbgMenuMsgCheck(void) {
 #include "src/game/gs_party_access_fn_8000C4A0.inc"
 }
 #else
-s32 fn_8000C4A0(void) {
+s32 dbgMenuMsgCheck(void) {
     u32 local;
     if ((fn_800F7BC4(1) & 0x20) == 0) { goto ret1; }
     if ((u8)fn_8001E3E0(0, &local) == 0) { return -1; }
     fn_801067E8(local, 1, 0);
-    fn_8001D7E4();
+    menuSubKeyWait();
     fn_801065B8(1);
     return 0;
 ret1:
@@ -810,7 +810,7 @@ u32 fn_8000C688(s32 arg) {
 #endif
 
 /* fn_8000C6EC - 0x8000C6EC | size: 0x9c */
-extern s32 fn_8010264C(u32 a, u32 b);
+extern s32 menuOpen(u32 a, u32 b);
 extern u32 fn_801666BC(u16 a);
 extern void fn_80166B18(u16 a);
 extern void fn_801659FC(u16 a, u32 b, u32 c);
@@ -839,7 +839,7 @@ loop_body:
 do_else:
     fn_801659FC(entry, 0, 0x7f);
 loop_check:
-    val = fn_8010264C(2, 1);
+    val = menuOpen(2, 1);
     if (val != -1) { goto loop_body; }
     fn_80102510(2);
     return -1;
@@ -852,7 +852,7 @@ extern void fn_80266320(void);
 extern void fn_801EF02C(void);
 extern void fn_801EF080(void);
 extern void fn_801EF0D4(void);
-extern void fn_8025FF18(u32);
+extern void memoDataSetMemoFlag(u32);
 extern void fn_8025FBCC(u32);
 extern void fn_80190528(u32);
 extern void fn_800884BC(u32, u32, u32);
@@ -864,7 +864,7 @@ extern u32 fn_8012AC08(u32, s32);
 extern u32 fn_80123FBC(u32);
 extern void fn_80097A38(u32, s32);
 extern void fn_800FF730(u32);
-extern void fn_8001BDF4(s32, s32, s32);
+extern void menuPokemonOpen(s32, s32, s32);
 extern void fn_800F0654(u32, s32, ...);
 extern void fn_8026132C(u32, u32, s32, u16*, s32, u32*);
 extern void fn_8002DC6C(u32);
@@ -907,7 +907,7 @@ loop_body:
 do_else:
     fn_801659FC(entry, 0, 0x7f);
 loop_check:
-    val = fn_8010264C(2, 1);
+    val = menuOpen(2, 1);
     if (val != -1) { goto loop_body; }
     fn_80102510(2);
     return -1;
@@ -952,7 +952,7 @@ inner_check:
 do_else:
     fn_801659FC(entry, 0, 0x7f);
 loop_check:
-    val = fn_8010264C(2, 1);
+    val = menuOpen(2, 1);
     if (val != -1) { goto loop_body; }
     fn_80102510(2);
     return -1;
@@ -997,7 +997,7 @@ inner_check:
 do_else:
     fn_80165A20(entry, 0, 0x7f);
 loop_check:
-    val = fn_8010264C(2, 1);
+    val = menuOpen(2, 1);
     if (val != -1) { goto loop_body; }
     fn_80102510(2);
     return -1;
@@ -1151,7 +1151,7 @@ s32 fn_8000CC84(void) {
 /* fn_8000CCA8 - 0x8000CCA8 | size: 0x28 */
 /* GSparty_GetOTSID */
 s32 fn_8000CCA8(void) {
-    fn_8025FF18(0);
+    memoDataSetMemoFlag(0);
     return 1;
 }
 
@@ -1197,19 +1197,19 @@ void testEvolution__Fv(void) {
     if ((u8)fn_80123FBC(val1) == 0) { return; }
     val2 = fn_8012A5B0(NULL, 3, 1);
     if ((u8)fn_80123FBC(val2) == 0) { return; }
-    fn_801C41C8(3, lbl_8047B6E8);
-    fn_801C40F0(1);
+    fadeSet(3, lbl_8047B6E8);
+    fadeCheck(1);
     locals.left = 1;
     locals.right = 2;
     fn_8026132C(val1, val2, 1, &locals.left, 2, locals.work);
-    fn_801C41C8(2, lbl_8047B6E8);
-    fn_801C40F0(1);
+    fadeSet(2, lbl_8047B6E8);
+    fadeCheck(1);
 }
 #endif
 
-/* fn_8000CE18 - 0x8000CE18 | size: 0x44 */
+/* dbgMenuMenuTestEvolution - 0x8000CE18 | size: 0x44 */
 /* GSparty_CureStatus -- call fn_800FF560, then GSthreadCreate with fn_8000CD50 as callback */
-s32 fn_8000CE18(void) {
+s32 dbgMenuMenuTestEvolution(void) {
     u32 r;
     r = (u32)fn_800FF560();
     GSthreadCreate(1, r, 0x4000, 1, 1, (u32)testEvolution__Fv);
@@ -1267,24 +1267,24 @@ s32 fn_8000CED0(void) {
 #pragma peephole on
 #pragma peephole on
 
-/* fn_8000CEF8 - 0x8000CEF8 | size: 0x70 */
+/* dbgMenuMenuTestPokemonMenu - 0x8000CEF8 | size: 0x70 */
 /* GSparty_FullHeal -- switch on r3 input */
 #pragma peephole off
 #if 0
-asm void fn_8000CEF8(void) {
+asm void dbgMenuMenuTestPokemonMenu(void) {
 #include "src/game/gs_party_access_fn_8000CEF8.inc"
 }
 #else
-u32 fn_8000CEF8(s32 arg) {
+u32 dbgMenuMenuTestPokemonMenu(s32 arg) {
     switch (arg) {
         case 0x110:
-            fn_8001BDF4(1, 0, 0);
+            menuPokemonOpen(1, 0, 0);
             break;
         case 0x111:
-            fn_8001BDF4(2, 0, 0);
+            menuPokemonOpen(2, 0, 0);
             break;
         default:
-            fn_8001BDF4(2, 0, 0);
+            menuPokemonOpen(2, 0, 0);
             break;
     }
     return 0;

@@ -15,12 +15,12 @@
  *   fn_80167040 (GSDVD_CheckAndClose)
  *   fn_80167070 (GSDVD_CloseHandle)
  *   fn_80167118 (GSDVD_Open)
- *   fn_80167298 (GSDVD_Read)
+ *   _sndSetSampleDataUploadCallbackFunction (GSDVD_Read)
  *   _sndCheckSndWorkALL (GSDVD_ReadAsync)
  *   fn_8016737C (GSDVD_GetReadStatus)
- *   fn_80167408 (GSDVD_CancelRead)
- *   fn_80167490 (GSDVD_WaitForRead)
- *   fn_80167508 (GSDVD_GetFileSize)
+ *   _sndSetVolumeWork (GSDVD_CancelRead)
+ *   _sndStopSE (GSDVD_WaitForRead)
+ *   _sndStopBGM (GSDVD_GetFileSize)
  *   fn_8016758C (GSDVD_GetFilePosition)
  *   fn_8016761C (GSDVD_Seek)
  *   fn_80167720 (GSDVD_CheckActive)
@@ -33,15 +33,15 @@
  *   fn_80167964 (GSDVD_AllocStreamBuffer)
  *   fn_801679E4 (GSDVD_GetBufferPtr)
  *   fn_80167A14 (GSDVD_GetBufferSize)
- *   fn_80167A44 (GSDVD_GetBufferState)
+ *   _sndInitStack (GSDVD_GetBufferState)
  *   fn_80167A6C (GSDVD_SetBufferState)
- *   fn_80167A9C (GSDVD_ValidateBuffer)
- *   fn_80167AF0 (GSDVD_FreeHandleResources)
+ *   _sndSetReverbParm (GSDVD_ValidateBuffer)
+ *   _sndInitParms (GSDVD_FreeHandleResources)
  *   fn_80167B70 (GSDVD_GetHandleInfo)
  *   fn_80167BB0 (GSDVD_SetHandleCallback)
  *   _gsdvdErrorTask_801879AC (GSDVD_ProcessQueue)
- *   fn_80167D30 (GSDVD_FlushQueue)
- *   fn_80167D60 (GSDVD_QueueRequest)
+ *   _gsdvdError_MsgOpen (GSDVD_FlushQueue)
+ *   _errorTask_State_None_80187B24 (GSDVD_QueueRequest)
  *   fn_80167DC0 (GSDVD_IsQueueEmpty)
  *   fn_80167DD8 (GSDVD_GetQueueDepth)
  *   fn_80167E10 (GSDVD_SetPriority)
@@ -55,8 +55,8 @@
  *   fn_80167F28 (GSDVD_ClearErrorState)
  *   fn_80167FA4 (GSDVD_EmptyFunc)
  *   fn_80167FA8 (GSDVD_ErrorStateMachine)
- *   fn_801680C0 (GSDVD_PollDiscStatus)
- *   fn_80168110 (GSDVD_HandleCoverOpenWait)
+ *   _AsyncCallback (GSDVD_PollDiscStatus)
+ *   _info2work (GSDVD_HandleCoverOpenWait)
  *   fn_80168164 (GSDVD_HandleCoverClosed)
  *   fn_8016819C (GSDVD_HandleDiscChange)
  *   fn_8016821C (GSDVD_HandleFatalError)
@@ -169,7 +169,7 @@ void GSDVD_CheckAndClose(void) {
  * ================================================================== */
 s32 GSDVD_CloseHandle(u32 handleIndex, u32 mode) {
     extern void fn_8016782C();
-    extern void fn_80167AF0();
+    extern void _sndInitParms();
     u8 sp[0x10];
     u32 tmp = 0;
     u32 r5 = 0;
@@ -198,7 +198,7 @@ s32 GSDVD_CloseHandle(u32 handleIndex, u32 mode) {
     }
     handleIndex = r31;
     mode = r30;
-    fn_80167AF0();
+    _sndInitParms();
     handleIndex = r30;
     fn_8016782C();
     mode = 0x0;
@@ -229,7 +229,7 @@ s32 GSDVD_Open(u32 slotIndex, u32 resId, void* callback, u32 param1, u32 param2,
     extern void fn_80167BB0();
     extern void fn_80167E64();
     extern void fn_80167F28();
-    extern void fn_80167298();
+    extern void _sndSetSampleDataUploadCallbackFunction();
     u8 sp[0x30];
     u32 tmp = 0;
     u32 r25 = 0;
@@ -277,9 +277,9 @@ s32 GSDVD_Open(u32 slotIndex, u32 resId, void* callback, u32 param1, u32 param2,
     if (resId == 1) {
         param3 = 0x0;
         fn_800AE78C();
-        callback = (void*)(u32)fn_80167298;
+        callback = (void*)(u32)_sndSetSampleDataUploadCallbackFunction;
         resId = slotIndex;
-        slotIndex = (u32)fn_80167298;
+        slotIndex = (u32)_sndSetSampleDataUploadCallbackFunction;
         fn_80159ED0();
         slotIndex = (u32)callback;
         fn_80167F28();
@@ -362,7 +362,7 @@ void GSDVD_ErrorStateMachine(void) {
     extern void fn_800057A0();
     extern void fn_800057A8();
     extern void fn_800A7BCC();
-    extern void fn_800A82FC();
+    extern void DVDSetAutoFatalMessaging();
     extern void fn_800FE834();
     extern void fn_8016821C();
     extern void fn_8016824C();
@@ -428,7 +428,7 @@ void GSDVD_ErrorStateMachine(void) {
         *(u8*)((u8*)r3 + 0x7) = tmp;
     }
     r3 = 0x1;
-    fn_800A82FC();
+    DVDSetAutoFatalMessaging();
     r4 = (u32)_gsdvdErrorTask_801879AC;
     r3 = 0x1;
     r6 = (u32)_gsdvdErrorTask_801879AC;
@@ -582,7 +582,7 @@ void GSDVD_ErrorCoverOpenMain(void) {
     extern void fn_800E209C();
     extern void fn_800E24B0();
     extern void fn_800E27B0();
-    extern void fn_800E3534();
+    extern void _toolentryAlloc__FUl();
     extern void fn_800FE834();
     extern void fn_80168284();
     u8 sp[0x20];
@@ -608,7 +608,7 @@ void GSDVD_ErrorCoverOpenMain(void) {
     r4 = 0x0;
     memset((void*)r3, (int)r4, (u32)r5);
     r3 = r27;
-    fn_800E3534();
+    _toolentryAlloc__FUl();
     tmp = r3 & 0xFFFF;
     if ((s32)tmp == 0) return;
     r4 = (u32)lbl_804526E0;
@@ -622,7 +622,7 @@ void GSDVD_ErrorCoverOpenMain(void) {
     *(u32*)((u8*)r6 + 0x0) = r3;
     memset((void*)r3, (int)r4, (u32)r5);
     r3 = r27;
-    fn_800E3534();
+    _toolentryAlloc__FUl();
     tmp = r3 & 0xFFFF;
     if ((s32)tmp == 0) {
         r28 = *(u16*)((u8*)r28 + 0x1C);
@@ -665,7 +665,7 @@ void GSDVD_ErrorCoverOpenMain(void) {
     *(u32*)((u8*)r31 + 0x4) = r3;
     memset((void*)r3, (int)r4, (u32)r5);
     r3 = r27;
-    fn_800E3534();
+    _toolentryAlloc__FUl();
     tmp = r3 & 0xFFFF;
     if (r3 == 0) {
         r28 = *(u16*)((u8*)r28 + 0x1C);

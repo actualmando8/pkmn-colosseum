@@ -336,7 +336,7 @@ typedef struct WObjVec {
 #define WOBJ_USE_ANIM_POS 0x1
 #define WOBJ_POS_DIRTY 0x2
 
-extern void fn_800A37CC(f32 mtx[3][4], WObjVec* src, WObjVec* dst);
+extern void PSMTXMultVec(f32 mtx[3][4], WObjVec* src, WObjVec* dst);
 
 #define WOBJ_RESOLVE_ANIM_POSITION(wobj_)                                      \
     do {                                                                       \
@@ -354,7 +354,7 @@ extern void fn_800A37CC(f32 mtx[3][4], WObjVec* src, WObjVec* dst);
                             fn_8019D9DC(jobj_);                                \
                         }                                                      \
                     }                                                          \
-                    fn_800A37CC(jobj_->mtx, (WObjVec*) &(wobj_)->pos_x,        \
+                    PSMTXMultVec(jobj_->mtx, (WObjVec*) &(wobj_)->pos_x,        \
                                 (WObjVec*) &(wobj_)->pos_x);                   \
                 }                                                              \
             }                                                                  \

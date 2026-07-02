@@ -68,7 +68,7 @@
  * Public API -- GSgfx callbacks
  * =================================================================== */
 
-/** fn_800D3E4C */ void GSgfx_VBlankCallback(s32 mode, void* buffer);
+/** _gfxScratchNotify__F15GSscratchNotifyPvUc */ void GSgfx_VBlankCallback(s32 mode, void* buffer);
 /** fn_800D3EC4 */ void GSgfx_PreRetraceCallback(s32 flag, f32 p1, f32 p2,
                                                    f32 p3, f32 p4, f32 p5, f32 p6);
 /** fn_800D3F50 */ void GSgfx_DrawDoneCallback(void);

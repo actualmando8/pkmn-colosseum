@@ -32,8 +32,8 @@
  *   - Large state machine functions (fn_8012640C at 5456 bytes,
  *     fn_801254B4 at 3928 bytes) for field transition logic
  *   - Iteration over object lists with 0x28 or 0x34 byte strides
- *   - Frequent calls to GSmem (fn_800E27B0, fn_800E3534)
- *   - Matrix operations for camera (fn_800A37CC, fn_800A3A9C)
+ *   - Frequent calls to GSmem (fn_800E27B0, _toolentryAlloc__FUl)
+ *   - Matrix operations for camera (PSMTXMultVec, fn_800A3A9C)
  *
  * Debug strings:
  *   "floorUpdateFieldCamera: error updating field camera - divide by zero!"
@@ -47,12 +47,12 @@ extern void  fn_800DD970(const char* fmt, ...);         /* OSReport / GSlog */
 extern void* memcpy(void* dst, const void* src, u32 n);
 extern void* memset(void* dst, int val, u32 size);
 /* GSmem */
-extern u16   fn_800E3534(u32 size);                     /* GSmemAllocRaw */
+extern u16   _toolentryAlloc__FUl(u32 size);                     /* GSmemAllocRaw */
 extern void* fn_800E27B0(u16 handle);                   /* GSmemGetPtr */
 extern void* fn_800E24B0(u16 handle);                   /* GSmemLock */
 extern void  fn_800E209C(u16 handle);                   /* GSmemFree */
 /* Matrix / vector */
-extern void  fn_800A37CC(void* mtx, void* vec, void* out); /* MTXMultVec3 */
+extern void  PSMTXMultVec(void* mtx, void* vec, void* out); /* MTXMultVec3 */
 extern void  fn_800A3A9C(void* out, void* in, f32 s);     /* VEC normalize */
 /* GSgfx renderer */
 extern void  fn_800D7868(void* handle, u32 a, u32 b, u32 c,
@@ -268,7 +268,7 @@ void floorUpdateFieldCamera_Pseudocode(void) {
  * ================================================================== */
 void GSfield_TransitionStateMachine(void) {
     extern void fn_8011BEB4();
-    extern void fn_8011CE44();
+    extern void pokemonGrowDataBiosGetExp();
     extern void fn_8011CE74();
     extern void fn_8011E000();
     extern void fn_8011E018();
@@ -1393,7 +1393,7 @@ L_80127134: ;
 L_80127234: ;
     r3 = r30;
     r4 = r29 & 0xFF;
-    fn_8011CE44();
+    pokemonGrowDataBiosGetExp();
     if (r3 <= r31) {
         r29 = r29 + 0x1;
         if ((s32)r29 < (s32)0x65) goto L_80127234;
@@ -3569,11 +3569,11 @@ void GSfield_ProcessTriggers(void) {
     extern void fn_8018805C();
     extern void fn_801885C4();
     extern void fn_801887D8();
-    extern void fn_8018D928();
+    extern void peopleSearchID();
     extern void fn_8018D998();
     extern void fn_8018F658();
     extern void fn_8018F678();
-    extern void fn_8018F6F4();
+    extern void peopleInfoBiosGetPtr();
     extern u8 lbl_80426BD0;
     u8 sp[0x120];
     u32 r0 = 0;
@@ -3969,14 +3969,14 @@ L_8012CE64: ;
     r4 = r31;
     r3 = 0x0;
     fn_8018D998();
-    fn_8018D928();
+    peopleSearchID();
     if (r3 == (u32)0x0) {
         r3 = -0x1;
         goto L_8012D06C;
     }
     r3 = *(u32*)((u8*)r3 + 0x30);
 L_8012D06C: ;
-    fn_8018F6F4();
+    peopleInfoBiosGetPtr();
     r24 = r3;
     fn_8018F678();
     f0 = lbl_8047D038;
@@ -5341,7 +5341,7 @@ u32 fn_80115100(void) {
 #pragma push
 #pragma scheduling off
 u32 fn_80115208(void) {
-    fn_8010CC04();
+    GScolsys2UnloadCCD();
     return 1;
 }
 #pragma pop
@@ -5554,7 +5554,7 @@ extern void fn_80124A60(u8* ptr);
 extern void fn_80128300(void);
 extern void fn_80128524(void);
 extern void fn_80129094(void);
-extern void fn_801294C4(u8* ptr, u32 offset);
+extern void heroAddPokedoru(u8* ptr, u32 offset);
 extern s32 fn_80129A78(u8* ptr, u32 arg2, u32 arg3, u32 arg4);
 extern u32 fn_8012A08C(u8* ptr, void* arg2);
 extern void fn_8012A1A4(u8* ptr, u32 arg2, u8 arg3);
@@ -5562,15 +5562,15 @@ extern void fn_8012A248();
 extern void fn_8012A7DC();  /* K&R: typed impl or conflict */
 extern void fn_8012A824();  /* K&R: typed impl or conflict */
 extern void fn_8012A86C();  /* K&R: typed impl or conflict */
-extern void fn_8012A89C();  /* K&R: typed impl or conflict */
-extern void fn_8012AA64();  /* K&R: typed impl or conflict */
+extern void heroBiosSetHizukiNamePtr();  /* K&R: typed impl or conflict */
+extern void heroBiosSetNamePtr();  /* K&R: typed impl or conflict */
 extern void fn_8012BBA8(void);
 extern void fn_8012BCA4(void);
 extern void fn_8012CA84();
 extern void fn_80130A88(u32 arg1);
 extern void fn_80130BB0(u32 arg1);
-extern s32 fn_801694E0(u32);
-extern void* fn_8011CA34(u16 idx);
+extern s32 psGetGeneratorChildMaxLife(u32);
+extern void* wazaDataBiosGetPtr(u16 idx);
 extern u32 fn_8012640C();
 extern void fn_801254B4();
 extern void fn_8011BEB4(void);
@@ -5719,7 +5719,7 @@ extern u32 lbl_80478EB8;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void fn_80116164(void);
 /* 0x80116470 | 0x4E8 */
-extern void fn_80113F6C(void);
+extern void floorGetResource(void);
 extern void fn_800ECCA8(void);
 extern void fn_800ECA78(void);
 extern void fn_800EC9DC(void);
@@ -5739,7 +5739,7 @@ extern void fn_801669BC(void);
 extern void fn_800EC1BC(void);
 extern void fn_801845E4(void);
 extern void fn_801860F8(void);
-extern void fn_800EC4D0(void);
+extern void GSmodelGetFrameCount(void);
 extern void fn_800D37CC(void);
 extern f32 lbl_8047CFA0;
 extern u32 lbl_80478EC8;
@@ -5765,7 +5765,7 @@ extern f32 lbl_8047CFA4;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void fn_80116958(void);
 /* 0x80116D30 | 0x13C */
-extern void fn_801141F8();
+extern void EvlogSet__FScUl();
 extern void fn_801CA9F8();
 extern void fn_800F7434();
 extern u8 lbl_80272708[];
@@ -5786,7 +5786,7 @@ void fn_80116D30(u32 kind, u32 arg)
     u8* text;
 
     text = lbl_80272708;
-    fn_801141F8(kind, arg, text);
+    EvlogSet__FScUl(kind, arg, text);
     skind = (s8)kind;
 
     switch (skind) {
@@ -5832,7 +5832,7 @@ void fn_80116E6C(u8* ptr, u8 val) {
     ptr[0] = tmp;
 }
 /* 0x80116E84 | 0x2C */
-void fn_80116E84(u8* dst, f32* src) {
+void floorCharacterBiosSetPos(u8* dst, f32* src) {
     if (dst == NULL) { return; }
     if (src == NULL) { return; }
     *(f32*)(&dst[0x18]) = src[0];
@@ -5903,13 +5903,13 @@ _ret0_80117054:
     return 0;
 }
 /* 0x80117070 | 0x34 */
-extern void* fn_8018F6CC(u16);
+extern void* peopleInfoBiosGetPtrFromIndex(u16);
 #pragma push
 #pragma scheduling off
-void* fn_80117070(u8* ptr) {
+void* floorCharacterBiosGetPeopleInfoPtr(u8* ptr) {
     void* sub;
     if (ptr == NULL) { goto ret_null; }
-    sub = fn_8018F6CC(*(u16*)(&ptr[0x6]));
+    sub = peopleInfoBiosGetPtrFromIndex(*(u16*)(&ptr[0x6]));
     return sub;
 ret_null:
     return NULL;
@@ -6164,7 +6164,7 @@ void fn_80117500(void) {
 }
 #endif
 /* 0x801176C8 | 0x254 */
-extern void fn_800FE714(void);
+extern void GSgappTerminate(void);
 extern void fn_800FE834(void);
 extern u8 lbl_804083D0[0x30];
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
@@ -6192,7 +6192,7 @@ extern void fn_800EF5A4(void);
 extern void fn_800E4BF4(void);
 extern void GStextureCreate(void);
 extern void fn_80113D34(void);
-extern void fn_800E4014(void);
+extern void GSmodelSetVisibility(void);
 extern void fn_800EC188(void);
 extern void fn_800E563C(void);
 extern u32 lbl_80478B40;
@@ -6217,7 +6217,7 @@ u8 fn_80117AE4(u32 arg1) {
     extern void fn_800E4BF4(void* a);
     extern void* GStextureCreate(u16 a, u16 b, u32 c, u32 d, u32 e);
     extern void* fn_80113D34(u32 a, u32 b);
-    extern void fn_800E4014(void* a, u32 b);
+    extern void GSmodelSetVisibility(void* a, u32 b);
     extern void fn_800EC188(void* a, u32 b);
     extern void fn_800ECCA8(void* a, u32 b);
     extern void fn_800EC990(void* a);
@@ -6264,7 +6264,7 @@ u8 fn_80117AE4(u32 arg1) {
         return 0;
     }
     lbl_8047AD90 = (u32)fn_80113D34(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 0xc));
-    fn_800E4014((void*)lbl_8047AD90, 0);
+    GSmodelSetVisibility((void*)lbl_8047AD90, 0);
     fn_800EC188((void*)lbl_8047AD90, 1);
     fn_800ECCA8((void*)lbl_8047AD90, *(u32*)((u8*)lbl_8047AD88 + 0x10));
     fn_800EC990((void*)lbl_8047AD90);
@@ -6408,7 +6408,7 @@ void fn_80117E58(void* arg) {
     extern void fn_800E4BF4(void* a);
     extern void* GStextureCreate(u16 a, u16 b, u32 c, u32 d, u32 e);
     extern void* fn_80113D34(u32 a, u32 b);
-    extern void fn_800E4014(void* a, u32 b);
+    extern void GSmodelSetVisibility(void* a, u32 b);
     extern void fn_800EC188(void* a, u32 b);
     extern void fn_800ECCA8(void* a, u32 b);
     extern void fn_800EC990(void* a);
@@ -6464,7 +6464,7 @@ void fn_80117E58(void* arg) {
         return;
     }
     lbl_8047AD90 = (u32)fn_80113D34(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 0xc));
-    fn_800E4014((void*)lbl_8047AD90, 0);
+    GSmodelSetVisibility((void*)lbl_8047AD90, 0);
     fn_800EC188((void*)lbl_8047AD90, 1);
     fn_800ECCA8((void*)lbl_8047AD90, *(u32*)((u8*)lbl_8047AD88 + 0x10));
     fn_800EC990((void*)lbl_8047AD90);
@@ -6579,7 +6579,7 @@ void fn_80118104(u32 a, u8 b) {
 }
 #endif
 /* 0x801181B0 | 0x23C */
-extern void fn_801694A8(void* ptr);
+extern void psGetParticleChildCount(void* ptr);
 extern void psKillFamily();
 extern void fn_800EC160();
 extern void fn_80169484();
@@ -6702,7 +6702,7 @@ void fn_80118CD0(void* obj) {
 }
 /* 0x80118CF4 | 36 bytes | load_then_call */
 void fn_80118CF4(void* obj) {
-    fn_80169390(*(void**)((u8*)obj + 0x10));
+    psSetTornadoScaling(*(void**)((u8*)obj + 0x10));
 }
 /* 0x80118D18 | 36 bytes | load_then_call */
 void fn_80118D18(void* obj) {
@@ -6710,7 +6710,7 @@ void fn_80118D18(void* obj) {
 }
 /* 0x80118D3C | 36 bytes | load_then_call */
 void fn_80118D3C(void* obj) {
-    fn_80169404(*(void**)((u8*)obj + 0x10));
+    psSetOffsetRotationInLocal(*(void**)((u8*)obj + 0x10));
 }
 /* 0x80118D60 | 36 bytes | load_then_call */
 void fn_80118D60(void* obj) {
@@ -6718,13 +6718,13 @@ void fn_80118D60(void* obj) {
 }
 /* 0x80118D84 | 36 bytes | load_then_call */
 void fn_80118D84(void* obj) {
-    fn_801694A8(*(void**)((u8*)obj + 0x10));
+    psGetParticleChildCount(*(void**)((u8*)obj + 0x10));
 }
 /* 0x80118DA8 | 0x38 */
-extern s32 fn_801694E0(u32);
+extern s32 psGetGeneratorChildMaxLife(u32);
 s32 fn_80118DA8(u8* ptr) {
     if (ptr[1] == 1) { return -1; }
-    return fn_801694E0(*(u32*)(&ptr[0x10]));
+    return psGetGeneratorChildMaxLife(*(u32*)(&ptr[0x10]));
 }
 /* 0x80118DE0 | 0xAC */
 extern void psSetGeneratorAngleRadiusScale(void);
@@ -6844,7 +6844,7 @@ extern u32 lbl_8047ADA0;
 void fn_801195AC(void);
 /* 0x80119824 | 0x10C */
 extern void fn_8016A01C(void);
-extern void fn_80175DF0(void);
+extern void psInitGenerator(void);
 extern void fn_8016AAF4(void);
 extern void fn_8019733C(void);
 extern void fn_8019D618(void);
@@ -6864,10 +6864,10 @@ void fn_80119824(u32 count1, u32 count2) {
     extern u16 lbl_8047ADA4;
     extern u32 lbl_8047ADA8;
     extern u32 lbl_8047ADAC;
-    extern u16 fn_800E3534(u32 size);
+    extern u16 _toolentryAlloc__FUl(u32 size);
     extern void* fn_800E27B0(u16 handle);
     extern void psInitParticle(s32 a);
-    extern void fn_80175DF0(s32 a);
+    extern void psInitGenerator(s32 a);
     extern void psInitAppSRT(s32 a, s32 b);
     extern void fn_8019733C(void* fp);
     extern void fn_8019D618(void* fp);
@@ -6877,7 +6877,7 @@ void fn_80119824(u32 count1, u32 count2) {
     u32 h;
     u32 i;
     lbl_8047ADA0 = count1;
-    h = fn_800E3534(count1 * 0x108);
+    h = _toolentryAlloc__FUl(count1 * 0x108);
     lbl_8047AD98 = (u16)h;
     if ((u16)h == 0) { return; }
     lbl_8047AD9C = (u32)fn_800E27B0((u16)h);
@@ -6885,7 +6885,7 @@ void fn_80119824(u32 count1, u32 count2) {
         *(u8*)(lbl_8047AD9C + i * 0x108) = 0;
     }
     lbl_8047ADAC = count2;
-    h = fn_800E3534(count2 * 0x74);
+    h = _toolentryAlloc__FUl(count2 * 0x74);
     lbl_8047ADA4 = (u16)h;
     if ((u16)h == 0) { return; }
     lbl_8047ADA8 = (u32)fn_800E27B0((u16)h);
@@ -6893,7 +6893,7 @@ void fn_80119824(u32 count1, u32 count2) {
         *(u8*)(lbl_8047ADA8 + i * 0x74) = 0;
     }
     psInitParticle(0);
-    fn_80175DF0(0);
+    psInitGenerator(0);
     psInitAppSRT(0, 0x74);
     fn_8019733C(fn_80119BD0);
     fn_8019D618(fn_80119BD0);
@@ -6909,7 +6909,7 @@ void fn_80119824(void) {
     extern u32 lbl_8047ADAC;
     extern void fn_8016A01C();
     extern void fn_8016AAF4();
-    extern void fn_80175DF0();
+    extern void psInitGenerator();
     extern void fn_8019733C();
     extern void fn_8019D610();
     extern void fn_8019D618();
@@ -6925,7 +6925,7 @@ void fn_80119824(void) {
     r3 = r0 * 0x108;
     r31 = r4;
     lbl_8047ADA0 = r0;
-    ((void(*)(void))fn_800E3534)();
+    ((void(*)(void))_toolentryAlloc__FUl)();
     r0 = r3 & 0xFFFF;
     lbl_8047AD98 = r3;
     if ((s32)r0 == (s32)0) return;
@@ -6945,7 +6945,7 @@ void fn_80119824(void) {
 
     r3 = r31 * 0x74;
     lbl_8047ADAC = r31;
-    ((void(*)(void))fn_800E3534)();
+    ((void(*)(void))_toolentryAlloc__FUl)();
     r0 = r3 & 0xFFFF;
     lbl_8047ADA4 = r3;
     if (r6 == (u32)r0) return;
@@ -6966,7 +6966,7 @@ void fn_80119824(void) {
     r3 = 0x0;
     fn_8016A01C();
     r3 = 0x0;
-    fn_80175DF0();
+    psInitGenerator();
     r3 = 0x0;
     r4 = 0x74;
     fn_8016AAF4();
@@ -6989,7 +6989,7 @@ void fn_80119930(void);
 extern void fn_800E3B6C(void);
 extern void fn_800E3BF8(void);
 extern void fn_800E6DC0(void);
-extern void fn_800EE22C(void);
+extern void GSpartGetJObjIndex(void);
 extern void fn_800E3CBC(void);
 extern void fn_800E3BF0(void);
 extern void fn_800E3D08(void);
@@ -7005,7 +7005,7 @@ void fn_80119BD0(u32 arg1, u32 arg2, u32 arg5, u8* arg6) {
     extern u8* fn_800E3B6C();
     extern u8* fn_800E3BF8();
     extern u32 fn_800E6DC0();
-    extern u32 fn_800EE22C();
+    extern u32 GSpartGetJObjIndex();
     extern u8* fn_800EE150();
     extern u32 fn_800E3CBC();
     extern u8* fn_801190DC();
@@ -7040,7 +7040,7 @@ void fn_80119BD0(u32 arg1, u32 arg2, u32 arg5, u8* arg6) {
         node = *(u8**)(node + 0x10);
     }
 
-    index = fn_800EE22C(node, arg6);
+    index = GSpartGetJObjIndex(node, arg6);
     if (index == 0xFFFFFFFF) {
         return;
     }
@@ -8191,7 +8191,7 @@ u8 fn_8011C588(u8* ptr, u16 idx) {
 /* 0x8011CA34 | 0x2C */
 extern u32 lbl_80478DF8;
 extern u32 lbl_80478DFC;
-void* fn_8011CA34(u16 idx) {
+void* wazaDataBiosGetPtr(u16 idx) {
     u32* hdr = (u32*)lbl_80478DF8;
     if (idx >= hdr[0]) {
         return (void*)lbl_80478DFC;
@@ -8201,7 +8201,7 @@ void* fn_8011CA34(u16 idx) {
 /* 0x8011CA60 | 0x3C */
 extern u32 lbl_80478B78;
 extern u32 lbl_8035F9A8[];
-u32 fn_8011CA60(u8* ptr) {
+u32 pokemonNakigoeDataBiosGetDataAddress(u8* ptr) {
     u16 idx;
     if (ptr == NULL) { return 0; }
     idx = *(u16*)(&ptr[0x10]);
@@ -8213,14 +8213,14 @@ extern u32 lbl_80478E68;
 extern u32 lbl_80478E6C;
 #pragma push
 #pragma peephole off
-void* fn_8011CAB8(u16 idx) {
+void* pokemonDpFilterDataBiosGetPtr(u16 idx) {
     u32* hdr = (u32*)lbl_80478E68;
     if (idx >= hdr[0]) { return NULL; }
     return (u8*)lbl_80478E6C + idx;
 }
 #pragma pop
 /* 0x8011CAE0 | 0x30 */
-s8 fn_8011CAE0(u8* ptr, u8 idx) {
+s8 pokemonFriendFilterDataBiosGetValue(u8* ptr, u8 idx) {
     if (ptr == NULL) { return 0; }
     if (idx >= 3) { return 0; }
     return (s8)ptr[idx];
@@ -8244,7 +8244,7 @@ extern u32 lbl_80478E58;
 extern u32 lbl_80478E5C;
 #pragma push
 #pragma peephole off
-void* fn_8011CBC8(u8 idx) {
+void* pokemonSeikakuRateDataBiosGetPtr(u8 idx) {
     u32* hdr = (u32*)lbl_80478E58;
     if (idx >= hdr[0]) { return NULL; }
     return (u8*)lbl_80478E5C + (u32)idx * 2;
@@ -8271,7 +8271,7 @@ void* fn_8011CE18(u8 idx) {
     return (u8*)lbl_80478E64 + (u32)idx * 0x28;
 }
 /* 0x8011CE44 | 0x30 */
-u32 fn_8011CE44(u8* ptr, u8 idx) {
+u32 pokemonGrowDataBiosGetExp(u8* ptr, u8 idx) {
     if (ptr == NULL) { return 0; }
     if (idx >= 0x65) { return 0; }
     return *(u32*)(&ptr[(u32)idx * 4]);
@@ -9102,7 +9102,7 @@ asm void fn_8011DCC4(void) {
 void fn_8011DCC4(u8* ptr, u32 arg2, u8 arg3) {
     extern u8* fn_8011F260(u8* a, u32 b, u32 c);
     extern u32 fn_80123CD4(u8* a, u32 b);
-    extern void* fn_8011CA34(u32 val);
+    extern void* wazaDataBiosGetPtr(u32 val);
     u8* result;
     result = fn_8011F260(ptr, arg2, 0);
     if (result == NULL) { return; }
@@ -9110,7 +9110,7 @@ void fn_8011DCC4(u8* ptr, u32 arg2, u8 arg3) {
     if ((u8)fn_80123CD4(ptr, arg2) == 1) {
         u8* tmp = fn_8011F260(ptr, arg2, 1);
         u32 val = tmp == NULL ? 0 : *(u16*)tmp;
-        if ((u8)fn_8011CA04(fn_8011CA34(val)) <= 4) { return; }
+        if ((u8)fn_8011CA04(wazaDataBiosGetPtr(val)) <= 4) { return; }
     }
     result[3] = arg3;
 }
@@ -9997,7 +9997,7 @@ extern f32 lbl_8047CFF4;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void fn_8011FCA4(void);
 /* 0x8011FDC8 | 0x504 */
-extern void fn_800F9E70(void);
+extern void GScharCpy(void);
 extern void fn_8010BBB8(void);
 extern void fn_8001D994(void);
 extern f64 lbl_8047D010;
@@ -10019,7 +10019,7 @@ asm void fn_801202CC(void) {
 void fn_801202CC(u8* ptr, u8* out) {
     extern u32 fn_8012640C(u8* ptr, u32 a, u32 b, u32 c);
     extern void* fn_8011CE74(u8 idx);
-    extern u32 fn_8011CE44(void* ptr, u8 idx);
+    extern u32 pokemonGrowDataBiosGetExp(void* ptr, u8 idx);
     u8 idx;
     u32 base;
     void* table;
@@ -10036,7 +10036,7 @@ void fn_801202CC(u8* ptr, u8* out) {
         if (table == NULL) {
             base = 0;
         } else {
-            base = fn_8011CE44(table, idx);
+            base = pokemonGrowDataBiosGetExp(table, idx);
         }
     }
 
@@ -10048,7 +10048,7 @@ void fn_801202CC(u8* ptr, u8* out) {
             if (table == NULL) {
                 next = 0;
             } else {
-                next = fn_8011CE44(table, (u8)(idx + 1));
+                next = pokemonGrowDataBiosGetExp(table, (u8)(idx + 1));
             }
         }
         *(u32*)(out + 0x1C) = next - base;
@@ -10180,14 +10180,14 @@ asm void fn_80120CDC(void) {
 u32 fn_80120CDC(u8* ptr) {
     extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
     extern void* fn_8011CE74(u32 val);
-    extern u32 fn_8011CE44(void* a, u32 b);
+    extern u32 pokemonGrowDataBiosGetExp(void* a, u32 b);
     u8 byte1, byte2;
     void* result;
     byte1 = (u8)fn_8012640C(NULL, (u16)fn_8012640C(ptr, 0, 0x6e, 0), 0x11, 0);
     byte2 = (u8)fn_8012640C(ptr, 0, 0x7a, 0);
     result = fn_8011CE74(byte1);
     if (result == NULL) { return 0; }
-    return fn_8011CE44(result, byte2);
+    return pokemonGrowDataBiosGetExp(result, byte2);
 }
 #endif
 /* 0x80120DD0 | 0x210 */
@@ -11352,8 +11352,8 @@ void fn_8012546C(void* ptr) {
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void fn_8012795C(void);
 /* 0x8012805C | 0x2A4 */
-extern void fn_801C41C8(void);
-extern void fn_801C40F0(void);
+extern void fadeSet(void);
+extern void fadeCheck(void);
 extern void fn_8026132C(void);
 extern f32 lbl_8047D020;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
@@ -11462,12 +11462,12 @@ extern void fn_80135338(void);
 extern void fn_80134F88(void);
 extern void fn_801908D4(void);
 extern void fn_801D1FA8(void);
-extern void fn_801ED310(void);
+extern void sodateyaInit(void);
 extern void fn_8006B6B4(void);
 extern void fn_80260070(void);
 extern void fn_80083CBC(void);
 extern void fn_801EF128(void);
-extern void fn_80265F4C(void);
+extern void exribbonInit(void);
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void fn_80129094(void);
 /* 0x80129280 | 0x104 */
@@ -11519,8 +11519,8 @@ u32 fn_80129280(u8* arg1, u16 arg2) {
     }
 }
 #endif
-/* 0x78 | fn_80129384 | multi_call_guarded */
-void fn_80129384(u8* ptr, s32 offset) {
+/* 0x78 | heroDecPokecoupon | multi_call_guarded */
+void heroDecPokecoupon(u8* ptr, s32 offset) {
     extern u32 fn_8012A5B0(u8* ptr, u32 a, u32 b);
     extern void fn_8012A450(u8* ptr, u32 a, u32 b);
     fn_8012A450(ptr, 0xd, fn_8012A5B0(ptr, 0xd, 0) - offset);
@@ -11528,8 +11528,8 @@ void fn_80129384(u8* ptr, s32 offset) {
         fn_8012A450(ptr, 0xe, fn_8012A5B0(ptr, 0xe, 0) - offset);
     }
 }
-/* 0x78 | fn_801293FC | multi_call_guarded */
-void fn_801293FC(u8* ptr, s32 offset) {
+/* 0x78 | heroAddPokecoupon | multi_call_guarded */
+void heroAddPokecoupon(u8* ptr, s32 offset) {
     extern u32 fn_8012A5B0(u8* ptr, u32 a, u32 b);
     extern void fn_8012A450(u8* ptr, u32 a, u32 b);
     u32 val;
@@ -11542,25 +11542,25 @@ void fn_801293FC(u8* ptr, s32 offset) {
         fn_8012A450(ptr, 0xe, val);
     }
 }
-/* 0x50 | fn_80129474 | call_sequence */
+/* 0x50 | heroDecPokedoru | call_sequence */
 #if 0
-asm void fn_80129474(void) {
+asm void heroDecPokedoru(void) {
 #include "src/game/gs_field_world_fn_80129474.inc"
 }
 #else
-void fn_80129474(u8* ptr, u32 offset) {
+void heroDecPokedoru(u8* ptr, u32 offset) {
     extern u32 fn_8012A5B0(u8* ptr, u32 a, u32 b);
     extern void fn_8012A450(u8* ptr, u32 a, u32 b);
     fn_8012A450(ptr, 0xc, fn_8012A5B0(ptr, 0xc, 0) - offset);
 }
 #endif
-/* 0x50 | fn_801294C4 | call_sequence */
+/* 0x50 | heroAddPokedoru | call_sequence */
 #if 0
-asm void fn_801294C4(void) {
+asm void heroAddPokedoru(void) {
 #include "src/game/gs_field_world_fn_801294C4.inc"
 }
 #else
-void fn_801294C4(u8* ptr, u32 offset) {
+void heroAddPokedoru(u8* ptr, u32 offset) {
     extern u32 fn_8012A5B0(u8* ptr, u32 a, u32 b);
     extern void fn_8012A450(u8* ptr, u32 a, u32 b);
     u32 val = fn_8012A5B0(ptr, 0xc, 0);
@@ -11655,13 +11655,13 @@ u32 fn_80129718(u8* ptr, u32 arg2) {
     return fn_80142368(val, local_a, arg2, 2, local_8) != 0;
 }
 #endif
-/* 0x68 | fn_801297D8 | guarded_call */
+/* 0x68 | heroHizukiItemGetItemAryPtr | guarded_call */
 #if 0
-asm void fn_801297D8(void) {
+asm void heroHizukiItemGetItemAryPtr(void) {
 #include "src/game/gs_field_world_fn_801297D8.inc"
 }
 #else
-u32 fn_801297D8(u8* ptr, u16* out_a, u16* out_b, u8* out_c, u8* out_d) {
+u32 heroHizukiItemGetItemAryPtr(u8* ptr, u16* out_a, u16* out_b, u8* out_c, u8* out_d) {
     extern u32 fn_8012A5B0(u8* ptr, u32 a, u32 b);
     if (out_a != NULL) { *out_a = 0xa; }
     if (out_b != NULL) { *out_b = 1; }
@@ -11670,8 +11670,8 @@ u32 fn_801297D8(u8* ptr, u16* out_a, u16* out_b, u8* out_c, u8* out_d) {
     return fn_8012A5B0(ptr, 0xa, 0);
 }
 #endif
-/* 0x78 | fn_80129840 | generic */
-void fn_80129840(u8* arg1) {
+/* 0x78 | heroCheckSetMonohiroiAllTemotiPokemon | generic */
+void heroCheckSetMonohiroiAllTemotiPokemon(u8* arg1) {
     extern u32 fn_8012A5B0(u8* ptr, u32 a, u32 b);
     extern u8 fn_80123FBC(u32 a);
     extern void fn_80120674(u32 a);
@@ -11999,7 +11999,7 @@ void fn_8012A450(u8* ptr, u32 selector, u32 value) {
 
     switch (sel) {
     case 1:
-        fn_8012AA64(ptr, (void*)value);
+        heroBiosSetNamePtr(ptr, (void*)value);
         break;
     case 2:
         fn_8012AA54(ptr, value);
@@ -12041,7 +12041,7 @@ void fn_8012A450(u8* ptr, u32 selector, u32 value) {
         fn_8012A9AC(ptr, (u8)value);
         break;
     case 15:
-        fn_8012A89C(ptr, (void*)value);
+        heroBiosSetHizukiNamePtr(ptr, (void*)value);
         break;
     case 16:
         fn_8012A7B4(ptr, (u8)value);
@@ -12078,7 +12078,7 @@ void fn_8012A86C(u8* ptr, s32 val) {
     *(s32*)(&ptr[0xA84]) = val;
 }
 /* 0x8012A89C | 0x38 */
-void fn_8012A89C(u8* ptr, void* src) {
+void heroBiosSetHizukiNamePtr(u8* ptr, void* src) {
     if (ptr == NULL) { return; }
     if (src == NULL) { return; }
     GScharLenCpy(ptr + 0xAC2, src, 0xB);
@@ -12089,7 +12089,7 @@ void* fn_8012A8D4(void* ptr) {
     return (u8*)ptr + 0xAC2;
 }
 /* 0x8012AA64 | 0x38 */
-void fn_8012AA64(void* dst, void* src) {
+void heroBiosSetNamePtr(void* dst, void* src) {
     extern void GScharLenCpy();
     if (dst == NULL) { return; }
     if (src == NULL) { return; }
@@ -12209,7 +12209,7 @@ void fn_8012AC9C(void) {
 }
 #endif
 /* 0x8012AD50 | 0x434 */
-extern void fn_801C409C(void);
+extern void fadeEffectDokuStart(void);
 extern void fn_8018C69C(void);
 extern void fn_8018CA20(void);
 extern void fn_801067E8(void);
@@ -12229,8 +12229,8 @@ void fn_8012B184(s32 val) {
 }
 /* 0x8012B19C | 0x448 */
 extern void fn_8018D998(void);
-extern void fn_8018D928(void);
-extern void fn_8018F6F4(void);
+extern void peopleSearchID(void);
+extern void peopleInfoBiosGetPtr(void);
 extern void fn_8018F5E4(void);
 extern void fn_8010F320(void);
 extern void fn_800A3AC0(void);
@@ -12426,7 +12426,7 @@ extern void fn_8018FCBC(void);
 extern void fn_8018FC50(void);
 extern void fn_800CE148(void);
 extern void fn_800CDBE0(void);
-extern void fn_80111B9C(void);
+extern void GScolsys2CheckGetEventID(void);
 extern void fn_8018790C(void);
 extern void fn_800F7D38(void);
 extern void fn_800F7C8C(void);
@@ -12461,7 +12461,7 @@ extern void fn_8018F4C8(void);
 extern void fn_800EC578(void);
 extern void GSmodelGetAnimFrame(void);
 extern void fn_800EC5FC(void);
-extern void fn_800EC5B8(void);
+extern void GSmodelSetBlendFactor(void);
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 extern f32 lbl_8047D084;
@@ -12531,7 +12531,7 @@ void fn_8012E388(void);
 /* 0x8012E7B8 | 0x41C */
 extern void fn_800F7AF0(void);
 extern void fn_801887D8(void);
-extern void fn_800A3C00(void);
+extern void PSVECDistance(void);
 extern f32 lbl_8047D038;
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
@@ -12946,7 +12946,7 @@ void* fn_80114E0C(u32 a, u32 b) {
 }
 #pragma pop
 #endif
-extern void fn_800FC244();
+extern void GSmsgOpen();
 #if 0
 asm void fn_80114F18(void) {
 #include "src/game/gs_field_world_fn_80114F18.inc"
@@ -12963,7 +12963,7 @@ void* fn_80114F18(u32 a, u32 b) {
     }
     result = fn_800F9318(a, b);
     if (result != NULL) {
-        fn_800FC244(result);
+        GSmsgOpen(result);
     }
     return result;
 }
@@ -13025,7 +13025,7 @@ u32 fn_80115170(void* ptr) {
 }
 #pragma pop
 #endif
-extern void fn_800FC1D0();
+extern void GSmsgClose();
 #if 0
 asm void fn_801151BC(void) {
 #include "src/game/gs_field_world_fn_801151BC.inc"
@@ -13038,7 +13038,7 @@ u32 fn_801151BC(void* ptr) {
     if (fn_800FF554() != 0) {
         return 0;
     }
-    fn_800FC1D0(ptr);
+    GSmsgClose(ptr);
     return 1;
 }
 #pragma pop
@@ -13464,13 +13464,13 @@ extern u32 lbl_8047CFC0;
 extern u32 lbl_8047CFC8;
 extern u32 lbl_8047CFC4;
 #if 0
-asm void fn_80116F68(void) {
+asm void floorCharacterBiosGetRot(void) {
 #include "src/game/gs_field_world_fn_80116F68.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-s32 fn_80116F68(void* a, void* b) {
+s32 floorCharacterBiosGetRot(void* a, void* b) {
     if (a == 0) return 0;
     if (b == 0) return 0;
     fn_800E01F4(b, *(f32*)&lbl_8047CFC0,
@@ -13481,14 +13481,14 @@ s32 fn_80116F68(void* a, void* b) {
 #pragma pop
 #endif
 #if 0
-asm void fn_80116FE0(void) {
+asm void floorCharacterBiosGetPos(void) {
 #include "src/game/gs_field_world_fn_80116FE0.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma push
 #pragma peephole off
-u32 fn_80116FE0(u8* ptr, void* obj) {
+u32 floorCharacterBiosGetPos(u8* ptr, void* obj) {
     if (ptr == NULL) {
         return 0;
     }
@@ -14248,7 +14248,7 @@ u32 fn_801229F4(u8* ptr, u8 idx) {
     if (sub == NULL) {
         return 0;
     }
-    return fn_8011CE44(sub, idx);
+    return pokemonGrowDataBiosGetExp(sub, idx);
 }
 #endif
 #if 0
@@ -14622,11 +14622,11 @@ extern void jumptable_8035E4B0();
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 u32 fn_8012640C(void);
 #if 0
-asm void fn_8012A130(void) {
+asm void heroCheckValid(void) {
 #include "src/game/gs_field_world_fn_8012A130.inc"
 }
 #else
-u32 fn_8012A130(u8* ptr) {
+u32 heroCheckValid(u8* ptr) {
     extern u32 fn_8012A5B0(u8* ptr, u32 a, u32 b);
     extern s32 GScharCmp(u32 val, u16* out);
     u16 local = 0;
@@ -14685,8 +14685,8 @@ void fn_8012CA84(s32 playerIdx, f32* dirVec, f32* fwdVec) {
     extern void fn_801885C4(u32, u32, f32*, u32);         /* setMoveDirection(grp, hdl, dir, flags) */
     extern f32  fn_801887D8(u32, u32, f32*);              /* computeTurnAmount(grp, hdl, dir) */
     extern void fn_8018D998(u32, u32);                    /* selectEntity(grp, hdl) */
-    extern void* fn_8018D928(void);                       /* getEntityData() */
-    extern void* fn_8018F6F4(s32);                        /* getAngleConfig(param) */
+    extern void* peopleSearchID(void);                       /* getEntityData() */
+    extern void* peopleInfoBiosGetPtr(s32);                        /* getAngleConfig(param) */
     extern f32  fn_8018F678(void*);                       /* getMaxTurnRatePos(obj) */
     extern f32  fn_8018F658(void*);                       /* getMaxTurnRateNeg(obj) */
     extern u8   lbl_80426BD0[];                           /* player state array (stride 0x20) */
@@ -14855,7 +14855,7 @@ void fn_8012CA84(s32 playerIdx, f32* dirVec, f32* fwdVec) {
                 turnParam = -1;
             } else {
                 fn_8018D998(0, turnH);
-                tPtr = fn_8018D928();
+                tPtr = peopleSearchID();
                 if (tPtr != NULL) {
                     turnParam = *(s32*)((u8*)tPtr + 0x30);
                 } else {
@@ -14863,7 +14863,7 @@ void fn_8012CA84(s32 playerIdx, f32* dirVec, f32* fwdVec) {
                 }
             }
 
-            angleObj = fn_8018F6F4(turnParam);
+            angleObj = peopleInfoBiosGetPtr(turnParam);
 
             {
                 f32 r = fn_8018F678(angleObj);

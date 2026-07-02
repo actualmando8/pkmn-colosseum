@@ -92,8 +92,8 @@ typedef struct DisplayFuncVec {
 } DisplayFuncVec;
 
 extern void fn_800A3AC0(void*, void*, f32);
-extern f32 fn_800A3B38(void*);
-extern void fn_800A3B9C(void*, void*, void*);
+extern f32 PSVECMag(void*);
+extern void PSVECCrossProduct(void*, void*, void*);
 extern const DisplayFuncVec lbl_802746D0; /* { 0.0f, 0.0f, 1.0f } */
 extern f32 lbl_80478ACC;
 
@@ -153,13 +153,13 @@ void fn_80198038(void* dobj, void* mtx, void* renderState)
     DISPLAYFUNC_LOAD_COLUMN(col2, mtx, 2);
     DISPLAYFUNC_LOAD_TRANSLATION(trans, mtx);
 
-    col0Len = fn_800A3B38(&col0);
-    col2Len = fn_800A3B38(&col2);
-    col1Len = fn_800A3B38(&col1);
+    col0Len = PSVECMag(&col0);
+    col2Len = PSVECMag(&col2);
+    col1Len = PSVECMag(&col1);
     col1Work = col1;
 
     if (((HSD_DObj*) dobj)->flags & DISPLAYFUNC_FLAG_2000) {
-        scale = -1.0f / (lbl_80478ACC + fn_800A3B38(&trans));
+        scale = -1.0f / (lbl_80478ACC + PSVECMag(&trans));
         fn_800A3AC0(&trans, &basis, scale);
     } else {
         basis = lbl_802746D0;
@@ -167,23 +167,23 @@ void fn_80198038(void* dobj, void* mtx, void* renderState)
 
     scale = 1.0f / (lbl_80478ACC + col1Len);
     fn_800A3AC0(&col1Work, &col1Work, scale);
-    fn_800A3B9C(&col1Work, &basis, &cross);
-    crossLen = fn_800A3B38(&cross);
+    PSVECCrossProduct(&col1Work, &basis, &cross);
+    crossLen = PSVECMag(&cross);
 
     if (crossLen >= lbl_80478ACC) {
         col0Len /= crossLen;
-        fn_800A3B9C(&basis, &cross, &col1Work);
-        col1Len /= lbl_80478ACC + fn_800A3B38(&col1Work);
+        PSVECCrossProduct(&basis, &cross, &col1Work);
+        col1Len /= lbl_80478ACC + PSVECMag(&col1Work);
     } else {
         DisplayFuncVec flat;
 
         DISPLAYFUNC_SET_VEC(flat, basis.x, 0.0f, basis.z);
-        horizLen = fn_800A3B38(&flat);
+        horizLen = PSVECMag(&flat);
         denom = lbl_80478ACC + horizLen;
         scale = -basis.y / denom;
         DISPLAYFUNC_SET_VEC(col1Work, basis.x * scale, denom, basis.z * scale);
-        fn_800A3B9C(&col1Work, &basis, &cross);
-        col0Len /= lbl_80478ACC + fn_800A3B38(&cross);
+        PSVECCrossProduct(&col1Work, &basis, &cross);
+        col0Len /= lbl_80478ACC + PSVECMag(&cross);
     }
 
     DISPLAYFUNC_STORE_COLUMN(renderState, 0, cross, col0Len);
@@ -198,8 +198,8 @@ void fn_80198038(void* dobj, void* mtx, void* renderState)
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_800A2D64(void*, void*);
-extern void fn_800A3ADC(void*, void*);
+extern void PSMTXCopy(void*, void*);
+extern void PSVECNormalize(void*, void*);
 #if 0
 asm void fn_801985E0(void* dobj, void* mtx, void* renderState) {
 #include "src/hsd/hsd_displayfunc_fn_801985E0.inc"
@@ -227,38 +227,38 @@ void fn_801985E0(void* dobj, void* mtx, void* renderState)
     DISPLAYFUNC_LOAD_COLUMN(col2, mtx, 2);
     DISPLAYFUNC_LOAD_TRANSLATION(trans, mtx);
 
-    scale = 1.0f / (lbl_80478ACC + fn_800A3B38(&col0));
+    scale = 1.0f / (lbl_80478ACC + PSVECMag(&col0));
     fn_800A3AC0(&col0, &col0Unit, scale);
-    col1Len = fn_800A3B38(&col1);
-    col2Len = fn_800A3B38(&col2);
+    col1Len = PSVECMag(&col1);
+    col2Len = PSVECMag(&col2);
 
     if (((HSD_DObj*) dobj)->flags & DISPLAYFUNC_FLAG_2000) {
         DisplayFuncVec flat;
 
         DISPLAYFUNC_SET_VEC(flat, trans.x, 0.0f, trans.z);
-        basisLen = fn_800A3B38(&flat);
+        basisLen = PSVECMag(&flat);
         denom = lbl_80478ACC + basisLen;
         scale = -trans.y / denom;
         DISPLAYFUNC_SET_VEC(basis, trans.x * scale, denom, trans.z * scale);
-        fn_800A3ADC(&basis, &basis);
+        PSVECNormalize(&basis, &basis);
     } else {
         DISPLAYFUNC_SET_VEC(basis, 0.0f, 1.0f, 0.0f);
     }
 
-    fn_800A3B9C(&col0Unit, &basis, &cross);
-    crossLen = fn_800A3B38(&cross);
+    PSVECCrossProduct(&col0Unit, &basis, &cross);
+    crossLen = PSVECMag(&cross);
 
     if (crossLen >= lbl_80478ACC) {
         col2Len /= crossLen;
-        fn_800A3B9C(&cross, &col0Unit, &basis);
-        col1Len /= lbl_80478ACC + fn_800A3B38(&basis);
+        PSVECCrossProduct(&cross, &col0Unit, &basis);
+        col1Len /= lbl_80478ACC + PSVECMag(&basis);
 
         DISPLAYFUNC_STORE_COLUMN(renderState, 0, col0, 1.0f);
         DISPLAYFUNC_STORE_COLUMN(renderState, 1, basis, col1Len);
         DISPLAYFUNC_STORE_COLUMN(renderState, 2, cross, col2Len);
         DISPLAYFUNC_STORE_TRANSLATION(renderState, trans);
     } else {
-        fn_800A2D64(mtx, renderState);
+        PSMTXCopy(mtx, renderState);
     }
 }
 #endif
@@ -294,25 +294,25 @@ void fn_80198B20(void* dobj, void* mtx, void* renderState)
     DISPLAYFUNC_LOAD_COLUMN(col2, mtx, 2);
     DISPLAYFUNC_LOAD_TRANSLATION(trans, mtx);
 
-    scale = 1.0f / (lbl_80478ACC + fn_800A3B38(&col1));
+    scale = 1.0f / (lbl_80478ACC + PSVECMag(&col1));
     fn_800A3AC0(&col1, &col1Unit, scale);
-    col0Len = fn_800A3B38(&col0);
-    col2Len = fn_800A3B38(&col2);
+    col0Len = PSVECMag(&col0);
+    col2Len = PSVECMag(&col2);
 
     if (((HSD_DObj*) dobj)->flags & DISPLAYFUNC_FLAG_2000) {
-        scale = -1.0f / (lbl_80478ACC + fn_800A3B38(&trans));
+        scale = -1.0f / (lbl_80478ACC + PSVECMag(&trans));
         fn_800A3AC0(&trans, &basis, scale);
     } else {
         basis = lbl_802746D0;
     }
 
-    fn_800A3B9C(&col1Unit, &basis, &cross);
-    crossLen = fn_800A3B38(&cross);
+    PSVECCrossProduct(&col1Unit, &basis, &cross);
+    crossLen = PSVECMag(&cross);
 
     if (crossLen >= lbl_80478ACC) {
         col0Len /= crossLen;
-        fn_800A3B9C(&cross, &col1Unit, &basis);
-        basisLen = fn_800A3B38(&basis);
+        PSVECCrossProduct(&cross, &col1Unit, &basis);
+        basisLen = PSVECMag(&basis);
         col2Len /= lbl_80478ACC + basisLen;
 
         DISPLAYFUNC_STORE_COLUMN(renderState, 0, cross, col0Len);
@@ -320,7 +320,7 @@ void fn_80198B20(void* dobj, void* mtx, void* renderState)
         DISPLAYFUNC_STORE_COLUMN(renderState, 2, basis, col2Len);
         DISPLAYFUNC_STORE_TRANSLATION(renderState, trans);
     } else {
-        fn_800A2D64(mtx, renderState);
+        PSMTXCopy(mtx, renderState);
     }
 }
 #endif

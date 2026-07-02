@@ -16,7 +16,7 @@
  * The save system is initialized at boot from main.c:
  *   fn_801E1300 - Card system init
  *   fn_801E1B2C - Save data init
- *   fn_801E12A0 - Save system post-init
+ *   GSvtrRegisterGSgapp - Save system post-init
  *
  * Per-frame updates via:
  *   fn_801E0FB4 - Save/card per-frame update
@@ -210,7 +210,7 @@ void save_CardSystemInit(void);
 void save_DataInit(void);
 
 /**
- * fn_801E12A0: Post-initialization for save system.
+ * GSvtrRegisterGSgapp: Post-initialization for save system.
  * Called from GameInit() after task registration.
  * Finalizes card system state.
  */

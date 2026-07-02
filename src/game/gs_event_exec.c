@@ -37,7 +37,7 @@
  *   fn_80014398  GSevent_BranchOnFlag         -- 0x1B8 bytes, conditional branch
  *   fn_80014550  GSevent_UnlockLocation       -- 0x24 bytes, unlock map location
  *   fn_80014574  GSevent_CutsceneSequence     -- 0x4D4 bytes, full cutscene playback
- *   fn_80014A48  GSevent_SetWeather           -- 0x9C bytes, change weather effect
+ *   menuPocket2NumCtrl  GSevent_SetWeather           -- 0x9C bytes, change weather effect
  *   fn_80014AE4  GSevent_SetTimeOfDay         -- 0xBC bytes, set time/lighting
  *   fn_80014BA0  GSevent_TriggerBattle        -- 0x98 bytes, start battle from event
  *   fn_80014C38  GSevent_ShadowEncounter      -- 0xE4 bytes, Shadow Pokemon event
@@ -137,7 +137,7 @@ u32 fn_80014110(void) {
 extern u8*  fn_801040A0(void);
 extern void* fn_80103FFC(void*, s32);
 extern void* fn_80103FE4(void*);
-extern u8   fn_80104704(s32);
+extern u8   windowSearchID(s32);
 extern void fn_80103F74(s32, s32, s32);
 extern void fn_801669BC(s32);
 extern void* memcpy(void* dst, const void* src, u32 n);
@@ -157,7 +157,7 @@ s32 fn_800129A8(u8* ctx) {
     if ((s32)(s8)ctx[1] == 0) {
         id = *(s32*)(ctx + 4);
         kind = 0;
-        if (fn_80104704(id) != 0) {
+        if (windowSearchID(id) != 0) {
             if (id == 0x49) kind = 0x538;
             else if (id >= 0x49) { if (id < 0x4b) kind = 0x540; }
             else if (id >= 0x47) kind = 0x540;
@@ -166,7 +166,7 @@ s32 fn_800129A8(u8* ctx) {
         }
         id = *(s32*)(ctx + 4);
         kind = 0;
-        if (fn_80104704(id) != 0) {
+        if (windowSearchID(id) != 0) {
             if (id == 0x49) kind = 0x539;
             else if (id >= 0x49) { if (id < 0x4b) kind = 0x541; }
             else if (id >= 0x47) kind = 0x541;
@@ -574,7 +574,7 @@ s32 fn_80013668(u8* ctx) {
 
 /* fn_8001374C - 0x8001374C | size: 0x168 */
 extern void* fn_80129BC8(u32, u8, void*, s32, s32, s32);
-extern void* fn_801297D8(u32, void*, s32, s32, s32);
+extern void* heroHizukiItemGetItemAryPtr(u32, void*, s32, s32, s32);
 extern u8  fn_801429E8(void*);
 extern s32 fn_80143C68(void*);
 extern s32 fn_80129A78(u32, s32, s32, s32);
@@ -598,7 +598,7 @@ s32 fn_8001374C(s32 entry_idx, s32 target_n, s32* out) {
     if (flag >= 0) {
         list = fn_80129BC8(lbl_8047A2F8, (u8)flag, buf, 0, 0, 0);
     } else {
-        list = fn_801297D8(lbl_8047A2F8, buf, 0, 0, 0);
+        list = heroHizukiItemGetItemAryPtr(lbl_8047A2F8, buf, 0, 0, 0);
     }
     idx = -1;
     i = 0;
@@ -649,7 +649,7 @@ s32 fn_800138B4(s32 entry_idx, s32 target_n, s32* out) {
     if (flag >= 0) {
         list = fn_80129BC8(lbl_8047A2F8, (u8)flag, buf, 0, 0, 0);
     } else {
-        list = fn_801297D8(lbl_8047A2F8, buf, 0, 0, 0);
+        list = heroHizukiItemGetItemAryPtr(lbl_8047A2F8, buf, 0, 0, 0);
     }
     idx = -1;
     i = 0;
@@ -753,7 +753,7 @@ s32 fn_80013A18(s32 entry_idx, s32 target_n, s32* out) {
     if (flag >= 0) {
         list = fn_80129BC8(lbl_8047A2F8, (u8)flag, &count_a, 0, 0, 0);
     } else {
-        list = fn_801297D8(lbl_8047A2F8, &count_a, 0, 0, 0);
+        list = heroHizukiItemGetItemAryPtr(lbl_8047A2F8, &count_a, 0, 0, 0);
     }
 
     idx = -1;
@@ -810,7 +810,7 @@ have_quantity:
     if (flag >= 0) {
         list = fn_80129BC8(lbl_8047A2F8, (u8)flag, &count_b, 0, 0, 0);
     } else {
-        list = fn_801297D8(lbl_8047A2F8, &count_b, 0, 0, 0);
+        list = heroHizukiItemGetItemAryPtr(lbl_8047A2F8, &count_b, 0, 0, 0);
     }
 
     idx = -1;
@@ -866,7 +866,7 @@ have_item:
 
 /* fn_80013DFC - 0x80013DFC | size: 0x184 */
 extern void fn_801440A0(u16);
-extern u8   fn_80143E88(void);
+extern u8   itemDataBiosGetHidenMachineNo(void);
 extern u8   fn_80144014(void);
 extern s32  fn_8001BCEC(u8, u8, s32, s32);
 extern void fn_8001B184(void);
@@ -885,7 +885,7 @@ s32 fn_80013DFC(s32 entry_idx, s32 target_n, s32* out) {
     if (flag >= 0) {
         list = fn_80129BC8(lbl_8047A2F8, (u8)flag, buf, 0, 0, 0);
     } else {
-        list = fn_801297D8(lbl_8047A2F8, buf, 0, 0, 0);
+        list = heroHizukiItemGetItemAryPtr(lbl_8047A2F8, buf, 0, 0, 0);
     }
     idx = -1;
     i = 0;
@@ -903,7 +903,7 @@ s32 fn_80013DFC(s32 entry_idx, s32 target_n, s32* out) {
     idx = 0;
 after:
     fn_801440A0(idx);
-    if (fn_80143E88() != 0xFF) {
+    if (itemDataBiosGetHidenMachineNo() != 0xFF) {
         fn_80132A38(0x2d, (u16)idx);
         fn_80106D3C(2, 0x4262, 1, 0);
         fn_801069FC(1);
@@ -947,7 +947,7 @@ s32 fn_80013F80(s32 entry_idx, s32 target_n, s32* out) {
     if (flag >= 0) {
         list = fn_80129BC8(lbl_8047A2F8, (u8)flag, buf, 0, 0, 0);
     } else {
-        list = fn_801297D8(lbl_8047A2F8, buf, 0, 0, 0);
+        list = heroHizukiItemGetItemAryPtr(lbl_8047A2F8, buf, 0, 0, 0);
     }
     idx = -1;
     i = 0;
@@ -1368,10 +1368,10 @@ s32 fn_80014574(u8* ctx) {
 #pragma pop
 #endif
 
-/* fn_80014A48 - 0x80014A48 | size: 0x9c */
+/* menuPocket2NumCtrl - 0x80014A48 | size: 0x9c */
 #pragma push
 #pragma peephole off
-s32 fn_80014A48(u8* ctx) {
+s32 menuPocket2NumCtrl(u8* ctx) {
     u8* p = *(u8**)(ctx + 0x60);
     switch ((s32)(s8)ctx[0x1]) {
     case 0:

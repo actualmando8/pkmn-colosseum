@@ -760,7 +760,7 @@ void fn_800F76E4(u8* arg) {
     *(u8*)(arg + 0xa) = 1;
 }
 #endif
-extern void fn_800E3534(void);
+extern void _toolentryAlloc__FUl(void);
 extern void fn_800DD38C(void);
 extern u8 lbl_80401BF8[];
 extern u8* lbl_80478B00;
@@ -768,7 +768,7 @@ extern u8 lbl_802712E4[];
 #if 1
 s32 fn_800F7758(u32 count) {
     extern void* memset(void* dst, int val, u32 size);
-    extern u16 fn_800E3534(u32 size);
+    extern u16 _toolentryAlloc__FUl(u32 size);
     extern void* fn_800E27B0(u16 handle);
     extern void fn_800DD38C(const char* msg, ...);
     extern u8 lbl_80401BF8[];
@@ -781,7 +781,7 @@ s32 fn_800F7758(u32 count) {
     memset(lbl_80401BF8, 0, 0x14);
     count16 = (u16)count;
     lbl_80478B00 = lbl_80401BF8;
-    *(u16*)(lbl_80478B00 + 2) = fn_800E3534(count16 * 0x16c);
+    *(u16*)(lbl_80478B00 + 2) = _toolentryAlloc__FUl(count16 * 0x16c);
     if (*(u16*)(lbl_80478B00 + 2) == 0) {
         fn_800DD38C((const char*)lbl_802712E4);
         return -1;

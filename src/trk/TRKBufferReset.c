@@ -10,7 +10,7 @@ typedef struct TRKBuffer {
 
 extern TRKBuffer lbl_803FCE08[];
 
-s32 fn_800BEE44(TRKBuffer* buffer, u32 position) {
+s32 TRKSetBufferPosition(TRKBuffer* buffer, u32 position) {
     s32 result = 0;
 
     if (position > 0x880) {

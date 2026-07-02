@@ -855,7 +855,7 @@ void fn_801F000C(void) {
 }
 
 /* 0x801F0058 | size: 0x78 | small */
-u32 fn_801F0058(u32 param1, u32 param2) {
+u32 fightTargetIsHostSide(u32 param1, u32 param2) {
     extern u32 fn_801F02AC();
     u32 slotVal;
     u32 cmpVal;
@@ -1545,14 +1545,14 @@ u8 fn_801F18DC(u32 param_1) {
 /* 0x801F1918 | size: 0x74 | small */
 void fn_801F1918(void* obj, u32 arg2, void* dst) {
     extern u32 fn_802037DC(u32);
-    extern void fn_800F9E70(void*, u32);
+    extern void GScharCpy(void*, u32);
     extern u32 fn_801F54A4(void*, u32, u32, u32);
     void* d;
     void* o;
 
     o = obj;
     d = dst;
-    fn_800F9E70(d, fn_802037DC(arg2));
+    GScharCpy(d, fn_802037DC(arg2));
     if ((fn_801F54A4(o, 0, 0x22, 0) & 0xFF) == 1) {
         *(u8*)((u8*)d + 0x16) = 0;
     } else {
@@ -1630,7 +1630,7 @@ u16 fn_801F1A6C(u32 obj, u32 slot, u32* arr, u8 r6, u8 r7_orig) {
 /* 0x801F1B14 | size: 0x184 | medium */
 u32 _fightFloorGetFightTrainerFightPokemonPtrArySub__FPvUsPv(void* obj, u32 slot, void* data) {
     extern u32 fn_801FA634();
-    extern u32 fn_801F8424(void*, u32, u32);
+    extern u32 fightTrainerIsAllyFightTargetPtr(void*, u32, u32);
     extern void* fn_801F986C(void*, u32);
     extern u32 fn_80206608();
     struct { u32 slotVal; s32 flag1; u32 count; void** arr; u32 maxcnt; s32 flag2; }* s = data;
@@ -1645,10 +1645,10 @@ u32 _fightFloorGetFightTrainerFightPokemonPtrArySub__FPvUsPv(void* obj, u32 slot
     if ((u8)fn_801FA634() == 0)
         return 1;
     if (s->flag1 == 0) {
-        if ((u8)fn_801F8424(obj, slotVal, slot) == 1)
+        if ((u8)fightTrainerIsAllyFightTargetPtr(obj, slotVal, slot) == 1)
             return 1;
     } else {
-        if ((u8)fn_801F8424(obj, slotVal, slot) == 0)
+        if ((u8)fightTrainerIsAllyFightTargetPtr(obj, slotVal, slot) == 0)
             return 1;
     }
     i = 0;
@@ -1691,7 +1691,7 @@ u16 fn_801F1C18(u32 obj, u32 slot, u32* arr, u8 r6, u8 r7) {
 /* 0x801F1C98 | size: 0xC0 | medium */
 u32 _fightFloorGetFightTrainerFightOutPokemonPtrArySub__FPvUsPv(void* obj, u32 slot, void* data) {
     extern u32 fn_802062FC();
-    extern u32 fn_801F8424(void*, void*, u32);
+    extern u32 fightTrainerIsAllyFightTargetPtr(void*, void*, u32);
     struct { u32 slotVal; void** arr; u32 count; s32 flag; s32 mode; }* s = data;
     u32 slotVal;
     void** arr;
@@ -1703,10 +1703,10 @@ u32 _fightFloorGetFightTrainerFightOutPokemonPtrArySub__FPvUsPv(void* obj, u32 s
             return 1;
     }
     if (s->flag == 0) {
-        if ((u8)fn_801F8424((void*)slotVal, obj, slot) == 1)
+        if ((u8)fightTrainerIsAllyFightTargetPtr((void*)slotVal, obj, slot) == 1)
             return 1;
     } else {
-        if ((u8)fn_801F8424((void*)slotVal, obj, slot) == 0)
+        if ((u8)fightTrainerIsAllyFightTargetPtr((void*)slotVal, obj, slot) == 0)
             return 1;
     }
     arr[s->count] = obj;
@@ -1731,7 +1731,7 @@ u32 fn_801F1DBC(u32 obj, u32 side) {
     extern u32 fn_801F7404(void);
     extern u32 fn_801F7258(u32, u32);
     extern u32 fn_801FB8F8(void);
-    extern u32 fn_801F0058(u32, u32);
+    extern u32 fightTargetIsHostSide(u32, u32);
     u32 r31;
     u32 r24;
     u32 r30;
@@ -1770,7 +1770,7 @@ u32 fn_801F1DBC(u32 obj, u32 side) {
     r29 = 0;
 _found:
     if (r29 != 0) {
-        if ((u8)fn_801F0058(r29, r30) == 1)
+        if ((u8)fightTargetIsHostSide(r29, r30) == 1)
             r0 = 1;
         else
             r0 = 0;
@@ -4857,7 +4857,7 @@ u8* fn_801F7908(u8* base, u16 idx) {
 void fn_801F7954(u8* ptr, u8* arr) {
     extern u16 fn_801EF634(void);
     extern u8* fn_801FB1C0(u8*, u32, u16, u32);
-    extern u8 fn_8012A130(void);
+    extern u8 heroCheckValid(void);
     extern u8* fn_8012A5B0(u8*, u32, u16);
     extern u8 fn_80123FBC(void);
     extern u32 fn_8012640C(u8*, u32, u16, u32);
@@ -4876,7 +4876,7 @@ void fn_801F7954(u8* ptr, u8* arr) {
     if ((u16)fn_801EF634() == 1) { r0 = 0; goto L_check; }
     if ((s32)fn_801FB1C0(ptr, 0, 0x43, 0) == 0) { r0 = 0; goto L_check; }
     if (fn_801FB1C0(ptr, 0, 0x44, 0) == NULL) { r0 = 0; goto L_check; }
-    if (fn_8012A130() == 0) { r0 = 0; goto L_check; }
+    if (heroCheckValid() == 0) { r0 = 0; goto L_check; }
     r0 = 1;
 L_check:
     if ((u8)r0 == 0) return;

@@ -62,7 +62,7 @@ u32 wcstombs(char* dst, const wchar_t* src, u32 n) {
  *
  * 0x800C80D0 | size: 0x4C
  */
-s32 fn_800C80D0(const wchar_t* s1, const wchar_t* s2, u32 n) {
+s32 memcmp(const wchar_t* s1, const wchar_t* s2, u32 n) {
     const u8* p1 = (const u8*)s1 - 1;
     const u8* p2 = (const u8*)s2 - 1;
     u32 count = n + 1;

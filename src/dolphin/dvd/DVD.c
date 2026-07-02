@@ -610,7 +610,7 @@ DVDDiskID* DVDGetCurrentDiskID(void) {
  */
 
 /*
- * fn_800A609C - 0x800A609C | size: 0x38
+ * stateCheckID2 - 0x800A609C | size: 0x38
  * DVD state machine callback - reads disk ID after cover close
  * TODO: Full decompilation
  */

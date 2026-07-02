@@ -62,7 +62,7 @@
  *   State 4: Cleanup -- restore camera, free resources
  *
  * fn_8000D298 (GSnpc_InitDialog) sets up the NPC sprite for dialog:
- *   - Calls fn_80109220 to set NPC facing direction
+ *   - Calls winSpriteSetDisp to set NPC facing direction
  *   - Gets the NPC data from fn_8005D934 (lookup by ID)
  *   - Sets up the text viewport via fn_801040F0
  *   - If the NPC has a special marker (offset +0x4C), renders it
@@ -102,7 +102,7 @@ extern u32 _menuFightIsUse__FP16MENU_WAZA_STATUSUs();
 extern void* menuSubCalcColor(void*, void*);
 
 /* NPC/People system */
-extern void  fn_80109220(void* npc, s32 direction);  /* Set NPC facing */
+extern void  winSpriteSetDisp(void* npc, s32 direction);  /* Set NPC facing */
 extern void* fn_8005D934(s16 npcId);                  /* Lookup NPC data by ID */
 
 /* Text/dialog system */
@@ -820,14 +820,14 @@ s32 fn_80011A1C(u8* obj, s32 a1, s32 a2) {
 #endif
 
 /* 0x78 | fn_80011B4C | generic */
-extern u32 fn_80104704();
+extern u32 windowSearchID();
 extern u8* fn_801040A0();
 #pragma peephole off
 #pragma peephole off
 u32 fn_80011B4C(u32 arg1, u8 arg2) {
     u32 r;
     while (1) {
-        if (!(r = fn_80104704(arg1))) return 0;
+        if (!(r = windowSearchID(arg1))) return 0;
         if (*(s16*)((u8*)fn_801040A0(r) + 0xc) == 0) return 0;
         if (arg2 != 0) {
             _threadSwitch();
@@ -856,7 +856,7 @@ void fn_80011BC4(u32 arg1, u32 target) {
     u32 data;
     u32 diff;
     s16 score;
-    ptr = fn_80104704(arg1);
+    ptr = windowSearchID(arg1);
     if (!ptr) { return; }
     state = (u32)fn_80103FE4(ptr);
     data = (u32)fn_801040A0(ptr);
@@ -884,7 +884,7 @@ void fn_80011BC4(u32 arg1, u32 target) {
 u32 fn_80011C78(u32 arg1, u8 arg2) {
     u32 r;
     while (1) {
-        if (!(r = fn_80104704(arg1))) return 0;
+        if (!(r = windowSearchID(arg1))) return 0;
         if (*(s16*)((u8*)fn_801040A0(r) + 0x2) == 0) return 0;
         if (arg2 != 0) {
             _threadSwitch();
@@ -908,7 +908,7 @@ void fn_80011CF0(u32 arg1, s16 target) {
     u32 data;
     s16 current;
     s32 diff;
-    if (!(ptr = fn_80104704(arg1))) { return; }
+    if (!(ptr = windowSearchID(arg1))) { return; }
     state = (u32)fn_80103FE4(ptr);
     data = (u32)fn_801040A0(ptr);
     current = *(s16*)(state + 0x1a);
@@ -934,7 +934,7 @@ void fn_80011D9C(s32 id, s32 do_extra) {
     u32 resolved;
     s32 kind;
     kind = 0;
-    resolved = fn_80104704(id);
+    resolved = windowSearchID(id);
     if (resolved == 0) return;
     switch (id) {
     case 0x45: case 0x46: case 0x49:
@@ -959,10 +959,10 @@ void fn_80011D9C(s32 id, s32 do_extra) {
 /* Set an NPC's facing direction. */
 void fn_80011E68(u32 npcId, u16 direction) {
     extern void* fn_80103FE4(void* obj);
-    extern void* fn_80104704(u32 npcId);
+    extern void* windowSearchID(u32 npcId);
     void* npc;
 
-    npc = fn_80104704(npcId);
+    npc = windowSearchID(npcId);
     if (npc != NULL) {
         u8* obj = (u8*)fn_80103FE4(npc);
         *(u16*)(obj + 0x1A) = direction;
@@ -970,7 +970,7 @@ void fn_80011E68(u32 npcId, u16 direction) {
 }
 
 /* 0x80011EA4 | 0x9B4 -- GSnpc_WarpToLocation continued */
-extern void fn_801091F4();
+extern void winSpriteGetDisp();
 extern void fn_8001DACC();
 extern void fn_8010B9E8();
 extern void fn_801F54A4();
@@ -1023,7 +1023,7 @@ void fn_80011EA4(void) {
     extern void fn_80103FE4();
     extern void fn_801040A0();
     extern void fn_80104160();
-    extern void fn_801091F4();
+    extern void winSpriteGetDisp();
     extern void fn_8010B9E8();
     extern void fn_801F54A4();
     u8 sp[0x70];
@@ -1135,9 +1135,9 @@ do {
     }
 } while (0);
     r3 = r28;
-    ((void(*)(void))fn_80109220)();
+    ((void(*)(void))winSpriteSetDisp)();
     r3 = r28;
-    fn_801091F4();
+    winSpriteGetDisp();
     tmp = r3 & 0xFF;
     if (tmp == 0) return;
     tmp = *(s16*)((u8*)r28 + 0x6);
@@ -1204,7 +1204,7 @@ do {
             fn_8001DACC();
             r3 = r28;
             r4 = 0x0;
-            ((void(*)(void))fn_80109220)();
+            ((void(*)(void))winSpriteSetDisp)();
             return;
         L_8001215C:
             r5 = *(u16*)((u8*)r30 + 0x26);
@@ -1597,7 +1597,7 @@ L_80012758:
 extern s32 fn_8012C540();
 extern void fn_80116D30(void);
 extern void fn_8012BCA4(void);
-extern void fn_801D23C0(void);
+extern void mailMainReceiveTerminate(void);
 extern void fn_800EC918(void);
 extern s32 fn_800D37CC();
 extern void fn_8010206C(void);
@@ -1608,12 +1608,12 @@ extern void* fn_801906A0();
 extern u32 fn_800FF560();
 extern void fn_80130CD8(void);
 extern void fn_800FE6F8(void);
-extern void fn_800F03D4(void);
+extern void GSthreadBlockGroup(void);
 extern void GSthreadCreate(void);
 extern void fn_800FE6DC(void);
 extern void fn_80102510();
 extern void fn_800EC8DC(void);
-extern void fn_8001BDF4(void);
+extern void menuPokemonOpen(void);
 extern void fn_8004BE0C(void);
 extern u32 fn_80018F88();
 extern u32 fn_80019070();
@@ -1621,7 +1621,7 @@ extern void fn_8012BAD0(void);
 extern s32 fn_801CBAB8();
 extern void fn_80109764(void);
 extern void fn_801660D8(void);
-extern void fn_80102038(void);
+extern void menuReleaseOffScreen(void);
 extern void menuCloseSync(void);
 extern void fn_8012BBA8(void);
 extern u8 lbl_8047A2A0;
@@ -1643,7 +1643,7 @@ u32 fn_8000D710(u32 mode) {
     extern s32 fn_8012C540(void* out);
     extern void fn_80116D30(s32 kind, u16 value);
     extern void fn_8012BCA4(void);
-    extern void fn_801D23C0(void);
+    extern void mailMainReceiveTerminate(void);
     extern void fn_800EC918(void);
     extern s32 fn_800D37CC(void);
     extern void fn_8010206C(f32 value);
@@ -1654,12 +1654,12 @@ u32 fn_8000D710(u32 mode) {
     extern u32 fn_800FF560(void);
     extern void fn_80130CD8(void);
     extern void fn_800FE6F8(void);
-    extern void fn_800F03D4(u32);
+    extern void GSthreadBlockGroup(u32);
     extern void GSthreadCreate(s32, void*, u32, s32, s32, void*);
     extern void fn_800FE6DC(void);
     extern void fn_80102510(s32);
     extern void fn_800EC8DC(void);
-    extern void fn_8001BDF4(s32, s32, s32);
+    extern void menuPokemonOpen(s32, s32, s32);
     extern void fn_8004BE0C(void);
     extern u32 fn_80018F88(s32, void*, s32);
     extern u32 fn_80019070(u32);
@@ -1667,7 +1667,7 @@ u32 fn_8000D710(u32 mode) {
     extern s32 fn_801CBAB8(void);
     extern void fn_80109764(void);
     extern void fn_801660D8(s32, s32, s32);
-    extern void fn_80102038(f32 value);
+    extern void menuReleaseOffScreen(f32 value);
     extern void menuCloseSync(s32, s32);
     extern void fn_8012BBA8(void);
     extern f32 lbl_8047B6F0;
@@ -1686,7 +1686,7 @@ u32 fn_8000D710(u32 mode) {
     }
 
     fn_8012BCA4();
-    fn_801D23C0();
+    mailMainReceiveTerminate();
     _threadSwitch();
     fn_800EC918();
     lbl_8047A2A0 = 1;
@@ -1711,7 +1711,7 @@ u32 fn_8000D710(u32 mode) {
             lbl_8047A2A8 = fn_800FF560();
             fn_80130CD8();
             fn_800FE6F8();
-            fn_800F03D4(lbl_8047A2A8);
+            GSthreadBlockGroup(lbl_8047A2A8);
             lbl_8047A2AC = lbl_8047A2A8 - 0x20;
             GSthreadCreate(0xF, (void*)lbl_8047A2AC, 0x4000, 1, 1, threadEntry);
             _threadSwitch();
@@ -1721,7 +1721,7 @@ u32 fn_8000D710(u32 mode) {
             if (lbl_8047A2B0 == 0) {
                 fn_80102510(dialogId);
                 fn_800EC8DC();
-                fn_8001BDF4(1, 0, 0);
+                menuPokemonOpen(1, 0, 0);
                 fn_800EC918();
             } else if (lbl_8047A2B0 == 1) {
                 fn_80102510(dialogId);
@@ -1757,7 +1757,7 @@ u32 fn_8000D710(u32 mode) {
     fn_80102510(dialogId);
     tmp = fn_800D37CC();
     if (tmp != 0) {
-        fn_80102038(lbl_8047B6F0 / (f32)(s32)tmp);
+        menuReleaseOffScreen(lbl_8047B6F0 / (f32)(s32)tmp);
     }
     menuCloseSync(dialogId, 1);
     fn_800D3074(2);
@@ -1770,8 +1770,8 @@ u32 fn_8000D710(u32 mode) {
 #endif
 
 /* fn_8000DAB0 - 0x8000DAB0 | size: 0x38 */
-extern u32 fn_8010264C(u32, u32);
-extern void fn_800F0384(u32);
+extern u32 menuOpen(u32, u32);
+extern void GSthreadUnblockGroup(u32);
 extern u32 lbl_8047A2A4;
 extern u32 lbl_8047A2A8;
 extern u32 lbl_8047A2B0;
@@ -1782,8 +1782,8 @@ asm void fn_8000DAB0(void) {
 #else
 #pragma peephole off
 u32 fn_8000DAB0(void) {
-    lbl_8047A2B0 = fn_8010264C(lbl_8047A2A4, 1);
-    fn_800F0384(lbl_8047A2A8);
+    lbl_8047A2B0 = menuOpen(lbl_8047A2A4, 1);
+    GSthreadUnblockGroup(lbl_8047A2A8);
     return lbl_8047A2B0;
 }
 #pragma peephole on
@@ -1933,7 +1933,7 @@ void fn_8000DDE8(void) { fn_801026A4(0x10b, -1, 0, 0, 0, 0); }
 #endif
 
 /* fn_8000DE24 - 0x8000DE24 | size: 0xa0 */
-extern void fn_80102ED4(void);
+extern void menuButtonNormal(void);
 #if 0
 asm void fn_8000DE24(void) {
 #include "src/game/gs_npc_interact_fn_8000DE24.inc"
@@ -1945,13 +1945,13 @@ asm void fn_8000DE24(void) {
 #pragma peephole off
 #pragma peephole off
 void fn_8000DE24(u8* ptr) {
-    extern void fn_80102ED4(u8* a);
+    extern void menuButtonNormal(u8* a);
     extern u8 fn_801F18DC(s32 a);
     extern u8 fn_801F1700(s32 a);
     extern u8 fn_80265924(void);
     extern u16 fn_801EF634(void);
     u8 flag;
-    fn_80102ED4(ptr);
+    menuButtonNormal(ptr);
     if (!(u8)fn_801F18DC(0)) goto _zero;
     if ((u8)fn_801F1700(0) == 1 && (u8)fn_80265924() == 1) { flag = 1; goto _check; }
     if ((u16)fn_801EF634() == 1) { flag = 1; goto _check; }
@@ -1979,7 +1979,7 @@ asm void fn_8000DEC4(void) {
 #pragma peephole off
 void fn_8000DEC4(u8* arg1, u8* arg2) {
     extern void* fn_801040D0(u8* a, u32 b);
-    extern void fn_80109220(u8* a, u32 b);
+    extern void winSpriteSetDisp(u8* a, u32 b);
     u8* entry;
     s32 i;
     entry = (u8*)fn_801040D0(arg1, 0);
@@ -1995,7 +1995,7 @@ void fn_8000DEC4(u8* arg1, u8* arg2) {
         }
         npc_id = *(s16*)(arg2 + 6);
         if (value == npc_id) {
-            fn_80109220(arg2, 1);
+            winSpriteSetDisp(arg2, 1);
             return;
         }
         switch (*(s32*)(entry + 0xC)) {
@@ -2006,12 +2006,12 @@ void fn_8000DEC4(u8* arg1, u8* arg2) {
             default: value = 0; break;
         }
         if (value == npc_id) {
-            fn_80109220(arg2, 1);
+            winSpriteSetDisp(arg2, 1);
             return;
         }
         entry += 0x10;
     }
-    fn_80109220(arg2, 0);
+    winSpriteSetDisp(arg2, 0);
 }
 #pragma pop
 #endif
@@ -2117,15 +2117,15 @@ asm void fn_8000E204(void) {
 void fn_8000E204(u8* arg1, u8* arg2) {
     extern u32 fn_8005D8B8(s16 val);
     extern s32 fn_801022B8(u32 val);
-    extern void fn_80109220(u8* a, u32 b);
+    extern void winSpriteSetDisp(u8* a, u32 b);
     if ((u8)fn_8005D8B8(*(s16*)(arg2 + 6)) != 0) {
         if (*(s16*)(arg2 + 6) == fn_801022B8(*(u32*)(arg1 + 4))) {
-            fn_80109220(arg2, 1);
+            winSpriteSetDisp(arg2, 1);
         } else {
-            fn_80109220(arg2, 0);
+            winSpriteSetDisp(arg2, 0);
         }
     } else {
-        fn_80109220(arg2, 0);
+        winSpriteSetDisp(arg2, 0);
     }
 }
 #pragma pop
@@ -2216,7 +2216,7 @@ void fn_8000EA10(u8* ctx, u8* npc) {
 #endif
 
 /* fn_8000ED34 - 0x8000ED34 | size: 0x5dc */
-extern void fn_80102254(void);
+extern void menuSetDisp(void);
 extern void fn_800F7920(void);
 extern void fn_800F7994(void);
 extern void fn_800CE2D8(void);
@@ -2235,7 +2235,7 @@ asm void fn_8000ED34(void) {
 void fn_8000ED34(u8* ctx) {
     extern u8* fn_80105624(void);
     extern u32 fn_801040D0(u8* a, s32 b);
-    extern void fn_80102254(u32, s32);
+    extern void menuSetDisp(u32, s32);
     extern u8 fn_80102620(s32);
     extern s8 fn_800F7920(s32, s32);
     extern s8 fn_800F7994(s32, s32);
@@ -2261,7 +2261,7 @@ void fn_8000ED34(u8* ctx) {
     base = fn_801040D0(ctx, 0);
     fn_801040D0(ctx, 1);
     aux = fn_801040D0(ctx, 2);
-    fn_80102254(*(u32*)(ctx + 4), 1);
+    menuSetDisp(*(u32*)(ctx + 4), 1);
     activeMenu = 0;
     targetMenu = 0;
     selected = -1;
@@ -2324,7 +2324,7 @@ void fn_8000ED34(u8* ctx) {
             ctx[0x99] = 1;
             *(s32*)(ctx + 0x80) = -1;
         } else if (*(u16*)flags & 0x800) {
-            fn_80102254(*(u32*)(ctx + 4), 0);
+            menuSetDisp(*(u32*)(ctx + 4), 0);
             stored = -1;
             if (*(u16*)flags & 1) {
                 if (*(u16*)flags & 8) {
@@ -2370,12 +2370,12 @@ void fn_8000ED34(u8* ctx) {
         if (ctx[0x98] == 0) {
             if (targetMenu == 0xFC) {
                 fn_801026A4(0xFC, *(u32*)(ctx + 4), 0, 0, 0, 1, base);
-                fn_80102254(0xFC, 1);
-                fn_80102254(0xFD, 0);
+                menuSetDisp(0xFC, 1);
+                menuSetDisp(0xFD, 0);
             } else if (targetMenu == 0xFD) {
                 fn_801026A4(0xFD, *(u32*)(ctx + 4), 0, 0, 0, 2, base, lbl_8047885C);
-                fn_80102254(0xFD, 1);
-                fn_80102254(0xFC, 0);
+                menuSetDisp(0xFD, 1);
+                menuSetDisp(0xFC, 0);
             }
         }
     }
@@ -2423,9 +2423,9 @@ void fn_8000F35C(u8* ctx, u8* npc) {
     idx = id - 0x11CE;
     if ((u32)idx <= 9) {
         if (idx == 0) {
-            fn_80109220(npc, 1);
+            winSpriteSetDisp(npc, 1);
         } else {
-            fn_80109220(npc, visible);
+            winSpriteSetDisp(npc, visible);
         }
     }
 }
@@ -2445,7 +2445,7 @@ asm void fn_8000F400(void) {
 #pragma push
 #pragma peephole off
 void fn_8000F400(u8* ctx, u8* npc) {
-    extern u32 fn_80104704(void);
+    extern u32 windowSearchID(void);
     extern u8* fn_80103FE4(void);
     extern u32 fn_801040D0(u8* a, s32 b);
     extern u32 fn_80205B8C(void*);
@@ -2468,7 +2468,7 @@ void fn_8000F400(u8* ctx, u8* npc) {
     s32 delta;
 
     fn_801040D0(ctx, 0);
-    if (fn_80104704() == 0) return;
+    if (windowSearchID() == 0) return;
     party = fn_80103FE4();
     if (party == NULL) return;
     state = (u8*)fn_801040D0(ctx, 1);
@@ -2485,7 +2485,7 @@ void fn_8000F400(u8* ctx, u8* npc) {
         else if (id == 0x11F5) value = 3;
         else if (id == 0x11F6) value = 2;
         else value = 0;
-        fn_80109220(npc, value == selected);
+        winSpriteSetDisp(npc, value == selected);
     } else if (id == 0x11F8) {
         fn_801040F0(0, 0, ctx, *(u16*)(party + (selected * 0xC) + 0xC), 0);
     } else if (id == 0x11F9) {
@@ -2528,7 +2528,7 @@ asm void fn_8000F768(void) {
 #pragma push
 #pragma peephole off
 void fn_8000F768(u8* ctx, u8* npc) {
-    extern u32 fn_80104704(void);
+    extern u32 windowSearchID(void);
     extern u8* fn_80103FE4(void);
     extern u32 fn_801040D0(u8* a, s32 b);
     extern void fn_800FBB34();
@@ -2543,7 +2543,7 @@ void fn_8000F768(u8* ctx, u8* npc) {
     s32 delta;
 
     fn_801040D0(ctx, 0);
-    if (fn_80104704() == 0) return;
+    if (windowSearchID() == 0) return;
     entries = fn_80103FE4();
     if (entries == NULL) return;
     color = (s32)menuSubCalcColor(ctx, npc);
@@ -2553,9 +2553,9 @@ void fn_8000F768(u8* ctx, u8* npc) {
     slot = idx & 3;
     entry = entries + (slot * 0xC);
     if (*(u32*)(entry + 4) != 0) {
-        fn_80109220(npc, 1);
+        winSpriteSetDisp(npc, 1);
     } else {
-        fn_80109220(npc, 0);
+        winSpriteSetDisp(npc, 0);
         return;
     }
 
@@ -2594,7 +2594,7 @@ asm void fn_8000F964(void) {
 void fn_8000F964(u8* ctx) {
     extern u8* fn_80105624(void);
     extern u8* fn_80103FE4(u8* a);
-    extern void fn_80102254(u32, s32);
+    extern void menuSetDisp(u32, s32);
     extern u8 fn_80102620(s32);
     extern s8 fn_800F7920(s32, s32);
     extern s8 fn_800F7994(s32, s32);
@@ -2616,7 +2616,7 @@ void fn_8000F964(u8* ctx) {
     selected = -1;
     activeMenu = 0;
     targetMenu = 0;
-    fn_80102254(*(u32*)(ctx + 4), 1);
+    menuSetDisp(*(u32*)(ctx + 4), 1);
     if ((u8)fn_80102620(0xF9) != 0) {
         activeMenu = 0xF9;
     } else if ((u8)fn_80102620(0xFA) != 0) {
@@ -2645,7 +2645,7 @@ void fn_8000F964(u8* ctx) {
         ctx[0x99] = 1;
         *(s32*)(ctx + 0x80) = -1;
     } else if (*(u16*)flags & 0x800) {
-        fn_80102254(*(u32*)(ctx + 4), 0);
+        menuSetDisp(*(u32*)(ctx + 4), 0);
         if (*(u16*)flags & 1) {
             stored = 0;
         } else if (*(u16*)flags & 8) {
@@ -2685,12 +2685,12 @@ void fn_8000F964(u8* ctx) {
         if (ctx[0x98] == 0) {
             if (targetMenu == 0xF9) {
                 fn_801026A4(0xF9, *(u32*)(ctx + 4), 0, 0, 0, 1, *(u32*)(ctx + 4));
-                fn_80102254(0xF9, 1);
-                fn_80102254(0xFA, 0);
+                menuSetDisp(0xF9, 1);
+                menuSetDisp(0xFA, 0);
             } else if (targetMenu == 0xFA) {
                 fn_801026A4(0xFA, *(u32*)(ctx + 4), 0, 0, 0, 2, *(u32*)(ctx + 4), lbl_80478858);
-                fn_80102254(0xFA, 1);
-                fn_80102254(0xF9, 0);
+                menuSetDisp(0xFA, 1);
+                menuSetDisp(0xF9, 0);
             }
         }
     }
@@ -3183,7 +3183,7 @@ u32 fn_80010844(u8* ctx) {
     extern u8* fn_80105624(void);
     extern u32 fn_80205B8C(void*);
     extern u32 fn_8012640C();
-    extern void fn_80102ED4(u8* a);
+    extern void menuButtonNormal(u8* a);
     extern void fn_80123C54(void*, s32, s32);
     extern void fn_801204A8(void*, void*);
     u8* participant;
@@ -3206,7 +3206,7 @@ u32 fn_80010844(u8* ctx) {
             ctx[0x98] = 1;
             ctx[0x99] = 1;
         } else {
-            fn_80102ED4(ctx);
+            menuButtonNormal(ctx);
         }
     } else if (state[0] == 1) {
         if ((flags & 0xD0) != 0) {
@@ -3303,7 +3303,7 @@ u32 fn_80010B30(u8* arg) {
     extern void* fn_80103FFC(u8* a, u32 size);
     extern void* fn_80103FE4(u8* a);
     extern s32 fn_801022B8(u32 val);
-    extern u8* fn_801046C8(u8* a, s32 id);
+    extern u8* windowSearchItemID(u8* a, s32 id);
     extern void fn_8005D8F8(s32 id, s32 flag);
     void* entry;
     void* participant;
@@ -3315,15 +3315,15 @@ u32 fn_80010B30(u8* arg) {
             memcpy(entry, *(void**)(arg + 0x60), 0x18);
         }
         if (*(u8*)((u8*)entry + 0x16) != 0) {
-            r = fn_801046C8(arg, 0xB6);
+            r = windowSearchItemID(arg, 0xB6);
             *(s32*)(r + 0x4C) = 0x13D;
-            r = fn_801046C8(arg, 0xB8);
+            r = windowSearchItemID(arg, 0xB8);
             *(s32*)(r + 0x4C) = 0x140;
             fn_8005D8F8(0xB8, 1);
         } else {
-            r = fn_801046C8(arg, 0xB6);
+            r = windowSearchItemID(arg, 0xB6);
             *(s32*)(r + 0x4C) = 0x13F;
-            r = fn_801046C8(arg, 0xB8);
+            r = windowSearchItemID(arg, 0xB8);
             *(s32*)(r + 0x4C) = 0;
             fn_8005D8F8(0xB8, 0);
         }

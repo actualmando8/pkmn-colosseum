@@ -380,12 +380,12 @@ u32 fn_8009F3D4(void) {
     return *(volatile u32*)0x80000028;
 }
 
-/* fn_8009F3E0 - 0x8009F3E0 | size: 0x3C
+/* OnReset_800AF628 - 0x8009F3E0 | size: 0x3C
  * OSProtectMemory reset callback - disables memory protection
  * when the system is being reset (final == TRUE).
  * Returns TRUE always.
  */
-BOOL fn_8009F3E0(s32 final) {
+BOOL OnReset_800AF628(s32 final) {
     if (final != 0) {
         *(volatile u16*)0xCC004010 = 0xFF;
         __OSMaskInterrupts(0xF0000000);

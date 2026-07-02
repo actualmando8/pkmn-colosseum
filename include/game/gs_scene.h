@@ -58,7 +58,7 @@ typedef struct GSSceneRenderEntry {
 
 /** fn_8017572C */ void   GSscene_ProcessFreeList(void);
 /** fn_80175B94 */ void*  GSscene_SpawnObject(u32 type, u32 param);
-/** fn_80175F44 */ u32    GSscene_GetObjectCount(void);
+/** psGetNewIDNum */ u32    GSscene_GetObjectCount(void);
 /** fn_80177A64 */ void   GSscene_XFBCapture(u32 captureIndex);
 /** fn_80178AA8 */ void   GSscene_CameraUpdate(u32 sceneObj);
 /** fn_80179020 */ void   GSscene_CameraInterpolate(u32 camera);

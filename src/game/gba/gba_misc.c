@@ -78,7 +78,7 @@ extern void fn_800E8FA0();
 extern void fn_800E8FE8();
 extern void fn_800E900C();
 extern void fn_800E9108();
-extern void fn_800EC4D0();
+extern void GSmodelGetFrameCount();
 extern void fn_800EC990();
 extern void fn_800ECA78();
 extern void fn_800ECB74();
@@ -216,10 +216,10 @@ void fn_800895A4(void) {
     extern void fn_8012A774();
     extern void fn_8012AA44();
     extern void fn_8012AA54();
-    extern void fn_8012AA64();
+    extern void heroBiosSetNamePtr();
     extern void fn_8012AC08();
     extern void fn_80135938();
-    extern void fn_80265EC4();
+    extern void exribbonSetNo();
     u8 sp[0x30];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -255,7 +255,7 @@ void fn_800895A4(void) {
     ((void(*)(void))fn_800F9C04)();
     r3 = r30;
     r4 = (u32)sp + 0x8;
-    fn_8012AA64();
+    heroBiosSetNamePtr();
     r4 = *(u8*)((u8*)r31 + 0xC);
     r3 = r30;
     fn_8012AA44();
@@ -291,7 +291,7 @@ void fn_800895A4(void) {
         r0 = r29 + 0x26c;
         r3 = r29;
         r4 = *(u8*)(r31 + r0);
-        fn_80265EC4();
+        exribbonSetNo();
         r29 = r29 + 0x1;
     } while ((s32)r29 < 0xb);
     return;
@@ -333,7 +333,7 @@ void fn_800896E8(void) {
     extern void fn_80132A38();
     extern void fn_80189990();
     extern void fn_8018C1E8();
-    extern void fn_801C40F0();
+    extern void fadeCheck();
     extern void fn_801CA5C4();
     extern void fn_801EEAD0();
     extern void fn_801FC794();
@@ -522,7 +522,7 @@ void fn_800896E8(void) {
     } while (0);
 
     r3 = 0x1;
-    fn_801C40F0();
+    fadeCheck();
     r3 = r29;
 
     return;
@@ -815,7 +815,7 @@ s32 fn_80089E20(s32 r30, void* r31, u32 r5, u32 r29) {
     extern void fn_8008AE18(void*, void*);
     extern u8 fn_8011E868(void*);
     extern u16 fn_8011F5C8(void*);
-    extern u8 fn_80265F14(s32);
+    extern u8 exribbonGetNo(s32);
     u8 sp[0x78];
     u32 tmp;
     u32 r3;
@@ -858,7 +858,7 @@ s32 fn_80089E20(s32 r30, void* r31, u32 r5, u32 r29) {
     r31 = sp + 0x6C;
     memset(r31, 0, 0xc);
     for (r29 = 0; (s32)r29 < 0xb; r31 = (u8*)r31 + 1, r29++) {
-        *(u8*)r31 = fn_80265F14(r29);
+        *(u8*)r31 = exribbonGetNo(r29);
     }
     ret = fn_800726A8(r30 - 1, sp + 0x0);
     r3 = r30 << 1;
@@ -3759,7 +3759,7 @@ void fn_8008C7B0(void) {
     r3 = r29;
     r4 = (u32)sp + 0x8;
     r5 = 0x0;
-    ((void(*)(void))fn_800EC4D0)();
+    ((void(*)(void))GSmodelGetFrameCount)();
     f1 = *(f32*)(sp + 0x8);
     r3 = r29;
     f0 = *(f32*)&lbl_8047C1D8;
@@ -3976,7 +3976,7 @@ void fn_8008CACC(void) {
     r3 = r29;
     r4 = (u32)sp + 0x8;
     r5 = 0x0;
-    ((void(*)(void))fn_800EC4D0)();
+    ((void(*)(void))GSmodelGetFrameCount)();
     f1 = *(f32*)(sp + 0x8);
     r3 = r29;
     f0 = *(f32*)&lbl_8047C1D8;
@@ -4185,7 +4185,7 @@ void fn_8008CDD8(void) {
     r3 = r29;
     r4 = (u32)sp + 0x8;
     r5 = 0x0;
-    ((void(*)(void))fn_800EC4D0)();
+    ((void(*)(void))GSmodelGetFrameCount)();
     f1 = *(f32*)(sp + 0x8);
     r3 = r29;
     f0 = *(f32*)&lbl_8047C1D8;
@@ -4375,7 +4375,7 @@ void fn_8008D0A0(void) {
     r3 = r29;
     r4 = (u32)sp + 0x8;
     r5 = 0x0;
-    ((void(*)(void))fn_800EC4D0)();
+    ((void(*)(void))GSmodelGetFrameCount)();
     f1 = *(f32*)(sp + 0x8);
     r3 = r29;
     f0 = *(f32*)&lbl_8047C1D8;
@@ -4568,7 +4568,7 @@ void fn_8008D348(void) {
     r3 = r21;
     r4 = (u32)sp + 0x8;
     r5 = 0x0;
-    ((void(*)(void))fn_800EC4D0)();
+    ((void(*)(void))GSmodelGetFrameCount)();
     f1 = *(f32*)(sp + 0x8);
     r3 = r21;
     f0 = *(f32*)&lbl_8047C1D8;
@@ -4981,7 +4981,7 @@ void fn_8008D938(void) {
     r3 = r14;
     r4 = (u32)sp + 0x8;
     r5 = 0x0;
-    ((void(*)(void))fn_800EC4D0)();
+    ((void(*)(void))GSmodelGetFrameCount)();
     f1 = *(f32*)(sp + 0x8);
     r3 = r14;
     f0 = *(f32*)&lbl_8047C1D8;
@@ -5637,7 +5637,7 @@ void fn_8008E320(void) {
     r3 = r26;
     r4 = (u32)sp + 0x8;
     r5 = 0x0;
-    ((void(*)(void))fn_800EC4D0)();
+    ((void(*)(void))GSmodelGetFrameCount)();
     f1 = *(f32*)(sp + 0x8);
     r3 = r26;
     f0 = *(f32*)&lbl_8047C1D8;
@@ -5961,7 +5961,7 @@ void fn_8008E7D4(void) {
     r3 = r27;
     r4 = (u32)sp + 0x8;
     r5 = 0x0;
-    ((void(*)(void))fn_800EC4D0)();
+    ((void(*)(void))GSmodelGetFrameCount)();
     f1 = *(f32*)(sp + 0x8);
     r3 = r27;
     f0 = *(f32*)&lbl_8047C1D8;
@@ -6257,7 +6257,7 @@ void fn_8008EC28(void) {
     r3 = r29;
     r4 = (u32)sp + 0x8;
     r5 = 0x0;
-    ((void(*)(void))fn_800EC4D0)();
+    ((void(*)(void))GSmodelGetFrameCount)();
     f1 = *(f32*)(sp + 0x8);
     r3 = r29;
     f0 = *(f32*)&lbl_8047C1D8;
@@ -6440,7 +6440,7 @@ void fn_8008EED0(void) {
     r3 = r29;
     r4 = (u32)sp + 0x8;
     r5 = 0x0;
-    ((void(*)(void))fn_800EC4D0)();
+    ((void(*)(void))GSmodelGetFrameCount)();
     f1 = *(f32*)(sp + 0x8);
     r3 = r29;
     f0 = *(f32*)&lbl_8047C1D8;
@@ -6631,7 +6631,7 @@ void fn_8008F190(void) {
     r3 = r29;
     r4 = (u32)sp + 0x8;
     r5 = 0x0;
-    ((void(*)(void))fn_800EC4D0)();
+    ((void(*)(void))GSmodelGetFrameCount)();
     f1 = *(f32*)(sp + 0x8);
     r3 = r29;
     f0 = *(f32*)&lbl_8047C1D8;
@@ -6877,7 +6877,7 @@ void fn_8008F524(void) {
     r3 = r29;
     r4 = (u32)sp + 0x8;
     r5 = 0x0;
-    ((void(*)(void))fn_800EC4D0)();
+    ((void(*)(void))GSmodelGetFrameCount)();
     f1 = *(f32*)(sp + 0x8);
     r3 = r29;
     f0 = *(f32*)&lbl_8047C1D8;
@@ -7152,7 +7152,7 @@ void fn_8008F91C(void) {
     r3 = r29;
     r4 = (u32)sp + 0x8;
     r5 = 0x0;
-    ((void(*)(void))fn_800EC4D0)();
+    ((void(*)(void))GSmodelGetFrameCount)();
     f1 = *(f32*)(sp + 0x8);
     r3 = r29;
     f0 = *(f32*)&lbl_8047C1D8;
@@ -7353,7 +7353,7 @@ void fn_8008FBF4(void) {
     r3 = r29;
     r4 = (u32)sp + 0x8;
     r5 = 0x0;
-    ((void(*)(void))fn_800EC4D0)();
+    ((void(*)(void))GSmodelGetFrameCount)();
     f1 = *(f32*)(sp + 0x8);
     r3 = r29;
     f0 = *(f32*)&lbl_8047C1D8;
@@ -7534,7 +7534,7 @@ void fn_8008FE94(void) {
     r3 = r29;
     r4 = (u32)sp + 0x8;
     r5 = 0x0;
-    ((void(*)(void))fn_800EC4D0)();
+    ((void(*)(void))GSmodelGetFrameCount)();
     f1 = *(f32*)(sp + 0x8);
     r3 = r29;
     f0 = *(f32*)&lbl_8047C1D8;
@@ -7733,7 +7733,7 @@ void fn_80090100(void) {
     r3 = r17;
     r4 = (u32)sp + 0x8;
     r5 = 0x0;
-    ((void(*)(void))fn_800EC4D0)();
+    ((void(*)(void))GSmodelGetFrameCount)();
     f1 = *(f32*)(sp + 0x8);
     r3 = r17;
     f0 = *(f32*)&lbl_8047C1D8;
@@ -8091,7 +8091,7 @@ void fn_80090720(void) {
     r3 = r30;
     r4 = (u32)sp + 0x8;
     r5 = 0x0;
-    ((void(*)(void))fn_800EC4D0)();
+    ((void(*)(void))GSmodelGetFrameCount)();
     f1 = *(f32*)(sp + 0x8);
     r3 = r30;
     f0 = *(f32*)&lbl_8047C1D8;
@@ -8281,7 +8281,7 @@ void fn_800909E4(void) {
     r3 = r30;
     r4 = (u32)sp + 0x8;
     r5 = 0x0;
-    ((void(*)(void))fn_800EC4D0)();
+    ((void(*)(void))GSmodelGetFrameCount)();
     f1 = *(f32*)(sp + 0x8);
     r3 = r30;
     f0 = *(f32*)&lbl_8047C1D8;
@@ -8513,7 +8513,7 @@ void fn_80090D34(void) {
     r3 = r30;
     r4 = (u32)sp + 0x8;
     r5 = 0x0;
-    ((void(*)(void))fn_800EC4D0)();
+    ((void(*)(void))GSmodelGetFrameCount)();
     f1 = *(f32*)(sp + 0x8);
     r3 = r30;
     f0 = *(f32*)&lbl_8047C1D8;

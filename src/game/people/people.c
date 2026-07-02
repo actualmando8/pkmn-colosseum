@@ -69,7 +69,7 @@ void fn_8018FC74(PeopleEntry* entry);
 void fn_8018FC98(PeopleEntry* entry, void* pos);
 void* fn_8018FCBC(PeopleEntry* entry);
 void fn_8018FC08(PeopleEntry* entry);
-void* fn_8018F6F4(void* scriptObj);
+void* peopleInfoBiosGetPtr(void* scriptObj);
 
 /* ===== External SDK / engine functions ===== */
 extern void  fn_800DD970(const char* fmt, ...);     /* OSReport / debug printf */
@@ -85,7 +85,7 @@ extern void fn_800E3D00(void*);
 extern void fn_800E3D08(void*);
 extern void fn_800E3D6C(void*);
 extern void fn_800E3D98(void*, void*);
-extern void fn_800E4014(void*, u8);
+extern void GSmodelSetVisibility(void*, u8);
 extern void fn_800E4170(void*);
 extern void fn_800E43A4(void*);
 extern void fn_800E9B2C(void);
@@ -103,7 +103,7 @@ extern void fn_800ECCA8(void);
 extern void fn_8010FFC4(void);
 
 /* GSmem allocator */
-extern u16   fn_800E3534(u32 size);                 /* GSmemAllocRaw */
+extern u16   _toolentryAlloc__FUl(u32 size);                 /* GSmemAllocRaw */
 extern void* fn_800E27B0(u32 handle);               /* GSmemGetPtr */
 
 /* Floor/field system */
@@ -114,7 +114,7 @@ extern void  fn_80167E64(void* field);              /* field finalize */
 
 /* Thread/task system */
 extern void* fn_800FE834(u32 pri, u32 type, void* taskBuf, void* callback);
-extern void  fn_800FE714(void* task);               /* task cleanup */
+extern void  GSgappTerminate(void* task);               /* task cleanup */
 
 /* Model system */
 extern void  fn_8017BB80(void* floorObj, void* modelData); /* model open */
@@ -175,7 +175,7 @@ PeopleEntry* peopleInit(u32 maxPeople)
     totalSize = maxPeople * PEOPLE_ENTRY_SIZE;
 
     /* Allocate from GSmem */
-    gPeopleArray = (PeopleEntry*)fn_800E27B0(gPeopleMemHandle = fn_800E3534(totalSize));
+    gPeopleArray = (PeopleEntry*)fn_800E27B0(gPeopleMemHandle = _toolentryAlloc__FUl(totalSize));
 
     /* Zero-fill entire array */
     memset(gPeopleArray, 0, totalSize);
@@ -390,7 +390,7 @@ void fn_80181224(void)
     gPeopleOpenWork->subState = 0;
 
     /* Clean up the thread/task */
-    fn_800FE714(gPeopleOpenWork->threadObj);
+    GSgappTerminate(gPeopleOpenWork->threadObj);
 }
 
 /* =======================================================================
@@ -595,8 +595,8 @@ void fn_8018B368(void) {
 
 /* 0x8018B558 | 0x214 */
 extern void fn_800EC5FC(void);
-extern void fn_800EC5B8(void);
-extern void fn_800EC4D0(void);
+extern void GSmodelSetBlendFactor(void);
+extern void GSmodelGetFrameCount(void);
 extern void fn_800EC8C8(void);
 extern u32 lbl_8047D7D0;
 extern u32 lbl_8047D79C;
@@ -1022,7 +1022,7 @@ void fn_80186284(u32 a, u32 b, f32 x, s32 c, s32 d, f32 y) { /* TODO: match -- 9
 #endif
 
 /* 0x80186620 | 0x53C */
-extern void fn_801779EC(void);
+extern void cameraGetActive(void);
 extern void fn_800D258C(void);
 extern void _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID(void);
 extern void fn_800DA028(void);
@@ -1087,9 +1087,9 @@ void fn_80186B5C(void) { /* TODO: match -- 1420 bytes at 0x80186B5C */ }
 #endif
 
 /* 0x801870E8 | 0x3D4 */
-extern void fn_8010C77C(void);
+extern void GScolsy2UtilGetSidePlanePoint(void);
 extern void fn_8010FA54(void);
-extern void fn_800A3BD8(void);
+extern void PSVECSquareDistance(void);
 extern void fn_8010F71C(void);
 extern u32 lbl_8047D844;
 extern u32 lbl_8047D7A0;
@@ -1238,7 +1238,7 @@ extern u32 lbl_80478E78;
 extern u32 lbl_80478E7C;
 extern s32 lbl_8047B1F8;
 extern PeopleEntry* lbl_8047B200;
-u8* fn_8018F6CC(u32 index) {
+u8* peopleInfoBiosGetPtrFromIndex(u32 index) {
     if (index >= *(u32*)lbl_80478E78) {
         return (u8*)0;
     }
@@ -1512,8 +1512,8 @@ void fn_8018CD08(void) {
 void fn_8018D7D0(void) {
 }
 
-/* fn_8018D928 -- not recovered, gap in archive campaign (size 0x70) */
-void fn_8018D928(void) {
+/* peopleSearchID -- not recovered, gap in archive campaign (size 0x70) */
+void peopleSearchID(void) {
 }
 
 /* fn_8018D998 -- not recovered, gap in archive campaign (size 0xF0) */
@@ -1574,8 +1574,8 @@ void fn_8018F678(void) {
 void fn_8018F698(void) {
 }
 
-/* fn_8018F6F4 = fn_8018F6F4 (see people.h) -- not recovered, gap in archive campaign */
-void* fn_8018F6F4(void* scriptObj) {
+/* peopleInfoBiosGetPtr = peopleInfoBiosGetPtr (see people.h) -- not recovered, gap in archive campaign */
+void* peopleInfoBiosGetPtr(void* scriptObj) {
     return NULL;
 }
 

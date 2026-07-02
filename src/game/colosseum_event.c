@@ -4396,7 +4396,7 @@ void fn_80206C94(int r3)
 #pragma pop
 /* Address: 0x802073C0 | Size: 0x88 | Ghidra import */
 
-void fn_802073C0(u32 r3)
+void fightOutPokemonInitAbiCntAll(u32 r3)
 
 {
     extern u32 _DAT_80279c60;
@@ -5520,7 +5520,7 @@ void fn_8020912C(void)
 #pragma peephole on
 void fn_80209380(void* ctx) {
     extern u8 fn_800E3D08();
-    extern void fn_800E4014();
+    extern void GSmodelSetVisibility();
     extern void fn_801DA4E8();
     extern void* fn_801DAC3C();
     extern void fn_801F000C();
@@ -5537,7 +5537,7 @@ void fn_80209380(void* ctx) {
         if (eeData != NULL) {
             fn_801DA4E8(eeData, 1);
         }
-        fn_800E4014(resolved, 1);
+        GSmodelSetVisibility(resolved, 1);
         fn_801F000C(3);
         eeData = fn_8012640C(ctx, 0, 0xEE, 0);
         if (eeData != NULL) {
@@ -6242,7 +6242,7 @@ u8 fn_8020A8A0(u16 index) {
 int fn_8020A8E0(u32 r3,u32 r4)
 
 {
-    extern int fn_800E0C04();
+    extern int _fadeEffectGetRandom__FUl();
     extern u32 fn_80135E44();
     extern u32 fn_801F021C();
     extern void fn_801F0234();
@@ -6301,7 +6301,7 @@ int fn_8020A8E0(u32 r3,u32 r4)
             sVar10 = fn_8020A5C0(uVar3,bVar14);
             cVar13 = fn_8020A6A0(uVar3,bVar14);
             if (bVar12 == 2) {
-              iVar6 = fn_800E0C04((uVar5 & 0xffff) - (uVar4 & 0xffff));
+              iVar6 = _fadeEffectGetRandom__FUl((uVar5 & 0xffff) - (uVar4 & 0xffff));
               uVar8 = (uVar4 & 0xffff) + iVar6;
 LAB_00207c9c:
               if ((cVar13 == 1) && (uVar8 = uVar8 * (int)sVar9, sVar10 != 0)) {
@@ -6364,7 +6364,7 @@ LAB_00207c9c:
     sVar10 = fn_8020A5C0(r3,bVar14);
     cVar13 = fn_8020A6A0(r3,bVar14);
     if (bVar12 == 2) {
-      iVar2 = fn_800E0C04((uVar4 & 0xffff) - (uVar8 & 0xffff));
+      iVar2 = _fadeEffectGetRandom__FUl((uVar4 & 0xffff) - (uVar8 & 0xffff));
       uVar1 = (uVar8 & 0xffff) + iVar2;
 LAB_00207a34:
       if ((cVar13 == 1) && (uVar1 = uVar1 * (int)sVar9, sVar10 != 0)) {
@@ -6419,7 +6419,7 @@ u32 fn_8020AF30(void)
 {
     u32 r3;
 
-    extern u32 fn_80136368();
+    extern u32 tenkouDataBiosGetFightInitMsgId();
     extern void fn_801F37B0();
     extern s8 fn_801F453C();
     extern void fn_801F4C14();
@@ -6436,7 +6436,7 @@ u32 fn_8020AF30(void)
   fn_801F37B0(0,0x8020aff4,local_18,0);
   if (cVar2 != 0) {
     fn_801F4C14(0,0,0x36,0,local_18[0]);
-    uVar1 = fn_80136368(cVar2);
+    uVar1 = tenkouDataBiosGetFightInitMsgId(cVar2);
     fn_801F4C14(0,0,0x50,0,uVar1);
     uVar1 = fn_8020D8F0(r3);
     fn_80211B94(r3,uVar1,0);
@@ -6477,7 +6477,7 @@ u32 fn_8020B058(void)
     extern void fn_8012805C();
     extern u32 fn_80128A64();
     extern int fn_80129280();
-    extern void fn_80129840();
+    extern void heroCheckSetMonohiroiAllTemotiPokemon();
     extern u32 fn_8012A5B0();
     extern void fn_8012AC64();
     extern short fn_801EF634();
@@ -6531,7 +6531,7 @@ u32 fn_8020B058(void)
         }
         cVar7 = fn_801F54A4(0,0,0x30,0);
         if (cVar7 == 1) {
-          fn_80129840(iVar3);
+          heroCheckSetMonohiroiAllTemotiPokemon(iVar3);
         }
         fn_801F54A4(0,0,0x28,0);
       }
@@ -6840,19 +6840,19 @@ u32 fn_8020BA80(void* ctx)
 #pragma pop
 /* 0x8020BAF8 | size: 0xAC */
 void fn_8020BAF8(void* ctx) {
-    extern u8 fn_801F0058();
+    extern u8 fightTargetIsHostSide();
     extern u8 fn_801F3984();
     extern void fn_801F4C14();
     extern u16 fn_801F54A4();
     extern u32 fn_8020D908();
-    extern void fn_80212840();
+    extern void fightSeqSpecificationActionCounterInit();
     u16 tableId;
     u32 obj;
     u8 result;
     tableId = fn_801F54A4(NULL, 0, 0x14, 0);
     obj = fn_8020D908(ctx);
-    fn_80212840(obj);
-    if (fn_801F0058(obj, tableId) == 1) {
+    fightSeqSpecificationActionCounterInit(obj);
+    if (fightTargetIsHostSide(obj, tableId) == 1) {
         result = fn_801F3984(0, 4);
     } else {
         result = fn_801F3984(0, 5);
@@ -6882,7 +6882,7 @@ u32 fn_8020BBA4(void* ctx) {
 /* 0x8020BBFC | size: 0x98 */
 #pragma push
 #pragma peephole on
-u32 fn_8020BBFC(void* ctx) {
+u32 fightActionFlowAllFightOutPokemonDoFightAction(void* ctx) {
     extern u16 fn_801EF634();
     extern void fn_801F3B24();
     extern void fn_801F4718();
@@ -7139,8 +7139,8 @@ u32 fn_8020C15C(void)
     extern void fn_80103BA8();
     extern void fn_80132A38();
     extern void fn_80165A20();
-    extern s8 fn_801C40F0();
-    extern void fn_801C41C8();
+    extern s8 fadeCheck();
+    extern void fadeSet();
     extern void fn_801DA4E8();
     extern void fn_801DA8C4();
     extern s8 fn_801DA94C();
@@ -7208,7 +7208,7 @@ u32 fn_8020C15C(void)
         }
         else {
           fn_80103BA8(local_3c,1);
-          cVar14 = fn_801C40F0(0);
+          cVar14 = fadeCheck(0);
           bVar1 = bVar2;
           if ((cVar14 == 0) && ((local_3c[0] & 0x20) != 0)) {
             bVar1 = 1;
@@ -7229,7 +7229,7 @@ u32 fn_8020C15C(void)
           }
           else {
             fn_80103BA8(local_58,1);
-            cVar14 = fn_801C40F0(0);
+            cVar14 = fadeCheck(0);
             bVar1 = bVar2;
             if ((cVar14 == 0) && ((local_58[0] & 0x20) != 0)) {
               bVar1 = 1;
@@ -7249,7 +7249,7 @@ u32 fn_8020C15C(void)
           }
           else {
             fn_80103BA8(local_74,1);
-            cVar14 = fn_801C40F0(0);
+            cVar14 = fadeCheck(0);
             bVar1 = bVar2;
             if ((cVar14 == 0) && ((local_74[0] & 0x20) != 0)) {
               bVar1 = 1;
@@ -7263,8 +7263,8 @@ u32 fn_8020C15C(void)
     }
 LAB_00209430:
     if (bVar2) {
-      fn_801C41C8((double)lbl_8047E520,3);
-      fn_801C40F0(1);
+      fadeSet((double)lbl_8047E520,3);
+      fadeCheck(1);
       if (uVar7 != 0) {
         fn_801DA9B4(uVar5,uVar7 & 0xffff,4);
       }
@@ -7277,7 +7277,7 @@ LAB_00209430:
     if (iVar9 != 0) {
       fn_801DA9E8(uVar5,0x5f,4);
       if (bVar2) {
-        fn_801C41C8((double)lbl_8047E520,2);
+        fadeSet((double)lbl_8047E520,2);
         bVar2 = 0;
       }
       fn_80262490(iVar9);
@@ -7298,7 +7298,7 @@ LAB_00209430:
       fn_80132A38(0x23,uVar3);
       fn_801DA9E8(uVar5,uVar8 & 0xffff,4);
       if (bVar2) {
-        fn_801C41C8((double)lbl_8047E520,2);
+        fadeSet((double)lbl_8047E520,2);
         bVar2 = 0;
       }
       fn_80262490(0x766d);
@@ -7308,7 +7308,7 @@ LAB_00209430:
       fn_8026246C();
     }
     if (bVar2) {
-      fn_801C41C8((double)lbl_8047E520,2);
+      fadeSet((double)lbl_8047E520,2);
     }
     if (uVar6 != 0) {
       if (uVar7 != 0) {
@@ -7959,7 +7959,7 @@ u32 fn_8020DAD0(u32 p1) {
     extern void fn_8011395C();
     extern void fn_80113FE8();
     extern void fn_801140C8();
-    extern void fn_80129474();
+    extern void heroDecPokedoru();
     extern u32 fn_8012A5B0();
     extern void fn_80132A38();
     extern void fn_801657D0();
@@ -7969,11 +7969,11 @@ u32 fn_8020DAD0(u32 p1) {
     extern u8 fn_801902E0();
     extern void fn_801903B0();
     extern void fn_80190528();
-    extern void fn_801C40F0();
-    extern void fn_801C4164(f32, f32, u32, u32, u32);
-    extern void fn_801C41C8();
+    extern void fadeCheck();
+    extern void fadeSetEX(f32, f32, u32, u32, u32);
+    extern void fadeSet();
     extern void fn_801D0AFC();
-    extern void fn_801D23C0();
+    extern void mailMainReceiveTerminate();
     extern void fn_801EF61C();
     extern void fn_801EF62C();
     extern u32 fn_801EF634();
@@ -7996,7 +7996,7 @@ u32 fn_8020DAD0(u32 p1) {
     extern u32 fn_8020E0F8();
     extern u8 fn_8020E260();
     extern u32 fn_8020E488();
-    extern u16 fn_80261388();
+    extern u16 charNameBiosSearchIndex();
     extern u16 charNameBiosGetHearFlag();
     extern f32 lbl_8047E528;
     extern f32 lbl_8047E52C;
@@ -8023,7 +8023,7 @@ u32 fn_8020DAD0(u32 p1) {
         fn_801F4C14(0, 0, 0x4a, 0, uVar2);
         uVar2 = fn_8020E0B0(uVar1);
         uVar7 = fn_801F54A4(0, uVar2, 2, 0);
-        fn_801D23C0();
+        mailMainReceiveTerminate();
         uVar9 = fn_8020E0E0(uVar1);
         iVar3 = fn_8020E488(uVar9);
         if ((iVar3 != 0) && (cVar10 = fn_8020E260(), cVar10 != 0)) {
@@ -8031,7 +8031,7 @@ u32 fn_8020DAD0(u32 p1) {
             iVar3 = fn_801FCCC4();
             if (iVar3 != 0) {
                 uVar2 = fn_801FCC7C();
-                sVar8 = fn_80261388();
+                sVar8 = charNameBiosSearchIndex();
                 if ((sVar8 != 0) && (sVar8 = charNameBiosGetHearFlag(), sVar8 != 0)) {
                     fn_80190528();
                 }
@@ -8044,7 +8044,7 @@ u32 fn_8020DAD0(u32 p1) {
         uVar2 = fn_8020DEB0();
         uVar4 = fn_8020DE80();
         uVar5 = fn_8020DE98(uVar2);
-        fn_801C4164(lbl_8047E528, fn_8020DE68(uVar2), 9, uVar5, uVar4);
+        fadeSetEX(lbl_8047E528, fn_8020DE68(uVar2), 9, uVar5, uVar4);
         sVar8 = fn_8020DE50(uVar2);
         if (sVar8 != 0) {
             fn_80166AB8(sVar8, 0, 0);
@@ -8062,7 +8062,7 @@ u32 fn_8020DAD0(u32 p1) {
                 fn_801EF61C(0);
                 fn_801903B0(0xe05);
                 uVar6 = fn_8012A5B0(0, 0xc, 0);
-                fn_80129474(0, ((s32)uVar6 >> 1) + (((s32)uVar6 < 0) & (uVar6 & 1)));
+                heroDecPokedoru(0, ((s32)uVar6 >> 1) + (((s32)uVar6 < 0) & (uVar6 & 1)));
                 fn_801D0AFC(1);
                 fn_8018DA88();
                 fn_80113FE8();
@@ -8077,8 +8077,8 @@ u32 fn_8020DAD0(u32 p1) {
         fn_801140C8();
         cVar10 = fn_801902E0(0xe05);
         if (cVar10 == 0) {
-            fn_801C41C8(lbl_8047E52C, 2);
-            fn_801C40F0(1);
+            fadeSet(lbl_8047E52C, 2);
+            fadeCheck(1);
         }
         fn_801EF61C(0);
         uVar1 = fn_801EF634();
@@ -9565,7 +9565,7 @@ void fn_80210190(void* p1, void* p2, void* p3, u32 unused, u32 p4) {
 /* 0x80210234 | size: 0x84 */
 #pragma push
 #pragma peephole on
-u32 fn_80210234(u32 unused, void* typeObj) {
+u32 fightWazaWzxVariationFuncRenzokugiri(u32 unused, void* typeObj) {
     extern s16 fn_80202360();
     s16 val;
     val = fn_80202360(typeObj, 0x2E);
@@ -10557,8 +10557,8 @@ void fn_80211E18(u32 r3,u32 r4)
     extern int fn_802026E4();
     extern void fn_80202810();
     extern void fn_80211B94();
-    extern void fn_80261B68();
-    extern void fn_80261E7C();
+    extern void fightMenuAllFightTrainerCloseStatusMenu();
+    extern void fightMenuAllFightOutPokemonCloseStatusMenu();
     extern void fn_8026246C();
     extern void fn_80265598();
     extern u8 lbl_80478D7D;
@@ -10836,8 +10836,8 @@ void fn_80211E18(u32 r3,u32 r4)
     DAT_8038ff76 = bVar1;
     DAT_8038fffc = cVar2;
     fn_801DA7AC();
-    fn_80261B68(0);
-    fn_80261E7C(0);
+    fightMenuAllFightTrainerCloseStatusMenu(0);
+    fightMenuAllFightOutPokemonCloseStatusMenu(0);
     fn_8026246C();
   }
   return;

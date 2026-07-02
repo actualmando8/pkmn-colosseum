@@ -104,7 +104,7 @@ u16 GSmemAllocTail(u32 alignment, u32 size);
  * @param size       Rounded allocation size (including header padding).
  * @return           Handle, or 0 on failure.
  *
- * Corresponds to fn_800E3534.
+ * Corresponds to _toolentryAlloc__FUl.
  */
 u16 GSmemAllocRaw(u32 size);
 

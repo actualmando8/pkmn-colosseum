@@ -23,7 +23,7 @@
  * battle_MainLoop runs on its own thread and:
  *   1. Starts a sound effect (fn_801659FC, BGM id 0x3E8)
  *   2. Initializes battle subsystems (fn_8020C840)
- *   3. Sets up the battle camera (fn_801C41C8)
+ *   3. Sets up the battle camera (fadeSet)
  *   4. Configures scene rendering passes via fn_801F0B00
  *   5. Enters a polling loop that:
  *      a. Saves/restores VSync state (fn_801337A0/fn_801337A8)
@@ -106,8 +106,8 @@ extern void fn_801C2D68(void);                      /* battle grid tick 2 */
 extern void fn_801C2D80(void);                      /* battle grid cleanup */
 extern void fn_801C2F00(void* data, u32 size);      /* battle grid load data */
 extern void fn_801C31EC(void);                      /* battle grid release */
-extern void fn_801C40F0(s32 flag);                  /* battle grid set flag */
-extern void fn_801C41C8(s32 mode);                  /* battle camera init */
+extern void fadeCheck(s32 flag);                  /* battle grid set flag */
+extern void fadeSet(s32 mode);                  /* battle camera init */
 
 /* Battle scene */
 extern void fn_801DAC90(void);                      /* waza system cleanup */
@@ -799,7 +799,7 @@ void fn_801EFA08(void) {
     ((void(*)(void))fn_8020C840)();
     f1 = lbl_8047E508;
     r3 = 0x8;
-    ((void(*)(void))fn_801C41C8)();
+    ((void(*)(void))fadeSet)();
     r3 = (u32)lbl_8046D760;
     r5 = (u32)lbl_80375CC8;
     r8 = (u32)lbl_80375CC8;
@@ -819,7 +819,7 @@ void fn_801EFA08(void) {
         ((void(*)(void))fn_801C2F00)();
     }
     r3 = 0x1;
-    ((void(*)(void))fn_801C40F0)();
+    ((void(*)(void))fadeCheck)();
     ((void(*)(void))fn_801337A0)();
     r28 = r3;
     r3 = 0x1;
@@ -1122,9 +1122,9 @@ void fn_801EFA08(void) {
     }
     f1 = lbl_8047E508;
     r3 = 0x3;
-    ((void(*)(void))fn_801C41C8)();
+    ((void(*)(void))fadeSet)();
     r3 = 0x1;
-    ((void(*)(void))fn_801C40F0)();
+    ((void(*)(void))fadeCheck)();
     r3 = (u32)lbl_8046D760;
     r5 = (u32)lbl_80375D80;
     r8 = (u32)lbl_80375D80;

@@ -13,8 +13,8 @@
  *   fn_801019F8 (GSmodel_ClearResourceTable)
  *   fn_80101A28 (GSmodel_GetResourceCount)
  *   fn_80101A4C (GSmodel_GetResourceByIndex)
- *   fn_80101A70 (GSmodel_GetResourceHandle)
- *   fn_80101A9C (GSmodel_SetResourceActive)
+ *   kaisuuBiosGetMax (GSmodel_GetResourceHandle)
+ *   kaisuuBiosGetMin (GSmodel_SetResourceActive)
  *   fn_80101AC4 (GSmodel_AllocModelSlot)
  *   fn_80101B34 (GSmodel_FreeModelSlot)
  *   fn_80101B90 (GSmodel_LoadFromFSYS)
@@ -57,7 +57,7 @@ extern void* memcpy(void* dst, const void* src, u32 n);
 extern void  fn_800DD970(const char* fmt, ...);         /* OSReport / GSlog */
 
 /* GSmem */
-extern u16   fn_800E3534(u32 size);                     /* GSmemAllocRaw */
+extern u16   _toolentryAlloc__FUl(u32 size);                     /* GSmemAllocRaw */
 extern void* fn_800E27B0(u16 handle);                   /* GSmemGetPtr */
 extern void* fn_800E24B0(u16 handle);                   /* GSmemLock */
 extern void  fn_800E209C(u16 handle);                   /* GSmemFree */
@@ -66,9 +66,9 @@ extern void  fn_800E209C(u16 handle);                   /* GSmemFree */
 extern u8 lbl_8047AA80[];  /* GSgfx state pointer (via sda21) */
 
 /* Matrix math */
-extern void  fn_800A2D38(void);                         /* MTXIdentity */
-extern void  fn_800A2D64(void* mtxA, void* mtxB);      /* MTXConcat */
-extern void  fn_800A37CC(void* mtx, void* vec, void* out); /* MTXMultVec3 */
+extern void  PSMTXIdentity(void);                         /* MTXIdentity */
+extern void  PSMTXCopy(void* mtxA, void* mtxB);      /* MTXConcat */
+extern void  PSMTXMultVec(void* mtx, void* vec, void* out); /* MTXMultVec3 */
 
 /* Model resource table (BSS) */
 extern u8 lbl_80402518[];  /* model resource table -- 0x2400 bytes */
@@ -359,20 +359,20 @@ extern void fn_800D6728(void);
 /* Forward declarations for functions defined later in this TU */
 extern u8    fn_80109718(u8 param);
 extern void  fn_80104828(void* ptr, u32 flags);
-extern void* fn_80104704(s32 param);
+extern void* windowSearchID(s32 param);
 extern s32   fn_80109884(void);
-extern void  fn_80109220(void* node, u32 enable);
+extern void  winSpriteSetDisp(void* node, u32 enable);
 extern void  fn_801043A4(s32 param);
 extern void  windowCheckCursor(void* p, u8 flags);
 extern void  fn_80104160(void* r3, void* r4, s16 r5, s16 r6, s32 r7, s32 r8, s32 r9, s32 r10);
 extern u8    fn_80109664(u8 param);
-extern void  fn_801096AC(f32 f1, f32 f2);
+extern void  menuOffScreenFadeSet(f32 f1, f32 f2);
 extern u8    fn_8010977C(u32 param);
 extern void  fn_80109764(void);
 extern u32   fn_801046B8(void);
 extern void* fn_80105624(void);
 extern void* fn_8005D830(u32 idx);
-extern void* fn_801046C8(void* head, s32 key);
+extern void* windowSearchItemID(void* head, s32 key);
 extern void  fn_801026A4(void* p, u32 r4, s32 r5, s32 r6, void* r7, s32 r8, ...);
 extern u8    fn_801096E8(u8 val);
 extern u8    fn_801096F8(u8 val);
@@ -387,7 +387,7 @@ void fn_801019F8(void) {
 }
 
 /* 0x80101A70 | 0x2C */
-void* fn_80101A70(u32 index) {
+void* kaisuuBiosGetMax(u32 index) {
     struct Entry {
         void* start;
         void* end;
@@ -400,7 +400,7 @@ void* fn_80101A70(u32 index) {
 
 /* 0x80101A9C | 0x28 */
 /* Returns value at entry[index].field0 (lwzx from offset 0) in the 8-byte table */
-void* fn_80101A9C(u32 index) {
+void* kaisuuBiosGetMin(u32 index) {
     if (index >= lbl_80478B20) { return (void*)0; }
     return *(void**)(lbl_80315690 + index * 8);
 }
@@ -409,8 +409,8 @@ void* fn_80101A9C(u32 index) {
 extern u32 fn_800E0C54(void);  /* random or tick */
 u32 fn_80101AC4(u32 param) {
     u32 r30 = param;
-    u32 r31 = (u32)fn_80101A70(r30);
-    r30 = (u32)fn_80101A9C(r30);
+    u32 r31 = (u32)kaisuuBiosGetMax(r30);
+    r30 = (u32)kaisuuBiosGetMin(r30);
     if (r31 != r30) {
         u32 tick = fn_800E0C54();
         u32 range = r31 - r30;
@@ -481,10 +481,10 @@ void fn_80102014(void) {
 /* 0x80102038 | 0x34 */
 #pragma push
 #pragma scheduling off
-void fn_80102038(f32 f1) {
+void menuReleaseOffScreen(f32 f1) {
     f32 f2;
     f2 = f1;
-    fn_801096AC(lbl_8047CDC0, f2);
+    menuOffScreenFadeSet(lbl_8047CDC0, f2);
     fn_80109664(1);
     fn_80109764();
 }
@@ -496,7 +496,7 @@ void fn_8010206C(f32 param) {
     fn_8010977C(1);
     fn_801096F8(1);
     fn_801096E8(0);
-    fn_801096AC(lbl_8047CDC4, f31);
+    menuOffScreenFadeSet(lbl_8047CDC4, f31);
 }
 
 /* 0x801020C0 | 0x78 */
@@ -561,12 +561,12 @@ s32 fn_80102138(void* unused, u32 param) {
 /* 0x801021F8 | 0x5C */
 void fn_801021F8(void* p, u32 val) {
     u32 r30 = val;
-    void* r3 = fn_80104704((s32)p);
+    void* r3 = windowSearchID((s32)p);
     if (r3 == (void*)0) { return; }
     {
         void* r31 = *(void**)((u8*)r3 + 0x20);
         while (r31 != (void*)0) {
-            fn_80109220(r31, r30);
+            winSpriteSetDisp(r31, r30);
             r31 = *(void**)r31;
         }
     }
@@ -575,9 +575,9 @@ void fn_801021F8(void* p, u32 val) {
 /* 0x80102254 | 0x64 */
 #pragma push
 #pragma peephole off
-void fn_80102254(void* p, u32 enable) {
+void menuSetDisp(void* p, u32 enable) {
     u32 r31 = enable;
-    void* r3 = fn_80104704((s32)p);
+    void* r3 = windowSearchID((s32)p);
     if (r3 == (void*)0) { return; }
     if ((u8)r31 != 0) {
         s8 r0 = (s8)(*(u8*)r3 | 2);
@@ -594,7 +594,7 @@ void fn_80102254(void* p, u32 enable) {
 #pragma peephole off
 void* fn_801022B8(void* p, u32 target) {
     void* r29 = p;
-    void* r3 = fn_80104704((s32)p);
+    void* r3 = windowSearchID((s32)p);
     s32 r31;
     if (r3 != (void*)0) {
         s8 r4 = (s8)*(u8*)((u8*)r3 + 0x95);
@@ -636,7 +636,7 @@ void* fn_801022B8(void* p, u32 target) {
 #pragma peephole off
 s32 fn_80102398(void* p, u32 val) {
     u32 r31 = val;
-    void* r3 = fn_80104704((s32)p);
+    void* r3 = windowSearchID((s32)p);
     if (r3 == (void*)0) goto ret_m1;
     *(s8*)((u8*)r3 + 0x95) = (s8)r31;
     goto ret0;
@@ -649,7 +649,7 @@ ret0:
 
 /* 0x801023E4 | 0x44 */
 s32 fn_801023E4(void* p) {
-    void* r3 = fn_80104704((s32)p);
+    void* r3 = windowSearchID((s32)p);
     if (r3 == (void*)0) goto ret_m1;
     {
         s8 r4 = (s8)*(u8*)((u8*)r3 + 0x95);
@@ -668,7 +668,7 @@ s32 menuCloseSync(void* p, u8 flag) {
     if ((u8)flag != 0) {
         goto loop;
     loop: {
-            void* r3 = fn_80104704((s32)r31);
+            void* r3 = windowSearchID((s32)r31);
             if (r3 != (void*)0) goto step2;
             return 0;
         step2:
@@ -680,7 +680,7 @@ s32 menuCloseSync(void* p, u8 flag) {
             goto loop;
         }
     } else {
-        void* r3 = fn_80104704((s32)r31);
+        void* r3 = windowSearchID((s32)r31);
         s32 r0 = (s32)r3;
         s32 neg = -r0;
         return (u32)(neg | r0) >> 31;
@@ -715,10 +715,10 @@ void fn_80102510(s32 p) {
         r31 = (s32)fn_801046B8();
     }
     {
-        void* r3 = fn_80104704(r31);
+        void* r3 = windowSearchID(r31);
         if (r3 != (void*)0) {
             fn_80104828(r3, 0);
-            fn_80104704(r31);
+            windowSearchID(r31);
         }
     }
 }
@@ -729,12 +729,12 @@ s32 fn_80102568(void* p, u32 mode, u8 wait) {
     void* r29 = p;
     void* r30 = (void*)mode;
     u8 r31 = (u8)wait;
-    void* r3 = fn_80104704((s32)p);
+    void* r3 = windowSearchID((s32)p);
     if (r3 == (void*)0) { return 1; }
     fn_80104828(r29, (u32)r30);
     if ((u8)r31 != 0) {
         while (1) {
-            r3 = fn_80104704((s32)r29);
+            r3 = windowSearchID((s32)r29);
             if (r3 == (void*)0) { return 0; }
             if (fn_800F037C() != 0) {
                 _threadSwitch();
@@ -744,20 +744,20 @@ s32 fn_80102568(void* p, u32 mode, u8 wait) {
             return 0;
         }
     }
-    r3 = fn_80104704((s32)r29);
+    r3 = windowSearchID((s32)r29);
     return 0;
 }
 
 /* 0x80102620 | 0x2C */
 s32 fn_80102620(s32 param) {
-    s32 r = (s32)fn_80104704(param);
+    s32 r = (s32)windowSearchID(param);
     return (u32)((-r) | r) >> 31;
 }
 
 /* 0x8010264C | 0x58 */
 #pragma push
 #pragma peephole off
-void fn_8010264C(void* p, void* q) {
+void menuOpen(void* p, void* q) {
     void* r30 = p;
     void* r31 = q;
     fn_801026A4(r30, fn_801046B8(), 0, 0, r31, 0);
@@ -780,7 +780,7 @@ void fn_801026A4(void* p, u32 r4, s32 r5, s32 r6, void* r7, s32 r8, ...) {
 void fn_80102868(void* p, s16 a, s16 b) {
     s16 r30 = a;
     s16 r31 = b;
-    void* r3 = fn_80104704((s32)p);
+    void* r3 = windowSearchID((s32)p);
     if (r3 == (void*)0) { return; }
     *(s16*)((u8*)r3 + 0x84) = r30;
     *(s16*)((u8*)r3 + 0x86) = r31;
@@ -790,7 +790,7 @@ void fn_80102868(void* p, s16 a, s16 b) {
 /* 0x80102ED4 | 0x64 */
 #pragma push
 #pragma peephole off
-void fn_80102ED4(void* p) {
+void menuButtonNormal(void* p) {
     void* r31;
     if ((r31 = p) == (void*)0) { return; }
     {
@@ -944,7 +944,7 @@ void fn_80103F74(void* head, u16 key, u32 data) {
         while (r30 != (void*)0) {
             s32 r0 = (s32)*(s16*)((u8*)r30 + 0x6);
             if (r0 == r31) {
-                fn_80109220(r30, r29);
+                winSpriteSetDisp(r30, r29);
             }
             r30 = *(void**)r30;
         }
@@ -974,7 +974,7 @@ void* fn_80103FFC(void* p, s32 size) {
     }
     if (r31 <= 0) { return (void*)0; }
     {
-        u16 h = fn_800E3534((u32)r31);
+        u16 h = _toolentryAlloc__FUl((u32)r31);
         *(u16*)((u8*)r30 + 0xac) = h;
         if (*(u16*)((u8*)r30 + 0xac) != 0) {
             void* ptr = fn_800E27B0(*(u16*)((u8*)r30 + 0xac));
@@ -1125,7 +1125,7 @@ u32 fn_801046B8(void) {
 /* 0x801046C8 | 0x3C */
 #pragma push
 #pragma scheduling off
-void* fn_801046C8(void* head, s32 key) {
+void* windowSearchItemID(void* head, s32 key) {
     if (head == (void*)0) { return (void*)0; }
     {
         void* r3 = *(void**)((u8*)head + 0x1c);
@@ -1141,7 +1141,7 @@ void* fn_801046C8(void* head, s32 key) {
 #pragma pop
 
 /* 0x80104704 | 0x48 */
-void* fn_80104704(s32 param) {
+void* windowSearchID(s32 param) {
     if (param <= 0) { return (void*)0; }
     {
         void* r4 = *(void**)((u8*)lbl_80404ACC + 0xc);
@@ -1178,8 +1178,8 @@ void fn_8010474C(void* obj) {
         if (nx != (void*)0) {
             *(void**)((u8*)nx + 0x14) = *(void**)((u8*)obj + 0x14);
         }
-        { extern void fn_8010925C(void* head); fn_8010925C((u8*)obj + 0x1c); }
-        { extern void fn_8010925C(void* head); fn_8010925C((u8*)obj + 0x20); }
+        { extern void winSpriteRelease(void* head); winSpriteRelease((u8*)obj + 0x1c); }
+        { extern void winSpriteRelease(void* head); winSpriteRelease((u8*)obj + 0x20); }
         if (*(u16*)((u8*)obj + 0xac) != 0) {
             fn_800E24B0(*(u16*)((u8*)obj + 0xac));
             fn_800E209C(*(u16*)((u8*)obj + 0xac));
@@ -1252,7 +1252,7 @@ void fn_80105410(u16 count) {
 
     memset(lbl_80404ACC, 0, 0x9c);
     size = (u16)count * 0xb4;
-    handle = fn_800E3534(size);
+    handle = _toolentryAlloc__FUl(size);
     GS_MODEL_STATE->entryHandle = handle;
     if ((u16)handle == 0) {
         fn_800DD970((const char*)lbl_80271EC4);
@@ -1308,7 +1308,7 @@ void fn_80105A3C(void) {
 #pragma pop
 
 /* 0x80105C30 | 0x38 */
-void fn_80105C30(void* p) {
+void winMsgButton(void* p) {
     void* r31 = fn_801040A0(p);
     void* r3 = fn_80105624();
     *(u32*)((u8*)r31 + 0x8) = *(u16*)((u8*)r3 + 0x4);
@@ -1482,8 +1482,8 @@ void fn_80106F98(void) {
 #pragma pop
 
 /* 0x801070F4 | 0x7C */
-s32 fn_801070F4(s32 param) {
-    void* r3 = fn_80104704(param);
+s32 winSeqCheckMove(s32 param) {
+    void* r3 = windowSearchID(param);
     if (r3 == (void*)0) { return 0; }
     if (*(void**)((u8*)r3 + 0x24) != (void*)0) { return 1; }
     {
@@ -1500,8 +1500,8 @@ s32 fn_801070F4(s32 param) {
 
 /* 0x80107170 | 0x60 */
 s32 fn_80107170(s32 r3, s32 r31) {
-    void* r3r = fn_80104704(r3);
-    void* result = fn_801046C8(r3r, r31);
+    void* r3r = windowSearchID(r3);
+    void* result = windowSearchItemID(r3r, r31);
     if (result == (void*)0) { goto _ret0; }
     if (*(void**)((u8*)result + 0xc) == (void*)0) { goto _ret0; }
     if ((u8)*(u8*)((u8*)result + 0x46) != 0) { goto _ret0; }
@@ -1523,7 +1523,7 @@ void fn_801071D0(void) {
 #pragma push
 #pragma peephole off
 s32 fn_80107E78(void* r3, s32 r4, u16 r30) {
-    void* r31 = fn_801046C8(r3, r4);
+    void* r31 = windowSearchItemID(r3, r4);
     if (r31 == (void*)0) { goto _ret0; }
     {
         void* r3b = fn_8005D830((u32)(u16)r30);
@@ -1539,7 +1539,7 @@ _ret0:
 #pragma push
 #pragma peephole off
 s32 fn_80107ED8(s32 r3, u16 r30) {
-    void* r31 = fn_80104704(r3);
+    void* r31 = windowSearchID(r3);
     if (r31 == (void*)0) { goto _ret0; }
     {
         void* r3b = fn_8005D830((u32)(u16)r30);
@@ -1558,7 +1558,7 @@ _ret0:
 #pragma optimization_level 1
 void fn_80107F38(s32 param, u32 key) {
     u32 r28 = key;
-    void* r3 = fn_80104704(param);
+    void* r3 = windowSearchID(param);
     if (r3 == (void*)0) { return; }
     {
         u8* r31 = lbl_80404B68;
@@ -1614,7 +1614,7 @@ void fn_80107F38(s32 param, u32 key) {
 #pragma peephole off
 void fn_801080CC(s32 param, u32 key) {
     u32 r28 = key;
-    void* r31 = fn_80104704(param);
+    void* r31 = windowSearchID(param);
     if (r31 == (void*)0) { goto _ret80CC; }
     if ((u32)(u16)r28 == 0) {
         *(u32*)((u8*)r31 + 0x24) = 0;
@@ -1711,7 +1711,7 @@ void fn_801081F8(void* r3_arg, u16 r4, u16 r5) {
             r26++;
         }
     } else {
-        void* r30 = fn_801046C8(r3_arg, (s32)r4);
+        void* r30 = windowSearchItemID(r3_arg, (s32)r4);
         if (r30 == (void*)0) { return; }
         if ((u32)(u16)r25 == 0) {
             *(u32*)((u8*)r30 + 0xc) = 0;
@@ -1767,7 +1767,7 @@ void fn_801081F8(void* r3_arg, u16 r4, u16 r5) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80108518(void* out, u32 idx) {
+void winSetSequence(void* out, u32 idx) {
 #pragma optimization_level 4
 #pragma peephole off
     if ((u16)idx == 0) {
@@ -1783,7 +1783,7 @@ void fn_80108518(void* out, u32 idx) {
 /* 0x801091F4 | 0x2C | nc_getter_s8 -- returns 1 if bit 1 of ptr[0x4] is set */
 #pragma push
 #pragma peephole off
-s32 fn_801091F4(void* ptr) {
+s32 winSpriteGetDisp(void* ptr) {
     if (ptr == (void*)0) { return 0; }
     {
         s8 r0 = (s8)*((u8*)ptr + 0x4);
@@ -1798,7 +1798,7 @@ s32 fn_801091F4(void* ptr) {
 #pragma push
 #pragma peephole off
 #pragma scheduling off
-void fn_80109220(void* node, u32 enable) {
+void winSpriteSetDisp(void* node, u32 enable) {
     if (node == (void*)0) { return; }
     if ((u8)enable != 0) {
         s8 r0 = (s8)(*(u8*)((u8*)node + 0x4) | 2);
@@ -1813,7 +1813,7 @@ void fn_80109220(void* node, u32 enable) {
 /* 0x8010925C | 0x34 */
 #pragma push
 #pragma peephole off
-void fn_8010925C(void* head) {
+void winSpriteRelease(void* head) {
     if (head == (void*)0) { return; }
     {
         u8 r0 = 0;
@@ -1867,7 +1867,7 @@ void* fn_80109290(void* root) {
 #pragma push
 #pragma peephole off
 void fn_80109358(void) {
-    u16 h = fn_800E3534(0x10000 - 0x5740);
+    u16 h = _toolentryAlloc__FUl(0x10000 - 0x5740);
     lbl_8047AD18 = h;
     if ((u16)h == 0) {
         fn_800DD970((const char*)lbl_80271F18, (const char*)lbl_8035B3F0);
@@ -1905,7 +1905,7 @@ done:
 #pragma pop
 
 /* 0x801096AC | 0x3C */
-void fn_801096AC(f32 f1, f32 f2) {
+void menuOffScreenFadeSet(f32 f1, f32 f2) {
     f32 f3 = lbl_8047AD30;
     f32 f0 = lbl_8047CE50;
     lbl_8047AD24 = 1;

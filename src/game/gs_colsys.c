@@ -15,14 +15,14 @@
  *   fn_8010C54C (GScolsys2_CalcAdvantage)
  *   fn_8010C650 (GScolsys2_CalcGroupResult)
  *   fn_8010C74C (wrapper for GetTypeInteraction)
- *   fn_8010C77C (GScolsys2_DotPlaneEdge)
+ *   GScolsy2UtilGetSidePlanePoint (GScolsys2_DotPlaneEdge)
  *   fn_8010C7BC (GScolsys2_QueryTriVisible)
  *   fn_8010C844 (GScolsys2_SetTriVisible)
  *   fn_8010C8D0 (GScolsys2_BuildTransform)
  *   fn_8010CA30 (GScolsys2_BuildInverseTransform)
  *   fn_8010CBC0 (GScolsys2_GetWZXData)
- *   fn_8010CBD0 (GScolsys2_GetActiveLayerPtr)
- *   fn_8010CC04 (GScolsys2_Reset)
+ *   GScolsys2GetCurFloor (GScolsys2_GetActiveLayerPtr)
+ *   GScolsys2UnloadCCD (GScolsys2_Reset)
  *   fn_8010CC54 (GScolsys2_Finalize)
  *   fn_8010CD6C (GScolsys2_Cleanup)
  *   fn_8010CE04 (GScolsys2_RelocateWZX)
@@ -60,20 +60,20 @@ extern void* memcpy(void* dst, const void* src, u32 size);
 
 /* ===== External SDK / engine functions ===== */
 extern void  fn_800DD970(const char* fmt, ...);        /* OSReport */
-extern u16   fn_800E3534(u32 size);                    /* GSmemAllocRaw */
+extern u16   _toolentryAlloc__FUl(u32 size);                    /* GSmemAllocRaw */
 extern void* fn_800E27B0(u16 handle);                  /* GSmemGetPtr */
 extern void* fn_800E2C04(u32 size, u32 align);         /* GSmemAllocAligned */
 extern void  fn_800EF5A4(void);                        /* GStexture trigger */
 extern void  fn_800C8710(const char* fmt, ...);         /* OSPanic / printf */
 
 /* Matrix / vector math helpers */
-extern void  fn_800A2D38(void);                         /* MTXIdentity or push */
-extern void  fn_800A2D64(void* mtxA, void* mtxB);      /* MTXConcat */
+extern void  PSMTXIdentity(void);                         /* MTXIdentity or push */
+extern void  PSMTXCopy(void* mtxA, void* mtxB);      /* MTXConcat */
 extern void  fn_800A2D98(void* mtxDst, void* mtxSrc, void* mtxDst2); /* MTXMultVec */
 extern void  fn_800A3244(void* mtxDst, void* mtxSrc, f32 scale);     /* MTXScaleApply */
-extern void  fn_800A32E8(void* mtxDst, void* mtxSrc, f32 tx, f32 ty, f32 tz); /* MTXTransApply */
-extern void  fn_800A335C(void* mtxDst, void* mtxSrc, f32 tx, f32 ty, f32 tz); /* MTXTranslate */
-extern void  fn_800A37CC(void* mtxDst, void* vecSrc, void* vecDst);  /* MTXMultVec3 */
+extern void  PSMTXTransApply(void* mtxDst, void* mtxSrc, f32 tx, f32 ty, f32 tz); /* MTXTransApply */
+extern void  PSMTXScaleApply(void* mtxDst, void* mtxSrc, f32 tx, f32 ty, f32 tz); /* MTXTranslate */
+extern void  PSMTXMultVec(void* mtxDst, void* vecSrc, void* vecDst);  /* MTXMultVec3 */
 
 /* GSgfx renderer functions */
 extern void* fn_800D7894(void);                        /* GSgfx create render obj */
@@ -192,7 +192,7 @@ void GScolsys2_AllocBuffers(u32 count)
 
     /* Allocate record pool if not already allocated */
     if (lbl_8047AD50 == 0) {
-        lbl_8047AD50 = fn_800E3534(count << 4);  /* count * 16 */
+        lbl_8047AD50 = _toolentryAlloc__FUl(count << 4);  /* count * 16 */
         lbl_8047AD4C = fn_800E27B0(lbl_8047AD50);
     }
 
@@ -201,7 +201,7 @@ void GScolsys2_AllocBuffers(u32 count)
 
     /* Allocate sub-mesh pool if not already allocated */
     if (lbl_8047AD58 == 0) {
-        lbl_8047AD58 = fn_800E3534(lbl_8047AD48 << 3);  /* count * 8 */
+        lbl_8047AD58 = _toolentryAlloc__FUl(lbl_8047AD48 << 3);  /* count * 8 */
         lbl_8047AD54 = fn_800E27B0(lbl_8047AD58);
     }
 
@@ -491,7 +491,7 @@ u16 GScolsys2_GetTypeInteractionWrap(u16 typeA, u16 typeB)
 }
 
 /* ===================================================================
- * fn_8010C77C -- GScolsys2_DotPlaneEdge
+ * GScolsy2UtilGetSidePlanePoint -- GScolsys2_DotPlaneEdge
  *
  * Computes the dot product: N . (P2 - P1)
  * where N = normal (r3), P1 = point 1 (r4), P2 = point 2 (r5).
@@ -630,7 +630,7 @@ s32 GScolsys2_BuildTransform(void* outMtx, u32 triIndex)
     entry = base + COL_LAYER_IDX * GSCOLSYS_LAYER_SIZE + 4
             + triIndex * GSCOLSYS_TRI_ENTRY_SIZE;
 
-    fn_800A2D38();  /* push/init matrix state */
+    PSMTXIdentity();  /* push/init matrix state */
 
     /* Check if triangle is active (bit 0 of flags at +0x24) */
     if ((*(u16*)(entry + 0x24) & 1) == 0) {
@@ -641,7 +641,7 @@ s32 GScolsys2_BuildTransform(void* outMtx, u32 triIndex)
     memcpy(identityMtx, lbl_80272020, sizeof(identityMtx));
     memcpy(axisOrder, lbl_80272044, sizeof(axisOrder));
 
-    fn_800A2D38();  /* init matrix state */
+    PSMTXIdentity();  /* init matrix state */
 
     /* Apply rotation for each axis */
     for (i = 0; i < 3; i++) {
@@ -654,7 +654,7 @@ s32 GScolsys2_BuildTransform(void* outMtx, u32 triIndex)
     }
 
     /* Compute final concatenated matrix */
-    fn_800A2D64(concatMtx, outMtx);
+    PSMTXCopy(concatMtx, outMtx);
 
     /* Apply translation */
     fn_800A2D98(outMtx, outMtx, outMtx);
@@ -692,21 +692,21 @@ s32 GScolsys2_BuildInverseTransform(void* outMtx, u32 triIndex)
     entry = base + COL_LAYER_IDX * GSCOLSYS_LAYER_SIZE + 4
             + triIndex * GSCOLSYS_TRI_ENTRY_SIZE;
 
-    fn_800A2D38();  /* push matrix state */
+    PSMTXIdentity();  /* push matrix state */
 
     if ((*(u16*)(entry + 0x24) & 1) == 0) {
         return 1;
     }
 
     /* Apply inverse translation first */
-    fn_800A335C(outMtx, outMtx,
+    PSMTXScaleApply(outMtx, outMtx,
                 *(f32*)(entry + 0x18), *(f32*)(entry + 0x1C), *(f32*)(entry + 0x20));
 
     /* Copy identity and axis order */
     memcpy(identityMtx, lbl_80272020, sizeof(identityMtx));
     memcpy(axisOrder, lbl_80272044, sizeof(axisOrder));
 
-    fn_800A2D38();
+    PSMTXIdentity();
 
     /* Apply inverse rotation */
     for (i = 0; i < 3; i++) {
@@ -718,11 +718,11 @@ s32 GScolsys2_BuildInverseTransform(void* outMtx, u32 triIndex)
         fn_800A2D98(tempMtx, concatMtx, concatMtx);
     }
 
-    fn_800A2D64(concatMtx, outMtx);
+    PSMTXCopy(concatMtx, outMtx);
     fn_800A2D98(outMtx, outMtx, outMtx);
 
     /* Apply translation offset from entry+0x00 */
-    fn_800A32E8(outMtx, outMtx,
+    PSMTXTransApply(outMtx, outMtx,
                 *(f32*)(entry + 0x00), *(f32*)(entry + 0x04), *(f32*)(entry + 0x08));
 
     return 1;
@@ -739,7 +739,7 @@ void* GScolsys2_GetWZXData(void)
 }
 
 /* ===================================================================
- * fn_8010CBD0 -- GScolsys2_GetActiveLayerPtr
+ * GScolsys2GetCurFloor -- GScolsys2_GetActiveLayerPtr
  *
  * Returns a pointer to the active collision layer, or NULL if the
  * active layer index is out of range (< 0 or >= 4).
@@ -756,7 +756,7 @@ void* GScolsys2_GetActiveLayerPtr(void)
 }
 
 /* ===================================================================
- * fn_8010CC04 -- GScolsys2_Reset
+ * GScolsys2UnloadCCD -- GScolsys2_Reset
  *
  * Resets the collision system:
  *   1. Clears the WZX data pointer to NULL
@@ -1152,7 +1152,7 @@ void GScolsys2_DrawTriGroup(GSColSubMesh* mesh, void* mtx)
 
         for (j = 0; j < 3; j++) {
             /* Transform vertex through matrix */
-            fn_800A37CC(mtx, triPtr + j * 0x0C, &transformed);
+            PSMTXMultVec(mtx, triPtr + j * 0x0C, &transformed);
 
             /* Submit vertex position */
             fn_800D6680(transformed.x, transformed.y, transformed.z);
@@ -1277,13 +1277,13 @@ void* GScolsys2_Draw(void)
                     fn_800D67BC(2);  /* 2 vertices per line segment */
 
                     /* Current vertex */
-                    fn_800A37CC(invTransform, subVerts + v * 0x0C, &xformed[0]);
+                    PSMTXMultVec(invTransform, subVerts + v * 0x0C, &xformed[0]);
                     fn_800D6680(xformed[0].x, xformed[0].y, xformed[0].z);
                     fn_800D5CB8(0, (u8)(color >> 24), (u8)(color >> 16),
                                 (u8)(color >> 8), (u8)color);
 
                     /* Next vertex */
-                    fn_800A37CC(invTransform, subVerts + nextV * 0x0C, &xformed[1]);
+                    PSMTXMultVec(invTransform, subVerts + nextV * 0x0C, &xformed[1]);
                     fn_800D6680(xformed[1].x, xformed[1].y, xformed[1].z);
                     fn_800D5CB8(0, (u8)(color >> 24), (u8)(color >> 16),
                                 (u8)(color >> 8), (u8)color);
@@ -1308,7 +1308,7 @@ void* GScolsys2_Draw(void)
                 fn_800D67BC(3);
                 for (v = 0; v < 3; v++) {
                     Vec3f xf;
-                    fn_800A37CC(invTransform, subVerts + v * 0x0C, &xf);
+                    PSMTXMultVec(invTransform, subVerts + v * 0x0C, &xf);
                     fn_800D6680(xf.x, xf.y, xf.z);
                     fn_800D5CB8(0, (u8)(color >> 24), (u8)(color >> 16),
                                 (u8)(color >> 8), (u8)color);
@@ -1331,7 +1331,7 @@ void* GScolsys2_Draw(void)
                 fn_800D67BC(3);
                 for (v = 0; v < 3; v++) {
                     Vec3f xf;
-                    fn_800A37CC(invTransform, subVerts + v * 0x0C, &xf);
+                    PSMTXMultVec(invTransform, subVerts + v * 0x0C, &xf);
                     fn_800D6680(xf.x, xf.y, xf.z);
                     fn_800D5CB8(0, (u8)(color >> 24), (u8)(color >> 16),
                                 (u8)(color >> 8), (u8)color);
@@ -1359,7 +1359,7 @@ void* GScolsys2_Draw(void)
                 fn_800D67BC(3);
                 for (v = 0; v < 3; v++) {
                     Vec3f xf;
-                    fn_800A37CC(invTransform, subVerts + v * 0x0C, &xf);
+                    PSMTXMultVec(invTransform, subVerts + v * 0x0C, &xf);
                     fn_800D6680(xf.x, xf.y, xf.z);
                     fn_800D5CB8(0, (u8)(color >> 24), (u8)(color >> 16),
                                 (u8)(color >> 8), (u8)color);
@@ -1465,11 +1465,11 @@ void GScolsys2_DrawActive(void)
                     Vec3f xf;
                     if (nextV >= 3) nextV = 0;
                     fn_800D67BC(2);
-                    fn_800A37CC(invTransform, subVerts + v * 0x0C, &xf);
+                    PSMTXMultVec(invTransform, subVerts + v * 0x0C, &xf);
                     fn_800D6680(xf.x, xf.y, xf.z);
                     fn_800D5CB8(0, (u8)(color >> 24), (u8)(color >> 16),
                                 (u8)(color >> 8), (u8)color);
-                    fn_800A37CC(invTransform, subVerts + nextV * 0x0C, &xf);
+                    PSMTXMultVec(invTransform, subVerts + nextV * 0x0C, &xf);
                     fn_800D6680(xf.x, xf.y, xf.z);
                     fn_800D5CB8(0, (u8)(color >> 24), (u8)(color >> 16),
                                 (u8)(color >> 8), (u8)color);
@@ -1490,7 +1490,7 @@ void GScolsys2_DrawActive(void)
                 fn_800D67BC(3);
                 for (v = 0; v < 3; v++) {
                     Vec3f xf;
-                    fn_800A37CC(invTransform, subVerts + v * 0x0C, &xf);
+                    PSMTXMultVec(invTransform, subVerts + v * 0x0C, &xf);
                     fn_800D6680(xf.x, xf.y, xf.z);
                     fn_800D5CB8(0, (u8)(color >> 24), (u8)(color >> 16),
                                 (u8)(color >> 8), (u8)color);
@@ -1511,7 +1511,7 @@ void GScolsys2_DrawActive(void)
                 fn_800D67BC(3);
                 for (v = 0; v < 3; v++) {
                     Vec3f xf;
-                    fn_800A37CC(invTransform, subVerts + v * 0x0C, &xf);
+                    PSMTXMultVec(invTransform, subVerts + v * 0x0C, &xf);
                     fn_800D6680(xf.x, xf.y, xf.z);
                     fn_800D5CB8(0, (u8)(color >> 24), (u8)(color >> 16),
                                 (u8)(color >> 8), (u8)color);
@@ -1536,7 +1536,7 @@ void GScolsys2_DrawActive(void)
                 fn_800D67BC(3);
                 for (v = 0; v < 3; v++) {
                     Vec3f xf;
-                    fn_800A37CC(invTransform, subVerts + v * 0x0C, &xf);
+                    PSMTXMultVec(invTransform, subVerts + v * 0x0C, &xf);
                     fn_800D6680(xf.x, xf.y, xf.z);
                     fn_800D5CB8(0, (u8)(color >> 24), (u8)(color >> 16),
                                 (u8)(color >> 8), (u8)color);
@@ -1974,7 +1974,7 @@ u16 fn_8010C74C(u16 typeA, u16 typeB) {
 #pragma fp_contract on
 #pragma fp_contract on
 #pragma fp_contract on
-f32 fn_8010C77C(Vec3f* normal, Vec3f* p1, Vec3f* p2) {
+f32 GScolsy2UtilGetSidePlanePoint(Vec3f* normal, Vec3f* p1, Vec3f* p2) {
     return (normal->x * (p2->x - p1->x))
         + (normal->y * (p2->y - p1->y))
         + (normal->z * (p2->z - p1->z));
@@ -2091,7 +2091,7 @@ u32 fn_8010CBC0(void) {
 #pragma pop
 
 /* 0x8010CBD0 | 0x34 */
-void* fn_8010CBD0(void) {
+void* GScolsys2GetCurFloor(void) {
     s32 layer;
 
     layer = COL_LAYER_IDX;
@@ -2105,7 +2105,7 @@ void* fn_8010CBD0(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_8010CC04(void) {
+void GScolsys2UnloadCCD(void) {
     /* TODO: match -- 80 bytes at 0x8010CC04 */
 }
 #pragma pop

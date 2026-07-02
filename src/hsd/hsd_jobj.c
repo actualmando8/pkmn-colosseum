@@ -486,9 +486,9 @@ extern f32 fn_800A3B7C(JObjVec* a, JObjVec* b);
 extern void fn_800A3AC0(JObjVec* src, JObjVec* dst, f32 scale);
 extern void fn_800A3A78(JObjVec* a, JObjVec* b, JObjVec* dst);
 extern void fn_800A3A9C(JObjVec* a, JObjVec* b, JObjVec* dst);
-extern void fn_800A3B9C(JObjVec* a, JObjVec* b, JObjVec* dst);
+extern void PSVECCrossProduct(JObjVec* a, JObjVec* b, JObjVec* dst);
 extern void fn_800A3244(f32 mtx[3][4], JObjVec* axis, f32 angle);
-extern void fn_800A37CC(f32 mtx[3][4], JObjVec* src, JObjVec* dst);
+extern void PSMTXMultVec(f32 mtx[3][4], JObjVec* src, JObjVec* dst);
 extern HSD_RObj* HSD_RObjGetByType(HSD_RObj* robj, u32 type, u32 subtype);
 extern void fn_801AED88(HSD_RObj* robj, HSD_JObj* jobj,
                         HSD_ObjUpdateFunc update_func);
@@ -843,14 +843,14 @@ void resolveIKJoint2(HSD_JObj* jobj) {
         if (clamped != 0) {
             JObjMtx_LoadColumn(parent, 2, &parent_z);
             fn_800A3244(rot_mtx, &parent_z, angle);
-            fn_800A37CC(rot_mtx, &parent_x, &target_dir);
+            PSMTXMultVec(rot_mtx, &parent_x, &target_dir);
         }
     }
 
     JObjMtx_LoadColumn(parent, 2, &parent_z);
-    fn_800A3B9C(&parent_z, &target_dir, &bend_axis);
+    PSVECCrossProduct(&parent_z, &target_dir, &bend_axis);
     JObjVec_Normalize(&bend_axis, &bend_axis);
-    fn_800A3B9C(&target_dir, &bend_axis, &side_axis);
+    PSVECCrossProduct(&target_dir, &bend_axis, &side_axis);
 
     JObjMtx_StoreScaledColumn(jobj, 0, &target_dir, scale.x);
     JObjMtx_StoreScaledColumn(jobj, 1, &bend_axis, scale.y);
@@ -978,14 +978,14 @@ void resolveIKJoint1(HSD_JObj* jobj) {
             fn_800A3A9C(&pole_hint, &origin, &pole_hint);
             if (rotate_x != 0.0f) {
                 fn_800A3244(rot_mtx, &target, rotate_x);
-                fn_800A37CC(rot_mtx, &pole_hint, &pole_hint);
+                PSMTXMultVec(rot_mtx, &pole_hint, &pole_hint);
             }
-            fn_800A3B9C(&target, &pole_hint, &normal_axis);
-            fn_800A3B9C(&normal_axis, &target, &pole_hint);
+            PSVECCrossProduct(&target, &pole_hint, &normal_axis);
+            PSVECCrossProduct(&normal_axis, &target, &pole_hint);
         } else {
             JObjMtx_LoadColumn(jobj, 2, &normal_axis);
-            fn_800A3B9C(&normal_axis, &target, &pole_hint);
-            fn_800A3B9C(&target, &pole_hint, &normal_axis);
+            PSVECCrossProduct(&normal_axis, &target, &pole_hint);
+            PSVECCrossProduct(&target, &pole_hint, &normal_axis);
         }
 
         JObjVec_Normalize(&normal_axis, &normal_axis);
@@ -1019,7 +1019,7 @@ void resolveIKJoint1(HSD_JObj* jobj) {
     fn_800A3AC0(&tmp, &tmp, norm_scale);
 
     JObjMtx_StoreScaledColumn(jobj, 0, &tmp, scale.x);
-    fn_800A3B9C(&normal_axis, &tmp, &column);
+    PSVECCrossProduct(&normal_axis, &tmp, &column);
     JObjMtx_StoreScaledColumn(jobj, 1, &column, scale.y);
     JObjMtx_StoreScaledColumn(jobj, 2, &normal_axis, scale.z);
     JObjMtx_StoreTranslation(jobj, &origin);
@@ -1855,7 +1855,7 @@ done:
 #pragma optimizewithasm off
 extern HSD_DObj* fn_801992D8(HSD_DObjDesc* desc);
 extern HSD_RObj* fn_801AE5E8(HSD_RObjDesc* desc);
-extern void fn_800A2D38(f32 mtx[3][4]);
+extern void PSMTXIdentity(f32 mtx[3][4]);
 extern f32* HSD_MtxAlloc(void);
 extern void HSD_IDInsertToTable(void* table, u32 key, u32 value);
 extern void* memcpy(void* dst, const void* src, u32 n);
@@ -1909,7 +1909,7 @@ s32 JObjLoad(HSD_JObj* jobj, HSD_Joint* joint, HSD_JObj* parent)
     jobj->translate_x = joint->position_x;
     jobj->translate_y = joint->position_y;
     jobj->translate_z = joint->position_z;
-    fn_800A2D38(jobj->mtx);
+    PSMTXIdentity(jobj->mtx);
     jobj->scl = NULL;
 
     if (joint->mtx != NULL) {
