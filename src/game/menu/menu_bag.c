@@ -13,17 +13,19 @@
  *   - fn_8004EADC and fn_8004EC54 are initialization functions that copy
  *     item data from the save file (via fn_801FBFBC) into the local cache,
  *     iterating 0x229 (553) times with 0x14-byte entries.
- *   - fn_80050844 (0xECC = 3,788 bytes) is the main bag update loop with
- *     a massive switch statement dispatching on message IDs (0x5BC through
- *     0xFEC, with cases for each pocket and item action).
+ *   - fn_8004EDCC, fn_8004F860, fn_8004FE3C and fn_80050844 share one
+ *     template: reload the species cache, then run a scene-message loop
+ *     (fn_801026A4/fn_801022B8) that dispatches per-message onto
+ *     HANDLE_BAG_VALUE, which reads a numeric field from the on-screen input
+ *     widget (fn_8001E224), clamps it to +-0xC8, and commits it
+ *     (fn_801FAA58). Each of the four owns a distinct scene model
+ *     (0x87/0x8A/0x8B/0x8C) and a distinct set of message-ID -> field-slot
+ *     pairs; the message IDs are mostly a contiguous per-pocket range with
+ *     one or two special IDs (e.g. registered/key-item actions) spliced in.
  *   - fn_80051710 (0x728 bytes) handles bag pocket switching
  *   - fn_80051E38 (0x122C = 4,652 bytes) processes item use/give/toss actions
- *   - fn_8004EDCC (0xA94 = 2,708 bytes) handles item sorting/filtering
- *   - fn_8004F860 (0x5DC bytes) manages scroll position and item list display
- *   - fn_8004FE3C (0xA08 = 2,568 bytes) processes item selection confirmation
- *   - Message IDs 0x5BC-0x5D3 map to pocket navigation, 0x766 and 0xFEC
- *     to special item actions (key items, registered items)
- *   - Scene model indices 0x89 and 0x8A used for bag UI elements
+ *   - Scene model indices 0x87, 0x89, 0x8A, 0x8B, 0x8C used for bag UI
+ *     elements (one per pocket / sub-screen)
  *   - Checks scene model 0x44 for resource availability
  *
  * BSS usage:
@@ -64,6 +66,27 @@ typedef struct BagCacheEntry {
 
 /* ===== BSS data ===== */
 extern BagCacheEntry lbl_803A6AB0[];   /* Bag item cache (0x2B38 bytes) */
+
+/*
+ * Clamp a numeric bag-value field (IV/EV-style stat, quantity, etc.) read via
+ * the on-screen numeric input widget, then write it back.
+ *   fn_801FB1C0(0, slot_, 0x3E, 0)      -- resolve the widget's message bank
+ *   fn_8001E224(bank, &value_, 0,0x32,0x32,0) -- read+validate the entered value
+ *   fn_801FAA58(0, slot_, 0x3E, 0, value_)     -- commit the clamped value
+ *   fn_8001E200()                              -- close the widget
+ */
+#define HANDLE_BAG_VALUE(slot_, value_)                                           \
+        if (fn_8001E224(fn_801FB1C0(0, (slot_), 0x3E, 0),                         \
+                        &(value_), 0, 0x32, 0x32, 0) == 1) {                      \
+            if ((value_) > 0xC8) {                                                \
+                (value_) = 0xC8;                                                  \
+            }                                                                     \
+            if ((value_) < -0xC8) {                                               \
+                (value_) = -0xC8;                                                 \
+            }                                                                     \
+            fn_801FAA58(0, (slot_), 0x3E, 0, (value_));                           \
+        }                                                                         \
+        fn_8001E200()
 
 /*
  * Functions in this translation unit (9 total):
@@ -160,24 +183,9 @@ s32 fn_80050844(void) {
     s32 result;
     u32 msg;
 
-#define HANDLE_BAG_VALUE(slot_, value_)                                           \
-        if (fn_8001E224(fn_801FB1C0(0, (slot_), 0x3E, 0),                         \
-                        &(value_), 0, 0x32, 0x32, 0) == 1) {                      \
-            if ((value_) > 0xC8) {                                                \
-                (value_) = 0xC8;                                                  \
-            }                                                                     \
-            if ((value_) < -0xC8) {                                               \
-                (value_) = -0xC8;                                                 \
-            }                                                                     \
-            fn_801FAA58(0, (slot_), 0x3E, 0, (value_));                           \
-        }                                                                         \
-        fn_8001E200()
-
-    index = 0;
-    while ((u16)index < 0x229) {
+    for (index = 0; (u16)index < 0x229; index++) {
         src = fn_801FBFBC(index);
         dst = &lbl_803A6AB0[(u16)index];
-        index++;
         *dst = *src;
     }
 
@@ -186,11 +194,9 @@ s32 fn_80050844(void) {
         if (result == -1) {
             fn_80102568(0x8A, 0, 1);
 
-            index = 0;
-            while ((u16)index < 0x229) {
+            for (index = 0; (u16)index < 0x229; index++) {
                 dst = fn_801FBFBC(index);
                 src = &lbl_803A6AB0[(u16)index];
-                index++;
                 *dst = *src;
             }
 
@@ -289,8 +295,320 @@ s32 fn_80050844(void) {
         }
     }
 
-#undef HANDLE_BAG_VALUE
-
     fn_80102568(0x8A, 0, 1);
+    return 1;
+}
+
+/* 0x8004F860 | size: 0x5DC */
+s32 fn_8004F860(void) {
+#pragma peephole off
+    s32 value7;
+    s32 value6;
+    s32 value5;
+    s32 value4;
+    s32 value3;
+    s32 value2;
+    s32 value1;
+    s32 value0;
+    u32 index;
+    BagCacheEntry* src;
+    BagCacheEntry* dst;
+    s32 result;
+    u32 msg;
+
+    for (index = 0; (u16)index < 0x229; index++) {
+        src = fn_801FBFBC(index);
+        dst = &lbl_803A6AB0[(u16)index];
+        *dst = *src;
+    }
+
+    while (1) {
+        result = fn_801026A4(0x87, 0, 0, 0, 1, 0);
+        if (result == -1) {
+            fn_80102568(0x87, 0, 1);
+
+            for (index = 0; (u16)index < 0x229; index++) {
+                dst = fn_801FBFBC(index);
+                src = &lbl_803A6AB0[(u16)index];
+                *dst = *src;
+            }
+
+            return -1;
+        }
+
+        if (result == -2) {
+            if (menuOpen(0x44, 1) != 0) {
+                fn_80102568(0x44, 0, 1);
+                continue;
+            }
+
+            fn_80102568(0x44, 0, 1);
+            break;
+        }
+
+        msg = fn_801022B8(0x87);
+        switch (msg) {
+        case 0x5E3:
+            HANDLE_BAG_VALUE(0x34, value7);
+            continue;
+        case 0x5E4:
+            HANDLE_BAG_VALUE(0x35, value6);
+            continue;
+        case 0x5E5:
+            HANDLE_BAG_VALUE(0x36, value5);
+            continue;
+        case 0x5E6:
+            HANDLE_BAG_VALUE(0x37, value4);
+            continue;
+        case 0xFD5:
+            HANDLE_BAG_VALUE(0x38, value3);
+            continue;
+        case 0xFE9:
+            HANDLE_BAG_VALUE(0x39, value2);
+            continue;
+        case 0xFEA:
+            HANDLE_BAG_VALUE(0x3A, value1);
+            continue;
+        case 0xFEB:
+            HANDLE_BAG_VALUE(0x3B, value0);
+            continue;
+        default:
+            continue;
+        }
+    }
+
+    fn_80102568(0x87, 0, 1);
+    return 1;
+}
+
+/* 0x8004FE3C | size: 0xA08 */
+s32 fn_8004FE3C(void) {
+#pragma peephole off
+    s32 value15;
+    s32 value14;
+    s32 value13;
+    s32 value12;
+    s32 value11;
+    s32 value10;
+    s32 value9;
+    s32 value8;
+    s32 value7;
+    s32 value6;
+    s32 value5;
+    s32 value4;
+    s32 value3;
+    s32 value2;
+    s32 value1;
+    s32 value0;
+    u32 index;
+    BagCacheEntry* src;
+    BagCacheEntry* dst;
+    s32 result;
+    u32 msg;
+
+    for (index = 0; (u16)index < 0x229; index++) {
+        src = fn_801FBFBC(index);
+        dst = &lbl_803A6AB0[(u16)index];
+        *dst = *src;
+    }
+
+    while (1) {
+        result = fn_801026A4(0x8B, 0, 0, 0, 1, 0);
+        if (result == -1) {
+            fn_80102568(0x8B, 0, 1);
+
+            for (index = 0; (u16)index < 0x229; index++) {
+                dst = fn_801FBFBC(index);
+                src = &lbl_803A6AB0[(u16)index];
+                *dst = *src;
+            }
+
+            return -1;
+        }
+
+        if (result == -2) {
+            if (menuOpen(0x44, 1) != 0) {
+                fn_80102568(0x44, 0, 1);
+                continue;
+            }
+
+            fn_80102568(0x44, 0, 1);
+            break;
+        }
+
+        msg = fn_801022B8(0x8B);
+        switch (msg) {
+        case 0x5D4:
+            HANDLE_BAG_VALUE(0x1A, value15);
+            continue;
+        case 0xFD3:
+            HANDLE_BAG_VALUE(0x1B, value14);
+            continue;
+        case 0xFD4:
+            HANDLE_BAG_VALUE(0x1C, value13);
+            continue;
+        case 0x5D5:
+            HANDLE_BAG_VALUE(0x1E, value12);
+            continue;
+        case 0x5D6:
+            HANDLE_BAG_VALUE(0x1F, value11);
+            continue;
+        case 0x5D7:
+            HANDLE_BAG_VALUE(0x20, value10);
+            continue;
+        case 0x5D8:
+            HANDLE_BAG_VALUE(0x21, value9);
+            continue;
+        case 0x5D9:
+            HANDLE_BAG_VALUE(0x22, value8);
+            continue;
+        case 0x5DA:
+            HANDLE_BAG_VALUE(0x23, value7);
+            continue;
+        case 0x5DB:
+            HANDLE_BAG_VALUE(0x24, value6);
+            continue;
+        case 0x5DC:
+            HANDLE_BAG_VALUE(0x1D, value5);
+            continue;
+        case 0x5DD:
+            HANDLE_BAG_VALUE(0x2D, value4);
+            continue;
+        case 0x5DE:
+            HANDLE_BAG_VALUE(0x25, value3);
+            continue;
+        case 0x5DF:
+            HANDLE_BAG_VALUE(0x26, value2);
+            continue;
+        case 0x5E0:
+            HANDLE_BAG_VALUE(0x27, value1);
+            continue;
+        case 0x5E1:
+            HANDLE_BAG_VALUE(0x28, value0);
+            continue;
+        default:
+            continue;
+        }
+    }
+
+    fn_80102568(0x8B, 0, 1);
+    return 1;
+}
+
+/* 0x8004EDCC | size: 0xA94 */
+s32 fn_8004EDCC(void) {
+#pragma peephole off
+    s32 value16;
+    s32 value15;
+    s32 value14;
+    s32 value13;
+    s32 value12;
+    s32 value11;
+    s32 value10;
+    s32 value9;
+    s32 value8;
+    s32 value7;
+    s32 value6;
+    s32 value5;
+    s32 value4;
+    s32 value3;
+    s32 value2;
+    s32 value1;
+    s32 value0;
+    u32 index;
+    BagCacheEntry* src;
+    BagCacheEntry* dst;
+    s32 result;
+    u32 msg;
+
+    for (index = 0; (u16)index < 0x229; index++) {
+        src = fn_801FBFBC(index);
+        dst = &lbl_803A6AB0[(u16)index];
+        *dst = *src;
+    }
+
+    while (1) {
+        result = fn_801026A4(0x8C, 0, 0, 0, 1, 0);
+        if (result == -1) {
+            fn_80102568(0x8C, 0, 1);
+
+            for (index = 0; (u16)index < 0x229; index++) {
+                dst = fn_801FBFBC(index);
+                src = &lbl_803A6AB0[(u16)index];
+                *dst = *src;
+            }
+
+            return -1;
+        }
+
+        if (result == -2) {
+            if (menuOpen(0x44, 1) != 0) {
+                fn_80102568(0x44, 0, 1);
+                continue;
+            }
+
+            fn_80102568(0x44, 0, 1);
+            break;
+        }
+
+        msg = fn_801022B8(0x8C);
+        switch (msg) {
+        case 0x5E8:
+            HANDLE_BAG_VALUE(0x3C, value16);
+            continue;
+        case 0x5E9:
+            HANDLE_BAG_VALUE(0x3D, value15);
+            continue;
+        case 0xEF0:
+            HANDLE_BAG_VALUE(0x3E, value14);
+            continue;
+        case 0x5EA:
+            HANDLE_BAG_VALUE(0x3F, value13);
+            continue;
+        case 0x5EB:
+            HANDLE_BAG_VALUE(0x40, value12);
+            continue;
+        case 0x5EC:
+            HANDLE_BAG_VALUE(0x44, value11);
+            continue;
+        case 0x5ED:
+            HANDLE_BAG_VALUE(0x48, value10);
+            continue;
+        case 0x5EE:
+            HANDLE_BAG_VALUE(0x49, value9);
+            continue;
+        case 0x5EF:
+            HANDLE_BAG_VALUE(0x4B, value8);
+            continue;
+        case 0x5F0:
+            HANDLE_BAG_VALUE(0x4C, value7);
+            continue;
+        case 0x5F1:
+            HANDLE_BAG_VALUE(0x4A, value6);
+            continue;
+        case 0x5F2:
+            HANDLE_BAG_VALUE(0x45, value5);
+            continue;
+        case 0x5F3:
+            HANDLE_BAG_VALUE(0x46, value4);
+            continue;
+        case 0x5F4:
+            HANDLE_BAG_VALUE(0x47, value3);
+            continue;
+        case 0x5F5:
+            HANDLE_BAG_VALUE(0x41, value2);
+            continue;
+        case 0x5F6:
+            HANDLE_BAG_VALUE(0x42, value1);
+            continue;
+        case 0x5F7:
+            HANDLE_BAG_VALUE(0x43, value0);
+            continue;
+        default:
+            continue;
+        }
+    }
+
+    fn_80102568(0x8C, 0, 1);
     return 1;
 }
