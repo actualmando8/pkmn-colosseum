@@ -116,6 +116,26 @@ typedef struct BattleGridCameraWork {
     f32 sequenceTimer;
 } BattleGridCameraWork;
 
+typedef struct BattleGridSceneSlot {
+    s32 active;
+    void* jobj;
+    f32 posX;
+    f32 posY;
+    f32 posZ;
+    u8 pad_14[0x3C];
+    f32 rotationY;
+    f32 scale;
+    s32 animType;
+    u8 pad_5C[4];
+    f32 blend;
+    u8 pad_64[0x0C];
+} BattleGridSceneSlot;
+
+typedef struct BattleGridSceneWork {
+    u8 pad_00[0x20];
+    BattleGridSceneSlot slots[BATTLE_TOTAL_POKEMON];
+} BattleGridSceneWork;
+
 /* =========================================================================
  * NOTE: 0x801C01C8-0x801C0F20 (incl. the real, variadic HSD_ForeachAnim at
  * 0x801C028C) is HSD library code, split into hsd/hsd_aobj_range_801C01C8.c
@@ -127,7 +147,7 @@ typedef struct BattleGridCameraWork {
  * Address: 0x801C0F20 | Size: 0x354
  */
 void fn_801C0F20(void* ctx) {
-    u8* state = (u8*)ctx;
+    BattleGridSceneWork* state = (BattleGridSceneWork*)ctx;
     s32 i;
 
     if (state == NULL) {
@@ -136,8 +156,8 @@ void fn_801C0F20(void* ctx) {
 
     /* Update all active pre-grid slot animations */
     for (i = 0; i < BATTLE_TOTAL_POKEMON; i++) {
-        u8* slot = state + 0x20 + (i * 0x70);
-        s32 active = *(s32*)(slot + 0x00);
+        BattleGridSceneSlot* slot = &state->slots[i];
+        s32 active = slot->active;
 
         if (active == 0) {
             continue;
@@ -145,7 +165,7 @@ void fn_801C0F20(void* ctx) {
 
         /* Update model animation */
         {
-            void* jobj = *(void**)(slot + 0x04);
+            void* jobj = slot->jobj;
             if (jobj != NULL) {
                 fn_80362D0C(jobj); /* HSD_JObjAnimAll */
             }
@@ -153,13 +173,13 @@ void fn_801C0F20(void* ctx) {
 
         /* Update position interpolation */
         {
-            f32 blend = *(f32*)(slot + 0x60);
+            f32 blend = slot->blend;
             if (blend < 1.0f) {
                 blend += 0.02f;
                 if (blend > 1.0f) {
                     blend = 1.0f;
                 }
-                *(f32*)(slot + 0x60) = blend;
+                slot->blend = blend;
             }
         }
     }
@@ -170,14 +190,14 @@ void fn_801C0F20(void* ctx) {
  * Address: 0x801C1274 | Size: 0x59C
  */
 void fn_801C1274(void* ctx, s32 slot) {
-    u8* state = (u8*)ctx;
-    u8* slotData;
+    BattleGridSceneWork* state = (BattleGridSceneWork*)ctx;
+    BattleGridSceneSlot* slotData;
 
     if (state == NULL || slot < 0 || slot >= BATTLE_TOTAL_POKEMON) {
         return;
     }
 
-    slotData = state + 0x20 + (slot * 0x70);
+    slotData = &state->slots[slot];
 
     /* Load model for this slot based on battle data */
     /* Determine if this is a player or enemy slot */
@@ -200,13 +220,13 @@ void fn_801C1274(void* ctx, s32 slot) {
         case 3: posX =  3.0f; posZ =  5.0f; break;
         default: posX = 0.0f; posZ = 0.0f; break;
         }
-        *(f32*)(slotData + 0x08) = posX;
-        *(f32*)(slotData + 0x0C) = 0.0f;
-        *(f32*)(slotData + 0x10) = posZ;
+        slotData->posX = posX;
+        slotData->posY = 0.0f;
+        slotData->posZ = posZ;
     }
 
     /* Mark slot as active */
-    *(s32*)(slotData + 0x00) = 1;
+    slotData->active = 1;
 }
 
 /**
@@ -283,7 +303,7 @@ void fn_801C2670(void* ctx, s32 objType, s32 param) {
  * Address: 0x801C27F4 | Size: 0x1D0
  */
 void fn_801C27F4(void* ctx, f32 posX, f32 posZ) {
-    u8* state = (u8*)ctx;
+    BattleGridSceneWork* state = (BattleGridSceneWork*)ctx;
     if (state == NULL) {
         return;
     }
@@ -301,13 +321,13 @@ void fn_801C27F4(void* ctx, f32 posX, f32 posZ) {
         s32 i;
 
         for (i = 0; i < BATTLE_TOTAL_POKEMON; i++) {
-            u8* slot = state + 0x20 + (i * 0x70);
+            BattleGridSceneSlot* slot = &state->slots[i];
             f32 sx = (i & 1) ? offsetX : -offsetX;
             f32 sz = (i >= BATTLE_POS_ENEMY_LEFT) ? depthZ : -depthZ;
 
-            *(f32*)(slot + 0x08) = posX + sx;
-            *(f32*)(slot + 0x0C) = 0.0f;
-            *(f32*)(slot + 0x10) = posZ + sz;
+            slot->posX = posX + sx;
+            slot->posY = 0.0f;
+            slot->posZ = posZ + sz;
         }
     }
 }
@@ -412,16 +432,16 @@ u16 fn_801C2AE8(u32 id) {
  */
 void fn_801C2B2C(void) {
     s32 i;
-    u8* state = (u8*)lbl_80466E50;
+    BattleGridSceneWork* state = (BattleGridSceneWork*)lbl_80466E50;
 
     for (i = 0; i < BATTLE_TOTAL_POKEMON; i++) {
-        u8* slot = state + 0x20 + (i * 0x70);
-        void* jobj = *(void**)(slot + 0x04);
+        BattleGridSceneSlot* slot = &state->slots[i];
+        void* jobj = slot->jobj;
 
-        if (jobj != NULL && *(s32*)(slot + 0x00) != 0) {
-            f32 x = *(f32*)(slot + 0x08);
-            f32 y = *(f32*)(slot + 0x0C);
-            f32 z = *(f32*)(slot + 0x10);
+        if (jobj != NULL && slot->active != 0) {
+            f32 x = slot->posX;
+            f32 y = slot->posY;
+            f32 z = slot->posZ;
             fn_8036A384(jobj, x, y, z);
         }
     }
@@ -495,19 +515,19 @@ void fn_801C2D74(void) {
  */
 void fn_801C2D80(void) {
     s32 i;
-    u8* state = (u8*)lbl_80466E50;
+    BattleGridSceneWork* state = (BattleGridSceneWork*)lbl_80466E50;
 
     /* Release all grid slot models */
     for (i = 0; i < BATTLE_TOTAL_POKEMON; i++) {
-        u8* slot = state + 0x20 + (i * 0x70);
-        void* jobj = *(void**)(slot + 0x04);
+        BattleGridSceneSlot* slot = &state->slots[i];
+        void* jobj = slot->jobj;
 
         if (jobj != NULL) {
             fn_80363CF4(jobj); /* HSD_JObjRemoveAll */
-            *(void**)(slot + 0x04) = NULL;
+            slot->jobj = NULL;
         }
 
-        *(s32*)(slot + 0x00) = 0; /* inactive */
+        slot->active = 0;
     }
 
     /* Clear scene animation context */
@@ -558,17 +578,19 @@ s32 fn_801C3108(void) {
  */
 void fn_801C3114(void) {
     s32 i;
+    BattleGridSceneWork* sceneWork;
 
     memset(lbl_80467030, 0, 0x20);
     memset(lbl_80466E50, 0, 0x1E0);
 
     /* Initialize 4 BattleGridSlot entries with default values */
+    sceneWork = (BattleGridSceneWork*)lbl_80466E50;
     for (i = 0; i < BATTLE_TOTAL_POKEMON; i++) {
-        u8* slot = lbl_80466E50 + 0x20 + (i * 0x70);
-        *(s32*)(slot + 0x00) = 0; /* inactive */
-        *(void**)(slot + 0x04) = NULL; /* no model */
-        *(f32*)(slot + 0x50) = 0.0f; /* rotation */
-        *(f32*)(slot + 0x54) = 1.0f; /* scale */
+        BattleGridSceneSlot* slot = &sceneWork->slots[i];
+        slot->active = 0;
+        slot->jobj = NULL;
+        slot->rotationY = 0.0f;
+        slot->scale = 1.0f;
     }
 }
 
@@ -623,20 +645,20 @@ void fn_801C3430(void) {
  */
 void fn_801C3A64(void) {
     s32 i;
-    u8* state = (u8*)lbl_80466E50;
+    BattleGridSceneWork* state = (BattleGridSceneWork*)lbl_80466E50;
 
     /* Load Pokemon and trainer models into each active grid slot */
     for (i = 0; i < BATTLE_TOTAL_POKEMON; i++) {
-        u8* slot = state + 0x20 + (i * 0x70);
-        s32 active = *(s32*)(slot + 0x00);
+        BattleGridSceneSlot* slot = &state->slots[i];
+        s32 active = slot->active;
 
         if (active != 0) {
             /* Model is already loaded or should be loaded from battle data */
-            void* jobj = *(void**)(slot + 0x04);
+            void* jobj = slot->jobj;
             if (jobj != NULL) {
-                f32 x = *(f32*)(slot + 0x08);
-                f32 y = *(f32*)(slot + 0x0C);
-                f32 z = *(f32*)(slot + 0x10);
+                f32 x = slot->posX;
+                f32 y = slot->posY;
+                f32 z = slot->posZ;
                 fn_8036A384(jobj, x, y, z);
             }
         }
@@ -652,24 +674,24 @@ void fn_801C3A64(void) {
  */
 void fn_801C3B80(void) {
     s32 i;
-    u8* state = (u8*)lbl_80466E50;
+    BattleGridSceneWork* state = (BattleGridSceneWork*)lbl_80466E50;
 
     /* Recalculate world-space positions for all grid slots */
     for (i = 0; i < BATTLE_TOTAL_POKEMON; i++) {
-        u8* slot = state + 0x20 + (i * 0x70);
-        s32 active = *(s32*)(slot + 0x00);
+        BattleGridSceneSlot* slot = &state->slots[i];
+        s32 active = slot->active;
 
         if (active == 0) {
             continue;
         }
 
         {
-            void* jobj = *(void**)(slot + 0x04);
+            void* jobj = slot->jobj;
             if (jobj != NULL) {
-                f32 x = *(f32*)(slot + 0x08);
-                f32 y = *(f32*)(slot + 0x0C);
-                f32 z = *(f32*)(slot + 0x10);
-                f32 scale = *(f32*)(slot + 0x54);
+                f32 x = slot->posX;
+                f32 y = slot->posY;
+                f32 z = slot->posZ;
+                f32 scale = slot->scale;
 
                 fn_8036A384(jobj, x, y, z);
                 fn_8036A478(jobj, scale, scale, scale);
@@ -683,24 +705,24 @@ void fn_801C3B80(void) {
  * Address: 0x801C3C98 | Size: 0xCC
  */
 void fn_801C3C98(s32 slot) {
-    u8* state = (u8*)lbl_80466E50;
-    u8* slotData;
+    BattleGridSceneWork* state = (BattleGridSceneWork*)lbl_80466E50;
+    BattleGridSceneSlot* slotData;
 
     if (slot < 0 || slot >= BATTLE_TOTAL_POKEMON) {
         return;
     }
 
-    slotData = state + 0x20 + (slot * 0x70);
+    slotData = &state->slots[slot];
 
     /* Update slot state: apply position, rotation, and scale to JObj */
     {
-        void* jobj = *(void**)(slotData + 0x04);
+        void* jobj = slotData->jobj;
         if (jobj != NULL) {
-            f32 x = *(f32*)(slotData + 0x08);
-            f32 y = *(f32*)(slotData + 0x0C);
-            f32 z = *(f32*)(slotData + 0x10);
-            f32 rot = *(f32*)(slotData + 0x50);
-            f32 scale = *(f32*)(slotData + 0x54);
+            f32 x = slotData->posX;
+            f32 y = slotData->posY;
+            f32 z = slotData->posZ;
+            f32 rot = slotData->rotationY;
+            f32 scale = slotData->scale;
 
             fn_8036A384(jobj, x, y, z);
             fn_8036A2D8(jobj, 0.0f, rot, 0.0f);
@@ -732,21 +754,21 @@ void battleGridReplacePokemon(void* model) {
  * Address: 0x801C3E3C | Size: 0xD4
  */
 void fn_801C3E3C(s32 slot, s32 animType) {
-    u8* state = (u8*)lbl_80466E50;
-    u8* slotData;
+    BattleGridSceneWork* state = (BattleGridSceneWork*)lbl_80466E50;
+    BattleGridSceneSlot* slotData;
 
     if (slot < 0 || slot >= BATTLE_TOTAL_POKEMON) {
         return;
     }
 
-    slotData = state + 0x20 + (slot * 0x70);
+    slotData = &state->slots[slot];
 
     /* Set animation transition type for the slot model */
-    *(s32*)(slotData + 0x58) = animType;
+    slotData->animType = animType;
 
     /* Request the animation on the slot's JObj */
     {
-        void* jobj = *(void**)(slotData + 0x04);
+        void* jobj = slotData->jobj;
         if (jobj != NULL) {
             fn_80362E40(jobj, 0.0f); /* HSD_JObjReqAnimAll */
         }
@@ -1289,25 +1311,25 @@ void fn_801C4A1C(s32 slot, f32 scale) {
  * Address: 0x801C4A44 | Size: 0x254
  */
 void fn_801C4A44(s32 slot, f32 x, f32 y, f32 z, f32 rot, f32 scale) {
-    u8* state = (u8*)lbl_80466E50;
-    u8* slotData;
+    BattleGridSceneWork* state = (BattleGridSceneWork*)lbl_80466E50;
+    BattleGridSceneSlot* slotData;
 
     if (slot < 0 || slot >= BATTLE_TOTAL_POKEMON) {
         return;
     }
 
-    slotData = state + 0x20 + (slot * 0x70);
+    slotData = &state->slots[slot];
 
     /* Set all transform properties */
-    *(f32*)(slotData + 0x08) = x;
-    *(f32*)(slotData + 0x0C) = y;
-    *(f32*)(slotData + 0x10) = z;
-    *(f32*)(slotData + 0x50) = rot;
-    *(f32*)(slotData + 0x54) = scale;
+    slotData->posX = x;
+    slotData->posY = y;
+    slotData->posZ = z;
+    slotData->rotationY = rot;
+    slotData->scale = scale;
 
     /* Apply to JObj */
     {
-        void* jobj = *(void**)(slotData + 0x04);
+        void* jobj = slotData->jobj;
         if (jobj != NULL) {
             fn_8036A384(jobj, x, y, z);
             fn_8036A2D8(jobj, 0.0f, rot, 0.0f);

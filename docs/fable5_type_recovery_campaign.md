@@ -689,3 +689,28 @@ Walls / defer:
   recovery.
 - `fn_801C423C` remains a known caution: typed transition-state access looked
   cleaner but reduced fuzzy score from `90.83929%` to `90.21429%`.
+
+## Battle Grid Scene Slot Batch 8, 2026-07-01
+
+Applied after local review:
+
+- `battle_grid.c`: introduced `BattleGridSceneWork` and `BattleGridSceneSlot`
+  for the `lbl_80466E50` scene work block: `0x20` header bytes followed by
+  four `0x70` slot records.
+- Named the known slot fields: `active`, `jobj`, `posX`, `posY`, `posZ`,
+  `rotationY`, `scale`, `animType`, and `blend`.
+- Converted the slot access sites in `fn_801C0F20`, `fn_801C1274`,
+  `fn_801C27F4`, `fn_801C2B2C`, `fn_801C2D80`, `fn_801C3114`,
+  `fn_801C3A64`, `fn_801C3B80`, `fn_801C3C98`, `fn_801C3E3C`, and
+  `fn_801C4A44`.
+
+Validation result:
+
+- All scored touched functions stayed at their prior percentages.
+- `fn_801C3114` initially regressed when the typed scene-work pointer was bound
+  before the two `memset` calls; moving that binding after the memsets restored
+  the prior `39.351852%` score.
+- `main/game/battle/battle_grid` stayed at `13.071283%` fuzzy and
+  `5.4287167%` matched code.
+- The remaining `0x70` slot arithmetic is in the full render loop and is
+  intentionally deferred to a separate pass.
