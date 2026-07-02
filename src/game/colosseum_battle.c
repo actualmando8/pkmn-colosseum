@@ -21388,70 +21388,25 @@ u32 fn_80253DA4(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x80253E68 | Size: 0xC0 */
-void fn_80253E68(void* ctx, u32 param1, u32 param2) {
-    extern void fn_80235A3C();
-    extern void fn_80235AA0();
-    extern void fn_8025C808();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
+s32 fightTrainerAiWazaHit205(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u8 fn_80235AA0(void* ctx, u32 elem);
+    extern u8 fn_80235A3C(void* ctx, u32 elem);
+    extern u8 fn_8025C808(void*, u32, u32, u32, u32, u32, u32);
+    u8 a = fn_80235AA0(ctx, param3);
+    u8 b = fn_80235A3C(ctx, param3);
 
-    r30 = r6;
-    r28 = r4;
-    r27 = r3;
-    r29 = r5;
-    r4 = r30;
-    fn_80235AA0();
-    r31 = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_80235A3C();
-    r0 = r31 & 0xFF;
-    if ((s32)r0 == (s32)0) {
-        r0 = r3 & 0xFF;
-        if ((s32)r0 == (s32)0) {
-            r3 = 0x0;
-            return;
+    if (a == 0 && b == 0) {
+        return 0;
     }
+    if (fn_8025C808(ctx, param1, param3, param2, 0x90, 1, 1) != 0) {
+        goto ret1;
     }
-    r3 = r27;
-    r4 = r28;
-    r5 = r30;
-    r6 = r29;
-    r7 = 0x90;
-    r8 = 0x1;
-    r9 = 0x1;
-    fn_8025C808();
-    r0 = r3 & 0xFF;
-    if ((s32)r0 == (s32)0) {
-        r3 = r27;
-        r4 = r28;
-        r5 = r30;
-        r6 = r29;
-        r7 = 0x90;
-        r8 = 0x2;
-        r9 = 0x1;
-        fn_8025C808();
-        r0 = r3 & 0xFF;
-        if ((s32)r0 == (s32)0) {
-            r3 = 0x0;
-            return;
+    if (fn_8025C808(ctx, param1, param3, param2, 0x90, 2, 1) != 0) {
+        goto ret1;
     }
-    }
-    r3 = 0x1;
-
-    return;
+    return 0;
+ret1:
+    return 1;
 }
 
 /* Address: 0x80253F28 | Size: 0xB4 */
@@ -21514,74 +21469,37 @@ void fn_80253F28(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x80253FDC | Size: 0xF0 (240 bytes) */
-void fn_80253FDC(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80235B04();
-    extern void fn_8023793C();
-    extern void fn_80239500();
-    extern void fn_8025C264();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+s32 fightTrainerAiWazaHit203(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u8 fn_80235B04(void* ctx, u32 zero, u32 one);
+    extern u32 fn_80239500(void* ctx, u32 param2);
+    extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
+    extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    u8 state = fn_80235B04(ctx, 0, 1);
+    u32 v1;
+    s32 gate;
 
-    r31 = r4;
-    r28 = r5;
-    r27 = r3;
-    r29 = r6;
-    r4 = 0x0;
-    r5 = 0x1;
-    fn_80235B04();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x2) {
-        r30 = 0xb;
-
-    } else if (r0 == (u32)0x3) {
-        r30 = 0x5;
-
-    } else if (r0 == (u32)0x1) {
-        r30 = 0xa;
-
-    } else if (r0 == (u32)0x4) {
-        r30 = 0xf;
-
+    if (state == 2) {
+        v1 = 0xb;
+    } else if (state == 3) {
+        v1 = 0x5;
+    } else if (state == 1) {
+        v1 = 0xa;
+    } else if (state == 4) {
+        v1 = 0xf;
     } else {
-        r30 = 0x0;
+        v1 = 0;
     }
-    r3 = r27;
-    r4 = r31;
-    r5 = r28;
-    r6 = r29;
-    r7 = 0x0;
-    fn_8025C264();
-    r0 = r3;
-    r3 = r27;
-    r31 = r0;
-    r4 = r28;
-    fn_80239500();
-    r6 = r3;
-    r3 = r27;
-    r4 = r29;
-    r5 = r30;
-    fn_8023793C();
-    r0 = r3 & 0xFFFF;
-    if (r0 == (u32)0x43) {
-        r31 = 0x0;
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
+        gate = 0;
     }
-    if ((s32)r31 == (s32)0x0) {
-        r3 = 0x0;
-    } else {
-
-        r3 = 0x1;
+    if (gate == 0) {
+        return 0;
     }
-    return;
+    if (gate == -1) {
+        return 1;
+    }
+    return 1;
 }
 
 /* -------------------------------------------------------------------
@@ -22157,64 +22075,28 @@ void fn_802546E8(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x80254810 | Size: 0xC8 (200 bytes) */
-void fn_80254810(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80229934();
-    extern void fn_80237F74();
-    extern void fn_8025C264();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+s32 fightTrainerAiWazaHit191(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 one);
+    extern u8 fn_80229934(u32 param2, u32 param1, u32 param3);
+    extern u8 fn_80237F74(void* ctx, u32 a, u32 type);
+    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0xFFFF);
 
-    r7 = (0x1 << 16);
-    r27 = r3;
-    r28 = r4;
-    r29 = r5;
-    r30 = r6;
-    fn_8025C264();
-    r31 = r3;
-    r3 = r29;
-    r4 = r28;
-    r5 = r30;
-    fn_80229934();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80229934(param2, param1, param3) == 1) {
+        return 0;
     }
-    r3 = r27;
-    r4 = r28;
-    r5 = 0x19;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80237F74(ctx, param1, 0x19) == 1) {
+        return 0;
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0x19;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80237F74(ctx, param3, 0x19) == 1) {
+        return 0;
     }
-    if ((s32)r31 == (s32)0x0) {
-        r3 = 0x0;
-        return;
+    if (gate == 0) {
+        return 0;
     }
-    r3 = 0x1;
-
-    return;
+    if (gate == -1) {
+        return 1;
+    }
+    return 1;
 }
 
 /* Address: 0x802548D8 | Size: 0xB4 */
@@ -22277,75 +22159,31 @@ void fn_802548D8(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x8025498C | Size: 0xE4 (228 bytes) */
-void fn_8025498C(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_802376EC();
-    extern void fn_8023793C();
-    extern void fn_80239500();
-    extern void fn_802395C8();
-    extern void fn_8025C264();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+s32 fightTrainerAiWazaHit189(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_802395C8(void* ctx, u32 param2, u32 param1);
+    extern u16 fn_802376EC(void* ctx, u32 elem);
+    extern u32 fn_80239500(void* ctx, u32 param2);
+    extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
+    extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    u32 v1 = fn_802395C8(ctx, param2, param1);
+    u16 a = fn_802376EC(ctx, param1);
+    u16 b = fn_802376EC(ctx, param3);
+    s32 gate;
 
-    r27 = r4;
-    r28 = r5;
-    r26 = r3;
-    r29 = r6;
-    r5 = r27;
-    r4 = r28;
-    fn_802395C8();
-    r0 = r3;
-    r3 = r26;
-    r30 = r0;
-    r4 = r27;
-    fn_802376EC();
-    r31 = r3;
-    r3 = r26;
-    r4 = r29;
-    fn_802376EC();
-    r3 = r3 & 0xFFFF;
-    r0 = r31 & 0xFFFF;
-    if (r3 <= (u32)r0) {
-        r3 = 0x0;
-        return;
+    if (b <= a) {
+        return 0;
     }
-    r3 = r26;
-    r4 = r27;
-    r5 = r28;
-    r6 = r29;
-    r7 = 0x0;
-    fn_8025C264();
-    r0 = r3;
-    r3 = r26;
-    r31 = r0;
-    r4 = r28;
-    fn_80239500();
-    r6 = r3;
-    r3 = r26;
-    r4 = r29;
-    r5 = r30;
-    fn_8023793C();
-    r0 = r3 & 0xFFFF;
-    if (r0 == (u32)0x43) {
-        r31 = 0x0;
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
+        gate = 0;
     }
-    if ((s32)r31 == (s32)0x0) {
-        r3 = 0x0;
-        return;
+    if (gate == 0) {
+        return 0;
     }
-    r3 = 0x1;
-
-    return;
+    if (gate == -1) {
+        return 1;
+    }
+    return 1;
 }
 
 /* Address: 0x80254A70 | Size: 0xB4 */
@@ -22780,76 +22618,39 @@ void fn_80254F88(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x80255000 | Size: 0xF0 (240 bytes) */
-void fn_80255000(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80142984();
-    extern void fn_80216048();
-    extern void fn_80237F74();
-    extern void fn_802383A4();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+s32 fightTrainerAiWazaHit177(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u16 fn_802383A4(void* ctx, u32 elem);
+    extern u8 fn_80216048(u32 elem);
+    extern u8 fn_80142984(u32 elem);
+    extern u8 fn_80237F74(void* ctx, u32 a, u32 type);
+    u16 A = fn_802383A4(ctx, param1);
+    u16 B = fn_802383A4(ctx, param3);
+    u8 c = fn_80216048(param1);
 
-    r28 = r3;
-    r30 = r4;
-    r29 = r6;
-    fn_802383A4();
-    r0 = r3;
-    r3 = r28;
-    r31 = r0;
-    r4 = r29;
-    fn_802383A4();
-    r0 = r3;
-    r3 = r30;
-    r30 = r0;
-    fn_80216048();
-    r0 = r3 & 0xFF;
-    if ((s32)r0 == (s32)0) {
-        r3 = 0x0;
-        return;
+    if (!c) {
+        return 0;
     }
-    r0 = r31 & 0xFFFF;
-    if ((s32)r0 == (s32)0) {
-        r0 = r30 & 0xFFFF;
-        if ((s32)r0 == (s32)0) { r3 = 0x0; return; }
+    if (A == 0 && B == 0) {
+        goto ret0;
     }
-    r3 = r31 & 0xFFFF;
-    if (r3 == (u32)0xaf) { r3 = 0x0; return; }
-    r0 = r30 & 0xFFFF;
-    if (r0 == (u32)0xaf) { r3 = 0x0; return; }
-    if (r3 != (u32)0x0) {
-        r3 = r31;
-        fn_80142984();
-        r0 = r3 & 0xFF;
-        if (r3 == (u32)0x0) { r3 = 0x0; return; }
+    if (A == 0xaf) {
+        goto ret0;
     }
-    r0 = r30 & 0xFFFF;
-    if (r3 != (u32)0x0 || r3 != (u32)0x0) {
-        r3 = r30;
-        fn_80142984();
-        r0 = r3 & 0xFF;
-
-        r3 = 0x0;
-        return;
+    if (B == 0xaf) {
+        goto ret0;
     }
-    r3 = r28;
-    r4 = r29;
-    r5 = 0x3c;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (A != 0 && fn_80142984(A) == 0) {
+        goto ret0;
     }
-    r3 = 0x1;
-
-    return;
+    if (B != 0 && fn_80142984(B) == 0) {
+        return 0;
+    }
+    if (fn_80237F74(ctx, param3, 0x3c) == 1) {
+        return 0;
+    }
+    return 1;
+ret0:
+    return 0;
 }
 
 /* Address: 0x802550F0 | Size: 0xB4 */
@@ -23160,92 +22961,29 @@ void fn_80255438(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x802554EC | Size: 0x10C (268 bytes) */
-void fn_802554EC(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_802359D8();
-    extern void fn_80235AA0();
-    extern void fn_80236BFC();
-    extern void fn_8025C808();
-    extern void fn_8025CAA8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+s32 fightTrainerAiWazaHit168(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u8 fn_80235AA0(void* ctx, u32 elem);
+    extern u8 fn_802359D8(void* ctx, u32 elem);
+    extern u8 fn_8025CAA8(void* ctx, u32 param3, u32 param2);
+    extern u8 fn_8025C808(void*, u32, u32, u32, u32, u32, u32);
+    extern u8 fn_80236BFC(void* ctx, u32 param3, u32 flag);
+    u8 q1 = fn_80235AA0(ctx, param3);
+    u8 q2 = fn_802359D8(ctx, param3);
 
-    r29 = r6;
-    r27 = r4;
-    r26 = r3;
-    r28 = r5;
-    r4 = r29;
-    fn_80235AA0();
-    r30 = r3;
-    r3 = r26;
-    r4 = r29;
-    fn_802359D8();
-    r31 = r3;
-    r3 = r26;
-    r4 = r29;
-    r5 = r28;
-    fn_8025CAA8();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_8025CAA8(ctx, param3, param2) == 1) {
+        return 0;
     }
-    r0 = r30 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r0 = r31 & 0xFF;
-        if (r0 == (u32)0x1) {
-            r3 = 0x0;
-            return;
+    if (q1 == 0 && q2 == 0) {
+        return 0;
     }
+    if (fn_8025C808(ctx, param1, param3, param2, 0xa0, 1, 1) == 0 &&
+        fn_8025C808(ctx, param1, param3, param2, 0xa0, 4, 1) == 0) {
+        return 0;
     }
-    r3 = r26;
-    r4 = r27;
-    r5 = r29;
-    r6 = r28;
-    r7 = 0xa0;
-    r8 = 0x1;
-    r9 = 0x1;
-    fn_8025C808();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r26;
-        r4 = r27;
-        r5 = r29;
-        r6 = r28;
-        r7 = 0xa0;
-        r8 = 0x4;
-        r9 = 0x1;
-        fn_8025C808();
-        r0 = r3 & 0xFF;
-        if (r0 == (u32)0x1) {
-            r3 = 0x0;
-            return;
+    if (fn_80236BFC(ctx, param3, 0x14) == 1) {
+        return 0;
     }
-    }
-    r3 = r26;
-    r4 = r29;
-    r5 = 0x14;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
-    }
-    r3 = 0x1;
-
-    return;
+    return 1;
 }
 
 /* Address: 0x802555F8 | Size: 0x228 (552 bytes) */
@@ -23512,70 +23250,28 @@ void fn_80255AE4(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x80255B4C | Size: 0xCC (204 bytes) */
-void fn_80255B4C(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80236BFC();
-    extern void fn_8023793C();
-    extern void fn_80239500();
-    extern void fn_802395C8();
-    extern void fn_8025C264();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+s32 fightTrainerAiWazaHit161(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_802395C8(void* ctx, u32 param2, u32 param1);
+    extern u8 fn_80236BFC(void* ctx, u32 param1, u32 flag);
+    extern u32 fn_80239500(void* ctx, u32 param2);
+    extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
+    extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    u32 v1 = fn_802395C8(ctx, param2, param1);
+    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
 
-    r27 = r4;
-    r28 = r5;
-    r26 = r3;
-    r29 = r6;
-    r5 = r27;
-    r4 = r28;
-    fn_802395C8();
-    r0 = r3;
-    r3 = r26;
-    r30 = r0;
-    r4 = r27;
-    r5 = r28;
-    r6 = r29;
-    r7 = 0x0;
-    fn_8025C264();
-    r0 = r3;
-    r3 = r26;
-    r31 = r0;
-    r4 = r27;
-    r5 = 0x2d;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if ((s32)r0 == (s32)0) {
-        r31 = 0x0;
+    if (fn_80236BFC(ctx, param1, 0x2d) == 0) {
+        gate = 0;
     }
-    r3 = r26;
-    r4 = r28;
-    fn_80239500();
-    r6 = r3;
-    r3 = r26;
-    r4 = r29;
-    r5 = r30;
-    fn_8023793C();
-    r0 = r3 & 0xFFFF;
-    if (r0 == (u32)0x43) {
-        r31 = 0x0;
+    if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
+        gate = 0;
     }
-    if ((s32)r31 == (s32)0x0) {
-        r3 = 0x0;
-    } else {
-
-        r3 = 0x1;
+    if (gate == 0) {
+        return 0;
     }
-    return;
+    if (gate == -1) {
+        return 1;
+    }
+    return 1;
 }
 
 /* Address: 0x80255C18 | Size: 0x74 | Pattern: field_accessor */
@@ -24479,57 +24175,27 @@ int fn_80256780(void)
   return iVar2 - ((u32)(iVar2 == 0) + -(uVar1 & 0xff) + 1);
 }
 /* Address: 0x802567B8 | Size: 0xA4 */
-void fn_802567B8(void* ctx, u32 param1, u32 param2) {
-    extern void fn_80120B00();
-    extern void fn_80205B8C();
-    extern void fn_8023793C();
-    extern void fn_8025C264();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r1 = (u32)sp;
-    u32 r4 = param1;
-    u32 r5 = param2;
+s32 fightTrainerAiWazaHit135(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_80205B8C(u32 v);
+    extern void fn_80120B00(u32, void*, void*);
+    extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
+    extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    s16 hi;
+    u16 lo;
+    s32 gate;
 
-    r29 = r4;
-    r28 = r3;
-    r31 = r5;
-    r30 = r6;
-    r3 = r29;
-    fn_80205B8C();
-    r4 = (u32)sp + 0xa;
-    r5 = (u32)sp + 0x8;
-    fn_80120B00();
-    r3 = r28;
-    r4 = r29;
-    r5 = r31;
-    r6 = r30;
-    r7 = 0x0;
-    fn_8025C264();
-    r0 = *(u16*)(sp + 0xA);
-    r31 = r3;
-    r5 = *(u16*)(sp + 0x8);
-    r3 = r28;
-    r4 = r30;
-    r6 = (s16)r0;
-    fn_8023793C();
-    r0 = r3 & 0xFFFF;
-    if (r0 == (u32)0x43) {
-        r31 = 0x0;
+    fn_80120B00(fn_80205B8C(param1), &hi, &lo);
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    if (fn_8023793C(ctx, param3, lo, hi) == 0x43) {
+        gate = 0;
     }
-    if ((s32)r31 == (s32)0x0) {
-        r3 = 0x0;
-    } else {
-
-        r3 = 0x1;
+    if (gate == 0) {
+        return 0;
     }
-    return;
+    if (gate == -1) {
+        return 1;
+    }
+    return 1;
 }
 
 /* Address: 0x8025685C | Size: 0x38 | Ghidra import */
@@ -25535,123 +25201,48 @@ void fn_80257544(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x802575C8 | Size: 0x188 (392 bytes) */
-void fn_802575C8(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80235910();
-    extern void fn_80235A3C();
-    extern void fn_80235AA0();
-    extern void fn_80236BFC();
-    extern void fn_80237288();
-    extern void fn_80237DBC();
-    extern void fn_8025C808();
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+s32 fightTrainerAiWazaHit109(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u8 fn_80235AA0(void* ctx, u32 elem);
+    extern u8 fn_80235A3C(void* ctx, u32 elem);
+    extern u8 fn_80235910(void* ctx, u32 elem);
+    extern u8 fn_80237DBC(void* ctx, u32 a, u32 type);
+    extern u8 fn_80236BFC(void* ctx, u32 a, u32 type);
+    extern u8 fn_80237288(void* ctx, u32 elem);
+    extern u8 fn_8025C808(void*, u32, u32, u32, u32, u32, u32);
+    u8 a = fn_80235AA0(ctx, param3);
+    u8 b = fn_80235A3C(ctx, param3);
+    u8 c = fn_80235910(ctx, param3);
 
-    r28 = r6;
-    r26 = r4;
-    r25 = r3;
-    r27 = r5;
-    r4 = r28;
-    fn_80235AA0();
-    r29 = r3;
-    r3 = r25;
-    r4 = r28;
-    fn_80235A3C();
-    r30 = r3;
-    r3 = r25;
-    r4 = r28;
-    fn_80235910();
-    r31 = r3;
-    r3 = r25;
-    r4 = r26;
-    r5 = 0x7;
-    fn_80237DBC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r25;
-        r4 = r28;
-        r5 = 0x14;
-        fn_80236BFC();
-        r0 = r3 & 0xFF;
-        if (r0 == (u32)0x1) {
-            r3 = 0x0;
-            return;
+    if (fn_80237DBC(ctx, param1, 7) == 1) {
+        if (fn_80236BFC(ctx, param3, 0x14) == 1) {
+            return 0;
         }
-        r3 = r25;
-        r4 = r28;
-        r5 = 0x18;
-        fn_80236BFC();
-        r0 = r3 & 0xFF;
-        if (r0 == (u32)0x1) { r3 = 0x0; return; }
-        r3 = r25;
-        r4 = r28;
-        fn_80237288();
-        r0 = r3 & 0xFF;
-        if (r0 != (u32)0x1) { r3 = 0x1; return; }
+        if (fn_80236BFC(ctx, param3, 0x18) == 1) {
+            goto ret0;
+        }
+        if (fn_80237288(ctx, param3) != 1) {
+            goto ret1;
+        }
+        return 0;
+    }
 
-        r3 = 0x0;
-        return;
+    if (c == 0 && a >= 0xc && b >= 0xc) {
+        return 0;
     }
-    r0 = r31 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r0 = r29 & 0xFF;
-        if (r0 >= (u32)0xc) {
-            r0 = r30 & 0xFF;
-            if (r0 >= (u32)0xc) {
-                r3 = 0x0;
-                return;
+    if (fn_8025C808(ctx, param1, param3, param2, 0x90, 3, 0x41) != 0) {
+        goto ret1;
     }
+    if (fn_8025C808(ctx, param1, param3, param2, 0x10, 1, 0x41) != 0) {
+        goto ret1;
     }
+    if (fn_8025C808(ctx, param1, param3, param2, 0x10, 2, 0x41) != 0) {
+        goto ret1;
     }
-    r3 = r25;
-    r4 = r26;
-    r5 = r28;
-    r6 = r27;
-    r7 = 0x90;
-    r8 = 0x3;
-    r9 = 0x41;
-    fn_8025C808();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0xc) { r3 = 0x1; return; }
-    r3 = r25;
-    r4 = r26;
-    r5 = r28;
-    r6 = r27;
-    r7 = 0x10;
-    r8 = 0x1;
-    r9 = 0x41;
-    fn_8025C808();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0xc) { r3 = 0x1; return; }
-    r3 = r25;
-    r4 = r26;
-    r5 = r28;
-    r6 = r27;
-    r7 = 0x10;
-    r8 = 0x2;
-    r9 = 0x41;
-    fn_8025C808();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0xc) { r3 = 0x1; return; }
-    r3 = 0x0;
-    return;
-
-    r3 = 0x1;
-
-    return;
+    return 0;
+ret1:
+    return 1;
+ret0:
+    return 0;
 }
 
 /* Address: 0x80257750 | Size: 0xE8 (232 bytes) */
@@ -25986,71 +25577,34 @@ void fn_80257AA0(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x80257B54 | Size: 0xCC (204 bytes) */
-void fn_80257B54(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1A6C();
-    extern void fn_80238748();
-    extern void fn_80239058();
-    u8 sp[0x90];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r1 = (u32)sp;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+s32 fightTrainerAiWazaHit102(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_801F1A6C(u32 zero, void* ctx, void* buf, u32 one1, u32 one2);
+    extern u8 fn_80239058(void* ctx, u32 elem, u32 type);
+    extern u8 fn_80238748(void* ctx, u32 elem);
+    u32 buf[0x17];
+    u32 count = fn_801F1A6C(0, ctx, buf, 1, 1);
+    u16 target = (u16)param2;
+    u8 flag = 0;
+    u16 i;
 
-    r6 = 0x1;
-    r7 = 0x1;
-    r25 = r3;
-    r26 = r5;
-    r5 = (u32)sp + 0x8;
-    r4 = r25;
-    r3 = 0x0;
-    fn_801F1A6C();
-    r28 = (u32)sp + 0x8;
-    r31 = r3 & 0xFFFF;
-    r30 = r26 & 0xFFFF;
-    r26 = 0x0;
-    r27 = 0x0;
-    while (1) {
-        r0 = r27 & 0xFFFF;
-        if (r0 >= (u32)r31) break;
-        r4 = *(u32*)(r28 + r29);
-        if (r4 == (u32)0x0 || r0 == (u32)0x1 || r0 == (u32)0x1) {
-            if (r30 == (u32)0xd7) {
-                r3 = r25;
-                r5 = 0x2b;
-                fn_80239058();
-                r0 = r3 & 0xFF;
-
-            }
-            r4 = *(u32*)(r28 + r29);
-            r3 = r25;
-            fn_80238748();
-            r0 = r3 & 0xFF;
-
-            r26 = 0x1;
-            break;
+    for (i = 0; i < (u16)count; i++) {
+        u32 elem = buf[i];
+        if (elem == 0) {
+            continue;
         }
-        r27 = r27 + 0x1;
-
+        if (target == 0xd7 && fn_80239058(ctx, elem, 0x2b) == 1) {
+            continue;
+        }
+        if (fn_80238748(ctx, elem) != 0) {
+            continue;
+        }
+        flag = 1;
+        break;
     }
-
-    r0 = r26 & 0xFF;
-    if (r0 == (u32)r31) {
-        r3 = 0x0;
-    } else {
-
-        r3 = 0x1;
+    if (flag == 0) {
+        return 0;
     }
-    return;
+    return 1;
 }
 
 /* Address: 0x80257C20 | Size: 0xB4 */
@@ -26113,95 +25667,44 @@ void fn_80257C20(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x80257CD4 | Size: 0x124 (292 bytes) */
-void fn_80257CD4(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_802364BC();
-    extern void fn_802367CC();
-    extern void fn_80237288();
-    extern void fn_802381C4();
-    extern void fn_8025C264();
-    u8 sp[0x50];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r1 = (u32)sp;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+s32 fightTrainerAiWazaHit100(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 one);
+    extern u16 fn_802367CC(void* ctx, u32 param3, void* arrayA, void* arrayB, u32 flag);
+    extern u32 fn_802364BC(void* ctx, u32 param3);
+    extern u8 fn_80237288(void* ctx, u32 elem);
+    extern u8 fn_802381C4(void* ctx, u32 param3, u32 v);
+    u16 arrayA[0x10];
+    s16 arrayB[0x2];
+    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0xFFFF);
+    u16 count = fn_802367CC(ctx, param3, arrayA, arrayB, 0);
+    u32 a = fn_802364BC(ctx, param3);
+    u8 flag;
+    u16 i;
 
-    r7 = (0x1 << 16);
-    r30 = r3;
-    r31 = r6;
-    fn_8025C264();
-    r27 = r3;
-    r3 = r30;
-    r4 = r31;
-    r5 = (u32)sp + 0x1c;
-    r6 = (u32)sp + 0x8;
-    r7 = 0x0;
-    fn_802367CC();
-    r28 = r3;
-    r3 = r30;
-    r4 = r31;
-    fn_802364BC();
-    r0 = r3 & 0xFFFF;
-    r29 = r3;
-    if ((s32)r0 == (s32)0) { r3 = 0x0; return; }
-    if (r0 == (u32)0x165) { r3 = 0x0; return; }
-    if (r0 == (u32)0xffff) { r3 = 0x0; return; }
-    r3 = r30;
-    r4 = r31;
-    fn_80237288();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-
-        r3 = 0x0;
-        return;
+    if ((u16)a == 0 || a == 0x165 || a == 0xffff || fn_80237288(ctx, param3) == 1) {
+        return 0;
     }
-    r7 = r28 & 0xFFFF;
-    r6 = (u32)sp + 0x8;
-    r5 = r29 & 0xFFFF;
-    r4 = (u32)sp + 0x1c;
-    r3 = 0x0;
-    r10 = 0x0;
-    while (1) {
-        r0 = r10 & 0xFF;
-        if ((s32)r0 >= (s32)r7) break;
-        r9 = *(s16*)(r6 + r8);
-        r0 = (s16)r9;
-        if (r0 >= (u32)0x1) {
-            r0 = *(u16*)(r4 + r8);
-            if (r5 == (u32)r0) {
-                r3 = r30;
-                r4 = r31;
-                r5 = r9 & 0xFF;
-                fn_802381C4();
-                break;
+    flag = 0;
+    for (i = 0; i < count; i++) {
+        if (arrayB[i] < 0) {
+            continue;
         }
+        if ((u16)a != arrayA[i]) {
+            continue;
         }
-        r10 = r10 + 0x1;
-
+        flag = fn_802381C4(ctx, param3, (u8)arrayB[i]);
+        break;
     }
-
-    r0 = r3 & 0xFF;
-    if ((s32)r0 == (s32)r7) {
-        r3 = 0x0;
-        return;
+    if (flag == 0) {
+        return 0;
     }
-    if ((s32)r27 == (s32)0x0) {
-        r3 = 0x0;
-        return;
+    if (gate == 0) {
+        return 0;
     }
-    r3 = 0x1;
-
-    return;
+    if (gate == -1) {
+        return 1;
+    }
+    return 1;
 }
 
 /* Address: 0x80257DF8 | Size: 0xB4 */
@@ -26271,150 +25774,67 @@ int fn_80257EAC(u32 arg0, u32 arg1, u32 arg2, u32 arg3)
     return (u8)fn_80229934(arg2, arg1, arg3) != 1;
 }
 /* Address: 0x80257EE4 | Size: 0xE4 (228 bytes) */
-void fn_80257EE4(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80218FDC();
-    extern void fn_8021901C();
-    extern void fn_802367CC();
-    extern void fn_80236BFC();
-    u8 sp[0x40];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r1 = (u32)sp;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+s32 fightTrainerAiWazaHit097(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u16 fn_802367CC(void* ctx, u32 param1, void* buf, u32 zero, u32 one);
+    extern u8 fn_80236BFC(void* ctx, u32 param1, u32 flag);
+    extern u8 fn_80218FDC(u32 elem);
+    extern u8 fn_8021901C(u32 elem);
+    u16 buf[0xa];
+    u16 count = fn_802367CC(ctx, param1, buf, 0, 1);
+    u16 i;
 
-    r6 = 0x0;
-    r7 = 0x1;
-    r5 = (u32)sp + 0x8;
-    r28 = r3;
-    r27 = r4;
-    fn_802367CC();
-    r29 = r3;
-    r3 = r28;
-    r4 = r27;
-    r5 = 0x8;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if ((s32)r0 == (s32)0) {
-        r3 = 0x0;
-        return;
+    if (!fn_80236BFC(ctx, param1, 8)) {
+        return 0;
     }
-    r30 = (u32)sp + 0x8;
-    r31 = r29 & 0xFFFF;
-    r28 = 0x0;
-    while (1) {
-        r0 = r28 & 0xFFFF;
-        if (r0 >= (u32)r31) break;
-        r27 = *(u16*)(r30 + r0);
-        if (r27 != (u32)0x165 && r27 != (u32)0x163) {
-
-            r3 = r27;
-            fn_80218FDC();
-            r0 = r3 & 0xFF;
-            if (r27 == (u32)0x163 && r27 != (u32)0x108 && r27 != (u32)0xfd) {
-
-                r3 = r27;
-                fn_8021901C();
-                r0 = r3 & 0xFF;
-                if (r27 == (u32)0xfd) break;
+    for (i = 0; i < count; i++) {
+        u16 elem = buf[i];
+        if (elem == 0x165 || elem == 0x163) {
+            continue;
         }
+        if (fn_80218FDC(elem) != 0) {
+            continue;
         }
-        r28 = r28 + 0x1;
-
+        if (elem == 0x108 || elem == 0xfd) {
+            continue;
+        }
+        if (fn_8021901C(elem) == 0) {
+            break;
+        }
     }
-
-    r3 = r28 & 0xFFFF;
-    r0 = r29 & 0xFFFF;
-    if (r3 >= (u32)r0) {
-        r3 = 0x0;
-        return;
+    if (i >= count) {
+        return 0;
     }
-    r3 = 0x1;
-
-    return;
+    return 1;
 }
 
 /* Address: 0x80257FC8 | Size: 0xF4 (244 bytes) */
-void fn_80257FC8(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80219270();
-    extern void fn_80236458();
-    extern void fn_802367CC();
-    extern void fn_80236BFC();
-    u8 sp[0x40];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r1 = (u32)sp;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+s32 fightTrainerAiWazaHit095(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u16 fn_802367CC(void* ctx, u32 param1, void* buf, u32 zero1, u32 zero2);
+    extern u16 fn_80236458(void* ctx, u32 param3);
+    extern u8 fn_80236BFC(void* ctx, u32 a, u32 type);
+    extern u8 fn_80219270(u32 elem);
+    u16 buf[0xa];
+    u16 count = fn_802367CC(ctx, param1, buf, 0, 0);
+    u16 target = fn_80236458(ctx, param3);
+    u16 i;
 
-    r7 = 0x0;
-    r5 = (u32)sp + 0x8;
-    r29 = r6;
-    r27 = r3;
-    r28 = r4;
-    r6 = 0x0;
-    fn_802367CC();
-    r31 = r3;
-    r3 = r27;
-    r4 = r29;
-    fn_80236458();
-    r0 = r3;
-    r3 = r27;
-    r30 = r0;
-    r4 = r29;
-    r5 = 0x14;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80236BFC(ctx, param3, 0x14) == 1) {
+        return 0;
     }
-    r3 = r27;
-    r4 = r28;
-    r5 = 0x10;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) { r3 = 0x0; return; }
-    r3 = r30;
-    fn_80219270();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-
-        r3 = 0x0;
-        return;
+    if (fn_80236BFC(ctx, param1, 0x10) == 1) {
+        goto ret0;
     }
-    r5 = r30 & 0xFFFF;
-    r4 = (u32)sp + 0x8;
-    r0 = r31 & 0xFFFF;
-    r6 = 0x0;
-    while (1) {
-        r3 = r6 & 0xFFFF;
-        if (r3 >= (u32)r0) break;
-        r3 = *(u16*)(r4 + r3);
-        if (r5 == (u32)r3) {
-            r3 = 0x0;
-            return;
+    if (fn_80219270(target) == 1) {
+        return 0;
+    }
+    for (i = 0; i < count; i++) {
+        if (buf[i] == target) {
+            return 0;
         }
-        r6 = r6 + 0x1;
-
     }
-    r3 = 0x1;
-
-    return;
+    return 1;
+ret0:
+    return 0;
 }
 
 /* -------------------------------------------------------------------
@@ -26461,70 +25881,29 @@ void fn_802580BC(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x8025813C | Size: 0xD0 (208 bytes) */
-void fn_8025813C(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80236BFC();
-    extern void fn_8023793C();
-    extern void fn_80239500();
-    extern void fn_802395C8();
-    extern void fn_8025C264();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+s32 fightTrainerAiWazaHit092(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_802395C8(void* ctx, u32 param2, u32 param1);
+    extern u8 fn_80236BFC(void* ctx, u32 param1, u32 flag);
+    extern u32 fn_80239500(void* ctx, u32 param2);
+    extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
+    extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    u32 v1 = fn_802395C8(ctx, param2, param1);
+    s32 gate;
 
-    r31 = r4;
-    r28 = r5;
-    r27 = r3;
-    r29 = r6;
-    r5 = r31;
-    r4 = r28;
-    fn_802395C8();
-    r0 = r3;
-    r3 = r27;
-    r30 = r0;
-    r4 = r31;
-    r5 = 0x8;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if ((s32)r0 == (s32)0) {
-        r3 = 0x0;
-        return;
+    if (!fn_80236BFC(ctx, param1, 0x8)) {
+        return 0;
     }
-    r3 = r27;
-    r4 = r31;
-    r5 = r28;
-    r6 = r29;
-    r7 = 0x0;
-    fn_8025C264();
-    r0 = r3;
-    r3 = r27;
-    r31 = r0;
-    r4 = r28;
-    fn_80239500();
-    r6 = r3;
-    r3 = r27;
-    r4 = r29;
-    r5 = r30;
-    fn_8023793C();
-    r0 = r3 & 0xFFFF;
-    if (r0 == (u32)0x43) {
-        r31 = 0x0;
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
+        gate = 0;
     }
-    if ((s32)r31 == (s32)0x0) {
-        r3 = 0x0;
-        return;
+    if (gate == 0) {
+        return 0;
     }
-    r3 = 0x1;
-
-    return;
+    if (gate == -1) {
+        return 1;
+    }
+    return 1;
 }
 
 /* Address: 0x8025820C | Size: 0x78 | Pattern: field_accessor */
@@ -26566,104 +25945,48 @@ void fn_8025820C(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x80258284 | Size: 0x140 (320 bytes) */
-void fn_80258284(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80219804();
-    extern void fn_802364BC();
-    extern void fn_802367CC();
-    extern void fn_80236BFC();
-    extern void fn_802381C4();
-    extern void fn_8025C264();
-    u8 sp[0x50];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r1 = (u32)sp;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+s32 fightTrainerAiWazaHit090(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u16 fn_802367CC(void* ctx, u32 param3, void* arrayA, void* arrayB, u32 flag);
+    extern u32 fn_802364BC(void* ctx, u32 param3);
+    extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    extern u8 fn_80219804(u32 elem);
+    extern u8 fn_802381C4(void* ctx, u32 param3, u32 v);
+    extern u8 fn_80236BFC(void* ctx, u32 a, u32 type);
+    u16 arrayA[0x10];
+    s16 arrayB[0x2];
+    u16 count = fn_802367CC(ctx, param3, arrayA, arrayB, 0);
+    u32 targetVal = fn_802364BC(ctx, param3);
+    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    u8 flag;
+    u16 i;
 
-    r7 = 0x0;
-    r31 = r6;
-    r26 = r4;
-    r29 = r5;
-    r30 = r3;
-    r4 = r31;
-    r5 = (u32)sp + 0x1c;
-    r6 = (u32)sp + 0x8;
-    fn_802367CC();
-    r28 = r3;
-    r3 = r30;
-    r4 = r31;
-    fn_802364BC();
-    r0 = r3;
-    r3 = r30;
-    r27 = r0;
-    r4 = r26;
-    r5 = r29;
-    r6 = r31;
-    r7 = 0x0;
-    fn_8025C264();
-    r29 = r3;
-    r3 = r27;
-    fn_80219804();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80219804(targetVal) == 1) {
+        return 0;
     }
-    r7 = (u32)sp + 0x8;
-    r6 = r27 & 0xFFFF;
-    r5 = (u32)sp + 0x1c;
-    r0 = r28 & 0xFFFF;
-    r3 = 0x0;
-    r10 = 0x0;
-    while (1) {
-        r4 = r10 & 0xFFFF;
-        if (r4 >= (u32)r0) break;
-        r9 = *(s16*)(r7 + r8);
-        r4 = (s16)r9;
-        if (r0 >= (u32)0x1) {
-            r4 = *(u16*)(r5 + r8);
-            if (r6 == (u32)r4) {
-                r3 = r30;
-                r4 = r31;
-                r5 = r9 & 0xFF;
-                fn_802381C4();
-                break;
+    flag = 0;
+    for (i = 0; i < count; i++) {
+        if (arrayB[i] < 0) {
+            continue;
         }
+        if ((u16)targetVal != arrayA[i]) {
+            continue;
         }
-        r10 = r10 + 0x1;
-
+        flag = fn_802381C4(ctx, param3, (u8)arrayB[i]);
+        break;
     }
-
-    r0 = r3 & 0xFF;
-    if (r4 == (u32)r0) {
-        r3 = 0x0;
-        return;
+    if (flag == 0) {
+        return 0;
     }
-    r3 = r30;
-    r4 = r31;
-    r5 = 0x2a;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80236BFC(ctx, param3, 0x2a) == 1) {
+        return 0;
     }
-    if ((s32)r29 == (s32)0x0) {
-        r3 = 0x0;
-        return;
+    if (gate == 0) {
+        return 0;
     }
-    r3 = 0x1;
+    if (gate == -1) {
+        return 1;
+    }
+    return 1;
 
     return;
 }
@@ -26840,248 +26163,106 @@ void fn_80258524(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x802585D4 | Size: 0x120 (288 bytes) */
-void fn_802585D4(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_802364BC();
-    extern void fn_802367CC();
-    extern void fn_80236BFC();
-    extern void fn_802381C4();
-    extern void fn_8025C264();
-    u8 sp[0x50];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r1 = (u32)sp;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+s32 fightTrainerAiWazaHit086(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u16 fn_802367CC(void* ctx, u32 param3, void* arrayA, void* arrayB, u32 flag);
+    extern u16 fn_802364BC(void* ctx, u32 param3);
+    extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    extern u8 fn_802381C4(void* ctx, u32 param3, u32 v);
+    extern u8 fn_80236BFC(void* ctx, u32 a, u32 type);
+    u16 arrayA[0x10];
+    s16 arrayB[0x2];
+    u16 count = fn_802367CC(ctx, param3, arrayA, arrayB, 0);
+    u16 target = fn_802364BC(ctx, param3);
+    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    u8 flag = 0;
+    u16 i;
 
-    r7 = 0x0;
-    r31 = r6;
-    r26 = r4;
-    r29 = r5;
-    r30 = r3;
-    r4 = r31;
-    r5 = (u32)sp + 0x1c;
-    r6 = (u32)sp + 0x8;
-    fn_802367CC();
-    r27 = r3;
-    r3 = r30;
-    r4 = r31;
-    fn_802364BC();
-    r28 = r3;
-    r3 = r30;
-    r4 = r26;
-    r5 = r29;
-    r6 = r31;
-    r7 = 0x0;
-    fn_8025C264();
-    r29 = r3;
-    r7 = (u32)sp + 0x8;
-    r6 = r28 & 0xFFFF;
-    r5 = (u32)sp + 0x1c;
-    r0 = r27 & 0xFFFF;
-    r3 = 0x0;
-    r10 = 0x0;
-    while (1) {
-        r4 = r10 & 0xFFFF;
-        if (r4 >= (u32)r0) break;
-        r9 = *(s16*)(r7 + r8);
-        r4 = (s16)r9;
-        if ((s32)r0 >= (s32)0) {
-            r4 = *(u16*)(r5 + r8);
-            if (r6 == (u32)r4) {
-                r3 = r30;
-                r4 = r31;
-                r5 = r9 & 0xFF;
-                fn_802381C4();
-                break;
+    for (i = 0; i < count; i++) {
+        if (arrayB[i] < 0) {
+            continue;
         }
+        if (target != arrayA[i]) {
+            continue;
         }
-        r10 = r10 + 0x1;
-
+        flag = fn_802381C4(ctx, param3, (u8)arrayB[i]);
+        break;
     }
-
-    r0 = r3 & 0xFF;
-    if (r4 == (u32)r0) {
-        r3 = 0x0;
-        return;
+    if (flag == 0) {
+        return 0;
     }
-    r3 = r30;
-    r4 = r31;
-    r5 = 0x29;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80236BFC(ctx, param3, 0x29) == 1) {
+        return 0;
     }
-    if ((s32)r29 == (s32)0x0) {
-        r3 = 0x0;
-        return;
+    if (gate == 0) {
+        return 0;
     }
-    r3 = 0x1;
+    if (gate == -1) {
+        return 1;
+    }
+    return 1;
 
     return;
 }
 
 /* Address: 0x802586FC | Size: 0xBC */
-void fn_802586FC(void* ctx, u32 param1, u32 param2) {
-    extern void fn_80236BFC();
-    extern void fn_80237DBC();
-    extern void fn_8025C264();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
+s32 fightTrainerAiWazaHit084(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    extern u8 fn_80236BFC(void* ctx, u32 a, u32 type);
+    extern u8 fn_80237DBC(void* ctx, u32 a, u32 type);
+    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
 
-    r7 = 0x0;
-    r29 = r3;
-    r30 = r6;
-    fn_8025C264();
-    r31 = r3;
-    r3 = r29;
-    r4 = r30;
-    r5 = 0x1c;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80236BFC(ctx, param3, 0x1c) == 1) {
+        return 0;
     }
-    r3 = r29;
-    r4 = r30;
-    r5 = 0xc;
-    fn_80237DBC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80237DBC(ctx, param3, 0xc) == 1) {
+        return 0;
     }
-    r3 = r29;
-    r4 = r30;
-    r5 = 0x14;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80236BFC(ctx, param3, 0x14) == 1) {
+        return 0;
     }
-    if ((s32)r31 == (s32)0x0) {
-        r3 = 0x0;
-        return;
+    if (gate == 0) {
+        return 0;
     }
-    r3 = 0x1;
-
-    return;
+    if (gate == -1) {
+        return 1;
+    }
+    return 1;
 }
 
 /* Address: 0x802587C0 | Size: 0x144 (324 bytes) */
-void fn_802587C0(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_8021A2C0();
-    extern void fn_802364BC();
-    extern void fn_802367CC();
-    extern void fn_80236BFC();
-    extern void fn_8025C264();
-    u8 sp[0x40];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r1 = (u32)sp;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+s32 fightTrainerAiWazaHit082(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u16 fn_802367CC(void* ctx, u32 elem, void* arrA, void* arrB, u32 flag);
+    extern u32 fn_802364BC(void* ctx, u32 param3);
+    extern u8 fn_80236BFC(void* ctx, u32 a, u32 type);
+    extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 one);
+    extern u8 fn_8021A2C0(u32 elem);
+    u16 buf[0x10];
+    u16 count = fn_802367CC(ctx, param1, buf, 0, 0);
+    u32 targetVal = fn_802364BC(ctx, param3);
+    s32 gate;
+    u16 i;
 
-    r7 = 0x0;
-    r28 = r5;
-    r31 = r6;
-    r26 = r3;
-    r27 = r4;
-    r5 = (u32)sp + 0x8;
-    r6 = 0x0;
-    fn_802367CC();
-    r30 = r3;
-    r3 = r26;
-    r4 = r31;
-    fn_802364BC();
-    r0 = r3;
-    r3 = r26;
-    r29 = r0;
-    r4 = r31;
-    r5 = 0x14;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80236BFC(ctx, param3, 0x14) == 1) {
+        return 0;
     }
-    r7 = (0x1 << 16);
-    r3 = r26;
-    r4 = r27;
-    r5 = r28;
-    r6 = r31;
-    fn_8025C264();
-    r31 = r3;
-    r3 = r26;
-    r4 = r27;
-    r5 = 0x10;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) { r3 = 0x0; return; }
-    r3 = r29;
-    fn_8021A2C0();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1) { r3 = 0x0; return; }
-    r5 = r29 & 0xFFFF;
-    if (r0 == (u32)0x1) { r3 = 0x0; return; }
-    if (r5 == (u32)0xffff) { r3 = 0x0; return; }
-    if (r5 == (u32)0x165) { r3 = 0x0; return; }
-    if (r5 == (u32)0x163) {
-
-        r3 = 0x0;
-        return;
+    gate = fn_8025C264(ctx, param1, param2, param3, 0xFFFF);
+    if (fn_80236BFC(ctx, param1, 0x10) == 1 ||
+        fn_8021A2C0(targetVal) != 0 ||
+        targetVal == 0 || targetVal == 0xffff || targetVal == 0x165 || targetVal == 0x163) {
+        return 0;
     }
-    r4 = (u32)sp + 0x8;
-    r0 = r30 & 0xFFFF;
-    r6 = 0x0;
-    while (1) {
-        r3 = r6 & 0xFFFF;
-        if (r3 >= (u32)r0) break;
-        r3 = *(u16*)(r4 + r3);
-        if (r5 == (u32)r3) {
-            r3 = 0x0;
-            return;
+    for (i = 0; i < count; i++) {
+        if (targetVal == buf[i]) {
+            return 0;
         }
-        r6 = r6 + 0x1;
-
     }
-    if ((s32)r31 == (s32)0x0) {
-        r3 = 0x0;
-        return;
+    if (gate == 0) {
+        return 0;
     }
-    r3 = 0x1;
-
-    return;
+    if (gate == -1) {
+        return 1;
+    }
+    return 1;
 }
 
 /* Address: 0x80258904 | Size: 0xB0 */
@@ -29335,83 +28516,34 @@ void fn_8025A6BC(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x8025A770 | Size: 0x100 (256 bytes) */
-void fn_8025A770(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80237774();
-    extern void fn_8023793C();
-    extern void fn_80237F74();
-    extern void fn_80239500();
-    extern void fn_802395C8();
-    extern void fn_8025C264();
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+s32 fightTrainerAiWazaHit038(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u8 fn_80237774(void* ctx, u32 elem);
+    extern u32 fn_802395C8(void* ctx, u32 param2, u32 param1);
+    extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 one);
+    extern u32 fn_80239500(void* ctx, u32 param2);
+    extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
+    extern u8 fn_80237F74(void* ctx, u32 a, u32 type);
+    u8 a = fn_80237774(ctx, param1);
+    u8 b = fn_80237774(ctx, param3);
+    u32 v1 = fn_802395C8(ctx, param2, param1);
+    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0xFFFF);
 
-    r25 = r3;
-    r29 = r4;
-    r26 = r5;
-    r27 = r6;
-    fn_80237774();
-    r30 = r3;
-    r3 = r25;
-    r4 = r27;
-    fn_80237774();
-    r31 = r3;
-    r3 = r25;
-    r4 = r26;
-    r5 = r29;
-    fn_802395C8();
-    r7 = (0x1 << 16);
-    r28 = r3;
-    r3 = r25;
-    r4 = r29;
-    r5 = r26;
-    r6 = r27;
-    fn_8025C264();
-    r0 = r3;
-    r3 = r25;
-    r29 = r0;
-    r4 = r26;
-    fn_80239500();
-    r6 = r3;
-    r3 = r25;
-    r4 = r27;
-    r5 = r28;
-    fn_8023793C();
-    r0 = r3 & 0xFFFF;
-    if (r0 == (u32)0x43) {
-        r29 = 0x0;
+    if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
+        gate = 0;
     }
-    r3 = r25;
-    r4 = r27;
-    r5 = 0x5;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r29 = 0x0;
+    if (fn_80237F74(ctx, param3, 5) == 1) {
+        gate = 0;
     }
-    r3 = r30 & 0xFF;
-    r0 = r31 & 0xFF;
-    if (r3 < r0) {
-        r29 = 0x0;
+    if (a < b) {
+        gate = 0;
     }
-    if ((s32)r29 == (s32)0x0) {
-        r3 = 0x0;
-    } else {
-
-        r3 = 0x1;
+    if (gate == 0) {
+        return 0;
     }
-    return;
+    if (gate == -1) {
+        return 1;
+    }
+    return 1;
 }
 
 /* Address: 0x8025A870 | Size: 0x8C */
@@ -29803,75 +28935,33 @@ void fn_8025AE28(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x8025AED8 | Size: 0xE0 (224 bytes) */
-void fn_8025AED8(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F4354();
-    extern void fn_801F87CC();
-    extern void fn_80236BFC();
-    extern void fn_80237F74();
-    extern void fn_8025C264();
-    u8 sp[0x40];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r1 = (u32)sp;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+s32 fightTrainerAiWazaHit028(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_801F4354(u32 zero, u32 param3);
+    extern u8 fn_80237F74(void* ctx, u32 a, u32 type);
+    extern u8 fn_80236BFC(void* ctx, u32 a, u32 type);
+    extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    extern u16 fn_801F87CC(u32 v, void* buf);
+    u8 buf[0x14];
+    u32 prev = fn_801F4354(0, param3);
+    s32 gate;
 
-    r27 = r3;
-    r30 = r6;
-    r28 = r4;
-    r29 = r5;
-    r3 = 0x0;
-    r4 = r30;
-    fn_801F4354();
-    r0 = r3;
-    r3 = r27;
-    r31 = r0;
-    r4 = r30;
-    r5 = 0x15;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80237F74(ctx, param3, 0x15) == 1) {
+        return 0;
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0x25;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80236BFC(ctx, param3, 0x25) == 1) {
+        return 0;
     }
-    r3 = r27;
-    r4 = r28;
-    r5 = r29;
-    r6 = r30;
-    r7 = 0x0;
-    fn_8025C264();
-    r0 = r3;
-    r3 = r31;
-    r31 = r0;
-    r4 = (u32)sp + 0x8;
-    fn_801F87CC();
-    r0 = r3 & 0xFFFF;
-    if (r0 == (u32)0x1) {
-        r31 = 0x0;
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    if (fn_801F87CC(prev, buf) == 0) {
+        gate = 0;
     }
-    if ((s32)r31 == (s32)0x0) {
-        r3 = 0x0;
-        return;
+    if (gate == 0) {
+        return 0;
     }
-    r3 = 0x1;
-
-    return;
+    if (gate == -1) {
+        return 1;
+    }
+    return 1;
 }
 
 /* Address: 0x8025AFB8 | Size: 0xB0 */
