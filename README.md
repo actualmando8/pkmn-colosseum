@@ -65,6 +65,27 @@ The build splits `sys/main.dol`, substitutes only objects declared in
 `configure.py`, links `build/GC6E01/main.dol`, and verifies it against
 `config/GC6E01/build.sha1`.
 
+## Worker Worktrees
+
+Use the helper below for parallel decompilation workers. It creates or repairs a
+worktree and links `orig/GC6E01/sys` to the local original game files so
+`ninja all_source build/GC6E01/report.json` can validate from the worker tree.
+
+```bash
+python3 tools/setup_worker_worktree.py /tmp/pkmn-parallel-example \
+  --branch campaign/parallel-example \
+  --base origin/master
+```
+
+Add `--validate` to run the standard worker checks after setup:
+
+```bash
+python3 configure.py --no-progress
+ninja all_source build/GC6E01/report.json
+python3 tools/update_readme_progress.py --check
+git diff --check
+```
+
 ## Layout
 
 ```text
