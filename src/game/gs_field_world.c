@@ -12905,13 +12905,13 @@ void fn_80130BB0(u32 arg1) {
 extern void fn_800F76E4();
 extern void fn_80112700(void);
 #if 0
-asm void fn_80114D18(void) {
+asm void floorReadScriptPostFunc(void) {
 #include "src/game/gs_field_world_fn_80114D18.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma peephole off
-void* fn_80114D18(u32 a, u32 b) {
+void* floorReadScriptPostFunc(u32 a, u32 b) {
     void* result;
 
     result = fn_800F9318(a, b);
@@ -12925,14 +12925,14 @@ void* fn_80114D18(u32 a, u32 b) {
 #endif
 extern void fn_800FC39C();
 #if 0
-asm void fn_80114E0C(void) {
+asm void floorReadFontPostFunc(void) {
 #include "src/game/gs_field_world_fn_80114E0C.inc"
 }
 #else
 #pragma push
 #pragma peephole off
 #pragma optimization_level 4
-void* fn_80114E0C(u32 a, u32 b) {
+void* floorReadFontPostFunc(u32 a, u32 b) {
     void* result;
 
     if (fn_800FF548() != 0) {
@@ -12948,14 +12948,14 @@ void* fn_80114E0C(u32 a, u32 b) {
 #endif
 extern void GSmsgOpen();
 #if 0
-asm void fn_80114F18(void) {
+asm void floorReadMsgPostFunc(void) {
 #include "src/game/gs_field_world_fn_80114F18.inc"
 }
 #else
 #pragma push
 #pragma peephole off
 #pragma optimization_level 4
-void* fn_80114F18(u32 a, u32 b) {
+void* floorReadMsgPostFunc(u32 a, u32 b) {
     void* result;
 
     if (fn_800FF548() != 0) {

@@ -2,52 +2,46 @@
  * @file gs_field_resource.c
  * @brief GSfield floor resource pre-load callbacks.
  *
- * Decompiled from (corrected attribution -- see notes below):
- *   floorReadGFLPreFunc      (0x8011432C, string-proven: lbl_80272200)
- *   fn_801143A0              (0x801143A0, return_const stub)
- *   fn_801143A8              (0x801143A8, NOT YET MATCHED -- see notes)
- *   fn_801143EC              (0x801143EC, matched, unproven name)
- *   floorReadParticlePreFunc (0x8011445C, string-proven: lbl_80272270)
- *   fn_801144D0              (0x801144D0, NOT YET MATCHED -- see notes)
- *   fn_801145C0              (0x801145C0, matched, unproven name -- see
- *                             two-particle-string-users anomaly below)
- *   floorReadWZXPreFunc      (0x80114634, string-proven: lbl_802722B8)
- *   floorReadPKXPreFunc      (0x801146A4, string-proven: lbl_802722F0)
- *   floorReadTexPostFunc     (0x80114714, string-proven: lbl_80272328)
- *   floorReadTexPreFunc      (0x80114760, NOT YET MATCHED -- see notes)
- *   fn_801147D4              (0x801147D4, matched, unproven name)
- *   floorReadColPreFunc      (0x80114808, string-proven: lbl_80272394)
- *   fn_8011487C              (0x8011487C, matched, unproven name)
- *   floorReadCameraPreFunc   (0x80114948, matched, previously proven)
- *   fn_801149BC              (0x801149BC, matched, unproven name)
- *   floorReadObjPreFunc      (0x80114A70, string-proven: lbl_80272460)
+ * Decompiled from (attribution FINAL -- registration-table-proven, see note):
+ *   floorReadGFLPreFunc                (0x8011432C, string lbl_80272200 + table 0x11)
+ *   floorReadBGMPostFunc               (0x801143A0, table 0x04; byte-identical to XD)
+ *   floorReadBGMPreFunc                (0x801143A8, table 0x04; asm-only)
+ *   floorReadNotLinkedParticlePostFunc (0x801143EC, table 0x12)
+ *   floorReadNotLinkedParticlePreFunc  (0x8011445C, string lbl_80272270 + table 0x12)
+ *   floorReadParticlePostFunc          (0x801144D0, table 0x0A; scene_data tail; asm-only)
+ *   floorReadParticlePreFunc           (0x801145C0, string lbl_80272270 + table 0x0A)
+ *   floorReadWZXPreFunc                (0x80114634, string lbl_802722B8 + table 0x10)
+ *   floorReadPKXPreFunc                (0x801146A4, string lbl_802722F0 + table 0x0F)
+ *   floorReadTexPostFunc               (0x80114714, string lbl_80272328 + table 0x09)
+ *   floorReadTexPreFunc                (0x80114760, string lbl_8027235C + table 0x09; asm-only)
+ *   floorReadColPostFunc               (0x801147D4, table 0x03)
+ *   floorReadColPreFunc                (0x80114808, string lbl_80272394 + table 0x03)
+ *   floorReadCameraPostFunc            (0x8011487C, table 0x0C; _registerCamera strings)
+ *   floorReadCameraPreFunc             (0x80114948, string lbl_80272428 + table 0x0C)
+ *   floorReadObjPostFunc               (0x801149BC, table 0x02)
+ *   floorReadObjPreFunc                (0x80114A70, string lbl_80272460 + table 0x02)
  *
- * ATTRIBUTION NOTE (2026-07-01 scaffold-reconciliation pass):
- *   This file previously carried a dead "orphan" block (a first-generation
- *   recovery attempt) whose function names never matched any symbols.txt
- *   entry, so it never paired in objdiff and its address attributions were
- *   wrong. It has been removed. The renames above are string-anchored: each
- *   function references a rodata string containing its own name, verified
- *   against the target DOL. This OVERRIDES any earlier attribution.
- *
- *   TWO-PARTICLE-STRING ANOMALY: both fn_8011445C and fn_801145C0 reference
- *   the "floorReadParticlePreFunc(): can't alloc..." string (lbl_80272270).
- *   Only fn_8011445C has been renamed to floorReadParticlePreFunc, since it
- *   is the only one with sufficient independent evidence; fn_801145C0 stays
- *   under its fn_ name pending further evidence (e.g. a distinguishing
- *   caller or handler-table cross-reference).
- *
- *   SOUND-FAMILY NAMES REMAIN UNPROVEN: fn_801143A8 and fn_801144D0 are
- *   believed (from the broader gs_floor_data.c / gs_floor.h documentation
- *   trail) to be sound-buffer pre-funcs, but neither has a string-proven
- *   name nor a matched body, so both are kept under fn_ names. A candidate
- *   body was harvested from the old orphan block for each, but the orphan
- *   bodies turned out to be empty "/* TODO: match *\/" placeholders with no
- *   real logic -- there was nothing to adopt. Both remain asm-only (no C
- *   stub) rather than carry a body that can never match. Likewise
- *   floorReadTexPreFunc (0x80114760, string-proven name only -- the orphan
- *   "floorReadTexPreFunc" body was also an empty placeholder) remains
- *   asm-only pending a real decompilation attempt.
+ * ATTRIBUTION NOTE: names are pinned by TWO independent evidence systems.
+ *   (1) Self-name assert strings in rodata (each pre-func prints its own
+ *       name on allocation failure), verified against the target DOL.
+ *   (2) The floor resource handler registration table at lbl_8036C2A0
+ *       (16-byte entries: size?, type-id, PreFunc, PostFunc), which pairs
+ *       every PreFunc with its PostFunc per resource slot. Table entries
+ *       decoded from the DOL; layout mirrors Pokemon XD's floorRead
+ *       family, where every resource type has a paired Post+Pre handler.
+ *   The table resolved the former two-particle-string anomaly: BOTH
+ *   0x8011445C and 0x801145C0 reference lbl_80272270, but entry 0x12
+ *   pairs 0x8011445C with the NotLinkedParticle PostFunc (0x801143EC)
+ *   while entry 0x0A pairs 0x801145C0 with the true ParticlePostFunc
+ *   (0x801144D0, the scene_data group-linking one) -- matching XD, where
+ *   the two PreFunc bodies are also byte-identical to each other.
+ *   The GFL PostFunc (table 0x11) is fn_801142F8 in gs_field_colquery.c
+ *   territory -- rename parked until that fleet-owned file is free.
+ *   An earlier first-generation "orphan" recovery block (names that never
+ *   paired, wrong attributions) was removed by the 2026-07-01 pass; its
+ *   candidate bodies were empty TODO placeholders (nothing adoptable), so
+ *   floorReadBGMPreFunc, floorReadParticlePostFunc, and floorReadTexPreFunc
+ *   remain asm-only pending real decompilation attempts.
  *
  * Each floor archive (FSYS) contains multiple resource types that need
  * to be loaded into memory before the floor becomes active. The pre-func
@@ -97,8 +91,8 @@ extern void* fn_800F9418(u32 size, u32 alignment,
 
 /* ===== String constants (rodata) ===== */
 extern const char lbl_80272200[]; /* floorReadGFLPreFunc(): can't alloc... */
-extern const char lbl_80272238[]; /* "ERROR: Over Sound Buffer! snd_res_id=%d..." (fn_801143A8, unproven) */
-extern const char lbl_80272270[]; /* floorReadParticlePreFunc(): can't alloc... (also read by fn_801145C0, see header note) */
+extern const char lbl_80272238[]; /* "ERROR: Over Sound Buffer! snd_res_id=%d..." (floorReadBGMPreFunc, unproven) */
+extern const char lbl_80272270[]; /* "floorReadParticlePreFunc(): can't alloc..." (read by BOTH particle pre-funcs, see header note) */
 extern const char lbl_802722B8[]; /* floorReadWZXPreFunc(): can't alloc... */
 extern const char lbl_802722F0[]; /* floorReadPKXPreFunc(): can't alloc... */
 extern const char lbl_8027235C[]; /* floorReadTexPreFunc(): can't alloc... (next unit's Tex string; not yet wired to a matched body) */
@@ -114,7 +108,7 @@ extern const char lbl_80272394[]; /* floorReadColPreFunc(): can't alloc... -- st
 extern const char lbl_80272460[]; /* floorReadObjPreFunc: can't alloc... -- string-proves fn_80114A70's name */
 
 /* ===== BSS / global state ===== */
-extern u32 lbl_8047B0B0;  /* sound buffer size limit (fn_801143A8, unproven) */
+extern u32 lbl_8047B0B0;  /* sound buffer size limit (floorReadBGMPreFunc, unproven) */
 
 /* ===== Internal callbacks referenced by pre-funcs ===== */
 extern void fn_80115094(void);  /* GFL resource completion callback */
@@ -154,7 +148,7 @@ void* floorReadGFLPreFunc(u32 resId, u32 loadMode, u32 dataSize) {
 #pragma pop
 
 /* 0x801143A0 | 0x8 | return_const */
-u32 fn_801143A0(void) { return 0; }
+u32 floorReadBGMPostFunc(void) { return 0; }
 
 /* 0x801143A8 | 0x44 | UNMATCHED -- sound buffer size check (unproven name).
  * ADOPTION ATTEMPT: harvested the old orphan "floorReadSoundPreFunc_CheckBuffer"
@@ -166,7 +160,7 @@ u32 fn_801143A0(void) { return 0; }
 /* 0x801143EC | 0x70 */
 #pragma push
 #pragma peephole off
-void* fn_801143EC(u32 resId, u32 param) {
+void* floorReadNotLinkedParticlePostFunc(u32 resId, u32 param) {
     void* result = fn_800F9318(resId, (param & 0x7FFF0000) | 0x400);
     void* node = fn_801195AC(result);
     if (node != (void*)0) {
@@ -177,10 +171,10 @@ void* fn_801143EC(u32 resId, u32 param) {
 #pragma peephole on
 #pragma pop
 
-/* 0x8011445C | 0x74 | floorReadParticlePreFunc (string-proven) */
+/* 0x8011445C | 0x74 | floorReadNotLinkedParticlePreFunc (string + table 0x12) */
 #pragma push
 #pragma peephole off
-void* floorReadParticlePreFunc(u32 resId, u32 loadMode, u32 dataSize) {
+void* floorReadNotLinkedParticlePreFunc(u32 resId, u32 loadMode, u32 dataSize) {
     void* buf;
     u32 alignedSize;
 
@@ -201,14 +195,13 @@ void* floorReadParticlePreFunc(u32 resId, u32 loadMode, u32 dataSize) {
  * there was no real logic to adopt). No signature/callee-extern tweak can
  * fix an empty body, so the adoption was reverted. Left asm-only. */
 
-/* 0x801145C0 | 0x74 | matched, unproven name.
- * NOTE: also references lbl_80272270 ("floorReadParticlePreFunc(): can't
- * alloc..."), same as floorReadParticlePreFunc above. Two functions read
- * this string; only 0x8011445C has independent evidence for the rename,
- * so this one keeps its fn_ name pending further evidence. */
+/* 0x801145C0 | 0x74 | floorReadParticlePreFunc (table 0x0A, paired with
+ * floorReadParticlePostFunc at 0x801144D0). Reads the same lbl_80272270
+ * string as floorReadNotLinkedParticlePreFunc -- the two bodies are
+ * byte-identical, exactly as in XD. */
 #pragma push
 #pragma peephole off
-void* fn_801145C0(u32 resId, u32 loadMode, u32 dataSize) {
+void* floorReadParticlePreFunc(u32 resId, u32 loadMode, u32 dataSize) {
     void* buf;
     u32 alignedSize;
 
@@ -276,7 +269,7 @@ void* floorReadTexPostFunc(void) {
 /* 0x801147D4 | 0x34 | matched, unproven name */
 #pragma push
 #pragma peephole off
-void* fn_801147D4(void) {
+void* floorReadColPostFunc(void) {
     void* result = fn_800F9318();
     fn_8010CFE4();
     return result;
@@ -304,7 +297,7 @@ void* floorReadColPreFunc(u32 resId, u32 loadMode, u32 dataSize) {
 /* 0x8011487C | 0xCC | matched, unproven name */
 #pragma push
 #pragma peephole off
-void* fn_8011487C(u32 resId, u32 loadMode, u32 dataSize) {
+void* floorReadCameraPostFunc(u32 resId, u32 loadMode, u32 dataSize) {
 #pragma optimization_level 4
     extern void HSD_ArchiveParse(void* archive, void* buf, u32 size);
     extern void* HSD_ArchiveGetPublicAddress(void* archive, const char* sym);
@@ -355,7 +348,7 @@ void* floorReadCameraPreFunc(void* owner, u32 param, u32 alloc_size) {
 /* 0x801149BC | 0xB4 | matched, unproven name */
 #pragma push
 #pragma peephole off
-void* fn_801149BC(u32 resId, u32 loadMode, u32 dataSize) {
+void* floorReadObjPostFunc(u32 resId, u32 loadMode, u32 dataSize) {
     extern void* fn_800F9318(void);
     extern void HSD_ArchiveParse(void* archive, void* buf, u32 size);
     extern void* HSD_ArchiveGetPublicAddress(void* archive, const char* sym);

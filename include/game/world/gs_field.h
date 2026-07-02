@@ -147,12 +147,11 @@ s32 GSfield_LinePlaneTest(void* segStart, void* segEnd,
  * Public API -- Floor Resource Pre-funcs (gs_field_resource.c)
  * =================================================================== */
 
-/** fn_8011432C */ void* floorReadGFLPreFunc(u32 resId, u32 loadMode, u32 dataSize);
-/** fn_801143A8 */ void* floorReadSoundPreFunc_Stub(void);
-/** fn_801144D0 */ void* floorReadSoundPreFunc(u32 resId, u32 loadMode, u32 dataSize);
-/** fn_80114760 */ void* floorReadParticlePreFunc(u32 resId, u32 loadMode, u32 dataSize);
-/** fn_80114AE0 */ void* floorReadWZXPreFunc(u32 resId, u32 loadMode, u32 dataSize);
-/** fn_80114878 */ void* floorReadPKXPreFunc(u32 resId, u32 loadMode, u32 dataSize);
+void* floorReadGFLPreFunc(u32 resId, u32 loadMode, u32 dataSize);
+void* floorReadNotLinkedParticlePreFunc(u32 resId, u32 loadMode, u32 dataSize);
+void* floorReadParticlePreFunc(u32 resId, u32 loadMode, u32 dataSize);
+void* floorReadWZXPreFunc(u32 resId, u32 loadMode, u32 dataSize);
+void* floorReadPKXPreFunc(u32 resId, u32 loadMode, u32 dataSize);
 void* floorReadCameraPreFunc(void* owner, u32 param, u32 alloc_size);
 void* floorReadMapPreFunc(void* owner, u32 param, u32 alloc_size);
 
