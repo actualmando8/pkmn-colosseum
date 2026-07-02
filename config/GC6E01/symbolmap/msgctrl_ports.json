@@ -1,0 +1,311 @@
+{
+ "unit": "src/game/effect/effect_util.c (mis-attributed: actually the message-control TU; msgctrl* handlers 0x80131630-0x80132690 are DEFINED here)",
+ "evidence": "index-parallel port from XD msgctrlcode table (XD .data 0x80404710, 111 entries) to Colosseum lbl_80363778 (.data, 95 entries, [param,handler] stride 8); 10/10 anchors at identical indices; unused holes (58-60,63-64) agree between games; consumer fn_800F98F4 dispatches on escape-code byte",
+ "status": "PARKED: effect_util.c is fleet-owned/dirty; apply when the file frees or let the fleet apply during its own pass",
+ "renames": [
+  {
+   "old": "fn_80132690",
+   "new": "msgctrlKeyWait"
+  },
+  {
+   "old": "fn_8013263C",
+   "new": "msgctrlRubyTop"
+  },
+  {
+   "old": "fn_8013262C",
+   "new": "msgctrlRubyEnd"
+  },
+  {
+   "old": "fn_80132570",
+   "new": "msgctrlColor"
+  },
+  {
+   "old": "fn_80132264",
+   "new": "msgctrlEvStrBuf0"
+  },
+  {
+   "old": "fn_8013225C",
+   "new": "msgctrlEvStrBuf1"
+  },
+  {
+   "old": "fn_801321BC",
+   "new": "msgctrlAttackMons"
+  },
+  {
+   "old": "fn_80132124",
+   "new": "msgctrlDeffenceMons"
+  },
+  {
+   "old": "fn_8013208C",
+   "new": "msgctrlClientMos"
+  },
+  {
+   "old": "fn_80131FF4",
+   "new": "msgctrlTsuikaMons"
+  },
+  {
+   "old": "fn_80131FEC",
+   "new": "msgctrlMyName"
+  },
+  {
+   "old": "fn_80131FE4",
+   "new": "msgctrlMyMons"
+  },
+  {
+   "old": "fn_80131FDC",
+   "new": "msgctrlMyMons2"
+  },
+  {
+   "old": "fn_80131FD4",
+   "new": "msgctrlEnemyMons"
+  },
+  {
+   "old": "fn_80131FCC",
+   "new": "msgctrlEnemyMons2"
+  },
+  {
+   "old": "fn_80131FC4",
+   "new": "msgctrlEnemyTmons"
+  },
+  {
+   "old": "fn_80131FBC",
+   "new": "msgctrlEnemyTmons2"
+  },
+  {
+   "old": "fn_80131FB4",
+   "new": "msgctrlSpeabiNamea"
+  },
+  {
+   "old": "fn_80131FAC",
+   "new": "msgctrlSpeabiNamed"
+  },
+  {
+   "old": "fn_80131FA4",
+   "new": "msgctrlSpeabiNamec"
+  },
+  {
+   "old": "fn_80131F9C",
+   "new": "msgctrlSpeabiNamet"
+  },
+  {
+   "old": "fn_80131F04",
+   "new": "msgctrlClientnowork"
+  },
+  {
+   "old": "fn_80131CC0",
+   "new": "msgctrlSideAttackNameha"
+  },
+  {
+   "old": "fn_80131C98",
+   "new": "msgctrlSideAttackNamewo"
+  },
+  {
+   "old": "fn_80131C70",
+   "new": "msgctrlSideAttackNameno"
+  },
+  {
+   "old": "fn_80131BF0",
+   "new": "msgctrlTrainerType"
+  },
+  {
+   "old": "fn_80131BE8",
+   "new": "msgctrlTrainerName"
+  },
+  {
+   "old": "fn_80131BE0",
+   "new": "msgctrlTrainerLose"
+  },
+  {
+   "old": "fn_80131BD8",
+   "new": "msgctrlTrainerEnename"
+  },
+  {
+   "old": "fn_80131BD0",
+   "new": "msgctrlTrainerEnename2"
+  },
+  {
+   "old": "fn_80131BC8",
+   "new": "msgctrlTrainerClientno"
+  },
+  {
+   "old": "fn_80131BC0",
+   "new": "msgctrlWazaName"
+  },
+  {
+   "old": "fn_80131BB8",
+   "new": "msgctrlItemName"
+  },
+  {
+   "old": "fn_80131BB0",
+   "new": "msgctrlPasoName"
+  },
+  {
+   "old": "fn_80132428",
+   "new": "msgctrlHero"
+  },
+  {
+   "old": "fn_801323FC",
+   "new": "msgctrlHizuki"
+  },
+  {
+   "old": "fn_801323C8",
+   "new": "msgctrlItem"
+  },
+  {
+   "old": "fn_80132394",
+   "new": "msgctrlItem2"
+  },
+  {
+   "old": "fn_80132360",
+   "new": "msgctrlDigit"
+  },
+  {
+   "old": "fn_8013232C",
+   "new": "msgctrlDigit2"
+  },
+  {
+   "old": "fn_80132324",
+   "new": "msgctrlMsgID"
+  },
+  {
+   "old": "fn_8013231C",
+   "new": "msgctrlPokemon"
+  },
+  {
+   "old": "fn_80132314",
+   "new": "msgctrlPokemon2"
+  },
+  {
+   "old": "fn_801322E0",
+   "new": "msgctrlMenuDigit"
+  },
+  {
+   "old": "fn_801322AC",
+   "new": "msgctrlMenuDigit2"
+  },
+  {
+   "old": "fn_801322A4",
+   "new": "msgctrlMenuPokemon"
+  },
+  {
+   "old": "fn_8013229C",
+   "new": "msgctrlMenuMsg"
+  },
+  {
+   "old": "fn_801324CC",
+   "new": "msgctrlPalette"
+  },
+  {
+   "old": "fn_8013226C",
+   "new": "msgctrlWaza"
+  },
+  {
+   "old": "fn_80131BA8",
+   "new": "msgctrlSeOff"
+  },
+  {
+   "old": "fn_80131BA0",
+   "new": "msgctrlSeOn"
+  },
+  {
+   "old": "fn_80132254",
+   "new": "msgctrlEvStrBuf2"
+  },
+  {
+   "old": "fn_80131C48",
+   "new": "msgctrlSideDefenceNameha"
+  },
+  {
+   "old": "fn_80131C20",
+   "new": "msgctrlSideDefenceNamewo"
+  },
+  {
+   "old": "fn_80131BF8",
+   "new": "msgctrlSideDefenceNameno"
+  },
+  {
+   "old": "fn_80131B6C",
+   "new": "msgctrlMenuUDigit"
+  },
+  {
+   "old": "fn_80131B38",
+   "new": "msgctrlMenuUDigit2"
+  },
+  {
+   "old": "fn_80131B04",
+   "new": "msgctrlMenuHex"
+  },
+  {
+   "old": "fn_80131AD0",
+   "new": "msgctrlMenuHex2"
+  },
+  {
+   "old": "fn_80131A9C",
+   "new": "msgctrlMenuZDigit"
+  },
+  {
+   "old": "fn_80131A68",
+   "new": "msgctrlMenuZDigit2"
+  },
+  {
+   "old": "fn_80131A34",
+   "new": "msgctrlMoney"
+  },
+  {
+   "old": "fn_8013182C",
+   "new": "msgctrlTime"
+  },
+  {
+   "old": "fn_80131824",
+   "new": "msgctrlString"
+  },
+  {
+   "old": "fn_801317FC",
+   "new": "msgctrlPokemonID"
+  },
+  {
+   "old": "fn_801317C8",
+   "new": "msgctrlMenuFullDigit"
+  },
+  {
+   "old": "fn_80131794",
+   "new": "msgctrlMenuMoney"
+  },
+  {
+   "old": "fn_80132294",
+   "new": "msgctrlMenuMsg2"
+  },
+  {
+   "old": "fn_801316E0",
+   "new": "msgctrlMenuMsgID"
+  },
+  {
+   "old": "fn_801316D8",
+   "new": "msgctrlMenuMsgID2"
+  },
+  {
+   "old": "fn_801316D0",
+   "new": "msgctrlString2"
+  },
+  {
+   "old": "fn_801316A8",
+   "new": "msgctrlTribe"
+  },
+  {
+   "old": "fn_801316A0",
+   "new": "msgctrlNpc"
+  },
+  {
+   "old": "fn_80131690",
+   "new": "msgctrlIndentOff"
+  },
+  {
+   "old": "fn_80131660",
+   "new": "msgctrlLineSpace"
+  },
+  {
+   "old": "fn_80131630",
+   "new": "msgctrlBaseLineBias"
+  }
+ ]
+}
