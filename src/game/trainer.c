@@ -9439,37 +9439,6 @@ void* fn_80201704(void* arg0) {
     return result;
 }
 
-/* 0x80201764 | size: 0x12C */
-void fn_80201764(void* context, void* item, void* target) {
-    extern u16 fn_80119ED0(void* item);
-    extern void fn_8011A280(void* partyList, void* item, void* target);
-    extern void fn_801214FC(void* pokemon, void* item, void* target);
-    void* partyList;
-    void* pokemon;
-    u16 itemType;
-
-    itemType = (u16)fn_80119ED0(item);
-    if (itemType != 0x7C) {
-        if ((u16)fn_80119ED0(item) != 0xC8) {
-            if ((u16)fn_80119ED0(item) != 0xCD) {
-                if ((u16)fn_80119ED0(item) == 0xD8) {
-                    fn_8011A280(context, item, target);
-                }
-                return;
-            }
-        }
-    }
-    partyList = fn_8012640C(context, 0, 0xD6, 0);
-    if ((u16)fn_80119ED0(item) == 0x7C || (u16)fn_80119ED0(item) == 0xC8) {
-        if (partyList == NULL) {
-            pokemon = NULL;
-        } else {
-            pokemon = fn_8012640C(partyList, 0, 0xCC, 0);
-        }
-        fn_801214FC(pokemon, item, target);
-    } else {
-        if ((u16)fn_80119ED0(item) == 0xCD) {
-            fn_8011A280(partyList, item, target);
-        }
-    }
-}
+/* fn_80201764 (0x80201764, size 0x12C) moved to fight_range_80201764.c
+ * -- that TU owns the 0x80201764-0x80202810 .text range per splits.txt.
+ * Not called elsewhere in this file. */
