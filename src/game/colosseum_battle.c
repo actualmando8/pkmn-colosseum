@@ -22667,7 +22667,7 @@ s32 fightTrainerAiWazaHit097(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u16 fn_802367CC(void* ctx, u32 param1, void* buf, u32 zero, u32 one);
     extern u8 fn_80236BFC(void* ctx, u32 param1, u32 flag);
     extern u8 fn_80218FDC(u32 elem);
-    extern u8 fn_8021901C(u32 elem);
+    extern u8 fn_8021901C(int elem);
     u16 buf[0xa];
     u16 count = fn_802367CC(ctx, param1, buf, 0, 1);
     u16 i;
@@ -22771,25 +22771,27 @@ void fightTrainerAiWazaHit094(void* ctx, u32 slot, u32 param) {
 
 /* Address: 0x8025813C | Size: 0xD0 (208 bytes) */
 s32 fightTrainerAiWazaHit092(void* ctx, u32 param1, u32 param2, u32 param3) {
+    u32 *new_var;
     extern u32 fn_802395C8(void* ctx, u32 param2, u32 param1);
     extern u8 fn_80236BFC(void* ctx, u32 param1, u32 flag);
     extern u32 fn_80239500(void* ctx, u32 param2);
+    s32 gate;
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
     u32 v1 = fn_802395C8(ctx, param2, param1);
-    s32 gate;
 
     if (!fn_80236BFC(ctx, param1, 0x8)) {
         return 0;
     }
+    new_var = &v1;
     gate = fn_8025C264(ctx, param1, param2, param3, 0);
-    if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
+    if (fn_8023793C(ctx, param3, *new_var, fn_80239500(ctx, param2)) == 0x43) {
         gate = 0;
     }
     if (gate == 0) {
         return 0;
     }
-    if (gate == -1) {
+    if (((0, gate)) == (-1)) {
         return 1;
     }
     return 1;

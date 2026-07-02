@@ -489,6 +489,7 @@ static int DObjLoad(HSD_DObj* dobj_arg, HSD_DObjDesc* desc_arg)
                 __assert(&lbl_8047DA18, 0x181, &lbl_8047DA20);
             }
         }
+        dobj = dobj_arg;
         {
             void (**vtbl)(void) = (void (**)(void)) HSD_CLASS_METHOD(sub);
             ((int (*)(HSD_DObj*, HSD_DObjDesc*)) vtbl[0x40 / 4])(sub, subdesc);

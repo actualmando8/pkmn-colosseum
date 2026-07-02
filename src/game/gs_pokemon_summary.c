@@ -1072,7 +1072,8 @@ asm void fn_80016618(void) {
 s32 fn_80016618(u8* src, u8* dst) {
     u8* entry;
     u16 tmp;
-    entry = SUMMARY_ENTRY_RAW(SUMMARY_CTX_S8(src, 0x95));
+    entry = (u8*)sSummaryPageEntries;
+    entry = entry + (s32)(SUMMARY_CTX_S8(src, 0x95)) * SUMMARY_ENTRY_STRIDE;
     tmp = (u16)(fn_80103E68((u16)SUMMARY_ENTRY_LABEL(entry)) >> 16);
     if ((s32)(s8)*(u8*)&tmp > 0 && (s32)lbl_8047A2D8 == -1) {
         dst[0x67] = *(f32*)&lbl_8047B740 * (*(f32*)&lbl_8047B744 - *(f32*)&lbl_8047A2C4);

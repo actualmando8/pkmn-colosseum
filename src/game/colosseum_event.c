@@ -1830,8 +1830,9 @@ void fn_802032E4(void* ctx, u32 param) {
     extern u8 fn_80121ADC();
     extern void fn_80122370();
     extern u32 fn_80123090();
-    void* ccCtx;
+    void* resolvedPtr;
     void* ccData;
+    void* ccCtx;
     u8 result;
     u32 value;
 
@@ -1843,7 +1844,7 @@ void fn_802032E4(void* ctx, u32 param) {
     } else {
         if (fn_80119ED0(0x3D) == 0x7C || fn_80119ED0(0x3D) == 0xC8) {
             void* tmp;
-            if (ctx == 0) { tmp = 0; } else { tmp = fn_8012640C(ctx, 0, 0xCC, 0); }
+            if (ctx == 0) { tmp = 0; } else { resolvedPtr = fn_8012640C(ctx, 0, 0xCC, 0); tmp = resolvedPtr; }
             result = fn_80121ADC(tmp, 0x3D);
         } else {
             if (fn_80119ED0(0x3D) != 0xCD) {
