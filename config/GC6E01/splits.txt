@@ -170,8 +170,14 @@ game/gs_task.c:
 game/gs_party_access.c:
 	.text       start:0x8000CA34 end:0x8000D290
 
+game/gs_range_8000D290.c:
+	.text       start:0x8000D290 end:0x8000DAA8
+
 game/gs_npc_interact.c:
 	.text       start:0x8000DAA8 end:0x80011EA4
+
+game/gs_range_80011EA4.c:
+	.text       start:0x80011EA4 end:0x80012D20
 
 game/gs_event_exec.c:
 	.text       start:0x80012D20 end:0x8001501C
@@ -191,8 +197,14 @@ game/gs_worldmap.c:
 game/gs_npc_event.c:
 	.text       start:0x80030170 end:0x80033278
 
+game/gs_range_80033278.c:
+	.text       start:0x80033278 end:0x80035E04
+
 game/movie.c:
 	.text       start:0x80035E04 end:0x8003686C
+
+game/gs_range_8003686C.c:
+	.text       start:0x8003686C end:0x8004EADC
 
 game/menu/menu_bag.c:
 	.text       start:0x8004EADC end:0x80051710
@@ -203,23 +215,44 @@ game/menu/menu_middle.c:
 game/menu/menu_carde_matrix.c:
 	.text       start:0x8007C300 end:0x8007FD64
 
+game/gs_range_8007FD64.c:
+	.text       start:0x8007FD64 end:0x80088428
+
 game/gba/gba_conv.c:
 	.text       start:0x80088428 end:0x80089048
+
+game/field_range_80089048.c:
+	.text       start:0x80089048 end:0x800896B8
 
 game/gba/gba_misc.c:
 	.text       start:0x800896B8 end:0x8008C7B0
 
+game/gs_range_8008C7B0.c:
+	.text       start:0x8008C7B0 end:0x800980E0
+
 dolphin/os/PPCArch.c:
 	.text       start:0x800980E0 end:0x80098108
+
+dolphin/sdk_range_80098108.c:
+	.text       start:0x80098108 end:0x8009A0E0
 
 dolphin/os/OSGetExceptionHandler.c:
 	.text       start:0x8009A0E0 end:0x8009A0F4
 
+dolphin/sdk_range_8009A0F4.c:
+	.text       start:0x8009A0F4 end:0x8009A2C8
+
 dolphin/os/OSAlarmCreate.c:
 	.text       start:0x8009A2C8 end:0x8009A2D8
 
+dolphin/sdk_range_8009A2D8.c:
+	.text       start:0x8009A2D8 end:0x8009AFB0
+
 dolphin/os/OSArena.c:
 	.text       start:0x8009AFB0 end:0x8009AFD0
+
+dolphin/sdk_range_8009AFD0.c:
+	.text       start:0x8009AFD0 end:0x8009B290
 
 dolphin/os/OSCache.c:
 	.text       start:0x8009B290 end:0x8009B914
@@ -233,6 +266,9 @@ dolphin/os/OSContext.c:
 dolphin/os/OSContextClear.c:
 	.text       start:0x8009BD60 end:0x8009BD84
 
+dolphin/sdk_range_8009BD84.c:
+	.text       start:0x8009BD84 end:0x8009DF88
+
 dolphin/os/OSInterruptHandlers.c:
 	.text       start:0x8009DF88 end:0x8009DFB8
 
@@ -245,8 +281,14 @@ dolphin/os/OSEXI_fn_8009E7A8.c:
 dolphin/os/OSEXI_fn_8009E7AC.c:
 	.text       start:0x8009E7AC end:0x8009E7B0
 
+dolphin/sdk_range_8009E7B0.c:
+	.text       start:0x8009E7B0 end:0x8009F1B8
+
 dolphin/os/OSMemory.c:
 	.text       start:0x8009F1B8 end:0x8009F77C
+
+dolphin/sdk_range_8009F77C.c:
+	.text       start:0x8009F77C end:0x8009FAEC
 
 dolphin/os/OSState_fn_8009FAEC.c:
 	.text       start:0x8009FAEC end:0x8009FAF8
@@ -254,11 +296,17 @@ dolphin/os/OSState_fn_8009FAEC.c:
 dolphin/os/OSReset.c:
 	.text       start:0x8009FAF8 end:0x800A03B4
 
+dolphin/sdk_range_800A03B4.c:
+	.text       start:0x800A03B4 end:0x800A064C
+
 dolphin/os/OSReboot_fn_800A064C.c:
 	.text       start:0x800A064C end:0x800A06AC
 
 dolphin/os/OSReboot_WriteSram.c:
 	.text       start:0x800A06AC end:0x800A07C4
+
+dolphin/sdk_range_800A07C4.c:
+	.text       start:0x800A07C4 end:0x800A13E8
 
 dolphin/os/OSThreadQueue.c:
 	.text       start:0x800A13E8 end:0x800A1404
@@ -271,6 +319,9 @@ dolphin/os/OSTime_range_800A2778.c:
 
 dolphin/os/OSTime.c:
 	.text       start:0x800A27FC end:0x800A2B9C
+
+dolphin/sdk_range_800A2B9C.c:
+	.text       start:0x800A2B9C end:0x800A2C30
 
 dolphin/db/DBInit.c:
 	.text       start:0x800A2C30 end:0x800A2C58
@@ -287,6 +338,9 @@ dolphin/db/DBIsExceptionMarked.c:
 dolphin/db/DBPrintf.c:
 	.text       start:0x800A2CE8 end:0x800A2D38
 
+dolphin/sdk_range_800A2D38.c:
+	.text       start:0x800A2D38 end:0x800A3EB0
+
 dolphin/dvd/DVDLowInitWA.c:
 	.text       start:0x800A3EB0 end:0x800A3EF0
 
@@ -299,8 +353,14 @@ dolphin/dvd/DVDLowSetWAType.c:
 dolphin/dvd/DVDFs.c:
 	.text       start:0x800A4CF0 end:0x800A4D28
 
+dolphin/sdk_range_800A4D28.c:
+	.text       start:0x800A4D28 end:0x800A5624
+
 dolphin/dvd/DVD.c:
 	.text       start:0x800A5624 end:0x800A7820
+
+dolphin/sdk_range_800A7820.c:
+	.text       start:0x800A7820 end:0x800A7F28
 
 dolphin/dvd/DVDQueue.c:
 	.text       start:0x800A7F28 end:0x800A7F80
@@ -314,8 +374,14 @@ dolphin/dvd/DVDError_ErrorCode2Num.c:
 dolphin/dvd/DVDError.c:
 	.text       start:0x800A80FC end:0x800A8178
 
+dolphin/sdk_range_800A8178.c:
+	.text       start:0x800A8178 end:0x800AA280
+
 dolphin/vi/VI_fn_800AA280.c:
 	.text       start:0x800AA280 end:0x800AA288
+
+dolphin/sdk_range_800AA288.c:
+	.text       start:0x800AA288 end:0x800AA498
 
 dolphin/vi/VI_fn_800AA498.c:
 	.text       start:0x800AA498 end:0x800AA4D4
@@ -323,8 +389,14 @@ dolphin/vi/VI_fn_800AA498.c:
 dolphin/pad/PAD.c:
 	.text       start:0x800AA4D4 end:0x800AC02C
 
+dolphin/sdk_range_800AC02C.c:
+	.text       start:0x800AC02C end:0x800B71F0
+
 dolphin/gx/GX_fn_800B71F0.c:
 	.text       start:0x800B71F0 end:0x800B71FC
+
+dolphin/sdk_range_800B71FC.c:
+	.text       start:0x800B71FC end:0x800B770C
 
 dolphin/gx/GX_fn_800B770C.c:
 	.text       start:0x800B770C end:0x800B7714
@@ -332,11 +404,20 @@ dolphin/gx/GX_fn_800B770C.c:
 dolphin/gx/GX_fn_800B7714.c:
 	.text       start:0x800B7714 end:0x800B771C
 
+dolphin/sdk_range_800B771C.c:
+	.text       start:0x800B771C end:0x800B856C
+
 dolphin/gx/GX_fn_800B856C.c:
 	.text       start:0x800B856C end:0x800B857C
 
+dolphin/sdk_range_800B857C.c:
+	.text       start:0x800B857C end:0x800BA198
+
 dolphin/gx/GX_fn_800BA198.c:
 	.text       start:0x800BA198 end:0x800BA1B4
+
+dolphin/sdk_range_800BA1B4.c:
+	.text       start:0x800BA1B4 end:0x800BA414
 
 dolphin/gx/GX_fn_800BA414.c:
 	.text       start:0x800BA414 end:0x800BA424
@@ -347,14 +428,23 @@ dolphin/gx/GX_fn_800BA424.c:
 dolphin/gx/GX_fn_800BA440.c:
 	.text       start:0x800BA440 end:0x800BA44C
 
+dolphin/sdk_range_800BA44C.c:
+	.text       start:0x800BA44C end:0x800BAE5C
+
 dolphin/gx/GX_fn_800BAE5C.c:
 	.text       start:0x800BAE5C end:0x800BAE64
+
+dolphin/sdk_range_800BAE64.c:
+	.text       start:0x800BAE64 end:0x800BB2E4
 
 dolphin/gx/GX_fn_800BB2E4.c:
 	.text       start:0x800BB2E4 end:0x800BB2F8
 
 dolphin/gx/GX_fn_800BB2F8.c:
 	.text       start:0x800BB2F8 end:0x800BB30C
+
+dolphin/sdk_range_800BB30C.c:
+	.text       start:0x800BB30C end:0x800BE464
 
 trk/TRKConstructEvent.c:
 	.text       start:0x800BE464 end:0x800BE47C
@@ -385,6 +475,9 @@ trk/TRKSerial.c:
 
 trk/usr_put_initialize.c:
 	.text       start:0x800BF338 end:0x800BF33C
+
+dolphin/sdk_range_800BF33C.c:
+	.text       start:0x800BF33C end:0x800BF534
 
 trk/TRKDispatchInit.c:
 	.text       start:0x800BF534 end:0x800BF53C
@@ -458,6 +551,9 @@ trk/ddh_cc_range_800C3E90.c:
 trk/ddh_cc_shutdown.c:
 	.text       start:0x800C3EB4 end:0x800C3EBC
 
+trk/trk_range_800C3EBC.c:
+	.text       start:0x800C3EBC end:0x800C41A4
+
 trk/circle_buffer_count.c:
 	.text       start:0x800C41A4 end:0x800C41AC
 
@@ -473,14 +569,26 @@ trk/gdev_cc_range_800C4444.c:
 trk/gdev_cc_shutdown.c:
 	.text       start:0x800C4468 end:0x800C4470
 
+trk/trk_range_800C4470.c:
+	.text       start:0x800C4470 end:0x800C459C
+
 crt/mwtrace_helpers.c:
 	.text       start:0x800C459C end:0x800C45A0
+
+game/gs_range_800C45A0.c:
+	.text       start:0x800C45A0 end:0x800C4668
 
 crt/global_destructor_chain.c:
 	.text       start:0x800C4668 end:0x800C470C
 
+dolphin/sdk_range_800C470C.c:
+	.text       start:0x800C470C end:0x800C4E44
+
 crt/exit.c:
 	.text       start:0x800C4E44 end:0x800C5458
+
+dolphin/sdk_range_800C5458.c:
+	.text       start:0x800C5458 end:0x800C754C
 
 crt/critical_regions.c:
 	.text       start:0x800C754C end:0x800C7558
@@ -512,11 +620,20 @@ crt/string_range_800CA78C.c:
 crt/string.c:
 	.text       start:0x800CA7FC end:0x800CAA58
 
+crt/math_range_800CAA58.c:
+	.text       start:0x800CAA58 end:0x800CE79C
+
 dolphin/exi/EXI2Stubs.c:
 	.text       start:0x800CE79C end:0x800CE7DC
 
+dolphin/sdk_range_800CE7DC.c:
+	.text       start:0x800CE7DC end:0x800CEA3C
+
 dolphin/exi/EXI2_range_800CEA3C.c:
 	.text       start:0x800CEA3C end:0x800CEB64
+
+dolphin/sdk_range_800CEB64.c:
+	.text       start:0x800CEB64 end:0x800CF708
 
 dolphin/si/SI_fn_800CF708.c:
 	.text       start:0x800CF708 end:0x800CF728
@@ -536,6 +653,9 @@ dolphin/si/SI_range_800D0F68.c:
 dolphin/si/SI_fn_800D104C.c:
 	.text       start:0x800D104C end:0x800D1070
 
+game/gs_range_800D1070.c:
+	.text       start:0x800D1070 end:0x800D13C4
+
 game/gs_render_util.c:
 	.text       start:0x800D13C4 end:0x800D3074
 
@@ -544,6 +664,9 @@ game/gs_gfx.c:
 
 game/gs_render.c:
 	.text       start:0x800D3E4C end:0x800E202C
+
+game/gs_range_800E202C.c:
+	.text       start:0x800E202C end:0x800EF098
 
 game/gs_texture.c:
 	.text       start:0x800EF098 end:0x800F07A8
@@ -563,17 +686,32 @@ game/gs_floor_data.c:
 game/gs_floor.c:
 	.text       start:0x800FF788 end:0x80101910
 
+game/gs_range_80101910.c:
+	.text       start:0x80101910 end:0x801019F8
+
 game/gs_model.c:
 	.text       start:0x801019F8 end:0x80109C88
+
+game/gs_range_80109C88.c:
+	.text       start:0x80109C88 end:0x8010C364
 
 game/gs_colsys.c:
 	.text       start:0x8010C364 end:0x8010CBD0
 
+game/gs_range_8010CBD0.c:
+	.text       start:0x8010CBD0 end:0x8010F6A0
+
 game/gs_field_colquery.c:
 	.text       start:0x8010F6A0 end:0x801140DC
 
+game/field_range_801140DC.c:
+	.text       start:0x801140DC end:0x8011432C
+
 game/gs_field_resource.c:
 	.text       start:0x8011432C end:0x80114AE0
+
+game/field_range_80114AE0.c:
+	.text       start:0x80114AE0 end:0x80114D6C
 
 game/gs_field_world.c:
 	.text       start:0x80114D6C end:0x80130CE0
@@ -596,17 +734,32 @@ game/people/people_data.c:
 game/people/people_field.c:
 	.text       start:0x80144574 end:0x801652DC
 
+game/musyx_range_801652DC.c:
+	.text       start:0x801652DC end:0x801653BC
+
 game/sound/sound.c:
 	.text       start:0x801653BC end:0x801653CC
+
+game/gs_range_801653CC.c:
+	.text       start:0x801653CC end:0x80167040
 
 game/gs_dvd.c:
 	.text       start:0x80167040 end:0x80168C64
 
+game/ps_range_80168C64.c:
+	.text       start:0x80168C64 end:0x8017572C
+
 game/gs_scene.c:
 	.text       start:0x8017572C end:0x8017A5FC
 
+game/gs_range_8017A5FC.c:
+	.text       start:0x8017A5FC end:0x8017B07C
+
 game/fsys/fsys_file.c:
 	.text       start:0x8017B07C end:0x8017F2C4
+
+game/gs_range_8017F2C4.c:
+	.text       start:0x8017F2C4 end:0x80180C78
 
 game/people/people.c:
 	.text       start:0x80180C78 end:0x8018FE30
@@ -616,6 +769,9 @@ hsd/hsd_object.c:
 
 hsd/hsd_wobj.c:
 	.text       start:0x801914F4 end:0x801920E4
+
+hsd/hsd_range_801920E4.c:
+	.text       start:0x801920E4 end:0x801938FC
 
 hsd/hsd_class.c:
 	.text       start:0x801938FC end:0x80193C24
@@ -640,6 +796,9 @@ hsd/hsd_jobj.c:
 
 hsd/hsd_lobj.c:
 	.text       start:0x801A4000 end:0x801A69C0
+
+hsd/hsd_range_801A69C0.c:
+	.text       start:0x801A69C0 end:0x801A8428
 
 hsd/hsd_mobj_clear_flags.c:
 	.text       start:0x801A8428 end:0x801A8440
@@ -701,11 +860,17 @@ hsd/hsd_robj_get_alloc_data.c:
 hsd/hsd_robj_get_alloc_data2.c:
 	.text       start:0x801B014C end:0x801B0158
 
+hsd/hsd_range_801B0158.c:
+	.text       start:0x801B0158 end:0x801B019C
+
 hsd/hsd_shadow.c:
 	.text       start:0x801B019C end:0x801B1730
 
 hsd/hsd_texp.c:
 	.text       start:0x801B1730 end:0x801BBAC8
+
+hsd/hsd_range_801BBAC8.c:
+	.text       start:0x801BBAC8 end:0x801C01C8
 
 hsd/hsd_aobj_range_801C01C8.c:
 	.text       start:0x801C01C8 end:0x801C0F20
@@ -725,6 +890,9 @@ game/pokemon.c:
 game/trainer.c:
 	.text       start:0x801F7F80 end:0x80201764
 
+game/fight_range_80201764.c:
+	.text       start:0x80201764 end:0x80202810
+
 game/colosseum_event.c:
 	.text       start:0x80202810 end:0x80211A00
 
@@ -733,3 +901,6 @@ game/fight_range_80211A00.c:
 
 game/colosseum_battle.c:
 	.text       start:0x802405C0 end:0x80265EC4
+
+game/gs_range_80265EC4.c:
+	.text       start:0x80265EC4 end:0x8026635C

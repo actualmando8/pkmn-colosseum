@@ -9,21 +9,21 @@
     "total_units": 320
   },
   "topology_status": {
-    "auto_units": 79,
-    "named_units": 241,
-    "source_backed_units": 221,
-    "auto_code": 824240,
+    "auto_units": 22,
+    "named_units": 298,
+    "source_backed_units": 278,
+    "auto_code": 290752,
     "auto_data": 2182883,
-    "auto_functions": 2113
+    "auto_functions": 724
   },
   "baseline_progress": {
-    "matched_code": "257164",
-    "matched_code_percent": 10.306728,
-    "matched_data": "12364",
-    "matched_data_percent": 0.56295806,
-    "matched_functions": 3370,
-    "matched_functions_percent": 39.172382,
-    "fuzzy_match_percent": 22.649708
+    "matched_code": "260380",
+    "matched_code_percent": 10.43562,
+    "matched_data": "12684",
+    "matched_data_percent": 0.5775283,
+    "matched_functions": 3384,
+    "matched_functions_percent": 39.335117,
+    "fuzzy_match_percent": 22.906649
   },
   "unit_topology": [
     {
@@ -898,7 +898,7 @@
       "total_functions": 25
     },
     {
-      "name": "main/auto_01_8000D290_text",
+      "name": "main/game/gs_range_8000D290",
       "sections": [
         {
           "name": ".text",
@@ -924,7 +924,7 @@
       "total_functions": 52
     },
     {
-      "name": "main/auto_01_80011EA4_text",
+      "name": "main/game/gs_range_80011EA4",
       "sections": [
         {
           "name": ".text",
@@ -1015,7 +1015,7 @@
       "total_functions": 33
     },
     {
-      "name": "main/auto_01_80033278_text",
+      "name": "main/game/gs_range_80033278",
       "sections": [
         {
           "name": ".text",
@@ -1041,7 +1041,7 @@
       "total_functions": 21
     },
     {
-      "name": "main/auto_01_8003686C_text",
+      "name": "main/game/gs_range_8003686C",
       "sections": [
         {
           "name": ".text",
@@ -1119,7 +1119,7 @@
       "total_functions": 15
     },
     {
-      "name": "main/auto_01_8007FD64_text",
+      "name": "main/game/gs_range_8007FD64",
       "sections": [
         {
           "name": ".text",
@@ -1145,7 +1145,7 @@
       "total_functions": 16
     },
     {
-      "name": "main/auto_01_80089048_text",
+      "name": "main/game/field_range_80089048",
       "sections": [
         {
           "name": ".text",
@@ -1171,7 +1171,7 @@
       "total_functions": 37
     },
     {
-      "name": "main/auto_01_8008C7B0_text",
+      "name": "main/game/gs_range_8008C7B0",
       "sections": [
         {
           "name": ".text",
@@ -1197,7 +1197,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/auto_01_80098108_text",
+      "name": "main/dolphin/sdk_range_80098108",
       "sections": [
         {
           "name": ".text",
@@ -1223,7 +1223,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/auto_01_8009A0F4_text",
+      "name": "main/dolphin/sdk_range_8009A0F4",
       "sections": [
         {
           "name": ".text",
@@ -1249,7 +1249,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/auto_01_8009A2D8_text",
+      "name": "main/dolphin/sdk_range_8009A2D8",
       "sections": [
         {
           "name": ".text",
@@ -1275,7 +1275,7 @@
       "total_functions": 4
     },
     {
-      "name": "main/auto_01_8009AFD0_text",
+      "name": "main/dolphin/sdk_range_8009AFD0",
       "sections": [
         {
           "name": ".text",
@@ -1353,7 +1353,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/auto_01_8009BD84_text",
+      "name": "main/dolphin/sdk_range_8009BD84",
       "sections": [
         {
           "name": ".text",
@@ -1418,7 +1418,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/auto_01_8009E7B0_text",
+      "name": "main/dolphin/sdk_range_8009E7B0",
       "sections": [
         {
           "name": ".text",
@@ -1444,7 +1444,7 @@
       "total_functions": 12
     },
     {
-      "name": "main/auto_01_8009F77C_text",
+      "name": "main/dolphin/sdk_range_8009F77C",
       "sections": [
         {
           "name": ".text",
@@ -1483,7 +1483,7 @@
       "total_functions": 8
     },
     {
-      "name": "main/auto_01_800A03B4_text",
+      "name": "main/dolphin/sdk_range_800A03B4",
       "sections": [
         {
           "name": ".text",
@@ -1522,7 +1522,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/auto_01_800A07C4_text",
+      "name": "main/dolphin/sdk_range_800A07C4",
       "sections": [
         {
           "name": ".text",
@@ -1587,7 +1587,7 @@
       "total_functions": 2
     },
     {
-      "name": "main/auto_01_800A2B9C_text",
+      "name": "main/dolphin/sdk_range_800A2B9C",
       "sections": [
         {
           "name": ".text",
@@ -1665,7 +1665,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/auto_01_800A2D38_text",
+      "name": "main/dolphin/sdk_range_800A2D38",
       "sections": [
         {
           "name": ".text",
@@ -1730,7 +1730,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/auto_01_800A4D28_text",
+      "name": "main/dolphin/sdk_range_800A4D28",
       "sections": [
         {
           "name": ".text",
@@ -1756,7 +1756,7 @@
       "total_functions": 38
     },
     {
-      "name": "main/auto_01_800A7820_text",
+      "name": "main/dolphin/sdk_range_800A7820",
       "sections": [
         {
           "name": ".text",
@@ -1821,7 +1821,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/auto_01_800A8178_text",
+      "name": "main/dolphin/sdk_range_800A8178",
       "sections": [
         {
           "name": ".text",
@@ -1847,7 +1847,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/auto_01_800AA288_text",
+      "name": "main/dolphin/sdk_range_800AA288",
       "sections": [
         {
           "name": ".text",
@@ -1886,7 +1886,7 @@
       "total_functions": 20
     },
     {
-      "name": "main/auto_01_800AC02C_text",
+      "name": "main/dolphin/sdk_range_800AC02C",
       "sections": [
         {
           "name": ".text",
@@ -1912,7 +1912,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/auto_01_800B71FC_text",
+      "name": "main/dolphin/sdk_range_800B71FC",
       "sections": [
         {
           "name": ".text",
@@ -1951,7 +1951,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/auto_01_800B771C_text",
+      "name": "main/dolphin/sdk_range_800B771C",
       "sections": [
         {
           "name": ".text",
@@ -1977,7 +1977,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/auto_01_800B857C_text",
+      "name": "main/dolphin/sdk_range_800B857C",
       "sections": [
         {
           "name": ".text",
@@ -2003,7 +2003,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/auto_01_800BA1B4_text",
+      "name": "main/dolphin/sdk_range_800BA1B4",
       "sections": [
         {
           "name": ".text",
@@ -2055,7 +2055,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/auto_01_800BA44C_text",
+      "name": "main/dolphin/sdk_range_800BA44C",
       "sections": [
         {
           "name": ".text",
@@ -2081,7 +2081,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/auto_01_800BAE64_text",
+      "name": "main/dolphin/sdk_range_800BAE64",
       "sections": [
         {
           "name": ".text",
@@ -2120,7 +2120,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/auto_01_800BB30C_text",
+      "name": "main/dolphin/sdk_range_800BB30C",
       "sections": [
         {
           "name": ".text",
@@ -2263,7 +2263,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/auto_01_800BF33C_text",
+      "name": "main/dolphin/sdk_range_800BF33C",
       "sections": [
         {
           "name": ".text",
@@ -2588,7 +2588,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/auto_01_800C3EBC_text",
+      "name": "main/trk/trk_range_800C3EBC",
       "sections": [
         {
           "name": ".text",
@@ -2666,7 +2666,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/auto_01_800C4470_text",
+      "name": "main/trk/trk_range_800C4470",
       "sections": [
         {
           "name": ".text",
@@ -2692,7 +2692,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/auto_01_800C45A0_text",
+      "name": "main/game/gs_range_800C45A0",
       "sections": [
         {
           "name": ".text",
@@ -2718,7 +2718,7 @@
       "total_functions": 2
     },
     {
-      "name": "main/auto_01_800C470C_text",
+      "name": "main/dolphin/sdk_range_800C470C",
       "sections": [
         {
           "name": ".text",
@@ -2744,7 +2744,7 @@
       "total_functions": 6
     },
     {
-      "name": "main/auto_01_800C5458_text",
+      "name": "main/dolphin/sdk_range_800C5458",
       "sections": [
         {
           "name": ".text",
@@ -2887,7 +2887,7 @@
       "total_functions": 5
     },
     {
-      "name": "main/auto_01_800CAA58_text",
+      "name": "main/crt/math_range_800CAA58",
       "sections": [
         {
           "name": ".text",
@@ -2913,7 +2913,7 @@
       "total_functions": 11
     },
     {
-      "name": "main/auto_01_800CE7DC_text",
+      "name": "main/dolphin/sdk_range_800CE7DC",
       "sections": [
         {
           "name": ".text",
@@ -2939,7 +2939,7 @@
       "total_functions": 2
     },
     {
-      "name": "main/auto_01_800CEB64_text",
+      "name": "main/dolphin/sdk_range_800CEB64",
       "sections": [
         {
           "name": ".text",
@@ -3043,7 +3043,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/auto_01_800D1070_text",
+      "name": "main/game/gs_range_800D1070",
       "sections": [
         {
           "name": ".text",
@@ -3095,7 +3095,7 @@
       "total_functions": 277
     },
     {
-      "name": "main/auto_01_800E202C_text",
+      "name": "main/game/gs_range_800E202C",
       "sections": [
         {
           "name": ".text",
@@ -3186,7 +3186,7 @@
       "total_functions": 9
     },
     {
-      "name": "main/auto_01_80101910_text",
+      "name": "main/game/gs_range_80101910",
       "sections": [
         {
           "name": ".text",
@@ -3212,7 +3212,7 @@
       "total_functions": 126
     },
     {
-      "name": "main/auto_01_80109C88_text",
+      "name": "main/game/gs_range_80109C88",
       "sections": [
         {
           "name": ".text",
@@ -3238,7 +3238,7 @@
       "total_functions": 16
     },
     {
-      "name": "main/auto_01_8010CBD0_text",
+      "name": "main/game/gs_range_8010CBD0",
       "sections": [
         {
           "name": ".text",
@@ -3264,7 +3264,7 @@
       "total_functions": 53
     },
     {
-      "name": "main/auto_01_801140DC_text",
+      "name": "main/game/field_range_801140DC",
       "sections": [
         {
           "name": ".text",
@@ -3290,7 +3290,7 @@
       "total_functions": 17
     },
     {
-      "name": "main/auto_01_80114AE0_text",
+      "name": "main/game/field_range_80114AE0",
       "sections": [
         {
           "name": ".text",
@@ -3394,7 +3394,7 @@
       "total_functions": 350
     },
     {
-      "name": "main/auto_01_801652DC_text",
+      "name": "main/game/musyx_range_801652DC",
       "sections": [
         {
           "name": ".text",
@@ -3420,7 +3420,7 @@
       "total_functions": 2
     },
     {
-      "name": "main/auto_01_801653CC_text",
+      "name": "main/game/gs_range_801653CC",
       "sections": [
         {
           "name": ".text",
@@ -3446,7 +3446,7 @@
       "total_functions": 55
     },
     {
-      "name": "main/auto_01_80168C64_text",
+      "name": "main/game/ps_range_80168C64",
       "sections": [
         {
           "name": ".text",
@@ -3472,7 +3472,7 @@
       "total_functions": 77
     },
     {
-      "name": "main/auto_01_8017A5FC_text",
+      "name": "main/game/gs_range_8017A5FC",
       "sections": [
         {
           "name": ".text",
@@ -3498,7 +3498,7 @@
       "total_functions": 68
     },
     {
-      "name": "main/auto_01_8017F2C4_text",
+      "name": "main/game/gs_range_8017F2C4",
       "sections": [
         {
           "name": ".text",
@@ -3563,7 +3563,7 @@
       "total_functions": 16
     },
     {
-      "name": "main/auto_01_801920E4_text",
+      "name": "main/hsd/hsd_range_801920E4",
       "sections": [
         {
           "name": ".text",
@@ -3680,7 +3680,7 @@
       "total_functions": 35
     },
     {
-      "name": "main/auto_01_801A69C0_text",
+      "name": "main/hsd/hsd_range_801A69C0",
       "sections": [
         {
           "name": ".text",
@@ -3953,7 +3953,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/auto_01_801B0158_text",
+      "name": "main/hsd/hsd_range_801B0158",
       "sections": [
         {
           "name": ".text",
@@ -3992,7 +3992,7 @@
       "total_functions": 77
     },
     {
-      "name": "main/auto_01_801BBAC8_text",
+      "name": "main/hsd/hsd_range_801BBAC8",
       "sections": [
         {
           "name": ".text",
@@ -4109,7 +4109,7 @@
       "total_functions": 388
     },
     {
-      "name": "main/auto_01_80201764_text",
+      "name": "main/game/fight_range_80201764",
       "sections": [
         {
           "name": ".text",
@@ -4161,7 +4161,7 @@
       "total_functions": 675
     },
     {
-      "name": "main/auto_01_80265EC4_text",
+      "name": "main/game/gs_range_80265EC4",
       "sections": [
         {
           "name": ".text",
