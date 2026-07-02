@@ -215,7 +215,7 @@ extern void gamedataSetStatus();
 extern void statusGetStatus();
 extern void statusSetStatus();
 /* Forward declarations for self-referencing asm blocks */
-extern void* fn_80104704(s32 key);
+extern void* windowSearchID(s32 key);
 extern void* fn_80134228(s32 offset);
 /* _msgctrlSideName__FP15FightOutPokemonUc already declared at top with typed params */
 extern s32 fn_80133E6C(void* obj, s32 offset);
@@ -235,21 +235,21 @@ extern u8 fn_80135A88(void* ptr);
 extern u8 fn_80135A70(void* ptr);
 extern u32 fn_80135028();
 extern u32 fn_80135F90(u32 index);
-extern u32 fn_80136050(u32 index);
-extern u32 fn_80135FF8(u32 index);
-extern s32 fn_80135FBC(u32 index, u32 subIndex);
+extern u32 koukaDataBiosGetStatusKind(u32 index);
+extern u32 koukaDataBiosGetVar(u32 index);
+extern s32 koukaDataBiosGetValue(u32 index, u32 subIndex);
 extern u32 fn_80136024(u32 index);
 extern s32 fn_801026A4(u32, ...);
 extern void* fn_80132834(void* table, u32 stride, u32 count, u32 type);
 extern void fn_80132A38(u32 id, u32 value);
 extern s32 fn_801338A4(s32 offset);
-extern u32 fn_80133B50(u32 arg0, u32* outMax);
+extern u32 _dbgMenuGetMenuNum__FP14tagWINDOW_WORKPl(u32 arg0, u32* outMax);
 extern u32 fn_80133BE4(void* obj, s32 offset);
 extern s32 fn_80133C3C(s32 key);
-extern u32 fn_80133E1C(void* obj, s32 offset);
+extern u32 _dbgMenuGetMsgID__FP14tagWINDOW_WORKl(void* obj, s32 offset);
 extern s32 _dbgMenuGetLink__Fl(s32 idx);
 extern u32 fn_80134274(void);
-extern s32 fn_801342B8(s32 idx);
+extern s32 dbgMenuGetLink__Fl(s32 idx);
 extern u32 fn_80134304(void);
 extern void fn_80135338(void*);
 extern void fn_801353C0(void*, u8, u8, u8, u8);
@@ -315,7 +315,7 @@ u32 fn_801316D8(void) { return lbl_8047AE9C; }
 u32 fn_801316E0(void) { return lbl_8047AE98; }
 
 /* 0x801316E8 | 0x2C -- read byte from stream, store to obj+0x03 if flag clear */
-u32 fn_801316E8(EffectUtilCommandObj* obj) {
+u32 msgctrlTalkSE(EffectUtilCommandObj* obj) {
     u8* stream;
     if (obj->activeFlag == 0) {
         stream = obj->stream;
@@ -328,7 +328,7 @@ u32 fn_801316E8(EffectUtilCommandObj* obj) {
 
 /* 0x80131768 | 0x2C -- read byte from stream, store to obj+0x02 if flag set */
 extern void* fn_80132834(void* table, u32 stride, u32 count, u32 type);
-u32 fn_80131768(EffectUtilCommandObj* obj) {
+u32 msgctrlShadow(EffectUtilCommandObj* obj) {
     u8* stream;
     if (obj->activeFlag != 0) {
         stream = obj->stream;
@@ -671,7 +671,7 @@ void fn_80131CC0(void) {
 void _msgctrlSideName__FP15FightOutPokemonUc(u32 arg1, u32 arg2) {
     extern void fn_800FA280();
     extern void fn_80132A38();
-    extern void fn_801F0058();
+    extern void fightTargetIsHostSide();
     extern void fn_801F025C();
     extern void fn_801F18DC();
     extern void fn_801F4354();
@@ -791,7 +791,7 @@ void _msgctrlSideName__FP15FightOutPokemonUc(u32 arg1, u32 arg2) {
     }
     r3 = r24;
     r4 = r30;
-    fn_801F0058();
+    fightTargetIsHostSide();
     r0 = r3 & 0xFF;
     if (r0 == (u32)0x1) {
         r0 = r31 & 0xFF;
@@ -1044,9 +1044,9 @@ u32 fn_8013225C(void) { return lbl_8047ADCC; }
 /* 0x80132264 | 0x8 | sda_getter */
 u32 fn_80132264(void) { return lbl_8047ADC8; }
 
-/* 0x8013226C | 0x28 -- calls fn_8011CA34(lbl_8047AE7C) then fn_8011CA1C */
+/* 0x8013226C | 0x28 -- calls wazaDataBiosGetPtr(lbl_8047AE7C) then fn_8011CA1C */
 extern u16  lbl_8047AE7C;
-extern void fn_8011CA34(u16 handle);
+extern void wazaDataBiosGetPtr(u16 handle);
 extern void fn_8011CA1C(void);
 extern u16  lbl_8047AE7C;
 #if 0
@@ -1056,7 +1056,7 @@ asm void fn_8013226C(void) {
 #else
 #pragma peephole off
 void fn_8013226C(void) {
-    fn_8011CA34(lbl_8047AE7C);
+    wazaDataBiosGetPtr(lbl_8047AE7C);
     fn_8011CA1C();
 }
 #pragma peephole on
@@ -1211,7 +1211,7 @@ void fn_801324CC(EffectUtilCommandObj* obj) {
 }
 
 /* 0x801325C4 | 0x68 -- read byte command into u16 field and apply */
-s32 fn_801325C4(EffectUtilCommandObj* obj) {
+s32 msgctrlFont(EffectUtilCommandObj* obj) {
     u8* stream;
 
     if (obj->activeFlag == 0) {
@@ -1280,12 +1280,12 @@ u32 fn_80132690(void* obj) {
 
 /* 0x8013275C | 0x84 */
 #if 0
-asm void fn_8013275C(void) {
+asm void msgctrlKeyEnd(void) {
 #include "src/game/effect/effect_util_fn_8013275C.inc"
 }
 #else
 #pragma peephole off
-u32 fn_8013275C(void* obj) {
+u32 msgctrlKeyEnd(void* obj) {
     u8* p = (u8*)obj;
     if (p[0x44] & 0x02) {
         p[0x45] = 1;
@@ -1600,7 +1600,7 @@ void fn_80132C48(void) {
 #endif
 
 /* 0x80132C6C | 0x310 */
-extern u32 fn_800E3534(u32 size);
+extern u32 _toolentryAlloc__FUl(u32 size);
 extern u32 fn_800E27B0(u32 handle);
 extern u32 lbl_8047AEB4;
 extern u32 lbl_8047AEC0;
@@ -1636,7 +1636,7 @@ void fn_80132C6C(u32 count, u32 maxPerSlot, u32 arg2, u32 arg3) {
     lbl_8047AECC = arg3;
     lbl_8047AEC8 = arg2;
 
-    lbl_8047AEB8 = (u16)fn_800E3534(count * 0x18);
+    lbl_8047AEB8 = (u16)_toolentryAlloc__FUl(count * 0x18);
     if (lbl_8047AEB8 == 0) return;
     lbl_8047AEB0 = fn_800E27B0(lbl_8047AEB8);
 
@@ -1654,7 +1654,7 @@ void fn_80132C6C(u32 count, u32 maxPerSlot, u32 arg2, u32 arg3) {
     }
 
     total = lbl_8047AEB4 * lbl_8047AEC0;
-    lbl_8047AEC4 = (u16)fn_800E3534(total << 5);
+    lbl_8047AEC4 = (u16)_toolentryAlloc__FUl(total << 5);
     if (lbl_8047AEC4 == 0) return;
     lbl_8047AEBC = fn_800E27B0(lbl_8047AEC4);
     if (total == 0) return;
@@ -1876,7 +1876,7 @@ void fn_80133664(void* obj) {
     s8 minor;
 
     flags = *(u16*)((u8*)fn_80105624() + 0x6);
-    entryCount = (s8)fn_80133B50((u32)obj, NULL);
+    entryCount = (s8)_dbgMenuGetMenuNum__FP14tagWINDOW_WORKPl((u32)obj, NULL);
     maxCount = (s8)fn_8005D9E4(*(u32*)((u8*)obj + 0x04));
     if (entryCount < maxCount) {
         maxCount = entryCount;
@@ -2018,7 +2018,7 @@ retry:
 
     outValue = (s32*)(lbl_8047AEDC + fn_80133C3C(key) * 4);
     valueIndex = fn_801026A4(sceneId, key, outValue, 0, 1, 0);
-    obj = (u8*)fn_80104704(sceneId);
+    obj = (u8*)windowSearchID(sceneId);
     if (obj != NULL) {
         *outValue = (s8)obj[0x94] + (s8)obj[0x95];
     } else {
@@ -2090,11 +2090,11 @@ retry:
 /* 0x80133B50 | 0x94 */
 extern u32 fn_800FA444(u32 val);
 #if 0
-asm void fn_80133B50(void) {
+asm void _dbgMenuGetMenuNum__FP14tagWINDOW_WORKPl(void) {
 #include "src/game/effect/effect_util_fn_80133B50.inc"
 }
 #else
-u32 fn_80133B50(u32 arg0, u32* outMax) {
+u32 _dbgMenuGetMenuNum__FP14tagWINDOW_WORKPl(u32 arg0, u32* outMax) {
     u32 index;
     u32 value;
     u32 max;
@@ -2105,7 +2105,7 @@ u32 fn_80133B50(u32 arg0, u32* outMax) {
     }
     index = 0;
     do {
-        value = fn_80133E1C((void*)arg0, index);
+        value = _dbgMenuGetMsgID__FP14tagWINDOW_WORKl((void*)arg0, index);
         if (outMax != NULL) {
             value = fn_800FA444(value) >> 16;
             max = *outMax;
@@ -2137,7 +2137,7 @@ s32 fn_80133C3C(s32 key) {
     EffectUtilCountFunc countFunc;
     EffectUtilEntryFunc entryFunc;
 
-    obj = (u8*)fn_80104704(key);
+    obj = (u8*)windowSearchID(key);
     if (obj != NULL) {
         selected = fn_80133E6C(obj, (s8)obj[0x94] + (s8)obj[0x95]);
         if (selected > 0) {
@@ -2242,7 +2242,7 @@ s32 fn_80133E6C(void* obj, s32 offset) {
             }
 
             if (linked > 0 && (s32)fn_80134304() > linked) {
-                linked = fn_801342B8(linked);
+                linked = dbgMenuGetLink__Fl(linked);
                 if ((s16)linked <= 0 || (s32)fn_80134304() <= (s16)linked) {
                     linked = 0;
                 }
@@ -2309,8 +2309,8 @@ s32 _dbgMenuGetLink__Fl(s32 idx) {
 }
 #endif
 
-/* 0x80134228 | 0x30 -- saturate add: max(0, lbl_80478848 + arg) then fn_80104704 */
-/* extern void* fn_80104704(s32 key); -- forward-declared K&R style above */
+/* 0x80134228 | 0x30 -- saturate add: max(0, lbl_80478848 + arg) then windowSearchID */
+/* extern void* windowSearchID(s32 key); -- forward-declared K&R style above */
 #pragma push
 #pragma optimization_level 1
 void* fn_80134228(s32 offset) {
@@ -2318,7 +2318,7 @@ void* fn_80134228(s32 offset) {
     s32 mask;
     mask = offset >> 31;
     key = (s32)lbl_80478848 + offset;
-    return fn_80104704(key & ~mask);
+    return windowSearchID(key & ~mask);
 }
 #pragma pop
 
@@ -2573,7 +2573,7 @@ s32 fn_801348EC(void* base, void* src, s8 slot, s8 idx) {
 #endif
 
 /* 0x801349DC | 0xBC */
-extern void fn_800F9E70(void);
+extern void GScharCpy(void);
 #if 0
 asm void fn_801349DC(void) {
 #include "src/game/effect/effect_util_fn_801349DC.inc"
@@ -2582,7 +2582,7 @@ asm void fn_801349DC(void) {
 #pragma optimization_level 4
 #pragma scheduling on
 s32 fn_801349DC(void* base, s8 slot, u16* name) {
-    extern void fn_800F9E70(void*, u16*);
+    extern void GScharCpy(void*, u16*);
     s32 len;
     u16* p;
     s8 s;
@@ -2599,7 +2599,7 @@ s32 fn_801349DC(void* base, s8 slot, u16* name) {
         len++;
     }
     if (len > 8) return 0;
-    fn_800F9E70((u8*)base + (s32)s * 0x24a4, name);
+    GScharCpy((u8*)base + (s32)s * 0x24a4, name);
     return 1;
 }
 #pragma scheduling off
@@ -2760,12 +2760,12 @@ s32 fn_80134E10(void* base, void* src, s8 slot, s8 idx) {
 
 /* 0x80134EF0 | 0x98 */
 #if 0
-asm void fn_80134EF0(void) {
+asm void getPokemon__5PCBOXFScSc(void) {
 #include "src/game/effect/effect_util_fn_80134EF0.inc"
 }
 #else
 #pragma scheduling on
-void* fn_80134EF0(void* base, s8 r4, s8 r5) {
+void* getPokemon__5PCBOXFScSc(void* base, s8 r4, s8 r5) {
     s8 slot;
     s8 entry;
     if (base == 0) {
@@ -3633,12 +3633,12 @@ u32 fn_80135E44(u32 kind, u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
 extern u32 lbl_80478B90;
 extern EffectLinkedStatusRow lbl_80363B78[];
 #if 0
-asm void fn_80135F58(void) {
+asm void koukaLinkDataBiosGetKouka(void) {
 #include "src/game/effect/effect_util_fn_80135F58.inc"
 }
 #else
 #pragma scheduling on
-u32 fn_80135F58(u32 index, u32 sub) {
+u32 koukaLinkDataBiosGetKouka(u32 index, u32 sub) {
     if (index > lbl_80478B90 || sub > 8) {
         return 0;
     }
@@ -3668,7 +3668,7 @@ u32 fn_80135F90(u32 index) {
 #pragma push
 #pragma scheduling on
 #pragma fp_contract on
-s32 fn_80135FBC(u32 index, u32 subIndex) {
+s32 koukaDataBiosGetValue(u32 index, u32 subIndex) {
     extern EffectStatusTableEntry lbl_80363B18[];
     extern u32 lbl_80478B88;
     if (index > lbl_80478B88 || subIndex > 2) {
@@ -3683,7 +3683,7 @@ s32 fn_80135FBC(u32 index, u32 subIndex) {
 /* 0x80135FF8 | 0x2C */
 /* Get the status update mode from the effect status table. */
 #pragma scheduling on
-u32 fn_80135FF8(u32 index) {
+u32 koukaDataBiosGetVar(u32 index) {
     extern EffectStatusTableEntry lbl_80363B18[];
     extern u32 lbl_80478B88;
 
@@ -3711,7 +3711,7 @@ u32 fn_80136024(u32 index) {
 /* 0x80136050 | 0x28 */
 /* Get the status kind from the effect status table. */
 #pragma scheduling on
-u32 fn_80136050(u32 index) {
+u32 koukaDataBiosGetStatusKind(u32 index) {
     extern EffectStatusTableEntry lbl_80363B18[];
     extern u32 lbl_80478B88;
 
@@ -3746,7 +3746,7 @@ void fn_80136078(u32 index, void* arg1, void* arg2, s32* out) {
     }
 
     for (sub = 0; sub < 8; sub++) {
-        if ((fn_80135F58(linkedIndex, sub & 0xFFFF) & 0xFFFF) != 0) {
+        if ((koukaLinkDataBiosGetKouka(linkedIndex, sub & 0xFFFF) & 0xFFFF) != 0) {
             if (out != NULL) {
                 _koukaOneExec__FUlPvPvPl(index, arg1, arg2, out + ((sub & 0xFFFF) + 1));
             } else {
@@ -3779,11 +3779,11 @@ void _koukaOneExec__FUlPvPvPl(u32 index, void* arg1, void* arg2, s32* out) {
         return;
     }
 
-    statusKind = fn_80136050(index);
+    statusKind = koukaDataBiosGetStatusKind(index);
     statusSub = fn_80136024(index);
-    amount = (s16)fn_80135FBC(index, 0);
-    divisor = (s16)fn_80135FBC(index, 1);
-    mode = fn_80135FF8(index) & 0xFF;
+    amount = (s16)koukaDataBiosGetValue(index, 0);
+    divisor = (s16)koukaDataBiosGetValue(index, 1);
+    mode = koukaDataBiosGetVar(index) & 0xFF;
 
     current = fn_80135E44(statusKind, (u32)arg1, 0, statusSub, amount & 0xFFFF);
     if (mode == 0 || mode == 2 || mode == 3) {
@@ -3841,10 +3841,10 @@ extern void fn_800EFD3C(void);
 extern void fn_800EFD14(void);
 extern void fn_8013757C(void);
 extern void fn_800EF590(void);
-extern void fn_801DB060(void);
+extern void wazaSequenceSysGetResID(void);
 extern void fn_8010147C(void);
 extern void fn_801013A0(void);
-extern void fn_800E4014(void);
+extern void GSmodelSetVisibility(void);
 extern void fn_8013735C(void);
 extern void fn_8013D604(void);
 extern void fn_80137114(void);
@@ -3875,7 +3875,7 @@ void fn_801364A8(void) {
     extern void fn_800E01D0();
     extern void fn_800E27B0();
     extern void fn_800E2C04();
-    extern void fn_800E4014();
+    extern void GSmodelSetVisibility();
     extern void fn_800EF590();
     extern void fn_800EFD14();
     extern void fn_800EFD3C();
@@ -3887,7 +3887,7 @@ void fn_801364A8(void) {
     extern void fn_8013757C();
     extern void fn_80137780();
     extern void fn_8013D604();
-    extern void fn_801DB060();
+    extern void wazaSequenceSysGetResID();
     u8 sp[0x70];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -4223,9 +4223,9 @@ void fn_801364A8(void) {
         r3 = *(u32*)((u8*)r29 + 0x30);
         *(u16*)((u8*)r28 + 0x52) = r3;
         *(u16*)((u8*)r28 + 0x48) = r0;
-        fn_801DB060();
+        wazaSequenceSysGetResID();
         *(u16*)((u8*)r28 + 0x4A) = r3;
-        fn_801DB060();
+        wazaSequenceSysGetResID();
         *(u16*)((u8*)r28 + 0x4C) = r3;
         r3 = r27;
         r5 = 0x4e20;
@@ -4244,7 +4244,7 @@ void fn_801364A8(void) {
         fn_800F9318();
         if (r3 != (u32)0x0) {
             r4 = 0x0;
-            fn_800E4014();
+            GSmodelSetVisibility();
         }
         r3 = *(u32*)((u8*)r29 + 0x34);
         r0 = r3 + 0x1f;
@@ -4310,9 +4310,9 @@ void fn_801364A8(void) {
         f0 = *(f32*)((u8*)r29 + 0x28);
         *(f32*)((u8*)r28 + 0xD0) = f0;
         *(u32*)((u8*)r28 + 0x58) = r0;
-        fn_801DB060();
+        wazaSequenceSysGetResID();
         *(u32*)((u8*)r28 + 0x60) = r3;
-        fn_801DB060();
+        wazaSequenceSysGetResID();
         *(u32*)((u8*)r28 + 0x5C) = r3;
         r3 = r31;
         r5 = 0x4e20;
@@ -4331,7 +4331,7 @@ void fn_801364A8(void) {
         fn_800F9318();
         if (r3 != (u32)0x0) {
             r4 = 0x0;
-            fn_800E4014();
+            GSmodelSetVisibility();
         }
         r3 = *(u32*)((u8*)r29 + 0x2C);
         r0 = r3 + 0x1f;
@@ -4522,9 +4522,9 @@ void fn_801364A8(void) {
         *(u32*)((u8*)r28 + 0x8) = r0;
         r0 = *(u32*)((u8*)r29 + 0x0);
         if ((s32)r0 != (s32)0x0) {
-            fn_801DB060();
+            wazaSequenceSysGetResID();
             *(u32*)((u8*)r28 + 0xC) = r3;
-            fn_801DB060();
+            wazaSequenceSysGetResID();
             *(u32*)((u8*)r28 + 0x10) = r3;
             r3 = r27;
             r5 = 0x4e20;
@@ -4543,7 +4543,7 @@ void fn_801364A8(void) {
             fn_800F9318();
             if (r3 != (u32)0x0) {
                 r4 = 0x0;
-                fn_800E4014();
+                GSmodelSetVisibility();
             }
             r3 = *(u32*)((u8*)r29 + 0x0);
             r0 = r3 + 0x1f;
@@ -4648,13 +4648,13 @@ void fn_801364A8(void) {
 extern s32 fn_801666BC(u16);
 extern u16 lbl_8047AEA4;
 #if 0
-asm void fn_80131588(void) {
+asm void msgctrlSndWait(void) {
 #include "src/game/effect/effect_util_fn_80131588.inc"
 }
 #else
 #pragma peephole off
 #pragma scheduling on
-u32 fn_80131588(EffectUtilCommandObj* obj) {
+u32 msgctrlSndWait(EffectUtilCommandObj* obj) {
     if (obj->activeFlag == 0) {
         u16 handle = lbl_8047AEA4;
         if (handle == 0) {
@@ -4672,12 +4672,12 @@ u32 fn_80131588(EffectUtilCommandObj* obj) {
 extern void fn_80165A20(u16, u32, u32);
 extern u16 lbl_8047AEA4;
 #if 0
-asm void fn_801315EC(void) {
+asm void msgctrlSndPlay(void) {
 #include "src/game/effect/effect_util_fn_801315EC.inc"
 }
 #else
 #pragma peephole off
-u32 fn_801315EC(EffectUtilCommandObj* obj) {
+u32 msgctrlSndPlay(EffectUtilCommandObj* obj) {
     if (obj->activeFlag == 0) {
         u16 handle = lbl_8047AEA4;
         if (handle != 0) {
@@ -4690,7 +4690,7 @@ u32 fn_801315EC(EffectUtilCommandObj* obj) {
 #endif
 extern void GSmsgAdjustAlign(void);
 #if 0
-asm void fn_80131714(void) {
+asm void msgctrlAlign(void) {
 #include "src/game/effect/effect_util_fn_80131714.inc"
 }
 #else
@@ -4698,7 +4698,7 @@ asm void fn_80131714(void) {
 #pragma push
 #pragma peephole off
 #pragma scheduling on
-s32 fn_80131714(EffectUtilCommandObj* obj) {
+s32 msgctrlAlign(EffectUtilCommandObj* obj) {
     extern void GSmsgAdjustAlign(void*);
     u8* stream;
     if (obj->activeFlag != 0) {
@@ -4714,12 +4714,12 @@ s32 fn_80131714(EffectUtilCommandObj* obj) {
 #pragma pop
 #endif
 #if 0
-asm void fn_80132454(void) {
+asm void msgctrlWait(void) {
 #include "src/game/effect/effect_util_fn_80132454.inc"
 }
 #else
 #pragma optimization_level 4
-s32 fn_80132454(EffectUtilCommandObj* obj) {
+s32 msgctrlWait(EffectUtilCommandObj* obj) {
     u8* stream;
     s16 counter;
     if (obj->activeFlag != 0) {
@@ -4773,7 +4773,7 @@ s32 fn_80132570(EffectUtilCommandObj* obj) {
 #endif
 extern void fn_800FAA98(void);
 #if 0
-asm void fn_8013264C(void) {
+asm void msgctrlRubyStart(void) {
 #include "src/game/effect/effect_util_fn_8013264C.inc"
 }
 #else
@@ -4781,7 +4781,7 @@ asm void fn_8013264C(void) {
 #pragma push
 #pragma peephole off
 #pragma scheduling on
-s32 fn_8013264C(EffectUtilCommandObj* obj) {
+s32 msgctrlRubyStart(EffectUtilCommandObj* obj) {
     extern void fn_800FAA98(void*);
     if (obj->activeFlag != 0) {
         fn_800FAA98(obj);
@@ -4794,11 +4794,11 @@ s32 fn_8013264C(EffectUtilCommandObj* obj) {
 #endif
 extern f64 lbl_8047D0E0;
 #if 0
-asm void fn_801327E0(void) {
+asm void msgctrlCR(void) {
 #include "src/game/effect/effect_util_fn_801327E0.inc"
 }
 #else
-u32 fn_801327E0(void* obj) {
+u32 msgctrlCR(void* obj) {
     u8* p = (u8*)obj;
     *(f32*)(p + 0x0C) = *(f32*)(p + 0x04);
     *(f32*)(p + 0x10) += *(f32*)(p + 0x64) * (f32)((s32)(u8)p[0x23] + (s32)(s8)p[0x42]);
@@ -4825,27 +4825,27 @@ u32 fn_80132F7C(void) {
 extern void fn_801E1810(void);
 extern void _threadSwitch(void);
 extern u8 fn_801E1874(void);
-extern s32 fn_8010264C(u32, u32);
-extern void fn_800C8520(u8*, u8*, ...);
+extern s32 menuOpen(u32, u32);
+extern void sprintf(u8*, u8*, ...);
 extern void fn_801E189C(u8*, u32);
 extern u8 lbl_80272AA8[];
 extern u8 lbl_8047D0E8[4];
 #if 0
-asm void fn_80132FD8(void) {
+asm void GSmoviePlay(void) {
 #include "src/game/effect/effect_util_fn_80132FD8.inc"
 }
 #else
 #pragma scheduling on
-u32 fn_80132FD8(void) {
+u32 GSmoviePlay(void) {
     u8 buf[0x18];
     s32 id;
     while ((u32)(fn_801E1874() & 0xFF) == 1) {
         fn_801E1810();
         _threadSwitch();
     }
-    id = fn_8010264C(2, 1);
+    id = menuOpen(2, 1);
     if (id != -1) {
-        fn_800C8520(buf, lbl_80272AA8, lbl_8047D0E8, id);
+        sprintf(buf, lbl_80272AA8, lbl_8047D0E8, id);
         fn_801E189C(buf, 0);
     }
     return 0;
@@ -4880,11 +4880,11 @@ asm void fn_8013334C(void) {
 #pragma optimization_level 4
 #pragma scheduling on
 u32 fn_8013334C(void) {
-    extern s32 fn_8010264C(u32, u32);
+    extern s32 menuOpen(u32, u32);
     extern s32 fn_801D1CC4(s32);
     extern void fn_801D1D58(s32);
     s32 slot;
-    while ((slot = fn_8010264C(2, 1)) != -1) {
+    while ((slot = menuOpen(2, 1)) != -1) {
         if (fn_801D1CC4(slot) == 0) {
             fn_801D1D58(slot);
             fn_801D268C();
@@ -4982,12 +4982,12 @@ u32 fn_80133BE4(void* obj, s32 offset) {
 #endif
 extern u32 lbl_80478F8C;
 #if 0
-asm void fn_80133E1C(void) {
+asm void _dbgMenuGetMsgID__FP14tagWINDOW_WORKl(void) {
 #include "src/game/effect/effect_util_fn_80133E1C.inc"
 }
 #else
 #pragma peephole off
-u32 fn_80133E1C(void* obj, s32 offset) {
+u32 _dbgMenuGetMsgID__FP14tagWINDOW_WORKl(void* obj, s32 offset) {
     EffectUtilEntry* result;
     s32 index = fn_80133E6C(obj, offset);
     {
@@ -5031,11 +5031,11 @@ _ret2:
 #endif
 extern u32 lbl_80478F8C;
 #if 0
-asm void fn_801342B8(void) {
+asm void dbgMenuGetLink__Fl(void) {
 #include "src/game/effect/effect_util_fn_801342B8.inc"
 }
 #else
-s32 fn_801342B8(s32 idx) {
+s32 dbgMenuGetLink__Fl(s32 idx) {
     EffectUtilEntryFunc fp = (EffectUtilEntryFunc)lbl_80478F8C;
     EffectUtilEntry* result;
     if (fp == NULL) {
@@ -5089,12 +5089,12 @@ _compute:
 #endif
 extern u32 lbl_80478B98;  /* effect count (SDA) */
 #if 0
-asm void fn_80136368(void) {
+asm void tenkouDataBiosGetFightInitMsgId(void) {
 #include "src/game/effect/effect_util_fn_80136368.inc"
 }
 #else
 #pragma scheduling on
-u32 fn_80136368(u16 index) {
+u32 tenkouDataBiosGetFightInitMsgId(u16 index) {
     EffectTraceFxEntry* entry;
     if ((u32)index > lbl_80478B98) {
         entry = NULL;

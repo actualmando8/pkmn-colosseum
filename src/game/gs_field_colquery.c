@@ -24,16 +24,16 @@
  *   fn_80111470 (GSfield_FloorHeightAtPoint)
  *   fn_8011163C (GSfield_HeightmapSample)
  *   fn_80111864 (GSfield_TerrainProbe)
- *   fn_80111B9C (GSfield_IsPointOnFloor)
+ *   GScolsys2CheckGetEventID (GSfield_IsPointOnFloor)
  *   fn_80111C24 (GSfield_RegionBoundsTest)
  *   fn_80111DF8 (GSfield_ClipToFloorBounds)
  *   fn_80111F2C (GSfield_ProjectPointToFloor)
  *   fn_8011207C (GSfield_FindSpawnPoint)
  *   fn_80112260 (GSfield_GetSpawnPosition)
- *   fn_80112380 (GSfield_CheckReady)
+ *   floorCheckFightKind (GSfield_CheckReady)
  *   fn_801123D4 (GSfield_ResourceInit)
  *   fn_80112700 (GSfield_GetActiveFloorId)
- *   fn_8011274C (GSfield_FinalizeLoad)
+ *   floorCheckFade (GSfield_FinalizeLoad)
  *   fn_80112780 (GSfield_BeginTransition)
  *   fn_801127BC (GSfield_SetTransitionCallback)
  *   fn_80112844 (GSfield_GetTransitionState)
@@ -43,8 +43,8 @@
  *   fn_801129CC (GSfield_UpdateObjects)
  *   fn_80112F8C (GSfield_ClearObjectList)
  *   fn_80112FEC (GSfield_AddObject)
- *   fn_80113248 (GSfield_RemoveObject)
- *   fn_801134E4 (GSfield_MoveObject)
+ *   _floorInitCharacters__FP11GSfloor_dd_ (GSfield_RemoveObject)
+ *   floorInitMap (GSfield_MoveObject)
  *   fn_80113778 (GSfield_SetObjectVisible)
  *   fn_80113828 (GSfield_GetObjectPosition)
  *   fn_8011388C (GSfield_SetObjectPosition)
@@ -58,9 +58,9 @@
  *   fn_80113B84 (GSfield_DespawnFieldModel)
  *   fn_80113D10 (GSfield_GetModelGroup)
  *   fn_80113D34 (GSfield_GetModelIndex)
- *   fn_80113D58 (GSfield_LoadFieldModel)
+ *   floorOpenObject (GSfield_LoadFieldModel)
  *   fn_80113F48 (GSfield_UnloadFieldModel)
- *   fn_80113F6C (GSfield_SetModelAnimation)
+ *   floorGetResource (GSfield_SetModelAnimation)
  *   fn_80113FB4 (GSfield_GetModelAnimFrame)
  *   fn_80113FE8 (GSfield_PlayModelAnimation)
  *   fn_801140C8 (GSfield_StopModelAnimation)
@@ -68,7 +68,7 @@
  *   fn_8011416C (GSfield_GetModelMaterial)
  *   fn_8011418C (GSfield_SetModelTexture)
  *   fn_801141D8 (GSfield_GetModelTexture)
- *   fn_801141F8 (GSfield_AttachToJoint)
+ *   EvlogSet__FScUl (GSfield_AttachToJoint)
  *   fn_80114254 (GSfield_DetachFromJoint)
  *   fn_801142B4 (GSfield_GetJointPosition)
  *   fn_801142F8 (GSfield_GetJointCount)
@@ -79,7 +79,7 @@
  * sorted by distance.
  *
  * Key patterns observed in the disassembly:
- *   - Heavy use of fn_800A37CC (MTXMultVec3) for coordinate transforms
+ *   - Heavy use of PSMTXMultVec (MTXMultVec3) for coordinate transforms
  *   - Calls to fn_8010C7BC (GScolsys2_QueryTriVisible) for per-tri checks
  *   - Calls to fn_8010CA30 / fn_8010C8D0 for forward/inverse transforms
  *   - Calls to fn_8010DEF0 (GScolsys2_TriangleBoundsCheck)
@@ -98,13 +98,13 @@ extern void  fn_800DD970(const char* fmt, ...);        /* OSReport / GSlog */
 extern void* memcpy(void* dst, const void* src, u32 n);
 
 /* Matrix / vector math helpers */
-extern void  fn_800A37CC(void* mtxDst, void* vecSrc, void* vecDst);  /* MTXMultVec3 */
+extern void  PSMTXMultVec(void* mtxDst, void* vecSrc, void* vecDst);  /* MTXMultVec3 */
 extern void  fn_800A3A78(void* vecA, void* scale, void* vecOut);     /* VEC scale */
 extern void  fn_800A3A9C(void* a, void* b, void* out);             /* VEC diff/setup */
-extern f32   fn_800A3B38(void* vec);                                /* VEC magnitude */
+extern f32   PSVECMag(void* vec);                                /* VEC magnitude */
 extern void  fn_800A3AC0(void* curve, void* paramOut, f32 t);       /* VEC lerp */
 f32   fn_800A3B7C(void* a, void* b);
-f32   fn_800A3BD8(void* a, void* b);
+f32   PSVECSquareDistance(void* a, void* b);
 
 /* GScolsys2 functions */
 extern void* fn_8010CBC0(void);                         /* GScolsys2_GetWZXData */
@@ -113,7 +113,7 @@ extern void  fn_8010CA30(void* mtxOut, u32 layerIdx);   /* GScolsys2_BuildInvers
 extern void  fn_8010C8D0(void* mtxOut, u32 layerIdx);   /* GScolsys2_BuildTransform */
 extern s32   fn_8010DEF0(void* result, void* origin,
                           void* verts, void* normal);    /* GScolsys2_TriangleBoundsCheck */
-f32   fn_8010C77C(void* normal, void* p1, void* p2);
+f32   GScolsy2UtilGetSidePlanePoint(void* normal, void* p1, void* p2);
 void  GScolsy2UtilGetCpPlanePoint(void* out, void* normal, void* verts, void* point);
 f32   GScolsys2UtilGetCpLinePoint(void* out, void* start, void* end, void* point);
 s32   GScolsy2UtilChkInTri(void* point, void* verts, void* normal);
@@ -251,7 +251,7 @@ typedef struct GSFieldColqueryState {
 s32 GSfield_RayCast(void* origin, void* direction) {
     /* TODO: match -- 824 bytes at 0x8010E138 */
     /* Calls: fn_8010CBC0, fn_8010C7BC, fn_8010CA30, fn_8010C8D0,
-     *        fn_800A37CC, fn_8010DEF0 */
+     *        PSMTXMultVec, fn_8010DEF0 */
 }
 #pragma pop
 
@@ -428,7 +428,7 @@ void fn_8010F6A0(void* arg0, void* arg1, void* arg2, f32 t) {
     f32 v[3];
 
     fn_800A3A9C(arg2, arg1, v);
-    fn_800A3AC0(v, v, t / fn_800A3B38(v));
+    fn_800A3AC0(v, v, t / PSVECMag(v));
     fn_800A3A78(v, arg1, arg0);
 }
 
@@ -465,7 +465,7 @@ void fn_8010FDF8(void) {
 #pragma optimizewithasm off
 s32 fn_8010FFC4(s32 index, s32 flag) {
 #pragma optimization_level 4
-    extern u8* fn_8010CBD0(void);
+    extern u8* GScolsys2GetCurFloor(void);
     u8* table;
     u8* entry;
     u8* p;
@@ -474,7 +474,7 @@ s32 fn_8010FFC4(s32 index, s32 flag) {
     if (index < 0 || index >= 0x30) {
         result = 4;
     } else {
-        table = fn_8010CBD0();
+        table = GScolsys2GetCurFloor();
         if (table == NULL) {
             result = 1;
         } else {
@@ -505,13 +505,13 @@ s32 fn_8010FFC4(s32 index, s32 flag) {
 #pragma optimizewithasm off
 s32 fn_80110084(s32* outIndex, void* data) {
 #pragma optimization_level 4
-    extern void* fn_8010CBD0(void);
+    extern void* GScolsys2GetCurFloor(void);
     u8* base;
     s32 index;
     u8* entry;
     s32 i;
 
-    base = (u8*)fn_8010CBD0();
+    base = (u8*)GScolsys2GetCurFloor();
     if (base == NULL) {
         return 1;
     }
@@ -593,22 +593,22 @@ s32 fn_80110E64(GScolsys2Vec3* point, GScolsys2Vec3* dirVec, f32 radius,
             }
         }
         if (scanIdx >= outCount) {
-            fn_800A37CC(mtxFwd, &tri->normal, &planePoint);
+            PSMTXMultVec(mtxFwd, &tri->normal, &planePoint);
             if (fn_800A3B7C(&planePoint, dirVec) < 0.0f) {
                 vdst = verts;
                 vsrc = tri->verts;
                 vertIdx = 0;
                 do {
-                    fn_800A37CC(mtxInv, vsrc, vdst);
+                    PSMTXMultVec(mtxInv, vsrc, vdst);
                     vertIdx++;
                     vsrc++;
                     vdst++;
                 } while (vertIdx < 3);
-                if (fn_8010C77C(&planePoint, verts, point) < 0.0f) {
+                if (GScolsy2UtilGetSidePlanePoint(&planePoint, verts, point) < 0.0f) {
                     hit = 0;
                 } else {
                     GScolsy2UtilGetCpPlanePoint(&cp, &planePoint, verts, point);
-                    if (fn_800A3BD8(&cp, point) >= radiusSq) {
+                    if (PSVECSquareDistance(&cp, point) >= radiusSq) {
                         hit = 0;
                     } else if (GScolsy2UtilChkInTri(&cp, verts, &planePoint) == 0) {
                         hit = 0;
@@ -643,20 +643,20 @@ s32 fn_80110E64(GScolsys2Vec3* point, GScolsys2Vec3* dirVec, f32 radius,
                 }
             }
             if (scanIdx >= outCount) {
-                fn_800A37CC(mtxFwd, &tri->normal, &planePoint);
+                PSMTXMultVec(mtxFwd, &tri->normal, &planePoint);
                 if (fn_800A3B7C(&planePoint, dirVec) < 0.0f) {
                     vdst = verts;
                     vsrc = tri->verts;
                     vertIdx = 0;
                     do {
-                        fn_800A37CC(mtxInv, vsrc, vdst);
+                        PSMTXMultVec(mtxInv, vsrc, vdst);
                         vertIdx++;
                         vsrc++;
                         vdst++;
                     } while (vertIdx < 3);
                     edgeMasksA = lbl_8047CF48;
                     flags = tri->flags;
-                    if (fn_8010C77C(&planePoint, verts, point) < 0.0f) {
+                    if (GScolsy2UtilGetSidePlanePoint(&planePoint, verts, point) < 0.0f) {
                         hit = 0;
                     } else {
                         vsrc = verts;
@@ -669,7 +669,7 @@ s32 fn_80110E64(GScolsys2Vec3* point, GScolsys2Vec3* dirVec, f32 radius,
                                 }
                                 lineT = GScolsys2UtilGetCpLinePoint(&lineCp, vsrc, &verts[next], point);
                                 if (lineT >= 0.0f && lineT <= 1.0f
-                                    && fn_800A3BD8(&lineCp, point) < radiusSq) {
+                                    && PSVECSquareDistance(&lineCp, point) < radiusSq) {
                                     hit = 1;
                                     break;
                                 }
@@ -704,20 +704,20 @@ s32 fn_80110E64(GScolsys2Vec3* point, GScolsys2Vec3* dirVec, f32 radius,
                 }
             }
             if (scanIdx >= outCount) {
-                fn_800A37CC(mtxFwd, &tri->normal, &planePoint);
+                PSMTXMultVec(mtxFwd, &tri->normal, &planePoint);
                 if (fn_800A3B7C(&planePoint, dirVec) < 0.0f) {
                     vdst = verts;
                     vsrc = tri->verts;
                     vertIdx = 0;
                     do {
-                        fn_800A37CC(mtxInv, vsrc, vdst);
+                        PSMTXMultVec(mtxInv, vsrc, vdst);
                         vertIdx++;
                         vsrc++;
                         vdst++;
                     } while (vertIdx < 3);
                     edgeMasksB = lbl_8047CF50;
                     flags = tri->flags;
-                    if (fn_8010C77C(&planePoint, verts, point) < 0.0f) {
+                    if (GScolsy2UtilGetSidePlanePoint(&planePoint, verts, point) < 0.0f) {
                         hit = 0;
                     } else {
                         vsrc = verts;
@@ -728,7 +728,7 @@ s32 fn_80110E64(GScolsys2Vec3* point, GScolsys2Vec3* dirVec, f32 radius,
                                 next -= 3;
                             }
                             if ((flags & edgeMasksB.values[vertIdx]) != 0 && (flags & edgeMasksB.values[next]) != 0) {
-                                if (fn_800A3BD8(vsrc, point) < radiusSq) {
+                                if (PSVECSquareDistance(vsrc, point) < radiusSq) {
                                     hit = 1;
                                     break;
                                 }
@@ -841,14 +841,14 @@ s32 fn_80111864(void* a, void* b, void* c) {
                     if (scanIdx < tempCount) {
                         goto next_triangle;
                     }
-                    fn_800A37CC(mtxFwd, tri + 0x24, planePoint);
+                    PSMTXMultVec(mtxFwd, tri + 0x24, planePoint);
                     if (fn_800A3B7C(planePoint, dirVec) >= lbl_8047CF60) {
                         goto next_triangle;
                     }
                     scan = (u8*)verts;
                     vertIdx = 0;
                     do {
-                        fn_800A37CC(mtxInv, tri + (vertIdx * 0xC), scan);
+                        PSMTXMultVec(mtxInv, tri + (vertIdx * 0xC), scan);
                         vertIdx++;
                         scan += 0xC;
                     } while (vertIdx < 3);
@@ -938,14 +938,14 @@ s32 fn_80111864(void* a, void* b, void* c) {
 #pragma pop
 
 /* 0x80111B9C | 0x88 */
-s32 fn_80111B9C(void* arg0, void* arg1, void* arg2) {
-    extern f32 fn_800A3C00(void* a, void* b);
+s32 GScolsys2CheckGetEventID(void* arg0, void* arg1, void* arg2) {
+    extern f32 PSVECDistance(void* a, void* b);
     extern f32 lbl_8047CF60;
 
     if (fn_8010CBC0() == 0) {
         return 0;
     }
-    if (fn_800A3C00(arg1, arg0) <= lbl_8047CF60) {
+    if (PSVECDistance(arg1, arg0) <= lbl_8047CF60) {
         return 0;
     }
     return fn_80111864(arg0, arg1, arg2);
@@ -958,7 +958,7 @@ s32 fn_80111B9C(void* arg0, void* arg1, void* arg2) {
 #pragma peephole off
 s32 fn_80111C24(void* origin, void* dir) {
 #pragma optimization_level 4
-    extern f32 fn_800A3C00(void* a, void* b);
+    extern f32 PSVECDistance(void* a, void* b);
     extern s32 GScolsys2UtilGetCpPlaneLine(void* a, void* b, void* c, void* d, void* e, void* f);
     extern s32 GScolsy2UtilChkInTri(void* a, void* b, void* c);
     extern f32 lbl_8047CF68;
@@ -986,7 +986,7 @@ s32 fn_80111C24(void* origin, void* dir) {
     if (fn_8010CBC0() == NULL) {
         return 0;
     }
-    if (fn_800A3C00(dir, origin) <= lbl_8047CF68) {
+    if (PSVECDistance(dir, origin) <= lbl_8047CF68) {
         return 0;
     }
     wzx = (GSFieldWzxData*)fn_8010CBC0();
@@ -1003,12 +1003,12 @@ s32 fn_80111C24(void* origin, void* dir) {
                 tri = (GSFieldWzxCompactTriangle*)triList->triangles;
                 vertIdx = 0;
                 while (vertIdx < triList->triangleCount) {
-                    fn_800A37CC(mtxFwd, &tri->normal, &pt);
+                    PSMTXMultVec(mtxFwd, &tri->normal, &pt);
                     vsrc = tri->vertices;
                     vdst = verts;
                     k = 0;
                     do {
-                        fn_800A37CC(mtxInv, vsrc, vdst);
+                        PSMTXMultVec(mtxInv, vsrc, vdst);
                         k++;
                         vsrc++;
                         vdst++;
@@ -1085,7 +1085,7 @@ void fn_80112260(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #pragma peephole off
-s32 fn_80112380(u32 id) {
+s32 floorCheckFightKind(u32 id) {
 #pragma optimization_level 4
     extern void fn_80115C48(void);
     extern s32 fn_80115AC8(void);
@@ -1127,12 +1127,12 @@ void fn_80112700(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #pragma peephole off
-void fn_8011274C(void) {
-    extern void fn_801C40F0(s32);
+void floorCheckFade(void) {
+    extern void fadeCheck(s32);
     extern void fn_800D3074(s32);
     extern u8 lbl_80478DD0;
 
-    fn_801C40F0(1);
+    fadeCheck(1);
     lbl_80478DD0 = 0;
     fn_800D3074(1);
 }
@@ -1262,8 +1262,8 @@ void fn_801128A0(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_801129AC(void) {
-    extern void fn_801D23C0(void);
-    fn_801D23C0();
+    extern void mailMainReceiveTerminate(void);
+    mailMainReceiveTerminate();
 }
 #pragma pop
 
@@ -1299,12 +1299,12 @@ void fn_80112FEC(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #pragma peephole off
-void fn_80113248(void* a) {
+void _floorInitCharacters__FP11GSfloor_dd_(void* a) {
 #pragma optimization_level 4
     extern u32 fn_80115A80(void);
     extern u32 fn_80115704(void* a);
     extern u8* fn_8011711C(u32 i);
-    extern void fn_80117070(void);
+    extern void floorCharacterBiosGetPeopleInfoPtr(void);
     extern s32 fn_8018F6B4(void);
     extern u8 fn_800FF548(void);
     extern u32 fn_8018E050(u32 model, u32 i, s32 x);
@@ -1312,9 +1312,9 @@ void fn_80113248(void* a) {
     extern s32 fn_80183958(u32 model, u32 i);
     extern void fn_801837D8(u32 model, u32 i, s32 a, u32 b, s32 c);
     extern void fn_8018C7C8(u32 model, u32 i, s32 flag);
-    extern void fn_80116FE0(u8* obj, void* out);
+    extern void floorCharacterBiosGetPos(u8* obj, void* out);
     extern void fn_8018C0A8(u32 model, u32 i, void* p);
-    extern void fn_80116F68(u8* obj, void* out);
+    extern void floorCharacterBiosGetRot(u8* obj, void* out);
     extern void fn_8018BF24(u32 model, u32 i, void* p);
     extern void fn_8018CB5C(u32 model, u32 i);
     extern s32 fn_80117054(u8* obj);
@@ -1345,7 +1345,7 @@ void fn_80113248(void* a) {
     count = fn_80115704(a);
     for (i = 0; i < count; i++) {
         obj = fn_8011711C(i);
-        fn_80117070();
+        floorCharacterBiosGetPeopleInfoPtr();
         result = fn_8018F6B4();
         if (fn_800FF548() == 0) {
             result = fn_8018E050(model, i, result);
@@ -1363,9 +1363,9 @@ void fn_80113248(void* a) {
             }
             fn_8018C7C8(model, i, 4);
             fn_8018C7C8(model, i, 8);
-            fn_80116FE0(obj, v14);
+            floorCharacterBiosGetPos(obj, v14);
             fn_8018C0A8(model, i, v14);
-            fn_80116F68(obj, v8);
+            floorCharacterBiosGetRot(obj, v8);
             fn_8018BF24(model, i, v8);
             fn_8018CB5C(model, i);
             fn_8018C1E8(model, i, fn_80117054(obj));
@@ -1412,7 +1412,7 @@ void fn_80113248(void* a) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_801134E4(void) {
+void floorInitMap(void) {
     /* TODO: match -- 660 bytes at 0x801134E4 */
 }
 #pragma pop
@@ -1645,9 +1645,9 @@ u32 fn_80113D10(u32 group) {
 #pragma scheduling off
 void fn_80113D34(u32 unused, u32 modelIndex) {
 #pragma optimization_level 4
-    extern void fn_80113D58();
+    extern void floorOpenObject();
 
-    fn_80113D58(modelIndex);
+    floorOpenObject(modelIndex);
 }
 #pragma scheduling on
 #pragma scheduling on
@@ -1665,7 +1665,7 @@ void fn_80113D34(u32 unused, u32 modelIndex) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80113D58(u32 modelIndex) {
+void floorOpenObject(u32 modelIndex) {
 #pragma optimization_level 4
     extern const char lbl_80272088[];
     extern const char lbl_8035B868[];
@@ -1673,7 +1673,7 @@ void fn_80113D58(u32 modelIndex) {
     extern void* fn_800F92D4(u32);
     extern void* HSD_ArchiveGetPublicAddress(void*, const char*);
     extern void* fn_800E4D18(void*);
-    extern void fn_800E4014(void*, u32);
+    extern void GSmodelSetVisibility(void*, u32);
     extern u32 fn_800EC1BC(void*);
     extern void fn_800ECCA8(void*, u32);
     extern void fn_800EC9DC(void*, f32);
@@ -1731,7 +1731,7 @@ void fn_80113D58(u32 modelIndex) {
         return;
     }
 
-    fn_800E4014(model, 1);
+    GSmodelSetVisibility(model, 1);
     if (fn_800EC1BC(model) != 0) {
         fn_800ECCA8(model, 0);
         fn_800EC9DC(model, lbl_8047CF98);
@@ -1762,7 +1762,7 @@ void fn_80113F48(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void* fn_80113F6C(u32 key, u32 arg) {
+void* floorGetResource(u32 key, u32 arg) {
 #pragma optimization_level 4
     extern void* fn_80115C48(u32);
     extern u32 fn_80115A80(void*);
@@ -1918,7 +1918,7 @@ void fn_801141D8(u32 texture, u32 palette, u8 textureSlot) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_801141F8(void) {
+void EvlogSet__FScUl(void) {
     /* TODO: match -- 92 bytes at 0x801141F8 */
 }
 #pragma pop

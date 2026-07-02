@@ -23,7 +23,7 @@
  *   wazaSequenceEntryStart (0x2BC): wazaSequenceEntryStart -- starts a single entry
  *   fn_801D87B0 (0x388): wazaSequenceStartEntry -- initializes entry resources
  *   _wazaSequenceParticleEntryStart (0x6B4): _wazaSequenceParticleEntryStart -- particle init
- *   fn_801D91EC (0x604): _wazaSequenceModelEntryStart -- model init
+ *   _wazaSequenceModelEntryStart (0x604): _wazaSequenceModelEntryStart -- model init
  *   fn_801D9950 (0x2CC): wazaSequencePokemonMotionStart -- motion driver
  *   fn_801D349C (0xAE0): Move animation state machine A
  *   fn_801D3F7C (0x548): Move animation state machine B
@@ -130,7 +130,7 @@ void fn_801D7B94(void);
 void wazaSequenceEntryStart(void);
 void fn_801D87B0(void* entry, s32 type);
 void _wazaSequenceParticleEntryStart(void* entry);
-void fn_801D91EC(void* entry);
+void _wazaSequenceModelEntryStart(void* entry);
 void fn_801D9950(s32 slot, s32 motionType);
 void fn_801DAC90(void);
 void fn_801DAEF8(s32 count);
@@ -511,14 +511,14 @@ BOOL fn_801D1E50(s32 seqHandle) {
 }
 
 /**
- * fn_801D1F0C - Waza get party entry by index from u16 array.
+ * mailGetMailIDInMailbox - Waza get party entry by index from u16 array.
  * Address: 0x801D1F0C | Size: 0x70
  * Gets party via fn_80129280(0, 0xA), bounds-checks idx against party+0x400,
  * returns u16 at party[idx*2].
  */
 #pragma push
 #pragma peephole off
-s32 fn_801D1F0C(s32 idx) {
+s32 mailGetMailIDInMailbox(s32 idx) {
     WazaPartyScratch* party;
     WazaPartyScratch* countParty;
     u16 count;
@@ -578,7 +578,7 @@ void fn_801D228C(s32 seqHandle, f32 targetRot, f32 speed) {
 }
 
 /**
- * fn_801D23C0 - Waza reset callback timer and stop active handle.
+ * mailMainReceiveTerminate - Waza reset callback timer and stop active handle.
  * Address: 0x801D23C0 | Size: 0x44
  */
 extern s32 lbl_80467390[];
@@ -602,7 +602,7 @@ extern s32 lbl_80467390[];
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
-void fn_801D23C0(void) {
+void mailMainReceiveTerminate(void) {
     u32 handle;
     lbl_80467390[1] = 0x258;
     handle = lbl_80467390[2];
@@ -664,7 +664,7 @@ void fn_801D29D8(s32 moveID, s32 hitCount) {
 }
 
 /**
- * fn_801D2B08 - Waza register multi-hit callback and clear state.
+ * mailMainInit - Waza register multi-hit callback and clear state.
  * Address: 0x801D2B08 | Size: 0x44
  */
 #pragma peephole off
@@ -687,7 +687,7 @@ void fn_801D29D8(s32 moveID, s32 hitCount) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
-void fn_801D2B08(void) {
+void mailMainInit(void) {
     s32* state;
 
     heroMoveAddStepCallback(fn_801D29D8, 0);
@@ -760,7 +760,7 @@ u32 fn_801D2C6C(void) {
 void fn_801D2C74(s32 moveID) {
     extern void fn_801D30BC();
     extern void GSscene_SetMode(s32 arg);
-    extern void fn_80176AE4(void* arg);
+    extern void cameraStopAnime(void* arg);
     extern void fn_801765F4(s32 arg);
     extern s32  fn_800057A8(void);
     extern u8   lbl_8047B3F4;
@@ -777,7 +777,7 @@ void fn_801D2C74(s32 moveID) {
                     GSscene_SetMode(8);
                 } else {
                     if (*(u32*)((u8*)obj + 0x18) != 0 && *(u32*)((u8*)obj + 0x20) != 0) {
-                        fn_80176AE4(obj);
+                        cameraStopAnime(obj);
                     }
                     lbl_8047B3F0 = 0;
                 }
@@ -805,7 +805,7 @@ void fn_801D2D28() {
  * Address: 0x801D2F94 | Size: 0x88
  */
 extern void GSscene_SetMode(s32 arg);
-extern void fn_80176AE4(void* arg);
+extern void cameraStopAnime(void* arg);
 extern void fn_801765F4(s32 arg);
 extern s32  fn_800057A8(void);
 void fn_801D2F94(void) {
@@ -816,7 +816,7 @@ void fn_801D2F94(void) {
             GSscene_SetMode(8);
         } else {
             if (*(u32*)((u8*)obj + 0x18) != 0 && *(u32*)((u8*)obj + 0x20) != 0) {
-                fn_80176AE4(obj);
+                cameraStopAnime(obj);
             }
             lbl_8047B3F0 = 0;
         }
@@ -851,7 +851,7 @@ void fn_801D3034(u32 state) {
             GSscene_SetMode(8);
         } else {
             if (*(u32*)((u8*)obj + 0x18) != 0 && *(u32*)((u8*)obj + 0x20) != 0) {
-                fn_80176AE4(obj);
+                cameraStopAnime(obj);
             }
             lbl_8047B3F0 = 0;
         }
@@ -951,7 +951,7 @@ void fn_801D53D8(s32 slot, f32 zoom, f32 speed) {
     extern void fn_801D5464(s32 slot, s32 motionType);
     extern void fn_801D58E4();
     extern u32 fn_800F9318(s32, s32);
-    extern void fn_800E4014(s32, s32);
+    extern void GSmodelSetVisibility(s32, s32);
     extern s32 GSthreadCreate(s32, s32, s32, s32, s32, void*);
     extern s32 fn_800057A8(void);
 
@@ -962,7 +962,7 @@ void fn_801D53D8(s32 slot, f32 zoom, f32 speed) {
     fn_801D58E4();
     result = fn_800F9318(0, 0x64);
     if (result != 0) {
-        fn_800E4014(result, 0);
+        GSmodelSetVisibility(result, 0);
     }
     *(s32*)(lbl_804673F8 + 0x66C) = GSthreadCreate(0x14, 0x58, 0x2000, 1, 0, fn_801D5464);
     value = fn_800057A8();
@@ -1168,12 +1168,12 @@ void _wazaSequenceParticleEntryStart(void* entry) {
 }
 
 /**
- * fn_801D91EC / _wazaSequenceModelEntryStart - Model entry init.
+ * _wazaSequenceModelEntryStart / _wazaSequenceModelEntryStart - Model entry init.
  * Address: 0x801D91EC | Size: 0x604
  * Proposed name from symbols: _wazaSequenceModelEntryStart.
  * Initializes a 3D model effect for a move animation.
  */
-void fn_801D91EC(void* entry) {
+void _wazaSequenceModelEntryStart(void* entry) {
     /* TODO: Model entry start (0x604 bytes)
      * 1. Loads model from FDAT archive
      * 2. Creates JObj hierarchy
@@ -1717,10 +1717,10 @@ void fn_801DAEF8(s32 count) {
 }
 
 /**
- * fn_801DB060 - Waza system get initialized.
+ * wazaSequenceSysGetResID - Waza system get initialized.
  * Address: 0x801DB060 | Size: 0x28
  */
-BOOL fn_801DB060(void) {
+BOOL wazaSequenceSysGetResID(void) {
     if ((u32)(lbl_8047B410 + 0x10000) == 0xFFFF) {
         lbl_8047B410 = 0;
     }
@@ -2056,13 +2056,13 @@ void fn_801DBDDC(void* obj) {
  * Address: 0x801DBFB0 | Size: 0x64
  */
 s32 fn_801DBFB0(void) {
-    extern u16 fn_800E3534(u32 size);
+    extern u16 _toolentryAlloc__FUl(u32 size);
     extern void* fn_800E27B0(u16 handle);
 
     u16 handle;
     void* obj;
 
-    handle = fn_800E3534(0x40);
+    handle = _toolentryAlloc__FUl(0x40);
     if (handle != 0) {
         obj = fn_800E27B0(handle);
         memset(obj, 0, 0x40);
@@ -2352,7 +2352,7 @@ void fn_801DD23C(void* obj) {
     extern void fn_801DA4E8();
     extern void fn_801193BC(s32);
     extern void fn_800F9210();
-    extern void fn_80140138(void*);
+    extern void Unload__13ModelSequenceFPUc(void*);
     extern void fn_801DB1CC(void* obj);
     extern void fn_801D9E34(void* obj);
     extern void fn_801DA014(void* obj);
@@ -2402,7 +2402,7 @@ void fn_801DD23C(void* obj) {
             fn_800F9210(*(u32*)data, *(u32*)(data + 0x0C));
         }
 
-        fn_80140138(data + 0x50);
+        Unload__13ModelSequenceFPUc(data + 0x50);
 
         if (*(u32*)data != 0) {
             if (*(u32*)(data + 4) != 0) {
