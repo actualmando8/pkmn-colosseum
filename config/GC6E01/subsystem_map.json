@@ -1588,7 +1588,7 @@
 "name": "fn_80011288",
 "addr": "0x80011288",
 "size": 540,
-"label": "gs-engine",
+"label": "fight",
 "confidence": 1.9,
 "seed": null
 },
@@ -1596,7 +1596,7 @@
 "name": "fn_800114A4",
 "addr": "0x800114A4",
 "size": 604,
-"label": "gs-engine",
+"label": "fight",
 "confidence": 1.9,
 "seed": null
 },
@@ -65913,7 +65913,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80253F28",
+"name": "fightTrainerAiWazaHit204",
 "addr": "0x80253F28",
 "size": 180,
 "label": "fight",
@@ -65929,7 +65929,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802540CC",
+"name": "fightTrainerAiWazaHit202",
 "addr": "0x802540CC",
 "size": 180,
 "label": "fight",
@@ -65937,7 +65937,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80254180",
+"name": "fightTrainerAiWazaHit201",
 "addr": "0x80254180",
 "size": 52,
 "label": "fight",
@@ -65945,7 +65945,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802541B4",
+"name": "fightTrainerAiWazaHit200",
 "addr": "0x802541B4",
 "size": 180,
 "label": "fight",
@@ -65953,7 +65953,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80254268",
+"name": "fightTrainerAiWazaHit199",
 "addr": "0x80254268",
 "size": 504,
 "label": "fight",
@@ -65961,7 +65961,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80254460",
+"name": "fightTrainerAiWazaHit198",
 "addr": "0x80254460",
 "size": 180,
 "label": "fight",
@@ -65969,7 +65969,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80254514",
+"name": "fightTrainerAiWazaHit197",
 "addr": "0x80254514",
 "size": 180,
 "label": "fight",
@@ -65977,7 +65977,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802545C8",
+"name": "fightTrainerAiWazaHit196",
 "addr": "0x802545C8",
 "size": 176,
 "label": "fight",
@@ -65985,7 +65985,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80254678",
+"name": "fightTrainerAiWazaHit195",
 "addr": "0x80254678",
 "size": 8,
 "label": "fight",
@@ -65993,7 +65993,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80254680",
+"name": "fightTrainerAiWazaHit194",
 "addr": "0x80254680",
 "size": 56,
 "label": "fight",
@@ -66001,7 +66001,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802546B8",
+"name": "fightTrainerAiWazaHit193",
 "addr": "0x802546B8",
 "size": 48,
 "label": "fight",
@@ -66009,7 +66009,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802546E8",
+"name": "fightTrainerAiWazaHit192",
 "addr": "0x802546E8",
 "size": 296,
 "label": "fight",
@@ -66025,7 +66025,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802548D8",
+"name": "fightTrainerAiWazaHit190",
 "addr": "0x802548D8",
 "size": 180,
 "label": "fight",
@@ -66041,7 +66041,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80254A70",
+"name": "fightTrainerAiWazaHit188",
 "addr": "0x80254A70",
 "size": 180,
 "label": "fight",
@@ -66049,7 +66049,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80254B24",
+"name": "fightTrainerAiWazaHit187",
 "addr": "0x80254B24",
 "size": 376,
 "label": "fight",
@@ -66057,7 +66057,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80254C9C",
+"name": "fightTrainerAiWazaHit186",
 "addr": "0x80254C9C",
 "size": 176,
 "label": "fight",
@@ -66065,7 +66065,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80254D4C",
+"name": "fightTrainerAiWazaHit185",
 "addr": "0x80254D4C",
 "size": 180,
 "label": "fight",
@@ -66073,7 +66073,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80254E00",
+"name": "fightTrainerAiWazaHit184",
 "addr": "0x80254E00",
 "size": 44,
 "label": "fight",
@@ -66081,7 +66081,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80254E2C",
+"name": "fightTrainerAiWazaHit183",
 "addr": "0x80254E2C",
 "size": 8,
 "label": "fight",
@@ -66089,7 +66089,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80254E34",
+"name": "fightTrainerAiWazaHit182",
 "addr": "0x80254E34",
 "size": 180,
 "label": "fight",
@@ -66097,7 +66097,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80254EE8",
+"name": "fightTrainerAiWazaHit181",
 "addr": "0x80254EE8",
 "size": 52,
 "label": "fight",
@@ -66113,7 +66113,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80254F54",
+"name": "fightTrainerAiWazaHit179",
 "addr": "0x80254F54",
 "size": 52,
 "label": "fight",
@@ -66121,7 +66121,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80254F88",
+"name": "fightTrainerAiWazaHit178",
 "addr": "0x80254F88",
 "size": 120,
 "label": "fight",
@@ -66137,7 +66137,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802550F0",
+"name": "fightTrainerAiWazaHit176",
 "addr": "0x802550F0",
 "size": 180,
 "label": "fight",
@@ -66145,7 +66145,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802551A4",
+"name": "fightTrainerAiWazaHit175",
 "addr": "0x802551A4",
 "size": 116,
 "label": "fight",
@@ -66153,7 +66153,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80255218",
+"name": "fightTrainerAiWazaHit174",
 "addr": "0x80255218",
 "size": 8,
 "label": "fight",
@@ -66161,7 +66161,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80255220",
+"name": "fightTrainerAiWazaHit173",
 "addr": "0x80255220",
 "size": 168,
 "label": "fight",
@@ -66169,7 +66169,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802552C8",
+"name": "fightTrainerAiWazaHit172",
 "addr": "0x802552C8",
 "size": 8,
 "label": "fight",
@@ -66177,7 +66177,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802552D0",
+"name": "fightTrainerAiWazaHit171",
 "addr": "0x802552D0",
 "size": 180,
 "label": "fight",
@@ -66185,7 +66185,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80255384",
+"name": "fightTrainerAiWazaHit170",
 "addr": "0x80255384",
 "size": 180,
 "label": "fight",
@@ -66193,7 +66193,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80255438",
+"name": "fightTrainerAiWazaHit169",
 "addr": "0x80255438",
 "size": 180,
 "label": "fight",
@@ -66265,7 +66265,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80255C8C",
+"name": "fightTrainerAiWazaHit159",
 "addr": "0x80255C8C",
 "size": 176,
 "label": "fight",
@@ -66273,7 +66273,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80255D3C",
+"name": "fightTrainerAiWazaHit158",
 "addr": "0x80255D3C",
 "size": 64,
 "label": "fight",
@@ -66281,7 +66281,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80255D7C",
+"name": "fightTrainerAiWazaHit157",
 "addr": "0x80255D7C",
 "size": 56,
 "label": "fight",
@@ -66297,7 +66297,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80255DF8",
+"name": "fightTrainerAiWazaHit155",
 "addr": "0x80255DF8",
 "size": 176,
 "label": "fight",
@@ -66305,7 +66305,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80255EA8",
+"name": "fightTrainerAiWazaHit154",
 "addr": "0x80255EA8",
 "size": 60,
 "label": "fight",
@@ -66313,7 +66313,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80255EE4",
+"name": "fightTrainerAiWazaHit153",
 "addr": "0x80255EE4",
 "size": 8,
 "label": "fight",
@@ -66321,7 +66321,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80255EEC",
+"name": "fightTrainerAiWazaHit152",
 "addr": "0x80255EEC",
 "size": 180,
 "label": "fight",
@@ -66329,7 +66329,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80255FA0",
+"name": "fightTrainerAiWazaHit151",
 "addr": "0x80255FA0",
 "size": 180,
 "label": "fight",
@@ -66337,7 +66337,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80256054",
+"name": "fightTrainerAiWazaHit150",
 "addr": "0x80256054",
 "size": 180,
 "label": "fight",
@@ -66345,7 +66345,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80256108",
+"name": "fightTrainerAiWazaHit149",
 "addr": "0x80256108",
 "size": 180,
 "label": "fight",
@@ -66353,7 +66353,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802561BC",
+"name": "fightTrainerAiWazaHit148",
 "addr": "0x802561BC",
 "size": 56,
 "label": "fight",
@@ -66361,7 +66361,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802561F4",
+"name": "fightTrainerAiWazaHit147",
 "addr": "0x802561F4",
 "size": 180,
 "label": "fight",
@@ -66369,7 +66369,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802562A8",
+"name": "fightTrainerAiWazaHit146",
 "addr": "0x802562A8",
 "size": 180,
 "label": "fight",
@@ -66377,7 +66377,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025635C",
+"name": "fightTrainerAiWazaHit145",
 "addr": "0x8025635C",
 "size": 180,
 "label": "fight",
@@ -66385,7 +66385,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80256410",
+"name": "fightTrainerAiWazaHit144",
 "addr": "0x80256410",
 "size": 176,
 "label": "fight",
@@ -66393,7 +66393,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802564C0",
+"name": "fightTrainerAiWazaHit143",
 "addr": "0x802564C0",
 "size": 8,
 "label": "fight",
@@ -66513,7 +66513,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80256B18",
+"name": "fightTrainerAiWazaHit126",
 "addr": "0x80256B18",
 "size": 180,
 "label": "fight",
@@ -66521,7 +66521,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80256BCC",
+"name": "fightTrainerAiWazaHit125",
 "addr": "0x80256BCC",
 "size": 180,
 "label": "fight",
@@ -66529,7 +66529,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80256C80",
+"name": "fightTrainerAiWazaHit124",
 "addr": "0x80256C80",
 "size": 60,
 "label": "fight",
@@ -66537,7 +66537,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80256CBC",
+"name": "fightTrainerAiWazaHit123",
 "addr": "0x80256CBC",
 "size": 180,
 "label": "fight",
@@ -66545,7 +66545,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80256D70",
+"name": "fightTrainerAiWazaHit122",
 "addr": "0x80256D70",
 "size": 176,
 "label": "fight",
@@ -66553,7 +66553,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80256E20",
+"name": "fightTrainerAiWazaHit121",
 "addr": "0x80256E20",
 "size": 176,
 "label": "fight",
@@ -66561,7 +66561,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80256ED0",
+"name": "fightTrainerAiWazaHit120",
 "addr": "0x80256ED0",
 "size": 512,
 "label": "fight",
@@ -66569,7 +66569,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802570D0",
+"name": "fightTrainerAiWazaHit119",
 "addr": "0x802570D0",
 "size": 176,
 "label": "fight",
@@ -66577,7 +66577,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80257180",
+"name": "fightTrainerAiWazaHit118",
 "addr": "0x80257180",
 "size": 572,
 "label": "fight",
@@ -66585,7 +66585,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802573BC",
+"name": "fightTrainerAiWazaHit117",
 "addr": "0x802573BC",
 "size": 176,
 "label": "fight",
@@ -66593,7 +66593,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025746C",
+"name": "fightTrainerAiWazaHit116",
 "addr": "0x8025746C",
 "size": 8,
 "label": "fight",
@@ -66601,7 +66601,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80257474",
+"name": "fightTrainerAiWazaHit115",
 "addr": "0x80257474",
 "size": 56,
 "label": "fight",
@@ -66617,7 +66617,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80257508",
+"name": "fightTrainerAiWazaHit113",
 "addr": "0x80257508",
 "size": 60,
 "label": "fight",
@@ -66649,7 +66649,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80257750",
+"name": "fightTrainerAiWazaHit108",
 "addr": "0x80257750",
 "size": 232,
 "label": "fight",
@@ -66665,7 +66665,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802578C4",
+"name": "fightTrainerAiWazaHit106",
 "addr": "0x802578C4",
 "size": 120,
 "label": "fight",
@@ -66673,7 +66673,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025793C",
+"name": "fightTrainerAiWazaHit105",
 "addr": "0x8025793C",
 "size": 180,
 "label": "fight",
@@ -66681,7 +66681,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802579F0",
+"name": "fightTrainerAiWazaHit104",
 "addr": "0x802579F0",
 "size": 176,
 "label": "fight",
@@ -66689,7 +66689,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80257AA0",
+"name": "fightTrainerAiWazaHit103",
 "addr": "0x80257AA0",
 "size": 180,
 "label": "fight",
@@ -66705,7 +66705,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80257C20",
+"name": "fightTrainerAiWazaHit101",
 "addr": "0x80257C20",
 "size": 180,
 "label": "fight",
@@ -66721,7 +66721,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80257DF8",
+"name": "fightTrainerAiWazaHit099",
 "addr": "0x80257DF8",
 "size": 180,
 "label": "fight",
@@ -66753,7 +66753,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802580BC",
+"name": "fightTrainerAiWazaHit094",
 "addr": "0x802580BC",
 "size": 120,
 "label": "fight",
@@ -66761,7 +66761,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80258134",
+"name": "fightTrainerAiWazaHit093",
 "addr": "0x80258134",
 "size": 8,
 "label": "fight",
@@ -66777,7 +66777,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025820C",
+"name": "fightTrainerAiWazaHit091",
 "addr": "0x8025820C",
 "size": 120,
 "label": "fight",
@@ -66793,7 +66793,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802583C4",
+"name": "fightTrainerAiWazaHit089",
 "addr": "0x802583C4",
 "size": 176,
 "label": "fight",
@@ -66801,7 +66801,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80258474",
+"name": "fightTrainerAiWazaHit088",
 "addr": "0x80258474",
 "size": 176,
 "label": "fight",
@@ -66809,7 +66809,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80258524",
+"name": "fightTrainerAiWazaHit087",
 "addr": "0x80258524",
 "size": 176,
 "label": "fight",
@@ -66825,7 +66825,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802586F4",
+"name": "fightTrainerAiWazaHit085",
 "addr": "0x802586F4",
 "size": 8,
 "label": "fight",
@@ -66841,7 +66841,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802587B8",
+"name": "fightTrainerAiWazaHit083",
 "addr": "0x802587B8",
 "size": 8,
 "label": "fight",
@@ -67169,7 +67169,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025A8FC",
+"name": "fightTrainerAiWazaHit036",
 "addr": "0x8025A8FC",
 "size": 180,
 "label": "fight",
@@ -67177,7 +67177,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025A9B0",
+"name": "fightTrainerAiWazaHit035",
 "addr": "0x8025A9B0",
 "size": 60,
 "label": "fight",
@@ -67185,7 +67185,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025A9EC",
+"name": "fightTrainerAiWazaHit034",
 "addr": "0x8025A9EC",
 "size": 180,
 "label": "fight",
@@ -67193,7 +67193,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025AAA0",
+"name": "fightTrainerAiWazaHit033",
 "addr": "0x8025AAA0",
 "size": 624,
 "label": "fight",
@@ -67201,7 +67201,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025AD10",
+"name": "fightTrainerAiWazaHit032",
 "addr": "0x8025AD10",
 "size": 56,
 "label": "fight",
@@ -67209,7 +67209,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025AD48",
+"name": "fightTrainerAiWazaHit031",
 "addr": "0x8025AD48",
 "size": 180,
 "label": "fight",
@@ -67217,7 +67217,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025ADFC",
+"name": "fightTrainerAiWazaHit030",
 "addr": "0x8025ADFC",
 "size": 44,
 "label": "fight",
@@ -67225,7 +67225,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8025AE28",
+"name": "fightTrainerAiWazaHit029",
 "addr": "0x8025AE28",
 "size": 176,
 "label": "fight",
@@ -68951,14 +68951,8 @@
 {
 "label": "fight",
 "start": "0x800111C4",
-"end": "0x80011288",
-"count": 3
-},
-{
-"label": "gs-engine",
-"start": "0x80011288",
 "end": "0x80011700",
-"count": 2
+"count": 5
 },
 {
 "label": "menu",
