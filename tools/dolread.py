@@ -19,6 +19,7 @@ Usage:
   tools/dolread.py u32  0x8036C2A0 16         # N big-endian words
   tools/dolread.py table 0x8036C2A0 --stride 16 --count 20
   tools/dolread.py findptr 0x8011432C 0x80114948 ...   # hunt tables
+  tools/dolread.py sweep                      # find ALL candidate tables
   tools/dolread.py sections                   # list DOL sections
 Options: --dol PATH (default orig/GC6E01/sys/main.dol),
          --symbols PATH (default config/GC6E01/symbols.txt).
@@ -107,7 +108,9 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("cmd", choices=["str", "hex", "u32", "table", "findptr",
-                                    "sections"])
+                                    "sweep", "sections"])
+    ap.add_argument("--min-run", type=int, default=5,
+                    help="sweep: minimum members per table")
     ap.add_argument("args", nargs="*")
     ap.add_argument("--dol", default=str(ROOT / "orig/GC6E01/sys/main.dol"))
     ap.add_argument("--symbols", default=str(ROOT / "config/GC6E01/symbols.txt"))
@@ -148,6 +151,54 @@ def main():
             ws = struct.unpack(f">{words}I", b)
             cells = ", ".join(annotate(w, dol, syms) for w in ws)
             print(f"{i:>3} @0x{base:08X}: [{cells}]")
+    elif a.cmd == "sweep":
+        # Find every strided run of function-start pointers in the data
+        # sections: dispatch tables, handler registries, vtables. Runs
+        # are claimed smallest-stride-first so a dense array is not also
+        # reported at every multiple of its stride.
+        fn_pat = re.compile(
+            r"(\w+) = \.text:(0x[0-9A-Fa-f]+); // type:function")
+        fn_starts = {}
+        for line in open(a.symbols):
+            m = fn_pat.match(line)
+            if m:
+                fn_starts[int(m.group(2), 16)] = m.group(1)
+        hits = {}
+        for off, base, size, kind in dol.sections:
+            if kind != "data":
+                continue
+            for i in range(0, size - 3, 4):
+                w = struct.unpack_from(">I", dol.raw[off + i:off + i + 4])[0]
+                if w in fn_starts:
+                    hits[base + i] = w
+        posset = set(hits)
+        consumed = set()
+        tables = []
+        for stride in (4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 48, 64):
+            for p in sorted(hits):
+                if p in consumed:
+                    continue
+                if (p - stride) in posset and (p - stride) not in consumed:
+                    continue  # not the start of a run at this stride
+                n, q = 0, p
+                while q in posset and q not in consumed:
+                    n += 1
+                    q += stride
+                if n < a.min_run:
+                    continue
+                members = [fn_starts[hits[p + i * stride]] for i in range(n)]
+                named = [m for m in members if not m.startswith(("fn_", "lbl_"))]
+                for i in range(n):
+                    consumed.add(p + i * stride)
+                tables.append((p, stride, n, len(named), named[:3],
+                               [m for m in members if m.startswith("fn_")][:3]))
+        tables.sort(key=lambda t: (-(t[3] > 0 and t[3] < t[2]), t[3] == 0,
+                                   -(t[2] - t[3])))
+        print(f"{len(tables)} candidate tables (>= {a.min_run} members); "
+              f"anchored-and-incomplete first")
+        for p, stride, n, nn, sn, su in tables:
+            print(f"0x{p:08X} stride {stride:>2} count {n:>4} named {nn:>3} "
+                  f"| {','.join(sn)} | {','.join(su)}")
     elif a.cmd == "findptr":
         hits = dol.find_words(addrs)
         for addr, val in hits:
