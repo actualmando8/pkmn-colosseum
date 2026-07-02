@@ -140,6 +140,9 @@ game/battle_waza_sdata2_8047E290.c:
 game/data/sdata2_8047E390.c:
 	.sdata2     start:0x8047E390 end:0x8047E490
 
+game/data/sdata2_8047E490.c:
+	.sdata2     start:0x8047E490 end:0x8047E538
+
 game/colosseum_battle_sdata2.c:
 	.sdata2     start:0x8047E658 end:0x8047E700
 
@@ -149,8 +152,14 @@ game/data/rodata_80266BD8.c:
 game/data/rodata_80266C7C.c:
 	.rodata     start:0x80266C7C end:0x80266D78
 
+game/data/rodata_80266D78.c:
+	.rodata     start:0x80266D78 end:0x80267060
+
 game/data/rodata_80267060.c:
 	.rodata     start:0x80267060 end:0x80267250
+
+game/data/rodata_80267250.c:
+	.rodata     start:0x80267250 end:0x80267350
 
 game/data/rodata_80267350.c:
 	.rodata     start:0x80267350 end:0x80267398

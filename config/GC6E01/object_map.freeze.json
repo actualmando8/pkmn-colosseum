@@ -6,24 +6,24 @@
     "total_code": 2495108,
     "total_data": 2196256,
     "total_functions": 8603,
-    "total_units": 337
+    "total_units": 338
   },
   "topology_status": {
-    "auto_units": 13,
-    "named_units": 324,
-    "source_backed_units": 304,
+    "auto_units": 11,
+    "named_units": 327,
+    "source_backed_units": 307,
     "auto_code": 0,
-    "auto_data": 2182883,
+    "auto_data": 2181715,
     "auto_functions": 0
   },
   "baseline_progress": {
-    "matched_code": "259444",
-    "matched_code_percent": 10.398107,
-    "matched_data": "12684",
-    "matched_data_percent": 0.5775283,
-    "matched_functions": 3379,
-    "matched_functions_percent": 39.276997,
-    "fuzzy_match_percent": 22.842564
+    "matched_code": "290840",
+    "matched_code_percent": 11.656409,
+    "matched_data": "14541",
+    "matched_data_percent": 0.66208124,
+    "matched_functions": 3483,
+    "matched_functions_percent": 40.485878,
+    "fuzzy_match_percent": 25.71043
   },
   "unit_topology": [
     {
@@ -599,16 +599,29 @@
       "total_functions": 0
     },
     {
-      "name": "main/auto_09_8047E490_sdata2",
+      "name": "main/game/data/sdata2_8047E490",
       "sections": [
         {
           "name": ".sdata2",
-          "size": 456,
+          "size": 168,
           "virtual_address": 2152195216
         }
       ],
       "total_code": 0,
-      "total_data": 456,
+      "total_data": 168,
+      "total_functions": 0
+    },
+    {
+      "name": "main/auto_09_8047E538_sdata2",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 288,
+          "virtual_address": 2152195384
+        }
+      ],
+      "total_code": 0,
+      "total_data": 288,
       "total_functions": 0
     },
     {
@@ -729,7 +742,7 @@
       "total_functions": 0
     },
     {
-      "name": "main/auto_04_80266D78_rodata",
+      "name": "main/game/data/rodata_80266D78",
       "sections": [
         {
           "name": ".rodata",
@@ -755,7 +768,7 @@
       "total_functions": 0
     },
     {
-      "name": "main/auto_04_80267250_rodata",
+      "name": "main/game/data/rodata_80267250",
       "sections": [
         {
           "name": ".rodata",

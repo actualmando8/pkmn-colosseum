@@ -32,4 +32,4 @@ SDATA2 const u8 lbl_8047CC70[5] = "jobj";
 SDATA2 const f32 lbl_8047CC78 = 0.0001f;
 SDATA2 const f64 lbl_8047CC80 = 4.503601774854144e+15;
 SDATA2 const f64 lbl_8047CC88 = 4.503599627370496e+15;
-SDATA2 const u8 lbl_8047CC90[8] = "aobj.h";
+SDATA2 const u8 lbl_8047CC90[7] = "aobj.h";

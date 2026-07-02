@@ -64,4 +64,4 @@ SDATA2 const u8 lbl_8047BB8C[4] = "ポ";
 SDATA2 const u8 lbl_8047BB90[4] = "S";
 SDATA2 const u8 lbl_8047BB94[4] = "T";
 SDATA2 const u8 lbl_8047BB98[4] = "U";
-SDATA2 const u8 lbl_8047BB9C[4] = "V";
+SDATA2 const u8 lbl_8047BB9C[2] = "V";

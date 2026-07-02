@@ -3,11 +3,6 @@
 #pragma section ".sdata2"
 #define SDATA2 __declspec(section ".sdata2")
 
-typedef union Sdata2AlignedString3 {
-    u8 text[3];
-    f64 align;
-} Sdata2AlignedString3;
-
 /*
  * Mixed HSD .sdata2 constants and assert strings. Source references tie the
  * range to hash/id helpers, HSD initialization, and JObj display/update code.
@@ -49,4 +44,4 @@ SDATA2 const f32 lbl_8047DB78 = 3.1415927f;
 SDATA2 const f32 lbl_8047DB7C = 9.99999993922529e-09f;
 SDATA2 const f32 lbl_8047DB80 = 0.25f;
 SDATA2 const f32 lbl_8047DB84 = 2.0f;
-SDATA2 const Sdata2AlignedString3 lbl_8047DB88 = { "jp" };
+SDATA2 const u8 lbl_8047DB88[3] = "jp";
