@@ -6730,10 +6730,10 @@ u32 fn_8020B72C(void* ctx)
     extern u32 fn_8022B2CC();
     u16 uVar6;
     u32 uVar1;
+    u32 uVar3;
     u32 uVar2;
     u8 cVar8;
     u16 uVar7;
-    u32 uVar3;
     u16 uVar4;
     s8 uVar9;
     u32 uVar5;
@@ -6756,7 +6756,7 @@ u32 fn_8020B72C(void* ctx)
         cVar8 = fn_8011BEB4((void*)uVar3, 0, 0x32, 0);
         if (cVar8 == 0) {
             uVar5 = (u32)fn_8012640C((void*)uVar2, 0, 0x7f, (u8)uVar9);
-            if ((uVar4 & 0xffff) != (uVar5 & 0xffff)) {
+            if ((uVar5 & 0xffff) != (uVar4 & 0xffff)) {
                 uVar4 = (u16)(u32)fn_8012640C((void*)uVar2, 0, 0x7f, (u8)uVar9);
                 fn_8011BBD8((void*)uVar3, 0, 0x27, 0, uVar4);
                 fn_80209C1C((void*)uVar3, uVar4);
@@ -8826,12 +8826,11 @@ void fn_8020EED4(void* ctx1, void* ctx2, u32 p5, u32 p6, void* p7)
     extern void fn_802085C4();
     extern void fn_80208750();
     u16 limit;
-    void* uVar2;
     void* uVar1;
+    void* uVar2;
     u8 cVar5;
 
-    limit = fn_801F54A4(0, 0, 0x14, 0);
-    uVar1 = (void*)fn_801F02AC(0xf, ctx2, limit);
+    uVar1 = (void*)fn_801F02AC(0xf, ctx2, limit = fn_801F54A4(0, 0, 0x14, 0));
     uVar2 = (void*)fn_801F02AC(0x10, ctx2, limit);
     fn_80208750(ctx2, ctx1, 1, p7);
     fn_80208750(uVar1, ctx1, 2, p7);

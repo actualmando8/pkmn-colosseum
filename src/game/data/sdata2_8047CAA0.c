@@ -65,4 +65,4 @@ SDATA2 const f32 lbl_8047CBC8 = 0.0f;
 SDATA2 const f32 lbl_8047CBCC = 30.0f;
 SDATA2 const f32 lbl_8047CBD0 = 0.1f;
 SDATA2 const f32 lbl_8047CBD4 = 3000.0f;
-SDATA2 const u8 lbl_8047CBD8[8] = "shadow";
+SDATA2 const u8 lbl_8047CBD8[7] = "shadow";

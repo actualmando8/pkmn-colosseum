@@ -506,6 +506,7 @@ static int DObjLoad(HSD_DObj* dobj_arg, HSD_DObjDesc* desc_arg)
     HSD_DObj* sub;
     HSD_ClassInfo* info;
 
+    dobj = dobj_arg;
     desc = desc_arg;
     subdesc = desc->next;
     if (subdesc == NULL) {
@@ -530,7 +531,6 @@ static int DObjLoad(HSD_DObj* dobj_arg, HSD_DObjDesc* desc_arg)
             ((int (*)(HSD_DObj*, HSD_DObjDesc*)) vtbl[0x40 / 4])(sub, subdesc);
         }
     }
-    dobj = dobj_arg;
     dobj->next = sub;
     dobj->mobj = fn_801A7B24(desc->mobjdesc);
     dobj->pobj = fn_801AD288(desc->pobjdesc);

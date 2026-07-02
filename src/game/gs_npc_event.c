@@ -1069,24 +1069,6 @@ void fn_8003258C(void) {
             case 18:
                 r31 = 0x12c0;
                 break;
-            case 0:
-            case 1:
-            case 2:
-            case 4:
-            case 5:
-            case 6:
-            case 7:
-            case 8:
-            case 9:
-            case 10:
-            case 11:
-            case 13:
-            case 14:
-            case 15:
-            case 16:
-            case 17:
-                r31 = 0x258;
-                break;
             default:
                 r31 = 0x258;
                 break;
@@ -1598,7 +1580,7 @@ u8* fn_80032ED8(s32 arg0, s32 arg1, u8* arg2) {
         if (arg2 != 0) {
             fn_800330B8((s32)slot, arg2_iter);
         } else {
-            fn_800330B8((s32)slot, tbl + (s8)*(u8*)(arg0 + i + 0xD) * 0x2A + 0x514);
+            fn_800330B8((s32)slot, tbl + ((s8)*(u8*)(arg0 + i + 0xD) * 0x2A + 0x514));
         }
         arg2_iter += 0x2A;
         slot += 0x50;

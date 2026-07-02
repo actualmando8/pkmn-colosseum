@@ -7072,7 +7072,6 @@ s32 fn_800F67C8(void* obj) {
     s32 i;
     s32 loopCount;
     const char* errStr;
-    u8* stackPtr;
 
     p = (u8*)obj;
 
@@ -7084,8 +7083,7 @@ s32 fn_800F67C8(void* obj) {
     } else {
         count = count - 1;
         *(s32*)(p + 0x28) = count;
-        stackPtr = p + count * 4;
-        val1 = *(u32*)(stackPtr + 0x6C);
+        val1 = *((u32*)(p + 0x6C) + count);
     }
 
     /* Pop 2 (into val2) → store to obj->0x1C */
@@ -7096,8 +7094,7 @@ s32 fn_800F67C8(void* obj) {
     } else {
         count = count - 1;
         *(s32*)(p + 0x28) = count;
-        stackPtr = p + count * 4;
-        val2 = *(u32*)(stackPtr + 0x6C);
+        val2 = *((u32*)(p + 0x6C) + count);
     }
     *(u32*)(p + 0x1C) = val2;
 
@@ -7109,8 +7106,7 @@ s32 fn_800F67C8(void* obj) {
     } else {
         count = count - 1;
         *(s32*)(p + 0x28) = count;
-        stackPtr = p + count * 4;
-        val3 = *(u32*)(stackPtr + 0x6C);
+        val3 = *((u32*)(p + 0x6C) + count);
     }
     *(u32*)(p + 0x14) = val3;
 
@@ -7170,7 +7166,7 @@ s32 fn_800F694C(void* obj) {
         fn_800DD38C((const char*)lbl_80271068);
     } else {
         *(u32*)(p + 0x28) = count + 1;
-        *(u32*)(p + 0x6C + count * 4) = value;
+        *((u32*)(p + 0x6C) + count) = value;
     }
 
     /* Push obj->0x1C */
@@ -7180,7 +7176,7 @@ s32 fn_800F694C(void* obj) {
         fn_800DD38C((const char*)lbl_80271068);
     } else {
         *(u32*)(p + 0x28) = count + 1;
-        *(u32*)(p + 0x6C + count * 4) = value;
+        *((u32*)(p + 0x6C) + count) = value;
     }
 
     /* Push stackBase (argCount) */
@@ -7189,7 +7185,7 @@ s32 fn_800F694C(void* obj) {
         fn_800DD38C((const char*)lbl_80271068);
     } else {
         *(u32*)(p + 0x28) = count + 1;
-        *(u32*)(p + 0x6C + count * 4) = (u32)stackBase;
+        *((u32*)(p + 0x6C) + count) = (u32)stackBase;
     }
 
     /* Update obj->0x1C = obj->0x28 - (argCount + stackBase + 3) */
@@ -7200,7 +7196,7 @@ s32 fn_800F694C(void* obj) {
     if (funcIdx >= (u32)*(u16*)(head + 0x4)) {
         fn_800DD38C((const char*)lbl_8027115C, funcIdx);
     } else {
-        *(u32*)(p + 0x14) = (u32)head + *(u32*)(head + funcIdx * 4 + 0x18);
+        *(u32*)(p + 0x14) = (u32)head + *((u32*)(head + 0x18) + funcIdx);
     }
     return 1;
 }
@@ -7347,7 +7343,7 @@ done:
     } else {
         count--;
         *(u32*)(p + 0x28) = count;
-        val = *(u32*)(p + 0x6C + count * 4);
+        val = *((u32*)(p + 0x6C) + count);
     }
     {
         void (*cb)(void*, u32) = (void (*)(void*, u32))*(u32*)(p + 0x10);
@@ -7758,7 +7754,7 @@ u32 fn_800F7434(void* callback, u32 arg, ...) {
     u8* strBase;
     u8* ip;
     u32 state;
-    u32 opcode;
+    s32 opcode;
     void (*dispatch)(void*);
     u32 count;
     volatile u32 ret;
@@ -7813,7 +7809,7 @@ done:
     } else {
         count--;
         *(u32*)(entry + 0x28) = count;
-        val = *(u32*)(entry + 0x6C + count * 4);
+        val = *((u32*)(entry + 0x6C) + count);
     }
     {
         void (*cb)(void*, u32) = (void (*)(void*, u32))*(u32*)(entry + 0x10);

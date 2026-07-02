@@ -10414,8 +10414,9 @@ void* fn_80121C18(void* arg) {
     r30 = fn_8012640C(arg, 0, 0x6f, 0);
     r28 = (u16)fn_8012640C(arg, 0, 0x6e, 0);
 
-    valid = 0;
-    if (r28 != 0) {
+    if (r28 == 0) {
+        valid = 0;
+    } else {
         if (fn_8012640C(NULL, r28, 1, 0) == 0) { valid = 0; }
         else if (r28 >= *(u32*)(u32)lbl_80478F90) { valid = 0; }
         else { valid = 1; }
@@ -12578,10 +12579,10 @@ u32 fn_8012F008(s32 idx, s32 state)
     if (idx < 0 || idx >= 2) {
         valid = 0;
     } else {
-        if ((*(u16*)(lbl_80426BD0 + idx * 0x20 + 4) & 1) != 0) {
-            valid = 1;
-        } else {
+        if ((*(u16*)(lbl_80426BD0 + idx * 0x20 + 4) & 1) == 0) {
             valid = 0;
+        } else {
+            valid = 1;
         }
     }
     if ((valid & 0xFF) == 0) {

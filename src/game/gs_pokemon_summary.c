@@ -1070,8 +1070,10 @@ asm void fn_80016618(void) {
 #pragma push
 #pragma peephole off
 s32 fn_80016618(u8* src, u8* dst) {
+    u8* entry;
     u16 tmp;
-    tmp = (u16)(fn_80103E68((u16)*(u32*)(&sSummaryPageEntries[(s32)(s8)src[0x95] * 0x4C + 0x1C])) >> 16);
+    entry = SUMMARY_ENTRY_RAW(SUMMARY_CTX_S8(src, 0x95));
+    tmp = (u16)(fn_80103E68((u16)SUMMARY_ENTRY_LABEL(entry)) >> 16);
     if ((s32)(s8)*(u8*)&tmp > 0 && (s32)lbl_8047A2D8 == -1) {
         dst[0x67] = *(f32*)&lbl_8047B740 * (*(f32*)&lbl_8047B744 - *(f32*)&lbl_8047A2C4);
     } else {
@@ -1335,10 +1337,12 @@ s32 fn_80016F14(u8* src, u8* dst) {
         if ((s32)lbl_8047A2C8 != 0) {
             v -= (s32)*(f32*)&lbl_8047A2D0;
         }
-        if (v + (s32)*(s16*)(dst + 0x56) < 0x95) {
-            col = 0;
-        } else if (v < 0x18d) {
-            col = 0xff;
+        if (v + (s32)*(s16*)(dst + 0x56) >= 0x95) {
+            if (v >= 0x18d) {
+                col = 0;
+            } else {
+                col = 0xff;
+            }
         } else {
             col = 0;
         }

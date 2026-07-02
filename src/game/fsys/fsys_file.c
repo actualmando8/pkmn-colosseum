@@ -1329,7 +1329,7 @@ u32 fn_8017C39C(FSYSSlot* slot) {
 #endif
 
 /* 0x8017C414 | 0x154 */
-extern u32 fn_8017A624(void*);
+extern s32 fn_8017A624(void*);
 extern u32 OSDisableInterrupts(void);
 extern void OSRestoreInterrupts(u32);
 #if 0
@@ -1776,8 +1776,6 @@ asm void fn_8017D68C(void) {
 #pragma optimization_level 0
 FSYSFileHandle* fn_8017D68C(FSYSSlot* slot) {
     FSYSFileHandle* table;
-    FSYSFileHandle* src;
-    FSYSFileHandle* dst;
     FSYSFileHandle saved;
     s32 foundIndex;
     s32 i;
@@ -1806,10 +1804,7 @@ FSYSFileHandle* fn_8017D68C(FSYSSlot* slot) {
         i = 0;
         while (i < (s32)lbl_8047B1BC - 1) {
             if (i >= foundIndex) {
-                src = &table[i + 1];
-                dst = &table[i];
-                dst->handleID = src->handleID;
-                dst->userData = src->userData;
+                table[i] = table[i + 1];
             }
             i++;
         }
@@ -1821,10 +1816,7 @@ FSYSFileHandle* fn_8017D68C(FSYSSlot* slot) {
         if ((s32)lbl_8047B1BC == 0x64) {
             i = 0;
             while (i < 0x63) {
-                src = &table[i + 1];
-                dst = &table[i];
-                dst->handleID = src->handleID;
-                dst->userData = src->userData;
+                table[i] = table[i + 1];
                 i++;
             }
             lbl_8047B1BC = lbl_8047B1BC - 1;

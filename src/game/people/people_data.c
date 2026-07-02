@@ -756,8 +756,7 @@ void fn_80142B24(void* p, u32 a, u16 b, u32 c, u32 d) {
         break;
     case 10:
         fn_80143BA0(target, d);
-        fn_80143B90(target, (u16)d);
-        break;
+        /* fallthrough */
     case 12:
         fn_80143B90(target, (u16)d);
         break;

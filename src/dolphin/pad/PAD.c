@@ -626,9 +626,9 @@ BOOL fn_800AB150(PADStatus *status) {
  * fn_800AB4FC = PADControlAllMotors (unmatched attempt)
  */
 void fn_800AB4FC(const u32 *commandArray) {
-    BOOL commit = FALSE;
     BOOL enabled = OSDisableInterrupts();
     s32 chan;
+    BOOL commit = FALSE;
 
     for (chan = 0; chan < 4; chan++, commandArray++) {
         u32 chanBit = 0x80000000u >> chan;
@@ -760,7 +760,7 @@ BOOL __PADDisableRecalibration(BOOL disable) {
 
     old = (*(volatile u8 *)0x800030E3 & 0x40) ? TRUE : FALSE;
     flags = *(volatile u8 *)0x800030E3;
-    flags &= ~0x40;
+    flags &= 0xbf;
     *(volatile u8 *)0x800030E3 = flags;
     if (disable) {
         *(volatile u8 *)0x800030E3 = *(volatile u8 *)0x800030E3 | 0x40;

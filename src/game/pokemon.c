@@ -906,7 +906,7 @@ u32 fn_801F0134(u32 param1, u32 param2) {
                 else
                     byte = entry[1];
                 if ((u8)byte != 0) {
-                    if (fn_801F02AC(i, slotBase, param2) == param1) {
+                    if (param1 == fn_801F02AC(i, slotBase, param2)) {
                         return i;
                     }
                 }
@@ -914,8 +914,7 @@ u32 fn_801F0134(u32 param1, u32 param2) {
         }
         i++;
     }
-    i = 0;
-    return i;
+    return 0;
 }
 
 /* 0x801F0234 | size: 0x28 | small */
@@ -953,11 +952,11 @@ u32 fn_801F02AC(u32 slotType, u32 ptr, u32 count) {
     u32 ctxObj;
     u32 savedPtr;
     u32 numSides;
-    u32 m;
-    u32 n;
-    u32 k;
     u32 i;
     u32 j;
+    u32 k;
+    u32 m;
+    u32 n;
     u32 flag;
 
     if ((u16)slotType == 0) {
@@ -2390,8 +2389,8 @@ void fn_801F2F3C(void *param_1) {
     u32 count, cols, rows, i;
     void *team;
     u32 j;
-    void *row_obj;
     u32 k;
+    void *row_obj;
     void *cell;
 
     pkmn = param_1;

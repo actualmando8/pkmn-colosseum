@@ -2442,12 +2442,11 @@ asm void fn_80163F98(void) {
 }
 #else
 void fn_80163F98(void) {
-    u32 one = 1;
-    lbl_8047B098 = one;
+    lbl_8047B098 = 1;
     if (lbl_8047B094 != 0) {
         lbl_8047B094 = 0;
         if (lbl_8047B090 == 0) {
-            lbl_8047B090 = one;
+            lbl_8047B090 = 1;
             OSEnableInterrupts();
             ((void(*)(void))lbl_8047B0A4)();
             OSDisableInterrupts();
@@ -2458,31 +2457,38 @@ void fn_80163F98(void) {
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
 asm u32 salInitAi(u32(*fnptr)(void), u32 d, u32 a) {
 #include "src/game/people/people_field_fn_80163FFC.inc"
 }
 #else
+/* WALL (Sonnet 5 2026-07-01, measured 99.6%): guard-clause restructure
+ * (`if (ptr != 0) { ...; return 1; } return 0;`) plus opt_level 4 fixed the
+ * branch polarity/layout and register spill vs base/prior attempt. Residual
+ * is register-letter only: target loads the 0/1 immediates into r0/r4 in the
+ * opposite pairing from ours (li r4,1/li r0,0 vs our li r4,0/li r0,1), which
+ * flips the two adjacent `stw` operand registers. 3 statement-order variants
+ * tried (naive, swapped store order, local one/zero temps); none changed the
+ * pairing further. Known wall class, not C-controllable. */
 u32 salInitAi(u32(*fnptr)(void), u32 d, u32 a) {
     lbl_8047B09C = fn_801643D8(0xA00);
-    if (lbl_8047B09C == 0) {
-        return 0;
+    if (lbl_8047B09C != 0) {
+        memset((void*)lbl_8047B09C, 0, 0xA00);
+        DCFlushRange((void*)lbl_8047B09C, 0xA00);
+        lbl_8047B098 = 1;
+        lbl_8047B094 = 0;
+        lbl_8047B0A0 = 1;
+        lbl_8047B090 = 0;
+        lbl_8047B0A4 = (u32)fnptr;
+        fn_800AC02C((u32)salCallback);
+        fn_800AC070((u8*)(lbl_8047B09C + 0x80000000u) + (u32)lbl_8047B0A0 * 0x280, 0x280);
+        ((u32*)lbl_80434C50)[1] = 0x20;
+        *(u32*)a = 0x7D00;
+        return 1;
     }
-
-    memset((void*)lbl_8047B09C, 0, 0xA00);
-    DCFlushRange((void*)lbl_8047B09C, 0xA00);
-    lbl_8047B094 = 0;
-    lbl_8047B098 = 1;
-    lbl_8047B0A0 = 1;
-    lbl_8047B090 = 0;
-    lbl_8047B0A4 = (u32)fnptr;
-    fn_800AC02C((u32)salCallback);
-    fn_800AC070((u8*)(lbl_8047B09C + 0x80000000u) + (u32)lbl_8047B0A0 * 0x280, 0x280);
-    ((u32*)lbl_80434C50)[1] = 0x20;
-    *(u32*)a = 0x7D00;
-    return 1;
+    return 0;
 }
 #endif
 #pragma pop

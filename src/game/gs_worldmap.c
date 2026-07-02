@@ -3937,7 +3937,8 @@ s32 fn_80029CC0(u8* r30) {
                     cur = (u16)fn_80143C50(slot);
                 }
                 delta = (u16)(0x3e7 - cur);
-                give = (delta >= qty) ? qty : delta;
+                if (delta < qty) give = delta;
+                else give = qty;
                 fn_80143B70(slot, (u16)(cur + give));
             }
         } else {
@@ -3955,7 +3956,8 @@ s32 fn_80029CC0(u8* r30) {
                         cur = (u16)fn_80143C50(slot);
                     }
                     delta = (u16)(0x3e7 - cur);
-                    give = (delta >= qty) ? qty : delta;
+                    if (delta < qty) give = delta;
+                    else give = qty;
                     fn_80143B70(slot, (u16)(cur + give));
                     qty = (u16)(qty - give);
                 }

@@ -2580,7 +2580,7 @@ void fn_801F8A18(void) {
 
 /* 0x801F8C00 | size: 0x180 */
 u32 fn_801F8C00(void* context, void* filter) {
-    extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 idx);
+    extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u16 idx);
     extern u8 fn_80204854(void* pokemon, void* filter);
     extern u8 fn_80204928(void* filter, void* pokemon);
     extern u8 fn_80206608(void* ptr);
@@ -2603,10 +2603,8 @@ u32 fn_801F8C00(void* context, void* filter) {
             if ((u8)fn_80206780(pokemon) == 0) {
                 pokemon = NULL;
             }
-            if (pokemon != NULL) {
-                if ((u8)fn_80204928(filter, pokemon) == 1) {
-                    break;
-                }
+            if (pokemon != NULL && (u8)fn_80204928(filter, pokemon) == 1) {
+                break;
             }
         }
         pokemon = NULL;
@@ -2625,11 +2623,9 @@ u32 fn_801F8C00(void* context, void* filter) {
             if ((u8)fn_80206780(pokemon) == 0) {
                 pokemon = NULL;
             }
-            if (pokemon != NULL) {
-                if ((u8)fn_80204854(pokemon, filter) == 1) {
-                    found = 1;
-                    break;
-                }
+            if (pokemon != NULL && (u8)fn_80204854(pokemon, filter) == 1) {
+                found = 1;
+                break;
             }
         }
         found = 0;
@@ -2667,12 +2663,12 @@ void* fn_801F8D80(void* context, void* filter) {
 
 /* 0x801F8E34 | size: 0xF0 */
 void* fn_801F8E34(void* context, void* filter) {
-    extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 idx);
+    extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u16 idx);
     extern u8 fn_80204928(void* filter, void* pokemon);
     extern u8 fn_802062FC(void* ptr);
     extern u8 fn_80206780(void* ptr);
-    void* pokemon;
     u16 i;
+    void* pokemon;
 
     if (context == NULL) {
         return NULL;
@@ -2691,10 +2687,8 @@ void* fn_801F8E34(void* context, void* filter) {
             if ((u8)fn_80206780(pokemon) == 0) {
                 pokemon = NULL;
             }
-            if (pokemon != NULL) {
-                if ((u8)fn_80204928(filter, pokemon) == 1) {
-                    break;
-                }
+            if (pokemon != NULL && (u8)fn_80204928(filter, pokemon) == 1) {
+                break;
             }
         }
         pokemon = NULL;
@@ -2709,12 +2703,13 @@ void* fn_801F8E34(void* context, void* filter) {
 
 /* 0x801F8F24 | size: 0xB4 */
 void* fn_801F8F24(void* context, s16 speciesId) {
-    extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 idx);
+    extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u16 idx);
     extern u8 fn_80206A04(void* ptr);
     void* pokemon;
     u16 i;
+    s16 species;
 
-    if ((s16)speciesId < 0) {
+    if ((species = (s16)speciesId) < 0) {
         return NULL;
     }
     for (i = 0; i < 6; i++) {
@@ -2723,7 +2718,7 @@ void* fn_801F8F24(void* context, s16 speciesId) {
             pokemon = NULL;
         }
         if (pokemon != NULL) {
-            if ((s16)(s32)fn_8012640C(pokemon, 0, 0xCE, 0) == (s16)speciesId) {
+            if (species == (s16)(s32)fn_8012640C(pokemon, 0, 0xCE, 0)) {
                 return pokemon;
             }
         }
@@ -2795,10 +2790,9 @@ void fn_801F9130(void* unused, void* trainer, void* pokemon) {
     extern void fn_80204F6C(void* trainer, u32 p1, u32 p2, u32 p3, void* table, u16 moveId, u32 nameId, u32 slotIdx);
     extern void* fn_80205B8C(void* trainer);
     extern void fn_8022B2CC(void* trainer, u16 moveId, void* pokemon, u32 p3, u32 p4, u32 p5, s32 p6);
-    u32 sp8;
-    s8 i;
-    u16 moveId;
     s32 slot;
+    u16 moveId;
+    s8 i;
 
     if ((u8)fn_801FF1BC(trainer, 1) != 0) {
         return;
@@ -2812,7 +2806,6 @@ void fn_801F9130(void* unused, void* trainer, void* pokemon) {
         }
     }
     fn_8022B2CC(trainer, moveId, pokemon, 0, 1, 0, -1);
-    sp8 = 0;
     fn_80204F6C(trainer, 0, 0x13, 0, (void*)lbl_80375CA8, moveId, fn_801F0134(trainer, pokemon), (u32)i);
 }
 #pragma pop
@@ -2821,7 +2814,7 @@ void fn_801F9130(void* unused, void* trainer, void* pokemon) {
 u32 fn_801F923C(void* context, void* param) {
     extern u16 fn_801EF634(void* ctx);
     extern void fightActionInit(void* ptr);
-    extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 idx);
+    extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u16 idx);
     extern void fn_80207760(void* ptr);
     extern void fn_802342CC(void* ctx, void* param);
     extern u8 fn_80262508(void* ctx, void* param);
@@ -2871,10 +2864,7 @@ u32 fn_801F923C(void* context, void* param) {
     if (battleType != 1) {
         return 1;
     }
-    if ((u8)fn_80262508(context, param) == 0) {
-        return 0;
-    }
-    return 1;
+    return (u8)fn_80262508(context, param) != 0;
 }
 
 /* 0x801F93F8 | size: 0x208 | large */
@@ -3043,13 +3033,11 @@ s32 fn_801F9600(void* context, void* p1, void* p2, void* p3) {
     extern s32 fn_8024E690(void* ctx, void* p1, void* p2, void* p3);
     extern s32 fn_80262D3C(void* ctx, void* p1, void* p2, void* p3);
     extern s32 fn_80263DE4(void* ctx, u32 zero, void* p1, void* p2, u32 flags);
-    s32 result;
     u16 slot;
     u16 species;
     u16 type;
     u8 battleType;
 
-    result = -1;
     slot = (u16)(u32)fn_801FB1C0(context, 0, 0x43, 0);
     species = (u16)(u32)fn_801FB1C0(0, slot, 0x2, 0);
     if ((u8)fn_80008174() == 1) {
@@ -3078,7 +3066,7 @@ s32 fn_801F9600(void* context, void* p1, void* p2, void* p3) {
         battleType = 2;
     }
     if (battleType != 1) {
-        return result;
+        return -1;
     }
     return fn_80262D3C(context, p1, p2, p3);
 }
@@ -9334,8 +9322,8 @@ void fn_80201340(void* context, void* target, u16 value) {
     extern u8 fn_8020E614(void* entry);
     u8* data;
     u8* entry;
-    u32 i;
     u32 offset;
+    u32 i;
 
     if (context == NULL) {
         return;

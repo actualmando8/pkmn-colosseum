@@ -619,13 +619,13 @@ after:
         fn_80106D3C(2, 0x4263, 1, 0);
         fn_801069FC(1);
         *out = 0;
-    } else {
-        fn_8012959C(lbl_8047A2F8, idx, 1, (s16)target_n);
-        fn_80132A38(0x2d, (u16)idx);
-        fn_80106D3C(2, 0x4268, 1, 0);
-        fn_801069FC(1);
-        *out = 0;
+        return 0;
     }
+    fn_8012959C(lbl_8047A2F8, idx, 1, (s16)target_n);
+    fn_80132A38(0x2d, (u16)idx);
+    fn_80106D3C(2, 0x4268, 1, 0);
+    fn_801069FC(1);
+    *out = 0;
     return 0;
 }
 #pragma pop
