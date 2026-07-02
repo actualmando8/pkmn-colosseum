@@ -142,13 +142,23 @@ def main():
     for rank, (payoff, g, avg_size) in enumerate(scored[:args.top], 1):
         g = sorted(g, key=lambda i: fns[i]["addr"])
         n_unm = sum(1 for i in g if (fns[i]["fuzzy"] or 0) < 100.0)
-        print("#%-3d payoff=%-9.0f members=%-4d avg_size=%-6.0f unmatched=%d  unit=%s"
-              % (rank, payoff, len(g), avg_size, n_unm, fns[g[0]]["unit"]))
+        # a shape-family can span units; summarize the true distribution
+        # (labeling by the lowest-address member alone misdirected a sweep)
+        unit_counts = {}
+        for i in g:
+            unit_counts[fns[i]["unit"]] = unit_counts.get(fns[i]["unit"], 0) + 1
+        unit_summary = " ".join(
+            "%s(%d)" % (u, c)
+            for u, c in sorted(unit_counts.items(), key=lambda kv: -kv[1])[:4])
+        if len(unit_counts) > 4:
+            unit_summary += " +%d more units" % (len(unit_counts) - 4)
+        print("#%-3d payoff=%-9.0f members=%-4d avg_size=%-6.0f unmatched=%d  units: %s"
+              % (rank, payoff, len(g), avg_size, n_unm, unit_summary))
         for i in g[:8]:
             f = fns[i]
             fuzzy = "%.1f%%" % f["fuzzy"] if f["fuzzy"] is not None else "-"
-            print("      0x%08X %-45s sz=%-5d %s" % (
-                f["addr"], f["name"], f["size"], fuzzy))
+            print("      0x%08X %-45s sz=%-5d %s %s" % (
+                f["addr"], f["name"], f["size"], fuzzy, f["unit"]))
         if len(g) > 8:
             print("      ... +%d more" % (len(g) - 8))
         print()
