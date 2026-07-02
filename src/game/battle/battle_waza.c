@@ -107,8 +107,8 @@ extern void  fn_80122048(void* particle, f32 x, f32 y, f32 z); /* set particle p
 extern void* fn_80129280(s32 side, s32 slotType);
 extern void* fn_801C4078(s32 slot);                        /* get grid slot model */
 extern f32   fn_801C4814(s32 slot);                        /* get slot X */
-extern f32   fn_801C483C(s32 slot);                        /* get slot Y */
-extern f32   fn_801C4864(s32 slot);                        /* get slot Z */
+extern f32   fadeEffectHookFunction_fadein_Init(s32 slot);                        /* get slot Y */
+extern f32   fadeEffectHookFunction_trainer_Init(s32 slot);                        /* get slot Z */
 
 /* Waza effect functions (engine callbacks) */
 extern s32   fn_801190DC(s32, s32, s32);

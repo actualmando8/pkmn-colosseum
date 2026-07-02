@@ -962,7 +962,7 @@ void fn_80069C0C(void* arg0) {
 #pragma scheduling off
 u16 fn_8006A65C(void) {
     extern void* fn_80129280(int, int);
-    extern void fn_801657D0(int);
+    extern void scriptSoundStop(int);
     extern void fn_80088EA8(void*);
     extern u32 fn_801906A0(int);
     extern void fn_80069C0C(void*);
@@ -972,7 +972,7 @@ u16 fn_8006A65C(void) {
     u32 x;
 
     menuPtr = (u8*)fn_80129280(0, 0xe) + 0xC9A8;
-    fn_801657D0(0x3e8);
+    scriptSoundStop(0x3e8);
     fn_80088EA8(menuPtr);
     x = fn_801906A0(0xb59);
     *(u32*)((u8*)fn_80129280(0, 0xe) + 0x14) = x;

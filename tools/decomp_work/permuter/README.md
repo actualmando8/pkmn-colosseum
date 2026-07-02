@@ -8,6 +8,26 @@ Windows).  This farm sidesteps `-j` entirely: it runs N independent
 single-threaded permuter processes, one per work unit, all native
 (mwcceppc.exe runs directly — no wibo, no wine, no WSL).
 
+## Measured scaling (Ryzen 9 9950X3D, 16C/32T)
+
+The hard ceiling on this box is Windows **process-creation throughput**
+(kernel + Defender image-load inspection), not CPU.  Every permuter iteration
+spawns child processes; cutting spawns per iteration is what scales:
+
+| configuration | spawns/iter | aggregate iters/s (steady) |
+|---|---|---|
+| compile.bat → cmd → sjiswrap → mwcc, + objdump | ~5 | ~55 flat from 8..20 workers |
+| direct mwcc via `compile_cmd.json`, + objdump | 2 | ~90 at 8–16 workers |
+
+Throughput plateaus by ~10 workers and degrades past ~16, so the farm runs
+**12 workers** (breadth over 12 targets; total iteration throughput is the
+same from 8 up).  Temp files are kept inside the Defender-excluded farm dir
+(`%TEMP%` is redirected per worker) — candidate .c/.o scanning was a
+measurable part of the old tax.  Killing worker trees must use
+`taskkill /T` (`Stop-Process` on a `py`-launched process orphans the real
+python worker — zombie workers silently eating cores are another way a farm
+"fails to scale").
+
 ## Pieces
 
 | file | where it runs | what it does |
@@ -47,7 +67,11 @@ ssh win "type C:\Users\douglaswhittingham\gamecube-decomp\pkmn-permuter\state\st
 ```
 
 The farm runs as scheduled task `PkmnPermuterFarm` (S4U, at-startup trigger,
-no time limit), so it survives ssh disconnects and reboots.  While it runs it
+no time limit, absolute path to
+`...\AppData\Local\Programs\Python\Python312\python.exe` — `py` is not on the
+task context's PATH), so it survives ssh disconnects and reboots.
+Re-register/reconfigure with `register_task.ps1 -Workers N -Budget S` in the
+farm dir.  While it runs it
 calls `SetThreadExecutionState(ES_SYSTEM_REQUIRED)` so the box will not sleep;
 when it exits, normal sleep policy resumes.  `powercfg /change
 standby-timeout-ac 0` was also set (AC sleep disabled) — revert with

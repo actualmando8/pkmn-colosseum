@@ -662,17 +662,19 @@ void fn_8021D010(void) {
 void fn_80222ADC(void) {
     u32 ctx1 = fn_801F025C(0x11, 0);
     u32 fieldD9 = fn_8012640C(ctx1, 0, 0xD9, 0);
-    s16 val = (s16)(u8)fn_8011BEB4(fieldD9, 0, 0x31, 0) - 1;
+    s16 val = (long long)(((s16)((u8)fn_8011BEB4(fieldD9, 0, 0x31, 0))) - 1);
 
     if (val < 0) {
         val = 0;
     }
     if (val == 0) {
+        ctx1 = ctx1;
         lbl_8047B610 = lbl_8047B610 + 5;
     } else {
         lbl_8047B610 = *(u32*)(lbl_8047B610 + 1);
     }
     fn_8011BBD8(fieldD9, 0, 0x31, 0, val);
+    ctx1 = ctx1;
 }
 #pragma optimize_for_size reset
 

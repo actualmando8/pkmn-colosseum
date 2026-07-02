@@ -349,8 +349,8 @@ typedef struct TypeMatchup {
 /* fn_801C43F4 */ void fn_801C43F4(s32 seqType, f32 param1, f32 param2); /* 0x3DC */
 /* fadeInit */ s32  fadeInit(void);
 /* fn_801C4814 */ f32  fn_801C4814(s32 slot);
-/* fn_801C483C */ f32  fn_801C483C(s32 slot);
-/* fn_801C4864 */ f32  fn_801C4864(s32 slot);
+/* fadeEffectHookFunction_fadein_Init */ f32  fadeEffectHookFunction_fadein_Init(s32 slot);
+/* fadeEffectHookFunction_trainer_Init */ f32  fadeEffectHookFunction_trainer_Init(s32 slot);
 /* fadeEffectHookFunction_fadeout_in_Init */ void fadeEffectHookFunction_fadeout_in_Init(s32 slot, f32 x);
 /* fadeEffectHookFunction_carde_Init */ void fadeEffectHookFunction_carde_Init(s32 slot, f32 y);
 /* fadeEffectHookFunction_boss_Init */ void fadeEffectHookFunction_boss_Init(s32 slot, f32 z);

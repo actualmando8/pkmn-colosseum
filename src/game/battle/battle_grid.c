@@ -1215,7 +1215,7 @@ f32 fn_801C4814(s32 slot) {
 #pragma scheduling on
 
 /**
- * fn_801C483C - Grid get slot Y position.
+ * fadeEffectHookFunction_fadein_Init - Grid get slot Y position.
  * Address: 0x801C483C | Size: 0x28
  */
 #pragma scheduling off
@@ -1226,7 +1226,7 @@ f32 fn_801C4814(s32 slot) {
 #pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
-f32 fn_801C483C(s32 slot) {
+f32 fadeEffectHookFunction_fadein_Init(s32 slot) {
     extern void fn_801C4CB8(void);
 
     fn_801C431C((s32)fn_801C4CB8);
@@ -1241,7 +1241,7 @@ f32 fn_801C483C(s32 slot) {
 #pragma scheduling on
 
 /**
- * fn_801C4864 - Grid get slot Z position.
+ * fadeEffectHookFunction_trainer_Init - Grid get slot Z position.
  * Address: 0x801C4864 | Size: 0x28
  */
 #pragma scheduling off
@@ -1253,7 +1253,7 @@ f32 fn_801C483C(s32 slot) {
 #pragma scheduling off
 #pragma scheduling off
 #pragma scheduling off
-f32 fn_801C4864(s32 slot) {
+f32 fadeEffectHookFunction_trainer_Init(s32 slot) {
     extern f32 fn_801C54FC(void);
 
     fn_801C431C((s32)fn_801C54FC);

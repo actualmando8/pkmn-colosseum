@@ -35,7 +35,7 @@
  *   while entry 0x0A pairs 0x801145C0 with the true ParticlePostFunc
  *   (0x801144D0, the scene_data group-linking one) -- matching XD, where
  *   the two PreFunc bodies are also byte-identical to each other.
- *   The GFL PostFunc (table 0x11) is fn_801142F8 in gs_field_colquery.c
+ *   The GFL PostFunc (table 0x11) is floorReadGFLPostFunc in gs_field_colquery.c
  *   territory -- rename parked until that fleet-owned file is free.
  *   An earlier first-generation "orphan" recovery block (names that never
  *   paired, wrong attributions) was removed by the 2026-07-01 pass; its

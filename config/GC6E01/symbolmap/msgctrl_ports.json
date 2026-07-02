@@ -1,7 +1,7 @@
 {
  "unit": "src/game/effect/effect_util.c (mis-attributed: actually the message-control TU; msgctrl* handlers 0x80131630-0x80132690 are DEFINED here)",
  "evidence": "index-parallel port from XD msgctrlcode table (XD .data 0x80404710, 111 entries) to Colosseum lbl_80363778 (.data, 95 entries, [param,handler] stride 8); 10/10 anchors at identical indices; unused holes (58-60,63-64) agree between games; consumer fn_800F98F4 dispatches on escape-code byte",
- "status": "PARKED: effect_util.c is fleet-owned/dirty; apply when the file frees or let the fleet apply during its own pass",
+ "status": "APPLIED 2026-07-02 (fleet WIP landed; effect_util.c freed)",
  "renames": [
   {
    "old": "fn_80132690",

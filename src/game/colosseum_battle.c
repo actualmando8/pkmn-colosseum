@@ -28547,7 +28547,7 @@ fn_80260EBC(u32 r3,u32 r4,u32 r5,u16 *r6,
 {
     extern u32 DAT_8027a488;
     extern int fn_8011F5FC();
-    extern int fn_801657D0();
+    extern int scriptSoundStop();
     extern int fn_80260910();
     extern f32 lbl_8047E6C0;
   u16 uVar1;
@@ -28667,7 +28667,7 @@ LAB_0025e130:
     }
     else {
       uVar5 = fn_801656D8();
-      fn_801657D0(0x32);
+      scriptSoundStop(0x32);
     }
     local_178 = iVar9;
     local_170 = uVar4;
@@ -30173,7 +30173,7 @@ void fn_80266250(void)
     extern int fn_801653C4();
     extern u32 fn_801656D8();
     extern void fn_80165A20();
-    extern void fn_801657D0();
+    extern void scriptSoundStop();
     extern void fn_801659FC();
     extern void fn_801DADC0();
     extern void fn_801DAC90();
@@ -30195,7 +30195,7 @@ void fn_80266250(void)
     iVar2 = fn_801653BC();
     if (iVar2 != 0) {
         uVar4 = fn_801656D8();
-        fn_801657D0(0x32);
+        scriptSoundStop(0x32);
     } else {
         uVar4 = 0;
     }

@@ -7971,7 +7971,7 @@ u32 fn_8020DAD0(u32 p1) {
     extern void heroDecPokedoru();
     extern u32 fn_8012A5B0();
     extern void fn_80132A38();
-    extern void fn_801657D0();
+    extern void scriptSoundStop();
     extern void fn_80165A20();
     extern void fn_80166AB8();
     extern void fn_8018DA88();
@@ -8048,7 +8048,7 @@ u32 fn_8020DAD0(u32 p1) {
             }
         }
         fn_80165A20(1, 1000, 0xff);
-        fn_801657D0(1000);
+        scriptSoundStop(1000);
         fn_8020DFF0(uVar1);
         uVar2 = fn_8020DEB0();
         uVar4 = fn_8020DE80();

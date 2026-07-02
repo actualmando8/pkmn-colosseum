@@ -493,7 +493,7 @@
 "addr": "0x80007FDC",
 "size": 56,
 "label": "gs-engine",
-"confidence": 1.9,
+"confidence": 1.89,
 "seed": null
 },
 {
@@ -1588,7 +1588,7 @@
 "name": "fn_80011288",
 "addr": "0x80011288",
 "size": 540,
-"label": "fight",
+"label": "gs-engine",
 "confidence": 1.9,
 "seed": null
 },
@@ -1596,7 +1596,7 @@
 "name": "fn_800114A4",
 "addr": "0x800114A4",
 "size": 604,
-"label": "fight",
+"label": "gs-engine",
 "confidence": 1.9,
 "seed": null
 },
@@ -26865,7 +26865,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801142F8",
+"name": "floorReadGFLPostFunc",
 "addr": "0x801142F8",
 "size": 52,
 "label": "field",
@@ -33017,7 +33017,7 @@
 "seed": null
 },
 {
-"name": "fn_80131630",
+"name": "msgctrlBaseLineBias",
 "addr": "0x80131630",
 "size": 48,
 "label": "field",
@@ -33025,7 +33025,7 @@
 "seed": null
 },
 {
-"name": "fn_80131660",
+"name": "msgctrlLineSpace",
 "addr": "0x80131660",
 "size": 48,
 "label": "field",
@@ -33033,7 +33033,7 @@
 "seed": null
 },
 {
-"name": "fn_80131690",
+"name": "msgctrlIndentOff",
 "addr": "0x80131690",
 "size": 16,
 "label": "fight",
@@ -33041,7 +33041,7 @@
 "seed": null
 },
 {
-"name": "fn_801316A0",
+"name": "msgctrlNpc",
 "addr": "0x801316A0",
 "size": 8,
 "label": "fight",
@@ -33049,7 +33049,7 @@
 "seed": null
 },
 {
-"name": "fn_801316A8",
+"name": "msgctrlTribe",
 "addr": "0x801316A8",
 "size": 40,
 "label": "fight",
@@ -33057,7 +33057,7 @@
 "seed": null
 },
 {
-"name": "fn_801316D0",
+"name": "msgctrlString2",
 "addr": "0x801316D0",
 "size": 8,
 "label": "fight",
@@ -33065,7 +33065,7 @@
 "seed": null
 },
 {
-"name": "fn_801316D8",
+"name": "msgctrlMenuMsgID2",
 "addr": "0x801316D8",
 "size": 8,
 "label": "fight",
@@ -33073,7 +33073,7 @@
 "seed": null
 },
 {
-"name": "fn_801316E0",
+"name": "msgctrlMenuMsgID",
 "addr": "0x801316E0",
 "size": 8,
 "label": "fight",
@@ -33105,7 +33105,7 @@
 "seed": null
 },
 {
-"name": "fn_80131794",
+"name": "msgctrlMenuMoney",
 "addr": "0x80131794",
 "size": 52,
 "label": "gs-engine",
@@ -33113,7 +33113,7 @@
 "seed": null
 },
 {
-"name": "fn_801317C8",
+"name": "msgctrlMenuFullDigit",
 "addr": "0x801317C8",
 "size": 52,
 "label": "gs-engine",
@@ -33121,7 +33121,7 @@
 "seed": null
 },
 {
-"name": "fn_801317FC",
+"name": "msgctrlPokemonID",
 "addr": "0x801317FC",
 "size": 40,
 "label": "field",
@@ -33129,7 +33129,7 @@
 "seed": null
 },
 {
-"name": "fn_80131824",
+"name": "msgctrlString",
 "addr": "0x80131824",
 "size": 8,
 "label": "field",
@@ -33137,7 +33137,7 @@
 "seed": null
 },
 {
-"name": "fn_8013182C",
+"name": "msgctrlTime",
 "addr": "0x8013182C",
 "size": 520,
 "label": "gs-engine",
@@ -33145,7 +33145,7 @@
 "seed": null
 },
 {
-"name": "fn_80131A34",
+"name": "msgctrlMoney",
 "addr": "0x80131A34",
 "size": 52,
 "label": "gs-engine",
@@ -33153,7 +33153,7 @@
 "seed": null
 },
 {
-"name": "fn_80131A68",
+"name": "msgctrlMenuZDigit2",
 "addr": "0x80131A68",
 "size": 52,
 "label": "gs-engine",
@@ -33161,7 +33161,7 @@
 "seed": null
 },
 {
-"name": "fn_80131A9C",
+"name": "msgctrlMenuZDigit",
 "addr": "0x80131A9C",
 "size": 52,
 "label": "gs-engine",
@@ -33169,7 +33169,7 @@
 "seed": null
 },
 {
-"name": "fn_80131AD0",
+"name": "msgctrlMenuHex2",
 "addr": "0x80131AD0",
 "size": 52,
 "label": "gs-engine",
@@ -33177,7 +33177,7 @@
 "seed": null
 },
 {
-"name": "fn_80131B04",
+"name": "msgctrlMenuHex",
 "addr": "0x80131B04",
 "size": 52,
 "label": "gs-engine",
@@ -33185,7 +33185,7 @@
 "seed": null
 },
 {
-"name": "fn_80131B38",
+"name": "msgctrlMenuUDigit2",
 "addr": "0x80131B38",
 "size": 52,
 "label": "gs-engine",
@@ -33193,7 +33193,7 @@
 "seed": null
 },
 {
-"name": "fn_80131B6C",
+"name": "msgctrlMenuUDigit",
 "addr": "0x80131B6C",
 "size": 52,
 "label": "gs-engine",
@@ -33201,7 +33201,7 @@
 "seed": null
 },
 {
-"name": "fn_80131BA0",
+"name": "msgctrlSeOn",
 "addr": "0x80131BA0",
 "size": 8,
 "label": "gs-engine",
@@ -33209,7 +33209,7 @@
 "seed": null
 },
 {
-"name": "fn_80131BA8",
+"name": "msgctrlSeOff",
 "addr": "0x80131BA8",
 "size": 8,
 "label": "gs-engine",
@@ -33217,7 +33217,7 @@
 "seed": null
 },
 {
-"name": "fn_80131BB0",
+"name": "msgctrlPasoName",
 "addr": "0x80131BB0",
 "size": 8,
 "label": "gs-engine",
@@ -33225,7 +33225,7 @@
 "seed": null
 },
 {
-"name": "fn_80131BB8",
+"name": "msgctrlItemName",
 "addr": "0x80131BB8",
 "size": 8,
 "label": "gs-engine",
@@ -33233,7 +33233,7 @@
 "seed": null
 },
 {
-"name": "fn_80131BC0",
+"name": "msgctrlWazaName",
 "addr": "0x80131BC0",
 "size": 8,
 "label": "gs-engine",
@@ -33241,7 +33241,7 @@
 "seed": null
 },
 {
-"name": "fn_80131BC8",
+"name": "msgctrlTrainerClientno",
 "addr": "0x80131BC8",
 "size": 8,
 "label": "gs-engine",
@@ -33249,7 +33249,7 @@
 "seed": null
 },
 {
-"name": "fn_80131BD0",
+"name": "msgctrlTrainerEnename2",
 "addr": "0x80131BD0",
 "size": 8,
 "label": "gs-engine",
@@ -33257,7 +33257,7 @@
 "seed": null
 },
 {
-"name": "fn_80131BD8",
+"name": "msgctrlTrainerEnename",
 "addr": "0x80131BD8",
 "size": 8,
 "label": "gs-engine",
@@ -33265,7 +33265,7 @@
 "seed": null
 },
 {
-"name": "fn_80131BE0",
+"name": "msgctrlTrainerLose",
 "addr": "0x80131BE0",
 "size": 8,
 "label": "fight",
@@ -33273,7 +33273,7 @@
 "seed": null
 },
 {
-"name": "fn_80131BE8",
+"name": "msgctrlTrainerName",
 "addr": "0x80131BE8",
 "size": 8,
 "label": "fight",
@@ -33281,7 +33281,7 @@
 "seed": null
 },
 {
-"name": "fn_80131BF0",
+"name": "msgctrlTrainerType",
 "addr": "0x80131BF0",
 "size": 8,
 "label": "fight",
@@ -33289,7 +33289,7 @@
 "seed": null
 },
 {
-"name": "fn_80131BF8",
+"name": "msgctrlSideDefenceNameno",
 "addr": "0x80131BF8",
 "size": 40,
 "label": "fight",
@@ -33297,7 +33297,7 @@
 "seed": null
 },
 {
-"name": "fn_80131C20",
+"name": "msgctrlSideDefenceNamewo",
 "addr": "0x80131C20",
 "size": 40,
 "label": "fight",
@@ -33305,7 +33305,7 @@
 "seed": null
 },
 {
-"name": "fn_80131C48",
+"name": "msgctrlSideDefenceNameha",
 "addr": "0x80131C48",
 "size": 40,
 "label": "fight",
@@ -33313,7 +33313,7 @@
 "seed": null
 },
 {
-"name": "fn_80131C70",
+"name": "msgctrlSideAttackNameno",
 "addr": "0x80131C70",
 "size": 40,
 "label": "fight",
@@ -33321,7 +33321,7 @@
 "seed": null
 },
 {
-"name": "fn_80131C98",
+"name": "msgctrlSideAttackNamewo",
 "addr": "0x80131C98",
 "size": 40,
 "label": "fight",
@@ -33329,7 +33329,7 @@
 "seed": null
 },
 {
-"name": "fn_80131CC0",
+"name": "msgctrlSideAttackNameha",
 "addr": "0x80131CC0",
 "size": 40,
 "label": "fight",
@@ -33345,7 +33345,7 @@
 "seed": null
 },
 {
-"name": "fn_80131F04",
+"name": "msgctrlClientnowork",
 "addr": "0x80131F04",
 "size": 152,
 "label": "fight",
@@ -33353,7 +33353,7 @@
 "seed": null
 },
 {
-"name": "fn_80131F9C",
+"name": "msgctrlSpeabiNamet",
 "addr": "0x80131F9C",
 "size": 8,
 "label": "fight",
@@ -33361,7 +33361,7 @@
 "seed": null
 },
 {
-"name": "fn_80131FA4",
+"name": "msgctrlSpeabiNamec",
 "addr": "0x80131FA4",
 "size": 8,
 "label": "fight",
@@ -33369,7 +33369,7 @@
 "seed": null
 },
 {
-"name": "fn_80131FAC",
+"name": "msgctrlSpeabiNamed",
 "addr": "0x80131FAC",
 "size": 8,
 "label": "fight",
@@ -33377,7 +33377,7 @@
 "seed": null
 },
 {
-"name": "fn_80131FB4",
+"name": "msgctrlSpeabiNamea",
 "addr": "0x80131FB4",
 "size": 8,
 "label": "fight",
@@ -33385,7 +33385,7 @@
 "seed": null
 },
 {
-"name": "fn_80131FBC",
+"name": "msgctrlEnemyTmons2",
 "addr": "0x80131FBC",
 "size": 8,
 "label": "fight",
@@ -33393,7 +33393,7 @@
 "seed": null
 },
 {
-"name": "fn_80131FC4",
+"name": "msgctrlEnemyTmons",
 "addr": "0x80131FC4",
 "size": 8,
 "label": "fight",
@@ -33401,7 +33401,7 @@
 "seed": null
 },
 {
-"name": "fn_80131FCC",
+"name": "msgctrlEnemyMons2",
 "addr": "0x80131FCC",
 "size": 8,
 "label": "fight",
@@ -33409,7 +33409,7 @@
 "seed": null
 },
 {
-"name": "fn_80131FD4",
+"name": "msgctrlEnemyMons",
 "addr": "0x80131FD4",
 "size": 8,
 "label": "fight",
@@ -33417,7 +33417,7 @@
 "seed": null
 },
 {
-"name": "fn_80131FDC",
+"name": "msgctrlMyMons2",
 "addr": "0x80131FDC",
 "size": 8,
 "label": "fight",
@@ -33425,7 +33425,7 @@
 "seed": null
 },
 {
-"name": "fn_80131FE4",
+"name": "msgctrlMyMons",
 "addr": "0x80131FE4",
 "size": 8,
 "label": "fight",
@@ -33433,7 +33433,7 @@
 "seed": null
 },
 {
-"name": "fn_80131FEC",
+"name": "msgctrlMyName",
 "addr": "0x80131FEC",
 "size": 8,
 "label": "fight",
@@ -33441,7 +33441,7 @@
 "seed": null
 },
 {
-"name": "fn_80131FF4",
+"name": "msgctrlTsuikaMons",
 "addr": "0x80131FF4",
 "size": 152,
 "label": "fight",
@@ -33449,7 +33449,7 @@
 "seed": null
 },
 {
-"name": "fn_8013208C",
+"name": "msgctrlClientMos",
 "addr": "0x8013208C",
 "size": 152,
 "label": "fight",
@@ -33457,7 +33457,7 @@
 "seed": null
 },
 {
-"name": "fn_80132124",
+"name": "msgctrlDeffenceMons",
 "addr": "0x80132124",
 "size": 152,
 "label": "fight",
@@ -33465,7 +33465,7 @@
 "seed": null
 },
 {
-"name": "fn_801321BC",
+"name": "msgctrlAttackMons",
 "addr": "0x801321BC",
 "size": 152,
 "label": "fight",
@@ -33473,7 +33473,7 @@
 "seed": null
 },
 {
-"name": "fn_80132254",
+"name": "msgctrlEvStrBuf2",
 "addr": "0x80132254",
 "size": 8,
 "label": "fight",
@@ -33481,7 +33481,7 @@
 "seed": null
 },
 {
-"name": "fn_8013225C",
+"name": "msgctrlEvStrBuf1",
 "addr": "0x8013225C",
 "size": 8,
 "label": "fight",
@@ -33489,7 +33489,7 @@
 "seed": null
 },
 {
-"name": "fn_80132264",
+"name": "msgctrlEvStrBuf0",
 "addr": "0x80132264",
 "size": 8,
 "label": "field",
@@ -33497,7 +33497,7 @@
 "seed": null
 },
 {
-"name": "fn_8013226C",
+"name": "msgctrlWaza",
 "addr": "0x8013226C",
 "size": 40,
 "label": "field",
@@ -33505,7 +33505,7 @@
 "seed": null
 },
 {
-"name": "fn_80132294",
+"name": "msgctrlMenuMsg2",
 "addr": "0x80132294",
 "size": 8,
 "label": "field",
@@ -33513,7 +33513,7 @@
 "seed": null
 },
 {
-"name": "fn_8013229C",
+"name": "msgctrlMenuMsg",
 "addr": "0x8013229C",
 "size": 8,
 "label": "field",
@@ -33521,7 +33521,7 @@
 "seed": null
 },
 {
-"name": "fn_801322A4",
+"name": "msgctrlMenuPokemon",
 "addr": "0x801322A4",
 "size": 8,
 "label": "gs-engine",
@@ -33529,7 +33529,7 @@
 "seed": null
 },
 {
-"name": "fn_801322AC",
+"name": "msgctrlMenuDigit2",
 "addr": "0x801322AC",
 "size": 52,
 "label": "gs-engine",
@@ -33537,7 +33537,7 @@
 "seed": null
 },
 {
-"name": "fn_801322E0",
+"name": "msgctrlMenuDigit",
 "addr": "0x801322E0",
 "size": 52,
 "label": "gs-engine",
@@ -33545,7 +33545,7 @@
 "seed": null
 },
 {
-"name": "fn_80132314",
+"name": "msgctrlPokemon2",
 "addr": "0x80132314",
 "size": 8,
 "label": "gs-engine",
@@ -33553,7 +33553,7 @@
 "seed": null
 },
 {
-"name": "fn_8013231C",
+"name": "msgctrlPokemon",
 "addr": "0x8013231C",
 "size": 8,
 "label": "gs-engine",
@@ -33561,7 +33561,7 @@
 "seed": null
 },
 {
-"name": "fn_80132324",
+"name": "msgctrlMsgID",
 "addr": "0x80132324",
 "size": 8,
 "label": "gs-engine",
@@ -33569,7 +33569,7 @@
 "seed": null
 },
 {
-"name": "fn_8013232C",
+"name": "msgctrlDigit2",
 "addr": "0x8013232C",
 "size": 52,
 "label": "gs-engine",
@@ -33577,7 +33577,7 @@
 "seed": null
 },
 {
-"name": "fn_80132360",
+"name": "msgctrlDigit",
 "addr": "0x80132360",
 "size": 52,
 "label": "item",
@@ -33585,7 +33585,7 @@
 "seed": null
 },
 {
-"name": "fn_80132394",
+"name": "msgctrlItem2",
 "addr": "0x80132394",
 "size": 52,
 "label": "item",
@@ -33593,7 +33593,7 @@
 "seed": null
 },
 {
-"name": "fn_801323C8",
+"name": "msgctrlItem",
 "addr": "0x801323C8",
 "size": 52,
 "label": "item",
@@ -33601,7 +33601,7 @@
 "seed": null
 },
 {
-"name": "fn_801323FC",
+"name": "msgctrlHizuki",
 "addr": "0x801323FC",
 "size": 44,
 "label": "field",
@@ -33609,7 +33609,7 @@
 "seed": null
 },
 {
-"name": "fn_80132428",
+"name": "msgctrlHero",
 "addr": "0x80132428",
 "size": 44,
 "label": "field",
@@ -33625,7 +33625,7 @@
 "seed": null
 },
 {
-"name": "fn_801324CC",
+"name": "msgctrlPalette",
 "addr": "0x801324CC",
 "size": 164,
 "label": "gs-engine",
@@ -33633,7 +33633,7 @@
 "seed": null
 },
 {
-"name": "fn_80132570",
+"name": "msgctrlColor",
 "addr": "0x80132570",
 "size": 84,
 "label": "gs-engine",
@@ -33649,7 +33649,7 @@
 "seed": null
 },
 {
-"name": "fn_8013262C",
+"name": "msgctrlRubyEnd",
 "addr": "0x8013262C",
 "size": 16,
 "label": "gs-engine",
@@ -33657,7 +33657,7 @@
 "seed": null
 },
 {
-"name": "fn_8013263C",
+"name": "msgctrlRubyTop",
 "addr": "0x8013263C",
 "size": 16,
 "label": "gs-engine",
@@ -33673,7 +33673,7 @@
 "seed": null
 },
 {
-"name": "fn_80132690",
+"name": "msgctrlKeyWait",
 "addr": "0x80132690",
 "size": 204,
 "label": "gs-engine",
@@ -39185,7 +39185,7 @@
 "seed": null
 },
 {
-"name": "fn_801657D0",
+"name": "scriptSoundStop",
 "addr": "0x801657D0",
 "size": 40,
 "label": "gs-engine",
@@ -47593,20 +47593,20 @@
 "seed": null
 },
 {
-"name": "fn_801C483C",
+"name": "fadeEffectHookFunction_fadein_Init",
 "addr": "0x801C483C",
 "size": 40,
 "label": "fade",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_801C4864",
+"name": "fadeEffectHookFunction_trainer_Init",
 "addr": "0x801C4864",
 "size": 40,
 "label": "fade",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fadeEffectHookFunction_fadeout_in_Init",
@@ -50212,7 +50212,7 @@
 "name": "fn_801E075C",
 "addr": "0x801E075C",
 "size": 644,
-"label": "field",
+"label": "gs-engine",
 "confidence": 1.9,
 "seed": null
 },
@@ -68951,8 +68951,14 @@
 {
 "label": "fight",
 "start": "0x800111C4",
+"end": "0x80011288",
+"count": 3
+},
+{
+"label": "gs-engine",
+"start": "0x80011288",
 "end": "0x80011700",
-"count": 5
+"count": 2
 },
 {
 "label": "menu",
@@ -70715,14 +70721,14 @@
 {
 "label": "field",
 "start": "0x801DF790",
-"end": "0x801e09e0",
-"count": 4
+"end": "0x801e075c",
+"count": 3
 },
 {
 "label": "gs-engine",
-"start": "0x801E09E0",
+"start": "0x801E075C",
 "end": "0x801e11cc",
-"count": 7
+"count": 8
 },
 {
 "label": "particle",

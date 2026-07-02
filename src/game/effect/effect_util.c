@@ -166,7 +166,7 @@ u8 fn_80131574(u32 idx) {
 /* 0x80131630 | 0x30 -- read byte from stream, store extsb to obj+0x43 if flag set */
 #pragma push
 #pragma optimization_level 2
-u32 fn_80131630(EffectUtilCommandObj* obj) {
+u32 msgctrlBaseLineBias(EffectUtilCommandObj* obj) {
     u8* stream;
     if (obj->activeFlag != 0) {
         stream = obj->stream;
@@ -181,7 +181,7 @@ u32 fn_80131630(EffectUtilCommandObj* obj) {
 /* 0x80131660 | 0x30 -- read byte from stream, store extsb to obj+0x42 if flag set */
 #pragma push
 #pragma optimization_level 2
-u32 fn_80131660(EffectUtilCommandObj* obj) {
+u32 msgctrlLineSpace(EffectUtilCommandObj* obj) {
     u8* stream;
     if (obj->activeFlag != 0) {
         stream = obj->stream;
@@ -194,13 +194,13 @@ u32 fn_80131660(EffectUtilCommandObj* obj) {
 #pragma pop
 
 /* 0x80131690 | 16 bytes | set_field_return */
-u32 fn_80131690(EffectUtilCommandObj* obj) {
+u32 msgctrlIndentOff(EffectUtilCommandObj* obj) {
     obj->field_41 = 1;
     return 0;
 }
 
 /* 0x801316A0 | 0x8 | sda_getter */
-u16 fn_801316A0(void) { return lbl_8047AEA2; }
+u16 msgctrlNpc(void) { return lbl_8047AEA2; }
 
 /* 0x801316A8 | 0x28 -- calls fn_801FBD58 with lbl_8047AEA0 then fn_801FBD28 */
 extern u16  lbl_8047AEA0;
@@ -295,24 +295,24 @@ typedef struct EffectStatusTableEntry {
 } EffectStatusTableEntry;
 
 #if 0
-asm void fn_801316A8(void) {
+asm void msgctrlTribe(void) {
 #include "src/game/effect/effect_util_fn_801316A8.inc"
 }
 #else
-void fn_801316A8(void) {
+void msgctrlTribe(void) {
     fn_801FBD58(lbl_8047AEA0);
     fn_801FBD28();
 }
 #endif
 
 /* 0x801316D0 | 0x8 | sda_getter */
-u32 fn_801316D0(void) { return lbl_8047AE8C; }
+u32 msgctrlString2(void) { return lbl_8047AE8C; }
 
 /* 0x801316D8 | 0x8 | sda_getter */
-u32 fn_801316D8(void) { return lbl_8047AE9C; }
+u32 msgctrlMenuMsgID2(void) { return lbl_8047AE9C; }
 
 /* 0x801316E0 | 0x8 | sda_getter */
-u32 fn_801316E0(void) { return lbl_8047AE98; }
+u32 msgctrlMenuMsgID(void) { return lbl_8047AE98; }
 
 /* 0x801316E8 | 0x2C -- read byte from stream, store to obj+0x03 if flag clear */
 u32 msgctrlTalkSE(EffectUtilCommandObj* obj) {
@@ -344,12 +344,12 @@ extern u8  lbl_80426FF0[];
 extern u32 lbl_8047AE94;
 extern u32 lbl_8047AE94;
 #if 0
-asm void fn_80131794(void) {
+asm void msgctrlMenuMoney(void) {
 #include "src/game/effect/effect_util_fn_80131794.inc"
 }
 #else
 #pragma peephole off
-void fn_80131794(void) {
+void msgctrlMenuMoney(void) {
     fn_80132834(lbl_80426FF0, 0x10, lbl_8047AE94, 4);
 }
 #pragma peephole on
@@ -360,12 +360,12 @@ extern u8  lbl_80427010[];
 extern u32 lbl_8047AE68;
 extern u32 lbl_8047AE68;
 #if 0
-asm void fn_801317C8(void) {
+asm void msgctrlMenuFullDigit(void) {
 #include "src/game/effect/effect_util_fn_801317C8.inc"
 }
 #else
 #pragma peephole off
-void fn_801317C8(void) {
+void msgctrlMenuFullDigit(void) {
     fn_80132834(lbl_80427010, 0x10, lbl_8047AE68, 5);
 }
 #pragma peephole on
@@ -377,18 +377,18 @@ extern void fn_8011E778(u16 handle);
 extern void fn_8011E760(void);
 extern u16  lbl_8047AE90;
 #if 0
-asm void fn_801317FC(void) {
+asm void msgctrlPokemonID(void) {
 #include "src/game/effect/effect_util_fn_801317FC.inc"
 }
 #else
-void fn_801317FC(void) {
+void msgctrlPokemonID(void) {
     fn_8011E778(lbl_8047AE90);
     fn_8011E760();
 }
 #endif
 
 /* 0x80131824 | 0x8 | sda_getter */
-u32 fn_80131824(void) { return lbl_8047AE88; }
+u32 msgctrlString(void) { return lbl_8047AE88; }
 
 /* 0x8013182C | 0x208 */
 extern u32 lbl_8047AE84;
@@ -396,11 +396,11 @@ extern u8 lbl_80427030[];
 extern u32 lbl_8047AEA8;
 extern u8 lbl_80427050[];
 #if 0
-asm void fn_8013182C(void) {
+asm void msgctrlTime(void) {
 #include "src/game/effect/effect_util_fn_8013182C.inc"
 }
 #else
-void fn_8013182C(void) {
+void msgctrlTime(void) {
     u32 seconds = lbl_8047AE84 / 3600;
     u32 minutes = (lbl_8047AE84 - seconds * 3600) / 60;
     u32 outIndex = 0;
@@ -440,12 +440,12 @@ extern u8 lbl_80427070[];
 extern u32 lbl_8047AE80;
 extern u32 lbl_8047AE80;
 #if 0
-asm void fn_80131A34(void) {
+asm void msgctrlMoney(void) {
 #include "src/game/effect/effect_util_fn_80131A34.inc"
 }
 #else
 #pragma peephole off
-void fn_80131A34(void) {
+void msgctrlMoney(void) {
     fn_80132834(lbl_80427070, 0x10, lbl_8047AE80, 4);
 }
 #pragma peephole on
@@ -456,12 +456,12 @@ extern u8 lbl_80427090[];
 extern u32 lbl_8047AE6C;
 extern u32 lbl_8047AE6C;
 #if 0
-asm void fn_80131A68(void) {
+asm void msgctrlMenuZDigit2(void) {
 #include "src/game/effect/effect_util_fn_80131A68.inc"
 }
 #else
 #pragma peephole off
-void fn_80131A68(void) {
+void msgctrlMenuZDigit2(void) {
     fn_80132834(lbl_80427090, 0x10, lbl_8047AE6C, 2);
 }
 #pragma peephole on
@@ -471,12 +471,12 @@ void fn_80131A68(void) {
 extern u8 lbl_804270B0[];
 extern u32 lbl_8047AE68;
 #if 0
-asm void fn_80131A9C(void) {
+asm void msgctrlMenuZDigit(void) {
 #include "src/game/effect/effect_util_fn_80131A9C.inc"
 }
 #else
 #pragma peephole off
-void fn_80131A9C(void) {
+void msgctrlMenuZDigit(void) {
     fn_80132834(lbl_804270B0, 0x10, lbl_8047AE68, 2);
 }
 #pragma peephole on
@@ -486,12 +486,12 @@ void fn_80131A9C(void) {
 extern u8 lbl_804270D0[];
 extern u32 lbl_8047AE68;
 #if 0
-asm void fn_80131AD0(void) {
+asm void msgctrlMenuHex2(void) {
 #include "src/game/effect/effect_util_fn_80131AD0.inc"
 }
 #else
 #pragma peephole off
-void fn_80131AD0(void) {
+void msgctrlMenuHex2(void) {
     fn_80132834(lbl_804270D0, 0x10, lbl_8047AE68, 3);
 }
 #pragma peephole on
@@ -501,12 +501,12 @@ void fn_80131AD0(void) {
 extern u8 lbl_804270F0[];
 extern u32 lbl_8047AE68;
 #if 0
-asm void fn_80131B04(void) {
+asm void msgctrlMenuHex(void) {
 #include "src/game/effect/effect_util_fn_80131B04.inc"
 }
 #else
 #pragma peephole off
-void fn_80131B04(void) {
+void msgctrlMenuHex(void) {
     fn_80132834(lbl_804270F0, 0x10, lbl_8047AE68, 3);
 }
 #pragma peephole on
@@ -516,12 +516,12 @@ void fn_80131B04(void) {
 extern u8 lbl_80427110[];
 extern u32 lbl_8047AE6C;
 #if 0
-asm void fn_80131B38(void) {
+asm void msgctrlMenuUDigit2(void) {
 #include "src/game/effect/effect_util_fn_80131B38.inc"
 }
 #else
 #pragma peephole off
-void fn_80131B38(void) {
+void msgctrlMenuUDigit2(void) {
     fn_80132834(lbl_80427110, 0x10, lbl_8047AE6C, 1);
 }
 #pragma peephole on
@@ -531,60 +531,60 @@ void fn_80131B38(void) {
 extern u8 lbl_80427130[];
 extern u32 lbl_8047AE68;
 #if 0
-asm void fn_80131B6C(void) {
+asm void msgctrlMenuUDigit(void) {
 #include "src/game/effect/effect_util_fn_80131B6C.inc"
 }
 #else
 #pragma peephole off
-void fn_80131B6C(void) {
+void msgctrlMenuUDigit(void) {
     fn_80132834(lbl_80427130, 0x10, lbl_8047AE68, 1);
 }
 #pragma peephole on
 #endif
 
 /* 0x80131BA0 | 0x8 | return_const */
-u32 fn_80131BA0(void) { return 0; }
+u32 msgctrlSeOn(void) { return 0; }
 
 /* 0x80131BA8 | 0x8 | return_const */
-u32 fn_80131BA8(void) { return 0; }
+u32 msgctrlSeOff(void) { return 0; }
 
 /* 0x80131BB0 | 0x8 | sda_getter */
-u32 fn_80131BB0(void) { return lbl_8047AE40; }
+u32 msgctrlPasoName(void) { return lbl_8047AE40; }
 
 /* 0x80131BB8 | 0x8 | sda_getter */
-u32 fn_80131BB8(void) { return lbl_8047AE3C; }
+u32 msgctrlItemName(void) { return lbl_8047AE3C; }
 
 /* 0x80131BC0 | 0x8 | sda_getter */
-u32 fn_80131BC0(void) { return lbl_8047AE38; }
+u32 msgctrlWazaName(void) { return lbl_8047AE38; }
 
 /* 0x80131BC8 | 0x8 | sda_getter */
-u32 fn_80131BC8(void) { return lbl_8047AE34; }
+u32 msgctrlTrainerClientno(void) { return lbl_8047AE34; }
 
 /* 0x80131BD0 | 0x8 | sda_getter */
-u32 fn_80131BD0(void) { return lbl_8047AE30; }
+u32 msgctrlTrainerEnename2(void) { return lbl_8047AE30; }
 
 /* 0x80131BD8 | 0x8 | sda_getter */
-u32 fn_80131BD8(void) { return lbl_8047AE2C; }
+u32 msgctrlTrainerEnename(void) { return lbl_8047AE2C; }
 
 /* 0x80131BE0 | 0x8 | sda_getter */
-u32 fn_80131BE0(void) { return lbl_8047AE28; }
+u32 msgctrlTrainerLose(void) { return lbl_8047AE28; }
 
 /* 0x80131BE8 | 0x8 | sda_getter */
-u32 fn_80131BE8(void) { return lbl_8047AE24; }
+u32 msgctrlTrainerName(void) { return lbl_8047AE24; }
 
 /* 0x80131BF0 | 0x8 | sda_getter */
-u32 fn_80131BF0(void) { return lbl_8047AE20; }
+u32 msgctrlTrainerType(void) { return lbl_8047AE20; }
 
 /* 0x80131BF8 | 0x28 -- _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE4C, 2) */
 extern u32 lbl_8047AE4C;
 extern u32 lbl_8047AE4C;
 #if 0
-asm void fn_80131BF8(void) {
+asm void msgctrlSideDefenceNameno(void) {
 #include "src/game/effect/effect_util_fn_80131BF8.inc"
 }
 #else
 #pragma peephole off
-void fn_80131BF8(void) {
+void msgctrlSideDefenceNameno(void) {
     _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE4C, 2);
 }
 #pragma peephole on
@@ -594,12 +594,12 @@ void fn_80131BF8(void) {
 extern u32 lbl_8047AE48;
 extern u32 lbl_8047AE48;
 #if 0
-asm void fn_80131C20(void) {
+asm void msgctrlSideDefenceNamewo(void) {
 #include "src/game/effect/effect_util_fn_80131C20.inc"
 }
 #else
 #pragma peephole off
-void fn_80131C20(void) {
+void msgctrlSideDefenceNamewo(void) {
     _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE48, 1);
 }
 #pragma peephole on
@@ -609,12 +609,12 @@ void fn_80131C20(void) {
 extern u32 lbl_8047AE44;
 extern u32 lbl_8047AE44;
 #if 0
-asm void fn_80131C48(void) {
+asm void msgctrlSideDefenceNameha(void) {
 #include "src/game/effect/effect_util_fn_80131C48.inc"
 }
 #else
 #pragma peephole off
-void fn_80131C48(void) {
+void msgctrlSideDefenceNameha(void) {
     _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE44, 0);
 }
 #pragma peephole on
@@ -624,12 +624,12 @@ void fn_80131C48(void) {
 extern u32 lbl_8047AE1C;
 extern u32 lbl_8047AE1C;
 #if 0
-asm void fn_80131C70(void) {
+asm void msgctrlSideAttackNameno(void) {
 #include "src/game/effect/effect_util_fn_80131C70.inc"
 }
 #else
 #pragma peephole off
-void fn_80131C70(void) {
+void msgctrlSideAttackNameno(void) {
     _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE1C, 2);
 }
 #pragma peephole on
@@ -639,12 +639,12 @@ void fn_80131C70(void) {
 extern u32 lbl_8047AE18;
 extern u32 lbl_8047AE18;
 #if 0
-asm void fn_80131C98(void) {
+asm void msgctrlSideAttackNamewo(void) {
 #include "src/game/effect/effect_util_fn_80131C98.inc"
 }
 #else
 #pragma peephole off
-void fn_80131C98(void) {
+void msgctrlSideAttackNamewo(void) {
     _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE18, 1);
 }
 #pragma peephole on
@@ -654,12 +654,12 @@ void fn_80131C98(void) {
 extern u32 lbl_8047AE14;
 extern u32 lbl_8047AE14;
 #if 0
-asm void fn_80131CC0(void) {
+asm void msgctrlSideAttackNameha(void) {
 #include "src/game/effect/effect_util_fn_80131CC0.inc"
 }
 #else
 #pragma peephole off
-void fn_80131CC0(void) {
+void msgctrlSideAttackNameha(void) {
     _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE14, 0);
 }
 #pragma peephole on
@@ -835,7 +835,7 @@ extern void fn_802037DC(void);
 extern void fn_800FA280(void);
 extern u32 lbl_8047AE10;
 #if 0
-asm void fn_80131F04(void) {
+asm void msgctrlClientnowork(void) {
 #include "src/game/effect/effect_util_fn_80131F04.inc"
 }
 #else
@@ -843,7 +843,7 @@ asm void fn_80131F04(void) {
 #pragma peephole off
 #pragma push
 #pragma optimization_level 1
-void fn_80131F04(void) {
+void msgctrlClientnowork(void) {
     extern u32 lbl_8047AE10;
     extern u32 fn_801F4354(u32, u32);
     extern u32 fn_801F18DC(u32);
@@ -867,42 +867,42 @@ void fn_80131F04(void) {
 #endif
 
 /* 0x80131F9C | 0x8 | sda_getter */
-u32 fn_80131F9C(void) { return lbl_8047AE0C; }
+u32 msgctrlSpeabiNamet(void) { return lbl_8047AE0C; }
 
 /* 0x80131FA4 | 0x8 | sda_getter */
-u32 fn_80131FA4(void) { return lbl_8047AE08; }
+u32 msgctrlSpeabiNamec(void) { return lbl_8047AE08; }
 
 /* 0x80131FAC | 0x8 | sda_getter */
-u32 fn_80131FAC(void) { return lbl_8047AE04; }
+u32 msgctrlSpeabiNamed(void) { return lbl_8047AE04; }
 
 /* 0x80131FB4 | 0x8 | sda_getter */
-u32 fn_80131FB4(void) { return lbl_8047AE00; }
+u32 msgctrlSpeabiNamea(void) { return lbl_8047AE00; }
 
 /* 0x80131FBC | 0x8 | sda_getter */
-u32 fn_80131FBC(void) { return lbl_8047ADFC; }
+u32 msgctrlEnemyTmons2(void) { return lbl_8047ADFC; }
 
 /* 0x80131FC4 | 0x8 | sda_getter */
-u32 fn_80131FC4(void) { return lbl_8047ADF8; }
+u32 msgctrlEnemyTmons(void) { return lbl_8047ADF8; }
 
 /* 0x80131FCC | 0x8 | sda_getter */
-u32 fn_80131FCC(void) { return lbl_8047ADF4; }
+u32 msgctrlEnemyMons2(void) { return lbl_8047ADF4; }
 
 /* 0x80131FD4 | 0x8 | sda_getter */
-u32 fn_80131FD4(void) { return lbl_8047ADF0; }
+u32 msgctrlEnemyMons(void) { return lbl_8047ADF0; }
 
 /* 0x80131FDC | 0x8 | sda_getter */
-u32 fn_80131FDC(void) { return lbl_8047ADEC; }
+u32 msgctrlMyMons2(void) { return lbl_8047ADEC; }
 
 /* 0x80131FE4 | 0x8 | sda_getter */
-u32 fn_80131FE4(void) { return lbl_8047ADE8; }
+u32 msgctrlMyMons(void) { return lbl_8047ADE8; }
 
 /* 0x80131FEC | 0x8 | sda_getter */
-u32 fn_80131FEC(void) { return lbl_8047ADE4; }
+u32 msgctrlMyName(void) { return lbl_8047ADE4; }
 
 /* 0x80131FF4 | 0x98 */
 extern u32 lbl_8047ADE0;
 #if 0
-asm void fn_80131FF4(void) {
+asm void msgctrlTsuikaMons(void) {
 #include "src/game/effect/effect_util_fn_80131FF4.inc"
 }
 #else
@@ -910,7 +910,7 @@ asm void fn_80131FF4(void) {
 #pragma peephole off
 #pragma push
 #pragma optimization_level 1
-void fn_80131FF4(void) {
+void msgctrlTsuikaMons(void) {
     extern u32 lbl_8047ADE0;
     extern u32 fn_801F4354(u32, u32);
     extern u32 fn_801F18DC(u32);
@@ -936,7 +936,7 @@ void fn_80131FF4(void) {
 /* 0x8013208C | 0x98 */
 extern u32 lbl_8047ADDC;
 #if 0
-asm void fn_8013208C(void) {
+asm void msgctrlClientMos(void) {
 #include "src/game/effect/effect_util_fn_8013208C.inc"
 }
 #else
@@ -944,7 +944,7 @@ asm void fn_8013208C(void) {
 #pragma peephole off
 #pragma push
 #pragma optimization_level 1
-void fn_8013208C(void) {
+void msgctrlClientMos(void) {
     extern u32 lbl_8047ADDC;
     extern u32 fn_801F4354(u32, u32);
     extern u32 fn_801F18DC(u32);
@@ -970,7 +970,7 @@ void fn_8013208C(void) {
 /* 0x80132124 | 0x98 */
 extern u32 lbl_8047ADD8;
 #if 0
-asm void fn_80132124(void) {
+asm void msgctrlDeffenceMons(void) {
 #include "src/game/effect/effect_util_fn_80132124.inc"
 }
 #else
@@ -978,7 +978,7 @@ asm void fn_80132124(void) {
 #pragma peephole off
 #pragma push
 #pragma optimization_level 1
-void fn_80132124(void) {
+void msgctrlDeffenceMons(void) {
     extern u32 lbl_8047ADD8;
     extern u32 fn_801F4354(u32, u32);
     extern u32 fn_801F18DC(u32);
@@ -1004,7 +1004,7 @@ void fn_80132124(void) {
 /* 0x801321BC | 0x98 */
 extern u32 lbl_8047ADD4;
 #if 0
-asm void fn_801321BC(void) {
+asm void msgctrlAttackMons(void) {
 #include "src/game/effect/effect_util_fn_801321BC.inc"
 }
 #else
@@ -1012,7 +1012,7 @@ asm void fn_801321BC(void) {
 #pragma peephole off
 #pragma push
 #pragma optimization_level 1
-void fn_801321BC(void) {
+void msgctrlAttackMons(void) {
     extern u32 lbl_8047ADD4;
     extern u32 fn_801F4354(u32, u32);
     extern u32 fn_801F18DC(u32);
@@ -1036,13 +1036,13 @@ void fn_801321BC(void) {
 #endif
 
 /* 0x80132254 | 0x8 | sda_getter */
-u32 fn_80132254(void) { return lbl_8047ADD0; }
+u32 msgctrlEvStrBuf2(void) { return lbl_8047ADD0; }
 
 /* 0x8013225C | 0x8 | sda_getter */
-u32 fn_8013225C(void) { return lbl_8047ADCC; }
+u32 msgctrlEvStrBuf1(void) { return lbl_8047ADCC; }
 
 /* 0x80132264 | 0x8 | sda_getter */
-u32 fn_80132264(void) { return lbl_8047ADC8; }
+u32 msgctrlEvStrBuf0(void) { return lbl_8047ADC8; }
 
 /* 0x8013226C | 0x28 -- calls wazaDataBiosGetPtr(lbl_8047AE7C) then fn_8011CA1C */
 extern u16  lbl_8047AE7C;
@@ -1050,12 +1050,12 @@ extern void wazaDataBiosGetPtr(u16 handle);
 extern void fn_8011CA1C(void);
 extern u16  lbl_8047AE7C;
 #if 0
-asm void fn_8013226C(void) {
+asm void msgctrlWaza(void) {
 #include "src/game/effect/effect_util_fn_8013226C.inc"
 }
 #else
 #pragma peephole off
-void fn_8013226C(void) {
+void msgctrlWaza(void) {
     wazaDataBiosGetPtr(lbl_8047AE7C);
     fn_8011CA1C();
 }
@@ -1063,24 +1063,24 @@ void fn_8013226C(void) {
 #endif
 
 /* 0x80132294 | 0x8 | sda_getter */
-u32 fn_80132294(void) { return lbl_8047AE78; }
+u32 msgctrlMenuMsg2(void) { return lbl_8047AE78; }
 
 /* 0x8013229C | 0x8 | sda_getter */
-u32 fn_8013229C(void) { return lbl_8047AE74; }
+u32 msgctrlMenuMsg(void) { return lbl_8047AE74; }
 
 /* 0x801322A4 | 0x8 | sda_getter */
-u32 fn_801322A4(void) { return lbl_8047AE70; }
+u32 msgctrlMenuPokemon(void) { return lbl_8047AE70; }
 
 /* 0x801322AC | 0x34 -- fn_80132834(lbl_80427150, 0x10, lbl_8047AE6C, 0) */
 extern u8 lbl_80427150[];
 extern u32 lbl_8047AE6C;
 #if 0
-asm void fn_801322AC(void) {
+asm void msgctrlMenuDigit2(void) {
 #include "src/game/effect/effect_util_fn_801322AC.inc"
 }
 #else
 #pragma peephole off
-void fn_801322AC(void) {
+void msgctrlMenuDigit2(void) {
     fn_80132834(lbl_80427150, 0x10, lbl_8047AE6C, 0);
 }
 #pragma peephole on
@@ -1090,37 +1090,37 @@ void fn_801322AC(void) {
 extern u8 lbl_80427170[];
 extern u32 lbl_8047AE68;
 #if 0
-asm void fn_801322E0(void) {
+asm void msgctrlMenuDigit(void) {
 #include "src/game/effect/effect_util_fn_801322E0.inc"
 }
 #else
 #pragma peephole off
-void fn_801322E0(void) {
+void msgctrlMenuDigit(void) {
     fn_80132834(lbl_80427170, 0x10, lbl_8047AE68, 0);
 }
 #pragma peephole on
 #endif
 
 /* 0x80132314 | 0x8 | sda_getter */
-u32 fn_80132314(void) { return lbl_8047AE64; }
+u32 msgctrlPokemon2(void) { return lbl_8047AE64; }
 
 /* 0x8013231C | 0x8 | sda_getter */
-u32 fn_8013231C(void) { return lbl_8047AE60; }
+u32 msgctrlPokemon(void) { return lbl_8047AE60; }
 
 /* 0x80132324 | 0x8 | sda_getter */
-u32 fn_80132324(void) { return lbl_8047AE5C; }
+u32 msgctrlMsgID(void) { return lbl_8047AE5C; }
 
 /* 0x8013232C | 0x34 -- fn_80132834(lbl_80427190, 0x10, lbl_8047AE58, 0) */
 extern u8  lbl_80427190[];
 extern u32 lbl_8047AE58;
 extern u32 lbl_8047AE58;
 #if 0
-asm void fn_8013232C(void) {
+asm void msgctrlDigit2(void) {
 #include "src/game/effect/effect_util_fn_8013232C.inc"
 }
 #else
 #pragma peephole off
-void fn_8013232C(void) {
+void msgctrlDigit2(void) {
     fn_80132834(lbl_80427190, 0x10, lbl_8047AE58, 0);
 }
 #pragma peephole on
@@ -1131,12 +1131,12 @@ extern u8  lbl_804271B0[];
 extern u32 lbl_8047AE54;
 extern u32 lbl_8047AE54;
 #if 0
-asm void fn_80132360(void) {
+asm void msgctrlDigit(void) {
 #include "src/game/effect/effect_util_fn_80132360.inc"
 }
 #else
 #pragma peephole off
-void fn_80132360(void) {
+void msgctrlDigit(void) {
     fn_80132834(lbl_804271B0, 0x10, lbl_8047AE54, 0);
 }
 #pragma peephole on
@@ -1146,7 +1146,7 @@ void fn_80132360(void) {
 extern u16  lbl_8047AE52;
 extern void fn_801440A0(u16 handle);
 extern u32  fn_80144088(void);
-u32 fn_80132394(void) {
+u32 msgctrlItem2(void) {
     u32 result;
     fn_801440A0(lbl_8047AE52);
     result = fn_80144088();
@@ -1156,7 +1156,7 @@ u32 fn_80132394(void) {
 
 /* 0x801323C8 | 0x34 -- calls fn_801440A0(lbl_8047AE50) then fn_80144088, default to 0x2B6E */
 extern u16 lbl_8047AE50;
-u32 fn_801323C8(void) {
+u32 msgctrlItem(void) {
     u32 result;
     fn_801440A0(lbl_8047AE50);
     result = fn_80144088();
@@ -1168,7 +1168,7 @@ u32 fn_801323C8(void) {
 extern u32  fn_80129280(u32 side, u32 slotType);
 extern u32  fn_8012A8D4(void);
 #pragma peephole off
-u32 fn_801323FC(void) {
+u32 msgctrlHizuki(void) {
     fn_80129280(0, 2);
     return fn_8012A8D4();
 }
@@ -1177,13 +1177,13 @@ u32 fn_801323FC(void) {
 /* 0x80132428 | 0x2C -- fn_80129280(0, 2) then fn_8012AC54 */
 extern u32 fn_8012AC54(void);
 #pragma peephole off
-u32 fn_80132428(void) {
+u32 msgctrlHero(void) {
     fn_80129280(0, 2);
     return fn_8012AC54();
 }
 
 /* 0x801324CC | 0xA4 -- read color index from stream, look up RGBA, apply */
-void fn_801324CC(EffectUtilCommandObj* obj) {
+void msgctrlPalette(EffectUtilCommandObj* obj) {
     extern u32 lbl_80478E88;
     extern u32 lbl_80478E8C;
     extern void fn_800FA160(void*);
@@ -1229,13 +1229,13 @@ s32 msgctrlFont(EffectUtilCommandObj* obj) {
 }
 
 /* 0x8013262C | 16 bytes | set_field_return */
-u32 fn_8013262C(EffectUtilCommandObj* obj) {
+u32 msgctrlRubyEnd(EffectUtilCommandObj* obj) {
     obj->field_4B = 0;
     return 0;
 }
 
 /* 0x8013263C | 16 bytes | set_field_return */
-u32 fn_8013263C(EffectUtilCommandObj* obj) {
+u32 msgctrlRubyTop(EffectUtilCommandObj* obj) {
     obj->field_4B = 2;
     return 0;
 }
@@ -1243,7 +1243,7 @@ u32 fn_8013263C(EffectUtilCommandObj* obj) {
 /* 0x80132690 | 0xCC -- effect tick with flag-based logic */
 #pragma push
 #pragma peephole off
-u32 fn_80132690(void* obj) {
+u32 msgctrlKeyWait(void* obj) {
     extern void fn_80166A28(u32);
     u8* p = (u8*)obj;
 
@@ -4748,7 +4748,7 @@ s32 msgctrlWait(EffectUtilCommandObj* obj) {
 #endif
 extern void fn_800FA160(void);
 #if 0
-asm void fn_80132570(void) {
+asm void msgctrlColor(void) {
 #include "src/game/effect/effect_util_fn_80132570.inc"
 }
 #else
@@ -4756,7 +4756,7 @@ asm void fn_80132570(void) {
 #pragma push
 #pragma peephole off
 #pragma scheduling on
-s32 fn_80132570(EffectUtilCommandObj* obj) {
+s32 msgctrlColor(EffectUtilCommandObj* obj) {
     extern void fn_800FA160(void*);
     u8* stream;
     if (obj->activeFlag != 0) {

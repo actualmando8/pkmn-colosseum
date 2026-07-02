@@ -354,6 +354,13 @@ def main():
                 n_ok += 1
                 print(f"KEEP {fn} (already generated)")
                 continue
+            if old.get("status") == "dequeued":
+                # terminal: manually pulled from the farm (e.g. people_field /
+                # MusyX units with broken isolated baselines) — never resurrect
+                manifest.append(old)
+                n_skip += 1
+                print(f"KEEP {fn} (dequeued)")
+                continue
 
         paths = unit_to_paths(unit)
         nu = ninja_units.get(paths["obj"])

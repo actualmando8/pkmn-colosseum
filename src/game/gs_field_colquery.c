@@ -71,7 +71,7 @@
  *   EvlogSet__FScUl (GSfield_AttachToJoint)
  *   fn_80114254 (GSfield_DetachFromJoint)
  *   fn_801142B4 (GSfield_GetJointPosition)
- *   fn_801142F8 (GSfield_GetJointCount)
+ *   floorReadGFLPostFunc (table 0x11 PostFunc; old GSfield_GetJointCount attribution was fiction)
  *
  * This module wraps GScolsys2 collision queries for use by the field/world
  * system. It transforms world-space coordinates through the collision mesh
@@ -1964,7 +1964,7 @@ void* fn_801142B4(void* group, void* model, u32 size) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #pragma peephole off
-void* fn_801142F8(u32 group, u32 modelId) {
+void* floorReadGFLPostFunc(u32 group, u32 modelId) {
 #pragma optimization_level 4
     extern void* fn_800F9318(u32, u32);
     extern void fn_801ED680(void*);
