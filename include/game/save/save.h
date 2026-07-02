@@ -20,7 +20,7 @@
  *
  * Per-frame updates via:
  *   fn_801E0FB4 - Save/card per-frame update
- *   fn_801E1274 - Card system tick
+ *   GSvtrLoadTexture - Card system tick
  *   fn_801E11E8 - Card system check pending
  *
  * Related source files:
@@ -228,7 +228,7 @@ void save_PostInit(void);
 void save_CardUpdate(s32 mode, u32 param1, u32 param2);
 
 /**
- * fn_801E1274: Card system tick.
+ * GSvtrLoadTexture: Card system tick.
  * Called from GameMainLoop per frame.
  * Advances card state machine.
  */

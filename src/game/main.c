@@ -191,7 +191,7 @@ extern void fn_80128E38(u32 a, u32 b); /* RNG init */
 extern void fn_801EF5C0(void);    /* Battle system global init */
 extern u32  fn_80129280(u32 a, u32 b); /* RNG or calendar read */
 extern void fn_801909A8(u32 a, u32 b, u32 c, u32 d, u32 e, u32 f); /* Calendar/RTC set */
-extern void fn_801E1274(void);    /* Card system tick */
+extern void GSvtrLoadTexture(void);    /* Card system tick */
 extern void fn_8010C220(void);    /* Effect system tick */
 extern void fn_80179BEC(void);    /* World/map system init */
 extern void fn_8013024C(void);    /* 3D model system init */
@@ -797,7 +797,7 @@ void fn_80005AAC(void) {
                 fn_80129280(0, 8), fn_80129280(0, 6), fn_80129280(0, 9));
 
     /* Tick save/card system */
-    fn_801E1274();
+    GSvtrLoadTexture();
 
     /* Tick effect system (no-op stub at this point) */
     fn_8010C220();

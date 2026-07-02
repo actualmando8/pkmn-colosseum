@@ -4911,7 +4911,7 @@ u32 fn_80133510(void) {
 }
 #pragma scheduling off
 #endif
-extern void fn_8012F11C(void);
+extern void heroMoveIsMember(void);
 extern void fn_8012F150(void);
 extern void fn_8012F1FC(void);
 #if 0
@@ -4922,12 +4922,12 @@ asm void fn_8013356C(void) {
 #pragma optimization_level 4
 #pragma scheduling on
 u32 fn_8013356C(u32 arg1, s32 arg2) {
-    extern u32 fn_8012F11C(s32);
+    extern u32 heroMoveIsMember(s32);
     extern void fn_8012F150(s32);
     extern void fn_8012F1FC(s32);
     s32 r31 = (arg2 == 0) ? 1 : -1;
     if (r31 >= 0) {
-        if (fn_8012F11C(r31) & 0xFF) {
+        if (heroMoveIsMember(r31) & 0xFF) {
             fn_8012F150(r31);
         } else {
             fn_8012F1FC(r31);

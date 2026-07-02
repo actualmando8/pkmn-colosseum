@@ -22667,7 +22667,7 @@ int fightTrainerAiWazaHit098(u32 arg0, u32 arg1, u32 arg2, u32 arg3)
 s32 fightTrainerAiWazaHit097(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u16 fn_802367CC(void* ctx, u32 param1, void* buf, u32 zero, u32 one);
     extern u8 fn_80236BFC(void* ctx, u32 param1, u32 flag);
-    extern u8 fn_80218FDC(u32 elem);
+    extern u8 fightSeqRendouWazaCheck(u32 elem);
     extern u8 fn_8021901C(int elem);
     u16 buf[0xa];
     u16 count = fn_802367CC(ctx, param1, buf, 0, 1);
@@ -22681,7 +22681,7 @@ s32 fightTrainerAiWazaHit097(void* ctx, u32 param1, u32 param2, u32 param3) {
         if (elem == 0x165 || elem == 0x163) {
             continue;
         }
-        if (fn_80218FDC(elem) != 0) {
+        if (fightSeqRendouWazaCheck(elem) != 0) {
             continue;
         }
         if (elem == 0x108 || elem == 0xfd) {
@@ -27599,7 +27599,7 @@ asm void fn_8025F350(void) {
 }
 #endif
 #pragma pop
-void fn_8025F350(void) {
+void GBAInit(void) {
   int i;
   u32 r0;
   u32 r30;
@@ -27769,7 +27769,7 @@ asm void fn_8025F648(void) {
 }
 #endif
 #pragma pop
-u32 fn_8025F648(int r3, u32 r4, u32 r5) {
+u32 GBAWrite(int r3, u32 r4, u32 r5) {
   int idx;
   u32 r29;
   u32 r30;
@@ -27796,7 +27796,7 @@ u32 fn_8025F648(int r3, u32 r4, u32 r5) {
 }
 
 /* Address: 0x8025F70C | Size: 0xDC | Ghidra import */
-void fn_8025F70C(int r3,u32 r4,u32 r5)
+void __GBAHandler(int r3,u32 r4,u32 r5)
 
 {
     extern int fn_8009BB68();
@@ -27867,7 +27867,7 @@ u32 __GBASync(int r3)
 }
 
 /* Address: 0x8025F888 | Size: 0x124 | Ghidra import */
-void fn_8025F888(int r3,u32 r4)
+void TypeAndStatusCallback(int r3,u32 r4)
 
 {
     extern u32 DAT_80478410;
@@ -27887,7 +27887,7 @@ void fn_8025F888(int r3,u32 r4)
   if (lbl_8047B670 == 0) {
     if (((r4 & 0xff) == 0) && ((r4 & 0xffff0000) == 0x40000)) {
       iVar2 = fn_800D06F4(r3,iVar1 + -0x7fb87c20,*(u32 *)(iVar1 + -0x7fb87c14),
-                           iVar1 + -0x7fb87c1b,*(u32 *)(iVar1 + -0x7fb87c10),0x8025f70c,
+                           iVar1 + -0x7fb87c1b,*(u32 *)(iVar1 + -0x7fb87c10),(u32)__GBAHandler,
                            *(u32 *)(&DAT_80478410 + iVar1),
                            *(u32 *)(&DAT_80478414 + iVar1));
       if (iVar2 != 0) {
@@ -27931,7 +27931,7 @@ u32 __GBATransfer(int r3,u32 r4,u32 r5,u32 r6)
   *(u32 *)(iVar1 + -0x7fb87be8) = r6;
   *(u32 *)(iVar1 + -0x7fb87c14) = r4;
   *(u32 *)(iVar1 + -0x7fb87c10) = r5;
-  SIGetTypeAsync(r3,0x8025f888);
+  SIGetTypeAsync(r3,(u32)TypeAndStatusCallback);
   fn_8009DF64(uVar2);
   return 0;
 }
@@ -29450,7 +29450,7 @@ void fn_802622E4(void)
 }
 
 /* Address: 0x80262308 | Size: 0x2C | Ghidra import */
-u32 fn_80262308(void)
+u32 fightMenuYesNo(void)
 {
     extern s8 fn_8001E184(void);
 

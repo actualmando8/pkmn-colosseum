@@ -6744,21 +6744,21 @@ u32 fightActionFlowKaisiPost(void* ctx) {
     extern void fn_8022E314();
     extern s32 fn_8020C0C0();
     extern s32 fn_8020C0E4();
-    extern s32 fn_8020C108();
+    extern s32 _fightActionFlowKaisiPostSubFightOutPokemonDarkCheckAppear__FPvUsPv();
     u8 localBuf[0x10];
 
     fn_801F4718(0);
     fn_801F3B24(0, 0);
     fn_80211830();
     localBuf[0] = 0;
-    fn_801F37B0(0, (u32)fn_8020C108, &localBuf[0], 0);
+    fn_801F37B0(0, (u32)_fightActionFlowKaisiPostSubFightOutPokemonDarkCheckAppear__FPvUsPv, &localBuf[0], 0);
     fn_80211948(fn_8020D920(ctx), 0, 6, 0, lbl_80375CC8, lbl_80378AA0);
     fn_801F37B0(0, (u32)fn_8020C0E4, 0, 1);
     fn_8022E314(1);
     fn_8022E1C4();
     fn_801F37B0(0, (u32)fn_8020C0C0, 0, 1);
     localBuf[0] = 1;
-    fn_801F37B0(0, (u32)fn_8020C108, &localBuf[0], 0);
+    fn_801F37B0(0, (u32)_fightActionFlowKaisiPostSubFightOutPokemonDarkCheckAppear__FPvUsPv, &localBuf[0], 0);
     fn_801F3178(0);
     fn_801F3074(0);
     fn_801F2F3C(0);
@@ -6790,8 +6790,8 @@ s32 fn_8020C0E4(void) {
 }
 #pragma pop
 
-/* fn_8020C108 | Size: 0x54 | Apply effect with optional data parameter */
-s32 fn_8020C108(void* ctx, u32 unused, u8* data) {
+/* _fightActionFlowKaisiPostSubFightOutPokemonDarkCheckAppear__FPvUsPv | Size: 0x54 | Apply effect with optional data parameter */
+s32 _fightActionFlowKaisiPostSubFightOutPokemonDarkCheckAppear__FPvUsPv(void* ctx, u32 unused, u8* data) {
     extern void fn_8022E6F0(void* ctx, u32 value);
     if (data != NULL) {
         fn_8022E6F0(ctx, data[0]);
@@ -8392,7 +8392,7 @@ int fn_8020EBA8(void* p1, u16 p2, s16 p3) {
 /* 0x8020ECA4 | size: 0x3C | small */
 #pragma push
 #pragma peephole on
-u32 fn_8020ECA4(void* obj) {
+u32 fightTrainerEnemyPokemonCheckValid(void* obj) {
     extern s16 fn_801FBF04();
     s16 val;
     if (obj == 0) return 0;

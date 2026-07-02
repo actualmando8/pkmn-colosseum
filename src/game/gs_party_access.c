@@ -53,8 +53,8 @@
  *   fn_8000C234  GSparty_GetIV_Atk            -- get Attack IV
  *   fn_8000C258  GSparty_GetIV_Def            -- get Defense IV
  *   fn_8000C27C  GSparty_GetIV_Spd            -- get Speed IV
- *   fn_8000C2A0  GSparty_GetEV_HP             -- get HP EV (0x3C bytes)
- *   fn_8000C2DC  GSparty_GetEV_Atk            -- get Attack EV
+ *   dbgMenuGSvtrChangeDisp  GSparty_GetEV_HP             -- get HP EV (0x3C bytes)
+ *   dbgMenuGSvtrChangeActive  GSparty_GetEV_Atk            -- get Attack EV
  *   fn_8000C318  GSparty_GetGender            -- 8 bytes, return gender byte
  *   fn_8000C320  GSparty_GetShiny             -- 8 bytes, return shiny flag
  *   fn_8000C328  GSparty_GetFriendship        -- get friendship value
@@ -554,33 +554,33 @@ u32 fn_8000C27C(void) {
 #pragma peephole on
 #endif
 
-/* fn_8000C2A0 - 0x8000C2A0 | size: 0x3c */
+/* dbgMenuGSvtrChangeDisp - 0x8000C2A0 | size: 0x3c */
 extern u32 fn_801E11CC(void);
 extern void fn_801E11D4(u32 a, u8 b);
 #if 0
-asm void fn_8000C2A0(void) {
+asm void dbgMenuGSvtrChangeDisp(void) {
 #include "src/game/gs_party_access_fn_8000C2A0.inc"
 }
 #else
 #pragma peephole off
-u32 fn_8000C2A0(void) {
+u32 dbgMenuGSvtrChangeDisp(void) {
     fn_801E11D4((u8)((u8)fn_801E11CC() == 0), lbl_8047A298);
     return 0;
 }
 #pragma peephole on
 #endif
 
-/* fn_8000C2DC - 0x8000C2DC | size: 0x3c */
+/* dbgMenuGSvtrChangeActive - 0x8000C2DC | size: 0x3c */
 extern u32 fn_801E11E8(void);
 extern void fn_801E1258(void);
 extern void fn_801E11F0(void);
 #if 0
-asm void fn_8000C2DC(void) {
+asm void dbgMenuGSvtrChangeActive(void) {
 #include "src/game/gs_party_access_fn_8000C2DC.inc"
 }
 #else
 #pragma peephole off
-u32 fn_8000C2DC(void) {
+u32 dbgMenuGSvtrChangeActive(void) {
     if ((u8)fn_801E11E8() == 0) {
         fn_801E1258();
     } else {

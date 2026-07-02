@@ -2096,7 +2096,7 @@ BOOL fightTrainerIsAllyFightTargetPtr(void* arg0, void* arg1, u32 arg2) {
 /* 0x801F849C | size: 0x7C */
 void fn_801F849C(void* arg0, u32 arg1) {
     extern void* fn_801FB1C0(void*, u32, u32, u32);
-    extern u32 fn_8020ECA4(void*);
+    extern u32 fightTrainerEnemyPokemonCheckValid(void*);
     extern void fightTrainerEnemyPokemonInitFightOutStatus(void*);
     u32 mode;
     void* pokemon;
@@ -2109,7 +2109,7 @@ void fn_801F849C(void* arg0, u32 arg1) {
     i = 0;
     while (i < 12) {
         pokemon = fn_801FB1C0(arg0, 0, 0x4e, i);
-        if (mode != 1 || (u8)fn_8020ECA4(pokemon)) {
+        if (mode != 1 || (u8)fightTrainerEnemyPokemonCheckValid(pokemon)) {
             fightTrainerEnemyPokemonInitFightOutStatus(pokemon);
         }
         i++;

@@ -8766,7 +8766,7 @@ u32 fn_8012F008(s32 idx, s32 state)
 }
 #endif
 /* 0x8012F11C | 0x34 */
-u32 fn_8012F11C(s32 idx) {
+u32 heroMoveIsMember(s32 idx) {
     u8* ptr;
     u16 val;
     if (idx < 0 || idx >= 2) { return 0; }

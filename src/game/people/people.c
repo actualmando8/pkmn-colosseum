@@ -1085,13 +1085,13 @@ extern const f32 lbl_8047D7EC;
 extern const f32 lbl_8047D838;
 extern void fn_80186284(u32 a, u32 b, f32 x, s32 c, s32 d, f32 y);
 #if 0
-asm void fn_80186254(void) {
+asm void peopleGazeHeroCheck(void) {
 #include "src/game/people/people_fn_80186254.inc"
 }
 #else
 #pragma push
 #pragma scheduling on
-void fn_80186254(u32 a, u32 b) {
+void peopleGazeHeroCheck(u32 a, u32 b) {
     fn_80186284(a, b, lbl_8047D7EC, 0, 100, lbl_8047D838);
 }
 #pragma pop
