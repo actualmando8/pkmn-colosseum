@@ -125,7 +125,7 @@ void fn_80088EA8(u8* p);
 s32 fn_80088F58(void);
 s32 fn_80088F74(void);
 s32 fn_80088F88(void);
-s32 fn_80088FA4(void);
+s32 dbgMenuGBAAddCoupon(void);
 s32 dbgToolBattleDebugSetAGBConnectionMode(s32 a, s32 b);
 s32 fn_80089028(void);
 void fn_80089030(u8 x);
@@ -5130,7 +5130,7 @@ void fn_800886D0(void) {
     extern void fn_801CADA8();
     extern void fn_801D0748();
     extern void fn_801EE398();
-    extern void fn_80266320();
+    extern void d2presentOpen();
     u8 sp[0x20];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -5199,7 +5199,7 @@ L_800887C4:
     r29 = 0x0;
 L_800887C8:
     r3 = r29;
-    fn_80266320();
+    d2presentOpen();
     if ((s32)r29 == 2) {
         fn_80128E24();
         r5 = 0x20000;
@@ -5697,7 +5697,7 @@ s32 fn_80088F88(void) {
 }
 
 /* 0x80088FA4 | size: 0x54 */
-s32 fn_80088FA4(void) {
+s32 dbgMenuGBAAddCoupon(void) {
     #pragma peephole off
     extern s32 menuOpen(s32, s32);
     extern void fn_80102510(s32);

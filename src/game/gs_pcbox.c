@@ -106,7 +106,7 @@ extern void  fn_801069FC(s32 slot);
 extern void  fn_801080CC(void* ctx, s32 state);
 extern void  fn_8005D95C(s16 npcId, u16* outX, u16* outY);
 extern void  fn_8005D9AC(s16 x, s16 y, s16 z);
-extern void* fn_8005DA18(void* data);
+extern void* menuDataBiosGetPtr(void* data);
 
 /* =========================================================================
  * BSS data references
@@ -3363,7 +3363,7 @@ void fn_8001F1E8(u8* arg) {
     extern void fn_801337A8(s32);
     extern void fn_801669E4(s32, s32, s32);
     extern void fn_80166AB8(s32, s32, s32);
-    extern void* fn_8005DA18(u32);
+    extern void* menuDataBiosGetPtr(u32);
     u32 a;
     u32 b;
     u8* obj;
@@ -3371,7 +3371,7 @@ void fn_8001F1E8(u8* arg) {
     if ((s32)lbl_8047A31C < 4) {
         fn_801337A8(0);
         if (arg == 0) return;
-        fn_8005DA18(*(u32*)(arg + 0x4));
+        menuDataBiosGetPtr(*(u32*)(arg + 0x4));
         a = fn_800F7AF0(1);
         b = fn_800F7BC4(1);
         if ((b & a) & 0x1100) {
@@ -3389,7 +3389,7 @@ void fn_8001F1E8(u8* arg) {
     }
     fn_801337A8(1);
     if (arg == 0) return;
-    fn_8005DA18(*(u32*)(arg + 0x4));
+    menuDataBiosGetPtr(*(u32*)(arg + 0x4));
     obj = fn_80105624();
     if ((*(u16*)(obj + 0x4) & 0x810) == 0) return;
     *(u8*)(arg + 0x98) = 1;

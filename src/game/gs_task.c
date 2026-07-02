@@ -20,7 +20,7 @@
  * Key functions:
  *   fn_80006630  GStask_InitCamera         -- calls GSscene_CameraSetPosition
  *   fn_80006654  GStask_LoadTopMenu         -- loads archive slot 6 (topmenu)
- *   fn_800066C4  GStask_SetSceneType        -- dispatches to GSscene_SetMode based on mode
+ *   dbgMenuCameraSetType  GStask_SetSceneType        -- dispatches to GSscene_SetMode based on mode
  *   fn_80006724  GStask_LoadPDAMenu         -- loads archive slot 6, priority 3 (pda_menu)
  *   fn_8000677C  GStask_LoadPocketMenu      -- loads archive slot 6, priority 2 (pocket_menu)
  *   fn_800067D4  GStask_LoadPCBoxMenu       -- loads archive slot 6, priority 1 (pcbox_menu)
@@ -39,7 +39,7 @@
  *   fn_8000730C  GStask_LoadSlot5           -- archive load helper, slot 5
  *   menuFightPokemonSelectSub  GStask_InitSceneResources  -- 0x2F8 bytes, resource init
  *   fn_8000765C  GStask_ShutdownResources   -- resource cleanup
- *   fn_80007708  GStask_UpdateLoadState     -- resource loading state machine
+ *   dbgMenuFightFightTrainerAiDataEdit  GStask_UpdateLoadState     -- resource loading state machine
  *   fn_80007778  GStask_GetLoadFlag0        -- small accessor (0x20 bytes)
  *   fn_80007798  GStask_GetLoadFlag1        -- small accessor
  *   fn_800077B8  GStask_GetLoadFlag2        -- small accessor
@@ -320,10 +320,10 @@ s32 GStask_LoadBattleMenu(void) {
 
 /* Accessor functions (0x80008390 - 0x80009178) follow a repeating pattern:
  *
- * fn_80008390 (size 0x6C) - Get party slot 0 species
+ * _dbgMenuFightGetFightTrainerPokemonPartDataIdSub (size 0x6C) - Get party slot 0 species
  * _dbgMenuFightGetWazaDataIdSub (size 0x64) - Get party slot 0 level
  * fn_80008460 (size 0x60) - Get party slot 0 HP
- * fn_800084C0 (size 0x58) - Get party slot 0 status
+ * _dbgMenuFightGetWazaTypeIdSub (size 0x58) - Get party slot 0 status
  * fn_80008518 (size 0x64) - Get party slot 1 species
  * ...and so on for each party slot property
  *
@@ -1471,7 +1471,7 @@ s32 menuFightPokemonSelectSub(u32 ctx) {
 #endif
 
 /* fn_8000765C - 0x8000765C | size: 0xac */
-extern void* fn_80008390(u16 id);
+extern void* _dbgMenuFightGetFightTrainerPokemonPartDataIdSub(u16 id);
 extern void fn_80051710(u16 id);
 extern u16 lbl_80478830;
 extern u32 lbl_80478F08;
@@ -1490,7 +1490,7 @@ s32 fn_8000765C(void) {
     }
 
     for (;;) {
-        if (fn_8001E304(lbl_80478830, &result, fn_80008390) == 0) {
+        if (fn_8001E304(lbl_80478830, &result, _dbgMenuFightGetFightTrainerPokemonPartDataIdSub) == 0) {
             val = -1;
         } else {
             if (result >= *(u32*)lbl_80478F08) {
@@ -1509,15 +1509,15 @@ s32 fn_8000765C(void) {
 #pragma peephole on
 #endif
 
-/* fn_80007708 - 0x80007708 | size: 0x70 */
+/* dbgMenuFightFightTrainerAiDataEdit - 0x80007708 | size: 0x70 */
 extern s32  fn_80051E38(u32 slot);
 #if 0
-asm void fn_80007708(void) {
+asm void dbgMenuFightFightTrainerAiDataEdit(void) {
 #include "src/game/gs_task_fn_80007708.inc"
 }
 #else
 #pragma peephole off
-s32 fn_80007708(void) {
+s32 dbgMenuFightFightTrainerAiDataEdit(void) {
     u16 tmp;
     u16 slot;
     tmp  = (u16)(u32)fn_801FB1C0((s32)lbl_8047A278, 0, 0x43, 0);
@@ -1764,7 +1764,7 @@ extern u8 fn_802117FC(void);
 extern void fn_80211810(u8 val);
 extern s8 menuSubOpenYesNo(s32 max, s32 a, s32 b, s32 initial);
 extern u8 fn_8001E224(u8 val, u32* out, s32 a, s32 b, s32 c, s32 d);
-extern u8 fn_80219FE4(u16 id);
+extern u8 fightSeqCheckYubiwohuruWazaDataId(u16 id);
 extern u8 lbl_80478828;
 extern u8 lbl_8047A271;
 extern u8 lbl_8047A270;
@@ -1946,7 +1946,7 @@ s32 fn_80007B30(void) {
                         sid = (s16)tmp;
                     }
                     if (sid < 0) break;
-                    if (fn_80219FE4((u16)sid) == 1) {
+                    if (fightSeqCheckYubiwohuruWazaDataId((u16)sid) == 1) {
                         lbl_8047A282 = (u16)sid;
                         break;
                     }
@@ -2154,7 +2154,7 @@ void* _dbgMenuFightGetWazaDataIdSub(u32 id) {
 #endif
 
 /* fn_80008460 - 0x80008460 | size: 0x60 */
-extern void* fn_800084C0(u32 id);   /* forward decl for callback */
+extern void* _dbgMenuFightGetWazaTypeIdSub(u32 id);   /* forward decl for callback */
 #if 0
 asm void fn_80008460(void) {
 #include "src/game/gs_task_fn_80008460.inc"
@@ -2164,7 +2164,7 @@ asm void fn_80008460(void) {
 #pragma peephole off
 s32 fn_80008460(s32 id) {
     u32 result;
-    if (fn_8001E304((u8)id, &result, fn_800084C0) == 0) return -1;
+    if (fn_8001E304((u8)id, &result, _dbgMenuFightGetWazaTypeIdSub) == 0) return -1;
     if (result > 0xb) result = 0xb;
     fn_8001E200();
     return (s32)result;
@@ -2172,16 +2172,16 @@ s32 fn_80008460(s32 id) {
 #pragma pop
 #endif
 
-/* fn_800084C0 - 0x800084C0 | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl wazaGetWazaTypeIdName vs bl wazaGetWazaTypeIdName (same addr) */
+/* _dbgMenuFightGetWazaTypeIdSub - 0x800084C0 | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl wazaGetWazaTypeIdName vs bl wazaGetWazaTypeIdName (same addr) */
 extern void* wazaGetWazaTypeIdName(u8 idx);
 #if 0
-asm void fn_800084C0(void) {
+asm void _dbgMenuFightGetWazaTypeIdSub(void) {
 #include "src/game/gs_task_fn_800084C0.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-void* fn_800084C0(u32 id) {
+void* _dbgMenuFightGetWazaTypeIdSub(u32 id) {
     if (id == 0) return fn_800FA280(0xEB63);
     if (id > 0xb) return fn_800FA280(0xEB63);
     return fn_800FA280((u32)wazaGetWazaTypeIdName((u8)id));

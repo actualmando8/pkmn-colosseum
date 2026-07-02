@@ -11354,7 +11354,7 @@ void fn_8012795C(void);
 /* 0x8012805C | 0x2A4 */
 extern void fadeSet(void);
 extern void fadeCheck(void);
-extern void fn_8026132C(void);
+extern void evolutionOpen(void);
 extern f32 lbl_8047D020;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void fn_8012805C(void);

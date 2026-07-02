@@ -7418,7 +7418,7 @@ extern void fn_801D04D0(void);
 extern void fn_80089D98(void);
 extern void fn_801D046C(void);
 extern void memcardGetTaskResult(void);
-extern void fn_8008ABE4(void);
+extern void gbaCommandSetKeyState(void);
 extern void fn_801D039C(void);
 extern void menuSubKeyWait(void);
 extern void _fadeEffectGetRandom__FUl(void);
@@ -7474,7 +7474,7 @@ void fn_8002DD24(void *arg)
 
     /* Threading / render helpers */
     extern void _threadSwitch(void);   /* GSthread yield (one frame) */
-    extern void fn_8008ABE4(s32 mode, s32 flag); /* abort / cancel scene */
+    extern void gbaCommandSetKeyState(s32 mode, s32 flag); /* abort / cancel scene */
 
     /* Save-data helpers */
     extern void *fn_80129280(s32 side, s32 slotType); /* get party/save ptr */
@@ -7545,7 +7545,7 @@ L_loop:
     }
 
     /* Scene is done – tear down and check the result code */
-    fn_8008ABE4(2, 1);
+    gbaCommandSetKeyState(2, 1);
     fn_801D039C();
 
     if (event_result == 4) {

@@ -107,7 +107,7 @@
  *   0xA488 : u32 field (set/get via fn_801F647C/fn_801F6490)
  *   0xA484 : u32 field (set/get via fn_801F64AC/fn_801F64C0)
  *   0xA4E4 : u16 field (set/get via fn_801F64DC/fn_801F64F0)
- *   0xA4C4 : u32[8] array (set/get via fn_801F650C/fn_801F6544)
+ *   0xA4C4 : u32[8] array (set/get via fightFloorBiosSetFightOutPokemonPtrAryPtr/fn_801F6544)
  *   0xA4C0 : u16 field (set/get via fn_801F65C0/fn_801F65D4)
  */
 struct Pokemon;

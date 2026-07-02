@@ -484,7 +484,7 @@ BOOL sndSetMasterVolumeBgm(u32 volume, u32 panValue);
  *
  * @return TRUE if audio output is active, FALSE otherwise.
  *
- * Address: 0x80166C74 (fn_80166C74), size 0x4C
+ * Address: 0x80166C74 (GSsndGetOutputMode), size 0x4C
  */
 BOOL sndIsAudioAvailable(void);
 

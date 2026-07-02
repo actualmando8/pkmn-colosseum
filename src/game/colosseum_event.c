@@ -6865,15 +6865,15 @@ void fn_8020BAF8(void* ctx) {
 /* Address: 0x8020BBA4 | Size: 0x58 | Ghidra import */
 #pragma push
 #pragma peephole on
-u32 fn_8020BBA4(void* ctx) {
+u32 fightActionFlowOneTurnPost(void* ctx) {
     extern u16 fn_801EF634();
     extern void fn_801F000C();
     extern void fn_801F4AC0();
-    extern void fn_802119D4();
+    extern void fightSeqPost();
     u16 sVar1;
     sVar1 = fn_801EF634();
     if (sVar1 != 0) { return 1; }
-    fn_802119D4(ctx);
+    fightSeqPost(ctx);
     fn_801F000C(5);
     fn_801F4AC0(0);
     return 1;
@@ -7002,7 +7002,7 @@ u32 fn_8020BE38(void) {
     extern u16 fn_801F54A4();
     extern void* fn_801F7258();
     extern u8 fn_8026316C();
-    extern u32 fn_8020BF40();
+    extern u32 _fightActionFlowFightTrainerSelectFightAction__FPvUsPv();
     u8 checkResult;
     u16 partyCount;
     u16 slotCount;
@@ -7013,7 +7013,7 @@ u32 fn_8020BE38(void) {
 
     checkResult = fn_80008174();
     if (checkResult != 1) {
-        fn_801F2B5C(0, (u32)fn_8020BF40, 0, 1);
+        fn_801F2B5C(0, (u32)_fightActionFlowFightTrainerSelectFightAction__FPvUsPv, 0, 1);
     } else {
         partyCount = fn_801F54A4(0, 0, 0x14, 0);
         slotCount = fn_801F54A4(0, 0, 0x16, 0);
@@ -7036,15 +7036,15 @@ u32 fn_8020BE38(void) {
 /* 0x8020BF40 | size: 0x60 */
 #pragma push
 #pragma peephole on
-u32 fn_8020BF40(void* ctx, u32 param) {
+u32 _fightActionFlowFightTrainerSelectFightAction__FPvUsPv(void* ctx, u32 param) {
     extern u16 fn_801EF634();
-    extern void fn_801F150C();
+    extern void fightFloorSetTuusinErrorFightResult();
     extern u8 fn_801F923C();
     if (fn_801EF634() != 0) {
         return 1;
     }
     if (fn_801F923C(ctx, param) == 0) {
-        fn_801F150C(0);
+        fightFloorSetTuusinErrorFightResult(0);
     }
     return 1;
 }
@@ -10343,8 +10343,8 @@ void fn_80211948(void)
   }
   return;
 }
-/* fn_802119D4 | Size: 0x2C | Clear bit 20 in flags and call fn_80213270 */
-void fn_802119D4(void) {
+/* fightSeqPost | Size: 0x2C | Clear bit 20 in flags and call fn_80213270 */
+void fightSeqPost(void) {
     extern u32 lbl_8047B618;
     extern void fn_80213270(void);
     lbl_8047B618 &= ~0x00100000u;

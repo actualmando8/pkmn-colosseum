@@ -25,7 +25,7 @@ typedef struct GbaMiscContext {
 #define GbaMisc_ResetEntryStatusA fn_80089D30
 #define GbaMisc_GetEntryStatus fn_8008A9E4
 #define GbaMisc_SendPackedEntryStatus fn_8008AB20
-#define GbaMisc_SetEntryState fn_8008ABE4
+#define GbaMisc_SetEntryState gbaCommandSetKeyState
 #define GbaMisc_RunFlagDispatch fn_8008C700
 
 #define GBA_MISC_ENTRY_WORD_OFFSET(idx) ((idx) << 2)
@@ -162,10 +162,10 @@ u32 fn_80089F68(u32 v);
 u32 fn_80089F70(u32 v);
 void fn_80089F78(void);
 s32 fn_8008A99C(void);
-int fn_8008A9AC(u32 r3, u8* r4);
+int gbaCommandEntryPokemon(u32 r3, u8* r4);
 s32 GbaMisc_GetEntryStatus(s32 idx, u32* out);
 void GbaMisc_SendPackedEntryStatus(s32 param0, u32 param1, u32 param2);
-void fn_8008AB4C(s32 param0, s32 param1);
+void gbaCommandSendWazaText(s32 param0, s32 param1);
 s32 fn_8008AB8C(s32 r3);
 u8 fn_8008ABA0(s32 idx);
 s32 GbaMisc_SetEntryState(s32 idx, s32 value);
@@ -1593,7 +1593,7 @@ s32 fn_8008A99C(void) {
 }
 
 /* 0x8008A9AC | size: 0x38 */
-int fn_8008A9AC(u32 r3, u8* r4) {
+int gbaCommandEntryPokemon(u32 r3, u8* r4) {
     r4[0] = r3 & 0xF;
     r4[1] = (r3 >> 4) & 0xF;
     r4[2] = (r3 >> 8) & 0xF;
@@ -1671,7 +1671,7 @@ void GbaMisc_SendPackedEntryStatus(s32 param0, u32 param1, u32 param2) {
 #pragma pop
 
 /* 0x8008AB4C | size: 0x40 */
-void fn_8008AB4C(s32 param0, s32 param1) {
+void gbaCommandSendWazaText(s32 param0, s32 param1) {
     extern void fn_80083D30(s32, void*);
     extern void fn_800733D0(s32, void*);
     u8 buf[0x780];

@@ -43,7 +43,7 @@
  *   fn_8000FE38  GSnpc_MoveTutorTeach        -- 0x118 bytes, teach move
  *   fn_8000FF50  GSnpc_NameRater             -- 0x58 bytes, name rater check
  *   fn_8000FFA8  GSnpc_NameRaterRename       -- 0x118 bytes, rename Pokemon
- *   fn_800100C0  GSnpc_DaycareDeposit        -- 0x68 bytes, daycare deposit
+ *   menuFightCtrlBall  GSnpc_DaycareDeposit        -- 0x68 bytes, daycare deposit
  *   _menuFightIsUse__FP16MENU_WAZA_STATUSUs  GSnpc_DaycareWithdraw       -- 0x16C bytes, daycare withdraw
  *   fn_80010294  GSnpc_PurificationChamber   -- 0x1E8 bytes, purification setup
  *   fn_8001047C  GSnpc_ShadowGaugeCheck      -- 0x10C bytes, check purification ready
@@ -957,7 +957,7 @@ void fn_80011D9C(s32 id, s32 do_extra) {
 
 /* 0x80011E68 | 0x3C */
 /* Set an NPC's facing direction. */
-void fn_80011E68(u32 npcId, u16 direction) {
+void menuFightStatusSetHP(u32 npcId, u16 direction) {
     extern void* fn_80103FE4(void* obj);
     extern void* windowSearchID(u32 npcId);
     void* npc;
@@ -1614,7 +1614,7 @@ extern void fn_800FE6DC(void);
 extern void fn_80102510();
 extern void fn_800EC8DC(void);
 extern void menuPokemonOpen(void);
-extern void fn_8004BE0C(void);
+extern void menuPdaOpen(void);
 extern u32 fn_80018F88();
 extern u32 fn_80019070();
 extern void fn_8012BAD0(void);
@@ -1660,7 +1660,7 @@ u32 fn_8000D710(u32 mode) {
     extern void fn_80102510(s32);
     extern void fn_800EC8DC(void);
     extern void menuPokemonOpen(s32, s32, s32);
-    extern void fn_8004BE0C(void);
+    extern void menuPdaOpen(void);
     extern u32 fn_80018F88(s32, void*, s32);
     extern u32 fn_80019070(u32);
     extern void fn_8012BAD0(u32, u32, u32, s32, s32);
@@ -1726,7 +1726,7 @@ u32 fn_8000D710(u32 mode) {
             } else if (lbl_8047A2B0 == 1) {
                 fn_80102510(dialogId);
                 fn_800EC8DC();
-                fn_8004BE0C();
+                menuPdaOpen();
                 fn_800EC918();
             } else if (lbl_8047A2B0 == 2) {
                 fn_80102510(dialogId);
@@ -2846,14 +2846,14 @@ void fn_8000FFA8(u8* ctx, u8* npc) {
 #pragma pop
 #endif
 
-/* fn_800100C0 - 0x800100C0 | size: 0x68 */
+/* menuFightCtrlBall - 0x800100C0 | size: 0x68 */
 #if 0
-asm void fn_800100C0(void) {
+asm void menuFightCtrlBall(void) {
 #include "src/game/gs_npc_interact_fn_800100C0.inc"
 }
 #else
 #pragma peephole off
-u32 fn_800100C0(u8* ptr) {
+u32 menuFightCtrlBall(u8* ptr) {
     extern void* fn_801040A0(u8* a);
     extern void* fn_801040D0(u8* a, u32 b);
     void* dst = fn_801040A0(ptr);

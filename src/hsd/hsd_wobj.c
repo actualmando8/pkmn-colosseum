@@ -547,7 +547,7 @@ void HSD_WObjInterpretAnim(HSD_WObj* wobj) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_801B1890(WObjVec* out, HSD_Spline* spline, f32 frame);
+extern void splArcLengthPoint(WObjVec* out, HSD_Spline* spline, f32 frame);
 #if 0
 asm void WObjUpdateFunc(void) {
 #include "src/hsd/hsd_wobj_WObjUpdateFunc.inc"
@@ -583,7 +583,7 @@ void WObjUpdateFunc(HSD_WObj* wobj, u32 type, void* value)
         if (jobj->u.spline == NULL) {
             __assert(lbl_8047D8C8, 0x9B, (const char*) lbl_80274498);
         }
-        fn_801B1890(&position, jobj->u.spline, *fval);
+        splArcLengthPoint(&position, jobj->u.spline, *fval);
         WOBJ_SET_POSITION(wobj, &position);
         wobj->flags |= WOBJ_USE_ANIM_POS;
         break;

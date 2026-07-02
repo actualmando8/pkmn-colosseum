@@ -201,12 +201,12 @@
 "seed": null
 },
 {
-"name": "fn_800066C4",
+"name": "dbgMenuCameraSetType",
 "addr": "0x800066C4",
 "size": 96,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_80006724",
@@ -353,19 +353,19 @@
 "seed": null
 },
 {
-"name": "fn_80007708",
+"name": "dbgMenuFightFightTrainerAiDataEdit",
 "addr": "0x80007708",
 "size": 112,
 "label": "menu",
-"confidence": 1.42,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_80007778",
 "addr": "0x80007778",
 "size": 32,
 "label": "gs-engine",
-"confidence": 1.4,
+"confidence": 1.37,
 "seed": null
 },
 {
@@ -429,7 +429,7 @@
 "addr": "0x80007848",
 "size": 164,
 "label": "gs-engine",
-"confidence": 1.9,
+"confidence": 1.89,
 "seed": null
 },
 {
@@ -593,12 +593,12 @@
 "seed": "prefix"
 },
 {
-"name": "fn_80008390",
+"name": "_dbgMenuFightGetFightTrainerPokemonPartDataIdSub",
 "addr": "0x80008390",
 "size": 108,
 "label": "menu",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "_dbgMenuFightGetWazaDataIdSub",
@@ -612,17 +612,17 @@
 "name": "fn_80008460",
 "addr": "0x80008460",
 "size": 96,
-"label": "gs-engine",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
 {
-"name": "fn_800084C0",
+"name": "_dbgMenuFightGetWazaTypeIdSub",
 "addr": "0x800084C0",
 "size": 88,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_80008518",
@@ -1161,12 +1161,12 @@
 "seed": "prefix"
 },
 {
-"name": "fn_8000CE5C",
+"name": "dbgMenuMenuTestWazaMenu",
 "addr": "0x8000CE5C",
 "size": 116,
 "label": "menu",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_8000CED0",
@@ -1201,12 +1201,12 @@
 "seed": "prefix"
 },
 {
-"name": "fn_8000D11C",
+"name": "dbgMenuWazaDebugStop",
 "addr": "0x8000D11C",
 "size": 56,
-"label": "gs-engine",
-"confidence": 1.45,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_8000D154",
@@ -1225,19 +1225,19 @@
 "seed": null
 },
 {
-"name": "fn_8000D234",
+"name": "dbgMenuWazaDebugStart",
 "addr": "0x8000D234",
 "size": 92,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_8000D290",
 "addr": "0x8000D290",
 "size": 8,
-"label": "gs-engine",
-"confidence": 1.9,
+"label": "menu",
+"confidence": 1.0,
 "seed": null
 },
 {
@@ -1460,7 +1460,7 @@
 "name": "fn_8000FE38",
 "addr": "0x8000FE38",
 "size": 280,
-"label": "gs-engine",
+"label": "fight",
 "confidence": 1.9,
 "seed": null
 },
@@ -1468,25 +1468,25 @@
 "name": "fn_8000FF50",
 "addr": "0x8000FF50",
 "size": 88,
-"label": "gs-engine",
-"confidence": 1.9,
+"label": "fight",
+"confidence": 0.95,
 "seed": null
 },
 {
 "name": "fn_8000FFA8",
 "addr": "0x8000FFA8",
 "size": 280,
-"label": "gs-engine",
-"confidence": 1.9,
+"label": "menu",
+"confidence": 1.0,
 "seed": null
 },
 {
-"name": "fn_800100C0",
+"name": "menuFightCtrlBall",
 "addr": "0x800100C0",
 "size": 104,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "_menuFightIsUse__FP16MENU_WAZA_STATUSUs",
@@ -1588,7 +1588,7 @@
 "name": "fn_80011288",
 "addr": "0x80011288",
 "size": 540,
-"label": "fight",
+"label": "gs-engine",
 "confidence": 1.9,
 "seed": null
 },
@@ -1596,7 +1596,7 @@
 "name": "fn_800114A4",
 "addr": "0x800114A4",
 "size": 604,
-"label": "fight",
+"label": "gs-engine",
 "confidence": 1.9,
 "seed": null
 },
@@ -1668,17 +1668,17 @@
 "name": "fn_80011D9C",
 "addr": "0x80011D9C",
 "size": 204,
-"label": "fight",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
 {
-"name": "fn_80011E68",
+"name": "menuFightStatusSetHP",
 "addr": "0x80011E68",
 "size": 60,
-"label": "fight",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_80011EA4",
@@ -2413,7 +2413,7 @@
 "addr": "0x8001BD80",
 "size": 116,
 "label": "gs-engine",
-"confidence": 1.42,
+"confidence": 1.9,
 "seed": null
 },
 {
@@ -5677,16 +5677,16 @@
 "addr": "0x8004BDFC",
 "size": 16,
 "label": "gs-engine",
-"confidence": 1.9,
+"confidence": 1.42,
 "seed": null
 },
 {
-"name": "fn_8004BE0C",
+"name": "menuPdaOpen",
 "addr": "0x8004BE0C",
 "size": 52,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "pdaMailGetMailID",
@@ -7113,12 +7113,12 @@
 "seed": null
 },
 {
-"name": "fn_8005D7F8",
+"name": "menuSeBiosGetPtr",
 "addr": "0x8005D7F8",
 "size": 56,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_8005D830",
@@ -7193,12 +7193,12 @@
 "seed": null
 },
 {
-"name": "fn_8005DA18",
+"name": "menuDataBiosGetPtr",
 "addr": "0x8005DA18",
 "size": 48,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_8005DA48",
@@ -7905,19 +7905,19 @@
 "seed": null
 },
 {
-"name": "fn_8006AC28",
+"name": "menuCBBios_InitTrainer",
 "addr": "0x8006AC28",
 "size": 68,
-"label": "gs-engine",
-"confidence": 1.42,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_8006AC6C",
 "addr": "0x8006AC6C",
 "size": 96,
 "label": "gs-engine",
-"confidence": 1.9,
+"confidence": 1.42,
 "seed": null
 },
 {
@@ -8060,7 +8060,7 @@
 "name": "fn_8006B420",
 "addr": "0x8006B420",
 "size": 140,
-"label": "gs-engine",
+"label": "field",
 "confidence": 1.9,
 "seed": null
 },
@@ -8068,7 +8068,7 @@
 "name": "fn_8006B4AC",
 "addr": "0x8006B4AC",
 "size": 112,
-"label": "gs-engine",
+"label": "field",
 "confidence": 1.9,
 "seed": null
 },
@@ -8076,8 +8076,8 @@
 "name": "fn_8006B51C",
 "addr": "0x8006B51C",
 "size": 96,
-"label": "gs-engine",
-"confidence": 1.42,
+"label": "field",
+"confidence": 1.45,
 "seed": null
 },
 {
@@ -8101,7 +8101,7 @@
 "addr": "0x8006B5D0",
 "size": 228,
 "label": "field",
-"confidence": 1.89,
+"confidence": 1.63,
 "seed": null
 },
 {
@@ -8109,7 +8109,7 @@
 "addr": "0x8006B6B4",
 "size": 564,
 "label": "field",
-"confidence": 1.79,
+"confidence": 1.32,
 "seed": null
 },
 {
@@ -8641,19 +8641,19 @@
 "seed": null
 },
 {
-"name": "fn_80071644",
+"name": "menuCB_InitMenu",
 "addr": "0x80071644",
 "size": 88,
-"label": "gs-engine",
-"confidence": 0.95,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_8007169C",
 "addr": "0x8007169C",
 "size": 44,
-"label": "dolphin-sdk",
-"confidence": 0.95,
+"label": "menu",
+"confidence": 1.0,
 "seed": null
 },
 {
@@ -8669,14 +8669,14 @@
 "addr": "0x800716E8",
 "size": 24,
 "label": "dolphin-sdk",
-"confidence": 0.95,
+"confidence": 1.9,
 "seed": null
 },
 {
 "name": "fn_80071700",
 "addr": "0x80071700",
 "size": 680,
-"label": "fight",
+"label": "dolphin-sdk",
 "confidence": 1.9,
 "seed": null
 },
@@ -8684,7 +8684,7 @@
 "name": "fn_800719A8",
 "addr": "0x800719A8",
 "size": 316,
-"label": "fight",
+"label": "dolphin-sdk",
 "confidence": 1.9,
 "seed": null
 },
@@ -8780,7 +8780,7 @@
 "name": "fn_800730F8",
 "addr": "0x800730F8",
 "size": 728,
-"label": "fight",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
@@ -8788,7 +8788,7 @@
 "name": "fn_800733D0",
 "addr": "0x800733D0",
 "size": 704,
-"label": "fight",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
@@ -8796,8 +8796,8 @@
 "name": "fn_80073690",
 "addr": "0x80073690",
 "size": 112,
-"label": "fight",
-"confidence": 1.9,
+"label": "menu",
+"confidence": 1.45,
 "seed": null
 },
 {
@@ -8852,8 +8852,8 @@
 "name": "fn_80074324",
 "addr": "0x80074324",
 "size": 60,
-"label": "fight",
-"confidence": 1.9,
+"label": "dolphin-sdk",
+"confidence": 1.42,
 "seed": null
 },
 {
@@ -9196,8 +9196,8 @@
 "name": "fn_80077AAC",
 "addr": "0x80077AAC",
 "size": 36,
-"label": "fight",
-"confidence": 1.45,
+"label": "field",
+"confidence": 1.42,
 "seed": null
 },
 {
@@ -9205,7 +9205,7 @@
 "addr": "0x80077AD0",
 "size": 36,
 "label": "fight",
-"confidence": 1.9,
+"confidence": 1.45,
 "seed": null
 },
 {
@@ -9260,23 +9260,23 @@
 "name": "fn_80077BD0",
 "addr": "0x80077BD0",
 "size": 76,
-"label": "gs-engine",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
 {
-"name": "fn_80077C1C",
+"name": "menuCBRule_CheckValidItem",
 "addr": "0x80077C1C",
 "size": 76,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_80077C68",
 "addr": "0x80077C68",
 "size": 288,
-"label": "gs-engine",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
@@ -9284,25 +9284,25 @@
 "name": "fn_80077D88",
 "addr": "0x80077D88",
 "size": 48,
-"label": "gs-engine",
-"confidence": 1.42,
+"label": "menu",
+"confidence": 1.9,
 "seed": null
 },
 {
 "name": "fn_80077DB8",
 "addr": "0x80077DB8",
 "size": 152,
-"label": "field",
-"confidence": 1.66,
+"label": "menu",
+"confidence": 1.9,
 "seed": null
 },
 {
-"name": "fn_80077E50",
+"name": "menuCBRule_ConstantRule",
 "addr": "0x80077E50",
 "size": 48,
-"label": "field",
-"confidence": 1.28,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_80077E80",
@@ -9525,24 +9525,24 @@
 "addr": "0x8007C23C",
 "size": 36,
 "label": "dolphin-sdk",
-"confidence": 1.9,
+"confidence": 1.45,
 "seed": null
 },
 {
 "name": "fn_8007C260",
 "addr": "0x8007C260",
 "size": 12,
-"label": "dolphin-sdk",
-"confidence": 0.95,
-"seed": null
-},
-{
-"name": "fn_8007C26C",
-"addr": "0x8007C26C",
-"size": 84,
 "label": "menu",
 "confidence": 1.0,
 "seed": null
+},
+{
+"name": "menuPokeCouponMain",
+"addr": "0x8007C26C",
+"size": 84,
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "menuPokeCouponInit",
@@ -9988,23 +9988,23 @@
 "name": "fn_80088F88",
 "addr": "0x80088F88",
 "size": 28,
-"label": "gs-engine",
-"confidence": 0.95,
+"label": "menu",
+"confidence": 1.0,
 "seed": null
 },
 {
-"name": "fn_80088FA4",
+"name": "dbgMenuGBAAddCoupon",
 "addr": "0x80088FA4",
 "size": 84,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "dbgToolBattleDebugSetAGBConnectionMode",
 "addr": "0x80088FF8",
 "size": 48,
-"label": "gs-engine",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
@@ -10012,16 +10012,16 @@
 "name": "fn_80089028",
 "addr": "0x80089028",
 "size": 8,
-"label": "gs-engine",
-"confidence": 1.9,
+"label": "menu",
+"confidence": 1.58,
 "seed": null
 },
 {
 "name": "fn_80089030",
 "addr": "0x80089030",
 "size": 24,
-"label": "gs-engine",
-"confidence": 1.42,
+"label": "menu",
+"confidence": 1.26,
 "seed": null
 },
 {
@@ -10117,7 +10117,7 @@
 "addr": "0x80089B8C",
 "size": 132,
 "label": "fight",
-"confidence": 1.63,
+"confidence": 1.46,
 "seed": null
 },
 {
@@ -10125,22 +10125,22 @@
 "addr": "0x80089C10",
 "size": 68,
 "label": "fight",
-"confidence": 1.63,
+"confidence": 0.73,
 "seed": null
 },
 {
 "name": "fn_80089C54",
 "addr": "0x80089C54",
 "size": 48,
-"label": "fight",
-"confidence": 1.77,
+"label": "dolphin-sdk",
+"confidence": 0.95,
 "seed": null
 },
 {
 "name": "fn_80089C84",
 "addr": "0x80089C84",
 "size": 36,
-"label": "fight",
+"label": "dolphin-sdk",
 "confidence": 1.9,
 "seed": null
 },
@@ -10148,7 +10148,7 @@
 "name": "fn_80089CA8",
 "addr": "0x80089CA8",
 "size": 136,
-"label": "fight",
+"label": "dolphin-sdk",
 "confidence": 1.9,
 "seed": null
 },
@@ -10156,7 +10156,7 @@
 "name": "fn_80089D30",
 "addr": "0x80089D30",
 "size": 68,
-"label": "fight",
+"label": "dolphin-sdk",
 "confidence": 1.9,
 "seed": null
 },
@@ -10164,16 +10164,16 @@
 "name": "fn_80089D74",
 "addr": "0x80089D74",
 "size": 36,
-"label": "fight",
-"confidence": 1.42,
+"label": "dolphin-sdk",
+"confidence": 1.9,
 "seed": null
 },
 {
 "name": "fn_80089D98",
 "addr": "0x80089D98",
 "size": 136,
-"label": "field",
-"confidence": 0.95,
+"label": "dolphin-sdk",
+"confidence": 1.42,
 "seed": null
 },
 {
@@ -10228,23 +10228,23 @@
 "name": "fn_8008A99C",
 "addr": "0x8008A99C",
 "size": 16,
-"label": "fight",
-"confidence": 1.9,
+"label": "menu",
+"confidence": 1.0,
 "seed": null
 },
 {
-"name": "fn_8008A9AC",
+"name": "gbaCommandEntryPokemon",
 "addr": "0x8008A9AC",
 "size": 56,
-"label": "fight",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_8008A9E4",
 "addr": "0x8008A9E4",
 "size": 316,
-"label": "fight",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
@@ -10252,17 +10252,17 @@
 "name": "fn_8008AB20",
 "addr": "0x8008AB20",
 "size": 44,
-"label": "fight",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
 {
-"name": "fn_8008AB4C",
+"name": "gbaCommandSendWazaText",
 "addr": "0x8008AB4C",
 "size": 64,
-"label": "fight",
-"confidence": 1.42,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_8008AB8C",
@@ -10281,19 +10281,19 @@
 "seed": null
 },
 {
-"name": "fn_8008ABE4",
+"name": "gbaCommandSetKeyState",
 "addr": "0x8008ABE4",
 "size": 80,
-"label": "fight",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_8008AC34",
 "addr": "0x8008AC34",
 "size": 484,
-"label": "fight",
-"confidence": 1.9,
+"label": "menu",
+"confidence": 1.0,
 "seed": null
 },
 {
@@ -10689,19 +10689,19 @@
 "seed": null
 },
 {
-"name": "fn_80093F2C",
+"name": "menuPokemonStatusCtrlRibbon",
 "addr": "0x80093F2C",
 "size": 56,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_80093F64",
 "addr": "0x80093F64",
 "size": 1772,
-"label": "gs-engine",
-"confidence": 1.9,
+"label": "menu",
+"confidence": 1.5,
 "seed": null
 },
 {
@@ -10769,12 +10769,12 @@
 "seed": null
 },
 {
-"name": "fn_800979EC",
+"name": "menuPokemonStatus",
 "addr": "0x800979EC",
 "size": 76,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_80097A38",
@@ -12017,7 +12017,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8009ED70",
+"name": "OSLinkFixed",
 "addr": "0x8009ED70",
 "size": 60,
 "label": "dolphin-sdk",
@@ -14721,7 +14721,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800B13F4",
+"name": "InitCallback",
 "addr": "0x800B13F4",
 "size": 112,
 "label": "dolphin-sdk",
@@ -19140,7 +19140,7 @@
 "name": "fn_800D0F44",
 "addr": "0x800D0F44",
 "size": 36,
-"label": "fight",
+"label": "dolphin-si",
 "confidence": 1.9,
 "seed": null
 },
@@ -36497,7 +36497,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8014C038",
+"name": "synthForceLowPrecisionUpdate",
 "addr": "0x8014C038",
 "size": 68,
 "label": "musyx",
@@ -36521,7 +36521,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8014C5B4",
+"name": "synthFXGetMaxVoices",
 "addr": "0x8014C5B4",
 "size": 52,
 "label": "musyx",
@@ -36833,7 +36833,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8014EC98",
+"name": "CheckOutputMode",
 "addr": "0x8014EC98",
 "size": 52,
 "label": "musyx",
@@ -37633,7 +37633,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80158BB4",
+"name": "sndPitchUpOne",
 "addr": "0x80158BB4",
 "size": 60,
 "label": "musyx",
@@ -37841,7 +37841,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8015ABB4",
+"name": "sal_setup_dspvol",
 "addr": "0x8015ABB4",
 "size": 72,
 "label": "musyx",
@@ -37889,7 +37889,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8015D408",
+"name": "salSynthSendMessage",
 "addr": "0x8015D408",
 "size": 68,
 "label": "musyx",
@@ -39505,12 +39505,12 @@
 "seed": null
 },
 {
-"name": "fn_80166C74",
+"name": "GSsndGetOutputMode",
 "addr": "0x80166C74",
 "size": 76,
 "label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_80166CC0",
@@ -46265,7 +46265,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801B1890",
+"name": "splArcLengthPoint",
 "addr": "0x801B1890",
 "size": 72,
 "label": "hsd",
@@ -48065,7 +48065,7 @@
 "seed": null
 },
 {
-"name": "fn_801C9D74",
+"name": "scriptLightStopMotion",
 "addr": "0x801C9D74",
 "size": 80,
 "label": "gs-engine",
@@ -51761,7 +51761,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F150C",
+"name": "fightFloorSetTuusinErrorFightResult",
 "addr": "0x801F150C",
 "size": 72,
 "label": "fight",
@@ -52105,7 +52105,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F33E8",
+"name": "fightFloorCheckFightOutPokemonPtrAryJoutaiDataId",
 "addr": "0x801F33E8",
 "size": 72,
 "label": "fight",
@@ -52113,7 +52113,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F3430",
+"name": "_fightFloorCheckFightOutPokemonPtrAryJoutaiDataIdSub__FPvUsPv",
 "addr": "0x801F3430",
 "size": 108,
 "label": "fight",
@@ -52121,7 +52121,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F349C",
+"name": "fightFloorGetFightOutPokemonPtrAryPokemonTokuseiDataIdFirst",
 "addr": "0x801F349C",
 "size": 80,
 "label": "fight",
@@ -52137,7 +52137,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F3624",
+"name": "fightFloorCheckFightOutPokemonPtrAryPokemonTokuseiDataId",
 "addr": "0x801F3624",
 "size": 84,
 "label": "fight",
@@ -52393,7 +52393,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F650C",
+"name": "fightFloorBiosSetFightOutPokemonPtrAryPtr",
 "addr": "0x801F650C",
 "size": 56,
 "label": "fight",
@@ -52409,7 +52409,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F6560",
+"name": "fightFloorBiosSetFightOutPokemonPtrAry",
 "addr": "0x801F6560",
 "size": 40,
 "label": "fight",
@@ -52417,7 +52417,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F6588",
+"name": "fightFloorBiosGetFightOutPokemonPtrAry",
 "addr": "0x801F6588",
 "size": 56,
 "label": "fight",
@@ -52873,7 +52873,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F6B18",
+"name": "fightFloorBiosGetJoutaiPtr",
 "addr": "0x801F6B18",
 "size": 48,
 "label": "fight",
@@ -57985,7 +57985,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020BBA4",
+"name": "fightActionFlowOneTurnPost",
 "addr": "0x8020BBA4",
 "size": 88,
 "label": "fight",
@@ -58017,7 +58017,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020BF40",
+"name": "_fightActionFlowFightTrainerSelectFightAction__FPvUsPv",
 "addr": "0x8020BF40",
 "size": 96,
 "label": "fight",
@@ -59497,7 +59497,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802119D4",
+"name": "fightSeqPost",
 "addr": "0x802119D4",
 "size": 44,
 "label": "fight",
@@ -60433,7 +60433,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80219804",
+"name": "fightSeqIsEncoreNgWazaDataId",
 "addr": "0x80219804",
 "size": 52,
 "label": "fight",
@@ -60489,7 +60489,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80219FE4",
+"name": "fightSeqCheckYubiwohuruWazaDataId",
 "addr": "0x80219FE4",
 "size": 112,
 "label": "fight",
@@ -60673,7 +60673,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8021B870",
+"name": "_fightSeqWsKuroikiriSub__FPvUsPv",
 "addr": "0x8021B870",
 "size": 72,
 "label": "fight",
@@ -61233,7 +61233,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80220778",
+"name": "_WsWkcActSubJoutaiMigawari__FPvUsPv",
 "addr": "0x80220778",
 "size": 92,
 "label": "fight",
@@ -68193,7 +68193,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8026132C",
+"name": "evolutionOpen",
 "addr": "0x8026132C",
 "size": 92,
 "label": "fight",
@@ -68345,7 +68345,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802621C4",
+"name": "fightMenuOpenLevelUpStatusMenu",
 "addr": "0x802621C4",
 "size": 48,
 "label": "fight",
@@ -68361,7 +68361,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80262270",
+"name": "fightMenuWazaWasure",
 "addr": "0x80262270",
 "size": 116,
 "label": "fight",
@@ -68705,7 +68705,7 @@
 "seed": null
 },
 {
-"name": "fn_80266320",
+"name": "d2presentOpen",
 "addr": "0x80266320",
 "size": 60,
 "label": "gs-engine",
@@ -68753,8 +68753,20 @@
 {
 "label": "gs-engine",
 "start": "0x80006630",
+"end": "0x800066c4",
+"count": 2
+},
+{
+"label": "menu",
+"start": "0x800066C4",
+"end": "0x80006724",
+"count": 1
+},
+{
+"label": "gs-engine",
+"start": "0x80006724",
 "end": "0x80006908",
-"count": 8
+"count": 5
 },
 {
 "label": "fight",
@@ -68801,14 +68813,14 @@
 {
 "label": "menu",
 "start": "0x80008244",
-"end": "0x80008460",
-"count": 3
+"end": "0x80008518",
+"count": 5
 },
 {
 "label": "gs-engine",
-"start": "0x80008460",
+"start": "0x80008518",
 "end": "0x800096b4",
-"count": 15
+"count": 13
 },
 {
 "label": "field",
@@ -68873,14 +68885,26 @@
 {
 "label": "menu",
 "start": "0x8000CD20",
-"end": "0x8000d11c",
-"count": 8
+"end": "0x8000d154",
+"count": 9
 },
 {
 "label": "gs-engine",
-"start": "0x8000D11C",
+"start": "0x8000D154",
+"end": "0x8000d234",
+"count": 2
+},
+{
+"label": "menu",
+"start": "0x8000D234",
+"end": "0x8000d298",
+"count": 2
+},
+{
+"label": "gs-engine",
+"start": "0x8000D298",
 "end": "0x8000dc88",
-"count": 11
+"count": 6
 },
 {
 "label": "fight",
@@ -68891,14 +68915,20 @@
 {
 "label": "gs-engine",
 "start": "0x8000DEC4",
-"end": "0x80010128",
-"count": 17
+"end": "0x8000fe38",
+"count": 13
+},
+{
+"label": "fight",
+"start": "0x8000FE38",
+"end": "0x8000ffa8",
+"count": 2
 },
 {
 "label": "menu",
-"start": "0x80010128",
+"start": "0x8000FFA8",
 "end": "0x80010294",
-"count": 1
+"count": 3
 },
 {
 "label": "gs-engine",
@@ -68915,8 +68945,14 @@
 {
 "label": "fight",
 "start": "0x800111C4",
+"end": "0x80011288",
+"count": 3
+},
+{
+"label": "gs-engine",
+"start": "0x80011288",
 "end": "0x80011700",
-"count": 5
+"count": 2
 },
 {
 "label": "menu",
@@ -68933,14 +68969,8 @@
 {
 "label": "menu",
 "start": "0x80011CF0",
-"end": "0x80011d9c",
-"count": 1
-},
-{
-"label": "fight",
-"start": "0x80011D9C",
 "end": "0x80011ea4",
-"count": 2
+"count": 3
 },
 {
 "label": "gs-engine",
@@ -69281,8 +69311,20 @@
 {
 "label": "gs-engine",
 "start": "0x80041E48",
+"end": "0x8004be0c",
+"count": 28
+},
+{
+"label": "menu",
+"start": "0x8004BE0C",
+"end": "0x8004be40",
+"count": 1
+},
+{
+"label": "gs-engine",
+"start": "0x8004BE40",
 "end": "0x80053064",
-"count": 82
+"count": 53
 },
 {
 "label": "menu",
@@ -69293,8 +69335,32 @@
 {
 "label": "gs-engine",
 "start": "0x8005344C",
+"end": "0x8005d7f8",
+"count": 123
+},
+{
+"label": "menu",
+"start": "0x8005D7F8",
+"end": "0x8005d830",
+"count": 1
+},
+{
+"label": "gs-engine",
+"start": "0x8005D830",
+"end": "0x8005da18",
+"count": 9
+},
+{
+"label": "menu",
+"start": "0x8005DA18",
+"end": "0x8005da48",
+"count": 1
+},
+{
+"label": "gs-engine",
+"start": "0x8005DA48",
 "end": "0x8005dc24",
-"count": 136
+"count": 2
 },
 {
 "label": "menu",
@@ -69387,10 +69453,16 @@
 "count": 3
 },
 {
-"label": "gs-engine",
+"label": "menu",
 "start": "0x8006AC28",
+"end": "0x8006ac6c",
+"count": 1
+},
+{
+"label": "gs-engine",
+"start": "0x8006AC6C",
 "end": "0x8006ae18",
-"count": 5
+"count": 4
 },
 {
 "label": "field",
@@ -69419,8 +69491,14 @@
 {
 "label": "gs-engine",
 "start": "0x8006B1F4",
+"end": "0x8006b420",
+"count": 4
+},
+{
+"label": "field",
+"start": "0x8006B420",
 "end": "0x8006b57c",
-"count": 7
+"count": 3
 },
 {
 "label": "fight",
@@ -69437,20 +69515,26 @@
 {
 "label": "gs-engine",
 "start": "0x8006B8E8",
-"end": "0x8007169c",
-"count": 67
+"end": "0x80071644",
+"count": 66
+},
+{
+"label": "menu",
+"start": "0x80071644",
+"end": "0x800716c8",
+"count": 2
 },
 {
 "label": "dolphin-sdk",
-"start": "0x8007169C",
-"end": "0x80071700",
-"count": 3
+"start": "0x800716C8",
+"end": "0x80071ae4",
+"count": 4
 },
 {
 "label": "fight",
-"start": "0x80071700",
+"start": "0x80071AE4",
 "end": "0x80072548",
-"count": 6
+"count": 4
 },
 {
 "label": "dolphin-sdk",
@@ -69467,26 +69551,26 @@
 {
 "label": "menu",
 "start": "0x80073034",
-"end": "0x800730f8",
-"count": 1
+"end": "0x80073700",
+"count": 4
 },
 {
 "label": "fight",
-"start": "0x800730F8",
+"start": "0x80073700",
 "end": "0x80073e84",
-"count": 7
+"count": 4
 },
 {
 "label": "dolphin-sdk",
 "start": "0x80073E84",
-"end": "0x80074324",
-"count": 2
+"end": "0x80074360",
+"count": 3
 },
 {
 "label": "fight",
-"start": "0x80074324",
+"start": "0x80074360",
 "end": "0x80075390",
-"count": 4
+"count": 3
 },
 {
 "label": "gs-engine",
@@ -69515,32 +69599,20 @@
 {
 "label": "field",
 "start": "0x80076398",
-"end": "0x80077aac",
-"count": 8
+"end": "0x80077ad0",
+"count": 9
 },
 {
 "label": "fight",
-"start": "0x80077AAC",
+"start": "0x80077AD0",
 "end": "0x80077ba8",
-"count": 7
+"count": 6
 },
 {
 "label": "menu",
 "start": "0x80077BA8",
-"end": "0x80077bd0",
-"count": 1
-},
-{
-"label": "gs-engine",
-"start": "0x80077BD0",
-"end": "0x80077db8",
-"count": 4
-},
-{
-"label": "field",
-"start": "0x80077DB8",
 "end": "0x80077e80",
-"count": 2
+"count": 7
 },
 {
 "label": "gs-engine",
@@ -69551,14 +69623,14 @@
 {
 "label": "dolphin-sdk",
 "start": "0x8007B0D8",
-"end": "0x8007c26c",
-"count": 7
+"end": "0x8007c260",
+"count": 6
 },
 {
 "label": "menu",
-"start": "0x8007C26C",
+"start": "0x8007C260",
 "end": "0x8007c300",
-"count": 2
+"count": 3
 },
 {
 "label": "gs-engine",
@@ -69597,7 +69669,7 @@
 "count": 3
 },
 {
-"label": "gs-engine",
+"label": "menu",
 "start": "0x80088F88",
 "end": "0x80089048",
 "count": 5
@@ -69611,20 +69683,32 @@
 {
 "label": "fight",
 "start": "0x800896B8",
-"end": "0x80089d98",
-"count": 15
+"end": "0x80089c54",
+"count": 10
+},
+{
+"label": "dolphin-sdk",
+"start": "0x80089C54",
+"end": "0x80089e20",
+"count": 6
 },
 {
 "label": "field",
-"start": "0x80089D98",
+"start": "0x80089E20",
 "end": "0x80089f58",
-"count": 2
+"count": 1
 },
 {
 "label": "fight",
 "start": "0x80089F58",
+"end": "0x8008a99c",
+"count": 5
+},
+{
+"label": "menu",
+"start": "0x8008A99C",
 "end": "0x8008ab8c",
-"count": 10
+"count": 5
 },
 {
 "label": "gs-engine",
@@ -69633,7 +69717,7 @@
 "count": 2
 },
 {
-"label": "fight",
+"label": "menu",
 "start": "0x8008ABE4",
 "end": "0x8008ae18",
 "count": 2
@@ -69683,8 +69767,20 @@
 {
 "label": "gs-engine",
 "start": "0x80093B4C",
+"end": "0x80093f2c",
+"count": 1
+},
+{
+"label": "menu",
+"start": "0x80093F2C",
+"end": "0x80094650",
+"count": 2
+},
+{
+"label": "gs-engine",
+"start": "0x80094650",
 "end": "0x8009567c",
-"count": 4
+"count": 1
 },
 {
 "label": "field",
@@ -69695,8 +69791,20 @@
 {
 "label": "gs-engine",
 "start": "0x800965C8",
+"end": "0x800979ec",
+"count": 6
+},
+{
+"label": "menu",
+"start": "0x800979EC",
+"end": "0x80097a38",
+"count": 1
+},
+{
+"label": "gs-engine",
+"start": "0x80097A38",
 "end": "0x80097ff8",
-"count": 16
+"count": 9
 },
 {
 "label": "dolphin-sdk",
@@ -69875,20 +69983,8 @@
 {
 "label": "dolphin-si",
 "start": "0x800CFA60",
-"end": "0x800d0f44",
-"count": 20
-},
-{
-"label": "fight",
-"start": "0x800D0F44",
-"end": "0x800d0f68",
-"count": 1
-},
-{
-"label": "dolphin-si",
-"start": "0x800D0F68",
 "end": "0x800d1070",
-"count": 2
+"count": 23
 },
 {
 "label": "gs-engine",

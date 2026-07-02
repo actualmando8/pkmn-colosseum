@@ -86,15 +86,15 @@
  *   fn_8000CD20  GSparty_GetFormData          -- get form/cosmetic data
  *   fn_8000CD50  GSparty_GetStatusFull        -- 0xC8 bytes, get full status struct
  *   dbgMenuMenuTestEvolution  GSparty_CureStatus           -- cure status condition
- *   fn_8000CE5C  GSparty_ApplyDamage          -- apply damage to HP
+ *   dbgMenuMenuTestWazaMenu  GSparty_ApplyDamage          -- apply damage to HP
  *   fn_8000CED0  GSparty_IsAlive              -- check if HP > 0
  *   dbgMenuMenuTestPokemonMenu  GSparty_FullHeal             -- restore HP to max
  *   fn_8000CF68  GSparty_GetBattleStats       -- 0xF4 bytes, get computed battle stats
  *   fn_8000D05C  GSparty_CalcStatModifiers    -- 0xC0 bytes, apply stat stage modifiers
- *   fn_8000D11C  GSparty_GetCritRate          -- get critical hit rate
+ *   dbgMenuWazaDebugStop  GSparty_GetCritRate          -- get critical hit rate
  *   fn_8000D154  GSparty_GetAccuracy          -- get accuracy modifier
  *   fn_8000D1C4  GSparty_GetEvasion           -- get evasion modifier
- *   fn_8000D234  GSparty_ResetStatStages      -- reset all stat stages to 0
+ *   dbgMenuWazaDebugStart  GSparty_ResetStatStages      -- reset all stat stages to 0
  *   fn_8000D290  GSparty_Nop                  -- 8 bytes, return void
  *
  * SDA globals:
@@ -848,7 +848,7 @@ loop_check:
 #pragma peephole on
 
 /* ===== New externs for decompiled functions ===== */
-extern void fn_80266320(void);
+extern void d2presentOpen(void);
 extern void fn_801EF02C(void);
 extern void fn_801EF080(void);
 extern void fn_801EF0D4(void);
@@ -866,7 +866,7 @@ extern void fn_80097A38(u32, s32);
 extern void fn_800FF730(u32);
 extern void menuPokemonOpen(s32, s32, s32);
 extern void fn_800F0654(u32, s32, ...);
-extern void fn_8026132C(u32, u32, s32, u16*, s32, u32*);
+extern void evolutionOpen(u32, u32, s32, u16*, s32, u32*);
 extern void fn_8002DC6C(u32);
 extern void fn_80029760(u32, s32);
 extern void fn_80165A20(u32, s32, s32);
@@ -1089,9 +1089,9 @@ s32 fn_8000CB28(void) {
 #pragma pop
 
 /* fn_8000CB54 - 0x8000CB54 | size: 0x20 */
-/* GSparty_IsShadow -- tail call to fn_80266320 */
+/* GSparty_IsShadow -- tail call to d2presentOpen */
 void fn_8000CB54(void) {
-    fn_80266320();
+    d2presentOpen();
 }
 
 /* fn_8000CB74 - 0x8000CB74 | size: 0xc8 */
@@ -1201,7 +1201,7 @@ void testEvolution__Fv(void) {
     fadeCheck(1);
     locals.left = 1;
     locals.right = 2;
-    fn_8026132C(val1, val2, 1, &locals.left, 2, locals.work);
+    evolutionOpen(val1, val2, 1, &locals.left, 2, locals.work);
     fadeSet(2, lbl_8047B6E8);
     fadeCheck(1);
 }
@@ -1216,15 +1216,15 @@ s32 dbgMenuMenuTestEvolution(void) {
     return 0;
 }
 
-/* fn_8000CE5C - 0x8000CE5C | size: 0x74 */
+/* dbgMenuMenuTestWazaMenu - 0x8000CE5C | size: 0x74 */
 /* GSparty_ApplyDamage -- get party slot, validate, call fn_80097A38 */
 #pragma peephole off
 #if 0
-asm void fn_8000CE5C(void) {
+asm void dbgMenuMenuTestWazaMenu(void) {
 #include "src/game/gs_party_access_fn_8000CE5C.inc"
 }
 #else
-u32 fn_8000CE5C(void) {
+u32 dbgMenuMenuTestWazaMenu(void) {
     u32 val;
     val = fn_80129280(0, 2);
     if (val == 0) { return 0; }
@@ -1374,7 +1374,7 @@ idx_done:
 #pragma peephole reset
 #endif
 
-/* fn_8000D11C - 0x8000D11C | size: 0x38 */
+/* dbgMenuWazaDebugStop - 0x8000D11C | size: 0x38 */
 /* GSparty_GetCritRate -- conditional call based on global */
 #pragma push
 #pragma peephole off
@@ -1404,7 +1404,7 @@ idx_done:
 #pragma peephole off
 #pragma push
 #pragma peephole off
-s32 fn_8000D11C(void) {
+s32 dbgMenuWazaDebugStop(void) {
     s32 v = ((BattleAnimState*)lbl_804673F8)->activeFlag;
     if (v != 0) {
         fn_800FF660();
@@ -1538,7 +1538,7 @@ s32 fn_8000D1C4(void) {
 #pragma pop
 #pragma pop
 
-/* fn_8000D234 - 0x8000D234 | size: 0x5c */
+/* dbgMenuWazaDebugStart - 0x8000D234 | size: 0x5c */
 /* GSparty_ResetStatStages */
 #pragma push
 #pragma peephole off
@@ -1568,7 +1568,7 @@ s32 fn_8000D1C4(void) {
 #pragma peephole off
 #pragma push
 #pragma peephole off
-s32 fn_8000D234(void) {
+s32 dbgMenuWazaDebugStart(void) {
     u32 r;
     r = fn_80102620(0x13);
     if ((u8)r != 0) {

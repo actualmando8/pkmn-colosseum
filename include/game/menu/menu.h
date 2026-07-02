@@ -364,7 +364,7 @@ void menuCB_Common_ValidateTransition(void);
 BOOL menuCB_Common_IsActive(void);
 
 /**
- * fn_80071644: Initializes the common menu work area.
+ * menuCB_InitMenu: Initializes the common menu work area.
  * Size: 0x58
  */
 void menuCB_Common_Init(void);

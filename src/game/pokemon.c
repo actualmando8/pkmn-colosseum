@@ -72,7 +72,7 @@
  *   0xA488 : u32  (fn_801F647C set, fn_801F6490 get) - possibly experience
  *   0xA484 : u32  (fn_801F64AC set, fn_801F64C0 get) - possibly encryption key
  *   0xA4E4 : u16  (fn_801F64DC set, fn_801F64F0 get) - possibly species
- *   0xA4C4 : u32[8] (fn_801F650C set, fn_801F6544 get) - possibly move/PP data
+ *   0xA4C4 : u32[8] (fightFloorBiosSetFightOutPokemonPtrAryPtr set, fn_801F6544 get) - possibly move/PP data
  *   0xA4C0 : u16  (fn_801F65C0 set, fn_801F65D4 get) - possibly held item
  *
  * STAT CALCULATION HELPERS (0x801F6B54 - 0x801F7F80):
@@ -307,7 +307,7 @@ void* GetPokemonStatePtr(void) {
 /* --- fn_801F64DC / fn_801F64F0: Struct field at offset 0xA4E4 (u16) --- */
 /* TODO: Identify this field - possibly species ID */
 
-/* --- fn_801F650C / fn_801F6544: Struct array at offset 0xA4C4 (u32[8]) --- */
+/* --- fightFloorBiosSetFightOutPokemonPtrAryPtr / fn_801F6544: Struct array at offset 0xA4C4 (u32[8]) --- */
 /* This is likely the move/PP data array. 8 entries x 4 bytes = 32 bytes.
  * With 4 moves, each entry could hold move ID + PP packed as u16+u16. */
 
@@ -370,9 +370,9 @@ u32 fn_801F66EC(u8* ptr, u8 idx);
 
 /* Forward declarations for functions referenced by fn_801F54A4 asm wrapper */
 u8* fn_801F6544(u8* ptr);
-u32 fn_801F6588(u8* ptr, u16 idx);
+u32 fightFloorBiosGetFightOutPokemonPtrAry(u8* ptr, u16 idx);
 u8* fn_801F6AB4(u8* ptr, u16 idx);
-u8* fn_801F6B18(u8* ptr, u16 idx);
+u8* fightFloorBiosGetJoutaiPtr(u8* ptr, u16 idx);
 u32 fn_801F7258(u32 param_1);
 u32 fn_801F7404(u32 param_1);
 void fn_801F025C(u32 slotType, u32 idx);
@@ -1399,7 +1399,7 @@ void fightActionInit(u8* ptr) {
 }
 
 /* 0x801F150C | size: 0x48 | small */
-void fn_801F150C(void* param) {
+void fightFloorSetTuusinErrorFightResult(void* param) {
     extern void fn_801F37B0(void*, void*, u32, u32);
     extern void fn_801F3984(void*, u32);
     extern s32 fn_801F1554(void*);
@@ -2567,19 +2567,19 @@ u32 fn_801F32EC(void *param_1, u32 r4_unused, u8 *out_buf) {
 }
 
 /* 0x801F33E8 | size: 0x48 | small */
-u16 fn_801F33E8(void *param_1, u16 param_2) {
+u16 fightFloorCheckFightOutPokemonPtrAryJoutaiDataId(void *param_1, u16 param_2) {
     extern u32 fn_801F37B0(void*, void*, void*, u8);
-    extern u32 fn_801F3430(void*, u32, void*);
+    extern u32 _fightFloorCheckFightOutPokemonPtrAryJoutaiDataIdSub__FPvUsPv(void*, u32, void*);
     u32 buf[2];
 
     buf[0] = param_2;
     buf[1] = 0;
-    fn_801F37B0(param_1, (void*)fn_801F3430, buf, 0);
+    fn_801F37B0(param_1, (void*)_fightFloorCheckFightOutPokemonPtrAryJoutaiDataIdSub__FPvUsPv, buf, 0);
     return (u16)buf[1];
 }
 
 /* 0x801F3430 | size: 0x6C | small */
-u32 fn_801F3430(void *param_1, u32 r4_unused, u32 *buf) {
+u32 _fightFloorCheckFightOutPokemonPtrAryJoutaiDataIdSub__FPvUsPv(void *param_1, u32 r4_unused, u32 *buf) {
     extern u32 fn_802062FC(void*);
     extern u32 fn_802026E4(void*, u16);
 
@@ -2591,7 +2591,7 @@ u32 fn_801F3430(void *param_1, u32 r4_unused, u32 *buf) {
 }
 
 /* 0x801F349C | size: 0x50 | small */
-void *fn_801F349C(void *param_1, u16 param_2, void *param_3, u8 param_4, u32 param_5) {
+void *fightFloorGetFightOutPokemonPtrAryPokemonTokuseiDataIdFirst(void *param_1, u16 param_2, void *param_3, u8 param_4, u32 param_5) {
     extern u32 fn_801F37B0(void*, void*, void*, void*);
     extern void _fightFloorGetFightOutPokemonPtrAryPokemonTokuseiDataIdFirstSub__FPvUsPv(void*, u32, void*);
     u32 buf[4];
@@ -2650,7 +2650,7 @@ _checkId:
 }
 
 /* 0x801F3624 | size: 0x54 | small */
-u16 fn_801F3624(void *param_1, u16 param_2, u8 param_3, u32 param_4) {
+u16 fightFloorCheckFightOutPokemonPtrAryPokemonTokuseiDataId(void *param_1, u16 param_2, u8 param_3, u32 param_4) {
     extern u32 fn_801F37B0(void*, void*, void*, u32);
     extern void _fightFloorCheckFightOutPokemonPtrAryPokemonTokuseiDataIdSub__FPvUsPv(void*, u32, void*);
     u32 buf[4];
@@ -3369,8 +3369,8 @@ u8 fn_801F4C14(u32 p1, u16 p2, u32 p3, u16 p4, u32 p5) {
     extern void fn_801F6778(u32, u16);
     extern void fn_801F6764(u32, u16);
     extern void fn_801F65C0(u32, s16);
-    extern void fn_801F6560(u32, u16, u32);
-    extern void fn_801F650C(u32, u32);
+    extern void fightFloorBiosSetFightOutPokemonPtrAry(u32, u16, u32);
+    extern void fightFloorBiosSetFightOutPokemonPtrAryPtr(u32, u32);
     extern void fn_801F64DC(u32, u16);
     extern void fn_801F3984(u32, u16);
     extern u32 fn_801F0134(u32, u16);
@@ -3648,10 +3648,10 @@ u8 fn_801F4C14(u32 p1, u16 p2, u32 p3, u16 p4, u32 p5) {
         fn_801F65C0(p1, (s16)p5);
         break;
     case 0x59:
-        fn_801F6560(p1, (u16)p4, p5);
+        fightFloorBiosSetFightOutPokemonPtrAry(p1, (u16)p4, p5);
         break;
     case 0x5a:
-        fn_801F650C(p1, p5);
+        fightFloorBiosSetFightOutPokemonPtrAryPtr(p1, p5);
         break;
     case 0x5b:
         fn_801F64DC(p1, (u16)p5);
@@ -3799,8 +3799,8 @@ s32 fn_801F54A4(u8* pkm, u32 slot, u32 field, u32 arg) {
     case 0x7:
         return fn_801F668C(pkm);
     case 0x9: {
-        extern u8* fn_801F6B18();
-        return (s32)fn_801F6B18(pkm, arg);
+        extern u8* fightFloorBiosGetJoutaiPtr();
+        return (s32)fightFloorBiosGetJoutaiPtr(pkm, arg);
     }
     case 0xA: {
         u32 v;
@@ -4021,7 +4021,7 @@ s32 fn_801F54A4(u8* pkm, u32 slot, u32 field, u32 arg) {
     case 0x58:
         return (s16)fn_801F65D4(pkm);
     case 0x59:
-        return fn_801F6588(pkm, (u16)arg);
+        return fightFloorBiosGetFightOutPokemonPtrAry(pkm, (u16)arg);
     case 0x5A:
         return (s32)fn_801F6544(pkm);
     case 0x5B:
@@ -4168,7 +4168,7 @@ u32 fn_801F61EC(u32 param_1, u32 *param_2, u32 param_3, u32 param_4, u32 param_5
 }
 
 /* 0x801F650C | size: 0x38 | small */
-void fn_801F650C(u32 *param_1, u32 *param_2) {
+void fightFloorBiosSetFightOutPokemonPtrAryPtr(u32 *param_1, u32 *param_2) {
     u32 i;
 
     if (param_1 == NULL) return;
@@ -4184,7 +4184,7 @@ u8* fn_801F6544(u8* ptr) {
 }
 
 /* 0x801F6560 | size: 0x28 */
-void fn_801F6560(u8* ptr, u16 idx, u32 val) {
+void fightFloorBiosSetFightOutPokemonPtrAry(u8* ptr, u16 idx, u32 val) {
     u32* base;
     if (ptr == NULL) { return; }
     if (idx >= 8) { return; }
@@ -4193,7 +4193,7 @@ void fn_801F6560(u8* ptr, u16 idx, u32 val) {
 }
 
 /* 0x801F6588 | size: 0x38 */
-u32 fn_801F6588(u8* ptr, u16 idx) {
+u32 fightFloorBiosGetFightOutPokemonPtrAry(u8* ptr, u16 idx) {
     u32* base;
     if (ptr == NULL) { return 0; }
     if (idx >= 8) { return 0; }
@@ -4225,7 +4225,7 @@ u8* fn_801F6AB4(u8* ptr, u16 idx) {
 }
 
 /* 0x801F6B18 | size: 0x30 */
-u8* fn_801F6B18(u8* ptr, u16 idx) {
+u8* fightFloorBiosGetJoutaiPtr(u8* ptr, u16 idx) {
     if (ptr == NULL) { return NULL; }
     if (idx >= 1) { return NULL; }
     return ptr + idx * 0x10;

@@ -92,9 +92,9 @@ extern u8  lbl_80315690[]; /* resource table, 8-byte entries */
 /* Additional externs used by various functions */
 extern void  fn_800E4BF4(u32);     /* GSmem release/unref */
 extern void  fn_800D2738(void);
-extern void* fn_8005DA18(void);    /* linked list head */
+extern void* menuDataBiosGetPtr(void);    /* linked list head */
 extern void* fn_8005D934(s16 idx); /* node by index */
-extern void* fn_8005D7F8(s32);
+extern void* menuSeBiosGetPtr(s32);
 extern u16   fn_8005D798(void*, s32);
 extern void* fn_8005D858(s32);
 extern int   fn_80166A28(u16);
@@ -504,7 +504,7 @@ void fn_8010206C(f32 param) {
 #pragma peephole off
 s32 fn_801020C0(void) {
     s32 r31 = 0;
-    void* r3 = fn_8005DA18();
+    void* r3 = menuDataBiosGetPtr();
     if (r3 == (void*)0) { return 0; }
     {
         s32 r0 = (s16)*(s16*)((u8*)r3 + 0x4);
@@ -529,7 +529,7 @@ _ret_r31:
 #pragma peephole off
 s32 fn_80102138(void* unused, u32 param) {
     u32 r29 = param;
-    void* r3 = fn_8005DA18();
+    void* r3 = menuDataBiosGetPtr();
     if (r3 == (void*)0) { return -3; }
     {
         s32 r31 = (s16)*(s16*)((u8*)r3 + 0x4);
@@ -604,7 +604,7 @@ void* fn_801022B8(void* p, u32 target) {
         r31 = -1;
     }
     if (r31 == -1) { return (void*)0; }
-    { extern void* fn_8005DA18(void*); r3 = fn_8005DA18(r29); }
+    { extern void* menuDataBiosGetPtr(void*); r3 = menuDataBiosGetPtr(r29); }
     if (r3 == (void*)0) { return (void*)0; }
     {
         s32 r30 = (s16)*(s16*)((u8*)r3 + 0x4);
@@ -813,8 +813,8 @@ void menuButtonNormal(void* p) {
 #pragma peephole off
 void fn_80103484(void* p, void* q) {
     s32 r31 = (s32)q;
-    void* r3 = fn_8005DA18();
-    void* r3c = fn_8005D7F8((s32)(*(u8*)((u8*)r3 + 0x0) & 0x7));
+    void* r3 = menuDataBiosGetPtr();
+    void* r3c = menuSeBiosGetPtr((s32)(*(u8*)((u8*)r3 + 0x0) & 0x7));
     if (r3c == (void*)0) { return; }
     {
         u32 v = (u32)(u16)fn_8005D798(r3c, r31);
@@ -1042,7 +1042,7 @@ u8* fn_80104318(u8* arg) {
 #pragma peephole off
     void* node;
     s32 idx;
-    { extern void* fn_8005DA18(void*); node = fn_8005DA18(*(void**)(arg + 0x4)); }
+    { extern void* menuDataBiosGetPtr(void*); node = menuDataBiosGetPtr(*(void**)(arg + 0x4)); }
     node = fn_8005D934(*(s16*)((u8*)node + 0x4));
     idx = 0;
     while (1) {
@@ -1163,7 +1163,7 @@ void fn_8010474C(void* obj) {
 #pragma peephole off
     void* h;
     void* nx;
-    { extern void* fn_8005DA18(void*); h = fn_8005DA18(*(void**)((u8*)obj + 0x4)); }
+    { extern void* menuDataBiosGetPtr(void*); h = menuDataBiosGetPtr(*(void**)((u8*)obj + 0x4)); }
     if (*(u32*)((u8*)h + 0x14) != 0) {
         *(u8*)((u8*)obj + 0x1) = 5;
         (*(void (*)(void*))*(u32*)((u8*)h + 0x14))(obj);
@@ -1630,10 +1630,10 @@ void fn_801080CC(s32 param, u32 key) {
         *(s16*)(r29 + 0x2) = *(s16*)((u8*)r31 + 0x86);
         *(u32*)(r29 + 0x4) = *(u32*)((u8*)r31 + 0x88);
         *(u8*)(r29 + 0x20) = *(u8*)r31;
-        { extern void* fn_8005DA18(void*);
-          *(s16*)(r29 + 0x8) = *(s16*)((u8*)fn_8005DA18(*(void**)((u8*)r31 + 0x4)) + 0x6); }
-        { extern void* fn_8005DA18(void*); void* t;
-          t = fn_8005DA18(*(void**)((u8*)r31 + 0x4));
+        { extern void* menuDataBiosGetPtr(void*);
+          *(s16*)(r29 + 0x8) = *(s16*)((u8*)menuDataBiosGetPtr(*(void**)((u8*)r31 + 0x4)) + 0x6); }
+        { extern void* menuDataBiosGetPtr(void*); void* t;
+          t = menuDataBiosGetPtr(*(void**)((u8*)r31 + 0x4));
           r30 = lbl_80404B8C;
           r28 = 0;
           *(s16*)(r30 + 0xa) = *(s16*)((u8*)t + 0x8); }

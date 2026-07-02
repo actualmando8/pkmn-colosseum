@@ -165,7 +165,7 @@
  *     cameraGetFrameCount, lightGetFrameCount, _modelLoad
  *
  *   Original-name candidates for our extern fn_XXXXXXXX:
- *     fn_8005D934 / fn_8005DA18 -- linked-list/menu accessors
+ *     fn_8005D934 / menuDataBiosGetPtr -- linked-list/menu accessors
  *     fn_800D3088 / fn_800D37CC -- frame timing (returns u32/s32 ticks)
  *     fn_800E0CA0 / fn_800E090C -- vec3 transform helpers
  *     fn_800FA280 / fn_80132A38 -- message/window callbacks
@@ -431,7 +431,7 @@ void fn_800246CC(void) {
  * (uses r25-r31 vs target r27-r31 - we have 2 extra locals) + one extra
  * clrlwi from the (u8)fn_801902E0 cast on ret.
  */
-extern void* fn_8005DA18(s32);
+extern void* menuDataBiosGetPtr(s32);
 extern void* fn_8005D934(u32);
 extern u32 lbl_80478DE4;
 extern u32 lbl_8047A370;
@@ -464,7 +464,7 @@ void fn_800246FC(u8* arg0, u8* arg1) {
     extern f32 lbl_8047B8D8;
     extern f32 lbl_8047B8DC;
     extern u8* fn_8005D934(s32);
-    extern u8* fn_8005DA18(u32);
+    extern u8* menuDataBiosGetPtr(u32);
     extern u32 fn_801902E0(void*);
     extern void* fn_800FA280(u32);
     extern void fn_80132A38(s32, void*);
@@ -486,7 +486,7 @@ void fn_800246FC(u8* arg0, u8* arg1) {
             case 1:
                 if (lbl_80478898 > lbl_8047B8D8) {
                     table_index = lbl_8047A368;
-                    node = fn_8005DA18(*(u32*)(arg0 + 4));
+                    node = menuDataBiosGetPtr(*(u32*)(arg0 + 4));
                     node = fn_8005D934(*(s16*)(node + 4));
                     count = 0;
                     while (1) {
@@ -516,7 +516,7 @@ void fn_800246FC(u8* arg0, u8* arg1) {
                     alpha = (u32)(s32)(lbl_8047B8DC * ((lbl_80478898 - lbl_8047B8D8) / lbl_8047B8D8));
                 } else {
                     table_index = lbl_8047A36C;
-                    node = fn_8005DA18(*(u32*)(arg0 + 4));
+                    node = menuDataBiosGetPtr(*(u32*)(arg0 + 4));
                     node = fn_8005D934(*(s16*)(node + 4));
                     count = 0;
                     while (1) {
@@ -548,7 +548,7 @@ void fn_800246FC(u8* arg0, u8* arg1) {
                 break;
             default:
                 table_index = lbl_8047A368;
-                node = fn_8005DA18(*(u32*)(arg0 + 4));
+                node = menuDataBiosGetPtr(*(u32*)(arg0 + 4));
                 node = fn_8005D934(*(s16*)(node + 4));
                 count = 0;
                 while (1) {
@@ -636,7 +636,7 @@ void fn_80024A2C(u8* arg0, u8* arg1) {
     extern u32 lbl_80478DD8;
     extern u32 lbl_8047A368;
     extern u8* fn_8005D934(s32);
-    extern u8* fn_8005DA18(u32);
+    extern u8* menuDataBiosGetPtr(u32);
     u8* node;
     u8* found;
     u8* ptr;
@@ -644,7 +644,7 @@ void fn_80024A2C(u8* arg0, u8* arg1) {
     s32 offset;
 
     index = lbl_8047A368;
-    node = fn_8005DA18(*(u32*)(arg0 + 4));
+    node = menuDataBiosGetPtr(*(u32*)(arg0 + 4));
     node = fn_8005D934(*(s16*)(node + 4));
     offset = 0;
     while (1) {
@@ -723,7 +723,7 @@ void fn_80024BA4(s32 arg0, u8* arg1) {
     extern u32 lbl_80478DD8;
     extern u32 lbl_8047A36C;
     extern u8* fn_8005D934(s32);
-    extern u8* fn_8005DA18(u32);
+    extern u8* menuDataBiosGetPtr(u32);
     extern u32 fn_801902E0(s32);
     /* Declaration order: iVar6->r30, iVar29->r29, uVar7->r28 (shared with iVar6 dead).
      * iVar2->r28 (overlaps uVar7 but not iVar6). pbVar3 saved for loop-1. */
@@ -735,7 +735,7 @@ void fn_80024BA4(s32 arg0, u8* arg1) {
     u8* pbVar4;
 
     iVar6 = (s32)lbl_8047A36C;
-    pbVar3 = fn_8005D934(*(s16*)((u8*)fn_8005DA18(*(u32*)(arg0 + 4)) + 4));
+    pbVar3 = fn_8005D934(*(s16*)((u8*)menuDataBiosGetPtr(*(u32*)(arg0 + 4)) + 4));
     iVar29 = 0;
     while (1) {
         if (((u32)*(volatile u8*)pbVar3 >> 7) & 1) {
@@ -882,7 +882,7 @@ void fn_80024DBC(s32 arg0, u8* arg1) {
     extern f64 lbl_8047B8B8;
     extern f32 lbl_8047B8E0;
     extern u8* fn_8005D934(s32);
-    extern u8* fn_8005DA18(u32);
+    extern u8* menuDataBiosGetPtr(u32);
     extern void fn_800E090C(void*, void*, void*);
     extern void fn_800E0CA0(f64);
     s32 iVar2;
@@ -905,7 +905,7 @@ void fn_80024DBC(s32 arg0, u8* arg1) {
     default:
         uVar4 = (s32)lbl_8047A368;
         if ((u32)uVar4 < *(u32*)lbl_80478DD8) {
-            iVar2 = (s32)fn_8005DA18(*(u32*)(arg0 + 4));
+            iVar2 = (s32)menuDataBiosGetPtr(*(u32*)(arg0 + 4));
             pbVar3 = fn_8005D934(*(s16*)(iVar2 + 4));
             uVar5 = 0;
             while (1) {
@@ -966,7 +966,7 @@ void fn_80024F2C(s32 arg0, u8* arg1) {
     extern f64 lbl_8047B8B8;
     extern f32 lbl_8047B8E0;
     extern u8* fn_8005D934(s32);
-    extern u8* fn_8005DA18(u32);
+    extern u8* menuDataBiosGetPtr(u32);
     extern void fn_800E090C(void*, void*, void*);
     extern void fn_800E0CA0(f64);
     s32 iVar2;
@@ -989,7 +989,7 @@ void fn_80024F2C(s32 arg0, u8* arg1) {
     default:
         uVar4 = (s32)lbl_8047A368;
         if ((u32)uVar4 < *(u32*)lbl_80478DD8) {
-            iVar2 = (s32)fn_8005DA18(*(u32*)(arg0 + 4));
+            iVar2 = (s32)menuDataBiosGetPtr(*(u32*)(arg0 + 4));
             pbVar3 = fn_8005D934(*(s16*)(iVar2 + 4));
             uVar5 = 0;
             while (1) {
@@ -1045,7 +1045,7 @@ void fn_8002509C(s32 arg0, u8* arg1) {
     extern f64 lbl_8047B8B8;
     extern f32 lbl_8047B8E0;
     extern u8* fn_8005D934(s32);
-    extern u8* fn_8005DA18(u32);
+    extern u8* menuDataBiosGetPtr(u32);
     extern void fn_800E090C(void*, void*, void*);
     extern void fn_800E0CA0(f64);
     s32 iVar2;
@@ -1068,7 +1068,7 @@ void fn_8002509C(s32 arg0, u8* arg1) {
     default:
         uVar4 = (s32)lbl_8047A368;
         if ((u32)uVar4 < *(u32*)lbl_80478DD8) {
-            iVar2 = (s32)fn_8005DA18(*(u32*)(arg0 + 4));
+            iVar2 = (s32)menuDataBiosGetPtr(*(u32*)(arg0 + 4));
             pbVar3 = fn_8005D934(*(s16*)(iVar2 + 4));
             uVar5 = 0;
             while (1) {
@@ -1124,7 +1124,7 @@ void fn_8002520C(s32 arg0, u8* arg1) {
     extern f64 lbl_8047B8B8;
     extern f32 lbl_8047B8E0;
     extern u8* fn_8005D934(s32);
-    extern u8* fn_8005DA18(u32);
+    extern u8* menuDataBiosGetPtr(u32);
     extern void fn_800E090C(void*, void*, void*);
     extern void fn_800E0CA0(f64);
     s32 iVar2;
@@ -1147,7 +1147,7 @@ void fn_8002520C(s32 arg0, u8* arg1) {
     default:
         uVar4 = (s32)lbl_8047A368;
         if ((u32)uVar4 < *(u32*)lbl_80478DD8) {
-            iVar2 = (s32)fn_8005DA18(*(u32*)(arg0 + 4));
+            iVar2 = (s32)menuDataBiosGetPtr(*(u32*)(arg0 + 4));
             pbVar3 = fn_8005D934(*(s16*)(iVar2 + 4));
             uVar5 = 0;
             while (1) {
@@ -1203,7 +1203,7 @@ void fn_8002537C(s32 arg0, u8* arg1) {
     extern u32 lbl_8047A368;
     extern u32 lbl_8047A370;
     extern u8* fn_8005D934(s32);
-    extern u8* fn_8005DA18(u32);
+    extern u8* menuDataBiosGetPtr(u32);
     extern void fn_800E090C(void*, void*, void*);
     extern void fn_800E0CA0(f64);
     s32 iVar1;
@@ -1223,7 +1223,7 @@ void fn_8002537C(s32 arg0, u8* arg1) {
     default:
         uVar3 = (s32)lbl_8047A368;
         if ((u32)uVar3 < *(u32*)lbl_80478DD8) {
-            iVar1 = (s32)fn_8005DA18(*(u32*)(arg0 + 4));
+            iVar1 = (s32)menuDataBiosGetPtr(*(u32*)(arg0 + 4));
             pbVar2 = fn_8005D934(*(s16*)(iVar1 + 4));
             uVar4 = 0;
             while (1) {
@@ -1274,7 +1274,7 @@ void fn_80025490(s32 arg0, u8* arg1) {
     extern u32 lbl_8047A368;
     extern u32 lbl_8047A370;
     extern u8* fn_8005D934(s32);
-    extern u8* fn_8005DA18(u32);
+    extern u8* menuDataBiosGetPtr(u32);
     extern void fn_800E090C(void*, void*, void*);
     extern void fn_800E0CA0(f64);
     s32 iVar1;
@@ -1294,7 +1294,7 @@ void fn_80025490(s32 arg0, u8* arg1) {
     default:
         uVar3 = (s32)lbl_8047A368;
         if ((u32)uVar3 < *(u32*)lbl_80478DD8) {
-            iVar1 = (s32)fn_8005DA18(*(u32*)(arg0 + 4));
+            iVar1 = (s32)menuDataBiosGetPtr(*(u32*)(arg0 + 4));
             pbVar2 = fn_8005D934(*(s16*)(iVar1 + 4));
             uVar4 = 0;
             while (1) {
@@ -2427,7 +2427,7 @@ void fn_80020A4C(void* r3, u8* r4) {
 #endif
 
 /* fn_80020ADC - 0x80020ADC | size: 0x58 */
-extern u32 fn_80166C74(void);
+extern u32 GSsndGetOutputMode(void);
 #if 0
 asm void fn_80020ADC(void) {
 #include "src/game/gs_title_fn_80020ADC.inc"
@@ -2436,7 +2436,7 @@ asm void fn_80020ADC(void) {
 #pragma scheduling on
 #pragma optimization_level 4
 void fn_80020ADC(void* r3, u8* r4) {
-    if (fn_80166C74() != 1) {
+    if (GSsndGetOutputMode() != 1) {
         *(s8*)(r4 + 4) = *(s8*)(r4 + 4) | 2;
     } else {
         *(s8*)(r4 + 4) = *(s8*)(r4 + 4) & ~2;
@@ -2453,7 +2453,7 @@ asm void fn_80020B34(void) {
 #pragma scheduling on
 #pragma optimization_level 4
 void fn_80020B34(void* r3, u8* r4) {
-    if (fn_80166C74() == 1) {
+    if (GSsndGetOutputMode() == 1) {
         *(s8*)(r4 + 4) = *(s8*)(r4 + 4) | 2;
     } else {
         *(s8*)(r4 + 4) = *(s8*)(r4 + 4) & ~2;
@@ -2487,7 +2487,7 @@ asm void fn_80020BA0(void) {
 void fn_80020BA0(void* arg0, u8* arg1) {
     s16* ptr;
 
-    if (fn_80166C74() == 0) {
+    if (GSsndGetOutputMode() == 0) {
         ptr = (s16*)(lbl_802EF0A8 + 0x8FF0);
     } else {
         ptr = (s16*)(lbl_802EF0A8 + 0x900C);
@@ -2526,7 +2526,7 @@ void fn_80020C9C(void) {
     extern void _threadSwitch(void);
     extern u8 winSeqCheckMove(s32);
     extern void fn_800205C0(s32);
-    extern u32 fn_80166C74(void);
+    extern u32 GSsndGetOutputMode(void);
     extern s32 fn_80135168(s32, s32);
     extern s32 menuOpen(s32, s32);
     extern void fn_80166CC0(u32);
@@ -2564,7 +2564,7 @@ void fn_80020C9C(void) {
     do {
         switch (state) {
         case 0:
-            region = fn_80166C74();
+            region = GSsndGetOutputMode();
             fmt = fn_80135168(0, 9);
             menuOpen(0x7F, 0);
             menuOpen(0x80, 0);
@@ -4012,7 +4012,7 @@ asm void fn_80023E60(void) {
 s32 fn_80023E60(u8* arg0) {
     extern s32 fn_80104318(u8*);
     extern u16* fn_80105624(void);
-    extern u8* fn_8005DA18(u32);
+    extern u8* menuDataBiosGetPtr(u32);
     extern u8* fn_8005D934(s32);
     extern void fn_800E0060(f32*, f32*);
     extern f32 fn_800E0000(f32*, f32*);
@@ -4034,7 +4034,7 @@ s32 fn_80023E60(u8* arg0) {
         return 0;
     }
 
-    da18 = fn_8005DA18(*(u32*)(arg0 + 4));
+    da18 = menuDataBiosGetPtr(*(u32*)(arg0 + 4));
     r104318 = (u8*)fn_80104318(arg0);
 
     if (r104318 == NULL) {
@@ -4053,7 +4053,7 @@ s32 fn_80023E60(u8* arg0) {
         lbl_80478898 = lbl_8047B8A8;
         lbl_8047A370 = 1;
 
-        p = fn_8005DA18(*(u32*)(arg0 + 4));
+        p = menuDataBiosGetPtr(*(u32*)(arg0 + 4));
         p = fn_8005D934(*(s16*)(p + 4));
         found = 0;
         while (1) {
@@ -4075,7 +4075,7 @@ MATCH1:
         }
 
         target = (s32)lbl_8047A36C;
-        p = fn_8005DA18(*(u32*)(arg0 + 4));
+        p = menuDataBiosGetPtr(*(u32*)(arg0 + 4));
         p = fn_8005D934(*(s16*)(p + 4));
         found = 0;
         while (1) {
@@ -4158,7 +4158,7 @@ void fn_80024160(u8* arg0, void* arg1, u16* arg2, u8* arg3) {
 
     if (mask != 0) {
         active_index = lbl_8047A368;
-        current = fn_8005DA18(*(u32*)(arg0 + 4));
+        current = menuDataBiosGetPtr(*(u32*)(arg0 + 4));
         current = fn_8005D934(*(s16*)(current + 4));
         chain_index = 0;
         while (1) {

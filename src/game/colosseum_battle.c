@@ -25949,7 +25949,7 @@ s32 fightTrainerAiWazaHit090(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u16 fn_802367CC(void* ctx, u32 param3, void* arrayA, void* arrayB, u32 flag);
     extern u32 fn_802364BC(void* ctx, u32 param3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
-    extern u8 fn_80219804(u32 elem);
+    extern u8 fightSeqIsEncoreNgWazaDataId(u32 elem);
     extern u8 fn_802381C4(void* ctx, u32 param3, u32 v);
     extern u8 fn_80236BFC(void* ctx, u32 a, u32 type);
     u16 arrayA[0x10];
@@ -25960,7 +25960,7 @@ s32 fightTrainerAiWazaHit090(void* ctx, u32 param1, u32 param2, u32 param3) {
     u8 flag;
     u16 i;
 
-    if (fn_80219804(targetVal) == 1) {
+    if (fightSeqIsEncoreNgWazaDataId(targetVal) == 1) {
         return 0;
     }
     flag = 0;
