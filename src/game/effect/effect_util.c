@@ -404,34 +404,33 @@ void msgctrlTime(void) {
     u32 seconds = lbl_8047AE84 / 3600;
     u32 minutes = (lbl_8047AE84 - seconds * 3600) / 60;
     u32 outIndex = 0;
-    u16* out = (u16*)lbl_80427050;
     u16* glyph;
 
     if (seconds >= 100) {
         glyph = (u16*)fn_80132834(lbl_80427030, 0x10, seconds / 100, 0);
         lbl_8047AEA8 = (u32)glyph;
-        out[outIndex++] = glyph[0];
+        ((u16*)lbl_80427050)[outIndex++] = glyph[0];
         seconds -= (seconds / 100) * 100;
     }
 
     glyph = (u16*)fn_80132834(lbl_80427030, 0x10, seconds / 10, 0);
     lbl_8047AEA8 = (u32)glyph;
-    out[outIndex++] = glyph[0];
+    ((u16*)lbl_80427050)[outIndex++] = glyph[0];
 
     glyph = (u16*)fn_80132834(lbl_80427030, 0x10, seconds - (seconds / 10) * 10, 0);
     lbl_8047AEA8 = (u32)glyph;
-    out[outIndex++] = glyph[0];
+    ((u16*)lbl_80427050)[outIndex++] = glyph[0];
 
-    out[outIndex++] = 0x3A;
+    ((u16*)lbl_80427050)[outIndex++] = 0x3A;
 
     glyph = (u16*)fn_80132834(lbl_80427030, 0x10, minutes / 10, 0);
     lbl_8047AEA8 = (u32)glyph;
-    out[outIndex++] = glyph[0];
+    ((u16*)lbl_80427050)[outIndex++] = glyph[0];
 
     glyph = (u16*)fn_80132834(lbl_80427030, 0x10, minutes - (minutes / 10) * 10, 0);
     lbl_8047AEA8 = (u32)glyph;
-    out[outIndex++] = glyph[0];
-    out[outIndex] = 0;
+    ((u16*)lbl_80427050)[outIndex++] = glyph[0];
+    ((u16*)lbl_80427050)[outIndex] = 0;
 }
 #endif
 
@@ -1184,7 +1183,7 @@ u32 msgctrlHero(void) {
 
 /* 0x801324CC | 0xA4 -- read color index from stream, look up RGBA, apply */
 void msgctrlPalette(EffectUtilCommandObj* obj) {
-    extern u32 lbl_80478E88;
+    extern u32* lbl_80478E88;
     extern u32 lbl_80478E8C;
     extern void fn_800FA160(void*);
     u8* stream;
@@ -1195,7 +1194,7 @@ void msgctrlPalette(EffectUtilCommandObj* obj) {
     if (obj->activeFlag != 0) {
         stream = obj->stream;
         idx = *stream;
-        maxIdx = lbl_80478E88;
+        maxIdx = *lbl_80478E88;
         if (idx >= maxIdx) {
             idx = 0;
         }
@@ -4802,8 +4801,10 @@ asm void msgctrlCR(void) {
 #pragma scheduling on
 u32 msgctrlCR(void* obj) {
     u8* p = (u8*)obj;
+    f32 diff;
     *(f32*)(p + 0x0C) = *(f32*)(p + 0x04);
-    *(f32*)(p + 0x10) += *(f32*)(p + 0x64) * (f32)((s32)(s8)p[0x42] + (s32)(u8)p[0x23]);
+    diff = (f32)((s32)(s8)p[0x42] + (s32)(u8)p[0x23]);
+    *(f32*)(p + 0x10) += *(f32*)(p + 0x64) * diff;
     return 0;
 }
 #pragma scheduling off
