@@ -170,7 +170,7 @@ void _HSD_RandForgetMemory(void)
 /* Address: 0x801ADD0C | Size: 0x3C  -- Deactivate texture anim state */
 #pragma push
 #pragma optimization_level 1
-void fn_801ADD0C(void)
+void _HSD_RObjForgetMemory(void)
 {
     s32 r = fn_801A6990(lbl_8047B308);
     if (r != 0) {

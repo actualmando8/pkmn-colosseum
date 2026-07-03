@@ -552,10 +552,10 @@ s32 fn_801C2A90(s32 slot) {
 }
 
 /**
- * fn_801C2AAC - Get grid group base pointer.
+ * HSD_AObjGetAllocData - Get grid group base pointer.
  * Address: 0x801C2AAC | Size: 0xC
  */
-void* fn_801C2AAC(void) {
+void* HSD_AObjGetAllocData(void) {
     extern u8 lbl_80466DB8[];
     return lbl_80466DB8;
 }

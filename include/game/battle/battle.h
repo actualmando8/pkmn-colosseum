@@ -308,7 +308,7 @@ typedef struct TypeMatchup {
 /* fn_801C2A60 */ s32  fn_801C2A60(void);
 /* fn_801C2A74 */ s32  fn_801C2A74(s32 slot);
 /* fn_801C2A90 */ s32  fn_801C2A90(s32 slot);
-/* fn_801C2AAC */ void* fn_801C2AAC(void);
+/* HSD_AObjGetAllocData */ void* HSD_AObjGetAllocData(void);
 /* fn_801C2AB8 */ void fn_801C2AB8(s32 slot, s32 animState);
 /* fn_801C2AE8 */ u16 fn_801C2AE8(u32 id);
 /* fn_801C2B2C */ void fn_801C2B2C(void);

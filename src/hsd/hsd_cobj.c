@@ -2541,11 +2541,11 @@ void __assert(const char* file, u32 line, const char* expr) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_80196EB4(void) {
+asm void _HSD_DispForgetMemory(void) {
 #include "src/hsd/hsd_cobj_fn_80196EB4.inc"
 }
 #else
-void fn_80196EB4(void) {
+void _HSD_DispForgetMemory(void) {
     extern u32 lbl_8047B24C;
     extern u32 lbl_8047B250;
     extern u32 lbl_8047B254;

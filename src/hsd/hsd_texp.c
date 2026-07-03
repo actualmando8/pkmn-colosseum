@@ -42,19 +42,19 @@ extern char lbl_802753DC[];
 
 /* Address: 0x801B4240 | Size: 0xC */
 /* Get pointer to BSS object lbl_80465728 */
-void* fn_801B4240(void) {
+void* HSD_ChanGetAllocData(void) {
     return lbl_80465728;
 }
 
 /* Address: 0x801B424C | Size: 0xC */
 /* Get pointer to BSS object lbl_80465754 */
-void* fn_801B424C(void) {
+void* HSD_TevRegGetAllocData(void) {
     return lbl_80465754;
 }
 
 /* Address: 0x801B4258 | Size: 0xC */
 /* Get pointer to BSS object lbl_80465780 */
-void* fn_801B4258(void) {
+void* HSD_RenderGetAllocData(void) {
     return lbl_80465780;
 }
 
