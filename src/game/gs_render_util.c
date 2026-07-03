@@ -54,7 +54,7 @@ typedef struct GSRenderCamera {
 } GSRenderCamera;
 
 /* ===== External references ===== */
-extern void fn_800DD970(const char* fmt, ...);
+extern void GSlogWrite(const char* fmt, ...);
 extern void SISetSamplingRate(u32 rate);
 
 /* ===== Global state (SDA) ===== */

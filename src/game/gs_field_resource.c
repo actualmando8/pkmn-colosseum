@@ -84,8 +84,8 @@
 #include "game/world/gs_field.h"
 
 /* ===== External SDK / engine functions ===== */
-extern void  fn_800DD970(const char* fmt, ...);         /* OSReport / GSlog */
-extern void* fn_800F9418(u32 size, u32 alignment,
+extern void  GSlogWrite(const char* fmt, ...);         /* OSReport / GSlog */
+extern void* GSresAllocResourceAlign(u32 size, u32 alignment,
                           u32 loadParam, u32 loadParam2,
                           void* callback);               /* GSres alloc+load */
 
@@ -115,8 +115,8 @@ extern void fn_80115094(void);  /* GFL resource completion callback */
 extern void fn_801150B8(void);  /* sound resource completion callback */
 extern void fn_80115208(void);  /* resource completion callback (Col/...) */
 
-extern void* fn_800F9318();        /* GSres simple alloc */
-extern void* fn_800F9378();        /* GSres install loader */
+extern void* GSresGetResource();        /* GSres simple alloc */
+extern void* GSresRegisterResource();        /* GSres install loader */
 extern void  fn_8010CFE4();        /* PKX overlap setup */
 extern u32   fn_800EFD3C();        /* WZX overlap check */
 extern void* fn_801195AC();        /* node lookup */
@@ -138,9 +138,9 @@ void* floorReadGFLPreFunc(u32 resId, u32 loadMode, u32 dataSize) {
     u32 alignedSize;
 
     alignedSize = (dataSize + 0x1F) & ~0x1F;
-    buf = fn_800F9418(alignedSize, 0x20, resId, loadMode, (void*)fn_80115094);
+    buf = GSresAllocResourceAlign(alignedSize, 0x20, resId, loadMode, (void*)fn_80115094);
     if (buf == (void*)0) {
-        fn_800DD970(lbl_80272200, dataSize);
+        GSlogWrite(lbl_80272200, dataSize);
     }
     return buf;
 }
@@ -161,10 +161,10 @@ u32 floorReadBGMPostFunc(void) { return 0; }
 #pragma push
 #pragma peephole off
 void* floorReadNotLinkedParticlePostFunc(u32 resId, u32 param) {
-    void* result = fn_800F9318(resId, (param & 0x7FFF0000) | 0x400);
+    void* result = GSresGetResource(resId, (param & 0x7FFF0000) | 0x400);
     void* node = fn_801195AC(result);
     if (node != (void*)0) {
-        fn_800F9378(node, resId, param, (void*)fn_801150B8);
+        GSresRegisterResource(node, resId, param, (void*)fn_801150B8);
     }
     return result;
 }
@@ -179,9 +179,9 @@ void* floorReadNotLinkedParticlePreFunc(u32 resId, u32 loadMode, u32 dataSize) {
     u32 alignedSize;
 
     alignedSize = (dataSize + 0x1F) & ~0x1F;
-    buf = fn_800F9418(alignedSize, 0x20, resId, (loadMode & 0x7FFF0000) | 0x400, (void*)0);
+    buf = GSresAllocResourceAlign(alignedSize, 0x20, resId, (loadMode & 0x7FFF0000) | 0x400, (void*)0);
     if (buf == (void*)0) {
-        fn_800DD970(lbl_80272270, alignedSize);
+        GSlogWrite(lbl_80272270, alignedSize);
     }
     return buf;
 }
@@ -206,9 +206,9 @@ void* floorReadParticlePreFunc(u32 resId, u32 loadMode, u32 dataSize) {
     u32 alignedSize;
 
     alignedSize = (dataSize + 0x1F) & ~0x1F;
-    buf = fn_800F9418(alignedSize, 0x20, resId, (loadMode & 0x7FFF0000) | 0x400, (void*)0);
+    buf = GSresAllocResourceAlign(alignedSize, 0x20, resId, (loadMode & 0x7FFF0000) | 0x400, (void*)0);
     if (buf == (void*)0) {
-        fn_800DD970(lbl_80272270, alignedSize);
+        GSlogWrite(lbl_80272270, alignedSize);
     }
     return buf;
 }
@@ -221,9 +221,9 @@ void* floorReadParticlePreFunc(u32 resId, u32 loadMode, u32 dataSize) {
 void* floorReadWZXPreFunc(u32 resId, u32 loadMode, u32 dataSize) {
     void* buf;
     u32 alignedSize = (dataSize + 0x1F) & ~0x1F;
-    buf = fn_800F9418(alignedSize, 0x20, resId, loadMode, (void*)0);
+    buf = GSresAllocResourceAlign(alignedSize, 0x20, resId, loadMode, (void*)0);
     if (buf == (void*)0) {
-        fn_800DD970(lbl_802722B8, alignedSize);
+        GSlogWrite(lbl_802722B8, alignedSize);
     }
     return buf;
 }
@@ -236,9 +236,9 @@ void* floorReadWZXPreFunc(u32 resId, u32 loadMode, u32 dataSize) {
 void* floorReadPKXPreFunc(u32 resId, u32 loadMode, u32 dataSize) {
     void* buf;
     u32 alignedSize = (dataSize + 0x1F) & ~0x1F;
-    buf = fn_800F9418(alignedSize, 0x20, resId, loadMode, (void*)0);
+    buf = GSresAllocResourceAlign(alignedSize, 0x20, resId, loadMode, (void*)0);
     if (buf == (void*)0) {
-        fn_800DD970(lbl_802722F0, alignedSize);
+        GSlogWrite(lbl_802722F0, alignedSize);
     }
     return buf;
 }
@@ -250,9 +250,9 @@ void* floorReadPKXPreFunc(u32 resId, u32 loadMode, u32 dataSize) {
 #pragma push
 #pragma peephole off
 void* floorReadTexPostFunc(void) {
-    void* result = fn_800F9318();
+    void* result = GSresGetResource();
     if (fn_800EFD3C(result) == 0) {
-        fn_800DD970(lbl_80272328);
+        GSlogWrite(lbl_80272328);
     }
     return result;
 }
@@ -270,7 +270,7 @@ void* floorReadTexPostFunc(void) {
 #pragma push
 #pragma peephole off
 void* floorReadColPostFunc(void) {
-    void* result = fn_800F9318();
+    void* result = GSresGetResource();
     fn_8010CFE4();
     return result;
 }
@@ -285,9 +285,9 @@ void* floorReadColPreFunc(u32 resId, u32 loadMode, u32 dataSize) {
     u32 alignedSize;
 
     alignedSize = (dataSize + 0x1F) & ~0x1F;
-    buf = fn_800F9418(alignedSize, 0x20, resId, loadMode, (void*)fn_80115208);
+    buf = GSresAllocResourceAlign(alignedSize, 0x20, resId, loadMode, (void*)fn_80115208);
     if (buf == (void*)0) {
-        fn_800DD970(lbl_80272394, alignedSize);
+        GSlogWrite(lbl_80272394, alignedSize);
     }
     return buf;
 }
@@ -302,7 +302,7 @@ void* floorReadCameraPostFunc(u32 resId, u32 loadMode, u32 dataSize) {
     extern void HSD_ArchiveParse(void* archive, void* buf, u32 size);
     extern void* HSD_ArchiveGetPublicAddress(void* archive, const char* sym);
     extern void* fn_800D27FC(void* model);
-    extern void fn_800F9378(void* entry, u32 resId, u32 loadMode, void* callback);
+    extern void GSresRegisterResource(void* entry, u32 resId, u32 loadMode, void* callback);
     extern u32 fn_801150DC(void);
     const u8* strings;
     HSDArchiveBuffer* archive;
@@ -312,17 +312,17 @@ void* floorReadCameraPostFunc(u32 resId, u32 loadMode, u32 dataSize) {
 
     flags = loadMode & 0x7FFF0000;
     strings = (const u8*)lbl_80272200;
-    archive = fn_800F9318(resId, flags | 0x400);
+    archive = GSresGetResource(resId, flags | 0x400);
     HSD_ArchiveParse(archive, archive->payload, dataSize);
     pub = HSD_ArchiveGetPublicAddress(archive, (const char*)(strings + 0xAC));
     if (pub == (void*)0) {
-        fn_800DD970((const char*)(strings + 0x1CC));
+        GSlogWrite((const char*)(strings + 0x1CC));
     } else {
         entry = fn_800D27FC(*(void**)((u8*)pub + 4));
         if (entry == (void*)0) {
-            fn_800DD970((const char*)(strings + 0x200));
+            GSlogWrite((const char*)(strings + 0x200));
         } else {
-            fn_800F9378(entry, resId, loadMode, (void*)fn_801150DC);
+            GSresRegisterResource(entry, resId, loadMode, (void*)fn_801150DC);
         }
     }
     return pub;
@@ -336,9 +336,9 @@ void* floorReadCameraPostFunc(u32 resId, u32 loadMode, u32 dataSize) {
 #pragma peephole off
 void* floorReadCameraPreFunc(void* owner, u32 param, u32 alloc_size) {
     u32 total = ((alloc_size + 0x1F) & ~0x1F) + 0x60;
-    HSDArchiveBuffer* archive = fn_800F9418(total, 0x20, (u32)owner, (param & 0x7FFF0000) | 0x400, (void*)0);
+    HSDArchiveBuffer* archive = GSresAllocResourceAlign(total, 0x20, (u32)owner, (param & 0x7FFF0000) | 0x400, (void*)0);
     if (archive == (void*)0) {
-        fn_800DD970(lbl_80272428, total);
+        GSlogWrite(lbl_80272428, total);
         return (void*)0;
     }
     return archive->payload;
@@ -349,10 +349,10 @@ void* floorReadCameraPreFunc(void* owner, u32 param, u32 alloc_size) {
 #pragma push
 #pragma peephole off
 void* floorReadObjPostFunc(u32 resId, u32 loadMode, u32 dataSize) {
-    extern void* fn_800F9318(void);
+    extern void* GSresGetResource(void);
     extern void HSD_ArchiveParse(void* archive, void* buf, u32 size);
     extern void* HSD_ArchiveGetPublicAddress(void* archive, const char* sym);
-    extern void fn_800F9378(void* entry, u32 resId, u32 flags, u32 cb);
+    extern void GSresRegisterResource(void* entry, u32 resId, u32 flags, u32 cb);
     HSDArchiveBuffer* archive;
     void* pub;
     void* entry;
@@ -361,7 +361,7 @@ void* floorReadObjPostFunc(u32 resId, u32 loadMode, u32 dataSize) {
     u32 counter;
 
     counter = 0;
-    archive = fn_800F9318();
+    archive = GSresGetResource();
     HSD_ArchiveParse(archive, archive->payload, dataSize);
     pub = HSD_ArchiveGetPublicAddress(archive, lbl_802722AC);
     if (pub == (void*)0) {
@@ -371,7 +371,7 @@ void* floorReadObjPostFunc(u32 resId, u32 loadMode, u32 dataSize) {
     if (*(u32*)pub != 0) {
         offset = 0;
         while ((entry = *(void**)(*(u8**)pub + offset)) != 0) {
-            fn_800F9378(entry, resId, flags | counter, 0);
+            GSresRegisterResource(entry, resId, flags | counter, 0);
             offset += 4;
             counter++;
         }
@@ -386,9 +386,9 @@ void* floorReadObjPostFunc(u32 resId, u32 loadMode, u32 dataSize) {
 #pragma peephole off
 void* floorReadObjPreFunc(void* owner, u32 param, u32 alloc_size) {
     u32 total = ((alloc_size + 0x1F) & ~0x1F) + 0x60;
-    HSDArchiveBuffer* archive = fn_800F9418(total, 0x20, (u32)owner, param, (void*)0);
+    HSDArchiveBuffer* archive = GSresAllocResourceAlign(total, 0x20, (u32)owner, param, (void*)0);
     if (archive == (void*)0) {
-        fn_800DD970(lbl_80272460, total);
+        GSlogWrite(lbl_80272460, total);
         return (void*)0;
     }
     return archive->payload;

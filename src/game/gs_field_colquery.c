@@ -80,7 +80,7 @@
  *
  * Key patterns observed in the disassembly:
  *   - Heavy use of PSMTXMultVec (MTXMultVec3) for coordinate transforms
- *   - Calls to fn_8010C7BC (GScolsys2_QueryTriVisible) for per-tri checks
+ *   - Calls to GScolsys2GetObjEnable (GScolsys2_QueryTriVisible) for per-tri checks
  *   - Calls to fn_8010CA30 / fn_8010C8D0 for forward/inverse transforms
  *   - Calls to fn_8010DEF0 (GScolsys2_TriangleBoundsCheck)
  *   - Float comparisons with parametric t values (ray intersection)
@@ -94,7 +94,7 @@
 #include "game/world/gs_field.h"
 
 /* ===== External SDK / engine functions ===== */
-extern void  fn_800DD970(const char* fmt, ...);        /* OSReport / GSlog */
+extern void  GSlogWrite(const char* fmt, ...);        /* OSReport / GSlog */
 extern void* memcpy(void* dst, const void* src, u32 n);
 
 /* Matrix / vector math helpers */
@@ -108,7 +108,7 @@ f32   PSVECSquareDistance(void* a, void* b);
 
 /* GScolsys2 functions */
 extern void* fn_8010CBC0(void);                         /* GScolsys2_GetWZXData */
-extern s32   fn_8010C7BC(u32 triIdx, void* outFlag);    /* GScolsys2_QueryTriVisible */
+extern s32   GScolsys2GetObjEnable(u32 triIdx, void* outFlag);    /* GScolsys2_QueryTriVisible */
 extern void  fn_8010CA30(void* mtxOut, u32 layerIdx);   /* GScolsys2_BuildInverseTransform */
 extern void  fn_8010C8D0(void* mtxOut, u32 layerIdx);   /* GScolsys2_BuildTransform */
 extern s32   fn_8010DEF0(void* result, void* origin,
@@ -250,7 +250,7 @@ typedef struct GSFieldColqueryState {
 #pragma optimizewithasm off
 s32 GSfield_RayCast(void* origin, void* direction) {
     /* TODO: match -- 824 bytes at 0x8010E138 */
-    /* Calls: fn_8010CBC0, fn_8010C7BC, fn_8010CA30, fn_8010C8D0,
+    /* Calls: fn_8010CBC0, GScolsys2GetObjEnable, fn_8010CA30, fn_8010C8D0,
      *        PSMTXMultVec, fn_8010DEF0 */
 }
 #pragma pop
@@ -816,7 +816,7 @@ s32 fn_80111864(void* a, void* b, void* c) {
     region = *(u8**)wzx;
     regionIdx = 0;
     while ((u32)regionIdx < *(u32*)(wzx + 4)) {
-        fn_8010C7BC(regionIdx, &visible);
+        GScolsys2GetObjEnable(regionIdx, &visible);
         if (visible != 0) {
             triList = *(u8**)(region + 0x30);
             if (triList != NULL) {
@@ -994,7 +994,7 @@ s32 fn_80111C24(void* origin, void* dir) {
     region = wzx->regions;
     regIdx = 0;
     while (regIdx < wzx->regionCount) {
-        fn_8010C7BC(regIdx, &visFlag);
+        GScolsys2GetObjEnable(regIdx, &visFlag);
         if (visFlag != 0) {
             triList = region->boundaryTriangles;
             if (triList != NULL) {
@@ -1353,7 +1353,7 @@ void _floorInitCharacters__FP11GSfloor_dd_(void* a) {
             result = fn_8018D998(model, i);
         }
         if (result == 0) {
-            fn_800DD970(lbl_802720CC, lbl_8035B888);
+            GSlogWrite(lbl_802720CC, lbl_8035B888);
         } else if (fn_800FF548() != 1) {
             {
                 s32 emitId;
@@ -1701,24 +1701,24 @@ void floorOpenObject(u32 modelIndex) {
     }
 
     if (archiveMode == 0) {
-        fn_800DD970(strings + 0xDC, lbl_8035B868);
+        GSlogWrite(strings + 0xDC, lbl_8035B868);
         return;
     }
 
     archive = fn_800F92D4(archiveMode);
     if (special != 0) {
         if (archive == NULL) {
-            fn_800DD970(strings + 0xF8, lbl_8035B868);
+            GSlogWrite(strings + 0xF8, lbl_8035B868);
             return;
         }
         pub = HSD_ArchiveGetPublicAddress(archive, strings + 0x28);
         if (pub == NULL) {
-            fn_800DD970(strings + 0x118, lbl_8035B868);
+            GSlogWrite(strings + 0x118, lbl_8035B868);
             return;
         }
         archive = *(void**)pub;
         if (*(void**)archive == NULL) {
-            fn_800DD970(strings + 0x140, lbl_8035B868);
+            GSlogWrite(strings + 0x140, lbl_8035B868);
             return;
         }
         archive = *(void**)archive;
@@ -1726,8 +1726,8 @@ void floorOpenObject(u32 modelIndex) {
 
     model = fn_800E4D18(archive);
     if (model == NULL) {
-        fn_800DD970(strings + 0x64, lbl_8035B868);
-        fn_800DD970(strings + 0x15C);
+        GSlogWrite(strings + 0x64, lbl_8035B868);
+        GSlogWrite(strings + 0x15C);
         return;
     }
 
@@ -1766,14 +1766,14 @@ void* floorGetResource(u32 key, u32 arg) {
 #pragma optimization_level 4
     extern void* fn_80115C48(u32);
     extern u32 fn_80115A80(void*);
-    extern void* fn_800F9318(u32, u32);
+    extern void* GSresGetResource(u32, u32);
     void* resource;
 
     resource = fn_80115C48(key);
     if (resource == NULL) {
         return NULL;
     }
-    return fn_800F9318(fn_80115A80(resource), arg);
+    return GSresGetResource(fn_80115A80(resource), arg);
 }
 #pragma pop
 
@@ -1930,9 +1930,9 @@ void EvlogSet__FScUl(void) {
 #pragma peephole off
 s32 fn_80114254(s32 param1, s32 param2, s32 param3) {
 #pragma optimization_level 4
-    extern s32 fn_800F9318(s32);
+    extern s32 GSresGetResource(s32);
     extern void fn_8017F484(s32, s32, s32);
-    s32 result = fn_800F9318(param1);
+    s32 result = GSresGetResource(param1);
 
     fn_8017F484(param1, param2, param3);
     return result;
@@ -1947,10 +1947,10 @@ s32 fn_80114254(s32 param1, s32 param2, s32 param3) {
 #pragma peephole off
 void* fn_801142B4(void* group, void* model, u32 size) {
 #pragma optimization_level 4
-    extern void* fn_800F9418(u32 size, u32 alignment, void* group, void* model, u32 flags);
+    extern void* GSresAllocResourceAlign(u32 size, u32 alignment, void* group, void* model, u32 flags);
     void* result;
 
-    result = fn_800F9418((size + 0x1F) & ~0x1F, 0x20, group, model, 0);
+    result = GSresAllocResourceAlign((size + 0x1F) & ~0x1F, 0x20, group, model, 0);
     if (result == NULL) {
         result = NULL;
     }
@@ -1966,11 +1966,11 @@ void* fn_801142B4(void* group, void* model, u32 size) {
 #pragma peephole off
 void* floorReadGFLPostFunc(u32 group, u32 modelId) {
 #pragma optimization_level 4
-    extern void* fn_800F9318(u32, u32);
+    extern void* GSresGetResource(u32, u32);
     extern void fn_801ED680(void*);
     void* model;
 
-    model = fn_800F9318(group, modelId);
+    model = GSresGetResource(group, modelId);
     fn_801ED680(model);
     return model;
 }

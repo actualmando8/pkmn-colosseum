@@ -30,7 +30,7 @@
 #include "game/gs_floor.h"
 
 /* ===== External engine / SDK functions (used by the stub scaffold) ===== */
-extern void  fn_800DD970(const char* fmt, ...);         /* GSlog / OSReport */
+extern void  GSlogWrite(const char* fmt, ...);         /* GSlog / OSReport */
 
 /* ===== String constants (rodata references) ===== */
 extern const char lbl_802717F0[];  /* "GSfloorOpen: cannot find floor %d\n" */
@@ -68,7 +68,7 @@ not_found:
 
 found:
     if (entry == NULL) {
-        fn_800DD970(lbl_802717F0, floorId);
+        GSlogWrite(lbl_802717F0, floorId);
         return;
     }
 

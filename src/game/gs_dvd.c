@@ -31,8 +31,8 @@
 #include "dolphin/types.h"
 
 /* ===== External SDK / engine functions ===== */
-extern void  fn_800DD970(const char* fmt, ...);         /* OSReport / GSlog */
-extern void  fn_800F9318(void* ptr, u32 param);        /* resource resolution */
+extern void  GSlogWrite(const char* fmt, ...);         /* OSReport / GSlog */
+extern void  GSresGetResource(void* ptr, u32 param);        /* resource resolution */
 extern void  fn_801669E4(u32 a, u32 b, u32 c);         /* sound subsystem */
 extern void  fn_8016A644(void* ptr);                    /* resource cleanup */
 extern void  fn_80169520(void* ptr);                    /* status flag update */

@@ -21,7 +21,7 @@ extern f32 lbl_8047C1E0; /* {41.6666641f, 0.0f} -- PAL-adjusted 50-unit wait */
 /* 0x80091564 | size: 0x210 */
 void fn_80091564(u32 ctx) {
     #pragma peephole off
-    extern u32 fn_800F9318(u32 ctx, u32 id);
+    extern u32 GSresGetResource(u32 ctx, u32 id);
     extern void fn_800E8FA0(u32 w, u32 h);
     extern void fn_801CB7C4(u32 id);
     extern void fn_800E3C08(u32 handle, u32 val);
@@ -46,13 +46,13 @@ void fn_80091564(u32 ctx) {
     u32 iconResult;
     u32 finalResult;
 
-    lbl_8047A690 = fn_800F9318(ctx, 0x06DC1605);
-    lbl_8047A694 = fn_800F9318(ctx, 0x06DC1001);
+    lbl_8047A690 = GSresGetResource(ctx, 0x06DC1605);
+    lbl_8047A694 = GSresGetResource(ctx, 0x06DC1001);
     fn_800E8FA0(0x280, 0x1E0);
     fn_801CB7C4(0x06DC1000);
 
-    fn_800E3C08(fn_800F9318(ctx, 0x06DC1000), fn_800F9318(ctx, 0x11261400));
-    fn_800E3C00(fn_800F9318(ctx, 0x06DC1000), 4);
+    fn_800E3C08(GSresGetResource(ctx, 0x06DC1000), GSresGetResource(ctx, 0x11261400));
+    fn_800E3C00(GSresGetResource(ctx, 0x06DC1000), 4);
 
     fn_801CB834(0x06DC1000, 4, 0, 0);
     waitFrames = 100;
@@ -70,7 +70,7 @@ void fn_80091564(u32 ctx) {
     iconHandle = fn_801CBA0C(0x06BD0400);
     fn_801CB834(iconHandle, 7, 0, 0);
 
-    iconResult = fn_800F9318(ctx, iconHandle);
+    iconResult = GSresGetResource(ctx, iconHandle);
     fn_800E9108(iconResult, 2);
     fn_800E8FE8(iconResult, lbl_8047A690);
     fn_800E900C(iconResult, 1, &lbl_8047A694);
@@ -99,7 +99,7 @@ void fn_80091564(u32 ctx) {
 /* 0x80091774 | size: 0x210 */
 void fn_80091774(u32 ctx) {
     #pragma peephole off
-    extern u32 fn_800F9318(u32 ctx, u32 id);
+    extern u32 GSresGetResource(u32 ctx, u32 id);
     extern void fn_800E8FA0(u32 w, u32 h);
     extern void fn_801CB7C4(u32 id);
     extern void fn_800E3C08(u32 handle, u32 val);
@@ -124,13 +124,13 @@ void fn_80091774(u32 ctx) {
     u32 iconResult;
     u32 finalResult;
 
-    lbl_8047A690 = fn_800F9318(ctx, 0x06DC1605);
-    lbl_8047A694 = fn_800F9318(ctx, 0x06DC1001);
+    lbl_8047A690 = GSresGetResource(ctx, 0x06DC1605);
+    lbl_8047A694 = GSresGetResource(ctx, 0x06DC1001);
     fn_800E8FA0(0x280, 0x1E0);
     fn_801CB7C4(0x06DC1000);
 
-    fn_800E3C08(fn_800F9318(ctx, 0x06DC1000), fn_800F9318(ctx, 0x11251400));
-    fn_800E3C00(fn_800F9318(ctx, 0x06DC1000), 4);
+    fn_800E3C08(GSresGetResource(ctx, 0x06DC1000), GSresGetResource(ctx, 0x11251400));
+    fn_800E3C00(GSresGetResource(ctx, 0x06DC1000), 4);
 
     fn_801CB834(0x06DC1000, 3, 0, 0);
     waitFrames = 100;
@@ -148,7 +148,7 @@ void fn_80091774(u32 ctx) {
     iconHandle = fn_801CBA0C(0x06BD0400);
     fn_801CB834(iconHandle, 6, 0, 0);
 
-    iconResult = fn_800F9318(ctx, iconHandle);
+    iconResult = GSresGetResource(ctx, iconHandle);
     fn_800E9108(iconResult, 2);
     fn_800E8FE8(iconResult, lbl_8047A690);
     fn_800E900C(iconResult, 1, &lbl_8047A694);
@@ -177,7 +177,7 @@ void fn_80091774(u32 ctx) {
 /* 0x80091984 | size: 0x210 */
 void fn_80091984(u32 ctx) {
     #pragma peephole off
-    extern u32 fn_800F9318(u32 ctx, u32 id);
+    extern u32 GSresGetResource(u32 ctx, u32 id);
     extern void fn_800E8FA0(u32 w, u32 h);
     extern void fn_801CB7C4(u32 id);
     extern void fn_800E3C08(u32 handle, u32 val);
@@ -202,13 +202,13 @@ void fn_80091984(u32 ctx) {
     u32 iconResult;
     u32 finalResult;
 
-    lbl_8047A690 = fn_800F9318(ctx, 0x06DC1605);
-    lbl_8047A694 = fn_800F9318(ctx, 0x06DC1001);
+    lbl_8047A690 = GSresGetResource(ctx, 0x06DC1605);
+    lbl_8047A694 = GSresGetResource(ctx, 0x06DC1001);
     fn_800E8FA0(0x280, 0x1E0);
     fn_801CB7C4(0x06DC1000);
 
-    fn_800E3C08(fn_800F9318(ctx, 0x06DC1000), fn_800F9318(ctx, 0x11241400));
-    fn_800E3C00(fn_800F9318(ctx, 0x06DC1000), 4);
+    fn_800E3C08(GSresGetResource(ctx, 0x06DC1000), GSresGetResource(ctx, 0x11241400));
+    fn_800E3C00(GSresGetResource(ctx, 0x06DC1000), 4);
 
     fn_801CB834(0x06DC1000, 2, 0, 0);
     waitFrames = 100;
@@ -226,7 +226,7 @@ void fn_80091984(u32 ctx) {
     iconHandle = fn_801CBA0C(0x06BD0400);
     fn_801CB834(iconHandle, 5, 0, 1);
 
-    iconResult = fn_800F9318(ctx, iconHandle);
+    iconResult = GSresGetResource(ctx, iconHandle);
     fn_800E9108(iconResult, 2);
     fn_800E8FE8(iconResult, lbl_8047A690);
     fn_800E900C(iconResult, 1, &lbl_8047A694);
@@ -255,7 +255,7 @@ void fn_80091984(u32 ctx) {
 /* 0x80091B94 | size: 0x210 */
 void fn_80091B94(u32 ctx) {
     #pragma peephole off
-    extern u32 fn_800F9318(u32 ctx, u32 id);
+    extern u32 GSresGetResource(u32 ctx, u32 id);
     extern void fn_800E8FA0(u32 w, u32 h);
     extern void fn_801CB7C4(u32 id);
     extern void fn_800E3C08(u32 handle, u32 val);
@@ -280,13 +280,13 @@ void fn_80091B94(u32 ctx) {
     u32 iconResult;
     u32 finalResult;
 
-    lbl_8047A690 = fn_800F9318(ctx, 0x06DC1605);
-    lbl_8047A694 = fn_800F9318(ctx, 0x06DC1001);
+    lbl_8047A690 = GSresGetResource(ctx, 0x06DC1605);
+    lbl_8047A694 = GSresGetResource(ctx, 0x06DC1001);
     fn_800E8FA0(0x280, 0x1E0);
     fn_801CB7C4(0x06DC1000);
 
-    fn_800E3C08(fn_800F9318(ctx, 0x06DC1000), fn_800F9318(ctx, 0x11221400));
-    fn_800E3C00(fn_800F9318(ctx, 0x06DC1000), 4);
+    fn_800E3C08(GSresGetResource(ctx, 0x06DC1000), GSresGetResource(ctx, 0x11221400));
+    fn_800E3C00(GSresGetResource(ctx, 0x06DC1000), 4);
 
     fn_801CB834(0x06DC1000, 0, 0, 0);
     waitFrames = 100;
@@ -304,7 +304,7 @@ void fn_80091B94(u32 ctx) {
     iconHandle = fn_801CBA0C(0x06BD0400);
     fn_801CB834(iconHandle, 1, 0, 0);
 
-    iconResult = fn_800F9318(ctx, iconHandle);
+    iconResult = GSresGetResource(ctx, iconHandle);
     fn_800E9108(iconResult, 2);
     fn_800E8FE8(iconResult, lbl_8047A690);
     fn_800E900C(iconResult, 1, &lbl_8047A694);
@@ -333,7 +333,7 @@ void fn_80091B94(u32 ctx) {
 /* 0x8008CACC | size: 0x30C */
 void fn_8008CACC(u32 ctx) {
     #pragma peephole off
-    extern u32 fn_800F9318(u32 ctx, u32 id);
+    extern u32 GSresGetResource(u32 ctx, u32 id);
     extern void fn_800E8FA0(u32 w, u32 h);
     extern void fn_801CB7C4(u32 id);
     extern void fn_800E3C08(u32 handle, u32 val);
@@ -367,8 +367,8 @@ void fn_8008CACC(u32 ctx) {
     u32 iconResult;
     u32 finalResult;
 
-    lbl_8047A690 = fn_800F9318(ctx, 0x0CE61602);
-    lbl_8047A694 = fn_800F9318(ctx, 0x0CE61002);
+    lbl_8047A690 = GSresGetResource(ctx, 0x0CE61602);
+    lbl_8047A694 = GSresGetResource(ctx, 0x0CE61002);
     fn_800E8FA0(0x280, 0x1E0);
     fn_801CB834(0x0CE61000, 0, 0, 0);
 
@@ -386,12 +386,12 @@ void fn_8008CACC(u32 ctx) {
 
     fn_801CB7C4(0x0CE61000);
 
-    material = (GSmaterialEntry *)fn_800F9318(ctx, 0x0CE61000);
+    material = (GSmaterialEntry *)GSresGetResource(ctx, 0x0CE61000);
     fn_80118874(material->texture, 1);
     material->texture = NULL;
 
     frame = lbl_8047C1D4;
-    handle2 = fn_800F9318(ctx, 0x0CE61004);
+    handle2 = GSresGetResource(ctx, 0x0CE61004);
     fn_800ECCA8(handle2, 0);
     GSmodelGetFrameCount(handle2, &frame, 0);
     frame = frame - lbl_8047C1D8;
@@ -400,8 +400,8 @@ void fn_8008CACC(u32 ctx) {
     fn_800ECB74(handle2, 0);
     fn_800EC990(handle2);
 
-    fn_800E3C08(fn_800F9318(ctx, 0x0CE61000), fn_800F9318(ctx, 0x11211400));
-    fn_800E3C00(fn_800F9318(ctx, 0x0CE61000), 4);
+    fn_800E3C08(GSresGetResource(ctx, 0x0CE61000), GSresGetResource(ctx, 0x11211400));
+    fn_800E3C00(GSresGetResource(ctx, 0x0CE61000), 4);
 
     fn_801CB834(0x0CE61000, 2, 0, 0);
     waitFrames = 100;
@@ -417,7 +417,7 @@ void fn_8008CACC(u32 ctx) {
     }
 
     iconHandle = fn_801CBA0C(0x06BC0400);
-    iconResult = fn_800F9318(ctx, iconHandle);
+    iconResult = GSresGetResource(ctx, iconHandle);
     fn_800E9108(iconResult, 2);
     fn_800E8FE8(iconResult, lbl_8047A690);
     fn_800E900C(iconResult, 1, &lbl_8047A694);
@@ -447,7 +447,7 @@ void fn_8008CACC(u32 ctx) {
 /* 0x8008FE94 | size: 0x26C */
 void fn_8008FE94(u32 ctx) {
     #pragma peephole off
-    extern u32 fn_800F9318(u32 ctx, u32 id);
+    extern u32 GSresGetResource(u32 ctx, u32 id);
     extern void fn_800E8FA0(u32 w, u32 h);
     extern void fn_801CB7C4(u32 id);
     extern void fn_801CB834(u32 id, u32 slot, u32 x, u32 y);
@@ -479,8 +479,8 @@ void fn_8008FE94(u32 ctx) {
     u32 iconResult;
     u32 finalResult;
 
-    lbl_8047A690 = fn_800F9318(ctx, 0x0CE61602);
-    lbl_8047A694 = fn_800F9318(ctx, 0x0CE61002);
+    lbl_8047A690 = GSresGetResource(ctx, 0x0CE61602);
+    lbl_8047A694 = GSresGetResource(ctx, 0x0CE61002);
     fn_800E8FA0(0x280, 0x1E0);
     fn_801CB834(0x0CE61000, 0, 0, 0);
 
@@ -498,12 +498,12 @@ void fn_8008FE94(u32 ctx) {
 
     fn_801CB7C4(0x0CE61000);
 
-    material = (GSmaterialEntry *)fn_800F9318(ctx, 0x0CE61000);
+    material = (GSmaterialEntry *)GSresGetResource(ctx, 0x0CE61000);
     fn_80118874(material->texture, 1);
     material->texture = NULL;
 
     frame = lbl_8047C1D4;
-    handle2 = fn_800F9318(ctx, 0x0CE61004);
+    handle2 = GSresGetResource(ctx, 0x0CE61004);
     fn_800ECCA8(handle2, 0);
     GSmodelGetFrameCount(handle2, &frame, 0);
     frame = frame - lbl_8047C1D8;
@@ -513,7 +513,7 @@ void fn_8008FE94(u32 ctx) {
     fn_800EC990(handle2);
 
     iconHandle = fn_801CBA0C(0x06BD0400);
-    iconResult = fn_800F9318(ctx, iconHandle);
+    iconResult = GSresGetResource(ctx, iconHandle);
     fn_800E9108(iconResult, 2);
     fn_800E8FE8(iconResult, lbl_8047A690);
     fn_800E900C(iconResult, 1, &lbl_8047A694);
@@ -543,7 +543,7 @@ void fn_8008FE94(u32 ctx) {
 /* 0x8008CDD8 | size: 0x2C8 */
 void fn_8008CDD8(u32 ctx) {
     #pragma peephole off
-    extern u32 fn_800F9318(u32 ctx, u32 id);
+    extern u32 GSresGetResource(u32 ctx, u32 id);
     extern void fn_800E8FA0(u32 w, u32 h);
     extern void fn_801CB7C4(u32 id);
     extern void fn_800E3C08(u32 handle, u32 val);
@@ -578,8 +578,8 @@ void fn_8008CDD8(u32 ctx) {
     u32 iconResult;
     u32 finalResult;
 
-    lbl_8047A690 = fn_800F9318(ctx, 0x0CE61602);
-    lbl_8047A694 = fn_800F9318(ctx, 0x0CE61002);
+    lbl_8047A690 = GSresGetResource(ctx, 0x0CE61602);
+    lbl_8047A694 = GSresGetResource(ctx, 0x0CE61002);
     fn_800E8FA0(0x280, 0x1E0);
     fn_801CB834(0x0CE61000, 0, 0, 0);
 
@@ -597,12 +597,12 @@ void fn_8008CDD8(u32 ctx) {
 
     fn_801CB7C4(0x0CE61000);
 
-    material = (GSmaterialEntry *)fn_800F9318(ctx, 0x0CE61000);
+    material = (GSmaterialEntry *)GSresGetResource(ctx, 0x0CE61000);
     fn_80118874(material->texture, 1);
     material->texture = NULL;
 
     frame = lbl_8047C1D4;
-    handle2 = fn_800F9318(ctx, 0x0CE61004);
+    handle2 = GSresGetResource(ctx, 0x0CE61004);
     fn_800ECCA8(handle2, 0);
     GSmodelGetFrameCount(handle2, &frame, 0);
     frame = frame - lbl_8047C1D8;
@@ -612,13 +612,13 @@ void fn_8008CDD8(u32 ctx) {
     fn_800EC990(handle2);
 
     iconHandle = fn_801CBA0C(0x06AF0400);
-    iconResult = fn_800F9318(ctx, iconHandle);
+    iconResult = GSresGetResource(ctx, iconHandle);
     fn_800E9108(iconResult, 2);
     fn_800E8FE8(iconResult, lbl_8047A690);
     fn_800E900C(iconResult, 1, &lbl_8047A694);
 
-    fn_800E3C08(fn_800F9318(ctx, iconHandle), fn_800F9318(ctx, 0x11511400));
-    fn_800E3C00(fn_800F9318(ctx, iconHandle), 4);
+    fn_800E3C08(GSresGetResource(ctx, iconHandle), GSresGetResource(ctx, 0x11511400));
+    fn_800E3C00(GSresGetResource(ctx, iconHandle), 4);
 
     fn_80176E0C(ctx, 0x0D011800, 0, 0);
     waitFrames = 1;
@@ -647,7 +647,7 @@ void fn_8008CDD8(u32 ctx) {
 /* 0x8008D0A0 | size: 0x2A8 */
 void fn_8008D0A0(u32 ctx) {
     #pragma peephole off
-    extern u32 fn_800F9318(u32 ctx, u32 id);
+    extern u32 GSresGetResource(u32 ctx, u32 id);
     extern void fn_800E8FA0(u32 w, u32 h);
     extern void fn_801CB7C4(u32 id);
     extern void fn_800E3C08(u32 handle, u32 val);
@@ -681,8 +681,8 @@ void fn_8008D0A0(u32 ctx) {
     u32 iconResult;
     u32 finalResult;
 
-    lbl_8047A690 = fn_800F9318(ctx, 0x0CE61602);
-    lbl_8047A694 = fn_800F9318(ctx, 0x0CE61002);
+    lbl_8047A690 = GSresGetResource(ctx, 0x0CE61602);
+    lbl_8047A694 = GSresGetResource(ctx, 0x0CE61002);
     fn_800E8FA0(0x280, 0x1E0);
     fn_801CB834(0x0CE61000, 0, 0, 0);
 
@@ -700,12 +700,12 @@ void fn_8008D0A0(u32 ctx) {
 
     fn_801CB7C4(0x0CE61000);
 
-    material = (GSmaterialEntry *)fn_800F9318(ctx, 0x0CE61000);
+    material = (GSmaterialEntry *)GSresGetResource(ctx, 0x0CE61000);
     fn_80118874(material->texture, 1);
     material->texture = NULL;
 
     frame = lbl_8047C1D4;
-    handle2 = fn_800F9318(ctx, 0x0CE61004);
+    handle2 = GSresGetResource(ctx, 0x0CE61004);
     fn_800ECCA8(handle2, 0);
     GSmodelGetFrameCount(handle2, &frame, 0);
     frame = frame - lbl_8047C1D8;
@@ -715,13 +715,13 @@ void fn_8008D0A0(u32 ctx) {
     fn_800EC990(handle2);
 
     iconHandle = fn_801CBA0C(0x06AF0400);
-    iconResult = fn_800F9318(ctx, iconHandle);
+    iconResult = GSresGetResource(ctx, iconHandle);
     fn_800E9108(iconResult, 2);
     fn_800E8FE8(iconResult, lbl_8047A690);
     fn_800E900C(iconResult, 1, &lbl_8047A694);
 
-    fn_800E3C08(fn_800F9318(ctx, iconHandle), fn_800F9318(ctx, 0x11511400));
-    fn_800E3C00(fn_800F9318(ctx, iconHandle), 4);
+    fn_800E3C08(GSresGetResource(ctx, iconHandle), GSresGetResource(ctx, 0x11511400));
+    fn_800E3C00(GSresGetResource(ctx, iconHandle), 4);
 
     fn_80176E0C(ctx, 0x0D001800, 0, 0);
     waitFrames = 1;
@@ -748,7 +748,7 @@ void fn_8008D0A0(u32 ctx) {
 /* 0x8008EC28 | size: 0x2A8 */
 void fn_8008EC28(u32 ctx) {
     #pragma peephole off
-    extern u32 fn_800F9318(u32 ctx, u32 id);
+    extern u32 GSresGetResource(u32 ctx, u32 id);
     extern void fn_800E8FA0(u32 w, u32 h);
     extern void fn_801CB7C4(u32 id);
     extern void fn_800E3C08(u32 handle, u32 val);
@@ -782,8 +782,8 @@ void fn_8008EC28(u32 ctx) {
     u32 iconResult;
     u32 finalResult;
 
-    lbl_8047A690 = fn_800F9318(ctx, 0x0CE61602);
-    lbl_8047A694 = fn_800F9318(ctx, 0x0CE61002);
+    lbl_8047A690 = GSresGetResource(ctx, 0x0CE61602);
+    lbl_8047A694 = GSresGetResource(ctx, 0x0CE61002);
     fn_800E8FA0(0x280, 0x1E0);
     fn_801CB834(0x0CE61000, 0, 0, 0);
 
@@ -801,12 +801,12 @@ void fn_8008EC28(u32 ctx) {
 
     fn_801CB7C4(0x0CE61000);
 
-    material = (GSmaterialEntry *)fn_800F9318(ctx, 0x0CE61000);
+    material = (GSmaterialEntry *)GSresGetResource(ctx, 0x0CE61000);
     fn_80118874(material->texture, 1);
     material->texture = NULL;
 
     frame = lbl_8047C1D4;
-    handle2 = fn_800F9318(ctx, 0x0CE61004);
+    handle2 = GSresGetResource(ctx, 0x0CE61004);
     fn_800ECCA8(handle2, 0);
     GSmodelGetFrameCount(handle2, &frame, 0);
     frame = frame - lbl_8047C1D8;
@@ -816,13 +816,13 @@ void fn_8008EC28(u32 ctx) {
     fn_800EC990(handle2);
 
     iconHandle = fn_801CBA0C(0x06AF0400);
-    iconResult = fn_800F9318(ctx, iconHandle);
+    iconResult = GSresGetResource(ctx, iconHandle);
     fn_800E9108(iconResult, 2);
     fn_800E8FE8(iconResult, lbl_8047A690);
     fn_800E900C(iconResult, 1, &lbl_8047A694);
 
-    fn_800E3C08(fn_800F9318(ctx, iconHandle), fn_800F9318(ctx, 0x11511400));
-    fn_800E3C00(fn_800F9318(ctx, iconHandle), 4);
+    fn_800E3C08(GSresGetResource(ctx, iconHandle), GSresGetResource(ctx, 0x11511400));
+    fn_800E3C00(GSresGetResource(ctx, iconHandle), 4);
 
     fn_80176E0C(ctx, 0x0CFB1800, 0, 0);
     waitFrames = 1;
@@ -849,7 +849,7 @@ void fn_8008EC28(u32 ctx) {
 /* 0x8008EED0 | size: 0x2C0 */
 void fn_8008EED0(u32 ctx) {
     #pragma peephole off
-    extern u32 fn_800F9318(u32 ctx, u32 id);
+    extern u32 GSresGetResource(u32 ctx, u32 id);
     extern void fn_800E8FA0(u32 w, u32 h);
     extern void fn_801CB7C4(u32 id);
     extern void fn_800E3C08(u32 handle, u32 val);
@@ -884,8 +884,8 @@ void fn_8008EED0(u32 ctx) {
     u32 iconResult;
     u32 finalResult;
 
-    lbl_8047A690 = fn_800F9318(ctx, 0x0CE61602);
-    lbl_8047A694 = fn_800F9318(ctx, 0x0CE61002);
+    lbl_8047A690 = GSresGetResource(ctx, 0x0CE61602);
+    lbl_8047A694 = GSresGetResource(ctx, 0x0CE61002);
     fn_800E8FA0(0x280, 0x1E0);
     fn_801CB834(0x0CE61000, 0, 0, 0);
 
@@ -903,12 +903,12 @@ void fn_8008EED0(u32 ctx) {
 
     fn_801CB7C4(0x0CE61000);
 
-    material = (GSmaterialEntry *)fn_800F9318(ctx, 0x0CE61000);
+    material = (GSmaterialEntry *)GSresGetResource(ctx, 0x0CE61000);
     fn_80118874(material->texture, 1);
     material->texture = NULL;
 
     frame = lbl_8047C1D4;
-    handle2 = fn_800F9318(ctx, 0x0CE61004);
+    handle2 = GSresGetResource(ctx, 0x0CE61004);
     fn_800ECCA8(handle2, 0);
     GSmodelGetFrameCount(handle2, &frame, 0);
     frame = frame - lbl_8047C1D8;
@@ -919,13 +919,13 @@ void fn_8008EED0(u32 ctx) {
 
     iconHandle = fn_801CBA0C(0x06AF0400);
     fn_801CB834(iconHandle, 4, 0, 0);
-    iconResult = fn_800F9318(ctx, iconHandle);
+    iconResult = GSresGetResource(ctx, iconHandle);
     fn_800E9108(iconResult, 2);
     fn_800E8FE8(iconResult, lbl_8047A690);
     fn_800E900C(iconResult, 1, &lbl_8047A694);
 
-    fn_800E3C08(fn_800F9318(ctx, iconHandle), fn_800F9318(ctx, 0x11511400));
-    fn_800E3C00(fn_800F9318(ctx, iconHandle), 4);
+    fn_800E3C08(GSresGetResource(ctx, iconHandle), GSresGetResource(ctx, 0x11511400));
+    fn_800E3C00(GSresGetResource(ctx, iconHandle), 4);
 
     fn_80176E0C(ctx, 0x0CFA1800, 0, 0);
     waitFrames = 1;
@@ -953,7 +953,7 @@ void fn_8008EED0(u32 ctx) {
 /* 0x8008F190 | size: 0x394 */
 void fn_8008F190(u32 ctx) {
     #pragma peephole off
-    extern u32 fn_800F9318(u32 ctx, u32 id);
+    extern u32 GSresGetResource(u32 ctx, u32 id);
     extern void fn_800E8FA0(u32 w, u32 h);
     extern void fn_801CB7C4(u32 id);
     extern void fn_800E3C08(u32 handle, u32 val);
@@ -988,8 +988,8 @@ void fn_8008F190(u32 ctx) {
     u32 iconResult;
     u32 finalResult;
 
-    lbl_8047A690 = fn_800F9318(ctx, 0x0CE61602);
-    lbl_8047A694 = fn_800F9318(ctx, 0x0CE61002);
+    lbl_8047A690 = GSresGetResource(ctx, 0x0CE61602);
+    lbl_8047A694 = GSresGetResource(ctx, 0x0CE61002);
     fn_800E8FA0(0x280, 0x1E0);
     fn_801CB834(0x0CE61000, 0, 0, 0);
 
@@ -1007,12 +1007,12 @@ void fn_8008F190(u32 ctx) {
 
     fn_801CB7C4(0x0CE61000);
 
-    material = (GSmaterialEntry *)fn_800F9318(ctx, 0x0CE61000);
+    material = (GSmaterialEntry *)GSresGetResource(ctx, 0x0CE61000);
     fn_80118874(material->texture, 1);
     material->texture = NULL;
 
     frame = lbl_8047C1D4;
-    handle2 = fn_800F9318(ctx, 0x0CE61004);
+    handle2 = GSresGetResource(ctx, 0x0CE61004);
     fn_800ECCA8(handle2, 0);
     GSmodelGetFrameCount(handle2, &frame, 0);
     frame = frame - lbl_8047C1D8;
@@ -1021,8 +1021,8 @@ void fn_8008F190(u32 ctx) {
     fn_800ECB74(handle2, 0);
     fn_800EC990(handle2);
 
-    fn_800E3C08(fn_800F9318(ctx, 0x0CE61000), fn_800F9318(ctx, 0x111B1400));
-    fn_800E3C00(fn_800F9318(ctx, 0x0CE61000), 4);
+    fn_800E3C08(GSresGetResource(ctx, 0x0CE61000), GSresGetResource(ctx, 0x111B1400));
+    fn_800E3C00(GSresGetResource(ctx, 0x0CE61000), 4);
 
     fn_801CB834(0x0CE61000, 3, 0, 0);
     waitFrames = 0x32;
@@ -1039,13 +1039,13 @@ void fn_8008F190(u32 ctx) {
 
     iconHandle = fn_801CBA0C(0x06AF0400);
     fn_801CB834(iconHandle, 0, 0, 0);
-    iconResult = fn_800F9318(ctx, iconHandle);
+    iconResult = GSresGetResource(ctx, iconHandle);
     fn_800E9108(iconResult, 2);
     fn_800E8FE8(iconResult, lbl_8047A690);
     fn_800E900C(iconResult, 1, &lbl_8047A694);
 
-    fn_800E3C08(fn_800F9318(ctx, iconHandle), fn_800F9318(ctx, 0x11511400));
-    fn_800E3C00(fn_800F9318(ctx, iconHandle), 4);
+    fn_800E3C08(GSresGetResource(ctx, iconHandle), GSresGetResource(ctx, 0x11511400));
+    fn_800E3C00(GSresGetResource(ctx, iconHandle), 4);
 
     fn_80176E0C(ctx, 0x0CF91800, 0, 0);
     waitFrames = 1;
@@ -1076,7 +1076,7 @@ void fn_8008F190(u32 ctx) {
 /* 0x8008FBF4 | size: 0x2A0 */
 void fn_8008FBF4(u32 ctx) {
     #pragma peephole off
-    extern u32 fn_800F9318(u32 ctx, u32 id);
+    extern u32 GSresGetResource(u32 ctx, u32 id);
     extern void fn_800E8FA0(u32 w, u32 h);
     extern void fn_801CB7C4(u32 id);
     extern void fn_800E3C08(u32 handle, u32 val);
@@ -1110,8 +1110,8 @@ void fn_8008FBF4(u32 ctx) {
     u32 iconResult;
     u32 finalResult;
 
-    lbl_8047A690 = fn_800F9318(ctx, 0x0CE61602);
-    lbl_8047A694 = fn_800F9318(ctx, 0x0CE61002);
+    lbl_8047A690 = GSresGetResource(ctx, 0x0CE61602);
+    lbl_8047A694 = GSresGetResource(ctx, 0x0CE61002);
     fn_800E8FA0(0x280, 0x1E0);
     fn_801CB834(0x0CE61000, 0, 0, 0);
 
@@ -1129,12 +1129,12 @@ void fn_8008FBF4(u32 ctx) {
 
     fn_801CB7C4(0x0CE61000);
 
-    material = (GSmaterialEntry *)fn_800F9318(ctx, 0x0CE61000);
+    material = (GSmaterialEntry *)GSresGetResource(ctx, 0x0CE61000);
     fn_80118874(material->texture, 1);
     material->texture = NULL;
 
     frame = lbl_8047C1D4;
-    handle2 = fn_800F9318(ctx, 0x0CE61004);
+    handle2 = GSresGetResource(ctx, 0x0CE61004);
     fn_800ECCA8(handle2, 0);
     GSmodelGetFrameCount(handle2, &frame, 0);
     frame = frame - lbl_8047C1D8;
@@ -1145,13 +1145,13 @@ void fn_8008FBF4(u32 ctx) {
 
     iconHandle = fn_801CBA0C(0x06AF0400);
     fn_801CB834(iconHandle, 0, 0, 1);
-    iconResult = fn_800F9318(ctx, iconHandle);
+    iconResult = GSresGetResource(ctx, iconHandle);
     fn_800E9108(iconResult, 2);
     fn_800E8FE8(iconResult, lbl_8047A690);
     fn_800E900C(iconResult, 1, &lbl_8047A694);
 
-    fn_800E3C08(fn_800F9318(ctx, iconHandle), fn_800F9318(ctx, 0x11511400));
-    fn_800E3C00(fn_800F9318(ctx, iconHandle), 4);
+    fn_800E3C08(GSresGetResource(ctx, iconHandle), GSresGetResource(ctx, 0x11511400));
+    fn_800E3C00(GSresGetResource(ctx, iconHandle), 4);
 
     fn_80176E0C(ctx, 0x0CF51800, 0, 0);
     waitFrames = 1;
@@ -1175,14 +1175,14 @@ void fn_8008FBF4(u32 ctx) {
 }
 
 static inline u32 fn_80090720_getHandle2(u32 ctx) {
-    extern u32 fn_800F9318(u32 ctx, u32 id);
-    return fn_800F9318(ctx, 0x0CE61004);
+    extern u32 GSresGetResource(u32 ctx, u32 id);
+    return GSresGetResource(ctx, 0x0CE61004);
 }
 
 /* 0x80090720 | size: 0x2C4 */
 void fn_80090720(u32 ctx) {
     #pragma peephole off
-    extern u32 fn_800F9318(u32 ctx, u32 id);
+    extern u32 GSresGetResource(u32 ctx, u32 id);
     extern void fn_800E8FA0(u32 w, u32 h);
     extern void fn_801CB7C4(u32 id);
     extern void fn_801CB834(u32 id, u32 slot, u32 x, u32 y);
@@ -1216,8 +1216,8 @@ void fn_80090720(u32 ctx) {
     u32 iconResult;
     u32 finalResult;
 
-    lbl_8047A690 = fn_800F9318(ctx, 0x0CE61602);
-    lbl_8047A694 = fn_800F9318(ctx, 0x0CE61002);
+    lbl_8047A690 = GSresGetResource(ctx, 0x0CE61602);
+    lbl_8047A694 = GSresGetResource(ctx, 0x0CE61002);
     fn_800E8FA0(0x280, 0x1E0);
 
     frame = lbl_8047C1D4;
@@ -1245,12 +1245,12 @@ void fn_80090720(u32 ctx) {
 
     fn_801CB7C4(0x0CE61000);
 
-    material = (GSmaterialEntry *)fn_800F9318(ctx, 0x0CE61000);
+    material = (GSmaterialEntry *)GSresGetResource(ctx, 0x0CE61000);
     fn_80118874(material->texture, 1);
     material->texture = NULL;
 
     iconHandle = fn_801CBA0C(0x06BC0400);
-    iconResult = fn_800F9318(ctx, iconHandle);
+    iconResult = GSresGetResource(ctx, iconHandle);
     fn_800E9108(iconResult, 2);
     fn_800E8FE8(iconResult, lbl_8047A690);
     fn_800E900C(iconResult, 1, &lbl_8047A694);
@@ -1286,7 +1286,7 @@ void fn_80090720(u32 ctx) {
 /* 0x8008C7B0 | size: 0x31C */
 void fn_8008C7B0(u32 ctx) {
     #pragma peephole off
-    extern u32 fn_800F9318(u32 ctx, u32 id);
+    extern u32 GSresGetResource(u32 ctx, u32 id);
     extern void fn_800E8FA0(u32 w, u32 h);
     extern void fn_801CB7C4(u32 id);
     extern void fn_800E3C08(u32 handle, u32 val);
@@ -1323,8 +1323,8 @@ void fn_8008C7B0(u32 ctx) {
     u32 tmpA;
     u32 tmpB;
 
-    lbl_8047A690 = fn_800F9318(ctx, 0x0CE61602);
-    lbl_8047A694 = fn_800F9318(ctx, 0x0CE61002);
+    lbl_8047A690 = GSresGetResource(ctx, 0x0CE61602);
+    lbl_8047A694 = GSresGetResource(ctx, 0x0CE61002);
     fn_800E8FA0(0x280, 0x1E0);
     fn_801CB834(0x0CE61000, 0, 0, 0);
 
@@ -1342,12 +1342,12 @@ void fn_8008C7B0(u32 ctx) {
 
     fn_801CB7C4(0x0CE61000);
 
-    material = (GSmaterialEntry *)fn_800F9318(ctx, 0x0CE61000);
+    material = (GSmaterialEntry *)GSresGetResource(ctx, 0x0CE61000);
     fn_80118874(material->texture, 1);
     material->texture = NULL;
 
     frame = lbl_8047C1D4;
-    handle2 = fn_800F9318(ctx, 0x0CE61004);
+    handle2 = GSresGetResource(ctx, 0x0CE61004);
     fn_800ECCA8(handle2, 0);
     GSmodelGetFrameCount(handle2, &frame, 0);
     frame = frame - lbl_8047C1D8;
@@ -1359,18 +1359,18 @@ void fn_8008C7B0(u32 ctx) {
     iconHandle = fn_801CBA0C(0x06AF0400);
     iconHandle2 = fn_801CBA0C(0x0B720400);
 
-    b2 = fn_800F9318(ctx, iconHandle);
+    b2 = GSresGetResource(ctx, iconHandle);
     fn_800E9108(b2, 2);
     fn_800E8FE8(b2, lbl_8047A690);
     fn_800E900C(b2, 1, &lbl_8047A694);
 
-    b2 = fn_800F9318(ctx, iconHandle2);
+    b2 = GSresGetResource(ctx, iconHandle2);
     fn_800E9108(b2, 2);
     fn_800E8FE8(b2, lbl_8047A690);
     fn_800E900C(b2, 1, &lbl_8047A694);
 
-    fn_800E3C08(fn_800F9318(ctx, iconHandle), fn_800F9318(ctx, 0x11511400));
-    fn_800E3C00(fn_800F9318(ctx, iconHandle), 4);
+    fn_800E3C08(GSresGetResource(ctx, iconHandle), GSresGetResource(ctx, 0x11511400));
+    fn_800E3C00(GSresGetResource(ctx, iconHandle), 4);
 
     fn_80176E0C(ctx, 0x0D041800, 0, 0);
     waitFrames = 1;

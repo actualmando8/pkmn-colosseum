@@ -96,7 +96,7 @@
 #include "dolphin/types.h"
 
 /* ===== External SDK / engine functions ===== */
-extern void  fn_800DD970(const char* fmt, ...);         /* OSReport / GSlog */
+extern void  GSlogWrite(const char* fmt, ...);         /* OSReport / GSlog */
 extern void* memcpy(void* dst, const void* src, u32 n);
 extern void* memset(void* dst, int val, u32 size);
 
@@ -128,7 +128,7 @@ extern void fn_800D258C(void* a);
 extern void fn_800D1674(void* a, void* b);
 extern void GScameraSetRotation(void* a, void* b);
 extern void _threadSwitch(void);
-extern void* fn_800F9318(u32 a, u32 b);
+extern void* GSresGetResource(u32 a, u32 b);
 extern void* fn_800F92D4(u32 a);
 extern void GScameraStopAnimation(void* a);
 extern void fn_800E3D98(void* a, void* b);
@@ -486,7 +486,7 @@ void cameraStopAnimation(void) {
     void* p;
     void* r;
     p = lbl_80478C40;
-    r = fn_800F9318(*(u32*)((u8*)p + 0xD0), *(u32*)((u8*)p + 0xD4));
+    r = GSresGetResource(*(u32*)((u8*)p + 0xD0), *(u32*)((u8*)p + 0xD4));
     if (r == 0)
         r = fn_800F92D4(*(u32*)((u8*)p + 0xD4));
     if (r != 0)
@@ -772,7 +772,7 @@ void fn_80177760(void* unused, u32 a, u32 b, f32 param) {
         p = lbl_80478C40;
         *(u32*)((u8*)p + 0x3C) = (u32)-1;
     }
-    handle = fn_800F9318(a, b);
+    handle = GSresGetResource(a, b);
     if (handle != 0) {
         fn_800E3D98(handle, local);
     }
@@ -824,7 +824,7 @@ asm void GSscene_SetCameraRotationVector(void) {
 #else
 void GSscene_SetCameraRotationVector(void* src) {
     void* handle;
-    handle = fn_800F9318(0, 0);
+    handle = GSresGetResource(0, 0);
     fn_800E01D0((u8*)lbl_80478C40 + 0x10, src);
     GScameraSetRotation(handle, src);
 }
@@ -1019,12 +1019,12 @@ void fn_80179E04(void* dst) {
     void* handle;
     u32 mode;
     out = dst;
-    handle = fn_800F9318(0, 0);
+    handle = GSresGetResource(0, 0);
     ptr = lbl_80478C40;
     mode = *(u8*)ptr;
     if (mode == 4 || mode == 8) {
         void* next;
-        next = fn_800F9318(*(u32*)((u8*)ptr + 0xD0), *(u32*)((u8*)ptr + 0xD4));
+        next = GSresGetResource(*(u32*)((u8*)ptr + 0xD0), *(u32*)((u8*)ptr + 0xD4));
         if (next == 0)
             next = fn_800F92D4(*(u32*)((u8*)ptr + 0xD4));
         handle = next;
@@ -1057,11 +1057,11 @@ void fn_80179EA4(void* src) {
     src_val = (u32)src;
     saved_src = (void*)src_val;
     memcpy(lbl_80478C40, saved_src, 0xFC);
-    handle = fn_800F9318(0, 0);
+    handle = GSresGetResource(0, 0);
     ptr = lbl_80478C40;
     r0 = *(u8*)ptr;
     if (r0 == 4 || r0 == 8) {
-        next = fn_800F9318(*(u32*)((u8*)ptr + 0xD0), *(u32*)((u8*)ptr + 0xD4));
+        next = GSresGetResource(*(u32*)((u8*)ptr + 0xD0), *(u32*)((u8*)ptr + 0xD4));
         if (next == 0) {
             next = fn_800F92D4(*(u32*)((u8*)ptr + 0xD4));
         }

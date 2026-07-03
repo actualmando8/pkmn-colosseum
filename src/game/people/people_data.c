@@ -130,7 +130,7 @@
 #include "game/people/people.h"
 
 /* ===== External SDK / engine functions ===== */
-extern void  fn_800DD970(const char* fmt, ...);     /* OSReport */
+extern void  GSlogWrite(const char* fmt, ...);     /* OSReport */
 extern void* memset(void* dst, int val, u32 size);
 extern void* memcpy(void* dst, const void* src, u32 size);
 
@@ -149,7 +149,7 @@ extern void  fn_800E019C(void* model, void* param);
 extern void  __cvt_fp2unsigned(void* param1, void* param2);
 
 /* Floor resource system */
-extern void* fn_800F9318(u16 group, u16 model, u16 param);
+extern void* GSresGetResource(u16 group, u16 model, u16 param);
 
 /* Thread/task system */
 extern void* fn_800FE834(u32 pri, u32 type, void* buf, void* callback);

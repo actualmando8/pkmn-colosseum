@@ -135,7 +135,7 @@ extern void fadeInit(void);                           /* Script engine init */
 extern void fn_80168638(u32 numSlots);                   /* Floor/scene loader init */
 extern void fn_80130CE0(u32 maxEffects);                 /* 3D model/effect loader */
 extern u32  fn_800E0DDC(void);                           /* OSGetFreeMemSize-like */
-extern void fn_800DD970(const char* fmt, ...);           /* OSReport / debug printf */
+extern void GSlogWrite(const char* fmt, ...);           /* OSReport / debug printf */
 extern f32 __cvt_fp2unsigned(f32 volume);                     /* volume clamp/process */
 
 /* --- Game main loop (fn_80005AAC) and its helpers --- */
@@ -202,7 +202,7 @@ extern void fn_801128A0(void);    /* Colosseum mode init */
 extern void* tableResBiosGetResPtr(u32 id);  /* Load relocatable module (REL) by ID */
 
 extern void* fn_801664F0(void* color); /* Set clear/background color */
-extern void fn_800F9378(void* work, u32 time, u32 numFrames, u32 arg); /* Thread wait/schedule */
+extern void GSresRegisterResource(void* work, u32 time, u32 numFrames, u32 arg); /* Thread wait/schedule */
 
 extern u32  fn_800A03B4(void);    /* OSGetResetButtonState */
 extern int  OSGetResetButtonState(void); /* real symtab name (signed return -> cmpwi) */
@@ -713,7 +713,7 @@ void fn_800057B0(void) {
     /* Print available memory to debug console */
     {
         u32 freeMem = (u32)fn_800E0DDC();
-        fn_800DD970(lbl_80266420, freeMem); /* "OS avail memory: %d\n" */
+        GSlogWrite(lbl_80266420, freeMem); /* "OS avail memory: %d\n" */
     }
 
     /* Create and start the main game loop thread:
@@ -1087,7 +1087,7 @@ void fn_8000604C(void) {
 void fn_8000609C(void) {
     struct BgColor12 { u32 c[3]; } buf;
     buf = *(struct BgColor12*)lbl_80266438;
-    fn_800F9378(fn_801664F0(&buf), 0, 0x7D0, 0);
+    GSresRegisterResource(fn_801664F0(&buf), 0, 0x7D0, 0);
 }
 #pragma pop
 

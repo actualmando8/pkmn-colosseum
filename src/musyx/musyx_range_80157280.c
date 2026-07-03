@@ -16,7 +16,7 @@
 #include "game/people/people.h"
 
 /* ===== External SDK / engine functions ===== */
-extern void  fn_800DD970(const char* fmt, ...);
+extern void  GSlogWrite(const char* fmt, ...);
 extern void* memset(void* dst, int val, u32 size);
 extern void* memcpy(void* dst, const void* src, u32 size);
 extern void  DCFlushRange(void* ptr, u32 size);
@@ -81,7 +81,7 @@ extern void  fn_800E013C(void* param);
 extern u32   __cvt_fp2unsigned(f64 val);
 
 /* Floor/field system */
-extern void* fn_800F9318(u16 group, u16 model, u16 param);
+extern void* GSresGetResource(u16 group, u16 model, u16 param);
 
 /* GX rendering */
 extern void  GSmodelSetVisibility(void* param);
@@ -505,7 +505,12 @@ extern void fn_800AE8A4(void);
 extern void fn_800AE8EC(void);
 extern u32  fn_800AE92C(void);
 extern void DSPAddTask(u8* ptr);
-extern void fn_800CE358(void);
+extern f64 fn_800CE358(f64 base, f64 exp); /* MSL pow(double,double); Colosseum's
+                                             * pre-2.0.1 adsrConvertTimeCents calls
+                                             * this (not powf) -- confirmed by
+                                             * disassembly: args loaded via lfd
+                                             * (double) not lfs, and result is
+                                             * frsp'd down to single afterward. */
 extern void fn_8015B250(u32, u32);
 extern u32 ReverbHICreate(u8* obj, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6);
 extern u32 ReverbHIModify(u8* obj, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6);
@@ -517,7 +522,7 @@ extern u32  fn_800ACB44(void);
 extern u32  fn_800ACB4C(void);
 extern void fn_800AE630(void);
 extern u32  fn_800AE78C(void);
-extern void adsrConvertTimeCents(void);
+extern u32  adsrConvertTimeCents(s32 tc); /* verified true signature via synth_adsr.c reference + callsite (see below) */
 extern void salActivateStudio(void);
 extern void fn_8015AAA0(void);
 extern void salActivateVoice(u8* ptr, u8 unused2);
@@ -904,7 +909,6 @@ void fn_801626AC(u32 index, void* ptr, u32 mode) {
     } PeopleFieldMode12Args;
     extern u32 lbl_8047B024;
     extern u8 lbl_8036944C[];
-    extern u32 adsrConvertTimeCents(u32);
     PeopleFieldState* entries = (*(PeopleFieldState* volatile*)&lbl_8047B024);
     PeopleFieldState* entry = &entries[index];
     u8 m = (u8)mode;
@@ -2689,7 +2693,10 @@ typedef struct {
     u64 cFlags;                 /* 0x114 */
     u8 block;                  /* 0x11C */
     u8 fxFlag;                 /* 0x11D */
-    u8 pad_11E[0x404 - 0x11E];
+    u8 pad_11E[0x121 - 0x11E]; /* vGroup, studio, track */
+    u8 midi;                   /* 0x121 */
+    u8 midiSet;                /* 0x122 */
+    u8 pad_123[0x404 - 0x123];
 } SynthVoiceMini; /* offset-mirror of SYNTH_VOICE, stride 0x404 */
 #pragma pack()
 
@@ -3424,4 +3431,151 @@ void fn_80157360(SynthVoiceMini* svoice) {
     }
 }
 #endif
+#pragma pop
+
+/* ===== synthvoice.c: voiceKillSound, 0x80158870 =====
+ * identity: reference synthvoice.c voiceKillSound(u32 voiceid). sndActive =
+ * lbl_8047AF18 (u8, confirmed by disassembly @0x80158884). The reference's
+ * vidGetInternalId(voiceid) call is fully auto-inlined here (no `bl` to
+ * vidGetInternalId in the disassembly, even though vidGetInternalId itself
+ * remains a real standalone symbol elsewhere) -- residual-split-map note:
+ * this is a case where the SAME callee is inlined at one call site and not
+ * at another within retail. */
+extern u8 lbl_8047AF18; /* sndActive */
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+s32 voiceKillSound(u32 voiceid) {
+    s32 ret = -1;
+    u32 next_voiceid;
+    u32 i;
+
+    if (lbl_8047AF18 != FALSE) {
+        for (voiceid = vidGetInternalId(voiceid); voiceid != 0xFFFFFFFF; voiceid = next_voiceid) {
+            i = voiceid & 0xFF;
+            next_voiceid = lbl_8047AF48[i].child;
+            if (voiceid == lbl_8047AF48[i].id) {
+                voiceKill(i);
+                ret = 0;
+            }
+        }
+    }
+
+    return ret;
+}
+#pragma pop
+
+/* ===== synthvoice.c: voice*LastStarted cluster, 0x80158934-0x80158BB0 =====
+ * identity: reference synthvoice.c voiceIsLastStarted/voiceSetLastStarted/
+ * voiceResetLastStarted/voiceInitLastStarted (identical across all three
+ * reference corpora -- marioparty4/smstrikers/prime). Backing statics
+ * synth_last_fxstarted[64] / synth_last_started[8][16] identified via
+ * symbol-map size-run correlation: XD's symbols.txt has
+ * synth_last_fxstarted @.bss size 0x40 immediately followed by
+ * synth_last_started @.bss size 0x80, both immediately after voiceList
+ * (size 0x100) -- same contiguous layout as Colosseum's
+ * lbl_80445F50 (size 0xF00, ends with voiceList) followed immediately by
+ * lbl_80446E50 (size 0x40) then lbl_80446E90 (size 0x80) in
+ * config/GC6E01/symbols.txt. Confirmed by disassembly
+ * (build/GC6E01/asm/musyx/musyx_range_80157280.s @0x80158934): both
+ * lbl_80446E50 and lbl_80446E90 are referenced exactly as
+ * synth_last_fxstarted/synth_last_started would be. */
+extern u8 lbl_80446E50[64];    /* synth_last_fxstarted */
+extern u8 lbl_80446E90[8][16]; /* synth_last_started */
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+u32 voiceIsLastStarted(SynthVoiceMini* svoice) {
+    u32 i;
+
+    if (svoice->id != 0xFFFFFFFF && svoice->midi != 0xFF) {
+        i = svoice->id & 0xFF;
+        if (svoice->midiSet == 0xFF) {
+            if (lbl_80446E50[i] == i) {
+                return TRUE;
+            }
+        } else if (lbl_80446E90[svoice->midiSet][svoice->midi] == i) {
+            return TRUE;
+        }
+    }
+
+    return FALSE;
+}
+#pragma pop
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+void voiceSetLastStarted(SynthVoiceMini* svoice) {
+    u32 i;
+
+    if (svoice->id != 0xFFFFFFFF && svoice->midi != 0xFF) {
+        i = svoice->id & 0xFF;
+        if (svoice->midiSet == 0xFF) {
+            lbl_80446E50[i] = i;
+        } else {
+            lbl_80446E90[svoice->midiSet][svoice->midi] = i;
+        }
+    }
+}
+#pragma pop
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+void voiceResetLastStarted(SynthVoiceMini* svoice) {
+    u32 i;
+
+    if (svoice->id != 0xFFFFFFFF && svoice->midi != 0xFF) {
+        i = svoice->id & 0xFF;
+        if (svoice->midiSet == 0xFF) {
+            if (lbl_80446E50[i] == i) {
+                lbl_80446E50[i] = 0xFF;
+            }
+        } else if (i == lbl_80446E90[svoice->midiSet][svoice->midi]) {
+            lbl_80446E90[svoice->midiSet][svoice->midi] = 0xFF;
+        }
+    }
+}
+#pragma pop
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+void voiceInitLastStarted(void) {
+    u32 i;
+    u32 j;
+
+    for (i = 0; i < 8; i++) {
+        for (j = 0; j < 16; j++) {
+            lbl_80446E90[i][j] = 0xFF;
+        }
+    }
+
+    for (j = 0; j < 64; j++) {
+        lbl_80446E50[j] = 0xFF;
+    }
+}
+#pragma pop
+
+/* ===== synth_adsr.c: adsrConvertTimeCents, 0x80158CD4 =====
+ * identity: reference synth_adsr.c `u32 adsrConvertTimeCents(s32 tc) {
+ * return 1000.f * powf(2.f, 1.2715658e-08f * tc); }`. Colosseum's build
+ * (pre-2.0.1 fork) calls the DOUBLE-precision `pow` (fn_800CE358), not
+ * `powf` -- confirmed by disassembly: the base constant 2.0 and the
+ * exponent are both loaded/passed as doubles (lfd, not lfs), and the
+ * result is explicitly `frsp`'d down to single precision before the
+ * final `* 1000.f` and the u32 truncation (__cvt_fp2unsigned). This
+ * FIXES the previously-stale `void adsrConvertTimeCents(void)` /
+ * `u32(u32)` declarations (see identity notes on the extern near line
+ * 520 / removed local redeclaration) -- true signature is
+ * `u32 adsrConvertTimeCents(s32 tc)`. */
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+u32 adsrConvertTimeCents(s32 tc) {
+    return (u32)(1000.f * (f32)fn_800CE358(2.0, 1.2715658e-08f * tc));
+}
 #pragma pop

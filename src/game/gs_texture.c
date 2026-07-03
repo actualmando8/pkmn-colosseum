@@ -63,7 +63,7 @@ extern void  GSmemFree(u16 handle);                    /* fn_800E209C */
 extern u16   GSmemAlloc(u32 alignment, u32 size);      /* fn_800E2C04 */
 extern void  DCFlushRange(void* addr, u32 len);
 extern void  GXInvalidateTexAll(void);                        /* GXInvalidateTexAll */
-extern void  fn_800DD970(const char* fmt, ...);        /* OSReport */
+extern void  GSlogWrite(const char* fmt, ...);        /* OSReport */
 extern void  fn_800BB050(void* gxTlutObj, void* data, u32 format); /* GXInitTlutObj */
 extern void  fn_800BA9E4(void* gxTexObj, void* data,
                           u16 width, u16 height, u32 gxFmt,
@@ -298,7 +298,7 @@ GStextureHandle* GStextureCreate(u16 width, u16 height, u32 format,
             break;
         default:
             /* Unknown format */
-            fn_800DD970(lbl_80270F98);
+            GSlogWrite(lbl_80270F98);
             return NULL;
     }
 
@@ -328,7 +328,7 @@ GStextureHandle* GStextureCreate(u16 width, u16 height, u32 format,
 
         /* Warn if dimensions were adjusted */
         if (adjWidth != origW || adjHeight != origH) {
-            fn_800DD970(lbl_80270FBC, origW, origH, adjWidth, adjHeight);
+            GSlogWrite(lbl_80270FBC, origW, origH, adjWidth, adjHeight);
         }
     }
 

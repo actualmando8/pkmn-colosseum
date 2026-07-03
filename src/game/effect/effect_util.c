@@ -918,10 +918,10 @@ void msgctrlTsuikaMons(void) {
     extern u32 fn_802037DC(u32);
     extern void fn_80132A38(u32, u32);
     extern void fn_800FA280(u32);
+    u32 result;
     u32 val = lbl_8047ADE0;
-    u32 result = fn_801F4354(0, val);
-    u32 flag = fn_801F18DC(0) & 0xFF;
-    if (flag == 1 && result != 0) {
+    result = fn_801F4354(0, val);
+    if (((u8)fn_801F18DC(0) == 1) && result != 0) {
         fn_80132A38(0x4D, fn_801F8100(result));
         fn_80132A38(0x57, fn_802037DC(val));
         fn_800FA280(0x7721);
@@ -952,10 +952,10 @@ void msgctrlClientMos(void) {
     extern u32 fn_802037DC(u32);
     extern void fn_80132A38(u32, u32);
     extern void fn_800FA280(u32);
+    u32 result;
     u32 val = lbl_8047ADDC;
-    u32 result = fn_801F4354(0, val);
-    u32 flag = fn_801F18DC(0) & 0xFF;
-    if (flag == 1 && result != 0) {
+    result = fn_801F4354(0, val);
+    if (((u8)fn_801F18DC(0) == 1) && result != 0) {
         fn_80132A38(0x4D, fn_801F8100(result));
         fn_80132A38(0x57, fn_802037DC(val));
         fn_800FA280(0x7721);
@@ -986,10 +986,10 @@ void msgctrlDeffenceMons(void) {
     extern u32 fn_802037DC(u32);
     extern void fn_80132A38(u32, u32);
     extern void fn_800FA280(u32);
+    u32 result;
     u32 val = lbl_8047ADD8;
-    u32 result = fn_801F4354(0, val);
-    u32 flag = fn_801F18DC(0) & 0xFF;
-    if (flag == 1 && result != 0) {
+    result = fn_801F4354(0, val);
+    if (((u8)fn_801F18DC(0) == 1) && result != 0) {
         fn_80132A38(0x4D, fn_801F8100(result));
         fn_80132A38(0x57, fn_802037DC(val));
         fn_800FA280(0x7721);
@@ -1020,10 +1020,10 @@ void msgctrlAttackMons(void) {
     extern u32 fn_802037DC(u32);
     extern void fn_80132A38(u32, u32);
     extern void fn_800FA280(u32);
+    u32 result;
     u32 val = lbl_8047ADD4;
-    u32 result = fn_801F4354(0, val);
-    u32 flag = fn_801F18DC(0) & 0xFF;
-    if (flag == 1 && result != 0) {
+    result = fn_801F4354(0, val);
+    if (((u8)fn_801F18DC(0) == 1) && result != 0) {
         fn_80132A38(0x4D, fn_801F8100(result));
         fn_80132A38(0x57, fn_802037DC(val));
         fn_800FA280(0x7721);
@@ -1742,11 +1742,11 @@ u32 fn_801330C8(void) {
 
 /* 0x80133218 | 0x38 -- fn_800E1544() then print result, return 0 */
 extern u32  fn_800E1544(void);
-extern void fn_800DD970(const char* fmt, ...);
+extern void GSlogWrite(const char* fmt, ...);
 extern const char lbl_80272AB8[];
 u32 fn_80133218(void) {
     u32 val = fn_800E1544();
-    fn_800DD970(lbl_80272AB8, val);
+    GSlogWrite(lbl_80272AB8, val);
     return 0;
 }
 
@@ -1780,7 +1780,7 @@ u32 fn_80133328(void) {
 }
 
 /* 0x801333AC | 0xA4 */
-extern void fn_800F9318(void);
+extern void GSresGetResource(void);
 #if 0
 asm void fn_801333AC(void) {
 #include "src/game/effect/effect_util_fn_801333AC.inc"
@@ -1788,9 +1788,9 @@ asm void fn_801333AC(void) {
 #else
 #pragma optimization_level 4
 u32 fn_801333AC(s32 arg) {
-    extern void* fn_800F9318(u32, u32);
+    extern void* GSresGetResource(u32, u32);
     u8* ptr;
-    ptr = (u8*)fn_800F9318(0, 2);
+    ptr = (u8*)GSresGetResource(0, 2);
     if (ptr == 0) return 0;
     switch (arg) {
     case 0xb8:
@@ -3879,7 +3879,7 @@ void fn_801364A8(void) {
     extern void fn_800EF590();
     extern void fn_800EFD14();
     extern void fn_800EFD3C();
-    extern void fn_800F9318();
+    extern void GSresGetResource();
     extern void fn_801013A0();
     extern void fn_8010147C();
     extern void fn_80137114();
@@ -4234,14 +4234,14 @@ void fn_801364A8(void) {
         fn_8010147C();
         r4 = *(u16*)((u8*)r28 + 0x4A);
         r3 = 0x4e20;
-        fn_800F9318();
+        GSresGetResource();
         r6 = *(u16*)((u8*)r28 + 0x4C);
         r4 = 0x4e20;
         r5 = 0x0;
         fn_801013A0();
         r4 = *(u16*)((u8*)r28 + 0x4C);
         r3 = 0x4e20;
-        fn_800F9318();
+        GSresGetResource();
         if (r3 != (u32)0x0) {
             r4 = 0x0;
             GSmodelSetVisibility();
@@ -4321,14 +4321,14 @@ void fn_801364A8(void) {
         fn_8010147C();
         r4 = *(u32*)((u8*)r28 + 0x60);
         r3 = 0x4e20;
-        fn_800F9318();
+        GSresGetResource();
         r6 = *(u32*)((u8*)r28 + 0x5C);
         r4 = 0x4e20;
         r5 = 0x0;
         fn_801013A0();
         r4 = *(u32*)((u8*)r28 + 0x5C);
         r3 = 0x4e20;
-        fn_800F9318();
+        GSresGetResource();
         if (r3 != (u32)0x0) {
             r4 = 0x0;
             GSmodelSetVisibility();
@@ -4533,14 +4533,14 @@ void fn_801364A8(void) {
             fn_8010147C();
             r4 = *(u32*)((u8*)r28 + 0xC);
             r3 = 0x4e20;
-            fn_800F9318();
+            GSresGetResource();
             r6 = *(u32*)((u8*)r28 + 0x10);
             r4 = 0x4e20;
             r5 = 0x0;
             fn_801013A0();
             r4 = *(u32*)((u8*)r28 + 0x10);
             r3 = 0x4e20;
-            fn_800F9318();
+            GSresGetResource();
             if (r3 != (u32)0x0) {
                 r4 = 0x0;
                 GSmodelSetVisibility();
@@ -4719,32 +4719,33 @@ asm void msgctrlWait(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma peephole off
 s32 msgctrlWait(EffectUtilCommandObj* obj) {
     u8* stream;
     s16 counter;
     if (obj->activeFlag != 0) {
+        goto doneIncrement;
+    }
+    if (obj->waitCounter == 0) {
         stream = obj->stream;
-        obj->stream = stream + 1;
-        return 0;
+        obj->waitCounter = (s16)((s16)stream[0] + 1);
     }
     counter = obj->waitCounter;
-    if (counter == 0) {
-        stream = obj->stream;
-        counter = (s16)((s16)stream[0] + 1);
-        obj->waitCounter = counter;
-    }
     counter = (s16)(counter - 1);
     obj->waitCounter = counter;
     if (counter <= 0) {
         obj->waitCounter = 0;
-        stream = obj->stream;
-        obj->stream = stream + 1;
-        return 0;
+        goto doneIncrement;
     }
     stream = obj->stream;
     obj->stream = stream - 3;
     return 1;
+doneIncrement:
+    stream = obj->stream;
+    obj->stream = stream + 1;
+    return 0;
 }
+#pragma peephole on
 #endif
 extern void fn_800FA160(void);
 #if 0
@@ -4798,12 +4799,14 @@ asm void msgctrlCR(void) {
 #include "src/game/effect/effect_util_fn_801327E0.inc"
 }
 #else
+#pragma scheduling on
 u32 msgctrlCR(void* obj) {
     u8* p = (u8*)obj;
     *(f32*)(p + 0x0C) = *(f32*)(p + 0x04);
-    *(f32*)(p + 0x10) += *(f32*)(p + 0x64) * (f32)((s32)(u8)p[0x23] + (s32)(s8)p[0x42]);
+    *(f32*)(p + 0x10) += *(f32*)(p + 0x64) * (f32)((s32)(s8)p[0x42] + (s32)(u8)p[0x23]);
     return 0;
 }
+#pragma scheduling off
 #endif
 #if 0
 asm void fn_80132F7C(void) {
@@ -4861,9 +4864,9 @@ asm void fn_8013327C(void) {
 #pragma scheduling on
 u32 fn_8013327C(void) {
     if ((u32)(fn_800E0E14(1, 0) & 0xFF) == 1) {
-        fn_800DD970(lbl_80272AE0);
+        GSlogWrite(lbl_80272AE0);
     } else {
-        fn_800DD970(lbl_80272AF0);
+        GSlogWrite(lbl_80272AF0);
     }
     return 0;
 }

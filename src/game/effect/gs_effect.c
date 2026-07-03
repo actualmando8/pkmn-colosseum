@@ -47,7 +47,7 @@
 #include "game/gs_mem.h"
 
 /* ===== External SDK / engine functions ===== */
-extern void  fn_800DD970(const char* fmt, ...);          /* OSReport / GSlog */
+extern void  GSlogWrite(const char* fmt, ...);          /* OSReport / GSlog */
 extern void  fn_800E24B0(u16 handle);                    /* GSmemLock (raw) */
 extern void  fn_800E209C(u16 handle);                    /* GSmemFree (raw) */
 extern u32   fn_800D3088(void);                          /* GSgfxGetTickCount */
@@ -309,7 +309,7 @@ _got_inst:
 _ret1:
     return TRUE;
 _print_error:
-    fn_800DD970(lbl_80272A58);
+    GSlogWrite(lbl_80272A58);
 _final0:
     return FALSE;
 }

@@ -14,7 +14,7 @@
 #include "game/people/people.h"
 
 /* ===== External SDK / engine functions ===== */
-extern void  fn_800DD970(const char* fmt, ...);
+extern void  GSlogWrite(const char* fmt, ...);
 extern void* memset(void* dst, int val, u32 size);
 extern void* memcpy(void* dst, const void* src, u32 size);
 extern void  DCFlushRange(void* ptr, u32 size);
@@ -79,7 +79,7 @@ extern void  fn_800E013C(void* param);
 extern u32   __cvt_fp2unsigned(f64 val);
 
 /* Floor/field system */
-extern void* fn_800F9318(u16 group, u16 model, u16 param);
+extern void* GSresGetResource(u16 group, u16 model, u16 param);
 
 /* GX rendering */
 extern void  GSmodelSetVisibility(void* param);

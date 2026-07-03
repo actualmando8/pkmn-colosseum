@@ -113,7 +113,7 @@
  *   fn_80131428 (GSEffectAllocSlot)  -- allocate effect slot
  *   fn_80131200 (GSEffectRegister)   -- register callbacks
  *   fn_8013139C (GSEffectResetState) -- re-trigger effect
- *   fn_800F9318 (floor resource lookup)
+ *   GSresGetResource (floor resource lookup)
  *   fn_800E3D98 (GSmem / resource helper)
  *   _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID, GScameraGetActiveCamera, GScameraGetPosition, GScameraGetPerspective -- matrix/vector ops
  *   fn_800DA4C4, fn_800DA2BC, fn_800DA1E8, fn_800DA028 -- GX TEV/material setup
@@ -141,7 +141,7 @@
 #include "game/effect/gs_effect.h"
 
 /* ===== External SDK / engine functions ===== */
-extern void  fn_800DD970(const char* fmt, ...);     /* OSReport */
+extern void  GSlogWrite(const char* fmt, ...);     /* OSReport */
 extern void* memset(void* dst, int val, u32 size);
 
 /* renamed symbols referenced by asm incs (symbolmap port) */
@@ -168,7 +168,7 @@ extern void  fn_80131200(u32 effectId,
 extern void  fn_8013139C(u32 effectId, u32 param);        /* GSEffectResetState */
 
 /* Floor resource system */
-extern void* fn_800F9318(u32 group, u32 model);
+extern void* GSresGetResource(u32 group, u32 model);
 
 /* Matrix / vector operations */
 extern void  fn_800E3D98(void* dst, void* src);
@@ -438,7 +438,7 @@ u32 _lightningRenderMain(void* ptr) {
     }
 
     p = ptr;
-    model = fn_800F9318(*(u16*)(p + 0xA), *(u16*)(p + 0xC));
+    model = GSresGetResource(*(u16*)(p + 0xA), *(u16*)(p + 0xC));
     if (model == NULL) {
         return 0;
     }
@@ -527,20 +527,20 @@ u32 fn_801386DC(void* ptr) {
     u16 handle;
 
     if (ptr == NULL) {
-        fn_800DD970((const char*)lbl_80272B40 + 0xB0);
+        GSlogWrite((const char*)lbl_80272B40 + 0xB0);
         return 0;
     }
 
     p = ptr;
-    if (fn_800F9318(*(u16*)(p + 0xA), *(u16*)(p + 0xC)) == NULL) {
-        fn_800DD970((const char*)lbl_80272B40, *(u16*)(p + 0xA), *(u16*)(p + 0xC));
+    if (GSresGetResource(*(u16*)(p + 0xA), *(u16*)(p + 0xC)) == NULL) {
+        GSlogWrite((const char*)lbl_80272B40, *(u16*)(p + 0xA), *(u16*)(p + 0xC));
         return 0;
     }
 
     handle = _toolentryAlloc__FUl(*(u16*)(p + 0x8) * 0x97C);
     *(u16*)p = handle;
     if (handle == 0) {
-        fn_800DD970((const char*)lbl_80272B40 + 0x60);
+        GSlogWrite((const char*)lbl_80272B40 + 0x60);
         return 0;
     }
 
@@ -609,7 +609,7 @@ void fn_80138838(void* ptr, u32 b) {
     }
 
     p = ptr;
-    model = fn_800F9318(*(u16*)(p + 0xA), *(u16*)(p + 0xC));
+    model = GSresGetResource(*(u16*)(p + 0xA), *(u16*)(p + 0xC));
     if (model == NULL || *(void**)(p + 0x4) == NULL) {
         return;
     }
@@ -748,7 +748,7 @@ u32 fn_80138CCC(void* ptr) {
     u16 i;
 
     if (ptr == NULL) {
-        fn_800DD970((const char*)lbl_80272C90);
+        GSlogWrite((const char*)lbl_80272C90);
         return 0;
     }
 
@@ -759,9 +759,9 @@ u32 fn_80138CCC(void* ptr) {
         *(u16*)(p + 0x38) = count;
     }
 
-    *(void**)(p + 0x8) = fn_800F9318(*(u16*)(p + 0x40), *(u16*)(p + 0x44));
+    *(void**)(p + 0x8) = GSresGetResource(*(u16*)(p + 0x40), *(u16*)(p + 0x44));
     if (*(void**)(p + 0x8) == NULL) {
-        fn_800DD970((const char*)lbl_80272C30, *(u16*)(p + 0x40), *(u16*)(p + 0x44));
+        GSlogWrite((const char*)lbl_80272C30, *(u16*)(p + 0x40), *(u16*)(p + 0x44));
         return 0;
     }
 
@@ -769,7 +769,7 @@ u32 fn_80138CCC(void* ptr) {
     handle = _toolentryAlloc__FUl(size);
     *(u16*)(p + 0x4) = handle;
     if (handle == 0) {
-        fn_800DD970((const char*)lbl_80272C90);
+        GSlogWrite((const char*)lbl_80272C90);
         return 0;
     }
 
@@ -886,14 +886,14 @@ void _leaffxGenerateLeafData(void* ptr, void* entry) {
 
     p = ptr;
     e = entry;
-    source = fn_800F9318(*(u16*)(p + 0x46), *(u16*)(p + 0x48));
+    source = GSresGetResource(*(u16*)(p + 0x46), *(u16*)(p + 0x48));
     if (source == NULL) {
         return;
     }
 
     clone = fn_800E4C98(source);
     if (clone == NULL) {
-        fn_800DD970((const char*)lbl_80272CC4);
+        GSlogWrite((const char*)lbl_80272CC4);
         return;
     }
 
@@ -982,7 +982,7 @@ u32 fn_80139934(void* ptr) {
         camera = GScameraGetActiveCamera();
         count = *(u16*)(p + 0x44);
         entry = *(void**)p;
-        model = fn_800F9318(*(u16*)(p + 0x4c), *(u16*)(p + 0x4e));
+        model = GSresGetResource(*(u16*)(p + 0x4c), *(u16*)(p + 0x4e));
         if (*(void**)(p + 0x58) == NULL) {
             return 0;
         }
@@ -1090,7 +1090,7 @@ u32 fn_80139D10(void* ptr) {
     u32 size;
 
     if (ptr == NULL) {
-        fn_800DD970((const char*)lbl_80272D54);
+        GSlogWrite((const char*)lbl_80272D54);
         return 0;
     }
 
@@ -1115,7 +1115,7 @@ u32 fn_80139D10(void* ptr) {
     size = count * 0x12E4;
     handle = _toolentryAlloc__FUl(size);
     if (handle == 0) {
-        fn_800DD970((const char*)lbl_80272D08);
+        GSlogWrite((const char*)lbl_80272D08);
         return 0;
     }
 
@@ -1233,15 +1233,15 @@ asm u32 fn_8013A49C(void* ptr) {
 u32 fn_8013A49C(void* ptr) {
     void* res;
     if (ptr) {
-        res = fn_800F9318(*(u16*)((u8*)ptr + 0xc), *(u16*)((u8*)ptr + 0xe));
+        res = GSresGetResource(*(u16*)((u8*)ptr + 0xc), *(u16*)((u8*)ptr + 0xe));
         if (res == NULL) {
-            fn_800DD970((const char*)lbl_80272D90, *(u16*)((u8*)ptr + 0xc), *(u16*)((u8*)ptr + 0xe));
+            GSlogWrite((const char*)lbl_80272D90, *(u16*)((u8*)ptr + 0xc), *(u16*)((u8*)ptr + 0xe));
             return 0;
         }
         *(u16*)((u8*)ptr + 0x8) = 0;
         return 1;
     }
-    fn_800DD970((const char*)lbl_80272DF4);
+    GSlogWrite((const char*)lbl_80272DF4);
     return 0;
 }
 #endif
@@ -1268,7 +1268,7 @@ u32 fn_8013A520(void* ptr) {
     }
 
     p = ptr;
-    model = fn_800F9318(*(u16*)(p + 0xC), *(u16*)(p + 0xE));
+    model = GSresGetResource(*(u16*)(p + 0xC), *(u16*)(p + 0xE));
     if (model == NULL) {
         return 0;
     }
@@ -1575,7 +1575,7 @@ u16 filterStart(void* arg) {
     } else {
         *(void**)ptr = GSfilterCreate();
         if (*(void**)ptr == NULL) {
-            fn_800DD970((const char*)lbl_80272E30);
+            GSlogWrite((const char*)lbl_80272E30);
             return 0;
         }
     }
@@ -1585,7 +1585,7 @@ u16 filterStart(void* arg) {
     return 1;
 
 report_null:
-    fn_800DD970((const char*)lbl_80272E70);
+    GSlogWrite((const char*)lbl_80272E70);
     return 0;
 }
 #endif
@@ -1708,7 +1708,7 @@ u16 surfEffectStart(void* ptr) {
     u32 pointCount;
 
     if (ptr == NULL) {
-        fn_800DD970((const char*)lbl_80272EA0);
+        GSlogWrite((const char*)lbl_80272EA0);
         return 0;
     }
 
@@ -1716,13 +1716,13 @@ u16 surfEffectStart(void* ptr) {
     *(u16*)(p + 0xCC) = 0;
     memset(p, 0, 0x24);
     if (*(u32*)(p + 0x54) == 0) {
-        fn_800DD970((const char*)lbl_80272EA0);
+        GSlogWrite((const char*)lbl_80272EA0);
         return 0;
     }
 
-    model = fn_800F9318(*(u32*)(p + 0x50), *(u32*)(p + 0x54));
+    model = GSresGetResource(*(u32*)(p + 0x50), *(u32*)(p + 0x54));
     if (model == NULL) {
-        fn_800DD970((const char*)lbl_80272EA0);
+        GSlogWrite((const char*)lbl_80272EA0);
         return 0;
     }
 
@@ -1733,7 +1733,7 @@ u16 surfEffectStart(void* ptr) {
     handle = _toolentryAlloc__FUl(pointCount * 0xC);
     *(u16*)(p + 0x20) = handle;
     if (handle == 0) {
-        fn_800DD970((const char*)lbl_80272EA0);
+        GSlogWrite((const char*)lbl_80272EA0);
         return 0;
     }
 
@@ -1989,7 +1989,7 @@ u16 seaEffectStart(void* ptr) {
     u32 pointCount;
 
     if (ptr == NULL) {
-        fn_800DD970((const char*)lbl_80272ED0);
+        GSlogWrite((const char*)lbl_80272ED0);
         return 0;
     }
 
@@ -1997,13 +1997,13 @@ u16 seaEffectStart(void* ptr) {
     *(u16*)(p + 0xA4) = 0;
     memset(p, 0, 0x48);
     if (*(u32*)(p + 0x78) == 0) {
-        fn_800DD970((const char*)lbl_80272ED0);
+        GSlogWrite((const char*)lbl_80272ED0);
         return 0;
     }
 
-    model = fn_800F9318(*(u32*)(p + 0x74), *(u32*)(p + 0x78));
+    model = GSresGetResource(*(u32*)(p + 0x74), *(u32*)(p + 0x78));
     if (model == NULL) {
-        fn_800DD970((const char*)lbl_80272ED0);
+        GSlogWrite((const char*)lbl_80272ED0);
         return 0;
     }
 
@@ -2014,7 +2014,7 @@ u16 seaEffectStart(void* ptr) {
     handle = _toolentryAlloc__FUl(pointCount * 0xC);
     *(u16*)(p + 0x1C) = handle;
     if (handle == 0) {
-        fn_800DD970((const char*)lbl_80272ED0);
+        GSlogWrite((const char*)lbl_80272ED0);
         return 0;
     }
 
@@ -2283,7 +2283,7 @@ u32 envMapEffectInit(void* ptr) {
         lbl_8047AEE4 = lbl_8047AEE4 + 1;
         return 1;
     }
-    fn_800DD970((const char*)lbl_80272F00);
+    GSlogWrite((const char*)lbl_80272F00);
     return 0;
 }
 #endif
@@ -2308,7 +2308,7 @@ u32 envMapEffectStart(void* ptr) {
         return 1;
     }
 log:
-    fn_800DD970((const char*)lbl_80272F38);
+    GSlogWrite((const char*)lbl_80272F38);
     return 0;
 }
 #endif
@@ -2499,7 +2499,7 @@ u32 blurEffectStart(void* ptr) {
             }
         }
     }
-    fn_800DD970((const char*)lbl_80272F70);
+    GSlogWrite((const char*)lbl_80272F70);
     return 0;
 }
 #endif
@@ -2711,7 +2711,7 @@ u32 auraEffectStart(void* ptr) {
     if (*(void**)((u8*)ptr + 0x4) == NULL) { goto log; }
     return 1;
 log:
-    fn_800DD970((const char*)lbl_80272FA0);
+    GSlogWrite((const char*)lbl_80272FA0);
     return 0;
 }
 #endif
@@ -2990,7 +2990,7 @@ u16 distortionEffectStart(void* ptr) {
     void* part;
 
     if (ptr == NULL) {
-        fn_800DD970((const char*)lbl_80272FE0);
+        GSlogWrite((const char*)lbl_80272FE0);
         return 0;
     }
 
@@ -3252,12 +3252,12 @@ u32 fn_8013FCC4(void* ptr) {
     void* res;
     if (ptr) {
         if (*(u32*)((u8*)ptr + 0x4) != 0 && *(u32*)((u8*)ptr + 0x8) != 0) {
-            *(void**)((u8*)ptr + 0x10) = fn_800F9318(*(u32*)ptr, *(u32*)((u8*)ptr + 0x8));
+            *(void**)((u8*)ptr + 0x10) = GSresGetResource(*(u32*)ptr, *(u32*)((u8*)ptr + 0x8));
         } else {
             *(void**)((u8*)ptr + 0x10) = NULL;
         }
         if (*(u32*)((u8*)ptr + 0xc) != 0) {
-            res = fn_800F9318(*(u32*)ptr, *(u32*)((u8*)ptr + 0xc));
+            res = GSresGetResource(*(u32*)ptr, *(u32*)((u8*)ptr + 0xc));
             if (res != NULL) {
                 *(void**)((u8*)ptr + 0x14) = fn_801195AC(res);
             } else {
@@ -3345,7 +3345,7 @@ u16 billboardEffectStart(void* ptr) {
     return 1;
 
 report_null:
-    fn_800DD970((const char*)lbl_80273078);
+    GSlogWrite((const char*)lbl_80273078);
     return 0;
 }
 #endif
@@ -3445,9 +3445,9 @@ u32 fn_80140190(void** out, void* model, u32 arg) {
     out[1] = NULL;
     out[0] = fn_800EE6B4(handle, 0);
     if (out[0] != NULL) {
-        tex1 = fn_800F9318(0x387, 0x10561200);
+        tex1 = GSresGetResource(0x387, 0x10561200);
         if (tex1 != NULL) {
-            tex2 = fn_800F9318(0x387, 0x10571200);
+            tex2 = GSresGetResource(0x387, 0x10571200);
             if (tex2 != NULL) {
                 out[1] = _pachiruEffectCreateTexture__FP9GStextureP9GStextureUl(tex1, tex2, arg);
                 if (out[1] != NULL) {

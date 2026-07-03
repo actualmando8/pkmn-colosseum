@@ -72,7 +72,7 @@ void fn_8018FC08(PeopleEntry* entry, void* vec);
 void* peopleInfoBiosGetPtr(void* scriptObj);
 
 /* ===== External SDK / engine functions ===== */
-extern void  fn_800DD970(const char* fmt, ...);     /* OSReport / debug printf */
+extern void  GSlogWrite(const char* fmt, ...);     /* OSReport / debug printf */
 extern void* memset(void* dst, int val, u32 size);
 extern void* memcpy(void* dst, const void* src, u32 size);
 
@@ -560,7 +560,7 @@ void fn_8018B220(u32 groupId, u32 index) {
         entry = peopleGetEntry(j);
         if (!entry->active) continue;
         if (entry->index != index) continue;
-        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
         found = entry->selfPtr;
         goto loop3;
     }
@@ -648,7 +648,7 @@ void fn_8018BC88(u32 groupId, u32 index, s32 motionId, void* target) {
         entry = peopleGetEntry(j);
         if (!entry->active) continue;
         if (entry->index != index) continue;
-        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
         found = entry->selfPtr;
         goto loop3;
     }
@@ -725,7 +725,7 @@ void fn_8018DCA8(void) {
 #endif
 
 /* 0x8018E9B4 | 0x338 */
-extern void fn_800F9318(void);
+extern void GSresGetResource(void);
 extern void fn_800F7BC4(void);
 extern void fn_80101B90(void);
 extern void fn_8011163C(void);
@@ -901,7 +901,7 @@ BOOL fn_80183E5C(u32 groupId, u32 index, u8 flag) {
         entry = peopleGetEntry(j);
         if (!entry->active) continue;
         if (entry->index != index) continue;
-        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
         found = entry->selfPtr;
         goto loop3;
     }
@@ -1240,7 +1240,7 @@ BOOL fn_80188984(u32 groupId, u32 index, u8 flag) {
         entry = peopleGetEntry(j);
         if (!entry->active) continue;
         if (entry->index != index) continue;
-        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
         found = entry->selfPtr;
         goto loop3;
     }
@@ -1503,7 +1503,7 @@ s32 fn_801812E8(u32 groupId, u32 index, u8 doInteract) {
         entry = peopleGetEntry(j);
         if (!entry->active) continue;
         if (entry->index != index) continue;
-        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
         found = entry->selfPtr;
         goto loop3;
     }
@@ -1625,7 +1625,7 @@ f32 fn_801887D8(u32 groupId, u32 index, void* param3) {
         entry = peopleGetEntry(j);
         if (!entry->active) continue;
         if (entry->index != index) continue;
-        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
         found = entry->selfPtr;
         goto loop3;
     }
@@ -1704,7 +1704,7 @@ BOOL fn_80189328(u32 groupId, u32 index, u8 enable) {
         entry = peopleGetEntry(j);
         if (!entry->active) continue;
         if (entry->index != index) continue;
-        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
         found = entry->selfPtr;
         goto loop3;
     }
@@ -1795,7 +1795,7 @@ void fn_8018BDF4(u32 groupId, u32 index, void* pos) {
         entry = peopleGetEntry(j);
         if (!entry->active) continue;
         if (entry->index != index) continue;
-        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
         found = entry->selfPtr;
         goto loop3;
     }
@@ -1838,7 +1838,7 @@ void fn_8018BF24(u32 groupId, u32 index, f32* vec) {
         entry = peopleGetEntry(j);
         if (!entry->active) continue;
         if (entry->index != index) continue;
-        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
         found = entry->selfPtr;
         goto loop3;
     }
@@ -1884,7 +1884,7 @@ void fn_8018C0A8(u32 groupId, u32 index, void* vec) {
         entry = peopleGetEntry(j);
         if (!entry->active) continue;
         if (entry->index != index) continue;
-        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
         found = entry->selfPtr;
         goto loop3;
     }
@@ -1931,7 +1931,7 @@ BOOL fn_8018C424(u32 groupId, u32 index, u32 mask) {
         entry = peopleGetEntry(j);
         if (!entry->active) continue;
         if (entry->index != index) continue;
-        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
         found = entry->selfPtr;
         goto loop3;
     }
@@ -1977,7 +1977,7 @@ void fn_8018C69C(u32 groupId, u32 index, u32 mask) {
         entry = peopleGetEntry(j);
         if (!entry->active) continue;
         if (entry->index != index) continue;
-        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
         found = entry->selfPtr;
         goto loop3;
     }
@@ -2018,7 +2018,7 @@ void fn_8018C7C8(u32 groupId, u32 index, u32 mask) {
         entry = peopleGetEntry(j);
         if (!entry->active) continue;
         if (entry->index != index) continue;
-        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
         found = entry->selfPtr;
         goto loop3;
     }
@@ -2059,7 +2059,7 @@ void fn_8018C8F4(u32 groupId, u32 index, u32 flags) {
         entry = peopleGetEntry(j);
         if (!entry->active) continue;
         if (entry->index != index) continue;
-        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
         found = entry->selfPtr;
         goto loop3;
     }
@@ -2101,7 +2101,7 @@ void fn_8018CA20(u32 groupId, u32 index, u8 animId) {
         entry = peopleGetEntry(j);
         if (!entry->active) continue;
         if (entry->index != index) continue;
-        fn_800DD970((const char*)lbl_80273FD8, groupId, index);
+        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
         found = entry->selfPtr;
         goto loop3;
     }

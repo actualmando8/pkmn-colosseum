@@ -50,7 +50,7 @@ extern void _threadSwitch(void);                      /* tick render */
 extern void* GSthreadCreate(s32 priority, void* parent, s32 stackSize,
                           u8 usesFPU, void* entry, s32 arg); /* GSthread_Create */
 extern void fn_800D3088(void);                      /* GSgfx tick */
-extern void fn_800DD970(const char* fmt, ...);      /* GSlog_Print */
+extern void GSlogWrite(const char* fmt, ...);      /* GSlog_Print */
 
 /* Scene management */
 extern void fn_80102568(s32 objID, s32 arg1, s32 arg2);   /* release scene object */

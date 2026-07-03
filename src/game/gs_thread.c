@@ -134,7 +134,7 @@ typedef struct GSVMCtx {
 } GSVMCtx;
 
 /* ===== External SDK / engine functions ===== */
-extern void  fn_800DD970(const void* fmt, ...);          /* OSReport */
+extern void  GSlogWrite(const void* fmt, ...);          /* OSReport */
 extern u16   GSmemAllocRaw(u32 size);                    /* _toolentryAlloc__FUl */
 extern void* GSmemGetPtr(u16 handle);                    /* fn_800E27B0 */
 extern void* GSmemLock(u16 handle);                      /* fn_800E24B0 */
@@ -352,7 +352,7 @@ static void*     gsThreadCurrentCtx;  /* lbl_8047AC1C : current thread context p
  *
  *  Assembly:
  *    // Warn if usesFPU == 0
- *    if (usesFPU == 0) fn_800DD970(lbl_80271008);
+ *    if (usesFPU == 0) GSlogWrite(lbl_80271008);
  *    // Find a free thread slot (active == 0)
  *    thread = NULL;
  *    for each slot in gsThreadArray:
@@ -405,7 +405,7 @@ GSThread* GSthreadCreate(u32 affinity, u32 priority, u32 stackSize,
 
     /* Warn if FPU context saving is disabled */
     if (usesFPU == 0) {
-        fn_800DD970(lbl_80271008);
+        GSlogWrite(lbl_80271008);
     }
 
     /* Find a free thread slot */
@@ -1134,14 +1134,14 @@ u32 fn_800F92D4(u32 key) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800F9318(void) {
+asm void GSresGetResource(void) {
 #include "src/game/gs_thread_fn_800F9318.inc"
 }
 #else
 #pragma push
 #pragma peephole off
 #pragma optimization_level 2
-u32 fn_800F9318(u32 key1, u32 key2) {
+u32 GSresGetResource(u32 key1, u32 key2) {
     u8* entry;
     u32 i;
 
@@ -1161,12 +1161,12 @@ u32 fn_800F9318(u32 key1, u32 key2) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800F9378(void) {
+asm void GSresRegisterResource(void) {
 #include "src/game/gs_thread_fn_800F9378.inc"
 }
 #else
 #pragma optimization_level 2
-void fn_800F9378(u32 fn, u32 key1, u32 key2, u32 val) {
+void GSresRegisterResource(u32 fn, u32 key1, u32 key2, u32 val) {
     u8* arr;
     u8* p;
     u32 i;
@@ -1198,12 +1198,12 @@ void fn_800F9378(u32 fn, u32 key1, u32 key2, u32 val) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800F9418(void) {
+asm void GSresAllocResourceAlign(void) {
 #include "src/game/gs_thread_fn_800F9418.inc"
 }
 #else
 #pragma optimization_level 2
-void* fn_800F9418(u32 align, u32 size, u32 key1, u32 key2, u32 val) {
+void* GSresAllocResourceAlign(u32 align, u32 size, u32 key1, u32 key2, u32 val) {
     u8* arr;
     u8* p;
     u8* slot;
@@ -1502,7 +1502,7 @@ u8 *fn_800F96E4(arg0, arg1, arg2)
                     }
 
                     if ((s8)work[0x40] >= 3) {
-                        fn_800DD970((const char *)lbl_80271700, lbl_80315678);
+                        GSlogWrite((const char *)lbl_80271700, lbl_80315678);
                     } else {
                         *(u32 *)(work + 0x34 + (s8)work[0x40] * 4) = (u32)copy;
                         work[0x40]++;
@@ -2285,7 +2285,7 @@ s32 fn_800FA444(arg0)
                             }
                         }
                         if ((s8)work[0x40] >= 3) {
-                            fn_800DD970((const char *)lbl_80271700, lbl_80315678);
+                            GSlogWrite((const char *)lbl_80271700, lbl_80315678);
                         } else {
                             *(u32 *)(work + 0x34 + (s8)work[0x40] * 4) = (u32)ip + 2;
                             work[0x40]++;
@@ -2461,7 +2461,7 @@ void fn_800FAA98(arg0)
                             }
 
                             if ((s8)arg0[0x40] >= 3) {
-                                fn_800DD970((const char *)lbl_80271700, lbl_80315678);
+                                GSlogWrite((const char *)lbl_80271700, lbl_80315678);
                             } else {
                                 *(u32 *)(arg0 + 0x34 + (s8)arg0[0x40] * 4) = (u32)ip + 2;
                                 arg0[0x40]++;
@@ -3204,7 +3204,7 @@ s32 fn_800FBF74(arg0, arg1, arg2)
         }
     }
     if (i == *(u16 *)mgr) {
-        fn_800DD970((const char *)lbl_80271730, arg0);
+        GSlogWrite((const char *)lbl_80271730, arg0);
         return -1;
     }
 
@@ -3238,7 +3238,7 @@ s32 fn_800FBF74(arg0, arg1, arg2)
         }
     }
     if (text == NULL) {
-        fn_800DD970((const char *)lbl_80271754, arg0);
+        GSlogWrite((const char *)lbl_80271754, arg0);
         return -1;
     }
 
@@ -3488,7 +3488,7 @@ loop:
             entry = NULL;
         }
         if (entry == NULL) {
-            fn_800DD970((const char*)lbl_8027177C, *(u16*)p);
+            GSlogWrite((const char*)lbl_8027177C, *(u16*)p);
         }
     } else {
         /* Found occupied slot with matching key; insert node into list */
@@ -3555,14 +3555,14 @@ s32 fn_800FC528(arg0, arg1)
     handle = GSmemAllocRaw((u32)arg0 * 0x68);
     *(u16 *)(mgr + 0x02) = handle;
     if (handle == 0) {
-        fn_800DD970((const char *)lbl_802717B4);
+        GSlogWrite((const char *)lbl_802717B4);
         return -1;
     }
     *(u32 *)(mgr + 0x20) = (u32)GSmemGetPtr(handle);
     handle = GSmemAllocRaw((u32)arg1 * 8);
     *(u16 *)(mgr + 0x06) = handle;
     if (handle == 0) {
-        fn_800DD970((const char *)lbl_802717B4);
+        GSlogWrite((const char *)lbl_802717B4);
         return -1;
     }
     *(u32 *)(mgr + 0x24) = (u32)GSmemGetPtr(handle);
@@ -3884,7 +3884,7 @@ s32 _msgGetSize__FPCUs(arg0)
     s32 i;
 
     if (arg0 == NULL) {
-        fn_800DD970((const char *)lbl_802717D4);
+        GSlogWrite((const char *)lbl_802717D4);
         return 0;
     }
 
@@ -3992,7 +3992,7 @@ s32 _msgGetSize__FPCUs(arg0)
         }
 
         if ((s8)work[0x40] >= 3) {
-            fn_800DD970((const char *)lbl_80271700, lbl_80315678);
+            GSlogWrite((const char *)lbl_80271700, lbl_80315678);
         } else {
             *(u32 *)(work + 0x34 + (s8)work[0x40] * 4) = (u32)ip + 2;
             work[0x40]++;
@@ -4925,7 +4925,7 @@ s32 fn_800F16C0(void* obj) {
 
     /* null-terminate and print */
     *r26 = 0;
-    fn_800DD970((const char*)lbl_80401AB8);
+    GSlogWrite((const char*)lbl_80401AB8);
 
     /* pop twice, drain */
     if (*(u32*)(p+0x28) <= 0) {
@@ -6917,7 +6917,7 @@ u32 fn_800F6BC4(void* obj) {
     for (;;) {
         state = (u32)*(u8*)(p + 0x4);
         if (state == 0) {
-            fn_800DD970((const char*)(strBase + 0x120), *(u32*)(p + 0x8));
+            GSlogWrite((const char*)(strBase + 0x120), *(u32*)(p + 0x8));
             goto done;
         }
         if (state == 3) {
@@ -7343,7 +7343,7 @@ u32 fn_800F7318(u32 r27, void* callback, u32 r28, u32 r29, u32 r30, u32 r8, ...)
         *(u32*)(entry + 0x10) = r30;
         fn_800F0654(thread, 1, entry);
     } else {
-        fn_800DD970((const char*)lbl_80271294, lbl_80315668);
+        GSlogWrite((const char*)lbl_80271294, lbl_80315668);
     }
     return *(u16*)(entry + 0x6);
 }
@@ -7383,7 +7383,7 @@ u32 fn_800F7434(void* callback, u32 arg, ...) {
     for (;;) {
         state = (u32)*(u8*)(entry + 0x4);
         if (state == 0) {
-            fn_800DD970((const char*)(strBase + 0x120), *(u32*)(entry + 0x8));
+            GSlogWrite((const char*)(strBase + 0x120), *(u32*)(entry + 0x8));
             goto done;
         }
         if (state == 3) {

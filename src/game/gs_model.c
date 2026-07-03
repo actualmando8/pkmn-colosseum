@@ -24,7 +24,7 @@
 /* ===== External SDK / engine functions ===== */
 extern void* memset(void* dst, int val, u32 size);
 extern void* memcpy(void* dst, const void* src, u32 n);
-extern void  fn_800DD970(const char* fmt, ...);         /* OSReport / GSlog */
+extern void  GSlogWrite(const char* fmt, ...);         /* OSReport / GSlog */
 
 /* GSmem */
 extern u16   _toolentryAlloc__FUl(u32 size);                     /* GSmemAllocRaw */
@@ -459,7 +459,7 @@ s32 menuCloseSync(void* p, u8 flag) {
             return 0;
         step2:
             if ((u32)fn_800F037C() != 0) goto do_yield;
-            fn_800DD970((const char*)lbl_80271E10, (const char*)lbl_8035B060, r31);
+            GSlogWrite((const char*)lbl_80271E10, (const char*)lbl_8035B060, r31);
             goto ret0;
         do_yield:
             _threadSwitch();
@@ -526,7 +526,7 @@ s32 fn_80102568(void* p, u32 mode, u8 wait) {
                 _threadSwitch();
                 continue;
             }
-            fn_800DD970((const char*)lbl_80271E10, (const char*)lbl_8035B060, r29);
+            GSlogWrite((const char*)lbl_80271E10, (const char*)lbl_8035B060, r29);
             return 0;
         }
     }
@@ -1041,7 +1041,7 @@ void fn_80105410(u16 count) {
     handle = _toolentryAlloc__FUl(size);
     GS_MODEL_STATE->entryHandle = handle;
     if ((u16)handle == 0) {
-        fn_800DD970((const char*)lbl_80271EC4);
+        GSlogWrite((const char*)lbl_80271EC4);
     } else {
         ptr = fn_800E27B0((u16)handle);
         GS_MODEL_STATE->entries = ptr;
@@ -1643,7 +1643,7 @@ void* fn_80109290(void* root) {
             }
             r31 = (void*)((u8*)r31 + 0x78);
         }
-        fn_800DD970((const char*)lbl_80271EE8);
+        GSlogWrite((const char*)lbl_80271EE8);
         return (void*)0;
     }
 }
@@ -1656,7 +1656,7 @@ void fn_80109358(void) {
     u16 h = _toolentryAlloc__FUl(0x10000 - 0x5740);
     lbl_8047AD18 = h;
     if ((u16)h == 0) {
-        fn_800DD970((const char*)lbl_80271F18, (const char*)lbl_8035B3F0);
+        GSlogWrite((const char*)lbl_80271F18, (const char*)lbl_8035B3F0);
     } else {
         void* ptr = fn_800E27B0((u16)h);
         lbl_8047AD1C = (u8*)ptr;

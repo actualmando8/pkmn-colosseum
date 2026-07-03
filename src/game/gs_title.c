@@ -2055,7 +2055,7 @@ s32 fn_80025F74(void) {
  *        ret == 1: use 0xC6B1000 variant
  *        else:     use 0xC6C1000 variant
  *      Load it via fn_801CBA0C + fn_801CB954(activate=0).
- *   3. Set up TEV/sprite chain via fn_80113F48 + fn_800F9318 composition:
+ *   3. Set up TEV/sprite chain via fn_80113F48 + GSresGetResource composition:
  *        GSmodelSetBoundCheck, fn_800E9108(2), fn_800E8FE8, fn_800E900C(1, &obj_c),
  *        fn_800E8FA0(0x280, 0x1E0)  -- viewport 640x480
  *        fn_800E3C08, fn_800E3C00(4)
@@ -2076,7 +2076,7 @@ s32 fn_80025F74(void) {
  */
 extern void fn_801CBA0C(void);
 extern void fn_80113F48(void);
-extern void fn_800F9318(void);
+extern void GSresGetResource(void);
 extern void GSmodelSetBoundCheck(void);
 extern void fn_800E9108(void);
 extern void fn_800E8FE8(void);
@@ -2146,7 +2146,7 @@ void fn_80025F84(void) {
     extern void fn_800E9108(u32, s32);
     extern u32 GStextureCreate(s32, s32, s32, s32, s32);
     extern void _threadSwitch(void);
-    extern u32 fn_800F9318(u32, u32);
+    extern u32 GSresGetResource(u32, u32);
     extern u32 fn_80113F48(void);
     extern void fn_80165A20(s32, s32, s32);
     extern void fn_80176E0C(u32, u32, s32, s32);
@@ -2176,11 +2176,11 @@ void fn_80025F84(void) {
         frame_a = 0;
     }
 
-    obj_a = fn_800F9318(fn_80113F48(), tex);
+    obj_a = GSresGetResource(fn_80113F48(), tex);
     GSmodelSetBoundCheck(obj_a, 0);
-    obj_b = fn_800F9318(fn_80113F48(), tex);
-    obj_c = fn_800F9318(fn_80113F48(), 0xC6A1002);
-    obj_d = fn_800F9318(fn_80113F48(), 0xC6A1603);
+    obj_b = GSresGetResource(fn_80113F48(), tex);
+    obj_c = GSresGetResource(fn_80113F48(), 0xC6A1002);
+    obj_d = GSresGetResource(fn_80113F48(), 0xC6A1603);
     {
         u32 obj_c_local = obj_c;
         fn_800E9108(obj_b, 2);
@@ -2188,9 +2188,9 @@ void fn_80025F84(void) {
         fn_800E900C(obj_b, 1, &obj_c_local);
     }
     fn_800E8FA0(0x280, 0x1e0);
-    obj_e = fn_800F9318(fn_80113F48(), 0xC831400);
-    fn_800E3C08(fn_800F9318(fn_80113F48(), tex), obj_e);
-    fn_800E3C00(fn_800F9318(fn_80113F48(), tex), 4);
+    obj_e = GSresGetResource(fn_80113F48(), 0xC831400);
+    fn_800E3C08(GSresGetResource(fn_80113F48(), tex), obj_e);
+    fn_800E3C00(GSresGetResource(fn_80113F48(), tex), 4);
     fn_801CB954(tex, 1);
     fn_801CB61C(tex, 0xC6A1000, 0);
     fn_801CB834(tex, frame_a, 0, 1);
@@ -2246,7 +2246,7 @@ void fn_80025F84(void) {
     *(f32*)lbl_803A2040 = lbl_8047B8F0;
     *(f32*)(lbl_803A2040 + 4) = lbl_8047B8F4;
     *(f32*)(lbl_803A2040 + 8) = lbl_8047B8AC;
-    lbl_8047A39C = fn_800F9318(fn_80113F48(), lbl_8047A384);
+    lbl_8047A39C = GSresGetResource(fn_80113F48(), lbl_8047A384);
     lbl_8047A3A4 = lbl_8047B8A8;
 
     delay = 0x78 - __cvt_fp2unsigned((f64)((f32)fn_800D37CC() * lbl_8047B8E4));
@@ -2790,7 +2790,7 @@ void fn_80021644(void) {
     extern void fn_80165A20(s32, s32, s32);
     extern void* fn_80113F48(void);
     extern u32 fn_801CBA0C(s32);
-    extern void fn_800F9318(void*, u32);
+    extern void GSresGetResource(void*, u32);
     extern void fn_80176E0C(s32, s32, s32, s32);
     extern void GSscene_SetMode(s32);
     void* handle;
@@ -2799,7 +2799,7 @@ void fn_80021644(void) {
         fn_80165A20(0x446, 0, 0xff);
         handle = fn_80113F48();
         lbl_8047A35C = fn_801CBA0C(0x0FFE1000);
-        fn_800F9318(handle, lbl_8047A35C);
+        GSresGetResource(handle, lbl_8047A35C);
         fn_80176E0C(0x632, 0x0FFF1800, 0, 1);
         GSscene_SetMode(4);
         lbl_8047A360 = lbl_8047A358;

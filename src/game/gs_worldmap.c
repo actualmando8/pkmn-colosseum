@@ -7617,7 +7617,7 @@ extern void fn_8012805C(void);
 extern void fn_80176E0C(void);
 extern void fn_80113F48(void);
 extern void fn_801CBA0C(void);
-extern void fn_800F9318(void);
+extern void GSresGetResource(void);
 extern void GSscene_SetMode(void);
 extern void GSmodelSetVisibility(void);
 extern u32 lbl_8047A424;
@@ -7647,7 +7647,7 @@ asm void fn_8002DF10(void) {
  *   4. Yield one frame (_threadSwitch)
  *   5. Spawn/configure encounter objects (fn_8012805C)
  *   6. Re-anchor NPC handles (fn_80109C88, menuModelInit)
- *   7. Scene-load BGM/scene (fn_80176E0C, fn_801CBA0C, fn_800F9318)
+ *   7. Scene-load BGM/scene (fn_80176E0C, fn_801CBA0C, GSresGetResource)
  *   8. Restore people state (GSscene_SetMode)
  *   9. Mark availability flag and advance state (lbl_8047A42C = 0x12)
  */
@@ -7698,8 +7698,8 @@ void fn_8002DF10(void)
     extern u32  fn_80113F48(void);
     /* fn_801CBA0C - scene transition fade-out: (u32 color_key) -> u32 fade_handle */
     extern u32  fn_801CBA0C(u32 color_key);
-    /* fn_800F9318 - resolve resource pointer from handle (u32 handle) -> void* */
-    extern void* fn_800F9318(u32 handle);
+    /* GSresGetResource - resolve resource pointer from handle (u32 handle) -> void* */
+    extern void* GSresGetResource(u32 handle);
     /* GSscene_SetMode - restore people state (s32 mode) */
     extern void GSscene_SetMode(s32 mode);
     /* GSmodelSetVisibility - enable/disable field object (void* obj, s32 flag) */
@@ -7822,7 +7822,7 @@ void fn_8002DF10(void)
 
     scene_handle = fn_80113F48();
     lbl_8047A418 = fn_801CBA0C(0x0ffe1000);
-    lbl_8047A414 = (u32)fn_800F9318(scene_handle);
+    lbl_8047A414 = (u32)GSresGetResource(scene_handle);
 
     fn_80176E0C(0x37c, 0x0fff1800, 0, 1);
 

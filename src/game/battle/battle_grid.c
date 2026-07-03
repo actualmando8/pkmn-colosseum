@@ -56,7 +56,7 @@ extern void* memset(void* dst, int val, u32 size);
 extern void* memcpy(void* dst, const void* src, u32 size);
 
 /* Engine / GS core */
-extern void  fn_800DD970(const char* fmt, ...);      /* GSlog_Print */
+extern void  GSlogWrite(const char* fmt, ...);      /* GSlog_Print */
 extern void  fn_800D3088(void);                       /* GSgfx tick */
 extern void* GSthreadCreate(s32 priority, void* parent, s32 stackSize,
                           u8 usesFPU, void* entry, s32 arg); /* GSthread_Create */

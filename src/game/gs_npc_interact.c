@@ -3360,7 +3360,7 @@ u32 fn_80010B30(u8* arg) {
 extern u32 fn_80207BF4(void* arg);
 extern u8 fn_801F8C00(u32 warpId, u32 arg);
 extern s32 fn_80203848(u32 arg);
-extern void fn_800DD970(const char* fmt, ...);
+extern void GSlogWrite(const char* fmt, ...);
 extern u8 lbl_80266788[];
 extern u8 lbl_802E4B78[];
 #if 0
@@ -3457,7 +3457,7 @@ doneLabel:
     if (kind == 0) {
         return 1;
     }
-    fn_800DD970((const char*)lbl_80266788, (const char*)lbl_802E4B78);
+    GSlogWrite((const char*)lbl_80266788, (const char*)lbl_802E4B78);
 #undef WAIT_FOR_DIALOG
     return 0;
 }

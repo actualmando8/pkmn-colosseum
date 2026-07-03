@@ -59,8 +59,8 @@ extern void  DCFlushRange(void* addr, u32 len);
 extern void  sprintf(char* dst, const char* fmt, ...);
 
 /* Memory read (heap-to-ptr with DMA) */
-extern void* fn_800F9418(u32 size, u32 priority, u32 alignment, u32 fileID, u32 param);
-extern void* fn_800F9318(u32 fileHandle, u32 fileID);
+extern void* GSresAllocResourceAlign(u32 size, u32 priority, u32 alignment, u32 fileID, u32 param);
+extern void* GSresGetResource(u32 fileHandle, u32 fileID);
 
 /* Slot search */
 extern FSYSSlot* FSYSFindSlot(u32 fileHandle, u32 mode);
@@ -381,7 +381,7 @@ s32 fn_8017E30C(FSYSSlot* slot) {
         } else {
             /* No callback; allocate buffer from heap */
             u32 allocSize = (uncompSize + 0x1F) & ~0x1F;
-            allocatedBuf = (void*)fn_800F9418(allocSize,
+            allocatedBuf = (void*)GSresAllocResourceAlign(allocSize,
                                                slot->fileHandle,
                                                fileEntry->nameHash,
                                                0, 0);
@@ -421,7 +421,7 @@ s32 fn_8017E30C(FSYSSlot* slot) {
 
         if (poolEntry2 != NULL) {
             /* Flush D-cache and invoke the completion callback */
-            void* readResult = fn_800F9318(slot->fileHandle, fileEntry->nameHash);
+            void* readResult = GSresGetResource(slot->fileHandle, fileEntry->nameHash);
             if (readResult != NULL) {
                 if (isCompressed) {
                     DCFlushRange(readResult, fileEntry->compressedSize);
@@ -988,7 +988,7 @@ static void* FSYSAllocEntryBuffer(FSYSSlot* slot, FSYSFileEntry* entry, u32 size
         return callback(slot->fileHandle, entry->nameHash, size);
     }
 
-    return (void*)fn_800F9418(FSYSAlign32(size), 0x20, slot->fileHandle, entry->nameHash, 0);
+    return (void*)GSresAllocResourceAlign(FSYSAlign32(size), 0x20, slot->fileHandle, entry->nameHash, 0);
 }
 
 static void FSYSRunDoneCallback(FSYSSlot* slot, FSYSFileEntry* entry) {
@@ -1002,7 +1002,7 @@ static void FSYSRunDoneCallback(FSYSSlot* slot, FSYSFileEntry* entry) {
         return;
     }
 
-    cached = fn_800F9318(slot->fileHandle, entry->nameHash);
+    cached = GSresGetResource(slot->fileHandle, entry->nameHash);
     if (entry->flags & FSYS_COMPRESSED_FLAG) {
         size = entry->compressedSize;
     } else {
@@ -1265,7 +1265,7 @@ void fn_8017C074(FSYSSlot* slot, FSYSSubEntry* sub, u32 index, void* work) {
         callback = (FSYSAllocCallback)FSYS_POOL_ALLOC_CB(pool);
         buffer = callback(slot->fileHandle, entry->nameHash, entry->compressedSize);
     } else {
-        buffer = (void*)fn_800F9418(FSYSAlign32(entry->compressedSize), 0x20,
+        buffer = (void*)GSresAllocResourceAlign(FSYSAlign32(entry->compressedSize), 0x20,
                                     slot->field_08, entry->nameHash, 0);
     }
 

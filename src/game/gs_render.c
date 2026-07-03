@@ -480,7 +480,7 @@ void fn_800D3FA4(void) {
 #include "dolphin/types.h"
 
 /* ===== External SDK / engine functions ===== */
-extern void  fn_800DD970(const char*, ...);             /* OSReport / GSlog */
+extern void  GSlogWrite(const char*, ...);             /* OSReport / GSlog */
 extern void* memcpy(void* dst, const void* src, u32 n);
 extern void* memset(void* dst, int val, u32 size);
 
@@ -2211,7 +2211,7 @@ asm void fn_800D7D10(void) {
 #else
 void fn_800D7D10(u8 idx, void* src) {
     if (*(s32*)lbl_8047AA80 == 1) { fn_800D4F98(0x44, 2, (u32)idx, src); }
-    else if (idx > 9) { fn_800DD970(lbl_80270440); }
+    else if (idx > 9) { GSlogWrite(lbl_80270440); }
     else { fn_800E0628(src, &lbl_80400948[idx * 0x30]); }
 }
 #endif
@@ -2230,7 +2230,7 @@ void fn_800D7D90(u8 idx, void* src) {
     } else {
         r31 = (u32)idx;
         if (r31 > 9) {
-            fn_800DD970(lbl_80270440);
+            GSlogWrite(lbl_80270440);
         } else {
             GXLoadPosMtxImm((u32)r30, *(u32*)((u8*)lbl_80314610 + (u32)idx * 4));
             fn_800E0628((void*)(lbl_80400948 + r31 * 0x30), r30);
@@ -2255,7 +2255,7 @@ void fn_800D7E5C(void) {
     if (*(s32*)state == 1) {
         fn_800D4F98(0x42, 0);
     } else if (lbl_8047AAC0 >= lbl_8047AAC4) {
-        fn_800DD970(lbl_80270460);
+        GSlogWrite(lbl_80270460);
     } else {
         lbl_8047AAC0 = lbl_8047AAC0 + 0x30;
         mtx = *(u32*)(lbl_80314610 + 0x24);
@@ -2281,7 +2281,7 @@ void fn_800D7F14(void* src) {
     if (*(s32*)state == 1) {
         fn_800D4F98(0x41, 0x10, src);
     } else if (lbl_8047AAC0 <= lbl_8047AABC) {
-        fn_800DD970(lbl_80270480);
+        GSlogWrite(lbl_80270480);
     } else {
         lbl_8047AAC0 = lbl_8047AAC0 - 0x30;
         fn_800E0290((void*)lbl_8047AAC0, (void*)(lbl_8047AAC0 + 0x30), src);
@@ -2331,7 +2331,7 @@ void fn_800D8088(void* src) {
     if (*(s32*)state == 1) {
         fn_800D4F98(0x3f, 0x10, src);
     } else if (lbl_8047AAC0 <= lbl_8047AABC) {
-        fn_800DD970(lbl_80270480);
+        GSlogWrite(lbl_80270480);
     } else {
         lbl_8047AAC0 = lbl_8047AAC0 - 0x30;
         fn_800E0628((void*)lbl_8047AAC0, src);
@@ -4726,11 +4726,11 @@ extern u32 lbl_8047AB0C;
 extern u32 lbl_8047AB00;
 extern u32 lbl_8047AB04;
 #if 0
-asm void fn_800DD970(const char* fmt, ...) {
+asm void GSlogWrite(const char* fmt, ...) {
 #include "src/game/gs_render_fn_800DD970.inc"
 }
 #else
-void fn_800DD970(const char* fmt, ...) {
+void GSlogWrite(const char* fmt, ...) {
     (void)fmt;
 }
 #endif
@@ -4760,14 +4760,14 @@ u32 GSlogInit(u32 size, u8 flag) {
     lbl_8047AB04 = n;
     *(u8*)&lbl_8047AB11 = flag;
     if (n == 0) {
-        fn_800DD970(strings + 0x2c);
+        GSlogWrite(strings + 0x2c);
         return 1;
     }
 
     h0 = _toolentryAlloc__FUl(n);
     *(u16*)&lbl_8047AAF8 = h0;
     if (h0 == 0) {
-        fn_800DD970(strings + 0x48);
+        GSlogWrite(strings + 0x48);
         return 0;
     }
 
@@ -4777,7 +4777,7 @@ u32 GSlogInit(u32 size, u8 flag) {
     *(u16*)&lbl_8047AAFA = h1;
     if (h1 == 0) {
         fn_800E209C(*(u16*)&lbl_8047AAF8);
-        fn_800DD970(strings + 0x48);
+        GSlogWrite(strings + 0x48);
         return 0;
     }
 
@@ -4785,7 +4785,7 @@ u32 GSlogInit(u32 size, u8 flag) {
     if (lbl_8047AAFC == 0) {
         fn_800E209C(*(u16*)&lbl_8047AAF8);
         fn_800E209C(*(u16*)&lbl_8047AAFA);
-        fn_800DD970(strings + 0x48);
+        GSlogWrite(strings + 0x48);
         return 0;
     }
 
@@ -4794,11 +4794,11 @@ u32 GSlogInit(u32 size, u8 flag) {
         fn_800E24B0(*(u16*)&lbl_8047AAF8);
         fn_800E209C(*(u16*)&lbl_8047AAF8);
         fn_800E209C(*(u16*)&lbl_8047AAFA);
-        fn_800DD970(strings + 0x48);
+        GSlogWrite(strings + 0x48);
         return 0;
     }
 
-    fn_800DD970(strings + 0x5c, lbl_8047AB04);
+    GSlogWrite(strings + 0x5c, lbl_8047AB04);
     return 1;
 }
 #endif
@@ -5098,7 +5098,7 @@ void GSmaterialSetPEdescr(u8* obj, u32 new_val) {
     if ((u32)(sentinel + 0x01020000) == 0xfefe) {
         *(u32*)(obj + 0x3c) = *(u32*)(*(u8**)(obj + 0x8) + 0x10);
     } else {
-        fn_800DD970(lbl_80270528);
+        GSlogWrite(lbl_80270528);
     }
     *(u32*)(*(u8**)(obj + 0x8) + 0x10) = new_val;
 }
@@ -5191,7 +5191,7 @@ u8* GSmaterialCreate(void) {
     p = 0;
     found:
     if (p == 0) {
-        fn_800DD970(lbl_8027056C);
+        GSlogWrite(lbl_8027056C);
         return 0;
     }
     p[0] = 1;
@@ -5308,7 +5308,7 @@ void _matGSmatEnableEnvMapExt(u8* obj) {
 
     image = *(u32*)(obj + 0x28);
     if (image == 0) {
-        fn_800DD970(lbl_80270610);
+        GSlogWrite(lbl_80270610);
         return;
     }
 
@@ -6082,7 +6082,7 @@ u8 fn_800E0E14(u32 verbose, u32 dumpMap) {
 
     ok = 1;
     if (verbose != 0) {
-        fn_800DD970((char*)lbl_80270658);
+        GSlogWrite((char*)lbl_80270658);
     }
 
     block = (u32*)lbl_8047AB30;
@@ -6091,15 +6091,15 @@ u8 fn_800E0E14(u32 verbose, u32 dumpMap) {
         count++;
         if ((u32)block < lbl_8047AB68 || (u32)block > lbl_8047AB64) {
             ok = 0;
-            fn_800DD970((char*)lbl_80270658 + 0x64);
+            GSlogWrite((char*)lbl_80270658 + 0x64);
         }
         if ((u32)block >= lbl_8047AB38) {
             ok = 0;
-            fn_800DD970((char*)lbl_80270658 + 0x90);
+            GSlogWrite((char*)lbl_80270658 + 0x90);
         }
         if ((u32)block + block[2] > lbl_8047AB38) {
             ok = 0;
-            fn_800DD970((char*)lbl_80270658 + 0xc0);
+            GSlogWrite((char*)lbl_80270658 + 0xc0);
         }
         block = (u32*)block[1];
     }
@@ -6110,11 +6110,11 @@ u8 fn_800E0E14(u32 verbose, u32 dumpMap) {
         u32 size = *(u32*)(cursor + 0x8);
         if (size == 0 || cursor + size > end) {
             ok = 0;
-            fn_800DD970((char*)lbl_80270658 + 0x2e8, cursor);
+            GSlogWrite((char*)lbl_80270658 + 0x2e8, cursor);
             break;
         }
         if (dumpMap != 0) {
-            fn_800DD970((char*)lbl_80270658 + 0x268, cursor, cursor + size - 1,
+            GSlogWrite((char*)lbl_80270658 + 0x268, cursor, cursor + size - 1,
                         *(u32*)cursor, *(u32*)(cursor + 4));
         }
         cursor += size;
@@ -6122,18 +6122,18 @@ u8 fn_800E0E14(u32 verbose, u32 dumpMap) {
 
     if ((u32)cursor != lbl_8047AB38) {
         ok = 0;
-        fn_800DD970((char*)lbl_80270658 + 0x318, cursor);
+        GSlogWrite((char*)lbl_80270658 + 0x318, cursor);
     }
     if (count != lbl_8047AB4C) {
         ok = 0;
-        fn_800DD970((char*)lbl_80270658 + 0x36c);
+        GSlogWrite((char*)lbl_80270658 + 0x36c);
     }
 
     if (verbose != 0) {
-        fn_800DD970((char*)lbl_80270658 + 0x3a4, lbl_8047AB68, lbl_8047AB64);
-        fn_800DD970((char*)lbl_80270658 + 0x3cc, lbl_8047AB4C);
-        fn_800DD970((char*)lbl_80270658 + 0x3e8, lbl_8047AB48);
-        fn_800DD970((char*)lbl_80270658 + 0x404, lbl_8047AB34 - lbl_8047AB38 + 0x10);
+        GSlogWrite((char*)lbl_80270658 + 0x3a4, lbl_8047AB68, lbl_8047AB64);
+        GSlogWrite((char*)lbl_80270658 + 0x3cc, lbl_8047AB4C);
+        GSlogWrite((char*)lbl_80270658 + 0x3e8, lbl_8047AB48);
+        GSlogWrite((char*)lbl_80270658 + 0x404, lbl_8047AB34 - lbl_8047AB38 + 0x10);
     }
 
     if (!ok) {

@@ -73,7 +73,7 @@ extern void* memset(void* dst, int val, u32 size);
 extern void* memcpy(void* dst, const void* src, u32 size);
 
 /* Engine core */
-extern void  fn_800DD970(const char* fmt, ...);           /* GSlog_Print */
+extern void  GSlogWrite(const char* fmt, ...);           /* GSlog_Print */
 extern s32   fn_800D37CC(void);                            /* GSrandom_Get */
 extern void  fn_800D3088(void);                            /* GSgfx tick */
 extern void* fn_800DB940(u32 size);                        /* GSmem_Alloc */
@@ -950,7 +950,7 @@ void fn_801D53D8(s32 slot, f32 zoom, f32 speed) {
     extern u8 lbl_804673F8[];
     extern void fn_801D5464(s32 slot, s32 motionType);
     extern void fn_801D58E4();
-    extern u32 fn_800F9318(s32, s32);
+    extern u32 GSresGetResource(s32, s32);
     extern void GSmodelSetVisibility(s32, s32);
     extern s32 GSthreadCreate(s32, s32, s32, s32, s32, void*);
     extern s32 fn_800057A8(void);
@@ -960,7 +960,7 @@ void fn_801D53D8(s32 slot, f32 zoom, f32 speed) {
 
     fn_801DAEF8(8);
     fn_801D58E4();
-    result = fn_800F9318(0, 0x64);
+    result = GSresGetResource(0, 0x64);
     if (result != 0) {
         GSmodelSetVisibility(result, 0);
     }

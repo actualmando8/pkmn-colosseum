@@ -55,7 +55,7 @@
 #include "dolphin/types.h"
 #include "game/world/gs_field.h"
 /* ===== External SDK / engine functions ===== */
-extern void  fn_800DD970(const char* fmt, ...);         /* OSReport / GSlog */
+extern void  GSlogWrite(const char* fmt, ...);         /* OSReport / GSlog */
 extern void* memcpy(void* dst, const void* src, u32 n);
 extern void* memset(void* dst, int val, u32 size);
 /* GSmem */
@@ -95,7 +95,7 @@ extern void sin();
 extern void statusGetStatus();
 /* GSfloor / GScolsys */
 extern void* fn_800FF56C(void);                             /* GSfloor get active */
-extern void  fn_8010C7BC(u32 triIdx, void* outFlag);        /* GScolsys query */
+extern void  GScolsys2GetObjEnable(u32 triIdx, void* outFlag);        /* GScolsys query */
 /* ===== Index lookup globals ===== */
 extern u8 lbl_8035BBA8[];  /* NPC table (BSS) */
 extern u8 lbl_8035C430[];  /* field obj table (BSS) */
@@ -236,7 +236,7 @@ void floorUpdateFieldCamera_Pseudocode(void) {
     if (f0 == f29) {
         r3 = (u32)&lbl_80272770;
         r3 = (u32)&lbl_80272770;
-        ((void(*)(void))fn_800DD970)();
+        ((void(*)(void))GSlogWrite)();
         r3 = 0x0;
     } else {
     f0 = lbl_8047CFDC;
@@ -1411,14 +1411,14 @@ void fn_80129BC8(void);
 void fn_8012A450();
 void fn_8012A5B0(void);
 /* 0x70 | floorReadMapPreFunc | alloc_wrapper */
-extern void* fn_800F9418();  /* K&R: called with 5 args, returns void* */
+extern void* GSresAllocResourceAlign();  /* K&R: called with 5 args, returns void* */
 #pragma push
 #pragma peephole off
 void* floorReadMapPreFunc(void* owner, u32 param, u32 alloc_size) {
     u32 total = ((alloc_size + 0x1F) & ~0x1F) + 0x60;
-    void* mem = (void*)fn_800F9418(total, 0x20, (u32)owner, (u32)param, 0);
+    void* mem = (void*)GSresAllocResourceAlign(total, 0x20, (u32)owner, (u32)param, 0);
     if (mem == NULL) {
-        fn_800DD970(lbl_802724E8, total);
+        GSlogWrite(lbl_802724E8, total);
         return NULL;
     }
     return (u8*)mem + 0x60;
@@ -1435,9 +1435,9 @@ void* floorReadScriptPreFunc(void* owner, u32 param, u32 alloc_size) {
     void* mem;
     if ((u8)fn_800FF548() != 0) { return NULL; }
     alloc_size = (alloc_size + 0x1F) & ~0x1F;
-    mem = (void*)fn_800F9418(alloc_size, 0x20, (u32)owner, param, (u32)fn_80115124);
+    mem = (void*)GSresAllocResourceAlign(alloc_size, 0x20, (u32)owner, param, (u32)fn_80115124);
     if (mem == NULL) {
-        fn_800DD970(lbl_80272520, alloc_size);
+        GSlogWrite(lbl_80272520, alloc_size);
     }
     return mem;
 }
@@ -1446,9 +1446,9 @@ void* floorReadFontPreFunc(void* owner, u32 param, u32 alloc_size) {
     void* mem;
     if ((u8)fn_800FF548() != 0) { return NULL; }
     alloc_size = (alloc_size + 0x1F) & ~0x1F;
-    mem = (void*)fn_800F9418(alloc_size, 0x20, (u32)owner, param, (u32)fn_80115170);
+    mem = (void*)GSresAllocResourceAlign(alloc_size, 0x20, (u32)owner, param, (u32)fn_80115170);
     if (mem == NULL) {
-        fn_800DD970(lbl_8027255C, alloc_size);
+        GSlogWrite(lbl_8027255C, alloc_size);
     }
     return mem;
 }
@@ -1457,9 +1457,9 @@ void* floorReadMsgPreFunc(void* owner, u32 param, u32 alloc_size) {
     void* mem;
     if ((u8)fn_800FF548() != 0) { return NULL; }
     alloc_size = (alloc_size + 0x1F) & ~0x1F;
-    mem = (void*)fn_800F9418(alloc_size, 0x20, (u32)owner, param, (u32)fn_801151BC);
+    mem = (void*)GSresAllocResourceAlign(alloc_size, 0x20, (u32)owner, param, (u32)fn_801151BC);
     if (mem == NULL) {
-        fn_800DD970(lbl_80272594, alloc_size);
+        GSlogWrite(lbl_80272594, alloc_size);
     }
     return mem;
 }
@@ -1539,7 +1539,7 @@ u32 fn_80115280(void* ptr) {
     u32* data;
     u32 count = 0;
     if (ptr == NULL) {
-        fn_800DD970(lbl_80272608, lbl_8035BB50);
+        GSlogWrite(lbl_80272608, lbl_8035BB50);
         return 0;
     }
     data = *(u32**)((u8*)ptr + 0x10);
@@ -1548,7 +1548,7 @@ u32 fn_80115280(void* ptr) {
     }
     data = *(u32**)data;
     if (data == NULL) {
-        fn_800DD970(lbl_8027262C, lbl_8035BB50);
+        GSlogWrite(lbl_8027262C, lbl_8035BB50);
         return 0;
     }
     if (data[2] != 0) { count++; }
@@ -1572,7 +1572,7 @@ extern u8 lbl_8035BB50[];
 void* fn_8011538C(void* ptr, u32 idx) {
     void* p1;
     if (ptr == NULL) {
-        fn_800DD970(lbl_80272608, lbl_8035BB30);
+        GSlogWrite(lbl_80272608, lbl_8035BB30);
         return NULL;
     }
     p1 = *(void**)((u8*)ptr + 0x10);
@@ -1580,7 +1580,7 @@ void* fn_8011538C(void* ptr, u32 idx) {
     if (idx >= 8) { return NULL; }
     p1 = *(void**)p1;
     if (p1 == NULL) {
-        fn_800DD970(lbl_8027262C, lbl_8035BB30);
+        GSlogWrite(lbl_8027262C, lbl_8035BB30);
         return NULL;
     }
     (u8*)p1 += idx * 4;
@@ -1598,14 +1598,14 @@ void* fn_8011542C(void* ptr) {
     void* p1;
     void* p2;
     if (ptr == NULL) {
-        fn_800DD970(lbl_80272608, lbl_8035BB10);
+        GSlogWrite(lbl_80272608, lbl_8035BB10);
         return NULL;
     }
     p1 = *(void**)((u8*)ptr + 0x10);
     if (p1 == NULL) { return NULL; }
     p2 = *(void**)p1;
     if (p2 == NULL) {
-        fn_800DD970(lbl_8027262C, lbl_8035BB10);
+        GSlogWrite(lbl_8027262C, lbl_8035BB10);
         return NULL;
     }
     return *(void**)((u8*)p2 + 0x4);
@@ -1620,14 +1620,14 @@ void* fn_801154B4(void* ptr) {
     void* p1;
     void* p2;
     if (ptr == NULL) {
-        fn_800DD970(lbl_80272608, lbl_8035BAF4);
+        GSlogWrite(lbl_80272608, lbl_8035BAF4);
         return NULL;
     }
     p1 = *(void**)((u8*)ptr + 0x10);
     if (p1 == NULL) { return NULL; }
     p2 = *(void**)p1;
     if (p2 == NULL) {
-        fn_800DD970(lbl_8027262C, lbl_8035BAF4);
+        GSlogWrite(lbl_8027262C, lbl_8035BAF4);
         return NULL;
     }
     return *(void**)p2;
@@ -1640,7 +1640,7 @@ extern u8 lbl_8035BAD8[];
 #pragma peephole off
 void fn_8011553C(void* obj, u32 val) {
     if (obj == NULL) {
-        fn_800DD970(lbl_80272658, lbl_8035BAD8, val);
+        GSlogWrite(lbl_80272658, lbl_8035BAD8, val);
         return;
     }
     *(u32*)((u8*)obj + 0x34) = val;
@@ -1653,7 +1653,7 @@ extern u8 lbl_8035BABC[];
 #pragma peephole off
 void fn_80115584(void* obj, u32 val) {
     if (obj == NULL) {
-        fn_800DD970(lbl_80272680, lbl_8035BABC, val);
+        GSlogWrite(lbl_80272680, lbl_8035BABC, val);
         return;
     }
     *(u32*)((u8*)obj + 0x8) = val;
@@ -1666,7 +1666,7 @@ void fn_80115584(void* obj, u32 val) {
 u32 fn_80115A38(u8* entry) {
     extern u8 lbl_8035B91C[];
     if (entry == 0) {
-        fn_800DD970(lbl_80272608, (const char*)lbl_8035B91C);
+        GSlogWrite(lbl_80272608, (const char*)lbl_8035B91C);
         return 0;
     }
     return *(u32*)(entry + 0x4);
@@ -1772,7 +1772,7 @@ void* fn_80115BD8(void) {
         }
         entry += 0x4C;
     }
-    fn_800DD970((const char*)lbl_802726D4, (const char*)lbl_8035B8A0);
+    GSlogWrite((const char*)lbl_802726D4, (const char*)lbl_8035B8A0);
     entry = (u8*)0;
     return (void*)entry;
 }
@@ -1950,16 +1950,16 @@ void fn_80116D30(u32 kind, u32 arg)
 
     switch (skind) {
     case 1:
-        fn_800DD970((const char*)(text + 0x14), arg);
+        GSlogWrite((const char*)(text + 0x14), arg);
         break;
     case 2:
-        fn_800DD970((const char*)(text + 0x28), arg);
+        GSlogWrite((const char*)(text + 0x28), arg);
         break;
     case 3:
-        fn_800DD970((const char*)(text + 0x3C), arg);
+        GSlogWrite((const char*)(text + 0x3C), arg);
         break;
     case 4:
-        fn_800DD970((const char*)(text + 0x50), arg);
+        GSlogWrite((const char*)(text + 0x50), arg);
         break;
     }
 
@@ -2213,7 +2213,7 @@ void fn_801171C8(void) {
 #endif
 #pragma pop
 /* 0x80117330 | 0x194 */
-extern void* fn_800F9318();
+extern void* GSresGetResource();
 extern void fn_800E3D98(void*, void*);
 extern void GSscene_GetCameraViewVector(void*);
 extern f32 fn_8017669C(void);
@@ -2255,7 +2255,7 @@ void fn_80117330(f32 arg) {
     if (GSscene_GetMode() != 0) { return; }
     if (lbl_8047AD68 == 0) { return; }
 
-    obj = fn_800F9318(0, 0x64);
+    obj = GSresGetResource(0, 0x64);
     if (obj != NULL) {
         fn_800E3D98(obj, pos);
     } else {
@@ -2370,7 +2370,7 @@ asm void fn_80117AE4(void) {
 #else
 u8 fn_80117AE4(u32 arg1) {
     extern u32 fn_80113F48(void);
-    extern void* fn_800F9318(u32 a, u32 b);
+    extern void* GSresGetResource(u32 a, u32 b);
     extern void fn_800E5550(void* a);
     extern void fn_800EF5A4(void* a);
     extern void fn_800E4BF4(void* a);
@@ -2387,7 +2387,7 @@ u8 fn_80117AE4(u32 arg1) {
     if ((s32)lbl_80478B40 == (s32)arg1) { return; }
 
     if (lbl_8047AD88 != 0) {
-        fn_800E5550(fn_800F9318(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 8)));
+        fn_800E5550(GSresGetResource(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 8)));
         if (lbl_8047AD8C != 0) {
             fn_800EF5A4((void*)lbl_8047AD8C);
             lbl_8047AD8C = 0;
@@ -2427,8 +2427,8 @@ u8 fn_80117AE4(u32 arg1) {
     fn_800EC188((void*)lbl_8047AD90, 1);
     fn_800ECCA8((void*)lbl_8047AD90, *(u32*)((u8*)lbl_8047AD88 + 0x10));
     fn_800EC990((void*)lbl_8047AD90);
-    lbl_8047AD94 = (u32)fn_800F9318(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 0x14));
-    fn_800E563C(fn_800F9318(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 8)), (void*)lbl_8047AD8C);
+    lbl_8047AD94 = (u32)GSresGetResource(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 0x14));
+    fn_800E563C(GSresGetResource(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 8)), (void*)lbl_8047AD8C);
     lbl_80478B40 = arg1;
     return 1;
 }
@@ -2450,13 +2450,13 @@ asm void fn_80117C84(void) {
 #pragma peephole off
 void fn_80117C84(void) {
     extern u32 fn_80113F48(void);
-    extern void* fn_800F9318(u32 a, u32 b);
+    extern void* GSresGetResource(u32 a, u32 b);
     extern void fn_800E5550(void* a);
     extern void fn_800EF5A4(void* a);
     extern void fn_800E4BF4(void* a);
     u8* ptr = (u8*)lbl_8047AD88;
     if (ptr != NULL) {
-        fn_800E5550(fn_800F9318(fn_80113F48(), *(u32*)(ptr + 8)));
+        fn_800E5550(GSresGetResource(fn_80113F48(), *(u32*)(ptr + 8)));
         if (lbl_8047AD8C != 0) {
             fn_800EF5A4((void*)lbl_8047AD8C);
             lbl_8047AD8C = 0;
@@ -2561,7 +2561,7 @@ asm void fn_80117E58(void) {
 #else
 void fn_80117E58(void* arg) {
     extern u32 fn_80113F48(void);
-    extern void* fn_800F9318(u32 a, u32 b);
+    extern void* GSresGetResource(u32 a, u32 b);
     extern void fn_800E5550(void* a);
     extern void fn_800EF5A4(void* a);
     extern void fn_800E4BF4(void* a);
@@ -2587,7 +2587,7 @@ void fn_80117E58(void* arg) {
 
     ptr = (u8*)lbl_8047AD88;
     if (ptr != NULL) {
-        fn_800E5550(fn_800F9318(fn_80113F48(), *(u32*)(ptr + 8)));
+        fn_800E5550(GSresGetResource(fn_80113F48(), *(u32*)(ptr + 8)));
         if (lbl_8047AD8C != 0) {
             fn_800EF5A4((void*)lbl_8047AD8C);
             lbl_8047AD8C = 0;
@@ -2627,8 +2627,8 @@ void fn_80117E58(void* arg) {
     fn_800EC188((void*)lbl_8047AD90, 1);
     fn_800ECCA8((void*)lbl_8047AD90, *(u32*)((u8*)lbl_8047AD88 + 0x10));
     fn_800EC990((void*)lbl_8047AD90);
-    lbl_8047AD94 = (u32)fn_800F9318(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 0x14));
-    fn_800E563C(fn_800F9318(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 8)), (void*)lbl_8047AD8C);
+    lbl_8047AD94 = (u32)GSresGetResource(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 0x14));
+    fn_800E563C(GSresGetResource(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 8)), (void*)lbl_8047AD8C);
     lbl_80478B40 = 0;
 }
 #endif
@@ -2668,13 +2668,13 @@ asm void fn_80118070(void) {
 #pragma peephole off
 void fn_80118070(void) {
     extern u32 fn_80113F48(void);
-    extern void* fn_800F9318(u32 a, u32 b);
+    extern void* GSresGetResource(u32 a, u32 b);
     extern void fn_800E5550(void* a);
     extern void fn_800EF5A4(void* a);
     extern void fn_800E4BF4(void* a);
     u8* ptr = (u8*)lbl_8047AD88;
     if (ptr != NULL) {
-        fn_800E5550(fn_800F9318(fn_80113F48(), *(u32*)(ptr + 8)));
+        fn_800E5550(GSresGetResource(fn_80113F48(), *(u32*)(ptr + 8)));
         if (lbl_8047AD8C != 0) {
             fn_800EF5A4((void*)lbl_8047AD8C);
             lbl_8047AD8C = 0;
@@ -9074,7 +9074,7 @@ asm void floorReadScriptPostFunc(void) {
 void* floorReadScriptPostFunc(u32 a, u32 b) {
     void* result;
 
-    result = fn_800F9318(a, b);
+    result = GSresGetResource(a, b);
     if (fn_800FF548() == 0 && result != NULL) {
         fn_800F76E4(result);
         fn_80112700();
@@ -9098,7 +9098,7 @@ void* floorReadFontPostFunc(u32 a, u32 b) {
     if (fn_800FF548() != 0) {
         return NULL;
     }
-    result = fn_800F9318(a, b);
+    result = GSresGetResource(a, b);
     if (result != NULL) {
         fn_800FC39C(result);
     }
@@ -9121,7 +9121,7 @@ void* floorReadMsgPostFunc(u32 a, u32 b) {
     if (fn_800FF548() != 0) {
         return NULL;
     }
-    result = fn_800F9318(a, b);
+    result = GSresGetResource(a, b);
     if (result != NULL) {
         GSmsgOpen(result);
     }
@@ -9140,9 +9140,9 @@ asm void floorReadNormalPreFunc(void) {
 void* floorReadNormalPreFunc(u32 a, u32 b, u32 size) {
     void* result;
 
-    result = fn_800F9418((size + 0x1F) & ~0x1F, 0x20, a, b, 0);
+    result = GSresAllocResourceAlign((size + 0x1F) & ~0x1F, 0x20, a, b, 0);
     if (result == NULL) {
-        fn_800DD970(lbl_802725CC, size);
+        GSlogWrite(lbl_802725CC, size);
     }
     return result;
 }
@@ -9218,7 +9218,7 @@ void* fn_801155CC(u8* ptr) {
     void* sub;
 
     if (ptr == NULL) {
-        fn_800DD970(lbl_80272608, lbl_8035BA98);
+        GSlogWrite(lbl_80272608, lbl_8035BA98);
         return NULL;
     }
     sub = *(void**)(ptr + 0x1C);
@@ -9243,7 +9243,7 @@ void* fn_80115628(u8* ptr) {
     void* sub;
 
     if (ptr == NULL) {
-        fn_800DD970(lbl_80272608, lbl_8035BA7C);
+        GSlogWrite(lbl_80272608, lbl_8035BA7C);
         return NULL;
     }
     sub = *(void**)(ptr + 0x18);
@@ -9269,7 +9269,7 @@ void* fn_80115684(u8* ptr, u32 idx) {
     void* arr;
 
     if (ptr == NULL) {
-        fn_800DD970(lbl_80272608, lbl_8035BA60);
+        GSlogWrite(lbl_80272608, lbl_8035BA60);
         return NULL;
     }
     sub = *(void**)(ptr + 0x14);
@@ -9298,7 +9298,7 @@ u32 fn_80115704(u8* ptr) {
     void* sub;
 
     if (ptr == NULL) {
-        fn_800DD970(lbl_80272608, lbl_8035BA48);
+        GSlogWrite(lbl_80272608, lbl_8035BA48);
         return 0;
     }
     sub = *(void**)(ptr + 0x14);
@@ -9320,7 +9320,7 @@ asm void fn_80115768(void) {
 #pragma optimization_level 4
 u32 fn_80115768(u8* ptr) {
     if (ptr == NULL) {
-        fn_800DD970(lbl_80272608, lbl_8035BA2C);
+        GSlogWrite(lbl_80272608, lbl_8035BA2C);
         return 0;
     }
     return *(u32*)(ptr + 0x44);
@@ -9338,7 +9338,7 @@ asm void fn_801157B0(void) {
 #pragma optimization_level 4
 u32 fn_801157B0(u8* ptr) {
     if (ptr == NULL) {
-        fn_800DD970(lbl_80272608, lbl_8035BA10);
+        GSlogWrite(lbl_80272608, lbl_8035BA10);
         return 0;
     }
     return *(u32*)(ptr + 0x40);
@@ -9356,7 +9356,7 @@ asm void fn_801157F8(void) {
 #pragma optimization_level 4
 u32 fn_801157F8(u8* ptr) {
     if (ptr == NULL) {
-        fn_800DD970(lbl_80272608, lbl_8035B9F8);
+        GSlogWrite(lbl_80272608, lbl_8035B9F8);
         return 0;
     }
     return *(u32*)(ptr + 0x3C);
@@ -9374,7 +9374,7 @@ asm void fn_80115840(void) {
 #pragma optimization_level 4
 u32 fn_80115840(u8* ptr) {
     if (ptr == NULL) {
-        fn_800DD970(lbl_80272608, lbl_8035B9DC);
+        GSlogWrite(lbl_80272608, lbl_8035B9DC);
         return 0;
     }
     return *(u32*)(ptr + 0x24);
@@ -9392,7 +9392,7 @@ asm void fn_80115888(void) {
 #pragma optimization_level 4
 u32 fn_80115888(u8* ptr) {
     if (ptr == NULL) {
-        fn_800DD970(lbl_80272608, lbl_8035B9C0);
+        GSlogWrite(lbl_80272608, lbl_8035B9C0);
         return 0;
     }
     return *(u32*)(ptr + 0x38);
@@ -9410,7 +9410,7 @@ asm void fn_801158D0(void) {
 #pragma optimization_level 4
 u32 fn_801158D0(u8* ptr) {
     if (ptr == NULL) {
-        fn_800DD970(lbl_80272608, lbl_8035B9A4);
+        GSlogWrite(lbl_80272608, lbl_8035B9A4);
         return 0;
     }
     return *(u32*)(ptr + 0x34);
@@ -9428,7 +9428,7 @@ asm void fn_80115918(void) {
 #pragma optimization_level 4
 u32 fn_80115918(u8* ptr) {
     if (ptr == NULL) {
-        fn_800DD970(lbl_80272608, lbl_8035B988);
+        GSlogWrite(lbl_80272608, lbl_8035B988);
         return 0;
     }
     return *(u32*)(ptr + 0x30);
@@ -9446,7 +9446,7 @@ asm void fn_80115960(void) {
 #pragma optimization_level 4
 u32 fn_80115960(u8* ptr) {
     if (ptr == NULL) {
-        fn_800DD970(lbl_80272608, lbl_8035B96C);
+        GSlogWrite(lbl_80272608, lbl_8035B96C);
         return 0;
     }
     return *(u32*)(ptr + 0x2C);
@@ -9464,7 +9464,7 @@ asm void fn_801159A8(void) {
 #pragma optimization_level 4
 u32 fn_801159A8(u8* ptr) {
     if (ptr == NULL) {
-        fn_800DD970(lbl_80272608, lbl_8035B950);
+        GSlogWrite(lbl_80272608, lbl_8035B950);
         return 0;
     }
     return *(u32*)(ptr + 0x28);
@@ -9482,7 +9482,7 @@ asm void fn_801159F0(void) {
 #pragma optimization_level 4
 u32 fn_801159F0(u8* ptr) {
     if (ptr == NULL) {
-        fn_800DD970(lbl_80272608, lbl_8035B938);
+        GSlogWrite(lbl_80272608, lbl_8035B938);
         return 0;
     }
     return *(u32*)(ptr + 0x0C);
@@ -9500,7 +9500,7 @@ asm void fn_80115A80(void) {
 #pragma optimization_level 4
 u32 fn_80115A80(u8* ptr) {
     if (ptr == NULL) {
-        fn_800DD970(lbl_80272608, lbl_8035B904);
+        GSlogWrite(lbl_80272608, lbl_8035B904);
         return 0;
     }
     return *(u32*)(ptr + 0x4);
@@ -9521,7 +9521,7 @@ u8 fn_80115AC8(u8* ptr) {
     u8 val;
 
     if (ptr == NULL) {
-        fn_800DD970(lbl_80272608, lbl_8035B8E8);
+        GSlogWrite(lbl_80272608, lbl_8035B8E8);
         return 0;
     }
     val = (ptr[0] >> 5) & 7;
@@ -9547,7 +9547,7 @@ asm void fn_80115B48(void) {
 #pragma optimization_level 4
 u32 fn_80115B48(u8* ptr) {
     if (ptr == NULL) {
-        fn_800DD970(lbl_802726AC, lbl_8035B8CC);
+        GSlogWrite(lbl_802726AC, lbl_8035B8CC);
         return 0;
     }
     return *(u32*)(ptr + 0x8);
@@ -9565,7 +9565,7 @@ asm void fn_80115B90(void) {
 #pragma optimization_level 4
 u8 fn_80115B90(u8* ptr) {
     if (ptr == NULL) {
-        fn_800DD970(lbl_80272608, lbl_8035B8B4);
+        GSlogWrite(lbl_80272608, lbl_8035B8B4);
         return 0;
     }
     return *(u8*)(ptr + 0x1);
@@ -9589,7 +9589,7 @@ void* fn_80115C48(u32 key) {
         if (*(u32*)(p + 0xC) == key) return p;
         p += 0x4C;
     }
-    fn_800DD970((char*)lbl_802726D4, lbl_8035B8A0);
+    GSlogWrite((char*)lbl_802726D4, lbl_8035B8A0);
     return 0;
 }
 #pragma pop
@@ -9611,7 +9611,7 @@ s32 floorEventChangeTresure(u32 index, u16 val, u8 byte) {
     u8* entry;
     count = *(u32*)lbl_80478EB8;
     if (index >= count) {
-        fn_800DD970((const char*)lbl_80272708, lbl_8035BB70);
+        GSlogWrite((const char*)lbl_80272708, lbl_8035BB70);
         return -1;
     }
     entry = (u8*)lbl_80478EBC + index * 0x1c;
@@ -10838,7 +10838,7 @@ void fn_8012CA84(s32 playerIdx, f32* dirVec, f32* fwdVec) {
     extern f64  fn_800CE2D8(f32, f32);                    /* atan2f(y, x) */
     extern void fn_800E3D6C(void*, void*);                /* getRotation(obj, out) */
     extern void fn_800E3D98(void*, void*);                /* getPosition(obj, out) */
-    extern void* fn_800F9318(u32, u32);                   /* resolveHandle(group, id) */
+    extern void* GSresGetResource(u32, u32);                   /* resolveHandle(group, id) */
     extern void fn_8012C660(void*, s32, f32);             /* applyTurnResult(obj, idx, amt) */
     extern void fn_8018790C(u32, u32);                    /* stopMovement(group, handle) */
     extern void fn_8018805C(u32, u32, f32, f32);          /* setHeading(grp, hdl, angle, spd) */
@@ -10891,7 +10891,7 @@ void fn_8012CA84(s32 playerIdx, f32* dirVec, f32* fwdVec) {
         if (playerIdx >= 0 && playerIdx < 2) {
             h = htbl[playerIdx];
         }
-        obj = fn_800F9318(0, h);
+        obj = GSresGetResource(0, h);
         fn_800E3D98(obj, posA);
         posA[1] = lbl_8047D038;
 
@@ -10903,7 +10903,7 @@ void fn_8012CA84(s32 playerIdx, f32* dirVec, f32* fwdVec) {
         if (playerIdx >= 0 && playerIdx < 2) {
             h = htbl[playerIdx];
         }
-        obj = fn_800F9318(0, h);
+        obj = GSresGetResource(0, h);
         fn_800E3D98(obj, posB);
         posB[1] = lbl_8047D038;
 
@@ -10968,7 +10968,7 @@ void fn_8012CA84(s32 playerIdx, f32* dirVec, f32* fwdVec) {
             if (targetIdx >= 0 && targetIdx < 2) {
                 tgtH = htbl[targetIdx];
             }
-            obj = fn_800F9318(0, tgtH);
+            obj = GSresGetResource(0, tgtH);
             fn_800E3D98(obj, targetPos);
 
             htbl[0] = *(u32*)&lbl_8047D030;
@@ -10976,7 +10976,7 @@ void fn_8012CA84(s32 playerIdx, f32* dirVec, f32* fwdVec) {
             if (playerIdx >= 0 && playerIdx < 2) {
                 plrH = htbl[playerIdx];
             }
-            obj = fn_800F9318(0, plrH);
+            obj = GSresGetResource(0, plrH);
             fn_800E3D98(obj, playerPos);
 
             htbl[0] = *(u32*)&lbl_8047D030;
@@ -10984,7 +10984,7 @@ void fn_8012CA84(s32 playerIdx, f32* dirVec, f32* fwdVec) {
             if (playerIdx >= 0 && playerIdx < 2) {
                 rotH = htbl[playerIdx];
             }
-            obj = fn_800F9318(0, rotH);
+            obj = GSresGetResource(0, rotH);
             fn_800E3D6C(obj, rotation);
 
             heading = rotation[1];
@@ -11110,7 +11110,7 @@ void fn_8012CA84(s32 playerIdx, f32* dirVec, f32* fwdVec) {
     if (playerIdx >= 0 && playerIdx < 2) {
         finalHandle = htbl[playerIdx];
     }
-    obj = fn_800F9318(0, finalHandle);
+    obj = GSresGetResource(0, finalHandle);
     fn_8012C660(obj, playerIdx, turnAmount);
 }
 #endif
@@ -11123,7 +11123,7 @@ asm void fn_8012D2BC(void) {
 #else
 void fn_8012D2BC(u32 param) {
     extern u8 lbl_80426BD0[];
-    extern void* fn_800F9318(u32 a, u32 b);
+    extern void* GSresGetResource(u32 a, u32 b);
     extern void fn_800E3D6C(void* a, u32 b);
     s32 idx;
     u32 table[2];
@@ -11136,7 +11136,7 @@ void fn_8012D2BC(u32 param) {
     if (idx >= 0 && idx < 2) {
         val = table[idx];
     }
-    result = fn_800F9318(0, val);
+    result = GSresGetResource(0, val);
     fn_800E3D6C(result, param);
 }
 #endif
@@ -11149,7 +11149,7 @@ asm void fn_8012D32C(void) {
 #else
 void fn_8012D32C(u32 param) {
     extern u8 lbl_80426BD0[];
-    extern void* fn_800F9318(u32 a, u32 b);
+    extern void* GSresGetResource(u32 a, u32 b);
     extern void fn_800E3D98(void* a, u32 b);
     s32 idx;
     u32 table[2];
@@ -11162,7 +11162,7 @@ void fn_8012D32C(u32 param) {
     if (idx >= 0 && idx < 2) {
         val = table[idx];
     }
-    result = fn_800F9318(0, val);
+    result = GSresGetResource(0, val);
     fn_800E3D98(result, param);
 }
 #endif

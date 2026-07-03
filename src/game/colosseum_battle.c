@@ -162,7 +162,7 @@ u32  __GBASync(int r3);
 u32  __GBATransfer(int r3, u32 r4, u32 r5, u32 r6);
 
 /* Forward declarations for asm wrapper bl targets (use () form for compat) */
-extern void fn_800AE7E0();
+extern void DSPInit();
 extern void fn_800E01F4();
 extern int  _fadeEffectGetRandom__FUl();
 extern u32  fn_8011F520();
@@ -183,7 +183,7 @@ u32 fn_802600E4();
 u32 fn_802600E4();
 int fightTrainerAiWazaValueKuroikiri(void* ctx, u32 param1, u32 param2, u32 param3);
 void fightTrainerAiWazaValueHimitunotikara(void* ctx, u32 param1, u32 param2, u32 param3);
-void fn_8024E690(void* ctx, u32 param1, u32 param2, u32 param3);
+s32 fn_8024E690(void* ctx, u32 param1, u32 param2, u32 param3);
 u32 fightTrainerAiWazaHit045(void* trainerCtx, u32 trainerSlot, u32 resultSlot, u32 resultType);
 void fn_8026316C(void* ctx, u32 param1, u32 param2, u32 param3);
 
@@ -328,7 +328,7 @@ int fightTrainerAiWazaValueKuroikiri(void* ctx, u32 param1, u32 param2, u32 para
             bufD[5] = fn_802358AC(ctx, elem);
             bufD[6] = fn_802357CC(ctx, elem);
             for (j = 0; j < 7; j++) {
-                if (bufD[j] >= 0 && bufD[j] <= 2) { matched = 1; goto M3; }
+                if ((s32)(u8)bufD[j] >= 0 && (s32)(u8)bufD[j] <= 2) { matched = 1; goto M3; }
             }
             matched = 0;
         M3:
@@ -436,7 +436,7 @@ int fightTrainerAiWazaValueKuroikiri(void* ctx, u32 param1, u32 param2, u32 para
             bufH[5] = fn_802358AC(ctx, elem);
             bufH[6] = fn_802357CC(ctx, elem);
             for (j = 0; j < 7; j++) {
-                if (bufH[j] >= 0 && bufH[j] <= 2) { matched = 1; goto M7; }
+                if ((s32)(u8)bufH[j] >= 0 && (s32)(u8)bufH[j] <= 2) { matched = 1; goto M7; }
             }
             matched = 0;
         M7:
@@ -1544,7 +1544,7 @@ void fightTrainerAiWazaValueHimitunotikara(void* ctx, u32 param1, u32 param2, u3
  *   - Team state restoration (PP, status)
  * ========================================================================= */
 /* TODO: Decompile fn_8024E690 (4644 bytes) */
-void fn_8024E690(void* ctx, u32 param1, u32 param2, u32 param3) {
+s32 fn_8024E690(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u8 lbl_8027A434[];
     extern u32 lbl_80478B38;
     extern void fn_8000815C();
@@ -2806,7 +2806,7 @@ void fn_8026316C(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fn_80207760();
     extern void fn_8020E1A4();
     extern void fn_8020E204();
-    extern void fn_80263BC8();
+    extern u32 fn_80263BC8();
     extern void fn_80265924();
     u8 sp[0x50];
     u32 r0 = 0;
@@ -3543,6 +3543,306 @@ while (1) {
     r3 = 0x1;
 
     return;
+}
+
+/* Address: 0x80263BC8 | Size: 0x21C | Ghidra import */
+u32 fn_80263BC8(u32 r3, u32 r4, u32 r5, s32 mode)
+{
+    extern u8 fn_801FF1BC(u32, u32);
+    extern u8 fn_801F54A4(u32, u32, u32, u32);
+    extern void fn_80132A38(u32, u32);
+    extern void fn_80106394(u32, u32, u32);
+    extern void fn_801F000C(u32);
+    extern void fn_80106080(u32);
+    extern u8 fn_80264D58(u32, u32, u32);
+    extern u8 fn_80264488(u32, u32, u32);
+    extern s32 fn_80263DE4(u32, u32, u32, u32, u32);
+    extern void fn_8020505C(u32, u32, u32, u32, void *, s32);
+    extern char lbl_80375D30[];
+    u8 flag;
+    u32 result;
+
+    result = 0;
+    switch (mode) {
+    case 0:
+        flag = fn_801FF1BC(r4, 1);
+        if (flag == 1) {
+            fn_80132A38(0x11, r4);
+            fn_80106394(0x75fc, 1, 1);
+            fn_801F000C(0x40);
+            fn_80106080(0);
+        }
+        if (flag == 0) {
+            if (fn_80264D58(r3, r4, r5) == 0) {
+                result = 2;
+            }
+        }
+        break;
+    case 1:
+        if (fn_801F54A4(0, 0, 0x20, 0) == 0) {
+            fn_80106394(0x75f5, 1, 1);
+            fn_801F000C(0x40);
+            fn_80106080(0);
+            result = 2;
+        }
+        else if (fn_80264488(r3, r4, r5) == 0) {
+            result = 2;
+        }
+        break;
+    case 2:
+        r5 = fn_80263DE4(r3, r4, r5, 1, 1);
+        if ((s16)r5 < 0) {
+            flag = 0;
+        }
+        else {
+            fn_8020505C(r4, 0, 9, 0, lbl_80375D30, (s16)r5);
+            flag = 1;
+        }
+        if (flag == 0) {
+            result = 2;
+        }
+        break;
+    case 3:
+        if (fn_801F54A4(0, 0, 0x22, 0) == 1) {
+            fn_8020505C(r4, 0, 8, 0, lbl_80375D30, 0);
+        }
+        else if (fn_801F54A4(0, 0, 0x21, 0) == 1) {
+            fn_8020505C(r4, 0, 0xa, 0, lbl_80375D30, 0);
+        }
+        else {
+            result = 2;
+        }
+        break;
+    default:
+        result = 1;
+        break;
+    }
+    return result;
+}
+
+/* Address: 0x80263DE4 | Size: 0x6A4 | Ghidra import */
+s32 fn_80263DE4(u32 r3, u32 r4, u32 r5, u32 retry, u32 reopen)
+{
+    extern u16 fn_801EF634(void);
+    extern u8 fn_801F1700(u32);
+    extern u8 fn_801F1758(u32);
+    extern u8 fn_80265924(void);
+    extern u8 fn_801F18DC(u32);
+    extern u32 fn_801F02AC(u32, u32, u32);
+    extern u16 fightSideGetStatus(u32, u32, u32, u32);
+    extern u16 fn_801F0134(u32, u32);
+    extern void fn_801F0234(void);
+    extern s32 fn_801F0204(void);
+    extern void fn_801026A4(u32, u32, u32, u32, u32, u32, ...);
+    extern u8 fn_80102620(u32);
+    extern void fn_80102568(u32, u32, u32);
+    extern void fn_80261954(u32);
+    extern void fn_80261AD0(s8);
+    extern s32 fn_800114A4(u32, u32, u32, u32, u32);
+    extern void fn_801EFFC4(u32);
+    extern void fn_80011D9C(u32, u32);
+    extern s32 fn_801F93F8(u32, u32, u32);
+    extern u32 fn_801FB1C0(u32, u32, u32, u32);
+    extern u8 fn_80206A04(u32);
+    extern s16 fn_8012640C(u32, u32, u32, u32);
+    u32 ctx;
+    u32 actor;
+    u32 param;
+    s32 choice;
+    u32 msg;
+    u32 found;
+    u32 status;
+    u32 side;
+    s32 index;
+    u32 item;
+
+    ctx = r3;
+    actor = r4;
+    param = r5;
+    while (1) {
+        if ((u16)fn_801EF634() == 1) {
+            return -2;
+        }
+        if ((fn_801F1700(0) == 1) && (fn_80265924() == 1)) {
+            if ((u8)reopen == 0) {
+                return fn_801F93F8(ctx, actor, param);
+            }
+            if ((u8)retry != 0) {
+                return -1;
+            }
+            continue;
+        }
+        if ((fn_801F18DC(0) != 0) && ((u8)reopen == 0)) {
+            msg = 0x100;
+            found = fn_801F02AC(2, ctx, param);
+            if (found == 0) {
+                status = 0;
+            }
+            else {
+                side = fightSideGetStatus(found, 0, 5, 0);
+                if (fn_801F0134(ctx, param) == 0) {
+                    status = 0;
+                }
+                else {
+                    fn_801F0234();
+                    index = fn_801F0204();
+                    if (index < 0) {
+                        status = 0;
+                    }
+                    else {
+                        status = fightSideGetStatus(0, side, 2, index & 0xffff);
+                    }
+                }
+            }
+            switch (status) {
+            case 0xf1:
+                msg = 0x100;
+                break;
+            case 0xf2:
+                msg = 0x101;
+                break;
+            case 0xf3:
+                msg = 0x102;
+                break;
+            case 0xf4:
+                msg = 0x103;
+                break;
+            }
+            fn_801026A4(msg, 0, 0, 0, 0, 0);
+        }
+        if (fn_801F18DC(0) == 0) {
+            fn_80261954(1);
+        }
+        choice = fn_800114A4(ctx, actor, param, retry, fn_801F18DC(0));
+        fn_801EFFC4(0xa);
+        if ((fn_801F18DC(0) == 0) && ((u8)reopen == 1)) {
+            fn_80261AD0(1);
+            if ((actor != 0) && (fn_801F18DC(0) != 1)) {
+                found = fn_801F02AC(2, actor, param);
+                if (found == 0) {
+                    status = 0;
+                }
+                else {
+                    side = fightSideGetStatus(found, 0, 5, 0);
+                    if (fn_801F0134(actor, param) == 0) {
+                        status = 0;
+                    }
+                    else {
+                        fn_801F0234();
+                        index = fn_801F0204();
+                        if (index < 0) {
+                            status = 0;
+                        }
+                        else {
+                            status = fightSideGetStatus(0, side, 3, index & 0xffff);
+                        }
+                    }
+                }
+                fn_80011D9C(status, 1);
+            }
+        }
+        if ((fn_801F18DC(0) != 0) && ((u8)reopen == 0)) {
+            msg = 0x100;
+            found = fn_801F02AC(2, ctx, param);
+            if (found == 0) {
+                status = 0;
+            }
+            else {
+                side = fightSideGetStatus(found, 0, 5, 0);
+                if (fn_801F0134(ctx, param) == 0) {
+                    status = 0;
+                }
+                else {
+                    fn_801F0234();
+                    index = fn_801F0204();
+                    if (index < 0) {
+                        status = 0;
+                    }
+                    else {
+                        status = fightSideGetStatus(0, side, 2, index & 0xffff);
+                    }
+                }
+            }
+            switch (status) {
+            case 0xf1:
+                msg = 0x100;
+                break;
+            case 0xf2:
+                msg = 0x101;
+                break;
+            case 0xf3:
+                msg = 0x102;
+                break;
+            case 0xf4:
+                msg = 0x103;
+                break;
+            }
+            if (fn_80102620(msg) != 0) {
+                msg = 0x100;
+                found = fn_801F02AC(2, ctx, param);
+                if (found == 0) {
+                    status = 0;
+                }
+                else {
+                    side = fightSideGetStatus(found, 0, 5, 0);
+                    if (fn_801F0134(ctx, param) == 0) {
+                        status = 0;
+                    }
+                    else {
+                        fn_801F0234();
+                        index = fn_801F0204();
+                        if (index < 0) {
+                            status = 0;
+                        }
+                        else {
+                            status = fightSideGetStatus(0, side, 2, index & 0xffff);
+                        }
+                    }
+                }
+                switch (status) {
+                case 0xf1:
+                    msg = 0x100;
+                    break;
+                case 0xf2:
+                    msg = 0x101;
+                    break;
+                case 0xf3:
+                    msg = 0x102;
+                    break;
+                case 0xf4:
+                    msg = 0x103;
+                    break;
+                }
+                fn_80102568(msg, 0, 1);
+            }
+        }
+        if ((u16)fn_801EF634() == 1) {
+            return -2;
+        }
+        if ((fn_801F1700(0) == 1) && (fn_80265924() == 1) && (choice < 0)) {
+            if ((u8)reopen == 0) {
+                return fn_801F93F8(ctx, actor, param);
+            }
+            if ((u8)retry != 0) {
+                return -1;
+            }
+            continue;
+        }
+        if (choice < 0) {
+            if ((u8)retry == 0) {
+                continue;
+            }
+            return -1;
+        }
+        item = fn_801FB1C0(ctx, 0, 0x45, choice & 0xffff);
+        if (fn_80206A04(item) == 0) {
+            continue;
+        }
+        if (((u8)fn_8012640C(item, 0, 0xd2, 0)) == 1) {
+            continue;
+        }
+        return fn_8012640C(item, 0, 0xce, 0);
+    }
 }
 
 /* ===================================================================
@@ -5538,80 +5838,28 @@ void fightTrainerAiWazaValueKoukanKinsi(void* ctx, u32 param1, u32 param2, u32 p
 }
 
 /* Address: 0x80242648 | Size: 0xE8 (232 bytes) */
-void fightTrainerAiWazaValueKanasibari(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80205B8C();
-    extern void fn_80236520();
-    extern void fn_80236D60();
-    extern void fn_8023943C();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueKanasibari(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80236520(void*, u32);
+    extern s32 fn_80236D60(void*, u32, u32);
+    extern u8 fn_8023943C(void*, u32, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
+    u32 move;
 
-    r29 = r6;
-    r27 = r4;
-    r26 = r3;
-    r28 = r5;
-    r4 = r29;
-    r31 = 0x0;
-    fn_80236520();
-    r0 = r3;
-    r3 = r26;
-    r30 = r0;
-    r4 = r27;
-    r5 = r29;
-    fn_80236D60();
-    if ((s32)r3 > (s32)0x0) {
-        r0 = r30 & 0xFFFF;
-        if ((s32)r3 != (s32)0x0) {
-            if (r0 != (u32)0xffff) {
-                if (r0 != (u32)0x165) {
-                    if (r0 != (u32)0x163) {
-                        r3 = r26;
-                        r4 = r30;
-                        r5 = 0x1;
-                        fn_8023943C();
-                        r0 = r3 & 0xFF;
-                        if (r0 == (u32)0x1) {
-                            r4 = r26;
-                            r3 = 0x0;
-                            r5 = 0x19c;
-                            fn_80239984();
-                            r0 = r3;
-                            r3 = r27;
-                            r31 = r0;
-                            fn_80205B8C();
-                            r6 = (0x1 << 16);
-                            r5 = r3;
-                            r4 = r26;
-                            r8 = r28;
-                            r6 = 0x0;
-                            r7 = 0x0;
-                            r9 = 0x0;
-                            r10 = 0x19c;
-                            fn_80239EE8();
+    handle = 0;
+    move = fn_80236520(ctx, param3);
+    if (fn_80236D60(ctx, param1, param3) > 0) {
+        if ((move & 0xFFFF) != 0 && (move & 0xFFFF) != 0xFFFF && (move & 0xFFFF) != 0x165 &&
+            (move & 0xFFFF) != 0x163) {
+            if (fn_8023943C(ctx, move, 1) == 1) {
+                handle = fn_80239984(0, ctx, 0x19c);
+                fn_80239EE8(0xEC64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x19c);
+            }
+        }
     }
-    }
-    }
-    }
-    }
-    }
-    r3 = r31;
-    return;
+    return handle;
 }
 
 /* Address: 0x80242730 | Size: 0x170 (368 bytes) */
@@ -5725,94 +5973,31 @@ void fightTrainerAiWazaValueMitizure(void* ctx, u32 param1, u32 param2, u32 para
 }
 
 /* Address: 0x802428A0 | Size: 0x134 (308 bytes) */
-void fightTrainerAiWazaValueUrami(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80205B8C();
-    extern void fn_80236520();
-    extern void fn_80236D60();
-    extern void fn_802391E0();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueUrami(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80236520(void*, u32);
+    extern s32 fn_80236D60(void*, u32, u32);
+    extern u8 fn_802391E0(void*, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
+    u32 move;
+    u32 value;
 
-    r29 = r6;
-    r27 = r4;
-    r26 = r3;
-    r28 = r5;
-    r4 = r29;
-    r31 = 0x0;
-    fn_80236520();
-    r0 = r3 & 0xFFFF;
-    r30 = r3;
-    if ((s32)r0 == (s32)0) { r3 = r31; return; }
-    if (r0 == (u32)0xffff) { r3 = r31; return; }
-    if (r0 == (u32)0x165) { r3 = r31; return; }
-    if (r0 == (u32)0x163) { r3 = r31; return; }
-    r3 = r26;
-    r4 = r27;
-    r5 = r29;
-    fn_80236D60();
-    if ((s32)r3 <= (s32)0x0) { r3 = r31; return; }
-    r3 = r26;
-    r4 = r30;
-    fn_802391E0();
-    r0 = r3 & 0xFF;
-    if (r0 <= (u32)0x5) {
-        r4 = r26;
-        r3 = 0x0;
-        r5 = 0x197;
-        fn_80239984();
-        r0 = r3;
-        r3 = r27;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r26;
-        r8 = r28;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x197;
-        fn_80239EE8();
-        r3 = r31;
-        return;
+    handle = 0;
+    move = fn_80236520(ctx, param3);
+    if ((move & 0xFFFF) != 0 && (move & 0xFFFF) != 0xFFFF && (move & 0xFFFF) != 0x165 &&
+        (move & 0xFFFF) != 0x163 && fn_80236D60(ctx, param1, param3) > 0) {
+        value = fn_802391E0(ctx, move);
+        if ((value & 0xFF) <= 5) {
+            handle = fn_80239984(0, ctx, 0x197);
+            fn_80239EE8(0xEC64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x197);
+        } else if ((value & 0xFF) <= 0xa) {
+            handle = fn_80239984(0, ctx, 0x198);
+            fn_80239EE8(0xEC64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x198);
+        }
     }
-    if (r0 > (u32)0xa) { r3 = r31; return; }
-    r4 = r26;
-    r3 = 0x0;
-    r5 = 0x198;
-    fn_80239984();
-    r0 = r3;
-    r3 = r27;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r26;
-    r8 = r28;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x198;
-    fn_80239EE8();
-
-    r3 = r31;
-    return;
+    return handle;
 }
 
 /* Address: 0x802429D4 | Size: 0x17C (380 bytes) */
@@ -6042,135 +6227,47 @@ void fightTrainerAiWazaValueIbaru(void* ctx, u32 param1, u32 param2, u32 param3)
 }
 
 /* Address: 0x80242CCC | Size: 0xE4 (228 bytes) */
-void fightTrainerAiWazaValueAnkooru(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80205B8C();
-    extern void fn_802364BC();
-    extern void fn_80236D60();
-    extern void fn_8023943C();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueAnkooru(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_802364BC(void*, u32);
+    extern s32 fn_80236D60(void*, u32, u32);
+    extern u8 fn_8023943C(void*, u32, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
+    u32 move;
 
-    r29 = r6;
-    r27 = r4;
-    r26 = r3;
-    r28 = r5;
-    r4 = r29;
-    r31 = 0x0;
-    fn_802364BC();
-    r0 = r3;
-    r3 = r26;
-    r30 = r0;
-    r4 = r27;
-    r5 = r29;
-    fn_80236D60();
-    if ((s32)r3 > (s32)0x0) {
-        r0 = r30 & 0xFFFF;
-        if ((s32)r3 != (s32)0x0) {
-            if (r0 != (u32)0xffff) {
-                if (r0 != (u32)0x165) {
-                    if (r0 != (u32)0x163) {
-                        r3 = r26;
-                        r4 = r30;
-                        r5 = 0x1;
-                        fn_8023943C();
-                        r0 = r3 & 0xFF;
-                        if (r0 == (u32)0x163) {
-                            r4 = r26;
-                            r3 = 0x0;
-                            r5 = 0x190;
-                            fn_80239984();
-                            r0 = r3;
-                            r3 = r27;
-                            r31 = r0;
-                            fn_80205B8C();
-                            r6 = (0x1 << 16);
-                            r5 = r3;
-                            r4 = r26;
-                            r8 = r28;
-                            r6 = 0x0;
-                            r7 = 0x0;
-                            r9 = 0x0;
-                            r10 = 0x190;
-                            fn_80239EE8();
+    handle = 0;
+    move = fn_802364BC(ctx, param3);
+    if (fn_80236D60(ctx, param1, param3) > 0) {
+        if ((move & 0xFFFF) != 0 && (move & 0xFFFF) != 0xFFFF && (move & 0xFFFF) != 0x165 &&
+            (move & 0xFFFF) != 0x163) {
+            if (fn_8023943C(ctx, move, 1) == 0) {
+                handle = fn_80239984(0, ctx, 0x190);
+                fn_80239EE8(0xEC64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x190);
+            }
+        }
     }
-    }
-    }
-    }
-    }
-    }
-    r3 = r31;
-    return;
+    return handle;
 }
 
 /* Address: 0x80242DB0 | Size: 0x9C */
-void fightTrainerAiWazaValueIkarinomaeba(void* ctx, u32 param1, u32 param2) {
+u32 fightTrainerAiWazaValueIkarinomaeba(void* ctx, u32 param1, u32 param2, u32 extra) {
     extern f32 lbl_8047E630;
-    extern void fn_80205B8C();
-    extern void fn_802373B0();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f1 = 0.0f;
-    u32 r4 = param1;
-    u32 r5 = param2;
+    extern u32 fn_80205B8C(u32);
+    extern u8 fn_802373B0(void*, u32, s32, f32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
+    f32 threshold;
 
-    f1 = lbl_8047E630;
-    r29 = r4;
-    r30 = r5;
-    r28 = r3;
-    r4 = r6;
-    r31 = 0x0;
-    r5 = 0x1;
-    fn_802373B0();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r4 = r28;
-        r3 = 0x0;
-        r5 = 0x18f;
-        fn_80239984();
-        r0 = r3;
-        r3 = r29;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r28;
-        r8 = r30;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x18f;
-        fn_80239EE8();
+    threshold = lbl_8047E630;
+    handle = 0;
+    if (fn_802373B0(ctx, extra, 1, threshold) == 1) {
+        handle = fn_80239984(0, ctx, 0x18f);
+        fn_80239EE8(0xEC64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x18f);
     }
-    r3 = r31;
-    return;
+    return handle;
 }
 
 /* Address: 0x80242E4C | Size: 0x1A0 (416 bytes) */
@@ -6446,64 +6543,21 @@ u32 fightTrainerAiWazaValueSubayasaDaun(void* ctx, u32 param1, u32 param2, u32 p
 }
 
 /* Address: 0x802435D4 | Size: 0xB8 */
-void fightTrainerAiWazaValueGamusyara(void* ctx, u32 param1, u32 param2) {
-    extern void fn_801FB1C0();
-    extern void fn_80205B8C();
-    extern void fn_802376EC();
-    extern void fightTrainerAiAddValue();
-    extern void fn_80239CCC();
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
+u32 fightTrainerAiWazaValueGamusyara(void* ctx, u32 param1, u32 param2, u32 extra) {
+    extern u32 fn_801FB1C0(u32, u32, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_802376EC(void*, u32);
+    extern u32 fightTrainerAiAddValue(u32, u32);
+    extern void fn_80239CCC(u32, void*, u32, u32, u32, u32, u32, u32, u32);
+    u32 baseHp;
+    u32 handle;
 
-    r27 = r3;
-    r28 = r4;
-    r29 = r5;
-    r30 = r6;
-    fn_802376EC();
-    r31 = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_802376EC();
-    r3 = r3 & 0xFFFF;
-    r0 = r31 & 0xFFFF;
-    r30 = (s32)r3 / (s32)r0;
-    r3 = 0x0;
-    r4 = 0x180;
-    r5 = 0x3e;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r30 = r30 * r3;
-    r3 = 0x0;
-    r4 = r30;
-    fightTrainerAiAddValue();
-    r0 = r3;
-    r3 = r28;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r27;
-    r8 = r29;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x180;
-    fn_80239CCC();
-    r3 = r31;
-    return;
+    baseHp = fn_802376EC(ctx, param1);
+    extra = (s32)(fn_802376EC(ctx, extra) & 0xFFFF) / (s32)(baseHp & 0xFFFF);
+    extra *= fn_801FB1C0(0, 0x180, 0x3e, 0);
+    handle = fightTrainerAiAddValue(0, extra);
+    fn_80239CCC(0xEC64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x180, extra);
+    return handle;
 }
 
 /* Address: 0x8024368C | Size: 0x1AC (428 bytes) */
@@ -7395,56 +7449,19 @@ void fightTrainerAiWazaValueMiyaburu(void* ctx, u32 param1, u32 param2, u32 para
 }
 
 /* Address: 0x80244478 | Size: 0x9C */
-void fightTrainerAiWazaValueMajikkukooto(void* ctx, u32 param1, u32 param2) {
-    extern void fn_80205B8C();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
+u32 fightTrainerAiWazaValueMajikkukooto(void* ctx, u32 param1, u32 param2) {
+    extern u32 fn_8012640C(u32, u32, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
 
-    r6 = 0x0;
-    r29 = r4;
-    r28 = r3;
-    r30 = r5;
-    r31 = 0x0;
-    r3 = r29;
-    r4 = 0x0;
-    r5 = 0xed;
-    ((void(*)(void))fn_8012640C)();
-    r0 = r3 & 0xFFFF;
-    if ((s32)r0 != (s32)0) {
-        r4 = r28;
-        r3 = 0x0;
-        r5 = 0x166;
-        fn_80239984();
-        r0 = r3;
-        r3 = r29;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r28;
-        r8 = r30;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x166;
-        fn_80239EE8();
+    handle = 0;
+    if ((fn_8012640C(param1, 0, 0xed, 0) & 0xFFFF) != 0) {
+        handle = fn_80239984(0, ctx, 0x166);
+        fn_80239EE8(0xEC64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x166);
     }
-    r3 = r31;
-    return;
+    return handle;
 }
 
 /* Address: 0x80244514 | Size: 0x18C (396 bytes) */
@@ -7700,78 +7717,32 @@ void fightTrainerAiWazaValueKauntaa(void* ctx, u32 param1, u32 param2, u32 param
 }
 
 /* Address: 0x8024482C | Size: 0xD4 (212 bytes) */
-void fightTrainerAiWazaValueAroma(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1A6C();
-    extern void fn_80205B8C();
-    extern void fn_80238748();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x90];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r1 = (u32)sp;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueAroma(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_801F1A6C(u32, void*, u32*, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u8 fn_80238748(void*, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 list[23];
+    void* battleCtx = ctx;
+    u32 trainer = param1;
+    u32 sequenceArg = param2;
+    u32* listPtr;
+    u32 handle = 0;
+    u32 i;
+    u32 count;
 
-    r6 = 0x1;
-    r7 = 0x1;
-    r25 = r3;
-    r26 = r4;
-    r27 = r5;
-    r5 = (u32)sp + 0x8;
-    r4 = r25;
-    r29 = 0x0;
-    r3 = 0x0;
-    fn_801F1A6C();
-    r30 = (u32)sp + 0x8;
-    r31 = r3 & 0xFFFF;
-    r28 = 0x0;
-    while (1) {
-        r0 = r28 & 0xFFFF;
-        if (r0 >= (u32)r31) break;
-        r3 = r25;
-        r4 = *(u32*)(r30 + r0);
-        fn_80238748();
-        r0 = r3 & 0xFF;
-        if ((s32)r0 == (s32)0) {
-            r4 = r25;
-            r3 = 0x0;
-            r5 = 0x161;
-            fn_80239984();
-            r0 = r3;
-            r3 = r26;
-            r29 = r0;
-            fn_80205B8C();
-            r6 = (0x1 << 16);
-            r5 = r3;
-            r4 = r25;
-            r8 = r27;
-            r6 = 0x0;
-            r7 = 0x0;
-            r9 = 0x0;
-            r10 = 0x161;
-            fn_80239EE8();
-            r3 = r29;
-            return;
+    count = fn_801F1A6C(0, battleCtx, list, 1, 1);
+    listPtr = list;
+    count &= 0xFFFF;
+    for (i = 0; (u16)i < count; i++) {
+        if (fn_80238748(battleCtx, listPtr[(u16)i]) == 0) {
+            handle = fn_80239984(0, battleCtx, 0x161);
+            fn_80239EE8(0xEC64, battleCtx, fn_80205B8C(trainer), 0, 0, sequenceArg, 0, 0x161);
+            break;
         }
-        r28 = r28 + 0x1;
-
     }
-
-    r3 = r29;
-    return;
+    return handle;
 }
 
 /* Address: 0x80244900 | Size: 0x8C */
@@ -8726,57 +8697,22 @@ void fightTrainerAiWazaValueNemuru(void* ctx, u32 param1, u32 param2, u32 param3
 }
 
 /* Address: 0x80245718 | Size: 0x98 */
-void fightTrainerAiWazaValueKaihuku2(void* ctx, u32 param1, u32 param2) {
+u32 fightTrainerAiWazaValueKaihuku2(void* ctx, u32 param1, u32 param2) {
     extern f32 lbl_8047E630;
-    extern void fn_80205B8C();
-    extern void fn_802373B0();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f1 = 0.0f;
-    u32 r4 = param1;
-    u32 r5 = param2;
+    extern u32 fn_80205B8C(u32);
+    extern u8 fn_802373B0(void*, u32, s32, f32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
+    f32 threshold;
 
-    f1 = lbl_8047E630;
-    r30 = r5;
-    r28 = r3;
-    r29 = r4;
-    r31 = 0x0;
-    r5 = -0x1;
-    fn_802373B0();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r4 = r28;
-        r3 = 0x0;
-        r5 = 0x147;
-        fn_80239984();
-        r0 = r3;
-        r3 = r29;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r28;
-        r8 = r30;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x147;
-        fn_80239EE8();
+    threshold = lbl_8047E630;
+    handle = 0;
+    if (fn_802373B0(ctx, param1, -1, threshold) == 1) {
+        handle = fn_80239984(0, ctx, 0x147);
+        fn_80239EE8(0xEC64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x147);
     }
-    r3 = r31;
-    return;
+    return handle;
 }
 
 /* Address: 0x802457B0 | Size: 0x168 (360 bytes) */
@@ -9230,75 +9166,20 @@ s32 fightTrainerAiWazaValueItigekihissatu(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x802470C4 | Size: 0xEC (236 bytes) */
-void fightTrainerAiWazaValueZennouryokuappu(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1990();
-    extern void fn_80205B8C();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueZennouryokuappu(void* ctx, u32 slot, u32 param, u32 unused) {
+    extern u8 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
 
-    r28 = r3;
-    r29 = r4;
-    r30 = r5;
-    r3 = 0x0;
-    r4 = r28;
-    r5 = 0x133;
-    fn_80239984();
-    r0 = r3;
-    r3 = r29;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r28;
-    r8 = r30;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x133;
-    fn_80239EE8();
-    r4 = r28;
-    r8 = r29;
-    r3 = 0x0;
-    r5 = 0x1;
-    r6 = 0x1;
-    r7 = 0x10e;
-    fn_801F1990();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r28;
-        r5 = 0x134;
-        fn_80239984();
-        r0 = r3;
-        r3 = r29;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r28;
-        r8 = r30;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x134;
-        fn_80239EE8();
+    handle = fn_80239984(0, ctx, 0x133);
+    fn_80239EE8(0xEC64, ctx, fn_80205B8C(slot), 0, 0, param, 0, 0x133);
+    if (fn_801F1990(0, ctx, 1, 1, 0x10e, slot) == 1) {
+        handle = fn_80239984(handle, ctx, 0x134);
+        fn_80239EE8(0xEC64, ctx, fn_80205B8C(slot), 0, 0, param, 0, 0x134);
     }
-    r3 = r31;
-    return;
+    return handle;
 }
 
 /* Address: 0x802471B0 | Size: 0x128 (296 bytes) */
@@ -9335,165 +9216,45 @@ u32 fightTrainerAiWazaValueTuikaKougekiAppu(void* ctx, u32 param1, u32 param2, u
 }
 
 /* Address: 0x802472D8 | Size: 0xDC (220 bytes) */
-void fightTrainerAiWazaValueHaganenotubasa(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80205B8C();
-    extern void fn_80235A3C();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueHaganenotubasa(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_80205B8C(u32);
+    extern u8 fn_80235A3C(void*, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
 
-    r28 = r3;
-    r29 = r4;
-    r30 = r5;
-    r3 = 0x0;
-    r4 = r28;
-    r5 = 0x12f;
-    fn_80239984();
-    r0 = r3;
-    r3 = r29;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r28;
-    r8 = r30;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x12f;
-    fn_80239EE8();
-    r3 = r28;
-    r4 = r29;
-    fn_80235A3C();
-    r0 = r3 & 0xFF;
-    if (r0 >= (u32)0xc) {
-        r3 = r31;
-        r4 = r28;
-        r5 = 0x130;
-        fn_80239984();
-        r0 = r3;
-        r3 = r29;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r28;
-        r8 = r30;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x130;
-        fn_80239EE8();
+    handle = fn_80239984(0, ctx, 0x12f);
+    fn_80239EE8(0xEC64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x12f);
+    if (fn_80235A3C(ctx, param1) >= 0xc) {
+        handle = fn_80239984(handle, ctx, 0x130);
+        fn_80239EE8(0xEC64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x130);
     }
-    r3 = r31;
-    return;
+    return handle;
 }
 
 /* Address: 0x802473B4 | Size: 0x144 (324 bytes) */
-void fn_802473B4(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1990();
-    extern void fn_80205B8C();
-    extern void fn_8023831C();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fn_802473B4(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u8 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_8023831C(void*);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    void* battleCtx = ctx;
+    u32 trainer = param1;
+    u32 sequenceArg = param2;
+    u32 handle = 0;
 
-    r28 = r3;
-    r29 = r4;
-    r30 = r5;
-    r31 = 0x0;
-    fn_8023831C();
-    r0 = r3 & 0xFFFF;
-    if (r0 == (u32)0x17) {
-        r4 = r28;
-        r3 = 0x0;
-        r5 = 0x12c;
-        fn_80239984();
-        r0 = r3;
-        r3 = r29;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r28;
-        r8 = r30;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x12c;
-        fn_80239EE8();
+    if ((fn_8023831C(battleCtx) & 0xFFFF) == 0x17) {
+        handle = fn_80239984(0, battleCtx, 0x12c);
+        fn_80239EE8(0xEC64, battleCtx, fn_80205B8C(trainer), 0, 0, sequenceArg, 0, 0x12c);
     }
-    r4 = r28;
-    r8 = r29;
-    r3 = 0x0;
-    r5 = 0x1;
-    r6 = 0x1;
-    r7 = 0x10e;
-    fn_801F1990();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r28;
-        r5 = 0x12d;
-        fn_80239984();
-        r0 = r3;
-        r3 = r29;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r28;
-        r8 = r30;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x12d;
-        fn_80239EE8();
+    if (fn_801F1990(0, battleCtx, 1, 1, 0x10e, trainer) == 1) {
+        handle = fn_80239984(handle, battleCtx, 0x12d);
+        fn_80239EE8(0xEC64, battleCtx, fn_80205B8C(trainer), 0, 0, sequenceArg, 0, 0x12d);
     }
-    r3 = r31;
-    r4 = r28;
-    r5 = 0x12e;
-    fn_80239984();
-    r31 = r3;
-    r3 = r29;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r28;
-    r8 = r30;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x12e;
-    fn_80239EE8();
-    r3 = r31;
-    return;
+    handle = fn_80239984(handle, battleCtx, 0x12e);
+    fn_80239EE8(0xEC64, battleCtx, fn_80205B8C(trainer), 0, 0, sequenceArg, 0, 0x12e);
+    return handle;
 }
 
 /* Address: 0x802474F8 | Size: 0x1A8 (424 bytes) */
@@ -9638,111 +9399,42 @@ s32 fightTrainerAiWazaValueHatakiotosu(void* ctx, void* param1, u32 param2, u32 
 }
 
 /* Address: 0x802477B0 | Size: 0x158 (344 bytes) */
-void fightTrainerAiWazaValueDouguUbau(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80142984();
-    extern void fn_80205B8C();
-    extern void fn_80216048();
-    extern void fn_80237F74();
-    extern void fn_802383A4();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r24 = 0;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueDouguUbau(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u8 fn_80142984(u32);
+    extern u32 fn_80205B8C(u32);
+    extern u8 fn_80216048(u32);
+    extern u8 fn_80237F74(void*, u32, u32);
+    extern u32 fn_802383A4();
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    void* battleCtx = ctx;
+    u32 trainer = param1;
+    u32 sequenceArg = param2;
+    u32 target = param3;
+    u32 handle = 0;
+    u8 canSteal;
+    u32 targetItem;
+    u32 ownItem;
 
-    r29 = r3;
-    r30 = r4;
-    r31 = r5;
-    r24 = r6;
-    r27 = 0x0;
-    fn_802383A4();
-    r28 = r3;
-    r3 = r29;
-    r4 = r24;
-    fn_802383A4();
-    r0 = r3;
-    r3 = r30;
-    r25 = r0;
-    r26 = 0x1;
-    fn_80216048();
-    r0 = r3 & 0xFF;
-    if ((s32)r0 == (s32)0) {
-        r26 = 0x0;
+    ownItem = fn_802383A4(battleCtx);
+    targetItem = fn_802383A4(battleCtx, target);
+    canSteal = 1;
+    if (fn_80216048(trainer) == 0) {
+        canSteal = 0;
     }
-    r0 = r28 & 0xFFFF;
-    if ((s32)r0 == (s32)0) {
-        r0 = r25 & 0xFFFF;
-        if (r0 != (u32)0xaf && r0 != (u32)0x0) {
-
-            r3 = r25;
-            fn_80142984();
-            r0 = r3 & 0xFF;
-            if (r0 == (u32)0x0) {
-        }
-        }
-        r26 = 0x0;
-            }
-    r0 = r26 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r4 = r29;
-        r3 = 0x0;
-        r5 = 0x124;
-        fn_80239984();
-        r0 = r3;
-        r3 = r30;
-        r27 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r29;
-        r8 = r31;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x124;
-        fn_80239EE8();
+    if ((ownItem & 0xFFFF) != 0 || (targetItem & 0xFFFF) == 0xAF || (targetItem & 0xFFFF) == 0 ||
+        fn_80142984(targetItem) == 0) {
+        canSteal = 0;
     }
-    r3 = r29;
-    r4 = r24;
-    r5 = 0x3c;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r27;
-        r4 = r29;
-        r5 = 0x125;
-        fn_80239984();
-        r0 = r3;
-        r3 = r30;
-        r27 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r29;
-        r8 = r31;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x125;
-        fn_80239EE8();
+    if (canSteal == 1) {
+        handle = fn_80239984(0, battleCtx, 0x124);
+        fn_80239EE8(0xEC64, battleCtx, fn_80205B8C(trainer), 0, 0, sequenceArg, 0, 0x124);
     }
-    r3 = r27;
-    return;
+    if (fn_80237F74(battleCtx, target, 0x3c) == 1) {
+        handle = fn_80239984(handle, battleCtx, 0x125);
+        fn_80239EE8(0xEC64, battleCtx, fn_80205B8C(trainer), 0, 0, sequenceArg, 0, 0x125);
+    }
+    return handle;
 }
 
 /* Address: 0x80247908 | Size: 0x1C0 (448 bytes) */
@@ -13360,69 +13052,21 @@ void fightTrainerAiWazaValueNekodamasi(void* ctx, u32 param1, u32 param2, u32 pa
 }
 
 /* Address: 0x8024AEF0 | Size: 0xD4 (212 bytes) */
-void fightTrainerAiWazaValueGoddobaado(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80205B8C();
-    extern void fn_80236D60();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueGoddobaado(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_80205B8C(u32);
+    extern s32 fn_80236D60(void*, u32, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
 
-    r30 = r5;
-    r28 = r3;
-    r29 = r4;
-    r5 = r6;
-    r31 = 0x0;
-    fn_80236D60();
-    if ((s32)r3 > (s32)0x0) {
-        r4 = r28;
-        r3 = 0x0;
-        r5 = 0xbb;
-        fn_80239984();
-        r0 = r3;
-        r3 = r29;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r28;
-        r8 = r30;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xbb;
-        fn_80239EE8();
+    handle = 0;
+    if (fn_80236D60(ctx, param1, param3) > 0) {
+        handle = fn_80239984(0, ctx, 0xbb);
+        fn_80239EE8(0xEC64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xbb);
     }
-    r3 = r31;
-    r4 = r28;
-    r5 = 0xbc;
-    fn_80239984();
-    r31 = r3;
-    r3 = r29;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r28;
-    r8 = r30;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0xbc;
-    fn_80239EE8();
-    r3 = r31;
-    return;
+    handle = fn_80239984(handle, ctx, 0xbc);
+    fn_80239EE8(0xEC64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xbc);
+    return handle;
 }
 
 /* Address: 0x8024AFC4 | Size: 0x4B0 (1200 bytes) */
@@ -16190,123 +15834,31 @@ u32 fightTrainerAiWazaValueKyuusyuu(void* ctx, u32 param1, u32 param2, u32 param
 }
 
 /* Address: 0x8024DAFC | Size: 0xC0 */
-void fightTrainerAiWazaValueRokettoZutuki(void* ctx, u32 param1, u32 param2) {
-    extern void fn_80205B8C();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
+u32 fightTrainerAiWazaValueRokettoZutuki(void* ctx, u32 slot, u32 param) {
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
 
-    r28 = r3;
-    r29 = r4;
-    r30 = r5;
-    r3 = 0x0;
-    r4 = r28;
-    r5 = 0x61;
-    fn_80239984();
-    r0 = r3;
-    r3 = r29;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r28;
-    r8 = r30;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x61;
-    fn_80239EE8();
-    r3 = r31;
-    r4 = r28;
-    r5 = 0x62;
-    fn_80239984();
-    r31 = r3;
-    r3 = r29;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r28;
-    r8 = r30;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x62;
-    fn_80239EE8();
-    r3 = r31;
-    return;
+    handle = fn_80239984(0, ctx, 0x61);
+    fn_80239EE8(0xEC64, ctx, fn_80205B8C(slot), 0, 0, param, 0, 0x61);
+    handle = fn_80239984(handle, ctx, 0x62);
+    fn_80239EE8(0xEC64, ctx, fn_80205B8C(slot), 0, 0, param, 0, 0x62);
+    return handle;
 }
 
 /* Address: 0x8024DBBC | Size: 0xC0 */
-void fightTrainerAiWazaValueKamaitati(void* ctx, u32 param1, u32 param2) {
-    extern void fn_80205B8C();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
+u32 fightTrainerAiWazaValueKamaitati(void* ctx, u32 slot, u32 param) {
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
 
-    r28 = r3;
-    r29 = r4;
-    r30 = r5;
-    r3 = 0x0;
-    r4 = r28;
-    r5 = 0x5f;
-    fn_80239984();
-    r0 = r3;
-    r3 = r29;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r28;
-    r8 = r30;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x5f;
-    fn_80239EE8();
-    r3 = r31;
-    r4 = r28;
-    r5 = 0x60;
-    fn_80239984();
-    r31 = r3;
-    r3 = r29;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r28;
-    r8 = r30;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x60;
-    fn_80239EE8();
-    r3 = r31;
-    return;
+    handle = fn_80239984(0, ctx, 0x5f);
+    fn_80239EE8(0xEC64, ctx, fn_80205B8C(slot), 0, 0, param, 0, 0x5f);
+    handle = fn_80239984(handle, ctx, 0x60);
+    fn_80239EE8(0xEC64, ctx, fn_80205B8C(slot), 0, 0, param, 0, 0x60);
+    return handle;
 }
 
 /* Address: 0x8024DC7C | Size: 0x210 (528 bytes) */
@@ -16462,175 +16014,53 @@ void fightTrainerAiWazaValueKiaipanti(void* ctx, u32 param1, u32 param2, u32 par
 }
 
 /* Address: 0x8024DE8C | Size: 0x138 (312 bytes) */
-void fightTrainerAiWazaValueAteminage(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80205B8C();
-    extern void fn_802357CC();
-    extern void fn_802358AC();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueAteminage(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_80205B8C(u32);
+    extern u8 fn_802357CC(void*, u32);
+    extern u8 fn_802358AC(void*, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    void* battleCtx = ctx;
+    u32 trainer = param1;
+    u32 sequenceArg = param2;
+    u32 handle = 0;
 
-    r29 = r4;
-    r28 = r3;
-    r30 = r5;
-    r4 = r6;
-    r31 = 0x0;
-    fn_802357CC();
-    r0 = r3 & 0xFF;
-    if (r0 > (u32)0x6) {
-        r4 = r28;
-        r3 = 0x0;
-        r5 = 0x58;
-        fn_80239984();
-        r0 = r3;
-        r3 = r29;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r28;
-        r8 = r30;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x58;
-        fn_80239EE8();
+    if (fn_802357CC(battleCtx, param3) > 6U) {
+        handle = fn_80239984(0, battleCtx, 0x58);
+        fn_80239EE8(0xEC64, battleCtx, fn_80205B8C(trainer), 0, 0, sequenceArg, 0, 0x58);
     }
-    r3 = r28;
-    r4 = r29;
-    fn_802358AC();
-    r0 = r3 & 0xFF;
-    if (r0 < (u32)0x6) {
-        r3 = r31;
-        r4 = r28;
-        r5 = 0x59;
-        fn_80239984();
-        r0 = r3;
-        r3 = r29;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r28;
-        r8 = r30;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x59;
-        fn_80239EE8();
+    if (fn_802358AC(battleCtx, trainer) < 6U) {
+        handle = fn_80239984(handle, battleCtx, 0x59);
+        fn_80239EE8(0xEC64, battleCtx, fn_80205B8C(trainer), 0, 0, sequenceArg, 0, 0x59);
     }
-    r3 = r31;
-    r4 = r28;
-    r5 = 0x5a;
-    fn_80239984();
-    r31 = r3;
-    r3 = r29;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r28;
-    r8 = r30;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x5a;
-    fn_80239EE8();
-    r3 = r31;
-    return;
+    handle = fn_80239984(handle, battleCtx, 0x5a);
+    fn_80239EE8(0xEC64, battleCtx, fn_80205B8C(trainer), 0, 0, sequenceArg, 0, 0x5a);
+    return handle;
 }
 
 /* Address: 0x8024DFC4 | Size: 0x108 (264 bytes) */
-void fightTrainerAiWazaValueRibenji(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80205B8C();
-    extern void fn_80236520();
-    extern void fn_8023943C();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueRibenji(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80236520(void*, u32);
+    extern u8 fn_8023943C(void*, u32, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    void* battleCtx = ctx;
+    u32 trainer = param1;
+    u32 sequenceArg = param2;
+    u32 handle = 0;
+    u32 move = fn_80236520(battleCtx, param3);
 
-    r29 = r4;
-    r28 = r3;
-    r30 = r5;
-    r4 = r6;
-    r31 = 0x0;
-    fn_80236520();
-    r0 = r3 & 0xFFFF;
-    r4 = r3;
-    if ((s32)r0 != (s32)0) {
-        if (r0 != (u32)0xffff) {
-            if (r0 != (u32)0x165) {
-                if (r0 != (u32)0x163) {
-                    r3 = r28;
-                    r5 = 0x1;
-                    fn_8023943C();
-                    r0 = r3 & 0xFF;
-                    if (r0 == (u32)0x1) {
-                        r4 = r28;
-                        r3 = 0x0;
-                        r5 = 0x56;
-                        fn_80239984();
-                        r0 = r3;
-                        r3 = r29;
-                        r31 = r0;
-                        fn_80205B8C();
-                        r6 = (0x1 << 16);
-                        r5 = r3;
-                        r4 = r28;
-                        r8 = r30;
-                        r6 = 0x0;
-                        r7 = 0x0;
-                        r9 = 0x0;
-                        r10 = 0x56;
-                        fn_80239EE8();
+    if ((move & 0xFFFF) != 0 && (move & 0xFFFF) != 0xFFFF && (move & 0xFFFF) != 0x165 &&
+        (move & 0xFFFF) != 0x163) {
+        if (fn_8023943C(battleCtx, move, 1) == 1) {
+            handle = fn_80239984(0, battleCtx, 0x56);
+            fn_80239EE8(0xEC64, battleCtx, fn_80205B8C(trainer), 0, 0, sequenceArg, 0, 0x56);
+        }
     }
-    }
-    }
-    }
-    }
-    r3 = r31;
-    r4 = r28;
-    r5 = 0x57;
-    fn_80239984();
-    r31 = r3;
-    r3 = r29;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r28;
-    r8 = r30;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x57;
-    fn_80239EE8();
-    r3 = r31;
-    return;
+    handle = fn_80239984(handle, battleCtx, 0x57);
+    fn_80239EE8(0xEC64, battleCtx, fn_80205B8C(trainer), 0, 0, sequenceArg, 0, 0x57);
+    return handle;
 }
 
 /* Address: 0x8024E0CC | Size: 0x7C | Pattern: field_accessor */
@@ -16646,147 +16076,37 @@ u32 fightTrainerAiWazaValueTokubetuYuusen(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x8024E148 | Size: 0xEC (236 bytes) */
-void fightTrainerAiWazaValueKouPuraioritii(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1990();
-    extern void fn_80205B8C();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueKouPuraioritii(void* ctx, u32 slot, u32 param, u32 unused) {
+    extern u8 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
 
-    r28 = r3;
-    r29 = r4;
-    r30 = r5;
-    r3 = 0x0;
-    r4 = r28;
-    r5 = 0x53;
-    fn_80239984();
-    r0 = r3;
-    r3 = r29;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r28;
-    r8 = r30;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x53;
-    fn_80239EE8();
-    r4 = r28;
-    r8 = r29;
-    r3 = 0x0;
-    r5 = 0x1;
-    r6 = 0x1;
-    r7 = 0x10e;
-    fn_801F1990();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r28;
-        r5 = 0x54;
-        fn_80239984();
-        r0 = r3;
-        r3 = r29;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r28;
-        r8 = r30;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x54;
-        fn_80239EE8();
+    handle = fn_80239984(0, ctx, 0x53);
+    fn_80239EE8(0xEC64, ctx, fn_80205B8C(slot), 0, 0, param, 0, 0x53);
+    if (fn_801F1990(0, ctx, 1, 1, 0x10e, slot) == 1) {
+        handle = fn_80239984(handle, ctx, 0x54);
+        fn_80239EE8(0xEC64, ctx, fn_80205B8C(slot), 0, 0, param, 0, 0x54);
     }
-    r3 = r31;
-    return;
+    return handle;
 }
 
 /* Address: 0x8024E234 | Size: 0xEC (236 bytes) */
-void fn_8024E234(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1990();
-    extern void fn_80205B8C();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fn_8024E234(void* ctx, u32 slot, u32 param, u32 unused) {
+    extern u8 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
 
-    r28 = r3;
-    r29 = r4;
-    r30 = r5;
-    r3 = 0x0;
-    r4 = r28;
-    r5 = 0x51;
-    fn_80239984();
-    r0 = r3;
-    r3 = r29;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r28;
-    r8 = r30;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x51;
-    fn_80239EE8();
-    r4 = r28;
-    r8 = r29;
-    r3 = 0x0;
-    r5 = 0x1;
-    r6 = 0x1;
-    r7 = 0x10e;
-    fn_801F1990();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r28;
-        r5 = 0x52;
-        fn_80239984();
-        r0 = r3;
-        r3 = r29;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r28;
-        r8 = r30;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x52;
-        fn_80239EE8();
+    handle = fn_80239984(0, ctx, 0x51);
+    fn_80239EE8(0xEC64, ctx, fn_80205B8C(slot), 0, 0, param, 0, 0x51);
+    if (fn_801F1990(0, ctx, 1, 1, 0x10e, slot) == 1) {
+        handle = fn_80239984(handle, ctx, 0x52);
+        fn_80239EE8(0xEC64, ctx, fn_80205B8C(slot), 0, 0, param, 0, 0x52);
     }
-    r3 = r31;
-    return;
+    return handle;
 }
 
 /* Address: 0x8024E320 | Size: 0x164 (356 bytes) */
@@ -16818,59 +16138,19 @@ u32 fightTrainerAiWazaValueHittyuu(void* ctx, u32 param1, u32 param2, u32 param3
 }
 
 /* Address: 0x8024E484 | Size: 0xA8 */
-void fightTrainerAiWazaValueTuujouIryoku(void* ctx, u32 param1, u32 param2) {
-    extern void fn_801F1990();
-    extern void fn_80205B8C();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
+u32 fightTrainerAiWazaValueTuujouIryoku(void* ctx, u32 slot, u32 param) {
+    extern u8 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
 
-    r6 = 0x1;
-    r7 = 0x10e;
-    r28 = r3;
-    r29 = r4;
-    r30 = r5;
-    r31 = 0x0;
-    r4 = r28;
-    r8 = r29;
-    r3 = 0x0;
-    r5 = 0x1;
-    fn_801F1990();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r4 = r28;
-        r3 = 0x0;
-        r5 = 0x4d;
-        fn_80239984();
-        r0 = r3;
-        r3 = r29;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r28;
-        r8 = r30;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x4d;
-        fn_80239EE8();
+    handle = 0;
+    if (fn_801F1990(0, ctx, 1, 1, 0x10e, slot) == 1) {
+        handle = fn_80239984(0, ctx, 0x4d);
+        fn_80239EE8(0xEC64, ctx, fn_80205B8C(slot), 0, 0, param, 0, 0x4d);
     }
-    r3 = r31;
-    return;
+    return handle;
 }
 
 /* Address: 0x8024E534 | Size: 0x44 | Pattern: field_accessor */
@@ -16888,7 +16168,7 @@ void fn_8024E578(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fn_8020505C();
     extern void fn_80205B8C();
     extern void fn_8023A118();
-    extern void fn_8024E690();
+    extern s32 fn_8024E690();
     extern void fn_8024F8B4();
     u8 sp[0x30];
     u32 r0 = 0;
@@ -17374,7 +16654,7 @@ void fn_8024F8B4(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x8024FE80 | Size: 0x1F0 (496 bytes) */
-void fn_8024FE80(void* ctx, u32 param1, u32 param2, u32 param3) {
+void fightTrainerAiGetFightPokemonIrekaeDasuTokuseiAddsubDataId(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u8 lbl_8027A420[];
     extern void fn_801F1C18();
     extern void fn_80235B04();
@@ -18081,97 +17361,45 @@ u32 fightTrainerAiWazaDamage204(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x80250B44 | Size: 0x78 | Pattern: field_accessor */
-void fightTrainerAiWazaDamage203(void* ctx, u32 slot, u32 param) {
-    extern void fn_80211170();
-    extern void fn_80235B04();
-    extern void fn_80250BBC();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = slot;
-    u32 r5 = param;
+u32 fightTrainerAiWazaDamage203(void* ctx, u32 slot, u32 param, u32 extra) {
+    extern u32 fn_80211170(void*, u32, u32, u32, u32, u32, void*, u32);
+    extern u8 fn_80235B04(void*, u32, u32);
+    extern void fn_80250BBC(void*, u32, u32);
+    u32 damage;
+    u8 boost;
 
-    r28 = r4;
-    r29 = r5;
-    r27 = r3;
-    r30 = r6;
-    r4 = 0x0;
-    r5 = 0x1;
-    fn_80235B04();
-    r4 = (u32)fn_80250BBC;
-    r31 = r3;
-    r9 = (u32)fn_80250BBC;
-    r3 = r27;
-    r4 = r29;
-    r5 = r28;
-    r6 = r30;
-    r7 = 0x0;
-    r8 = 0x0;
-    r10 = 0x0;
-    fn_80211170();
-    r0 = r31 & 0xFF;
-    if ((s32)r0 != (s32)0) {
-        r3 = r3 << 1;
+    boost = fn_80235B04(ctx, 0, 1);
+    damage = fn_80211170(ctx, param, slot, extra, 0, 0, fn_80250BBC, 0);
+    if (boost != 0) {
+        damage <<= 1;
     }
-    return;
+    return damage;
 }
 
 /* Address: 0x80250BBC | Size: 0xA8 */
-void fn_80250BBC(void* ctx, u32 param1, u32 param2) {
-    extern void fn_8011BBD8();
-    extern void fn_80235B04();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
+u32 fn_80250BBC(void* ctx, u32 param1, u32 param2) {
+    extern u32 fn_8011BBD8(u32, u32, u32, u32, u32);
+    extern u32 fn_8012640C(u32, u32, u32, u32);
+    extern u32 fn_80235B04(void*, u32, u32);
+    u32 value;
+    u32 status;
+    u32 mapped;
 
-    r4 = 0x0;
-    r30 = r5;
-    r5 = 0x1;
-    fn_80235B04();
-    r31 = r3;
-    r3 = r30;
-    r4 = 0x0;
-    r5 = 0xd9;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    r0 = r31 & 0xFF;
-    if (r0 == (u32)0x2) {
-        r0 = 0xb;
-
-    } else if (r0 == (u32)0x3) {
-        r0 = 0x5;
-
-    } else if (r0 == (u32)0x1) {
-        r0 = 0xa;
-
-    } else if (r0 == (u32)0x4) {
-        r0 = 0xf;
-
+    status = fn_80235B04(ctx, 0, 1);
+    value = fn_8012640C(param2, 0, 0xd9, 0);
+    status = status & 0xFF;
+    if (status == 2) {
+        mapped = 0xb;
+    } else if (status == 3) {
+        mapped = 5;
+    } else if (status == 1) {
+        mapped = 0xa;
+    } else if (status == 4) {
+        mapped = 0xf;
     } else {
-        r0 = 0x0;
+        mapped = 0;
     }
-    r7 = r0 & 0xFFFF;
-    r4 = 0x0;
-    r5 = 0x30;
-    r6 = 0x0;
-    fn_8011BBD8();
-    return;
+    return fn_8011BBD8(value, 0, 0x30, 0, mapped & 0xFFFF);
 }
 
 /* Address: 0x80250C64 | Size: 0x84 | Pattern: field_accessor */
@@ -18265,88 +17493,38 @@ u32 fightTrainerAiWazaDamage190(u32 r3, u32 r4, u32 r5, u32 r6)
 
 /* Address: 0x80250FBC | Size: 0xB4 */
 void fn_80250FBC(void* ctx, u32 param1, u32 param2) {
-    extern void fn_8011BBD8();
-    extern void fn_8011BEB4();
-    extern void fn_80237664();
-    extern void fn_802376EC();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
+    extern void fn_8011BBD8(u32, u32, u32, u32, u32);
+    extern u32 fn_8011BEB4(u32, u32, u32, u32);
+    extern u32 fn_8012640C(u32, u32, u32, u32);
+    extern u32 fn_80237664(void*, u32);
+    extern u32 fn_802376EC(void*, u32);
+    u32 value;
+    u32 current;
+    u32 maximum;
+    u16 amount;
 
-    r4 = 0x0;
-    r6 = 0x0;
-    r31 = r5;
-    r28 = r3;
-    r5 = 0xd9;
-    r3 = r31;
-    ((void(*)(void))fn_8012640C)();
-    r0 = r3;
-    r3 = r28;
-    r29 = r0;
-    r4 = r31;
-    fn_802376EC();
-    r30 = r3;
-    r3 = r28;
-    r4 = r31;
-    fn_80237664();
-    r31 = r3;
-    r3 = r29;
-    r4 = 0x0;
-    r5 = 0x2f;
-    r6 = 0x0;
-    fn_8011BEB4();
-    r3 = r3 & 0xFFFF;
-    r0 = r30 & 0xFFFF;
-    r3 = r3 * r0;
-    r0 = r31 & 0xFFFF;
-    r0 = (s32)r3 / (s32)r0;
-    r0 = r0 & 0xFFFF;
-    if ((s32)r0 == (s32)0) {
-        r0 = 0x1;
+    value = fn_8012640C(param2, 0, 0xd9, 0);
+    current = fn_802376EC(ctx, param2);
+    maximum = fn_80237664(ctx, param2);
+    amount = fn_8011BEB4(value, 0, 0x2f, 0);
+    amount = (s32)(amount * (current & 0xFFFF)) / (s32)(maximum & 0xFFFF);
+    if (amount == 0) {
+        amount = 1;
     }
-    r3 = r29;
-    r7 = r0 & 0xFFFF;
-    r4 = 0x0;
-    r5 = 0x2f;
-    r6 = 0x0;
-    fn_8011BBD8();
-    return;
+    fn_8011BBD8(value, 0, 0x2f, 0, amount);
 }
 
 /* Address: 0x80251070 | Size: 0x5C | Pattern: field_accessor */
-void fightTrainerAiWazaDamage189(void* ctx, u32 slot, u32 param) {
-    extern void fn_802376EC();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = slot;
+u32 fightTrainerAiWazaDamage189(void* ctx, u32 slot, u32 param, u32 arg3) {
+    extern u32 fn_802376EC(void*, u32);
+    u32 first;
+    u32 second;
+    u32 diff;
 
-    r29 = r3;
-    r30 = r6;
-    fn_802376EC();
-    r31 = r3 & 0xFFFF;
-    r3 = r29;
-    r4 = r30;
-    fn_802376EC();
-    r0 = r3 & 0xFFFF;
-    r3 = r31 - r0;
-    r0 = r0 - r31;
-    r3 = r3 + r4;
-    r3 = r3 - r3; /* -borrow */;
-    r3 = r0 & ~r3;
-    return;
+    first = fn_802376EC(ctx, slot) & 0xffff;
+    second = fn_802376EC(ctx, arg3) & 0xffff;
+    diff = second - first;
+    return diff & -(second > first);
 }
 
 /* Address: 0x802510CC | Size: 0x84 | Pattern: field_accessor */
@@ -18389,60 +17567,23 @@ u32 fightTrainerAiWazaDamage182(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x802512A4 | Size: 0xAC */
-void fightTrainerAiWazaDamage173(void* ctx, u32 param1, u32 param2) {
-    extern void fn_8011BEB4();
-    extern void fn_801363E8();
-    extern void fn_801F54A4();
-    extern void fn_8023C370();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
+u32 fightTrainerAiWazaDamage173(void* ctx, u32 slot, u32 param, u32 extra) {
+    extern u32 fn_8011BEB4(u32, u32, u32, u32);
+    extern u32 fn_801363E8(u32);
+    extern u32 fn_801F54A4(u32, u32, u32, u32);
+    extern u32 fn_8023C370(void*, u32, u32, u32, u32);
+    u32 paramType;
+    u32 other;
+    u32 otherType;
 
-    r27 = r3;
-    r28 = r4;
-    r30 = r5;
-    r29 = r6;
-    r3 = 0x0;
-    r4 = 0x0;
-    r5 = 0xf;
-    r6 = 0x0;
-    fn_801F54A4();
-    r3 = r3 & 0xFFFF;
-    fn_801363E8();
-    r4 = r30;
-    r30 = r3;
-    r3 = 0x0;
-    r5 = 0x9;
-    r6 = 0x0;
-    fn_8011BEB4();
-    r31 = r3 & 0xFFFF;
-    r4 = r30;
-    r3 = 0x0;
-    r5 = 0x9;
-    r6 = 0x0;
-    fn_8011BEB4();
-    r0 = r3 & 0xFFFF;
-    if (r0 != (u32)r31) {
-        r3 = r27;
-        r4 = r28;
-        r5 = r30;
-        r6 = r29;
-        r7 = 0x1;
-        fn_8023C370();
-    } else {
-
-        r3 = 0x0;
+    other = fn_801363E8(fn_801F54A4(0, 0, 0xf, 0) & 0xFFFF);
+    paramType = fn_8011BEB4(0, param, 9, 0) & 0xFFFF;
+    param = other;
+    otherType = fn_8011BEB4(0, param, 9, 0) & 0xFFFF;
+    if (otherType != paramType) {
+        return fn_8023C370(ctx, slot, param, extra, 1);
     }
-    return;
+    return 0;
 }
 
 /* Address: 0x80251358 | Size: 0x78 | Pattern: field_accessor */
@@ -18472,89 +17613,43 @@ u32 fightTrainerAiWazaDamage170(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x80251454 | Size: 0x70 | Pattern: field_accessor */
-void fightTrainerAiWazaDamage169(void* ctx, u32 slot, u32 param) {
-    extern void fn_80211170();
-    extern void fn_8023720C();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = slot;
-    u32 r5 = param;
+u32 fightTrainerAiWazaDamage169(void* ctx, u32 slot, u32 param, u32 extra) {
+    extern u32 fn_80211170(void*, u32, u32, u32, u32, u32, u32, u32);
+    extern u8 fn_8023720C(void*, u32);
+    u32 savedSlot;
+    void* savedCtx;
+    u32 damage;
 
-    r7 = 0x0;
-    r8 = 0x0;
-    r9 = 0x0;
-    r10 = 0x0;
-    r31 = r4;
-    r4 = r5;
-    r30 = r3;
-    r5 = r31;
-    fn_80211170();
-    r0 = r3;
-    r4 = r31;
-    r3 = r30;
-    r31 = r0;
-    fn_8023720C();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r31 = r31 << 1;
+    savedSlot = slot;
+    savedCtx = ctx;
+    damage = fn_80211170(ctx, param, savedSlot, extra, 0, 0, 0, 0);
+    if (fn_8023720C(savedCtx, savedSlot) == 1) {
+        damage <<= 1;
     }
-    r3 = r31;
-    return;
+    return damage;
 }
 
 /* Address: 0x802514EC | Size: 0x98 */
-void fightTrainerAiWazaDamage162(void* ctx, u32 param1, u32 param2) {
-    extern void fn_80119DD0();
-    extern void fn_80202360();
-    extern void fn_80236BFC();
-    extern void fn_80237664();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
+s32 fightTrainerAiWazaDamage162(void* ctx, u32 param1, u32 param2) {
+    extern u8 fn_80119DD0(u32);
+    extern s16 fn_80202360(u32, u32);
+    extern u8 fn_80236BFC(void*, u32, u32);
+    extern u32 fn_80237664(void*, u32);
+    s16 multiplier;
+    s16 shift;
+    u32 hp;
 
-    r5 = 0x2d;
-    r29 = r3;
-    r30 = r4;
-    r31 = 0x1;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r30;
-        r4 = 0x2d;
-        fn_80202360();
-        r31 = r3;
+    multiplier = 1;
+    if (fn_80236BFC(ctx, param1, 0x2d) == 1) {
+        multiplier = fn_80202360(param1, 0x2d);
     }
-    r3 = 0x2d;
-    fn_80119DD0();
-    r0 = r3 & 0xFF;
-    r0 = r0 - r31;
-    r0 = (s16)r0;
-    if (r0 < (u32)0x1) {
-        r0 = 0x0;
+    shift = fn_80119DD0(0x2d) - multiplier;
+    if (shift < 0) {
+        shift = 0;
     }
-    r0 = (s16)r0;
-    r3 = 0x1;
-    r0 = r3 << r0;
-    r3 = r29;
-    r4 = r30;
-    r31 = (s16)r0;
-    fn_80237664();
-    r0 = r3 & 0xFFFF;
-    r0 = (s32)r0 / (s32)r31;
-    r3 = -r0;
-    return;
+    multiplier = 1 << shift;
+    hp = fn_80237664(ctx, param1) & 0xFFFF;
+    return -((s32)hp / multiplier);
 }
 
 /* Address: 0x80251584 | Size: 0x88 */
@@ -18660,64 +17755,24 @@ u32 fightTrainerAiWazaDamage149(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x80251950 | Size: 0xBC */
-void fightTrainerAiWazaDamage148(void* ctx, u32 param1, u32 param2) {
-    extern void fn_8011BEB4();
-    extern void fn_801F025C();
-    extern void fn_802026E4();
-    extern void fn_80232110();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
+u32 fightTrainerAiWazaDamage148(void* ctx, u32 slot, u32 param, u32 extra) {
+    extern u32 fn_8011BEB4(u32, u32, u32, u32);
+    extern u32 fn_801F025C(u32, u32);
+    extern u8 fn_802026E4(u32, u32);
+    extern u32 fn_80232110(u32, u32, u32, u32, u32, u32);
+    u32 damage;
+    u32 stat7;
+    u32 stat3;
+    u32 target;
 
-    r3 = 0x0;
-    r28 = r5;
-    r27 = r4;
-    r29 = r6;
-    r4 = r28;
-    r5 = 0x7;
-    r6 = 0x0;
-    fn_8011BEB4();
-    r31 = r3 & 0xFFFF;
-    r4 = r28;
-    r3 = 0x0;
-    r5 = 0x3;
-    r6 = 0x0;
-    fn_8011BEB4();
-    r30 = r3 & 0xFFFF;
-    r4 = r29;
-    r3 = 0x2;
-    fn_801F025C();
-    r0 = r3;
-    r3 = r27;
-    r5 = r0;
-    r4 = r29;
-    r6 = r28;
-    r7 = r31;
-    r8 = r30;
-    fn_80232110();
-    r0 = r3;
-    r3 = r27;
-    r31 = r0;
-    r4 = 0x32;
-    fn_802026E4();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31 * 0xf;
-        r0 = 0xa;
-        r31 = (s32)r3 / (s32)r0;
+    stat7 = fn_8011BEB4(0, param, 7, 0) & 0xFFFF;
+    stat3 = fn_8011BEB4(0, param, 3, 0) & 0xFFFF;
+    target = fn_801F025C(2, extra);
+    damage = fn_80232110(slot, extra, target, param, stat7, stat3);
+    if (fn_802026E4(slot, 0x32) == 1) {
+        damage = (s32)(damage * 0xf) / 0xa;
     }
-    r3 = r31;
-    return;
+    return damage;
 }
 
 /* Address: 0x80251A0C | Size: 0x78 | Pattern: field_accessor */
@@ -18932,45 +17987,18 @@ u32 fightTrainerAiWazaDamage123(u32 r3, u32 r4, u32 r5, u32 r6)
 
 /* Address: 0x80252188 | Size: 0x80 | Pattern: field_accessor */
 void fn_80252188(void* ctx, u32 slot, u32 param) {
-    extern void fn_8011BBD8();
-    extern void fn_8011BEB4();
-    extern void fn_80217BD0();
-    extern void fn_8023842C();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = slot;
-    u32 r5 = param;
+    extern void fn_8011BBD8(u32, u32, u32, u32, u32);
+    extern u32 fn_8011BEB4(u32, u32, u32, u32);
+    extern u32 fn_8012640C(u32, u32, u32, u32);
+    extern u32 fn_80217BD0(u32);
+    extern u32 fn_8023842C(void*, u32);
+    u32 value;
+    u32 amount;
 
-    r4 = 0x0;
-    r6 = 0x0;
-    r30 = r5;
-    r29 = r3;
-    r5 = 0xd9;
-    r3 = r30;
-    ((void(*)(void))fn_8012640C)();
-    r4 = 0x0;
-    r31 = r3;
-    r5 = 0x2f;
-    r6 = 0x0;
-    fn_8011BEB4();
-    r3 = r29;
-    r4 = r30;
-    fn_8023842C();
-    fn_80217BD0();
-    r0 = r3;
-    r3 = r31;
-    r7 = r0 & 0xFFFF;
-    r4 = 0x0;
-    r5 = 0x2f;
-    r6 = 0x0;
-    fn_8011BBD8();
-    return;
+    value = fn_8012640C(param, 0, 0xd9, 0);
+    fn_8011BEB4(value, 0, 0x2f, 0);
+    amount = fn_80217BD0(fn_8023842C(ctx, param));
+    fn_8011BBD8(value, 0, 0x2f, 0, amount & 0xFFFF);
 }
 
 /* Address: 0x80252208 | Size: 0x40 | Ghidra import */
@@ -19000,45 +18028,18 @@ u32 fightTrainerAiWazaDamage121(u32 r3, u32 r4, u32 r5, u32 r6)
 
 /* Address: 0x802522CC | Size: 0x80 | Pattern: field_accessor */
 void fn_802522CC(void* ctx, u32 slot, u32 param) {
-    extern void fn_8011BBD8();
-    extern void fn_8011BEB4();
-    extern void fn_80217BEC();
-    extern void fn_8023842C();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = slot;
-    u32 r5 = param;
+    extern void fn_8011BBD8(u32, u32, u32, u32, u32);
+    extern u32 fn_8011BEB4(u32, u32, u32, u32);
+    extern u32 fn_8012640C(u32, u32, u32, u32);
+    extern u32 fn_80217BEC(u32);
+    extern u32 fn_8023842C(void*, u32);
+    u32 value;
+    u32 amount;
 
-    r4 = 0x0;
-    r6 = 0x0;
-    r30 = r5;
-    r29 = r3;
-    r5 = 0xd9;
-    r3 = r30;
-    ((void(*)(void))fn_8012640C)();
-    r4 = 0x0;
-    r31 = r3;
-    r5 = 0x2f;
-    r6 = 0x0;
-    fn_8011BEB4();
-    r3 = r29;
-    r4 = r30;
-    fn_8023842C();
-    fn_80217BEC();
-    r0 = r3;
-    r3 = r31;
-    r7 = r0 & 0xFFFF;
-    r4 = 0x0;
-    r5 = 0x2f;
-    r6 = 0x0;
-    fn_8011BBD8();
-    return;
+    value = fn_8012640C(param, 0, 0xd9, 0);
+    fn_8011BEB4(value, 0, 0x2f, 0);
+    amount = fn_80217BEC(fn_8023842C(ctx, param));
+    fn_8011BBD8(value, 0, 0x2f, 0, amount & 0xFFFF);
 }
 
 /* Address: 0x80252354 | Size: 0x3C | Pattern: simple_wrapper */
@@ -19055,48 +18056,20 @@ u32 fightTrainerAiWazaDamage117(u32 r3, u32 r4, u32 r5, u32 r6)
 
 /* Address: 0x802523D8 | Size: 0x90 */
 void fn_802523D8(void* ctx, u32 param1, u32 param2) {
-    extern void fn_8011BBD8();
-    extern void fn_8011BEB4();
-    extern void fn_80236BFC();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
+    extern void fn_8011BBD8(u32, u32, u32, u32, u32);
+    extern u32 fn_8011BEB4(u32, u32, u32, u32);
+    extern u32 fn_8012640C(u32, u32, u32, u32);
+    extern u8 fn_80236BFC(void*, u32, u32);
+    u32 value;
+    u32 result;
+    u32 amount;
 
-    r4 = 0x0;
-    r6 = 0x0;
-    r29 = r5;
-    r28 = r3;
-    r5 = 0xd9;
-    r3 = r29;
-    ((void(*)(void))fn_8012640C)();
-    r4 = 0x0;
-    r31 = r3;
-    r5 = 0x2f;
-    r6 = 0x0;
-    fn_8011BEB4();
-    r30 = r3 & 0xFFFF;
-    r3 = r28;
-    r4 = r29;
-    r5 = 0x1a;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
+    value = fn_8012640C(param2, 0, 0xd9, 0);
+    amount = fn_8011BEB4(value, 0, 0x2f, 0) & 0xFFFF;
+    if (fn_80236BFC(ctx, param2, 0x1a) == 1) {
+        amount = (amount << 1) & 0xFFFF;
     }
-    r3 = r31;
-    r7 = r30 & 0xFFFF;
-    r4 = 0x0;
-    r5 = 0x2f;
-    r6 = 0x0;
-    fn_8011BBD8();
-    return;
+    fn_8011BBD8(value, 0, 0x2f, 0, amount & 0xFFFF);
 }
 
 /* Address: 0x802524B8 | Size: 0x84 | Pattern: field_accessor */
@@ -19114,64 +18087,17 @@ u32 fightTrainerAiWazaDamage105(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x8025253C | Size: 0xB4 */
-void fn_8025253C(void* ctx, u32 param1, u32 param2) {
-    extern void fn_80211170();
-    extern void fn_802525F0();
-    extern void fn_80252634();
-    extern void fn_80252678();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
+u32 fightTrainerAiWazaDamage104(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_80211170(void*, u32, u32, u32, u32, u32, u32, u32);
+    extern u32 fn_802525F0(void);
+    extern u32 fn_80252634(void);
+    extern u32 fn_80252678(void);
+    u32 result;
 
-    r7 = (u32)fn_80252678;
-    r8 = 0x0;
-    r9 = (u32)fn_80252678;
-    r7 = 0x0;
-    r10 = 0x0;
-    r28 = r4;
-    r29 = r5;
-    r27 = r3;
-    r30 = r6;
-    r5 = r28;
-    r4 = r29;
-    fn_80211170();
-    r4 = (u32)fn_80252634;
-    r31 = r3;
-    r9 = (u32)fn_80252634;
-    r3 = r27;
-    r4 = r29;
-    r5 = r28;
-    r6 = r30;
-    r7 = 0x0;
-    r8 = 0x0;
-    r10 = 0x0;
-    fn_80211170();
-    r4 = (u32)fn_802525F0;
-    r31 = r31 + r3;
-    r9 = (u32)fn_802525F0;
-    r3 = r27;
-    r4 = r29;
-    r5 = r28;
-    r6 = r30;
-    r7 = 0x0;
-    r8 = 0x0;
-    r10 = 0x0;
-    fn_80211170();
-    r31 = r31 + r3;
-    r3 = r31;
-    return;
+    result = fn_80211170(ctx, param2, param1, param3, 0, 0, (u32)fn_80252678, 0);
+    result += fn_80211170(ctx, param2, param1, param3, 0, 0, (u32)fn_80252634, 0);
+    result += fn_80211170(ctx, param2, param1, param3, 0, 0, (u32)fn_802525F0, 0);
+    return result;
 }
 
 /* Address: 0x802525F0 | Size: 0x44 | Pattern: field_accessor */
@@ -19210,45 +18136,18 @@ u32 fightTrainerAiWazaDamage103(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x80252748 | Size: 0x74 | Pattern: field_accessor */
-void fightTrainerAiWazaDamage101(void* ctx, u32 slot, u32 param) {
-    extern void fn_80211170();
-    extern void fn_802376EC();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = slot;
-    u32 r5 = param;
+u32 fightTrainerAiWazaDamage101(void* ctx, u32 slot, u32 param, u32 extra) {
+    extern u32 fn_80211170(void*, u32, u32, u32, u32, u32, u32, u32);
+    extern u32 fn_802376EC(void*, u32);
+    u32 cap;
+    u32 damage;
 
-    r30 = r6;
-    r28 = r4;
-    r27 = r3;
-    r29 = r5;
-    r4 = r30;
-    fn_802376EC();
-    r31 = r3;
-    r3 = r27;
-    r4 = r29;
-    r5 = r28;
-    r6 = r30;
-    r7 = 0x0;
-    r8 = 0x0;
-    r9 = 0x0;
-    r10 = 0x0;
-    fn_80211170();
-    r4 = r31 & 0xFFFF;
-    if ((s32)r4 <= (s32)r3) {
+    cap = fn_802376EC(ctx, extra);
+    damage = fn_80211170(ctx, param, slot, extra, 0, 0, 0, 0);
+    if ((s32)(cap & 0xFFFF) <= (s32)damage) {
+        return (cap & 0xFFFF) - 1;
     }
-    return;
+    return damage;
 }
 
 /* Address: 0x802527C4 | Size: 0x40 | Ghidra import */
@@ -19684,38 +18583,17 @@ u32 fightTrainerAiWazaDamage000(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x80253950 | Size: 0x6C | Pattern: field_accessor */
-void fightTrainerAiWazaHit213(void* ctx, u32 slot, u32 param) {
-    extern void fn_80136428();
-    extern void fn_801F54A4();
-    extern void fn_80237DBC();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = slot;
-    u32 r5 = param;
+u32 fightTrainerAiWazaHit213(void* ctx, u32 slot, u32 param) {
+    extern u32 fn_80136428(u32);
+    extern u32 fn_801F54A4(u32, u32, u32, u32);
+	    extern u8 fn_80237DBC(void*, u32, u32);
+	    u32 value;
+	    u8 result;
 
-    r5 = 0xf;
-    r6 = 0x0;
-    r30 = r3;
-    r31 = r4;
-    r3 = 0x0;
-    r4 = 0x0;
-    fn_801F54A4();
-    r3 = r3 & 0xFFFF;
-    fn_80136428();
-    r0 = r3;
-    r3 = r30;
-    r4 = r31;
-    r5 = r0 & 0xFF;
-    fn_80237DBC();
-    r0 = r3 & 0xFF;
-    r3 = 0x1 - r0;
-    r3 = r3 - r0; /* -borrow */;
-    return;
-}
+	    value = fn_80136428(fn_801F54A4(0, 0, 0xf, 0) & 0xFFFF);
+	    result = fn_80237DBC(ctx, slot, value & 0xFF);
+	    return result != 1;
+	}
 
 /* Address: 0x802539BC | Size: 0xC4 (196 bytes) */
 u32 fightTrainerAiWazaHit212(void* ctx, u32 param1, u32 param2, u32 param3) {
@@ -19789,7 +18667,7 @@ s32 fightTrainerAiWazaHit209(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -19833,7 +18711,7 @@ s32 fightTrainerAiWazaHit207(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -19899,7 +18777,7 @@ s32 fightTrainerAiWazaHit204(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -19959,7 +18837,7 @@ s32 fightTrainerAiWazaHit202(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -19998,7 +18876,7 @@ s32 fightTrainerAiWazaHit200(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -20156,7 +19034,7 @@ s32 fightTrainerAiWazaHit198(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -20177,7 +19055,7 @@ s32 fightTrainerAiWazaHit197(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -20188,8 +19066,9 @@ s32 fightTrainerAiWazaHit196(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80239500(void* ctx, u32 param2);
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    s32 gate;
     u32 v1 = fn_802395C8(ctx, param2, param1);
-    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
 
     if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
         gate = 0;
@@ -20204,21 +19083,14 @@ s32 fightTrainerAiWazaHit196(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x80254680 | Size: 0x38 | Ghidra import */
-int fightTrainerAiWazaHit194(void)
+int fightTrainerAiWazaHit194(u32 r3, u32 r4, u32 r5, u32 r6)
 
 {
-    u32 r3;
-    u32 r4;
-    u32 r5;
-    u32 r6;
-
-    extern u32 fn_80236BFC();
+  extern u32 fn_80236BFC();
   u32 uVar1;
-  int iVar2;
   
   uVar1 = fn_80236BFC(r3,r6,0x28);
-  iVar2 = -(uVar1 & 0xff) + 1;
-  return iVar2 - ((u32)(iVar2 == 0) + -(uVar1 & 0xff));
+  return (uVar1 & 0xff) != 1;
 }
 /* Address: 0x802546B8 | Size: 0x30 | Ghidra import */
 u32 fightTrainerAiWazaHit193(void)
@@ -20363,7 +19235,7 @@ s32 fightTrainerAiWazaHit190(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -20412,7 +19284,7 @@ s32 fightTrainerAiWazaHit188(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -20534,8 +19406,9 @@ s32 fightTrainerAiWazaHit186(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80239500(void* ctx, u32 param2);
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    s32 gate;
     u32 v1 = fn_802395C8(ctx, param2, param1);
-    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
 
     if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
         gate = 0;
@@ -20565,7 +19438,7 @@ s32 fightTrainerAiWazaHit185(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -20596,7 +19469,7 @@ s32 fightTrainerAiWazaHit182(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -20640,41 +19513,22 @@ int fightTrainerAiWazaHit179(void)
 /* Address: 0x80254F88 | Size: 0x78 | Pattern: field_accessor */
 /* Address: 0x80254F88 | Size: 0x78 | Pattern: field_accessor */
 /* Address: 0x80254F88 | Size: 0x78 | Pattern: field_accessor */
-void fightTrainerAiWazaHit178(void* ctx, u32 slot, u32 param) {
-    extern void fn_80237F74();
-    extern void fn_8025C264();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = slot;
-    u32 r5 = param;
+u32 fightTrainerAiWazaHit178(void* ctx, u32 slot, u32 param, u32 extra) {
+    extern u8 fn_80237F74(void*, u32, u32);
+    extern s32 fn_8025C264(void*, u32, u32, u32, u32);
+    s32 gate;
 
-    r7 = (0x1 << 16);
-    r29 = r3;
-    r30 = r6;
-    fn_8025C264();
-    r31 = r3;
-    r3 = r29;
-    r4 = r30;
-    r5 = 0x19;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    gate = fn_8025C264(ctx, slot, param, extra, 0xFFFF);
+    if (fn_80237F74(ctx, extra, 0x19) == 1) {
+        return 0;
     }
-    if ((s32)r31 == (s32)0x0) {
-        r3 = 0x0;
-        return;
+    if (gate == 0) {
+        return 0;
     }
-    r3 = 0x1;
-
-    return;
+    if (gate == -1) {
+        return 1;
+    }
+    return 1;
 }
 
 /* Address: 0x80255000 | Size: 0xF0 (240 bytes) */
@@ -20714,59 +19568,33 @@ ret0:
 }
 
 /* Address: 0x802550F0 | Size: 0xB4 */
-void fightTrainerAiWazaHit176(void* ctx, u32 param1, u32 param2) {
-    extern void fn_801F025C();
-    extern void fn_801F54A4();
-    extern void fn_802062FC();
-    extern void fn_80236BFC();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
+u32 fightTrainerAiWazaHit176(void* ctx, u32 slot, u32 param) {
+    extern u32 fn_801F025C(u32);
+    extern u32 fn_801F54A4(u32, u32, u32, u32);
+    extern u8 fn_802062FC(u32);
+    extern u8 fn_80236BFC(void*, u32, u32);
+    u32 target;
 
-    r29 = r3;
-    r30 = r4;
-    r3 = 0xe;
-    fn_801F025C();
-    if ((s32)r0 == (s32)0) {
-        r3 = 0x0;
-        return;
+    target = fn_801F025C(0xe);
+    if (target == 0) {
+        return 0;
     }
-    r3 = 0x0;
-    r4 = 0x0;
-    r5 = 0x19;
-    r6 = 0x0;
-    fn_801F54A4();
-    r0 = r3 & 0xFFFF;
-    if (r0 < (u32)0x2) { r3 = 0x0; return; }
-    r3 = r31;
-    fn_802062FC();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1) { r3 = 0x0; return; }
-    r3 = r29;
-    r4 = r30;
-    r5 = 0x32;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1) { r3 = 0x0; return; }
-    r3 = r29;
-    r4 = r31;
-    r5 = 0x32;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) { r3 = 0x1; return; }
-
-    r3 = 0x0;
-    return;
-
-    r3 = 0x1;
-
-    return;
+    if ((fn_801F54A4(0, 0, 0x19, 0) & 0xFFFF) < 2) {
+        goto fail;
+    }
+    if (fn_802062FC(target) != 1) {
+        goto fail;
+    }
+    if (fn_80236BFC(ctx, slot, 0x32) != 0) {
+        goto fail;
+    }
+    if (fn_80236BFC(ctx, target, 0x32) == 0) {
+        goto success;
+    }
+fail:
+    return 0;
+success:
+    return 1;
 }
 
 /* Address: 0x802551A4 | Size: 0x74 | Pattern: field_accessor */
@@ -20789,58 +19617,23 @@ u32 fightTrainerAiWazaHit175(void* ctx, u32 slot, u32 param, u32 param3) {
 }
 
 /* Address: 0x80255220 | Size: 0xA8 */
-void fightTrainerAiWazaHit173(void* ctx, u32 param1, u32 param2) {
-    extern void fn_8011BEB4();
-    extern void fn_801363E8();
-    extern void fn_801F54A4();
-    extern void fn_8023C530();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
+u32 fightTrainerAiWazaHit173(void* ctx, u32 slot, u32 param, u32 extra) {
+    extern u32 fn_8011BEB4(u32, u32, u32, u32);
+    extern u32 fn_801363E8(u32);
+    extern u32 fn_801F54A4(u32, u32, u32, u32);
+    extern u32 fn_8023C530(void*, u32, u32, u32);
+    u32 paramType;
+    u32 other;
+    u32 otherType;
 
-    r27 = r3;
-    r28 = r4;
-    r30 = r5;
-    r29 = r6;
-    r3 = 0x0;
-    r4 = 0x0;
-    r5 = 0xf;
-    r6 = 0x0;
-    fn_801F54A4();
-    r3 = r3 & 0xFFFF;
-    fn_801363E8();
-    r4 = r30;
-    r30 = r3;
-    r3 = 0x0;
-    r5 = 0x9;
-    r6 = 0x0;
-    fn_8011BEB4();
-    r31 = r3 & 0xFFFF;
-    r4 = r30;
-    r3 = 0x0;
-    r5 = 0x9;
-    r6 = 0x0;
-    fn_8011BEB4();
-    r0 = r3 & 0xFFFF;
-    if (r0 != (u32)r31) {
-        r3 = r27;
-        r4 = r28;
-        r5 = r30;
-        r6 = r29;
-        fn_8023C530();
-    } else {
-
-        r3 = 0x1;
+    other = fn_801363E8(fn_801F54A4(0, 0, 0xf, 0) & 0xFFFF);
+    paramType = fn_8011BEB4(0, param, 9, 0) & 0xFFFF;
+    param = other;
+    otherType = fn_8011BEB4(0, param, 9, 0) & 0xFFFF;
+    if (otherType != paramType) {
+        return fn_8023C530(ctx, slot, param, extra);
     }
-    return;
+    return 1;
 }
 
 /* Address: 0x802552D0 | Size: 0xB4 */
@@ -20859,7 +19652,7 @@ s32 fightTrainerAiWazaHit171(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -20880,7 +19673,7 @@ s32 fightTrainerAiWazaHit170(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -20901,7 +19694,7 @@ s32 fightTrainerAiWazaHit169(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -21154,45 +19947,20 @@ int fightTrainerAiWazaHit164(void)
 
     extern u32 fn_80235B04();
   u32 uVar1;
-  int iVar2;
   
   uVar1 = fn_80235B04(r3,0,0);
-  iVar2 = -(uVar1 & 0xff) + 4;
-  return iVar2 - ((u32)(iVar2 == 0) + -(uVar1 & 0xff) + 3);
+  return (uVar1 & 0xff) != 4;
 }
 /* Address: 0x80255AE4 | Size: 0x68 | Pattern: field_accessor */
-void fightTrainerAiWazaHit162(void* ctx, u32 slot, u32 param) {
+u32 fightTrainerAiWazaHit162(void* ctx, u32 slot, u32 param) {
     extern f32 lbl_8047E648;
-    extern void fn_80236BFC();
-    extern void fn_802373B0();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f1 = 0.0f;
-    u32 r4 = slot;
-    u32 r5 = param;
+    extern u8 fn_80236BFC(void*, u32, u32);
+    extern u8 fn_802373B0(void*, u32, s32, f32);
 
-    r5 = 0x2d;
-    r30 = r3;
-    r31 = r4;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if ((s32)r0 == (s32)0) {
-        r3 = 0x0;
-    } else {
-
-        f1 = lbl_8047E648;
-        r3 = r30;
-        r4 = r31;
-        r5 = 0x0;
-        fn_802373B0();
-        r0 = r3 & 0xFF;
-        r3 = 0x1 - r0;
-        r3 = r3 - r0; /* -borrow */;
+    if (fn_80236BFC(ctx, slot, 0x2d) == 0) {
+        return 0;
     }
-    return;
+    return fn_802373B0(ctx, slot, 0, lbl_8047E648) != 1;
 }
 
 /* Address: 0x80255B4C | Size: 0xCC (204 bytes) */
@@ -21202,8 +19970,9 @@ s32 fightTrainerAiWazaHit161(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80239500(void* ctx, u32 param2);
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    s32 gate;
     u32 v1 = fn_802395C8(ctx, param2, param1);
-    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
 
     if (fn_80236BFC(ctx, param1, 0x2d) == 0) {
         gate = 0;
@@ -21245,8 +20014,9 @@ s32 fightTrainerAiWazaHit159(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80239500(void* ctx, u32 param2);
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    s32 gate;
     u32 v1 = fn_802395C8(ctx, param2, param1);
-    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
 
     if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
         gate = 0;
@@ -21270,33 +20040,12 @@ u32 fightTrainerAiWazaHit158(u32 r3_in, u32 r4)
   result = uVar1 != 0;
   return result;
 }
-/* Address: 0x80255D7C | Size: 0x38 | Ghidra import */
-/* Address: 0x80255D7C | Size: 0x38 | Ghidra import */
-/* Address: 0x80255D7C | Size: 0x38 | Ghidra import */
-/* Address: 0x80255D7C | Size: 0x38 | Ghidra import */
-/* Address: 0x80255D7C | Size: 0x38 | Ghidra import */
-/* Address: 0x80255D7C | Size: 0x38 | Ghidra import */
-/* Address: 0x80255D7C | Size: 0x38 | Ghidra import */
-/* Address: 0x80255D7C | Size: 0x38 | Ghidra import */
-/* Address: 0x80255D7C | Size: 0x38 | Ghidra import */
-/* Address: 0x80255D7C | Size: 0x38 | Ghidra import */
-/* Address: 0x80255D7C | Size: 0x38 | Ghidra import */
-/* Address: 0x80255D7C | Size: 0x38 | Ghidra import */
-int fightTrainerAiWazaHit157(void)
-
-{
-    u32 r3;
-    u32 r4;
-
-    extern u32 fn_802373B0();
+/* Address: 0x80255D7C | Size: 0x38 */
+u32 fightTrainerAiWazaHit157(void* ctx, u32 slot, u32 param2, u32 param3) {
     extern f32 lbl_8047E648;
+    extern u8 fn_802373B0(void*, u32, s32, f32);
 
-  u32 uVar1;
-  int iVar2;
-  
-  uVar1 = fn_802373B0((double)lbl_8047E648,r3,r4,0);
-  iVar2 = -(uVar1 & 0xff) + 1;
-  return iVar2 - ((u32)(iVar2 == 0) + -(uVar1 & 0xff));
+    return fn_802373B0(ctx, slot, 0, lbl_8047E648) != 1;
 }
 /* Address: 0x80255DB4 | Size: 0x44 | Pattern: field_accessor */
 u32 fightTrainerAiWazaHit156(void* ctx, u32 slot, u32 param, u32 arg3) {
@@ -21311,8 +20060,9 @@ s32 fightTrainerAiWazaHit155(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80239500(void* ctx, u32 param2);
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    s32 gate;
     u32 v1 = fn_802395C8(ctx, param2, param1);
-    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
 
     if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
         gate = 0;
@@ -21356,7 +20106,7 @@ s32 fightTrainerAiWazaHit152(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -21377,7 +20127,7 @@ s32 fightTrainerAiWazaHit151(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -21398,7 +20148,7 @@ s32 fightTrainerAiWazaHit150(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -21419,27 +20169,20 @@ s32 fightTrainerAiWazaHit149(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
 
 /* Address: 0x802561BC | Size: 0x38 | Ghidra import */
-int fightTrainerAiWazaHit148(void)
+int fightTrainerAiWazaHit148(u32 r3, u32 r4, u32 r5, u32 r6)
 
 {
-    u32 r3;
-    u32 r4;
-    u32 r5;
-    u32 r6;
-
-    extern u32 fn_80236BFC();
+  extern u32 fn_80236BFC();
   u32 uVar1;
-  int iVar2;
   
   uVar1 = fn_80236BFC(r3,r6,0x34);
-  iVar2 = -(uVar1 & 0xff) + 1;
-  return iVar2 - ((u32)(iVar2 == 0) + -(uVar1 & 0xff));
+  return (uVar1 & 0xff) != 1;
 }
 /* Address: 0x802561F4 | Size: 0xB4 */
 s32 fightTrainerAiWazaHit147(void* ctx, u32 param1, u32 param2, u32 param3) {
@@ -21457,7 +20200,7 @@ s32 fightTrainerAiWazaHit147(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -21478,7 +20221,7 @@ s32 fightTrainerAiWazaHit146(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -21499,7 +20242,7 @@ s32 fightTrainerAiWazaHit145(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -21510,8 +20253,9 @@ s32 fightTrainerAiWazaHit144(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80239500(void* ctx, u32 param2);
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    s32 gate;
     u32 v1 = fn_802395C8(ctx, param2, param1);
-    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
 
     if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
         gate = 0;
@@ -21559,7 +20303,7 @@ s32 fightTrainerAiWazaHit140(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -21580,7 +20324,7 @@ s32 fightTrainerAiWazaHit139(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -21601,7 +20345,7 @@ s32 fightTrainerAiWazaHit138(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -21626,11 +20370,9 @@ int fightTrainerAiWazaHit136(void)
 
     extern u32 fn_80235B04();
   u32 uVar1;
-  int iVar2;
   
   uVar1 = fn_80235B04(r3,0,0);
-  iVar2 = -(uVar1 & 0xff) + 2;
-  return iVar2 - ((u32)(iVar2 == 0) + -(uVar1 & 0xff) + 1);
+  return (uVar1 & 0xff) != 2;
 }
 /* Address: 0x802567B8 | Size: 0xA4 */
 s32 fightTrainerAiWazaHit135(void* ctx, u32 param1, u32 param2, u32 param3) {
@@ -21638,7 +20380,7 @@ s32 fightTrainerAiWazaHit135(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fn_80120B00(u32, void*, void*);
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
-    s16 hi;
+    u16 hi;
     u16 lo;
     s32 gate;
 
@@ -21656,56 +20398,26 @@ s32 fightTrainerAiWazaHit135(void* ctx, u32 param1, u32 param2, u32 param3) {
     return 1;
 }
 
-/* Address: 0x8025685C | Size: 0x38 | Ghidra import */
-int fightTrainerAiWazaHit134(void)
-
-{
-    u32 r3;
-    u32 r4;
-
-    extern u32 fn_802373B0();
+/* Address: 0x8025685C | Size: 0x38 */
+u32 fightTrainerAiWazaHit134(void* ctx, u32 slot, u32 param2, u32 param3) {
     extern f32 lbl_8047E648;
+    extern u8 fn_802373B0(void*, u32, s32, f32);
 
-  u32 uVar1;
-  int iVar2;
-  
-  uVar1 = fn_802373B0((double)lbl_8047E648,r3,r4,0);
-  iVar2 = -(uVar1 & 0xff) + 1;
-  return iVar2 - ((u32)(iVar2 == 0) + -(uVar1 & 0xff));
+    return fn_802373B0(ctx, slot, 0, lbl_8047E648) != 1;
 }
-/* Address: 0x80256894 | Size: 0x38 | Ghidra import */
-int fightTrainerAiWazaHit133(void)
-
-{
-    u32 r3;
-    u32 r4;
-
-    extern u32 fn_802373B0();
+/* Address: 0x80256894 | Size: 0x38 */
+u32 fightTrainerAiWazaHit133(void* ctx, u32 slot, u32 param2, u32 param3) {
     extern f32 lbl_8047E648;
+    extern u8 fn_802373B0(void*, u32, s32, f32);
 
-  u32 uVar1;
-  int iVar2;
-  
-  uVar1 = fn_802373B0((double)lbl_8047E648,r3,r4,0);
-  iVar2 = -(uVar1 & 0xff) + 1;
-  return iVar2 - ((u32)(iVar2 == 0) + -(uVar1 & 0xff));
+    return fn_802373B0(ctx, slot, 0, lbl_8047E648) != 1;
 }
-/* Address: 0x802568CC | Size: 0x38 | Ghidra import */
-int fightTrainerAiWazaHit132(void)
-
-{
-    u32 r3;
-    u32 r4;
-
-    extern u32 fn_802373B0();
+/* Address: 0x802568CC | Size: 0x38 */
+u32 fightTrainerAiWazaHit132(void* ctx, u32 slot, u32 param2, u32 param3) {
     extern f32 lbl_8047E648;
+    extern u8 fn_802373B0(void*, u32, s32, f32);
 
-  u32 uVar1;
-  int iVar2;
-  
-  uVar1 = fn_802373B0((double)lbl_8047E648,r3,r4,0);
-  iVar2 = -(uVar1 & 0xff) + 1;
-  return iVar2 - ((u32)(iVar2 == 0) + -(uVar1 & 0xff));
+    return fn_802373B0(ctx, slot, 0, lbl_8047E648) != 1;
 }
 /* Address: 0x80256904 | Size: 0xB0 */
 s32 fightTrainerAiWazaHit130(void* ctx, u32 param1, u32 param2, u32 param3) {
@@ -21713,8 +20425,9 @@ s32 fightTrainerAiWazaHit130(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80239500(void* ctx, u32 param2);
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    s32 gate;
     u32 v1 = fn_802395C8(ctx, param2, param1);
-    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
 
     if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
         gate = 0;
@@ -21744,7 +20457,7 @@ s32 fightTrainerAiWazaHit129(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -21797,7 +20510,7 @@ s32 fightTrainerAiWazaHit126(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -21818,7 +20531,7 @@ s32 fightTrainerAiWazaHit125(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -21853,7 +20566,7 @@ s32 fightTrainerAiWazaHit123(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -21864,8 +20577,9 @@ s32 fightTrainerAiWazaHit122(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80239500(void* ctx, u32 param2);
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    s32 gate;
     u32 v1 = fn_802395C8(ctx, param2, param1);
-    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
 
     if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
         gate = 0;
@@ -21885,8 +20599,9 @@ s32 fightTrainerAiWazaHit121(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80239500(void* ctx, u32 param2);
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    s32 gate;
     u32 v1 = fn_802395C8(ctx, param2, param1);
-    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
 
     if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
         gate = 0;
@@ -22051,8 +20766,9 @@ s32 fightTrainerAiWazaHit119(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80239500(void* ctx, u32 param2);
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    s32 gate;
     u32 v1 = fn_802395C8(ctx, param2, param1);
-    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
 
     if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
         gate = 0;
@@ -22233,8 +20949,9 @@ s32 fightTrainerAiWazaHit117(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80239500(void* ctx, u32 param2);
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    s32 gate;
     u32 v1 = fn_802395C8(ctx, param2, param1);
-    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
 
     if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
         gate = 0;
@@ -22256,11 +20973,9 @@ int fightTrainerAiWazaHit115(void)
 
     extern u32 fn_80235B04();
   u32 uVar1;
-  int iVar2;
   
   uVar1 = fn_80235B04(r3,0,0);
-  iVar2 = -(uVar1 & 0xff) + 3;
-  return iVar2 - ((u32)(iVar2 == 0) + -(uVar1 & 0xff) + 2);
+  return (uVar1 & 0xff) != 3;
 }
 /* Address: 0x802574AC | Size: 0x5C | Pattern: field_accessor */
 u32 fightTrainerAiWazaHit114(void* ctx, u32 slot, u32 param, u32 arg3) {
@@ -22288,42 +21003,23 @@ u32 fightTrainerAiWazaHit113(u32 r3, u32 r4, u32 r5, u32 r6)
   return 1;
 }
 /* Address: 0x80257544 | Size: 0x7C | Pattern: field_accessor */
-void fightTrainerAiWazaHit112(void* ctx, u32 slot, u32 param) {
-    extern void fn_80119DD0();
-    extern void fn_801F025C();
-    extern void fn_801F6D9C();
-    extern void fn_801F6E98();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = slot;
+u32 fightTrainerAiWazaHit112(void* ctx, u32 slot, u32 param) {
+    extern u8 fn_80119DD0(u32);
+    extern u32 fn_801F025C(u32);
+    extern u32 fn_801F6D9C(u32, u32);
+    extern u8 fn_801F6E98(u32, u32);
+    u32 target;
+    u32 count;
 
-    r3 = 0x3;
-    fn_801F025C();
-    r30 = 0x0;
-    r31 = r3;
-    r4 = 0x4a;
-    fn_801F6E98();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = 0x4a;
-        fn_801F6D9C();
-        r30 = r3;
+    target = fn_801F025C(3);
+    count = 0;
+    if (fn_801F6E98(target, 0x4a) == 1) {
+        count = fn_801F6D9C(target, 0x4a);
     }
-    r3 = 0x4a;
-    fn_80119DD0();
-    r3 = r3 & 0xFF;
-    r0 = (s16)r30;
-    if ((s32)r0 >= (s32)r3) {
-        r3 = 0x0;
-    } else {
-
-        r3 = 0x1;
+    if ((s16)count >= (s32)fn_80119DD0(0x4a)) {
+        return 0;
     }
-    return;
+    return 1;
 }
 
 /* Address: 0x802575C8 | Size: 0x188 (392 bytes) */
@@ -22343,11 +21039,10 @@ s32 fightTrainerAiWazaHit109(void* ctx, u32 param1, u32 param2, u32 param3) {
         if (fn_80236BFC(ctx, param3, 0x14) == 1) {
             return 0;
         }
-        if (fn_80236BFC(ctx, param3, 0x18) == 1) {
-            goto ret0;
-        }
-        if (fn_80237288(ctx, param3) != 1) {
-            goto ret1;
+        if (fn_80236BFC(ctx, param3, 0x18) != 1) {
+            if (fn_80237288(ctx, param3) != 1) {
+                goto ret1;
+            }
         }
         return 0;
     }
@@ -22401,82 +21096,35 @@ s32 fightTrainerAiWazaHit108(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x80257838 | Size: 0x8C */
-void fightTrainerAiWazaHit107(void* ctx, u32 param1, u32 param2) {
-    extern void fn_80236BFC();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
+u32 fightTrainerAiWazaHit107(void* ctx, u32 param1, u32 param2, u32 extra) {
+    extern u8 fn_80236BFC(void*, u32, u32);
 
-    r5 = 0x14;
-    r31 = r6;
-    r30 = r3;
-    r4 = r31;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80236BFC(ctx, extra, 0x14) == 1) {
+        return 0;
     }
-    r3 = r30;
-    r4 = r31;
-    r5 = 0x17;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80236BFC(ctx, extra, 0x17) == 1) {
+        return 0;
     }
-    r3 = r30;
-    r4 = r31;
-    r5 = 0x8;
-    fn_80236BFC();
-    r3 = r3 & 0xFF;
-    r3 = r3 - r0; /* -borrow */;
-
-    return;
+    return fn_80236BFC(ctx, extra, 8) != 0;
 }
 
 /* Address: 0x802578C4 | Size: 0x78 | Pattern: field_accessor */
-void fightTrainerAiWazaHit106(void* ctx, u32 slot, u32 param) {
-    extern void fn_80236BFC();
-    extern void fn_8025C264();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = slot;
-    u32 r5 = param;
+u32 fightTrainerAiWazaHit106(void* ctx, u32 slot, u32 param, u32 extra) {
+    extern u8 fn_80236BFC(void*, u32, u32);
+    extern s32 fn_8025C264(void*, u32, u32, u32, u32);
+    s32 gate;
 
-    r7 = (0x1 << 16);
-    r29 = r3;
-    r30 = r6;
-    fn_8025C264();
-    r31 = r3;
-    r3 = r29;
-    r4 = r30;
-    r5 = 0x16;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    gate = fn_8025C264(ctx, slot, param, extra, 0xFFFE);
+    if (fn_80236BFC(ctx, extra, 0x16) == 1) {
+        return 0;
     }
-    if ((s32)r31 == (s32)0x0) {
-        r3 = 0x0;
-        return;
+    if (gate == 0) {
+        return 0;
     }
-    r3 = 0x1;
-
-    return;
+    if (gate == -1) {
+        return 1;
+    }
+    return 1;
 }
 
 /* Address: 0x8025793C | Size: 0xB4 */
@@ -22495,7 +21143,7 @@ s32 fightTrainerAiWazaHit105(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -22506,8 +21154,9 @@ s32 fightTrainerAiWazaHit104(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80239500(void* ctx, u32 param2);
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    s32 gate;
     u32 v1 = fn_802395C8(ctx, param2, param1);
-    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
 
     if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
         gate = 0;
@@ -22537,7 +21186,7 @@ s32 fightTrainerAiWazaHit103(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -22554,14 +21203,13 @@ s32 fightTrainerAiWazaHit102(void* ctx, u32 param1, u32 param2, u32 param3) {
     u16 i;
 
     for (i = 0; i < (u16)count; i++) {
-        u32 elem = buf[i];
-        if (elem == 0) {
+        if (buf[i] == 0) {
             continue;
         }
-        if (target == 0xd7 && fn_80239058(ctx, elem, 0x2b) == 1) {
+        if (target == 0xd7 && fn_80239058(ctx, buf[i], 0x2b) == 1) {
             continue;
         }
-        if (fn_80238748(ctx, elem) != 0) {
+        if (fn_80238748(ctx, buf[i]) != 0) {
             continue;
         }
         flag = 1;
@@ -22589,7 +21237,7 @@ s32 fightTrainerAiWazaHit101(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -22600,16 +21248,16 @@ s32 fightTrainerAiWazaHit100(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u16 fn_802367CC(void* ctx, u32 param3, void* arrayA, void* arrayB, u32 flag);
     extern u32 fn_802364BC(void* ctx, u32 param3);
     extern u8 fn_80237288(void* ctx, u32 elem);
-    extern u8 fn_802381C4(void* ctx, u32 param3, u32 v);
-    u16 arrayA[0x10];
-    s16 arrayB[0x2];
+    extern u8 fn_802381C4(void* ctx, u32 param3, u8 v);
+    u16 arrayA[0xe];
+    s16 arrayB[0xa];
     s32 gate = fn_8025C264(ctx, param1, param2, param3, 0xFFFF);
     u16 count = fn_802367CC(ctx, param3, arrayA, arrayB, 0);
     u32 a = fn_802364BC(ctx, param3);
     u8 flag;
-    u16 i;
+    u8 i;
 
-    if ((u16)a == 0 || a == 0x165 || a == 0xffff || fn_80237288(ctx, param3) == 1) {
+    if ((u16)a == 0 || (u16)a == 0x165 || (u16)a == 0xffff || fn_80237288(ctx, param3) == 1) {
         return 0;
     }
     flag = 0;
@@ -22651,7 +21299,7 @@ s32 fightTrainerAiWazaHit099(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -22733,41 +21381,22 @@ ret0:
  * ------------------------------------------------------------------- */
 
 /* Address: 0x802580BC | Size: 0x78 | Pattern: field_accessor */
-void fightTrainerAiWazaHit094(void* ctx, u32 slot, u32 param) {
-    extern void fn_80236BFC();
-    extern void fn_8025C264();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = slot;
-    u32 r5 = param;
+u32 fightTrainerAiWazaHit094(void* ctx, u32 slot, u32 param, u32 extra) {
+    extern u8 fn_80236BFC(void*, u32, u32);
+    extern s32 fn_8025C264(void*, u32, u32, u32, u32);
+    s32 gate;
 
-    r7 = (0x1 << 16);
-    r29 = r3;
-    r30 = r6;
-    fn_8025C264();
-    r31 = r3;
-    r3 = r29;
-    r4 = r30;
-    r5 = 0x14;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    gate = fn_8025C264(ctx, slot, param, extra, 0xFFFF);
+    if (fn_80236BFC(ctx, extra, 0x14) == 1) {
+        return 0;
     }
-    if ((s32)r31 == (s32)0x0) {
-        r3 = 0x0;
-        return;
+    if (gate == 0) {
+        return 0;
     }
-    r3 = 0x1;
-
-    return;
+    if (gate == -1) {
+        return 1;
+    }
+    return 1;
 }
 
 /* Address: 0x8025813C | Size: 0xD0 (208 bytes) */
@@ -22799,41 +21428,22 @@ s32 fightTrainerAiWazaHit092(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x8025820C | Size: 0x78 | Pattern: field_accessor */
-void fightTrainerAiWazaHit091(void* ctx, u32 slot, u32 param) {
-    extern void fn_80236BFC();
-    extern void fn_8025C264();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = slot;
-    u32 r5 = param;
+u32 fightTrainerAiWazaHit091(void* ctx, u32 slot, u32 param, u32 extra) {
+    extern u8 fn_80236BFC(void*, u32, u32);
+    extern s32 fn_8025C264(void*, u32, u32, u32, u32);
+    s32 gate;
 
-    r7 = (0x1 << 16);
-    r29 = r3;
-    r30 = r6;
-    fn_8025C264();
-    r31 = r3;
-    r3 = r29;
-    r4 = r30;
-    r5 = 0x14;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    gate = fn_8025C264(ctx, slot, param, extra, 0xFFFF);
+    if (fn_80236BFC(ctx, extra, 0x14) == 1) {
+        return 0;
     }
-    if ((s32)r31 == (s32)0x0) {
-        r3 = 0x0;
-        return;
+    if (gate == 0) {
+        return 0;
     }
-    r3 = 0x1;
-
-    return;
+    if (gate == -1) {
+        return 1;
+    }
+    return 1;
 }
 
 /* Address: 0x80258284 | Size: 0x140 (320 bytes) */
@@ -22842,10 +21452,10 @@ s32 fightTrainerAiWazaHit090(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_802364BC(void* ctx, u32 param3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
     extern u8 fightSeqIsEncoreNgWazaDataId(u32 elem);
-    extern u8 fn_802381C4(void* ctx, u32 param3, u32 v);
+    extern u8 fn_802381C4(void* ctx, u32 param3, u8 v);
     extern u8 fn_80236BFC(void* ctx, u32 a, u32 type);
-    u16 arrayA[0x10];
-    s16 arrayB[0x2];
+    u16 arrayA[0xe];
+    s16 arrayB[0xa];
     u16 count = fn_802367CC(ctx, param3, arrayA, arrayB, 0);
     u32 targetVal = fn_802364BC(ctx, param3);
     s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
@@ -22889,8 +21499,9 @@ s32 fightTrainerAiWazaHit089(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80239500(void* ctx, u32 param2);
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    s32 gate;
     u32 v1 = fn_802395C8(ctx, param2, param1);
-    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
 
     if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
         gate = 0;
@@ -22910,8 +21521,9 @@ s32 fightTrainerAiWazaHit088(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80239500(void* ctx, u32 param2);
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    s32 gate;
     u32 v1 = fn_802395C8(ctx, param2, param1);
-    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
 
     if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
         gate = 0;
@@ -22931,8 +21543,9 @@ s32 fightTrainerAiWazaHit087(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80239500(void* ctx, u32 param2);
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    s32 gate;
     u32 v1 = fn_802395C8(ctx, param2, param1);
-    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
 
     if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
         gate = 0;
@@ -22951,10 +21564,10 @@ s32 fightTrainerAiWazaHit086(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u16 fn_802367CC(void* ctx, u32 param3, void* arrayA, void* arrayB, u32 flag);
     extern u16 fn_802364BC(void* ctx, u32 param3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
-    extern u8 fn_802381C4(void* ctx, u32 param3, u32 v);
+    extern u8 fn_802381C4(void* ctx, u32 param3, u8 v);
     extern u8 fn_80236BFC(void* ctx, u32 a, u32 type);
-    u16 arrayA[0x10];
-    s16 arrayB[0x2];
+    u16 arrayA[0xe];
+    s16 arrayB[0xa];
     u16 count = fn_802367CC(ctx, param3, arrayA, arrayB, 0);
     u16 target = fn_802364BC(ctx, param3);
     s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
@@ -23032,11 +21645,11 @@ s32 fightTrainerAiWazaHit082(void* ctx, u32 param1, u32 param2, u32 param3) {
     gate = fn_8025C264(ctx, param1, param2, param3, 0xFFFF);
     if (fn_80236BFC(ctx, param1, 0x10) == 1 ||
         fightSeqMonomaneNGCheck(targetVal) != 0 ||
-        targetVal == 0 || targetVal == 0xffff || targetVal == 0x165 || targetVal == 0x163) {
+        (u16)targetVal == 0 || (u16)targetVal == 0xffff || (u16)targetVal == 0x165 || (u16)targetVal == 0x163) {
         return 0;
     }
     for (i = 0; i < count; i++) {
-        if (targetVal == buf[i]) {
+        if ((u16)targetVal == buf[i]) {
             return 0;
         }
     }
@@ -23055,8 +21668,9 @@ s32 fightTrainerAiWazaHit081(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80239500(void* ctx, u32 param2);
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    s32 gate;
     u32 v1 = fn_802395C8(ctx, param2, param1);
-    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
 
     if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
         gate = 0;
@@ -23076,8 +21690,9 @@ s32 fightTrainerAiWazaHit080(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80239500(void* ctx, u32 param2);
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    s32 gate;
     u32 v1 = fn_802395C8(ctx, param2, param1);
-    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
 
     if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
         gate = 0;
@@ -23122,7 +21737,7 @@ s32 fightTrainerAiWazaHit078(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -23143,7 +21758,7 @@ s32 fightTrainerAiWazaHit077(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -23164,7 +21779,7 @@ s32 fightTrainerAiWazaHit076(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -23185,7 +21800,7 @@ s32 fightTrainerAiWazaHit075(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -23206,7 +21821,7 @@ s32 fightTrainerAiWazaHit073(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -23227,7 +21842,7 @@ s32 fightTrainerAiWazaHit072(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -23248,7 +21863,7 @@ s32 fightTrainerAiWazaHit071(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -23269,7 +21884,7 @@ s32 fightTrainerAiWazaHit070(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -23290,7 +21905,7 @@ s32 fightTrainerAiWazaHit069(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -23311,7 +21926,7 @@ s32 fightTrainerAiWazaHit068(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -23576,7 +22191,7 @@ s32 fightTrainerAiWazaHit062(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u8 fn_8025C808(void* ctx, u32 param1, u32 param3, u32 param2, u32 a, u32 b, u32 c);
     s32 gate;
 
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0xa0) < 0) {
         if (fn_80236BFC(ctx, param3, 0x14) == 1) {
             return 0;
         }
@@ -23585,7 +22200,7 @@ s32 fightTrainerAiWazaHit062(void* ctx, u32 param1, u32 param2, u32 param3) {
     if (fn_8025C808(ctx, param1, param3, param2, 0xa0, 0x5, 0x1) == 0) {
         return 0;
     }
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0xa0) < 0) {
         if (gate == 0) {
             return 0;
         }
@@ -23604,7 +22219,7 @@ s32 fightTrainerAiWazaHit060(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u8 fn_8025C808(void* ctx, u32 param1, u32 param3, u32 param2, u32 a, u32 b, u32 c);
     s32 gate;
 
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0xa0) < 0) {
         if (fn_80236BFC(ctx, param3, 0x14) == 1) {
             return 0;
         }
@@ -23613,7 +22228,7 @@ s32 fightTrainerAiWazaHit060(void* ctx, u32 param1, u32 param2, u32 param3) {
     if (fn_8025C808(ctx, param1, param3, param2, 0xa0, 0x3, 0x1) == 0) {
         return 0;
     }
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0xa0) < 0) {
         if (gate == 0) {
             return 0;
         }
@@ -23632,7 +22247,7 @@ s32 fightTrainerAiWazaHit059(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u8 fn_8025C808(void* ctx, u32 param1, u32 param3, u32 param2, u32 a, u32 b, u32 c);
     s32 gate;
 
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0xa0) < 0) {
         if (fn_80236BFC(ctx, param3, 0x14) == 1) {
             return 0;
         }
@@ -23641,7 +22256,7 @@ s32 fightTrainerAiWazaHit059(void* ctx, u32 param1, u32 param2, u32 param3) {
     if (fn_8025C808(ctx, param1, param3, param2, 0xa0, 0x2, 0x1) == 0) {
         return 0;
     }
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0xa0) < 0) {
         if (gate == 0) {
             return 0;
         }
@@ -23660,7 +22275,7 @@ s32 fightTrainerAiWazaHit058(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u8 fn_8025C808(void* ctx, u32 param1, u32 param3, u32 param2, u32 a, u32 b, u32 c);
     s32 gate;
 
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0xa0) < 0) {
         if (fn_80236BFC(ctx, param3, 0x14) == 1) {
             return 0;
         }
@@ -23669,7 +22284,7 @@ s32 fightTrainerAiWazaHit058(void* ctx, u32 param1, u32 param2, u32 param3) {
     if (fn_8025C808(ctx, param1, param3, param2, 0xa0, 0x1, 0x1) == 0) {
         return 0;
     }
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0xa0) < 0) {
         if (gate == 0) {
             return 0;
         }
@@ -23705,7 +22320,7 @@ s32 fightTrainerAiWazaHit054(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u8 fn_8025C808(void* ctx, u32 param1, u32 param3, u32 param2, u32 a, u32 b, u32 c);
     s32 gate;
 
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0x20) < 0) {
         if (fn_80236BFC(ctx, param3, 0x14) == 1) {
             return 0;
         }
@@ -23714,7 +22329,7 @@ s32 fightTrainerAiWazaHit054(void* ctx, u32 param1, u32 param2, u32 param3) {
     if (fn_8025C808(ctx, param1, param3, param2, 0x20, 0x5, 0x41) == 0) {
         return 0;
     }
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0x20) < 0) {
         if (gate == 0) {
             return 0;
         }
@@ -23733,7 +22348,7 @@ s32 fightTrainerAiWazaHit053(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u8 fn_8025C808(void* ctx, u32 param1, u32 param3, u32 param2, u32 a, u32 b, u32 c);
     s32 gate;
 
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0x20) < 0) {
         if (fn_80236BFC(ctx, param3, 0x14) == 1) {
             return 0;
         }
@@ -23742,7 +22357,7 @@ s32 fightTrainerAiWazaHit053(void* ctx, u32 param1, u32 param2, u32 param3) {
     if (fn_8025C808(ctx, param1, param3, param2, 0x20, 0x4, 0x41) == 0) {
         return 0;
     }
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0x20) < 0) {
         if (gate == 0) {
             return 0;
         }
@@ -23761,7 +22376,7 @@ s32 fightTrainerAiWazaHit052(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u8 fn_8025C808(void* ctx, u32 param1, u32 param3, u32 param2, u32 a, u32 b, u32 c);
     s32 gate;
 
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0x20) < 0) {
         if (fn_80236BFC(ctx, param3, 0x14) == 1) {
             return 0;
         }
@@ -23770,7 +22385,7 @@ s32 fightTrainerAiWazaHit052(void* ctx, u32 param1, u32 param2, u32 param3) {
     if (fn_8025C808(ctx, param1, param3, param2, 0x20, 0x3, 0x41) == 0) {
         return 0;
     }
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0x20) < 0) {
         if (gate == 0) {
             return 0;
         }
@@ -23789,7 +22404,7 @@ s32 fightTrainerAiWazaHit051(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u8 fn_8025C808(void* ctx, u32 param1, u32 param3, u32 param2, u32 a, u32 b, u32 c);
     s32 gate;
 
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0x20) < 0) {
         if (fn_80236BFC(ctx, param3, 0x14) == 1) {
             return 0;
         }
@@ -23798,7 +22413,7 @@ s32 fightTrainerAiWazaHit051(void* ctx, u32 param1, u32 param2, u32 param3) {
     if (fn_8025C808(ctx, param1, param3, param2, 0x20, 0x2, 0x41) == 0) {
         return 0;
     }
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0x20) < 0) {
         if (gate == 0) {
             return 0;
         }
@@ -23817,7 +22432,7 @@ s32 fightTrainerAiWazaHit050(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u8 fn_8025C808(void* ctx, u32 param1, u32 param3, u32 param2, u32 a, u32 b, u32 c);
     s32 gate;
 
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0x20) < 0) {
         if (fn_80236BFC(ctx, param3, 0x14) == 1) {
             return 0;
         }
@@ -23826,7 +22441,7 @@ s32 fightTrainerAiWazaHit050(void* ctx, u32 param1, u32 param2, u32 param3) {
     if (fn_8025C808(ctx, param1, param3, param2, 0x20, 0x1, 0x41) == 0) {
         return 0;
     }
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0x20) < 0) {
         if (gate == 0) {
             return 0;
         }
@@ -23990,7 +22605,7 @@ s32 fn_8025A16C(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -24034,7 +22649,7 @@ s32 fightTrainerAiWazaHit044(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -24055,7 +22670,7 @@ s32 fightTrainerAiWazaHit043(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -24076,7 +22691,7 @@ s32 fightTrainerAiWazaHit042(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -24087,8 +22702,9 @@ s32 fightTrainerAiWazaHit041(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80239500(void* ctx, u32 param2);
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    s32 gate;
     u32 v1 = fn_802395C8(ctx, param2, param1);
-    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
 
     if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
         gate = 0;
@@ -24108,8 +22724,9 @@ s32 fightTrainerAiWazaHit040(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80239500(void* ctx, u32 param2);
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    s32 gate;
     u32 v1 = fn_802395C8(ctx, param2, param1);
-    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
 
     if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
         gate = 0;
@@ -24139,7 +22756,7 @@ s32 fightTrainerAiWazaHit039(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -24152,10 +22769,11 @@ s32 fightTrainerAiWazaHit038(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80239500(void* ctx, u32 param2);
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern u8 fn_80237F74(void* ctx, u32 a, u32 type);
+    s32 gate;
     u8 a = fn_80237774(ctx, param1);
     u8 b = fn_80237774(ctx, param3);
     u32 v1 = fn_802395C8(ctx, param2, param1);
-    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0xFFFF);
+    gate = fn_8025C264(ctx, param1, param2, param3, 0xFFFF);
 
     if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
         gate = 0;
@@ -24176,47 +22794,19 @@ s32 fightTrainerAiWazaHit038(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x8025A870 | Size: 0x8C */
-void fightTrainerAiWazaHit037(void* ctx, u32 param1, u32 param2) {
+u32 fightTrainerAiWazaHit037(void* ctx, u32 param1, u32 param2) {
     extern f32 lbl_8047E648;
-    extern void fn_80236BFC();
-    extern void fn_802373B0();
-    extern void fightTrainerAiCheckSawagu();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f1 = 0.0f;
-    u32 r4 = param1;
-    u32 r5 = param2;
+    extern u8 fn_80236BFC(void*, u32, u32);
+    extern u8 fn_802373B0(void*, u32, s32, f32);
+    extern u8 fightTrainerAiCheckSawagu(void*, u32);
 
-    r5 = 0x8;
-    r30 = r3;
-    r31 = r4;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80236BFC(ctx, param1, 8) == 1) {
+        return 0;
     }
-    r3 = r30;
-    r4 = r31;
-    fightTrainerAiCheckSawagu();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fightTrainerAiCheckSawagu(ctx, param1) == 1) {
+        return 0;
     }
-    f1 = lbl_8047E648;
-    r3 = r30;
-    r4 = r31;
-    r5 = 0x0;
-    fn_802373B0();
-    r0 = r3 & 0xFF;
-    r3 = 0x1 - r0;
-    r3 = r3 - r0; /* -borrow */;
-
-    return;
+    return fn_802373B0(ctx, param1, 0, lbl_8047E648) != 1;
 }
 
 /* Address: 0x8025A8FC | Size: 0xB4 */
@@ -24235,7 +22825,7 @@ s32 fightTrainerAiWazaHit036(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -24270,7 +22860,7 @@ s32 fightTrainerAiWazaHit034(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -24344,22 +22934,12 @@ u8 fightTrainerAiWazaHit033(void* ctx, u32 param1, u32 param2, u32 param3) {
     return 1;
 }
 
-/* Address: 0x8025AD10 | Size: 0x38 | Ghidra import */
-int fightTrainerAiWazaHit032(void)
-
-{
-    u32 r3;
-    u32 r4;
-
-    extern u32 fn_802373B0();
+/* Address: 0x8025AD10 | Size: 0x38 */
+u32 fightTrainerAiWazaHit032(void* ctx, u32 slot, u32 param2, u32 param3) {
     extern f32 lbl_8047E648;
+    extern u8 fn_802373B0(void*, u32, s32, f32);
 
-  u32 uVar1;
-  int iVar2;
-  
-  uVar1 = fn_802373B0((double)lbl_8047E648,r3,r4,0);
-  iVar2 = -(uVar1 & 0xff) + 1;
-  return iVar2 - ((u32)(iVar2 == 0) + -(uVar1 & 0xff));
+    return fn_802373B0(ctx, slot, 0, lbl_8047E648) != 1;
 }
 /* Address: 0x8025AD48 | Size: 0xB4 */
 s32 fightTrainerAiWazaHit031(void* ctx, u32 param1, u32 param2, u32 param3) {
@@ -24377,7 +22957,7 @@ s32 fightTrainerAiWazaHit031(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -24398,8 +22978,9 @@ s32 fightTrainerAiWazaHit029(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80239500(void* ctx, u32 param2);
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    s32 gate;
     u32 v1 = fn_802395C8(ctx, param2, param1);
-    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
 
     if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
         gate = 0;
@@ -24449,8 +23030,9 @@ s32 fightTrainerAiWazaHit027(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80239500(void* ctx, u32 param2);
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    s32 gate;
     u32 v1 = fn_802395C8(ctx, param2, param1);
-    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
 
     if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
         gate = 0;
@@ -24480,7 +23062,7 @@ s32 fightTrainerAiWazaHit026(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -24493,7 +23075,7 @@ s32 fightTrainerAiWazaHit024(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u8 fn_8025C808(void* ctx, u32 param1, u32 param3, u32 param2, u32 a, u32 b, u32 c);
     s32 gate;
 
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0x90) < 0) {
         if (fn_80236BFC(ctx, param3, 0x14) == 1) {
             return 0;
         }
@@ -24502,7 +23084,7 @@ s32 fightTrainerAiWazaHit024(void* ctx, u32 param1, u32 param2, u32 param3) {
     if (fn_8025C808(ctx, param1, param3, param2, 0x90, 0x7, 0x1) == 0) {
         return 0;
     }
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0x90) < 0) {
         if (gate == 0) {
             return 0;
         }
@@ -24521,7 +23103,7 @@ s32 fightTrainerAiWazaHit023(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u8 fn_8025C808(void* ctx, u32 param1, u32 param3, u32 param2, u32 a, u32 b, u32 c);
     s32 gate;
 
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0x90) < 0) {
         if (fn_80236BFC(ctx, param3, 0x14) == 1) {
             return 0;
         }
@@ -24530,7 +23112,7 @@ s32 fightTrainerAiWazaHit023(void* ctx, u32 param1, u32 param2, u32 param3) {
     if (fn_8025C808(ctx, param1, param3, param2, 0x90, 0x6, 0x1) == 0) {
         return 0;
     }
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0x90) < 0) {
         if (gate == 0) {
             return 0;
         }
@@ -24549,7 +23131,7 @@ s32 fightTrainerAiWazaHit020(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u8 fn_8025C808(void* ctx, u32 param1, u32 param3, u32 param2, u32 a, u32 b, u32 c);
     s32 gate;
 
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0x90) < 0) {
         if (fn_80236BFC(ctx, param3, 0x14) == 1) {
             return 0;
         }
@@ -24558,7 +23140,7 @@ s32 fightTrainerAiWazaHit020(void* ctx, u32 param1, u32 param2, u32 param3) {
     if (fn_8025C808(ctx, param1, param3, param2, 0x90, 0x3, 0x1) == 0) {
         return 0;
     }
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0x90) < 0) {
         if (gate == 0) {
             return 0;
         }
@@ -24577,7 +23159,7 @@ s32 fightTrainerAiWazaHit019(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u8 fn_8025C808(void* ctx, u32 param1, u32 param3, u32 param2, u32 a, u32 b, u32 c);
     s32 gate;
 
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0x90) < 0) {
         if (fn_80236BFC(ctx, param3, 0x14) == 1) {
             return 0;
         }
@@ -24586,7 +23168,7 @@ s32 fightTrainerAiWazaHit019(void* ctx, u32 param1, u32 param2, u32 param3) {
     if (fn_8025C808(ctx, param1, param3, param2, 0x90, 0x2, 0x1) == 0) {
         return 0;
     }
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0x90) < 0) {
         if (gate == 0) {
             return 0;
         }
@@ -24605,7 +23187,7 @@ s32 fightTrainerAiWazaHit018(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u8 fn_8025C808(void* ctx, u32 param1, u32 param3, u32 param2, u32 a, u32 b, u32 c);
     s32 gate;
 
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0x90) < 0) {
         if (fn_80236BFC(ctx, param3, 0x14) == 1) {
             return 0;
         }
@@ -24614,7 +23196,7 @@ s32 fightTrainerAiWazaHit018(void* ctx, u32 param1, u32 param2, u32 param3) {
     if (fn_8025C808(ctx, param1, param3, param2, 0x90, 0x1, 0x1) == 0) {
         return 0;
     }
-    if (fightSeqCondChgActParaIdToValue(0x10) < 0) {
+    if (fightSeqCondChgActParaIdToValue(0x90) < 0) {
         if (gate == 0) {
             return 0;
         }
@@ -24641,7 +23223,7 @@ s32 fightTrainerAiWazaHit017(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -25023,7 +23605,7 @@ s32 fightTrainerAiWazaHit006(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -25044,7 +23626,7 @@ s32 fightTrainerAiWazaHit005(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -25065,7 +23647,7 @@ s32 fightTrainerAiWazaHit004(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -25086,7 +23668,7 @@ s32 fightTrainerAiWazaHit003(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -25107,7 +23689,7 @@ s32 fightTrainerAiWazaHit002(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (gate == -1) {
-        return 1;
+        return gate != 0;
     }
     return 1;
 }
@@ -25160,8 +23742,9 @@ s32 fightTrainerAiWazaHit000(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80239500(void* ctx, u32 param2);
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    s32 gate;
     u32 v1 = fn_802395C8(ctx, param2, param1);
-    s32 gate = fn_8025C264(ctx, param1, param2, param3, 0);
+    gate = fn_8025C264(ctx, param1, param2, param3, 0);
 
     if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
         gate = 0;
@@ -25509,70 +24092,49 @@ typedef struct HorobinoutaCtx {
  * return value -- the counter in ctx is the real output).
  */
 #pragma optimize_for_size on
-s32 _fightTrainerAiCheckHorobinoutaSub(void* floor, u16 idx, HorobinoutaCtx* ctx) {
-    extern u8 fn_802062FC(void* floor, u16 idx, HorobinoutaCtx* ctx);
-    extern u8 fightTrainerIsAllyFightTargetPtr(u32 fieldA, void* floor, u16 idx);
+s32 _fightTrainerAiCheckHorobinoutaSub(void* floor, u32 idx, HorobinoutaCtx* ctx) {
+    extern u8 fn_802062FC(void* floor, u32 idx, HorobinoutaCtx* ctx);
+    extern u8 fightTrainerIsAllyFightTargetPtr(u32 fieldA, void* floor, u32 idx);
     extern u8 fn_80236BFC(u32 fieldA, void* floor, u32 flag);
     extern u8 fn_80237F74(u32 fieldA, void* floor, u32 flag);
-    u32 fieldA = ctx->field0;
+    u32 r31;
+    u32 r30;
+    u32 r28;
+    u32 r29;
 
-    if (!fn_802062FC(floor, idx, ctx)) {
+    r29 = (u32)ctx;
+    r28 = idx;
+    r31 = (u32)floor;
+    r30 = *(u32*)r29;
+    if (!fn_802062FC((void*)r31, r28, (HorobinoutaCtx*)r29)) {
         return 1;
     }
-    if (fightTrainerIsAllyFightTargetPtr(fieldA, floor, idx) == 1) {
+    if (fightTrainerIsAllyFightTargetPtr(r30, (void*)r31, r28) == 1) {
         return 1;
     }
-    if (fn_80236BFC(fieldA, floor, 0x1e) != 1 && fn_80237F74(fieldA, floor, 0x2b) != 1) {
-        ctx->counter++;
+    if (fn_80236BFC(r30, (void*)r31, 0x1e) != 1 && fn_80237F74(r30, (void*)r31, 0x2b) != 1) {
+        *(u32*)(r29 + 4) = *(u32*)(r29 + 4) + 1;
     }
     return 1;
 }
 #pragma optimize_for_size reset
 
 /* Address: 0x8025C770 | Size: 0x98 */
-void fn_8025C770(void* ctx, u32 param1, u32 param2) {
-    extern void fn_801FB1C0();
-    extern void fn_8021B364();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r31 = 0;
-    u32 r1 = (u32)sp;
-    u32 r4 = param1;
-    u32 r5 = param2;
+u32 fn_8025C770(void* ctx, u32 param1, u32 param2) {
+    extern u32 fn_801FB1C0(void*, u32, u32, u32);
+    extern u8 fn_8021B364(u32, void*);
+    u8 out[0x10];
+    u32 value;
+    u32 result;
 
-    r5 = 0x43;
-    r6 = 0x0;
-    r31 = r4;
-    r4 = 0x0;
-    fn_801FB1C0();
-    r4 = r3 & 0xFFFF;
-    r3 = 0x0;
-    r5 = 0x2;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r4 = r3 & 0xFFFF;
-    r3 = 0x0;
-    r5 = 0x2a;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = (u32)sp + 0x8;
-        fn_8021B364();
-        r3 = r3 & 0xFF;
-        r0 = 0x1;
-        r0 = r3 - r0;
-        r0 = -0x1;
-        r3 = r0 & 0xFF;
-    } else {
-
-        r3 = 0x1;
+    value = fn_801FB1C0(ctx, 0, 0x43, 0) & 0xFFFF;
+    value = fn_801FB1C0(0, value, 2, 0) & 0xFFFF;
+    if ((u8)fn_801FB1C0(0, value, 0x2a, 0) == 1) {
+        value = fn_8021B364(param1, out) & 0xFF;
+        result = value >= 1;
+        return result & 0xFF;
     }
-    r31 = *(u32*)(sp + 0x1C);
-    return;
+    return 1;
 }
 
 /* Address: 0x8025C808 | Size: 0x2A0 (672 bytes) */
@@ -25776,48 +24338,19 @@ void fn_8025C808(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x8025CAA8 | Size: 0x94 */
-void fn_8025CAA8(void* ctx, u32 param1, u32 param2) {
-    extern void fn_801FB1C0();
-    extern void fn_80229C28();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r6 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
+u32 fn_8025CAA8(void* ctx, u32 param1, u32 param2) {
+    extern u32 fn_801FB1C0(void*, u32, u32, u32);
+    extern u8 fn_80229C28(u32, u32);
+    u32 value;
 
-    r6 = 0x0;
-    r30 = r4;
-    r31 = r5;
-    r4 = 0x0;
-    r5 = 0x43;
-    fn_801FB1C0();
-    r4 = r3 & 0xFFFF;
-    r3 = 0x0;
-    r5 = 0x2;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r4 = r3 & 0xFFFF;
-    r3 = 0x0;
-    r5 = 0x24;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r30;
-        r4 = r31;
-        fn_80229C28();
-        r0 = r3 & 0xFF;
-        if (r0 == (u32)0x1) {
-            r3 = 0x1;
-            return;
+    value = fn_801FB1C0(ctx, 0, 0x43, 0) & 0xFFFF;
+    value = fn_801FB1C0(0, value, 2, 0) & 0xFFFF;
+    if ((u8)fn_801FB1C0(0, value, 0x24, 0) == 1) {
+        if (fn_80229C28(param1, param2) == 1) {
+            return 1;
+        }
     }
-    }
-    r3 = 0x0;
-
-    return;
+    return 0;
 }
 
 /* Address: 0x8025CB3C | Size: 0xAC */
@@ -26159,70 +24692,53 @@ u32 fn_8025D06C(void)
 
 
 /* Address: 0x8025D0A8 | Size: 0xBC */
-void fn_8025D0A8(void* ctx, u32 param1, u32 param2) {
+f32 fn_8025D0A8(void* ctx, u32 param1, u32 param2) {
     extern u32 lbl_80478EAC;
     extern f32 lbl_8047E658;
     extern f32 lbl_8047E65C;
-    extern void fn_8011F5C8();
-    extern void fn_80123FBC();
-    extern void fn_80129280();
-    extern void fn_8012AC08();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f0 = 0.0f;
-    f32 f1 = 0.0f;
-    u32 r4 = param1;
-    u32 r5 = param2;
+    extern u16 fn_8011F5C8(void*);
+    extern u8 fn_80123FBC(void*);
+    extern void* fn_80129280(u32, u32);
+    extern void* fn_8012AC08(void*, u32);
+    void* party;
+    void* member;
+    u32 count;
+    u32 i;
+    u32 offset;
+    u16 species;
+    u16 entry;
+    f32 scale;
+    f32 factor;
 
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
-
-    r30 = 0x0;
-    if ((s32)r0 == (s32)0) {
-        r3 = 0x0;
-        r4 = 0x2;
-        fn_80129280();
-        r28 = r3;
+    party = ctx;
+    count = 0;
+    if (party == 0) {
+        party = fn_80129280(0, 2);
     }
-    r31 = 0x0;
-    do {
-        r3 = r28;
-        r4 = r31 & 0xFFFF;
-        fn_8012AC08();
-        r29 = r3;
-        fn_80123FBC();
-        r0 = r3 & 0xFF;
-        if ((s32)r0 != (s32)0) {
-            r3 = r29;
-            fn_8011F5C8();
-            r4 = lbl_80478EAC;
-            r0 = r3 & 0xFFFF;
-            r3 = 0x0;
-            do {
-                r5 = *(u16*)(r4 + r3);
-                if (r5 == (u32)0x0) break;
-                if (r0 == (u32)r5) {
-                    r30 = r30 + 0x1;
+    for (i = 0; (s32)i < 6; i++) {
+        member = fn_8012AC08(party, i & 0xFFFF);
+        if (fn_80123FBC(member) != 0) {
+            species = fn_8011F5C8(member);
+            offset = 0;
+            while (1) {
+                entry = *(u16*)(lbl_80478EAC + offset);
+                if (entry == 0) {
+                    break;
                 }
-                r3 = r3 + 0x2;
-            } while (1);
+                if (species == entry) {
+                    count++;
+                }
+                offset += 2;
+            }
         }
-        r31 = r31 + 0x1;
-    } while ((s32)r31 < (s32)0x6);
-    f1 = lbl_8047E658;
-    f0 = lbl_8047E65C;
-    ctr_fn = (void(*)(void))r30;
-    if ((s32)r30 > (s32)0x0) {
-        do {
-            f1 = f1 * f0;
-        } while (--ctr != 0);
     }
-    return;
+    scale = lbl_8047E658;
+    factor = lbl_8047E65C;
+    while ((s32)count > 0) {
+        scale *= factor;
+        count--;
+    }
+    return scale;
 }
 
 /* Address: 0x8025D164 | Size: 0x128 (296 bytes) */
@@ -26513,31 +25029,24 @@ void fn_8025D3F4(void* ctx, u32 param1, u32 param2, u32 param3) {
 u32 fn_8025D560(void* ctx) { return *(u32*)((u8*)fn_8006B09C(ctx) + 0x20); }
 
 /* Address: 0x8025D584 | Size: 0x5C | Pattern: field_accessor */
-void toolentryTaisenDeleteEtnryPokemonOrder(void* ctx, u32 slot, u32 param) {
-    extern void fn_8006B09C();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r4 = slot;
-    u32 r5 = param;
+u32 toolentryTaisenDeleteEtnryPokemonOrder(void* ctx, u32 slot, u32 param) {
+    typedef struct BattleFieldAccessor {
+        u8 unk_00[8];
+        u32 values[6];
+        u32 count;
+    } BattleFieldAccessor;
+    extern BattleFieldAccessor* fn_8006B09C(void*);
+    BattleFieldAccessor* entry;
+    s32 index;
 
-    fn_8006B09C();
-    r4 = *(u32*)((u8*)r3 + 0x20);
-    if ((s32)r0 < (s32)0) { r3 = 0x0; return; }
-    if ((s32)r0 > (s32)0x6) {
-
-        r3 = 0x0;
-        return;
+    entry = fn_8006B09C(ctx);
+    index = entry->count - 1;
+    if ((index < 0) || (index > 6)) {
+        return 0;
     }
-    r0 = r0 << 2;
-    r5 = -0x1;
-    r4 = r3 + r0;
-    *(u32*)((u8*)r4 + 0x8) = r5;
-    r4 = *(u32*)((u8*)r3 + 0x20);
-    *(u32*)((u8*)r3 + 0x20) = r0;
-    r3 = *(u32*)((u8*)r3 + 0x20);
-
-    return;
+    entry->values[index] = (u32)-1;
+    entry->count--;
+    return entry->count;
 }
 
 /* Address: 0x8025D5E0 | Size: 0x64 | Pattern: field_accessor */
@@ -26560,84 +25069,59 @@ u32 toolentryTaisenSetEtnryPokemonOrderGBA(void* ctx, s32 count, u32* src) {
 }
 
 /* Address: 0x8025D644 | Size: 0x100 (256 bytes) */
-void fn_8025D644(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_8006B09C();
-    extern void fn_8006B1D4();
-    extern void fn_80123FBC();
-    extern void fn_8012AC08();
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
+s32 fn_8025D644(void* ctx, u32 order, u32 param2, u32 param3) {
+    typedef struct BattleFieldAccessor {
+        u8 unk_00[8];
+        u32 values[6];
+        u32 count;
+    } BattleFieldAccessor;
+    extern BattleFieldAccessor* fn_8006B09C(void*);
+    extern u32 fn_8006B1D4(void*);
+    extern u32 fn_80123FBC(void*);
+    extern void* fn_8012AC08(void*, u32);
+    BattleFieldAccessor* entry;
+    u32 entryCount;
+    u32 liveCount;
+    u32 limit;
+    u32 rawLimit;
+    s32 i;
+    u32 r0;
+    u32 r3;
 
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
-
-    r29 = r4;
-    r25 = r3;
-    fn_8006B09C();
-    r31 = r3;
-    r30 = *(u32*)((u8*)r3 + 0x20);
-    fn_8006B1D4();
-    r26 = 0x0;
-    r28 = r3 & 0xFFFF;
-    r27 = r26;
+    entry = fn_8006B09C(ctx);
+    entryCount = entry->count;
+    rawLimit = fn_8006B1D4(entry);
+    liveCount = 0;
+    limit = rawLimit & 0xFFFF;
+    i = liveCount;
     do {
-        r3 = r25;
-        fn_8006B09C();
-        r4 = r27 & 0xFFFF;
-        r3 = r3 + 0xb44;
-        fn_8012AC08();
-        fn_80123FBC();
+        r3 = (u32)fn_8006B09C(ctx);
+        r3 = (u32)fn_8012AC08((void*)(r3 + 0xb44), i & 0xFFFF);
+        r3 = fn_80123FBC((void*)r3);
         r3 = r3 & 0xFF;
-        r0 = r3 - r0; /* -borrow */;
+        r0 = r3 != 0;
         r0 = r0 & 0xFF;
         if ((s32)r0 != (s32)0) {
-            r3 = r26 & 0xFFFF;
-            r0 = r3 + 0x1;
-            r26 = r0 & 0xFFFF;
+            r3 = liveCount & 0xFFFF;
+            r0 = r3 + 1;
+            liveCount = r0 & 0xFFFF;
         }
-        r27 = r27 + 0x1;
-    } while ((s32)r27 < (s32)0x6);
-    r0 = r26 & 0xFFFF;
-    r3 = *(u32*)((u8*)r31 + 0x20);
-    if (r0 < r28) {
-        r28 = r26;
+        i++;
+    } while (i < 6);
+    if ((liveCount & 0xFFFF) < limit) {
+        limit = liveCount;
     }
-    r0 = r28 & 0xFFFF;
-    if ((s32)r3 >= (s32)r0) {
-        r3 = -0x1;
-        return;
+    if ((s32)entry->count >= (s32)(limit & 0xFFFF)) {
+        return -1;
     }
-    r3 = 0x0;
-    ctr_fn = (void(*)(void))r30;
-    if ((s32)r30 > (s32)0x0) {
-        do {
-            r0 = r3 + 0x8;
-            r0 = *(u32*)(r31 + r0);
-            if ((s32)r0 == (s32)r29) {
-                r3 = -0x1;
-                return;
-            }
-            r3 = r3 + 0x4;
-        } while (--ctr != 0);
+    for (i = 0; i < (s32)entryCount; i++) {
+        if ((s32)entry->values[i] == (s32)order) {
+            return -1;
+        }
     }
-    r0 = r30 << 2;
-    r3 = r30;
-    r4 = r31 + r0;
-    *(u32*)((u8*)r4 + 0x8) = r29;
-    r4 = *(u32*)((u8*)r31 + 0x20);
-    r0 = r4 + 0x1;
-    *(u32*)((u8*)r31 + 0x20) = r0;
-
-    return;
+    entry->values[entryCount] = order;
+    entry->count++;
+    return entryCount;
 }
 
 /* Address: 0x8025D744 | Size: 0x44 | Pattern: field_accessor */
@@ -26674,35 +25158,29 @@ void fn_8025D788(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x8025D808 | Size: 0x94 */
-void fn_8025D808(void* ctx, u32 param1, u32 param2) {
-    extern void fn_8006B09C();
-    extern void fn_8006B1D4();
-    extern void fn_80123FBC();
-    extern void fn_8012AC08();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
+u32 fn_8025D808(void* ctx, u32 param1, u32 param2) {
+    extern void* fn_8006B09C(void*);
+    extern u32 fn_8006B1D4(void*);
+    extern u32 fn_80123FBC(void*);
+    extern void* fn_8012AC08(void*, u32);
+    u32 r0;
+    u32 r3;
+    u32 r28;
+    u32 r30;
+    u32 r31;
+    void* saved;
 
-    r28 = r3;
-    fn_8006B1D4();
-    r30 = 0x0;
-    r29 = r28;
+    r3 = fn_8006B1D4(ctx);
+    r30 = 0;
+    saved = ctx;
     r31 = r30;
     r28 = r3 & 0xFFFF;
     do {
-        r3 = r29;
-        fn_8006B09C();
-        r4 = r31 & 0xFFFF;
-        r3 = r3 + 0xb44;
-        fn_8012AC08();
-        fn_80123FBC();
+        r3 = (u32)fn_8006B09C(saved);
+        r3 = (u32)fn_8012AC08((void *)(r3 + 0xb44), r31 & 0xFFFF);
+        r3 = fn_80123FBC((void *)r3);
         r3 = r3 & 0xFF;
-        r0 = r3 - r0; /* -borrow */;
+        r0 = r3 != 0;
         r0 = r0 & 0xFF;
         if ((s32)r0 != (s32)0) {
             r3 = r30 & 0xFFFF;
@@ -26716,34 +25194,32 @@ void fn_8025D808(void* ctx, u32 param1, u32 param2) {
     if (r0 < r28) {
         r3 = r30;
     }
-    return;
+    return r3;
 }
 
 /* Address: 0x8025D89C | Size: 0x78 | Pattern: field_accessor */
-void fn_8025D89C(void* ctx, u32 slot, u32 param) {
-    extern void fn_8006B09C();
-    extern void fn_80123FBC();
-    extern void fn_8012AC08();
+u32 fn_8025D89C(void* ctx, u32 slot, u32 param) {
+    extern void* fn_8006B09C(void*);
+    extern u32 fn_80123FBC(void*);
+    extern void* fn_8012AC08(void*, u32);
     u8 sp[0x20];
     u32 r0 = 0;
     u32 r3 = (u32)ctx;
-    u32 r29 = 0;
-    u32 r30 = 0;
     u32 r31 = 0;
+    u32 r30 = 0;
+    u32 r29 = 0;
     u32 r4 = slot;
 
     r30 = 0x0;
     r31 = r3;
     r29 = 0x0;
     do {
-        r3 = r31;
-        fn_8006B09C();
+        r3 = (u32)fn_8006B09C((void *)r31);
         r4 = r29 & 0xFFFF;
-        r3 = r3 + 0xb44;
-        fn_8012AC08();
-        fn_80123FBC();
+        r3 = (u32)fn_8012AC08((void *)(r3 + 0xb44), r4);
+        r3 = fn_80123FBC((void *)r3);
         r3 = r3 & 0xFF;
-        r0 = r3 - r0; /* -borrow */;
+        r0 = r3 != 0;
         r0 = r0 & 0xFF;
         if ((s32)r0 != (s32)0) {
             r3 = r30 & 0xFFFF;
@@ -26752,8 +25228,7 @@ void fn_8025D89C(void* ctx, u32 slot, u32 param) {
         }
         r29 = r29 + 0x1;
     } while ((s32)r29 < (s32)0x6);
-    r3 = r30;
-    return;
+    return r30;
 }
 
 /* Address: 0x8025D914 | Size: 0x24 | Pattern: null_check_getter */
@@ -26885,13 +25360,13 @@ u32 tableResBiosGetResPtr(u32 idx) {
     extern u8 lbl_8039A690[];
     extern u32 *lbl_80478E08;
     extern u32 *lbl_80478E0C;
-    extern void fn_800DD970(const char* fmt, ...);
+    extern void GSlogWrite(const char* fmt, ...);
 
     u32 count;
     u32* table;
     count = *lbl_80478E08;
     if (idx >= count) {
-        fn_800DD970((const char*)lbl_8027A450, lbl_8039A690);
+        GSlogWrite((const char*)lbl_8027A450, lbl_8039A690);
         return 0;
     }
     table = lbl_80478E0C;
@@ -27221,7 +25696,7 @@ void fn_8025E1BC(float f1, float f2, float f3, float f4, float f5, float f6) {
 void fn_8025E534(void)
 {
     extern u32 lbl_8027A478[];
-    extern u32 fn_800F9318();
+    extern u32 GSresGetResource();
     extern u32 fn_80113F48();
     extern int fn_80118A68();
     extern int fn_80118F04();
@@ -27246,13 +25721,13 @@ void fn_8025E534(void)
     lbl_8047B664 = 0;
 skip_cleanup:
     uVar2 = fn_80113F48();
-    uVar2 = fn_800F9318(uVar2, 0x108a1400);
+    uVar2 = GSresGetResource(uVar2, 0x108a1400);
     uVar2 = fn_801190DC(uVar2, 0, 0);
     lbl_8047B660 = uVar2;
     fn_80118F04(uVar2, local_buf);
     fVar1 = lbl_8047E684;
     lbl_8047B664 = 1;
-    waitTime__Ff((double)fVar1);
+    waitTime__Ff(fVar1);
     if ((s32)lbl_8047B664 == 1) {
         fn_80118A68(lbl_8047B660, 1);
         lbl_8047B660 = 0;
@@ -27306,6 +25781,7 @@ u32 fn_8025E640(u32 r3,int r4)
   short sVar9;
   short sVar10;
   u32 uVar3;
+  u8 cVar6;
   s8 cVar12;
   u32 uVar4;
   u32 uVar13;
@@ -27607,7 +26083,7 @@ void GBAInit(void) {
   u8 *r28;
   r0 = *(u32 *)0x800000F8;
   r0 = r0 >> 2;
-  r0 = (u32)(((u64)0x431BDE83UL * r0) >> 32);
+  r0 = __mulhwu(0x431BDE83u, r0);
   r0 = r0 >> 15;
   r0 = r0 * 60;
   r30 = r0 >> 3;
@@ -27622,7 +26098,7 @@ void GBAInit(void) {
     r28 += 0x40;
   }
   OSInitAlarm();
-  fn_800AE7E0();
+  DSPInit();
   lbl_8047B670 = 0;
   OSRegisterResetFunction(lbl_8039A6B8);
 }
@@ -27705,13 +26181,13 @@ u32 fn_8025F514(void) {
 void ReadProc(int r3)
 
 {
-    extern int fn_800054F4();
-  r3 = r3 * 0x100;
-  if (*(int *)(r3 + -0x7fb87c00) == 0) {
-    fn_800054F4(*(u32 *)(r3 + -0x7fb87c08),r3 + -0x7fb87c1b,4);
-    **(u8 **)(r3 + -0x7fb87c0c) = *(u8 *)(r3 + -0x7fb87c17) & 0x3a;
+  u8 *entry;
+
+  entry = lbl_804783E0 + r3 * 0x100;
+  if (*(s32 *)(entry + 0x20) == 0) {
+    memcpy(*(void **)(entry + 0x18), entry + 0x5, 4);
+    **(u8 **)(entry + 0x14) = *(u8 *)(entry + 0x9) & 0x3a;
   }
-  return;
 }
 
 #pragma push
@@ -27796,240 +26272,243 @@ u32 GBAWrite(int r3, u32 r4, u32 r5) {
 }
 
 /* Address: 0x8025F70C | Size: 0xDC | Ghidra import */
-void __GBAHandler(int r3,u32 r4,u32 r5)
+void __GBAHandler(int chan, u32 status, void* currentContext)
 
 {
-    extern int fn_8009BB68();
-    extern int fn_8009BD60();
-    extern u32 lbl_8047B670;
-  int iVar1;
-  void *pcVar2;
+    extern void OSClearContext(void*);
+    extern void OSSetCurrentContext(void*);
+  u8* entry;
+  void (*callback0)(int);
+  void (*callback1)(int, u32);
+  u8 context[0x2d0];
 
-  u8 auStack_2e0 [724];
-  
-  iVar1 = r3 * 0x100;
-  if (lbl_8047B670 == 0) {
-    if ((r4 & 0xf) == 0) {
-      *(u32 *)(iVar1 + -0x7fb87c00) = 0;
-    }
-    else {
-      *(u32 *)(iVar1 + -0x7fb87c00) = 1;
-    }
-    pcVar2 = *(void **)(iVar1 + -0x7fb87be8);
-    if (pcVar2 != (void *)0x0) {
-      *(u32 *)(iVar1 + -0x7fb87be8) = 0;
-      ((void (*)())pcVar2)(r3);
-    }
-    if (*(int *)(iVar1 + -0x7fb87c04) != 0) {
-      fn_8009BD60((int*)auStack_2e0);
-      fn_8009BB68((int*)auStack_2e0);
-      pcVar2 = *(void **)(iVar1 + -0x7fb87c04);
-      *(u32 *)(iVar1 + -0x7fb87c04) = 0;
-      ((void (*)())pcVar2)(r3,*(u32 *)(iVar1 + -0x7fb87c00));
-      fn_8009BD60((int*)auStack_2e0);
-      fn_8009BB68(r5);
-    }
+  entry = lbl_804783E0 + chan * 0x100;
+  if (lbl_8047B670 != 0) {
+    return;
   }
-  return;
+  if ((status & 0xf) != 0) {
+    *(u32 *)(entry + 0x20) = 1;
+  }
+  else {
+    *(u32 *)(entry + 0x20) = 0;
+  }
+  callback0 = *(void (**)(int))(entry + 0x38);
+  if (callback0 != NULL) {
+    *(u32 *)(entry + 0x38) = 0;
+    callback0(chan);
+  }
+  callback1 = *(void (**)(int, u32))(entry + 0x1c);
+  if (callback1 != NULL) {
+    OSClearContext(context);
+    OSSetCurrentContext(context);
+    *(u32 *)(entry + 0x1c) = 0;
+    callback1(chan, *(u32 *)(entry + 0x20));
+    OSClearContext(context);
+    OSSetCurrentContext(currentContext);
+  }
 }
 
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 /* Address: 0x8025F7E8 | Size: 0x34 | Ghidra import */
 void __GBASyncCallback(int r3)
 
 {
-    extern int OSWakeupThread();
+    extern void OSWakeupThread(void *);
   OSWakeupThread(lbl_804783E0 + r3 * 0x100 + 0x24);
-  return;
 }
-#pragma pop
 
 /* Address: 0x8025F81C | Size: 0x6C | Ghidra import */
 u32 __GBASync(int r3)
 
 {
-    extern u32 fn_8009DF3C();
-    extern int fn_8009DF64();
-    extern int OSSleepThread();
-  u32 uVar1;
-  u32 uVar2;
-  
-  r3 = r3 * 0x100;
-  uVar1 = fn_8009DF3C();
-  while (*(int *)(r3 + -0x7fb87c04) != 0) {
-    OSSleepThread(r3 + -0x7fb87bfc);
+  extern u32 OSDisableInterrupts(void);
+  extern void OSRestoreInterrupts(u32);
+  extern void OSSleepThread(void *);
+  u8 *entry;
+  u32 interrupts;
+  u32 status;
+
+  entry = lbl_804783E0 + r3 * 0x100;
+  interrupts = OSDisableInterrupts();
+  while (*(u32 *)(entry + 0x1c) != 0) {
+    OSSleepThread(entry + 0x24);
   }
-  uVar2 = *(u32 *)(r3 + -0x7fb87c00);
-  fn_8009DF64(uVar1);
-  return uVar2;
+  status = *(u32 *)(entry + 0x20);
+  OSRestoreInterrupts(interrupts);
+  return status;
 }
 
 /* Address: 0x8025F888 | Size: 0x124 | Ghidra import */
 void TypeAndStatusCallback(int r3,u32 r4)
 
 {
-    extern u32 DAT_80478410;
-    extern u32 DAT_80478414;
-    extern u32 fn_8009BBC4();
-    extern int fn_800A1960();
-    extern int fn_800D06F4();
-    extern u32 lbl_8047B670;
-  int iVar1;
-  int iVar2;
-  u32 uVar3;
-  void *pcVar4;
+  extern void *OSGetCurrentContext(void);
+  extern void OSClearContext(void *);
+  extern void OSSetCurrentContext(void *);
+  extern void __OSReschedule(void);
+  extern int SITransfer(int, void *, u32, void *, u32, u32, u32, u32);
+  u8 *entry;
+  void (*callback0)(int);
+  void (*callback1)(int, u32);
+  void *currentContext;
+  u8 context[0x2d0];
 
-  u8 auStack_2e0 [724];
-  
-  iVar1 = r3 * 0x100;
+  entry = lbl_804783E0 + r3 * 0x100;
   if (lbl_8047B670 == 0) {
-    if (((r4 & 0xff) == 0) && ((r4 & 0xffff0000) == 0x40000)) {
-      iVar2 = fn_800D06F4(r3,iVar1 + -0x7fb87c20,*(u32 *)(iVar1 + -0x7fb87c14),
-                           iVar1 + -0x7fb87c1b,*(u32 *)(iVar1 + -0x7fb87c10),(u32)__GBAHandler,
-                           *(u32 *)(&DAT_80478410 + iVar1),
-                           *(u32 *)(&DAT_80478414 + iVar1));
-      if (iVar2 != 0) {
-        return;
-      }
-      *(u32 *)(iVar1 + -0x7fb87c00) = 2;
+    if (((r4 & 0xff) != 0) || ((r4 & 0xffff0000) != 0x40000)) {
+      *(u32 *)(entry + 0x20) = 1;
     }
     else {
-      *(u32 *)(iVar1 + -0x7fb87c00) = 1;
+      if (SITransfer(r3, entry, *(u32 *)(entry + 0xc),
+                     entry + 0x5, *(u32 *)(entry + 0x10),
+                     (u32)__GBAHandler, *(u32 *)(entry + 0x30),
+                     *(u32 *)(entry + 0x34)) != 0) {
+        return;
+      }
+      *(u32 *)(entry + 0x20) = 2;
     }
-    pcVar4 = *(void **)(iVar1 + -0x7fb87be8);
-    if (pcVar4 != (void *)0x0) {
-      *(u32 *)(iVar1 + -0x7fb87be8) = 0;
-      ((void (*)())pcVar4)(r3);
+    callback0 = *(void (**)(int))(entry + 0x38);
+    if (callback0 != (void *)0x0) {
+      *(u32 *)(entry + 0x38) = 0;
+      callback0(r3);
     }
-    if (*(int *)(iVar1 + -0x7fb87c04) != 0) {
-      uVar3 = fn_8009BBC4();
-      fn_8009BD60((int*)auStack_2e0);
-      fn_8009BB68((int*)auStack_2e0);
-      pcVar4 = *(void **)(iVar1 + -0x7fb87c04);
-      *(u32 *)(iVar1 + -0x7fb87c04) = 0;
-      ((void (*)())pcVar4)(r3,*(u32 *)(iVar1 + -0x7fb87c00));
-      fn_8009BD60((int*)auStack_2e0);
-      fn_8009BB68(uVar3);
-      fn_800A1960();
+    callback1 = *(void (**)(int, u32))(entry + 0x1c);
+    if (callback1 != (void *)0x0) {
+      currentContext = OSGetCurrentContext();
+      OSClearContext(context);
+      OSSetCurrentContext(context);
+      *(u32 *)(entry + 0x1c) = 0;
+      callback1(r3, *(u32 *)(entry + 0x20));
+      OSClearContext(context);
+      OSSetCurrentContext(currentContext);
+      __OSReschedule();
     }
   }
-  return;
 }
 
 /* Address: 0x8025F9AC | Size: 0x74 | Ghidra import */
 u32 __GBATransfer(int r3,u32 r4,u32 r5,u32 r6)
 
 {
-    extern int SIGetTypeAsync();
-  int iVar1;
-  u32 uVar2;
-  
-  iVar1 = r3 * 0x100;
-  uVar2 = fn_8009DF3C();
-  *(u32 *)(iVar1 + -0x7fb87be8) = r6;
-  *(u32 *)(iVar1 + -0x7fb87c14) = r4;
-  *(u32 *)(iVar1 + -0x7fb87c10) = r5;
-  SIGetTypeAsync(r3,(u32)TypeAndStatusCallback);
-  fn_8009DF64(uVar2);
+  extern u32 OSDisableInterrupts(void);
+  extern void OSRestoreInterrupts(u32);
+  extern int SIGetTypeAsync();
+  u32 chan;
+  u32 sendBytes;
+  u32 recvBytes;
+  u32 callback;
+  u8 *entry;
+  u32 interrupts;
+
+  chan = r3;
+  sendBytes = r4;
+  recvBytes = r5;
+  callback = r6;
+  entry = lbl_804783E0 + chan * 0x100;
+  interrupts = OSDisableInterrupts();
+  *(u32 *)(entry + 0x38) = callback;
+  *(u32 *)(entry + 0xc) = sendBytes;
+  *(u32 *)(entry + 0x10) = recvBytes;
+  SIGetTypeAsync(chan,(u32)TypeAndStatusCallback);
+  OSRestoreInterrupts(interrupts);
   return 0;
 }
 
 /* Address: 0x8025FA20 | Size: 0x1AC | Ghidra import */
-void fn_8025FA20(u16 r3,u32 *r4,u32 *r5)
+void fn_8025FA20(u16 r3, f32 *r4, f32 *r5)
 
 {
-    extern u32 lbl_8047E690;
-    extern u32 lbl_8047E694;
-    extern u32 lbl_8047E698;
-    extern u32 lbl_8047E69C;
-    extern u32 lbl_8047E6A0;
-    extern u32 lbl_8047E6A4;
-    extern u32 lbl_8047E6A8;
-    extern u32 lbl_8047E6AC;
-  u32 uVar1;
+    extern f32 lbl_8047E690;
+    extern f32 lbl_8047E694;
+    extern f32 lbl_8047E698;
+    extern f32 lbl_8047E69C;
+    extern f32 lbl_8047E6A0;
+    extern f32 lbl_8047E6A4;
+    extern f32 lbl_8047E6A8;
+    extern f32 lbl_8047E6AC;
+  s32 id;
+  f32 fVar1;
 
-  uVar1 = lbl_8047E690;
-  if (r3 == 0x92) {
-    uVar1 = lbl_8047E6A4;
+  id = (u16)r3;
+  fVar1 = lbl_8047E690;
+  if (id == 0x92) {
+    fVar1 = lbl_8047E6A4;
   }
-  else if (r3 < 0x92) {
-    if (r3 == 0x4a) {
-      uVar1 = lbl_8047E698;
+  else if (id < 0x92) {
+    if (id == 0x4a) {
+      fVar1 = lbl_8047E698;
     }
-    else if (r3 < 0x4a) {
-      if (r3 == 0x26) {
-        uVar1 = lbl_8047E694;
+    else if (id < 0x4a) {
+      if (id == 0x26) {
+        fVar1 = lbl_8047E694;
       }
-      else if (r3 < 0x26) {
-        if (r3 == 0x1a) {
-          uVar1 = lbl_8047E6A0;
+      else if (id < 0x26) {
+        if (id == 0x1a) {
+          fVar1 = lbl_8047E6A0;
         }
-        else if ((r3 < 0x1a) && (r3 == 6)) {
-          uVar1 = lbl_8047E6A0;
+        else if ((id < 0x1a) && (id == 6)) {
+          fVar1 = lbl_8047E6A0;
         }
       }
-      else if (r3 == 0x44) {
-        uVar1 = lbl_8047E6A8;
+      else if (id == 0x44) {
+        fVar1 = lbl_8047E6A8;
       }
     }
-    else if (r3 == 0x8e) {
-      uVar1 = lbl_8047E69C;
+    else if (id == 0x8e) {
+      fVar1 = lbl_8047E69C;
     }
-    else if (r3 < 0x8e) {
-      if (r3 == 0x85) {
-        uVar1 = lbl_8047E698;
+    else if (id < 0x8e) {
+      if (id == 0x85) {
+        fVar1 = lbl_8047E698;
       }
-      else if ((r3 < 0x85) && (r3 < 0x4c)) {
-        uVar1 = lbl_8047E698;
-      }
-    }
-    else if (r3 == 0x90) {
-      uVar1 = lbl_8047E6A4;
-    }
-    else if (0x8f < r3) {
-      uVar1 = lbl_8047E69C;
-    }
-  }
-  else if (r3 == 0x136) {
-    uVar1 = lbl_8047E69C;
-  }
-  else if (r3 < 0x136) {
-    if (r3 == 0xfa) {
-      uVar1 = lbl_8047E698;
-    }
-    else if (r3 < 0xfa) {
-      if (r3 == 0xe2) {
-        uVar1 = lbl_8047E69C;
-      }
-      else if ((r3 < 0xe2) && (r3 == 0xd9)) {
-        uVar1 = lbl_8047E69C;
+      else if ((id < 0x85) && (id < 0x4c)) {
+        fVar1 = lbl_8047E698;
       }
     }
-    else if (r3 == 300) {
-      uVar1 = lbl_8047E6A0;
+    else if (id == 0x90) {
+      fVar1 = lbl_8047E6A4;
+    }
+    else if (0x8f < id) {
+      fVar1 = lbl_8047E69C;
     }
   }
-  else if (r3 == 0x16b) {
-    uVar1 = lbl_8047E698;
+  else if (id == 0x136) {
+    fVar1 = lbl_8047E69C;
   }
-  else if (r3 < 0x16b) {
-    if (r3 == 0x14b) {
-      uVar1 = lbl_8047E6A8;
+  else if (id < 0x136) {
+    if (id == 0xfa) {
+      fVar1 = lbl_8047E698;
+    }
+    else if (id < 0xfa) {
+      if (id == 0xe2) {
+        fVar1 = lbl_8047E69C;
+      }
+      else if ((id < 0xe2) && (id == 0xd9)) {
+        fVar1 = lbl_8047E69C;
+      }
+    }
+    else if (id == 300) {
+      fVar1 = lbl_8047E6A0;
     }
   }
-  else if (r3 == 0x198) {
-    uVar1 = lbl_8047E6A4;
+  else if (id == 0x16b) {
+    fVar1 = lbl_8047E698;
   }
-  else if ((r3 < 0x198) && (0x196 < r3)) {
-    uVar1 = lbl_8047E6A4;
+  else if (id < 0x16b) {
+    if (id == 0x14b) {
+      fVar1 = lbl_8047E6A8;
+    }
   }
-  if (r5 != (u32 *)0x0) {
+  else if (id == 0x198) {
+    fVar1 = lbl_8047E6A4;
+  }
+  else if ((id < 0x198) && (0x196 < id)) {
+    fVar1 = lbl_8047E6A4;
+  }
+  if (r5 != (f32 *)0x0) {
     *r5 = lbl_8047E6AC;
   }
-  if (r4 != (u32 *)0x0) {
-    *r4 = uVar1;
+  if (r4 != (f32 *)0x0) {
+    *r4 = fVar1;
     return;
   }
   return;
@@ -28087,26 +26566,29 @@ asm void fn_8025FD34(void) {
 #pragma pop
 u32 fn_8025FD34(u16 *r3, u16 r4) {
   u16 *queue;
+  u16 *countQueue;
   u16 count;
-  u32 lookup;
-  u16 i;
+  s32 lookup;
+  u32 i;
   u32 r5;
-  u32 r0;
+  s32 r0;
   queue = r3;
-  lookup = (u32)r4;
   if (queue == (u16 *)0) {
     queue = (u16 *)fn_80129280(0, 0xC);
   }
+  countQueue = queue;
   if (queue == (u16 *)0) {
-    queue = (u16 *)fn_80129280(0, 0xC);
+    countQueue = (u16 *)fn_80129280(0, 0xC);
   }
-  count = *queue;
-  for (i = 0; (u32)(u16)i < (u32)count; i = i + 1) {
-    r5 = (u32)(u16)i * 12;
-    r0 = (u32)*(u16 *)((u8 *)queue + r5 + 4) & 0x3FFF;
-    if (r0 == lookup) {
-      return *(u32 *)((u8 *)queue + r5 + 8);
-    }
+  count = *countQueue;
+	  lookup = (u16)r4;
+	  for (i = 0; (u32)(u16)i < (u32)count; i = i + 1) {
+	    r5 = (i & 0xffff) * 12;
+	    r0 = r5 + 4;
+	    r0 = (u32)*(u16 *)((u8 *)queue + r0) & 0x3FFF;
+	    if (r0 == lookup) {
+	      return *(u32 *)((u8 *)queue + r5 + 8);
+	    }
   }
   return 0;
 }
@@ -28122,26 +26604,29 @@ asm void fn_8025FDDC(void) {
 #pragma pop
 u32 fn_8025FDDC(u16 *r3, u16 r4) {
   u16 *queue;
+  u16 *countQueue;
   u16 count;
-  u32 lookup;
-  u16 i;
+  s32 lookup;
+  u32 i;
   u32 r5;
-  u32 r0;
+  s32 r0;
   queue = r3;
-  lookup = (u32)r4;
   if (queue == (u16 *)0) {
     queue = (u16 *)fn_80129280(0, 0xC);
   }
+  countQueue = queue;
   if (queue == (u16 *)0) {
-    queue = (u16 *)fn_80129280(0, 0xC);
+    countQueue = (u16 *)fn_80129280(0, 0xC);
   }
-  count = *queue;
-  for (i = 0; (u32)(u16)i < (u32)count; i = i + 1) {
-    r5 = (u32)(u16)i * 12;
-    r0 = (u32)*(u16 *)((u8 *)queue + r5 + 4) & 0x3FFF;
-    if (r0 == lookup) {
-      return *(u32 *)((u8 *)queue + r5 + 0xC);
-    }
+  count = *countQueue;
+	  lookup = (u16)r4;
+	  for (i = 0; (u32)(u16)i < (u32)count; i = i + 1) {
+	    r5 = (i & 0xffff) * 12;
+	    r0 = r5 + 4;
+	    r0 = (u32)*(u16 *)((u8 *)queue + r0) & 0x3FFF;
+	    if (r0 == lookup) {
+	      return *(u32 *)((u8 *)queue + r5 + 0xC);
+	    }
   }
   return 0;
 }
@@ -28177,23 +26662,22 @@ u16 memoDataGetCount(u16 *r3)
 u32 memoDataSetMemoFlag(u16 *r3)
 
 {
-  u32 uVar1;
-  u16 uVar2;
+  u32 uVar2;
   u32 uVar3;
+  u32 uVar1;
   
   uVar3 = 0;
   if (r3 == (u16 *)0x0) {
     r3 = (u16 *)fn_80129280(0,0xc);
   }
   uVar2 = 0;
-  while (1) {
-    if (*r3 <= uVar2) break;
-    uVar1 = (u32)uVar2;
-    if ((r3[uVar1 * 6 + 2] & 0x8000) != 0) {
+  while ((u32)(u16)uVar2 < (u32)*r3) {
+    uVar1 = (uVar2 & 0xffff) * 12;
+    if ((*(volatile u16 *)((u8 *)r3 + uVar1 + 4) & 0x8000) != 0) {
       uVar3 = 1;
     }
     uVar2 = uVar2 + 1;
-    r3[uVar1 * 6 + 2] = r3[uVar1 * 6 + 2] & 0x3fff;
+    *(volatile u16 *)((u8 *)r3 + uVar1 + 4) = *(volatile u16 *)((u8 *)r3 + uVar1 + 4) & 0x3fff;
   }
   return uVar3;
 }
@@ -28207,43 +26691,39 @@ asm void fn_8025FF9C(void) {
 }
 #endif
 #pragma pop
-void fn_8025FF9C(u16 *r3, u32 r4) {
-  u16 *queue;
-  u32 r30;
-  u16 count;
-  u32 lookup;
-  u32 r5;
-  u16 i;
+void memoDataSet(u16 *r3, u32 r4) {
+	  u16 *queue;
+	  u32 r30;
+	  u16 count;
+	  u32 lookup;
+	  u32 r5;
+	  u32 i;
   u32 r0;
   u32 new_entry_off;
   u8 *new_entry;
   queue = r3;
   r30 = r4;
-  if (queue == (u16 *)0) {
-    queue = (u16 *)fn_80129280(0, 0xC);
-  }
-  lookup = (u32)(u16)fn_8011F5C8(r30);
+	  if (queue == (u16 *)0) {
+	    queue = (u16 *)fn_80129280(0, 0xC);
+	  }
+	  lookup = (u32)(u16)fn_8011F5C8(r30);
   count = *queue;
   for (i = 0; (u32)(u16)i < (u32)count; i = i + 1) {
-    r5 = (u32)(u16)i * 12;
+    r5 = (i & 0xffff) * 12;
     r0 = (u32)*(u16 *)((u8 *)queue + r5 + 4) & 0x3FFF;
     if (r0 == lookup) {
       return;
     }
-  }
-  new_entry_off = (u32)count * 12;
-  new_entry = (u8 *)queue + new_entry_off;
-  *(u16 *)(new_entry + 4) = (u16)(lookup | 0x8000);
-  r5 = fn_8011F5B0(r30);
-  new_entry_off = (u32)*queue * 12;
-  new_entry = (u8 *)queue + new_entry_off;
-  *(u32 *)(new_entry + 0xC) = r5;
-  r5 = fn_8011F520(r30);
-  new_entry_off = (u32)*queue * 12;
-  new_entry = (u8 *)queue + new_entry_off;
-  *(u32 *)(new_entry + 0x8) = r5;
-  *queue = (u16)(*queue + 1);
-}
+	  }
+	  new_entry_off = (u32)count * 12;
+	  new_entry = (u8 *)queue + new_entry_off;
+	  *(u16 *)(new_entry + 4) = (u16)(lookup | 0x8000);
+	  r5 = fn_8011F5B0(r30);
+	  *(u32 *)((u8 *)queue + ((u32)*queue * 12 + 0xC)) = r5;
+	  r5 = fn_8011F520(r30);
+	  *(u32 *)((u8 *)queue + ((u32)*queue * 12 + 0x8)) = r5;
+	  *queue = (u16)(*queue + 1);
+	}
 
 #pragma push
 #pragma optimization_level 0
@@ -28255,21 +26735,25 @@ asm void fn_80260070(void) {
 #endif
 #pragma pop
 void fn_80260070(u16 *r3) {
-  u16 *queue;
-  int i;
-  u32 off;
-  u8 *entry;
-  queue = r3;
-  if (queue == (u16 *)0) {
-    queue = (u16 *)fn_80129280(0, 0xC);
+  u16 *r29;
+  u32 r30;
+  s32 r27;
+  u32 r31;
+  u8 *r28;
+  r29 = r3;
+  if (r29 == (u16 *)0) {
+    r29 = (u16 *)fn_80129280(0, 0xC);
   }
-  *queue = 0;
-  off = 0;
-  for (i = 0; i < 0x1F4; i++) {
-    entry = (u8 *)queue + off;
-    *(u16 *)(entry + 4) = 0;
-    *(u32 *)(entry + 0xC) = _fadeEffectGetRandom__FUl(-1);
-    off += 12;
+  r30 = 0;
+  r27 = 0;
+  *r29 = r30;
+  r31 = r30;
+  while (r27 < 0x1F4) {
+    r28 = (u8 *)r29 + r31;
+    *(u16 *)(r28 + 4) = r30;
+    *(u32 *)(r28 + 0xC) = _fadeEffectGetRandom__FUl(-1);
+    r27++;
+    r31 += 12;
   }
 }
 
@@ -28762,14 +27246,14 @@ u32 charNameBiosSearchIndex(u32 value)
 u32 fn_802613D4(u32 idx) {
     extern void* lbl_80478F80;
     extern void* lbl_80478F84;
-    extern void fn_800DD970(char*, char*, ...);
+    extern void GSlogWrite(char*, char*, ...);
     extern char lbl_8027A4C8[];
     extern char lbl_8039A6C8[];
     u8* entry;
     u16 i = (u16)idx;
 
     if (i >= *(u32*)lbl_80478F80) {
-        fn_800DD970(lbl_8027A4C8, lbl_8039A6C8);
+        GSlogWrite(lbl_8027A4C8, lbl_8039A6C8);
         entry = NULL;
     } else {
         entry = (u8*)lbl_80478F84 + i * 8;
@@ -28782,18 +27266,19 @@ u32 fn_802613D4(u32 idx) {
 #pragma peephole on
 
 /* Address: 0x80261444 | Size: 0x70 | Ghidra import */
+#pragma peephole off
 u32 charNameBiosGetHearFlag(u32 idx)
 {
     extern void* lbl_80478F80;
     extern void* lbl_80478F84;
-    extern void fn_800DD970(char*, char*, ...);
+    extern void GSlogWrite(char*, char*, ...);
     extern char lbl_8027A4C8[];
     extern char lbl_8039A6C8[];
     u8* entry;
     u16 i = (u16)idx;
 
     if (i >= *(u32*)lbl_80478F80) {
-        fn_800DD970(lbl_8027A4C8, lbl_8039A6C8);
+        GSlogWrite(lbl_8027A4C8, lbl_8039A6C8);
         entry = NULL;
     } else {
         entry = (u8*)lbl_80478F84 + i * 8;
@@ -28803,6 +27288,7 @@ u32 charNameBiosGetHearFlag(u32 idx)
     }
     return *(u16*)entry;
 }
+#pragma peephole on
 
 /* Address: 0x802614B4 | Size: 0x88 | Ghidra import */
 int fn_802614B4(void)
@@ -29054,6 +27540,67 @@ LAB_0025e8fc:
   return 1;
 }
 
+/* Address: 0x80261954 | Size: 0x17C | Ghidra import */
+void fn_80261954(u32 wait)
+{
+    extern void fn_801F2B5C();
+    extern u32 fn_801F37B0();
+    extern u8 fn_801F1700(u32);
+    extern u8 fn_801F1758(u32);
+    extern void fn_8000DDBC(void);
+    extern void fn_8000DD30(void);
+    extern u8 fn_8000DD98(void);
+    extern u8 fn_8000DD0C(void);
+    extern u32 fn_80261BEC();
+    extern u32 fn_80261CBC();
+    extern u32 fn_80261EF8();
+    extern u32 fn_80261FB4();
+    u8 done;
+
+    fn_801F2B5C(0, fn_80261CBC, 0, 0);
+    fn_801F37B0(0, fn_80261FB4, 0, 0);
+    if (fn_801F1700(0) == 1) {
+        fn_8000DDBC();
+    }
+    if (fn_801F1758(0) == 1) {
+        fn_8000DD30();
+    }
+    if ((u8)wait == 1) {
+        fn_801F2B5C(0, fn_80261CBC, 0, 0);
+        do {
+            done = 1;
+            fn_801F2B5C(0, fn_80261BEC, &done, 0);
+            if (done == 1) {
+                break;
+            }
+            _threadSwitch();
+        } while (1);
+        fn_801F37B0(0, fn_80261FB4, 0, 0);
+        do {
+            if ((u8)fn_801F37B0(0, fn_80261EF8, 0, 0) == 1) {
+                break;
+            }
+            _threadSwitch();
+        } while (1);
+        if (fn_801F1700(0) == 1) {
+            do {
+                if (fn_8000DD98() == 0) {
+                    break;
+                }
+                _threadSwitch();
+            } while (1);
+        }
+        if (fn_801F1758(0) == 1) {
+            do {
+                if (fn_8000DD0C() == 0) {
+                    break;
+                }
+                _threadSwitch();
+            } while (1);
+        }
+    }
+}
+
 /* Address: 0x80261AD0 | Size: 0x98 | Ghidra import */
 void fn_80261AD0(s8 timerMode)
 {
@@ -29087,17 +27634,15 @@ void fightMenuAllFightTrainerCloseStatusMenu(u32 wait)
     extern void _threadSwitch(void);
     extern u32 fn_80261BEC();
     extern u32 fn_80261CBC();
-    u32 one;
-    u32 (*callback)();
+    u32 r30;
     u8 done;
 
     fn_801F2B5C(0, fn_80261CBC, 0, 0);
     if ((u8)wait == 1) {
-        one = 1;
-        callback = fn_80261BEC;
+        r30 = 1;
         do {
-            done = one;
-            fn_801F2B5C(0, callback, &done, 0);
+            done = r30;
+            fn_801F2B5C(0, fn_80261BEC, &done, 0);
             if (done == 1) {
                 break;
             }
@@ -29194,10 +27739,8 @@ u32 fn_80261D8C(u32 r3, u32 r4)
     u16 sVar4;
     u32 uVar2;
     u32 uVar5;
-    u32 local_28;
-    u16 local_24;
-    u32 local_20;
-    u16 local_1c;
+    u32 local_20[2];
+    u32 local_28[2];
 
     iVar1 = fn_801F02AC(2, r3, r4);
     if (iVar1 == 0) {
@@ -29217,10 +27760,10 @@ u32 fn_80261D8C(u32 r3, u32 r4)
             }
         }
     }
-    fn_801F7954(r3, &local_28);
-    local_20 = local_28;
-    local_1c = local_24;
-    fn_801026A4(uVar5, 0, 0, 0, 0, 1, &local_20);
+    fn_801F7954(r3, local_28);
+    local_20[0] = local_28[0];
+    *(u16 *)&local_20[1] = *(u16 *)&local_28[1];
+    fn_801026A4(uVar5, 0, 0, 0, 0, 1, local_20);
   return 1;
 }
 
@@ -29231,13 +27774,10 @@ void fightMenuAllFightOutPokemonCloseStatusMenu(u32 wait)
     extern void _threadSwitch(void);
     extern u32 fn_80261EF8();
     extern u32 fn_80261FB4();
-    u32 (*callback)();
-
     fn_801F37B0(0, fn_80261FB4, 0, 0);
     if ((u8)wait == 1) {
-        callback = fn_80261EF8;
         do {
-            if ((u8)fn_801F37B0(0, callback, 0, 0) == 1) {
+            if ((u8)fn_801F37B0(0, fn_80261EF8, 0, 0) == 1) {
                 break;
             }
             _threadSwitch();
@@ -29277,8 +27817,7 @@ int fn_80261EF8(u32 r3,u32 r4)
     }
   }
   uVar3 = fn_80102620(uVar2);
-  iVar1 = -(uVar3 & 0xff) + 1;
-  return iVar1 - ((u32)(iVar1 == 0) + -(uVar3 & 0xff));
+  return (uVar3 & 0xff) != 1;
 }
 
 /* Address: 0x80261FB4 | Size: 0xD0 | Ghidra import */
@@ -29325,6 +27864,7 @@ u32 fn_80262084(u32 r3,u32 r4,char *r5)
 
 {
     extern int fn_801FE168();
+  extern void fn_801026A4(u32, u32, u32, u32, u32, u32, ...);
   u32 *puVar1;
   u32 uVar2;
   u8 cVar7;
@@ -29336,11 +27876,8 @@ u32 fn_80262084(u32 r3,u32 r4,char *r5)
   u32 *puVar9;
   u8 cVar10;
   u32 uVar11;
-  u32 uStack_7c;
-  u32 local_78 [10];
-  u8 local_4f;
-  u32 uStack_4c;
-  u32 local_48 [14];
+  u32 local_48[12];
+  u32 local_78[12];
   
   if (r5 == (char *)0x0) {
     cVar10 = '\x01';
@@ -29349,7 +27886,9 @@ u32 fn_80262084(u32 r3,u32 r4,char *r5)
     cVar10 = *r5;
   }
   cVar7 = fn_802062FC(r3);
-  if (cVar7 != '\0') {
+  if (cVar7 == '\0') {
+    return 1;
+  }
     iVar3 = fn_801F02AC(2,r3,r4);
     if (iVar3 == 0) {
       uVar11 = 0;
@@ -29373,22 +27912,20 @@ u32 fn_80262084(u32 r3,u32 r4,char *r5)
     }
     fn_801FE168(r3,local_78);
     if (cVar10 == '\0') {
-      local_4f = 0;
+      ((u8 *)local_78)[0x29] = 0;
     }
-    puVar9 = &uStack_4c;
-    puVar8 = &uStack_7c;
+    puVar9 = local_48 - 1;
+    puVar8 = local_78 - 1;
     iVar3 = 6;
-    do {
+    while (iVar3--) {
       puVar1 = puVar8 + 1;
       puVar8 = puVar8 + 2;
-      uVar2 = *puVar8;
-      puVar9[1] = *puVar1;
+      uVar2 = *puVar1;
+      puVar9[1] = uVar2;
       puVar9 = puVar9 + 2;
-      *puVar9 = uVar2;
-      iVar3 = iVar3 + -1;
-    } while (iVar3 != 0);
+      *puVar9 = *puVar8;
+    }
     fn_801026A4(uVar11,0xffffffff,0,0,0,1,local_48);
-  }
   return 1;
 }
 
@@ -29454,7 +27991,7 @@ u32 fightMenuYesNo(void)
 {
     extern s8 fn_8001E184(void);
 
-    return fn_8001E184() == 0;
+    return (__cntlzw((s8)fn_8001E184()) >> 5) & 0xff;
 }
 
 /* Address: 0x80262334 | Size: 0x80 | Ghidra import */
@@ -29462,9 +27999,11 @@ u32 fn_80262334(u32 msgId, u32 unused, u32 itemId)
 {
     extern u32 itemGetStatus(u32, u32, u32, u32);
     extern u32 fn_800FA280(u32);
+    u32 itemName;
 
-    fn_80132A38(0x10, msgId);
-    fn_80132A38(0x29, fn_800FA280(itemGetStatus(0, itemId, 1, 0)));
+    fn_80132A38(0x10);
+    itemName = fn_800FA280(itemGetStatus(0, itemId, 1, 0));
+    fn_80132A38(0x29, itemName);
     if (msgId != 0) {
         fn_80106394(msgId, 1, 1);
         return 1;
@@ -29477,9 +28016,11 @@ u32 fn_802623B4(u32 msgId, u32 pokemon)
 {
     extern u32 fn_8011BEB4(u32, u32, u32, u32);
     extern u32 fn_800FA280(u32);
+    u32 name;
 
     fn_80132A38(0xf, msgId);
-    fn_80132A38(0xd, fn_800FA280(fn_8011BEB4(0, pokemon, 0xa, 0)));
+    name = fn_800FA280(fn_8011BEB4(0, pokemon, 0xa, 0));
+    fn_80132A38(0xd, name);
     fn_80132A38(0x28, fn_800FA280(fn_8011BEB4(0, pokemon, 1, 0)));
     fn_80132A38(0xe, fn_800FA280(fn_8011BEB4(0, pokemon, 0xb, 0)));
     fn_80106394(0x768d, 1, 1);
@@ -29510,6 +28051,534 @@ u32 fn_802624CC(u32 msgId)
         return 1;
     }
     return 0;
+}
+
+/* Address: 0x80262508 | Size: 0x82C | Ghidra import */
+u32 fn_80262508(u32 r3, u32 r4)
+{
+    extern u32 fn_801FB1C0(u32, u32, u32, u32);
+    extern u8 fn_801F18DC(u32);
+    extern u32 fn_801F02AC(u32, u32, u32);
+    extern u16 fightSideGetStatus(u32, u32, u32, u32);
+    extern u16 fn_801F0134(u32, u32);
+    extern void fn_801F0234(void);
+    extern s32 fn_801F0204(void);
+    extern void fn_801026A4(u32, u32, u32, u32, u32, u32, ...);
+    extern u16 fn_801F54A4(u32, u32, u32, u32);
+    extern void fn_8020E204(u32);
+    extern u32 fn_8020E1A4(void);
+    extern u32 fn_801F981C(u32, u32);
+    extern u8 fn_80205C24(u32, u32);
+    extern void fn_80207760(u32);
+    extern u16 fn_801EF634(void);
+    extern u8 fn_801F1700(u32);
+    extern u8 fn_80265924(void);
+    extern u32 fn_800111C4(u32, u32, u32, u32);
+    extern s32 fn_80089F70(u32);
+    extern s8 fn_80089F68(u32);
+    extern u16 fn_80089F58(u32);
+    extern u16 fn_80089F60(u32);
+    extern u8 fn_801FF1BC(u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern s16 fn_8012640C(u32, u32, u32, u32);
+    extern u32 lbl_80478DF8;
+    extern u32 fn_8022B2CC(u32, u32, u32, u32, u32, u32, s32);
+    extern u32 fn_801F47B4(u32, u32);
+    extern u32 fn_801F7258(u32, u32);
+    extern void fn_80204F6C(u32, u32, u32, u32, void *, u32, u32, s32, u32);
+    extern void fn_8020505C(u32, u32, u32, u32, void *, s32);
+    extern void fn_801F9130(u32, u32, u32);
+    extern void fn_801F9790(u32);
+    extern u8 fn_80102620(u32);
+    extern void fn_80102568(u32, u32, u32);
+    extern char lbl_80375D30[];
+    extern char lbl_80375CA8[];
+    u32 ctx;
+    u32 param;
+    u32 battle;
+    u32 found;
+    u32 status;
+    u32 side;
+    s32 index;
+    u32 msg;
+    u16 optionCount;
+    u32 count;
+    u32 lastGood;
+    u32 i;
+    u32 slot;
+    u32 entry;
+    s32 kind;
+    s32 moveSlot;
+    u32 moveId;
+    u32 selected;
+    u32 targetIndex;
+    u32 sideIndex;
+    u32 optionIndex;
+    u32 scanIndex;
+    u32 sideObj;
+    u32 optionObj;
+    u32 done;
+
+    ctx = r3;
+    param = r4;
+    battle = fn_801FB1C0(ctx, 0, 0x4b, 0);
+    if (fn_801F18DC(0) != 0) {
+        msg = 0x100;
+        found = fn_801F02AC(2, ctx, param);
+        if (found == 0) {
+            status = 0;
+        }
+        else {
+            side = fightSideGetStatus(found, 0, 5, 0);
+            if (fn_801F0134(ctx, param) == 0) {
+                status = 0;
+            }
+            else {
+                fn_801F0234();
+                index = fn_801F0204();
+                if (index < 0) {
+                    status = 0;
+                }
+                else {
+                    status = fightSideGetStatus(0, side, 2, index & 0xffff);
+                }
+            }
+        }
+        switch (status) {
+        case 0xf1:
+            msg = 0x100;
+            break;
+        case 0xf2:
+            msg = 0x101;
+            break;
+        case 0xf3:
+            msg = 0x102;
+            break;
+        case 0xf4:
+            msg = 0x103;
+            break;
+        }
+        fn_801026A4(msg, 0, 0, 0, 0, 0);
+    }
+    optionCount = fn_801F54A4(0, 0, 0x16, 0);
+    fn_8020E204(param);
+    count = fn_8020E1A4() & 0xff;
+    lastGood = 0;
+    i = 0;
+    while ((u32)(u16)i < count) {
+        slot = fn_801F981C(ctx, i);
+        if (slot == 0) {
+            lastGood = i;
+            i++;
+            continue;
+        }
+        if (fn_80205C24(slot, 1) == 0) {
+            lastGood = i;
+            i++;
+            continue;
+        }
+        while (1) {
+            fn_80207760(slot);
+            if ((u16)fn_801EF634() == 1) {
+                fn_801F9790(ctx);
+                if (fn_801F18DC(0) != 0) {
+                    msg = 0x100;
+                    found = fn_801F02AC(2, ctx, param);
+                    if (found == 0) {
+                        status = 0;
+                    }
+                    else {
+                        side = fightSideGetStatus(found, 0, 5, 0);
+                        if (fn_801F0134(ctx, param) == 0) {
+                            status = 0;
+                        }
+                        else {
+                            fn_801F0234();
+                            index = fn_801F0204();
+                            status = (index < 0) ? 0 : fightSideGetStatus(0, side, 2, index & 0xffff);
+                        }
+                    }
+                    switch (status) {
+                    case 0xf1:
+                        msg = 0x100;
+                        break;
+                    case 0xf2:
+                        msg = 0x101;
+                        break;
+                    case 0xf3:
+                        msg = 0x102;
+                        break;
+                    case 0xf4:
+                        msg = 0x103;
+                        break;
+                    }
+                    if (fn_80102620(msg) != 0) {
+                        fn_80102568(msg, 0, 1);
+                    }
+                }
+                return 0;
+            }
+            if ((fn_801F1700(0) == 1) && (fn_80265924() == 1)) {
+                fn_801F9130(ctx, slot, param);
+                lastGood = i;
+                break;
+            }
+            entry = fn_800111C4(battle, ctx, (u16)i, param);
+            kind = fn_80089F70(entry);
+            if ((u16)fn_801EF634() == 1) {
+                fn_801F9790(ctx);
+                return 0;
+            }
+            if (kind == 3) {
+                fn_8020505C(slot, 0, 8, 0, lbl_80375D30, 0);
+                lastGood = i;
+                break;
+            }
+            if (kind == 1) {
+                if (fn_801FF1BC(slot, 1) != 0) {
+                    lastGood = i;
+                    break;
+                }
+                moveSlot = fn_80089F68(entry);
+                if (moveSlot < 0) {
+                    continue;
+                }
+                moveId = fn_8012640C(fn_80205B8C(slot), 0, 0x7f, moveSlot);
+                moveId &= 0xffff;
+                if ((moveId == 0) || (moveId >= lbl_80478DF8) || (moveId == 0x165)) {
+                    continue;
+                }
+                selected = fn_8022B2CC(slot, moveId, param, (u32)fn_80262D34, 1, 0, -1);
+                if (selected == 0) {
+                    targetIndex = fn_80089F60(entry);
+                    scanIndex = 0;
+                    done = 0;
+                    sideIndex = 0;
+                    while ((sideIndex & 0xffff) < 2) {
+                        sideObj = fn_801F47B4(0, sideIndex);
+                        if (sideObj != 0) {
+                            optionIndex = 0;
+                            while ((optionIndex & 0xffff) < optionCount) {
+                                optionObj = fn_801F7258(sideObj, optionIndex);
+                                if (optionObj != 0) {
+                                    selected = fn_801FB1C0(optionObj, 0, 0x46, scanIndex);
+                                    if ((u16)scanIndex == targetIndex) {
+                                        done = 1;
+                                        break;
+                                    }
+                                    scanIndex++;
+                                }
+                                optionIndex++;
+                            }
+                            if (done == 1) {
+                                break;
+                            }
+                        }
+                        sideIndex++;
+                    }
+                }
+                if (selected == 0) {
+                    continue;
+                }
+                fn_80204F6C(slot, 0, 0x13, 0, lbl_80375CA8, moveId,
+                            fn_801F0134(selected, param), moveSlot, 0);
+                lastGood = i;
+                break;
+            }
+            if (kind == 2) {
+                moveId = fn_801FB1C0(ctx, 0, 0x45, fn_80089F58(entry));
+                index = fn_8012640C(moveId, 0, 0xce, 0);
+                if (index < 0) {
+                    continue;
+                }
+                fn_8020505C(slot, 0, 9, 0, lbl_80375D30, index);
+                lastGood = i;
+                break;
+            }
+            if (kind == 4) {
+                fn_801F9130(ctx, slot, param);
+                lastGood = i;
+                break;
+            }
+            if (kind == 5) {
+                fn_801F9790(ctx);
+                return 0;
+            }
+            if (kind != 0) {
+                fn_801F9130(ctx, slot, param);
+                lastGood = i;
+                break;
+            }
+            if ((u16)i == 0) {
+                break;
+            }
+            i = lastGood;
+        }
+        i++;
+    }
+    if (fn_801F18DC(0) != 0) {
+        msg = 0x100;
+        found = fn_801F02AC(2, ctx, param);
+        if (found == 0) {
+            status = 0;
+        }
+        else {
+            side = fightSideGetStatus(found, 0, 5, 0);
+            if (fn_801F0134(ctx, param) == 0) {
+                status = 0;
+            }
+            else {
+                fn_801F0234();
+                index = fn_801F0204();
+                status = (index < 0) ? 0 : fightSideGetStatus(0, side, 2, index & 0xffff);
+            }
+        }
+        switch (status) {
+        case 0xf1:
+            msg = 0x100;
+            break;
+        case 0xf2:
+            msg = 0x101;
+            break;
+        case 0xf3:
+            msg = 0x102;
+            break;
+        case 0xf4:
+            msg = 0x103;
+            break;
+        }
+        if (fn_80102620(msg) != 0) {
+            msg = 0x100;
+            found = fn_801F02AC(2, ctx, param);
+            if (found == 0) {
+                status = 0;
+            }
+            else {
+                side = fightSideGetStatus(found, 0, 5, 0);
+                if (fn_801F0134(ctx, param) == 0) {
+                    status = 0;
+                }
+                else {
+                    fn_801F0234();
+                    index = fn_801F0204();
+                    status = (index < 0) ? 0 : fightSideGetStatus(0, side, 2, index & 0xffff);
+                }
+            }
+            switch (status) {
+            case 0xf1:
+                msg = 0x100;
+                break;
+            case 0xf2:
+                msg = 0x101;
+                break;
+            case 0xf3:
+                msg = 0x102;
+                break;
+            case 0xf4:
+                msg = 0x103;
+                break;
+            }
+            fn_80102568(msg, 0, 1);
+        }
+    }
+    return 1;
+}
+
+/* Address: 0x80262D3C | Size: 0x430 | Ghidra import */
+s32 fn_80262D3C(u32 r3, u32 r4, u32 r5, s32 r6)
+{
+    extern u32 fn_801FB1C0(u32, u32, u32, u32);
+    extern void fn_8020E204(u32);
+    extern u32 fn_8020E1A4(void);
+    extern u16 fn_801EF634(void);
+    extern u8 fn_801F1700(u32);
+    extern u8 fn_80265924(void);
+    extern u8 fn_801F18DC(u32);
+    extern u32 fn_801F02AC(u32, u32, u32);
+    extern u16 fightSideGetStatus(u32, u32, u32, u32);
+    extern u16 fn_801F0134(u32, u32);
+    extern void fn_801F0234(void);
+    extern s32 fn_801F0204(void);
+    extern void fn_801026A4(u32, u32, u32, u32, u32, u32, ...);
+    extern u32 fn_800111E8(u32, u32, u32, u32);
+    extern s32 fn_80089F70(u32);
+    extern u16 fn_80089F58(u32);
+    extern s16 fn_8012640C(u32, u32, u32, u32);
+    extern s32 fn_801F93F8(u32, s32, u32);
+    extern u8 fn_80102620(u32);
+    extern void fn_80102568(u32, u32, u32);
+    u32 ctx;
+    u32 param1;
+    u32 param2;
+    s32 target;
+    u32 battle;
+    u32 count;
+    u32 i;
+    u32 found;
+    u32 status;
+    u32 side;
+    s32 index;
+    u32 msg;
+    u32 entry;
+    s32 kind;
+
+    ctx = r3;
+    param1 = r4;
+    param2 = r5;
+    target = r6;
+    battle = fn_801FB1C0(ctx, 0, 0x4b, 0);
+    fn_8020E204(param1);
+    count = fn_8020E1A4() & 0xff;
+    i = 0;
+    while ((u32)(u16)i < count) {
+        found = fn_801FB1C0(ctx, 0, 0x46, i);
+        if (found == (u32)target) {
+            break;
+        }
+        i++;
+    }
+    if ((u32)(u16)i >= count) {
+        return fn_8024E690((void *)ctx, param1, param2, target);
+    }
+
+    if ((u16)fn_801EF634() == 1) {
+        target = -2;
+    }
+    else if ((fn_801F1700(0) == 1) && (fn_80265924() == 1)) {
+        target = fn_801F93F8(ctx, target, param1);
+    }
+    else {
+        if (fn_801F18DC(0) != 0) {
+            msg = 0x100;
+            found = fn_801F02AC(2, ctx, param1);
+            if (found == 0) {
+                status = 0;
+            }
+            else {
+                side = fightSideGetStatus(found, 0, 5, 0);
+                if (fn_801F0134(ctx, param1) == 0) {
+                    status = 0;
+                }
+                else {
+                    fn_801F0234();
+                    index = fn_801F0204();
+                    if (index < 0) {
+                        status = 0;
+                    }
+                    else {
+                        status = fightSideGetStatus(0, side, 2, index & 0xffff);
+                    }
+                }
+            }
+            switch (status) {
+            case 0xf1:
+                msg = 0x100;
+                break;
+            case 0xf2:
+                msg = 0x101;
+                break;
+            case 0xf3:
+                msg = 0x102;
+                break;
+            case 0xf4:
+                msg = 0x103;
+                break;
+            }
+            fn_801026A4(msg, 0, 0, 0, 0, 0);
+        }
+        entry = fn_800111E8(battle, ctx, (u16)i, param1);
+        kind = fn_80089F70(entry);
+        if ((u16)fn_801EF634() == 1) {
+            target = -2;
+        }
+        else if (kind == 2) {
+            found = fn_801FB1C0(ctx, 0, 0x45, fn_80089F58(entry));
+            target = fn_8012640C(found, 0, 0xce, 0);
+        }
+        else if (kind == 5) {
+            target = -2;
+        }
+        else {
+            target = fn_801F93F8(ctx, target, param1);
+        }
+    }
+
+    if (fn_801F18DC(0) != 0) {
+        msg = 0x100;
+        found = fn_801F02AC(2, ctx, param1);
+        if (found == 0) {
+            status = 0;
+        }
+        else {
+            side = fightSideGetStatus(found, 0, 5, 0);
+            if (fn_801F0134(ctx, param1) == 0) {
+                status = 0;
+            }
+            else {
+                fn_801F0234();
+                index = fn_801F0204();
+                if (index < 0) {
+                    status = 0;
+                }
+                else {
+                    status = fightSideGetStatus(0, side, 2, index & 0xffff);
+                }
+            }
+        }
+        switch (status) {
+        case 0xf1:
+            msg = 0x100;
+            break;
+        case 0xf2:
+            msg = 0x101;
+            break;
+        case 0xf3:
+            msg = 0x102;
+            break;
+        case 0xf4:
+            msg = 0x103;
+            break;
+        }
+        if (fn_80102620(msg) != 0) {
+            msg = 0x100;
+            found = fn_801F02AC(2, ctx, param1);
+            if (found == 0) {
+                status = 0;
+            }
+            else {
+                side = fightSideGetStatus(found, 0, 5, 0);
+                if (fn_801F0134(ctx, param1) == 0) {
+                    status = 0;
+                }
+                else {
+                    fn_801F0234();
+                    index = fn_801F0204();
+                    if (index < 0) {
+                        status = 0;
+                    }
+                    else {
+                        status = fightSideGetStatus(0, side, 2, index & 0xffff);
+                    }
+                }
+            }
+            switch (status) {
+            case 0xf1:
+                msg = 0x100;
+                break;
+            case 0xf2:
+                msg = 0x101;
+                break;
+            case 0xf3:
+                msg = 0x102;
+                break;
+            case 0xf4:
+                msg = 0x103;
+                break;
+            }
+            fn_80102568(msg, 0, 1);
+        }
+    }
+    return target;
 }
 
 /* Address: 0x80264ADC | Size: 0x27C | Ghidra import */
@@ -29764,6 +28833,208 @@ LAB_00262054:
   } while (1);
 }
 
+/* Address: 0x8026532C | Size: 0xD0 | Ghidra import */
+void fn_8026532C(u32 r3, u32 r4, u32 r5)
+{
+  u32 iVar1;
+  u16 uVar3;
+  u16 sVar4;
+  u32 uVar2;
+  u32 uVar6;
+
+  iVar1 = fn_801F02AC(2, r3, r4);
+  if (iVar1 == 0) {
+    uVar6 = 0;
+  }
+  else {
+    uVar3 = fightSideGetStatus(iVar1, 0, 5, 0);
+    sVar4 = fn_801F0134(r3, r4);
+    if (sVar4 == 0) {
+      uVar6 = 0;
+    }
+    else {
+      fn_801F0234();
+      uVar2 = fn_801F0204();
+      if ((int)uVar2 < 0) {
+        uVar6 = 0;
+      }
+      else {
+        uVar6 = fightSideGetStatus(0, uVar3, 3, uVar2 & 0xffff);
+      }
+    }
+  }
+  if ((u8)fn_80102620(uVar6) != 0) {
+    fn_80102568(uVar6, 0, r5);
+  }
+}
+
+/* Address: 0x802653FC | Size: 0x19C | Ghidra import */
+void fn_802653FC(u32 r3, u32 r4, u32 r5)
+{
+  typedef struct StatusMenuCopy {
+    u32 word[12];
+  } StatusMenuCopy;
+  typedef struct StatusMenuOut {
+    StatusMenuCopy copy;
+    u32 pad[2];
+  } StatusMenuOut;
+  extern int fn_801FE168();
+  extern void fn_801026A4(u32, u32, u32, u32, u32, u32, ...);
+  u32 r28;
+  u32 r29;
+  u32 r30;
+  u32 iVar3;
+  u16 uVar5;
+  u16 sVar6;
+  u32 uVar4;
+  u32 checkStatus;
+  u32 uVar11;
+  StatusMenuOut local_48;
+  StatusMenuCopy local_78;
+
+  r28 = r3;
+  r29 = r4;
+  r30 = r5;
+  iVar3 = fn_801F02AC(2, r28, r29);
+  if (iVar3 == 0) {
+    checkStatus = 0;
+  }
+  else {
+    uVar5 = fightSideGetStatus(iVar3, 0, 5, 0);
+    sVar6 = fn_801F0134(r28, r29);
+    if (sVar6 == 0) {
+      checkStatus = 0;
+    }
+    else {
+      fn_801F0234();
+      uVar4 = fn_801F0204();
+      if ((int)uVar4 < 0) {
+        checkStatus = 0;
+      }
+      else {
+        checkStatus = fightSideGetStatus(0, uVar5, 3, uVar4 & 0xffff);
+      }
+    }
+  }
+  if ((u8)fn_80102620(checkStatus) != 0) {
+    iVar3 = fn_801F02AC(2, r28, r29);
+    if (iVar3 == 0) {
+      uVar11 = 0;
+    }
+    else {
+      uVar5 = fightSideGetStatus(iVar3, 0, 5, 0);
+      sVar6 = fn_801F0134(r28, r29);
+      if (sVar6 == 0) {
+        uVar11 = 0;
+      }
+      else {
+        fn_801F0234();
+        uVar4 = fn_801F0204();
+        if ((int)uVar4 < 0) {
+          uVar11 = 0;
+        }
+        else {
+          uVar11 = fightSideGetStatus(0, uVar5, 3, uVar4 & 0xffff);
+        }
+      }
+    }
+    fn_801FE168(r28, &local_78);
+    if ((u8)r30 == 0) {
+      *(u8 *)((u8 *)&local_78 + 0x29) = 0;
+    }
+    local_48.copy = local_78;
+    fn_801026A4(uVar11, -1, 0, 0, 0, 1, &local_48.copy);
+  }
+}
+
+/* Address: 0x80265598 | Size: 0x114 | Ghidra import */
+void fn_80265598(u32 r3, u32 r4, u32 r5)
+{
+  typedef struct StatusMenuCopy {
+    u32 word[12];
+  } StatusMenuCopy;
+  typedef struct StatusMenuOut {
+    StatusMenuCopy copy;
+    u32 pad[2];
+  } StatusMenuOut;
+  extern int fn_801FE168();
+  extern void fn_801026A4(u32, u32, u32, u32, u32, u32, ...);
+  u32 r28;
+  u32 r29;
+  u32 r30;
+  u32 iVar3;
+  u16 uVar5;
+  u16 sVar6;
+  u32 uVar4;
+  u32 uVar11;
+  StatusMenuOut local_48;
+  StatusMenuCopy local_78;
+
+  r28 = r3;
+  r29 = r4;
+  r30 = r5;
+  iVar3 = fn_801F02AC(2, r28, r29);
+  if (iVar3 == 0) {
+    uVar11 = 0;
+  }
+  else {
+    uVar5 = fightSideGetStatus(iVar3, 0, 5, 0);
+    sVar6 = fn_801F0134(r28, r29);
+    if (sVar6 == 0) {
+      uVar11 = 0;
+    }
+    else {
+      fn_801F0234();
+      uVar4 = fn_801F0204();
+      if ((int)uVar4 < 0) {
+        uVar11 = 0;
+      }
+      else {
+        uVar11 = fightSideGetStatus(0, uVar5, 3, uVar4 & 0xffff);
+      }
+    }
+  }
+  fn_801FE168(r28, &local_78);
+  if ((u8)r30 == 0) {
+    *(u8 *)((u8 *)&local_78 + 0x29) = 0;
+  }
+  local_48.copy = local_78;
+  fn_801026A4(uVar11, -1, 0, 0, 0, 1, &local_48.copy);
+}
+
+/* Address: 0x802656AC | Size: 0xA8 | Ghidra import */
+u32 fn_802656AC(u32 r3, u32 r4)
+{
+  u32 iVar1;
+  u16 uVar3;
+  u16 sVar4;
+  u32 uVar2;
+  u32 uVar6;
+
+  iVar1 = fn_801F02AC(2, r3, r4);
+  if (iVar1 == 0) {
+    uVar6 = 0;
+  }
+  else {
+    uVar3 = fightSideGetStatus(iVar1, 0, 5, 0);
+    sVar4 = fn_801F0134(r3, r4);
+    if (sVar4 == 0) {
+      uVar6 = 0;
+    }
+    else {
+      fn_801F0234();
+      uVar2 = fn_801F0204();
+      if ((int)uVar2 < 0) {
+        uVar6 = 0;
+      }
+      else {
+        uVar6 = fightSideGetStatus(0, uVar3, 3, uVar2 & 0xffff);
+      }
+    }
+  }
+  return uVar6;
+}
+
 /* Address: 0x80265754 | Size: 0x174 | Ghidra import */
 void fn_80265754(u32 r3,u32 r4)
 
@@ -29855,11 +29126,11 @@ void fn_802658C8(void)
     if (state->thread != 0) {
         fn_800F05A0(state->thread);
     }
-    state->done = 0;
+    lbl_80478800.done = 0;
     state->thread = 0;
-    state->elapsed = lbl_8047E6D8;
-    state->limit = lbl_8047E6D8;
-    state->forceDone = 0;
+    lbl_80478800.elapsed = lbl_8047E6D8;
+    lbl_80478800.limit = lbl_8047E6D8;
+    lbl_80478800.forceDone = 0;
 }
 
 /* Address: 0x80265924 | Size: 0x38 | Ghidra import */
@@ -29923,17 +29194,51 @@ void fn_802659F8(void)
     extern u32 GSthreadCreate(u32, u32, u32, u32, u32, u32);
     extern void fn_800F0654(u32, u32, ...);
     extern void fn_80265DB0(u8 *);
-    ColosseumBattleTimerState *state;
     u32 thread;
 
-    state = &lbl_80478800;
-    if (state->forceDone != 1) {
+    if (lbl_80478800.forceDone != 1) {
         thread = GSthreadCreate(1, fn_800FF560(), 0x4000, 1, 0, (u32)fn_80265DB0);
         if (thread != 0) {
-            state->thread = thread;
+            lbl_80478800.thread = thread;
             fn_800F0654(thread, 1);
         }
     }
+}
+
+/* Address: 0x80265A6C | Size: 0xD0 | Ghidra import */
+void fn_80265A6C(void)
+{
+    extern ColosseumBattleTimerState lbl_80478800;
+    extern f32 lbl_8047E6D8;
+    extern f32 lbl_8047E6E8;
+    extern s32 fn_80077B84(void);
+    extern void fn_800F05A0(u32);
+    ColosseumBattleTimerState *state;
+    f32 limit;
+
+    limit = (f32)fn_80077B84();
+    state = &lbl_80478800;
+    if (state->thread != 0) {
+        if (state->thread != 0) {
+            fn_800F05A0(state->thread);
+        }
+        lbl_80478800.done = 0;
+        state->thread = 0;
+        lbl_80478800.elapsed = lbl_8047E6D8;
+        lbl_80478800.limit = lbl_8047E6D8;
+        lbl_80478800.forceDone = 0;
+    }
+    lbl_80478800.done = 0;
+    lbl_80478800.elapsed = lbl_8047E6D8;
+    if (limit < lbl_8047E6D8) {
+        lbl_80478800.forceDone = 1;
+        lbl_80478800.limit = lbl_8047E6E8;
+    }
+    else {
+        lbl_80478800.forceDone = 0;
+        lbl_80478800.limit = limit;
+    }
+    state->thread = 0;
 }
 
 /* Address: 0x80265B3C | Size: 0x38 | Ghidra import */
@@ -29997,17 +29302,51 @@ void fn_80265C10(void)
     extern u32 GSthreadCreate(u32, u32, u32, u32, u32, u32);
     extern void fn_800F0654(u32, u32, ...);
     extern void fn_80265DB0(u8 *);
-    ColosseumBattleTimerState *state;
     u32 thread;
 
-    state = &lbl_80478810;
-    if (state->forceDone != 1) {
+    if (lbl_80478810.forceDone != 1) {
         thread = GSthreadCreate(1, fn_800FF560(), 0x4000, 1, 0, (u32)fn_80265DB0);
         if (thread != 0) {
-            state->thread = thread;
+            lbl_80478810.thread = thread;
             fn_800F0654(thread, 1);
         }
     }
+}
+
+/* Address: 0x80265C84 | Size: 0xD0 | Ghidra import */
+void fn_80265C84(void)
+{
+    extern ColosseumBattleTimerState lbl_80478810;
+    extern f32 lbl_8047E6D8;
+    extern f32 lbl_8047E6E8;
+    extern s32 menuCBRule_GetBattleTimeLimit(void);
+    extern void fn_800F05A0(u32);
+    ColosseumBattleTimerState *state;
+    f32 limit;
+
+    limit = (f32)menuCBRule_GetBattleTimeLimit();
+    state = &lbl_80478810;
+    if (state->thread != 0) {
+        if (state->thread != 0) {
+            fn_800F05A0(state->thread);
+        }
+        lbl_80478810.done = 0;
+        state->thread = 0;
+        lbl_80478810.elapsed = lbl_8047E6D8;
+        lbl_80478810.limit = lbl_8047E6D8;
+        lbl_80478810.forceDone = 0;
+    }
+    lbl_80478810.done = 0;
+    lbl_80478810.elapsed = lbl_8047E6D8;
+    if (limit < lbl_8047E6D8) {
+        lbl_80478810.forceDone = 1;
+        lbl_80478810.limit = lbl_8047E6E8;
+    }
+    else {
+        lbl_80478810.forceDone = 0;
+        lbl_80478810.limit = limit;
+    }
+    state->thread = 0;
 }
 
 /* Address: 0x80265D54 | Size: 0x5C | Ghidra import */
@@ -30022,11 +29361,11 @@ void fn_80265D54(void)
     if (state->thread != 0) {
         fn_800F05A0(state->thread);
     }
-    state->done = 0;
+    lbl_80478810.done = 0;
     state->thread = 0;
-    state->elapsed = lbl_8047E6D8;
-    state->limit = lbl_8047E6D8;
-    state->forceDone = 0;
+    lbl_80478810.elapsed = lbl_8047E6D8;
+    lbl_80478810.limit = lbl_8047E6D8;
+    lbl_80478810.forceDone = 0;
 }
 
 /* Address: 0x80265E34 | Size: 0x48 | Ghidra import */
@@ -30727,33 +30066,28 @@ LAB_0025d3c4:
 /* Address: 0x8025DC2C | Size: 0x90 | Ghidra import (PSQ removed) */
 
 
-void waitTime__Ff(double r3)
+void waitTime__Ff(float r3)
 
 {
     extern f32 lbl_8047E660;
     extern f32 lbl_8047E664;
     extern f64 lbl_8047E668;
-  float fVar1;
-
   u32 uVar2;
 
-  u64 f29;
-  double dVar3;
-  u64 f30;
-  double dVar4;
-  u64 f31;
+  u32 stack[2];
   double dVar5;
-  u8 auStack_28 [16];
-  u8 auStack_18 [16];
-  u8 auStack_8 [8];
+  double dVar4;
+  float fVar1;
 
-  dVar4 = (double)(float)((double)lbl_8047E664 * r3);
-  dVar5 = lbl_8047E668;
+  dVar4 = (double)(float)(lbl_8047E664 * r3);
   fVar1 = lbl_8047E660;
-  while (dVar3 = (double)fVar1, dVar3 < dVar4) {
+  dVar5 = lbl_8047E668;
+  while (fVar1 < dVar4) {
     _threadSwitch();
     uVar2 = fn_800D3088();
-    fVar1 = (float)(dVar3 + (double)(float)((double)(((u64)(0x43300000) << 32) | (u32)(uVar2)) - dVar5));
+    stack[1] = uVar2;
+    stack[0] = 0x43300000;
+    fVar1 += (float)(*(double *)stack - dVar5);
   }
 
   return;
@@ -31218,32 +30552,23 @@ LAB_00261a8c:
 }
 
 /* Address: 0x80265DB0 | Size: 0x84 | Ghidra import (PSQ removed) */
-void fn_80265DB0(u8 *r3)
-
+void fn_80265DB0(ColosseumBattleTimerState *r3)
 {
-    extern u32 lbl_8047E6D8;
+    extern f32 lbl_8047E6D8;
     extern f32 lbl_8047E6DC;
-    extern f64 lbl_8047E6E0;
+    extern u32 fn_800D3088(void);
+    extern void _threadSwitch(void);
+  u32 ticks;
+  f32 scale;
 
-  u32 uVar1;
-
-  u64 f30;
-  double dVar2;
-  u64 f31;
-  double dVar3;
-  u8 auStack_18 [16];
-  u8 auStack_8 [8];
-
-  dVar2 = lbl_8047E6E0;
-  *(u32 *)(r3 + 4) = lbl_8047E6D8;
-  dVar3 = (double)lbl_8047E6DC;
-  while (*(float *)(r3 + 4) < (float)(dVar3 * (double)*(float *)(r3 + 8))) {
+  r3->elapsed = lbl_8047E6D8;
+  scale = lbl_8047E6DC;
+  while (r3->elapsed < scale * r3->limit) {
     _threadSwitch();
-    uVar1 = fn_800D3088();
-    *(float *)(r3 + 4) =
-         *(float *)(r3 + 4) + (float)((double)(((u64)(0x43300000) << 32) | (u32)(uVar1)) - dVar2);
+    ticks = fn_800D3088();
+    r3->elapsed = (f32)ticks + r3->elapsed;
   }
-  *r3 = 1;
+  r3->done = 1;
   do {
     _threadSwitch();
   } while (1);

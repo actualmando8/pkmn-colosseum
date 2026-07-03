@@ -493,7 +493,7 @@
 "addr": "0x80007FDC",
 "size": 56,
 "label": "gs-engine",
-"confidence": 1.9,
+"confidence": 1.89,
 "seed": null
 },
 {
@@ -21097,7 +21097,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800DD970",
+"name": "GSlogWrite",
 "addr": "0x800DD970",
 "size": 1508,
 "label": "gs-engine",
@@ -24233,7 +24233,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800F9318",
+"name": "GSresGetResource",
 "addr": "0x800F9318",
 "size": 96,
 "label": "gs-engine",
@@ -24241,7 +24241,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800F9378",
+"name": "GSresRegisterResource",
 "addr": "0x800F9378",
 "size": 160,
 "label": "gs-engine",
@@ -24249,7 +24249,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800F9418",
+"name": "GSresAllocResourceAlign",
 "addr": "0x800F9418",
 "size": 300,
 "label": "gs-engine",
@@ -26169,7 +26169,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8010C7BC",
+"name": "GScolsys2GetObjEnable",
 "addr": "0x8010C7BC",
 "size": 136,
 "label": "gs-engine",
@@ -26177,7 +26177,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8010C844",
+"name": "GScolsys2SetObjEnable",
 "addr": "0x8010C844",
 "size": 140,
 "label": "gs-engine",

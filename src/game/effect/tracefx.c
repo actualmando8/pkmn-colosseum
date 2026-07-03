@@ -45,9 +45,9 @@
 #include "game/effect/gs_effect.h"
 
 /* ===== External engine functions ===== */
-extern void  fn_800DD970(const char* fmt, ...);          /* OSReport / GSlog */
+extern void  GSlogWrite(const char* fmt, ...);          /* OSReport / GSlog */
 extern u32   GSgfxGetFrameCount(void);                   /* fn_800D37CC */
-extern void* fn_800F9318(u32 group, u32 model);         /* GSfloor model load */
+extern void* GSresGetResource(u32 group, u32 model);         /* GSfloor model load */
 extern void* fn_800EE150(void* model, u16 partIdx);     /* GSpart get sub-part */
 extern void  GSpartGetTransform(void* part, void* outPos,
                           void* a, void* b);             /* GSpart get position */
@@ -185,9 +185,9 @@ u32 fn_8013735C(void* work, void* params, u32 frames) {
     *(u32*)(w + 0x78) = wazaSequenceSysGetResID();
 
     fn_8010147C(arena, *(u32*)(p + 0x38), 0x4e20, *(u32*)(w + 0x7c));
-    model = fn_800F9318(0x4e20, *(u32*)(w + 0x7c));
+    model = GSresGetResource(0x4e20, *(u32*)(w + 0x7c));
     fn_801013A0((u32)model, 0x4e20, 0, *(u32*)(w + 0x78));
-    model = fn_800F9318(0x4e20, *(u32*)(w + 0x78));
+    model = GSresGetResource(0x4e20, *(u32*)(w + 0x78));
     if (model != NULL) {
         GSmodelSetVisibility(model, 0);
     }
@@ -289,7 +289,7 @@ BOOL tracefxStartEffect(u8* w) {
 
     max_count = *(u16*)(w + 0x20);
     count = *(u16*)(w + 0x22);
-    model = fn_800F9318(*(u16*)(w + 0x24), *(u16*)(w + 0x26));
+    model = GSresGetResource(*(u16*)(w + 0x24), *(u16*)(w + 0x26));
 
     if (*(void**)(w + 0x14) == (void*)0) {
         return FALSE;
@@ -372,7 +372,7 @@ BOOL tracefxStartEffect(u8* w) {
     return TRUE;
 
 fail:
-    fn_800DD970(lbl_80272B08);
+    GSlogWrite(lbl_80272B08);
     return FALSE;
 }
 #pragma pop

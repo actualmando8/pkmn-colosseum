@@ -955,7 +955,7 @@ L_80032484:
 extern void fn_80112260(s32);
 extern u32  fn_80113F48(void);
 extern u32  fn_801CBA0C(u32);
-extern u32  fn_800F9318(u32);
+extern u32  GSresGetResource(u32);
 extern void fn_80176E0C(s32, u32, s32, s32);
 extern void GSscene_SetMode(s32);
 extern void fn_801CB7C4(u32);
@@ -1002,7 +1002,7 @@ void fn_800324A0(void) {
         handle = fn_80113F48();
         value = fn_801CBA0C(0x0FFE1000);
         lbl_8047A418 = value;
-        lbl_8047A414 = fn_800F9318(handle);
+        lbl_8047A414 = GSresGetResource(handle);
         fn_80176E0C(0x37C, 0x0FFF1800, 0, 1);
         GSscene_SetMode(4);
         fn_801CB7C4(0x10B11000);

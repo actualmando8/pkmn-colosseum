@@ -9,7 +9,7 @@
  *                -- surface-type table (lbl_8035B500) field readers /
  *                   type-vs-type interaction lookup
  *   GScolsy2UtilGetSidePlanePoint -- 3-component dot product
- *   fn_8010C7BC, fn_8010C844 -- active-layer per-triangle visibility
+ *   GScolsys2GetObjEnable, GScolsys2SetObjEnable -- active-layer per-triangle visibility
  *                   flag get/set (via lbl_80404C68)
  *   fn_8010CBC0  -- returns the first word of lbl_80404C68
  *
@@ -23,7 +23,7 @@
  * building, debug-draw display lists, ground raycasting) under invented
  * names, none of which appear in symbols.txt and none of which are
  * called from anywhere else in the tree. The block also duplicated
- * fn_8010C7BC/fn_8010C844's real logic under GScolsys2_QueryTriVisible/
+ * GScolsys2GetObjEnable/GScolsys2SetObjEnable's real logic under GScolsys2_QueryTriVisible/
  * GScolsys2_SetTriVisible, and claimed several functions (GScolsys2Draw,
  * GScolsys2UnloadCCD, GScolsys2GetCurFloor, ...) whose real addresses
  * (0x8010CBD0-0x8010F6A0, per splits.txt) belong to gs_range_8010CBD0.c,
@@ -337,7 +337,7 @@ f32 GScolsy2UtilGetSidePlanePoint(Vec3f* normal, Vec3f* p1, Vec3f* p2) {
 #pragma pop
 
 /* 0x8010C7BC | 0x88 */
-s32 fn_8010C7BC(s32 triIndex, u32* outResult) {
+s32 GScolsys2GetObjEnable(s32 triIndex, u32* outResult) {
     u8* base = (u8*)COL_STATE;
     void* wzx = COL_WZX;
     u8* entry;
@@ -366,7 +366,7 @@ s32 fn_8010C7BC(s32 triIndex, u32* outResult) {
 }
 
 /* 0x8010C844 | 0x8C */
-s32 fn_8010C844(s32 triIndex, s32 visible) {
+s32 GScolsys2SetObjEnable(s32 triIndex, s32 visible) {
     u8* base = (u8*)COL_STATE;
     void* wzx = COL_WZX;
     u8* entry;
