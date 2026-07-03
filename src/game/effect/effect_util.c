@@ -1870,7 +1870,7 @@ u32 fn_80133630(void) {
 
 /* 0x80133664 | 0x13C */
 extern void* fn_80105624(void);
-extern u32 fn_8005D9E4(u32 arg);
+extern u32 menuDataBiosGetType(u32 arg);
 #if 0
 asm void fn_80133664(void) {
 #include "src/game/effect/effect_util_fn_80133664.inc"
@@ -1886,7 +1886,7 @@ void fn_80133664(void* obj) {
 
     flags = *(u16*)((u8*)fn_80105624() + 0x6);
     entryCount = (s8)_dbgMenuGetMenuNum__FP14tagWINDOW_WORKPl((u32)obj, NULL);
-    maxCount = (s8)fn_8005D9E4(*(u32*)((u8*)obj + 0x04));
+    maxCount = (s8)menuDataBiosGetType(*(u32*)((u8*)obj + 0x04));
     if (entryCount < maxCount) {
         maxCount = entryCount;
     }

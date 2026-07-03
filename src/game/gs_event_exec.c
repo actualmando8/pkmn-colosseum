@@ -218,7 +218,7 @@ s32 fn_80012B94(u8* ctx) {
     cmd   = (u8)(s32)fn_801040D0(ctx, 0);
     arr   = (u8*)fn_80103FE4(ctx);
     count = (s32)(s8)(s32)fn_801040D0(ctx, 2);
-    cap   = (s32)(u8)fn_8005D9E4(*(s32*)(ctx + 4));
+    cap   = (s32)(u8)menuDataBiosGetType(*(s32*)(ctx + 4));
     if (count > cap) count = cap;
 
     max_hi = 0;
@@ -320,7 +320,7 @@ s32 fn_80012E18(u8* ctx) {
     state = fn_80105624();
     bits = *(u16*)(state + 6);
     v1 = (s32)(s8)(s32)fn_801040D0(ctx, 2);
-    v2 = (s32)(s8)(s32)fn_8005D9E4(*(s32*)(ctx + 4));
+    v2 = (s32)(s8)(s32)menuDataBiosGetType(*(s32*)(ctx + 4));
     if (v1 < v2) {
         maxv = v2;
         minv = v1;

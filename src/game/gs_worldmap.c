@@ -3254,7 +3254,7 @@ s32 fn_80028948(void* r3)
 /* fn_80028FBC - 0x80028FBC | size: 0x59c */
 extern void fn_8011F4F0(void);
 extern void fn_80134A98(void);
-extern void fn_8005D934(void);
+extern void menuItemBiosGetPtr(void);
 extern void menuModelInit(void);
 extern void fn_8010A010(void);
 extern void peopleInfoBiosGetPtr(void);
@@ -3320,7 +3320,7 @@ void fn_80028FBC(void) {
     extern u32  fn_8011F4F0(u32 a);
     extern u32  fn_80134A98(s32 a, s32 b);
     extern void GScharCpy(void* dst, u8* src);           /* copy/build name struct    */
-    extern void* fn_8005D934(s32 id);                      /* returns struct ptr        */
+    extern void* menuItemBiosGetPtr(s32 id);                      /* returns struct ptr        */
     extern void menuModelInit(void* handle, s16 a, s16 b);
     extern void fn_8010A010(void* handle, s32 v);
     extern void peopleInfoBiosGetPtr(s32 v);
@@ -3357,7 +3357,7 @@ void fn_80028FBC(void) {
     u8  ok;
     s32 nameBuf[8]; /* sp+0x30 local name buffer (was sp[]) */
     s32 entryBuf[4];/* sp+0x20: copy of map header fields   */
-    void* mdl;      /* struct ptr from fn_8005D934          */
+    void* mdl;      /* struct ptr from menuItemBiosGetPtr          */
     s32 motOut;     /* fn_8018F4C8 out word @ sp+0xc        */
     s32 motTmp;     /* fn_8018F4C8 out word @ sp+0x8        */
 
@@ -3423,7 +3423,7 @@ void fn_80028FBC(void) {
     subIndex = *(s32*)(ctx + 0x1c);
 
     /* Fetch the model descriptor (0xd3a for mode 2, else 0xd39) and pose it. */
-    mdl = fn_8005D934((mode == 2) ? 0xd3a : 0xd39);
+    mdl = menuItemBiosGetPtr((mode == 2) ? 0xd3a : 0xd39);
     menuModelInit(lbl_803A2094, *(s16*)((u8*)mdl + 0x6), *(s16*)((u8*)mdl + 0x8));
 
     /* --- Per-mode model setup. --- */
@@ -8633,7 +8633,7 @@ void fn_8002EE74(void)
 #endif
 
 /* fn_8002F284 - 0x8002F284 | size: 0x518 */
-extern void fn_8005D8F8(void);
+extern void menuItemBiosSetSelectFlag(void);
 extern void fn_80102138(void);
 extern void fn_801022B8(void);
 extern u32 lbl_8047A410;
@@ -8644,8 +8644,8 @@ extern u32 lbl_8047A428;
 #pragma peephole off
 void fn_8002F284(void)
 {
-    /* --- UI item-enable dispatcher: fn_8005D8F8(u32 elementId, u32 val) --- */
-    extern void fn_8005D8F8(u32 id, u32 val);
+    /* --- UI item-enable dispatcher: menuItemBiosSetSelectFlag(u32 elementId, u32 val) --- */
+    extern void menuItemBiosSetSelectFlag(u32 id, u32 val);
     /* --- party-collection accessor + per-member predicates --- */
     extern void* fn_8012AC08(u8* base, u16 idx);   /* idx-th party member object */
     extern u32   fn_8011E850(u8* mon);             /* eligibility predicate A */
@@ -8695,12 +8695,12 @@ void fn_8002F284(void)
     partyBase = lbl_803A2688;
 
     /* Re-enable the six fixed world-map menu element IDs. */
-    fn_8005D8F8(0x1005, 0);
-    fn_8005D8F8(0x1002, 0);
-    fn_8005D8F8(0x1004, 0);
-    fn_8005D8F8(0x1001, 0);
-    fn_8005D8F8(0x1003, 0);
-    fn_8005D8F8(0x1000, 0);
+    menuItemBiosSetSelectFlag(0x1005, 0);
+    menuItemBiosSetSelectFlag(0x1002, 0);
+    menuItemBiosSetSelectFlag(0x1004, 0);
+    menuItemBiosSetSelectFlag(0x1001, 0);
+    menuItemBiosSetSelectFlag(0x1003, 0);
+    menuItemBiosSetSelectFlag(0x1000, 0);
 
     /* Slot 0: eligibility -> menu element 0xFFF. */
     mon = fn_8012AC08(partyBase, 0);
@@ -8715,7 +8715,7 @@ void fn_8002F284(void)
             eligible = 0;
         }
     }
-    fn_8005D8F8(0xFFF, (u32)eligible);
+    menuItemBiosSetSelectFlag(0xFFF, (u32)eligible);
 
     /* Slot 1 -> menu element 0xFFC. */
     mon = fn_8012AC08(partyBase, 1);
@@ -8730,7 +8730,7 @@ void fn_8002F284(void)
             eligible = 0;
         }
     }
-    fn_8005D8F8(0xFFC, (u32)eligible);
+    menuItemBiosSetSelectFlag(0xFFC, (u32)eligible);
 
     /* Slot 2 -> menu element 0xFFE. */
     mon = fn_8012AC08(partyBase, 2);
@@ -8745,7 +8745,7 @@ void fn_8002F284(void)
             eligible = 0;
         }
     }
-    fn_8005D8F8(0xFFE, (u32)eligible);
+    menuItemBiosSetSelectFlag(0xFFE, (u32)eligible);
 
     /* Slot 3 -> menu element 0xFFB. */
     mon = fn_8012AC08(partyBase, 3);
@@ -8760,7 +8760,7 @@ void fn_8002F284(void)
             eligible = 0;
         }
     }
-    fn_8005D8F8(0xFFB, (u32)eligible);
+    menuItemBiosSetSelectFlag(0xFFB, (u32)eligible);
 
     /* Slot 4 -> menu element 0xFFD. */
     mon = fn_8012AC08(partyBase, 4);
@@ -8775,7 +8775,7 @@ void fn_8002F284(void)
             eligible = 0;
         }
     }
-    fn_8005D8F8(0xFFD, (u32)eligible);
+    menuItemBiosSetSelectFlag(0xFFD, (u32)eligible);
 
     /* Slot 5 -> menu element 0xFFA. */
     lastMon = fn_8012AC08(partyBase, 5);
@@ -8790,7 +8790,7 @@ void fn_8002F284(void)
             eligible = 0;
         }
     }
-    fn_8005D8F8(0xFFA, (u32)eligible);
+    menuItemBiosSetSelectFlag(0xFFA, (u32)eligible);
 
     /* Ensure destination object 0xD9 is loaded.  Lazy-load when either the
      * "already initialized" flag is set, or the object is not yet present. */
@@ -8891,7 +8891,7 @@ valid_destination:
  * 3-predicate eligibility test used in gs_npc_event.c:208-216:
  *     eligible = fn_8011E850(mon) ||
  *                (fn_80123FBC(mon) && menuCBRule_CheckPokemonEventFlag() == 1)
- * The per-slot result (0/1) is fed to UI dispatcher fn_8005D8F8 under the
+ * The per-slot result (0/1) is fed to UI dispatcher menuItemBiosSetSelectFlag under the
  * corresponding menu element ID.
  *
  * It then ensures scene/object 0xD9 is loaded (lazy-load via fn_80102138 if
@@ -8906,8 +8906,8 @@ valid_destination:
  */
 void fn_8002F284(void)
 {
-    /* --- UI item-enable dispatcher: fn_8005D8F8(u32 elementId, u32 val) --- */
-    extern void fn_8005D8F8(u32 id, u32 val);
+    /* --- UI item-enable dispatcher: menuItemBiosSetSelectFlag(u32 elementId, u32 val) --- */
+    extern void menuItemBiosSetSelectFlag(u32 id, u32 val);
     /* --- party-collection accessor + per-member predicates --- */
     extern void* fn_8012AC08(u8* base, u16 idx);   /* idx-th party member object */
     extern u8    fn_8011E850(u8* mon);             /* eligibility predicate A */
@@ -8955,12 +8955,12 @@ void fn_8002F284(void)
     local8 = 0;
 
     /* Re-enable the six fixed world-map menu element IDs. */
-    fn_8005D8F8(0x1005, 0);
-    fn_8005D8F8(0x1002, 0);
-    fn_8005D8F8(0x1004, 0);
-    fn_8005D8F8(0x1001, 0);
-    fn_8005D8F8(0x1003, 0);
-    fn_8005D8F8(0x1000, 0);
+    menuItemBiosSetSelectFlag(0x1005, 0);
+    menuItemBiosSetSelectFlag(0x1002, 0);
+    menuItemBiosSetSelectFlag(0x1004, 0);
+    menuItemBiosSetSelectFlag(0x1001, 0);
+    menuItemBiosSetSelectFlag(0x1003, 0);
+    menuItemBiosSetSelectFlag(0x1000, 0);
 
     /* Slot 0: eligibility -> menu element 0xFFF. */
     mon = fn_8012AC08(partyBase, 0);
@@ -8971,7 +8971,7 @@ void fn_8002F284(void)
     } else {
         eligible = 0;
     }
-    fn_8005D8F8(0xFFF, (u32)eligible);
+    menuItemBiosSetSelectFlag(0xFFF, (u32)eligible);
 
     /* Slot 1 -> menu element 0xFFC. */
     mon = fn_8012AC08(partyBase, 1);
@@ -8982,7 +8982,7 @@ void fn_8002F284(void)
     } else {
         eligible = 0;
     }
-    fn_8005D8F8(0xFFC, (u32)eligible);
+    menuItemBiosSetSelectFlag(0xFFC, (u32)eligible);
 
     /* Slot 2 -> menu element 0xFFE. */
     mon = fn_8012AC08(partyBase, 2);
@@ -8993,7 +8993,7 @@ void fn_8002F284(void)
     } else {
         eligible = 0;
     }
-    fn_8005D8F8(0xFFE, (u32)eligible);
+    menuItemBiosSetSelectFlag(0xFFE, (u32)eligible);
 
     /* Slot 3 -> menu element 0xFFB. */
     mon = fn_8012AC08(partyBase, 3);
@@ -9004,7 +9004,7 @@ void fn_8002F284(void)
     } else {
         eligible = 0;
     }
-    fn_8005D8F8(0xFFB, (u32)eligible);
+    menuItemBiosSetSelectFlag(0xFFB, (u32)eligible);
 
     /* Slot 4 -> menu element 0xFFD. */
     mon = fn_8012AC08(partyBase, 4);
@@ -9015,7 +9015,7 @@ void fn_8002F284(void)
     } else {
         eligible = 0;
     }
-    fn_8005D8F8(0xFFD, (u32)eligible);
+    menuItemBiosSetSelectFlag(0xFFD, (u32)eligible);
 
     /* Slot 5 -> menu element 0xFFA. */
     mon = fn_8012AC08(partyBase, 5);
@@ -9026,7 +9026,7 @@ void fn_8002F284(void)
     } else {
         eligible = 0;
     }
-    fn_8005D8F8(0xFFA, (u32)eligible);
+    menuItemBiosSetSelectFlag(0xFFA, (u32)eligible);
 
     /* Ensure destination object 0xD9 is loaded.  Lazy-load when either the
      * "already initialized" flag is set, or the object is not yet present. */

@@ -486,7 +486,7 @@ u8 fn_8000817C(void) {
 }
 
 /* 0x80008868 | 0x3D8 */
-extern void fn_8005D9E4(void);
+extern void menuDataBiosGetType(void);
 extern void fn_8001EA98(void);
 extern void fn_8001E4B4(void);
 extern void sprintf(void);
@@ -514,7 +514,7 @@ void fn_80008868(void) {
     extern u8 lbl_8047B6C8[3];
     extern void fn_8001E4B4();
     extern void fn_8001EA98();
-    extern void fn_8005D9E4();
+    extern void menuDataBiosGetType();
     extern void sprintf();
     extern void fn_800FAEF8();
     extern void fn_801906A0();
@@ -540,7 +540,7 @@ void fn_80008868(void) {
 
     r3 = *(u32*)((u8*)r3 + 0x4);
     r25 = 0x28;
-    fn_8005D9E4();
+    menuDataBiosGetType();
     r4 = lbl_80478F98;
     tmp = 0x0;
     *(u32*)(sp + 0x8) = tmp;
@@ -789,7 +789,7 @@ void fn_80008C40(void) {
     extern u32 lbl_80478838;
     extern u32 lbl_80478F98;
     extern u32 lbl_80478F9C;
-    extern void fn_8005D9E4();
+    extern void menuDataBiosGetType();
     extern void fn_80105624();
     extern void fn_801903B0();
     extern void fn_80190528();
@@ -817,7 +817,7 @@ void fn_80008C40(void) {
     tmp = *(u32*)((u8*)r4 + 0x0);
     r3 = *(u32*)((u8*)r28 + 0x4);
     r30 = (s16)tmp;
-    fn_8005D9E4();
+    menuDataBiosGetType();
     r29 = r3 & 0xFF;
     tmp = (s16)r29;
     if ((s32)r30 < (s32)tmp) {
@@ -842,7 +842,7 @@ void fn_80008C40(void) {
     tmp = r4 & 0x00000004;
     if ((s32)tmp != 0) {
         r3 = *(u32*)((u8*)r28 + 0x4);
-        fn_8005D9E4();
+        menuDataBiosGetType();
         r3 = r3 & 0xFF;
         tmp = *(s16*)((u8*)(u32)sp + 0xA);
         tmp = tmp - r3;
@@ -853,7 +853,7 @@ void fn_80008C40(void) {
         tmp = r4 & 0x00000008;
         if ((s32)tmp != 0) {
             r3 = *(u32*)((u8*)r28 + 0x4);
-            fn_8005D9E4();
+            menuDataBiosGetType();
             tmp = *(s16*)((u8*)(u32)sp + 0xA);
             r3 = r3 & 0xFF;
             r3 = r3 + tmp;

@@ -63,7 +63,7 @@ extern u8  lbl_80315690[]; /* resource table, 8-byte entries */
 extern void  fn_800E4BF4(u32);     /* GSmem release/unref */
 extern void  fn_800D2738(void);
 extern void* menuDataBiosGetPtr(void);    /* linked list head */
-extern void* fn_8005D934(s16 idx); /* node by index */
+extern void* menuItemBiosGetPtr(s16 idx); /* node by index */
 extern void* menuSeBiosGetPtr(s32);
 extern u16   fn_8005D798(void*, s32);
 extern void* fn_8005D858(s32);
@@ -295,7 +295,7 @@ s32 fn_801020C0(void) {
     {
         s32 r0 = (s16)*(s16*)((u8*)r3 + 0x4);
         do {
-            void* node = fn_8005D934((s16)r0);
+            void* node = menuItemBiosGetPtr((s16)r0);
             if (((u32)*(volatile u8*)node >> 7) & 1) {
                 r31++;
             }
@@ -322,7 +322,7 @@ s32 fn_80102138(void* unused, u32 param) {
         s32 r30 = 0;
     loop:
         {
-            void* node = fn_8005D934((s16)r31);
+            void* node = menuItemBiosGetPtr((s16)r31);
             if ((u32)(s16)r31 == (u32)r29) {
                 if (((u32)*(volatile u8*)node >> 7) & 1) {
                     return r30;
@@ -397,7 +397,7 @@ void* fn_801022B8(void* p, u32 target) {
         s32 r29b = 0;
         void* result = (void*)0;
         do {
-            void* node = fn_8005D934((s16)r30);
+            void* node = menuItemBiosGetPtr((s16)r30);
             if (((u32)*(volatile u8*)node >> 7) & 1) {
                 if (r29b == r31) {
                     return (void*)(s32)(s16)r30;
@@ -829,7 +829,7 @@ u8* fn_80104318(u8* arg) {
     void* node;
     s32 idx;
     { extern void* menuDataBiosGetPtr(void*); node = menuDataBiosGetPtr(*(void**)(arg + 0x4)); }
-    node = fn_8005D934(*(s16*)((u8*)node + 0x4));
+    node = menuItemBiosGetPtr(*(s16*)((u8*)node + 0x4));
     idx = 0;
     while (1) {
         if (((u32)*(volatile u8*)node >> 7) & 1) {
@@ -841,7 +841,7 @@ u8* fn_80104318(u8* arg) {
         if (((u32)*(volatile u8*)node >> 6) & 1) {
             break;
         }
-        node = fn_8005D934(*(s16*)((u8*)node + 0x18));
+        node = menuItemBiosGetPtr(*(s16*)((u8*)node + 0x18));
     }
     return (u8*)0;
 }
@@ -1369,8 +1369,8 @@ void fn_80107F38(s32 param, u32 key) {
             *(s16*)(r31 + 0x1a) = *(s16*)((u8*)r29 + 0x5e);
             *(s16*)(r31 + 0x1c) = *(s16*)((u8*)r29 + 0x60);
             *(s16*)(r31 + 0x1e) = *(s16*)((u8*)r29 + 0x62);
-            *(s16*)(r31 + 0x8) = *(s16*)((u8*)fn_8005D934(*(s16*)((u8*)r29 + 0x6)) + 0x2);
-            *(s16*)(r31 + 0xa) = *(s16*)((u8*)fn_8005D934(*(s16*)((u8*)r29 + 0x6)) + 0x4);
+            *(s16*)(r31 + 0x8) = *(s16*)((u8*)menuItemBiosGetPtr(*(s16*)((u8*)r29 + 0x6)) + 0x2);
+            *(s16*)(r31 + 0xa) = *(s16*)((u8*)menuItemBiosGetPtr(*(s16*)((u8*)r29 + 0x6)) + 0x4);
             r28 = 0;
             while (r28 < fn_800D3088()) {
                 fn_801074D4(r31, (u8*)r29 + 0xc);
@@ -1468,9 +1468,9 @@ void fn_801081F8(void* r3_arg, u16 r4, u16 r5) {
                 *(s16*)(r30 + 0x1e) = *(s16*)(r27 + 0x62);
                 {
                     void* t;
-                    t = fn_8005D934(*(s16*)(r27 + 0x6));
+                    t = menuItemBiosGetPtr(*(s16*)(r27 + 0x6));
                     *(s16*)(r30 + 0x8) = *(s16*)((u8*)t + 0x2);
-                    t = fn_8005D934(*(s16*)(r27 + 0x6));
+                    t = menuItemBiosGetPtr(*(s16*)(r27 + 0x6));
                     *(s16*)(r30 + 0xa) = *(s16*)((u8*)t + 0x4);
                 }
                 {
@@ -1521,9 +1521,9 @@ void fn_801081F8(void* r3_arg, u16 r4, u16 r5) {
             *(s16*)(r31 + 0x1e) = *(s16*)((u8*)r30 + 0x62);
             {
                 void* t;
-                t = fn_8005D934(*(s16*)((u8*)r30 + 0x6));
+                t = menuItemBiosGetPtr(*(s16*)((u8*)r30 + 0x6));
                 *(s16*)(r31 + 0x8) = *(s16*)((u8*)t + 0x2);
-                t = fn_8005D934(*(s16*)((u8*)r30 + 0x6));
+                t = menuItemBiosGetPtr(*(s16*)((u8*)r30 + 0x6));
                 {
                     u8* r25b = lbl_80404B68;
                     s32 r23 = 0;

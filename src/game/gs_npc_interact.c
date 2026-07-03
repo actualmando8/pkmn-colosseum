@@ -63,7 +63,7 @@
  *
  * fn_8000D298 (GSnpc_InitDialog) sets up the NPC sprite for dialog:
  *   - Calls winSpriteSetDisp to set NPC facing direction
- *   - Gets the NPC data from fn_8005D934 (lookup by ID)
+ *   - Gets the NPC data from menuItemBiosGetPtr (lookup by ID)
  *   - Sets up the text viewport via fn_801040F0
  *   - If the NPC has a special marker (offset +0x4C), renders it
  *     using fn_800FA444/fn_800FB680 for the dialog portrait
@@ -103,7 +103,7 @@ extern void* menuSubCalcColor(void*, void*);
 
 /* NPC/People system */
 extern void  winSpriteSetDisp(void* npc, s32 direction);  /* Set NPC facing */
-extern void* fn_8005D934(s16 npcId);                  /* Lookup NPC data by ID */
+extern void* menuItemBiosGetPtr(s16 npcId);                  /* Lookup NPC data by ID */
 
 /* Text/dialog system */
 extern void  fn_801040F0();
@@ -241,7 +241,7 @@ u32 fn_8001120C(void* obj) {
 #pragma peephole on
 
 /* 0x80011288 | 0x21C */
-extern void fn_8005D8F8();
+extern void menuItemBiosSetSelectFlag();
 extern void fn_80102138();
 extern s32 fn_801026A4(s32, ...);
 #if 0
@@ -250,7 +250,7 @@ asm void fn_80011288(void) {
 }
 #else
 void fn_80011288(void) {
-    extern void fn_8005D8F8();
+    extern void menuItemBiosSetSelectFlag();
     extern void fn_80102138();
     extern void fn_801026A4();
     u8 sp[0x20];
@@ -274,16 +274,16 @@ void fn_80011288(void) {
     do {
         r3 = 0x1258;
         r4 = 0x0;
-        fn_8005D8F8();
+        menuItemBiosSetSelectFlag();
         r3 = 0x1259;
         r4 = 0x0;
-        fn_8005D8F8();
+        menuItemBiosSetSelectFlag();
         r3 = 0x125a;
         r4 = 0x0;
-        fn_8005D8F8();
+        menuItemBiosSetSelectFlag();
         r3 = 0x125b;
         r4 = 0x0;
-        fn_8005D8F8();
+        menuItemBiosSetSelectFlag();
         r31 = r28;
         r30 = 0x0;
         do {
@@ -314,7 +314,7 @@ void fn_80011288(void) {
         } while (0);
             if ((s32)r3 != 0) {
                 r4 = 0x1;
-                fn_8005D8F8();
+                menuItemBiosSetSelectFlag();
             }
             r31 = r31 + 0x8;
             r30 = r30 + 0x1;
@@ -2105,7 +2105,7 @@ void fn_8000DFF0(u8* ctx) {
 #endif
 
 /* fn_8000E204 - 0x8000E204 | size: 0x88 */
-extern void fn_8005D8B8(void);
+extern void menuItemBiosGetSelectFlag(void);
 extern void fn_801022B8(void);
 #if 0
 asm void fn_8000E204(void) {
@@ -2115,10 +2115,10 @@ asm void fn_8000E204(void) {
 #pragma push
 #pragma peephole off
 void fn_8000E204(u8* arg1, u8* arg2) {
-    extern u32 fn_8005D8B8(s16 val);
+    extern u32 menuItemBiosGetSelectFlag(s16 val);
     extern s32 fn_801022B8(u32 val);
     extern void winSpriteSetDisp(u8* a, u32 b);
-    if ((u8)fn_8005D8B8(*(s16*)(arg2 + 6)) != 0) {
+    if ((u8)menuItemBiosGetSelectFlag(*(s16*)(arg2 + 6)) != 0) {
         if (*(s16*)(arg2 + 6) == fn_801022B8(*(u32*)(arg1 + 4))) {
             winSpriteSetDisp(arg2, 1);
         } else {
@@ -3263,11 +3263,11 @@ u32 fn_800109A0(u8* ctx) {
     party = fn_80103FE4(ctx);
     if ((s8)ctx[1] == 5) {
         for (i = 0; i < 4; i++) {
-            fn_8005D8F8(*(u16*)(lbl_80478850 + (i * 2)), 1);
+            menuItemBiosSetSelectFlag(*(u16*)(lbl_80478850 + (i * 2)), 1);
         }
     } else {
         for (i = 0; i < 4; i++) {
-            fn_8005D8F8(*(u16*)(lbl_80478850 + (i * 2)),
+            menuItemBiosSetSelectFlag(*(u16*)(lbl_80478850 + (i * 2)),
                          (*(u32*)(party + (i * 0xC) + 4) != 0) ? 1 : 0);
         }
     }
@@ -3304,7 +3304,7 @@ u32 fn_80010B30(u8* arg) {
     extern void* fn_80103FE4(u8* a);
     extern s32 fn_801022B8(u32 val);
     extern u8* windowSearchItemID(u8* a, s32 id);
-    extern void fn_8005D8F8(s32 id, s32 flag);
+    extern void menuItemBiosSetSelectFlag(s32 id, s32 flag);
     void* entry;
     void* participant;
     s32 trainer_id;
@@ -3319,13 +3319,13 @@ u32 fn_80010B30(u8* arg) {
             *(s32*)(r + 0x4C) = 0x13D;
             r = windowSearchItemID(arg, 0xB8);
             *(s32*)(r + 0x4C) = 0x140;
-            fn_8005D8F8(0xB8, 1);
+            menuItemBiosSetSelectFlag(0xB8, 1);
         } else {
             r = windowSearchItemID(arg, 0xB6);
             *(s32*)(r + 0x4C) = 0x13F;
             r = windowSearchItemID(arg, 0xB8);
             *(s32*)(r + 0x4C) = 0;
-            fn_8005D8F8(0xB8, 0);
+            menuItemBiosSetSelectFlag(0xB8, 0);
         }
     }
     participant = fn_80103FE4(arg);

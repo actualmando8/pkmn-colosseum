@@ -104,8 +104,8 @@ extern s32   fn_8012A5B0(void* partyData, s32 slot, s32 p3);
 extern void  fn_80106ADC(s32 p1, void* text, s32 p3, s32 p4, u8 p5);
 extern void  fn_801069FC(s32 slot);
 extern void  fn_801080CC(void* ctx, s32 state);
-extern void  fn_8005D95C(s16 npcId, u16* outX, u16* outY);
-extern void  fn_8005D9AC(s16 x, s16 y, s16 z);
+extern void  menuDataBiosGetXY(s16 npcId, u16* outX, u16* outY);
+extern void  menuDataBiosSetXY(s16 x, s16 y, s16 z);
 extern void* menuDataBiosGetPtr(void* data);
 
 /* =========================================================================
@@ -1176,7 +1176,7 @@ void fn_8001C7B8(void) {
                     r3 = tmp + r3;
                     r25 = *(s16*)(r3 + r24);
                     r3 = r25;
-                    ((void(*)(void))fn_8005D95C)();
+                    ((void(*)(void))menuDataBiosGetXY)();
                     tmp = *(s16*)((u8*)(u32)sp + 0x1E);
                     r3 = r25;
                     if ((s32)tmp > 0xfa) {
@@ -1197,7 +1197,7 @@ void fn_8001C7B8(void) {
                     r3 = tmp + r3;
                     r28 = *(s16*)(r3 + r25);
                     r3 = r28;
-                    ((void(*)(void))fn_8005D95C)();
+                    ((void(*)(void))menuDataBiosGetXY)();
                     tmp = *(s16*)((u8*)(u32)sp + 0x1A);
                     r3 = r28;
                     if ((s32)tmp > 0xfa) {
@@ -1219,7 +1219,7 @@ void fn_8001C7B8(void) {
                         tmp = tmp * 0x30;
                         r28 = *(s16*)(r30 + tmp);
                         r3 = r28;
-                        ((void(*)(void))fn_8005D95C)();
+                        ((void(*)(void))menuDataBiosGetXY)();
                         r3 = r28;
                         winSeqCheckMove();
                         tmp = r3 & 0xFF;
@@ -1417,7 +1417,7 @@ void fn_8001C7B8(void) {
                     r3 = tmp + r3;
                     r24 = *(s16*)(r3 + r24);
                     r3 = r24;
-                    ((void(*)(void))fn_8005D95C)();
+                    ((void(*)(void))menuDataBiosGetXY)();
                     tmp = *(s16*)((u8*)(u32)sp + 0x12);
                     r3 = r24;
                     if ((s32)tmp > 0xfa) {
@@ -1437,7 +1437,7 @@ void fn_8001C7B8(void) {
                     r3 = tmp + r3;
                     r24 = *(s16*)(r3 + r25);
                     r3 = r24;
-                    ((void(*)(void))fn_8005D95C)();
+                    ((void(*)(void))menuDataBiosGetXY)();
                     tmp = *(s16*)((u8*)(u32)sp + 0xE);
                     r3 = r24;
                     if ((s32)tmp > 0xfa) {
@@ -1455,7 +1455,7 @@ void fn_8001C7B8(void) {
                         tmp = tmp * 0x30;
                         r24 = *(s16*)(r30 + tmp);
                         r3 = r24;
-                        ((void(*)(void))fn_8005D95C)();
+                        ((void(*)(void))menuDataBiosGetXY)();
                         r3 = r24;
                         winSeqCheckMove();
                         tmp = r3 & 0xFF;
@@ -2381,8 +2381,8 @@ void fn_8001DACC(void) {
 #pragma push
 #pragma peephole off
 s32 fn_8001DFA8(u32 arg1, u8* arg2) {
-    extern u8 fn_8005D8B8(s16);
-    if (fn_8005D8B8(*(s16*)(arg2 + 0x6)) != 0) {
+    extern u8 menuItemBiosGetSelectFlag(s16);
+    if (menuItemBiosGetSelectFlag(*(s16*)(arg2 + 0x6)) != 0) {
         *(u8*)(arg2 + 0x66) = 0xff;
         *(u8*)(arg2 + 0x65) = 0xff;
         *(u8*)(arg2 + 0x64) = 0xff;
@@ -2491,7 +2491,7 @@ extern void fn_800D5BA0(void);
 extern void fn_800D5648(void);
 extern void fn_8005D858(void);
 extern void fn_801040F0(void);
-extern void fn_8005D934(void);
+extern void menuItemBiosGetPtr(void);
 extern void fn_80104160(void);
 extern u8 lbl_80266C20[];
 extern f64 lbl_8047B7D8;
@@ -2509,7 +2509,7 @@ void fn_8001E644(void) {
     extern f32 lbl_8047B7E0;
     extern f32 lbl_8047B7E4;
     extern void fn_8005D858();
-    extern void fn_8005D934();
+    extern void menuItemBiosGetPtr();
     extern void fn_800D5648();
     extern void fn_800D5BA0();
     extern void fn_800D61E4();
@@ -2706,10 +2706,10 @@ void fn_8001E644(void) {
     fn_8005D858();
     r24 = r3;
     r3 = 0x84;
-    fn_8005D934();
+    menuItemBiosGetPtr();
     r25 = r3;
     r3 = 0x87;
-    fn_8005D934();
+    menuItemBiosGetPtr();
     r7 = *(s16*)((u8*)r25 + 0x2);
     r23 = r26 - r27;
     tmp = *(s16*)((u8*)r3 + 0x2);
@@ -2726,10 +2726,10 @@ void fn_8001E644(void) {
     r10 = 0x0;
     fn_80104160();
     r3 = 0x85;
-    fn_8005D934();
+    menuItemBiosGetPtr();
     r25 = r3;
     r3 = 0x86;
-    fn_8005D934();
+    menuItemBiosGetPtr();
     r8 = *(s16*)((u8*)r25 + 0x2);
     r4 = r27;
     tmp = *(s16*)((u8*)r3 + 0x2);
@@ -2748,10 +2748,10 @@ void fn_8001E644(void) {
     fn_8005D858();
     r27 = r3;
     r3 = 0x84;
-    fn_8005D934();
+    menuItemBiosGetPtr();
     r25 = r3;
     r3 = 0x8b;
-    fn_8005D934();
+    menuItemBiosGetPtr();
     r5 = r3;
     r23 = r29 - r30;
     r4 = *(s16*)((u8*)r25 + 0x4);
@@ -2769,10 +2769,10 @@ void fn_8001E644(void) {
     r4 = (s16)tmp;
     fn_80104160();
     r3 = 0x88;
-    fn_8005D934();
+    menuItemBiosGetPtr();
     r25 = r3;
     r3 = 0x8a;
-    fn_8005D934();
+    menuItemBiosGetPtr();
     tmp = *(s16*)((u8*)r3 + 0x4);
     r3 = r30;
     r4 = *(s16*)((u8*)r25 + 0x4);
@@ -5511,7 +5511,7 @@ void fn_80019938(u8* a, u8* b) {
 
 /* fn_800199F4 - 0x800199F4 | size: 0x128 */
 extern void* fn_80103FFC();
-extern void fn_8005D8F8();
+extern void menuItemBiosSetSelectFlag();
 extern void* memcpy(void* dst, const void* src, u32 n);
 extern u32 lbl_80478870;
 #if 0
@@ -5541,9 +5541,9 @@ s32 fn_800199F4(u8* arg) {
     }
     while (i < 4) {
         if (*(u32*)(entry + 4) != 0) {
-            fn_8005D8F8(*ids, 1);
+            menuItemBiosSetSelectFlag(*ids, 1);
         } else {
-            fn_8005D8F8(*ids, 0);
+            menuItemBiosSetSelectFlag(*ids, 0);
         }
         entry += 0xc;
         ids++;
@@ -6151,7 +6151,7 @@ void fn_8001AA98(u8* a) {
 #endif
 
 /* fn_8001AB70 - 0x8001AB70 | size: 0x3d4 */
-extern u8 fn_8005D9E4(void*);
+extern u8 menuDataBiosGetType(void*);
 #if 0
 asm void fn_8001AB70(void) {
 #include "src/game/gs_pcbox_fn_8001AB70.inc"
@@ -6264,7 +6264,7 @@ void fn_8001AB70(u8* ctx) {
             newIndex = 6;
         }
     } else if ((buttons & 2) != 0) {
-        count = fn_8005D9E4(*(void**)(ctx + 4));
+        count = menuDataBiosGetType(*(void**)(ctx + 4));
         step = 1;
         newIndex++;
         if (newIndex >= count) {
@@ -6291,7 +6291,7 @@ void fn_8001AB70(u8* ctx) {
 #endif
 
 /* fn_8001AF44 - 0x8001AF44 | size: 0x240 */
-extern void fn_8005D880(s16 x, s16 y, s16 z);
+extern void menuItemBiosSetXY(s16 x, s16 y, s16 z);
 extern u32 lbl_8047A308;
 #if 0
 asm void fn_8001AF44(void) {
@@ -6325,16 +6325,16 @@ s32 fn_8001AF44(s32 ctx) {
                 s32 state;
 
                 slot = lbl_802E4E58 + (s32)(s8)lbl_803A1D40[4] * 0x30 + byte_off;
-                fn_8005D880(*(s16*)(slot + 2), *(s16*)(slot + 4), *(s16*)(slot + 6));
+                menuItemBiosSetXY(*(s16*)(slot + 2), *(s16*)(slot + 4), *(s16*)(slot + 6));
                 slot = lbl_802E4E58 + (s32)(s8)lbl_803A1D40[4] * 0x30 + byte_off;
-                fn_8005D9AC(*(s16*)(slot + 0), *(s16*)(slot + 4), *(s16*)(slot + 6));
+                menuDataBiosSetXY(*(s16*)(slot + 0), *(s16*)(slot + 4), *(s16*)(slot + 6));
 
                 slot = lbl_802E4E58 + (s32)(s8)lbl_803A1D40[4] * 0x30;
                 fn_801026A4((s32)*(s16*)(slot + byte_off), 0x63, 0, 0, 0, 2, (void*)iter, i);
 
                 slot = lbl_802E4E58 + (s32)(s8)lbl_803A1D40[4] * 0x30;
                 npcId = *(s16*)(slot + byte_off);
-                fn_8005D95C(npcId, (u16*)&sx, (u16*)&sy);
+                menuDataBiosGetXY(npcId, (u16*)&sx, (u16*)&sy);
                 if (sx > 0xfa) state = 0x116;
                 else state = 0x11e;
                 fn_801080CC((void*)(s32)npcId, state);
@@ -6356,7 +6356,7 @@ s32 fn_8001AF44(s32 ctx) {
 
                 slot = lbl_802E4E58 + (s32)(s8)lbl_803A1D40[4] * 0x30;
                 npcId = *(s16*)(slot + i);
-                fn_8005D95C(npcId, (u16*)&sx, (u16*)&sy);
+                menuDataBiosGetXY(npcId, (u16*)&sx, (u16*)&sy);
                 if (sx > 0xfa) state = 0x11a;
                 else state = 0x122;
                 fn_801080CC((void*)(s32)npcId, state);

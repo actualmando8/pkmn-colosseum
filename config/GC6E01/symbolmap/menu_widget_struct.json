@@ -1,0 +1,37 @@
+{
+ "menu_item_struct": {
+  "base_colo": "lbl_802EF0A8",
+  "base_xd": "_menu_item",
+  "stride": "0x1c",
+  "layout_colo": {
+   "0x0": "flags(u8; MSB=select, bit6=chain-terminator)",
+   "0x1": "reserved const 0xFF (never read)",
+   "0x2": "x(s16)",
+   "0x4": "y(s16)",
+   "0x6": "x2/secondary-x(sparse)",
+   "0x8": "y2/secondary-y(sparse)",
+   "0xa": "unknown param(s16)",
+   "0xc-0x13": "mostly zero",
+   "0x14": "callback fn-ptr(sparse)",
+   "0x18": "next(s16 index link)"
+  },
+  "layout_xd_deltas": "XD inserted alpha@0x2 + sprite_id@0x4 + width@0xa + height@0xc + textptr@0x10; x/y shifted +4; back half (flags@0x0, callback@0x14, next@0x18) BYTE-STABLE"
+ },
+ "menu_data_struct": {
+  "base_colo": "lbl_802E2DB8(272x0x1c)",
+  "base_xd": "_menu_data(288x0x1c)",
+  "stride": "0x1c",
+  "note": "per-panel control record; accessor menuDataBiosGetPtr IDENTICALLY NAMED in both games"
+ },
+ "accessors_named": [
+  "fn_8005D880=menuItemBiosSetXY",
+  "fn_8005D8B8=menuItemBiosGetSelectFlag",
+  "fn_8005D8F8=menuItemBiosSetSelectFlag",
+  "fn_8005D934=menuItemBiosGetPtr",
+  "fn_8005D95C=menuDataBiosGetXY",
+  "fn_8005D9AC=menuDataBiosSetXY",
+  "fn_8005D9E4=menuDataBiosGetType"
+ ],
+ "fingerprint_followup": "Semantic-field fingerprint now VIABLE using stable anchors (flags@0x0, callback@0x14, next-link topology@0x18, x/y after +4 item / +2 data remap). Est yield 10-30 battle/scene menu callbacks with named XD counterparts. NOT the full 628-callback space \u2014 item/data callback tables are small.",
+ "prior_pass_errors": "0xFF marker is at struct offset 0x1 not 0x5 (0x5 = low byte of s16 Y); it is reserved padding NOT a terminator; the real terminator is a bit in flags@0x0; 'word1-hi16 sequence counter' was an artifact of reading raw halfwords across the repacked struct."
+}

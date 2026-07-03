@@ -12,7 +12,7 @@
 extern void menuSubGetPokemonSexForDisp();
 extern void fn_8005D830();
 extern void fn_8005D858();
-extern void fn_8005D8F8();
+extern void menuItemBiosSetSelectFlag();
 extern void fn_80071160();
 extern void fn_80071208();
 extern void fn_80071318();
@@ -6301,7 +6301,7 @@ void fn_8006F284(void) {
         r0 = (u32)r0 >> 5;
         r25 = r0 & 0xFF;
         r4 = r25;
-        ((void(*)(void))fn_8005D8F8)();
+        ((void(*)(void))menuItemBiosSetSelectFlag)();
         if (r25 == (u32)0x0) {
             r3 = *(u32*)((u8*)r31 + 0x4);
             r4 = 0x9fd;

@@ -493,7 +493,7 @@
 "addr": "0x80007FDC",
 "size": 56,
 "label": "gs-engine",
-"confidence": 1.89,
+"confidence": 1.9,
 "seed": null
 },
 {
@@ -1588,7 +1588,7 @@
 "name": "fn_80011288",
 "addr": "0x80011288",
 "size": 540,
-"label": "fight",
+"label": "gs-engine",
 "confidence": 1.9,
 "seed": null
 },
@@ -1596,7 +1596,7 @@
 "name": "fn_800114A4",
 "addr": "0x800114A4",
 "size": 604,
-"label": "fight",
+"label": "gs-engine",
 "confidence": 1.9,
 "seed": null
 },
@@ -3172,7 +3172,7 @@
 "name": "fn_80024A2C",
 "addr": "0x80024A2C",
 "size": 376,
-"label": "gs-engine",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
@@ -3180,7 +3180,7 @@
 "name": "fn_80024BA4",
 "addr": "0x80024BA4",
 "size": 312,
-"label": "gs-engine",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
@@ -3188,7 +3188,7 @@
 "name": "fn_80024CDC",
 "addr": "0x80024CDC",
 "size": 224,
-"label": "gs-engine",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
@@ -3196,7 +3196,7 @@
 "name": "fn_80024DBC",
 "addr": "0x80024DBC",
 "size": 368,
-"label": "gs-engine",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
@@ -3204,7 +3204,7 @@
 "name": "fn_80024F2C",
 "addr": "0x80024F2C",
 "size": 368,
-"label": "gs-engine",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
@@ -3212,7 +3212,7 @@
 "name": "fn_8002509C",
 "addr": "0x8002509C",
 "size": 368,
-"label": "gs-engine",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
@@ -3220,7 +3220,7 @@
 "name": "fn_8002520C",
 "addr": "0x8002520C",
 "size": 368,
-"label": "gs-engine",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
@@ -3228,7 +3228,7 @@
 "name": "fn_8002537C",
 "addr": "0x8002537C",
 "size": 276,
-"label": "gs-engine",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
@@ -3236,7 +3236,7 @@
 "name": "fn_80025490",
 "addr": "0x80025490",
 "size": 276,
-"label": "gs-engine",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
@@ -7137,60 +7137,60 @@
 "seed": null
 },
 {
-"name": "fn_8005D880",
+"name": "menuItemBiosSetXY",
 "addr": "0x8005D880",
 "size": 56,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_8005D8B8",
+"name": "menuItemBiosGetSelectFlag",
 "addr": "0x8005D8B8",
 "size": 64,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_8005D8F8",
+"name": "menuItemBiosSetSelectFlag",
 "addr": "0x8005D8F8",
 "size": 60,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_8005D934",
+"name": "menuItemBiosGetPtr",
 "addr": "0x8005D934",
 "size": 40,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_8005D95C",
+"name": "menuDataBiosGetXY",
 "addr": "0x8005D95C",
 "size": 80,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_8005D9AC",
+"name": "menuDataBiosSetXY",
 "addr": "0x8005D9AC",
 "size": 56,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_8005D9E4",
+"name": "menuDataBiosGetType",
 "addr": "0x8005D9E4",
 "size": 52,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "menuDataBiosGetPtr",
@@ -42153,7 +42153,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80183FC4",
+"name": "peopleAddWalkList",
 "addr": "0x80183FC4",
 "size": 460,
 "label": "people",
@@ -48377,12 +48377,12 @@
 "seed": null
 },
 {
-"name": "fn_801CB104",
+"name": "floorCharacterSetPos",
 "addr": "0x801CB104",
 "size": 68,
 "label": "field",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_801CB148",
@@ -48489,7 +48489,7 @@
 "seed": null
 },
 {
-"name": "fn_801CB708",
+"name": "scriptWaitSyncMotion",
 "addr": "0x801CB708",
 "size": 188,
 "label": "gs-engine",
@@ -68957,8 +68957,14 @@
 {
 "label": "fight",
 "start": "0x800111C4",
+"end": "0x80011288",
+"count": 3
+},
+{
+"label": "gs-engine",
+"start": "0x80011288",
 "end": "0x80011700",
-"count": 5
+"count": 2
 },
 {
 "label": "menu",
@@ -69185,8 +69191,20 @@
 {
 "label": "gs-engine",
 "start": "0x80023DA8",
+"end": "0x80024a2c",
+"count": 19
+},
+{
+"label": "menu",
+"start": "0x80024A2C",
+"end": "0x800255a4",
+"count": 9
+},
+{
+"label": "gs-engine",
+"start": "0x800255A4",
 "end": "0x800263b0",
-"count": 38
+"count": 10
 },
 {
 "label": "field",
@@ -69353,14 +69371,14 @@
 {
 "label": "gs-engine",
 "start": "0x8005D830",
-"end": "0x8005da18",
-"count": 9
+"end": "0x8005d880",
+"count": 2
 },
 {
 "label": "menu",
-"start": "0x8005DA18",
+"start": "0x8005D880",
 "end": "0x8005da48",
-"count": 1
+"count": 8
 },
 {
 "label": "gs-engine",
