@@ -561,10 +561,10 @@ void* sndBSearch(u8* key, u8* base, s32 count, u32 size, PeopleCmpFn cmp) {
 extern u32  OSEnableInterrupts(void);
 extern u32  OSGetTick(void);
 extern void fn_80098034(void);
-extern void fn_800AC0F8(void);
-extern void fn_800AC110(void);
+extern void AIStartDMA(void);
+extern void AIStopDMA(void);
 extern u32  fn_800AE794(void);
-extern void fn_800AE7CC(u32 a);
+extern void DSPSendMailToDSP(u32 a);
 extern void DSPInit(void);
 extern void fn_800AE8A4(void);
 extern void fn_800AE8EC(void);
@@ -581,12 +581,12 @@ extern u32 ReverbHICreate(u8* obj, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f
 extern u32 ReverbHIModify(u8* obj, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6);
 extern void ReverbHICallback(u32 a, u32 b, u32 c, u8* d);
 extern void DCStoreRange(void* addr, u32 nBytes);
-extern void fn_800AC02C(u32 a);
+extern void AIRegisterDMACallback(u32 a);
 extern void AIInitDMA(u8* ptr, u32 size);
-extern u32  fn_800ACB44(void);
-extern u32  fn_800ACB4C(void);
+extern u32  ARGetBaseAddress(void);
+extern u32  ARGetSize(void);
 extern void fn_800AE630(void);
-extern u32  fn_800AE78C(void);
+extern u32  ARQGetChunkSize(void);
 extern u32  adsrConvertTimeCents(s32 tc); /* verified true signature via synth_adsr.c reference + callsite (see below) */
 extern void salActivateStudio(void);
 extern void fn_8015AAA0(void);
@@ -1819,7 +1819,7 @@ void fn_801634A8(u32 size) {
     PFAramQueue* lowQueue;
     PFAramQueue* highQueue;
 
-    base = fn_800ACB44();
+    base = ARGetBaseAddress();
     clearBuf = (u8*)fn_801643D8(0x500);
     if (clearBuf != NULL) {
         memset(clearBuf, 0, 0x500);
@@ -1840,7 +1840,7 @@ void fn_801634A8(u32 size) {
     }
 
     lbl_8047B07C = base + size;
-    end = fn_800ACB4C();
+    end = ARGetSize();
     if (lbl_8047B07C > end) {
         lbl_8047B07C = end;
     }
@@ -1861,7 +1861,7 @@ asm void fn_80163794(void) {
 void fn_80163794(void) {}
 #endif
 #pragma pop
-extern u32 fn_800ACB44(void);
+extern u32 ARGetBaseAddress(void);
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
@@ -1870,7 +1870,7 @@ asm void fn_80163798(void) {
 #include "src/game/people/people_field_fn_80163798.inc"
 }
 #else
-void fn_80163798(void) { fn_800ACB44(); }
+void fn_80163798(void) { ARGetBaseAddress(); }
 #endif
 #pragma pop
 #pragma push
@@ -1888,7 +1888,7 @@ void aramSetUploadCallback(u8* ptr, u32 size) {
     u32 avail;
     if (ptr) {
         aligned = (size + 0x1f) & ~0x1fu;
-        avail = fn_800AE78C();
+        avail = ARQGetChunkSize();
         lbl_8047B06C = aligned < avail ? avail : aligned;
     }
     lbl_8047B070 = (u32)ptr;
@@ -2216,7 +2216,7 @@ u32 salInitAi(u32(*fnptr)(void), u32 d, u32 a) {
         lbl_8047B0A0 = 1;
         lbl_8047B090 = 0;
         lbl_8047B0A4 = (u32)fnptr;
-        fn_800AC02C((u32)salCallback);
+        AIRegisterDMACallback((u32)salCallback);
         AIInitDMA((u8*)(lbl_8047B09C + 0x80000000u) + (u32)lbl_8047B0A0 * 0x280, 0x280);
         ((u32*)lbl_80434C50)[1] = 0x20;
         *(u32*)a = 0x7D00;
@@ -2234,14 +2234,14 @@ asm void fn_801640C4(void) {
 #include "src/game/people/people_field_fn_801640C4.inc"
 }
 #else
-void fn_801640C4(void) { fn_800AC0F8(); }
+void fn_801640C4(void) { AIStartDMA(); }
 #endif
 #pragma pop
 u32 salExitAi(void) {
     extern u32 lbl_8047B09C;
     extern void fn_80164400(u32 a);
-    fn_800AC02C(0);
-    fn_800AC110();
+    AIRegisterDMACallback(0);
+    AIStopDMA();
     fn_80164400(lbl_8047B09C);
     return 1;
 }
@@ -2319,9 +2319,9 @@ void salCtrlDsp(u32 arg) {
     arg = lbl_8047B010;
     lbl_8047B098 = 0;
     fn_80098034();
-    fn_800AE7CC((u32)lbl_8047B00C | 0xBABE0000);
+    DSPSendMailToDSP((u32)lbl_8047B00C | 0xBABE0000);
     while (fn_800AE794() != 0) {}
-    fn_800AE7CC(arg);
+    DSPSendMailToDSP(arg);
     while (fn_800AE794() != 0) {}
 }
 #endif

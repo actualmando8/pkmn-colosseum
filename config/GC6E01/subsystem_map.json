@@ -14089,7 +14089,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800AC02C",
+"name": "AIRegisterDMACallback",
 "addr": "0x800AC02C",
 "size": 68,
 "label": "dolphin-sdk",
@@ -14105,7 +14105,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800AC0F8",
+"name": "AIStartDMA",
 "addr": "0x800AC0F8",
 "size": 24,
 "label": "dolphin-sdk",
@@ -14113,7 +14113,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800AC110",
+"name": "AIStopDMA",
 "addr": "0x800AC110",
 "size": 24,
 "label": "dolphin-sdk",
@@ -14129,7 +14129,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800AC200",
+"name": "AIGetStreamPlayState",
 "addr": "0x800AC200",
 "size": 16,
 "label": "dolphin-sdk",
@@ -14145,7 +14145,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800AC2F0",
+"name": "AIGetDSPSampleRate",
 "addr": "0x800AC2F0",
 "size": 20,
 "label": "dolphin-sdk",
@@ -14161,7 +14161,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800AC3D8",
+"name": "AIGetStreamSampleRate",
 "addr": "0x800AC3D8",
 "size": 16,
 "label": "dolphin-sdk",
@@ -14169,7 +14169,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800AC3E8",
+"name": "AISetStreamVolLeft",
 "addr": "0x800AC3E8",
 "size": 28,
 "label": "dolphin-sdk",
@@ -14177,7 +14177,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800AC404",
+"name": "AIGetStreamVolLeft",
 "addr": "0x800AC404",
 "size": 16,
 "label": "dolphin-sdk",
@@ -14185,7 +14185,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800AC414",
+"name": "AISetStreamVolRight",
 "addr": "0x800AC414",
 "size": 28,
 "label": "dolphin-sdk",
@@ -14193,7 +14193,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800AC430",
+"name": "AIGetStreamVolRight",
 "addr": "0x800AC430",
 "size": 16,
 "label": "dolphin-sdk",
@@ -14241,7 +14241,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800AC910",
+"name": "ARRegisterDMACallback",
 "addr": "0x800AC910",
 "size": 68,
 "label": "dolphin-sdk",
@@ -14273,7 +14273,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800ACB44",
+"name": "ARGetBaseAddress",
 "addr": "0x800ACB44",
 "size": 8,
 "label": "dolphin-sdk",
@@ -14281,7 +14281,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800ACB4C",
+"name": "ARGetSize",
 "addr": "0x800ACB4C",
 "size": 8,
 "label": "dolphin-sdk",
@@ -14297,7 +14297,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800ACBCC",
+"name": "__ARClearInterrupt",
 "addr": "0x800ACBCC",
 "size": 32,
 "label": "dolphin-sdk",
@@ -14305,7 +14305,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800ACBEC",
+"name": "__ARGetInterruptStatus",
 "addr": "0x800ACBEC",
 "size": 16,
 "label": "dolphin-sdk",
@@ -14329,7 +14329,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800AE4F0",
+"name": "__ARQCallbackHack",
 "addr": "0x800AE4F0",
 "size": 4,
 "label": "dolphin-sdk",
@@ -14361,7 +14361,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800AE78C",
+"name": "ARQGetChunkSize",
 "addr": "0x800AE78C",
 "size": 8,
 "label": "dolphin-sdk",
@@ -14385,7 +14385,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800AE7B4",
+"name": "DSPReadMailFromDSP",
 "addr": "0x800AE7B4",
 "size": 24,
 "label": "dolphin-sdk",
@@ -14393,7 +14393,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800AE7CC",
+"name": "DSPSendMailToDSP",
 "addr": "0x800AE7CC",
 "size": 20,
 "label": "dolphin-sdk",
@@ -14441,7 +14441,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800AE9AC",
+"name": "__DSP_debug_printf",
 "addr": "0x800AE9AC",
 "size": 80,
 "label": "dolphin-sdk",
@@ -14489,7 +14489,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800AF280",
+"name": "__CARDDefaultApiCallback",
 "addr": "0x800AF280",
 "size": 4,
 "label": "dolphin-sdk",
@@ -14617,7 +14617,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800B016C",
+"name": "__CARDGetFontEncode",
 "addr": "0x800B016C",
 "size": 8,
 "label": "dolphin-sdk",
@@ -14737,7 +14737,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800B1788",
+"name": "BlockReadCallback",
 "addr": "0x800B1788",
 "size": 220,
 "label": "dolphin-sdk",
@@ -14745,7 +14745,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800B1864",
+"name": "__CARDRead",
 "addr": "0x800B1864",
 "size": 100,
 "label": "dolphin-sdk",
@@ -14769,7 +14769,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800B1A08",
+"name": "__CARDGetFatBlock",
 "addr": "0x800B1A08",
 "size": 8,
 "label": "dolphin-sdk",
@@ -14777,7 +14777,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800B1A10",
+"name": "WriteCallback_800C1C98",
 "addr": "0x800B1A10",
 "size": 212,
 "label": "dolphin-sdk",
@@ -14785,7 +14785,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800B1AE4",
+"name": "EraseCallback_800C1D6C",
 "addr": "0x800B1AE4",
 "size": 200,
 "label": "dolphin-sdk",
@@ -14817,7 +14817,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800B1E0C",
+"name": "__CARDGetDirBlock",
 "addr": "0x800B1E0C",
 "size": 8,
 "label": "dolphin-sdk",
@@ -14825,7 +14825,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800B1E14",
+"name": "WriteCallback_800C209C",
 "addr": "0x800B1E14",
 "size": 208,
 "label": "dolphin-sdk",
@@ -14833,7 +14833,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800B1EE4",
+"name": "EraseCallback_800C216C",
 "addr": "0x800B1EE4",
 "size": 200,
 "label": "dolphin-sdk",
@@ -15009,7 +15009,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800B4338",
+"name": "__CARDGetFileNo",
 "addr": "0x800B4338",
 "size": 336,
 "label": "dolphin-sdk",
@@ -15033,7 +15033,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800B463C",
+"name": "__CARDIsOpened",
 "addr": "0x800B463C",
 "size": 8,
 "label": "dolphin-sdk",
@@ -15201,7 +15201,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800B5CD8",
+"name": "__GXDefaultTlutRegionCallback",
 "addr": "0x800B5CD8",
 "size": 36,
 "label": "dolphin-sdk",
@@ -15233,7 +15233,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800B6FE0",
+"name": "GXCPInterruptHandler",
 "addr": "0x800B6FE0",
 "size": 308,
 "label": "dolphin-sdk",
@@ -50212,7 +50212,7 @@
 "name": "fn_801E075C",
 "addr": "0x801E075C",
 "size": 644,
-"label": "gs-engine",
+"label": "field",
 "confidence": 1.9,
 "seed": null
 },
@@ -70733,14 +70733,14 @@
 {
 "label": "field",
 "start": "0x801DF790",
-"end": "0x801e075c",
-"count": 3
+"end": "0x801e09e0",
+"count": 4
 },
 {
 "label": "gs-engine",
-"start": "0x801E075C",
+"start": "0x801E09E0",
 "end": "0x801e11cc",
-"count": 8
+"count": 7
 },
 {
 "label": "particle",
