@@ -850,10 +850,12 @@ void msgctrlClientnowork(void) {
     extern u32 fn_802037DC(u32);
     extern void fn_80132A38(u32, u32);
     extern void fn_800FA280(u32);
+    int new_var;
     u32 result;
     u32 val = lbl_8047AE10;
     result = fn_801F4354(0, val);
-    if (((u8)fn_801F18DC(0) == 1) && result != 0) {
+    new_var = 0;
+    if (((u8)(new_var, fn_801F18DC(0)) == 1) && result != 0) {
         fn_80132A38(0x4D, fn_801F8100(result));
         fn_80132A38(0x57, fn_802037DC(val));
         fn_800FA280(0x7721);
@@ -918,12 +920,14 @@ void msgctrlTsuikaMons(void) {
     extern void fn_80132A38(u32, u32);
     extern void fn_800FA280(u32);
     u32 result;
+    u32 new_var;
     u32 val = lbl_8047ADE0;
     result = fn_801F4354(0, val);
+    new_var = val;
     if (((u8)fn_801F18DC(0) == 1) && result != 0) {
         fn_80132A38(0x4D, fn_801F8100(result));
-        fn_80132A38(0x57, fn_802037DC(val));
-        fn_800FA280(0x7721);
+        fn_80132A38(0x57, fn_802037DC(new_var));
+        do { fn_800FA280(0x7721); } while (0);
     } else {
         fn_802037DC(val);
     }
@@ -953,10 +957,12 @@ void msgctrlClientMos(void) {
     extern void fn_800FA280(u32);
     u32 result;
     u32 val = lbl_8047ADDC;
+    u32 new_var;
     result = fn_801F4354(0, val);
+    new_var = val;
     if (((u8)fn_801F18DC(0) == 1) && result != 0) {
         fn_80132A38(0x4D, fn_801F8100(result));
-        fn_80132A38(0x57, fn_802037DC(val));
+        fn_80132A38(0x57, fn_802037DC(new_var));
         fn_800FA280(0x7721);
     } else {
         fn_802037DC(val);
@@ -987,10 +993,12 @@ void msgctrlDeffenceMons(void) {
     extern void fn_800FA280(u32);
     u32 result;
     u32 val = lbl_8047ADD8;
+    u32 new_var;
     result = fn_801F4354(0, val);
+    new_var = val;
     if (((u8)fn_801F18DC(0) == 1) && result != 0) {
         fn_80132A38(0x4D, fn_801F8100(result));
-        fn_80132A38(0x57, fn_802037DC(val));
+        fn_80132A38(0x57, fn_802037DC(new_var));
         fn_800FA280(0x7721);
     } else {
         fn_802037DC(val);
@@ -1020,14 +1028,16 @@ void msgctrlAttackMons(void) {
     extern void fn_80132A38(u32, u32);
     extern void fn_800FA280(u32);
     u32 result;
+    u32 new_var;
     u32 val = lbl_8047ADD4;
     result = fn_801F4354(0, val);
+    new_var = val;
     if (((u8)fn_801F18DC(0) == 1) && result != 0) {
         fn_80132A38(0x4D, fn_801F8100(result));
-        fn_80132A38(0x57, fn_802037DC(val));
+        fn_80132A38(0x57, fn_802037DC(new_var));
         fn_800FA280(0x7721);
     } else {
-        fn_802037DC(val);
+        fn_802037DC(new_var);
     }
 }
 #pragma pop

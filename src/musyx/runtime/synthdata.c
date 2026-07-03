@@ -157,13 +157,16 @@ s32 fn_80150E68(u16 sid) {
     extern u8 lbl_804378F8[];
     extern u16 lbl_8047AFA6;
 #define tab ((DataTabT*)lbl_804378F8)
-    s32 i, j;
+    s32 i;
+    u16 new_var;
+    s32 j;
 
     hwDisableIrq();
-    for (i = 0; i < lbl_8047AFA6 && tab[i].id != sid; ++i) {}
+    new_var = lbl_8047AFA6;
+    for (i = 0; i < new_var && tab[i].id != sid; ++i) {}
 
-    if (i != lbl_8047AFA6 && --tab[i].refCount == 0) {
-        for (j = i + 1; j < lbl_8047AFA6; j++) {
+    if (i != new_var && --tab[i].refCount == 0) {
+        for (j = i + 1; j < new_var; j++) {
             tab[j - 1] = tab[j];
         }
         --lbl_8047AFA6;
@@ -219,13 +222,15 @@ s32 dataRemoveLayer(u16 sid) {
     extern u8 lbl_804380F8[];
     extern u16 lbl_8047AFA4;
 #define tab ((LayerTabT*)lbl_804380F8)
+    u16 new_var;
     s32 i, j;
 
     hwDisableIrq();
+    new_var = lbl_8047AFA4;
     for (i = 0; i < lbl_8047AFA4 && tab[i].id != sid; ++i) {}
 
     if (i != lbl_8047AFA4 && --tab[i].refCount == 0) {
-        for (j = i + 1; j < lbl_8047AFA4; j++) {
+        for (j = i + 1; j < new_var; j++) {
             tab[j - 1] = tab[j];
         }
         --lbl_8047AFA4;
@@ -281,12 +286,14 @@ s32 fn_801515F4(u16 sid) {
     extern u16 lbl_8047AFA8;
 #define tab ((DataTabT*)lbl_80438CF8)
     s32 i, j;
+    u16 new_var;
 
     hwDisableIrq();
+    new_var = lbl_8047AFA8;
     for (i = 0; i < lbl_8047AFA8 && tab[i].id != sid; ++i) {}
 
     if (i != lbl_8047AFA8 && --tab[i].refCount == 0) {
-        for (j = i + 1; j < lbl_8047AFA8; j++) {
+        for (j = i + 1; j < new_var; j++) {
             tab[j - 1] = tab[j];
         }
         --lbl_8047AFA8;
@@ -353,6 +360,7 @@ s32 fn_801518F8(u16 sid) {
     extern u16 lbl_8047AFAA;
     extern void fn_80163050(void* header, void* addr);
 #define tab ((SdirTabT*)lbl_8043CCF8)
+    SdirTabT* new_var;
     u32 i;
     SdirDataT* data;
     SdirDataT* sdir;
@@ -369,7 +377,8 @@ s32 fn_801518F8(u16 sid) {
     }
 done:
     if (sdir->refCount == 0) {
-        sdir->addr = (void*)((u32)tab[i].base + sdir->offset);
+        new_var = tab;
+        sdir->addr = (void*)((u32)new_var[i].base + sdir->offset);
         header = &sdir->header;
         fn_80163050(&header, &sdir->addr);
     }

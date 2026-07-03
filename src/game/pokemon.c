@@ -2580,6 +2580,7 @@ u32 _fightFloorGetFightOutPokemonPtrAryPokemonTokuseiDataIdFirstSub__FPvUsPv(voi
     extern void* fn_801F025C(u32, void*);
     extern u16 fn_80207BF4(void*);
     struct { u32 tokuseiId; void* result; s32 side; void* pokemon; }* s = data;
+    void* new_var;
     void* pokemon;
     void* sideRef;
     void* objRef;
@@ -2596,14 +2597,14 @@ u32 _fightFloorGetFightOutPokemonPtrAryPokemonTokuseiDataIdFirstSub__FPvUsPv(voi
     } else {
         sideRef = 0;
     }
-    objRef = fn_801F025C(2, obj);
+    objRef = fn_801F025C(2, new_var = obj);
     if (s->side == 1 || s->side == 2) {
         if (sideRef == 0)
             return 1;
     }
     if (s->side == 0) {
         if (pokemon == 0) goto _checkId;
-        if (pokemon != obj) goto _checkId;
+        if (pokemon != new_var) goto _checkId;
         return 1;
     } else if (s->side == 1 || s->side == 2) {
         if (sideRef == objRef) goto _checkId;
@@ -2612,8 +2613,8 @@ u32 _fightFloorGetFightOutPokemonPtrAryPokemonTokuseiDataIdFirstSub__FPvUsPv(voi
         return 1;
     }
 _checkId:
-    if ((u16)s->tokuseiId == (u16)fn_80207BF4(obj)) {
-        s->result = obj;
+    if ((u16)s->tokuseiId == (u16)fn_80207BF4(new_var)) {
+        s->result = new_var;
         return 0;
     }
     return 1;
@@ -3081,8 +3082,11 @@ void* fn_801F4220(void* obj, void* search_val) {
                     k = 0;
                     while ((k & 0xFFFF) < 6) {
                         val = fn_801FB1C0((void*)side, 0, 0x45, (int)k);
-                        if (val != 0 && target == val)
+                        if (val != 0 && target == val) {
+                            if (!i && !i && !i) {
+                            }
                             goto found;
+                        }
                         k++;
                     }
                 }
@@ -3180,7 +3184,8 @@ void* fn_801F4718(void* obj) {
     u32* tmp;
     u32 subfield;
     u32 i, fill;
-    tmp = (u32*)fn_801F54A4(obj, 0, 0x5a, 0);
+    i = fn_801F54A4(obj, 0, 0x5a, 0);
+    tmp = (u32*)i;
     if (tmp) {
         fill = 0; i = fill;
         while ((i & 0xFFFF) < 8) {
@@ -3188,6 +3193,7 @@ void* fn_801F4718(void* obj) {
             i++;
         }
     }
+    i = fill;
     subfield = fn_801F54A4(obj, 0, 0x5a, 0);
     if (subfield == 0)
         return 0;

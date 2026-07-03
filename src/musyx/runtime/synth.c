@@ -714,9 +714,9 @@ u32 fn_8014ABE8(u16 id, u8 prio, u8 max, u8 key, u8 vol, u8 panning, u8 midi, u8
 }
 
 static void synthAddJob(SYNTH_VOICE* svoice, u32 jobType, u32 deltaTime) {
+    u8 jobTabIndex;
     SYNTH_QUEUE* newJq;
     SYNTH_QUEUE** root;
-    u8 jobTabIndex;
     SYNTH_JOBTAB* jobTab;
 
     jobTabIndex = ((deltaTime / 256) + lbl_8047AF19) & 0x1f;
@@ -763,8 +763,8 @@ static void synthAddJob(SYNTH_VOICE* svoice, u32 jobType, u32 deltaTime) {
             return;
         }
         root = &jobTab->event;
-        break;
     default:
+        break;
         return;
     }
 
@@ -1440,7 +1440,7 @@ u32 fn_8014CF30(u32 mesg, u32 voiceID) {
         voiceKill(voiceID & 0xff);
         break;
     case 2:
-        ret = fn_80159550(voiceID);
+        ret = fn_80159550(voiceID & 0xFF);
         break;
     case 3:
         vsSampleEndNotify(hwGetVirtualSampleID(voiceID & 0xff));

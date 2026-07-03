@@ -487,17 +487,22 @@ void fn_802183BC(void) {
  * lbl_8047B618. PC always advances by 1.
  */
 #pragma optimize_for_size on
+inline u32 inline_fn() {
+    return fn_801F025C(0x12, 0);
+}
+
 void fn_80218BD4(void) {
     u32 sub1;
     u32 ctx2;
     u32 sub2;
 
     sub1 = fn_801F025C(2, fn_801F025C(0x11, 0));
-    ctx2 = fn_801F025C(0x12, 0);
+    ctx2 = inline_fn();
     sub2 = fn_801F025C(2, ctx2);
 
     if (fn_802026E4(ctx2, 0x15) == 1 && sub1 != sub2 && (lbl_8047B618 & 0x1000000) == 0) {
-        lbl_8047B618 = lbl_8047B618 | 0x40;
+        sub1 = 0x40;
+        lbl_8047B618 = lbl_8047B618 | sub1;
     }
     lbl_8047B610 = lbl_8047B610 + 1;
 }

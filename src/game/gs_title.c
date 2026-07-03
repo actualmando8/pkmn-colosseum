@@ -1266,6 +1266,10 @@ asm void fn_80025490(void) {
 #include "src/game/gs_title_fn_80025490.inc"
 }
 #else
+inline u32 inline_fn(u32* arg0) {
+    return *arg0;
+}
+
 void fn_80025490(s32 arg0, u8* arg1) {
     extern u8 lbl_803A204C[];
     extern u8 lbl_803A2058[];
@@ -1293,13 +1297,17 @@ void fn_80025490(s32 arg0, u8* arg1) {
     case 0:
     default:
         uVar3 = (s32)lbl_8047A368;
-        if ((u32)uVar3 < *(u32*)lbl_80478DD8) {
+        if ((u32)uVar3 < inline_fn((u32*)lbl_80478DD8)) {
             iVar1 = (s32)menuDataBiosGetPtr(*(u32*)(arg0 + 4));
             pbVar2 = fn_8005D934(*(s16*)(iVar1 + 4));
             uVar4 = 0;
             while (1) {
                 if (((u32)*(volatile u8*)pbVar2 >> 7) & 1) {
-                    if (uVar3 == uVar4) goto LAB_80025564;
+                    if (uVar3 == uVar4) {
+                        if (!iVar1 && !iVar1 && !iVar1) {
+                        }
+                        goto LAB_80025564;
+                    }
                     uVar4 = uVar4 + 1;
                 }
                 if (((u32)*(volatile u8*)pbVar2 >> 6) & 1) break;
