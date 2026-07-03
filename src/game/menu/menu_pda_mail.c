@@ -99,7 +99,12 @@ extern s32 pdaMailGetMailID(s32 index);
 extern u32 fn_801D1A44(s32 idx);
 
 typedef struct PdaMailWindowA {
-    u8 pad00[0x60];
+    u8 pad00;
+    s8 phase;
+    s8 guard;
+    u8 pad03;
+    s32 msgObj;
+    u8 pad08[0x58];
     s32** field_0x60;
 } PdaMailWindowA;
 
@@ -307,4 +312,329 @@ void fn_8004D8BC(PdaMailWindowA* window)
     }
 }
 #pragma peephole reset
+#endif
+
+/* fn_800FF730 (gs_floor_data.c): floor-transition trigger; fn_8011288C
+ * (gs_field_colquery.c, GSfield_IsTransitioning): floor resource-alloc
+ * helper; _threadSwitch: cooperative thread yield. */
+extern void fn_800FF730(s32 floorId);
+extern void fn_8011288C(s32 a, u32 b);
+extern void _threadSwitch(void);
+
+#if 0
+asm void menuPdaOpen(void) {
+#include "src/game/menu/menu_pda_mail_menuPdaOpen.inc"
+}
+#else
+#pragma scheduling off
+void menuPdaOpen(void)
+{
+    fn_800FF730(0x392);
+    fn_8011288C(0, 0);
+    _threadSwitch();
+}
+#pragma scheduling reset
+#endif
+
+/* fn_801D1F7C (battle_waza.c): Waza-party active-effect count getter. */
+extern u16 fn_801D1F7C(void);
+
+/* Mail-ID lookup table (halfword mail IDs), indexed by receive-order
+ * slot; sda21-addressed pointer variable (matches XD's pdaMailGetMailID
+ * exactly per file header). */
+extern u16* lbl_8047A500;
+
+#if 0
+asm s32 pdaMailGetMailID(s32 index) {
+#include "src/game/menu/menu_pda_mail_pdaMailGetMailID.inc"
+}
+#else
+#pragma peephole off
+s32 pdaMailGetMailID(s32 index)
+{
+    extern s32 fn_801D1F7C(void);
+    if (index < 0 || index >= fn_801D1F7C()) {
+        return -1;
+    }
+    return lbl_8047A500[index];
+}
+#pragma peephole reset
+#endif
+
+/* mailGetReceiveNumber (XD-named, same address/size): returns the
+ * receive-order slot for a given mail ID, or -1 if not found. */
+extern s32 mailGetReceiveNumber(s32 mailId);
+
+/* GScharCmp (menuCB_Battle.c): compares two rendered-message buffers. */
+extern s32 GScharCmp(void* a, void* b);
+
+#if 0
+asm s32 fn_8004BE90(u16* a, u16* b) {
+#include "src/game/menu/menu_pda_mail_fn_8004BE90.inc"
+}
+#else
+/* WALL: W1 register-letter (idA/idB swap r31<->r30 vs target regardless
+ * of local decl order/type -- u16 default order, swapped decl order,
+ * s32 widen all tried); everything else (control flow, call order,
+ * scheduling, subf formula) matches. Parked at 99.2% after 3 attempts. */
+s32 fn_8004BE90(u16* a, u16* b)
+{
+    s32 idA = *a;
+    s32 idB = *b;
+    s32 cmp;
+    void* msgA = fn_800FA280(fn_801D1ACC(idA));
+    void* msgB = fn_800FA280(fn_801D1ACC(idB));
+    cmp = GScharCmp(msgA, msgB);
+    if (cmp != 0) {
+        return cmp;
+    }
+    return mailGetReceiveNumber(idB) - mailGetReceiveNumber(idA);
+}
+#endif
+
+#if 0
+asm s32 fn_8004BF20(u16* a, u16* b) {
+#include "src/game/menu/menu_pda_mail_fn_8004BF20.inc"
+}
+#else
+/* WALL: same class as fn_8004BE90 (W1 register-letter idA/idB swap).
+ * Parked at 99.2% (see fn_8004BE90 for attempts). */
+s32 fn_8004BF20(u16* a, u16* b)
+{
+    s32 idA = *a;
+    s32 idB = *b;
+    s32 cmp;
+    void* msgA = fn_800FA280(fn_801D1A88(idA));
+    void* msgB = fn_800FA280(fn_801D1A88(idB));
+    cmp = GScharCmp(msgA, msgB);
+    if (cmp != 0) {
+        return cmp;
+    }
+    return mailGetReceiveNumber(idB) - mailGetReceiveNumber(idA);
+}
+#endif
+
+/* fn_801080CC (gs_event_exec.c): fires a scripted SE/event by (ctx, id). */
+extern void fn_801080CC(s32 ctx, s32 id);
+
+/* Small widget/state-machine record shared by the phase-triggered SE
+ * callbacks below: phase drives a switch (only phases 0 and 3 do
+ * anything), guard is a one-shot latch, msgObj is passed straight
+ * through to fn_801080CC as its first (context) argument. */
+typedef struct PdaMailPhaseWidget {
+    u8 pad00;
+    s8 phase;
+    s8 guard;
+    u8 pad03;
+    s32 msgObj;
+} PdaMailPhaseWidget;
+
+#if 0
+asm s32 fn_8004D928(PdaMailPhaseWidget* w) {
+#include "src/game/menu/menu_pda_mail_fn_8004D928.inc"
+}
+#else
+#pragma peephole off
+s32 fn_8004D928(PdaMailPhaseWidget* w)
+{
+    switch (w->phase) {
+    case 0:
+        if (w->guard == 0) {
+            fn_801080CC(w->msgObj, 0x1c2);
+            w->guard = 1;
+        }
+        break;
+    case 3:
+        if (w->guard == 0) {
+            fn_801080CC(w->msgObj, 0x1c6);
+            w->guard = 1;
+        }
+        break;
+    }
+    return 0;
+}
+#pragma scheduling reset
+#pragma peephole reset
+#endif
+
+#if 0
+asm s32 fn_8004DB80(PdaMailPhaseWidget* w) {
+#include "src/game/menu/menu_pda_mail_fn_8004DB80.inc"
+}
+#else
+#pragma peephole off
+s32 fn_8004DB80(PdaMailPhaseWidget* w)
+{
+    switch (w->phase) {
+    case 0:
+        if (w->guard == 0) {
+            fn_801080CC(w->msgObj, 0x1c2);
+            w->guard = 1;
+        }
+        break;
+    case 3:
+        if (w->guard == 0) {
+            fn_801080CC(w->msgObj, 0x1c6);
+            w->guard = 1;
+        }
+        break;
+    }
+    return 0;
+}
+#pragma scheduling reset
+#pragma peephole reset
+#endif
+
+#if 0
+asm s32 fn_8004DF34(PdaMailPhaseWidget* w) {
+#include "src/game/menu/menu_pda_mail_fn_8004DF34.inc"
+}
+#else
+#pragma peephole off
+s32 fn_8004DF34(PdaMailPhaseWidget* w)
+{
+    switch (w->phase) {
+    case 0:
+        if (w->guard == 0) {
+            fn_801080CC(w->msgObj, 0x1c2);
+            w->guard = 1;
+        }
+        break;
+    case 3:
+        if (w->guard == 0) {
+            fn_801080CC(w->msgObj, 0x1c6);
+            w->guard = 1;
+        }
+        break;
+    }
+    return 0;
+}
+#pragma scheduling reset
+#pragma peephole reset
+#endif
+
+/* Angle-wrap constants for the two phase-2 float animations below
+ * (distinct sdata2 float pair per callback; same idiom as fn_8004E144
+ * but single-precision and accessed through window->field_0x60). */
+extern f32 lbl_8047BE18;
+extern f32 lbl_8047BE1C;
+extern f32 lbl_8047BE4C;
+extern f32 lbl_8047BE50;
+
+#if 0
+asm s32 fn_8004D26C(PdaMailWindowA* window) {
+#include "src/game/menu/menu_pda_mail_fn_8004D26C.inc"
+}
+#else
+/* WALL: W1 register-letter (f1/f2 swap between the float value temp
+ * and the threshold local, same class as fn_8004E144) -- compound
+ * assignment-in-condition, split statements, and swapping which
+ * constant gets a named local all tried; switch dispatch/case layout,
+ * SE-call bodies, and store-vs-compare ordering all byte-match.
+ * Parked at 99.6% after 3 attempts. */
+#pragma peephole off
+s32 fn_8004D26C(PdaMailWindowA* window)
+{
+    s32** field = window->field_0x60;
+    switch (window->phase) {
+    case 0:
+        if (window->guard == 0) {
+            fn_801080CC(window->msgObj, 0x1c2);
+            window->guard = 1;
+        }
+        break;
+    case 2: {
+        f32 thresh = lbl_8047BE1C;
+        if ((*(f32*)*field += lbl_8047BE18) >= thresh) {
+            *(f32*)*field -= thresh;
+        }
+        break;
+    }
+    case 3:
+        if (window->guard == 0) {
+            fn_801080CC(window->msgObj, 0x1c6);
+            window->guard = 1;
+        }
+        break;
+    }
+    return 0;
+}
+#pragma scheduling reset
+#pragma peephole reset
+#endif
+
+#if 0
+asm s32 fn_8004E8E0(PdaMailWindowA* window) {
+#include "src/game/menu/menu_pda_mail_fn_8004E8E0.inc"
+}
+#else
+/* WALL: same class as fn_8004D26C (W1 register-letter f1/f2 swap).
+ * Parked at 99.6% (see fn_8004D26C for attempts). */
+#pragma peephole off
+s32 fn_8004E8E0(PdaMailWindowA* window)
+{
+    s32** field = window->field_0x60;
+    switch (window->phase) {
+    case 0:
+        if (window->guard == 0) {
+            fn_801080CC(0x77, 0x86);
+            window->guard = 1;
+        }
+        break;
+    case 2: {
+        f32 thresh = lbl_8047BE4C;
+        if ((*(f32*)*field += lbl_8047BE50) >= thresh) {
+            *(f32*)*field -= thresh;
+        }
+        break;
+    }
+    case 3:
+        if (window->guard == 0) {
+            fn_801080CC(0x77, 0x8a);
+            window->guard = 1;
+        }
+        break;
+    }
+    return 0;
+}
+#pragma scheduling reset
+#pragma peephole reset
+#endif
+
+/* fn_801046B8/fn_801026A4/fn_80102510/menuCloseSync (gs_event_exec.c):
+ * modal list-menu open/poll/close idiom -- same call skeleton as the
+ * gs_event_exec.c item-quantity-picker (menu_id, input-state,
+ * &config, 0, 1, 1, &out), open by id, close by id. */
+extern u32 fn_801046B8(void);
+extern s32 fn_801026A4(s32 menuId, u32 inputState, s32* config, s32 zero,
+                        s32 one1, s32 one2, s32* out, ...);
+extern void fn_80102510(s32 menuId);
+extern void menuCloseSync(s32 menuId, s32 flag);
+
+#if 0
+asm s32 fn_8004DC18(s32 a) {
+#include "src/game/menu/menu_pda_mail_fn_8004DC18.inc"
+}
+#else
+/* WALL: W3 scheduling (target hoists the "out=0" li r0,0x0 one slot
+ * earlier, ahead of the param spill store); declaration order (for
+ * correct stack-slot placement), statement-order, #pragma scheduling
+ * off, and #pragma peephole off all tried without moving it. Parked
+ * at 95.2% after 3 attempts -- everything else (call skeleton, vararg
+ * setup, validity checks, clamp range) byte-matches. */
+s32 fn_8004DC18(s32 a)
+{
+    s32 out = 0;
+    s32 localA = a;
+    s32 choice = fn_801026A4(0x75, fn_801046B8(), &localA, 0, 1, 1, &out);
+    if (choice != -1 && choice != localA) {
+        out = 1;
+    }
+    fn_80102510(0x75);
+    menuCloseSync(0x75, 1);
+    if (choice < 0 || choice >= 4) {
+        return -1;
+    }
+    return choice;
+}
 #endif
