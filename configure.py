@@ -1815,6 +1815,71 @@ config.libs = [
             ),
             Object(
                 DataCandidate,
+                "game/data/bss_8039E700.c",
+                progress_category="game",
+            ),
+            Object(
+                DataCandidate,
+                "game/data/bss_803A2040.c",
+                progress_category="game",
+            ),
+            Object(
+                DataCandidate,
+                "game/data/bss_803A9E40.c",
+                progress_category="game",
+            ),
+            Object(
+                DataCandidate,
+                "game/data/bss_803B6E40.c",
+                progress_category="game",
+            ),
+            Object(
+                DataCandidate,
+                "game/data/bss_803D6E40.c",
+                progress_category="game",
+            ),
+            Object(
+                DataCandidate,
+                "game/data/bss_803F6E40.c",
+                progress_category="game",
+            ),
+            Object(
+                DataCandidate,
+                "game/data/bss_80402480.c",
+                progress_category="game",
+            ),
+            Object(
+                DataCandidate,
+                "game/data/bss_80408400.c",
+                progress_category="game",
+            ),
+            Object(
+                DataCandidate,
+                "game/data/bss_80448440.c",
+                progress_category="game",
+            ),
+            Object(
+                DataCandidate,
+                "game/data/bss_80452500.c",
+                progress_category="game",
+            ),
+            Object(
+                DataCandidate,
+                "game/data/bss_80465080.c",
+                progress_category="game",
+            ),
+            Object(
+                DataCandidate,
+                "game/data/bss_8046A440.c",
+                progress_category="game",
+            ),
+            Object(
+                DataCandidate,
+                "game/data/bss_8046D500.c",
+                progress_category="game",
+            ),
+            Object(
+                DataCandidate,
                 "game/data/data_80363630.c",
                 progress_category="game",
             ),

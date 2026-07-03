@@ -152,6 +152,45 @@ game/colosseum_battle_sdata2.c:
 game/data/bss_8039A700.c:
 	.bss        start:0x8039A700 end:0x8039E700
 
+game/data/bss_8039E700.c:
+	.bss        start:0x8039E700 end:0x803A2040
+
+game/data/bss_803A2040.c:
+	.bss        start:0x803A2040 end:0x803A9E40
+
+game/data/bss_803A9E40.c:
+	.bss        start:0x803A9E40 end:0x803B6E40
+
+game/data/bss_803B6E40.c:
+	.bss        start:0x803B6E40 end:0x803D6E40
+
+game/data/bss_803D6E40.c:
+	.bss        start:0x803D6E40 end:0x803F6E40
+
+game/data/bss_803F6E40.c:
+	.bss        start:0x803F6E40 end:0x803FB380
+
+game/data/bss_80402480.c:
+	.bss        start:0x80402480 end:0x80408400
+
+game/data/bss_80408400.c:
+	.bss        start:0x80408400 end:0x80448440
+
+game/data/bss_80448440.c:
+	.bss        start:0x80448440 end:0x80452500
+
+game/data/bss_80452500.c:
+	.bss        start:0x80452500 end:0x80465080
+
+game/data/bss_80465080.c:
+	.bss        start:0x80465080 end:0x8046A440
+
+game/data/bss_8046A440.c:
+	.bss        start:0x8046A440 end:0x8046D500
+
+game/data/bss_8046D500.c:
+	.bss        start:0x8046D500 end:0x80478800
+
 game/data/data_802EDB7C.c:
 	.data       start:0x802EDB7C end:0x802EDE54
 
