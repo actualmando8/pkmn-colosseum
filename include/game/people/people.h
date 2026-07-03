@@ -295,8 +295,9 @@ void peopleMoveWalkPath(u32 groupId, u32 index, u32 pathId, u32 pathParam);
 /** Walk-to-position movement handler. fn_80188CA0 */
 void peopleMoveWalkPosition(u32 groupId, u32 index, u32 targetX, u32 targetY, u32 targetZ);
 
-/** Walk-list "add" handler (debug name: "peopleAddWalkList"). fn_80188AF4 */
-void peopleMoveAddWalkList(u32 groupId, u32 index);
+/** Walk-list "add" handler -- self-tag string proven at 0x80183FC4
+ * (named peopleAddWalkList; the old fn_80188AF4 attribution here was
+ * wrong, same class as the peopleMoveCheck fix). */
 
 /** Check movement completion (self-tag string lbl_8036C52C; scrCmd table
  * index 62). 0x8018A280 -- the old fn_8018F4C8 attribution here was wrong.

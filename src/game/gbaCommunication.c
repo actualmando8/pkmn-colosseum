@@ -549,7 +549,7 @@ void fn_8008CDD8(u32 ctx) {
     extern void fn_800E3C08(u32 handle, u32 val);
     extern void fn_800E3C00(u32 handle, u32 val);
     extern void fn_801CB834(u32 id, u32 slot, u32 x, u32 y);
-    extern void fn_801CB708(u32 id, u32 val);
+    extern void scriptWaitSyncMotion(u32 id, u32 val);
     extern s32 fn_800D37CC(void);
     extern void _threadSwitch(void);
     extern u32 fn_800D3088(void);
@@ -636,7 +636,7 @@ void fn_8008CDD8(u32 ctx) {
     finalResult = fn_801CBA0C(0x0D0B1000);
     fn_801845E4(ctx, iconHandle, ctx, finalResult, 0);
     fn_801CB834(iconHandle, 0xB, 0, 0);
-    fn_801CB708(iconHandle, 1);
+    scriptWaitSyncMotion(iconHandle, 1);
     fn_801CB834(iconHandle, 0xC, 0, 0);
 
     cameraWaitSyncAnime(1);
@@ -855,7 +855,7 @@ void fn_8008EED0(u32 ctx) {
     extern void fn_800E3C08(u32 handle, u32 val);
     extern void fn_800E3C00(u32 handle, u32 val);
     extern void fn_801CB834(u32 id, u32 slot, u32 x, u32 y);
-    extern void fn_801CB708(u32 id, u32 val);
+    extern void scriptWaitSyncMotion(u32 id, u32 val);
     extern s32 fn_800D37CC(void);
     extern void _threadSwitch(void);
     extern u32 fn_800D3088(void);
@@ -942,7 +942,7 @@ void fn_8008EED0(u32 ctx) {
 
     finalResult = fn_801CBA0C(0x0D031000);
     fn_801845E4(ctx, iconHandle, ctx, finalResult, 0);
-    fn_801CB708(iconHandle, 1);
+    scriptWaitSyncMotion(iconHandle, 1);
     fn_801CB834(iconHandle, 5, 0, 0);
 
     cameraWaitSyncAnime(1);
@@ -959,7 +959,7 @@ void fn_8008F190(u32 ctx) {
     extern void fn_800E3C08(u32 handle, u32 val);
     extern void fn_800E3C00(u32 handle, u32 val);
     extern void fn_801CB834(u32 id, u32 slot, u32 x, u32 y);
-    extern void fn_801CB708(u32 id, u32 val);
+    extern void scriptWaitSyncMotion(u32 id, u32 val);
     extern s32 fn_800D37CC(void);
     extern void _threadSwitch(void);
     extern u32 fn_800D3088(void);
@@ -1063,9 +1063,9 @@ void fn_8008F190(u32 ctx) {
     finalResult = fn_801CBA0C(0x0CF81000);
     fn_801845E4(ctx, iconHandle, ctx, finalResult, 0);
     fn_801CB834(iconHandle, 1, 0, 0);
-    fn_801CB708(iconHandle, 1);
+    scriptWaitSyncMotion(iconHandle, 1);
     fn_801CB834(iconHandle, 2, 0, 0);
-    fn_801CB708(iconHandle, 1);
+    scriptWaitSyncMotion(iconHandle, 1);
     fn_801CB834(iconHandle, 3, 0, 0);
 
     cameraWaitSyncAnime(1);
@@ -1186,7 +1186,7 @@ void fn_80090720(u32 ctx) {
     extern void fn_800E8FA0(u32 w, u32 h);
     extern void fn_801CB7C4(u32 id);
     extern void fn_801CB834(u32 id, u32 slot, u32 x, u32 y);
-    extern void fn_801CB708(u32 id, u32 val);
+    extern void scriptWaitSyncMotion(u32 id, u32 val);
     extern s32 fn_800D37CC(void);
     extern void _threadSwitch(void);
     extern u32 fn_800D3088(void);
@@ -1273,9 +1273,9 @@ void fn_80090720(u32 ctx) {
     fn_801845E4(ctx, new_var, ctx, finalResult, 0);
     fn_801CB834(new_var, 1, 0, 0);
     fn_801CB834(0x0CE61004, 0, 0, 0);
-    fn_801CB708(iconHandle, 1);
+    scriptWaitSyncMotion(iconHandle, 1);
     fn_801CB834(iconHandle, 2, 0, 0);
-    fn_801CB708(new_var, 1);
+    scriptWaitSyncMotion(new_var, 1);
     fn_801CB834(new_var, 3, 0, 0);
 
     cameraWaitSyncAnime(1);

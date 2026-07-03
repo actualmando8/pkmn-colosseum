@@ -935,11 +935,11 @@ found_entry:
 /* 0x80183FC4 | 0x1CC */
 extern u8 lbl_8027404C[];
 #if 0
-asm void fn_80183FC4(void) {
+asm void peopleAddWalkList(void) {
 #include "src/game/people/people_fn_80183FC4.inc"
 }
 #else
-void fn_80183FC4(void) { /* TODO: match -- 460 bytes at 0x80183FC4 */ }
+void peopleAddWalkList(void) { /* TODO: match -- 460 bytes at 0x80183FC4 */ }
 #endif
 
 /* 0x80184190 | 0x2C0 */

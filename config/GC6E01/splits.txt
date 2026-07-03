@@ -228,7 +228,13 @@ game/movie.c:
 	.text       start:0x80035E04 end:0x8003686C
 
 game/gs_range_8003686C.c:
-	.text       start:0x8003686C end:0x8004EADC
+	.text       start:0x8003686C end:0x80037158
+
+game/menu/pda_range_80037158.c:
+	.text       start:0x80037158 end:0x8004B7EC
+
+game/menu/menu_pda_mail.c:
+	.text       start:0x8004B7EC end:0x8004EADC
 
 game/menu/menu_bag.c:
 	.text       start:0x8004EADC end:0x80051710

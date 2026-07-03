@@ -6,24 +6,24 @@
     "total_code": 2495108,
     "total_data": 2196256,
     "total_functions": 8603,
-    "total_units": 346
+    "total_units": 348
   },
   "topology_status": {
     "auto_units": 9,
-    "named_units": 337,
-    "source_backed_units": 317,
+    "named_units": 339,
+    "source_backed_units": 319,
     "auto_code": 0,
     "auto_data": 2179323,
     "auto_functions": 0
   },
   "baseline_progress": {
-    "matched_code": "308952",
-    "matched_code_percent": 12.38231,
+    "matched_code": "344124",
+    "matched_code_percent": 13.791948,
     "matched_data": "16933",
     "matched_data_percent": 0.7709939,
-    "matched_functions": 3556,
-    "matched_functions_percent": 41.33442,
-    "fuzzy_match_percent": 26.633749
+    "matched_functions": 3696,
+    "matched_functions_percent": 42.961758,
+    "fuzzy_match_percent": 28.755045
   },
   "unit_topology": [
     {
@@ -1084,13 +1084,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 98928,
+          "size": 2284,
           "virtual_address": 2147706988
         }
       ],
-      "total_code": 98928,
+      "total_code": 2284,
       "total_data": 0,
-      "total_functions": 171
+      "total_functions": 3
+    },
+    {
+      "name": "main/game/menu/pda_range_80037158",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 83604,
+          "virtual_address": 2147709272
+        }
+      ],
+      "total_code": 83604,
+      "total_data": 0,
+      "total_functions": 118
+    },
+    {
+      "name": "main/game/menu/menu_pda_mail",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 13040,
+          "virtual_address": 2147792876
+        }
+      ],
+      "total_code": 13040,
+      "total_data": 0,
+      "total_functions": 50
     },
     {
       "name": "main/game/menu/menu_bag",
