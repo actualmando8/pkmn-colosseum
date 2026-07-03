@@ -720,11 +720,16 @@ asm void fn_80162494(void) {
 #include "src/game/people/people_field_fn_80162494.inc"
 }
 #else
+/* hwSetPriority (hardware.c) -- cross-TU boundary: synthvoice.c's
+ * voiceSetPriority calls this via a real `bl`, not inlined, in retail (see
+ * fn_8016246C's dont_inline note). */
+#pragma dont_inline on
 void fn_80162494(u32 index, u32 val) {
     PeopleFieldMoveSlot* entries = (PeopleFieldMoveSlot*)lbl_8047B024;
 
     entries[index].field_1C = val;
 }
+#pragma dont_inline reset
 #endif
 #pragma pop
 #pragma push
@@ -2661,18 +2666,32 @@ asm void fn_80158328(void) {
 #include "src/game/people/people_field_fn_80158328.inc"
 }
 #else
+/* pack(4): matches synth.c/synthmacros.c's SYNTH_VOICE (also pack(4)) --
+ * without it MWCC 8-byte-aligns the u64 cFlags field, bumping struct size
+ * to 0x408 and shifting block/fxFlag/etc. by 4 bytes (confirmed by
+ * objdiff: mulli by 0x408 instead of 0x404, fxFlag read at 0x121 instead
+ * of 0x11D). */
+#pragma pack(4)
 typedef struct {
     u8 pad_00[0x34];
-    void* addr;               /* 0x34 */
-    u8 pad_38[0xF4 - 0x38];
-    u32 id;                   /* 0xF4 */
-    u8 pad_F8[0x100 - 0xF8];
-    u16 allocId;              /* 0x100 */
-    u8 pad_102[0x11C - 0x102];
-    u8 block;                 /* 0x11C */
-    u8 fxFlag;                /* 0x11D */
+    void* addr;                /* 0x34 */
+    u8 pad_38[0xEC - 0x38];
+    u32 child;                 /* 0xEC */
+    u32 parent;                /* 0xF0 */
+    u32 id;                    /* 0xF4 */
+    void* vidList;              /* 0xF8 (VidListFull*; see vidGetInternalId below) */
+    void* vidMasterList;        /* 0xFC (VidListFull*) */
+    u16 allocId;               /* 0x100 */
+    u8 pad_102[0x10C - 0x102];
+    u8 prio;                    /* 0x10C */
+    u8 pad_10D[3];
+    u32 age;                    /* 0x110 */
+    u64 cFlags;                 /* 0x114 */
+    u8 block;                  /* 0x11C */
+    u8 fxFlag;                 /* 0x11D */
     u8 pad_11E[0x404 - 0x11E];
 } SynthVoiceMini; /* offset-mirror of SYNTH_VOICE, stride 0x404 */
+#pragma pack()
 
 extern SynthVoiceMini* lbl_8047AF48;      /* synthVoice */
 extern u32 fn_80157A64(u8 priority, u8 maxVoices, u16 allocId, u8 fxFlag); /* voiceAllocate */
@@ -2787,6 +2806,622 @@ u32 vidGetInternalId(u32 vid) {
     }
 
     return 0xFFFFFFFF;
+}
+#endif
+#pragma pop
+
+/* ===== synthvoice.c: voice allocation/priority core continuation =====
+ * identity: reference synthvoice.c, pre-2.0.1 branch (Colosseum pin
+ * 2.0.0/2.0.1, no `block` guard for MUSY_VERSION>=1.5.4 second inner loop,
+ * u16 allocId). Globals cross-verified against
+ * build/GC6E01/asm/musyx/musyx_range_80157280.s disassembly:
+ *   lbl_8047AFD0 = vidFree           lbl_8047AFD8 = vidCurrentId
+ *   lbl_8047AFDC = voicePrioSortRootListRoot (u16)
+ *   lbl_8047AFDE = voiceMusicRunning lbl_8047AFDF = voiceFxRunning
+ *   lbl_8047AFE0 = voiceListInsert   lbl_8047AFE1 = voiceListRoot
+ *   lbl_8047AF50 = synthIdleWaitActive (first byte of an 8-byte object)
+ *   lbl_80445F50 = merged synthvoice statics blob (size 0xF00):
+ *     +0x000 vidList[128]              (VID_LIST, 0x10 each)
+ *     +0x800 voicePrioSortVoices[64]   (SYNTH_VOICELIST, 4 each)
+ *     +0x900 voicePrioSortVoicesRoot[256] (u8)
+ *     +0xA00 voicePrioSortRootList[256]   (SYNTH_ROOTLIST, 4 each)
+ *     +0xE00 voiceList[64]             (SYNTH_VOICELIST, 4 each)
+ * voiceRemovePriority/vidRemove/voiceInitFreeList/voiceInitPrioSort are
+ * static single-or-multi-callsite helpers in the reference and are fully
+ * auto-inlined at every call site here (confirmed by disassembly: no `bl`
+ * to any of them). vidMakeNew/voiceSetPriority/voiceAllocate/voiceFree/
+ * synthInitAllocationAids/voiceUnblock/voiceKill/vidRemoveVoiceReferences
+ * remain real `bl` targets at their call sites (never inlined into each
+ * other), matching their non-static linkage in the reference. */
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+#if 0
+asm void fn_801576C4(void) {
+#include "src/game/people/people_field_fn_801576C4.inc"
+}
+#else
+typedef struct { u8 prev; u8 next; u16 user; } VoiceListEntry; /* SYNTH_VOICELIST, size 4 */
+typedef struct { u16 next; u16 prev; } RootListEntry;          /* SYNTH_ROOTLIST, size 4 */
+
+typedef struct {
+    u8 pad_00[0x210];
+    u8 voiceNum;  /* 0x210 */
+    u8 maxMusic;  /* 0x211 */
+    u8 maxSFX;    /* 0x212 */
+} SynthInfoMini;
+
+extern VidListFull* lbl_8047AFD0; /* vidFree */
+extern u32 lbl_8047AFD8;          /* vidCurrentId */
+extern u16 lbl_8047AFDC;          /* voicePrioSortRootListRoot */
+extern u8 lbl_8047AFDE;           /* voiceMusicRunning */
+extern u8 lbl_8047AFDF;           /* voiceFxRunning */
+extern u8 lbl_8047AFE0;           /* voiceListInsert */
+extern u8 lbl_8047AFE1;           /* voiceListRoot */
+extern u8 lbl_8047AF50;           /* synthIdleWaitActive */
+extern u8 lbl_80445F50[];         /* merged synthvoice statics blob, see above */
+
+/* NOTE: voicePrioSortVoices/voicePrioSortVoicesRoot/voicePrioSortRootList/
+ * voiceListArr are NOT macros -- each function that touches them must
+ * declare its own local pointer variable(s), e.g.
+ *   VoiceListEntry* voicePrioSortVoices = (VoiceListEntry*)(lbl_80445F50 + 0x800);
+ * Retail computes each array's base pointer once per function and reuses
+ * that register for every indexed access (confirmed by objdiff: routing
+ * these through a macro that re-derives `blob + CONST` at each access
+ * site produced displacement-addressed stores instead of retail's
+ * register-indexed ones). */
+#define voicePrioSortRootListRoot lbl_8047AFDC
+#define voiceMusicRunning lbl_8047AFDE
+#define voiceFxRunning lbl_8047AFDF
+#define voiceListInsert lbl_8047AFE0
+#define voiceListRoot lbl_8047AFE1
+#define synthIdleWaitActive lbl_8047AF50
+#define synthInfo (*(SynthInfoMini*)lbl_80434C50)
+
+extern void voiceResetLastStarted(SynthVoiceMini* svoice);
+extern void fn_8014E7D0(u32 voice); /* streamKill (stream.c) */
+
+static void voiceRemovePriority(SynthVoiceMini* svoice);
+static void vidRemove(VidListFull** list);
+
+static u32 get_newvid(void) {
+    u32 vid;
+
+    do {
+        vid = lbl_8047AFD8++;
+    } while (vid == 0xFFFFFFFF);
+
+    return vid;
+}
+
+u32 fn_801576C4(SynthVoiceMini* svoice, u32 isMaster) {
+    u32 vid;
+    VidListFull* nvl;
+    VidListFull* lvl;
+    VidListFull* vl;
+
+    vid = get_newvid();
+
+    lvl = NULL;
+    nvl = lbl_8047AFD4;
+
+    while (nvl != NULL) {
+        if (nvl->vid > vid) {
+            break;
+        }
+
+        if (nvl->vid == vid) {
+            vid = get_newvid();
+        }
+
+        lvl = nvl;
+        nvl = nvl->next;
+    }
+
+    if ((vl = lbl_8047AFD0) == NULL) {
+        return 0xFFFFFFFF;
+    }
+
+    if ((lbl_8047AFD0 = vl->next) != NULL) {
+        lbl_8047AFD0->prev = NULL;
+    }
+
+    if (lvl == NULL) {
+        lbl_8047AFD4 = vl;
+    } else {
+        lvl->next = vl;
+    }
+
+    vl->prev = lvl;
+    vl->next = nvl;
+
+    if (nvl != NULL) {
+        nvl->prev = vl;
+    }
+
+    vl->vid = vid;
+    vl->root = svoice->id;
+    svoice->vidMasterList = isMaster ? vl : NULL;
+    svoice->vidList = vl;
+
+    return isMaster ? vid : svoice->id;
+}
+#endif
+#pragma pop
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+#if 0
+asm void voiceSetPriority(void) {
+#include "src/game/people/people_field_voiceSetPriority.inc"
+}
+#else
+static void voiceRemovePriority(SynthVoiceMini* svoice) {
+    VoiceListEntry* voicePrioSortVoices = (VoiceListEntry*)(lbl_80445F50 + 0x800);
+    u8* voicePrioSortVoicesRoot = lbl_80445F50 + 0x900;
+    RootListEntry* voicePrioSortRootList = (RootListEntry*)(lbl_80445F50 + 0xA00);
+    VoiceListEntry* vps;
+    RootListEntry* rps;
+
+    vps = &voicePrioSortVoices[(u8)svoice->id];
+    if (vps->user != 1) {
+        return;
+    }
+
+    if (vps->prev != 0xFF) {
+        voicePrioSortVoices[vps->prev].next = vps->next;
+    } else {
+        voicePrioSortVoicesRoot[svoice->prio] = vps->next;
+    }
+
+    if (vps->next != 0xFF) {
+        voicePrioSortVoices[vps->next].prev = vps->prev;
+    } else if (vps->prev == 0xFF) {
+        rps = &voicePrioSortRootList[svoice->prio];
+
+        if (rps->prev != 0xFFFF) {
+            voicePrioSortRootList[rps->prev].next = rps->next;
+        } else {
+            voicePrioSortRootListRoot = rps->next;
+        }
+
+        if (rps->next != 0xFFFF) {
+            voicePrioSortRootList[rps->next].prev = rps->prev;
+        }
+    }
+
+    vps->user = 0;
+}
+
+void voiceSetPriority(SynthVoiceMini* svoice, u8 prio) {
+    VoiceListEntry* voicePrioSortVoices = (VoiceListEntry*)(lbl_80445F50 + 0x800);
+    u8* voicePrioSortVoicesRoot = lbl_80445F50 + 0x900;
+    RootListEntry* voicePrioSortRootList = (RootListEntry*)(lbl_80445F50 + 0xA00);
+    u16 li;
+    VoiceListEntry* vps;
+    u16 i;
+    u32 v;
+
+    v = (u8)svoice->id;
+    vps = &voicePrioSortVoices[v];
+    if (vps->user == 1) {
+        if (svoice->prio == prio) {
+            return;
+        }
+
+        voiceRemovePriority(svoice);
+    }
+
+    vps->user = 1;
+    vps->prev = 0xFF;
+    if ((vps->next = voicePrioSortVoicesRoot[prio]) != 0xFF) {
+        voicePrioSortVoices[voicePrioSortVoicesRoot[prio]].prev = v;
+    } else if (voicePrioSortRootListRoot != 0xFFFF) {
+        if (prio >= voicePrioSortRootListRoot) {
+            for (i = voicePrioSortRootListRoot; i != 0xFFFF; i = voicePrioSortRootList[i].next) {
+                if ((u16)i > prio) {
+                    break;
+                }
+                li = i;
+            }
+
+            voicePrioSortRootList[li].next = (u16)prio;
+            voicePrioSortRootList[prio].prev = li;
+            voicePrioSortRootList[prio].next = i;
+            if (i != 0xFFFF) {
+                voicePrioSortRootList[i].prev = prio;
+            }
+        } else {
+            voicePrioSortRootList[prio].next = voicePrioSortRootListRoot;
+            voicePrioSortRootList[prio].prev = 0xFFFF;
+            voicePrioSortRootList[voicePrioSortRootListRoot].prev = prio;
+            voicePrioSortRootListRoot = prio;
+        }
+    } else {
+        voicePrioSortRootList[prio].next = 0xFFFF;
+        voicePrioSortRootList[prio].prev = 0xFFFF;
+        voicePrioSortRootListRoot = prio;
+    }
+
+    voicePrioSortVoicesRoot[prio] = v;
+    svoice->prio = prio;
+    fn_80162494(svoice->id & 0xFF, ((u32)prio << 24) | (svoice->age >> 15));
+}
+#endif
+#pragma pop
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+#if 0
+asm void fn_80157A64(void) {
+#include "src/game/people/people_field_fn_80157A64.inc"
+}
+#else
+u32 fn_80157A64(u8 priority, u8 maxVoices, u16 allocId, u8 fxFlag) {
+    u8* voicePrioSortVoicesRoot = lbl_80445F50 + 0x900;
+    VoiceListEntry* voicePrioSortVoices = (VoiceListEntry*)(lbl_80445F50 + 0x800);
+    RootListEntry* voicePrioSortRootList = (RootListEntry*)(lbl_80445F50 + 0xA00);
+    VoiceListEntry* voiceListArr = (VoiceListEntry*)(lbl_80445F50 + 0xE00);
+    s32 i;
+    s32 num;
+    s32 voice;
+    u16 p;
+    u32 type_alloc;
+    VoiceListEntry* sfv;
+
+    if (synthIdleWaitActive) {
+        goto _fail;
+    }
+
+    if (fxFlag) {
+        type_alloc = (voiceFxRunning >= synthInfo.maxSFX) && (synthInfo.voiceNum > synthInfo.maxSFX);
+        if (synthInfo.maxSFX <= maxVoices) {
+            goto _skip_alloc;
+        }
+        goto _do_alloc;
+    } else {
+        type_alloc = (voiceMusicRunning >= synthInfo.maxMusic) && (synthInfo.voiceNum > synthInfo.maxMusic);
+        if (synthInfo.maxMusic <= maxVoices) {
+            goto _skip_alloc;
+        }
+
+    _do_alloc:
+        num = 0;
+        voice = -1;
+        p = voicePrioSortRootListRoot;
+        while (p != 0xFFFF && priority >= p && voice == -1) {
+            for (i = voicePrioSortVoicesRoot[p]; i != 0xFF; i = voicePrioSortVoices[i].next) {
+                if (allocId != lbl_8047AF48[i].allocId) {
+                    continue;
+                }
+                ++num;
+                if (lbl_8047AF48[i].block) {
+                    continue;
+                }
+                if (!type_alloc || fxFlag == lbl_8047AF48[i].fxFlag) {
+                    if (lbl_8047AF48[i].cFlags & 2) {
+                        continue;
+                    }
+                    if (voice != -1) {
+                        if (lbl_8047AF48[i].age < lbl_8047AF48[voice].age) {
+                            voice = i;
+                        }
+                    } else {
+                        voice = i;
+                    }
+                }
+            }
+
+            p = voicePrioSortRootList[p].next;
+        }
+    }
+
+    if (num < maxVoices) {
+        while (p != 0xFFFF && num < maxVoices) {
+            for (i = voicePrioSortVoicesRoot[p]; i != 0xFF; i = voicePrioSortVoices[i].next) {
+                if (allocId == lbl_8047AF48[i].allocId) {
+                    num++;
+                }
+            }
+
+            p = voicePrioSortRootList[p].next;
+        }
+
+        if (num < maxVoices) {
+        _skip_alloc:
+            if (voiceListRoot != 0xFF && type_alloc == 0) {
+                voice = voiceListRoot;
+                goto _update;
+            }
+
+            if (priority < voicePrioSortRootListRoot) {
+                return 0xFFFFFFFF;
+            }
+
+            voice = -1;
+            p = voicePrioSortRootListRoot;
+
+            while (p != 0xFFFF && priority >= p && voice == -1) {
+                for (i = voicePrioSortVoicesRoot[p]; i != 0xFF; i = voicePrioSortVoices[i].next) {
+                    if (lbl_8047AF48[i].block != 0) {
+                        continue;
+                    }
+
+                    if (!type_alloc || fxFlag == lbl_8047AF48[i].fxFlag) {
+                        if (lbl_8047AF48[i].cFlags & 2) {
+                            continue;
+                        }
+                        if (voice != -1) {
+                            if (lbl_8047AF48[voice].age > lbl_8047AF48[i].age) {
+                                voice = i;
+                            }
+                        } else {
+                            voice = i;
+                        }
+                    }
+                }
+                p = voicePrioSortRootList[p].next;
+            }
+
+            if (voice == -1) {
+                return 0xFFFFFFFF;
+            }
+
+            if (lbl_8047AF48[voice].prio > priority) {
+                goto _fail;
+            }
+        }
+    }
+
+_update:
+    if (voice == -1) {
+        goto _fail;
+    }
+
+    if (voiceListArr[voice].user == 1) {
+        sfv = voiceListArr + voice;
+        i = sfv->prev;
+
+        if (i != 0xFF) {
+            voiceListArr[i].next = sfv->next;
+        } else {
+            voiceListRoot = sfv->next;
+        }
+
+        i = sfv->next;
+        if (i != 0xFF) {
+            voiceListArr[i].prev = sfv->prev;
+        }
+
+        if (voice == voiceListInsert) {
+            voiceListInsert = sfv->prev;
+        }
+
+        sfv->user = 0;
+    } else if (lbl_8047AF48[voice].fxFlag) {
+        voiceFxRunning--;
+    } else {
+        voiceMusicRunning--;
+    }
+
+    if (fxFlag != FALSE) {
+        ++voiceFxRunning;
+    } else {
+        ++voiceMusicRunning;
+    }
+
+    return voice;
+
+_fail:
+    return -1;
+}
+#endif
+#pragma pop
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+#if 0
+asm void voiceFree(void) {
+#include "src/game/people/people_field_voiceFree.inc"
+}
+#else
+void voiceFree(SynthVoiceMini* svoice) {
+    VoiceListEntry* voiceListArr = (VoiceListEntry*)(lbl_80445F50 + 0xE00);
+    u32 i;
+    VoiceListEntry* sfv;
+
+    macMakeInactive(svoice, 2); /* MAC_STATE_STOPPED */
+    voiceRemovePriority(svoice);
+    svoice->addr = NULL;
+    svoice->prio = 0;
+    sfv = &voiceListArr[(i = (u8)svoice->id)];
+    if (sfv->user == 0) {
+        sfv->user = 1;
+        if (voiceListRoot != 0xFF) {
+            sfv->next = 0xFF;
+            sfv->prev = voiceListInsert;
+            voiceListArr[voiceListInsert].next = i;
+        } else {
+            sfv->next = 0xFF;
+            sfv->prev = 0xFF;
+            voiceListRoot = i;
+        }
+
+        voiceListInsert = i;
+        if (svoice->fxFlag != 0) {
+            --voiceFxRunning;
+        } else {
+            --voiceMusicRunning;
+        }
+    }
+
+    svoice->id = 0xFFFFFFFF;
+}
+#endif
+#pragma pop
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+#if 0
+asm void synthInitAllocationAids(void) {
+#include "src/game/people/people_field_synthInitAllocationAids.inc"
+}
+#else
+static void voiceInitFreeList(void) {
+    VoiceListEntry* voiceListArr = (VoiceListEntry*)(lbl_80445F50 + 0xE00);
+    u32 i;
+
+    for (i = 0; i < synthInfo.voiceNum; ++i) {
+        voiceListArr[i].prev = (u8)(i - 1);
+        voiceListArr[i].next = (u8)(i + 1);
+        voiceListArr[i].user = 1;
+    }
+
+    voiceListArr[0].prev = 0xFF;
+    voiceListArr[synthInfo.voiceNum - 1].next = 0xFF;
+    voiceListRoot = 0;
+    voiceListInsert = synthInfo.voiceNum - 1;
+}
+
+static void voiceInitPrioSort(void) {
+    VoiceListEntry* voicePrioSortVoices = (VoiceListEntry*)(lbl_80445F50 + 0x800);
+    u8* voicePrioSortVoicesRoot = lbl_80445F50 + 0x900;
+    u32 i;
+
+    for (i = 0; i < synthInfo.voiceNum; ++i) {
+        voicePrioSortVoices[i].user = 0;
+    }
+
+    for (i = 0; i < 256; ++i) {
+        voicePrioSortVoicesRoot[i] = 0xFF;
+    }
+
+    voicePrioSortRootListRoot = 0xFFFF;
+}
+
+void synthInitAllocationAids(void) {
+    voiceInitFreeList();
+    voiceInitPrioSort();
+    voiceFxRunning = 0;
+    voiceMusicRunning = 0;
+}
+#endif
+#pragma pop
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+#if 0
+asm void voiceUnblock(void) {
+#include "src/game/people/people_field_voiceUnblock.inc"
+}
+#else
+void voiceUnblock(u32 voice) {
+    if (voice == 0xFFFFFFFF) {
+        return;
+    }
+
+    if (fn_8016246C(voice)) {
+        hwBreak(voice);
+    }
+
+    lbl_8047AF48[voice].id = voice;
+    voiceFree(&lbl_8047AF48[voice]);
+    lbl_8047AF48[voice].block = 0;
+}
+#endif
+#pragma pop
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+#if 0
+asm void voiceKill(void) {
+#include "src/game/people/people_field_voiceKill.inc"
+}
+#else
+void voiceKill(u32 vi) {
+    SynthVoiceMini* sv = &lbl_8047AF48[vi];
+
+    if (sv->addr != NULL) {
+        fn_80157360(sv);
+        sv->cFlags &= ~(u64)3;
+        sv->age = 0;
+        voiceFree(sv);
+    }
+
+    if (sv->block != 0) {
+        fn_8014E7D0(vi);
+    }
+
+    hwBreak(vi);
+}
+#endif
+#pragma pop
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+#if 0
+asm void fn_80157360(void) {
+#include "src/game/people/people_field_fn_80157360.inc"
+}
+#else
+static void vidRemove(VidListFull** list) {
+    if ((*list)->prev != NULL) {
+        (*list)->prev->next = (*list)->next;
+    } else {
+        lbl_8047AFD4 = (*list)->next;
+    }
+
+    if ((*list)->next != NULL) {
+        (*list)->next->prev = (*list)->prev;
+    }
+
+    (*list)->next = lbl_8047AFD0;
+
+    if (lbl_8047AFD0 != NULL) {
+        lbl_8047AFD0->prev = *list;
+    }
+
+    (*list)->prev = NULL;
+    lbl_8047AFD0 = *list;
+    *list = NULL;
+}
+
+void fn_80157360(SynthVoiceMini* svoice) {
+    if (svoice->id == 0xFFFFFFFF) {
+        return;
+    }
+
+    voiceResetLastStarted(svoice);
+    if (svoice->parent != 0xFFFFFFFF) {
+        lbl_8047AF48[(u8)svoice->parent].child = svoice->child;
+        if (svoice->child != 0xFFFFFFFF) {
+            lbl_8047AF48[(u8)svoice->child].parent = svoice->parent;
+        }
+
+        vidRemove((VidListFull**)&svoice->vidList);
+    } else if (svoice->child != 0xFFFFFFFF) {
+        ((VidListFull*)svoice->vidList)->root = svoice->child;
+        lbl_8047AF48[(u8)svoice->child].parent = 0xFFFFFFFF;
+        lbl_8047AF48[(u8)svoice->child].vidMasterList = svoice->vidMasterList;
+        if (svoice->vidList != svoice->vidMasterList) {
+            vidRemove((VidListFull**)&svoice->vidList);
+        }
+
+        svoice->vidMasterList = svoice->vidList = NULL;
+    } else if (svoice->vidList != svoice->vidMasterList) {
+        vidRemove((VidListFull**)&svoice->vidList);
+        vidRemove((VidListFull**)&svoice->vidMasterList);
+    } else {
+        vidRemove((VidListFull**)&svoice->vidList);
+        svoice->vidMasterList = NULL;
+    }
 }
 #endif
 #pragma pop
