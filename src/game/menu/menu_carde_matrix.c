@@ -1674,48 +1674,41 @@ void fn_8007D978(u32 r3) {
     r15 = *(u32*)((u8*)r3 + 0x0);
     tmp = (s8)tmp;
     r18 = r15;
-    do {
-    if ((s32)tmp != 3) {
-        if ((s32)tmp < 3) {
-            if ((s32)tmp != 0) {
-                break;
-            }
-            if ((s32)tmp != 5) {
-                break;
-                }
-            tmp = *(u8*)((u8*)r14 + 0x2);
-            tmp = (s8)tmp;
-            if ((s32)tmp == 0) {
-                r3 = r14;
-                r4 = 0x0;
-                fn_801040D0();
-                r4 = r3;
-                r3 = r14;
-                fn_8007FDBC();
-                tmp = r3;
-                r3 = r14;
-                r18 = tmp;
-                fn_801040A0();
-                *(u32*)((u8*)r3 + 0x0) = r18;
-                r3 = r14;
-                r4 = 0x79a;
-                r5 = 0x40;
-                fn_801081F8();
-                r3 = r14;
-                r4 = 0x826;
-                r5 = 0x48;
-                fn_801081F8();
-            }
-            break;
+    switch ((s32)tmp) {
+    case 0:
+        tmp = *(u8*)((u8*)r14 + 0x2);
+        tmp = (s8)tmp;
+        if ((s32)tmp == 0) {
+            r3 = r14;
+            r4 = 0x0;
+            fn_801040D0();
+            r4 = r3;
+            r3 = r14;
+            fn_8007FDBC();
+            tmp = r3;
+            r3 = r14;
+            r18 = tmp;
+            fn_801040A0();
+            *(u32*)((u8*)r3 + 0x0) = r18;
+            r3 = r14;
+            r4 = 0x79a;
+            r5 = 0x40;
+            fn_801081F8();
+            r3 = r14;
+            r4 = 0x826;
+            r5 = 0x48;
+            fn_801081F8();
         }
+        break;
+    case 3:
         tmp = *(u8*)((u8*)r14 + 0x2);
         tmp = (s8)tmp;
         if ((s32)tmp == 0) {
             tmp = 0x1;
             *(u8*)((u8*)r14 + 0x2) = tmp;
         }
-
-            } else {
+        break;
+    case 5:
         r3 = *(u32*)((u8*)r15 + 0xB0);
         if (r3 != 0) {
             fn_800E202C();
@@ -1751,8 +1744,9 @@ void fn_8007D978(u32 r3) {
         r3 = r14;
         fn_800E209C();
         return;
-            }
-    } while (0);
+    default:
+        break;
+    }
 do {
     r16 = r18;
 do {
