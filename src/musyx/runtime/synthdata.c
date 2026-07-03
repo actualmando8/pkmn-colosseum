@@ -7,7 +7,7 @@
  * identifies dataInsertKeymap (0x80150C78) through dataInit (0x801524E0)
  * as synthdata.c at seq=1.0 vs the matched MP4/Prime/Strikers copies
  * (including the maccmp/curvecmp/layercmp/fxcmp comparator cluster);
- * fn_801525C4 (0x20) is dataExit (reference synthdata.c's final one-call
+ * dataExit (0x20) is dataExit (reference synthdata.c's final one-call
  * wrapper), ending at mcmdWait (0x801525E4), synthmacros.c's first fn.
  * The dataInsert/dataRemove half (0x80150C78 - 0x8015210C) is asm-only.
  */
@@ -153,7 +153,7 @@ s32 dataInsertKeymap(u16 cid, void* keymapdata) {
 #undef tab
 }
 
-s32 fn_80150E68(u16 sid) {
+s32 dataRemoveKeymap(u16 sid) {
     extern u8 lbl_804378F8[];
     extern u16 lbl_8047AFA6;
 #define tab ((DataTabT*)lbl_804378F8)
@@ -281,7 +281,7 @@ s32 dataInsertCurve(u16 cid, void* curvedata) {
 #undef tab
 }
 
-s32 fn_801515F4(u16 sid) {
+s32 dataRemoveCurve(u16 sid) {
     extern u8 lbl_80438CF8[];
     extern u16 lbl_8047AFA8;
 #define tab ((DataTabT*)lbl_80438CF8)
@@ -306,7 +306,7 @@ s32 fn_801515F4(u16 sid) {
 #undef tab
 }
 
-s32 fn_80151770(SdirDataT* sdir, void* smp_data) {
+s32 dataInsertSDir(SdirDataT* sdir, void* smp_data) {
     extern u8 lbl_8043CCF8[];
     extern u16 lbl_8047AFAA;
 #define tab ((SdirTabT*)lbl_8043CCF8)
@@ -355,7 +355,7 @@ s32 fn_80151770(SdirDataT* sdir, void* smp_data) {
 #undef tab
 }
 
-s32 fn_801518F8(u16 sid) {
+s32 dataAddSampleReference(u16 sid) {
     extern u8 lbl_8043CCF8[];
     extern u16 lbl_8047AFAA;
     extern void fn_80163050(void* header, void* addr);
@@ -387,7 +387,7 @@ done:
 #undef tab
 }
 
-s32 fn_801519D0(u16 sid) {
+s32 dataRemoveSampleReference(u16 sid) {
     extern u8 lbl_8043CCF8[];
     extern u16 lbl_8047AFAA;
     extern void fn_80163104(void* header, void* addr);
@@ -409,7 +409,7 @@ s32 fn_801519D0(u16 sid) {
     return 0;
 }
 
-s32 fn_80151A68(u16 gid, FxEntryT* fx, u16 fxNum) {
+s32 dataInsertFX(u16 gid, FxEntryT* fx, u16 fxNum) {
     extern u8 lbl_8043D2F8[];
     extern u16 lbl_8047AFA0;
 #define tab ((FxGroupT*)lbl_8043D2F8)
@@ -437,7 +437,7 @@ s32 fn_80151A68(u16 gid, FxEntryT* fx, u16 fxNum) {
 #undef tab
 }
 
-s32 fn_80151B84(u16 mid, void* macroaddr) {
+s32 dataInsertMacro(u16 mid, void* macroaddr) {
     extern u8 lbl_8043D6F8[];
     extern u8 lbl_8043DEF8[];
     extern u16 lbl_8047AFA2;
@@ -577,11 +577,11 @@ u32 dataGetMacro(u32 key) {
 }
 #endif
 #if 0
-asm void fn_801521A8(void) {
+asm void smpcmp(void) {
 #include "src/game/people/people_field_fn_801521A8.inc"
 }
 #else
-s32 fn_801521A8(u16* a, u16* b) {
+s32 smpcmp(u16* a, u16* b) {
     return (s32)(a[0]) - (s32)(b[0]);
 }
 #endif
@@ -601,7 +601,7 @@ extern u32 lbl_8047AF88;
 extern u32 lbl_8047AF84;
 extern u16 lbl_8047AFAA;
 #if 0
-asm void fn_801521B8(void) {
+asm void dataGetSample(void) {
 #include "src/game/people/people_field_fn_801521B8.inc"
 }
 #else
@@ -615,7 +615,7 @@ asm void fn_801521B8(void) {
  * global once (target instead re-derives it as `result + 0xc` in a
  * different register than the later header-relative reads) plus the same
  * lhzx/stwx addressing-mode CSE wall documented on dataGetMacro. */
-u32 fn_801521B8(u16 key, u32* out) {
+u32 dataGetSample(u16 key, u32* out) {
     void* result;
     u8* header;
     u8* table;
@@ -624,7 +624,7 @@ u32 fn_801521B8(u16 key, u32* out) {
     *(u16*)lbl_80445EF8 = key;
     for (i = 0; i < lbl_8047AFAA; i++) {
         table = lbl_8043CCF8 + i * 0xC;
-        result = sndBSearch(lbl_80445EF8, *(u8**)table, *(u16*)(table + 8), 0x20, (PeopleCmpFn)fn_801521A8);
+        result = sndBSearch(lbl_80445EF8, *(u8**)table, *(u16*)(table + 8), 0x20, (PeopleCmpFn)smpcmp);
         lbl_8047AF88 = (u32)result;
         if (result != NULL && *(u16*)((u8*)result + 2) != 0xFFFF) {
             header = (u8*)result + 0xC;
@@ -783,7 +783,7 @@ void dataInit(u32 smpBase, u32 smpLength) {
 
 #undef fn_80162118
 
-void fn_801525C4(void) {
+void dataExit(void) {
     extern void fn_80163030(void);
     fn_80163030();
 }

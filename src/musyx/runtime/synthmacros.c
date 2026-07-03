@@ -9,7 +9,7 @@
  * copies); macInit (0x80157218 + 0x68) is reference synthmacros.c's last
  * function and ends exactly at vidInit (0x80157280), reference
  * synthvoice.c's first. The mcmd motion-setter family below
- * (fn_80153FEC .. fn_80154A14) inlines the same-TU static
+ * (mcmdPanningSelect .. mcmdDopplerSelect) inlines the same-TU static
  * MotionSetterCommon; all other functions asm-only until matched.
  */
 #include "dolphin/types.h"
@@ -290,7 +290,7 @@ extern u32 fn_80162214(u32 time);                /* sndConvert2Ms: time / 256 */
 extern void sndConvertTicks(u32* ticks, SYNTH_VOICE* sv);
 extern void fn_801603C0(u32 ctrl, u32 midi, u32 midiSet, u32 value); /* inpSetMidiCtrl */
 extern void synthInitPortamento(SYNTH_VOICE* svoice);
-extern u32 fn_80156DE0(u16 macid, u8 priority, u8 maxVoices, u16 allocId, u8 key, u8 vol, u8 panning,
+extern u32 macStart(u16 macid, u8 priority, u8 maxVoices, u16 allocId, u8 key, u8 vol, u8 panning,
                         u8 midi, u8 midiSet, u8 section, u16 step, u16 trackid, u8 new_vid,
                         u8 vGroup, u8 studio, u32 itd); /* macStart, defined later in this file */
 extern u16 fn_8014D740(u8 midiSet, u8 midi);              /* seqGetMIDIPriority */
@@ -318,7 +318,7 @@ typedef struct SAMPLE_INFO {
     u8 compType;     // 0x1c
 } SAMPLE_INFO; // size 0x20
 
-extern s32 fn_801521B8(u16 key, SAMPLE_INFO* out); /* dataGetSample */
+extern s32 dataGetSample(u16 key, SAMPLE_INFO* out); /* dataGetSample */
 extern void hwInitSamplePlayback(u32 voice, u16 pitch, void* smp, u32 resetState, u32 unk1C,
                                   u32 unk18, u32 initFlags, u32 setupFlag);
 extern void fn_8014C07C(SYNTH_VOICE* svoice); /* synth.c: synthAddJob(svoice, 2, 0) */
@@ -349,101 +349,101 @@ static void SelectSourceCommon(u8* svoice, u8* dest, u32* cstep, u64 tstflag, u3
 }
 #define PF_DEFINE_MOTION_SETTER(name, initMask, dataOffset, doneMask) \
 void name(u8* ctx, u32* cmd) { SelectSourceCommon(ctx, ctx + (dataOffset), cmd, (initMask), (doneMask)); }
-/* fn_80153EE8 = mcmdVolumeSelect (inpVolume@0x218, tstflag 0x80000, dirty 1);
+/* mcmdVolumeSelect = mcmdVolumeSelect (inpVolume@0x218, tstflag 0x80000, dirty 1);
  * identified from the SelectSource offset table below, not simindex (which
  * cannot distinguish these 260B siblings from each other). */
 #if 0
-asm void fn_80153EE8(void) {
+asm void mcmdVolumeSelect(void) {
 #include "src/game/people/people_field_fn_80153EE8.inc"
 }
 #else
-PF_DEFINE_MOTION_SETTER(fn_80153EE8, 0x00080000ULL, 0x218, 0x0001u)
+PF_DEFINE_MOTION_SETTER(mcmdVolumeSelect, 0x00080000ULL, 0x218, 0x0001u)
 #endif
 #if 0
-asm void fn_80153FEC(void) {
+asm void mcmdPanningSelect(void) {
 #include "src/game/people/people_field_fn_80153FEC.inc"
 }
 #else
-PF_DEFINE_MOTION_SETTER(fn_80153FEC, 0x00100000ULL, 0x23C, 0x0002u)
+PF_DEFINE_MOTION_SETTER(mcmdPanningSelect, 0x00100000ULL, 0x23C, 0x0002u)
 #endif
 #if 0
-asm void fn_801540F0(void) {
+asm void mcmdPitchWheelSelect(void) {
 #include "src/game/people/people_field_fn_801540F0.inc"
 }
 #else
-PF_DEFINE_MOTION_SETTER(fn_801540F0, 0x00200000ULL, 0x284, 0x0008u)
+PF_DEFINE_MOTION_SETTER(mcmdPitchWheelSelect, 0x00200000ULL, 0x284, 0x0008u)
 #endif
 #if 0
-asm void fn_801541F4(void) {
+asm void mcmdModWheelSelect(void) {
 #include "src/game/people/people_field_fn_801541F4.inc"
 }
 #else
-PF_DEFINE_MOTION_SETTER(fn_801541F4, 0x00400000ULL, 0x2CC, 0x0020u)
+PF_DEFINE_MOTION_SETTER(mcmdModWheelSelect, 0x00400000ULL, 0x2CC, 0x0020u)
 #endif
 #if 0
-asm void fn_801542F8(void) {
+asm void mcmdPedalSelect(void) {
 #include "src/game/people/people_field_fn_801542F8.inc"
 }
 #else
-PF_DEFINE_MOTION_SETTER(fn_801542F8, 0x02000000ULL, 0x2F0, 0x0040u)
+PF_DEFINE_MOTION_SETTER(mcmdPedalSelect, 0x02000000ULL, 0x2F0, 0x0040u)
 #endif
 #if 0
-asm void fn_801543FC(void) {
+asm void mcmdPortamentoSelect(void) {
 #include "src/game/people/people_field_fn_801543FC.inc"
 }
 #else
-PF_DEFINE_MOTION_SETTER(fn_801543FC, 0x01000000ULL, 0x314, 0x0080u)
+PF_DEFINE_MOTION_SETTER(mcmdPortamentoSelect, 0x01000000ULL, 0x314, 0x0080u)
 #endif
 #if 0
-asm void fn_80154500(void) {
+asm void mcmdReverbSelect(void) {
 #include "src/game/people/people_field_fn_80154500.inc"
 }
 #else
-PF_DEFINE_MOTION_SETTER(fn_80154500, 0x00800000ULL, 0x35C, 0x0200u)
+PF_DEFINE_MOTION_SETTER(mcmdReverbSelect, 0x00800000ULL, 0x35C, 0x0200u)
 #endif
 #if 0
-asm void fn_80154604(void) {
+asm void mcmdPreAuxASelect(void) {
 #include "src/game/people/people_field_fn_80154604.inc"
 }
 #else
-PF_DEFINE_MOTION_SETTER(fn_80154604, 0x20000000ULL, 0x338, 0x0100u)
+PF_DEFINE_MOTION_SETTER(mcmdPreAuxASelect, 0x20000000ULL, 0x338, 0x0100u)
 #endif
 #if 0
-asm void fn_80154708(void) {
+asm void mcmdPreAuxBSelect(void) {
 #include "src/game/people/people_field_fn_80154708.inc"
 }
 #else
-PF_DEFINE_MOTION_SETTER(fn_80154708, 0x40000000ULL, 0x380, 0x0400u)
+PF_DEFINE_MOTION_SETTER(mcmdPreAuxBSelect, 0x40000000ULL, 0x380, 0x0400u)
 #endif
 #if 0
-asm void fn_8015480C(void) {
+asm void mcmdPostAuxBSelect(void) {
 #include "src/game/people/people_field_fn_8015480C.inc"
 }
 #else
-PF_DEFINE_MOTION_SETTER(fn_8015480C, 0x80000000ULL, 0x3A4, 0x0800u)
+PF_DEFINE_MOTION_SETTER(mcmdPostAuxBSelect, 0x80000000ULL, 0x3A4, 0x0800u)
 #endif
 #if 0
-asm void fn_80154910(void) {
+asm void mcmdSurroundPanningSelect(void) {
 #include "src/game/people/people_field_fn_80154910.inc"
 }
 #else
-PF_DEFINE_MOTION_SETTER(fn_80154910, 0x04000000ULL, 0x260, 0x0004u)
+PF_DEFINE_MOTION_SETTER(mcmdSurroundPanningSelect, 0x04000000ULL, 0x260, 0x0004u)
 #endif
 #if 0
-asm void fn_80154A14(void) {
+asm void mcmdDopplerSelect(void) {
 #include "src/game/people/people_field_fn_80154A14.inc"
 }
 #else
-PF_DEFINE_MOTION_SETTER(fn_80154A14, 0x08000000ULL, 0x2A8, 0x0010u)
+PF_DEFINE_MOTION_SETTER(mcmdDopplerSelect, 0x08000000ULL, 0x2A8, 0x0010u)
 #endif
-/* fn_80154B18 = mcmdTremoloSelect (inpTremolo@0x3C8, tstflag 0x10000000,
+/* mcmdTremoloSelect = mcmdTremoloSelect (inpTremolo@0x3C8, tstflag 0x10000000,
  * dirty 0x1000) -- last of the 13-member SelectSource family. */
 #if 0
-asm void fn_80154B18(void) {
+asm void mcmdTremoloSelect(void) {
 #include "src/game/people/people_field_fn_80154B18.inc"
 }
 #else
-PF_DEFINE_MOTION_SETTER(fn_80154B18, 0x10000000ULL, 0x3C8, 0x1000u)
+PF_DEFINE_MOTION_SETTER(mcmdTremoloSelect, 0x10000000ULL, 0x3C8, 0x1000u)
 #endif
 #undef PF_DEFINE_MOTION_SETTER
 
@@ -481,14 +481,14 @@ static void SelectSourceFull(u8* svoice, u8* dest, u32* cstep, u64 tstflag, u32 
     }
 }
 
-void fn_80154C1C(SYNTH_VOICE* svoice, MSTEP* cstep) {
+void mcmdAuxAFXSelect(SYNTH_VOICE* svoice, MSTEP* cstep) {
     static u64 mask[4] = {0x100000000ULL, 0x200000000ULL, 0x400000000ULL, 0x800000000ULL};
     static u32 dirty[4] = {0x80000001u, 0x80000002u, 0x80000004u, 0x80000008u};
     u32 i = (u8)(cstep->para[1] >> 0x18);
     SelectSourceFull((u8*)svoice, (u8*)&inpAuxA[svoice->studio][i], cstep->para, mask[i], dirty[i]);
 }
 
-void fn_80154D98(SYNTH_VOICE* svoice, MSTEP* cstep) {
+void mcmdAuxBFXSelect(SYNTH_VOICE* svoice, MSTEP* cstep) {
     static u64 mask[4] = {0x1000000000ULL, 0x2000000000ULL, 0x4000000000ULL, 0x8000000000ULL};
     static u32 dirty[4] = {0x80000010u, 0x80000020u, 0x80000040u, 0x80000080u};
     u32 i = (u8)(cstep->para[1] >> 0x18);
@@ -945,12 +945,12 @@ u32 mcmdAddKey(SYNTH_VOICE* svoice, MSTEP* cstep) {
 }
 
 /* mcmdStartSample */
-void fn_80152D5C(SYNTH_VOICE* svoice, MSTEP* cstep) {
+void mcmdStartSample(SYNTH_VOICE* svoice, MSTEP* cstep) {
     static SAMPLE_INFO newsmp;
     u16 smp;
 
     smp = (u16)(cstep->para[0] >> 8);
-    if (fn_801521B8(smp, &newsmp) != 0) {
+    if (dataGetSample(smp, &newsmp) != 0) {
         return;
     }
 
@@ -1370,13 +1370,13 @@ static void DoPanningSetup(SYNTH_VOICE* svoice, MSTEP* cstep, u8 pi) {
 }
 
 /* mcmdSetPanning */
-void fn_80153874(SYNTH_VOICE* svoice, MSTEP* cstep) { DoPanningSetup(svoice, cstep, 0); }
+void mcmdSetPanning(SYNTH_VOICE* svoice, MSTEP* cstep) { DoPanningSetup(svoice, cstep, 0); }
 
 /* mcmdSetSurroundPanning */
-void fn_80153910(SYNTH_VOICE* svoice, MSTEP* cstep) { DoPanningSetup(svoice, cstep, 1); }
+void mcmdSetSurroundPanning(SYNTH_VOICE* svoice, MSTEP* cstep) { DoPanningSetup(svoice, cstep, 1); }
 
 /* mcmdPlayMacro */
-void fn_80152AF8(SYNTH_VOICE* svoice, MSTEP* cstep) {
+void mcmdPlayMacro(SYNTH_VOICE* svoice, MSTEP* cstep) {
     s32 key;
     u32 new_child;
 
@@ -1388,7 +1388,7 @@ void fn_80152AF8(SYNTH_VOICE* svoice, MSTEP* cstep) {
     }
 
     svoice->block = 1;
-    new_child = fn_80156DE0((u16)(cstep->para[0] >> 0x10), (u8)(cstep->para[1] >> 0x10),
+    new_child = macStart((u16)(cstep->para[0] >> 0x10), (u8)(cstep->para[1] >> 0x10),
                              (u8)(cstep->para[1] >> 0x18), svoice->allocId, (u8)key,
                              (u8)(svoice->volume >> 0x10), (u8)(svoice->panning[0] >> 0x10),
                              svoice->midi, svoice->midiSet, svoice->section, (u16)cstep->para[1],
@@ -1425,7 +1425,7 @@ extern u8 lbl_8047AFC8; /* DebugMacroSteps: static local counter inside macHandl
 
 
 /* Reference-shaped static helpers for macHandleActive's inlined cases.
- * Source position (before fn_801557EC) makes MWCC auto-inline them. */
+ * Source position (before macHandleActive) makes MWCC auto-inline them. */
 static u32 mcmdGoto(SYNTH_VOICE* svoice, MSTEP* cstep) {
     MSTEP* macAddr;
 
@@ -1576,7 +1576,7 @@ static void mcmdSetupLFO(SYNTH_VOICE* svoice, MSTEP* cstep) {
     svoice->lfo[index].period = time;
 }
 
-void fn_801557EC(SYNTH_VOICE* svoice) { /* macHandleActive */
+void macHandleActive(SYNTH_VOICE* svoice) { /* macHandleActive */
     u8 i;
     u32 lastNote;
     u32 ex;
@@ -1713,7 +1713,7 @@ void fn_801557EC(SYNTH_VOICE* svoice) { /* macHandleActive */
             ex = mcmdWait(svoice, &cstep);
             break;
         case 0x08:
-            fn_80152AF8(svoice, &cstep);
+            mcmdPlayMacro(svoice, &cstep);
             break;
         case 0x09: {
             /* mcmdSendKeyOff, hand-inlined (contains a loop; -inline auto refuses) */
@@ -1761,13 +1761,13 @@ void fn_801557EC(SYNTH_VOICE* svoice) { /* macHandleActive */
             mcmdScaleVolume(svoice, &cstep);
             break;
         case 0x0e:
-            fn_80153874(svoice, &cstep);
+            mcmdSetPanning(svoice, &cstep);
             break;
         case 0x0f:
             mcmdEnvelope(svoice, &cstep);
             break;
         case 0x10:
-            fn_80152D5C(svoice, &cstep);
+            mcmdStartSample(svoice, &cstep);
             break;
         case 0x11:
             hwBreak(svoice->id & 0xFF);
@@ -1792,7 +1792,7 @@ void fn_801557EC(SYNTH_VOICE* svoice) { /* macHandleActive */
             mcmdFadeIn(svoice, &cstep);
             break;
         case 0x15:
-            fn_80153910(svoice, &cstep);
+            mcmdSetSurroundPanning(svoice, &cstep);
             break;
         case 0x16:
             mcmdSetADSRFromCtrl(svoice, &cstep);
@@ -1925,49 +1925,49 @@ void fn_801557EC(SYNTH_VOICE* svoice) { /* macHandleActive */
             mcmdSetAgeCounterByVolume(svoice, &cstep);
             break;
         case 0x40:
-            fn_80153EE8((u8*)svoice, cstep.para);
+            mcmdVolumeSelect((u8*)svoice, cstep.para);
             break;
         case 0x41:
-            fn_80153FEC((u8*)svoice, cstep.para);
+            mcmdPanningSelect((u8*)svoice, cstep.para);
             break;
         case 0x42:
-            fn_801540F0((u8*)svoice, cstep.para);
+            mcmdPitchWheelSelect((u8*)svoice, cstep.para);
             break;
         case 0x43:
-            fn_801541F4((u8*)svoice, cstep.para);
+            mcmdModWheelSelect((u8*)svoice, cstep.para);
             break;
         case 0x44:
-            fn_801542F8((u8*)svoice, cstep.para);
+            mcmdPedalSelect((u8*)svoice, cstep.para);
             break;
         case 0x45:
-            fn_801543FC((u8*)svoice, cstep.para);
+            mcmdPortamentoSelect((u8*)svoice, cstep.para);
             break;
         case 0x46:
-            fn_80154500((u8*)svoice, cstep.para);
+            mcmdReverbSelect((u8*)svoice, cstep.para);
             break;
         case 0x47:
-            fn_80154910((u8*)svoice, cstep.para);
+            mcmdSurroundPanningSelect((u8*)svoice, cstep.para);
             break;
         case 0x48:
-            fn_80154A14((u8*)svoice, cstep.para);
+            mcmdDopplerSelect((u8*)svoice, cstep.para);
             break;
         case 0x49:
-            fn_80154B18((u8*)svoice, cstep.para);
+            mcmdTremoloSelect((u8*)svoice, cstep.para);
             break;
         case 0x4a:
-            fn_80154604((u8*)svoice, cstep.para);
+            mcmdPreAuxASelect((u8*)svoice, cstep.para);
             break;
         case 0x4b:
-            fn_80154708((u8*)svoice, cstep.para);
+            mcmdPreAuxBSelect((u8*)svoice, cstep.para);
             break;
         case 0x4c:
-            fn_8015480C((u8*)svoice, cstep.para);
+            mcmdPostAuxBSelect((u8*)svoice, cstep.para);
             break;
         case 0x4d:
-            fn_80154C1C(svoice, &cstep);
+            mcmdAuxAFXSelect(svoice, &cstep);
             break;
         case 0x4e:
-            fn_80154D98(svoice, &cstep);
+            mcmdAuxBFXSelect(svoice, &cstep);
             break;
         case 0x50:
             mcmdSetupLFO(svoice, &cstep);
@@ -2018,7 +2018,7 @@ void fn_801557EC(SYNTH_VOICE* svoice) { /* macHandleActive */
 
 
 /* macHandle */
-void fn_80156744(u32 deltaTime) {
+void macHandle(u32 deltaTime) {
     SYNTH_VOICE* sv;
     SYNTH_VOICE* nextSv;
     u64 w;
@@ -2035,7 +2035,7 @@ void fn_80156744(u32 deltaTime) {
         if (HasHWEventTrap(sv) != 0) {
             CheckHWEventTrap(sv);
         }
-        fn_801557EC(sv);
+        macHandleActive(sv);
     }
     macRealTime += deltaTime;
 }
@@ -2140,7 +2140,7 @@ void macMakeInactive(SYNTH_VOICE* svoice, s32 newState) {
  * disassembly, which shows the full UnYieldMacro/active-list bodies
  * inlined twice (once via the initial macMakeInactive(svoice, 2), once via
  * the closing macMakeActive(svoice)) with no bl to either symbol. */
-u32 fn_80156DE0(u16 macid, u8 priority, u8 maxVoices, u16 allocId, u8 key, u8 vol, u8 panning,
+u32 macStart(u16 macid, u8 priority, u8 maxVoices, u16 allocId, u8 key, u8 vol, u8 panning,
                 u8 midi, u8 midiSet, u8 section, u16 step, u16 trackid, u8 new_vid, u8 vGroup,
                 u8 studio, u32 itd) {
     u32 voice;

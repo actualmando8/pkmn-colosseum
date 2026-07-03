@@ -21279,11 +21279,11 @@ void fn_8025E5F4(void)
     extern int GSthreadCreate();
     extern u32 fn_800FF560();
     extern void fn_8025E534();
-    extern u32 fn_801CAF0C();
+    extern u32 scriptGetDarkPointZeroPokemonNum();
   u32 uVar1;
   u32 uVar2;
 
-  uVar1 = fn_801CAF0C();
+  uVar1 = scriptGetDarkPointZeroPokemonNum();
   if ((uVar1 & 0xFFFF) != 0) {
     uVar2 = fn_800FF560();
     GSthreadCreate(1, uVar2, 0x4000, 1, 1, (u32)fn_8025E534);
@@ -21435,7 +21435,7 @@ void fn_8025EF58(void)
       }
       uVar8 = uVar8 + 1;
     }
-    sVar5 = fn_801CAF0C();
+    sVar5 = scriptGetDarkPointZeroPokemonNum();
     fn_80129280(0,0);
     fn_80129280(0,2);
     cVar7 = fn_80129B2C(0,0x219);
@@ -21492,7 +21492,7 @@ void fn_8025EF58(void)
         lbl_8047B660 = 0;
         lbl_8047B664 = 0;
       }
-      sVar6 = fn_801CAF0C();
+      sVar6 = scriptGetDarkPointZeroPokemonNum();
       if (sVar6 == 0) {
         lbl_8047B668 = 0xffffffff;
         ((u32*)&lbl_8047B668)[1] = 0xffffffff;

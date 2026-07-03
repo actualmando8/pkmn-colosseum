@@ -1726,8 +1726,8 @@ extern void heroBiosSetNamePtr();  /* K&R: typed impl or conflict */
 extern void fn_8012BBA8(void);
 extern void fn_8012BCA4(void);
 extern void fn_8012CA84();
-extern void fn_80130A88(u32 arg1);
-extern void fn_80130BB0(u32 arg1);
+extern void heroPokemonGetEifie(u32 arg1);
+extern void heroPokemonGetBlacky(u32 arg1);
 extern s32 psGetGeneratorChildMaxLife(u32);
 extern void* wazaDataBiosGetPtr(u16 idx);
 extern u32 fn_8012640C();
@@ -1912,7 +1912,7 @@ extern f32 lbl_8047CFB0;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void fn_80116470(void);
 /* 0x80116958 | 0x3D8 */
-extern void fn_801CAA08(void);
+extern void scriptSetCol(void);
 extern void fn_801903B0(void);
 extern void fn_8018C558(void);
 extern void fn_8018C8F4(void);
@@ -1925,7 +1925,7 @@ extern f32 lbl_8047CFA4;
 void fn_80116958(void);
 /* 0x80116D30 | 0x13C */
 extern void EvlogSet__FScUl();
-extern void fn_801CA9F8();
+extern void scriptSetEventColID();
 extern void fn_800F7434();
 extern u8 lbl_80272708[];
 extern u32 lbl_80478EC4;
@@ -1972,7 +1972,7 @@ void fn_80116D30(u32 kind, u32 arg)
             (s32)*(u8*)rec == skind &&
             *(u32*)(rec + 4) == arg &&
             *(u32*)(rec + 8) != 0) {
-            fn_801CA9F8(arg);
+            scriptSetEventColID(arg);
             fn_800F7434(*(u32*)(rec + 8), 4, *(u32*)(rec + 0xC),
                         *(u32*)(rec + 0x10), *(u32*)(rec + 0x14),
                         *(u32*)(rec + 0x18));
@@ -2741,7 +2741,7 @@ void fn_80118104(u32 a, u8 b) {
 extern void psGetParticleChildCount(void* ptr);
 extern void psKillFamily();
 extern void fn_800EC160();
-extern void fn_80169484();
+extern void psUnlinkChildGensFromJObj();
 extern void psKillGenerator();
 extern u32 lbl_8047AD9C;
 extern u32 lbl_8047ADA0;
@@ -2788,7 +2788,7 @@ void fn_80118A68(u8* obj, u32 notify) {
         *(u32*)(obj + 0x4C) = 0;
         obj[6] = 0;
         obj[5] = 0;
-        fn_80169484(*(u32*)(obj + 0x10));
+        psUnlinkChildGensFromJObj(*(u32*)(obj + 0x10));
         *active = 0;
 
         if (*active == 0) {
@@ -2853,11 +2853,11 @@ void fn_80118C88(void* obj) {
 }
 /* 0x80118CAC | 36 bytes | load_then_call */
 void fn_80118CAC(void* obj) {
-    fn_80169340(*(void**)((u8*)obj + 0x10));
+    psSetRandomVelocityScaling(*(void**)((u8*)obj + 0x10));
 }
 /* 0x80118CD0 | 36 bytes | load_then_call */
 void fn_80118CD0(void* obj) {
-    fn_80169368(*(void**)((u8*)obj + 0x10));
+    psSetNodeScaling(*(void**)((u8*)obj + 0x10));
 }
 /* 0x80118CF4 | 36 bytes | load_then_call */
 void fn_80118CF4(void* obj) {
@@ -2865,7 +2865,7 @@ void fn_80118CF4(void* obj) {
 }
 /* 0x80118D18 | 36 bytes | load_then_call */
 void fn_80118D18(void* obj) {
-    fn_801693DC(*(void**)((u8*)obj + 0x10));
+    psSetParticleTexScaling(*(void**)((u8*)obj + 0x10));
 }
 /* 0x80118D3C | 36 bytes | load_then_call */
 void fn_80118D3C(void* obj) {
@@ -2873,7 +2873,7 @@ void fn_80118D3C(void* obj) {
 }
 /* 0x80118D60 | 36 bytes | load_then_call */
 void fn_80118D60(void* obj) {
-    fn_8016945C(*(void**)((u8*)obj + 0x10));
+    psSetVelocityRotationInLocal(*(void**)((u8*)obj + 0x10));
 }
 /* 0x80118D84 | 36 bytes | load_then_call */
 void fn_80118D84(void* obj) {
@@ -2938,7 +2938,7 @@ void fn_80118F7C(u8* obj, void* arg) {
     fn_800E01F4(arg, f1, f2, f3);
 }
 /* 0x80118FB0 | 0x12C */
-extern void fn_80169494(void);
+extern void psLinkChildGensToJObj(void);
 extern f32 lbl_8047CFE8;
 extern f32 lbl_8047CFEC;
 #if 0
@@ -2949,7 +2949,7 @@ asm void fn_80118FB0(void) {
 void fn_80118FB0(u8* obj, u8* desc, u32 state, u32 byte5, u32 init_from_zero, u32 attach_model) {
     extern void fn_800E01D0(void* dst, void* src);
     extern void fn_800E01F4(void* dst, f32 x, f32 y, f32 z);
-    extern void fn_80169494(u32 model, u32 value);
+    extern void psLinkChildGensToJObj(u32 model, u32 value);
     f32 zero;
     f32 one;
 
@@ -2975,7 +2975,7 @@ void fn_80118FB0(u8* obj, u8* desc, u32 state, u32 byte5, u32 init_from_zero, u3
         one = lbl_8047CFEC;
         fn_800E01F4(obj + 0x2C, one, one, one);
         if ((u8)attach_model != 0) {
-            fn_80169494(*(u32*)(obj + 0x10), *(u32*)(desc + 0x8));
+            psLinkChildGensToJObj(*(u32*)(obj + 0x10), *(u32*)(desc + 0x8));
         }
         *(u32*)(obj + 0x44) = state;
         obj[5] = (u8)byte5;
@@ -2984,7 +2984,7 @@ void fn_80118FB0(u8* obj, u8* desc, u32 state, u32 byte5, u32 init_from_zero, u3
 }
 #endif
 /* 0x801190DC | 0x2E0 */
-extern void fn_80173718(void);
+extern void psCreateGeneratorID(void);
 extern void fn_800D3094(void);
 extern u32 lbl_8047ADAC;
 extern u32 lbl_8047ADA8;
@@ -8866,11 +8866,11 @@ void fn_8013024C(void);
 extern void gamedataGetStatus(void);
 extern void gamedataAttestCreate(void);
 #if 0
-asm void fn_80130660(void) {
+asm void heroPokemonGetCelebi(void) {
 #include "src/game/gs_field_world_fn_80130660.inc"
 }
 #else
-void fn_80130660(u8* arg1) {
+void heroPokemonGetCelebi(u8* arg1) {
     extern u32 gamedataGetStatus(u32 a, u32 b);
     extern void gamedataAttestCreate(u32* a, u32 b, u32 c, u8 d, u8 e);
     extern void fn_801240C4(u8* a, u32 b, u32 c, u32* d);
@@ -8938,11 +8938,11 @@ void fn_80130770(u8* arg1) {
 #endif
 /* 0x80130890 | 0x110 */
 #if 0
-asm void fn_80130890(void) {
+asm void heroPokemonGetHouou(void) {
 #include "src/game/gs_field_world_fn_80130890.inc"
 }
 #else
-void fn_80130890(u8* arg1) {
+void heroPokemonGetHouou(u8* arg1) {
     extern u32 gamedataGetStatus(u32 a, u32 b);
     extern void gamedataAttestCreate(u32* a, u32 b, u32 c, u8 d, u8 e);
     extern void fn_801240C4(u8* a, u32 b, u32 c, u32* d);
@@ -9002,11 +9002,11 @@ void fn_801309A0(u32 arg1) {
 #endif
 /* 0x80130A88 | 0x128 */
 #if 0
-asm void fn_80130A88(void) {
+asm void heroPokemonGetEifie(void) {
 #include "src/game/gs_field_world_fn_80130A88.inc"
 }
 #else
-void fn_80130A88(u32 arg1) {
+void heroPokemonGetEifie(u32 arg1) {
     extern u32 fn_8012A5B0(u8* a, u32 b, u32 c);
     extern u32 gamedataGetStatus(u32 a, u32 b);
     extern void fn_801240C4(u8* a, u32 b, u32 c, u32 d);
@@ -9033,11 +9033,11 @@ void fn_80130A88(u32 arg1) {
 #endif
 /* 0x80130BB0 | 0x128 */
 #if 0
-asm void fn_80130BB0(void) {
+asm void heroPokemonGetBlacky(void) {
 #include "src/game/gs_field_world_fn_80130BB0.inc"
 }
 #else
-void fn_80130BB0(u32 arg1) {
+void heroPokemonGetBlacky(u32 arg1) {
     extern u32 fn_8012A5B0(u8* a, u32 b, u32 c);
     extern u32 gamedataGetStatus(u32 a, u32 b);
     extern void fn_801240C4(u8* a, u32 b, u32 c, u32 d);

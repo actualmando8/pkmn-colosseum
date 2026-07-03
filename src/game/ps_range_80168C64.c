@@ -7,18 +7,18 @@
  * campaign 2026-07-01). All functions asm-only until matched; the
  * range name stays honest until internal TU structure is proven.
  *
- * fn_8016F500 (psinterpret_Main) identification:
+ * psInterpretParticle0 (psinterpret_Main) identification:
  *   - simindex xd-corpus twin: psInterpretParticle0 @ 0x8018F9E0 in
  *     GXXE01 (Pokemon XD), score=0.976 seq=0.979, sz=12736 vs 12592.
  *   - config/GC6E01/symbols.txt / XD symbols.txt confirm the twin name
  *     and size (0x31C0).
  *   - the immediately preceding function in this unit is already named
  *     "psInterpretParticles" (the per-frame driver over all active
- *     particles), which calls fn_8016F500 once per particle - plural
+ *     particles), which calls psInterpretParticle0 once per particle - plural
  *     driver / singular interpreter, matching the XD naming pattern.
  *   - include/game/script/script.h (from a prior campaign) already
  *     carries a matching PSParticle struct (0x94 bytes) and the
- *     prototype for fn_8016F500 as psinterpret_Main(pp, parentCtx).
+ *     prototype for psInterpretParticle0 as psinterpret_Main(pp, parentCtx).
  *     Its field offsets were independently re-verified below against
  *     the retail asm (lerpTimer@0xC, color1Timer@0xE, color2Timer@0x10,
  *     alphaTimer@0x54, sizeXTimer@0x5A, sizeYTimer@0x5C, headingTimer@
@@ -52,7 +52,7 @@
  *     campaign; the real linked symbol names (per current
  *     config/GC6E01/symbols.txt, and used verbatim in the retail asm)
  *     are getFloat, getTime, psApplyOffsetLocalRotation,
- *     psGenerateParticleID0, fn_80173718, modifyDir, modifyDirGenBase
+ *     psGenerateParticleID0, psCreateGeneratorID, modifyDir, modifyDirGenBase
  *     respectively. This file declares those directly.
  *   - PS_FLAG_ORBIT in script.h is documented as 0x8; the retail
  *     physics-integration epilogue (0x801723B8) actually tests bit 29
@@ -96,12 +96,12 @@ extern void psApplyVelocityLocalRotation(PSParticle* pp);               /* 0x801
 extern f32 fn_801ADC7C(void);                                           /* psRandom, 0x801ADC7C */
 extern PSParticle* psGenerateParticleID0(PSParticle* pp, u8 linkNo, u8 bankIdx,
                                           u16 scriptId, void* arg);      /* 0x80169A48 */
-extern PSParticle* fn_80173718(PSParticle* pp, u8 linkNo, u8 bankIdx, u16 scriptId);
+extern PSParticle* psCreateGeneratorID(PSParticle* pp, u8 linkNo, u8 bankIdx, u16 scriptId);
 extern void psCopyGeneratorData(PSParticle* gen, void* peopleObj);       /* 0x80172930 */
 extern void psChangeParticleAppSRT(PSParticle* pp, void* parentObj);    /* 0x8016A878 */
-extern void fn_8016A978(PSParticle* pp, void* parentObj);
+extern void psAttachParticleAppSRT(PSParticle* pp, void* parentObj);
 extern void psChangeGeneratorAppSRT(PSParticle* gen);                   /* 0x8016A79C */
-extern void fn_8016A93C(PSParticle* gen);
+extern void psAttachGeneratorAppSRT(PSParticle* gen);
 extern void genPosUpdate(void* obj);                                    /* 0x80175E88 */
 extern void modifyDir(PSParticle* pp, f32 param);                       /* 0x80172FA8 */
 extern void modifyDirGenBase(PSParticle* pp, f32 a, f32 b, f32 c, f32 d); /* 0x801732A0 */
@@ -109,7 +109,7 @@ extern f32 sqrtf(f32 x);
 extern void applyForceJObj(void* jobj, f32 a, f32 b);                   /* 0x80172BBC */
 extern void setVelToJObj(void* jobj, void* camData);                    /* 0x80172D00 */
 extern u8 U8ClampAdd(u8 cur, s32 delta);                                /* 0x801728B0 */
-extern PSParticle* fn_80172928(PSParticle* pp);                         /* psCleanup, 0x80172928 */
+extern PSParticle* _psListGetNext(PSParticle* pp);                         /* psCleanup, 0x80172928 */
 extern s32 psRemoveParticleAppSRT(PSParticle* pp);                      /* 0x?? */
 extern void psDeletePntJObjwithParticle(PSParticle* pp);
 extern void _psListDelete(PSParticle* pp, PSParticle* parent);
@@ -120,13 +120,13 @@ extern f32 fn_800CE688(f32 x);
 extern void* fn_8019F718(void);
 extern void psSetPointJObj(s32 idx, void* renderObj);
 extern void fn_801A05EC(void* renderObj);
-extern void fn_80172840(void* camSlot);
-extern void fn_80172790(void* camSlot, f32 dx);
-extern void fn_801726E0(void* camSlot, f32 dy);
-extern void fn_80172630(void* camSlot, f32 dz);
+extern void HSD_JObjSetupMatrix(void* camSlot);
+extern void HSD_JObjAddTx(void* camSlot, f32 dx);
+extern void HSD_JObjAddTy(void* camSlot, f32 dy);
+extern void HSD_JObjAddTz(void* camSlot, f32 dz);
 
 /* ======================================================================
- * fn_8016F500 | psinterpret_Main
+ * psInterpretParticle0 | psinterpret_Main
  *
  * Executes one frame of a single particle script. See file header for
  * identification evidence and coverage notes.
@@ -137,7 +137,7 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
     u16 delay;
 
     if (pp->flags & PS_FLAG_PAUSED) {
-        fn_80172928(pp);
+        _psListGetNext(pp);
         return pp;
     }
 
@@ -404,7 +404,7 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
                             (*(u16*)((u8*)pp->peopleObj + 0x12) & 0x40)) {
                             psChangeParticleAppSRT(spawned, pp->parentObj);
                         } else {
-                            fn_8016A978(spawned, pp->parentObj);
+                            psAttachParticleAppSRT(spawned, pp->parentObj);
                         }
                         spawned->positionX = pp->positionX;
                         spawned->positionY = pp->positionY;
@@ -433,7 +433,7 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
                             (*(u16*)((u8*)pp->peopleObj + 0x12) & 0x40)) {
                             psChangeParticleAppSRT(spawned, pp->parentObj);
                         } else {
-                            fn_8016A978(spawned, pp->parentObj);
+                            psAttachParticleAppSRT(spawned, pp->parentObj);
                         }
                         spawned->positionX = pp->positionX;
                         spawned->positionY = pp->positionY;
@@ -492,7 +492,7 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
                         u32* bank = (u32*)lbl_804527C8[pp->bankIndex];
                         u16 scriptId = bank ? (u16)bank[tblIdx] : 0;
                         stream += 3;
-                        gen = fn_80173718(pp, pp->linkNo, pp->bankIndex, scriptId);
+                        gen = psCreateGeneratorID(pp, pp->linkNo, pp->bankIndex, scriptId);
                         if (gen == NULL) break;
                         gen->scriptId = pp->scriptId;
                         psCopyGeneratorData(gen, pp->peopleObj);
@@ -501,7 +501,7 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
                                 (*(u16*)((u8*)pp->peopleObj + 0x12) & 0x40)) {
                                 psChangeGeneratorAppSRT(gen);
                             } else {
-                                fn_8016A93C(gen);
+                                psAttachGeneratorAppSRT(gen);
                             }
                         }
                         gen->flags = (gen->flags & ~0x1F8) | ((loopArg & 0x7) << 3);
@@ -533,7 +533,7 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
             (*(u32*)((u8*)pp->peopleObj + 0x4C))--;
         }
 
-        result = fn_80172928(pp);
+        result = _psListGetNext(pp);
 
         if (pp->parentObj != NULL) {
             if (psRemoveParticleAppSRT(pp) == 0 && parentCtx == NULL) {
@@ -600,13 +600,13 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
 
         camSlot = lbl_80452DC8[slotIdx];
         if (camSlot != NULL) {
-            fn_80172840(camSlot);
-            fn_80172790(camSlot, pp->positionX - *(f32*)((u8*)camSlot + 0x50));
-            fn_801726E0(camSlot, pp->positionY - *(f32*)((u8*)camSlot + 0x60));
-            fn_80172630(camSlot, pp->positionZ - *(f32*)((u8*)camSlot + 0x70));
+            HSD_JObjSetupMatrix(camSlot);
+            HSD_JObjAddTx(camSlot, pp->positionX - *(f32*)((u8*)camSlot + 0x50));
+            HSD_JObjAddTy(camSlot, pp->positionY - *(f32*)((u8*)camSlot + 0x60));
+            HSD_JObjAddTz(camSlot, pp->positionZ - *(f32*)((u8*)camSlot + 0x70));
         }
     }
 
-    fn_80172928(pp);
+    _psListGetNext(pp);
     return pp;
 }

@@ -493,7 +493,7 @@
 "addr": "0x80007FDC",
 "size": 56,
 "label": "gs-engine",
-"confidence": 1.9,
+"confidence": 1.89,
 "seed": null
 },
 {
@@ -32849,7 +32849,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80130660",
+"name": "heroPokemonGetCelebi",
 "addr": "0x80130660",
 "size": 272,
 "label": "field",
@@ -32865,7 +32865,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80130890",
+"name": "heroPokemonGetHouou",
 "addr": "0x80130890",
 "size": 272,
 "label": "field",
@@ -32881,7 +32881,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80130A88",
+"name": "heroPokemonGetEifie",
 "addr": "0x80130A88",
 "size": 296,
 "label": "field",
@@ -32889,7 +32889,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80130BB0",
+"name": "heroPokemonGetBlacky",
 "addr": "0x80130BB0",
 "size": 296,
 "label": "field",
@@ -36913,7 +36913,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80150E68",
+"name": "dataRemoveKeymap",
 "addr": "0x80150E68",
 "size": 380,
 "label": "musyx",
@@ -36945,7 +36945,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801515F4",
+"name": "dataRemoveCurve",
 "addr": "0x801515F4",
 "size": 380,
 "label": "musyx",
@@ -36953,7 +36953,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80151770",
+"name": "dataInsertSDir",
 "addr": "0x80151770",
 "size": 392,
 "label": "musyx",
@@ -36961,7 +36961,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801518F8",
+"name": "dataAddSampleReference",
 "addr": "0x801518F8",
 "size": 216,
 "label": "musyx",
@@ -36969,7 +36969,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801519D0",
+"name": "dataRemoveSampleReference",
 "addr": "0x801519D0",
 "size": 152,
 "label": "musyx",
@@ -36977,7 +36977,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80151A68",
+"name": "dataInsertFX",
 "addr": "0x80151A68",
 "size": 284,
 "label": "musyx",
@@ -36985,7 +36985,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80151B84",
+"name": "dataInsertMacro",
 "addr": "0x80151B84",
 "size": 772,
 "label": "musyx",
@@ -37017,7 +37017,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801521A8",
+"name": "smpcmp",
 "addr": "0x801521A8",
 "size": 16,
 "label": "musyx",
@@ -37025,7 +37025,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801521B8",
+"name": "dataGetSample",
 "addr": "0x801521B8",
 "size": 296,
 "label": "musyx",
@@ -37097,7 +37097,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801525C4",
+"name": "dataExit",
 "addr": "0x801525C4",
 "size": 32,
 "label": "musyx",
@@ -37129,7 +37129,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80152AF8",
+"name": "mcmdPlayMacro",
 "addr": "0x80152AF8",
 "size": 396,
 "label": "musyx",
@@ -37145,7 +37145,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80152D5C",
+"name": "mcmdStartSample",
 "addr": "0x80152D5C",
 "size": 508,
 "label": "musyx",
@@ -37193,7 +37193,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80153874",
+"name": "mcmdSetPanning",
 "addr": "0x80153874",
 "size": 156,
 "label": "musyx",
@@ -37201,7 +37201,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80153910",
+"name": "mcmdSetSurroundPanning",
 "addr": "0x80153910",
 "size": 156,
 "label": "musyx",
@@ -37241,7 +37241,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80153EE8",
+"name": "mcmdVolumeSelect",
 "addr": "0x80153EE8",
 "size": 260,
 "label": "musyx",
@@ -37249,7 +37249,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80153FEC",
+"name": "mcmdPanningSelect",
 "addr": "0x80153FEC",
 "size": 260,
 "label": "musyx",
@@ -37257,7 +37257,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801540F0",
+"name": "mcmdPitchWheelSelect",
 "addr": "0x801540F0",
 "size": 260,
 "label": "musyx",
@@ -37265,7 +37265,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801541F4",
+"name": "mcmdModWheelSelect",
 "addr": "0x801541F4",
 "size": 260,
 "label": "musyx",
@@ -37273,7 +37273,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801542F8",
+"name": "mcmdPedalSelect",
 "addr": "0x801542F8",
 "size": 260,
 "label": "musyx",
@@ -37281,7 +37281,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801543FC",
+"name": "mcmdPortamentoSelect",
 "addr": "0x801543FC",
 "size": 260,
 "label": "musyx",
@@ -37289,7 +37289,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80154500",
+"name": "mcmdReverbSelect",
 "addr": "0x80154500",
 "size": 260,
 "label": "musyx",
@@ -37297,7 +37297,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80154604",
+"name": "mcmdPreAuxASelect",
 "addr": "0x80154604",
 "size": 260,
 "label": "musyx",
@@ -37305,7 +37305,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80154708",
+"name": "mcmdPreAuxBSelect",
 "addr": "0x80154708",
 "size": 260,
 "label": "musyx",
@@ -37313,7 +37313,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8015480C",
+"name": "mcmdPostAuxBSelect",
 "addr": "0x8015480C",
 "size": 260,
 "label": "musyx",
@@ -37321,7 +37321,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80154910",
+"name": "mcmdSurroundPanningSelect",
 "addr": "0x80154910",
 "size": 260,
 "label": "musyx",
@@ -37329,7 +37329,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80154A14",
+"name": "mcmdDopplerSelect",
 "addr": "0x80154A14",
 "size": 260,
 "label": "musyx",
@@ -37337,7 +37337,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80154B18",
+"name": "mcmdTremoloSelect",
 "addr": "0x80154B18",
 "size": 260,
 "label": "musyx",
@@ -37345,7 +37345,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80154C1C",
+"name": "mcmdAuxAFXSelect",
 "addr": "0x80154C1C",
 "size": 380,
 "label": "musyx",
@@ -37353,7 +37353,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80154D98",
+"name": "mcmdAuxBFXSelect",
 "addr": "0x80154D98",
 "size": 380,
 "label": "musyx",
@@ -37417,7 +37417,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801557EC",
+"name": "macHandleActive",
 "addr": "0x801557EC",
 "size": 3928,
 "label": "musyx",
@@ -37425,7 +37425,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80156744",
+"name": "macHandle",
 "addr": "0x80156744",
 "size": 336,
 "label": "musyx",
@@ -37481,7 +37481,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80156DE0",
+"name": "macStart",
 "addr": "0x80156DE0",
 "size": 1080,
 "label": "musyx",
@@ -40049,7 +40049,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80169340",
+"name": "psSetRandomVelocityScaling",
 "addr": "0x80169340",
 "size": 40,
 "label": "particle",
@@ -40057,7 +40057,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80169368",
+"name": "psSetNodeScaling",
 "addr": "0x80169368",
 "size": 40,
 "label": "particle",
@@ -40073,7 +40073,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801693DC",
+"name": "psSetParticleTexScaling",
 "addr": "0x801693DC",
 "size": 40,
 "label": "particle",
@@ -40089,7 +40089,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8016945C",
+"name": "psSetVelocityRotationInLocal",
 "addr": "0x8016945C",
 "size": 40,
 "label": "particle",
@@ -40097,7 +40097,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80169484",
+"name": "psUnlinkChildGensFromJObj",
 "addr": "0x80169484",
 "size": 16,
 "label": "particle",
@@ -40105,7 +40105,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80169494",
+"name": "psLinkChildGensToJObj",
 "addr": "0x80169494",
 "size": 20,
 "label": "particle",
@@ -40265,7 +40265,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8016A93C",
+"name": "psAttachGeneratorAppSRT",
 "addr": "0x8016A93C",
 "size": 60,
 "label": "particle",
@@ -40273,7 +40273,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8016A978",
+"name": "psAttachParticleAppSRT",
 "addr": "0x8016A978",
 "size": 60,
 "label": "particle",
@@ -40321,7 +40321,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8016C150",
+"name": "psDispSubMakePolygon",
 "addr": "0x8016C150",
 "size": 3292,
 "label": "particle",
@@ -40337,7 +40337,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8016D8A0",
+"name": "psDispSubPointTrail",
 "addr": "0x8016D8A0",
 "size": 1124,
 "label": "particle",
@@ -40345,7 +40345,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8016DD04",
+"name": "psDispSubAPPSRTPoint",
 "addr": "0x8016DD04",
 "size": 1780,
 "label": "particle",
@@ -40393,7 +40393,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8016F2F4",
+"name": "psSetupTevInvalidState",
 "addr": "0x8016F2F4",
 "size": 12,
 "label": "particle",
@@ -40417,7 +40417,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8016F500",
+"name": "psInterpretParticle0",
 "addr": "0x8016F500",
 "size": 12592,
 "label": "particle",
@@ -40425,7 +40425,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80172630",
+"name": "HSD_JObjAddTz",
 "addr": "0x80172630",
 "size": 176,
 "label": "particle",
@@ -40433,7 +40433,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801726E0",
+"name": "HSD_JObjAddTy",
 "addr": "0x801726E0",
 "size": 176,
 "label": "particle",
@@ -40441,7 +40441,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80172790",
+"name": "HSD_JObjAddTx",
 "addr": "0x80172790",
 "size": 176,
 "label": "particle",
@@ -40449,7 +40449,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80172840",
+"name": "HSD_JObjSetupMatrix",
 "addr": "0x80172840",
 "size": 112,
 "label": "particle",
@@ -40465,7 +40465,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80172908",
+"name": "HSD_MTXSRT",
 "addr": "0x80172908",
 "size": 32,
 "label": "particle",
@@ -40473,7 +40473,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80172928",
+"name": "_psListGetNext",
 "addr": "0x80172928",
 "size": 8,
 "label": "particle",
@@ -40561,7 +40561,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80173718",
+"name": "psCreateGeneratorID",
 "addr": "0x80173718",
 "size": 2176,
 "label": "particle",
@@ -48217,7 +48217,7 @@
 "seed": null
 },
 {
-"name": "fn_801CA91C",
+"name": "scriptGetPremium",
 "addr": "0x801CA91C",
 "size": 36,
 "label": "field",
@@ -48233,7 +48233,7 @@
 "seed": null
 },
 {
-"name": "fn_801CA990",
+"name": "scriptGetPokedoru",
 "addr": "0x801CA990",
 "size": 44,
 "label": "field",
@@ -48241,7 +48241,7 @@
 "seed": null
 },
 {
-"name": "fn_801CA9BC",
+"name": "scriptSetEventCol",
 "addr": "0x801CA9BC",
 "size": 52,
 "label": "field",
@@ -48249,7 +48249,7 @@
 "seed": null
 },
 {
-"name": "fn_801CA9F0",
+"name": "scriptGetEventColID",
 "addr": "0x801CA9F0",
 "size": 8,
 "label": "field",
@@ -48257,7 +48257,7 @@
 "seed": null
 },
 {
-"name": "fn_801CA9F8",
+"name": "scriptSetEventColID",
 "addr": "0x801CA9F8",
 "size": 16,
 "label": "field",
@@ -48265,7 +48265,7 @@
 "seed": null
 },
 {
-"name": "fn_801CAA08",
+"name": "scriptSetCol",
 "addr": "0x801CAA08",
 "size": 44,
 "label": "field",
@@ -48297,7 +48297,7 @@
 "seed": null
 },
 {
-"name": "fn_801CAAF4",
+"name": "scriptCheckTemochiPokemon",
 "addr": "0x801CAAF4",
 "size": 376,
 "label": "field",
@@ -48305,7 +48305,7 @@
 "seed": null
 },
 {
-"name": "fn_801CAC6C",
+"name": "scriptStoreTemochiPokemon",
 "addr": "0x801CAC6C",
 "size": 172,
 "label": "field",
@@ -48313,7 +48313,7 @@
 "seed": null
 },
 {
-"name": "fn_801CAD18",
+"name": "scriptGetEarthRibbon",
 "addr": "0x801CAD18",
 "size": 136,
 "label": "field",
@@ -48353,7 +48353,7 @@
 "seed": null
 },
 {
-"name": "fn_801CAF0C",
+"name": "scriptGetDarkPointZeroPokemonNum",
 "addr": "0x801CAF0C",
 "size": 200,
 "label": "field",
@@ -48361,7 +48361,7 @@
 "seed": null
 },
 {
-"name": "fn_801CAFD4",
+"name": "scriptGetDarkPokemonNum",
 "addr": "0x801CAFD4",
 "size": 164,
 "label": "field",
@@ -48369,7 +48369,7 @@
 "seed": null
 },
 {
-"name": "fn_801CB078",
+"name": "scriptGetPokemonNum",
 "addr": "0x801CB078",
 "size": 140,
 "label": "field",
@@ -48385,7 +48385,7 @@
 "seed": "prefix"
 },
 {
-"name": "fn_801CB148",
+"name": "scriptFloorCharSetDisp",
 "addr": "0x801CB148",
 "size": 56,
 "label": "field",
@@ -50212,7 +50212,7 @@
 "name": "fn_801E075C",
 "addr": "0x801E075C",
 "size": 644,
-"label": "field",
+"label": "gs-engine",
 "confidence": 1.9,
 "seed": null
 },
@@ -70733,14 +70733,14 @@
 {
 "label": "field",
 "start": "0x801DF790",
-"end": "0x801e09e0",
-"count": 4
+"end": "0x801e075c",
+"count": 3
 },
 {
 "label": "gs-engine",
-"start": "0x801E09E0",
+"start": "0x801E075C",
 "end": "0x801e11cc",
-"count": 7
+"count": 8
 },
 {
 "label": "particle",

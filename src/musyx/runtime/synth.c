@@ -421,14 +421,14 @@ extern u32 fn_801643D8(u32 size);             /* salMalloc */
 extern void fn_80157360(SYNTH_VOICE* sv);     /* vidRemoveVoiceReferences */
 extern u32 fn_801576B0(SYNTH_VOICE* sv);      /* vidMakeRoot */
 extern u32 fn_801576C4(SYNTH_VOICE* sv, u32 isMaster); /* vidMakeNew */
-extern u32 fn_80156DE0(u16 macId, s32 prio, u8 maxVoices, u32 allocId, u8 key, u8 vol, u8 panning,
+extern u32 macStart(u16 macId, s32 prio, u8 maxVoices, u32 allocId, u8 key, u8 vol, u8 panning,
                         u8 midi, u8 midiSet, u8 section, u16 step, u16 trackid, u32 vidFlag,
                         u8 vGroup, u8 studio, u32 itd); /* macStart */
 extern void fn_801603C0(u32 ctrl, u32 midi, u32 midiSet, u32 value); /* inpSetMidiCtrl */
 extern u32 fn_80161934(u8 idx, u8 param, u32 midi, u32 midiSet); /* inpGetAuxA */
 extern u32 fn_801619E8(u8 idx, u8 param, u32 midi, u32 midiSet); /* inpGetAuxB */
 extern void fn_80161A9C(u32 a);               /* inpInit */
-extern void fn_80156744(u32 deltaTime);       /* macHandle */
+extern void macHandle(u32 deltaTime);       /* macHandle */
 
 /* -------------------------------------------------------------------
  * synthGetTicksPerSecond / synthSetBpm's table
@@ -575,7 +575,7 @@ static u32 StartLayer(u16 layerID, s32 prio, u8 maxVoices, u16 allocId, u8 key, 
 
         switch (l->id & 0xC000) {
         case 0:
-            new_id = fn_80156DE0(l->id, prio, maxVoices, allocId, k | (key & 0x80), v, p, midi,
+            new_id = macStart(l->id, prio, maxVoices, allocId, k | (key & 0x80), v, p, midi,
                                   midiSet, section, step, trackid, 0, vGroup, studio, itd);
             break;
         case 0x4000:
@@ -652,7 +652,7 @@ static u32 StartKeymap(u16 keymapID, s32 prio, u8 maxVoices, u16 allocId, u8 key
                 if (vid != 0xffffffff) {
                     return vid;
                 }
-                return fn_80156DE0(keymap[o].id, prio, maxVoices, allocId, k | (key & 0x80), vol,
+                return macStart(keymap[o].id, prio, maxVoices, allocId, k | (key & 0x80), vol,
                                     panning, midi, midiSet, section, step, trackid, vidFlag,
                                     vGroup, studio, itd);
             }
@@ -689,7 +689,7 @@ u32 fn_8014ABE8(u16 id, u8 prio, u8 max, u8 key, u8 vol, u8 panning, u8 midi, u8
         if (vid != 0xFFFFFFFF) {
             return vid;
         }
-        return fn_80156DE0(id, prio, max, id, key, vol, panning, midi, midiSet, section, step,
+        return macStart(id, prio, max, id, key, vol, panning, midi, midiSet, section, step,
                             trackid, 1, vGroup, studio, itd);
     }
     case 0x4000: {
@@ -1313,7 +1313,7 @@ void synthHandle(u32 deltaTime) {
         return;
     }
 
-    fn_80156744(deltaTime);
+    macHandle(deltaTime);
 
     {
         SYNTH_JOBTAB* jTab = &lbl_804354A4[lbl_8047AF19];

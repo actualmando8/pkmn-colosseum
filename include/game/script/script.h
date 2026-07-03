@@ -297,7 +297,7 @@ void psinterpret_RunAll(u32 linkMask);            /* psInterpretParticles */
  *  a wait/yield is encountered or the script terminates.
  *  parentCtx is passed when recursively spawning child scripts.
  *  Returns the next particle in the list (for iteration). */
-PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx);  /* fn_8016F500 */
+PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx);  /* psInterpretParticle0 */
 
 /* ======================================================================
  * Helper function prototypes (called by the interpreter)
@@ -314,13 +314,13 @@ u8* psReadFloat(u8* streamPtr, f32* outValue);    /* getFloat */
 PSParticle* psSpawnScript(PSParticle* parent, u8 linkNo, u8 bankIdx, u16 scriptId, void* arg);  /* fn_80169A48 */
 
 /** Spawn a new generator script (creates NPC/people objects). */
-PSParticle* psSpawnGenerator(u8 linkNo, u8 bankIdx, u16 scriptId);  /* fn_80173718 */
+PSParticle* psSpawnGenerator(u8 linkNo, u8 bankIdx, u16 scriptId);  /* psCreateGeneratorID */
 
 /** Initialize a particle with default values after spawn. */
 void psInitParticle(PSParticle* pp);              /* fn_80172AE0 */
 
 /** Clean up a particle on termination. */
-PSParticle* psCleanup(PSParticle* pp);            /* fn_80172928 */
+PSParticle* psCleanup(PSParticle* pp);            /* _psListGetNext */
 
 /** Update particle's velocity based on position data. */
 void psUpdateVelocity(PSParticle* pp, f32* velocityVec);  /* fn_801729EC */
@@ -344,13 +344,13 @@ void psPeopleLinkUpdate(PSParticle* pp);          /* fn_8016A6FC */
 void psPeopleAttach(PSParticle* pp, void* parent);    /* fn_8016A878 */
 
 /** Attach particle to a people/NPC object (standalone). */
-void psPeopleAttachStandalone(PSParticle* pp, void* parent);  /* fn_8016A978 */
+void psPeopleAttachStandalone(PSParticle* pp, void* parent);  /* psAttachParticleAppSRT */
 
 /** Detach particle from its people/NPC object. */
 void psPeopleDetach(PSParticle* pp);              /* fn_8016A79C */
 
 /** Detach particle standalone. */
-void psPeopleDetachStandalone(PSParticle* pp);    /* fn_8016A93C */
+void psPeopleDetachStandalone(PSParticle* pp);    /* psAttachGeneratorAppSRT */
 
 /** Initialize generator data for a spawned generator. */
 void psGeneratorInit(PSParticle* gen, void* owner);   /* fn_80172930 */
@@ -365,6 +365,6 @@ u8 psClampColorByte(u8 current);                  /* U8ClampAdd */
 void psPeopleUpdateMatrices(void* people);        /* genPosUpdate */
 
 /** Initialize people/NPC attachment data. */
-void psSetupMotion(PSParticle* pp, void* owner, void* posData, void* rotData, void* scaleData, void* reserved);  /* fn_80172908 */
+void psSetupMotion(PSParticle* pp, void* owner, void* posData, void* rotData, void* scaleData, void* reserved);  /* HSD_MTXSRT */
 
 #endif /* SCRIPT_H */
