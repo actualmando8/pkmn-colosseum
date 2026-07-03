@@ -28,7 +28,7 @@ extern void ARQPostRequest();
 extern void InitStreamBuffers();
 extern void aramQueueCallback();
 extern void aramUploadData();
-extern u32 inpGetMidiCtrl(u32 ctrl, u32 bank, u32 channel);
+extern u16 inpGetMidiCtrl(u8 ctrl, u8 channel, u8 set); /* true signature, verified via disassembly */
 extern void salCalcVolume(u32 volumeArg, f32* out, u32 voiceIndex, f32 a, f32 b, f32 c, u32 hasPan, u32 studioFlag);
 extern void salCallback();
 extern u8 jumptable_80369CB0[];
@@ -97,7 +97,30 @@ extern void  fn_80142984(u32 id);       /* peopleFieldGetByID */
 /* shared with synthdata.c (sndBSearch comparator signature) */
 typedef s32 (*PeopleCmpFn)(u8* a, u8* b);
 
-extern u32 _GetInputValue(u8* obj, u8* motionBase, u32 p1, u32 p2);
+extern u32 _GetInputValue(u8* obj, u8* motionBase, u8 p1, u8 p2); /* true return type IS
+                                                                      * u32 -- the callee
+                                                                      * explicitly casts its
+                                                                      * own return expression
+                                                                      * to (u16) internally
+                                                                      * (verified: changing
+                                                                      * this to a declared u16
+                                                                      * return regressed the
+                                                                      * 11 already-matched
+                                                                      * inpGet* callers, which
+                                                                      * defensively re-mask a
+                                                                      * u16-typed return value
+                                                                      * that retail does not). */
+/* inpGetVolume, 0x801615D4: same cached-getter shape as the 11 already-matched
+ * inpGet* below (bit 0x1, motion struct at +0x218, cached value at +0x238). */
+u32 inpGetVolume(u8* obj) {
+    u32 flags;
+    flags = *(u32*)(obj + 0x214);
+    if (!(flags & 0x1)) {
+        return *(u16*)(obj + 0x238);
+    }
+    *(u32*)(obj + 0x214) = flags & ~0x1u;
+    return _GetInputValue(obj, obj + 0x218, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+}
 #if 0
 asm void inpGetPanning(void) {
 #include "src/game/people/people_field_inpGetPanning.inc"
@@ -278,6 +301,35 @@ u32 inpGetTremolo(u8* obj) {
 #pragma push
 #pragma optimization_level 4
 #pragma optimizewithasm off
+/* fn_80161934 = inpGetAuxA (0x80161934) -- same shape as fn_801619E8/inpGetAuxB
+ * below but using lbl_80369C90 (dirtyMask table) and lbl_80435B74 (inpAuxA,
+ * already-known identity) instead of lbl_80369CA0/lbl_804356F4. Parked at
+ * ~88% (matches fn_801619E8's pre-existing residual): remaining diff is a
+ * register-allocation/scheduling artifact (retail interleaves the dirtyMask
+ * table load with the inpGlobalMIDIDirtyFlags row computation; this
+ * three-named-local shape schedules them sequentially instead). */
+extern u32 lbl_80449390[];
+extern u32 lbl_80369C90[];
+extern u8  lbl_80435B74[];
+u32 fn_80161934(u8 idx, u8 index, u8 midi, u8 midiSet) {
+    u32* row = ((u32(*)[16])lbl_80449390)[midiSet];
+    u32 t2 = lbl_80369C90[index];
+    u32 t1 = row[midi];
+    u32 mask = t2 & t1;
+    u32 nonzero = ((-mask | mask) >> 31);
+    if (nonzero) {
+        row[midi] = t1 & ~t2;
+    }
+    if (nonzero) {
+        return _GetInputValue(NULL, lbl_80435B74 + (u32)idx * 0x90 + (u32)index * 0x24, midi, midiSet);
+    } else {
+        return *(u16*)(lbl_80435B74 + (u32)idx * 0x90 + (u32)index * 0x24 + 0x20);
+    }
+}
+#pragma pop
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
 #if 0
 asm void fn_801619E8(void) {
 #include "src/game/people/people_field_fn_801619E8.inc"
@@ -286,19 +338,19 @@ asm void fn_801619E8(void) {
 extern u32 lbl_80449390[];
 extern u32 lbl_80369CA0[];
 extern u8  lbl_804356F4[];
-u32 fn_801619E8(u8 idx, u8 r4, u32 r5, u32 r6) {
-    u32* row = lbl_80449390 + (u8)r6 * 16;
-    u32 t2 = lbl_80369CA0[r4];
-    u32 t1 = row[(u8)r5];
+u32 fn_801619E8(u8 idx, u8 index, u8 midi, u8 midiSet) {
+    u32* row = ((u32(*)[16])lbl_80449390)[midiSet];
+    u32 t2 = lbl_80369CA0[index];
+    u32 t1 = row[midi];
     u32 mask = t2 & t1;
     u32 nonzero = ((-mask | mask) >> 31);
     if (nonzero) {
-        row[(u8)r5] = t1 & ~t2;
+        row[midi] = t1 & ~t2;
     }
     if (nonzero) {
-        return _GetInputValue(NULL, lbl_804356F4 + (u32)idx * 0x90 + (u32)r4 * 0x24, r5, r6);
+        return _GetInputValue(NULL, lbl_804356F4 + (u32)idx * 0x90 + (u32)index * 0x24, midi, midiSet);
     } else {
-        return *(u16*)(lbl_804356F4 + (u32)idx * 0x90 + (u32)r4 * 0x24 + 0x20);
+        return *(u16*)(lbl_804356F4 + (u32)idx * 0x90 + (u32)index * 0x24 + 0x20);
     }
 }
 #endif
@@ -314,7 +366,14 @@ asm void inpTranslateExCtrl(void) {
 /* WALL (w_sg2 2026-06-18, measured 99.64% @ opt_level 4): only residual is anonymous
    jumptable @174@ha/l vs named jumptable_80369CB0@ha/l (numeric-vs-named reloc artifact,
    not C-controllable). Real C is active for coverage. NOTE: needs opt_level 4 (opt 0 = 58%). */
-u32 inpTranslateExCtrl(u32 r3) {
+/* dont_inline: inpAddCtrl calls this via a real `bl` in retail (confirmed by
+ * disassembly @0x80160F10) -- without this, MWCC's -inline auto inlines it
+ * there instead (turning the call into a duplicated jump-table dispatch).
+ * NOTE: at some OTHER call sites (fn_80161D90/fn_80161E8C) retail fully
+ * inlines this same function via a jump table -- another same-callee,
+ * different-call-site inlining split; those two remain parked/unmatched. */
+#pragma dont_inline on
+u8 inpTranslateExCtrl(u8 r3) {
     u32 key = r3 & 0xFF;
     switch (key) {
     case 0x80: return 0x80;
@@ -329,10 +388,16 @@ u32 inpTranslateExCtrl(u32 r3) {
     default:   return r3;
     }
 }
+#pragma dont_inline reset
 #endif
 #pragma pop
 extern void fn_80160BDC(void);
-extern void fn_801603C0(u32 ctrl, u32 bank, u32 channel, u32 value);
+extern void fn_801603C0(u8 ctrl, u8 channel, u8 set, u8 value); /* inpSetMidiCtrl -- true
+                                                                  * signature is all-u8
+                                                                  * (verified: callers don't
+                                                                  * re-mask already-clean u8
+                                                                  * args when this is declared
+                                                                  * u8, matching retail) */
 extern u32  salInitDspCtrl(u8 a, u8 b, u8 c);
 extern void salExitDspCtrl(void);
 #pragma push
@@ -3577,5 +3642,696 @@ void voiceInitLastStarted(void) {
 #pragma optimizewithasm off
 u32 adsrConvertTimeCents(s32 tc) {
     return (u32)(1000.f * (f32)fn_800CE358(2.0, 1.2715658e-08f * tc));
+}
+#pragma pop
+
+/* ===== synth_adsr.c: salChangeADSRState/adsrSetup/adsrStartRelease/
+ * adsrRelease/adsrHandle/adsrHandleLowPrecision, 0x80158D2C-0x80159490 =====
+ * identity: reference synth_adsr.c, byte-for-byte match to Colosseum's
+ * disassembly for all struct offsets and control flow (no pre-2.0.1
+ * deviations found here, unlike adsrConvertTimeCents's pow/powf swap).
+ * ADSR_VARS layout confirmed field-by-field from disassembly (mode@0x00,
+ * state@0x01, cnt@0x04, currentVolume@0x08, currentIndex@0x0C,
+ * currentDelta@0x10, data.dls: aTime@0x14, dTime@0x18, sLevel@0x1C,
+ * rTime@0x20, cutOff@0x24, aMode@0x26) -- this is exactly the reference
+ * header's natural (unpacked) alignment, no #pragma pack needed.
+ * dspAttenuationTab = lbl_803692C8 (u16[], confirmed by disassembly at
+ * both salChangeADSRState and adsrHandle). dspScale2IndexTab = lbl_8036944C
+ * (already known, reused here in adsrStartRelease).
+ * RESIDUAL-SPLIT-MAP: adsrRelease's call to adsrStartRelease(adsr,
+ * adsr->data.dls.rTime) is FULLY INLINED in retail (no `bl
+ * adsrStartRelease` anywhere in adsrRelease's disassembly -- the whole
+ * mode-0/mode-1 switch body is duplicated in place), even though
+ * adsrStartRelease remains a real standalone `bl` target at its other
+ * call sites (e.g. 0x8015C640, 0x8015BEF8). Mirrors the vidGetInternalId/
+ * voiceKillSound case: same callee, inlined at one call site and not at
+ * another. Source-order placement of adsrStartRelease's definition
+ * *before* adsrRelease in this file is required to get MWCC's -inline
+ * auto to make the same call. adsrGetIndex (static, 2 call sites within
+ * salChangeADSRState/adsrHandle) is always inlined in retail (no
+ * standalone symbol) -- matches reference's `static` linkage. */
+extern u16 lbl_803692C8[]; /* dspAttenuationTab */
+
+typedef struct {
+    u8 mode;
+    u8 state;
+    u32 cnt;
+    s32 currentVolume;
+    s32 currentIndex;
+    s32 currentDelta;
+    union {
+        struct {
+            u32 aTime;
+            u32 dTime;
+            u16 sLevel;
+            u32 rTime;
+            u16 cutOff;
+            u8 aMode;
+        } dls;
+        struct {
+            u32 aTime;
+            u32 dTime;
+            u16 sLevel;
+            u32 rTime;
+        } linear;
+    } data;
+} AdsrVars;
+
+static u32 adsrGetIndex(AdsrVars* adsr) {
+    s32 i = 193 - ((adsr->currentIndex + 0x8000) >> 16);
+    return i < 0 ? 0 : i;
+}
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+u32 salChangeADSRState(AdsrVars* adsr) {
+    u32 VoiceDone;
+    VoiceDone = FALSE;
+
+    switch (adsr->mode) {
+    case 0:
+        switch (adsr->state) {
+        case 0: {
+            if ((adsr->cnt = adsr->data.dls.aTime)) {
+                adsr->state = 1;
+                adsr->currentVolume = 0;
+                adsr->currentDelta = 0x7fff0000 / adsr->data.dls.aTime;
+                goto done;
+            }
+        }
+        case 1: {
+            if ((adsr->cnt = adsr->data.dls.dTime)) {
+                adsr->state = 2;
+                adsr->currentVolume = 0x7fff0000;
+                adsr->currentDelta =
+                    -((0x7fff0000 - (adsr->data.dls.sLevel * 0x10000)) / adsr->data.dls.dTime);
+                goto done;
+            }
+        }
+        case 2: {
+            if (adsr->data.dls.sLevel != 0) {
+                adsr->state = 3;
+                adsr->currentVolume = adsr->data.dls.sLevel << 0x10;
+                adsr->currentDelta = 0;
+                goto done;
+            }
+        }
+        case 4: {
+            break;
+        }
+        default:
+            goto done;
+        }
+        adsr->currentVolume = 0;
+        VoiceDone = TRUE;
+        break;
+    case 1:
+        switch (adsr->state) {
+        case 0: {
+            if ((adsr->cnt = adsr->data.dls.aTime)) {
+                adsr->state = 1;
+                if (adsr->data.dls.aMode == 0) {
+                    adsr->currentVolume = 0;
+                    adsr->currentDelta = 0x7fff0000 / adsr->cnt;
+                } else {
+                    adsr->currentVolume = adsr->currentIndex = 0;
+                    adsr->currentDelta = 0xc10000 / adsr->cnt;
+                }
+                goto done;
+            }
+        }
+        case 1: {
+            adsr->cnt = adsr->data.dls.dTime * (((0xc1u - adsr->data.dls.sLevel) * 0x10000) / 0xc1) >> 16;
+            if (adsr->cnt) {
+                adsr->state = 2;
+                adsr->currentVolume = 0x7fff0000;
+                adsr->currentIndex = 0xc10000;
+                adsr->currentDelta = -(((0xc1 - (u32)adsr->data.dls.sLevel) * 0x10000) / adsr->cnt);
+                goto done;
+            }
+        }
+        case 2: {
+            if (adsr->data.dls.sLevel) {
+                adsr->state = 3;
+                adsr->currentIndex = adsr->data.dls.sLevel << 16;
+                adsr->currentVolume = lbl_803692C8[adsrGetIndex(adsr)] << 16;
+                adsr->currentDelta = 0;
+                goto done;
+            }
+            break;
+        }
+        case 4: {
+            break;
+        }
+        default:
+            goto done;
+        }
+        adsr->currentVolume = 0;
+        VoiceDone = TRUE;
+        break;
+    }
+done:
+    return VoiceDone;
+}
+#pragma pop
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+u32 adsrSetup(AdsrVars* adsr) {
+    adsr->state = 0;
+    return salChangeADSRState(adsr);
+}
+#pragma pop
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+u32 adsrStartRelease(AdsrVars* adsr, u32 rtime) {
+    switch (adsr->mode) {
+    case 0:
+        adsr->state = 4;
+        adsr->cnt = rtime;
+        if (rtime == 0) {
+            adsr->cnt = 1;
+            adsr->currentDelta = 0;
+            return 1;
+        }
+        adsr->currentDelta = -(adsr->currentVolume / rtime);
+        break;
+    case 1:
+        if (adsr->data.dls.aMode == 0 && adsr->state == 1) {
+            adsr->currentIndex = (193 - lbl_8036944C[adsr->currentVolume >> 21]) * 0x10000;
+        }
+
+        adsr->cnt = (u32)(3.238342E-4f * (f32)adsr->currentIndex * (f32)rtime) >> 12;
+        adsr->state = 4;
+        if (adsr->cnt == 0) {
+            adsr->cnt = 1;
+            adsr->currentDelta = adsr->currentIndex = adsr->currentVolume = 0;
+            return 1;
+        }
+
+        adsr->currentDelta = -(adsr->currentIndex / adsr->cnt);
+        break;
+    }
+
+    return 0;
+}
+#pragma pop
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+u32 adsrRelease(AdsrVars* adsr) {
+    switch (adsr->mode) {
+    case 0:
+    case 1:
+        return adsrStartRelease(adsr, adsr->data.dls.rTime);
+    }
+
+    return FALSE;
+}
+#pragma pop
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+u32 adsrHandle(AdsrVars* adsr, u16* adsr_start, u16* adsr_delta) {
+    s32 old_volume;
+    u32 VoiceDone;
+    s32 vDelta;
+
+    VoiceDone = FALSE;
+
+    switch (adsr->mode) {
+    case 0:
+        if (adsr->state != 3) {
+            old_volume = adsr->currentVolume;
+            adsr->currentVolume += adsr->currentDelta;
+            *adsr_start = old_volume >> 16;
+            if (adsr->currentDelta >= 0) {
+                *adsr_delta = adsr->currentDelta >> 21;
+            } else {
+                *adsr_delta = -(-adsr->currentDelta >> 21);
+            }
+
+            if (--adsr->cnt == 0) {
+                VoiceDone = salChangeADSRState(adsr);
+            }
+        } else {
+            *adsr_start = adsr->currentVolume >> 16;
+            *adsr_delta = 0;
+        }
+        break;
+    case 1:
+        if (adsr->state != 3) {
+            old_volume = adsr->currentVolume;
+            if (adsr->data.dls.aMode == 0 && adsr->state == 1) {
+                adsr->currentVolume += adsr->currentDelta;
+            } else {
+                adsr->currentIndex += adsr->currentDelta;
+                adsr->currentVolume = lbl_803692C8[adsrGetIndex(adsr)] << 16;
+            }
+            *adsr_start = old_volume >> 16;
+            vDelta = adsr->currentVolume - old_volume;
+            if (vDelta >= 0) {
+                *adsr_delta = vDelta >> 21;
+            } else {
+                *adsr_delta = -(-vDelta >> 21);
+            }
+
+            if (--adsr->cnt == 0) {
+                VoiceDone = salChangeADSRState(adsr);
+            }
+        } else {
+            *adsr_start = adsr->currentVolume >> 16;
+            *adsr_delta = 0;
+        }
+        break;
+    }
+
+    return VoiceDone;
+}
+#pragma pop
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+u32 adsrHandleLowPrecision(AdsrVars* adsr, u16* adsr_start, u16* adsr_delta) {
+    u8 i;
+
+    for (i = 0; i < 15; i++) {
+        if (adsrHandle(adsr, adsr_start, adsr_delta)) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+#pragma pop
+
+/* ===== snd_midictrl.c: inp* cluster, 0x8015FFD4-0x801610F4 =====
+ * identity: reference snd_midictrl.c. Statics identified via symbol-map
+ * size-run correlation against XD's contiguous run (inpGlobalMIDIDirtyFlags
+ * 0x200, midi_ctrl 0x4300, inpChannelDefaults 0x480, fx_ctrl 0x2180,
+ * inpFXChannelDefaults 0x240, midi_lastNote 0x80, fx_lastNote 0x40) mapped
+ * onto Colosseum's config/GC6E01/symbols.txt run (lbl_80449390 0x200,
+ * lbl_80449590 0x4300, lbl_8044D890 0x80, lbl_8044D910 0x2180,
+ * lbl_8044FA90 0x40, lbl_8044FAD0 0x80, lbl_8044FB50 0x40) -- note
+ * inpChannelDefaults/inpFXChannelDefaults are 6x SMALLER than XD's
+ * (0x80/0x40 vs 0x480/0x240) because Colosseum's pre-2.0.1
+ * CHANNEL_DEFAULTS is just `u8 pbRange` (1 byte) -- the lpfLower/
+ * UpperFrqBoundary fields are a >=2.0.1 addition (confirmed by
+ * disassembly: fn_80160ED4/inpResetChannelDefaults only ever touches
+ * offset 0x0, never the lpf fields the reference has under
+ * MUSY_VERSION>=2.0.1). inpColdMIDIDefaults/inpWarmMIDIDefaults (both
+ * 134-byte tables, padded to 0x88 in .rodata) = lbl_80273338/
+ * lbl_802733C0 (data already 100% matched in this unit -- no new data
+ * needed, just extern declarations by address). */
+extern u32 lbl_80449390[];            /* inpGlobalMIDIDirtyFlags (flat; matches existing
+                                        * extern in fn_801619E8 -- must not redeclare with
+                                        * a conflicting sized type) */
+extern u8  lbl_80449590[8][16][134];  /* midi_ctrl */
+extern u8  lbl_8044D890[8][16];       /* inpChannelDefaults (pre-2.0.1: just pbRange) */
+extern u8  lbl_8044D910[64][134];     /* fx_ctrl */
+extern u8  lbl_8044FA90[64];          /* inpFXChannelDefaults (pre-2.0.1: just pbRange) */
+extern u8  lbl_8044FAD0[8][16];       /* midi_lastNote */
+extern u8  lbl_8044FB50[64];          /* fx_lastNote */
+extern const u8 lbl_80273338[134];    /* inpColdMIDIDefaults */
+extern const u8 lbl_802733C0[134];    /* inpWarmMIDIDefaults */
+extern void inpSetMidiLastNote(u8 midi, u8 midiSet, u8 key);
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+void fn_8016039C(u8 chan, u8 midiSet, s32 flag) { /* inpSetGlobalMIDIDirtyFlag */
+    /* cast to a true 2D array locally (rather than manually flattening the
+     * index) so MWCC emits retail's separate row-stride/column-stride
+     * multiplies instead of a single combined-index multiply. */
+    ((u32(*)[16])lbl_80449390)[midiSet][chan] |= flag;
+}
+#pragma pop
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+void inpSetMidiCtrl14(u8 ctrl, u8 channel, u8 set, u16 value) {
+    if (channel == 0xFF) {
+        return;
+    }
+
+    if (ctrl < 64) {
+        fn_801603C0(ctrl & 31, channel, set, value >> 7);
+        fn_801603C0((ctrl & 31) + 32, channel, set, value & 0x7f);
+    } else if (ctrl == 128 || ctrl == 129) {
+        fn_801603C0(ctrl & 254, channel, set, value >> 7);
+        fn_801603C0((ctrl & 254) + 1, channel, set, value & 0x7f);
+    } else if (ctrl == 132 || ctrl == 133) {
+        fn_801603C0(ctrl & 254, channel, set, value >> 7);
+        fn_801603C0((ctrl & 254) + 1, channel, set, value & 0x7f);
+    } else {
+        fn_801603C0(ctrl, channel, set, value >> 7);
+    }
+}
+#pragma pop
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+void inpResetMidiCtrl(u8 ch, u8 set, u32 coldReset) {
+    const u8* values;
+    u8* dest;
+    u32 i;
+
+    values = (coldReset ? lbl_80273338 : lbl_802733C0);
+    dest = set != 0xFF ? lbl_80449590[set][ch] : lbl_8044D910[ch];
+
+    if (coldReset) {
+        memcpy(dest, values, 134);
+    } else {
+        for (i = 0; i < 134; i++) {
+            if (values[i] != 0xFF) {
+                dest[i] = values[i];
+            }
+        }
+    }
+
+    inpSetMidiLastNote(ch, set, 0xFF);
+}
+#pragma pop
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+u16 inpGetMidiCtrl(u8 ctrl, u8 channel, u8 set) {
+
+    if (channel != 0xff) {
+        if (set != 0xff) {
+
+            if (ctrl < 0x40) {
+                return lbl_80449590[set][channel][ctrl & 0x1f] << 7 |
+                       lbl_80449590[set][channel][(ctrl & 0x1f) + 0x20];
+            }
+            if (ctrl < 0x46) {
+                return lbl_80449590[set][channel][ctrl] < 0x40 ? 0 : 0x3fff;
+            }
+            if (ctrl >= 0x60 && ctrl < 0x66) {
+                return 0;
+            }
+
+            if ((ctrl == 0x80) || (ctrl == 0x81)) {
+                return lbl_80449590[set][channel][ctrl & 0xfe] << 7 |
+                       lbl_80449590[set][channel][(ctrl & 0xfe) + 1];
+            }
+            if ((ctrl == 0x84) || (ctrl == 0x85)) {
+                return lbl_80449590[set][channel][ctrl & 0xfe] << 7 |
+                       lbl_80449590[set][channel][(ctrl & 0xfe) + 1];
+            }
+
+            return lbl_80449590[set][channel][ctrl] << 7;
+        }
+        if (ctrl < 0x40) {
+            return lbl_8044D910[channel][ctrl & 0x1f] << 7 | lbl_8044D910[channel][(ctrl & 0x1f) + 0x20];
+        }
+        if (ctrl < 0x46) {
+            return lbl_8044D910[channel][ctrl] < 0x40 ? 0 : 0x3fff;
+        }
+        if (ctrl >= 0x60 && ctrl < 0x66) {
+            return 0;
+        }
+        if ((ctrl == 0x80) || (ctrl == 0x81)) {
+            return lbl_8044D910[channel][ctrl & 0xfe] << 7 | lbl_8044D910[channel][(ctrl & 0xfe) + 1];
+        }
+        if ((ctrl == 0x84) || (ctrl == 0x85)) {
+            return lbl_8044D910[channel][ctrl & 0xfe] << 7 | lbl_8044D910[channel][(ctrl & 0xfe) + 1];
+        }
+        return lbl_8044D910[channel][ctrl] << 7;
+    }
+    return 0;
+}
+#pragma pop
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+u8* fn_80160EA0(u8 midi, u8 midiSet) { /* inpGetChannelDefaults */
+    if (midiSet == 0xFF) {
+        return &lbl_8044FA90[midi];
+    }
+
+    return &lbl_8044D890[midiSet][midi];
+}
+#pragma pop
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+void fn_80160ED4(u8 midi, u8 midiSet) { /* inpResetChannelDefaults */
+    u8* channelDefaults;
+    channelDefaults = midiSet != 0xFF ? &lbl_8044D890[midiSet][midi] : &lbl_8044FA90[midi];
+    *channelDefaults = 2;
+}
+#pragma pop
+
+typedef struct {
+    struct {
+        u8 midiCtrl;
+        u8 combine;
+        u8 pad_02[2];
+        s32 scale;
+    } source[4];
+    u16 oldValue;
+    u8 numSource;
+} CtrlDest;
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+void inpAddCtrl(CtrlDest* dest, u8 ctrl, s32 scale, u8 comb, u32 isVar) {
+    u8 n;
+    if (comb == 0) {
+        dest->numSource = 0;
+    }
+
+    if (dest->numSource < 4) {
+        n = dest->numSource++;
+        if (isVar == 0) {
+            ctrl = inpTranslateExCtrl(ctrl);
+        } else {
+            comb |= 0x10;
+        }
+
+        dest->source[n].midiCtrl = ctrl;
+        dest->source[n].combine = comb;
+        dest->source[n].scale = scale;
+    }
+}
+#pragma pop
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+void inpFXCopyCtrl(u8 ctrl, u8* dvoice, u8* svoice) {
+    u8 di;
+    u8 si;
+    di = *(u32*)(dvoice + 0xF4); /* id field is u32; narrows via lwz+clrlwi, matching retail */
+    si = *(u32*)(svoice + 0xF4);
+
+    if (ctrl < 64) {
+        lbl_8044D910[di][ctrl & 31] = lbl_8044D910[si][ctrl & 31];
+        lbl_8044D910[di][(ctrl & 31) + 32] = lbl_8044D910[si][(ctrl & 31) + 32];
+    } else if (ctrl == 128 || ctrl == 129) {
+        lbl_8044D910[di][ctrl & 254] = lbl_8044D910[si][ctrl & 254];
+        lbl_8044D910[di][(ctrl & 254) + 1] = lbl_8044D910[si][(ctrl & 254) + 1];
+    } else if (ctrl == 132 || ctrl == 133) {
+        lbl_8044D910[di][ctrl & 254] = lbl_8044D910[si][ctrl & 254];
+        lbl_8044D910[di][(ctrl & 254) + 1] = lbl_8044D910[si][(ctrl & 254) + 1];
+    } else {
+        lbl_8044D910[di][ctrl] = lbl_8044D910[si][ctrl];
+    }
+}
+#pragma pop
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+void inpSetMidiLastNote(u8 midi, u8 midiSet, u8 key) {
+    if (midiSet != 0xFF) {
+        lbl_8044FAD0[midiSet][midi] = key;
+    } else {
+        lbl_8044FB50[midi] = key;
+    }
+}
+#pragma pop
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+u8 inpGetMidiLastNote(u8 midi, u8 midiSet) {
+    if (midiSet != 0xFF) {
+        return lbl_8044FAD0[midiSet][midi];
+    }
+    return lbl_8044FB50[midi];
+}
+#pragma pop
+
+/* ===== snd_midictrl.c: _GetInputValue, 0x80161134 =====
+ * identity: reference snd_midictrl.c static _GetInputValue. svoice field
+ * offsets confirmed by disassembly: macStartTime@0x90 (u64, matches
+ * reference's synth.h offset), timeUsedByInput@0xA8, orgNote@0x12F,
+ * orgVolume@0x158 (u32), lfo[].value@0x1C4/0x1D0 (s16, stride 0xC,
+ * matches fn_80161D90/inpGetExCtrl's already-known 0x1C4/0x1D0 offsets),
+ * lfoUsedByInput[]@0x1D4/0x1D5. synthRealTime = lbl_8047AF58 (u64, hi/lo
+ * halves at consecutive .sbss addresses 0x8047AF58/0x8047AF5C).
+ * varGet = synthmacros.c's varGet (already matched there, real signature
+ * s16 varGet(SYNTH_VOICE*, u32, u8) -- cross-TU real `bl`, not inlined).
+ * CtrlDest (CTRL_DEST) reused from inpAddCtrl's definition above:
+ * source[i] entries are 8 bytes (midiCtrl@0, combine@1, scale@4),
+ * numSource@0x22 -- confirmed again here via the `addi r31,r31,8` pointer
+ * walk and `lbz r0,0x22(r25)` loop bound. */
+extern s16 varGet(u8* svoice, u32 ctrl, u8 index);
+extern u64 lbl_8047AF58; /* synthRealTime */
+
+#define GIV_CLAMP(value, min, max) ((value) > (max) ? (max) : (value) < (min) ? (min) : (value))
+#define GIV_CLAMP_INV(value, min, max) ((value) < (min) ? (min) : (value) > (max) ? (max) : (value))
+#define GIV_MIN(a, b) ((a) > (b) ? (b) : (a))
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+u32 _GetInputValue(u8* svoice, u8* motionBase, u8 midi, u8 midiSet) {
+    CtrlDest* inp = (CtrlDest*)motionBase;
+    u32 i;
+    u32 value;
+    u8 ctrl;
+    s32 tmp;
+    s32 vtmp;
+    u32 sign;
+
+    for (value = 0, i = 0; i < inp->numSource; i++) {
+        if (inp->source[i].combine & 0x10) {
+            tmp = svoice != NULL ? varGet(svoice, 0, inp->source[i].midiCtrl) : 0;
+            goto block_18;
+        }
+        ctrl = inp->source[i].midiCtrl;
+        if (ctrl == 128 || ctrl == 1 || ctrl == 10 || ctrl == 160 || ctrl == 161 || ctrl == 131) {
+            switch (ctrl) {
+            case 160:
+            case 161:
+                if (svoice != NULL) {
+                    tmp = (*(s16*)(svoice - 0x5bc + ctrl * 12)) << 1;
+                    svoice[ctrl + 0x134] = 1;
+                } else {
+                    tmp = 0;
+                }
+                break;
+            default:
+                tmp = inpGetMidiCtrl(ctrl, midi, midiSet) - 0x2000;
+                break;
+            }
+        block_18:
+            tmp = (tmp * (inp->source[i].scale >> 1)) >> 15;
+            tmp = GIV_CLAMP_INV(tmp, -0x2000, 0x1FFF);
+            switch (inp->source[i].combine & 15) {
+            case 0:
+                value = tmp + 0x2000;
+                sign = 1;
+                break;
+            case 1:
+                if (sign != 0) {
+                    vtmp = (value + tmp);
+                    vtmp -= 0x2000;
+                    value = GIV_CLAMP_INV(vtmp, -0x2000, 0x1FFF) + 0x2000;
+                } else {
+                    vtmp = value + tmp;
+                    value = GIV_CLAMP(vtmp, 0, 0x3FFF);
+                }
+                break;
+            case 2:
+                if (sign != 0) {
+                    vtmp = (s32)((value - 0x2000) * tmp) >> 13;
+                } else {
+                    vtmp = (tmp * value) >> 13;
+                    sign = 1;
+                }
+                value = GIV_CLAMP_INV(vtmp, -0x2000, 0x1FFF) + 0x2000;
+                break;
+            case 3:
+                if (sign != 0) {
+                    vtmp = (value - 0x2000) - tmp;
+                    value = GIV_CLAMP_INV(vtmp, -0x2000, 0x1FFF) + 0x2000;
+                } else {
+                    vtmp = value - tmp;
+                    value = GIV_CLAMP(vtmp, 0, 0x3FFF);
+                }
+                break;
+            }
+        } else {
+            switch (ctrl) {
+            case 162:
+                tmp = svoice != NULL ? svoice[0x12F] << 7 : 0;
+                break;
+            case 163:
+                tmp = svoice != NULL ? (*(u32*)(svoice + 0x158)) >> 9 : 0;
+                break;
+            case 164:
+                if (svoice != NULL) {
+                    tmp = (s32)((lbl_8047AF58 - *(u64*)(svoice + 0x90)) >> 8);
+                    if (tmp > 0x3fff) {
+                        tmp = 0x3fff;
+                    }
+                    svoice[0xA8] = 1;
+                } else {
+                    tmp = 0;
+                }
+                break;
+            default:
+                tmp = inpGetMidiCtrl(ctrl, midi, midiSet);
+                break;
+            }
+            tmp = (tmp * (inp->source[i].scale >> 1)) >> 15;
+            if (tmp > 0x3FFF) {
+                tmp = 0x3FFF;
+            }
+            switch (inp->source[i].combine & 0xF) {
+            case 0:
+                value = tmp;
+                sign = 0;
+                break;
+            case 1:
+                if (sign != 0) {
+                    vtmp = (value + tmp);
+                    vtmp -= 0x2000;
+                    value = GIV_CLAMP_INV(vtmp, -0x2000, 0x1FFF) + 0x2000;
+                } else {
+                    value += tmp;
+                    value = GIV_MIN(value, 0x3FFF);
+                }
+                break;
+            case 2:
+                if (sign != 0) {
+                    vtmp = (s32)(tmp * (value - 0x2000)) >> 14;
+                    value = GIV_CLAMP_INV(vtmp, -0x2000, 0x1FFF) + 0x2000;
+                } else {
+                    value = ((value * tmp) >> 0xE);
+                    value = GIV_MIN(value, 0x3FFF);
+                }
+                break;
+            case 3:
+                if (sign != 0) {
+                    vtmp = (value - 0x2000) - tmp;
+                    value = GIV_CLAMP_INV(vtmp, -0x2000, 0x1FFF) + 0x2000;
+                } else {
+                    vtmp = value - tmp;
+                    value = GIV_CLAMP(vtmp, 0, 0x3FFF);
+                }
+                break;
+            }
+        }
+    }
+    inp->oldValue = value;
+    return (u16)value;
 }
 #pragma pop
