@@ -152,6 +152,10 @@ def main():
             cells = ", ".join(annotate(w, dol, syms) for w in ws)
             print(f"{i:>3} @0x{base:08X}: [{cells}]")
     elif a.cmd == "sweep":
+        # NOTE: for RECORD tables (structs with a fn-ptr field, not bare
+        # pointer arrays) the reported base is the POINTER FIELD's column
+        # start, not the record start — subtract the field's struct offset
+        # to get row 0 (e.g. MENU_ITEM callbacks sit at +0x14).
         # Find every strided run of function-start pointers in the data
         # sections: dispatch tables, handler registries, vtables. Runs
         # are claimed smallest-stride-first so a dense array is not also

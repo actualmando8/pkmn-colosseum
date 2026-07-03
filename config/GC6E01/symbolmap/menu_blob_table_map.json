@@ -2,904 +2,1104 @@
  "blob_refs_found": 302,
  "tables": [
   {
-   "base": "0x80303ce8",
+   "base": "0x80303CD4",
    "stride": 28,
    "count": 192,
    "screen": "Battle Menu (menuCB_Battle cluster)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x80303ce8 --stride 28 --count 192; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/menu/menuCB_Battle.s",
-   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation."
+   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation.",
+   "callback_col_addr": "0x80303ce8",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x8030b58c",
+   "base": "0x8030B578",
    "stride": 28,
    "count": 134,
    "screen": "Card-e Reader Matrix Menu (Colosseum-exclusive)",
    "purity": 0.78,
    "evidence": "table entries decoded via tools/dolread.py table 0x8030b58c --stride 28 --count 134; 78% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/menu/menu_carde_matrix.s",
-   "xd_analog": "No XD analog: Card-e Reader (e-Reader) battle-card scanning is Colosseum-exclusive; XD symbols.txt has no menuCB_Carde*/matrix family."
+   "xd_analog": "No XD analog: Card-e Reader (e-Reader) battle-card scanning is Colosseum-exclusive; XD symbols.txt has no menuCB_Carde*/matrix family.",
+   "callback_col_addr": "0x8030b58c",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x803027e8",
+   "base": "0x803027D4",
    "stride": 28,
    "count": 124,
    "screen": "Battle Menu (menuCB_Battle cluster)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x803027e8 --stride 28 --count 124; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/menu/menuCB_Battle.s",
-   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation."
+   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation.",
+   "callback_col_addr": "0x803027e8",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x8030d090",
+   "base": "0x8030D07C",
    "stride": 28,
    "count": 115,
    "screen": "Card-e Reader Matrix Menu (Colosseum-exclusive)",
    "purity": 0.99,
    "evidence": "table entries decoded via tools/dolread.py table 0x8030d090 --stride 28 --count 115; 99% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/menu/menu_carde_matrix.s",
-   "xd_analog": "No XD analog: Card-e Reader (e-Reader) battle-card scanning is Colosseum-exclusive; XD symbols.txt has no menuCB_Carde*/matrix family."
+   "xd_analog": "No XD analog: Card-e Reader (e-Reader) battle-card scanning is Colosseum-exclusive; XD symbols.txt has no menuCB_Carde*/matrix family.",
+   "callback_col_addr": "0x8030d090",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802fd500",
+   "base": "0x802FD4EC",
    "stride": 28,
    "count": 93,
    "screen": "Battle Menu (menuCB_Battle cluster)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802fd500 --stride 28 --count 93; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/menu/menuCB_Battle.s",
-   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation."
+   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation.",
+   "callback_col_addr": "0x802fd500",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x80306fc4",
+   "base": "0x80306FB0",
    "stride": 28,
    "count": 91,
    "screen": "Battle Menu (menuCB_Battle cluster)",
    "purity": 0.96,
    "evidence": "table entries decoded via tools/dolread.py table 0x80306fc4 --stride 28 --count 91; 96% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/menu/menuCB_Battle.s",
-   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation."
+   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation.",
+   "callback_col_addr": "0x80306fc4",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x80306464",
+   "base": "0x80306450",
    "stride": 28,
    "count": 56,
    "screen": "unknown (common menu engine / window+sound framework cluster)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x80306464 --stride 28 --count 56; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_range_8003686C.s",
-   "xd_analog": "not checked / no clear analog found"
+   "xd_analog": "not checked / no clear analog found",
+   "callback_col_addr": "0x80306464",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f165c",
+   "base": "0x802F1648",
    "stride": 28,
    "count": 47,
    "screen": "GBA Link/Connect Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f165c --stride 28 --count 47; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gbaCommunication.s",
-   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens."
+   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens.",
+   "callback_col_addr": "0x802f165c",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f8598",
+   "base": "0x802F8584",
    "stride": 28,
    "count": 43,
    "screen": "GBA Link/Connect Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f8598 --stride 28 --count 43; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gbaCommunication.s",
-   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens."
+   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens.",
+   "callback_col_addr": "0x802f8598",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x80309f04",
+   "base": "0x80309EF0",
    "stride": 28,
    "count": 40,
    "screen": "NPC Event Menu/Prompts",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x80309f04 --stride 28 --count 40; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_npc_event.s",
-   "xd_analog": "Colosseum file already named gs_npc_event.c (committed); not cross-checked against XD in this pass."
+   "xd_analog": "Colosseum file already named gs_npc_event.c (committed); not cross-checked against XD in this pass.",
+   "callback_col_addr": "0x80309f04",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f0eec",
+   "base": "0x802F0ED8",
    "stride": 28,
    "count": 38,
    "screen": "GBA Link/Connect Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f0eec --stride 28 --count 38; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gbaCommunication.s",
-   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens."
+   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens.",
+   "callback_col_addr": "0x802f0eec",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f6084",
+   "base": "0x802F6070",
    "stride": 28,
    "count": 38,
    "screen": "World Map Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f6084 --stride 28 --count 38; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_worldmap.s",
-   "xd_analog": "XD symbols.txt has menuWorldMapMXInit/Ctrl/Main/Exit/Debug, menuWorldMapButton, menuWorldMapCursor, menuWorldMapMX, WorldMap::CallBackFunc/Ctrl -- direct category match."
+   "xd_analog": "XD symbols.txt has menuWorldMapMXInit/Ctrl/Main/Exit/Debug, menuWorldMapButton, menuWorldMapCursor, menuWorldMapMX, WorldMap::CallBackFunc/Ctrl -- direct category match.",
+   "callback_col_addr": "0x802f6084",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f32e8",
+   "base": "0x802F32D4",
    "stride": 28,
    "count": 36,
    "screen": "PC Box Menu",
    "purity": 0.58,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f32e8 --stride 28 --count 36; 58% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_pcbox.s",
-   "xd_analog": "XD symbols.txt has menuPcBoxMarkingCtrl, menuPcBoxMarkingItemCallback, menuPcBoxPokemon, menuPokemonStatusOpenFromPcBox -- direct category match."
+   "xd_analog": "XD symbols.txt has menuPcBoxMarkingCtrl, menuPcBoxMarkingItemCallback, menuPcBoxPokemon, menuPokemonStatusOpenFromPcBox -- direct category match.",
+   "callback_col_addr": "0x802f32e8",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x80308df4",
+   "base": "0x80308DE0",
    "stride": 28,
    "count": 36,
    "screen": "Middle/Pause Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x80308df4 --stride 28 --count 36; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/menu/menu_middle.s",
-   "xd_analog": "Colosseum file already named menu_middle.c (committed); not cross-checked against a specific XD symbol family in this pass."
+   "xd_analog": "Colosseum file already named menu_middle.c (committed); not cross-checked against a specific XD symbol family in this pass.",
+   "callback_col_addr": "0x80308df4",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x8030f4e0",
+   "base": "0x8030F4CC",
    "stride": 28,
    "count": 35,
    "screen": "GBA Link/Connect Menu",
    "purity": 0.94,
    "evidence": "table entries decoded via tools/dolread.py table 0x8030f4e0 --stride 28 --count 35; 94% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gbaCommunication.s",
-   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens."
+   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens.",
+   "callback_col_addr": "0x8030f4e0",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x8030e328",
+   "base": "0x8030E314",
    "stride": 28,
    "count": 33,
    "screen": "NPC Interaction Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x8030e328 --stride 28 --count 33; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_npc_interact.s",
-   "xd_analog": "Colosseum file already named gs_npc_interact.c (committed); not cross-checked against XD in this pass."
+   "xd_analog": "Colosseum file already named gs_npc_interact.c (committed); not cross-checked against XD in this pass.",
+   "callback_col_addr": "0x8030e328",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f6d18",
+   "base": "0x802F6D04",
    "stride": 28,
    "count": 32,
    "screen": "unknown (common menu engine / window+sound framework cluster)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f6d18 --stride 28 --count 32; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_range_8003686C.s",
-   "xd_analog": "not checked / no clear analog found"
+   "xd_analog": "not checked / no clear analog found",
+   "callback_col_addr": "0x802f6d18",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f2814",
+   "base": "0x802F2800",
    "stride": 28,
    "count": 30,
    "screen": "Pokemon Summary Screen",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f2814 --stride 28 --count 30; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_pokemon_summary.s",
-   "xd_analog": "Colosseum file already named gs_pokemon_summary.c (committed); XD has extensive menuPokemonStatus* family for the analogous screen."
+   "xd_analog": "Colosseum file already named gs_pokemon_summary.c (committed); XD has extensive menuPokemonStatus* family for the analogous screen.",
+   "callback_col_addr": "0x802f2814",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x8030ee88",
+   "base": "0x8030EE74",
    "stride": 28,
    "count": 26,
    "screen": "NPC Interaction Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x8030ee88 --stride 28 --count 26; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_npc_interact.s",
-   "xd_analog": "Colosseum file already named gs_npc_interact.c (committed); not cross-checked against XD in this pass."
+   "xd_analog": "Colosseum file already named gs_npc_interact.c (committed); not cross-checked against XD in this pass.",
+   "callback_col_addr": "0x8030ee88",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802fb13c",
+   "base": "0x802FB128",
    "stride": 28,
    "count": 25,
    "screen": "unknown (common menu engine / window+sound framework cluster)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802fb13c --stride 28 --count 25; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_range_8003686C.s",
-   "xd_analog": "not checked / no clear analog found"
+   "xd_analog": "not checked / no clear analog found",
+   "callback_col_addr": "0x802fb13c",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x80303620",
+   "base": "0x8030360C",
    "stride": 28,
    "count": 25,
    "screen": "Battle Menu (menuCB_Battle cluster)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x80303620 --stride 28 --count 25; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/menu/menuCB_Battle.s",
-   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation."
+   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation.",
+   "callback_col_addr": "0x80303620",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x80303984",
+   "base": "0x80303970",
    "stride": 28,
    "count": 25,
    "screen": "Battle Menu (menuCB_Battle cluster)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x80303984 --stride 28 --count 25; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/menu/menuCB_Battle.s",
-   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation."
+   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation.",
+   "callback_col_addr": "0x80303984",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f20dc",
+   "base": "0x802F20C8",
    "stride": 28,
    "count": 24,
    "screen": "GBA Link/Connect Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f20dc --stride 28 --count 24; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gbaCommunication.s",
-   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens."
+   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens.",
+   "callback_col_addr": "0x802f20dc",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f2c90",
+   "base": "0x802F2C7C",
    "stride": 28,
    "count": 24,
    "screen": "Event script execution (shared, not menu-specific)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f2c90 --stride 28 --count 24; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_event_exec.s",
-   "xd_analog": "Colosseum file already named gs_event_exec.c (committed); likely shared infra, not a single screen."
+   "xd_analog": "Colosseum file already named gs_event_exec.c (committed); likely shared infra, not a single screen.",
+   "callback_col_addr": "0x802f2c90",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x803093a4",
+   "base": "0x80309390",
    "stride": 28,
    "count": 24,
    "screen": "PC Box Menu",
    "purity": 0.83,
    "evidence": "table entries decoded via tools/dolread.py table 0x803093a4 --stride 28 --count 24; 83% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_pcbox.s",
-   "xd_analog": "XD symbols.txt has menuPcBoxMarkingCtrl, menuPcBoxMarkingItemCallback, menuPcBoxPokemon, menuPokemonStatusOpenFromPcBox -- direct category match."
+   "xd_analog": "XD symbols.txt has menuPcBoxMarkingCtrl, menuPcBoxMarkingItemCallback, menuPcBoxPokemon, menuPokemonStatusOpenFromPcBox -- direct category match.",
+   "callback_col_addr": "0x803093a4",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x8030df54",
+   "base": "0x8030DF40",
    "stride": 28,
    "count": 24,
    "screen": "NPC Interaction Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x8030df54 --stride 28 --count 24; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_npc_interact.s",
-   "xd_analog": "Colosseum file already named gs_npc_interact.c (committed); not cross-checked against XD in this pass."
+   "xd_analog": "Colosseum file already named gs_npc_interact.c (committed); not cross-checked against XD in this pass.",
+   "callback_col_addr": "0x8030df54",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x8030eb08",
+   "base": "0x8030EAF4",
    "stride": 28,
    "count": 24,
    "screen": "NPC Interaction Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x8030eb08 --stride 28 --count 24; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_npc_interact.s",
-   "xd_analog": "Colosseum file already named gs_npc_interact.c (committed); not cross-checked against XD in this pass."
+   "xd_analog": "Colosseum file already named gs_npc_interact.c (committed); not cross-checked against XD in this pass.",
+   "callback_col_addr": "0x8030eb08",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f1e3c",
+   "base": "0x802F1E28",
    "stride": 28,
    "count": 23,
    "screen": "GBA Link/Connect Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f1e3c --stride 28 --count 23; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gbaCommunication.s",
-   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens."
+   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens.",
+   "callback_col_addr": "0x802f1e3c",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x80309c2c",
+   "base": "0x80309C18",
    "stride": 28,
    "count": 23,
    "screen": "Middle/Pause Menu",
    "purity": 0.52,
    "evidence": "table entries decoded via tools/dolread.py table 0x80309c2c --stride 28 --count 23; 52% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/menu/menu_middle.s",
-   "xd_analog": "Colosseum file already named menu_middle.c (committed); not cross-checked against a specific XD symbol family in this pass."
+   "xd_analog": "Colosseum file already named menu_middle.c (committed); not cross-checked against a specific XD symbol family in this pass.",
+   "callback_col_addr": "0x80309c2c",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f58a4",
+   "base": "0x802F5890",
    "stride": 28,
    "count": 22,
    "screen": "PC Box Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f58a4 --stride 28 --count 22; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_pcbox.s",
-   "xd_analog": "XD symbols.txt has menuPcBoxMarkingCtrl, menuPcBoxMarkingItemCallback, menuPcBoxPokemon, menuPokemonStatusOpenFromPcBox -- direct category match."
+   "xd_analog": "XD symbols.txt has menuPcBoxMarkingCtrl, menuPcBoxMarkingItemCallback, menuPcBoxPokemon, menuPokemonStatusOpenFromPcBox -- direct category match.",
+   "callback_col_addr": "0x802f58a4",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f7108",
+   "base": "0x802F70F4",
    "stride": 28,
    "count": 20,
    "screen": "unknown (common menu engine / window+sound framework cluster)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f7108 --stride 28 --count 20; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_range_8003686C.s",
-   "xd_analog": "not checked / no clear analog found"
+   "xd_analog": "not checked / no clear analog found",
+   "callback_col_addr": "0x802f7108",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x8030fd84",
+   "base": "0x8030FD70",
    "stride": 28,
    "count": 20,
    "screen": "World Map Menu",
    "purity": 0.95,
    "evidence": "table entries decoded via tools/dolread.py table 0x8030fd84 --stride 28 --count 20; 95% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_worldmap.s",
-   "xd_analog": "XD symbols.txt has menuWorldMapMXInit/Ctrl/Main/Exit/Debug, menuWorldMapButton, menuWorldMapCursor, menuWorldMapMX, WorldMap::CallBackFunc/Ctrl -- direct category match."
+   "xd_analog": "XD symbols.txt has menuWorldMapMXInit/Ctrl/Main/Exit/Debug, menuWorldMapButton, menuWorldMapCursor, menuWorldMapMX, WorldMap::CallBackFunc/Ctrl -- direct category match.",
+   "callback_col_addr": "0x8030fd84",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x8030856c",
+   "base": "0x80308558",
    "stride": 28,
    "count": 18,
    "screen": "Middle/Pause Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x8030856c --stride 28 --count 18; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/menu/menu_middle.s",
-   "xd_analog": "Colosseum file already named menu_middle.c (committed); not cross-checked against a specific XD symbol family in this pass."
+   "xd_analog": "Colosseum file already named menu_middle.c (committed); not cross-checked against a specific XD symbol family in this pass.",
+   "callback_col_addr": "0x8030856c",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f36f4",
+   "base": "0x802F36E0",
    "stride": 28,
    "count": 17,
    "screen": "World Map Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f36f4 --stride 28 --count 17; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_worldmap.s",
-   "xd_analog": "XD symbols.txt has menuWorldMapMXInit/Ctrl/Main/Exit/Debug, menuWorldMapButton, menuWorldMapCursor, menuWorldMapMX, WorldMap::CallBackFunc/Ctrl -- direct category match."
+   "xd_analog": "XD symbols.txt has menuWorldMapMXInit/Ctrl/Main/Exit/Debug, menuWorldMapButton, menuWorldMapCursor, menuWorldMapMX, WorldMap::CallBackFunc/Ctrl -- direct category match.",
+   "callback_col_addr": "0x802f36f4",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f1bf0",
+   "base": "0x802F1BDC",
    "stride": 28,
    "count": 16,
    "screen": "GBA Link/Connect Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f1bf0 --stride 28 --count 16; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gbaCommunication.s",
-   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens."
+   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens.",
+   "callback_col_addr": "0x802f1bf0",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802fb6b4",
+   "base": "0x802FB6A0",
    "stride": 28,
    "count": 16,
    "screen": "Battle Menu (menuCB_Battle cluster)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802fb6b4 --stride 28 --count 16; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/menu/menuCB_Battle.s",
-   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation."
+   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation.",
+   "callback_col_addr": "0x802fb6b4",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f3a04",
+   "base": "0x802F39F0",
    "stride": 28,
    "count": 15,
    "screen": "World Map Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f3a04 --stride 28 --count 15; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_worldmap.s",
-   "xd_analog": "XD symbols.txt has menuWorldMapMXInit/Ctrl/Main/Exit/Debug, menuWorldMapButton, menuWorldMapCursor, menuWorldMapMX, WorldMap::CallBackFunc/Ctrl -- direct category match."
+   "xd_analog": "XD symbols.txt has menuWorldMapMXInit/Ctrl/Main/Exit/Debug, menuWorldMapButton, menuWorldMapCursor, menuWorldMapMX, WorldMap::CallBackFunc/Ctrl -- direct category match.",
+   "callback_col_addr": "0x802f3a04",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802fba18",
+   "base": "0x802FBA04",
    "stride": 28,
    "count": 15,
    "screen": "Battle Menu (menuCB_Battle cluster)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802fba18 --stride 28 --count 15; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/menu/menuCB_Battle.s",
-   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation."
+   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation.",
+   "callback_col_addr": "0x802fba18",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802fbcf0",
+   "base": "0x802FBCDC",
    "stride": 28,
    "count": 15,
    "screen": "unknown (common menu engine / window+sound framework cluster)",
    "purity": 0.6,
    "evidence": "table entries decoded via tools/dolread.py table 0x802fbcf0 --stride 28 --count 15; 60% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_range_8003686C.s",
-   "xd_analog": "not checked / no clear analog found"
+   "xd_analog": "not checked / no clear analog found",
+   "callback_col_addr": "0x802fbcf0",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f23d0",
+   "base": "0x802F23BC",
    "stride": 28,
    "count": 14,
    "screen": "GBA Link/Connect Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f23d0 --stride 28 --count 14; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gbaCommunication.s",
-   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens."
+   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens.",
+   "callback_col_addr": "0x802f23d0",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f25c8",
+   "base": "0x802F25B4",
    "stride": 28,
    "count": 14,
    "screen": "GBA Link/Connect Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f25c8 --stride 28 --count 14; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gbaCommunication.s",
-   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens."
+   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens.",
+   "callback_col_addr": "0x802f25c8",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802ff218",
+   "base": "0x802FF204",
    "stride": 28,
    "count": 14,
    "screen": "Middle/Pause Menu",
    "purity": 0.57,
    "evidence": "table entries decoded via tools/dolread.py table 0x802ff218 --stride 28 --count 14; 57% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/menu/menu_middle.s",
-   "xd_analog": "Colosseum file already named menu_middle.c (committed); not cross-checked against a specific XD symbol family in this pass."
+   "xd_analog": "Colosseum file already named menu_middle.c (committed); not cross-checked against a specific XD symbol family in this pass.",
+   "callback_col_addr": "0x802ff218",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x8030c450",
+   "base": "0x8030C43C",
    "stride": 28,
    "count": 14,
    "screen": "NPC Event Menu/Prompts",
    "purity": 0.86,
    "evidence": "table entries decoded via tools/dolread.py table 0x8030c450 --stride 28 --count 14; 86% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_npc_event.s",
-   "xd_analog": "Colosseum file already named gs_npc_event.c (committed); not cross-checked against XD in this pass."
+   "xd_analog": "Colosseum file already named gs_npc_event.c (committed); not cross-checked against XD in this pass.",
+   "callback_col_addr": "0x8030c450",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x8030c5f4",
+   "base": "0x8030C5E0",
    "stride": 28,
    "count": 14,
    "screen": "NPC Event Menu/Prompts",
    "purity": 0.43,
    "evidence": "table entries decoded via tools/dolread.py table 0x8030c5f4 --stride 28 --count 14; 43% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_npc_event.s",
-   "xd_analog": "Colosseum file already named gs_npc_event.c (committed); not cross-checked against XD in this pass."
+   "xd_analog": "Colosseum file already named gs_npc_event.c (committed); not cross-checked against XD in this pass.",
+   "callback_col_addr": "0x8030c5f4",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f00b4",
+   "base": "0x802F00A0",
    "stride": 28,
    "count": 13,
    "screen": "Event script execution (shared, not menu-specific)",
    "purity": 0.54,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f00b4 --stride 28 --count 13; 54% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_event_exec.s",
-   "xd_analog": "Colosseum file already named gs_event_exec.c (committed); likely shared infra, not a single screen."
+   "xd_analog": "Colosseum file already named gs_event_exec.c (committed); likely shared infra, not a single screen.",
+   "callback_col_addr": "0x802f00b4",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x80306c28",
+   "base": "0x80306C14",
    "stride": 28,
    "count": 13,
    "screen": "Middle/Pause Menu",
    "purity": 0.69,
    "evidence": "table entries decoded via tools/dolread.py table 0x80306c28 --stride 28 --count 13; 69% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/menu/menu_middle.s",
-   "xd_analog": "Colosseum file already named menu_middle.c (committed); not cross-checked against a specific XD symbol family in this pass."
+   "xd_analog": "Colosseum file already named menu_middle.c (committed); not cross-checked against a specific XD symbol family in this pass.",
+   "callback_col_addr": "0x80306c28",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x8030aff8",
+   "base": "0x8030AFE4",
    "stride": 28,
    "count": 13,
    "screen": "NPC Event Menu/Prompts",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x8030aff8 --stride 28 --count 13; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_npc_event.s",
-   "xd_analog": "Colosseum file already named gs_npc_event.c (committed); not cross-checked against XD in this pass."
+   "xd_analog": "Colosseum file already named gs_npc_event.c (committed); not cross-checked against XD in this pass.",
+   "callback_col_addr": "0x8030aff8",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f9d1c",
+   "base": "0x802F9D08",
    "stride": 28,
    "count": 12,
    "screen": "Battle Menu (menuCB_Battle cluster)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f9d1c --stride 28 --count 12; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/menu/menuCB_Battle.s",
-   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation."
+   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation.",
+   "callback_col_addr": "0x802f9d1c",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f317c",
+   "base": "0x802F3168",
    "stride": 28,
    "count": 11,
    "screen": "Event script execution (shared, not menu-specific)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f317c --stride 28 --count 11; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_event_exec.s",
-   "xd_analog": "Colosseum file already named gs_event_exec.c (committed); likely shared infra, not a single screen."
+   "xd_analog": "Colosseum file already named gs_event_exec.c (committed); likely shared infra, not a single screen.",
+   "callback_col_addr": "0x802f317c",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f3be0",
+   "base": "0x802F3BCC",
    "stride": 28,
    "count": 11,
    "screen": "World Map Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f3be0 --stride 28 --count 11; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_worldmap.s",
-   "xd_analog": "XD symbols.txt has menuWorldMapMXInit/Ctrl/Main/Exit/Debug, menuWorldMapButton, menuWorldMapCursor, menuWorldMapMX, WorldMap::CallBackFunc/Ctrl -- direct category match."
+   "xd_analog": "XD symbols.txt has menuWorldMapMXInit/Ctrl/Main/Exit/Debug, menuWorldMapButton, menuWorldMapCursor, menuWorldMapMX, WorldMap::CallBackFunc/Ctrl -- direct category match.",
+   "callback_col_addr": "0x802f3be0",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f79c8",
+   "base": "0x802F79B4",
    "stride": 28,
    "count": 11,
    "screen": "unknown (common menu engine / window+sound framework cluster)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f79c8 --stride 28 --count 11; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_range_8003686C.s",
-   "xd_analog": "not checked / no clear analog found"
+   "xd_analog": "not checked / no clear analog found",
+   "callback_col_addr": "0x802f79c8",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802feeb4",
+   "base": "0x802FEEA0",
    "stride": 28,
    "count": 11,
    "screen": "Title Screen",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802feeb4 --stride 28 --count 11; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_title.s",
-   "xd_analog": "Colosseum file already named gs_title.c (committed)."
+   "xd_analog": "Colosseum file already named gs_title.c (committed).",
+   "callback_col_addr": "0x802feeb4",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x80300be8",
+   "base": "0x80300BD4",
    "stride": 28,
    "count": 11,
    "screen": "Middle/Pause Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x80300be8 --stride 28 --count 11; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/menu/menu_middle.s",
-   "xd_analog": "Colosseum file already named menu_middle.c (committed); not cross-checked against a specific XD symbol family in this pass."
+   "xd_analog": "Colosseum file already named menu_middle.c (committed); not cross-checked against a specific XD symbol family in this pass.",
+   "callback_col_addr": "0x80300be8",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x8030a55c",
+   "base": "0x8030A548",
    "stride": 28,
    "count": 11,
    "screen": "NPC Event Menu/Prompts",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x8030a55c --stride 28 --count 11; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_npc_event.s",
-   "xd_analog": "Colosseum file already named gs_npc_event.c (committed); not cross-checked against XD in this pass."
+   "xd_analog": "Colosseum file already named gs_npc_event.c (committed); not cross-checked against XD in this pass.",
+   "callback_col_addr": "0x8030a55c",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x8030fc34",
+   "base": "0x8030FC20",
    "stride": 28,
    "count": 11,
    "screen": "GBA Link/Connect Menu",
    "purity": 0.82,
    "evidence": "table entries decoded via tools/dolread.py table 0x8030fc34 --stride 28 --count 11; 82% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gbaCommunication.s",
-   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens."
+   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens.",
+   "callback_col_addr": "0x8030fc34",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f302c",
+   "base": "0x802F3018",
    "stride": 28,
    "count": 10,
    "screen": "Event script execution (shared, not menu-specific)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f302c --stride 28 --count 10; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_event_exec.s",
-   "xd_analog": "Colosseum file already named gs_event_exec.c (committed); likely shared infra, not a single screen."
+   "xd_analog": "Colosseum file already named gs_event_exec.c (committed); likely shared infra, not a single screen.",
+   "callback_col_addr": "0x802f302c",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f6618",
+   "base": "0x802F6604",
    "stride": 28,
    "count": 10,
    "screen": "unknown (common menu engine / window+sound framework cluster)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f6618 --stride 28 --count 10; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_range_8003686C.s",
-   "xd_analog": "not checked / no clear analog found"
+   "xd_analog": "not checked / no clear analog found",
+   "callback_col_addr": "0x802f6618",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f6b74",
+   "base": "0x802F6B60",
    "stride": 28,
    "count": 10,
    "screen": "unknown (common menu engine / window+sound framework cluster)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f6b74 --stride 28 --count 10; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_range_8003686C.s",
-   "xd_analog": "not checked / no clear analog found"
+   "xd_analog": "not checked / no clear analog found",
+   "callback_col_addr": "0x802f6b74",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x8030aec4",
+   "base": "0x8030AEB0",
    "stride": 28,
    "count": 10,
    "screen": "NPC Event Menu/Prompts",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x8030aec4 --stride 28 --count 10; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_npc_event.s",
-   "xd_analog": "Colosseum file already named gs_npc_event.c (committed); not cross-checked against XD in this pass."
+   "xd_analog": "Colosseum file already named gs_npc_event.c (committed); not cross-checked against XD in this pass.",
+   "callback_col_addr": "0x8030aec4",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f0258",
+   "base": "0x802F0244",
    "stride": 28,
    "count": 9,
    "screen": "unknown (unnamed placeholder file)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f0258 --stride 28 --count 9; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_range_80011EA4.s",
-   "xd_analog": "not checked / no clear analog found"
+   "xd_analog": "not checked / no clear analog found",
+   "callback_col_addr": "0x802f0258",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f2b78",
+   "base": "0x802F2B64",
    "stride": 28,
    "count": 9,
    "screen": "Pokemon Summary Screen",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f2b78 --stride 28 --count 9; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_pokemon_summary.s",
-   "xd_analog": "Colosseum file already named gs_pokemon_summary.c (committed); XD has extensive menuPokemonStatus* family for the analogous screen."
+   "xd_analog": "Colosseum file already named gs_pokemon_summary.c (committed); XD has extensive menuPokemonStatus* family for the analogous screen.",
+   "callback_col_addr": "0x802f2b78",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f38ec",
+   "base": "0x802F38D8",
    "stride": 28,
    "count": 9,
    "screen": "World Map Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f38ec --stride 28 --count 9; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_worldmap.s",
-   "xd_analog": "XD symbols.txt has menuWorldMapMXInit/Ctrl/Main/Exit/Debug, menuWorldMapButton, menuWorldMapCursor, menuWorldMapMX, WorldMap::CallBackFunc/Ctrl -- direct category match."
+   "xd_analog": "XD symbols.txt has menuWorldMapMXInit/Ctrl/Main/Exit/Debug, menuWorldMapButton, menuWorldMapCursor, menuWorldMapMX, WorldMap::CallBackFunc/Ctrl -- direct category match.",
+   "callback_col_addr": "0x802f38ec",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f4d7c",
+   "base": "0x802F4D68",
    "stride": 28,
    "count": 9,
    "screen": "unknown (common menu engine / window+sound framework cluster)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f4d7c --stride 28 --count 9; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_range_8003686C.s",
-   "xd_analog": "not checked / no clear analog found"
+   "xd_analog": "not checked / no clear analog found",
+   "callback_col_addr": "0x802f4d7c",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f5658",
+   "base": "0x802F5644",
    "stride": 28,
    "count": 9,
    "screen": "PC Box Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f5658 --stride 28 --count 9; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_pcbox.s",
-   "xd_analog": "XD symbols.txt has menuPcBoxMarkingCtrl, menuPcBoxMarkingItemCallback, menuPcBoxPokemon, menuPokemonStatusOpenFromPcBox -- direct category match."
+   "xd_analog": "XD symbols.txt has menuPcBoxMarkingCtrl, menuPcBoxMarkingItemCallback, menuPcBoxPokemon, menuPokemonStatusOpenFromPcBox -- direct category match.",
+   "callback_col_addr": "0x802f5658",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f77b4",
+   "base": "0x802F77A0",
    "stride": 28,
    "count": 9,
    "screen": "unknown (common menu engine / window+sound framework cluster)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f77b4 --stride 28 --count 9; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_range_8003686C.s",
-   "xd_analog": "not checked / no clear analog found"
+   "xd_analog": "not checked / no clear analog found",
+   "callback_col_addr": "0x802f77b4",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802fbee8",
+   "base": "0x802FBED4",
    "stride": 28,
    "count": 9,
    "screen": "unknown (common menu engine / window+sound framework cluster)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802fbee8 --stride 28 --count 9; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_range_8003686C.s",
-   "xd_analog": "not checked / no clear analog found"
+   "xd_analog": "not checked / no clear analog found",
+   "callback_col_addr": "0x802fbee8",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x8030a700",
+   "base": "0x8030A6EC",
    "stride": 28,
    "count": 9,
    "screen": "NPC Event Menu/Prompts",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x8030a700 --stride 28 --count 9; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_npc_event.s",
-   "xd_analog": "Colosseum file already named gs_npc_event.c (committed); not cross-checked against XD in this pass."
+   "xd_analog": "Colosseum file already named gs_npc_event.c (committed); not cross-checked against XD in this pass.",
+   "callback_col_addr": "0x8030a700",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x8030f9e8",
+   "base": "0x8030F9D4",
    "stride": 28,
    "count": 9,
    "screen": "PC Box Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x8030f9e8 --stride 28 --count 9; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_pcbox.s",
-   "xd_analog": "XD symbols.txt has menuPcBoxMarkingCtrl, menuPcBoxMarkingItemCallback, menuPcBoxPokemon, menuPokemonStatusOpenFromPcBox -- direct category match."
+   "xd_analog": "XD symbols.txt has menuPcBoxMarkingCtrl, menuPcBoxMarkingItemCallback, menuPcBoxPokemon, menuPokemonStatusOpenFromPcBox -- direct category match.",
+   "callback_col_addr": "0x8030f9e8",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f0d64",
+   "base": "0x802F0D50",
    "stride": 28,
    "count": 8,
    "screen": "GBA Link/Connect Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f0d64 --stride 28 --count 8; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gbaCommunication.s",
-   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens."
+   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens.",
+   "callback_col_addr": "0x802f0d64",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f8ad8",
+   "base": "0x802F8AC4",
    "stride": 28,
    "count": 8,
    "screen": "GBA Link/Connect Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f8ad8 --stride 28 --count 8; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gbaCommunication.s",
-   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens."
+   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens.",
+   "callback_col_addr": "0x802f8ad8",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f8d40",
+   "base": "0x802F8D2C",
    "stride": 28,
    "count": 8,
    "screen": "GBA Link/Connect Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f8d40 --stride 28 --count 8; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gbaCommunication.s",
-   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens."
+   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens.",
+   "callback_col_addr": "0x802f8d40",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f9c20",
+   "base": "0x802F9C0C",
    "stride": 28,
    "count": 8,
    "screen": "Battle Menu (menuCB_Battle cluster)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f9c20 --stride 28 --count 8; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/menu/menuCB_Battle.s",
-   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation."
+   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation.",
+   "callback_col_addr": "0x802f9c20",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802fc0a8",
+   "base": "0x802FC094",
    "stride": 28,
    "count": 8,
    "screen": "Battle Menu (menuCB_Battle cluster)",
    "purity": 0.88,
    "evidence": "table entries decoded via tools/dolread.py table 0x802fc0a8 --stride 28 --count 8; 88% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/menu/menuCB_Battle.s",
-   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation."
+   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation.",
+   "callback_col_addr": "0x802fc0a8",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802fcec4",
+   "base": "0x802FCEB0",
    "stride": 28,
    "count": 8,
    "screen": "unknown (unnamed placeholder file)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802fcec4 --stride 28 --count 8; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_range_80033278.s",
-   "xd_analog": "not checked / no clear analog found"
+   "xd_analog": "not checked / no clear analog found",
+   "callback_col_addr": "0x802fcec4",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802fed80",
+   "base": "0x802FED6C",
    "stride": 28,
    "count": 8,
    "screen": "Title Screen",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802fed80 --stride 28 --count 8; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_title.s",
-   "xd_analog": "Colosseum file already named gs_title.c (committed)."
+   "xd_analog": "Colosseum file already named gs_title.c (committed).",
+   "callback_col_addr": "0x802fed80",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x803014e0",
+   "base": "0x803014CC",
    "stride": 28,
    "count": 8,
    "screen": "Middle/Pause Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x803014e0 --stride 28 --count 8; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/menu/menu_middle.s",
-   "xd_analog": "Colosseum file already named menu_middle.c (committed); not cross-checked against a specific XD symbol family in this pass."
+   "xd_analog": "Colosseum file already named menu_middle.c (committed); not cross-checked against a specific XD symbol family in this pass.",
+   "callback_col_addr": "0x803014e0",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x803062a4",
+   "base": "0x80306290",
    "stride": 28,
    "count": 8,
    "screen": "Battle Menu (menuCB_Battle cluster)",
    "purity": 0.38,
    "evidence": "table entries decoded via tools/dolread.py table 0x803062a4 --stride 28 --count 8; 38% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/menu/menuCB_Battle.s",
-   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation."
+   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation.",
+   "callback_col_addr": "0x803062a4",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802efbc8",
+   "base": "0x802EFBB4",
    "stride": 28,
    "count": 7,
    "screen": "unknown (model/render, likely shared)",
    "purity": 0.86,
    "evidence": "table entries decoded via tools/dolread.py table 0x802efbc8 --stride 28 --count 7; 86% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_model.s",
-   "xd_analog": "Colosseum file already named gs_model.c (committed) but is rendering infra, not a screen."
+   "xd_analog": "Colosseum file already named gs_model.c (committed) but is rendering infra, not a screen.",
+   "callback_col_addr": "0x802efbc8",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f05d8",
+   "base": "0x802F05C4",
    "stride": 28,
    "count": 7,
    "screen": "NPC Interaction Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f05d8 --stride 28 --count 7; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_npc_interact.s",
-   "xd_analog": "Colosseum file already named gs_npc_interact.c (committed); not cross-checked against XD in this pass."
+   "xd_analog": "Colosseum file already named gs_npc_interact.c (committed); not cross-checked against XD in this pass.",
+   "callback_col_addr": "0x802f05d8",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f2f4c",
+   "base": "0x802F2F38",
    "stride": 28,
    "count": 7,
    "screen": "Event script execution (shared, not menu-specific)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f2f4c --stride 28 --count 7; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_event_exec.s",
-   "xd_analog": "Colosseum file already named gs_event_exec.c (committed); likely shared infra, not a single screen."
+   "xd_analog": "Colosseum file already named gs_event_exec.c (committed); likely shared infra, not a single screen.",
+   "callback_col_addr": "0x802f2f4c",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f5070",
+   "base": "0x802F505C",
    "stride": 28,
    "count": 7,
    "screen": "unknown (common menu engine / window+sound framework cluster)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f5070 --stride 28 --count 7; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_range_8003686C.s",
-   "xd_analog": "not checked / no clear analog found"
+   "xd_analog": "not checked / no clear analog found",
+   "callback_col_addr": "0x802f5070",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x8030e76c",
+   "base": "0x8030E758",
    "stride": 28,
    "count": 7,
    "screen": "NPC Interaction Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x8030e76c --stride 28 --count 7; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_npc_interact.s",
-   "xd_analog": "Colosseum file already named gs_npc_interact.c (committed); not cross-checked against XD in this pass."
+   "xd_analog": "Colosseum file already named gs_npc_interact.c (committed); not cross-checked against XD in this pass.",
+   "callback_col_addr": "0x8030e76c",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x8030f25c",
+   "base": "0x8030F248",
    "stride": 28,
    "count": 7,
    "screen": "NPC Interaction Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x8030f25c --stride 28 --count 7; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_npc_interact.s",
-   "xd_analog": "Colosseum file already named gs_npc_interact.c (committed); not cross-checked against XD in this pass."
+   "xd_analog": "Colosseum file already named gs_npc_interact.c (committed); not cross-checked against XD in this pass.",
+   "callback_col_addr": "0x8030f25c",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x8030fb38",
+   "base": "0x8030FB24",
    "stride": 28,
    "count": 7,
    "screen": "NPC Interaction Menu",
    "purity": 0.57,
    "evidence": "table entries decoded via tools/dolread.py table 0x8030fb38 --stride 28 --count 7; 57% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_npc_interact.s",
-   "xd_analog": "Colosseum file already named gs_npc_interact.c (committed); not cross-checked against XD in this pass."
+   "xd_analog": "Colosseum file already named gs_npc_interact.c (committed); not cross-checked against XD in this pass.",
+   "callback_col_addr": "0x8030fb38",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f1480",
+   "base": "0x802F146C",
    "stride": 28,
    "count": 6,
    "screen": "GBA Link/Connect Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f1480 --stride 28 --count 6; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gbaCommunication.s",
-   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens."
+   "xd_analog": "XD symbols.txt has menuCB_GBAConnect_Disp=0x80077248, menuTool_GBAConnect_Button, menuTool_GBAConnect_Ctrl, menuCB_GBADisconnectedErrorJob -- direct category match for GBA link-cable connect screens.",
+   "callback_col_addr": "0x802f1480",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f4b68",
+   "base": "0x802F4B54",
    "stride": 28,
    "count": 6,
    "screen": "unknown (common menu engine / window+sound framework cluster)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f4b68 --stride 28 --count 6; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_range_8003686C.s",
-   "xd_analog": "not checked / no clear analog found"
+   "xd_analog": "not checked / no clear analog found",
+   "callback_col_addr": "0x802f4b68",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f4e94",
+   "base": "0x802F4E80",
    "stride": 28,
    "count": 6,
    "screen": "unknown (common menu engine / window+sound framework cluster)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f4e94 --stride 28 --count 6; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_range_8003686C.s",
-   "xd_analog": "not checked / no clear analog found"
+   "xd_analog": "not checked / no clear analog found",
+   "callback_col_addr": "0x802f4e94",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f52d8",
+   "base": "0x802F52C4",
    "stride": 28,
    "count": 6,
    "screen": "unknown (common menu engine / window+sound framework cluster)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f52d8 --stride 28 --count 6; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_range_8003686C.s",
-   "xd_analog": "not checked / no clear analog found"
+   "xd_analog": "not checked / no clear analog found",
+   "callback_col_addr": "0x802f52d8",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f7d64",
+   "base": "0x802F7D50",
    "stride": 28,
    "count": 6,
    "screen": "unknown (common menu engine / window+sound framework cluster)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f7d64 --stride 28 --count 6; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_range_8003686C.s",
-   "xd_analog": "not checked / no clear analog found"
+   "xd_analog": "not checked / no clear analog found",
+   "callback_col_addr": "0x802f7d64",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f8234",
+   "base": "0x802F8220",
    "stride": 28,
    "count": 6,
    "screen": "unknown (unnamed placeholder file)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f8234 --stride 28 --count 6; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_range_80011EA4.s",
-   "xd_analog": "not checked / no clear analog found"
+   "xd_analog": "not checked / no clear analog found",
+   "callback_col_addr": "0x802f8234",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f8314",
+   "base": "0x802F8300",
    "stride": 28,
    "count": 6,
    "screen": "unknown (unnamed placeholder file)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f8314 --stride 28 --count 6; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_range_80011EA4.s",
-   "xd_analog": "not checked / no clear analog found"
+   "xd_analog": "not checked / no clear analog found",
+   "callback_col_addr": "0x802f8314",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f83f4",
+   "base": "0x802F83E0",
    "stride": 28,
    "count": 6,
    "screen": "PC Box Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f83f4 --stride 28 --count 6; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_pcbox.s",
-   "xd_analog": "XD symbols.txt has menuPcBoxMarkingCtrl, menuPcBoxMarkingItemCallback, menuPcBoxPokemon, menuPokemonStatusOpenFromPcBox -- direct category match."
+   "xd_analog": "XD symbols.txt has menuPcBoxMarkingCtrl, menuPcBoxMarkingItemCallback, menuPcBoxPokemon, menuPokemonStatusOpenFromPcBox -- direct category match.",
+   "callback_col_addr": "0x802f83f4",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802fd420",
+   "base": "0x802FD40C",
    "stride": 28,
    "count": 6,
    "screen": "Battle Menu (menuCB_Battle cluster)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802fd420 --stride 28 --count 6; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/menu/menuCB_Battle.s",
-   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation."
+   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation.",
+   "callback_col_addr": "0x802fd420",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802ff7ac",
+   "base": "0x802FF798",
    "stride": 28,
    "count": 6,
    "screen": "Middle/Pause Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802ff7ac --stride 28 --count 6; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/menu/menu_middle.s",
-   "xd_analog": "Colosseum file already named menu_middle.c (committed); not cross-checked against a specific XD symbol family in this pass."
+   "xd_analog": "Colosseum file already named menu_middle.c (committed); not cross-checked against a specific XD symbol family in this pass.",
+   "callback_col_addr": "0x802ff7ac",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x803082cc",
+   "base": "0x803082B8",
    "stride": 28,
    "count": 6,
    "screen": "Middle/Pause Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x803082cc --stride 28 --count 6; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/menu/menu_middle.s",
-   "xd_analog": "Colosseum file already named menu_middle.c (committed); not cross-checked against a specific XD symbol family in this pass."
+   "xd_analog": "Colosseum file already named menu_middle.c (committed); not cross-checked against a specific XD symbol family in this pass.",
+   "callback_col_addr": "0x803082cc",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x8030998c",
+   "base": "0x80309978",
    "stride": 28,
    "count": 6,
    "screen": "Middle/Pause Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x8030998c --stride 28 --count 6; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/menu/menu_middle.s",
-   "xd_analog": "Colosseum file already named menu_middle.c (committed); not cross-checked against a specific XD symbol family in this pass."
+   "xd_analog": "Colosseum file already named menu_middle.c (committed); not cross-checked against a specific XD symbol family in this pass.",
+   "callback_col_addr": "0x8030998c",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802efd6c",
+   "base": "0x802EFD58",
    "stride": 28,
    "count": 5,
    "screen": "unknown (model/render, likely shared)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802efd6c --stride 28 --count 5; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_model.s",
-   "xd_analog": "Colosseum file already named gs_model.c (committed) but is rendering infra, not a screen."
+   "xd_analog": "Colosseum file already named gs_model.c (committed) but is rendering infra, not a screen.",
+   "callback_col_addr": "0x802efd6c",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f5ec4",
+   "base": "0x802F5EB0",
    "stride": 28,
    "count": 5,
    "screen": "World Map Menu",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f5ec4 --stride 28 --count 5; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_worldmap.s",
-   "xd_analog": "XD symbols.txt has menuWorldMapMXInit/Ctrl/Main/Exit/Debug, menuWorldMapButton, menuWorldMapCursor, menuWorldMapMX, WorldMap::CallBackFunc/Ctrl -- direct category match."
+   "xd_analog": "XD symbols.txt has menuWorldMapMXInit/Ctrl/Main/Exit/Debug, menuWorldMapButton, menuWorldMapCursor, menuWorldMapMX, WorldMap::CallBackFunc/Ctrl -- direct category match.",
+   "callback_col_addr": "0x802f5ec4",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f7f94",
+   "base": "0x802F7F80",
    "stride": 28,
    "count": 5,
    "screen": "Title Screen",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f7f94 --stride 28 --count 5; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/gs_title.s",
-   "xd_analog": "Colosseum file already named gs_title.c (committed)."
+   "xd_analog": "Colosseum file already named gs_title.c (committed).",
+   "callback_col_addr": "0x802f7f94",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   },
   {
-   "base": "0x802f9b78",
+   "base": "0x802F9B64",
    "stride": 28,
    "count": 5,
    "screen": "Battle Menu (menuCB_Battle cluster)",
    "purity": 1.0,
    "evidence": "table entries decoded via tools/dolread.py table 0x802f9b78 --stride 28 --count 5; 100% of function-pointer members resolve to functions defined in build/GC6E01/asm/game/menu/menuCB_Battle.s",
-   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation."
+   "xd_analog": "XD symbols.txt has real menuCB_Battle=0x8004D394 (size 0xC8) plus a large menuCB_Battle*/menuCB_BattleResult*/menuCB_BattleStart* family -- confirms 'Battle' menu screens are a genuine named category in the shared engine. No byte-level match attempted between XD menuCB_Battle and our fn_80065628 (sizes differ: 0xC8 vs 0x108) so this is category-level, not function-level, confirmation.",
+   "callback_col_addr": "0x802f9b78",
+   "base_note": "row start = swept ptr addr minus 0x14 (sweep locks onto MENU_ITEM callback field @+0x14)"
   }
  ],
  "proposals": [
@@ -916,5 +1116,8 @@
    "evidence": "XD's own menuCB_Battle symbol (0x8004D394, size 0xC8) does not size-match fn_80065628 (size 0x108), so it is NOT the same function; the 192-entry table is more likely per-scrCmd sub-handlers for the battle menu rather than a single top-level menuCB_Battle equivalent. Would need per-entry structural diffing against XD's stride-28 battle table (if one exists) to confirm individual renames -- out of scope for this pass."
   }
  ],
- "notes": "METHODOLOGY: Step 1 (literal base+offset reconstruction) mostly did not resolve as originally framed. grep across all 302 lis+addi sites that load lbl_802EF0A8 shows the assembler NEVER emits a symbolic 'lbl_802EF0A8+0xNNNN' relocation (verified: zero hits for 'lbl_802EF0A8+' anywhere in build/GC6E01/asm/). The base register is always established at offset 0 (0x802EF0A8 exactly); reaching a table 0x1000+ bytes into the blob requires either (a) a runtime-computed index (loop/switch-driven, not a static literal -- this is the majority case, ~200/302 sites) or (b) a secondary addis+addi/subi chain using *numeric* (non-symbolic) immediates, e.g. 'addis r28, r3, 0x2' then 'lha r3, -0x2df2(r28)' in fn_800643D4 (menuCB_Battle.s) -- confirmed present (62 addis-on-base-reg sites found) but only partially traced (21 resolved) within this pass's budget; none of the resolved chains landed exactly on a known table base (they hit small scalar fields near/inside table rows, e.g. reading 2 fields of one row, not the table start), so per-table static caller attribution via this path remains incomplete. Because of that, the table->screen map above is built from a STRONGER and more direct signal: tools/dolread.py sweep decodes each stride-28 table's own member words (findptr against symbols.txt function starts) -- i.e. which functions' ADDRESSES are stored as the table's callback pointers. Cross-referencing every member against a fn-name->source-file index built from build/GC6E01/asm/game/**/*.s (favoring already-'named' files over 'auto_*'/'*_range_*'/'rodata_*'/'sdata2_*' placeholders) gives 60-100% single-file purity for the great majority of the 100 in-blob tables, which is direct evidence the table literally IS that screen's widget/dispatch data. The four largest address-range clusters that directly execute lis+addi against lbl_802EF0A8 (from refs.json) map onto these same named files: auto_01_8000BA94_text.s (16 fns, spans gs_pcbox.s/gs_title.s/gs_worldmap.s sub-ranges), auto_01_80030170_text.s = auto_01_80034280_text.s = gs_range_8003686C.s (22 fns, contains _menuSoundReadWaveThread -- looks like shared menu/window/sound engine code, not one screen), auto_01_80051710_text.s = gs_range_8005344C.s = menuCB_Battle.s (17 fns), and auto_01_8007162C_text.s = menu_range_8007109C.s (1 fn, fn_800756C8). gs_range_8003686C.s/auto_01_8003686C_text.s and its counterpart auto_01_80030170_text.s/auto_01_80034280_text.s are near-byte-identical dumps of the SAME address range with different external-call symbol resolution (fn_800AA498 vs VIGetDTVStatus, fn_801045A8 vs windowCheckCursor, etc.) -- treated as one cluster throughout. Same duplication pattern confirmed for gs_range_8005344C.s/menuCB_Battle.s and auto_01_8007109C_text.s/menu_range_8007109C.s (765-line diffs, only naming differs). 'unknown (common menu engine / window+sound framework cluster)' tables (owned by gs_range_8003686C.s) total ~14 tables / ~205 entries -- this is the single largest unidentified chunk; it is NOT obviously one screen (contains _menuSoundReadWaveThread, calls windowSearchID/windowCheckCursor -- generic window-management primitives), more likely a shared per-widget-type callback library used across several screens. Recommend a follow-up pass specifically on this ~0x18000-byte range (fn_8003686C..fn_8004E9C0) before renaming its file. rodata_802663A0.c's BigEntry structs (fn_800150E4/fn_8001501C) were NOT found to reference lbl_802EF0A8 directly or via any 'lbl_802EF0A8+' text; auto_01_8001501C_text.s only contains fn_800161B0 (1 site, shared with the gs_pokemon_summary.s cluster) -- the BigEntry/menu-dispatch struct link to this blob the user flagged as 'related discovery' was not corroborated in this pass and should be treated as open."
+ "notes": "METHODOLOGY: Step 1 (literal base+offset reconstruction) mostly did not resolve as originally framed. grep across all 302 lis+addi sites that load lbl_802EF0A8 shows the assembler NEVER emits a symbolic 'lbl_802EF0A8+0xNNNN' relocation (verified: zero hits for 'lbl_802EF0A8+' anywhere in build/GC6E01/asm/). The base register is always established at offset 0 (0x802EF0A8 exactly); reaching a table 0x1000+ bytes into the blob requires either (a) a runtime-computed index (loop/switch-driven, not a static literal -- this is the majority case, ~200/302 sites) or (b) a secondary addis+addi/subi chain using *numeric* (non-symbolic) immediates, e.g. 'addis r28, r3, 0x2' then 'lha r3, -0x2df2(r28)' in fn_800643D4 (menuCB_Battle.s) -- confirmed present (62 addis-on-base-reg sites found) but only partially traced (21 resolved) within this pass's budget; none of the resolved chains landed exactly on a known table base (they hit small scalar fields near/inside table rows, e.g. reading 2 fields of one row, not the table start), so per-table static caller attribution via this path remains incomplete. Because of that, the table->screen map above is built from a STRONGER and more direct signal: tools/dolread.py sweep decodes each stride-28 table's own member words (findptr against symbols.txt function starts) -- i.e. which functions' ADDRESSES are stored as the table's callback pointers. Cross-referencing every member against a fn-name->source-file index built from build/GC6E01/asm/game/**/*.s (favoring already-'named' files over 'auto_*'/'*_range_*'/'rodata_*'/'sdata2_*' placeholders) gives 60-100% single-file purity for the great majority of the 100 in-blob tables, which is direct evidence the table literally IS that screen's widget/dispatch data. The four largest address-range clusters that directly execute lis+addi against lbl_802EF0A8 (from refs.json) map onto these same named files: auto_01_8000BA94_text.s (16 fns, spans gs_pcbox.s/gs_title.s/gs_worldmap.s sub-ranges), auto_01_80030170_text.s = auto_01_80034280_text.s = gs_range_8003686C.s (22 fns, contains _menuSoundReadWaveThread -- looks like shared menu/window/sound engine code, not one screen), auto_01_80051710_text.s = gs_range_8005344C.s = menuCB_Battle.s (17 fns), and auto_01_8007162C_text.s = menu_range_8007109C.s (1 fn, fn_800756C8). gs_range_8003686C.s/auto_01_8003686C_text.s and its counterpart auto_01_80030170_text.s/auto_01_80034280_text.s are near-byte-identical dumps of the SAME address range with different external-call symbol resolution (fn_800AA498 vs VIGetDTVStatus, fn_801045A8 vs windowCheckCursor, etc.) -- treated as one cluster throughout. Same duplication pattern confirmed for gs_range_8005344C.s/menuCB_Battle.s and auto_01_8007109C_text.s/menu_range_8007109C.s (765-line diffs, only naming differs). 'unknown (common menu engine / window+sound framework cluster)' tables (owned by gs_range_8003686C.s) total ~14 tables / ~205 entries -- this is the single largest unidentified chunk; it is NOT obviously one screen (contains _menuSoundReadWaveThread, calls windowSearchID/windowCheckCursor -- generic window-management primitives), more likely a shared per-widget-type callback library used across several screens. Recommend a follow-up pass specifically on this ~0x18000-byte range (fn_8003686C..fn_8004E9C0) before renaming its file. rodata_802663A0.c's BigEntry structs (fn_800150E4/fn_8001501C) were NOT found to reference lbl_802EF0A8 directly or via any 'lbl_802EF0A8+' text; auto_01_8001501C_text.s only contains fn_800161B0 (1 site, shared with the gs_pokemon_summary.s cluster) -- the BigEntry/menu-dispatch struct link to this blob the user flagged as 'related discovery' was not corroborated in this pass and should be treated as open.",
+ "_correction": {
+  "_CORRECTION_2026_07_03": "All table `base` values were the MENU_ITEM callback-field column (row_start + 0x14), not the row start \u2014 the dolread sweep locks onto the fn-ptr column. Bases corrected here (callback addr preserved in callback_col_addr). Screen attributions unaffected (callbacks were correctly identified)."
+ }
 }
