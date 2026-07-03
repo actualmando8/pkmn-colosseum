@@ -910,7 +910,7 @@ void fn_80089F78(void) {
     extern void fn_801F1700();
     extern void fn_801F2020();
     extern void fn_801F54A4();
-    extern void fn_801F6B48();
+    extern void fightFloorBiosGetFightFloorPtr();
     extern void fn_801F8C00();
     extern void fn_801F981C();
     extern void fn_801F986C();
@@ -1313,7 +1313,7 @@ void fn_80089F78(void) {
         r6 = 0x0;
 
     } else {
-        fn_801F6B48();
+        fightFloorBiosGetFightFloorPtr();
         r4 = r22;
         r5 = (u32)sp + 0x18;
         fn_801F2020();

@@ -102,13 +102,13 @@
  * runtime state for the Colosseum engine.
  *
  * Key field offsets (accessed via addis + negative offset pattern):
- *   0xA490 : u32 field (set/get via fn_801F641C/fn_801F6430)
- *   0xA48C : u32 field (set/get via fn_801F644C/fn_801F6460)
- *   0xA488 : u32 field (set/get via fn_801F647C/fn_801F6490)
- *   0xA484 : u32 field (set/get via fn_801F64AC/fn_801F64C0)
- *   0xA4E4 : u16 field (set/get via fn_801F64DC/fn_801F64F0)
+ *   0xA490 : u32 field (set/get via fightFloorBiosSetItemPokemonPtr/fightFloorBiosGetItemPokemonPtr)
+ *   0xA48C : u32 field (set/get via fightFloorBiosSetTokuseiPokemonPtr/fightFloorBiosGetTokuseiPokemonPtr)
+ *   0xA488 : u32 field (set/get via fightFloorBiosSetTuikakoukaPokemonPtr/fightFloorBiosGetTuikakoukaPokemonPtr)
+ *   0xA484 : u32 field (set/get via fightFloorBiosSetKizetuPokemonPtr/fightFloorBiosGetKizetuPokemonPtr)
+ *   0xA4E4 : u16 field (set/get via fightFloorBiosSetFirstAttackRnd/fightFloorBiosGetFirstAttackRnd)
  *   0xA4C4 : u32[8] array (set/get via fightFloorBiosSetFightOutPokemonPtrAryPtr/fn_801F6544)
- *   0xA4C0 : u16 field (set/get via fn_801F65C0/fn_801F65D4)
+ *   0xA4C0 : u16 field (set/get via fightFloorBiosSetFightPokemonEntryCnt/fightFloorBiosGetFightPokemonEntryCnt)
  */
 struct Pokemon;
 
@@ -174,14 +174,14 @@ u32 PokemonSlotLookup(u16 slotType, u32 index, u16 count);
 struct Pokemon* GetPokemonContext(void);
 
 /**
- * fn_801F6B48 - GetCurrentPokemon
+ * fightFloorBiosGetFightFloorPtr - GetCurrentPokemon
  * Returns a pointer to the Pokemon currently selected/active in the
  * global context. Called when pokemon parameter is NULL in Get/Set.
  */
 struct Pokemon* GetCurrentPokemon(void);
 
 /**
- * fn_801F640C / fn_801F6414 - Set/Get global Pokemon state pointer
+ * fightFloorBiosSetEncountFloorId / fightFloorBiosGetEncountFloorId - Set/Get global Pokemon state pointer
  * These store/load lbl_8047B5F0 (SDA21). Implemented in pokemon.c
  * (matched 100%).
  */

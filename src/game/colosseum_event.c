@@ -9949,7 +9949,7 @@ void fn_80211830(void) {
     extern u32 lbl_8047B62C;
     extern void fn_801F37B0();
     extern void* fn_801F47B4();
-    extern void fn_801F6EEC();
+    extern void fightSideInitJoutaiDataId();
     extern s32 _fightSeqInitSubFightOutPokemon__FPvUsPv();
     extern s32 fn_80213558();
     extern s32 fn_802136A4();
@@ -9962,7 +9962,7 @@ void fn_80211830(void) {
     for (i = 0; i < 2; i++) {
         slotData = fn_801F47B4(0, i);
         if (slotData != NULL) {
-            fn_801F6EEC(slotData, 0x4D);
+            fightSideInitJoutaiDataId(slotData, 0x4D);
         }
     }
     fn_801F37B0(0, (u32)fn_802136A4, 0, 0);
