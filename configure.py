@@ -1795,6 +1795,41 @@ config.libs = [
             ),
             Object(
                 DataCandidate,
+                "game/data/data_802EDB7C.c",
+                progress_category="game",
+            ),
+            Object(
+                DataCandidate,
+                "game/data/data_803152B8.c",
+                progress_category="game",
+            ),
+            Object(
+                DataCandidate,
+                "game/data/data_803634A8.c",
+                progress_category="game",
+            ),
+            Object(
+                DataCandidate,
+                "game/data/data_80363630.c",
+                progress_category="game",
+            ),
+            Object(
+                DataCandidate,
+                "game/data/data_80369CB0.c",
+                progress_category="game",
+            ),
+            Object(
+                DataCandidate,
+                "game/data/data_8036C864.c",
+                progress_category="game",
+            ),
+            Object(
+                DataCandidate,
+                "game/data/data_8037564C.c",
+                progress_category="game",
+            ),
+            Object(
+                DataCandidate,
                 "game/data/sdata2_8047B6A0.c",
                 progress_category="game",
             ),
