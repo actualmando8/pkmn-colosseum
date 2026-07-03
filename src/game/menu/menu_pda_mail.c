@@ -349,7 +349,13 @@ asm s32 pdaMailGetMailID(s32 index) {
 #include "src/game/menu/menu_pda_mail_pdaMailGetMailID.inc"
 }
 #else
+/* dont_inline: every earlier call site in this TU only sees the forward
+ * `extern` prototype (this definition comes after them in file order),
+ * so they naturally keep a real `bl pdaMailGetMailID`. Call sites placed
+ * AFTER this definition (e.g. fn_8004D9C0) would otherwise get auto-
+ * inlined by -inline; retail keeps a real call there too, so pin it. */
 #pragma peephole off
+#pragma dont_inline on
 s32 pdaMailGetMailID(s32 index)
 {
     extern s32 fn_801D1F7C(void);
@@ -358,6 +364,7 @@ s32 pdaMailGetMailID(s32 index)
     }
     return lbl_8047A500[index];
 }
+#pragma dont_inline reset
 #pragma peephole reset
 #endif
 
@@ -611,6 +618,71 @@ extern s32 fn_801026A4(s32 menuId, u32 inputState, s32* config, s32 zero,
 extern void fn_80102510(s32 menuId);
 extern void menuCloseSync(s32 menuId, s32 flag);
 
+/* fn_801D1B4C (battle_waza.c): Waza party mailbox-sort-mode byte
+ * getter (0=default/none, 1=ascending, 2=ascending+recent-sort,
+ * 3=ascending+alpha-sort). mailGetMailIDInMailbox (battle_waza.c):
+ * mail ID by receive-order index. qsort: standard library sort. */
+extern s32 fn_801D1B4C(void);
+extern s32 mailGetMailIDInMailbox(s32 idx);
+extern void qsort(void* base, u32 count, u32 size,
+                   s32 (*cmp)(const void*, const void*));
+
+#if 0
+asm void fn_8004BFB0(void) {
+#include "src/game/menu/menu_pda_mail_fn_8004BFB0.inc"
+}
+#else
+/* WALL: W1 register-letter (retail keeps the mail-id buffer pointer in
+ * a single register r31 shared across all 4 switch arms with no r28
+ * companion; every source shape tried here -- shared top-level pointer,
+ * per-case-local pointer, block-scoped locals -- allocates an extra
+ * callee-saved register (r28) not present in target) + a redundant
+ * clrlwi mask before each halfword store that the target elides.
+ * Best reached 76.4% after 3 source-shape attempts. */
+void fn_8004BFB0(void)
+{
+    extern s32 fn_801D1F7C(void);
+    u16* buf = lbl_8047A500;
+    u8 mode = (u8) fn_801D1B4C();
+
+    switch (mode) {
+    case 1: {
+        s32 i = 0;
+        u16 count = (u16) fn_801D1F7C();
+        for (; i < count; i++) {
+            *buf++ = mailGetMailIDInMailbox(i);
+        }
+        break;
+    }
+    case 2: {
+        u16 count = (u16) fn_801D1F7C();
+        s32 i = 0;
+        for (; i < count; i++) {
+            *buf++ = mailGetMailIDInMailbox(i);
+        }
+        qsort(lbl_8047A500, count, 2, (void*) fn_8004BF20);
+        break;
+    }
+    case 3: {
+        u16 count = (u16) fn_801D1F7C();
+        s32 i = 0;
+        for (; i < count; i++) {
+            *buf++ = mailGetMailIDInMailbox(i);
+        }
+        qsort(lbl_8047A500, count, 2, (void*) fn_8004BE90);
+        break;
+    }
+    default: {
+        s32 i;
+        for (i = fn_801D1F7C() - 1; i >= 0; i--) {
+            *buf++ = mailGetMailIDInMailbox(i);
+        }
+        break;
+    }
+    }
+}
+#endif
+
 #if 0
 asm s32 fn_8004DC18(s32 a) {
 #include "src/game/menu/menu_pda_mail_fn_8004DC18.inc"
@@ -637,4 +709,172 @@ s32 fn_8004DC18(s32 a)
     }
     return choice;
 }
+#endif
+
+/* lbl_8047A518: persistent "current mailbox cursor" slot -- read/written
+ * across menu-reopen cycles by fn_8004D9C0 below (in/out selection index
+ * for the fn_801026A4 modal-list idiom) and (per XD skeleton) by sibling
+ * cursor helpers elsewhere in the PDA subsystem. fn_8004E9C0 (defined
+ * later in this TU): per-selection SE/animation pump for the mailbox
+ * list cursor -- asm-only still, called here only by symbol. */
+extern s32 lbl_8047A518;
+extern void fn_8004E9C0(s32 mailId);
+
+#if 0
+asm s32 fn_8004D9C0(s32 a) {
+#include "src/game/menu/menu_pda_mail_fn_8004D9C0.inc"
+}
+#else
+/* WALL: W3 vararg-slot scheduling (target computes the 7th arg's stack
+ * address (addi r9, r1, 0x8) before the four small-immediate args (r3/
+ * r5/r6/r7/r8); ours computes it last. #pragma scheduling off already
+ * fixed the epilogue-restore order (see fn_8004D590 precedent); a
+ * separate &cfg temp for the 7th arg didn't move this further. Parked
+ * at 96.1% after 3 attempts -- call skeleton, loop body, and mail-ID/
+ * SE-pump dispatch all byte-match. */
+#pragma scheduling off
+s32 fn_8004D9C0(s32 a)
+{
+    lbl_8047A518 = a;
+    for (;;) {
+        s32* cfg = &lbl_8047A518;
+        s32 choice = fn_801026A4(0x74, fn_801046B8(), 0, 0, 1, 1, (s32*) &cfg);
+        if (choice == -1) {
+            break;
+        }
+        {
+            s32 mailId = pdaMailGetMailID(lbl_8047A518);
+            if (fn_801D16F0(mailId) != 0) {
+                fn_8004E9C0(mailId);
+            }
+        }
+    }
+    fn_80102510(0x74);
+    menuCloseSync(0x74, 1);
+    return lbl_8047A518;
+}
+#pragma scheduling reset
+#endif
+
+/* PdaMailOutC: widget/out-record variant used by fn_8004DCC0 -- a
+ * halfword "current message id" field at 0x6 (compared against the
+ * lookup table below) plus the shared field_0x4c out-slot seen on
+ * PdaMailOutA. fn_801D1620 (battle_waza.c): despite its current void
+ * mutator shape there (unverified, 22.9% match), this call site treats
+ * it as returning a value -- only the calling convention matters here. */
+typedef struct PdaMailOutC {
+    u8 pad00[6];
+    s16 msgId;
+    u8 pad08[0x44];
+    u32 field_0x4c;
+} PdaMailOutC;
+
+extern u32 fn_801D1620(u8 idx);
+
+/* lbl_802672F0 (rodata_80267250.c): shared message-id table; this call
+ * site takes a mutable stack COPY of the first 11 (of 12) entries. */
+extern const u32 lbl_802672F0[12];
+
+#if 0
+asm s32 fn_8004DCC0(void* unused, PdaMailOutC* window) {
+#include "src/game/menu/menu_pda_mail_fn_8004DCC0.inc"
+}
+#else
+#pragma peephole off
+s32 fn_8004DCC0(void* unused, PdaMailOutC* window)
+{
+    s32 table[11];
+    s32 i;
+
+    table[0] = (s32) lbl_802672F0[0];
+    table[1] = (s32) lbl_802672F0[1];
+    table[2] = (s32) lbl_802672F0[2];
+    table[3] = (s32) lbl_802672F0[3];
+    table[4] = (s32) lbl_802672F0[4];
+    table[5] = (s32) lbl_802672F0[5];
+    table[6] = (s32) lbl_802672F0[6];
+    table[7] = (s32) lbl_802672F0[7];
+    table[8] = (s32) lbl_802672F0[8];
+    table[9] = (s32) lbl_802672F0[9];
+    table[10] = (s32) lbl_802672F0[10];
+
+    for (i = 0; i < 11; i++) {
+        if (window->msgId == table[i]) {
+            break;
+        }
+    }
+    if (i >= 11) {
+        return 0;
+    }
+    {
+        u32 result = fn_801D1620((u8) i);
+        if (result != 0) {
+            window->field_0x4c = result;
+        } else {
+            window->field_0x4c = 0x36CD;
+        }
+    }
+    return 0;
+}
+#pragma peephole reset
+#endif
+
+/* fn_80166A50 (gs_event_exec.c/gs_title.c convention): plays an SE by
+ * (id, a, b, c). fn_801D1B78/fn_801D1C20/fn_801D228C (battle_waza.c):
+ * despite their current unverified shapes there (2.4%/2.4%/1.3% match
+ * -- those bodies are still stubs), this call site's actual arg count
+ * (1 each) is what matters for our own byte match. */
+extern void fn_80166A50(s32 id, s32 a, s32 b, s32 c);
+extern s32 fn_801D1B78(s32 mailId);
+extern void fn_801D1C20(s32 mailId);
+extern void fn_801D228C(u16 mailId);
+
+#if 0
+asm s32 fn_8004D7D0(PdaMailWindowA* window) {
+#include "src/game/menu/menu_pda_mail_fn_8004D7D0.inc"
+}
+#else
+#pragma peephole off
+s32 fn_8004D7D0(PdaMailWindowA* window)
+{
+    extern s32 fn_801D1F7C(void);
+    s32** field = window->field_0x60;
+    u8* state = fn_80105624();
+    s32 index = **field;
+    s32 cur = index;
+    u16 flags;
+
+    flags = *(u16*) (state + 6);
+    if (flags & 0x2) {
+        s32 count = fn_801D1F7C();
+        index++;
+        if (index >= count) {
+            index = 0;
+        }
+    }
+    flags = *(u16*) (state + 6);
+    if (flags & 0x1) {
+        index--;
+        if (index < 0) {
+            index = fn_801D1F7C() - 1;
+        }
+    }
+    if (index != cur) {
+        fn_80166A50(0x23, 0, 0xFF, 0);
+        **field = index;
+    }
+    index = pdaMailGetMailID(index);
+    if (fn_801D1B78(index) == 0) {
+        fn_801D1C20(index);
+        fn_801D228C((u16) index);
+    }
+    return 0;
+}
+/* WALL: W1 register-letter (target holds the post-lookup mail id in a
+ * freshly allocated r29 for its whole live range; reusing "index"'s own
+ * register vs. a separate "mailId" local both land on r28/r31 instead).
+ * Parked at 99.75% after 3 attempts -- everything else, including the
+ * two count()-hoist reorderings and the peephole-off record-form fix,
+ * byte-matches. */
+#pragma peephole reset
 #endif
