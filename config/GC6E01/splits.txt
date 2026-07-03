@@ -773,8 +773,32 @@ game/effect/effect_visual.c:
 game/people/people_data.c:
 	.text       start:0x80140588 end:0x80144574
 
-game/people/people_field.c:
-	.text       start:0x80144574 end:0x801652DC
+game/item_range_80144574.c:
+	.text       start:0x80144574 end:0x8014635C
+
+musyx/runtime/seq.c:
+	.text       start:0x8014635C end:0x8014A23C
+
+musyx/runtime/synth.c:
+	.text       start:0x8014A23C end:0x8014D598
+
+musyx/runtime/seq_api.c:
+	.text       start:0x8014D598 end:0x8014D75C
+
+musyx/runtime/snd_synthapi.c:
+	.text       start:0x8014D75C end:0x8014DDD8
+
+musyx/runtime/stream.c:
+	.text       start:0x8014DDD8 end:0x80150C78
+
+musyx/runtime/synthdata.c:
+	.text       start:0x80150C78 end:0x801525E4
+
+musyx/runtime/synthmacros.c:
+	.text       start:0x801525E4 end:0x80157280
+
+musyx/musyx_range_80157280.c:
+	.text       start:0x80157280 end:0x801652DC
 
 game/musyx_range_801652DC.c:
 	.text       start:0x801652DC end:0x801653BC
