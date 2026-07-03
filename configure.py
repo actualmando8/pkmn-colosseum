@@ -240,62 +240,62 @@ config.libs = [
         "Runtime.PPCEABI.H",
         "GC/1.2.5n",
         [
-            Object(CodeCandidate, "trk/ddh_cc_range_800C3E90.c", mw_version="GC/1.3", progress_category="sdk"),  # CALIB_TRK
-            Object(CodeCandidate, "hsd/hsd_mobj_range_801A8478.c", mw_version="GC/1.3", progress_category="sdk"),  # CALIB_HSD1
-            Object(CodeCandidate, "hsd/hsd_mobj_range_801A84B4.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_HSD_VECINIT
-            Object(CodeCandidate, "hsd/hsd_mtx.c", mw_version="GC/1.3", progress_category="sdk"),  # CALIB_HSD2
-            Object(CodeCandidate, "crt/stdio_range_800C7558.c", mw_version="GC/1.3", progress_category="sdk"),  # CALIB_CRT
-            Object(CodeCandidate, "trk/ddh_cc_range_800C3C00.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK
-            Object(CodeCandidate, "trk/gdev_cc_range_800C41AC.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK
-            Object(CodeCandidate, "trk/gdev_cc_range_800C4444.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK
-            Object(CodeCandidate, "hsd/hsd_mobj_range_801A86B4.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_HSD
-            Object(CodeCandidate, "hsd/hsd_pobj_range_801AA608.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_HSD_POBJ
-            Object(CodeCandidate, "trk/TRKTarget_range_800C1310.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK2
-            Object(CodeCandidate, "trk/TRKComm_range_800C3678.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK3
-            Object(CodeCandidate, "trk/TRKNub_range_800BE47C.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK3
-            Object(CodeCandidate, "trk/TRKNub_range_800BEE74.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK3
-            Object(CodeCandidate, "trk/TRKDispatch_range_800C0CD8.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK3
-            Object(CodeCandidate, "trk/TRKTarget_range_800C1348.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK3
-            Object(CodeCandidate, "trk/TRKInit.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK3
-            Object(CodeCandidate, "trk/TRKBoard_range_800C33BC.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_TRK3
-            Object(CodeCandidate, "crt/printf.c", mw_version="GC/1.3", progress_category="sdk"),  # BANK_CRT_PRINTF
+            Object(CodeCandidate, "trk/ddh_cc_range_800C3E90.c", mw_version="GC/1.3", progress_category="runtime"),  # CALIB_TRK
+            Object(CodeCandidate, "hsd/hsd_mobj_range_801A8478.c", mw_version="GC/1.3", progress_category="hsd"),  # CALIB_HSD1
+            Object(CodeCandidate, "hsd/hsd_mobj_range_801A84B4.c", mw_version="GC/1.3", progress_category="hsd"),  # BANK_HSD_VECINIT
+            Object(CodeCandidate, "hsd/hsd_mtx.c", mw_version="GC/1.3", progress_category="hsd"),  # CALIB_HSD2
+            Object(CodeCandidate, "crt/stdio_range_800C7558.c", mw_version="GC/1.3", progress_category="runtime"),  # CALIB_CRT
+            Object(CodeCandidate, "trk/ddh_cc_range_800C3C00.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK
+            Object(CodeCandidate, "trk/gdev_cc_range_800C41AC.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK
+            Object(CodeCandidate, "trk/gdev_cc_range_800C4444.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK
+            Object(CodeCandidate, "hsd/hsd_mobj_range_801A86B4.c", mw_version="GC/1.3", progress_category="hsd"),  # BANK_HSD
+            Object(CodeCandidate, "hsd/hsd_pobj_range_801AA608.c", mw_version="GC/1.3", progress_category="hsd"),  # BANK_HSD_POBJ
+            Object(CodeCandidate, "trk/TRKTarget_range_800C1310.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK2
+            Object(CodeCandidate, "trk/TRKComm_range_800C3678.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
+            Object(CodeCandidate, "trk/TRKNub_range_800BE47C.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
+            Object(CodeCandidate, "trk/TRKNub_range_800BEE74.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
+            Object(CodeCandidate, "trk/TRKDispatch_range_800C0CD8.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
+            Object(CodeCandidate, "trk/TRKTarget_range_800C1348.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
+            Object(CodeCandidate, "trk/TRKInit.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
+            Object(CodeCandidate, "trk/TRKBoard_range_800C33BC.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
+            Object(CodeCandidate, "crt/printf.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_CRT_PRINTF
             Object(
                 NonMatching,
                 "__init_cpp_exceptions.cpp",
                 source="crt_data/__init_cpp_exceptions.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "crt/mem.c",
                 mw_version="GC/2.0",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "crt/string.c",
                 mw_version="GC/1.3",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "crt/wchar.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "crt/mwtrace_helpers.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "crt/critical_regions.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "crt/stdio_atexit.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
@@ -560,7 +560,7 @@ config.libs = [
                 "game/people/people_field.c",
                 mw_version="GC/1.3.2",
                 extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
+                progress_category="musyx",
             ),
             Object(
                 CodeCandidate,
@@ -808,13 +808,13 @@ config.libs = [
                 CodeCandidate,
                 "trk/trk_range_800C3EBC.c",
                 mw_version="GC/1.3",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "trk/trk_range_800C4470.c",
                 mw_version="GC/1.3",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
@@ -839,7 +839,7 @@ config.libs = [
                 CodeCandidate,
                 "crt/math_range_800CAA58.c",
                 mw_version="GC/1.3",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
@@ -941,25 +941,25 @@ config.libs = [
                 CodeCandidate,
                 "hsd/hsd_range_801920E4.c",
                 mw_version="GC/1.3",
-                progress_category="sdk",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_memory.c",
                 mw_version="GC/1.3",
-                progress_category="sdk",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_range_801B0158.c",
                 mw_version="GC/1.3",
-                progress_category="sdk",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_tobj.c",
                 mw_version="GC/1.3",
-                progress_category="sdk",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
@@ -1123,7 +1123,7 @@ config.libs = [
                 CodeCandidate,
                 "crt/__start.c",
                 mw_version="GC/1.3.2",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
@@ -1297,43 +1297,43 @@ config.libs = [
                 CodeCandidate,
                 "hsd/hsd_dobj.c",
                 mw_version="GC/1.3",
-                progress_category="sdk",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_wobj.c",
                 mw_version="GC/1.3",
-                progress_category="sdk",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_fog.c",
                 mw_version="GC/1.3",
-                progress_category="sdk",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_initialize.c",
                 mw_version="GC/1.3",
-                progress_category="sdk",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_class.c",
                 mw_version="GC/1.3",
-                progress_category="sdk",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_object.c",
                 mw_version="GC/1.3",
-                progress_category="sdk",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_displayfunc.c",
                 mw_version="GC/1.3",
-                progress_category="sdk",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
@@ -1393,19 +1393,19 @@ config.libs = [
                 CodeCandidate,
                 "hsd/hsd_cobj.c",
                 mw_version="GC/1.3",
-                progress_category="sdk",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_jobj.c",
                 mw_version="GC/1.3",
-                progress_category="sdk",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_lobj.c",
                 mw_version="GC/1.3",
-                progress_category="sdk",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
@@ -1446,44 +1446,44 @@ config.libs = [
                 CodeCandidate,
                 "hsd/hsd_shadow.c",
                 mw_version="GC/1.3",
-                progress_category="sdk",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_util.c",
                 mw_version="GC/1.3",
-                progress_category="sdk",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_video.c",
                 mw_version="GC/1.3",
-                progress_category="sdk",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_mobj.c",
                 mw_version="GC/1.3",
-                progress_category="sdk",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_robj_range_801ADD48.c",
                 mw_version="GC/1.3",
-                progress_category="sdk",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_texp.c",
                 mw_version="GC/1.3",
-                progress_category="sdk",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_aobj_range_801C01C8.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="sdk",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
@@ -1504,184 +1504,184 @@ config.libs = [
                 CodeCandidate,
                 "crt/exit.c",
                 mw_version="GC/1.3.2",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "crt/global_destructor_chain.c",
                 mw_version="GC/1.3",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_pobj.c",
-                progress_category="game",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_mobj_clear_flags.c",
-                progress_category="game",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_mobj_set_flags.c",
-                progress_category="game",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_mobj_get_flags.c",
-                progress_category="game",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_mobj_set_current.c",
-                progress_category="game",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_mtx_get_alloc_data.c",
-                progress_category="game",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_vec_get_alloc_data.c",
-                progress_category="game",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_mtx_scaled_add.c",
-                progress_category="game",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_pobj_empty.c",
-                progress_category="game",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_robj_update_func.c",
-                progress_category="game",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_robj_find_by_type.c",
-                progress_category="game",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_robj_get_alloc_data.c",
-                progress_category="game",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_robj_get_alloc_data2.c",
-                progress_category="game",
+                progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "trk/TRKConstructEvent.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "trk/TRKBufferReset.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "trk/TRKGetBuffer.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "trk/TRKTerminateSerialHandler.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "trk/TRKSerial.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "trk/usr_put_initialize.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "trk/TRKDispatchInit.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "trk/TRKDispatchConnected.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "trk/TRKDispatchMutex.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "trk/TRKTargetState.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "trk/TRKTargetStopped.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "trk/TRKBoard.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "trk/TRKCommState.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "trk/TRKComm.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "trk/udp_cc.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "trk/ddh_cc_close.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "trk/ddh_cc_shutdown.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "trk/circle_buffer_count.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "trk/gdev_cc_close.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 CodeCandidate,
                 "trk/gdev_cc_shutdown.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 DataCandidate,
                 "crt/sdata2_math.c",
                 source="crt_data/sdata2_math.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 DataCandidate,
@@ -1797,7 +1797,7 @@ config.libs = [
                 DataCandidate,
                 "crt/sdata2_math_8047C8A0.c",
                 source="crt_data/sdata2_math_8047C8A0.c",
-                progress_category="sdk",
+                progress_category="runtime",
             ),
             Object(
                 DataCandidate,
@@ -1883,32 +1883,32 @@ config.libs = [
             Object(
                 DataCandidate,
                 "hsd/hsd_sdata2_8047D990.c",
-                progress_category="game",
+                progress_category="hsd",
             ),
             Object(
                 DataCandidate,
                 "hsd/hsd_sdata2_8047DA90.c",
-                progress_category="game",
+                progress_category="hsd",
             ),
             Object(
                 DataCandidate,
                 "hsd/hsd_sdata2_8047DB90.c",
-                progress_category="game",
+                progress_category="hsd",
             ),
             Object(
                 DataCandidate,
                 "hsd/hsd_sdata2_8047DC90.c",
-                progress_category="game",
+                progress_category="hsd",
             ),
             Object(
                 DataCandidate,
                 "hsd/hsd_sdata2_8047DD90.c",
-                progress_category="game",
+                progress_category="hsd",
             ),
             Object(
                 DataCandidate,
                 "hsd/hsd_sdata2_8047DE90.c",
-                progress_category="game",
+                progress_category="hsd",
             ),
             Object(
                 DataCandidate,
@@ -1956,7 +1956,10 @@ config.libs = [
 
 config.progress_categories = [
     ProgressCategory("game", "Game Code"),
-    ProgressCategory("sdk", "SDK Code"),
+    ProgressCategory("sdk", "Dolphin SDK Code"),
+    ProgressCategory("hsd", "HSD/sysdolphin (Third Party)"),
+    ProgressCategory("musyx", "MusyX (Third Party)"),
+    ProgressCategory("runtime", "Gekko Runtime Code"),
 ]
 config.progress_each_module = args.verbose
 
