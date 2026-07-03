@@ -94,6 +94,433 @@ extern void  fn_80142984(u32 id);       /* peopleFieldGetByID */
 
 /* Script system */
 
+/* ===== dataInsert*/ /* dataRemove* cluster (0x80150C78 - 0x8015210C) =====
+ * Struct shapes below were reverse-engineered from
+ * build/GC6E01/asm/musyx/runtime/synthdata.s (field offsets/sizes confirmed
+ * by the stw/sth/lhz/stwx patterns of each function) since the reference
+ * AxioDL synthdata.c declares these as opaque named structs we don't have
+ * headers for. Field ORDER below reflects real memory layout, not
+ * necessarily the reference source's declaration order. Locally-scoped
+ * typedefs (distinct names from dataInit's own `DataMacMainEntry`) so as
+ * not to require touching the already-matched dataInit block below. */
+extern void hwDisableIrq(void);
+extern void hwEnableIrq(void);
+
+typedef struct { void* data; u16 id; u16 refCount; } DataTabT;               /* keymap/curve entry, 8 bytes */
+typedef struct { void* data; u16 id; u16 num; u16 refCount; } LayerTabT;     /* layer entry, 12 bytes */
+typedef struct { void* data; void* base; u16 numSmp; } SdirTabT;             /* sample-dir directory entry, 12 bytes */
+typedef struct { u16 id; u16 refCount; u32 offset; void* addr; u8 header[0x14]; } SdirDataT; /* sample-dir data entry, 0x20 bytes */
+typedef struct { u8 pad[9]; u8 vGroup; } FxEntryT;                            /* individual FX_TAB entry, 0xA bytes (only vGroup@9 used here) */
+typedef struct { u16 gid; u16 fxNum; void* fxTab; } FxGroupT;                 /* FX group cluster entry, 8 bytes */
+typedef struct { u16 num; u16 subTabIndex; } MacMainEntryT;                   /* macro main-table entry, 4 bytes */
+typedef struct { void* data; u16 id; u16 refCount; } MacSubEntryT;            /* macro sub-table entry, 8 bytes */
+
+s32 dataInsertKeymap(u16 cid, void* keymapdata) {
+    extern u8 lbl_804378F8[];
+    extern u16 lbl_8047AFA6;
+#define tab ((DataTabT*)lbl_804378F8)
+    s32 i, j;
+
+    hwDisableIrq();
+    for (i = 0; i < lbl_8047AFA6 && tab[i].id < cid; ++i) {}
+
+    if (i < lbl_8047AFA6) {
+        if (cid != tab[i].id) {
+            if (lbl_8047AFA6 < 0x100) {
+                for (j = lbl_8047AFA6 - 1; j >= i; --j) tab[j + 1] = tab[j];
+                ++lbl_8047AFA6;
+            } else {
+                hwEnableIrq();
+                return 0;
+            }
+        } else {
+            tab[i].refCount++;
+            hwEnableIrq();
+            return 0;
+        }
+    } else if (lbl_8047AFA6 < 0x100) {
+        ++lbl_8047AFA6;
+    } else {
+        hwEnableIrq();
+        return 0;
+    }
+
+    tab[i].id = cid;
+    tab[i].data = keymapdata;
+    tab[i].refCount = 1;
+    hwEnableIrq();
+    return 1;
+#undef tab
+}
+
+s32 fn_80150E68(u16 sid) {
+    extern u8 lbl_804378F8[];
+    extern u16 lbl_8047AFA6;
+#define tab ((DataTabT*)lbl_804378F8)
+    s32 i, j;
+
+    hwDisableIrq();
+    for (i = 0; i < lbl_8047AFA6 && tab[i].id != sid; ++i) {}
+
+    if (i != lbl_8047AFA6 && --tab[i].refCount == 0) {
+        for (j = i + 1; j < lbl_8047AFA6; j++) {
+            tab[j - 1] = tab[j];
+        }
+        --lbl_8047AFA6;
+        hwEnableIrq();
+        return 1;
+    }
+
+    hwEnableIrq();
+    return 0;
+#undef tab
+}
+
+s32 dataInsertLayer(u16 cid, void* layerdata, u16 size) {
+    extern u8 lbl_804380F8[];
+    extern u16 lbl_8047AFA4;
+#define tab ((LayerTabT*)lbl_804380F8)
+    s32 i, j;
+
+    hwDisableIrq();
+    for (i = 0; i < lbl_8047AFA4 && tab[i].id < cid; ++i) {}
+
+    if (i < lbl_8047AFA4) {
+        if (cid != tab[i].id) {
+            if (lbl_8047AFA4 < 0x100) {
+                for (j = lbl_8047AFA4 - 1; j >= i; --j) tab[j + 1] = tab[j];
+                ++lbl_8047AFA4;
+            } else {
+                hwEnableIrq();
+                return 0;
+            }
+        } else {
+            tab[i].refCount++;
+            hwEnableIrq();
+            return 0;
+        }
+    } else if (lbl_8047AFA4 < 0x100) {
+        ++lbl_8047AFA4;
+    } else {
+        hwEnableIrq();
+        return 0;
+    }
+
+    tab[i].id = cid;
+    tab[i].data = layerdata;
+    tab[i].num = size;
+    tab[i].refCount = 1;
+    hwEnableIrq();
+    return 1;
+#undef tab
+}
+
+s32 dataRemoveLayer(u16 sid) {
+    extern u8 lbl_804380F8[];
+    extern u16 lbl_8047AFA4;
+#define tab ((LayerTabT*)lbl_804380F8)
+    s32 i, j;
+
+    hwDisableIrq();
+    for (i = 0; i < lbl_8047AFA4 && tab[i].id != sid; ++i) {}
+
+    if (i != lbl_8047AFA4 && --tab[i].refCount == 0) {
+        for (j = i + 1; j < lbl_8047AFA4; j++) {
+            tab[j - 1] = tab[j];
+        }
+        --lbl_8047AFA4;
+        hwEnableIrq();
+        return 1;
+    }
+
+    hwEnableIrq();
+    return 0;
+#undef tab
+}
+
+s32 dataInsertCurve(u16 cid, void* curvedata) {
+    extern u8 lbl_80438CF8[];
+    extern u16 lbl_8047AFA8;
+#define tab ((DataTabT*)lbl_80438CF8)
+    s32 i, j;
+
+    hwDisableIrq();
+    for (i = 0; i < lbl_8047AFA8 && tab[i].id < cid; ++i) {}
+
+    if (i < lbl_8047AFA8) {
+        if (cid != tab[i].id) {
+            if (lbl_8047AFA8 < 0x800) {
+                for (j = lbl_8047AFA8 - 1; j >= i; --j) tab[j + 1] = tab[j];
+                ++lbl_8047AFA8;
+            } else {
+                hwEnableIrq();
+                return 0;
+            }
+        } else {
+            hwEnableIrq();
+            tab[i].refCount++;
+            return 0;
+        }
+    } else if (lbl_8047AFA8 < 0x800) {
+        ++lbl_8047AFA8;
+    } else {
+        hwEnableIrq();
+        return 0;
+    }
+
+    tab[i].id = cid;
+    tab[i].data = curvedata;
+    tab[i].refCount = 1;
+    hwEnableIrq();
+    return 1;
+#undef tab
+}
+
+s32 fn_801515F4(u16 sid) {
+    extern u8 lbl_80438CF8[];
+    extern u16 lbl_8047AFA8;
+#define tab ((DataTabT*)lbl_80438CF8)
+    s32 i, j;
+
+    hwDisableIrq();
+    for (i = 0; i < lbl_8047AFA8 && tab[i].id != sid; ++i) {}
+
+    if (i != lbl_8047AFA8 && --tab[i].refCount == 0) {
+        for (j = i + 1; j < lbl_8047AFA8; j++) {
+            tab[j - 1] = tab[j];
+        }
+        --lbl_8047AFA8;
+        hwEnableIrq();
+        return 1;
+    }
+
+    hwEnableIrq();
+    return 0;
+#undef tab
+}
+
+s32 fn_80151770(SdirDataT* sdir, void* smp_data) {
+    extern u8 lbl_8043CCF8[];
+    extern u16 lbl_8047AFAA;
+#define tab ((SdirTabT*)lbl_8043CCF8)
+    s32 i;
+    SdirDataT* s;
+    u16 n;
+    u16 j;
+    u16 k;
+
+    for (i = 0; i < lbl_8047AFAA && tab[i].data != sdir; ++i) {}
+
+    if (i == lbl_8047AFAA) {
+        if (lbl_8047AFAA < 0x80) {
+            n = 0;
+            for (s = sdir; s->id != 0xFFFF; ++s) {
+                ++n;
+            }
+
+            hwDisableIrq();
+            for (j = 0; j < n; ++j) {
+                for (i = 0; i < lbl_8047AFAA; ++i) {
+                    for (k = 0; k < tab[i].numSmp; ++k) {
+                        if (sdir[j].id == ((SdirDataT*)tab[i].data)[k].id) goto found_id;
+                    }
+                }
+            found_id:
+                if (i != lbl_8047AFAA) {
+                    sdir[j].refCount = 0xFFFF;
+                } else {
+                    sdir[j].refCount = 0;
+                }
+            }
+
+            tab[lbl_8047AFAA].data = sdir;
+            tab[lbl_8047AFAA].numSmp = n;
+            tab[lbl_8047AFAA].base = smp_data;
+            ++lbl_8047AFAA;
+            hwEnableIrq();
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    return 1;
+#undef tab
+}
+
+s32 fn_801518F8(u16 sid) {
+    extern u8 lbl_8043CCF8[];
+    extern u16 lbl_8047AFAA;
+    extern void fn_80163050(void* header, void* addr);
+#define tab ((SdirTabT*)lbl_8043CCF8)
+    u32 i;
+    SdirDataT* data;
+    SdirDataT* sdir;
+    void* header;
+
+    sdir = NULL;
+    for (i = 0; i < lbl_8047AFAA; ++i) {
+        for (data = (SdirDataT*)tab[i].data; data->id != 0xFFFF; ++data) {
+            if (data->id == sid && data->refCount != 0xFFFF) {
+                sdir = data;
+                goto done;
+            }
+        }
+    }
+done:
+    if (sdir->refCount == 0) {
+        sdir->addr = (void*)((u32)tab[i].base + sdir->offset);
+        header = &sdir->header;
+        fn_80163050(&header, &sdir->addr);
+    }
+    ++sdir->refCount;
+    return 1;
+#undef tab
+}
+
+s32 fn_801519D0(u16 sid) {
+    extern u8 lbl_8043CCF8[];
+    extern u16 lbl_8047AFAA;
+    extern void fn_80163104(void* header, void* addr);
+    SdirTabT* tab = (SdirTabT*)lbl_8043CCF8;
+    u32 i;
+    SdirDataT* sdir;
+
+    for (i = 0; i < lbl_8047AFAA; ++i) {
+        for (sdir = (SdirDataT*)tab[i].data; sdir->id != 0xFFFF; ++sdir) {
+            if (sdir->id == sid && sdir->refCount != 0xFFFF) {
+                --sdir->refCount;
+                if (sdir->refCount == 0) {
+                    fn_80163104(&sdir->header, sdir->addr);
+                }
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+s32 fn_80151A68(u16 gid, FxEntryT* fx, u16 fxNum) {
+    extern u8 lbl_8043D2F8[];
+    extern u16 lbl_8047AFA0;
+#define tab ((FxGroupT*)lbl_8043D2F8)
+    s32 i;
+
+    for (i = 0; i < lbl_8047AFA0 && gid != tab[i].gid; ++i) {}
+
+    if (i == lbl_8047AFA0) {
+        if (lbl_8047AFA0 < 0x80) {
+            hwDisableIrq();
+            tab[lbl_8047AFA0].gid = gid;
+            tab[lbl_8047AFA0].fxNum = fxNum;
+            tab[lbl_8047AFA0].fxTab = fx;
+
+            for (i = 0; i < fxNum; ++i, ++fx) {
+                fx->vGroup = 31;
+            }
+
+            lbl_8047AFA0++;
+            hwEnableIrq();
+            return 1;
+        }
+    }
+    return 0;
+#undef tab
+}
+
+s32 fn_80151B84(u16 mid, void* macroaddr) {
+    extern u8 lbl_8043D6F8[];
+    extern u8 lbl_8043DEF8[];
+    extern u16 lbl_8047AFA2;
+#define mainTab ((MacMainEntryT*)lbl_8043D6F8)
+#define subTab ((MacSubEntryT*)lbl_8043DEF8)
+    s32 main;
+    s32 base;
+    s32 pos;
+    s32 i;
+
+    hwDisableIrq();
+    main = (mid >> 6) & 0x3FF;
+
+    if (mainTab[main].num == 0) {
+        pos = base = mainTab[main].subTabIndex = lbl_8047AFA2;
+    } else {
+        base = mainTab[main].subTabIndex;
+        for (i = 0; i < mainTab[main].num && subTab[base + i].id < mid; ++i) {}
+
+        if (i < mainTab[main].num) {
+            pos = base + i;
+            if (mid == subTab[pos].id) {
+                subTab[pos].refCount++;
+                hwEnableIrq();
+                return 0;
+            }
+        } else {
+            pos = base + i;
+        }
+    }
+
+    if (lbl_8047AFA2 < 0x1000) {
+        for (i = 0; i < 512; ++i) {
+            if (mainTab[i].subTabIndex > base) mainTab[i].subTabIndex++;
+        }
+
+        i = lbl_8047AFA2 - 1;
+        for (; i >= pos; --i) subTab[i + 1] = subTab[i];
+
+        subTab[pos].id = mid;
+        subTab[pos].data = macroaddr;
+        subTab[pos].refCount = 1;
+        mainTab[main].num++;
+        lbl_8047AFA2++;
+        hwEnableIrq();
+        return 1;
+    }
+    hwEnableIrq();
+    return 0;
+#undef mainTab
+#undef subTab
+}
+
+s32 dataRemoveMacro(u16 mid) {
+    extern u8 lbl_8043D6F8[];
+    extern u8 lbl_8043DEF8[];
+    extern u16 lbl_8047AFA2;
+#define mainTab ((MacMainEntryT*)lbl_8043D6F8)
+#define subTab ((MacSubEntryT*)lbl_8043DEF8)
+    s32 main;
+    s32 base;
+    s32 i;
+
+    hwDisableIrq();
+    main = (mid >> 6) & 0x3FF;
+
+    if (mainTab[main].num != 0) {
+        base = mainTab[main].subTabIndex;
+        for (i = 0; i < mainTab[main].num && mid != subTab[base + i].id; ++i) {}
+
+        if (i < mainTab[main].num) {
+            if (--subTab[base + i].refCount == 0) {
+                for (i = base + i + 1; i < lbl_8047AFA2; ++i) {
+                    subTab[i - 1] = subTab[i];
+                }
+
+                for (i = 0; i < 512; ++i) {
+                    if (mainTab[i].subTabIndex > base) --mainTab[i].subTabIndex;
+                }
+
+                --mainTab[main].num;
+                --lbl_8047AFA2;
+            }
+        }
+    }
+
+    hwEnableIrq();
+    return 0;
+#undef mainTab
+#undef subTab
+}
+
 s32 maccmp(u16* a, u16* b) {
     return (s32)(a[2]) - (s32)(b[2]);
 }
@@ -169,6 +596,16 @@ asm void fn_801521B8(void) {
 #include "src/game/people/people_field_fn_801521B8.inc"
 }
 #else
+/* likely dataGetSample. 79.0% -> 79.8% (2026-07-02): moving the
+ * `lbl_8047AF84 = (u32)header;` scratch-cache store to AFTER the
+ * header-relative reads (instead of immediately after computing `header`)
+ * stopped the compiler from reloading `header`'s value back from that
+ * global before each subsequent access -- it now keeps `header` live in a
+ * register for out[1]/out[5]/out[4]/the byte-extract. Residual 20.2% gap is
+ * the first access (`out[0] = *(u32*)header`) still routing through the
+ * global once (target instead re-derives it as `result + 0xc` in a
+ * different register than the later header-relative reads) plus the same
+ * lhzx/stwx addressing-mode CSE wall documented on dataGetMacro. */
 u32 fn_801521B8(u16 key, u32* out) {
     void* result;
     u8* header;
@@ -182,15 +619,15 @@ u32 fn_801521B8(u16 key, u32* out) {
         lbl_8047AF88 = (u32)result;
         if (result != NULL && *(u16*)((u8*)result + 2) != 0xFFFF) {
             header = (u8*)result + 0xC;
-            lbl_8047AF84 = (u32)header;
             out[0] = *(u32*)header;
-            out[1] = *(u32*)((u8*)result + 8);
+            out[1] = *(u32*)(header - 4);
             out[3] = 0;
-            out[5] = *(u32*)((u8*)result + 0x14);
-            out[4] = *(u32*)((u8*)result + 0x10) & 0x00FFFFFF;
-            *(u8*)((u8*)out + 0x1C) = (u8)(*(u32*)((u8*)result + 0x10) >> 24);
-            if (*(u32*)((u8*)result + 0x1C) != 0) {
-                out[2] = *(u32*)table + *(u32*)((u8*)result + 0x1C);
+            out[5] = *(u32*)(header + 8);
+            out[4] = *(u32*)(header + 4) & 0x00FFFFFF;
+            *(u8*)((u8*)out + 0x1C) = (u8)(*(u32*)(header + 4) >> 24);
+            lbl_8047AF84 = (u32)header;
+            if (*(u32*)(header + 0x10) != 0) {
+                out[2] = *(u32*)table + *(u32*)(header + 0x10);
             }
             return 0;
         }
@@ -336,3 +773,8 @@ void dataInit(u32 smpBase, u32 smpLength) {
 #endif
 
 #undef fn_80162118
+
+void fn_801525C4(void) {
+    extern void fn_80163030(void);
+    fn_80163030();
+}

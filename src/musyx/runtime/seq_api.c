@@ -11,3 +11,52 @@
  * All functions asm-only until matched.
  */
 #include "dolphin/types.h"
+
+/* ===== Cross-TU MusyX runtime functions (defined in seq.c) ===== */
+extern u32  seqGetPrivateId(u32 seqId);
+extern void seqPause(u32 seqId);
+extern void seqSpeed(u32 seqId, u16 speed);
+extern void seqContinue(u32 seqId);
+extern void seqMute(u32 seqId, u32 mask1, u32 mask2);
+extern void seqVolume(u8 volume, u16 time, u32 seqId, u8 mode);
+
+/* ===== Cross-TU MusyX runtime globals (defined in seq.c) ===== */
+extern u16 lbl_80434910[8][16]; /* seqMIDIPriority */
+
+/* ===== Cross-TU low-level hardware IRQ helpers ===== */
+extern void hwDisableIrq(void);
+extern void hwEnableIrq(void);
+
+u32 fn_8014D598(u32 seqId) { return seqGetPrivateId(seqId) != -1; }
+
+void fn_8014D5C8(u32 seqId) {
+  hwDisableIrq();
+  seqPause(seqId);
+  hwEnableIrq();
+}
+
+void sndSeqSpeed(u32 seqId, u16 speed) {
+  hwDisableIrq();
+  seqSpeed(seqId, speed);
+  hwEnableIrq();
+}
+
+void fn_8014D648(u32 seqId) {
+  hwDisableIrq();
+  seqContinue(seqId);
+  hwEnableIrq();
+}
+
+void sndSeqMute(u32 seqId, u32 mask1, u32 mask2) {
+  hwDisableIrq();
+  seqMute(seqId, mask1, mask2);
+  hwEnableIrq();
+}
+
+void sndSeqVolume(u8 volume, u16 time, u32 seqId, u8 mode) {
+  hwDisableIrq();
+  seqVolume(volume, time, seqId, mode);
+  hwEnableIrq();
+}
+
+u16 fn_8014D740(u8 set, u8 channel) { return lbl_80434910[set][channel]; }
