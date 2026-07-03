@@ -1411,7 +1411,611 @@ void fn_80152AF8(SYNTH_VOICE* svoice, MSTEP* cstep) {
     }
 }
 
-extern void fn_801557EC(SYNTH_VOICE* svoice); /* macHandleActive */
+extern void* memset(void* dst, int val, u32 size);
+extern void fn_80161A9C(void* svoice); /* inpInit */
+extern u32 inpGetMidiLastNote(u32 midi, u32 midiSet);
+extern void voiceSetLastStarted(SYNTH_VOICE* svoice);
+extern u8* fn_80160EA0(u32 midi, u32 midiSet); /* inpGetChannelDefaults; only pbRange (offset 0) used here */
+extern u32 inpGetModulation(SYNTH_VOICE* sv);
+extern void fn_801629A4(u32 index, u8 value);
+extern void fn_801629D0(u32 index, u8 value);
+extern u32 hwFrq2Pitch(u32 value);
+extern u8 lbl_8047AFC8; /* DebugMacroSteps: static local counter inside macHandleActive */
+#define DebugMacroSteps lbl_8047AFC8
+
+
+/* Reference-shaped static helpers for macHandleActive's inlined cases.
+ * Source position (before fn_801557EC) makes MWCC auto-inline them. */
+static u32 mcmdGoto(SYNTH_VOICE* svoice, MSTEP* cstep) {
+    MSTEP* macAddr;
+
+    if ((macAddr = (MSTEP*)dataGetMacro((u16)(cstep->para[0] >> 16))) != NULL) {
+        svoice->addr = macAddr;
+        svoice->curAddr = macAddr + (u16)cstep->para[1];
+        return 0;
+    }
+    return mcmdEndOfMacro(svoice);
+}
+
+static void mcmdUntrapEvent(SYNTH_VOICE* svoice, MSTEP* cstep) {
+    u8 i;
+
+    svoice->trapEventAddr[(u8)(cstep->para[0] >> 8)] = NULL;
+    for (i = 0; i < 3; ++i) {
+        if (svoice->trapEventAddr[i] != NULL) {
+            return;
+        }
+    }
+    svoice->trapEventAny = 0;
+}
+
+static void mcmdSetPianoPanning(SYNTH_VOICE* svoice, MSTEP* cstep) {
+    s32 pan;
+
+    pan = ((((svoice->curNote - (u8)(cstep->para[0] >> 16)) << 16) * (s8)(u8)(cstep->para[0] >> 8)) >> 7) +
+          ((cstep->para[0] >> 24) << 16);
+    pan = pan < 0 ? 0 : pan > 0x7f0000 ? 0x7f0000 : pan;
+    svoice->panTarget[0] = pan;
+    svoice->panning[0] = pan;
+}
+
+static u32 mcmdLastKey(SYNTH_VOICE* svoice, MSTEP* cstep) {
+    svoice->curNote = svoice->lastNote + (s8)(u8)(cstep->para[0] >> 8);
+    svoice->curNote = (s16)svoice->curNote < 0 ? 0 : svoice->curNote > 0x7f ? 0x7f : svoice->curNote;
+    svoice->curDetune = (s8)(cstep->para[0] >> 16);
+
+    if (svoice->midi != 0xFF) {
+        inpSetMidiLastNote(svoice->midi, svoice->midiSet, (u8)svoice->curNote);
+    }
+
+    cstep->para[0] = 4;
+    return mcmdWait(svoice, cstep);
+}
+
+static u32 mcmdPitchSweep(SYNTH_VOICE* svoice, MSTEP* cstep, u8 i) {
+    s32 pitch;
+    s16 freq;
+
+    svoice->sweepOff[i] = 0;
+    svoice->sweepNum[i] = (u8)(cstep->para[0] >> 8);
+    svoice->sweepCnt[i] = svoice->sweepNum[i] << 16;
+    freq = (s16)(cstep->para[0] >> 16);
+    if (freq >= 0) {
+        pitch = hwFrq2Pitch(freq);
+    } else {
+        pitch = -(s32)hwFrq2Pitch(-freq);
+    }
+    svoice->sweepAdd[i] = pitch << 16;
+    cstep->para[0] = 0;
+    return mcmdWait(svoice, cstep);
+}
+
+static void mcmdSetPitch(SYNTH_VOICE* svoice, MSTEP* cstep) {
+    svoice->playFrq = cstep->para[0] >> 8;
+    svoice->playFrq |= (u8)cstep->para[1];
+
+    if (svoice->sInfo != 0xFFFFFFFF) {
+        DoSetPitch(svoice);
+    }
+}
+
+static void mcmdScaleVolumeDLS(SYNTH_VOICE* svoice, MSTEP* cstep) {
+    u16 scale;
+
+    scale = (u16)(cstep->para[0] >> 8);
+    if ((cstep->para[0] >> 24) == 0) {
+        svoice->volume = ((svoice->volume >> 5) * scale) >> 7;
+    } else {
+        svoice->volume = ((svoice->orgVolume >> 5) * scale) >> 7;
+    }
+
+    if (svoice->volume > 0x7f0000) {
+        svoice->volume = 0x7f0000;
+    }
+
+    svoice->cFlags |= 0x100000000000ULL;
+}
+
+static void mcmdReturn(SYNTH_VOICE* svoice) {
+    if (svoice->callStackEntryNum != 0) {
+        svoice->addr = svoice->callStack[svoice->callStackIndex].addr;
+        svoice->curAddr = svoice->callStack[svoice->callStackIndex].curAddr;
+        svoice->callStackIndex = (svoice->callStackIndex - 1) & 3;
+        --svoice->callStackEntryNum;
+    }
+}
+
+static void mcmdAddAgeCounter(SYNTH_VOICE* svoice, MSTEP* cstep) {
+    s32 age;
+
+    age = (svoice->age >> 15) + (s16)(cstep->para[0] >> 16);
+    if (age < 0) {
+        svoice->age = 0;
+    } else if (age > 0xFFFF) {
+        svoice->age = 0x7FFF8000;
+    } else {
+        svoice->age = age << 15;
+    }
+
+    fn_80162494(svoice->id & 0xFF, ((u32)svoice->prio << 24) | (svoice->age >> 15));
+}
+
+static void mcmdSetAgeCounter(SYNTH_VOICE* svoice, MSTEP* cstep) {
+    svoice->age = (u32)((u16)(cstep->para[0] >> 16)) << 15;
+    fn_80162494(svoice->id & 0xFF, ((u32)svoice->prio << 24) | (svoice->age >> 15));
+}
+
+static void mcmdAddPriority(SYNTH_VOICE* svoice, MSTEP* cstep) {
+    s16 prio;
+
+    prio = svoice->prio + (s16)(cstep->para[0] >> 16);
+    voiceSetPriority(svoice, prio < 0 ? 0 : prio > 0xFF ? 0xFF : prio);
+}
+
+static void mcmdSetAgeCounterByVolume(SYNTH_VOICE* svoice, MSTEP* cstep) {
+    u32 age;
+
+    age = (cstep->para[0] >> 16) + (((u16)cstep->para[1] * (u8)(svoice->volume >> 16)) >> 7);
+    svoice->age = age > 0xEA60 ? 0x75300000 : age << 15;
+    fn_80162494(svoice->id & 0xFF, ((u32)svoice->prio << 24) | (svoice->age >> 15));
+}
+
+static void mcmdSetupLFO(SYNTH_VOICE* svoice, MSTEP* cstep) {
+    u32 time;
+    u32 ms;
+    u8 index;
+
+    time = cstep->para[0] >> 16;
+    index = (u8)(cstep->para[0] >> 8);
+    fn_801621BC(&time);
+    if (svoice->lfo[index].period != 0) {
+        ms = (u16)cstep->para[1];
+        fn_801621BC(&ms);
+        svoice->lfo[index].time = ms;
+    }
+    svoice->lfo[index].period = time;
+}
+
+void fn_801557EC(SYNTH_VOICE* svoice) { /* macHandleActive */
+    u8 i;
+    u32 lastNote;
+    u32 ex;
+    u8* channelDefaults;
+    static MSTEP cstep; /* lbl_8047AFB0 */
+
+    if (svoice->cFlags & 3) {
+        if (svoice->cFlags & 1) {
+            svoice->cFlags &= ~1ULL;
+            hwBreak(svoice->id & 0xFF);
+        }
+
+        svoice->panning[0] = svoice->panTarget[0] = (u32)(svoice->setup_pan) << 16;
+        svoice->panning[1] = svoice->panTarget[1] = 0;
+        svoice->volume = (u32)(svoice->setup_vol) << 16;
+        svoice->volTable = 0;
+        svoice->orgVolume = svoice->volume;
+        svoice->midi = svoice->setup_midi;
+        svoice->midiSet = svoice->setup_midiSet;
+        svoice->section = svoice->setup_section;
+        svoice->track = svoice->setup_track;
+        svoice->itdMode = svoice->setup_itdMode;
+        svoice->keyGroup = 0;
+        svoice->vibModAddScale = 0;
+        svoice->treScale = 0;
+        fn_80161A9C(svoice);
+        lastNote = inpGetMidiLastNote(svoice->midi, svoice->midiSet);
+        if ((u8)lastNote != 0xFF) {
+            svoice->lastNote = lastNote;
+        } else {
+            svoice->lastNote = svoice->orgNote;
+        }
+
+        inpSetMidiLastNote(svoice->midi, svoice->midiSet, svoice->orgNote);
+        voiceSetLastStarted(svoice);
+        svoice->vGroup = svoice->setup_vGroup;
+        svoice->studio = svoice->setup_studio;
+        svoice->portTime = 0;
+        svoice->portDuration = 25600;
+        svoice->portType = 0;
+        if (svoice->midi != 0xFF) {
+            svoice->portLastCtrlState = inpGetMidiCtrl(0x41, svoice->midi, svoice->midiSet);
+        } else {
+            svoice->portLastCtrlState = 0;
+        }
+        channelDefaults = fn_80160EA0(svoice->midi, svoice->midiSet);
+        svoice->pbLowerKeyRange = *channelDefaults;
+        svoice->pbUpperKeyRange = *channelDefaults;
+        svoice->revVolScale = 128;
+        svoice->revVolOffset = 0;
+        svoice->loop = 0;
+        svoice->sweepNum[0] = 0;
+        svoice->sweepNum[1] = 0;
+        svoice->sweepOff[0] = 0;
+        svoice->sweepOff[1] = 0;
+        svoice->lfo[0].period = 0;
+        svoice->lfo[0].value = 0;
+        svoice->lfo[0].lastValue = 0x7fff;
+        svoice->lfo[1].period = 0;
+        svoice->lfo[1].value = 0;
+        svoice->lfo[1].lastValue = 0x7fff;
+
+        for (i = 0; i < 3; ++i) {
+            svoice->trapEventAddr[i] = NULL;
+        }
+
+        svoice->trapEventAny = 0;
+        svoice->sInfo = (u32)-1;
+        svoice->playFrq = (u32)-1;
+        svoice->pbLast = 0x2000;
+        svoice->curOutputVolume = 0;
+        svoice->cFlags &= 8;
+        svoice->cFlags |= 0x300000000000ULL;
+        memset(svoice->local_vars, 0, sizeof(svoice->local_vars));
+        svoice->waitTime = macRealTime;
+        svoice->macStartTime = macRealTime;
+        synthStartSynthJobHandling(svoice);
+    }
+
+    DebugMacroSteps = 0;
+
+    do {
+        if (++DebugMacroSteps > 32) {
+            break;
+        }
+
+        cstep.para[0] = svoice->curAddr->para[0];
+        cstep.para[1] = svoice->curAddr->para[1];
+        ++svoice->curAddr;
+        ex = 0;
+
+        switch (cstep.para[0] & 0x7F) {
+        case 0x00:
+            ex = mcmdEndOfMacro(svoice);
+            break;
+        case 0x01:
+            ex = mcmdEndOfMacro(svoice);
+            break;
+        case 0x02: {
+            MSTEP* m;
+            if (svoice->curNote < (u8)(cstep.para[0] >> 8)) {
+                break;
+            }
+            m = (MSTEP*)dataGetMacro((u16)(cstep.para[0] >> 16));
+            if (m != NULL) {
+                svoice->addr = m;
+                svoice->curAddr = m + (u16)cstep.para[1];
+            }
+            break;
+        }
+        case 0x03: {
+            MSTEP* m;
+            if (((svoice->volume >> 16) & 0xFF) < (u8)(cstep.para[0] >> 8)) {
+                break;
+            }
+            m = (MSTEP*)dataGetMacro((u16)(cstep.para[0] >> 16));
+            if (m != NULL) {
+                svoice->addr = m;
+                svoice->curAddr = m + (u16)cstep.para[1];
+            }
+            break;
+        }
+        case 0x04:
+            ex = mcmdWait(svoice, &cstep);
+            break;
+        case 0x05:
+            mcmdLoop(svoice, &cstep);
+            break;
+        case 0x06:
+            ex = mcmdGoto(svoice, &cstep);
+            break;
+        case 0x07:
+            ((u8*)&cstep)[6] = 1;
+            ex = mcmdWait(svoice, &cstep);
+            break;
+        case 0x08:
+            fn_80152AF8(svoice, &cstep);
+            break;
+        case 0x09: {
+            /* mcmdSendKeyOff, hand-inlined (contains a loop; -inline auto refuses) */
+            u32 voiceid;
+            u32 vi;
+
+            voiceid = (svoice->orgNote + (u8)(cstep.para[0] >> 8)) << 8;
+            voiceid |= ((u16)(cstep.para[0] >> 16)) << 16;
+            for (vi = 0; vi < synthInfo.voiceNum; ++vi) {
+                if (synthVoice[vi].id == (voiceid | vi)) {
+                    /* SendSingleKeyOff(voiceid | vi), hand-inlined */
+                    u32 vid = voiceid | vi;
+                    if (vid != 0xFFFFFFFF) {
+                        u32 v = vid & 0xFF;
+                        if (vid == synthVoice[v].id) {
+                            macSetExternalKeyoff(&synthVoice[v]);
+                        }
+                    }
+                }
+            }
+            break;
+        }
+        case 0x0a: {
+            MSTEP* m;
+            if (svoice->midi == 0xFF) {
+                break;
+            }
+            if ((u8)(inpGetModulation(svoice) >> 7) < ((cstep.para[0] >> 8) & 0xFF)) {
+                break;
+            }
+            m = (MSTEP*)dataGetMacro((u16)(cstep.para[0] >> 16));
+            if (m != NULL) {
+                svoice->addr = m;
+                svoice->curAddr = m + (u16)cstep.para[1];
+            }
+            break;
+        }
+        case 0x0b:
+            mcmdSetPianoPanning(svoice, &cstep);
+            break;
+        case 0x0c:
+            mcmdSetADSR(svoice, &cstep);
+            break;
+        case 0x0d:
+            mcmdScaleVolume(svoice, &cstep);
+            break;
+        case 0x0e:
+            fn_80153874(svoice, &cstep);
+            break;
+        case 0x0f:
+            mcmdEnvelope(svoice, &cstep);
+            break;
+        case 0x10:
+            fn_80152D5C(svoice, &cstep);
+            break;
+        case 0x11:
+            hwBreak(svoice->id & 0xFF);
+            break;
+        case 0x12:
+            svoice->cFlags |= 0x80ULL;
+            fn_8014C07C(svoice);
+            break;
+        case 0x13: {
+            MSTEP* m;
+            if ((u8)fn_80162070() < ((cstep.para[0] >> 8) & 0xFF)) {
+                break;
+            }
+            m = (MSTEP*)dataGetMacro((u16)(cstep.para[0] >> 16));
+            if (m != NULL) {
+                svoice->addr = m;
+                svoice->curAddr = m + (u16)cstep.para[1];
+            }
+            break;
+        }
+        case 0x14:
+            mcmdFadeIn(svoice, &cstep);
+            break;
+        case 0x15:
+            fn_80153910(svoice, &cstep);
+            break;
+        case 0x16:
+            mcmdSetADSRFromCtrl(svoice, &cstep);
+            break;
+        case 0x17:
+            mcmdRandomKey(svoice, &cstep);
+            break;
+        case 0x18:
+            ex = mcmdAddKey(svoice, &cstep);
+            break;
+        case 0x19:
+            ex = mcmdSetKey(svoice, &cstep);
+            break;
+        case 0x1a:
+            ex = mcmdLastKey(svoice, &cstep);
+            break;
+        case 0x1b:
+            mcmdPortamento(svoice, &cstep);
+            break;
+        case 0x1c:
+            mcmdVibrato(svoice, &cstep);
+            break;
+        case 0x1d:
+            ex = mcmdPitchSweep(svoice, &cstep, 0);
+            break;
+        case 0x1e:
+            ex = mcmdPitchSweep(svoice, &cstep, 1);
+            break;
+        case 0x1f:
+            mcmdSetPitch(svoice, &cstep);
+            break;
+        case 0x20:
+            mcmdSetPitchADSR(svoice, &cstep);
+            break;
+        case 0x21:
+            mcmdScaleVolumeDLS(svoice, &cstep);
+            break;
+        case 0x22:
+            svoice->vibModAddScale = ((s8)(cstep.para[0] >> 8) << 8);
+            if (svoice->vibModAddScale >= 0) {
+                svoice->vibModAddScale += ((s16)(s8)(cstep.para[0] >> 16) << 8) / 100;
+            } else {
+                svoice->vibModAddScale -= ((s16)(s8)(cstep.para[0] >> 16) << 8) / 100;
+            }
+            break;
+        case 0x23:
+            svoice->treScale = (u16)(cstep.para[0] >> 8);
+            svoice->treModAddScale = (u16)cstep.para[1];
+            svoice->treCurScale = 1.f;
+            break;
+        case 0x24:
+            mcmdReturn(svoice);
+            break;
+        case 0x25:
+            ex = mcmdGosub(svoice, &cstep);
+            break;
+        case 0x28: {
+            MSTEP* m = (MSTEP*)dataGetMacro((u16)(cstep.para[0] >> 16));
+            u8 idx;
+            if (m == NULL) {
+                break;
+            }
+            idx = (u8)(cstep.para[0] >> 8);
+            svoice->trapEventAddr[idx] = m;
+            svoice->trapEventCurAddr[idx] = m + (u16)cstep.para[1];
+            svoice->trapEventAny = 1;
+            if (idx != 0) {
+                break;
+            }
+            if ((svoice->cFlags & 0x10000000008ULL) == 0x10000000008ULL) {
+                svoice->cFlags |= 0x40000000000ULL;
+            }
+            break;
+        }
+        case 0x29:
+            mcmdUntrapEvent(svoice, &cstep);
+            break;
+        case 0x2a:
+            mcmdSendMessage(svoice, &cstep);
+            break;
+        case 0x2b: {
+            s32 mesg = 0;
+            u8 idx;
+            if (svoice->mesgNum != 0) {
+                mesg = svoice->mesgQueue[svoice->mesgRead];
+                svoice->mesgRead = (svoice->mesgRead + 1) & 3;
+                svoice->mesgNum -= 1;
+            }
+            idx = (u8)(cstep.para[0] >> 8);
+            varSet32(svoice, 0, idx, mesg);
+            break;
+        }
+        case 0x2c:
+            mcmdGetVID(svoice, &cstep);
+            break;
+        case 0x30:
+            mcmdAddAgeCounter(svoice, &cstep);
+            break;
+        case 0x31:
+            mcmdSetAgeCounter(svoice, &cstep);
+            break;
+        case 0x32:
+            synthGlobalVariable[(u8)(cstep.para[0] >> 8)] = (u8)(cstep.para[0] >> 16);
+            break;
+        case 0x33:
+            svoice->pbLowerKeyRange = (u8)(cstep.para[0] >> 16);
+            svoice->pbUpperKeyRange = (u8)(cstep.para[0] >> 8);
+            break;
+        case 0x34:
+            svoice->revVolScale = (u8)(cstep.para[0] >> 8);
+            svoice->revVolOffset = (u8)(cstep.para[0] >> 16);
+            break;
+        case 0x35:
+            svoice->cFlags |= 0x10000ULL;
+            break;
+        case 0x36:
+            voiceSetPriority(svoice, (u8)(cstep.para[0] >> 8));
+            break;
+        case 0x37:
+            mcmdAddPriority(svoice, &cstep);
+            break;
+        case 0x38:
+            if (cstep.para[1] != 0) {
+                svoice->ageSpeed = (svoice->age >> 8) / cstep.para[1];
+            } else {
+                svoice->ageSpeed = 0;
+            }
+            break;
+        case 0x39:
+            mcmdSetAgeCounterByVolume(svoice, &cstep);
+            break;
+        case 0x40:
+            fn_80153EE8((u8*)svoice, cstep.para);
+            break;
+        case 0x41:
+            fn_80153FEC((u8*)svoice, cstep.para);
+            break;
+        case 0x42:
+            fn_801540F0((u8*)svoice, cstep.para);
+            break;
+        case 0x43:
+            fn_801541F4((u8*)svoice, cstep.para);
+            break;
+        case 0x44:
+            fn_801542F8((u8*)svoice, cstep.para);
+            break;
+        case 0x45:
+            fn_801543FC((u8*)svoice, cstep.para);
+            break;
+        case 0x46:
+            fn_80154500((u8*)svoice, cstep.para);
+            break;
+        case 0x47:
+            fn_80154910((u8*)svoice, cstep.para);
+            break;
+        case 0x48:
+            fn_80154A14((u8*)svoice, cstep.para);
+            break;
+        case 0x49:
+            fn_80154B18((u8*)svoice, cstep.para);
+            break;
+        case 0x4a:
+            fn_80154604((u8*)svoice, cstep.para);
+            break;
+        case 0x4b:
+            fn_80154708((u8*)svoice, cstep.para);
+            break;
+        case 0x4c:
+            fn_8015480C((u8*)svoice, cstep.para);
+            break;
+        case 0x4d:
+            fn_80154C1C(svoice, &cstep);
+            break;
+        case 0x4e:
+            fn_80154D98(svoice, &cstep);
+            break;
+        case 0x50:
+            mcmdSetupLFO(svoice, &cstep);
+            break;
+        case 0x58: {
+            u8 mode = (u8)(cstep.para[0] >> 8);
+            svoice->volTable = (mode != 0);
+            svoice->itdMode = ((u8)(cstep.para[0] >> 16) == 0);
+            break;
+        }
+        case 0x59:
+            mcmdSetKeyGroup(svoice, &cstep);
+            break;
+        case 0x5a:
+            fn_801629A4(svoice->id & 0xFF, (u8)(cstep.para[0] >> 8));
+            fn_801629D0(svoice->id & 0xFF, (u8)(cstep.para[0] >> 16));
+            svoice->cFlags |= 0x80000000000ULL;
+            break;
+        case 0x60:
+            mcmdVarCalculation(svoice, &cstep, 0);
+            break;
+        case 0x61:
+            mcmdVarCalculation(svoice, &cstep, 1);
+            break;
+        case 0x62:
+            mcmdVarCalculation(svoice, &cstep, 2);
+            break;
+        case 0x63:
+            mcmdVarCalculation(svoice, &cstep, 3);
+            break;
+        case 0x64:
+            mcmdVarCalculation(svoice, &cstep, 4);
+            break;
+        case 0x65:
+            varSet32(svoice, (u8)(cstep.para[0] >> 8), (u8)(cstep.para[0] >> 16), (s16)cstep.para[1]);
+            break;
+        case 0x70:
+            mcmdIfVarCompare(svoice, &cstep, 0);
+            break;
+        case 0x71:
+            mcmdIfVarCompare(svoice, &cstep, 1);
+            break;
+        }
+    } while (!ex);
+}
+
+#undef DebugMacroSteps
+
 
 /* macHandle */
 void fn_80156744(u32 deltaTime) {
