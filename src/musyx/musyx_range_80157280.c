@@ -582,6 +582,18 @@ void sndConvertTicks(u32* ptr, u32 divisor) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
+asm void fn_80162214(void) {
+#include "src/game/people/people_field_fn_80162214.inc"
+}
+#else
+/* identity: sndConvert2Ms (MusyX runtime, snd_service.c) */
+u32 fn_80162214(u32 time) { return time / 256; }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+#if 0
 asm void hwInit(void) {
 #include "src/game/people/people_field_fn_80162370.inc"
 }
@@ -679,11 +691,17 @@ u8 fn_80162464(void) { return lbl_8047B050; }
 #endif
 #pragma pop
 extern u32 lbl_8047B024;
+/* hwIsActive (hardware.c) -- cross-TU boundary: synthvoice.c's voiceBlock
+ * calls this via a real `bl`, not inlined, in retail. dont_inline keeps
+ * this residual TU's auto-inliner from collapsing it into same-file
+ * callers that originally lived in a different TU (validated trick). */
+#pragma dont_inline on
 u32 fn_8016246C(u32 index) {
     PeopleFieldMoveSlot* entries = (PeopleFieldMoveSlot*)lbl_8047B024;
 
     return entries[index].active != 0;
 }
+#pragma dont_inline reset
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
@@ -806,6 +824,9 @@ asm void hwBreak(void) {
 #include "src/game/people/people_field_fn_8016265C.inc"
 }
 #else
+/* hardware.c -- see fn_8016246C's dont_inline note (cross-TU boundary vs.
+ * voiceBlock/synthvoice.c). */
+#pragma dont_inline on
 void hwBreak(u32 index) {
     extern u32 lbl_8047B024;
     extern u8 lbl_8047B050;
@@ -821,6 +842,7 @@ void hwBreak(u32 index) {
     p += (u32)lbl_8047B050 * 4;
     *(u32*)(p + 0x24) |= 0x20;
 }
+#pragma dont_inline reset
 #endif
 #pragma pop
 #pragma push
@@ -2617,6 +2639,154 @@ void fn_80164DD0(s32* samples, u8* obj, u32 channel) {
         prev = value;
     }
     *(s32*)(obj + stateOffset) = (s32)prev;
+}
+#endif
+#pragma pop
+
+/* ===== synthvoice.c: voiceBlock, 0x80158328 =====
+ * identity: simindex ext:metroidprime seq=1.0 vs synthvoice.c voiceBlock
+ * (100% shape match). synthVoice is lbl_8047AF48 (SYNTH_VOICE*, stride
+ * 0x404, id@0xF4) per synth.c/stream.c. Colosseum MusyX 2.0.0/2.0.1 (pre-
+ * 2.0.1 4-byte PRG_STATE build per slice-3 pin) takes the
+ * `MUSY_VERSION <= 2.0.1` branch of allocId (u16, value 0xFFFF).
+ * fn_80157A64 = voiceAllocate (not yet decompiled -- still asm/orig; report
+ * only, no rename per campaign rules). fn_80157360 = vidRemoveVoiceReferences
+ * (0x350 bytes, not yet decompiled). macMakeInactive/voiceSetPriority are
+ * cross-TU (synthmacros.c / not-yet-decompiled-here respectively). */
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+#if 0
+asm void fn_80158328(void) {
+#include "src/game/people/people_field_fn_80158328.inc"
+}
+#else
+typedef struct {
+    u8 pad_00[0x34];
+    void* addr;               /* 0x34 */
+    u8 pad_38[0xF4 - 0x38];
+    u32 id;                   /* 0xF4 */
+    u8 pad_F8[0x100 - 0xF8];
+    u16 allocId;              /* 0x100 */
+    u8 pad_102[0x11C - 0x102];
+    u8 block;                 /* 0x11C */
+    u8 fxFlag;                /* 0x11D */
+    u8 pad_11E[0x404 - 0x11E];
+} SynthVoiceMini; /* offset-mirror of SYNTH_VOICE, stride 0x404 */
+
+extern SynthVoiceMini* lbl_8047AF48;      /* synthVoice */
+extern u32 fn_80157A64(u8 priority, u8 maxVoices, u16 allocId, u8 fxFlag); /* voiceAllocate */
+extern void fn_80157360(SynthVoiceMini* sv);                    /* vidRemoveVoiceReferences */
+extern void macMakeInactive(SynthVoiceMini* sv, s32 newState);
+extern void voiceSetPriority(SynthVoiceMini* sv, u8 prio);
+
+u32 fn_80158328(u8 prio) {
+    u32 voice;
+
+    if ((voice = fn_80157A64(prio, 0xFF, 0xFFFF, 1)) != 0xFFFFFFFF) {
+        lbl_8047AF48[voice].block = 1;
+        lbl_8047AF48[voice].fxFlag = 1;
+        lbl_8047AF48[voice].allocId = 0xFFFF;
+
+        fn_80157360(&lbl_8047AF48[voice]);
+        lbl_8047AF48[voice].id = voice | 0xFFFFFF00;
+
+        if (fn_8016246C(voice)) {
+            hwBreak(voice);
+        }
+
+        macMakeInactive(&lbl_8047AF48[voice], 2); /* MAC_STATE_STOPPED */
+        lbl_8047AF48[voice].addr = NULL;
+        voiceSetPriority(&lbl_8047AF48[voice], prio);
+    }
+
+    return voice;
+}
+#endif
+#pragma pop
+
+/* ===== synthvoice.c: vidMakeRoot, 0x801576B0 =====
+ * identity: reference synthvoice.c vidMakeRoot(SYNTH_VOICE* svoice)
+ * { svoice->vidMasterList = svoice->vidList; return svoice->vidList->vid; }
+ * VID_LIST: { next; prev; u32 vid; u32 root; } -- vid @0x8. SYNTH_VOICE
+ * vidList@0xF8 / vidMasterList@0xFC per synth.c. */
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+#if 0
+asm void fn_801576B0(void) {
+#include "src/game/people/people_field_fn_801576B0.inc"
+}
+#else
+typedef struct {
+    u8 pad_00[8];
+    u32 vid; /* 0x8 */
+} VidListMini;
+
+typedef struct {
+    u8 pad_00[0xF8];
+    VidListMini* vidList;       /* 0xF8 */
+    VidListMini* vidMasterList; /* 0xFC */
+} SvoiceVidMini;
+
+u32 fn_801576B0(SvoiceVidMini* svoice) {
+    svoice->vidMasterList = svoice->vidList;
+    return svoice->vidList->vid;
+}
+#endif
+#pragma pop
+
+/* ===== synthvoice.c: vidGetInternalId, 0x801577C8 (already named) =====
+ * identity: reference synthvoice.c vidGetInternalId(u32 vid):
+ * VID_LIST* vl; if (vid != 0xffffffff) { if ((vl = get_vidlist(vid)) !=
+ * NULL) return vl->root; } return 0xffffffff;
+ * get_vidlist(vid) walks a sorted singly-linked vidRoot list comparing
+ * ->vid (static helper, single call site -> inlined here). VID_LIST.root
+ * is the 4th field (0xC). */
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+#if 0
+asm void vidGetInternalId(void) {
+#include "src/game/people/people_field_vidGetInternalId.inc"
+}
+#else
+typedef struct VidListFull {
+    struct VidListFull* next; /* 0x0 */
+    struct VidListFull* prev; /* 0x4 */
+    u32 vid;                  /* 0x8 */
+    u32 root;                 /* 0xC */
+} VidListFull;
+
+extern VidListFull* lbl_8047AFD4; /* vidRoot (static file-scope in synthvoice.c;
+                                    * confirmed by objdiff -- NOT lbl_8047AF14) */
+
+static VidListFull* get_vidlist(u32 vid) {
+    VidListFull* vl = lbl_8047AFD4;
+
+    while (vl != NULL) {
+        if (vl->vid == vid) {
+            return vl;
+        }
+        if (vl->vid > vid) {
+            break;
+        }
+        vl = vl->next;
+    }
+
+    return NULL;
+}
+
+u32 vidGetInternalId(u32 vid) {
+    VidListFull* vl;
+
+    if (vid != 0xFFFFFFFF) {
+        if ((vl = get_vidlist(vid)) != NULL) {
+            return vl->root;
+        }
+    }
+
+    return 0xFFFFFFFF;
 }
 #endif
 #pragma pop
