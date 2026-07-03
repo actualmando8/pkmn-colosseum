@@ -2896,7 +2896,7 @@ void fn_800216E8(void* arg0, s32 arg1, u8* arg2, s16 arg3, s32 arg4) {
 /* fn_800218BC - 0x800218BC | size: 0x1e0 */
 extern void fn_80014118(s32, void*, void*);
 extern s32 fn_80123FBC(s32);
-extern u8 fn_8011FC74(s32);
+extern u8 pokemonIsDarkPokemon(s32);
 extern f32 fn_8011FC14(void*);
 extern s32 fn_800141BC(void*, s32);
 extern void fn_80014198(s32);
@@ -2939,7 +2939,7 @@ s32 fn_800218BC(u32 arg0, u32* arg1) {
     for (i = 0; i < 6; i++) {
         fn_80014118(i, &sp_c, &sp_8);
         if ((u8)fn_80123FBC((s32)sp_c) != 0) {
-            if (fn_8011FC74((s32)sp_c) != 0) {
+            if (pokemonIsDarkPokemon((s32)sp_c) != 0) {
                 if (fn_8011FC14(sp_c) > thresh) break;
             }
         }
@@ -2954,7 +2954,7 @@ s32 fn_800218BC(u32 arg0, u32* arg1) {
     if (idx >= 0) {
         fn_80014118(idx, &sp_c, &sp_8);
         ok = 0;
-        if (fn_8011FC74((s32)sp_c) != 0) {
+        if (pokemonIsDarkPokemon((s32)sp_c) != 0) {
             if (fn_8011FC14(sp_c) > *(f32*)&lbl_8047B8A0) ok = 1;
         }
         if (ok == 0) {
@@ -3248,7 +3248,7 @@ s32 fn_80022720(u32 arg0, u32* arg1) {
 
 /* fn_80022834 - 0x80022834 | size: 0x308 */
 extern void fn_800232F0(void);
-extern void fn_801440A0(void);
+extern void itemDataBiosGetPtr(void);
 extern void itemDataBiosGetWazaMachineNo(void);
 extern void itemDataBiosGetWazaIDByWazaMachineNo(void);
 extern void itemDataBiosGetHidenMachineNo(void);
@@ -3268,7 +3268,7 @@ asm void fn_80022834(void) {
 #pragma scheduling on
 #pragma optimization_level 4
 s32 fn_80022834(u32 arg0, u32* arg1) {
-    extern void* fn_801440A0(u32);
+    extern void* itemDataBiosGetPtr(u32);
     extern u32 itemDataBiosGetWazaMachineNo(void*);
     extern u32 itemDataBiosGetWazaIDByWazaMachineNo(u32);
     extern u32 itemDataBiosGetHidenMachineNo(void*);
@@ -3300,7 +3300,7 @@ s32 fn_80022834(u32 arg0, u32* arg1) {
     s32 sd;
     u8 buf;
 
-    handle = fn_801440A0((u16)arg0);
+    handle = itemDataBiosGetPtr((u16)arg0);
     status = (u8)itemDataBiosGetWazaMachineNo(handle);
     value16 = itemDataBiosGetWazaIDByWazaMachineNo(status);
     fn_80166A50(0x4CB, 0, 0xFF, 0);
@@ -3329,7 +3329,7 @@ s32 fn_80022834(u32 arg0, u32* arg1) {
     if (slot >= 0) {
         fn_80014118(slot, &sc, &sd);
         c = sc;
-        if (fn_8011FC74(c) != 0) {
+        if (pokemonIsDarkPokemon(c) != 0) {
             fn_80106D3C(2, 0x424C, 1, 0);
             fn_801069FC(1);
             tmp = 0;
@@ -3600,7 +3600,7 @@ s32 fn_80022EE4(u32 arg0, u32* arg1) {
     slot = fn_800141BC((void*)arg0, 1);
     if (slot >= 0) {
         fn_80014118(slot, &sc, &sd);
-        if ((u8)fn_8011FC74(sc) == 0) {
+        if ((u8)pokemonIsDarkPokemon(sc) == 0) {
             effect = fn_80144574(text_buf, sc, sd, (u16)arg0, 0);
             if ((s16)effect <= 0) {
                 fn_80106D3C(2, 0x4261, 1, 0);
@@ -3841,9 +3841,9 @@ s32 fn_80023760(u32 arg0, u32* arg1) {
 #endif
 
 /* fn_80023968 - 0x80023968 | size: 0x234 */
-extern void fn_80143DFC(void);
-extern void fn_80143A94(void);
-extern void fn_801437B8(void);
+extern void itemDataBiosGetItemEffectParam(void);
+extern void itemParamGetPtr(void);
+extern void itemParamGetPPSelectFlag(void);
 #if 0
 asm void fn_80023968(void) {
 #include "src/game/gs_title_fn_80023968.inc"

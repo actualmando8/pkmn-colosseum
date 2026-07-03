@@ -46,7 +46,7 @@
  *   fn_8001B1EC  GSpcbox_MainStateMachine     -- 0x8D8 bytes, main PC box state machine
  *   fn_8001BAC4  GSpcbox_TransitionState      -- 0x228 bytes, state transition handler
  *   menuPokemonOpenItemGive  GSpcbox_CheckCanDeposit      -- 0x50 bytes, validate deposit allowed
- *   fn_8001BD3C  GSpcbox_CheckCanWithdraw     -- 0x44 bytes, validate withdraw allowed
+ *   menuPokemonOpenItemUse  GSpcbox_CheckCanWithdraw     -- 0x44 bytes, validate withdraw allowed
  *   menuPokemonOpenFight  GSpcbox_CheckPartySpace      -- 0x74 bytes, check party has room
  *   menuPokemonOpen  GSpcbox_CheckLastPokemon     -- 0x44 bytes, prevent depositing last mon
  *   fn_8001BE38  GSpcbox_ShowConfirmDialog    -- 0x84 bytes, confirmation prompt
@@ -54,8 +54,8 @@
  *
  * fn_800181C4 (GSpcbox_SelectPokemon) implements the core selection logic:
  *   - Takes party slot index, species ID, and box position as parameters
- *   - Looks up the species data via fn_801440A0 / fn_80143FFC
- *   - If the count (from fn_80143FFC) is 0, shows "no Pokemon here" message
+ *   - Looks up the species data via itemDataBiosGetPtr / itemDataBiosGetPrice
+ *   - If the count (from itemDataBiosGetPrice) is 0, shows "no Pokemon here" message
  *     via fn_8002A0B8 (format text) and fn_80106ADC (display)
  *   - Otherwise, opens the detail view with move list, stats, etc.
  *   - References sSummaryPageEntries event/page table with 0x4C stride per entry
@@ -91,9 +91,9 @@ extern void  fn_80129BC8(void* pokeData, u8 fieldId, u16* outCount,
                           s32 p4, s32 p5, s32 p6);
 extern void  heroHizukiItemGetItemAryPtr(void* pokeData, u16* outCount, s32 p3, s32 p4, s32 p5);
 extern u8    fn_801429E8(void* fieldData);
-extern u16   fn_80143C50(void* fieldData);
-extern u16   fn_801440A0(u16 speciesId);
-extern u16   fn_80143FFC(void);
+extern u16   itemBiosGetNum(void* fieldData);
+extern u16   itemDataBiosGetPtr(u16 speciesId);
+extern u16   itemDataBiosGetPrice(void);
 
 /* Text formatting */
 extern void  fn_8002A0B8(void* outBuf, void* fmt, s32 p3, s32 p4,
@@ -4551,8 +4551,8 @@ void fn_8001FD48(void) {
 /* ===== Phase 2 recovery stubs ===== */
 
 /* fn_80018594 - 0x80018594 | size: 0x34c */
-extern u32 fn_80143DE4();
-extern u32 fn_80143DCC();
+extern u32 itemDataBiosGetFieldUseFunc();
+extern u32 itemDataBiosGetBattleUseFunc();
 extern s32 fn_80017CB8();
 extern void fn_8012959C(void);
 extern void menuCloseSync(); /* referenced by asm incs */
@@ -4603,11 +4603,11 @@ s32 fn_80018594(u32 boxIndex, u32 speciesId, u32 slotIndex, u16* outSpecies) {
         }
 
         *outSpecies = (u16)selectedSpecies;
-        fn_801440A0((u16)selectedSpecies);
+        itemDataBiosGetPtr((u16)selectedSpecies);
         if ((s32)lbl_8047A2E0 == 0) {
-            speciesCallback = (s32 (*)())fn_80143DE4();
+            speciesCallback = (s32 (*)())itemDataBiosGetFieldUseFunc();
         } else {
-            speciesCallback = (s32 (*)())fn_80143DCC();
+            speciesCallback = (s32 (*)())itemDataBiosGetBattleUseFunc();
         }
         if (speciesCallback == 0) {
             fn_80106D3C(2, 0x4261, 1, 0);
@@ -4721,8 +4721,8 @@ s32 fn_800188E0(s32 mode, u32 ptr, u32 r5, u32 r6, u16* out) {
     case 2: {
         s32 r0;
         {
-            extern void fn_801440A0();
-            fn_801440A0(r5);
+            extern void itemDataBiosGetPtr();
+            itemDataBiosGetPtr(r5);
         }
         r0 = fn_80143FCC();
         if ((u8)r0 != 0) {
@@ -4761,7 +4761,7 @@ s32 fn_800188E0(s32 mode, u32 ptr, u32 r5, u32 r6, u16* out) {
 /* fn_80018A68 - 0x80018A68 | size: 0x4c8 */
 extern u32 fn_80103E68();
 extern void fn_80103EAC();
-extern u16 fn_80143C68();
+extern u16 itemBiosGetItemDataId();
 extern void fn_800FF660(void);
 extern void fn_8011288C();
 extern u32 lbl_80478860;
@@ -4903,7 +4903,7 @@ u16 fn_80018A68(void) {
                 if (fn_801429E8(fieldData) != 0) {
                     activeIndex++;
                     if (activeIndex >= targetIndex) {
-                        selectedSpecies = fn_80143C68(fieldData);
+                        selectedSpecies = itemBiosGetItemDataId(fieldData);
                         break;
                     }
                 }
@@ -5176,9 +5176,9 @@ s32 fn_80019204(u8* a, u8* b) {
 #endif
 
 /* fn_800192A8 - 0x800192A8 | size: 0x228 */
-extern u32 fn_80144088(u32 a);
+extern u32 itemDataBiosGetName(u32 a);
 extern void fn_800FB680();
-extern u32 fn_80144014(u32 a);
+extern u32 itemDataBiosGetKind(u32 a);
 extern u32 fn_800FA444(u32 a);
 extern void fn_80142CF4(void);
 extern u8 lbl_80266BF0[];
@@ -5227,14 +5227,14 @@ s32 fn_800192A8(u8* a, u8* b) {
     if (r3u == 0) {
         r6 = 0x134;
     } else {
-        r6 = (u32)fn_801440A0(r3u);
-        r6 = (u32)fn_80144088(r6);
+        r6 = (u32)itemDataBiosGetPtr(r3u);
+        r6 = (u32)itemDataBiosGetName(r6);
     }
     ((void(*)(u32,u32,u32,u32))fn_800FB680)(0, 0, (u32)(s32)(-1), r6);
     r3u = *(u16*)((u8*)r31 + r28);
     if (r3u == 0) return 0;
-    r4 = (u32)fn_801440A0(r3u);
-    r4 = (u32)fn_80144014(r4);
+    r4 = (u32)itemDataBiosGetPtr(r3u);
+    r4 = (u32)itemDataBiosGetKind(r4);
     fn_80129BC8(0, r4, &sp_a, 0, 0, 0);
     ((void(*)(u32,u32))fn_80132A38)(0x34, (u32)(u16)sp_a);
     r29  = (s32)(s16)(u16)(((u32)((u32(*)(u32))fn_800FA444)(0xca)) >> 16);
@@ -5242,8 +5242,8 @@ s32 fn_800192A8(u8* a, u8* b) {
     r6 = (u32)(s32)(0xc3 - r29);
     ((void(*)(u32,u32,u32,u32))fn_800FB680)(r6, 0, (u32)(s32)(-1), 0x12e);
     r28b = (u32)*(u16*)((u8*)r31 + r28);
-    r4 = (u32)fn_801440A0((u16)r28b);
-    r4 = (u32)fn_80144014(r4);
+    r4 = (u32)itemDataBiosGetPtr((u16)r28b);
+    r4 = (u32)itemDataBiosGetKind(r4);
     fn_80129BC8(0, r4, &sp_8, 0, 0, 0);
     r30 = 0;
     r29 = (s32)r4; /* r3 after fn_80129BC8 = field array ptr */
@@ -5253,7 +5253,7 @@ s32 fn_800192A8(u8* a, u8* b) {
         while ((s32)r30 < (s32)(u16)sp_8) {
             if (fn_801429E8((void*)r29) != 0) {
                 if (((u32(*)(u32,u32,u32,u32))fn_80142CF4)((u32)r29, 0, 0x1b, 0) == r28b) {
-                    r31_acc += (u32)fn_80143C50((void*)r29);
+                    r31_acc += (u32)itemBiosGetNum((void*)r29);
                 }
             }
             r30++;
@@ -5457,8 +5457,8 @@ s32 fn_80019754(void* arg) {
 
     count = 0;
     for (i = 0; (u32)(u16)i < lbl_80478BD8 && count < 3; i++) {
-        fn_801440A0(i);
-        if ((u8)fn_80144014(0) == 6) {
+        itemDataBiosGetPtr(i);
+        if ((u8)itemDataBiosGetKind(0) == 6) {
             if ((u8)fn_80129B2C(0, i)) {
                 ids[count] = (u16)i;
                 count++;
@@ -5791,7 +5791,7 @@ u32 fn_80019D5C(u32 a, u32 b) {
 /* fn_80019F6C - 0x80019F6C | size: 0xa18 */
 extern s32 fn_801040D0(s32, s32);
 extern u32 itemDataBiosGetWazaMachineNo();
-extern u32 fn_8011FC74();
+extern u32 pokemonIsDarkPokemon();
 extern u32 fn_8011E2AC();
 extern void fn_800FBB34();
 extern void fn_8010B9E8();
@@ -5866,8 +5866,8 @@ void fn_80019F6C(u8* ctx, u8* pane) {
     count = (u16)fn_801040D0((s32)ctx, 1);
 
     if (lbl_803A1D40[0] == 3 || lbl_803A1D40[0] == 4) {
-        species = fn_801440A0(*(u16*)(lbl_803A1D40 + 0x12));
-        if ((u8)fn_80144014(species) == 4) {
+        species = itemDataBiosGetPtr(*(u16*)(lbl_803A1D40 + 0x12));
+        if ((u8)itemDataBiosGetKind(species) == 4) {
             if (paneId == 0x3BC || paneId == 0x12A1) {
                 value = itemDataBiosGetWazaMachineNo(species);
                 mon = NULL;
@@ -5908,7 +5908,7 @@ void fn_80019F6C(u8* ctx, u8* pane) {
                 if (mon != NULL && (u8)fn_80123FBC(mon) == 0) {
                     mon = NULL;
                 }
-                if ((u8)fn_8011FC74(mon) != 0) {
+                if ((u8)pokemonIsDarkPokemon(mon) != 0) {
                     msg = 0x2B65;
                 } else if ((u8)fn_8011E2AC(fn_8011E778(fn_8011F5C8(mon)), value) != 0) {
                     msg = 0x2B64;
@@ -6069,7 +6069,7 @@ asm void fn_8001A984(void) {
 void fn_8001A984(u8* a) {
     extern u8 lbl_803A1D40[];
     extern u8 lbl_803A1C20[];
-    extern u32 fn_801440A0();
+    extern u32 itemDataBiosGetPtr();
     extern void fn_80132A38();
     extern void fn_800FB680();
     u32 r6;
@@ -6080,8 +6080,8 @@ void fn_8001A984(u8* a) {
     if ((s32)r0 == 0x0) {
         r0 = *(u8*)(lbl_803A1D40 + 0x0);
         if ((s32)r0 == 0x3 || (s32)r0 == 0x4) {
-            r3 = (u8*)fn_801440A0(*(u16*)(lbl_803A1D40 + 0x12));
-            r0 = fn_80144014((u32)r3);
+            r3 = (u8*)itemDataBiosGetPtr(*(u16*)(lbl_803A1D40 + 0x12));
+            r0 = itemDataBiosGetKind((u32)r3);
             r6 = ((r0 & 0xFF) == 0x4) ? 0x2b63 : 0x2b61;
         } else if ((s32)r0 == 0x5) {
             r6 = 0x2b62;
@@ -6673,7 +6673,7 @@ s32 fn_8001B1EC() {
             if (mon == NULL) {
                 continue;
             }
-            if ((u8)fn_8011FC74(mon) == 0) {
+            if ((u8)pokemonIsDarkPokemon(mon) == 0) {
                 fn_80106D3C(2, 0x44DD, 1, 0);
                 fn_801069FC(1);
                 continue;
@@ -6812,16 +6812,16 @@ void menuPokemonOpenItemGive(u32 a, u32 b, u32 c, u32 d) {
 #pragma pop
 #endif
 
-/* fn_8001BD3C - 0x8001BD3C | size: 0x44 */
+/* menuPokemonOpenItemUse - 0x8001BD3C | size: 0x44 */
 #if 0
-asm void fn_8001BD3C(void) {
+asm void menuPokemonOpenItemUse(void) {
 #include "src/game/gs_pcbox_fn_8001BD3C.inc"
 }
 #else
 #pragma push
 #pragma optimization_level 4
 #pragma peephole off
-void fn_8001BD3C(u32 a, u32 b, u32 c, u32 d) {
+void menuPokemonOpenItemUse(u32 a, u32 b, u32 c, u32 d) {
     extern u8 lbl_803A1D40[];
     extern void fn_8001BAC4();
     *(u8*)(lbl_803A1D40 + 0x4) = 0x1;

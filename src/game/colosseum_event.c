@@ -6143,7 +6143,7 @@ u32 fightActionFlowSyuuryouPost(void)
 {
     extern int fn_8006B0F8();
     extern s8 fn_8006B57C();
-    extern s8 fn_8011FC74();
+    extern s8 pokemonIsDarkPokemon();
     extern s8 fn_801233F4();
     extern void fn_8012805C();
     extern u32 fn_80128A64();
@@ -6190,7 +6190,7 @@ u32 fightActionFlowSyuuryouPost(void)
           for (uVar9 = 0; uVar9 < 6; uVar9 = uVar9 + 1) {
             uVar4 = fn_8012A5B0(iVar3,3,uVar9);
             cVar7 = fn_801233F4();
-            if (((((cVar7 != 0) && (cVar7 = fn_8011FC74(uVar4), cVar7 != 1)) &&
+            if (((((cVar7 != 0) && (cVar7 = pokemonIsDarkPokemon(uVar4), cVar7 != 1)) &&
                  (iVar5 = fn_801F9930(iVar2,uVar4), iVar5 != 0)) &&
                 ((cVar7 = fn_80206608(), cVar7 != 0 &&
                  (cVar7 = (int)fn_8012640C(iVar5,0,0xd0,0), cVar7 != 0)))) &&
@@ -10199,23 +10199,23 @@ void fn_80211E18(u32 r3,u32 r4)
     extern u32 fn_800FA280();
     extern void fn_801299C8();
     extern void fn_80132A38();
-    extern s8 fn_801437E0();
-    extern s8 fn_80143878();
-    extern s8 fn_801438A0();
-    extern s8 fn_801438C8();
-    extern s8 fn_801438F0();
-    extern s8 fn_80143918();
-    extern s8 fn_80143940();
-    extern s8 fn_80143990();
-    extern s8 fn_801439B8();
-    extern s8 fn_801439D4();
-    extern s8 fn_801439F0();
-    extern s8 fn_80143A0C();
-    extern s8 fn_80143A28();
-    extern s8 fn_80143A44();
-    extern u32 fn_80143A94();
-    extern void fn_80143DFC();
-    extern void fn_801440A0();
+    extern s8 itemParamGetHPUp();
+    extern s8 itemParamGetConfuseFlag();
+    extern s8 itemParamGetParalyzeFlag();
+    extern s8 itemParamGetFreezeFlag();
+    extern s8 itemParamGetBurnFlag();
+    extern s8 itemParamGetPoisonFlag();
+    extern s8 itemParamGetSleepFlag();
+    extern s8 itemParamGetGuardFlag();
+    extern s8 itemParamGetSpAttackUp();
+    extern s8 itemParamGetHitUp();
+    extern s8 itemParamGetQuickUp();
+    extern s8 itemParamGetDefenceUp();
+    extern s8 itemParamGetAttackUp();
+    extern s8 itemParamGetCriticalFlag();
+    extern u32 itemParamGetPtr();
+    extern void itemDataBiosGetItemEffectParam();
+    extern void itemDataBiosGetPtr();
     extern void fn_801DA7AC();
     extern void fn_801EF8F4();
     extern u32 fn_801F025C();
@@ -10261,9 +10261,9 @@ void fn_80211E18(u32 r3,u32 r4)
     itemGetStatus(iVar7,0,0x1f,0);
     sVar10 = itemGetStatus(iVar7,0,0x20,0);
     cVar12 = itemGetStatus(iVar7,0,0x21,0);
-    fn_801440A0(r4);
-    fn_80143DFC();
-    uVar8 = fn_80143A94();
+    itemDataBiosGetPtr(r4);
+    itemDataBiosGetItemEffectParam();
+    uVar8 = itemParamGetPtr();
     cVar2 = DAT_8038fffc;
     bVar1 = DAT_8038ff76;
     cVar13 = fn_802026E4(uVar3,0x2e);
@@ -10287,9 +10287,9 @@ void fn_80211E18(u32 r3,u32 r4)
       else {
         uVar14 = _DAT_80375e44;
         if (((r4 & 0xffff) != 0x50) && ((r4 & 0xffff) != 0x51)) {
-          fn_801440A0(r4);
-          fn_80143DFC();
-          iVar7 = fn_80143A94();
+          itemDataBiosGetPtr(r4);
+          itemDataBiosGetItemEffectParam();
+          iVar7 = itemParamGetPtr();
           if (iVar7 == 0) {
             uVar15 = 7;
           }
@@ -10297,28 +10297,28 @@ void fn_80211E18(u32 r3,u32 r4)
             uVar15 = 1;
           }
           else {
-            cVar13 = fn_801437E0();
+            cVar13 = itemParamGetHPUp();
             if (cVar13 == 0) {
-              cVar13 = fn_80143940(iVar7);
-              if ((((cVar13 == 1) || (cVar13 = fn_80143918(iVar7), cVar13 == 1)) ||
-                  (cVar13 = fn_801438F0(iVar7), cVar13 == 1)) ||
-                 (((cVar13 = fn_801438C8(iVar7), cVar13 == 1 ||
-                   (cVar13 = fn_801438A0(iVar7), cVar13 == 1)) ||
-                  (cVar13 = fn_80143878(iVar7), cVar13 == 1)))) {
+              cVar13 = itemParamGetSleepFlag(iVar7);
+              if ((((cVar13 == 1) || (cVar13 = itemParamGetPoisonFlag(iVar7), cVar13 == 1)) ||
+                  (cVar13 = itemParamGetBurnFlag(iVar7), cVar13 == 1)) ||
+                 (((cVar13 = itemParamGetFreezeFlag(iVar7), cVar13 == 1 ||
+                   (cVar13 = itemParamGetParalyzeFlag(iVar7), cVar13 == 1)) ||
+                  (cVar13 = itemParamGetConfuseFlag(iVar7), cVar13 == 1)))) {
                 uVar15 = 3;
               }
               else {
-                cVar13 = fn_80143A44(iVar7);
+                cVar13 = itemParamGetCriticalFlag(iVar7);
                 if (cVar13 == 1) {
                   uVar15 = 4;
                 }
                 else {
-                  cVar13 = fn_80143A28(iVar7);
-                  if (((cVar13 == 0) && (cVar13 = fn_80143A0C(iVar7), cVar13 == 0)) &&
-                     ((cVar13 = fn_801439F0(iVar7), cVar13 == 0 &&
-                      ((cVar13 = fn_801439D4(iVar7), cVar13 == 0 &&
-                       (cVar13 = fn_801439B8(iVar7), cVar13 == 0)))))) {
-                    cVar13 = fn_80143990(iVar7);
+                  cVar13 = itemParamGetAttackUp(iVar7);
+                  if (((cVar13 == 0) && (cVar13 = itemParamGetDefenceUp(iVar7), cVar13 == 0)) &&
+                     ((cVar13 = itemParamGetQuickUp(iVar7), cVar13 == 0 &&
+                      ((cVar13 = itemParamGetHitUp(iVar7), cVar13 == 0 &&
+                       (cVar13 = itemParamGetSpAttackUp(iVar7), cVar13 == 0)))))) {
+                    cVar13 = itemParamGetGuardFlag(iVar7);
                     if (cVar13 == 1) {
                       uVar15 = 6;
                     }
@@ -10345,11 +10345,11 @@ void fn_80211E18(u32 r3,u32 r4)
             }
             else if (uVar15 < 4) {
               if (2 < uVar15) {
-                cVar13 = fn_80143940(uVar8);
-                if ((((cVar13 == 1) && (cVar13 = fn_80143918(uVar8), cVar13 == 1)) &&
-                    (cVar13 = fn_801438F0(uVar8), cVar13 == 1)) &&
-                   ((cVar13 = fn_801438C8(uVar8), cVar13 == 1 &&
-                    (cVar13 = fn_801438A0(uVar8), cVar13 == 1)))) {
+                cVar13 = itemParamGetSleepFlag(uVar8);
+                if ((((cVar13 == 1) && (cVar13 = itemParamGetPoisonFlag(uVar8), cVar13 == 1)) &&
+                    (cVar13 = itemParamGetBurnFlag(uVar8), cVar13 == 1)) &&
+                   ((cVar13 = itemParamGetFreezeFlag(uVar8), cVar13 == 1 &&
+                    (cVar13 = itemParamGetParalyzeFlag(uVar8), cVar13 == 1)))) {
                   cVar13 = fn_802026E4(uVar3,8);
                   if (cVar13 == 1) {
                     lbl_80478D7D = 5;
@@ -10386,32 +10386,32 @@ void fn_80211E18(u32 r3,u32 r4)
                   }
                 }
                 else {
-                  cVar13 = fn_80143940(uVar8);
+                  cVar13 = itemParamGetSleepFlag(uVar8);
                   if (cVar13 == 1) {
                     lbl_80478D7D = 5;
                   }
                   else {
-                    cVar13 = fn_80143918(uVar8);
+                    cVar13 = itemParamGetPoisonFlag(uVar8);
                     if (cVar13 == 1) {
                       lbl_80478D7D = 4;
                     }
                     else {
-                      cVar13 = fn_801438F0(uVar8);
+                      cVar13 = itemParamGetBurnFlag(uVar8);
                       if (cVar13 == 1) {
                         lbl_80478D7D = 3;
                       }
                       else {
-                        cVar13 = fn_801438C8(uVar8);
+                        cVar13 = itemParamGetFreezeFlag(uVar8);
                         if (cVar13 == 1) {
                           lbl_80478D7D = 2;
                         }
                         else {
-                          cVar13 = fn_801438A0(uVar8);
+                          cVar13 = itemParamGetParalyzeFlag(uVar8);
                           if (cVar13 == 1) {
                             lbl_80478D7D = 1;
                           }
                           else {
-                            cVar13 = fn_80143878(uVar8);
+                            cVar13 = itemParamGetConfuseFlag(uVar8);
                             if (cVar13 == 1) {
                               lbl_80478D7D = 0;
                             }
@@ -10425,19 +10425,19 @@ void fn_80211E18(u32 r3,u32 r4)
             }
             else if ((uVar15 != 6) && (uVar15 < 6)) {
               lbl_80478D7D = 4;
-              uVar11 = fn_80143A28(uVar8);
+              uVar11 = itemParamGetAttackUp(uVar8);
               uVar11 = uVar11 & 0xff;
               if (uVar11 == 0) {
-                uVar11 = fn_80143A0C(uVar8);
+                uVar11 = itemParamGetDefenceUp(uVar8);
                 uVar11 = uVar11 & 0xff;
                 if (uVar11 == 0) {
-                  uVar11 = fn_801439F0(uVar8);
+                  uVar11 = itemParamGetQuickUp(uVar8);
                   uVar11 = uVar11 & 0xff;
                   if (uVar11 == 0) {
-                    uVar11 = fn_801439D4(uVar8);
+                    uVar11 = itemParamGetHitUp(uVar8);
                     uVar11 = uVar11 & 0xff;
                     if (uVar11 == 0) {
-                      uVar11 = fn_801439B8(uVar8);
+                      uVar11 = itemParamGetSpAttackUp(uVar8);
                       uVar11 = uVar11 & 0xff;
                       if (uVar11 != 0) {
                         uVar3 = fn_800FA280(_DAT_80279e8c);

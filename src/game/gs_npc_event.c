@@ -1882,8 +1882,8 @@ void fn_80030428(void) { }
 
 /* fn_8003042C - 0x8003042C | size: 0x148 */
 extern void fn_801230E0(void);
-extern void fn_801440A0(void);
-extern void fn_80144088(void);
+extern void itemDataBiosGetPtr(void);
+extern void itemDataBiosGetName(void);
 extern u8 lbl_80266F68[];
 extern u32 lbl_8047A424;
 extern u32 lbl_8047A420;
@@ -1917,8 +1917,8 @@ void fn_8003042C(u8* arg0, u8* arg1) {
 
     if (obj != 0) {
         if (((u16 (*)(void*))fn_801230E0)(obj) != 0) {
-            fn_801440A0();
-            fn_80144088();
+            itemDataBiosGetPtr();
+            itemDataBiosGetName();
             fn_80132A38(0x37, ((s32 (*)(void))fn_800FA280)());
             fn_800FB680(0, 0, combined, 0xE7);
             *(u32*)(arg1 + 0x4C) = 0;

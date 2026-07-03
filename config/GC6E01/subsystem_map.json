@@ -1588,7 +1588,7 @@
 "name": "fn_80011288",
 "addr": "0x80011288",
 "size": 540,
-"label": "gs-engine",
+"label": "fight",
 "confidence": 1.9,
 "seed": null
 },
@@ -1596,7 +1596,7 @@
 "name": "fn_800114A4",
 "addr": "0x800114A4",
 "size": 604,
-"label": "gs-engine",
+"label": "fight",
 "confidence": 1.9,
 "seed": null
 },
@@ -2401,12 +2401,12 @@
 "seed": "prefix"
 },
 {
-"name": "fn_8001BD3C",
+"name": "menuPokemonOpenItemUse",
 "addr": "0x8001BD3C",
 "size": 68,
 "label": "menu",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "menuPokemonOpenFight",
@@ -31185,7 +31185,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011F77C",
+"name": "pokemonGetDarkPokemonLevel",
 "addr": "0x8011F77C",
 "size": 404,
 "label": "field",
@@ -31217,7 +31217,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011FC74",
+"name": "pokemonIsDarkPokemon",
 "addr": "0x8011FC74",
 "size": 48,
 "label": "field",
@@ -35553,7 +35553,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8014369C",
+"name": "itemParamGetFriend3Up",
 "addr": "0x8014369C",
 "size": 28,
 "label": "item",
@@ -35561,7 +35561,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801436B8",
+"name": "itemParamGetFriend2Up",
 "addr": "0x801436B8",
 "size": 28,
 "label": "item",
@@ -35569,7 +35569,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801436D4",
+"name": "itemParamGetFriend1Up",
 "addr": "0x801436D4",
 "size": 28,
 "label": "item",
@@ -35577,7 +35577,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801436F0",
+"name": "itemParamGetPPMaxFullFlag",
 "addr": "0x801436F0",
 "size": 40,
 "label": "item",
@@ -35585,7 +35585,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143718",
+"name": "itemParamGetSpAttackEffortUp",
 "addr": "0x80143718",
 "size": 24,
 "label": "item",
@@ -35593,7 +35593,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143730",
+"name": "itemParamGetSpDefenceEffortUp",
 "addr": "0x80143730",
 "size": 24,
 "label": "item",
@@ -35601,7 +35601,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143748",
+"name": "itemParamGetQuickEffortUp",
 "addr": "0x80143748",
 "size": 24,
 "label": "item",
@@ -35609,7 +35609,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143760",
+"name": "itemParamGetDefenceEffortUp",
 "addr": "0x80143760",
 "size": 24,
 "label": "item",
@@ -35617,7 +35617,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143778",
+"name": "itemParamGetEvolutionFlag",
 "addr": "0x80143778",
 "size": 40,
 "label": "item",
@@ -35625,7 +35625,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801437A0",
+"name": "itemParamGetPPUp",
 "addr": "0x801437A0",
 "size": 24,
 "label": "item",
@@ -35633,7 +35633,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801437B8",
+"name": "itemParamGetPPSelectFlag",
 "addr": "0x801437B8",
 "size": 40,
 "label": "item",
@@ -35641,7 +35641,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801437E0",
+"name": "itemParamGetHPUp",
 "addr": "0x801437E0",
 "size": 24,
 "label": "item",
@@ -35649,7 +35649,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801437F8",
+"name": "itemParamGetReviveFlag",
 "addr": "0x801437F8",
 "size": 40,
 "label": "item",
@@ -35657,7 +35657,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143820",
+"name": "itemParamGetAttackEffortUp",
 "addr": "0x80143820",
 "size": 24,
 "label": "item",
@@ -35665,7 +35665,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143838",
+"name": "itemParamGetHPEffortUp",
 "addr": "0x80143838",
 "size": 24,
 "label": "item",
@@ -35673,7 +35673,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143850",
+"name": "itemParamGetPPMaxUpFlag",
 "addr": "0x80143850",
 "size": 40,
 "label": "item",
@@ -35681,7 +35681,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143878",
+"name": "itemParamGetConfuseFlag",
 "addr": "0x80143878",
 "size": 40,
 "label": "item",
@@ -35689,7 +35689,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801438A0",
+"name": "itemParamGetParalyzeFlag",
 "addr": "0x801438A0",
 "size": 40,
 "label": "item",
@@ -35697,7 +35697,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801438C8",
+"name": "itemParamGetFreezeFlag",
 "addr": "0x801438C8",
 "size": 40,
 "label": "item",
@@ -35705,7 +35705,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801438F0",
+"name": "itemParamGetBurnFlag",
 "addr": "0x801438F0",
 "size": 40,
 "label": "item",
@@ -35713,7 +35713,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143918",
+"name": "itemParamGetPoisonFlag",
 "addr": "0x80143918",
 "size": 40,
 "label": "item",
@@ -35721,7 +35721,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143940",
+"name": "itemParamGetSleepFlag",
 "addr": "0x80143940",
 "size": 40,
 "label": "item",
@@ -35729,7 +35729,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143968",
+"name": "itemParamGetLevelUpFlag",
 "addr": "0x80143968",
 "size": 40,
 "label": "item",
@@ -35737,7 +35737,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143990",
+"name": "itemParamGetGuardFlag",
 "addr": "0x80143990",
 "size": 40,
 "label": "item",
@@ -35745,7 +35745,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801439B8",
+"name": "itemParamGetSpAttackUp",
 "addr": "0x801439B8",
 "size": 28,
 "label": "item",
@@ -35753,7 +35753,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801439D4",
+"name": "itemParamGetHitUp",
 "addr": "0x801439D4",
 "size": 28,
 "label": "item",
@@ -35761,7 +35761,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801439F0",
+"name": "itemParamGetQuickUp",
 "addr": "0x801439F0",
 "size": 28,
 "label": "item",
@@ -35769,7 +35769,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143A0C",
+"name": "itemParamGetDefenceUp",
 "addr": "0x80143A0C",
 "size": 28,
 "label": "item",
@@ -35777,7 +35777,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143A28",
+"name": "itemParamGetAttackUp",
 "addr": "0x80143A28",
 "size": 28,
 "label": "item",
@@ -35785,7 +35785,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143A44",
+"name": "itemParamGetCriticalFlag",
 "addr": "0x80143A44",
 "size": 40,
 "label": "item",
@@ -35793,7 +35793,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143A6C",
+"name": "itemParamGetMeromeroFlag",
 "addr": "0x80143A6C",
 "size": 40,
 "label": "item",
@@ -35801,7 +35801,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143A94",
+"name": "itemParamGetPtr",
 "addr": "0x80143A94",
 "size": 40,
 "label": "item",
@@ -35809,7 +35809,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143ABC",
+"name": "tasteDataGetAisyou",
 "addr": "0x80143ABC",
 "size": 52,
 "label": "item",
@@ -35817,7 +35817,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143AF0",
+"name": "tasteDataGetNigateMsgDataId",
 "addr": "0x80143AF0",
 "size": 24,
 "label": "item",
@@ -35825,7 +35825,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143B08",
+"name": "tasteDataGetPtr",
 "addr": "0x80143B08",
 "size": 40,
 "label": "item",
@@ -35833,7 +35833,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143B30",
+"name": "itemSoubiDataBiosGetFightKoukaDataId",
 "addr": "0x80143B30",
 "size": 24,
 "label": "item",
@@ -35841,7 +35841,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143B48",
+"name": "itemSoubiDataBiosGetPtr",
 "addr": "0x80143B48",
 "size": 40,
 "label": "item",
@@ -35849,7 +35849,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143B70",
+"name": "itemBiosSetNum",
 "addr": "0x80143B70",
 "size": 16,
 "label": "item",
@@ -35857,7 +35857,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143B80",
+"name": "itemBiosSetItemDataId",
 "addr": "0x80143B80",
 "size": 16,
 "label": "item",
@@ -35865,7 +35865,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143B90",
+"name": "itemBallDataBiosSetFightKoukaDataId",
 "addr": "0x80143B90",
 "size": 16,
 "label": "item",
@@ -35873,7 +35873,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143BA0",
+"name": "itemDataBiosSetBuff",
 "addr": "0x80143BA0",
 "size": 16,
 "label": "item",
@@ -35881,7 +35881,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143BB0",
+"name": "itemDataBiosSetUseFriend",
 "addr": "0x80143BB0",
 "size": 32,
 "label": "item",
@@ -35889,7 +35889,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143BD0",
+"name": "itemDataBiosSetFightUseKoukaDataId",
 "addr": "0x80143BD0",
 "size": 16,
 "label": "item",
@@ -35897,7 +35897,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143BE0",
+"name": "itemDataBiosSetItemSoubiDataId",
 "addr": "0x80143BE0",
 "size": 16,
 "label": "item",
@@ -35905,7 +35905,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143BF0",
+"name": "itemDataBiosSetDoc",
 "addr": "0x80143BF0",
 "size": 16,
 "label": "item",
@@ -35913,7 +35913,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143C00",
+"name": "itemDataBiosSetUseful",
 "addr": "0x80143C00",
 "size": 16,
 "label": "item",
@@ -35921,7 +35921,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143C10",
+"name": "itemDataBiosSetImportant",
 "addr": "0x80143C10",
 "size": 16,
 "label": "item",
@@ -35929,7 +35929,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143C20",
+"name": "itemDataBiosSetPrice",
 "addr": "0x80143C20",
 "size": 16,
 "label": "item",
@@ -35937,7 +35937,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143C30",
+"name": "itemDataBiosSetKind",
 "addr": "0x80143C30",
 "size": 16,
 "label": "item",
@@ -35945,7 +35945,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143C40",
+"name": "itemDataBiosSetName",
 "addr": "0x80143C40",
 "size": 16,
 "label": "item",
@@ -35953,7 +35953,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143C50",
+"name": "itemBiosGetNum",
 "addr": "0x80143C50",
 "size": 24,
 "label": "item",
@@ -35961,7 +35961,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143C68",
+"name": "itemBiosGetItemDataId",
 "addr": "0x80143C68",
 "size": 24,
 "label": "item",
@@ -35969,7 +35969,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143C80",
+"name": "itemBallDataBiosGetSnatchSnatchWzxDataId",
 "addr": "0x80143C80",
 "size": 24,
 "label": "item",
@@ -35977,7 +35977,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143C98",
+"name": "itemBallDataBiosGetSnatchShakeWzxDataId",
 "addr": "0x80143C98",
 "size": 24,
 "label": "item",
@@ -35985,7 +35985,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143CB0",
+"name": "itemBallDataBiosGetSnatchPokeoutWzxDataId",
 "addr": "0x80143CB0",
 "size": 24,
 "label": "item",
@@ -35993,7 +35993,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143CC8",
+"name": "itemBallDataBiosGetSnatchMissWzxDataId",
 "addr": "0x80143CC8",
 "size": 24,
 "label": "item",
@@ -36001,7 +36001,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143CE0",
+"name": "itemBallDataBiosGetSnatchBalllandWzxDataId",
 "addr": "0x80143CE0",
 "size": 24,
 "label": "item",
@@ -36009,7 +36009,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143CF8",
+"name": "itemBallDataBiosGetSnatchAttackWzxDataId",
 "addr": "0x80143CF8",
 "size": 24,
 "label": "item",
@@ -36017,7 +36017,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143D10",
+"name": "itemBallDataBiosGetThrowWzxDataId",
 "addr": "0x80143D10",
 "size": 24,
 "label": "item",
@@ -36025,7 +36025,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143D28",
+"name": "itemBallDataBiosGetDowninWzxDataId",
 "addr": "0x80143D28",
 "size": 24,
 "label": "item",
@@ -36033,7 +36033,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143D40",
+"name": "itemBallDataBiosGetOutWzxDataId",
 "addr": "0x80143D40",
 "size": 24,
 "label": "item",
@@ -36041,7 +36041,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143D58",
+"name": "itemBallDataBiosGetOpenWzxDataId",
 "addr": "0x80143D58",
 "size": 24,
 "label": "item",
@@ -36049,7 +36049,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143D70",
+"name": "itemBallDataBiosGetInWzxDataId",
 "addr": "0x80143D70",
 "size": 24,
 "label": "item",
@@ -36057,7 +36057,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143D88",
+"name": "itemBallDataBiosGetFightKoukaDataId",
 "addr": "0x80143D88",
 "size": 24,
 "label": "item",
@@ -36065,7 +36065,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143DA0",
+"name": "itemBallDataBiosGetPtr",
 "addr": "0x80143DA0",
 "size": 44,
 "label": "item",
@@ -36073,7 +36073,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143DCC",
+"name": "itemDataBiosGetBattleUseFunc",
 "addr": "0x80143DCC",
 "size": 24,
 "label": "item",
@@ -36081,7 +36081,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143DE4",
+"name": "itemDataBiosGetFieldUseFunc",
 "addr": "0x80143DE4",
 "size": 24,
 "label": "item",
@@ -36089,7 +36089,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143DFC",
+"name": "itemDataBiosGetItemEffectParam",
 "addr": "0x80143DFC",
 "size": 24,
 "label": "item",
@@ -36097,7 +36097,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143E14",
+"name": "itemDataBiosGetBuff",
 "addr": "0x80143E14",
 "size": 24,
 "label": "item",
@@ -36105,7 +36105,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143E2C",
+"name": "itemDataBiosGetUseFriend",
 "addr": "0x80143E2C",
 "size": 52,
 "label": "item",
@@ -36145,7 +36145,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143F54",
+"name": "itemDataBiosGetFightUseKoukaDataId",
 "addr": "0x80143F54",
 "size": 24,
 "label": "item",
@@ -36153,7 +36153,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143F6C",
+"name": "itemDataBiosGetItemSoubiDataId",
 "addr": "0x80143F6C",
 "size": 24,
 "label": "item",
@@ -36161,7 +36161,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143F84",
+"name": "itemDataBiosGetDoc",
 "addr": "0x80143F84",
 "size": 24,
 "label": "item",
@@ -36193,7 +36193,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143FE4",
+"name": "itemDataBiosGetCoupon",
 "addr": "0x80143FE4",
 "size": 24,
 "label": "item",
@@ -36201,7 +36201,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80143FFC",
+"name": "itemDataBiosGetPrice",
 "addr": "0x80143FFC",
 "size": 24,
 "label": "item",
@@ -36209,7 +36209,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80144014",
+"name": "itemDataBiosGetKind",
 "addr": "0x80144014",
 "size": 24,
 "label": "item",
@@ -36217,7 +36217,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8014402C",
+"name": "itemDataBiosCheckExportable",
 "addr": "0x8014402C",
 "size": 56,
 "label": "item",
@@ -36225,7 +36225,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80144064",
+"name": "itemDataBiosCheckImportable",
 "addr": "0x80144064",
 "size": 36,
 "label": "item",
@@ -36233,7 +36233,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80144088",
+"name": "itemDataBiosGetName",
 "addr": "0x80144088",
 "size": 24,
 "label": "item",
@@ -36241,7 +36241,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801440A0",
+"name": "itemDataBiosGetPtr",
 "addr": "0x801440A0",
 "size": 80,
 "label": "item",
@@ -36249,7 +36249,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801440F0",
+"name": "itemUse2PokemonSimulation",
 "addr": "0x801440F0",
 "size": 184,
 "label": "item",
@@ -36257,7 +36257,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801441A8",
+"name": "friendXUp__FP7PokemonP12FightPokemonScUsUs",
 "addr": "0x801441A8",
 "size": 548,
 "label": "item",
@@ -42889,7 +42889,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8018F730",
+"name": "peopleBiosGetPushDataSize",
 "addr": "0x8018F730",
 "size": 88,
 "label": "people",
@@ -42897,7 +42897,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8018F788",
+"name": "peopleBiosPushData",
 "addr": "0x8018F788",
 "size": 244,
 "label": "people",
@@ -42905,7 +42905,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8018F87C",
+"name": "peopleBiosPopData",
 "addr": "0x8018F87C",
 "size": 688,
 "label": "people",
@@ -52281,7 +52281,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F61BC",
+"name": "fightFloorGetNowPtr",
 "addr": "0x801F61BC",
 "size": 48,
 "label": "fight",
@@ -68957,14 +68957,8 @@
 {
 "label": "fight",
 "start": "0x800111C4",
-"end": "0x80011288",
-"count": 3
-},
-{
-"label": "gs-engine",
-"start": "0x80011288",
 "end": "0x80011700",
-"count": 2
+"count": 5
 },
 {
 "label": "menu",

@@ -80,9 +80,9 @@
 extern void* fn_80129BC8();
 extern void* heroHizukiItemGetItemAryPtr();
 extern u8    fn_801429E8(void* fieldData);    /* Check field validity */
-extern u16   fn_80143C50(void* fieldData);    /* Get field value */
-extern u16   fn_801440A0(u16 speciesId);      /* Get species data */
-extern u16   fn_80143FFC(void);               /* Get display field count */
+extern u16   itemBiosGetNum(void* fieldData);    /* Get field value */
+extern u16   itemDataBiosGetPtr(u16 speciesId);      /* Get species data */
+extern u16   itemDataBiosGetPrice(void);               /* Get display field count */
 
 /* Text rendering */
 extern void  fn_80132A38(s32 paramId, s32 value);
@@ -183,15 +183,15 @@ typedef s32 (*SummaryPageDrawFn)(s32 x, s32 pageIndex, u16* messageParam);
 typedef s32 (*DrawHandlerFn)(u8*, u8*, u16*);
 typedef s32 (*SummaryMenuCallback)(s32, s32, s32*);
 
-extern u32 fn_80143C68(void*);
-extern u32 fn_80144088(void);
+extern u32 itemBiosGetItemDataId(void*);
+extern u32 itemDataBiosGetName(void);
 extern u32 itemDataBiosGetKinomiNo(u16);
 extern u32 itemDataBiosGetWazaMachineNo(void);
 extern u32 itemDataBiosGetHidenMachineNo(u32);
 extern u32 itemDataBiosGetWazaIDByWazaMachineNo(u32);
-extern u32 fn_80143F84(void);
+extern u32 itemDataBiosGetDoc(void);
 extern u32 fn_80143F9C(void);
-extern u32 fn_80143DCC(void);
+extern u32 itemDataBiosGetBattleUseFunc(void);
 extern u32 wazaDataBiosGetPtr(u16);
 extern u32 fn_8011CA1C(u32);
 extern u8* fn_80105624(void);
@@ -324,15 +324,15 @@ s32 fn_800150E4(s32 x, s32 pageIndex, u16* packedRange) {
             while (++listIndex < itemCount) {
                 if (fn_801429E8(field) != 0) {
                     if (--itemIndex < 0) {
-                        value = fn_80143C68(field);
+                        value = itemBiosGetItemDataId(field);
                         break;
                     }
                 }
                 field = (u8*)field + 4;
             }
 
-            fn_801440A0((u16)value);
-            textId = fn_80144088();
+            itemDataBiosGetPtr((u16)value);
+            textId = itemDataBiosGetName();
             fn_800FB680(textX + 0xA, y, -1, textId);
             itemIndex += listIndex + 1;
         }
@@ -426,15 +426,15 @@ s32 fn_80015374(s32 x, s32 pageIndex, u16* packedRange) {
             while (++listIndex < itemCount) {
                 if (fn_801429E8(field) != 0) {
                     if (--itemIndex < 0) {
-                        value = fn_80143C68(field);
+                        value = itemBiosGetItemDataId(field);
                         break;
                     }
                 }
                 field = (u8*)field + 4;
             }
 
-            fn_801440A0((u16)value);
-            textId = fn_80144088();
+            itemDataBiosGetPtr((u16)value);
+            textId = itemDataBiosGetName();
             if (textId != 0) {
                 fn_800FB680(x, y, -1, textId);
             }
@@ -537,7 +537,7 @@ s32 fn_800155B0(s32 x, s32 pageIndex, u16* packedRange) {
             while (++listIndex < itemCount) {
                 if (fn_801429E8(field) != 0) {
                     if (--itemIndex < 0) {
-                        species = fn_80143C68(field);
+                        species = itemBiosGetItemDataId(field);
                         break;
                     }
                 }
@@ -553,8 +553,8 @@ s32 fn_800155B0(s32 x, s32 pageIndex, u16* packedRange) {
             fn_80132A38(0x34, level);
             fn_800FB680(textX, y, -1, 0xCA);
             textX += (s32)(u16)(fn_800FA444(0xCA) >> 16);
-            fn_801440A0((u16)species);
-            textId = fn_80144088();
+            itemDataBiosGetPtr((u16)species);
+            textId = itemDataBiosGetName();
             fn_800FB680(textX + 9, y, -1, textId);
 
             dataSource = SUMMARY_ENTRY_FIELD(entry);
@@ -573,7 +573,7 @@ s32 fn_800155B0(s32 x, s32 pageIndex, u16* packedRange) {
             while (++listIndex < itemCount) {
                 if (fn_801429E8(field) != 0) {
                     if (--itemIndex < 0) {
-                        value = fn_80143C50(field);
+                        value = itemBiosGetNum(field);
                         break;
                     }
                 }
@@ -678,14 +678,14 @@ s32 fn_800159BC(s32 x, s32 pageIndex, u16* packedRange) {
             while (++listIndex < itemCount) {
                 if (fn_801429E8(field) != 0) {
                     if (--itemIndex < 0) {
-                        species = fn_80143C68(field);
+                        species = itemBiosGetItemDataId(field);
                         break;
                     }
                 }
                 field = (u8*)field + 4;
             }
 
-            speciesData = fn_801440A0((u16)species);
+            speciesData = itemDataBiosGetPtr((u16)species);
             rank = (u8)itemDataBiosGetWazaMachineNo();
             subRank = (u8)itemDataBiosGetHidenMachineNo(speciesData);
             messageId = (subRank != 0xFF) ? 0x2B00 : 0x2AFF;
@@ -726,7 +726,7 @@ s32 fn_800159BC(s32 x, s32 pageIndex, u16* packedRange) {
             while (++listIndex < itemCount) {
                 if (fn_801429E8(field) != 0) {
                     if (--itemIndex < 0) {
-                        value = fn_80143C50(field);
+                        value = itemBiosGetNum(field);
                         break;
                     }
                 }
@@ -827,14 +827,14 @@ s32 fn_80015E3C(s32 x, s32 pageIndex, u16* packedRange) {
             while (++listIndex < itemCount) {
                 if (fn_801429E8(field) != 0) {
                     if (--itemIndex < 0) {
-                        value = fn_80143C68(field);
+                        value = itemBiosGetItemDataId(field);
                         break;
                     }
                 }
                 field = (u8*)field + 4;
             }
-            fn_801440A0((u16)value);
-            textId = fn_80144088();
+            itemDataBiosGetPtr((u16)value);
+            textId = itemDataBiosGetName();
             if (textId != 0) {
                 fn_800FB680(x, y, -1, textId);
             }
@@ -855,7 +855,7 @@ s32 fn_80015E3C(s32 x, s32 pageIndex, u16* packedRange) {
             while (++listIndex < itemCount) {
                 if (fn_801429E8(field) != 0) {
                     if (--itemIndex < 0) {
-                        value = fn_80143C50(field);
+                        value = itemBiosGetNum(field);
                         break;
                     }
                 }
@@ -1449,7 +1449,7 @@ s32 fn_80017028(u8* ctx) {
                 if (fn_801429E8(field) != 0) {
                     visibleIndex++;
                     if (visibleIndex >= cursorIndex) {
-                        species = fn_80143C68(field);
+                        species = itemBiosGetItemDataId(field);
                         break;
                     }
                 }
@@ -1469,7 +1469,7 @@ s32 fn_80017028(u8* ctx) {
                 if (fn_801429E8(field) != 0) {
                     visibleIndex++;
                     if (visibleIndex >= cursorIndex) {
-                        species = fn_80143C68(field);
+                        species = itemBiosGetItemDataId(field);
                         break;
                     }
                 }
@@ -1572,15 +1572,15 @@ s32 fn_80017028(u8* ctx) {
             if (fn_801429E8(field) != 0) {
                 visibleIndex++;
                 if (visibleIndex >= cursorIndex) {
-                    species = fn_80143C68(field);
+                    species = itemBiosGetItemDataId(field);
                     break;
                 }
             }
             field = (u8*)field + 4;
         }
         if ((u16)species != 0) {
-            fn_801440A0((u16)species);
-            lbl_8047A2DC = fn_80143F84();
+            itemDataBiosGetPtr((u16)species);
+            lbl_8047A2DC = itemDataBiosGetDoc();
         } else {
             lbl_8047A2DC = fallbackLabels[lbl_8047A2E0];
         }
@@ -1773,15 +1773,15 @@ s32 fn_80017A0C(u8* ctx) {
                 if (fn_801429E8(field) != 0) {
                     visibleIndex++;
                     if (visibleIndex >= cursorIndex) {
-                        species = fn_80143C68(field);
+                        species = itemBiosGetItemDataId(field);
                         break;
                     }
                 }
                 field = (u8*)field + 4;
             }
 
-            fn_801440A0((u16)species);
-            lbl_8047A2DC = fn_80143F84();
+            itemDataBiosGetPtr((u16)species);
+            lbl_8047A2DC = itemDataBiosGetDoc();
             SUMMARY_STORE_F32(lbl_8047A2D4, SUMMARY_F32(lbl_8047B748));
             SUMMARY_STORE_F32(lbl_8047A2D0, SUMMARY_F32(lbl_8047B748));
             lbl_8047A2C8 = 0;
@@ -1881,15 +1881,15 @@ s32 fn_80017CB8(u8* outEntries, s32 maxEntries, s32 pageIndex, s32 selectedIndex
         if (fn_801429E8(field) != 0) {
             visibleIndex++;
             if (visibleIndex >= selectedIndex) {
-                species = fn_80143C68(field);
+                species = itemBiosGetItemDataId(field);
                 break;
             }
         }
         field = (u8*)field + 4;
     }
 
-    fn_801440A0((u16)species);
-    hasRibbonState = (fn_80143DCC() != 0);
+    itemDataBiosGetPtr((u16)species);
+    hasRibbonState = (itemDataBiosGetBattleUseFunc() != 0);
     speciesIsNotEgg = ((u16)species != 0x219);
 
     sourceEntries = *(u8**)(entry + 0x24 + (s32)lbl_8047A2E0 * 8);
@@ -1943,7 +1943,7 @@ s32 fn_80017E8C(s32 pageIndex, u16 species, s16 slotIndex) {
     u32 selectedValue;
     u32 menuArg[5];
 
-    fn_801440A0(species);
+    itemDataBiosGetPtr(species);
     if ((u8)fn_80143F9C() == 0) {
         fn_80132A38(0x2D, species);
         fn_80106D3C(2, 0x426C, 1, 0);
@@ -1975,7 +1975,7 @@ s32 fn_80017E8C(s32 pageIndex, u16 species, s16 slotIndex) {
             if (fn_801429E8(field) != 0) {
                 visibleIndex++;
                 if (visibleIndex >= slotIndex) {
-                    selectedValue = fn_80143C50(field);
+                    selectedValue = itemBiosGetNum(field);
                     break;
                 }
             }

@@ -3755,8 +3755,8 @@ s32 fn_80029760(s32 r3, s32 r4) {
 #endif
 
 /* fn_80029850 - 0x80029850 | size: 0x8c */
-extern u16 fn_80143C68(void*);
-extern u16 fn_80143C50(void*);
+extern u16 itemBiosGetItemDataId(void*);
+extern u16 itemBiosGetNum(void*);
 #if 0
 asm void fn_80029850(void) {
 #include "src/game/gs_worldmap_fn_80029850.inc"
@@ -3779,9 +3779,9 @@ u32 fn_80029850(u8* r3, u16 r4, u16 r5, u16 r6) {
     r27 = 0;
     r31 = r5;
     while (r27 < r29) {
-        val = fn_80143C68(r26);
+        val = itemBiosGetItemDataId(r26);
         if (val == r31) {
-            cur = fn_80143C50(r26);
+            cur = itemBiosGetNum(r26);
             r28 += (u16)(r30 - cur);
         } else if (val == 0) {
             r28 += r30;
@@ -3794,8 +3794,8 @@ u32 fn_80029850(u8* r3, u16 r4, u16 r5, u16 r6) {
 #endif
 
 /* fn_80029AC8 - 0x80029AC8 | size: 0x1f8 */
-extern void fn_80143B80(void*, u16);
-extern void fn_80143B70(void*, u16);
+extern void itemBiosSetItemDataId(void*, u16);
+extern void itemBiosSetNum(void*, u16);
 #if 0
 asm void fn_80029AC8(void) {
 #include "src/game/gs_worldmap_fn_80029AC8.inc"
@@ -3824,20 +3824,20 @@ void fn_80029AC8(s32 r3, s32 r4, s32 r5, void* r6) {
             s16 i = r27;
             if (i >= 0 && i < r28) {
                 void* slot = (void*)(r31 + ((s32)i << 2));
-                u16 v = fn_80143C68(slot);
+                u16 v = itemBiosGetItemDataId(slot);
                 if (v == r30 || v == 0) {
                     u16 cur;
                     u16 delta;
                     u16 give;
                     if (v == 0) {
-                        fn_80143B80(slot, r30);
+                        itemBiosSetItemDataId(slot, r30);
                         cur = 0;
                     } else {
-                        cur = fn_80143C50(slot);
+                        cur = itemBiosGetNum(slot);
                     }
                     delta = (u16)(0x3e7 - cur);
                     give = (delta >= r24) ? r24 : delta;
-                    fn_80143B70(slot, (u16)(cur + give));
+                    itemBiosSetNum(slot, (u16)(cur + give));
                     r24 = (u16)(r24 - give);
                 }
             }
@@ -3852,20 +3852,20 @@ void fn_80029AC8(s32 r3, s32 r4, s32 r5, void* r6) {
             s16 i = r27;
             if (i >= 0 && i < r28) {
                 void* slot = (void*)((u8*)r31 + 0x3ac + ((s32)i << 2));
-                u16 v = fn_80143C68(slot);
+                u16 v = itemBiosGetItemDataId(slot);
                 if (v == r30 || v == 0) {
                     u16 cur;
                     u16 delta;
                     u16 give;
                     if (v == 0) {
-                        fn_80143B80(slot, r30);
+                        itemBiosSetItemDataId(slot, r30);
                         cur = 0;
                     } else {
-                        cur = fn_80143C50(slot);
+                        cur = itemBiosGetNum(slot);
                     }
                     delta = (u16)(0x3e7 - cur);
                     give = (delta >= r25) ? r25 : delta;
-                    fn_80143B70(slot, (u16)(cur + give));
+                    itemBiosSetNum(slot, (u16)(cur + give));
                     r25 = (u16)(r25 - give);
                 }
             }
@@ -3934,18 +3934,18 @@ s32 fn_80029CC0(u8* r30) {
         if (idx != -1) {
             if (idx >= 0 && idx < (s32)cnt) {
                 slot = (void*)(r30 + ((s32)idx << 2));
-                v = (u16)fn_80143C68(slot);
+                v = (u16)itemBiosGetItemDataId(slot);
                 if (v != id && v != 0) continue;
                 if (v == 0) {
-                    fn_80143B80(slot, id);
+                    itemBiosSetItemDataId(slot, id);
                     cur = 0;
                 } else {
-                    cur = (u16)fn_80143C50(slot);
+                    cur = (u16)itemBiosGetNum(slot);
                 }
                 delta = (u16)(0x3e7 - cur);
                 if (delta < qty) give = delta;
                 else give = qty;
-                fn_80143B70(slot, (u16)(cur + give));
+                itemBiosSetNum(slot, (u16)(cur + give));
             }
         } else {
             for (j = 0; j < (s32)cnt && qty != 0; j++) {
@@ -3953,18 +3953,18 @@ s32 fn_80029CC0(u8* r30) {
                 qty = (u16)qty;
                 if (jj >= 0 && jj < (s32)cnt) {
                     slot = (void*)(r30 + ((s32)jj << 2));
-                    v = (u16)fn_80143C68(slot);
+                    v = (u16)itemBiosGetItemDataId(slot);
                     if (v != id && v != 0) continue;
                     if (v == 0) {
-                        fn_80143B80(slot, id);
+                        itemBiosSetItemDataId(slot, id);
                         cur = 0;
                     } else {
-                        cur = (u16)fn_80143C50(slot);
+                        cur = (u16)itemBiosGetNum(slot);
                     }
                     delta = (u16)(0x3e7 - cur);
                     if (delta < qty) give = delta;
                     else give = qty;
-                    fn_80143B70(slot, (u16)(cur + give));
+                    itemBiosSetNum(slot, (u16)(cur + give));
                     qty = (u16)(qty - give);
                 }
             }
@@ -4599,8 +4599,8 @@ s32 fn_8002AE9C(void* r3, u8* r4) {
 #endif
 
 /* fn_8002AEF8 - 0x8002AEF8 | size: 0x144 | WALL 83.7%: regalloc + scheduling */
-extern void fn_801440A0(u32);
-extern u32 fn_80144014(void);
+extern void itemDataBiosGetPtr(u32);
+extern u32 itemDataBiosGetKind(void);
 extern u32 fn_80129BC8(s32, u32, u16*, s32, s32, s32, s32);
 extern u32 itemGetStatus(u32, s32, s32, s32);
 #if 0
@@ -4630,8 +4630,8 @@ s32 fn_8002AEF8(void* r3, u8* r4) {
     r29 = 0;
     if ((u16)r30 != 0) {
         r31 = r30;
-        fn_801440A0(r30);
-        r27 = fn_80129BC8(0, fn_80144014(), &stack, 0, 0, 0, 0);
+        itemDataBiosGetPtr(r30);
+        r27 = fn_80129BC8(0, itemDataBiosGetKind(), &stack, 0, 0, 0, 0);
         r28 = 0;
         while (r28 < (s32)stack) {
             if ((u16)itemGetStatus(r27, 0, 0x1b, 0) == (u16)r31) {
@@ -4752,9 +4752,9 @@ end:
 
 /* fn_8002B1A0 - 0x8002B1A0 | size: 0x26c */
 extern void fn_800FE38C(void);
-extern u32 fn_80144088(void);
-extern u32 fn_80143FFC(void);
-extern u32 fn_80143FE4(void);
+extern u32 itemDataBiosGetName(void);
+extern u32 itemDataBiosGetPrice(void);
+extern u32 itemDataBiosGetCoupon(void);
 extern void fn_800FE35C(void);
 extern f32 lbl_8047B980;
 #if 0
@@ -4774,16 +4774,16 @@ asm void fn_8002B1A0(void) {
 void fn_8002B1A0(void* arg0, u8* arg1)
 {
     extern void fn_800FE38C(s32, s32, s32, s32);
-    extern u32 fn_80144088(void);
-    extern u32 fn_80143FFC(void);
-    extern u32 fn_80143FE4(void);
+    extern u32 itemDataBiosGetName(void);
+    extern u32 itemDataBiosGetPrice(void);
+    extern u32 itemDataBiosGetCoupon(void);
     extern void fn_800FE35C(void);
     extern f32  lbl_8047B980;
 
     extern void fn_80132A38(s32, void*);
     extern u32  fn_800FA444(u32);
     extern void fn_800FB680(s32, s32, s32, u32);
-    extern void fn_801440A0(u32);
+    extern void itemDataBiosGetPtr(u32);
 
     extern u8   lbl_802EF0A8[];
 
@@ -4896,9 +4896,9 @@ void fn_8002B1A0(void* arg0, u8* arg1)
             }
 
             /* draw the icon for this slot (if any) */
-            fn_801440A0(slot_id);
+            itemDataBiosGetPtr(slot_id);
             {
-                u32 icon_h = (u32)fn_80144088();
+                u32 icon_h = (u32)itemDataBiosGetName();
                 if (icon_h != 0) {
                     fn_800FB680(0, x_pos, -1, icon_h);
                 }
@@ -4910,9 +4910,9 @@ void fn_8002B1A0(void* arg0, u8* arg1)
                 if (mode == 0 || mode == 1) {
                     /* normal mode: draw background string at y_base, then value */
                     fn_800FB680(x_mid, x_pos, -1, 0x14f);
-                    fn_801440A0(slot_id);
+                    itemDataBiosGetPtr(slot_id);
                     {
-                        u32 val = fn_80143FFC();
+                        u32 val = itemDataBiosGetPrice();
                         fn_80132A38(0x50, (void*)(u32)(u16)val);
                     }
                     {
@@ -4922,9 +4922,9 @@ void fn_8002B1A0(void* arg0, u8* arg1)
                     }
                 } else {
                     /* alternate mode: draw different value string */
-                    fn_801440A0(slot_id);
+                    itemDataBiosGetPtr(slot_id);
                     {
-                        u32 val = fn_80143FE4();
+                        u32 val = itemDataBiosGetCoupon();
                         fn_80132A38(0x50, (void*)(u32)(u16)val);
                     }
                     {
@@ -5492,7 +5492,7 @@ s32 fn_8002BCE8(void* r3, u8* r4) {
 #endif
 
 /* fn_8002BE08 - 0x8002BE08 | size: 0x20c | WALL 86.5%: regalloc + scheduling */
-extern void fn_80143F84(void);
+extern void itemDataBiosGetDoc(void);
 extern f32 lbl_8047B9B8;
 extern f32 lbl_8047B9BC;
 extern u32 lbl_8047A3E4;
@@ -5555,8 +5555,8 @@ u32 fn_8002BE08(u8* arg0) {
         r3val = ((u16*)(*(u32*)(ctx + 0x4)))[sum];
     }
     if ((u16)r3val != 0) {
-        fn_801440A0((u16)r3val);
-        fn_80143F84();
+        itemDataBiosGetPtr((u16)r3val);
+        itemDataBiosGetDoc();
     } else {
         u8 b = ctx[0x1c];
         if (b == 0 || b == 1) {
@@ -5940,10 +5940,10 @@ void fn_8002C408(s32 mapIdx, u32 mode)
     extern u32   fn_80129280(u8* obj, u16 sel);            /* object/property accessor */
     extern u32   fn_8012A5B0(u8* ptr, u32 selector, u32 idx); /* state/interaction getter */
     extern void  fn_8012A450(u8* ptr, u32 selector, u32 value); /* state setter */
-    extern void* fn_801440A0(u16 speciesId);              /* select species/item entry */
-    extern u32   fn_80143FE4(void);                        /* read selected entry value (u16) */
-    extern u16   fn_80143C68(void* slot);                  /* item/species id at slot */
-    extern u16   fn_80143C50(void* slot);                  /* quantity at slot */
+    extern void* itemDataBiosGetPtr(u16 speciesId);              /* select species/item entry */
+    extern u32   itemDataBiosGetCoupon(void);                        /* read selected entry value (u16) */
+    extern u16   itemBiosGetItemDataId(void* slot);                  /* item/species id at slot */
+    extern u16   itemBiosGetNum(void* slot);                  /* quantity at slot */
     extern u16   fn_80134420(s32 a, u16 species);          /* owned-count query (mode 2) */
     extern s32   fn_801298B8(u8* ptr, u32 species);        /* owned-count query (default) */
     extern void  fn_80029EF4(void* a, s32 b, s32 c, u8 d, void* e); /* commit purchase */
@@ -6092,9 +6092,9 @@ void fn_8002C408(s32 mapIdx, u32 mode)
         {
             u16* p = listStart;
             while (*p != 0) {
-                fn_801440A0(*p);
+                itemDataBiosGetPtr(*p);
                 {
-                    s32 v = (s32)(u16)fn_80143FE4();
+                    s32 v = (s32)(u16)itemDataBiosGetCoupon();
                     if (v < minCost) minCost = v;
                 }
                 p++;
@@ -6157,8 +6157,8 @@ L_628:
     }
 
     /* (3) affordability for the chosen entry -> max quantity */
-    fn_801440A0((u16)sel);
-    maxAfford = (s32)(u16)fn_80143FE4();
+    itemDataBiosGetPtr((u16)sel);
+    maxAfford = (s32)(u16)itemDataBiosGetCoupon();
     if (maxAfford > 0) {
         s32 have;
         /* modeLow is 4 in this loop; preserve the per-mode currency fetch */
@@ -6174,8 +6174,8 @@ L_628:
     }
 
     /* (4) format header line, open quantity selector */
-    fn_801440A0((u16)sel);
-    unitPrice = (s32)(u16)fn_80143FE4();
+    itemDataBiosGetPtr((u16)sel);
+    unitPrice = (s32)(u16)itemDataBiosGetCoupon();
     species   = (s32)(u16)sel;
     fn_80029FAC(&msgBuf[1], mapIdx, 0xc, 0x2d, species, -1);
     lbl_8047A3E4 = 0; /* result captured by fn_80029FAC via &msgBuf[1] path */
@@ -6222,9 +6222,9 @@ L_628:
             u16 n = buf.count;
             for (i = 0; i < (s32)n; i++) {
                 void* slot = base + i * 4;
-                u16 id = fn_80143C68(slot);
+                u16 id = itemBiosGetItemDataId(slot);
                 if (id == (u16)sel) {
-                    ownedRoom += (s32)(u16)(0x3e7 - fn_80143C50(slot));
+                    ownedRoom += (s32)(u16)(0x3e7 - itemBiosGetNum(slot));
                 } else if (id == 0) {
                     ownedRoom += 0x3e7;
                 }
@@ -6321,9 +6321,9 @@ L_CB40:
                     if (j < 0 || j > (s32)buf.count) {
                         id = 0;
                     } else {
-                        id = fn_80143C68(slot);
+                        id = itemBiosGetItemDataId(slot);
                         if (id != 0) {
-                            inv.items[j].qty = fn_80143C50(slot);
+                            inv.items[j].qty = itemBiosGetNum(slot);
                         }
                     }
                     inv.items[j].id = id;
@@ -6393,7 +6393,7 @@ asm void fn_8002CE6C(void) {
  *     call fn_801046B8 + fn_801026A4 to show the selection dialog.
  *  4. On cancel (-1) → post "cancel" message and return.
  *  5. On selection:
- *       - look up species data (fn_801440A0) and get trade count (fn_80143FFC).
+ *       - look up species data (itemDataBiosGetPtr) and get trade count (itemDataBiosGetPrice).
  *       - if count == 0 or ratio > 99 → post "no stock" message and return.
  *       - if trade precondition fails (fn_801298B8 < 1) → post "busy" message and return.
  *       - otherwise: play sound, deduct from party (heroDecPokedoru),
@@ -6408,8 +6408,8 @@ void fn_8002CE6C(u8* obj, u8 slot) {
     extern u32  fn_8012A5B0(u8* ptr, u32 sel, u32 idx); /* interaction getter */
     extern u32  fn_801046B8(void);                    /* get display context handle */
     extern s32 fn_801026A4(u32 sceneId, u32 a, u32 b, u32 c, u32 d, u32 e, ...); /* show menu dialog */
-    extern void fn_801440A0(u32 speciesId);            /* load species data */
-    extern u16  fn_80143FFC(void);                    /* get trade/field count */
+    extern void itemDataBiosGetPtr(u32 speciesId);            /* load species data */
+    extern u16  itemDataBiosGetPrice(void);                    /* get trade/field count */
     extern s32  fn_801298B8(u8* ptr, u32 itemId);     /* check trade precondition */
     extern void fn_80166AB8(u32 soundId, u32 a, u32 b); /* play sound */
     extern void heroDecPokedoru(u8* ptr, u32 offset);     /* deduct from party (give Pokemon) */
@@ -6451,8 +6451,8 @@ void fn_8002CE6C(u8* obj, u8 slot) {
     u32  obj_idx;     /* r31 = obj * 4, used as byte-offset into u16 location table */
     u32  frames;      /* r28, frame accumulator for the spin-yield */
     u16  selection;   /* r28 after dialog, selected item key */
-    u16  species;     /* r27 = fn_801440A0 result (first call) */
-    s32  trade_count; /* r26 = fn_80143FFC result (second call) */
+    u16  species;     /* r27 = itemDataBiosGetPtr result (first call) */
+    s32  trade_count; /* r26 = itemDataBiosGetPrice result (second call) */
     s32  ratio;       /* r0, computed trade ratio */
 
     /* --- derive the byte-offset index from the obj pointer integer value --- */
@@ -6593,11 +6593,11 @@ _loop_top:
         }
 
         /* 6. Look up species and count for selected item */
-        fn_801440A0((u32)selection);
-        species = (u16)fn_80143FFC();
+        itemDataBiosGetPtr((u32)selection);
+        species = (u16)itemDataBiosGetPrice();
 
-        fn_801440A0((u32)selection);
-        trade_count = (s16)fn_80143FFC();
+        itemDataBiosGetPtr((u32)selection);
+        trade_count = (s16)itemDataBiosGetPrice();
 
         /* 7. Compute stock ratio and check >= 1 */
         if (trade_count > 0) {
@@ -6694,9 +6694,9 @@ void fn_8002D154(s32 mapIndex, u8 colorIndex)
     extern s8 menuSubOpenYesNo(s32 a, s32 b, s32 c, s32 d);
     extern void fn_801069FC(s32 a);
     extern void fn_80102568(s32 a, s32 b, s32 c);                  /* close/release   */
-    extern u32  fn_801440A0(u32 itemId);                           /* select item     */
-    extern u32  fn_80144014(void);                                 /* item category   */
-    extern u32  fn_80143FFC(void);                                 /* item price/value*/
+    extern u32  itemDataBiosGetPtr(u32 itemId);                           /* select item     */
+    extern u32  itemDataBiosGetKind(void);                                 /* item category   */
+    extern u32  itemDataBiosGetPrice(void);                                 /* item price/value*/
     extern s8   fn_80129B2C(s32 a, s32 b);                         /* story/flag query*/
     extern u32  fn_8012A5B0(u8* ptr, u32 selector, u32 idx);       /* money getter    */
     extern u32  fn_801298B8(s32 a, u32 item);                      /* inventory count */
@@ -6798,12 +6798,12 @@ void fn_8002D154(s32 mapIndex, u8 colorIndex)
         }
 
         /* validate the item exists */
-        if (fn_801440A0(selectedItem) == 0) {
+        if (itemDataBiosGetPtr(selectedItem) == 0) {
             continue;
         }
 
         /* special-case: "key item" category (6) gated by a story flag */
-        if ((fn_80144014() & 0xff) == 6) {
+        if ((itemDataBiosGetKind() & 0xff) == 6) {
             if ((fn_80129B2C(0, 0x21e) & 0xff) == 0) {
                 fn_8002A2CC((u8*)mapIndex, 8, -1);
                 continue;
@@ -6811,8 +6811,8 @@ void fn_8002D154(s32 mapIndex, u8 colorIndex)
         }
 
         /* (3b) compute how many the player can afford (capped at 99) */
-        fn_801440A0(selectedItem);
-        maxAffordable = (s32)(fn_80143FFC() & 0xffff);
+        itemDataBiosGetPtr(selectedItem);
+        maxAffordable = (s32)(itemDataBiosGetPrice() & 0xffff);
         if (maxAffordable > 0) {
             maxAffordable = (s32)fn_8012A5B0((u8*)0, 0xc, 0) / maxAffordable;
             if (maxAffordable > 0x63) {
@@ -6827,8 +6827,8 @@ void fn_8002D154(s32 mapIndex, u8 colorIndex)
         }
 
         /* (4) format the item header and open the quantity selector */
-        fn_801440A0(selectedItem);
-        unitPrice = fn_80143FFC() & 0xffff;
+        itemDataBiosGetPtr(selectedItem);
+        unitPrice = itemDataBiosGetPrice() & 0xffff;
         {
             u16 itemId16 = selectedItem & 0xffff;
             lbl_8047A3E4 = fn_8002A0B8(fmtBuf, mapIndex, 0xc, 0x2d, itemId16, -1);
@@ -8223,7 +8223,7 @@ void fn_8002E460(void* mapCtx)
 
 /* fn_8002EA5C - 0x8002EA5C | size: 0x418 */
 extern void fn_8011F1A0(void);
-extern void fn_80144064(void);
+extern void itemDataBiosCheckImportable(void);
 extern void fn_801021F8(void);
 extern void fn_8012AC08(void);
 extern void fn_8011E850(void);
@@ -8253,7 +8253,7 @@ asm void fn_8002EA5C(void) {
  *
  * Flow:
  *   1. Query the selected map entry; gate on availability (fn_8011F1A0 +
- *      fn_80144064). If unavailable, run the "blocked" timeout: flash the
+ *      itemDataBiosCheckImportable). If unavailable, run the "blocked" timeout: flash the
  *      0xD9 list element (marker 0x43DD), spin a frame-wait, clear it, then
  *      set state lbl_8047A42C = 7 and bail.
  *   2. Otherwise scan party-member slots 0..5 (skipping the active map slot)
@@ -8286,8 +8286,8 @@ void fn_8002EA5C(void)
     /* cross-TU callees (block-scope typed externs, TU convention) */
     extern u32  fn_8012A5B0(u8* ptr, u32 selector, u32 idx);   /* interaction getter   */
     extern u16  fn_8011F1A0(u8* ptr);                          /* map availability     */
-    extern void fn_801440A0(void);                             /* effect/handle helper */
-    extern u8   fn_80144064(void);                             /* gate result          */
+    extern void itemDataBiosGetPtr(void);                             /* effect/handle helper */
+    extern u8   itemDataBiosCheckImportable(void);                             /* gate result          */
     extern void fn_801021F8(u32 id, u32 flag);                 /* list show/hide       */
     extern s32  fn_8011F4F0(u32 ref);                          /* get species          */
     extern void fn_80132A38(u32 prop, u32 value);              /* set display property */
@@ -8323,8 +8323,8 @@ void fn_8002EA5C(void)
     mapRef = (u8*)(u32)fn_8012A5B0(lbl_803A2688, 3, (u16)mapId);
 
     if ((u16)fn_8011F1A0((u8*)mapRef) != 0) {
-        fn_801440A0();
-        available = fn_80144064();
+        itemDataBiosGetPtr();
+        available = itemDataBiosCheckImportable();
     } else {
         available = 1;
     }
@@ -9114,7 +9114,7 @@ void fn_8002F284(void)
 #endif
 
 /* fn_8002F79C - 0x8002F79C | size: 0x4bc */
-extern void fn_8014402C(void);
+extern void itemDataBiosCheckExportable(void);
 extern void fn_8011ED68(void);
 extern u32 lbl_8047A428;
 extern f32 lbl_8047B9D4;
@@ -9157,8 +9157,8 @@ void fn_8002F79C(void) {
     extern u8*  fn_80129280(s32 side, s32 slotType);      /* get party/group handle */
     extern u32  fn_8012A5B0(u8* ptr, u32 selector, u32 idx); /* interaction getter */
     extern u16  fn_8011F1A0(u8* obj);                     /* read interaction field */
-    extern u8   fn_801440A0(u16 handle);                  /* effect/UI helper */
-    extern u8   fn_8014402C(void);                        /* arrival-ready query */
+    extern u8   itemDataBiosGetPtr(u16 handle);                  /* effect/UI helper */
+    extern u8   itemDataBiosCheckExportable(void);                        /* arrival-ready query */
     extern s32  fn_8011F4F0(s32 pokemon);                 /* get species/id */
     extern void fn_80132A38(s32 msgType, s32 species);    /* show message */
     extern void* windowSearchID(s32 key);                    /* lookup effect object */
@@ -9203,8 +9203,8 @@ void fn_8002F79C(void) {
 
     field = fn_8011F1A0(interact);
     if (field != 0) {
-        fn_801440A0(field);
-        ready = fn_8014402C();
+        itemDataBiosGetPtr(field);
+        ready = itemDataBiosCheckExportable();
     } else {
         ready = 1;
     }

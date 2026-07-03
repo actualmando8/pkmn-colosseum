@@ -576,7 +576,7 @@ s32 fn_80013668(u8* ctx) {
 extern void* fn_80129BC8(u32, u8, void*, s32, s32, s32);
 extern void* heroHizukiItemGetItemAryPtr(u32, void*, s32, s32, s32);
 extern u8  fn_801429E8(void*);
-extern s32 fn_80143C68(void*);
+extern s32 itemBiosGetItemDataId(void*);
 extern s32 fn_80129A78(u32, s32, s32, s32);
 extern void fn_8012959C(u32, s32, s32, s16);
 extern u8 lbl_80266918[];
@@ -606,7 +606,7 @@ s32 fn_8001374C(s32 entry_idx, s32 target_n, s32* out) {
         if (fn_801429E8(list)) {
             idx++;
             if (idx >= target_n) {
-                idx = fn_80143C68(list);
+                idx = itemBiosGetItemDataId(list);
                 goto after;
             }
         }
@@ -657,7 +657,7 @@ s32 fn_800138B4(s32 entry_idx, s32 target_n, s32* out) {
         if (fn_801429E8(list)) {
             idx++;
             if (idx >= target_n) {
-                idx = fn_80143C68(list);
+                idx = itemBiosGetItemDataId(list);
                 goto after;
             }
         }
@@ -682,7 +682,7 @@ after:
 #pragma pop
 
 /* fn_80013A18 - 0x80013A18 | size: 0x3e4 */
-extern s32 fn_80143C50(void*);
+extern s32 itemBiosGetNum(void*);
 extern u32 fn_801046B8(void);
 extern s32 fn_801026A4(s32, u32, void*, s32, s32, s32, ...);
 extern void fn_80102510(s32);
@@ -762,7 +762,7 @@ s32 fn_80013A18(s32 entry_idx, s32 target_n, s32* out) {
         if (fn_801429E8(list) != 0) {
             idx++;
             if (idx >= target_n) {
-                quantity = (s32)(u16)fn_80143C50(list);
+                quantity = (s32)(u16)itemBiosGetNum(list);
                 goto have_quantity;
             }
         }
@@ -819,7 +819,7 @@ have_quantity:
         if (fn_801429E8(list) != 0) {
             idx++;
             if (idx >= target_n) {
-                idx = (s32)(u16)fn_80143C68(list);
+                idx = (s32)(u16)itemBiosGetItemDataId(list);
                 goto have_item;
             }
         }
@@ -865,9 +865,9 @@ have_item:
 #endif
 
 /* fn_80013DFC - 0x80013DFC | size: 0x184 */
-extern void fn_801440A0(u16);
+extern void itemDataBiosGetPtr(u16);
 extern u8   itemDataBiosGetHidenMachineNo(void);
-extern u8   fn_80144014(void);
+extern u8   itemDataBiosGetKind(void);
 extern s32  menuPokemonOpenItemGive(u8, u8, s32, s32);
 extern void fn_8001B184(void);
 #pragma push
@@ -893,7 +893,7 @@ s32 fn_80013DFC(s32 entry_idx, s32 target_n, s32* out) {
         if (fn_801429E8(list)) {
             idx++;
             if (idx >= target_n) {
-                idx = fn_80143C68(list);
+                idx = itemBiosGetItemDataId(list);
                 goto after;
             }
         }
@@ -902,7 +902,7 @@ s32 fn_80013DFC(s32 entry_idx, s32 target_n, s32* out) {
     }
     idx = 0;
 after:
-    fn_801440A0(idx);
+    itemDataBiosGetPtr(idx);
     if (itemDataBiosGetHidenMachineNo() != 0xFF) {
         fn_80132A38(0x2d, (u16)idx);
         fn_80106D3C(2, 0x4262, 1, 0);
@@ -910,8 +910,8 @@ after:
         *out = 0;
         return 0;
     }
-    fn_801440A0(idx);
-    x = (u8)fn_80144014();
+    itemDataBiosGetPtr(idx);
+    x = (u8)itemDataBiosGetKind();
     fn_80102568(0x59, 0, 1);
     lbl_8047A2EC = menuPokemonOpenItemGive((u8)x, (u8)target_n, idx, 0);
     fn_8001B184();
@@ -926,8 +926,8 @@ after:
 /* fn_80013F80 - 0x80013F80 | size: 0x17c */
 extern u32 lbl_8047A2E0;
 typedef s32 (*MusicFp)(u16, s32*);
-extern MusicFp fn_80143DE4(void);
-extern MusicFp fn_80143DCC(void);
+extern MusicFp itemDataBiosGetFieldUseFunc(void);
+extern MusicFp itemDataBiosGetBattleUseFunc(void);
 #pragma push
 #pragma peephole off
 s32 fn_80013F80(s32 entry_idx, s32 target_n, s32* out) {
@@ -955,7 +955,7 @@ s32 fn_80013F80(s32 entry_idx, s32 target_n, s32* out) {
         if (fn_801429E8(list)) {
             idx++;
             if (idx >= target_n) {
-                idx = fn_80143C68(list);
+                idx = itemBiosGetItemDataId(list);
                 goto after;
             }
         }
@@ -965,11 +965,11 @@ s32 fn_80013F80(s32 entry_idx, s32 target_n, s32* out) {
     idx = 0;
 after:
     id = (u16)idx;
-    fn_801440A0(id);
+    itemDataBiosGetPtr(id);
     if ((s32)lbl_8047A2E0 == 0) {
-        fp = fn_80143DE4();
+        fp = itemDataBiosGetFieldUseFunc();
     } else {
-        fp = fn_80143DCC();
+        fp = itemDataBiosGetBattleUseFunc();
     }
     if (fp == 0) {
         fn_80106D3C(2, 0x4261, 1, 0);
@@ -1028,7 +1028,7 @@ void fn_80014198(u32 val) {
 }
 
 /* fn_800141BC - 0x800141BC | size: 0x78 */
-extern s32 fn_8001BD3C(s32 mode, u8 a, u16 b, u32 p);
+extern s32 menuPokemonOpenItemUse(s32 mode, u8 a, u16 b, u32 p);
 #pragma push
 #pragma peephole off
 s32 fn_800141BC(s32 arg0, s32 arg1) {
@@ -1040,7 +1040,7 @@ s32 fn_800141BC(s32 arg0, s32 arg1) {
     } else {
         mode = 3;
     }
-    result = fn_8001BD3C(mode, (u8)arg1, arg0, lbl_8047A2F4);
+    result = menuPokemonOpenItemUse(mode, (u8)arg1, arg0, lbl_8047A2F4);
     if (arg1 == 0) {
         result = -1;
     }

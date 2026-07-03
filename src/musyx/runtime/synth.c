@@ -85,7 +85,7 @@ extern void* GSresGetResource(u16 group, u16 model, u16 param);
 extern void  GSmodelSetVisibility(void* param);
 
 /* People data layer (people_data.c) */
-extern void* fn_801440A0(u16 index);   /* peopleFieldGetByIndex */
+extern void* itemDataBiosGetPtr(u16 index);   /* peopleFieldGetByIndex */
 extern void* fn_80142CF4(u32 a, u32 b, u32 c, u32 d);  /* peopleFieldAlloc */
 extern void  fn_801429E8(void* entry);  /* peopleFieldGetEntry */
 extern void  fn_80142984(u32 id);       /* peopleFieldGetByID */

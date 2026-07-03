@@ -150,6 +150,8 @@ extern u32 lbl_8047B670;
 
 /* Data labels used by asm wrappers */
 extern u8  lbl_8039A6B8[];
+extern u8  lbl_8039A6A8[];
+extern int lbl_804782BC[];
 extern u8  lbl_804782E0[];
 extern u8  lbl_804783E0[];
 
@@ -185,7 +187,7 @@ int fightTrainerAiWazaValueKuroikiri(void* ctx, u32 param1, u32 param2, u32 para
 void fightTrainerAiWazaValueHimitunotikara(void* ctx, u32 param1, u32 param2, u32 param3);
 s32 fn_8024E690(void* ctx, u32 param1, u32 param2, u32 param3);
 u32 fightTrainerAiWazaHit045(void* trainerCtx, u32 trainerSlot, u32 resultSlot, u32 resultType);
-void fn_8026316C(void* ctx, u32 param1, u32 param2, u32 param3);
+u32 fn_8026316C(void* ctx, u32 param1, u32 param2);
 
 /* =========================================================================
  * fightTrainerAiWazaValueKuroikiri - BattleOrchestrator
@@ -2782,7 +2784,7 @@ u32 fightTrainerAiWazaHit045(void* trainerCtx, u32 trainerSlot, u32 resultSlot, 
  *   - Restore overworld state
  * ========================================================================= */
 /* TODO: Decompile fn_8026316C (2652 bytes) */
-void fn_8026316C(void* ctx, u32 param1, u32 param2, u32 param3) {
+u32 fn_8026316C(void* ctx, u32 param1, u32 param2) {
     extern void fn_800119A8();
     extern void fn_80011A1C();
     extern void fn_80011D9C();
@@ -2827,7 +2829,7 @@ void fn_8026316C(void* ctx, u32 param1, u32 param2, u32 param3) {
     u32 r1 = (u32)sp;
     u32 r4 = param1;
     u32 r5 = param2;
-    u32 r6 = param3;
+    u32 r6 = 0;
 
     r31 = r4;
     r29 = r3;
@@ -2908,8 +2910,7 @@ void fn_8026316C(void* ctx, u32 param1, u32 param2, u32 param3) {
     r26 = 0x0;
 while (1) {
         r0 = r30 & 0xFFFF;
-        if (r0 < r27) continue;
-    break;
+        if (r0 >= r27) break;
     do {
         r3 = r29;
         r4 = r30;
@@ -3343,7 +3344,7 @@ while (1) {
 
                 }
                 r3 = 0x0;
-                return;
+                return r3;
             }
             if (r0 == (u32)0x2) continue;
         break;
@@ -3542,7 +3543,7 @@ while (1) {
     }
     r3 = 0x1;
 
-    return;
+    return r3;
 }
 
 /* Address: 0x80263BC8 | Size: 0x21C | Ghidra import */
@@ -3629,7 +3630,7 @@ s32 fn_80263DE4(u32 r3, u32 r4, u32 r5, u32 retry, u32 reopen)
     extern u8 fn_80265924(void);
     extern u8 fn_801F18DC(u32);
     extern u32 fn_801F02AC(u32, u32, u32);
-    extern u16 fightSideGetStatus(u32, u32, u32, u32);
+    extern u32 fightSideGetStatus(u32, u32, u32, u32);
     extern u16 fn_801F0134(u32, u32);
     extern void fn_801F0234(void);
     extern s32 fn_801F0204(void);
@@ -3679,7 +3680,7 @@ s32 fn_80263DE4(u32 r3, u32 r4, u32 r5, u32 retry, u32 reopen)
                 status = 0;
             }
             else {
-                side = fightSideGetStatus(found, 0, 5, 0);
+                side = (u16)fightSideGetStatus(found, 0, 5, 0);
                 if (fn_801F0134(ctx, param) == 0) {
                     status = 0;
                 }
@@ -3723,7 +3724,7 @@ s32 fn_80263DE4(u32 r3, u32 r4, u32 r5, u32 retry, u32 reopen)
                     status = 0;
                 }
                 else {
-                    side = fightSideGetStatus(found, 0, 5, 0);
+                    side = (u16)fightSideGetStatus(found, 0, 5, 0);
                     if (fn_801F0134(actor, param) == 0) {
                         status = 0;
                     }
@@ -3748,7 +3749,7 @@ s32 fn_80263DE4(u32 r3, u32 r4, u32 r5, u32 retry, u32 reopen)
                 status = 0;
             }
             else {
-                side = fightSideGetStatus(found, 0, 5, 0);
+                side = (u16)fightSideGetStatus(found, 0, 5, 0);
                 if (fn_801F0134(ctx, param) == 0) {
                     status = 0;
                 }
@@ -3784,7 +3785,7 @@ s32 fn_80263DE4(u32 r3, u32 r4, u32 r5, u32 retry, u32 reopen)
                     status = 0;
                 }
                 else {
-                    side = fightSideGetStatus(found, 0, 5, 0);
+                    side = (u16)fightSideGetStatus(found, 0, 5, 0);
                     if (fn_801F0134(ctx, param) == 0) {
                         status = 0;
                     }
@@ -5298,188 +5299,70 @@ void fightTrainerAiWazaValueTedasuke(void* ctx, u32 param1, u32 param2, u32 para
 }
 
 /* Address: 0x80241B70 | Size: 0x278 (632 bytes) */
-void fightTrainerAiWazaValueKyouseikoutai(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F025C();
-    extern void fn_801F6D9C();
-    extern void fn_801F6E98();
-    extern void fn_80205B8C();
-    extern void fn_802357CC();
-    extern void fn_802358AC();
-    extern void fn_80235910();
-    extern void fn_80235974();
-    extern void fn_802359D8();
-    extern void fn_80235A3C();
-    extern void fn_80235AA0();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r1 = (u32)sp;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueKyouseikoutai(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_801F025C(u32, u32);
+    extern u32 fn_801F6D9C(u32, u32);
+    extern u8 fn_801F6E98(u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u8 fn_802357CC(void*, u32);
+    extern u8 fn_802358AC(void*, u32);
+    extern u8 fn_80235910(void*, u32);
+    extern u8 fn_80235974(void*, u32);
+    extern u8 fn_802359D8(void*, u32);
+    extern u8 fn_80235A3C(void*, u32);
+    extern u8 fn_80235AA0(void*, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u8 stats[7];
+    u32 handle;
+    u32 mode;
+    u8 found;
+    u8 i;
 
-    r28 = r3;
-    r26 = r6;
-    r29 = r4;
-    r30 = r5;
-    r31 = 0x0;
-    r4 = r26;
-    r3 = 0x2;
-    fn_801F025C();
-    r4 = 0x4a;
-    r27 = r3;
-    fn_801F6E98();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r27;
-        r4 = 0x4a;
-        fn_801F6D9C();
-        r27 = r3;
+    handle = 0;
+    mode = fn_801F025C(2, param3);
+    if (fn_801F6E98(mode, 0x4a) == 1) {
+        mode = fn_801F6D9C(mode, 0x4a);
     } else {
-
-        r27 = 0x0;
+        mode = 0;
     }
-    r3 = r28;
-    r4 = r26;
-    fn_80235AA0();
-    *(u8*)(sp + 0x8) = r3;
-    r3 = r28;
-    r4 = r26;
-    fn_80235A3C();
-    *(u8*)(sp + 0x9) = r3;
-    r3 = r28;
-    r4 = r26;
-    fn_802359D8();
-    *(u8*)(sp + 0xA) = r3;
-    r3 = r28;
-    r4 = r26;
-    fn_80235974();
-    *(u8*)(sp + 0xB) = r3;
-    r3 = r28;
-    r4 = r26;
-    fn_80235910();
-    *(u8*)(sp + 0xC) = r3;
-    r3 = r28;
-    r4 = r26;
-    fn_802358AC();
-    *(u8*)(sp + 0xD) = r3;
-    r3 = r28;
-    r4 = r26;
-    fn_802357CC();
-    *(u8*)(sp + 0xE) = r3;
-    r3 = (u32)sp + 0x8;
-    r4 = 0x0;
-    while (1) {
-        r0 = r4 & 0xFF;
-        if (r0 >= (u32)0x7) break;
-        r0 = r4 & 0xFF;
-        r0 = *(u8*)(r3 + r0);
-        if (r0 >= (u32)0x8 || r0 > (u32)0xc) {
+    stats[0] = fn_80235AA0(ctx, param3);
+    stats[1] = fn_80235A3C(ctx, param3);
+    stats[2] = fn_802359D8(ctx, param3);
+    stats[3] = fn_80235974(ctx, param3);
+    stats[4] = fn_80235910(ctx, param3);
+    stats[5] = fn_802358AC(ctx, param3);
+    stats[6] = fn_802357CC(ctx, param3);
 
-            r0 = 0x1;
-            break;
-        }
-        r4 = r4 + 0x1;
-
+    i = 0;
+    goto check_stats;
+check_stat_value:
+    if (stats[i] >= 8 && stats[i] <= 0xc) {
+        found = 1;
+        goto done_stats;
     }
-    r0 = 0x0;
-
-    r0 = r0 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r4 = r28;
-        r3 = 0x0;
-        r5 = 0x1ac;
-        fn_80239984();
-        r0 = r3;
-        r3 = r29;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r28;
-        r8 = r30;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x1ac;
-        fn_80239EE8();
+    i++;
+check_stats:
+    if (i < 7) {
+        goto check_stat_value;
     }
-    r0 = (s16)r27;
-    if ((s32)r0 == (s32)0x1) {
-        r3 = r31;
-        r4 = r28;
-        r5 = 0x1ad;
-        fn_80239984();
-        r0 = r3;
-        r3 = r29;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r28;
-        r8 = r30;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x1ad;
-        fn_80239EE8();
-        r3 = r31;
-        return;
+    found = 0;
+done_stats:
+    if (found == 1) {
+        handle = fn_80239984(0, ctx, 0x1ac);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x1ac);
     }
-    if ((s32)r0 == (s32)0x2) {
-        r3 = r31;
-        r4 = r28;
-        r5 = 0x1ae;
-        fn_80239984();
-        r0 = r3;
-        r3 = r29;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r28;
-        r8 = r30;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x1ae;
-        fn_80239EE8();
-        r3 = r31;
-        return;
+    if ((s16)mode == 1) {
+        handle = fn_80239984(handle, ctx, 0x1ad);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x1ad);
+    } else if ((s16)mode == 2) {
+        handle = fn_80239984(handle, ctx, 0x1ae);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x1ae);
+    } else if ((s16)mode == 3) {
+        handle = fn_80239984(handle, ctx, 0x1af);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x1af);
     }
-    if ((s32)r0 != (s32)0x3) { r3 = r31; return; }
-    r3 = r31;
-    r4 = r28;
-    r5 = 0x1af;
-    fn_80239984();
-    r0 = r3;
-    r3 = r29;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r28;
-    r8 = r30;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x1af;
-    fn_80239EE8();
-
-    r3 = r31;
-    return;
+    return handle;
 }
 
 /* Address: 0x80241DE8 | Size: 0x1FC (508 bytes) */
@@ -5592,249 +5475,51 @@ s32 fightTrainerAiWazaValueKonoyubitomare(void* ctx, u32 param1, u32 param2, u32
 }
 
 /* Address: 0x8024228C | Size: 0x3BC (956 bytes) */
-void fightTrainerAiWazaValueKoukanKinsi(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80205B8C();
-    extern void fn_80236BFC();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueKoukanKinsi(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80236BFC(void*, u32, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
 
-    r29 = r5;
-    r30 = r6;
-    r28 = r4;
-    r27 = r3;
-    r31 = 0x0;
-    r4 = r30;
-    r5 = 0x3;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r4 = r27;
-        r3 = 0x0;
-        r5 = 0x19d;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x19d;
-        fn_80239EE8();
+    handle = 0;
+    if ((u8)fn_80236BFC(ctx, param3, 3) == 1) {
+        handle = fn_80239984(0, ctx, 0x19d);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x19d);
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0x4;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0x19e;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x19e;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 4) == 1) {
+        handle = fn_80239984(handle, ctx, 0x19e);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x19e);
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0x6;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0x19f;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x19f;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 6) == 1) {
+        handle = fn_80239984(handle, ctx, 0x19f);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x19f);
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0x5;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0x1a0;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x1a0;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 5) == 1) {
+        handle = fn_80239984(handle, ctx, 0x1a0);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x1a0);
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0x9;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0x1a1;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x1a1;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 9) == 1) {
+        handle = fn_80239984(handle, ctx, 0x1a1);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x1a1);
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0xa;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0x1a2;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x1a2;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 0xa) == 1) {
+        handle = fn_80239984(handle, ctx, 0x1a2);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x1a2);
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0x18;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0x1a3;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x1a3;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 0x18) == 1) {
+        handle = fn_80239984(handle, ctx, 0x1a3);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x1a3);
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0x1e;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0x1a4;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x1a4;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 0x1e) == 1) {
+        handle = fn_80239984(handle, ctx, 0x1a4);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x1a4);
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0x1c;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0x1a5;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x1a5;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 0x1c) == 1) {
+        handle = fn_80239984(handle, ctx, 0x1a5);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x1a5);
     }
-    r3 = r31;
-    return;
+    return handle;
 }
 
 /* Address: 0x80242648 | Size: 0xE8 (232 bytes) */
@@ -5863,113 +5548,28 @@ u32 fightTrainerAiWazaValueKanasibari(void* ctx, u32 param1, u32 param2, u32 par
 }
 
 /* Address: 0x80242730 | Size: 0x170 (368 bytes) */
-void fightTrainerAiWazaValueMitizure(void* ctx, u32 param1, u32 param2, u32 param3) {
+u32 fightTrainerAiWazaValueMitizure(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern f32 lbl_8047E630;
     extern f32 lbl_8047E638;
     extern f32 lbl_8047E63C;
-    extern void fn_80205B8C();
-    extern void fn_802373B0();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f1 = 0.0f;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+    extern u32 fn_80205B8C(u32);
+    extern u8 fn_802373B0(void*, u32, s32, f32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
 
-    f1 = lbl_8047E638;
-    r30 = r5;
-    r28 = r3;
-    r29 = r4;
-    r31 = 0x0;
-    r5 = -0x1;
-    fn_802373B0();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r4 = r28;
-        r3 = 0x0;
-        r5 = 0x19b;
-        fn_80239984();
-        r0 = r3;
-        r3 = r29;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r28;
-        r8 = r30;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x19b;
-        fn_80239EE8();
-        r3 = r31;
-        return;
+    handle = 0;
+    if (fn_802373B0(ctx, param1, -1, lbl_8047E638) == 1) {
+        handle = fn_80239984(0, ctx, 0x19b);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x19b);
+    } else if (fn_802373B0(ctx, param1, -1, lbl_8047E63C) == 1) {
+        handle = fn_80239984(0, ctx, 0x19a);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x19a);
+    } else if (fn_802373B0(ctx, param1, -1, lbl_8047E630) == 1) {
+        handle = fn_80239984(0, ctx, 0x199);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x199);
     }
-    f1 = lbl_8047E63C;
-    r3 = r28;
-    r4 = r29;
-    r5 = -0x1;
-    fn_802373B0();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r4 = r28;
-        r3 = 0x0;
-        r5 = 0x19a;
-        fn_80239984();
-        r0 = r3;
-        r3 = r29;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r28;
-        r8 = r30;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x19a;
-        fn_80239EE8();
-        r3 = r31;
-        return;
-    }
-    f1 = lbl_8047E630;
-    r3 = r28;
-    r4 = r29;
-    r5 = -0x1;
-    fn_802373B0();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1) { r3 = r31; return; }
-    r4 = r28;
-    r3 = 0x0;
-    r5 = 0x199;
-    fn_80239984();
-    r0 = r3;
-    r3 = r29;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r28;
-    r8 = r30;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x199;
-    fn_80239EE8();
-
-    r3 = r31;
-    return;
+    return handle;
 }
 
 /* Address: 0x802428A0 | Size: 0x134 (308 bytes) */
@@ -6001,229 +5601,69 @@ u32 fightTrainerAiWazaValueUrami(void* ctx, u32 param1, u32 param2, u32 param3) 
 }
 
 /* Address: 0x802429D4 | Size: 0x17C (380 bytes) */
-void fightTrainerAiWazaValueOdareru(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80205B8C();
-    extern void fn_80236FFC();
-    extern void fn_802370AC();
-    extern void fn_8023715C();
-    extern void fn_80237F74();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueOdareru(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80236FFC(void*, u32);
+    extern u32 fn_802370AC(void*, u32);
+    extern u32 fn_8023715C(void*, u32);
+    extern u8 fn_80237F74(void*, u32, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 statLimit;
+    u32 statCurrent;
+    u32 statNext;
+    u32 handle;
 
-    r25 = r6;
-    r30 = r4;
-    r29 = r3;
-    r31 = r5;
-    r4 = r25;
-    r26 = 0x0;
-    fn_80236FFC();
-    r28 = r3;
-    r3 = r29;
-    r4 = r25;
-    fn_8023715C();
-    r27 = r3;
-    r3 = r29;
-    r4 = r25;
-    fn_802370AC();
-    r4 = r27 & 0xFFFF;
-    r0 = r28 & 0xFFFF;
-    r28 = r3;
-    if (r4 > r0) {
-        r4 = r29;
-        r3 = 0x0;
-        r5 = 0x194;
-        fn_80239984();
-        r0 = r3;
-        r3 = r30;
-        r26 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r29;
-        r8 = r31;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x194;
-        fn_80239EE8();
+    handle = 0;
+    statLimit = fn_80236FFC(ctx, param3);
+    statCurrent = fn_8023715C(ctx, param3);
+    statNext = fn_802370AC(ctx, param3);
+    if ((u16)statCurrent > (u16)statLimit) {
+        handle = fn_80239984(0, ctx, 0x194);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x194);
     }
-    r3 = r27 & 0xFFFF;
-    r0 = r28 & 0xFFFF;
-    if (r3 > r0) {
-        r3 = r26;
-        r4 = r29;
-        r5 = 0x195;
-        fn_80239984();
-        r0 = r3;
-        r3 = r30;
-        r26 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r29;
-        r8 = r31;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x195;
-        fn_80239EE8();
+    if ((u16)statCurrent > (u16)statNext) {
+        handle = fn_80239984(handle, ctx, 0x195);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x195);
     }
-    r3 = r29;
-    r4 = r25;
-    r5 = 0x14;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r26;
-        r4 = r29;
-        r5 = 0x196;
-        fn_80239984();
-        r0 = r3;
-        r3 = r30;
-        r26 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r29;
-        r8 = r31;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x196;
-        fn_80239EE8();
+    if (fn_80237F74(ctx, param3, 0x14) == 1) {
+        handle = fn_80239984(handle, ctx, 0x196);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x196);
     }
-    r3 = r26;
-    return;
+    return handle;
 }
 
 /* Address: 0x80242B50 | Size: 0x17C (380 bytes) */
-void fightTrainerAiWazaValueIbaru(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80205B8C();
-    extern void fn_80236FFC();
-    extern void fn_802370AC();
-    extern void fn_8023715C();
-    extern void fn_80237F74();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueIbaru(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80236FFC(void*, u32);
+    extern u32 fn_802370AC(void*, u32);
+    extern u32 fn_8023715C(void*, u32);
+    extern u8 fn_80237F74(void*, u32, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 statLimit;
+    u32 statCurrent;
+    u32 statNext;
+    u32 handle;
 
-    r25 = r6;
-    r30 = r4;
-    r29 = r3;
-    r31 = r5;
-    r4 = r25;
-    r26 = 0x0;
-    fn_80236FFC();
-    r28 = r3;
-    r3 = r29;
-    r4 = r25;
-    fn_8023715C();
-    r27 = r3;
-    r3 = r29;
-    r4 = r25;
-    fn_802370AC();
-    r4 = r28 & 0xFFFF;
-    r0 = r27 & 0xFFFF;
-    r28 = r3;
-    if (r4 > r0) {
-        r4 = r29;
-        r3 = 0x0;
-        r5 = 0x191;
-        fn_80239984();
-        r0 = r3;
-        r3 = r30;
-        r26 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r29;
-        r8 = r31;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x191;
-        fn_80239EE8();
+    handle = 0;
+    statLimit = fn_80236FFC(ctx, param3);
+    statCurrent = fn_8023715C(ctx, param3);
+    statNext = fn_802370AC(ctx, param3);
+    if ((u16)statLimit > (u16)statCurrent) {
+        handle = fn_80239984(0, ctx, 0x191);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x191);
     }
-    r3 = r27 & 0xFFFF;
-    r0 = r28 & 0xFFFF;
-    if (r3 > r0) {
-        r3 = r26;
-        r4 = r29;
-        r5 = 0x192;
-        fn_80239984();
-        r0 = r3;
-        r3 = r30;
-        r26 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r29;
-        r8 = r31;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x192;
-        fn_80239EE8();
+    if ((u16)statCurrent > (u16)statNext) {
+        handle = fn_80239984(handle, ctx, 0x192);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x192);
     }
-    r3 = r29;
-    r4 = r25;
-    r5 = 0x14;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r26;
-        r4 = r29;
-        r5 = 0x193;
-        fn_80239984();
-        r0 = r3;
-        r3 = r30;
-        r26 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r29;
-        r8 = r31;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x193;
-        fn_80239EE8();
+    if (fn_80237F74(ctx, param3, 0x14) == 1) {
+        handle = fn_80239984(handle, ctx, 0x193);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x193);
     }
-    r3 = r26;
-    return;
+    return handle;
 }
 
 /* Address: 0x80242CCC | Size: 0xE4 (228 bytes) */
@@ -6259,11 +5699,9 @@ u32 fightTrainerAiWazaValueIkarinomaeba(void* ctx, u32 param1, u32 param2, u32 e
     extern u32 fn_80239984(u32, void*, u32);
     extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
     u32 handle;
-    f32 threshold;
 
-    threshold = lbl_8047E630;
     handle = 0;
-    if (fn_802373B0(ctx, extra, 1, threshold) == 1) {
+    if (fn_802373B0(ctx, extra, 1, lbl_8047E630) == 1) {
         handle = fn_80239984(0, ctx, 0x18f);
         fn_80239EE8(0xEC64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x18f);
     }
@@ -6271,128 +5709,40 @@ u32 fightTrainerAiWazaValueIkarinomaeba(void* ctx, u32 param1, u32 param2, u32 e
 }
 
 /* Address: 0x80242E4C | Size: 0x1A0 (416 bytes) */
-void fightTrainerAiWazaValueKusuguruDaun(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80205B8C();
-    extern void fn_80235A3C();
-    extern void fn_80235AA0();
-    extern void fn_80236F4C();
-    extern void fn_80236FFC();
-    extern void fn_802370AC();
-    extern void fn_8023715C();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r24 = 0;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueKusuguruDaun(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_80205B8C(u32);
+    extern u8 fn_80235A3C(void*, u32);
+    extern u8 fn_80235AA0(void*, u32);
+    extern u32 fn_80236F4C(void*, u32);
+    extern u32 fn_80236FFC(void*, u32);
+    extern u32 fn_802370AC(void*, u32);
+    extern u32 fn_8023715C(void*, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 currentAtk;
+    u32 limitAtk;
+    u32 currentDef;
+    u32 limitDef;
+    u32 handle;
 
-    r30 = r6;
-    r28 = r4;
-    r27 = r3;
-    r29 = r5;
-    r4 = r30;
-    r31 = 0x0;
-    fn_8023715C();
-    r24 = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_80236FFC();
-    r26 = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_802370AC();
-    r25 = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_80236F4C();
-    r4 = r24 & 0xFFFF;
-    r0 = r26 & 0xFFFF;
-    r26 = r3;
-    if (r4 > r0) {
-        r4 = r27;
-        r3 = 0x0;
-        r5 = 0x18c;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x18c;
-        fn_80239EE8();
+    handle = 0;
+    currentAtk = fn_8023715C(ctx, param3);
+    limitAtk = fn_80236FFC(ctx, param3);
+    currentDef = fn_802370AC(ctx, param3);
+    limitDef = fn_80236F4C(ctx, param3);
+    if ((u16)currentAtk > (u16)limitAtk) {
+        handle = fn_80239984(0, ctx, 0x18c);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x18c);
     }
-    r3 = r25 & 0xFFFF;
-    r0 = r26 & 0xFFFF;
-    if (r3 > r0) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0x18d;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x18d;
-        fn_80239EE8();
+    if ((u16)currentDef > (u16)limitDef) {
+        handle = fn_80239984(handle, ctx, 0x18d);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x18d);
     }
-    r3 = r27;
-    r4 = r30;
-    fn_80235AA0();
-    r0 = r3 & 0xFF;
-    if (r0 <= (u32)0x4) {
-        r3 = r27;
-        r4 = r30;
-        fn_80235A3C();
-        r0 = r3 & 0xFF;
-        if (r0 <= (u32)0x4) {
-            r3 = r31;
-            r4 = r27;
-            r5 = 0x18e;
-            fn_80239984();
-            r0 = r3;
-            r3 = r28;
-            r31 = r0;
-            fn_80205B8C();
-            r6 = (0x1 << 16);
-            r5 = r3;
-            r4 = r27;
-            r8 = r29;
-            r6 = 0x0;
-            r7 = 0x0;
-            r9 = 0x0;
-            r10 = 0x18e;
-            fn_80239EE8();
+    if (fn_80235AA0(ctx, param3) <= 4 && fn_80235A3C(ctx, param3) <= 4) {
+        handle = fn_80239984(handle, ctx, 0x18e);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x18e);
     }
-    }
-    r3 = r31;
-    return;
+    return handle;
 }
 
 /* Address: 0x80242FEC | Size: 0xF8 (248 bytes) */
@@ -6561,126 +5911,32 @@ u32 fightTrainerAiWazaValueGamusyara(void* ctx, u32 param1, u32 param2, u32 extr
 }
 
 /* Address: 0x8024368C | Size: 0x1AC (428 bytes) */
-void fightTrainerAiWazaValueItamiwake(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80205B8C();
-    extern void fn_802387C8();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueItamiwake(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_80205B8C(u32);
+    extern s32 fn_802387C8(void*, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    s32 ownHp;
+    s32 targetHp;
+    u32 handle;
 
-    r30 = r3;
-    r26 = r4;
-    r31 = r5;
-    r27 = r6;
-    r28 = 0x0;
-    fn_802387C8();
-    r29 = r3;
-    r3 = r30;
-    r4 = r27;
-    fn_802387C8();
-    r0 = r29 * 0x3;
-    if ((s32)r0 <= (s32)r3) {
-        r4 = r30;
-        r3 = 0x0;
-        r5 = 0x17d;
-        fn_80239984();
-        r0 = r3;
-        r3 = r26;
-        r28 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r30;
-        r8 = r31;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x17d;
-        fn_80239EE8();
-        r3 = r28;
-        return;
+    handle = 0;
+    ownHp = fn_802387C8(ctx, param1);
+    targetHp = fn_802387C8(ctx, param3);
+    if (ownHp * 3 <= targetHp) {
+        handle = fn_80239984(0, ctx, 0x17d);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x17d);
+    } else if (ownHp * 2 <= targetHp) {
+        handle = fn_80239984(0, ctx, 0x17c);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x17c);
+    } else if (ownHp >= targetHp * 3) {
+        handle = fn_80239984(0, ctx, 0x17f);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x17f);
+    } else if (ownHp >= targetHp * 2) {
+        handle = fn_80239984(0, ctx, 0x17e);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x17e);
     }
-    r0 = r29 << 1;
-    if ((s32)r0 <= (s32)r3) {
-        r4 = r30;
-        r3 = 0x0;
-        r5 = 0x17c;
-        fn_80239984();
-        r0 = r3;
-        r3 = r26;
-        r28 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r30;
-        r8 = r31;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x17c;
-        fn_80239EE8();
-        r3 = r28;
-        return;
-    }
-    r0 = r3 * 0x3;
-    if ((s32)r29 >= (s32)r0) {
-        r4 = r30;
-        r3 = 0x0;
-        r5 = 0x17f;
-        fn_80239984();
-        r0 = r3;
-        r3 = r26;
-        r28 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r30;
-        r8 = r31;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x17f;
-        fn_80239EE8();
-        r3 = r28;
-        return;
-    }
-    r0 = r3 << 1;
-    if ((s32)r29 < (s32)r0) { r3 = r28; return; }
-    r4 = r30;
-    r3 = 0x0;
-    r5 = 0x17e;
-    fn_80239984();
-    r0 = r3;
-    r3 = r26;
-    r28 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r30;
-    r8 = r31;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x17e;
-    fn_80239EE8();
-
-    r3 = r28;
-    return;
+    return handle;
 }
 
 /* Address: 0x80243838 | Size: 0x94 */
@@ -6726,171 +5982,40 @@ u32 fightTrainerAiWazaValueRokkuon(void* ctx, u32 param1, u32 param2, u32 param3
 }
 
 /* Address: 0x80243A0C | Size: 0x250 (592 bytes) */
-void fightTrainerAiWazaValueNoroi(void* ctx, u32 param1, u32 param2, u32 param3) {
+u32 fightTrainerAiWazaValueNoroi(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern f32 lbl_8047E630;
     extern f32 lbl_8047E640;
-    extern void fn_80205B8C();
-    extern void fn_80235714();
-    extern void fn_802373B0();
-    extern void fn_80237DBC();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f1 = 0.0f;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80235714(void*, u32);
+    extern u32 fn_802373B0(void*, u32, s32, f32);
+    extern u32 fn_80237DBC(void*, u32, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
+    u32 state;
 
-    r29 = r5;
-    r27 = r3;
-    r28 = r4;
-    r30 = 0x0;
-    r5 = 0x7;
-    fn_80237DBC();
-    r31 = r3;
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        f1 = lbl_8047E630;
-        r3 = r27;
-        r4 = r28;
-        r5 = 0x1;
-        fn_802373B0();
-        r0 = r3 & 0xFF;
-        if (r0 == (u32)0x1) {
-            r4 = r27;
-            r3 = 0x0;
-            r5 = 0x174;
-            fn_80239984();
-            r0 = r3;
-            r3 = r28;
-            r30 = r0;
-            fn_80205B8C();
-            r6 = (0x1 << 16);
-            r5 = r3;
-            r4 = r27;
-            r8 = r29;
-            r6 = 0x0;
-            r7 = 0x0;
-            r9 = 0x0;
-            r10 = 0x174;
-            fn_80239EE8();
-            goto L_80243B24;
+    handle = 0;
+    state = fn_80237DBC(ctx, param1, 7);
+    if ((u8)state == 1 && (u8)fn_802373B0(ctx, param1, 1, lbl_8047E630) == 1) {
+        handle = fn_80239984(0, ctx, 0x174);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x174);
+    } else if ((u8)state == 1 && (u8)fn_802373B0(ctx, param1, -1, lbl_8047E640) == 1) {
+        handle = fn_80239984(0, ctx, 0x175);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x175);
     }
+    if ((u8)state == 0 && (u8)fn_80235714(ctx, param1) == 0) {
+        handle = fn_80239984(handle, ctx, 0x176);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x176);
     }
-    r0 = r31 & 0xFF;
-    if (r0 == (u32)0x1) {
-        f1 = lbl_8047E640;
-        r3 = r27;
-        r4 = r28;
-        r5 = -0x1;
-        fn_802373B0();
-        r0 = r3 & 0xFF;
-        if (r0 == (u32)0x1) {
-            r4 = r27;
-            r3 = 0x0;
-            r5 = 0x175;
-            fn_80239984();
-            r0 = r3;
-            r3 = r28;
-            r30 = r0;
-            fn_80205B8C();
-            r6 = (0x1 << 16);
-            r5 = r3;
-            r4 = r27;
-            r8 = r29;
-            r6 = 0x0;
-            r7 = 0x0;
-            r9 = 0x0;
-            r10 = 0x175;
-            fn_80239EE8();
+    if ((u8)state == 1) {
+        handle = fn_80239984(handle, ctx, 0x177);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x177);
     }
+    if ((u8)state == 0 && (u8)fn_80235714(ctx, param1) == 1) {
+        handle = fn_80239984(handle, ctx, 0x178);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x178);
     }
-L_80243B24:
-    r0 = r31 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r27;
-        r4 = r28;
-        fn_80235714();
-        r0 = r3 & 0xFF;
-        if (r0 == (u32)0x1) {
-            r3 = r30;
-            r4 = r27;
-            r5 = 0x176;
-            fn_80239984();
-            r0 = r3;
-            r3 = r28;
-            r30 = r0;
-            fn_80205B8C();
-            r6 = (0x1 << 16);
-            r5 = r3;
-            r4 = r27;
-            r8 = r29;
-            r6 = 0x0;
-            r7 = 0x0;
-            r9 = 0x0;
-            r10 = 0x176;
-            fn_80239EE8();
-    }
-    }
-    r0 = r31 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r30;
-        r4 = r27;
-        r5 = 0x177;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r30 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x177;
-        fn_80239EE8();
-    }
-    r0 = r31 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r27;
-        r4 = r28;
-        fn_80235714();
-        r0 = r3 & 0xFF;
-        if (r0 == (u32)0x1) {
-            r3 = r30;
-            r4 = r27;
-            r5 = 0x178;
-            fn_80239984();
-            r0 = r3;
-            r3 = r28;
-            r30 = r0;
-            fn_80205B8C();
-            r6 = (0x1 << 16);
-            r5 = r3;
-            r4 = r27;
-            r8 = r29;
-            r6 = 0x0;
-            r7 = 0x0;
-            r9 = 0x0;
-            r10 = 0x178;
-            fn_80239EE8();
-    }
-    }
-    r3 = r30;
-    return;
+    return handle;
 }
 
 /* Address: 0x80243C5C | Size: 0x7C | Pattern: field_accessor */
@@ -7346,106 +6471,29 @@ void fightTrainerAiWazaValueKoraeru(void* ctx, u32 param1, u32 param2, u32 param
 }
 
 /* Address: 0x80244318 | Size: 0x160 (352 bytes) */
-void fightTrainerAiWazaValueMiyaburu(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80205B8C();
-    extern void fn_802357CC();
-    extern void fn_80236BFC();
-    extern void fn_80237DBC();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueMiyaburu(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_802357CC(void*, u32);
+    extern u8 fn_80236BFC(void*, u32, u32);
+    extern u8 fn_80237DBC(void*, u32, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
 
-    r29 = r5;
-    r30 = r6;
-    r28 = r4;
-    r27 = r3;
-    r31 = 0x0;
-    r4 = r30;
-    r5 = 0x7;
-    fn_80237DBC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r4 = r27;
-        r3 = 0x0;
-        r5 = 0x167;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x167;
-        fn_80239EE8();
+    handle = 0;
+    if (fn_80237DBC(ctx, param3, 7) == 1) {
+        handle = fn_80239984(0, ctx, 0x167);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x167);
     }
-    r3 = r27;
-    r4 = r30;
-    fn_802357CC();
-    r0 = r3 & 0xFF;
-    if (r0 >= (u32)0x8) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0x168;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x168;
-        fn_80239EE8();
+    if ((fn_802357CC(ctx, param3) & 0xff) >= 8) {
+        handle = fn_80239984(handle, ctx, 0x168);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x168);
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0x19;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0x169;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x169;
-        fn_80239EE8();
+    if (fn_80236BFC(ctx, param3, 0x19) == 1) {
+        handle = fn_80239984(handle, ctx, 0x169);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x169);
     }
-    r3 = r31;
-    return;
+    return handle;
 }
 
 /* Address: 0x80244478 | Size: 0x9C */
@@ -7465,255 +6513,91 @@ u32 fightTrainerAiWazaValueMajikkukooto(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x80244514 | Size: 0x18C (396 bytes) */
-void fightTrainerAiWazaValueMiraakooto(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_8010C4A0();
-    extern void fn_801F1C18();
-    extern void fn_80205B8C();
-    extern void fn_80236520();
-    extern void fn_80236FFC();
-    extern void fn_8023715C();
-    extern void fn_802395C8();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x50];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r22 = 0;
-    u32 r23 = 0;
-    u32 r24 = 0;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r1 = (u32)sp;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueMiraakooto(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_8010C4A0(u32);
+    extern u16 fn_801F1C18(u32, void*, u32*, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80236520(void*, u32);
+    extern u32 fn_80236FFC(void*, u32);
+    extern u32 fn_8023715C(void*, u32);
+    extern u32 fn_802395C8(void*, u32, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 entries[8];
+    u32 rawCount;
+    u32 count;
+    u32 move;
+    u32* entriesPtr;
+    u32 index;
+    u32 current;
+    u32 handle;
 
-    r7 = 0x1;
-    r27 = r3;
-    r28 = r4;
-    r29 = r5;
-    r30 = r6;
-    r4 = r27;
-    r5 = (u32)sp + 0x8;
-    r31 = 0x0;
-    r3 = 0x0;
-    r6 = 0x0;
-    fn_801F1C18();
-    r25 = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_80236520();
-    r24 = (u32)sp + 0x8;
-    r23 = r3;
-    r26 = r25 & 0xFFFF;
-    r22 = 0x0;
-    while (1) {
-        r0 = r22 & 0xFFFF;
-        if (r0 >= (u32)r26) break;
-        r3 = r27;
-        r4 = *(u32*)(r24 + r25);
-        fn_8023715C();
-        r4 = *(u32*)(r24 + r25);
-        r25 = r3;
-        r3 = r27;
-        fn_80236FFC();
-        r4 = r25 & 0xFFFF;
-        r0 = r3 & 0xFFFF;
-        if (r4 < r0) {
-            r4 = r27;
-            r3 = 0x0;
-            r5 = 0x164;
-            fn_80239984();
-            r0 = r3;
-            r3 = r28;
-            r31 = r0;
-            fn_80205B8C();
-            r6 = (0x1 << 16);
-            r5 = r3;
-            r4 = r27;
-            r8 = r29;
-            r6 = 0x0;
-            r7 = 0x0;
-            r9 = 0x0;
-            r10 = 0x164;
-            fn_80239EE8();
+    handle = 0;
+    rawCount = fn_801F1C18(0, ctx, entries, 0, 1);
+    move = fn_80236520(ctx, param3);
+    entriesPtr = entries;
+    count = rawCount & 0xffff;
+    index = 0;
+    while ((u16)index < count) {
+        current = fn_8023715C(ctx, entriesPtr[(u16)index]);
+        if ((u16)current < (u16)fn_80236FFC(ctx, entriesPtr[(u16)index])) {
+            handle = fn_80239984(0, ctx, 0x164);
+            fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x164);
             break;
         }
-        r22 = r22 + 0x1;
-
+        index++;
     }
-
-    r0 = r23 & 0xFFFF;
-    if (r0 != (u32)r26) {
-        if (r0 != (u32)0xffff) {
-            if (r0 != (u32)0x165) {
-                if (r0 != (u32)0x163) {
-                    r3 = r27;
-                    r4 = r23;
-                    r5 = r30;
-                    fn_802395C8();
-                    fn_8010C4A0();
-                    r0 = r3 & 0xFF;
-                    if (r0 == (u32)0x2) {
-                        r3 = r31;
-                        r4 = r27;
-                        r5 = 0x165;
-                        fn_80239984();
-                        r0 = r3;
-                        r3 = r28;
-                        r31 = r0;
-                        fn_80205B8C();
-                        r6 = (0x1 << 16);
-                        r5 = r3;
-                        r4 = r27;
-                        r8 = r29;
-                        r6 = 0x0;
-                        r7 = 0x0;
-                        r9 = 0x0;
-                        r10 = 0x165;
-                        fn_80239EE8();
+    if ((u16)move != 0 && (u16)move != 0xffff && (u16)move != 0x165 && (u16)move != 0x163) {
+        if ((u8)fn_8010C4A0(fn_802395C8(ctx, move, param3)) == 2) {
+            handle = fn_80239984(handle, ctx, 0x165);
+            fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x165);
+        }
     }
-    }
-    }
-    }
-    }
-    r3 = r31;
-    return;
+    return handle;
 }
 
 /* Address: 0x802446A0 | Size: 0x18C (396 bytes) */
-void fightTrainerAiWazaValueKauntaa(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_8010C4A0();
-    extern void fn_801F1C18();
-    extern void fn_80205B8C();
-    extern void fn_80236520();
-    extern void fn_80236FFC();
-    extern void fn_8023715C();
-    extern void fn_802395C8();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x50];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r22 = 0;
-    u32 r23 = 0;
-    u32 r24 = 0;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r1 = (u32)sp;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueKauntaa(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_8010C4A0(u32);
+    extern u16 fn_801F1C18(u32, void*, u32*, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80236520(void*, u32);
+    extern u32 fn_80236FFC(void*, u32);
+    extern u32 fn_8023715C(void*, u32);
+    extern u32 fn_802395C8(void*, u32, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 entries[8];
+    u32 rawCount;
+    u32 count;
+    u32 move;
+    u32* entriesPtr;
+    u32 index;
+    u32 current;
+    u32 handle;
 
-    r7 = 0x1;
-    r27 = r3;
-    r28 = r4;
-    r29 = r5;
-    r30 = r6;
-    r4 = r27;
-    r5 = (u32)sp + 0x8;
-    r31 = 0x0;
-    r3 = 0x0;
-    r6 = 0x0;
-    fn_801F1C18();
-    r25 = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_80236520();
-    r24 = (u32)sp + 0x8;
-    r23 = r3;
-    r26 = r25 & 0xFFFF;
-    r22 = 0x0;
-    while (1) {
-        r0 = r22 & 0xFFFF;
-        if (r0 >= (u32)r26) break;
-        r3 = r27;
-        r4 = *(u32*)(r24 + r25);
-        fn_8023715C();
-        r4 = *(u32*)(r24 + r25);
-        r25 = r3;
-        r3 = r27;
-        fn_80236FFC();
-        r4 = r25 & 0xFFFF;
-        r0 = r3 & 0xFFFF;
-        if (r4 > r0) {
-            r4 = r27;
-            r3 = 0x0;
-            r5 = 0x162;
-            fn_80239984();
-            r0 = r3;
-            r3 = r28;
-            r31 = r0;
-            fn_80205B8C();
-            r6 = (0x1 << 16);
-            r5 = r3;
-            r4 = r27;
-            r8 = r29;
-            r6 = 0x0;
-            r7 = 0x0;
-            r9 = 0x0;
-            r10 = 0x162;
-            fn_80239EE8();
+    handle = 0;
+    rawCount = fn_801F1C18(0, ctx, entries, 0, 1);
+    move = fn_80236520(ctx, param3);
+    entriesPtr = entries;
+    count = rawCount & 0xffff;
+    index = 0;
+    while ((u16)index < count) {
+        current = fn_8023715C(ctx, entriesPtr[(u16)index]);
+        if ((u16)current > (u16)fn_80236FFC(ctx, entriesPtr[(u16)index])) {
+            handle = fn_80239984(0, ctx, 0x162);
+            fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x162);
             break;
         }
-        r22 = r22 + 0x1;
-
+        index++;
     }
-
-    r0 = r23 & 0xFFFF;
-    if (r0 != (u32)r26) {
-        if (r0 != (u32)0xffff) {
-            if (r0 != (u32)0x165) {
-                if (r0 != (u32)0x163) {
-                    r3 = r27;
-                    r4 = r23;
-                    r5 = r30;
-                    fn_802395C8();
-                    fn_8010C4A0();
-                    r0 = r3 & 0xFF;
-                    if (r0 == (u32)0x1) {
-                        r3 = r31;
-                        r4 = r27;
-                        r5 = 0x163;
-                        fn_80239984();
-                        r0 = r3;
-                        r3 = r28;
-                        r31 = r0;
-                        fn_80205B8C();
-                        r6 = (0x1 << 16);
-                        r5 = r3;
-                        r4 = r27;
-                        r8 = r29;
-                        r6 = 0x0;
-                        r7 = 0x0;
-                        r9 = 0x0;
-                        r10 = 0x163;
-                        fn_80239EE8();
+    if ((u16)move != 0 && (u16)move != 0xffff && (u16)move != 0x165 && (u16)move != 0x163) {
+        if ((u8)fn_8010C4A0(fn_802395C8(ctx, move, param3)) == 1) {
+            handle = fn_80239984(handle, ctx, 0x163);
+            fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x163);
+        }
     }
-    }
-    }
-    }
-    }
-    r3 = r31;
-    return;
+    return handle;
 }
 
 /* Address: 0x8024482C | Size: 0xD4 (212 bytes) */
@@ -8577,123 +7461,34 @@ u32 fightTrainerAiWazaValueNemurare(void* ctx, u32 param1, u32 param2, u32 param
 }
 
 /* Address: 0x80245578 | Size: 0x1A0 (416 bytes) */
-void fightTrainerAiWazaValueNemuru(void* ctx, u32 param1, u32 param2, u32 param3) {
+u32 fightTrainerAiWazaValueNemuru(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern f32 lbl_8047E630;
-    extern void fn_80205B8C();
-    extern void fn_80237310();
-    extern void fn_802373B0();
-    extern void fn_8023831C();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f1 = 0.0f;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+    extern u32 fn_80205B8C(u32);
+    extern u8 fn_80237310(void*, u32);
+    extern u8 fn_802373B0(void*, u32, s32, f32);
+    extern u32 fn_8023831C(void*);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
+    u32 state;
 
-    r30 = r3;
-    r28 = r4;
-    r31 = r5;
-    r29 = 0x0;
-    fn_8023831C();
-    r0 = r3 & 0xFFFF;
-
-    if (r0 == (u32)0x3 || r0 == (u32)0x9) {
-
-        r4 = r30;
-        r3 = 0x0;
-        r5 = 0x148;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r29 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r30;
-        r8 = r31;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x148;
-        fn_80239EE8();
+    handle = 0;
+    state = fn_8023831C(ctx);
+    if ((state & 0xffff) == 3 || (state & 0xffff) == 9) {
+        handle = fn_80239984(0, ctx, 0x148);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x148);
     }
-    f1 = lbl_8047E630;
-    r3 = r30;
-    r4 = r28;
-    r5 = -0x1;
-    fn_802373B0();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r29;
-        r4 = r30;
-        r5 = 0x149;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r29 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r30;
-        r8 = r31;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x149;
-        fn_80239EE8();
+    if (fn_802373B0(ctx, param1, -1, lbl_8047E630) == 1) {
+        handle = fn_80239984(handle, ctx, 0x149);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x149);
     }
-    r3 = r30;
-    r4 = r28;
-    fn_80237310();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r29;
-        r4 = r30;
-        r5 = 0x14a;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r29 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r30;
-        r8 = r31;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x14a;
-        fn_80239EE8();
+    if (fn_80237310(ctx, param1) == 0) {
+        handle = fn_80239984(handle, ctx, 0x14a);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x14a);
     }
-    r3 = r29;
-    r4 = r30;
-    r5 = 0x14b;
-    fn_80239984();
-    r29 = r3;
-    r3 = r28;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r30;
-    r8 = r31;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x14b;
-    fn_80239EE8();
-    r3 = r29;
-    return;
+    handle = fn_80239984(handle, ctx, 0x14b);
+    fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x14b);
+    return handle;
 }
 
 /* Address: 0x80245718 | Size: 0x98 */
@@ -8704,11 +7499,9 @@ u32 fightTrainerAiWazaValueKaihuku2(void* ctx, u32 param1, u32 param2) {
     extern u32 fn_80239984(u32, void*, u32);
     extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
     u32 handle;
-    f32 threshold;
 
-    threshold = lbl_8047E630;
     handle = 0;
-    if (fn_802373B0(ctx, param1, -1, threshold) == 1) {
+    if (fn_802373B0(ctx, param1, -1, lbl_8047E630) == 1) {
         handle = fn_80239984(0, ctx, 0x147);
         fn_80239EE8(0xEC64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x147);
     }
@@ -8759,386 +7552,95 @@ u32 fightTrainerAiWazaValueKituke(void* ctx, u32 param1, u32 param2, u32 param3)
 }
 
 /* Address: 0x802459B0 | Size: 0x44C (1100 bytes) */
-void fightTrainerAiWazaValueOiuti(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F4354();
-    extern void fn_801F8A18();
-    extern void fn_80205B8C();
-    extern void fn_80235BE4();
-    extern void fn_80236BFC();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r1 = (u32)sp;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueOiuti(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_801F4354(u32, u32);
+    extern u32 fn_801F8A18(u32, u16*);
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80235BE4(void*, u32, u32, u32);
+    extern u32 fn_80236BFC(void*, u32, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u16 tmp;
+    u32 found;
+    u32 handle;
+    u32 pokemon;
+    u32 status;
 
-    r29 = r6;
-    r27 = r4;
-    r28 = r5;
-    r26 = r3;
-    r5 = r29;
-    r31 = 0x0;
-    r4 = 0x0;
-    r6 = 0x0;
-    fn_80235BE4();
-    r30 = r3;
-    r4 = r29;
-    r3 = 0x0;
-    fn_801F4354();
-    r0 = 0x0;
-    r4 = (u32)sp + 0x8;
-    *(u16*)(sp + 0x8) = r0;
-    fn_801F8A18();
-    if (r3 == (u32)0x0) {
-        r30 = 0x1;
+    handle = 0;
+    status = fn_80235BE4(ctx, 0, param3, 0);
+    pokemon = fn_801F4354(0, param3);
+    tmp = 0;
+    found = fn_801F8A18(pokemon, &tmp);
+    if (found == 0) {
+        status = 1;
     }
-    r3 = r26;
-    r4 = r29;
-    r5 = 0x3;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r4 = r26;
-        r3 = 0x0;
-        r5 = 0x139;
-        fn_80239984();
-        r0 = r3;
-        r3 = r27;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r26;
-        r8 = r28;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x139;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 3) == 1) {
+        handle = fn_80239984(0, ctx, 0x139);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x139);
     }
-    r3 = r26;
-    r4 = r29;
-    r5 = 0x4;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r26;
-        r5 = 0x13a;
-        fn_80239984();
-        r0 = r3;
-        r3 = r27;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r26;
-        r8 = r28;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x13a;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 4) == 1) {
+        handle = fn_80239984(handle, ctx, 0x13a);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x13a);
     }
-    r3 = r26;
-    r4 = r29;
-    r5 = 0x6;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r26;
-        r5 = 0x13b;
-        fn_80239984();
-        r0 = r3;
-        r3 = r27;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r26;
-        r8 = r28;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x13b;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 6) == 1) {
+        handle = fn_80239984(handle, ctx, 0x13b);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x13b);
     }
-    r3 = r26;
-    r4 = r29;
-    r5 = 0x1c;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r26;
-        r5 = 0x13c;
-        fn_80239984();
-        r0 = r3;
-        r3 = r27;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r26;
-        r8 = r28;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x13c;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 0x1c) == 1) {
+        handle = fn_80239984(handle, ctx, 0x13c);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x13c);
     }
-    r3 = r26;
-    r4 = r29;
-    r5 = 0x9;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r26;
-        r5 = 0x13d;
-        fn_80239984();
-        r0 = r3;
-        r3 = r27;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r26;
-        r8 = r28;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x13d;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 9) == 1) {
+        handle = fn_80239984(handle, ctx, 0x13d);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x13d);
     }
-    r3 = r26;
-    r4 = r29;
-    r5 = 0xa;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r26;
-        r5 = 0x13e;
-        fn_80239984();
-        r0 = r3;
-        r3 = r27;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r26;
-        r8 = r28;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x13e;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 0xa) == 1) {
+        handle = fn_80239984(handle, ctx, 0x13e);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x13e);
     }
-    r3 = r26;
-    r4 = r29;
-    r5 = 0x18;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r26;
-        r5 = 0x13f;
-        fn_80239984();
-        r0 = r3;
-        r3 = r27;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r26;
-        r8 = r28;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x13f;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 0x18) == 1) {
+        handle = fn_80239984(handle, ctx, 0x13f);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x13f);
     }
-    r3 = r26;
-    r4 = r29;
-    r5 = 0x1e;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r26;
-        r5 = 0x140;
-        fn_80239984();
-        r0 = r3;
-        r3 = r27;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r26;
-        r8 = r28;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x140;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 0x1e) == 1) {
+        handle = fn_80239984(handle, ctx, 0x140);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x140);
     }
-    r3 = r26;
-    r4 = r29;
-    r5 = 0x26;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r26;
-        r5 = 0x141;
-        fn_80239984();
-        r0 = r3;
-        r3 = r27;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r26;
-        r8 = r28;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x141;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 0x26) == 1) {
+        handle = fn_80239984(handle, ctx, 0x141);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x141);
     }
-    r0 = r30 & 0xFF;
-    if (r0 != (u32)0x1) {
-        r3 = r31;
-        r4 = r26;
-        r5 = 0x142;
-        fn_80239984();
-        r0 = r3;
-        r3 = r27;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r26;
-        r8 = r28;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x142;
-        fn_80239EE8();
+    if ((u8)status != 0) {
+        handle = fn_80239984(handle, ctx, 0x142);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x142);
     }
-    r3 = r31;
-    return;
+    return handle;
 }
 
 /* Address: 0x80245DFC | Size: 0x14C (332 bytes) */
-void fightTrainerAiWazaValueUezaabooru(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80205B8C();
-    extern void fn_80235B04();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueUezaabooru(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80235B04(void*, u32, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
+    u32 state;
 
-    r28 = r4;
-    r29 = r5;
-    r27 = r3;
-    r30 = 0x0;
-    r4 = 0x0;
-    r5 = 0x1;
-    fn_80235B04();
-    r31 = r3;
-    r0 = r3 & 0xFF;
-
-    if (r0 == (u32)0x1 || r0 == (u32)0x2) {
-
-        r4 = r27;
-        r3 = 0x0;
-        r5 = 0x136;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r30 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x136;
-        fn_80239EE8();
+    handle = 0;
+    state = fn_80235B04(ctx, 0, 1);
+    if ((state & 0xff) == 1 || (state & 0xff) == 2) {
+        handle = fn_80239984(0, ctx, 0x136);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x136);
     }
-    r0 = r31 & 0xFF;
-    if (r0 == (u32)0x4) {
-        r3 = r30;
-        r4 = r27;
-        r5 = 0x137;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r30 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x137;
-        fn_80239EE8();
+    if ((state & 0xff) == 4) {
+        handle = fn_80239984(handle, ctx, 0x137);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x137);
     }
-    r0 = r31 & 0xFF;
-    if (r0 == (u32)0x3) {
-        r3 = r30;
-        r4 = r27;
-        r5 = 0x138;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r30 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x138;
-        fn_80239EE8();
+    if ((state & 0xff) == 3) {
+        handle = fn_80239984(handle, ctx, 0x138);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x138);
     }
-    r3 = r30;
-    return;
+    return handle;
 }
 
 /* Address: 0x80245F48 | Size: 0x7C | Pattern: field_accessor */
@@ -9258,123 +7760,31 @@ u32 fn_802473B4(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x802474F8 | Size: 0x1A8 (424 bytes) */
-void fightTrainerAiWazaValueOobaahiito(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1990();
-    extern void fn_80205B8C();
-    extern void fn_80236BFC();
-    extern void fn_8023831C();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueOobaahiito(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u8 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u8 fn_80236BFC(void*, u32, u32);
+    extern u32 fn_8023831C(void*);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
 
-    r29 = r3;
-    r30 = r4;
-    r31 = r5;
-    r27 = r6;
-    r28 = 0x0;
-    fn_8023831C();
-    r0 = r3 & 0xFFFF;
-    if (r0 == (u32)0x17) {
-        r4 = r29;
-        r3 = 0x0;
-        r5 = 0x128;
-        fn_80239984();
-        r0 = r3;
-        r3 = r30;
-        r28 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r29;
-        r8 = r31;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x128;
-        fn_80239EE8();
+    handle = 0;
+    if ((fn_8023831C(ctx) & 0xffff) == 0x17) {
+        handle = fn_80239984(0, ctx, 0x128);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x128);
     }
-    r4 = r29;
-    r8 = r30;
-    r3 = 0x0;
-    r5 = 0x1;
-    r6 = 0x1;
-    r7 = 0x10e;
-    fn_801F1990();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r28;
-        r4 = r29;
-        r5 = 0x129;
-        fn_80239984();
-        r0 = r3;
-        r3 = r30;
-        r28 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r29;
-        r8 = r31;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x129;
-        fn_80239EE8();
+    if (fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+        handle = fn_80239984(handle, ctx, 0x129);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x129);
     }
-    r3 = r28;
-    r4 = r29;
-    r5 = 0x12a;
-    fn_80239984();
-    r28 = r3;
-    r3 = r30;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r29;
-    r8 = r31;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x12a;
-    fn_80239EE8();
-    r3 = r29;
-    r4 = r27;
-    r5 = 0x7;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r28;
-        r4 = r29;
-        r5 = 0x12b;
-        fn_80239984();
-        r28 = r3;
-        r3 = r30;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r29;
-        r8 = r31;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x12b;
-        fn_80239EE8();
+    handle = fn_80239984(handle, ctx, 0x12a);
+    fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x12a);
+    if (fn_80236BFC(ctx, param3, 7) == 1) {
+        handle = fn_80239984(handle, ctx, 0x12b);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x12b);
     }
-    r3 = r28;
-    return;
+    return handle;
 }
 
 /* Address: 0x802476A0 | Size: 0x110 (272 bytes) */
@@ -9438,619 +7848,154 @@ u32 fightTrainerAiWazaValueDouguUbau(void* ctx, u32 param1, u32 param2, u32 para
 }
 
 /* Address: 0x80247908 | Size: 0x1C0 (448 bytes) */
-void fightTrainerAiWazaValueSooraabiimu(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1990();
-    extern void fn_80205B8C();
-    extern void fn_80235B04();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueSooraabiimu(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u8 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80235B04(void*, u32, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 trainer;
+    u32 sequenceArg;
+    void* battleCtx;
+    u32 handle;
+    u32 state;
 
-    r30 = r4;
-    r31 = r5;
-    r29 = r3;
-    r27 = 0x0;
-    r4 = 0x0;
-    r5 = 0x1;
-    fn_80235B04();
-    r28 = r3;
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r4 = r29;
-        r3 = 0x0;
-        r5 = 0x120;
-        fn_80239984();
-        r0 = r3;
-        r3 = r30;
-        r27 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r29;
-        r8 = r31;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x120;
-        fn_80239EE8();
+    trainer = param1;
+    sequenceArg = param2;
+    battleCtx = ctx;
+    handle = 0;
+    state = fn_80235B04(battleCtx, 0, 1);
+    if ((state & 0xff) == 1) {
+        handle = fn_80239984(0, battleCtx, 0x120);
+        fn_80239EE8(0xec64, battleCtx, fn_80205B8C(trainer), 0, 0, sequenceArg, 0, 0x120);
     }
-    r4 = r29;
-    r8 = r30;
-    r3 = 0x0;
-    r5 = 0x1;
-    r6 = 0x1;
-    r7 = 0x10e;
-    fn_801F1990();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r27;
-        r4 = r29;
-        r5 = 0x121;
-        fn_80239984();
-        r0 = r3;
-        r3 = r30;
-        r27 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r29;
-        r8 = r31;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x121;
-        fn_80239EE8();
+    if (fn_801F1990(0, battleCtx, 1, 1, 0x10e, trainer) == 1) {
+        handle = fn_80239984(handle, battleCtx, 0x121);
+        fn_80239EE8(0xec64, battleCtx, fn_80205B8C(trainer), 0, 0, sequenceArg, 0, 0x121);
     }
-    r0 = r28 & 0xFF;
-    if (r0 != (u32)0x2 && r0 != (u32)0x4) {
-
-        if (r0 == (u32)0x3) {
-        }
-        r3 = r27;
-        r4 = r29;
-        r5 = 0x122;
-        fn_80239984();
-        r0 = r3;
-        r3 = r30;
-        r27 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r29;
-        r8 = r31;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x122;
-        fn_80239EE8();
-        }
-    r0 = r28 & 0xFF;
-    if (r0 == (u32)0x3) {
-        r3 = r27;
-        r4 = r29;
-        r5 = 0x123;
-        fn_80239984();
-        r0 = r3;
-        r3 = r30;
-        r27 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r29;
-        r8 = r31;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x123;
-        fn_80239EE8();
+    if ((state & 0xff) == 2 || (state & 0xff) == 4 || (state & 0xff) == 3) {
+        handle = fn_80239984(handle, battleCtx, 0x122);
+        fn_80239EE8(0xec64, battleCtx, fn_80205B8C(trainer), 0, 0, sequenceArg, 0, 0x122);
     }
-    r3 = r27;
-    return;
+    if ((state & 0xff) == 0) {
+        handle = fn_80239984(handle, battleCtx, 0x123);
+        fn_80239EE8(0xec64, battleCtx, fn_80205B8C(trainer), 0, 0, sequenceArg, 0, 0x123);
+    }
+    return handle;
 }
 
 /* Address: 0x80247AC8 | Size: 0x194 (404 bytes) */
-void fightTrainerAiWazaValueToraiatakku(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80205B8C();
-    extern void fn_80237310();
-    extern void fn_80237F74();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueToraiatakku(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_80205B8C(u32);
+    extern u8 fn_80237310(void*, u32);
+    extern u8 fn_80237F74(void*, u32, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
 
-    r31 = r3;
-    r27 = r4;
-    r28 = r5;
-    r29 = r6;
-    r4 = r31;
-    r3 = 0x0;
-    r5 = 0x11d;
-    fn_80239984();
-    r0 = r3;
-    r3 = r27;
-    r30 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r31;
-    r8 = r28;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x11d;
-    fn_80239EE8();
-    r3 = r31;
-    r4 = r29;
-    fn_80237310();
-    r0 = r3 & 0xFF;
-    if ((s32)r0 == (s32)0) {
-        r3 = r30;
-        r4 = r31;
-        r5 = 0x11e;
-        fn_80239984();
-        r0 = r3;
-        r3 = r27;
-        r30 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r31;
-        r8 = r28;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x11e;
-        fn_80239EE8();
+    handle = fn_80239984(0, ctx, 0x11d);
+    fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x11d);
+    if (fn_80237310(ctx, param3) == 0) {
+        handle = fn_80239984(handle, ctx, 0x11e);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x11e);
     }
-    r3 = r31;
-    r4 = r29;
-    r5 = 0x13;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1) {
-        r3 = r31;
-        r4 = r29;
-        r5 = 0x7;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-        if (r0 != (u32)0x1) {
-            r3 = r31;
-            r4 = r29;
-            r5 = 0x29;
-            fn_80237F74();
-            r0 = r3 & 0xFF;
-            if (r0 != (u32)0x1) {
-                r3 = r31;
-                r4 = r29;
-                r5 = 0x28;
-                fn_80237F74();
-                r0 = r3 & 0xFF;
-                if (r0 != (u32)0x1) { r3 = r30; return; }
+    if (fn_80237F74(ctx, param3, 0x13) == 1 || fn_80237F74(ctx, param3, 7) == 1 ||
+        fn_80237F74(ctx, param3, 0x29) == 1 || fn_80237F74(ctx, param3, 0x28) == 1) {
+        handle = fn_80239984(handle, ctx, 0x11f);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x11f);
     }
-    }
-    }
-    r3 = r30;
-    r4 = r31;
-    r5 = 0x11f;
-    fn_80239984();
-    r0 = r3;
-    r3 = r27;
-    r30 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r31;
-    r8 = r28;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x11f;
-    fn_80239EE8();
-
-    r3 = r30;
-    return;
+    return handle;
 }
 
 /* Address: 0x80247C5C | Size: 0x184 (388 bytes) */
-void fightTrainerAiWazaValueDokudokunokiba(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1990();
-    extern void fn_80205B8C();
-    extern void fn_80237310();
-    extern void fn_80237F74();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueDokudokunokiba(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u8 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u8 fn_80237310(void*, u32);
+    extern u8 fn_80237F74(void*, u32, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
 
-    r27 = r3;
-    r28 = r4;
-    r29 = r5;
-    r30 = r6;
-    r4 = r27;
-    r3 = 0x0;
-    r5 = 0x11a;
-    fn_80239984();
-    r0 = r3;
-    r3 = r28;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r27;
-    r8 = r29;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x11a;
-    fn_80239EE8();
-    r4 = r27;
-    r8 = r28;
-    r3 = 0x0;
-    r5 = 0x1;
-    r6 = 0x1;
-    r7 = 0x10e;
-    fn_801F1990();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0x11b;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x11b;
-        fn_80239EE8();
+    handle = fn_80239984(0, ctx, 0x11a);
+    fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x11a);
+    if (fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+        handle = fn_80239984(handle, ctx, 0x11b);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x11b);
     }
-    r3 = r27;
-    r4 = r30;
-    fn_80237310();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1) {
-        r3 = r27;
-        r4 = r30;
-        r5 = 0x11;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-        if (r0 != (u32)0x1) {
-            r3 = r27;
-            r4 = r30;
-            r5 = 0x13;
-            fn_80237F74();
-            r0 = r3 & 0xFF;
-            if (r0 != (u32)0x1) { r3 = r31; return; }
+    if (fn_80237310(ctx, param3) == 0 || fn_80237F74(ctx, param3, 0x11) == 1 ||
+        fn_80237F74(ctx, param3, 0x13) == 1) {
+        handle = fn_80239984(handle, ctx, 0x11c);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x11c);
     }
-    }
-    r3 = r31;
-    r4 = r27;
-    r5 = 0x11c;
-    fn_80239984();
-    r0 = r3;
-    r3 = r28;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r27;
-    r8 = r29;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x11c;
-    fn_80239EE8();
-
-    r3 = r31;
-    return;
+    return handle;
 }
 
 /* Address: 0x80247DE0 | Size: 0x1C0 (448 bytes) */
-void fightTrainerAiWazaValuePoizunteeru(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1990();
-    extern void fn_80205B8C();
-    extern void fn_80237310();
-    extern void fn_80237F74();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValuePoizunteeru(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u8 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u8 fn_80237310(void*, u32);
+    extern u8 fn_80237F74(void*, u32, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
 
-    r29 = r3;
-    r30 = r4;
-    r31 = r5;
-    r27 = r6;
-    r4 = r29;
-    r3 = 0x0;
-    r5 = 0x116;
-    fn_80239984();
-    r0 = r3;
-    r3 = r30;
-    r28 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r29;
-    r8 = r31;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x116;
-    fn_80239EE8();
-    r3 = r28;
-    r4 = r29;
-    r5 = 0x117;
-    fn_80239984();
-    r28 = r3;
-    r3 = r30;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r29;
-    r8 = r31;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x117;
-    fn_80239EE8();
-    r4 = r29;
-    r8 = r30;
-    r3 = 0x0;
-    r5 = 0x1;
-    r6 = 0x1;
-    r7 = 0x10e;
-    fn_801F1990();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r28;
-        r4 = r29;
-        r5 = 0x118;
-        fn_80239984();
-        r28 = r3;
-        r3 = r30;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r29;
-        r8 = r31;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x118;
-        fn_80239EE8();
+    handle = fn_80239984(0, ctx, 0x116);
+    fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x116);
+    handle = fn_80239984(handle, ctx, 0x117);
+    fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x117);
+    if (fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+        handle = fn_80239984(handle, ctx, 0x118);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x118);
     }
-    r3 = r29;
-    r4 = r27;
-    fn_80237310();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1) {
-        r3 = r29;
-        r4 = r27;
-        r5 = 0x11;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-        if (r0 != (u32)0x1) {
-            r3 = r29;
-            r4 = r27;
-            r5 = 0x13;
-            fn_80237F74();
-            r0 = r3 & 0xFF;
-            if (r0 != (u32)0x1) { r3 = r28; return; }
+    if (fn_80237310(ctx, param3) == 0 || fn_80237F74(ctx, param3, 0x11) == 1 ||
+        fn_80237F74(ctx, param3, 0x13) == 1) {
+        handle = fn_80239984(handle, ctx, 0x119);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x119);
     }
-    }
-    r3 = r28;
-    r4 = r29;
-    r5 = 0x119;
-    fn_80239984();
-    r28 = r3;
-    r3 = r30;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r29;
-    r8 = r31;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x119;
-    fn_80239EE8();
-
-    r3 = r28;
-    return;
+    return handle;
 }
 
 /* Address: 0x80247FA0 | Size: 0x1D0 (464 bytes) */
-void fightTrainerAiWazaValueTuikaDoku(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1990();
-    extern void fn_801FB1C0();
-    extern void fn_80205B8C();
-    extern void fn_80237310();
-    extern void fn_80237F74();
-    extern void fn_80239564();
-    extern void fn_80239984();
-    extern void fightTrainerAiAddValue();
-    extern void fn_80239CCC();
-    extern void fn_80239EE8();
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueTuikaDoku(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u8 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern s32 fn_801FB1C0(u32, u32, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u8 fn_80237310(void*, u32);
+    extern u8 fn_80237F74(void*, u32, u32);
+    extern u8 fn_80239564(void*, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern u32 fightTrainerAiAddValue(u32, s32);
+    extern void fn_80239CCC(u32, void*, u32, u32, u32, u32, u32, u32, s32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 battleParam = param2;
+    u32 trainerParam = param1;
+    void* battleCtx = ctx;
+    u32 target = param3;
+    s32 quotient;
+    u32 handle;
+    u32 pokemonPtr;
+    u32 statusValue;
 
-    r31 = r5;
-    r30 = r4;
-    r29 = r3;
-    r26 = r6;
-    r4 = r31;
-    fn_80239564();
-    r27 = r3 & 0xFF;
-    r3 = 0x0;
-    r4 = 0x113;
-    r5 = 0x3e;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r28 = (s32)r27 / (s32)r3;
-    r3 = 0x0;
-    r4 = r28;
-    fightTrainerAiAddValue();
-    r0 = r3;
-    r3 = r30;
-    r27 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r29;
-    r8 = r31;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x113;
-    fn_80239CCC();
-    r4 = r29;
-    r8 = r30;
-    r3 = 0x0;
-    r5 = 0x1;
-    r6 = 0x1;
-    r7 = 0x10e;
-    fn_801F1990();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r27;
-        r4 = r29;
-        r5 = 0x114;
-        fn_80239984();
-        r0 = r3;
-        r3 = r30;
-        r27 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r29;
-        r8 = r31;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x114;
-        fn_80239EE8();
+    statusValue = fn_80239564(battleCtx, battleParam);
+    quotient = (s32)statusValue / fn_801FB1C0(0, 0x113, 0x3e, 0);
+    handle = fightTrainerAiAddValue(0, quotient);
+    pokemonPtr = fn_80205B8C(trainerParam);
+    fn_80239CCC(0xec64, battleCtx, pokemonPtr, 0, 0, battleParam, 0, 0x113, quotient);
+    if (fn_801F1990(0, battleCtx, 1, 1, 0x10e, trainerParam) == 1) {
+        handle = fn_80239984(handle, battleCtx, 0x114);
+        fn_80239EE8(0xec64, battleCtx, fn_80205B8C(trainerParam), 0, 0, battleParam, 0, 0x114);
     }
-    r3 = r29;
-    r4 = r26;
-    fn_80237310();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1) {
-        r3 = r29;
-        r4 = r26;
-        r5 = 0x11;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-        if (r0 != (u32)0x1) {
-            r3 = r29;
-            r4 = r26;
-            r5 = 0x13;
-            fn_80237F74();
-            r0 = r3 & 0xFF;
-            if (r0 != (u32)0x1) { r3 = r27; return; }
+    if (fn_80237310(battleCtx, target) == 0 || fn_80237F74(battleCtx, target, 0x11) == 1 ||
+        fn_80237F74(battleCtx, target, 0x13) == 1) {
+        statusValue = fn_80239564(battleCtx, battleParam);
+        quotient = (s32)statusValue / fn_801FB1C0(0, 0x115, 0x3e, 0);
+        handle = fightTrainerAiAddValue(handle, quotient);
+        pokemonPtr = fn_80205B8C(trainerParam);
+        fn_80239CCC(0xec64, battleCtx, pokemonPtr, 0, 0, battleParam, 0, 0x115, quotient);
     }
-    }
-    r3 = r29;
-    r4 = r31;
-    fn_80239564();
-    r28 = r3 & 0xFF;
-    r3 = 0x0;
-    r4 = 0x115;
-    r5 = 0x3e;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r28 = (s32)r28 / (s32)r3;
-    r3 = r27;
-    r4 = r28;
-    fightTrainerAiAddValue();
-    r0 = r3;
-    r3 = r30;
-    r27 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r29;
-    r8 = r31;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x115;
-    fn_80239CCC();
-
-    r3 = r27;
-    return;
+    return handle;
 }
 
 /* Address: 0x80248170 | Size: 0x150 (336 bytes) */
@@ -10157,138 +8102,44 @@ s32 fightTrainerAiWazaValueDenjihou(void* ctx, u32 param1, u32 param2, u32 param
 }
 
 /* Address: 0x8024868C | Size: 0x1D0 (464 bytes) */
-void fightTrainerAiWazaValueTuikaMahi(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1990();
-    extern void fn_801FB1C0();
-    extern void fn_80205B8C();
-    extern void fn_80237310();
-    extern void fn_80237F74();
-    extern void fn_80239564();
-    extern void fn_80239984();
-    extern void fightTrainerAiAddValue();
-    extern void fn_80239CCC();
-    extern void fn_80239EE8();
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueTuikaMahi(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u8 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern s32 fn_801FB1C0(u32, u32, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u8 fn_80237310(void*, u32);
+    extern u8 fn_80237F74(void*, u32, u32);
+    extern u8 fn_80239564(void*, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern u32 fightTrainerAiAddValue(u32, s32);
+    extern void fn_80239CCC(u32, void*, u32, u32, u32, u32, u32, u32, s32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 battleParam = param2;
+    u32 trainerParam = param1;
+    void* battleCtx = ctx;
+    u32 target = param3;
+    s32 quotient;
+    u32 handle;
+    u32 pokemonPtr;
+    u32 statusValue;
 
-    r31 = r5;
-    r30 = r4;
-    r29 = r3;
-    r26 = r6;
-    r4 = r31;
-    fn_80239564();
-    r27 = r3 & 0xFF;
-    r3 = 0x0;
-    r4 = 0x104;
-    r5 = 0x3e;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r28 = (s32)r27 / (s32)r3;
-    r3 = 0x0;
-    r4 = r28;
-    fightTrainerAiAddValue();
-    r0 = r3;
-    r3 = r30;
-    r27 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r29;
-    r8 = r31;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x104;
-    fn_80239CCC();
-    r4 = r29;
-    r8 = r30;
-    r3 = 0x0;
-    r5 = 0x1;
-    r6 = 0x1;
-    r7 = 0x10e;
-    fn_801F1990();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r27;
-        r4 = r29;
-        r5 = 0x105;
-        fn_80239984();
-        r0 = r3;
-        r3 = r30;
-        r27 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r29;
-        r8 = r31;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x105;
-        fn_80239EE8();
+    statusValue = fn_80239564(battleCtx, battleParam);
+    quotient = (s32)statusValue / fn_801FB1C0(0, 0x104, 0x3e, 0);
+    handle = fightTrainerAiAddValue(0, quotient);
+    pokemonPtr = fn_80205B8C(trainerParam);
+    fn_80239CCC(0xec64, battleCtx, pokemonPtr, 0, 0, battleParam, 0, 0x104, quotient);
+    if (fn_801F1990(0, battleCtx, 1, 1, 0x10e, trainerParam) == 1) {
+        handle = fn_80239984(handle, battleCtx, 0x105);
+        fn_80239EE8(0xec64, battleCtx, fn_80205B8C(trainerParam), 0, 0, battleParam, 0, 0x105);
     }
-    r3 = r29;
-    r4 = r26;
-    fn_80237310();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1) {
-        r3 = r29;
-        r4 = r26;
-        r5 = 0x7;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-        if (r0 != (u32)0x1) {
-            r3 = r29;
-            r4 = r26;
-            r5 = 0x13;
-            fn_80237F74();
-            r0 = r3 & 0xFF;
-            if (r0 != (u32)0x1) { r3 = r27; return; }
+    if (fn_80237310(battleCtx, target) == 0 || fn_80237F74(battleCtx, target, 7) == 1 ||
+        fn_80237F74(battleCtx, target, 0x13) == 1) {
+        statusValue = fn_80239564(battleCtx, battleParam);
+        quotient = (s32)statusValue / fn_801FB1C0(0, 0x106, 0x3e, 0);
+        handle = fightTrainerAiAddValue(handle, quotient);
+        pokemonPtr = fn_80205B8C(trainerParam);
+        fn_80239CCC(0xec64, battleCtx, pokemonPtr, 0, 0, battleParam, 0, 0x106, quotient);
     }
-    }
-    r3 = r29;
-    r4 = r31;
-    fn_80239564();
-    r28 = r3 & 0xFF;
-    r3 = 0x0;
-    r4 = 0x106;
-    r5 = 0x3e;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r28 = (s32)r28 / (s32)r3;
-    r3 = r27;
-    r4 = r28;
-    fightTrainerAiAddValue();
-    r0 = r3;
-    r3 = r30;
-    r27 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r29;
-    r8 = r31;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x106;
-    fn_80239CCC();
-
-    r3 = r27;
-    return;
+    return handle;
 }
 
 /* Address: 0x8024885C | Size: 0x2C0 (704 bytes) */
@@ -10491,1585 +8342,403 @@ void fightTrainerAiWazaValueTuikaKoori(void* ctx, u32 param1, u32 param2, u32 pa
 }
 
 /* Address: 0x80248B1C | Size: 0x220 (544 bytes) */
-void fightTrainerAiWazaValueBureizukikku(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1990();
-    extern void fn_80205B8C();
-    extern void fn_80236BFC();
-    extern void fn_80237310();
-    extern void fn_80237F74();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueBureizukikku(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80236BFC(void*, u32, u32);
+    extern u32 fn_80237310(void*, u32);
+    extern u32 fn_80237F74(void*, u32, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
 
-    r28 = r3;
-    r29 = r4;
-    r30 = r5;
-    r31 = r6;
-    r4 = r28;
-    r3 = 0x0;
-    r5 = 0xfb;
-    fn_80239984();
-    r0 = r3;
-    r3 = r29;
-    r27 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r28;
-    r8 = r30;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0xfb;
-    fn_80239EE8();
-    r3 = r27;
-    r4 = r28;
-    r5 = 0xfc;
-    fn_80239984();
-    r27 = r3;
-    r3 = r29;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r28;
-    r8 = r30;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0xfc;
-    fn_80239EE8();
-    r4 = r28;
-    r8 = r29;
-    r3 = 0x0;
-    r5 = 0x1;
-    r6 = 0x1;
-    r7 = 0x10e;
-    fn_801F1990();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r27;
-        r4 = r28;
-        r5 = 0xfd;
-        fn_80239984();
-        r27 = r3;
-        r3 = r29;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r28;
-        r8 = r30;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xfd;
-        fn_80239EE8();
+    handle = fn_80239984(0, ctx, 0xfb);
+    fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xfb);
+    handle = fn_80239984(handle, ctx, 0xfc);
+    fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xfc);
+    if ((u8)fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+        handle = fn_80239984(handle, ctx, 0xfd);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xfd);
     }
-    r3 = r28;
-    r4 = r31;
-    r5 = 0x7;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r27;
-        r4 = r28;
-        r5 = 0xfe;
-        fn_80239984();
-        r27 = r3;
-        r3 = r29;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r28;
-        r8 = r30;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xfe;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 7) == 1) {
+        handle = fn_80239984(handle, ctx, 0xfe);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xfe);
     }
-    r3 = r28;
-    r4 = r31;
-    fn_80237310();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1) {
-        r3 = r28;
-        r4 = r31;
-        r5 = 0x29;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-        if (r0 != (u32)0x1) {
-            r3 = r28;
-            r4 = r31;
-            r5 = 0x13;
-            fn_80237F74();
-            r0 = r3 & 0xFF;
-            if (r0 != (u32)0x1) { r3 = r27; return; }
+    if ((u8)fn_80237310(ctx, param3) == 0 || (u8)fn_80237F74(ctx, param3, 0x29) == 1 ||
+        (u8)fn_80237F74(ctx, param3, 0x13) == 1) {
+        handle = fn_80239984(handle, ctx, 0xff);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xff);
     }
-    }
-    r3 = r27;
-    r4 = r28;
-    r5 = 0xff;
-    fn_80239984();
-    r27 = r3;
-    r3 = r29;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r28;
-    r8 = r30;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0xff;
-    fn_80239EE8();
-
-    r3 = r27;
-    return;
+    return handle;
 }
 
 /* Address: 0x80248D3C | Size: 0x288 (648 bytes) */
-void fightTrainerAiWazaValueJikokaitou(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1990();
-    extern void fn_801FB1C0();
-    extern void fn_80205B8C();
-    extern void fn_80236BFC();
-    extern void fn_80237310();
-    extern void fn_80237F74();
-    extern void fn_80239564();
-    extern void fn_80239984();
-    extern void fightTrainerAiAddValue();
-    extern void fn_80239CCC();
-    extern void fn_80239EE8();
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f6 = 0.0f;
-    f32 f7 = 0.0f;
-    f32 f8 = 0.0f;
-    f32 f9 = 0.0f;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueJikokaitou(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern s32 fn_801FB1C0(u32, u32, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80236BFC(void*, u32, u32);
+    extern u32 fn_80237310(void*, u32);
+    extern u32 fn_80237F74(void*, u32, u32);
+    extern u32 fn_80239564(void*, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern u32 fightTrainerAiAddValue(u32, s32);
+    extern void fn_80239CCC(u32, void*, u32, u32, u32, u32, u32, u32, s32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    s32 denom;
+    s32 numerator;
+    s32 quotient;
+    u32 handle;
 
-    r29 = r5;
-    r27 = r3;
-    r28 = r4;
-    r30 = r6;
-    r31 = 0x0;
-    r5 = 0x7;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r4 = r27;
-        r3 = 0x0;
-        r5 = 0xf6;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xf6;
-        fn_80239EE8();
+    handle = 0;
+    if ((u8)fn_80236BFC(ctx, param1, 7) == 1) {
+        handle = fn_80239984(0, ctx, 0xf6);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xf6);
     }
-    r3 = r27;
-    r4 = r29;
-    fn_80239564();
-    r26 = r3 & 0xFF;
-    r3 = 0x0;
-    r4 = 0xf7;
-    r5 = 0x3e;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r26 = (s32)r26 / (s32)r3;
-    r3 = r31;
-    r4 = r26;
-    fightTrainerAiAddValue();
-    r31 = r3;
-    r3 = r28;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r27;
-    r8 = r29;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0xf7;
-    fn_80239CCC();
-    r4 = r27;
-    r8 = r28;
-    r3 = 0x0;
-    r5 = 0x1;
-    r6 = 0x1;
-    r7 = 0x10e;
-    fn_801F1990();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0xf8;
-        fn_80239984();
-        r31 = r3;
-        r3 = r28;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xf8;
-        fn_80239EE8();
+    quotient = (s32)(fn_80239564(ctx, param2) & 0xff);
+    denom = fn_801FB1C0(0, 0xf7, 0x3e, 0);
+    quotient = quotient / denom;
+    handle = fightTrainerAiAddValue(handle, quotient);
+    fn_80239CCC(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xf7, quotient);
+    if ((u8)fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+        handle = fn_80239984(handle, ctx, 0xf8);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xf8);
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0x7;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0xf9;
-        fn_80239984();
-        r31 = r3;
-        r3 = r28;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xf9;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 7) == 1) {
+        handle = fn_80239984(handle, ctx, 0xf9);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xf9);
     }
-    r3 = r27;
-    r4 = r30;
-    fn_80237310();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1) {
-        r3 = r27;
-        r4 = r30;
-        r5 = 0x29;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-        if (r0 != (u32)0x1) {
-            r3 = r27;
-            r4 = r30;
-            r5 = 0x13;
-            fn_80237F74();
-            r0 = r3 & 0xFF;
-            if (r0 != (u32)0x1) { r3 = r31; return; }
+    if ((u8)fn_80237310(ctx, param3) != 0) {
+        if ((u8)fn_80237F74(ctx, param3, 0x29) != 1) {
+            if ((u8)fn_80237F74(ctx, param3, 0x13) != 1) {
+                goto done;
+            }
+        }
     }
-    }
-    r3 = r27;
-    r4 = r29;
-    fn_80239564();
-    r30 = r3 & 0xFF;
-    r3 = 0x0;
-    r4 = 0xfa;
-    r5 = 0x3e;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r30 = (s32)r30 / (s32)r3;
-    r3 = r31;
-    r4 = r30;
-    fightTrainerAiAddValue();
-    r31 = r3;
-    r3 = r28;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r27;
-    r8 = r29;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0xfa;
-    fn_80239CCC();
-
-    r3 = r31;
-    return;
+    numerator = (s32)(fn_80239564(ctx, param2) & 0xff);
+    denom = fn_801FB1C0(0, 0xfa, 0x3e, 0);
+    quotient = numerator / denom;
+    handle = fightTrainerAiAddValue(handle, quotient);
+    fn_80239CCC(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xfa, quotient);
+done:
+    return handle;
 }
 
 /* Address: 0x80248FC4 | Size: 0x49C (1180 bytes) */
-void fightTrainerAiWazaValueHonoonouzu(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F4354();
-    extern void fn_801F8A18();
-    extern void fn_80205B8C();
-    extern void fn_80235BE4();
-    extern void fn_80236BFC();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f0 = 0.0f;
-    f32 f1 = 0.0f;
-    f32 f2 = 0.0f;
-    f32 f3 = 0.0f;
-    f32 f4 = 0.0f;
-    f32 f5 = 0.0f;
-    u32 r1 = (u32)sp;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueHonoonouzu(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_801F4354(u32, u32);
+    extern u32 fn_801F8A18(u32, u16*);
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80235BE4(void*, u32, u32, u32);
+    extern u32 fn_80236BFC(void*, u32, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u16 tmp;
+    u32 found;
+    u32 handle;
+    u32 pokemon;
+    u32 status;
 
-    r28 = r6;
-    r26 = r4;
-    r27 = r5;
-    r31 = r3;
-    r5 = r28;
-    r30 = 0x0;
-    r4 = 0x0;
-    r6 = 0x0;
-    fn_80235BE4();
-    r29 = r3;
-    r4 = r28;
-    r3 = 0x0;
-    fn_801F4354();
-    r0 = 0x0;
-    r4 = (u32)sp + 0x8;
-    *(u16*)(sp + 0x8) = r0;
-    fn_801F8A18();
-    if (r3 == (u32)0x0) {
-        r29 = 0x1;
+    handle = 0;
+    status = fn_80235BE4(ctx, 0, param3, 0);
+    pokemon = fn_801F4354(0, param3);
+    tmp = 0;
+    found = fn_801F8A18(pokemon, &tmp);
+    if (found == 0) {
+        status = 1;
     }
-    r0 = r29 & 0xFF;
-    if (r3 == (u32)0x0) {
-        r4 = r31;
-        r3 = 0x0;
-        r5 = 0xeb;
-        fn_80239984();
-        r0 = r3;
-        r3 = r26;
-        r30 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r31;
-        r8 = r27;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xeb;
-        fn_80239EE8();
+    if ((u8)status == 0) {
+        handle = fn_80239984(0, ctx, 0xeb);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xeb);
     }
-    r3 = r31;
-    r4 = r28;
-    r5 = 0x3;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r30;
-        r4 = r31;
-        r5 = 0xec;
-        fn_80239984();
-        r0 = r3;
-        r3 = r26;
-        r30 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r31;
-        r8 = r27;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xec;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 3) == 1) {
+        handle = fn_80239984(handle, ctx, 0xec);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xec);
     }
-    r3 = r31;
-    r4 = r28;
-    r5 = 0x4;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r30;
-        r4 = r31;
-        r5 = 0xed;
-        fn_80239984();
-        r0 = r3;
-        r3 = r26;
-        r30 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r31;
-        r8 = r27;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xed;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 4) == 1) {
+        handle = fn_80239984(handle, ctx, 0xed);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xed);
     }
-    r3 = r31;
-    r4 = r28;
-    r5 = 0x6;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r30;
-        r4 = r31;
-        r5 = 0xee;
-        fn_80239984();
-        r0 = r3;
-        r3 = r26;
-        r30 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r31;
-        r8 = r27;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xee;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 6) == 1) {
+        handle = fn_80239984(handle, ctx, 0xee);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xee);
     }
-    r3 = r31;
-    r4 = r28;
-    r5 = 0x1c;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r30;
-        r4 = r31;
-        r5 = 0xef;
-        fn_80239984();
-        r0 = r3;
-        r3 = r26;
-        r30 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r31;
-        r8 = r27;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xef;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 0x1c) == 1) {
+        handle = fn_80239984(handle, ctx, 0xef);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xef);
     }
-    r3 = r31;
-    r4 = r28;
-    r5 = 0x9;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r30;
-        r4 = r31;
-        r5 = 0xf0;
-        fn_80239984();
-        r0 = r3;
-        r3 = r26;
-        r30 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r31;
-        r8 = r27;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xf0;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 9) == 1) {
+        handle = fn_80239984(handle, ctx, 0xf0);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xf0);
     }
-    r3 = r31;
-    r4 = r28;
-    r5 = 0xa;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r30;
-        r4 = r31;
-        r5 = 0xf1;
-        fn_80239984();
-        r0 = r3;
-        r3 = r26;
-        r30 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r31;
-        r8 = r27;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xf1;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 0xa) == 1) {
+        handle = fn_80239984(handle, ctx, 0xf1);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xf1);
     }
-    r3 = r31;
-    r4 = r28;
-    r5 = 0x18;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r30;
-        r4 = r31;
-        r5 = 0xf2;
-        fn_80239984();
-        r0 = r3;
-        r3 = r26;
-        r30 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r31;
-        r8 = r27;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xf2;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 0x18) == 1) {
+        handle = fn_80239984(handle, ctx, 0xf2);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xf2);
     }
-    r3 = r31;
-    r4 = r28;
-    r5 = 0x1e;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r30;
-        r4 = r31;
-        r5 = 0xf3;
-        fn_80239984();
-        r0 = r3;
-        r3 = r26;
-        r30 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r31;
-        r8 = r27;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xf3;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 0x1e) == 1) {
+        handle = fn_80239984(handle, ctx, 0xf3);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xf3);
     }
-    r3 = r31;
-    r4 = r28;
-    r5 = 0x7;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r30;
-        r4 = r31;
-        r5 = 0xf4;
-        fn_80239984();
-        r0 = r3;
-        r3 = r26;
-        r30 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r31;
-        r8 = r27;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xf4;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 7) == 1) {
+        handle = fn_80239984(handle, ctx, 0xf4);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xf4);
     }
-    r0 = r29 & 0xFF;
-    if (r0 != (u32)0x1) {
-        r3 = r30;
-        r4 = r31;
-        r5 = 0xf5;
-        fn_80239984();
-        r0 = r3;
-        r3 = r26;
-        r30 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r31;
-        r8 = r27;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xf5;
-        fn_80239EE8();
+    if ((u8)status != 0) {
+        handle = fn_80239984(handle, ctx, 0xf5);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xf5);
     }
-    r3 = r30;
-    return;
+    return handle;
 }
 
 /* Address: 0x80249460 | Size: 0x218 (536 bytes) */
-void fightTrainerAiWazaValueIryokuHonoo(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1990();
-    extern void fn_801FB1C0();
-    extern void fn_80205B8C();
-    extern void fn_80236BFC();
-    extern void fn_80237310();
-    extern void fn_80237F74();
-    extern void fn_80239564();
-    extern void fn_80239984();
-    extern void fightTrainerAiAddValue();
-    extern void fn_80239CCC();
-    extern void fn_80239EE8();
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueIryokuHonoo(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern s32 fn_801FB1C0(u32, u32, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80236BFC(void*, u32, u32);
+    extern u32 fn_80237310(void*, u32);
+    extern u32 fn_80237F74(void*, u32, u32);
+    extern u32 fn_80239564(void*, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern u32 fightTrainerAiAddValue(u32, s32);
+    extern void fn_80239CCC(u32, void*, u32, u32, u32, u32, u32, u32, s32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    s32 denom;
+    s32 quotient;
+    u32 handle;
 
-    r29 = r5;
-    r28 = r4;
-    r27 = r3;
-    r30 = r6;
-    r4 = r29;
-    fn_80239564();
-    r26 = r3 & 0xFF;
-    r3 = 0x0;
-    r4 = 0xe7;
-    r5 = 0x3e;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r26 = (s32)r26 / (s32)r3;
-    r3 = 0x0;
-    r4 = r26;
-    fightTrainerAiAddValue();
-    r0 = r3;
-    r3 = r28;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r27;
-    r8 = r29;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0xe7;
-    fn_80239CCC();
-    r4 = r27;
-    r8 = r28;
-    r3 = 0x0;
-    r5 = 0x1;
-    r6 = 0x1;
-    r7 = 0x10e;
-    fn_801F1990();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0xe8;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xe8;
-        fn_80239EE8();
+    quotient = (s32)(fn_80239564(ctx, param2) & 0xff);
+    denom = fn_801FB1C0(0, 0xe7, 0x3e, 0);
+    quotient = quotient / denom;
+    handle = fightTrainerAiAddValue(0, quotient);
+    fn_80239CCC(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xe7, quotient);
+    if ((u8)fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+        handle = fn_80239984(handle, ctx, 0xe8);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xe8);
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0x7;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0xe9;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xe9;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 7) == 1) {
+        handle = fn_80239984(handle, ctx, 0xe9);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xe9);
     }
-    r3 = r27;
-    r4 = r30;
-    fn_80237310();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1) {
-        r3 = r27;
-        r4 = r30;
-        r5 = 0x29;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-        if (r0 != (u32)0x1) { r3 = r31; return; }
+    if ((u8)fn_80237310(ctx, param3) == 0 || (u8)fn_80237F74(ctx, param3, 0x29) == 1) {
+        quotient = (s32)(fn_80239564(ctx, param2) & 0xff);
+        denom = fn_801FB1C0(0, 0xea, 0x3e, 0);
+        quotient = quotient / denom;
+        handle = fightTrainerAiAddValue(handle, quotient);
+        fn_80239CCC(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xea, quotient);
     }
-    r3 = r27;
-    r4 = r29;
-    fn_80239564();
-    r30 = r3 & 0xFF;
-    r3 = 0x0;
-    r4 = 0xea;
-    r5 = 0x3e;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r30 = (s32)r30 / (s32)r3;
-    r3 = r31;
-    r4 = r30;
-    fightTrainerAiAddValue();
-    r0 = r3;
-    r3 = r28;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r27;
-    r8 = r29;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0xea;
-    fn_80239CCC();
-
-    r3 = r31;
-    return;
+    return handle;
 }
 
 /* Address: 0x80249678 | Size: 0x248 (584 bytes) */
-void fightTrainerAiWazaValueTuikouKonran(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1990();
-    extern void fn_801FB1C0();
-    extern void fn_80205B8C();
-    extern void fn_80236BFC();
-    extern void fn_80237F74();
-    extern void fn_80239564();
-    extern void fn_80239984();
-    extern void fightTrainerAiAddValue();
-    extern void fn_80239CCC();
-    extern void fn_80239EE8();
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueTuikouKonran(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern s32 fn_801FB1C0(u32, u32, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80236BFC(void*, u32, u32);
+    extern u32 fn_80237F74(void*, u32, u32);
+    extern u32 fn_80239564(void*, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern u32 fightTrainerAiAddValue(u32, s32);
+    extern void fn_80239CCC(u32, void*, u32, u32, u32, u32, u32, u32, s32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    s32 denom;
+    s32 numerator;
+    s32 quotient;
+    u32 handle;
 
-    r29 = r5;
-    r28 = r4;
-    r27 = r3;
-    r30 = r6;
-    r4 = r29;
-    fn_80239564();
-    r26 = r3 & 0xFF;
-    r3 = 0x0;
-    r4 = 0xe3;
-    r5 = 0x3e;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r26 = (s32)r26 / (s32)r3;
-    r3 = 0x0;
-    r4 = r26;
-    fightTrainerAiAddValue();
-    r0 = r3;
-    r3 = r28;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r27;
-    r8 = r29;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0xe3;
-    fn_80239CCC();
-    r4 = r27;
-    r8 = r28;
-    r3 = 0x0;
-    r5 = 0x1;
-    r6 = 0x1;
-    r7 = 0x10e;
-    fn_801F1990();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0xe4;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xe4;
-        fn_80239EE8();
+    quotient = (s32)(fn_80239564(ctx, param2) & 0xff);
+    denom = fn_801FB1C0(0, 0xe3, 0x3e, 0);
+    quotient = quotient / denom;
+    handle = fightTrainerAiAddValue(0, quotient);
+    fn_80239CCC(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xe3, quotient);
+    if ((u8)fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+        handle = fn_80239984(handle, ctx, 0xe4);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xe4);
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0x9;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r27;
-        r4 = r29;
-        fn_80239564();
-        r26 = r3 & 0xFF;
-        r3 = 0x0;
-        r4 = 0xe5;
-        r5 = 0x3e;
-        r6 = 0x0;
-        fn_801FB1C0();
-        r26 = (s32)r26 / (s32)r3;
-        r3 = r31;
-        r4 = r26;
-        fightTrainerAiAddValue();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xe5;
-        fn_80239CCC();
+    if ((u8)fn_80236BFC(ctx, param3, 9) == 1) {
+        quotient = (s32)(fn_80239564(ctx, param2) & 0xff);
+        denom = fn_801FB1C0(0, 0xe5, 0x3e, 0);
+        quotient = quotient / denom;
+        handle = fightTrainerAiAddValue(handle, quotient);
+        fn_80239CCC(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xe5, quotient);
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0x13;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1) {
-        r3 = r27;
-        r4 = r30;
-        r5 = 0x14;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-        if (r0 != (u32)0x1) { r3 = r31; return; }
+    if ((u8)fn_80237F74(ctx, param3, 0x13) != 1) {
+        if ((u8)fn_80237F74(ctx, param3, 0x14) != 1) {
+            goto done;
+        }
     }
-    r3 = r27;
-    r4 = r29;
-    fn_80239564();
-    r30 = r3 & 0xFF;
-    r3 = 0x0;
-    r4 = 0xe6;
-    r5 = 0x3e;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r26 = (s32)r30 / (s32)r3;
-    r3 = r31;
-    r4 = r26;
-    fightTrainerAiAddValue();
-    r0 = r3;
-    r3 = r28;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r27;
-    r8 = r29;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0xe6;
-    fn_80239CCC();
-
-    r3 = r31;
-    return;
+    numerator = (s32)(fn_80239564(ctx, param2) & 0xff);
+    denom = fn_801FB1C0(0, 0xe6, 0x3e, 0);
+    quotient = numerator / denom;
+    handle = fightTrainerAiAddValue(handle, quotient);
+    fn_80239CCC(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xe6, quotient);
+done:
+    return handle;
 }
 
 /* Address: 0x802498C0 | Size: 0x1F4 (500 bytes) */
-void fightTrainerAiWazaValueDorokake(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80205B8C();
-    extern void fn_802358AC();
-    extern void fn_80237F74();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueDorokake(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_802358AC(void*, u32);
+    extern u32 fn_80237F74(void*, u32, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
 
-    r27 = r3;
-    r28 = r4;
-    r29 = r5;
-    r30 = r6;
-    r4 = r27;
-    r3 = 0x0;
-    r5 = 0xdf;
-    fn_80239984();
-    r0 = r3;
-    r3 = r28;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r27;
-    r8 = r29;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0xdf;
-    fn_80239EE8();
-    r3 = r27;
-    r4 = r30;
-    fn_802358AC();
-    r0 = r3 & 0xFF;
-    if ((s32)r0 == (s32)0) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0xe0;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xe0;
-        fn_80239EE8();
+    handle = fn_80239984(0, ctx, 0xdf);
+    fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xdf);
+    if ((u8)fn_802358AC(ctx, param3) == 0) {
+        handle = fn_80239984(handle, ctx, 0xe0);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xe0);
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0x1d;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1) {
-        r3 = r27;
-        r4 = r30;
-        r5 = 0x13;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-        if (r0 != (u32)0x1) {
-            r3 = r27;
-            r4 = r30;
-            r5 = 0x49;
-            fn_80237F74();
-            r0 = r3 & 0xFF;
-            if (r0 != (u32)0x1) {
-                r3 = r27;
-                r4 = r30;
-                r5 = 0x33;
-                fn_80237F74();
-                r0 = r3 & 0xFF;
-                if (r0 == (u32)0x1) {
-        }
-        }
-        }
-        r3 = r31;
-        r4 = r27;
-        r5 = 0xe1;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xe1;
-        fn_80239EE8();
-                }
-    r3 = r27;
-    r4 = r30;
-    fn_802358AC();
-    r0 = r3 & 0xFF;
-    if (r0 <= (u32)0x4) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0xe2;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xe2;
-        fn_80239EE8();
+    if ((u8)fn_80237F74(ctx, param3, 0x1d) == 1 || (u8)fn_80237F74(ctx, param3, 0x13) == 1 ||
+        (u8)fn_80237F74(ctx, param3, 0x49) == 1 || (u8)fn_80237F74(ctx, param3, 0x33) == 1) {
+        handle = fn_80239984(handle, ctx, 0xe1);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xe1);
     }
-    r3 = r31;
-    return;
+    if ((u8)fn_802358AC(ctx, param3) <= 4) {
+        handle = fn_80239984(handle, ctx, 0xe2);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xe2);
+    }
+    return handle;
 }
 
 /* Address: 0x80249AB4 | Size: 0x278 (632 bytes) */
-void fightTrainerAiWazaValueTuikouMeityuuDaun(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1990();
-    extern void fn_801FB1C0();
-    extern void fn_80205B8C();
-    extern void fn_802358AC();
-    extern void fn_80237F74();
-    extern void fn_80239564();
-    extern void fn_80239984();
-    extern void fightTrainerAiAddValue();
-    extern void fn_80239CCC();
-    extern void fn_80239EE8();
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueTuikouMeityuuDaun(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern s32 fn_801FB1C0(u32, u32, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_802358AC(void*, u32);
+    extern u32 fn_80237F74(void*, u32, u32);
+    extern u32 fn_80239564(void*, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern u32 fightTrainerAiAddValue(u32, s32);
+    extern void fn_80239CCC(u32, void*, u32, u32, u32, u32, u32, u32, s32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    s32 denom;
+    s32 numerator;
+    s32 quotient;
+    u32 handle;
 
-    r29 = r5;
-    r28 = r4;
-    r27 = r3;
-    r30 = r6;
-    r4 = r29;
-    fn_80239564();
-    r26 = r3 & 0xFF;
-    r3 = 0x0;
-    r4 = 0xdb;
-    r5 = 0x3e;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r26 = (s32)r26 / (s32)r3;
-    r3 = 0x0;
-    r4 = r26;
-    fightTrainerAiAddValue();
-    r0 = r3;
-    r3 = r28;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r27;
-    r8 = r29;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0xdb;
-    fn_80239CCC();
-    r4 = r27;
-    r8 = r28;
-    r3 = 0x0;
-    r5 = 0x1;
-    r6 = 0x1;
-    r7 = 0x10e;
-    fn_801F1990();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0xdc;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xdc;
-        fn_80239EE8();
+    quotient = (s32)(fn_80239564(ctx, param2) & 0xff);
+    denom = fn_801FB1C0(0, 0xdb, 0x3e, 0);
+    quotient = quotient / denom;
+    handle = fightTrainerAiAddValue(0, quotient);
+    fn_80239CCC(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xdb, quotient);
+    if ((u8)fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+        handle = fn_80239984(handle, ctx, 0xdc);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xdc);
     }
-    r3 = r27;
-    r4 = r30;
-    fn_802358AC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r27;
-        r4 = r29;
-        fn_80239564();
-        r26 = r3 & 0xFF;
-        r3 = 0x0;
-        r4 = 0xdd;
-        r5 = 0x3e;
-        r6 = 0x0;
-        fn_801FB1C0();
-        r26 = (s32)r26 / (s32)r3;
-        r3 = r31;
-        r4 = r26;
-        fightTrainerAiAddValue();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xdd;
-        fn_80239CCC();
+    if (fn_802358AC(ctx, param3) == 1) {
+        quotient = (s32)(fn_80239564(ctx, param2) & 0xff);
+        denom = fn_801FB1C0(0, 0xdd, 0x3e, 0);
+        quotient = quotient / denom;
+        handle = fightTrainerAiAddValue(handle, quotient);
+        fn_80239CCC(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xdd, quotient);
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0x1d;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1) {
-        r3 = r27;
-        r4 = r30;
-        r5 = 0x13;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-        if (r0 != (u32)0x1) {
-            r3 = r27;
-            r4 = r30;
-            r5 = 0x49;
-            fn_80237F74();
-            r0 = r3 & 0xFF;
-            if (r0 != (u32)0x1) {
-                r3 = r27;
-                r4 = r30;
-                r5 = 0x33;
-                fn_80237F74();
-                r0 = r3 & 0xFF;
-                if (r0 != (u32)0x1) { r3 = r31; return; }
+    if ((u8)fn_80237F74(ctx, param3, 0x1d) != 1) {
+        if ((u8)fn_80237F74(ctx, param3, 0x13) != 1) {
+            if ((u8)fn_80237F74(ctx, param3, 0x49) != 1) {
+                if ((u8)fn_80237F74(ctx, param3, 0x33) != 1) {
+                    goto done;
+                }
+            }
+        }
     }
-    }
-    }
-    r3 = r27;
-    r4 = r29;
-    fn_80239564();
-    r30 = r3 & 0xFF;
-    r3 = 0x0;
-    r4 = 0xde;
-    r5 = 0x3e;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r26 = (s32)r30 / (s32)r3;
-    r3 = r31;
-    r4 = r26;
-    fightTrainerAiAddValue();
-    r0 = r3;
-    r3 = r28;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r27;
-    r8 = r29;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0xde;
-    fn_80239CCC();
-
-    r3 = r31;
-    return;
+    numerator = (s32)(fn_80239564(ctx, param2) & 0xff);
+    denom = fn_801FB1C0(0, 0xde, 0x3e, 0);
+    quotient = numerator / denom;
+    handle = fightTrainerAiAddValue(handle, quotient);
+    fn_80239CCC(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xde, quotient);
+done:
+    return handle;
 }
 
 /* Address: 0x80249D2C | Size: 0x25C (604 bytes) */
-void fightTrainerAiWazaValueTuikouTokubouDaun(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1990();
-    extern void fn_801FB1C0();
-    extern void fn_80205B8C();
-    extern void fn_80235974();
-    extern void fn_80237F74();
-    extern void fn_80239564();
-    extern void fn_80239984();
-    extern void fightTrainerAiAddValue();
-    extern void fn_80239CCC();
-    extern void fn_80239EE8();
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueTuikouTokubouDaun(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern s32 fn_801FB1C0(u32, u32, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80235974(void*, u32);
+    extern u32 fn_80237F74(void*, u32, u32);
+    extern u32 fn_80239564(void*, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern u32 fightTrainerAiAddValue(u32, s32);
+    extern void fn_80239CCC(u32, void*, u32, u32, u32, u32, u32, u32, s32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    s32 denom;
+    s32 numerator;
+    s32 quotient;
+    u32 handle;
 
-    r29 = r5;
-    r28 = r4;
-    r27 = r3;
-    r30 = r6;
-    r4 = r29;
-    fn_80239564();
-    r26 = r3 & 0xFF;
-    r3 = 0x0;
-    r4 = 0xd7;
-    r5 = 0x3e;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r26 = (s32)r26 / (s32)r3;
-    r3 = 0x0;
-    r4 = r26;
-    fightTrainerAiAddValue();
-    r0 = r3;
-    r3 = r28;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r27;
-    r8 = r29;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0xd7;
-    fn_80239CCC();
-    r4 = r27;
-    r8 = r28;
-    r3 = 0x0;
-    r5 = 0x1;
-    r6 = 0x1;
-    r7 = 0x10e;
-    fn_801F1990();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0xd8;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xd8;
-        fn_80239EE8();
+    quotient = (s32)(fn_80239564(ctx, param2) & 0xff);
+    denom = fn_801FB1C0(0, 0xd7, 0x3e, 0);
+    quotient = quotient / denom;
+    handle = fightTrainerAiAddValue(0, quotient);
+    fn_80239CCC(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xd7, quotient);
+    if ((u8)fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+        handle = fn_80239984(handle, ctx, 0xd8);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xd8);
     }
-    r3 = r27;
-    r4 = r30;
-    fn_80235974();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r27;
-        r4 = r29;
-        fn_80239564();
-        r26 = r3 & 0xFF;
-        r3 = 0x0;
-        r4 = 0xd9;
-        r5 = 0x3e;
-        r6 = 0x0;
-        fn_801FB1C0();
-        r26 = (s32)r26 / (s32)r3;
-        r3 = r31;
-        r4 = r26;
-        fightTrainerAiAddValue();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xd9;
-        fn_80239CCC();
+    if (fn_80235974(ctx, param3) == 1) {
+        quotient = (s32)(fn_80239564(ctx, param2) & 0xff);
+        denom = fn_801FB1C0(0, 0xd9, 0x3e, 0);
+        quotient = quotient / denom;
+        handle = fightTrainerAiAddValue(handle, quotient);
+        fn_80239CCC(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xd9, quotient);
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0x1d;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1) {
-        r3 = r27;
-        r4 = r30;
-        r5 = 0x13;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-        if (r0 != (u32)0x1) {
-            r3 = r27;
-            r4 = r30;
-            r5 = 0x49;
-            fn_80237F74();
-            r0 = r3 & 0xFF;
-            if (r0 != (u32)0x1) { r3 = r31; return; }
+    if ((u8)fn_80237F74(ctx, param3, 0x1d) != 1) {
+        if ((u8)fn_80237F74(ctx, param3, 0x13) != 1) {
+            if ((u8)fn_80237F74(ctx, param3, 0x49) != 1) {
+                goto done;
+            }
+        }
     }
-    }
-    r3 = r27;
-    r4 = r29;
-    fn_80239564();
-    r30 = r3 & 0xFF;
-    r3 = 0x0;
-    r4 = 0xda;
-    r5 = 0x3e;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r26 = (s32)r30 / (s32)r3;
-    r3 = r31;
-    r4 = r26;
-    fightTrainerAiAddValue();
-    r0 = r3;
-    r3 = r28;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r27;
-    r8 = r29;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0xda;
-    fn_80239CCC();
-
-    r3 = r31;
-    return;
+    numerator = (s32)(fn_80239564(ctx, param2) & 0xff);
+    denom = fn_801FB1C0(0, 0xda, 0x3e, 0);
+    quotient = numerator / denom;
+    handle = fightTrainerAiAddValue(handle, quotient);
+    fn_80239CCC(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xda, quotient);
+done:
+    return handle;
 }
 
 /* Address: 0x80249F88 | Size: 0x1E8 (488 bytes) */
-void fightTrainerAiWazaValueTuikouTokukouDaun(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1990();
-    extern void fn_80205B8C();
-    extern void fn_802359D8();
-    extern void fn_80237F74();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueTuikouTokukouDaun(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_802359D8(void*, u32);
+    extern u32 fn_80237F74(void*, u32, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
 
-    r29 = r3;
-    r30 = r4;
-    r31 = r5;
-    r27 = r6;
-    r4 = r29;
-    r3 = 0x0;
-    r5 = 0xd3;
-    fn_80239984();
-    r0 = r3;
-    r3 = r30;
-    r28 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r29;
-    r8 = r31;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0xd3;
-    fn_80239EE8();
-    r4 = r29;
-    r8 = r30;
-    r3 = 0x0;
-    r5 = 0x1;
-    r6 = 0x1;
-    r7 = 0x10e;
-    fn_801F1990();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r28;
-        r4 = r29;
-        r5 = 0xd4;
-        fn_80239984();
-        r0 = r3;
-        r3 = r30;
-        r28 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r29;
-        r8 = r31;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xd4;
-        fn_80239EE8();
+    handle = fn_80239984(0, ctx, 0xd3);
+    fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xd3);
+    if ((u8)fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+        handle = fn_80239984(handle, ctx, 0xd4);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xd4);
     }
-    r3 = r29;
-    r4 = r27;
-    fn_802359D8();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r28;
-        r4 = r29;
-        r5 = 0xd5;
-        fn_80239984();
-        r0 = r3;
-        r3 = r30;
-        r28 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r29;
-        r8 = r31;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xd5;
-        fn_80239EE8();
+    if ((u8)fn_802359D8(ctx, param3) == 0) {
+        handle = fn_80239984(handle, ctx, 0xd5);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xd5);
     }
-    r3 = r29;
-    r4 = r27;
-    r5 = 0x1d;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1) {
-        r3 = r29;
-        r4 = r27;
-        r5 = 0x13;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-        if (r0 != (u32)0x1) {
-            r3 = r29;
-            r4 = r27;
-            r5 = 0x49;
-            fn_80237F74();
-            r0 = r3 & 0xFF;
-            if (r0 != (u32)0x1) { r3 = r28; return; }
+    if ((u8)fn_80237F74(ctx, param3, 0x1d) != 1) {
+        if ((u8)fn_80237F74(ctx, param3, 0x13) != 1) {
+            if ((u8)fn_80237F74(ctx, param3, 0x49) != 1) {
+                goto done;
+            }
+        }
     }
-    }
-    r3 = r28;
-    r4 = r29;
-    r5 = 0xd6;
-    fn_80239984();
-    r0 = r3;
-    r3 = r30;
-    r28 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r29;
-    r8 = r31;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0xd6;
-    fn_80239EE8();
-
-    r3 = r28;
-    return;
+    handle = fn_80239984(handle, ctx, 0xd6);
+    fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xd6);
+done:
+    return handle;
 }
 
 /* Address: 0x8024A170 | Size: 0x2B8 (696 bytes) */
@@ -12441,614 +9110,161 @@ void fightTrainerAiWazaValueKanarazuSubayasaDaun(void* ctx, u32 param1, u32 para
 }
 
 /* Address: 0x8024A664 | Size: 0x2C0 (704 bytes) */
-void fightTrainerAiWazaValueTuikouSubayasaDaun(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1990();
-    extern void fn_801FB1C0();
-    extern void fn_80205B8C();
-    extern void fn_80235910();
-    extern void fn_80236BFC();
-    extern void fn_80237F74();
-    extern void fn_80239564();
-    extern void fn_80239984();
-    extern void fightTrainerAiAddValue();
-    extern void fn_80239CCC();
-    extern void fn_80239EE8();
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueTuikouSubayasaDaun(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern s32 fn_801FB1C0(u32, u32, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80235910(void*, u32);
+    extern u32 fn_80236BFC(void*, u32, u32);
+    extern u32 fn_80237F74(void*, u32, u32);
+    extern u32 fn_80239564(void*, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern u32 fightTrainerAiAddValue(u32, s32);
+    extern void fn_80239CCC(u32, void*, u32, u32, u32, u32, u32, u32, s32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    s32 denom;
+    s32 numerator;
+    s32 quotient;
+    u32 handle;
 
-    r29 = r5;
-    r28 = r4;
-    r27 = r3;
-    r30 = r6;
-    r4 = r29;
-    fn_80239564();
-    r26 = r3 & 0xFF;
-    r3 = 0x0;
-    r4 = 0xc7;
-    r5 = 0x3e;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r26 = (s32)r26 / (s32)r3;
-    r3 = 0x0;
-    r4 = r26;
-    fightTrainerAiAddValue();
-    r0 = r3;
-    r3 = r28;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r27;
-    r8 = r29;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0xc7;
-    fn_80239CCC();
-    r4 = r27;
-    r8 = r28;
-    r3 = 0x0;
-    r5 = 0x1;
-    r6 = 0x1;
-    r7 = 0x10e;
-    fn_801F1990();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0xc8;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xc8;
-        fn_80239EE8();
+    quotient = (s32)(fn_80239564(ctx, param2) & 0xff);
+    denom = fn_801FB1C0(0, 0xc7, 0x3e, 0);
+    quotient = quotient / denom;
+    handle = fightTrainerAiAddValue(0, quotient);
+    fn_80239CCC(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xc7, quotient);
+    if ((u8)fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+        handle = fn_80239984(handle, ctx, 0xc8);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xc8);
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0x5;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0xc9;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xc9;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 5) == 1) {
+        handle = fn_80239984(handle, ctx, 0xc9);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xc9);
     }
-    r3 = r27;
-    r4 = r30;
-    fn_80235910();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r27;
-        r4 = r29;
-        fn_80239564();
-        r26 = r3 & 0xFF;
-        r3 = 0x0;
-        r4 = 0xca;
-        r5 = 0x3e;
-        r6 = 0x0;
-        fn_801FB1C0();
-        r26 = (s32)r26 / (s32)r3;
-        r3 = r31;
-        r4 = r26;
-        fightTrainerAiAddValue();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xca;
-        fn_80239CCC();
+    if (fn_80235910(ctx, param3) == 1) {
+        quotient = (s32)(fn_80239564(ctx, param2) & 0xff);
+        denom = fn_801FB1C0(0, 0xca, 0x3e, 0);
+        quotient = quotient / denom;
+        handle = fightTrainerAiAddValue(handle, quotient);
+        fn_80239CCC(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xca, quotient);
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0x1d;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1) {
-        r3 = r27;
-        r4 = r30;
-        r5 = 0x13;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-        if (r0 != (u32)0x1) {
-            r3 = r27;
-            r4 = r30;
-            r5 = 0x49;
-            fn_80237F74();
-            r0 = r3 & 0xFF;
-            if (r0 != (u32)0x1) { r3 = r31; return; }
+    if ((u8)fn_80237F74(ctx, param3, 0x1d) != 1) {
+        if ((u8)fn_80237F74(ctx, param3, 0x13) != 1) {
+            if ((u8)fn_80237F74(ctx, param3, 0x49) != 1) {
+                goto done;
+            }
+        }
     }
-    }
-    r3 = r27;
-    r4 = r29;
-    fn_80239564();
-    r30 = r3 & 0xFF;
-    r3 = 0x0;
-    r4 = 0xcb;
-    r5 = 0x3e;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r26 = (s32)r30 / (s32)r3;
-    r3 = r31;
-    r4 = r26;
-    fightTrainerAiAddValue();
-    r0 = r3;
-    r3 = r28;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r27;
-    r8 = r29;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0xcb;
-    fn_80239CCC();
-
-    r3 = r31;
-    return;
+    numerator = (s32)(fn_80239564(ctx, param2) & 0xff);
+    denom = fn_801FB1C0(0, 0xcb, 0x3e, 0);
+    quotient = numerator / denom;
+    handle = fightTrainerAiAddValue(handle, quotient);
+    fn_80239CCC(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xcb, quotient);
+done:
+    return handle;
 }
 
 /* Address: 0x8024A924 | Size: 0x25C (604 bytes) */
-void fightTrainerAiWazaValueTuikouBougyoDaun(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1990();
-    extern void fn_801FB1C0();
-    extern void fn_80205B8C();
-    extern void fn_80235A3C();
-    extern void fn_80237F74();
-    extern void fn_80239564();
-    extern void fn_80239984();
-    extern void fightTrainerAiAddValue();
-    extern void fn_80239CCC();
-    extern void fn_80239EE8();
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueTuikouBougyoDaun(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern s32 fn_801FB1C0(u32, u32, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80235A3C(void*, u32);
+    extern u32 fn_80237F74(void*, u32, u32);
+    extern u32 fn_80239564(void*, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern u32 fightTrainerAiAddValue(u32, s32);
+    extern void fn_80239CCC(u32, void*, u32, u32, u32, u32, u32, u32, s32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    s32 denom;
+    s32 numerator;
+    s32 quotient;
+    u32 handle;
 
-    r29 = r5;
-    r28 = r4;
-    r27 = r3;
-    r30 = r6;
-    r4 = r29;
-    fn_80239564();
-    r26 = r3 & 0xFF;
-    r3 = 0x0;
-    r4 = 0xc3;
-    r5 = 0x3e;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r26 = (s32)r26 / (s32)r3;
-    r3 = 0x0;
-    r4 = r26;
-    fightTrainerAiAddValue();
-    r0 = r3;
-    r3 = r28;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r27;
-    r8 = r29;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0xc3;
-    fn_80239CCC();
-    r4 = r27;
-    r8 = r28;
-    r3 = 0x0;
-    r5 = 0x1;
-    r6 = 0x1;
-    r7 = 0x10e;
-    fn_801F1990();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0xc4;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xc4;
-        fn_80239EE8();
+    quotient = (s32)(fn_80239564(ctx, param2) & 0xff);
+    denom = fn_801FB1C0(0, 0xc3, 0x3e, 0);
+    quotient = quotient / denom;
+    handle = fightTrainerAiAddValue(0, quotient);
+    fn_80239CCC(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xc3, quotient);
+    if ((u8)fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+        handle = fn_80239984(handle, ctx, 0xc4);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xc4);
     }
-    r3 = r27;
-    r4 = r30;
-    fn_80235A3C();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r27;
-        r4 = r29;
-        fn_80239564();
-        r26 = r3 & 0xFF;
-        r3 = 0x0;
-        r4 = 0xc5;
-        r5 = 0x3e;
-        r6 = 0x0;
-        fn_801FB1C0();
-        r26 = (s32)r26 / (s32)r3;
-        r3 = r31;
-        r4 = r26;
-        fightTrainerAiAddValue();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xc5;
-        fn_80239CCC();
+    if (fn_80235A3C(ctx, param3) == 1) {
+        quotient = (s32)(fn_80239564(ctx, param2) & 0xff);
+        denom = fn_801FB1C0(0, 0xc5, 0x3e, 0);
+        quotient = quotient / denom;
+        handle = fightTrainerAiAddValue(handle, quotient);
+        fn_80239CCC(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xc5, quotient);
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0x1d;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1) {
-        r3 = r27;
-        r4 = r30;
-        r5 = 0x13;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-        if (r0 != (u32)0x1) {
-            r3 = r27;
-            r4 = r30;
-            r5 = 0x49;
-            fn_80237F74();
-            r0 = r3 & 0xFF;
-            if (r0 != (u32)0x1) { r3 = r31; return; }
+    if ((u8)fn_80237F74(ctx, param3, 0x1d) != 1) {
+        if ((u8)fn_80237F74(ctx, param3, 0x13) != 1) {
+            if ((u8)fn_80237F74(ctx, param3, 0x49) != 1) {
+                goto done;
+            }
+        }
     }
-    }
-    r3 = r27;
-    r4 = r29;
-    fn_80239564();
-    r30 = r3 & 0xFF;
-    r3 = 0x0;
-    r4 = 0xc6;
-    r5 = 0x3e;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r26 = (s32)r30 / (s32)r3;
-    r3 = r31;
-    r4 = r26;
-    fightTrainerAiAddValue();
-    r0 = r3;
-    r3 = r28;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r27;
-    r8 = r29;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0xc6;
-    fn_80239CCC();
-
-    r3 = r31;
-    return;
+    numerator = (s32)(fn_80239564(ctx, param2) & 0xff);
+    denom = fn_801FB1C0(0, 0xc6, 0x3e, 0);
+    quotient = numerator / denom;
+    handle = fightTrainerAiAddValue(handle, quotient);
+    fn_80239CCC(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xc6, quotient);
+done:
+    return handle;
 }
 
 /* Address: 0x8024AB80 | Size: 0x204 (516 bytes) */
-void fightTrainerAiWazaValueOororabiimu(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1990();
-    extern void fn_80205B8C();
-    extern void fn_80235AA0();
-    extern void fn_80237F74();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueOororabiimu(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80235AA0(void*, u32);
+    extern u32 fn_80237F74(void*, u32, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
 
-    r27 = r3;
-    r28 = r4;
-    r29 = r5;
-    r30 = r6;
-    r4 = r27;
-    r3 = 0x0;
-    r5 = 0xbf;
-    fn_80239984();
-    r0 = r3;
-    r3 = r28;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r27;
-    r8 = r29;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0xbf;
-    fn_80239EE8();
-    r4 = r27;
-    r8 = r28;
-    r3 = 0x0;
-    r5 = 0x1;
-    r6 = 0x1;
-    r7 = 0x10e;
-    fn_801F1990();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0xc0;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xc0;
-        fn_80239EE8();
+    handle = fn_80239984(0, ctx, 0xbf);
+    fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xbf);
+    if ((u8)fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+        handle = fn_80239984(handle, ctx, 0xc0);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xc0);
     }
-    r3 = r27;
-    r4 = r30;
-    fn_80235AA0();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0xc1;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xc1;
-        fn_80239EE8();
+    if ((u8)fn_80235AA0(ctx, param3) == 0) {
+        handle = fn_80239984(handle, ctx, 0xc1);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xc1);
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0x1d;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1) {
-        r3 = r27;
-        r4 = r30;
-        r5 = 0x13;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-        if (r0 != (u32)0x1) {
-            r3 = r27;
-            r4 = r30;
-            r5 = 0x49;
-            fn_80237F74();
-            r0 = r3 & 0xFF;
-            if (r0 != (u32)0x1) {
-                r3 = r27;
-                r4 = r30;
-                r5 = 0x34;
-                fn_80237F74();
-                r0 = r3 & 0xFF;
-                if (r0 != (u32)0x1) { r3 = r31; return; }
+    if ((u8)fn_80237F74(ctx, param3, 0x1d) == 1 || (u8)fn_80237F74(ctx, param3, 0x13) == 1 ||
+        (u8)fn_80237F74(ctx, param3, 0x49) == 1 || (u8)fn_80237F74(ctx, param3, 0x34) == 1) {
+        handle = fn_80239984(handle, ctx, 0xc2);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xc2);
     }
-    }
-    }
-    r3 = r31;
-    r4 = r27;
-    r5 = 0xc2;
-    fn_80239984();
-    r0 = r3;
-    r3 = r28;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r27;
-    r8 = r29;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0xc2;
-    fn_80239EE8();
-
-    r3 = r31;
-    return;
+    return handle;
 }
 
 /* Address: 0x8024AD84 | Size: 0x16C (364 bytes) */
-void fightTrainerAiWazaValueNekodamasi(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80205B8C();
-    extern void fn_80237F74();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueNekodamasi(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_8012640C(u32, u32, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u8 fn_80237F74(void*, u32, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
 
-    r28 = r4;
-    r27 = r3;
-    r29 = r5;
-    r30 = r6;
-    r3 = r28;
-    r31 = 0x0;
-    r4 = 0x0;
-    r5 = 0xed;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    r0 = r3 & 0xFFFF;
-    if ((s32)r0 != (s32)0) {
-        r4 = r27;
-        r3 = 0x0;
-        r5 = 0xbd;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xbd;
-        fn_80239EE8();
+    handle = 0;
+    if ((fn_8012640C(param1, 0, 0xed, 0) & 0xffff) != 0) {
+        handle = fn_80239984(0, ctx, 0xbd);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xbd);
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0x27;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0xbe;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xbe;
-        fn_80239EE8();
-        r3 = r31;
-        return;
+    if (fn_80237F74(ctx, param3, 0x27) == 1) {
+        handle = fn_80239984(handle, ctx, 0xbe);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xbe);
+        goto done;
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0x13;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1) { r3 = r31; return; }
-    r3 = r31;
-    r4 = r27;
-    r5 = 0xbe;
-    fn_80239984();
-    r0 = r3;
-    r3 = r28;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r27;
-    r8 = r29;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0xbe;
-    fn_80239EE8();
-
-    r3 = r31;
-    return;
+    if (fn_80237F74(ctx, param3, 0x13) == 1) {
+        handle = fn_80239984(handle, ctx, 0xbe);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xbe);
+    }
+done:
+    return handle;
 }
 
 /* Address: 0x8024AEF0 | Size: 0xD4 (212 bytes) */
@@ -13070,314 +9286,70 @@ u32 fightTrainerAiWazaValueGoddobaado(void* ctx, u32 param1, u32 param2, u32 par
 }
 
 /* Address: 0x8024AFC4 | Size: 0x4B0 (1200 bytes) */
-void fightTrainerAiWazaValueTuikaHirumi(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1990();
-    extern void fn_801FB1C0();
-    extern void fn_80205B8C();
-    extern void fn_80236BFC();
-    extern void fn_80236D60();
-    extern void fn_80239564();
-    extern void fn_80239984();
-    extern void fightTrainerAiAddValue();
-    extern void fn_80239CCC();
-    extern void fn_80239EE8();
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueTuikaHirumi(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern s32 fn_801FB1C0(u32, u32, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80236BFC(void*, u32, u32);
+    extern s32 fn_80236D60(void*, u32, u32);
+    extern u32 fn_80239564(void*, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern u32 fightTrainerAiAddValue(u32, s32);
+    extern void fn_80239CCC(u32, void*, u32, u32, u32, u32, u32, u32, s32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    s32 denom;
+    s32 quotient;
+    u32 handle;
 
-    r30 = r6;
-    r29 = r5;
-    r27 = r3;
-    r28 = r4;
-    r5 = r30;
-    r31 = 0x0;
-    fn_80236D60();
-    if ((s32)r3 > (s32)0x0) {
-        r3 = r27;
-        r4 = r29;
-        fn_80239564();
-        r26 = r3 & 0xFF;
-        r3 = 0x0;
-        r4 = 0xb0;
-        r5 = 0x3e;
-        r6 = 0x0;
-        fn_801FB1C0();
-        r26 = (s32)r26 / (s32)r3;
-        r3 = 0x0;
-        r4 = r26;
-        fightTrainerAiAddValue();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xb0;
-        fn_80239CCC();
-        r3 = r27;
-        r4 = r30;
-        r5 = 0x3;
-        fn_80236BFC();
-        r0 = r3 & 0xFF;
-        if (r0 == (u32)0x1) {
-            r3 = r31;
-            r4 = r27;
-            r5 = 0xb1;
-            fn_80239984();
-            r0 = r3;
-            r3 = r28;
-            r31 = r0;
-            fn_80205B8C();
-            r6 = (0x1 << 16);
-            r5 = r3;
-            r4 = r27;
-            r8 = r29;
-            r6 = 0x0;
-            r7 = 0x0;
-            r9 = 0x0;
-            r10 = 0xb1;
-            fn_80239EE8();
+    handle = 0;
+    if (fn_80236D60(ctx, param1, param3) > 0) {
+        quotient = (s32)(fn_80239564(ctx, param2) & 0xff);
+        denom = fn_801FB1C0(0, 0xb0, 0x3e, 0);
+        quotient = quotient / denom;
+        handle = fightTrainerAiAddValue(0, quotient);
+        fn_80239CCC(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xb0, quotient);
+        if ((u8)fn_80236BFC(ctx, param3, 3) == 1) {
+            handle = fn_80239984(handle, ctx, 0xb1);
+            fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xb1);
         }
-        r3 = r27;
-        r4 = r30;
-        r5 = 0x4;
-        fn_80236BFC();
-        r0 = r3 & 0xFF;
-        if (r0 == (u32)0x1) {
-            r3 = r31;
-            r4 = r27;
-            r5 = 0xb2;
-            fn_80239984();
-            r0 = r3;
-            r3 = r28;
-            r31 = r0;
-            fn_80205B8C();
-            r6 = (0x1 << 16);
-            r5 = r3;
-            r4 = r27;
-            r8 = r29;
-            r6 = 0x0;
-            r7 = 0x0;
-            r9 = 0x0;
-            r10 = 0xb2;
-            fn_80239EE8();
+        if ((u8)fn_80236BFC(ctx, param3, 4) == 1) {
+            handle = fn_80239984(handle, ctx, 0xb2);
+            fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xb2);
         }
-        r3 = r27;
-        r4 = r30;
-        r5 = 0x6;
-        fn_80236BFC();
-        r0 = r3 & 0xFF;
-        if (r0 == (u32)0x1) {
-            r3 = r31;
-            r4 = r27;
-            r5 = 0xb3;
-            fn_80239984();
-            r0 = r3;
-            r3 = r28;
-            r31 = r0;
-            fn_80205B8C();
-            r6 = (0x1 << 16);
-            r5 = r3;
-            r4 = r27;
-            r8 = r29;
-            r6 = 0x0;
-            r7 = 0x0;
-            r9 = 0x0;
-            r10 = 0xb3;
-            fn_80239EE8();
+        if ((u8)fn_80236BFC(ctx, param3, 6) == 1) {
+            handle = fn_80239984(handle, ctx, 0xb3);
+            fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xb3);
         }
-        r3 = r27;
-        r4 = r30;
-        r5 = 0x1c;
-        fn_80236BFC();
-        r0 = r3 & 0xFF;
-        if (r0 == (u32)0x1) {
-            r3 = r31;
-            r4 = r27;
-            r5 = 0xb4;
-            fn_80239984();
-            r0 = r3;
-            r3 = r28;
-            r31 = r0;
-            fn_80205B8C();
-            r6 = (0x1 << 16);
-            r5 = r3;
-            r4 = r27;
-            r8 = r29;
-            r6 = 0x0;
-            r7 = 0x0;
-            r9 = 0x0;
-            r10 = 0xb4;
-            fn_80239EE8();
+        if ((u8)fn_80236BFC(ctx, param3, 0x1c) == 1) {
+            handle = fn_80239984(handle, ctx, 0xb4);
+            fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xb4);
         }
-        r3 = r27;
-        r4 = r30;
-        r5 = 0x18;
-        fn_80236BFC();
-        r0 = r3 & 0xFF;
-        if (r0 == (u32)0x1) {
-            r3 = r31;
-            r4 = r27;
-            r5 = 0xb5;
-            fn_80239984();
-            r0 = r3;
-            r3 = r28;
-            r31 = r0;
-            fn_80205B8C();
-            r6 = (0x1 << 16);
-            r5 = r3;
-            r4 = r27;
-            r8 = r29;
-            r6 = 0x0;
-            r7 = 0x0;
-            r9 = 0x0;
-            r10 = 0xb5;
-            fn_80239EE8();
+        if ((u8)fn_80236BFC(ctx, param3, 0x18) == 1) {
+            handle = fn_80239984(handle, ctx, 0xb5);
+            fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xb5);
         }
-        r3 = r27;
-        r4 = r30;
-        r5 = 0x5;
-        fn_80236BFC();
-        r0 = r3 & 0xFF;
-        if (r0 == (u32)0x1) {
-            r3 = r31;
-            r4 = r27;
-            r5 = 0xb6;
-            fn_80239984();
-            r0 = r3;
-            r3 = r28;
-            r31 = r0;
-            fn_80205B8C();
-            r6 = (0x1 << 16);
-            r5 = r3;
-            r4 = r27;
-            r8 = r29;
-            r6 = 0x0;
-            r7 = 0x0;
-            r9 = 0x0;
-            r10 = 0xb6;
-            fn_80239EE8();
+        if ((u8)fn_80236BFC(ctx, param3, 5) == 1) {
+            handle = fn_80239984(handle, ctx, 0xb6);
+            fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xb6);
         }
-        r3 = r27;
-        r4 = r30;
-        r5 = 0x9;
-        fn_80236BFC();
-        r0 = r3 & 0xFF;
-        if (r0 == (u32)0x1) {
-            r3 = r31;
-            r4 = r27;
-            r5 = 0xb7;
-            fn_80239984();
-            r0 = r3;
-            r3 = r28;
-            r31 = r0;
-            fn_80205B8C();
-            r6 = (0x1 << 16);
-            r5 = r3;
-            r4 = r27;
-            r8 = r29;
-            r6 = 0x0;
-            r7 = 0x0;
-            r9 = 0x0;
-            r10 = 0xb7;
-            fn_80239EE8();
+        if ((u8)fn_80236BFC(ctx, param3, 9) == 1) {
+            handle = fn_80239984(handle, ctx, 0xb7);
+            fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xb7);
         }
-        r3 = r27;
-        r4 = r30;
-        r5 = 0xa;
-        fn_80236BFC();
-        r0 = r3 & 0xFF;
-        if (r0 == (u32)0x1) {
-            r3 = r31;
-            r4 = r27;
-            r5 = 0xb8;
-            fn_80239984();
-            r0 = r3;
-            r3 = r28;
-            r31 = r0;
-            fn_80205B8C();
-            r6 = (0x1 << 16);
-            r5 = r3;
-            r4 = r27;
-            r8 = r29;
-            r6 = 0x0;
-            r7 = 0x0;
-            r9 = 0x0;
-            r10 = 0xb8;
-            fn_80239EE8();
+        if ((u8)fn_80236BFC(ctx, param3, 0xa) == 1) {
+            handle = fn_80239984(handle, ctx, 0xb8);
+            fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xb8);
         }
-        r3 = r27;
-        r4 = r30;
-        r5 = 0x1e;
-        fn_80236BFC();
-        r0 = r3 & 0xFF;
-        if (r0 == (u32)0x1) {
-            r3 = r31;
-            r4 = r27;
-            r5 = 0xb9;
-            fn_80239984();
-            r0 = r3;
-            r3 = r28;
-            r31 = r0;
-            fn_80205B8C();
-            r6 = (0x1 << 16);
-            r5 = r3;
-            r4 = r27;
-            r8 = r29;
-            r6 = 0x0;
-            r7 = 0x0;
-            r9 = 0x0;
-            r10 = 0xb9;
-            fn_80239EE8();
+        if ((u8)fn_80236BFC(ctx, param3, 0x1e) == 1) {
+            handle = fn_80239984(handle, ctx, 0xb9);
+            fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xb9);
+        }
     }
+    if ((u8)fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+        handle = fn_80239984(handle, ctx, 0xba);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xba);
     }
-    r4 = r27;
-    r8 = r28;
-    r3 = 0x0;
-    r5 = 0x1;
-    r6 = 0x1;
-    r7 = 0x10e;
-    fn_801F1990();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0xba;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xba;
-        fn_80239EE8();
-    }
-    r3 = r31;
-    return;
+    return handle;
 }
 
 /* Address: 0x8024B474 | Size: 0x5D0 (1488 bytes) */
@@ -13779,384 +9751,97 @@ L_8024B878:
 }
 
 /* Address: 0x8024BA44 | Size: 0x438 (1080 bytes) */
-void fightTrainerAiWazaValueSokubaku(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F4354();
-    extern void fn_801F8A18();
-    extern void fn_80205B8C();
-    extern void fn_80235BE4();
-    extern void fn_80236BFC();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r1 = (u32)sp;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueSokubaku(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_801F4354(u32, u32);
+    extern u32 fn_801F8A18(u32, u16*);
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80235BE4(void*, u32, u32, u32);
+    extern u32 fn_80236BFC(void*, u32, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u16 tmp;
+    u32 found;
+    u32 handle;
+    u32 pokemon;
+    u32 status;
 
-    r29 = r6;
-    r27 = r4;
-    r28 = r5;
-    r26 = r3;
-    r5 = r29;
-    r31 = 0x0;
-    r4 = 0x0;
-    r6 = 0x0;
-    fn_80235BE4();
-    r30 = r3;
-    r4 = r29;
-    r3 = 0x0;
-    fn_801F4354();
-    r0 = 0x0;
-    r4 = (u32)sp + 0x8;
-    *(u16*)(sp + 0x8) = r0;
-    fn_801F8A18();
-    if (r3 == (u32)0x0) {
-        r30 = 0x1;
+    handle = 0;
+    status = fn_80235BE4(ctx, 0, param3, 0);
+    pokemon = fn_801F4354(0, param3);
+    tmp = 0;
+    found = fn_801F8A18(pokemon, &tmp);
+    if (found == 0) {
+        status = 1;
     }
-    r0 = r30 & 0xFF;
-    if (r3 == (u32)0x0) {
-        r4 = r26;
-        r3 = 0x0;
-        r5 = 0x9f;
-        fn_80239984();
-        r0 = r3;
-        r3 = r27;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r26;
-        r8 = r28;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x9f;
-        fn_80239EE8();
+    if ((u8)status == 0) {
+        handle = fn_80239984(0, ctx, 0x9f);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x9f);
     }
-    r3 = r26;
-    r4 = r29;
-    r5 = 0x3;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r26;
-        r5 = 0xa0;
-        fn_80239984();
-        r0 = r3;
-        r3 = r27;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r26;
-        r8 = r28;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xa0;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 3) == 1) {
+        handle = fn_80239984(handle, ctx, 0xa0);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xa0);
     }
-    r3 = r26;
-    r4 = r29;
-    r5 = 0x4;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r26;
-        r5 = 0xa1;
-        fn_80239984();
-        r0 = r3;
-        r3 = r27;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r26;
-        r8 = r28;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xa1;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 4) == 1) {
+        handle = fn_80239984(handle, ctx, 0xa1);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xa1);
     }
-    r3 = r26;
-    r4 = r29;
-    r5 = 0x6;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r26;
-        r5 = 0xa2;
-        fn_80239984();
-        r0 = r3;
-        r3 = r27;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r26;
-        r8 = r28;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xa2;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 6) == 1) {
+        handle = fn_80239984(handle, ctx, 0xa2);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xa2);
     }
-    r3 = r26;
-    r4 = r29;
-    r5 = 0x9;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r26;
-        r5 = 0xa4;
-        fn_80239984();
-        r0 = r3;
-        r3 = r27;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r26;
-        r8 = r28;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xa4;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 9) == 1) {
+        handle = fn_80239984(handle, ctx, 0xa4);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xa4);
     }
-    r3 = r26;
-    r4 = r29;
-    r5 = 0xa;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r26;
-        r5 = 0xa5;
-        fn_80239984();
-        r0 = r3;
-        r3 = r27;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r26;
-        r8 = r28;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xa5;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 0xa) == 1) {
+        handle = fn_80239984(handle, ctx, 0xa5);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xa5);
     }
-    r3 = r26;
-    r4 = r29;
-    r5 = 0x18;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r26;
-        r5 = 0xa6;
-        fn_80239984();
-        r0 = r3;
-        r3 = r27;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r26;
-        r8 = r28;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xa6;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 0x18) == 1) {
+        handle = fn_80239984(handle, ctx, 0xa6);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xa6);
     }
-    r3 = r26;
-    r4 = r29;
-    r5 = 0x1e;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r26;
-        r5 = 0xa7;
-        fn_80239984();
-        r0 = r3;
-        r3 = r27;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r26;
-        r8 = r28;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xa7;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 0x1e) == 1) {
+        handle = fn_80239984(handle, ctx, 0xa7);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xa7);
     }
-    r3 = r26;
-    r4 = r29;
-    r5 = 0x1c;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r26;
-        r5 = 0xa3;
-        fn_80239984();
-        r0 = r3;
-        r3 = r27;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r26;
-        r8 = r28;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xa3;
-        fn_80239EE8();
+    if ((u8)fn_80236BFC(ctx, param3, 0x1c) == 1) {
+        handle = fn_80239984(handle, ctx, 0xa3);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xa3);
     }
-    r0 = r30 & 0xFF;
-    if (r0 != (u32)0x1) {
-        r3 = r31;
-        r4 = r26;
-        r5 = 0xa8;
-        fn_80239984();
-        r0 = r3;
-        r3 = r27;
-        r31 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r26;
-        r8 = r28;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0xa8;
-        fn_80239EE8();
+    if ((u8)status != 0) {
+        handle = fn_80239984(handle, ctx, 0xa8);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xa8);
     }
-    r3 = r31;
-    return;
+    return handle;
 }
 
 /* Address: 0x8024BE7C | Size: 0x144 (324 bytes) */
-void fightTrainerAiWazaValueKorogaru(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801FB1C0();
-    extern void fn_80205B8C();
-    extern void fn_80236BFC();
-    extern void fn_802387C8();
-    extern void fn_80239984();
-    extern void fightTrainerAiAddValue();
-    extern void fn_80239CCC();
-    extern void fn_80239EE8();
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueKorogaru(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern s32 fn_801FB1C0(u32, u32, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u8 fn_80236BFC(void*, u32, u32);
+    extern s32 fn_802387C8(void*, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern u32 fightTrainerAiAddValue(u32, s32);
+    extern void fn_80239CCC(u32, void*, u32, u32, u32, u32, u32, u32, s32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
+    s32 value;
+    s32 quotient;
 
-    r27 = r5;
-    r31 = r3;
-    r26 = r4;
-    r29 = 0x0;
-    r5 = 0x1a;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r4 = r31;
-        r3 = 0x0;
-        r5 = 0x9c;
-        fn_80239984();
-        r0 = r3;
-        r3 = r26;
-        r29 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r31;
-        r8 = r27;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x9c;
-        fn_80239EE8();
+    handle = 0;
+    if (fn_80236BFC(ctx, param1, 0x1a) == 1) {
+        handle = fn_80239984(0, ctx, 0x9c);
+        fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x9c);
     }
-    r3 = r31;
-    r4 = r26;
-    fn_802387C8();
-    r30 = r3;
-    r3 = 0x0;
-    r4 = 0x9d;
-    r5 = 0x3e;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r28 = (s32)r30 / (s32)r3;
-    r3 = r29;
-    r4 = r28;
-    fightTrainerAiAddValue();
-    r30 = r3;
-    r3 = r26;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r31;
-    r8 = r27;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x9d;
-    fn_80239CCC();
-    r3 = r30;
-    r4 = r31;
-    r5 = 0x9e;
-    fn_80239984();
-    r30 = r3;
-    r3 = r26;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r31;
-    r8 = r27;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x9e;
-    fn_80239EE8();
-    r3 = r30;
-    return;
+    value = fn_802387C8(ctx, param1);
+    quotient = value / fn_801FB1C0(0, 0x9d, 0x3e, 0);
+    handle = fightTrainerAiAddValue(handle, quotient);
+    fn_80239CCC(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x9d, quotient);
+    handle = fn_80239984(handle, ctx, 0x9e);
+    fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x9e);
+    return handle;
 }
 
 /* Address: 0x8024BFC0 | Size: 0x5FC (1532 bytes) */
@@ -15862,155 +11547,60 @@ u32 fightTrainerAiWazaValueKamaitati(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x8024DC7C | Size: 0x210 (528 bytes) */
-void fightTrainerAiWazaValueKiaipanti(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1C18();
-    extern void fn_80205B8C();
-    extern void fn_80236520();
-    extern void fn_80236BFC();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x50];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r24 = 0;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r1 = (u32)sp;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+u32 fightTrainerAiWazaValueKiaipanti(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fn_801F1C18(u32, void*, u32*, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u32 fn_80236520(void*, u32);
+    extern u8 fn_80236BFC(void*, u32, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 entries[8];
+    void* battleCtx;
+    u32 trainer;
+    u32 sequenceArg;
+    u32 handle;
+    u32 rawCount;
+    u32* entriesPtr;
+    u16 count;
+    u32 index;
 
-    r6 = 0x0;
-    r7 = 0x1;
-    r27 = r3;
-    r28 = r4;
-    r29 = r5;
-    r5 = (u32)sp + 0x8;
-    r4 = r27;
-    r30 = 0x0;
-    r3 = 0x0;
-    fn_801F1C18();
-    r31 = r3;
-    r3 = r27;
-    r4 = r28;
-    fn_80236520();
-    r0 = r3 & 0xFFFF;
-    if (r0 == (u32)0x117) {
-        r4 = r27;
-        r3 = 0x0;
-        r5 = 0x5b;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r30 = r0;
-        fn_80205B8C();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x5b;
-        fn_80239EE8();
+    battleCtx = ctx;
+    trainer = param1;
+    sequenceArg = param2;
+    handle = 0;
+    rawCount = fn_801F1C18(0, battleCtx, entries, 0, 1);
+    if ((fn_80236520(battleCtx, trainer) & 0xFFFF) == 0x117) {
+        handle = fn_80239984(0, battleCtx, 0x5B);
+        fn_80239EE8(0xEC64, battleCtx, fn_80205B8C(trainer), 0, 0, sequenceArg, 0, 0x5B);
     }
-    r25 = (u32)sp + 0x8;
-    r26 = r31 & 0xFFFF;
-    r24 = 0x0;
-    while (1) {
-        r0 = r24 & 0xFFFF;
-        if (r0 >= (u32)r26) break;
-        r3 = r27;
-        r4 = *(u32*)(r25 + r0);
-        r5 = 0x8;
-        fn_80236BFC();
-        r0 = r3 & 0xFF;
-        if (r0 == (u32)0x1) {
-            r3 = r30;
-            r4 = r27;
-            r5 = 0x5c;
-            fn_80239984();
-            r0 = r3;
-            r3 = r28;
-            r30 = r0;
-            fn_80205B8C();
-            r6 = (0x1 << 16);
-            r5 = r3;
-            r4 = r27;
-            r8 = r29;
-            r6 = 0x0;
-            r7 = 0x0;
-            r9 = 0x0;
-            r10 = 0x5c;
-            fn_80239EE8();
+
+    entriesPtr = entries;
+    count = rawCount;
+    index = 0;
+    while ((u16)index < count) {
+        if (fn_80236BFC(battleCtx, entriesPtr[(u16)index], 8) == 1) {
+            handle = fn_80239984(handle, battleCtx, 0x5C);
+            fn_80239EE8(0xEC64, battleCtx, fn_80205B8C(trainer), 0, 0, sequenceArg, 0, 0x5C);
             break;
         }
-        r24 = r24 + 0x1;
-
+        index++;
     }
 
-    r26 = (u32)sp + 0x8;
-    r31 = r31 & 0xFFFF;
-    r25 = 0x0;
-    while (1) {
-        r0 = r25 & 0xFFFF;
-        if (r0 >= (u32)r31) break;
-        r3 = r27;
-        r4 = *(u32*)(r26 + r0);
-        r5 = 0x7;
-        fn_80236BFC();
-        r0 = r3 & 0xFF;
-        if (r0 == (u32)0x1) {
-            r3 = r30;
-            r4 = r27;
-            r5 = 0x5d;
-            fn_80239984();
-            r0 = r3;
-            r3 = r28;
-            r30 = r0;
-            fn_80205B8C();
-            r6 = (0x1 << 16);
-            r5 = r3;
-            r4 = r27;
-            r8 = r29;
-            r6 = 0x0;
-            r7 = 0x0;
-            r9 = 0x0;
-            r10 = 0x5d;
-            fn_80239EE8();
+    entriesPtr = entries;
+    rawCount = rawCount & 0xFFFF;
+    index = 0;
+    while ((u16)index < rawCount) {
+        if (fn_80236BFC(battleCtx, entriesPtr[(u16)index], 7) == 1) {
+            handle = fn_80239984(handle, battleCtx, 0x5D);
+            fn_80239EE8(0xEC64, battleCtx, fn_80205B8C(trainer), 0, 0, sequenceArg, 0, 0x5D);
             break;
         }
-        r25 = r25 + 0x1;
-
+        index++;
     }
 
-    r3 = r30;
-    r4 = r27;
-    r5 = 0x5e;
-    fn_80239984();
-    r25 = r3;
-    r3 = r28;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r27;
-    r8 = r29;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x5e;
-    fn_80239EE8();
-    r3 = r25;
-    return;
+    handle = fn_80239984(handle, battleCtx, 0x5E);
+    fn_80239EE8(0xEC64, battleCtx, fn_80205B8C(trainer), 0, 0, sequenceArg, 0, 0x5E);
+    return handle;
 }
 
 /* Address: 0x8024DE8C | Size: 0x138 (312 bytes) */
@@ -16161,95 +11751,36 @@ u32 fn_8024E534(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x8024E578 | Size: 0x118 (280 bytes) */
-void fn_8024E578(void* ctx, u32 param1, u32 param2, u32 param3) {
+u32 fn_8024E578(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u8 lbl_80375D30[];
-    extern void fn_801F4354();
-    extern void fn_801FB1C0();
-    extern void fn_8020505C();
-    extern void fn_80205B8C();
-    extern void fn_8023A118();
-    extern s32 fn_8024E690();
-    extern void fn_8024F8B4();
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+    extern u32 fn_801F4354(u32, u32);
+    extern u32 fn_801FB1C0(u32, u32, u32, u32);
+    extern void fn_8020505C(u32, u32, u32, u32, void*, s32);
+    extern u32 fn_80205B8C(u32);
+    extern void fn_8023A118(u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, s32);
+    extern s32 fn_8024E690(void*, u32, u32, u32);
+    extern s32 fn_8024F8B4();
+    u32 choice;
+    s32 score;
+    u32 field;
 
-    r6 = 0x0;
-    r28 = r4;
-    r29 = r5;
-    r27 = r3;
-    r4 = 0x0;
-    r5 = 0x43;
-    fn_801FB1C0();
-    r4 = r3 & 0xFFFF;
-    r3 = 0x0;
-    r5 = 0x2;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r4 = r28;
-    r3 = 0x0;
-    fn_801F4354();
-    r0 = r3;
-    r3 = r27;
-    r30 = r0;
-    r4 = r28;
-    r5 = r29;
-    fn_8024F8B4();
-    if ((s32)r0 <= (s32)0) {
-        r3 = 0x0;
-        return;
+    fn_801FB1C0(0, fn_801FB1C0((u32)ctx, 0, 0x43, 0) & 0xffff, 2, 0);
+    field = fn_801F4354(0, param1);
+    score = fn_8024F8B4(ctx, param1, param2);
+    if (score <= 0) {
+        return 0;
     }
-    r3 = r28;
-    fn_80205B8C();
-    r0 = 0x0;
-    r5 = (0x1 << 16);
-    *(u32*)(sp + 0x8) = r0;
-    r0 = 0x228;
-    r7 = r3;
-    r6 = r30;
-    *(u32*)(sp + 0xC) = r0;
-    r8 = 0x0;
-    r9 = 0x0;
-    r10 = 0x0;
-    fn_8023A118();
-    r3 = r27;
-    r4 = r29;
-    r6 = r28;
-    r5 = 0x1;
-    fn_8024E690();
-    r5 = r3;
-    r0 = (s16)r5;
-    if ((s32)r0 < (s32)0) {
-        r3 = 0x0;
-        return;
+    fn_8023A118(0xec63, 0xec04, 0xec05, field, fn_80205B8C(param1), 0, 0, 0, 0, 0x228, score);
+    choice = fn_8024E690(ctx, param2, 1, param1);
+    if ((s16)choice < 0) {
+        return 0;
     }
-    r4 = (u32)lbl_80375D30;
-    r8 = (s16)r5;
-    r7 = (u32)lbl_80375D30;
-    r3 = r28;
-    r4 = 0x0;
-    r5 = 0x9;
-    r6 = 0x0;
-    fn_8020505C();
-    r3 = 0x1;
-
-    return;
+    fn_8020505C(param1, 0, 9, 0, lbl_80375D30, (s16)choice);
+    return 1;
 }
 
 /* Address: 0x8024F8B4 | Size: 0x5CC (1484 bytes) */
-void fn_8024F8B4(void* ctx, u32 param1, u32 param2, u32 param3) {
+s32 fn_8024F8B4(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fn_801F1C18();
     extern void fn_801F4354();
     extern void fn_801FB1C0();
@@ -16650,7 +12181,7 @@ void fn_8024F8B4(void* ctx, u32 param1, u32 param2, u32 param3) {
     r10 = 0x0;
     fn_8023A118();
     r3 = r24;
-    return;
+    return r3;
 }
 
 /* Address: 0x8024FE80 | Size: 0x1F0 (496 bytes) */
@@ -16861,9 +12392,9 @@ s32 fn_80250070(void* ctx, u32 param1, u32 param2, u32 param3) {
 /* Address: 0x802502EC | Size: 0x694 (1684 bytes) */
 void fn_802502EC(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u8 lbl_80375D70[];
-    extern void fn_8011FC74();
+    extern void pokemonIsDarkPokemon();
     extern void fn_80142984();
-    extern void fn_801440F0();
+    extern void itemUse2PokemonSimulation();
     extern void fn_801F0134();
     extern void fn_801F1A6C();
     extern void fn_801F1C18();
@@ -17011,7 +12542,7 @@ void fn_802502EC(void* ctx, u32 param1, u32 param2, u32 param3) {
                     r3 = (u32)sp + 0x110;
                     r4 = 0x0;
                     r7 = 0x0;
-                    fn_801440F0();
+                    itemUse2PokemonSimulation();
                     r3 = (s16)r3;
                     r0 = -r3;
                     r0 = r0 & ~r3;
@@ -17027,7 +12558,7 @@ void fn_802502EC(void* ctx, u32 param1, u32 param2, u32 param3) {
                             if (r0 == (u32)0x1) {
                                 r3 = r29;
                                 fn_80205B8C();
-                                fn_8011FC74();
+                                pokemonIsDarkPokemon();
                                 r0 = r3 & 0xFF;
                                 if (r0 == (u32)0x1) {
                                     r17 = r25 << 2;
@@ -17062,7 +12593,7 @@ void fn_802502EC(void* ctx, u32 param1, u32 param2, u32 param3) {
                             if (r0 == (u32)0x1) {
                                 r3 = r29;
                                 fn_80205B8C();
-                                fn_8011FC74();
+                                pokemonIsDarkPokemon();
                                 r0 = r3 & 0xFF;
                                 if (r0 == (u32)0x1) {
                                     r17 = r25 << 2;
@@ -17520,11 +13051,13 @@ u32 fightTrainerAiWazaDamage189(void* ctx, u32 slot, u32 param, u32 arg3) {
     u32 first;
     u32 second;
     u32 diff;
+    u32 sumBase;
 
     first = fn_802376EC(ctx, slot) & 0xffff;
     second = fn_802376EC(ctx, arg3) & 0xffff;
     diff = second - first;
-    return diff & -(second > first);
+    sumBase = first - second;
+    return diff & -((sumBase + (second ^ 0x80000000)) < sumBase);
 }
 
 /* Address: 0x802510CC | Size: 0x84 | Pattern: field_accessor */
@@ -18559,7 +14092,6 @@ u32 fightTrainerAiWazaDamage002(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80211170(void* ctx, u32 param2, u32 param1, u32 param3, u32 zero1, u32 zero2, u32 zero3, u32 zero4);
     extern u8 fn_80236BFC(void* ctx, u32 param3, u32 flag);
     u32 v1 = fn_80211170(ctx, param2, param1, param3, 0, 0, 0, 0);
-
     if (fn_80236BFC(ctx, param3, 0x21) == 1) {
         if ((u16)param2 == 0x39) {
             v1 = v1 << 1;
@@ -18586,14 +14118,15 @@ u32 fightTrainerAiWazaDamage000(void* ctx, u32 param1, u32 param2, u32 param3) {
 u32 fightTrainerAiWazaHit213(void* ctx, u32 slot, u32 param) {
     extern u32 fn_80136428(u32);
     extern u32 fn_801F54A4(u32, u32, u32, u32);
-	    extern u8 fn_80237DBC(void*, u32, u32);
-	    u32 value;
-	    u8 result;
+    extern u8 fn_80237DBC(void*, u32, u32);
+    u32 value;
+    u32 result;
 
-	    value = fn_80136428(fn_801F54A4(0, 0, 0xf, 0) & 0xFFFF);
-	    result = fn_80237DBC(ctx, slot, value & 0xFF);
-	    return result != 1;
-	}
+    value = fn_80136428(fn_801F54A4(0, 0, 0xf, 0) & 0xFFFF);
+    result = fn_80237DBC(ctx, slot, value & 0xFF);
+    result = result != 1;
+    return result;
+}
 
 /* Address: 0x802539BC | Size: 0xC4 (196 bytes) */
 u32 fightTrainerAiWazaHit212(void* ctx, u32 param1, u32 param2, u32 param3) {
@@ -19560,7 +15093,7 @@ s32 fightTrainerAiWazaHit177(void* ctx, u32 param1, u32 param2, u32 param3) {
         return 0;
     }
     if (fn_80237F74(ctx, param3, 0x3c) == 1) {
-        return 0;
+        goto ret0;
     }
     return 1;
 ret0:
@@ -20378,7 +15911,7 @@ int fightTrainerAiWazaHit136(void)
 s32 fightTrainerAiWazaHit135(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80205B8C(u32 v);
     extern void fn_80120B00(u32, void*, void*);
-    extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
+    extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, s16 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
     u16 hi;
     u16 lo;
@@ -20386,7 +15919,7 @@ s32 fightTrainerAiWazaHit135(void* ctx, u32 param1, u32 param2, u32 param3) {
 
     fn_80120B00(fn_80205B8C(param1), &hi, &lo);
     gate = fn_8025C264(ctx, param1, param2, param3, 0);
-    if (fn_8023793C(ctx, param3, lo, hi) == 0x43) {
+    if (fn_8023793C(ctx, param3, lo, (s16)hi) == 0x43) {
         gate = 0;
     }
     if (gate == 0) {
@@ -21198,18 +16731,24 @@ s32 fightTrainerAiWazaHit102(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u8 fn_80238748(void* ctx, u32 elem);
     u32 buf[0x17];
     u32 count = fn_801F1A6C(0, ctx, buf, 1, 1);
-    u16 target = (u16)param2;
-    u8 flag = 0;
+    u16 count16;
+    u16 target;
+    u32 *bufPtr;
     u16 i;
+    u8 flag;
 
-    for (i = 0; i < (u16)count; i++) {
-        if (buf[i] == 0) {
+    bufPtr = buf;
+    count16 = (u16)count;
+    target = (u16)param2;
+    flag = 0;
+    for (i = 0; i < count16; i++) {
+        if (bufPtr[i] == 0) {
             continue;
         }
-        if (target == 0xd7 && fn_80239058(ctx, buf[i], 0x2b) == 1) {
+        if (target == 0xd7 && fn_80239058(ctx, bufPtr[i], 0x2b) == 1) {
             continue;
         }
-        if (fn_80238748(ctx, buf[i]) != 0) {
+        if (fn_80238748(ctx, bufPtr[i]) != 0) {
             continue;
         }
         flag = 1;
@@ -21347,13 +16886,13 @@ s32 fightTrainerAiWazaHit097(void* ctx, u32 param1, u32 param2, u32 param3) {
 
 /* Address: 0x80257FC8 | Size: 0xF4 (244 bytes) */
 s32 fightTrainerAiWazaHit095(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u16 fn_802367CC(void* ctx, u32 param1, void* buf, u32 zero1, u32 zero2);
-    extern u16 fn_80236458(void* ctx, u32 param3);
+    extern u32 fn_802367CC(void* ctx, u32 param1, void* buf, u32 zero1, u32 zero2);
+    extern u32 fn_80236458(void* ctx, u32 param3);
     extern u8 fn_80236BFC(void* ctx, u32 a, u32 type);
     extern u8 fn_80219270(u32 elem);
     u16 buf[0xa];
-    u16 count = fn_802367CC(ctx, param1, buf, 0, 0);
-    u16 target = fn_80236458(ctx, param3);
+    u32 count = fn_802367CC(ctx, param1, buf, 0, 0);
+    u32 target = fn_80236458(ctx, param3);
     u16 i;
 
     if (fn_80236BFC(ctx, param3, 0x14) == 1) {
@@ -21362,17 +16901,18 @@ s32 fightTrainerAiWazaHit095(void* ctx, u32 param1, u32 param2, u32 param3) {
     if (fn_80236BFC(ctx, param1, 0x10) == 1) {
         goto ret0;
     }
-    if (fn_80219270(target) == 1) {
-        return 0;
+    if (fn_80219270(target) != 1) {
+        goto scan;
     }
-    for (i = 0; i < count; i++) {
-        if (buf[i] == target) {
+ret0:
+    return 0;
+scan:
+    for (i = 0; i < (u16)count; i++) {
+        if (buf[i] == (u16)target) {
             return 0;
         }
     }
     return 1;
-ret0:
-    return 0;
 }
 
 /* -------------------------------------------------------------------
@@ -24138,7 +19678,7 @@ u32 fn_8025C770(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x8025C808 | Size: 0x2A0 (672 bytes) */
-void fn_8025C808(void* ctx, u32 param1, u32 param2, u32 param3) {
+u32 fn_8025C808(void* ctx, u32 param1, u32 param2, u32 param3, u32 param4, u32 param5, u32 param6) {
     extern void fn_801F025C();
     extern void fn_801F6E98();
     extern void fn_801FB1C0();
@@ -24149,9 +19689,9 @@ void fn_8025C808(void* ctx, u32 param1, u32 param2, u32 param3) {
     u8 sp[0x40];
     u32 r0 = 0;
     u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
+    u32 r7 = param4;
+    u32 r8 = param5;
+    u32 r9 = param6;
     u32 r21 = 0;
     u32 r22 = 0;
     u32 r23 = 0;
@@ -24220,7 +19760,7 @@ void fn_8025C808(void* ctx, u32 param1, u32 param2, u32 param3) {
                 r0 = r24 & 0xFFFF;
                 if (r0 != (u32)0xae) {
                     r3 = 0x0;
-                    return;
+                    return r3;
         }
         }
         }
@@ -24259,7 +19799,7 @@ void fn_8025C808(void* ctx, u32 param1, u32 param2, u32 param3) {
             r0 = r0 & 0xFF;
 
             r3 = 0x0;
-            return;
+            return r3;
         }
         r3 = r22;
         r4 = r30;
@@ -24279,7 +19819,7 @@ void fn_8025C808(void* ctx, u32 param1, u32 param2, u32 param3) {
             r0 = r24 & 0xFFFF;
 
             r3 = 0x0;
-            return;
+            return r3;
             }
         r3 = r22;
         r4 = r30;
@@ -24292,7 +19832,7 @@ void fn_8025C808(void* ctx, u32 param1, u32 param2, u32 param3) {
                 r0 = r29 & 0xFFFF;
                 if (r0 == (u32)0xeb) {
                     r3 = 0x0;
-                    return;
+                    return r3;
         }
         }
         }
@@ -24307,7 +19847,7 @@ void fn_8025C808(void* ctx, u32 param1, u32 param2, u32 param3) {
                 r0 = r29 & 0xFFFF;
                 if (r0 == (u32)0xe6) {
                     r3 = 0x0;
-                    return;
+                    return r3;
         }
         }
         }
@@ -24320,21 +19860,21 @@ void fn_8025C808(void* ctx, u32 param1, u32 param2, u32 param3) {
             r0 = r31 & 0x1F;
             if (r0 == (u32)0x1) {
                 r3 = 0x0;
-                return;
+                return r3;
         }
         }
         r0 = (s8)r26;
-        if (r0 > (u32)0x1) { r3 = 0x1; return; }
+        if (r0 > (u32)0x1) { r3 = 0x1; return r3; }
         r3 = 0x0;
-        return;
+        return r3;
     }
-    if ((s32)r26 < (s32)0xc) { r3 = 0x1; return; }
+    if ((s32)r26 < (s32)0xc) { r3 = 0x1; return r3; }
     r3 = 0x0;
-    return;
+    return r3;
 
     r3 = 0x1;
 
-    return;
+    return r3;
 }
 
 /* Address: 0x8025CAA8 | Size: 0x94 */
@@ -24705,6 +20245,8 @@ f32 fn_8025D0A8(void* ctx, u32 param1, u32 param2) {
     u32 count;
     u32 i;
     u32 offset;
+    u32 masked;
+    u16 idx;
     u16 species;
     u16 entry;
     f32 scale;
@@ -25165,19 +20707,19 @@ u32 fn_8025D808(void* ctx, u32 param1, u32 param2) {
     extern void* fn_8012AC08(void*, u32);
     u32 r0;
     u32 r3;
-    u32 r28;
+    u32 r29;
     u32 r30;
     u32 r31;
     void* saved;
 
-    r3 = fn_8006B1D4(ctx);
-    r30 = 0;
     saved = ctx;
-    r31 = r30;
-    r28 = r3 & 0xFFFF;
+    r3 = fn_8006B1D4(saved);
+    r31 = r3 & 0xFFFF;
+    r30 = 0;
+    r29 = 0;
     do {
         r3 = (u32)fn_8006B09C(saved);
-        r3 = (u32)fn_8012AC08((void *)(r3 + 0xb44), r31 & 0xFFFF);
+        r3 = (u32)fn_8012AC08((void *)(r3 + 0xb44), r29 & 0xFFFF);
         r3 = fn_80123FBC((void *)r3);
         r3 = r3 & 0xFF;
         r0 = r3 != 0;
@@ -25187,11 +20729,11 @@ u32 fn_8025D808(void* ctx, u32 param1, u32 param2) {
             r0 = r3 + 0x1;
             r30 = r0 & 0xFFFF;
         }
-        r31 = r31 + 0x1;
-    } while ((s32)r31 < (s32)0x6);
+        r29 = r29 + 0x1;
+    } while ((s32)r29 < (s32)0x6);
     r0 = r30 & 0xFFFF;
-    r3 = r28;
-    if (r0 < r28) {
+    r3 = r31;
+    if (r0 < r31) {
         r3 = r30;
     }
     return r3;
@@ -25514,14 +21056,13 @@ u32 fn_8025DF38(int *r3,u32 r4,u16 *r5,int r6)
     extern u32 fn_8011538C();
     extern int fn_80115BD8();
     extern u32 fn_8018F470();
-    extern s8 fn_801DDD28();
+    extern u8 fn_801DDD28();
     extern int fn_801DE190();
-  BOOL bVar1;
   u32 uVar2;
   int iVar3;
-  s8 cVar8;
+  u8 cVar8;
   int iVar4;
-  int iVar5;
+  u32 iVar5;
   u32 uVar6;
   u32 uVar7;
   int iVar9;
@@ -25531,7 +21072,7 @@ u32 fn_8025DF38(int *r3,u32 r4,u16 *r5,int r6)
   uVar2 = _fadeEffectGetRandom__FUl(0xffffffff);
   iVar3 = fn_801DE190(r4,uVar2,0);
   *r3 = iVar3;
-  if (iVar3 == 0) {
+  if ((u32)iVar3 == 0) {
     uVar2 = 0;
   }
   else {
@@ -25542,7 +21083,7 @@ u32 fn_8025DF38(int *r3,u32 r4,u16 *r5,int r6)
       }
       r5 = r5 + 2;
     }
-    if (((r3 != (int *)0x0) && (*r3 != 0)) && (iVar3 = fn_801DAC3C(), iVar3 != 0)) {
+    if (((r3 != (int *)0x0) && (*(u32 *)r3 != 0)) && (iVar3 = fn_801DAC3C(), iVar3 != 0)) {
       fn_800E90C8(iVar3,1);
       iVar4 = fn_80115BD8();
       if (iVar4 != 0) {
@@ -25551,17 +21092,14 @@ u32 fn_8025DF38(int *r3,u32 r4,u16 *r5,int r6)
         iVar9 = 0;
         iVar10 = 0;
         if (iVar5 == 1) {
-          bVar1 = 0;
-          while (!bVar1) {
-            uVar6 = fn_8011538C(iVar4,0);
-            uVar7 = fn_800FF56C();
-            iVar5 = floorGetResource(uVar7,uVar6);
-            if (iVar5 != 0) {
-              *(int *)((int)local_68 + iVar10) = iVar5;
+          for (uVar7 = 0; uVar7 < iVar5; uVar7 = uVar7 + 1) {
+            uVar6 = fn_8011538C(iVar4,uVar7);
+            uVar6 = floorGetResource(fn_800FF56C(),uVar6);
+            if (uVar6 != 0) {
+              *(int *)((int)local_68 + iVar10) = uVar6;
               iVar9 = iVar9 + 1;
               iVar10 = iVar10 + 4;
             }
-            bVar1 = 1;
           }
           fn_800E9108(iVar3,1);
           fn_800E8FE8(iVar3,uVar2);
@@ -25771,60 +21309,37 @@ u32 fn_8025E640(u32 r3,int r4)
     extern int fn_80132A38();
     extern int fn_80165668();
     /* fn_802600E4 forward-declared at file scope */
-  u8 bVar11;
+  u32 bVar11;
   int iVar1;
   u32 uVar2;
-  short sVar5;
-  short sVar6;
-  short sVar7;
-  short sVar8;
-  short sVar9;
-  short sVar10;
   u32 uVar3;
-  u8 cVar6;
   s8 cVar12;
   u32 uVar4;
   u32 uVar13;
-  char local_58;
-  u8 local_57 [3];
-  u8 local_54 [2];
-  short local_52;
-  short local_50;
-  short local_4e;
-  short local_4c;
-  short local_4a;
-  short local_48;
-  u8 local_44 [2];
-  short local_42;
-  short local_40;
-  short local_3e;
-  short local_3c;
-  short local_3a;
-  short local_38;
+  u8 local_57[3];
+  u8 local_54[4];
+  u8 local_44[4];
+  u8 local_58[4];
   
   uVar13 = 0;
-  local_58 = '\0';
+  local_58[0] = '\0';
   fn_8012640C(r3,0,0x7a,0);
   while (1) {
     if (r4 == 0) {
       fn_801254B4(r3,0,0xc6,0,0);
       return uVar13;
     }
-    bVar11 = (int)fn_8012640C(r3,0,0x7a,0);
-    if (99 < bVar11) break;
+    bVar11 = (u8)fn_8012640C(r3,0,0x7a,0);
+    if (bVar11 > 99) break;
     iVar1 = (int)fn_8012640C(r3,0,0x79,0);
     uVar2 = fn_801229F4(r3,bVar11 + 1);
-    sVar5 = (int)fn_8012640C(r3,0,0x87,0);
-    sVar6 = (int)fn_8012640C(r3,0,0x88,0);
-    sVar7 = (int)fn_8012640C(r3,0,0x89,0);
-    sVar8 = (int)fn_8012640C(r3,0,0x8a,0);
-    sVar9 = (int)fn_8012640C(r3,0,0x8b,0);
-    sVar10 = (int)fn_8012640C(r3,0,0x8c,0);
-    if ((u32)(iVar1 + r4) < uVar2) {
-      r4 = 0;
-      fn_801254B4(r3,0,0x79,0);
-    }
-    else {
+    fn_8012640C(r3,0,0x87,0);
+    fn_8012640C(r3,0,0x88,0);
+    fn_8012640C(r3,0,0x89,0);
+    fn_8012640C(r3,0,0x8a,0);
+    fn_8012640C(r3,0,0x8b,0);
+    fn_8012640C(r3,0,0x8c,0);
+    if ((u32)(iVar1 + r4) >= uVar2) {
       r4 = (iVar1 + r4) - uVar2;
       uVar13 = 1;
       fn_8011DE98(r3,uVar2);
@@ -25835,32 +21350,30 @@ u32 fn_8025E640(u32 r3,int r4)
       fn_80165668(0x4ca,0,0xff);
       fn_80132A38(0x2f,uVar2 & 0xff);
       fn_801067E8(0x44ce,1,0);
-      local_52 = (int)fn_8012640C(r3,0,0x87,0);
-      local_50 = (int)fn_8012640C(r3,0,0x88,0);
-      local_4e = (int)fn_8012640C(r3,0,0x89,0);
-      local_4a = (int)fn_8012640C(r3,0,0x8a,0);
-      local_48 = (int)fn_8012640C(r3,0,0x8b,0);
-      local_4c = (int)fn_8012640C(r3,0,0x8c,0);
-      local_3c = local_4c - sVar10;
-      local_42 = local_52 - sVar5;
-      local_40 = local_50 - sVar6;
-      local_3e = local_4e - sVar7;
-      local_3a = local_4a - sVar8;
-      local_38 = local_48 - sVar9;
+      fn_8012640C(r3,0,0x87,0);
+      fn_8012640C(r3,0,0x88,0);
+      fn_8012640C(r3,0,0x89,0);
+      fn_8012640C(r3,0,0x8a,0);
+      fn_8012640C(r3,0,0x8b,0);
+      fn_8012640C(r3,0,0x8c,0);
       local_44[0] = 1;
       fn_80105E7C(local_44,1);
       local_54[0] = 0;
       fn_80105E7C(local_54,1);
       fn_80105C68(1);
-      local_58 = '\0';
-      while (uVar4 = fn_801236F8(r3,uVar2,&local_58), (uVar4 & 0xffff) != 0) {
+      local_58[0] = '\0';
+      while (uVar4 = fn_801236F8(r3,uVar2,local_58), (uVar4 & 0xffff) != 0) {
         cVar12 = fn_80123B5C(r3,uVar4);
         if ((cVar12 == -1) &&
            (iVar1 = fn_802600E4(r3,uVar4,local_57,0,0x8025e3b0,0), iVar1 != 0)) {
           fn_80123D58(r3,local_57[0],uVar4);
         }
-        local_58 = local_58 + '\x01';
+        local_58[0] = local_58[0] + 1;
       }
+    }
+    else {
+      r4 = 0;
+      fn_801254B4(r3,0,0x79,0);
     }
   }
   return uVar13;
@@ -25911,7 +21424,7 @@ void fn_8025EF58(void)
       uVar3 = fn_8012AC08(uVar2,uVar8);
       cVar7 = fn_80123FBC();
       if (cVar7 != '\0') {
-        cVar7 = fn_8011FC74(uVar3);
+        cVar7 = pokemonIsDarkPokemon(uVar3);
         if (cVar7 == '\x01') {
           fn_8011EE40(uVar3);
           cVar7 = fn_801EEC74();
@@ -25982,7 +21495,7 @@ void fn_8025EF58(void)
       sVar6 = fn_801CAF0C();
       if (sVar6 == 0) {
         lbl_8047B668 = 0xffffffff;
-        lbl_8047B66C = 0xffffffff;
+        ((u32*)&lbl_8047B668)[1] = 0xffffffff;
       }
       else {
         fn_801067E8(0x3b0f,1,0);
@@ -26007,7 +21520,7 @@ void fn_8025EF58(void)
     }
     else {
       lbl_8047B668 = 0xffffffff;
-      lbl_8047B66C = 0xffffffff;
+      ((u32*)&lbl_8047B668)[1] = 0xffffffff;
     }
   }
   return;
@@ -26112,12 +21625,14 @@ asm void fn_8025F3F4(void) {
 }
 #endif
 #pragma pop
+#pragma push
+#pragma peephole off
 u32 fn_8025F3F4(int r3, u32 r4) {
   int idx;
   u8 *entry;
-  u32 result;
-  idx = r3;
-  entry = lbl_804783E0 + idx * 0x100;
+  s32 result;
+	  idx = r3;
+	  entry = lbl_804783E0 + idx * 0x100;
   if (*(u32 *)(entry + 0x1C) != 0) {
     result = 2;
   } else {
@@ -26131,6 +21646,7 @@ u32 fn_8025F3F4(int r3, u32 r4) {
   }
   return result;
 }
+#pragma pop
 
 #pragma push
 #pragma optimization_level 0
@@ -26141,10 +21657,12 @@ asm void fn_8025F484(void) {
 }
 #endif
 #pragma pop
+#pragma push
+#pragma peephole off
 u32 fn_8025F484(int r3, u32 r4) {
   int idx;
   u8 *entry;
-  u32 result;
+  s32 result;
   idx = r3;
   entry = lbl_804783E0 + idx * 0x100;
   if (*(u32 *)(entry + 0x1C) != 0) {
@@ -26160,6 +21678,7 @@ u32 fn_8025F484(int r3, u32 r4) {
   }
   return result;
 }
+#pragma pop
 
 #pragma push
 #pragma optimization_level 0
@@ -26199,10 +21718,12 @@ asm void GBARead(void) {
 }
 #endif
 #pragma pop
+#pragma push
+#pragma peephole off
 u32 GBARead(int r3, u32 r4, u32 r5) {
   int idx;
   u8 *entry;
-  u32 result;
+  s32 result;
   idx = r3;
   entry = lbl_804783E0 + idx * 0x100;
   if (*(u32 *)(entry + 0x1C) != 0) {
@@ -26219,6 +21740,7 @@ u32 GBARead(int r3, u32 r4, u32 r5) {
   }
   return result;
 }
+#pragma pop
 
 #pragma push
 #pragma optimization_level 0
@@ -26245,12 +21767,15 @@ asm void fn_8025F648(void) {
 }
 #endif
 #pragma pop
+#pragma push
+#pragma peephole off
+#pragma optimize_for_size off
 u32 GBAWrite(int r3, u32 r4, u32 r5) {
   int idx;
   u32 r29;
   u32 r30;
   u8 *entry;
-  u32 result;
+  s32 result;
   idx = r3;
   r29 = r4;
   r30 = r5;
@@ -26270,6 +21795,7 @@ u32 GBAWrite(int r3, u32 r4, u32 r5) {
   }
   return result;
 }
+#pragma pop
 
 /* Address: 0x8025F70C | Size: 0xDC | Ghidra import */
 void __GBAHandler(int chan, u32 status, void* currentContext)
@@ -26317,6 +21843,8 @@ void __GBASyncCallback(int r3)
 }
 
 /* Address: 0x8025F81C | Size: 0x6C | Ghidra import */
+#pragma push
+#pragma optimize_for_size off
 u32 __GBASync(int r3)
 
 {
@@ -26336,6 +21864,7 @@ u32 __GBASync(int r3)
   OSRestoreInterrupts(interrupts);
   return status;
 }
+#pragma pop
 
 /* Address: 0x8025F888 | Size: 0x124 | Ghidra import */
 void TypeAndStatusCallback(int r3,u32 r4)
@@ -26565,29 +22094,28 @@ asm void fn_8025FD34(void) {
 #endif
 #pragma pop
 u32 fn_8025FD34(u16 *r3, u16 r4) {
-  u16 *queue;
-  u16 *countQueue;
-  u16 count;
-  s32 lookup;
-  u32 i;
-  u32 r5;
-  s32 r0;
+	  u16 *queue;
+	  u16 *countQueue;
+	  u32 count;
+	  u32 r5;
+	  u32 i;
+	  s32 r0;
   queue = r3;
   if (queue == (u16 *)0) {
     queue = (u16 *)fn_80129280(0, 0xC);
   }
   countQueue = queue;
-  if (queue == (u16 *)0) {
-    countQueue = (u16 *)fn_80129280(0, 0xC);
-  }
-  count = *countQueue;
-	  lookup = (u16)r4;
+	  if (queue == (u16 *)0) {
+	    countQueue = (u16 *)fn_80129280(0, 0xC);
+	  }
+	  count = (u32)*countQueue;
 	  for (i = 0; (u32)(u16)i < (u32)count; i = i + 1) {
-	    r5 = (i & 0xffff) * 12;
-	    r0 = r5 + 4;
-	    r0 = (u32)*(u16 *)((u8 *)queue + r0) & 0x3FFF;
-	    if (r0 == lookup) {
-	      return *(u32 *)((u8 *)queue + r5 + 8);
+    r5 = (i & 0xffff) * 12;
+    r0 = r5 + 4;
+    r0 = (u32)*(u16 *)((u8 *)queue + r0) & 0x3FFF;
+		    if (r0 == (u16)r4) {
+	      r0 = r5 + 8;
+	      return *(u32 *)((u8 *)queue + r0);
 	    }
   }
   return 0;
@@ -26605,10 +22133,9 @@ asm void fn_8025FDDC(void) {
 u32 fn_8025FDDC(u16 *r3, u16 r4) {
   u16 *queue;
   u16 *countQueue;
-  u16 count;
-  s32 lookup;
-  u32 i;
   u32 r5;
+  u32 i;
+  u32 count;
   s32 r0;
   queue = r3;
   if (queue == (u16 *)0) {
@@ -26618,14 +22145,14 @@ u32 fn_8025FDDC(u16 *r3, u16 r4) {
   if (queue == (u16 *)0) {
     countQueue = (u16 *)fn_80129280(0, 0xC);
   }
-  count = *countQueue;
-	  lookup = (u16)r4;
+  count = (u32)*countQueue;
 	  for (i = 0; (u32)(u16)i < (u32)count; i = i + 1) {
 	    r5 = (i & 0xffff) * 12;
 	    r0 = r5 + 4;
 	    r0 = (u32)*(u16 *)((u8 *)queue + r0) & 0x3FFF;
-	    if (r0 == lookup) {
-	      return *(u32 *)((u8 *)queue + r5 + 0xC);
+	    if (r0 == (u16)r4) {
+	      r0 = r5 + 0xC;
+	      return *(u32 *)((u8 *)queue + r0);
 	    }
   }
   return 0;
@@ -26692,36 +22219,32 @@ asm void fn_8025FF9C(void) {
 #endif
 #pragma pop
 void memoDataSet(u16 *r3, u32 r4) {
-	  u16 *queue;
-	  u32 r30;
-	  u16 count;
-	  u32 lookup;
-	  u32 r5;
-	  u32 i;
-  u32 r0;
-  u32 new_entry_off;
-  u8 *new_entry;
-  queue = r3;
+			  u16 *queue;
+			  u32 r30;
+			  u32 count;
+			  u32 lookup;
+			  u32 r5;
+			  u32 i;
+		  u32 r0;
+	  queue = r3;
   r30 = r4;
 	  if (queue == (u16 *)0) {
 	    queue = (u16 *)fn_80129280(0, 0xC);
 	  }
-	  lookup = (u32)(u16)fn_8011F5C8(r30);
-  count = *queue;
-  for (i = 0; (u32)(u16)i < (u32)count; i = i + 1) {
-    r5 = (i & 0xffff) * 12;
-    r0 = (u32)*(u16 *)((u8 *)queue + r5 + 4) & 0x3FFF;
-    if (r0 == lookup) {
-      return;
-    }
-	  }
-	  new_entry_off = (u32)count * 12;
-	  new_entry = (u8 *)queue + new_entry_off;
-	  *(u16 *)(new_entry + 4) = (u16)(lookup | 0x8000);
-	  r5 = fn_8011F5B0(r30);
-	  *(u32 *)((u8 *)queue + ((u32)*queue * 12 + 0xC)) = r5;
-	  r5 = fn_8011F520(r30);
-	  *(u32 *)((u8 *)queue + ((u32)*queue * 12 + 0x8)) = r5;
+		  lookup = fn_8011F5C8(r30) & 0xffff;
+		  count = *queue;
+		  for (i = 0; (u32)(u16)i < (u32)count; i = i + 1) {
+		    r5 = (i & 0xffff) * 12;
+		    r0 = (u32)*(u16 *)((u8 *)queue + r5 + 4) & 0x3FFF;
+		    if (r0 == lookup) {
+		      return;
+		    }
+			  }
+					  *(u16 *)((u8 *)queue + ((u32)count * 12 + 4)) = (u16)(lookup | 0x8000);
+				  r5 = fn_8011F5B0(r30);
+				  *(u32 *)((u8 *)queue + ((u32)*queue * 12 + 0xC)) = r5;
+				  r5 = fn_8011F520(r30);
+				  *(u32 *)((u8 *)queue + ((u32)*queue * 12 + 0x8)) = r5;
 	  *queue = (u16)(*queue + 1);
 	}
 
@@ -26735,11 +22258,11 @@ asm void fn_80260070(void) {
 #endif
 #pragma pop
 void fn_80260070(u16 *r3) {
-  u16 *r29;
-  u32 r30;
-  s32 r27;
   u32 r31;
+  u32 r30;
+  u16 *r29;
   u8 *r28;
+  s32 r27;
   r29 = r3;
   if (r29 == (u16 *)0) {
     r29 = (u16 *)fn_80129280(0, 0xC);
@@ -27229,13 +22752,17 @@ u32 charNameBiosSearchIndex(u32 value)
     extern u32 *lbl_80478F84;
     u32 count;
     u32 *table;
-    u16 i;
+    u32 i;
+    u32 offset;
+    u16 idx;
 
     count = *lbl_80478F80;
     table = lbl_80478F84;
-    for (i = 0; i < count; i++) {
-        if (table[(u32)i * 2 + 1] == value) {
-            return i;
+    for (i = 0; (u16)i < count; i++) {
+        offset = ((u16)i) << 3;
+        idx = (u16)i;
+        if (*(u32 *)((u8 *)table + offset + 4) == value) {
+            return idx;
         }
     }
     return 0;
@@ -27382,18 +22909,17 @@ void fn_802615F4(short *r3)
     extern int fn_801DAEF8();
     extern u32 fn_801DE418();
     extern int fn_801F198C();
-  BOOL bVar1;
   u32 uVar2;
   u32 uVar3;
-  short sVar4;
-  short sVar6;
+  int sVar4;
+  int sVar6;
   int *piVar5;
   
   fn_801DAEF8(10);
   sVar6 = *r3;
   piVar5 = (int *)(r3 + 0x24);
   sVar4 = r3[1];
-  while (bVar1 = sVar6 != 0, sVar6 = sVar6 + -1, bVar1) {
+  while (sVar6 != 0) {
     uVar3 = fn_801DE418(*(u16 *)(piVar5 + 1));
     *(u32 *)(*piVar5 + 0x27c0) = uVar3;
     *(u32 *)piVar5[2] = uVar3;
@@ -27401,8 +22927,9 @@ void fn_802615F4(short *r3)
     fn_800E9B2C(uVar2,piVar5 + 3);
     fn_801DA224(uVar3,*(u8 *)((int)piVar5 + 6));
     piVar5 = piVar5 + 0x1e;
+    sVar6 = sVar6 + -1;
   }
-  while (bVar1 = sVar4 != 0, sVar4 = sVar4 + -1, bVar1) {
+  while (sVar4 != 0) {
     uVar3 = fn_801DE190(*(u16 *)(piVar5 + 1),piVar5[2],*(u8 *)((int)piVar5 + 7));
     *(u32 *)(*piVar5 + 0x600) = uVar3;
     *(u32 *)piVar5[3] = uVar3;
@@ -27412,6 +22939,7 @@ void fn_802615F4(short *r3)
     uVar2 = fn_800E3D08(uVar2);
     fn_801DA4E8(uVar3,uVar2);
     piVar5 = piVar5 + 0x1f;
+    sVar4 = sVar4 + -1;
   }
   uVar3 = fn_801C3108();
   fn_800054F4(uVar3,r3 + 2,0x44);
@@ -27428,66 +22956,71 @@ u32 fn_80261708(u32 r3,u32 r4,char *r5)
     extern int fn_800E9C6C();
     extern u8 fn_801D9E1C();
     extern u8 fn_801DA354();
-    extern short fn_801DAC78();
+    extern u16 fn_801DAC78();
     extern int fn_801DB100();
     extern u32 fn_801DE164();
   int iVar1;
-  int iVar2;
-  short sVar5;
+  u32 *puVar9;
+  u32 iVar2;
+  u16 sVar5;
   u8 uVar6;
   u32 uVar3;
-  int iVar4;
-  int iVar7;
-  int iVar8;
-  u32 *puVar9;
-  int iVar10;
+	  int iVar8;
+	  int iVar4;
+	  int iVar7;
+	  int iVar10;
+	  int base;
   
-  iVar2 = (int)fn_8012640C(r3,0,0xee,0);
-  if ((iVar2 != 0) && (sVar5 = fn_801DAC78(), sVar5 != 0)) {
-    if (*r5 != '\0') {
-      puVar9 = *(u32 **)(r5 + 8);
-      *puVar9 = r3;
-      *(short *)(puVar9 + 1) = sVar5;
-      uVar6 = fn_801DA354(iVar2);
-      *(u8 *)((int)puVar9 + 6) = uVar6;
-      uVar6 = fn_801D9E1C(iVar2);
-      *(u8 *)((int)puVar9 + 7) = uVar6;
-      uVar3 = fn_801DE164(iVar2);
-      puVar9[2] = uVar3;
-      if (iVar2 == 0) {
-        iVar1 = 0;
-      }
-      else {
-        iVar8 = 0;
-        iVar4 = 0;
-        do {
-          iVar7 = 0;
-          iVar10 = 2;
-          do {
-            iVar1 = *(int *)(r5 + 4) + iVar4 + iVar7;
-            if (*(int *)(iVar1 + 4) == iVar2) {
-              iVar1 = iVar1 + 4;
-              goto LAB_0025e7f4;
-            }
-            iVar7 = iVar7 + 4;
-            iVar10 = iVar10 + -1;
-          } while (iVar10 != 0);
-          iVar8 = iVar8 + 1;
-          iVar4 = iVar4 + 0x10;
-        } while (iVar8 < 4);
-        iVar1 = 0;
-      }
-LAB_0025e7f4:
-      puVar9[3] = iVar1;
-      uVar3 = fn_801DAC3C(iVar2);
-      fn_800E9C6C(uVar3,puVar9 + 4);
-      *(int *)(r5 + 8) = *(int *)(r5 + 8) + 0x7c;
-    }
-    if (r5[1] != '\0') {
-      fn_801DB100(iVar2);
-    }
-    *(short *)(r5 + 2) = *(short *)(r5 + 2) + 1;
+  iVar2 = (u32)fn_8012640C(r3,0,0xee,0);
+  if (iVar2 == 0) {
+    return 1;
   }
+  sVar5 = fn_801DAC78();
+  if (sVar5 == 0) {
+    return 1;
+  }
+  if (*r5 != '\0') {
+    puVar9 = *(u32 **)(r5 + 8);
+    *puVar9 = r3;
+    *(short *)(puVar9 + 1) = sVar5;
+    uVar6 = fn_801DA354(iVar2);
+    *(u8 *)((int)puVar9 + 6) = uVar6;
+    uVar6 = fn_801D9E1C(iVar2);
+    *(u8 *)((int)puVar9 + 7) = uVar6;
+    uVar3 = fn_801DE164(iVar2);
+    puVar9[2] = uVar3;
+    base = *(int *)(r5 + 4);
+    if (iVar2 == 0) {
+      iVar1 = 0;
+    }
+    else {
+		      iVar8 = 0;
+		      iVar4 = 0;
+		      do {
+		        iVar7 = 0;
+		        for (iVar10 = 2; iVar10 != 0; iVar10--) {
+		          iVar1 = base + iVar4 + iVar7;
+	          if (*(int *)(iVar1 + 4) == iVar2) {
+	            iVar1 = iVar1 + 4;
+	            goto LAB_0025e7f4;
+          }
+          iVar7 = iVar7 + 4;
+        }
+        iVar8 = iVar8 + 1;
+        iVar4 = iVar4 + 0x10;
+      } while (iVar8 < 4);
+      iVar1 = 0;
+    }
+LAB_0025e7f4:
+    puVar9[3] = iVar1;
+    uVar3 = fn_801DAC3C(iVar2);
+    fn_800E9C6C(uVar3,puVar9 + 4);
+    *(int *)(r5 + 8) = *(int *)(r5 + 8) + 0x7c;
+  }
+  if (r5[1] != '\0') {
+    fn_801DB100(iVar2);
+  }
+  *(u16 *)(r5 + 2) = *(u16 *)(r5 + 2) + 1;
   return 1;
 }
 
@@ -27495,48 +23028,53 @@ LAB_0025e7f4:
 u32 fn_8026184C(u32 r3,u32 r4,char *r5)
 
 {
-  int iVar1;
-  short sVar4;
+  u32 *puVar7;
+  u32 iVar1;
+  int sVar4;
   u8 uVar5;
   int iVar2;
   u32 uVar3;
   int *piVar6;
-  u32 *puVar7;
+  int base;
   int iVar8;
   
   iVar1 = fn_801FB1C0(r3,0,0x4c,0);
-  if ((iVar1 != 0) && (sVar4 = fn_801DAC78(), sVar4 != 0)) {
-    if (*r5 != '\0') {
-      puVar7 = *(u32 **)(r5 + 8);
-      *puVar7 = r3;
-      *(short *)(puVar7 + 1) = sVar4;
-      uVar5 = fn_801DA354(iVar1);
-      *(u8 *)((int)puVar7 + 6) = uVar5;
-      if (iVar1 == 0) {
-        piVar6 = (int *)0x0;
-      }
-      else {
-        iVar2 = 0;
-        iVar8 = 4;
-        do {
-          piVar6 = (int *)(*(int *)(r5 + 4) + iVar2);
-          if (*piVar6 == iVar1) goto LAB_0025e8fc;
-          iVar2 = iVar2 + 0x10;
-          iVar8 = iVar8 + -1;
-        } while (iVar8 != 0);
-        piVar6 = (int *)0x0;
-      }
-LAB_0025e8fc:
-      puVar7[2] = (u32)piVar6;
-      uVar3 = fn_801DAC3C(iVar1);
-      fn_800E9C6C(uVar3,puVar7 + 3);
-      *(int *)(r5 + 8) = *(int *)(r5 + 8) + 0x78;
-    }
-    if (r5[1] != '\0') {
-      fn_801DB100(iVar1);
-    }
-    *(short *)(r5 + 2) = *(short *)(r5 + 2) + 1;
+  if (iVar1 == 0) {
+    return 1;
   }
+  sVar4 = fn_801DAC78();
+  if ((u16)sVar4 == 0) {
+    return 1;
+  }
+  if (*r5 != '\0') {
+    puVar7 = *(u32 **)(r5 + 8);
+    *puVar7 = r3;
+    *(short *)(puVar7 + 1) = sVar4;
+    uVar5 = fn_801DA354(iVar1);
+    *(u8 *)((int)puVar7 + 6) = uVar5;
+    base = *(int *)(r5 + 4);
+    if (iVar1 == 0) {
+      piVar6 = (int *)0x0;
+    }
+	    else {
+	      iVar2 = 0;
+		      for (iVar8 = 4; iVar8 != 0; iVar8--) {
+                piVar6 = (int *)(base + iVar2);
+                    if (*piVar6 == iVar1) goto LAB_0025e8fc;
+                iVar2 = iVar2 + 0x10;
+		      }
+	      piVar6 = (int *)0x0;
+	    }
+LAB_0025e8fc:
+    puVar7[2] = (u32)piVar6;
+    uVar3 = fn_801DAC3C(iVar1);
+    fn_800E9C6C(uVar3,puVar7 + 3);
+    *(int *)(r5 + 8) = *(int *)(r5 + 8) + 0x78;
+  }
+  if (r5[1] != '\0') {
+    fn_801DB100(iVar1);
+  }
+  *(u16 *)(r5 + 2) = *(u16 *)(r5 + 2) + 1;
   return 1;
 }
 
@@ -27660,6 +23198,8 @@ u32 fn_80261BEC(u32 r3,u32 r4,u8 *r5)
   u16 uVar4;
   u16 sVar5;
   u32 uVar3;
+  u8 result;
+  u32 found;
   u8 cVar6;
 
   iVar1 = fn_801F02AC(2,r3,r4);
@@ -27707,7 +23247,7 @@ u32 fn_80261CBC(u32 r3,u32 r4)
   }
   else {
     uVar3 = fightSideGetStatus(iVar1,0,5,0);
-    sVar4 = fn_801F0134(r3,r4);
+      sVar4 = fn_801F0134(r3,r4);
     if (sVar4 == 0) {
       uVar6 = 0;
     }
@@ -27794,6 +23334,7 @@ int fn_80261EF8(u32 r3,u32 r4)
   u16 uVar4;
   u16 sVar5;
   u32 uVar3;
+  u8 result;
   
   iVar1 = fn_801F02AC(2,r3,r4);
   if (iVar1 == 0) {
@@ -27817,7 +23358,8 @@ int fn_80261EF8(u32 r3,u32 r4)
     }
   }
   uVar3 = fn_80102620(uVar2);
-  return (uVar3 & 0xff) != 1;
+  result = (uVar3 & 0xff) != 1;
+  return result;
 }
 
 /* Address: 0x80261FB4 | Size: 0xD0 | Ghidra import */
@@ -27875,27 +23417,27 @@ u32 fn_80262084(u32 r3,u32 r4,char *r5)
   u32 *puVar8;
   u32 *puVar9;
   u8 cVar10;
-  u32 uVar11;
-  u32 local_48[12];
-  u32 local_78[12];
-  
-  if (r5 == (char *)0x0) {
-    cVar10 = '\x01';
-  }
-  else {
-    cVar10 = *r5;
-  }
-  cVar7 = fn_802062FC(r3);
-  if (cVar7 == '\0') {
-    return 1;
-  }
-    iVar3 = fn_801F02AC(2,r3,r4);
+	  u32 uVar11;
+	  u32 local_48[12];
+	  u32 local_78[12];
+
+	  if (r5 == (char *)0x0) {
+	    cVar10 = '\x01';
+	  }
+	  else {
+	    cVar10 = *r5;
+	  }
+	  cVar7 = fn_802062FC(r3);
+	  if (cVar7 == '\0') {
+	    return 1;
+	  }
+	    iVar3 = fn_801F02AC(2,r3,r4);
     if (iVar3 == 0) {
       uVar11 = 0;
     }
     else {
       uVar5 = fightSideGetStatus(iVar3,0,5,0);
-      sVar6 = fn_801F0134(r3,r4);
+	      sVar6 = fn_801F0134(r3,r4);
       if (sVar6 == 0) {
         uVar11 = 0;
       }
@@ -27910,7 +23452,7 @@ u32 fn_80262084(u32 r3,u32 r4,char *r5)
         }
       }
     }
-    fn_801FE168(r3,local_78);
+	    fn_801FE168(r3,local_78);
     if (cVar10 == '\0') {
       ((u8 *)local_78)[0x29] = 0;
     }
@@ -28395,7 +23937,7 @@ s32 fn_80262D3C(u32 r3, u32 r4, u32 r5, s32 r6)
     extern u8 fn_80265924(void);
     extern u8 fn_801F18DC(u32);
     extern u32 fn_801F02AC(u32, u32, u32);
-    extern u16 fightSideGetStatus(u32, u32, u32, u32);
+    extern u32 fightSideGetStatus(u32, u32, u32, u32);
     extern u16 fn_801F0134(u32, u32);
     extern void fn_801F0234(void);
     extern s32 fn_801F0204(void);
@@ -28442,12 +23984,12 @@ s32 fn_80262D3C(u32 r3, u32 r4, u32 r5, s32 r6)
     }
 
     if ((u16)fn_801EF634() == 1) {
-        target = -2;
+        goto set_cancel;
     }
-    else if ((fn_801F1700(0) == 1) && (fn_80265924() == 1)) {
-        target = fn_801F93F8(ctx, target, param1);
+    if ((fn_801F1700(0) == 1) && (fn_80265924() == 1)) {
+        goto set_select;
     }
-    else {
+    {
         if (fn_801F18DC(0) != 0) {
             msg = 0x100;
             found = fn_801F02AC(2, ctx, param1);
@@ -28455,7 +23997,7 @@ s32 fn_80262D3C(u32 r3, u32 r4, u32 r5, s32 r6)
                 status = 0;
             }
             else {
-                side = fightSideGetStatus(found, 0, 5, 0);
+                side = (u16)fightSideGetStatus(found, 0, 5, 0);
                 if (fn_801F0134(ctx, param1) == 0) {
                     status = 0;
                 }
@@ -28489,19 +24031,26 @@ s32 fn_80262D3C(u32 r3, u32 r4, u32 r5, s32 r6)
         entry = fn_800111E8(battle, ctx, (u16)i, param1);
         kind = fn_80089F70(entry);
         if ((u16)fn_801EF634() == 1) {
-            target = -2;
+            goto set_cancel;
         }
-        else if (kind == 2) {
+        if (kind == 2) {
             found = fn_801FB1C0(ctx, 0, 0x45, fn_80089F58(entry));
             target = fn_8012640C(found, 0, 0xce, 0);
+            goto after_select;
         }
-        else if (kind == 5) {
-            target = -2;
-        }
-        else {
-            target = fn_801F93F8(ctx, target, param1);
-        }
-    }
+	        if (kind == 4) {
+	            goto set_select;
+	        }
+	        if (kind == 5) {
+	            goto set_cancel;
+	        }
+	    }
+set_select:
+    target = fn_801F93F8(ctx, target, param1);
+    goto after_select;
+set_cancel:
+    target = -2;
+after_select:
 
     if (fn_801F18DC(0) != 0) {
         msg = 0x100;
@@ -28510,7 +24059,7 @@ s32 fn_80262D3C(u32 r3, u32 r4, u32 r5, s32 r6)
             status = 0;
         }
         else {
-            side = fightSideGetStatus(found, 0, 5, 0);
+            side = (u16)fightSideGetStatus(found, 0, 5, 0);
             if (fn_801F0134(ctx, param1) == 0) {
                 status = 0;
             }
@@ -28546,7 +24095,7 @@ s32 fn_80262D3C(u32 r3, u32 r4, u32 r5, s32 r6)
                 status = 0;
             }
             else {
-                side = fightSideGetStatus(found, 0, 5, 0);
+                side = (u16)fightSideGetStatus(found, 0, 5, 0);
                 if (fn_801F0134(ctx, param1) == 0) {
                     status = 0;
                 }
@@ -28592,12 +24141,13 @@ u32 fn_80264ADC(u32 r3,u32 r4,u32 r5)
     extern int fn_801906A0();
     extern int fn_801F000C();
   u32 uVar1;
-  s8 cVar6;
+  u8 cVar6;
   int iVar2;
   u16 uVar4;
-  short sVar5;
+  u16 sVar5;
   u32 uVar3;
-  u8 auStack_38 [4];
+  u32 found;
+  u8 auStack_38 [0x24];
   u32 local_34;
   u32 local_2c;
   u32 local_24;
@@ -28607,65 +24157,67 @@ u32 fn_80264ADC(u32 r3,u32 r4,u32 r5)
   
 LAB_00261af4:
   uVar1 = fn_801F02AC(0xf,r3,r5);
-  cVar6 = fn_802062FC();
-  if (cVar6 == '\x01') {
-    iVar2 = fn_801F02AC(2,uVar1,r5);
-    if (iVar2 == 0) {
-      local_34 = 0;
+    cVar6 = fn_802062FC();
+    if (cVar6 == '\x01') {
+    found = fn_801F02AC(2,uVar1,r5);
+    if (found == 0) {
+      uVar3 = 0;
     }
     else {
-      uVar4 = fightSideGetStatus(iVar2,0,5,0);
+      uVar4 = fightSideGetStatus(found,0,5,0);
       sVar5 = fn_801F0134(uVar1,r5);
       if (sVar5 == 0) {
-        local_34 = 0;
+        uVar3 = 0;
       }
       else {
         fn_801F0234();
         uVar3 = fn_801F0204();
         if ((int)uVar3 < 0) {
-          local_34 = 0;
+          uVar3 = 0;
         }
         else {
-          local_34 = fightSideGetStatus(0,uVar4,3,uVar3 & 0xffff);
+          uVar3 = fightSideGetStatus(0,uVar4,3,uVar3 & 0xffff);
         }
       }
     }
   }
   else {
-    local_34 = 0;
+    uVar3 = 0;
   }
+  *(u32 *)(auStack_38 + 4) = uVar3;
   uVar1 = fn_801F02AC(0x10,r3,r5);
   cVar6 = fn_802062FC();
   if (cVar6 == '\x01') {
-    iVar2 = fn_801F02AC(2,uVar1,r5);
-    if (iVar2 == 0) {
-      local_2c = 0;
+    found = fn_801F02AC(2,uVar1,r5);
+    if (found == 0) {
+      uVar3 = 0;
     }
     else {
-      uVar4 = fightSideGetStatus(iVar2,0,5,0);
+      uVar4 = fightSideGetStatus(found,0,5,0);
       sVar5 = fn_801F0134(uVar1,r5);
       if (sVar5 == 0) {
-        local_2c = 0;
+        uVar3 = 0;
       }
       else {
         fn_801F0234();
         uVar3 = fn_801F0204();
         if ((int)uVar3 < 0) {
-          local_2c = 0;
+          uVar3 = 0;
         }
         else {
-          local_2c = fightSideGetStatus(0,uVar4,3,uVar3 & 0xffff);
+          uVar3 = fightSideGetStatus(0,uVar4,3,uVar3 & 0xffff);
         }
       }
     }
   }
   else {
-    local_2c = 0;
+    uVar3 = 0;
   }
-  local_24 = 0;
-  local_1c = 0;
-  local_18 = 2;
-  local_17 = fn_801F18DC(0);
+  *(u32 *)(auStack_38 + 0xc) = uVar3;
+  *(u32 *)(auStack_38 + 0x14) = 0;
+  *(u32 *)(auStack_38 + 0x1c) = 0;
+  auStack_38[0x20] = 2;
+  auStack_38[0x21] = fn_801F18DC(0);
   iVar2 = fn_80011288((int*)auStack_38,0,1);
   if (iVar2 < 0) {
     fn_8001120C(1);
@@ -28681,20 +24233,21 @@ LAB_00261ccc:
     cVar6 = fn_802062FC(uVar1);
     if (cVar6 != '\0') {
       fn_80205B8C(uVar1);
-      cVar6 = fn_8011FC74();
-      if (cVar6 != '\0') {
-        fn_8001120C(1);
-        return uVar1;
+      cVar6 = pokemonIsDarkPokemon();
+      if (cVar6 == '\0') {
+        uVar3 = fn_801906A0(0x99f);
+        if (uVar3 == 0) {
+          fn_80106394(0x7716,1,1);
+        }
+        else {
+          fn_80106394(0x7702,1,1);
+        }
+        fn_801F000C(0x40);
+        fn_80106080(0);
+        goto LAB_00261af4;
       }
-      iVar2 = fn_801906A0(0x99f);
-      if (iVar2 == 0) {
-        fn_80106394(0x7716,1,1);
-      }
-      else {
-        fn_80106394(0x7702,1,1);
-      }
-      fn_801F000C(0x40);
-      fn_80106080(0);
+      fn_8001120C(1);
+      return uVar1;
     }
   }
   goto LAB_00261af4;
@@ -28706,13 +24259,14 @@ u32 fn_8026503C(u32 r3,u32 r4,u32 r5)
 {
     extern u8 lbl_8047B678;
   u32 uVar1;
-  s8 cVar6;
+  u8 cVar6;
   int iVar2;
   u16 uVar4;
-  short sVar5;
+  u16 sVar5;
   u32 uVar3;
+  u32 found;
 
-  u8 auStack_38 [4];
+  u8 auStack_38 [0x24];
   u32 local_34;
   u32 local_2c;
   u32 local_24;
@@ -28725,90 +24279,93 @@ LAB_00262054:
     uVar1 = fn_801F02AC(0xf,r3,r5);
     cVar6 = fn_802062FC();
     if (cVar6 == '\x01') {
-      iVar2 = fn_801F02AC(2,uVar1,r5);
-      if (iVar2 == 0) {
-        local_34 = 0;
+      found = fn_801F02AC(2,uVar1,r5);
+      if (found == 0) {
+        uVar3 = 0;
       }
       else {
-        uVar4 = fightSideGetStatus(iVar2,0,5,0);
+        uVar4 = fightSideGetStatus(found,0,5,0);
         sVar5 = fn_801F0134(uVar1,r5);
         if (sVar5 == 0) {
-          local_34 = 0;
+          uVar3 = 0;
         }
         else {
           fn_801F0234();
           uVar3 = fn_801F0204();
           if ((int)uVar3 < 0) {
-            local_34 = 0;
+            uVar3 = 0;
           }
           else {
-            local_34 = fightSideGetStatus(0,uVar4,3,uVar3 & 0xffff);
+            uVar3 = fightSideGetStatus(0,uVar4,3,uVar3 & 0xffff);
           }
         }
       }
     }
     else {
-      local_34 = 0;
+      uVar3 = 0;
     }
+    *(u32 *)(auStack_38 + 4) = uVar3;
     uVar1 = fn_801F02AC(0x10,r3,r5);
     cVar6 = fn_802062FC();
     if (cVar6 == '\x01') {
-      iVar2 = fn_801F02AC(2,uVar1,r5);
-      if (iVar2 == 0) {
-        local_2c = 0;
+      found = fn_801F02AC(2,uVar1,r5);
+      if (found == 0) {
+        uVar3 = 0;
       }
       else {
-        uVar4 = fightSideGetStatus(iVar2,0,5,0);
+        uVar4 = fightSideGetStatus(found,0,5,0);
         sVar5 = fn_801F0134(uVar1,r5);
         if (sVar5 == 0) {
-          local_2c = 0;
+          uVar3 = 0;
         }
         else {
           fn_801F0234();
           uVar3 = fn_801F0204();
           if ((int)uVar3 < 0) {
-            local_2c = 0;
+            uVar3 = 0;
           }
           else {
-            local_2c = fightSideGetStatus(0,uVar4,3,uVar3 & 0xffff);
+            uVar3 = fightSideGetStatus(0,uVar4,3,uVar3 & 0xffff);
           }
         }
       }
     }
     else {
-      local_2c = 0;
+      uVar3 = 0;
     }
+    *(u32 *)(auStack_38 + 0xc) = uVar3;
     uVar1 = fn_801F02AC(0xe,r3,r5);
     cVar6 = fn_802062FC();
     if (cVar6 == '\x01') {
-      iVar2 = fn_801F02AC(2,uVar1,r5);
-      if (iVar2 == 0) {
-        local_24 = 0;
+      found = fn_801F02AC(2,uVar1,r5);
+      if (found == 0) {
+        uVar3 = 0;
       }
       else {
-        uVar4 = fightSideGetStatus(iVar2,0,5,0);
+        uVar4 = fightSideGetStatus(found,0,5,0);
         sVar5 = fn_801F0134(uVar1,r5);
         if (sVar5 == 0) {
-          local_24 = 0;
+          uVar3 = 0;
         }
         else {
           fn_801F0234();
           uVar3 = fn_801F0204();
           if ((int)uVar3 < 0) {
-            local_24 = 0;
+            uVar3 = 0;
           }
           else {
-            local_24 = fightSideGetStatus(0,uVar4,3,uVar3 & 0xffff);
+            uVar3 = fightSideGetStatus(0,uVar4,3,uVar3 & 0xffff);
           }
         }
       }
     }
     else {
-      local_24 = 0;
+      uVar3 = 0;
     }
-    local_1c = 0;
-    local_18 = 3;
-    local_17 = fn_801F18DC(0);
+    *(u32 *)(auStack_38 + 0x14) = uVar3;
+    *(u32 *)(auStack_38 + 0x1c) = 0;
+    auStack_38[0x20] = 3;
+    auStack_38[0x21] = fn_801F18DC(0);
     iVar2 = fn_80011288((int*)auStack_38,0,1);
     lbl_8047B678 = 1;
     if (iVar2 < 0) {
@@ -29384,6 +24941,7 @@ u32 fn_80265E34(u32 r3)
 }
 
 /* Address: 0x80265E7C | Size: 0x48 | Ghidra import */
+#pragma dont_inline on
 u32 fn_80265E7C(u32 r3)
 
 {
@@ -29397,6 +24955,7 @@ u32 fn_80265E7C(u32 r3)
   }
   return 1;
 }
+#pragma dont_inline reset
 
 /* Address: 0x80265F94 | Size: 0x2BC | Ghidra import */
 void fn_80265F94(int r3)
@@ -29695,7 +25254,7 @@ void fn_8025E9BC(u32 r3)
     fn_801065B8(1);
     sVar7 = fn_8011EE58(uVar1);
     sVar6 = fn_8011EDF8(uVar1);
-    fn_8011D904(uVar1,(u16)((sVar6 + 0x46) + sVar7));
+    fn_8011D904(uVar1,(u16)((sVar6 + sVar7) + 0x46));
     fn_8011DE68(uVar1,0);
     iVar3 = fn_8025E640(uVar1,uVar2);
     if (iVar3 == 1) {
@@ -29732,7 +25291,10 @@ void fn_8025E9BC(u32 r3)
     fn_801067E8(0x3b0c,1,0);
     fn_801067E8(0x3b0d,1,1);
     cVar7 = fn_8001E184();
-    if (cVar7 == '\0') {
+    if (cVar7 != '\0') {
+      fn_801065B8(1);
+    }
+    else {
       fn_801065B8(1);
       fadeSet((double)lbl_8047E680,3);
       fadeCheck(1);
@@ -29745,9 +25307,6 @@ void fn_8025E9BC(u32 r3)
         fn_8025DE54((u32*)auStack_24,(u16*)&lbl_80478DB0,1,1,1,0);
       }
     }
-    else {
-      fn_801065B8(1);
-    }
   }
   return;
 }
@@ -29757,9 +25316,6 @@ void fn_8025E9BC(u32 r3)
 void fn_8025ED4C(void)
 
 {
-    extern u32 _DAT_804782bc;
-    extern u32 _DAT_804782c0;
-    extern u32 _DAT_804782c4;
     extern u32 lbl_80478DA8;
     extern u32 lbl_8047B668;
     extern u32 lbl_8047B66C;
@@ -29767,64 +25323,64 @@ void fn_8025ED4C(void)
   BOOL bVar1;
 
   u32 uVar2;
-  s8 cVar4;
+  u8 cVar4;
   int iVar3;
 
   u8 auStack_18 [16];
   
-  if ((_DAT_804782bc == 0) || (_DAT_804782bc == 1)) {
+  if ((lbl_804782BC[0] == 0) || (lbl_804782BC[0] == 1)) {
     fn_801DADC0(1);
-    if (_DAT_804782bc == 0) {
-      uVar2 = fn_8012A5B0(0,3,_DAT_804782c4 & 0xffff);
+    if (lbl_804782BC[0] == 0) {
+      uVar2 = fn_8012A5B0(0,3,lbl_804782BC[2] & 0xffff);
       cVar4 = fn_80123FBC();
-      if (cVar4 == '\x01') {
+      if (cVar4 != '\x01') {
+        bVar1 = 0;
+      }
+      else {
         fn_8012640C(uVar2,0,0x6e,0);
-        iVar3 = fn_8025E0B0((int*)auStack_18,uVar2,(u16*)lbl_80478DA8,2);
+        iVar3 = fn_8025E0B0((int*)auStack_18,uVar2,(u16*)&lbl_80478DA8,2);
         if (iVar3 == 1) {
-          fn_8025DE54((u32*)auStack_18,(u16*)lbl_80478DA8,2,1,1,0);
+          fn_8025DE54((u32*)auStack_18,(u16*)&lbl_80478DA8,2,1,1,0);
           bVar1 = 1;
         }
         else {
           bVar1 = 0;
         }
       }
-      else {
-        bVar1 = 0;
-      }
-      if (bVar1) {
-        fn_8025E9BC(_DAT_804782c4);
+      if (bVar1 == 1) {
+        fn_8025E9BC(lbl_804782BC[2]);
       }
     }
-    else if (_DAT_804782bc == 1) {
-      uVar2 = fn_8012A5B0(0,3,_DAT_804782c4 & 0xffff);
+    else if (lbl_804782BC[0] == 1) {
+      uVar2 = fn_8012A5B0(0,3,lbl_804782BC[2] & 0xffff);
       cVar4 = fn_80123FBC();
-      if (cVar4 == '\x01') {
+      if (cVar4 != '\x01') {
+        bVar1 = 0;
+      }
+      else {
         fn_801254B4(uVar2,0,0xc5,0,0);
         fn_8012640C(uVar2,0,0x6e,0);
-        iVar3 = fn_8025E0B0((int*)auStack_18,uVar2,(u16*)0x8039a6a8,4);
+        iVar3 = fn_8025E0B0((int*)auStack_18,uVar2,(u16*)lbl_8039A6A8,4);
         if (iVar3 == 1) {
-          fn_8025DE54((u32*)auStack_18,(u16*)0x8039a6a8,4,1,1,0);
+          fn_8025DE54((u32*)auStack_18,(u16*)lbl_8039A6A8,4,1,1,0);
           bVar1 = 1;
         }
         else {
           bVar1 = 0;
         }
       }
-      else {
-        bVar1 = 0;
-      }
-      if (bVar1) {
-        fn_8025E9BC(_DAT_804782c4);
+      if (bVar1 == 1) {
+        fn_8025E9BC(lbl_804782BC[2]);
       }
     }
     fadeSet((double)lbl_8047E680,3);
     fadeCheck(1);
-    fn_801DAC90();
-    _DAT_804782bc = -1;
-    lbl_8047B668 = 0xffffffff;
-    lbl_8047B66C = 0xffffffff;
-    _DAT_804782c0 = 0;
-    _DAT_804782c4 = 0;
+			    fn_801DAC90();
+			    lbl_804782BC[0] = -1;
+			    lbl_8047B668 = 0xffffffff;
+			    lbl_8047B66C = 0xffffffff;
+			    *(u16 *)((u8 *)lbl_804782BC + 4) = 0;
+    lbl_804782BC[2] = 0;
     fn_800FF660();
     fn_8011288C(0,0);
     _threadSwitch();
@@ -30074,20 +25630,15 @@ void waitTime__Ff(float r3)
     extern f64 lbl_8047E668;
   u32 uVar2;
 
-  u32 stack[2];
-  double dVar5;
   double dVar4;
   float fVar1;
 
   dVar4 = (double)(float)(lbl_8047E664 * r3);
   fVar1 = lbl_8047E660;
-  dVar5 = lbl_8047E668;
   while (fVar1 < dVar4) {
     _threadSwitch();
     uVar2 = fn_800D3088();
-    stack[1] = uVar2;
-    stack[0] = 0x43300000;
-    fVar1 += (float)(*(double *)stack - dVar5);
+    fVar1 += (float)uVar2;
   }
 
   return;
@@ -30096,31 +25647,27 @@ void waitTime__Ff(float r3)
 /* Address: 0x80260910 | Size: 0x5AC | Ghidra import (PSQ removed) */
 
 
-u32 fn_80260910(u32 *r3,int r4,int r5,int r6)
+u32 fn_80260910(u32 *r3,u32 r4,u32 r5,u32 r6)
 
 {
-    extern u32 DAT_8027a488;
-    extern u32 DAT_8027a48c;
-    extern u32 _DAT_8027a488;
-    extern u32 _DAT_8027a48c;
-    extern u32 _DAT_8027a4b0;
-    extern u32 _DAT_8027a4b8;
+    extern u8 lbl_8027A488[];
+    extern u8 lbl_8027A4B0[];
     extern f32 lbl_8047E6B0;
     extern f32 lbl_8047E6B4;
     extern f64 lbl_8047E6B8;
     extern f32 lbl_8047E6C0;
     extern f32 lbl_8047E6C4;
-    u32 saved_r29 = 0;
+    u32 saved_r29;
   float fVar1;
   u16 uVar2;
   BOOL bVar3;
   BOOL bVar4;
 
   u32 uVar5;
-  int iVar6;
+  u32 iVar6;
   u32 uVar7;
   u32 uVar8;
-  s8 cVar10;
+  u8 cVar10;
   u16 uVar9;
   u32 uVar11;
   u32 uVar12;
@@ -30159,13 +25706,13 @@ u32 fn_80260910(u32 *r3,int r4,int r5,int r6)
     uVar9 = fn_8011E15C();
     fn_80166A28(uVar9);
   }
-  if (_DAT_8027a48c == 0) {
+  if (*(u32 *)(lbl_8027A488 + 4) == 0) {
     uVar5 = *r3;
   }
   else {
     uVar5 = r3[1];
   }
-  fn_801DA9E8(uVar5,_DAT_8027a488,4);
+  fn_801DA9E8(uVar5,*(u16 *)lbl_8027A488,4);
   fn_801DB088();
   r3[2] = 0;
   bVar3 = 1;
@@ -30177,24 +25724,24 @@ u32 fn_80260910(u32 *r3,int r4,int r5,int r6)
 LAB_0025db60:
       fadeSet((double)lbl_8047E6C0,5);
       while (cVar10 = fadeCheck(0), cVar10 != '\0') {
-        if (*(int *)(&DAT_8027a48c + r3[2] * 8) == 0) {
+        if (*(int *)(lbl_8027A488 + r3[2] * 8 + 4) == 0) {
           uVar5 = *r3;
         }
         else {
           uVar5 = r3[1];
         }
-        uVar9 = *(u16 *)(&DAT_8027a488 + r3[2] * 8);
+        uVar9 = *(u16 *)(lbl_8027A488 + r3[2] * 8);
         fn_801DB088();
         fn_801DA94C(uVar5,uVar9,4);
         _threadSwitch();
       }
-      if (*(int *)(&DAT_8027a48c + r3[2] * 8) == 0) {
+      if (*(int *)(lbl_8027A488 + r3[2] * 8 + 4) == 0) {
         uVar5 = *r3;
       }
       else {
         uVar5 = r3[1];
       }
-      fn_801DA8C4(uVar5,*(u16 *)(&DAT_8027a488 + r3[2] * 8),4);
+      fn_801DA8C4(uVar5,*(u16 *)(lbl_8027A488 + r3[2] * 8),4);
       dVar15 = lbl_8047E6B8;
       dVar14 = (double)lbl_8047E6B4;
       fVar1 = lbl_8047E6B0;
@@ -30206,11 +25753,11 @@ LAB_0025db60:
       if (bVar4) {
         fn_801065B8(1);
         soundStop(0x3d4,0x32);
-        iVar6 = 0;
-        if ((_DAT_8027a4b0 < uVar12) && (iVar6 = 1, _DAT_8027a4b8 < uVar12)) {
+          iVar6 = 0;
+        if ((*(u32 *)lbl_8027A4B0 < uVar12) && (iVar6 = 1, *(u32 *)(lbl_8027A4B0 + 8) < uVar12)) {
           iVar6 = 2;
         }
-        fn_802606D8(r3,*(u32 *)(iVar6 * 8 + -0x7fd85b4c),0,8);
+        fn_802606D8(r3,*(u32 *)(lbl_8027A4B0 + iVar6 * 8 + 4),0,8);
         if (r5 == 0) {
           iVar6 = 0;
         }
@@ -30299,13 +25846,13 @@ LAB_0025db60:
         goto LAB_0025db60;
       }
     }
-    if (*(int *)(&DAT_8027a48c + r3[2] * 8) == 0) {
+    if (*(int *)(lbl_8027A488 + r3[2] * 8 + 4) == 0) {
       uVar5 = *r3;
     }
     else {
       uVar5 = r3[1];
     }
-    uVar2 = *(u16 *)(&DAT_8027a488 + r3[2] * 8);
+    uVar2 = *(u16 *)(lbl_8027A488 + r3[2] * 8);
     fn_801DB088();
     uVar7 = fn_801DA94C(uVar5,uVar2,4);
     if (-1 < (int)-(uVar7 & 0xff)) goto LAB_0025db60;
@@ -30566,7 +26113,7 @@ void fn_80265DB0(ColosseumBattleTimerState *r3)
   while (r3->elapsed < scale * r3->limit) {
     _threadSwitch();
     ticks = fn_800D3088();
-    r3->elapsed = (f32)ticks + r3->elapsed;
+	    r3->elapsed = (f32)ticks + r3->elapsed;
   }
   r3->done = 1;
   do {

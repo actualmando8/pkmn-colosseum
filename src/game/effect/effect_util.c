@@ -1151,24 +1151,24 @@ void msgctrlDigit(void) {
 #pragma peephole on
 #endif
 
-/* 0x80132394 | 0x34 -- calls fn_801440A0(lbl_8047AE52) then fn_80144088, default to 0x2B6E */
+/* 0x80132394 | 0x34 -- calls itemDataBiosGetPtr(lbl_8047AE52) then itemDataBiosGetName, default to 0x2B6E */
 extern u16  lbl_8047AE52;
-extern void fn_801440A0(u16 handle);
-extern u32  fn_80144088(void);
+extern void itemDataBiosGetPtr(u16 handle);
+extern u32  itemDataBiosGetName(void);
 u32 msgctrlItem2(void) {
     u32 result;
-    fn_801440A0(lbl_8047AE52);
-    result = fn_80144088();
+    itemDataBiosGetPtr(lbl_8047AE52);
+    result = itemDataBiosGetName();
     if (result == 0) { result = 0x2B6E; }
     return result;
 }
 
-/* 0x801323C8 | 0x34 -- calls fn_801440A0(lbl_8047AE50) then fn_80144088, default to 0x2B6E */
+/* 0x801323C8 | 0x34 -- calls itemDataBiosGetPtr(lbl_8047AE50) then itemDataBiosGetName, default to 0x2B6E */
 extern u16 lbl_8047AE50;
 u32 msgctrlItem(void) {
     u32 result;
-    fn_801440A0(lbl_8047AE50);
-    result = fn_80144088();
+    itemDataBiosGetPtr(lbl_8047AE50);
+    result = itemDataBiosGetName();
     if (result == 0) { result = 0x2B6E; }
     return result;
 }
@@ -2406,7 +2406,7 @@ asm void fn_80134420(void) {
 #else
 #pragma optimization_level 4
 u16 fn_80134420(void* base, u16 effect_id) {
-    extern u8 fn_801440A0(u16);
+    extern u8 itemDataBiosGetPtr(u16);
     extern u8 fn_801429E8(void*);
     extern u16 itemGetStatus(void*, u32, u32, u32);
     void* cur;
@@ -2417,7 +2417,7 @@ u16 fn_80134420(void* base, u16 effect_id) {
     if (base == 0) {
         base = (void*)fn_80129280(0, 3);
     }
-    if (!fn_801440A0(effect_id)) return 0;
+    if (!itemDataBiosGetPtr(effect_id)) return 0;
     cur = (u8*)base;
     for (i = 0; i < 0xeb; i++, cur = (u8*)cur + 4) {
         if (fn_801429E8((u8*)cur + 0x6dec)) {
@@ -2447,14 +2447,14 @@ asm void fn_80134584(void) {
 #else
 #pragma scheduling on
 u16 fn_80134584(void* base, u16 effect_id, u16 r5) {
-    extern u8 fn_801440A0(u16);
+    extern u8 itemDataBiosGetPtr(u16);
     extern u8 fn_801429E8(void*);
     extern u16 itemGetStatus(void*, u32, u32, u32);
     extern u16 fn_80140ACC(void*, u16, u16, u16, s16, u16, u32);
     void* cur; s16 idx; s32 i;
     if (base == 0) { base = (void*)fn_80129280(0, 3); }
     if (r5 == 0) return r5;
-    if (!fn_801440A0(effect_id)) return r5;
+    if (!itemDataBiosGetPtr(effect_id)) return r5;
     cur = (u8*)base;
     for (i = 0; i < 0xeb; i++, cur = (u8*)cur + 4) {
         if (fn_801429E8((u8*)cur + 0x6dec)) {
@@ -2476,14 +2476,14 @@ asm void fn_8013467C(void) {
 #else
 #pragma scheduling on
 u16 fn_8013467C(void* base, u16 effect_id, u16 r5) {
-    extern u8 fn_801440A0(u16);
+    extern u8 itemDataBiosGetPtr(u16);
     extern u8 fn_801429E8(void*);
     extern u16 itemGetStatus(void*, u32, u32, u32);
     extern u16 fn_80141308(void*, u16, u16, u16, s16, u16, u32, u32);
     void* cur; s16 idx; s32 i;
     if (base == 0) { base = (void*)fn_80129280(0, 3); }
     if (r5 == 0) return r5;
-    if (!fn_801440A0(effect_id)) return r5;
+    if (!itemDataBiosGetPtr(effect_id)) return r5;
     cur = (u8*)base;
     for (i = 0; i < 0xeb; i++, cur = (u8*)cur + 4) {
         if (fn_801429E8((u8*)cur + 0x6dec)) {

@@ -120,8 +120,8 @@ extern struct Pokemon* fn_801F6738(u32 index);
 /* fn_801F6B48: Get currently selected/active Pokemon */
 extern struct Pokemon* fn_801F6B48(void);
 
-/* fn_801F61BC: Get Pokemon system context pointer */
-extern struct Pokemon* fn_801F61BC(void);
+/* fightFloorGetNowPtr: Get Pokemon system context pointer */
+extern struct Pokemon* fightFloorGetNowPtr(void);
 
 /* fn_802050F4: Pokemon nature/friendship comparison helper */
 extern s8 fn_802050F4(struct Pokemon* pokemon);
@@ -931,7 +931,7 @@ u32 fn_801F02AC(u32 slotType, u32 ptr, u32 count) {
     if ((u16)slotType == 0) {
         return 0;
     }
-    ctx = (u32)fn_801F61BC();
+    ctx = (u32)fightFloorGetNowPtr();
     if ((u16)slotType == 1) {
         return ctx;
     }

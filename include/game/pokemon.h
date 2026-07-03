@@ -167,7 +167,7 @@ u32 PokemonSlotLookup(u16 slotType, u32 index, u16 count);
  */
 
 /**
- * fn_801F61BC - GetPokemonContext
+ * fightFloorGetNowPtr - GetPokemonContext
  * Returns the current Pokemon context pointer from the global state.
  * Called from PokemonSlotLookup to get the base address for lookups.
  */

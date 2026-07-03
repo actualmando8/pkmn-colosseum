@@ -1704,7 +1704,7 @@ extern void fn_8011C430(u8* ptr, u16 idx, u8 val);
 extern u32 fn_8011C450(u8* ptr);
 extern u32 fn_8011C4B0(u8* ptr);
 extern u32 fn_8011C510(u8* ptr);
-extern void fn_8011F77C(void);
+extern void pokemonGetDarkPokemonLevel(void);
 extern u32  fn_80120C6C(u32 a, u16 key);
 extern u8 fn_80121ADC(u8* ptr, u32 slot);
 extern void fn_801237B8(void);
@@ -6049,7 +6049,7 @@ asm void fn_8011F634(void) {
 #else
 u32 fn_8011F634(u8* ptr) {
     extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
-    extern u32 fn_8011F77C(u8* a);
+    extern u32 pokemonGetDarkPokemonLevel(u8* a);
     extern void* fn_8011CE18(u32 val);
     extern u32 fn_8011CBF4(void* a, u32 b);
     u8 byte1;
@@ -6057,7 +6057,7 @@ u32 fn_8011F634(u8* ptr) {
     if (ptr == NULL) { return 0; }
     if ((u8)fn_8012640C(ptr, 0, 0xc2, 0) == 0) { return 0; }
     byte1 = (u8)fn_8012640C(ptr, 0, 0xbf, 0);
-    val2 = fn_8011F77C(ptr);
+    val2 = pokemonGetDarkPokemonLevel(ptr);
     if ((u8)val2 <= 7) {
         return fn_8011CBF4(fn_8011CE18(byte1), val2);
     }
@@ -6072,7 +6072,7 @@ asm void fn_8011F6D8(void) {
 #else
 u32 fn_8011F6D8(u8* ptr) {
     extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
-    extern u32 fn_8011F77C(u8* a);
+    extern u32 pokemonGetDarkPokemonLevel(u8* a);
     extern void* fn_8011CE18(u32 val);
     extern u32 fn_8011CC24(void* a, u32 b);
     u8 byte1;
@@ -6080,7 +6080,7 @@ u32 fn_8011F6D8(u8* ptr) {
     if (ptr == NULL) { return 0; }
     if ((u8)fn_8012640C(ptr, 0, 0xc2, 0) == 0) { return 0; }
     byte1 = (u8)fn_8012640C(ptr, 0, 0xbf, 0);
-    val2 = fn_8011F77C(ptr);
+    val2 = pokemonGetDarkPokemonLevel(ptr);
     if ((u8)val2 <= 7) {
         return fn_8011CC24(fn_8011CE18(byte1), val2);
     }
@@ -6097,11 +6097,11 @@ extern f32 lbl_8047CFFC;
 extern f32 lbl_8047D000;
 extern f32 lbl_8047D004;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8011F77C(void);
+void pokemonGetDarkPokemonLevel(void);
 /* 0x8011F910 | 0x2BC */
-extern void fn_801440A0(void);
-extern void fn_80144014(void);
-extern void fn_80143E14(void);
+extern void itemDataBiosGetPtr(void);
+extern void itemDataBiosGetKind(void);
+extern void itemDataBiosGetBuff(void);
 extern f64 lbl_8047D008;
 extern f64 lbl_8047D010;
 extern f32 lbl_8047CFF0;
@@ -6145,7 +6145,7 @@ f32 fn_8011FC14(u8* ptr) {
 }
 #endif
 /* 0x8011FC74 | 0x30 */
-u8 fn_8011FC74(u32 arg) {
+u8 pokemonIsDarkPokemon(u32 arg) {
     extern u32 fn_8012640C(u32 a, u32 b, u32 c, u32 d);
     return (u8)fn_8012640C(arg, 0, 0xC2, 0);
 }
@@ -7531,7 +7531,7 @@ extern void jumptable_80363468();
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void fn_801286C8(void);
 /* 0x80128A64 | 0x25C */
-extern void fn_80143F6C(void);
+extern void itemDataBiosGetItemSoubiDataId(void);
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void fn_80128A64(void);
 /* 0x80128CC0 | 0x1C */
@@ -8336,8 +8336,8 @@ void fn_8012AC9C(void) {
     extern u32 fn_8012A5B0(u8* a, u32 b, u32 c);
     extern u32 fn_80123FBC(u32 val);
     extern void fn_8011F1A0(u32 val);
-    extern void* fn_801440A0(void);
-    extern u32 fn_80143F6C(void* a);
+    extern void* itemDataBiosGetPtr(void);
+    extern u32 itemDataBiosGetItemSoubiDataId(void* a);
     extern void fn_80122370(u32 a, u32 b, u32 c);
     u32* counter = (u32*)(lbl_80426BD0 + 0x184);
     u32 val;
@@ -8354,11 +8354,11 @@ void fn_8012AC9C(void) {
         if (obj != 0) {
             if ((u8)fn_80123FBC(obj) != 0) {
                 fn_8011F1A0(obj);
-                result = fn_801440A0();
+                result = itemDataBiosGetPtr();
                 if (result == NULL) {
                     val = 0;
                 } else {
-                    val = fn_80143F6C(result);
+                    val = itemDataBiosGetItemSoubiDataId(result);
                 }
                 fn_80122370(obj, val, 5);
             }
@@ -10239,8 +10239,8 @@ u32 fn_80120C6C(u32 a, u16 key) {
     return (*(u32* volatile*)&lbl_80478F90)[0] > key;
 }
 #endif
-extern void* fn_80143B08(void* ptr);
-extern void fn_80143ABC(void* ptr, u8 val);
+extern void* tasteDataGetPtr(void* ptr);
+extern void tasteDataGetAisyou(void* ptr, u8 val);
 #if 0
 asm void fn_80120D6C(void) {
 #include "src/game/gs_field_world_fn_80120D6C.inc"
@@ -10251,8 +10251,8 @@ s32 fn_80120D6C(u8* ptr, void* arg2) {
     u8 val; void* tmp;
     if (ptr == NULL) { return -1; }
     val = (u8)fn_8012640C(ptr, 0, 0xbf, 0);
-    tmp = fn_80143B08(arg2);
-    fn_80143ABC(tmp, val);
+    tmp = tasteDataGetPtr(arg2);
+    tasteDataGetAisyou(tmp, val);
 }
 #endif
 #if 0

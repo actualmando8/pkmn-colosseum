@@ -3475,7 +3475,7 @@ u32 fn_80140190(void** out, void* model, u32 arg) {
 #endif
 
 #if 0
-asm void fn_801436F0(void) {
+asm void itemParamGetPPMaxFullFlag(void) {
 #include "src/game/effect/effect_visual_fn_801436F0.inc"
 }
 #else
@@ -3495,7 +3495,7 @@ asm void fn_801436F0(void) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
-u32 fn_801436F0(void* ptr) {
+u32 itemParamGetPPMaxFullFlag(void* ptr) {
     s32 v;
     if (ptr == NULL) return 0;
     v = !!((((u8*)ptr)[0x4] >> 3) & 1);
@@ -3520,11 +3520,11 @@ u32 fn_801436F0(void* ptr) {
 #endif
 
 #if 0
-asm void fn_80143718(void) {
+asm void itemParamGetSpAttackEffortUp(void) {
 #include "src/game/effect/effect_visual_fn_80143718.inc"
 }
 #else
-unsigned int fn_80143718(const void *ptr) {
+unsigned int itemParamGetSpAttackEffortUp(const void *ptr) {
     const unsigned char *p = (const unsigned char*)ptr;
     if (p == NULL) return 0;
     return (unsigned int)(unsigned char)p[0xF];
@@ -3532,11 +3532,11 @@ unsigned int fn_80143718(const void *ptr) {
 #endif
 
 #if 0
-asm void fn_80143730(void) {
+asm void itemParamGetSpDefenceEffortUp(void) {
 #include "src/game/effect/effect_visual_fn_80143730.inc"
 }
 #else
-unsigned int fn_80143730(const void *ptr) {
+unsigned int itemParamGetSpDefenceEffortUp(const void *ptr) {
     const unsigned char *p = (const unsigned char*)ptr;
     if (p == NULL) return 0;
     return (unsigned int)(unsigned char)p[0xE];
@@ -3544,11 +3544,11 @@ unsigned int fn_80143730(const void *ptr) {
 #endif
 
 #if 0
-asm void fn_80143748(void) {
+asm void itemParamGetQuickEffortUp(void) {
 #include "src/game/effect/effect_visual_fn_80143748.inc"
 }
 #else
-unsigned int fn_80143748(const void *ptr) {
+unsigned int itemParamGetQuickEffortUp(const void *ptr) {
     const unsigned char *p = (const unsigned char*)ptr;
     if (p == NULL) return 0;
     return (unsigned int)(unsigned char)p[0xD];
@@ -3556,7 +3556,7 @@ unsigned int fn_80143748(const void *ptr) {
 #endif
 
 #if 0
-asm void fn_80143778(void) {
+asm void itemParamGetEvolutionFlag(void) {
 #include "src/game/effect/effect_visual_fn_80143778.inc"
 }
 #else
@@ -3576,7 +3576,7 @@ asm void fn_80143778(void) {
 #pragma peephole off
 #pragma peephole off
 #pragma peephole off
-unsigned int fn_80143778(const void *ptr) {
+unsigned int itemParamGetEvolutionFlag(const void *ptr) {
     s32 v;
     if (ptr == NULL) return 0;
     v = !!((((u8*)ptr)[0x4] >> 4) & 1);
@@ -3613,11 +3613,11 @@ unsigned int fn_801437D8(const void *ptr) {
 #endif
 
 #if 0
-asm void fn_80143ABC(void) {
+asm void tasteDataGetAisyou(void) {
 #include "src/game/effect/effect_visual_fn_80143ABC.inc"
 }
 #else
-int fn_80143ABC(void* obj, u32 index) {
+int tasteDataGetAisyou(void* obj, u32 index) {
     s8* new_var;
     u32 masked_index;
     if (obj == NULL) return 0;

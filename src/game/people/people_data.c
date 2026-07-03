@@ -12,7 +12,7 @@
  * Address range: 0x80140588 - 0x80144574 (approximately 0x3FEC bytes)
  * Function count: ~100 functions (83 of which are tiny getters/setters)
  *
- * Note: fn_801440A0 was previously defined here under the invented name
+ * Note: itemDataBiosGetPtr was previously defined here under the invented name
  * "peopleFieldGetByIndex"; it has been renamed to match the unmatched
  * fn_ slot it actually fills (address + exact size match, and the
  * "peopleFieldGetByIndex" label is independently corroborated by a
@@ -79,7 +79,7 @@
  *     Initialize the field people system. Allocates the NPC array,
  *     lookup table, and work buffer. Sets up global state.
  *
- * Getter/setter cluster (fn_8014369C - fn_80144064):
+ * Getter/setter cluster (itemParamGetFriend3Up - itemDataBiosCheckImportable):
  *   83 tiny functions (most 0x10-0x28 bytes each) that provide safe
  *   access to PeopleFieldEntry struct fields. Each follows the pattern:
  *     if (ptr == NULL) return 0;
@@ -90,24 +90,24 @@
  *   gPeopleFieldLookup (lbl_803681E8).
  *
  *   PeopleFieldEntry layout (from getter offsets):
- *     0x00: f32   field_00       (fn_80143C00 get, fn_80143850 set)
- *     0x04: u8    flags_04       (fn_801436F0 bit test)
- *     0x05: s8    field_05       (fn_801436D4 get)
- *     0x06: s8    field_06       (fn_801436B8 get)
- *     0x07: s8    field_07       (fn_8014369C get)
+ *     0x00: f32   field_00       (itemDataBiosSetUseful get, itemParamGetPPMaxUpFlag set)
+ *     0x04: u8    flags_04       (itemParamGetPPMaxFullFlag bit test)
+ *     0x05: s8    field_05       (itemParamGetFriend1Up get)
+ *     0x06: s8    field_06       (itemParamGetFriend2Up get)
+ *     0x07: s8    field_07       (itemParamGetFriend3Up get)
  *     0x08: (unknown)
- *     0x0C: u8    field_0C       (fn_80143760 get)
- *     0x0D: u8    field_0D       (fn_80143748 get)
- *     0x0E: u8    field_0E       (fn_80143730 get)
- *     0x0F: u8    field_0F       (fn_80143718 get)
- *     0x10: f32   posX           (fn_80143BD0 get, fn_80143C50 set)
- *     0x14: f32   posY           (fn_80143BE0 get, fn_80143C68 set)
- *     0x18: f32   posZ           (fn_80143BF0 get, fn_80143C80 set)
- *     0x1C: f32   rotAngle       (fn_80143C10 get, fn_80143C98 set)
- *     0x20: f32   scale          (fn_80143C20 get, fn_80143CB0 set)
- *     0x24: u32   modelRef       (fn_80143C30 get, fn_80143CE0 set)
+ *     0x0C: u8    field_0C       (itemParamGetDefenceEffortUp get)
+ *     0x0D: u8    field_0D       (itemParamGetQuickEffortUp get)
+ *     0x0E: u8    field_0E       (itemParamGetSpDefenceEffortUp get)
+ *     0x0F: u8    field_0F       (itemParamGetSpAttackEffortUp get)
+ *     0x10: f32   posX           (itemDataBiosSetFightUseKoukaDataId get, itemBiosGetNum set)
+ *     0x14: f32   posY           (itemDataBiosSetItemSoubiDataId get, itemBiosGetItemDataId set)
+ *     0x18: f32   posZ           (itemDataBiosSetDoc get, itemBallDataBiosGetSnatchSnatchWzxDataId set)
+ *     0x1C: f32   rotAngle       (itemDataBiosSetImportant get, itemBallDataBiosGetSnatchShakeWzxDataId set)
+ *     0x20: f32   scale          (itemDataBiosSetPrice get, itemBallDataBiosGetSnatchPokeoutWzxDataId set)
+ *     0x24: u32   modelRef       (itemDataBiosSetKind get, itemBallDataBiosGetSnatchBalllandWzxDataId set)
  *
- *   fn_801440A0 (peopleFieldGetByIndex) -- 0x50 bytes
+ *   itemDataBiosGetPtr (peopleFieldGetByIndex) -- 0x50 bytes
  *     The single most-called function in the entire range (48 external
  *     callers). Takes a u16 index, validates against gPeopleFieldCount,
  *     looks up the slot via gPeopleFieldLookup, multiplies by 0x28 to
@@ -185,7 +185,7 @@ typedef struct PeopleFieldEntry {
 } PeopleFieldEntry;
 
 /* ===================================================================
- * DECOMPILED: fn_801440A0 (aka "peopleFieldGetByIndex" in cross-file
+ * DECOMPILED: itemDataBiosGetPtr (aka "peopleFieldGetByIndex" in cross-file
  * comments, e.g. people_field.c)
  *
  * The most-called function in the entire range (48 external callers).
@@ -201,7 +201,7 @@ extern PeopleFieldEntry lbl_80363CE8[]; /* gPeopleFieldArray */
 /* Returns u8* (not PeopleFieldEntry*) to match the extern declaration
  * used at this function's call sites elsewhere in this file (e.g. the
  * fn_80142B24 dispatcher below). */
-u8* fn_801440A0(u16 index) {
+u8* itemDataBiosGetPtr(u16 index) {
     u16 slot;
 
     if (index >= lbl_80478BD8) {
@@ -238,116 +238,116 @@ u8* fn_801440A0(u16 index) {
 /* fn_801431AC: peopleFieldInit (0x4F0 bytes) */
 
 /* --- Getter/Setter cluster (83 functions) --- */
-/* fn_8014369C: getField07 */
-/* fn_801436B8: getField06 */
-/* fn_801436D4: getField05 */
-/* fn_801436F0: testFlags04 */
-/* fn_80143718: getField0F */
-/* fn_80143730: getField0E */
-/* fn_80143748: getField0D */
-/* fn_80143760: getField0C */
-/* fn_80143778: getField08_lo (bit extract) */
-/* fn_801437A0: getField08_hi */
-/* fn_801437B8: setField08_lo */
-/* fn_801437E0: getField09 */
-/* fn_801437F8: setField09 */
-/* fn_80143820: getField0A */
-/* fn_80143838: getField0B */
-/* fn_80143850: setField00 (f32) */
-/* fn_80143878: setField04_bit0 */
-/* fn_801438A0: setField04_bit1 */
-/* fn_801438C8: setField04_bit2 */
-/* fn_801438F0: setField04_bit3 */
-/* fn_80143918: setField05 (s8) */
-/* fn_80143940: setField06 (s8) */
-/* fn_80143968: setField07 (s8) */
-/* fn_80143990: setField08 (u32) */
-/* fn_801439B8: setField0C (u8) */
-/* fn_801439D4: setField0D (u8) */
-/* fn_801439F0: setField0E (u8) */
-/* fn_80143A0C: setField0F (u8) */
-/* fn_80143A28: clearFlags04 */
-/* fn_80143A44: setFlags04 */
-/* fn_80143A6C: setField_special1 */
-/* fn_80143A94: setField_special2 */
-/* fn_80143ABC: setField_special3 */
-/* fn_80143AF0: getField_special1 */
-/* fn_80143B08: getField_special2 */
-/* fn_80143B30: getField_special3 */
-/* fn_80143B48: setField_special4 */
-/* fn_80143B70: getField10_int (posX as int) */
-/* fn_80143B80: getField14_int (posY as int) */
-/* fn_80143B90: getField18_int (posZ as int) */
-/* fn_80143BA0: getField1C_int (rotAngle as int) */
-/* fn_80143BB0: setField10_int */
-/* fn_80143BD0: getPosX (f32) */
-/* fn_80143BE0: getPosY (f32) */
-/* fn_80143BF0: getPosZ (f32) */
-/* fn_80143C00: getField00 (f32) */
-/* fn_80143C10: getRotAngle (f32) */
-/* fn_80143C20: getScale (f32) */
-/* fn_80143C30: getModelRef (u32) */
-/* fn_80143C40: getField24_byte */
-/* fn_80143C50: setPosX (f32) */
-/* fn_80143C68: setPosY (f32) */
-/* fn_80143C80: setPosZ (f32) */
-/* fn_80143C98: setRotAngle (f32) */
-/* fn_80143CB0: setScale (f32) */
-/* fn_80143CC8: setModelRef */
-/* fn_80143CE0: setField24 */
-/* fn_80143CF8: setField24_byte */
-/* fn_80143D10: getField_ext1 */
-/* fn_80143D28: getField_ext2 */
-/* fn_80143D40: getField_ext3 */
-/* fn_80143D58: getField_ext4 */
-/* fn_80143D70: getField_ext5 */
-/* fn_80143D88: getField_ext6 */
-/* fn_80143DA0: getField_ext7 (with extra logic) */
-/* fn_80143DCC: getField_ext8 */
-/* fn_80143DE4: getField_ext9 */
-/* fn_80143DFC: getField_ext10 */
-/* fn_80143E14: getField_ext11 */
-/* fn_80143E2C: setField_ext1 */
+/* itemParamGetFriend3Up: getField07 */
+/* itemParamGetFriend2Up: getField06 */
+/* itemParamGetFriend1Up: getField05 */
+/* itemParamGetPPMaxFullFlag: testFlags04 */
+/* itemParamGetSpAttackEffortUp: getField0F */
+/* itemParamGetSpDefenceEffortUp: getField0E */
+/* itemParamGetQuickEffortUp: getField0D */
+/* itemParamGetDefenceEffortUp: getField0C */
+/* itemParamGetEvolutionFlag: getField08_lo (bit extract) */
+/* itemParamGetPPUp: getField08_hi */
+/* itemParamGetPPSelectFlag: setField08_lo */
+/* itemParamGetHPUp: getField09 */
+/* itemParamGetReviveFlag: setField09 */
+/* itemParamGetAttackEffortUp: getField0A */
+/* itemParamGetHPEffortUp: getField0B */
+/* itemParamGetPPMaxUpFlag: setField00 (f32) */
+/* itemParamGetConfuseFlag: setField04_bit0 */
+/* itemParamGetParalyzeFlag: setField04_bit1 */
+/* itemParamGetFreezeFlag: setField04_bit2 */
+/* itemParamGetBurnFlag: setField04_bit3 */
+/* itemParamGetPoisonFlag: setField05 (s8) */
+/* itemParamGetSleepFlag: setField06 (s8) */
+/* itemParamGetLevelUpFlag: setField07 (s8) */
+/* itemParamGetGuardFlag: setField08 (u32) */
+/* itemParamGetSpAttackUp: setField0C (u8) */
+/* itemParamGetHitUp: setField0D (u8) */
+/* itemParamGetQuickUp: setField0E (u8) */
+/* itemParamGetDefenceUp: setField0F (u8) */
+/* itemParamGetAttackUp: clearFlags04 */
+/* itemParamGetCriticalFlag: setFlags04 */
+/* itemParamGetMeromeroFlag: setField_special1 */
+/* itemParamGetPtr: setField_special2 */
+/* tasteDataGetAisyou: setField_special3 */
+/* tasteDataGetNigateMsgDataId: getField_special1 */
+/* tasteDataGetPtr: getField_special2 */
+/* itemSoubiDataBiosGetFightKoukaDataId: getField_special3 */
+/* itemSoubiDataBiosGetPtr: setField_special4 */
+/* itemBiosSetNum: getField10_int (posX as int) */
+/* itemBiosSetItemDataId: getField14_int (posY as int) */
+/* itemBallDataBiosSetFightKoukaDataId: getField18_int (posZ as int) */
+/* itemDataBiosSetBuff: getField1C_int (rotAngle as int) */
+/* itemDataBiosSetUseFriend: setField10_int */
+/* itemDataBiosSetFightUseKoukaDataId: getPosX (f32) */
+/* itemDataBiosSetItemSoubiDataId: getPosY (f32) */
+/* itemDataBiosSetDoc: getPosZ (f32) */
+/* itemDataBiosSetUseful: getField00 (f32) */
+/* itemDataBiosSetImportant: getRotAngle (f32) */
+/* itemDataBiosSetPrice: getScale (f32) */
+/* itemDataBiosSetKind: getModelRef (u32) */
+/* itemDataBiosSetName: getField24_byte */
+/* itemBiosGetNum: setPosX (f32) */
+/* itemBiosGetItemDataId: setPosY (f32) */
+/* itemBallDataBiosGetSnatchSnatchWzxDataId: setPosZ (f32) */
+/* itemBallDataBiosGetSnatchShakeWzxDataId: setRotAngle (f32) */
+/* itemBallDataBiosGetSnatchPokeoutWzxDataId: setScale (f32) */
+/* itemBallDataBiosGetSnatchMissWzxDataId: setModelRef */
+/* itemBallDataBiosGetSnatchBalllandWzxDataId: setField24 */
+/* itemBallDataBiosGetSnatchAttackWzxDataId: setField24_byte */
+/* itemBallDataBiosGetThrowWzxDataId: getField_ext1 */
+/* itemBallDataBiosGetDowninWzxDataId: getField_ext2 */
+/* itemBallDataBiosGetOutWzxDataId: getField_ext3 */
+/* itemBallDataBiosGetOpenWzxDataId: getField_ext4 */
+/* itemBallDataBiosGetInWzxDataId: getField_ext5 */
+/* itemBallDataBiosGetFightKoukaDataId: getField_ext6 */
+/* itemBallDataBiosGetPtr: getField_ext7 (with extra logic) */
+/* itemDataBiosGetBattleUseFunc: getField_ext8 */
+/* itemDataBiosGetFieldUseFunc: getField_ext9 */
+/* itemDataBiosGetItemEffectParam: getField_ext10 */
+/* itemDataBiosGetBuff: getField_ext11 */
+/* itemDataBiosGetUseFriend: setField_ext1 */
 /* itemDataBiosGetKinomiNo: setField_ext2 */
 /* itemDataBiosGetHidenMachineNo: setField_ext3 (0x68 bytes) */
 /* itemDataBiosGetWazaIDByWazaMachineNo: setField_ext4 */
 /* itemDataBiosGetWazaMachineNo: setField_ext5 */
-/* fn_80143F54: getField_ext12 */
-/* fn_80143F6C: getField_ext13 */
-/* fn_80143F84: getField_ext14 */
+/* itemDataBiosGetFightUseKoukaDataId: getField_ext12 */
+/* itemDataBiosGetItemSoubiDataId: getField_ext13 */
+/* itemDataBiosGetDoc: getField_ext14 */
 /* fn_80143F9C: getField_ext15 */
 /* fn_80143FB4: getField_ext16 */
 /* fn_80143FCC: getField_ext17 */
-/* fn_80143FE4: getField_ext18 */
-/* fn_80143FFC: getField_ext19 */
-/* fn_80144014: getField_ext20 */
-/* fn_8014402C: setField_ext6 */
-/* fn_80144064: setField_ext7 */
-/* fn_80144088: peopleFieldQuery (0x18 bytes) -- quick status check */
+/* itemDataBiosGetCoupon: getField_ext18 */
+/* itemDataBiosGetPrice: getField_ext19 */
+/* itemDataBiosGetKind: getField_ext20 */
+/* itemDataBiosCheckExportable: setField_ext6 */
+/* itemDataBiosCheckImportable: setField_ext7 */
+/* itemDataBiosGetName: peopleFieldQuery (0x18 bytes) -- quick status check */
 
-/* fn_801440F0: peopleFieldOpenModel (0xB8 bytes) */
-/* fn_801441A8: peopleFieldConfigModel (0x224 bytes) */
+/* itemUse2PokemonSimulation: peopleFieldOpenModel (0xB8 bytes) */
+/* friendXUp__FP7PokemonP12FightPokemonScUsUs: peopleFieldConfigModel (0x224 bytes) */
 /* fn_801443CC: peopleFieldFinalizeModel (0x1A8 bytes) */
 /* renamed symbols referenced by asm incs (symbolmap port) */
 /* Forward declarations for self-referencing asm blocks */
 extern void fn_801425E8(u32* base, u16 count, u8 mode);
 extern void fn_80142B24(void*, u32, u16, u32, u32);
 extern s32 itemGetStatus(u32, u16, u16, u32);
-extern u16  fn_80143B30(u8* p);
-extern u8*  fn_80143B48(u16 idx);
-extern void fn_80143B70(u8* p, u16 val);
-extern void fn_80143B80(u8* p, u16 val);
-extern void fn_80143B90(u8* p, u16 val);
-extern void fn_80143BA0(u8* p, u32 val);
-extern void fn_80143BB0(u8* p, u16 idx, u8 val);
-extern void fn_80143BD0(u8* p, u16 val);
-extern void fn_80143BE0(u8* p, u16 val);
-extern void fn_80143BF0(u8* p, u32 val);
-extern void fn_80143C00(u8* p, u8 val);
-extern void fn_80143C10(u8* p, u8 val);
-extern void fn_80143C20(u8* p, u16 val);
-extern void fn_80143C30(u8* p, u8 val);
-extern void fn_80143C40(u8* p, u32 val);
+extern u16  itemSoubiDataBiosGetFightKoukaDataId(u8* p);
+extern u8*  itemSoubiDataBiosGetPtr(u16 idx);
+extern void itemBiosSetNum(u8* p, u16 val);
+extern void itemBiosSetItemDataId(u8* p, u16 val);
+extern void itemBallDataBiosSetFightKoukaDataId(u8* p, u16 val);
+extern void itemDataBiosSetBuff(u8* p, u32 val);
+extern void itemDataBiosSetUseFriend(u8* p, u16 idx, u8 val);
+extern void itemDataBiosSetFightUseKoukaDataId(u8* p, u16 val);
+extern void itemDataBiosSetItemSoubiDataId(u8* p, u16 val);
+extern void itemDataBiosSetDoc(u8* p, u32 val);
+extern void itemDataBiosSetUseful(u8* p, u8 val);
+extern void itemDataBiosSetImportant(u8* p, u8 val);
+extern void itemDataBiosSetPrice(u8* p, u16 val);
+extern void itemDataBiosSetKind(u8* p, u8 val);
+extern void itemDataBiosSetName(u8* p, u32 val);
 
 #if 0
 asm void fn_80140A9C(void) {
@@ -699,8 +699,8 @@ void fn_80142A88(u32* base, u16 count) {
     }
 }
 #endif
-extern u8* fn_801440A0(u16 idx);
-extern u8* fn_80143DA0(u16 idx);
+extern u8* itemDataBiosGetPtr(u16 idx);
+extern u8* itemBallDataBiosGetPtr(u16 idx);
 extern void fn_8020A328(u8* p, u16 val);
 extern void fn_8020A318(u8* p, u16 val);
 extern void fn_8020A308(u8* p, u32 val);
@@ -720,12 +720,12 @@ void fn_80142B24(void* p, u32 a, u16 b, u32 c, u32 d) {
     }
 
     if (b < 0xb) {
-        target = fn_801440A0((u16)a);
+        target = itemDataBiosGetPtr((u16)a);
         if (target == NULL) {
             return;
         }
     } else if (b < 0x18) {
-        target = fn_80143DA0((u16)a);
+        target = itemBallDataBiosGetPtr((u16)a);
         if (target == NULL) {
             return;
         }
@@ -738,43 +738,43 @@ void fn_80142B24(void* p, u32 a, u16 b, u32 c, u32 d) {
 
     switch (b) {
     case 1:
-        fn_80143C40(target, d);
+        itemDataBiosSetName(target, d);
         break;
     case 2:
-        fn_80143C30(target, (u8)d);
+        itemDataBiosSetKind(target, (u8)d);
         break;
     case 3:
-        fn_80143C20(target, (u16)d);
+        itemDataBiosSetPrice(target, (u16)d);
         break;
     case 4:
-        fn_80143C10(target, (u8)d);
+        itemDataBiosSetImportant(target, (u8)d);
         break;
     case 5:
-        fn_80143C00(target, (u8)d);
+        itemDataBiosSetUseful(target, (u8)d);
         break;
     case 6:
-        fn_80143BF0(target, d);
+        itemDataBiosSetDoc(target, d);
         break;
     case 7:
-        fn_80143BE0(target, (u16)d);
+        itemDataBiosSetItemSoubiDataId(target, (u16)d);
         break;
     case 8:
-        fn_80143BD0(target, (u16)d);
+        itemDataBiosSetFightUseKoukaDataId(target, (u16)d);
         break;
     case 9:
-        fn_80143BB0(target, (u16)c, (u8)d);
+        itemDataBiosSetUseFriend(target, (u16)c, (u8)d);
         break;
     case 10:
-        fn_80143BA0(target, d);
+        itemDataBiosSetBuff(target, d);
         /* fallthrough */
     case 12:
-        fn_80143B90(target, (u16)d);
+        itemBallDataBiosSetFightKoukaDataId(target, (u16)d);
         break;
     case 27:
-        fn_80143B80(target, (u16)d);
+        itemBiosSetItemDataId(target, (u16)d);
         break;
     case 28:
-        fn_80143B70(target, (u16)d);
+        itemBiosSetNum(target, (u16)d);
         break;
     case 30:
         fn_8020A328(target, (u16)d);
@@ -793,30 +793,30 @@ void fn_80142B24(void* p, u32 a, u16 b, u32 c, u32 d) {
     }
 }
 #endif
-extern u32 fn_80144088(u8* p);
-extern u8 fn_80144014(u8* p);
-extern u32 fn_80143FFC(u8* p);
+extern u32 itemDataBiosGetName(u8* p);
+extern u8 itemDataBiosGetKind(u8* p);
+extern u32 itemDataBiosGetPrice(u8* p);
 extern u8 fn_80143FCC(u8* p);
 extern u8 fn_80143FB4(u8* p);
-extern u32 fn_80143F84(u8* p);
-extern u32 fn_80143F6C(u8* p);
-extern u32 fn_80143F54(u8* p);
-extern s32 fn_80143E2C(u8* p, u16 idx);
-extern u32 fn_80143E14(u8* p);
-extern u32 fn_80143D88(u8* p);
-extern u32 fn_80143D70(u8* p);
-extern u32 fn_80143D58(u8* p);
-extern u32 fn_80143D40(u8* p);
-extern u32 fn_80143D28(u8* p);
-extern u32 fn_80143D10(u8* p);
-extern u32 fn_80143CF8(u8* p);
-extern u32 fn_80143CE0(u8* p);
-extern u32 fn_80143CC8(u8* p);
-extern u32 fn_80143CB0(u8* p);
-extern u32 fn_80143C98(u8* p);
-extern u32 fn_80143C80(u8* p);
-extern u32 fn_80143C68(u8* p);
-extern u32 fn_80143C50(u8* p);
+extern u32 itemDataBiosGetDoc(u8* p);
+extern u32 itemDataBiosGetItemSoubiDataId(u8* p);
+extern u32 itemDataBiosGetFightUseKoukaDataId(u8* p);
+extern s32 itemDataBiosGetUseFriend(u8* p, u16 idx);
+extern u32 itemDataBiosGetBuff(u8* p);
+extern u32 itemBallDataBiosGetFightKoukaDataId(u8* p);
+extern u32 itemBallDataBiosGetInWzxDataId(u8* p);
+extern u32 itemBallDataBiosGetOpenWzxDataId(u8* p);
+extern u32 itemBallDataBiosGetOutWzxDataId(u8* p);
+extern u32 itemBallDataBiosGetDowninWzxDataId(u8* p);
+extern u32 itemBallDataBiosGetThrowWzxDataId(u8* p);
+extern u32 itemBallDataBiosGetSnatchAttackWzxDataId(u8* p);
+extern u32 itemBallDataBiosGetSnatchBalllandWzxDataId(u8* p);
+extern u32 itemBallDataBiosGetSnatchMissWzxDataId(u8* p);
+extern u32 itemBallDataBiosGetSnatchPokeoutWzxDataId(u8* p);
+extern u32 itemBallDataBiosGetSnatchShakeWzxDataId(u8* p);
+extern u32 itemBallDataBiosGetSnatchSnatchWzxDataId(u8* p);
+extern u32 itemBiosGetItemDataId(u8* p);
+extern u32 itemBiosGetNum(u8* p);
 extern u32 fn_8020A380(u8* p);
 extern u32 fn_8020A368(u8* p);
 extern u32 fn_8020A350(u8* p);
@@ -836,17 +836,17 @@ s32 itemGetStatus(u32 a, u16 b, u16 c, u32 d) {
     }
 
     if (c < 0xb) {
-        target = fn_801440A0(b);
+        target = itemDataBiosGetPtr(b);
         if (target == NULL) {
             return 0;
         }
     } else if (c < 0x18) {
-        target = fn_80143DA0(b);
+        target = itemBallDataBiosGetPtr(b);
         if (target == NULL) {
             return 0;
         }
     } else if (c < 0x1a) {
-        target = fn_80143B48(b);
+        target = itemSoubiDataBiosGetPtr(b);
         if (target == NULL) {
             return 0;
         }
@@ -859,55 +859,55 @@ s32 itemGetStatus(u32 a, u16 b, u16 c, u32 d) {
 
     switch (c) {
     case 1:
-        return fn_80144088(target);
+        return itemDataBiosGetName(target);
     case 2:
-        return fn_80144014(target);
+        return itemDataBiosGetKind(target);
     case 3:
-        return (u16)fn_80143FFC(target);
+        return (u16)itemDataBiosGetPrice(target);
     case 4:
         return fn_80143FCC(target);
     case 5:
         return fn_80143FB4(target);
     case 6:
-        return fn_80143F84(target);
+        return itemDataBiosGetDoc(target);
     case 7:
-        return (u16)fn_80143F6C(target);
+        return (u16)itemDataBiosGetItemSoubiDataId(target);
     case 8:
-        return (u16)fn_80143F54(target);
+        return (u16)itemDataBiosGetFightUseKoukaDataId(target);
     case 9:
-        return (s8)fn_80143E2C(target, (u16)d);
+        return (s8)itemDataBiosGetUseFriend(target, (u16)d);
     case 10:
-        return fn_80143E14(target);
+        return itemDataBiosGetBuff(target);
     case 12:
-        return (u16)fn_80143D88(target);
+        return (u16)itemBallDataBiosGetFightKoukaDataId(target);
     case 13:
-        return fn_80143D70(target);
+        return itemBallDataBiosGetInWzxDataId(target);
     case 14:
-        return fn_80143D58(target);
+        return itemBallDataBiosGetOpenWzxDataId(target);
     case 15:
-        return fn_80143D40(target);
+        return itemBallDataBiosGetOutWzxDataId(target);
     case 16:
-        return fn_80143D28(target);
+        return itemBallDataBiosGetDowninWzxDataId(target);
     case 17:
-        return fn_80143D10(target);
+        return itemBallDataBiosGetThrowWzxDataId(target);
     case 18:
-        return fn_80143CF8(target);
+        return itemBallDataBiosGetSnatchAttackWzxDataId(target);
     case 19:
-        return fn_80143CE0(target);
+        return itemBallDataBiosGetSnatchBalllandWzxDataId(target);
     case 20:
-        return fn_80143CC8(target);
+        return itemBallDataBiosGetSnatchMissWzxDataId(target);
     case 21:
-        return fn_80143CB0(target);
+        return itemBallDataBiosGetSnatchPokeoutWzxDataId(target);
     case 22:
-        return fn_80143C98(target);
+        return itemBallDataBiosGetSnatchShakeWzxDataId(target);
     case 23:
-        return fn_80143C80(target);
+        return itemBallDataBiosGetSnatchSnatchWzxDataId(target);
     case 25:
-        return (u16)fn_80143B30(target);
+        return (u16)itemSoubiDataBiosGetFightKoukaDataId(target);
     case 27:
-        return (u16)fn_80143C68(target);
+        return (u16)itemBiosGetItemDataId(target);
     case 28:
-        return (u16)fn_80143C50(target);
+        return (u16)itemBiosGetNum(target);
     case 30:
         return (u16)fn_8020A380(target);
     case 31:
@@ -1395,36 +1395,36 @@ returnSixteen:
 }
 #endif
 #if 0
-asm void fn_801436B8(void) {
+asm void itemParamGetFriend2Up(void) {
 #include "src/game/people/people_data_fn_801436B8.inc"
 }
 #else
 #pragma optimization_level 4
-s8 fn_801436B8(u8* p) {
+s8 itemParamGetFriend2Up(u8* p) {
     if (p == NULL) return 0;
     return (s8)p[0x6];
 }
 #endif
 #if 0
-asm void fn_801436D4(void) {
+asm void itemParamGetFriend1Up(void) {
 #include "src/game/people/people_data_fn_801436D4.inc"
 }
 #else
 #pragma optimization_level 4
-s8 fn_801436D4(u8* p) {
+s8 itemParamGetFriend1Up(u8* p) {
     if (p == NULL) return 0;
     return (s8)p[0x5];
 }
 #endif
 #if 0
-asm void fn_801436F0(void) {
+asm void itemParamGetPPMaxFullFlag(void) {
 #include "src/game/people/people_data_fn_801436F0.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma push
 #pragma peephole off
-s32 fn_801436F0(u8* p) {
+s32 itemParamGetPPMaxFullFlag(u8* p) {
     s32 v;
     if (p == NULL) return 0;
     v = !!((p[0x4] >> 3) & 1);
@@ -1433,58 +1433,58 @@ s32 fn_801436F0(u8* p) {
 #pragma pop
 #endif
 #if 0
-asm void fn_80143718(void) {
+asm void itemParamGetSpAttackEffortUp(void) {
 #include "src/game/people/people_data_fn_80143718.inc"
 }
 #else
 #pragma optimization_level 4
-u8 fn_80143718(u8* p) {
+u8 itemParamGetSpAttackEffortUp(u8* p) {
     if (p == NULL) return 0;
     return p[0xf];
 }
 #endif
 #if 0
-asm void fn_80143730(void) {
+asm void itemParamGetSpDefenceEffortUp(void) {
 #include "src/game/people/people_data_fn_80143730.inc"
 }
 #else
 #pragma optimization_level 4
-u8 fn_80143730(u8* p) {
+u8 itemParamGetSpDefenceEffortUp(u8* p) {
     if (p == NULL) return 0;
     return p[0xe];
 }
 #endif
 #if 0
-asm void fn_80143748(void) {
+asm void itemParamGetQuickEffortUp(void) {
 #include "src/game/people/people_data_fn_80143748.inc"
 }
 #else
 #pragma optimization_level 4
-u8 fn_80143748(u8* p) {
+u8 itemParamGetQuickEffortUp(u8* p) {
     if (p == NULL) return 0;
     return p[0xd];
 }
 #endif
 #if 0
-asm void fn_80143760(void) {
+asm void itemParamGetDefenceEffortUp(void) {
 #include "src/game/people/people_data_fn_80143760.inc"
 }
 #else
 #pragma optimization_level 4
-u8 fn_80143760(u8* p) {
+u8 itemParamGetDefenceEffortUp(u8* p) {
     if (p == NULL) return 0;
     return p[0xc];
 }
 #endif
 #if 0
-asm void fn_80143778(void) {
+asm void itemParamGetEvolutionFlag(void) {
 #include "src/game/people/people_data_fn_80143778.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma push
 #pragma peephole off
-s32 fn_80143778(u8* p) {
+s32 itemParamGetEvolutionFlag(u8* p) {
     s32 v;
     if (p == NULL) return 0;
     v = !!((p[0x4] >> 4) & 1);
@@ -1493,25 +1493,25 @@ s32 fn_80143778(u8* p) {
 #pragma pop
 #endif
 #if 0
-asm void fn_801437A0(void) {
+asm void itemParamGetPPUp(void) {
 #include "src/game/people/people_data_fn_801437A0.inc"
 }
 #else
 #pragma optimization_level 4
-u8 fn_801437A0(u8* p) {
+u8 itemParamGetPPUp(u8* p) {
     if (p == NULL) return 0;
     return p[0xb];
 }
 #endif
 #if 0
-asm void fn_801437B8(void) {
+asm void itemParamGetPPSelectFlag(void) {
 #include "src/game/people/people_data_fn_801437B8.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma push
 #pragma peephole off
-s32 fn_801437B8(u8* p) {
+s32 itemParamGetPPSelectFlag(u8* p) {
     s32 v;
     if (p == NULL) return 0;
     v = !!((p[0x4] >> 5) & 1);
@@ -1520,25 +1520,25 @@ s32 fn_801437B8(u8* p) {
 #pragma pop
 #endif
 #if 0
-asm void fn_801437E0(void) {
+asm void itemParamGetHPUp(void) {
 #include "src/game/people/people_data_fn_801437E0.inc"
 }
 #else
 #pragma optimization_level 4
-u8 fn_801437E0(u8* p) {
+u8 itemParamGetHPUp(u8* p) {
     if (p == NULL) return 0;
     return p[0xa];
 }
 #endif
 #if 0
-asm void fn_801437F8(void) {
+asm void itemParamGetReviveFlag(void) {
 #include "src/game/people/people_data_fn_801437F8.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma push
 #pragma peephole off
-s32 fn_801437F8(u8* p) {
+s32 itemParamGetReviveFlag(u8* p) {
     s32 v;
     if (p == NULL) return 0;
     v = !!((p[0x4] >> 6) & 1);
@@ -1547,36 +1547,36 @@ s32 fn_801437F8(u8* p) {
 #pragma pop
 #endif
 #if 0
-asm void fn_80143820(void) {
+asm void itemParamGetAttackEffortUp(void) {
 #include "src/game/people/people_data_fn_80143820.inc"
 }
 #else
 #pragma optimization_level 4
-u8 fn_80143820(u8* p) {
+u8 itemParamGetAttackEffortUp(u8* p) {
     if (p == NULL) return 0;
     return p[0x9];
 }
 #endif
 #if 0
-asm void fn_80143838(void) {
+asm void itemParamGetHPEffortUp(void) {
 #include "src/game/people/people_data_fn_80143838.inc"
 }
 #else
 #pragma optimization_level 4
-u8 fn_80143838(u8* p) {
+u8 itemParamGetHPEffortUp(u8* p) {
     if (p == NULL) return 0;
     return p[0x8];
 }
 #endif
 #if 0
-asm void fn_80143850(void) {
+asm void itemParamGetPPMaxUpFlag(void) {
 #include "src/game/people/people_data_fn_80143850.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma push
 #pragma peephole off
-s32 fn_80143850(u8* p) {
+s32 itemParamGetPPMaxUpFlag(u8* p) {
     s32 v;
     if (p == NULL) return 0;
     v = !!((p[0x4] >> 7) & 1);
@@ -1585,14 +1585,14 @@ s32 fn_80143850(u8* p) {
 #pragma pop
 #endif
 #if 0
-asm void fn_80143878(void) {
+asm void itemParamGetConfuseFlag(void) {
 #include "src/game/people/people_data_fn_80143878.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma push
 #pragma peephole off
-s32 fn_80143878(u8* p) {
+s32 itemParamGetConfuseFlag(u8* p) {
     s32 v;
     if (p == NULL) return 0;
     v = !!(p[0x3] & 1);
@@ -1601,14 +1601,14 @@ s32 fn_80143878(u8* p) {
 #pragma pop
 #endif
 #if 0
-asm void fn_801438A0(void) {
+asm void itemParamGetParalyzeFlag(void) {
 #include "src/game/people/people_data_fn_801438A0.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma push
 #pragma peephole off
-s32 fn_801438A0(u8* p) {
+s32 itemParamGetParalyzeFlag(u8* p) {
     s32 v;
     if (p == NULL) return 0;
     v = !!((p[0x3] >> 1) & 1);
@@ -1617,14 +1617,14 @@ s32 fn_801438A0(u8* p) {
 #pragma pop
 #endif
 #if 0
-asm void fn_801438C8(void) {
+asm void itemParamGetFreezeFlag(void) {
 #include "src/game/people/people_data_fn_801438C8.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma push
 #pragma peephole off
-s32 fn_801438C8(u8* p) {
+s32 itemParamGetFreezeFlag(u8* p) {
     s32 v;
     if (p == NULL) return 0;
     v = !!((p[0x3] >> 2) & 1);
@@ -1633,14 +1633,14 @@ s32 fn_801438C8(u8* p) {
 #pragma pop
 #endif
 #if 0
-asm void fn_801438F0(void) {
+asm void itemParamGetBurnFlag(void) {
 #include "src/game/people/people_data_fn_801438F0.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma push
 #pragma peephole off
-s32 fn_801438F0(u8* p) {
+s32 itemParamGetBurnFlag(u8* p) {
     s32 v;
     if (p == NULL) return 0;
     v = !!((p[0x3] >> 3) & 1);
@@ -1649,14 +1649,14 @@ s32 fn_801438F0(u8* p) {
 #pragma pop
 #endif
 #if 0
-asm void fn_80143918(void) {
+asm void itemParamGetPoisonFlag(void) {
 #include "src/game/people/people_data_fn_80143918.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma push
 #pragma peephole off
-s32 fn_80143918(u8* p) {
+s32 itemParamGetPoisonFlag(u8* p) {
     s32 v;
     if (p == NULL) return 0;
     v = !!((p[0x3] >> 4) & 1);
@@ -1665,14 +1665,14 @@ s32 fn_80143918(u8* p) {
 #pragma pop
 #endif
 #if 0
-asm void fn_80143940(void) {
+asm void itemParamGetSleepFlag(void) {
 #include "src/game/people/people_data_fn_80143940.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma push
 #pragma peephole off
-s32 fn_80143940(u8* p) {
+s32 itemParamGetSleepFlag(u8* p) {
     s32 v;
     if (p == NULL) return 0;
     v = !!((p[0x3] >> 5) & 1);
@@ -1681,14 +1681,14 @@ s32 fn_80143940(u8* p) {
 #pragma pop
 #endif
 #if 0
-asm void fn_80143968(void) {
+asm void itemParamGetLevelUpFlag(void) {
 #include "src/game/people/people_data_fn_80143968.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma push
 #pragma peephole off
-s32 fn_80143968(u8* p) {
+s32 itemParamGetLevelUpFlag(u8* p) {
     s32 v;
     if (p == NULL) return 0;
     v = !!((p[0x3] >> 6) & 1);
@@ -1697,14 +1697,14 @@ s32 fn_80143968(u8* p) {
 #pragma pop
 #endif
 #if 0
-asm void fn_80143990(void) {
+asm void itemParamGetGuardFlag(void) {
 #include "src/game/people/people_data_fn_80143990.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma push
 #pragma peephole off
-s32 fn_80143990(u8* p) {
+s32 itemParamGetGuardFlag(u8* p) {
     s32 v;
     if (p == NULL) return 0;
     v = !!((p[0x3] >> 7) & 1);
@@ -1713,69 +1713,69 @@ s32 fn_80143990(u8* p) {
 #pragma pop
 #endif
 #if 0
-asm void fn_801439B8(void) {
+asm void itemParamGetSpAttackUp(void) {
 #include "src/game/people/people_data_fn_801439B8.inc"
 }
 #else
 #pragma optimization_level 4
-u32 fn_801439B8(u8* p) {
+u32 itemParamGetSpAttackUp(u8* p) {
     if (p == NULL) return 0;
     return (u32)(p[0x2] & 0xF);
 }
 #endif
 #if 0
-asm void fn_801439D4(void) {
+asm void itemParamGetHitUp(void) {
 #include "src/game/people/people_data_fn_801439D4.inc"
 }
 #else
 #pragma optimization_level 4
-u32 fn_801439D4(u8* p) {
+u32 itemParamGetHitUp(u8* p) {
     if (p == NULL) return 0;
     return (u32)((p[0x2] >> 4) & 0xF);
 }
 #endif
 #if 0
-asm void fn_801439F0(void) {
+asm void itemParamGetQuickUp(void) {
 #include "src/game/people/people_data_fn_801439F0.inc"
 }
 #else
 #pragma optimization_level 4
-u32 fn_801439F0(u8* p) {
+u32 itemParamGetQuickUp(u8* p) {
     if (p == NULL) return 0;
     return (u32)(p[0x1] & 0xF);
 }
 #endif
 #if 0
-asm void fn_80143A0C(void) {
+asm void itemParamGetDefenceUp(void) {
 #include "src/game/people/people_data_fn_80143A0C.inc"
 }
 #else
 #pragma optimization_level 4
-u32 fn_80143A0C(u8* p) {
+u32 itemParamGetDefenceUp(u8* p) {
     if (p == NULL) return 0;
     return (u32)((p[0x1] >> 4) & 0xF);
 }
 #endif
 #if 0
-asm void fn_80143A28(void) {
+asm void itemParamGetAttackUp(void) {
 #include "src/game/people/people_data_fn_80143A28.inc"
 }
 #else
 #pragma optimization_level 4
-u32 fn_80143A28(u8* p) {
+u32 itemParamGetAttackUp(u8* p) {
     if (p == NULL) return 0;
     return (u32)((p[0x0] >> 1) & 0xF);
 }
 #endif
 #if 0
-asm void fn_80143A44(void) {
+asm void itemParamGetCriticalFlag(void) {
 #include "src/game/people/people_data_fn_80143A44.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma push
 #pragma peephole off
-s32 fn_80143A44(u8* p) {
+s32 itemParamGetCriticalFlag(u8* p) {
     s32 v;
     if (p == NULL) return 0;
     v = !!((p[0x0] >> 5) & 1);
@@ -1784,14 +1784,14 @@ s32 fn_80143A44(u8* p) {
 #pragma pop
 #endif
 #if 0
-asm void fn_80143A6C(void) {
+asm void itemParamGetMeromeroFlag(void) {
 #include "src/game/people/people_data_fn_80143A6C.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma push
 #pragma peephole off
-s32 fn_80143A6C(u8* p) {
+s32 itemParamGetMeromeroFlag(u8* p) {
     s32 v;
     if (p == NULL) return 0;
     v = !!((p[0x0] >> 7) & 1);
@@ -1802,36 +1802,36 @@ s32 fn_80143A6C(u8* p) {
 extern u32 lbl_80478BE0;
 extern u8 lbl_80368630[];
 #if 0
-asm void fn_80143A94(void) {
+asm void itemParamGetPtr(void) {
 #include "src/game/people/people_data_fn_80143A94.inc"
 }
 #else
 #pragma optimization_level 4
-u8* fn_80143A94(u8 idx) {
+u8* itemParamGetPtr(u8 idx) {
     u8* result = &lbl_80368630[(u8)idx * 16];
     if (idx < lbl_80478BE0) return result;
     return NULL;
 }
 #endif
 #if 0
-asm void fn_80143ABC(void) {
+asm void tasteDataGetAisyou(void) {
 #include "src/game/people/people_data_fn_80143ABC.inc"
 }
 #else
 #pragma optimization_level 4
-s8 fn_80143ABC(u8* p, u16 idx) {
+s8 tasteDataGetAisyou(u8* p, u16 idx) {
     if (p == NULL) return 0;
     if ((u32)(idx & 0xFFFF) >= 0x19) return 0;
     return (s8)(p[idx + 4]);
 }
 #endif
 #if 0
-asm void fn_80143AF0(void) {
+asm void tasteDataGetNigateMsgDataId(void) {
 #include "src/game/people/people_data_fn_80143AF0.inc"
 }
 #else
 #pragma optimization_level 4
-u32 fn_80143AF0(u8* p) {
+u32 tasteDataGetNigateMsgDataId(u8* p) {
     if (p == NULL) return 0;
     return *(u32*)p;
 }
@@ -1839,24 +1839,24 @@ u32 fn_80143AF0(u8* p) {
 extern u32 lbl_80478BC8;
 extern u8 lbl_80367F78[];
 #if 0
-asm void fn_80143B08(void) {
+asm void tasteDataGetPtr(void) {
 #include "src/game/people/people_data_fn_80143B08.inc"
 }
 #else
 #pragma optimization_level 4
-u8* fn_80143B08(u16 idx) {
+u8* tasteDataGetPtr(u16 idx) {
     u8* result = &lbl_80367F78[(u16)idx * 32];
     if ((u16)idx < lbl_80478BC8) return result;
     return NULL;
 }
 #endif
 #if 0
-asm void fn_80143B30(void) {
+asm void itemSoubiDataBiosGetFightKoukaDataId(void) {
 #include "src/game/people/people_data_fn_80143B30.inc"
 }
 #else
 #pragma optimization_level 4
-u16 fn_80143B30(u8* p) {
+u16 itemSoubiDataBiosGetFightKoukaDataId(u8* p) {
     if (p == NULL) return 0;
     return *(u16*)p;
 }
@@ -1864,68 +1864,68 @@ u16 fn_80143B30(u8* p) {
 extern u32 lbl_80478BC0;
 extern u8 lbl_80367EF0[];
 #if 0
-asm void fn_80143B48(void) {
+asm void itemSoubiDataBiosGetPtr(void) {
 #include "src/game/people/people_data_fn_80143B48.inc"
 }
 #else
 #pragma optimization_level 4
-u8* fn_80143B48(u16 idx) {
+u8* itemSoubiDataBiosGetPtr(u16 idx) {
     u8* result = &lbl_80367EF0[(u16)idx * 2];
     if ((u16)idx < lbl_80478BC0) return result;
     return NULL;
 }
 #endif
 #if 0
-asm void fn_80143B70(void) {
+asm void itemBiosSetNum(void) {
 #include "src/game/people/people_data_fn_80143B70.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_80143B70(u8* p, u16 val) {
+void itemBiosSetNum(u8* p, u16 val) {
     if (p == NULL) return;
     *(u16*)(p + 0x2) = val;
 }
 #endif
 #if 0
-asm void fn_80143B80(void) {
+asm void itemBiosSetItemDataId(void) {
 #include "src/game/people/people_data_fn_80143B80.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_80143B80(u8* p, u16 val) {
+void itemBiosSetItemDataId(u8* p, u16 val) {
     if (p == NULL) return;
     *(u16*)(p + 0x0) = val;
 }
 #endif
 #if 0
-asm void fn_80143B90(void) {
+asm void itemBallDataBiosSetFightKoukaDataId(void) {
 #include "src/game/people/people_data_fn_80143B90.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_80143B90(u8* p, u16 val) {
+void itemBallDataBiosSetFightKoukaDataId(u8* p, u16 val) {
     if (p == NULL) return;
     *(u16*)(p + 0x0) = val;
 }
 #endif
 #if 0
-asm void fn_80143BA0(void) {
+asm void itemDataBiosSetBuff(void) {
 #include "src/game/people/people_data_fn_80143BA0.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_80143BA0(u8* p, u32 val) {
+void itemDataBiosSetBuff(u8* p, u32 val) {
     if (p == NULL) return;
     *(u32*)(p + 0x18) = val;
 }
 #endif
 #if 0
-asm void fn_80143BB0(void) {
+asm void itemDataBiosSetUseFriend(void) {
 #include "src/game/people/people_data_fn_80143BB0.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_80143BB0(u8* p, u16 idx, u8 val) {
+void itemDataBiosSetUseFriend(u8* p, u16 idx, u8 val) {
     u32 i;
     if (p == NULL) return;
     i = (u32)(idx & 0xFFFF);
@@ -1934,89 +1934,89 @@ void fn_80143BB0(u8* p, u16 idx, u8 val) {
 }
 #endif
 #if 0
-asm void fn_80143BD0(void) {
+asm void itemDataBiosSetFightUseKoukaDataId(void) {
 #include "src/game/people/people_data_fn_80143BD0.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_80143BD0(u8* p, u16 val) {
+void itemDataBiosSetFightUseKoukaDataId(u8* p, u16 val) {
     if (p == NULL) return;
     *(u16*)(p + 0xc) = val;
 }
 #endif
 #if 0
-asm void fn_80143BE0(void) {
+asm void itemDataBiosSetItemSoubiDataId(void) {
 #include "src/game/people/people_data_fn_80143BE0.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_80143BE0(u8* p, u16 val) {
+void itemDataBiosSetItemSoubiDataId(u8* p, u16 val) {
     if (p == NULL) return;
     *(u16*)(p + 0xa) = val;
 }
 #endif
 #if 0
-asm void fn_80143BF0(void) {
+asm void itemDataBiosSetDoc(void) {
 #include "src/game/people/people_data_fn_80143BF0.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_80143BF0(u8* p, u32 val) {
+void itemDataBiosSetDoc(u8* p, u32 val) {
     if (p == NULL) return;
     *(u32*)(p + 0x14) = val;
 }
 #endif
 #if 0
-asm void fn_80143C00(void) {
+asm void itemDataBiosSetUseful(void) {
 #include "src/game/people/people_data_fn_80143C00.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_80143C00(u8* p, u8 val) {
+void itemDataBiosSetUseful(u8* p, u8 val) {
     if (p == NULL) return;
     p[0x2] = val;
 }
 #endif
 #if 0
-asm void fn_80143C10(void) {
+asm void itemDataBiosSetImportant(void) {
 #include "src/game/people/people_data_fn_80143C10.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_80143C10(u8* p, u8 val) {
+void itemDataBiosSetImportant(u8* p, u8 val) {
     if (p == NULL) return;
     p[0x1] = val;
 }
 #endif
 #if 0
-asm void fn_80143C20(void) {
+asm void itemDataBiosSetPrice(void) {
 #include "src/game/people/people_data_fn_80143C20.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_80143C20(u8* p, u16 val) {
+void itemDataBiosSetPrice(u8* p, u16 val) {
     if (p == NULL) return;
     *(u16*)(p + 0x6) = val;
 }
 #endif
 #if 0
-asm void fn_80143C30(void) {
+asm void itemDataBiosSetKind(void) {
 #include "src/game/people/people_data_fn_80143C30.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_80143C30(u8* p, u8 val) {
+void itemDataBiosSetKind(u8* p, u8 val) {
     if (p == NULL) return;
     p[0x0] = val;
 }
 #endif
 #if 0
-asm void fn_80143C40(void) {
+asm void itemDataBiosSetName(void) {
 #include "src/game/people/people_data_fn_80143C40.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_80143C40(u8* p, u32 val) {
+void itemDataBiosSetName(u8* p, u32 val) {
     if (p == NULL) return;
     *(u32*)(p + 0x10) = val;
 }

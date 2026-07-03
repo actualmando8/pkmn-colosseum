@@ -4663,7 +4663,7 @@ void fn_8006DC28(void) {
     extern void winSpriteSetDisp();
     extern void fn_8010B01C();
     extern void fn_8011F1A0();
-    extern void fn_8011FC74();
+    extern void pokemonIsDarkPokemon();
     extern void fn_80123FBC();
     extern void fn_8012AC08();
     extern u32 fn_8006E128(u8* p);
@@ -4850,7 +4850,7 @@ void fn_8006DC28(void) {
                         r22 = 0x25c;
                     }
                     r3 = r25;
-                    fn_8011FC74();
+                    pokemonIsDarkPokemon();
                     r0 = r3 & 0xFF;
                     if (r0 != (u32)0x0) {
                         r22 = 0x341;
@@ -6065,8 +6065,8 @@ void fn_8006EF24(void) {
 void fn_8006EFF8(void) {
     extern void winSpriteSetDisp();
     extern void fn_80142984();
-    extern void fn_80144088();
-    extern void fn_801440A0();
+    extern void itemDataBiosGetName();
+    extern void itemDataBiosGetPtr();
     u8 sp[0x30];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -6147,8 +6147,8 @@ void fn_8006EFF8(void) {
         r0 = r3 & 0xFF;
         if (r0 != (u32)0x0) {
             r3 = r22;
-            fn_801440A0();
-            fn_80144088();
+            itemDataBiosGetPtr();
+            itemDataBiosGetName();
             *(u32*)((u8*)r29 + 0x4C) = r3;
         } else {
 
