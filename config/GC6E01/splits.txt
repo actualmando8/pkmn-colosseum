@@ -149,6 +149,9 @@ game/data/sdata2_8047E538.c:
 game/colosseum_battle_sdata2.c:
 	.sdata2     start:0x8047E658 end:0x8047E700
 
+game/data/bss_8039A700.c:
+	.bss        start:0x8039A700 end:0x8039E700
+
 game/data/data_802EDB7C.c:
 	.data       start:0x802EDB7C end:0x802EDE54
 
