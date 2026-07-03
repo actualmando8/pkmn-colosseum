@@ -1389,12 +1389,12 @@ u8* peopleInfoBiosGetPtrFromIndex(u32 index) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_8018F730(void) {
+asm void peopleBiosGetPushDataSize(void) {
 #include "src/game/people/people_fn_8018F730.inc"
 }
 #else
 #pragma optimization_level 4
-u32 fn_8018F730(void) {
+u32 peopleBiosGetPushDataSize(void) {
     PeopleEntry* current;
     PeopleEntry* entry = lbl_8047B200;
     s32 count = lbl_8047B1F8;
@@ -1422,22 +1422,22 @@ u32 fn_8018F730(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_8018F788(void) {
+asm void peopleBiosPushData(void) {
 #include "src/game/people/people_fn_8018F788.inc"
 }
 #else
-void fn_8018F788(void) { /* TODO */ }
+void peopleBiosPushData(void) { /* TODO */ }
 #endif
 #pragma pop
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_8018F87C(void) {
+asm void peopleBiosPopData(void) {
 #include "src/game/people/people_fn_8018F87C.inc"
 }
 #else
-void fn_8018F87C(void) { /* TODO */ }
+void peopleBiosPopData(void) { /* TODO */ }
 #endif
 #pragma pop
 #pragma push

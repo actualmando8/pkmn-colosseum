@@ -325,7 +325,7 @@ s32 peopleFindAndSetupMotion(u32 groupId, u32 index, u8 doSetup);
 void peopleOpenSetup(PeopleEntry* entry, void* spawnData, u32 motionId, u32 param);
 
 /** Full open procedure with spawn data processing.
- *  fn_8018F87C -- iterates spawn data records and calls peopleOpenSetup. */
+ *  peopleBiosPopData -- iterates spawn data records and calls peopleOpenSetup. */
 void peopleOpenFromSpawnData(void* spawnDataArray, u32 count, u32 groupId);
 
 /** Set the NPC's animation bank. fn_8018FB60 */
