@@ -340,9 +340,12 @@ asm void fn_80026640(void) {
 #pragma optimization_level 4
 s32 fn_80026640(void* r3, u8* r4) {
     void* ctx;
+    u8* new_var;
     s32* entry;
     ctx = *(void**)((u8*)r3 + 0x60);
-    entry = (s32*)(lbl_80266DD8 + (*(s32*)((u8*)ctx + 0x1c) << 4));
+    new_var = lbl_80266DD8;
+    new_var = new_var + (*(s32*)((u8*)ctx + 0x1c) << 4);
+    entry = (s32*)new_var;
     if (entry[1] == 0xa) goto L_40_then;
     r4[0x67] = 0;
     goto L_40_end;

@@ -4541,7 +4541,8 @@ void fn_800DD0B8(u32 count) {
     if (handle) {
         u32 off;
         u32 i;
-        lbl_8047AAEC = (u32)fn_800E27B0((u16)handle);
+        off = (u32)fn_800E27B0((u16)handle);
+        lbl_8047AAEC = off;
         for (off = 0, i = 0; i < lbl_8047AAF0; i++, off += 0x74) {
             *(u8*)(lbl_8047AAEC + off) = 0;
         }

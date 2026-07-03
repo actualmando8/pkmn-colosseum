@@ -2640,8 +2640,10 @@ u32 _fightFloorCheckFightOutPokemonPtrAryPokemonTokuseiDataIdSub__FPvUsPv(void* 
     extern void* fn_801F025C(u32, void*);
     extern u16 fn_80207BF4(void*);
     struct { u32 tokuseiId; u32 count; s32 side; void* pokemon; }* s = data;
+    void* new_var;
     void* pokemon;
     void* sideRef;
+    unsigned char pad;
     void* objRef;
 
     pokemon = s->pokemon;
@@ -2656,14 +2658,14 @@ u32 _fightFloorCheckFightOutPokemonPtrAryPokemonTokuseiDataIdSub__FPvUsPv(void* 
     } else {
         sideRef = 0;
     }
-    objRef = fn_801F025C(2, obj);
+    objRef = fn_801F025C(2, new_var = obj);
     if (s->side == 1 || s->side == 2) {
         if (sideRef == 0)
             return 1;
     }
     if (s->side == 0) {
         if (pokemon == 0) goto _checkId;
-        if (pokemon != obj) goto _checkId;
+        if (pokemon != new_var) goto _checkId;
         return 1;
     } else if (s->side == 1 || s->side == 2) {
         if (sideRef == objRef) goto _checkId;
@@ -2672,7 +2674,7 @@ u32 _fightFloorCheckFightOutPokemonPtrAryPokemonTokuseiDataIdSub__FPvUsPv(void* 
         return 1;
     }
 _checkId:
-    if ((u16)s->tokuseiId == (u16)fn_80207BF4(obj)) {
+    if ((u16)s->tokuseiId == (u16)fn_80207BF4(new_var)) {
         s->count = s->count + 1;
     }
     return 1;
