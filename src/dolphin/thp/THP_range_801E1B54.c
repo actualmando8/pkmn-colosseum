@@ -145,6 +145,339 @@ static void __THPHuffDecodeDCTCompV(register THPFileInfo *info, THPCoeff *block)
 static s32 __THPAudioGetNewSample(THPAudioDecodeInfo *info);
 static void __THPAudioInitialize(THPAudioDecodeInfo *info, u8 *ptr);
 
+/* ===================================================================
+ * THP PLAYER WRAPPER (game-specific, no cross-game exemplar)
+ * 0x801E1B54 - 0x801E5548 (46 functions, ends where THPVideoDecode
+ * begins below).
+ *
+ * Three worker threads talk to the main thread through raw
+ * OSMessageQueues (OSInitMessageQueue/OSSendMessage/OSReceiveMessage
+ * are fn_8009F1D0/fn_8009F230/fn_8009F2F8, already matched in
+ * src/dolphin/os/OSMemory.c -- queues are plain u8* here, matching
+ * that file's own idiom):
+ *
+ *   Thread A (lbl_80469040 stack + lbl_8046A040 OSThread): DVD read
+ *     thread, body fn_801E1C1C, created by fn_801E1D7C(priority),
+ *     cancel/resume fn_801E1D0C/fn_801E1D48 gated on lbl_8047B460.
+ *     Owns 3 queues (depth 10): lbl_8046A3D0 (Put=fn_801E1B54,
+ *     Get=fn_801E1B84), lbl_8046A3F0 (Get=fn_801E1BE8), lbl_8046A410
+ *     (Put=fn_801E1BB8).
+ *   Thread B (lbl_8046AE78 stack + lbl_8046BE78 OSThread): audio
+ *     decode thread, body fn_801E4B38 or fn_801E4C80 (mode-selected),
+ *     created by fn_801E4E1C(priority, mode), cancel/resume
+ *     fn_801E4DAC/fn_801E4DE8 gated on lbl_8047B480. Owns 2 queues
+ *     (depth 3): lbl_8046AE38 (Get=fn_801E4AC4), lbl_8046AE58
+ *     (Put=fn_801E4B08).
+ *   Thread C (lbl_8046C1E8 stack + lbl_8046D1E8 OSThread): video
+ *     decode thread, body fn_801E4F64 or fn_801E5154 (mode-selected),
+ *     created by fn_801E5470(priority, mode), cancel/resume
+ *     fn_801E5400/fn_801E543C gated on lbl_8047B488/lbl_8047B48C.
+ *     Owns 2 queues (depth 3): lbl_8046C1A8 (Get=fn_801E4EF0),
+ *     lbl_8046C1C8 (Put=fn_801E4F34).
+ *
+ * lbl_8046AC60 (0x1C0 bytes) is the ActivePlayer (THPPlayer-ish)
+ * struct; scratch memory shared with the battle system when no movie
+ * is playing (see include/game/battle/battle.h, battle_grid.c's
+ * `extern u8 lbl_8046AC60[0x100]` "battle transfer context").  Field
+ * offsets confirmed by this unit so far:
+ *   +0x50 ?              +0x58 ?
+ *   +0x64 ?
+ *   +0x80 mVideoWidth/Height/... (3 words, THPPlayerGetVideoInfo)
+ *   +0x8C mAudio... (4 words, THPPlayerGetAudioInfo)
+ *   +0x90 ?              +0xA0 mIsOpen (BOOL)
+ *   +0xA4 mState (u8, THPPlayerGetState)   +0xA6 mPlayFlag? (u8, bit0)
+ *   +0xA7 mAudioExist? (u8)                +0xA8 mDvdError (s32)
+ *   +0xB0 mIsOnMemory (BOOL)               +0xC0 mFrameSize/ReadSize
+ *   +0xE8 pointer (buffer set)
+ * Extern helpers referenced from elsewhere in the game (already
+ * matched, not owned by this unit):
+ *   fn_8009F1D0/fn_8009F230/fn_8009F2F8 - src/dolphin/os/OSMemory.c
+ *   fn_800AA2F0 - GXSetViewport (src/game/gs_render.c)
+ *   fn_800A8850 - AIStopDMA (src/game/main.c)
+ *   fn_8014E9B4/fn_8014EE40 - MusyX stream update/start (src/musyx/runtime/stream.c)
+ * ------------------------------------------------------------- */
+
+extern BOOL fn_8009F230(u8 *queue, u32 msg, u32 flags);
+extern BOOL fn_8009F2F8(u8 *queue, u32 *msgOut, u32 flags);
+extern void fn_8009F1D0(u8 *queue, u32 msgArray, u32 msgCount);
+extern void fn_800A50E4(void);
+
+typedef struct OSThread OSThread;
+extern void OSCancelThread(OSThread *thread);
+extern BOOL OSCreateThread(OSThread *thread, void *(*func)(void *), void *param, void *stack,
+                            u32 stackSize, s32 priority, u16 attr);
+extern s32 OSResumeThread(OSThread *thread);
+extern void *memcpy(void *dst, const void *src, u32 n);
+
+void *fn_801E1C1C(void *arg);
+void *fn_801E4B38(void *arg);
+void *fn_801E4C80(void *arg);
+void *fn_801E4F64(void *arg);
+void *fn_801E5154(void *arg);
+void fn_801E4F34(u32 msg);
+
+/* ---- Thread A: DVD read thread ---- */
+u8 lbl_80469040[0x1390]; /* stack(0x1000) + OSThread(0x318) + 3 msg arrays (0x28 each) */
+u8 lbl_8046A3D0[0x20];   /* queue: Put=fn_801E1B54, Get=fn_801E1B84 */
+u8 lbl_8046A3F0[0x20];   /* queue: Get=fn_801E1BE8 */
+u8 lbl_8046A410[0x20];   /* queue: Put=fn_801E1BB8 */
+u8 lbl_8046A494[0x20];   /* queue used by fn_801E386C's forwarding loop */
+u8 lbl_8046A4B4[0x20];   /* queue: Put=fn_801E446C */
+
+/* ---- ActivePlayer (THPPlayer-ish) struct; ledger above ---- */
+u8 lbl_8046AC60[0x1C0];
+
+/* ---- Thread B: audio decode thread ---- */
+u8 lbl_8046AE20[0x1058 + 0x318]; /* 2 msg arrays(0xC each) + 2 queues(0x20 each) + stack(0x1000) + OSThread(0x318) */
+#define lbl_8046AE38 (lbl_8046AE20 + 0x18) /* queue: Get=fn_801E4AC4 */
+#define lbl_8046AE58 (lbl_8046AE20 + 0x38) /* queue: Put=fn_801E4B08 */
+
+/* ---- Thread C: video decode thread ---- */
+u8 lbl_8046C190[0x1058 + 0x318]; /* same layout as Thread B */
+#define lbl_8046C1A8 (lbl_8046C190 + 0x18) /* queue: Get=fn_801E4EF0 */
+#define lbl_8046C1C8 (lbl_8046C190 + 0x38) /* queue: Put=fn_801E4F34 */
+
+/* ---- misc small globals ---- */
+u32 lbl_80478D00 = 0xFFFFFFFF;
+u32 lbl_80478D04 = 0xFFFFFFFF;
+BOOL lbl_8047B460; /* thread A created flag */
+BOOL lbl_8047B468; /* fn_801E386C forwarding-loop run flag */
+BOOL lbl_8047B480; /* thread B created flag */
+BOOL lbl_8047B488; /* thread C created flag */
+BOOL lbl_8047B48C; /* thread C created flag (2nd, set alongside B488) */
+
+/* ---- Thread A: message queue wrappers ---- */
+BOOL fn_801E1B54(u32 msg)
+{
+    return fn_8009F230(lbl_8046A3D0, msg, 1);
+}
+
+u32 fn_801E1B84(void)
+{
+    u32 msg;
+    fn_8009F2F8(lbl_8046A3D0, &msg, 1);
+    return msg;
+}
+
+void fn_801E1BB8(u32 msg)
+{
+    fn_8009F230(lbl_8046A410, msg, 1);
+}
+
+u32 fn_801E1BE8(void)
+{
+    u32 msg;
+    fn_8009F2F8(lbl_8046A3F0, &msg, 1);
+    return msg;
+}
+
+/* ---- Thread A: cancel/resume ---- */
+void fn_801E1D0C(void)
+{
+    if (lbl_8047B460) {
+        OSCancelThread((OSThread *)(lbl_80469040 + 0x1000));
+        lbl_8047B460 = FALSE;
+    }
+}
+
+void fn_801E1D48(void)
+{
+    if (lbl_8047B460) {
+        OSResumeThread((OSThread *)(lbl_80469040 + 0x1000));
+    }
+}
+
+/* ---- Thread A: create ---- */
+BOOL fn_801E1D7C(s32 priority)
+{
+    if (!OSCreateThread((OSThread *)(lbl_80469040 + 0x1000), (void *(*)(void *))fn_801E1C1C, NULL,
+                         lbl_80469040 + 0x1000, 0x1000, priority, 1)) {
+        return FALSE;
+    }
+    fn_8009F1D0(lbl_80469040 + 0x13D0, (u32)(lbl_80469040 + 0x1368), 0xA);
+    fn_8009F1D0(lbl_80469040 + 0x13B0, (u32)(lbl_80469040 + 0x1340), 0xA);
+    fn_8009F1D0(lbl_80469040 + 0x1390, (u32)(lbl_80469040 + 0x1318), 0xA);
+    lbl_8047B460 = TRUE;
+    return TRUE;
+}
+
+/* ---- Thread B: message queue wrappers ---- */
+u32 fn_801E4AC4(void)
+{
+    u32 msg;
+    if (!fn_8009F2F8(lbl_8046AE38, &msg, 0)) {
+        return 0;
+    }
+    return msg;
+}
+
+void fn_801E4B08(u32 msg)
+{
+    fn_8009F230(lbl_8046AE58, msg, 0);
+}
+
+/* ---- Thread A: additional send-only queue wrapper (lbl_8046A4B4) ---- */
+void fn_801E446C(u32 msg)
+{
+    fn_8009F230(lbl_8046A4B4, msg, 1);
+}
+
+/* ---- Thread A: forwarding loop (drains lbl_8046A494, forwards to Thread C's send queue) ---- */
+void fn_801E386C(void)
+{
+    u32 msg;
+    while (lbl_8047B468) {
+        if (!fn_8009F2F8(lbl_8046A494, &msg, 0)) {
+            msg = 0;
+        }
+        if (msg == 0) {
+            break;
+        }
+        fn_801E4F34(msg);
+    }
+}
+
+/* ---- Thread C: message queue wrappers ---- */
+u32 fn_801E4EF0(void)
+{
+    u32 msg;
+    if (!fn_8009F2F8(lbl_8046C1A8, &msg, 0)) {
+        return 0;
+    }
+    return msg;
+}
+
+void fn_801E4F34(u32 msg)
+{
+    fn_8009F230(lbl_8046C1C8, msg, 0);
+}
+
+/* ---- Thread B: cancel/resume ---- */
+void fn_801E4DAC(void)
+{
+    if (lbl_8047B480) {
+        OSCancelThread((OSThread *)(lbl_8046AE20 + 0x1058));
+        lbl_8047B480 = FALSE;
+    }
+}
+
+void fn_801E4DE8(void)
+{
+    if (lbl_8047B480) {
+        OSResumeThread((OSThread *)(lbl_8046AE20 + 0x1058));
+    }
+}
+
+/* ---- Thread C: cancel/resume ---- */
+void fn_801E5400(void)
+{
+    if (lbl_8047B488) {
+        OSCancelThread((OSThread *)(lbl_8046C190 + 0x1058));
+        lbl_8047B488 = FALSE;
+    }
+}
+
+void fn_801E543C(void)
+{
+    if (lbl_8047B488) {
+        OSResumeThread((OSThread *)(lbl_8046C190 + 0x1058));
+    }
+}
+
+/* ---- Thread B: create (mode-selects thread body) ---- */
+BOOL fn_801E4E1C(s32 priority, u32 mode)
+{
+    if (mode != 0) {
+        if (!OSCreateThread((OSThread *)(lbl_8046AE20 + 0x1058), (void *(*)(void *))fn_801E4B38,
+                             (void *)mode, lbl_8046AE20 + 0x58, 0x1000, priority, 1)) {
+            return FALSE;
+        }
+    } else {
+        if (!OSCreateThread((OSThread *)(lbl_8046AE20 + 0x1058), (void *(*)(void *))fn_801E4C80,
+                             NULL, lbl_8046AE20 + 0x58, 0x1000, priority, 1)) {
+            return FALSE;
+        }
+    }
+    fn_8009F1D0(lbl_8046AE20 + 0x38, (u32)(lbl_8046AE20 + 0xC), 3);
+    fn_8009F1D0(lbl_8046AE20 + 0x18, (u32)(lbl_8046AE20 + 0x0), 3);
+    lbl_8047B480 = TRUE;
+    return TRUE;
+}
+
+/* ---- Thread C: create (mode-selects thread body) ---- */
+BOOL fn_801E5470(s32 priority, u32 mode)
+{
+    if (mode != 0) {
+        if (!OSCreateThread((OSThread *)(lbl_8046C190 + 0x1058), (void *(*)(void *))fn_801E4F64,
+                             (void *)mode, lbl_8046C190 + 0x58, 0x1000, priority, 1)) {
+            return FALSE;
+        }
+    } else {
+        if (!OSCreateThread((OSThread *)(lbl_8046C190 + 0x1058), (void *(*)(void *))fn_801E5154,
+                             NULL, lbl_8046C190 + 0x58, 0x1000, priority, 1)) {
+            return FALSE;
+        }
+    }
+    fn_8009F1D0(lbl_8046C190 + 0x38, (u32)(lbl_8046C190 + 0xC), 3);
+    fn_8009F1D0(lbl_8046C190 + 0x18, (u32)(lbl_8046C190 + 0x0), 3);
+    lbl_8047B488 = TRUE;
+    lbl_8047B48C = TRUE;
+    return TRUE;
+}
+
+/* ---- simple ActivePlayer getters ---- */
+void fn_801E3858(u32 *out1, u32 *out2)
+{
+    *out1 = lbl_80478D00;
+    *out2 = lbl_80478D04;
+}
+
+u8 fn_801E38D8(void)
+{
+    return lbl_8046AC60[0xA4];
+}
+
+BOOL fn_801E38E8(void *dst)
+{
+    if (!*(BOOL *)(lbl_8046AC60 + 0xA0)) {
+        return FALSE;
+    }
+    memcpy(dst, lbl_8046AC60 + 0x8C, 0x10);
+    return TRUE;
+}
+
+BOOL fn_801E3930(void *dst)
+{
+    if (!*(BOOL *)(lbl_8046AC60 + 0xA0)) {
+        return FALSE;
+    }
+    memcpy(dst, lbl_8046AC60 + 0x80, 0xC);
+    return TRUE;
+}
+
+s32 fn_801E25C8(void)
+{
+    void *p;
+    if (!*(BOOL *)(lbl_8046AC60 + 0xA0) || lbl_8046AC60[0xA4] == 0) {
+        return -1;
+    }
+    p = *(void **)(lbl_8046AC60 + 0xE8);
+    if (p == NULL) {
+        return -1;
+    }
+    return *(s32 *)((u8 *)p + 0xC) + *(s32 *)(lbl_8046AC60 + 0xC0);
+}
+
+BOOL fn_801E4724(void)
+{
+    if (*(BOOL *)(lbl_8046AC60 + 0xA0) && lbl_8046AC60[0xA4] == 0) {
+        *(BOOL *)(lbl_8046AC60 + 0xA0) = FALSE;
+        fn_800A50E4();
+        return TRUE;
+    }
+    return FALSE;
+}
+
 s32 THPVideoDecode(void *file, void *tileY, void *tileU, void *tileV, void *work)
 {
     u8 all_done, status;
