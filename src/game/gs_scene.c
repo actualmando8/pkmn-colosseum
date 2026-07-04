@@ -299,11 +299,13 @@ void fn_80179FA4(void) {
 
 /* ===== Small accessor/setter functions ===== */
 
-/* fn_801765F4 -- nop accessor, 0xC bytes. Previously mis-attributed
- * as "GSscene_NopAccessor1"; that name does not appear in symbols.txt
- * and nothing in the tree calls it. */
-void* fn_801765F4(void) {
-    return (void*)0;
+/* fn_801765F4 -- sets byte field 0x3 of the object pointed to by
+ * lbl_80478C40. Previously mis-attributed as "GSscene_NopAccessor1"
+ * and stubbed as a trivial "return NULL;"; that name does not appear
+ * in symbols.txt and nothing in the tree calls it. */
+void fn_801765F4(u8 value) {
+    extern void* lbl_80478C40;
+    *((u8*)lbl_80478C40 + 3) = value;
 }
 
 /* psGetNewIDNum (0x80175F44) -- real name per symbols.txt, 0x28 bytes.
