@@ -3400,33 +3400,33 @@ void fn_80135BA0(void* ptr, u32 val) {
 
 /* 0x80135BB0 | 24 bytes | beq_default_getter */
 u8 fn_80135BB0(void* ptr) {
-    if (ptr == NULL) goto _ret0;
-    return ((EffectParamBlock*)ptr)->field_22;
-_ret0:
+    if (ptr != NULL) {
+        return ((EffectParamBlock*)ptr)->field_22;
+    }
     return 0;
 }
 
 /* 0x80135BC8 | 24 bytes | beq_default_getter */
 u8 fn_80135BC8(void* ptr) {
-    if (ptr == NULL) goto _ret0;
-    return ((EffectParamBlock*)ptr)->field_21;
-_ret0:
+    if (ptr != NULL) {
+        return ((EffectParamBlock*)ptr)->field_21;
+    }
     return 0;
 }
 
 /* 0x80135BE0 | 24 bytes | beq_default_getter */
 u8 fn_80135BE0(void* ptr) {
-    if (ptr == NULL) goto _ret0;
-    return ((EffectParamBlock*)ptr)->field_20;
-_ret0:
+    if (ptr != NULL) {
+        return ((EffectParamBlock*)ptr)->field_20;
+    }
     return 0;
 }
 
 /* 0x80135BF8 | 24 bytes | beq_default_getter */
 u32 fn_80135BF8(void* ptr) {
-    if (ptr == NULL) goto _ret0;
-    return ((EffectParamBlock*)ptr)->field_1C;
-_ret0:
+    if (ptr != NULL) {
+        return ((EffectParamBlock*)ptr)->field_1C;
+    }
     return 0;
 }
 
@@ -3447,17 +3447,17 @@ f32 fn_80135C10(void* ptr) {
 
 /* 0x80135C28 | 24 bytes | beq_default_getter */
 u32 fn_80135C28(void* ptr) {
-    if (ptr == NULL) goto _ret0;
-    return ((EffectParamBlock*)ptr)->field_14;
-_ret0:
+    if (ptr != NULL) {
+        return ((EffectParamBlock*)ptr)->field_14;
+    }
     return 0;
 }
 
 /* 0x80135C40 | 24 bytes | beq_default_getter */
 u32 fn_80135C40(void* ptr) {
-    if (ptr == NULL) goto _ret0;
-    return ((EffectParamBlock*)ptr)->field_08;
-_ret0:
+    if (ptr != NULL) {
+        return ((EffectParamBlock*)ptr)->field_08;
+    }
     return 0;
 }
 
@@ -3477,9 +3477,9 @@ u64 fn_80135C58(u32* p) {
 
 /* 0x80135C78 | 24 bytes | beq_default_getter */
 u32 fn_80135C78(void* ptr) {
-    if (ptr == NULL) goto _ret0;
-    return ((EffectParamBlock*)ptr)->field_0C;
-_ret0:
+    if (ptr != NULL) {
+        return ((EffectParamBlock*)ptr)->field_0C;
+    }
     return 0;
 }
 

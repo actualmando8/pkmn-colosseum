@@ -119,6 +119,9 @@ extern void  fn_80118FB0(s32, s32, s32, s32, s32, s32);
 extern void  fn_80118D18(s32, s32);
 extern void  fn_80118DE0(s32, void*, s32, s32);
 extern void  fn_800EE828(s32);
+extern u8    fn_800E6BC8(s32);
+extern s32   fn_800EE0E8(s32);
+extern void  fn_80118CAC(s32, s32);
 
 /* Forward declarations for converted functions */
 void fn_801D349C(void);
@@ -236,43 +239,79 @@ s32 fn_801D14C0(s32 idx) {
 }
 
 /**
- * fn_801D1504 - Waza get entry position Y.
+ * fn_801D1504 - Waza get entry field at +0x20 (s32), by index.
  * Address: 0x801D1504 | Size: 0x44
  */
-f32 fn_801D1504(void* entry) {
-    WazaEntry* sequenceEntry = (WazaEntry*)entry;
-    if (sequenceEntry == NULL) return 0.0f;
-    return sequenceEntry->posY;
+s32 fn_801D1504(void* entry) {
+    s32 idx;
+    void* sequenceEntry;
+
+    idx = (s32)entry;
+    if (idx < 0 || (u32)idx >= *lbl_80478E98) {
+        sequenceEntry = NULL;
+    } else {
+        sequenceEntry = (void*)(lbl_80478E9C + (u32)idx * sizeof(WazaEntry));
+    }
+
+    if (sequenceEntry == NULL) return -1;
+    return *(s32*)((u8*)sequenceEntry + 0x20);
 }
 
 /**
- * fn_801D1548 - Waza get entry position Z.
+ * fn_801D1548 - Waza get entry field at +0x1C (s32), by index.
  * Address: 0x801D1548 | Size: 0x44
  */
-f32 fn_801D1548(void* entry) {
-    WazaEntry* sequenceEntry = (WazaEntry*)entry;
-    if (sequenceEntry == NULL) return 0.0f;
-    return sequenceEntry->posZ;
+s32 fn_801D1548(void* entry) {
+    s32 idx;
+    void* sequenceEntry;
+
+    idx = (s32)entry;
+    if (idx < 0 || (u32)idx >= *lbl_80478E98) {
+        sequenceEntry = NULL;
+    } else {
+        sequenceEntry = (void*)(lbl_80478E9C + (u32)idx * sizeof(WazaEntry));
+    }
+
+    if (sequenceEntry == NULL) return -1;
+    return *(s32*)((u8*)sequenceEntry + 0x1C);
 }
 
 /**
- * fn_801D158C - Waza get entry scale.
+ * fn_801D158C - Waza get entry field at +0x00 (u8), by index.
  * Address: 0x801D158C | Size: 0x44
  */
-f32 fn_801D158C(void* entry) {
-    WazaEntry* sequenceEntry = (WazaEntry*)entry;
-    if (sequenceEntry == NULL) return 1.0f;
-    return sequenceEntry->scale;
+u32 fn_801D158C(void* entry) {
+    s32 idx;
+    void* sequenceEntry;
+
+    idx = (s32)entry;
+    if (idx < 0 || (u32)idx >= *lbl_80478E98) {
+        sequenceEntry = NULL;
+    } else {
+        sequenceEntry = (void*)(lbl_80478E9C + (u32)idx * sizeof(WazaEntry));
+    }
+
+    if (sequenceEntry == NULL) return 0xFF;
+    return *(u8*)((u8*)sequenceEntry + 0x00);
 }
 
 /**
- * fn_801D15D0 - Waza get entry rotation.
+ * fn_801D15D0 - Waza get entry field at +0x06 (u16), by index.
  * Address: 0x801D15D0 | Size: 0x48
  */
-f32 fn_801D15D0(void* entry) {
-    WazaEntry* sequenceEntry = (WazaEntry*)entry;
-    if (sequenceEntry == NULL) return 0.0f;
-    return sequenceEntry->rotation;
+u32 fn_801D15D0(void* entry) {
+    s32 idx;
+    void* sequenceEntry;
+
+    idx = (s32)entry;
+    if (idx < 0 || (u32)idx >= *lbl_80478E98) {
+        sequenceEntry = NULL;
+    } else {
+        sequenceEntry = (void*)(lbl_80478E9C + (u32)idx * sizeof(WazaEntry));
+    }
+
+    if (sequenceEntry == NULL) return 0xFFFF;
+    return *(u16*)((u8*)sequenceEntry + 0x06);
 }
 
 /**
@@ -285,12 +324,16 @@ u32 fn_801D1618(void) {
 }
 
 /**
- * fn_801D1620 - Waza set entry active.
+ * fn_801D1620 - Waza handle table lookup (second word of pair).
  * Address: 0x801D1620 | Size: 0x30
  */
-void fn_801D1620(void* entry, u8 active) {
-    if (entry == NULL) return;
-    *(u8*)((u8*)entry + 0x24) = active;
+extern u32 lbl_8036E0E0[];
+u32 fn_801D1620(u32 idx) {
+    s32 slot = idx & 0xFF;
+    if (slot >= lbl_80478CB8) {
+        return 0;
+    }
+    return lbl_8036E0E0[slot * 2 + 1];
 }
 
 /**
@@ -1276,7 +1319,8 @@ typedef struct WazaEffect {
     /* 0x32 */ u16 index;                    /* table index */
     /* 0x34 */ u8 pad_34[0x40];
     /* 0x74 */ u8 active;
-    /* 0x75 */ u8 pad_75[0x0F];
+    /* 0x75 */ u8 pad_75[0x0B];
+    /* 0x80 */ u32 field_80;                 /* secondary motion/effect handle */
     /* 0x84 */ u32 effect_handle;            /* effect handle */
     /* 0x88 */ u8 pad_88[0x04];
 } WazaEffect;
@@ -1342,20 +1386,87 @@ void fn_801D9E8C(void* effect) {
 #undef WAZA_SDATA2_VALUE
 
 /**
- * fn_801DA014 - Waza effect get interpolation progress.
+ * fn_801DA014 - Waza effect timer cancel.
  * Address: 0x801DA014 | Size: 0x5C
  */
-f32 fn_801DA014(void* effect) {
-    return 0.0f;
+#pragma dont_inline on
+void fn_801DA014(void* effect) {
+    extern void fn_80118A68();
+
+    if (effect != NULL && *(u32*)(lbl_80467CC0 + 0x8) != 0 && *(u32*)((u8*)effect + 0x80) != 0) {
+        fn_80118A68(*(u32*)((u8*)effect + 0x80), 1);
+        *(u32*)((u8*)effect + 0x80) = 0;
+    }
 }
+#pragma dont_inline reset
 
 /**
  * fn_801DA070 - Waza effect bezier curve eval.
  * Address: 0x801DA070 | Size: 0x1B4
  */
+#define WAZA_SDATA2_VALUE(addr) lbl_##addr
 void fn_801DA070(void* effect) {
-    /* TODO: Bezier curve evaluation (0x1B4 bytes) */
+    WazaEffect* fx;
+    void* target;
+    void* entry;
+    u32 ctx;
+    s32 n;
+    f32 val;
+    s32 scale_selector;
+    u8 scale_buf[4];
+
+    fx = (WazaEffect*)effect;
+    if (fx == NULL) return;
+    ctx = *(u32*)(lbl_80467CC0 + 0x8);
+    if (ctx == 0) return;
+    if (fx->field_80 != 0) return;
+
+    fx->field_80 = fn_801190DC(ctx, 0, 0);
+    if (fx->field_80 == 0) return;
+
+    if ((fx->flags & 1) != 1) {
+        fn_80118C88(fx->field_80, 0);
+    }
+
+    entry = fx->table_bytes + fx->index * sizeof(WazaEffectTblEntry);
+    if ((u8)fn_800E6BC8(fx->handle) != 0) {
+        n = fn_800EE0E8(fx->handle) - 1;
+    } else {
+        n = *(s32*)((u8*)entry + 0x54);
+    }
+
+    if (n > 0) {
+        target = fn_800EE150(fx->handle, n);
+    } else {
+        target = NULL;
+    }
+
+    if (target == NULL) return;
+
+    if (effect != NULL) {
+        scale_selector = fx->scale_selector;
+    } else {
+        scale_selector = 0;
+    }
+
+    switch (scale_selector) {
+    case -2: val = WAZA_SDATA2_VALUE(8047E388); break;
+    case -1: val = WAZA_SDATA2_VALUE(8047E38C); break;
+    case 1:  val = WAZA_SDATA2_VALUE(8047E390); break;
+    case 2:  val = WAZA_SDATA2_VALUE(8047E394); break;
+    case 3:  val = WAZA_SDATA2_VALUE(8047E398); break;
+    default: val = WAZA_SDATA2_VALUE(8047E39C); break;
+    }
+
+    fn_800E01F4(scale_buf, val, val, val);
+
+    fn_80118FB0(fx->field_80, (s32)target, 4, 0, 1, 0);
+    fn_80118D18(fx->field_80, 1);
+    fn_80118CAC(fx->field_80, 1);
+    fn_80118DE0(fx->field_80, scale_buf, 1, 0);
+    fn_800EE828((s32)target);
 }
+#undef WAZA_SDATA2_VALUE
 
 /**
  * fn_801DA224 - Waza effect arc trajectory.

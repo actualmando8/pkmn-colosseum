@@ -2934,3 +2934,12 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     }
 }
 #pragma pop
+
+/*
+ * fn_80056A78 (0x80056A78): trivial sda_getter, ported from the previous
+ * campaign's archive/previous_campaign/src/game/menu/menu_status.c.
+ */
+extern u32 lbl_8047A584;
+u32 fn_80056A78(void) {
+    return lbl_8047A584;
+}

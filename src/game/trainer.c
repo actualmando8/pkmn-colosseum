@@ -115,17 +115,18 @@ extern u32 itemGetStatus(u32 context, u32 param, u16 field, u32 flags);
 /* fn_801F02AC - PokemonSlotLookup (89 calls) */
 extern u32 fn_801F02AC(u32 type, void* ptr, u32 param);
 
-/* Category resolution sub-dispatchers */
-extern void* fn_801FCCC4(u32 slot); /* Battle trainer */
-extern void* fn_801FCAD0(u32 slot); /* Party config */
-extern void* fn_801FCA2C(u32 slot); /* Team roster */
-extern void* fn_801FC658(u32 slot); /* Story/event data */
-extern void* fn_801FBFBC(u32 slot); /* Misc attributes */
+/* Category resolution sub-dispatchers (defined with real bodies at their
+ * proper address-ordered locations below). */
+void* fn_801FCCC4(u16 slot); /* Battle trainer */
+void* fn_801FCAD0(u16 slot); /* Party config */
+void* fn_801FCA2C(u16 slot); /* Team roster */
+void* fn_801FC658(u16 slot); /* Story/event data */
+void* fn_801FBFBC(u16 slot); /* Misc attributes */
 
-/* Event integration */
-extern void fn_801FE7EC(void* trainer, u32 eventId, u32 param1, u32 param2);
-extern u8   fn_801FECD4(void* trainer);
-extern void fn_801FE710(void* trainer, u32 eventId, u32 param);
+/* Event integration (defined with real bodies below) */
+void fn_801FE7EC(void* trainer, u16 eventId, u32 param1, u32 param2);
+u8   fn_801FECD4(void* trainer);
+void fn_801FE710(void* trainer, u16 eventId, u32 param);
 
 /* Item/Pokemon field access helpers used by battle item flow. */
 u8 fn_80121574(void* obj, s32 arg);
@@ -398,6 +399,41 @@ u32 fn_801FBF8C(u8* ptr) {
 u32 fn_801FBFA4(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u32*)(&ptr[0x0]);
+}
+
+/* Address: 0x801FBFBC | Size: 0x2C | Pattern: dispatch_resolver (misc attributes) */
+void* fn_801FBFBC(u16 slot) {
+    slot = slot;
+    if (slot >= lbl_80478F28[0]) { return NULL; }
+    return lbl_80478F2C + slot * 0x14;
+}
+
+/* Address: 0x801FCAD0 | Size: 0x2C | Pattern: dispatch_resolver (party config) */
+void* fn_801FCAD0(u16 slot) {
+    slot = slot;
+    if (slot >= lbl_80478F08[0]) { return NULL; }
+    return lbl_80478F0C + slot * 0x14;
+}
+
+/* Address: 0x801FCA2C | Size: 0x2C | Pattern: dispatch_resolver (team roster) */
+void* fn_801FCA2C(u16 slot) {
+    slot = slot;
+    if (slot >= lbl_80478F10[0]) { return NULL; }
+    return lbl_80478F14 + slot * 0x50;
+}
+
+/* Address: 0x801FC658 | Size: 0x2C | Pattern: dispatch_resolver (story/event) */
+void* fn_801FC658(u16 slot) {
+    slot = slot;
+    if (slot >= lbl_80478F30[0]) { return NULL; }
+    return lbl_80478F34 + slot * 0x28;
+}
+
+/* Address: 0x801FCCC4 | Size: 0x2C | Pattern: dispatch_resolver (battle trainer) */
+void* fn_801FCCC4(u16 slot) {
+    slot = slot;
+    if (slot >= lbl_80478F20[0]) { return NULL; }
+    return lbl_80478F24 + slot * 0x34;
 }
 
 /* Address: 0x801FBFE8 | Size: 0x10 | Pattern: nullcheck_setter */
@@ -2569,8 +2605,10 @@ u32 fn_801F8C00(void* context, void* filter) {
             if ((u8)fn_80206780(pokemon) == 0) {
                 pokemon = NULL;
             }
-            if (pokemon != NULL && (u8)fn_80204928(filter, pokemon) == 1) {
-                break;
+            if (pokemon != NULL) {
+                if ((u8)fn_80204928(filter, pokemon) == 1) {
+                    break;
+                }
             }
         }
         pokemon = NULL;
@@ -2589,9 +2627,11 @@ u32 fn_801F8C00(void* context, void* filter) {
             if ((u8)fn_80206780(pokemon) == 0) {
                 pokemon = NULL;
             }
-            if (pokemon != NULL && (u8)fn_80204854(pokemon, filter) == 1) {
-                found = 1;
-                break;
+            if (pokemon != NULL) {
+                if ((u8)fn_80204854(pokemon, filter) == 1) {
+                    found = 1;
+                    break;
+                }
             }
         }
         found = 0;
@@ -2675,7 +2715,8 @@ void* fn_801F8F24(void* context, s16 speciesId) {
     u16 i;
     s16 species;
 
-    if ((species = (s16)speciesId) < 0) {
+    species = speciesId;
+    if (species < 0) {
         return NULL;
     }
     for (i = 0; i < 6; i++) {
@@ -6533,6 +6574,29 @@ void fn_801FE5D4(void* context) {
     }
 }
 
+/* 0x801FE710 | size: 0xDC | ClearTrainerEventState */
+void fn_801FE710(void* trainer, u16 eventId, u32 param) {
+    void* src;
+    void* dst;
+    u32 val;
+
+    if ((u8)param == 1) {
+        src = fn_8012640C(trainer, 0, 0xD5, 0);
+        dst = fn_8012640C(trainer, 0, 0xD7, 0);
+    } else {
+        src = fn_8012640C(trainer, 0, 0xD7, 0);
+        dst = fn_8012640C(trainer, 0, 0xD5, 0);
+    }
+    if (src == NULL) {
+        return;
+    }
+    if (dst == NULL) {
+        return;
+    }
+    val = (u32)fn_8012640C(src, 0, eventId, 0);
+    fn_801254B4(dst, 0, eventId, 0, val);
+}
+
 /* 0x801FE91C | size: 0x2F4 | large */
 void fn_801FE91C(void) {
     extern u8 lbl_80279CB8[];
@@ -6768,6 +6832,19 @@ u32 fn_801FEC10(void* context) {
     *dest2 = *src;
     fn_801254B4(context, 0, 0xD6, 0, (u32)dest2);
     return 1;
+}
+
+/* 0x801FECD4 | size: 0x68 | CheckTrainerEventState */
+u8 fn_801FECD4(void* trainer) {
+    void* a;
+    void* b;
+
+    if (trainer == NULL) {
+        return 0;
+    }
+    a = fn_8012640C(trainer, 0, 0xD6, 0);
+    b = fn_8012640C(trainer, 0, 0xD7, 0);
+    return (u8)(a == b);
 }
 
 /* 0x801FED3C | size: 0x238 | large */
@@ -8694,7 +8771,7 @@ void fn_801FFEC8(void) {
 
 /* 0x80200A5C | size: 0xB4 */
 typedef struct { u16 fields[9]; } FieldTable9;
-u32 fn_80200A5C(void* context) {
+u32 fightOutPokemonCheckNoAttackFlag(void* context) {
     extern FieldTable9 lbl_80279CA4;
     FieldTable9 table;
     u8 i;
@@ -9255,12 +9332,9 @@ u8 fn_80201248(void* context, u16* output) {
         return 0;
     }
     entryList = (u8*)fn_8012640C(context, 0, 0x122, 0);
-    if (output != NULL) {
-        for (i = 0; i < 4; i++) {
+    for (i = 0; i < 4; i++) {
+        if (output != NULL) {
             output[i] = 0;
-        }
-    } else {
-        for (i = 0; i < 4; i++) {
         }
     }
     count = 0;

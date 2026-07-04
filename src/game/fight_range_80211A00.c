@@ -1590,3 +1590,130 @@ after_scan_haradaiko:
 
     return acc;
 }
+
+/*
+ * Small FightSeq opcode handlers / accessors ported from the previous
+ * campaign's archive (archive/previous_campaign/src/game/colosseum_script.c,
+ * "EXPANDED FUNCTION COVERAGE" section, tools/gen_accessors.py-tagged
+ * patterns). Each was mechanically classified as one of a handful of
+ * trivial shapes (simple_setter / sda_getter / simple_wrapper /
+ * null_check_getter / return_constant) operating on the FightSeq PC
+ * (lbl_8047B610) and flag byte (lbl_8047B614); re-verified here against
+ * this unit's own compiler flags rather than copied wholesale.
+ */
+extern u8 lbl_8047B614;
+
+/* WS_ALERTEND (0x802223D4) */
+void WS_ALERTEND(void) { lbl_8047B614 = 2; }
+
+/* WS_SPEABIEND (0x802224D0) */
+void WS_SPEABIEND(void) { lbl_8047B614 = 2; }
+
+/* WS_SEQEND (0x802224DC) */
+void WS_SEQEND(void) { lbl_8047B614 = 1; }
+
+/* WS_WAZAEND (0x802224E8) */
+void WS_WAZAEND(void) { lbl_8047B614 = 1; }
+
+/* WS_SEQRET (0x802224F4) */
+void WS_SEQRET(void) { lbl_8047B614 = 2; }
+
+/* fn_80222500 (0x80222500): advance FightSeq PC by 2. */
+void fn_80222500(void) { lbl_8047B610 = lbl_8047B610 + 2; }
+
+/* fn_80222510 (0x80222510): advance FightSeq PC by 1. */
+void fn_80222510(void) { lbl_8047B610 = lbl_8047B610 + 1; }
+
+/* fn_80222554 (0x80222554): AND-NOT a u32 field with a script-embedded
+ * mask -- REJECTED, could not reach 100% (best attempt 76.25%, MWCC
+ * emits xor+and instead of andc for this shape under -O4). Left
+ * unimplemented (still asm-only) rather than landed at <100%. */
+
+/* fn_80222584 (0x80222584): AND-NOT-XOR a u16 field with a script-embedded mask. */
+void fn_80222584(void)
+{
+    u32 t = lbl_8047B610;
+    u16 *ptr = *(u16 **)(t + 1);
+    u16 val = *(u16 *)(t + 5);
+    *ptr = *ptr & (val ^ 0xffff);
+    lbl_8047B610 = lbl_8047B610 + 7;
+}
+
+/* fn_802225B0 (0x802225B0): same shape as fn_80222554, u8 field. */
+void fn_802225B0(void)
+{
+    u32 t = lbl_8047B610;
+    u8 *ptr = *(u8 **)(t + 1);
+    u8 val = *(u8 *)(t + 5);
+    *ptr = *ptr & (val ^ 0xff);
+    lbl_8047B610 = lbl_8047B610 + 6;
+}
+
+/* fn_802225DC (0x802225DC): OR a u32 field with a script-embedded mask. */
+void fn_802225DC(void)
+{
+    u32 t = lbl_8047B610;
+    u32 *ptr = *(u32 **)(t + 1);
+    u32 val = *(u32 *)(t + 5);
+    *ptr |= val;
+    lbl_8047B610 = lbl_8047B610 + 9;
+}
+
+/* fn_80222604 (0x80222604): same shape as fn_802225DC, u16 field. */
+void fn_80222604(void)
+{
+    u32 t = lbl_8047B610;
+    u16 *ptr = *(u16 **)(t + 1);
+    u16 val = *(u16 *)(t + 5);
+    *ptr |= val;
+    lbl_8047B610 = lbl_8047B610 + 7;
+}
+
+/* fn_8022262C (0x8022262C): same shape as fn_802225DC, u8 field. */
+void fn_8022262C(void)
+{
+    u32 t = lbl_8047B610;
+    u8 *ptr = *(u8 **)(t + 1);
+    u8 val = *(u8 *)(t + 5);
+    *ptr |= val;
+    lbl_8047B610 = lbl_8047B610 + 6;
+}
+
+/* fn_802226EC (0x802226EC): subtract a script-embedded u8 value from a
+ * field. */
+void fn_802226EC(void)
+{
+    u32 t = lbl_8047B610;
+    u8 *ptr = *(u8 **)(t + 1);
+    u8 val = *(u8 *)(t + 5);
+    *ptr -= val;
+    lbl_8047B610 = lbl_8047B610 + 6;
+}
+
+/* fn_80222714 (0x80222714): add a script-embedded u8 value to a field. */
+void fn_80222714(void)
+{
+    u32 t = lbl_8047B610;
+    u8 *ptr = *(u8 **)(t + 1);
+    u8 val = *(u8 *)(t + 5);
+    *ptr += val;
+    lbl_8047B610 = lbl_8047B610 + 6;
+}
+
+/* fn_8022273C (0x8022273C): store a script-embedded u8 value into a
+ * field. */
+void fn_8022273C(void)
+{
+    u32 t = lbl_8047B610;
+    u8 val = *(u8 *)(t + 5);
+    u8 *ptr = *(u8 **)(t + 1);
+    *ptr = val;
+    lbl_8047B610 = lbl_8047B610 + 6;
+}
+
+/* fn_80222ACC (0x80222ACC): read the current FightSeq PC, then advance
+ * it to the script-embedded jump target. */
+u32 fn_80222ACC(void) { u32 r = lbl_8047B610; lbl_8047B610 = *(u32 *)(r + 1); return r; }
+
+/* fn_8023C368 (0x8023C368): constant-zero accessor. */
+u32 fn_8023C368(void) { return 0; }

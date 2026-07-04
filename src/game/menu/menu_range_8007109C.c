@@ -27,6 +27,119 @@ typedef struct GbaIdleCallback {
 
 extern GbaIdleCallback lbl_803B6E18[5];
 extern s32 lbl_803B6E08[4];
+extern u8 lbl_803B6D88[0x58];
+extern void fn_80113828(s32, s32);
+
+/*
+ * Small helpers ported from the previous campaign's archive
+ * (archive/previous_campaign/src/game/menu/menu_common_ext.c). Each is
+ * a trivial, self-contained accessor/no-op operating on the GBA-link
+ * FightSeq-style call stack at lbl_803B6D88; re-verified against this
+ * unit's own compiler flags rather than copied wholesale.
+ */
+
+/* fn_8007162C (0x8007162C): peek the current call-stack depth slot. */
+s32 fn_8007162C(void) {
+    u32 depth;
+
+    depth = *(u32*)(lbl_803B6D88 + 0x40);
+    return *(s32*)(lbl_803B6D88 + depth * 8);
+}
+
+/* fn_800716C8 (0x800716C8): register a per-channel idle callback
+ * (archive's "return 0" stub was incomplete -- disassembly shows it
+ * actually populates lbl_803B6E18[chan]). */
+s32 fn_800716C8(s32 chan, void* arg, void (*func)(s32 chan, void* arg)) {
+    lbl_803B6E18[chan].func = func;
+    lbl_803B6E18[chan].arg = arg;
+    return 0;
+}
+
+/* fn_800716E8 (0x800716E8): store a per-channel value, always returns 0. */
+s32 fn_800716E8(s32 channel, s32 value) {
+    lbl_803B6E08[channel] = value;
+    return 0;
+}
+
+/* fn_8007169C (0x8007169C): fixed diagnostic-log call, always returns 0. */
+#pragma push
+#pragma peephole off
+s32 fn_8007169C(void) {
+    fn_80113828(0x385, 0);
+    return 0;
+}
+#pragma pop
+
+/*
+ * Trivial single-call tail-wrappers ported from the previous campaign's
+ * archive (archive/previous_campaign/src/game/menu/menu_tool2.c);
+ * re-verified against this unit's own compiler flags.
+ */
+extern s32 fn_80190528(s32);
+extern s32 fn_801902E0(s32);
+extern s32 fadeCheck(s32);
+extern s32 fn_80102510(s32);
+extern s32 fn_801906A0(s32);
+extern void _flagSet();
+
+#pragma push
+#pragma scheduling off
+s32 fn_80075A9C(void) { return fn_80190528(0xab5); }
+#pragma pop
+
+#pragma push
+#pragma scheduling off
+s32 fn_80075AC0(void) { return fn_801902E0(0xab5); }
+#pragma pop
+
+#pragma push
+#pragma scheduling off
+s32 fn_80075AE4(void) { return fn_80190528(0xab4); }
+#pragma pop
+
+#pragma push
+#pragma scheduling off
+s32 fn_80075B08(void) { return fn_801902E0(0xab4); }
+#pragma pop
+
+#pragma push
+#pragma scheduling off
+s32 fn_80075B2C(void) { return fn_80190528(0xab3); }
+#pragma pop
+
+#pragma push
+#pragma scheduling off
+s32 fn_80075B50(void) { return fn_801902E0(0xab3); }
+#pragma pop
+
+#pragma push
+#pragma scheduling off
+s32 fn_80075BFC(void) { return fn_80190528(0xab1); }
+#pragma pop
+
+#pragma push
+#pragma scheduling off
+s32 fn_80075C20(void) { return fn_801902E0(0xab1); }
+#pragma pop
+
+#pragma push
+#pragma scheduling off
+s32 fn_80075C44(void) { return fn_801902E0(0xa14); }
+#pragma pop
+
+#pragma push
+#pragma scheduling off
+s32 fn_80075C68(void) {
+    fadeCheck(1);
+    return fn_80102510(0xe0);
+}
+#pragma pop
+
+/* fn_80075B74 (0x80075B74) and fn_80075BC4 (0x80075BC4) -- REJECTED,
+ * could not reach 100% (best attempts 76.7% / 37.8%; MWCC's exact
+ * branchless-clamp codegen for these two counter helpers did not fall
+ * out of several equivalent C phrasings tried). Left unimplemented
+ * (still asm-only) rather than landed at <100%. */
 
 /* Address: 0x80071700 | Size: 0x2A8 */
 #pragma peephole off
@@ -243,3 +356,146 @@ done:
     return result;
 }
 #pragma peephole reset
+
+/*
+ * More small helpers ported from the previous campaign's archive
+ * (menu_common_ext.c, menu_tool.c, menu_tool2.c, menu_exdisc.c);
+ * re-verified against this unit's own compiler flags.
+ */
+extern void OSResumeThread(u32);
+extern u32 lbl_8047A600;
+
+/* fn_80072684 (0x80072684): resume the thread stashed at lbl_8047A600. */
+void fn_80072684(void) {
+    OSResumeThread(lbl_8047A600);
+}
+
+/* fn_80073E84 (0x80073E84): constant-1 accessor. */
+s32 fn_80073E84(void) {
+    return 1;
+}
+
+extern s32 fn_80102620(s32);
+/* fn_80075638 (0x80075638): tail-call wrapper. */
+#pragma push
+#pragma scheduling off
+s32 fn_80075638(void) { return fn_80102620(0xd8); }
+#pragma pop
+
+extern void fn_801CB9D8(u32);
+extern u8 lbl_8047A5D0;
+/* fn_800757F0 (0x800757F0): release and clear the handle at lbl_8047A5D0. */
+void fn_800757F0(void) {
+    fn_801CB9D8(*(u32*)&lbl_8047A5D0);
+    *(u32*)&lbl_8047A5D0 = 0;
+}
+
+/* fn_80075D98 (0x80075D98): no-op. */
+void fn_80075D98(void) {
+}
+
+extern s32 fadeCheck(s32);
+extern s32 fn_80102510(s32);
+/* fn_80075D9C (0x80075D9C): tail-call wrapper. */
+#pragma push
+#pragma scheduling off
+s32 fn_80075D9C(void) {
+    fadeCheck(1);
+    return fn_80102510(0xe2);
+}
+#pragma pop
+
+extern s32 fn_80165A20(s32, s32, s32);
+/* fn_80075F4C (0x80075F4C): tail-call wrapper. */
+#pragma push
+#pragma scheduling off
+s32 fn_80075F4C(void) { return fn_80165A20(0x46a, 0, 0x7f); }
+#pragma pop
+
+extern u8* fn_8006B420(void);
+
+/* fn_80077AAC..fn_80077B60 (0x80077AAC-0x80077B60): fixed-index byte
+ * accessors into the fn_8006B420() record. */
+#pragma push
+#pragma scheduling off
+u8 fn_80077AAC(void) { return fn_8006B420()[0x13]; }
+#pragma pop
+
+#pragma push
+#pragma scheduling off
+u8 fn_80077AD0(void) { return fn_8006B420()[0x12]; }
+#pragma pop
+
+#pragma push
+#pragma scheduling off
+u8 fn_80077AF4(void) { return fn_8006B420()[0x11]; }
+#pragma pop
+
+#pragma push
+#pragma scheduling off
+u8 fn_80077B18(void) { return fn_8006B420()[0x10]; }
+#pragma pop
+
+#pragma push
+#pragma scheduling off
+u8 fn_80077B3C(void) { return fn_8006B420()[0xf]; }
+#pragma pop
+
+#pragma push
+#pragma scheduling off
+u8 fn_80077B60(void) { return fn_8006B420()[0xe]; }
+#pragma pop
+
+/* fn_80077B84 (0x80077B84): fixed-index s16 accessor into the same record. */
+#pragma push
+#pragma scheduling off
+s16 fn_80077B84(void) { return ((s16*)fn_8006B420())[0xb]; }
+#pragma pop
+
+/* menuCBRule_GetBattleTimeLimit (0x80077BA8): same shape, scaled by 0x3c. */
+s32 menuCBRule_GetBattleTimeLimit(void) {
+    return ((s16*)fn_8006B420())[0xa] * 0x3c;
+}
+
+extern u32 lbl_80478928;
+extern u16 lbl_802EE458[];
+
+/* fn_80077D88 (0x80077D88): bounds-checked table lookup. */
+u16 fn_80077D88(s32 index) {
+    if (index < 0 || lbl_80478928 <= (u32)index) {
+        return 0;
+    }
+    return lbl_802EE458[index];
+}
+
+extern u8 lbl_80268940[];
+
+/* menuCBRule_ConstantRule (0x80077E50): fixed-slot table lookup, NULL out of range. */
+void* menuCBRule_ConstantRule(s32 index) {
+    switch (index) {
+    case 0:
+    case 1:
+    case 2:
+        return lbl_80268940 + (index * 0x54);
+    }
+    return (void*)0;
+}
+
+extern void* memcpy(void* dst, const void* src, u32 size);
+
+/* fn_80077E80 (0x80077E80): fixed-size record copy. */
+#pragma scheduling off
+void fn_80077E80(void* dst, void* src) {
+    memcpy(dst, src, 0x54);
+}
+#pragma scheduling on
+
+extern s32 memcmp(const void* s1, const void* s2, u32 size);
+
+/* fn_80077EA4 (0x80077EA4): fixed-size record equality check. */
+#pragma push
+#pragma peephole off
+u8 fn_80077EA4(u16* s1, u16* s2) {
+    return memcmp(s1, s2, 0x54) == 0;
+}
+#pragma pop

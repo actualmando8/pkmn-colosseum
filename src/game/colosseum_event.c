@@ -4265,16 +4265,27 @@ u32 fn_80207B5C(void* context, u8 flags, u16 value) {
 #pragma scheduling reset
 
 /* 0x80207B8C | size: 0x34 */
+#pragma push
+#pragma scheduling on
+#pragma peephole on
 u16 fn_80207B8C(void* context, u8 field) {
     return (u16)(u32)fn_8012640C(context, 0, 0xFF, field);
 }
+#pragma pop
 
 /* 0x80207BC0 | size: 0x34 */
+#pragma push
+#pragma scheduling on
+#pragma peephole on
 u32 fn_80207BC0(void* context, u16 value) {
     return fn_801254B4(context, 0, 0x100, 0, value);
 }
+#pragma pop
 
 /* 0x80207C24 | size: 0x48 | small */
+#pragma push
+#pragma scheduling on
+#pragma peephole on
 void fn_80207C24(void* ctx, u32 param) {
     extern void fn_801DA5AC();
     void* obj = fn_8012640C(ctx, 0, 0xee, 0);
@@ -4282,6 +4293,7 @@ void fn_80207C24(void* ctx, u32 param) {
         fn_801DA5AC(obj, param);
     }
 }
+#pragma pop
 
 /* Address: 0x80207C6C | Size: 0x2f0 | Ghidra import */
 u32 fn_80207C6C(void)
@@ -4721,7 +4733,7 @@ void fn_802086E8(void)
     extern void fn_801DA8C4();
   u16 uVar2;
   int iVar1;
-  
+
   uVar2 = fn_8011BEB4(0,r4,0x1f,0);
   iVar1 = (int)fn_8012640C(r3,0,0xee,0);
   if (iVar1 != 0) {
@@ -5386,51 +5398,50 @@ void fn_802097C8(u32 param_1, u32 param_2, u32 param_3) {
 #pragma pop
 
 /* Address: 0x8020981C | Size: 0x54 | Ghidra import */
-u32 fn_8020981C(void)
+#pragma push
+#pragma scheduling on
+#pragma peephole on
+u32 fn_8020981C(void* ctx, u32 param)
 
 {
-    u32 r3;
-    u32 r4;
-
-    extern short fn_80119ED0();
+    extern u16 fn_80119ED0();
     extern u32 fn_8011B444();
-  short sVar2;
+  u16 sVar2;
   u32 uVar1;
-  
-  sVar2 = fn_80119ED0(r4);
-  if (sVar2 == 0x2a) {
-    uVar1 = fn_8011B444(r3,r4);
+
+  sVar2 = fn_80119ED0(param);
+  if (sVar2 != 0x2a) {
+    uVar1 = 0;
   }
   else {
-    uVar1 = 0;
+    uVar1 = fn_8011B444(ctx,param);
   }
   return uVar1;
 }
+#pragma pop
 /* Address: 0x80209870 | Size: 0x9c | Ghidra import */
-u32 fn_80209870(void)
+u32 fn_80209870(void* ctx)
 
 {
-    u32 r3;
+    extern u16 fn_80119ED0();
+    extern u8 fn_8011B67C();
+  u16 sVar1;
+  u8 cVar2;
 
-    extern short fn_80119ED0();
-    extern s8 fn_8011B67C();
-  short sVar1;
-  s8 cVar2;
-  
   sVar1 = fn_80119ED0(0x41);
-  if (sVar1 == 0x2a) {
-    cVar2 = fn_8011B67C(r3,0x41);
+  if (sVar1 != 0x2a) {
+    cVar2 = 0;
   }
   else {
-    cVar2 = 0;
+    cVar2 = fn_8011B67C(ctx,0x41);
   }
   if (cVar2 == 1) {
     sVar1 = fn_80119ED0(0x42);
-    if (sVar1 == 0x2a) {
-      cVar2 = fn_8011B67C(r3,0x42);
+    if (sVar1 != 0x2a) {
+      cVar2 = 0;
     }
     else {
-      cVar2 = 0;
+      cVar2 = fn_8011B67C(ctx,0x42);
     }
     if (cVar2 == 1) {
       return 1;
@@ -8045,7 +8056,7 @@ int fn_8020E57C(void)
   int iVar1;
   u16 uVar2;
   int iVar3;
-  
+
   if (r3 != 0) {
     for (uVar2 = 0; uVar2 < r4; uVar2 = uVar2 + 1) {
       iVar3 = r3 + (u32)uVar2 * 0xc;
@@ -8103,7 +8114,7 @@ void fn_8020E6D4(void)
     extern void fn_801FD0AC();
   u16 uVar1;
   int iVar2;
-  
+
   if (r3 != 0) {
     for (uVar1 = 0; uVar1 < r4; uVar1 = uVar1 + 1) {
       iVar2 = r3 + (u32)uVar1 * 0xc;
@@ -8601,58 +8612,41 @@ void fightWazaWzxTypeFuncHensin(void* battleCtx, void* ctx) {
 }
 
 /* Address: 0x8020F368 | Size: 0x80 | Ghidra import */
-void fightWazaWzxTypeFuncMagiccort(void)
-
+#pragma push
+#pragma peephole on
+void fightWazaWzxTypeFuncMagiccort(void* ctx1, void* target1, void* sideCtx, u32 unused, void* p7)
 {
-    u32 r3;
-    u32 r4;
-    u32 r5;
-    u32 r6;
-    u32 r7;
-
-    extern u32 fn_801F0204();
-    extern void fn_801F0234();
+    extern void* fn_801F0204();
+    extern void* fn_801F0234();
     extern int fn_802026E4();
     extern void fn_802085C4();
     extern void fn_80208750();
-  s8 cVar2;
-  u32 uVar1;
-  
-  fn_80208750(r4,r3,1,r7);
-  cVar2 = fn_802026E4(r5,0x37);
+  u8 cVar2;
+
+  fn_80208750(target1,ctx1,1,p7);
+  cVar2 = fn_802026E4(sideCtx,0x37);
   if (cVar2 == 1) {
-    fn_801F0234(0x11);
-    uVar1 = fn_801F0204();
-    fn_802085C4(r4,r3,1,0,uVar1);
+    fn_802085C4(target1,ctx1,1,0,fn_801F0204(fn_801F0234(0x11)));
   }
   return;
 }
+#pragma pop
 /* Address: 0x8020F3F0 | Size: 0xa4 | Ghidra import */
-void fn_8020F3F0(void)
-
+#pragma push
+#pragma peephole on
+void fn_8020F3F0(void* ctx1, void* target1, void* target2, u32 unused, void* p7)
 {
-    u32 r3;
-    u32 r4;
-    u32 r5;
-    u32 r6;
-    u32 r7;
-
-    extern u32 fn_801F0204();
-    extern void fn_801F0234();
+    extern void* fn_801F0204();
+    extern void* fn_801F0234();
     extern void fn_802085C4();
     extern void fn_80208750();
-  u32 uVar1;
 
-  fn_80208750(r4,r3,1,r7);
-  fn_80208750(r5,r3,2,r7);
-  fn_801F0234(0x11);
-  uVar1 = fn_801F0204();
-  fn_802085C4(r4,r3,1,1,uVar1);
-  fn_801F0234(0x12);
-  uVar1 = fn_801F0204();
-  fn_802085C4(r5,r3,2,0,uVar1);
-  return;
+    fn_80208750(target1,ctx1,1,p7);
+    fn_80208750(target2,ctx1,2,p7);
+    fn_802085C4(target1,ctx1,1,1,fn_801F0204(fn_801F0234(0x11)));
+    fn_802085C4(target2,ctx1,2,0,fn_801F0204(fn_801F0234(0x12)));
 }
+#pragma pop
 /* Address: 0x8020F494 | Size: 0x84 | Ghidra import */
 
 u32 fightWazaWzxVariationFuncWeatherBall(void)
@@ -8686,31 +8680,21 @@ u32 fightWazaWzxVariationFuncWeatherBall(void)
   return uVar1;
 }
 /* Address: 0x8020F518 | Size: 0xa4 | Ghidra import */
-void fn_8020F518(void)
-
+#pragma push
+#pragma peephole on
+void fn_8020F518(void* ctx1, void* target1, void* target2, u32 unused, void* p7)
 {
-    u32 r3;
-    u32 r4;
-    u32 r5;
-    u32 r6;
-    u32 r7;
-
-    extern u32 fn_801F0204();
-    extern void fn_801F0234();
+    extern void* fn_801F0204();
+    extern void* fn_801F0234();
     extern void fn_802085C4();
     extern void fn_80208750();
-  u32 uVar1;
-  
-  fn_80208750(r4,r3,1,r7);
-  fn_80208750(r5,r3,2,r7);
-  fn_801F0234(0x11);
-  uVar1 = fn_801F0204();
-  fn_802085C4(r4,r3,1,1,uVar1);
-  fn_801F0234(0x12);
-  uVar1 = fn_801F0204();
-  fn_802085C4(r5,r3,2,0,uVar1);
-  return;
+
+    fn_80208750(target1,ctx1,1,p7);
+    fn_80208750(target2,ctx1,2,p7);
+    fn_802085C4(target1,ctx1,1,1,fn_801F0204(fn_801F0234(0x11)));
+    fn_802085C4(target2,ctx1,2,0,fn_801F0204(fn_801F0234(0x12)));
 }
+#pragma pop
 /* Address: 0x8020F5BC | Size: 0x8c | Ghidra import */
 #pragma push
 #pragma peephole on
@@ -8737,31 +8721,21 @@ u32 fightWazaWzxVariationFuncIceball(u32 unused, void* typeObj)
 }
 #pragma pop
 /* Address: 0x8020F648 | Size: 0xa4 | Ghidra import */
-void fightWazaWzxTypeFuncKawarawari(void)
-
+#pragma push
+#pragma peephole on
+void fightWazaWzxTypeFuncKawarawari(void* ctx1, void* target1, void* target2, u32 unused, void* p7)
 {
-    u32 r3;
-    u32 r4;
-    u32 r5;
-    u32 r6;
-    u32 r7;
-
-    extern u32 fn_801F0204();
-    extern void fn_801F0234();
+    extern void* fn_801F0204();
+    extern void* fn_801F0234();
     extern void fn_802085C4();
     extern void fn_80208750();
-  u32 uVar1;
 
-  fn_80208750(r4,r3,1,0);
-  fn_80208750(r5,r3,2,r7);
-  fn_801F0234(0x11);
-  uVar1 = fn_801F0204();
-  fn_802085C4(r4,r3,1,1,uVar1);
-  fn_801F0234(0x12);
-  uVar1 = fn_801F0204();
-  fn_802085C4(r5,r3,2,0,uVar1);
-  return;
+    fn_80208750(target1,ctx1,1,0);
+    fn_80208750(target2,ctx1,2,p7);
+    fn_802085C4(target1,ctx1,1,1,fn_801F0204(fn_801F0234(0x11)));
+    fn_802085C4(target2,ctx1,2,0,fn_801F0204(fn_801F0234(0x12)));
 }
+#pragma pop
 /* 0x8020F6EC | size: 0x60 | small */
 s32 fightWazaWzxVariationFuncKawarawari(void) {
     extern u8 lbl_80379F58[];
@@ -8777,17 +8751,18 @@ s32 fightWazaWzxVariationFuncKawarawari(void) {
 }
 
 /* 0x8020F74C | size: 0x64 */
+#pragma push
+#pragma peephole on
 void fightWazaWzxTypeFuncNegaigoto(void* p1, void* p2, u32 unused1, u32 unused2, u32 p3) {
     extern u32 fn_801F0204();
     extern void fn_801F0234();
     extern void fn_802085C4();
     extern void fn_80208750();
-    u32 result;
     fn_80208750(p2, p1, 1, p3);
     fn_801F0234(0x11);
-    result = fn_801F0204();
-    fn_802085C4(p2, p1, 1, 0, result);
+    fn_802085C4(p2, p1, 1, 0, fn_801F0204());
 }
+#pragma pop
 
 /* 0x8020F7B8 | size: 0x114 */
 void fightWazaWzxTypeFuncTedasuke(void* p1, void* p2, u32 p3, u32 p4) {
@@ -8822,49 +8797,33 @@ void fightWazaWzxTypeFuncTedasuke(void* p1, void* p2, u32 p3, u32 p4) {
 }
 
 /* Address: 0x8020F8D4 | Size: 0x64 | Ghidra import */
-void fn_8020F8D4(void)
-
+#pragma push
+#pragma peephole on
+void fn_8020F8D4(void* ctx1, void* target1, u32 unused1, u32 unused2, void* p7)
 {
-    u32 r3;
-    u32 r4;
-    u32 r5;
-    u32 r6;
-    u32 r7;
-
-    extern u32 fn_801F0204();
-    extern void fn_801F0234();
+    extern void* fn_801F0204();
+    extern void* fn_801F0234();
     extern void fn_802085C4();
     extern void fn_80208750();
-  u32 uVar1;
-  
-  fn_80208750(r4,r3,3,r7);
-  fn_801F0234(0x11);
-  uVar1 = fn_801F0204();
-  fn_802085C4(r4,r3,3,0,uVar1);
-  return;
+
+    fn_80208750(target1,ctx1,3,p7);
+    fn_802085C4(target1,ctx1,3,0,fn_801F0204(fn_801F0234(0x11)));
 }
+#pragma pop
 /* Address: 0x8020F938 | Size: 0x64 | Ghidra import */
-void fn_8020F938(void)
-
+#pragma push
+#pragma peephole on
+void fn_8020F938(void* ctx1, void* target1, u32 unused1, u32 unused2, void* p7)
 {
-    u32 r3;
-    u32 r4;
-    u32 r5;
-    u32 r6;
-    u32 r7;
-
-    extern u32 fn_801F0204();
-    extern void fn_801F0234();
+    extern void* fn_801F0204();
+    extern void* fn_801F0234();
     extern void fn_802085C4();
     extern void fn_80208750();
-  u32 uVar1;
-  
-  fn_80208750(r4,r3,3,r7);
-  fn_801F0234(0x11);
-  uVar1 = fn_801F0204();
-  fn_802085C4(r4,r3,3,0,uVar1);
-  return;
+
+    fn_80208750(target1,ctx1,3,p7);
+    fn_802085C4(target1,ctx1,3,0,fn_801F0204(fn_801F0234(0x11)));
 }
+#pragma pop
 /* fightWazaWzxVariationFuncNomikomu | Size: 0x40 | Check if byte at fixed address equals 3 */
 BOOL fightWazaWzxVariationFuncNomikomu(void) {
     extern u8 lbl_80379F58[];
@@ -8881,31 +8840,21 @@ BOOL fightWazaWzxVariationFuncNomikomu(void) {
 }
 
 /* Address: 0x8020F9DC | Size: 0xa4 | Ghidra import */
-void fn_8020F9DC(void)
-
+#pragma push
+#pragma peephole on
+void fn_8020F9DC(void* ctx1, void* target1, void* target2, u32 unused, void* p7)
 {
-    u32 r3;
-    u32 r4;
-    u32 r5;
-    u32 r6;
-    u32 r7;
-
-    extern u32 fn_801F0204();
-    extern void fn_801F0234();
+    extern void* fn_801F0204();
+    extern void* fn_801F0234();
     extern void fn_802085C4();
     extern void fn_80208750();
-  u32 uVar1;
 
-  fn_80208750(r4,r3,1,r7);
-  fn_80208750(r5,r3,2,r7);
-  fn_801F0234(0x11);
-  uVar1 = fn_801F0204();
-  fn_802085C4(r4,r3,1,1,uVar1);
-  fn_801F0234(0x12);
-  uVar1 = fn_801F0204();
-  fn_802085C4(r5,r3,2,0,uVar1);
-  return;
+    fn_80208750(target1,ctx1,1,p7);
+    fn_80208750(target2,ctx1,2,p7);
+    fn_802085C4(target1,ctx1,1,1,fn_801F0204(fn_801F0234(0x11)));
+    fn_802085C4(target2,ctx1,2,0,fn_801F0204(fn_801F0234(0x12)));
 }
+#pragma pop
 /* fightWazaWzxVariationFuncHakidasu | Size: 0x40 | Check if byte at fixed address equals 3 */
 BOOL fightWazaWzxVariationFuncHakidasu(void) {
     extern u8 lbl_80379F58[];
@@ -8938,36 +8887,26 @@ void fightWazaWzxTypeFuncAtt(void* p1, void* p2, u32 unused1, u16 flag, u32 p4) 
 #pragma pop
 
 /* Address: 0x8020FB38 | Size: 0xc4 | Ghidra import */
-void fightWazaWzxTypeFuncItamiwake(void)
-
+#pragma push
+#pragma peephole on
+void fightWazaWzxTypeFuncItamiwake(void* ctx1, void* target1, void* target2, u16 flag, void* p7)
 {
-    u32 r3;
-    u32 r4;
-    u32 r5;
-    short r6;
-    u32 r7;
-
-    extern u32 fn_801F0204();
-    extern void fn_801F0234();
+    extern void* fn_801F0204();
+    extern void* fn_801F0234();
     extern void fn_802085C4();
     extern void fn_80208750();
-  u32 uVar1;
-  
-  if (r6 == 0) {
-    fn_80208750(r4,r3,1,r7);
-    fn_80208750(r5,r3,2,r7);
-    fn_801F0234(0x11);
-    uVar1 = fn_801F0204();
-    fn_802085C4(r4,r3,1,0,uVar1);
-  }
-  else {
-    fn_80208750(r5,r3,2,r7);
-    fn_801F0234(0x12);
-    uVar1 = fn_801F0204();
-    fn_802085C4(r5,r3,2,0,uVar1);
-  }
-  return;
+
+    if (flag != 0) {
+        fn_80208750(target2,ctx1,2,p7);
+        fn_802085C4(target2,ctx1,2,0,fn_801F0204(fn_801F0234(0x12)));
+    }
+    else {
+        fn_80208750(target1,ctx1,1,p7);
+        fn_80208750(target2,ctx1,2,p7);
+        fn_802085C4(target1,ctx1,1,0,fn_801F0204(fn_801F0234(0x11)));
+    }
 }
+#pragma pop
 /* Address: 0x8020FC04 | Size: 0x6c | Ghidra import */
 
 u32 fightWazaWzxVariationFuncWeatherHP(void)
@@ -9061,31 +9000,21 @@ u32 fightWazaWzxVariationFuncMagnitude(void)
   return 0;
 }
 /* Address: 0x8020FE40 | Size: 0xa4 | Ghidra import */
-void fn_8020FE40(void)
-
+#pragma push
+#pragma peephole on
+void fn_8020FE40(void* ctx1, void* target1, void* target2, u32 unused, void* p7)
 {
-    u32 r3;
-    u32 r4;
-    u32 r5;
-    u32 r6;
-    u32 r7;
-
-    extern u32 fn_801F0204();
-    extern void fn_801F0234();
+    extern void* fn_801F0204();
+    extern void* fn_801F0234();
     extern void fn_802085C4();
     extern void fn_80208750();
-  u32 uVar1;
-  
-  fn_80208750(r4,r3,1,0);
-  fn_80208750(r5,r3,2,r7);
-  fn_801F0234(0x11);
-  uVar1 = fn_801F0204();
-  fn_802085C4(r4,r3,1,1,uVar1);
-  fn_801F0234(0x12);
-  uVar1 = fn_801F0204();
-  fn_802085C4(r5,r3,2,0,uVar1);
-  return;
+
+    fn_80208750(target1,ctx1,1,0);
+    fn_80208750(target2,ctx1,2,p7);
+    fn_802085C4(target1,ctx1,1,1,fn_801F0204(fn_801F0234(0x11)));
+    fn_802085C4(target2,ctx1,2,0,fn_801F0204(fn_801F0234(0x12)));
 }
+#pragma pop
 /* Address: 0x8020FEE4 | Size: 0x78 | Ghidra import */
 char fightWazaWzxVariationFuncYatuatari()
 
@@ -9114,31 +9043,21 @@ char fightWazaWzxVariationFuncYatuatari()
   return cVar1;
 }
 /* Address: 0x8020FF5C | Size: 0xa4 | Ghidra import */
-void fn_8020FF5C(void)
-
+#pragma push
+#pragma peephole on
+void fn_8020FF5C(void* ctx1, void* target1, void* target2, u32 unused, void* p7)
 {
-    u32 r3;
-    u32 r4;
-    u32 r5;
-    u32 r6;
-    u32 r7;
-
-    extern u32 fn_801F0204();
-    extern void fn_801F0234();
+    extern void* fn_801F0204();
+    extern void* fn_801F0234();
     extern void fn_802085C4();
     extern void fn_80208750();
-  u32 uVar1;
-  
-  fn_80208750(r4,r3,1,0);
-  fn_80208750(r5,r3,2,r7);
-  fn_801F0234(0x11);
-  uVar1 = fn_801F0204();
-  fn_802085C4(r4,r3,1,1,uVar1);
-  fn_801F0234(0x12);
-  uVar1 = fn_801F0204();
-  fn_802085C4(r5,r3,2,0,uVar1);
-  return;
+
+    fn_80208750(target1,ctx1,1,0);
+    fn_80208750(target2,ctx1,2,p7);
+    fn_802085C4(target1,ctx1,1,1,fn_801F0204(fn_801F0234(0x11)));
+    fn_802085C4(target2,ctx1,2,0,fn_801F0204(fn_801F0234(0x12)));
 }
+#pragma pop
 /* Address: 0x80210000 | Size: 0x74 | Ghidra import */
 u32 fightWazaWzxVariationFuncPresent(void)
 
@@ -9166,31 +9085,21 @@ LAB_0020d058:
   return uVar1;
 }
 /* Address: 0x80210074 | Size: 0xa4 | Ghidra import */
-void fn_80210074(void)
-
+#pragma push
+#pragma peephole on
+void fn_80210074(void* ctx1, void* target1, void* target2, u32 unused, void* p7)
 {
-    u32 r3;
-    u32 r4;
-    u32 r5;
-    u32 r6;
-    u32 r7;
-
-    extern u32 fn_801F0204();
-    extern void fn_801F0234();
+    extern void* fn_801F0204();
+    extern void* fn_801F0234();
     extern void fn_802085C4();
     extern void fn_80208750();
-  u32 uVar1;
-  
-  fn_80208750(r4,r3,1,0);
-  fn_80208750(r5,r3,2,r7);
-  fn_801F0234(0x11);
-  uVar1 = fn_801F0204();
-  fn_802085C4(r4,r3,1,1,uVar1);
-  fn_801F0234(0x12);
-  uVar1 = fn_801F0204();
-  fn_802085C4(r5,r3,2,0,uVar1);
-  return;
+
+    fn_80208750(target1,ctx1,1,0);
+    fn_80208750(target2,ctx1,2,p7);
+    fn_802085C4(target1,ctx1,1,1,fn_801F0204(fn_801F0234(0x11)));
+    fn_802085C4(target2,ctx1,2,0,fn_801F0204(fn_801F0234(0x12)));
 }
+#pragma pop
 /* Address: 0x80210118 | Size: 0x78 | Ghidra import */
 int fightWazaWzxVariationFuncOngaesi(void)
 
@@ -9217,21 +9126,19 @@ int fightWazaWzxVariationFuncOngaesi(void)
   return iVar2;
 }
 /* 0x80210190 | size: 0xA4 */
-void fn_80210190(void* p1, void* p2, void* p3, u32 unused, u32 p4) {
-    extern u32 fn_801F0204();
-    extern void fn_801F0234();
+#pragma push
+#pragma peephole on
+void fn_80210190(void* p1, void* p2, void* p3, u32 unused, void* p4) {
+    extern void* fn_801F0204();
+    extern void* fn_801F0234();
     extern void fn_802085C4();
     extern void fn_80208750();
-    u32 result;
     fn_80208750(p2, p1, 1, p4);
     fn_80208750(p3, p1, 2, p4);
-    fn_801F0234(0x11);
-    result = fn_801F0204();
-    fn_802085C4(p2, p1, 1, 1, result);
-    fn_801F0234(0x12);
-    result = fn_801F0204();
-    fn_802085C4(p3, p1, 2, 0, result);
+    fn_802085C4(p2, p1, 1, 1, fn_801F0204(fn_801F0234(0x11)));
+    fn_802085C4(p3, p1, 2, 0, fn_801F0204(fn_801F0234(0x12)));
 }
+#pragma pop
 
 /* 0x80210234 | size: 0x84 */
 #pragma push
@@ -9252,31 +9159,21 @@ u32 fightWazaWzxVariationFuncRenzokugiri(u32 unused, void* typeObj) {
 #pragma pop
 
 /* Address: 0x802102B8 | Size: 0xa4 | Ghidra import */
-void fn_802102B8(void)
-
+#pragma push
+#pragma peephole on
+void fn_802102B8(void* ctx1, void* target1, void* target2, u32 unused, void* p7)
 {
-    u32 r3;
-    u32 r4;
-    u32 r5;
-    u32 r6;
-    u32 r7;
-
-    extern u32 fn_801F0204();
-    extern void fn_801F0234();
+    extern void* fn_801F0204();
+    extern void* fn_801F0234();
     extern void fn_802085C4();
     extern void fn_80208750();
-  u32 uVar1;
-  
-  fn_80208750(r4,r3,1,0);
-  fn_80208750(r5,r3,2,r7);
-  fn_801F0234(0x11);
-  uVar1 = fn_801F0204();
-  fn_802085C4(r4,r3,1,1,uVar1);
-  fn_801F0234(0x12);
-  uVar1 = fn_801F0204();
-  fn_802085C4(r5,r3,2,0,uVar1);
-  return;
+
+    fn_80208750(target1,ctx1,1,0);
+    fn_80208750(target2,ctx1,2,p7);
+    fn_802085C4(target1,ctx1,1,1,fn_801F0204(fn_801F0234(0x11)));
+    fn_802085C4(target2,ctx1,2,0,fn_801F0204(fn_801F0234(0x12)));
 }
+#pragma pop
 /* Address: 0x8021035C | Size: 0x8c | Ghidra import */
 #pragma push
 #pragma peephole on
@@ -9355,31 +9252,21 @@ u32 fightWazaWzxVariationFuncTripleKick(void)
   return uVar1;
 }
 /* Address: 0x8021056C | Size: 0xa4 | Ghidra import */
-void fn_8021056C(void)
-
+#pragma push
+#pragma peephole on
+void fn_8021056C(void* ctx1, void* target1, void* target2, u32 unused, void* p7)
 {
-    u32 r3;
-    u32 r4;
-    u32 r5;
-    u32 r6;
-    u32 r7;
-
-    extern u32 fn_801F0204();
-    extern void fn_801F0234();
+    extern void* fn_801F0204();
+    extern void* fn_801F0234();
     extern void fn_802085C4();
     extern void fn_80208750();
-  u32 uVar1;
-  
-  fn_80208750(r4,r3,1,0);
-  fn_80208750(r5,r3,2,r7);
-  fn_801F0234(0x11);
-  uVar1 = fn_801F0204();
-  fn_802085C4(r4,r3,1,1,uVar1);
-  fn_801F0234(0x12);
-  uVar1 = fn_801F0204();
-  fn_802085C4(r5,r3,2,0,uVar1);
-  return;
+
+    fn_80208750(target1,ctx1,1,0);
+    fn_80208750(target2,ctx1,2,p7);
+    fn_802085C4(target1,ctx1,1,1,fn_801F0204(fn_801F0234(0x11)));
+    fn_802085C4(target2,ctx1,2,0,fn_801F0204(fn_801F0234(0x12)));
 }
+#pragma pop
 /* fightWazaWzxVariationFuncTikyuunage | Size: 0x48 | Get level category from fn_80203E0C result */
 u32 fightWazaWzxVariationFuncTikyuunage(void* unused, void* param) {
     extern u8 fn_80203E0C(void* param);
@@ -9394,31 +9281,21 @@ u32 fightWazaWzxVariationFuncTikyuunage(void* unused, void* param) {
 }
 
 /* Address: 0x80210658 | Size: 0xa4 | Ghidra import */
-void fn_80210658(void)
-
+#pragma push
+#pragma peephole on
+void fn_80210658(void* ctx1, void* target1, void* target2, u32 unused, void* p7)
 {
-    u32 r3;
-    u32 r4;
-    u32 r5;
-    u32 r6;
-    u32 r7;
-
-    extern u32 fn_801F0204();
-    extern void fn_801F0234();
+    extern void* fn_801F0204();
+    extern void* fn_801F0234();
     extern void fn_802085C4();
     extern void fn_80208750();
-  u32 uVar1;
-  
-  fn_80208750(r4,r3,1,r7);
-  fn_80208750(r5,r3,2,r7);
-  fn_801F0234(0x11);
-  uVar1 = fn_801F0204();
-  fn_802085C4(r4,r3,1,1,uVar1);
-  fn_801F0234(0x12);
-  uVar1 = fn_801F0204();
-  fn_802085C4(r5,r3,2,0,uVar1);
-  return;
+
+    fn_80208750(target1,ctx1,1,p7);
+    fn_80208750(target2,ctx1,2,p7);
+    fn_802085C4(target1,ctx1,1,1,fn_801F0204(fn_801F0234(0x11)));
+    fn_802085C4(target2,ctx1,2,0,fn_801F0204(fn_801F0234(0x12)));
 }
+#pragma pop
 /* Address: 0x802106FC | Size: 0xc0 | Ghidra import */
 u32 fightWazaWzxVariationFuncKetaguri(void)
 
@@ -9613,73 +9490,49 @@ void fightWazaWzxTypeFuncVampire(void* p1, void* p2, void* p3, u16 mode, u32 p5)
 #pragma pop
 
 /* Address: 0x80210E5C | Size: 0x64 | Ghidra import */
-void fn_80210E5C(void)
-
+#pragma push
+#pragma peephole on
+void fn_80210E5C(void* ctx1, void* target1, u32 unused1, u32 unused2, void* p7)
 {
-    u32 r3;
-    u32 r4;
-    u32 r5;
-    u32 r6;
-    u32 r7;
-
-    extern u32 fn_801F0204();
-    extern void fn_801F0234();
+    extern void* fn_801F0204();
+    extern void* fn_801F0234();
     extern void fn_802085C4();
     extern void fn_80208750();
-  u32 uVar1;
-  
-  fn_80208750(r4,r3,3,r7);
-  fn_801F0234(0x11);
-  uVar1 = fn_801F0204();
-  fn_802085C4(r4,r3,3,0,uVar1);
-  return;
+
+    fn_80208750(target1,ctx1,3,p7);
+    fn_802085C4(target1,ctx1,3,0,fn_801F0204(fn_801F0234(0x11)));
 }
+#pragma pop
 /* Address: 0x80210EC8 | Size: 0x170 | Ghidra import */
-void fightWazaWzxTypeFuncTame(void)
-
+#pragma push
+#pragma peephole on
+void fightWazaWzxTypeFuncTame(void* p1, void* p2, void* p3, u16 mode, u32 p5)
 {
-    u32 r3;
-    u32 r4;
-    u32 r5;
-    short r6;
-    u32 r7;
-
-    extern u32 DAT_8038ff5a;
-    extern s8 fn_8011BEB4();
-    extern u32 fn_801F0204();
-    extern void fn_801F0234();
+    extern u8 lbl_80379F58[];
+    extern u8 fn_8011BEB4();
+    extern void* fn_801F0204();
+    extern void* fn_801F0234();
     extern void fn_802085C4();
     extern void fn_80208750();
-  s8 cVar2;
-  u32 uVar1;
-  
-  if (DAT_8038ff5a == 1) {
-    cVar2 = fn_8011BEB4(0,r3,5,0);
-    if ((((cVar2 == 4) || (cVar2 == 6)) || (cVar2 == 1)) && (r6 != 0)) {
-      fn_80208750(r5,r3,2,r7);
-      fn_801F0234(0x12);
-      uVar1 = fn_801F0204();
-      fn_802085C4(r5,r3,2,0,uVar1);
+    u8 battleType;
+
+    if (*(u8*)((u8*)lbl_80379F58 + (0x1 << 16) + 0x6002) == 1) {
+        battleType = (u8)fn_8011BEB4(0, p1, 5, 0);
+        if ((battleType == 4 || battleType == 6 || battleType == 1) && mode != 0) {
+            fn_80208750(p3, p1, 2, p5);
+            fn_802085C4(p3, p1, 2, 0, fn_801F0204(fn_801F0234(0x12)));
+        } else {
+            fn_80208750(p2, p1, 1, p5);
+            fn_80208750(p3, p1, 2, p5);
+            fn_802085C4(p2, p1, 1, 1, fn_801F0204(fn_801F0234(0x11)));
+            fn_802085C4(p3, p1, 2, 0, fn_801F0204(fn_801F0234(0x12)));
+        }
+    } else {
+        fn_80208750(p2, p1, 3, p5);
+        fn_802085C4(p2, p1, 3, 0, fn_801F0204(fn_801F0234(0x11)));
     }
-    else {
-      fn_80208750(r4,r3,1,r7);
-      fn_80208750(r5,r3,2,r7);
-      fn_801F0234(0x11);
-      uVar1 = fn_801F0204();
-      fn_802085C4(r4,r3,1,1,uVar1);
-      fn_801F0234(0x12);
-      uVar1 = fn_801F0204();
-      fn_802085C4(r5,r3,2,0,uVar1);
-    }
-  }
-  else {
-    fn_80208750(r4,r3,3,r7);
-    fn_801F0234(0x11);
-    uVar1 = fn_801F0204();
-    fn_802085C4(r4,r3,3,0,uVar1);
-  }
-  return;
 }
+#pragma pop
 /* 0x80211040 | size: 0x11C */
 #pragma push
 #pragma peephole on
