@@ -898,28 +898,36 @@ u32 fn_80011C78(u32 arg1, u8 arg2) {
 
 /* 0x80011CF0 | 0xAC */
 #if 0
-asm void fn_80011CF0(void) {
+asm void menuFightStatusStartAnimHP(void) {
 #include "src/game/gs_npc_interact_fn_80011CF0.inc"
 }
 #else
-void fn_80011CF0(u32 arg1, s16 target) {
+#pragma peephole off
+void menuFightStatusStartAnimHP(u32 arg1, s16 target) {
     u32 ptr;
     u32 state;
     u32 data;
-    s16 current;
     s32 diff;
-    if (!(ptr = windowSearchID(arg1))) { return; }
+
+    ptr = windowSearchID(arg1);
+    if (ptr == 0) {
+        return;
+    }
     state = (u32)fn_80103FE4(ptr);
     data = (u32)fn_801040A0(ptr);
-    current = *(s16*)(state + 0x1a);
-    diff = current - (s16)target;
-    if (diff < 0) { diff = -diff; }
+    diff = *(s16*)(state + 0x1a) - (s16)target;
+    if (diff < 0) {
+        diff = -diff;
+    }
     *(s16*)(data + 2) = (s16)((diff * 100) / *(s16*)(state + 0x18));
-    if (*(s16*)(data + 2) <= 0) { *(s16*)(data + 2) = 1; }
-    *(s16*)(data + 0) = current;
+    if (*(s16*)(data + 2) <= 0) {
+        *(s16*)(data + 2) = 1;
+    }
+    *(s16*)(data + 0) = *(s16*)(state + 0x1a);
     *(s16*)(state + 0x1a) = target;
     *(s16*)(data + 4) = 0;
 }
+#pragma peephole on
 #endif
 
 /* 0x80011D9C | 0xCC — item-kind resolver + dispatch (same switch as fn_800129A8) */

@@ -68,6 +68,7 @@ extern void  fn_800BB050(void* gxTlutObj, void* data, u32 format); /* GXInitTlut
 extern void  fn_800BA9E4(void* gxTexObj, void* data,
                           u16 width, u16 height, u32 gxFmt,
                           u32 wrapS, u32 wrapT, u32 hasMips); /* GXInitTexObj */
+extern void* fn_800E24B0(u16 handle);                  /* GSmemLock */
 
 /* ===== String constants (rodata) ===== */
 extern const char lbl_80270F98[]; /* "GStexture: invalid texture format" */
@@ -107,15 +108,36 @@ void fn_800EF1E8(void) {
  *  pointer-ish return; kept unmatched rather than asserting the old
  *  fictional GXTexFmt-lookup body.
  * ======================================================================= */
-void fn_800EF3E0(void) {
-    /* TODO: match -- 0xF4 bytes at 0x800EF3E0 */
+s32 fn_800EF3E0(GStextureHandle* tex, u8 alpha) {
+    u32 fmt = tex->format;
+
+    switch (fmt) {
+        case 0x00: return 0x08;
+        case 0x01: return 0x09;
+        case 0x30: return 0x0A;
+        case 0x40: return 0x00;
+        case 0x41: return 0x02;
+        case 0x42: return 0x01;
+        case 0x43: return 0x03;
+        case 0x44: return 0x04;
+        case 0x45: return 0x06;
+        case 0x90: return 0x05;
+        case 0xB0: return 0x0E;
+        case 0xA0:
+            if (alpha != 0) {
+                return 0x01;
+            }
+            return 0x27;
+        default:
+            return -1;
+    }
 }
 
 /* =======================================================================
  *  fn_800EF4D4 | 0x8
  * ======================================================================= */
-void fn_800EF4D4(void) {
-    /* TODO: match -- 0x8 bytes at 0x800EF4D4 */
+u32 fn_800EF4D4(GStextureHandle* tex) {
+    return tex->tlutFormat;
 }
 
 /* =======================================================================
@@ -123,29 +145,29 @@ void fn_800EF4D4(void) {
  *  TODO: match -- gs_render.c calls fn_800EF4DC() with zero args and
  *  discards the result, incompatible with a GetFormat(tex) getter.
  * ======================================================================= */
-void fn_800EF4DC(void) {
-    /* TODO: match -- 0x8 bytes at 0x800EF4DC */
+u32 fn_800EF4DC(GStextureHandle* tex) {
+    return tex->format;
 }
 
 /* =======================================================================
  *  fn_800EF4E4 | 0x10
  * ======================================================================= */
-void fn_800EF4E4(void) {
-    /* TODO: match -- 0x10 bytes at 0x800EF4E4 */
+u8 fn_800EF4E4(GStextureHandle* tex) {
+    return (u8)(tex->mipLevels - 1);
 }
 
 /* =======================================================================
  *  fn_800EF4F4 | 0x8
  * ======================================================================= */
-void fn_800EF4F4(void) {
-    /* TODO: match -- 0x8 bytes at 0x800EF4F4 */
+u16 fn_800EF4F4(GStextureHandle* tex) {
+    return tex->height;
 }
 
 /* =======================================================================
  *  fn_800EF4FC | 0x8
  * ======================================================================= */
-void fn_800EF4FC(void) {
-    /* TODO: match -- 0x8 bytes at 0x800EF4FC */
+u16 fn_800EF4FC(GStextureHandle* tex) {
+    return tex->width;
 }
 
 /* =======================================================================
@@ -153,8 +175,17 @@ void fn_800EF4FC(void) {
  *  TODO: match -- gs_render.c calls fn_800EF578() with zero args,
  *  incompatible with the old 4-argument SetWrapMode signature.
  * ======================================================================= */
-void fn_800EF578(void) {
-    /* TODO: match -- 0x18 bytes at 0x800EF578 */
+void fn_800EF578(GStextureHandle* tex, u32 wrapS, u32 wrapT, u32 lodClamp) {
+    /* objdiff ground truth: this store pair lands at offsets 0x18/0x1C,
+     * not 0x10/0x14 -- the GStextureHandle field names in the header
+     * (wrapS/wrapT vs minFilter/magFilter) are swapped from their real
+     * struct offsets. Using the header's minFilter/magFilter accessors
+     * here (which resolve to 0x18/0x1C) to reach the correct bytes
+     * without editing the out-of-scope header. */
+    tex->minFilter = wrapS;
+    tex->magFilter = wrapT;
+    tex->lodClamp = lodClamp;
+    tex->dirty = 1;
 }
 
 /* =======================================================================
@@ -163,8 +194,13 @@ void fn_800EF578(void) {
  *  fn_800EF590() with zero args, incompatible with the old 3-argument
  *  SetFilterMode signature.
  * ======================================================================= */
-void fn_800EF590(void) {
-    /* TODO: match -- 0x14 bytes at 0x800EF590 */
+void fn_800EF590(GStextureHandle* tex, u32 minFilt, u32 magFilt) {
+    /* See fn_800EF578: header field names for the wrap/filter pair are
+     * swapped from their real offsets. wrapS/wrapT resolve to 0x10/0x14,
+     * which is where objdiff ground truth places these two stores. */
+    tex->wrapS = minFilt;
+    tex->wrapT = magFilt;
+    tex->dirty = 1;
 }
 
 /* =======================================================================
@@ -175,8 +211,17 @@ void fn_800EF590(void) {
  *  usage is inconsistent with a GStextureHandle-specific free, so no
  *  semantic name is asserted here.
  * ======================================================================= */
-void fn_800EF5A4(void) {
-    /* TODO: match -- 0x58 bytes at 0x800EF5A4 */
+void fn_800EF5A4(GStextureHandle* tex) {
+    if (tex->inUse == 0) {
+        return;
+    }
+    if (tex->memHandle == 0) {
+        return;
+    }
+
+    tex->inUse = 0;
+    fn_800E24B0(tex->memHandle);
+    GSmemFree(tex->memHandle);
 }
 
 /* =======================================================================

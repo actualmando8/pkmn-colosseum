@@ -363,14 +363,14 @@ s32 fn_80012E18(u8* ctx) {
 }
 #pragma pop
 
-/* fn_80012FB0 - 0x80012FB0 | size: 0x2ec */
+/* menuPanelCursorDecimalInput - 0x80012FB0 | size: 0x2ec */
 extern void fn_801040B8(void*, s32, s32);
 #if 0
-asm void fn_80012FB0(void) {
+asm void menuPanelCursorDecimalInput(void) {
 #include "src/game/gs_event_exec_fn_80012FB0.inc"
 }
 #else
-s32 fn_80012FB0(u8* ctx) {
+s32 menuPanelCursorDecimalInput(u8* ctx) {
     u8* state;
     u8* cursor;
     s32 value;
@@ -396,9 +396,9 @@ s32 fn_80012FB0(u8* ctx) {
 
     state = fn_80105624();
     bits = *(u16*)(state + 6);
-    if ((bits & 8) != 0) {
+    if (bits & 8) {
         *(s32*)cursor = *(s32*)cursor - 1;
-    } else if ((bits & 4) != 0) {
+    } else if (bits & 4) {
         *(s32*)cursor = *(s32*)cursor + 1;
     }
 
@@ -411,13 +411,13 @@ s32 fn_80012FB0(u8* ctx) {
     }
 
     delta = 0;
-    if ((bits & 1) != 0) {
+    if (bits & 1) {
         delta = 1;
         pos = *(s32*)cursor;
         for (i = 0; i < pos; i++) {
             delta *= radix;
         }
-    } else if ((bits & 2) != 0) {
+    } else if (bits & 2) {
         delta = -1;
         pos = *(s32*)cursor;
         for (i = 0; i < pos; i++) {
@@ -543,11 +543,11 @@ s32 fn_8001329C(u8* ctx, u8* tgt) {
 #pragma pop
 #endif
 
-/* fn_80013668 - 0x80013668 | size: 0xdc */
+/* menuPanelCtrlLvUp - 0x80013668 | size: 0xdc */
 extern u8 fn_80107ED8(s32, s32);
 #pragma push
 #pragma peephole off
-s32 fn_80013668(u8* ctx) {
+s32 menuPanelCtrlLvUp(u8* ctx) {
     s32 flag = 0;
     switch ((s32)(s8)ctx[1]) {
     case 0:
@@ -587,7 +587,7 @@ extern u32 lbl_8047A2F8;
 #pragma push
 #pragma optimization_level 2
 s32 fn_8001374C(s32 entry_idx, s32 target_n, s32* out) {
-    s32   buf[5];
+    s32   buf[4];
     u8*   entry;
     s32   flag;
     void* list;
@@ -873,7 +873,7 @@ extern void fn_8001B184(void);
 #pragma push
 #pragma peephole off
 s32 fn_80013DFC(s32 entry_idx, s32 target_n, s32* out) {
-    s32   buf[5];
+    s32   buf[4];
     u8*   entry;
     s32   flag;
     void* list;
