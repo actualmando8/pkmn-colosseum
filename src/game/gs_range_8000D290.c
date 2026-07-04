@@ -8,3 +8,8 @@
  * range name stays honest until internal TU structure is proven.
  */
 #include "dolphin/types.h"
+
+/* 0x8000D290 */
+u32 fn_8000D290(void) {
+    return 1;
+}
