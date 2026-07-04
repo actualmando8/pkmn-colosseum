@@ -3348,13 +3348,13 @@ void fn_800FC2A4(void) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800FC2A8(void* ptr) {
+asm void GSmsgFontClose(void* ptr) {
 #include "src/game/gs_thread_fn_800FC2A8.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma scheduling on
-u32 fn_800FC2A8(void* ptr) {
+u32 GSmsgFontClose(void* ptr) {
     u8* p;
     register s32 offset;
     register u8* head;

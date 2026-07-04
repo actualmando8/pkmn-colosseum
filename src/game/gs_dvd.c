@@ -26,6 +26,16 @@
  * routine, unrelated to "DVD init"). This pass did not otherwise
  * change any other function or the rest of this file's speculative
  * GSDVD_* naming table below, which remains unverified.
+ *
+ * 2026-07-03: re-tried porting the archive bodies for fn_80167040
+ * ("GSDVD_CheckAndClose", 48 bytes) and fn_80167070
+ * ("GSDVD_CloseHandle", 168 bytes) under their correct current
+ * fn_ names -- both compile but land at 66.7% / 76.2% fuzzy match
+ * (not 100%), confirming the archive content for this file is
+ * unreliable register-level fiction, not real disassembly. Reverted
+ * both, no net change. The only new function landed this pass is
+ * fn_80167FA4 (trivial 4-byte empty function / blr-only stub),
+ * confirmed 100% via objdiff.
  */
 
 #include "dolphin/types.h"
@@ -49,6 +59,7 @@ extern u8 lbl_80478FB4[];  /* DVD extended state (sda21) */
 /* Forward declarations for converted functions */
 s32 fn_80167E54(void);
 u32 fn_80167E5C(u8* obj);
+void fn_80167FA4(void);
 
 
 /*
@@ -198,6 +209,16 @@ void _sndCheckSndWorkALL(void) {
  * not attempted since the removed body was generic linked-list/
  * allocator code with no real connection to that function's semantics.
  */
+
+/* ==================================================================
+ * fn_80167FA4 -- ported from archive (verified 100% via objdiff).
+ * Archive labeled this "GSDVD_EmptyFunc" but that name is not in
+ * symbols.txt (this unit is actually MusyX audio, see file header);
+ * kept the fn_ name. 4-byte empty function (just blr).
+ * ================================================================== */
+void fn_80167FA4(void) {
+    /* intentionally empty */
+}
 
 /* ===================================================================
  * AUTO-GENERATED accessor functions

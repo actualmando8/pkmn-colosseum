@@ -10,6 +10,12 @@
 #include "dolphin/types.h"
 #include "game/gs_material.h"
 
+#define GBA_DATA_OFFSET 0x20
+#define GBA_STATE_PORT 0x4338
+#define GBA_STATE_TIMEOUT 0x433C
+#define GBA_STATE_PHASE 0x4340
+#define GBA_THREAD_PRIORITY 8
+
 extern u32 lbl_8047A690;
 extern u32 lbl_8047A694;
 extern f32 lbl_8047C1D0; /* 0.833333313f -- PAL-adjusted 1-unit wait */
@@ -17,6 +23,37 @@ extern f32 lbl_8047C1D4; /* 0.0f */
 extern f32 lbl_8047C1D8; /* 1.0f */
 extern f32 lbl_8047C1DC; /* 83.3333282f -- PAL-adjusted 100-unit wait */
 extern f32 lbl_8047C1E0; /* {41.6666641f, 0.0f} -- PAL-adjusted 50-unit wait */
+
+/* Additional data labels referenced by the ported gba_comm_ext.c /
+ * late_game.c bodies below (GBA link-cable state machine + battle-status
+ * window helpers living in this same address range per the current
+ * object map). */
+extern u8 lbl_803FB328[];
+extern u8 lbl_803FB380[];
+extern u8 lbl_8047C1E8;
+extern u8 lbl_8026F5A8[];
+extern u8 lbl_8026F5C0[];
+
+/* Common callees needed by the ported bodies below that are not already
+ * declared with a full prototype at the point of use. */
+extern void _threadSwitch(void);
+extern void* windowSearchID(u32 id);
+extern void fn_8009F7B4(void *p);
+extern void fn_8009F890(void *p);
+extern void fn_800A257C(void *p, u32 b);
+extern void fn_800716E8(u32 port, u32 val);
+extern void fn_8009FABC(void *p);
+extern void fn_800A1E54(void *p, u32 v);
+extern void fn_800716C8(u32 port, void *a, void *b);
+extern u32 fn_800E202C(void *p);
+extern void __assert(const u8 *file, u32 line, const u8 *msg);
+extern void fn_800E24B0(u32 status);
+extern void fn_800E209C(u32 status);
+extern u32 fn_800A13F8(void);
+extern void OSYieldThread(void);
+extern void fn_800FF730(u32 id);
+extern void fn_8011288C(u32 a, u32 b);
+extern u32 GSresGetResource(u32 ctx, u32 id);
 
 /* 0x80091564 | size: 0x210 */
 void fn_80091564(u32 ctx) {
@@ -1396,4 +1433,428 @@ void fn_8008C7B0(u32 ctx) {
     fn_80190528(0x8D0);
     fn_800FF58C(1);
     fn_8011288C(0, 0);
+}
+/* 0x800934E4 | size: 0x90 */
+s32 fn_800934E4(s32 channel)
+{
+#pragma peephole off
+    s32 idle;
+    u8* work;
+    u32 slot;
+
+    if (channel < 0 || channel > 3) {
+        return 0;
+    }
+
+    slot = (u32)channel << 2;
+    work = *(u8**)((u8*)lbl_803FB328 + slot);
+    if (work != NULL) {
+        fn_8009F7B4(work);
+        idle = (*(u32*)(work + GBA_STATE_PHASE) == 0);
+        fn_8009F890(work);
+        fn_800A257C(work + GBA_DATA_OFFSET, GBA_THREAD_PRIORITY);
+    } else {
+        idle = 1;
+    }
+
+    return idle;
+}
+
+/* 0x80093574 | size: 0x9C */
+u32 fn_80093574(s32 channel)
+{
+#pragma peephole off
+    u32 status;
+    u8* work;
+    u32 slot;
+
+    if (channel < 0 || channel > 3) {
+        return 0x10000;
+    }
+
+    slot = (u32)channel << 2;
+    work = *(u8**)((u8*)lbl_803FB328 + slot);
+    if (work == NULL) {
+        return 0;
+    }
+
+    while (1) {
+        fn_8009F7B4(work);
+        status = *(u32*)(work + GBA_STATE_TIMEOUT);
+        fn_8009F890(work);
+        fn_800A257C(work + GBA_DATA_OFFSET, GBA_THREAD_PRIORITY);
+        if ((s32)(status >> 16) == 3) {
+            _threadSwitch();
+        } else {
+            return status;
+        }
+    }
+}
+
+/* 0x80093610 | size: 0x88 */
+u32 fn_80093610(s32 channel)
+{
+#pragma peephole off
+    u32 status;
+    u8* work;
+    u32 slot;
+
+    if (channel < 0 || channel > 3) {
+        return 0x10000;
+    }
+
+    slot = (u32)channel << 2;
+    work = *(u8**)((u8*)lbl_803FB328 + slot);
+    if (work == NULL) {
+        return 0;
+    }
+
+    fn_8009F7B4(work);
+    status = *(u32*)(work + GBA_STATE_TIMEOUT);
+    fn_8009F890(work);
+    fn_800A257C(work + GBA_DATA_OFFSET, GBA_THREAD_PRIORITY);
+
+    return status;
+}
+
+/* 0x80093698 | size: 0x15C */
+s32 fn_80093698(s32 channel)
+{
+#pragma peephole off
+    u32 slot;
+    u32 status;
+    u8* work;
+
+    if (channel < 0 || channel > 3) {
+        return 0;
+    }
+
+    slot = (u32)channel << 2;
+    work = *(u8**)((u8*)lbl_803FB328 + slot);
+    if (work == NULL) {
+        return 1;
+    }
+
+    fn_800716E8(*(s32*)(work + GBA_STATE_PORT), 1);
+    while (1) {
+        fn_8009F7B4(work);
+        status = *(u32*)(work + GBA_STATE_TIMEOUT);
+        fn_8009F890(work);
+        fn_800A257C(work + GBA_DATA_OFFSET, GBA_THREAD_PRIORITY);
+        if ((s32)(status >> 16) == 3) {
+            _threadSwitch();
+        } else {
+            break;
+        }
+    }
+
+    fn_8009F7B4(work);
+    *(u32*)(work + GBA_STATE_PHASE) = 0xD;
+    *(u32*)(work + GBA_STATE_TIMEOUT) = 0x3000D;
+    fn_8009F890(work);
+    fn_800A257C(work + GBA_DATA_OFFSET, GBA_THREAD_PRIORITY);
+    fn_8009FABC(work + 0x18);
+    fn_800A1E54(work + GBA_DATA_OFFSET, 0);
+    fn_800716C8(*(s32*)(work + GBA_STATE_PORT), NULL, NULL);
+    fn_800716E8(*(s32*)(work + GBA_STATE_PORT), 0);
+
+    status = fn_800E202C(*(u8**)((u8*)lbl_803FB328 + slot));
+    if ((status & 0xFFFF) == 0) {
+        __assert(lbl_8026F5A8, 0x1E6, &lbl_8047C1E8);
+    }
+    fn_800E24B0(status);
+    fn_800E209C(status);
+    *(u8**)((u8*)lbl_803FB328 + slot) = NULL;
+
+    return 1;
+}
+
+/* 0x80093B04 | size: 0x48 */
+void fn_80093B04(u32 a, u32 b) {
+    u32 r31;
+    u32 result;
+    r31 = b;
+    result = fn_800A13F8();
+    if (r31 != 0) {
+        if (r31 != result) return;
+    }
+    fn_800A257C((void*)result, 0x10);
+    OSYieldThread();
+    return;
+}
+
+/* 0x80093F2C | size: 0x38 */
+#pragma push
+#pragma scheduling off
+void menuPokemonStatusCtrlRibbon(void) {
+    extern void fn_80093F64();
+    u8 *r4 = (u8*)&lbl_803FB380;
+    u32 r3 = *(u32*)(r4 + 0xC);
+
+    if (r3 != 0) {
+        fn_80093F64(r3, r4 + 0x1c);
+    }
+    return;
+}
+#pragma pop
+
+/* 0x80096C48 | size: 0x10C */
+#pragma peephole off
+void fn_80096C48(u32 unused, u8* dst) {
+    typedef struct {
+        f32 x;
+        f32 y;
+        f32 z;
+    } ColorTriple;
+
+    ColorTriple state0;
+    ColorTriple state1;
+    ColorTriple state2;
+    register u8* out;
+    register ColorTriple* triple;
+    u8* obj;
+    s32 state;
+
+    out = dst;
+    state0 = *(ColorTriple*)(lbl_8026F5C0 + 0x00);
+    state1 = *(ColorTriple*)(lbl_8026F5C0 + 0x0C);
+    state2 = *(ColorTriple*)(lbl_8026F5C0 + 0x18);
+
+    obj = windowSearchID(0x53);
+    if (obj == NULL) {
+        return;
+    }
+
+    state = (s8)obj[0x95];
+    switch (state) {
+    case 0:
+        triple = &state0;
+        break;
+    case 1:
+        triple = &state1;
+        break;
+    case 2:
+        triple = &state2;
+        break;
+    }
+
+    out[0x64] = triple->x;
+    out[0x65] = triple->y;
+    out[0x66] = triple->z;
+}
+#pragma peephole on
+
+/* 0x80097BBC | size: 0x114 */
+#pragma peephole off
+s32 fn_80097BBC(u8 chan) {
+    extern void* fn_80129280();
+    extern void* fn_8012AC08();
+    extern int fn_80123FBC();
+    extern int fn_8010B560();
+    void* entity;
+    void* mgr;
+
+    entity = NULL;
+    if (chan < 6) {
+        mgr = fn_80129280(0, 2);
+        if (mgr != 0) {
+            entity = fn_8012AC08(mgr, chan);
+            if ((u8)fn_80123FBC() == 0) {
+                entity = NULL;
+            }
+        }
+    }
+    if (entity == 0) {
+        return -1;
+    }
+    while ((u8)fn_8010B560() != 0) {
+        _threadSwitch();
+    }
+    memset(lbl_803FB380, 0, 0x44);
+    *(u8*)(lbl_803FB380 + 0x0) = 0x11;
+    *(u32*)(lbl_803FB380 + 0x8) = 0;
+    *(u32*)(lbl_803FB380 + 0xC) = (u32)entity;
+    *(u16*)(lbl_803FB380 + 0x18) = 0;
+    *(u32*)(lbl_803FB380 + 0x10) = 0;
+    *(u32*)(lbl_803FB380 + 0x14) = 0;
+    *(u32*)(lbl_803FB380 + 0x4) = -1;
+    fn_800FF730(0x39d);
+    if (lbl_803FB380[0] & 8) {
+        fn_8011288C(0, 0);
+    }
+    _threadSwitch();
+    return *(s32*)(lbl_803FB380 + 0x4);
+}
+#pragma peephole on
+#pragma peephole reset
+
+/* 0x800979EC | size: 0x4C */
+#pragma scheduling off
+#pragma scheduling off
+#pragma scheduling off
+#pragma scheduling off
+#pragma scheduling off
+#pragma scheduling off
+#pragma scheduling off
+#pragma scheduling off
+void menuPokemonStatus(void) {
+    extern u32 fn_8009769C(u8, u32, u32, u16, u32, u32);
+
+    *(u32*)(lbl_803FB380 + 4) = fn_8009769C(
+        lbl_803FB380[0],
+        *(u32*)(lbl_803FB380 + 8),
+        *(u32*)(lbl_803FB380 + 0xC),
+        *(u16*)(lbl_803FB380 + 0x18),
+        *(u32*)(lbl_803FB380 + 0x10),
+        *(u32*)(lbl_803FB380 + 0x14));
+}
+#pragma scheduling on
+#pragma scheduling on
+#pragma scheduling on
+#pragma scheduling on
+#pragma scheduling on
+#pragma scheduling on
+#pragma scheduling on
+#pragma scheduling on
+
+/* 0x80097FCC | size: 0x4 */
+void fn_80097FCC(void) {
+}
+
+/* 0x80097FD0 | size: 0x28 */
+void fn_80097FD0(void) {
+    extern int fn_80113F48();
+    GSresGetResource(fn_80113F48(), 0x12670000);
+}
+
+/* 0x80097FF8 | size: 0x4 */
+void fn_80097FF8(void) {
+}
+
+/* 0x80097A38 | size: 0xCC */
+s32 fn_80097A38(u32 arg0, u16 arg1) {
+    extern int fn_8010B560();
+
+    while ((u8)fn_8010B560() != 0) {
+        _threadSwitch();
+    }
+    memset(lbl_803FB380, 0, 0x44);
+    *(u8*)(lbl_803FB380 + 0x0) = 0x59;
+    *(u32*)(lbl_803FB380 + 0x8) = 0;
+    *(u32*)(lbl_803FB380 + 0xC) = arg0;
+    *(u16*)(lbl_803FB380 + 0x18) = arg1;
+    *(u32*)(lbl_803FB380 + 0x10) = 0;
+    *(u32*)(lbl_803FB380 + 0x14) = 0;
+    *(s32*)(lbl_803FB380 + 0x4) = -1;
+    fn_800FF730(0x39d);
+    if (lbl_803FB380[0] & 8) {
+        fn_8011288C(0, 0);
+    }
+    _threadSwitch();
+    return *(s32*)(lbl_803FB380 + 0x4);
+}
+
+/* 0x80097B04 | size: 0xB8 */
+s32 fn_80097B04(u32 arg0, u16 arg1) {
+    extern int fn_8010B560();
+    extern u32 fn_8009769C(u8, u32, u32, u16, u32, u32);
+
+    while ((u8)fn_8010B560() != 0) {
+        _threadSwitch();
+    }
+    memset(lbl_803FB380, 0, 0x44);
+    *(u8*)(lbl_803FB380 + 0x0) = 0x58;
+    *(u32*)(lbl_803FB380 + 0x8) = 0;
+    *(u32*)(lbl_803FB380 + 0xC) = arg0;
+    *(u16*)(lbl_803FB380 + 0x18) = arg1;
+    *(u32*)(lbl_803FB380 + 0x10) = 0;
+    *(u32*)(lbl_803FB380 + 0x14) = 0;
+    *(s32*)(lbl_803FB380 + 0x4) = -1;
+    fn_8009769C(lbl_803FB380[0], *(u32*)(lbl_803FB380 + 0x8), *(u32*)(lbl_803FB380 + 0xC),
+                arg1, *(u32*)(lbl_803FB380 + 0x10), *(u32*)(lbl_803FB380 + 0x14));
+    return *(s32*)(lbl_803FB380 + 0x4);
+}
+
+/* 0x80097CD0 | size: 0xC4 */
+s32 fn_80097CD0(u32 arg0, u32 arg1, u32 arg2) {
+    extern int fn_8010B560();
+    extern u32 fn_8009769C(u8, u32, u32, u16, u32, u32);
+
+    while ((u8)fn_8010B560() != 0) {
+        _threadSwitch();
+    }
+    memset(lbl_803FB380, 0, 0x44);
+    *(u8*)(lbl_803FB380 + 0x0) = 0xc;
+    *(u32*)(lbl_803FB380 + 0x8) = 0;
+    *(u32*)(lbl_803FB380 + 0xC) = arg0;
+    *(u16*)(lbl_803FB380 + 0x18) = 0;
+    *(u32*)(lbl_803FB380 + 0x10) = arg1;
+    *(u32*)(lbl_803FB380 + 0x14) = arg2;
+    *(s32*)(lbl_803FB380 + 0x4) = -1;
+    fn_8009769C(lbl_803FB380[0], *(u32*)(lbl_803FB380 + 0x8), *(u32*)(lbl_803FB380 + 0xC),
+                *(u16*)(lbl_803FB380 + 0x18), *(u32*)(lbl_803FB380 + 0x10), *(u32*)(lbl_803FB380 + 0x14));
+    return *(s32*)(lbl_803FB380 + 0x4);
+}
+
+/* 0x80097D94 | size: 0xC4 */
+s32 fn_80097D94(u32 arg0, u32 arg1, u32 arg2) {
+    extern int fn_8010B560();
+    extern u32 fn_8009769C(u8, u32, u32, u16, u32, u32);
+
+    while ((u8)fn_8010B560() != 0) {
+        _threadSwitch();
+    }
+    memset(lbl_803FB380, 0, 0x44);
+    *(u8*)(lbl_803FB380 + 0x0) = 0xe;
+    *(u32*)(lbl_803FB380 + 0x8) = 0;
+    *(u32*)(lbl_803FB380 + 0xC) = arg0;
+    *(u16*)(lbl_803FB380 + 0x18) = 0;
+    *(u32*)(lbl_803FB380 + 0x10) = arg1;
+    *(u32*)(lbl_803FB380 + 0x14) = arg2;
+    *(s32*)(lbl_803FB380 + 0x4) = -1;
+    fn_8009769C(lbl_803FB380[0], *(u32*)(lbl_803FB380 + 0x8), *(u32*)(lbl_803FB380 + 0xC),
+                *(u16*)(lbl_803FB380 + 0x18), *(u32*)(lbl_803FB380 + 0x10), *(u32*)(lbl_803FB380 + 0x14));
+    return *(s32*)(lbl_803FB380 + 0x4);
+}
+
+/* 0x80097E58 | size: 0xB0 */
+s32 fn_80097E58(u32 arg0, u32 arg1, u32 arg2, u32 arg3) {
+    extern int fn_8010B560();
+    extern u32 fn_8009769C(u8, u32, u32, u16, u32, u32);
+
+    while ((u8)fn_8010B560() != 0) {
+        _threadSwitch();
+    }
+    memset(lbl_803FB380, 0, 0x44);
+    *(u8*)(lbl_803FB380 + 0x0) = 0xac;
+    *(u32*)(lbl_803FB380 + 0x8) = arg0;
+    *(u32*)(lbl_803FB380 + 0xC) = arg1;
+    *(u16*)(lbl_803FB380 + 0x18) = 0;
+    *(u32*)(lbl_803FB380 + 0x10) = arg2;
+    *(u32*)(lbl_803FB380 + 0x14) = arg3;
+    *(s32*)(lbl_803FB380 + 0x4) = -1;
+    fn_8009769C(lbl_803FB380[0], *(u32*)(lbl_803FB380 + 0x8), *(u32*)(lbl_803FB380 + 0xC),
+                *(u16*)(lbl_803FB380 + 0x18), *(u32*)(lbl_803FB380 + 0x10), *(u32*)(lbl_803FB380 + 0x14));
+    return *(s32*)(lbl_803FB380 + 0x4);
+}
+
+/* 0x80097F08 | size: 0xC4 */
+s32 fn_80097F08(u32 arg0, u32 arg1, u32 arg2) {
+    extern int fn_8010B560();
+    extern u32 fn_8009769C(u8, u32, u32, u16, u32, u32);
+
+    while ((u8)fn_8010B560() != 0) {
+        _threadSwitch();
+    }
+    memset(lbl_803FB380, 0, 0x44);
+    *(u8*)(lbl_803FB380 + 0x0) = 0x8e;
+    *(u32*)(lbl_803FB380 + 0x8) = 0;
+    *(u32*)(lbl_803FB380 + 0xC) = arg0;
+    *(u16*)(lbl_803FB380 + 0x18) = 0;
+    *(u32*)(lbl_803FB380 + 0x10) = arg1;
+    *(u32*)(lbl_803FB380 + 0x14) = arg2;
+    *(s32*)(lbl_803FB380 + 0x4) = -1;
+    fn_8009769C(lbl_803FB380[0], *(u32*)(lbl_803FB380 + 0x8), *(u32*)(lbl_803FB380 + 0xC),
+                *(u16*)(lbl_803FB380 + 0x18), *(u32*)(lbl_803FB380 + 0x10), *(u32*)(lbl_803FB380 + 0x14));
+    return *(s32*)(lbl_803FB380 + 0x4);
 }

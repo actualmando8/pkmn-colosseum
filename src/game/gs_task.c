@@ -1166,7 +1166,7 @@ asm void fn_80006FAC(void) {
 }
 #else
 #pragma peephole off
-void fn_80006FAC(u8* ctx) {
+void menuFightButtonNormal(u8* ctx) {
     u32 buttons;
     u32 held;
 

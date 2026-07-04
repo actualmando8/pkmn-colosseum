@@ -2482,19 +2482,19 @@ s32 fn_80027D58(void* actor) {
 }
 #endif
 
-/* fn_800280FC - 0x800280FC | size: 0xf4 */
+/* menuNameEntryCtrl - 0x800280FC | size: 0xf4 */
 extern void fn_801080CC(void*, s32);
 extern f32 lbl_8047B930;
 extern f32 lbl_8047B950;
 extern f32 lbl_8047B934;
 #if 0
-asm void fn_800280FC(void) {
+asm void menuNameEntryCtrl(void) {
 #include "src/game/gs_worldmap_fn_800280FC.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma peephole off
-s32 fn_800280FC(void* r3) {
+s32 menuNameEntryCtrl(void* r3) {
     u8* r30;
     u8* r31;
     f32* fptr;
