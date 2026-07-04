@@ -321,7 +321,7 @@ typedef struct SAMPLE_INFO {
 extern s32 dataGetSample(u16 key, SAMPLE_INFO* out); /* dataGetSample */
 extern void hwInitSamplePlayback(u32 voice, u16 pitch, void* smp, u32 resetState, u32 unk1C,
                                   u32 unk18, u32 initFlags, u32 setupFlag);
-extern void fn_8014C07C(SYNTH_VOICE* svoice); /* synth.c: synthAddJob(svoice, 2, 0) */
+extern void synthKeyStateUpdate(SYNTH_VOICE* svoice); /* synth.c: synthAddJob(svoice, 2, 0) */
 extern void hwSetADSR(u32 voice, ADSR_INFO* adsr, u32 mode);
 extern u32 adsrConvertTimeCents(s32 tc);
 extern u32 adsrSetup(ADSR_VARS* adsr);
@@ -983,7 +983,7 @@ void mcmdStartSample(SYNTH_VOICE* svoice, MSTEP* cstep) {
         DoSetPitch(svoice);
     }
     svoice->cFlags |= 0x20;
-    fn_8014C07C(svoice);
+    synthKeyStateUpdate(svoice);
 }
 
 void mcmdVibrato(SYNTH_VOICE* svoice, MSTEP* cstep) {
@@ -1774,7 +1774,7 @@ void macHandleActive(SYNTH_VOICE* svoice) { /* macHandleActive */
             break;
         case 0x12:
             svoice->cFlags |= 0x80ULL;
-            fn_8014C07C(svoice);
+            synthKeyStateUpdate(svoice);
             break;
         case 0x13: {
             MSTEP* m;

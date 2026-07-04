@@ -1635,7 +1635,7 @@ s32 fn_80017790(u8* unused, SummaryDrawItem* item) {
 #endif
 
 /* fn_80017868 - 0x80017868 | size: 0x84 */
-extern u32 fn_8012A5B0(u32 a, s32 b, s32 c);
+extern u32 heroGetStatus(u32 a, s32 b, s32 c);
 extern u32 lbl_8047A2F8;
 extern u32 lbl_8047A2E0;
 #if 0
@@ -1647,7 +1647,7 @@ asm void fn_80017868(void) {
 #pragma peephole off
 s32 fn_80017868(u32 unused, u8* ctx) {
     u32 r;
-    r = fn_8012A5B0(lbl_8047A2F8, 0xC, 0);
+    r = heroGetStatus(lbl_8047A2F8, 0xC, 0);
     if ((s32)lbl_8047A2E0 != 3) return 0;
     fn_80132A38(0x50, (s32)r);
     fn_800FB680((s32)*(s16*)(ctx + 0x54) - (s32)(s16)(fn_800FA444(0x151) >> 16), 0, -1, 0x151);

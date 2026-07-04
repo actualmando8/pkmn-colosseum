@@ -2118,7 +2118,7 @@ u32 fn_802043D4(void)
     extern s8 fn_80121ADC();
     extern u32 fn_80122FF4();
     extern short fn_80123090();
-    extern s8 fn_8012A5B0();
+    extern s8 heroGetStatus();
     extern int fn_8020E4E8();
   u32 uVar1;
   short sVar4;
@@ -2229,7 +2229,7 @@ u32 fn_802043D4(void)
       cVar8 = 0;
     }
     else {
-      cVar8 = fn_8012A5B0(r7,0x11,0);
+      cVar8 = heroGetStatus(r7,0x11,0);
     }
     uVar1 = (int)fn_8012640C(iVar11,0,0x8c,0);
     uVar1 = uVar1 & 0xffff;
@@ -6149,7 +6149,7 @@ u32 fightActionFlowSyuuryouPost(void)
     extern u32 fn_80128A64();
     extern int fn_80129280();
     extern void heroCheckSetMonohiroiAllTemotiPokemon();
-    extern u32 fn_8012A5B0();
+    extern u32 heroGetStatus();
     extern void fn_8012AC64();
     extern short fn_801EF634();
     extern void fn_801EFFC4();
@@ -6188,7 +6188,7 @@ u32 fightActionFlowSyuuryouPost(void)
         cVar7 = fn_801F54A4(0,0,0x24,0);
         if ((cVar7 == 1) && (cVar7 = fn_801F9034(iVar2), cVar7 == 1)) {
           for (uVar9 = 0; uVar9 < 6; uVar9 = uVar9 + 1) {
-            uVar4 = fn_8012A5B0(iVar3,3,uVar9);
+            uVar4 = heroGetStatus(iVar3,3,uVar9);
             cVar7 = fn_801233F4();
             if (((((cVar7 != 0) && (cVar7 = pokemonIsDarkPokemon(uVar4), cVar7 != 1)) &&
                  (iVar5 = fn_801F9930(iVar2,uVar4), iVar5 != 0)) &&
@@ -7349,7 +7349,7 @@ u32 fightActionFlowKaisiNyuujouTrainer(void)
     extern s8 fn_8006B57C();
     extern s8 fn_801233F4();
     extern s8 fn_80123FBC();
-    extern u32 fn_8012A5B0();
+    extern u32 heroGetStatus();
     extern void fn_8012AC64();
     extern void fn_801C3430();
     extern void fn_801C3FBC();
@@ -7447,7 +7447,7 @@ u32 fightActionFlowKaisiNyuujouTrainer(void)
           uVar19 = 0;
           while (((((uVar19 & 0xffff) < 6 && (iVar11 = (int)cVar15, iVar11 < (int)(uVar5 & 0xffff)))
                   && (iVar11 < (int)uVar4)) && (iVar11 < 6))) {
-            uVar9 = fn_8012A5B0(uVar8,3,uVar19);
+            uVar9 = heroGetStatus(uVar8,3,uVar19);
             cVar16 = fn_801233F4();
             if ((cVar16 != 0) && (iVar11 = fn_801F9930(uVar7,uVar9), iVar11 == 0)) {
               uVar10 = fn_801FB1C0(uVar7,0,0x45,(int)cVar15);
@@ -7465,7 +7465,7 @@ u32 fightActionFlowKaisiNyuujouTrainer(void)
           }
           uVar19 = 0;
           while ((((uVar19 & 0xffff) < 6 && ((int)cVar15 < (int)uVar4)) && (cVar15 < 6))) {
-            uVar9 = fn_8012A5B0(uVar8,3,uVar19);
+            uVar9 = heroGetStatus(uVar8,3,uVar19);
             cVar16 = fn_80123FBC();
             if ((cVar16 != 0) && (iVar11 = fn_801F9930(uVar7,uVar9), iVar11 == 0)) {
               uVar10 = fn_801FB1C0(uVar7,0,0x45,(int)cVar15);
@@ -7631,7 +7631,7 @@ u32 fn_8020DAD0(u32 p1) {
     extern void fn_80113FE8();
     extern void fn_801140C8();
     extern void heroDecPokedoru();
-    extern u32 fn_8012A5B0();
+    extern u32 heroGetStatus();
     extern void fn_80132A38();
     extern void scriptSoundStop();
     extern void fn_80165A20();
@@ -7732,7 +7732,7 @@ u32 fn_8020DAD0(u32 p1) {
             if (cVar10 == 0) {
                 fn_801EF61C(0);
                 fn_801903B0(0xe05);
-                uVar6 = fn_8012A5B0(0, 0xc, 0);
+                uVar6 = heroGetStatus(0, 0xc, 0);
                 heroDecPokedoru(0, ((s32)uVar6 >> 1) + (((s32)uVar6 < 0) & (uVar6 & 1)));
                 fn_801D0AFC(1);
                 fn_8018DA88();

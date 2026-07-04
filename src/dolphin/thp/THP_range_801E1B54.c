@@ -200,7 +200,7 @@ static void __THPAudioInitialize(THPAudioDecodeInfo *info, u8 *ptr);
 extern BOOL fn_8009F230(u8 *queue, u32 msg, u32 flags);
 extern BOOL fn_8009F2F8(u8 *queue, u32 *msgOut, u32 flags);
 extern void fn_8009F1D0(u8 *queue, u32 msgArray, u32 msgCount);
-extern void fn_800A50E4(void);
+extern void DVDClose(void);
 
 typedef struct OSThread OSThread;
 extern void OSCancelThread(OSThread *thread);
@@ -472,7 +472,7 @@ BOOL fn_801E4724(void)
 {
     if (*(BOOL *)(lbl_8046AC60 + 0xA0) && lbl_8046AC60[0xA4] == 0) {
         *(BOOL *)(lbl_8046AC60 + 0xA0) = FALSE;
-        fn_800A50E4();
+        DVDClose();
         return TRUE;
     }
     return FALSE;

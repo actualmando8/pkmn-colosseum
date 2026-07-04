@@ -181,7 +181,7 @@ extern u32 lbl_8047B274;
 extern u32 lbl_8047B268;
 extern u32 lbl_8047B26C;
 
-void fn_8019C7E0(void) {
+void _HSD_MemClearDefaultCB(void) {
     fn_8009AC3C(lbl_80478C70);
     if (lbl_8047B270 != 0 && lbl_8047B274 != 0) {
         lbl_8047B268 = lbl_8047B270;
@@ -326,7 +326,7 @@ void fn_8019C978(void) {
     if (initFlag == 0) {
         callbacks[0] = (u32)_HSD_MemAllocDefaultCB;
         callbacks[1] = (u32)_HSD_MemFreeDefaultCB;
-        callbacks[2] = (u32)fn_8019C7E0;
+        callbacks[2] = (u32)_HSD_MemClearDefaultCB;
         callbacks[3] = (u32)_HSD_MemGetRemainDefaultCB;
         callbacks[4] = (u32)_HSD_MemCheckOwnDefaultCB;
         _HSD_MemSetCallbacks(callbacks, 0x14);

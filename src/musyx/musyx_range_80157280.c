@@ -570,7 +570,7 @@ extern void fn_800AE8A4(void);
 extern void fn_800AE8EC(void);
 extern u32  fn_800AE92C(void);
 extern void DSPAddTask(u8* ptr);
-extern f64 fn_800CE358(f64 base, f64 exp); /* MSL pow(double,double); Colosseum's
+extern f64 pow(f64 base, f64 exp); /* MSL pow(double,double); Colosseum's
                                              * pre-2.0.1 adsrConvertTimeCents calls
                                              * this (not powf) -- confirmed by
                                              * disassembly: args loaded via lfd
@@ -3628,7 +3628,7 @@ void voiceInitLastStarted(void) {
 /* ===== synth_adsr.c: adsrConvertTimeCents, 0x80158CD4 =====
  * identity: reference synth_adsr.c `u32 adsrConvertTimeCents(s32 tc) {
  * return 1000.f * powf(2.f, 1.2715658e-08f * tc); }`. Colosseum's build
- * (pre-2.0.1 fork) calls the DOUBLE-precision `pow` (fn_800CE358), not
+ * (pre-2.0.1 fork) calls the DOUBLE-precision `pow` (pow), not
  * `powf` -- confirmed by disassembly: the base constant 2.0 and the
  * exponent are both loaded/passed as doubles (lfd, not lfs), and the
  * result is explicitly `frsp`'d down to single precision before the
@@ -3641,7 +3641,7 @@ void voiceInitLastStarted(void) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 u32 adsrConvertTimeCents(s32 tc) {
-    return (u32)(1000.f * (f32)fn_800CE358(2.0, 1.2715658e-08f * tc));
+    return (u32)(1000.f * (f32)pow(2.0, 1.2715658e-08f * tc));
 }
 #pragma pop
 

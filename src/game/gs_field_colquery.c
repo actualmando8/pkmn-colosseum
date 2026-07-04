@@ -99,11 +99,11 @@ extern void* memcpy(void* dst, const void* src, u32 n);
 
 /* Matrix / vector math helpers */
 extern void  PSMTXMultVec(void* mtxDst, void* vecSrc, void* vecDst);  /* MTXMultVec3 */
-extern void  fn_800A3A78(void* vecA, void* scale, void* vecOut);     /* VEC scale */
-extern void  fn_800A3A9C(void* a, void* b, void* out);             /* VEC diff/setup */
+extern void  PSVECAdd(void* vecA, void* scale, void* vecOut);     /* VEC scale */
+extern void  PSVECSubtract(void* a, void* b, void* out);             /* VEC diff/setup */
 extern f32   PSVECMag(void* vec);                                /* VEC magnitude */
-extern void  fn_800A3AC0(void* curve, void* paramOut, f32 t);       /* VEC lerp */
-f32   fn_800A3B7C(void* a, void* b);
+extern void  PSVECScale(void* curve, void* paramOut, f32 t);       /* VEC lerp */
+f32   PSVECDotProduct(void* a, void* b);
 f32   PSVECSquareDistance(void* a, void* b);
 
 /* GScolsys2 functions */
@@ -427,9 +427,9 @@ void fn_8010F5A4(void) {
 void fn_8010F6A0(void* arg0, void* arg1, void* arg2, f32 t) {
     f32 v[3];
 
-    fn_800A3A9C(arg2, arg1, v);
-    fn_800A3AC0(v, v, t / PSVECMag(v));
-    fn_800A3A78(v, arg1, arg0);
+    PSVECSubtract(arg2, arg1, v);
+    PSVECScale(v, v, t / PSVECMag(v));
+    PSVECAdd(v, arg1, arg0);
 }
 
 /* 0x8010FA54 | 0xA0 */
@@ -594,7 +594,7 @@ s32 fn_80110E64(GScolsys2Vec3* point, GScolsys2Vec3* dirVec, f32 radius,
         }
         if (scanIdx >= outCount) {
             PSMTXMultVec(mtxFwd, &tri->normal, &planePoint);
-            if (fn_800A3B7C(&planePoint, dirVec) < 0.0f) {
+            if (PSVECDotProduct(&planePoint, dirVec) < 0.0f) {
                 vdst = verts;
                 vsrc = tri->verts;
                 vertIdx = 0;
@@ -644,7 +644,7 @@ s32 fn_80110E64(GScolsys2Vec3* point, GScolsys2Vec3* dirVec, f32 radius,
             }
             if (scanIdx >= outCount) {
                 PSMTXMultVec(mtxFwd, &tri->normal, &planePoint);
-                if (fn_800A3B7C(&planePoint, dirVec) < 0.0f) {
+                if (PSVECDotProduct(&planePoint, dirVec) < 0.0f) {
                     vdst = verts;
                     vsrc = tri->verts;
                     vertIdx = 0;
@@ -705,7 +705,7 @@ s32 fn_80110E64(GScolsys2Vec3* point, GScolsys2Vec3* dirVec, f32 radius,
             }
             if (scanIdx >= outCount) {
                 PSMTXMultVec(mtxFwd, &tri->normal, &planePoint);
-                if (fn_800A3B7C(&planePoint, dirVec) < 0.0f) {
+                if (PSVECDotProduct(&planePoint, dirVec) < 0.0f) {
                     vdst = verts;
                     vsrc = tri->verts;
                     vertIdx = 0;
@@ -778,7 +778,7 @@ void fn_8011163C(void) {
 #pragma optimizewithasm off
 s32 fn_80111864(void* a, void* b, void* c) {
 #pragma optimization_level 4
-    extern f32 fn_800A3B7C(void* a, void* b);
+    extern f32 PSVECDotProduct(void* a, void* b);
     extern s32 GScolsys2UtilGetCpPlaneLine(void* a, void* b, void* c, void* d, void* e, void* f);
     extern s32 GScolsy2UtilChkInTri(void* a, void* b, void* c);
     extern f32 lbl_8047CF60;
@@ -812,7 +812,7 @@ s32 fn_80111864(void* a, void* b, void* c) {
     outCount = 0;
     outOffset = 0;
     wzx = (u8*)fn_8010CBC0();
-    fn_800A3A9C(b, a, dirVec);
+    PSVECSubtract(b, a, dirVec);
     region = *(u8**)wzx;
     regionIdx = 0;
     while ((u32)regionIdx < *(u32*)(wzx + 4)) {
@@ -842,7 +842,7 @@ s32 fn_80111864(void* a, void* b, void* c) {
                         goto next_triangle;
                     }
                     PSMTXMultVec(mtxFwd, tri + 0x24, planePoint);
-                    if (fn_800A3B7C(planePoint, dirVec) >= lbl_8047CF60) {
+                    if (PSVECDotProduct(planePoint, dirVec) >= lbl_8047CF60) {
                         goto next_triangle;
                     }
                     scan = (u8*)verts;
@@ -990,7 +990,7 @@ s32 fn_80111C24(void* origin, void* dir) {
         return 0;
     }
     wzx = (GSFieldWzxData*)fn_8010CBC0();
-    fn_800A3A9C(dir, origin, &dirVec);
+    PSVECSubtract(dir, origin, &dirVec);
     region = wzx->regions;
     regIdx = 0;
     while (regIdx < wzx->regionCount) {

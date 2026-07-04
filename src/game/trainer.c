@@ -1874,7 +1874,7 @@ void* fn_801F8100(void* context) {
     extern u16 fn_801EF634(void* ctx);
     extern u8 heroCheckValid(void* ptr);
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 index);
-    extern void* fn_8012A5B0(void* ptr, u32 param1, u32 param2);
+    extern void* heroGetStatus(void* ptr, u32 param1, u32 param2);
     int valid;
     void* result;
 
@@ -1906,7 +1906,7 @@ void* fn_801F8100(void* context) {
     if (result == NULL) {
         return NULL;
     }
-    return fn_8012A5B0(result, 1, 0);
+    return heroGetStatus(result, 1, 0);
 }
 
 /* 0x801F81F8 | size: 0x22C | large */
@@ -3121,7 +3121,7 @@ void fn_801F99C8(void) {
     extern void fn_80123FBC();
     extern void fn_80124A60();
     extern void heroCheckValid();
-    extern void fn_8012A5B0();
+    extern void heroGetStatus();
     extern void fn_801EF634();
     extern void fn_801FB1C0();
     extern void fn_802331F4();
@@ -3311,7 +3311,7 @@ void fn_801F99C8(void) {
         r3 = r31;
         r5 = r26 & 0xFF;
         r4 = 0x3;
-        fn_8012A5B0();
+        heroGetStatus();
         if (r3 != (u32)0x0) {
             r0 = r26 & 0xFF;
             /* subi r5, r3, 0x4 */;
@@ -3342,8 +3342,8 @@ void fn_801F9CBC(void) {
     extern void fn_80129A78();
     extern void fn_80129F20();
     extern void fn_8012A1A4();
-    extern void fn_8012A450();
-    extern void fn_8012A5B0();
+    extern void heroSetStatus();
+    extern void heroGetStatus();
     extern void fn_8012AC64();
     extern void fn_801F9F78();
     extern void fn_801FB1C0();
@@ -3448,7 +3448,7 @@ void fn_801F9CBC(void) {
         r3 = r31;
         r4 = 0x2;
         r5 = 0x0;
-        fn_8012A5B0();
+        heroGetStatus();
         r5 = r3;
         r3 = r29;
         r4 = (u32)sp + 0x8;
@@ -3502,35 +3502,35 @@ void fn_801F9CBC(void) {
     r3 = r31;
     r4 = 0xf;
     r5 = 0x0;
-    fn_8012A450();
+    heroSetStatus();
     r3 = r31;
     r4 = 0x10;
     r5 = 0x0;
-    fn_8012A450();
+    heroSetStatus();
     r3 = r31;
     r4 = 0x11;
     r5 = 0x0;
-    fn_8012A450();
+    heroSetStatus();
     r3 = r31;
     r4 = 0x12;
     r5 = 0x0;
-    fn_8012A450();
+    heroSetStatus();
     r3 = r31;
     r4 = 0x13;
     r5 = 0x0;
-    fn_8012A450();
+    heroSetStatus();
     r3 = r31;
     r4 = 0x14;
     r5 = 0x0;
-    fn_8012A450();
+    heroSetStatus();
     r3 = r31;
     r4 = 0x15;
     r5 = 0x0;
-    fn_8012A450();
+    heroSetStatus();
     r3 = r31;
     r4 = 0x16;
     r5 = 0x0;
-    fn_8012A450();
+    heroSetStatus();
 
     return;
 }

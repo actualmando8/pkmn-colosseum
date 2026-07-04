@@ -21393,7 +21393,7 @@ void fn_8025EF58(void)
     extern int fn_8011288C();
     extern int fn_8011EE40();
     extern s8 fn_80129B2C();
-    extern u32 fn_8012A5B0();
+    extern u32 heroGetStatus();
     extern int fadeCheck();
     extern s8 fn_801EEC74();
     extern u32 lbl_8047B660;
@@ -21473,7 +21473,7 @@ void fn_8025EF58(void)
     if (iVar1 == 2) {
       fn_8025DD14((int*)auStack_28);
       fn_80165668(0x3c8,0,0xff);
-      uVar2 = fn_8012A5B0(0,3,lbl_8047B66C & 0xffff);
+      uVar2 = heroGetStatus(0,3,lbl_8047B66C & 0xffff);
       _DAT_804782c0 = (int)fn_8012640C(uVar2,0,0x6e,0);
       _DAT_804782bc = 1;
       _DAT_804782c4 = lbl_8047B66C;
@@ -21502,7 +21502,7 @@ void fn_8025EF58(void)
         fn_801065B8(1);
         uVar4 = menuPokemonOpen(7,0,0);
         if (uVar4 != 0xffffffff) {
-          uVar2 = fn_8012A5B0(0,3,uVar4 & 0xffff);
+          uVar2 = heroGetStatus(0,3,uVar4 & 0xffff);
           _DAT_804782c0 = (int)fn_8012640C(uVar2,0,0x6e,0);
           _DAT_804782bc = 0;
           _DAT_804782c4 = uVar4;
@@ -25229,7 +25229,7 @@ void fn_8025E9BC(u32 r3)
   u16 local_28 [2];
 
   local_28[0] = 0;
-  uVar1 = fn_8012A5B0(0,3,r3 & 0xffff);
+  uVar1 = heroGetStatus(0,3,r3 & 0xffff);
   uVar8 = fn_80123FBC();
   if (uVar8 == 1) {
     fn_8012640C(uVar1,0,0x6e,0);
@@ -25331,7 +25331,7 @@ void fn_8025ED4C(void)
   if ((lbl_804782BC[0] == 0) || (lbl_804782BC[0] == 1)) {
     fn_801DADC0(1);
     if (lbl_804782BC[0] == 0) {
-      uVar2 = fn_8012A5B0(0,3,lbl_804782BC[2] & 0xffff);
+      uVar2 = heroGetStatus(0,3,lbl_804782BC[2] & 0xffff);
       cVar4 = fn_80123FBC();
       if (cVar4 != '\x01') {
         bVar1 = 0;
@@ -25352,7 +25352,7 @@ void fn_8025ED4C(void)
       }
     }
     else if (lbl_804782BC[0] == 1) {
-      uVar2 = fn_8012A5B0(0,3,lbl_804782BC[2] & 0xffff);
+      uVar2 = heroGetStatus(0,3,lbl_804782BC[2] & 0xffff);
       cVar4 = fn_80123FBC();
       if (cVar4 != '\x01') {
         bVar1 = 0;

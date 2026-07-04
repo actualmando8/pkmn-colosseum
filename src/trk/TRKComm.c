@@ -218,7 +218,7 @@ void fn_800C39B0(u8 state) {
  */
 u32 __close_console(u32 arg) {
     extern s32 fn_800C04F4(void);
-    extern u32 fn_800C2A00(u32 cmd, u32 param);
+    extern u32 TRKCloseFile(u32 cmd, u32 param);
     s32 initOk;
     u32 result;
 
@@ -227,7 +227,7 @@ u32 __close_console(u32 arg) {
         return 1;
     }
 
-    result = fn_800C2A00(0xD3, arg) & 0xFF;
+    result = TRKCloseFile(0xD3, arg) & 0xFF;
     switch (result) {
     case 0:
         return 0;
@@ -250,7 +250,7 @@ u32 __close_console(u32 arg) {
 u32 fn_800C3A40(u32 unused, u32 length, u32* addrPtr) {
     extern u8 fn_800C39A0(void);
     extern s32 fn_800C04F4(void);
-    extern u32 fn_800C29F0(u32 cmd, u32 dir, u32* addrBuf, u32 len);
+    extern u32 TRKAccessFile(u32 cmd, u32 dir, u32* addrBuf, u32 len);
     u32 addrBuf;
     u32 result;
 
@@ -263,7 +263,7 @@ u32 fn_800C3A40(u32 unused, u32 length, u32* addrPtr) {
     }
 
     addrBuf = *addrPtr;
-    result = fn_800C29F0(0xD0, 1, &addrBuf, length);
+    result = TRKAccessFile(0xD0, 1, &addrBuf, length);
     *addrPtr = addrBuf;
 
     switch (result & 0xFF) {
@@ -287,7 +287,7 @@ u32 fn_800C3A40(u32 unused, u32 length, u32* addrPtr) {
 u32 fn_800C3AFC(u32 unused, u32 length, u32* addrPtr) {
     extern u8 fn_800C39A0(void);
     extern s32 fn_800C04F4(void);
-    extern u32 fn_800C29F0(u32 cmd, u32 dir, u32* addrBuf, u32 len);
+    extern u32 TRKAccessFile(u32 cmd, u32 dir, u32* addrBuf, u32 len);
     u32 addrBuf;
     u32 result;
 
@@ -300,7 +300,7 @@ u32 fn_800C3AFC(u32 unused, u32 length, u32* addrPtr) {
     }
 
     addrBuf = *addrPtr;
-    result = fn_800C29F0(0xD1, 0, &addrBuf, length);
+    result = TRKAccessFile(0xD1, 0, &addrBuf, length);
     *addrPtr = addrBuf;
 
     switch (result & 0xFF) {

@@ -98,7 +98,7 @@ extern u16   itemDataBiosGetPrice(void);
 /* Text formatting */
 extern void  fn_8002A0B8(void* outBuf, void* fmt, s32 p3, s32 p4,
                           u16 p5, s32 p6, ...);
-extern s32   fn_8012A5B0(void* partyData, s32 slot, s32 p3);
+extern s32   heroGetStatus(void* partyData, s32 slot, s32 p3);
 
 /* Dialog/rendering */
 extern void  fn_80106ADC(s32 p1, void* text, s32 p3, s32 p4, u8 p5);

@@ -4836,7 +4836,7 @@ void fn_801F7954(u8* ptr, u8* arr) {
     extern u16 fn_801EF634(void);
     extern u8* fn_801FB1C0(u8*, u32, u16, u32);
     extern u8 heroCheckValid(void);
-    extern u8* fn_8012A5B0(u8*, u32, u16);
+    extern u8* heroGetStatus(u8*, u32, u16);
     extern u8 fn_80123FBC(void);
     extern u32 fn_8012640C(u8*, u32, u16, u32);
     extern u8 fn_80206A04(u8*);
@@ -4869,7 +4869,7 @@ L_check:
     }
     r31 = 0;
     while ((u16)r31 < 6) {
-        r27 = fn_8012A5B0(r30, 3, (u16)r31);
+        r27 = heroGetStatus(r30, 3, (u16)r31);
         r0 = fn_80123FBC();
         if ((u8)r0 != 0) {
             r25 = 0;

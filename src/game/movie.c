@@ -50,8 +50,8 @@ extern u32  fn_8011394C(void);                         /* floor state query */
 extern void* fn_80129280(u32 a, u32 b);               /* battle/effect state setup */
 extern void fn_80135030(void* ctx, u32 a, u32 b);     /* effect parameter set */
 extern void* fn_80135168(void* ctx, u32 a);            /* effect query */
-extern void fn_8012A450(u32 a, u32 b, u32 c);         /* effect system control */
-extern void* fn_8012A5B0(u32 a, u32 b, u32 c);        /* effect system query */
+extern void heroSetStatus(u32 a, u32 b, u32 c);         /* effect system control */
+extern void* heroGetStatus(u32 a, u32 b, u32 c);        /* effect system query */
 extern void fn_80106D3C(u32 a, u32 b, u32 c, u32 d);  /* floor transition trigger */
 extern s8   fn_8001E074(u32 a, u32 b, u32 c, u32 d);  /* input poll / wait */
 extern void* fn_801D036C(void);                        /* battle state query */
@@ -282,7 +282,7 @@ void fn_80035F64(void) {
     fn_80135030(effectCtx, 7, 1);
     fn_80135030(effectCtx, 8, 1);
 
-    fn_8012A450(0, 0x18, 1);
+    heroSetStatus(0, 0x18, 1);
 
     savedCtx = fn_801D036C();
 
@@ -336,8 +336,8 @@ void fn_80035F64(void) {
             void* pairB;
 
             effectCtx2 = fn_80129280((u32)savedCtx, 2);
-            pairA = (void*)fn_8012A5B0(2, 0, 0);
-            pairB = (void*)fn_8012A5B0(0, 2, 0);
+            pairA = (void*)heroGetStatus(2, 0, 0);
+            pairB = (void*)heroGetStatus(0, 2, 0);
 
             if (pairA != pairB) {
                 queryResult = (void*)fn_80135168(savedCtx, 4);

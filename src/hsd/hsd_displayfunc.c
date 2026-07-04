@@ -91,7 +91,7 @@ typedef struct DisplayFuncVec {
     f32 z;
 } DisplayFuncVec;
 
-extern void fn_800A3AC0(void*, void*, f32);
+extern void PSVECScale(void*, void*, f32);
 extern f32 PSVECMag(void*);
 extern void PSVECCrossProduct(void*, void*, void*);
 extern const DisplayFuncVec lbl_802746D0; /* { 0.0f, 0.0f, 1.0f } */
@@ -160,13 +160,13 @@ void fn_80198038(void* dobj, void* mtx, void* renderState)
 
     if (((HSD_DObj*) dobj)->flags & DISPLAYFUNC_FLAG_2000) {
         scale = -1.0f / (lbl_80478ACC + PSVECMag(&trans));
-        fn_800A3AC0(&trans, &basis, scale);
+        PSVECScale(&trans, &basis, scale);
     } else {
         basis = lbl_802746D0;
     }
 
     scale = 1.0f / (lbl_80478ACC + col1Len);
-    fn_800A3AC0(&col1Work, &col1Work, scale);
+    PSVECScale(&col1Work, &col1Work, scale);
     PSVECCrossProduct(&col1Work, &basis, &cross);
     crossLen = PSVECMag(&cross);
 
@@ -228,7 +228,7 @@ void fn_801985E0(void* dobj, void* mtx, void* renderState)
     DISPLAYFUNC_LOAD_TRANSLATION(trans, mtx);
 
     scale = 1.0f / (lbl_80478ACC + PSVECMag(&col0));
-    fn_800A3AC0(&col0, &col0Unit, scale);
+    PSVECScale(&col0, &col0Unit, scale);
     col1Len = PSVECMag(&col1);
     col2Len = PSVECMag(&col2);
 
@@ -295,13 +295,13 @@ void fn_80198B20(void* dobj, void* mtx, void* renderState)
     DISPLAYFUNC_LOAD_TRANSLATION(trans, mtx);
 
     scale = 1.0f / (lbl_80478ACC + PSVECMag(&col1));
-    fn_800A3AC0(&col1, &col1Unit, scale);
+    PSVECScale(&col1, &col1Unit, scale);
     col0Len = PSVECMag(&col0);
     col2Len = PSVECMag(&col2);
 
     if (((HSD_DObj*) dobj)->flags & DISPLAYFUNC_FLAG_2000) {
         scale = -1.0f / (lbl_80478ACC + PSVECMag(&trans));
-        fn_800A3AC0(&trans, &basis, scale);
+        PSVECScale(&trans, &basis, scale);
     } else {
         basis = lbl_802746D0;
     }

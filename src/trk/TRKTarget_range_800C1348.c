@@ -19,8 +19,8 @@ extern u8 gTRKExceptionStatus[];
 /* "TargetDoStep()\n" */
 extern u8 lbl_8026FB70[];
 
-/* fn_800C1548 - 0x800C1548 | size 0x10 | scope none */
-s32 fn_800C1548(void) {
+/* TRKTargetGetPC - 0x800C1548 | size 0x10 | scope none */
+s32 TRKTargetGetPC(void) {
     return *(s32*)&gTRKCPUState[0x80];
 }
 

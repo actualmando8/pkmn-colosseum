@@ -85,7 +85,7 @@
  *     (GSgfx vector/matrix operations)
  *   - Camera state at lbl_80478C40 (sda21)
  *   - fn_800FF56C (GSfloor get active) called from camera code
- *   - GScameraSetPosition, GScameraLookAt, fn_800CE2D8 (trig/angle functions)
+ *   - GScameraSetPosition, GScameraLookAt, atan2 (trig/angle functions)
  *
  * Debug strings:
  *   "gs%04d.xfb"
@@ -112,7 +112,7 @@ extern void  fn_800E019C(void* out, void* a, void* b);  /* cross product */
 extern void  fn_800DFF98(void* out, void* a, void* b);  /* vector subtract */
 extern void  GScameraSetPosition(void* obj, void* mtx);         /* set model matrix */
 extern void  GScameraLookAt(void* obj, void* tbl, void* pos); /* set joint pos */
-extern f32   fn_800CE2D8(f32 x, f32 y);                /* atan2 */
+extern f32   atan2(f32 x, f32 y);                /* atan2 */
 extern void* fn_800FF56C(void);                         /* GSfloor get active */
 
 /* Script/generator */

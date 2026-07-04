@@ -96,7 +96,7 @@ extern void  fn_800D6728(void);                    /* Commit render state */
 
 /* NPC/interaction */
 extern void* fn_80109934(void* data);              /* Get model from data */
-extern s32   fn_8012A5B0(void* partyData, s32 slot, s32 p3);
+extern s32   heroGetStatus(void* partyData, s32 slot, s32 p3);
 extern void  fn_80132A38(s32 paramId, s32 value);
 extern void  fn_800FB680(s32, s32, u32, u16);
 
@@ -156,7 +156,7 @@ void fn_80031188(u8* r3, u8* r4) {
         break;
     case 0xF6A:
         {
-            s32 val = fn_8012A5B0((void*)lbl_803A2688, 1, 0);
+            s32 val = heroGetStatus((void*)lbl_803A2688, 1, 0);
             fn_80132A38(0x4D, val);
             fn_800FB680(0, 0, combined, 0x4413);
         }
@@ -200,9 +200,9 @@ void fn_80031228(u8* arg0, u8* arg1) {
 
     obj = 0;
     if (kind == 1) {
-        obj = (void*)fn_8012A5B0(0, 3, (u16)arg);
+        obj = (void*)heroGetStatus(0, 3, (u16)arg);
     } else if (kind == 2) {
-        obj = (void*)fn_8012A5B0(lbl_803A2688, 3, (u16)arg);
+        obj = (void*)heroGetStatus(lbl_803A2688, 3, (u16)arg);
     }
 
     if (((u8 (*)(void*))fn_8011E850)(obj) != 0) {
@@ -252,9 +252,9 @@ void fn_80031404(u8* arg0, u8* arg1) {
 
     obj = 0;
     if (kind == 1) {
-        obj = (void*)fn_8012A5B0(0, 3, (u16)arg);
+        obj = (void*)heroGetStatus(0, 3, (u16)arg);
     } else if (kind == 2) {
-        obj = (void*)fn_8012A5B0(lbl_803A2688, 3, (u16)arg);
+        obj = (void*)heroGetStatus(lbl_803A2688, 3, (u16)arg);
     }
 
     if (((u8 (*)(void*))fn_80123FBC)(obj) != 0 &&
@@ -316,9 +316,9 @@ void fn_80031648(u8* arg0, u8* arg1) {
 
     obj = 0;
     if (group == 1) {
-        obj = (void*)fn_8012A5B0(0, 3, (u16)arg);
+        obj = (void*)heroGetStatus(0, 3, (u16)arg);
     } else if (group == 2) {
-        obj = (void*)fn_8012A5B0(lbl_803A2688, 3, (u16)arg);
+        obj = (void*)heroGetStatus(lbl_803A2688, 3, (u16)arg);
     }
 
     if (((u8 (*)(void*))fn_8011E850)(obj) != 0) {
@@ -1338,7 +1338,7 @@ void fn_800327FC(void) {
             r5 = r20;
             r3 = 0x0;
             r4 = 0x3;
-            ((void(*)(void))fn_8012A5B0)();
+            ((void(*)(void))heroGetStatus)();
             r14 = r3;
             fn_80123FBC();
             tmp = r3 & 0xFF;
@@ -1861,7 +1861,7 @@ void fn_80030388(u8* r3, u8* r4) {
         break;
     case 0x10CA:
         {
-            s32 val = fn_8012A5B0((void*)lbl_803A2688, 1, 0);
+            s32 val = heroGetStatus((void*)lbl_803A2688, 1, 0);
             fn_80132A38(0x4D, val);
             fn_800FB680(0, 0, combined, 0x4413);
         }
@@ -1910,9 +1910,9 @@ void fn_8003042C(u8* arg0, u8* arg1) {
 
     obj = 0;
     if (kind == 1) {
-        obj = (void*)fn_8012A5B0(0, 3, (u16)lbl_8047A424);
+        obj = (void*)heroGetStatus(0, 3, (u16)lbl_8047A424);
     } else if (kind == 2) {
-        obj = (void*)fn_8012A5B0(lbl_803A2688, 3, (u16)lbl_8047A420);
+        obj = (void*)heroGetStatus(lbl_803A2688, 3, (u16)lbl_8047A420);
     }
 
     if (obj != 0) {
@@ -1998,9 +1998,9 @@ void fn_80030574(u8* arg0, u8* arg1) {
 
     obj = 0;
     if (group == 1) {
-        obj = (void*)fn_8012A5B0(0, 3, (u16)lbl_8047A424);
+        obj = (void*)heroGetStatus(0, 3, (u16)lbl_8047A424);
     } else if (group == 2) {
-        obj = (void*)fn_8012A5B0(lbl_803A2688, 3, (u16)lbl_8047A420);
+        obj = (void*)heroGetStatus(lbl_803A2688, 3, (u16)lbl_8047A420);
     }
 
     if (obj == 0) {
@@ -2059,9 +2059,9 @@ void fn_800307A8(u8* arg0, u8* arg1) {
 
     obj = 0;
     if (kind == 1) {
-        obj = (void*)fn_8012A5B0(0, 3, (u16)lbl_8047A424);
+        obj = (void*)heroGetStatus(0, 3, (u16)lbl_8047A424);
     } else if (kind == 2) {
-        obj = (void*)fn_8012A5B0(lbl_803A2688, 3, (u16)lbl_8047A420);
+        obj = (void*)heroGetStatus(lbl_803A2688, 3, (u16)lbl_8047A420);
     }
 
     if (obj != 0) {
@@ -2113,10 +2113,10 @@ void fn_800308D4(u8* arg0, u8* arg1) {
 
     switch (kind) {
     case 1:
-        obj = (void*)fn_8012A5B0(0, 3, (u16)lbl_8047A424);
+        obj = (void*)heroGetStatus(0, 3, (u16)lbl_8047A424);
         break;
     case 2:
-        obj = (void*)fn_8012A5B0(lbl_803A2688, 3, (u16)lbl_8047A420);
+        obj = (void*)heroGetStatus(lbl_803A2688, 3, (u16)lbl_8047A420);
         break;
     }
 
@@ -2166,9 +2166,9 @@ void fn_80030A44(u8* arg0, u8* arg1) {
 
     obj = 0;
     if (group == 1) {
-        obj = (void*)fn_8012A5B0(0, 3, (u16)lbl_8047A424);
+        obj = (void*)heroGetStatus(0, 3, (u16)lbl_8047A424);
     } else if (group == 2) {
-        obj = (void*)fn_8012A5B0(lbl_803A2688, 3, (u16)lbl_8047A420);
+        obj = (void*)heroGetStatus(lbl_803A2688, 3, (u16)lbl_8047A420);
     }
 
     if (obj == 0) {
@@ -2276,9 +2276,9 @@ void fn_80030D34(u8* arg0, u8* arg1) {
 
     obj = 0;
     if (kind == 1) {
-        obj = (void*)fn_8012A5B0(0, 3, (u16)arg);
+        obj = (void*)heroGetStatus(0, 3, (u16)arg);
     } else if (kind == 2) {
-        obj = (void*)fn_8012A5B0(lbl_803A2688, 3, (u16)arg);
+        obj = (void*)heroGetStatus(lbl_803A2688, 3, (u16)arg);
     }
 
     if (((u8 (*)(void*))fn_8011E850)(obj) != 0) {
@@ -2339,9 +2339,9 @@ void fn_80030F0C(u8* arg0, u8* arg1) {
 
     obj = 0;
     if (group == 1) {
-        obj = (void*)fn_8012A5B0(0, 3, (u16)arg);
+        obj = (void*)heroGetStatus(0, 3, (u16)arg);
     } else if (group == 2) {
-        obj = (void*)fn_8012A5B0(lbl_803A2688, 3, (u16)arg);
+        obj = (void*)heroGetStatus(lbl_803A2688, 3, (u16)arg);
     }
 
     if (((u8 (*)(void*))fn_8011E850)(obj) != 0) {

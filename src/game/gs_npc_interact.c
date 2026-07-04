@@ -2219,7 +2219,7 @@ void fn_8000EA10(u8* ctx, u8* npc) {
 extern void menuSetDisp(void);
 extern void fn_800F7920(void);
 extern void fn_800F7994(void);
-extern void fn_800CE2D8(void);
+extern void atan2(void);
 extern u32 lbl_8047B710;
 extern u32 lbl_8047B700;
 extern u32 lbl_8047B704;

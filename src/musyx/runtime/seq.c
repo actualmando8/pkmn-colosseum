@@ -300,12 +300,12 @@ extern SEQ_INSTANCE* lbl_8047AF14;   /* seqActiveRoot */
 extern u32 lbl_8047AF00;             /* curSeqId */
 
 extern void synthSetBpm(u32 bpm, u8 seqId, u8 secIndex);
-extern f64 fn_800CE318(f64 a, f64 b); /* fmod (wraps __ieee754_fmod) */
+extern f64 fmod(f64 a, f64 b); /* fmod (wraps __ieee754_fmod) */
 extern f64 floor(f64 x);
 extern SEQ_EVENT* fn_801485FC(SEQ_EVENT* event, u8 secIndex, u32* loopFlag); /* HandleEvent */
 extern u32 synthSendKeyOff(u32 id);
 extern u32 synthIsFadeOutActive(u8 volGroup);
-extern u32 fn_8014D880(u32 id); /* sndFXCheck */
+extern u32 sndFXCheck(u32 id); /* sndFXCheck */
 extern u8 lbl_8047AEFC;         /* curFadeOutState */
 extern u32 lbl_8047AEF8;        /* seq_next_id */
 extern NOTE lbl_804271D0[256];  /* seqNote */
@@ -931,7 +931,7 @@ static void SetTickDelta(SEQ_SECTION* section, u32 deltaTime) {
     tickDelta *= (f32)section->speed * (1.f / 256.f);
 
     section->tickDelta[section->timeIndex].low =
-        (u32)(f32)fn_800CE318(tickDelta * 65536.f, 65536.f);
+        (u32)(f32)fmod(tickDelta * 65536.f, 65536.f);
     section->tickDelta[section->timeIndex].high = (s32)(f32)floor(tickDelta);
 }
 
@@ -1033,7 +1033,7 @@ static void HandleKeyOffNotes(void) {
         n = lbl_8047AF08->noteKeyOff;
         while (n != NULL) {
             nn = n->next;
-            if (n->id != SND_SEQ_ERROR_ID && fn_8014D880(n->id) == SND_SEQ_ERROR_ID) {
+            if (n->id != SND_SEQ_ERROR_ID && sndFXCheck(n->id) == SND_SEQ_ERROR_ID) {
                 seqFreeKeyOffNote(n);
             }
             n = nn;
