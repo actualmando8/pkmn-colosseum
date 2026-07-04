@@ -648,7 +648,7 @@ void fn_801C2D54(void) {
  * Address: 0x801C2D5C | Size: 0xC
  */
 void fn_801C2D5C(void) {
-    fn_801C2D54();
+    lbl_8047B399 = 0;
 }
 
 /**
