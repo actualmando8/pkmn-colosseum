@@ -1554,7 +1554,10 @@ void fn_80183730(void) {
 }
 
 /* fn_8018397C -- not recovered, gap in archive campaign (size 0x24) */
-void fn_8018397C(void) {
+u32 fn_8018397C(u8* arg1, u32 arg2) {
+    extern u32 fn_801170A4(u8*, u32);
+    extern u32 fn_80116EB0(void*);
+    return fn_80116EB0((void*)fn_801170A4(arg1, arg2));
 }
 
 /* fn_80184470 -- not recovered, gap in archive campaign (size 0x174) */
@@ -2176,27 +2179,42 @@ void fn_8018F4C8(void* entry, u8 param, s32* outNode, u8* outResult) {
 }
 
 /* fn_8018F5E4 -- not recovered, gap in archive campaign (size 0x18) */
-void fn_8018F5E4(void) {
+f32 fn_8018F5E4(void* ptr) {
+    extern f32 lbl_8047D8A8;
+    return (ptr != NULL) ? *(f32*)((u8*)ptr + 0x18) : lbl_8047D8A8;
 }
 
 /* fn_8018F618 -- not recovered, gap in archive campaign (size 0x20) */
-void fn_8018F618(void) {
+f32 fn_8018F618(void* ptr) {
+    extern f32 lbl_8047D8A8;
+    extern f32 lbl_8047D8AC;
+    return (ptr != NULL) ? lbl_8047D8AC * *(f32*)((u8*)ptr + 0x20) : lbl_8047D8A8;
 }
 
 /* fn_8018F638 -- not recovered, gap in archive campaign (size 0x20) */
-void fn_8018F638(void) {
+f32 fn_8018F638(void* ptr) {
+    extern f32 lbl_8047D8A8;
+    extern f32 lbl_8047D8AC;
+    return (ptr != NULL) ? lbl_8047D8AC * *(f32*)((u8*)ptr + 0x1c) : lbl_8047D8A8;
 }
 
 /* fn_8018F658 -- not recovered, gap in archive campaign (size 0x20) */
-void fn_8018F658(void) {
+f32 fn_8018F658(void* ptr) {
+    extern f32 lbl_8047D8A8;
+    extern f32 lbl_8047D8AC;
+    return (ptr != NULL) ? lbl_8047D8AC * *(f32*)((u8*)ptr + 0x20) : lbl_8047D8A8;
 }
 
 /* fn_8018F678 -- not recovered, gap in archive campaign (size 0x20) */
-void fn_8018F678(void) {
+f32 fn_8018F678(void* ptr) {
+    extern f32 lbl_8047D8A8;
+    extern f32 lbl_8047D8AC;
+    return (ptr != NULL) ? lbl_8047D8AC * *(f32*)((u8*)ptr + 0x1c) : lbl_8047D8A8;
 }
 
 /* fn_8018F698 -- not recovered, gap in archive campaign (size 0x1C) */
-void fn_8018F698(void) {
+s32 fn_8018F698(void* ptr) {
+    return (ptr != NULL) ? (s32)(s8)((u8*)ptr)[9] : -1;
 }
 
 /* peopleInfoBiosGetPtr = peopleInfoBiosGetPtr (see people.h) -- not recovered, gap in archive campaign */
@@ -2218,26 +2236,31 @@ void fn_8018FB60(PeopleEntry* entry, u8 animId) {
  * (2-arg signature corrected from caller fn_8018BF24's disassembly: r3=entry,
  * r4=vec -- the 1-arg forward decl was a placeholder). */
 void fn_8018FC08(PeopleEntry* entry, void* vec) {
-
+    extern void fn_800E4170(void*, void*);
+    fn_800E4170(entry->modelHandle, vec);
 }
 
 /* fn_8018FC2C = fn_8018FC2C (see people.h) -- not recovered, gap in archive campaign */
 void fn_8018FC2C(PeopleEntry* entry) {
-
+    extern void fn_800E3D6C(void*);
+    fn_800E3D6C(entry->modelHandle);
 }
 
 /* fn_8018FC74 = fn_8018FC74 (see people.h) -- not recovered, gap in archive campaign
  * (2-arg signature corrected from caller fn_8018C0A8's disassembly). */
 void fn_8018FC74(PeopleEntry* entry, void* vec) {
-
+    extern void fn_800E43A4(void*, void*);
+    fn_800E43A4(entry->modelHandle, vec);
 }
 
 /* fn_8018FC98 = fn_8018FC98 (see people.h) -- not recovered, gap in archive campaign */
 void fn_8018FC98(PeopleEntry* entry, void* pos) {
-
+    extern void fn_800E3D98(void*, void*);
+    fn_800E3D98(entry->modelHandle, pos);
 }
 
 /* fn_8018FCBC = fn_8018FCBC (see people.h) -- not recovered, gap in archive campaign */
 void* fn_8018FCBC(PeopleEntry* entry) {
-    return NULL;
+    extern void* fn_800E3D00(void*);
+    return fn_800E3D00(entry->modelHandle);
 }
