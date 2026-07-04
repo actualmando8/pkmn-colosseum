@@ -2000,66 +2000,39 @@ void floorCharacterBiosSetPos(u8* dst, f32* src) {
 }
 /* 0x80116EB0 | 24 bytes | beq_default_getter */
 u32 fn_80116EB0(void* ptr) {
-    if (ptr == NULL) goto _ret0_80116EB0;
-    return *(u32*)((u8*)ptr + 0x14);
-_ret0_80116EB0:
-    return 0;
+    return (ptr != NULL) ? *(u32*)((u8*)ptr + 0x14) : 0;
 }
 /* 0x80116EC8 | 24 bytes | beq_default_getter */
 u32 fn_80116EC8(void* ptr) {
-    if (ptr == NULL) goto _ret0_80116EC8;
-    return *(u32*)((u8*)ptr + 0x10);
-_ret0_80116EC8:
-    return 0;
+    return (ptr != NULL) ? *(u32*)((u8*)ptr + 0x10) : 0;
 }
 /* 0x80116EE0 | 24 bytes | beq_default_getter */
-u16 fn_80116EE0(void* ptr) {
-    if (ptr == NULL) goto _ret0_80116EE0;
-    return *(u16*)((u8*)ptr + 0x8);
-_ret0_80116EE0:
-    return 0;
+u32 fn_80116EE0(void* ptr) {
+    return (ptr != NULL) ? *(u16*)((u8*)ptr + 0x8) : 0;
 }
 /* 0x80116EF8 | 0x1C */
 u32 fn_80116EF8(u8* ptr) {
-    if (ptr == NULL) goto _ret0_16EF8;
-    return (u32)((ptr[0] >> 4) & 1);
-_ret0_16EF8:
-    return 0;
+    return (ptr != NULL) ? (u32)((ptr[0] >> 4) & 1) : 0;
 }
 /* 0x80116F14 | 0x1C */
 u32 fn_80116F14(u8* ptr) {
-    if (ptr == NULL) goto _ret0_80116F14;
-    return (u32)((ptr[1] >> 4) & 3);
-_ret0_80116F14:
-    return 0;
+    return (ptr != NULL) ? (u32)((ptr[1] >> 4) & 3) : 0;
 }
 /* 0x80116F30 | 0x1C */
 u32 fn_80116F30(u8* ptr) {
-    if (ptr == NULL) goto _ret0_80116F30;
-    return (u32)((ptr[1] >> 6) & 3);
-_ret0_80116F30:
-    return 0;
+    return (ptr != NULL) ? (u32)((ptr[1] >> 6) & 3) : 0;
 }
 /* 0x80116F4C | 0x1C */
 u32 fn_80116F4C(u8* ptr) {
-    if (ptr == NULL) goto _ret0_80116F4C;
-    return (u32)(ptr[0] & 7);
-_ret0_80116F4C:
-    return 0;
+    return (ptr != NULL) ? (u32)(ptr[0] & 7) : 0;
 }
 /* 0x80117038 | 0x1C */
 u32 fn_80117038(u8* ptr) {
-    if (ptr == NULL) goto _ret0_80117038;
-    return (u32)((ptr[0] >> 6) & 1);
-_ret0_80117038:
-    return 0;
+    return (ptr != NULL) ? (u32)((ptr[0] >> 6) & 1) : 0;
 }
 /* 0x80117054 | 0x1C */
 u32 fn_80117054(u8* ptr) {
-    if (ptr == NULL) goto _ret0_80117054;
-    return (u32)((ptr[0] >> 7) & 1);
-_ret0_80117054:
-    return 0;
+    return (ptr != NULL) ? (u32)((ptr[0] >> 7) & 1) : 0;
 }
 /* 0x80117070 | 0x34 */
 extern void* peopleInfoBiosGetPtrFromIndex(u16);
