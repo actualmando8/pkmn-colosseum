@@ -18,7 +18,9 @@
  *   fn_800FF828 | 0x148  (TODO, not yet matched)
  *   fn_800FF970 | 0x11B4 (TODO, not yet matched)
  *   fn_80100B24 | 0x720  (TODO, not yet matched)
- *   loadParticle | 0xA4  (TODO, not yet matched)
+ *   loadParticle | 0xA4  (100% match; ported from archive/previous_campaign
+ *                        GSfloorLoadParticle body, default optimization --
+ *                        no O0 pragma needed)
  *   fn_801012E8 | 0xB8   (TODO, not yet matched)
  *   fn_801013A0 | 0xDC   (TODO, not yet matched)
  *   fn_8010147C | 0x494  (TODO, not yet matched)
@@ -31,9 +33,14 @@
 
 /* ===== External engine / SDK functions (used by the stub scaffold) ===== */
 extern void  GSlogWrite(const char* fmt, ...);         /* GSlog / OSReport */
+extern void* GSresAllocResourceAlign(u32 size, u32 alignment, u32 loadParam,
+                                      u32 loadParam2, void* callback);
+extern void  memcpy(void* dst, const void* src, u32 n);
 
 /* ===== String constants (rodata references) ===== */
 extern const char lbl_802717F0[];  /* "GSfloorOpen: cannot find floor %d\n" */
+extern const char lbl_802719C4[];  /* "loadParticle(): loading...\n" */
+extern const char lbl_802719E0[];  /* "loadParticlePtr(): can't alloc %d bytes of memory\n" */
 
 /* ===================================================================
  * Generated: 0 pattern-matched + 9 stubs
@@ -118,13 +125,20 @@ void fn_80100B24(void) {
 #pragma pop
 
 /* 0x80101244 | 0xA4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void loadParticle(void) {
-    /* TODO: match -- 164 bytes at 0x80101244 */
+void loadParticle(void* dst, u32 size, void* callback, void* callbackArg) {
+    void* buf;
+
+    GSlogWrite(lbl_802719C4);
+
+    buf = GSresAllocResourceAlign((size + 0x1F) & ~0x1F, 0x20,
+                                   (u32)callback, (u32)callbackArg, NULL);
+    if (buf == NULL) {
+        GSlogWrite(lbl_802719E0, size);
+        return;
+    }
+
+    memcpy(buf, dst, size);
 }
-#pragma pop
 
 /* 0x801012E8 | 0xB8 */
 #pragma push

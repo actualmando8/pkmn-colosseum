@@ -147,6 +147,50 @@ s32 fn_8004EADC(void) {
     }
 }
 
+/* 0x8004EC54 | size: 0x178 */
+s32 fn_8004EC54(void) {
+#pragma peephole off
+    u32 index;
+    BagCacheEntry* src;
+    BagCacheEntry* dst;
+    s32 result;
+
+    index = 0;
+    while ((u16)index < 0x229) {
+        src = fn_801FBFBC(index);
+        dst = &lbl_803A6AB0[(u16)index];
+        index++;
+        *dst = *src;
+    }
+
+    while (1) {
+        result = fn_801026A4(0x88, 0, 0, 0, 1, 0);
+        if (result == -1) {
+            fn_80102568(0x88, 0, 1);
+
+            index = 0;
+            while ((u16)index < 0x229) {
+                dst = fn_801FBFBC(index);
+                src = &lbl_803A6AB0[(u16)index];
+                index++;
+                *dst = *src;
+            }
+
+            return -1;
+        }
+
+        if (result == -2) {
+            if (menuOpen(0x44, 1) != 0) {
+                fn_80102568(0x44, 0, 1);
+            } else {
+                fn_80102568(0x44, 0, 1);
+                fn_80102568(0x88, 0, 1);
+                return 1;
+            }
+        }
+    }
+}
+
 /* 0x80050844 | size: 0xECC */
 s32 fn_80050844(void) {
 #pragma peephole off

@@ -88,6 +88,8 @@ extern f32 lbl_8047BA30; /* 1.0f -- fade speed */
  *    bl fn_80165A20                  ; sndPlay(0x495, 0, 127) -- opening BGM
  *    blr
  * ======================================================================= */
+#pragma push
+#pragma peephole off
 void fn_80035EE4(void) {
     /* Set up screen fade: mode 2 (fade-in from black), speed 1.0 */
     fadeSet(2, lbl_8047BA30);
@@ -99,6 +101,8 @@ void fn_80035EE4(void) {
     /* Start opening BGM: sound ID 0x0495, no fade, max volume */
     fn_80165A20(0x0495, 0, 0x7F);
 }
+#pragma peephole on
+#pragma pop
 
 /* =======================================================================
  *  fn_80035F34 (moviePlayAutoDemo)
@@ -116,10 +120,14 @@ void fn_80035EE4(void) {
  *  for autodemo01.thp happens in a separate call chain. The pattern
  *  of "open movie -> wait -> cleanup" is handled by the caller.
  * ======================================================================= */
+#pragma push
+#pragma peephole off
 void fn_80035F34(void) {
     fadeSet(3, lbl_8047BA30);
     fadeCheck(1);
 }
+#pragma peephole on
+#pragma pop
 
 /* =======================================================================
  *  fn_80035E04 (movieStopAndCleanup)
