@@ -114,9 +114,9 @@ extern s32 psRemoveParticleAppSRT(PSParticle* pp);                      /* 0x?? 
 extern void psDeletePntJObjwithParticle(PSParticle* pp);
 extern void _psListDelete(PSParticle* pp, PSParticle* parent);
 extern PSParticle* _psListGetFirst(s32 linkNo);
-extern f32 fn_800CE6AC(f32 x); /* sinf-family */
-extern f32 fn_800CE6D0(f32 x); /* cosf-family */
-extern f32 fn_800CE688(f32 x);
+extern f32 sinf(f32 x); /* sinf-family */
+extern f32 cosf(f32 x); /* cosf-family */
+extern f32 tanf(f32 x);
 extern void* fn_8019F718(void);
 extern void psSetPointJObj(s32 idx, void* renderObj);
 extern void fn_801A05EC(void* renderObj);
@@ -551,10 +551,10 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
     /* ---- Phase 6: physics integration (verified @ 0x801723B8) ---- */
     if (pp->flags & 0x4) { /* ORBIT - see file header note on bit value */
         void* peopleObj = pp->peopleObj;
-        f32 sinScale = fn_800CE6AC(pp->scaleFactor);
-        f32 sinFrict = fn_800CE6AC(pp->frictionFactor);
-        f32 cosScale = fn_800CE6D0(pp->scaleFactor);
-        f32 cosFrict = fn_800CE6D0(pp->frictionFactor);
+        f32 sinScale = sinf(pp->scaleFactor);
+        f32 sinFrict = sinf(pp->frictionFactor);
+        f32 cosScale = cosf(pp->scaleFactor);
+        f32 cosFrict = cosf(pp->frictionFactor);
         f32 a, b, mag;
 
         pp->velocityZ += *(f32*)((u8*)peopleObj + 0x54);
@@ -562,8 +562,8 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
         if (a < 0.0f) a = -a;
         b = *(f32*)((u8*)peopleObj + 0x48);
         if (b < 0.0f) b = -b;
-        mag = fn_800CE688(b);
-        mag = pp->positionX + fn_800CE6D0(mag) * pp->velocityZ;
+        mag = tanf(b);
+        mag = pp->positionX + cosf(mag) * pp->velocityZ;
         mag = (mag * a) * b; /* NOTE: precise reconstruction of this term
                                  not fully verified; see 0x80172430-0x801724C8 */
         pp->positionX = *(f32*)((u8*)peopleObj + 0x20) +

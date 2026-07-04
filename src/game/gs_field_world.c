@@ -31,7 +31,7 @@
  *     struct fields at fixed offsets (0x8011E4A4-0x8011E800 area)
  *   - Iteration over object lists with 0x28 or 0x34 byte strides
  *   - Frequent calls to GSmem (fn_800E27B0, _toolentryAlloc__FUl)
- *   - Matrix operations for camera (PSMTXMultVec, fn_800A3A9C)
+ *   - Matrix operations for camera (PSMTXMultVec, PSVECSubtract)
  *
  * Debug strings:
  *   "floorUpdateFieldCamera: error updating field camera - divide by zero!"
@@ -65,7 +65,7 @@ extern void* fn_800E24B0(u16 handle);                   /* GSmemLock */
 extern void  fn_800E209C(u16 handle);                   /* GSmemFree */
 /* Matrix / vector */
 extern void  PSMTXMultVec(void* mtx, void* vec, void* out); /* MTXMultVec3 */
-extern void  fn_800A3A9C(void* out, void* in, f32 s);     /* VEC normalize */
+extern void  PSVECSubtract(void* out, void* in, f32 s);     /* VEC normalize */
 /* GSgfx renderer */
 extern void  fn_800D7868(void* handle, u32 a, u32 b, u32 c,
                           u32 d, u32 e, u32 f, u32 g);     /* GSgfx draw setup */
@@ -1408,8 +1408,8 @@ void fn_8011F260(void);
 void fn_8012546C(void*);
 void fn_8012795C(void);
 void fn_80129BC8(void);
-void fn_8012A450();
-void fn_8012A5B0(void);
+void heroSetStatus();
+void heroGetStatus(void);
 /* 0x70 | floorReadMapPreFunc | alloc_wrapper */
 extern void* GSresAllocResourceAlign();  /* K&R: called with 5 args, returns void* */
 #pragma push
@@ -1739,8 +1739,8 @@ extern u8 fn_8011E3FC(u8* ptr, u16 idx);
 extern void fn_8011F260(void);
 extern void fn_80129BC8(void);
 extern u8 floorUpdateFieldCamera();
-extern void fn_8012A450();
-extern void fn_8012A5B0(void);
+extern void heroSetStatus();
+extern void heroGetStatus(void);
 extern void fn_8012C660(void);
 extern void* fn_8012AC08(u8* ptr, u16 idx);
 extern void* fn_8012A8D4(void* ptr);
@@ -2223,7 +2223,7 @@ extern void fn_800E01F4(void* obj, f32 f1, f32 f2, f32 f3);
 extern void fn_800E0518(void*, f32);
 extern void fn_800DFF98(void*, void*, void*);
 extern void fn_800E019C(void*, void*, void*);
-extern f64 fn_800CE2D8(f32, f32);
+extern f64 atan2(f32, f32);
 extern void fn_801776E8(u32, void*, f32);
 extern void fn_80177574(u32, void*, f32);
 extern void fn_80177478(u32, void*, f32);
@@ -2281,7 +2281,7 @@ void fn_80117330(f32 arg) {
     fn_800E019C(rot, pos, view);
     fn_800E019C(rot, rot, mat);
     *(f32*)(&mat[0x10]) = z;
-    *(f32*)(&mat[0xC]) = -(f32)fn_800CE2D8(x, y);
+    *(f32*)(&mat[0xC]) = -(f32)atan2(x, y);
     *(f32*)(&mat[0x14]) = lbl_8047CFD0;
     fn_801776E8(0, pos, arg);
     fn_80177574(0, rot, arg);
@@ -7680,25 +7680,25 @@ u32 fn_80129280(u8* arg1, u16 arg2) {
 #endif
 /* 0x78 | heroDecPokecoupon | multi_call_guarded */
 void heroDecPokecoupon(u8* ptr, s32 offset) {
-    extern u32 fn_8012A5B0(u8* ptr, u32 a, u32 b);
-    extern void fn_8012A450(u8* ptr, u32 a, u32 b);
-    fn_8012A450(ptr, 0xd, fn_8012A5B0(ptr, 0xd, 0) - offset);
+    extern u32 heroGetStatus(u8* ptr, u32 a, u32 b);
+    extern void heroSetStatus(u8* ptr, u32 a, u32 b);
+    heroSetStatus(ptr, 0xd, heroGetStatus(ptr, 0xd, 0) - offset);
     if (offset <= 0) {
-        fn_8012A450(ptr, 0xe, fn_8012A5B0(ptr, 0xe, 0) - offset);
+        heroSetStatus(ptr, 0xe, heroGetStatus(ptr, 0xe, 0) - offset);
     }
 }
 /* 0x78 | heroAddPokecoupon | multi_call_guarded */
 void heroAddPokecoupon(u8* ptr, s32 offset) {
-    extern u32 fn_8012A5B0(u8* ptr, u32 a, u32 b);
-    extern void fn_8012A450(u8* ptr, u32 a, u32 b);
+    extern u32 heroGetStatus(u8* ptr, u32 a, u32 b);
+    extern void heroSetStatus(u8* ptr, u32 a, u32 b);
     u32 val;
-    val = fn_8012A5B0(ptr, 0xd, 0);
+    val = heroGetStatus(ptr, 0xd, 0);
     val += offset;
-    fn_8012A450(ptr, 0xd, val);
+    heroSetStatus(ptr, 0xd, val);
     if (offset >= 0) {
-        val = fn_8012A5B0(ptr, 0xe, 0);
+        val = heroGetStatus(ptr, 0xe, 0);
         val += offset;
-        fn_8012A450(ptr, 0xe, val);
+        heroSetStatus(ptr, 0xe, val);
     }
 }
 /* 0x50 | heroDecPokedoru | call_sequence */
@@ -7708,9 +7708,9 @@ asm void heroDecPokedoru(void) {
 }
 #else
 void heroDecPokedoru(u8* ptr, u32 offset) {
-    extern u32 fn_8012A5B0(u8* ptr, u32 a, u32 b);
-    extern void fn_8012A450(u8* ptr, u32 a, u32 b);
-    fn_8012A450(ptr, 0xc, fn_8012A5B0(ptr, 0xc, 0) - offset);
+    extern u32 heroGetStatus(u8* ptr, u32 a, u32 b);
+    extern void heroSetStatus(u8* ptr, u32 a, u32 b);
+    heroSetStatus(ptr, 0xc, heroGetStatus(ptr, 0xc, 0) - offset);
 }
 #endif
 /* 0x50 | heroAddPokedoru | call_sequence */
@@ -7720,11 +7720,11 @@ asm void heroAddPokedoru(void) {
 }
 #else
 void heroAddPokedoru(u8* ptr, u32 offset) {
-    extern u32 fn_8012A5B0(u8* ptr, u32 a, u32 b);
-    extern void fn_8012A450(u8* ptr, u32 a, u32 b);
-    u32 val = fn_8012A5B0(ptr, 0xc, 0);
+    extern u32 heroGetStatus(u8* ptr, u32 a, u32 b);
+    extern void heroSetStatus(u8* ptr, u32 a, u32 b);
+    u32 val = heroGetStatus(ptr, 0xc, 0);
     val += offset;
-    fn_8012A450(ptr, 0xc, val);
+    heroSetStatus(ptr, 0xc, val);
 }
 #endif
 /* 0x80129514 | 0x88 */
@@ -7735,12 +7735,12 @@ asm void fn_80129514(void) {
 }
 #else
 void fn_80129514(u8* ptr, s32 arg2, s32 arg3) {
-    extern void* fn_8012A5B0(u8* a, u32 b, u32 c);
+    extern void* heroGetStatus(u8* a, u32 b, u32 c);
     extern void fn_80140A9C(u8* a, u8* b);
     u16 local;
     u8* val;
     if (&local != NULL) { local = 0xa; }
-    val = (u8*)fn_8012A5B0(ptr, 0xa, 0);
+    val = (u8*)heroGetStatus(ptr, 0xa, 0);
     if (val == NULL) { return; }
     if ((u16)arg2 >= local) { return; }
     if ((u16)arg3 >= local) { return; }
@@ -7755,7 +7755,7 @@ asm void fn_8012959C(void) {
 }
 #else
 s32 fn_8012959C(u8* ptr, u32 arg2, u32 arg3, u32 arg4) {
-    extern void* fn_8012A5B0(u8* a, u32 b, u32 c);
+    extern void* heroGetStatus(u8* a, u32 b, u32 c);
     extern s32 fn_80140ACC(void* a, u16 b, u32 c, u32 d, u32 e, u16 f, u8 g);
     u16 local_c = 0;
     u16 local_a = 0;
@@ -7764,7 +7764,7 @@ s32 fn_8012959C(u8* ptr, u32 arg2, u32 arg3, u32 arg4) {
     if (&local_c != NULL) { local_c = 0xa; }
     if (&local_a != NULL) { local_a = 1; }
     if (&local_8 != NULL) { local_8 = 0; }
-    val = fn_8012A5B0(ptr, 0xa, 0);
+    val = heroGetStatus(ptr, 0xa, 0);
     if (val == NULL) { return -1; }
     return fn_80140ACC(val, local_c, arg2, arg3, arg4, local_a, local_8);
 }
@@ -7777,7 +7777,7 @@ asm void fn_80129650(void) {
 }
 #else
 s32 fn_80129650(u8* ptr, u32 arg2, u32 arg3, u32 arg4) {
-    extern void* fn_8012A5B0(u8* a, u32 b, u32 c);
+    extern void* heroGetStatus(u8* a, u32 b, u32 c);
     extern s32 fn_80141308(void* a, u16 b, u32 c, u32 d, u32 e, u16 f, u8 g, u8 h);
     u16 local_c = 0;
     u16 local_a = 0;
@@ -7788,7 +7788,7 @@ s32 fn_80129650(u8* ptr, u32 arg2, u32 arg3, u32 arg4) {
     if (&local_a != NULL) { local_a = 1; }
     if (&local_9 != NULL) { local_9 = 0; }
     if (&local_8 != NULL) { local_8 = 1; }
-    val = fn_8012A5B0(ptr, 0xa, 0);
+    val = heroGetStatus(ptr, 0xa, 0);
     if (val == NULL) { return -1; }
     return fn_80141308(val, local_c, arg2, arg3, arg4, local_a, local_9, local_8);
 }
@@ -7801,14 +7801,14 @@ asm void fn_80129718(void) {
 }
 #else
 u32 fn_80129718(u8* ptr, u32 arg2) {
-    extern void* fn_8012A5B0(u8* a, u32 b, u32 c);
+    extern void* heroGetStatus(u8* a, u32 b, u32 c);
     extern s32 fn_80142368(void* a, u16 b, u32 c, u32 d, u16 e);
     u16 local_a = 0;
     u16 local_8 = 0;
     void* val;
     if (&local_a != NULL) { local_a = 0xa; }
     if (&local_8 != NULL) { local_8 = 1; }
-    val = fn_8012A5B0(ptr, 0xa, 0);
+    val = heroGetStatus(ptr, 0xa, 0);
     if (val == NULL) { return 0; }
     if ((u32)fn_80142368(val, local_a, arg2, 1, local_8) != 0) { return 1; }
     return fn_80142368(val, local_a, arg2, 2, local_8) != 0;
@@ -7821,23 +7821,23 @@ asm void heroHizukiItemGetItemAryPtr(void) {
 }
 #else
 u32 heroHizukiItemGetItemAryPtr(u8* ptr, u16* out_a, u16* out_b, u8* out_c, u8* out_d) {
-    extern u32 fn_8012A5B0(u8* ptr, u32 a, u32 b);
+    extern u32 heroGetStatus(u8* ptr, u32 a, u32 b);
     if (out_a != NULL) { *out_a = 0xa; }
     if (out_b != NULL) { *out_b = 1; }
     if (out_c != NULL) { *out_c = 0; }
     if (out_d != NULL) { *out_d = 1; }
-    return fn_8012A5B0(ptr, 0xa, 0);
+    return heroGetStatus(ptr, 0xa, 0);
 }
 #endif
 /* 0x78 | heroCheckSetMonohiroiAllTemotiPokemon | generic */
 void heroCheckSetMonohiroiAllTemotiPokemon(u8* arg1) {
-    extern u32 fn_8012A5B0(u8* ptr, u32 a, u32 b);
+    extern u32 heroGetStatus(u8* ptr, u32 a, u32 b);
     extern u8 fn_80123FBC(u32 a);
     extern void fn_80120674(u32 a);
     u32 result;
     u32 i;
     for (i = 0; (u16)i < 6; i++) {
-        result = fn_8012A5B0(arg1, 3, i);
+        result = heroGetStatus(arg1, 3, i);
         if (fn_80123FBC(result)) {
             fn_80120674(result);
         }
@@ -7946,12 +7946,12 @@ asm void fn_80129D64(void) {
 }
 #else
 u32 fn_80129D64(u8* ptr, u8* arg2) {
-    extern u32 fn_8012A5B0(u8* a, u32 b, u32 c);
+    extern u32 heroGetStatus(u8* a, u32 b, u32 c);
     extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
     extern u32 fn_800F9EE4(u32 a, u32 b);
     u32 val1, temp, val2, result2;
-    val1 = fn_8012A5B0(ptr, 2, 0);
-    temp = fn_8012A5B0(ptr, 1, 0);
+    val1 = heroGetStatus(ptr, 2, 0);
+    temp = heroGetStatus(ptr, 1, 0);
     val2 = fn_8012640C(arg2, 0, 0x75, 0);
     result2 = fn_8012640C(arg2, 0, 0x76, 0);
     if (val1 != val2) { return 0; }
@@ -7966,7 +7966,7 @@ asm void fn_80129E20(void) {
 }
 #else
 s32 fn_80129E20(u8* ptr, void* buf, u8 flag) {
-    extern void* fn_8012A5B0(u8* a, u32 b, u32 c);
+    extern void* heroGetStatus(u8* a, u32 b, u32 c);
     extern u32 fn_80123FBC(void* val);
     extern void fn_8011F5FC(void* a, void* b);
     extern u32 fn_80134BC0(u32 a, void* b, s32 c);
@@ -7979,7 +7979,7 @@ s32 fn_80129E20(u8* ptr, void* buf, u8 flag) {
     fn_8011F5FC(local_buf, buf);
     if (&local_buf == NULL) { i = 6; goto after_loop; }
     for (i = 0; i < 6; i++) {
-        val = fn_8012A5B0(ptr, 3, i);
+        val = heroGetStatus(ptr, 3, i);
         if ((u8)fn_80123FBC(val) != 1) {
             fn_8011F5FC(val, local_buf);
             goto after_loop;
@@ -8003,7 +8003,7 @@ asm void fn_80129F20(void) {
 #else
 s32 fn_80129F20(u8* ptr, u8* buf, u32 arg3, u16 arg4, u8 flag) {
     extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
-    extern u32 fn_8012A5B0(u8* a, u32 b, u32 c);
+    extern u32 heroGetStatus(u8* a, u32 b, u32 c);
     extern u32 fn_80123FBC(u32 val);
     extern void fn_8011F5FC(void* a, void* b);
     extern void fn_80123EF0(u8* a, u32 b, u32 c, u32 d, u32 e, u32 f, u32 g);
@@ -8018,9 +8018,9 @@ s32 fn_80129F20(u8* ptr, u8* buf, u32 arg3, u16 arg4, u8 flag) {
 
     if (buf == NULL) { return 6; }
     field7a = (u8)fn_8012640C(buf, 0, 0x7a, 0);
-    status = (u8)fn_8012A5B0(ptr, 0xb, 0);
-    val2 = fn_8012A5B0(ptr, 2, 0);
-    val1 = fn_8012A5B0(ptr, 1, 0);
+    status = (u8)heroGetStatus(ptr, 0xb, 0);
+    val2 = heroGetStatus(ptr, 2, 0);
+    val1 = heroGetStatus(ptr, 1, 0);
     fn_8011F5FC(local_buf, buf);
     fn_80123EF0(local_buf, arg3, field7a, arg4, status, val2, val1);
 
@@ -8029,7 +8029,7 @@ s32 fn_80129F20(u8* ptr, u8* buf, u32 arg3, u16 arg4, u8 flag) {
     } else {
         i = 0;
         while ((u8)i < 6) {
-            slot = (void*)fn_8012A5B0(ptr, 3, (u8)i);
+            slot = (void*)heroGetStatus(ptr, 3, (u8)i);
             if ((u8)fn_80123FBC((u32)slot) != 1) {
                 fn_8011F5FC(slot, local_buf);
                 break;
@@ -8054,7 +8054,7 @@ asm void fn_8012A08C(void) {
 }
 #else
 u32 fn_8012A08C(u8* ptr, void* arg2) {
-    extern u32 fn_8012A5B0(u8* a, u32 b, u32 c);
+    extern u32 heroGetStatus(u8* a, u32 b, u32 c);
     extern u32 fn_80123FBC(u32 val);
     extern void fn_8011F5FC(u32 a, void* b);
     u32 val;
@@ -8062,7 +8062,7 @@ u32 fn_8012A08C(u8* ptr, void* arg2) {
     if (arg2 == NULL) { return 6; }
     i = 0;
     while ((u8)i < 6) {
-        val = fn_8012A5B0(ptr, 3, i & 0xFF);
+        val = heroGetStatus(ptr, 3, i & 0xFF);
         if ((u8)fn_80123FBC(val) != 1) {
             fn_8011F5FC(val, arg2);
             return i;
@@ -8081,17 +8081,17 @@ asm void fn_8012A1A4(void) {
 void fn_8012A1A4(u8* ptr, u32 arg2, u8 arg3) {
     extern void fn_8012A248(u8* ptr);
     extern u32 fn_800E0C54(void);
-    extern void fn_8012A450(u8* ptr, u32 a, u32 b);
+    extern void heroSetStatus(u8* ptr, u32 a, u32 b);
     extern u32 fn_800FA280(u32 val);
     u32 lo;
     u32 hi;
     fn_8012A248(ptr);
     lo = fn_800E0C54() & 0xFFFF;
     hi = fn_800E0C54() << 16;
-    fn_8012A450(ptr, 2, hi | lo);
-    fn_8012A450(ptr, 1, arg2);
-    fn_8012A450(ptr, 0xb, arg3);
-    fn_8012A450(ptr, 0x17, fn_800FA280(0xfa2));
+    heroSetStatus(ptr, 2, hi | lo);
+    heroSetStatus(ptr, 1, arg2);
+    heroSetStatus(ptr, 0xb, arg3);
+    heroSetStatus(ptr, 0x17, fn_800FA280(0xfa2));
 }
 #endif
 /* 0x8012A248 | 0x208 */
@@ -8102,47 +8102,47 @@ asm void fn_8012A248(void) {
 }
 #else
 void fn_8012A248(u8* ptr) {
-    extern void fn_8012A450(u8* p, u32 a, u32 b);
-    extern u8* fn_8012A5B0(u8* p, u32 a, u32 b);
+    extern void heroSetStatus(u8* p, u32 a, u32 b);
+    extern u8* heroGetStatus(u8* p, u32 a, u32 b);
     extern void fn_801249F8(u8* p, u16 count);
     extern void fn_80142A88(u8* p, u32 v);
     u16 local = 0;
 
-    fn_8012A450(ptr, 1, (u32)&local);
-    fn_8012A450(ptr, 2, 0);
-    fn_801249F8(fn_8012A5B0(ptr, 3, 0), 6);
-    fn_80142A88(fn_8012A5B0(ptr, 4, 0), 0x14);
-    fn_80142A88(fn_8012A5B0(ptr, 5, 0), 0x2b);
-    fn_80142A88(fn_8012A5B0(ptr, 6, 0), 0x10);
-    fn_80142A88(fn_8012A5B0(ptr, 7, 0), 0x40);
-    fn_80142A88(fn_8012A5B0(ptr, 8, 0), 0x2e);
-    fn_80142A88(fn_8012A5B0(ptr, 9, 0), 0x3);
-    fn_8012A450(ptr, 0xb, 2);
-    fn_8012A450(ptr, 0xc, 0);
-    fn_8012A450(ptr, 0xd, 0);
-    fn_8012A450(ptr, 0xe, 0);
-    fn_8012A450(ptr, 0xf, 1);
-    fn_8012A450(ptr, 0x10, 1);
-    fn_8012A450(ptr, 0x11, 1);
-    fn_8012A450(ptr, 0x12, 1);
-    fn_8012A450(ptr, 0x13, 1);
-    fn_8012A450(ptr, 0x14, 1);
-    fn_8012A450(ptr, 0x15, 1);
-    fn_8012A450(ptr, 0x16, 1);
-    fn_8012A450(ptr, 0x17, (u32)&local);
-    fn_8012A450(ptr, 0x18, 0);
-    fn_80142A88(fn_8012A5B0(ptr, 0xa, 0), 0xa);
-    fn_8012A450(ptr, 0x19, 0);
+    heroSetStatus(ptr, 1, (u32)&local);
+    heroSetStatus(ptr, 2, 0);
+    fn_801249F8(heroGetStatus(ptr, 3, 0), 6);
+    fn_80142A88(heroGetStatus(ptr, 4, 0), 0x14);
+    fn_80142A88(heroGetStatus(ptr, 5, 0), 0x2b);
+    fn_80142A88(heroGetStatus(ptr, 6, 0), 0x10);
+    fn_80142A88(heroGetStatus(ptr, 7, 0), 0x40);
+    fn_80142A88(heroGetStatus(ptr, 8, 0), 0x2e);
+    fn_80142A88(heroGetStatus(ptr, 9, 0), 0x3);
+    heroSetStatus(ptr, 0xb, 2);
+    heroSetStatus(ptr, 0xc, 0);
+    heroSetStatus(ptr, 0xd, 0);
+    heroSetStatus(ptr, 0xe, 0);
+    heroSetStatus(ptr, 0xf, 1);
+    heroSetStatus(ptr, 0x10, 1);
+    heroSetStatus(ptr, 0x11, 1);
+    heroSetStatus(ptr, 0x12, 1);
+    heroSetStatus(ptr, 0x13, 1);
+    heroSetStatus(ptr, 0x14, 1);
+    heroSetStatus(ptr, 0x15, 1);
+    heroSetStatus(ptr, 0x16, 1);
+    heroSetStatus(ptr, 0x17, (u32)&local);
+    heroSetStatus(ptr, 0x18, 0);
+    fn_80142A88(heroGetStatus(ptr, 0xa, 0), 0xa);
+    heroSetStatus(ptr, 0x19, 0);
 }
 #endif
 /* 0x8012A450 | 0x160 */
 extern void jumptable_803634F0();
 #if 0
-asm void fn_8012A450(void) {
+asm void heroSetStatus(void) {
 #include "src/game/gs_field_world_fn_8012A450.inc"
 }
 #else
-void fn_8012A450(u8* ptr, u32 selector, u32 value) {
+void heroSetStatus(u8* ptr, u32 selector, u32 value) {
     extern u32 fn_80129280(u8*, u16);
     u16 sel = (u16)selector;
 
@@ -8214,7 +8214,7 @@ void fn_8012A450(u8* ptr, u32 selector, u32 value) {
 /* 0x8012A5B0 | 0x1C4 */
 extern void jumptable_80363558();
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8012A5B0(void);
+void heroGetStatus(void);
 /* 0x8012A7DC | 0x30 */
 void fn_8012A7DC(u8* ptr, s32 val) {
     if (ptr == NULL) { return; }
@@ -8333,7 +8333,7 @@ asm void fn_8012AC9C(void) {
 }
 #else
 void fn_8012AC9C(void) {
-    extern u32 fn_8012A5B0(u8* a, u32 b, u32 c);
+    extern u32 heroGetStatus(u8* a, u32 b, u32 c);
     extern u32 fn_80123FBC(u32 val);
     extern void fn_8011F1A0(u32 val);
     extern void* itemDataBiosGetPtr(void);
@@ -8350,7 +8350,7 @@ void fn_8012AC9C(void) {
     *counter = 0;
     i = 0;
     do {
-        obj = fn_8012A5B0(NULL, 3, (u16)i);
+        obj = heroGetStatus(NULL, 3, (u16)i);
         if (obj != 0) {
             if ((u8)fn_80123FBC(obj) != 0) {
                 fn_8011F1A0(obj);
@@ -8392,8 +8392,8 @@ extern void peopleSearchID(void);
 extern void peopleInfoBiosGetPtr(void);
 extern void fn_8018F5E4(void);
 extern void fn_8010F320(void);
-extern void fn_800A3AC0(void);
-extern void fn_800A3A78(void);
+extern void PSVECScale(void);
+extern void PSVECAdd(void);
 extern void fn_8010FDF8(void);
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
@@ -9007,7 +9007,7 @@ asm void heroPokemonGetEifie(void) {
 }
 #else
 void heroPokemonGetEifie(u32 arg1) {
-    extern u32 fn_8012A5B0(u8* a, u32 b, u32 c);
+    extern u32 heroGetStatus(u8* a, u32 b, u32 c);
     extern u32 gamedataGetStatus(u32 a, u32 b);
     extern void fn_801240C4(u8* a, u32 b, u32 c, u32 d);
     extern void fn_80123D58(u8* a, u32 b, u32 c);
@@ -9017,7 +9017,7 @@ void heroPokemonGetEifie(u32 arg1) {
     extern void fn_80129F20(u32 a, u8* b, u32 c, u32 d, u32 e);
     u8 buf[0x140];
     u32 val, tmp;
-    val = fn_8012A5B0((u8*)arg1, 2, 0);
+    val = heroGetStatus((u8*)arg1, 2, 0);
     fn_801240C4(buf, 0xc4, 0x19, gamedataGetStatus(0, 1));
     fn_80123D58(buf, 0, 0x5d);
     fn_80123D58(buf, 1, 0xd8);
@@ -9038,7 +9038,7 @@ asm void heroPokemonGetBlacky(void) {
 }
 #else
 void heroPokemonGetBlacky(u32 arg1) {
-    extern u32 fn_8012A5B0(u8* a, u32 b, u32 c);
+    extern u32 heroGetStatus(u8* a, u32 b, u32 c);
     extern u32 gamedataGetStatus(u32 a, u32 b);
     extern void fn_801240C4(u8* a, u32 b, u32 c, u32 d);
     extern void fn_80123D58(u8* a, u32 b, u32 c);
@@ -9048,7 +9048,7 @@ void heroPokemonGetBlacky(u32 arg1) {
     extern void fn_80129F20(u32 a, u8* b, u32 c, u32 d, u32 e);
     u8 buf[0x140];
     u32 val, tmp;
-    val = fn_8012A5B0((u8*)arg1, 2, 0);
+    val = heroGetStatus((u8*)arg1, 2, 0);
     fn_801240C4(buf, 0xc5, 0x1a, gamedataGetStatus(0, 1));
     fn_80123D58(buf, 0, 0x2c);
     fn_80123D58(buf, 1, 0x122);
@@ -10787,15 +10787,15 @@ asm void heroCheckValid(void) {
 }
 #else
 u32 heroCheckValid(u8* ptr) {
-    extern u32 fn_8012A5B0(u8* ptr, u32 a, u32 b);
+    extern u32 heroGetStatus(u8* ptr, u32 a, u32 b);
     extern s32 GScharCmp(u32 val, u16* out);
     u16 local = 0;
-    if (GScharCmp(fn_8012A5B0(ptr, 1, 0), &local) == 0) { return 0; }
-    return fn_8012A5B0(ptr, 0xb, 0) != 2;
+    if (GScharCmp(heroGetStatus(ptr, 1, 0), &local) == 0) { return 0; }
+    return heroGetStatus(ptr, 0xb, 0) != 2;
 }
 #endif
 extern void fn_801885C4(void);
-extern void fn_800A3B7C(void);
+extern void PSVECDotProduct(void);
 extern void fn_8018F678(void);
 extern void fn_8018F658(void);
 extern f32 lbl_8047D030;
@@ -10832,10 +10832,10 @@ void fn_8012CA84(s32 playerIdx, f32* dirVec, f32* fwdVec) {
     extern f32 lbl_8047D0A0;        /* PI */
     extern f32 lbl_8047D0A4;        /* minimum turn threshold */
     extern u32  fn_800D3088(void);                        /* frame count */
-    extern void fn_800A3A9C(void*, void*, void*);         /* VECSubtract(a, b, out) */
-    extern void fn_800A3AC0(void*, void*, f32);           /* VECScale(in, out, s) */
-    extern f32  fn_800A3B7C(void*, void*);                /* VECDotProduct */
-    extern f64  fn_800CE2D8(f32, f32);                    /* atan2f(y, x) */
+    extern void PSVECSubtract(void*, void*, void*);         /* VECSubtract(a, b, out) */
+    extern void PSVECScale(void*, void*, f32);           /* VECScale(in, out, s) */
+    extern f32  PSVECDotProduct(void*, void*);                /* VECDotProduct */
+    extern f64  atan2(f32, f32);                    /* atan2f(y, x) */
     extern void fn_800E3D6C(void*, void*);                /* getRotation(obj, out) */
     extern void fn_800E3D98(void*, void*);                /* getPosition(obj, out) */
     extern void* GSresGetResource(u32, u32);                   /* resolveHandle(group, id) */
@@ -10907,28 +10907,28 @@ void fn_8012CA84(s32 playerIdx, f32* dirVec, f32* fwdVec) {
         fn_800E3D98(obj, posB);
         posB[1] = lbl_8047D038;
 
-        fn_800A3A9C(posB, posA, diffVec);
+        PSVECSubtract(posB, posA, diffVec);
 
         clampedSpeed = dirMag / frameTime;
         if (clampedSpeed > lbl_8047D080) {
             clampedSpeed = lbl_8047D080;
         }
 
-        fn_800A3AC0(diffVec, scaledDir, clampedSpeed / dirMag);
+        PSVECScale(diffVec, scaledDir, clampedSpeed / dirMag);
 
         {
             f32 fwdSq = fwdVec[0] * fwdVec[0] + fwdVec[2] * fwdVec[2];
             f32 fwdMag = (fwdSq > 0.0f) ? sqrtf(fwdSq) : 0.0f;
 
             if (fwdMag > lbl_8047D060) {
-                f32 angle = (f32)fn_800CE2D8(fwdVec[0], fwdVec[2]);
+                f32 angle = (f32)atan2(fwdVec[0], fwdVec[2]);
                 fn_8018805C(0, entityHandle, angle, clampedSpeed);
             }
         }
 
         turnAmount = fn_801887D8(0, entityHandle, scaledDir);
 
-        if (fn_800A3B7C(diffVec, fwdVec) < lbl_8047D038) {
+        if (PSVECDotProduct(diffVec, fwdVec) < lbl_8047D038) {
             turnAmount = -turnAmount;
         }
 
@@ -10992,7 +10992,7 @@ void fn_8012CA84(s32 playerIdx, f32* dirVec, f32* fwdVec) {
             while (heading <= lbl_8047D098) { heading += lbl_8047D094; }
             rotation[1] = heading;
 
-            targetAngle = (f32)fn_800CE2D8(
+            targetAngle = (f32)atan2(
                 targetPos[0] - playerPos[0],
                 targetPos[2] - playerPos[2]
             );

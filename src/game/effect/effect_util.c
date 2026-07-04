@@ -3527,7 +3527,7 @@ void fn_80135CE8(void* ptr) {
 #endif
 
 /* 0x80135D10 | 0x134 */
-extern u32 fn_8012A450();
+extern u32 heroSetStatus();
 extern u32 fn_80142B24();
 extern u32 fn_801254B4();
 extern u32 fn_8011BBD8();
@@ -3548,7 +3548,7 @@ asm void fn_80135D10(void) {
 u32 fn_80135D10(u32 kind, u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
     extern u32 fn_8011BBD8();
     extern u32 fn_801254B4();
-    extern u32 fn_8012A450();
+    extern u32 heroSetStatus();
     extern u32 fn_80135024();
     extern u32 fn_8013583C();
     extern u32 fn_80142B24();
@@ -3567,7 +3567,7 @@ u32 fn_80135D10(u32 kind, u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
         fn_80135024(arg1, arg3, arg5);
         break;
     case 3:
-        fn_8012A450(arg1, arg3, arg5);
+        heroSetStatus(arg1, arg3, arg5);
         break;
     case 4:
         fn_80142B24(arg1, arg2, arg3, arg4, arg5);
@@ -3598,7 +3598,7 @@ u32 fn_80135D10(u32 kind, u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
 
 /* 0x80135E44 | 0x114 */
 extern u32 itemGetStatus();
-extern u32 fn_8012A5B0();
+extern u32 heroGetStatus();
 extern u32 fn_8012640C();
 extern u32 fn_8011BEB4();
 extern u32 fn_801F54A4();
@@ -3619,7 +3619,7 @@ u32 fn_80135E44(u32 kind, u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
     case 2:
         return fn_80135028(arg1, arg3, arg4);
     case 3:
-        return fn_8012A5B0(arg1, arg3, arg4);
+        return heroGetStatus(arg1, arg3, arg4);
     case 4:
         return itemGetStatus(arg1, arg2, arg3, arg4);
     case 5:

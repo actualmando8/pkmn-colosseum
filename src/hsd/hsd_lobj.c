@@ -692,7 +692,7 @@ extern void fn_800BA414(void* light, f32 x, f32 y, f32 z);
 extern void fn_800BA198(void* light, f32 a0, f32 a1, f32 a2,
                         f32 k0, f32 k1, f32 k2);
 extern void fn_800BA440(void* light, u32* color);
-extern void fn_800A3A9C(void* a, void* b, void* dst);
+extern void PSVECSubtract(void* a, void* b, void* dst);
 extern void PSVECNormalize(void* src, void* dst);
 extern void PSMTXMultVecSR(void* mtx, void* src, void* dst);
 extern void fn_800BA424(void* light, f32 x, f32 y, f32 z);
@@ -757,7 +757,7 @@ asm void HSD_LObjSetup(void* setup) {
         if ((lobj)->interest != NULL) {                                     \
             HSD_WObjGetPosition((lobj)->interest, &lobj_interest);                  \
         }                                                                   \
-        fn_800A3A9C(&lobj_interest, &lobj_pos, &(dst));                     \
+        PSVECSubtract(&lobj_interest, &lobj_pos, &(dst));                     \
         LOBJ_NORMALIZE_OR_DEFAULT(dst);                                     \
     } while (0)
 
@@ -1110,7 +1110,7 @@ void HSD_LObjGetLightVector(HSD_LObj* lobj, f32* out)
         if (lobj != NULL && *(volatile u32*)((u8*)lobj + 0x1C) != 0) {
             HSD_WObjGetPosition(lobj->interest, interest);
         }
-        fn_800A3A9C(interest, pos, out);
+        PSVECSubtract(interest, pos, out);
 
         if (out == NULL) {
             goto invalid_vec;

@@ -40,9 +40,9 @@ typedef struct SynthInfo {
 } SynthInfo;
 
 /* ===== Cross-TU MusyX runtime functions (defined in synth.c) ===== */
-extern u32 fn_8014C6B0(u32 vid, u8 ctrl, u8 value);   /* synthFXSetCtrl */
+extern u32 synthFXSetCtrl(u32 vid, u8 ctrl, u8 value);   /* synthFXSetCtrl */
 extern u32 synthSendKeyOff(u32 id);
-extern u32 fn_8014C5E8(u16 fid, u8 vol, u8 pan, u8 studio, u32 itd); /* synthFXStart */
+extern u32 synthFXStart(u16 fid, u8 vol, u8 pan, u8 studio, u32 itd); /* synthFXStart */
 extern u32 vidGetInternalId(u32 id);
 extern void synthVolume(u8 volume, u16 time, u8 vGroup, u8 seqMode, u32 seqId);
 extern u32 fn_8016246C(u32 voice); /* hwIsActive */
@@ -81,7 +81,7 @@ extern void fn_80162DE0(u8 studio, u32 arg1);
 u32 sndFXCtrl(u32 vid, u8 ctrl, u8 value) {
   u32 ret;
   hwDisableIrq();
-  ret = fn_8014C6B0(vid, ctrl, value);
+  ret = synthFXSetCtrl(vid, ctrl, value);
   hwEnableIrq();
   return ret;
 }
@@ -94,17 +94,17 @@ u32 sndFXKeyOff(u32 vid) {
   return ret;
 }
 
-u32 fn_8014D7FC(u16 fid, u8 vol, u8 pan, u8 studio) {
+u32 sndFXStartEx(u16 fid, u8 vol, u8 pan, u8 studio) {
   u32 v;
   hwDisableIrq();
-  v = fn_8014C5E8(fid, vol, pan, studio, lbl_804356A4[studio * 2 + 1]);
+  v = synthFXStart(fid, vol, pan, studio, lbl_804356A4[studio * 2 + 1]);
   hwEnableIrq();
   return v;
 }
 
-u32 fn_8014D880(u32 vid) { return vidGetInternalId(vid) != -1 ? vid : -1; }
+u32 sndFXCheck(u32 vid) { return vidGetInternalId(vid) != -1 ? vid : -1; }
 
-void fn_8014D8C0(void* callback) { lbl_8047AF4C = callback; }
+void sndSetReceiveMessageCallback(void* callback) { lbl_8047AF4C = callback; }
 
 void sndVolume(u8 volume, u16 time, u8 volgroup) {
   hwDisableIrq();

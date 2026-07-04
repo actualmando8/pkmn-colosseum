@@ -2770,7 +2770,7 @@ u32 fn_8013E6C4(u8* ptr)
 #else
 void fn_8013E6C4(void) { /* TODO */ }
 #endif
-extern void fn_800CE318(void);
+extern void fmod(void);
 extern u32 lbl_8047D2B8;
 extern u32 lbl_8047D2A8;
 extern u32 lbl_8047D2BC;
@@ -2801,7 +2801,7 @@ u32 fn_8013E8A4(void* ptr, u32 delta) {
     }
 
     *(u16*)(p + 0x30) = frame + delta;
-    fn_800CE318();
+    fmod();
     if (*(void**)(p + 0x4) != NULL) {
         fn_8013EA44(p);
     }

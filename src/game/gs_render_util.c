@@ -69,7 +69,7 @@ extern void PSMTXMultVec(void* mtx, void* vecIn, void* vecOut); /* MTXMultVec3 *
 extern void fn_800A38C0(void* mtxA, void* mtxB, void* mtxOut); /* MTXConcat */
 extern void fn_800A3544(void* mtx);                             /* MTXIdentity */
 extern void fn_800A35D0(void* mtxA, void* mtxB);               /* MTXCopy */
-extern void fn_800A3A9C(void* out, void* in, f32 scale);       /* VECNormalize */
+extern void PSVECSubtract(void* out, void* in, f32 scale);       /* VECNormalize */
 extern void PSMTXCopy(void* mtxA, void* mtxB);
 
 /* GX functions */

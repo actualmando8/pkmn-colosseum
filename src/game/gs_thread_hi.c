@@ -5931,7 +5931,7 @@ s32 fn_800F4440(void* obj) {
 #endif
 
 /* 0x800F4818 | 0x420 */
-extern void fn_800CE318(void);
+extern void fmod(void);
 extern u32 lbl_8047E710;
 extern u32 lbl_8047CCC0;
 #if 0
@@ -6016,12 +6016,12 @@ s32 fn_800F4818(void* obj) {
                 result = (u32)((s32)val2 % (s32)val1);
             } else {
                 f32 f2 = (f32)(s32)val2; f32 f0 = *(f32*)&val1;
-                fn_800CE318();
+                fmod();
                 result = *(u32*)&f0;
             }
         } else {
             f32 f2 = (f32)(s32)val2; f32 f0 = *(f32*)&val1;
-            fn_800CE318();
+            fmod();
             result = *(u32*)&f0;
         }
     }

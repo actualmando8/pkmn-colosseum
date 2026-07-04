@@ -5410,13 +5410,13 @@ asm void fn_800DFFCC(void) {
 #else
 void fn_800DFFCC(void* a, void* b, void* c) { PSVECCrossProduct(b, c, a); }
 #endif
-extern void fn_800A3B7C(void);
+extern void PSVECDotProduct(void);
 #if 0
 asm void fn_800E0000(void) {
 #include "src/game/gs_render_fn_800E0000.inc"
 }
 #else
-void fn_800E0000(void) { fn_800A3B7C(); }
+void fn_800E0000(void) { PSVECDotProduct(); }
 #endif
 extern void PSVECSquareDistance(void);
 #if 0
@@ -5450,7 +5450,7 @@ asm void fn_800E008C(void) {
 #else
 void fn_800E008C(void) { PSVECMag(); }
 #endif
-extern void fn_800A3AC0(void*, void*, f32);
+extern void PSVECScale(void*, void*, f32);
 extern const f32 lbl_8047CAD8;
 #if 0
 asm void fn_800E00AC(void) {
@@ -5458,7 +5458,7 @@ asm void fn_800E00AC(void) {
 }
 #else
 void fn_800E00AC(void* a, void* b, f32 scale) {
-    fn_800A3AC0(b, a, lbl_8047CAD8 / scale);
+    PSVECScale(b, a, lbl_8047CAD8 / scale);
 }
 #endif
 #if 0
@@ -5484,23 +5484,23 @@ asm void fn_800E013C(void* a, void* b, f32 c) {
 #include "src/game/gs_render_fn_800E013C.inc"
 }
 #else
-void fn_800E013C(void* a, void* b, f32 c) { fn_800A3AC0(b, a, c); }
+void fn_800E013C(void* a, void* b, f32 c) { PSVECScale(b, a, c); }
 #endif
-extern void fn_800A3A9C(void*, void*, void*);
+extern void PSVECSubtract(void*, void*, void*);
 #if 0
 asm void fn_800E0168(void) {
 #include "src/game/gs_render_fn_800E0168.inc"
 }
 #else
-void fn_800E0168(void* a, void* b, void* c) { fn_800A3A9C(b, c, a); }
+void fn_800E0168(void* a, void* b, void* c) { PSVECSubtract(b, c, a); }
 #endif
-extern void fn_800A3A78(void*, void*, void*);
+extern void PSVECAdd(void*, void*, void*);
 #if 0
 asm void fn_800E019C(void) {
 #include "src/game/gs_render_fn_800E019C.inc"
 }
 #else
-void fn_800E019C(void* a, void* b, void* c) { fn_800A3A78(b, c, a); }
+void fn_800E019C(void* a, void* b, void* c) { PSVECAdd(b, c, a); }
 #endif
 #if 0
 asm void fn_800E01D0(void) {
@@ -5573,7 +5573,7 @@ asm void fn_800E02C4(void) {
 #else
 void fn_800E02C4(void* a) { PSMTXScaleApply(a, a); }
 #endif
-extern void fn_800A3074(void*, u32);
+extern void PSMTXRotRad(void*, u32);
 #if 0
 asm void fn_800E02E8(void* obj) {
 #include "src/game/gs_render_fn_800E02E8.inc"
@@ -5582,7 +5582,7 @@ asm void fn_800E02E8(void* obj) {
 void fn_800E02E8(void* obj, f32 angle)
 {
     u8 tmp[0x30];
-    fn_800A3074(tmp, 0x5a);
+    PSMTXRotRad(tmp, 0x5a);
     PSMTXConcat(obj, tmp, obj);
 }
 #endif
@@ -5594,7 +5594,7 @@ asm void fn_800E032C(void* obj) {
 void fn_800E032C(void* obj, f32 angle)
 {
     u8 tmp[0x30];
-    fn_800A3074(tmp, 0x59);
+    PSMTXRotRad(tmp, 0x59);
     PSMTXConcat(obj, tmp, obj);
 }
 #endif
@@ -5606,7 +5606,7 @@ asm void fn_800E0370(void* obj) {
 void fn_800E0370(void* obj, f32 angle)
 {
     u8 tmp[0x30];
-    fn_800A3074(tmp, 0x58);
+    PSMTXRotRad(tmp, 0x58);
     PSMTXConcat(obj, tmp, obj);
 }
 #endif
@@ -5668,21 +5668,21 @@ asm void fn_800E04F4(void) {
 #include "src/game/gs_render_fn_800E04F4.inc"
 }
 #else
-void fn_800E04F4(void* a) { fn_800A3074(a, 0x5a); }
+void fn_800E04F4(void* a) { PSMTXRotRad(a, 0x5a); }
 #endif
 #if 0
 asm void fn_800E0518(void) {
 #include "src/game/gs_render_fn_800E0518.inc"
 }
 #else
-void fn_800E0518(void* a) { fn_800A3074(a, 0x59); }
+void fn_800E0518(void* a) { PSMTXRotRad(a, 0x59); }
 #endif
 #if 0
 asm void fn_800E053C(void) {
 #include "src/game/gs_render_fn_800E053C.inc"
 }
 #else
-void fn_800E053C(void* a) { fn_800A3074(a, 0x58); }
+void fn_800E053C(void* a) { PSMTXRotRad(a, 0x58); }
 #endif
 #if 0
 asm void fn_800E0560(void) {
@@ -5998,7 +5998,7 @@ void fn_800E0C78(void) {
     *(u32*)lbl_80478C94 = (u32)t;
 }
 #endif
-extern f64 fn_800CE318(f64 x, f64 y);
+extern f64 fmod(f64 x, f64 y);
 extern s32 __cvt_fp2unsigned(f32 x);
 extern f32 lbl_8047CB20;
 extern f32 lbl_8047CB1C;
@@ -6021,7 +6021,7 @@ f32 fn_800E0CA0(f32 x) {
     scale = lbl_8047CB1C;
     if (x > lbl_8047CB20) {
         scale = lbl_8047CB24;
-        tmp = (f32)fn_800CE318(x, lbl_8047CB28);
+        tmp = (f32)fmod(x, lbl_8047CB28);
         x = tmp;
     }
     if (x > lbl_8047CB18) {

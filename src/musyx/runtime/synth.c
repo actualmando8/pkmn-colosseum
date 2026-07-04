@@ -5,7 +5,7 @@
  * Split out of the misnamed people_field.c unit (2026-07-02). Reference:
  * AxioDL/musyx `musyx/runtime/synth.c` (byte-exact matched in MP4 / Prime /
  * Strikers at GC/1.3.2). Boundary evidence: synthSetBpm (0x8014A23C) is
- * reference synth.c's first function; fn_8014D574 is synthExit (loads the
+ * reference synth.c's first function; synthExit is synthExit (loads the
  * synthVoice work array lbl_8047AF48 and calls salFree = fn_80164400),
  * reference synth.c's last function, ending at 0x8014D598.
  */
@@ -675,7 +675,7 @@ static void unblockAllAllocatedVoices(u32 vid) {
     }
 }
 
-u32 fn_8014ABE8(u16 id, u8 prio, u8 max, u8 key, u8 vol, u8 panning, u8 midi, u8 midiSet,
+u32 synthStartSound(u16 id, u8 prio, u8 max, u8 key, u8 vol, u8 panning, u8 midi, u8 midiSet,
                 u8 section, u16 step, u16 trackid, u8 vGroup, s16 prioOffset, u8 studio, u32 itd) {
     prio += prioOffset;
     prio = prio < 0 ? 0 : (prio > 0xff ? 0xff : prio);
@@ -788,7 +788,7 @@ void synthForceLowPrecisionUpdate(SYNTH_VOICE* svoice) {
     synthAddJob(svoice, 1, 0);
 }
 
-void fn_8014C07C(SYNTH_VOICE* svoice) { synthAddJob(svoice, 2, 0); }
+void synthKeyStateUpdate(SYNTH_VOICE* svoice) { synthAddJob(svoice, 2, 0); }
 
 u8 synthFXGetMaxVoices(u16 fid) {
     FX_TAB* fx;
@@ -798,7 +798,7 @@ u8 synthFXGetMaxVoices(u16 fid) {
     return 0;
 }
 
-u32 fn_8014C5E8(u16 fid, u8 vol, u8 pan, u8 studio, u32 itd) {
+u32 synthFXStart(u16 fid, u8 vol, u8 pan, u8 studio, u32 itd) {
     FX_TAB* fx;
     u32 v;
     v = 0xFFFFFFFF;
@@ -809,13 +809,13 @@ u32 fn_8014C5E8(u16 fid, u8 vol, u8 pan, u8 studio, u32 itd) {
         if (pan == 0xFF) {
             pan = fx->panning;
         }
-        v = fn_8014ABE8(fx->macro, fx->priority, fx->maxVoices, fx->key | 0x80, vol, pan, 0xFF,
+        v = synthStartSound(fx->macro, fx->priority, fx->maxVoices, fx->key | 0x80, vol, pan, 0xFF,
                         0xFF, 0, 0, 0xFF, fx->vGroup, 0, studio, itd);
     }
     return v;
 }
 
-u32 fn_8014C6B0(u32 vid, u8 ctrl, u8 value) {
+u32 synthFXSetCtrl(u32 vid, u8 ctrl, u8 value) {
     u32 i;
     u32 ret;
     ret = 0;
@@ -837,7 +837,7 @@ u32 fn_8014C6B0(u32 vid, u8 ctrl, u8 value) {
     return ret;
 }
 
-u32 fn_8014C794(u32 vid, u8 ctrl, u16 value) {
+u32 synthFXSetCtrl14(u32 vid, u8 ctrl, u16 value) {
     u32 i;
     u32 ret;
     ret = 0;
@@ -1167,7 +1167,7 @@ end:
     UpdateTimeMIDICtrl(sv);
 }
 
-void fn_8014B788(u32 i) {
+void ZeroOffsetHandler(u32 i) {
     SYNTH_VOICE* sv;
     u32 lowDeltaTime;
     u16 Modulation;
@@ -1364,7 +1364,7 @@ void synthHandle(u32 deltaTime) {
             nextJq = jq->next;
             jq->jobTabIndex = 0xff;
             if (!lbl_8047AF48[jq->voice].block) {
-                fn_8014B788(jq->voice);
+                ZeroOffsetHandler(jq->voice);
             }
             jq = nextJq;
         }
@@ -1422,7 +1422,7 @@ void synthHandle(u32 deltaTime) {
     lbl_8047AF58 += deltaTime;
 }
 
-u32 fn_8014CF30(u32 mesg, u32 voiceID) {
+u32 synthHWMessageHandler(u32 mesg, u32 voiceID) {
     u32 ret;
     ret = 0;
     switch (mesg) {
@@ -1544,5 +1544,5 @@ void synthInit(u32 mixFrq, u32 numVoices) {
     }
     lbl_8047AF19 = 0;
 
-    fn_8016248C((u32)fn_8014CF30);
+    fn_8016248C((u32)synthHWMessageHandler);
 }

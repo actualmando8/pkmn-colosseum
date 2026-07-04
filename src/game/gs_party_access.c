@@ -207,7 +207,7 @@ s32 fn_8000BB48(void) {
 #endif
 
 /* fn_8000BBEC - 0x8000BBEC | size: 0x6c */
-extern u32 fn_8012A5B0(u8* a, u32 b, u32 c);
+extern u32 heroGetStatus(u8* a, u32 b, u32 c);
 #if 0
 asm void fn_8000BBEC(void) {
 #include "src/game/gs_party_access_fn_8000BBEC.inc"
@@ -216,7 +216,7 @@ asm void fn_8000BBEC(void) {
 s32 fn_8000BBEC(void) {
     u32 val;
     if ((u8)fn_801EF63C() == 1) { return -1; }
-    val = fn_8012A5B0(NULL, 3, 5);
+    val = heroGetStatus(NULL, 3, 5);
     if (val == 0) { return -1; }
     return fn_800096B4(val, 0, 0, 0, 0, 0);
 }
@@ -231,7 +231,7 @@ asm void fn_8000BC58(void) {
 s32 fn_8000BC58(void) {
     u32 val;
     if ((u8)fn_801EF63C() == 1) { return -1; }
-    val = fn_8012A5B0(NULL, 3, 4);
+    val = heroGetStatus(NULL, 3, 4);
     if (val == 0) { return -1; }
     return fn_800096B4(val, 0, 0, 0, 0, 0);
 }
@@ -246,7 +246,7 @@ asm void fn_8000BCC4(void) {
 s32 fn_8000BCC4(void) {
     u32 val;
     if ((u8)fn_801EF63C() == 1) { return -1; }
-    val = fn_8012A5B0(NULL, 3, 3);
+    val = heroGetStatus(NULL, 3, 3);
     if (val == 0) { return -1; }
     return fn_800096B4(val, 0, 0, 0, 0, 0);
 }
@@ -261,7 +261,7 @@ asm void fn_8000BD30(void) {
 s32 fn_8000BD30(void) {
     u32 val;
     if ((u8)fn_801EF63C() == 1) { return -1; }
-    val = fn_8012A5B0(NULL, 3, 2);
+    val = heroGetStatus(NULL, 3, 2);
     if (val == 0) { return -1; }
     return fn_800096B4(val, 0, 0, 0, 0, 0);
 }
@@ -276,7 +276,7 @@ asm void fn_8000BD9C(void) {
 s32 fn_8000BD9C(void) {
     u32 val;
     if ((u8)fn_801EF63C() == 1) { return -1; }
-    val = fn_8012A5B0(NULL, 3, 1);
+    val = heroGetStatus(NULL, 3, 1);
     if (val == 0) { return -1; }
     return fn_800096B4(val, 0, 0, 0, 0, 0);
 }
@@ -291,7 +291,7 @@ asm void fn_8000BE08(void) {
 s32 fn_8000BE08(void) {
     u32 val;
     if ((u8)fn_801EF63C() == 1) { return -1; }
-    val = fn_8012A5B0(NULL, 3, 0);
+    val = heroGetStatus(NULL, 3, 0);
     if (val == 0) { return -1; }
     return fn_800096B4(val, 0, 0, 0, 0, 0);
 }
@@ -1193,9 +1193,9 @@ void testEvolution__Fv(void) {
     u32 val1, val2;
     GSpartyEvolutionArgs locals;
 
-    val1 = fn_8012A5B0(NULL, 3, 0);
+    val1 = heroGetStatus(NULL, 3, 0);
     if ((u8)fn_80123FBC(val1) == 0) { return; }
-    val2 = fn_8012A5B0(NULL, 3, 1);
+    val2 = heroGetStatus(NULL, 3, 1);
     if ((u8)fn_80123FBC(val2) == 0) { return; }
     fadeSet(3, lbl_8047B6E8);
     fadeCheck(1);

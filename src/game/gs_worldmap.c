@@ -229,7 +229,7 @@ s32 fn_8002641C(void* r3, u8* r4) {
 #endif
 
 /* fn_80026478 - 0x80026478 | size: 0xa4 */
-extern void* fn_8012A5B0(s32, s32, u32);
+extern void* heroGetStatus(s32, s32, u32);
 extern u8 fn_80123FBC(void);
 extern u8 fn_801231A4(void*);
 #if 0
@@ -250,7 +250,7 @@ s32 fn_80026478(void* r3, u8* r4) {
         r4[0x67] = 0;
         return 0;
     }
-    r31 = fn_8012A5B0(0, 3, (u16)*(u32*)((u8*)ctx + 0x20));
+    r31 = heroGetStatus(0, 3, (u16)*(u32*)((u8*)ctx + 0x20));
     if ((u8)fn_80123FBC() == 0) goto L_done;
     if ((u32)(fn_801231A4(r31) & 0xff) != 1) goto L_done;
     r30 = 0xff;
@@ -280,7 +280,7 @@ s32 fn_8002651C(void* r3, u8* r4) {
         r4[0x67] = 0;
         return 0;
     }
-    r31 = fn_8012A5B0(0, 3, (u16)*(u32*)((u8*)ctx + 0x20));
+    r31 = heroGetStatus(0, 3, (u16)*(u32*)((u8*)ctx + 0x20));
     if ((u8)fn_80123FBC() == 0) goto L_done2;
     if ((u32)(fn_801231A4(r31) & 0xff) != 0) goto L_done2;
     r30 = 0xff;
@@ -1952,7 +1952,7 @@ s32 fn_800278A4(void* r3) {
     r29 = (u8*)r3;
     r31 = *(void**)(r29 + 0x60);
     if (*(s32*)r31 == 2) {
-        r30 = fn_8012A5B0(0, 3, (u16)*(u32*)((u8*)r31 + 0x4));
+        r30 = heroGetStatus(0, 3, (u16)*(u32*)((u8*)r31 + 0x4));
         if ((fn_80123FBC() & 0xff) == 0) {
             r4 = fn_8011F5C8(r30);
         } else {
@@ -3268,7 +3268,7 @@ extern void fn_80109B90(void);
 extern void fadeSet(void);
 extern void fadeCheck(void);
 extern void fn_8010A420(void);
-extern void fn_8012A450(void);
+extern void heroSetStatus(void);
 extern void fn_8011DEE4(void);
 extern void fn_801349DC(void);
 extern void fn_800F9EE4(void);
@@ -3318,7 +3318,7 @@ void fn_80028FBC(void) {
 
     /* --- callees (minimal real signatures inferred from each bl site) --- */
     extern u32  fn_800FA280(u32 id);                       /* id -> resource ptr        */
-    extern u32  fn_8012A5B0(u8* ptr, u32 selector, u32 idx);
+    extern u32  heroGetStatus(u8* ptr, u32 selector, u32 idx);
     extern u32  fn_80123FBC(void);                         /* returns u8 status         */
     extern u32  fn_8011F4F0(u32 a);
     extern u32  fn_80134A98(s32 a, s32 b);
@@ -3344,7 +3344,7 @@ void fn_80028FBC(void) {
     extern void fn_80102510(s32 id);
     extern void menuCloseSync(s32 id, s32 a);
     extern s32  fn_800281F4(u8* ctx, void* nameBuf, s32 mode, s32 subIndex, s32 last);
-    extern void fn_8012A450(s32 a, s32 b, u8* ctx);
+    extern void heroSetStatus(s32 a, s32 b, u8* ctx);
     extern void fn_8011DEE4(u32 v, u8* ctx);
     extern void pcboxSetPokemonBoxName(s32 a, s32 name, u8* ctx);
     extern s32  GScharCmp(u8* ctx, void* nameBuf);
@@ -3390,7 +3390,7 @@ void fn_80028FBC(void) {
         sel = fn_800FA280(*(u32*)(data + 0xc));
         break;
     case 2:
-        r0 = (s32)fn_8012A5B0(0, 3, (u16)subIndex);
+        r0 = (s32)heroGetStatus(0, 3, (u16)subIndex);
         if ((fn_80123FBC() & 0xff) == 0) {
             sel = 0;
         } else {
@@ -3446,7 +3446,7 @@ void fn_80028FBC(void) {
         break;
     }
     case 2:
-        sel = fn_8012A5B0(0, 3, (u16)subIndex);
+        sel = heroGetStatus(0, 3, (u16)subIndex);
         if ((fn_80123FBC() & 0xff) != 0) {
             fn_80109C88(lbl_803A2094, sel);
         }
@@ -3552,10 +3552,10 @@ void fn_80028FBC(void) {
     case 0:
         break;
     case 1:
-        fn_8012A450(0, 0x17, lbl_803A2068);
+        heroSetStatus(0, 0x17, lbl_803A2068);
         break;
     case 2:
-        sel = fn_8012A5B0(0, 3, (u16)subIndex);
+        sel = heroGetStatus(0, 3, (u16)subIndex);
         if ((fn_80123FBC() & 0xff) != 0) {
             fn_8011DEE4(sel, lbl_803A2068);
         }
@@ -3611,7 +3611,7 @@ s32 fn_80029558(s32 r3, s32 r4) {
     if (r29 >= 4) goto _558_fail;
     goto _558_r30;
     _558_eq2:
-    fn_8012A5B0(0, 3, (u16)r30);
+    heroGetStatus(0, 3, (u16)r30);
     if ((u8)fn_80123FBC() == 0) r31 = 0;
     goto _558_done;
     _558_r30:
@@ -3677,7 +3677,7 @@ s32 fn_80029660(s32 r3, s32 r4) {
     if (r29 >= 4) goto _660_fail;
     goto _660_r30;
     _660_eq2:
-    fn_8012A5B0(0, 3, (u16)r30);
+    heroGetStatus(0, 3, (u16)r30);
     if ((u8)fn_80123FBC() == 0) r31 = 0;
     goto _660_done;
     _660_r30:
@@ -3728,7 +3728,7 @@ s32 fn_80029760(s32 r3, s32 r4) {
     if (r29 >= 4) goto _760_fail;
     goto _760_r30;
     _760_eq2:
-    fn_8012A5B0(0, 3, (u16)r30);
+    heroGetStatus(0, 3, (u16)r30);
     if ((u8)fn_80123FBC() == 0) r31 = 0;
     goto _760_done;
     _760_r30:
@@ -4425,7 +4425,7 @@ s32 fn_8002AB40(void* r3, u8* r4) {
 
     switch ((s32)(u32)ctx[0x1C]) {
     case 2:
-        value = (u32)fn_8012A5B0(0, 0xE, 0);
+        value = (u32)heroGetStatus(0, 0xE, 0);
         break;
     case 3:
         if (ctx + 0x20 != NULL) {
@@ -4435,7 +4435,7 @@ s32 fn_8002AB40(void* r3, u8* r4) {
         }
         break;
     default:
-        value = (u32)fn_8012A5B0(0, 0xE, 0);
+        value = (u32)heroGetStatus(0, 0xE, 0);
         break;
     }
 
@@ -4488,7 +4488,7 @@ s32 fn_8002ACB8(void* r3, u8* r4) {
     }
 
     if (ctx[0x1C] == 0 || ctx[0x1C] == 1) {
-        fn_80132A38(0x50, fn_8012A5B0(0, 0xC, 0));
+        fn_80132A38(0x50, heroGetStatus(0, 0xC, 0));
         text_id = 0x151;
         x = (s32)*(s16*)(r4 + 0x54) - (s32)(s16)(fn_800FA444(text_id) >> 16);
         fn_800FB680(x, 0, -1, text_id);
@@ -4497,7 +4497,7 @@ s32 fn_8002ACB8(void* r3, u8* r4) {
 
     switch ((s32)(u32)ctx[0x1C]) {
     case 2:
-        value = (u32)fn_8012A5B0(0, 0xD, 0);
+        value = (u32)heroGetStatus(0, 0xD, 0);
         break;
     case 3:
         if (ctx + 0x20 != NULL) {
@@ -4517,7 +4517,7 @@ s32 fn_8002ACB8(void* r3, u8* r4) {
         }
         break;
     default:
-        value = (u32)fn_8012A5B0(0, 0xD, 0);
+        value = (u32)heroGetStatus(0, 0xD, 0);
         break;
     }
 
@@ -5938,8 +5938,8 @@ void fn_8002C408(s32 mapIdx, u32 mode)
     extern void  fn_80142A88(void* buf, s32 v);            /* clear/init work buffer */
     extern s32   fn_80029CC0(u8* buf);                     /* scene callback 2 (mode 3 init) */
     extern u32   fn_80129280(u8* obj, u16 sel);            /* object/property accessor */
-    extern u32   fn_8012A5B0(u8* ptr, u32 selector, u32 idx); /* state/interaction getter */
-    extern void  fn_8012A450(u8* ptr, u32 selector, u32 value); /* state setter */
+    extern u32   heroGetStatus(u8* ptr, u32 selector, u32 idx); /* state/interaction getter */
+    extern void  heroSetStatus(u8* ptr, u32 selector, u32 value); /* state setter */
     extern void* itemDataBiosGetPtr(u16 speciesId);              /* select species/item entry */
     extern u32   itemDataBiosGetCoupon(void);                        /* read selected entry value (u16) */
     extern u16   itemBiosGetItemDataId(void* slot);                  /* item/species id at slot */
@@ -6071,7 +6071,7 @@ void fn_8002C408(s32 mapIdx, u32 mode)
             u32 snap = fn_80129280((u8*)0, 3);
             memcpy((void*)lbl_8047A3DC, (const void*)snap, 0x7198);
         }
-        lbl_8047A3D8 = fn_8012A5B0((u8*)0, 0xd, 0);
+        lbl_8047A3D8 = heroGetStatus((u8*)0, 0xd, 0);
         ok = 1;
     } else {
         ok = 1;
@@ -6083,7 +6083,7 @@ void fn_8002C408(s32 mapIdx, u32 mode)
     /* ===== Phase B: mode-4 affordability gate ===== */
     if ((mode & 0xff) == 4) {
         /* modeLow is provably 4 here -> available currency via interaction getter */
-        r15_have = (s32)fn_8012A5B0((u8*)0, 0xd, 0);
+        r15_have = (s32)heroGetStatus((u8*)0, 0xd, 0);
 
         /* min entry value across this location's list */
         listStart = (u16*)((u8*)lbl_80478E44 +
@@ -6162,7 +6162,7 @@ L_628:
     if (maxAfford > 0) {
         s32 have;
         /* modeLow is 4 in this loop; preserve the per-mode currency fetch */
-        have = (s32)fn_8012A5B0((u8*)0, 0xd, 0);
+        have = (s32)heroGetStatus((u8*)0, 0xd, 0);
         maxAfford = have / maxAfford;
         if (maxAfford > 0x63) maxAfford = 0x63;
     } else {
@@ -6291,7 +6291,7 @@ L_CB40:
             if (fn_801D0748(4, 2, 0) != 4) {
                 u32 snap = fn_80129280((u8*)0, 3);
                 memcpy((void*)lbl_8047A3DC, (const void*)snap, 0x7198);
-                fn_8012A450((u8*)0, 0xd, lbl_8047A3D8);
+                heroSetStatus((u8*)0, 0xd, lbl_8047A3D8);
             }
             r25 = 1;
             goto loop_test;
@@ -6405,7 +6405,7 @@ void fn_8002CE6C(u8* obj, u8 slot) {
     extern void fn_8002A2CC(u8* obj, s32 msgId, s32 arg2, ...); /* post format message */
     extern void _threadSwitch(void);                     /* GSthread yield */
     extern void fn_800D3088(void);                     /* GSgfx tick / frame advance */
-    extern u32  fn_8012A5B0(u8* ptr, u32 sel, u32 idx); /* interaction getter */
+    extern u32  heroGetStatus(u8* ptr, u32 sel, u32 idx); /* interaction getter */
     extern u32  fn_801046B8(void);                    /* get display context handle */
     extern s32 fn_801026A4(u32 sceneId, u32 a, u32 b, u32 c, u32 d, u32 e, ...); /* show menu dialog */
     extern void itemDataBiosGetPtr(u32 speciesId);            /* load species data */
@@ -6467,7 +6467,7 @@ _loop_top:
     /* 1. Open display engine, get nearest interaction partner, start message */
     fn_80102568(0x60, 0, 1);
     {
-        u32 nearest = fn_8012A5B0(NULL, 0xc, 0);
+        u32 nearest = heroGetStatus(NULL, 0xc, 0);
         fn_8002A2CC(obj, 0, 0x4b, (s32)nearest, -1);
     }
 
@@ -6601,7 +6601,7 @@ _loop_top:
 
         /* 7. Compute stock ratio and check >= 1 */
         if (trade_count > 0) {
-            u32 stock = fn_8012A5B0(NULL, 0xc, 0);
+            u32 stock = heroGetStatus(NULL, 0xc, 0);
             ratio = (s32)stock / trade_count;
             if (ratio > 0x63) ratio = 0x63;
         } else {
@@ -6698,7 +6698,7 @@ void fn_8002D154(s32 mapIndex, u8 colorIndex)
     extern u32  itemDataBiosGetKind(void);                                 /* item category   */
     extern u32  itemDataBiosGetPrice(void);                                 /* item price/value*/
     extern s8   fn_80129B2C(s32 a, s32 b);                         /* story/flag query*/
-    extern u32  fn_8012A5B0(u8* ptr, u32 selector, u32 idx);       /* money getter    */
+    extern u32  heroGetStatus(u8* ptr, u32 selector, u32 idx);       /* money getter    */
     extern u32  fn_801298B8(s32 a, u32 item);                      /* inventory count */
     extern void heroDecPokedoru(s32 a, s32 amount);                    /* spend money     */
     extern void fn_80129A78(s32 a, s32 item, u16 qty, s32 d);      /* add item        */
@@ -6814,7 +6814,7 @@ void fn_8002D154(s32 mapIndex, u8 colorIndex)
         itemDataBiosGetPtr(selectedItem);
         maxAffordable = (s32)(itemDataBiosGetPrice() & 0xffff);
         if (maxAffordable > 0) {
-            maxAffordable = (s32)fn_8012A5B0((u8*)0, 0xc, 0) / maxAffordable;
+            maxAffordable = (s32)heroGetStatus((u8*)0, 0xc, 0) / maxAffordable;
             if (maxAffordable > 0x63) {
                 maxAffordable = 0x63;
             }
@@ -6953,7 +6953,7 @@ void fn_8002D5D4(void)
     extern void fn_800E209C(u16);       /* GSmemFree */
     extern void fn_800FF660(void);
     extern void fn_8011288C(s32, u32);
-    extern u32  fn_8012A5B0(u8*, u32, u32);  /* GSmap_GetNearestLocation */
+    extern u32  heroGetStatus(u8*, u32, u32);  /* GSmap_GetNearestLocation */
     extern u32  fn_8002A0B8(u8*, s32, s32, s32, ...); /* GSmap_FormatText1 */
     extern void fn_8002A1C4(u8*, s32, s32, ...); /* GSmap_FormatText2 */
     extern void fn_8002A2CC(u8*, s32, s32, ...); /* GSmap_FormatText3 */
@@ -6982,7 +6982,7 @@ void fn_8002D5D4(void)
     if (npcState == 0) {
         /* --- path 0: initial location-name dialog (menu 0x62) --- */
         {
-            u32 nearLoc = fn_8012A5B0(NULL, 0xc, 0);
+            u32 nearLoc = heroGetStatus(NULL, 0xc, 0);
             /* format text: first_va = 0x4b, then nearLoc, then -1 */
             fmtTableVal = fn_8002A0B8(&fmtId, locIdx, 0, 0x4b, (s32)nearLoc, -1);
             fn_80106ADC(2, fmtTableVal, 1, 0, fmtId);
@@ -7138,7 +7138,7 @@ void fn_8002D91C(u32 arg0)
     extern void fn_801069FC(s32 p);                 /* yield / wait frame */
     extern void fn_80106ADC(s32 a, u32 b, s32 c, s32 d, u8 e); /* text display helper */
 
-    extern u32  fn_8012A5B0(u8 *ptr, u32 selector, u32 idx); /* interaction getter */
+    extern u32  heroGetStatus(u8 *ptr, u32 selector, u32 idx); /* interaction getter */
 
     /* format-text helpers (vararg: last s32 arg is -1 terminator) */
     extern u32  fn_8002A0B8(u8 *buf, s32 locIdx, s32 field, s32 p6, ...);
@@ -7172,7 +7172,7 @@ void fn_8002D91C(u32 arg0)
     s32 menu_res;   /* r29: raw menu query result, normalised to 0-3         */
     u8  text_buf0;  /* sp+8: first byte written by fn_80029FAC / fn_8002A0B8 */
     u8  text_buf1;  /* sp+9: first byte written by fn_8002A0B8               */
-    u32 interact;   /* r7 scratch for fn_8012A5B0 result                     */
+    u32 interact;   /* r7 scratch for heroGetStatus result                     */
 
     /* --------------------------------------------------------------------- */
     /* Save arg0 for this dialog session and clear the flag word that follows */
@@ -7189,7 +7189,7 @@ void fn_8002D91C(u32 arg0)
     if (type_byte == 0) {
 
         /* Fetch the interaction entry and format the first text line */
-        interact = fn_8012A5B0((u8 *)0, 0xc, 0);
+        interact = heroGetStatus((u8 *)0, 0xc, 0);
         {
             u32 text_entry = fn_8002A0B8(&text_buf1, (s32)arg0, 0, 0x4b,
                                          (s32)interact, (s32)-1);
@@ -7215,7 +7215,7 @@ void fn_8002D91C(u32 arg0)
             {
                 u32 text_entry = fn_8002A0B8(&text_buf1, (s32)arg0, 1, (s32)-1);
                 /* FUNCTIONAL-TODO: The va_arg terminator is -1 in r6; r7
-                 * coming from fn_8012A5B0 at entry is gone by this second
+                 * coming from heroGetStatus at entry is gone by this second
                  * call site -- the asm does NOT pass r7 here.             */
                 fn_80106ADC(2, text_entry, 1, 0, text_buf1);
             }
@@ -7460,8 +7460,8 @@ void fn_8002DD24(void *arg)
     extern u32 lbl_804788B0;  /* canonical; per-site reinterpret cast */
     extern u32 lbl_8047A42C;            /* worldmap state machine token */
 
-    /* Interaction getter: fn_8012A5B0(u8* base, u32 selector, u32 idx) */
-    extern void *fn_8012A5B0(u8 *ptr, u32 selector, u32 idx);
+    /* Interaction getter: heroGetStatus(u8* base, u32 selector, u32 idx) */
+    extern void *heroGetStatus(u8 *ptr, u32 selector, u32 idx);
 
     /* Message/dialog trigger:
        fn_80106D3C(s32 slot, s32 msgId, s32 p3, s32 p4)             */
@@ -7502,10 +7502,10 @@ void fn_8002DD24(void *arg)
     save_base = lbl_803A2518;
 
     /* Warm up the interaction table for slot-A (result not used here) */
-    fn_8012A5B0(NULL, 3, (u32)(u16)lbl_8047A424);
+    heroGetStatus(NULL, 3, (u32)(u16)lbl_8047A424);
 
     /* Get the Pokémon object for slot-B */
-    pkm_b = fn_8012A5B0(save_base + 0x170, 3, (u32)(u16)lbl_8047A420);
+    pkm_b = heroGetStatus(save_base + 0x170, 3, (u32)(u16)lbl_8047A420);
 
     did_action = 0;
     confirmed  = 0;
@@ -7668,8 +7668,8 @@ void fn_8002DF10(void)
     extern u32   lbl_8047A414;
     extern u32   lbl_8047A42C;
 
-    /* fn_8012A5B0 - interaction getter:  (u8* base, u32 mode, u16 idx) -> u8* NPC handle */
-    extern u8*  fn_8012A5B0(u8 *ptr, u32 selector, u32 idx);
+    /* heroGetStatus - interaction getter:  (u8* base, u32 mode, u16 idx) -> u8* NPC handle */
+    extern u8*  heroGetStatus(u8 *ptr, u32 selector, u32 idx);
     /* fn_80128A64 - get NPC key/type at location:
          (u8* world, u32 mode, u16 key, u16* key_out, u8* type_out) -> u32 npc_handle (0/0xffff=invalid) */
     extern u32  fn_80128A64(u8 *arg0, u32 arg1, u16 arg2, u16 *arg3, u8 *arg4);
@@ -7733,9 +7733,9 @@ void fn_8002DF10(void)
     need_update = 0;
 
     /* Check slot A (lbl_8047A424): get NPC handle at index 3 */
-    npc_a = fn_8012A5B0(NULL, 3, (u16)lbl_8047A424);
+    npc_a = heroGetStatus(NULL, 3, (u16)lbl_8047A424);
     /* Check slot B (lbl_8047A420): get NPC handle at index 3 from base+0x170 */
-    npc_b = fn_8012A5B0(base + 0x170, 3, (u16)lbl_8047A420);
+    npc_b = heroGetStatus(base + 0x170, 3, (u16)lbl_8047A420);
 
     /* Check slot A availability */
     npc_result = fn_80128A64(npc_a, 2, 0, &key_a, &type_a);
@@ -7809,10 +7809,10 @@ void fn_8002DF10(void)
     fadeCheck(1);
 
     /* Refresh NPC handles after encounter (slots may have changed) */
-    npc_b = fn_8012A5B0(NULL, 3, (u16)lbl_8047A424);          /* r30 */
+    npc_b = heroGetStatus(NULL, 3, (u16)lbl_8047A424);          /* r30 */
     /* FUNCTIONAL-TODO: asm re-uses r29 for slot-B after refresh */
     {
-        u8 *npc_b2 = fn_8012A5B0(base + 0x170, 3, (u16)lbl_8047A420); /* r29 */
+        u8 *npc_b2 = heroGetStatus(base + 0x170, 3, (u16)lbl_8047A420); /* r29 */
 
         menuModelInit(base + 0xd18, 0xe8, 0x11c);
         menuModelInit(base + 0xcd0, 0xe8, 0x11c);
@@ -7906,18 +7906,18 @@ void fn_8002E26C(void)
     extern void menuModelInit(void *widget, s32 x, s32 y);
     extern void fn_80109C88(void *widget, void *obj);
     extern void menuOpen(s32 id, s32 flag);
-    extern u32  fn_8012A5B0(u8 *ptr, u32 selector, u32 idx);
+    extern u32  heroGetStatus(u8 *ptr, u32 selector, u32 idx);
 
     u8  *base  = lbl_803A2518;
-    void *obj_a;   /* r30: result of first  fn_8012A5B0 */
-    void *obj_b;   /* r29: result of second fn_8012A5B0 */
+    void *obj_a;   /* r30: result of first  heroGetStatus */
+    void *obj_b;   /* r29: result of second heroGetStatus */
     u32   handle;  /* r3 after fn_80113F48              */
 
     /* --- Initialise interaction objects --- */
     fn_80124A60(base);
 
-    obj_a = (void *)fn_8012A5B0((u8 *)0, 3, (u16)lbl_8047A424);
-    obj_b = (void *)fn_8012A5B0(base + 0x170, 3, (u16)lbl_8047A420);
+    obj_a = (void *)heroGetStatus((u8 *)0, 3, (u16)lbl_8047A424);
+    obj_b = (void *)heroGetStatus(base + 0x170, 3, (u16)lbl_8047A420);
 
     /* Cross-link the three objects */
     fn_8011F5FC(base,  obj_b);
@@ -8029,7 +8029,7 @@ void fn_8002E460(void* mapCtx)
     extern u32 lbl_8047A410;  /* canonical; per-site reinterpret cast */
     extern f32 lbl_8047B9D0;            /* camera transition param (0.0f) */
 
-    extern u8*  fn_8012A5B0(void* obj, u32 selector, u32 idx);   /* interaction getter -> handle */
+    extern u8*  heroGetStatus(void* obj, u32 selector, u32 idx);   /* interaction getter -> handle */
     extern void menuModelInit(void* widget, s32 a, s32 b);         /* list-widget init */
     extern void fn_80109C88(void* widget, void* item);          /* bind item to widget */
     extern void fn_8010A420(void* widget);                      /* destroy widget */
@@ -8065,8 +8065,8 @@ void fn_8002E460(void* mapCtx)
     static const s32 idsA[5] = { 0x11A8, 0x0F9B, 0x0F9A, 0x0FA3, 0x0FA5 };
     static const s32 idsB[5] = { 0x11A9, 0x0F99, 0x0F98, 0x0FA4, 0x0FA6 };
 
-    handleA = fn_8012A5B0((void*)0, 3, lbl_8047A424 & 0xFFFF);
-    handleB = fn_8012A5B0(state + 0x170, 3, lbl_8047A420 & 0xFFFF);
+    handleA = heroGetStatus((void*)0, 3, lbl_8047A424 & 0xFFFF);
+    handleB = heroGetStatus(state + 0x170, 3, lbl_8047A420 & 0xFFFF);
 
     menuModelInit(state + 0xD18, 0xE4, 0x8F);
     menuModelInit(state + 0xCD0, 0xE4, 0x8F);
@@ -8284,7 +8284,7 @@ void fn_8002EA5C(void)
     extern f32 lbl_8047B9D0;     /* frame-wait limit, transition loop */
 
     /* cross-TU callees (block-scope typed externs, TU convention) */
-    extern u32  fn_8012A5B0(u8* ptr, u32 selector, u32 idx);   /* interaction getter   */
+    extern u32  heroGetStatus(u8* ptr, u32 selector, u32 idx);   /* interaction getter   */
     extern u16  fn_8011F1A0(u8* ptr);                          /* map availability     */
     extern void itemDataBiosGetPtr(void);                             /* effect/handle helper */
     extern u8   itemDataBiosCheckImportable(void);                             /* gate result          */
@@ -8320,7 +8320,7 @@ void fn_8002EA5C(void)
     u8   found;
 
     mapId  = lbl_8047A428;
-    mapRef = (u8*)(u32)fn_8012A5B0(lbl_803A2688, 3, (u16)mapId);
+    mapRef = (u8*)(u32)heroGetStatus(lbl_803A2688, 3, (u16)mapId);
 
     if ((u16)fn_8011F1A0((u8*)mapRef) != 0) {
         itemDataBiosGetPtr();
@@ -8479,7 +8479,7 @@ asm void fn_8002EE74(void) {
 void fn_8002EE74(void)
 {
     /* --- cross-TU callee decls (block-scope, TU convention) --- */
-    extern u32   fn_8012A5B0(u8* ptr, u32 selector, u32 idx);   /* interaction getter */
+    extern u32   heroGetStatus(u8* ptr, u32 selector, u32 idx);   /* interaction getter */
     extern void  fn_801021F8(void* p, u32 val);                 /* enable/disable node subtree */
     extern u8    fn_80123FBC(void* obj);
     extern u8    menuCBRule_CheckPokemonEventFlag(void* obj);
@@ -8516,7 +8516,7 @@ void fn_8002EE74(void)
     void* child;
     f32   acc;
 
-    obj = (void*)fn_8012A5B0(lbl_803A2688, 3, (u16)lbl_8047A428);
+    obj = (void*)heroGetStatus(lbl_803A2688, 3, (u16)lbl_8047A428);
     fn_801021F8((void*)0xd9, 0);
 
     if (fn_80123FBC(obj) != 0 &&
@@ -9155,7 +9155,7 @@ asm void fn_8002F79C(void) {
 void fn_8002F79C(void) {
     /* ---- cross-TU callees (block-scope typed externs, TU convention) ---- */
     extern u8*  fn_80129280(s32 side, s32 slotType);      /* get party/group handle */
-    extern u32  fn_8012A5B0(u8* ptr, u32 selector, u32 idx); /* interaction getter */
+    extern u32  heroGetStatus(u8* ptr, u32 selector, u32 idx); /* interaction getter */
     extern u16  fn_8011F1A0(u8* obj);                     /* read interaction field */
     extern u8   itemDataBiosGetPtr(u16 handle);                  /* effect/UI helper */
     extern u8   itemDataBiosCheckExportable(void);                        /* arrival-ready query */
@@ -9199,7 +9199,7 @@ void fn_8002F79C(void) {
     u8  foundWild;
 
     party = fn_80129280(0, 2);
-    interact = (u8*)fn_8012A5B0(0, 3, (u16)lbl_8047A428);
+    interact = (u8*)heroGetStatus(0, 3, (u16)lbl_8047A428);
 
     field = fn_8011F1A0(interact);
     if (field != 0) {

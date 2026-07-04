@@ -474,13 +474,13 @@ typedef struct JObjVec {
 } JObjVec;
 
 extern f32 sqrtf(f32 x);
-extern f64 fn_800CE298(f64 x);
-extern f32 fn_800A3B7C(JObjVec* a, JObjVec* b);
-extern void fn_800A3AC0(JObjVec* src, JObjVec* dst, f32 scale);
-extern void fn_800A3A78(JObjVec* a, JObjVec* b, JObjVec* dst);
-extern void fn_800A3A9C(JObjVec* a, JObjVec* b, JObjVec* dst);
+extern f64 acos(f64 x);
+extern f32 PSVECDotProduct(JObjVec* a, JObjVec* b);
+extern void PSVECScale(JObjVec* src, JObjVec* dst, f32 scale);
+extern void PSVECAdd(JObjVec* a, JObjVec* b, JObjVec* dst);
+extern void PSVECSubtract(JObjVec* a, JObjVec* b, JObjVec* dst);
 extern void PSVECCrossProduct(JObjVec* a, JObjVec* b, JObjVec* dst);
-extern void fn_800A3244(f32 mtx[3][4], JObjVec* axis, f32 angle);
+extern void PSMTXRotAxisRad(f32 mtx[3][4], JObjVec* axis, f32 angle);
 extern void PSMTXMultVec(f32 mtx[3][4], JObjVec* src, JObjVec* dst);
 extern HSD_RObj* HSD_RObjGetByType(HSD_RObj* robj, u32 type, u32 subtype);
 extern void fn_801AED88(HSD_RObj* robj, HSD_JObj* jobj,
@@ -556,9 +556,9 @@ static void JObjVec_Normalize(JObjVec* src, JObjVec* dst)
     f32 dot;
     f32 scale;
 
-    dot = fn_800A3B7C(src, src);
+    dot = PSVECDotProduct(src, src);
     scale = JObj_InvSqrt(1.0e-10f + dot);
-    fn_800A3AC0(src, dst, scale);
+    PSVECScale(src, dst, scale);
 }
 
 static HSD_JObj* JObj_FindEffectType(HSD_JObj* jobj, u32 type)
@@ -797,10 +797,10 @@ void resolveIKJoint2(HSD_JObj* jobj) {
         return;
     }
 
-    fn_800A3AC0(&parent_x, &parent_x, hint->u.ik_hint.bone_length * x_scale);
-    fn_800A3A78(&parent_pos, &parent_x, &joint_pos);
+    PSVECScale(&parent_x, &parent_x, hint->u.ik_hint.bone_length * x_scale);
+    PSVECAdd(&parent_pos, &parent_x, &joint_pos);
     JObjVec_LoadTranslate(effector, &target_dir);
-    fn_800A3A9C(&target_dir, &joint_pos, &target_dir);
+    PSVECSubtract(&target_dir, &joint_pos, &target_dir);
     JObjVec_Normalize(&target_dir, &target_dir);
 
     min_limit = HSD_RObjGetByType(jobj->robj, REFTYPE_LIMIT, 5);
@@ -815,13 +815,13 @@ void resolveIKJoint2(HSD_JObj* jobj) {
         flip = (hint->flags & 4) != 0;
         JObjMtx_LoadColumn(parent, 0, &parent_x);
         JObjVec_Normalize(&parent_x, &parent_x);
-        dot = fn_800A3B7C(&parent_x, &target_dir);
+        dot = PSVECDotProduct(&parent_x, &target_dir);
         if (dot >= 1.0f) {
             angle = 0.0f;
         } else if (dot <= -1.0f) {
             angle = 3.1415927f;
         } else {
-            angle = (f32) fn_800CE298(dot);
+            angle = (f32) acos(dot);
         }
         if (!flip) {
             angle = -angle;
@@ -835,7 +835,7 @@ void resolveIKJoint2(HSD_JObj* jobj) {
         }
         if (clamped != 0) {
             JObjMtx_LoadColumn(parent, 2, &parent_z);
-            fn_800A3244(rot_mtx, &parent_z, angle);
+            PSMTXRotAxisRad(rot_mtx, &parent_z, angle);
             PSMTXMultVec(rot_mtx, &parent_x, &target_dir);
         }
     }
@@ -958,8 +958,8 @@ void resolveIKJoint1(HSD_JObj* jobj) {
     effector->translate_x = target.x;
     effector->translate_y = target.y;
     effector->translate_z = target.z;
-    fn_800A3A9C(&target, &origin, &target_dir);
-    dist_sq = fn_800A3B7C(&target_dir, &target_dir);
+    PSVECSubtract(&target, &origin, &target_dir);
+    dist_sq = PSVECDotProduct(&target_dir, &target_dir);
     first_sq = first_len * first_len;
     second_sq = second_len * second_len;
     height_sq = 0.0f;
@@ -968,9 +968,9 @@ void resolveIKJoint1(HSD_JObj* jobj) {
     if (dist_sq > 1.0e-8f) {
         target = target_dir;
         if (fn_801AFCAC(jobj->robj, 3, &pole_hint) != 0) {
-            fn_800A3A9C(&pole_hint, &origin, &pole_hint);
+            PSVECSubtract(&pole_hint, &origin, &pole_hint);
             if (rotate_x != 0.0f) {
-                fn_800A3244(rot_mtx, &target, rotate_x);
+                PSMTXRotAxisRad(rot_mtx, &target, rotate_x);
                 PSMTXMultVec(rot_mtx, &pole_hint, &pole_hint);
             }
             PSVECCrossProduct(&target, &pole_hint, &normal_axis);
@@ -1002,14 +1002,14 @@ void resolveIKJoint1(HSD_JObj* jobj) {
         height_len = -height_len;
     }
     if ((second_sq - height_sq) < dist_sq) {
-        fn_800A3AC0(&target_dir, &tmp, axial_len);
+        PSVECScale(&target_dir, &tmp, axial_len);
     } else {
-        fn_800A3AC0(&target_dir, &tmp, -axial_len);
+        PSVECScale(&target_dir, &tmp, -axial_len);
     }
-    fn_800A3AC0(&bend_axis, &pole, height_len);
-    fn_800A3A78(&tmp, &pole, &tmp);
-    norm_scale = JObj_InvSqrt(1.0e-10f + fn_800A3B7C(&tmp, &tmp));
-    fn_800A3AC0(&tmp, &tmp, norm_scale);
+    PSVECScale(&bend_axis, &pole, height_len);
+    PSVECAdd(&tmp, &pole, &tmp);
+    norm_scale = JObj_InvSqrt(1.0e-10f + PSVECDotProduct(&tmp, &tmp));
+    PSVECScale(&tmp, &tmp, norm_scale);
 
     JObjMtx_StoreScaledColumn(jobj, 0, &tmp, scale.x);
     PSVECCrossProduct(&normal_axis, &tmp, &column);

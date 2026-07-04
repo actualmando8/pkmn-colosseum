@@ -677,8 +677,8 @@ found_entry:
 }
 
 /* 0x8018D680 | 0x150 */
-extern void fn_800CE2D8(void);
-extern f64 fn_800CE318(f64 angle);
+extern void atan2(void);
+extern f64 fmod(f64 angle);
 extern void fn_800E0718(void);
 extern void fn_800DFEEC(void);
 extern void fn_800E0040(void);
@@ -732,8 +732,8 @@ extern void fn_8011163C(void);
 extern void fn_8012BAF0(void);
 extern void fn_8010FDF8(void);
 extern void fn_8010F320(void);
-extern void fn_800A3A9C(void);
-extern void fn_800A3A78(void);
+extern void PSVECSubtract(void);
+extern void PSVECAdd(void);
 extern void fn_801101B4(void);
 extern void fn_8010E138(void);
 extern u32 lbl_8047D890;
@@ -1855,9 +1855,9 @@ loop3:
 
 found_entry:
     if (entry != NULL) {
-        vec[0] = (f32)fn_800CE318(lbl_8047D7F0 + vec[0]);
-        vec[1] = (f32)fn_800CE318(lbl_8047D7F0 + vec[1]);
-        vec[2] = (f32)fn_800CE318(lbl_8047D7F0 + vec[2]);
+        vec[0] = (f32)fmod(lbl_8047D7F0 + vec[0]);
+        vec[1] = (f32)fmod(lbl_8047D7F0 + vec[1]);
+        vec[2] = (f32)fmod(lbl_8047D7F0 + vec[2]);
         fn_8018FC08(entry, vec);
         *(f32*)&entry->field_40 = vec[1];
     }

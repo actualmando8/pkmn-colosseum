@@ -996,11 +996,11 @@ void HSD_CObjSetFov(HSD_CObj* cobj, f32 val)
 #pragma optimization_level 2
 #pragma optimizewithasm off
 extern void OSReport(const char* fmt, ...);
-extern void fn_800A3244(void);
+extern void PSMTXRotAxisRad(void);
 extern void fn_800A3820(void);
-extern void fn_800A3A9C(void*, void*, void*);
+extern void PSVECSubtract(void*, void*, void*);
 extern void fn_800A3ADC(void);
-extern void fn_800CE59C(void);
+extern void fabs(void);
 extern void fn_800CE718(void);
 extern int vec_normalize_check(f32*, void*);   /* wrk8: real sig (was `void (void)`) */
 extern void HSD_CObjSetMtxDirty(HSD_CObj*);
@@ -1062,11 +1062,11 @@ void fn_801947C8(HSD_CObj* cobj, f32 roll)
         } else {
             HSD_CObjGetEyePosition(cobj, eye);
             HSD_CObjGetInterest(cobj, interest);
-            fn_800A3A9C(interest, eye, dir);                 /* dir = interest - eye */
+            PSVECSubtract(interest, eye, dir);                 /* dir = interest - eye */
             ok = (((int (*)(f32*, f32*)) vec_normalize_check)(dir, dir) == 0); /* normalize + guard */
         }
         if (ok) {
-            f32 absy = ((f32 (*)(f32)) fn_800CE59C)(dir[1]); /* fabsf */
+            f32 absy = ((f32 (*)(f32)) fabs)(dir[1]); /* fabsf */
             if (1.0f - absy >= 1e-4f /* near-1 eps - INFERRED */) {
                 f32 q = dir[0] * dir[0] + dir[2] * dir[2];
                 f32 len = (q > 0.0f) ? sqrtf(q) : lbl_80478AC0;
@@ -1082,7 +1082,7 @@ void fn_801947C8(HSD_CObj* cobj, f32 roll)
                 perp[1] = dir[1] * s;
                 perp[2] = dir[2] * s;
             }
-            ((void (*)(f32*, f32*, f32)) fn_800A3244)(&mtx[0][0], dir, -roll);
+            ((void (*)(f32*, f32*, f32)) PSMTXRotAxisRad)(&mtx[0][0], dir, -roll);
             ((void (*)(f32*, f32*, f32*)) fn_800A3820)(&mtx[0][0], perp, rotated);
             ((void (*)(f32*, f32*)) fn_800A3ADC)(rotated, newup); /* newup = normalized up */
         }
@@ -1094,9 +1094,9 @@ void fn_801947C8(HSD_CObj* cobj, f32 roll)
     }
     if (cobj->flags & 1) {
         int ok;
-        if (((f32 (*)(f32)) fn_800CE59C)(newup[0]) <= eps &&
-            ((f32 (*)(f32)) fn_800CE59C)(newup[1]) <= eps &&
-            ((f32 (*)(f32)) fn_800CE59C)(newup[2]) <= eps) {
+        if (((f32 (*)(f32)) fabs)(newup[0]) <= eps &&
+            ((f32 (*)(f32)) fabs)(newup[1]) <= eps &&
+            ((f32 (*)(f32)) fabs)(newup[2]) <= eps) {
             ok = -1; /* degenerate up-vector */
         } else {
             ((void (*)(f32*, f32*)) fn_800A3ADC)(newup, normup); /* normalize -> normup */
@@ -1254,13 +1254,13 @@ void HSD_CObjSetMtxDirty(HSD_CObj* ptr) { *(u32*)((u8*) ptr + 0x8) |= 0xC0000000
 #pragma optimization_level 3
 #pragma optimizewithasm off
 extern void OSReport(const char* fmt, ...);
-extern void fn_800A3244(void);
+extern void PSMTXRotAxisRad(void);
 extern void fn_800A3458(void);
 extern void fn_800A3820(void);
-extern void fn_800A3A9C(void*, void*, void*);
+extern void PSVECSubtract(void*, void*, void*);
 extern void fn_800A3ADC(void);
-extern f32 fn_800A3B7C();
-extern f64 fn_800CE2D8();
+extern f32 PSVECDotProduct();
+extern f64 atan2();
 extern void fn_80191688(HSD_WObj*, void*);
 extern void __assert(const char*, u32, const char*);
 #if 0
@@ -1340,7 +1340,7 @@ void fn_80194DA4(HSD_CObj* cobj, f32* up)
             if (cobj == NULL) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
             if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
             fn_80191688(cobj->interest, interest);
-            fn_800A3A9C(interest, eye, dir);
+            PSVECSubtract(interest, eye, dir);
             if ((dir[0] < 0.0f ? -dir[0] : dir[0]) <= epsilon &&
                 (dir[1] < 0.0f ? -dir[1] : dir[1]) <= epsilon &&
                 (dir[2] < 0.0f ? -dir[2] : dir[2]) <= epsilon) {
@@ -1353,7 +1353,7 @@ void fn_80194DA4(HSD_CObj* cobj, f32* up)
         if (!ok) {
             roll = 0.0f;
         } else {
-            f32 dot = ((f32 (*)(f32*, f32*)) fn_800A3B7C)(up, dir);
+            f32 dot = ((f32 (*)(f32*, f32*)) PSVECDotProduct)(up, dir);
             f32 absdot = dot < 0.0f ? -dot : dot;
             if (1.0f - absdot < epsilon) {
                 roll = 0.0f; /* up nearly parallel to dir: unusable */
@@ -1363,7 +1363,7 @@ void fn_80194DA4(HSD_CObj* cobj, f32* up)
                 if (out[1] == 0.0f) {
                     roll = (-out[0] >= 0.0f) ? 1.5707964f : -1.5707964f; /* +/-PI/2 */
                 } else {
-                    roll = ((f32 (*)(f32, f32)) fn_800CE2D8)(-out[0], out[1]);
+                    roll = ((f32 (*)(f32, f32)) atan2)(-out[0], out[1]);
                 }
             }
         }
@@ -1410,7 +1410,7 @@ int HSD_CObjGetUpVector(HSD_CObj* cobj, f32* up)
 #pragma optimization_level 2
 #pragma optimizewithasm off
 extern void fn_800A3820(void);
-extern void fn_800A3A9C(void*, void*, void*);
+extern void PSVECSubtract(void*, void*, void*);
 extern void fn_800A3ADC(void);
 #if 0
 asm void roll2upvec(void) {
@@ -1450,7 +1450,7 @@ int roll2upvec(HSD_CObj* cobj, f32 roll, f32* out)
         if (cobj == NULL) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
         if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
         fn_80191688(cobj->interest, interest);
-        fn_800A3A9C(interest, eye, dir);   /* dir = interest - eye */
+        PSVECSubtract(interest, eye, dir);   /* dir = interest - eye */
         if ((dir[0] < 0.0f ? -dir[0] : dir[0]) <= eps &&
             (dir[1] < 0.0f ? -dir[1] : dir[1]) <= eps &&
             (dir[2] < 0.0f ? -dir[2] : dir[2]) <= eps) {
@@ -1484,7 +1484,7 @@ int roll2upvec(HSD_CObj* cobj, f32 roll, f32* out)
         perp[2] = dir[2] * s;
     }
 
-    ((void (*)(f32*, f32*, f32)) fn_800A3244)(&mtx[0][0], dir, -roll); /* rot about dir by -roll */
+    ((void (*)(f32*, f32*, f32)) PSMTXRotAxisRad)(&mtx[0][0], dir, -roll); /* rot about dir by -roll */
     ((void (*)(f32*, f32*, f32*)) fn_800A3820)(&mtx[0][0], perp, rotated);
     ((void (*)(f32*, f32*)) fn_800A3ADC)(rotated, out); /* normalize -> out */
     return 1;
@@ -1499,11 +1499,11 @@ int roll2upvec(HSD_CObj* cobj, f32 roll, f32* out)
 extern f32 fn_800A3B38(void*);
 extern void __assert(const char*, u32, const char*);
 extern void fn_80191688(HSD_WObj*, void*);
-extern void fn_800A3A9C(void*, void*, void*);
+extern void PSVECSubtract(void*, void*, void*);
 extern void fn_800A3ADC();
 extern void fn_800A3820();
-extern f32 fn_800A3B7C();
-extern f64 fn_800CE2D8();
+extern f32 PSVECDotProduct();
+extern f64 atan2();
 extern f32 lbl_8047D978;
 extern f32 lbl_8047D9B0;
 extern f32 lbl_8047D9B4;
@@ -1541,7 +1541,7 @@ f32 upvec2roll(HSD_CObj* cobj, f32* arg) {
         if (cobj == NULL) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
         if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
         fn_80191688(cobj->interest, interest);
-        fn_800A3A9C(interest, eye, dir);
+        PSVECSubtract(interest, eye, dir);
         if (__fabs(dir[0]) <= lbl_80478AC8 &&
             __fabs(dir[1]) <= lbl_80478AC8 &&
             __fabs(dir[2]) <= lbl_80478AC8) {
@@ -1557,7 +1557,7 @@ f32 upvec2roll(HSD_CObj* cobj, f32* arg) {
     }
     {
         f32 dot;
-        dot = fn_800A3B7C(arg, dir);
+        dot = PSVECDotProduct(arg, dir);
         dot = __fabs(dot);
         if (lbl_8047D9B0 - dot < lbl_80478AC8) {
             return lbl_8047D978; /* dir nearly parallel to arg: unusable */
@@ -1576,7 +1576,7 @@ f32 upvec2roll(HSD_CObj* cobj, f32* arg) {
         if (lbl_8047D978 == y) {
             return (neg_x >= lbl_8047D978) ? lbl_8047D9B4 : lbl_8047D9B8;
         }
-        return (f32) fn_800CE2D8(neg_x, y);
+        return (f32) atan2(neg_x, y);
     }
 }
 #endif
@@ -1623,7 +1623,7 @@ f32 HSD_CObjGetEyeDistance(HSD_CObj* cobj) {
         __assert(&lbl_8047D958, 0x2D0, &lbl_8047D960);
     }
     fn_80191688(cobj->interest, interest);
-    fn_800A3A9C(interest, eye, diff);
+    PSVECSubtract(interest, eye, diff);
     return fn_800A3B38(diff);
 }
 #endif

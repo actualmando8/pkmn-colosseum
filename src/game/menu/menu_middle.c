@@ -34,7 +34,7 @@ extern void fn_80077DB8();
 extern void menuCBRule_ConstantRule();
 extern void fn_80088EA8();
 extern void sprintf();
-extern void fn_800CE318();
+extern void fmod();
 extern void fn_800D5648();
 extern void fn_800D5BA0();
 extern void fn_800D61E4();
@@ -7302,7 +7302,7 @@ void fn_8006FEE4(void) {
             f0 = f1 + f0;
             *(f32*)((u8*)r31 + 0x70) = f0;
             f1 = *(f32*)((u8*)r31 + 0x70);
-            ((void(*)(void))fn_800CE318)();
+            ((void(*)(void))fmod)();
             f0 = (f32)f1;
             *(f32*)((u8*)r31 + 0x70) = f0;
         } else {
@@ -7320,7 +7320,7 @@ void fn_8006FEE4(void) {
             }
             f1 = *(f32*)((u8*)r31 + 0x70);
             f2 = *(f64*)&lbl_8047C080;
-            ((void(*)(void))fn_800CE318)();
+            ((void(*)(void))fmod)();
             f0 = (f32)f1;
             *(f32*)((u8*)r31 + 0x70) = f0;
         }

@@ -1588,7 +1588,7 @@
 "name": "fn_80011288",
 "addr": "0x80011288",
 "size": 540,
-"label": "fight",
+"label": "gs-engine",
 "confidence": 1.9,
 "seed": null
 },
@@ -1596,7 +1596,7 @@
 "name": "fn_800114A4",
 "addr": "0x800114A4",
 "size": 604,
-"label": "fight",
+"label": "gs-engine",
 "confidence": 1.9,
 "seed": null
 },
@@ -12785,7 +12785,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800A3074",
+"name": "PSMTXRotRad",
 "addr": "0x800A3074",
 "size": 112,
 "label": "dolphin-sdk",
@@ -12809,7 +12809,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800A3244",
+"name": "PSMTXRotAxisRad",
 "addr": "0x800A3244",
 "size": 112,
 "label": "dolphin-sdk",
@@ -12929,7 +12929,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800A3A78",
+"name": "PSVECAdd",
 "addr": "0x800A3A78",
 "size": 36,
 "label": "dolphin-sdk",
@@ -12937,7 +12937,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800A3A9C",
+"name": "PSVECSubtract",
 "addr": "0x800A3A9C",
 "size": 36,
 "label": "dolphin-sdk",
@@ -12945,7 +12945,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800A3AC0",
+"name": "PSVECScale",
 "addr": "0x800A3AC0",
 "size": 28,
 "label": "dolphin-sdk",
@@ -12961,7 +12961,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800A3B20",
+"name": "PSVECSquareMag",
 "addr": "0x800A3B20",
 "size": 24,
 "label": "dolphin-sdk",
@@ -12977,7 +12977,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800A3B7C",
+"name": "PSVECDotProduct",
 "addr": "0x800A3B7C",
 "size": 32,
 "label": "dolphin-sdk",
@@ -13217,7 +13217,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800A50E4",
+"name": "DVDClose",
 "addr": "0x800A50E4",
 "size": 36,
 "label": "dolphin-sdk",
@@ -13249,7 +13249,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800A53EC",
+"name": "cbForReadAsync",
 "addr": "0x800A53EC",
 "size": 48,
 "label": "dolphin-sdk",
@@ -13265,7 +13265,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800A5534",
+"name": "cbForReadSync",
 "addr": "0x800A5534",
 "size": 36,
 "label": "dolphin-sdk",
@@ -13281,7 +13281,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800A55F0",
+"name": "cbForSeekAsync",
 "addr": "0x800A55F0",
 "size": 48,
 "label": "dolphin-sdk",
@@ -13289,7 +13289,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800A5620",
+"name": "defaultOptionalCommandChecker",
 "addr": "0x800A5620",
 "size": 4,
 "label": "dolphin-sdk",
@@ -17169,7 +17169,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800C1548",
+"name": "TRKTargetGetPC",
 "addr": "0x800C1548",
 "size": 16,
 "label": "dolphin-sdk",
@@ -17281,36 +17281,36 @@
 "seed": "prefix"
 },
 {
-"name": "fn_800C29F0",
+"name": "TRKAccessFile",
 "addr": "0x800C29F0",
 "size": 8,
 "label": "trk",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_800C29F8",
+"name": "TRKOpenFile",
 "addr": "0x800C29F8",
 "size": 8,
 "label": "trk",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_800C2A00",
+"name": "TRKCloseFile",
 "addr": "0x800C2A00",
 "size": 8,
 "label": "trk",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_800C2A08",
+"name": "TRKPositionFile",
 "addr": "0x800C2A08",
 "size": 8,
 "label": "trk",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "TRKSaveExtended1Block",
@@ -18609,7 +18609,7 @@
 "seed": null
 },
 {
-"name": "fn_800CE298",
+"name": "acos",
 "addr": "0x800CE298",
 "size": 32,
 "label": "hsd",
@@ -18617,7 +18617,7 @@
 "seed": null
 },
 {
-"name": "fn_800CE2B8",
+"name": "asin",
 "addr": "0x800CE2B8",
 "size": 32,
 "label": "hsd",
@@ -18625,7 +18625,7 @@
 "seed": null
 },
 {
-"name": "fn_800CE2D8",
+"name": "atan2",
 "addr": "0x800CE2D8",
 "size": 32,
 "label": "gs-engine",
@@ -18633,7 +18633,7 @@
 "seed": null
 },
 {
-"name": "fn_800CE2F8",
+"name": "exp",
 "addr": "0x800CE2F8",
 "size": 32,
 "label": "gs-engine",
@@ -18641,7 +18641,7 @@
 "seed": null
 },
 {
-"name": "fn_800CE318",
+"name": "fmod",
 "addr": "0x800CE318",
 "size": 32,
 "label": "people",
@@ -18649,7 +18649,7 @@
 "seed": null
 },
 {
-"name": "fn_800CE338",
+"name": "log",
 "addr": "0x800CE338",
 "size": 32,
 "label": "libm",
@@ -18657,7 +18657,7 @@
 "seed": null
 },
 {
-"name": "fn_800CE358",
+"name": "pow",
 "addr": "0x800CE358",
 "size": 32,
 "label": "libm",
@@ -18673,23 +18673,23 @@
 "seed": "prefix"
 },
 {
-"name": "fn_800CE59C",
+"name": "fabs",
 "addr": "0x800CE59C",
 "size": 8,
 "label": "libm",
-"confidence": 1.0,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "sqrtf",
 "addr": "0x800CE5A4",
 "size": 228,
-"label": "dolphin-sdk",
-"confidence": 0.95,
+"label": "libm",
+"confidence": 1.0,
 "seed": null
 },
 {
-"name": "fn_800CE688",
+"name": "tanf",
 "addr": "0x800CE688",
 "size": 36,
 "label": "dolphin-sdk",
@@ -18697,7 +18697,7 @@
 "seed": null
 },
 {
-"name": "fn_800CE6AC",
+"name": "sinf",
 "addr": "0x800CE6AC",
 "size": 36,
 "label": "dolphin-sdk",
@@ -18705,7 +18705,7 @@
 "seed": null
 },
 {
-"name": "fn_800CE6D0",
+"name": "cosf",
 "addr": "0x800CE6D0",
 "size": 36,
 "label": "dolphin-sdk",
@@ -18713,7 +18713,7 @@
 "seed": null
 },
 {
-"name": "fn_800CE6F4",
+"name": "acosf",
 "addr": "0x800CE6F4",
 "size": 36,
 "label": "dolphin-sdk",
@@ -18729,7 +18729,7 @@
 "seed": null
 },
 {
-"name": "fn_800CE77C",
+"name": "sqrt",
 "addr": "0x800CE77C",
 "size": 32,
 "label": "libm",
@@ -32217,7 +32217,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A450",
+"name": "heroSetStatus",
 "addr": "0x8012A450",
 "size": 352,
 "label": "field",
@@ -32225,7 +32225,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A5B0",
+"name": "heroGetStatus",
 "addr": "0x8012A5B0",
 "size": 452,
 "label": "field",
@@ -36457,7 +36457,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8014ABE8",
+"name": "synthStartSound",
 "addr": "0x8014ABE8",
 "size": 1116,
 "label": "musyx",
@@ -36473,7 +36473,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8014B788",
+"name": "ZeroOffsetHandler",
 "addr": "0x8014B788",
 "size": 1788,
 "label": "musyx",
@@ -36505,7 +36505,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8014C07C",
+"name": "synthKeyStateUpdate",
 "addr": "0x8014C07C",
 "size": 40,
 "label": "musyx",
@@ -36529,7 +36529,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8014C5E8",
+"name": "synthFXStart",
 "addr": "0x8014C5E8",
 "size": 200,
 "label": "musyx",
@@ -36537,7 +36537,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8014C6B0",
+"name": "synthFXSetCtrl",
 "addr": "0x8014C6B0",
 "size": 228,
 "label": "musyx",
@@ -36545,7 +36545,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8014C794",
+"name": "synthFXSetCtrl14",
 "addr": "0x8014C794",
 "size": 228,
 "label": "musyx",
@@ -36593,7 +36593,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8014CF30",
+"name": "synthHWMessageHandler",
 "addr": "0x8014CF30",
 "size": 208,
 "label": "musyx",
@@ -36609,7 +36609,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8014D574",
+"name": "synthExit",
 "addr": "0x8014D574",
 "size": 36,
 "label": "musyx",
@@ -36689,7 +36689,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8014D7FC",
+"name": "sndFXStartEx",
 "addr": "0x8014D7FC",
 "size": 132,
 "label": "musyx",
@@ -36697,7 +36697,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8014D880",
+"name": "sndFXCheck",
 "addr": "0x8014D880",
 "size": 64,
 "label": "musyx",
@@ -36705,7 +36705,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8014D8C0",
+"name": "sndSetReceiveMessageCallback",
 "addr": "0x8014D8C0",
 "size": 8,
 "label": "musyx",
@@ -44433,7 +44433,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8019C7E0",
+"name": "_HSD_MemClearDefaultCB",
 "addr": "0x8019C7E0",
 "size": 116,
 "label": "hsd",
@@ -68957,8 +68957,14 @@
 {
 "label": "fight",
 "start": "0x800111C4",
+"end": "0x80011288",
+"count": 3
+},
+{
+"label": "gs-engine",
+"start": "0x80011288",
 "end": "0x80011700",
-"count": 5
+"count": 2
 },
 {
 "label": "menu",
@@ -69959,14 +69965,14 @@
 {
 "label": "libm",
 "start": "0x800CE338",
-"end": "0x800ce5a4",
-"count": 4
+"end": "0x800ce688",
+"count": 5
 },
 {
 "label": "dolphin-sdk",
-"start": "0x800CE5A4",
+"start": "0x800CE688",
 "end": "0x800ce718",
-"count": 5
+"count": 4
 },
 {
 "label": "libm",
