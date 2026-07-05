@@ -31,7 +31,7 @@ extern void* lbl_80478C94;           /* RNG current state pointer   */
 /* Address: 0x801AA6D0 | Size: 0xB8  -- PObj remove */
 #pragma push
 #pragma optimization_level 1
-void fn_801AA6D0(void* pobj)
+void PObjAmnesia(void* pobj)
 {
     void* p = pobj;
 
