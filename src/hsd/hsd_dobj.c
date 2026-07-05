@@ -329,7 +329,7 @@ void HSD_DObjCountVertices(HSD_DObj* dobj, s32* total_a, s32* total_b) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_801AD044(HSD_PObj* pobj, HSD_PObjDesc* desc);
+extern void HSD_PObjResolveRefsAll(HSD_PObj* pobj, HSD_PObjDesc* desc);
 #if 0
 asm void HSD_DObjResolveRefsAll(void) {
 #include "src/hsd/hsd_dobj_HSD_DObjResolveRefsAll.inc"
@@ -343,7 +343,7 @@ void HSD_DObjResolveRefsAll(HSD_DObj* dobj, HSD_DObjDesc* desc) {
     d = dobj;
     while (d != NULL && dd != NULL) {
         if (d != NULL && dd != NULL) {
-            fn_801AD044(d->pobj, dd->pobjdesc);
+            HSD_PObjResolveRefsAll(d->pobj, dd->pobjdesc);
         }
         d = d->next;
         dd = dd->next;
@@ -445,7 +445,7 @@ HSD_DObj* HSD_DObjLoadDesc(HSD_DObjDesc* desc)
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void OSReport(const char* fmt, ...);
-extern HSD_PObj* fn_801AD288(void* pobjdesc);
+extern HSD_PObj* HSD_PObjLoadDesc(HSD_PObjDesc* pobjdesc);
 extern void HSD_Panic(const char* file, s32 line, const char* msg);
 extern HSD_ClassInfo* lbl_8047B260;
 extern HSD_DObjInfo lbl_8036C7A0;
@@ -497,7 +497,7 @@ static int DObjLoad(HSD_DObj* dobj_arg, HSD_DObjDesc* desc_arg)
     }
     dobj->next = sub;
     dobj->mobj = HSD_MObjLoadDesc(desc->mobjdesc);
-    dobj->pobj = fn_801AD288(desc->pobjdesc);
+    dobj->pobj = HSD_PObjLoadDesc(desc->pobjdesc);
 
     if (dobj->mobj != NULL) {
         u32 type = dobj->mobj->rendermode;
