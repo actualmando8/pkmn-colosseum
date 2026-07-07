@@ -50,3 +50,12 @@ tools/mwcc_compiler/
 *.exe
 *.orig
 *.pre
+
+# Windows compile dependency scratch (Z:\tmp\wt* .d files)
+/*.d
+
+# Local reference data / scratch (not tracked in git)
+tools/symbolmap/xd_ref/GXXE01/_xdsplit/
+tools/symbolmap/xd_ref/GXXE01/config/
+tools/decomp_work/scratch/
+.pi-sessions/
