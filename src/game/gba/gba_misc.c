@@ -691,8 +691,9 @@ u8 GbaMisc_GetMappedContextByte(void) {
     u32 count;
 
     ptr = fn_80083CFC(0);
+    table = &ptr->tableKey_4136;
     if (ptr != 0) {
-        value = ptr->tableKey_4136;
+        value = *table;
     } else {
         value = 0;
     }

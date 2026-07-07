@@ -320,9 +320,12 @@ asm void fn_80026600(void) {
 #pragma optimization_level 4
 s32 fn_80026600(void* r3, u8* r4) {
     void* ctx;
+    u8* new_var;
     s32* entry;
     ctx = *(void**)((u8*)r3 + 0x60);
-    entry = (s32*)(lbl_80266DD8 + (*(s32*)((u8*)ctx + 0x1c) << 4));
+    new_var = lbl_80266DD8;
+    new_var = new_var + (*(s32*)((u8*)ctx + 0x1c) << 4);
+    entry = (s32*)new_var;
     if (entry[1] != 8) r4[0x67] = 0;
     else r4[0x67] = 0xff;
     return 0;
@@ -368,9 +371,12 @@ asm void fn_80026680(void) {
 #pragma optimization_level 4
 s32 fn_80026680(void* r3, u8* r4) {
     void* ctx;
+    u8* new_var;
     s32* entry;
     ctx = *(void**)((u8*)r3 + 0x60);
-    entry = (s32*)(lbl_80266DD8 + (*(s32*)((u8*)ctx + 0x1c) << 4));
+    new_var = lbl_80266DD8;
+    new_var = new_var + (*(s32*)((u8*)ctx + 0x1c) << 4);
+    entry = (s32*)new_var;
     if (entry[1] == 7) goto L_80_then;
     r4[0x67] = 0;
     goto L_80_end;
@@ -421,9 +427,12 @@ asm void fn_80026700(void) {
 #pragma optimization_level 4
 s32 fn_80026700(void* r3, u8* r4) {
     void* ctx;
+    u8* new_var;
     s32* entry;
     ctx = *(void**)((u8*)r3 + 0x60);
-    entry = (s32*)(lbl_80266DD8 + (*(s32*)((u8*)ctx + 0x1c) << 4));
+    new_var = lbl_80266DD8;
+    new_var = new_var + (*(s32*)((u8*)ctx + 0x1c) << 4);
+    entry = (s32*)new_var;
     if (entry[1] == 0xa) goto L_700_then;
     r4[0x67] = 0;
     goto L_700_end;
@@ -4041,18 +4050,19 @@ u32 fn_80029FAC(u8* r3, s32 r4, s32 r5, s32 r6, ...) {
     u8* table;
     s32 idx;
     s32 offset;
+    u32* new_var;
 
     *(u32*)list = 0x04000000;
     list[0].overflow_arg_area = (u32*)((u8*)list + 0x30);
     list[0].reg_save_area = (u32*)((u8*)list - 0x60);
     idx = r4 << 2;
-    map = (u8*)lbl_80478E54;
+    map = (u8*)((((((((((((lbl_80478E54 & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu);
     r31 = r5 << 2;
     table = (u8*)lbl_80478E4C;
     r30 = 1;
     offset = map[idx] * 0x4c;
     *r3 = table[offset];
-    r28 = (u8*)*(volatile u32*)&lbl_80478E4C + offset + 4;
+    r28 = (u8*)*(volatile u32*)(new_var = &lbl_80478E4C) + offset + 4;
     while (r6 >= 0) {
         if (r30 != 0) {
             r29 = r6;
@@ -4082,6 +4092,7 @@ u32 fn_8002A0B8(u8* r3, s32 r4, s32 r5, s32 r6, ...) {
     WorldMapVaListArray list;
     s32 r31;
     s32 r30;
+    u8 new_var;
     s32 r29;
     u8* r28;
     u8* map;
@@ -4093,15 +4104,16 @@ u32 fn_8002A0B8(u8* r3, s32 r4, s32 r5, s32 r6, ...) {
     list[0].overflow_arg_area = (u32*)((u8*)list + 0x30);
     list[0].reg_save_area = (u32*)((u8*)list - 0x60);
     idx = r4 << 2;
-    map = (u8*)lbl_80478E54;
+    map = (u8*)(((((((lbl_80478E54 & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu);
     r31 = r5 << 2;
+    new_var = map[idx];
     table = (u8*)lbl_80478E3C;
     r30 = 1;
-    offset = map[idx] * 0x3c;
+    offset = new_var * 0x3c;
     *r3 = table[offset];
     r28 = (u8*)*(volatile u32*)&lbl_80478E3C + offset + 4;
     while (r6 >= 0) {
-        if (r30 != 0) {
+        if (0 != r30) {
             r29 = r6;
             r30 = 0;
         } else {
@@ -4140,7 +4152,7 @@ void fn_8002A1C4(u8* r3, s32 r4, s32 r5, ...) {
     list[0].overflow_arg_area = (u32*)((u8*)list + 0x30);
     list[0].reg_save_area = (u32*)((u8*)list - 0x60);
     idx = (s32)r3 << 2;
-    map = (u8*)lbl_80478E54;
+    map = (u8*)(lbl_80478E54 & 0xFFFFFFFFFFFFFFFFu);
     r31 = r4 << 2;
     r3 = (u8*)lbl_80478E4C + map[idx] * 0x4c;
     r27 = r3[0];
@@ -4188,9 +4200,10 @@ void fn_8002A2CC(u8* r3, s32 r4, s32 r5, ...) {
     idx = (s32)r3 << 2;
     map = (u8*)lbl_80478E54;
     r31 = r4 << 2;
-    r3 = (u8*)lbl_80478E3C + map[idx] * 0x3c;
+    r3 = (u8*)lbl_80478E3C + map[idx] * (0x3c & 0xFFFFFFFFFFFFFFFFu);
     r27 = r3[0];
     r28 = r3 + 4;
+    r5 = r5;
     r30 = 1;
     while (r5 >= 0) {
         if (r30 != 0) {

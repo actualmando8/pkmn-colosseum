@@ -117,7 +117,7 @@ extern u16   fn_8020E0B0(void* tbl);              /* Get resource size */
 extern u16   fn_8020E020(void* tbl, s32 slot);    /* Get resource slot value */
 
 /* Random selection helpers */
-extern u8    fn_8001E304(u16 count, u32* outResult, void* validationFn);
+extern u8    fn_8001E304(volatile unsigned int count, u32* outResult, void* validationFn);
 extern void  fn_8001E200(void);
 
 /* Callback function pointers used in validation */

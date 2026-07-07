@@ -142,12 +142,16 @@ s32 _dbgMenuGetItemNo__FP14tagWINDOW_WORKl(void* obj, s32 offset);
 /* 0x58 | fn_8013151C | leaf_multi_output */
 void* fn_8013151C(u32 arg) {
     GSEffectInstance* entry;
+    unsigned int new_var;
     GSEffectGlobals* globals;
     if (arg == 0) goto _ret0;
     globals = &lbl_803635C0;
     if (arg > globals->maxEffects) goto _ret0;
     entry = &((GSEffectInstance*)globals->instanceTable)[arg - 1];
-    if (entry->state == GSEFFECT_STATE_UNINIT) goto _ret0;
+    new_var = entry->state == GSEFFECT_STATE_UNINIT;
+    if (new_var) goto _ret0;
+    if ((arg && arg) && arg) {
+    }
     goto _compute;
 _ret0:
     entry = 0;

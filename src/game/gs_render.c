@@ -2147,7 +2147,8 @@ void fn_800D7B80(u32 count) {
     u32 off;
     u32 i;
     lbl_8047AAB0 = count;
-    handle = _toolentryAlloc__FUl(count * 0x190);
+    off = _toolentryAlloc__FUl(count * 0x190);
+    handle = off;
     lbl_8047AAA8 = handle;
     if (handle != 0) {
         lbl_8047AAAC = (u32)fn_800E27B0(handle);
@@ -5221,13 +5222,16 @@ asm void fn_800DF854(void) {
 #else
 void fn_800DF854(u32 count) {
     u16 handle;
+    u16 new_var;
     lbl_8047AB20 = count;
     handle = _toolentryAlloc__FUl(count * 0x40);
-    lbl_8047AB18 = handle;
-    if (handle) {
+    new_var = handle;
+    lbl_8047AB18 = new_var;
+    if (new_var) {
         u32 off;
         u32 i;
-        lbl_8047AB1C = (u32)fn_800E27B0((u16)handle);
+        off = (u32)fn_800E27B0((u16)new_var);
+        lbl_8047AB1C = off;
         for (off = 0, i = 0; i < lbl_8047AB20; i++, off += 0x40) {
             *(u8*)(lbl_8047AB1C + off) = 0;
         }

@@ -67,6 +67,8 @@ void fn_800FF788(u32 floorId) {
         if (*(u32*)(entry + 0xC) != floorId) {
             goto not_found;
         }
+        if (((!entry) && (!entry)) && (!entry)) {
+        }
         goto found;
 not_found:
         entry += 0x4C;

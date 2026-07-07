@@ -1447,8 +1447,9 @@ u32 fn_801F1700(void* param) {
     s32 r;
 
     val = fn_801F54A4(param, 0, 0x34, 0);
-    flag = val & 0xFF;
-    r = fn_80077B84(val);
+    r = val;
+    flag = r & 0xFF;
+    r = fn_80077B84(r);
     if (flag == 1 && r > 0) {
         return 1;
     }
@@ -3207,8 +3208,10 @@ void* fn_801F47B4(void* a, u32 b) {
     extern u32 fn_801F54A4(void*, int, int, u32);
     void *ret;
     u32 result = fn_801F54A4(a, 0, 0x35, b);
-    if ((u8)fn_801F7404(result) != 0)
+    if ((u8)fn_801F7404(result) != 0) {
+        ret = 0;
         goto ret_result;
+    }
     ret = 0;
     goto end;
 ret_result:
@@ -4646,7 +4649,7 @@ void fn_801F7480(u32 param_1, u16 param_2) {
             }
         }
         if (param_1 != 0) {
-            fn_801F78AC(param_1, (u16)param_2);
+            fn_801F78AC(param_1, (u16)(param_2 & 0xFFFFFFFFu));
         }
     }
 }

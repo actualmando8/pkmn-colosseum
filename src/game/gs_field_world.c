@@ -7209,15 +7209,19 @@ asm void fn_801236F8(void) {
 #include "src/game/gs_field_world_fn_801236F8.inc"
 }
 #else
+inline u32 inline_fn(u16 val, u8* counter_ptr) {
+    return fn_8012640C(NULL, val, 0x1e, *counter_ptr);
+}
+
 u16 fn_801236F8(u8* ptr, u8 arg2, u8* counter_ptr) {
     extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
     u16 val;
     if (ptr == NULL || counter_ptr == NULL) { return 0; }
     val = (u16)fn_8012640C(ptr, 0, 0x6e, 0);
-    arg2 = (u8)arg2;
+    arg2 = (0, (u8)arg2);
     while (*counter_ptr < 0x14) {
         if ((s32)fn_8012640C(NULL, val, 0x1d, *counter_ptr) == (s32)arg2) {
-            return (u16)fn_8012640C(NULL, val, 0x1e, *counter_ptr);
+            return (u16)inline_fn(val, counter_ptr);
         }
         (*counter_ptr)++;
     }

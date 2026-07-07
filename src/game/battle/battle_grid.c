@@ -1077,6 +1077,7 @@ void* fn_801C423C(void (*callback)(void), u8 mode, u32 arg, f32 value) {
     extern void fn_801C432C();
     extern void fn_801C6928(void);
     void* previous;
+    long new_var;
     void (*savedCallback)(void);
     u8* gridState;
     u32 modeByte;
@@ -1096,15 +1097,16 @@ void* fn_801C423C(void (*callback)(void), u8 mode, u32 arg, f32 value) {
     *(volatile f32*)(gridState + 0x18) = lbl_8047DFB8;
     *(volatile u8*)gridState = 0;
     previous = *(void* volatile *)(gridState + 0xC);
-    *(void* volatile *)(gridState + 0xC) = NULL;
+    *(void* volatile *)(0xC + gridState) = NULL;
 
     if (modeByte == 1) {
         fn_801C432C();
-    } else if (*(void* volatile *)(gridState + 0x10) != NULL) {
+    } else if (*(void* volatile *)(gridState + 0x10) != (0, NULL)) {
         if (*(u32 volatile *)(lbl_80466E30 + 0x10) != menuOffScreenGetPtr()) {
             fn_800EF5A4(*(void* volatile *)(lbl_80466E30 + 0x10));
         }
-        *(void* volatile *)(lbl_80466E30 + 0x10) = NULL;
+        new_var = 0x10;
+        *(void* volatile *)(lbl_80466E30 + new_var) = NULL;
     }
 
     fn_801C6928();

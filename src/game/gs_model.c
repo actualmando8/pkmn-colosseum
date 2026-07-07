@@ -436,14 +436,18 @@ ret0:
 /* 0x801023E4 | 0x44 */
 s32 menuGetCursor(void* p) {
     void* r3 = windowSearchID((s32)p);
-    if (r3 == (void*)0) goto ret_m1;
+    unsigned char pad;
+    if (r3 == (void*)0) {
+        pad = 1;
+        goto ret_m1;
+    }
     {
         s8 r4 = (s8)*(u8*)((u8*)r3 + 0x95);
         s8 r0 = (s8)*(u8*)((u8*)r3 + 0x94);
         return (s32)r4 + (s32)r0;
     }
 ret_m1:
-    return -1;
+    return -pad;
 }
 
 /* 0x80102428 | 0x98 */
