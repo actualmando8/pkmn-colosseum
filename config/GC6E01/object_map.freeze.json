@@ -9,18 +9,18 @@
     "total_units": 509
   },
   "topology_status": {
-    "auto_units": 59,
-    "named_units": 450,
-    "source_backed_units": 430,
+    "auto_units": 58,
+    "named_units": 451,
+    "source_backed_units": 431,
     "auto_code": 0,
-    "auto_data": 136107,
+    "auto_data": 131871,
     "auto_functions": 0
   },
   "baseline_progress": {
     "matched_code": "418060",
     "matched_code_percent": 16.755186,
-    "matched_data": "2060017",
-    "matched_data_percent": 93.8024,
+    "matched_data": "2064253",
+    "matched_data_percent": 93.995285,
     "matched_functions": 3950,
     "matched_functions_percent": 45.914215,
     "fuzzy_match_percent": 32.629124
@@ -2887,7 +2887,7 @@
       "total_functions": 0
     },
     {
-      "name": "main/auto_04_80267398_rodata",
+      "name": "main/game/data/rodata_80267398",
       "sections": [
         {
           "name": ".rodata",

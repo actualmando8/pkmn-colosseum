@@ -503,6 +503,9 @@ game/data/rodata_80267250.c:
 game/data/rodata_80267350.c:
 	.rodata     start:0x80267350 end:0x80267398
 
+game/data/rodata_80267398.c:
+	.rodata     start:0x80267398 end:0x80268424
+
 game/data/rodata_80268424.c:
 	.rodata     start:0x80268424 end:0x8026860C
 
