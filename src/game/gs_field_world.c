@@ -1862,7 +1862,7 @@ extern void fn_801653CC(void);
 extern void fn_80132A38(void);
 extern void fn_80106D3C(void);
 extern void fn_801069FC(void);
-extern void fn_8013467C(void);
+extern void pcboxDelItem(void);
 extern void fn_8001E184(void);
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void fn_80115E6C(void);
@@ -2099,9 +2099,9 @@ void fn_80117164(void) {
 #endif
 /* 0x801171C8 | 0x168 */
 extern u8 GSscene_GetMode(void);
-extern void fn_80176868(f32);
-extern void fn_801767E0(f32);
-extern void fn_80176758(f32);
+extern void cameraSetHeight(f32);
+extern void cameraSetDistance(f32);
+extern void cameraSetRotY(f32);
 extern void GSscene_GetCameraPositionVector(void*);
 extern u8 lbl_8047AD71;
 extern u32 lbl_8047AD68;
@@ -2136,9 +2136,9 @@ void fn_801171C8(void) {
         f32 direct_z;
         direct_z = ptr[5];
         direct_x = ptr[3];
-        fn_80176868(ptr[4]);
-        fn_801767E0(direct_x);
-        fn_80176758(direct_z);
+        cameraSetHeight(ptr[4]);
+        cameraSetDistance(direct_x);
+        cameraSetRotY(direct_z);
         return;
     }
 
@@ -2178,9 +2178,9 @@ void fn_801171C8(void) {
     {
         f32 out_y = lbl_8047AD78;
         f32 out_z = lbl_8047AD7C;
-        fn_80176868(lbl_8047AD74);
-        fn_801767E0(out_y);
-        fn_80176758(out_z);
+        cameraSetHeight(lbl_8047AD74);
+        cameraSetDistance(out_y);
+        cameraSetRotY(out_z);
     }
 }
 #endif
@@ -2189,9 +2189,9 @@ void fn_801171C8(void) {
 extern void* GSresGetResource();
 extern void fn_800E3D98(void*, void*);
 extern void GSscene_GetCameraViewVector(void*);
-extern f32 fn_8017669C(void);
-extern f32 fn_80176690(void);
-extern f32 fn_80176684(void);
+extern f32 cameraGetHeight(void);
+extern f32 cameraGetDistance(void);
+extern f32 cameraGetRotY(void);
 extern void fn_800E01F4(void* obj, f32 f1, f32 f2, f32 f3);
 extern void fn_800E0518(void*, f32);
 extern void fn_800DFF98(void*, void*, void*);
@@ -2242,9 +2242,9 @@ void fn_80117330(f32 arg) {
         y = ptr[3];
         z = ptr[5];
     } else {
-        x = fn_8017669C();
-        y = fn_80176690();
-        z = fn_80176684();
+        x = cameraGetHeight();
+        y = cameraGetDistance();
+        z = cameraGetRotY();
         if (floorUpdateFieldCamera(pos, &x, &y, &z) == 0) { return; }
     }
 
@@ -3901,7 +3901,7 @@ p2_check:
     return (u8)fn_8011A030(base);
 }
 /* 0x8011B2C0 | 0x184 */
-extern s32 fn_80101AC4(u32);
+extern s32 kaisuuGetKaisuu(u32);
 #if 0
 asm void fn_8011B2C0(void) {
 #include "src/game/gs_field_world_fn_8011B2C0.inc"
@@ -3958,7 +3958,7 @@ void fn_8011B2C0(void* obj, u16 id, u16 arg3) {
     }
     fn_80119FF0(elem, id);
     fn_80119FE0(elem, arg3);
-    fn_80119FD0(elem, (s8)fn_80101AC4(fn_80119D90(id)));
+    fn_80119FD0(elem, (s8)kaisuuGetKaisuu(fn_80119D90(id)));
     if (type == 4) {
         u32 count = old_count + 1;
         u8 limit = fn_80119DD0(id);
@@ -7059,7 +7059,7 @@ u32 fn_80123110(u8* ptr, register u32 arg2, u8 flag) {
 }
 #endif
 /* 0x801231A4 | 0x13C */
-extern u32 fn_80131574(u32);
+extern u32 sexGetPokemonSexRaitoKotei(u32);
 #if 0
 asm void fn_801231A4(void) {
 #include "src/game/gs_field_world_fn_801231A4.inc"
@@ -7082,11 +7082,11 @@ u8 fn_801231A4(u8* ptr)
         result = 2;
     } else {
         wanted = (u16)fn_8012640C(0, (u16)fn_8012640C(ptr, 0, 0x6E, 0), 0x13, 0);
-        if ((s32)wanted == (s32)(u8)fn_80131574(0)) {
+        if ((s32)wanted == (s32)(u8)sexGetPokemonSexRaitoKotei(0)) {
             result = 0;
-        } else if ((s32)wanted == (s32)(u8)fn_80131574(1)) {
+        } else if ((s32)wanted == (s32)(u8)sexGetPokemonSexRaitoKotei(1)) {
             result = 1;
-        } else if ((s32)wanted == (s32)(u8)fn_80131574(2)) {
+        } else if ((s32)wanted == (s32)(u8)sexGetPokemonSexRaitoKotei(2)) {
             result = 2;
         } else {
             result = -1;
@@ -7585,13 +7585,13 @@ void* fn_80128E2C(void) {
 /* 0x80128E38 | 0x25C */
 extern void fn_8013528C(void);
 extern void fn_800F9D04(void);
-extern void fn_80135030(void);
+extern void gamedatasaveSetStatus(void);
 extern u8 lbl_8047D028[8];
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void fn_80128E38(void);
 /* 0x80129094 | 0x1EC */
-extern void fn_80135338(void);
-extern void fn_80134F88(void);
+extern void gamedataInit(void);
+extern void pcboxInit(void);
 extern void fn_801908D4(void);
 extern void mailInitMailbox(void);
 extern void sodateyaInit(void);
@@ -8677,7 +8677,7 @@ extern f32 lbl_8047D0D4;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void fn_8012E7B8(void);
 /* 0x8012EBD4 | 0x3E4 */
-extern void fn_801337B0(void);
+extern void dbgMenuIsOpen(void);
 extern void fn_80102620(void);
 extern void fn_8018C424(void);
 extern void fn_8000D710(void);

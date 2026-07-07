@@ -2554,7 +2554,7 @@ void fn_800281F0(void) { }
 
 /* fn_800281F4 - 0x800281F4 | size: 0x250 */
 extern void GScharCpy(void*, u8*);
-extern void fn_801337A8(void);
+extern void dbgMenuSetEnable(void);
 extern void fn_801046B8(void);
 extern void fn_801026A4(void);
 extern void fn_80106D3C(void);
@@ -2606,7 +2606,7 @@ s32 fn_800281F4(u16 *existing_name, u8 *name_buf_in, void *arg2, void *arg3, s32
 {
     /* --- block-scope extern declarations (TU convention) --- */
     extern u8  *GScharCpy(u8 *dst, u8 *src);        /* GS string copy                  */
-    extern void fn_801337A8(s32 mode);                 /* set VSync mode (0=off, 1=on)    */
+    extern void dbgMenuSetEnable(s32 mode);                 /* set VSync mode (0=off, 1=on)    */
     extern u32  fn_801046B8(void);                     /* get current scene handle         */
     extern void fn_801026A4(s32 sceneId, u32 handle, s32 a, s32 b, s32 c, s32 d, ...); /* open GS scene with descriptor */
     extern void fn_80166A28(u32 arg);                  /* audio/effect trigger             */
@@ -2679,7 +2679,7 @@ s32 fn_800281F4(u16 *existing_name, u8 *name_buf_in, void *arg2, void *arg3, s32
     existing_name[0] = 0;
 
     /* Turn off VSync while the name-input UI is open                     */
-    fn_801337A8(0);
+    dbgMenuSetEnable(0);
 
     name_ptr = existing_name;
     done      = 0;
@@ -2791,7 +2791,7 @@ s32 fn_800281F4(u16 *existing_name, u8 *name_buf_in, void *arg2, void *arg3, s32
     /* -----------------------------------------------------------------
      * Cleanup: restore VSync and close the name-input scene.
      * ----------------------------------------------------------------- */
-    fn_801337A8(1);
+    dbgMenuSetEnable(1);
     fn_80102510(0x6e);
     menuCloseSync(0x6e, 1);
 
@@ -3982,7 +3982,7 @@ s32 fn_80029CC0(u8* r30) {
 
 /* fn_80029EF4 - 0x80029EF4 | size: 0xb8 */
 extern void heroDecPokecoupon(s32, void*);
-extern void fn_8013467C(s32, s32, u16);
+extern void pcboxDelItem(s32, s32, u16);
 extern void fn_80129A78(s32, s32, u16, s32);
 #if 0
 asm void fn_80029EF4(void) {
@@ -3997,7 +3997,7 @@ void fn_80029EF4(void* r3, s32 r4, s32 r5, u8 r6, void* r7) {
     switch ((u8)r6) {
     case 2:
         heroDecPokecoupon(0, r3);
-        fn_8013467C(0, r29, (u16)r30);
+        pcboxDelItem(0, r29, (u16)r30);
         if (r31 != 0) { ((u8*)r31)[0x760] = 1; }
         break;
     case 3:
@@ -5892,7 +5892,7 @@ void fn_8002C284(u32 loc_idx, u32 mode)
 
 /* fn_8002C408 - 0x8002C408 | size: 0xa64 */
 extern void fn_80129280(void);
-extern void fn_80134420(void);
+extern void pcboxGetItemCapacity(void);
 extern void fn_801298B8(void);
 extern void fn_80166AB8(void);
 extern void fn_80093574(void);
@@ -5944,7 +5944,7 @@ void fn_8002C408(s32 mapIdx, u32 mode)
     extern u32   itemDataBiosGetCoupon(void);                        /* read selected entry value (u16) */
     extern u16   itemBiosGetItemDataId(void* slot);                  /* item/species id at slot */
     extern u16   itemBiosGetNum(void* slot);                  /* quantity at slot */
-    extern u16   fn_80134420(s32 a, u16 species);          /* owned-count query (mode 2) */
+    extern u16   pcboxGetItemCapacity(s32 a, u16 species);          /* owned-count query (mode 2) */
     extern s32   fn_801298B8(u8* ptr, u32 species);        /* owned-count query (default) */
     extern void  fn_80029EF4(void* a, s32 b, s32 c, u8 d, void* e); /* commit purchase */
     extern void  fn_8002A1C4(u8* idx, s32 msgId, s32 term, ...);    /* show message line */
@@ -6214,7 +6214,7 @@ L_628:
 
     /* (6) compute owned count / room left for this species */
     if (modeLow == 2) {
-        ownedRoom = (s32)(u16)fn_80134420(0, (u16)sel);
+        ownedRoom = (s32)(u16)pcboxGetItemCapacity(0, (u16)sel);
     } else if (modeLow == 3) {
         ownedRoom = 0;
         {
@@ -7617,7 +7617,7 @@ extern void fn_80128A64(void);
 extern void fn_801CB9D8(void);
 extern void fn_80112260(void);
 extern void fn_8012805C(void);
-extern void fn_80176E0C(void);
+extern void cameraPlayAnime(void);
 extern void fn_80113F48(void);
 extern void fn_801CBA0C(void);
 extern void GSresGetResource(void);
@@ -7650,7 +7650,7 @@ asm void fn_8002DF10(void) {
  *   4. Yield one frame (_threadSwitch)
  *   5. Spawn/configure encounter objects (fn_8012805C)
  *   6. Re-anchor NPC handles (fn_80109C88, menuModelInit)
- *   7. Scene-load BGM/scene (fn_80176E0C, fn_801CBA0C, GSresGetResource)
+ *   7. Scene-load BGM/scene (cameraPlayAnime, fn_801CBA0C, GSresGetResource)
  *   8. Restore people state (GSscene_SetMode)
  *   9. Mark availability flag and advance state (lbl_8047A42C = 0x12)
  */
@@ -7695,8 +7695,8 @@ void fn_8002DF10(void)
     extern void menuModelInit(u8 *obj, s32 w, s32 h);
     /* fn_80109C88 - model set NPC handle (u8* obj, u8* npc_handle) */
     extern void fn_80109C88(u8 *obj, u8 *npc_handle);
-    /* fn_80176E0C - scene render/BGM start (s32 scene_id, u32 color_key, s32 a, s32 b) */
-    extern void fn_80176E0C(s32 scene_id, u32 color_key, s32 a, s32 b);
+    /* cameraPlayAnime - scene render/BGM start (s32 scene_id, u32 color_key, s32 a, s32 b) */
+    extern void cameraPlayAnime(s32 scene_id, u32 color_key, s32 a, s32 b);
     /* fn_80113F48 - get current scene/resource handle */
     extern u32  fn_80113F48(void);
     /* fn_801CBA0C - scene transition fade-out: (u32 color_key) -> u32 fade_handle */
@@ -7821,13 +7821,13 @@ void fn_8002DF10(void)
         fn_80109C88(base + 0xcd0, npc_b2);
     }
 
-    fn_80176E0C(0x37c, 0x0fff1800, 0, 1);
+    cameraPlayAnime(0x37c, 0x0fff1800, 0, 1);
 
     scene_handle = fn_80113F48();
     lbl_8047A418 = fn_801CBA0C(0x0ffe1000);
     lbl_8047A414 = (u32)GSresGetResource(scene_handle);
 
-    fn_80176E0C(0x37c, 0x0fff1800, 0, 1);
+    cameraPlayAnime(0x37c, 0x0fff1800, 0, 1);
 
     GSscene_SetMode(4);
 
@@ -7897,7 +7897,7 @@ void fn_8002E26C(void)
     extern void fadeCheck(s32 flag);
     extern void fn_801024E8(s32 arg);
     extern u32  fn_80113F48(void);
-    extern void fn_80176E0C(s32 handle, u32 flags, s32 a3, s32 a4);
+    extern void cameraPlayAnime(s32 handle, u32 flags, s32 a3, s32 a4);
     extern void _threadSwitch(void);
     extern void fn_80166AB8(s32 a1, s32 a2, s32 a3);
     extern void fn_80112260(s32 flag);
@@ -7939,7 +7939,7 @@ void fn_8002E26C(void)
 
     /* --- Set up field model and audio, yield one VBlank --- */
     handle = fn_80113F48();
-    fn_80176E0C((s32)handle, 0x10b71800, 0, 0);
+    cameraPlayAnime((s32)handle, 0x10b71800, 0, 0);
 
     _threadSwitch();   /* vsync yield */
 
@@ -7966,7 +7966,7 @@ void fn_8002E26C(void)
     fn_80109C88(base + 0xcd0, obj_b);
 
     /* --- Re-enable sound and render handle --- */
-    fn_80176E0C(0x37c, 0x0fff1800, 0, 1);
+    cameraPlayAnime(0x37c, 0x0fff1800, 0, 1);
 
     GSmodelSetVisibility(lbl_8047A414, 1);
     menuOpen(0xde, 1);
@@ -8443,10 +8443,10 @@ void fn_8002EA5C(void)
 #endif
 
 /* fn_8002EE74 - 0x8002EE74 | size: 0x410 */
-extern void fn_80103CC0(void);
+extern void menuSetEnablePort(void);
 extern void windowCheckCursor(void);
-extern void fn_801043A4(void);
-extern void fn_801023E4(void);
+extern void windowGetValue(void);
+extern void menuGetCursor(void);
 extern void fn_80102004(void);
 extern u32 lbl_8047A428;
 extern f32 lbl_8047B9D4;
@@ -8492,12 +8492,12 @@ void fn_8002EE74(void)
     extern void  _threadSwitch(void);                             /* host vsync yield (GSthreadYield) */
     extern s32   fn_800D37CC(void);                             /* timer read A */
     extern u32   fn_800D3088(void);                             /* timer read B (tick) */
-    extern void  fn_80103CC0(s32 mode);
+    extern void  menuSetEnablePort(s32 mode);
     extern void  fn_801026A4(void* p, u32 r4, s32 r5, s32 r6, void* r7, s32 r8, ...);
     extern u32   fn_801046B8(void);
     extern void  windowCheckCursor(void* p, u8 flags);
-    extern s32   fn_801043A4(s32 key);
-    extern s32   fn_801023E4(void* p);
+    extern s32   windowGetValue(s32 key);
+    extern s32   menuGetCursor(void* p);
     extern void  fn_80102510(s32 p);
     extern u32   fn_80102004(void);
     extern void  fn_80106D3C(s32 a, s32 b, s32 c, s32 d);
@@ -8585,7 +8585,7 @@ void fn_8002EE74(void)
         s32 destResult;
         s32 flag = 1;
 
-        fn_80103CC0(2);
+        menuSetEnablePort(2);
         fn_801026A4((void*)0xe3, fn_801046B8(), (s32)&flag, 0, (void*)0, 0);
 
         node  = windowSearchID(0xe3);
@@ -8603,14 +8603,14 @@ void fn_8002EE74(void)
         }
 
         windowCheckCursor((void*)0xe3, 1);
-        branchResult = fn_801043A4(0xe3);
-        destResult   = fn_801023E4((void*)0xe3);
+        branchResult = windowGetValue(0xe3);
+        destResult   = menuGetCursor((void*)0xe3);
         fn_80102510(0xe3);
         if (branchResult == -1) {
             destResult = -1;
         }
 
-        fn_80103CC0(1);
+        menuSetEnablePort(1);
         if ((s32)fn_80102004() == 1) {
             fn_80106D3C(2, 0x4448, 1, 0);
             fn_80102510(0xd9);
@@ -8637,7 +8637,7 @@ void fn_8002EE74(void)
 
 /* fn_8002F284 - 0x8002F284 | size: 0x518 */
 extern void menuItemBiosSetSelectFlag(void);
-extern void fn_80102138(void);
+extern void menuGetCursorFromItemID(void);
 extern void fn_801022B8(void);
 extern u32 lbl_8047A410;
 extern u32 lbl_8047A42C;
@@ -8655,10 +8655,10 @@ void fn_8002F284(void)
     extern u32   fn_80123FBC(u8* mon);             /* eligibility predicate B */
     extern u32   menuCBRule_CheckPokemonEventFlag(u8* mon);             /* global-state gate (==1) */
     /* --- scene/object (id 0xD9) management (gs_model.c family) --- */
-    extern s32   fn_801023E4(void* p);             /* present? (>=0) / -1 absent */
-    extern s32   fn_80102138(void* p, u32 param);  /* lazy load -> handle/result */
+    extern s32   menuGetCursor(void* p);             /* present? (>=0) / -1 absent */
+    extern s32   menuGetCursorFromItemID(void* p, u32 param);  /* lazy load -> handle/result */
     extern void  fn_801021F8(void* p, u32 val);    /* set visibility on subtree */
-    extern u8    fn_80103CC0(u8 mode);             /* push render mode, ret old */
+    extern u8    menuSetEnablePort(u8 mode);             /* push render mode, ret old */
     extern u32   fn_801046B8(void);                /* current context handle */
     extern void  fn_801026A4(void* p, u32 a, ...); /* submit/build */
     extern void* windowSearchID(s32 p);               /* resolve node by id */
@@ -8668,7 +8668,7 @@ void fn_8002F284(void)
     extern s32   fn_80102004(void);                /* arrival/joint-count query */
     extern void  fn_80106D3C(s32 a, s32 b, s32 c, s32 d); /* trigger arrival fx */
     extern void  fn_80102510(s32 p);               /* unload/release object */
-    extern s32   fn_801043A4(s32 param);           /* dest id */
+    extern s32   windowGetValue(s32 param);           /* dest id */
     extern s32   fn_801022B8(s32 p);               /* map key */
 
     /* --- small-data globals --- */
@@ -8683,10 +8683,10 @@ void fn_8002F284(void)
     void* mon;
     void* lastMon;
     s32  eligible;
-    s32  local8;          /* frame local at 0x8(sp); fn_80102138 result / flag */
+    s32  local8;          /* frame local at 0x8(sp); menuGetCursorFromItemID result / flag */
     void* node;
     void* child;
-    s32  destId;          /* fn_801043A4 result (treated as s32) */
+    s32  destId;          /* windowGetValue result (treated as s32) */
     s32  mapKey;          /* fn_801022B8 result (table lookup key) */
     s32  resolvedMapId;   /* table-scan result, default 0 */
     s32  stateValue;
@@ -8797,13 +8797,13 @@ void fn_8002F284(void)
 
     /* Ensure destination object 0xD9 is loaded.  Lazy-load when either the
      * "already initialized" flag is set, or the object is not yet present. */
-    if ((*(u8*)&lbl_8047A410) != 0 || fn_801023E4((void*)0xD9) == 0) {
-        local8 = fn_80102138((void*)0xD9, 0xFFF);
+    if ((*(u8*)&lbl_8047A410) != 0 || menuGetCursor((void*)0xD9) == 0) {
+        local8 = menuGetCursorFromItemID((void*)0xD9, 0xFFF);
         (*(u8*)&lbl_8047A410) = 0;
     }
 
     fn_801021F8((void*)0xD9, 1);
-    fn_80103CC0(2);
+    menuSetEnablePort(2);
 
     /* Build/submit the object; the nonzero-local path passes &local8. */
     if (local8 != 0) {
@@ -8821,7 +8821,7 @@ void fn_8002F284(void)
     }
 
     windowCheckCursor((void*)0xD9, 1);
-    fn_80103CC0(1);
+    menuSetEnablePort(1);
 
     /* Early "already arrived" branch. */
     if (fn_80102004() == 1) {
@@ -8832,7 +8832,7 @@ void fn_8002F284(void)
     }
 
     /* Otherwise resolve the chosen destination id. */
-    destId = fn_801043A4(0xD9);
+    destId = windowGetValue(0xD9);
     resolvedMapId = 0;
 
     /* Scan the 12-entry destination table for the map key returned by
@@ -8897,7 +8897,7 @@ valid_destination:
  * The per-slot result (0/1) is fed to UI dispatcher menuItemBiosSetSelectFlag under the
  * corresponding menu element ID.
  *
- * It then ensures scene/object 0xD9 is loaded (lazy-load via fn_80102138 if
+ * It then ensures scene/object 0xD9 is loaded (lazy-load via menuGetCursorFromItemID if
  * not already present), shows it, looks up child node 0x10B2 and pokes a tag,
  * and finally resolves the chosen travel destination either through an early
  * "already arrived" path (fn_80102004()==1 -> sets state (*(s32*)&lbl_8047A42C)=0) or by
@@ -8917,10 +8917,10 @@ void fn_8002F284(void)
     extern u32   fn_80123FBC(u8* mon);             /* eligibility predicate B */
     extern u8    menuCBRule_CheckPokemonEventFlag(void);                /* global-state gate (==1) */
     /* --- scene/object (id 0xD9) management (gs_model.c family) --- */
-    extern s32   fn_801023E4(void* p);             /* present? (>=0) / -1 absent */
-    extern s32   fn_80102138(void* p, u32 param);  /* lazy load -> handle/result */
+    extern s32   menuGetCursor(void* p);             /* present? (>=0) / -1 absent */
+    extern s32   menuGetCursorFromItemID(void* p, u32 param);  /* lazy load -> handle/result */
     extern void  fn_801021F8(void* p, u32 val);    /* set visibility on subtree */
-    extern u8    fn_80103CC0(u8 mode);             /* push render mode, ret old */
+    extern u8    menuSetEnablePort(u8 mode);             /* push render mode, ret old */
     extern u32   fn_801046B8(void);                /* current context handle */
     extern void  fn_801026A4(void* p, u32 a, void* b, s32 c, void* d, s32 e); /* submit/build */
     extern void* windowSearchID(s32 p);               /* resolve node by id */
@@ -8930,7 +8930,7 @@ void fn_8002F284(void)
     extern s32   fn_80102004(void);                /* arrival/joint-count query */
     extern void  fn_80106D3C(s32 a, s32 b, s32 c, s32 d); /* trigger arrival fx */
     extern void  fn_80102510(s32 p);               /* unload/release object */
-    extern void* fn_801043A4(s32 param);           /* (here used as s32 dest id) */
+    extern void* windowGetValue(s32 param);           /* (here used as s32 dest id) */
     extern void* fn_801022B8(void* p, u32 target); /* (here used as s32 map key) */
 
     /* --- small-data globals --- */
@@ -8945,10 +8945,10 @@ void fn_8002F284(void)
     void* mon;
     s32  eligible;
     s32  i;
-    s32  local8;          /* frame local at 0x8(sp); fn_80102138 result / flag */
+    s32  local8;          /* frame local at 0x8(sp); menuGetCursorFromItemID result / flag */
     void* node;
     void* child;
-    s32  destId;          /* fn_801043A4 result (treated as s32) */
+    s32  destId;          /* windowGetValue result (treated as s32) */
     s32  mapKey;          /* fn_801022B8 result (table lookup key) */
     s32  resolvedMapId;   /* table-scan result, default 0 */
     u8*  ent;
@@ -9033,13 +9033,13 @@ void fn_8002F284(void)
 
     /* Ensure destination object 0xD9 is loaded.  Lazy-load when either the
      * "already initialized" flag is set, or the object is not yet present. */
-    if ((*(u8*)&lbl_8047A410) != 0 || fn_801023E4((void*)0xD9) == 0) {
-        local8 = fn_80102138((void*)0xD9, 0xFFF);
+    if ((*(u8*)&lbl_8047A410) != 0 || menuGetCursor((void*)0xD9) == 0) {
+        local8 = menuGetCursorFromItemID((void*)0xD9, 0xFFF);
         (*(u8*)&lbl_8047A410) = 0;
     }
 
     fn_801021F8((void*)0xD9, 1);
-    fn_80103CC0(2);
+    menuSetEnablePort(2);
 
     /* Build/submit the object; the nonzero-local path passes &local8. */
     if (local8 != 0) {
@@ -9057,7 +9057,7 @@ void fn_8002F284(void)
     }
 
     windowCheckCursor((void*)0xD9, 1);
-    fn_80103CC0(1);
+    menuSetEnablePort(1);
 
     /* Early "already arrived" branch. */
     if (fn_80102004() == 1) {
@@ -9068,7 +9068,7 @@ void fn_8002F284(void)
     }
 
     /* Otherwise resolve the chosen destination id. */
-    destId = (s32)fn_801043A4(0xD9);
+    destId = (s32)windowGetValue(0xD9);
     resolvedMapId = 0;
 
     /* Scan the 12-entry destination table for the map key returned by

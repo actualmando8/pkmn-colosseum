@@ -2073,7 +2073,7 @@ s32 fn_80025F74(void) {
  *      (lbl_80478DEC + idx*0x10), read 2 u32s, advance index (wrap > 9).
  *   5. Reset cursor scales: lbl_8047A3A4 = lbl_8047A3A0 = lbl_8047B8A8 (0).
  *   6. Register fn_80025A80 as a particle callback (GSgfxBeginBackFBCapture).
- *   7. Start BGM via fn_80176E0C, then run two timing delay loops
+ *   7. Start BGM via cameraPlayAnime, then run two timing delay loops
  *      (_threadSwitch + fn_800D3088 accumulator vs 1 or 0xAE target).
  *   8. Store title origin coords to lbl_803A2040[0..2] and start the final
  *      fade-in loop using __cvt_fp2unsigned for FP-to-int conversion.
@@ -2095,7 +2095,7 @@ extern void fn_800E3C00(void);
 extern void fn_801CB61C(void);
 extern void fn_801CB834(void);
 extern void fn_80165A20(void);
-extern void fn_80176E0C(void);
+extern void cameraPlayAnime(void);
 extern void __cvt_fp2unsigned(void);
 extern u8 lbl_8047A380;
 extern u32 lbl_8047A384;
@@ -2157,7 +2157,7 @@ void fn_80025F84(void) {
     extern u32 GSresGetResource(u32, u32);
     extern u32 fn_80113F48(void);
     extern void fn_80165A20(s32, s32, s32);
-    extern void fn_80176E0C(u32, u32, s32, s32);
+    extern void cameraPlayAnime(u32, u32, s32, s32);
     extern u8 fn_801902E0(s32);
     extern void fn_801CB61C(u32, u32, s32);
     extern void fn_801CB834(u32, u32, s32, s32);
@@ -2226,7 +2226,7 @@ void fn_80025F84(void) {
         lbl_8047A3A0 = lbl_8047B8A8;
         lbl_8047A38C = GStextureCreate(0, 0, 0x44, 0, 0);
         GSgfxBeginBackFBCapture(lbl_8047A38C, (void*)fn_80025A80, 0);
-        fn_80176E0C(fn_80113F48(), frame_b, 0, 0);
+        cameraPlayAnime(fn_80113F48(), frame_b, 0, 0);
 
         delay = 1;
         tick = fn_800D37CC();
@@ -2327,10 +2327,10 @@ void fn_8002060C(void) {
 
 /* fn_80020618 - 0x80020618 | size: 0x304 */
 extern void fn_80105624(void);
-extern s32 fn_80135168(s32, s32);
+extern s32 gamedatasaveGetStatus(s32, s32);
 extern void fn_80166CC0(void);
 extern void fn_800F78A4(s32, s32, s32, s32, s32);
-extern void fn_80135030(void);
+extern void gamedatasaveSetStatus(void);
 extern u32 lbl_8047B878;
 extern u8 lbl_803A1FC8[];
 extern u32 lbl_8047B880;
@@ -2483,7 +2483,7 @@ void fn_80020B8C(void* r3, u8* r4) {
 
 /* fn_80020BA0 - 0x80020BA0 | size: 0xfc */
 extern void fn_801040F0(s32, s32, void*, s32, s32);
-extern s32 fn_80135168(s32, s32);
+extern s32 gamedatasaveGetStatus(s32, s32);
 extern u8 lbl_802EF0A8[];
 #if 0
 asm void fn_80020BA0(void) {
@@ -2502,7 +2502,7 @@ void fn_80020BA0(void* arg0, u8* arg1) {
     }
     fn_801040F0((s16)(ptr[1] - *(s16*)(arg1 + 0x50)), (s16)(ptr[2] - *(s16*)(arg1 + 0x52)), arg0, 0x192, 0);
 
-    if (fn_80135168(0, 9) == 1) {
+    if (gamedatasaveGetStatus(0, 9) == 1) {
         ptr = (s16*)(lbl_802EF0A8 + 0x8FD4);
     } else {
         ptr = (s16*)(lbl_802EF0A8 + 0x8FB8);
@@ -2535,10 +2535,10 @@ void fn_80020C9C(void) {
     extern u8 winSeqCheckMove(s32);
     extern void fn_800205C0(s32);
     extern u32 GSsndGetOutputMode(void);
-    extern s32 fn_80135168(s32, s32);
+    extern s32 gamedatasaveGetStatus(s32, s32);
     extern s32 menuOpen(s32, s32);
     extern void fn_80166CC0(u32);
-    extern void fn_80135030(s32, s32, s32);
+    extern void gamedatasaveSetStatus(s32, s32, s32);
     extern u8 fn_801D04E8(void);
     extern void fn_80106D3C(s32, s32, s32, s32);
     extern u8 fn_8001E074(s32, s32, s32, s32);
@@ -2573,7 +2573,7 @@ void fn_80020C9C(void) {
         switch (state) {
         case 0:
             region = GSsndGetOutputMode();
-            fmt = fn_80135168(0, 9);
+            fmt = gamedatasaveGetStatus(0, 9);
             menuOpen(0x7F, 0);
             menuOpen(0x80, 0);
             menuOpen(0x7C, 0);
@@ -2583,7 +2583,7 @@ void fn_80020C9C(void) {
             do {
                 if (menuOpen(0x7B, 1) < 0) {
                     fn_80166CC0(region);
-                    fn_80135030(0, 9, fmt);
+                    gamedatasaveSetStatus(0, 9, fmt);
                     break;
                 }
             } while (sp[0] != 2);
@@ -2591,7 +2591,7 @@ void fn_80020C9C(void) {
             break;
         case 0x64:
             *(s32*)&lbl_803A1FC8 = -1;
-            if (fn_80135168(0, 9) != fmt) {
+            if (gamedatasaveGetStatus(0, 9) != fmt) {
                 if (fn_801D04E8() != 0) {
                     fn_80106D3C(1, 0x3D82, 1, 0);
                     if ((s8)menuSubOpenYesNo(0, 0x3C, 0xAA, 1) == 0) {
@@ -2799,7 +2799,7 @@ void fn_80021644(void) {
     extern void* fn_80113F48(void);
     extern u32 fn_801CBA0C(s32);
     extern void GSresGetResource(void*, u32);
-    extern void fn_80176E0C(s32, s32, s32, s32);
+    extern void cameraPlayAnime(s32, s32, s32, s32);
     extern void GSscene_SetMode(s32);
     void* handle;
 
@@ -2808,7 +2808,7 @@ void fn_80021644(void) {
         handle = fn_80113F48();
         lbl_8047A35C = fn_801CBA0C(0x0FFE1000);
         GSresGetResource(handle, lbl_8047A35C);
-        fn_80176E0C(0x632, 0x0FFF1800, 0, 1);
+        cameraPlayAnime(0x632, 0x0FFF1800, 0, 1);
         GSscene_SetMode(4);
         lbl_8047A360 = lbl_8047A358;
         (&lbl_8047A360)[1] = 0;
@@ -3020,7 +3020,7 @@ void fn_80021B14(void) { /* TODO */ }
 #endif
 
 /* fn_80022050 - 0x80022050 | size: 0x12c */
-extern s32 fn_801347E0(void);
+extern s32 pcboxGetNbPokemonBox(void);
 extern s32 fn_801347E8(s32, s8);
 extern void fn_800140FC(s32*, s32*);
 extern s32 fn_801F7EF0(s32);
@@ -3052,7 +3052,7 @@ s32 fn_80022050(s32 arg0, s32* arg1) {
         iVar4 = iVar4 + 1;
     } while (iVar4 < 6);
     if (iVar3 >= 6) {
-        cVar1 = fn_801347E0();
+        cVar1 = pcboxGetNbPokemonBox();
         iVar3 = 0;
         while (iVar3 < cVar1) {
             cVar2 = pcboxGetPokemonBoxNbEmptySlot(0, (s8)iVar3);
@@ -3464,7 +3464,7 @@ s32 fn_80022B3C(s32 arg0, s32 arg1) {
     fn_801069FC(1);
     
     /* Check if particle system is available */
-    if (fn_80135168(0, 9) == 0) {
+    if (gamedatasaveGetStatus(0, 9) == 0) {
         /* Wait for particle system with timeout */
         for (i = 0; i < 2; i++) {
             fn_800F78A4(1, 0, 0xFF, 0x15, 0);
@@ -3577,7 +3577,7 @@ s32 fn_80022E54(void* r3, u32* r4) {
 
 /* fn_80022EE4 - 0x80022EE4 | size: 0x184 */
 extern s32 fn_80128A64(s32, s32, u16, void*, void*);
-extern void fn_801096F8(s32);
+extern void menuOffScreenSetDisp(s32);
 extern void fn_8012805C(s32, s32, u16, void*, s32, s32, s32, s32);
 extern f32 lbl_8047B8A4;
 #if 0
@@ -3618,9 +3618,9 @@ s32 fn_80022EE4(u32 arg0, u32* arg1) {
         effect = fn_80128A64(sc, 1, (u16)arg0, &sp8, &spC);
         fadeSet(lbl_8047B8A4, 3);
         fadeCheck(1);
-        fn_801096F8(0);
+        menuOffScreenSetDisp(0);
         fn_8012805C(sc, effect, sp8, &spC, 0, 1, 0, 0);
-        fn_801096F8(1);
+        menuOffScreenSetDisp(1);
         fadeSet(lbl_8047B8A4, 2);
         fadeCheck(1);
         *arg1 = 1;
@@ -3992,7 +3992,7 @@ void fn_80023E5C(void) { }
 #endif
 
 /* fn_80023E60 - 0x80023E60 | size: 0x300 */
-extern void fn_80104318(void);
+extern void windowGetCursorToItem(void);
 extern void fn_800E0060(void);
 extern void fn_800E0000(void);
 extern u32 lbl_8047A370;
@@ -4018,7 +4018,7 @@ asm void fn_80023E60(void) {
 #pragma peephole off
 #pragma optimization_level 4
 s32 fn_80023E60(u8* arg0) {
-    extern s32 fn_80104318(u8*);
+    extern s32 windowGetCursorToItem(u8*);
     extern u16* fn_80105624(void);
     extern u8* menuDataBiosGetPtr(u32);
     extern u8* menuItemBiosGetPtr(s32);
@@ -4043,7 +4043,7 @@ s32 fn_80023E60(u8* arg0) {
     }
 
     da18 = menuDataBiosGetPtr(*(u32*)(arg0 + 4));
-    r104318 = (u8*)fn_80104318(arg0);
+    r104318 = (u8*)windowGetCursorToItem(arg0);
 
     if (r104318 == NULL) {
         arg0[0x95] = 0;

@@ -1904,9 +1904,9 @@ void fn_8001D834(void) {
 
 /* 0x8001D8E8 | 0xAC */
 extern void fn_801046B8();
-extern void fn_80102868(void);
+extern void menuSetPosition(void);
 extern void windowCheckCursor(void);
-extern void fn_801043A4(void);
+extern void windowGetValue(void);
 #if 0
 asm void fn_8001D8E8(void) {
 #include "src/game/gs_pcbox_fn_8001D8E8.inc"
@@ -1915,8 +1915,8 @@ asm void fn_8001D8E8(void) {
 void fn_8001D8E8(void) {
     extern void fn_80102568();
     extern void fn_801026A4();
-    extern void fn_80102868();
-    extern void fn_801043A4();
+    extern void menuSetPosition();
+    extern void windowGetValue();
     extern void windowCheckCursor();
     extern void fn_801046B8();
     u8 sp[0x30];
@@ -1953,12 +1953,12 @@ void fn_8001D8E8(void) {
     r4 = (s16)r30;
     r5 = (s16)r31;
     r3 = 0xe7;
-    fn_80102868();
+    menuSetPosition();
     r3 = 0xe7;
     r4 = 0x1;
     windowCheckCursor();
     r3 = 0xe7;
-    fn_801043A4();
+    windowGetValue();
     tmp = r3;
     r3 = 0xe7;
     r31 = tmp;
@@ -2427,8 +2427,8 @@ asm void fn_8001E3E0(void) {
 s32 fn_8001E3E0(void* a, u32* b) {
     extern void* fn_801046B8();
     extern void fn_801026A4(s32, ...);
-    extern void fn_80102868();
-    extern void fn_801043A4();
+    extern void menuSetPosition();
+    extern void windowGetValue();
     extern void windowCheckCursor();
     extern u8* windowSearchID();
     extern void fn_80102510();
@@ -2440,9 +2440,9 @@ s32 fn_8001E3E0(void* a, u32* b) {
     r4_tmp = fn_801046B8();
     a_save = a;
     fn_801026A4(0x2, r4_tmp, 0, 0, 0, 0x3, a_save, 0x1, 0);
-    fn_80102868(0x2, 0x32, 0x3c);
+    menuSetPosition(0x2, 0x32, 0x3c);
     windowCheckCursor(0x2, 0x1);
-    fn_801043A4(0x2);
+    windowGetValue(0x2);
     r3 = windowSearchID(0x2);
     if (r3 != 0) {
         if (b != 0) *b = *(u32*)(r3 + 0x80);
@@ -3347,7 +3347,7 @@ void fn_8001EF78(void) {
 #endif
 
 /* 0x8001F1E8 | 0x11C */
-extern void fn_801337A8(void);
+extern void dbgMenuSetEnable(void);
 extern void fn_801669E4(void);
 extern u8* fn_80105624();
 extern void fn_80166AB8(void);
@@ -3360,7 +3360,7 @@ void fn_8001F1E8(u8* arg) {
     extern u32 fn_800F7AF0(s32);
     extern u32 fn_800F7BC4(s32);
     extern u8* fn_80105624(void);
-    extern void fn_801337A8(s32);
+    extern void dbgMenuSetEnable(s32);
     extern void fn_801669E4(s32, s32, s32);
     extern void fn_80166AB8(s32, s32, s32);
     extern void* menuDataBiosGetPtr(u32);
@@ -3369,7 +3369,7 @@ void fn_8001F1E8(u8* arg) {
     u8* obj;
 
     if ((s32)lbl_8047A31C < 4) {
-        fn_801337A8(0);
+        dbgMenuSetEnable(0);
         if (arg == 0) return;
         menuDataBiosGetPtr(*(u32*)(arg + 0x4));
         a = fn_800F7AF0(1);
@@ -3387,7 +3387,7 @@ void fn_8001F1E8(u8* arg) {
         lbl_8047A328 = 1;
         return;
     }
-    fn_801337A8(1);
+    dbgMenuSetEnable(1);
     if (arg == 0) return;
     menuDataBiosGetPtr(*(u32*)(arg + 0x4));
     obj = fn_80105624();
@@ -4087,11 +4087,11 @@ extern void fn_800ECA78(void);
 extern void fn_800EC9DC(void);
 extern void fn_800EC990(void);
 extern void fn_800ECB74(void);
-extern void fn_80176E0C(void);
+extern void cameraPlayAnime(void);
 extern void fn_800EC960(void);
 extern void fn_801D0748(void);
 extern void fn_80128E38(void);
-extern void fn_80135168(void);
+extern void gamedatasaveGetStatus(void);
 extern void fn_800216E0(void);
 extern void fn_80113828(void);
 extern f32 lbl_8047B814;
@@ -4144,14 +4144,14 @@ void fn_8001FD48(void) {
     extern void fn_801046B8();
     extern void fn_80113828();
     extern void fn_80128E38();
-    extern void fn_80135168();
+    extern void gamedatasaveGetStatus();
     extern void fn_80165548();
     extern void fn_8016557C();
     extern void fn_80165A20();
     extern void fn_801662E8();
     extern void cameraStartAnimation();
     extern void cameraStopAnimation();
-    extern void fn_80176E0C();
+    extern void cameraPlayAnime();
     extern void fn_8017B1AC();
     extern void fadeCheck();
     extern void fadeSet();
@@ -4319,7 +4319,7 @@ void fn_8001FD48(void) {
                         r4 = r4 + 0x1800;
                         r5 = 0x0;
                         r6 = 0x0;
-                        fn_80176E0C();
+                        cameraPlayAnime();
                         f1 = lbl_8047B810;
                         r3 = 0x4;
                         fadeSet();
@@ -4414,7 +4414,7 @@ void fn_8001FD48(void) {
             r4 = r4 + 0x1800;
             r5 = 0x0;
             r6 = 0x0;
-            fn_80176E0C();
+            cameraPlayAnime();
             if (r30 != 0) {
                 r3 = r30;
                 r4 = 0x2;
@@ -4445,7 +4445,7 @@ void fn_8001FD48(void) {
             r4 = r4 + 0x1800;
             r5 = 0x0;
             r6 = 0x0;
-            fn_80176E0C();
+            cameraPlayAnime();
             if (r30 != 0) {
                 r3 = r30;
                 r4 = 0x2;
@@ -4520,7 +4520,7 @@ void fn_8001FD48(void) {
         }
         r3 = 0x0;
         r4 = 0x4;
-        fn_80135168();
+        gamedatasaveGetStatus();
         if (r3 != 0) {
             r3 = 0x1;
             fn_800216E0();
@@ -5480,7 +5480,7 @@ s32 fn_80019754(void* arg) {
 #endif
 
 /* fn_80019938 - 0x80019938 | size: 0xbc */
-extern u8* fn_80103FE4();
+extern u8* windowGetAllocPtr();
 #if 0
 asm void fn_80019938(void) {
 #include "src/game/gs_pcbox_fn_80019938.inc"
@@ -5494,7 +5494,7 @@ void fn_80019938(u8* a, u8* b) {
     s16 r0;
     u32 r4;
     u32 r4v;
-    base = fn_80103FE4();
+    base = windowGetAllocPtr();
     r0 = *(s16*)(b + 0x6);
     r4 = 0x0;
     if (r0 == (s16)0xe93) r4 = 0x0;
@@ -5534,7 +5534,7 @@ s32 fn_800199F4(u8* arg) {
     }
     {
         u8* tmp;
-        tmp = fn_80103FE4(arg);
+        tmp = windowGetAllocPtr(arg);
         i = 0;
         ids = (u16*)&lbl_80478870;
         entry = tmp;
@@ -5789,7 +5789,7 @@ u32 fn_80019D5C(u32 a, u32 b) {
 #endif
 
 /* fn_80019F6C - 0x80019F6C | size: 0xa18 */
-extern s32 fn_801040D0(s32, s32);
+extern s32 windowGetParam(s32, s32);
 extern u32 itemDataBiosGetWazaMachineNo();
 extern u32 pokemonIsDarkPokemon();
 extern u32 fn_8011E2AC();
@@ -5829,7 +5829,7 @@ void fn_80019F6C(u8* ctx, u8* pane) {
     s32 grade;
     f32 ratio;
 
-    entry = (u8*)fn_801040D0((s32)ctx, 0);
+    entry = (u8*)windowGetParam((s32)ctx, 0);
     if (entry == NULL) {
         return;
     }
@@ -5863,7 +5863,7 @@ void fn_80019F6C(u8* ctx, u8* pane) {
     }
 
     color = (s32)menuSubCalcColor(ctx, pane);
-    count = (u16)fn_801040D0((s32)ctx, 1);
+    count = (u16)windowGetParam((s32)ctx, 1);
 
     if (lbl_803A1D40[0] == 3 || lbl_803A1D40[0] == 4) {
         species = itemDataBiosGetPtr(*(u16*)(lbl_803A1D40 + 0x12));
@@ -6309,7 +6309,7 @@ s32 fn_8001AF44(s32 ctx) {
     u8* iter;
     s32 i;
 
-    result = fn_801040D0(ctx, 0);
+    result = windowGetParam(ctx, 0);
     if (result == 0) return 0;
 
     if ((s8)*((u8*)ctx + 1) == 0) {
@@ -7091,9 +7091,9 @@ asm void fn_8001E074(void) {
 s8 fn_8001E074(u8 arg1, s16 arg2, s16 arg3, u32 arg4) {
     extern void* fn_801046B8();
     extern s32 fn_801026A4(s32, ...);
-    extern void fn_80102868(s32, s16, s16);
+    extern void menuSetPosition(s32, s16, s16);
     extern void windowCheckCursor(s32, s32);
-    extern u32 fn_801043A4(s32);
+    extern u32 windowGetValue(s32);
     extern void fn_80102568(s32, s32, s32);
     u32 sp8;
     s16 r30;
@@ -7105,9 +7105,9 @@ s8 fn_8001E074(u8 arg1, s16 arg2, s16 arg3, u32 arg4) {
     else r30 = 0x44;
     r31 = r30;
     fn_801026A4((s32)r31, fn_801046B8(), &sp8, 0, 0, 0);
-    if (arg2 >= 0 && arg3 >= 0) fn_80102868((s32)r31, arg2, arg3);
+    if (arg2 >= 0 && arg3 >= 0) menuSetPosition((s32)r31, arg2, arg3);
     windowCheckCursor((s32)r31, 0x1);
-    r30 = (s8)fn_801043A4((s32)r31);
+    r30 = (s8)windowGetValue((s32)r31);
     fn_80102568((s32)r31, 0x0, 0x1);
     return (s8)r30;
 }
@@ -7126,14 +7126,14 @@ s32 fn_8001E184(void) {
     extern void* fn_801046B8();
     extern void fn_801026A4(s32, ...);
     extern void windowCheckCursor();
-    extern u32 fn_801043A4();
+    extern u32 windowGetValue();
     extern void fn_80102568();
     u32 sp8;
     s8 r31;
     sp8 = 0;
     fn_801026A4(0x12, fn_801046B8(), &sp8, 0, 0, 0);
     windowCheckCursor(0x12, 0x1);
-    r31 = (s8)fn_801043A4(0x12);
+    r31 = (s8)windowGetValue(0x12);
     fn_80102568(0x12, 0x0, 0x1);
     return r31;
 }
@@ -7167,9 +7167,9 @@ asm void fn_8001E224(void) {
 s32 fn_8001E224(void* a, u32* b, u8 c, void* d, void* e, u8 f) {
     extern void* fn_801046B8();
     extern void fn_801026A4(s32, ...);
-    extern void fn_80102868();
+    extern void menuSetPosition();
     extern void windowCheckCursor();
-    extern void fn_801043A4();
+    extern void windowGetValue();
     extern u8* windowSearchID();
     extern void fn_80102510();
     void* r4;
@@ -7180,9 +7180,9 @@ s32 fn_8001E224(void* a, u32* b, u8 c, void* d, void* e, u8 f) {
     r4 = fn_801046B8();
     c_val = c;
     fn_801026A4(0x2, r4, 0, 0, 0, 0x3, a, c_val, 0);
-    fn_80102868(0x2, d, e);
+    menuSetPosition(0x2, d, e);
     windowCheckCursor(0x2, 0x1);
-    fn_801043A4(0x2);
+    windowGetValue(0x2);
     r3 = windowSearchID(0x2);
     if (r3 != 0) {
         if (b != 0) *b = *(u32*)(r3 + 0x80);
@@ -7205,9 +7205,9 @@ asm void fn_8001E304(void) {
 s32 fn_8001E304(void* a, u32* b, void* c) {
     extern void* fn_801046B8();
     extern void fn_801026A4(s32, ...);
-    extern void fn_80102868();
+    extern void menuSetPosition();
     extern void windowCheckCursor();
-    extern void fn_801043A4();
+    extern void windowGetValue();
     extern u8* windowSearchID();
     extern void fn_80102510();
     void* r4_tmp;
@@ -7216,9 +7216,9 @@ s32 fn_8001E304(void* a, u32* b, void* c) {
     r31 = 0;
     r4_tmp = fn_801046B8();
     fn_801026A4(0x2, r4_tmp, 0, 0, 0, 0x3, a, 0x1, c);
-    fn_80102868(0x2, 0x32, 0x3c);
+    menuSetPosition(0x2, 0x32, 0x3c);
     windowCheckCursor(0x2, 0x1);
-    fn_801043A4(0x2);
+    windowGetValue(0x2);
     r3 = windowSearchID(0x2);
     if (r3 != 0) {
         if (b != 0) *b = *(u32*)(r3 + 0x80);

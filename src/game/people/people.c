@@ -1151,7 +1151,7 @@ void fn_80186620(void) { /* TODO: match -- 1340 bytes at 0x80186620 */ }
 /* 0x80186B5C | 0x58C */
 extern void fn_800F7A7C(void);
 extern void fn_800F7A08(void);
-extern void fn_80176684(void);
+extern void cameraGetRotY(void);
 extern u8 lbl_80273FB4[];
 extern u32 lbl_8047D7C8;
 extern u32 lbl_8047D84C;

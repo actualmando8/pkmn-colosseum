@@ -1803,7 +1803,7 @@ u32 fn_80113FB4(u32 key) {
 void fn_80113FE8(void) {
 #pragma optimization_level 4
     extern u8 lbl_80408378[];
-    extern u32 fn_80135168(s32, s32);
+    extern u32 gamedatasaveGetStatus(s32, s32);
     extern u32 fn_800FF56C(void);
     extern void fn_800FF58C(u32);
     u8* state = lbl_80408378;
@@ -1816,9 +1816,9 @@ void fn_80113FE8(void) {
         b = *(u32*)(state + 0x4C);
         c = *(u8*)(state + 0x50);
     } else {
-        a = fn_80135168(0, 5);
-        b = fn_80135168(0, 7);
-        c = (u8)fn_80135168(0, 8);
+        a = gamedatasaveGetStatus(0, 5);
+        b = gamedatasaveGetStatus(0, 7);
+        c = (u8)gamedatasaveGetStatus(0, 8);
     }
     if (a != 0) {
         *(u32*)(lbl_80408378 + 0x0) = fn_800FF56C();
@@ -1851,15 +1851,15 @@ void fn_801140DC(u32 material, u32 palette, u8 slot) {
 #pragma optimization_level 4
     extern u32 fn_80128E24(void);
     extern void* fn_80128E04(void);
-    extern void fn_80135030(void*, u32, u32);
+    extern void gamedatasaveSetStatus(void*, u32, u32);
     void* obj;
 
     if (fn_80128E24() != 0) {
         obj = fn_80128E04();
         if (obj != 0) {
-            fn_80135030(obj, 5, material);
-            fn_80135030(obj, 7, palette);
-            fn_80135030(obj, 8, slot);
+            gamedatasaveSetStatus(obj, 5, material);
+            gamedatasaveSetStatus(obj, 7, palette);
+            gamedatasaveSetStatus(obj, 8, slot);
         }
     }
 }

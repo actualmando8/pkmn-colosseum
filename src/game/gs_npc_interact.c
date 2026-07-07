@@ -132,7 +132,7 @@ extern u32   fn_800F7BC4(s32 slot);                   /* Get VSync flags */
 /* Battle bridge */
 extern void  fn_80132A38();                           /* Set battle parameter */
 extern void  fn_801F4C14();                           /* Configure map object */
-extern u32   fn_801040D0();                           /* Get participant data */
+extern u32   windowGetParam();                           /* Get participant data */
 
 /* =========================================================================
  * SDA globals
@@ -242,7 +242,7 @@ u32 fn_8001120C(void* obj) {
 
 /* 0x80011288 | 0x21C */
 extern void menuItemBiosSetSelectFlag();
-extern void fn_80102138();
+extern void menuGetCursorFromItemID();
 extern s32 fn_801026A4(s32, ...);
 #if 0
 asm void fn_80011288(void) {
@@ -251,7 +251,7 @@ asm void fn_80011288(void) {
 #else
 void fn_80011288(void) {
     extern void menuItemBiosSetSelectFlag();
-    extern void fn_80102138();
+    extern void menuGetCursorFromItemID();
     extern void fn_801026A4();
     u8 sp[0x20];
     u32 tmp = 0;
@@ -321,11 +321,11 @@ void fn_80011288(void) {
         } while ((s32)r30 < 4);
         r3 = 0xff;
         r4 = 0x125a;
-        fn_80102138();
+        menuGetCursorFromItemID();
         if ((s32)r3 == (s32)-0x1) {
             r3 = 0xff;
             r4 = 0x125b;
-            fn_80102138();
+            menuGetCursorFromItemID();
             if ((s32)r3 == (s32)-0x1) {
                 tmp = 0x0;
                 *(u32*)(sp + 0x8) = tmp;
@@ -821,14 +821,14 @@ s32 fn_80011A1C(u8* obj, s32 a1, s32 a2) {
 
 /* 0x78 | fn_80011B4C | generic */
 extern u32 windowSearchID();
-extern u8* fn_801040A0();
+extern u8* windowGetFreeWork();
 #pragma peephole off
 #pragma peephole off
 u32 fn_80011B4C(u32 arg1, u8 arg2) {
     u32 r;
     while (1) {
         if (!(r = windowSearchID(arg1))) return 0;
-        if (*(s16*)((u8*)fn_801040A0(r) + 0xc) == 0) return 0;
+        if (*(s16*)((u8*)windowGetFreeWork(r) + 0xc) == 0) return 0;
         if (arg2 != 0) {
             _threadSwitch();
         } else {
@@ -840,7 +840,7 @@ u32 fn_80011B4C(u32 arg1, u8 arg2) {
 #pragma peephole on
 
 /* 0x80011BC4 | 0xB4 */
-extern u8* fn_80103FE4();
+extern u8* windowGetAllocPtr();
 extern void fn_80166A28(u32 val);
 #if 0
 asm void fn_80011BC4(void) {
@@ -858,8 +858,8 @@ void fn_80011BC4(u32 arg1, u32 target) {
     s16 score;
     ptr = windowSearchID(arg1);
     if (!ptr) { return; }
-    state = (u32)fn_80103FE4(ptr);
-    data = (u32)fn_801040A0(ptr);
+    state = (u32)windowGetAllocPtr(ptr);
+    data = (u32)windowGetFreeWork(ptr);
     if (target > *(u32*)(state + 0x20)) {
         diff = target - *(u32*)(state + 0x20);
     } else {
@@ -885,7 +885,7 @@ u32 fn_80011C78(u32 arg1, u8 arg2) {
     u32 r;
     while (1) {
         if (!(r = windowSearchID(arg1))) return 0;
-        if (*(s16*)((u8*)fn_801040A0(r) + 0x2) == 0) return 0;
+        if (*(s16*)((u8*)windowGetFreeWork(r) + 0x2) == 0) return 0;
         if (arg2 != 0) {
             _threadSwitch();
         } else {
@@ -913,8 +913,8 @@ void menuFightStatusStartAnimHP(u32 arg1, s16 target) {
     if (ptr == 0) {
         return;
     }
-    state = (u32)fn_80103FE4(ptr);
-    data = (u32)fn_801040A0(ptr);
+    state = (u32)windowGetAllocPtr(ptr);
+    data = (u32)windowGetFreeWork(ptr);
     diff = *(s16*)(state + 0x1a) - (s16)target;
     if (diff < 0) {
         diff = -diff;
@@ -966,13 +966,13 @@ void fn_80011D9C(s32 id, s32 do_extra) {
 /* 0x80011E68 | 0x3C */
 /* Set an NPC's facing direction. */
 void menuFightStatusSetHP(u32 npcId, u16 direction) {
-    extern void* fn_80103FE4(void* obj);
+    extern void* windowGetAllocPtr(void* obj);
     extern void* windowSearchID(u32 npcId);
     void* npc;
 
     npc = windowSearchID(npcId);
     if (npc != NULL) {
-        u8* obj = (u8*)fn_80103FE4(npc);
+        u8* obj = (u8*)windowGetAllocPtr(npc);
         *(u16*)(obj + 0x1A) = direction;
     }
 }
@@ -1028,8 +1028,8 @@ void fn_80011EA4(void) {
     extern void fn_800D888C();
     extern void fn_800D88DC();
     extern void fn_800FA280();
-    extern void fn_80103FE4();
-    extern void fn_801040A0();
+    extern void windowGetAllocPtr();
+    extern void windowGetFreeWork();
     extern void fn_80104160();
     extern void winSpriteGetDisp();
     extern void fn_8010B9E8();
@@ -1060,14 +1060,14 @@ void fn_80011EA4(void) {
 
     r27 = r3;
     r28 = r4;
-    fn_80103FE4();
+    windowGetAllocPtr();
     tmp = r3;
     r3 = r27;
     r30 = tmp;
-    fn_801040A0();
+    windowGetFreeWork();
     r31 = r3;
     r3 = r27;
-    fn_80103FE4();
+    windowGetAllocPtr();
     r6 = *(s16*)((u8*)r28 + 0x6);
     r4 = 0x1;
     r5 = *(u8*)((u8*)r3 + 0x16);
@@ -1810,7 +1810,7 @@ asm void fn_8000DAE8(void) {
 #pragma push
 #pragma peephole off
 void fn_8000DAE8(u8* ctx, u8* npc) {
-    extern s32 fn_801040D0(u8* a, s32 b);
+    extern s32 windowGetParam(u8* a, s32 b);
     extern void fn_80132A38(s32 a, s32 b);
     extern void fn_800FB680();
     extern void fn_800FBB34();
@@ -1822,7 +1822,7 @@ void fn_8000DAE8(u8* ctx, u8* npc) {
 
     npcId = *(s16*)(npc + 6);
     if (npcId == 0x12AD) {
-        value = fn_801040D0(ctx, 0);
+        value = windowGetParam(ctx, 0);
         minute = value % 60;
         hour = value / 60;
         lbl_803A1B80[2] = 0x3A;
@@ -1838,7 +1838,7 @@ void fn_8000DAE8(u8* ctx, u8* npc) {
         fn_80132A38(0x37, value);
         fn_800FB680(0, 0, (s32)menuSubCalcColor(ctx, npc), 0xCF);
     } else if (npcId == 0x12AF) {
-        value = fn_801040D0(ctx, 0);
+        value = windowGetParam(ctx, 0);
         fn_80132A38(0x34, value);
         fn_800FBB34(0, 0, *(s16*)(npc + 0x54), *(s16*)(npc + 0x56),
                     (s32)menuSubCalcColor(ctx, npc), 0xDE);
@@ -1849,7 +1849,7 @@ void fn_8000DAE8(u8* ctx, u8* npc) {
 
 /* fn_8000DC88 - 0x8000DC88 | size: 0x84 */
 extern void fn_80265B74(void);
-extern void fn_801040B8(void);
+extern void windowSetParam(void);
 extern void fn_8026595C(void);
 #if 0
 asm void fn_8000DC88(void) {
@@ -1860,13 +1860,13 @@ asm void fn_8000DC88(void) {
 u32 fn_8000DC88(u8* ptr) {
     extern f64 fn_80265B74(void);
     extern f64 fn_8026595C(void);
-    extern void fn_801040B8(u8* a, u32 b, s32 c);
+    extern void windowSetParam(u8* a, u32 b, s32 c);
     switch (*(s32*)(ptr + 4)) {
         case 0x10a:
-            fn_801040B8(ptr, 0, (s32)fn_80265B74());
+            windowSetParam(ptr, 0, (s32)fn_80265B74());
             break;
         case 0x10b:
-            fn_801040B8(ptr, 0, (s32)fn_8026595C());
+            windowSetParam(ptr, 0, (s32)fn_8026595C());
             break;
     }
     return 0;
@@ -1986,11 +1986,11 @@ asm void fn_8000DEC4(void) {
 #pragma push
 #pragma peephole off
 void fn_8000DEC4(u8* arg1, u8* arg2) {
-    extern void* fn_801040D0(u8* a, u32 b);
+    extern void* windowGetParam(u8* a, u32 b);
     extern void winSpriteSetDisp(u8* a, u32 b);
     u8* entry;
     s32 i;
-    entry = (u8*)fn_801040D0(arg1, 0);
+    entry = (u8*)windowGetParam(arg1, 0);
     for (i = 0; i < 2; i++) {
         s32 value;
         s16 npc_id;
@@ -2035,7 +2035,7 @@ asm void fn_8000DFF0(void) {
 #pragma peephole off
 void fn_8000DFF0(u8* ctx) {
     extern u8* fn_80105624(void);
-    extern u32 fn_801040D0(u8* a, s32 b);
+    extern u32 windowGetParam(u8* a, s32 b);
     u8* flags;
     u8* entry;
     u16 bits;
@@ -2046,7 +2046,7 @@ void fn_8000DFF0(u8* ctx) {
     u8 pressed;
 
     flags = fn_80105624();
-    entry = (u8*)fn_801040D0(ctx, 0);
+    entry = (u8*)windowGetParam(ctx, 0);
     selected = -1;
     bits = *(u16*)(flags + 4);
     if (bits & 1) {
@@ -2163,7 +2163,7 @@ asm void fn_8000EA10(void) {
 #pragma push
 #pragma peephole off
 void fn_8000EA10(u8* ctx, u8* npc) {
-    extern u32 fn_801040D0(u8* a, s32 b);
+    extern u32 windowGetParam(u8* a, s32 b);
     extern u32 fn_8012640C();
     extern u32 fn_80123FBC(void);
     extern u32 fn_8001D624(u32, s32);
@@ -2178,7 +2178,7 @@ void fn_8000EA10(u8* ctx, u8* npc) {
     s32 top;
     s32 delta;
 
-    handle = fn_801040D0(ctx, 0);
+    handle = windowGetParam(ctx, 0);
     npcId = *(s16*)(npc + 6);
     idx = npcId - 0x1215;
     slot = -1;
@@ -2242,7 +2242,7 @@ asm void fn_8000ED34(void) {
 #pragma peephole off
 void fn_8000ED34(u8* ctx) {
     extern u8* fn_80105624(void);
-    extern u32 fn_801040D0(u8* a, s32 b);
+    extern u32 windowGetParam(u8* a, s32 b);
     extern void menuSetDisp(u32, s32);
     extern u8 fn_80102620(s32);
     extern s8 fn_800F7920(s32, s32);
@@ -2266,9 +2266,9 @@ void fn_8000ED34(u8* ctx) {
     s32 stored;
 
     flags = fn_80105624();
-    base = fn_801040D0(ctx, 0);
-    fn_801040D0(ctx, 1);
-    aux = fn_801040D0(ctx, 2);
+    base = windowGetParam(ctx, 0);
+    windowGetParam(ctx, 1);
+    aux = windowGetParam(ctx, 2);
     menuSetDisp(*(u32*)(ctx + 4), 1);
     activeMenu = 0;
     targetMenu = 0;
@@ -2399,9 +2399,9 @@ asm void menuFightCtrlSecretPokemonTop(void) {
 #else
 #pragma peephole off
 u32 menuFightCtrlSecretPokemonTop(u32 arg) {
-    fn_801040D0((void*)arg, 0);
-    fn_801040D0((void*)arg, 1);
-    fn_801040D0((void*)arg, 2);
+    windowGetParam((void*)arg, 0);
+    windowGetParam((void*)arg, 1);
+    windowGetParam((void*)arg, 2);
     return 0;
 }
 #pragma peephole on
@@ -2423,7 +2423,7 @@ void fn_8000F35C(u8* ctx, u8* npc) {
 
     visible = 1;
     if (*(s32*)(ctx + 4) == 0xF8) {
-        if ((u8)fn_801040D0(ctx, 2) == 0) {
+        if ((u8)windowGetParam(ctx, 2) == 0) {
             visible = 0;
         }
     }
@@ -2454,8 +2454,8 @@ asm void fn_8000F400(void) {
 #pragma peephole off
 void fn_8000F400(u8* ctx, u8* npc) {
     extern u32 windowSearchID(void);
-    extern u8* fn_80103FE4(void);
-    extern u32 fn_801040D0(u8* a, s32 b);
+    extern u8* windowGetAllocPtr(void);
+    extern u32 windowGetParam(u8* a, s32 b);
     extern u32 fn_80205B8C(void*);
     extern u32 fn_8012640C();
     extern u32 fn_80123FBC(void);
@@ -2475,11 +2475,11 @@ void fn_8000F400(u8* ctx, u8* npc) {
     s32 y1;
     s32 delta;
 
-    fn_801040D0(ctx, 0);
+    windowGetParam(ctx, 0);
     if (windowSearchID() == 0) return;
-    party = fn_80103FE4();
+    party = windowGetAllocPtr();
     if (party == NULL) return;
-    state = (u8*)fn_801040D0(ctx, 1);
+    state = (u8*)windowGetParam(ctx, 1);
     selected = *(s32*)state;
     if (selected < 0) return;
     battle = fn_80205B8C(*(void**)(party + 0x40));
@@ -2537,8 +2537,8 @@ asm void fn_8000F768(void) {
 #pragma peephole off
 void fn_8000F768(u8* ctx, u8* npc) {
     extern u32 windowSearchID(void);
-    extern u8* fn_80103FE4(void);
-    extern u32 fn_801040D0(u8* a, s32 b);
+    extern u8* windowGetAllocPtr(void);
+    extern u32 windowGetParam(u8* a, s32 b);
     extern void fn_800FBB34();
     extern void fn_800FB680();
     u8* entries;
@@ -2550,9 +2550,9 @@ void fn_8000F768(u8* ctx, u8* npc) {
     s32 y;
     s32 delta;
 
-    fn_801040D0(ctx, 0);
+    windowGetParam(ctx, 0);
     if (windowSearchID() == 0) return;
-    entries = fn_80103FE4();
+    entries = windowGetAllocPtr();
     if (entries == NULL) return;
     color = (s32)menuSubCalcColor(ctx, npc);
     id = *(s16*)(npc + 6);
@@ -2601,7 +2601,7 @@ asm void fn_8000F964(void) {
 #pragma peephole off
 void fn_8000F964(u8* ctx) {
     extern u8* fn_80105624(void);
-    extern u8* fn_80103FE4(u8* a);
+    extern u8* windowGetAllocPtr(u8* a);
     extern void menuSetDisp(u32, s32);
     extern u8 fn_80102620(s32);
     extern s8 fn_800F7920(s32, s32);
@@ -2620,7 +2620,7 @@ void fn_8000F964(u8* ctx) {
     u8 pressed;
 
     flags = fn_80105624();
-    entries = fn_80103FE4(ctx);
+    entries = windowGetAllocPtr(ctx);
     selected = -1;
     activeMenu = 0;
     targetMenu = 0;
@@ -2717,14 +2717,14 @@ asm void menuFightCtrlSecretWazaTop(void) {
 #pragma peephole off
 u32 menuFightCtrlSecretWazaTop(u8* ptr) {
     extern void* fn_80103FFC(u8* a, u32 size);
-    extern void fn_80103FE4(u8* a);
+    extern void windowGetAllocPtr(u8* a);
     if ((s8)ptr[1] == 0) {
         void* dst = fn_80103FFC(ptr, 0x48);
         if (dst != NULL) {
             memcpy(dst, *(void**)(ptr + 0x60), 0x48);
         }
     }
-    fn_80103FE4(ptr);
+    windowGetAllocPtr(ptr);
     return 0;
 }
 #pragma peephole on
@@ -2818,13 +2818,13 @@ asm void fn_8000FFA8(void) {
 #pragma push
 #pragma peephole off
 void fn_8000FFA8(u8* ctx, u8* npc) {
-    extern u8* fn_801040A0(u8* a);
+    extern u8* windowGetFreeWork(u8* a);
     u8* state;
     s32 idx;
     s32 slot;
     s32 msg;
 
-    state = fn_801040A0(ctx);
+    state = windowGetFreeWork(ctx);
     idx = *(s16*)(npc + 6) - 0x11AA;
     slot = -1;
     msg = 0;
@@ -2862,11 +2862,11 @@ asm void menuFightCtrlBall(void) {
 #else
 #pragma peephole off
 u32 menuFightCtrlBall(u8* ptr) {
-    extern void* fn_801040A0(u8* a);
-    extern void* fn_801040D0(u8* a, u32 b);
-    void* dst = fn_801040A0(ptr);
+    extern void* windowGetFreeWork(u8* a);
+    extern void* windowGetParam(u8* a, u32 b);
+    void* dst = windowGetFreeWork(ptr);
     if ((s8)ptr[1] == 0) {
-        memcpy(dst, fn_801040D0(ptr, 0), 6);
+        memcpy(dst, windowGetParam(ptr, 0), 6);
     }
     return 0;
 }
@@ -2951,7 +2951,7 @@ asm void fn_80010294(void) {
 #pragma push
 #pragma peephole off
 void fn_80010294(u8* ctx, u8* npc) {
-    extern u8* fn_80103FE4(u8* a);
+    extern u8* windowGetAllocPtr(u8* a);
     extern u32 fn_80104530(u32 val);
     extern u32 fn_80205B8C(void*);
     extern u32 fn_8012640C();
@@ -2963,7 +2963,7 @@ void fn_80010294(u8* ctx, u8* npc) {
     s32 y;
     u32 result;
 
-    entries = fn_80103FE4(ctx);
+    entries = windowGetAllocPtr(ctx);
     color = (u32)menuSubCalcColor(ctx, npc);
     idx = (s8)((fn_80104530(*(u32*)(ctx + 4)) >> 16) & 0xFF);
     y = *(s16*)(npc + 0x54) - (s16)(fn_800FA444(0x197) >> 16);
@@ -3004,7 +3004,7 @@ asm void fn_8001047C(void) {
 #pragma push
 #pragma peephole off
 void fn_8001047C(u8* arg1) {
-    extern void* fn_80103FE4(u8* a);
+    extern void* windowGetAllocPtr(u8* a);
     extern u32 fn_80104530(u32 val);
     extern void* fn_80205B8C(void* obj);
     extern u32 fn_8012640C(s32 p1, s32 p2, s32 p3, s32 p4, u16 p5, s32 p6);
@@ -3017,7 +3017,7 @@ void fn_8001047C(u8* arg1) {
     u16 battle_result;
     u16 val;
     s32 temp;
-    participant = fn_80103FE4(arg1);
+    participant = windowGetAllocPtr(arg1);
     npc_data = fn_80104530(*(u32*)(arg1 + 4));
     idx = (s16)(npc_data >> 16);
     temp = (s8)(idx & 0xFF);
@@ -3057,8 +3057,8 @@ void fn_80010588(u8* arg1, u8* arg2) {
         u32 value;
         u32 unk_08;
     } NpcInteractEntry;
-    extern NpcInteractEntry* fn_80103FE4(u8* a);
-    extern void* fn_801040A0(u8* a);
+    extern NpcInteractEntry* windowGetAllocPtr(u8* a);
+    extern void* windowGetFreeWork(u8* a);
     extern void fn_800FB680(s32 a, s32 b, s32 c, u32 d);
     NpcInteractEntry* participant;
     void* npc_data;
@@ -3066,8 +3066,8 @@ void fn_80010588(u8* arg1, u8* arg2) {
     s16 npc_id;
     s32 offset;
     u32 result;
-    participant = fn_80103FE4(arg1);
-    npc_data = fn_801040A0(arg1);
+    participant = windowGetAllocPtr(arg1);
+    npc_data = windowGetFreeWork(arg1);
     npc_id = *(s16*)(arg2 + 6);
     idx = 0;
     switch (npc_id) {
@@ -3108,9 +3108,9 @@ asm void fn_800106A4(void) {
 #pragma push
 #pragma peephole off
 void fn_800106A4(u8* arg1, u8* arg2) {
-    extern u32 fn_80103FE4(u8* a);
-    extern u32 fn_801040A0(u8* a);
-    extern u32 fn_801040D0(u8* a, s32 b);
+    extern u32 windowGetAllocPtr(u8* a);
+    extern u32 windowGetFreeWork(u8* a);
+    extern u32 windowGetParam(u8* a, s32 b);
     extern void fn_80132A38(s32 p1, s32 val);
     extern void* fn_8001D834(u8* a, u8* b);
     extern void fn_800FB680(s32 a, s32 b, s32 c, u32 d);
@@ -3128,18 +3128,18 @@ void fn_800106A4(u8* arg1, u8* arg2) {
     r30 = 0;
     switch (npc_id) {
     case 0xb4:
-        t1 = fn_80103FE4(arg1);
+        t1 = windowGetAllocPtr(arg1);
         fn_80132A38(0x37, (s32)t1);
         r30 = 0xcf;
         break;
     case 0x11cd:
-        t2 = fn_80103FE4(arg1);
+        t2 = windowGetAllocPtr(arg1);
         fn_80132A38(0x36, (s32)t2);
         r30 = 0x196;
         break;
     case 0xc1:
-        participant = (void*)fn_80103FE4(arg1);
-        npc_data = (void*)fn_801040A0(arg1);
+        participant = (void*)windowGetAllocPtr(arg1);
+        npc_data = (void*)windowGetFreeWork(arg1);
         sub = (s32)*(u8*)npc_data;
         switch (sub) {
         case 0:
@@ -3155,10 +3155,10 @@ void fn_800106A4(u8* arg1, u8* arg2) {
         r30 = 0x196;
         val = (s32)*(u32*)(arg1 + 4);
         if (val == 0xf7) {
-            fn_80132A38(0x36, *(s32*)fn_80103FE4(arg1));
+            fn_80132A38(0x36, *(s32*)windowGetAllocPtr(arg1));
         } else if (val == 0xf8) {
-            p1 = (u8*)fn_801040D0(arg1, 1);
-            if ((u8)fn_801040D0(arg1, 2) != 0) {
+            p1 = (u8*)windowGetParam(arg1, 1);
+            if ((u8)windowGetParam(arg1, 2) != 0) {
                 fn_80132A38(0x36, (s32)fn_802037DC(p1));
             } else {
                 r30 = 0x1a9;
@@ -3186,8 +3186,8 @@ asm void fn_80010844(void) {
 #pragma push
 #pragma peephole off
 u32 fn_80010844(u8* ctx) {
-    extern u8* fn_80103FE4(u8* a);
-    extern u8* fn_801040A0(u8* a);
+    extern u8* windowGetAllocPtr(u8* a);
+    extern u8* windowGetFreeWork(u8* a);
     extern u8* fn_80105624(void);
     extern u32 fn_80205B8C(void*);
     extern u32 fn_8012640C();
@@ -3201,8 +3201,8 @@ u32 fn_80010844(u8* ctx) {
     u16 flags;
     u32 saved;
 
-    participant = fn_80103FE4(ctx);
-    state = fn_801040A0(ctx);
+    participant = windowGetAllocPtr(ctx);
+    state = windowGetFreeWork(ctx);
     model = fn_80205B8C(*(void**)(participant + 0x40));
     flagsObj = fn_80105624();
     flags = *(u16*)(flagsObj + 4);
@@ -3247,9 +3247,9 @@ asm void fn_800109A0(void) {
 #pragma peephole off
 u32 fn_800109A0(u8* ctx) {
     extern void* fn_80103FFC(u8* a, u32 size);
-    extern u32 fn_801040D0(u8* a, s32 b);
-    extern u8* fn_801040A0(u8* a);
-    extern u8* fn_80103FE4(u8* a);
+    extern u32 windowGetParam(u8* a, s32 b);
+    extern u8* windowGetFreeWork(u8* a);
+    extern u8* windowGetAllocPtr(u8* a);
     extern s32 fn_801022B8(u32 val);
     void* dst;
     u8* state;
@@ -3260,15 +3260,15 @@ u32 fn_800109A0(u8* ctx) {
     if ((s8)ctx[1] == 0) {
         dst = fn_80103FFC(ctx, 0x48);
         if (dst != NULL) {
-            memcpy(dst, (void*)fn_801040D0(ctx, 0), 0x48);
+            memcpy(dst, (void*)windowGetParam(ctx, 0), 0x48);
         }
-        state = fn_801040A0(ctx);
+        state = windowGetFreeWork(ctx);
         state[0] = 0;
         state[1] = 0;
         state[2] = 0xFF;
     }
 
-    party = fn_80103FE4(ctx);
+    party = windowGetAllocPtr(ctx);
     if ((s8)ctx[1] == 5) {
         for (i = 0; i < 4; i++) {
             menuItemBiosSetSelectFlag(*(u16*)(lbl_80478850 + (i * 2)), 1);
@@ -3309,7 +3309,7 @@ u32 fn_800109A0(u8* ctx) {
 #pragma peephole off
 u32 fn_80010B30(u8* arg) {
     extern void* fn_80103FFC(u8* a, u32 size);
-    extern void* fn_80103FE4(u8* a);
+    extern void* windowGetAllocPtr(u8* a);
     extern s32 fn_801022B8(u32 val);
     extern u8* windowSearchItemID(u8* a, s32 id);
     extern void menuItemBiosSetSelectFlag(s32 id, s32 flag);
@@ -3336,7 +3336,7 @@ u32 fn_80010B30(u8* arg) {
             menuItemBiosSetSelectFlag(0xB8, 0);
         }
     }
-    participant = fn_80103FE4(arg);
+    participant = windowGetAllocPtr(arg);
     trainer_id = fn_801022B8(*(u32*)(arg + 4));
     switch (trainer_id) {
     case 0xB5:

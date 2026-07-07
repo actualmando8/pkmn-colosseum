@@ -380,7 +380,7 @@ s32 fn_8000BFA0(void) {
 extern u32 fn_80102620(s32);
 extern void fn_80102510(s32);
 extern void fn_801026A4(s32, ...);
-extern void fn_80102868(s32, s32, s32);
+extern void menuSetPosition(s32, s32, s32);
 #if 0
 asm void fn_8000C06C(void) {
 #include "src/game/gs_party_access_fn_8000C06C.inc"
@@ -391,12 +391,12 @@ u32 fn_8000C06C(void) {
     extern u32 fn_80102620(u32 a);
     extern void fn_80102510(u32 a);
     extern void fn_801026A4(u32 a, u32 b, u32 c, u32 d, u32 e, u32 f, ...);
-    extern void fn_80102868(u32 a, u32 b, u32 c);
+    extern void menuSetPosition(u32 a, u32 b, u32 c);
     if ((u8)fn_80102620(8) != 0) {
         fn_80102510(8);
     } else {
         fn_801026A4(8, 0, 0, 0, 1, 0);
-        fn_80102868(8, 0x17c, 0x20);
+        menuSetPosition(8, 0x17c, 0x20);
     }
     return 0;
 }
@@ -720,12 +720,12 @@ u32 fn_8000C518(void) {
     extern u32 fn_80102620(u32 a);
     extern void fn_80102510(u32 a);
     extern void fn_801026A4(u32 a, u32 b, u32 c, u32 d, u32 e, u32 f, ...);
-    extern void fn_80102868(u32 a, u32 b, u32 c);
+    extern void menuSetPosition(u32 a, u32 b, u32 c);
     if ((u8)fn_80102620(0xc) != 0) {
         fn_80102510(0xc);
     } else {
         fn_801026A4(0xc, 0, 0, 0, 1, 0);
-        fn_80102868(0xc, 0x190, 0x28);
+        menuSetPosition(0xc, 0x190, 0x28);
     }
     return 0;
 }
@@ -1015,7 +1015,7 @@ s32 fn_8000CA34(void) {
         fn_80102510(0x9);
     } else {
         fn_801026A4(0x9, 0, 0, 0, 1, 0);
-        fn_80102868(0x9, 0xC, 0xA);
+        menuSetPosition(0x9, 0xC, 0xA);
     }
     return 0;
 }
@@ -1463,7 +1463,7 @@ s32 fn_8000D154(void) {
         fn_80102510(0xCF);
     } else {
         fn_801026A4(0xCF, 0, 0, 0, 1, 0);
-        fn_80102868(0xCF, 0xC, 0xA);
+        menuSetPosition(0xCF, 0xC, 0xA);
     }
     return 0;
 }
@@ -1519,7 +1519,7 @@ s32 fn_8000D1C4(void) {
         fn_80102510(0x78);
     } else {
         fn_801026A4(0x78, 0, 0, 0, 1, 0);
-        fn_80102868(0x78, 0xC, 0xA);
+        menuSetPosition(0x78, 0xC, 0xA);
     }
     return 0;
 }

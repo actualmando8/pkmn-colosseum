@@ -79,7 +79,7 @@ extern u8 fn_800FF56C[];
 extern u8 fn_800FF660[];
 extern u8 fn_800FF730[];
 extern u8 fn_80102398[];
-extern u8 fn_801023E4[];
+extern u8 menuGetCursor[];
 extern u8 fn_80102510[];
 extern u8 fn_80106080[];
 extern u8 fn_80106394[];
@@ -120,21 +120,21 @@ extern u8 fn_801658FC[];
 extern u8 fn_8016597C[];
 extern u8 fn_801659FC[];
 extern u8 fn_80165A20[];
-extern u8 fn_80176758[];
-extern u8 fn_801767E0[];
-extern u8 fn_80176868[];
+extern u8 cameraSetRotY[];
+extern u8 cameraSetDistance[];
+extern u8 cameraSetHeight[];
 extern u8 fn_80176948[];
 extern u8 fn_8017697C[];
 extern u8 fn_801769B0[];
-extern u8 fn_80176E0C[];
+extern u8 cameraPlayAnime[];
 extern u8 fn_80177004[];
 extern u8 fn_8017707C[];
 extern u8 fn_801773F4[];
 extern u8 fn_801774F0[];
 extern u8 fn_801775EC[];
 extern u8 fn_80177760[];
-extern u8 fn_801779CC[];
-extern u8 fn_80177A64[];
+extern u8 cameraSetTarget[];
+extern u8 cameraUpdate[];
 extern u8 fn_80181478[];
 extern u8 fn_80181EB0[];
 extern u8 fn_801821B8[];
@@ -93838,7 +93838,7 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)fn_80102510),
     (void*)0x01000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_801023E4),
+    (void*)((u8*)menuGetCursor),
     (void*)0x01000000,
     (void*)0x00000000,
     (void*)((u8*)fn_80102398),
@@ -93907,7 +93907,7 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)GSscene_SetMode),
     (void*)0x01000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_801779CC),
+    (void*)((u8*)cameraSetTarget),
     (void*)0x01010000,
     (void*)0x00000000,
     (void*)((u8*)fn_8017697C),
@@ -93922,7 +93922,7 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)cameraSetRotation),
     (void*)0x02020200,
     (void*)0x00000000,
-    (void*)((u8*)fn_80176E0C),
+    (void*)((u8*)cameraPlayAnime),
     (void*)0x01010101,
     (void*)0x00000000,
     (void*)((u8*)cameraStopAnime),
@@ -93943,7 +93943,7 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)fn_80177760),
     (void*)0x01010102,
     (void*)0x00000000,
-    (void*)((u8*)fn_80177A64),
+    (void*)((u8*)cameraUpdate),
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)((u8*)fn_8018C1E8),
@@ -94237,13 +94237,13 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)fn_801EF6FC),
     (void*)0x01000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_80176868),
+    (void*)((u8*)cameraSetHeight),
     (void*)0x02000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_801767E0),
+    (void*)((u8*)cameraSetDistance),
     (void*)0x02000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_80176758),
+    (void*)((u8*)cameraSetRotY),
     (void*)0x02000000,
     (void*)0x00000000,
     (void*)((u8*)cameraSetFov),

@@ -39,9 +39,9 @@
  *   fn_801765F4 (nop accessor, 0xC bytes)
  *   fn_80176600-80176690 (GSscene_Get/SetField accessors)
  *   fn_801766A8 (GSscene_SetPosition)
- *   fn_80176758 (GSscene_SetRotation)
- *   fn_801767E0 (GSscene_SetScale)
- *   fn_80176868 (GSscene_SetColor)
+ *   cameraSetRotY (GSscene_SetRotation)
+ *   cameraSetDistance (GSscene_SetScale)
+ *   cameraSetHeight (GSscene_SetColor)
  *   cameraSetRotation (GSscene_GetTransform)
  *   fn_80176948-801769B0 (Get X/Y/Z position, still unnamed)
  *   cameraSetAnimeRate (GSscene_SetVisible)
@@ -49,20 +49,20 @@
  *   cameraStopAnime (GSscene_ComputeWorldTransform)
  *   fn_80176B48 (GSscene_UpdateTransformHierarchy)
  *   fn_80176C04 (GSscene_GetWorldPosition)
- *   fn_80176C78 (GSscene_Render)
- *   fn_80176E0C (GSscene_RenderChildren)
+ *   cameraPlayOffsetAnime (GSscene_Render)
+ *   cameraPlayAnime (GSscene_RenderChildren)
  *   fn_80177004 (GSscene_SetupRenderState)
  *   fn_8017707C (GSscene_MainUpdate)
  *   fn_801773F4-80177670 (GSscene_Get/Set animation params)
  *   fn_80177760 (GSscene_PlayAnimation)
  *   0x80177830-0x801779EC (GSscene_Get/Set small accessors)
- *   fn_80177A64 (XFB capture -- 3064 bytes, HUGE, still unnamed)
- *   fn_8017865C (GSscene_XFBSetupCapture)
+ *   cameraUpdate (XFB capture -- 3064 bytes, HUGE, still unnamed)
+ *   cameraRefreshTargetPos (GSscene_XFBSetupCapture)
  *   fn_801786F4 (GSscene_XFBProcess)
- *   fn_80178AA8 (camera update, 1400 bytes, still unnamed)
- *   fn_80179020 (camera interpolate, 996 bytes, still unnamed)
- *   fn_80179404 (GSscene_CameraSetTarget)
- *   fn_801794F0 (GSscene_CameraSetPosition)
+ *   _cameraPadRotateUpdate__FP9_GScamera (camera update, 1400 bytes, still unnamed)
+ *   _cameraPadMoveUpdate__FP9_GScamera (camera interpolate, 996 bytes, still unnamed)
+ *   cameraSetGScamera (GSscene_CameraSetTarget)
+ *   cameraResetFloor (GSscene_CameraSetPosition)
  *   fn_80179748 (GSscene_EnvironmentUpdate)
  *   fn_80179A18 (GSscene_LightingUpdate)
  *   fn_80179BEC (GSscene_FogUpdate)
@@ -71,7 +71,7 @@
  * The "gs%04d.xfb" string (lbl_80273A00) indicates this module can
  * capture the current framebuffer to numbered files, likely for
  * screenshot or debug purposes. The XFB capture function at
- * fn_80177A64 (3064 bytes) is the largest in this module.
+ * cameraUpdate (3064 bytes) is the largest in this module.
  *
  * Code patterns:
  *   - Linked-list object management (ptr at offset 0x00 = next)
@@ -224,7 +224,7 @@ void* psRemoveGenerator(u32 type, u32 param) {
 #pragma pop
 
 /* ==================================================================
- * fn_80177A64 -- still an unnamed scaffold in symbols.txt.
+ * cameraUpdate -- still an unnamed scaffold in symbols.txt.
  * Previously mis-attributed as "GSscene_XFBCapture"; that name does
  * not appear in symbols.txt and nothing in the tree calls it.
  *
@@ -237,13 +237,13 @@ void* psRemoveGenerator(u32 type, u32 param) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80177A64(u32 captureIndex) {
+void cameraUpdate(u32 captureIndex) {
     /* TODO: match -- 3064 bytes at 0x80177A64 */
 }
 #pragma pop
 
 /* ==================================================================
- * fn_80178AA8 -- still an unnamed scaffold in symbols.txt.
+ * _cameraPadRotateUpdate__FP9_GScamera -- still an unnamed scaffold in symbols.txt.
  * Previously mis-attributed as "GSscene_CameraUpdate"; that name does
  * not appear in symbols.txt and nothing in the tree calls it.
  *
@@ -260,13 +260,13 @@ void fn_80177A64(u32 captureIndex) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80178AA8(void* sceneObj) {
+void _cameraPadRotateUpdate__FP9_GScamera(void* sceneObj) {
     /* TODO: match -- 1400 bytes at 0x80178AA8 */
 }
 #pragma pop
 
 /* ==================================================================
- * fn_80179020 -- still an unnamed scaffold in symbols.txt.
+ * _cameraPadMoveUpdate__FP9_GScamera -- still an unnamed scaffold in symbols.txt.
  * Previously mis-attributed as "GSscene_CameraInterpolate"; that name
  * does not appear in symbols.txt and nothing in the tree calls it.
  *
@@ -275,7 +275,7 @@ void fn_80178AA8(void* sceneObj) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80179020(void* camera) {
+void _cameraPadMoveUpdate__FP9_GScamera(void* camera) {
     /* TODO: match -- 996 bytes at 0x80179020 */
 }
 #pragma pop
@@ -450,12 +450,12 @@ void fn_80176658(void* src) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-asm void fn_80176684(void) {
-#include "src/game/gs_scene_fn_80176684.inc"
+asm void cameraGetRotY(void) {
+#include "src/game/gs_scene_cameraGetRotY.inc"
 }
 #pragma pop
 #else
-f32 fn_80176684(void) {
+f32 cameraGetRotY(void) {
     return *(f32*)((u8*)lbl_80478C40 + 0x14);
 }
 #endif
@@ -463,12 +463,12 @@ f32 fn_80176684(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-asm void fn_8017669C(void) {
-#include "src/game/gs_scene_fn_8017669C.inc"
+asm void cameraGetHeight(void) {
+#include "src/game/gs_scene_cameraGetHeight.inc"
 }
 #pragma pop
 #else
-f32 fn_8017669C(void) {
+f32 cameraGetHeight(void) {
     return *(f32*)((u8*)lbl_80478C40 + 0x40);
 }
 #endif
@@ -517,15 +517,15 @@ void fn_80176F68(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_80176F98(void) {
-#include "src/game/gs_scene_fn_80176F98.inc"
+asm void cameraMoveEndCheckSpecial(void) {
+#include "src/game/gs_scene_cameraMoveEndCheckSpecial.inc"
 }
 #pragma pop
 #else
 #pragma pop
 #pragma push
 #pragma optimization_level 4
-u32 fn_80176F98(u8 param) {
+u32 cameraMoveEndCheckSpecial(u8 param) {
     void* p;
     for (;;) {
         p = lbl_80478C40;
@@ -956,13 +956,13 @@ void fn_801779B0(u32 a, u32 b, u32 c) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_801779CC(void) {
-#include "src/game/gs_scene_fn_801779CC.inc"
+asm void cameraSetTarget(void) {
+#include "src/game/gs_scene_cameraSetTarget.inc"
 }
 #else
 #pragma push
 #pragma optimization_level 1
-void fn_801779CC(u32 a, u32 b) {
+void cameraSetTarget(u32 a, u32 b) {
     *(u32*)((u8*)lbl_80478C40 + 0x34) = a;
     *(u32*)((u8*)lbl_80478C40 + 0x38) = b;
     *(u32*)((u8*)lbl_80478C40 + 0x3C) = (u32)-1;

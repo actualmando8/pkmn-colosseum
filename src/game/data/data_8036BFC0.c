@@ -11,7 +11,7 @@ extern u8 lbl_8036C248[];
 extern void* jumptable_8036C254[];
 extern void* jumptable_8036C278[];
 
-extern u8 fn_80177A64[];
+extern u8 cameraUpdate[];
 extern u8 generateParticle_8017424C[];
 extern u8 psCreateGeneratorID[];
 extern u8 psInterpretParticle0[];
@@ -195,26 +195,26 @@ u8 lbl_8036C248[12] = {
 };
 
 void* jumptable_8036C254[9] = {
-    (void*)((u8*)fn_80177A64 + 0x7C4),
-    (void*)((u8*)fn_80177A64 + 0x89C),
-    (void*)((u8*)fn_80177A64 + 0x89C),
-    (void*)((u8*)fn_80177A64 + 0xA6C),
-    (void*)((u8*)fn_80177A64 + 0xBC8),
-    (void*)((u8*)fn_80177A64 + 0xA60),
-    (void*)((u8*)fn_80177A64 + 0xA54),
-    (void*)((u8*)fn_80177A64 + 0xAF4),
-    (void*)((u8*)fn_80177A64 + 0xAE4),
+    (void*)((u8*)cameraUpdate + 0x7C4),
+    (void*)((u8*)cameraUpdate + 0x89C),
+    (void*)((u8*)cameraUpdate + 0x89C),
+    (void*)((u8*)cameraUpdate + 0xA6C),
+    (void*)((u8*)cameraUpdate + 0xBC8),
+    (void*)((u8*)cameraUpdate + 0xA60),
+    (void*)((u8*)cameraUpdate + 0xA54),
+    (void*)((u8*)cameraUpdate + 0xAF4),
+    (void*)((u8*)cameraUpdate + 0xAE4),
 };
 
 void* jumptable_8036C278[9] = {
-    (void*)((u8*)fn_80177A64 + 0x6A0),
-    (void*)((u8*)fn_80177A64 + 0x6A0),
-    (void*)((u8*)fn_80177A64 + 0x79C),
-    (void*)((u8*)fn_80177A64 + 0x79C),
-    (void*)((u8*)fn_80177A64 + 0x714),
-    (void*)((u8*)fn_80177A64 + 0x6A0),
-    (void*)((u8*)fn_80177A64 + 0x79C),
-    (void*)((u8*)fn_80177A64 + 0x6A0),
-    (void*)((u8*)fn_80177A64 + 0x79C),
+    (void*)((u8*)cameraUpdate + 0x6A0),
+    (void*)((u8*)cameraUpdate + 0x6A0),
+    (void*)((u8*)cameraUpdate + 0x79C),
+    (void*)((u8*)cameraUpdate + 0x79C),
+    (void*)((u8*)cameraUpdate + 0x714),
+    (void*)((u8*)cameraUpdate + 0x6A0),
+    (void*)((u8*)cameraUpdate + 0x79C),
+    (void*)((u8*)cameraUpdate + 0x6A0),
+    (void*)((u8*)cameraUpdate + 0x79C),
 };
 

@@ -137,7 +137,7 @@ extern void fn_80102510(u32 arg1);
 
 /* Forward declarations for converted functions */
 void _msgctrlSideName__FP15FightOutPokemonUc(u32 arg1, u32 arg2);
-s32 fn_80133E6C(void* obj, s32 offset);
+s32 _dbgMenuGetItemNo__FP14tagWINDOW_WORKl(void* obj, s32 offset);
 
 /* 0x58 | fn_8013151C | leaf_multi_output */
 void* fn_8013151C(u32 arg) {
@@ -159,7 +159,7 @@ _null_ret:
 }
 
 /* 0x80131574 | 20 bytes | indexed_lookup */
-u8 fn_80131574(u32 idx) {
+u8 sexGetPokemonSexRaitoKotei(u32 idx) {
     return lbl_803635D8[(u16)idx].value;
 }
 
@@ -216,10 +216,10 @@ extern void statusGetStatus();
 extern void statusSetStatus();
 /* Forward declarations for self-referencing asm blocks */
 extern void* windowSearchID(s32 key);
-extern void* fn_80134228(s32 offset);
+extern void* _dbgMenuGetWin__Fl(s32 offset);
 /* _msgctrlSideName__FP15FightOutPokemonUc already declared at top with typed params */
-extern s32 fn_80133E6C(void* obj, s32 offset);
-extern s32 fn_80134258(void* obj);
+extern s32 _dbgMenuGetItemNo__FP14tagWINDOW_WORKl(void* obj, s32 offset);
+extern s32 _dbgMenuGetIndex__FP14tagWINDOW_WORK(void* obj);
 extern void* fn_80135CD0(void* ptr);
 extern u8 fn_80135BC8(void* ptr);
 extern u32 fn_80135C28(void* ptr);
@@ -228,40 +228,40 @@ extern u8 fn_80135BE0(void* ptr);
 extern u8 fn_80135BB0(void* ptr);
 extern u32 fn_80135C78(void* ptr);
 extern u32 fn_80135BF8(void* ptr);
-extern u32 fn_80135B0C(void* ptr);
-extern u8 fn_80135AB8(void* ptr);
-extern u8 fn_80135AA0(void* ptr);
-extern u8 fn_80135A88(void* ptr);
-extern u8 fn_80135A70(void* ptr);
+extern u32 gamedataBiosGetGamedataAtttestPtr(void* ptr);
+extern u8 gamedataAttestBiosGetVerId(void* ptr);
+extern u8 gamedataAttestBiosGetGenId(void* ptr);
+extern u8 gamedataAttestBiosGetAreaId(void* ptr);
+extern u8 gamedataAttestBiosGetLangareaId(void* ptr);
 extern u32 fn_80135028();
-extern u32 fn_80135F90(u32 index);
+extern u32 koukaDataBiosGetLink(u32 index);
 extern u32 koukaDataBiosGetStatusKind(u32 index);
 extern u32 koukaDataBiosGetVar(u32 index);
 extern s32 koukaDataBiosGetValue(u32 index, u32 subIndex);
-extern u32 fn_80136024(u32 index);
+extern u32 koukaDataBiosGetStatus(u32 index);
 extern s32 fn_801026A4(u32, ...);
 extern void* fn_80132834(void* table, u32 stride, u32 count, u32 type);
 extern void fn_80132A38(u32 id, u32 value);
-extern s32 fn_801338A4(s32 offset);
+extern s32 _dbgMenuSub__Fl(s32 offset);
 extern u32 _dbgMenuGetMenuNum__FP14tagWINDOW_WORKPl(u32 arg0, u32* outMax);
-extern u32 fn_80133BE4(void* obj, s32 offset);
-extern s32 fn_80133C3C(s32 key);
+extern u32 _dbgMenuCheckTerminate__FP14tagWINDOW_WORKl(void* obj, s32 offset);
+extern s32 _dbgMenuGetMenuNo__Fl(s32 key);
 extern u32 _dbgMenuGetMsgID__FP14tagWINDOW_WORKl(void* obj, s32 offset);
 extern s32 _dbgMenuGetLink__Fl(s32 idx);
 extern u32 fn_80134274(void);
 extern s32 dbgMenuGetLink__Fl(s32 idx);
-extern u32 fn_80134304(void);
-extern void fn_80135338(void*);
+extern u32 debugMenuGetNum__Fv(void);
+extern void gamedataInit(void*);
 extern void fn_801353C0(void*, u8, u8, u8, u8);
 extern void fn_80135708(void*);
-extern void fn_80135A30(void* ptr, u8 val);
-extern void fn_80135A40(void* ptr, u8 val);
-extern void fn_80135A50(void* ptr, u8 val);
-extern void fn_80135A60(void* ptr, u8 val);
+extern void gamedataAttestBiosSetLangareaId(void* ptr, u8 val);
+extern void gamedataAttestBiosSetAreaId(void* ptr, u8 val);
+extern void gamedataAttestBiosSetGenId(void* ptr, u8 val);
+extern void gamedataAttestBiosSetVerId(void* ptr, u8 val);
 extern void fn_80135AEC(u32* dst, u32* src);
-extern void fn_80135B1C(void* ptr, u8 val);
-extern void fn_80135B2C(void* ptr, u8 val);
-extern void fn_80135B3C(void* ptr, u8 val);
+extern void gamedatasaveBiosSetOptionAudio(void* ptr, u8 val);
+extern void gamedatasaveBiosSetOptionNoVibration(void* ptr, u8 val);
+extern void gamedatasaveBiosSetFloorposindex(void* ptr, u8 val);
 extern void fn_80135B4C(void* ptr, u32 val);
 extern void fn_80135B5C(void* ptr, f32 val);
 extern void fn_80135B6C(void* ptr, u32 val);
@@ -1771,19 +1771,19 @@ extern const char lbl_80272AE0[];
 extern const char lbl_80272AF0[];
 /* 0x801332D8 | 0x28 -- fn_800D3074(2), return 0 */
 extern void fn_800D3074(u32 mode);
-u32 fn_801332D8(void) {
+u32 dbgMenuFrameRate20(void) {
     fn_800D3074(2);
     return 0;
 }
 
 /* 0x80133300 | 0x28 -- fn_800D3074(1), return 0 */
-u32 fn_80133300(void) {
+u32 dbgMenuFrameRate30(void) {
     fn_800D3074(1);
     return 0;
 }
 
 /* 0x80133328 | 36 bytes | call_return_const2 */
-u32 fn_80133328(void) {
+u32 dbgMenuSendAllMail(void) {
     fn_801D216C();
     return 0;
 }
@@ -1791,12 +1791,12 @@ u32 fn_80133328(void) {
 /* 0x801333AC | 0xA4 */
 extern void GSresGetResource(void);
 #if 0
-asm void fn_801333AC(void) {
-#include "src/game/effect/effect_util_fn_801333AC.inc"
+asm void dbgMenuColisionDisp(void) {
+#include "src/game/effect/effect_util_dbgMenuColisionDisp.inc"
 }
 #else
 #pragma optimization_level 4
-u32 fn_801333AC(s32 arg) {
+u32 dbgMenuColisionDisp(s32 arg) {
     extern void* GSresGetResource(u32, u32);
     u8* ptr;
     ptr = (u8*)GSresGetResource(0, 2);
@@ -1872,11 +1872,11 @@ u32 fn_80133630(void) {
 extern void* fn_80105624(void);
 extern u32 menuDataBiosGetType(u32 arg);
 #if 0
-asm void fn_80133664(void) {
-#include "src/game/effect/effect_util_fn_80133664.inc"
+asm void dbgMenuCursor(void) {
+#include "src/game/effect/effect_util_dbgMenuCursor.inc"
 }
 #else
-void fn_80133664(void* obj) {
+void dbgMenuCursor(void* obj) {
     u8 pair[2];
     s32 entryCount;
     s32 maxCount;
@@ -1921,14 +1921,14 @@ void fn_80133664(void* obj) {
 #endif
 
 /* 0x801337A0 | 0x8 | sda_getter */
-u8 fn_801337A0(void) { return lbl_8047AED0; }
+u8 dbgMenuGetEnable(void) { return lbl_8047AED0; }
 
 /* 0x801337A8 | 0x8 | sda_setter */
-void fn_801337A8(u8 val) { lbl_8047AED0 = val; }
+void dbgMenuSetEnable(u8 val) { lbl_8047AED0 = val; }
 
 /* 0x801337B0 | 0x34 -- check fn_80102620(lbl_80478848) != 0, return 0 or 1 */
 extern u32  lbl_80478848;
-u32 fn_801337B0(void) {
+u32 dbgMenuIsOpen(void) {
     u8 result = fn_80102620(lbl_80478848);
     return (result != 0) ? 1 : 0;
 }
@@ -1938,11 +1938,11 @@ extern u8   lbl_8047AED1;
 extern u32  lbl_80478848;
 extern u8   lbl_8047AED1;
 #if 0
-asm void fn_801337E4(void) {
-#include "src/game/effect/effect_util_fn_801337E4.inc"
+asm void dbgMenuClose(void) {
+#include "src/game/effect/effect_util_dbgMenuClose.inc"
 }
 #else
-void fn_801337E4(void) {
+void dbgMenuClose(void) {
     lbl_8047AED1 = 0;
     fn_80102510(lbl_80478848);
 }
@@ -1954,14 +1954,14 @@ extern u8 lbl_8047AED0;
 extern u32  lbl_80478848;
 extern u8   lbl_8047AED1;
 #if 0
-asm void fn_80133810(void) {
-#include "src/game/effect/effect_util_fn_80133810.inc"
+asm void dbgMenuMain(void) {
+#include "src/game/effect/effect_util_dbgMenuMain.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-void fn_80133810(u8 flag) {
-    extern s32 fn_801338A4(u32);
+void dbgMenuMain(u8 flag) {
+    extern s32 _dbgMenuSub__Fl(u32);
     u32 (*fp)(void);
     u32 result;
     fp = (u32 (*)(void))lbl_80478F88;
@@ -1981,7 +1981,7 @@ void fn_80133810(u8 flag) {
     }
     lbl_8047AED1 = flag;
     do {
-        if (fn_801338A4(0) < 0) {
+        if (_dbgMenuSub__Fl(0) < 0) {
             return;
         }
     } while (lbl_8047AED1 == 1);
@@ -1995,11 +1995,11 @@ extern u32 lbl_8047AEDC;
 extern u32 lbl_80478F88;
 extern u32 lbl_80478F8C;
 #if 0
-asm void fn_801338A4(void) {
-#include "src/game/effect/effect_util_fn_801338A4.inc"
+asm void _dbgMenuSub__Fl(void) {
+#include "src/game/effect/effect_util__dbgMenuSub__Fl.inc"
 }
 #else
-s32 fn_801338A4(s32 offset) {
+s32 _dbgMenuSub__Fl(s32 offset) {
     s32 prevOffset;
     s32 result;
     s32 sceneId;
@@ -2025,7 +2025,7 @@ retry:
         key = (s32)lbl_80478848 + prevOffset;
     }
 
-    outValue = (s32*)(lbl_8047AEDC + fn_80133C3C(key) * 4);
+    outValue = (s32*)(lbl_8047AEDC + _dbgMenuGetMenuNo__Fl(key) * 4);
     valueIndex = fn_801026A4(sceneId, key, outValue, 0, 1, 0);
     obj = (u8*)windowSearchID(sceneId);
     if (obj != NULL) {
@@ -2042,7 +2042,7 @@ retry:
         return result;
     }
 
-    valueIndex = fn_80133E6C(obj, (s8)obj[0x94] + (s8)obj[0x95]);
+    valueIndex = _dbgMenuGetItemNo__FP14tagWINDOW_WORKl(obj, (s8)obj[0x94] + (s8)obj[0x95]);
     link = 0;
     if (valueIndex > 0) {
         countFunc = (EffectUtilCountFunc)lbl_80478F88;
@@ -2079,7 +2079,7 @@ retry:
         if (callbackResult == -1 || (s16)link == 1) {
             goto retry;
         }
-        if (fn_801338A4(offset + 1) != 1) {
+        if (_dbgMenuSub__Fl(offset + 1) != 1) {
             goto retry;
         }
         return 1;
@@ -2122,7 +2122,7 @@ u32 _dbgMenuGetMenuNum__FP14tagWINDOW_WORKPl(u32 arg0, u32* outMax) {
                 *outMax = value;
             }
         }
-        done = fn_80133BE4((void*)arg0, index++);
+        done = _dbgMenuCheckTerminate__FP14tagWINDOW_WORKl((void*)arg0, index++);
     } while (done == 0);
     return index;
 }
@@ -2133,11 +2133,11 @@ extern void fn_800057A8(void);
 extern u32 lbl_80478F88;
 extern u32 lbl_80478F8C;
 #if 0
-asm void fn_80133C3C(void) {
-#include "src/game/effect/effect_util_fn_80133C3C.inc"
+asm void _dbgMenuGetMenuNo__Fl(void) {
+#include "src/game/effect/effect_util__dbgMenuGetMenuNo__Fl.inc"
 }
 #else
-s32 fn_80133C3C(s32 key) {
+s32 _dbgMenuGetMenuNo__Fl(s32 key) {
     s32 count;
     s32 index;
     s32 selected;
@@ -2148,7 +2148,7 @@ s32 fn_80133C3C(s32 key) {
 
     obj = (u8*)windowSearchID(key);
     if (obj != NULL) {
-        selected = fn_80133E6C(obj, (s8)obj[0x94] + (s8)obj[0x95]);
+        selected = _dbgMenuGetItemNo__FP14tagWINDOW_WORKl(obj, (s8)obj[0x94] + (s8)obj[0x95]);
         if (selected > 0) {
             countFunc = (EffectUtilCountFunc)lbl_80478F88;
             if (countFunc != NULL && countFunc() > selected) {
@@ -2196,11 +2196,11 @@ extern u32  lbl_80478848;
 extern u32 lbl_80478F88;
 extern u32 lbl_80478F8C;
 #if 0
-asm void fn_80133E6C(void) {
-#include "src/game/effect/effect_util_fn_80133E6C.inc"
+asm void _dbgMenuGetItemNo__FP14tagWINDOW_WORKl(void) {
+#include "src/game/effect/effect_util__dbgMenuGetItemNo__FP14tagWINDOW_WORKl.inc"
 }
 #else
-s32 fn_80133E6C(void* obj, s32 offset) {
+s32 _dbgMenuGetItemNo__FP14tagWINDOW_WORKl(void* obj, s32 offset) {
     s32 rel;
     s32 value;
     s32 baseValue;
@@ -2211,7 +2211,7 @@ s32 fn_80133E6C(void* obj, s32 offset) {
     EffectUtilEntryFunc entryFunc;
     EffectUtilEntry* entry;
 
-    rel = fn_80134258(obj);
+    rel = _dbgMenuGetIndex__FP14tagWINDOW_WORK(obj);
     if (rel < 0) {
         return 0;
     }
@@ -2219,40 +2219,40 @@ s32 fn_80133E6C(void* obj, s32 offset) {
         return (s32)fn_80134274() + offset;
     }
 
-    prev = (u8*)fn_80134228(rel - 1);
+    prev = (u8*)_dbgMenuGetWin__Fl(rel - 1);
     if (prev == NULL) {
         value = fn_80134274();
     } else {
         baseValue = (s8)prev[0x94] + (s8)prev[0x95];
-        rel = fn_80134258(prev);
+        rel = _dbgMenuGetIndex__FP14tagWINDOW_WORK(prev);
         if (rel < 0) {
             value = 0;
         } else if (rel == 0) {
             value = (s32)fn_80134274() + baseValue;
         } else {
-            prior = (u8*)fn_80134228(rel - 1);
+            prior = (u8*)_dbgMenuGetWin__Fl(rel - 1);
             if (prior == NULL) {
                 linked = fn_80134274();
             } else {
                 linked = (s8)prior[0x94] + (s8)prior[0x95];
-                rel = fn_80134258(prior);
+                rel = _dbgMenuGetIndex__FP14tagWINDOW_WORK(prior);
                 if (rel < 0) {
                     linked = 0;
                 } else if (rel == 0) {
                     linked += fn_80134274();
                 } else {
-                    u8* earlier = (u8*)fn_80134228(rel - 1);
+                    u8* earlier = (u8*)_dbgMenuGetWin__Fl(rel - 1);
                     if (earlier == NULL) {
                         linked += fn_80134274();
                     } else {
-                        linked += (s16)_dbgMenuGetLink__Fl(fn_80133E6C(earlier, (s8)earlier[0x94] + (s8)earlier[0x95]));
+                        linked += (s16)_dbgMenuGetLink__Fl(_dbgMenuGetItemNo__FP14tagWINDOW_WORKl(earlier, (s8)earlier[0x94] + (s8)earlier[0x95]));
                     }
                 }
             }
 
-            if (linked > 0 && (s32)fn_80134304() > linked) {
+            if (linked > 0 && (s32)debugMenuGetNum__Fv() > linked) {
                 linked = dbgMenuGetLink__Fl(linked);
-                if ((s16)linked <= 0 || (s32)fn_80134304() <= (s16)linked) {
+                if ((s16)linked <= 0 || (s32)debugMenuGetNum__Fv() <= (s16)linked) {
                     linked = 0;
                 }
             } else {
@@ -2322,7 +2322,7 @@ s32 _dbgMenuGetLink__Fl(s32 idx) {
 /* extern void* windowSearchID(s32 key); -- forward-declared K&R style above */
 #pragma push
 #pragma optimization_level 1
-void* fn_80134228(s32 offset) {
+void* _dbgMenuGetWin__Fl(s32 offset) {
     s32 key;
     s32 mask;
     mask = offset >> 31;
@@ -2332,7 +2332,7 @@ void* fn_80134228(s32 offset) {
 #pragma pop
 
 /* 0x80134258 | 0x1C -- get relative key from obj->0x04, return (key - lbl_80478848), or -1 */
-s32 fn_80134258(void* obj) {
+s32 _dbgMenuGetIndex__FP14tagWINDOW_WORK(void* obj) {
     u32 val = *(u32*)((u8*)obj + 0x04);
     if ((s32)val < (s32)lbl_80478848) return -1;
     return (s32)(val - lbl_80478848);
@@ -2341,11 +2341,11 @@ s32 fn_80134258(void* obj) {
 /* 0x80134304 | 0x38 */
 extern u32 lbl_80478F88;
 #if 0
-asm u32 fn_80134304(void) {
-#include "src/game/effect/effect_util_fn_80134304.inc"
+asm u32 debugMenuGetNum__Fv(void) {
+#include "src/game/effect/effect_util_debugMenuGetNum__Fv.inc"
 }
 #else
-u32 fn_80134304(void) {
+u32 debugMenuGetNum__Fv(void) {
     u32 (*fp)(void) = (u32 (*)(void))lbl_80478F88;
     if (fp == NULL) {
         return 0;
@@ -2357,13 +2357,13 @@ u32 fn_80134304(void) {
 /* 0x8013433C | 0xE4 */
 extern void fn_80140A9C(void);
 #if 0
-asm void fn_8013433C(void) {
-#include "src/game/effect/effect_util_fn_8013433C.inc"
+asm void pcboxSwapItemSlot(void) {
+#include "src/game/effect/effect_util_pcboxSwapItemSlot.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma scheduling on
-s32 fn_8013433C(void* base, s16 idx1, s16 idx2) {
+s32 pcboxSwapItemSlot(void* base, s16 idx1, s16 idx2) {
     extern void fn_80140A9C(void*, void*);
     void* b;
     void* b2;
@@ -2400,12 +2400,12 @@ s32 fn_8013433C(void* base, s16 idx1, s16 idx2) {
 
 /* 0x80134420 | 0x164 */
 #if 0
-asm void fn_80134420(void) {
-#include "src/game/effect/effect_util_fn_80134420.inc"
+asm void pcboxGetItemCapacity(void) {
+#include "src/game/effect/effect_util_pcboxGetItemCapacity.inc"
 }
 #else
 #pragma optimization_level 4
-u16 fn_80134420(void* base, u16 effect_id) {
+u16 pcboxGetItemCapacity(void* base, u16 effect_id) {
     extern u8 itemDataBiosGetPtr(u16);
     extern u8 fn_801429E8(void*);
     extern u16 itemGetStatus(void*, u32, u32, u32);
@@ -2441,12 +2441,12 @@ u16 fn_80134420(void* base, u16 effect_id) {
 
 /* 0x80134584 | 0xF8 */
 #if 0
-asm void fn_80134584(void) {
-#include "src/game/effect/effect_util_fn_80134584.inc"
+asm void pcboxAddItem(void) {
+#include "src/game/effect/effect_util_pcboxAddItem.inc"
 }
 #else
 #pragma scheduling on
-u16 fn_80134584(void* base, u16 effect_id, u16 r5) {
+u16 pcboxAddItem(void* base, u16 effect_id, u16 r5) {
     extern u8 itemDataBiosGetPtr(u16);
     extern u8 fn_801429E8(void*);
     extern u16 itemGetStatus(void*, u32, u32, u32);
@@ -2470,12 +2470,12 @@ u16 fn_80134584(void* base, u16 effect_id, u16 r5) {
 
 /* 0x8013467C | 0xEC */
 #if 0
-asm void fn_8013467C(void) {
-#include "src/game/effect/effect_util_fn_8013467C.inc"
+asm void pcboxDelItem(void) {
+#include "src/game/effect/effect_util_pcboxDelItem.inc"
 }
 #else
 #pragma scheduling on
-u16 fn_8013467C(void* base, u16 effect_id, u16 r5) {
+u16 pcboxDelItem(void* base, u16 effect_id, u16 r5) {
     extern u8 itemDataBiosGetPtr(u16);
     extern u8 fn_801429E8(void*);
     extern u16 itemGetStatus(void*, u32, u32, u32);
@@ -2497,13 +2497,13 @@ u16 fn_8013467C(void* base, u16 effect_id, u16 r5) {
 #endif
 
 /* 0x801347D0 | 0x8 | return_const */
-u32 fn_801347D0(void) { return 235; }
+u32 pcboxGetNbItemSlot(void) { return 235; }
 
 /* 0x801347D8 | 0x8 | return_const */
 u32 fn_801347D8(void) { return 30; }
 
 /* 0x801347E0 | 0x8 | return_const */
-u32 fn_801347E0(void) { return 3; }
+u32 pcboxGetNbPokemonBox(void) { return 3; }
 
 /* 0x801347E8 | 0x104 */
 extern void fn_80123FBC(void);
@@ -2544,12 +2544,12 @@ s8 fn_801347E8(void* base, s8 slot) {
 
 /* 0x801348EC | 0xF0 */
 #if 0
-asm void fn_801348EC(void) {
-#include "src/game/effect/effect_util_fn_801348EC.inc"
+asm void getPokemonBoxNbUsedSlot__5PCBOXFSc(void) {
+#include "src/game/effect/effect_util_getPokemonBoxNbUsedSlot__5PCBOXFSc.inc"
 }
 #else
 #pragma optimization_level 4
-s32 fn_801348EC(void* base, void* src, s8 slot, s8 idx) {
+s32 getPokemonBoxNbUsedSlot__5PCBOXFSc(void* base, void* src, s8 slot, s8 idx) {
     extern void fn_8012086C(void*);
     u8* entry;
     s8 s;
@@ -2617,13 +2617,13 @@ s32 fn_801349DC(void* base, s8 slot, u16* name) {
 /* 0x80134AF8 | 0xC8 */
 extern void fn_80124A60(void);
 #if 0
-asm void fn_80134AF8(void) {
-#include "src/game/effect/effect_util_fn_80134AF8.inc"
+asm void delPokemon__5PCBOXFScSc(void) {
+#include "src/game/effect/effect_util_delPokemon__5PCBOXFScSc.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma scheduling on
-s32 fn_80134AF8(void* base, s8 slot, s8 idx) {
+s32 delPokemon__5PCBOXFScSc(void* base, s8 slot, s8 idx) {
     extern u8 fn_80123FBC(void*);
     extern void fn_80124A60(void*);
     u8* entry;
@@ -2730,12 +2730,12 @@ s32 fn_80134BC0(void* base, void* src, s8 slot) {
 
 /* 0x80134E10 | 0xE0 */
 #if 0
-asm void fn_80134E10(void) {
-#include "src/game/effect/effect_util_fn_80134E10.inc"
+asm void setPokemon__5PCBOXFP7PokemonScSc(void) {
+#include "src/game/effect/effect_util_setPokemon__5PCBOXFP7PokemonScSc.inc"
 }
 #else
 #pragma optimization_level 4
-s32 fn_80134E10(void* base, void* src, s8 slot, s8 idx) {
+s32 setPokemon__5PCBOXFP7PokemonScSc(void* base, void* src, s8 slot, s8 idx) {
     extern void fn_8012086C(void*);
     u8* entry;
     s8 s;
@@ -2798,12 +2798,12 @@ extern void fn_800F96E4(void);
 extern void fn_801249F8(void);
 extern void fn_80142A88(void);
 #if 0
-asm void fn_80134F88(void) {
-#include "src/game/effect/effect_util_fn_80134F88.inc"
+asm void pcboxInit(void) {
+#include "src/game/effect/effect_util_pcboxInit.inc"
 }
 #else
 #pragma scheduling on
-void fn_80134F88(void* base) {
+void pcboxInit(void* base) {
     extern void fn_80132A38(u32, u32);
     extern void fn_800F96E4(void*, u32, u32);
     extern void fn_801249F8(void*, u32);
@@ -2844,11 +2844,11 @@ u32 fn_80135028() { return 0; }
 /* 0x80135030 | 0x138 */
 extern f64 lbl_8047D108;
 #if 0
-asm void fn_80135030(void) {
-#include "src/game/effect/effect_util_fn_80135030.inc"
+asm void gamedatasaveSetStatus(void) {
+#include "src/game/effect/effect_util_gamedatasaveSetStatus.inc"
 }
 #else
-void fn_80135030(void* ptr, u16 kind, u32 value) {
+void gamedatasaveSetStatus(void* ptr, u16 kind, u32 value) {
     void* sub;
 
     if (kind == 0 || kind >= 0xB) {
@@ -2891,13 +2891,13 @@ void fn_80135030(void* ptr, u16 kind, u32 value) {
         fn_80135B4C(sub, value);
         break;
     case 7:
-        fn_80135B3C(sub, (u8)value);
+        gamedatasaveBiosSetFloorposindex(sub, (u8)value);
         break;
     case 8:
-        fn_80135B2C(sub, (u8)value);
+        gamedatasaveBiosSetOptionNoVibration(sub, (u8)value);
         break;
     case 9:
-        fn_80135B1C(sub, (u8)value);
+        gamedatasaveBiosSetOptionAudio(sub, (u8)value);
         break;
     default:
         break;
@@ -2908,11 +2908,11 @@ void fn_80135030(void* ptr, u16 kind, u32 value) {
 /* 0x80135168 | 0x124 */
 extern void jumptable_80363A9C();
 #if 0
-asm void fn_80135168(void) {
-#include "src/game/effect/effect_util_fn_80135168.inc"
+asm void gamedatasaveGetStatus(void) {
+#include "src/game/effect/effect_util_gamedatasaveGetStatus.inc"
 }
 #else
-u32 fn_80135168(void* ptr, u16 kind) {
+u32 gamedatasaveGetStatus(void* ptr, u16 kind) {
     void* base = NULL;
     void* sub;
 
@@ -2968,7 +2968,7 @@ asm void fn_8013528C(void) {
 void fn_8013528C(void* ptr, u8 r4, u8 r5, u8 r6, u8 r7) {
     void* base;
     if (ptr == 0) return;
-    fn_80135338(ptr);
+    gamedataInit(ptr);
     if (ptr == 0) {
         base = (void*)fn_80129280(0, 0);
         if (base == 0) return;
@@ -2977,7 +2977,7 @@ void fn_8013528C(void* ptr, u8 r4, u8 r5, u8 r6, u8 r7) {
     } else {
         base = ptr;
     }
-    base = (void*)fn_80135B0C(base);
+    base = (void*)gamedataBiosGetGamedataAtttestPtr(base);
     if (base == 0) return;
     fn_801353C0(base, r4, r5, r6, r7);
 }
@@ -2985,12 +2985,12 @@ void fn_8013528C(void* ptr, u8 r4, u8 r5, u8 r6, u8 r7) {
 
 /* 0x80135338 | 0x88 */
 #if 0
-asm void fn_80135338(void) {
-#include "src/game/effect/effect_util_fn_80135338.inc"
+asm void gamedataInit(void) {
+#include "src/game/effect/effect_util_gamedataInit.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_80135338(void* ptr) {
+void gamedataInit(void* ptr) {
     void* base;
     if (ptr == 0) {
         base = (void*)fn_80129280(0, 0);
@@ -3000,7 +3000,7 @@ void fn_80135338(void* ptr) {
     } else {
         base = ptr;
     }
-    base = (void*)fn_80135B0C(base);
+    base = (void*)gamedataBiosGetGamedataAtttestPtr(base);
     if (base == 0) return;
     fn_80135708(base);
     fn_80135CE8(ptr);
@@ -3026,31 +3026,31 @@ void fn_801353C0(void* ptr, u8 r4, u8 r5, u8 r6, u8 r7) {
     if (ptr == 0) {
         base = (void*)fn_80129280(0, 0);
         if (base == 0) { base = 0; } else { base = (void*)fn_80129280((u32)base, 1); }
-        base = (void*)fn_80135B0C(base);
-        if (base != 0) { fn_80135A60(base, (u8)(r4 & 0xFF)); }
+        base = (void*)gamedataBiosGetGamedataAtttestPtr(base);
+        if (base != 0) { gamedataAttestBiosSetVerId(base, (u8)(r4 & 0xFF)); }
     } else {
-        base = (void*)fn_80135B0C(ptr);
-        if (base != 0) { fn_80135A60(base, (u8)(r4 & 0xFF)); }
+        base = (void*)gamedataBiosGetGamedataAtttestPtr(ptr);
+        if (base != 0) { gamedataAttestBiosSetVerId(base, (u8)(r4 & 0xFF)); }
     }
     /* A50 */
     if (ptr == 0) {
         base = (void*)fn_80129280(0, 0);
         if (base == 0) { base = 0; } else { base = (void*)fn_80129280((u32)base, 1); }
-        base = (void*)fn_80135B0C(base);
-        if (base != 0) { fn_80135A50(base, (u8)(r5 & 0xFF)); }
+        base = (void*)gamedataBiosGetGamedataAtttestPtr(base);
+        if (base != 0) { gamedataAttestBiosSetGenId(base, (u8)(r5 & 0xFF)); }
     } else {
-        base = (void*)fn_80135B0C(ptr);
-        if (base != 0) { fn_80135A50(base, (u8)(r5 & 0xFF)); }
+        base = (void*)gamedataBiosGetGamedataAtttestPtr(ptr);
+        if (base != 0) { gamedataAttestBiosSetGenId(base, (u8)(r5 & 0xFF)); }
     }
     /* A40 */
     if (ptr == 0) {
         base = (void*)fn_80129280(0, 0);
         if (base == 0) { base = 0; } else { base = (void*)fn_80129280((u32)base, 1); }
-        base = (void*)fn_80135B0C(base);
-        if (base != 0) { fn_80135A40(base, (u8)(r6 & 0xFF)); }
+        base = (void*)gamedataBiosGetGamedataAtttestPtr(base);
+        if (base != 0) { gamedataAttestBiosSetAreaId(base, (u8)(r6 & 0xFF)); }
     } else {
-        base = (void*)fn_80135B0C(ptr);
-        if (base != 0) { fn_80135A40(base, (u8)(r6 & 0xFF)); }
+        base = (void*)gamedataBiosGetGamedataAtttestPtr(ptr);
+        if (base != 0) { gamedataAttestBiosSetAreaId(base, (u8)(r6 & 0xFF)); }
     }
     /* A30 */
     if (ptr == 0) {
@@ -3061,9 +3061,9 @@ void fn_801353C0(void* ptr, u8 r4, u8 r5, u8 r6, u8 r7) {
     } else {
         base = ptr;
     }
-    base = (void*)fn_80135B0C(base);
+    base = (void*)gamedataBiosGetGamedataAtttestPtr(base);
     if (base == 0) return;
-    fn_80135A30(base, (u8)(r7 & 0xFF));
+    gamedataAttestBiosSetLangareaId(base, (u8)(r7 & 0xFF));
 }
 #endif
 
@@ -3082,11 +3082,11 @@ u32 fn_80135530(void* ptr) {
         base = (void*)fn_80129280(0, 0);
         if (base == 0) { r0 = 0; } else {
             base = (void*)fn_80129280((u32)base, 1);
-            if (base == 0) { r0 = 0; } else { base = (void*)fn_80135B0C(base); r0 = base ? ((u32)fn_80135AB8(base) & 0xFF) : 0; }
+            if (base == 0) { r0 = 0; } else { base = (void*)gamedataBiosGetGamedataAtttestPtr(base); r0 = base ? ((u32)gamedataAttestBiosGetVerId(base) & 0xFF) : 0; }
         }
     } else {
-        base = (void*)fn_80135B0C(ptr);
-        if (base != 0) { r0 = (u32)fn_80135AB8(base) & 0xFF; } else { r0 = 0; }
+        base = (void*)gamedataBiosGetGamedataAtttestPtr(ptr);
+        if (base != 0) { r0 = (u32)gamedataAttestBiosGetVerId(base) & 0xFF; } else { r0 = 0; }
     }
     if (r0 == 0) return 0;
     /* AA0 */
@@ -3094,11 +3094,11 @@ u32 fn_80135530(void* ptr) {
         base = (void*)fn_80129280(0, 0);
         if (base == 0) { r0 = 0; } else {
             base = (void*)fn_80129280((u32)base, 1);
-            if (base == 0) { r0 = 0; } else { base = (void*)fn_80135B0C(base); r0 = base ? ((u32)fn_80135AA0(base) & 0xFF) : 0; }
+            if (base == 0) { r0 = 0; } else { base = (void*)gamedataBiosGetGamedataAtttestPtr(base); r0 = base ? ((u32)gamedataAttestBiosGetGenId(base) & 0xFF) : 0; }
         }
     } else {
-        base = (void*)fn_80135B0C(ptr);
-        if (base != 0) { r0 = (u32)fn_80135AA0(base) & 0xFF; } else { r0 = 0; }
+        base = (void*)gamedataBiosGetGamedataAtttestPtr(ptr);
+        if (base != 0) { r0 = (u32)gamedataAttestBiosGetGenId(base) & 0xFF; } else { r0 = 0; }
     }
     if (r0 == 0) return 0;
     /* A88 */
@@ -3106,11 +3106,11 @@ u32 fn_80135530(void* ptr) {
         base = (void*)fn_80129280(0, 0);
         if (base == 0) { r0 = 0; } else {
             base = (void*)fn_80129280((u32)base, 1);
-            if (base == 0) { r0 = 0; } else { base = (void*)fn_80135B0C(base); r0 = base ? ((u32)fn_80135A88(base) & 0xFF) : 0; }
+            if (base == 0) { r0 = 0; } else { base = (void*)gamedataBiosGetGamedataAtttestPtr(base); r0 = base ? ((u32)gamedataAttestBiosGetAreaId(base) & 0xFF) : 0; }
         }
     } else {
-        base = (void*)fn_80135B0C(ptr);
-        if (base != 0) { r0 = (u32)fn_80135A88(base) & 0xFF; } else { r0 = 0; }
+        base = (void*)gamedataBiosGetGamedataAtttestPtr(ptr);
+        if (base != 0) { r0 = (u32)gamedataAttestBiosGetAreaId(base) & 0xFF; } else { r0 = 0; }
     }
     if (r0 == 0) return 0;
     /* A70 */
@@ -3118,11 +3118,11 @@ u32 fn_80135530(void* ptr) {
         base = (void*)fn_80129280(0, 0);
         if (base == 0) { r3 = 0; } else {
             base = (void*)fn_80129280((u32)base, 1);
-            if (base == 0) { r3 = 0; } else { base = (void*)fn_80135B0C(base); if (base) { r3 = (u32)fn_80135A70(base) & 0xFF; } else { r3 = 0; } }
+            if (base == 0) { r3 = 0; } else { base = (void*)gamedataBiosGetGamedataAtttestPtr(base); if (base) { r3 = (u32)gamedataAttestBiosGetLangareaId(base) & 0xFF; } else { r3 = 0; } }
         }
     } else {
-        base = (void*)fn_80135B0C(ptr);
-        if (base != 0) { r3 = (u32)fn_80135A70(base) & 0xFF; } else { r3 = 0; }
+        base = (void*)gamedataBiosGetGamedataAtttestPtr(ptr);
+        if (base != 0) { r3 = (u32)gamedataAttestBiosGetLangareaId(base) & 0xFF; } else { r3 = 0; }
     }
     return (r3 != 0) ? 1 : 0;
 }
@@ -3148,9 +3148,9 @@ void fn_80135708(void* ptr) {
     base = (void*)fn_80129280((u32)base, 1);
     if (base == 0) goto _a50;
 _a60_handler:
-    base = (void*)fn_80135B0C(base);
+    base = (void*)gamedataBiosGetGamedataAtttestPtr(base);
     if (base == 0) goto _a50;
-    fn_80135A60(base, 0);
+    gamedataAttestBiosSetVerId(base, 0);
 _a50:
     /* A50 */
     base = r31;
@@ -3160,9 +3160,9 @@ _a50:
     base = (void*)fn_80129280((u32)base, 1);
     if (base == 0) goto _a40;
 _a50_handler:
-    base = (void*)fn_80135B0C(base);
+    base = (void*)gamedataBiosGetGamedataAtttestPtr(base);
     if (base == 0) goto _a40;
-    fn_80135A50(base, 0);
+    gamedataAttestBiosSetGenId(base, 0);
 _a40:
     /* A40 */
     base = r31;
@@ -3172,9 +3172,9 @@ _a40:
     base = (void*)fn_80129280((u32)base, 1);
     if (base == 0) goto _a30;
 _a40_handler:
-    base = (void*)fn_80135B0C(base);
+    base = (void*)gamedataBiosGetGamedataAtttestPtr(base);
     if (base == 0) goto _a30;
-    fn_80135A40(base, 0);
+    gamedataAttestBiosSetAreaId(base, 0);
 _a30:
     /* A30 */
     base = r31;
@@ -3184,9 +3184,9 @@ _a30:
     base = (void*)fn_80129280((u32)base, 1);
     if (base == 0) goto _end;
 _a30_handler:
-    base = (void*)fn_80135B0C(base);
+    base = (void*)gamedataBiosGetGamedataAtttestPtr(base);
     if (base == 0) goto _end;
-    fn_80135A30(base, 0);
+    gamedataAttestBiosSetLangareaId(base, 0);
 _end:;
 }
 #pragma scheduling off
@@ -3210,14 +3210,14 @@ void fn_8013583C(void* ptr, u16 effect_type, u32 value) {
         ptr = base;
     }
     if (ptr == 0) return;
-    base = (void*)fn_80135B0C(ptr);
+    base = (void*)gamedataBiosGetGamedataAtttestPtr(ptr);
     if (base == 0) return;
     switch (et) {
         case 1: fn_80135AEC((u32*)ptr, (u32*)value); break;
-        case 2: fn_80135A60(base, (u8)(value & 0xFF)); break;
-        case 3: fn_80135A50(base, (u8)(value & 0xFF)); break;
-        case 4: fn_80135A40(base, (u8)(value & 0xFF)); break;
-        case 5: fn_80135A30(base, (u8)(value & 0xFF)); break;
+        case 2: gamedataAttestBiosSetVerId(base, (u8)(value & 0xFF)); break;
+        case 3: gamedataAttestBiosSetGenId(base, (u8)(value & 0xFF)); break;
+        case 4: gamedataAttestBiosSetAreaId(base, (u8)(value & 0xFF)); break;
+        case 5: gamedataAttestBiosSetLangareaId(base, (u8)(value & 0xFF)); break;
         default: break;
     }
 }
@@ -3245,14 +3245,14 @@ u8 fn_80135938(void* ptr, u16 effect_type) {
     } else {
         base = ptr;
     }
-    base = (void*)fn_80135B0C(base);
+    base = (void*)gamedataBiosGetGamedataAtttestPtr(base);
     if (base == 0) return 0;
     switch (et) {
         case 1: return 0;
-        case 2: return (u8)fn_80135AB8(base);
-        case 3: return (u8)fn_80135AA0(base);
-        case 4: return (u8)fn_80135A88(base);
-        case 5: return (u8)fn_80135A70(base);
+        case 2: return (u8)gamedataAttestBiosGetVerId(base);
+        case 3: return (u8)gamedataAttestBiosGetGenId(base);
+        case 4: return (u8)gamedataAttestBiosGetAreaId(base);
+        case 5: return (u8)gamedataAttestBiosGetLangareaId(base);
         default: return 0;
     }
 }
@@ -3260,49 +3260,49 @@ u8 fn_80135938(void* ptr, u16 effect_type) {
 #endif
 
 /* 0x80135A30 | 0x10 | nc_setter */
-void fn_80135A30(void* ptr, u8 val) {
+void gamedataAttestBiosSetLangareaId(void* ptr, u8 val) {
     if (ptr == NULL) { return; }
     ((EffectParamBlock*)ptr)->word0.byte.field_03 = val;
 }
 
 /* 0x80135A40 | 0x10 | nc_setter */
-void fn_80135A40(void* ptr, u8 val) {
+void gamedataAttestBiosSetAreaId(void* ptr, u8 val) {
     if (ptr == NULL) { return; }
     ((EffectParamBlock*)ptr)->word0.byte.field_02 = val;
 }
 
 /* 0x80135A50 | 0x10 | nc_setter */
-void fn_80135A50(void* ptr, u8 val) {
+void gamedataAttestBiosSetGenId(void* ptr, u8 val) {
     if (ptr == NULL) { return; }
     ((EffectParamBlock*)ptr)->word0.byte.field_01 = val;
 }
 
 /* 0x80135A60 | 0x10 | nc_setter */
-void fn_80135A60(void* ptr, u8 val) {
+void gamedataAttestBiosSetVerId(void* ptr, u8 val) {
     if (ptr == NULL) { return; }
     ((EffectParamBlock*)ptr)->word0.byte.field_00 = val;
 }
 
 /* 0x80135A70 | 0x18 | nc_getter */
-u8 fn_80135A70(void* ptr) {
+u8 gamedataAttestBiosGetLangareaId(void* ptr) {
     if (ptr == NULL) { return 0; }
     return ((EffectParamBlock*)ptr)->word0.byte.field_03;
 }
 
 /* 0x80135A88 | 0x18 | nc_getter */
-u8 fn_80135A88(void* ptr) {
+u8 gamedataAttestBiosGetAreaId(void* ptr) {
     if (ptr == NULL) { return 0; }
     return ((EffectParamBlock*)ptr)->word0.byte.field_02;
 }
 
 /* 0x80135AA0 | 0x18 | nc_getter */
-u8 fn_80135AA0(void* ptr) {
+u8 gamedataAttestBiosGetGenId(void* ptr) {
     if (ptr == NULL) { return 0; }
     return ((EffectParamBlock*)ptr)->word0.byte.field_01;
 }
 
 /* 0x80135AB8 | 0x18 | nc_getter */
-u8 fn_80135AB8(void* ptr) {
+u8 gamedataAttestBiosGetVerId(void* ptr) {
     if (ptr == NULL) { return 0; }
     return ((EffectParamBlock*)ptr)->word0.byte.field_00;
 }
@@ -3331,25 +3331,25 @@ void fn_80135AEC(u32* dst, u32* src) {
 }
 
 /* 0x80135B0C | 16 bytes | nc_bnelr */
-u32 fn_80135B0C(void* ptr) {
+u32 gamedataBiosGetGamedataAtttestPtr(void* ptr) {
     if (ptr != NULL) { return (u32)ptr; }
     return 0;
 }
 
 /* 0x80135B1C | 0x10 | nc_setter */
-void fn_80135B1C(void* ptr, u8 val) {
+void gamedatasaveBiosSetOptionAudio(void* ptr, u8 val) {
     if (ptr == NULL) { return; }
     ((EffectParamBlock*)ptr)->field_22 = val;
 }
 
 /* 0x80135B2C | 0x10 | nc_setter */
-void fn_80135B2C(void* ptr, u8 val) {
+void gamedatasaveBiosSetOptionNoVibration(void* ptr, u8 val) {
     if (ptr == NULL) { return; }
     ((EffectParamBlock*)ptr)->field_21 = val;
 }
 
 /* 0x80135B3C | 0x10 | nc_setter */
-void fn_80135B3C(void* ptr, u8 val) {
+void gamedatasaveBiosSetFloorposindex(void* ptr, u8 val) {
     if (ptr == NULL) { return; }
     ((EffectParamBlock*)ptr)->field_20 = val;
 }
@@ -3659,7 +3659,7 @@ u32 koukaLinkDataBiosGetKouka(u32 index, u32 sub) {
 /* 0x80135F90 | 0x2C */
 /* Get the linked effect index from the effect status table. */
 #pragma scheduling on
-u32 fn_80135F90(u32 index) {
+u32 koukaDataBiosGetLink(u32 index) {
     extern EffectStatusTableEntry lbl_80363B18[];
     extern u32 lbl_80478B88;
 
@@ -3706,7 +3706,7 @@ u32 koukaDataBiosGetVar(u32 index) {
 /* 0x80136024 | 0x2C */
 /* Get the status sub-type from the effect status table. */
 #pragma scheduling on
-u32 fn_80136024(u32 index) {
+u32 koukaDataBiosGetStatus(u32 index) {
     extern EffectStatusTableEntry lbl_80363B18[];
     extern u32 lbl_80478B88;
 
@@ -3749,7 +3749,7 @@ void fn_80136078(u32 index, void* arg1, void* arg2, s32* out) {
         _koukaOneExec__FUlPvPvPl(index, arg1, arg2, NULL);
     }
 
-    linkedIndex = fn_80135F90(index) & 0xFFFF;
+    linkedIndex = koukaDataBiosGetLink(index) & 0xFFFF;
     if (linkedIndex == 0) {
         return;
     }
@@ -3789,7 +3789,7 @@ void _koukaOneExec__FUlPvPvPl(u32 index, void* arg1, void* arg2, s32* out) {
     }
 
     statusKind = koukaDataBiosGetStatusKind(index);
-    statusSub = fn_80136024(index);
+    statusSub = koukaDataBiosGetStatus(index);
     amount = (s16)koukaDataBiosGetValue(index, 0);
     divisor = (s16)koukaDataBiosGetValue(index, 1);
     mode = koukaDataBiosGetVar(index) & 0xFF;
@@ -4887,13 +4887,13 @@ extern void mailChkReceiveMail(void);
 extern void mailAddMailbox(void);
 extern void fn_801D268C(void);
 #if 0
-asm void fn_8013334C(void) {
-#include "src/game/effect/effect_util_fn_8013334C.inc"
+asm void dbgMenuSendMail(void) {
+#include "src/game/effect/effect_util_dbgMenuSendMail.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma scheduling on
-u32 fn_8013334C(void) {
+u32 dbgMenuSendMail(void) {
     extern s32 menuOpen(u32, u32);
     extern s32 mailChkReceiveMail(s32);
     extern void mailAddMailbox(s32);
@@ -4970,14 +4970,14 @@ u32 fn_801335D4(void) {
 #endif
 extern u32 lbl_80478F8C;
 #if 0
-asm u8 fn_80133BE4(void) {
-#include "src/game/effect/effect_util_fn_80133BE4.inc"
+asm u8 _dbgMenuCheckTerminate__FP14tagWINDOW_WORKl(void) {
+#include "src/game/effect/effect_util__dbgMenuCheckTerminate__FP14tagWINDOW_WORKl.inc"
 }
 #else
-u32 fn_80133BE4(void* obj, s32 offset) {
+u32 _dbgMenuCheckTerminate__FP14tagWINDOW_WORKl(void* obj, s32 offset) {
     EffectUtilEntry* result;
     u32 ret;
-    s32 index = fn_80133E6C(obj, offset);
+    s32 index = _dbgMenuGetItemNo__FP14tagWINDOW_WORKl(obj, offset);
     {
         EffectUtilEntryFunc fp = (EffectUtilEntryFunc)lbl_80478F8C;
         if (fp == NULL) {
@@ -5003,7 +5003,7 @@ asm void _dbgMenuGetMsgID__FP14tagWINDOW_WORKl(void) {
 #pragma peephole off
 u32 _dbgMenuGetMsgID__FP14tagWINDOW_WORKl(void* obj, s32 offset) {
     EffectUtilEntry* result;
-    s32 index = fn_80133E6C(obj, offset);
+    s32 index = _dbgMenuGetItemNo__FP14tagWINDOW_WORKl(obj, offset);
     {
         EffectUtilEntryFunc fp = (EffectUtilEntryFunc)lbl_80478F8C;
         if (fp == NULL) {
@@ -5064,12 +5064,12 @@ s32 dbgMenuGetLink__Fl(s32 idx) {
 }
 #endif
 #if 0
-asm void fn_80134768(void) {
-#include "src/game/effect/effect_util_fn_80134768.inc"
+asm void pcboxGetItem(void) {
+#include "src/game/effect/effect_util_pcboxGetItem.inc"
 }
 #else
 #pragma optimization_level 4
-void* fn_80134768(void* base, s16 index) {
+void* pcboxGetItem(void* base, s16 index) {
     if (base == 0) {
         base = (void*)fn_80129280(0, 3);
     }

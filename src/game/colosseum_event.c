@@ -6818,7 +6818,7 @@ u32 fightActionFlowKaisiPre(void)
 
 {
     extern void _threadSwitch();
-    extern void fn_80103BA8();
+    extern void menuGetKeyInfo();
     extern void fn_80132A38();
     extern void fn_80165A20();
     extern s8 fadeCheck();
@@ -6889,7 +6889,7 @@ u32 fightActionFlowKaisiPre(void)
           bVar1 = 0;
         }
         else {
-          fn_80103BA8(local_3c,1);
+          menuGetKeyInfo(local_3c,1);
           cVar14 = fadeCheck(0);
           bVar1 = bVar2;
           if ((cVar14 == 0) && ((local_3c[0] & 0x20) != 0)) {
@@ -6910,7 +6910,7 @@ u32 fightActionFlowKaisiPre(void)
             bVar1 = 0;
           }
           else {
-            fn_80103BA8(local_58,1);
+            menuGetKeyInfo(local_58,1);
             cVar14 = fadeCheck(0);
             bVar1 = bVar2;
             if ((cVar14 == 0) && ((local_58[0] & 0x20) != 0)) {
@@ -6930,7 +6930,7 @@ u32 fightActionFlowKaisiPre(void)
             bVar1 = 0;
           }
           else {
-            fn_80103BA8(local_74,1);
+            menuGetKeyInfo(local_74,1);
             cVar14 = fadeCheck(0);
             bVar1 = bVar2;
             if ((cVar14 == 0) && ((local_74[0] & 0x20) != 0)) {

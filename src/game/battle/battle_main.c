@@ -55,7 +55,7 @@ extern void GSlogWrite(const char* fmt, ...);      /* GSlog_Print */
 /* Scene management */
 extern void fn_80102568(s32 objID, s32 arg1, s32 arg2);   /* release scene object */
 extern u8   fn_80102620(s32 objID);                        /* check scene object active */
-extern void fn_80103BA8(void* padData, s32 port);          /* read pad input */
+extern void menuGetKeyInfo(void* padData, s32 port);          /* read pad input */
 extern void fn_80113FB4(void);                             /* check floor loaded */
 
 /* Sound */
@@ -66,13 +66,13 @@ extern void fn_80165A20(s32 mode, s32 sndID, s32 volume);     /* sndFade */
 /* People / NPC system */
 extern u8   GSscene_GetMode(void);                      /* save people state */
 extern void GSscene_SetMode(u8 savedState);             /* restore people state */
-extern void fn_80177A64(void);                      /* clear people state */
+extern void cameraUpdate(void);                      /* clear people state */
 
 /* VSync management */
-extern u8   fn_801337A0(void);                      /* save VSync mode */
-extern void fn_801337A8(u8 mode);                   /* set VSync mode */
-extern void fn_801337E4(void);                      /* disable VSync */
-extern void fn_80133810(s32 mode);                  /* force VSync */
+extern u8   dbgMenuGetEnable(void);                      /* save VSync mode */
+extern void dbgMenuSetEnable(u8 mode);                   /* set VSync mode */
+extern void dbgMenuClose(void);                      /* disable VSync */
+extern void dbgMenuMain(s32 mode);                  /* force VSync */
 
 /* Battle subsystems */
 extern void fn_801C2D54(void);                      /* battle grid tick 1 */
@@ -458,25 +458,25 @@ void fn_801EF7C4(void* arg) {
 
 /* 0x801EF95C | size: 0xAC | medium */
 void fn_801EF95C(void) {
-    extern u8 fn_801337A0(void);
-    extern void fn_801337A8(u8 mode);
+    extern u8 dbgMenuGetEnable(void);
+    extern void dbgMenuSetEnable(u8 mode);
     extern u8 fn_8000816C(void);
-    extern void fn_80133810(s32 mode);
-    extern void fn_80103BA8(void* padData, s32 port);
+    extern void dbgMenuMain(s32 mode);
+    extern void menuGetKeyInfo(void* padData, s32 port);
     extern void _threadSwitch(void);
     extern u32 fn_800D3088(void);
     u8 ticks;
     u8 mode;
     u8 input[0x20];
 
-    mode = fn_801337A0();
-    fn_801337A8(1);
+    mode = dbgMenuGetEnable();
+    dbgMenuSetEnable(1);
     if (fn_8000816C() == 1) {
-        fn_80133810(1);
+        dbgMenuMain(1);
     } else {
         ticks = 0;
         while (ticks < 4) {
-            fn_80103BA8(input, 1);
+            menuGetKeyInfo(input, 1);
             if (!(*(u16*)input & 0x800)) {
                 _threadSwitch();
                 ticks += fn_800D3088();
@@ -485,10 +485,10 @@ void fn_801EF95C(void) {
             }
         }
         if (ticks < 4) {
-            fn_80133810(1);
+            dbgMenuMain(1);
         }
     }
-    fn_801337A8(mode);
+    dbgMenuSetEnable(mode);
 }
 
 /* fn_801EFA08 (battle_MainLoop) - documented above, needs full decompilation */
@@ -567,21 +567,21 @@ void fn_801EFA08(void) {
     }
     r3 = 0x1;
     ((void(*)(void))fadeCheck)();
-    ((void(*)(void))fn_801337A0)();
+    ((void(*)(void))dbgMenuGetEnable)();
     r28 = r3;
     r3 = 0x1;
-    ((void(*)(void))fn_801337A8)();
+    ((void(*)(void))dbgMenuSetEnable)();
     fn_8000816C();
     tmp = r3 & 0xFF;
     if (tmp == 1) {
         r3 = 0x1;
-        ((void(*)(void))fn_80133810)();
+        ((void(*)(void))dbgMenuMain)();
     } else {
         r29 = 0x0;
         while ((r29 & 0xFF) < 4) {
             r3 = (u32)sp + 0x24;
             r4 = 0x1;
-            ((void(*)(void))fn_80103BA8)();
+            ((void(*)(void))menuGetKeyInfo)();
             tmp = *(u16*)(sp + 0x24);
             tmp = tmp & 0x00000800;
             if (tmp != 1) break;
@@ -592,11 +592,11 @@ void fn_801EFA08(void) {
         }
         if ((r29 & 0xFF) < 4) {
             r3 = 0x1;
-            ((void(*)(void))fn_80133810)();
+            ((void(*)(void))dbgMenuMain)();
         }
     }
     r3 = r28;
-    ((void(*)(void))fn_801337A8)();
+    ((void(*)(void))dbgMenuSetEnable)();
     fn_801EF634();
     tmp = r3 & 0xFFFF;
     if (tmp == 4) {
@@ -676,21 +676,21 @@ void fn_801EFA08(void) {
             if (tmp != 1) break;
 
             /* Save/restore VSync, read pad input */
-            ((void(*)(void))fn_801337A0)();
+            ((void(*)(void))dbgMenuGetEnable)();
             r27 = r3;
             r3 = 0x1;
-            ((void(*)(void))fn_801337A8)();
+            ((void(*)(void))dbgMenuSetEnable)();
             fn_8000816C();
             tmp = r3 & 0xFF;
             if (tmp == 1) {
                 r3 = 0x1;
-                ((void(*)(void))fn_80133810)();
+                ((void(*)(void))dbgMenuMain)();
             } else {
                 r26 = 0x0;
                 while ((r26 & 0xFF) < 4) {
                     r3 = (u32)sp + 0x8;
                     r4 = 0x1;
-                    ((void(*)(void))fn_80103BA8)();
+                    ((void(*)(void))menuGetKeyInfo)();
                     tmp = *(u16*)(sp + 0x8);
                     tmp = tmp & 0x00000800;
                     if (tmp != 1) break;
@@ -701,11 +701,11 @@ void fn_801EFA08(void) {
                 }
                 if ((r26 & 0xFF) < 4) {
                     r3 = 0x1;
-                    ((void(*)(void))fn_80133810)();
+                    ((void(*)(void))dbgMenuMain)();
                 }
             }
             r3 = r27;
-            ((void(*)(void))fn_801337A8)();
+            ((void(*)(void))dbgMenuSetEnable)();
             fn_801EF634();
             tmp = r3 & 0xFFFF;
             if (tmp != 4) break;

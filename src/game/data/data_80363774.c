@@ -14,8 +14,8 @@ extern u8 lbl_80363B88[];
 extern u8 lbl_80363C00[];
 extern void* jumptable_80363C70[];
 
-extern u8 fn_80135030[];
-extern u8 fn_80135168[];
+extern u8 gamedatasaveSetStatus[];
+extern u8 gamedatasaveGetStatus[];
 extern u8 fn_801364A8[];
 extern u8 msgctrlAlign[];
 extern u8 msgctrlAttackMons[];
@@ -306,31 +306,31 @@ void* msgctrlcode[190] = {
 };
 
 void* jumptable_80363A70[11] = {
-    (void*)((u8*)fn_80135030 + 0x11C),
-    (void*)((u8*)fn_80135030 + 0x98),
-    (void*)((u8*)fn_80135030 + 0xA8),
-    (void*)((u8*)fn_80135030 + 0x11C),
-    (void*)((u8*)fn_80135030 + 0xB4),
-    (void*)((u8*)fn_80135030 + 0xC0),
-    (void*)((u8*)fn_80135030 + 0xCC),
-    (void*)((u8*)fn_80135030 + 0xF0),
-    (void*)((u8*)fn_80135030 + 0xFC),
-    (void*)((u8*)fn_80135030 + 0x108),
-    (void*)((u8*)fn_80135030 + 0x114),
+    (void*)((u8*)gamedatasaveSetStatus + 0x11C),
+    (void*)((u8*)gamedatasaveSetStatus + 0x98),
+    (void*)((u8*)gamedatasaveSetStatus + 0xA8),
+    (void*)((u8*)gamedatasaveSetStatus + 0x11C),
+    (void*)((u8*)gamedatasaveSetStatus + 0xB4),
+    (void*)((u8*)gamedatasaveSetStatus + 0xC0),
+    (void*)((u8*)gamedatasaveSetStatus + 0xCC),
+    (void*)((u8*)gamedatasaveSetStatus + 0xF0),
+    (void*)((u8*)gamedatasaveSetStatus + 0xFC),
+    (void*)((u8*)gamedatasaveSetStatus + 0x108),
+    (void*)((u8*)gamedatasaveSetStatus + 0x114),
 };
 
 void* jumptable_80363A9C[11] = {
-    (void*)((u8*)fn_80135168 + 0x108),
-    (void*)((u8*)fn_80135168 + 0xA8),
-    (void*)((u8*)fn_80135168 + 0xB0),
-    (void*)((u8*)fn_80135168 + 0x108),
-    (void*)((u8*)fn_80135168 + 0xB8),
-    (void*)((u8*)fn_80135168 + 0xC0),
-    (void*)((u8*)fn_80135168 + 0xC8),
-    (void*)((u8*)fn_80135168 + 0xDC),
-    (void*)((u8*)fn_80135168 + 0xE4),
-    (void*)((u8*)fn_80135168 + 0xF0),
-    (void*)((u8*)fn_80135168 + 0xFC),
+    (void*)((u8*)gamedatasaveGetStatus + 0x108),
+    (void*)((u8*)gamedatasaveGetStatus + 0xA8),
+    (void*)((u8*)gamedatasaveGetStatus + 0xB0),
+    (void*)((u8*)gamedatasaveGetStatus + 0x108),
+    (void*)((u8*)gamedatasaveGetStatus + 0xB8),
+    (void*)((u8*)gamedatasaveGetStatus + 0xC0),
+    (void*)((u8*)gamedatasaveGetStatus + 0xC8),
+    (void*)((u8*)gamedatasaveGetStatus + 0xDC),
+    (void*)((u8*)gamedatasaveGetStatus + 0xE4),
+    (void*)((u8*)gamedatasaveGetStatus + 0xF0),
+    (void*)((u8*)gamedatasaveGetStatus + 0xFC),
 };
 
 void* jumptable_80363AC8[10] = {

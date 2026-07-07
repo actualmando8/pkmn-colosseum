@@ -86,7 +86,7 @@
  * ========================================================================= */
 
 /* Scene system */
-extern void  fn_801794F0(void);                   /* GSscene_CameraSetPosition */
+extern void  cameraResetFloor(void);                   /* GSscene_CameraSetPosition */
 extern void  GSscene_SetMode(s32 mode);               /* GSscene_SetMode */
 
 /* FSYS archive loading */
@@ -101,7 +101,7 @@ extern s32   fn_801026A4(s32 slot, ...);           /* Dispatch scene event */
 extern void  fn_80102568(s32 slot, s32 p1, s32 p2);  /* Event cleanup */
 extern s32   fn_801022B8(s32 slot);               /* Get event result code */
 extern s32   menuOpen(s32 slot, s32 p1);       /* Query event state */
-extern void  fn_80102868(s32 slot, s32 p1, s32 p2);  /* Set event params */
+extern void  menuSetPosition(s32 slot, s32 p1, s32 p2);  /* Set event params */
 
 /* Resource management */
 extern void* fn_8020E0F8(void);                   /* Get scene resource table */
@@ -161,7 +161,7 @@ extern void* gEncounterTable;   /* lbl_80478F00 : .sbss -- encounter difficulty 
 #pragma push
 #pragma scheduling off
 s32 fn_80006630(void) {
-    fn_801794F0();
+    cameraResetFloor();
     return 0;
 }
 #pragma pop
@@ -184,7 +184,7 @@ s32 fn_80006654(void) {
         fn_80102510(6);
     } else {
         fn_801026A4(6, 0, 0, 0, 1, 0);
-        fn_80102868(6, 0x14, 0x104);
+        menuSetPosition(6, 0x14, 0x104);
     }
     return 0;
 }
@@ -1200,7 +1200,7 @@ void menuFightButtonNormal(u8* ctx) {
 /* fn_80007088 - 0x80007088 | size: 0x44 */
 extern u8   fn_801EF63C(void);
 extern void fn_801F1588(s32 mode);
-extern void fn_801337E4(void);
+extern void dbgMenuClose(void);
 #if 0
 asm void fn_80007088(void) {
 #include "src/game/gs_task_fn_80007088.inc"
@@ -1213,7 +1213,7 @@ s32 fn_80007088(void) {
         return -1;
     }
     fn_801F1588(0);
-    fn_801337E4();
+    dbgMenuClose();
     return 0;
 }
 #pragma pop
@@ -1233,7 +1233,7 @@ s32 fn_800070CC(void) {
         return -1;
     }
     fn_801EF62C(3);
-    fn_801337E4();
+    dbgMenuClose();
     return 0;
 }
 #pragma pop
@@ -1252,7 +1252,7 @@ s32 fn_80007110(void) {
         return -1;
     }
     fn_801EF62C(2);
-    fn_801337E4();
+    dbgMenuClose();
     return 0;
 }
 #pragma pop

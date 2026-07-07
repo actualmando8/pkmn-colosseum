@@ -152,8 +152,8 @@ extern u8 fn_80084038[];
 extern u8 fn_80096D54[];
 extern u8 fn_80096FA0[];
 extern u8 fn_800973EC[];
-extern u8 fn_80105A3C[];
-extern u8 fn_80133664[];
+extern u8 winMsgCtrl[];
+extern u8 dbgMenuCursor[];
 extern u8 menuFightButtonNormal[];
 extern u8 menuFightCtrlBall[];
 extern u8 menuFightCtrlSecretMain[];
@@ -284,7 +284,7 @@ void* lbl_802E2DB8[1904] = {
     (void*)0x70840F00,
     (void*)0x00010000,
     (void*)0x00000000,
-    (void*)((u8*)fn_80133664),
+    (void*)((u8*)dbgMenuCursor),
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)0x00000000,
@@ -384,14 +384,14 @@ void* lbl_802E2DB8[1904] = {
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)((u8*)winMsgButton),
-    (void*)((u8*)fn_80105A3C),
+    (void*)((u8*)winMsgCtrl),
     (void*)0x00000000,
     (void*)0x60100000,
     (void*)0x00750000,
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)((u8*)winMsgButton),
-    (void*)((u8*)fn_80105A3C),
+    (void*)((u8*)winMsgCtrl),
     (void*)0x00000000,
     (void*)0x72240000,
     (void*)0x008201C1,
@@ -727,7 +727,7 @@ void* lbl_802E2DB8[1904] = {
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)((u8*)winMsgButton),
-    (void*)((u8*)fn_80105A3C),
+    (void*)((u8*)winMsgCtrl),
     (void*)0x00000000,
     (void*)0x61240001,
     (void*)0x00610000,
@@ -839,7 +839,7 @@ void* lbl_802E2DB8[1904] = {
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)((u8*)winMsgButton),
-    (void*)((u8*)fn_80105A3C),
+    (void*)((u8*)winMsgCtrl),
     (void*)0x00000000,
     (void*)0x20040000,
     (void*)0x0092005B,
@@ -1889,7 +1889,7 @@ void* lbl_802E2DB8[1904] = {
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)((u8*)winMsgButton),
-    (void*)((u8*)fn_80105A3C),
+    (void*)((u8*)winMsgCtrl),
     (void*)0x00000000,
     (void*)0xA1840C00,
     (void*)0x00000000,
@@ -1903,14 +1903,14 @@ void* lbl_802E2DB8[1904] = {
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)((u8*)winMsgButton),
-    (void*)((u8*)fn_80105A3C),
+    (void*)((u8*)winMsgCtrl),
     (void*)0x00000000,
     (void*)0x60100000,
     (void*)0x100C0000,
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)((u8*)winMsgButton),
-    (void*)((u8*)fn_80105A3C),
+    (void*)((u8*)winMsgCtrl),
     (void*)0x00000000,
     (void*)0x73240000,
     (void*)0x10180000,
@@ -2155,7 +2155,7 @@ void* lbl_802E2DB8[1904] = {
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)((u8*)winMsgButton),
-    (void*)((u8*)fn_80105A3C),
+    (void*)((u8*)winMsgCtrl),
     (void*)0x00000000,
     (void*)0x60240000,
     (void*)0x12B20000,

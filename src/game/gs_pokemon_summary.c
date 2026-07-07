@@ -209,8 +209,8 @@ extern s32 fn_801026A4(s32, void*, ...);
 extern void fn_80102510(s32);
 extern void menuCloseSync(s32, s32);
 extern void fn_801069FC(s32);
-extern u32 fn_80134420(s32, u16);
-extern void fn_8013467C(s32, u16, u16);
+extern u32 pcboxGetItemCapacity(s32, u16);
+extern void pcboxDelItem(s32, u16, u16);
 extern void fn_8012959C(void*, u16, u16, s16);
 extern void fn_801299C8(void*, u16, u16, s16);
 extern void fn_80129514(void*, u16, u16);
@@ -2017,14 +2017,14 @@ s32 fn_80017E8C(s32 pageIndex, u16 species, s16 slotIndex) {
         return 0;
     }
 
-    if ((u16)fn_80134420(0, species) < result) {
+    if ((u16)pcboxGetItemCapacity(0, species) < result) {
         fn_80132A38(0x2D, species);
         fn_80106D3C(2, 0x2B49, 1, 0);
         fn_801069FC(1);
         return 0;
     }
 
-    fn_8013467C(0, species, (u16)result);
+    pcboxDelItem(0, species, (u16)result);
     if (dataSource == -1) {
         fn_8012959C((void*)lbl_8047A2F8, species, (u16)result, slotIndex);
     } else {

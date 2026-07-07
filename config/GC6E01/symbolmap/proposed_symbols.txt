@@ -1,12 +1,89 @@
-fn_801D1B4C -> mailGetSortMode  // pilot XD-port body-verified: Identical structure: both size 0x2C, single bl savedataGetStatus (Colosseum fn_8
-fn_801D1CC4 -> mailChkReceiveMail  // pilot XD-port body-verified: Instruction-identical: both size 0x94, single bl (fn_80129280 = savedataGetStatu
-fn_801D1D58 -> mailAddMailbox  // pilot XD-port body-verified: Identical structure: both size 0xF8, same instruction count, both call savedataG
-fn_801D1F7C -> mailGetNbMailInMailbox  // pilot XD-port body-verified: Identical shape: both size 0x2C, 11 instrs, single bl (Colo fn_80129280 == XD sa
-fn_801D1FA8 -> mailInitMailbox  // pilot XD-port body-verified: Identical shape/call sequence: prologue→memset(struct,0)→stb 0 flag near end→fil
-fn_801D349C -> _wazaSequenceCameraDoPosition__FP13ModelSequenceP24wazaSequenceCameraParamsfb  // pilot XD-port body-verified: Call sequences align: fn_800E0BE4=HSD_Randf and the 4-call group fn_801767E0/801
-fn_801D3F7C -> _wazaSequenceCameraDoDollyPosition__FP21TemplateExpFileHeaderP24wazaSequenceCameraParamsfb  // pilot XD-port body-verified: Both open with 10 random-value calls then the identical camera-dolly sequence se
-fn_801D49D8 -> _wazaSequenceCameraSelectDuration__FUcPff  // pilot XD-port body-verified: Both are a bitmask dispatch on arg-0 (tests 1,2,4,8,3,5,9 in identical order), e
-fn_801D4DA0 -> _wazaSequenceCameraSelectMotion__FP13ModelSequenceP12WazaSequenceP24wazaSequenceCameraParams  // pilot XD-port body-verified: Identical CFG: cmplwi 0x13a early-out, 4-bit popcount into r8, cmpwi r8 0/1 disp
-fn_801DB848 -> wazaSequenceSysGetModelShadowLight__Fv  // pilot XD-port body-verified: Both are byte-identical 8-byte getters (lwz r3,<global>@sda21(r0); blr), size 0x
-fn_801DB850 -> wazaSequenceSysGetModelShadowCount__Fv  // pilot XD-port body-verified: Both are byte-identical 0x8 getters: lwz r3,<global>@sda21(r0)+blr, no calls; XD
-fn_801DB858 -> wazaSequenceSysGetModelShadowList__Fv  // pilot XD-port body-verified: Both are identical 0xC address-of-global getters (lis/addi/blr, no bl calls); Co
+fn_80101AC4 -> kaisuuGetKaisuu  // game/gs_model.c callee: Identical size 0x70, same call sequence kaisuuBiosGetMax→kaisuuBiosGet
+fn_801020C0 -> menuGetSelectItemNum  // game/gs_model.c callee: Identical call sequence (menuDataBiosGetPtr then menuItemBiosGetPtr in
+fn_80102138 -> menuGetCursorFromItemID  // game/gs_model.c callee: Identical call sequence (menuDataBiosGetPtr, then menuItemBiosGetPtr i
+fn_801023E4 -> menuGetCursor  // game/gs_model.c ordinal: Identical call sequence (single bl windowSearchID) and control-flow sh
+fn_801024C0 -> menuCloseFloor  // game/gs_model.c ordinal: Byte-for-byte identical: both size 0x28, same 10-instr sequence with s
+fn_80102868 -> menuSetPosition  // game/gs_model.c callee: Identical 0x48 body, same single `bl windowSearchID` call, matching cm
+fn_80102F38 -> menuCursorNormal  // game/gs_model.c callee: Near-identical bodies: same menuDataBiosGetPtr anchor + exactly 10 tra
+fn_80103BA8 -> menuGetKeyInfo  // game/gs_model.c callee: Byte-identical dispatch switch, li r3 values (1/2/4/8/0), clrlwi/beq-t
+fn_80103CB0 -> menuGetEnablePort  // game/gs_model.c ordinal: Both are 4-instr leaf getters, size 0x10, identical lis/addi/lbz(struc
+fn_80103CC0 -> menuSetEnablePort  // game/gs_model.c ordinal: Identical leaf body: both size 0x18, 6 insns, same lis/addi base + lbz
+fn_80103FE4 -> windowGetAllocPtr  // game/gs_model.c callee: Both are 0x18 leaf getters with instruction-identical shape (null-chec
+fn_801040A0 -> windowGetFreeWork  // game/gs_model.c callee: Identical 0x18-byte leaf: same 6 instrs and CF (cmplwi r3,0 / beq / ad
+fn_801040B8 -> windowSetParam  // game/gs_model.c callee: Both are identical 6-instruction leaf setters (cmplwi/beqlr/slwi/add/s
+fn_801040D0 -> windowGetParam  // game/gs_model.c callee: Identical 8-instruction leaf getter, same size 0x20, same cmplwi/beq/s
+fn_80104318 -> windowGetCursorToItem  // game/gs_model.c callee: Identical call sequence (menuDataBiosGetPtr→menuItemBiosGetPtr→loop me
+fn_801043A4 -> windowGetValue  // game/gs_model.c callee: Switch-dispatch body is a 1:1 structural match (same r29/r30/r31 prolo
+fn_80104A94 -> _windowCreateItemSprite__FP14tagWINDOW_WORK  // game/gs_model.c callee: Call backbone matches in order (menuDataBiosGetPtr, menuItemBiosGetPtr
+fn_80105A3C -> winMsgCtrl  // game/gs_model.c callee: Identical switch-dispatch structure and prologue/epilogue; callee orde
+fn_80107ED8 -> winSeqIsCheck  // game/gs_model.c callee: Both size 0x60, instruction-for-instruction identical: same prologue, 
+fn_80109664 -> menuOffScreenFadeSync  // game/gs_model.c ordinal: Same spin-wait loop: identical prologue, loop shape, and single bl to 
+fn_801096E8 -> menuOffScreenSetPriority  // game/gs_model.c ordinal: Byte-identical: both 0x10 / 4 instrs, exact sequence lbz r0,sda21; stb
+fn_801096F8 -> menuOffScreenSetDisp  // game/gs_model.c ordinal: Byte-identical bodies: both size 0x10, leaf (no bl), lbz r0,sda / stb 
+fn_80109708 -> menuOffScreenIsDoing  // game/gs_model.c ordinal: Both are identical 0x8 2-instruction byte-getters (lbz r3, sda21-flag;
+fn_80109710 -> menuOffScreenGetPtr  // game/gs_model.c ordinal: Both are identical size-0x8 getters (lwz r3,<global>@sda21; blr), no b
+fn_80109718 -> menuOffScreenCheckEnable  // game/gs_model.c ordinal: Identical control flow (busy-wait loop on sda flag byte, single bl thr
+fn_80109884 -> _menuCBOffScreen__FP9GStextureUlPv  // game/gs_model.c callee: Both size 0x10, instruction-identical (li r0,1; li r3,0; stb r0,<sda21
+fn_80176684 -> cameraGetRotY  // game/gs_scene.c ordinal: Identical 3-instr 0xC bodies: lwz r3,camWork@sda21 / lfs f1,0x14(r3) /
+fn_80176690 -> cameraGetDistance  // game/gs_scene.c ordinal: Byte-identical leaf getter: both size 0xC, same 3 ops (lwz camwork@sda
+fn_8017669C -> cameraGetHeight  // game/gs_scene.c ordinal: Identical 3-instr bodies (lwz camwork@sda21; lfs f1,0x40(r3); blr), sa
+fn_80176758 -> cameraSetRotY  // game/gs_scene.c ordinal: Identical size 0x88, same instruction-by-instruction body: single bl (
+fn_801767E0 -> cameraSetDistance  // game/gs_scene.c ordinal: Byte-identical bodies: both size 0x88, single bl GSfloorGetCurrent (Co
+fn_80176868 -> cameraSetHeight  // game/gs_scene.c ordinal: Byte-identical bodies: same size 0x88, same instruction count/CFG (flo
+fn_80176C78 -> cameraPlayOffsetAnime  // game/gs_scene.c callee: Identical prologue and control-flow lattice; call sequence aligns 1:1 
+fn_80176E0C -> cameraPlayAnime  // game/gs_scene.c callee: 12-call sequence matches 1:1 in order and control-flow shape: GSresGet
+fn_80176F98 -> cameraMoveEndCheckSpecial  // game/gs_scene.c ordinal: Identical spin-loop structure (clrlwi r31 param, 3 checks, threadSwitc
+fn_801779CC -> cameraSetTarget  // game/gs_scene.c ordinal: Instruction-for-instruction identical leaf (size 0x20, 8 insns, no bl)
+fn_80177A64 -> cameraUpdate  // game/gs_scene.c callee: Same camera-update routine: sizes 0xBF8 vs 0xBCC (44B delta), identica
+fn_8017865C -> cameraRefreshTargetPos  // game/gs_scene.c callee: Named callee GSpartGetTransform anchors at same position with identica
+fn_80178AA8 -> _cameraPadRotateUpdate__FP9_GScamera  // game/gs_scene.c callee: bl sequences align: named anchors atan2/sin/cos and identical 5-call t
+fn_80179020 -> _cameraPadMoveUpdate__FP9_GScamera  // game/gs_scene.c callee: Exact 4-call camera tail (SetPosition/SetRotation/GetPerspective/SetPe
+fn_80179404 -> cameraSetGScamera  // game/gs_scene.c callee: First 5 bls match exactly in order (GSresGetResource, GScameraGetPersp
+fn_801794F0 -> cameraResetFloor  // game/gs_scene.c ordinal: Both have 5 bl to one repeated callee (fn_800FF56C↔GSfloorGetCurrent) 
+fn_80131574 -> sexGetPokemonSexRaitoKotei  // game/effect/effect_util.c ordinal: Byte-identical 5-instruction bodies (lis/clrlslwi r0,r3,16,3/addi/lbzx
+fn_801332D8 -> dbgMenuFrameRate20  // game/effect/effect_util.c ordinal: Both size 0x28, identical single-bl structure calling with li r3,0x2 t
+fn_80133300 -> dbgMenuFrameRate30  // game/effect/effect_util.c ordinal: Both are 0x28, 10-instr single-bl wrappers: load r3=0x1, call the vide
+fn_80133328 -> dbgMenuSendAllMail  // game/effect/effect_util.c ordinal: Both size 0x24, instruction-for-instruction identical: prologue, singl
+fn_8013334C -> dbgMenuSendMail  // game/effect/effect_util.c callee: Identical loop-until-menuOpen==-1 structure with same callee order (ma
+fn_801333AC -> dbgMenuColisionDisp  // game/effect/effect_util.c callee: Identical: both size 0xA4, same single bl GSresGetResource, byte-ident
+fn_80133664 -> dbgMenuCursor  // game/effect/effect_util.c callee: Shared exact-mangled anchor callee _dbgMenuGetMenuNum__FP14tagWINDOW_W
+fn_801337A0 -> dbgMenuGetEnable  // game/effect/effect_util.c ordinal: Identical size 0x8 and instruction-for-instruction body (lbz r3,<sda21
+fn_801337A8 -> dbgMenuSetEnable  // game/effect/effect_util.c ordinal: Both are size 0x8, identical 2-instruction body (stb r3,<sda21 enable 
+fn_801337B0 -> dbgMenuIsOpen  // game/effect/effect_util.c ordinal: Identical structure: sda21 load → single bl → same clrlwi24/neg/or/srw
+fn_801337E4 -> dbgMenuClose  // game/effect/effect_util.c ordinal: Near-identical body: same prologue/epilogue, li r0,0; lwz r3,menu_data
+fn_80133810 -> dbgMenuMain  // game/effect/effect_util.c callee: Core is a byte-for-byte structural match (debugMenuDataGetNum ptr-call
+fn_801338A4 -> _dbgMenuSub__Fl  // game/effect/effect_util.c callee: Call sequences match in order: both share named windowSearchID anchor,
+fn_80133BE4 -> _dbgMenuCheckTerminate__FP14tagWINDOW_WORKl  // game/effect/effect_util.c callee: Identical control-flow: bl item-no anchor + sda@bctrl indirect call + 
+fn_80133C3C -> _dbgMenuGetMenuNo__Fl  // game/effect/effect_util.c callee: Call sequence and CFG match exactly: bl windowSearchID → bl item-no he
+fn_80133E6C -> _dbgMenuGetItemNo__FP14tagWINDOW_WORKl  // game/effect/effect_util.c callee: Same recursive debug-menu item resolver: both self-recurse, both call 
+fn_80134228 -> _dbgMenuGetWin__Fl  // game/effect/effect_util.c callee: Both are menu-index→window getters with identical srawi/andc clamp idi
+fn_80134258 -> _dbgMenuGetIndex__FP14tagWINDOW_WORK  // game/effect/effect_util.c ordinal: Both leaf, zero bl; identical op index=0x4(r3)-menuDataNumber returnin
+fn_80134304 -> debugMenuGetNum__Fv  // game/effect/effect_util.c ordinal: Instruction-for-instruction identical: both 0x38, 14 insns, same indir
+fn_8013433C -> pcboxSwapItemSlot  // game/effect/effect_util.c callee: Instruction-identical structure; both have 3 guarded bl calls in same 
+fn_80134420 -> pcboxGetItemCapacity  // game/effect/effect_util.c callee: Identical 6-bl sequence in order (savedataGetStatus, itemDataBiosGetPt
+fn_80134584 -> pcboxAddItem  // game/effect/effect_util.c callee: Identical size 0xF8 and 5-call sequence aligns 1:1 (savedataGetStatus,
+fn_8013467C -> pcboxDelItem  // game/effect/effect_util.c callee: Identical 5-call sequence (savedataGetStatus/itemDataBiosGetPtr/itemCh
+fn_80134768 -> pcboxGetItem  // game/effect/effect_util.c callee: Identical structure: same prologue, single bl to savedataGetStatus(fn_
+fn_801347D0 -> pcboxGetNbItemSlot  // game/effect/effect_util.c ordinal: Byte-identical bodies: both `li r3,0xeb; blr`, size 0x8, global, retur
+fn_801347E0 -> pcboxGetNbPokemonBox  // game/effect/effect_util.c ordinal: Both are trivial 8-byte constant-return stubs (li r3; blr); constant d
+fn_801348EC -> getPokemonBoxNbUsedSlot__5PCBOXFSc  // game/effect/effect_util.c callee: Identical size (0xF0), identical control flow, and matching bl sequenc
+fn_80134AF8 -> delPokemon__5PCBOXFScSc  // game/effect/effect_util.c callee: Identical structure and 3/3 in-order call sequence (savedataGetStatus,
+fn_80134E10 -> setPokemon__5PCBOXFP7PokemonScSc  // game/effect/effect_util.c callee: Identical prologue, same savedataGetStatus(0,3) anchor callee, and byt
+fn_80134F88 -> pcboxInit  // game/effect/effect_util.c callee: Call sequence and control-flow shape match 1:1 (savedataGetStatus, the
+fn_80135030 -> gamedatasaveSetStatus  // game/effect/effect_util.c callee: Identical prologue, identical double savedataGetStatus guard, identica
+fn_80135168 -> gamedatasaveGetStatus  // game/effect/effect_util.c callee: Call sequence and control flow align exactly: double savedataGetStatus
+fn_80135338 -> gamedataInit  // game/effect/effect_util.c callee: Colosseum body is an exact structural prefix of XD gamedataInit: same 
+fn_80135A30 -> gamedataAttestBiosSetLangareaId  // game/effect/effect_util.c callee: Byte-identical bodies, both size 0x10 (cmplwi r3,0; beqlr; stb r4,0x3(
+fn_80135A40 -> gamedataAttestBiosSetAreaId  // game/effect/effect_util.c callee: Byte-identical: both size 0x10, cmplwi r3,0/beqlr/stb r4,0x2(r3)/blr; 
+fn_80135A50 -> gamedataAttestBiosSetGenId  // game/effect/effect_util.c callee: Byte-identical bodies (cmplwi r3,0 / beqlr / stb r4,0x1(r3) / blr), sa
+fn_80135A60 -> gamedataAttestBiosSetVerId  // game/effect/effect_util.c callee: Byte-for-byte identical: both size 0x10, exact 4-instr sequence (cmplw
+fn_80135A70 -> gamedataAttestBiosGetLangareaId  // game/effect/effect_util.c callee: Byte-identical bodies, both size 0x18: cmplwi r3,0 / bne / li r3,0 / b
+fn_80135A88 -> gamedataAttestBiosGetAreaId  // game/effect/effect_util.c callee: Both leaf fns are byte-identical (size 0x18, 6 instrs): cmplwi r3,0/bn
+fn_80135AA0 -> gamedataAttestBiosGetGenId  // game/effect/effect_util.c callee: Bodies byte-for-byte identical: both size 0x18, same 6-instr leaf gett
+fn_80135AB8 -> gamedataAttestBiosGetVerId  // game/effect/effect_util.c callee: Byte-for-byte identical bodies: both 0x18/6 instrs, same cmplwi r3,0 /
+fn_80135B0C -> gamedataBiosGetGamedataAtttestPtr  // game/effect/effect_util.c callee: Byte-for-byte identical bodies (28030000 4C820020 38600000 4E800020), 
+fn_80135B1C -> gamedatasaveBiosSetOptionAudio  // game/effect/effect_util.c callee: Byte-identical bodies (size 0x10): cmplwi r3,0 / beqlr / stb r4,0x22(r
+fn_80135B2C -> gamedatasaveBiosSetOptionNoVibration  // game/effect/effect_util.c callee: Byte-identical 0x10 leaf setter (cmplwi r3,0 / beqlr / stb r4,0x21(r3)
+fn_80135B3C -> gamedatasaveBiosSetFloorposindex  // game/effect/effect_util.c callee: Byte-identical: both size 0x10, exact same 4 insns (cmplwi r3,0; beqlr
+fn_80135F90 -> koukaDataBiosGetLink  // game/effect/effect_util.c ordinal: Instruction-identical: both 0x2C, zero bl calls, same shape (lwz count
+fn_80136024 -> koukaDataBiosGetStatus  // game/effect/effect_util.c ordinal: Both size 0x2C leaf fns with identical instruction sequence (lwz sda21

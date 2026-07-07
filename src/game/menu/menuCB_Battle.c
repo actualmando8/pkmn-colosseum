@@ -72,7 +72,7 @@ extern void fn_80102568();
 extern void fn_80102620();
 extern s32  fn_8010264C();
 extern void fn_801026A4();
-extern void fn_80102868();
+extern void menuSetPosition();
 extern u8*  fn_80104704(u32);
 extern void fn_801046B8();
 extern u8*  fn_80105624(void);
@@ -91,7 +91,7 @@ extern u8*  fn_8012AC54(void*);
 extern void fn_8012AC64();
 extern void fn_80130054();
 extern void fn_80132A38();
-extern void fn_80135168();
+extern void gamedatasaveGetStatus();
 extern void fn_80166A28();
 extern void fn_8019075C();
 extern void __assert();
@@ -168,7 +168,7 @@ void fn_80059BDC(void) {
     extern u32 fn_8012AC3C(void*);
     extern u8* fn_8012AC54(void*);
     extern s32 fn_801022B8(s32);
-    extern u32 fn_80135168(s32, s32);
+    extern u32 gamedatasaveGetStatus(s32, s32);
     extern s32 fn_80088C60(void);
     extern s32 fn_80088964(void);
     extern s32 fn_80088D84(void);
@@ -520,7 +520,7 @@ void fn_80059BDC(void) {
                     fn_801069FC(1);
                     break;
                 }
-                if (fn_80135168(0, 4) == 0) {
+                if (gamedatasaveGetStatus(0, 4) == 0) {
                     fn_80106D3C(2, 0x444D, 1, 0);
                     fn_801069FC(1);
                     break;
@@ -543,7 +543,7 @@ void fn_80059BDC(void) {
                 s32 m;
                 fn_801026A4(0xBE, 0, NULL, 0x10, 0, 1, 0xF5);
                 fn_801026A4(0xDA, 0, NULL, 0x10, 0, 4, prevCmd, 0, fn_8006B420(), 0);
-                fn_80102868(0xDA, 0, -0x28);
+                menuSetPosition(0xDA, 0, -0x28);
                 m = fn_80076054((u8*)prevCmd, fn_8006B420());
                 if ((u16)m == 0) {
                     __assert((char*)(dat + 0x98), 0x1BB, (char*)(dat + 0x1E0));
@@ -956,7 +956,7 @@ void fn_80059BDC(void) {
                         fn_801069FC(1);
                         break;
                     }
-                    if (fn_80135168(0, 4) == 0) {
+                    if (gamedatasaveGetStatus(0, 4) == 0) {
                         fn_80106D3C(2, 0x44DB, 1, 0);
                         fn_801069FC(1);
                         break;
@@ -1378,7 +1378,7 @@ void fn_80059BDC(void) {
                     fn_801069FC(1);
                     break;
                 }
-                if (fn_80135168(0, 4) == 0) {
+                if (gamedatasaveGetStatus(0, 4) == 0) {
                     fn_80106D3C(2, 0x44DB, 1, 0);
                     fn_801069FC(1);
                     break;

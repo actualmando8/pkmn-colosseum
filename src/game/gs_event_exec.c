@@ -134,9 +134,9 @@ u32 fn_80014110(void) {
 /* ===== Phase 2 recovery stubs ===== */
 
 /* fn_800129A8 - 0x800129A8 | size: 0x1ec */
-extern u8*  fn_801040A0(void);
+extern u8*  windowGetFreeWork(void);
 extern void* fn_80103FFC(void*, s32);
-extern void* fn_80103FE4(void*);
+extern void* windowGetAllocPtr(void*);
 extern u8   windowSearchID(s32);
 extern void fn_80103F74(s32, s32, s32);
 extern void fn_801669BC(s32);
@@ -148,12 +148,12 @@ s32 fn_800129A8(u8* ctx) {
     s32 id;
     s32 kind;
     void* buf;
-    p = fn_801040A0();
+    p = windowGetFreeWork();
     if ((s32)(s8)ctx[1] == 0) {
         buf = fn_80103FFC(ctx, 0x30);
         if (buf != 0) memcpy(buf, *(void**)(ctx + 0x60), 0x30);
     }
-    fn_80103FE4(ctx);
+    windowGetAllocPtr(ctx);
     if ((s32)(s8)ctx[1] == 0) {
         id = *(s32*)(ctx + 4);
         kind = 0;
@@ -194,7 +194,7 @@ s32 fn_800129A8(u8* ctx) {
 #pragma pop
 
 /* fn_80012B94 - 0x80012B94 | size: 0x18c */
-extern void* fn_801040D0(void*, s32);
+extern void* windowGetParam(void*, s32);
 extern s32   fn_800FA444(s32);
 extern void  fn_800FB680(s32, s32, s32, s32);
 extern void fn_8001E644(s32, s32, s32, s32, u8);
@@ -215,9 +215,9 @@ s32 fn_80012B94(u8* ctx) {
     s32  val;
     s32  delay;
     s32  acc;
-    cmd   = (u8)(s32)fn_801040D0(ctx, 0);
-    arr   = (u8*)fn_80103FE4(ctx);
-    count = (s32)(s8)(s32)fn_801040D0(ctx, 2);
+    cmd   = (u8)(s32)windowGetParam(ctx, 0);
+    arr   = (u8*)windowGetAllocPtr(ctx);
+    count = (s32)(s8)(s32)windowGetParam(ctx, 2);
     cap   = (s32)(u8)menuDataBiosGetType(*(s32*)(ctx + 4));
     if (count > cap) count = cap;
 
@@ -279,8 +279,8 @@ s32 fn_80012D20(u8* arg) {
     switch ((s32)(s8)ctx[1]) {
     case 0:
         if ((s32)(s8)ctx[2] == 0) {
-            src  = fn_801040D0(arg, 1);
-            size = (s32)fn_801040D0(ctx, 2) << 2;
+            src  = windowGetParam(arg, 1);
+            size = (s32)windowGetParam(ctx, 2) << 2;
             buf  = fn_80103FFC(ctx, size);
             if (buf != 0) {
                 memcpy(buf, src, size);
@@ -319,7 +319,7 @@ s32 fn_80012E18(u8* ctx) {
     u8  saved_hi, saved_lo;
     state = fn_80105624();
     bits = *(u16*)(state + 6);
-    v1 = (s32)(s8)(s32)fn_801040D0(ctx, 2);
+    v1 = (s32)(s8)(s32)windowGetParam(ctx, 2);
     v2 = (s32)(s8)(s32)menuDataBiosGetType(*(s32*)(ctx + 4));
     if (v1 < v2) {
         maxv = v2;
@@ -364,7 +364,7 @@ s32 fn_80012E18(u8* ctx) {
 #pragma pop
 
 /* menuPanelCursorDecimalInput - 0x80012FB0 | size: 0x2ec */
-extern void fn_801040B8(void*, s32, s32);
+extern void windowSetParam(void*, s32, s32);
 #if 0
 asm void menuPanelCursorDecimalInput(void) {
 #include "src/game/gs_event_exec_fn_80012FB0.inc"
@@ -383,9 +383,9 @@ s32 menuPanelCursorDecimalInput(u8* ctx) {
     s32 i;
     s64 signed_sum;
 
-    cursor = fn_801040A0();
-    value = (s32)fn_801040D0(ctx, 0);
-    mode = (s32)fn_801040D0(ctx, 1);
+    cursor = windowGetFreeWork();
+    value = (s32)windowGetParam(ctx, 0);
+    mode = (s32)windowGetParam(ctx, 1);
     if (mode == 2) {
         limit = 8;
         radix = 0x10;
@@ -444,7 +444,7 @@ s32 menuPanelCursorDecimalInput(u8* ctx) {
     }
 
     *(s32*)(ctx + 0x80) = (s32)signed_sum;
-    fn_801040B8(ctx, 0, (s32)signed_sum);
+    windowSetParam(ctx, 0, (s32)signed_sum);
     return 0;
 }
 #endif
@@ -466,7 +466,7 @@ s32 fn_8001329C(u8* ctx, u8* tgt) {
     s32 width;
     s32 color;
 
-    data = fn_801040D0(ctx, 0);
+    data = windowGetParam(ctx, 0);
     color = (s32)ctx[0x8B] | -0x100;
 
     switch (*(s16*)(tgt + 6)) {
@@ -544,7 +544,7 @@ s32 fn_8001329C(u8* ctx, u8* tgt) {
 #endif
 
 /* menuPanelCtrlLvUp - 0x80013668 | size: 0xdc */
-extern u8 fn_80107ED8(s32, s32);
+extern u8 winSeqIsCheck(s32, s32);
 #pragma push
 #pragma peephole off
 s32 menuPanelCtrlLvUp(u8* ctx) {
@@ -552,7 +552,7 @@ s32 menuPanelCtrlLvUp(u8* ctx) {
     switch ((s32)(s8)ctx[1]) {
     case 0:
         if ((s32)(s8)ctx[2] == 0) flag = 1;
-        if ((u8)fn_80107ED8(*(s32*)(ctx + 4), 0x2a) == 1) flag = 1;
+        if ((u8)winSeqIsCheck(*(s32*)(ctx + 4), 0x2a) == 1) flag = 1;
         if ((u8)flag != 0) {
             fn_801080CC(*(s32*)(ctx + 4), 0x26);
             ctx[2] = 1;

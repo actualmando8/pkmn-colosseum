@@ -71,7 +71,7 @@ void fn_80091564(u32 ctx) {
     extern u32 fn_800E9108(u32 handle, u32 val);
     extern void fn_800E8FE8(u32 handle, u32 val);
     extern void fn_800E900C(u32 handle, u32 val, u32 *param);
-    extern void fn_80176E0C(u32 ctx, u32 id, u32 a, u32 b);
+    extern void cameraPlayAnime(u32 ctx, u32 id, u32 a, u32 b);
     extern void fn_801845E4(u32 ctx, u32 modelHandle, u32 ctx2, u32 handle, u32 flags);
     extern void cameraWaitSyncAnime(s32 sync);
     extern void fn_800FF58C(u32 id);
@@ -112,7 +112,7 @@ void fn_80091564(u32 ctx) {
     fn_800E8FE8(iconResult, lbl_8047A690);
     fn_800E900C(iconResult, 1, &lbl_8047A694);
 
-    fn_80176E0C(ctx, 0x0C421800, 0, 0);
+    cameraPlayAnime(ctx, 0x0C421800, 0, 0);
     waitFrames = 1;
     if (fn_800D37CC() == 0x32) {
         waitFrames = (u32)lbl_8047C1D0;
@@ -149,7 +149,7 @@ void fn_80091774(u32 ctx) {
     extern u32 fn_800E9108(u32 handle, u32 val);
     extern void fn_800E8FE8(u32 handle, u32 val);
     extern void fn_800E900C(u32 handle, u32 val, u32 *param);
-    extern void fn_80176E0C(u32 ctx, u32 id, u32 a, u32 b);
+    extern void cameraPlayAnime(u32 ctx, u32 id, u32 a, u32 b);
     extern void fn_801845E4(u32 ctx, u32 modelHandle, u32 ctx2, u32 handle, u32 flags);
     extern void cameraWaitSyncAnime(s32 sync);
     extern void fn_800FF58C(u32 id);
@@ -190,7 +190,7 @@ void fn_80091774(u32 ctx) {
     fn_800E8FE8(iconResult, lbl_8047A690);
     fn_800E900C(iconResult, 1, &lbl_8047A694);
 
-    fn_80176E0C(ctx, 0x0C411800, 0, 0);
+    cameraPlayAnime(ctx, 0x0C411800, 0, 0);
     waitFrames = 1;
     if (fn_800D37CC() == 0x32) {
         waitFrames = (u32)lbl_8047C1D0;
@@ -227,7 +227,7 @@ void fn_80091984(u32 ctx) {
     extern u32 fn_800E9108(u32 handle, u32 val);
     extern void fn_800E8FE8(u32 handle, u32 val);
     extern void fn_800E900C(u32 handle, u32 val, u32 *param);
-    extern void fn_80176E0C(u32 ctx, u32 id, u32 a, u32 b);
+    extern void cameraPlayAnime(u32 ctx, u32 id, u32 a, u32 b);
     extern void fn_801845E4(u32 ctx, u32 modelHandle, u32 ctx2, u32 handle, u32 flags);
     extern void cameraWaitSyncAnime(s32 sync);
     extern void fn_800FF58C(u32 id);
@@ -268,7 +268,7 @@ void fn_80091984(u32 ctx) {
     fn_800E8FE8(iconResult, lbl_8047A690);
     fn_800E900C(iconResult, 1, &lbl_8047A694);
 
-    fn_80176E0C(ctx, 0x0C401800, 0, 0);
+    cameraPlayAnime(ctx, 0x0C401800, 0, 0);
     waitFrames = 1;
     if (fn_800D37CC() == 0x32) {
         waitFrames = (u32)lbl_8047C1D0;
@@ -305,7 +305,7 @@ void fn_80091B94(u32 ctx) {
     extern u32 fn_800E9108(u32 handle, u32 val);
     extern void fn_800E8FE8(u32 handle, u32 val);
     extern void fn_800E900C(u32 handle, u32 val, u32 *param);
-    extern void fn_80176E0C(u32 ctx, u32 id, u32 a, u32 b);
+    extern void cameraPlayAnime(u32 ctx, u32 id, u32 a, u32 b);
     extern void fn_801845E4(u32 ctx, u32 modelHandle, u32 ctx2, u32 handle, u32 flags);
     extern void cameraWaitSyncAnime(s32 sync);
     extern void fn_800FF58C(u32 id);
@@ -346,7 +346,7 @@ void fn_80091B94(u32 ctx) {
     fn_800E8FE8(iconResult, lbl_8047A690);
     fn_800E900C(iconResult, 1, &lbl_8047A694);
 
-    fn_80176E0C(ctx, 0x0C3E1800, 0, 0);
+    cameraPlayAnime(ctx, 0x0C3E1800, 0, 0);
     waitFrames = 1;
     if (fn_800D37CC() == 0x32) {
         waitFrames = (u32)lbl_8047C1D0;
@@ -383,7 +383,7 @@ void fn_8008CACC(u32 ctx) {
     extern u32 fn_800E9108(u32 handle, u32 val);
     extern void fn_800E8FE8(u32 handle, u32 val);
     extern void fn_800E900C(u32 handle, u32 val, u32 *param);
-    extern void fn_80176E0C(u32 ctx, u32 id, u32 a, u32 b);
+    extern void cameraPlayAnime(u32 ctx, u32 id, u32 a, u32 b);
     extern void fn_801845E4(u32 ctx, u32 modelHandle, u32 ctx2, u32 handle, u32 flags);
     extern void cameraWaitSyncAnime(s32 sync);
     extern void fn_800FF58C(u32 id);
@@ -459,7 +459,7 @@ void fn_8008CACC(u32 ctx) {
     fn_800E8FE8(iconResult, lbl_8047A690);
     fn_800E900C(iconResult, 1, &lbl_8047A694);
 
-    fn_80176E0C(ctx, 0x0D021800, 0, 0);
+    cameraPlayAnime(ctx, 0x0D021800, 0, 0);
     waitFrames = 1;
     if (fn_800D37CC() == 0x32) {
         waitFrames = (u32)lbl_8047C1D0;
@@ -495,7 +495,7 @@ void fn_8008FE94(u32 ctx) {
     extern u32 fn_800E9108(u32 handle, u32 val);
     extern void fn_800E8FE8(u32 handle, u32 val);
     extern void fn_800E900C(u32 handle, u32 val, u32 *param);
-    extern void fn_80176E0C(u32 ctx, u32 id, u32 a, u32 b);
+    extern void cameraPlayAnime(u32 ctx, u32 id, u32 a, u32 b);
     extern void fn_801845E4(u32 ctx, u32 modelHandle, u32 ctx2, u32 handle, u32 flags);
     extern void cameraWaitSyncAnime(s32 sync);
     extern void fn_800FF58C(u32 id);
@@ -555,7 +555,7 @@ void fn_8008FE94(u32 ctx) {
     fn_800E8FE8(iconResult, lbl_8047A690);
     fn_800E900C(iconResult, 1, &lbl_8047A694);
 
-    fn_80176E0C(ctx, 0x0CF41800, 0, 0);
+    cameraPlayAnime(ctx, 0x0CF41800, 0, 0);
     waitFrames = 1;
     if (fn_800D37CC() == 0x32) {
         waitFrames = (u32)lbl_8047C1D0;
@@ -594,7 +594,7 @@ void fn_8008CDD8(u32 ctx) {
     extern u32 fn_800E9108(u32 handle, u32 val);
     extern void fn_800E8FE8(u32 handle, u32 val);
     extern void fn_800E900C(u32 handle, u32 val, u32 *param);
-    extern void fn_80176E0C(u32 ctx, u32 id, u32 a, u32 b);
+    extern void cameraPlayAnime(u32 ctx, u32 id, u32 a, u32 b);
     extern void fn_801845E4(u32 ctx, u32 modelHandle, u32 ctx2, u32 handle, u32 flags);
     extern void cameraWaitSyncAnime(s32 sync);
     extern void fn_800FF58C(u32 id);
@@ -657,7 +657,7 @@ void fn_8008CDD8(u32 ctx) {
     fn_800E3C08(GSresGetResource(ctx, iconHandle), GSresGetResource(ctx, 0x11511400));
     fn_800E3C00(GSresGetResource(ctx, iconHandle), 4);
 
-    fn_80176E0C(ctx, 0x0D011800, 0, 0);
+    cameraPlayAnime(ctx, 0x0D011800, 0, 0);
     waitFrames = 1;
     if (fn_800D37CC() == 0x32) {
         waitFrames = (u32)lbl_8047C1D0;
@@ -697,7 +697,7 @@ void fn_8008D0A0(u32 ctx) {
     extern u32 fn_800E9108(u32 handle, u32 val);
     extern void fn_800E8FE8(u32 handle, u32 val);
     extern void fn_800E900C(u32 handle, u32 val, u32 *param);
-    extern void fn_80176E0C(u32 ctx, u32 id, u32 a, u32 b);
+    extern void cameraPlayAnime(u32 ctx, u32 id, u32 a, u32 b);
     extern void fn_801845E4(u32 ctx, u32 modelHandle, u32 ctx2, u32 handle, u32 flags);
     extern void cameraWaitSyncAnime(s32 sync);
     extern void fn_800FF58C(u32 id);
@@ -760,7 +760,7 @@ void fn_8008D0A0(u32 ctx) {
     fn_800E3C08(GSresGetResource(ctx, iconHandle), GSresGetResource(ctx, 0x11511400));
     fn_800E3C00(GSresGetResource(ctx, iconHandle), 4);
 
-    fn_80176E0C(ctx, 0x0D001800, 0, 0);
+    cameraPlayAnime(ctx, 0x0D001800, 0, 0);
     waitFrames = 1;
     if (fn_800D37CC() == 0x32) {
         waitFrames = (u32)lbl_8047C1D0;
@@ -798,7 +798,7 @@ void fn_8008EC28(u32 ctx) {
     extern u32 fn_800E9108(u32 handle, u32 val);
     extern void fn_800E8FE8(u32 handle, u32 val);
     extern void fn_800E900C(u32 handle, u32 val, u32 *param);
-    extern void fn_80176E0C(u32 ctx, u32 id, u32 a, u32 b);
+    extern void cameraPlayAnime(u32 ctx, u32 id, u32 a, u32 b);
     extern void fn_801845E4(u32 ctx, u32 modelHandle, u32 ctx2, u32 handle, u32 flags);
     extern void cameraWaitSyncAnime(s32 sync);
     extern void fn_800FF58C(u32 id);
@@ -861,7 +861,7 @@ void fn_8008EC28(u32 ctx) {
     fn_800E3C08(GSresGetResource(ctx, iconHandle), GSresGetResource(ctx, 0x11511400));
     fn_800E3C00(GSresGetResource(ctx, iconHandle), 4);
 
-    fn_80176E0C(ctx, 0x0CFB1800, 0, 0);
+    cameraPlayAnime(ctx, 0x0CFB1800, 0, 0);
     waitFrames = 1;
     if (fn_800D37CC() == 0x32) {
         waitFrames = (u32)lbl_8047C1D0;
@@ -900,7 +900,7 @@ void fn_8008EED0(u32 ctx) {
     extern u32 fn_800E9108(u32 handle, u32 val);
     extern void fn_800E8FE8(u32 handle, u32 val);
     extern void fn_800E900C(u32 handle, u32 val, u32 *param);
-    extern void fn_80176E0C(u32 ctx, u32 id, u32 a, u32 b);
+    extern void cameraPlayAnime(u32 ctx, u32 id, u32 a, u32 b);
     extern void fn_801845E4(u32 ctx, u32 modelHandle, u32 ctx2, u32 handle, u32 flags);
     extern void cameraWaitSyncAnime(s32 sync);
     extern void fn_800FF58C(u32 id);
@@ -964,7 +964,7 @@ void fn_8008EED0(u32 ctx) {
     fn_800E3C08(GSresGetResource(ctx, iconHandle), GSresGetResource(ctx, 0x11511400));
     fn_800E3C00(GSresGetResource(ctx, iconHandle), 4);
 
-    fn_80176E0C(ctx, 0x0CFA1800, 0, 0);
+    cameraPlayAnime(ctx, 0x0CFA1800, 0, 0);
     waitFrames = 1;
     if (fn_800D37CC() == 0x32) {
         waitFrames = (u32)lbl_8047C1D0;
@@ -1004,7 +1004,7 @@ void fn_8008F190(u32 ctx) {
     extern u32 fn_800E9108(u32 handle, u32 val);
     extern void fn_800E8FE8(u32 handle, u32 val);
     extern void fn_800E900C(u32 handle, u32 val, u32 *param);
-    extern void fn_80176E0C(u32 ctx, u32 id, u32 a, u32 b);
+    extern void cameraPlayAnime(u32 ctx, u32 id, u32 a, u32 b);
     extern void fn_801845E4(u32 ctx, u32 modelHandle, u32 ctx2, u32 handle, u32 flags);
     extern void cameraWaitSyncAnime(s32 sync);
     extern void fn_800FF58C(u32 id);
@@ -1084,7 +1084,7 @@ void fn_8008F190(u32 ctx) {
     fn_800E3C08(GSresGetResource(ctx, iconHandle), GSresGetResource(ctx, 0x11511400));
     fn_800E3C00(GSresGetResource(ctx, iconHandle), 4);
 
-    fn_80176E0C(ctx, 0x0CF91800, 0, 0);
+    cameraPlayAnime(ctx, 0x0CF91800, 0, 0);
     waitFrames = 1;
     if (fn_800D37CC() == 0x32) {
         waitFrames = (u32)lbl_8047C1D0;
@@ -1126,7 +1126,7 @@ void fn_8008FBF4(u32 ctx) {
     extern u32 fn_800E9108(u32 handle, u32 val);
     extern void fn_800E8FE8(u32 handle, u32 val);
     extern void fn_800E900C(u32 handle, u32 val, u32 *param);
-    extern void fn_80176E0C(u32 ctx, u32 id, u32 a, u32 b);
+    extern void cameraPlayAnime(u32 ctx, u32 id, u32 a, u32 b);
     extern void fn_801845E4(u32 ctx, u32 modelHandle, u32 ctx2, u32 handle, u32 flags);
     extern void cameraWaitSyncAnime(s32 sync);
     extern void fn_800FF58C(u32 id);
@@ -1190,7 +1190,7 @@ void fn_8008FBF4(u32 ctx) {
     fn_800E3C08(GSresGetResource(ctx, iconHandle), GSresGetResource(ctx, 0x11511400));
     fn_800E3C00(GSresGetResource(ctx, iconHandle), 4);
 
-    fn_80176E0C(ctx, 0x0CF51800, 0, 0);
+    cameraPlayAnime(ctx, 0x0CF51800, 0, 0);
     waitFrames = 1;
     if (fn_800D37CC() == 0x32) {
         waitFrames = (u32)lbl_8047C1D0;
@@ -1231,7 +1231,7 @@ void fn_80090720(u32 ctx) {
     extern u32 fn_800E9108(u32 handle, u32 val);
     extern void fn_800E8FE8(u32 handle, u32 val);
     extern void fn_800E900C(u32 handle, u32 val, u32 *param);
-    extern void fn_80176E0C(u32 ctx, u32 id, u32 a, u32 b);
+    extern void cameraPlayAnime(u32 ctx, u32 id, u32 a, u32 b);
     extern void fn_801845E4(u32 ctx, u32 modelHandle, u32 ctx2, u32 handle, u32 flags);
     extern void cameraWaitSyncAnime(s32 sync);
     extern void fn_800FF58C(u32 id);
@@ -1292,7 +1292,7 @@ void fn_80090720(u32 ctx) {
     fn_800E8FE8(iconResult, lbl_8047A690);
     fn_800E900C(iconResult, 1, &lbl_8047A694);
 
-    fn_80176E0C(ctx, 0x0CF21800, 0, 0);
+    cameraPlayAnime(ctx, 0x0CF21800, 0, 0);
     waitFrames = 1;
     if (fn_800D37CC() == 0x32) {
         waitFrames = (u32)lbl_8047C1D0;
@@ -1336,7 +1336,7 @@ void fn_8008C7B0(u32 ctx) {
     extern u32 fn_800E9108(u32 handle, u32 val);
     extern void fn_800E8FE8(u32 handle, u32 val);
     extern void fn_800E900C(u32 handle, u32 val, u32 *param);
-    extern void fn_80176E0C(u32 ctx, u32 id, u32 a, u32 b);
+    extern void cameraPlayAnime(u32 ctx, u32 id, u32 a, u32 b);
     extern void fn_801845E4(u32 ctx, u32 modelHandle, u32 ctx2, u32 handle, u32 flags);
     extern void cameraWaitSyncAnime(s32 sync);
     extern void fn_80190528(u32 id);
@@ -1409,7 +1409,7 @@ void fn_8008C7B0(u32 ctx) {
     fn_800E3C08(GSresGetResource(ctx, iconHandle), GSresGetResource(ctx, 0x11511400));
     fn_800E3C00(GSresGetResource(ctx, iconHandle), 4);
 
-    fn_80176E0C(ctx, 0x0D041800, 0, 0);
+    cameraPlayAnime(ctx, 0x0D041800, 0, 0);
     waitFrames = 1;
     if (fn_800D37CC() == 0x32) {
         waitFrames = (u32)lbl_8047C1D0;

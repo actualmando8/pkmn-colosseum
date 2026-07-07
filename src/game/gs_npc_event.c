@@ -488,8 +488,8 @@ extern void fn_801026A4(void);
 extern void windowSearchID(void);
 extern void windowSearchItemID(void);
 extern void windowCheckCursor(void);
-extern void fn_801043A4(void);
-extern void fn_801023E4(void);
+extern void windowGetValue(void);
+extern void menuGetCursor(void);
 extern void fn_80102510(void);
 extern void fadeSet(void);
 extern void fadeCheck(void);
@@ -499,7 +499,7 @@ extern void fn_80097CD0(void);
 extern void fn_8002F79C(void);
 extern void fn_8002F284(void);
 extern void fn_8002EE74(void);
-extern void fn_80103CC0(void);
+extern void menuSetEnablePort(void);
 extern void fn_80102004(void);
 extern void fn_80106D3C(s32, s32, s32, s32);
 extern void fn_8002EA5C(void);
@@ -574,13 +574,13 @@ void fn_80031B4C(void) {
     extern void fn_80102004();
     extern void fn_801021F8();
     extern void menuSetDisp();
-    extern void fn_801023E4();
+    extern void menuGetCursor();
     extern void fn_801024E8();
     extern void fn_80102510();
     extern void menuOpen();
     extern void fn_801026A4();
-    extern void fn_80103CC0();
-    extern void fn_801043A4();
+    extern void menuSetEnablePort();
+    extern void windowGetValue();
     extern void windowCheckCursor();
     extern void fn_801046B8();
     extern void windowSearchItemID();
@@ -697,10 +697,10 @@ void fn_80031B4C(void) {
                 r4 = 0x1;
                 windowCheckCursor();
                 r3 = 0xe3;
-                fn_801043A4();
+                windowGetValue();
                 r29 = r3;
                 r3 = 0xe3;
-                fn_801023E4();
+                menuGetCursor();
                 r26 = r3;
                 r3 = 0xe3;
                 fn_80102510();
@@ -774,10 +774,10 @@ void fn_80031B4C(void) {
                 r4 = 0x1;
                 windowCheckCursor();
                 r3 = 0xe3;
-                fn_801043A4();
+                windowGetValue();
                 r29 = r3;
                 r3 = 0xe3;
-                fn_801023E4();
+                menuGetCursor();
                 r26 = r3;
                 r3 = 0xe3;
                 fn_80102510();
@@ -956,7 +956,7 @@ extern void fn_80112260(s32);
 extern u32  fn_80113F48(void);
 extern u32  fn_801CBA0C(u32);
 extern u32  GSresGetResource(u32);
-extern void fn_80176E0C(s32, u32, s32, s32);
+extern void cameraPlayAnime(s32, u32, s32, s32);
 extern void GSscene_SetMode(s32);
 extern void fn_801CB7C4(u32);
 extern u8 lbl_8047A408;
@@ -1003,7 +1003,7 @@ void fn_800324A0(void) {
         value = fn_801CBA0C(0x0FFE1000);
         lbl_8047A418 = value;
         lbl_8047A414 = GSresGetResource(handle);
-        fn_80176E0C(0x37C, 0x0FFF1800, 0, 1);
+        cameraPlayAnime(0x37C, 0x0FFF1800, 0, 1);
         GSscene_SetMode(4);
         fn_801CB7C4(0x10B11000);
     }
@@ -1590,7 +1590,7 @@ u8* fn_80032ED8(s32 arg0, s32 arg1, u8* arg2) {
     }
 
     result = fn_801CA5C4(arg1, 1, 0);
-    fn_80176E0C((s32)fn_80113F48(), 0x11171800, 0, 0);
+    cameraPlayAnime((s32)fn_80113F48(), 0x11171800, 0, 0);
 
     if (lbl_8047A439 != 0) {
         sfx_id = 0x446;
@@ -1720,7 +1720,7 @@ void fn_80032ED8_legacy_disabled(void) {
     r5 = 0x0;
     r4 = r4 + 0x1800;
     r6 = 0x0;
-    fn_80176E0C();
+    cameraPlayAnime();
     tmp = lbl_8047A439;
     if (tmp != 0) {
         r28 = 0x446;

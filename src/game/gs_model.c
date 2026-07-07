@@ -143,15 +143,15 @@ extern void fn_800D5CB8(s32, s32, s32, s32, s32);
 extern void fn_800D6728(void);
 
 /* Forward declarations for functions defined later in this TU */
-extern u8    fn_80109718(u8 param);
+extern u8    menuOffScreenCheckEnable(u8 param);
 extern void  fn_80104828(void* ptr, u32 flags);
 extern void* windowSearchID(s32 param);
-extern s32   fn_80109884(void);
+extern s32   _menuCBOffScreen__FP9GStextureUlPv(void);
 extern void  winSpriteSetDisp(void* node, u32 enable);
-extern void  fn_801043A4(s32 param);
+extern void  windowGetValue(s32 param);
 extern void  windowCheckCursor(void* p, u8 flags);
 extern void  fn_80104160(void* r3, void* r4, s16 r5, s16 r6, s32 r7, s32 r8, s32 r9, s32 r10);
-extern u8    fn_80109664(u8 param);
+extern u8    menuOffScreenFadeSync(u8 param);
 extern void  menuOffScreenFadeSet(f32 f1, f32 f2);
 extern u8    fn_8010977C(u32 param);
 extern void  fn_80109764(void);
@@ -160,8 +160,8 @@ extern void* fn_80105624(void);
 extern void* fn_8005D830(u32 idx);
 extern void* windowSearchItemID(void* head, s32 key);
 extern void  fn_801026A4(void* p, u32 r4, s32 r5, s32 r6, void* r7, s32 r8, ...);
-extern u8    fn_801096E8(u8 val);
-extern u8    fn_801096F8(u8 val);
+extern u8    menuOffScreenSetPriority(u8 val);
+extern u8    menuOffScreenSetDisp(u8 val);
 extern u32   fn_800D3088(void);
 extern u8    lbl_80404B68[];  /* scratch table for fn_80107F38, fn_801081F8 */
 extern u8    lbl_80404B8C[];  /* scratch table for fn_801080CC */
@@ -193,7 +193,7 @@ void* kaisuuBiosGetMin(u32 index) {
 
 /* 0x80101AC4 | 0x70 */
 extern u32 fn_800E0C54(void);  /* random or tick */
-u32 fn_80101AC4(u32 param) {
+u32 kaisuuGetKaisuu(u32 param) {
     u32 r30 = param;
     u32 r31 = (u32)kaisuuBiosGetMax(r30);
     r30 = (u32)kaisuuBiosGetMin(r30);
@@ -260,7 +260,7 @@ void fn_80101FB8(u8 param) {
 #pragma push
 #pragma scheduling off
 void fn_80102014(void) {
-    fn_80109718(0);
+    menuOffScreenCheckEnable(0);
 }
 #pragma pop
 
@@ -271,7 +271,7 @@ void menuReleaseOffScreen(f32 f1) {
     f32 f2;
     f2 = f1;
     menuOffScreenFadeSet(lbl_8047CDC0, f2);
-    fn_80109664(1);
+    menuOffScreenFadeSync(1);
     fn_80109764();
 }
 #pragma pop
@@ -280,15 +280,15 @@ void menuReleaseOffScreen(f32 f1) {
 void fn_8010206C(f32 param) {
     f32 f31 = param;
     fn_8010977C(1);
-    fn_801096F8(1);
-    fn_801096E8(0);
+    menuOffScreenSetDisp(1);
+    menuOffScreenSetPriority(0);
     menuOffScreenFadeSet(lbl_8047CDC4, f31);
 }
 
 /* 0x801020C0 | 0x78 */
 #pragma push
 #pragma peephole off
-s32 fn_801020C0(void) {
+s32 menuGetSelectItemNum(void) {
     s32 r31 = 0;
     void* r3 = menuDataBiosGetPtr();
     if (r3 == (void*)0) { return 0; }
@@ -313,7 +313,7 @@ _ret_r31:
 /* 0x80102138 | 0xC0 */
 #pragma push
 #pragma peephole off
-s32 fn_80102138(void* unused, u32 param) {
+s32 menuGetCursorFromItemID(void* unused, u32 param) {
     u32 r29 = param;
     void* r3 = menuDataBiosGetPtr();
     if (r3 == (void*)0) { return -3; }
@@ -434,7 +434,7 @@ ret0:
 #pragma pop
 
 /* 0x801023E4 | 0x44 */
-s32 fn_801023E4(void* p) {
+s32 menuGetCursor(void* p) {
     void* r3 = windowSearchID((s32)p);
     if (r3 == (void*)0) goto ret_m1;
     {
@@ -479,7 +479,7 @@ ret0:
 /* 0x801024C0 | 0x28 */
 #pragma push
 #pragma scheduling off
-void fn_801024C0(void) {
+void menuCloseFloor(void) {
     fn_80104828(0, 4);
 }
 #pragma pop
@@ -563,7 +563,7 @@ void fn_801026A4(void* p, u32 r4, s32 r5, s32 r6, void* r7, s32 r8, ...) {
 /* 0x80102868 | 0x48 */
 #pragma push
 #pragma peephole off
-void fn_80102868(void* p, s16 a, s16 b) {
+void menuSetPosition(void* p, s16 a, s16 b) {
     s16 r30 = a;
     s16 r31 = b;
     void* r3 = windowSearchID((s32)p);
@@ -641,18 +641,18 @@ void fn_801038F8(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80103BA8(void) {
+void menuGetKeyInfo(void) {
     /* TODO: match -- 264 bytes at 0x80103BA8 */
 }
 #pragma pop
 
 /* 0x80103CB0 | 0x10 */
-u8 fn_80103CB0(void) {
+u8 menuGetEnablePort(void) {
     return lbl_80404ACC[0x92];
 }
 
 /* 0x80103CC0 | 0x18 */
-u8 fn_80103CC0(u8 val) {
+u8 menuSetEnablePort(u8 val) {
     u8 old = lbl_80404ACC[0x92];
     lbl_80404ACC[0x92] = val;
     return old;
@@ -739,7 +739,7 @@ void fn_80103F74(void* head, u16 key, u32 data) {
 #pragma pop
 
 /* 0x80103FE4 | 0x18 */
-void* fn_80103FE4(void* ptr) {
+void* windowGetAllocPtr(void* ptr) {
     if (ptr) {
         return *(void**)((u8*)ptr + 0xB0);
     }
@@ -774,7 +774,7 @@ void* fn_80103FFC(void* p, s32 size) {
 #pragma pop
 
 /* 0x801040A0 | 0x18 */
-void* fn_801040A0(void* ptr) {
+void* windowGetFreeWork(void* ptr) {
     if (ptr) {
         return (void*)((u8*)ptr + 0x9C);
     }
@@ -782,13 +782,13 @@ void* fn_801040A0(void* ptr) {
 }
 
 /* 0x801040B8 | 0x18 */
-void fn_801040B8(void* ptr, u32 idx, u32 val) {
+void windowSetParam(void* ptr, u32 idx, u32 val) {
     if (ptr == (void*)0) { return; }
     ((u32*)((u8*)ptr + 0x60))[idx] = val;
 }
 
 /* 0x801040D0 | 0x20 */
-u32 fn_801040D0(void* ptr, u32 idx) {
+u32 windowGetParam(void* ptr, u32 idx) {
     if (ptr) {
         return ((u32*)((u8*)ptr + 0x60))[idx];
     }
@@ -823,7 +823,7 @@ void fn_80104160(void* r3, void* r4, s16 r5, s16 r6, s32 r7, s32 r8, s32 r9, s32
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-u8* fn_80104318(u8* arg) {
+u8* windowGetCursorToItem(u8* arg) {
 #pragma optimization_level 4
 #pragma peephole off
     void* node;
@@ -851,7 +851,7 @@ u8* fn_80104318(u8* arg) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_801043A4(s32 param) {
+void windowGetValue(s32 param) {
     /* TODO: match -- 300 bytes at 0x801043A4 */
     (void)param;
 }
@@ -991,7 +991,7 @@ void fn_80104828(void* ptr, u32 flags) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80104A94(void) {
+void _windowCreateItemSprite__FP14tagWINDOW_WORK(void) {
     /* TODO: match -- 524 bytes at 0x80104A94 */
 }
 #pragma pop
@@ -1088,14 +1088,14 @@ void fn_801058CC(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80105A3C(void) {
+void winMsgCtrl(void) {
     /* TODO: match -- 500 bytes at 0x80105A3C */
 }
 #pragma pop
 
 /* 0x80105C30 | 0x38 */
 void winMsgButton(void* p) {
-    void* r31 = fn_801040A0(p);
+    void* r31 = windowGetFreeWork(p);
     void* r3 = fn_80105624();
     *(u32*)((u8*)r31 + 0x8) = *(u16*)((u8*)r3 + 0x4);
 }
@@ -1324,7 +1324,7 @@ _ret0:
 /* 0x80107ED8 | 0x60 */
 #pragma push
 #pragma peephole off
-s32 fn_80107ED8(s32 r3, u16 r30) {
+s32 winSeqIsCheck(s32 r3, u16 r30) {
     void* r31 = windowSearchID(r3);
     if (r31 == (void*)0) { goto _ret0; }
     {
@@ -1677,7 +1677,7 @@ void fn_801093C8(void) {
 /* 0x80109664 | 0x48 */
 #pragma push
 #pragma peephole off
-u8 fn_80109664(u8 param) {
+u8 menuOffScreenFadeSync(u8 param) {
     u8 r31 = (u8)param;
     goto check;
 loop:
@@ -1707,29 +1707,29 @@ void menuOffScreenFadeSet(f32 f1, f32 f2) {
 }
 
 /* 0x801096E8 | 0x10 */
-u8 fn_801096E8(u8 val) {
+u8 menuOffScreenSetPriority(u8 val) {
     u8 old = lbl_8047AD23;
     lbl_8047AD23 = val;
     return old;
 }
 
 /* 0x801096F8 | 0x10 */
-u8 fn_801096F8(u8 val) {
+u8 menuOffScreenSetDisp(u8 val) {
     u8 old = lbl_8047AD22;
     lbl_8047AD22 = val;
     return old;
 }
 
 /* 0x80109708 | 0x8 | sda_getter */
-u8 fn_80109708(void) { return lbl_8047AD21; }
+u8 menuOffScreenIsDoing(void) { return lbl_8047AD21; }
 
 /* 0x80109710 | 0x8 | sda_getter */
-u32 fn_80109710(void) { return lbl_8047AD28; }
+u32 menuOffScreenGetPtr(void) { return lbl_8047AD28; }
 
 /* 0x80109718 | 0x4C */
 #pragma push
 #pragma peephole off
-u8 fn_80109718(u8 param) {
+u8 menuOffScreenCheckEnable(u8 param) {
     u8 r31 = (u8)param;
     goto check;
 loop:
@@ -1765,7 +1765,7 @@ u8 fn_8010977C(u32 param) {
     lbl_8047AD34 = lbl_8047CE50;
     lbl_8047AD38 = lbl_8047CE50;
     lbl_8047AD3C = lbl_8047CE50;
-    GSgfxBeginBackFBCapture(lbl_8047AD28, fn_80109884, (void*)0);
+    GSgfxBeginBackFBCapture(lbl_8047AD28, _menuCBOffScreen__FP9GStextureUlPv, (void*)0);
     r31 = (u8)r31;
     goto check;
 loop:
@@ -1796,7 +1796,7 @@ void fn_80109810(void) {
 }
 
 /* 0x80109884 | 0x10 */
-s32 fn_80109884(void) {
+s32 _menuCBOffScreen__FP9GStextureUlPv(void) {
     lbl_8047AD20 = 1;
     return 0;
 }

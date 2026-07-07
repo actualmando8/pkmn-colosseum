@@ -66,7 +66,7 @@ extern void  fn_800F04C4(void);                       /* stop particle system */
 extern void  fn_80102568(s32 objID, s32 arg1, s32 arg2);   /* release scene object */
 extern u8    fn_80102620(s32 objID);                        /* check scene object active */
 extern void* fn_801025C0(s32 objID);                        /* get scene object pointer */
-extern void  fn_80103BA8(void* padData, s32 port);          /* read pad input */
+extern void  menuGetKeyInfo(void* padData, s32 port);          /* read pad input */
 
 /* HSD (SysDolphin) model/animation */
 extern void  fn_80362D0C(void* jobj);                       /* HSD_JObjAnimAll */
@@ -1072,7 +1072,7 @@ void fadeSet(s32 mode) {
 void* fn_801C423C(void (*callback)(void), u8 mode, u32 arg, f32 value) {
     extern u8 lbl_80466E30[];
     extern volatile const f32 lbl_8047DFB8;
-    extern u32 fn_80109710(void);
+    extern u32 menuOffScreenGetPtr(void);
     extern void fn_800EF5A4(void* texture);
     extern void fn_801C432C();
     extern void fn_801C6928(void);
@@ -1101,7 +1101,7 @@ void* fn_801C423C(void (*callback)(void), u8 mode, u32 arg, f32 value) {
     if (modeByte == 1) {
         fn_801C432C();
     } else if (*(void* volatile *)(gridState + 0x10) != NULL) {
-        if (*(u32 volatile *)(lbl_80466E30 + 0x10) != fn_80109710()) {
+        if (*(u32 volatile *)(lbl_80466E30 + 0x10) != menuOffScreenGetPtr()) {
             fn_800EF5A4(*(void* volatile *)(lbl_80466E30 + 0x10));
         }
         *(void* volatile *)(lbl_80466E30 + 0x10) = NULL;

@@ -24,8 +24,8 @@ extern void fn_800E27B0();
 extern void fn_800E2C04();
 extern void _threadSwitch();
 extern void GScharLenCpy();
-extern void fn_801040A0();
-extern void fn_801040D0();
+extern void windowGetFreeWork();
+extern void windowGetParam();
 extern void fn_801046B8();
 extern void windowSearchID();
 extern void fn_80105624();
@@ -119,7 +119,7 @@ void fn_8007C300(void) {
     r29 = r4;
     r3 = 0xa6;
     ((void(*)(void))windowSearchID)();
-    ((void(*)(void))fn_801040A0)();
+    ((void(*)(void))windowGetFreeWork)();
     r31 = *(u32*)((u8*)r3 + 0x0);
     if (r31 != 0x0) {
         r0 = 0x0;
@@ -129,7 +129,7 @@ void fn_8007C300(void) {
             ((void(*)(void))_threadSwitch)();
             r3 = 0xa6;
             ((void(*)(void))windowSearchID)();
-            ((void(*)(void))fn_801040A0)();
+            ((void(*)(void))windowGetFreeWork)();
             r31 = *(u32*)((u8*)r3 + 0x0);
             if (r31 == 0x0) {
                 r31 = 0x0;
@@ -178,10 +178,10 @@ void fn_8007C300(void) {
 #pragma scheduling off
 void fn_8007C414(void) {
     extern void* windowSearchID(u32 id);
-    extern u32* fn_801040A0(void* obj);
+    extern u32* windowGetFreeWork(void* obj);
     u32 p;
 
-    p = *fn_801040A0(windowSearchID(0xa6));
+    p = *windowGetFreeWork(windowSearchID(0xa6));
     if (p != 0) {
         *(u32*)(p + 0xBC) = 0;
     }
@@ -220,7 +220,7 @@ void fn_8007C450(void) {
     r29 = r7;
     r3 = 0xa6;
     ((void(*)(void))windowSearchID)();
-    ((void(*)(void))fn_801040A0)();
+    ((void(*)(void))windowGetFreeWork)();
     r31 = *(u32*)((u8*)r3 + 0x0);
     if (r31 != 0) {
         tmp = 0x0;
@@ -230,7 +230,7 @@ void fn_8007C450(void) {
             ((void(*)(void))_threadSwitch)();
             r3 = 0xa6;
             ((void(*)(void))windowSearchID)();
-            ((void(*)(void))fn_801040A0)();
+            ((void(*)(void))windowGetFreeWork)();
             r31 = *(u32*)((u8*)r3 + 0x0);
             if (r31 == 0) {
                 r31 = 0x0;
@@ -308,7 +308,7 @@ void fn_8007C450(void) {
     r3 = 0xa6;
     *(u32*)((u8*)r31 + 0xB8) = tmp;
     ((void(*)(void))windowSearchID)();
-    ((void(*)(void))fn_801040A0)();
+    ((void(*)(void))windowGetFreeWork)();
     r3 = *(u32*)((u8*)r3 + 0x0);
     if (r3 == 0) return;
     tmp = 0x0;
@@ -319,7 +319,7 @@ void fn_8007C450(void) {
         ((void(*)(void))_threadSwitch)();
         r3 = 0xa6;
         ((void(*)(void))windowSearchID)();
-        ((void(*)(void))fn_801040A0)();
+        ((void(*)(void))windowGetFreeWork)();
         r3 = *(u32*)((u8*)r3 + 0x0);
         if (r3 == 0) return;
 
@@ -337,7 +337,7 @@ void fn_8007C634(void) {
 
     r3 = 0xa6;
     ((void(*)(void))windowSearchID)();
-    ((void(*)(void))fn_801040A0)();
+    ((void(*)(void))windowGetFreeWork)();
     r4 = *(u32*)((u8*)r3 + 0x0);
     if (r4 != 0) {
         tmp = 0x0;
@@ -347,7 +347,7 @@ void fn_8007C634(void) {
             ((void(*)(void))_threadSwitch)();
             r3 = 0xa6;
             ((void(*)(void))windowSearchID)();
-            ((void(*)(void))fn_801040A0)();
+            ((void(*)(void))windowGetFreeWork)();
             r4 = *(u32*)((u8*)r3 + 0x0);
             if (r4 == 0) {
                 r4 = 0x0;
@@ -386,7 +386,7 @@ void fn_8007C634(void) {
     r3 = 0xa6;
     *(u32*)((u8*)r4 + 0xB8) = tmp;
     ((void(*)(void))windowSearchID)();
-    ((void(*)(void))fn_801040A0)();
+    ((void(*)(void))windowGetFreeWork)();
     r3 = *(u32*)((u8*)r3 + 0x0);
     if (r3 == 0) return;
     tmp = 0x0;
@@ -397,7 +397,7 @@ void fn_8007C634(void) {
         ((void(*)(void))_threadSwitch)();
         r3 = 0xa6;
         ((void(*)(void))windowSearchID)();
-        ((void(*)(void))fn_801040A0)();
+        ((void(*)(void))windowGetFreeWork)();
         r3 = *(u32*)((u8*)r3 + 0x0);
         if (r3 == 0) return;
 
@@ -409,10 +409,10 @@ void fn_8007C634(void) {
 /* 0x8007C764 | size: 0x44 */
 void fn_8007C764(u8 arg) {
     extern void* windowSearchID(u32 id);
-    extern u32* fn_801040A0(void* obj);
+    extern u32* windowGetFreeWork(void* obj);
     u32 p;
 
-    p = *fn_801040A0(windowSearchID(0xa6));
+    p = *windowGetFreeWork(windowSearchID(0xa6));
     if (p != 0) {
         *(u8*)(p + 0xC9) = arg;
     }
@@ -422,10 +422,10 @@ void fn_8007C764(u8 arg) {
 /* 0x8007C7A8 | size: 0x44 */
 void fn_8007C7A8(u8 arg) {
     extern void* windowSearchID(u32 id);
-    extern u32* fn_801040A0(void* obj);
+    extern u32* windowGetFreeWork(void* obj);
     u32 p;
 
-    p = *fn_801040A0(windowSearchID(0xa6));
+    p = *windowGetFreeWork(windowSearchID(0xa6));
     if (p != 0) {
         *(u8*)(p + 0xC8) = arg;
     }
@@ -456,7 +456,7 @@ void fn_8007C7EC(void) {
 
     r3 = 0xa6;
     ((void(*)(void))windowSearchID)();
-    ((void(*)(void))fn_801040A0)();
+    ((void(*)(void))windowGetFreeWork)();
     r31 = *(u32*)((u8*)r3 + 0x0);
     if (r31 == 0) return;
     tmp = *(u8*)((u8*)r31 + 0xB6);
@@ -605,7 +605,7 @@ void fn_8007C7EC(void) {
     r3 = 0xa6;
     *(u32*)((u8*)r31 + 0xB8) = tmp;
     ((void(*)(void))windowSearchID)();
-    ((void(*)(void))fn_801040A0)();
+    ((void(*)(void))windowGetFreeWork)();
     r3 = *(u32*)((u8*)r3 + 0x0);
     if (r3 == 0) return;
     tmp = 0x0;
@@ -616,7 +616,7 @@ void fn_8007C7EC(void) {
         ((void(*)(void))_threadSwitch)();
         r3 = 0xa6;
         ((void(*)(void))windowSearchID)();
-        ((void(*)(void))fn_801040A0)();
+        ((void(*)(void))windowGetFreeWork)();
         r3 = *(u32*)((u8*)r3 + 0x0);
         if (r3 == 0) return;
 
@@ -635,7 +635,7 @@ void fn_8007CAB0(void) {
 
     r3 = 0xa6;
     ((void(*)(void))windowSearchID)();
-    ((void(*)(void))fn_801040A0)();
+    ((void(*)(void))windowGetFreeWork)();
     r5 = *(u32*)((u8*)r3 + 0x0);
     if (r5 == 0) return;
     tmp = *(u8*)((u8*)r5 + 0xB6);
@@ -674,11 +674,11 @@ void fn_8007CAB0(void) {
 /* 0x8007CB54 | size: 0x60 */
 void fn_8007CB54(u32 arg) {
     extern void* windowSearchID(u32 id);
-    extern u32* fn_801040A0(void* obj);
+    extern u32* windowGetFreeWork(void* obj);
     extern void GScharLenCpy(u32 p, u32 arg, u32 size);
     u32 p;
 
-    p = *fn_801040A0(windowSearchID(0xa6));
+    p = *windowGetFreeWork(windowSearchID(0xa6));
     if (p != 0) {
         GScharLenCpy(p, arg, 0x50);
         *(u16*)(p + 0x9E) = 0;
@@ -717,7 +717,7 @@ void fn_8007CBB4(void) {
         r3 = 0xa6;
         ((void(*)(void))windowSearchID)();
     }
-    ((void(*)(void))fn_801040A0)();
+    ((void(*)(void))windowGetFreeWork)();
     r28 = *(u32*)((u8*)r3 + 0x0);
     tmp = 0x0;
     r30 = 0x0;
@@ -1310,7 +1310,7 @@ void fn_8007D4FC(void) {
         r3 = 0xa6;
         ((void(*)(void))windowSearchID)();
     }
-    ((void(*)(void))fn_801040A0)();
+    ((void(*)(void))windowGetFreeWork)();
     r4 = *(u32*)((u8*)r3 + 0x0);
     tmp = *(u16*)((u8*)r4 + 0x0);
     if (tmp != 0) {
@@ -1341,7 +1341,7 @@ void fn_8007D564(void) {
         r3 = 0xa6;
         ((void(*)(void))windowSearchID)();
     }
-    ((void(*)(void))fn_801040A0)();
+    ((void(*)(void))windowGetFreeWork)();
     r3 = *(u32*)((u8*)r3 + 0x0);
     if (r3 == 0) return;
     tmp = *(s16*)((u8*)r30 + 0x6);
@@ -1495,7 +1495,7 @@ void fn_8007D79C(void) {
         r3 = 0xa6;
         ((void(*)(void))windowSearchID)();
     }
-    ((void(*)(void))fn_801040A0)();
+    ((void(*)(void))windowGetFreeWork)();
     r4 = *(u32*)((u8*)r3 + 0x0);
     tmp = 0x0;
     *(u32*)((u8*)r31 + 0x4C) = tmp;
@@ -1561,7 +1561,7 @@ void fn_8007D89C(void) {
         r3 = 0xa6;
         ((void(*)(void))windowSearchID)();
     }
-    ((void(*)(void))fn_801040A0)();
+    ((void(*)(void))windowGetFreeWork)();
     r3 = *(u32*)((u8*)r3 + 0x0);
     if (r3 == 0) return;
     tmp = *(s16*)((u8*)r31 + 0x6);
@@ -1669,7 +1669,7 @@ void fn_8007D978(u32 r3) {
         r3 = 0xa6;
         windowSearchID();
     }
-    fn_801040A0();
+    windowGetFreeWork();
     tmp = *(u8*)((u8*)r14 + 0x1);
     r15 = *(u32*)((u8*)r3 + 0x0);
     tmp = (s8)tmp;
@@ -1681,14 +1681,14 @@ void fn_8007D978(u32 r3) {
         if ((s32)tmp == 0) {
             r3 = r14;
             r4 = 0x0;
-            fn_801040D0();
+            windowGetParam();
             r4 = r3;
             r3 = r14;
             fn_8007FDBC();
             tmp = r3;
             r3 = r14;
             r18 = tmp;
-            fn_801040A0();
+            windowGetFreeWork();
             *(u32*)((u8*)r3 + 0x0) = r18;
             r3 = r14;
             r4 = 0x79a;

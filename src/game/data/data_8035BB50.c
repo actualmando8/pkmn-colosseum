@@ -966,7 +966,7 @@ extern u8 fn_8011BEB4[];
 extern u8 fn_801254B4[];
 extern u8 fn_8012640C[];
 extern u8 fn_801286C8[];
-extern u8 fn_80133E6C[];
+extern u8 _dbgMenuGetItemNo__FP14tagWINDOW_WORKl[];
 extern u8 fn_8020EE1C[];
 extern u8 fn_8020F100[];
 extern u8 fn_8020F230[];
@@ -6799,7 +6799,7 @@ void* lbl_803632F8[11] = {
     (void*)0x010DCAF5,
     (void*)0x26102C02,
     (void*)0xE0594CB3,
-    (void*)((u8*)fn_80133E6C + 0xB8),
+    (void*)((u8*)_dbgMenuGetItemNo__FP14tagWINDOW_WORKl + 0xB8),
     (void*)0xEE4228E8,
     (void*)0xF9E8E62A,
     (void*)0xF9F2122B,

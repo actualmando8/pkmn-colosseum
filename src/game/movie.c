@@ -48,8 +48,8 @@ extern void fn_80113828(u32 a, u32 b);                /* floor resource unload h
 extern void fn_8011288C(u32 a, u32 b);                /* floor resource alloc helper */
 extern u32  fn_8011394C(void);                         /* floor state query */
 extern void* fn_80129280(u32 a, u32 b);               /* battle/effect state setup */
-extern void fn_80135030(void* ctx, u32 a, u32 b);     /* effect parameter set */
-extern void* fn_80135168(void* ctx, u32 a);            /* effect query */
+extern void gamedatasaveSetStatus(void* ctx, u32 a, u32 b);     /* effect parameter set */
+extern void* gamedatasaveGetStatus(void* ctx, u32 a);            /* effect query */
 extern void heroSetStatus(u32 a, u32 b, u32 c);         /* effect system control */
 extern void* heroGetStatus(u32 a, u32 b, u32 c);        /* effect system query */
 extern void fn_80106D3C(u32 a, u32 b, u32 c, u32 d);  /* floor transition trigger */
@@ -286,9 +286,9 @@ void fn_80035F64(void) {
 
     /* Step 5: Set up battle/effect state for credits scene */
     effectCtx = fn_80129280(0, 1);
-    fn_80135030(effectCtx, 5, 2);
-    fn_80135030(effectCtx, 7, 1);
-    fn_80135030(effectCtx, 8, 1);
+    gamedatasaveSetStatus(effectCtx, 5, 2);
+    gamedatasaveSetStatus(effectCtx, 7, 1);
+    gamedatasaveSetStatus(effectCtx, 8, 1);
 
     heroSetStatus(0, 0x18, 1);
 
@@ -333,7 +333,7 @@ void fn_80035F64(void) {
             goto postCheck;
         }
 
-        queryResult = (void*)fn_80135168(effectCtx, 4);
+        queryResult = (void*)gamedatasaveGetStatus(effectCtx, 4);
         if (queryResult == NULL) {
             goto postCheck;
         }
@@ -348,7 +348,7 @@ void fn_80035F64(void) {
             pairB = (void*)heroGetStatus(0, 2, 0);
 
             if (pairA != pairB) {
-                queryResult = (void*)fn_80135168(savedCtx, 4);
+                queryResult = (void*)gamedatasaveGetStatus(savedCtx, 4);
                 if (queryResult != NULL) {
                     goto postCheck;
                 }
