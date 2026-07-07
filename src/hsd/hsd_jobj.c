@@ -19,6 +19,8 @@
 #include "hsd/hsd_robj.h"
 
 static void JObjInfoInit(void);
+void JObjRelease(HSD_JObj* jobj);
+void JObjAmnesia(void* info);
 
 HSD_JObjInfo hsdJObj = { JObjInfoInit };
 
@@ -34,20 +36,9 @@ void HSD_JObjSetCurrent(HSD_JObj* jobj)
     current_jobj = jobj;
 }
 
-HSD_JObj* HSD_JObjGetCurrent(void)
-{
-    return current_jobj;
-}
-
 /* ========================================================================= */
 /*  Flag accessors                                                           */
 /* ========================================================================= */
-
-u32 HSD_JObjGetFlags(HSD_JObj* jobj)
-{
-    HSD_ASSERT(0, jobj);
-    return jobj->flags;
-}
 
 void HSD_JObjSetFlags(HSD_JObj* jobj, u32 flags)
 {
@@ -120,27 +111,6 @@ void HSD_JObjSetMtxDirtySub(HSD_JObj* jobj)
 /* ========================================================================= */
 /*  Hierarchy manipulation                                                   */
 /* ========================================================================= */
-
-void HSD_JObjAddChild(HSD_JObj* jobj, HSD_JObj* child)
-{
-    HSD_JObj* c;
-
-    HSD_ASSERT(0, jobj);
-    HSD_ASSERT(0, child);
-    HSD_ASSERT(0, child->parent == NULL);
-
-    child->parent = jobj;
-    if (jobj->child == NULL) {
-        jobj->child = child;
-    } else {
-        c = jobj->child;
-        while (c->next != NULL) {
-            c = c->next;
-        }
-        c->next = child;
-    }
-    HSD_JObjSetMtxDirty(child);
-}
 
 void HSD_JObjAddDObj(HSD_JObj* jobj, HSD_DObj* dobj)
 {
@@ -352,47 +322,13 @@ void HSD_JObjSetDefaultClass(HSD_ClassInfo* info)
 /*  Class lifecycle                                                          */
 /* ========================================================================= */
 
-static void JObjRelease(HSD_Class* o)
-{
-    HSD_JObj* jobj = (HSD_JObj*) o;
-
-    /* Release children */
-    HSD_JObjRemoveAll(jobj->child);
-    jobj->child = NULL;
-
-    /* Release DObj chain */
-    if (union_type_dobj(jobj)) {
-        HSD_DObjRemoveAll(jobj->u.dobj);
-        jobj->u.dobj = NULL;
-    }
-
-    /* Release animation */
-    HSD_AObjRemove(jobj->aobj);
-    jobj->aobj = NULL;
-
-    /* Release constraints */
-    HSD_RObjRemoveAll(jobj->robj);
-    jobj->robj = NULL;
-
-    HSD_OBJECT_PARENT_INFO(&hsdJObj)->release(o);
-}
-
-static void JObjAmnesia(HSD_ClassInfo* info)
-{
-    if (info == HSD_CLASS_INFO(default_class)) {
-        default_class = NULL;
-    }
-    current_jobj = NULL;
-    HSD_OBJECT_PARENT_INFO(&hsdJObj)->amnesia(info);
-}
-
 static void JObjInfoInit(void)
 {
     hsdInitClassInfo(HSD_CLASS_INFO(&hsdJObj), HSD_CLASS_INFO(&hsdObj),
                      "sysdolphin_base_library", "hsd_jobj",
                      sizeof(HSD_JObjInfo), sizeof(HSD_JObj));
-    HSD_CLASS_INFO(&hsdJObj)->release = JObjRelease;
-    HSD_CLASS_INFO(&hsdJObj)->amnesia = JObjAmnesia;
+    HSD_CLASS_INFO(&hsdJObj)->release = (void (*)(HSD_Class*)) JObjRelease;
+    HSD_CLASS_INFO(&hsdJObj)->amnesia = (void (*)(HSD_ClassInfo*)) JObjAmnesia;
 }
 
 /* ===================================================================
@@ -1030,8 +966,8 @@ asm void HSD_JObjGetCurrent(void) {
 #include "src/hsd/hsd_jobj_HSD_JObjGetCurrent.inc"
 }
 #else
-u32 HSD_JObjGetCurrent(void) {
-    return lbl_8047B2AC;
+HSD_JObj* HSD_JObjGetCurrent(void) {
+    return (HSD_JObj*) lbl_8047B2AC;
 }
 #endif
 #pragma pop
