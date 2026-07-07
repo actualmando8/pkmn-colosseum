@@ -68,7 +68,7 @@ extern u8 _HSD_RObjForgetMemory[];
 extern u8 _HSD_RandForgetMemory[];
 extern u8 _dbgMenuFightGetWazaDataIdSub[];
 extern u8 fn_80005FFC[];
-extern u8 fn_80007FDC[];
+extern u8 dbgMenuFightStop[];
 extern u8 fn_800096B4[];
 extern u8 fn_80111DF8[];
 extern u8 fn_80111F2C[];
@@ -4445,7 +4445,7 @@ const void* lbl_802758E8[3712] = {
     (void*)0xC0649084,
     (void*)0xC863AC63,
     (void*)0x88424000,
-    (void*)((u8*)fn_80007FDC + 0x24),
+    (void*)((u8*)dbgMenuFightStop + 0x24),
     (void*)0x8400ACA5,
     (void*)0x8421BC42,
     (void*)0xE042D043,
@@ -6981,7 +6981,7 @@ const void* lbl_802758E8[3712] = {
     (void*)0x6C6C6A5F,
     (void*)0x60897373,
     (void*)0x736C6C6A,
-    (void*)((u8*)fn_80007FDC + 0x24),
+    (void*)((u8*)dbgMenuFightStop + 0x24),
     (void*)0x8000B9CE,
     (void*)0xFFFFDEF7,
     (void*)0xF442AD6A,

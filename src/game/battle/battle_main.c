@@ -499,7 +499,7 @@ void fn_801EFA08(void) {
     extern u8 lbl_8046D760[];
     extern f32 lbl_8047E508;
     extern void fn_8000816C();
-    extern void fn_80008184();
+    extern void dbgMenuFightGetMsgSpeedToFrame();
     extern void fn_800FF660();
     extern void fn_8011288C();
     extern void fn_8016597C();
@@ -731,7 +731,7 @@ void fn_801EFA08(void) {
                     r3 = 0x0;
                     fn_801F1588();
                     r3 = 0xb4;
-                    fn_80008184();
+                    dbgMenuFightGetMsgSpeedToFrame();
                     /* mr. r28, r3 */;
                     if (r3 != 0) {
                         r26 = 0x0;

@@ -33,7 +33,7 @@ extern u8 fn_80017A0C[];
 extern u8 fn_800195E0[];
 extern u8 fn_80019680[];
 extern u8 fn_800199F4[];
-extern u8 fn_8001AA98[];
+extern u8 menuPokemonButton[];
 extern u8 fn_8001AB70[];
 extern u8 fn_8001AF44[];
 extern u8 fn_8001EF78[];
@@ -45,7 +45,7 @@ extern u8 fn_80024308[];
 extern u8 fn_80027D58[];
 extern u8 fn_800281F0[];
 extern u8 fn_80028534[];
-extern u8 fn_80028588[];
+extern u8 menuNameEntrySelectCtrl[];
 extern u8 fn_80028948[];
 extern u8 fn_8002A618[];
 extern u8 fn_8002AA68[];
@@ -971,7 +971,7 @@ void* lbl_802E2DB8[1904] = {
     (void*)0x03AA0000,
     (void*)0x00000000,
     (void*)((u8*)fn_8001AB70),
-    (void*)((u8*)fn_8001AA98),
+    (void*)((u8*)menuPokemonButton),
     (void*)((u8*)fn_8001AF44),
     (void*)0x00000000,
     (void*)0x00000000,
@@ -1063,7 +1063,7 @@ void* lbl_802E2DB8[1904] = {
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)((u8*)fn_80028534),
-    (void*)((u8*)fn_80028588),
+    (void*)((u8*)menuNameEntrySelectCtrl),
     (void*)0x00000000,
     (void*)0x65240000,
     (void*)0x04310000,

@@ -48,7 +48,7 @@ extern void fn_800E0C54();
 extern void _threadSwitch();
 extern void fn_800F9D04();
 extern void fn_800FA280();
-extern void fn_800FA444();
+extern void GSmsgGetRect();
 extern void fn_800FB680();
 extern void fn_800FE35C();
 extern void fn_800FE38C();
@@ -3791,7 +3791,7 @@ void fn_8006CCC0(void) {
                                     ((void(*)(void))windowSearchItemID)();
                                     r22 = r3;
                                     r3 = *(u32*)((u8*)r22 + 0x4C);
-                                    ((void(*)(void))fn_800FA444)();
+                                    ((void(*)(void))GSmsgGetRect)();
                                     r0 = *(s16*)((u8*)r22 + 0x50);
                                     r3 = (u32)r3 >> 16;
                                     r0 = r0 + r3;
@@ -3996,7 +3996,7 @@ void fn_8006CCC0(void) {
         r4 = 0x0;
         ((void(*)(void))fn_800FB680)();
         r3 = r21;
-        ((void(*)(void))fn_800FA444)();
+        ((void(*)(void))GSmsgGetRect)();
         r3 = (u32)r3 >> 16;
         r4 = *(u32*)((u8*)r22 + 0x18);
         r0 = r3 + 0x24;
@@ -4598,7 +4598,7 @@ void fn_8006DAE4(void* arg0) {
     extern void* windowGetParam(void*, int);
     extern void* windowSearchItemID(void*, int);
     extern void menuSetPosition(int, int, s16);
-    extern u32 fn_800FA444(void*);
+    extern u32 GSmsgGetRect(void*);
     extern void winSpriteSetDisp(void*, int);
     extern void fn_80070D84(void*, void*, int);
 
@@ -4635,7 +4635,7 @@ void fn_8006DAE4(void* arg0) {
             slot->field_4c = (u32)a;
             slot = (slot_obj_DAE4*)windowSearchItemID(arg0, 0xe8d);
             slot->field_4c = (u32)b;
-            cmp = (s16)(u16)fn_800FA444(c);
+            cmp = (s16)(u16)GSmsgGetRect(c);
             d29 = 0;
             d27 = 0;
             if (cmp > 0x32) {
@@ -7744,7 +7744,7 @@ void fn_800706C4(void) {
     *(u32*)&lbl_8047A5F0 = r0;
     } while (0);
     r3 = *(u32*)&lbl_8047A5F4;
-    ((void(*)(void))fn_800FA444)();
+    ((void(*)(void))GSmsgGetRect)();
     r0 = *(s16*)((u8*)r30 + 0x6);
     r3 = (u32)r3 >> 16;
     /* subi r3, r3, 0x20 */;

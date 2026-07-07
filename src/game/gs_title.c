@@ -167,7 +167,7 @@
  *   Original-name candidates for our extern fn_XXXXXXXX:
  *     menuItemBiosGetPtr / menuDataBiosGetPtr -- linked-list/menu accessors
  *     fn_800D3088 / fn_800D37CC -- frame timing (returns u32/s32 ticks)
- *     fn_800E0CA0 / fn_800E090C -- vec3 transform helpers
+ *     fn_800E0CA0 / GSlerpGetLinearInterpolationVector -- vec3 transform helpers
  *     fn_800FA280 / fn_80132A38 -- message/window callbacks
  *     fn_80106D3C / fn_801069FC -- text print + wait
  *     fn_801902E0 -- config flag check (returns u8)
@@ -837,7 +837,7 @@ void fn_80024CDC(s32 arg0, u8* arg1) {
 /* 0x80024DBC | 0x170
  *
  * fn_80024DBC -- one of four "twin" functions. Fade-aware position writer.
- *   - case 1 (lbl_8047A370 == 1): call fn_800E0CA0(fade_amt) + fn_800E090C
+ *   - case 1 (lbl_8047A370 == 1): call fn_800E0CA0(fade_amt) + GSlerpGetLinearInterpolationVector
  *     to interpolate a float-pair position into local_48[0..1]; convert to int.
  *   - default: linked-list walk to find the menu item at lbl_8047A368,
  *     pull its x (pbVar3+2) and y (pbVar3+4) shorts.
@@ -853,7 +853,7 @@ void fn_80024CDC(s32 arg0, u8* arg1) {
  * constants vs target lbl_8047B8B8@sda21 named refs.
  */
 extern f32 fn_800E0CA0(f32);
-extern void fn_800E090C(void*, void*, void*, f32);
+extern void GSlerpGetLinearInterpolationVector(void*, void*, void*, f32);
 extern u32 lbl_8047A370;
 extern f32 lbl_80478898;
 extern u8 lbl_803A2058[];
@@ -883,7 +883,7 @@ void fn_80024DBC(s32 arg0, u8* arg1) {
     extern f32 lbl_8047B8E0;
     extern u8* menuItemBiosGetPtr(s32);
     extern u8* menuDataBiosGetPtr(u32);
-    extern void fn_800E090C(void*, void*, void*);
+    extern void GSlerpGetLinearInterpolationVector(void*, void*, void*);
     extern void fn_800E0CA0(f64);
     s32 iVar2;
     u8 *pbVar3;
@@ -897,7 +897,7 @@ void fn_80024DBC(s32 arg0, u8* arg1) {
     switch ((s32)lbl_8047A370) {
     case 1:
         fn_800E0CA0((f64)lbl_80478898);
-        fn_800E090C(local_48, lbl_803A2058, lbl_803A204C);
+        GSlerpGetLinearInterpolationVector(local_48, lbl_803A2058, lbl_803A204C);
         unaff_r28 = (s32)local_48[0];
         unaff_r31 = (s32)local_48[1];
         break;
@@ -938,7 +938,7 @@ LAB_80024E94:
 /* 0x80024F2C | 0x170
  *
  * fn_80024F2C -- twin of fn_80024DBC, using +offset on x and -offset on y.
- * Same structure: case-1 calls fn_800E090C to interpolate, default walks list.
+ * Same structure: case-1 calls GSlerpGetLinearInterpolationVector to interpolate, default walks list.
  * See fn_80024DBC doc for full semantics.
  *
  * Status: 94.9% matched. Same SDA2 anonymous-constant blocker.
@@ -967,7 +967,7 @@ void fn_80024F2C(s32 arg0, u8* arg1) {
     extern f32 lbl_8047B8E0;
     extern u8* menuItemBiosGetPtr(s32);
     extern u8* menuDataBiosGetPtr(u32);
-    extern void fn_800E090C(void*, void*, void*);
+    extern void GSlerpGetLinearInterpolationVector(void*, void*, void*);
     extern void fn_800E0CA0(f64);
     s32 iVar2;
     u8 *pbVar3;
@@ -981,7 +981,7 @@ void fn_80024F2C(s32 arg0, u8* arg1) {
     switch ((s32)lbl_8047A370) {
     case 1:
         fn_800E0CA0((f64)lbl_80478898);
-        fn_800E090C(local_48, lbl_803A2058, lbl_803A204C);
+        GSlerpGetLinearInterpolationVector(local_48, lbl_803A2058, lbl_803A204C);
         unaff_r28 = (s32)local_48[0];
         unaff_r31 = (s32)local_48[1];
         break;
@@ -1046,7 +1046,7 @@ void fn_8002509C(s32 arg0, u8* arg1) {
     extern f32 lbl_8047B8E0;
     extern u8* menuItemBiosGetPtr(s32);
     extern u8* menuDataBiosGetPtr(u32);
-    extern void fn_800E090C(void*, void*, void*);
+    extern void GSlerpGetLinearInterpolationVector(void*, void*, void*);
     extern void fn_800E0CA0(f64);
     s32 iVar2;
     u8 *pbVar3;
@@ -1060,7 +1060,7 @@ void fn_8002509C(s32 arg0, u8* arg1) {
     switch ((s32)lbl_8047A370) {
     case 1:
         fn_800E0CA0((f64)lbl_80478898);
-        fn_800E090C(local_48, lbl_803A2058, lbl_803A204C);
+        GSlerpGetLinearInterpolationVector(local_48, lbl_803A2058, lbl_803A204C);
         unaff_r28 = (s32)local_48[0];
         unaff_r31 = (s32)local_48[1];
         break;
@@ -1125,7 +1125,7 @@ void fn_8002520C(s32 arg0, u8* arg1) {
     extern f32 lbl_8047B8E0;
     extern u8* menuItemBiosGetPtr(s32);
     extern u8* menuDataBiosGetPtr(u32);
-    extern void fn_800E090C(void*, void*, void*);
+    extern void GSlerpGetLinearInterpolationVector(void*, void*, void*);
     extern void fn_800E0CA0(f64);
     s32 iVar2;
     u8 *pbVar3;
@@ -1139,7 +1139,7 @@ void fn_8002520C(s32 arg0, u8* arg1) {
     switch ((s32)lbl_8047A370) {
     case 1:
         fn_800E0CA0((f64)lbl_80478898);
-        fn_800E090C(local_48, lbl_803A2058, lbl_803A204C);
+        GSlerpGetLinearInterpolationVector(local_48, lbl_803A2058, lbl_803A204C);
         unaff_r28 = (s32)local_48[0];
         unaff_r31 = (s32)local_48[1];
         break;
@@ -1179,7 +1179,7 @@ LAB_800252E4:
  * arg1[0x50] and 0 to arg1[0x52]. Only returns an X coord; Y is always 0,
  * meaning this is likely for horizontal-slider cursors.
  *
- * case 1: fn_800E090C returns a pair, use local_28[0] (x)
+ * case 1: GSlerpGetLinearInterpolationVector returns a pair, use local_28[0] (x)
  * default: linked-list walk, read pbVar2[2] (the x short of a menu item)
  *
  * Status: 98.4% matched. Remaining 2 diffs: bne+b vs beq pattern in the
@@ -1204,7 +1204,7 @@ void fn_8002537C(s32 arg0, u8* arg1) {
     extern u32 lbl_8047A370;
     extern u8* menuItemBiosGetPtr(s32);
     extern u8* menuDataBiosGetPtr(u32);
-    extern void fn_800E090C(void*, void*, void*);
+    extern void GSlerpGetLinearInterpolationVector(void*, void*, void*);
     extern void fn_800E0CA0(f64);
     s32 iVar1;
     u8 *pbVar2;
@@ -1216,7 +1216,7 @@ void fn_8002537C(s32 arg0, u8* arg1) {
     switch ((s32)lbl_8047A370) {
     case 1:
         fn_800E0CA0((f64)lbl_80478898);
-        fn_800E090C(local_28, lbl_803A2058, lbl_803A204C);
+        GSlerpGetLinearInterpolationVector(local_28, lbl_803A2058, lbl_803A204C);
         unaff_r29 = (s32)local_28[0];
         break;
     case 0:
@@ -1279,7 +1279,7 @@ void fn_80025490(s32 arg0, u8* arg1) {
     extern u32 lbl_8047A370;
     extern u8* menuItemBiosGetPtr(s32);
     extern u8* menuDataBiosGetPtr(u32);
-    extern void fn_800E090C(void*, void*, void*);
+    extern void GSlerpGetLinearInterpolationVector(void*, void*, void*);
     extern void fn_800E0CA0(f64);
     s32 iVar1;
     u8 *pbVar2;
@@ -1291,7 +1291,7 @@ void fn_80025490(s32 arg0, u8* arg1) {
     switch ((s32)lbl_8047A370) {
     case 1:
         fn_800E0CA0((f64)lbl_80478898);
-        fn_800E090C(local_24, lbl_803A2058, lbl_803A204C);
+        GSlerpGetLinearInterpolationVector(local_24, lbl_803A2058, lbl_803A204C);
         unaff_r29 = (s32)local_24[1];
         break;
     case 0:
@@ -1894,7 +1894,7 @@ s32 fn_80025A80(s32 param_1) {
  *             s32 flag_b, f32 *pos)  -- GX quad render primitive.
  *
  *   1. Build two vec3s (vec_a, vec_b) based on flag_a (1 = symmetric scale,
- *      else diagonal). Call fn_800E0CA0(rot) + fn_800E090C to combine them
+ *      else diagonal). Call fn_800E0CA0(rot) + GSlerpGetLinearInterpolationVector to combine them
  *      into a rotated offset vector at result_1.
  *   2. Multiply result_1.x by lbl_8047B8DC (alpha) and store as scaled.
  *   3. Build second vec3 pair based on flag_b, call fn_800E0CA0+090C again,
@@ -1905,7 +1905,7 @@ s32 fn_80025A80(s32 param_1) {
  *        fn_800D88DC(3), fn_800D888C(4), fn_800D6A00(4),
  *        fn_800D7820(lbl_80314AE8), fn_800D85D4(0, tex), fn_800D67BC(4)
  *   6. Emit 4 vertices forming a textured quad. Each vertex:
- *        fn_800DFF98(vert_out, result_2, uv_corner)  -- compute position
+ *        GSvecTransform(vert_out, result_2, uv_corner)  -- compute position
  *        fn_800D6680(vert.x, vert.y, vert.z)         -- write pos
  *        fn_800D5CB8(0, 0xff, 0xff, 0xff, scaled)    -- RGBA color
  *        fn_800D59B8(0, u, v)                        -- UV
@@ -1924,7 +1924,7 @@ extern void fn_800D6A00(void);
 extern void fn_800D7820(void);
 extern void fn_800D85D4(void);
 extern void fn_800D67BC(void);
-extern void fn_800DFF98(void);
+extern void GSvecTransform(void);
 extern void fn_800D6680(void);
 extern void fn_800D5CB8(void);
 extern void fn_800D59B8(void);
@@ -1962,10 +1962,10 @@ void fn_80025C1C(f32 arg_f1, f32 arg_f2, f32 arg_f3,
     extern void fn_800D85D4(s32, s32);
     extern void fn_800D888C(s32);
     extern void fn_800D88DC(s32);
-    extern void fn_800DFF98(f32*, f32*, f32*);
+    extern void GSvecTransform(f32*, f32*, f32*);
     extern void fn_800E03B4(f32*, f32*);
     extern void fn_800E042C(f32*, f32*);
-    extern void fn_800E090C(f32*, f32*, f32*);
+    extern void GSlerpGetLinearInterpolationVector(f32*, f32*, f32*);
     extern void fn_800E0CA0(f32);
     f32 vec_a[3];
     f32 vec_b[3];
@@ -1982,7 +1982,7 @@ void fn_80025C1C(f32 arg_f1, f32 arg_f2, f32 arg_f3,
         vec_b[0] = lbl_8047B8AC; vec_b[1] = lbl_8047B8AC; vec_b[2] = lbl_8047B8AC;
     }
     fn_800E0CA0(arg_f1);
-    fn_800E090C(result_1, vec_b, vec_a);
+    GSlerpGetLinearInterpolationVector(result_1, vec_b, vec_a);
     scaled = (s32)(lbl_8047B8DC * result_1[0]);
 
     if ((u8)arg_r5 == 1) {
@@ -1993,7 +1993,7 @@ void fn_80025C1C(f32 arg_f1, f32 arg_f2, f32 arg_f3,
         vec_b[0] = arg_f3;       vec_b[1] = arg_f3;       vec_b[2] = lbl_8047B8B0;
     }
     fn_800E0CA0(arg_f1);
-    fn_800E090C(result_1, vec_b, vec_a);
+    GSlerpGetLinearInterpolationVector(result_1, vec_b, vec_a);
     fn_800E042C(result_2, result_1);
 
     {
@@ -2002,7 +2002,7 @@ void fn_80025C1C(f32 arg_f1, f32 arg_f2, f32 arg_f3,
         vec_a[0] = arg_r6[0]; vec_a[1] = arg_r6[1]; vec_a[2] = bac;
     }
     fn_800E0CA0(arg_f1);
-    fn_800E090C(result_1, vec_b, vec_a);
+    GSlerpGetLinearInterpolationVector(result_1, vec_b, vec_a);
     fn_800E03B4(result_2, result_1);
 
     fn_800D88DC(3);
@@ -2013,25 +2013,25 @@ void fn_80025C1C(f32 arg_f1, f32 arg_f2, f32 arg_f3,
     fn_800D67BC(4);
 
     vec_b[0] = lbl_8047B90C; vec_b[1] = lbl_8047B910; vec_b[2] = lbl_8047B8AC;
-    fn_800DFF98(vert_out, result_2, vec_b);
+    GSvecTransform(vert_out, result_2, vec_b);
     fn_800D6680(vert_out[0], vert_out[1], vert_out[2]);
     fn_800D5CB8(0, 0xff, 0xff, 0xff, (s32)(u8)scaled);
     fn_800D59B8(0, lbl_8047B8AC, lbl_8047B8AC);
 
     vec_b[0] = lbl_8047B8F0; vec_b[1] = lbl_8047B910; vec_b[2] = lbl_8047B8AC;
-    fn_800DFF98(vert_out, result_2, vec_b);
+    GSvecTransform(vert_out, result_2, vec_b);
     fn_800D6680(vert_out[0], vert_out[1], vert_out[2]);
     fn_800D5CB8(0, 0xff, 0xff, 0xff, (s32)(u8)scaled);
     fn_800D59B8(0, lbl_8047B8B0, lbl_8047B8AC);
 
     vec_b[0] = lbl_8047B90C; vec_b[1] = lbl_8047B8F4; vec_b[2] = lbl_8047B8AC;
-    fn_800DFF98(vert_out, result_2, vec_b);
+    GSvecTransform(vert_out, result_2, vec_b);
     fn_800D6680(vert_out[0], vert_out[1], vert_out[2]);
     fn_800D5CB8(0, 0xff, 0xff, 0xff, (s32)(u8)scaled);
     fn_800D59B8(0, lbl_8047B8AC, lbl_8047B8B0);
 
     vec_b[0] = lbl_8047B8F0; vec_b[1] = lbl_8047B8F4; vec_b[2] = lbl_8047B8AC;
-    fn_800DFF98(vert_out, result_2, vec_b);
+    GSvecTransform(vert_out, result_2, vec_b);
     fn_800D6680(vert_out[0], vert_out[1], vert_out[2]);
     fn_800D5CB8(0, 0xff, 0xff, 0xff, (s32)(u8)scaled);
     fn_800D59B8(0, lbl_8047B8B0, lbl_8047B8B0);

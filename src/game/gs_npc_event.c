@@ -285,7 +285,7 @@ void fn_80031404(u8* arg0, u8* arg1) {
 #endif
 
 /* 0x80031648 | 0x290 */
-extern void fn_800FA444(void);
+extern void GSmsgGetRect(void);
 extern void fn_8011F4F0(void);
 #if 0
 asm void fn_80031648(void) {
@@ -335,7 +335,7 @@ void fn_80031648(u8* arg0, u8* arg1) {
         return;
     }
 
-    width = (s16)(((u32 (*)(s32))fn_800FA444)(0xE7) >> 16);
+    width = (s16)(((u32 (*)(s32))GSmsgGetRect)(0xE7) >> 16);
     x = (*(s16*)(arg1 + 0x54) / 2) - (width / 2);
     fn_800FB680((s16)x, 0, -1, 0xE7);
     winSpriteSetDisp(arg1, 1);
@@ -2091,7 +2091,7 @@ void fn_800308D4(u8* arg0, u8* arg1) {
     extern u16 pokemonGetStatus(void* obj, s32 a, s32 b, s32 c);
     extern s32 fn_8011E778(s32 v);
     extern s32 fn_8011E760(s32 v);
-    extern s32 fn_800FA444(s32 m);
+    extern s32 GSmsgGetRect(s32 m);
     extern s32 fn_800FA280(s32 m);
     s32 hi;
     s32 kind;
@@ -2121,7 +2121,7 @@ void fn_800308D4(u8* arg0, u8* arg1) {
     }
 
     if (obj != 0) {
-        hi = (s16)((u32)fn_800FA444(0x2BD4) >> 16);
+        hi = (s16)((u32)GSmsgGetRect(0x2BD4) >> 16);
         fn_800FB680(0, 0, combined, 0x2BD4);
         fn_80132A38(0x37, fn_800FA280(fn_8011E760(fn_8011E778(pokemonGetStatus(obj, 0, 0x6E, 0)))));
         fn_800FB680(hi, 0, combined, 0xE7);
@@ -2195,7 +2195,7 @@ void fn_80030A44(u8* arg0, u8* arg1) {
         }
 
         if (msg != 0) {
-            x = (s16)(((u32 (*)(s32))fn_800FA444)(0xE7) >> 16);
+            x = (s16)(((u32 (*)(s32))GSmsgGetRect)(0xE7) >> 16);
             fn_80132A38(0x37, ((s32 (*)(s32))fn_800FA280)(msg));
             fn_800FB680((u16)x + 2, 0, combined, 0xCF);
         }

@@ -66,7 +66,7 @@
  *   - Gets the NPC data from menuItemBiosGetPtr (lookup by ID)
  *   - Sets up the text viewport via fn_801040F0
  *   - If the NPC has a special marker (offset +0x4C), renders it
- *     using fn_800FA444/fn_800FB680 for the dialog portrait
+ *     using GSmsgGetRect/fn_800FB680 for the dialog portrait
  *
  * fn_8000E290 (GSnpc_TrainerBattle) is a key bridge function:
  *   - Gets the overworld data for the NPC
@@ -111,7 +111,7 @@ extern void  fn_801080CC(void* ctx, s32 state);       /* Set dialog state */
 extern void  fn_801081F8(void* ctx, s32 msgId, s32 flags); /* Display message */
 
 /* Rendering */
-extern u32   fn_800FA444();                           /* Get model dimensions */
+extern u32   GSmsgGetRect();                           /* Get model dimensions */
 extern void  fn_800FB680();
 
 /* Map/warp */
@@ -1266,7 +1266,7 @@ do {
             r3 = 0x34;
             ((void(*)(void))fn_80132A38)();
             r3 = 0xcb;
-            ((void(*)(void))fn_800FA444)();
+            ((void(*)(void))GSmsgGetRect)();
             tmp = (u32)r3 >> 16;
             r5 = r29;
             tmp = (s16)tmp;
@@ -1279,7 +1279,7 @@ do {
             r3 = 0x34;
             ((void(*)(void))fn_80132A38)();
             r3 = 0xcb;
-            ((void(*)(void))fn_800FA444)();
+            ((void(*)(void))GSmsgGetRect)();
             r3 = (u32)r3 >> 16;
             tmp = *(s16*)((u8*)r28 + 0x54);
             r3 = (s16)r3;
@@ -1295,7 +1295,7 @@ do {
             r3 = 0x34;
             ((void(*)(void))fn_80132A38)();
             r3 = 0xcb;
-            ((void(*)(void))fn_800FA444)();
+            ((void(*)(void))GSmsgGetRect)();
             r3 = (u32)r3 >> 16;
             tmp = *(s16*)((u8*)r28 + 0x54);
             r3 = (s16)r3;
@@ -1319,7 +1319,7 @@ do {
     r6 = 0xe9;
     ((void(*)(void))fn_800FB680)();
     r3 = 0xe9;
-    ((void(*)(void))fn_800FA444)();
+    ((void(*)(void))GSmsgGetRect)();
     tmp = *(u8*)((u8*)r30 + 0x28);
     r3 = (u32)r3 >> 16;
     r27 = (s16)r3;
@@ -1615,10 +1615,10 @@ extern void fn_800D3074(void);
 extern void* fn_801906A0();
 extern u32 fn_800FF560();
 extern void fn_80130CD8(void);
-extern void fn_800FE6F8(void);
+extern void GSgappBlock(void);
 extern void GSthreadBlockGroup(void);
 extern void GSthreadCreate(void);
-extern void fn_800FE6DC(void);
+extern void GSgappUnblock(void);
 extern void fn_80102510();
 extern void fn_800EC8DC(void);
 extern void menuPokemonOpen(void);
@@ -1661,10 +1661,10 @@ u32 fn_8000D710(u32 mode) {
     extern void* fn_801906A0(s32);
     extern u32 fn_800FF560(void);
     extern void fn_80130CD8(void);
-    extern void fn_800FE6F8(void);
+    extern void GSgappBlock(void);
     extern void GSthreadBlockGroup(u32);
     extern void GSthreadCreate(s32, void*, u32, s32, s32, void*);
-    extern void fn_800FE6DC(void);
+    extern void GSgappUnblock(void);
     extern void fn_80102510(s32);
     extern void fn_800EC8DC(void);
     extern void menuPokemonOpen(s32, s32, s32);
@@ -1718,13 +1718,13 @@ u32 fn_8000D710(u32 mode) {
             lbl_8047A2A4 = dialogId;
             lbl_8047A2A8 = fn_800FF560();
             fn_80130CD8();
-            fn_800FE6F8();
+            GSgappBlock();
             GSthreadBlockGroup(lbl_8047A2A8);
             lbl_8047A2AC = lbl_8047A2A8 - 0x20;
             GSthreadCreate(0xF, (void*)lbl_8047A2AC, 0x4000, 1, 1, threadEntry);
             _threadSwitch();
             fn_80130CD8();
-            fn_800FE6DC();
+            GSgappUnblock();
 
             if (lbl_8047A2B0 == 0) {
                 fn_80102510(dialogId);
@@ -2200,9 +2200,9 @@ void fn_8000EA10(u8* ctx, u8* npc) {
     if (npcId >= 0x1215 && npcId < 0x121B) {
         fn_801040F0(0, 0, ctx, (u16)fn_8001D624(handle, 1), 0);
     } else if (npcId >= 0x121B && npcId < 0x1221) {
-        y = (s16)(fn_800FA444(0x1A8) >> 16) + 2;
+        y = (s16)(GSmsgGetRect(0x1A8) >> 16) + 2;
         fn_800FB680(0, 0, color, 0x1A8);
-        top = (s16)(fn_800FA444(0x197) >> 16);
+        top = (s16)(GSmsgGetRect(0x197) >> 16);
         delta = *(s16*)(npc + 0x54) - y - top;
         y = y + ((delta + ((u32)delta >> 31)) >> 1);
         fn_800FB680(y, 0, color, 0x197);
@@ -2211,7 +2211,7 @@ void fn_8000EA10(u8* ctx, u8* npc) {
         fn_80132A38(0x34, (s16)pokemonGetStatus(handle, 0, 0x87, 0));
         fn_800FBB34(0, 0, *(s16*)(npc + 0x54), *(s16*)(npc + 0x56), color, 0xDE);
     } else if (npcId >= 0x1221 && npcId < 0x1227) {
-        y = (s16)(fn_800FA444(0x1A7) >> 16);
+        y = (s16)(GSmsgGetRect(0x1A7) >> 16);
         fn_800FB680(0, 0, color, 0x1A7);
         fn_80132A38(0x34, (u8)pokemonGetStatus(handle, 0, 0x7A, 0));
         fn_800FBB34(y, 0, *(s16*)(npc + 0x54), *(s16*)(npc + 0x56), color, 0xD2);
@@ -2511,10 +2511,10 @@ void fn_8000F400(u8* ctx, u8* npc) {
         fn_80132A38(0x37, *(u32*)(party + (selected * 0xC) + 4));
         fn_800FB680(0, 0, color, 0xCF);
     } else if (id >= 0x11FD && id < 0x1200) {
-        y0 = (s16)(fn_800FA444(0x1A4) >> 16);
+        y0 = (s16)(GSmsgGetRect(0x1A4) >> 16);
         delta = *(s16*)(npc + 0x54) - y0;
         fn_800FB680(0, 0, color, 0x1A4);
-        y1 = (s16)(fn_800FA444(0x197) >> 16);
+        y1 = (s16)(GSmsgGetRect(0x197) >> 16);
         y1 = (s16)((delta - y1 + ((u32)(delta - y1) >> 31)) >> 1);
         fn_800FB680(y0 + y1, 0, color, 0x197);
         fn_80132A38(0x34, *(u8*)(party + (selected * 0xC) + 0xF));
@@ -2570,7 +2570,7 @@ void fn_8000F768(u8* ctx, u8* npc) {
     if (id >= 0x11E2 && id < 0x11E6) {
         fn_801040F0(0, 0, ctx, *(u16*)(entry + 0xC), 0);
     } else if (id >= 0x11E6 && id < 0x11EA) {
-        y = (s16)(fn_800FA444(0x197) >> 16);
+        y = (s16)(GSmsgGetRect(0x197) >> 16);
         delta = *(s16*)(npc + 0x54) - y;
         y = (s16)((delta + ((u32)delta >> 31)) >> 1);
         fn_800FB680(y, 0, color, 0x197);
@@ -2966,7 +2966,7 @@ void fn_80010294(u8* ctx, u8* npc) {
     entries = windowGetAllocPtr(ctx);
     color = (u32)menuSubCalcColor(ctx, npc);
     idx = (s8)((fn_80104530(*(u32*)(ctx + 4)) >> 16) & 0xFF);
-    y = *(s16*)(npc + 0x54) - (s16)(fn_800FA444(0x197) >> 16);
+    y = *(s16*)(npc + 0x54) - (s16)(GSmsgGetRect(0x197) >> 16);
     y = (s16)((y + ((u32)y >> 31)) >> 1);
     fn_800FB680(y, 0, color, 0x197);
 

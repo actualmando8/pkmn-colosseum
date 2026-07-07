@@ -35,7 +35,7 @@
  * slots) and an active list (for running effects).
  *
  * Per-frame execution is driven by two task callbacks registered with
- * fn_800FE834 (GStaskRegister):
+ * GSgappCreate (GStaskRegister):
  *   - fn_80130F68 (effectRenderTask) at priority 0x7F (render pass)
  *   - fn_80130F04 (effectUpdateTask) at priority 0x80 (after rendering)
  *
@@ -96,7 +96,7 @@ void fn_80130CE0(u16 maxEffects) {
     u16 cnt;
     extern u16 _toolentryAlloc__FUl(u32);
     extern void* fn_800E27B0(u16);
-    extern u32 fn_800FE834(u32, u32, u32, void*);
+    extern u32 GSgappCreate(u32, u32, u32, void*);
 
     memHandle = _toolentryAlloc__FUl(maxEffects * sizeof(GSEffectInstance));
     gsEffectGlobals.memHandle = memHandle;
@@ -127,9 +127,9 @@ void fn_80130CE0(u16 maxEffects) {
         gsEffectGlobals.maxEffects = 0;
     }
     gsEffectGlobals.activeListHead = NULL;
-    lbl_8047ADC0 = fn_800FE834(1, 0x7F, 0, (void*)fn_80130F68);
+    lbl_8047ADC0 = GSgappCreate(1, 0x7F, 0, (void*)fn_80130F68);
     GSvtrRegisterGSgapp();
-    fn_800FE834(1, 0x80, 0, (void*)fn_80130F04);
+    GSgappCreate(1, 0x80, 0, (void*)fn_80130F04);
 }
 
 /* =======================================================================

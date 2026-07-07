@@ -81,7 +81,7 @@
  *   - Object entry size 0x50+ bytes (offsets seen up to 0x50)
  *   - fn_80169520 called for status updates
  *   - fn_8016A644 called for resource cleanup
- *   - Calls to fn_800E01F4, fn_800E0518, fn_800E019C, fn_800DFF98
+ *   - Calls to fn_800E01F4, fn_800E0518, GSvecAdd, GSvecTransform
  *     (GSgfx vector/matrix operations)
  *   - Camera state at lbl_80478C40 (sda21)
  *   - fn_800FF56C (GSfloor get active) called from camera code
@@ -108,8 +108,8 @@ extern void  fn_800E209C(u16 handle);                   /* GSmemFree */
 /* GSgfx math/render */
 extern void  fn_800E01F4(void* out, f32 angle, f32 a, f32 b); /* rotation matrix */
 extern void  fn_800E0518(void* out, f32 angle);         /* angle to vector */
-extern void  fn_800E019C(void* out, void* a, void* b);  /* cross product */
-extern void  fn_800DFF98(void* out, void* a, void* b);  /* vector subtract */
+extern void  GSvecAdd(void* out, void* a, void* b);  /* cross product */
+extern void  GSvecTransform(void* out, void* a, void* b);  /* vector subtract */
 extern void  GScameraSetPosition(void* obj, void* mtx);         /* set model matrix */
 extern void  GScameraLookAt(void* obj, void* tbl, void* pos); /* set joint pos */
 extern f32   atan2(f32 x, f32 y);                /* atan2 */

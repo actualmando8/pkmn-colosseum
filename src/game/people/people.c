@@ -77,8 +77,8 @@ extern void* memset(void* dst, int val, u32 size);
 extern void* memcpy(void* dst, const void* src, u32 size);
 
 /* External functions referenced from asm wrappers */
-extern void fn_800DCC3C(void);
-extern void fn_800DCC60(void);
+extern void GSlightSetTarget(void);
+extern void GSlightSetPosition(void);
 extern void fn_800E01F4(void);
 extern void fn_800E3CF8(void*);
 extern void fn_800E3D00(void*);
@@ -113,7 +113,7 @@ extern void  fn_80167ED0(void* field, void* obj, void* data, u32 param);
 extern void  fn_80167E64(void* field);              /* field finalize */
 
 /* Thread/task system */
-extern void* fn_800FE834(u32 pri, u32 type, void* taskBuf, void* callback);
+extern void* GSgappCreate(u32 pri, u32 type, void* taskBuf, void* callback);
 extern void  GSgappTerminate(void* task);               /* task cleanup */
 
 /* Model system */
@@ -503,7 +503,7 @@ void fn_8018A44C(void) {
 /* 0x8018A700 | 0x3CC */
 extern f32 fn_800E008C(void* param);
 extern void fn_800E013C(void);
-extern void fn_800E019C(void);
+extern void GSvecAdd(void);
 extern u32 lbl_8047D800;
 extern f32 lbl_8047D7A0;
 extern f32 lbl_8047D79C;

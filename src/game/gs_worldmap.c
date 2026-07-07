@@ -50,16 +50,16 @@
  *   fn_800277F4  GSmap_ProcessInput          -- 0xB0 bytes, input handling
  *   fn_800278A4  GSmap_ConfirmTravel         -- 0xBC bytes, "Travel to X?" dialog
  *   fn_80027960  GSmap_StartTravel           -- 0x144 bytes, begin travel sequence
- *   fn_80027AA4  GSmap_TravelAnimation       -- 0x2B4 bytes, flight/drive animation
+ *   selectLetter__FP14NAME_ENTRY_ARG  GSmap_TravelAnimation       -- 0x2B4 bytes, flight/drive animation
  *   fn_80027D58  GSmap_ArrivalSequence       -- 0x3A4 bytes, arrive at destination
  *   fn_800280FC  GSmap_UpdateCamera          -- 0xF4 bytes, map camera control
  *   fn_800281F0  GSmap_Nop                   -- 4 bytes, no-op
- *   fn_800281F4  GSmap_Init                  -- 0x250 bytes, full initialization
+ *   inputName__FPUsPUsiii  GSmap_Init                  -- 0x250 bytes, full initialization
  *   fn_80028444  GSmap_DrawCityA             -- 0x50 bytes, specific city renderer
  *   fn_80028494  GSmap_DrawCityB             -- 0x50 bytes
  *   fn_800284E4  GSmap_DrawCityC             -- 0x50 bytes
  *   fn_80028534  GSmap_DrawCityD             -- 0x54 bytes
- *   fn_80028588  GSmap_DrawAllCities         -- 0x98 bytes
+ *   menuNameEntrySelectCtrl  GSmap_DrawAllCities         -- 0x98 bytes
  *   fn_80028620  GSmap_DrawLandmarks         -- 0x108 bytes
  *   fn_80028728  GSmap_DrawPaths             -- 0x108 bytes
  *   fn_80028830  GSmap_DrawOverlays          -- 0x118 bytes
@@ -97,7 +97,7 @@
  *   fn_8002B088  GSmap_SetCameraTarget       -- 0x34 bytes
  *   fn_8002B0BC  GSmap_CameraPan             -- 0x78 bytes
  *   fn_8002B134  GSmap_CameraRotate          -- 0x6C bytes
- *   fn_8002B1A0  GSmap_DrawWeatherOverlay    -- 0x26C bytes
+ *   menuShopDrawListText  GSmap_DrawWeatherOverlay    -- 0x26C bytes
  *   fn_8002B40C  GSmap_DrawTimeOverlay       -- 0x188 bytes
  *   fn_8002B594  GSmap_DrawPartyIcons        -- 0x2EC bytes
  *   fn_8002B880  GSmap_DrawInfoPanel         -- 0x468 bytes
@@ -111,7 +111,7 @@
  *   fn_8002D154  GSmap_ConfirmSequence       -- 0x480 bytes
  *   fn_8002D5D4  GSmap_CancelTravel         -- 0x348 bytes
  *   fn_8002D91C  GSmap_ArrivalDialog         -- 0x350 bytes
- *   fn_8002DC6C  GSmap_SetStoryFlag          -- 0xB8 bytes
+ *   menuShopOpen  GSmap_SetStoryFlag          -- 0xB8 bytes
  *   fn_8002DD24  GSmap_CheckStoryState       -- 0x1EC bytes
  *   fn_8002DF10  GSmap_UpdateAvailability    -- 0x35C bytes
  *   fn_8002E26C  GSmap_RefreshDisplay        -- 0x1F4 bytes
@@ -592,9 +592,9 @@ s32 fn_80026860(void* r3, u8* r4)
 
 /* fn_800268F0 - 0x800268F0 | size: 0x254 */
 extern void fn_80132A38(s32, void*);
-extern u32 fn_800FA444(u32);
+extern u32 GSmsgGetRect(u32);
 extern void fn_800FB680(s32, s32, s32, u32);
-extern s32 fn_800FA314(void*);
+extern s32 GSmsgGetLength(void*);
 extern void* fn_800FA280(u32);
 extern f32 lbl_8047B934;
 extern f32 lbl_8047B938;
@@ -627,9 +627,9 @@ s32 fn_800268F0(void* r3, u8* r4)
     extern f32 lbl_8047B938;     /* map X scale (float) */
 
     extern void fn_80132A38(s32 cmd, void* buf);
-    extern u32  fn_800FA444(u32 id);
+    extern u32  GSmsgGetRect(u32 id);
     extern void fn_800FB680(s32 x, s32 y, s32 palette, u32 cmd);
-    extern s32  fn_800FA314(void* handle);
+    extern s32  GSmsgGetLength(void* handle);
     extern void* fn_800FA280(u32 id);
 
     u8  *self  = (u8*)r3;
@@ -673,8 +673,8 @@ s32 fn_800268F0(void* r3, u8* r4)
         buf[1] = 0;
         fn_80132A38(0x37, buf);
 
-        /* compute X offset: signed upper-16 of fn_800FA444(0xce), floor-div */
-        raw_x = fn_800FA444(0xce);
+        /* compute X offset: signed upper-16 of GSmsgGetRect(0xce), floor-div */
+        raw_x = GSmsgGetRect(0xce);
         pos_x = (s16)(raw_x >> 16);         /* extsh of upper half */
         delta = 0x1b - pos_x;
         x_off = (delta + (s32)((u32)delta >> 31)) >> 1; /* arithmetic floor */
@@ -711,7 +711,7 @@ s32 fn_800268F0(void* r3, u8* r4)
 
         handle = *(u32*)(lbl_80266E18 + map_row * 0x18 + map_col * 4 + 8);
 
-        list_count = fn_800FA314((void*)handle);
+        list_count = GSmsgGetLength((void*)handle);
         if (item_idx < 0 || item_idx >= list_count) {
             handle = 0;
             goto L_check_handle;
@@ -767,7 +767,7 @@ s32 fn_800268F0(void* r3, u8* r4)
             fn_80132A38(0x37, draw_buf);
 
             /* X offset computation (same arithmetic as Phase 1) */
-            raw_x2 = fn_800FA444(0xce);
+            raw_x2 = GSmsgGetRect(0xce);
             pos_x2 = (s16)(raw_x2 >> 16);
             delta2 = 0x1b - pos_x2;
             x_off2 = (delta2 + (s32)((u32)delta2 >> 31)) >> 1;
@@ -816,9 +816,9 @@ s32 fn_80026B44(void *r3, u8 *r4)
     extern f32 lbl_8047B938;     /* float constant: animation scale                  */
 
     extern void   fn_80132A38(s32 cmd, void *buf); /* set glyph draw param */
-    extern u32    fn_800FA444(u32 pool);            /* query pool metrics   */
+    extern u32    GSmsgGetRect(u32 pool);            /* query pool metrics   */
     extern void   fn_800FB680(s32 x, s32 y, s32 color, u32 glyph_id); /* draw glyph */
-    extern s32    fn_800FA314(void *tbl);           /* get entry count      */
+    extern s32    GSmsgGetLength(void *tbl);           /* get entry count      */
     extern void  *fn_800FA280(u32 key);             /* get base pointer     */
 
     void  *ctx;       /* r30: *(void**)(r3 + 0x60) */
@@ -833,7 +833,7 @@ s32 fn_80026B44(void *r3, u8 *r4)
     s32    sub_idx0;  /* r5: first index into lbl_80266E18 rows */
     s32    sub_idx1;  /* r0: second index (column) */
     s32    half_w;    /* width correction: (0x1b - measured_width + 1) / 2 rounded */
-    s32    measured;  /* signed half-word from fn_800FA444 high half */
+    s32    measured;  /* signed half-word from GSmsgGetRect high half */
     u8    *arr;
     s32    count;
     u16    glyph_id;
@@ -869,8 +869,8 @@ s32 fn_80026B44(void *r3, u8 *r4)
         buf[1] = 0;
         fn_80132A38(0x37, buf);
 
-        /* measured width: upper 16 bits of fn_800FA444 return, sign-extended */
-        measured = (s32)(s16)(u16)((u32)fn_800FA444(0xce) >> 16);
+        /* measured width: upper 16 bits of GSmsgGetRect return, sign-extended */
+        measured = (s32)(s16)(u16)((u32)GSmsgGetRect(0xce) >> 16);
 
         /* center the glyph: half of (0x1b - measured), rounding toward zero */
         {
@@ -919,7 +919,7 @@ s32 fn_80026B44(void *r3, u8 *r4)
             tbl_ptr = *(void **)(lbl_80266E18 + (u32)sub_idx0 * 0x18 + (u32)sub_idx1 * 4 + 8);
             special = (u32)tbl_ptr; /* r23 = the raw pointer / handle */
 
-            count = fn_800FA314(tbl_ptr);
+            count = GSmsgGetLength(tbl_ptr);
 
             if (val_b < 0 || val_b >= count) {
                 special = 0;
@@ -971,7 +971,7 @@ s32 fn_80026B44(void *r3, u8 *r4)
                 buf[1] = 0;
                 fn_80132A38(0x37, buf);
 
-                measured = (s32)(s16)(u16)((u32)fn_800FA444(0xce) >> 16);
+                measured = (s32)(s16)(u16)((u32)GSmsgGetRect(0xce) >> 16);
                 {
                     s32 diff = 0x1b - measured;
                     /* final glyph: x = char_count*0x1a + half_w             */
@@ -1020,9 +1020,9 @@ s32 fn_80026D98(void* r3, u8* r4)
     extern f32 lbl_8047B934;            /* float const: base animation phase    */
     extern f32 lbl_8047B938;            /* float const: animation scale factor  */
     extern void  fn_80132A38(s32 cmd, void* buf);
-    extern u32   fn_800FA444(u32 id);
+    extern u32   GSmsgGetRect(u32 id);
     extern void  fn_800FB680(s32 x, s32 y, s32 color, u32 id);
-    extern s32   fn_800FA314(void* ptr);
+    extern s32   GSmsgGetLength(void* ptr);
     extern void* fn_800FA280(u32 id);
 
     /* saved registers r23-r31 */
@@ -1087,8 +1087,8 @@ loop_body:
 
     fn_80132A38(0x37, r28);
 
-    /* get half-width of the glyph: upper s16 of fn_800FA444(0xce) */
-    r0 = (s32)(s16)(u16)( fn_800FA444(0xce) >> 16 );
+    /* get half-width of the glyph: upper s16 of GSmsgGetRect(0xce) */
+    r0 = (s32)(s16)(u16)( GSmsgGetRect(0xce) >> 16 );
 
     /* x offset = r29 + floor((0x1b - half_width) / 2)             */
     r0 = 0x1b - r0;
@@ -1159,7 +1159,7 @@ loop_check:
         r23 = *(u32*)(lbl_80266E18 + (u32)val_a * 0x18 + (u32)val_c * 4 + 8);
 
         /* bounds-check val_b against the array length */
-        count = fn_800FA314((void*)r23);
+        count = GSmsgGetLength((void*)r23);
         if (val_b < 0 || val_b >= count) {
             r23 = 0;
             goto after_species;
@@ -1228,7 +1228,7 @@ after_species:
         fn_80132A38(0x37, r28);
 
         /* half-width centering */
-        r0 = (s32)(s16)(u16)(fn_800FA444(0xce) >> 16);
+        r0 = (s32)(s16)(u16)(GSmsgGetRect(0xce) >> 16);
         r0 = 0x1b - r0;
         r0 = (r0 + (s32)((u32)r0 >> 31)) >> 1;
 
@@ -1893,7 +1893,7 @@ s32 fn_800275F4(void* r3) {
         while (r6 != 0) {
             r26[0] = r6; r26[1] = 0;
             fn_80132A38(0x37, r26);
-            r0 = (s32)(s16)(u16)((u32)fn_800FA444(0xce) >> 16);
+            r0 = (s32)(s16)(u16)((u32)GSmsgGetRect(0xce) >> 16);
             r0 = (0x1b - r0);
             r0 = (r0 + (s32)((u32)r0 >> 31)) >> 1;
             fn_800FB680(r31 + r0, r28, (s32)((u8*)r22)[0x8b] | (s32)(-0x100), 0xce);
@@ -1904,7 +1904,7 @@ s32 fn_800275F4(void* r3) {
             if (r23 < 0 || r23 >= 2) { r6 = 0; continue; }
             if (r24 < 0 || r24 >= 4) { r6 = 0; continue; }
             r21 = *(void**)r29;
-            r0 = fn_800FA314(r21);
+            r0 = GSmsgGetLength(r21);
             if (r25 < 0 || r25 >= r0) { r6 = 0; continue; }
             arr = (u8*)fn_800FA280((u32)r21);
             r6 = *(u16*)(arr + r30);
@@ -1993,7 +1993,7 @@ u16 fn_80027960(u16 r26, s32 r27) {
         r29 = (u32*)lbl_8047B920;
         ptr = r29[r28];
         if (ptr == 0) goto next;
-        r30 = fn_800FA314((void*)ptr);
+        r30 = GSmsgGetLength((void*)ptr);
         r5 = (u16*)((u8*)fn_800FA280(r29[r28]) + 2);
         r4 = 1;
         if (r30 > 1) {
@@ -2019,7 +2019,7 @@ found:
     if (r27 == 0) return r26;
     r30 = r27 << 2;
     r29 = (u32*)lbl_8047B920;
-    r31 = fn_800FA314((void*)r29[r27]);
+    r31 = GSmsgGetLength((void*)r29[r27]);
     r5 = (u16*)fn_800FA280(r29[r27]);
     r4 = 0;
     if (r31 > 0) {
@@ -2035,15 +2035,15 @@ found:
 }
 #endif
 
-/* fn_80027AA4 - 0x80027AA4 | size: 0x2b4 */
+/* selectLetter__FP14NAME_ENTRY_ARG - 0x80027AA4 | size: 0x2b4 */
 extern void fn_80166A28(void);
 #if 0
-asm void fn_80027AA4(void) {
-#include "src/game/gs_worldmap_fn_80027AA4.inc"
+asm void selectLetter__FP14NAME_ENTRY_ARG(void) {
+#include "src/game/gs_worldmap_selectLetter__FP14NAME_ENTRY_ARG.inc"
 }
 #else
 /*
- * fn_80027AA4 -- GSmap_TravelAnimation (0x80027AA4, size 0x2B4)
+ * selectLetter__FP14NAME_ENTRY_ARG -- GSmap_TravelAnimation (0x80027AA4, size 0x2B4)
  *
  * World-map travel / UI state machine tick.
  * Reads two indirect sub-state counters from the context object,
@@ -2054,8 +2054,8 @@ asm void fn_80027AA4(void) {
  * return    - 1 if a "complete / next-scene" transition was triggered,
  *             0 otherwise
  */
-s32 fn_80027AA4(void* r3) {
-    extern s32  fn_800FA314(void*);
+s32 selectLetter__FP14NAME_ENTRY_ARG(void* r3) {
+    extern s32  GSmsgGetLength(void*);
     extern void* fn_800FA280(u32);
     extern u16  fn_80027960(u16, s32);
     extern void fn_80166A28(u32);
@@ -2111,7 +2111,7 @@ s32 fn_80027AA4(void* r3) {
         list_obj  = *(void**)((u8*)entry_ptr + 0x8);
 
         /* validate r27 (the animation counter) as index into the list */
-        list_count = fn_800FA314(list_obj);
+        list_count = GSmsgGetLength(list_obj);
         if (r27 < 0 || r27 >= list_count)
             return 0;
 
@@ -2276,7 +2276,7 @@ asm void fn_80027D58(void) {
  * object (fn_80105624), then dispatches on its two bitfields:
  *   state->f4 (u16) bits select one mutually-exclusive action (each returns):
  *     bit 0x40 - cycle a per-slot toggle 0..1 and play SE 0x27
- *     bit 0x10 - commit/leave; if fn_80027AA4 says "exit" set actor[0x98],
+ *     bit 0x10 - commit/leave; if selectLetter__FP14NAME_ENTRY_ARG says "exit" set actor[0x98],
  *                else range-check the route list and set status fields
  *     bit 0x20 - delete the current list entry, play SE 0x25
  *     bit 0x400 - swap the selected slot's species across the two
@@ -2290,9 +2290,9 @@ asm void fn_80027D58(void) {
 s32 fn_80027D58(void* actor) {
     extern u16* fn_80105624(void);
     extern void fn_80166A28(s32 se);
-    extern s32  fn_80027AA4(void* ctx);
+    extern s32  selectLetter__FP14NAME_ENTRY_ARG(void* ctx);
     extern u16  fn_80027960(u16 value, s32 listIndex);
-    extern s32  fn_800FA314(u32 list);
+    extern s32  GSmsgGetLength(u32 list);
     extern void* fn_800FA280(u32 list);
     extern u8 lbl_80266DD8[];  /* canonical; per-site reinterpret cast */
     extern u32 lbl_8047B920;  /* canonical; per-site reinterpret cast */
@@ -2316,7 +2316,7 @@ s32 fn_80027D58(void* actor) {
     }
 
     if (flags4 & 0x10) {
-        if (fn_80027AA4(ctx) != 0) {
+        if (selectLetter__FP14NAME_ENTRY_ARG(ctx) != 0) {
             *(u8*)((u8*)actor + 0x98) = 1;
             return 0;
         }
@@ -2370,7 +2370,7 @@ s32 fn_80027D58(void* actor) {
                 if (list == 0) {
                     continue;
                 }
-                count = fn_800FA314(list);
+                count = GSmsgGetLength(list);
                 data  = (u16*)((u8*)fn_800FA280(list) + 2);  /* value half of key/value pairs */
                 r4    = 1;
                 if (count > 1) {
@@ -2561,7 +2561,7 @@ asm void fn_800281F0(void) {
 void fn_800281F0(void) { }
 #endif
 
-/* fn_800281F4 - 0x800281F4 | size: 0x250 */
+/* inputName__FPUsPUsiii - 0x800281F4 | size: 0x250 */
 extern void GScharCpy(void*, u8*);
 extern void dbgMenuSetEnable(void);
 extern void fn_801046B8(void);
@@ -2591,12 +2591,12 @@ extern u32 lbl_8047A3B4;
 extern u32 lbl_8047A3B0;
 extern u8 lbl_803A2068[];
 #if 0
-asm void fn_800281F4(void) {
-#include "src/game/gs_worldmap_fn_800281F4.inc"
+asm void inputName__FPUsPUsiii(void) {
+#include "src/game/gs_worldmap_inputName__FPUsPUsiii.inc"
 }
 #else
 /*
- * GSmap_Init (fn_800281F4) -- World-map name-entry dialog.
+ * GSmap_Init (inputName__FPUsPUsiii) -- World-map name-entry dialog.
  *
  * Opens the GS name-input scene (0x6e), lets the player type a name,
  * and returns 1 if a new name was accepted or 0 if the dialog was cancelled.
@@ -2611,7 +2611,7 @@ asm void fn_800281F4(void) {
  *
  * Returns 1 if the player accepted a new name, 0 otherwise.
  */
-s32 fn_800281F4(u16 *existing_name, u8 *name_buf_in, void *arg2, void *arg3, s32 allow_cancel)
+s32 inputName__FPUsPUsiii(u16 *existing_name, u8 *name_buf_in, void *arg2, void *arg3, s32 allow_cancel)
 {
     /* --- block-scope extern declarations (TU convention) --- */
     extern u8  *GScharCpy(u8 *dst, u8 *src);        /* GS string copy                  */
@@ -2908,14 +2908,14 @@ void fn_80028534(void* r3) {
 }
 #endif
 
-/* fn_80028588 - 0x80028588 | size: 0x98 */
+/* menuNameEntrySelectCtrl - 0x80028588 | size: 0x98 */
 #if 0
-asm void fn_80028588(void) {
-#include "src/game/gs_worldmap_fn_80028588.inc"
+asm void menuNameEntrySelectCtrl(void) {
+#include "src/game/gs_worldmap_menuNameEntrySelectCtrl.inc"
 }
 #else
 #pragma optimization_level 4
-s32 fn_80028588(void* r3) {
+s32 menuNameEntrySelectCtrl(void* r3) {
     u8* r31;
     s8 state;
     r31 = (u8*)r3;
@@ -3352,7 +3352,7 @@ void fn_80028FBC(void) {
     extern void fn_801069FC(s32 a);
     extern void fn_80102510(s32 id);
     extern void menuCloseSync(s32 id, s32 a);
-    extern s32  fn_800281F4(u8* ctx, void* nameBuf, s32 mode, s32 subIndex, s32 last);
+    extern s32  inputName__FPUsPUsiii(u8* ctx, void* nameBuf, s32 mode, s32 subIndex, s32 last);
     extern void heroSetStatus(s32 a, s32 b, u8* ctx);
     extern void fn_8011DEE4(u32 v, u8* ctx);
     extern void pcboxSetPokemonBoxName(s32 a, s32 name, u8* ctx);
@@ -3535,7 +3535,7 @@ void fn_80028FBC(void) {
                         break;
                     }
                     /* Re-run init for the next page; if it reports terminal, stop. */
-                    if (fn_800281F4(lbl_803A2068, nameBuf,
+                    if (inputName__FPUsPUsiii(lbl_803A2068, nameBuf,
                                     *(s32*)(ctx + 0x18), *(s32*)(ctx + 0x1c), 0) != 0) {
                         break;
                     }
@@ -3543,7 +3543,7 @@ void fn_80028FBC(void) {
             }
         } else {
             /* Empty list: single terminal init pass. */
-            fn_800281F4(lbl_803A2068, nameBuf, 0 /*unused*/, *(s32*)(ctx + 0x1c), 1);
+            inputName__FPUsPUsiii(lbl_803A2068, nameBuf, 0 /*unused*/, *(s32*)(ctx + 0x1c), 1);
         }
         (void)lastFlag;
     }
@@ -4258,7 +4258,7 @@ s32 fn_8002A400(void* r3, u8* r4) {
     } else {
         id = 0x151;
     }
-    ret = fn_800FA444(id);
+    ret = GSmsgGetRect(id);
     fn_800FB680((s32)*(s16*)(r30 + 0x54) - (s32)(ret >> 16), 0, -1, id);
     return 0;
 }
@@ -4503,7 +4503,7 @@ s32 fn_8002ACB8(void* r3, u8* r4) {
     if (ctx[0x1C] == 0 || ctx[0x1C] == 1) {
         fn_80132A38(0x50, heroGetStatus(0, 0xC, 0));
         text_id = 0x151;
-        x = (s32)*(s16*)(r4 + 0x54) - (s32)(s16)(fn_800FA444(text_id) >> 16);
+        x = (s32)*(s16*)(r4 + 0x54) - (s32)(s16)(GSmsgGetRect(text_id) >> 16);
         fn_800FB680(x, 0, -1, text_id);
         goto done;
     }
@@ -4536,7 +4536,7 @@ s32 fn_8002ACB8(void* r3, u8* r4) {
 
     fn_80132A38(0x50, (void*)value);
     text_id = 0x153;
-    x = (s32)*(s16*)(r4 + 0x54) - (s32)(s16)(fn_800FA444(text_id) >> 16);
+    x = (s32)*(s16*)(r4 + 0x54) - (s32)(s16)(GSmsgGetRect(text_id) >> 16);
     fn_800FB680(x + 6, 0, -1, text_id);
 done:
     return 0;
@@ -4763,7 +4763,7 @@ end:
 #pragma peephole on
 #endif
 
-/* fn_8002B1A0 - 0x8002B1A0 | size: 0x26c */
+/* menuShopDrawListText - 0x8002B1A0 | size: 0x26c */
 extern void fn_800FE38C(void);
 extern u32 itemDataBiosGetName(void);
 extern u32 itemDataBiosGetPrice(void);
@@ -4771,8 +4771,8 @@ extern u32 itemDataBiosGetCoupon(void);
 extern void fn_800FE35C(void);
 extern f32 lbl_8047B980;
 #if 0
-asm void fn_8002B1A0(void) {
-#include "src/game/gs_worldmap_fn_8002B1A0.inc"
+asm void menuShopDrawListText(void) {
+#include "src/game/gs_worldmap_menuShopDrawListText.inc"
 }
 #else
 /*
@@ -4784,7 +4784,7 @@ asm void fn_8002B1A0(void) {
  * drawing a header icon and either a normal or alternate text string per slot,
  * then draws a trailing "add" or "locked" button if visual space remains.
  */
-void fn_8002B1A0(void* arg0, u8* arg1)
+void menuShopDrawListText(void* arg0, u8* arg1)
 {
     extern void fn_800FE38C(s32, s32, s32, s32);
     extern u32 itemDataBiosGetName(void);
@@ -4794,7 +4794,7 @@ void fn_8002B1A0(void* arg0, u8* arg1)
     extern f32  lbl_8047B980;
 
     extern void fn_80132A38(s32, void*);
-    extern u32  fn_800FA444(u32);
+    extern u32  GSmsgGetRect(u32);
     extern void fn_800FB680(s32, s32, s32, u32);
     extern void itemDataBiosGetPtr(u32);
 
@@ -4860,8 +4860,8 @@ void fn_8002B1A0(void* arg0, u8* arg1)
     fn_80132A38(0x50, (void*)0x270f);
 
     /* ---- measure two reference strings to compute the text x-centre ---- */
-    w_0xdb  = (s32)(fn_800FA444(0xdb)  >> 16);
-    w_0x14f = (s32)(fn_800FA444(0x14f) >> 16);
+    w_0xdb  = (s32)(GSmsgGetRect(0xdb)  >> 16);
+    w_0x14f = (s32)(GSmsgGetRect(0x14f) >> 16);
 
     /* y-base for item text: from sprite descriptor */
     y_base = (s32)*(s16*)(arg1 + 0x54);
@@ -4929,7 +4929,7 @@ void fn_8002B1A0(void* arg0, u8* arg1)
                         fn_80132A38(0x50, (void*)(u32)(u16)val);
                     }
                     {
-                        s32 tw = (s32)(fn_800FA444(0xdb) >> 16);
+                        s32 tw = (s32)(GSmsgGetRect(0xdb) >> 16);
                         s32 tx = (s32)*(s16*)(arg1 + 0x54) - tw;
                         fn_800FB680(tx, x_pos, -1, 0xdb);
                     }
@@ -4941,7 +4941,7 @@ void fn_8002B1A0(void* arg0, u8* arg1)
                         fn_80132A38(0x50, (void*)(u32)(u16)val);
                     }
                     {
-                        s32 tw = (s32)(fn_800FA444(0x153) >> 16);
+                        s32 tw = (s32)(GSmsgGetRect(0x153) >> 16);
                         s32 tx = (s32)*(s16*)(arg1 + 0x54) - tw;
                         fn_800FB680(tx, x_pos, -1, 0x153);
                     }
@@ -7355,7 +7355,7 @@ void fn_8002D91C(u32 arg0)
 }
 #endif
 
-/* fn_8002DC6C - 0x8002DC6C | size: 0xb8 | WALL 71%: fsub/fdiv double vs fsubs/fdivs single + sda21 store */
+/* menuShopOpen - 0x8002DC6C | size: 0xb8 | WALL 71%: fsub/fdiv double vs fsubs/fdivs single + sda21 store */
 extern void mailMainReceiveTerminate(void);
 extern u32 fn_800D37CC(void);
 extern void fn_8010206C(f32);
@@ -7364,12 +7364,12 @@ extern void menuReleaseOffScreen(f32);
 extern f64 lbl_8047B998;
 extern f32 lbl_8047B9CC;
 #if 0
-asm void fn_8002DC6C(void) {
-#include "src/game/gs_worldmap_fn_8002DC6C.inc"
+asm void menuShopOpen(void) {
+#include "src/game/gs_worldmap_menuShopOpen.inc"
 }
 #else
 /*
- * fn_8002DC6C  GSmap_SetStoryFlag  0x8002DC6C  size: 0xB8
+ * menuShopOpen  GSmap_SetStoryFlag  0x8002DC6C  size: 0xB8
  *
  * Sets a story-progression flag on the worldmap state, kicks the scene
  * fade/timer system, issues a wait-for-dialog yield, then samples the
@@ -7382,7 +7382,7 @@ asm void fn_8002DC6C(void) {
  *   xoris r3,r3,0x8000 + lis r0,0x4330 stacked into a f64 then
  *   fsubs lbl_8047B998(r2) bias => plain (f32)(s32)fn_800D37CC()
  */
-void fn_8002DC6C(u32 flag)
+void menuShopOpen(u32 flag)
 {
     extern void mailMainReceiveTerminate(void);
     extern u32  fn_800D37CC(void);

@@ -8,7 +8,7 @@
  * (bodies duplicated verbatim from gs_thread.c, right down to a
  * mislabeled "@file gs_thread.c" header). None of the four public names
  * appear in config/GC6E01/symbols.txt. Their claimed addresses
- * (fn_800FE9B0, fn_800FE834, fn_800FE7A0, fn_800FEA74) *do* fall in this
+ * (GSgappInit, GSgappCreate, GSgappUpdate, gappBackgroundCallback) *do* fall in this
  * file's real range (0x800F8268-0x800FF0A0 per config/GC6E01/splits.txt),
  * and the real address-scaffolded stub definitions for those same
  * addresses already exist later in this file -- the fictional named
@@ -140,7 +140,7 @@ extern void cos();   /* MSL trig (renamed fn_800CDBE0) - referenced by asm incs 
 extern const char lbl_80271008[]; /* "GSthreadCreate. Warning: 'usesFPU==FALE' OK?\n" */
 
 /* ===== Forward declarations for internal functions ===== */
-extern void fn_800FEBA0(void);            /* GStaskSwapCallback */
+extern void gappVSyncCallback(void);            /* GStaskSwapCallback */
 extern void fn_800F0F4C(u32 arg);          /* GSthread trampoline / entry wrapper */
 extern void fn_800AB150(void* buf);
 extern u32 fn_800D0F44(u32 buttonIdx);
@@ -321,7 +321,7 @@ static void*     gsThreadCurrentCtx;  /* lbl_8047AC1C : current thread context p
  *  gs_thread.c. None of the four public names appear in
  *  config/GC6E01/symbols.txt. This file's real range
  *  (0x800F8268-0x800FF0A0 per config/GC6E01/splits.txt) does contain their
- *  claimed addresses (fn_800FE9B0, fn_800FE834, fn_800FE7A0, fn_800FEA74),
+ *  claimed addresses (GSgappInit, GSgappCreate, GSgappUpdate, gappBackgroundCallback),
  *  and the real address-scaffolded definitions for those four addresses
  *  already exist further down in this file (see the "Generated" stub
  *  section) -- the fictional named duplicates above them have been
@@ -531,20 +531,20 @@ extern u32 fn_800F9AEC(void* outbuf, u16* src, s32 mode);
 extern void fn_800F9D04(void);
 extern u8* GScharCpy(u8* dst, u8* src);
 extern void fn_800FA160(void* obj);
-extern s32 fn_800FA444();
-extern void fn_800FAA98();
+extern s32 GSmsgGetRect();
+extern void GSmsgInitRuby();
 extern s32 fn_800FAEF8();
 extern s32 fn_800FB43C();
 extern s32 fn_800FB680();
 extern s32 fn_800FB8C8();
 extern s32 fn_800FBB34();
 extern void GSmsgDaemon(void);
-extern s32 fn_800FBF74();
+extern s32 GSmsgExec();
 extern void fn_800FC2A4(void);
 extern u32 fn_800FC2A8(void* ptr);
-extern void* fn_800FC39C();
-extern s32 fn_800FC518(u32 val);
-extern s32 fn_800FC528();
+extern void* GSmsgFontOpen();
+extern s32 GSmsgSetCtrlFunc(u32 val);
+extern s32 GSmsgInit();
 extern s32 fn_800FC7E0();
 extern void fn_800FD348();
 extern void fn_800FD69C();
@@ -557,13 +557,13 @@ extern void fn_800FE4D4(void);
 extern void fn_800FE6A0(f32 a, f32 b);
 extern void fn_800FE6AC(s16* outA, s16* outB);
 extern void fn_800FE6D0(s32 a, s32 b);
-extern void fn_800FE6DC(u32 taskId);
-extern void fn_800FE6F8(u32 taskId);
+extern void GSgappUnblock(u32 taskId);
+extern void GSgappBlock(u32 taskId);
 extern void GSgappTerminate(u32 taskId);
-extern void fn_800FE7A0(void);
-extern u32 fn_800FE834(s32 state, u8 priority, void* param, void* func);
-extern void fn_800FE9B0();
-extern void fn_800FEA74(void);
+extern void GSgappUpdate(void);
+extern u32 GSgappCreate(s32 state, u8 priority, void* param, void* func);
+extern void GSgappInit();
+extern void gappBackgroundCallback(void);
 
 /* 0x800F8268 | 0x1C0 */
 #pragma push
@@ -1860,7 +1860,7 @@ void fn_800FA064(void* obj) {
 
     o = (u8*)obj;
     if (*(s16*)(o + 0x18) == 0) return;
-    rv = fn_800FA444(*(void**)(o + 0x1C));
+    rv = GSmsgGetRect(*(void**)(o + 0x1C));
     r5 = (s16)(rv >> 16);
     type = *(u8*)(o + 0x4A);
     base = *(f32*)(o + 0x4);
@@ -1916,12 +1916,12 @@ void fn_800FA160(void* obj) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800FA1BC(void) {
-#include "src/game/gs_thread_fn_800FA1BC.inc"
+asm void GSmsgSetFontInfo(void) {
+#include "src/game/gs_thread_GSmsgSetFontInfo.inc"
 }
 #else
 #pragma optimization_level 2
-void fn_800FA1BC(void* obj) {
+void GSmsgSetFontInfo(void* obj) {
     u8* o;
     u8* head;
     u32 count;
@@ -2018,12 +2018,12 @@ void* fn_800FA280(u32 key) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800FA314(void) {
-#include "src/game/gs_thread_fn_800FA314.inc"
+asm void GSmsgGetLength(void) {
+#include "src/game/gs_thread_GSmsgGetLength.inc"
 }
 #else
 #pragma optimization_level 2
-s32 fn_800FA314(u32 key) {
+s32 GSmsgGetLength(u32 key) {
     u8* head;
     u16 group;
     u32 sub;
@@ -2105,13 +2105,13 @@ s32 GSmsgIsCheck(u32 key) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm u32 fn_800FA444(obj)
+asm u32 GSmsgGetRect(obj)
     void* obj;
 {
-#include "src/game/gs_thread_fn_800FA444.inc"
+#include "src/game/gs_thread_GSmsgGetRect.inc"
 }
 #else
-s32 fn_800FA444(arg0)
+s32 GSmsgGetRect(arg0)
     u32 arg0;
 {
     u8 *mgr;
@@ -2328,11 +2328,11 @@ s32 fn_800FA444(arg0)
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800FAA98(void) {
-#include "src/game/gs_thread_fn_800FAA98.inc"
+asm void GSmsgInitRuby(void) {
+#include "src/game/gs_thread_GSmsgInitRuby.inc"
 }
 #else
-void fn_800FAA98(arg0)
+void GSmsgInitRuby(arg0)
     u8 *arg0;
 {
     u16 *savedIp;
@@ -2832,7 +2832,7 @@ s32 fn_800FB8C8(arg0, arg1, arg2, arg3, arg4, arg5)
     u8 *var_r24;
     u8 *var_r9;
 
-    temp_r25 = arg0 + (arg2 - (s16) (fn_800FA444(arg5) >> 0x10U));
+    temp_r25 = arg0 + (arg2 - (s16) (GSmsgGetRect(arg5) >> 0x10U));
     if (arg5 == 0) {
         var_r24 = 0;
     } else {
@@ -3163,11 +3163,11 @@ void GSmsgDaemon(void) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800FBF74(void) {
-#include "src/game/gs_thread_fn_800FBF74.inc"
+asm void GSmsgExec(void) {
+#include "src/game/gs_thread_GSmsgExec.inc"
 }
 #else
-s32 fn_800FBF74(arg0, arg1, arg2)
+s32 GSmsgExec(arg0, arg1, arg2)
     u32 arg0;
     s8 arg1;
     s8 arg2;
@@ -3413,14 +3413,14 @@ tail:
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void* fn_800FC39C(ptr)
+asm void* GSmsgFontOpen(ptr)
     void* ptr;
 {
-#include "src/game/gs_thread_fn_800FC39C.inc"
+#include "src/game/gs_thread_GSmsgFontOpen.inc"
 }
 #else
 #pragma optimization_level 2
-void* fn_800FC39C(ptr)
+void* GSmsgFontOpen(ptr)
     void* ptr;
 {
     u8* p;
@@ -3508,12 +3508,12 @@ loop:
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800FC518(void) {
-#include "src/game/gs_thread_fn_800FC518.inc"
+asm void GSmsgSetCtrlFunc(void) {
+#include "src/game/gs_thread_GSmsgSetCtrlFunc.inc"
 }
 #else
 #pragma optimization_level 2
-s32 fn_800FC518(u32 val) {
+s32 GSmsgSetCtrlFunc(u32 val) {
     *(u32*)((u8*)lbl_80478B08 + 0x28) = val;
     return 0;
 }
@@ -3525,11 +3525,11 @@ s32 fn_800FC518(u32 val) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800FC528(void) {
-#include "src/game/gs_thread_fn_800FC528.inc"
+asm void GSmsgInit(void) {
+#include "src/game/gs_thread_GSmsgInit.inc"
 }
 #else
-s32 fn_800FC528(arg0, arg1)
+s32 GSmsgInit(arg0, arg1)
     u16 arg0;
     u16 arg1;
 {
@@ -4168,12 +4168,12 @@ void fn_800FE6D0(s32 a, s32 b) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800FE6DC(void) {
-#include "src/game/gs_thread_fn_800FE6DC.inc"
+asm void GSgappUnblock(void) {
+#include "src/game/gs_thread_GSgappUnblock.inc"
 }
 #else
 #pragma optimization_level 2
-void fn_800FE6DC(u32 taskId) {
+void GSgappUnblock(u32 taskId) {
     u32 idx = taskId - 1;
     ((u8*)lbl_8047AC7C)[idx * 0x18 + 0xD] = 0;
 }
@@ -4185,12 +4185,12 @@ void fn_800FE6DC(u32 taskId) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800FE6F8(void) {
-#include "src/game/gs_thread_fn_800FE6F8.inc"
+asm void GSgappBlock(void) {
+#include "src/game/gs_thread_GSgappBlock.inc"
 }
 #else
 #pragma optimization_level 2
-void fn_800FE6F8(u32 taskId) {
+void GSgappBlock(u32 taskId) {
     u32 idx = taskId - 1;
     ((u8*)lbl_8047AC7C)[idx * 0x18 + 0xD] = 1;
 }
@@ -4235,12 +4235,12 @@ void GSgappTerminate(u32 taskId) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800FE7A0(void) {
-#include "src/game/gs_thread_fn_800FE7A0.inc"
+asm void GSgappUpdate(void) {
+#include "src/game/gs_thread_GSgappUpdate.inc"
 }
 #else
 #pragma optimization_level 2
-void fn_800FE7A0(void) {
+void GSgappUpdate(void) {
     u32* task;
     u32* next;
     u32 taskId;
@@ -4264,13 +4264,13 @@ void fn_800FE7A0(void) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm u32 fn_800FE834(s32 state, u8 priority, void* param, void* func) {
-#include "src/game/gs_thread_fn_800FE834.inc"
+asm u32 GSgappCreate(s32 state, u8 priority, void* param, void* func) {
+#include "src/game/gs_thread_GSgappCreate.inc"
 }
 #else
 #pragma optimization_level 2
 #pragma scheduling on
-u32 fn_800FE834(s32 state, u8 priority, void* param, void* func) {
+u32 GSgappCreate(s32 state, u8 priority, void* param, void* func) {
     u8* task;
     u32 count;
     u32 i;
@@ -4345,15 +4345,15 @@ found:
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800FE9B0(numTasks, numQueues)
+asm void GSgappInit(numTasks, numQueues)
     u32 numTasks;
     u32 numQueues;
 {
-#include "src/game/gs_thread_fn_800FE9B0.inc"
+#include "src/game/gs_thread_GSgappInit.inc"
 }
 #else
 #pragma optimization_level 2
-void fn_800FE9B0(numTasks, numQueues)
+void GSgappInit(numTasks, numQueues)
     u32 numTasks;
     u32 numQueues;
 {
@@ -4381,9 +4381,9 @@ void fn_800FE9B0(numTasks, numQueues)
     handle = GSmemAllocRaw(0x2000);
     lbl_8047AC8C = handle;
     lbl_8047AC90 = (u32)GSmemGetPtr(handle);
-    OSSetIdleFunction((void*)fn_800FEA74, NULL,
+    OSSetIdleFunction((void*)gappBackgroundCallback, NULL,
                 (void*)(lbl_8047AC90 + 0x1FFC), 0x1FFC);
-    fn_800D30A0((void*)fn_800FEBA0);
+    fn_800D30A0((void*)gappVSyncCallback);
 }
 #endif
 #pragma pop
@@ -4393,12 +4393,12 @@ void fn_800FE9B0(numTasks, numQueues)
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800FEA74(void) {
-#include "src/game/gs_thread_fn_800FEA74.inc"
+asm void gappBackgroundCallback(void) {
+#include "src/game/gs_thread_gappBackgroundCallback.inc"
 }
 #else
 #pragma optimization_level 2
-static void fn_800FEA74(void) {
+static void gappBackgroundCallback(void) {
     u32* task;
     u32* next;
     u32* pend;

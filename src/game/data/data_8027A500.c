@@ -34,7 +34,7 @@ extern u8 floorEventChangeTresure[];
 extern u8 floorEventSetTresureDisp[];
 extern u8 fn_80005FA8[];
 extern u8 fn_80006908[];
-extern u8 fn_80007FDC[];
+extern u8 dbgMenuFightStop[];
 extern u8 fn_80008C40[];
 extern u8 fn_800096B4[];
 extern u8 fn_8000ED34[];
@@ -55,7 +55,7 @@ extern u8 fn_80028FBC[];
 extern u8 fn_80029760[];
 extern u8 fn_8002CE6C[];
 extern u8 fn_8002D5D4[];
-extern u8 fn_8002DC6C[];
+extern u8 menuShopOpen[];
 extern u8 fn_80032564[];
 extern u8 fn_80035D70[];
 extern u8 fn_80035DA0[];
@@ -35772,7 +35772,7 @@ void* lbl_8027A500[68440] = {
     (void*)0x0FFFFE00,
     (void*)0x007FF000,
     (void*)0x000FFEFF,
-    (void*)((u8*)fn_80007FDC + 0x14),
+    (void*)((u8*)dbgMenuFightStop + 0x14),
     (void*)0x00000FF8,
     (void*)0xDFF3007F,
     (void*)0xF000000F,
@@ -49789,7 +49789,7 @@ void* lbl_8027A500[68440] = {
     (void*)0x0FFFFE00,
     (void*)0x007FF000,
     (void*)0x000FFEFF,
-    (void*)((u8*)fn_80007FDC + 0x14),
+    (void*)((u8*)dbgMenuFightStop + 0x14),
     (void*)0x00000FF8,
     (void*)0xDFF3007F,
     (void*)0xF000000F,
@@ -93871,7 +93871,7 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)fn_8003842C),
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_8002DC6C),
+    (void*)((u8*)menuShopOpen),
     (void*)0x01000000,
     (void*)0x00000000,
     (void*)((u8*)fn_8002D5D4),

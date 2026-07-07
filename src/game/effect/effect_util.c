@@ -1230,11 +1230,11 @@ s32 msgctrlFont(EffectUtilCommandObj* obj) {
     if (obj->activeFlag == 0) {
         stream = obj->stream;
         obj->commandValue = stream[0];
-        fn_800FA1BC(obj);
+        GSmsgSetFontInfo(obj);
     } else {
         stream = obj->stream;
         obj->commandValue = stream[0];
-        fn_800FA1BC(obj);
+        GSmsgSetFontInfo(obj);
     }
     stream = obj->stream;
     obj->stream = stream + 1;
@@ -2101,7 +2101,7 @@ retry:
 #endif
 
 /* 0x80133B50 | 0x94 */
-extern u32 fn_800FA444(u32 val);
+extern u32 GSmsgGetRect(u32 val);
 #if 0
 asm void _dbgMenuGetMenuNum__FP14tagWINDOW_WORKPl(void) {
 #include "src/game/effect/effect_util_fn_80133B50.inc"
@@ -2120,7 +2120,7 @@ u32 _dbgMenuGetMenuNum__FP14tagWINDOW_WORKPl(u32 arg0, u32* outMax) {
     do {
         value = _dbgMenuGetMsgID__FP14tagWINDOW_WORKl((void*)arg0, index);
         if (outMax != NULL) {
-            value = fn_800FA444(value) >> 16;
+            value = GSmsgGetRect(value) >> 16;
             max = *outMax;
             if ((s32)max < (s32)value) {
                 *outMax = value;
@@ -4785,7 +4785,7 @@ s32 msgctrlColor(EffectUtilCommandObj* obj) {
 #pragma scheduling off
 #pragma pop
 #endif
-extern void fn_800FAA98(void);
+extern void GSmsgInitRuby(void);
 #if 0
 asm void msgctrlRubyStart(void) {
 #include "src/game/effect/effect_util_fn_8013264C.inc"
@@ -4796,9 +4796,9 @@ asm void msgctrlRubyStart(void) {
 #pragma peephole off
 #pragma scheduling on
 s32 msgctrlRubyStart(EffectUtilCommandObj* obj) {
-    extern void fn_800FAA98(void*);
+    extern void GSmsgInitRuby(void*);
     if (obj->activeFlag != 0) {
-        fn_800FAA98(obj);
+        GSmsgInitRuby(obj);
     }
     obj->field_4B = 1;
     return 0;

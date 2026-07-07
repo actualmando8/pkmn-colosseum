@@ -136,7 +136,7 @@ void floorUpdateFieldCamera_Pseudocode(void) {
     extern f32 lbl_8047CFD0;
     extern f32 lbl_8047CFDC;
     extern f32 lbl_8047CFE0;
-    extern void fn_800E0020();
+    extern void GSvecSquareDistance();
     extern void fn_800E01F4();
     extern u32 lbl_8047AD68;
     extern u32 lbl_8047AD6C;
@@ -211,7 +211,7 @@ void floorUpdateFieldCamera_Pseudocode(void) {
     fn_800E01F4();
     r4 = r25;
     r3 = (u32)sp + 0x8;
-    fn_800E0020();
+    GSvecSquareDistance();
     if (f1 > f30) {
         f3 = f31 / f1;
         f2 = *(f32*)((u8*)r29 + 0xC);
@@ -1492,7 +1492,7 @@ u32 _unloadCamera__FPvUlUl(void) {
 #pragma push
 #pragma scheduling off
 u32 _unloadLight__FPvUlUl(void) {
-    fn_800DCD98();
+    GSlightFree();
     return 1;
 }
 #pragma pop
@@ -2194,8 +2194,8 @@ extern f32 cameraGetDistance(void);
 extern f32 cameraGetRotY(void);
 extern void fn_800E01F4(void* obj, f32 f1, f32 f2, f32 f3);
 extern void fn_800E0518(void*, f32);
-extern void fn_800DFF98(void*, void*, void*);
-extern void fn_800E019C(void*, void*, void*);
+extern void GSvecTransform(void*, void*, void*);
+extern void GSvecAdd(void*, void*, void*);
 extern f64 atan2(f32, f32);
 extern void fn_801776E8(u32, void*, f32);
 extern void fn_80177574(u32, void*, f32);
@@ -2250,9 +2250,9 @@ void fn_80117330(f32 arg) {
 
     fn_800E01F4(mat, lbl_8047CFD0, x, y);
     fn_800E0518(tmp, z);
-    fn_800DFF98(mat, tmp, mat);
-    fn_800E019C(rot, pos, view);
-    fn_800E019C(rot, rot, mat);
+    GSvecTransform(mat, tmp, mat);
+    GSvecAdd(rot, pos, view);
+    GSvecAdd(rot, rot, mat);
     *(f32*)(&mat[0x10]) = z;
     *(f32*)(&mat[0xC]) = -(f32)atan2(x, y);
     *(f32*)(&mat[0x14]) = lbl_8047CFD0;
@@ -2297,7 +2297,7 @@ void fn_80117500(void) {
 #endif
 /* 0x801176C8 | 0x254 */
 extern void GSgappTerminate(void);
-extern void fn_800FE834(void);
+extern void GSgappCreate(void);
 extern u8 lbl_804083D0[0x30];
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void fn_801176C8(void);
@@ -9060,7 +9060,7 @@ void* floorReadScriptPostFunc(u32 a, u32 b) {
 }
 #pragma peephole reset
 #endif
-extern void fn_800FC39C();
+extern void GSmsgFontOpen();
 #if 0
 asm void floorReadFontPostFunc(void) {
 #include "src/game/gs_field_world_fn_80114E0C.inc"
@@ -9077,7 +9077,7 @@ void* floorReadFontPostFunc(u32 a, u32 b) {
     }
     result = GSresGetResource(a, b);
     if (result != NULL) {
-        fn_800FC39C(result);
+        GSmsgFontOpen(result);
     }
     return result;
 }
@@ -9656,7 +9656,7 @@ u32 fn_801170A4(u8* arg1, u32 arg2) {
 }
 #pragma peephole on
 #endif
-extern void fn_800E0020(void);
+extern void GSvecSquareDistance(void);
 extern u32 lbl_8047AD68;
 extern u32 lbl_8047AD6C;
 extern f32 lbl_8047CFD0;

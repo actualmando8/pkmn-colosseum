@@ -18,8 +18,8 @@
  *   4. Return 1 on success, -1 on failure
  *
  * Key functions:
- *   fn_80006630  (calls GSscene_CameraSetPosition; decompiled under its real name below)
- *   fn_80006654  (loads archive slot 6 / topmenu; decompiled under its real name below)
+ *   dbgMenuCameraResetFloor  (calls GSscene_CameraSetPosition; decompiled under its real name below)
+ *   dbgMenuCameraChangeDisp  (loads archive slot 6 / topmenu; decompiled under its real name below)
  *   dbgMenuCameraSetType  (dispatches to GSscene_SetMode based on mode; decompiled below --
  *                          retail symbol name is a reused debug-menu name)
  *   fn_80006724  (loads archive slot 6, priority 3 / pda_menu; decompiled below)
@@ -29,36 +29,36 @@
  *   fn_80006884  GStask_SelectRandomNPC     -- random NPC selection from scene data
  *   fn_80006908  GStask_ProcessSceneEvent   -- 0x6A4 bytes, large scene event dispatcher
  *   fn_80006FAC  GStask_ProcessEventResult  -- handles event return codes
- *   fn_80007088  GStask_GetField1           -- struct field accessor (offset 0x00)
- *   fn_800070CC  GStask_GetField2           -- struct field accessor (offset 0x04)
- *   fn_80007110  GStask_GetField3           -- struct field accessor (offset 0x08)
- *   fn_80007154  GStask_LoadSlot0           -- archive load helper, slot 0
- *   fn_800071AC  GStask_LoadSlot1           -- archive load helper, slot 1
- *   fn_80007204  GStask_LoadSlot2           -- archive load helper, slot 2
- *   fn_8000725C  GStask_LoadSlot3           -- archive load helper, slot 3
- *   fn_800072B4  GStask_LoadSlot4           -- archive load helper, slot 4
- *   fn_8000730C  GStask_LoadSlot5           -- archive load helper, slot 5
+ *   dbgMenuFightStopTimeOut  GStask_GetField1           -- struct field accessor (offset 0x00)
+ *   dbgMenuFightStopHostLose  GStask_GetField2           -- struct field accessor (offset 0x04)
+ *   dbgMenuFightStopHostWin  GStask_GetField3           -- struct field accessor (offset 0x08)
+ *   dbgMenuFightFightPokemonSelect5  GStask_LoadSlot0           -- archive load helper, slot 0
+ *   dbgMenuFightFightPokemonSelect4  GStask_LoadSlot1           -- archive load helper, slot 1
+ *   dbgMenuFightFightPokemonSelect3  GStask_LoadSlot2           -- archive load helper, slot 2
+ *   dbgMenuFightFightPokemonSelect2  GStask_LoadSlot3           -- archive load helper, slot 3
+ *   dbgMenuFightFightPokemonSelect1  GStask_LoadSlot4           -- archive load helper, slot 4
+ *   dbgMenuFightFightPokemonSelect0  GStask_LoadSlot5           -- archive load helper, slot 5
  *   menuFightPokemonSelectSub  GStask_InitSceneResources  -- 0x2F8 bytes, resource init
- *   fn_8000765C  GStask_ShutdownResources   -- resource cleanup
+ *   dbgMenuFightFightTrainerPokemonPartDataEdit  GStask_ShutdownResources   -- resource cleanup
  *   dbgMenuFightFightTrainerAiDataEdit  GStask_UpdateLoadState     -- resource loading state machine
  *   fn_80007778  GStask_GetLoadFlag0        -- small accessor (0x20 bytes)
  *   fn_80007798  GStask_GetLoadFlag1        -- small accessor
  *   fn_800077B8  GStask_GetLoadFlag2        -- small accessor
- *   fn_800077D8  GStask_GetLoadFlag3        -- small accessor
+ *   dbgMenuFightFightTrainerAiAddsubWazaDefpokemon  GStask_GetLoadFlag3        -- small accessor
  *   fn_800077F8  GStask_ReturnZero          -- stub, returns 0
- *   fn_80007800  GStask_GetLoadFlag4        -- small accessor
+ *   dbgMenuFightFightTrainerAiAddsubIrekaeDasu  GStask_GetLoadFlag4        -- small accessor
  *   fn_80007820  GStask_GetLoadFlag5        -- small accessor
  *   fn_80007840  GStask_ReturnZero2         -- stub, returns 0
  *   fn_80007848  GStask_ValidateScene       -- validates scene index bounds
- *   fn_800078EC  GStask_ArchiveCB0          -- archive completion callback
- *   fn_80007944  GStask_ArchiveCB1          -- archive completion callback
- *   fn_8000799C  GStask_ArchiveCB2          -- archive completion callback
- *   fn_800079F4  GStask_ArchiveCB3          -- archive completion callback
- *   fn_80007A4C  GStask_ArchiveCB4          -- archive completion callback
- *   fn_80007A84  GStask_DispatchArchiveCBs  -- routes to the above callbacks
+ *   dbgMenuFightFightTrainerSelect1  GStask_ArchiveCB0          -- archive completion callback
+ *   dbgMenuFightFightTrainerSelect0  GStask_ArchiveCB1          -- archive completion callback
+ *   dbgMenuFightFightSideSelectHostEnemy  GStask_ArchiveCB2          -- archive completion callback
+ *   dbgMenuFightFightSideSelectHost  GStask_ArchiveCB3          -- archive completion callback
+ *   dbgMenuFightFightFloorEditTenkou  GStask_ArchiveCB4          -- archive completion callback
+ *   dbgMenuFightWazaEdit  GStask_DispatchArchiveCBs  -- routes to the above callbacks
  *   fn_80007B30  GStask_MainUpdate          -- 0x4AC bytes, main task state machine
- *   fn_80007FDC  GStask_GetSceneCount       -- return scene table size
- *   fn_80008014  GStask_GetEventCount       -- return event table size
+ *   dbgMenuFightStop  GStask_GetSceneCount       -- return scene table size
+ *   dbgMenuFightFightFloorEdit  GStask_GetEventCount       -- return event table size
  *   fn_8000804C  GStask_SetupTransition     -- scene transition setup (0xF8 bytes)
  *   fn_80008144  GStask_Accessor0           -- 8-byte accessor (lwz/blr)
  *   fn_8000814C  GStask_Accessor1           -- 8-byte accessor
@@ -68,14 +68,14 @@
  *   fn_8000816C  GStask_Accessor5           -- 8-byte accessor
  *   fn_80008174  GStask_Accessor6           -- 8-byte accessor
  *   fn_8000817C  GStask_Accessor7           -- 8-byte accessor
- *   fn_80008184  GStask_FinalizeLoad        -- 0xC0 bytes, finalize resource load
+ *   dbgMenuFightGetMsgSpeedToFrame  GStask_FinalizeLoad        -- 0xC0 bytes, finalize resource load
  *   _dbgMenuFightGetFightTrainerAiAddsubValueDataIdSub  GStask_BuildResourceList   -- 0x14C bytes, compile resource table
  *
  * Code patterns:
  *   - SDA globals lbl_8047A288 (current scene halfword), lbl_80478F50 (scene table ptr)
  *   - fn_801026A4 is the main event dispatch (takes slot, params, flags)
  *   - fn_80102568 is the event cancel/cleanup function
- *   - fn_8001E304 is a bounded random selection helper
+ *   - menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs is a bounded random selection helper
  *   - fn_8001E200 is a random result commit function
  */
 
@@ -117,13 +117,13 @@ extern u16   fn_8020E0B0(void* tbl);              /* Get resource size */
 extern u16   fn_8020E020(void* tbl, s32 slot);    /* Get resource slot value */
 
 /* Random selection helpers */
-extern u8    fn_8001E304(volatile unsigned int count, u32* outResult, void* validationFn);
+extern u8    menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs(volatile unsigned int count, u32* outResult, void* validationFn);
 extern void  fn_8001E200(void);
 
 /* Callback function pointers used in validation */
-extern void* fn_80008744(u32 id);   /* Validate NPC index (type byte) */
+extern void* _dbgMenuFightGetFightKindDataIdSub(u32 id);   /* Validate NPC index (type byte) */
 extern void* fn_800086EC(u32 id);   /* Validate NPC index (type byte) */
-extern void* fn_8000879C(u32 id);   /* Validate NPC index (type u16) */
+extern void* _dbgMenuFightGetFightFloorDataIdSub(u32 id);   /* Validate NPC index (type u16) */
 extern void* fn_8000868C(u32 id);   /* Validate scene item index */
 extern void* fn_800085D8(s32 difficulty);   /* Validate encounter difficulty */
 
@@ -148,7 +148,7 @@ extern void* gEncounterTable;   /* lbl_80478F00 : .sbss -- encounter difficulty 
 /* jumptable_802E28D0: Jump table for fn_80006908 scene event dispatch */
 
 /* =========================================================================
- * Function: fn_80006630 (orphan fiction "GStask_InitCamera" renamed --
+ * Function: dbgMenuCameraResetFloor (orphan fiction "GStask_InitCamera" renamed --
  *           address 0x80006630 / size 0x24 matches config/GC6E01/symbols.txt
  *           exactly, and this was the only code in the tree covering that
  *           address; the unmatched target had no other candidate)
@@ -160,14 +160,14 @@ extern void* gEncounterTable;   /* lbl_80478F00 : .sbss -- encounter difficulty 
  * ========================================================================= */
 #pragma push
 #pragma scheduling off
-s32 fn_80006630(void) {
+s32 dbgMenuCameraResetFloor(void) {
     cameraResetFloor();
     return 0;
 }
 #pragma pop
 
 /* =========================================================================
- * Function: fn_80006654 (orphan fiction "GStask_LoadTopMenu" renamed --
+ * Function: dbgMenuCameraChangeDisp (orphan fiction "GStask_LoadTopMenu" renamed --
  *           address/size match symbols.txt exactly)
  * Address:  0x80006654
  * Size:     0x70
@@ -179,7 +179,7 @@ s32 fn_80006630(void) {
 #pragma push
 #pragma scheduling off
 #pragma peephole off
-s32 fn_80006654(void) {
+s32 dbgMenuCameraChangeDisp(void) {
     if (fn_80102620(6) != 0) {
         fn_80102510(6);
     } else {
@@ -315,7 +315,7 @@ s32 fn_8000682C(void) {
  * fully decompiled here. They follow the same patterns:
  *
  * fn_80006884 (GStask_SelectRandomNPC):
- *   Uses fn_8001E304 to randomly select an NPC from the scene table,
+ *   Uses menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs to randomly select an NPC from the scene table,
  *   bounds-checks against lbl_80478F20, stores result in lbl_8047A288.
  *
  * fn_80006908 (GStask_ProcessSceneEvent):
@@ -325,14 +325,14 @@ s32 fn_8000682C(void) {
  *   NPC selection, resource loading, and encounter setup based on the
  *   event type. Each case in the switch:
  *     - Gets a resource from the scene table via fn_8020E0E0/fn_8020E0C8
- *     - Validates the result using fn_8001E304 with a callback
+ *     - Validates the result using menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs with a callback
  *     - Commits the selection via fn_8001E200
  *     - Updates the resource table via fn_8020DFB0/fn_8020DFA0/etc.
  *
- * fn_80006FAC - fn_80007110 (accessor cluster):
+ * fn_80006FAC - dbgMenuFightStopHostWin (accessor cluster):
  *   Small field accessors for the scene resource structure.
  *
- * fn_80007154 - fn_8000730C (archive load helpers):
+ * dbgMenuFightFightPokemonSelect5 - dbgMenuFightFightPokemonSelect0 (archive load helpers):
  *   Six nearly identical functions that load archives for slots 0-5,
  *   each following the same load/activate/commit pattern.
  *
@@ -344,7 +344,7 @@ s32 fn_8000682C(void) {
  *   0x4AC bytes. The main task update state machine that coordinates
  *   archive loading, scene transitions, and event processing.
  *
- * fn_80008184 - _dbgMenuFightGetFightTrainerAiAddsubValueDataIdSub (finalization):
+ * dbgMenuFightGetMsgSpeedToFrame - _dbgMenuFightGetFightTrainerAiAddsubValueDataIdSub (finalization):
  *   Finalize loaded resources and build the active resource list.
  * ========================================================================= */
 
@@ -352,9 +352,9 @@ s32 fn_8000682C(void) {
  *
  * _dbgMenuFightGetFightTrainerPokemonPartDataIdSub (size 0x6C) - Get party slot 0 species
  * _dbgMenuFightGetWazaDataIdSub (size 0x64) - Get party slot 0 level
- * fn_80008460 (size 0x60) - Get party slot 0 HP
+ * dbgMenuFightGetWazaTypeId (size 0x60) - Get party slot 0 HP
  * _dbgMenuFightGetWazaTypeIdSub (size 0x58) - Get party slot 0 status
- * fn_80008518 (size 0x64) - Get party slot 1 species
+ * dbgMenuFightGetZokuseiDataId (size 0x64) - Get party slot 1 species
  * ...and so on for each party slot property
  *
  * These are thin wrappers that index into the party data structure,
@@ -375,7 +375,7 @@ extern void* fn_8020DED8(void* ptr);
 extern u32 lbl_80478B38;
 
 /* =======================================================================
- * fn_8000857C -- GStask_LookupResourceById
+ * _dbgMenuFightGetZokuseiDataIdSub -- GStask_LookupResourceById
  *
  * Looks up a resource by ID. If ID is 9, uses a fixed constant.
  * If ID >= the global count (lbl_80478B38), also uses the constant.
@@ -385,7 +385,7 @@ extern u32 lbl_80478B38;
  * ======================================================================= */
 #pragma push
 #pragma peephole off
-void* fn_8000857C(u32 id)
+void* _dbgMenuFightGetZokuseiDataIdSub(u32 id)
 {
     if (id == 9) {
         return fn_800FA280(0x0000EB63);
@@ -1197,18 +1197,18 @@ void menuFightButtonNormal(u8* ctx) {
 #pragma peephole on
 #endif
 
-/* fn_80007088 - 0x80007088 | size: 0x44 */
+/* dbgMenuFightStopTimeOut - 0x80007088 | size: 0x44 */
 extern u8   fn_801EF63C(void);
 extern void fn_801F1588(s32 mode);
 extern void dbgMenuClose(void);
 #if 0
-asm void fn_80007088(void) {
+asm void dbgMenuFightStopTimeOut(void) {
 #include "src/game/gs_task_fn_80007088.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-s32 fn_80007088(void) {
+s32 dbgMenuFightStopTimeOut(void) {
     if (fn_801EF63C() == 0) {
         return -1;
     }
@@ -1219,16 +1219,16 @@ s32 fn_80007088(void) {
 #pragma pop
 #endif
 
-/* fn_800070CC - 0x800070CC | size: 0x44 */
+/* dbgMenuFightStopHostLose - 0x800070CC | size: 0x44 */
 extern void fn_801EF62C(s32 mode);
 #if 0
-asm void fn_800070CC(void) {
+asm void dbgMenuFightStopHostLose(void) {
 #include "src/game/gs_task_fn_800070CC.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-s32 fn_800070CC(void) {
+s32 dbgMenuFightStopHostLose(void) {
     if (fn_801EF63C() == 0) {
         return -1;
     }
@@ -1239,15 +1239,15 @@ s32 fn_800070CC(void) {
 #pragma pop
 #endif
 
-/* fn_80007110 - 0x80007110 | size: 0x44 */
+/* dbgMenuFightStopHostWin - 0x80007110 | size: 0x44 */
 #if 0
-asm void fn_80007110(void) {
+asm void dbgMenuFightStopHostWin(void) {
 #include "src/game/gs_task_fn_80007110.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-s32 fn_80007110(void) {
+s32 dbgMenuFightStopHostWin(void) {
     if (fn_801EF63C() == 0) {
         return -1;
     }
@@ -1258,19 +1258,19 @@ s32 fn_80007110(void) {
 #pragma pop
 #endif
 
-/* fn_80007154 - 0x80007154 | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl menuFightPokemonSelectSub vs bl menuFightPokemonSelectSub (same addr) */
+/* dbgMenuFightFightPokemonSelect5 - 0x80007154 | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl menuFightPokemonSelectSub vs bl menuFightPokemonSelectSub (same addr) */
 extern s32  menuFightPokemonSelectSub(void);
 extern u32  fn_801F986C(u32 ptr, s32 slot);
 extern u32  lbl_8047A278;
 extern u32  lbl_8047A27C;
 #if 0
-asm void fn_80007154(void) {
+asm void dbgMenuFightFightPokemonSelect5(void) {
 #include "src/game/gs_task_fn_80007154.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-s32 fn_80007154(void) {
+s32 dbgMenuFightFightPokemonSelect5(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A27C = fn_801F986C(lbl_8047A278, 5);
     if (lbl_8047A27C == 0) return -1;
@@ -1279,15 +1279,15 @@ s32 fn_80007154(void) {
 #pragma pop
 #endif
 
-/* fn_800071AC - 0x800071AC | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl menuFightPokemonSelectSub vs bl menuFightPokemonSelectSub (same addr) */
+/* dbgMenuFightFightPokemonSelect4 - 0x800071AC | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl menuFightPokemonSelectSub vs bl menuFightPokemonSelectSub (same addr) */
 #if 0
-asm void fn_800071AC(void) {
+asm void dbgMenuFightFightPokemonSelect4(void) {
 #include "src/game/gs_task_fn_800071AC.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-s32 fn_800071AC(void) {
+s32 dbgMenuFightFightPokemonSelect4(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A27C = fn_801F986C(lbl_8047A278, 4);
     if (lbl_8047A27C == 0) return -1;
@@ -1296,15 +1296,15 @@ s32 fn_800071AC(void) {
 #pragma pop
 #endif
 
-/* fn_80007204 - 0x80007204 | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl menuFightPokemonSelectSub vs bl menuFightPokemonSelectSub (same addr) */
+/* dbgMenuFightFightPokemonSelect3 - 0x80007204 | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl menuFightPokemonSelectSub vs bl menuFightPokemonSelectSub (same addr) */
 #if 0
-asm void fn_80007204(void) {
+asm void dbgMenuFightFightPokemonSelect3(void) {
 #include "src/game/gs_task_fn_80007204.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-s32 fn_80007204(void) {
+s32 dbgMenuFightFightPokemonSelect3(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A27C = fn_801F986C(lbl_8047A278, 3);
     if (lbl_8047A27C == 0) return -1;
@@ -1313,15 +1313,15 @@ s32 fn_80007204(void) {
 #pragma pop
 #endif
 
-/* fn_8000725C - 0x8000725C | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl menuFightPokemonSelectSub vs bl menuFightPokemonSelectSub (same addr) */
+/* dbgMenuFightFightPokemonSelect2 - 0x8000725C | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl menuFightPokemonSelectSub vs bl menuFightPokemonSelectSub (same addr) */
 #if 0
-asm void fn_8000725C(void) {
+asm void dbgMenuFightFightPokemonSelect2(void) {
 #include "src/game/gs_task_fn_8000725C.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-s32 fn_8000725C(void) {
+s32 dbgMenuFightFightPokemonSelect2(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A27C = fn_801F986C(lbl_8047A278, 2);
     if (lbl_8047A27C == 0) return -1;
@@ -1330,15 +1330,15 @@ s32 fn_8000725C(void) {
 #pragma pop
 #endif
 
-/* fn_800072B4 - 0x800072B4 | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl menuFightPokemonSelectSub vs bl menuFightPokemonSelectSub (same addr) */
+/* dbgMenuFightFightPokemonSelect1 - 0x800072B4 | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl menuFightPokemonSelectSub vs bl menuFightPokemonSelectSub (same addr) */
 #if 0
-asm void fn_800072B4(void) {
+asm void dbgMenuFightFightPokemonSelect1(void) {
 #include "src/game/gs_task_fn_800072B4.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-s32 fn_800072B4(void) {
+s32 dbgMenuFightFightPokemonSelect1(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A27C = fn_801F986C(lbl_8047A278, 1);
     if (lbl_8047A27C == 0) return -1;
@@ -1347,15 +1347,15 @@ s32 fn_800072B4(void) {
 #pragma pop
 #endif
 
-/* fn_8000730C - 0x8000730C | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl menuFightPokemonSelectSub vs bl menuFightPokemonSelectSub (same addr) */
+/* dbgMenuFightFightPokemonSelect0 - 0x8000730C | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl menuFightPokemonSelectSub vs bl menuFightPokemonSelectSub (same addr) */
 #if 0
-asm void fn_8000730C(void) {
+asm void dbgMenuFightFightPokemonSelect0(void) {
 #include "src/game/gs_task_fn_8000730C.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-s32 fn_8000730C(void) {
+s32 dbgMenuFightFightPokemonSelect0(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A27C = fn_801F986C(lbl_8047A278, 0);
     if (lbl_8047A27C == 0) return -1;
@@ -1500,18 +1500,18 @@ s32 menuFightPokemonSelectSub(u32 ctx) {
 #pragma peephole on
 #endif
 
-/* fn_8000765C - 0x8000765C | size: 0xac */
+/* dbgMenuFightFightTrainerPokemonPartDataEdit - 0x8000765C | size: 0xac */
 extern void* _dbgMenuFightGetFightTrainerPokemonPartDataIdSub(u32 id);
 extern void fn_80051710(u16 id);
 extern u16 lbl_80478830;
 extern u32 lbl_80478F08;
 #if 0
-asm void fn_8000765C(void) {
+asm void dbgMenuFightFightTrainerPokemonPartDataEdit(void) {
 #include "src/game/gs_task_fn_8000765C.inc"
 }
 #else
 #pragma peephole off
-s32 fn_8000765C(void) {
+s32 dbgMenuFightFightTrainerPokemonPartDataEdit(void) {
     u32 result;
     s32 val;
 
@@ -1520,7 +1520,7 @@ s32 fn_8000765C(void) {
     }
 
     for (;;) {
-        if (fn_8001E304(lbl_80478830, &result, _dbgMenuFightGetFightTrainerPokemonPartDataIdSub) == 0) {
+        if (menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs(lbl_80478830, &result, _dbgMenuFightGetFightTrainerPokemonPartDataIdSub) == 0) {
             val = -1;
         } else {
             if (result >= *(u32*)lbl_80478F08) {
@@ -1594,26 +1594,26 @@ void fn_800077B8(void) {
 }
 #endif
 
-/* fn_800077D8 - 0x800077D8 | size: 0x20 */
+/* dbgMenuFightFightTrainerAiAddsubWazaDefpokemon - 0x800077D8 | size: 0x20 */
 extern void fn_8004F860(void);
 #if 0
-asm void fn_800077D8(void) {
+asm void dbgMenuFightFightTrainerAiAddsubWazaDefpokemon(void) {
 #include "src/game/gs_task_fn_800077D8.inc"
 }
 #else
-void fn_800077D8(void) {
+void dbgMenuFightFightTrainerAiAddsubWazaDefpokemon(void) {
     fn_8004F860();
 }
 #endif
 
-/* fn_80007800 - 0x80007800 | size: 0x20 */
+/* dbgMenuFightFightTrainerAiAddsubIrekaeDasu - 0x80007800 | size: 0x20 */
 extern void fn_8004FE3C(void);
 #if 0
-asm void fn_80007800(void) {
+asm void dbgMenuFightFightTrainerAiAddsubIrekaeDasu(void) {
 #include "src/game/gs_task_fn_80007800.inc"
 }
 #else
-void fn_80007800(void) {
+void dbgMenuFightFightTrainerAiAddsubIrekaeDasu(void) {
     fn_8004FE3C();
 }
 #endif
@@ -1646,7 +1646,7 @@ s32 fn_80007848(void) {
     s32 val;
 
     for (;;) {
-        if (fn_8001E304(lbl_8047A28A, &result, _dbgMenuFightGetFightTrainerAiAddsubValueDataIdSub) == 0) {
+        if (menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs(lbl_8047A28A, &result, _dbgMenuFightGetFightTrainerAiAddsubValueDataIdSub) == 0) {
             val = -1;
         } else {
             if (result > *(u32*)lbl_80478F28) {
@@ -1665,17 +1665,17 @@ s32 fn_80007848(void) {
 #pragma peephole on
 #endif
 
-/* fn_800078EC - 0x800078EC | size: 0x58 */
+/* dbgMenuFightFightTrainerSelect1 - 0x800078EC | size: 0x58 */
 extern u32  fn_801F7258(u32 ptr, s32 mode);
 extern u32  lbl_8047A274;
 #if 0
-asm void fn_800078EC(void) {
+asm void dbgMenuFightFightTrainerSelect1(void) {
 #include "src/game/gs_task_fn_800078EC.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-s32 fn_800078EC(void) {
+s32 dbgMenuFightFightTrainerSelect1(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A278 = fn_801F7258(lbl_8047A274, 1);
     if (lbl_8047A278 == 0) return -1;
@@ -1684,15 +1684,15 @@ s32 fn_800078EC(void) {
 #pragma pop
 #endif
 
-/* fn_80007944 - 0x80007944 | size: 0x58 */
+/* dbgMenuFightFightTrainerSelect0 - 0x80007944 | size: 0x58 */
 #if 0
-asm void fn_80007944(void) {
+asm void dbgMenuFightFightTrainerSelect0(void) {
 #include "src/game/gs_task_fn_80007944.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-s32 fn_80007944(void) {
+s32 dbgMenuFightFightTrainerSelect0(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A278 = fn_801F7258(lbl_8047A274, 0);
     if (lbl_8047A278 == 0) return -1;
@@ -1701,16 +1701,16 @@ s32 fn_80007944(void) {
 #pragma pop
 #endif
 
-/* fn_8000799C - 0x8000799C | size: 0x58 */
+/* dbgMenuFightFightSideSelectHostEnemy - 0x8000799C | size: 0x58 */
 extern u32  fn_801F025C(s32 a, s32 b);
 #if 0
-asm void fn_8000799C(void) {
+asm void dbgMenuFightFightSideSelectHostEnemy(void) {
 #include "src/game/gs_task_fn_8000799C.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-s32 fn_8000799C(void) {
+s32 dbgMenuFightFightSideSelectHostEnemy(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A274 = fn_801F025C(5, 0);
     if (lbl_8047A274 == 0) return -1;
@@ -1719,15 +1719,15 @@ s32 fn_8000799C(void) {
 #pragma pop
 #endif
 
-/* fn_800079F4 - 0x800079F4 | size: 0x58 */
+/* dbgMenuFightFightSideSelectHost - 0x800079F4 | size: 0x58 */
 #if 0
-asm void fn_800079F4(void) {
+asm void dbgMenuFightFightSideSelectHost(void) {
 #include "src/game/gs_task_fn_800079F4.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-s32 fn_800079F4(void) {
+s32 dbgMenuFightFightSideSelectHost(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A274 = fn_801F025C(4, 0);
     if (lbl_8047A274 == 0) return -1;
@@ -1736,32 +1736,32 @@ s32 fn_800079F4(void) {
 #pragma pop
 #endif
 
-/* fn_80007A4C - 0x80007A4C | size: 0x38 */
+/* dbgMenuFightFightFloorEditTenkou - 0x80007A4C | size: 0x38 */
 #if 0
-asm void fn_80007A4C(void) {
+asm void dbgMenuFightFightFloorEditTenkou(void) {
 #include "src/game/gs_task_fn_80007A4C.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-s32 fn_80007A4C(void) {
+s32 dbgMenuFightFightFloorEditTenkou(void) {
     if (fn_801EF63C() == 0) return -1;
     return 1;
 }
 #pragma pop
 #endif
 
-/* fn_80007A84 - 0x80007A84 | size: 0xac | SYMBOL-NAME WALL 97.67%: bl dbgMenuFightWazaEditSub vs bl dbgMenuFightWazaEditSub (same addr) */
+/* dbgMenuFightWazaEdit - 0x80007A84 | size: 0xac | SYMBOL-NAME WALL 97.67%: bl dbgMenuFightWazaEditSub vs bl dbgMenuFightWazaEditSub (same addr) */
 extern void dbgMenuFightWazaEditSub(u16 id);
 extern u16 lbl_8047882A;
 extern void* _dbgMenuFightGetWazaDataIdSub(u32 id);
 #if 0
-asm void fn_80007A84(void) {
+asm void dbgMenuFightWazaEdit(void) {
 #include "src/game/gs_task_fn_80007A84.inc"
 }
 #else
 #pragma peephole off
-s32 fn_80007A84(void) {
+s32 dbgMenuFightWazaEdit(void) {
     u32 result;
     s32 val;
 
@@ -1770,7 +1770,7 @@ s32 fn_80007A84(void) {
     }
 
     for (;;) {
-        if (fn_8001E304(lbl_8047882A, &result, _dbgMenuFightGetWazaDataIdSub) == 0) {
+        if (menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs(lbl_8047882A, &result, _dbgMenuFightGetWazaDataIdSub) == 0) {
             val = -1;
         } else {
             if (result >= 0x163) {
@@ -1965,7 +1965,7 @@ s32 fn_80007B30(void) {
                 maxVal = 0x162;
                 sid = lbl_8047A282;
                 for (;;) {
-                    if (fn_8001E304((u16)sid, &tmp, _dbgMenuFightGetWazaDataIdSub) == 0) {
+                    if (menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs((u16)sid, &tmp, _dbgMenuFightGetWazaDataIdSub) == 0) {
                         sid = -1;
                     } else {
                         if (tmp >= 0x163) {
@@ -2002,30 +2002,30 @@ s32 fn_80007B30(void) {
 #pragma peephole on
 #endif
 
-/* fn_80007FDC - 0x80007FDC | size: 0x38 */
+/* dbgMenuFightStop - 0x80007FDC | size: 0x38 */
 #if 0
-asm void fn_80007FDC(void) {
+asm void dbgMenuFightStop(void) {
 #include "src/game/gs_task_fn_80007FDC.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-s32 fn_80007FDC(void) {
+s32 dbgMenuFightStop(void) {
     if (fn_801EF63C() == 0) return -1;
     return 1;
 }
 #pragma pop
 #endif
 
-/* fn_80008014 - 0x80008014 | size: 0x38 */
+/* dbgMenuFightFightFloorEdit - 0x80008014 | size: 0x38 */
 #if 0
-asm void fn_80008014(void) {
+asm void dbgMenuFightFightFloorEdit(void) {
 #include "src/game/gs_task_fn_80008014.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-s32 fn_80008014(void) {
+s32 dbgMenuFightFightFloorEdit(void) {
     if (fn_801EF63C() == 0) return -1;
     return 1;
 }
@@ -2050,7 +2050,7 @@ s32 fn_8000804C(void) {
     s32 val;
 
     for (;;) {
-        if (fn_8001E304(lbl_8047882C, &result, fn_800087FC) == 0) {
+        if (menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs(lbl_8047882C, &result, fn_800087FC) == 0) {
             val = -1;
         } else {
             if (result >= *(u32*)(void*)lbl_80478F50) {
@@ -2088,16 +2088,16 @@ s32 fn_8000804C(void) {
 #pragma peephole on
 #endif
 
-/* fn_80008184 - 0x80008184 | size: 0xc0 */
+/* dbgMenuFightGetMsgSpeedToFrame - 0x80008184 | size: 0xc0 */
 extern u8 fn_80106160(void);
 extern u8 lbl_80266678[];
 #if 0
-asm void fn_80008184(void) {
+asm void dbgMenuFightGetMsgSpeedToFrame(void) {
 #include "src/game/gs_task_fn_80008184.inc"
 }
 #else
 #pragma peephole off
-u32 fn_80008184(u32 value) {
+u32 dbgMenuFightGetMsgSpeedToFrame(u32 value) {
     u32 buttons;
     u32 held;
     u8 idx;
@@ -2193,18 +2193,18 @@ void* _dbgMenuFightGetWazaDataIdSub(u32 id) {
 #pragma pop
 #endif
 
-/* fn_80008460 - 0x80008460 | size: 0x60 */
+/* dbgMenuFightGetWazaTypeId - 0x80008460 | size: 0x60 */
 extern void* _dbgMenuFightGetWazaTypeIdSub(u32 id);   /* forward decl for callback */
 #if 0
-asm void fn_80008460(void) {
+asm void dbgMenuFightGetWazaTypeId(void) {
 #include "src/game/gs_task_fn_80008460.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-s32 fn_80008460(s32 id) {
+s32 dbgMenuFightGetWazaTypeId(s32 id) {
     u32 result;
-    if (fn_8001E304((u8)id, &result, _dbgMenuFightGetWazaTypeIdSub) == 0) return -1;
+    if (menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs((u8)id, &result, _dbgMenuFightGetWazaTypeIdSub) == 0) return -1;
     if (result > 0xb) result = 0xb;
     fn_8001E200();
     return (s32)result;
@@ -2229,17 +2229,17 @@ void* _dbgMenuFightGetWazaTypeIdSub(u32 id) {
 #pragma pop
 #endif
 
-/* fn_80008518 - 0x80008518 | size: 0x64 */
+/* dbgMenuFightGetZokuseiDataId - 0x80008518 | size: 0x64 */
 #if 0
-asm void fn_80008518(void) {
+asm void dbgMenuFightGetZokuseiDataId(void) {
 #include "src/game/gs_task_fn_80008518.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-s32 fn_80008518(u32 id) {
+s32 dbgMenuFightGetZokuseiDataId(u32 id) {
     u32 result;
-    if (fn_8001E304((u16)id, &result, fn_8000857C) == 0) return -1;
+    if (menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs((u16)id, &result, _dbgMenuFightGetZokuseiDataIdSub) == 0) return -1;
     if (result >= lbl_80478B38) result = lbl_80478B38 - 1;
     fn_8001E200();
     return (s32)result;
@@ -2313,15 +2313,15 @@ void* fn_800086EC(u32 id) {
 }
 #endif
 
-/* fn_80008744 - 0x80008744 | size: 0x58 */
+/* _dbgMenuFightGetFightKindDataIdSub - 0x80008744 | size: 0x58 */
 extern void* fn_8020E488(u16 id);
 extern void* fn_8020E248(void* ptr);
 #if 0
-asm void fn_80008744(void) {
+asm void _dbgMenuFightGetFightKindDataIdSub(void) {
 #include "src/game/gs_task_fn_80008744.inc"
 }
 #else
-void* fn_80008744(u32 id) {
+void* _dbgMenuFightGetFightKindDataIdSub(u32 id) {
     u32 result;
     if (id >= *(u32*)lbl_80478F40) {
         result = 0xEB63;
@@ -2333,13 +2333,13 @@ void* fn_80008744(u32 id) {
 }
 #endif
 
-/* fn_8000879C - 0x8000879C | size: 0x60 */
+/* _dbgMenuFightGetFightFloorDataIdSub - 0x8000879C | size: 0x60 */
 #if 0
-asm void fn_8000879C(void) {
+asm void _dbgMenuFightGetFightFloorDataIdSub(void) {
 #include "src/game/gs_task_fn_8000879C.inc"
 }
 #else
-void* fn_8000879C(u32 id) {
+void* _dbgMenuFightGetFightFloorDataIdSub(u32 id) {
     u32 result;
     if (id >= *(u32*)lbl_80478F48) {
         result = 0xEB63;

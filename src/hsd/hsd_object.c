@@ -50,7 +50,7 @@ extern void fn_800E04F4(void* dst, f32 angle);
 extern void fn_800E048C(void* dst, f32 x, f32 y, f32 z);
 extern void fn_800E0560(void* dst, f32* src);
 extern void fn_800E0290(void* dst, void* lhs, void* rhs);
-extern void fn_800DFF98(void* dst, void* mtx, void* vec);
+extern void GSvecTransform(void* dst, void* mtx, void* vec);
 extern void _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID(void);
 extern void fn_800D88DC(s32 mode);
 extern void fn_800D888C(s32 mode);
@@ -88,8 +88,8 @@ void fn_80190E60(HSD_ObjectTransformData* data) {
     fn_800E0290(mtx, mtx_z, mtx);
     fn_800E0290(mtx, mtx_translate, mtx);
     fn_800E0290(mtx, mtx_scale, mtx);
-    fn_800DFF98(corner0, mtx, data->corner0);
-    fn_800DFF98(corner1, mtx, data->corner1);
+    GSvecTransform(corner0, mtx, data->corner0);
+    GSvecTransform(corner1, mtx, data->corner1);
 
     _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
     fn_800D88DC(1);
@@ -162,8 +162,8 @@ s32 fn_80191118(HSD_ObjectTransformData* data) {
     fn_800E0290(mtx, mtx_z, mtx);
     fn_800E0290(mtx, mtx_translate, mtx);
     fn_800E0290(mtx, mtx_scale, mtx);
-    fn_800DFF98(corner0, mtx, data->corner0);
-    fn_800DFF98(corner1, mtx, data->corner1);
+    GSvecTransform(corner0, mtx, data->corner0);
+    GSvecTransform(corner1, mtx, data->corner1);
 
     result0 = fn_800D2F34(corner0, screen0);
     result1 = fn_800D2F34(corner1, screen1);

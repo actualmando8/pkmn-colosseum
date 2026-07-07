@@ -86,14 +86,14 @@ extern u16   itemDataBiosGetPrice(void);               /* Get display field coun
 
 /* Text rendering */
 extern void  fn_80132A38(s32 paramId, s32 value);
-extern u32   fn_800FA444(s32 resourceId);
+extern u32   GSmsgGetRect(s32 resourceId);
 extern void  fn_800FB680(s32 x, s32 y, s32 flags, u32 color);
 
 /* Math/rendering helpers */
 extern f32   sin(f32);
 extern f32   cos(f32);
 extern void  fn_800E0CA0(f32 angle);          /* Set camera rotation */
-extern void  fn_800E090C(void* outVec, void* posA, void* posB); /* Vector subtract */
+extern void  GSlerpGetLinearInterpolationVector(void* outVec, void* posA, void* posB); /* Vector subtract */
 extern void  fn_80106ADC(s32 p1, void* data, s32 p3, s32 p4, u8 p5);
 
 /* =========================================================================
@@ -306,11 +306,11 @@ s32 fn_800150E4(s32 x, s32 pageIndex, u16* packedRange) {
             textX = x;
             if (itemIndex + 1 < 10) {
                 fn_80132A38(0x34, 0);
-                textX += (s32)(u16)(fn_800FA444(0xCA) >> 16);
+                textX += (s32)(u16)(GSmsgGetRect(0xCA) >> 16);
             }
             fn_80132A38(0x34, itemIndex + 1);
             fn_800FB680(textX, y, -1, 0xCA);
-            textX += (s32)(u16)(fn_800FA444(0xCA) >> 16);
+            textX += (s32)(u16)(GSmsgGetRect(0xCA) >> 16);
 
             dataSource = SUMMARY_ENTRY_FIELD(entry);
             if (dataSource >= 0) {
@@ -523,7 +523,7 @@ s32 fn_800155B0(s32 x, s32 pageIndex, u16* packedRange) {
         if (itemIndex >= 0) {
             y = displayLine * 0x1F - scrollPixels;
             fn_800FB680(x, y, -1, 0x2AFF);
-            textX = x + (s32)(u16)(fn_800FA444(0x2AFF) >> 16);
+            textX = x + (s32)(u16)(GSmsgGetRect(0x2AFF) >> 16);
 
             dataSource = SUMMARY_ENTRY_FIELD(entry);
             if (dataSource >= 0) {
@@ -548,11 +548,11 @@ s32 fn_800155B0(s32 x, s32 pageIndex, u16* packedRange) {
             if (level < 10) {
                 fn_80132A38(0x34, 0);
                 fn_800FB680(textX, y, -1, 0xCA);
-                textX += (s32)(u16)(fn_800FA444(0xCA) >> 16);
+                textX += (s32)(u16)(GSmsgGetRect(0xCA) >> 16);
             }
             fn_80132A38(0x34, level);
             fn_800FB680(textX, y, -1, 0xCA);
-            textX += (s32)(u16)(fn_800FA444(0xCA) >> 16);
+            textX += (s32)(u16)(GSmsgGetRect(0xCA) >> 16);
             itemDataBiosGetPtr((u16)species);
             textId = itemDataBiosGetName();
             fn_800FB680(textX + 9, y, -1, textId);
@@ -560,7 +560,7 @@ s32 fn_800155B0(s32 x, s32 pageIndex, u16* packedRange) {
             dataSource = SUMMARY_ENTRY_FIELD(entry);
             field = heroItemGetItemKindToItemAryPtr((void*)lbl_8047A2F8, (u8)dataSource, &totalCount, 0, 0, 0);
             fn_80132A38(0x34, totalCount);
-            textX = x + 0x11A - ((s16)(fn_800FA444(0xCA) >> 16) + (s16)(fn_800FA444(0x12E) >> 16));
+            textX = x + 0x11A - ((s16)(GSmsgGetRect(0xCA) >> 16) + (s16)(GSmsgGetRect(0x12E) >> 16));
             fn_800FB680(textX, y, -1, 0x12E);
 
             if (dataSource >= 0) {
@@ -580,7 +580,7 @@ s32 fn_800155B0(s32 x, s32 pageIndex, u16* packedRange) {
                 field = (u8*)field + 4;
             }
             fn_80132A38(0x34, (u16)value);
-            fn_800FB680(x + 0x11A - (s16)(fn_800FA444(0xCA) >> 16), y, -1, 0xCA);
+            fn_800FB680(x + 0x11A - (s16)(GSmsgGetRect(0xCA) >> 16), y, -1, 0xCA);
             itemIndex += listIndex + 1;
         }
         displayLine++;
@@ -691,20 +691,20 @@ s32 fn_800159BC(s32 x, s32 pageIndex, u16* packedRange) {
             messageId = (subRank != 0xFF) ? 0x2B00 : 0x2AFF;
 
             fn_800FB680(x, y, -1, messageId);
-            textX = x + (s32)(u16)(fn_800FA444(messageId) >> 16);
+            textX = x + (s32)(u16)(GSmsgGetRect(messageId) >> 16);
             if (subRank != 0xFF) {
                 fn_80132A38(0x34, (u8)(subRank + 1));
                 fn_800FB680(textX, y, -1, 0xCA);
-                textX += (s32)(u16)(fn_800FA444(0xCA) >> 16);
+                textX += (s32)(u16)(GSmsgGetRect(0xCA) >> 16);
             } else {
                 if ((s32)(rank + 1) < 10) {
                     fn_80132A38(0x34, 0);
                     fn_800FB680(textX, y, -1, 0xCA);
-                    textX += (s32)(u16)(fn_800FA444(0xCA) >> 16);
+                    textX += (s32)(u16)(GSmsgGetRect(0xCA) >> 16);
                 }
                 fn_80132A38(0x34, rank + 1);
                 fn_800FB680(textX, y, -1, 0xCA);
-                textX += (s32)(u16)(fn_800FA444(0xCA) >> 16);
+                textX += (s32)(u16)(GSmsgGetRect(0xCA) >> 16);
             }
 
             messageId = wazaDataBiosGetName(wazaDataBiosGetPtr((u16)itemDataBiosGetWazaIDByWazaMachineNo(rank)));
@@ -713,7 +713,7 @@ s32 fn_800159BC(s32 x, s32 pageIndex, u16* packedRange) {
             dataSource = SUMMARY_ENTRY_FIELD(entry);
             heroItemGetItemKindToItemAryPtr((void*)lbl_8047A2F8, (u8)dataSource, &totalCount, 0, 0, 0);
             fn_80132A38(0x34, totalCount);
-            textX = x + 0x11A - ((s16)(fn_800FA444(0xCA) >> 16) + (s16)(fn_800FA444(0x12E) >> 16));
+            textX = x + 0x11A - ((s16)(GSmsgGetRect(0xCA) >> 16) + (s16)(GSmsgGetRect(0x12E) >> 16));
             fn_800FB680(textX, y, -1, 0x12E);
 
             if (dataSource >= 0) {
@@ -733,7 +733,7 @@ s32 fn_800159BC(s32 x, s32 pageIndex, u16* packedRange) {
                 field = (u8*)field + 4;
             }
             fn_80132A38(0x34, (u16)value);
-            fn_800FB680(x + 0x11A - (s16)(fn_800FA444(0xCA) >> 16), y, -1, 0xCA);
+            fn_800FB680(x + 0x11A - (s16)(GSmsgGetRect(0xCA) >> 16), y, -1, 0xCA);
             itemIndex += listIndex + 1;
         }
         displayLine++;
@@ -842,7 +842,7 @@ s32 fn_80015E3C(s32 x, s32 pageIndex, u16* packedRange) {
             dataSource = SUMMARY_ENTRY_FIELD(entry);
             heroItemGetItemKindToItemAryPtr((void*)lbl_8047A2F8, (u8)dataSource, &totalCount, 0, 0, 0);
             fn_80132A38(0x34, totalCount);
-            textX = x + 0x11A - ((s16)(fn_800FA444(0xCA) >> 16) + (s16)(fn_800FA444(0x12E) >> 16));
+            textX = x + 0x11A - ((s16)(GSmsgGetRect(0xCA) >> 16) + (s16)(GSmsgGetRect(0x12E) >> 16));
             fn_800FB680(textX, y, -1, 0x12E);
 
             if (dataSource >= 0) {
@@ -862,7 +862,7 @@ s32 fn_80015E3C(s32 x, s32 pageIndex, u16* packedRange) {
                 field = (u8*)field + 4;
             }
             fn_80132A38(0x34, (u16)value);
-            fn_800FB680(x + 0x11A - (s16)(fn_800FA444(0xCA) >> 16), y, -1, 0xCA);
+            fn_800FB680(x + 0x11A - (s16)(GSmsgGetRect(0xCA) >> 16), y, -1, 0xCA);
             itemIndex += listIndex + 1;
         }
         displayLine++;
@@ -972,7 +972,7 @@ s32 fn_80016348(u8* ctx, u8* item) {
     entry = SUMMARY_ENTRY_RAW(pageIndex);
     textId = *(s32*)(entry + 0x20);
     halfItemWidth = SUMMARY_ITEM_S16(item, 0x54) / 2;
-    halfTextWidth = (s16)(fn_800FA444(textId) >> 16) / 2;
+    halfTextWidth = (s16)(GSmsgGetRect(textId) >> 16) / 2;
     fn_800FB680((s32)SUMMARY_F32(lbl_8047A2D4) + halfItemWidth - halfTextWidth, 0, -1, textId);
 
     if (SUMMARY_F32(lbl_8047A2D4) != SUMMARY_F32(lbl_8047B748)) {
@@ -992,7 +992,7 @@ s32 fn_80016348(u8* ctx, u8* item) {
 
         entry = SUMMARY_ENTRY_RAW(neighborIndex);
         textId = *(s32*)(entry + 0x20);
-        halfTextWidth = (s16)(fn_800FA444(textId) >> 16) / 2;
+        halfTextWidth = (s16)(GSmsgGetRect(textId) >> 16) / 2;
         fn_800FB680((s32)neighborX + halfItemWidth - halfTextWidth, 0, -1, textId);
     }
 
@@ -1650,7 +1650,7 @@ s32 fn_80017868(u32 unused, u8* ctx) {
     r = heroGetStatus(lbl_8047A2F8, 0xC, 0);
     if ((s32)lbl_8047A2E0 != 3) return 0;
     fn_80132A38(0x50, (s32)r);
-    fn_800FB680((s32)*(s16*)(ctx + 0x54) - (s32)(s16)(fn_800FA444(0x151) >> 16), 0, -1, 0x151);
+    fn_800FB680((s32)*(s16*)(ctx + 0x54) - (s32)(s16)(GSmsgGetRect(0x151) >> 16), 0, -1, 0x151);
     return 0;
 }
 #pragma pop

@@ -105,8 +105,8 @@
  * External function declarations
  * ========================================================================= */
 
-/* fn_80008184: GSthread_GetCurrentContext or similar - called from fn_801F000C */
-extern u32 fn_80008184(void);
+/* dbgMenuFightGetMsgSpeedToFrame: GSthread_GetCurrentContext or similar - called from fn_801F000C */
+extern u32 dbgMenuFightGetMsgSpeedToFrame(void);
 
 /* _threadSwitch: VSync/frame wait - called in frame loop */
 extern void _threadSwitch(void);
@@ -813,7 +813,7 @@ u32 fightFloorBiosGetAttackPokemonPtr(u8* ptr) {
 void fn_801F000C(void) {
     u32 total;
     u32 elapsed;
-    total = fn_80008184();
+    total = dbgMenuFightGetMsgSpeedToFrame();
     if (total != 0) {
         elapsed = 0;
         while (elapsed < total) {

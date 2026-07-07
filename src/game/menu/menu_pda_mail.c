@@ -879,11 +879,11 @@ s32 fn_8004D7D0(PdaMailWindowA* window)
 #pragma peephole reset
 #endif
 
-/* fn_800FB680/fn_800FA444 (gs_title.c-family text helpers): draw a
+/* fn_800FB680/GSmsgGetRect (gs_title.c-family text helpers): draw a
  * message at (x,y,color,msgId) / measure a message's rendered width
  * (packed into the high halfword of the return value). */
 extern void fn_800FB680(s32 x, s32 y, u32 color, s32 msgId);
-extern u32 fn_800FA444(s32 msgId);
+extern u32 GSmsgGetRect(s32 msgId);
 
 #if 0
 asm s32 fn_8004C2D8(void* ctx, void* p) {
@@ -902,7 +902,7 @@ s32 fn_8004C2D8(u8* ctx, u8* p)
         pages = 1;
     }
     fn_80132A38(0x34, (void*) pages);
-    fn_800FB680(*(s16*) (p + 0x54) - (s32) (fn_800FA444(0xca) >> 16), 0, color, 0xca);
+    fn_800FB680(*(s16*) (p + 0x54) - (s32) (GSmsgGetRect(0xca) >> 16), 0, color, 0xca);
     return 0;
 }
 #pragma peephole reset
@@ -918,7 +918,7 @@ s32 fn_8004C36C(u8* ctx, u8* p)
 {
     u32 color = (u32) ctx[0x8b] | 0xe66e0000u;
     fn_80132A38(0x34, (void*) ((s8) ctx[0x94] + 1));
-    fn_800FB680(*(s16*) (p + 0x54) - (s32) (fn_800FA444(0xca) >> 16), 0, color, 0xca);
+    fn_800FB680(*(s16*) (p + 0x54) - (s32) (GSmsgGetRect(0xca) >> 16), 0, color, 0xca);
     return 0;
 }
 #pragma peephole reset

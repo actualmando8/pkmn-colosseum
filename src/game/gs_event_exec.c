@@ -195,7 +195,7 @@ s32 fn_800129A8(u8* ctx) {
 
 /* fn_80012B94 - 0x80012B94 | size: 0x18c */
 extern void* windowGetParam(void*, s32);
-extern s32   fn_800FA444(s32);
+extern s32   GSmsgGetRect(s32);
 extern void  fn_800FB680(s32, s32, s32, s32);
 extern void fn_8001E644(s32, s32, s32, s32, u8);
 extern void fn_8001EA98(s32, s32, s32, s32);
@@ -226,7 +226,7 @@ s32 fn_80012B94(u8* ctx) {
     iter = arr;
     i = 0;
     while (i < count) {
-        rng = fn_800FA444(*(s32*)iter);
+        rng = GSmsgGetRect(*(s32*)iter);
         if (max_hi < (s32)((u32)rng >> 16)) {
             max_hi = (s32)((u32)rng >> 16);
         }
@@ -248,7 +248,7 @@ s32 fn_80012B94(u8* ctx) {
     while (i < count) {
         val = *(s32*)iter;
         if (val != 0) {
-            rng = fn_800FA444(val);
+            rng = GSmsgGetRect(val);
             fn_800FB680(0x20, acc, -1, val);
             delay = (s32)(rng & 0xFFFF) + 2;
         } else {
@@ -480,61 +480,61 @@ s32 fn_8001329C(u8* ctx, u8* tgt) {
     case 0x93:
         value = *(s16*)(data + 2);
         if (data[0] != 0) {
-            width = fn_800FA444(0x1A0);
+            width = GSmsgGetRect(0x1A0);
             fn_800FB680((*(s16*)(tgt + 0x54) - 0x20) - (s32)(s16)((u32)width >> 16), 0, color, 0x1A0);
         }
         fn_80132A38(0x34, value);
-        width = fn_800FA444(0xC9);
+        width = GSmsgGetRect(0xC9);
         fn_800FB680(*(s16*)(tgt + 0x54) - (s32)(s16)((u32)width >> 16), 0, color, 0xC9);
         break;
     case 0x94:
         value = *(s16*)(data + 4);
         if (data[0] != 0) {
-            width = fn_800FA444(0x1A0);
+            width = GSmsgGetRect(0x1A0);
             fn_800FB680((*(s16*)(tgt + 0x54) - 0x20) - (s32)(s16)((u32)width >> 16), 0, color, 0x1A0);
         }
         fn_80132A38(0x34, value);
-        width = fn_800FA444(0xC9);
+        width = GSmsgGetRect(0xC9);
         fn_800FB680(*(s16*)(tgt + 0x54) - (s32)(s16)((u32)width >> 16), 0, color, 0xC9);
         break;
     case 0x95:
         value = *(s16*)(data + 6);
         if (data[0] != 0) {
-            width = fn_800FA444(0x1A0);
+            width = GSmsgGetRect(0x1A0);
             fn_800FB680((*(s16*)(tgt + 0x54) - 0x20) - (s32)(s16)((u32)width >> 16), 0, color, 0x1A0);
         }
         fn_80132A38(0x34, value);
-        width = fn_800FA444(0xC9);
+        width = GSmsgGetRect(0xC9);
         fn_800FB680(*(s16*)(tgt + 0x54) - (s32)(s16)((u32)width >> 16), 0, color, 0xC9);
         break;
     case 0x96:
         value = *(s16*)(data + 8);
         if (data[0] != 0) {
-            width = fn_800FA444(0x1A0);
+            width = GSmsgGetRect(0x1A0);
             fn_800FB680((*(s16*)(tgt + 0x54) - 0x20) - (s32)(s16)((u32)width >> 16), 0, color, 0x1A0);
         }
         fn_80132A38(0x34, value);
-        width = fn_800FA444(0xC9);
+        width = GSmsgGetRect(0xC9);
         fn_800FB680(*(s16*)(tgt + 0x54) - (s32)(s16)((u32)width >> 16), 0, color, 0xC9);
         break;
     case 0x97:
         value = *(s16*)(data + 0xA);
         if (data[0] != 0) {
-            width = fn_800FA444(0x1A0);
+            width = GSmsgGetRect(0x1A0);
             fn_800FB680((*(s16*)(tgt + 0x54) - 0x20) - (s32)(s16)((u32)width >> 16), 0, color, 0x1A0);
         }
         fn_80132A38(0x34, value);
-        width = fn_800FA444(0xC9);
+        width = GSmsgGetRect(0xC9);
         fn_800FB680(*(s16*)(tgt + 0x54) - (s32)(s16)((u32)width >> 16), 0, color, 0xC9);
         break;
     case 0x98:
         value = *(s16*)(data + 0xC);
         if (data[0] != 0) {
-            width = fn_800FA444(0x1A0);
+            width = GSmsgGetRect(0x1A0);
             fn_800FB680((*(s16*)(tgt + 0x54) - 0x20) - (s32)(s16)((u32)width >> 16), 0, color, 0x1A0);
         }
         fn_80132A38(0x34, value);
-        width = fn_800FA444(0xC9);
+        width = GSmsgGetRect(0xC9);
         fn_800FB680(*(s16*)(tgt + 0x54) - (s32)(s16)((u32)width >> 16), 0, color, 0xC9);
         break;
     }
@@ -1108,7 +1108,7 @@ s32 fn_8001431C(void* arg0, u8* arg1) {
     s32 rand;
     if (count <= 0) return 0;
     fn_80132A38(0x50, count * (s32)lbl_8047A2FC);
-    rand = fn_800FA444(0x151);
+    rand = GSmsgGetRect(0x151);
     fn_800FB680(*(s16*)(arg1 + 0x54) - (s32)(s16)((u32)rand >> 16), 0, -1, 0x151);
     return 0;
 }

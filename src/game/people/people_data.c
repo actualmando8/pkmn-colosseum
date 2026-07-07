@@ -145,14 +145,14 @@ extern void  fn_800E24B0(void* model, u32 param);
 extern void  fn_800E209C(void* model, u32 param);
 extern void  fn_800E01F4(void* dst, void* src);
 extern void  fn_800E01D0(void* dst, void* src);
-extern void  fn_800E019C(void* model, void* param);
+extern void  GSvecAdd(void* model, void* param);
 extern void  __cvt_fp2unsigned(void* param1, void* param2);
 
 /* Floor resource system */
 extern void* GSresGetResource(u16 group, u16 model, u16 param);
 
 /* Thread/task system */
-extern void* fn_800FE834(u32 pri, u32 type, void* buf, void* callback);
+extern void* GSgappCreate(u32 pri, u32 type, void* buf, void* callback);
 
 /* Interrupt control */
 extern u32  OSDisableInterrupts(void);

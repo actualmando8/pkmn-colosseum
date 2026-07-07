@@ -94,7 +94,7 @@ extern void fn_800E4D3C(u32 maxObjects);                /* GSmem object pool */
 extern void fn_800EE880(u32 param);                     /* VI callback setup */
 extern void fn_800DF854(u32 bufSize);                   /* Display list buffer init */
 extern void fn_800D2AD4(u32 count);                     /* GSgfx light init */
-extern void fn_800DD0B8(u32 count);                     /* GSgfx texture init */
+extern void GSlightInit(u32 count);                     /* GSgfx texture init */
 extern void fn_80119824(u32 a, u32 b);                  /* GSmaterial init */
 extern void fn_80132C6C(u32 a, u32 b, u32 c, u32 d);  /* GStexture cache init */
 extern void fn_800F8138(void);                           /* GSgfx camera/viewport init */
@@ -104,15 +104,15 @@ extern void fn_800F7E9C(u32 padIdx, u32 param);        /* PAD rumble config */
 extern void fn_800F7E40(u32 padIdx, u32 param);        /* PAD deadzone config */
 extern void fn_800F7DE4(u32 padIdx, u32 param);        /* PAD stick config */
 
-extern void fn_800FE9B0(u32 numTasks, u32 numQueues);  /* GSthread init */
+extern void GSgappInit(u32 numTasks, u32 numQueues);  /* GSthread init */
 extern void fn_800F9670(u32 maxSteps);                  /* GSthread step limit */
 extern void fn_800FF828(u32 a, u32 b, u32 c, u32 d);  /* GSthread pool config */
 extern void fn_8010D170(void);                           /* GSthread scheduler init */
 extern void fn_800F7758(u32 maxPads);                   /* PAD system init */
 extern void fn_800F75FC(void* padTable);                 /* PAD set mapping table */
-extern void fn_800FC528(u32 numFloors, u32 numLayers);  /* GSfloor system init */
-extern void fn_800FC518(void* sndTable);                 /* GSfloor sound table */
-extern void fn_800FC39C(void* relData);                  /* GSfloor register REL data */
+extern void GSmsgInit(u32 numFloors, u32 numLayers);  /* GSfloor system init */
+extern void GSmsgSetCtrlFunc(void* sndTable);                 /* GSfloor sound table */
+extern void GSmsgFontOpen(void* relData);                  /* GSfloor register REL data */
 extern void GSmsgOpen(void* relData);                  /* GSfloor register REL data (alt) */
 extern void fn_800F76E4(void* relData);                  /* GSfloor register REL data (floor) */
 extern void fn_80167DC0(u32 a, u32 b, u32 c, u32 d, u32 e); /* Script/event system init */
@@ -123,9 +123,9 @@ extern void fn_80103CD8(u32 param);                      /* Effect system init *
 extern void fn_80101FB8(u32 param);                      /* Particle system init */
 extern void fn_800D3074(u32 flag);                       /* GSgfx enable rendering */
 
-extern void fn_800FE834(u32 active, u32 taskId, u32 param, /* GSthread create task */
+extern void GSgappCreate(u32 active, u32 taskId, u32 param, /* GSthread create task */
                          void* func);
-extern void fn_800FE7A0(void);                           /* GSthread yield / run scheduler */
+extern void GSgappUpdate(void);                           /* GSthread yield / run scheduler */
 extern void GSthreadCreate(u32 affinity, u32 priority,      /* GSthread create main thread */
                          u32 stackSize, u32 usesFPU,
                          u32 autoStart, void* entry);
@@ -598,7 +598,7 @@ void fn_800057B0(void) {
     fn_800D2AD4(0x20);
 
     /* Initialize texture system with 32 textures */
-    fn_800DD0B8(0x20);
+    GSlightInit(0x20);
 
     /* Initialize material system: 32 materials, 128 max textures */
     fn_80119824(0x20, 0x80);
@@ -618,7 +618,7 @@ void fn_800057B0(void) {
     }
 
     /* Initialize GSthread system: 16 tasks, 4 queues */
-    fn_800FE9B0(0x10, 0x4);
+    GSgappInit(0x10, 0x4);
 
     /* Set thread step limit to 300 */
     fn_800F9670(0x12C);
@@ -636,15 +636,15 @@ void fn_800057B0(void) {
     fn_800F75FC(lbl_802E1CF0);
 
     /* Initialize floor/scene system: 2 floors, 5 layers */
-    fn_800FC528(0x2, 0x5);
+    GSmsgInit(0x2, 0x5);
 
     /* Register floor sound table */
-    fn_800FC518(msgctrlcode);
+    GSmsgSetCtrlFunc(msgctrlcode);
 
     /* Register floor REL data tables */
-    fn_800FC39C(lbl_8027A500); /* Main scene data */
-    fn_800FC39C(lbl_802BD260); /* Scene data #2 */
-    fn_800FC39C(lbl_802C0CB0); /* Scene data #3 */
+    GSmsgFontOpen(lbl_8027A500); /* Main scene data */
+    GSmsgFontOpen(lbl_802BD260); /* Scene data #2 */
+    GSmsgFontOpen(lbl_802C0CB0); /* Scene data #3 */
     GSmsgOpen(lbl_802CF810); /* Scene data #4 (alt registration) */
 
     /* Initialize the script/event system with event ID ranges */
@@ -670,33 +670,33 @@ void fn_800057B0(void) {
 
     /* ---------------------------------------------------------------
      * Register per-frame callback tasks.
-     * fn_800FE834 creates a task: (active, taskId, param, func)
+     * GSgappCreate creates a task: (active, taskId, param, func)
      * ---------------------------------------------------------------
      */
 
     /* Task 0xFF: Primary VBlank handler (fn_80005D80) */
-    fn_800FE834(1, 0xFF, 0, (void*)fn_80005D80);
+    GSgappCreate(1, 0xFF, 0, (void*)fn_80005D80);
 
     /* Task 0x00: Pad rumble update (fn_8000604C) */
-    fn_800FE834(1, 0x00, 0, (void*)fn_8000604C);
+    GSgappCreate(1, 0x00, 0, (void*)fn_8000604C);
 
     /* Task 0x01: Pad read/polling (fn_80005FFC) */
-    fn_800FE834(1, 0x01, 0, (void*)fn_80005FFC);
+    GSgappCreate(1, 0x01, 0, (void*)fn_80005FFC);
 
     /* Task 0x0A: Audio retrace callback (fn_80005FA8) */
-    fn_800FE834(1, 0x0A, 0, (void*)fn_80005FA8);
+    GSgappCreate(1, 0x0A, 0, (void*)fn_80005FA8);
 
     /* Post-init for save system */
     GSvtrRegisterGSgapp();
 
     /* Task 0xFD: Reset button countdown (fn_80005CE4) */
-    fn_800FE834(1, 0xFD, 0, (void*)fn_80005CE4);
+    GSgappCreate(1, 0xFD, 0, (void*)fn_80005CE4);
 
     /* Task 0xFE: Main retrace logic (fn_80005E00) */
-    fn_800FE834(1, 0xFE, 0, (void*)fn_80005E00);
+    GSgappCreate(1, 0xFE, 0, (void*)fn_80005E00);
 
     /* Task 0xFF: Reset handler (fn_80005C3C) - overrides earlier 0xFF? */
-    fn_800FE834(1, 0xFF, 0, (void*)fn_80005C3C);
+    GSgappCreate(1, 0xFF, 0, (void*)fn_80005C3C);
 
     /* Mark initialization as complete */
     lbl_80478DC9 = 1;
@@ -723,7 +723,7 @@ void fn_800057B0(void) {
 
     /* Infinite yield loop - scheduler takes over from here */
     for (;;) {
-        fn_800FE7A0(); /* GSthread yield */
+        GSgappUpdate(); /* GSthread yield */
     }
 }
 #pragma pop
@@ -779,7 +779,7 @@ void fn_80005AAC(void) {
     /* Load REL modules and register their scene/floor data.
      * tableResBiosGetResPtr loads a relocatable module by ID and returns a pointer
      * to its data, which is then registered with the floor system. */
-    fn_800FC39C(tableResBiosGetResPtr(1));  /* REL 1 -> register scene data */
+    GSmsgFontOpen(tableResBiosGetResPtr(1));  /* REL 1 -> register scene data */
     GSmsgOpen(tableResBiosGetResPtr(4));  /* REL 4 -> register scene data (alt) */
     fn_800F76E4(tableResBiosGetResPtr(7));  /* REL 7 -> register floor data */
 

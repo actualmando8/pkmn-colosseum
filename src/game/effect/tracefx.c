@@ -53,7 +53,7 @@ extern void  GSpartGetTransform(void* part, void* outPos,
                           void* a, void* b);             /* GSpart get position */
 extern void  fn_800EE828(void* part);                    /* GSpart commit */
 extern void  fn_800E01D0(void* dst, void* src);         /* Vec3 copy */
-extern void  fn_800E090C(void* dst, void* srcA,
+extern void  GSlerpGetLinearInterpolationVector(void* dst, void* srcA,
                           void* srcB, f32 t);            /* Vec3 lerp */
 extern void  GSmodelSetVisibility(void* model, u32 flag);        /* GSpart set visibility */
 extern u16   _toolentryAlloc__FUl(u32 size);                     /* GSmemAllocRaw */

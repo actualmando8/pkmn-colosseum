@@ -867,7 +867,7 @@ extern void fn_800FF730(u32);
 extern void menuPokemonOpen(s32, s32, s32);
 extern void fn_800F0654(u32, s32, ...);
 extern void evolutionOpen(u32, u32, s32, u16*, s32, u32*);
-extern void fn_8002DC6C(u32);
+extern void menuShopOpen(u32);
 extern void fn_80029760(u32, s32);
 extern void fn_80165A20(u32, s32, s32);
 extern u8 lbl_804673F8[];
@@ -1293,7 +1293,7 @@ u32 dbgMenuMenuTestPokemonMenu(s32 arg) {
 #pragma peephole on
 
 /* fn_8000CF68 - 0x8000CF68 | size: 0xf4 */
-/* GSparty_GetBattleStats -- search table for match, call fn_8002DC6C */
+/* GSparty_GetBattleStats -- search table for match, call menuShopOpen */
 #if 0
 asm void fn_8000CF68(void) {
 #include "src/game/gs_party_access_fn_8000CF68.inc"
@@ -1329,7 +1329,7 @@ idx_done:
         return 0;
     }
     val = local[idx].value;
-    fn_8002DC6C(val);
+    menuShopOpen(val);
     return 0;
 }
 #endif

@@ -74,7 +74,7 @@ extern void  fn_800E24B0(void* model, u32 param);
 extern void  fn_800E209C(void* model, u32 param);
 extern void  fn_800E01F4(void* dst, void* src);
 extern void  fn_800E01D0(void* dst, void* src);
-extern void  fn_800E019C(void* model, void* param);
+extern void  GSvecAdd(void* model, void* param);
 extern void  fn_800E0BA0(void* param);
 extern void  fn_800E0BE4(void* param);
 extern void  fn_800E013C(void* param);

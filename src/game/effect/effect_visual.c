@@ -585,9 +585,9 @@ extern void fn_800DFFCC(void);
 extern void fn_800E0718(void);
 extern void fn_800DFEEC(void);
 extern void fn_800E0518(void);
-extern void fn_800DFF98(void);
+extern void GSvecTransform(void);
 extern void fn_800E013C(void* dst, void* src, f32 scale);
-extern void fn_800E019C(void* dst, void* srcA, void* srcB);
+extern void GSvecAdd(void* dst, void* srcA, void* srcB);
 extern u32 lbl_8047D154;
 extern u32 lbl_8047D15C;
 extern u32 lbl_8047D14C;
@@ -671,7 +671,7 @@ extern u32 fn_800EE0E8(void* entry);
 extern void* fn_800EE150(void* model, u32 mode);
 extern s32 GSpartGetMaterialCount(void* outerP);
 extern void* fn_800EE6B4(void* handle, u32 idx);
-extern void fn_800DF21C(void* obj, f32 val);
+extern void GSmaterialSetAlpha(void* obj, f32 val);
 extern void fn_800DF608(void* handle);
 extern void fn_800EE828(void* handle);
 extern u32 lbl_8047D160;
@@ -716,7 +716,7 @@ u32 fn_80138BBC(void* ptr) {
                     partCount--;
                     obj = fn_800EE6B4(part, partCount);
                     if (obj != NULL) {
-                        fn_800DF21C(obj, *(f32*)&lbl_8047D160);
+                        GSmaterialSetAlpha(obj, *(f32*)&lbl_8047D160);
                         fn_800DF608(obj);
                     }
                 }
@@ -1061,7 +1061,7 @@ BOOL fn_80139AC4(void* ptr, u32 tick) {
     for (i = 0; i < count; i++, entry += 0x12E4) {
         if (frame >= *(u16*)(entry + 0x12DC) && frame < *(u16*)(entry + 0x12DE)) {
             *(u16*)(entry + 0x12E0) = 1;
-            fn_800E019C(entry + 0x12CC, entry + 0xC4, p + 0x20);
+            GSvecAdd(entry + 0x12CC, entry + 0xC4, p + 0x20);
         } else {
             *(u16*)(entry + 0x12E0) = 0;
         }
@@ -1806,7 +1806,7 @@ void fn_8013BA98(void* ptr) {
     }
 }
 #endif
-extern void fn_800E0204(void);
+extern void clear__5GSvecFv(void);
 extern u32 lbl_8047D200;
 extern u32 lbl_8047D210;
 extern u32 lbl_8047D214;
@@ -2510,11 +2510,11 @@ extern void fn_800EC570(void);
 extern void fn_800D45F8(void);
 extern void GSmaterialGetFlags(void);
 extern void GSmaterialSetFlags(void);
-extern void fn_800DF188(void);
+extern void GSmaterialStoreAlpha(void);
 extern void fn_800EC990(void* model);
 extern void fn_800ECA78(void* model, f32 value);
 extern void fn_800EC134(void);
-extern void fn_800DF140(void);
+extern void GSmaterialResetAlpha(void);
 extern void GSmaterialResetFlags(void);
 extern u32 lbl_8047D288;
 extern u32 lbl_8047D26C;
@@ -3419,7 +3419,7 @@ void Unload__13ModelSequenceFPUc(u8* ptr) {
 }
 #endif
 extern void* _pachiruEffectCreateTexture__FP9GStextureP9GStextureUl(void* tex1, void* tex2, u32 arg);
-extern void fn_800DF028(void* material, void* texture);
+extern void GSmaterialSetTexture(void* material, void* texture);
 #if 0
 asm void fn_80140190(void) {
 #include "src/game/effect/effect_visual_fn_80140190.inc"
@@ -3451,7 +3451,7 @@ u32 fn_80140190(void** out, void* model, u32 arg) {
             if (tex2 != NULL) {
                 out[1] = _pachiruEffectCreateTexture__FP9GStextureP9GStextureUl(tex1, tex2, arg);
                 if (out[1] != NULL) {
-                    fn_800DF028(out[0], out[1]);
+                    GSmaterialSetTexture(out[0], out[1]);
                     ret = 1;
                 }
             }

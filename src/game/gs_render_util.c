@@ -93,8 +93,8 @@ extern void fn_800E04F4(void* a, f32 b);
 extern void fn_800E05C0(void* a, f32 b, f32 c, f32 d);
 extern void fn_800E0290(void* a, void* b, void* c);
 extern void* fn_800E0264(void* dst, void* src);
-extern void fn_800E0678(void* a, f32 b, f32 c, f32 d, f32 e);
-extern void fn_800E0698(void* a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g);
+extern void GSmtx44Perspective(void* a, f32 b, f32 c, f32 d, f32 e);
+extern void GSmtx44Ortho(void* a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g);
 extern void HSD_CObjGetEyePosition(void* jobj, void* data);
 extern void HSD_CObjGetUpVector(void* jobj, void* data);
 extern void HSD_CObjGetInterest(void* jobj, void* data);
@@ -153,7 +153,7 @@ extern f32 lbl_8047CA08;   /* SDA2 float constant */
 extern f32 lbl_8047CA0C;   /* SDA2 float constant */
 extern u32 lbl_80270350[4]; /* .rodata array */
 extern void* fn_800D7BF8(u32 idx);
-extern void fn_800DFF98(void* out, void* sphere, void* ray);
+extern void GSvecTransform(void* out, void* sphere, void* ray);
 extern void GXProject(void* sphere, void* center, void* radii, f32 x, f32 y, f32 z, void* outA, void* outB, void* outC);
 extern void* HSD_FogLoadDesc(void* ctx);
 extern void HSD_FogSet(u32 zero);
@@ -522,10 +522,10 @@ void* GScameraGetProjMatrixPtr(GSRenderCamera* camera) {
         HSD_CObjGetPerspective(jobj, &x, &z);
         w = HSD_CObjGetNear(camera->cobj);
         h = HSD_CObjGetFar(camera->cobj);
-        fn_800E0678(lbl_804001B0, x, z, w, h);
+        GSmtx44Perspective(lbl_804001B0, x, z, w, h);
     } else {
         HSD_CObjGetOrtho(jobj, &out2, &out0, &out3, &out1);
-        fn_800E0698(lbl_804001B0, out2, out0, out3, out1, lbl_8047C994, lbl_8047C9C0);
+        GSmtx44Ortho(lbl_804001B0, out2, out0, out3, out1, lbl_8047C994, lbl_8047C9C0);
     }
     return lbl_804001B0;
 }
@@ -1213,7 +1213,7 @@ s32 fn_800D2DE8(void* arg1, void* arg2, u32 count) {
         i = 0;
         while (i < n) {
             f32 test[3];
-            fn_800DFF98(test, sphere, rays);
+            GSvecTransform(test, sphere, rays);
             if (test[2] >= *(f32*)((u8*)model + 0x2c)) {
                 f32 val = lbl_8047CA0C;
                 result = 3;
@@ -1252,7 +1252,7 @@ s32 fn_800D2F34(void* arg1, void* arg2) {
     if (sphere == 0 || model == 0) {
         return 0;
     }
-    fn_800DFF98(testOut, sphere, arg1);
+    GSvecTransform(testOut, sphere, arg1);
     {
         f32 t = *(volatile f32*)&testOut[2];
         f32 model2c = *(f32*)((u8*)model + 0x2c);
