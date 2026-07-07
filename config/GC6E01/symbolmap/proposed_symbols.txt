@@ -1,6 +1,12 @@
-fn_8019FF30 -> HSD_JObjGetFlags  // body: if(!r3)return 0; return r3->0x14 (flags getter); XD size 0x18 match
-fn_801A6DDC -> HSD_MObjSetAlpha  // body: stores float f1 into matobj sub-object; XD size match
-fn_8019CFBC -> JObjRelease  // body: HSD_VecFree + HSD_IDGetDataFromTable cleanup; XD Δ+8
-fn_8019F01C -> HSD_JObjGetCurrent  // body: returns current-jobj global lbl_8047B2AC; XD size 8 exact
-fn_801A015C -> HSD_JObjAddChild  // body: (parent r3, child r4) list manip; XD Δ+8
-fn_8019CF54 -> JObjAmnesia  // body: clears current-jobj globals when they point to r3; XD Δ+4
+fn_801D1B4C -> mailGetSortMode  // pilot XD-port body-verified: Identical structure: both size 0x2C, single bl savedataGetStatus (Colosseum fn_8
+fn_801D1CC4 -> mailChkReceiveMail  // pilot XD-port body-verified: Instruction-identical: both size 0x94, single bl (fn_80129280 = savedataGetStatu
+fn_801D1D58 -> mailAddMailbox  // pilot XD-port body-verified: Identical structure: both size 0xF8, same instruction count, both call savedataG
+fn_801D1F7C -> mailGetNbMailInMailbox  // pilot XD-port body-verified: Identical shape: both size 0x2C, 11 instrs, single bl (Colo fn_80129280 == XD sa
+fn_801D1FA8 -> mailInitMailbox  // pilot XD-port body-verified: Identical shape/call sequence: prologue→memset(struct,0)→stb 0 flag near end→fil
+fn_801D349C -> _wazaSequenceCameraDoPosition__FP13ModelSequenceP24wazaSequenceCameraParamsfb  // pilot XD-port body-verified: Call sequences align: fn_800E0BE4=HSD_Randf and the 4-call group fn_801767E0/801
+fn_801D3F7C -> _wazaSequenceCameraDoDollyPosition__FP21TemplateExpFileHeaderP24wazaSequenceCameraParamsfb  // pilot XD-port body-verified: Both open with 10 random-value calls then the identical camera-dolly sequence se
+fn_801D49D8 -> _wazaSequenceCameraSelectDuration__FUcPff  // pilot XD-port body-verified: Both are a bitmask dispatch on arg-0 (tests 1,2,4,8,3,5,9 in identical order), e
+fn_801D4DA0 -> _wazaSequenceCameraSelectMotion__FP13ModelSequenceP12WazaSequenceP24wazaSequenceCameraParams  // pilot XD-port body-verified: Identical CFG: cmplwi 0x13a early-out, 4-bit popcount into r8, cmpwi r8 0/1 disp
+fn_801DB848 -> wazaSequenceSysGetModelShadowLight__Fv  // pilot XD-port body-verified: Both are byte-identical 8-byte getters (lwz r3,<global>@sda21(r0); blr), size 0x
+fn_801DB850 -> wazaSequenceSysGetModelShadowCount__Fv  // pilot XD-port body-verified: Both are byte-identical 0x8 getters: lwz r3,<global>@sda21(r0)+blr, no calls; XD
+fn_801DB858 -> wazaSequenceSysGetModelShadowList__Fv  // pilot XD-port body-verified: Both are identical 0xC address-of-global getters (lis/addi/blr, no bl calls); Co

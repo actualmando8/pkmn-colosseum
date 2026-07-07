@@ -7593,7 +7593,7 @@ void fn_80128E38(void);
 extern void fn_80135338(void);
 extern void fn_80134F88(void);
 extern void fn_801908D4(void);
-extern void fn_801D1FA8(void);
+extern void mailInitMailbox(void);
 extern void sodateyaInit(void);
 extern void fn_8006B6B4(void);
 extern void fn_80260070(void);

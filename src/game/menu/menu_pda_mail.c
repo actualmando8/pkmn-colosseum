@@ -336,8 +336,8 @@ void menuPdaOpen(void)
 #pragma scheduling reset
 #endif
 
-/* fn_801D1F7C (battle_waza.c): Waza-party active-effect count getter. */
-extern u16 fn_801D1F7C(void);
+/* mailGetNbMailInMailbox (battle_waza.c): Waza-party active-effect count getter. */
+extern u16 mailGetNbMailInMailbox(void);
 
 /* Mail-ID lookup table (halfword mail IDs), indexed by receive-order
  * slot; sda21-addressed pointer variable (matches XD's pdaMailGetMailID
@@ -358,8 +358,8 @@ asm s32 pdaMailGetMailID(s32 index) {
 #pragma dont_inline on
 s32 pdaMailGetMailID(s32 index)
 {
-    extern s32 fn_801D1F7C(void);
-    if (index < 0 || index >= fn_801D1F7C()) {
+    extern s32 mailGetNbMailInMailbox(void);
+    if (index < 0 || index >= mailGetNbMailInMailbox()) {
         return -1;
     }
     return lbl_8047A500[index];
@@ -618,11 +618,11 @@ extern s32 fn_801026A4(s32 menuId, u32 inputState, s32* config, s32 zero,
 extern void fn_80102510(s32 menuId);
 extern void menuCloseSync(s32 menuId, s32 flag);
 
-/* fn_801D1B4C (battle_waza.c): Waza party mailbox-sort-mode byte
+/* mailGetSortMode (battle_waza.c): Waza party mailbox-sort-mode byte
  * getter (0=default/none, 1=ascending, 2=ascending+recent-sort,
  * 3=ascending+alpha-sort). mailGetMailIDInMailbox (battle_waza.c):
  * mail ID by receive-order index. qsort: standard library sort. */
-extern s32 fn_801D1B4C(void);
+extern s32 mailGetSortMode(void);
 extern s32 mailGetMailIDInMailbox(s32 idx);
 extern void qsort(void* base, u32 count, u32 size,
                    s32 (*cmp)(const void*, const void*));
@@ -641,21 +641,21 @@ asm void fn_8004BFB0(void) {
  * Best reached 76.4% after 3 source-shape attempts. */
 void fn_8004BFB0(void)
 {
-    extern s32 fn_801D1F7C(void);
+    extern s32 mailGetNbMailInMailbox(void);
     u16* buf = lbl_8047A500;
-    u8 mode = (u8) fn_801D1B4C();
+    u8 mode = (u8) mailGetSortMode();
 
     switch (mode) {
     case 1: {
         s32 i = 0;
-        u16 count = (u16) fn_801D1F7C();
+        u16 count = (u16) mailGetNbMailInMailbox();
         for (; i < count; i++) {
             *buf++ = mailGetMailIDInMailbox(i);
         }
         break;
     }
     case 2: {
-        u16 count = (u16) fn_801D1F7C();
+        u16 count = (u16) mailGetNbMailInMailbox();
         s32 i = 0;
         for (; i < count; i++) {
             *buf++ = mailGetMailIDInMailbox(i);
@@ -664,7 +664,7 @@ void fn_8004BFB0(void)
         break;
     }
     case 3: {
-        u16 count = (u16) fn_801D1F7C();
+        u16 count = (u16) mailGetNbMailInMailbox();
         s32 i = 0;
         for (; i < count; i++) {
             *buf++ = mailGetMailIDInMailbox(i);
@@ -674,7 +674,7 @@ void fn_8004BFB0(void)
     }
     default: {
         s32 i;
-        for (i = fn_801D1F7C() - 1; i >= 0; i--) {
+        for (i = mailGetNbMailInMailbox() - 1; i >= 0; i--) {
             *buf++ = mailGetMailIDInMailbox(i);
         }
         break;
@@ -837,7 +837,7 @@ asm s32 fn_8004D7D0(PdaMailWindowA* window) {
 #pragma peephole off
 s32 fn_8004D7D0(PdaMailWindowA* window)
 {
-    extern s32 fn_801D1F7C(void);
+    extern s32 mailGetNbMailInMailbox(void);
     s32** field = window->field_0x60;
     u8* state = fn_80105624();
     s32 index = **field;
@@ -846,7 +846,7 @@ s32 fn_8004D7D0(PdaMailWindowA* window)
 
     flags = *(u16*) (state + 6);
     if (flags & 0x2) {
-        s32 count = fn_801D1F7C();
+        s32 count = mailGetNbMailInMailbox();
         index++;
         if (index >= count) {
             index = 0;
@@ -856,7 +856,7 @@ s32 fn_8004D7D0(PdaMailWindowA* window)
     if (flags & 0x1) {
         index--;
         if (index < 0) {
-            index = fn_801D1F7C() - 1;
+            index = mailGetNbMailInMailbox() - 1;
         }
     }
     if (index != cur) {
@@ -893,11 +893,11 @@ asm s32 fn_8004C2D8(void* ctx, void* p) {
 #pragma peephole off
 s32 fn_8004C2D8(u8* ctx, u8* p)
 {
-    extern s32 fn_801D1F7C(void);
+    extern s32 mailGetNbMailInMailbox(void);
     s32 count;
     s32 pages;
     u32 color = (u32) ctx[0x8b] | 0xe66e0000u;
-    count = fn_801D1F7C();
+    count = mailGetNbMailInMailbox();
     if ((pages = (count + 9) / 10) <= 0) {
         pages = 1;
     }

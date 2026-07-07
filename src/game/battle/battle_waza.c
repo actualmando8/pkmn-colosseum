@@ -25,8 +25,8 @@
  *   _wazaSequenceParticleEntryStart (0x6B4): _wazaSequenceParticleEntryStart -- particle init
  *   _wazaSequenceModelEntryStart (0x604): _wazaSequenceModelEntryStart -- model init
  *   fn_801D9950 (0x2CC): wazaSequencePokemonMotionStart -- motion driver
- *   fn_801D349C (0xAE0): Move animation state machine A
- *   fn_801D3F7C (0x548): Move animation state machine B
+ *   _wazaSequenceCameraDoPosition__FP13ModelSequenceP24wazaSequenceCameraParamsfb (0xAE0): Move animation state machine A
+ *   _wazaSequenceCameraDoDollyPosition__FP21TemplateExpFileHeaderP24wazaSequenceCameraParamsfb (0x548): Move animation state machine B
  *   fn_801D44C4 (0x514): Move animation state machine C
  *   fn_801D624C (0x818): Move animation mega-function
  *
@@ -124,8 +124,8 @@ extern s32   fn_800EE0E8(s32);
 extern void  fn_80118CAC(s32, s32);
 
 /* Forward declarations for converted functions */
-void fn_801D349C(void);
-void fn_801D3F7C(void);
+void _wazaSequenceCameraDoPosition__FP13ModelSequenceP24wazaSequenceCameraParamsfb(void);
+void _wazaSequenceCameraDoDollyPosition__FP21TemplateExpFileHeaderP24wazaSequenceCameraParamsfb(void);
 void fn_801D44C4(void);
 void fn_801D624C(void);
 void fn_801D7464(void);
@@ -478,11 +478,11 @@ void fn_801D1B10(s32 handle) {
 #pragma pop
 
 /**
- * fn_801D1B4C - Waza get byte from battle party at offset 0x442.
+ * mailGetSortMode - Waza get byte from battle party at offset 0x442.
  * Address: 0x801D1B4C | Size: 0x2C
  */
 #pragma scheduling off
-u8 fn_801D1B4C(void) {
+u8 mailGetSortMode(void) {
     WazaPartyScratch* party = (WazaPartyScratch*)fn_80129280(0, 0x0A);
     return party->selectedHandle;
 }
@@ -505,12 +505,12 @@ void fn_801D1C20(s32 seqHandle) {
 }
 
 /**
- * fn_801D1CC4 - Waza effect trajectory calculation.
+ * mailChkReceiveMail - Waza effect trajectory calculation.
  * Address: 0x801D1CC4 | Size: 0x94
  */
 #pragma push
 #pragma peephole off
-BOOL fn_801D1CC4(s32 idx) {
+BOOL mailChkReceiveMail(s32 idx) {
     WazaPartyScratch* party = (WazaPartyScratch*)fn_80129280(0, 0x0A);
     u16 count;
     s32 i;
@@ -537,10 +537,10 @@ BOOL fn_801D1CC4(s32 idx) {
 #pragma pop
 
 /**
- * fn_801D1D58 - Waza projectile update.
+ * mailAddMailbox - Waza projectile update.
  * Address: 0x801D1D58 | Size: 0xF8
  */
-void fn_801D1D58(s32 seqHandle) {
+void mailAddMailbox(s32 seqHandle) {
     /* TODO: Waza projectile update (0xF8 bytes) */
 }
 
@@ -578,21 +578,21 @@ load:
 #pragma pop
 
 /**
- * fn_801D1F7C - Waza get active effect count from party+0x400.
+ * mailGetNbMailInMailbox - Waza get active effect count from party+0x400.
  * Address: 0x801D1F7C | Size: 0x2C
  */
 #pragma scheduling off
-u16 fn_801D1F7C(void) {
+u16 mailGetNbMailInMailbox(void) {
     WazaPartyScratch* party = (WazaPartyScratch*)fn_80129280(0, 0x0A);
     return party->count;
 }
 #pragma scheduling on
 
 /**
- * fn_801D1FA8 - Waza effect color modulation.
+ * mailInitMailbox - Waza effect color modulation.
  * Address: 0x801D1FA8 | Size: 0xD8
  */
-void fn_801D1FA8(s32 seqHandle, u32 color) {
+void mailInitMailbox(s32 seqHandle, u32 color) {
     /* TODO: Effect color modulation (0xD8 bytes) */
 }
 
@@ -917,21 +917,21 @@ void fn_801D30BC(void) {
 }
 
 /**
- * fn_801D349C - Move animation state machine A.
+ * _wazaSequenceCameraDoPosition__FP13ModelSequenceP24wazaSequenceCameraParamsfb - Move animation state machine A.
  * Address: 0x801D349C | Size: 0xAE0
  * Massive state machine (~2.8KB) for a class of move animations.
  * Likely handles physical/contact move animations.
  */
-void fn_801D349C(void) {
+void _wazaSequenceCameraDoPosition__FP13ModelSequenceP24wazaSequenceCameraParamsfb(void) {
     /* TODO: Move animation state machine A (0xAE0 bytes) */
 }
 
 /**
- * fn_801D3F7C - Move animation state machine B.
+ * _wazaSequenceCameraDoDollyPosition__FP21TemplateExpFileHeaderP24wazaSequenceCameraParamsfb - Move animation state machine B.
  * Address: 0x801D3F7C | Size: 0x548
  * State machine for beam/projectile move animations.
  */
-void fn_801D3F7C(void) {
+void _wazaSequenceCameraDoDollyPosition__FP21TemplateExpFileHeaderP24wazaSequenceCameraParamsfb(void) {
     /* TODO: Move animation state machine B (0x548 bytes) */
 }
 
@@ -945,19 +945,19 @@ void fn_801D44C4(void) {
 }
 
 /**
- * fn_801D49D8 - Move animation state machine D.
+ * _wazaSequenceCameraSelectDuration__FUcPff - Move animation state machine D.
  * Address: 0x801D49D8 | Size: 0x3C8
  * State machine for spread/multi-target move animations.
  */
-void fn_801D49D8(void) {
+void _wazaSequenceCameraSelectDuration__FUcPff(void) {
     /* TODO: Move animation state machine D (0x3C8 bytes) */
 }
 
 /**
- * fn_801D4DA0 - Move animation helper: particle burst.
+ * _wazaSequenceCameraSelectMotion__FP13ModelSequenceP12WazaSequenceP24wazaSequenceCameraParams - Move animation helper: particle burst.
  * Address: 0x801D4DA0 | Size: 0x218
  */
-void fn_801D4DA0(s32 effectID, s32 slot) {
+void _wazaSequenceCameraSelectMotion__FP13ModelSequenceP12WazaSequenceP24wazaSequenceCameraParams(s32 effectID, s32 slot) {
     /* TODO: Particle burst helper (0x218 bytes) */
 }
 
@@ -1960,29 +1960,29 @@ void fn_801DB3F8(void* seqData) {
 }
 
 /**
- * fn_801DB848 - Waza data get move count.
+ * wazaSequenceSysGetModelShadowLight__Fv - Waza data get move count.
  * Address: 0x801DB848 | Size: 0x8
  */
 extern s32 lbl_8047B418;
-s32 fn_801DB848(void) {
+s32 wazaSequenceSysGetModelShadowLight__Fv(void) {
     return lbl_8047B418;
 }
 
 /**
- * fn_801DB850 - Waza data get entry count for move.
+ * wazaSequenceSysGetModelShadowCount__Fv - Waza data get entry count for move.
  * Address: 0x801DB850 | Size: 0x8
  */
 extern s32 lbl_8047B414;
-s32 fn_801DB850(s32 moveID) {
+s32 wazaSequenceSysGetModelShadowCount__Fv(s32 moveID) {
     return lbl_8047B414;
 }
 
 /**
- * fn_801DB858 - Waza data get move flags.
+ * wazaSequenceSysGetModelShadowList__Fv - Waza data get move flags.
  * Address: 0x801DB858 | Size: 0xC
  */
 extern u8 lbl_80467C80[];
-void* fn_801DB858(s32 moveID) {
+void* wazaSequenceSysGetModelShadowList__Fv(s32 moveID) {
     return lbl_80467C80;
 }
 

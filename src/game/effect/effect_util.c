@@ -4883,8 +4883,8 @@ u32 fn_8013327C(void) {
 }
 #pragma scheduling off
 #endif
-extern void fn_801D1CC4(void);
-extern void fn_801D1D58(void);
+extern void mailChkReceiveMail(void);
+extern void mailAddMailbox(void);
 extern void fn_801D268C(void);
 #if 0
 asm void fn_8013334C(void) {
@@ -4895,12 +4895,12 @@ asm void fn_8013334C(void) {
 #pragma scheduling on
 u32 fn_8013334C(void) {
     extern s32 menuOpen(u32, u32);
-    extern s32 fn_801D1CC4(s32);
-    extern void fn_801D1D58(s32);
+    extern s32 mailChkReceiveMail(s32);
+    extern void mailAddMailbox(s32);
     s32 slot;
     while ((slot = menuOpen(2, 1)) != -1) {
-        if (fn_801D1CC4(slot) == 0) {
-            fn_801D1D58(slot);
+        if (mailChkReceiveMail(slot) == 0) {
+            mailAddMailbox(slot);
             fn_801D268C();
         }
     }
