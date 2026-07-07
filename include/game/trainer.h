@@ -99,7 +99,7 @@ u32 TrainerDataGet(void* pokemon, u32 slot, u16 field, u32 extra);
 u32 TrainerDataSet(void* pokemon, u32 slot, u16 field, u32 extra, u32 value);
 
 /**
- * fn_80205B8C / fn_80205BE8 - trainer -> party -> Pokemon pointer navigation
+ * fightOutPokemonGetPokemonPtr / fightPokemonGetPokemonPtr - trainer -> party -> Pokemon pointer navigation
  * (two-hop and single-hop). Implemented and matched at 100% in
  * colosseum_event.c, not in this file.
  */

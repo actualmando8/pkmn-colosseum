@@ -1508,9 +1508,9 @@ L_80032E94:
 #endif
 
 /* 0x80032ED8 | 0x1E0 */
-extern u8*  fn_8020E0F8(s32);
-extern void fn_8020DFA0(u8*, s32);
-extern void fn_8020DF90(u8*, u16);
+extern u8*  fightEncountDataBiosGetPtr(s32);
+extern void fightEncountDataBiosSetTrainer(u8*, s32);
+extern void fightEncountDataBiosSetFightFloorDataId(u8*, u16);
 extern s32  fn_801FCCC4(s32);
 extern void fn_801FCB94(s32, u8);
 extern void fn_801FCC54(s32, s32);
@@ -1547,13 +1547,13 @@ u8* fn_80032ED8(s32 arg0, s32 arg1, u8* arg2) {
     u8* walk;
     u8* arg2_iter;
 
-    node = fn_8020E0F8(arg1);
+    node = fightEncountDataBiosGetPtr(arg1);
     if (*(u32*)(arg0 + 0x1C) == 0) {
-        fn_8020DFA0(node, 0);
+        fightEncountDataBiosSetTrainer(node, 0);
     } else {
-        fn_8020DFA0(node, 1);
+        fightEncountDataBiosSetTrainer(node, 1);
     }
-    fn_8020DF90(node, (u16)lbl_8047A444);
+    fightEncountDataBiosSetFightFloorDataId(node, (u16)lbl_8047A444);
 
     ctx = fn_801FCCC4(9);
     fn_801FCB94(ctx, *(u8*)(arg0 + 0xC));
@@ -1625,21 +1625,21 @@ void fn_80032ED8_legacy_disabled(void) {
     r30 = r4;
     r31 = r5;
     r3 = r30;
-    fn_8020E0F8();
+    fightEncountDataBiosGetPtr();
     tmp = *(u32*)((u8*)r29 + 0x1C);
     r26 = r3;
     if ((s32)tmp == 0) {
         r4 = 0x0;
-        fn_8020DFA0();
+        fightEncountDataBiosSetTrainer();
     } else {
 
         r4 = 0x1;
-        fn_8020DFA0();
+        fightEncountDataBiosSetTrainer();
     }
     tmp = lbl_8047A444;
     r3 = r26;
     r4 = tmp & 0xFFFF;
-    fn_8020DF90();
+    fightEncountDataBiosSetFightFloorDataId();
     r3 = 0x9;
     fn_801FCCC4();
     r4 = *(u8*)((u8*)r29 + 0xC);

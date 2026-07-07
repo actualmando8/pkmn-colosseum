@@ -104,17 +104,17 @@ extern s32   menuOpen(s32 slot, s32 p1);       /* Query event state */
 extern void  menuSetPosition(s32 slot, s32 p1, s32 p2);  /* Set event params */
 
 /* Resource management */
-extern void* fn_8020E0F8(void);                   /* Get scene resource table */
-extern void  fn_8020DFB0(void* tbl, u8 idx);      /* Set resource field 0 */
-extern void  fn_8020DFA0(void* tbl, u8 idx);      /* Set resource field 1 */
-extern void  fn_8020DF90(void* tbl, u16 val);     /* Set resource field 2 */
-extern void  fn_8020E068(void* tbl, s32 slot);    /* Get resource subfield */
-extern void  fn_8020DF50(void* tbl, s32 slot, u16 val);  /* Set resource subfield */
-extern void  fn_8020DF10(void* tbl, s32 slot, s32 val);  /* Set resource property */
-extern u8    fn_8020E0E0(void* tbl);              /* Get resource type */
-extern u8    fn_8020E0C8(void* tbl);              /* Get resource subtype */
-extern u16   fn_8020E0B0(void* tbl);              /* Get resource size */
-extern u16   fn_8020E020(void* tbl, s32 slot);    /* Get resource slot value */
+extern void* fightEncountDataBiosGetPtr(void);                   /* Get scene resource table */
+extern void  fightEncountDataBiosSetFightKind(void* tbl, u8 idx);      /* Set resource field 0 */
+extern void  fightEncountDataBiosSetTrainer(void* tbl, u8 idx);      /* Set resource field 1 */
+extern void  fightEncountDataBiosSetFightFloorDataId(void* tbl, u16 val);     /* Set resource field 2 */
+extern void  fightEncountDataBiosGetFightTrainerDataId(void* tbl, s32 slot);    /* Get resource subfield */
+extern void  fightEncountDataBiosSetFightTrainerDataId(void* tbl, s32 slot, u16 val);  /* Set resource subfield */
+extern void  fightEncountDataBiosSetGSInputDevice(void* tbl, s32 slot, s32 val);  /* Set resource property */
+extern u8    fightEncountDataBiosGetFightKind(void* tbl);              /* Get resource type */
+extern u8    fightEncountDataBiosGetTrainer(void* tbl);              /* Get resource subtype */
+extern u16   fightEncountDataBiosGetFightFloorDataId(void* tbl);              /* Get resource size */
+extern u16   fightEncountDataBiosGetGSInputDevice(void* tbl, s32 slot);    /* Get resource slot value */
 
 /* Random selection helpers */
 extern u8    menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs(volatile unsigned int count, u32* outResult, void* validationFn);
@@ -324,10 +324,10 @@ s32 fn_8000682C(void) {
  *   Uses jumptable_802E28D0 for the initial dispatch, then performs
  *   NPC selection, resource loading, and encounter setup based on the
  *   event type. Each case in the switch:
- *     - Gets a resource from the scene table via fn_8020E0E0/fn_8020E0C8
+ *     - Gets a resource from the scene table via fightEncountDataBiosGetFightKind/fightEncountDataBiosGetTrainer
  *     - Validates the result using menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs with a callback
  *     - Commits the selection via fn_8001E200
- *     - Updates the resource table via fn_8020DFB0/fn_8020DFA0/etc.
+ *     - Updates the resource table via fightEncountDataBiosSetFightKind/fightEncountDataBiosSetTrainer/etc.
  *
  * fn_80006FAC - dbgMenuFightStopHostWin (accessor cluster):
  *   Small field accessors for the scene resource structure.
@@ -369,7 +369,7 @@ s32 fn_8000682C(void) {
 /* External functions used by lookup helpers */
 extern void* fn_800FA280(u32 id);
 extern void* fn_8010C4D4(u16 index);
-extern void* fn_8020DED8(void* ptr);
+extern void* fightEncountDataBiosGetFightName(void* ptr);
 
 /* Global state references */
 extern u32 lbl_80478B38;
@@ -406,7 +406,7 @@ void* _dbgMenuFightGetZokuseiDataIdSub(u32 id)
  *
  * Looks up an event resource by ID. Returns NULL-equivalent constant
  * on invalid input or out-of-range. Otherwise, chains through
- * fn_8020E0F8 -> fn_8020DED8 -> fn_800FA280.
+ * fightEncountDataBiosGetPtr -> fightEncountDataBiosGetFightName -> fn_800FA280.
  *
  * Address: 0x800087FC  Size: 0x6C (108 bytes)
  * ======================================================================= */
@@ -414,7 +414,7 @@ void* _dbgMenuFightGetZokuseiDataIdSub(u32 id)
 #pragma scheduling off
 void* fn_800087FC(u32 id)
 {
-    extern void* fn_8020E0F8(u16 id);
+    extern void* fightEncountDataBiosGetPtr(u16 id);
     extern u32 lbl_80478F50;
     u32 result;
 
@@ -423,7 +423,7 @@ void* fn_800087FC(u32 id)
     } else if (id >= *(u32*)lbl_80478F50) {
         result = 0x0000EB63;
     } else {
-        result = (u32)fn_8020DED8(fn_8020E0F8((u16)id));
+        result = (u32)fightEncountDataBiosGetFightName(fightEncountDataBiosGetPtr((u16)id));
     }
     if (result == 0) {
         result = 0x0000EB63;
@@ -1366,14 +1366,14 @@ s32 dbgMenuFightFightPokemonSelect0(void) {
 
 /* menuFightPokemonSelectSub - 0x80007364 | size: 0x2f8 */
 extern void* fn_801F54A4(s32 a, u16 b, s32 c, s32 d);
-extern void* fn_80205BE8(u32 ctx);
+extern void* fightPokemonGetPokemonPtr(u32 ctx);
 extern void* fn_801F4460(s32 a, u32 ctx);
-extern u8   fn_80203E7C(u32 ctx);
+extern u8   figthPokemonGetLevel(u32 ctx);
 extern u8   fn_801F8C00(void* ptr, u32 ctx);
 extern void* fn_801F8D80(void* ptr, u32 ctx);
 extern u8   fn_801FECD4(void);
-extern void fn_80207BF4(void* ptr);
-extern void fn_80207B8C(void* ptr, s32 a);
+extern void fightOutPokemonGetTokuseiDataId(void* ptr);
+extern void fightOutPokemonGetZokuseiDataId(void* ptr, s32 a);
 extern s32  fn_800096B4(void* ptr, s32 a, u8* b, u8* c, u8* d, u8* e);
 extern u16  pokemonGetStatus(s32 a, u16 b, s32 c, s32 d);
 extern void fn_8010B01C(void* ptr, s32 a, s32 b);
@@ -1386,12 +1386,12 @@ extern void fn_801C3430(void);
 extern void pokemonSetStatus(void* ptr, s32 a, s32 b, s32 c, s32 d);
 extern void fn_801DB100(void* ptr);
 extern void fn_801DA4E8(void* ptr, s32 a);
-extern void fn_80202810(void* ptr, s32 a);
+extern void fightOutPokemonWriteJoutaiDataId(void* ptr, s32 a);
 extern void fn_802653FC(void* ptr, u16 a, s32 b);
 extern void pokemonSetSequenceStatus(void* a, u16 b);
 extern void* pokemonGetTokuseiDataId(void* ptr);
-extern void fn_80207BC0(void* ptr, void* a);
-extern void fn_80207B5C(void* ptr, u8 a, u16 b);
+extern void fightOutPokemonSetTokuseiDataId(void* ptr, void* a);
+extern void fightOutPokemonSetZokuseiDataId(void* ptr, u8 a, u16 b);
 extern void fn_80265754(void* ptr, u16 a);
 #if 1
 #if 0
@@ -1421,7 +1421,7 @@ s32 menuFightPokemonSelectSub(u32 ctx) {
     sp_8 = 0;
 
     savedId = (u16)(u32)fn_801F54A4(0, 0, 0x14, 0);
-    scene = fn_80205BE8(ctx);
+    scene = fightPokemonGetPokemonPtr(ctx);
     if (scene == 0) {
         return -1;
     }
@@ -1431,7 +1431,7 @@ s32 menuFightPokemonSelectSub(u32 ctx) {
         return -1;
     }
 
-    prevLevel = fn_80203E7C(ctx);
+    prevLevel = figthPokemonGetLevel(ctx);
 
     if (fn_801F8C00(archive, ctx) == 2) {
         encounter = fn_801F8D80(archive, ctx);
@@ -1440,9 +1440,9 @@ s32 menuFightPokemonSelectSub(u32 ctx) {
         }
 
         if (encounter != 0) {
-            fn_80207BF4(encounter);
+            fightOutPokemonGetTokuseiDataId(encounter);
             for (loopIdx = 0; (u16)loopIdx < 2; loopIdx++) {
-                fn_80207B8C(encounter, 0);
+                fightOutPokemonGetZokuseiDataId(encounter, 0);
             }
         }
 
@@ -1463,7 +1463,7 @@ s32 menuFightPokemonSelectSub(u32 ctx) {
                     pokemonSetStatus(encounter, 0, 0xee, 0, (s32)animPtr);
                     fn_801DB100((void*)(u32)subItem);
                     fn_801DA4E8(animPtr, 1);
-                    fn_80202810(encounter, 0x14);
+                    fightOutPokemonWriteJoutaiDataId(encounter, 0x14);
                 }
                 {
                     u16 newId;
@@ -1475,13 +1475,13 @@ s32 menuFightPokemonSelectSub(u32 ctx) {
                     eeItem = pokemonGetStatus(0, (u16)(u32)encounter, 0xee, 0);
                     pokemonSetSequenceStatus(scene, eeItem);
                 }
-                fn_80207BC0(encounter, pokemonGetTokuseiDataId(scene));
+                fightOutPokemonSetTokuseiDataId(encounter, pokemonGetTokuseiDataId(scene));
                 {
                     u16 i;
                     for (i = 0; (u16)i < 2; i++) {
                         u16 val;
                         val = pokemonGetStatus(0, itemId, 0x16, i);
-                        fn_80207B5C(encounter, (u8)i, val);
+                        fightOutPokemonSetZokuseiDataId(encounter, (u8)i, val);
                     }
                 }
             }
@@ -1490,7 +1490,7 @@ s32 menuFightPokemonSelectSub(u32 ctx) {
         result = fn_800096B4(scene, 1, 0, 0, 0, 0);
     }
 
-    if ((u8)fn_80203E7C(ctx) > (u8)prevLevel) {
+    if ((u8)figthPokemonGetLevel(ctx) > (u8)prevLevel) {
         pokemonSetStatus((void*)ctx, 0, 0xd0, 0, 1);
     }
 
@@ -1790,8 +1790,8 @@ s32 dbgMenuFightWazaEdit(void) {
 #endif
 
 /* fn_80007B30 - 0x80007B30 | size: 0x4ac */
-extern u8 fn_802117FC(void);
-extern void fn_80211810(u8 val);
+extern u8 fightSeqGetEffectAminFlag(void);
+extern void fightSeqSetEffectAminFlag(u8 val);
 extern s8 menuSubOpenYesNo(s32 max, s32 a, s32 b, s32 initial);
 extern u8 fn_8001E224(u8 val, u32* out, s32 a, s32 b, s32 c, s32 d);
 extern u8 fightSeqCheckYubiwohuruWazaDataId(u16 id);
@@ -1828,7 +1828,7 @@ s32 fn_80007B30(void) {
     save_field = lbl_8047A270;
     save_battle = lbl_8047A284;
     save_speed = lbl_8047A285;
-    save_sfx = fn_802117FC();
+    save_sfx = fightSeqGetEffectAminFlag();
     save_rumble = lbl_8047A286;
     save_cam = lbl_8047A280;
     save_species = lbl_8047A282;
@@ -1845,7 +1845,7 @@ s32 fn_80007B30(void) {
             lbl_8047A270 = save_field;
             lbl_8047A284 = save_battle;
             lbl_8047A285 = save_speed;
-            fn_80211810(save_sfx);
+            fightSeqSetEffectAminFlag(save_sfx);
             lbl_8047A286 = save_rumble;
             lbl_8047A280 = save_cam;
             lbl_8047A282 = save_species;
@@ -1904,11 +1904,11 @@ s32 fn_80007B30(void) {
 
         if (evt == 0x5d) {
             s8 r;
-            r = menuSubOpenYesNo(0x7f, -1, -1, fn_802117FC() == 0);
+            r = menuSubOpenYesNo(0x7f, -1, -1, fightSeqGetEffectAminFlag() == 0);
             if (r == 0) {
-                fn_80211810(1);
+                fightSeqSetEffectAminFlag(1);
             } else if (r == 1) {
-                fn_80211810(0);
+                fightSeqSetEffectAminFlag(0);
             }
             continue;
         }
@@ -2294,8 +2294,8 @@ void* fn_8000868C(u32 id) {
 #endif
 
 /* fn_800086EC - 0x800086EC | size: 0x58 */
-extern void* fn_8020E204(u16 id);
-extern void* fn_8020E1EC(void* ptr);
+extern void* fightTypeDataBiosGetPtr(u16 id);
+extern void* fightTypeDataBiosGetName(void* ptr);
 #if 0
 asm void fn_800086EC(void) {
 #include "src/game/gs_task_fn_800086EC.inc"
@@ -2306,7 +2306,7 @@ void* fn_800086EC(u32 id) {
     if (id >= *(u32*)lbl_80478F00) {
         result = 0xEB63;
     } else {
-        result = (u32)fn_8020E1EC(fn_8020E204((u16)id));
+        result = (u32)fightTypeDataBiosGetName(fightTypeDataBiosGetPtr((u16)id));
     }
     if (result == 0) result = 0xEB63;
     return fn_800FA280(result);
@@ -2314,8 +2314,8 @@ void* fn_800086EC(u32 id) {
 #endif
 
 /* _dbgMenuFightGetFightKindDataIdSub - 0x80008744 | size: 0x58 */
-extern void* fn_8020E488(u16 id);
-extern void* fn_8020E248(void* ptr);
+extern void* fightKindDataBiosGetPtr(u16 id);
+extern void* fightKindDataBiosGetName(void* ptr);
 #if 0
 asm void _dbgMenuFightGetFightKindDataIdSub(void) {
 #include "src/game/gs_task_fn_80008744.inc"
@@ -2326,7 +2326,7 @@ void* _dbgMenuFightGetFightKindDataIdSub(u32 id) {
     if (id >= *(u32*)lbl_80478F40) {
         result = 0xEB63;
     } else {
-        result = (u32)fn_8020E248(fn_8020E488((u16)id));
+        result = (u32)fightKindDataBiosGetName(fightKindDataBiosGetPtr((u16)id));
     }
     if (result == 0) result = 0xEB63;
     return fn_800FA280(result);

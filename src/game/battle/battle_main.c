@@ -96,7 +96,7 @@ extern void fn_801F108C(void);                      /* battle scene init */
 extern u8   fn_801F1758(s32 arg);                   /* check scene state */
 
 /* Battle state machine */
-extern void fn_8020C840(void);                      /* battle system init */
+extern void fightActionFlowKaisiPreSubLoad(void);                      /* battle system init */
 
 /* GBA link */
 extern void fn_80265C84(void);
@@ -380,14 +380,14 @@ void fn_801EF644(s32 result) {
 void fn_801EF6FC(u8 a) {
     extern u8 lbl_8047B5E1;
     extern u16 fn_801EF624(void);
-    extern u32 fn_8020DD44(void);
+    extern u32 fightEncountGetEnvSndDataId(void);
     extern void fn_801659FC(u32 r3, u32 r4, u32 r5);
     u32 r3;
 
     if (lbl_8047B5E1 == 1) return;
     if (a == 0) return;
     if (fn_801EF624() == 0) return;
-    r3 = fn_8020DD44();
+    r3 = fightEncountGetEnvSndDataId();
     if (r3 != 0) {
         fn_801659FC(r3, 0x3e8, 0xff);
     }
@@ -399,14 +399,14 @@ void fn_801EF6FC(u8 a) {
 void fn_801EF758(u8 a) {
     extern u8 lbl_8047B5E0;
     extern u16 fn_801EF624(void);
-    extern u32 fn_8020DD80(void);
+    extern u32 fightEncountGetBgmSndDataId(void);
     extern void fn_80165A20(u32 r3, u32 r4, u32 r5);
     u32 r3;
 
     if (lbl_8047B5E0 == 1) return;
     if (a == 0) return;
     if (fn_801EF624() == 0) return;
-    r3 = fn_8020DD80();
+    r3 = fightEncountGetBgmSndDataId();
     if (r3 != 0) {
         fn_80165A20(r3, 0x0, 0xff);
     }
@@ -543,7 +543,7 @@ void fn_801EFA08(void) {
         r5 = 0xff;
         ((void(*)(void))fn_801659FC)();
     }
-    ((void(*)(void))fn_8020C840)();
+    ((void(*)(void))fightActionFlowKaisiPreSubLoad)();
     f1 = lbl_8047E508;
     r3 = 0x8;
     ((void(*)(void))fadeSet)();

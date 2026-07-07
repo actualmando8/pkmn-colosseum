@@ -78,7 +78,7 @@
  *
  * menuPokemonCheckPokemonChange (GSnpc_WarpToLocation) handles map transitions:
  *   - Checks warp destination validity via fn_801F2020
- *   - Gets the destination map name via fn_802037DC
+ *   - Gets the destination map name via fightOutPokemonGetNicknamePtr
  *   - Loads string message 0x76FB for the warp confirmation dialog
  *   - Waits for player input with a render loop
  *   - On confirmation, triggers the floor transition
@@ -116,7 +116,7 @@ extern void  fn_800FB680();
 
 /* Map/warp */
 extern u8    fn_801F2020(s32 p1, void* warpId, void* outDest);
-extern void* fn_802037DC(void* mapData);              /* Get map name string */
+extern void* fightOutPokemonGetNicknamePtr(void* mapData);              /* Get map name string */
 extern void  fn_80106D3C(s32 slot, s32 msgId, s32 p3, s32 p4);
 extern void  fn_801069FC(s32 slot);                   /* Close message box */
 
@@ -398,12 +398,12 @@ void fn_80011288(void) {
 #endif
 
 /* 0x800114A4 | 0x25C */
-extern void fn_8020E204();
-extern void fn_8020E1A4();
+extern void fightTypeDataBiosGetPtr();
+extern void fightTypeDataBiosGetFightoutPokemonNum();
 extern void menuPokemonOpenFight();
 extern void fn_80102568();
 extern void fn_801F02AC();
-extern void fn_802062FC();
+extern void fightOutPokemonCheckFightOut();
 extern void fn_802656AC();
 extern u32 menuPokemonCheckPokemonChange();
 extern void fn_80011288();
@@ -421,9 +421,9 @@ void fn_800114A4(void) {
     extern void fn_80102620();
     extern void fn_801026A4();
     extern void fn_801F02AC();
-    extern void fn_802062FC();
-    extern void fn_8020E1A4();
-    extern void fn_8020E204();
+    extern void fightOutPokemonCheckFightOut();
+    extern void fightTypeDataBiosGetFightoutPokemonNum();
+    extern void fightTypeDataBiosGetPtr();
     extern void fn_802656AC();
     u8 sp[0x60];
     u32 tmp = 0;
@@ -452,8 +452,8 @@ void fn_800114A4(void) {
     r27 = r6;
     r28 = r7;
     r3 = r26;
-    fn_8020E204();
-    fn_8020E1A4();
+    fightTypeDataBiosGetPtr();
+    fightTypeDataBiosGetFightoutPokemonNum();
     tmp = r28 & 0xFF;
     r31 = r3;
     if (tmp == 0) {
@@ -508,7 +508,7 @@ L_80011500:
         r3 = 0xf;
         fn_801F02AC();
         r23 = r3;
-        fn_802062FC();
+        fightOutPokemonCheckFightOut();
         tmp = r3 & 0xFF;
         if (tmp == 1) {
             r3 = r23;
@@ -524,7 +524,7 @@ L_80011500:
         r3 = 0x10;
         fn_801F02AC();
         r23 = r3;
-        fn_802062FC();
+        fightOutPokemonCheckFightOut();
         tmp = r3 & 0xFF;
         if (tmp == 1) {
             r3 = r23;
@@ -540,7 +540,7 @@ L_80011500:
         r3 = 0xe;
         fn_801F02AC();
         r23 = r3;
-        fn_802062FC();
+        fightOutPokemonCheckFightOut();
         tmp = r3 & 0xFF;
         if (tmp == 1) {
             r3 = r23;
@@ -2441,7 +2441,7 @@ void fn_8000F35C(u8* ctx, u8* npc) {
 #endif
 
 /* fn_8000F400 - 0x8000F400 | size: 0x368 */
-extern u32 fn_80205B8C();
+extern u32 fightOutPokemonGetPokemonPtr();
 extern u32 wazaGetStatus();
 extern void fn_800FB8C8(void);
 extern void jumptable_802E4CA8();
@@ -2456,7 +2456,7 @@ void fn_8000F400(u8* ctx, u8* npc) {
     extern u32 windowSearchID(void);
     extern u8* windowGetAllocPtr(void);
     extern u32 windowGetParam(u8* a, s32 b);
-    extern u32 fn_80205B8C(void*);
+    extern u32 fightOutPokemonGetPokemonPtr(void*);
     extern u32 pokemonGetStatus();
     extern u32 pokemonCheckValid(void);
     extern u32 wazaGetStatus();
@@ -2482,7 +2482,7 @@ void fn_8000F400(u8* ctx, u8* npc) {
     state = (u8*)windowGetParam(ctx, 1);
     selected = *(s32*)state;
     if (selected < 0) return;
-    battle = fn_80205B8C(*(void**)(party + 0x40));
+    battle = fightOutPokemonGetPokemonPtr(*(void**)(party + 0x40));
     if (battle == 0) return;
     result = pokemonGetStatus(battle, 0, 0x7F, (u16)selected);
     color = (s32)menuSubCalcColor(ctx, npc);
@@ -2875,7 +2875,7 @@ u32 menuFightCtrlBall(u8* ptr) {
 
 /* _menuFightIsUse__FP16MENU_WAZA_STATUSUs - 0x80010128 | size: 0x16c */
 extern u32 fn_801FFEC8();
-extern u32 fn_802040E8();
+extern u32 fightOutPokemonGetSoubiItemDataId();
 #if 0
 asm void _menuFightIsUse__FP16MENU_WAZA_STATUSUs(void) {
 #include "src/game/gs_npc_interact_fn_80010128.inc"
@@ -2887,12 +2887,12 @@ u32 _menuFightIsUse__FP16MENU_WAZA_STATUSUs(ctx, arg)
 u8* ctx;
 u16 arg;
 {
-    extern u32 fn_80205B8C(void*);
+    extern u32 fightOutPokemonGetPokemonPtr(void*);
     extern u32 fn_801FFEC8(void*, u16, s32, void*);
     extern u32 pokemonGetStatus();
     extern u32 wazaGetStatus();
     extern u32 fn_800FA280(void);
-    extern u32 fn_802040E8(void*);
+    extern u32 fightOutPokemonGetSoubiItemDataId(void*);
     u16 stackValue;
     u8* obj;
     u32 battle;
@@ -2901,7 +2901,7 @@ u16 arg;
     u32 msg;
 
     obj = *(u8**)(ctx + 0x40);
-    battle = fn_80205B8C(obj);
+    battle = fightOutPokemonGetPokemonPtr(obj);
     state = fn_801FFEC8(obj, arg, 1, &stackValue);
     result = pokemonGetStatus(battle, 0, 0x7F, arg);
     msg = 0;
@@ -2909,7 +2909,7 @@ u16 arg;
         fn_80132A38(0x11, (s32)obj);
         msg = wazaGetStatus(0, (u16)result, 1, 0);
         fn_80132A38(0x28, fn_800FA280());
-        fn_801F4C14(0, 0, 0x56, 0, (u16)fn_802040E8(obj));
+        fn_801F4C14(0, 0, 0x56, 0, (u16)fightOutPokemonGetSoubiItemDataId(obj));
     }
     switch ((u8)state) {
     case 6:
@@ -2953,7 +2953,7 @@ asm void fn_80010294(void) {
 void fn_80010294(u8* ctx, u8* npc) {
     extern u8* windowGetAllocPtr(u8* a);
     extern u32 fn_80104530(u32 val);
-    extern u32 fn_80205B8C(void*);
+    extern u32 fightOutPokemonGetPokemonPtr(void*);
     extern u32 pokemonGetStatus();
     extern void fn_800FB8C8();
     u8* entries;
@@ -2975,8 +2975,8 @@ void fn_80010294(u8* ctx, u8* npc) {
     if (*(u32*)(entries + offset + 4) == 0) return;
 
     result = 0;
-    if (fn_80205B8C(*(void**)(entries + 0x40)) != 0) {
-        result = (u16)pokemonGetStatus(fn_80205B8C(*(void**)(entries + 0x40)), 0, 0x7F,
+    if (fightOutPokemonGetPokemonPtr(*(void**)(entries + 0x40)) != 0) {
+        result = (u16)pokemonGetStatus(fightOutPokemonGetPokemonPtr(*(void**)(entries + 0x40)), 0, 0x7F,
                                   (s8)ctx[0x95]);
     }
     if (result == 0 || result == 0x164) {
@@ -3006,7 +3006,7 @@ asm void fn_8001047C(void) {
 void fn_8001047C(u8* arg1) {
     extern void* windowGetAllocPtr(u8* a);
     extern u32 fn_80104530(u32 val);
-    extern void* fn_80205B8C(void* obj);
+    extern void* fightOutPokemonGetPokemonPtr(void* obj);
     extern u32 pokemonGetStatus(s32 p1, s32 p2, s32 p3, s32 p4, u16 p5, s32 p6);
     extern void fn_80132A38(s32 p1, s32 val);
     extern void fn_801040F0(s32 p1, s32 p2, u8* p3, u16 p4, s32 p5);
@@ -3025,7 +3025,7 @@ void fn_8001047C(u8* arg1) {
     r30 = temp * 0xc;
     if (*(u32*)((u8*)participant + r30 + 4) == 0) return;
     battle_result = 0;
-    if (fn_80205B8C(*(void**)((u8*)participant + 0x40)) != 0) {
+    if (fightOutPokemonGetPokemonPtr(*(void**)((u8*)participant + 0x40)) != 0) {
         battle_result = (u16)pokemonGetStatus(0, 0x7f, 0, 0, (s8)(*(u8*)(arg1 + 0x95)), 0);
     }
     val = 0;
@@ -3114,7 +3114,7 @@ void fn_800106A4(u8* arg1, u8* arg2) {
     extern void fn_80132A38(s32 p1, s32 val);
     extern void* fn_8001D834(u8* a, u8* b);
     extern void fn_800FB680(s32 a, s32 b, s32 c, u32 d);
-    extern void* fn_802037DC(void* a);
+    extern void* fightOutPokemonGetNicknamePtr(void* a);
     void* participant;
     void* npc_data;
     u32 r30;
@@ -3159,7 +3159,7 @@ void fn_800106A4(u8* arg1, u8* arg2) {
         } else if (val == 0xf8) {
             p1 = (u8*)windowGetParam(arg1, 1);
             if ((u8)windowGetParam(arg1, 2) != 0) {
-                fn_80132A38(0x36, (s32)fn_802037DC(p1));
+                fn_80132A38(0x36, (s32)fightOutPokemonGetNicknamePtr(p1));
             } else {
                 r30 = 0x1a9;
             }
@@ -3189,7 +3189,7 @@ u32 fn_80010844(u8* ctx) {
     extern u8* windowGetAllocPtr(u8* a);
     extern u8* windowGetFreeWork(u8* a);
     extern u8* fn_80105624(void);
-    extern u32 fn_80205B8C(void*);
+    extern u32 fightOutPokemonGetPokemonPtr(void*);
     extern u32 pokemonGetStatus();
     extern void menuButtonNormal(u8* a);
     extern void pokemonWazaReplace(void*, s32, s32);
@@ -3203,7 +3203,7 @@ u32 fn_80010844(u8* ctx) {
 
     participant = windowGetAllocPtr(ctx);
     state = windowGetFreeWork(ctx);
-    model = fn_80205B8C(*(void**)(participant + 0x40));
+    model = fightOutPokemonGetPokemonPtr(*(void**)(participant + 0x40));
     flagsObj = fn_80105624();
     flags = *(u16*)(flagsObj + 4);
 
@@ -3365,9 +3365,9 @@ u32 fn_80010B30(u8* arg) {
 #pragma pop
 
 /* menuPokemonCheckPokemonChange - 0x80010C98 | size: 0x52c */
-extern u32 fn_80207BF4(void* arg);
+extern u32 fightOutPokemonGetTokuseiDataId(void* arg);
 extern u8 fn_801F8C00(u32 warpId, u32 arg);
-extern s32 fn_80203848(u32 arg);
+extern s32 fightPokemonGetNicknamePtr(u32 arg);
 extern void GSlogWrite(const char* fmt, ...);
 extern u8 lbl_80266788[];
 extern u8 lbl_802E4B78[];
@@ -3415,16 +3415,16 @@ doneLabel:
 
     relation = fn_801F2020(0, npc, &linkedNpc);
     if (relation == 1) {
-        fn_80132A38(0xD, (s32)fn_802037DC(npc));
+        fn_80132A38(0xD, (s32)fightOutPokemonGetNicknamePtr(npc));
         fn_80106D3C(1, 0x76FB, 1, 0);
         WAIT_FOR_DIALOG(waitRelationOne, checkRelationOne, haveRelationOne, doneRelationOne);
         fn_801069FC(1);
         return 0;
     }
     if (relation == 2) {
-        fn_801F4C14(0, 0, 0x57, 0, (u16)fn_80207BF4(linkedNpc));
-        fn_80132A38(0xD, (s32)fn_802037DC(linkedNpc));
-        fn_80132A38(0xE, (s32)fn_802037DC(npc));
+        fn_801F4C14(0, 0, 0x57, 0, (u16)fightOutPokemonGetTokuseiDataId(linkedNpc));
+        fn_80132A38(0xD, (s32)fightOutPokemonGetNicknamePtr(linkedNpc));
+        fn_80132A38(0xE, (s32)fightOutPokemonGetNicknamePtr(npc));
         fn_80106D3C(1, 0x761F, 1, 0);
         WAIT_FOR_DIALOG(waitRelationTwo, checkRelationTwo, haveRelationTwo, doneRelationTwo);
         fn_801069FC(1);
@@ -3442,21 +3442,21 @@ doneLabel:
     }
     kind = fn_801F8C00(warpId, variant);
     if (kind == 1) {
-        fn_80132A38(0xD, fn_80203848(variant));
+        fn_80132A38(0xD, fightPokemonGetNicknamePtr(variant));
         fn_80106D3C(1, 0x76FE, 1, 0);
         WAIT_FOR_DIALOG(waitKindOne, checkKindOne, haveKindOne, doneKindOne);
         fn_801069FC(1);
         return 0;
     }
     if (kind == 2) {
-        fn_80132A38(0xD, fn_80203848(variant));
+        fn_80132A38(0xD, fightPokemonGetNicknamePtr(variant));
         fn_80106D3C(1, 0x76FC, 1, 0);
         WAIT_FOR_DIALOG(waitKindTwo, checkKindTwo, haveKindTwo, doneKindTwo);
         fn_801069FC(1);
         return 0;
     }
     if (kind == 3) {
-        fn_80132A38(0xD, fn_80203848(variant));
+        fn_80132A38(0xD, fightPokemonGetNicknamePtr(variant));
         fn_80106D3C(1, 0x76FD, 1, 0);
         WAIT_FOR_DIALOG(waitKindThree, checkKindThree, haveKindThree, doneKindThree);
         fn_801069FC(1);

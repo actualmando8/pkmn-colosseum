@@ -834,7 +834,7 @@ void _msgctrlSideName__FP15FightOutPokemonUc(u32 arg1, u32 arg2) {
 extern void fn_801F4354(void);
 extern void fn_801F18DC(void);
 extern void fn_801F8100(void);
-extern void fn_802037DC(void);
+extern void fightOutPokemonGetNicknamePtr(void);
 extern void fn_800FA280(void);
 extern u32 lbl_8047AE10;
 #if 0
@@ -851,7 +851,7 @@ void msgctrlClientnowork(void) {
     extern u32 fn_801F4354(u32, u32);
     extern u32 fn_801F18DC(u32);
     extern u32 fn_801F8100(u32);
-    extern u32 fn_802037DC(u32);
+    extern u32 fightOutPokemonGetNicknamePtr(u32);
     extern void fn_80132A38(u32, u32);
     extern void fn_800FA280(u32);
     int new_var;
@@ -861,10 +861,10 @@ void msgctrlClientnowork(void) {
     new_var = 0;
     if (((u8)(new_var, fn_801F18DC(0)) == 1) && result != 0) {
         fn_80132A38(0x4D, fn_801F8100(result));
-        fn_80132A38(0x57, fn_802037DC(val));
+        fn_80132A38(0x57, fightOutPokemonGetNicknamePtr(val));
         fn_800FA280(0x7721);
     } else {
-        fn_802037DC(val);
+        fightOutPokemonGetNicknamePtr(val);
     }
 }
 #pragma pop
@@ -920,7 +920,7 @@ void msgctrlTsuikaMons(void) {
     extern u32 fn_801F4354(u32, u32);
     extern u32 fn_801F18DC(u32);
     extern u32 fn_801F8100(u32);
-    extern u32 fn_802037DC(u32);
+    extern u32 fightOutPokemonGetNicknamePtr(u32);
     extern void fn_80132A38(u32, u32);
     extern void fn_800FA280(u32);
     u32 result;
@@ -930,10 +930,10 @@ void msgctrlTsuikaMons(void) {
     new_var = val;
     if (((u8)fn_801F18DC(0) == 1) && result != 0) {
         fn_80132A38(0x4D, fn_801F8100(result));
-        fn_80132A38(0x57, fn_802037DC(new_var));
+        fn_80132A38(0x57, fightOutPokemonGetNicknamePtr(new_var));
         do { fn_800FA280(0x7721); } while (0);
     } else {
-        fn_802037DC(val);
+        fightOutPokemonGetNicknamePtr(val);
     }
 }
 #pragma pop
@@ -956,7 +956,7 @@ void msgctrlClientMos(void) {
     extern u32 fn_801F4354(u32, u32);
     extern u32 fn_801F18DC(u32);
     extern u32 fn_801F8100(u32);
-    extern u32 fn_802037DC(u32);
+    extern u32 fightOutPokemonGetNicknamePtr(u32);
     extern void fn_80132A38(u32, u32);
     extern void fn_800FA280(u32);
     u32 result;
@@ -966,10 +966,10 @@ void msgctrlClientMos(void) {
     new_var = val;
     if (((u8)fn_801F18DC(0) == 1) && result != 0) {
         fn_80132A38(0x4D, fn_801F8100(result));
-        fn_80132A38(0x57, fn_802037DC(new_var));
+        fn_80132A38(0x57, fightOutPokemonGetNicknamePtr(new_var));
         fn_800FA280(0x7721);
     } else {
-        fn_802037DC(val);
+        fightOutPokemonGetNicknamePtr(val);
     }
 }
 #pragma pop
@@ -992,7 +992,7 @@ void msgctrlDeffenceMons(void) {
     extern u32 fn_801F4354(u32, u32);
     extern u32 fn_801F18DC(u32);
     extern u32 fn_801F8100(u32);
-    extern u32 fn_802037DC(u32);
+    extern u32 fightOutPokemonGetNicknamePtr(u32);
     extern void fn_80132A38(u32, u32);
     extern void fn_800FA280(u32);
     u32 result;
@@ -1002,10 +1002,10 @@ void msgctrlDeffenceMons(void) {
     new_var = val;
     if (((u8)fn_801F18DC(0) == 1) && result != 0) {
         fn_80132A38(0x4D, fn_801F8100(result));
-        fn_80132A38(0x57, fn_802037DC(new_var));
+        fn_80132A38(0x57, fightOutPokemonGetNicknamePtr(new_var));
         fn_800FA280(0x7721);
     } else {
-        fn_802037DC(val);
+        fightOutPokemonGetNicknamePtr(val);
     }
 }
 #pragma pop
@@ -1028,7 +1028,7 @@ void msgctrlAttackMons(void) {
     extern u32 fn_801F4354(u32, u32);
     extern u32 fn_801F18DC(u32);
     extern u32 fn_801F8100(u32);
-    extern u32 fn_802037DC(u32);
+    extern u32 fightOutPokemonGetNicknamePtr(u32);
     extern void fn_80132A38(u32, u32);
     extern void fn_800FA280(u32);
     u32 result;
@@ -1038,10 +1038,10 @@ void msgctrlAttackMons(void) {
     new_var = val;
     if (((u8)fn_801F18DC(0) == 1) && result != 0) {
         fn_80132A38(0x4D, fn_801F8100(result));
-        fn_80132A38(0x57, fn_802037DC(new_var));
+        fn_80132A38(0x57, fightOutPokemonGetNicknamePtr(new_var));
         fn_800FA280(0x7721);
     } else {
-        fn_802037DC(new_var);
+        fightOutPokemonGetNicknamePtr(new_var);
     }
 }
 #pragma pop

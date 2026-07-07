@@ -701,10 +701,10 @@ void fn_80142A88(u32* base, u16 count) {
 #endif
 extern u8* itemDataBiosGetPtr(u16 idx);
 extern u8* itemBallDataBiosGetPtr(u16 idx);
-extern void fn_8020A328(u8* p, u16 val);
-extern void fn_8020A318(u8* p, u16 val);
-extern void fn_8020A308(u8* p, u32 val);
-extern void fn_8020A2F8(u8* p, u32 val);
+extern void fightItemBiosSetItemDataId(u8* p, u16 val);
+extern void fightItemBiosSetTargetDataId(u8* p, u16 val);
+extern void fightItemBiosSetCount(u8* p, u32 val);
+extern void fightItemBiosSetBuff(u8* p, u32 val);
 extern void jumptable_80367D60();
 #if 0
 asm void fn_80142B24(void* p, u32 a, u16 b, u32 c, u32 d) {
@@ -777,16 +777,16 @@ void fn_80142B24(void* p, u32 a, u16 b, u32 c, u32 d) {
         itemBiosSetNum(target, (u16)d);
         break;
     case 30:
-        fn_8020A328(target, (u16)d);
+        fightItemBiosSetItemDataId(target, (u16)d);
         break;
     case 31:
-        fn_8020A318(target, (u16)d);
+        fightItemBiosSetTargetDataId(target, (u16)d);
         break;
     case 32:
-        fn_8020A308(target, d);
+        fightItemBiosSetCount(target, d);
         break;
     case 33:
-        fn_8020A2F8(target, d);
+        fightItemBiosSetBuff(target, d);
         break;
     default:
         break;
@@ -817,10 +817,10 @@ extern u32 itemBallDataBiosGetSnatchShakeWzxDataId(u8* p);
 extern u32 itemBallDataBiosGetSnatchSnatchWzxDataId(u8* p);
 extern u32 itemBiosGetItemDataId(u8* p);
 extern u32 itemBiosGetNum(u8* p);
-extern u32 fn_8020A380(u8* p);
-extern u32 fn_8020A368(u8* p);
-extern u32 fn_8020A350(u8* p);
-extern u32 fn_8020A338(u8* p);
+extern u32 fightItemBiosGetItemDataId(u8* p);
+extern u32 fightItemBiosGetTargetDataId(u8* p);
+extern u32 fightItemBiosGetCount(u8* p);
+extern u32 fightItemBiosGetBuff(u8* p);
 extern void jumptable_80367DE8();
 #if 0
 asm s32 itemGetStatus(u32 a, u16 b, u16 c, u32 d) {
@@ -909,13 +909,13 @@ s32 itemGetStatus(u32 a, u16 b, u16 c, u32 d) {
     case 28:
         return (u16)itemBiosGetNum(target);
     case 30:
-        return (u16)fn_8020A380(target);
+        return (u16)fightItemBiosGetItemDataId(target);
     case 31:
-        return (u16)fn_8020A368(target);
+        return (u16)fightItemBiosGetTargetDataId(target);
     case 32:
-        return fn_8020A350(target);
+        return fightItemBiosGetCount(target);
     case 33:
-        return fn_8020A338(target);
+        return fightItemBiosGetBuff(target);
     default:
         return 0;
     }

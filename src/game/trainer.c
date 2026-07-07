@@ -30,13 +30,13 @@
  *   fn_801FAA58 (TrainerDataSet) - 169 calls
  *     Mirror of TrainerDataGet for writing values.
  *
- *   fn_80205B8C (GetTrainerPokemonPtr) - 668 calls, 0x58 bytes
+ *   fightOutPokemonGetPokemonPtr (GetTrainerPokemonPtr) - 668 calls, 0x58 bytes
  *     Navigates trainer -> party -> Pokemon by calling pokemonGetStatus twice:
  *       First call:  field=0xD6 (get party list)
  *       Second call: field=0xCC (get Pokemon from party slot)
  *     Returns the Pokemon data pointer, or NULL on any failure.
  *
- *   fn_80205BE8 (GetTrainerPokemonPtrSingle) - related helper
+ *   fightPokemonGetPokemonPtr (GetTrainerPokemonPtrSingle) - related helper
  *     Single-step version: just calls pokemonGetStatus with field=0xCC.
  *
  * TRAINER CATEGORY SUB-DISPATCHERS:
@@ -83,7 +83,7 @@
  *
  * Note: this file previously carried two fictional definitions --
  * GetTrainerPokemonPtr and GetTrainerPokemonPtrSingle -- claiming to be
- * fn_80205B8C and fn_80205BE8. Those two functions are actually
+ * fightOutPokemonGetPokemonPtr and fightPokemonGetPokemonPtr. Those two functions are actually
  * implemented and matched at 100% in colosseum_event.c, not here; the
  * fictional duplicates (which had no real callers) have been removed.
  *
@@ -155,7 +155,7 @@ u8 fn_801FCCAC(u8* ptr);
 void fn_801FAA58(void);
 void fn_801FB1C0(void);
 
-/* Note: fn_80205B8C and fn_80205BE8 (trainer -> party -> Pokemon pointer
+/* Note: fightOutPokemonGetPokemonPtr and fightPokemonGetPokemonPtr (trainer -> party -> Pokemon pointer
  * navigation, two-hop and single-hop) are actually defined and matched
  * at 100% in colosseum_event.c, not in this file. */
 
@@ -1847,7 +1847,7 @@ u8 fn_801FCCAC(u8* ptr) {
 /* 0x801F7F80 | size: 0x80 */
 void* fn_801F7F80(void* context, u16 count) {
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 index);
-    extern u8 fn_80206A04(void* ptr);
+    extern u8 fightPokemonCheckValid(void* ptr);
     int i;
     void* result;
 
@@ -1856,7 +1856,7 @@ void* fn_801F7F80(void* context, u16 count) {
     }
     for (i = 0; (u16)i < count; i++) {
         result = fn_801FB1C0(context, 0, 0x45, i);
-        if ((u8)fn_80206A04(result) == 0) {
+        if ((u8)fightPokemonCheckValid(result) == 0) {
             return result;
         }
     }
@@ -1948,11 +1948,11 @@ void* fn_801F8100(void* context) {
 /* 0x801F81F8 | size: 0x22C | large */
 void fn_801F81F8(void) {
     extern void fn_801FB1C0();
-    extern void fn_80204854();
-    extern void fn_80204928();
-    extern void fn_80206608();
-    extern void fn_80206780();
-    extern void fn_80206A04();
+    extern void fightOutPokemonCheckIrekaeReserveFightPokemon();
+    extern void fightPokemonCheckMotoFightPokemon();
+    extern void fightPokemonCheckFightOut();
+    extern void fightOutPokemonCheckValid();
+    extern void fightPokemonCheckValid();
     u8 sp[0x30];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -1989,7 +1989,7 @@ void fn_801F81F8(void) {
         r5 = 0x45;
         fn_801FB1C0();
         r31 = r3;
-        fn_80206A04();
+        fightPokemonCheckValid();
         r0 = r3 & 0xFF;
         if ((s32)r0 == (s32)0) {
             r31 = 0x0;
@@ -1997,7 +1997,7 @@ void fn_801F81F8(void) {
         do {
         if (r31 == (u32)0x0) break;
         r3 = r31;
-        fn_80206608();
+        fightPokemonCheckFightOut();
         r0 = r3 & 0xFF;
         if (r31 == (u32)0x0) {
             r0 = 0x1;
@@ -2020,7 +2020,7 @@ void fn_801F81F8(void) {
                 r5 = 0x46;
                 fn_801FB1C0();
                 r23 = r3;
-                fn_80206780();
+                fightOutPokemonCheckValid();
                 r0 = r3 & 0xFF;
                 if (r31 == (u32)0x0) {
                     r23 = 0x0;
@@ -2028,7 +2028,7 @@ void fn_801F81F8(void) {
                 if (r23 != (u32)0x0) {
                     r3 = r31;
                     r4 = r23;
-                    fn_80204928();
+                    fightPokemonCheckMotoFightPokemon();
                     r0 = r3 & 0xFF;
                     if (r0 == (u32)0x1) {
                         break;
@@ -2060,7 +2060,7 @@ void fn_801F81F8(void) {
                 r5 = 0x46;
                 fn_801FB1C0();
                 r23 = r3;
-                fn_80206780();
+                fightOutPokemonCheckValid();
                 r0 = r3 & 0xFF;
                 if (r31 == (u32)0x0) {
                     r23 = 0x0;
@@ -2068,7 +2068,7 @@ void fn_801F81F8(void) {
                 if (r23 != (u32)0x0) {
                     r3 = r23;
                     r4 = r31;
-                    fn_80204854();
+                    fightOutPokemonCheckIrekaeReserveFightPokemon();
                     r0 = r3 & 0xFF;
                     if (r0 == (u32)0x1) {
                         r0 = 0x1;
@@ -2154,14 +2154,14 @@ void fn_801F849C(void* arg0, u32 arg1) {
 
 /* 0x801F8518 | size: 0x98 */
 void* fn_801F8518(void* context, u32 index) {
-    extern u8 fn_80206780(void* ptr);
+    extern u8 fightOutPokemonCheckValid(void* ptr);
     extern u8 fn_801F1170(void* ptr);
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 idx);
     void* pokemon;
     void* sub;
 
     pokemon = fn_801FB1C0(context, 0, 0x46, index);
-    if ((u8)fn_80206780(pokemon) == 0) {
+    if ((u8)fightOutPokemonCheckValid(pokemon) == 0) {
         pokemon = NULL;
     }
     if (pokemon == NULL) {
@@ -2221,7 +2221,7 @@ void fn_801F86C0(void* context, u8 flag) {
     extern void fn_8012190C(void* ptr, u32 field, u32 val);
     extern u8 fn_80121ADC(void* ptr, u32 field);
     extern u16 pokemonGetSoubiItemDataId(void* pokemon);
-    extern u8 fn_80206A04(void* ptr);
+    extern u8 fightPokemonCheckValid(void* ptr);
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u16 idx);
     void* slot;
     u16 i;
@@ -2234,7 +2234,7 @@ void fn_801F86C0(void* context, u8 flag) {
     }
     for (i = 0; i < 6; i++) {
         slot = fn_801FB1C0(context, 0, 0x45, i);
-        if ((u8)fn_80206A04(slot) == 0) {
+        if ((u8)fightPokemonCheckValid(slot) == 0) {
             slot = NULL;
         }
         if (slot != NULL) {
@@ -2257,10 +2257,10 @@ void fn_801F86C0(void* context, u8 flag) {
 /* 0x801F87CC | size: 0x24C | large */
 void fn_801F87CC(void) {
     extern void fn_801FB1C0();
-    extern void fn_80204854();
-    extern void fn_80204928();
-    extern void fn_80206608();
-    extern void fn_80206780();
+    extern void fightOutPokemonCheckIrekaeReserveFightPokemon();
+    extern void fightPokemonCheckMotoFightPokemon();
+    extern void fightPokemonCheckFightOut();
+    extern void fightOutPokemonCheckValid();
     u8 sp[0x30];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -2309,7 +2309,7 @@ void fn_801F87CC(void) {
                 r5 = 0x45;
                 fn_801FB1C0();
                 r31 = r3;
-                fn_80206608();
+                fightPokemonCheckFightOut();
                 r0 = r3 & 0xFF;
                 if (r28 == (u32)0x0) {
                     r0 = 0x1;
@@ -2332,7 +2332,7 @@ void fn_801F87CC(void) {
                         r5 = 0x46;
                         fn_801FB1C0();
                         r26 = r3;
-                        fn_80206780();
+                        fightOutPokemonCheckValid();
                         r0 = r3 & 0xFF;
                         if (r31 == (u32)0x0) {
                             r26 = 0x0;
@@ -2340,7 +2340,7 @@ void fn_801F87CC(void) {
                         if (r26 != (u32)0x0) {
                             r3 = r31;
                             r4 = r26;
-                            fn_80204928();
+                            fightPokemonCheckMotoFightPokemon();
                             r0 = r3 & 0xFF;
                             if (r0 == (u32)0x1) {
                                 break;
@@ -2372,7 +2372,7 @@ void fn_801F87CC(void) {
                         r5 = 0x46;
                         fn_801FB1C0();
                         r26 = r3;
-                        fn_80206780();
+                        fightOutPokemonCheckValid();
                         r0 = r3 & 0xFF;
                         if (r31 == (u32)0x0) {
                             r26 = 0x0;
@@ -2380,7 +2380,7 @@ void fn_801F87CC(void) {
                         if (r26 != (u32)0x0) {
                             r3 = r26;
                             r4 = r31;
-                            fn_80204854();
+                            fightOutPokemonCheckIrekaeReserveFightPokemon();
                             r0 = r3 & 0xFF;
                             if (r0 == (u32)0x1) {
                                 r0 = 0x1;
@@ -2435,10 +2435,10 @@ void fn_801F87CC(void) {
 /* 0x801F8A18 | size: 0x1E8 | medium */
 void fn_801F8A18(void) {
     extern void fn_801FB1C0();
-    extern void fn_80204854();
-    extern void fn_80204928();
-    extern void fn_80206608();
-    extern void fn_80206780();
+    extern void fightOutPokemonCheckIrekaeReserveFightPokemon();
+    extern void fightPokemonCheckMotoFightPokemon();
+    extern void fightPokemonCheckFightOut();
+    extern void fightOutPokemonCheckValid();
     u8 sp[0x20];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -2469,7 +2469,7 @@ void fn_801F8A18(void) {
         r5 = 0x45;
         fn_801FB1C0();
         r31 = r3;
-        fn_80206608();
+        fightPokemonCheckFightOut();
         r0 = r3 & 0xFF;
         if (r30 == (u32)0x0) {
             r0 = 0x1;
@@ -2492,7 +2492,7 @@ void fn_801F8A18(void) {
                 r5 = 0x46;
                 fn_801FB1C0();
                 r27 = r3;
-                fn_80206780();
+                fightOutPokemonCheckValid();
                 r0 = r3 & 0xFF;
                 if (r31 == (u32)0x0) {
                     r27 = 0x0;
@@ -2500,7 +2500,7 @@ void fn_801F8A18(void) {
                 if (r27 != (u32)0x0) {
                     r3 = r31;
                     r4 = r27;
-                    fn_80204928();
+                    fightPokemonCheckMotoFightPokemon();
                     r0 = r3 & 0xFF;
                     if (r0 == (u32)0x1) {
                         break;
@@ -2532,7 +2532,7 @@ void fn_801F8A18(void) {
                 r5 = 0x46;
                 fn_801FB1C0();
                 r27 = r3;
-                fn_80206780();
+                fightOutPokemonCheckValid();
                 r0 = r3 & 0xFF;
                 if (r31 == (u32)0x0) {
                     r27 = 0x0;
@@ -2540,7 +2540,7 @@ void fn_801F8A18(void) {
                 if (r27 != (u32)0x0) {
                     r3 = r27;
                     r4 = r31;
-                    fn_80204854();
+                    fightOutPokemonCheckIrekaeReserveFightPokemon();
                     r0 = r3 & 0xFF;
                     if (r0 == (u32)0x1) {
                         r0 = 0x1;
@@ -2583,15 +2583,15 @@ void fn_801F8A18(void) {
 /* 0x801F8C00 | size: 0x180 */
 u32 fn_801F8C00(void* context, void* filter) {
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u16 idx);
-    extern u8 fn_80204854(void* pokemon, void* filter);
-    extern u8 fn_80204928(void* filter, void* pokemon);
-    extern u8 fn_80206608(void* ptr);
-    extern u8 fn_80206780(void* ptr);
+    extern u8 fightOutPokemonCheckIrekaeReserveFightPokemon(void* pokemon, void* filter);
+    extern u8 fightPokemonCheckMotoFightPokemon(void* filter, void* pokemon);
+    extern u8 fightPokemonCheckFightOut(void* ptr);
+    extern u8 fightOutPokemonCheckValid(void* ptr);
     void* pokemon;
     u8 found;
     u16 i;
 
-    if ((u8)fn_80206608(filter) == 0) {
+    if ((u8)fightPokemonCheckFightOut(filter) == 0) {
         return 1;
     }
     pokemon = NULL;
@@ -2602,11 +2602,11 @@ u32 fn_801F8C00(void* context, void* filter) {
     } else {
         for (i = 0; i < 2; i++) {
             pokemon = fn_801FB1C0(context, 0, 0x46, i);
-            if ((u8)fn_80206780(pokemon) == 0) {
+            if ((u8)fightOutPokemonCheckValid(pokemon) == 0) {
                 pokemon = NULL;
             }
             if (pokemon != NULL) {
-                if ((u8)fn_80204928(filter, pokemon) == 1) {
+                if ((u8)fightPokemonCheckMotoFightPokemon(filter, pokemon) == 1) {
                     break;
                 }
             }
@@ -2624,11 +2624,11 @@ u32 fn_801F8C00(void* context, void* filter) {
     } else {
         for (i = 0; i < 2; i++) {
             pokemon = fn_801FB1C0(context, 0, 0x46, i);
-            if ((u8)fn_80206780(pokemon) == 0) {
+            if ((u8)fightOutPokemonCheckValid(pokemon) == 0) {
                 pokemon = NULL;
             }
             if (pokemon != NULL) {
-                if ((u8)fn_80204854(pokemon, filter) == 1) {
+                if ((u8)fightOutPokemonCheckIrekaeReserveFightPokemon(pokemon, filter) == 1) {
                     found = 1;
                     break;
                 }
@@ -2642,8 +2642,8 @@ u32 fn_801F8C00(void* context, void* filter) {
 /* 0x801F8D80 | size: 0xB4 */
 void* fn_801F8D80(void* context, void* filter) {
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u16 idx);
-    extern u8 fn_80204928(void* filter, void* pokemon);
-    extern u8 fn_80206780(void* ptr);
+    extern u8 fightPokemonCheckMotoFightPokemon(void* filter, void* pokemon);
+    extern u8 fightOutPokemonCheckValid(void* ptr);
     void* pokemon;
     u16 i;
 
@@ -2655,11 +2655,11 @@ void* fn_801F8D80(void* context, void* filter) {
     }
     for (i = 0; i < 2; i++) {
         pokemon = fn_801FB1C0(context, 0, 0x46, i);
-        if ((u8)fn_80206780(pokemon) == 0) {
+        if ((u8)fightOutPokemonCheckValid(pokemon) == 0) {
             pokemon = NULL;
         }
         if (pokemon != NULL) {
-            if ((u8)fn_80204928(filter, pokemon) == 1) {
+            if ((u8)fightPokemonCheckMotoFightPokemon(filter, pokemon) == 1) {
                 return pokemon;
             }
         }
@@ -2670,9 +2670,9 @@ void* fn_801F8D80(void* context, void* filter) {
 /* 0x801F8E34 | size: 0xF0 */
 void* fn_801F8E34(void* context, void* filter) {
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u16 idx);
-    extern u8 fn_80204928(void* filter, void* pokemon);
-    extern u8 fn_802062FC(void* ptr);
-    extern u8 fn_80206780(void* ptr);
+    extern u8 fightPokemonCheckMotoFightPokemon(void* filter, void* pokemon);
+    extern u8 fightOutPokemonCheckFightOut(void* ptr);
+    extern u8 fightOutPokemonCheckValid(void* ptr);
     u16 i;
     void* pokemon;
 
@@ -2690,17 +2690,17 @@ void* fn_801F8E34(void* context, void* filter) {
     } else {
         for (i = 0; i < 2; i++) {
             pokemon = fn_801FB1C0(context, 0, 0x46, i);
-            if ((u8)fn_80206780(pokemon) == 0) {
+            if ((u8)fightOutPokemonCheckValid(pokemon) == 0) {
                 pokemon = NULL;
             }
-            if (pokemon != NULL && (u8)fn_80204928(filter, pokemon) == 1) {
+            if (pokemon != NULL && (u8)fightPokemonCheckMotoFightPokemon(filter, pokemon) == 1) {
                 break;
             }
         }
         pokemon = NULL;
     }
     if (pokemon != NULL) {
-        if ((u8)fn_802062FC(pokemon) == 0) {
+        if ((u8)fightOutPokemonCheckFightOut(pokemon) == 0) {
             pokemon = NULL;
         }
     }
@@ -2710,7 +2710,7 @@ void* fn_801F8E34(void* context, void* filter) {
 /* 0x801F8F24 | size: 0xB4 */
 void* fn_801F8F24(void* context, s16 speciesId) {
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u16 idx);
-    extern u8 fn_80206A04(void* ptr);
+    extern u8 fightPokemonCheckValid(void* ptr);
     void* pokemon;
     u16 i;
     s16 species;
@@ -2721,7 +2721,7 @@ void* fn_801F8F24(void* context, s16 speciesId) {
     }
     for (i = 0; i < 6; i++) {
         pokemon = fn_801FB1C0(context, 0, 0x45, i);
-        if ((u8)fn_80206A04(pokemon) == 0) {
+        if ((u8)fightPokemonCheckValid(pokemon) == 0) {
             pokemon = NULL;
         }
         if (pokemon != NULL) {
@@ -2774,8 +2774,8 @@ void* fn_801F90C4(void* arg0, void* arg1) {
     void* pokemon;
     void* trainerData;
 
-    extern void* fn_80205BE8(void*);
-    pokemon = fn_80205BE8(arg1);
+    extern void* fightPokemonGetPokemonPtr(void*);
+    pokemon = fightPokemonGetPokemonPtr(arg1);
     if (pokemon == NULL) {
         return NULL;
     }
@@ -2794,8 +2794,8 @@ void fn_801F9130(void* unused, void* trainer, void* pokemon) {
     extern u32 fn_801F0134(void* ptr, void* pokemon);
     extern u8 fn_801FF1BC(void* trainer, u32 mode);
     extern u8 fn_801FFEC8(void* trainer, s32 slot, u32 field, u32 flags);
-    extern void fn_80204F6C(void* trainer, u32 p1, u32 p2, u32 p3, void* table, u16 moveId, u32 nameId, u32 slotIdx);
-    extern void* fn_80205B8C(void* trainer);
+    extern void fightOutPokemonCreateFightActionAttackWaza(void* trainer, u32 p1, u32 p2, u32 p3, void* table, u16 moveId, u32 nameId, u32 slotIdx);
+    extern void* fightOutPokemonGetPokemonPtr(void* trainer);
     extern void fn_8022B2CC(void* trainer, u16 moveId, void* pokemon, u32 p3, u32 p4, u32 p5, s32 p6);
     s32 slot;
     u16 moveId;
@@ -2805,15 +2805,15 @@ void fn_801F9130(void* unused, void* trainer, void* pokemon) {
         return;
     }
     for (i = 0; (s8)i < 4; i++) {
-        moveId = (u16)(u32)pokemonGetStatus(fn_80205B8C(trainer), 0, 0x7F, 0);
+        moveId = (u16)(u32)pokemonGetStatus(fightOutPokemonGetPokemonPtr(trainer), 0, 0x7F, 0);
         slot = (s8)i;
         if ((u8)fn_801FFEC8(trainer, slot, 1, 0) == 0) {
-            moveId = (u16)(u32)pokemonGetStatus(fn_80205B8C(trainer), 0, 0x7F, slot);
+            moveId = (u16)(u32)pokemonGetStatus(fightOutPokemonGetPokemonPtr(trainer), 0, 0x7F, slot);
             break;
         }
     }
     fn_8022B2CC(trainer, moveId, pokemon, 0, 1, 0, -1);
-    fn_80204F6C(trainer, 0, 0x13, 0, (void*)lbl_80375CA8, moveId, fn_801F0134(trainer, pokemon), (u32)i);
+    fightOutPokemonCreateFightActionAttackWaza(trainer, 0, 0x13, 0, (void*)lbl_80375CA8, moveId, fn_801F0134(trainer, pokemon), (u32)i);
 }
 #pragma pop
 
@@ -2822,7 +2822,7 @@ u32 fn_801F923C(void* context, void* param) {
     extern u16 fn_801EF634(void* ctx);
     extern void fightActionInit(void* ptr);
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u16 idx);
-    extern void fn_80207760(void* ptr);
+    extern void fightOutPokemonInitFightActionBuff(void* ptr);
     extern void fn_802342CC(void* ctx, void* param);
     extern u8 fn_80262508(void* ctx, void* param);
     extern void fn_8026316C(void* ctx, void* param, u32 flags);
@@ -2837,9 +2837,9 @@ u32 fn_801F923C(void* context, void* param) {
         fightActionInit(result);
     }
     for (i = 0; i < 2; i++) {
-        fn_80207760(fn_801FB1C0(context, 0, 0x46, i));
+        fightOutPokemonInitFightActionBuff(fn_801FB1C0(context, 0, 0x46, i));
     }
-    fn_80207760(fn_801FB1C0(context, 0, 0x47, 0));
+    fightOutPokemonInitFightActionBuff(fn_801FB1C0(context, 0, 0x47, 0));
     if ((u16)fn_801EF634(context) == 1) {
         return 0;
     }
@@ -2877,10 +2877,10 @@ u32 fn_801F923C(void* context, void* param) {
 /* 0x801F93F8 | size: 0x208 | large */
 void fn_801F93F8(void) {
     extern void fn_801FB1C0();
-    extern void fn_80204854();
-    extern void fn_80204928();
-    extern void fn_80206608();
-    extern void fn_80206780();
+    extern void fightOutPokemonCheckIrekaeReserveFightPokemon();
+    extern void fightPokemonCheckMotoFightPokemon();
+    extern void fightPokemonCheckFightOut();
+    extern void fightOutPokemonCheckValid();
     u8 sp[0x20];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -2910,7 +2910,7 @@ void fn_801F93F8(void) {
             r5 = 0x45;
             fn_801FB1C0();
             r31 = r3;
-            fn_80206608();
+            fightPokemonCheckFightOut();
             r0 = r3 & 0xFF;
             if ((s32)r0 == (s32)0) {
                 r0 = 0x1;
@@ -2933,7 +2933,7 @@ void fn_801F93F8(void) {
                     r5 = 0x46;
                     fn_801FB1C0();
                     r28 = r3;
-                    fn_80206780();
+                    fightOutPokemonCheckValid();
                     r0 = r3 & 0xFF;
                     if (r31 == (u32)0x0) {
                         r28 = 0x0;
@@ -2941,7 +2941,7 @@ void fn_801F93F8(void) {
                     if (r28 != (u32)0x0) {
                         r3 = r31;
                         r4 = r28;
-                        fn_80204928();
+                        fightPokemonCheckMotoFightPokemon();
                         r0 = r3 & 0xFF;
                         if (r0 == (u32)0x1) {
                             break;
@@ -2973,7 +2973,7 @@ void fn_801F93F8(void) {
                     r5 = 0x46;
                     fn_801FB1C0();
                     r28 = r3;
-                    fn_80206780();
+                    fightOutPokemonCheckValid();
                     r0 = r3 & 0xFF;
                     if (r31 == (u32)0x0) {
                         r28 = 0x0;
@@ -2981,7 +2981,7 @@ void fn_801F93F8(void) {
                     if (r28 != (u32)0x0) {
                         r3 = r28;
                         r4 = r31;
-                        fn_80204854();
+                        fightOutPokemonCheckIrekaeReserveFightPokemon();
                         r0 = r3 & 0xFF;
                         if (r0 == (u32)0x1) {
                             r0 = 0x1;
@@ -3082,7 +3082,7 @@ s32 fn_801F9600(void* context, void* p1, void* p2, void* p3) {
 void fn_801F9790(void* context) {
     extern void fightActionInit(void* ptr);
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u16 idx);
-    extern void fn_80207760(void* ptr);
+    extern void fightOutPokemonInitFightActionBuff(void* ptr);
     void* result;
     u16 i;
 
@@ -3091,17 +3091,17 @@ void fn_801F9790(void* context) {
         fightActionInit(result);
     }
     for (i = 0; i < 2; i++) {
-        fn_80207760(fn_801FB1C0(context, 0, 0x46, i));
+        fightOutPokemonInitFightActionBuff(fn_801FB1C0(context, 0, 0x46, i));
     }
-    fn_80207760(fn_801FB1C0(context, 0, 0x47, 0));
+    fightOutPokemonInitFightActionBuff(fn_801FB1C0(context, 0, 0x47, 0));
 }
 
 /* 0x801F981C | size: 0x50 */
 void* fn_801F981C(void* arg1, u32 arg2) {
     extern void* fn_801FB1C0(void*, u32, u32, u32);
-    extern u32 fn_80206780(void*);
+    extern u32 fightOutPokemonCheckValid(void*);
     void* result = fn_801FB1C0(arg1, 0, 0x46, arg2);
-    if ((u8)fn_80206780(result) == 0) {
+    if ((u8)fightOutPokemonCheckValid(result) == 0) {
         return NULL;
     }
     return result;
@@ -3111,9 +3111,9 @@ void* fn_801F981C(void* arg1, u32 arg2) {
 /* 0x801F986C | size: 0x50 */
 void* fn_801F986C(void* arg1, u32 arg2) {
     extern void* fn_801FB1C0(void*, u32, u32, u32);
-    extern u32 fn_80206A04(void*);
+    extern u32 fightPokemonCheckValid(void*);
     void* result = fn_801FB1C0(arg1, 0, 0x45, arg2);
-    if ((u8)fn_80206A04(result) == 0) {
+    if ((u8)fightPokemonCheckValid(result) == 0) {
         return NULL;
     }
     return result;
@@ -3122,13 +3122,13 @@ void* fn_801F986C(void* arg1, u32 arg2) {
 /* 0x801F98BC | size: 0x74 */
 u32 fn_801F98BC(void* arg0) {
     extern void* fn_801FB1C0(void*, u32, u32, u32);
-    extern u32 fn_802062FC(void*);
+    extern u32 fightOutPokemonCheckFightOut(void*);
     u8 i;
     u32 count;
 
     count = 0;
     for (i = 0; i < 2; i++) {
-        if ((u8)fn_802062FC(fn_801FB1C0(arg0, 0, 0x46, i))) {
+        if ((u8)fightOutPokemonCheckFightOut(fn_801FB1C0(arg0, 0, 0x46, i))) {
             count = ((count & 0xFF) + 1) & 0xFF;
         }
     }
@@ -3138,14 +3138,14 @@ u32 fn_801F98BC(void* arg0) {
 /* 0x801F9930 | size: 0x98 */
 void* fn_801F9930(void* context, void* moveData) {
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 idx);
-    extern u8 fn_80206A04(void* ptr);
+    extern u8 fightPokemonCheckValid(void* ptr);
     int i;
     void* pokemon;
     void* data;
 
     for (i = 0; (u16)i < 6; i++) {
         pokemon = fn_801FB1C0(context, 0, 0x45, i);
-        if ((u8)fn_80206A04(pokemon) != 0) {
+        if ((u8)fightPokemonCheckValid(pokemon) != 0) {
             data = pokemonGetStatus(pokemon, 0, 0xCB, 0);
             if (data != NULL) {
                 if (moveData == data) {
@@ -3981,7 +3981,7 @@ u32 fn_801FA524(void* context) {
     extern u16 fn_801EF634(void* ctx);
     extern u8 heroCheckValid(void* ptr);
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 idx);
-    extern u8 fn_80206608(void* ptr);
+    extern u8 fightPokemonCheckFightOut(void* ptr);
     u8 valid;
     u8 count;
     u8 i;
@@ -4003,7 +4003,7 @@ u32 fn_801FA524(void* context) {
     }
     count = 0;
     for (i = count; i < 6; i++) {
-        if ((u8)fn_80206608(fn_801FB1C0(context, 0, 0x45, i)) != 0) {
+        if ((u8)fightPokemonCheckFightOut(fn_801FB1C0(context, 0, 0x45, i)) != 0) {
             count = (u8)(count + 1);
         }
     }
@@ -4041,19 +4041,19 @@ void fn_801FA6D8(void* trainer, void* arg1, u16 arg2, u32 arg3, u32 arg4) {
     extern void fn_801F198C(void);
     extern void fn_801FAA58(void* ctx, u32 slot, u32 field, u32 idx, u32 val);
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 idx);
-    extern void fn_80206C3C(void* ptr, u32 count);
-    extern void fn_80206C94(void* ptr);
-    extern void fn_802077D4(void* ptr, u32 count);
-    extern void fn_8020ECE0(void* ptr, u32 count);
+    extern void fightOutPokemonInitAry(void* ptr, u32 count);
+    extern void fightOutPokemonInit(void* ptr);
+    extern void fightPokemonInitAry(void* ptr, u32 count);
+    extern void fightTrainerEnemyPokemonInitAry(void* ptr, u32 count);
     void* result;
 
     if (trainer != NULL && arg1 != NULL) {
         if (trainer != NULL) {
             heroInit(fn_801FB1C0(trainer, 0, 0x44, 0));
             fn_801FAA58(trainer, 0, 0x43, 0, 0);
-            fn_802077D4(fn_801FB1C0(trainer, 0, 0x45, 0), 6);
-            fn_80206C3C(fn_801FB1C0(trainer, 0, 0x46, 0), 2);
-            fn_80206C94(fn_801FB1C0(trainer, 0, 0x47, 0));
+            fightPokemonInitAry(fn_801FB1C0(trainer, 0, 0x45, 0), 6);
+            fightOutPokemonInitAry(fn_801FB1C0(trainer, 0, 0x46, 0), 2);
+            fightOutPokemonInit(fn_801FB1C0(trainer, 0, 0x47, 0));
             fn_801FAA58(trainer, 0, 0x48, 0, 1);
             fn_801FAA58(trainer, 0, 0x49, 0, 0);
             fn_801FAA58(trainer, 0, 0x4A, 0, 0);
@@ -4063,7 +4063,7 @@ void fn_801FA6D8(void* trainer, void* arg1, u16 arg2, u32 arg3, u32 arg4) {
             if (result != NULL) {
                 fightActionInit(result);
             }
-            fn_8020ECE0(fn_801FB1C0(trainer, 0, 0x4E, 0), 0xC);
+            fightTrainerEnemyPokemonInitAry(fn_801FB1C0(trainer, 0, 0x4E, 0), 0xC);
         }
         result = fn_801FB1C0(trainer, 0, 0x44, 0);
         if (result != NULL) {
@@ -4084,10 +4084,10 @@ void fn_801FA8CC(void* base, u16 count) {
     extern void fightActionInit(void* ptr);
     extern void fn_801FAA58(void* ctx, u32 slot, u32 field, u32 idx, u32 val);
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 idx);
-    extern void fn_80206C3C(void* ptr, u32 count);
-    extern void fn_80206C94(void* ptr);
-    extern void fn_802077D4(void* ptr, u32 count);
-    extern void fn_8020ECE0(void* ptr, u32 count);
+    extern void fightOutPokemonInitAry(void* ptr, u32 count);
+    extern void fightOutPokemonInit(void* ptr);
+    extern void fightPokemonInitAry(void* ptr, u32 count);
+    extern void fightTrainerEnemyPokemonInitAry(void* ptr, u32 count);
     u8* trainer;
     void* result;
     u16 i;
@@ -4100,9 +4100,9 @@ void fn_801FA8CC(void* base, u16 count) {
         if (trainer != NULL) {
             heroInit(fn_801FB1C0(trainer, 0, 0x44, 0));
             fn_801FAA58(trainer, 0, 0x43, 0, 0);
-            fn_802077D4(fn_801FB1C0(trainer, 0, 0x45, 0), 6);
-            fn_80206C3C(fn_801FB1C0(trainer, 0, 0x46, 0), 2);
-            fn_80206C94(fn_801FB1C0(trainer, 0, 0x47, 0));
+            fightPokemonInitAry(fn_801FB1C0(trainer, 0, 0x45, 0), 6);
+            fightOutPokemonInitAry(fn_801FB1C0(trainer, 0, 0x46, 0), 2);
+            fightOutPokemonInit(fn_801FB1C0(trainer, 0, 0x47, 0));
             fn_801FAA58(trainer, 0, 0x48, 0, 1);
             fn_801FAA58(trainer, 0, 0x49, 0, 0);
             fn_801FAA58(trainer, 0, 0x4A, 0, 0);
@@ -4112,7 +4112,7 @@ void fn_801FA8CC(void* base, u16 count) {
             if (result != NULL) {
                 fightActionInit(result);
             }
-            fn_8020ECE0(fn_801FB1C0(trainer, 0, 0x4E, 0), 0xC);
+            fightTrainerEnemyPokemonInitAry(fn_801FB1C0(trainer, 0, 0x4E, 0), 0xC);
         }
     }
 }
@@ -4195,9 +4195,9 @@ void fn_801FAA58(void) {
     extern void fn_801FCD38();
     extern void fn_801FCD48();
     extern void fn_801FCD8C();
-    extern void fn_8020E7AC();
-    extern void fn_8020E95C();
-    extern void fn_8020EBA8();
+    extern void fightTrainerEnemyPokemonEraseAry();
+    extern void fightTrainerEnemyPokemonRegistAry();
+    extern void fightTrainerEnemyPokemonSearchAry();
     extern void fightTrainerEnemyPokemonInitFightOutStatus();
     extern u8 jumptable_80375670[];
     u8 sp[0x20];
@@ -4485,7 +4485,7 @@ void fn_801FAA58(void) {
 
         r5 = r30;
         r4 = 0xc;
-        fn_8020EBA8();
+        fightTrainerEnemyPokemonSearchAry();
     }
     }
     if (r3 == (u32)0x0) return;
@@ -4504,7 +4504,7 @@ void fn_801FAA58(void) {
 
         r5 = r30;
         r4 = 0xc;
-        fn_8020EBA8();
+        fightTrainerEnemyPokemonSearchAry();
     }
     }
     if (r3 == (u32)0x0) return;
@@ -4522,7 +4522,7 @@ void fn_801FAA58(void) {
 
         r5 = r30;
         r4 = 0xc;
-        fn_8020EBA8();
+        fightTrainerEnemyPokemonSearchAry();
     }
     }
     if (r3 == (u32)0x0) return;
@@ -4540,7 +4540,7 @@ void fn_801FAA58(void) {
 
         r5 = r30;
         r4 = 0xc;
-        fn_8020EBA8();
+        fightTrainerEnemyPokemonSearchAry();
     }
     }
     if (r3 == (u32)0x0) return;
@@ -4558,7 +4558,7 @@ void fn_801FAA58(void) {
 
         r5 = r30;
         r4 = 0xc;
-        fn_8020EBA8();
+        fightTrainerEnemyPokemonSearchAry();
     }
     }
     if (r3 == (u32)0x0) return;
@@ -4576,7 +4576,7 @@ void fn_801FAA58(void) {
 
         r5 = r30;
         r4 = 0xc;
-        fn_8020EBA8();
+        fightTrainerEnemyPokemonSearchAry();
     }
     }
     if (r3 == (u32)0x0) return;
@@ -4594,7 +4594,7 @@ void fn_801FAA58(void) {
 
         r5 = r30;
         r4 = 0xc;
-        fn_8020EBA8();
+        fightTrainerEnemyPokemonSearchAry();
     }
     }
     if (r3 == (u32)0x0) return;
@@ -4612,7 +4612,7 @@ void fn_801FAA58(void) {
 
         r5 = r30;
         r4 = 0xc;
-        fn_8020EBA8();
+        fightTrainerEnemyPokemonSearchAry();
     }
     }
     if (r3 == (u32)0x0) return;
@@ -4626,7 +4626,7 @@ void fn_801FAA58(void) {
     if (r3 == (u32)0x0) return;
     r5 = (s16)r31;
     r4 = 0xc;
-    fn_8020E95C();
+    fightTrainerEnemyPokemonRegistAry();
     return;
     r4 = 0x0;
     r5 = 0x4e;
@@ -4635,7 +4635,7 @@ void fn_801FAA58(void) {
     if (r3 == (u32)0x0) return;
     r5 = (s16)r31;
     r4 = 0xc;
-    fn_8020E7AC();
+    fightTrainerEnemyPokemonEraseAry();
     return;
     r30 = (s16)r28;
     if (r3 >= (u32)0x0) {
@@ -4648,7 +4648,7 @@ void fn_801FAA58(void) {
 
         r5 = r30;
         r4 = 0xc;
-        fn_8020EBA8();
+        fightTrainerEnemyPokemonSearchAry();
     }
     }
     if (r3 == (u32)0x0) return;
@@ -4741,7 +4741,7 @@ void fn_801FB1C0(void) {
     extern void fn_801FCE60();
     extern void fn_801FCE94();
     extern void fn_801FCEAC();
-    extern void fn_8020EBA8();
+    extern void fightTrainerEnemyPokemonSearchAry();
     extern u8 jumptable_803757D8[];
     u8 sp[0x20];
     u32 r0 = 0;
@@ -5042,7 +5042,7 @@ void fn_801FB1C0(void) {
 
         r5 = r31;
         r4 = 0xc;
-        fn_8020EBA8();
+        fightTrainerEnemyPokemonSearchAry();
     }
     }
     if (r3 == (u32)0x0) {
@@ -5064,7 +5064,7 @@ void fn_801FB1C0(void) {
 
         r5 = r31;
         r4 = 0xc;
-        fn_8020EBA8();
+        fightTrainerEnemyPokemonSearchAry();
     }
     }
     if (r3 == (u32)0x0) {
@@ -5085,7 +5085,7 @@ void fn_801FB1C0(void) {
 
         r5 = r31;
         r4 = 0xc;
-        fn_8020EBA8();
+        fightTrainerEnemyPokemonSearchAry();
     }
     }
     if (r3 == (u32)0x0) {
@@ -5106,7 +5106,7 @@ void fn_801FB1C0(void) {
 
         r5 = r31;
         r4 = 0xc;
-        fn_8020EBA8();
+        fightTrainerEnemyPokemonSearchAry();
     }
     }
     if (r3 == (u32)0x0) {
@@ -5127,7 +5127,7 @@ void fn_801FB1C0(void) {
 
         r5 = r31;
         r4 = 0xc;
-        fn_8020EBA8();
+        fightTrainerEnemyPokemonSearchAry();
     }
     }
     if (r3 == (u32)0x0) {
@@ -5148,7 +5148,7 @@ void fn_801FB1C0(void) {
 
         r5 = r31;
         r4 = 0xc;
-        fn_8020EBA8();
+        fightTrainerEnemyPokemonSearchAry();
     }
     }
     if (r3 == (u32)0x0) {
@@ -5169,7 +5169,7 @@ void fn_801FB1C0(void) {
 
         r5 = r31;
         r4 = 0xc;
-        fn_8020EBA8();
+        fightTrainerEnemyPokemonSearchAry();
     }
     }
     if (r3 == (u32)0x0) {
@@ -5190,7 +5190,7 @@ void fn_801FB1C0(void) {
 
         r5 = r31;
         r4 = 0xc;
-        fn_8020EBA8();
+        fightTrainerEnemyPokemonSearchAry();
     }
     }
     if (r3 == (u32)0x0) {
@@ -5333,7 +5333,7 @@ void fn_801FBC20(void* context, void* trainerCtx, u8 mode) {
     extern void fn_801DA9E8(void* ptr, u32 field, u32 size);
     extern void fn_801DDD28(void* ptr, u32 field, u32 size, u32 flags);
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 idx);
-    extern void* fn_80205B8C(void* ctx);
+    extern void* fightOutPokemonGetPokemonPtr(void* ctx);
     void* data;
     u8 typeId;
     u16 animId;
@@ -5341,7 +5341,7 @@ void fn_801FBC20(void* context, void* trainerCtx, u8 mode) {
     if ((data = fn_801FB1C0(context, 0, 0x4C, 0)) == NULL) {
         return;
     }
-    typeId = (u8)(u32)pokemonGetStatus(fn_80205B8C(trainerCtx), 0, 0x73, 0);
+    typeId = (u8)(u32)pokemonGetStatus(fightOutPokemonGetPokemonPtr(trainerCtx), 0, 0x73, 0);
     animId = (u16)itemGetStatus(0, typeId, 0x11, 0);
     if (mode == 0) {
         fn_801DDD28(data, animId, 4, 0);
@@ -6505,7 +6505,7 @@ void fn_801FE468(void* context, u8* dest) {
 
 /* 0x801FE55C | size: 0x78 */
 void fn_801FE55C(void* self, void* other, u32 offset) {
-    extern void* fn_8020E57C(void* data, u32 mode, void* key);
+    extern void* fightOutPokemonEnemySearchAry(void* data, u32 mode, void* key);
     extern u32 fn_801FD0BC(void* ptr);
     extern void fn_801FD07C(void* ptr, u32 val);
     void* data;
@@ -6516,7 +6516,7 @@ void fn_801FE55C(void* self, void* other, u32 offset) {
         if (other != NULL) {
             if (self != other) {
                 data = pokemonGetStatus(other, 0, 0x122, 0);
-                if ((result = fn_8020E57C(data, 4, self)) != NULL) {
+                if ((result = fightOutPokemonEnemySearchAry(data, 4, self)) != NULL) {
                     val = fn_801FD0BC(result);
                     val += offset;
                     fn_801FD07C(result, val);
@@ -7084,8 +7084,8 @@ void fn_801FF1BC(void) {
     extern void fn_801F11CC();
     extern void fn_801F54A4();
     extern void fn_801FFB30();
-    extern void fn_802099AC();
-    extern void fn_8020D878();
+    extern void fightWazaCreate();
+    extern void fightActionBiosSetBuffDataId();
     extern void fn_8022B2CC();
     u8 sp[0x20];
     u32 r0 = 0;
@@ -7347,7 +7347,7 @@ void fn_801FF1BC(void) {
                 r4 = -0x1;
                 r5 = 0xa5;
                 r7 = 0x1;
-                fn_802099AC();
+                fightWazaCreate();
                 r3 = r31;
                 r4 = 0x0;
                 r5 = 0xfe;
@@ -7366,7 +7366,7 @@ void fn_801FF1BC(void) {
                     if (r0 == (u32)0x1) {
                         r3 = r26;
                         r4 = 0xa5;
-                        fn_8020D878();
+                        fightActionBiosSetBuffDataId();
         }
         }
         }
@@ -7684,7 +7684,7 @@ void fn_801FF1BC(void) {
     r5 = r28;
     r6 = r26;
     r7 = 0x1;
-    fn_802099AC();
+    fightWazaCreate();
     r3 = r31;
     r4 = 0x0;
     r5 = 0xfe;
@@ -7703,7 +7703,7 @@ void fn_801FF1BC(void) {
     if (r0 != (u32)0x1) { r3 = 0x2; return; }
     r3 = r26;
     r4 = r28;
-    fn_8020D878();
+    fightActionBiosSetBuffDataId();
 
     r3 = 0x2;
     return;
@@ -9320,7 +9320,7 @@ void fn_802010C8(void) {
 
 /* 0x80201248 | size: 0xF8 */
 u8 fn_80201248(void* context, u16* output) {
-    extern u8 fn_8020E614(void* entry);
+    extern u8 fightOutPokemonEnemyCheckValid(void* entry);
     extern u16 fn_801FD0EC(void* entry);
     u8* entryList;
     u8* entry;
@@ -9340,7 +9340,7 @@ u8 fn_80201248(void* context, u16* output) {
     count = 0;
     for (i = 0; i < 4; i++) {
         entry = entryList + i * 0xC;
-        if ((u8)fn_8020E614((void*)entry) != 0) {
+        if ((u8)fightOutPokemonEnemyCheckValid((void*)entry) != 0) {
             moveId = fn_801FD0EC((void*)entry);
             if (moveId != 0) {
                 if (moveId != 0x165) {
@@ -9358,8 +9358,8 @@ u8 fn_80201248(void* context, u16* output) {
 /* 0x80201340 | size: 0xC0 */
 void fn_80201340(void* context, void* target, u16 value) {
     extern void fn_801FD09C(void* entry, u16 val);
-    extern void* fn_8020E57C(void* data, u32 mode, void* key);
-    extern u8 fn_8020E614(void* entry);
+    extern void* fightOutPokemonEnemySearchAry(void* data, u32 mode, void* key);
+    extern u8 fightOutPokemonEnemyCheckValid(void* entry);
     u8* data;
     u8* entry;
     u32 offset;
@@ -9371,17 +9371,17 @@ void fn_80201340(void* context, void* target, u16 value) {
     pokemonSetStatus(context, 0, 0xF7, 0, value);
     data = (u8*)pokemonGetStatus(context, 0, 0x122, 0);
     if (target != NULL) {
-        if (fn_8020E57C((void*)data, 4, target) == NULL) {
+        if (fightOutPokemonEnemySearchAry((void*)data, 4, target) == NULL) {
             return;
         }
-        fn_801FD09C(fn_8020E57C((void*)data, 4, target), value);
+        fn_801FD09C(fightOutPokemonEnemySearchAry((void*)data, 4, target), value);
         return;
     }
     i = 0;
     offset = 0;
     do {
         entry = data + offset;
-        if ((u8)fn_8020E614((void*)entry) != 0) {
+        if ((u8)fightOutPokemonEnemyCheckValid((void*)entry) != 0) {
             fn_801FD09C((void*)entry, value);
         }
         i++;

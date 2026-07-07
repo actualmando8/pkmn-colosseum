@@ -265,14 +265,14 @@ void fn_80069C0C(void* arg0) {
     extern void heroBiosCopy();
     extern void __assert();
     extern void fn_801F9CBC();
-    extern void fn_8020DEF0();
-    extern void fn_8020DF00();
-    extern void fn_8020DF10();
-    extern void fn_8020DF50();
-    extern void fn_8020DF90();
-    extern void fn_8020DFA0();
-    extern void fn_8020DFB0();
-    extern void fn_8020E0F8();
+    extern void fightEncountDataBiosSetSyoukaiWzxDataId();
+    extern void fightEncountDataBiosSetBgmSndId();
+    extern void fightEncountDataBiosSetGSInputDevice();
+    extern void fightEncountDataBiosSetFightTrainerDataId();
+    extern void fightEncountDataBiosSetFightFloorDataId();
+    extern void fightEncountDataBiosSetTrainer();
+    extern void fightEncountDataBiosSetFightKind();
+    extern void fightEncountDataBiosGetPtr();
     u8 sp[0xB90];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -312,7 +312,7 @@ void fn_80069C0C(void* arg0) {
         __assert();
     }
     r3 = r25;
-    fn_8020E0F8();
+    fightEncountDataBiosGetPtr();
     r0 = *(u32*)((u8*)r31 + 0x0);
     r30 = r3;
     if ((s32)r0 != (s32)0x1) {
@@ -376,7 +376,7 @@ void fn_80069C0C(void* arg0) {
     *(u32*)&lbl_8047A5D8 = r0;
     L_80069D7C: ;
     r3 = r30;
-    fn_8020DF00();
+    fightEncountDataBiosSetBgmSndId();
     r0 = *(u32*)((u8*)r31 + 0x0);
     do {
         if ((s32)r0 != (s32)0x1) break;
@@ -412,7 +412,7 @@ void fn_80069C0C(void* arg0) {
     r4 = r0;
     L_80069E08: ;
     r3 = r30;
-    fn_8020DF90();
+    fightEncountDataBiosSetFightFloorDataId();
     r0 = *(u32*)((u8*)r31 + 0x0);
     if ((s32)r0 != (s32)0x2) {
         if ((s32)r0 < (s32)0x2) {
@@ -433,51 +433,51 @@ void fn_80069C0C(void* arg0) {
             if (r0 < (u32)0x7) {
                 r3 = r30;
                 r4 = 0xd;
-                fn_8020DFB0();
+                fightEncountDataBiosSetFightKind();
             } else {
 
                 r3 = r30;
                 r4 = 0xe;
-                fn_8020DFB0();
+                fightEncountDataBiosSetFightKind();
             }
             r0 = *(u32*)((u8*)r31 + 0x14);
             r4 = r29 + 0x1c;
             r3 = r30;
             r0 = r0 << 2;
             r4 = *(u32*)(r4 + r0);
-            fn_8020DEF0();
+            fightEncountDataBiosSetSyoukaiWzxDataId();
             goto L_80069F04;
                 }
         r0 = *(u32*)((u8*)r31 + 0x14);
         if (r0 < (u32)0x63) {
             r3 = r30;
             r4 = 0xf;
-            fn_8020DFB0();
+            fightEncountDataBiosSetFightKind();
         } else {
 
             r3 = r30;
             r4 = 0x12;
-            fn_8020DFB0();
+            fightEncountDataBiosSetFightKind();
         }
         r3 = r30;
         r4 = 0x0;
-        fn_8020DEF0();
+        fightEncountDataBiosSetSyoukaiWzxDataId();
         goto L_80069F04;
     }
     r3 = r30;
     r4 = 0x10;
-    fn_8020DFB0();
+    fightEncountDataBiosSetFightKind();
     r3 = r30;
     r4 = 0x0;
-    fn_8020DEF0();
+    fightEncountDataBiosSetSyoukaiWzxDataId();
     goto L_80069F04;
     L_80069EEC: ;
     r3 = r30;
     r4 = 0xc;
-    fn_8020DFB0();
+    fightEncountDataBiosSetFightKind();
     r3 = r30;
     r4 = 0x0;
-    fn_8020DEF0();
+    fightEncountDataBiosSetSyoukaiWzxDataId();
     L_80069F04: ;
     ((void(*)(void))fn_80077DB8)();
     if ((s32)r3 == (s32)0x6) {
@@ -491,17 +491,17 @@ void fn_80069C0C(void* arg0) {
         } else {
         r3 = r30;
         r4 = 0x1;
-        fn_8020DFA0();
+        fightEncountDataBiosSetTrainer();
         goto L_80069FFC;
         }
         r3 = r30;
         r4 = 0x2;
-        fn_8020DFA0();
+        fightEncountDataBiosSetTrainer();
         goto L_80069FFC;
         L_80069F54: ;
         r3 = r30;
         r4 = 0x0;
-        fn_8020DFA0();
+        fightEncountDataBiosSetTrainer();
         goto L_80069FFC;
     }
     r0 = *(u32*)((u8*)r31 + 0x4);
@@ -520,7 +520,7 @@ void fn_80069C0C(void* arg0) {
     }
     r3 = r30;
     r4 = 0x5;
-    fn_8020DFA0();
+    fightEncountDataBiosSetTrainer();
     goto L_80069FFC;
     }
     if ((s32)r3 != (s32)0x2) {
@@ -531,7 +531,7 @@ void fn_80069C0C(void* arg0) {
     }
     r3 = r30;
     r4 = 0x6;
-    fn_8020DFA0();
+    fightEncountDataBiosSetTrainer();
     goto L_80069FFC;
     L_80069FD8: ;
     if ((s32)r3 != (s32)0x3) {
@@ -542,7 +542,7 @@ void fn_80069C0C(void* arg0) {
     }
     r3 = r30;
     r4 = 0x4;
-    fn_8020DFA0();
+    fightEncountDataBiosSetTrainer();
     L_80069FFC: ;
     r0 = *(u32*)((u8*)r31 + 0x0);
     if ((s32)r0 != (s32)0x2) {
@@ -920,36 +920,36 @@ void fn_80069C0C(void* arg0) {
         r5 = *(u16*)((u8*)r31 + 0x2CE4);
         r3 = r30;
         r4 = 0x2;
-        fn_8020DF50();
+        fightEncountDataBiosSetFightTrainerDataId();
         r5 = *(u16*)((u8*)r31 + 0x4344);
         r3 = r30;
         r4 = 0x3;
-        fn_8020DF50();
+        fightEncountDataBiosSetFightTrainerDataId();
         r5 = *(u32*)((u8*)r31 + 0x2D08);
         r3 = r30;
         r4 = 0x2;
-        fn_8020DF10();
+        fightEncountDataBiosSetGSInputDevice();
         r5 = *(u32*)((u8*)r31 + 0x4368);
         r3 = r30;
         r4 = 0x3;
-        fn_8020DF10();
+        fightEncountDataBiosSetGSInputDevice();
         }
     r5 = *(u16*)((u8*)r31 + 0x24);
     r3 = r30;
     r4 = 0x0;
-    fn_8020DF50();
+    fightEncountDataBiosSetFightTrainerDataId();
     r5 = *(u16*)((u8*)r31 + 0x1684);
     r3 = r30;
     r4 = 0x1;
-    fn_8020DF50();
+    fightEncountDataBiosSetFightTrainerDataId();
     r5 = *(u32*)((u8*)r31 + 0x48);
     r3 = r30;
     r4 = 0x0;
-    fn_8020DF10();
+    fightEncountDataBiosSetGSInputDevice();
     r5 = *(u32*)((u8*)r31 + 0x16A8);
     r3 = r30;
     r4 = 0x1;
-    fn_8020DF10();
+    fightEncountDataBiosSetGSInputDevice();
     L_8006A63C: ;
     r0 = 0x1;
     r3 = 0x0;

@@ -345,7 +345,7 @@ void fn_800896E8(void) {
     extern void fn_801FCC3C();
     extern void fn_801FCC54();
     extern void fn_801FCCC4();
-    extern void fn_8020E0F8();
+    extern void fightEncountDataBiosGetPtr();
     u8 sp[0x20];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -401,7 +401,7 @@ void fn_800896E8(void) {
     tmp = 0x2;
     r3 = 0x231;
     *(u8*)((u8*)r31 + 0x4000) = tmp;
-    fn_8020E0F8();
+    fightEncountDataBiosGetPtr();
     r3 = 0x9;
     fn_801FCCC4();
     r4 = *(u8*)((u8*)r31 + 0x4124);
@@ -920,14 +920,14 @@ void fn_80089F78(void) {
     extern void fn_801FDB78();
     extern void fn_801FF1BC();
     extern void fn_801FFEC8();
-    extern void fn_802042E0();
-    extern void fn_80205B8C();
-    extern void fn_80205BE8();
-    extern void fn_80207BF4();
-    extern void fn_8020E1A4();
-    extern void fn_8020E1BC();
-    extern void fn_8020E1D4();
-    extern void fn_8020E204();
+    extern void fightPokemonGetSoubiItemDataId();
+    extern void fightOutPokemonGetPokemonPtr();
+    extern void fightPokemonGetPokemonPtr();
+    extern void fightOutPokemonGetTokuseiDataId();
+    extern void fightTypeDataBiosGetFightoutPokemonNum();
+    extern void fightTypeDataBiosGetEntryPokemonNum();
+    extern void fightTypeDataBiosGetTrainerNum();
+    extern void fightTypeDataBiosGetPtr();
     extern void fn_8022B2CC();
     extern void fn_80265924();
     extern void fn_8008A99C();
@@ -971,15 +971,15 @@ void fn_80089F78(void) {
     fn_801F54A4();
     r24 = r3 & 0xFFFF;
     r3 = r24;
-    fn_8020E204();
+    fightTypeDataBiosGetPtr();
     r18 = r3;
-    fn_8020E1D4();
+    fightTypeDataBiosGetTrainerNum();
     r19 = r3;
     r3 = r18;
-    fn_8020E1BC();
+    fightTypeDataBiosGetEntryPokemonNum();
     r16 = r3;
     r3 = r18;
-    fn_8020E1A4();
+    fightTypeDataBiosGetFightoutPokemonNum();
     r18 = r3;
     r3 = r19 & 0xFF;
     tmp = r18 & 0xFF;
@@ -1095,7 +1095,7 @@ void fn_80089F78(void) {
         fn_801F986C();
         r29 = r3;
         if (r29 == 0) break;
-        fn_80205BE8();
+        fightPokemonGetPokemonPtr();
         r17 = r3;
         fn_8011E7C0();
         tmp = r3 & 0xFFFF;
@@ -1124,7 +1124,7 @@ void fn_80089F78(void) {
         r3 = r29;
         tmp = r20 & 0xFF;
         *(u8*)((u8*)r27 + 0x26) = tmp;
-        fn_802042E0();
+        fightPokemonGetSoubiItemDataId();
         r5 = r3 & 0xFFFF;
         tmp = *(u8*)((u8*)r27 + 0x27);
         r4 = -r5;
@@ -1162,7 +1162,7 @@ void fn_80089F78(void) {
         tmp = *(u8*)((u8*)r27 + 0x27);
         tmp = (tmp & ~0x0000000F) | (((r4 << 0) | (r4 >> 32)) & 0x0000000F);
         *(u8*)((u8*)r27 + 0x27) = tmp;
-        fn_802042E0();
+        fightPokemonGetSoubiItemDataId();
         tmp = r3 & 0xFFFF;
         r31 = r27;
         r3 = tmp << 8;
@@ -1233,7 +1233,7 @@ void fn_80089F78(void) {
     r3 = r22;
     r26 = 0x0;
     *(u32*)(sp + 0x3C) = tmp;
-    fn_80205B8C();
+    fightOutPokemonGetPokemonPtr();
     tmp = r3;
     r3 = r22;
     r21 = tmp;
@@ -1320,7 +1320,7 @@ void fn_80089F78(void) {
         fn_801F2020();
         tmp = r3 & 0xFF;
         if (tmp == 2) {
-            fn_80207BF4();
+            fightOutPokemonGetTokuseiDataId();
             tmp = r3 & 0xFFFF;
             if (tmp == 0x17) {
                 tmp = 0x2;
@@ -1457,7 +1457,7 @@ void fn_80089F78(void) {
             *(u8*)((u8*)r25 + 0x81C) = tmp;
         } else {
 
-            fn_80205B8C();
+            fightOutPokemonGetPokemonPtr();
             r18 = r3;
             fn_8011F598();
             r17 = r3;
