@@ -5,7 +5,7 @@ import argparse
 import re
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 SYMBOLS_FILE = REPO_ROOT / "config" / "GC6E01" / "symbols.txt"
 

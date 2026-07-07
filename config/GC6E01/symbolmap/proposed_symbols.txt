@@ -1,1 +1,6 @@
-
+fn_8019FF30 -> HSD_JObjGetFlags  // body: if(!r3)return 0; return r3->0x14 (flags getter); XD size 0x18 match
+fn_801A6DDC -> HSD_MObjSetAlpha  // body: stores float f1 into matobj sub-object; XD size match
+fn_8019CFBC -> JObjRelease  // body: HSD_VecFree + HSD_IDGetDataFromTable cleanup; XD Δ+8
+fn_8019F01C -> HSD_JObjGetCurrent  // body: returns current-jobj global lbl_8047B2AC; XD size 8 exact
+fn_801A015C -> HSD_JObjAddChild  // body: (parent r3, child r4) list manip; XD Δ+8
+fn_8019CF54 -> JObjAmnesia  // body: clears current-jobj globals when they point to r3; XD Δ+4

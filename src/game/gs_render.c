@@ -4908,7 +4908,7 @@ asm void fn_800DF11C(void) {
 #else
 void fn_800DF11C(u8* src, u8* dst) { dst[0] = src[0xc]; dst[1] = src[0xd]; dst[2] = src[0xe]; dst[3] = src[0xf]; }
 #endif
-extern void fn_801A6DDC(u32, ...);
+extern void HSD_MObjSetAlpha(u32, ...);
 extern f64 lbl_8047CAD0;
 extern f32 lbl_8047CACC;
 #if 0
@@ -4917,8 +4917,8 @@ asm void fn_800DF140(void) {
 }
 #else
 void fn_800DF140(u8* obj) {
-    extern void fn_801A6DDC(u32, f32);
-    fn_801A6DDC(*(u32*)(obj + 0x8), (f32)obj[0x1] / lbl_8047CACC);
+    extern void HSD_MObjSetAlpha(u32, f32);
+    HSD_MObjSetAlpha(*(u32*)(obj + 0x8), (f32)obj[0x1] / lbl_8047CACC);
 }
 #endif
 extern f32 lbl_8047CACC;
@@ -4965,8 +4965,8 @@ asm void fn_800DF21C(void) {
 }
 #else
 void fn_800DF21C(u8* obj) {
-    extern void fn_801A6DDC(u32);
-    fn_801A6DDC(*(u32*)((u8*)obj + 0x8));
+    extern void HSD_MObjSetAlpha(u32);
+    HSD_MObjSetAlpha(*(u32*)((u8*)obj + 0x8));
 }
 #endif
 #if 0

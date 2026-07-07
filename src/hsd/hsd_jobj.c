@@ -409,12 +409,12 @@ extern u8 lbl_8036C8E0[];
 extern u32 lbl_8047B29C;
 extern u32 lbl_8047B2AC;
 #if 0
-asm void fn_8019CF54(void) {
-#include "src/hsd/hsd_jobj_fn_8019CF54.inc"
+asm void JObjAmnesia(void) {
+#include "src/hsd/hsd_jobj_JObjAmnesia.inc"
 }
 #else
 #pragma optimization_level 1
-void fn_8019CF54(void* info) {
+void JObjAmnesia(void* info) {
     if (info == (void*)lbl_8047B298) {
         lbl_8047B298 = 0;
     }
@@ -436,12 +436,12 @@ extern void HSD_IDRemoveByIDFromTable(void* table, u32 key);
 extern void HSD_VecFree(void* data);
 extern void HSD_MtxFree(void* data);
 #if 0
-asm void fn_8019CFBC(void) {
-#include "src/hsd/hsd_jobj_fn_8019CFBC.inc"
+asm void JObjRelease(void) {
+#include "src/hsd/hsd_jobj_JObjRelease.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_8019CFBC(HSD_JObj* jobj) {
+void JObjRelease(HSD_JObj* jobj) {
     HSD_JOBJ_METHOD(jobj)->release_child(jobj);
 
     if (HSD_IDGetDataFromTable(NULL, jobj->id, NULL) == jobj) {
@@ -1026,11 +1026,11 @@ void resolveIKJoint1(HSD_JObj* jobj) {
 #pragma optimizewithasm off
 extern u32 lbl_8047B2AC;
 #if 0
-asm void fn_8019F01C(void) {
-#include "src/hsd/hsd_jobj_fn_8019F01C.inc"
+asm void HSD_JObjGetCurrent(void) {
+#include "src/hsd/hsd_jobj_HSD_JObjGetCurrent.inc"
 }
 #else
-u32 fn_8019F01C(void) {
+u32 HSD_JObjGetCurrent(void) {
     return lbl_8047B2AC;
 }
 #endif
@@ -1123,12 +1123,12 @@ void fn_8019F778(HSD_JObj* jobj) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_8019FF30(void) {
-#include "src/hsd/hsd_jobj_fn_8019FF30.inc"
+asm void HSD_JObjGetFlags(void) {
+#include "src/hsd/hsd_jobj_HSD_JObjGetFlags.inc"
 }
 #else
 #pragma optimization_level 4
-u32 fn_8019FF30(HSD_JObj* jobj) {
+u32 HSD_JObjGetFlags(HSD_JObj* jobj) {
     if (jobj != NULL) {
         return jobj->flags;
     }
@@ -1260,12 +1260,12 @@ void HSD_JObjAddNext(HSD_JObj* jobj, HSD_JObj* next) {
 #pragma optimizewithasm off
 extern void OSReport(void* fmt, ...);
 #if 0
-asm void fn_801A015C(void) {
-#include "src/hsd/hsd_jobj_fn_801A015C.inc"
+asm void HSD_JObjAddChild(void) {
+#include "src/hsd/hsd_jobj_HSD_JObjAddChild.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_801A015C(HSD_JObj* jobj, HSD_JObj* child) {
+void HSD_JObjAddChild(HSD_JObj* jobj, HSD_JObj* child) {
     /* decompiled cdx5: functional (non-byte-exact) */
     HSD_JObj* tail;
     HSD_JObj* parent;
