@@ -509,6 +509,21 @@ game/data/rodata_80267398.c:
 game/data/rodata_80268424.c:
 	.rodata     start:0x80268424 end:0x8026860C
 
+game/data/rodata_8026860C.c:
+	.rodata     start:0x8026860C end:0x8026F610
+
+game/data/rodata_8026F640.c:
+	.rodata     start:0x8026F640 end:0x8026FB80
+
+game/data/rodata_8026FB94.c:
+	.rodata     start:0x8026FB94 end:0x8026FE58
+
+game/data/rodata_8026FE58.c:
+	.rodata     start:0x8026FE58 end:0x8026FFE0
+
+game/data/rodata_80270008.c:
+	.rodata     start:0x80270008 end:0x8027A4F0
+
 __init_cpp_exceptions.cpp:
 	.dtors      start:0x80266380 end:0x80266384
 

@@ -1800,6 +1800,36 @@ config.libs = [
             ),
             Object(
                 DataCandidate,
+                "game/data/rodata_8026860C.c",
+                progress_category="game",
+                extra_cflags=["-sdata2 0"],
+            ),
+            Object(
+                DataCandidate,
+                "game/data/rodata_8026F640.c",
+                progress_category="game",
+                extra_cflags=["-sdata2 0"],
+            ),
+            Object(
+                DataCandidate,
+                "game/data/rodata_8026FB94.c",
+                progress_category="game",
+                extra_cflags=["-sdata2 0"],
+            ),
+            Object(
+                DataCandidate,
+                "game/data/rodata_8026FE58.c",
+                progress_category="game",
+                extra_cflags=["-sdata2 0"],
+            ),
+            Object(
+                DataCandidate,
+                "game/data/rodata_80270008.c",
+                progress_category="game",
+                extra_cflags=["-sdata2 0"],
+            ),
+            Object(
+                DataCandidate,
                 "game/data/data_802EDB7C.c",
                 progress_category="game",
             ),

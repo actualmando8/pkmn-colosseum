@@ -6,21 +6,21 @@
     "total_code": 2495108,
     "total_data": 2196124,
     "total_functions": 8603,
-    "total_units": 509
+    "total_units": 515
   },
   "topology_status": {
-    "auto_units": 58,
-    "named_units": 451,
-    "source_backed_units": 431,
+    "auto_units": 59,
+    "named_units": 456,
+    "source_backed_units": 436,
     "auto_code": 0,
-    "auto_data": 131871,
+    "auto_data": 58535,
     "auto_functions": 0
   },
   "baseline_progress": {
     "matched_code": "418060",
     "matched_code_percent": 16.755186,
-    "matched_data": "2064253",
-    "matched_data_percent": 93.995285,
+    "matched_data": "2137589",
+    "matched_data_percent": 97.334625,
     "matched_functions": 3950,
     "matched_functions_percent": 45.914215,
     "fuzzy_match_percent": 32.629124
@@ -2913,29 +2913,107 @@
       "total_functions": 0
     },
     {
-      "name": "main/auto_04_8026860C_rodata",
+      "name": "main/game/data/rodata_8026860C",
       "sections": [
         {
           "name": ".rodata",
-          "size": 30796,
+          "size": 28676,
           "virtual_address": 2150008332
         }
       ],
       "total_code": 0,
-      "total_data": 30796,
+      "total_data": 28676,
       "total_functions": 0
     },
     {
-      "name": "main/auto_04_8026FE58_rodata",
+      "name": "main/auto_04_8026F610_rodata",
       "sections": [
         {
           "name": ".rodata",
-          "size": 42648,
+          "size": 48,
+          "virtual_address": 2150037008
+        }
+      ],
+      "total_code": 0,
+      "total_data": 48,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/rodata_8026F640",
+      "sections": [
+        {
+          "name": ".rodata",
+          "size": 1344,
+          "virtual_address": 2150037056
+        }
+      ],
+      "total_code": 0,
+      "total_data": 1344,
+      "total_functions": 0
+    },
+    {
+      "name": "main/auto_04_8026FB80_rodata",
+      "sections": [
+        {
+          "name": ".rodata",
+          "size": 20,
+          "virtual_address": 2150038400
+        }
+      ],
+      "total_code": 0,
+      "total_data": 20,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/rodata_8026FB94",
+      "sections": [
+        {
+          "name": ".rodata",
+          "size": 708,
+          "virtual_address": 2150038420
+        }
+      ],
+      "total_code": 0,
+      "total_data": 708,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/rodata_8026FE58",
+      "sections": [
+        {
+          "name": ".rodata",
+          "size": 392,
           "virtual_address": 2150039128
         }
       ],
       "total_code": 0,
-      "total_data": 42648,
+      "total_data": 392,
+      "total_functions": 0
+    },
+    {
+      "name": "main/auto_04_8026FFE0_rodata",
+      "sections": [
+        {
+          "name": ".rodata",
+          "size": 40,
+          "virtual_address": 2150039520
+        }
+      ],
+      "total_code": 0,
+      "total_data": 40,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/rodata_80270008",
+      "sections": [
+        {
+          "name": ".rodata",
+          "size": 42216,
+          "virtual_address": 2150039560
+        }
+      ],
+      "total_code": 0,
+      "total_data": 42216,
       "total_functions": 0
     },
     {
