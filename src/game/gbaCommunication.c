@@ -1647,19 +1647,19 @@ void fn_80096C48(u32 unused, u8* dst) {
 /* 0x80097BBC | size: 0x114 */
 #pragma peephole off
 s32 fn_80097BBC(u8 chan) {
-    extern void* fn_80129280();
-    extern void* fn_8012AC08();
-    extern int fn_80123FBC();
+    extern void* savedataGetStatus();
+    extern void* heroBiosGetPokemonPtr();
+    extern int pokemonCheckValid();
     extern int fn_8010B560();
     void* entity;
     void* mgr;
 
     entity = NULL;
     if (chan < 6) {
-        mgr = fn_80129280(0, 2);
+        mgr = savedataGetStatus(0, 2);
         if (mgr != 0) {
-            entity = fn_8012AC08(mgr, chan);
-            if ((u8)fn_80123FBC() == 0) {
+            entity = heroBiosGetPokemonPtr(mgr, chan);
+            if ((u8)pokemonCheckValid() == 0) {
                 entity = NULL;
             }
         }

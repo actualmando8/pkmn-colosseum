@@ -27,7 +27,7 @@
  *            getter for the requested field.
  *
  * Related functions called by TrainerDataGet:
- *   fn_8012640C (1769 calls total): Master data table lookup from common_rel
+ *   pokemonGetStatus (1769 calls total): Master data table lookup from common_rel
  *   fn_80142CF4 (169 calls): Secondary data accessor (unknown table)
  */
 

@@ -573,11 +573,11 @@ s32 menuPanelCtrlLvUp(u8* ctx) {
 #pragma pop
 
 /* fn_8001374C - 0x8001374C | size: 0x168 */
-extern void* fn_80129BC8(u32, u8, void*, s32, s32, s32);
+extern void* heroItemGetItemKindToItemAryPtr(u32, u8, void*, s32, s32, s32);
 extern void* heroHizukiItemGetItemAryPtr(u32, void*, s32, s32, s32);
 extern u8  fn_801429E8(void*);
 extern s32 itemBiosGetItemDataId(void*);
-extern s32 fn_80129A78(u32, s32, s32, s32);
+extern s32 heroItemAddItemDataId(u32, s32, s32, s32);
 extern void fn_8012959C(u32, s32, s32, s16);
 extern u8 lbl_80266918[];
 #define sSummaryPageEntries lbl_80266918
@@ -596,7 +596,7 @@ s32 fn_8001374C(s32 entry_idx, s32 target_n, s32* out) {
     entry = (u8*)sSummaryPageEntries + entry_idx * 0x4C;
     flag  = *(s32*)(entry + 4);
     if (flag >= 0) {
-        list = fn_80129BC8(lbl_8047A2F8, (u8)flag, buf, 0, 0, 0);
+        list = heroItemGetItemKindToItemAryPtr(lbl_8047A2F8, (u8)flag, buf, 0, 0, 0);
     } else {
         list = heroHizukiItemGetItemAryPtr(lbl_8047A2F8, buf, 0, 0, 0);
     }
@@ -615,7 +615,7 @@ s32 fn_8001374C(s32 entry_idx, s32 target_n, s32* out) {
     }
     idx = 0;
 after:
-    if (fn_80129A78(lbl_8047A2F8, idx, 1, -1) > 0) {
+    if (heroItemAddItemDataId(lbl_8047A2F8, idx, 1, -1) > 0) {
         fn_80106D3C(2, 0x4263, 1, 0);
         fn_801069FC(1);
         *out = 0;
@@ -647,7 +647,7 @@ s32 fn_800138B4(s32 entry_idx, s32 target_n, s32* out) {
     entry += entry_idx * 0x4C;
     flag  = *(s32*)(entry + 4);
     if (flag >= 0) {
-        list = fn_80129BC8(lbl_8047A2F8, (u8)flag, buf, 0, 0, 0);
+        list = heroItemGetItemKindToItemAryPtr(lbl_8047A2F8, (u8)flag, buf, 0, 0, 0);
     } else {
         list = heroHizukiItemGetItemAryPtr(lbl_8047A2F8, buf, 0, 0, 0);
     }
@@ -743,7 +743,7 @@ s32 fn_80013A18(s32 entry_idx, s32 target_n, s32* out) {
     values[5] = lbl_80266BD8[5];
     lbl_8047A2DC = 0x2B1C;
 
-    fn_80129BC8(lbl_8047A2F8, (u8)flag, &count_all, 0, 0, 0);
+    heroItemGetItemKindToItemAryPtr(lbl_8047A2F8, (u8)flag, &count_all, 0, 0, 0);
     if ((s32)count_all > 0x64) {
         max_choice = 3;
     } else {
@@ -751,7 +751,7 @@ s32 fn_80013A18(s32 entry_idx, s32 target_n, s32* out) {
     }
 
     if (flag >= 0) {
-        list = fn_80129BC8(lbl_8047A2F8, (u8)flag, &count_a, 0, 0, 0);
+        list = heroItemGetItemKindToItemAryPtr(lbl_8047A2F8, (u8)flag, &count_a, 0, 0, 0);
     } else {
         list = heroHizukiItemGetItemAryPtr(lbl_8047A2F8, &count_a, 0, 0, 0);
     }
@@ -808,7 +808,7 @@ have_quantity:
     }
 
     if (flag >= 0) {
-        list = fn_80129BC8(lbl_8047A2F8, (u8)flag, &count_b, 0, 0, 0);
+        list = heroItemGetItemKindToItemAryPtr(lbl_8047A2F8, (u8)flag, &count_b, 0, 0, 0);
     } else {
         list = heroHizukiItemGetItemAryPtr(lbl_8047A2F8, &count_b, 0, 0, 0);
     }
@@ -883,7 +883,7 @@ s32 fn_80013DFC(s32 entry_idx, s32 target_n, s32* out) {
     entry = (u8*)sSummaryPageEntries + entry_idx * 0x4C;
     flag  = *(s32*)(entry + 4);
     if (flag >= 0) {
-        list = fn_80129BC8(lbl_8047A2F8, (u8)flag, buf, 0, 0, 0);
+        list = heroItemGetItemKindToItemAryPtr(lbl_8047A2F8, (u8)flag, buf, 0, 0, 0);
     } else {
         list = heroHizukiItemGetItemAryPtr(lbl_8047A2F8, buf, 0, 0, 0);
     }
@@ -945,7 +945,7 @@ s32 fn_80013F80(s32 entry_idx, s32 target_n, s32* out) {
     entry += entry_idx * 0x4C;
     flag  = *(s32*)(entry + 4);
     if (flag >= 0) {
-        list = fn_80129BC8(lbl_8047A2F8, (u8)flag, buf, 0, 0, 0);
+        list = heroItemGetItemKindToItemAryPtr(lbl_8047A2F8, (u8)flag, buf, 0, 0, 0);
     } else {
         list = heroHizukiItemGetItemAryPtr(lbl_8047A2F8, buf, 0, 0, 0);
     }

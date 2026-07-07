@@ -230,8 +230,8 @@ s32 fn_8002641C(void* r3, u8* r4) {
 
 /* fn_80026478 - 0x80026478 | size: 0xa4 */
 extern void* heroGetStatus(s32, s32, u32);
-extern u8 fn_80123FBC(void);
-extern u8 fn_801231A4(void*);
+extern u8 pokemonCheckValid(void);
+extern u8 pokemonGetSex(void*);
 #if 0
 asm void fn_80026478(void) {
 #include "src/game/gs_worldmap_fn_80026478.inc"
@@ -251,8 +251,8 @@ s32 fn_80026478(void* r3, u8* r4) {
         return 0;
     }
     r31 = heroGetStatus(0, 3, (u16)*(u32*)((u8*)ctx + 0x20));
-    if ((u8)fn_80123FBC() == 0) goto L_done;
-    if ((u32)(fn_801231A4(r31) & 0xff) != 1) goto L_done;
+    if ((u8)pokemonCheckValid() == 0) goto L_done;
+    if ((u32)(pokemonGetSex(r31) & 0xff) != 1) goto L_done;
     r30 = 0xff;
 L_done:
     r4[0x67] = r30;
@@ -281,8 +281,8 @@ s32 fn_8002651C(void* r3, u8* r4) {
         return 0;
     }
     r31 = heroGetStatus(0, 3, (u16)*(u32*)((u8*)ctx + 0x20));
-    if ((u8)fn_80123FBC() == 0) goto L_done2;
-    if ((u32)(fn_801231A4(r31) & 0xff) != 0) goto L_done2;
+    if ((u8)pokemonCheckValid() == 0) goto L_done2;
+    if ((u32)(pokemonGetSex(r31) & 0xff) != 0) goto L_done2;
     r30 = 0xff;
 L_done2:
     r4[0x67] = r30;
@@ -1962,7 +1962,7 @@ s32 fn_800278A4(void* r3) {
     r31 = *(void**)(r29 + 0x60);
     if (*(s32*)r31 == 2) {
         r30 = heroGetStatus(0, 3, (u16)*(u32*)((u8*)r31 + 0x4));
-        if ((fn_80123FBC() & 0xff) == 0) {
+        if ((pokemonCheckValid() & 0xff) == 0) {
             r4 = fn_8011F5C8(r30);
         } else {
             r4 = 1;
@@ -3328,7 +3328,7 @@ void fn_80028FBC(void) {
     /* --- callees (minimal real signatures inferred from each bl site) --- */
     extern u32  fn_800FA280(u32 id);                       /* id -> resource ptr        */
     extern u32  heroGetStatus(u8* ptr, u32 selector, u32 idx);
-    extern u32  fn_80123FBC(void);                         /* returns u8 status         */
+    extern u32  pokemonCheckValid(void);                         /* returns u8 status         */
     extern u32  fn_8011F4F0(u32 a);
     extern u32  fn_80134A98(s32 a, s32 b);
     extern void GScharCpy(void* dst, u8* src);           /* copy/build name struct    */
@@ -3400,7 +3400,7 @@ void fn_80028FBC(void) {
         break;
     case 2:
         r0 = (s32)heroGetStatus(0, 3, (u16)subIndex);
-        if ((fn_80123FBC() & 0xff) == 0) {
+        if ((pokemonCheckValid() & 0xff) == 0) {
             sel = 0;
         } else {
             sel = fn_8011F4F0((u32)r0);
@@ -3456,7 +3456,7 @@ void fn_80028FBC(void) {
     }
     case 2:
         sel = heroGetStatus(0, 3, (u16)subIndex);
-        if ((fn_80123FBC() & 0xff) != 0) {
+        if ((pokemonCheckValid() & 0xff) != 0) {
             fn_80109C88(lbl_803A2094, sel);
         }
         break;
@@ -3565,7 +3565,7 @@ void fn_80028FBC(void) {
         break;
     case 2:
         sel = heroGetStatus(0, 3, (u16)subIndex);
-        if ((fn_80123FBC() & 0xff) != 0) {
+        if ((pokemonCheckValid() & 0xff) != 0) {
             fn_8011DEE4(sel, lbl_803A2068);
         }
         break;
@@ -3621,7 +3621,7 @@ s32 fn_80029558(s32 r3, s32 r4) {
     goto _558_r30;
     _558_eq2:
     heroGetStatus(0, 3, (u16)r30);
-    if ((u8)fn_80123FBC() == 0) r31 = 0;
+    if ((u8)pokemonCheckValid() == 0) r31 = 0;
     goto _558_done;
     _558_r30:
     if (r30 < 0) goto _558_r30_fail;
@@ -3687,7 +3687,7 @@ s32 fn_80029660(s32 r3, s32 r4) {
     goto _660_r30;
     _660_eq2:
     heroGetStatus(0, 3, (u16)r30);
-    if ((u8)fn_80123FBC() == 0) r31 = 0;
+    if ((u8)pokemonCheckValid() == 0) r31 = 0;
     goto _660_done;
     _660_r30:
     if (r30 < 0) goto _660_r30_fail;
@@ -3738,7 +3738,7 @@ s32 fn_80029760(s32 r3, s32 r4) {
     goto _760_r30;
     _760_eq2:
     heroGetStatus(0, 3, (u16)r30);
-    if ((u8)fn_80123FBC() == 0) r31 = 0;
+    if ((u8)pokemonCheckValid() == 0) r31 = 0;
     goto _760_done;
     _760_r30:
     if (r30 < 0) goto _760_r30_fail;
@@ -3992,7 +3992,7 @@ s32 fn_80029CC0(u8* r30) {
 /* fn_80029EF4 - 0x80029EF4 | size: 0xb8 */
 extern void heroDecPokecoupon(s32, void*);
 extern void pcboxDelItem(s32, s32, u16);
-extern void fn_80129A78(s32, s32, u16, s32);
+extern void heroItemAddItemDataId(s32, s32, u16, s32);
 #if 0
 asm void fn_80029EF4(void) {
 #include "src/game/gs_worldmap_fn_80029EF4.inc"
@@ -4014,7 +4014,7 @@ void fn_80029EF4(void* r3, s32 r4, s32 r5, u8 r6, void* r7) {
         break;
     default:
         heroDecPokecoupon(0, r3);
-        fn_80129A78(0, r29, (u16)r30, -1);
+        heroItemAddItemDataId(0, r29, (u16)r30, -1);
         break;
     }
 }
@@ -4614,7 +4614,7 @@ s32 fn_8002AE9C(void* r3, u8* r4) {
 /* fn_8002AEF8 - 0x8002AEF8 | size: 0x144 | WALL 83.7%: regalloc + scheduling */
 extern void itemDataBiosGetPtr(u32);
 extern u32 itemDataBiosGetKind(void);
-extern u32 fn_80129BC8(s32, u32, u16*, s32, s32, s32, s32);
+extern u32 heroItemGetItemKindToItemAryPtr(s32, u32, u16*, s32, s32, s32, s32);
 extern u32 itemGetStatus(u32, s32, s32, s32);
 #if 0
 asm void fn_8002AEF8(void) {
@@ -4644,7 +4644,7 @@ s32 fn_8002AEF8(void* r3, u8* r4) {
     if ((u16)r30 != 0) {
         r31 = r30;
         itemDataBiosGetPtr(r30);
-        r27 = fn_80129BC8(0, itemDataBiosGetKind(), &stack, 0, 0, 0, 0);
+        r27 = heroItemGetItemKindToItemAryPtr(0, itemDataBiosGetKind(), &stack, 0, 0, 0, 0);
         r28 = 0;
         while (r28 < (s32)stack) {
             if ((u16)itemGetStatus(r27, 0, 0x1b, 0) == (u16)r31) {
@@ -5904,9 +5904,9 @@ void fn_8002C284(u32 loc_idx, u32 mode)
 #endif
 
 /* fn_8002C408 - 0x8002C408 | size: 0xa64 */
-extern void fn_80129280(void);
+extern void savedataGetStatus(void);
 extern void pcboxGetItemCapacity(void);
-extern void fn_801298B8(void);
+extern void heroItemCheckAddItemDataId(void);
 extern void fn_80166AB8(void);
 extern void fn_80093574(void);
 extern void fn_80092C90(void);
@@ -5950,7 +5950,7 @@ void fn_8002C408(s32 mapIdx, u32 mode)
     /* ---- cross-TU callees (block-scope typed externs, TU convention) ---- */
     extern void  fn_80142A88(void* buf, s32 v);            /* clear/init work buffer */
     extern s32   fn_80029CC0(u8* buf);                     /* scene callback 2 (mode 3 init) */
-    extern u32   fn_80129280(u8* obj, u16 sel);            /* object/property accessor */
+    extern u32   savedataGetStatus(u8* obj, u16 sel);            /* object/property accessor */
     extern u32   heroGetStatus(u8* ptr, u32 selector, u32 idx); /* state/interaction getter */
     extern void  heroSetStatus(u8* ptr, u32 selector, u32 value); /* state setter */
     extern void* itemDataBiosGetPtr(u16 speciesId);              /* select species/item entry */
@@ -5958,7 +5958,7 @@ void fn_8002C408(s32 mapIdx, u32 mode)
     extern u16   itemBiosGetItemDataId(void* slot);                  /* item/species id at slot */
     extern u16   itemBiosGetNum(void* slot);                  /* quantity at slot */
     extern u16   pcboxGetItemCapacity(s32 a, u16 species);          /* owned-count query (mode 2) */
-    extern s32   fn_801298B8(u8* ptr, u32 species);        /* owned-count query (default) */
+    extern s32   heroItemCheckAddItemDataId(u8* ptr, u32 species);        /* owned-count query (default) */
     extern void  fn_80029EF4(void* a, s32 b, s32 c, u8 d, void* e); /* commit purchase */
     extern void  fn_8002A1C4(u8* idx, s32 msgId, s32 term, ...);    /* show message line */
     extern u32   fn_80029FAC(u8* idx, s32 a, s32 b, s32 c, ...);    /* format text -> string ptr */
@@ -6081,7 +6081,7 @@ void fn_8002C408(s32 mapIdx, u32 mode)
         buf.credit1 = 0;
         buf.exitFlag = 0;
         {
-            u32 snap = fn_80129280((u8*)0, 3);
+            u32 snap = savedataGetStatus((u8*)0, 3);
             memcpy((void*)lbl_8047A3DC, (const void*)snap, 0x7198);
         }
         lbl_8047A3D8 = heroGetStatus((u8*)0, 0xd, 0);
@@ -6244,7 +6244,7 @@ L_628:
             }
         }
     } else {
-        ownedRoom = fn_801298B8((u8*)0, (u32)(u16)sel);
+        ownedRoom = heroItemCheckAddItemDataId((u8*)0, (u32)(u16)sel);
     }
 
     if (ownedRoom < chosenQty) {
@@ -6302,7 +6302,7 @@ L_CB40:
         if ((mode & 0xff) != 3) {
             /* default-mode close path: confirm-state query then optional restore */
             if (fn_801D0748(4, 2, 0) != 4) {
-                u32 snap = fn_80129280((u8*)0, 3);
+                u32 snap = savedataGetStatus((u8*)0, 3);
                 memcpy((void*)lbl_8047A3DC, (const void*)snap, 0x7198);
                 heroSetStatus((u8*)0, 0xd, lbl_8047A3D8);
             }
@@ -6408,9 +6408,9 @@ asm void fn_8002CE6C(void) {
  *  5. On selection:
  *       - look up species data (itemDataBiosGetPtr) and get trade count (itemDataBiosGetPrice).
  *       - if count == 0 or ratio > 99 → post "no stock" message and return.
- *       - if trade precondition fails (fn_801298B8 < 1) → post "busy" message and return.
+ *       - if trade precondition fails (heroItemCheckAddItemDataId < 1) → post "busy" message and return.
  *       - otherwise: play sound, deduct from party (heroDecPokedoru),
- *         execute trade (fn_80129A78), then loop back to show updated menu.
+ *         execute trade (heroItemAddItemDataId), then loop back to show updated menu.
  *  6. Close display engine and return.
  */
 void fn_8002CE6C(u8* obj, u8 slot) {
@@ -6423,10 +6423,10 @@ void fn_8002CE6C(u8* obj, u8 slot) {
     extern s32 fn_801026A4(u32 sceneId, u32 a, u32 b, u32 c, u32 d, u32 e, ...); /* show menu dialog */
     extern void itemDataBiosGetPtr(u32 speciesId);            /* load species data */
     extern u16  itemDataBiosGetPrice(void);                    /* get trade/field count */
-    extern s32  fn_801298B8(u8* ptr, u32 itemId);     /* check trade precondition */
+    extern s32  heroItemCheckAddItemDataId(u8* ptr, u32 itemId);     /* check trade precondition */
     extern void fn_80166AB8(u32 soundId, u32 a, u32 b); /* play sound */
     extern void heroDecPokedoru(u8* ptr, u32 offset);     /* deduct from party (give Pokemon) */
-    extern s32  fn_80129A78(u8* ptr, u32 itemId, u32 qty, u32 flags); /* execute trade/receive */
+    extern s32  heroItemAddItemDataId(u8* ptr, u32 itemId, u32 qty, u32 flags); /* execute trade/receive */
 
     /* lbl_802E4F68: table of 5 dialog key records, each record has:
      *   +0x00  s32  key value (used for match)
@@ -6627,7 +6627,7 @@ _loop_top:
         }
 
         /* 8. Check trade precondition */
-        if (fn_801298B8(NULL, (u32)selection) < 1) {
+        if (heroItemCheckAddItemDataId(NULL, (u32)selection) < 1) {
             fn_8002A2CC(obj, 6, -1);
             goto _done;
         }
@@ -6635,7 +6635,7 @@ _loop_top:
         /* 9. Execute trade: play sound, deduct, trade, then loop */
         fn_80166AB8(0x3cb, 0, 0);
         heroDecPokedoru(NULL, (u32)species);   /* give/deduct partner Pokemon by species offset */
-        fn_80129A78(NULL, (u32)selection, 1, -1); /* execute trade/receive */
+        heroItemAddItemDataId(NULL, (u32)selection, 1, -1); /* execute trade/receive */
         fn_8002A2CC(obj, 4, 0x2d, (s32)(selection & 0xffff), -1);
         goto _loop_top;
     }
@@ -6647,7 +6647,7 @@ _done:
 #endif
 
 /* fn_8002D154 - 0x8002D154 | size: 0x480 */
-extern void fn_80129B2C(void);
+extern void heroItemCheckHaveItemDataId(void);
 extern u32 lbl_804788A8;
 extern u32 lbl_80478E54;
 extern u32 lbl_80478E44;
@@ -6710,11 +6710,11 @@ void fn_8002D154(s32 mapIndex, u8 colorIndex)
     extern u32  itemDataBiosGetPtr(u32 itemId);                           /* select item     */
     extern u32  itemDataBiosGetKind(void);                                 /* item category   */
     extern u32  itemDataBiosGetPrice(void);                                 /* item price/value*/
-    extern s8   fn_80129B2C(s32 a, s32 b);                         /* story/flag query*/
+    extern s8   heroItemCheckHaveItemDataId(s32 a, s32 b);                         /* story/flag query*/
     extern u32  heroGetStatus(u8* ptr, u32 selector, u32 idx);       /* money getter    */
-    extern u32  fn_801298B8(s32 a, u32 item);                      /* inventory count */
+    extern u32  heroItemCheckAddItemDataId(s32 a, u32 item);                      /* inventory count */
     extern void heroDecPokedoru(s32 a, s32 amount);                    /* spend money     */
-    extern void fn_80129A78(s32 a, s32 item, u16 qty, s32 d);      /* add item        */
+    extern void heroItemAddItemDataId(s32 a, s32 item, u16 qty, s32 d);      /* add item        */
     extern void fn_80166AB8(s32 sfx, s32 b, s32 c);               /* play sound      */
     extern void fn_80106ADC(s32 a, u32 b, s32 c, s32 d, u8 e);
     extern u32  fn_8002A0B8(u8* buf, s32 idx, s32 a, s32 b, ...);  /* format text     */
@@ -6817,7 +6817,7 @@ void fn_8002D154(s32 mapIndex, u8 colorIndex)
 
         /* special-case: "key item" category (6) gated by a story flag */
         if ((itemDataBiosGetKind() & 0xff) == 6) {
-            if ((fn_80129B2C(0, 0x21e) & 0xff) == 0) {
+            if ((heroItemCheckHaveItemDataId(0, 0x21e) & 0xff) == 0) {
                 fn_8002A2CC((u8*)mapIndex, 8, -1);
                 continue;
             }
@@ -6889,20 +6889,20 @@ void fn_8002D154(s32 mapIndex, u8 colorIndex)
             }
 
             /* committed: verify capacity, charge money, grant items */
-            if ((s32)fn_801298B8(0, selectedItem) < chosenQty) {
+            if ((s32)heroItemCheckAddItemDataId(0, selectedItem) < chosenQty) {
                 fn_8002A2CC((u8*)mapIndex, 6, -1);
                 continue;
             }
             fn_80166AB8(0x3cb, 0, 0);
             heroDecPokedoru(0, totalCost);
-            fn_80129A78(0, selectedItem, (u16)chosenQty, -1);
+            heroItemAddItemDataId(0, selectedItem, (u16)chosenQty, -1);
             fn_8002A2CC((u8*)mapIndex, 4, -1);
 
             /* bonus item: buying >=10 of item 4 grants a premier-ball style extra */
             if ((selectedItem & 0xffff) == 4 && chosenQty >= 0xa &&
-                (s32)fn_801298B8(0, 0xc) >= 1) {
+                (s32)heroItemCheckAddItemDataId(0, 0xc) >= 1) {
                 fn_8002A2CC((u8*)mapIndex, 7, -1);
-                fn_80129A78(0, 0xc, 1, -1);
+                heroItemAddItemDataId(0, 0xc, 1, -1);
             }
         }
     }
@@ -7496,7 +7496,7 @@ void fn_8002DD24(void *arg)
     extern void gbaCommandSetKeyState(s32 mode, s32 flag); /* abort / cancel scene */
 
     /* Save-data helpers */
-    extern void *fn_80129280(s32 side, s32 slotType); /* get party/save ptr */
+    extern void *savedataGetStatus(s32 side, s32 slotType); /* get party/save ptr */
     extern void  menuSubKeyWait(void);                    /* save commit flush  */
     extern void  fn_801069FC(s32 slot);                /* save slot finalize */
     extern void  fn_8010A420(u8 *ptr);                 /* archive release    */
@@ -7583,12 +7583,12 @@ L_path_decision:
 L_save_copy:
     {
         /* Block-copy the caller's buffer into the live save region.
-         * fn_80129280(0,0) returns a pointer to the destination; the
+         * savedataGetStatus(0,0) returns a pointer to the destination; the
          * source is the 'arg' parameter passed to this function.
          * The CW loop copies 2 words × 15354 iterations = 122832 bytes.
          * We use a plain memcpy equivalent for x86 semantics.
          */
-        u8 *dst = (u8 *)fn_80129280(0, 0);
+        u8 *dst = (u8 *)savedataGetStatus(0, 0);
         u8 *src = (u8 *)arg;
         u32 i;
         for (i = 0; i < 15354; i++) {
@@ -7626,10 +7626,10 @@ L_delay:
 #endif
 
 /* fn_8002DF10 - 0x8002DF10 | size: 0x35c */
-extern void fn_80128A64(void);
+extern void pokemonEvolutionCheck(void);
 extern void fn_801CB9D8(void);
 extern void fn_80112260(void);
-extern void fn_8012805C(void);
+extern void pokemonEvolutionAll(void);
 extern void cameraPlayAnime(void);
 extern void fn_80113F48(void);
 extern void fn_801CBA0C(void);
@@ -7661,7 +7661,7 @@ asm void fn_8002DF10(void) {
  *   2. Hide marker objects (fn_8010A420)
  *   3. Wait for trainer anim (fn_801CB9D8)
  *   4. Yield one frame (_threadSwitch)
- *   5. Spawn/configure encounter objects (fn_8012805C)
+ *   5. Spawn/configure encounter objects (pokemonEvolutionAll)
  *   6. Re-anchor NPC handles (fn_80109C88, menuModelInit)
  *   7. Scene-load BGM/scene (cameraPlayAnime, fn_801CBA0C, GSresGetResource)
  *   8. Restore people state (GSscene_SetMode)
@@ -7683,9 +7683,9 @@ void fn_8002DF10(void)
 
     /* heroGetStatus - interaction getter:  (u8* base, u32 mode, u16 idx) -> u8* NPC handle */
     extern u8*  heroGetStatus(u8 *ptr, u32 selector, u32 idx);
-    /* fn_80128A64 - get NPC key/type at location:
+    /* pokemonEvolutionCheck - get NPC key/type at location:
          (u8* world, u32 mode, u16 key, u16* key_out, u8* type_out) -> u32 npc_handle (0/0xffff=invalid) */
-    extern u32  fn_80128A64(u8 *arg0, u32 arg1, u16 arg2, u16 *arg3, u8 *arg4);
+    extern u32  pokemonEvolutionCheck(u8 *arg0, u32 arg1, u16 arg2, u16 *arg3, u8 *arg4);
     /* fn_8011F5C8 - get Pokemon location / status field from NPC ptr */
     extern u16  fn_8011F5C8(void *ptr);
     /* fadeSet - BGM fade  (f32 vol, s32 mode) */
@@ -7702,8 +7702,8 @@ void fn_8002DF10(void)
     extern void fn_80112260(s32 flag);
     /* _threadSwitch - GS vsync yield */
     extern void _threadSwitch(void);
-    /* fn_8012805C - encounter trigger dispatcher */
-    extern s32 fn_8012805C(u8 *world, u32 npc, u16 key, u8 *type_out, u8 *team, s32 memo, s32 arg6, s32 audio);
+    /* pokemonEvolutionAll - encounter trigger dispatcher */
+    extern s32 pokemonEvolutionAll(u8 *world, u32 npc, u16 key, u8 *type_out, u8 *team, s32 memo, s32 arg6, s32 audio);
     /* menuModelInit - model set bounds (u8* obj, s32 w, s32 h) */
     extern void menuModelInit(u8 *obj, s32 w, s32 h);
     /* fn_80109C88 - model set NPC handle (u8* obj, u8* npc_handle) */
@@ -7728,10 +7728,10 @@ void fn_8002DF10(void)
     u8  *npc_b;         /* r30: NPC handle for slot B (lbl_8047A420) */
     u8   need_update;   /* r29: set to 1 if either slot is valid */
     u32  scene_handle;  /* r28 reused: result of fn_80113F48 */
-    u32  npc_result;    /* return of fn_80128A64 (cast to u16 for validity check) */
-    s32  enc_result;    /* return of fn_8012805C */
+    u32  npc_result;    /* return of pokemonEvolutionCheck (cast to u16 for validity check) */
+    s32  enc_result;    /* return of pokemonEvolutionAll */
 
-    /* Stack temporaries for fn_80128A64 and fn_8012805C output buffers */
+    /* Stack temporaries for pokemonEvolutionCheck and pokemonEvolutionAll output buffers */
     u16  key_a;         /* sp+0xc: key output for initial A-slot check */
     u8   type_a;        /* sp+0x18: type output for initial A-slot check */
     u16  key_b;         /* -- sp+0xc reused for B-slot check */
@@ -7751,13 +7751,13 @@ void fn_8002DF10(void)
     npc_b = heroGetStatus(base + 0x170, 3, (u16)lbl_8047A420);
 
     /* Check slot A availability */
-    npc_result = fn_80128A64(npc_a, 2, 0, &key_a, &type_a);
+    npc_result = pokemonEvolutionCheck(npc_a, 2, 0, &key_a, &type_a);
     if ((u16)npc_result != 0 && (u16)npc_result != 0xffff) {
         need_update = 1;
     }
 
     /* Check slot B availability */
-    npc_result = fn_80128A64(npc_b, 2, 0, &key_a, &type_a); /* reuses same stack slots */
+    npc_result = pokemonEvolutionCheck(npc_b, 2, 0, &key_a, &type_a); /* reuses same stack slots */
     if ((u16)npc_result != 0 && (u16)npc_result != 0xffff) {
         need_update = 1;
         /* Also update lbl_8047A40C from slot B's status field */
@@ -7791,10 +7791,10 @@ void fn_8002DF10(void)
     fadeCheck(1);
 
     /* --- Slot A encounter trigger --- */
-    npc_result = fn_80128A64(npc_a, 2, 0, &enc_key_a, &enc_type_a);
+    npc_result = pokemonEvolutionCheck(npc_a, 2, 0, &enc_key_a, &enc_type_a);
     if ((u16)npc_result != 0 && (u16)npc_result != 0xffff) {
         (*(u8*)&lbl_8047A408) = 1;
-        enc_result = fn_8012805C(npc_a, (u32)(u16)npc_result, 0,
+        enc_result = pokemonEvolutionAll(npc_a, (u32)(u16)npc_result, 0,
                                   &enc_type_a, NULL, 1, 0, 1);
         if (enc_result == 2) {
             (*(u8*)&lbl_8047A408) = 0;
@@ -7804,10 +7804,10 @@ void fn_8002DF10(void)
     }
 
     /* --- Slot B encounter trigger --- */
-    npc_result = fn_80128A64(npc_b, 2, 0, &enc_key_b, &enc_type_b);
+    npc_result = pokemonEvolutionCheck(npc_b, 2, 0, &enc_key_b, &enc_type_b);
     if ((u16)npc_result != 0 && (u16)npc_result != 0xffff) {
         (*(u8*)&lbl_8047A408) = 1;
-        enc_result = fn_8012805C(npc_b, (u32)(u16)npc_result, 0,
+        enc_result = pokemonEvolutionAll(npc_b, (u32)(u16)npc_result, 0,
                                   &enc_type_b, NULL, 0, 0, 1);
         if (enc_result == 2) {
             (*(u8*)&lbl_8047A408) = 0;
@@ -7861,8 +7861,8 @@ void fn_8002DF10(void)
 #endif
 
 /* fn_8002E26C - 0x8002E26C | size: 0x1f4 */
-extern void fn_80124A60(void);
-extern void fn_8011F5FC(void);
+extern void pokemonInit(void);
+extern void pokemonBiosCopy(void);
 extern void fn_801024E8(void);
 extern void fn_801CB834(void);
 extern void fn_80176B48(void);
@@ -7901,8 +7901,8 @@ void fn_8002E26C(void)
     extern f32 lbl_8047B9D8;             /* camera duration constant 1 (r2-rel)   */
 
     /* interaction/sound helpers */
-    extern void fn_80124A60(u8 *ctx);
-    extern void fn_8011F5FC(void *a, void *b);
+    extern void pokemonInit(u8 *ctx);
+    extern void pokemonBiosCopy(void *a, void *b);
     extern void fn_80102510(s32 sound_id);
     extern void fn_8010A420(void *widget);
     extern void GSmodelSetVisibility(u32 handle, s32 flag);
@@ -7927,15 +7927,15 @@ void fn_8002E26C(void)
     u32   handle;  /* r3 after fn_80113F48              */
 
     /* --- Initialise interaction objects --- */
-    fn_80124A60(base);
+    pokemonInit(base);
 
     obj_a = (void *)heroGetStatus((u8 *)0, 3, (u16)lbl_8047A424);
     obj_b = (void *)heroGetStatus(base + 0x170, 3, (u16)lbl_8047A420);
 
     /* Cross-link the three objects */
-    fn_8011F5FC(base,  obj_b);
-    fn_8011F5FC(obj_b, obj_a);
-    fn_8011F5FC(obj_a, base);
+    pokemonBiosCopy(base,  obj_b);
+    pokemonBiosCopy(obj_b, obj_a);
+    pokemonBiosCopy(obj_a, base);
 
     /* --- Play worldmap entry sound, hide UI widgets --- */
     fn_80102510(0xde);
@@ -8024,7 +8024,7 @@ asm void fn_8002E460(void) {
  * select/cancel SE, and refreshes the menu fields. The loop ends when both flags
  * are set (commit), when a cancel bit is hit (abort), or when the input query
  * returns a hard-cancel (status==0 path). On commit it tears down the widgets,
- * deep-copies the staged record returned by fn_80129280(0,0) into the caller's
+ * deep-copies the staged record returned by savedataGetStatus(0,0) into the caller's
  * mapCtx buffer (0x3BFA word-pairs = 0x1DFD0 bytes), advances the map state
  * machine to 0xD, and re-shows the dialog camera. On abort it resets the three
  * selector globals to -1 and advances to state 2.
@@ -8059,7 +8059,7 @@ void fn_8002E460(void* mapCtx)
     extern void fn_80166AB8(s32 soundId, s32 p2, s32 p3);       /* play SE */
     extern void fn_80106D3C(s32 a, s32 b, s32 c, s32 d);        /* dialog/sound event */
     extern void _threadSwitch(void);                             /* vsync / scheduler yield */
-    extern void* fn_80129280(s32 a, s32 sel);                  /* staged-record getter */
+    extern void* savedataGetStatus(s32 a, s32 sel);                  /* staged-record getter */
 
     u8* state = lbl_803A2518;
     u8* handleA;
@@ -8204,7 +8204,7 @@ void fn_8002E460(void* mapCtx)
         fn_8010A420(state + 0xD18);
         fn_8010A420(state + 0xCD0);
 
-        src = (u32*)fn_80129280(0, 0);
+        src = (u32*)savedataGetStatus(0, 0);
         dst = (u32*)mapCtx;
         /* deep-copy 0x3BFA word-pairs (0x1DFD0 bytes) from staged record into caller buffer */
         for (i = 0; i < 0x3BFA; i++) {
@@ -8238,11 +8238,11 @@ void fn_8002E460(void* mapCtx)
 extern void fn_8011F1A0(void);
 extern void itemDataBiosCheckImportable(void);
 extern void fn_801021F8(void);
-extern void fn_8012AC08(void);
+extern void heroBiosGetPokemonPtr(void);
 extern void fn_8011E850(void);
 extern void menuCBRule_CheckPokemonEventFlag(void);
 extern void fn_8011E8DC(void);
-extern void fn_8012640C(void);
+extern void pokemonGetStatus(void);
 extern u32 lbl_8047A428;
 extern u8 lbl_803A2688[];
 extern f32 lbl_8047B9D4;
@@ -8311,12 +8311,12 @@ void fn_8002EA5C(void)
     extern void _threadSwitch(void);                             /* vsync yield          */
     extern u32  fn_800D3088(void);                             /* elapsed frame ticks  */
     extern s32  fn_800D37CC(void);                             /* ticks per unit       */
-    extern u8*  fn_8012AC08(u8* base, u32 idx);                /* party slot getter    */
+    extern u8*  heroBiosGetPokemonPtr(u8* base, u32 idx);                /* party slot getter    */
     extern u8   fn_8011E850(u8* obj);                          /* slot predicate A     */
-    extern u8   fn_80123FBC(u8* obj);                          /* slot predicate B     */
+    extern u8   pokemonCheckValid(u8* obj);                          /* slot predicate B     */
     extern u8   menuCBRule_CheckPokemonEventFlag(u8* obj);                          /* slot predicate C     */
     extern u8   fn_8011E8DC(u8* obj);                          /* slot predicate D     */
-    extern u32  fn_8012640C(u8* obj, u32 id, u32 selector, u32 d); /* property getter  */
+    extern u32  pokemonGetStatus(u8* obj, u32 id, u32 selector, u32 d); /* property getter  */
     extern void fadeSet(f32 target, s32 mode);            /* camera/fade target   */
     extern void fadeCheck(s32 flag);                        /* camera/fade enable   */
     extern void fn_80102510(u32 id);                          /* sound/window kick    */
@@ -8384,11 +8384,11 @@ void fn_8002EA5C(void)
         if ((u16)i == (u16)mapId) {
             continue;
         }
-        slot = fn_8012AC08(lbl_803A2688, i);
+        slot = heroBiosGetPokemonPtr(lbl_803A2688, i);
         if ((u8)fn_8011E850(slot) != 0) {
             continue;
         }
-        if ((u8)fn_80123FBC(slot) == 0) {
+        if ((u8)pokemonCheckValid(slot) == 0) {
             continue;
         }
         if ((u8)menuCBRule_CheckPokemonEventFlag(slot) != 1) {
@@ -8397,7 +8397,7 @@ void fn_8002EA5C(void)
         if ((u8)fn_8011E8DC(slot) != 0) {
             continue;
         }
-        if ((u16)fn_8012640C(slot, 0, 0x83, 0) == 0) {
+        if ((u16)pokemonGetStatus(slot, 0, 0x83, 0) == 0) {
             continue;
         }
         found = 1;
@@ -8494,7 +8494,7 @@ void fn_8002EE74(void)
     /* --- cross-TU callee decls (block-scope, TU convention) --- */
     extern u32   heroGetStatus(u8* ptr, u32 selector, u32 idx);   /* interaction getter */
     extern void  fn_801021F8(void* p, u32 val);                 /* enable/disable node subtree */
-    extern u8    fn_80123FBC(void* obj);
+    extern u8    pokemonCheckValid(void* obj);
     extern u8    menuCBRule_CheckPokemonEventFlag(void* obj);
     extern u8    fn_8011E8DC(void* obj);
     extern u8    fn_8011E850(void* obj);
@@ -8532,7 +8532,7 @@ void fn_8002EE74(void)
     obj = (void*)heroGetStatus(lbl_803A2688, 3, (u16)lbl_8047A428);
     fn_801021F8((void*)0xd9, 0);
 
-    if (fn_80123FBC(obj) != 0 &&
+    if (pokemonCheckValid(obj) != 0 &&
         menuCBRule_CheckPokemonEventFlag(obj) == 1 &&
         fn_8011E8DC(obj) != 0) {
         /* ---- Branch A: depart-animation transition ---- */
@@ -8663,9 +8663,9 @@ void fn_8002F284(void)
     /* --- UI item-enable dispatcher: menuItemBiosSetSelectFlag(u32 elementId, u32 val) --- */
     extern void menuItemBiosSetSelectFlag(u32 id, u32 val);
     /* --- party-collection accessor + per-member predicates --- */
-    extern void* fn_8012AC08(u8* base, u16 idx);   /* idx-th party member object */
+    extern void* heroBiosGetPokemonPtr(u8* base, u16 idx);   /* idx-th party member object */
     extern u32   fn_8011E850(u8* mon);             /* eligibility predicate A */
-    extern u32   fn_80123FBC(u8* mon);             /* eligibility predicate B */
+    extern u32   pokemonCheckValid(u8* mon);             /* eligibility predicate B */
     extern u32   menuCBRule_CheckPokemonEventFlag(u8* mon);             /* global-state gate (==1) */
     /* --- scene/object (id 0xD9) management (gs_model.c family) --- */
     extern s32   menuGetCursor(void* p);             /* present? (>=0) / -1 absent */
@@ -8719,12 +8719,12 @@ void fn_8002F284(void)
     menuItemBiosSetSelectFlag(0x1000, 0);
 
     /* Slot 0: eligibility -> menu element 0xFFF. */
-    mon = fn_8012AC08(partyBase, 0);
+    mon = heroBiosGetPokemonPtr(partyBase, 0);
     predicate = (u8)fn_8011E850((u8*)mon);
     if (predicate > 0U) {
         eligible = 1;
     } else {
-        predicate = (u8)fn_80123FBC((u8*)mon);
+        predicate = (u8)pokemonCheckValid((u8*)mon);
         if (predicate > 0U && (u8)menuCBRule_CheckPokemonEventFlag((u8*)mon) == 1) {
             eligible = 1;
         } else {
@@ -8734,12 +8734,12 @@ void fn_8002F284(void)
     menuItemBiosSetSelectFlag(0xFFF, (u32)eligible);
 
     /* Slot 1 -> menu element 0xFFC. */
-    mon = fn_8012AC08(partyBase, 1);
+    mon = heroBiosGetPokemonPtr(partyBase, 1);
     predicate = (u8)fn_8011E850((u8*)mon);
     if (predicate > 0U) {
         eligible = 1;
     } else {
-        predicate = (u8)fn_80123FBC((u8*)mon);
+        predicate = (u8)pokemonCheckValid((u8*)mon);
         if (predicate > 0U && (u8)menuCBRule_CheckPokemonEventFlag((u8*)mon) == 1) {
             eligible = 1;
         } else {
@@ -8749,12 +8749,12 @@ void fn_8002F284(void)
     menuItemBiosSetSelectFlag(0xFFC, (u32)eligible);
 
     /* Slot 2 -> menu element 0xFFE. */
-    mon = fn_8012AC08(partyBase, 2);
+    mon = heroBiosGetPokemonPtr(partyBase, 2);
     predicate = (u8)fn_8011E850((u8*)mon);
     if (predicate > 0U) {
         eligible = 1;
     } else {
-        predicate = (u8)fn_80123FBC((u8*)mon);
+        predicate = (u8)pokemonCheckValid((u8*)mon);
         if (predicate > 0U && (u8)menuCBRule_CheckPokemonEventFlag((u8*)mon) == 1) {
             eligible = 1;
         } else {
@@ -8764,12 +8764,12 @@ void fn_8002F284(void)
     menuItemBiosSetSelectFlag(0xFFE, (u32)eligible);
 
     /* Slot 3 -> menu element 0xFFB. */
-    mon = fn_8012AC08(partyBase, 3);
+    mon = heroBiosGetPokemonPtr(partyBase, 3);
     predicate = (u8)fn_8011E850((u8*)mon);
     if (predicate > 0U) {
         eligible = 1;
     } else {
-        predicate = (u8)fn_80123FBC((u8*)mon);
+        predicate = (u8)pokemonCheckValid((u8*)mon);
         if (predicate > 0U && (u8)menuCBRule_CheckPokemonEventFlag((u8*)mon) == 1) {
             eligible = 1;
         } else {
@@ -8779,12 +8779,12 @@ void fn_8002F284(void)
     menuItemBiosSetSelectFlag(0xFFB, (u32)eligible);
 
     /* Slot 4 -> menu element 0xFFD. */
-    mon = fn_8012AC08(partyBase, 4);
+    mon = heroBiosGetPokemonPtr(partyBase, 4);
     predicate = (u8)fn_8011E850((u8*)mon);
     if (predicate > 0U) {
         eligible = 1;
     } else {
-        predicate = (u8)fn_80123FBC((u8*)mon);
+        predicate = (u8)pokemonCheckValid((u8*)mon);
         if (predicate > 0U && (u8)menuCBRule_CheckPokemonEventFlag((u8*)mon) == 1) {
             eligible = 1;
         } else {
@@ -8794,12 +8794,12 @@ void fn_8002F284(void)
     menuItemBiosSetSelectFlag(0xFFD, (u32)eligible);
 
     /* Slot 5 -> menu element 0xFFA. */
-    lastMon = fn_8012AC08(partyBase, 5);
+    lastMon = heroBiosGetPokemonPtr(partyBase, 5);
     predicate = (u8)fn_8011E850((u8*)lastMon);
     if (predicate > 0U) {
         eligible = 1;
     } else {
-        predicate = (u8)fn_80123FBC((u8*)lastMon);
+        predicate = (u8)pokemonCheckValid((u8*)lastMon);
         if (predicate > 0U && (u8)menuCBRule_CheckPokemonEventFlag((u8*)lastMon) == 1) {
             eligible = 1;
         } else {
@@ -8906,7 +8906,7 @@ valid_destination:
  * (slots 0..5) deciding whether each is grayed out, by running the same
  * 3-predicate eligibility test used in gs_npc_event.c:208-216:
  *     eligible = fn_8011E850(mon) ||
- *                (fn_80123FBC(mon) && menuCBRule_CheckPokemonEventFlag() == 1)
+ *                (pokemonCheckValid(mon) && menuCBRule_CheckPokemonEventFlag() == 1)
  * The per-slot result (0/1) is fed to UI dispatcher menuItemBiosSetSelectFlag under the
  * corresponding menu element ID.
  *
@@ -8925,9 +8925,9 @@ void fn_8002F284(void)
     /* --- UI item-enable dispatcher: menuItemBiosSetSelectFlag(u32 elementId, u32 val) --- */
     extern void menuItemBiosSetSelectFlag(u32 id, u32 val);
     /* --- party-collection accessor + per-member predicates --- */
-    extern void* fn_8012AC08(u8* base, u16 idx);   /* idx-th party member object */
+    extern void* heroBiosGetPokemonPtr(u8* base, u16 idx);   /* idx-th party member object */
     extern u8    fn_8011E850(u8* mon);             /* eligibility predicate A */
-    extern u32   fn_80123FBC(u8* mon);             /* eligibility predicate B */
+    extern u32   pokemonCheckValid(u8* mon);             /* eligibility predicate B */
     extern u8    menuCBRule_CheckPokemonEventFlag(void);                /* global-state gate (==1) */
     /* --- scene/object (id 0xD9) management (gs_model.c family) --- */
     extern s32   menuGetCursor(void* p);             /* present? (>=0) / -1 absent */
@@ -8979,10 +8979,10 @@ void fn_8002F284(void)
     menuItemBiosSetSelectFlag(0x1000, 0);
 
     /* Slot 0: eligibility -> menu element 0xFFF. */
-    mon = fn_8012AC08(partyBase, 0);
+    mon = heroBiosGetPokemonPtr(partyBase, 0);
     if (fn_8011E850((u8*)mon) != 0) {
         eligible = 1;
-    } else if (fn_80123FBC((u8*)mon) != 0 && menuCBRule_CheckPokemonEventFlag() == 1) {
+    } else if (pokemonCheckValid((u8*)mon) != 0 && menuCBRule_CheckPokemonEventFlag() == 1) {
         eligible = 1;
     } else {
         eligible = 0;
@@ -8990,10 +8990,10 @@ void fn_8002F284(void)
     menuItemBiosSetSelectFlag(0xFFF, (u32)eligible);
 
     /* Slot 1 -> menu element 0xFFC. */
-    mon = fn_8012AC08(partyBase, 1);
+    mon = heroBiosGetPokemonPtr(partyBase, 1);
     if (fn_8011E850((u8*)mon) != 0) {
         eligible = 1;
-    } else if (fn_80123FBC((u8*)mon) != 0 && menuCBRule_CheckPokemonEventFlag() == 1) {
+    } else if (pokemonCheckValid((u8*)mon) != 0 && menuCBRule_CheckPokemonEventFlag() == 1) {
         eligible = 1;
     } else {
         eligible = 0;
@@ -9001,10 +9001,10 @@ void fn_8002F284(void)
     menuItemBiosSetSelectFlag(0xFFC, (u32)eligible);
 
     /* Slot 2 -> menu element 0xFFE. */
-    mon = fn_8012AC08(partyBase, 2);
+    mon = heroBiosGetPokemonPtr(partyBase, 2);
     if (fn_8011E850((u8*)mon) != 0) {
         eligible = 1;
-    } else if (fn_80123FBC((u8*)mon) != 0 && menuCBRule_CheckPokemonEventFlag() == 1) {
+    } else if (pokemonCheckValid((u8*)mon) != 0 && menuCBRule_CheckPokemonEventFlag() == 1) {
         eligible = 1;
     } else {
         eligible = 0;
@@ -9012,10 +9012,10 @@ void fn_8002F284(void)
     menuItemBiosSetSelectFlag(0xFFE, (u32)eligible);
 
     /* Slot 3 -> menu element 0xFFB. */
-    mon = fn_8012AC08(partyBase, 3);
+    mon = heroBiosGetPokemonPtr(partyBase, 3);
     if (fn_8011E850((u8*)mon) != 0) {
         eligible = 1;
-    } else if (fn_80123FBC((u8*)mon) != 0 && menuCBRule_CheckPokemonEventFlag() == 1) {
+    } else if (pokemonCheckValid((u8*)mon) != 0 && menuCBRule_CheckPokemonEventFlag() == 1) {
         eligible = 1;
     } else {
         eligible = 0;
@@ -9023,10 +9023,10 @@ void fn_8002F284(void)
     menuItemBiosSetSelectFlag(0xFFB, (u32)eligible);
 
     /* Slot 4 -> menu element 0xFFD. */
-    mon = fn_8012AC08(partyBase, 4);
+    mon = heroBiosGetPokemonPtr(partyBase, 4);
     if (fn_8011E850((u8*)mon) != 0) {
         eligible = 1;
-    } else if (fn_80123FBC((u8*)mon) != 0 && menuCBRule_CheckPokemonEventFlag() == 1) {
+    } else if (pokemonCheckValid((u8*)mon) != 0 && menuCBRule_CheckPokemonEventFlag() == 1) {
         eligible = 1;
     } else {
         eligible = 0;
@@ -9034,10 +9034,10 @@ void fn_8002F284(void)
     menuItemBiosSetSelectFlag(0xFFD, (u32)eligible);
 
     /* Slot 5 -> menu element 0xFFA. */
-    mon = fn_8012AC08(partyBase, 5);
+    mon = heroBiosGetPokemonPtr(partyBase, 5);
     if (fn_8011E850((u8*)mon) != 0) {
         eligible = 1;
-    } else if (fn_80123FBC((u8*)mon) != 0 && menuCBRule_CheckPokemonEventFlag() == 1) {
+    } else if (pokemonCheckValid((u8*)mon) != 0 && menuCBRule_CheckPokemonEventFlag() == 1) {
         eligible = 1;
     } else {
         eligible = 0;
@@ -9167,7 +9167,7 @@ asm void fn_8002F79C(void) {
  */
 void fn_8002F79C(void) {
     /* ---- cross-TU callees (block-scope typed externs, TU convention) ---- */
-    extern u8*  fn_80129280(s32 side, s32 slotType);      /* get party/group handle */
+    extern u8*  savedataGetStatus(s32 side, s32 slotType);      /* get party/group handle */
     extern u32  heroGetStatus(u8* ptr, u32 selector, u32 idx); /* interaction getter */
     extern u16  fn_8011F1A0(u8* obj);                     /* read interaction field */
     extern u8   itemDataBiosGetPtr(u16 handle);                  /* effect/UI helper */
@@ -9180,12 +9180,12 @@ void fn_8002F79C(void) {
     extern void fn_80166AB8(u32 a, u32 b, u32 c);         /* play sound/cue */
     extern void fn_801021F8(s32 id, s32 flag);            /* set UI visibility */
     extern u32  fn_8011ED68(u8* obj);                     /* interaction busy query */
-    extern u8*  fn_8012AC08(u8* party, u32 slot);         /* get party member at slot */
+    extern u8*  heroBiosGetPokemonPtr(u8* party, u32 slot);         /* get party member at slot */
     extern u8   fn_8011E850(u8* mon);                     /* flag query */
-    extern u8   fn_80123FBC(u8* mon);                     /* validity check */
+    extern u8   pokemonCheckValid(u8* mon);                     /* validity check */
     extern u8   menuCBRule_CheckPokemonEventFlag(u8* mon);                     /* usable-state query */
     extern u8   fn_8011E8DC(u8* mon);                     /* flag query */
-    extern u32  fn_8012640C(u8* obj, u32 id, u32 selector, u32 d); /* mon prop getter */
+    extern u32  pokemonGetStatus(u8* obj, u32 id, u32 selector, u32 d); /* mon prop getter */
     extern void _threadSwitch(void);                        /* vsync / scheduler yield */
     extern u32  fn_800D37CC(void);                        /* GSrandom_Get */
     extern s32  fn_800D3088(void);                        /* GSgfx tick */
@@ -9211,7 +9211,7 @@ void fn_8002F79C(void) {
     u32 slot;
     u8  foundWild;
 
-    party = fn_80129280(0, 2);
+    party = savedataGetStatus(0, 2);
     interact = (u8*)heroGetStatus(0, 3, (u16)lbl_8047A428);
 
     field = fn_8011F1A0(interact);
@@ -9300,11 +9300,11 @@ void fn_8002F79C(void) {
         if ((u16)slot == (u16)lbl_8047A428) {
             continue;
         }
-        mon = fn_8012AC08(party, slot);
+        mon = heroBiosGetPokemonPtr(party, slot);
         if (fn_8011E850(mon) != 0) {
             continue;
         }
-        if (fn_80123FBC(mon) == 0) {
+        if (pokemonCheckValid(mon) == 0) {
             continue;
         }
         if (menuCBRule_CheckPokemonEventFlag(mon) != 1) {
@@ -9313,7 +9313,7 @@ void fn_8002F79C(void) {
         if (fn_8011E8DC(mon) != 0) {
             continue;
         }
-        if ((u16)fn_8012640C(mon, 0, 0x83, 0) != 0) {
+        if ((u16)pokemonGetStatus(mon, 0, 0x83, 0) != 0) {
             foundWild = 1;
         }
     }

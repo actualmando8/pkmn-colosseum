@@ -1375,21 +1375,21 @@ extern u8   fn_801FECD4(void);
 extern void fn_80207BF4(void* ptr);
 extern void fn_80207B8C(void* ptr, s32 a);
 extern s32  fn_800096B4(void* ptr, s32 a, u8* b, u8* c, u8* d, u8* e);
-extern u16  fn_8012640C(s32 a, u16 b, s32 c, s32 d);
+extern u16  pokemonGetStatus(s32 a, u16 b, s32 c, s32 d);
 extern void fn_8010B01C(void* ptr, s32 a, s32 b);
 extern void _threadSwitch(void);
 extern void fn_8010BBB8(void* ptr);
 extern s8   fn_8010BCE4(void);
-extern void* fn_80121C18(void* ptr);
+extern void* pokemonCreateSequence(void* ptr);
 extern void battleGridReplacePokemon(void* ptr, void* src);
 extern void fn_801C3430(void);
-extern void fn_801254B4(void* ptr, s32 a, s32 b, s32 c, s32 d);
+extern void pokemonSetStatus(void* ptr, s32 a, s32 b, s32 c, s32 d);
 extern void fn_801DB100(void* ptr);
 extern void fn_801DA4E8(void* ptr, s32 a);
 extern void fn_80202810(void* ptr, s32 a);
 extern void fn_802653FC(void* ptr, u16 a, s32 b);
-extern void fn_80122040(void* a, u16 b);
-extern void* fn_801248C4(void* ptr);
+extern void pokemonSetSequenceStatus(void* a, u16 b);
+extern void* pokemonGetTokuseiDataId(void* ptr);
 extern void fn_80207BC0(void* ptr, void* a);
 extern void fn_80207B5C(void* ptr, u8 a, u16 b);
 extern void fn_80265754(void* ptr, u16 a);
@@ -1448,19 +1448,19 @@ s32 menuFightPokemonSelectSub(u32 ctx) {
 
         result = fn_800096B4(scene, 1, &sp_b, &sp_a, &sp_9, &sp_8);
         if (result == 1) {
-            itemId = fn_8012640C(0, (u16)(u32)scene, 0x6e, 0);
+            itemId = pokemonGetStatus(0, (u16)(u32)scene, 0x6e, 0);
             if (encounter != 0) {
-                subItem = fn_8012640C(0, (u16)(u32)encounter, 0xee, 0);
+                subItem = pokemonGetStatus(0, (u16)(u32)encounter, 0xee, 0);
                 if (subItem != 0) {
                     void* animPtr;
                     fn_8010B01C(scene, 0, 0);
                     do {
                         fn_8010BBB8(scene);
                     } while (fn_8010BCE4() == 0);
-                    animPtr = fn_80121C18(scene);
+                    animPtr = pokemonCreateSequence(scene);
                     battleGridReplacePokemon((void*)(u32)subItem, animPtr);
                     fn_801C3430();
-                    fn_801254B4(encounter, 0, 0xee, 0, (s32)animPtr);
+                    pokemonSetStatus(encounter, 0, 0xee, 0, (s32)animPtr);
                     fn_801DB100((void*)(u32)subItem);
                     fn_801DA4E8(animPtr, 1);
                     fn_80202810(encounter, 0x14);
@@ -1472,15 +1472,15 @@ s32 menuFightPokemonSelectSub(u32 ctx) {
                 }
                 {
                     u16 eeItem;
-                    eeItem = fn_8012640C(0, (u16)(u32)encounter, 0xee, 0);
-                    fn_80122040(scene, eeItem);
+                    eeItem = pokemonGetStatus(0, (u16)(u32)encounter, 0xee, 0);
+                    pokemonSetSequenceStatus(scene, eeItem);
                 }
-                fn_80207BC0(encounter, fn_801248C4(scene));
+                fn_80207BC0(encounter, pokemonGetTokuseiDataId(scene));
                 {
                     u16 i;
                     for (i = 0; (u16)i < 2; i++) {
                         u16 val;
-                        val = fn_8012640C(0, itemId, 0x16, i);
+                        val = pokemonGetStatus(0, itemId, 0x16, i);
                         fn_80207B5C(encounter, (u8)i, val);
                     }
                 }
@@ -1491,7 +1491,7 @@ s32 menuFightPokemonSelectSub(u32 ctx) {
     }
 
     if ((u8)fn_80203E7C(ctx) > (u8)prevLevel) {
-        fn_801254B4((void*)ctx, 0, 0xd0, 0, 1);
+        pokemonSetStatus((void*)ctx, 0, 0xd0, 0, 1);
     }
 
     fn_80265754(archive, savedId);
@@ -2177,7 +2177,7 @@ void* _dbgMenuFightGetFightTrainerPokemonPartDataIdSub(u32 id) {
 #pragma pop
 
 /* _dbgMenuFightGetWazaDataIdSub - 0x800083FC | size: 0x64 */
-extern void* fn_8011BEB4(s32 a, u16 b, s32 c, s32 d);
+extern void* wazaGetStatus(s32 a, u16 b, s32 c, s32 d);
 #if 0
 asm void _dbgMenuFightGetWazaDataIdSub(void) {
 #include "src/game/gs_task_fn_800083FC.inc"
@@ -2188,7 +2188,7 @@ asm void _dbgMenuFightGetWazaDataIdSub(void) {
 void* _dbgMenuFightGetWazaDataIdSub(u32 id) {
     if (id == 0) return fn_800FA280(0xEB63);
     if (id >= 0x163) return fn_800FA280(0xEB63);
-    return fn_800FA280((u32)fn_8011BEB4(0, (u16)id, 1, 0));
+    return fn_800FA280((u32)wazaGetStatus(0, (u16)id, 1, 0));
 }
 #pragma pop
 #endif

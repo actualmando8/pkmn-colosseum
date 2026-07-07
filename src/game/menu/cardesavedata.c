@@ -86,9 +86,9 @@ void fn_80084A8C(void) {
     extern void fn_80087AE8();
     extern void fn_80128E04();
     extern void fn_80128E24();
-    extern void fn_80129280();
-    extern void fn_8012A248();
-    extern void fn_8012AC64();
+    extern void savedataGetStatus();
+    extern void heroInit();
+    extern void heroBiosCopy();
     extern void fn_80132A38();
     extern void gamedataAttestBiosGetLangareaId();
     extern void gamedataBiosGetGamedataAtttestPtr();
@@ -232,7 +232,7 @@ void fn_80084A8C(void) {
             }
         r3 = 0x0;
         r4 = 0x2;
-        fn_80129280();
+        savedataGetStatus();
         r4 = 0x0;
         *(u8*)((u8*)r16 + 0x21) = r4;
         r4 = 0x8;
@@ -285,7 +285,7 @@ void fn_80084A8C(void) {
             r3 = *(u32*)((u8*)r3 + 0x0);
             if (r3 != 0) {
                 r4 = r18;
-                fn_8012AC64();
+                heroBiosCopy();
         }
         }
         tmp = 0xa;
@@ -1009,7 +1009,7 @@ void fn_80084A8C(void) {
             }
         }
         r3 = r22;
-        fn_8012A248();
+        heroInit();
         tmp = 0x0;
         r3 = r28;
         *(u32*)(sp + 0x18) = tmp;

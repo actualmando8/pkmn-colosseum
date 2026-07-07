@@ -316,7 +316,7 @@ void gba_LinkInit(void);
 /* __assert */ extern void  GS_Assert(const char* file, u32 line, const char* msg);
 
 /* Pokemon validation */
-/* fn_80123FBC */ extern u8    pokemon_IsValid(void* pSaveCtx);
+/* pokemonCheckValid */ extern u8    pokemon_IsValid(void* pSaveCtx);
 /* fn_8011F5C8 */ extern u16   pokemon_GetSpecies(void* pSaveCtx);
 
 /* Data extraction */

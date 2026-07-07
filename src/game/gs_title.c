@@ -2727,10 +2727,10 @@ extern void fn_801CB9D8(u32);
 extern void fn_8010A420(void*);
 extern void fn_80029760(void);
 extern void fn_80029638(void);
-extern void fn_80128E38(void);
+extern void savedataCreate(void);
 extern void fn_800056E4(void);
 extern void fn_800056EC(void);
-extern void fn_80130054(void);
+extern void heroMoveSyncWithHero(void);
 extern void menuModelInit(void);
 extern void fn_8010A010(void);
 extern void peopleInfoBiosGetPtr(void);
@@ -2895,9 +2895,9 @@ void fn_800216E8(void* arg0, s32 arg1, u8* arg2, s16 arg3, s32 arg4) {
 
 /* fn_800218BC - 0x800218BC | size: 0x1e0 */
 extern void fn_80014118(s32, void*, void*);
-extern s32 fn_80123FBC(s32);
+extern s32 pokemonCheckValid(s32);
 extern u8 pokemonIsDarkPokemon(s32);
-extern f32 fn_8011FC14(void*);
+extern f32 pokemonGetDp(void*);
 extern s32 fn_800141BC(void*, s32);
 extern void fn_80014198(s32);
 extern u8 lbl_803A1B90[];
@@ -2910,7 +2910,7 @@ asm void fn_800218BC(void) {
 #pragma push
 #pragma peephole off
 s32 fn_800218BC(u32 arg0, u32* arg1) {
-    extern f32 fn_8011FC14(void*);
+    extern f32 pokemonGetDp(void*);
     extern void fn_80106D3C(s32, s32, s32, s32);
     extern void fn_801069FC(s32);
     f32 thresh;
@@ -2938,9 +2938,9 @@ s32 fn_800218BC(u32 arg0, u32* arg1) {
     thresh = *(f32*)&lbl_8047B8A0;
     for (i = 0; i < 6; i++) {
         fn_80014118(i, &sp_c, &sp_8);
-        if ((u8)fn_80123FBC((s32)sp_c) != 0) {
+        if ((u8)pokemonCheckValid((s32)sp_c) != 0) {
             if (pokemonIsDarkPokemon((s32)sp_c) != 0) {
-                if (fn_8011FC14(sp_c) > thresh) break;
+                if (pokemonGetDp(sp_c) > thresh) break;
             }
         }
     }
@@ -2955,7 +2955,7 @@ s32 fn_800218BC(u32 arg0, u32* arg1) {
         fn_80014118(idx, &sp_c, &sp_8);
         ok = 0;
         if (pokemonIsDarkPokemon((s32)sp_c) != 0) {
-            if (fn_8011FC14(sp_c) > *(f32*)&lbl_8047B8A0) ok = 1;
+            if (pokemonGetDp(sp_c) > *(f32*)&lbl_8047B8A0) ok = 1;
         }
         if (ok == 0) {
             fn_80106D3C(2, 0x4261, 1, 0);
@@ -3046,7 +3046,7 @@ s32 fn_80022050(s32 arg0, s32* arg1) {
     iVar4 = 0;
     do {
         fn_80014118(iVar4, &spC, &sp8);
-        if ((u8)fn_80123FBC(spC) != 0) {
+        if ((u8)pokemonCheckValid(spC) != 0) {
             iVar3 = iVar3 + 1;
         }
         iVar4 = iVar4 + 1;
@@ -3257,9 +3257,9 @@ extern void fn_8011F5C8(s32);
 extern void fn_8011E778(void);
 extern void fn_8011E2AC(void);
 extern void fn_802600E4(void);
-extern void fn_80123D58(void);
-extern void fn_80123090(void);
-extern void fn_80122370(void);
+extern void pokemonWazaCreate(void);
+extern void pokemonGetSoubiItemSoubiDataId(void);
+extern void pokemonGetFriendFormPokemonFriendFilterId(void);
 #if 0
 asm void fn_80022834(void) {
 #include "src/game/gs_title_fn_80022834.inc"
@@ -3278,9 +3278,9 @@ s32 fn_80022834(u32 arg0, u32* arg1) {
     extern s32 fn_8011E778(void);
     extern u8 fn_8011E2AC(s32, s32);
     extern s32 fn_802600E4(s32, u32, void*, s32, void*, s32);
-    extern void fn_80123D58(s32, u32, u32);
-    extern u32 fn_80123090(s32);
-    extern void fn_80122370(s32, u32, s32);
+    extern void pokemonWazaCreate(s32, u32, u32);
+    extern u32 pokemonGetSoubiItemSoubiDataId(s32);
+    extern void pokemonGetFriendFormPokemonFriendFilterId(s32, u32, s32);
     extern void cbForgetWazaSelect__FP7PokemonUsl(void);
 
     s32 type_byte;
@@ -3357,8 +3357,8 @@ s32 fn_80022834(u32 arg0, u32* arg1) {
                 } else {
                     tmp = fn_802600E4(c, v2, &buf, 1, cbForgetWazaSelect__FP7PokemonUsl, 0);
                     if (tmp != 0) {
-                        fn_80123D58(c, buf, (u16)v2);
-                        fn_80122370(c, fn_80123090(c), 4);
+                        pokemonWazaCreate(c, buf, (u16)v2);
+                        pokemonGetFriendFormPokemonFriendFilterId(c, pokemonGetSoubiItemSoubiDataId(c), 4);
                     }
                 }
             }
@@ -3384,7 +3384,7 @@ extern s32 fn_8011E15C(void);
 extern void fn_80166A28(s32);
 extern s32 fn_801666BC(s32);
 extern void fn_80121B4C(s32, s32);
-extern void fn_8011F910(s32, s32, s32);
+extern void pokemonAddDpFormPokemonDpFilterId(s32, s32, s32);
 extern u8 lbl_80266C30[];
 extern u32 lbl_8047B8A0;
 #if 0
@@ -3430,7 +3430,7 @@ s32 fn_80022B3C(s32 arg0, s32 arg1) {
     sp2C = *(s32*)((u8*)data_ptr + 0x1C);
     
     fn_80014118(temp_r30, &spC, &sp8);
-    result = fn_80123FBC(spC);
+    result = pokemonCheckValid(spC);
     
     if ((result & 0xFF000000) == 0) {
         return 1;
@@ -3492,7 +3492,7 @@ s32 fn_80022B3C(s32 arg0, s32 arg1) {
         return 0;
     }
     
-    result = fn_80123FBC(temp_r29);
+    result = pokemonCheckValid(temp_r29);
     if ((result & 0xFF000000) == 0) {
         return 0;
     }
@@ -3524,11 +3524,11 @@ s32 fn_80022B3C(s32 arg0, s32 arg1) {
     }
     
     /* Final particle processing */
-    f1 = fn_8011FC14((void*)spC);
+    f1 = pokemonGetDp((void*)spC);
     f0 = lbl_8047B8A0;
     
     if (f1 > f0) {
-        fn_8011F910(spC, temp_r30 & 0xFFFF, 4);
+        pokemonAddDpFormPokemonDpFilterId(spC, temp_r30 & 0xFFFF, 4);
         fn_8011F4F0(spC);
         result = fn_80121ADC(spC, 0x3E);
         
@@ -3576,9 +3576,9 @@ s32 fn_80022E54(void* r3, u32* r4) {
 #endif
 
 /* fn_80022EE4 - 0x80022EE4 | size: 0x184 */
-extern s32 fn_80128A64(s32, s32, u16, void*, void*);
+extern s32 pokemonEvolutionCheck(s32, s32, u16, void*, void*);
 extern void menuOffScreenSetDisp(s32);
-extern void fn_8012805C(s32, s32, u16, void*, s32, s32, s32, s32);
+extern void pokemonEvolutionAll(s32, s32, u16, void*, s32, s32, s32, s32);
 extern f32 lbl_8047B8A4;
 #if 0
 asm void fn_80022EE4(void) {
@@ -3615,11 +3615,11 @@ s32 fn_80022EE4(u32 arg0, u32* arg1) {
     fn_80014198(slot);
 
     if (slot >= 0 && (s16)effect > 0) {
-        effect = fn_80128A64(sc, 1, (u16)arg0, &sp8, &spC);
+        effect = pokemonEvolutionCheck(sc, 1, (u16)arg0, &sp8, &spC);
         fadeSet(lbl_8047B8A4, 3);
         fadeCheck(1);
         menuOffScreenSetDisp(0);
-        fn_8012805C(sc, effect, sp8, &spC, 0, 1, 0, 0);
+        pokemonEvolutionAll(sc, effect, sp8, &spC, 0, 1, 0, 0);
         menuOffScreenSetDisp(1);
         fadeSet(lbl_8047B8A4, 2);
         fadeCheck(1);
@@ -3748,13 +3748,13 @@ s32 cbForgetWazaSelect__FP7PokemonUsl(s32 r3, s32 r4) {
 #endif
 
 /* fn_800232F0 - 0x800232F0 | size: 0x470 */
-extern s32 fn_8012640C(u32, s32, s32, s32);
+extern s32 pokemonGetStatus(u32, s32, s32, s32);
 extern void fn_80165668(void);
 extern void fn_8011F4A8(void);
 extern void fn_80105D48(void);
 extern void fn_80105C68(void);
-extern void fn_80123B5C(void);
-extern void fn_801236F8(void);
+extern void pokemonSearchWazaDataId(void);
+extern void pokemonGetOboeWazaDataId(void);
 extern f32 lbl_8047B8A4;
 #if 0
 asm void fn_800232F0(void) {
@@ -3787,8 +3787,8 @@ s32 fn_80023760(u32 arg0, u32* arg1) {
     fn_800141BC((void*)arg0, 0);
     for (slot = 0; slot < 6; slot++) {
         fn_80014118(slot, &sc, &sd);
-        if ((u8)fn_80123FBC(sc) != 0) {
-            if ((s32)fn_8012640C(sc, 0, 0x83, 0) <= 0) {
+        if ((u8)pokemonCheckValid(sc) != 0) {
+            if ((s32)pokemonGetStatus(sc, 0, 0x83, 0) <= 0) {
                 if ((u8)fn_80121ADC(sc, 0x3E) == 0) {
                     effect = fn_80144574(buf, sc, sd, (u16)arg0, 0);
                     if ((s16)effect > 0) {

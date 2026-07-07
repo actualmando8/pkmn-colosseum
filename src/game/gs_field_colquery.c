@@ -1087,13 +1087,13 @@ void fn_80112260(void) {
 #pragma peephole off
 s32 floorCheckFightKind(u32 id) {
 #pragma optimization_level 4
-    extern void fn_80115C48(void);
-    extern s32 fn_80115AC8(void);
+    extern void floorDataBiosGetPtr(void);
+    extern s32 floorDataBiosGetFloorKind(void);
     s32 ready = 0;
 
     if (id != 0xFFFFFFFF) {
-        fn_80115C48();
-        switch (fn_80115AC8() & 0xFF) {
+        floorDataBiosGetPtr();
+        switch (floorDataBiosGetFloorKind() & 0xFF) {
         case 2:
             ready = 1;
             break;
@@ -1110,12 +1110,12 @@ s32 floorCheckFightKind(u32 id) {
 #pragma optimizewithasm off
 void fn_80112700(void) {
 #pragma optimization_level 4
-    extern void fn_80115BD8(void);
+    extern void floorDataBiosGetCurrentPtr(void);
     extern u32 fn_801159A8(void);
     extern void fn_800F7318(s32, u32, s32, s32, s32, ...);
     u32 id;
 
-    fn_80115BD8();
+    floorDataBiosGetCurrentPtr();
     if ((id = fn_801159A8()) != 0) {
         fn_800F7318(0xF, id, 0x1000, 1, 0, 0);
     }
@@ -1271,13 +1271,13 @@ void fn_801129AC(void) {
 #pragma push
 #pragma peephole off
 void fn_80112F8C(void) {
-    extern void* fn_801157B0(void);
+    extern void* floorDataBiosGetMainFunc(void);
     extern u32 fn_800FF560(void);
     extern void GSthreadCreate(s32 a, u32 b, u32 c, u32 d, u32 e, void* f);
     extern void fn_800FF0A0(void (*callback)(void));
     void* obj;
 
-    obj = fn_801157B0();
+    obj = floorDataBiosGetMainFunc();
     if (obj != NULL) {
         GSthreadCreate(1, fn_800FF560(), 0x4000, 1, 1, obj);
     }
@@ -1301,8 +1301,8 @@ void fn_80112FEC(void) {
 #pragma peephole off
 void _floorInitCharacters__FP11GSfloor_dd_(void* a) {
 #pragma optimization_level 4
-    extern u32 fn_80115A80(void);
-    extern u32 fn_80115704(void* a);
+    extern u32 floorDataBiosGetGroupID(void);
+    extern u32 floorDataBiosGetCharNum(void* a);
     extern u8* fn_8011711C(u32 i);
     extern void floorCharacterBiosGetPeopleInfoPtr(void);
     extern s32 fn_8018F6B4(void);
@@ -1317,15 +1317,15 @@ void _floorInitCharacters__FP11GSfloor_dd_(void* a) {
     extern void floorCharacterBiosGetRot(u8* obj, void* out);
     extern void fn_8018BF24(u32 model, u32 i, void* p);
     extern void fn_8018CB5C(u32 model, u32 i);
-    extern s32 fn_80117054(u8* obj);
+    extern s32 floorCharacterBiosGetVisibility(u8* obj);
     extern void fn_8018C1E8(u32 model, u32 i, s32 x);
-    extern s32 fn_80117038(u8* obj);
+    extern s32 floorCharacterBiosGetLoadInit(u8* obj);
     extern void fn_8018CA20(u32 model, u32 i, s32 x);
-    extern u8 fn_80116F4C(u8* obj);
+    extern u8 floorCharacterBiosGetMoveType(u8* obj);
     extern void fn_80183B44(u32 model, u32 i, f32 x);
     extern void fn_801839A0(u32 model, u32 i, f32 x, f32 y);
-    extern u8 fn_80116F30(u8* obj);
-    extern u8 fn_80116F14(u8* obj);
+    extern u8 floorCharacterBiosGetTalkStartType(u8* obj);
+    extern u8 floorCharacterBiosGetTalkEndType(u8* obj);
     extern void fn_8018C69C(u32 model, u32 i, s32 flag);
     extern void fn_80188F78(u32 model, u32 i);
     extern const char lbl_802720CC[];
@@ -1341,8 +1341,8 @@ void _floorInitCharacters__FP11GSfloor_dd_(void* a) {
     f32 v14[3];
     f32 v8[3];
 
-    model = fn_80115A80();
-    count = fn_80115704(a);
+    model = floorDataBiosGetGroupID();
+    count = floorDataBiosGetCharNum(a);
     for (i = 0; i < count; i++) {
         obj = fn_8011711C(i);
         floorCharacterBiosGetPeopleInfoPtr();
@@ -1368,9 +1368,9 @@ void _floorInitCharacters__FP11GSfloor_dd_(void* a) {
             floorCharacterBiosGetRot(obj, v8);
             fn_8018BF24(model, i, v8);
             fn_8018CB5C(model, i);
-            fn_8018C1E8(model, i, fn_80117054(obj));
-            fn_8018CA20(model, i, fn_80117038(obj));
-            switch (fn_80116F4C(obj)) {
+            fn_8018C1E8(model, i, floorCharacterBiosGetVisibility(obj));
+            fn_8018CA20(model, i, floorCharacterBiosGetLoadInit(obj));
+            switch (floorCharacterBiosGetMoveType(obj)) {
             case 0:
             case 1:
                 break;
@@ -1381,7 +1381,7 @@ void _floorInitCharacters__FP11GSfloor_dd_(void* a) {
                 fn_801839A0(model, i, lbl_8047CF8C, lbl_8047CF90);
                 break;
             }
-            switch (fn_80116F30(obj)) {
+            switch (floorCharacterBiosGetTalkStartType(obj)) {
             case 0:
                 break;
             case 1:
@@ -1391,7 +1391,7 @@ void _floorInitCharacters__FP11GSfloor_dd_(void* a) {
                 fn_8018C7C8(model, i, 0x20);
                 break;
             }
-            switch (fn_80116F14(obj)) {
+            switch (floorCharacterBiosGetTalkEndType(obj)) {
             case 0:
                 fn_8018C69C(model, i, 0x40);
                 break;
@@ -1529,7 +1529,7 @@ void fn_8011395C(u32 value) {
 #pragma scheduling off
 s32 fn_8011396C(s32 param) {
 #pragma optimization_level 4
-    extern u32 fn_80115C48(void);
+    extern u32 floorDataBiosGetPtr(void);
     extern s32 fn_80115840(void);
 
     switch (param) {
@@ -1538,7 +1538,7 @@ s32 fn_8011396C(s32 param) {
     case 0xFF:
         return 0;
     }
-    if (fn_80115C48() == 0) {
+    if (floorDataBiosGetPtr() == 0) {
         return 0;
     }
     return fn_80115840();
@@ -1750,11 +1750,11 @@ void floorOpenObject(u32 modelIndex) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_80113F48(void) {
-    extern void fn_80115BD8(void);
-    extern void fn_80115A80(void);
+    extern void floorDataBiosGetCurrentPtr(void);
+    extern void floorDataBiosGetGroupID(void);
 
-    fn_80115BD8();
-    fn_80115A80();
+    floorDataBiosGetCurrentPtr();
+    floorDataBiosGetGroupID();
 }
 #pragma pop
 
@@ -1764,16 +1764,16 @@ void fn_80113F48(void) {
 #pragma optimizewithasm off
 void* floorGetResource(u32 key, u32 arg) {
 #pragma optimization_level 4
-    extern void* fn_80115C48(u32);
-    extern u32 fn_80115A80(void*);
+    extern void* floorDataBiosGetPtr(u32);
+    extern u32 floorDataBiosGetGroupID(void*);
     extern void* GSresGetResource(u32, u32);
     void* resource;
 
-    resource = fn_80115C48(key);
+    resource = floorDataBiosGetPtr(key);
     if (resource == NULL) {
         return NULL;
     }
-    return GSresGetResource(fn_80115A80(resource), arg);
+    return GSresGetResource(floorDataBiosGetGroupID(resource), arg);
 }
 #pragma pop
 
@@ -1783,15 +1783,15 @@ void* floorGetResource(u32 key, u32 arg) {
 #pragma optimizewithasm off
 u32 fn_80113FB4(u32 key) {
 #pragma optimization_level 4
-    extern void* fn_80115C48(u32);
-    extern u32 fn_80115A80(void*);
+    extern void* floorDataBiosGetPtr(u32);
+    extern u32 floorDataBiosGetGroupID(void*);
     void* resource;
 
-    resource = fn_80115C48(key);
+    resource = floorDataBiosGetPtr(key);
     if (resource == NULL) {
         return 0;
     }
-    return fn_80115A80(resource);
+    return floorDataBiosGetGroupID(resource);
 }
 #pragma pop
 

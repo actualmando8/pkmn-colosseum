@@ -47,7 +47,7 @@ extern u32  fn_801902E0(u32 flagId);                   /* GSflagGet */
 extern void fn_80113828(u32 a, u32 b);                /* floor resource unload helper */
 extern void fn_8011288C(u32 a, u32 b);                /* floor resource alloc helper */
 extern u32  fn_8011394C(void);                         /* floor state query */
-extern void* fn_80129280(u32 a, u32 b);               /* battle/effect state setup */
+extern void* savedataGetStatus(u32 a, u32 b);               /* battle/effect state setup */
 extern void gamedatasaveSetStatus(void* ctx, u32 a, u32 b);     /* effect parameter set */
 extern void* gamedatasaveGetStatus(void* ctx, u32 a);            /* effect query */
 extern void heroSetStatus(u32 a, u32 b, u32 c);         /* effect system control */
@@ -235,7 +235,7 @@ void fn_80035E04(void) {
  *
  *    ; Set up battle/effect state for credits scene
  *    li r3, 0; li r4, 1
- *    bl fn_80129280            ; allocate effect context
+ *    bl savedataGetStatus            ; allocate effect context
  *    ; ... extensive effect parameter setup ...
  *
  *    ; Poll input for skip
@@ -285,7 +285,7 @@ void fn_80035F64(void) {
     fn_80190528(0x0478);
 
     /* Step 5: Set up battle/effect state for credits scene */
-    effectCtx = fn_80129280(0, 1);
+    effectCtx = savedataGetStatus(0, 1);
     gamedatasaveSetStatus(effectCtx, 5, 2);
     gamedatasaveSetStatus(effectCtx, 7, 1);
     gamedatasaveSetStatus(effectCtx, 8, 1);
@@ -294,7 +294,7 @@ void fn_80035F64(void) {
 
     savedCtx = fn_801D036C();
 
-    effectCtx2 = fn_80129280(0, 0);
+    effectCtx2 = savedataGetStatus(0, 0);
 
     /* Copy battle state data (0x3BFA iterations) */
     /* This is a large memcpy-like block transfer in the original assembly,
@@ -343,7 +343,7 @@ void fn_80035F64(void) {
             void* pairA;
             void* pairB;
 
-            effectCtx2 = fn_80129280((u32)savedCtx, 2);
+            effectCtx2 = savedataGetStatus((u32)savedCtx, 2);
             pairA = (void*)heroGetStatus(2, 0, 0);
             pairB = (void*)heroGetStatus(0, 2, 0);
 
@@ -362,7 +362,7 @@ void fn_80035F64(void) {
 
 postCheck:
     /* Restore original battle context */
-    effectCtx2 = fn_80129280(0, 0);
+    effectCtx2 = savedataGetStatus(0, 0);
     {
         u32* src = (u32*)((u8*)savedCtx - 4);
         u32* dst = (u32*)((u8*)effectCtx2 - 4);

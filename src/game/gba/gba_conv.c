@@ -67,7 +67,7 @@ extern void fn_80106D3C();
 extern void fn_801081F8();
 extern void winSpriteSetDisp();
 extern void fn_8011394C();
-extern void fn_8011C7C0();
+extern void wazaDataBiosGetDoc();
 extern void wazaDataBiosGetPtr();
 /* ... and 27 more external functions */
 extern void* memset(void* dst, int val, u32 size);
@@ -135,7 +135,7 @@ void fn_80089030(u8 x);
 
 /* 0x80083AF4 | size: 0x104 */
 void fn_80083AF4(void) {
-    extern void fn_80129280();
+    extern void savedataGetStatus();
     u8 sp[0x20];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -152,7 +152,7 @@ void fn_80083AF4(void) {
 
         r3 = 0x0;
         r4 = 0xd;
-        fn_80129280();
+        savedataGetStatus();
     }
     r0 = (u32)sp + 0x8;
     r6 = r3 + 0x4000;
@@ -207,7 +207,7 @@ while (1) {
 
 /* 0x80083BF8 | size: 0xC4 */
 void fn_80083BF8(void) {
-    extern void fn_80129280();
+    extern void savedataGetStatus();
     u8 sp[0x10];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -221,7 +221,7 @@ void fn_80083BF8(void) {
 
         r3 = 0x0;
         r4 = 0xd;
-        fn_80129280();
+        savedataGetStatus();
     }
     r6 = r3 + 0x4000;
     r7 = 0x0;
@@ -264,7 +264,7 @@ while (1) {
 
 /* 0x80083CBC | size: 0x40 */
 void fn_80083CBC(void) {
-    extern void fn_80129280();
+    extern void savedataGetStatus();
     u8 sp[0x10];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -276,7 +276,7 @@ void fn_80083CBC(void) {
 
         r3 = 0x0;
         r4 = 0xd;
-        fn_80129280();
+        savedataGetStatus();
     }
     r4 = 0x0;
     r5 = 0x49cc;
@@ -286,7 +286,7 @@ void fn_80083CBC(void) {
 
 /* 0x80083CFC | size: 0x34 */
 void fn_80083CFC(void) {
-    extern void fn_80129280();
+    extern void savedataGetStatus();
     u8 sp[0x10];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -297,7 +297,7 @@ void fn_80083CFC(void) {
 
         r3 = 0x0;
         r4 = 0xd;
-        fn_80129280();
+        savedataGetStatus();
     }
     return;
 }
@@ -305,7 +305,7 @@ void fn_80083CFC(void) {
 /* 0x80083D30 | size: 0x19C */
 void fn_80083D30(void) {
     extern void fn_8011F228();
-    extern void fn_8012AC08();
+    extern void heroBiosGetPokemonPtr();
     extern void fn_80135938();
     u8 sp[0x170];
     u32 tmp = 0;
@@ -327,7 +327,7 @@ void fn_80083D30(void) {
     do {
         r3 = r27;
         r4 = r31 & 0xFFFF;
-        fn_8012AC08();
+        heroBiosGetPokemonPtr();
         r30 = 0x0;
         r29 = r3;
         do {
@@ -342,7 +342,7 @@ void fn_80083D30(void) {
             memset((void*)r3, (int)r4, (u32)r5);
             if (r26 != 0) {
                 r3 = r26;
-                ((void(*)(void))fn_8011C7C0)();
+                ((void(*)(void))wazaDataBiosGetDoc)();
                 ((void(*)(void))fn_800FA280)();
                 r4 = 0x0;
                 r26 = r3;
@@ -445,7 +445,7 @@ void fn_80083ECC(void) {
     memset((void*)r3, (int)r4, (u32)r5);
     if (r30 == 0) { r3 = 0x0; return; }
     r3 = r30;
-    ((void(*)(void))fn_8011C7C0)();
+    ((void(*)(void))wazaDataBiosGetDoc)();
     ((void(*)(void))fn_800FA280)();
     r4 = 0x0;
     r30 = r3;
@@ -1220,9 +1220,9 @@ void fn_80084A8C(void) {
     extern void fn_80087AE8();
     extern void fn_80128E04();
     extern void fn_80128E24();
-    extern void fn_80129280();
-    extern void fn_8012A248();
-    extern void fn_8012AC64();
+    extern void savedataGetStatus();
+    extern void heroInit();
+    extern void heroBiosCopy();
     extern void fn_80132A38();
     extern void gamedataAttestBiosGetLangareaId();
     extern void gamedataBiosGetGamedataAtttestPtr();
@@ -1366,7 +1366,7 @@ void fn_80084A8C(void) {
             }
         r3 = 0x0;
         r4 = 0x2;
-        fn_80129280();
+        savedataGetStatus();
         r4 = 0x0;
         *(u8*)((u8*)r16 + 0x21) = r4;
         r4 = 0x8;
@@ -1419,7 +1419,7 @@ void fn_80084A8C(void) {
             r3 = *(u32*)((u8*)r3 + 0x0);
             if (r3 != 0) {
                 r4 = r18;
-                fn_8012AC64();
+                heroBiosCopy();
         }
         }
         tmp = 0xa;
@@ -2143,7 +2143,7 @@ void fn_80084A8C(void) {
             }
         }
         r3 = r22;
-        fn_8012A248();
+        heroInit();
         tmp = 0x0;
         r3 = r28;
         *(u32*)(sp + 0x18) = tmp;
@@ -5122,7 +5122,7 @@ void fn_800884BC(void) {
 /* 0x800886D0 | size: 0x294 */
 void fn_800886D0(void) {
     extern void fn_80128E24();
-    extern void fn_80129280();
+    extern void savedataGetStatus();
     extern void heroAddPokecoupon();
     extern void fn_801902E0();
     extern void fn_80190528();
@@ -5239,12 +5239,12 @@ L_80088824:
             r31 = r30 & 0xFFFF;
             r3 = 0x0;
             r4 = 0xe;
-            fn_80129280();
+            savedataGetStatus();
             tmp = r29 + 0x59aa;
             r4 = 0xe;
             *(u16*)(r3 + tmp) = r31;
             r3 = 0x0;
-            fn_80129280();
+            savedataGetStatus();
             tmp = r29 + 0x26;
             r29 = r29 + 0x1660;
             *(u16*)(r3 + tmp) = r31;
@@ -5253,7 +5253,7 @@ L_80088824:
         r31 = 0x0;
         r3 = 0x0;
         r4 = 0xe;
-        fn_80129280();
+        savedataGetStatus();
         *(u8*)((u8*)r3 + 0x1C) = r31;
         r3 = 0x8ae;
         r4 = 0x0;
@@ -5321,9 +5321,9 @@ s32 fn_800889A4(void) {
 /* 0x800889E4 | size: 0x27C */
 void fn_800889E4(void) {
     extern void fn_80128E24();
-    extern void fn_80129280();
-    extern void fn_8012D2BC();
-    extern void fn_8012D32C();
+    extern void savedataGetStatus();
+    extern void heroMoveGetHeroRot();
+    extern void heroMoveGetHeroPos();
     extern void fn_801906A0();
     extern void _flagSet();
     extern void __assert();
@@ -5345,7 +5345,7 @@ void fn_800889E4(void) {
     r3 = 0x0;
     r30 = (u32)&lbl_8026F4F8;
     r4 = 0xe;
-    fn_80129280();
+    savedataGetStatus();
     r31 = r3;
     r27 = r31 + (0x1 << 16);
     ((void(*)(void))fn_8006A7BC)();
@@ -5379,9 +5379,9 @@ void fn_800889E4(void) {
             __assert();
         }
         r3 = (u32)sp + 0x8;
-        fn_8012D32C();
+        heroMoveGetHeroPos();
         r3 = (u32)sp + 0x14;
-        fn_8012D2BC();
+        heroMoveGetHeroRot();
         f0 = *(f32*)(sp + 0x8);
         *(f32*)((u8*)r28 + 0xC) = f0;
         f0 = *(f32*)(sp + 0xC);
@@ -5447,12 +5447,12 @@ L_80088B48:
         r30 = r28 & 0xFFFF;
         r3 = 0x0;
         r4 = 0xe;
-        fn_80129280();
+        savedataGetStatus();
         tmp = r27 + 0x59aa;
         r4 = 0xe;
         *(u16*)(r3 + tmp) = r30;
         r3 = 0x0;
-        fn_80129280();
+        savedataGetStatus();
         tmp = r27 + 0x26;
         r27 = r27 + 0x1660;
         *(u16*)(r3 + tmp) = r30;
@@ -5461,7 +5461,7 @@ L_80088B48:
     r30 = 0x0;
     r3 = 0x0;
     r4 = 0xe;
-    fn_80129280();
+    savedataGetStatus();
     *(u8*)((u8*)r3 + 0x1C) = r30;
     r3 = 0x8ae;
     r4 = 0x0;
@@ -5494,7 +5494,7 @@ L_80088C38:
 /* 0x80088C60 | size: 0x124 */
 void fn_80088C60(void) {
     extern void fn_80128E24();
-    extern void fn_80129280();
+    extern void savedataGetStatus();
     extern void _flagSet();
     extern void fn_801D0748();
     u8 sp[0x20];
@@ -5527,12 +5527,12 @@ void fn_80088C60(void) {
         r31 = r30 & 0xFFFF;
         r3 = 0x0;
         r4 = 0xe;
-        fn_80129280();
+        savedataGetStatus();
         tmp = r29 + 0x59aa;
         r4 = 0xe;
         *(u16*)(r3 + tmp) = r31;
         r3 = 0x0;
-        fn_80129280();
+        savedataGetStatus();
         tmp = r29 + 0x26;
         r29 = r29 + 0x1660;
         *(u16*)(r3 + tmp) = r31;
@@ -5541,7 +5541,7 @@ void fn_80088C60(void) {
     r31 = 0x0;
     r3 = 0x0;
     r4 = 0xe;
-    fn_80129280();
+    savedataGetStatus();
     *(u8*)((u8*)r3 + 0x1C) = r31;
     r3 = 0x8ae;
     r4 = 0x0;
@@ -5569,7 +5569,7 @@ void fn_80088C60(void) {
 /* 0x80088D84 | size: 0x124 */
 void fn_80088D84(void) {
     extern void fn_80128E24();
-    extern void fn_80129280();
+    extern void savedataGetStatus();
     extern void _flagSet();
     extern void fn_801D0748();
     u8 sp[0x20];
@@ -5602,12 +5602,12 @@ void fn_80088D84(void) {
         r31 = r29 & 0xFFFF;
         r3 = 0x0;
         r4 = 0xe;
-        fn_80129280();
+        savedataGetStatus();
         tmp = r28 + 0x59aa;
         r4 = 0xe;
         *(u16*)(r3 + tmp) = r31;
         r3 = 0x0;
-        fn_80129280();
+        savedataGetStatus();
         tmp = r28 + 0x26;
         r28 = r28 + 0x1660;
         *(u16*)(r3 + tmp) = r31;
@@ -5616,7 +5616,7 @@ void fn_80088D84(void) {
     r31 = 0x0;
     r3 = 0x0;
     r4 = 0xe;
-    fn_80129280();
+    savedataGetStatus();
     *(u8*)((u8*)r3 + 0x1C) = r31;
     r3 = 0x8ae;
     r4 = 0x0;
@@ -5643,16 +5643,16 @@ void fn_80088D84(void) {
 
 /* 0x80088EA8 | size: 0xB0 */
 void fn_80088EA8(u8* p) {
-    extern void fn_8012D2BC(f32*);
-    extern void fn_8012D32C(f32*);
+    extern void heroMoveGetHeroRot(f32*);
+    extern void heroMoveGetHeroPos(f32*);
     extern u32 fn_800FF56C(void);
     extern u32 fn_8011394C(void);
     extern u32 fn_801906A0(s32);
     f32 a[3];
     f32 b[3];
 
-    fn_8012D32C(a);
-    fn_8012D2BC(b);
+    heroMoveGetHeroPos(a);
+    heroMoveGetHeroRot(b);
     *(f32*)(p + 0xC) = a[0];
     *(f32*)(p + 0x10) = a[1];
     *(f32*)(p + 0x14) = a[2];

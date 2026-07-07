@@ -71,7 +71,7 @@
  * fn_8000E290 (GSnpc_TrainerBattle) is a key bridge function:
  *   - Gets the overworld data for the NPC
  *   - Looks up the trainer ID
- *   - Dispatches a battle event via fn_8012640C
+ *   - Dispatches a battle event via pokemonGetStatus
  *   - On event completion, validates the battle result
  *   - Uses a jump table (jumptable_802E4BB8) to handle different
  *     battle outcome types (win, lose, flee, draw)
@@ -186,7 +186,7 @@ extern u32   windowGetParam();                           /* Get participant data
  *   0x123A: Boss/admin battle
  *
  * For each type, configures the battle participants, field, and rules,
- * then hands off to the battle system via fn_8012640C.
+ * then hands off to the battle system via pokemonGetStatus.
  * ========================================================================= */
 
 /* ===================================================================
@@ -1602,9 +1602,9 @@ L_80012758:
 /* ===== Phase 2 recovery stubs ===== */
 
 /* fn_8000D710 - 0x8000D710 | size: 0x398 */
-extern s32 fn_8012C540();
+extern s32 heroMoveCheckEvent();
 extern void fn_80116D30(void);
-extern void fn_8012BCA4(void);
+extern void heroMoveInitEvent(void);
 extern void mailMainReceiveTerminate(void);
 extern void fn_800EC918(void);
 extern s32 fn_800D37CC();
@@ -1625,13 +1625,13 @@ extern void menuPokemonOpen(void);
 extern void menuPdaOpen(void);
 extern u32 fn_80018F88();
 extern u32 fn_80019070();
-extern void fn_8012BAD0(void);
+extern void heroMoveAddAutoEvent(void);
 extern s32 fn_801CBAB8();
 extern void fn_80109764(void);
 extern void fn_801660D8(void);
 extern void menuReleaseOffScreen(void);
 extern void menuCloseSync(void);
-extern void fn_8012BBA8(void);
+extern void heroMoveTermEvent(void);
 extern u8 lbl_8047A2A0;
 extern u32 lbl_8047B6F8;
 extern f32 lbl_8047B6F0;
@@ -1648,9 +1648,9 @@ asm void fn_8000D710(void) {
 #pragma push
 #pragma peephole off
 u32 fn_8000D710(u32 mode) {
-    extern s32 fn_8012C540(void* out);
+    extern s32 heroMoveCheckEvent(void* out);
     extern void fn_80116D30(s32 kind, u16 value);
-    extern void fn_8012BCA4(void);
+    extern void heroMoveInitEvent(void);
     extern void mailMainReceiveTerminate(void);
     extern void fn_800EC918(void);
     extern s32 fn_800D37CC(void);
@@ -1671,13 +1671,13 @@ u32 fn_8000D710(u32 mode) {
     extern void menuPdaOpen(void);
     extern u32 fn_80018F88(s32, void*, s32);
     extern u32 fn_80019070(u32);
-    extern void fn_8012BAD0(u32, u32, u32, s32, s32);
+    extern void heroMoveAddAutoEvent(u32, u32, u32, s32, s32);
     extern s32 fn_801CBAB8(void);
     extern void fn_80109764(void);
     extern void fn_801660D8(s32, s32, s32);
     extern void menuReleaseOffScreen(f32 value);
     extern void menuCloseSync(s32, s32);
-    extern void fn_8012BBA8(void);
+    extern void heroMoveTermEvent(void);
     extern f32 lbl_8047B6F0;
     u8 stackData[0xD8];
     void* threadEntry;
@@ -1688,12 +1688,12 @@ u32 fn_8000D710(u32 mode) {
     u32 work;
     u32 tmp;
 
-    count = fn_8012C540(stackData);
+    count = heroMoveCheckEvent(stackData);
     for (i = 0; i < count; i++) {
         fn_80116D30(4, *(u16*)(stackData + 0x30 + (i * 0x34)));
     }
 
-    fn_8012BCA4();
+    heroMoveInitEvent();
     mailMainReceiveTerminate();
     _threadSwitch();
     fn_800EC918();
@@ -1742,7 +1742,7 @@ u32 fn_8000D710(u32 mode) {
                 result = fn_80018F88(0, &work, 0);
                 fn_800EC918();
                 if (((u16)result != 0) && (fn_80019070(result) != 0xFFFFFFFF)) {
-                    fn_8012BAD0(fn_80019070(result), (u16)result, work, 0, 0);
+                    heroMoveAddAutoEvent(fn_80019070(result), (u16)result, work, 0, 0);
                     break;
                 }
             } else {
@@ -1753,7 +1753,7 @@ u32 fn_8000D710(u32 mode) {
     case 1:
         result = fn_80018F88(0, &work, 0);
         if (((u16)result != 0) && (fn_80019070(result) != 0xFFFFFFFF)) {
-            fn_8012BAD0(fn_80019070(result), (u16)result, work, 0, 0);
+            heroMoveAddAutoEvent(fn_80019070(result), (u16)result, work, 0, 0);
         }
         break;
     default:
@@ -1769,7 +1769,7 @@ u32 fn_8000D710(u32 mode) {
     }
     menuCloseSync(dialogId, 1);
     fn_800D3074(2);
-    fn_8012BBA8();
+    heroMoveTermEvent();
     fn_800EC8DC();
     lbl_8047A2A0 = 0;
     return 0;
@@ -2151,8 +2151,8 @@ void fn_8000E28C(void) {}
 /* fn_8000EA10 - 0x8000EA10 | size: 0x324 */
 extern u32 fn_801F2A7C(s32 arg);
 extern u32 fn_801F986C(u32 warpId, u16 variant);
-extern u32 fn_8012640C();
-extern u32 fn_80123FBC();
+extern u32 pokemonGetStatus();
+extern u32 pokemonCheckValid();
 extern u32 fn_8001D624();
 extern void jumptable_802E4C20();
 #if 0
@@ -2164,8 +2164,8 @@ asm void fn_8000EA10(void) {
 #pragma peephole off
 void fn_8000EA10(u8* ctx, u8* npc) {
     extern u32 windowGetParam(u8* a, s32 b);
-    extern u32 fn_8012640C();
-    extern u32 fn_80123FBC(void);
+    extern u32 pokemonGetStatus();
+    extern u32 pokemonCheckValid(void);
     extern u32 fn_8001D624(u32, s32);
     extern void fn_800FBB34();
     extern void fn_800FB680();
@@ -2193,8 +2193,8 @@ void fn_8000EA10(u8* ctx, u8* npc) {
     if (handle == 0) return;
     handle = fn_801F986C(handle, (u16)slot);
     if (handle == 0) return;
-    handle = fn_8012640C(handle, 0, 0xCC, 0);
-    if ((u8)fn_80123FBC() == 0) return;
+    handle = pokemonGetStatus(handle, 0, 0xCC, 0);
+    if ((u8)pokemonCheckValid() == 0) return;
 
     color = (s32)menuSubCalcColor(ctx, npc);
     if (npcId >= 0x1215 && npcId < 0x121B) {
@@ -2206,17 +2206,17 @@ void fn_8000EA10(u8* ctx, u8* npc) {
         delta = *(s16*)(npc + 0x54) - y - top;
         y = y + ((delta + ((u32)delta >> 31)) >> 1);
         fn_800FB680(y, 0, color, 0x197);
-        fn_80132A38(0x34, (s16)fn_8012640C(handle, 0, 0x83, 0));
+        fn_80132A38(0x34, (s16)pokemonGetStatus(handle, 0, 0x83, 0));
         fn_800FBB34(0, 0, (s16)y, *(s16*)(npc + 0x56), color, 0xDE);
-        fn_80132A38(0x34, (s16)fn_8012640C(handle, 0, 0x87, 0));
+        fn_80132A38(0x34, (s16)pokemonGetStatus(handle, 0, 0x87, 0));
         fn_800FBB34(0, 0, *(s16*)(npc + 0x54), *(s16*)(npc + 0x56), color, 0xDE);
     } else if (npcId >= 0x1221 && npcId < 0x1227) {
         y = (s16)(fn_800FA444(0x1A7) >> 16);
         fn_800FB680(0, 0, color, 0x1A7);
-        fn_80132A38(0x34, (u8)fn_8012640C(handle, 0, 0x7A, 0));
+        fn_80132A38(0x34, (u8)pokemonGetStatus(handle, 0, 0x7A, 0));
         fn_800FBB34(y, 0, *(s16*)(npc + 0x54), *(s16*)(npc + 0x56), color, 0xD2);
     } else if (npcId >= 0x1227 && npcId < 0x122D) {
-        fn_80132A38(0x37, fn_8012640C(handle, 0, 0x77, 0));
+        fn_80132A38(0x37, pokemonGetStatus(handle, 0, 0x77, 0));
         fn_800FBB34(0, 0, *(s16*)(npc + 0x54), *(s16*)(npc + 0x56), color, 0xE7);
     }
 }
@@ -2247,8 +2247,8 @@ void fn_8000ED34(u8* ctx) {
     extern u8 fn_80102620(s32);
     extern s8 fn_800F7920(s32, s32);
     extern s8 fn_800F7994(s32, s32);
-    extern u32 fn_8012640C();
-    extern u32 fn_80123FBC(void);
+    extern u32 pokemonGetStatus();
+    extern u32 pokemonCheckValid(void);
     extern s32 fn_801026A4(s32, ...);
     u8* flags;
     u32 base;
@@ -2308,8 +2308,8 @@ void fn_8000ED34(u8* ctx) {
             if (handle != 0) {
                 handle = fn_801F986C(handle, (u16)selected);
                 if (handle != 0) {
-                    handle = fn_8012640C(handle, 0, 0xCC, 0);
-                    if ((u8)fn_80123FBC() == 0) {
+                    handle = pokemonGetStatus(handle, 0, 0xCC, 0);
+                    if ((u8)pokemonCheckValid() == 0) {
                         handle = 0;
                     }
                 }
@@ -2442,7 +2442,7 @@ void fn_8000F35C(u8* ctx, u8* npc) {
 
 /* fn_8000F400 - 0x8000F400 | size: 0x368 */
 extern u32 fn_80205B8C();
-extern u32 fn_8011BEB4();
+extern u32 wazaGetStatus();
 extern void fn_800FB8C8(void);
 extern void jumptable_802E4CA8();
 #if 0
@@ -2457,9 +2457,9 @@ void fn_8000F400(u8* ctx, u8* npc) {
     extern u8* windowGetAllocPtr(void);
     extern u32 windowGetParam(u8* a, s32 b);
     extern u32 fn_80205B8C(void*);
-    extern u32 fn_8012640C();
-    extern u32 fn_80123FBC(void);
-    extern u32 fn_8011BEB4();
+    extern u32 pokemonGetStatus();
+    extern u32 pokemonCheckValid(void);
+    extern u32 wazaGetStatus();
     extern void fn_800FBB34();
     extern void fn_800FB8C8();
     extern void fn_800FB680();
@@ -2484,7 +2484,7 @@ void fn_8000F400(u8* ctx, u8* npc) {
     if (selected < 0) return;
     battle = fn_80205B8C(*(void**)(party + 0x40));
     if (battle == 0) return;
-    result = fn_8012640C(battle, 0, 0x7F, (u16)selected);
+    result = pokemonGetStatus(battle, 0, 0x7F, (u16)selected);
     color = (s32)menuSubCalcColor(ctx, npc);
     id = *(s16*)(npc + 6);
 
@@ -2497,10 +2497,10 @@ void fn_8000F400(u8* ctx, u8* npc) {
     } else if (id == 0x11F8) {
         fn_801040F0(0, 0, ctx, *(u16*)(party + (selected * 0xC) + 0xC), 0);
     } else if (id == 0x11F9) {
-        value = fn_8011BEB4(0, (u16)result, 0x22, 0);
+        value = wazaGetStatus(0, (u16)result, 0x22, 0);
         fn_800FBB34(0, 0, *(s16*)(npc + 0x54), *(s16*)(npc + 0x56), color, value);
     } else if (id == 0x11FA || id == 0x11FB) {
-        value = fn_8011BEB4(0, (u16)result, (id == 0x11FA) ? 6 : 7, 0);
+        value = wazaGetStatus(0, (u16)result, (id == 0x11FA) ? 6 : 7, 0);
         if ((u32)value <= 1) {
             fn_800FB8C8(0, 0, *(s16*)(npc + 0x54), *(s16*)(npc + 0x56), color, 0x2BE2);
         } else {
@@ -2889,8 +2889,8 @@ u16 arg;
 {
     extern u32 fn_80205B8C(void*);
     extern u32 fn_801FFEC8(void*, u16, s32, void*);
-    extern u32 fn_8012640C();
-    extern u32 fn_8011BEB4();
+    extern u32 pokemonGetStatus();
+    extern u32 wazaGetStatus();
     extern u32 fn_800FA280(void);
     extern u32 fn_802040E8(void*);
     u16 stackValue;
@@ -2903,11 +2903,11 @@ u16 arg;
     obj = *(u8**)(ctx + 0x40);
     battle = fn_80205B8C(obj);
     state = fn_801FFEC8(obj, arg, 1, &stackValue);
-    result = fn_8012640C(battle, 0, 0x7F, arg);
+    result = pokemonGetStatus(battle, 0, 0x7F, arg);
     msg = 0;
     if ((u8)state != 0) {
         fn_80132A38(0x11, (s32)obj);
-        msg = fn_8011BEB4(0, (u16)result, 1, 0);
+        msg = wazaGetStatus(0, (u16)result, 1, 0);
         fn_80132A38(0x28, fn_800FA280());
         fn_801F4C14(0, 0, 0x56, 0, (u16)fn_802040E8(obj));
     }
@@ -2916,7 +2916,7 @@ u16 arg;
         msg = 0x7661;
         break;
     case 5:
-        fn_8011BEB4(0, stackValue, 1, 0);
+        wazaGetStatus(0, stackValue, 1, 0);
         fn_80132A38(0x28, fn_800FA280());
         msg = 0x76BB;
         break;
@@ -2954,7 +2954,7 @@ void fn_80010294(u8* ctx, u8* npc) {
     extern u8* windowGetAllocPtr(u8* a);
     extern u32 fn_80104530(u32 val);
     extern u32 fn_80205B8C(void*);
-    extern u32 fn_8012640C();
+    extern u32 pokemonGetStatus();
     extern void fn_800FB8C8();
     u8* entries;
     u32 color;
@@ -2976,7 +2976,7 @@ void fn_80010294(u8* ctx, u8* npc) {
 
     result = 0;
     if (fn_80205B8C(*(void**)(entries + 0x40)) != 0) {
-        result = (u16)fn_8012640C(fn_80205B8C(*(void**)(entries + 0x40)), 0, 0x7F,
+        result = (u16)pokemonGetStatus(fn_80205B8C(*(void**)(entries + 0x40)), 0, 0x7F,
                                   (s8)ctx[0x95]);
     }
     if (result == 0 || result == 0x164) {
@@ -3007,7 +3007,7 @@ void fn_8001047C(u8* arg1) {
     extern void* windowGetAllocPtr(u8* a);
     extern u32 fn_80104530(u32 val);
     extern void* fn_80205B8C(void* obj);
-    extern u32 fn_8012640C(s32 p1, s32 p2, s32 p3, s32 p4, u16 p5, s32 p6);
+    extern u32 pokemonGetStatus(s32 p1, s32 p2, s32 p3, s32 p4, u16 p5, s32 p6);
     extern void fn_80132A38(s32 p1, s32 val);
     extern void fn_801040F0(s32 p1, s32 p2, u8* p3, u16 p4, s32 p5);
     void* participant;
@@ -3026,7 +3026,7 @@ void fn_8001047C(u8* arg1) {
     if (*(u32*)((u8*)participant + r30 + 4) == 0) return;
     battle_result = 0;
     if (fn_80205B8C(*(void**)((u8*)participant + 0x40)) != 0) {
-        battle_result = (u16)fn_8012640C(0, 0x7f, 0, 0, (s8)(*(u8*)(arg1 + 0x95)), 0);
+        battle_result = (u16)pokemonGetStatus(0, 0x7f, 0, 0, (s8)(*(u8*)(arg1 + 0x95)), 0);
     }
     val = 0;
     if (battle_result == 0 || battle_result == 0x164) {
@@ -3176,8 +3176,8 @@ void fn_800106A4(u8* arg1, u8* arg2) {
 #endif
 
 /* fn_80010844 - 0x80010844 | size: 0x15c */
-extern void fn_80123C54(void);
-extern void fn_801204A8(void);
+extern void pokemonWazaReplace(void);
+extern void pokemonToMenuWazaStatus(void);
 #if 0
 asm void fn_80010844(void) {
 #include "src/game/gs_npc_interact_fn_80010844.inc"
@@ -3190,10 +3190,10 @@ u32 fn_80010844(u8* ctx) {
     extern u8* windowGetFreeWork(u8* a);
     extern u8* fn_80105624(void);
     extern u32 fn_80205B8C(void*);
-    extern u32 fn_8012640C();
+    extern u32 pokemonGetStatus();
     extern void menuButtonNormal(u8* a);
-    extern void fn_80123C54(void*, s32, s32);
-    extern void fn_801204A8(void*, void*);
+    extern void pokemonWazaReplace(void*, s32, s32);
+    extern void pokemonToMenuWazaStatus(void*, void*);
     u8* participant;
     u8* state;
     u8* flagsObj;
@@ -3209,7 +3209,7 @@ u32 fn_80010844(u8* ctx) {
 
     if (state[0] == 0) {
         if (model != 0 &&
-            ((u16)fn_8012640C(model, 0, 0x7F, (s8)ctx[0x95]) == 0x165) &&
+            ((u16)pokemonGetStatus(model, 0, 0x7F, (s8)ctx[0x95]) == 0x165) &&
             (*(u16*)(fn_80105624() + 4) & 0x40)) {
             ctx[0x98] = 1;
             ctx[0x99] = 1;
@@ -3219,9 +3219,9 @@ u32 fn_80010844(u8* ctx) {
     } else if (state[0] == 1) {
         if ((flags & 0xD0) != 0) {
             if (model != 0) {
-                fn_80123C54((void*)model, (s8)state[2], (s8)ctx[0x95]);
+                pokemonWazaReplace((void*)model, (s8)state[2], (s8)ctx[0x95]);
                 saved = *(u32*)(participant + 0x40);
-                fn_801204A8((void*)model, participant);
+                pokemonToMenuWazaStatus((void*)model, participant);
                 *(u32*)(participant + 0x40) = saved;
             }
             state[2] = 0xFF;

@@ -104,7 +104,7 @@ extern void  fn_80121F3C(void* particle);                  /* destroy particle *
 extern void  fn_80122048(void* particle, f32 x, f32 y, f32 z); /* set particle pos */
 
 /* Battle grid/scene */
-extern void* fn_80129280(s32 side, s32 slotType);
+extern void* savedataGetStatus(s32 side, s32 slotType);
 extern void* fn_801C4078(s32 slot);                        /* get grid slot model */
 extern f32   fn_801C4814(s32 slot);                        /* get slot X */
 extern f32   fadeEffectHookFunction_fadein_Init(s32 slot);                        /* get slot Y */
@@ -355,7 +355,7 @@ u32 fn_801D1650(u32 idx) {
  */
 void fn_801D167C(u32 handle) {
     s32 slot = handle & 0xFF;
-    WazaPartyScratch* party = (WazaPartyScratch*)fn_80129280(0, 0x0A);
+    WazaPartyScratch* party = (WazaPartyScratch*)savedataGetStatus(0, 0x0A);
     if (slot < lbl_80478CB8) {
         party->currentHandle = (u8)handle;
     }
@@ -367,7 +367,7 @@ void fn_801D167C(u32 handle) {
  */
 #pragma scheduling off
 u8 fn_801D16C4(void) {
-    WazaPartyScratch* party = (WazaPartyScratch*)fn_80129280(0, 0x0A);
+    WazaPartyScratch* party = (WazaPartyScratch*)savedataGetStatus(0, 0x0A);
     return party->currentHandle;
 }
 #pragma scheduling on
@@ -467,12 +467,12 @@ u32 fn_801D1ACC(s32 idx) {
 /**
  * fn_801D1B10 - Waza set byte in battle party by handle.
  * Address: 0x801D1B10 | Size: 0x3C
- * Calls fn_80129280(0, 0xA), stores (handle & 0xFF) to result+0x442.
+ * Calls savedataGetStatus(0, 0xA), stores (handle & 0xFF) to result+0x442.
  */
 #pragma push
 #pragma peephole off
 void fn_801D1B10(s32 handle) {
-    WazaPartyScratch* party = (WazaPartyScratch*)fn_80129280(0, 0x0A);
+    WazaPartyScratch* party = (WazaPartyScratch*)savedataGetStatus(0, 0x0A);
     party->selectedHandle = (u8)handle;
 }
 #pragma pop
@@ -483,7 +483,7 @@ void fn_801D1B10(s32 handle) {
  */
 #pragma scheduling off
 u8 mailGetSortMode(void) {
-    WazaPartyScratch* party = (WazaPartyScratch*)fn_80129280(0, 0x0A);
+    WazaPartyScratch* party = (WazaPartyScratch*)savedataGetStatus(0, 0x0A);
     return party->selectedHandle;
 }
 #pragma scheduling on
@@ -511,7 +511,7 @@ void fn_801D1C20(s32 seqHandle) {
 #pragma push
 #pragma peephole off
 BOOL mailChkReceiveMail(s32 idx) {
-    WazaPartyScratch* party = (WazaPartyScratch*)fn_80129280(0, 0x0A);
+    WazaPartyScratch* party = (WazaPartyScratch*)savedataGetStatus(0, 0x0A);
     u16 count;
     s32 i;
     u16* entry;
@@ -556,7 +556,7 @@ BOOL fn_801D1E50(s32 seqHandle) {
 /**
  * mailGetMailIDInMailbox - Waza get party entry by index from u16 array.
  * Address: 0x801D1F0C | Size: 0x70
- * Gets party via fn_80129280(0, 0xA), bounds-checks idx against party+0x400,
+ * Gets party via savedataGetStatus(0, 0xA), bounds-checks idx against party+0x400,
  * returns u16 at party[idx*2].
  */
 #pragma push
@@ -565,9 +565,9 @@ s32 mailGetMailIDInMailbox(s32 idx) {
     WazaPartyScratch* party;
     WazaPartyScratch* countParty;
     u16 count;
-    party = (WazaPartyScratch*)fn_80129280(0, 0x0A);
+    party = (WazaPartyScratch*)savedataGetStatus(0, 0x0A);
     if (idx < 0) goto neg1;
-    countParty = (WazaPartyScratch*)fn_80129280(0, 0x0A);
+    countParty = (WazaPartyScratch*)savedataGetStatus(0, 0x0A);
     count = countParty->count;
     if (idx < (s32)count) goto load;
 neg1:
@@ -583,7 +583,7 @@ load:
  */
 #pragma scheduling off
 u16 mailGetNbMailInMailbox(void) {
-    WazaPartyScratch* party = (WazaPartyScratch*)fn_80129280(0, 0x0A);
+    WazaPartyScratch* party = (WazaPartyScratch*)savedataGetStatus(0, 0x0A);
     return party->count;
 }
 #pragma scheduling on

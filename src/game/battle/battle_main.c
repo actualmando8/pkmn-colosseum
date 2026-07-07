@@ -111,7 +111,7 @@ extern void* fn_801F7258(void* a, u16 b);                  /* get slot member pt
 extern void* fn_801FB1C0(void* a, s32 b, s32 c, s32 d);   /* get checked handle */
 extern void  fn_801DA4E8(void* a, void* b);                /* dispatch event */
 extern void* fn_801F981C(void* a, u16 b);                  /* get item ptr */
-extern void* fn_8012640C(void* a, s32 b, s32 c, s32 d);   /* check item handle */
+extern void* pokemonGetStatus(void* a, s32 b, s32 c, s32 d);   /* check item handle */
 
 /* =========================================================================
  * External data (BSS, SDA21-relative)
@@ -233,7 +233,7 @@ void fn_801EF0D4(void) {
 
 /* 0x801EF128 | size: 0xBC | medium */
 void fn_801EF128(void) {
-    extern void fn_80129280();
+    extern void savedataGetStatus();
     extern void fn_801EEF08();
     extern void fn_801EEFF4();
     u8 sp[0x20];
@@ -251,7 +251,7 @@ void fn_801EF128(void) {
     if (r3 == 0) {
         r3 = 0x0;
         r4 = 0xf;
-        fn_80129280();
+        savedataGetStatus();
         r29 = r3;
     }
     r30 = 0x0;
@@ -289,11 +289,11 @@ void fn_801EF128(void) {
 }
 
 /* 0x801EF1E4 | size: 0x30 | small */
-/* Ensure battle data pointer is valid; if NULL, get default via fn_80129280. */
+/* Ensure battle data pointer is valid; if NULL, get default via savedataGetStatus. */
 void* fn_801EF1E4(void* data) {
-    extern void* fn_80129280(u32 a, u32 b);
+    extern void* savedataGetStatus(u32 a, u32 b);
     if (data == NULL) {
-        data = fn_80129280(0, 0xF);
+        data = savedataGetStatus(0, 0xF);
     }
     return data;
 }
@@ -448,7 +448,7 @@ void fn_801EF7C4(void* arg) {
             for (r29 = 0; (u16)r29 < r26; r29++) {
                 _h = fn_801F981C(r25, r29);
                 if (_h == 0) continue;
-                _h = fn_8012640C(_h, 0, 0xee, 0);
+                _h = pokemonGetStatus(_h, 0, 0xee, 0);
                 if (_h == 0) continue;
                 fn_801DA4E8(_h, arg);
             }

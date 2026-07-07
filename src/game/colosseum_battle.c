@@ -128,8 +128,8 @@
  * External declarations
  * ========================================================================= */
 
-extern void* fn_8012640C();
-extern u32   fn_801254B4();
+extern void* pokemonGetStatus();
+extern u32   pokemonSetStatus();
 
 /* Battle system functions */
 extern void fn_801EF8F4();
@@ -170,7 +170,7 @@ extern int  _fadeEffectGetRandom__FUl();
 extern u32  fn_8011F520();
 extern u32  fn_8011F5B0();
 extern u16  fn_8011F5C8();
-extern u32  fn_80129280();
+extern u32  savedataGetStatus();
 extern int  fadeCheck();
 extern int  fadeSet();
 extern int  fn_801DAC90();
@@ -676,7 +676,7 @@ void fightTrainerAiWazaValueHimitunotikara(void* ctx, u32 param1, u32 param2, u3
         r4 = 0x0;
         r5 = 0xd5;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         r4 = *(u32*)(r25 + r0);
         if (r3 != (u32)r4) {
             r3 = r31;
@@ -1754,7 +1754,7 @@ s32 fn_8024E690(void* ctx, u32 param1, u32 param2, u32 param3) {
             r4 = 0x0;
             r5 = 0xce;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             r3 = (s16)r3;
             return;
     }
@@ -1849,7 +1849,7 @@ s32 fn_8024E690(void* ctx, u32 param1, u32 param2, u32 param3) {
                 r4 = 0x0;
                 r5 = 0xce;
                 r6 = 0x0;
-                ((void(*)(void))fn_8012640C)();
+                ((void(*)(void))pokemonGetStatus)();
                 r3 = (s16)r3;
                 return;
     }
@@ -1871,7 +1871,7 @@ s32 fn_8024E690(void* ctx, u32 param1, u32 param2, u32 param3) {
             r4 = 0x0;
             r5 = 0xce;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             r0 = (s16)r3;
             if (r24 >= (u32)0x0) {
                 r3 = r15;
@@ -1889,7 +1889,7 @@ s32 fn_8024E690(void* ctx, u32 param1, u32 param2, u32 param3) {
                 r4 = 0x0;
                 r5 = 0xc9;
                 r6 = 0x0;
-                ((void(*)(void))fn_8012640C)();
+                ((void(*)(void))pokemonGetStatus)();
                 r3 = r3 & 0xFFFF;
                 if (r19 < r25) {
                     r19 = r25;
@@ -1925,7 +1925,7 @@ s32 fn_8024E690(void* ctx, u32 param1, u32 param2, u32 param3) {
                 r4 = 0x0;
                 r5 = 0xce;
                 r6 = 0x0;
-                ((void(*)(void))fn_8012640C)();
+                ((void(*)(void))pokemonGetStatus)();
                 r0 = (s16)r3;
                 if (r24 >= (u32)0x0) {
                     r4 = r24;
@@ -1936,7 +1936,7 @@ s32 fn_8024E690(void* ctx, u32 param1, u32 param2, u32 param3) {
                     r4 = 0x0;
                     r5 = 0xc9;
                     r6 = 0x0;
-                    ((void(*)(void))fn_8012640C)();
+                    ((void(*)(void))pokemonGetStatus)();
                     r3 = r3 & 0xFFFF;
                     r0 = r14 & 0xFFFF;
                     if (r0 >= (u32)r3) {
@@ -1960,7 +1960,7 @@ s32 fn_8024E690(void* ctx, u32 param1, u32 param2, u32 param3) {
                         r4 = 0x0;
                         r5 = 0xce;
                         r6 = 0x0;
-                        ((void(*)(void))fn_8012640C)();
+                        ((void(*)(void))pokemonGetStatus)();
                         r3 = (s16)r3;
                         return;
             }
@@ -1987,7 +1987,7 @@ s32 fn_8024E690(void* ctx, u32 param1, u32 param2, u32 param3) {
             r4 = 0x0;
             r5 = 0xce;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             r0 = (s16)r3;
             if (r27 >= (u32)0x0) {
                 r4 = r27;
@@ -2727,7 +2727,7 @@ s32 fn_8024E690(void* ctx, u32 param1, u32 param2, u32 param3) {
     r4 = 0x0;
     r5 = 0xce;
     r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
+    ((void(*)(void))pokemonGetStatus)();
     r3 = (s16)r3;
 
     return;
@@ -3338,7 +3338,7 @@ while (1) {
                         r5 = 0x120;
                         r6 = 0x0;
                         r7 = 0x0;
-                        ((void(*)(void))fn_801254B4)();
+                        ((void(*)(void))pokemonSetStatus)();
                     }
                     r24 = r24 + 0x1;
 
@@ -3536,7 +3536,7 @@ while (1) {
             r5 = 0x120;
             r6 = 0x0;
             r7 = 0x0;
-            ((void(*)(void))fn_801254B4)();
+            ((void(*)(void))pokemonSetStatus)();
         }
         r24 = r24 + 0x1;
 
@@ -3645,7 +3645,7 @@ s32 fn_80263DE4(u32 r3, u32 r4, u32 r5, u32 retry, u32 reopen)
     extern s32 fn_801F93F8(u32, u32, u32);
     extern u32 fn_801FB1C0(u32, u32, u32, u32);
     extern u8 fn_80206A04(u32);
-    extern s16 fn_8012640C(u32, u32, u32, u32);
+    extern s16 pokemonGetStatus(u32, u32, u32, u32);
     u32 ctx;
     u32 actor;
     u32 param;
@@ -3839,10 +3839,10 @@ s32 fn_80263DE4(u32 r3, u32 r4, u32 r5, u32 retry, u32 reopen)
         if (fn_80206A04(item) == 0) {
             continue;
         }
-        if (((u8)fn_8012640C(item, 0, 0xd2, 0)) == 1) {
+        if (((u8)pokemonGetStatus(item, 0, 0xd2, 0)) == 1) {
             continue;
         }
-        return fn_8012640C(item, 0, 0xce, 0);
+        return pokemonGetStatus(item, 0, 0xce, 0);
     }
 }
 
@@ -4599,7 +4599,7 @@ u32 fightTrainerAiWazaValueRisaikuru(void* ctx, u32 param1, u32 param2) {
 u32 fightTrainerAiWazaValueSiroikiri(void* ctx, u32 param1, u32 param2, u32 param3) {
 #pragma optimize_for_size on
     typedef void (*BattleScriptCallback)();
-    extern BattleScriptCallback fn_8011BEB4(u32, u16, u32, u32);
+    extern BattleScriptCallback wazaGetStatus(u32, u16, u32, u32);
     extern u32 fn_80205B8C(u32);
     extern u16 fn_80236520(void*, u32);
     extern u32 fn_80239984(u32, void*, u32);
@@ -4619,7 +4619,7 @@ u32 fightTrainerAiWazaValueSiroikiri(void* ctx, u32 param1, u32 param2, u32 para
     setup = 0;
     species = fn_80236520(ctx, param3);
     if ((species != 0) && (species != 0xffff) && (species != 0x165) && (species != 0x163)) {
-        callback = fn_8011BEB4(0, species, 0x1c, 0);
+        callback = wazaGetStatus(0, species, 0x1c, 0);
         if (callback == NULL) {
             callback = fn_8024E52C;
         }
@@ -5102,7 +5102,7 @@ void fightTrainerAiWazaValueTedasuke(void* ctx, u32 param1, u32 param2, u32 para
             r4 = 0x0;
             r5 = 0xfe;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
 
             fn_801F1170();
             r0 = r3 & 0xFF;
@@ -5198,7 +5198,7 @@ void fightTrainerAiWazaValueTedasuke(void* ctx, u32 param1, u32 param2, u32 para
             r4 = 0x0;
             r5 = 0xf9;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             r0 = r3 & 0xFF;
             if (r29 != (u32)r3) {
                 r3 = r31;
@@ -6032,7 +6032,7 @@ s32 fn_80243C5C(void* ctx, u32 slot, u32 param) {
 void fightTrainerAiWazaValueKoraeru(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 lbl_80478DF8;
     extern f32 lbl_8047E630;
-    extern void fn_8011BEB4();
+    extern void wazaGetStatus();
     extern void fn_801F1990();
     extern void fightFloorGetFightTrainerFightOutPokemonPtrAry();
     extern void fn_80205B8C();
@@ -6210,7 +6210,7 @@ void fightTrainerAiWazaValueKoraeru(void* ctx, u32 param1, u32 param2, u32 param
                     r4 = *(u16*)(r15 + r0);
                     r5 = 0x1c;
                     r6 = 0x0;
-                    fn_8011BEB4();
+                    wazaGetStatus();
                     if (r3 == (u32)0x0) {
                         r3 = r18;
                     }
@@ -6261,7 +6261,7 @@ void fightTrainerAiWazaValueKoraeru(void* ctx, u32 param1, u32 param2, u32 param
         r3 = 0x0;
         r5 = 0x1c;
         r6 = 0x0;
-        fn_8011BEB4();
+        wazaGetStatus();
         if (r3 == (u32)0x0) {
             r3 = (u32)fn_8024E52C;
             r3 = (u32)fn_8024E52C;
@@ -6379,7 +6379,7 @@ void fightTrainerAiWazaValueKoraeru(void* ctx, u32 param1, u32 param2, u32 param
         r4 = 0x0;
         r5 = 0xfc;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         if ((s32)r3 != (s32)0x0) {
             r3 = r29;
             r4 = r31;
@@ -6498,14 +6498,14 @@ u32 fightTrainerAiWazaValueMiyaburu(void* ctx, u32 param1, u32 param2, u32 param
 
 /* Address: 0x80244478 | Size: 0x9C */
 u32 fightTrainerAiWazaValueMajikkukooto(void* ctx, u32 param1, u32 param2) {
-    extern u32 fn_8012640C(u32, u32, u32, u32);
+    extern u32 pokemonGetStatus(u32, u32, u32, u32);
     extern u32 fn_80205B8C(u32);
     extern u32 fn_80239984(u32, void*, u32);
     extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
     u32 handle;
 
     handle = 0;
-    if ((fn_8012640C(param1, 0, 0xed, 0) & 0xFFFF) != 0) {
+    if ((pokemonGetStatus(param1, 0, 0xed, 0) & 0xFFFF) != 0) {
         handle = fn_80239984(0, ctx, 0x166);
         fn_80239EE8(0xEC64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x166);
     }
@@ -7422,7 +7422,7 @@ void fightTrainerAiWazaValueAmagoi(void* ctx, u32 param1, u32 param2, u32 param3
 
 /* Address: 0x80245418 | Size: 0x160 (352 bytes) */
 u32 fightTrainerAiWazaValueNemurare(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u32 fn_8012640C(u32, u32, u32, u32);
+    extern u32 pokemonGetStatus(u32, u32, u32, u32);
     extern u16 fn_801F1A6C(u32, void*, u32*, u32, u32);
     extern u32 fn_80205B8C(u32);
     extern u8 fn_80237310(void*, u32);
@@ -7444,7 +7444,7 @@ u32 fightTrainerAiWazaValueNemurare(void* ctx, u32 param1, u32 param2, u32 param
 
     index = 0;
     while (index < count) {
-        compareValue = fn_8012640C(param3, 0, 0xd5, 0);
+        compareValue = pokemonGetStatus(param3, 0, 0xd5, 0);
         if (compareValue == entries[index]) {
             ;
         } else {
@@ -8250,7 +8250,7 @@ void fightTrainerAiWazaValueTuikaKoori(void* ctx, u32 param1, u32 param2, u32 pa
         r4 = 0x0;
         r5 = 0xd5;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         r4 = *(u32*)(r25 + r0);
         if (r3 != (u32)r4) {
             r3 = r27;
@@ -9242,7 +9242,7 @@ u32 fightTrainerAiWazaValueOororabiimu(void* ctx, u32 param1, u32 param2, u32 pa
 
 /* Address: 0x8024AD84 | Size: 0x16C (364 bytes) */
 u32 fightTrainerAiWazaValueNekodamasi(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u32 fn_8012640C(u32, u32, u32, u32);
+    extern u32 pokemonGetStatus(u32, u32, u32, u32);
     extern u32 fn_80205B8C(u32);
     extern u8 fn_80237F74(void*, u32, u32);
     extern u32 fn_80239984(u32, void*, u32);
@@ -9250,7 +9250,7 @@ u32 fightTrainerAiWazaValueNekodamasi(void* ctx, u32 param1, u32 param2, u32 par
     u32 handle;
 
     handle = 0;
-    if ((fn_8012640C(param1, 0, 0xed, 0) & 0xffff) != 0) {
+    if ((pokemonGetStatus(param1, 0, 0xed, 0) & 0xffff) != 0) {
         handle = fn_80239984(0, ctx, 0xbd);
         fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0xbd);
     }
@@ -12536,7 +12536,7 @@ void fn_802502EC(void* ctx, u32 param1, u32 param2, u32 param3) {
                     r4 = 0x0;
                     r5 = 0xd5;
                     r6 = 0x0;
-                    ((void(*)(void))fn_8012640C)();
+                    ((void(*)(void))pokemonGetStatus)();
                     r5 = r3;
                     r6 = r23;
                     r3 = (u32)sp + 0x110;
@@ -12715,7 +12715,7 @@ void fn_802502EC(void* ctx, u32 param1, u32 param2, u32 param3) {
                                     r4 = 0x0;
                                     r5 = 0xd5;
                                     r6 = 0x0;
-                                    ((void(*)(void))fn_8012640C)();
+                                    ((void(*)(void))pokemonGetStatus)();
                                     r0 = *(u32*)(r19 + r21);
                                     if (r3 != (u32)r0) {
                                         r3 = r28;
@@ -12909,15 +12909,15 @@ u32 fightTrainerAiWazaDamage203(void* ctx, u32 slot, u32 param, u32 extra) {
 
 /* Address: 0x80250BBC | Size: 0xA8 */
 u32 fn_80250BBC(void* ctx, u32 param1, u32 param2) {
-    extern u32 fn_8011BBD8(u32, u32, u32, u32, u32);
-    extern u32 fn_8012640C(u32, u32, u32, u32);
+    extern u32 wazaSetStatus(u32, u32, u32, u32, u32);
+    extern u32 pokemonGetStatus(u32, u32, u32, u32);
     extern u32 fn_80235B04(void*, u32, u32);
     u32 value;
     u32 status;
     u32 mapped;
 
     status = fn_80235B04(ctx, 0, 1);
-    value = fn_8012640C(param2, 0, 0xd9, 0);
+    value = pokemonGetStatus(param2, 0, 0xd9, 0);
     status = status & 0xFF;
     if (status == 2) {
         mapped = 0xb;
@@ -12930,7 +12930,7 @@ u32 fn_80250BBC(void* ctx, u32 param1, u32 param2) {
     } else {
         mapped = 0;
     }
-    return fn_8011BBD8(value, 0, 0x30, 0, mapped & 0xFFFF);
+    return wazaSetStatus(value, 0, 0x30, 0, mapped & 0xFFFF);
 }
 
 /* Address: 0x80250C64 | Size: 0x84 | Pattern: field_accessor */
@@ -13000,17 +13000,17 @@ u32 fightTrainerAiWazaDamage196(u32 r3, u32 r4, u32 r5, u32 r6)
 
 /* Address: 0x80250EC4 | Size: 0x90 */
 void fn_80250EC4(void* ctx, u32 param1, u32 param2) {
-    extern void fn_8011BBD8(u32, u32, u32, u32, u32);
+    extern void wazaSetStatus(u32, u32, u32, u32, u32);
     extern u32 fightSeqGetKetaguriIryoku(u32);
     extern u32 fn_802377E8(void*, u32);
     u32 sourceValue;
     u32 convertedValue;
     u32 scaledValue;
 
-    sourceValue = (u32)fn_8012640C(param2, 0, 0xd9, 0);
+    sourceValue = (u32)pokemonGetStatus(param2, 0, 0xd9, 0);
     convertedValue = fn_802377E8(ctx, param2);
-    scaledValue = fightSeqGetKetaguriIryoku((u32)fn_8012640C(0, convertedValue, 0x5f, 0) & 0xffff);
-    fn_8011BBD8(sourceValue, 0, 0x2f, 0, scaledValue & 0xffff);
+    scaledValue = fightSeqGetKetaguriIryoku((u32)pokemonGetStatus(0, convertedValue, 0x5f, 0) & 0xffff);
+    wazaSetStatus(sourceValue, 0, 0x2f, 0, scaledValue & 0xffff);
 }
 
 /* Address: 0x80250F7C | Size: 0x40 | Ghidra import */
@@ -13024,9 +13024,9 @@ u32 fightTrainerAiWazaDamage190(u32 r3, u32 r4, u32 r5, u32 r6)
 
 /* Address: 0x80250FBC | Size: 0xB4 */
 void fn_80250FBC(void* ctx, u32 param1, u32 param2) {
-    extern void fn_8011BBD8(u32, u32, u32, u32, u32);
-    extern u32 fn_8011BEB4(u32, u32, u32, u32);
-    extern u32 fn_8012640C(u32, u32, u32, u32);
+    extern void wazaSetStatus(u32, u32, u32, u32, u32);
+    extern u32 wazaGetStatus(u32, u32, u32, u32);
+    extern u32 pokemonGetStatus(u32, u32, u32, u32);
     extern u32 fn_80237664(void*, u32);
     extern u32 fn_802376EC(void*, u32);
     u32 value;
@@ -13034,15 +13034,15 @@ void fn_80250FBC(void* ctx, u32 param1, u32 param2) {
     u32 maximum;
     u16 amount;
 
-    value = fn_8012640C(param2, 0, 0xd9, 0);
+    value = pokemonGetStatus(param2, 0, 0xd9, 0);
     current = fn_802376EC(ctx, param2);
     maximum = fn_80237664(ctx, param2);
-    amount = fn_8011BEB4(value, 0, 0x2f, 0);
+    amount = wazaGetStatus(value, 0, 0x2f, 0);
     amount = (s32)(amount * (current & 0xFFFF)) / (s32)(maximum & 0xFFFF);
     if (amount == 0) {
         amount = 1;
     }
-    fn_8011BBD8(value, 0, 0x2f, 0, amount);
+    wazaSetStatus(value, 0, 0x2f, 0, amount);
 }
 
 /* Address: 0x80251070 | Size: 0x5C | Pattern: field_accessor */
@@ -13101,7 +13101,7 @@ u32 fightTrainerAiWazaDamage182(void* ctx, u32 param1, u32 param2, u32 param3) {
 
 /* Address: 0x802512A4 | Size: 0xAC */
 u32 fightTrainerAiWazaDamage173(void* ctx, u32 slot, u32 param, u32 extra) {
-    extern u32 fn_8011BEB4(u32, u32, u32, u32);
+    extern u32 wazaGetStatus(u32, u32, u32, u32);
     extern u32 fn_801363E8(u32);
     extern u32 fn_801F54A4(u32, u32, u32, u32);
     extern u32 fn_8023C370(void*, u32, u32, u32, u32);
@@ -13110,9 +13110,9 @@ u32 fightTrainerAiWazaDamage173(void* ctx, u32 slot, u32 param, u32 extra) {
     u32 otherType;
 
     other = fn_801363E8(fn_801F54A4(0, 0, 0xf, 0) & 0xFFFF);
-    paramType = fn_8011BEB4(0, param, 9, 0) & 0xFFFF;
+    paramType = wazaGetStatus(0, param, 9, 0) & 0xFFFF;
     param = other;
-    otherType = fn_8011BEB4(0, param, 9, 0) & 0xFFFF;
+    otherType = wazaGetStatus(0, param, 9, 0) & 0xFFFF;
     if (otherType != paramType) {
         return fn_8023C370(ctx, slot, param, extra, 1);
     }
@@ -13289,7 +13289,7 @@ u32 fightTrainerAiWazaDamage149(void* ctx, u32 param1, u32 param2, u32 param3) {
 
 /* Address: 0x80251950 | Size: 0xBC */
 u32 fightTrainerAiWazaDamage148(void* ctx, u32 slot, u32 param, u32 extra) {
-    extern u32 fn_8011BEB4(u32, u32, u32, u32);
+    extern u32 wazaGetStatus(u32, u32, u32, u32);
     extern u32 fn_801F025C(u32, u32);
     extern u8 fn_802026E4(u32, u32);
     extern u32 fn_80232110(u32, u32, u32, u32, u32, u32);
@@ -13298,8 +13298,8 @@ u32 fightTrainerAiWazaDamage148(void* ctx, u32 slot, u32 param, u32 extra) {
     u32 stat3;
     u32 target;
 
-    stat7 = fn_8011BEB4(0, param, 7, 0) & 0xFFFF;
-    stat3 = fn_8011BEB4(0, param, 3, 0) & 0xFFFF;
+    stat7 = wazaGetStatus(0, param, 7, 0) & 0xFFFF;
+    stat3 = wazaGetStatus(0, param, 3, 0) & 0xFFFF;
     target = fn_801F025C(2, extra);
     damage = fn_80232110(slot, extra, target, param, stat7, stat3);
     if (fn_802026E4(slot, 0x32) == 1) {
@@ -13389,16 +13389,16 @@ u32 fightTrainerAiWazaDamage135(u32 r3, u32 r4, u32 r5, u32 r6)
 /* Address: 0x80251D2C | Size: 0x88 */
 void fn_80251D2C(void* ctx, u32 param1, u32 param2) {
     extern void* fn_80205B8C();
-    extern void fn_80120B00();
-    extern void fn_8011BBD8();
+    extern void pokemonGetMezamerupower();
+    extern void wazaSetStatus();
     void* handle;
     u16 var_a;
     u16 var_8;
 
-    handle = fn_8012640C(param2, 0, 0xd9, 0);
-    fn_80120B00(fn_80205B8C(param2), &var_a, &var_8);
-    fn_8011BBD8(handle, 0, 0x2f, 0, var_a);
-    fn_8011BBD8(handle, 0, 0x30, 0, var_8);
+    handle = pokemonGetStatus(param2, 0, 0xd9, 0);
+    pokemonGetMezamerupower(fn_80205B8C(param2), &var_a, &var_8);
+    wazaSetStatus(handle, 0, 0x2f, 0, var_a);
+    wazaSetStatus(handle, 0, 0x30, 0, var_8);
 }
 
 /* Address: 0x80251DB4 | Size: 0x90 */
@@ -13490,9 +13490,9 @@ u32 fightTrainerAiWazaDamage126(u32 r3, u32 r4, u32 r5, u32 r6)
 
 /* Address: 0x80252078 | Size: 0x44 | Pattern: field_accessor */
 u32 fn_80252078(void* ctx, u32 slot, u32 param) {
-    extern u32 fn_8011BBD8();
-    u32 val = (u32)fn_8012640C((void*)param, 0, 0xd9, 0);
-    return (u32)fn_8011BBD8(val, 0, 0x2f, 0, 0x46);
+    extern u32 wazaSetStatus();
+    u32 val = (u32)pokemonGetStatus((void*)param, 0, 0xd9, 0);
+    return (u32)wazaSetStatus(val, 0, 0x2f, 0, 0x46);
 }
 
 /* Address: 0x802520BC | Size: 0x84 | Pattern: field_accessor */
@@ -13520,18 +13520,18 @@ u32 fightTrainerAiWazaDamage123(u32 r3, u32 r4, u32 r5, u32 r6)
 
 /* Address: 0x80252188 | Size: 0x80 | Pattern: field_accessor */
 void fn_80252188(void* ctx, u32 slot, u32 param) {
-    extern void fn_8011BBD8(u32, u32, u32, u32, u32);
-    extern u32 fn_8011BEB4(u32, u32, u32, u32);
-    extern u32 fn_8012640C(u32, u32, u32, u32);
+    extern void wazaSetStatus(u32, u32, u32, u32, u32);
+    extern u32 wazaGetStatus(u32, u32, u32, u32);
+    extern u32 pokemonGetStatus(u32, u32, u32, u32);
     extern u32 fn_80217BD0(u32);
     extern u32 fn_8023842C(void*, u32);
     u32 value;
     u32 amount;
 
-    value = fn_8012640C(param, 0, 0xd9, 0);
-    fn_8011BEB4(value, 0, 0x2f, 0);
+    value = pokemonGetStatus(param, 0, 0xd9, 0);
+    wazaGetStatus(value, 0, 0x2f, 0);
     amount = fn_80217BD0(fn_8023842C(ctx, param));
-    fn_8011BBD8(value, 0, 0x2f, 0, amount & 0xFFFF);
+    wazaSetStatus(value, 0, 0x2f, 0, amount & 0xFFFF);
 }
 
 /* Address: 0x80252208 | Size: 0x40 | Ghidra import */
@@ -13545,9 +13545,9 @@ u32 fightTrainerAiWazaDamage122(u32 r3, u32 r4, u32 r5, u32 r6)
 
 /* Address: 0x80252248 | Size: 0x44 | Pattern: field_accessor */
 u32 fn_80252248(void* ctx, u32 slot, u32 param) {
-    extern u32 fn_8011BBD8();
-    u32 val = (u32)fn_8012640C((void*)param, 0, 0xd9, 0);
-    return (u32)fn_8011BBD8(val, 0, 0x2f, 0, 0x28);
+    extern u32 wazaSetStatus();
+    u32 val = (u32)pokemonGetStatus((void*)param, 0, 0xd9, 0);
+    return (u32)wazaSetStatus(val, 0, 0x2f, 0, 0x28);
 }
 
 /* Address: 0x8025228C | Size: 0x40 | Ghidra import */
@@ -13561,18 +13561,18 @@ u32 fightTrainerAiWazaDamage121(u32 r3, u32 r4, u32 r5, u32 r6)
 
 /* Address: 0x802522CC | Size: 0x80 | Pattern: field_accessor */
 void fn_802522CC(void* ctx, u32 slot, u32 param) {
-    extern void fn_8011BBD8(u32, u32, u32, u32, u32);
-    extern u32 fn_8011BEB4(u32, u32, u32, u32);
-    extern u32 fn_8012640C(u32, u32, u32, u32);
+    extern void wazaSetStatus(u32, u32, u32, u32, u32);
+    extern u32 wazaGetStatus(u32, u32, u32, u32);
+    extern u32 pokemonGetStatus(u32, u32, u32, u32);
     extern u32 fn_80217BEC(u32);
     extern u32 fn_8023842C(void*, u32);
     u32 value;
     u32 amount;
 
-    value = fn_8012640C(param, 0, 0xd9, 0);
-    fn_8011BEB4(value, 0, 0x2f, 0);
+    value = pokemonGetStatus(param, 0, 0xd9, 0);
+    wazaGetStatus(value, 0, 0x2f, 0);
     amount = fn_80217BEC(fn_8023842C(ctx, param));
-    fn_8011BBD8(value, 0, 0x2f, 0, amount & 0xFFFF);
+    wazaSetStatus(value, 0, 0x2f, 0, amount & 0xFFFF);
 }
 
 /* Address: 0x80252354 | Size: 0x3C | Pattern: simple_wrapper */
@@ -13589,20 +13589,20 @@ u32 fightTrainerAiWazaDamage117(u32 r3, u32 r4, u32 r5, u32 r6)
 
 /* Address: 0x802523D8 | Size: 0x90 */
 void fn_802523D8(void* ctx, u32 param1, u32 param2) {
-    extern void fn_8011BBD8(u32, u32, u32, u32, u32);
-    extern u32 fn_8011BEB4(u32, u32, u32, u32);
-    extern u32 fn_8012640C(u32, u32, u32, u32);
+    extern void wazaSetStatus(u32, u32, u32, u32, u32);
+    extern u32 wazaGetStatus(u32, u32, u32, u32);
+    extern u32 pokemonGetStatus(u32, u32, u32, u32);
     extern u8 fn_80236BFC(void*, u32, u32);
     u32 value;
     u32 result;
     u32 amount;
 
-    value = fn_8012640C(param2, 0, 0xd9, 0);
-    amount = fn_8011BEB4(value, 0, 0x2f, 0) & 0xFFFF;
+    value = pokemonGetStatus(param2, 0, 0xd9, 0);
+    amount = wazaGetStatus(value, 0, 0x2f, 0) & 0xFFFF;
     if (fn_80236BFC(ctx, param2, 0x1a) == 1) {
         amount = (amount << 1) & 0xFFFF;
     }
-    fn_8011BBD8(value, 0, 0x2f, 0, amount & 0xFFFF);
+    wazaSetStatus(value, 0, 0x2f, 0, amount & 0xFFFF);
 }
 
 /* Address: 0x802524B8 | Size: 0x84 | Pattern: field_accessor */
@@ -13635,23 +13635,23 @@ u32 fightTrainerAiWazaDamage104(void* ctx, u32 param1, u32 param2, u32 param3) {
 
 /* Address: 0x802525F0 | Size: 0x44 | Pattern: field_accessor */
 u32 fn_802525F0(void* ctx, u32 slot, u32 param) {
-    extern u32 fn_8011BBD8();
-    u32 val = (u32)fn_8012640C((void*)param, 0, 0xd9, 0);
-    return (u32)fn_8011BBD8(val, 0, 0x2f, 0, 0x1e);
+    extern u32 wazaSetStatus();
+    u32 val = (u32)pokemonGetStatus((void*)param, 0, 0xd9, 0);
+    return (u32)wazaSetStatus(val, 0, 0x2f, 0, 0x1e);
 }
 
 /* Address: 0x80252634 | Size: 0x44 | Pattern: field_accessor */
 u32 fn_80252634(void* ctx, u32 slot, u32 param) {
-    extern u32 fn_8011BBD8();
-    u32 val = (u32)fn_8012640C((void*)param, 0, 0xd9, 0);
-    return (u32)fn_8011BBD8(val, 0, 0x2f, 0, 0x14);
+    extern u32 wazaSetStatus();
+    u32 val = (u32)pokemonGetStatus((void*)param, 0, 0xd9, 0);
+    return (u32)wazaSetStatus(val, 0, 0x2f, 0, 0x14);
 }
 
 /* Address: 0x80252678 | Size: 0x44 | Pattern: field_accessor */
 u32 fn_80252678(void* ctx, u32 slot, u32 param) {
-    extern u32 fn_8011BBD8();
-    u32 val = (u32)fn_8012640C((void*)param, 0, 0xd9, 0);
-    return (u32)fn_8011BBD8(val, 0, 0x2f, 0, 0xa);
+    extern u32 wazaSetStatus();
+    u32 val = (u32)pokemonGetStatus((void*)param, 0, 0xd9, 0);
+    return (u32)wazaSetStatus(val, 0, 0x2f, 0, 0xa);
 }
 
 /* Address: 0x802526BC | Size: 0x84 | Pattern: field_accessor */
@@ -13694,19 +13694,19 @@ u32 fightTrainerAiWazaDamage099(u32 r3, u32 r4, u32 r5, u32 r6)
 
 /* Address: 0x80252804 | Size: 0x90 */
 void fn_80252804(void* ctx, u32 param1, u32 param2) {
-    extern void* fn_8012640C();
+    extern void* pokemonGetStatus();
     extern u32 fn_802376EC();
     extern s32 fn_80237664();
     extern u8 fn_80218B6C();
-    extern void fn_8011BBD8();
+    extern void wazaSetStatus();
     void* a;
     u32 b;
     s32 t;
 
-    a = fn_8012640C(param2, 0, 0xD9, 0);
+    a = pokemonGetStatus(param2, 0, 0xD9, 0);
     b = fn_802376EC(ctx, param2);
     t = fn_80237664(ctx, param2);
-    fn_8011BBD8(a, 0, 0x2F, 0, fn_80218B6C(b, t));
+    wazaSetStatus(a, 0, 0x2F, 0, fn_80218B6C(b, t));
 }
 
 /* Address: 0x80252894 | Size: 0x28 | Pattern: call_return_u16 */
@@ -15151,7 +15151,7 @@ u32 fightTrainerAiWazaHit175(void* ctx, u32 slot, u32 param, u32 param3) {
 
 /* Address: 0x80255220 | Size: 0xA8 */
 u32 fightTrainerAiWazaHit173(void* ctx, u32 slot, u32 param, u32 extra) {
-    extern u32 fn_8011BEB4(u32, u32, u32, u32);
+    extern u32 wazaGetStatus(u32, u32, u32, u32);
     extern u32 fn_801363E8(u32);
     extern u32 fn_801F54A4(u32, u32, u32, u32);
     extern u32 fn_8023C530(void*, u32, u32, u32);
@@ -15160,9 +15160,9 @@ u32 fightTrainerAiWazaHit173(void* ctx, u32 slot, u32 param, u32 extra) {
     u32 otherType;
 
     other = fn_801363E8(fn_801F54A4(0, 0, 0xf, 0) & 0xFFFF);
-    paramType = fn_8011BEB4(0, param, 9, 0) & 0xFFFF;
+    paramType = wazaGetStatus(0, param, 9, 0) & 0xFFFF;
     param = other;
-    otherType = fn_8011BEB4(0, param, 9, 0) & 0xFFFF;
+    otherType = wazaGetStatus(0, param, 9, 0) & 0xFFFF;
     if (otherType != paramType) {
         return fn_8023C530(ctx, slot, param, extra);
     }
@@ -15566,10 +15566,10 @@ s32 fightTrainerAiWazaHit159(void* ctx, u32 param1, u32 param2, u32 param3) {
 /* Address: 0x80255D3C | Size: 0x40 | Ghidra import */
 u32 fightTrainerAiWazaHit158(u32 r3_in, u32 r4)
 {
-    extern u32 fn_8012640C();
+    extern u32 pokemonGetStatus();
   u32 uVar1;
   u8 result;
-  uVar1 = fn_8012640C(r4, 0, 0xed, 0) & 0xFFFF;
+  uVar1 = pokemonGetStatus(r4, 0, 0xed, 0) & 0xFFFF;
   result = uVar1 != 0;
   return result;
 }
@@ -15910,14 +15910,14 @@ int fightTrainerAiWazaHit136(void)
 /* Address: 0x802567B8 | Size: 0xA4 */
 s32 fightTrainerAiWazaHit135(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_80205B8C(u32 v);
-    extern void fn_80120B00(u32, void*, void*);
+    extern void pokemonGetMezamerupower(u32, void*, void*);
     extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, s16 v3);
     extern s32 fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
     u16 hi;
     u16 lo;
     s32 gate;
 
-    fn_80120B00(fn_80205B8C(param1), &hi, &lo);
+    pokemonGetMezamerupower(fn_80205B8C(param1), &hi, &lo);
     gate = fn_8025C264(ctx, param1, param2, param3, 0);
     if (fn_8023793C(ctx, param3, lo, (s16)hi) == 0x43) {
         gate = 0;
@@ -19300,7 +19300,7 @@ s32 fightTrainerAiWazaHit000(void* ctx, u32 param1, u32 param2, u32 param3) {
 
 /* Address: 0x8025C264 | Size: 0x340 (832 bytes) */
 void fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_8011BEB4();
+    extern void wazaGetStatus();
     extern void fn_801F0134();
     extern void fn_801F1D5C();
     extern void fn_801F3BB4();
@@ -19352,7 +19352,7 @@ void fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3) {
     r3 = 0x0;
     r5 = 0x9;
     r6 = 0x0;
-    fn_8011BEB4();
+    wazaGetStatus();
     r30 = r3 & 0xFFFF;
     if (r28 == (u32)0x0) {
         r3 = 0x1;
@@ -19528,8 +19528,8 @@ void fn_8025C264(void* ctx, u32 param1, u32 param2, u32 param3) {
 
 /* Address: 0x8025C5A4 | Size: 0xD0 (208 bytes) */
 s32 fn_8025C5A4(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u16 fn_8011BEB4();
-    u32 val = fn_8011BEB4(0, param2, 9, 0) & 0xFFFF;
+    extern u16 wazaGetStatus();
+    u32 val = wazaGetStatus(0, param2, 9, 0) & 0xFFFF;
 
     if ((u16)param1 == 0x1F &&
         (val == 0x92 || val == 0x95 || val == 0x98 || val == 0xCF)) {
@@ -19744,7 +19744,7 @@ u32 fn_8025C808(void* ctx, u32 param1, u32 param2, u32 param3, u32 param4, u32 p
     r4 = 0x0;
     r5 = r29;
     r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
+    ((void(*)(void))pokemonGetStatus)();
     r26 = (s8)r3;
     r3 = r25;
     fightSeqCondChgActParaIdToValue();
@@ -19896,7 +19896,7 @@ u32 fn_8025CAA8(void* ctx, u32 param1, u32 param2) {
 /* Address: 0x8025CB3C | Size: 0xAC */
 u16 fn_8025CB3C(void* ctx, u32 param1, u32 param2) {
     extern u32 fn_800E0C54(void);
-    extern u32 fn_8012640C(u32, u32, u32, u32);
+    extern u32 pokemonGetStatus(u32, u32, u32, u32);
     extern u8 fn_80201248(u32, u16*);
     u16 choices[4];
     u32 species;
@@ -19904,7 +19904,7 @@ u16 fn_8025CB3C(void* ctx, u32 param1, u32 param2) {
     s32 index;
     u8 count;
 
-    species = fn_8012640C(param1, 0, 0xF7, 0) & 0xFFFF;
+    species = pokemonGetStatus(param1, 0, 0xF7, 0) & 0xFFFF;
     if ((species != 0) && (species != 0x165) && (species != 0xFFFF)) {
         return species;
     }
@@ -20015,13 +20015,13 @@ void fn_8025CDB8(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fn_800E27B0();
     extern void fn_800E2C04();
     extern void fn_800FA280();
-    extern void fn_8012086C();
-    extern void fn_80123EF0();
-    extern void fn_801240C4();
-    extern void fn_80124A60();
-    extern void fn_80129280();
-    extern void fn_8012A248();
-    extern void fn_8012AC08();
+    extern void pokemonAllKaihuku();
+    extern void pokemonSetCatchStatus();
+    extern void pokemonCreate();
+    extern void pokemonInit();
+    extern void savedataGetStatus();
+    extern void heroInit();
+    extern void heroBiosGetPokemonPtr();
     extern void fn_80135938();
     u8 sp[0x20];
     u32 r0 = 0;
@@ -20068,7 +20068,7 @@ void fn_8025CDB8(void* ctx, u32 param1, u32 param2, u32 param3) {
         r3 = r30;
         r5 = 0xa;
         r4 = r0 & 0xFFFF;
-        fn_801240C4();
+        pokemonCreate();
         r3 = r31 + 0x1004;
         fn_800FA280();
         r9 = r3;
@@ -20078,9 +20078,9 @@ void fn_8025CDB8(void* ctx, u32 param1, u32 param2, u32 param3) {
         r6 = 0x1;
         r7 = 0x0;
         r8 = 0x0;
-        fn_80123EF0();
+        pokemonSetCatchStatus();
         r3 = r30;
-        fn_8012086C();
+        pokemonAllKaihuku();
         r30 = r30 + 0x138;
         r31 = r31 + 0x1;
 
@@ -20114,15 +20114,15 @@ void fn_8025CDB8(void* ctx, u32 param1, u32 param2, u32 param3) {
         r3 = r31;
         fn_8006B09C();
         r3 = r3 + 0xb44;
-        fn_8012A248();
+        heroInit();
         r30 = 0x0;
         do {
             r3 = r31;
             fn_8006B09C();
             r4 = r30 & 0xFFFF;
             r3 = r3 + 0xb44;
-            fn_8012AC08();
-            fn_80124A60();
+            heroBiosGetPokemonPtr();
+            pokemonInit();
             r30 = r30 + 0x1;
         } while ((s32)r30 < (s32)0x6);
         r31 = r31 + 0x1;
@@ -20132,15 +20132,15 @@ void fn_8025CDB8(void* ctx, u32 param1, u32 param2, u32 param3) {
         r3 = r30;
         fn_8006B09C();
         r3 = r3 + 0x2c;
-        fn_8012A248();
+        heroInit();
         r31 = 0x0;
         do {
             r3 = r30;
             fn_8006B09C();
             r4 = r31 & 0xFFFF;
             r3 = r3 + 0x2c;
-            fn_8012AC08();
-            fn_80124A60();
+            heroBiosGetPokemonPtr();
+            pokemonInit();
             r31 = r31 + 0x1;
         } while ((s32)r31 < (s32)0x6);
         r30 = r30 + 0x1;
@@ -20151,7 +20151,7 @@ void fn_8025CDB8(void* ctx, u32 param1, u32 param2, u32 param3) {
     } while (--ctr != 0);
     r3 = 0x0;
     r4 = 0x2;
-    fn_80129280();
+    savedataGetStatus();
     r30 = r3;
     r3 = 0x0;
     fn_8006B09C();
@@ -20167,7 +20167,7 @@ void fn_8025CDB8(void* ctx, u32 param1, u32 param2, u32 param3) {
         if ((s32)r31 == (s32)0x0) {
             r3 = 0x0;
             r4 = 0x2;
-            fn_80129280();
+            savedataGetStatus();
             r30 = r3;
             r3 = r31;
             fn_8006B09C();
@@ -20187,7 +20187,7 @@ void fn_8025CDB8(void* ctx, u32 param1, u32 param2, u32 param3) {
                 fn_8006B09C();
                 r4 = r28 & 0xFFFF;
                 r3 = r3 + 0xb44;
-                fn_8012AC08();
+                heroBiosGetPokemonPtr();
                 if (r3 != (u32)0x0) {
                     r4 = r30;
                     r5 = 0x138;
@@ -20237,9 +20237,9 @@ f32 fn_8025D0A8(void* ctx, u32 param1, u32 param2) {
     extern f32 lbl_8047E658;
     extern f32 lbl_8047E65C;
     extern u16 fn_8011F5C8(void*);
-    extern u8 fn_80123FBC(void*);
-    extern void* fn_80129280(u32, u32);
-    extern void* fn_8012AC08(void*, u32);
+    extern u8 pokemonCheckValid(void*);
+    extern void* savedataGetStatus(u32, u32);
+    extern void* heroBiosGetPokemonPtr(void*, u32);
     void* party;
     void* member;
     u32 count;
@@ -20255,11 +20255,11 @@ f32 fn_8025D0A8(void* ctx, u32 param1, u32 param2) {
     party = ctx;
     count = 0;
     if (party == 0) {
-        party = fn_80129280(0, 2);
+        party = savedataGetStatus(0, 2);
     }
     for (i = 0; (s32)i < 6; i++) {
-        member = fn_8012AC08(party, i & 0xFFFF);
-        if (fn_80123FBC(member) != 0) {
+        member = heroBiosGetPokemonPtr(party, i & 0xFFFF);
+        if (pokemonCheckValid(member) != 0) {
             species = fn_8011F5C8(member);
             offset = 0;
             while (1) {
@@ -20293,8 +20293,8 @@ void fn_8025D164(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fn_8006B09C();
     extern void fn_8006B5A8();
     extern void fn_8011F5C8();
-    extern void fn_80123FBC();
-    extern void fn_8012AC08();
+    extern void pokemonCheckValid();
+    extern void heroBiosGetPokemonPtr();
     u8 sp[0x30];
     u32 r0 = 0;
     u32 r3 = (u32)ctx;
@@ -20325,9 +20325,9 @@ void fn_8025D164(void* ctx, u32 param1, u32 param2, u32 param3) {
         fn_8006B09C();
         r4 = r29 & 0xFFFF;
         r3 = r3 + 0xb44;
-        fn_8012AC08();
+        heroBiosGetPokemonPtr();
         r31 = r3;
-        fn_80123FBC();
+        pokemonCheckValid();
         r0 = r3 & 0xFF;
         if ((s32)r0 != (s32)0) {
             r3 = r31;
@@ -20466,8 +20466,8 @@ u32 fn_8025D364(void* ctx, u32 param1, u32 param2) {
 void fn_8025D3F4(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fn_8006B09C();
     extern void fn_8006B1D4();
-    extern void fn_80123FBC();
-    extern void fn_8012AC08();
+    extern void pokemonCheckValid();
+    extern void heroBiosGetPokemonPtr();
     u8 sp[0x20];
     u32 r0 = 0;
     u32 r3 = (u32)ctx;
@@ -20493,8 +20493,8 @@ void fn_8025D3F4(void* ctx, u32 param1, u32 param2, u32 param3) {
         fn_8006B09C();
         r4 = r29 & 0xFFFF;
         r3 = r3 + 0xb44;
-        fn_8012AC08();
-        fn_80123FBC();
+        heroBiosGetPokemonPtr();
+        pokemonCheckValid();
         r3 = r3 & 0xFF;
         r0 = r3 - r0; /* -borrow */;
         r0 = r0 & 0xFF;
@@ -20537,18 +20537,18 @@ void fn_8025D3F4(void* ctx, u32 param1, u32 param2, u32 param3) {
         fn_8006B09C();
         r4 = r28 & 0xFFFF;
         r3 = r3 + 0xb44;
-        fn_8012AC08();
+        heroBiosGetPokemonPtr();
         r28 = r3;
         r3 = r31;
         fn_8006B09C();
         r4 = r27 & 0xFFFF;
         r3 = r3 + 0x2c;
-        fn_8012AC08();
+        heroBiosGetPokemonPtr();
         r3 = r31;
         fn_8006B09C();
         r4 = r27 & 0xFFFF;
         r3 = r3 + 0x2c;
-        fn_8012AC08();
+        heroBiosGetPokemonPtr();
         if ((r3 != (u32)0x0) && (r28 != (u32)0x0)) {
 
             r0 = 0x27;
@@ -20619,8 +20619,8 @@ s32 fn_8025D644(void* ctx, u32 order, u32 param2, u32 param3) {
     } BattleFieldAccessor;
     extern BattleFieldAccessor* fn_8006B09C(void*);
     extern u32 fn_8006B1D4(void*);
-    extern u32 fn_80123FBC(void*);
-    extern void* fn_8012AC08(void*, u32);
+    extern u32 pokemonCheckValid(void*);
+    extern void* heroBiosGetPokemonPtr(void*, u32);
     BattleFieldAccessor* entry;
     u32 entryCount;
     u32 liveCount;
@@ -20638,8 +20638,8 @@ s32 fn_8025D644(void* ctx, u32 order, u32 param2, u32 param3) {
     i = liveCount;
     do {
         r3 = (u32)fn_8006B09C(ctx);
-        r3 = (u32)fn_8012AC08((void*)(r3 + 0xb44), i & 0xFFFF);
-        r3 = fn_80123FBC((void*)r3);
+        r3 = (u32)heroBiosGetPokemonPtr((void*)(r3 + 0xb44), i & 0xFFFF);
+        r3 = pokemonCheckValid((void*)r3);
         r3 = r3 & 0xFF;
         r0 = r3 != 0;
         r0 = r0 & 0xFF;
@@ -20703,8 +20703,8 @@ void fn_8025D788(void* ctx, u32 slot, u32 param) {
 u32 fn_8025D808(void* ctx, u32 param1, u32 param2) {
     extern void* fn_8006B09C(void*);
     extern u32 fn_8006B1D4(void*);
-    extern u32 fn_80123FBC(void*);
-    extern void* fn_8012AC08(void*, u32);
+    extern u32 pokemonCheckValid(void*);
+    extern void* heroBiosGetPokemonPtr(void*, u32);
     u32 r0;
     u32 r3;
     u32 r29;
@@ -20719,8 +20719,8 @@ u32 fn_8025D808(void* ctx, u32 param1, u32 param2) {
     r29 = 0;
     do {
         r3 = (u32)fn_8006B09C(saved);
-        r3 = (u32)fn_8012AC08((void *)(r3 + 0xb44), r29 & 0xFFFF);
-        r3 = fn_80123FBC((void *)r3);
+        r3 = (u32)heroBiosGetPokemonPtr((void *)(r3 + 0xb44), r29 & 0xFFFF);
+        r3 = pokemonCheckValid((void *)r3);
         r3 = r3 & 0xFF;
         r0 = r3 != 0;
         r0 = r0 & 0xFF;
@@ -20742,8 +20742,8 @@ u32 fn_8025D808(void* ctx, u32 param1, u32 param2) {
 /* Address: 0x8025D89C | Size: 0x78 | Pattern: field_accessor */
 u32 fn_8025D89C(void* ctx, u32 slot, u32 param) {
     extern void* fn_8006B09C(void*);
-    extern u32 fn_80123FBC(void*);
-    extern void* fn_8012AC08(void*, u32);
+    extern u32 pokemonCheckValid(void*);
+    extern void* heroBiosGetPokemonPtr(void*, u32);
     u8 sp[0x20];
     u32 r0 = 0;
     u32 r3 = (u32)ctx;
@@ -20758,8 +20758,8 @@ u32 fn_8025D89C(void* ctx, u32 slot, u32 param) {
     do {
         r3 = (u32)fn_8006B09C((void *)r31);
         r4 = r29 & 0xFFFF;
-        r3 = (u32)fn_8012AC08((void *)(r3 + 0xb44), r4);
-        r3 = fn_80123FBC((void *)r3);
+        r3 = (u32)heroBiosGetPokemonPtr((void *)(r3 + 0xb44), r4);
+        r3 = pokemonCheckValid((void *)r3);
         r3 = r3 & 0xFF;
         r0 = r3 != 0;
         r0 = r0 & 0xFF;
@@ -20780,10 +20780,10 @@ void* fn_8025D914(void* ctx) { return (u8*)fn_8006B09C(ctx) + 0xb44; }
 u32 fn_8025D938(u32 r3, u16 r4)
 {
     extern void* fn_8006B09C();
-    extern void fn_8012AC08();
+    extern void heroBiosGetPokemonPtr();
     int iVar1;
   iVar1 = (int)fn_8006B09C();
-  fn_8012AC08(iVar1 + 0x2c, r4);
+  heroBiosGetPokemonPtr(iVar1 + 0x2c, r4);
 }
 
 
@@ -20791,10 +20791,10 @@ u32 fn_8025D938(u32 r3, u16 r4)
 u32 fn_8025D970(u32 r3, u16 r4)
 {
     extern void* fn_8006B09C();
-    extern void fn_8012AC08();
+    extern void heroBiosGetPokemonPtr();
     int iVar1;
   iVar1 = (int)fn_8006B09C();
-  fn_8012AC08(iVar1 + 0xb44, r4);
+  heroBiosGetPokemonPtr(iVar1 + 0xb44, r4);
 }
 
 
@@ -21052,9 +21052,9 @@ u32 fn_8025DF38(int *r3,u32 r4,u16 *r5,int r6)
     extern int fn_800E9108();
     extern u32 fn_800FF56C();
     extern int floorGetResource();
-    extern int fn_80115280();
-    extern u32 fn_8011538C();
-    extern int fn_80115BD8();
+    extern int floorDataBiosGetShadowReciveNum();
+    extern u32 floorDataBiosGetShadowReciveID();
+    extern int floorDataBiosGetCurrentPtr();
     extern u32 fn_8018F470();
     extern u8 fn_801DDD28();
     extern int fn_801DE190();
@@ -21085,15 +21085,15 @@ u32 fn_8025DF38(int *r3,u32 r4,u16 *r5,int r6)
     }
     if (((r3 != (int *)0x0) && (*(u32 *)r3 != 0)) && (iVar3 = fn_801DAC3C(), iVar3 != 0)) {
       fn_800E90C8(iVar3,1);
-      iVar4 = fn_80115BD8();
+      iVar4 = floorDataBiosGetCurrentPtr();
       if (iVar4 != 0) {
         uVar2 = fn_8018F470(1);
-        iVar5 = fn_80115280(iVar4);
+        iVar5 = floorDataBiosGetShadowReciveNum(iVar4);
         iVar9 = 0;
         iVar10 = 0;
         if (iVar5 == 1) {
           for (uVar7 = 0; uVar7 < iVar5; uVar7 = uVar7 + 1) {
-            uVar6 = fn_8011538C(iVar4,uVar7);
+            uVar6 = floorDataBiosGetShadowReciveID(iVar4,uVar7);
             uVar6 = floorGetResource(fn_800FF56C(),uVar6);
             if (uVar6 != 0) {
               *(int *)((int)local_68 + iVar10) = uVar6;
@@ -21126,18 +21126,18 @@ u32 fn_8025E0B0(int *r3,u32 r4,u16 *r5,int r6)
   int iVar3;
   u8 cVar5;
 
-  sVar4 = (int)fn_8012640C(r4,0,0x6e,0);
+  sVar4 = (int)pokemonGetStatus(r4,0,0x6e,0);
   if (sVar4 == 0) {
     uVar1 = 0;
   }
   else {
-    sVar6 = (int)fn_8012640C(0,sVar4,0x66,0);
+    sVar6 = (int)pokemonGetStatus(0,sVar4,0x66,0);
     if (sVar6 == 0) {
       uVar1 = 0;
     }
     else {
       uVar1 = fn_8011F5B0(r4);
-      uVar2 = (int)fn_8012640C(r4,0,0xc1,0);
+      uVar2 = (int)pokemonGetStatus(r4,0,0xc1,0);
       uVar2 = (-uVar2 | uVar2) >> 0x1f;
       iResult = fn_801DE190(sVar6,uVar1,uVar2);
       *r3 = iResult;
@@ -21299,13 +21299,13 @@ u32 fn_8025E640(u32 r3,int r4)
     extern int fn_801067E8();
     extern int fn_8011DE98();
     extern u32 fn_8011F4A8();
-    extern int fn_80122370();
-    extern u32 fn_801229F4();
-    extern u32 fn_80123090();
-    extern u32 fn_801236F8();
-    extern s8 fn_80123B5C();
-    extern int fn_80123D58();
-    extern int fn_8012546C();
+    extern int pokemonGetFriendFormPokemonFriendFilterId();
+    extern u32 pokemonGetLevelToExp();
+    extern u32 pokemonGetSoubiItemSoubiDataId();
+    extern u32 pokemonGetOboeWazaDataId();
+    extern s8 pokemonSearchWazaDataId();
+    extern int pokemonWazaCreate();
+    extern int pokemonResetBasisStatus();
     extern int fn_80132A38();
     extern int fn_80165668();
     /* fn_802600E4 forward-declared at file scope */
@@ -21323,57 +21323,57 @@ u32 fn_8025E640(u32 r3,int r4)
   
   uVar13 = 0;
   local_58[0] = '\0';
-  fn_8012640C(r3,0,0x7a,0);
+  pokemonGetStatus(r3,0,0x7a,0);
   while (1) {
     if (r4 == 0) {
-      fn_801254B4(r3,0,0xc6,0,0);
+      pokemonSetStatus(r3,0,0xc6,0,0);
       return uVar13;
     }
-    bVar11 = (u8)fn_8012640C(r3,0,0x7a,0);
+    bVar11 = (u8)pokemonGetStatus(r3,0,0x7a,0);
     if (bVar11 > 99) break;
-    iVar1 = (int)fn_8012640C(r3,0,0x79,0);
-    uVar2 = fn_801229F4(r3,bVar11 + 1);
-    fn_8012640C(r3,0,0x87,0);
-    fn_8012640C(r3,0,0x88,0);
-    fn_8012640C(r3,0,0x89,0);
-    fn_8012640C(r3,0,0x8a,0);
-    fn_8012640C(r3,0,0x8b,0);
-    fn_8012640C(r3,0,0x8c,0);
+    iVar1 = (int)pokemonGetStatus(r3,0,0x79,0);
+    uVar2 = pokemonGetLevelToExp(r3,bVar11 + 1);
+    pokemonGetStatus(r3,0,0x87,0);
+    pokemonGetStatus(r3,0,0x88,0);
+    pokemonGetStatus(r3,0,0x89,0);
+    pokemonGetStatus(r3,0,0x8a,0);
+    pokemonGetStatus(r3,0,0x8b,0);
+    pokemonGetStatus(r3,0,0x8c,0);
     if ((u32)(iVar1 + r4) >= uVar2) {
       r4 = (iVar1 + r4) - uVar2;
       uVar13 = 1;
       fn_8011DE98(r3,uVar2);
-      fn_8012546C(r3);
-      uVar3 = fn_80123090(r3);
-      fn_80122370(r3,uVar3,0);
+      pokemonResetBasisStatus(r3);
+      uVar3 = pokemonGetSoubiItemSoubiDataId(r3);
+      pokemonGetFriendFormPokemonFriendFilterId(r3,uVar3,0);
       uVar2 = fn_8011F4A8(r3);
       fn_80165668(0x4ca,0,0xff);
       fn_80132A38(0x2f,uVar2 & 0xff);
       fn_801067E8(0x44ce,1,0);
-      fn_8012640C(r3,0,0x87,0);
-      fn_8012640C(r3,0,0x88,0);
-      fn_8012640C(r3,0,0x89,0);
-      fn_8012640C(r3,0,0x8a,0);
-      fn_8012640C(r3,0,0x8b,0);
-      fn_8012640C(r3,0,0x8c,0);
+      pokemonGetStatus(r3,0,0x87,0);
+      pokemonGetStatus(r3,0,0x88,0);
+      pokemonGetStatus(r3,0,0x89,0);
+      pokemonGetStatus(r3,0,0x8a,0);
+      pokemonGetStatus(r3,0,0x8b,0);
+      pokemonGetStatus(r3,0,0x8c,0);
       local_44[0] = 1;
       fn_80105E7C(local_44,1);
       local_54[0] = 0;
       fn_80105E7C(local_54,1);
       fn_80105C68(1);
       local_58[0] = '\0';
-      while (uVar4 = fn_801236F8(r3,uVar2,local_58), (uVar4 & 0xffff) != 0) {
-        cVar12 = fn_80123B5C(r3,uVar4);
+      while (uVar4 = pokemonGetOboeWazaDataId(r3,uVar2,local_58), (uVar4 & 0xffff) != 0) {
+        cVar12 = pokemonSearchWazaDataId(r3,uVar4);
         if ((cVar12 == -1) &&
            (iVar1 = fn_802600E4(r3,uVar4,local_57,0,0x8025e3b0,0), iVar1 != 0)) {
-          fn_80123D58(r3,local_57[0],uVar4);
+          pokemonWazaCreate(r3,local_57[0],uVar4);
         }
         local_58[0] = local_58[0] + 1;
       }
     }
     else {
       r4 = 0;
-      fn_801254B4(r3,0,0x79,0);
+      pokemonSetStatus(r3,0,0x79,0);
     }
   }
   return uVar13;
@@ -21392,7 +21392,7 @@ void fn_8025EF58(void)
     extern int fn_801065B8();
     extern int fn_8011288C();
     extern int fn_8011EE40();
-    extern s8 fn_80129B2C();
+    extern s8 heroItemCheckHaveItemDataId();
     extern u32 heroGetStatus();
     extern int fadeCheck();
     extern s8 fn_801EEC74();
@@ -21416,13 +21416,13 @@ void fn_8025EF58(void)
   
   if ((int)lbl_8047B668 != -1) {
     sVar6 = 0;
-    fn_80129280(0,0);
-    uVar2 = fn_80129280(0,2);
+    savedataGetStatus(0,0);
+    uVar2 = savedataGetStatus(0,2);
     uVar8 = 0;
     while (1) {
       if (5 < uVar8) break;
-      uVar3 = fn_8012AC08(uVar2,uVar8);
-      cVar7 = fn_80123FBC();
+      uVar3 = heroBiosGetPokemonPtr(uVar2,uVar8);
+      cVar7 = pokemonCheckValid();
       if (cVar7 != '\0') {
         cVar7 = pokemonIsDarkPokemon(uVar3);
         if (cVar7 == '\x01') {
@@ -21436,9 +21436,9 @@ void fn_8025EF58(void)
       uVar8 = uVar8 + 1;
     }
     sVar5 = scriptGetDarkPointZeroPokemonNum();
-    fn_80129280(0,0);
-    fn_80129280(0,2);
-    cVar7 = fn_80129B2C(0,0x219);
+    savedataGetStatus(0,0);
+    savedataGetStatus(0,2);
+    cVar7 = heroItemCheckHaveItemDataId(0,0x219);
     if (cVar7 == '\x01') {
       if (sVar6 == 0) {
         iVar1 = 3;
@@ -21474,7 +21474,7 @@ void fn_8025EF58(void)
       fn_8025DD14((int*)auStack_28);
       fn_80165668(0x3c8,0,0xff);
       uVar2 = heroGetStatus(0,3,lbl_8047B66C & 0xffff);
-      _DAT_804782c0 = (int)fn_8012640C(uVar2,0,0x6e,0);
+      _DAT_804782c0 = (int)pokemonGetStatus(uVar2,0,0x6e,0);
       _DAT_804782bc = 1;
       _DAT_804782c4 = lbl_8047B66C;
       fadeSet((double)lbl_8047E680,3);
@@ -21503,7 +21503,7 @@ void fn_8025EF58(void)
         uVar4 = menuPokemonOpen(7,0,0);
         if (uVar4 != 0xffffffff) {
           uVar2 = heroGetStatus(0,3,uVar4 & 0xffff);
-          _DAT_804782c0 = (int)fn_8012640C(uVar2,0,0x6e,0);
+          _DAT_804782c0 = (int)pokemonGetStatus(uVar2,0,0x6e,0);
           _DAT_804782bc = 0;
           _DAT_804782c4 = uVar4;
           fadeSet((double)lbl_8047E680,3);
@@ -22053,10 +22053,10 @@ void fn_8025FBCC(int r3)
   u16 uVar4;
   
   if (r3 == 0) {
-    fn_80129280(0,0xc);
+    savedataGetStatus(0,0xc);
   }
   for (uVar4 = 1; uVar4 < 0xfc; uVar4 = uVar4 + 1) {
-    puVar1 = (u16 *)fn_80129280(0,0xc);
+    puVar1 = (u16 *)savedataGetStatus(0,0xc);
     for (uVar3 = 0; (uVar3 & 0xffff) < (u32)*puVar1; uVar3 = uVar3 + 1) {
       if ((puVar1[(uVar3 & 0xffff) * 6 + 2] & 0x3fff) != uVar4) {
         }
@@ -22071,7 +22071,7 @@ void fn_8025FBCC(int r3)
     if (0x19b < uVar4) {
       return;
     }
-    puVar1 = (u16 *)fn_80129280(0,0xc);
+    puVar1 = (u16 *)savedataGetStatus(0,0xc);
     for (uVar3 = 0; (uVar3 & 0xffff) < (u32)*puVar1; uVar3 = uVar3 + 1) {
       if ((puVar1[(uVar3 & 0xffff) * 6 + 2] & 0x3fff) != uVar4) {
         }
@@ -22102,11 +22102,11 @@ u32 fn_8025FD34(u16 *r3, u16 r4) {
 	  s32 r0;
   queue = r3;
   if (queue == (u16 *)0) {
-    queue = (u16 *)fn_80129280(0, 0xC);
+    queue = (u16 *)savedataGetStatus(0, 0xC);
   }
   countQueue = queue;
 	  if (queue == (u16 *)0) {
-	    countQueue = (u16 *)fn_80129280(0, 0xC);
+	    countQueue = (u16 *)savedataGetStatus(0, 0xC);
 	  }
 	  count = (u32)*countQueue;
 	  for (i = 0; (u32)(u16)i < (u32)count; i = i + 1) {
@@ -22139,11 +22139,11 @@ u32 fn_8025FDDC(u16 *r3, u16 r4) {
   s32 r0;
   queue = r3;
   if (queue == (u16 *)0) {
-    queue = (u16 *)fn_80129280(0, 0xC);
+    queue = (u16 *)savedataGetStatus(0, 0xC);
   }
   countQueue = queue;
   if (queue == (u16 *)0) {
-    countQueue = (u16 *)fn_80129280(0, 0xC);
+    countQueue = (u16 *)savedataGetStatus(0, 0xC);
   }
   count = (u32)*countQueue;
 	  for (i = 0; (u32)(u16)i < (u32)count; i = i + 1) {
@@ -22162,9 +22162,9 @@ u32 fn_8025FDDC(u16 *r3, u16 r4) {
 u16 memoDataGetPokemonID(u16 *r3, u32 r4)
 {
     u16 res;
-    extern void *fn_80129280();
+    extern void *savedataGetStatus();
     if (r3 == (u16 *)0) {
-        r3 = (u16 *)fn_80129280(0, 0xc);
+        r3 = (u16 *)savedataGetStatus(0, 0xc);
     }
     if (*r3 != 0) {
         r3 = (u16 *)((u8 *)r3 + (r4 & 0xFFFF) * 12);
@@ -22180,7 +22180,7 @@ u16 memoDataGetCount(u16 *r3)
 
 {
   if (r3 == (u16 *)0x0) {
-    r3 = (u16 *)fn_80129280(0,0xc);
+    r3 = (u16 *)savedataGetStatus(0,0xc);
   }
   return *r3;
 }
@@ -22195,7 +22195,7 @@ u32 memoDataSetMemoFlag(u16 *r3)
   
   uVar3 = 0;
   if (r3 == (u16 *)0x0) {
-    r3 = (u16 *)fn_80129280(0,0xc);
+    r3 = (u16 *)savedataGetStatus(0,0xc);
   }
   uVar2 = 0;
   while ((u32)(u16)uVar2 < (u32)*r3) {
@@ -22229,7 +22229,7 @@ void memoDataSet(u16 *r3, u32 r4) {
 	  queue = r3;
   r30 = r4;
 	  if (queue == (u16 *)0) {
-	    queue = (u16 *)fn_80129280(0, 0xC);
+	    queue = (u16 *)savedataGetStatus(0, 0xC);
 	  }
 		  lookup = fn_8011F5C8(r30) & 0xffff;
 		  count = *queue;
@@ -22265,7 +22265,7 @@ void fn_80260070(u16 *r3) {
   s32 r27;
   r29 = r3;
   if (r29 == (u16 *)0) {
-    r29 = (u16 *)fn_80129280(0, 0xC);
+    r29 = (u16 *)savedataGetStatus(0, 0xC);
   }
   r30 = 0;
   r27 = 0;
@@ -22368,12 +22368,12 @@ int fn_8026045C(u32 r3,u32 r4,int r5)
     iVar2 = -1;
   }
   fn_801DADC0(2);
-  sVar4 = (int)fn_8012640C(r3,0,0x6e,0);
+  sVar4 = (int)pokemonGetStatus(r3,0,0x6e,0);
   if (sVar4 == 0) {
     sVar4 = -1;
   }
   else {
-    sVar4 = (int)fn_8012640C(0,sVar4,0x66,0);
+    sVar4 = (int)pokemonGetStatus(0,sVar4,0x66,0);
     if (sVar4 == 0) {
       sVar4 = -1;
     }
@@ -22383,7 +22383,7 @@ int fn_8026045C(u32 r3,u32 r4,int r5)
   }
   else {
     uVar1 = fn_8011F5B0(r3);
-    uVar3 = (int)fn_8012640C(r3,0,0xc1,0);
+    uVar3 = (int)pokemonGetStatus(r3,0,0xc1,0);
     iVar7 = fn_801DE190(sVar4,uVar1,(-uVar3 | uVar3) >> 0x1f);
     if (iVar7 == 0) {
       iVar7 = 0;
@@ -22554,7 +22554,7 @@ fn_80260EBC(u32 r3,u32 r4,u32 r5,u16 *r6,
 
 {
     extern u32 DAT_8027a488;
-    extern int fn_8011F5FC();
+    extern int pokemonBiosCopy();
     extern int scriptSoundStop();
     extern int fn_80260910();
     extern f32 lbl_8047E6C0;
@@ -22581,12 +22581,12 @@ fn_80260EBC(u32 r3,u32 r4,u32 r5,u16 *r6,
   fn_801DADC0(2);
   local_184 = 0;
   local_180 = 0;
-  sVar7 = (int)fn_8012640C(r3,0,0x6e,0);
+  sVar7 = (int)pokemonGetStatus(r3,0,0x6e,0);
   if (sVar7 == 0) {
     sVar7 = -1;
   }
   else {
-    sVar7 = (int)fn_8012640C(0,sVar7,0x66,0);
+    sVar7 = (int)pokemonGetStatus(0,sVar7,0x66,0);
     if (sVar7 == 0) {
       sVar7 = -1;
     }
@@ -22596,7 +22596,7 @@ fn_80260EBC(u32 r3,u32 r4,u32 r5,u16 *r6,
   }
   else {
     uVar3 = fn_8011F5B0(r3);
-    uVar4 = (int)fn_8012640C(r3,0,0xc1,0);
+    uVar4 = (int)pokemonGetStatus(r3,0,0xc1,0);
     iVar9 = fn_801DE190(sVar7,uVar3,(-uVar4 | uVar4) >> 0x1f);
     if (iVar9 == 0) {
       iVar9 = 0;
@@ -22617,12 +22617,12 @@ fn_80260EBC(u32 r3,u32 r4,u32 r5,u16 *r6,
   }
   if (iVar9 != 0) {
     local_184 = iVar9;
-    sVar7 = (int)fn_8012640C(r4,0,0x6e,0);
+    sVar7 = (int)pokemonGetStatus(r4,0,0x6e,0);
     if (sVar7 == 0) {
       sVar7 = -1;
     }
     else {
-      sVar7 = (int)fn_8012640C(0,sVar7,0x66,0);
+      sVar7 = (int)pokemonGetStatus(0,sVar7,0x66,0);
       if (sVar7 == 0) {
         sVar7 = -1;
       }
@@ -22632,7 +22632,7 @@ fn_80260EBC(u32 r3,u32 r4,u32 r5,u16 *r6,
     }
     else {
       uVar3 = fn_8011F5B0(r4);
-      uVar4 = (int)fn_8012640C(r4,0,0xc1,0);
+      uVar4 = (int)pokemonGetStatus(r4,0,0xc1,0);
       iVar9 = fn_801DE190(sVar7,uVar3,(-uVar4 | uVar4) >> 0x1f);
       if (iVar9 == 0) {
         iVar9 = 0;
@@ -22691,7 +22691,7 @@ LAB_0025e130:
       bVar2 = 0;
     }
     else {
-      fn_8011F5FC((int*)auStack_168,r4);
+      pokemonBiosCopy((int*)auStack_168,r4);
       for (iVar9 = 0; iVar9 < r7; iVar9 = iVar9 + 1) {
         uVar1 = *r6;
         iVar6 = fn_802600E4((int*)auStack_168,uVar1,local_188,0,0x8026045c,&local_184);
@@ -22699,7 +22699,7 @@ LAB_0025e130:
           local_188[0] = 0xff;
         }
         else {
-          fn_80123D58((int*)auStack_168,local_188[0],uVar1);
+          pokemonWazaCreate((int*)auStack_168,local_188[0],uVar1);
         }
         r6 = r6 + 1;
         *r8 = local_188[0];
@@ -22971,7 +22971,7 @@ u32 fn_80261708(u32 r3,u32 r4,char *r5)
 	  int iVar10;
 	  int base;
   
-  iVar2 = (u32)fn_8012640C(r3,0,0xee,0);
+  iVar2 = (u32)pokemonGetStatus(r3,0,0xee,0);
   if (iVar2 == 0) {
     return 1;
   }
@@ -23556,15 +23556,15 @@ u32 fn_80262334(u32 msgId, u32 unused, u32 itemId)
 /* Address: 0x802623B4 | Size: 0xB8 | Ghidra import */
 u32 fn_802623B4(u32 msgId, u32 pokemon)
 {
-    extern u32 fn_8011BEB4(u32, u32, u32, u32);
+    extern u32 wazaGetStatus(u32, u32, u32, u32);
     extern u32 fn_800FA280(u32);
     u32 name;
 
     fn_80132A38(0xf, msgId);
-    name = fn_800FA280(fn_8011BEB4(0, pokemon, 0xa, 0));
+    name = fn_800FA280(wazaGetStatus(0, pokemon, 0xa, 0));
     fn_80132A38(0xd, name);
-    fn_80132A38(0x28, fn_800FA280(fn_8011BEB4(0, pokemon, 1, 0)));
-    fn_80132A38(0xe, fn_800FA280(fn_8011BEB4(0, pokemon, 0xb, 0)));
+    fn_80132A38(0x28, fn_800FA280(wazaGetStatus(0, pokemon, 1, 0)));
+    fn_80132A38(0xe, fn_800FA280(wazaGetStatus(0, pokemon, 0xb, 0)));
     fn_80106394(0x768d, 1, 1);
     return 1;
 }
@@ -23622,7 +23622,7 @@ u32 fn_80262508(u32 r3, u32 r4)
     extern u16 fn_80089F60(u32);
     extern u8 fn_801FF1BC(u32, u32);
     extern u32 fn_80205B8C(u32);
-    extern s16 fn_8012640C(u32, u32, u32, u32);
+    extern s16 pokemonGetStatus(u32, u32, u32, u32);
     extern u32 lbl_80478DF8;
     extern u32 fn_8022B2CC(u32, u32, u32, u32, u32, u32, s32);
     extern u32 fn_801F47B4(u32, u32);
@@ -23785,7 +23785,7 @@ u32 fn_80262508(u32 r3, u32 r4)
                 if (moveSlot < 0) {
                     continue;
                 }
-                moveId = fn_8012640C(fn_80205B8C(slot), 0, 0x7f, moveSlot);
+                moveId = pokemonGetStatus(fn_80205B8C(slot), 0, 0x7f, moveSlot);
                 moveId &= 0xffff;
                 if ((moveId == 0) || (moveId >= lbl_80478DF8) || (moveId == 0x165)) {
                     continue;
@@ -23829,7 +23829,7 @@ u32 fn_80262508(u32 r3, u32 r4)
             }
             if (kind == 2) {
                 moveId = fn_801FB1C0(ctx, 0, 0x45, fn_80089F58(entry));
-                index = fn_8012640C(moveId, 0, 0xce, 0);
+                index = pokemonGetStatus(moveId, 0, 0xce, 0);
                 if (index < 0) {
                     continue;
                 }
@@ -23945,7 +23945,7 @@ s32 fn_80262D3C(u32 r3, u32 r4, u32 r5, s32 r6)
     extern u32 fn_800111E8(u32, u32, u32, u32);
     extern s32 fn_80089F70(u32);
     extern u16 fn_80089F58(u32);
-    extern s16 fn_8012640C(u32, u32, u32, u32);
+    extern s16 pokemonGetStatus(u32, u32, u32, u32);
     extern s32 fn_801F93F8(u32, s32, u32);
     extern u8 fn_80102620(u32);
     extern void fn_80102568(u32, u32, u32);
@@ -24035,7 +24035,7 @@ s32 fn_80262D3C(u32 r3, u32 r4, u32 r5, s32 r6)
         }
         if (kind == 2) {
             found = fn_801FB1C0(ctx, 0, 0x45, fn_80089F58(entry));
-            target = fn_8012640C(found, 0, 0xce, 0);
+            target = pokemonGetStatus(found, 0, 0xce, 0);
             goto after_select;
         }
 	        if (kind == 4) {
@@ -24933,7 +24933,7 @@ u32 fn_80265E34(u32 r3)
   int iVar1;
   
   fn_8011D5D4(r3,1);
-  iVar1 = fn_80129280(0,0x10);
+  iVar1 = savedataGetStatus(0,0x10);
   if (*(char *)(iVar1 + 5) == '\0') {
     *(u8 *)(iVar1 + 5) = 0x2d;
   }
@@ -24949,7 +24949,7 @@ u32 fn_80265E7C(u32 r3)
   int iVar1;
   
   fn_8011D5F8(r3,1);
-  iVar1 = fn_80129280(0,0x10);
+  iVar1 = savedataGetStatus(0,0x10);
   if (*(char *)(iVar1 + 4) == '\0') {
     *(u8 *)(iVar1 + 4) = 0x2c;
   }
@@ -24979,7 +24979,7 @@ void fn_80265F94(int r3)
   u16 uVar8;
   u32 uVar5;
   
-  sVar6 = (int)fn_8012640C(0,0xfa,0x66,0);
+  sVar6 = (int)pokemonGetStatus(0,0xfa,0x66,0);
   sVar7 = -1;
   if (sVar6 != 0) {
     sVar7 = sVar6;
@@ -25179,7 +25179,7 @@ int fn_8025E3B0(u32 r3,u32 r4)
   if (3 < iVar2) {
     iVar2 = -1;
   }
-  fn_8012640C(r3,0,0x6e,0);
+  pokemonGetStatus(r3,0,0x6e,0);
   fn_801DADC0(1);
   iVar3 = fn_8025E0B0((int*)auStack_58,r3,(u16*)lbl_80478DB0,1);
   if (iVar3 == 1) {
@@ -25201,12 +25201,12 @@ void fn_8025E9BC(u32 r3)
     extern u16 fn_8011EE58();
     extern u16 fn_8011F228();
     extern u32 fn_8011F4F0();
-    extern int fn_8011FBCC();
+    extern int pokemonSetDp();
     extern u8 fn_80121ADC();
     extern int fn_80121B4C();
-    extern int fn_8012805C();
-    extern u32 fn_80128A64();
-    extern u8 fn_80123FBC();
+    extern int pokemonEvolutionAll();
+    extern u32 pokemonEvolutionCheck();
+    extern u8 pokemonCheckValid();
     extern int fn_801EECD8();
     extern u32 lbl_80478DB0;
     extern f32 lbl_8047E680;
@@ -25230,16 +25230,16 @@ void fn_8025E9BC(u32 r3)
 
   local_28[0] = 0;
   uVar1 = heroGetStatus(0,3,r3 & 0xffff);
-  uVar8 = fn_80123FBC();
+  uVar8 = pokemonCheckValid();
   if (uVar8 == 1) {
-    fn_8012640C(uVar1,0,0x6e,0);
+    pokemonGetStatus(uVar1,0,0x6e,0);
     uVar2 = fn_8011EE40(uVar1);
     fn_801EECD8(uVar2,1);
     uVar8 = fn_80121ADC(uVar1,0x3e);
     if (uVar8 != 0) {
       fn_80121B4C(uVar1,0x3e);
     }
-    fn_8011FBCC((double)lbl_8047E688,uVar1);
+    pokemonSetDp((double)lbl_8047E688,uVar1);
     fn_80165668(0x3f7,0,0xff);
     sVar5 = fn_8011F228(uVar1,0);
     if (sVar5 != 0) {
@@ -25258,12 +25258,12 @@ void fn_8025E9BC(u32 r3)
     fn_8011DE68(uVar1,0);
     iVar3 = fn_8025E640(uVar1,uVar2);
     if (iVar3 == 1) {
-      uVar4 = fn_80128A64(uVar1,0,0,local_28,auStack_18);
+      uVar4 = pokemonEvolutionCheck(uVar1,0,0,local_28,auStack_18);
       if (((uVar4 & 0xffff) != 0) && ((uVar4 & 0xffff) != 0xffff)) {
         fadeSet((double)lbl_8047E680,3);
         fadeCheck(1);
         fn_801DAC90();
-        iVar3 = fn_8012805C(uVar1,uVar4,local_28[0],auStack_18,0,1,1,0);
+        iVar3 = pokemonEvolutionAll(uVar1,uVar4,local_28[0],auStack_18,0,1,1,0);
         if (iVar3 == 0) {
           fn_801DADC0(1);
           iVar3 = fn_8025E0B0((int*)auStack_1c,uVar1,(u16*)&lbl_80478DB0,1);
@@ -25332,12 +25332,12 @@ void fn_8025ED4C(void)
     fn_801DADC0(1);
     if (lbl_804782BC[0] == 0) {
       uVar2 = heroGetStatus(0,3,lbl_804782BC[2] & 0xffff);
-      cVar4 = fn_80123FBC();
+      cVar4 = pokemonCheckValid();
       if (cVar4 != '\x01') {
         bVar1 = 0;
       }
       else {
-        fn_8012640C(uVar2,0,0x6e,0);
+        pokemonGetStatus(uVar2,0,0x6e,0);
         iVar3 = fn_8025E0B0((int*)auStack_18,uVar2,(u16*)&lbl_80478DA8,2);
         if (iVar3 == 1) {
           fn_8025DE54((u32*)auStack_18,(u16*)&lbl_80478DA8,2,1,1,0);
@@ -25353,13 +25353,13 @@ void fn_8025ED4C(void)
     }
     else if (lbl_804782BC[0] == 1) {
       uVar2 = heroGetStatus(0,3,lbl_804782BC[2] & 0xffff);
-      cVar4 = fn_80123FBC();
+      cVar4 = pokemonCheckValid();
       if (cVar4 != '\x01') {
         bVar1 = 0;
       }
       else {
-        fn_801254B4(uVar2,0,0xc5,0,0);
-        fn_8012640C(uVar2,0,0x6e,0);
+        pokemonSetStatus(uVar2,0,0xc5,0,0);
+        pokemonGetStatus(uVar2,0,0x6e,0);
         iVar3 = fn_8025E0B0((int*)auStack_18,uVar2,(u16*)lbl_8039A6A8,4);
         if (iVar3 == 1) {
           fn_8025DE54((u32*)auStack_18,(u16*)lbl_8039A6A8,4,1,1,0);
@@ -25425,17 +25425,17 @@ u32 fn_80264D58(u32 r3,u32 r4,u32 r5)
   do {
     do {
       while (1) {
-        uVar2 = (int)fn_8012640C(r4,0,0x101,0);
+        uVar2 = (int)pokemonGetStatus(r4,0,0x101,0);
         uVar3 = fn_800117BC((int*)auStack_6c,uVar2,1);
         if ((int)uVar3 < 0) {
           menuFightCloseWaza(1);
           return 0;
         }
         cVar9 = fn_801FFEC8(r4,uVar3 & 0xffff,1,local_70);
-        uVar7 = (int)fn_8012640C(uVar1,0,0x7f,uVar3 & 0xffff);
+        uVar7 = (int)pokemonGetStatus(uVar1,0,0x7f,uVar3 & 0xffff);
         if (cVar9 != '\0') {
           fn_80132A38(0x11,r4);
-          fn_8011BEB4(0,uVar7,1,0);
+          wazaGetStatus(0,uVar7,1,0);
           uVar2 = fn_800FA280();
           fn_80132A38(0x28,uVar2);
           uVar7 = fn_802040E8(r4);
@@ -25445,7 +25445,7 @@ u32 fn_80264D58(u32 r3,u32 r4,u32 r5)
           saved_r27 = 0x7661;
         }
         else if (cVar9 == '\x05') {
-          fn_8011BEB4(0,local_70[0],1,0);
+          wazaGetStatus(0,local_70[0],1,0);
           uVar2 = fn_800FA280();
           fn_80132A38(0x28,uVar2);
           saved_r27 = 0x76bb;
@@ -25469,7 +25469,7 @@ u32 fn_80264D58(u32 r3,u32 r4,u32 r5)
         fn_801F000C(0x40);
         fn_80106080(0);
       }
-      uVar4 = (int)fn_8012640C(uVar1,0,0x7f,uVar3 & 0xffff);
+      uVar4 = (int)pokemonGetStatus(uVar1,0,0x7f,uVar3 & 0xffff);
       uVar4 = uVar4 & 0xffff;
     } while (((uVar4 == 0) || (lbl_80478DF8 <= uVar4)) || (uVar4 == 0x165));
     lbl_8047B678 = 0;
@@ -25690,7 +25690,7 @@ u32 fn_80260910(u32 *r3,u32 r4,u32 r5,u32 r6)
     iVar6 = 0;
   }
   else {
-    cVar10 = fn_80123FBC(r5);
+    cVar10 = pokemonCheckValid(r5);
     if (cVar10 == '\0') {
       iVar6 = 0;
     }
@@ -25762,7 +25762,7 @@ LAB_0025db60:
           iVar6 = 0;
         }
         else {
-          cVar10 = fn_80123FBC(r5);
+          cVar10 = pokemonCheckValid(r5);
           if (cVar10 == '\0') {
             iVar6 = 0;
           }
@@ -25799,7 +25799,7 @@ LAB_0025db60:
           iVar6 = 0;
         }
         else {
-          cVar10 = fn_80123FBC(r6);
+          cVar10 = pokemonCheckValid(r6);
           if (cVar10 == '\0') {
             iVar6 = 0;
           }
@@ -25958,7 +25958,7 @@ u32 fn_80264488(u32 r3,int r4,u32 r5)
   }
   iVar1 = fn_801FB1C0(r3,0,0x44,0);
   if (iVar1 != 0) {
-    uVar2 = (int)fn_8012640C(r4,0,0xd6,0);
+    uVar2 = (int)pokemonGetStatus(r4,0,0xd6,0);
     sVar4 = fn_801F8638(r3,uVar2);
     local_70[0] = (u32)sVar4;
     dVar11 = lbl_8047E6D0;
@@ -26008,7 +26008,7 @@ LAB_0026160c:
     if (((uVar9 & 0xffff) != 0) && (cVar6 = fn_80142CF4(0,uVar9,2,0), cVar6 == '\x02')) {
       for (uVar10 = 0; (uVar10 & 0xffff) < 2; uVar10 = uVar10 + 1) {
         iVar1 = fn_801FB1C0(r3,0,0x46,uVar10);
-        if ((iVar1 != 0) && (iVar3 = (int)fn_8012640C(iVar1,0,0xee,0), iVar3 != 0)) {
+        if ((iVar1 != 0) && (iVar3 = (int)pokemonGetStatus(iVar1,0,0xee,0), iVar3 != 0)) {
           if ((local_78[uVar10 & 0xffff] == '\x01') &&
              (cVar6 = fn_802026E4(iVar1,8), cVar6 == '\0')) {
             fn_801DA36C(iVar3,1);
@@ -26071,7 +26071,7 @@ LAB_0026160c:
           iVar1 = fn_801FB1C0(r3,0,0x46,uVar10);
           if (((iVar1 != 0) && (local_74[uVar10 & 0xffff] == '\0')) &&
              (cVar6 = fn_802062FC(), cVar6 == '\x01')) {
-            fn_801254B4(iVar1,0,0x120,0,1);
+            pokemonSetStatus(iVar1,0,0x120,0,1);
           }
         }
       }

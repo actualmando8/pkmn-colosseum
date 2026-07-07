@@ -213,11 +213,11 @@ void fn_80092B2C(void);
 /* 0x800895A4 | size: 0x114 */
 void fn_800895A4(void) {
     extern void fn_8008BBDC();
-    extern void fn_8012A774();
-    extern void fn_8012AA44();
-    extern void fn_8012AA54();
+    extern void heroBiosSetHomePlace();
+    extern void heroBiosSetSexDataId();
+    extern void heroBiosSetRnd();
     extern void heroBiosSetNamePtr();
-    extern void fn_8012AC08();
+    extern void heroBiosGetPokemonPtr();
     extern void fn_80135938();
     extern void exribbonSetNo();
     u8 sp[0x30];
@@ -244,7 +244,7 @@ void fn_800895A4(void) {
         r0 = 0x1;
     }
     r4 = r0 & 0xFF;
-    fn_8012A774();
+    heroBiosSetHomePlace();
     r3 = 0x0;
     r4 = 0x5;
     fn_80135938();
@@ -258,7 +258,7 @@ void fn_800895A4(void) {
     heroBiosSetNamePtr();
     r4 = *(u8*)((u8*)r31 + 0xC);
     r3 = r30;
-    fn_8012AA44();
+    heroBiosSetSexDataId();
     r6 = *(u32*)((u8*)r31 + 0x10);
     r3 = r30;
     r0 = r6 & 0x0000FF00;
@@ -270,13 +270,13 @@ void fn_800895A4(void) {
     r0 = r4 | r0;
     r0 = r5 | r0;
     r4 = r6 | r0;
-    fn_8012AA54();
+    heroBiosSetRnd();
     r29 = r31;
     r28 = 0x0;
     do {
         r3 = r30;
         r4 = r28 & 0xFFFF;
-        fn_8012AC08();
+        heroBiosGetPokemonPtr();
         r4 = r29 + 0x14;
         r27 = r3;
         fn_8008BBDC();
@@ -904,7 +904,7 @@ void fn_80089F78(void) {
     extern void fn_8011F4F0();
     extern void fn_8011F598();
     extern void fn_8011F5C8();
-    extern void fn_801231A4();
+    extern void pokemonGetSex();
     extern void gamedataAttestBiosGetLangareaId();
     extern void fn_801EF634();
     extern void fn_801F02AC();
@@ -1478,7 +1478,7 @@ void fn_80089F78(void) {
             fn_8011F5C8();
             r19 = r3;
             r3 = r18;
-            fn_801231A4();
+            pokemonGetSex();
             r5 = r19 & 0xFFFF;
             r6 = *(u8*)((u8*)r25 + 0x826);
             r6 = (r6 & ~0x000000C0) | (((r3 << 6) | (r3 >> 26)) & 0x000000C0);
@@ -1928,7 +1928,7 @@ void fn_8008AE18(void) {
     extern void fn_8012189C();
     extern void fn_80121984();
     extern void fn_80121ADC();
-    extern void fn_80123FBC();
+    extern void pokemonCheckValid();
     extern void gamedataAttestBiosGetLangareaId();
     extern void gamedataAttestBiosGetVerId();
     extern u8 jumptable_802EEBB8[];
@@ -1962,7 +1962,7 @@ void fn_8008AE18(void) {
     r5 = 0x64;
     memset((void*)r3, (int)r4, (u32)r5);
     r3 = r28;
-    fn_80123FBC();
+    pokemonCheckValid();
     tmp = r3 & 0xFF;
     if (tmp == 0) return;
     r3 = r28;
@@ -2890,7 +2890,7 @@ void fn_8008BBDC(void) {
     extern void fn_8012173C();
     extern void fn_8012190C();
     extern void fn_801219F4();
-    extern void fn_80124A60();
+    extern void pokemonInit();
     extern void fn_801353C0();
     extern u8 jumptable_802EEC10[];
     extern u8 jumptable_802EEC30[];
@@ -2918,7 +2918,7 @@ void fn_8008BBDC(void) {
 
     r30 = r3;
     r31 = r4;
-    fn_80124A60();
+    pokemonInit();
     r3 = *(u8*)((u8*)r31 + 0x13);
     /* extrwi tmp, r3, 1, 30 */;
     if (tmp == 0) {

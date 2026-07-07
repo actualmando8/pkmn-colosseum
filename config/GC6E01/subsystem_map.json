@@ -1588,7 +1588,7 @@
 "name": "fn_80011288",
 "addr": "0x80011288",
 "size": 540,
-"label": "gs-engine",
+"label": "fight",
 "confidence": 1.9,
 "seed": null
 },
@@ -1596,7 +1596,7 @@
 "name": "fn_800114A4",
 "addr": "0x800114A4",
 "size": 604,
-"label": "gs-engine",
+"label": "fight",
 "confidence": 1.9,
 "seed": null
 },
@@ -3725,7 +3725,7 @@
 "addr": "0x80029EF4",
 "size": 184,
 "label": "item",
-"confidence": 1.9,
+"confidence": 1.42,
 "seed": null
 },
 {
@@ -5021,23 +5021,23 @@
 "addr": "0x80039548",
 "size": 36,
 "label": "gs-engine",
-"confidence": 1.9,
+"confidence": 0.95,
 "seed": null
 },
 {
 "name": "fn_8003956C",
 "addr": "0x8003956C",
 "size": 152,
-"label": "gs-engine",
-"confidence": 1.9,
+"label": "savedata",
+"confidence": 1.0,
 "seed": null
 },
 {
 "name": "fn_80039604",
 "addr": "0x80039604",
 "size": 64,
-"label": "gs-engine",
-"confidence": 1.45,
+"label": "item",
+"confidence": 0.95,
 "seed": null
 },
 {
@@ -18628,7 +18628,7 @@
 "name": "atan2",
 "addr": "0x800CE2D8",
 "size": 32,
-"label": "gs-engine",
+"label": "people",
 "confidence": 1.9,
 "seed": null
 },
@@ -18636,8 +18636,8 @@
 "name": "exp",
 "addr": "0x800CE2F8",
 "size": 32,
-"label": "gs-engine",
-"confidence": 0.95,
+"label": "people",
+"confidence": 1.9,
 "seed": null
 },
 {
@@ -24961,7 +24961,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80101AC4",
+"name": "kaisuuGetKaisuu",
 "addr": "0x80101AC4",
 "size": 112,
 "label": "gs-engine",
@@ -25049,7 +25049,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801020C0",
+"name": "menuGetSelectItemNum",
 "addr": "0x801020C0",
 "size": 120,
 "label": "gs-engine",
@@ -25057,7 +25057,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80102138",
+"name": "menuGetCursorFromItemID",
 "addr": "0x80102138",
 "size": 192,
 "label": "gs-engine",
@@ -25097,7 +25097,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801023E4",
+"name": "menuGetCursor",
 "addr": "0x801023E4",
 "size": 68,
 "label": "gs-engine",
@@ -25113,7 +25113,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801024C0",
+"name": "menuCloseFloor",
 "addr": "0x801024C0",
 "size": 40,
 "label": "gs-engine",
@@ -25169,7 +25169,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80102868",
+"name": "menuSetPosition",
 "addr": "0x80102868",
 "size": 72,
 "label": "gs-engine",
@@ -25193,7 +25193,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80102F38",
+"name": "menuCursorNormal",
 "addr": "0x80102F38",
 "size": 1356,
 "label": "gs-engine",
@@ -25233,7 +25233,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80103BA8",
+"name": "menuGetKeyInfo",
 "addr": "0x80103BA8",
 "size": 264,
 "label": "gs-engine",
@@ -25241,7 +25241,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80103CB0",
+"name": "menuGetEnablePort",
 "addr": "0x80103CB0",
 "size": 16,
 "label": "gs-engine",
@@ -25249,7 +25249,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80103CC0",
+"name": "menuSetEnablePort",
 "addr": "0x80103CC0",
 "size": 24,
 "label": "gs-engine",
@@ -25297,7 +25297,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80103FE4",
+"name": "windowGetAllocPtr",
 "addr": "0x80103FE4",
 "size": 24,
 "label": "gs-engine",
@@ -25313,7 +25313,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801040A0",
+"name": "windowGetFreeWork",
 "addr": "0x801040A0",
 "size": 24,
 "label": "gs-engine",
@@ -25321,7 +25321,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801040B8",
+"name": "windowSetParam",
 "addr": "0x801040B8",
 "size": 24,
 "label": "gs-engine",
@@ -25329,7 +25329,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801040D0",
+"name": "windowGetParam",
 "addr": "0x801040D0",
 "size": 32,
 "label": "gs-engine",
@@ -25353,7 +25353,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80104318",
+"name": "windowGetCursorToItem",
 "addr": "0x80104318",
 "size": 140,
 "label": "gs-engine",
@@ -25361,7 +25361,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801043A4",
+"name": "windowGetValue",
 "addr": "0x801043A4",
 "size": 300,
 "label": "gs-engine",
@@ -25433,7 +25433,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80104A94",
+"name": "_windowCreateItemSprite__FP14tagWINDOW_WORK",
 "addr": "0x80104A94",
 "size": 524,
 "label": "gs-engine",
@@ -25505,7 +25505,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80105A3C",
+"name": "winMsgCtrl",
 "addr": "0x80105A3C",
 "size": 500,
 "label": "gs-engine",
@@ -25705,7 +25705,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80107ED8",
+"name": "winSeqIsCheck",
 "addr": "0x80107ED8",
 "size": 96,
 "label": "gs-engine",
@@ -25809,7 +25809,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80109664",
+"name": "menuOffScreenFadeSync",
 "addr": "0x80109664",
 "size": 72,
 "label": "gs-engine",
@@ -25825,7 +25825,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801096E8",
+"name": "menuOffScreenSetPriority",
 "addr": "0x801096E8",
 "size": 16,
 "label": "gs-engine",
@@ -25833,7 +25833,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801096F8",
+"name": "menuOffScreenSetDisp",
 "addr": "0x801096F8",
 "size": 16,
 "label": "gs-engine",
@@ -25841,7 +25841,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80109708",
+"name": "menuOffScreenIsDoing",
 "addr": "0x80109708",
 "size": 8,
 "label": "gs-engine",
@@ -25849,7 +25849,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80109710",
+"name": "menuOffScreenGetPtr",
 "addr": "0x80109710",
 "size": 8,
 "label": "gs-engine",
@@ -25857,7 +25857,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80109718",
+"name": "menuOffScreenCheckEnable",
 "addr": "0x80109718",
 "size": 76,
 "label": "gs-engine",
@@ -25889,7 +25889,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80109884",
+"name": "_menuCBOffScreen__FP9GStextureUlPv",
 "addr": "0x80109884",
 "size": 16,
 "label": "gs-engine",
@@ -27081,7 +27081,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80115094",
+"name": "_unloadFlare__FPvUlUl",
 "addr": "0x80115094",
 "size": 36,
 "label": "field",
@@ -27089,7 +27089,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801150B8",
+"name": "_unloadParticles__FPvUlUl",
 "addr": "0x801150B8",
 "size": 36,
 "label": "field",
@@ -27097,7 +27097,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801150DC",
+"name": "_unloadCamera__FPvUlUl",
 "addr": "0x801150DC",
 "size": 36,
 "label": "field",
@@ -27105,7 +27105,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80115100",
+"name": "_unloadLight__FPvUlUl",
 "addr": "0x80115100",
 "size": 36,
 "label": "field",
@@ -27113,7 +27113,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80115124",
+"name": "_unloadScript__FPvUlUl",
 "addr": "0x80115124",
 "size": 76,
 "label": "field",
@@ -27121,7 +27121,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80115170",
+"name": "_unloadFont__FPvUlUl",
 "addr": "0x80115170",
 "size": 76,
 "label": "field",
@@ -27129,7 +27129,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801151BC",
+"name": "_unloadMsg__FPvUlUl",
 "addr": "0x801151BC",
 "size": 76,
 "label": "field",
@@ -27137,7 +27137,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80115208",
+"name": "_unloadColsys__FPvUlUl",
 "addr": "0x80115208",
 "size": 36,
 "label": "field",
@@ -27145,7 +27145,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011522C",
+"name": "_unloadTexture__FPvUlUl",
 "addr": "0x8011522C",
 "size": 36,
 "label": "field",
@@ -27153,7 +27153,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80115250",
+"name": "floorReadMakeFogResID",
 "addr": "0x80115250",
 "size": 12,
 "label": "field",
@@ -27161,7 +27161,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011525C",
+"name": "floorReadMakeCameraResID",
 "addr": "0x8011525C",
 "size": 12,
 "label": "field",
@@ -27169,7 +27169,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80115268",
+"name": "floorReadMakeLightResID",
 "addr": "0x80115268",
 "size": 12,
 "label": "field",
@@ -27177,7 +27177,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80115274",
+"name": "floorReadMakeModelResID",
 "addr": "0x80115274",
 "size": 12,
 "label": "field",
@@ -27185,7 +27185,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80115280",
+"name": "floorDataBiosGetShadowReciveNum",
 "addr": "0x80115280",
 "size": 268,
 "label": "field",
@@ -27193,7 +27193,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011538C",
+"name": "floorDataBiosGetShadowReciveID",
 "addr": "0x8011538C",
 "size": 160,
 "label": "field",
@@ -27201,7 +27201,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011542C",
+"name": "floorDataBiosGetShadowLightID",
 "addr": "0x8011542C",
 "size": 136,
 "label": "field",
@@ -27209,7 +27209,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801154B4",
+"name": "floorDataBiosGetSunResID",
 "addr": "0x801154B4",
 "size": 136,
 "label": "field",
@@ -27225,7 +27225,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80115584",
+"name": "floorDataBiosSetMapResID",
 "addr": "0x80115584",
 "size": 72,
 "label": "field",
@@ -27233,7 +27233,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801155CC",
+"name": "floorDataBiosGetFieldCameraListPtr",
 "addr": "0x801155CC",
 "size": 92,
 "label": "field",
@@ -27241,7 +27241,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80115628",
+"name": "floorDataBiosGetPosListPtr",
 "addr": "0x80115628",
 "size": 92,
 "label": "field",
@@ -27249,7 +27249,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80115684",
+"name": "floorDataBiosGetCharInfo",
 "addr": "0x80115684",
 "size": 128,
 "label": "field",
@@ -27257,7 +27257,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80115704",
+"name": "floorDataBiosGetCharNum",
 "addr": "0x80115704",
 "size": 100,
 "label": "field",
@@ -27265,7 +27265,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80115768",
+"name": "floorDataBiosGetPostFunc",
 "addr": "0x80115768",
 "size": 72,
 "label": "field",
@@ -27273,7 +27273,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801157B0",
+"name": "floorDataBiosGetMainFunc",
 "addr": "0x801157B0",
 "size": 72,
 "label": "field",
@@ -27281,7 +27281,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801157F8",
+"name": "floorDataBiosGetPreFunc",
 "addr": "0x801157F8",
 "size": 72,
 "label": "field",
@@ -27337,7 +27337,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801159F0",
+"name": "floorDataBiosGetFloorID",
 "addr": "0x801159F0",
 "size": 72,
 "label": "field",
@@ -27345,7 +27345,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80115A38",
+"name": "floorDataBiosGetFileGroupID",
 "addr": "0x80115A38",
 "size": 72,
 "label": "field",
@@ -27353,7 +27353,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80115A80",
+"name": "floorDataBiosGetGroupID",
 "addr": "0x80115A80",
 "size": 72,
 "label": "field",
@@ -27361,7 +27361,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80115AC8",
+"name": "floorDataBiosGetFloorKind",
 "addr": "0x80115AC8",
 "size": 128,
 "label": "field",
@@ -27369,7 +27369,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80115B48",
+"name": "floorDataBiosGetMapResID",
 "addr": "0x80115B48",
 "size": 72,
 "label": "field",
@@ -27377,7 +27377,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80115B90",
+"name": "floorDataBiosGetArea",
 "addr": "0x80115B90",
 "size": 72,
 "label": "field",
@@ -27385,7 +27385,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80115BD8",
+"name": "floorDataBiosGetCurrentPtr",
 "addr": "0x80115BD8",
 "size": 112,
 "label": "field",
@@ -27393,7 +27393,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80115C48",
+"name": "floorDataBiosGetPtr",
 "addr": "0x80115C48",
 "size": 108,
 "label": "field",
@@ -27425,7 +27425,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80115E6C",
+"name": "floorEventGetTresure",
 "addr": "0x80115E6C",
 "size": 760,
 "label": "field",
@@ -27433,7 +27433,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80116164",
+"name": "floorEventCtrlTresure",
 "addr": "0x80116164",
 "size": 780,
 "label": "field",
@@ -27441,7 +27441,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80116470",
+"name": "floorEventCtrlElevator",
 "addr": "0x80116470",
 "size": 1256,
 "label": "field",
@@ -27449,7 +27449,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80116958",
+"name": "floorEventCtrlDoor",
 "addr": "0x80116958",
 "size": 984,
 "label": "field",
@@ -27465,7 +27465,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80116E6C",
+"name": "floorCharacterBiosSetVisibility",
 "addr": "0x80116E6C",
 "size": 24,
 "label": "field",
@@ -27481,7 +27481,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80116EB0",
+"name": "floorCharacterBiosGetTalkSctID",
 "addr": "0x80116EB0",
 "size": 24,
 "label": "field",
@@ -27489,7 +27489,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80116EC8",
+"name": "floorCharacterBiosGetMoveSctID",
 "addr": "0x80116EC8",
 "size": 24,
 "label": "field",
@@ -27497,7 +27497,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80116EE0",
+"name": "floorCharacterBiosGetNameID",
 "addr": "0x80116EE0",
 "size": 24,
 "label": "field",
@@ -27505,7 +27505,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80116EF8",
+"name": "floorCharacterBiosGetTalkWallThrough",
 "addr": "0x80116EF8",
 "size": 28,
 "label": "field",
@@ -27513,7 +27513,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80116F14",
+"name": "floorCharacterBiosGetTalkEndType",
 "addr": "0x80116F14",
 "size": 28,
 "label": "field",
@@ -27521,7 +27521,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80116F30",
+"name": "floorCharacterBiosGetTalkStartType",
 "addr": "0x80116F30",
 "size": 28,
 "label": "field",
@@ -27529,7 +27529,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80116F4C",
+"name": "floorCharacterBiosGetMoveType",
 "addr": "0x80116F4C",
 "size": 28,
 "label": "field",
@@ -27553,7 +27553,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80117038",
+"name": "floorCharacterBiosGetLoadInit",
 "addr": "0x80117038",
 "size": 28,
 "label": "field",
@@ -27561,7 +27561,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80117054",
+"name": "floorCharacterBiosGetVisibility",
 "addr": "0x80117054",
 "size": 28,
 "label": "field",
@@ -28281,7 +28281,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011BAC0",
+"name": "wazaIsWazaTypeId",
 "addr": "0x8011BAC0",
 "size": 172,
 "label": "field",
@@ -28289,7 +28289,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011BB6C",
+"name": "wazaGetMaxPP",
 "addr": "0x8011BB6C",
 "size": 108,
 "label": "field",
@@ -28297,7 +28297,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011BBD8",
+"name": "wazaSetStatus",
 "addr": "0x8011BBD8",
 "size": 732,
 "label": "field",
@@ -28305,7 +28305,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011BEB4",
+"name": "wazaGetStatus",
 "addr": "0x8011BEB4",
 "size": 796,
 "label": "field",
@@ -28313,7 +28313,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C1D0",
+"name": "wazaDataBiosSetFightWazaWzxVariationFuncPtr",
 "addr": "0x8011C1D0",
 "size": 80,
 "label": "field",
@@ -28321,7 +28321,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C220",
+"name": "wazaDataBiosSetFightWazaWzxTypeFuncPtr",
 "addr": "0x8011C220",
 "size": 80,
 "label": "field",
@@ -28329,7 +28329,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C270",
+"name": "wazaDataBiosGetFightWazaWzxVariationFuncPtr",
 "addr": "0x8011C270",
 "size": 96,
 "label": "field",
@@ -28337,7 +28337,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C2D0",
+"name": "wazaDataBiosGetFightWazaWzxTypeFuncPtr",
 "addr": "0x8011C2D0",
 "size": 96,
 "label": "field",
@@ -28345,7 +28345,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C330",
+"name": "wazaDataBiosSetFightTrainerAiWazaDamageFuncPtr",
 "addr": "0x8011C330",
 "size": 80,
 "label": "field",
@@ -28353,7 +28353,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C380",
+"name": "wazaDataBiosSetFightTrainerAiWazaHitFuncPtr",
 "addr": "0x8011C380",
 "size": 80,
 "label": "field",
@@ -28361,7 +28361,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C3D0",
+"name": "wazaDataBiosSetFightTrainerAiWazaValueFuncPtr",
 "addr": "0x8011C3D0",
 "size": 80,
 "label": "field",
@@ -28369,7 +28369,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C420",
+"name": "wazaDataBiosSetRiskFlag",
 "addr": "0x8011C420",
 "size": 16,
 "label": "field",
@@ -28377,7 +28377,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C430",
+"name": "wazaDataBiosSetTypeId",
 "addr": "0x8011C430",
 "size": 32,
 "label": "field",
@@ -28385,7 +28385,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C450",
+"name": "wazaDataBiosGetFightTrainerAiWazaDamageFuncPtr",
 "addr": "0x8011C450",
 "size": 96,
 "label": "field",
@@ -28393,7 +28393,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C4B0",
+"name": "wazaDataBiosGetFightTrainerAiWazaHitFuncPtr",
 "addr": "0x8011C4B0",
 "size": 96,
 "label": "field",
@@ -28401,7 +28401,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C510",
+"name": "wazaDataBiosGetFightTrainerAiWazaValueFuncPtr",
 "addr": "0x8011C510",
 "size": 96,
 "label": "field",
@@ -28409,7 +28409,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C570",
+"name": "wazaDataBiosGetRiskFlag",
 "addr": "0x8011C570",
 "size": 24,
 "label": "field",
@@ -28417,7 +28417,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C588",
+"name": "wazaDataBiosGetTypeId",
 "addr": "0x8011C588",
 "size": 48,
 "label": "field",
@@ -28425,7 +28425,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C5B8",
+"name": "wazaDataBiosSetHidenFlag",
 "addr": "0x8011C5B8",
 "size": 16,
 "label": "field",
@@ -28433,7 +28433,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C5C8",
+"name": "wazaDataBiosGetHidenFlag",
 "addr": "0x8011C5C8",
 "size": 24,
 "label": "field",
@@ -28457,7 +28457,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C600",
+"name": "wazaDataBiosSetDoc",
 "addr": "0x8011C600",
 "size": 16,
 "label": "field",
@@ -28465,7 +28465,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C610",
+"name": "wazaDataBiosSetWazawzxdataId",
 "addr": "0x8011C610",
 "size": 16,
 "label": "field",
@@ -28473,7 +28473,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C620",
+"name": "wazaDataBiosSetPressure",
 "addr": "0x8011C620",
 "size": 16,
 "label": "field",
@@ -28481,7 +28481,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C630",
+"name": "wazaDataBiosSetBouon",
 "addr": "0x8011C630",
 "size": 16,
 "label": "field",
@@ -28489,7 +28489,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C640",
+"name": "wazaDataBiosSetNegoto",
 "addr": "0x8011C640",
 "size": 16,
 "label": "field",
@@ -28497,7 +28497,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C650",
+"name": "wazaDataBiosSetNekonote",
 "addr": "0x8011C650",
 "size": 16,
 "label": "field",
@@ -28505,7 +28505,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C660",
+"name": "wazaDataBiosSetMonomane",
 "addr": "0x8011C660",
 "size": 16,
 "label": "field",
@@ -28513,7 +28513,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C670",
+"name": "wazaDataBiosSetYubiwohuru",
 "addr": "0x8011C670",
 "size": 16,
 "label": "field",
@@ -28521,7 +28521,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C680",
+"name": "wazaDataBiosSetOujanosirusi",
 "addr": "0x8011C680",
 "size": 16,
 "label": "field",
@@ -28529,7 +28529,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C690",
+"name": "wazaDataBiosSetOumugaesi",
 "addr": "0x8011C690",
 "size": 16,
 "label": "field",
@@ -28537,7 +28537,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C6A0",
+"name": "wazaDataBiosSetYokodori",
 "addr": "0x8011C6A0",
 "size": 16,
 "label": "field",
@@ -28545,7 +28545,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C6B0",
+"name": "wazaDataBiosSetMajikku",
 "addr": "0x8011C6B0",
 "size": 16,
 "label": "field",
@@ -28553,7 +28553,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C6C0",
+"name": "wazaDataBiosSetMamoru",
 "addr": "0x8011C6C0",
 "size": 16,
 "label": "field",
@@ -28561,7 +28561,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C6D0",
+"name": "wazaDataBiosSetDageki",
 "addr": "0x8011C6D0",
 "size": 16,
 "label": "field",
@@ -28569,7 +28569,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C6E0",
+"name": "wazaDataBiosSetAddFightKoukaAvg",
 "addr": "0x8011C6E0",
 "size": 16,
 "label": "field",
@@ -28577,7 +28577,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C6F0",
+"name": "wazaDataBiosSetFightAttackMsgId",
 "addr": "0x8011C6F0",
 "size": 16,
 "label": "field",
@@ -28585,7 +28585,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C700",
+"name": "wazaDataBiosSetSeqId",
 "addr": "0x8011C700",
 "size": 16,
 "label": "field",
@@ -28593,7 +28593,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C710",
+"name": "wazaDataBiosSetFightKoukaDataId",
 "addr": "0x8011C710",
 "size": 16,
 "label": "field",
@@ -28601,7 +28601,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C720",
+"name": "wazaDataBiosSetIryoku",
 "addr": "0x8011C720",
 "size": 16,
 "label": "field",
@@ -28609,7 +28609,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C730",
+"name": "wazaDataBiosSetAvg",
 "addr": "0x8011C730",
 "size": 16,
 "label": "field",
@@ -28617,7 +28617,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C740",
+"name": "wazaDataBiosSetRangeId",
 "addr": "0x8011C740",
 "size": 16,
 "label": "field",
@@ -28625,7 +28625,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C750",
+"name": "wazaDataBiosSetPri",
 "addr": "0x8011C750",
 "size": 16,
 "label": "field",
@@ -28633,7 +28633,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C760",
+"name": "wazaDataBiosSetZokuseiDataId",
 "addr": "0x8011C760",
 "size": 16,
 "label": "field",
@@ -28641,7 +28641,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C770",
+"name": "wazaDataBiosSetPp",
 "addr": "0x8011C770",
 "size": 16,
 "label": "field",
@@ -28649,7 +28649,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C780",
+"name": "wazaDataBiosSetName",
 "addr": "0x8011C780",
 "size": 16,
 "label": "field",
@@ -28673,7 +28673,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C7C0",
+"name": "wazaDataBiosGetDoc",
 "addr": "0x8011C7C0",
 "size": 24,
 "label": "field",
@@ -28681,7 +28681,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C7D8",
+"name": "wazaDataBiosGetWazawzxdataId",
 "addr": "0x8011C7D8",
 "size": 24,
 "label": "field",
@@ -28689,7 +28689,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C7F0",
+"name": "wazaDataBiosGetPressure",
 "addr": "0x8011C7F0",
 "size": 24,
 "label": "field",
@@ -28697,7 +28697,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C808",
+"name": "wazaDataBiosGetBouon",
 "addr": "0x8011C808",
 "size": 24,
 "label": "field",
@@ -28705,7 +28705,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C820",
+"name": "wazaDataBiosGetNegoto",
 "addr": "0x8011C820",
 "size": 24,
 "label": "field",
@@ -28713,7 +28713,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C838",
+"name": "wazaDataBiosGetNekonote",
 "addr": "0x8011C838",
 "size": 24,
 "label": "field",
@@ -28721,7 +28721,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C850",
+"name": "wazaDataBiosGetMonomane",
 "addr": "0x8011C850",
 "size": 24,
 "label": "field",
@@ -28729,7 +28729,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C868",
+"name": "wazaDataBiosGetYubiwohuru",
 "addr": "0x8011C868",
 "size": 24,
 "label": "field",
@@ -28737,7 +28737,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C880",
+"name": "wazaDataBiosGetOujanosirusi",
 "addr": "0x8011C880",
 "size": 24,
 "label": "field",
@@ -28745,7 +28745,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C898",
+"name": "wazaDataBiosGetOumugaesi",
 "addr": "0x8011C898",
 "size": 24,
 "label": "field",
@@ -28753,7 +28753,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C8B0",
+"name": "wazaDataBiosGetYokodori",
 "addr": "0x8011C8B0",
 "size": 24,
 "label": "field",
@@ -28761,7 +28761,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C8C8",
+"name": "wazaDataBiosGetMajikku",
 "addr": "0x8011C8C8",
 "size": 24,
 "label": "field",
@@ -28769,7 +28769,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C8E0",
+"name": "wazaDataBiosGetMamoru",
 "addr": "0x8011C8E0",
 "size": 24,
 "label": "field",
@@ -28777,7 +28777,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C8F8",
+"name": "wazaDataBiosGetDageki",
 "addr": "0x8011C8F8",
 "size": 24,
 "label": "field",
@@ -28785,7 +28785,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C910",
+"name": "wazaDataBiosGetAddFightKoukaAvg",
 "addr": "0x8011C910",
 "size": 24,
 "label": "field",
@@ -28793,7 +28793,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C928",
+"name": "wazaDataBiosGetFightAttackMsgId",
 "addr": "0x8011C928",
 "size": 24,
 "label": "field",
@@ -28801,7 +28801,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C940",
+"name": "wazaDataBiosGetFightAttackTunagiMsgId",
 "addr": "0x8011C940",
 "size": 24,
 "label": "field",
@@ -28809,7 +28809,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C958",
+"name": "wazaDataBiosGetSeqId",
 "addr": "0x8011C958",
 "size": 24,
 "label": "field",
@@ -28817,7 +28817,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C970",
+"name": "wazaDataBiosGetFightKoukaDataId",
 "addr": "0x8011C970",
 "size": 24,
 "label": "field",
@@ -28825,7 +28825,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C988",
+"name": "wazaDataBiosGetIryoku",
 "addr": "0x8011C988",
 "size": 24,
 "label": "field",
@@ -28833,7 +28833,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C9A0",
+"name": "wazaDataBiosGetAvg",
 "addr": "0x8011C9A0",
 "size": 24,
 "label": "field",
@@ -28841,7 +28841,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C9B8",
+"name": "wazaDataBiosGetRangeId",
 "addr": "0x8011C9B8",
 "size": 24,
 "label": "field",
@@ -28849,7 +28849,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C9D0",
+"name": "wazaDataBiosGetPri",
 "addr": "0x8011C9D0",
 "size": 28,
 "label": "field",
@@ -28857,7 +28857,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011C9EC",
+"name": "wazaDataBiosGetZokuseiDataId",
 "addr": "0x8011C9EC",
 "size": 24,
 "label": "field",
@@ -28865,7 +28865,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011CA04",
+"name": "wazaDataBiosGetPp",
 "addr": "0x8011CA04",
 "size": 24,
 "label": "field",
@@ -28873,7 +28873,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011CA1C",
+"name": "wazaDataBiosGetName",
 "addr": "0x8011CA1C",
 "size": 24,
 "label": "field",
@@ -31161,7 +31161,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011F5FC",
+"name": "pokemonBiosCopy",
 "addr": "0x8011F5FC",
 "size": 56,
 "label": "field",
@@ -31193,7 +31193,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011F910",
+"name": "pokemonAddDpFormPokemonDpFilterId",
 "addr": "0x8011F910",
 "size": 700,
 "label": "field",
@@ -31201,7 +31201,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011FBCC",
+"name": "pokemonSetDp",
 "addr": "0x8011FBCC",
 "size": 72,
 "label": "field",
@@ -31209,7 +31209,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011FC14",
+"name": "pokemonGetDp",
 "addr": "0x8011FC14",
 "size": 96,
 "label": "field",
@@ -31225,7 +31225,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011FCA4",
+"name": "pokemonSetDarkPokemonStatus",
 "addr": "0x8011FCA4",
 "size": 292,
 "label": "field",
@@ -31233,7 +31233,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8011FDC8",
+"name": "pokemonToMenuPokemonStatus",
 "addr": "0x8011FDC8",
 "size": 1284,
 "label": "field",
@@ -31241,7 +31241,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801202CC",
+"name": "pokemonToMenuPokemonStatusSubBar",
 "addr": "0x801202CC",
 "size": 476,
 "label": "field",
@@ -31249,7 +31249,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801204A8",
+"name": "pokemonToMenuWazaStatus",
 "addr": "0x801204A8",
 "size": 460,
 "label": "field",
@@ -31257,7 +31257,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80120674",
+"name": "pokemonCheckSetMonohiroi",
 "addr": "0x80120674",
 "size": 504,
 "label": "field",
@@ -31265,7 +31265,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012086C",
+"name": "pokemonAllKaihuku",
 "addr": "0x8012086C",
 "size": 660,
 "label": "field",
@@ -31273,7 +31273,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80120B00",
+"name": "pokemonGetMezamerupower",
 "addr": "0x80120B00",
 "size": 364,
 "label": "field",
@@ -31281,7 +31281,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80120C6C",
+"name": "pokemonDataCheckValid",
 "addr": "0x80120C6C",
 "size": 112,
 "label": "field",
@@ -31289,7 +31289,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80120CDC",
+"name": "pokemonGetNowLevelToExp",
 "addr": "0x80120CDC",
 "size": 144,
 "label": "field",
@@ -31297,7 +31297,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80120D6C",
+"name": "pokemonGetTasteLike",
 "addr": "0x80120D6C",
 "size": 100,
 "label": "field",
@@ -31305,7 +31305,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80120DD0",
+"name": "pokemonGetJoutaiMsgId",
 "addr": "0x80120DD0",
 "size": 528,
 "label": "field",
@@ -31313,7 +31313,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80120FE0",
+"name": "pokemonGetJoutaiMenuSpriteId",
 "addr": "0x80120FE0",
 "size": 536,
 "label": "field",
@@ -31321,7 +31321,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801211F8",
+"name": "pokemonGetJoutaiDataId",
 "addr": "0x801211F8",
 "size": 536,
 "label": "field",
@@ -31329,7 +31329,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80121410",
+"name": "pokemonIsHpMantan",
 "addr": "0x80121410",
 "size": 116,
 "label": "field",
@@ -31465,7 +31465,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80121BB4",
+"name": "pokemonReplace",
 "addr": "0x80121BB4",
 "size": 100,
 "label": "field",
@@ -31473,7 +31473,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80121C18",
+"name": "pokemonCreateSequence",
 "addr": "0x80121C18",
 "size": 1064,
 "label": "field",
@@ -31481,7 +31481,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80122040",
+"name": "pokemonSetSequenceStatus",
 "addr": "0x80122040",
 "size": 756,
 "label": "field",
@@ -31489,7 +31489,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80122334",
+"name": "pokemonGetAnnonKatati",
 "addr": "0x80122334",
 "size": 60,
 "label": "field",
@@ -31497,7 +31497,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80122370",
+"name": "pokemonGetFriendFormPokemonFriendFilterId",
 "addr": "0x80122370",
 "size": 864,
 "label": "field",
@@ -31505,7 +31505,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801226D0",
+"name": "pokemonGetEffortFromPokemon",
 "addr": "0x801226D0",
 "size": 804,
 "label": "field",
@@ -31513,7 +31513,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801229F4",
+"name": "pokemonGetLevelToExp",
 "addr": "0x801229F4",
 "size": 124,
 "label": "field",
@@ -31521,7 +31521,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80122A70",
+"name": "pokemonGetNowHpPercentage",
 "addr": "0x80122A70",
 "size": 112,
 "label": "field",
@@ -31529,7 +31529,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80122AE0",
+"name": "pokemonGetNowHpWaruValue",
 "addr": "0x80122AE0",
 "size": 112,
 "label": "field",
@@ -31537,7 +31537,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80122B50",
+"name": "pokemonGetMaxHpWaruValue",
 "addr": "0x80122B50",
 "size": 112,
 "label": "field",
@@ -31545,7 +31545,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80122BC0",
+"name": "pokemonIsNokoriHpFollowing",
 "addr": "0x80122BC0",
 "size": 164,
 "label": "field",
@@ -31553,7 +31553,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80122C64",
+"name": "pokemonIsJoutaiKaragenki",
 "addr": "0x80122C64",
 "size": 376,
 "label": "field",
@@ -31561,7 +31561,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80122DDC",
+"name": "pokemonIsJoutaiNormal",
 "addr": "0x80122DDC",
 "size": 536,
 "label": "field",
@@ -31569,7 +31569,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80122FF4",
+"name": "pokemonGetSoubiItemBuff",
 "addr": "0x80122FF4",
 "size": 156,
 "label": "field",
@@ -31577,7 +31577,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80123090",
+"name": "pokemonGetSoubiItemSoubiDataId",
 "addr": "0x80123090",
 "size": 80,
 "label": "field",
@@ -31585,7 +31585,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801230E0",
+"name": "pokemonGetSoubiItemDataId",
 "addr": "0x801230E0",
 "size": 48,
 "label": "field",
@@ -31593,7 +31593,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80123110",
+"name": "pokemonDoItemSoubi",
 "addr": "0x80123110",
 "size": 148,
 "label": "field",
@@ -31601,7 +31601,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801231A4",
+"name": "pokemonGetSex",
 "addr": "0x801231A4",
 "size": 316,
 "label": "field",
@@ -31609,7 +31609,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801232E0",
+"name": "pokemonSetOnDarkPokemonFlag",
 "addr": "0x801232E0",
 "size": 136,
 "label": "field",
@@ -31617,7 +31617,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80123368",
+"name": "pokemonSetOnZukanFlag",
 "addr": "0x80123368",
 "size": 140,
 "label": "field",
@@ -31625,7 +31625,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801233F4",
+"name": "pokemonCheckFightOut",
 "addr": "0x801233F4",
 "size": 400,
 "label": "field",
@@ -31633,7 +31633,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80123584",
+"name": "pokemonGetOboeWazaDataBanme",
 "addr": "0x80123584",
 "size": 152,
 "label": "field",
@@ -31641,7 +31641,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012361C",
+"name": "pokemonOboeWaza",
 "addr": "0x8012361C",
 "size": 220,
 "label": "field",
@@ -31649,7 +31649,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801236F8",
+"name": "pokemonGetOboeWazaDataId",
 "addr": "0x801236F8",
 "size": 192,
 "label": "field",
@@ -31657,7 +31657,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801237B8",
+"name": "pokemonSetWazaStatus",
 "addr": "0x801237B8",
 "size": 932,
 "label": "field",
@@ -31665,7 +31665,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80123B5C",
+"name": "pokemonSearchWazaDataId",
 "addr": "0x80123B5C",
 "size": 248,
 "label": "field",
@@ -31673,7 +31673,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80123C54",
+"name": "pokemonWazaReplace",
 "addr": "0x80123C54",
 "size": 128,
 "label": "field",
@@ -31681,7 +31681,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80123CD4",
+"name": "pokemonWazaCheckValid",
 "addr": "0x80123CD4",
 "size": 132,
 "label": "field",
@@ -31689,7 +31689,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80123D58",
+"name": "pokemonWazaCreate",
 "addr": "0x80123D58",
 "size": 280,
 "label": "field",
@@ -31697,7 +31697,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80123E70",
+"name": "pokemonWazaGetMaxPP",
 "addr": "0x80123E70",
 "size": 128,
 "label": "field",
@@ -31705,7 +31705,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80123EF0",
+"name": "pokemonSetCatchStatus",
 "addr": "0x80123EF0",
 "size": 204,
 "label": "field",
@@ -31713,7 +31713,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80123FBC",
+"name": "pokemonCheckValid",
 "addr": "0x80123FBC",
 "size": 264,
 "label": "field",
@@ -31721,7 +31721,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801240C4",
+"name": "pokemonCreate",
 "addr": "0x801240C4",
 "size": 844,
 "label": "field",
@@ -31729,7 +31729,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80124410",
+"name": "pokemonCreateRndFit",
 "addr": "0x80124410",
 "size": 1204,
 "label": "field",
@@ -31737,7 +31737,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801248C4",
+"name": "pokemonGetTokuseiDataId",
 "addr": "0x801248C4",
 "size": 180,
 "label": "field",
@@ -31745,7 +31745,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80124978",
+"name": "pokemonSetTokuseiFlag",
 "addr": "0x80124978",
 "size": 128,
 "label": "field",
@@ -31753,7 +31753,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801249F8",
+"name": "pokemonInitAry",
 "addr": "0x801249F8",
 "size": 104,
 "label": "field",
@@ -31761,7 +31761,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80124A60",
+"name": "pokemonInit",
 "addr": "0x80124A60",
 "size": 2008,
 "label": "field",
@@ -31769,7 +31769,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80125238",
+"name": "pokemonInitDarkPokemon",
 "addr": "0x80125238",
 "size": 168,
 "label": "field",
@@ -31777,7 +31777,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801252E0",
+"name": "pokemonInitJoutai",
 "addr": "0x801252E0",
 "size": 52,
 "label": "field",
@@ -31785,7 +31785,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80125314",
+"name": "pokemonWazaInit",
 "addr": "0x80125314",
 "size": 124,
 "label": "field",
@@ -31793,7 +31793,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80125390",
+"name": "pokemonCheckRare",
 "addr": "0x80125390",
 "size": 148,
 "label": "field",
@@ -31801,7 +31801,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80125424",
+"name": "pokemonGrowBasisStatus",
 "addr": "0x80125424",
 "size": 72,
 "label": "field",
@@ -31809,7 +31809,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012546C",
+"name": "pokemonResetBasisStatus",
 "addr": "0x8012546C",
 "size": 72,
 "label": "field",
@@ -31817,7 +31817,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801254B4",
+"name": "pokemonSetStatus",
 "addr": "0x801254B4",
 "size": 3928,
 "label": "field",
@@ -31825,7 +31825,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012640C",
+"name": "pokemonGetStatus",
 "addr": "0x8012640C",
 "size": 5456,
 "label": "field",
@@ -31833,7 +31833,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012795C",
+"name": "pokemonSetLevelBasisStatus",
 "addr": "0x8012795C",
 "size": 1792,
 "label": "field",
@@ -31841,7 +31841,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012805C",
+"name": "pokemonEvolutionAll",
 "addr": "0x8012805C",
 "size": 676,
 "label": "field",
@@ -31849,7 +31849,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80128300",
+"name": "pokemonEvolutionCreateAddPokemon",
 "addr": "0x80128300",
 "size": 548,
 "label": "field",
@@ -31857,7 +31857,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80128524",
+"name": "pokemonEvolution",
 "addr": "0x80128524",
 "size": 420,
 "label": "field",
@@ -31865,7 +31865,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801286C8",
+"name": "getEvoPokemonLevelUp",
 "addr": "0x801286C8",
 "size": 924,
 "label": "field",
@@ -31873,7 +31873,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80128A64",
+"name": "pokemonEvolutionCheck",
 "addr": "0x80128A64",
 "size": 604,
 "label": "field",
@@ -32009,7 +32009,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80128E38",
+"name": "savedataCreate",
 "addr": "0x80128E38",
 "size": 604,
 "label": "field",
@@ -32017,7 +32017,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80129094",
+"name": "savedataInit",
 "addr": "0x80129094",
 "size": 492,
 "label": "field",
@@ -32025,7 +32025,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80129280",
+"name": "savedataGetStatus",
 "addr": "0x80129280",
 "size": 260,
 "label": "field",
@@ -32113,7 +32113,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801298B8",
+"name": "heroItemCheckAddItemDataId",
 "addr": "0x801298B8",
 "size": 144,
 "label": "field",
@@ -32129,7 +32129,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801299C8",
+"name": "heroItemDecItemDataId",
 "addr": "0x801299C8",
 "size": 176,
 "label": "field",
@@ -32137,7 +32137,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80129A78",
+"name": "heroItemAddItemDataId",
 "addr": "0x80129A78",
 "size": 180,
 "label": "field",
@@ -32145,7 +32145,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80129B2C",
+"name": "heroItemCheckHaveItemDataId",
 "addr": "0x80129B2C",
 "size": 156,
 "label": "field",
@@ -32153,7 +32153,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80129BC8",
+"name": "heroItemGetItemKindToItemAryPtr",
 "addr": "0x80129BC8",
 "size": 412,
 "label": "field",
@@ -32169,7 +32169,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80129E20",
+"name": "heroGetPokemon",
 "addr": "0x80129E20",
 "size": 256,
 "label": "field",
@@ -32177,7 +32177,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80129F20",
+"name": "heroCatchPokemon",
 "addr": "0x80129F20",
 "size": 364,
 "label": "field",
@@ -32185,7 +32185,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A08C",
+"name": "heroAddPokemon",
 "addr": "0x8012A08C",
 "size": 164,
 "label": "field",
@@ -32201,7 +32201,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A1A4",
+"name": "heroCreate",
 "addr": "0x8012A1A4",
 "size": 164,
 "label": "field",
@@ -32209,7 +32209,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A248",
+"name": "heroInit",
 "addr": "0x8012A248",
 "size": 520,
 "label": "field",
@@ -32233,7 +32233,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A774",
+"name": "heroBiosSetHomePlace",
 "addr": "0x8012A774",
 "size": 16,
 "label": "field",
@@ -32241,7 +32241,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A784",
+"name": "heroBiosGetHomePlace",
 "addr": "0x8012A784",
 "size": 24,
 "label": "field",
@@ -32249,7 +32249,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A79C",
+"name": "heroBiosGetHizukiFlag",
 "addr": "0x8012A79C",
 "size": 24,
 "label": "field",
@@ -32257,7 +32257,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A7B4",
+"name": "heroBiosSetHizukiFlag",
 "addr": "0x8012A7B4",
 "size": 16,
 "label": "field",
@@ -32265,7 +32265,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A7C4",
+"name": "heroBiosGetPokecouponAll",
 "addr": "0x8012A7C4",
 "size": 24,
 "label": "field",
@@ -32273,7 +32273,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A7DC",
+"name": "heroBiosSetPokecouponAll",
 "addr": "0x8012A7DC",
 "size": 48,
 "label": "field",
@@ -32281,7 +32281,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A80C",
+"name": "heroBiosGetPokecoupon",
 "addr": "0x8012A80C",
 "size": 24,
 "label": "field",
@@ -32289,7 +32289,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A824",
+"name": "heroBiosSetPokecoupon",
 "addr": "0x8012A824",
 "size": 48,
 "label": "field",
@@ -32297,7 +32297,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A854",
+"name": "heroBiosGetPokedoru",
 "addr": "0x8012A854",
 "size": 24,
 "label": "field",
@@ -32305,7 +32305,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A86C",
+"name": "heroBiosSetPokedoru",
 "addr": "0x8012A86C",
 "size": 48,
 "label": "field",
@@ -32321,7 +32321,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A8D4",
+"name": "heroBiosGetHizukiNamePtr",
 "addr": "0x8012A8D4",
 "size": 24,
 "label": "field",
@@ -32329,7 +32329,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A8EC",
+"name": "heroBiosGetBadge08Flag",
 "addr": "0x8012A8EC",
 "size": 24,
 "label": "field",
@@ -32337,7 +32337,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A904",
+"name": "heroBiosGetBadge07Flag",
 "addr": "0x8012A904",
 "size": 24,
 "label": "field",
@@ -32345,7 +32345,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A91C",
+"name": "heroBiosGetBadge06Flag",
 "addr": "0x8012A91C",
 "size": 24,
 "label": "field",
@@ -32353,7 +32353,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A934",
+"name": "heroBiosGetBadge05Flag",
 "addr": "0x8012A934",
 "size": 24,
 "label": "field",
@@ -32361,7 +32361,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A94C",
+"name": "heroBiosGetBadge04Flag",
 "addr": "0x8012A94C",
 "size": 24,
 "label": "field",
@@ -32369,7 +32369,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A964",
+"name": "heroBiosGetBadge03Flag",
 "addr": "0x8012A964",
 "size": 24,
 "label": "field",
@@ -32377,7 +32377,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A97C",
+"name": "heroBiosGetBadge02Flag",
 "addr": "0x8012A97C",
 "size": 24,
 "label": "field",
@@ -32385,7 +32385,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A994",
+"name": "heroBiosGetBadge01Flag",
 "addr": "0x8012A994",
 "size": 24,
 "label": "field",
@@ -32393,7 +32393,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A9AC",
+"name": "heroBiosSetBadge08Flag",
 "addr": "0x8012A9AC",
 "size": 16,
 "label": "field",
@@ -32401,7 +32401,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A9BC",
+"name": "heroBiosSetBadge07Flag",
 "addr": "0x8012A9BC",
 "size": 16,
 "label": "field",
@@ -32409,7 +32409,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A9CC",
+"name": "heroBiosSetBadge06Flag",
 "addr": "0x8012A9CC",
 "size": 16,
 "label": "field",
@@ -32417,7 +32417,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A9DC",
+"name": "heroBiosSetBadge05Flag",
 "addr": "0x8012A9DC",
 "size": 16,
 "label": "field",
@@ -32425,7 +32425,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A9EC",
+"name": "heroBiosSetBadge04Flag",
 "addr": "0x8012A9EC",
 "size": 16,
 "label": "field",
@@ -32433,7 +32433,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012A9FC",
+"name": "heroBiosSetBadge03Flag",
 "addr": "0x8012A9FC",
 "size": 16,
 "label": "field",
@@ -32441,7 +32441,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012AA0C",
+"name": "heroBiosSetBadge02Flag",
 "addr": "0x8012AA0C",
 "size": 16,
 "label": "field",
@@ -32449,7 +32449,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012AA1C",
+"name": "heroBiosSetBadge01Flag",
 "addr": "0x8012AA1C",
 "size": 16,
 "label": "field",
@@ -32457,7 +32457,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012AA2C",
+"name": "heroBiosGetSexDataId",
 "addr": "0x8012AA2C",
 "size": 24,
 "label": "field",
@@ -32465,7 +32465,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012AA44",
+"name": "heroBiosSetSexDataId",
 "addr": "0x8012AA44",
 "size": 16,
 "label": "field",
@@ -32473,7 +32473,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012AA54",
+"name": "heroBiosSetRnd",
 "addr": "0x8012AA54",
 "size": 16,
 "label": "field",
@@ -32489,7 +32489,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012AA9C",
+"name": "heroBiosGetHizukiItemPtr",
 "addr": "0x8012AA9C",
 "size": 52,
 "label": "field",
@@ -32497,7 +32497,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012AAD0",
+"name": "heroBiosGetItemKoronPtr",
 "addr": "0x8012AAD0",
 "size": 52,
 "label": "field",
@@ -32505,7 +32505,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012AB04",
+"name": "heroBiosGetItemSeedPtr",
 "addr": "0x8012AB04",
 "size": 52,
 "label": "field",
@@ -32513,7 +32513,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012AB38",
+"name": "heroBiosGetItemSkillPtr",
 "addr": "0x8012AB38",
 "size": 52,
 "label": "field",
@@ -32521,7 +32521,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012AB6C",
+"name": "heroBiosGetItemBallPtr",
 "addr": "0x8012AB6C",
 "size": 52,
 "label": "field",
@@ -32529,7 +32529,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012ABA0",
+"name": "heroBiosGetExtraItemPtr",
 "addr": "0x8012ABA0",
 "size": 52,
 "label": "field",
@@ -32537,7 +32537,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012ABD4",
+"name": "heroBiosGetItemNormalPtr",
 "addr": "0x8012ABD4",
 "size": 52,
 "label": "field",
@@ -32545,7 +32545,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012AC08",
+"name": "heroBiosGetPokemonPtr",
 "addr": "0x8012AC08",
 "size": 52,
 "label": "field",
@@ -32553,7 +32553,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012AC3C",
+"name": "heroBiosGetRnd",
 "addr": "0x8012AC3C",
 "size": 24,
 "label": "field",
@@ -32561,7 +32561,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012AC54",
+"name": "heroBiosGetNamePtr",
 "addr": "0x8012AC54",
 "size": 16,
 "label": "field",
@@ -32569,7 +32569,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012AC64",
+"name": "heroBiosCopy",
 "addr": "0x8012AC64",
 "size": 56,
 "label": "field",
@@ -32577,7 +32577,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012AC9C",
+"name": "cbTsureFriend__Fl15FootStepCounterl",
 "addr": "0x8012AC9C",
 "size": 180,
 "label": "field",
@@ -32585,7 +32585,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012AD50",
+"name": "cbPoison__Fl15FootStepCounterl",
 "addr": "0x8012AD50",
 "size": 1076,
 "label": "field",
@@ -32593,7 +32593,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012B184",
+"name": "heroMoveSetLockFrame",
 "addr": "0x8012B184",
 "size": 24,
 "label": "field",
@@ -32609,7 +32609,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012B5E4",
+"name": "heroMoveChkHinderClear",
 "addr": "0x8012B5E4",
 "size": 1260,
 "label": "field",
@@ -32617,7 +32617,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012BAD0",
+"name": "heroMoveAddAutoEvent",
 "addr": "0x8012BAD0",
 "size": 32,
 "label": "field",
@@ -32633,7 +32633,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012BBA8",
+"name": "heroMoveTermEvent",
 "addr": "0x8012BBA8",
 "size": 252,
 "label": "field",
@@ -32641,7 +32641,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012BCA4",
+"name": "heroMoveInitEvent",
 "addr": "0x8012BCA4",
 "size": 316,
 "label": "field",
@@ -32657,7 +32657,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012BEB4",
+"name": "getStep__FP8FOOTSTEPP8_GSmodelPiP8FOOTWORK",
 "addr": "0x8012BEB4",
 "size": 512,
 "label": "field",
@@ -32665,7 +32665,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012C0B4",
+"name": "updateChat__F15HEROMOVE_MEMBER",
 "addr": "0x8012C0B4",
 "size": 1164,
 "label": "field",
@@ -32673,7 +32673,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012C540",
+"name": "heroMoveCheckEvent",
 "addr": "0x8012C540",
 "size": 288,
 "label": "field",
@@ -32681,7 +32681,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012C660",
+"name": "updateAnimation__Ff15HEROMOVE_MEMBER",
 "addr": "0x8012C660",
 "size": 1060,
 "label": "field",
@@ -32697,7 +32697,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012D2BC",
+"name": "heroMoveGetHeroRot",
 "addr": "0x8012D2BC",
 "size": 112,
 "label": "field",
@@ -32705,7 +32705,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012D32C",
+"name": "heroMoveGetHeroPos",
 "addr": "0x8012D32C",
 "size": 112,
 "label": "field",
@@ -32745,7 +32745,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012E7B8",
+"name": "moveLeader__F15HEROMOVE_MEMBER",
 "addr": "0x8012E7B8",
 "size": 1052,
 "label": "field",
@@ -32753,7 +32753,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012EBD4",
+"name": "heroMoveMain",
 "addr": "0x8012EBD4",
 "size": 996,
 "label": "field",
@@ -32761,7 +32761,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012EFB8",
+"name": "heroMoveGetResID",
 "addr": "0x8012EFB8",
 "size": 80,
 "label": "field",
@@ -32769,7 +32769,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012F008",
+"name": "heroMoveSetNeckMode",
 "addr": "0x8012F008",
 "size": 276,
 "label": "field",
@@ -32785,7 +32785,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012F150",
+"name": "heroMoveDismissMember",
 "addr": "0x8012F150",
 "size": 172,
 "label": "field",
@@ -32809,7 +32809,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012F610",
+"name": "initFloor__Fv",
 "addr": "0x8012F610",
 "size": 1224,
 "label": "field",
@@ -32817,7 +32817,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012FAD8",
+"name": "heroMoveGetKenObjID",
 "addr": "0x8012FAD8",
 "size": 508,
 "label": "field",
@@ -32825,7 +32825,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8012FCD4",
+"name": "heroMoveInit",
 "addr": "0x8012FCD4",
 "size": 896,
 "label": "field",
@@ -32833,7 +32833,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80130054",
+"name": "heroMoveSyncWithHero",
 "addr": "0x80130054",
 "size": 504,
 "label": "field",
@@ -32993,7 +32993,7 @@
 "seed": null
 },
 {
-"name": "fn_80131574",
+"name": "sexGetPokemonSexRaitoKotei",
 "addr": "0x80131574",
 "size": 20,
 "label": "field",
@@ -33793,44 +33793,44 @@
 "seed": null
 },
 {
-"name": "fn_801332D8",
+"name": "dbgMenuFrameRate20",
 "addr": "0x801332D8",
 "size": 40,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_80133300",
+"name": "dbgMenuFrameRate30",
 "addr": "0x80133300",
 "size": 40,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_80133328",
+"name": "dbgMenuSendAllMail",
 "addr": "0x80133328",
 "size": 36,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_8013334C",
+"name": "dbgMenuSendMail",
 "addr": "0x8013334C",
 "size": 96,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_801333AC",
+"name": "dbgMenuColisionDisp",
 "addr": "0x801333AC",
 "size": 164,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_80133450",
@@ -33885,64 +33885,64 @@
 "addr": "0x80133630",
 "size": 52,
 "label": "gs-engine",
-"confidence": 1.9,
+"confidence": 1.45,
 "seed": null
 },
 {
-"name": "fn_80133664",
+"name": "dbgMenuCursor",
 "addr": "0x80133664",
 "size": 316,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_801337A0",
+"name": "dbgMenuGetEnable",
 "addr": "0x801337A0",
 "size": 8,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_801337A8",
+"name": "dbgMenuSetEnable",
 "addr": "0x801337A8",
 "size": 8,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_801337B0",
+"name": "dbgMenuIsOpen",
 "addr": "0x801337B0",
 "size": 52,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_801337E4",
+"name": "dbgMenuClose",
 "addr": "0x801337E4",
 "size": 44,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_80133810",
+"name": "dbgMenuMain",
 "addr": "0x80133810",
 "size": 148,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_801338A4",
+"name": "_dbgMenuSub__Fl",
 "addr": "0x801338A4",
 "size": 684,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "_dbgMenuGetMenuNum__FP14tagWINDOW_WORKPl",
@@ -33953,20 +33953,20 @@
 "seed": "prefix"
 },
 {
-"name": "fn_80133BE4",
+"name": "_dbgMenuCheckTerminate__FP14tagWINDOW_WORKl",
 "addr": "0x80133BE4",
 "size": 88,
 "label": "menu",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_80133C3C",
+"name": "_dbgMenuGetMenuNo__Fl",
 "addr": "0x80133C3C",
 "size": 480,
 "label": "menu",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "_dbgMenuGetMsgID__FP14tagWINDOW_WORKl",
@@ -33977,12 +33977,12 @@
 "seed": "prefix"
 },
 {
-"name": "fn_80133E6C",
+"name": "_dbgMenuGetItemNo__FP14tagWINDOW_WORKl",
 "addr": "0x80133E6C",
 "size": 760,
 "label": "menu",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "_dbgMenuGetLink__Fl",
@@ -33993,20 +33993,20 @@
 "seed": "prefix"
 },
 {
-"name": "fn_80134228",
+"name": "_dbgMenuGetWin__Fl",
 "addr": "0x80134228",
 "size": 48,
 "label": "menu",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_80134258",
+"name": "_dbgMenuGetIndex__FP14tagWINDOW_WORK",
 "addr": "0x80134258",
 "size": 28,
 "label": "menu",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_80134274",
@@ -34025,76 +34025,76 @@
 "seed": "prefix"
 },
 {
-"name": "fn_80134304",
+"name": "debugMenuGetNum__Fv",
 "addr": "0x80134304",
 "size": 56,
 "label": "menu",
-"confidence": 1.48,
+"confidence": 1.5,
 "seed": null
 },
 {
-"name": "fn_8013433C",
+"name": "pcboxSwapItemSlot",
 "addr": "0x8013433C",
 "size": 228,
-"label": "item",
-"confidence": 1.9,
-"seed": null
+"label": "savedata",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_80134420",
+"name": "pcboxGetItemCapacity",
 "addr": "0x80134420",
 "size": 356,
-"label": "item",
-"confidence": 1.9,
-"seed": null
+"label": "savedata",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_80134584",
+"name": "pcboxAddItem",
 "addr": "0x80134584",
 "size": 248,
-"label": "item",
-"confidence": 1.9,
-"seed": null
+"label": "savedata",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_8013467C",
+"name": "pcboxDelItem",
 "addr": "0x8013467C",
 "size": 236,
-"label": "item",
-"confidence": 1.9,
-"seed": null
+"label": "savedata",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_80134768",
+"name": "pcboxGetItem",
 "addr": "0x80134768",
 "size": 104,
-"label": "item",
-"confidence": 1.9,
-"seed": null
+"label": "savedata",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_801347D0",
+"name": "pcboxGetNbItemSlot",
 "addr": "0x801347D0",
 "size": 8,
-"label": "item",
-"confidence": 1.9,
-"seed": null
+"label": "savedata",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_801347D8",
 "addr": "0x801347D8",
 "size": 8,
-"label": "gs-engine",
+"label": "savedata",
 "confidence": 1.9,
 "seed": null
 },
 {
-"name": "fn_801347E0",
+"name": "pcboxGetNbPokemonBox",
 "addr": "0x801347E0",
 "size": 8,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "savedata",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "pcboxGetPokemonBoxNbEmptySlot",
@@ -34105,7 +34105,7 @@
 "seed": "prefix"
 },
 {
-"name": "fn_801348EC",
+"name": "getPokemonBoxNbUsedSlot__5PCBOXFSc",
 "addr": "0x801348EC",
 "size": 240,
 "label": "savedata",
@@ -34129,7 +34129,7 @@
 "seed": null
 },
 {
-"name": "fn_80134AF8",
+"name": "delPokemon__5PCBOXFScSc",
 "addr": "0x80134AF8",
 "size": 200,
 "label": "field",
@@ -34145,7 +34145,7 @@
 "seed": null
 },
 {
-"name": "fn_80134E10",
+"name": "setPokemon__5PCBOXFP7PokemonScSc",
 "addr": "0x80134E10",
 "size": 224,
 "label": "field",
@@ -34161,19 +34161,19 @@
 "seed": null
 },
 {
-"name": "fn_80134F88",
+"name": "pcboxInit",
 "addr": "0x80134F88",
 "size": 156,
-"label": "field",
-"confidence": 1.9,
-"seed": null
+"label": "savedata",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_80135024",
 "addr": "0x80135024",
 "size": 4,
 "label": "field",
-"confidence": 1.9,
+"confidence": 1.42,
 "seed": null
 },
 {
@@ -34185,20 +34185,20 @@
 "seed": null
 },
 {
-"name": "fn_80135030",
+"name": "gamedatasaveSetStatus",
 "addr": "0x80135030",
 "size": 312,
 "label": "field",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_80135168",
+"name": "gamedatasaveGetStatus",
 "addr": "0x80135168",
 "size": 292,
 "label": "field",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "gamedataCreate",
@@ -34209,12 +34209,12 @@
 "seed": "prefix"
 },
 {
-"name": "fn_80135338",
+"name": "gamedataInit",
 "addr": "0x80135338",
 "size": 136,
 "label": "field",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "gamedataAttestCreate",
@@ -34257,68 +34257,68 @@
 "seed": "prefix"
 },
 {
-"name": "fn_80135A30",
+"name": "gamedataAttestBiosSetLangareaId",
 "addr": "0x80135A30",
 "size": 16,
 "label": "field",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_80135A40",
+"name": "gamedataAttestBiosSetAreaId",
 "addr": "0x80135A40",
 "size": 16,
 "label": "field",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_80135A50",
+"name": "gamedataAttestBiosSetGenId",
 "addr": "0x80135A50",
 "size": 16,
 "label": "field",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_80135A60",
+"name": "gamedataAttestBiosSetVerId",
 "addr": "0x80135A60",
 "size": 16,
 "label": "field",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_80135A70",
+"name": "gamedataAttestBiosGetLangareaId",
 "addr": "0x80135A70",
 "size": 24,
 "label": "field",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_80135A88",
+"name": "gamedataAttestBiosGetAreaId",
 "addr": "0x80135A88",
 "size": 24,
 "label": "field",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_80135AA0",
+"name": "gamedataAttestBiosGetGenId",
 "addr": "0x80135AA0",
 "size": 24,
 "label": "field",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_80135AB8",
+"name": "gamedataAttestBiosGetVerId",
 "addr": "0x80135AB8",
 "size": 24,
 "label": "field",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_80135AD0",
@@ -34337,36 +34337,36 @@
 "seed": null
 },
 {
-"name": "fn_80135B0C",
+"name": "gamedataBiosGetGamedataAtttestPtr",
 "addr": "0x80135B0C",
 "size": 16,
 "label": "field",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_80135B1C",
+"name": "gamedatasaveBiosSetOptionAudio",
 "addr": "0x80135B1C",
 "size": 16,
 "label": "field",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_80135B2C",
+"name": "gamedatasaveBiosSetOptionNoVibration",
 "addr": "0x80135B2C",
 "size": 16,
 "label": "field",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_80135B3C",
+"name": "gamedatasaveBiosSetFloorposindex",
 "addr": "0x80135B3C",
 "size": 16,
 "label": "field",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_80135B4C",
@@ -34537,12 +34537,12 @@
 "seed": "prefix"
 },
 {
-"name": "fn_80135F90",
+"name": "koukaDataBiosGetLink",
 "addr": "0x80135F90",
 "size": 44,
 "label": "effect",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "koukaDataBiosGetValue",
@@ -34561,12 +34561,12 @@
 "seed": "prefix"
 },
 {
-"name": "fn_80136024",
+"name": "koukaDataBiosGetStatus",
 "addr": "0x80136024",
 "size": 44,
 "label": "effect",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "koukaDataBiosGetStatusKind",
@@ -40729,7 +40729,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80176684",
+"name": "cameraGetRotY",
 "addr": "0x80176684",
 "size": 12,
 "label": "particle",
@@ -40737,7 +40737,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80176690",
+"name": "cameraGetDistance",
 "addr": "0x80176690",
 "size": 12,
 "label": "particle",
@@ -40745,7 +40745,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8017669C",
+"name": "cameraGetHeight",
 "addr": "0x8017669C",
 "size": 12,
 "label": "particle",
@@ -40761,7 +40761,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80176758",
+"name": "cameraSetRotY",
 "addr": "0x80176758",
 "size": 136,
 "label": "particle",
@@ -40769,7 +40769,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801767E0",
+"name": "cameraSetDistance",
 "addr": "0x801767E0",
 "size": 136,
 "label": "particle",
@@ -40777,7 +40777,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80176868",
+"name": "cameraSetHeight",
 "addr": "0x80176868",
 "size": 136,
 "label": "particle",
@@ -40865,7 +40865,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80176C78",
+"name": "cameraPlayOffsetAnime",
 "addr": "0x80176C78",
 "size": 404,
 "label": "particle",
@@ -40873,7 +40873,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80176E0C",
+"name": "cameraPlayAnime",
 "addr": "0x80176E0C",
 "size": 348,
 "label": "particle",
@@ -40889,7 +40889,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80176F98",
+"name": "cameraMoveEndCheckSpecial",
 "addr": "0x80176F98",
 "size": 108,
 "label": "particle",
@@ -41049,7 +41049,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801779CC",
+"name": "cameraSetTarget",
 "addr": "0x801779CC",
 "size": 32,
 "label": "gs-engine",
@@ -41081,7 +41081,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80177A64",
+"name": "cameraUpdate",
 "addr": "0x80177A64",
 "size": 3064,
 "label": "gs-engine",
@@ -41089,7 +41089,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8017865C",
+"name": "cameraRefreshTargetPos",
 "addr": "0x8017865C",
 "size": 152,
 "label": "gs-engine",
@@ -41105,7 +41105,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80178AA8",
+"name": "_cameraPadRotateUpdate__FP9_GScamera",
 "addr": "0x80178AA8",
 "size": 1400,
 "label": "gs-engine",
@@ -41113,7 +41113,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80179020",
+"name": "_cameraPadMoveUpdate__FP9_GScamera",
 "addr": "0x80179020",
 "size": 996,
 "label": "gs-engine",
@@ -41121,7 +41121,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80179404",
+"name": "cameraSetGScamera",
 "addr": "0x80179404",
 "size": 236,
 "label": "gs-engine",
@@ -41129,7 +41129,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801794F0",
+"name": "cameraResetFloor",
 "addr": "0x801794F0",
 "size": 600,
 "label": "gs-engine",
@@ -44489,7 +44489,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8019CF54",
+"name": "JObjAmnesia",
 "addr": "0x8019CF54",
 "size": 104,
 "label": "hsd",
@@ -44497,7 +44497,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8019CFBC",
+"name": "JObjRelease",
 "addr": "0x8019CFBC",
 "size": 160,
 "label": "hsd",
@@ -44577,7 +44577,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8019F01C",
+"name": "HSD_JObjGetCurrent",
 "addr": "0x8019F01C",
 "size": 8,
 "label": "hsd",
@@ -44649,7 +44649,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8019FF30",
+"name": "HSD_JObjGetFlags",
 "addr": "0x8019FF30",
 "size": 24,
 "label": "hsd",
@@ -44673,7 +44673,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801A015C",
+"name": "HSD_JObjAddChild",
 "addr": "0x801A015C",
 "size": 340,
 "label": "hsd",
@@ -45345,7 +45345,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801A6DDC",
+"name": "HSD_MObjSetAlpha",
 "addr": "0x801A6DDC",
 "size": 36,
 "label": "hsd",
@@ -45681,7 +45681,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801AA6D0",
+"name": "PObjAmnesia",
 "addr": "0x801AA6D0",
 "size": 184,
 "label": "hsd",
@@ -45689,7 +45689,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801AA788",
+"name": "PObjRelease",
 "addr": "0x801AA788",
 "size": 308,
 "label": "hsd",
@@ -45809,7 +45809,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801AD044",
+"name": "HSD_PObjResolveRefsAll",
 "addr": "0x801AD044",
 "size": 464,
 "label": "hsd",
@@ -45825,7 +45825,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801AD288",
+"name": "HSD_PObjLoadDesc",
 "addr": "0x801AD288",
 "size": 204,
 "label": "hsd",
@@ -45833,7 +45833,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801AD354",
+"name": "PObjLoad",
 "addr": "0x801AD354",
 "size": 712,
 "label": "hsd",
@@ -48985,7 +48985,7 @@
 "seed": null
 },
 {
-"name": "fn_801D1B4C",
+"name": "mailGetSortMode",
 "addr": "0x801D1B4C",
 "size": 44,
 "label": "gs-engine",
@@ -49009,7 +49009,7 @@
 "seed": null
 },
 {
-"name": "fn_801D1CC4",
+"name": "mailChkReceiveMail",
 "addr": "0x801D1CC4",
 "size": 148,
 "label": "gs-engine",
@@ -49017,7 +49017,7 @@
 "seed": null
 },
 {
-"name": "fn_801D1D58",
+"name": "mailAddMailbox",
 "addr": "0x801D1D58",
 "size": 248,
 "label": "gs-engine",
@@ -49041,7 +49041,7 @@
 "seed": null
 },
 {
-"name": "fn_801D1F7C",
+"name": "mailGetNbMailInMailbox",
 "addr": "0x801D1F7C",
 "size": 44,
 "label": "gs-engine",
@@ -49049,7 +49049,7 @@
 "seed": null
 },
 {
-"name": "fn_801D1FA8",
+"name": "mailInitMailbox",
 "addr": "0x801D1FA8",
 "size": 216,
 "label": "gs-engine",
@@ -49193,44 +49193,44 @@
 "seed": null
 },
 {
-"name": "fn_801D349C",
+"name": "_wazaSequenceCameraDoPosition__FP13ModelSequenceP24wazaSequenceCameraParamsfb",
 "addr": "0x801D349C",
 "size": 2784,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "waza",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_801D3F7C",
+"name": "_wazaSequenceCameraDoDollyPosition__FP21TemplateExpFileHeaderP24wazaSequenceCameraParamsfb",
 "addr": "0x801D3F7C",
 "size": 1352,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "waza",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_801D44C4",
 "addr": "0x801D44C4",
 "size": 1300,
-"label": "gs-engine",
+"label": "waza",
 "confidence": 1.9,
 "seed": null
 },
 {
-"name": "fn_801D49D8",
+"name": "_wazaSequenceCameraSelectDuration__FUcPff",
 "addr": "0x801D49D8",
 "size": 968,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "waza",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_801D4DA0",
+"name": "_wazaSequenceCameraSelectMotion__FP13ModelSequenceP12WazaSequenceP24wazaSequenceCameraParams",
 "addr": "0x801D4DA0",
 "size": 536,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "waza",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_801D4FB8",
@@ -49761,7 +49761,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801DB848",
+"name": "wazaSequenceSysGetModelShadowLight__Fv",
 "addr": "0x801DB848",
 "size": 8,
 "label": "waza",
@@ -49769,7 +49769,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801DB850",
+"name": "wazaSequenceSysGetModelShadowCount__Fv",
 "addr": "0x801DB850",
 "size": 8,
 "label": "waza",
@@ -49777,7 +49777,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801DB858",
+"name": "wazaSequenceSysGetModelShadowList__Fv",
 "addr": "0x801DB858",
 "size": 12,
 "label": "waza",
@@ -51588,7 +51588,7 @@
 "name": "fn_801EF95C",
 "addr": "0x801EF95C",
 "size": 172,
-"label": "gs-engine",
+"label": "fight",
 "confidence": 1.9,
 "seed": null
 },
@@ -68957,14 +68957,8 @@
 {
 "label": "fight",
 "start": "0x800111C4",
-"end": "0x80011288",
-"count": 3
-},
-{
-"label": "gs-engine",
-"start": "0x80011288",
 "end": "0x80011700",
-"count": 2
+"count": 5
 },
 {
 "label": "menu",
@@ -69299,14 +69293,20 @@
 {
 "label": "gs-engine",
 "start": "0x80038E74",
-"end": "0x80039644",
-"count": 8
+"end": "0x8003956c",
+"count": 6
+},
+{
+"label": "savedata",
+"start": "0x8003956C",
+"end": "0x80039604",
+"count": 1
 },
 {
 "label": "item",
-"start": "0x80039644",
+"start": "0x80039604",
 "end": "0x8003a10c",
-"count": 8
+"count": 9
 },
 {
 "label": "gs-engine",
@@ -69951,16 +69951,10 @@
 "count": 3
 },
 {
-"label": "gs-engine",
-"start": "0x800CE2D8",
-"end": "0x800ce318",
-"count": 2
-},
-{
 "label": "people",
-"start": "0x800CE318",
+"start": "0x800CE2D8",
 "end": "0x800ce338",
-"count": 1
+"count": 3
 },
 {
 "label": "libm",
@@ -70133,32 +70127,32 @@
 {
 "label": "gs-engine",
 "start": "0x801324CC",
-"end": "0x80133b50",
-"count": 40
+"end": "0x801332d8",
+"count": 21
 },
 {
 "label": "menu",
-"start": "0x80133B50",
-"end": "0x8013433c",
-"count": 11
-},
-{
-"label": "item",
-"start": "0x8013433C",
-"end": "0x801347d8",
-"count": 6
+"start": "0x801332D8",
+"end": "0x80133450",
+"count": 5
 },
 {
 "label": "gs-engine",
-"start": "0x801347D8",
-"end": "0x801347e8",
-"count": 2
+"start": "0x80133450",
+"end": "0x80133664",
+"count": 7
+},
+{
+"label": "menu",
+"start": "0x80133664",
+"end": "0x8013433c",
+"count": 18
 },
 {
 "label": "savedata",
-"start": "0x801347E8",
+"start": "0x8013433C",
 "end": "0x80134a98",
-"count": 3
+"count": 11
 },
 {
 "label": "field",
@@ -70173,10 +70167,16 @@
 "count": 1
 },
 {
-"label": "field",
+"label": "savedata",
 "start": "0x80134F88",
+"end": "0x80135024",
+"count": 1
+},
+{
+"label": "field",
+"start": "0x80135024",
 "end": "0x80135f58",
-"count": 46
+"count": 45
 },
 {
 "label": "effect",
@@ -70667,8 +70667,20 @@
 {
 "label": "gs-engine",
 "start": "0x801D0BD0",
+"end": "0x801d349c",
+"count": 54
+},
+{
+"label": "waza",
+"start": "0x801D349C",
+"end": "0x801d4fb8",
+"count": 5
+},
+{
+"label": "gs-engine",
+"start": "0x801D4FB8",
 "end": "0x801d744c",
-"count": 73
+"count": 14
 },
 {
 "label": "waza",
@@ -70847,20 +70859,8 @@
 {
 "label": "fight",
 "start": "0x801EF6FC",
-"end": "0x801ef95c",
-"count": 5
-},
-{
-"label": "gs-engine",
-"start": "0x801EF95C",
-"end": "0x801efa08",
-"count": 1
-},
-{
-"label": "fight",
-"start": "0x801EFA08",
 "end": "0x80265ec4",
-"count": 2134
+"count": 2140
 },
 {
 "label": "field",

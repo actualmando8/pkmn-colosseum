@@ -184,9 +184,9 @@ u32 fn_8000BB00(void) {
 
 /* fn_8000BB48 - 0x8000BB48 | size: 0xa4 */
 extern u32 fn_801EF63C(void);
-extern void fn_80124A60(u8* a);
+extern void pokemonInit(u8* a);
 extern s32 fn_800096B4(u32 a, u32 b, u32 c, u32 d, u32 e, u32 f);
-extern void fn_80129F20(u32 a, u8* b, u32 c, u32 d, u32 e);
+extern void heroCatchPokemon(u32 a, u8* b, u32 c, u32 d, u32 e);
 extern u8 lbl_80478840;
 extern u8 lbl_803A1A48[];
 #if 0
@@ -197,11 +197,11 @@ asm void fn_8000BB48(void) {
 s32 fn_8000BB48(void) {
     if ((u8)fn_801EF63C() == 1) { return -1; }
     if (lbl_80478840 != 0) {
-        fn_80124A60(lbl_803A1A48);
+        pokemonInit(lbl_803A1A48);
         lbl_80478840 = 0;
     }
     if (fn_800096B4((u32)lbl_803A1A48, 0, 0, 0, 0, 0) < 0) { return -1; }
-    fn_80129F20(0, lbl_803A1A48, 0, 4, 1);
+    heroCatchPokemon(0, lbl_803A1A48, 0, 4, 1);
     return -1;
 }
 #endif
@@ -734,7 +734,7 @@ u32 fn_8000C518(void) {
 
 /* fn_8000C588 - 0x8000C588 | size: 0x9c */
 extern void* fn_800FF56C(void);
-extern void* fn_80115C48(void* a);
+extern void* floorDataBiosGetPtr(void* a);
 extern u32 fn_801174C4(void);
 extern void fn_80117500(void);
 extern void fn_800FEC34(u32 a);
@@ -747,7 +747,7 @@ asm void fn_8000C588(void) {
 }
 #else
 u32 fn_8000C588(void) {
-    u8* obj = (u8*)fn_80115C48(fn_800FF56C());
+    u8* obj = (u8*)floorDataBiosGetPtr(fn_800FF56C());
     if ((u8)fn_80102620(0xa) != 0) {
         if ((u8)fn_801174C4() != 0) {
             fn_80117500();
@@ -859,9 +859,9 @@ extern void fn_800884BC(u32, u32, u32);
 extern void fn_800FF660(void);
 extern u32 fn_800FF560(void);
 extern u32 GSthreadCreate(s32, u32, s32, s32, s32, u32);
-extern u32 fn_80129280(s32, s32);
-extern u32 fn_8012AC08(u32, s32);
-extern u32 fn_80123FBC(u32);
+extern u32 savedataGetStatus(s32, s32);
+extern u32 heroBiosGetPokemonPtr(u32, s32);
+extern u32 pokemonCheckValid(u32);
 extern void fn_80097A38(u32, s32);
 extern void fn_800FF730(u32);
 extern void menuPokemonOpen(s32, s32, s32);
@@ -1194,9 +1194,9 @@ void testEvolution__Fv(void) {
     GSpartyEvolutionArgs locals;
 
     val1 = heroGetStatus(NULL, 3, 0);
-    if ((u8)fn_80123FBC(val1) == 0) { return; }
+    if ((u8)pokemonCheckValid(val1) == 0) { return; }
     val2 = heroGetStatus(NULL, 3, 1);
-    if ((u8)fn_80123FBC(val2) == 0) { return; }
+    if ((u8)pokemonCheckValid(val2) == 0) { return; }
     fadeSet(3, lbl_8047B6E8);
     fadeCheck(1);
     locals.left = 1;
@@ -1226,10 +1226,10 @@ asm void dbgMenuMenuTestWazaMenu(void) {
 #else
 u32 dbgMenuMenuTestWazaMenu(void) {
     u32 val;
-    val = fn_80129280(0, 2);
+    val = savedataGetStatus(0, 2);
     if (val == 0) { return 0; }
-    val = fn_8012AC08(val, 0);
-    if ((u8)fn_80123FBC(val) == 0) { return 0; }
+    val = heroBiosGetPokemonPtr(val, 0);
+    if ((u8)pokemonCheckValid(val) == 0) { return 0; }
     fn_80097A38(val, 0x25);
     return 0;
 }

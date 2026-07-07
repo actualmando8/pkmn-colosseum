@@ -81,15 +81,15 @@ extern void fn_801069FC();
 extern void fn_8010B9E8();
 extern void fn_80108518();
 extern void fn_80113828();
-extern void* fn_80129280();
+extern void* savedataGetStatus();
 extern void fn_80129384();
 extern void fn_801293FC();
-extern void fn_8012A248();
-extern void fn_8012A774();
-extern u32  fn_8012AC3C(void*);
-extern u8*  fn_8012AC54(void*);
-extern void fn_8012AC64();
-extern void fn_80130054();
+extern void heroInit();
+extern void heroBiosSetHomePlace();
+extern u32  heroBiosGetRnd(void*);
+extern u8*  heroBiosGetNamePtr(void*);
+extern void heroBiosCopy();
+extern void heroMoveSyncWithHero();
 extern void fn_80132A38();
 extern void gamedatasaveGetStatus();
 extern void fn_80166A28();
@@ -165,8 +165,8 @@ void fn_80059BDC(void) {
     extern s32 fn_80089028(void);
     extern s32 fn_80093574(s32);
     extern s32 fn_800849B4(s32, s32, void*, void*);
-    extern u32 fn_8012AC3C(void*);
-    extern u8* fn_8012AC54(void*);
+    extern u32 heroBiosGetRnd(void*);
+    extern u8* heroBiosGetNamePtr(void*);
     extern s32 fn_801022B8(s32);
     extern u32 gamedatasaveGetStatus(s32, s32);
     extern s32 fn_80088C60(void);
@@ -179,7 +179,7 @@ void fn_80059BDC(void) {
     extern s8 menuSubOpenYesNo(s32, s32, s32, s32);
     extern void floorChangePos(u32, s32, f32, f32, f32);
     typedef struct SaveImage { u32 data[0x330B]; } SaveImage;
-#define WORKP ((u8*)fn_80129280(0, 0xE))
+#define WORKP ((u8*)savedataGetStatus(0, 0xE))
     u8* dat = (u8*)lbl_80267840;
     s32 prevCmd;
     s32 first;
@@ -191,7 +191,7 @@ void fn_80059BDC(void) {
     f32 posY;
     f32 posZ;
 
-    fn_80129280(0, 0xE);
+    savedataGetStatus(0, 0xE);
     posFlag = 0;
     warpArg = 0;
     prevCmd = fn_8007162C();
@@ -412,7 +412,7 @@ void fn_80059BDC(void) {
                 fn_8019075C(0xAFC, 0);
                 fn_8019075C(0xB11, 0);
                 fn_8019075C(0xDE1, 0);
-                fn_80130054();
+                heroMoveSyncWithHero();
                 fn_8019075C(0xAFC, *(s32*)(q - 0x3634));
                 fn_8019075C(0xB11, *(s32*)(q - 0x362C));
                 fn_8019075C(0xDE1, *(s32*)(q - 0x3628));
@@ -525,7 +525,7 @@ void fn_80059BDC(void) {
                     fn_801069FC(1);
                     break;
                 }
-                fn_8012AC64(lbl_8047A5A0 + 0x1660, fn_80129280(0, 2));
+                heroBiosCopy(lbl_8047A5A0 + 0x1660, savedataGetStatus(0, 2));
                 cmd = 0xEE;
                 break;
             case 1:
@@ -562,7 +562,7 @@ void fn_80059BDC(void) {
                 break;
             }
             fn_8006B4AC(0);
-            fn_8012A774((u8*)prevCmd, 0);
+            heroBiosSetHomePlace((u8*)prevCmd, 0);
             fn_8006AC28(lbl_8047A5A0, 0);
             fn_8006A824(lbl_8047A5A0, (u8*)prevCmd);
             fn_800714C8();
@@ -576,7 +576,7 @@ void fn_80059BDC(void) {
             prevCmd = i;
             for (; i < 4; i++) {
                 memset(lbl_8047A5A0 + 0x1660 + prevCmd, 0, 0xB18);
-                fn_8012A248(lbl_8047A5A0 + 0x1660 + prevCmd);
+                heroInit(lbl_8047A5A0 + 0x1660 + prevCmd);
                 prevCmd += 0xB18;
             }
             arr[0] = NULL;
@@ -673,8 +673,8 @@ void fn_80059BDC(void) {
                         fn_801026A4(0xDA, 0, NULL, 0x10, 0, 4, fn_8006A7C8(sv2), r, 0, 0);
                     }
                 }
-                memcpy(lbl_8047A5A0 + 0x4318, fn_80129280(0, 0xE), 0xCC2C);
-                fn_8006AF44(fn_80129280(0, 0xE), lbl_8047A5A0);
+                memcpy(lbl_8047A5A0 + 0x4318, savedataGetStatus(0, 0xE), 0xCC2C);
+                fn_8006AF44(savedataGetStatus(0, 0xE), lbl_8047A5A0);
                 if ((u8)fn_801D04E8() == 0) {
                     fn_80166A28(0x26);
                     fn_80106D3C(2, 0x3C60, 1, 0);
@@ -682,7 +682,7 @@ void fn_80059BDC(void) {
                         fn_80106D3C(2, 0x3D55, 1, 0);
                     }
                 } else if (fn_800889A4() < 0) {
-                    memcpy(fn_80129280(0, 0xE), lbl_8047A5A0 + 0x4318, 0xCC2C);
+                    memcpy(savedataGetStatus(0, 0xE), lbl_8047A5A0 + 0x4318, 0xCC2C);
                     if (fn_8006A7E8(lbl_8047A5A0) != 0) {
                         fn_80106D3C(2, 0x3D55, 1, 0);
                     }
@@ -711,7 +711,7 @@ void fn_80059BDC(void) {
         case 0xCC: {
             u8* p;
             s32 r;
-            fn_80069C0C(fn_80129280(0, 0xE));
+            fn_80069C0C(savedataGetStatus(0, 0xE));
             p = fn_8006B09C(0);
             if ((u8)fn_80102620(0xDA)) {
                 fn_80102510(0xDA);
@@ -791,7 +791,7 @@ void fn_80059BDC(void) {
             {
                 u8* dst = lbl_8047A5A0 + 0x4318;
                 SaveImage* dstSaveImage = (SaveImage*)dst;
-                SaveImage* srcSaveImage = (SaveImage*)fn_80129280(0, 0xE);
+                SaveImage* srcSaveImage = (SaveImage*)savedataGetStatus(0, 0xE);
 
                 *dstSaveImage = *srcSaveImage;
                 prevCmd = (s32)fn_8006AFC4(dst);
@@ -905,7 +905,7 @@ void fn_80059BDC(void) {
                     fn_8019075C(0xAFC, 0);
                     fn_8019075C(0xB11, 0);
                     fn_8019075C(0xDE1, 0);
-                    fn_80130054();
+                    heroMoveSyncWithHero();
                     floorId = 0x4C;
                     cmd = 0x105;
                 } else {
@@ -1131,7 +1131,7 @@ void fn_80059BDC(void) {
             off = prevCmd;
             for (; (u32)prevCmd < 4; prevCmd++) {
                 memset(lbl_8047A5A0 + 0x1660 + off, 0, 0xB18);
-                fn_8012A248(lbl_8047A5A0 + 0x1660 + off);
+                heroInit(lbl_8047A5A0 + 0x1660 + off);
                 off += 0xB18;
             }
             switch (*(s32*)(WORKP + 4)) {
@@ -1170,7 +1170,7 @@ void fn_80059BDC(void) {
                 break;
             }
             if (*(s32*)(WORKP + 0x59AC) == 0) {
-                fn_8012A774(lbl_8047A5A0 + 0x1660, 0);
+                heroBiosSetHomePlace(lbl_8047A5A0 + 0x1660, 0);
             }
             switch (*(s32*)(WORKP + 4)) {
             case 0:
@@ -1363,7 +1363,7 @@ void fn_80059BDC(void) {
             floorId = 0x397;
             break;
         case 0xB8:
-            fn_80129280(0, 0xE);
+            savedataGetStatus(0, 0xE);
             fn_80062948();
             cmd = fn_80071398();
             break;
@@ -1456,12 +1456,12 @@ void fn_80059BDC(void) {
                         if (r < 0) {
                             continue;
                         }
-                        h = fn_8012AC3C((u8*)cmd + 0xB44);
-                        if (h != fn_8012AC3C(lbl_8047A5A0 + 0x1660)) {
+                        h = heroBiosGetRnd((u8*)cmd + 0xB44);
+                        if (h != heroBiosGetRnd(lbl_8047A5A0 + 0x1660)) {
                             goto mismatch105;
                         }
-                        nm = fn_8012AC54((u8*)cmd + 0xB44);
-                        if (GScharCmp(fn_8012AC54(lbl_8047A5A0 + 0x1660), nm) != 0) {
+                        nm = heroBiosGetNamePtr((u8*)cmd + 0xB44);
+                        if (GScharCmp(heroBiosGetNamePtr(lbl_8047A5A0 + 0x1660), nm) != 0) {
                             goto mismatch105;
                         }
                         fn_80106D3C(7, 0x3D51, 0, 1);
@@ -1492,7 +1492,7 @@ void fn_80059BDC(void) {
                     }
                     break;
                 }
-                if ((u8)fn_8006A76C(fn_80129280(0, 0xE)) == 0) {
+                if ((u8)fn_8006A76C(savedataGetStatus(0, 0xE)) == 0) {
                     do {
                         fn_80106D3C(2, 0x44EC, 1, 0);
                         if (menuSubOpenYesNo(0, 0x3C, 0x9E, 0) != 0) {

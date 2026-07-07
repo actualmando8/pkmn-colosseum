@@ -187,9 +187,9 @@ extern f32  fn_80135C10(void* mixer);  /* SoundGetMasterVolume */
 
 extern u32  fn_80128E2C(void);     /* RNG get seed */
 extern void fn_80128E14(u32 seed); /* RNG set seed */
-extern void fn_80128E38(u32 a, u32 b); /* RNG init */
+extern void savedataCreate(u32 a, u32 b); /* RNG init */
 extern void fn_801EF5C0(void);    /* Battle system global init */
-extern u32  fn_80129280(u32 a, u32 b); /* RNG or calendar read */
+extern u32  savedataGetStatus(u32 a, u32 b); /* RNG or calendar read */
 extern void fn_801909A8(u32 a, u32 b, u32 c, u32 d, u32 e, u32 f); /* Calendar/RTC set */
 extern void GSvtrLoadTexture(void);    /* Card system tick */
 extern void fn_8010C220(void);    /* Effect system tick */
@@ -787,14 +787,14 @@ void fn_80005AAC(void) {
      * OSGetTime returns u64 in r3:r4; we use r4 (low 32 bits).
      * rlwinm r27, r4, 0, 21, 26 => r4 & 0x000007E0 */
     fn_80128E14(fn_80128E2C() + ((u32)OSGetTime() & 0x7E0)); /* add time entropy to seed */
-    fn_80128E38(0, 0); /* Reset RNG sequence */
+    savedataCreate(0, 0); /* Reset RNG sequence */
 
     /* Initialize the battle system */
     fn_801EF5C0();
 
     /* Set the in-game calendar from RTC values (sec/min/hour/day/month/year) */
-    fn_801909A8(fn_80129280(0, 4), fn_80129280(0, 7), fn_80129280(0, 5),
-                fn_80129280(0, 8), fn_80129280(0, 6), fn_80129280(0, 9));
+    fn_801909A8(savedataGetStatus(0, 4), savedataGetStatus(0, 7), savedataGetStatus(0, 5),
+                savedataGetStatus(0, 8), savedataGetStatus(0, 6), savedataGetStatus(0, 9));
 
     /* Tick save/card system */
     GSvtrLoadTexture();

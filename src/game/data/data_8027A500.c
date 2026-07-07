@@ -97,18 +97,18 @@ extern u8 fn_801140C8[];
 extern u8 fn_801140DC[];
 extern u8 fn_8011416C[];
 extern u8 fn_801141D8[];
-extern u8 fn_80116470[];
-extern u8 fn_80116958[];
+extern u8 floorEventCtrlElevator[];
+extern u8 floorEventCtrlDoor[];
 extern u8 fn_80117330[];
 extern u8 fn_801174F4[];
 extern u8 fn_80117500[];
 extern u8 fn_80117AE4[];
-extern u8 fn_8012BAD0[];
-extern u8 fn_8012BBA8[];
-extern u8 fn_8012BCA4[];
-extern u8 fn_8012EBD4[];
-extern u8 fn_8012F008[];
-extern u8 fn_8012FCD4[];
+extern u8 heroMoveAddAutoEvent[];
+extern u8 heroMoveTermEvent[];
+extern u8 heroMoveInitEvent[];
+extern u8 heroMoveMain[];
+extern u8 heroMoveSetNeckMode[];
+extern u8 heroMoveInit[];
 extern u8 fn_80132A38[];
 extern u8 fn_801653C4[];
 extern u8 fn_80165668[];
@@ -93886,19 +93886,19 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)fadeCheck),
     (void*)0x01000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_8012FCD4),
+    (void*)((u8*)heroMoveInit),
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_8012EBD4),
+    (void*)((u8*)heroMoveMain),
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_8012BCA4),
+    (void*)((u8*)heroMoveInitEvent),
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_8012BBA8),
+    (void*)((u8*)heroMoveTermEvent),
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_8012BAD0),
+    (void*)((u8*)heroMoveAddAutoEvent),
     (void*)0x01010101,
     (void*)0x01000000,
     (void*)((u8*)fn_801C9F00),
@@ -94084,10 +94084,10 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)fn_80113828),
     (void*)0x01010000,
     (void*)0x00000000,
-    (void*)((u8*)fn_80116958),
+    (void*)((u8*)floorEventCtrlDoor),
     (void*)0x01010100,
     (void*)0x00000000,
-    (void*)((u8*)fn_80116470),
+    (void*)((u8*)floorEventCtrlElevator),
     (void*)0x01010101,
     (void*)0x01000000,
     (void*)((u8*)fn_800FF730),
@@ -94174,7 +94174,7 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)fn_8011388C),
     (void*)0x01010100,
     (void*)0x00000000,
-    (void*)((u8*)fn_8012F008),
+    (void*)((u8*)heroMoveSetNeckMode),
     (void*)0x01010000,
     (void*)0x00000000,
     (void*)((u8*)cameraSetFloorDefault),

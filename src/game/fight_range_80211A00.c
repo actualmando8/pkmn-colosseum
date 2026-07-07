@@ -192,27 +192,27 @@ void WS_CHIISAKUNARU(void) {
  *
  * Compares field 0x83 (a stat) of the slot-0x11 and slot-0x12
  * FightPokemon; if the slot-0x12 side's stat exceeds the slot-0x11
- * side's, records the (positive) delta via fn_8011BBD8 and advances
+ * side's, records the (positive) delta via wazaSetStatus and advances
  * the PC by 5; otherwise takes the script-embedded jump.
  */
-extern u32 fn_8012640C();
+extern u32 pokemonGetStatus();
 extern u32 fn_80205B8C();
-extern void fn_8011BBD8();
+extern void wazaSetStatus();
 #pragma optimize_for_size on
 void fn_80215808(void) {
     u32 ctx1 = fn_801F025C(0x11, 0);
-    u32 fieldD9 = fn_8012640C(ctx1, 0, 0xD9, 0);
+    u32 fieldD9 = pokemonGetStatus(ctx1, 0, 0xD9, 0);
     u32 poke1 = fn_80205B8C(ctx1);
-    s32 statA = (u16)fn_8012640C(poke1, 0, 0x83, 0);
+    s32 statA = (u16)pokemonGetStatus(poke1, 0, 0x83, 0);
 
     u32 ctx2 = fn_801F025C(0x12, 0);
     u32 poke2 = fn_80205B8C(ctx2);
-    s32 statB = (u16)fn_8012640C(poke2, 0, 0x83, 0);
+    s32 statB = (u16)pokemonGetStatus(poke2, 0, 0x83, 0);
 
     if (statB <= statA) {
         lbl_8047B610 = *(u32*)(lbl_8047B610 + 1);
     } else {
-        fn_8011BBD8(fieldD9, 0, 0x2d, 0, statB - statA);
+        wazaSetStatus(fieldD9, 0, 0x2d, 0, statB - statA);
         lbl_8047B610 = lbl_8047B610 + 5;
     }
 }
@@ -258,15 +258,15 @@ void WS_KIERUTAME_AFTAR(void) {
  * fn_80214DB0 (0x80214DB0)
  *
  * Marks field 0x118 of the slot-0x11 FightPokemon as changed
- * (fn_801254B4, mode 1), then: if fn_801F221C(0) reports 1, or
+ * (pokemonSetStatus, mode 1), then: if fn_801F221C(0) reports 1, or
  * event-state 0x33 isn't 2, take the script-embedded jump; otherwise
  * clear event-state 0x33 and advance the PC by 5.
  */
-extern u32 fn_801254B4();
+extern u32 pokemonSetStatus();
 extern u8  fn_801F221C();
 void fn_80214DB0(void) {
     u32 ctx = fn_801F025C(0x11, 0);
-    fn_801254B4(ctx, 0, 0x118, 0, 1);
+    pokemonSetStatus(ctx, 0, 0x118, 0, 1);
 
     if (fn_801F221C(0) != 1) {
         goto check2;
@@ -293,7 +293,7 @@ extern void fn_801F4C14();
 void fn_80214E50(void) {
     u32 ctx = fn_801F025C(0x11, 0);
     fn_801F4C14(0, 0, 0x43, 0, ctx);
-    fn_801254B4(ctx, 0, 0x118, 0, 1);
+    pokemonSetStatus(ctx, 0, 0x118, 0, 1);
 
     if (fn_801F221C(0) != 1) {
         goto check2;
@@ -346,19 +346,19 @@ void WS_KIERUTAME(void) {
  * fn_80217018 (0x80217018)
  *
  * Reads two u16 out-params from the slot-0x11 FightPokemon via
- * fn_80120B00 and records them into fields 0x2f/0x30 of the slot's
+ * pokemonGetMezamerupower and records them into fields 0x2f/0x30 of the slot's
  * field-0xD9 object. PC always advances by 1.
  */
-extern void fn_80120B00();
+extern void pokemonGetMezamerupower();
 void fn_80217018(void) {
     u32 ctx = fn_801F025C(0x11, 0);
-    u32 fieldD9 = fn_8012640C(ctx, 0, 0xD9, 0);
+    u32 fieldD9 = pokemonGetStatus(ctx, 0, 0xD9, 0);
     u32 poke = fn_80205B8C(ctx);
     u16 outA, outB;
 
-    fn_80120B00(poke, &outA, &outB);
-    fn_8011BBD8(fieldD9, 0, 0x2f, 0, outA);
-    fn_8011BBD8(fieldD9, 0, 0x30, 0, outB);
+    pokemonGetMezamerupower(poke, &outA, &outB);
+    wazaSetStatus(fieldD9, 0, 0x2f, 0, outA);
+    wazaSetStatus(fieldD9, 0, 0x30, 0, outB);
     lbl_8047B610 = lbl_8047B610 + 1;
 }
 
@@ -440,7 +440,7 @@ void fn_802182D4(void) {
         goto notmatched;
     }
 matched:
-    fn_801254B4(ctx1, 0, 0x118, 0, 1);
+    pokemonSetStatus(ctx1, 0, 0x118, 0, 1);
     lbl_8047B610 = *(u32*)(lbl_8047B610 + 1);
     return;
 notmatched:
@@ -465,14 +465,14 @@ void fn_802183BC(void) {
     u32 fieldD9;
 
     ctx1 = fn_801F025C(0x11, 0);
-    fieldD9 = fn_8012640C(ctx1, 0, 0xD9, 0);
+    fieldD9 = pokemonGetStatus(ctx1, 0, 0xD9, 0);
     ctx2 = fn_801F025C(0x12, 0);
 
     if (fn_802025B8(ctx2, 0x18) != 2) {
         lbl_8047B610 = *(u32*)(lbl_8047B610 + 1);
     } else {
         fn_8020248C(ctx2, 0x18, 0);
-        fn_8011BBD8(fieldD9, 0, 0x2d, 0, fn_80203B5C(ctx1, 2));
+        wazaSetStatus(fieldD9, 0, 0x2d, 0, fn_80203B5C(ctx1, 2));
         lbl_8047B610 = lbl_8047B610 + 5;
     }
 }
@@ -517,9 +517,9 @@ void fn_80218BD4(void) {
 extern u8 fn_80203E0C();
 void fn_80219D98(void) {
     u32 ctx1 = fn_801F025C(0x11, 0);
-    u32 fieldD9 = fn_8012640C(ctx1, 0, 0xD9, 0);
+    u32 fieldD9 = pokemonGetStatus(ctx1, 0, 0xD9, 0);
 
-    fn_8011BBD8(fieldD9, 0, 0x2d, 0, fn_80203E0C(ctx1));
+    wazaSetStatus(fieldD9, 0, 0x2d, 0, fn_80203E0C(ctx1));
     lbl_8047B610 = lbl_8047B610 + 1;
 }
 
@@ -573,10 +573,10 @@ void fn_8021A764(void) {
 extern u16 fn_80203ADC();
 void fn_8021AB9C(void) {
     u32 ctx1 = fn_801F025C(0x11, 0);
-    u32 fieldD9 = fn_8012640C(ctx1, 0, 0xD9, 0);
+    u32 fieldD9 = pokemonGetStatus(ctx1, 0, 0xD9, 0);
     u32 ctx2 = fn_801F025C(0x12, 0);
 
-    fn_8011BBD8(fieldD9, 0, 0x2d, 0, fn_80203ADC(ctx2, 2));
+    wazaSetStatus(fieldD9, 0, 0x2d, 0, fn_80203ADC(ctx2, 2));
     lbl_8047B610 = lbl_8047B610 + 1;
 }
 
@@ -591,12 +591,12 @@ void fn_8021AB9C(void) {
 extern u16 fn_800E0C54(void);
 void fn_8021B628(void) {
     u32 ctx1 = fn_801F025C(0x11, 0);
-    u32 fieldD9 = fn_8012640C(ctx1, 0, 0xD9, 0);
+    u32 fieldD9 = pokemonGetStatus(ctx1, 0, 0xD9, 0);
     u8 flag = *(u8*)(lbl_8047B610 + 1);
     u32 val;
 
     if (flag != 0) {
-        fn_8011BBD8(fieldD9, 0, 0x31, 0, flag);
+        wazaSetStatus(fieldD9, 0, 0x31, 0, flag);
     } else {
         val = fn_800E0C54() % 5;
         if (val < 2) {
@@ -604,7 +604,7 @@ void fn_8021B628(void) {
         } else {
             val = fn_800E0C54() % 5 + 2;
         }
-        fn_8011BBD8(fieldD9, 0, 0x31, 0, val);
+        wazaSetStatus(fieldD9, 0, 0x31, 0, val);
     }
     lbl_8047B610 = lbl_8047B610 + 2;
 }
@@ -616,21 +616,21 @@ void fn_8021B628(void) {
  * and stores its negation back into field 0x2d -- except a zero
  * result is stored as -1 instead of 0. PC always advances by 1.
  */
-extern s32 fn_8011BEB4();
+extern s32 wazaGetStatus();
 #pragma optimize_for_size on
 void fn_8021C0F4(void) {
     u32 ctx1 = fn_801F025C(0x11, 0);
-    u32 fieldD9 = fn_8012640C(ctx1, 0, 0xD9, 0);
+    u32 fieldD9 = pokemonGetStatus(ctx1, 0, 0xD9, 0);
     s32 half;
     s32 val;
 
-    fn_8011BEB4(fieldD9, 0, 0x2d, 0);
-    half = fn_8011BEB4(fieldD9, 0, 0x2e, 0) / 2;
+    wazaGetStatus(fieldD9, 0, 0x2d, 0);
+    half = wazaGetStatus(fieldD9, 0, 0x2e, 0) / 2;
     val = -half;
     if (val == 0) {
         val = -1;
     }
-    fn_8011BBD8(fieldD9, 0, 0x2d, 0, val);
+    wazaSetStatus(fieldD9, 0, 0x2d, 0, val);
     lbl_8047B610 = lbl_8047B610 + 1;
 }
 #pragma optimize_for_size reset
@@ -648,7 +648,7 @@ void fn_8021D010(void) {
     u32 ctx1 = fn_801F025C(0x11, 0);
     u32 poke = fn_80205B8C(ctx1);
 
-    fn_801254B4(poke, 0, 0x83, 0, 0);
+    pokemonSetStatus(poke, 0, 0x83, 0, 0);
     if (fn_801FECD4(ctx1) == 1) {
         fn_801FE7EC(ctx1, 0x83, 0, 0);
     }
@@ -666,8 +666,8 @@ void fn_8021D010(void) {
 #pragma optimize_for_size on
 void fn_80222ADC(void) {
     u32 ctx1 = fn_801F025C(0x11, 0);
-    u32 fieldD9 = fn_8012640C(ctx1, 0, 0xD9, 0);
-    s16 val = (long long)(((s16)((u8)fn_8011BEB4(fieldD9, 0, 0x31, 0))) - 1);
+    u32 fieldD9 = pokemonGetStatus(ctx1, 0, 0xD9, 0);
+    s16 val = (long long)(((s16)((u8)wazaGetStatus(fieldD9, 0, 0x31, 0))) - 1);
 
     if (val < 0) {
         val = 0;
@@ -678,7 +678,7 @@ void fn_80222ADC(void) {
     } else {
         lbl_8047B610 = *(u32*)(lbl_8047B610 + 1);
     }
-    fn_8011BBD8(fieldD9, 0, 0x31, 0, val);
+    wazaSetStatus(fieldD9, 0, 0x31, 0, val);
     ctx1 = ctx1;
 }
 #pragma optimize_for_size reset
@@ -694,10 +694,10 @@ void fn_80222ADC(void) {
 extern u8 fn_802096E8();
 extern u8 fn_802624CC();
 void fn_80226730(void) {
-    extern u8 fn_8011BEB4();
-    u32 fieldD9 = fn_8012640C(fn_801F025C(0x11, 0), 0, 0xD9, 0);
+    extern u8 wazaGetStatus();
+    u32 fieldD9 = pokemonGetStatus(fn_801F025C(0x11, 0), 0, 0xD9, 0);
 
-    if (fn_8011BEB4(fieldD9, 0, 0x2b, 0) == 2 && fn_802096E8(fieldD9) == 1) {
+    if (wazaGetStatus(fieldD9, 0, 0x2b, 0) == 2 && fn_802096E8(fieldD9) == 1) {
         fn_801F4C14(0, 0, 0x52, 0, 0x7631);
         if (fn_802624CC(0x7631) == 1) {
             lbl_80478D78[7] = 1;
@@ -775,7 +775,7 @@ s32 fightSeqGetItemType(u16 itemId) {
  * Trainer-data lookup helper: reads TrainerDataGet field 0x43 off ctx
  * (masked to u16), forwards that value into a second TrainerDataGet
  * call (result discarded -- side effect only), then returns field 0xeb
- * of the caller-supplied object via fn_8012640C. Part of a 100-byte
+ * of the caller-supplied object via pokemonGetStatus. Part of a 100-byte
  * template family (0x802358AC-0x80236BFC) that differs only in the
  * final field constant.
  */
@@ -787,42 +787,42 @@ extern u32 fn_801FB1C0();
 u8 fn_802358AC(u32 ctx, u32 obj) {
     u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
     fn_801FB1C0(0, tmp, 2, 0);
-    return (u8)fn_8012640C(obj, 0, 0xeb, 0);
+    return (u8)pokemonGetStatus(obj, 0, 0xeb, 0);
 }
 
 /* fn_80235910 (0x80235910): same shape as fn_802358AC, field 0xea. */
 u8 fn_80235910(u32 ctx, u32 obj) {
     u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
     fn_801FB1C0(0, tmp, 2, 0);
-    return (u8)fn_8012640C(obj, 0, 0xea, 0);
+    return (u8)pokemonGetStatus(obj, 0, 0xea, 0);
 }
 
 /* fn_80235974 (0x80235974): same shape as fn_802358AC, field 0xe9. */
 u8 fn_80235974(u32 ctx, u32 obj) {
     u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
     fn_801FB1C0(0, tmp, 2, 0);
-    return (u8)fn_8012640C(obj, 0, 0xe9, 0);
+    return (u8)pokemonGetStatus(obj, 0, 0xe9, 0);
 }
 
 /* fn_802359D8 (0x802359D8): same shape as fn_802358AC, field 0xe8. */
 u8 fn_802359D8(u32 ctx, u32 obj) {
     u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
     fn_801FB1C0(0, tmp, 2, 0);
-    return (u8)fn_8012640C(obj, 0, 0xe8, 0);
+    return (u8)pokemonGetStatus(obj, 0, 0xe8, 0);
 }
 
 /* fn_80235A3C (0x80235A3C): same shape as fn_802358AC, field 0xe7. */
 u8 fn_80235A3C(u32 ctx, u32 obj) {
     u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
     fn_801FB1C0(0, tmp, 2, 0);
-    return (u8)fn_8012640C(obj, 0, 0xe7, 0);
+    return (u8)pokemonGetStatus(obj, 0, 0xe7, 0);
 }
 
 /* fn_80235AA0 (0x80235AA0): same shape as fn_802358AC, field 0xe6. */
 u8 fn_80235AA0(u32 ctx, u32 obj) {
     u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
     fn_801FB1C0(0, tmp, 2, 0);
-    return (u8)fn_8012640C(obj, 0, 0xe6, 0);
+    return (u8)pokemonGetStatus(obj, 0, 0xe6, 0);
 }
 
 /* fn_80236458 (0x80236458): same shape as fn_802358AC, field 0xef,
@@ -830,48 +830,48 @@ u8 fn_80235AA0(u32 ctx, u32 obj) {
 u16 fn_80236458(u32 ctx, u32 obj) {
     u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
     fn_801FB1C0(0, tmp, 2, 0);
-    return (u16)fn_8012640C(obj, 0, 0xef, 0);
+    return (u16)pokemonGetStatus(obj, 0, 0xef, 0);
 }
 
 /* fn_802364BC (0x802364BC): same shape as fn_80236458, field 0xf0. */
 u16 fn_802364BC(u32 ctx, u32 obj) {
     u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
     fn_801FB1C0(0, tmp, 2, 0);
-    return (u16)fn_8012640C(obj, 0, 0xf0, 0);
+    return (u16)pokemonGetStatus(obj, 0, 0xf0, 0);
 }
 
 /* fn_80236520 (0x80236520): same shape as fn_80236458, field 0xf1. */
 u16 fn_80236520(u32 ctx, u32 obj) {
     u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
     fn_801FB1C0(0, tmp, 2, 0);
-    return (u16)fn_8012640C(obj, 0, 0xf1, 0);
+    return (u16)pokemonGetStatus(obj, 0, 0xf1, 0);
 }
 
 /* fn_80236B98 (0x80236B98): same shape as fn_80236458, field 0xfa. */
 u16 fn_80236B98(u32 ctx, u32 obj) {
     u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
     fn_801FB1C0(0, tmp, 2, 0);
-    return (u16)fn_8012640C(obj, 0, 0xfa, 0);
+    return (u16)pokemonGetStatus(obj, 0, 0xfa, 0);
 }
 
 /*
  * fn_802391E0 (0x802391E0)
  *
  * Same TrainerDataGet lookup shape as fn_802358AC, but the third call
- * goes through fn_8011BEB4 (field accessor) instead of fn_8012640C.
+ * goes through wazaGetStatus (field accessor) instead of pokemonGetStatus.
  */
-extern s32 fn_8011BEB4();
+extern s32 wazaGetStatus();
 u8 fn_802391E0(u32 ctx, u32 obj) {
     u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
     fn_801FB1C0(0, tmp, 2, 0);
-    return (u8)fn_8011BEB4(0, obj, 2, 0);
+    return (u8)wazaGetStatus(0, obj, 2, 0);
 }
 
 /* fn_80239244 (0x80239244): same shape as fn_802391E0, field 0x5. */
 u8 fn_80239244(u32 ctx, u32 obj) {
     u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
     fn_801FB1C0(0, tmp, 2, 0);
-    return (u8)fn_8011BEB4(0, obj, 5, 0);
+    return (u8)wazaGetStatus(0, obj, 5, 0);
 }
 
 /*
@@ -881,27 +881,27 @@ u8 fn_80239244(u32 ctx, u32 obj) {
 s16 fn_80239500(u32 ctx, u32 obj) {
     u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
     fn_801FB1C0(0, tmp, 2, 0);
-    return (s16)fn_8011BEB4(0, obj, 7, 0);
+    return (s16)wazaGetStatus(0, obj, 7, 0);
 }
 
 /* fn_80239564 (0x80239564): same shape as fn_802391E0, field 0xc. */
 u8 fn_80239564(u32 ctx, u32 obj) {
     u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
     fn_801FB1C0(0, tmp, 2, 0);
-    return (u8)fn_8011BEB4(0, obj, 0xc, 0);
+    return (u8)wazaGetStatus(0, obj, 0xc, 0);
 }
 
 /*
  * fn_80239498 (0x80239498)
  *
  * Same TrainerDataGet lookup shape, but takes a third parameter (val)
- * that is threaded through to the final fn_8011BEB4 call as the write
+ * that is threaded through to the final wazaGetStatus call as the write
  * value at field 0x1a.
  */
 u8 fn_80239498(u32 ctx, u32 obj, u8 val) {
     u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
     fn_801FB1C0(0, tmp, 2, 0);
-    return (u8)fn_8011BEB4(0, obj, 0x1a, val);
+    return (u8)wazaGetStatus(0, obj, 0x1a, val);
 }
 #pragma dont_inline reset
 

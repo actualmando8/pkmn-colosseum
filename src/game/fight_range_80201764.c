@@ -15,7 +15,7 @@
  */
 #include "dolphin/types.h"
 
-extern void* fn_8012640C(void* context, u32 slot, u16 tableId, u32 flags);
+extern void* pokemonGetStatus(void* context, u32 slot, u16 tableId, u32 flags);
 
 /* 0x80201764 | size: 0x12C */
 #pragma scheduling off
@@ -27,12 +27,12 @@ u16 fn_80201764(void* context, void* item, void* target) {
     void* partyList;
     void* pokemon;
     if (fn_80119ED0(item) == 0x7C || fn_80119ED0(item) == 0xC8 || fn_80119ED0(item) == 0xCD) {
-        partyList = fn_8012640C(context, 0, 0xD6, 0);
+        partyList = pokemonGetStatus(context, 0, 0xD6, 0);
         if (fn_80119ED0(item) == 0x7C || fn_80119ED0(item) == 0xC8) {
             if (partyList == NULL) {
                 pokemon = NULL;
             } else {
-                pokemon = fn_8012640C(partyList, 0, 0xCC, 0);
+                pokemon = pokemonGetStatus(partyList, 0, 0xCC, 0);
             }
             return fn_801214FC(pokemon, item, target);
         } else if (fn_80119ED0(item) == 0xCD) {
@@ -54,12 +54,12 @@ u16 fn_80201890(void* ctx, void* typeObj) {
     extern u16 fn_80121574();
     void* resolved;
     if (fn_80119ED0(typeObj) == 0x7C || fn_80119ED0(typeObj) == 0xC8 || fn_80119ED0(typeObj) == 0xCD) {
-        resolved = fn_8012640C(ctx, 0, 0xD6, 0);
+        resolved = pokemonGetStatus(ctx, 0, 0xD6, 0);
         if (fn_80119ED0(typeObj) == 0x7C || fn_80119ED0(typeObj) == 0xC8) {
             if (resolved == NULL) {
                 resolved = NULL;
             } else {
-                resolved = fn_8012640C(resolved, 0, 0xCC, 0);
+                resolved = pokemonGetStatus(resolved, 0, 0xCC, 0);
             }
             return fn_80121574(resolved, typeObj);
         }
@@ -86,18 +86,18 @@ u16 fn_802019BC(void* ctx, void* src, void* typeObj) {
     void* srcResolved;
     void* ctxResolved;
     if (fn_80119ED0(typeObj) == 0x7C || fn_80119ED0(typeObj) == 0xC8 || fn_80119ED0(typeObj) == 0xCD) {
-        srcResolved = fn_8012640C(src, 0, 0xD6, 0);
-        ctxResolved = fn_8012640C(ctx, 0, 0xD6, 0);
+        srcResolved = pokemonGetStatus(src, 0, 0xD6, 0);
+        ctxResolved = pokemonGetStatus(ctx, 0, 0xD6, 0);
         if (fn_80119ED0(typeObj) == 0x7C || fn_80119ED0(typeObj) == 0xC8) {
             if (ctxResolved == NULL) {
                 ctxResolved = NULL;
             } else {
-                ctxResolved = fn_8012640C(ctxResolved, 0, 0xCC, 0);
+                ctxResolved = pokemonGetStatus(ctxResolved, 0, 0xCC, 0);
             }
             if (srcResolved == NULL) {
                 srcResolved = NULL;
             } else {
-                srcResolved = fn_8012640C(srcResolved, 0, 0xCC, 0);
+                srcResolved = pokemonGetStatus(srcResolved, 0, 0xCC, 0);
             }
             return fn_80121484(ctxResolved, srcResolved, typeObj);
         } else if (fn_80119ED0(typeObj) == 0xCD) {
@@ -119,12 +119,12 @@ u16 fn_80201B2C(void* ctx, void* typeObj, u32 param) {
     extern u16 fn_801215E4();
     void* resolved;
     if (fn_80119ED0(typeObj) == 0x7C || fn_80119ED0(typeObj) == 0xC8 || fn_80119ED0(typeObj) == 0xCD) {
-        resolved = fn_8012640C(ctx, 0, 0xD6, 0);
+        resolved = pokemonGetStatus(ctx, 0, 0xD6, 0);
         if (fn_80119ED0(typeObj) == 0x7C || fn_80119ED0(typeObj) == 0xC8) {
             if (resolved == NULL) {
                 resolved = NULL;
             } else {
-                resolved = fn_8012640C(resolved, 0, 0xCC, 0);
+                resolved = pokemonGetStatus(resolved, 0, 0xCC, 0);
             }
             return fn_801215E4(resolved, typeObj, param);
         } else if (fn_80119ED0(typeObj) == 0xCD) {
@@ -146,12 +146,12 @@ u16 fn_80201C58(void* ctx, void* typeObj) {
     extern u16 fn_8012165C();
     void* resolved;
     if (fn_80119ED0(typeObj) == 0x7C || fn_80119ED0(typeObj) == 0xC8 || fn_80119ED0(typeObj) == 0xCD) {
-        resolved = fn_8012640C(ctx, 0, 0xD6, 0);
+        resolved = pokemonGetStatus(ctx, 0, 0xD6, 0);
         if (fn_80119ED0(typeObj) == 0x7C || fn_80119ED0(typeObj) == 0xC8) {
             if (resolved == NULL) {
                 resolved = NULL;
             } else {
-                resolved = fn_8012640C(resolved, 0, 0xCC, 0);
+                resolved = pokemonGetStatus(resolved, 0, 0xCC, 0);
             }
             return fn_8012165C(resolved, typeObj);
         }
@@ -177,12 +177,12 @@ u16 fn_80201D84(void* ctx, void* typeObj) {
     extern u16 fn_801216CC();
     void* resolved;
     if (fn_80119ED0(typeObj) == 0x7C || fn_80119ED0(typeObj) == 0xC8 || fn_80119ED0(typeObj) == 0xCD) {
-        resolved = fn_8012640C(ctx, 0, 0xD6, 0);
+        resolved = pokemonGetStatus(ctx, 0, 0xD6, 0);
         if (fn_80119ED0(typeObj) == 0x7C || fn_80119ED0(typeObj) == 0xC8) {
             if (resolved == NULL) {
                 resolved = NULL;
             } else {
-                resolved = fn_8012640C(resolved, 0, 0xCC, 0);
+                resolved = pokemonGetStatus(resolved, 0, 0xCC, 0);
             }
             return fn_801216CC(resolved, typeObj);
         }
@@ -208,12 +208,12 @@ u16 fn_80201EB0(void* ctx, void* typeObj, u32 param) {
     extern u16 fn_8012173C();
     void* resolved;
     if (fn_80119ED0(typeObj) == 0x7C || fn_80119ED0(typeObj) == 0xC8 || fn_80119ED0(typeObj) == 0xCD) {
-        resolved = fn_8012640C(ctx, 0, 0xD6, 0);
+        resolved = pokemonGetStatus(ctx, 0, 0xD6, 0);
         if (fn_80119ED0(typeObj) == 0x7C || fn_80119ED0(typeObj) == 0xC8) {
             if (resolved == NULL) {
                 resolved = NULL;
             } else {
-                resolved = fn_8012640C(resolved, 0, 0xCC, 0);
+                resolved = pokemonGetStatus(resolved, 0, 0xCC, 0);
             }
             return fn_8012173C(resolved, typeObj, param);
         } else if (fn_80119ED0(typeObj) == 0xCD) {
@@ -235,12 +235,12 @@ u16 fn_80201FDC(void* ctx, void* typeObj, u32 param) {
     extern u16 fn_801217B4();
     void* resolved;
     if (fn_80119ED0(typeObj) == 0x7C || fn_80119ED0(typeObj) == 0xC8 || fn_80119ED0(typeObj) == 0xCD) {
-        resolved = fn_8012640C(ctx, 0, 0xD6, 0);
+        resolved = pokemonGetStatus(ctx, 0, 0xD6, 0);
         if (fn_80119ED0(typeObj) == 0x7C || fn_80119ED0(typeObj) == 0xC8) {
             if (resolved == NULL) {
                 resolved = NULL;
             } else {
-                resolved = fn_8012640C(resolved, 0, 0xCC, 0);
+                resolved = pokemonGetStatus(resolved, 0, 0xCC, 0);
             }
             return fn_801217B4(resolved, typeObj, param);
         } else if (fn_80119ED0(typeObj) == 0xCD) {
@@ -262,12 +262,12 @@ u16 fn_80202108(void* ctx, void* typeObj) {
     extern u16 fn_8012182C();
     void* resolved;
     if (fn_80119ED0(typeObj) == 0x7C || fn_80119ED0(typeObj) == 0xC8 || fn_80119ED0(typeObj) == 0xCD) {
-        resolved = fn_8012640C(ctx, 0, 0xD6, 0);
+        resolved = pokemonGetStatus(ctx, 0, 0xD6, 0);
         if (fn_80119ED0(typeObj) == 0x7C || fn_80119ED0(typeObj) == 0xC8) {
             if (resolved == NULL) {
                 resolved = NULL;
             } else {
-                resolved = fn_8012640C(resolved, 0, 0xCC, 0);
+                resolved = pokemonGetStatus(resolved, 0, 0xCC, 0);
             }
             return fn_8012182C(resolved, typeObj);
         }
@@ -293,12 +293,12 @@ u16 fn_80202234(void* ctx, void* typeObj) {
     extern u16 fn_8012189C();
     void* resolved;
     if (fn_80119ED0(typeObj) == 0x7C || fn_80119ED0(typeObj) == 0xC8 || fn_80119ED0(typeObj) == 0xCD) {
-        resolved = fn_8012640C(ctx, 0, 0xD6, 0);
+        resolved = pokemonGetStatus(ctx, 0, 0xD6, 0);
         if (fn_80119ED0(typeObj) == 0x7C || fn_80119ED0(typeObj) == 0xC8) {
             if (resolved == NULL) {
                 resolved = NULL;
             } else {
-                resolved = fn_8012640C(resolved, 0, 0xCC, 0);
+                resolved = pokemonGetStatus(resolved, 0, 0xCC, 0);
             }
             return fn_8012189C(resolved, typeObj);
         }
@@ -324,12 +324,12 @@ u16 fn_80202360(void* ctx, void* typeObj) {
     extern u16 fn_80121984();
     void* resolved;
     if (fn_80119ED0(typeObj) == 0x7C || fn_80119ED0(typeObj) == 0xC8 || fn_80119ED0(typeObj) == 0xCD) {
-        resolved = fn_8012640C(ctx, 0, 0xD6, 0);
+        resolved = pokemonGetStatus(ctx, 0, 0xD6, 0);
         if (fn_80119ED0(typeObj) == 0x7C || fn_80119ED0(typeObj) == 0xC8) {
             if (resolved == NULL) {
                 resolved = NULL;
             } else {
-                resolved = fn_8012640C(resolved, 0, 0xCC, 0);
+                resolved = pokemonGetStatus(resolved, 0, 0xCC, 0);
             }
             return fn_80121984(resolved, typeObj);
         }
@@ -355,12 +355,12 @@ u16 fn_8020248C(void* ctx, void* typeObj, u32 param) {
     extern u16 fn_801219F4();
     void* resolved;
     if (fn_80119ED0(typeObj) == 0x7C || fn_80119ED0(typeObj) == 0xC8 || fn_80119ED0(typeObj) == 0xCD) {
-        resolved = fn_8012640C(ctx, 0, 0xD6, 0);
+        resolved = pokemonGetStatus(ctx, 0, 0xD6, 0);
         if (fn_80119ED0(typeObj) == 0x7C || fn_80119ED0(typeObj) == 0xC8) {
             if (resolved == NULL) {
                 resolved = NULL;
             } else {
-                resolved = fn_8012640C(resolved, 0, 0xCC, 0);
+                resolved = pokemonGetStatus(resolved, 0, 0xCC, 0);
             }
             return fn_801219F4(resolved, typeObj, param);
         } else if (fn_80119ED0(typeObj) == 0xCD) {
@@ -382,12 +382,12 @@ u16 fn_802025B8(void* ctx, void* typeObj) {
     extern u16 fn_80121A6C();
     void* resolved;
     if (fn_80119ED0(typeObj) == 0x7C || fn_80119ED0(typeObj) == 0xC8 || fn_80119ED0(typeObj) == 0xCD) {
-        resolved = fn_8012640C(ctx, 0, 0xD6, 0);
+        resolved = pokemonGetStatus(ctx, 0, 0xD6, 0);
         if (fn_80119ED0(typeObj) == 0x7C || fn_80119ED0(typeObj) == 0xC8) {
             if (resolved == NULL) {
                 resolved = NULL;
             } else {
-                resolved = fn_8012640C(resolved, 0, 0xCC, 0);
+                resolved = pokemonGetStatus(resolved, 0, 0xCC, 0);
             }
             return fn_80121A6C(resolved, typeObj);
         }
@@ -413,12 +413,12 @@ u16 fn_802026E4(void* ctx, void* typeObj) {
     extern u16 fn_80121ADC();
     void* resolved;
     if (fn_80119ED0(typeObj) == 0x7C || fn_80119ED0(typeObj) == 0xC8 || fn_80119ED0(typeObj) == 0xCD) {
-        resolved = fn_8012640C(ctx, 0, 0xD6, 0);
+        resolved = pokemonGetStatus(ctx, 0, 0xD6, 0);
         if (fn_80119ED0(typeObj) == 0x7C || fn_80119ED0(typeObj) == 0xC8) {
             if (resolved == NULL) {
                 resolved = NULL;
             } else {
-                resolved = fn_8012640C(resolved, 0, 0xCC, 0);
+                resolved = pokemonGetStatus(resolved, 0, 0xCC, 0);
             }
             return fn_80121ADC(resolved, typeObj);
         }

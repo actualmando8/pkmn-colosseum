@@ -31,13 +31,13 @@
  *     Mirror of TrainerDataGet for writing values.
  *
  *   fn_80205B8C (GetTrainerPokemonPtr) - 668 calls, 0x58 bytes
- *     Navigates trainer -> party -> Pokemon by calling fn_8012640C twice:
+ *     Navigates trainer -> party -> Pokemon by calling pokemonGetStatus twice:
  *       First call:  field=0xD6 (get party list)
  *       Second call: field=0xCC (get Pokemon from party slot)
  *     Returns the Pokemon data pointer, or NULL on any failure.
  *
  *   fn_80205BE8 (GetTrainerPokemonPtrSingle) - related helper
- *     Single-step version: just calls fn_8012640C with field=0xCC.
+ *     Single-step version: just calls pokemonGetStatus with field=0xCC.
  *
  * TRAINER CATEGORY SUB-DISPATCHERS:
  *   fn_801FCCC4: Resolves battle trainer context. Likely reads from the
@@ -64,7 +64,7 @@
  *   fn_801FE710 (5 calls):  Clear event state
  *
  * COMMONLY CALLED EXTERNAL FUNCTIONS:
- *   fn_8012640C (1769 total calls): Master data table resolver.
+ *   pokemonGetStatus (1769 total calls): Master data table resolver.
  *     This is THE core data access primitive for the entire game.
  *     It takes (pointer, slot, tableID, flags) and resolves a pointer
  *     into the common_rel data tables. Table IDs seen:
@@ -73,8 +73,8 @@
  *       0x79 = Secondary Pokemon data
  *       0xE5 = Extended trainer info
  *
- *   fn_801254B4 (544 total calls): Data table write accessor.
- *     Mirror of fn_8012640C for writing values.
+ *   pokemonSetStatus (544 total calls): Data table write accessor.
+ *     Mirror of pokemonGetStatus for writing values.
  *
  * BSS STATE:
  *   lbl_8047B610 : u32, trainer system program counter / script position
@@ -97,17 +97,17 @@
  * External declarations
  * ========================================================================= */
 
-/* fn_8012640C - Master data table resolver
+/* pokemonGetStatus - Master data table resolver
  * The most-called function in the entire game (1769 calls).
  * Takes a context pointer, slot index, table ID, and flags.
  * Returns a pointer to the resolved data, or NULL. */
-extern void* fn_8012640C(void* context, u32 slot, u16 tableId, u32 flags);
+extern void* pokemonGetStatus(void* context, u32 slot, u16 tableId, u32 flags);
 
-/* fn_801254B4 - Master data table writer (544 calls) */
-extern u32 fn_801254B4(void* context, u32 slot, u16 tableId, u32 flags, u32 value);
+/* pokemonSetStatus - Master data table writer (544 calls) */
+extern u32 pokemonSetStatus(void* context, u32 slot, u16 tableId, u32 flags, u32 value);
 
-/* fn_80125424 - Data table auxiliary writer */
-extern void fn_80125424(void* context, u32 value);
+/* pokemonGrowBasisStatus - Data table auxiliary writer */
+extern void pokemonGrowBasisStatus(void* context, u32 value);
 
 /* itemGetStatus - Secondary data accessor (169 calls) */
 extern u32 itemGetStatus(u32 context, u32 param, u16 field, u32 flags);
@@ -2167,7 +2167,7 @@ void* fn_801F8518(void* context, u32 index) {
     if (pokemon == NULL) {
         return NULL;
     }
-    sub = fn_8012640C(pokemon, 0, 0xFE, 0);
+    sub = pokemonGetStatus(pokemon, 0, 0xFE, 0);
     if (sub == NULL) {
         return NULL;
     }
@@ -2217,10 +2217,10 @@ s32 fn_801F8638(void* context, void* target) {
 
 /* 0x801F86C0 | size: 0x10C */
 void fn_801F86C0(void* context, u8 flag) {
-    extern void fn_8011F5FC(void* ptr, void* pokemon);
+    extern void pokemonBiosCopy(void* ptr, void* pokemon);
     extern void fn_8012190C(void* ptr, u32 field, u32 val);
     extern u8 fn_80121ADC(void* ptr, u32 field);
-    extern u16 fn_801230E0(void* pokemon);
+    extern u16 pokemonGetSoubiItemDataId(void* pokemon);
     extern u8 fn_80206A04(void* ptr);
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u16 idx);
     void* slot;
@@ -2238,15 +2238,15 @@ void fn_801F86C0(void* context, u8 flag) {
             slot = NULL;
         }
         if (slot != NULL) {
-            if ((pokemon = fn_8012640C(slot, 0, 0xCC, 0)) != NULL) {
-                speciesId = fn_801230E0(pokemon);
-                if ((moveData = fn_8012640C(slot, 0, 0xCB, 0)) != NULL) {
-                    fn_8011F5FC(moveData, pokemon);
+            if ((pokemon = pokemonGetStatus(slot, 0, 0xCC, 0)) != NULL) {
+                speciesId = pokemonGetSoubiItemDataId(pokemon);
+                if ((moveData = pokemonGetStatus(slot, 0, 0xCB, 0)) != NULL) {
+                    pokemonBiosCopy(moveData, pokemon);
                     if ((u8)fn_80121ADC(moveData, 4) == 1) {
                         fn_8012190C(moveData, 4, 1);
                     }
                     if (flag == 1) {
-                        fn_801254B4(moveData, 0, 0x82, 0, speciesId);
+                        pokemonSetStatus(moveData, 0, 0x82, 0, speciesId);
                     }
                 }
             }
@@ -2725,7 +2725,7 @@ void* fn_801F8F24(void* context, s16 speciesId) {
             pokemon = NULL;
         }
         if (pokemon != NULL) {
-            if (species == (s16)(s32)fn_8012640C(pokemon, 0, 0xCE, 0)) {
+            if (species == (s16)(s32)pokemonGetStatus(pokemon, 0, 0xCE, 0)) {
                 return pokemon;
             }
         }
@@ -2805,10 +2805,10 @@ void fn_801F9130(void* unused, void* trainer, void* pokemon) {
         return;
     }
     for (i = 0; (s8)i < 4; i++) {
-        moveId = (u16)(u32)fn_8012640C(fn_80205B8C(trainer), 0, 0x7F, 0);
+        moveId = (u16)(u32)pokemonGetStatus(fn_80205B8C(trainer), 0, 0x7F, 0);
         slot = (s8)i;
         if ((u8)fn_801FFEC8(trainer, slot, 1, 0) == 0) {
-            moveId = (u16)(u32)fn_8012640C(fn_80205B8C(trainer), 0, 0x7F, slot);
+            moveId = (u16)(u32)pokemonGetStatus(fn_80205B8C(trainer), 0, 0x7F, slot);
             break;
         }
     }
@@ -3024,7 +3024,7 @@ void fn_801F93F8(void) {
         r4 = 0x0;
         r5 = 0xce;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         r3 = (s16)r3;
     } else {
 
@@ -3146,7 +3146,7 @@ void* fn_801F9930(void* context, void* moveData) {
     for (i = 0; (u16)i < 6; i++) {
         pokemon = fn_801FB1C0(context, 0, 0x45, i);
         if ((u8)fn_80206A04(pokemon) != 0) {
-            data = fn_8012640C(pokemon, 0, 0xCB, 0);
+            data = pokemonGetStatus(pokemon, 0, 0xCB, 0);
             if (data != NULL) {
                 if (moveData == data) {
                     return pokemon;
@@ -3159,8 +3159,8 @@ void* fn_801F9930(void* context, void* moveData) {
 
 /* 0x801F99C8 | size: 0x2F4 | large */
 void fn_801F99C8(void) {
-    extern void fn_80123FBC();
-    extern void fn_80124A60();
+    extern void pokemonCheckValid();
+    extern void pokemonInit();
     extern void heroCheckValid();
     extern void heroGetStatus();
     extern void fn_801EF634();
@@ -3295,7 +3295,7 @@ void fn_801F99C8(void) {
         r3 = (u32)sp + 0x20;
         *(u32*)(r27 + r4) = r26;
         r3 = r3 + r0;
-        fn_80124A60();
+        pokemonInit();
         r25 = r25 + 0x1;
 
     }
@@ -3320,7 +3320,7 @@ void fn_801F99C8(void) {
         r29 = *(u32*)(r28 + r0);
         if (r29 != (u32)0x0) {
             r3 = r29;
-            fn_80123FBC();
+            pokemonCheckValid();
             r0 = r3 & 0xFF;
             if (r29 != (u32)0x0) {
                 r0 = r25 & 0xFF;
@@ -3379,13 +3379,13 @@ void fn_801F9CBC(void) {
     extern void fn_800896B8();
     extern void fn_800896C8();
     extern void fn_800FA280();
-    extern void fn_80129280();
-    extern void fn_80129A78();
-    extern void fn_80129F20();
-    extern void fn_8012A1A4();
+    extern void savedataGetStatus();
+    extern void heroItemAddItemDataId();
+    extern void heroCatchPokemon();
+    extern void heroCreate();
     extern void heroSetStatus();
     extern void heroGetStatus();
-    extern void fn_8012AC64();
+    extern void heroBiosCopy();
     extern void fn_801F9F78();
     extern void fn_801FB1C0();
     u8 sp[0x150];
@@ -3444,11 +3444,11 @@ void fn_801F9CBC(void) {
     if (r0 == (u32)0x3) {
         r3 = 0x0;
         r4 = 0x2;
-        fn_80129280();
+        savedataGetStatus();
         /* mr. r4, r3 */;
         if (r0 == (u32)0x3) return;
         r3 = r31;
-        fn_8012AC64();
+        heroBiosCopy();
         return;
     }
     r4 = r30;
@@ -3478,7 +3478,7 @@ void fn_801F9CBC(void) {
     r3 = r31;
     r4 = r28;
     r5 = r29;
-    fn_8012A1A4();
+    heroCreate();
     r4 = r30;
     r3 = 0x0;
     r5 = 0x5;
@@ -3501,7 +3501,7 @@ void fn_801F9CBC(void) {
             r4 = 0x0;
             r5 = 0xc9;
             r6 = 0x0;
-            ((void(*)(void))fn_801254B4)();
+            ((void(*)(void))pokemonSetStatus)();
             r4 = r29;
             r3 = 0x0;
             r5 = 0x12;
@@ -3512,7 +3512,7 @@ void fn_801F9CBC(void) {
             r4 = (u32)sp + 0x8;
             r5 = 0x0;
             r7 = 0x0;
-            fn_80129F20();
+            heroCatchPokemon();
             r0 = (s16)r3;
         }
         if (r0 >= (u32)r3) {
@@ -3533,7 +3533,7 @@ void fn_801F9CBC(void) {
             r3 = r31;
             r5 = 0x1;
             r6 = -0x1;
-            fn_80129A78();
+            heroItemAddItemDataId();
             if ((s32)r3 < (s32)0x0) break;
         }
         r29 = r29 + 0x1;
@@ -3581,14 +3581,14 @@ void fn_801F9F78(void) {
     extern u8 lbl_80279C48[];
     extern u8 lbl_80279C54[];
     extern void fn_800FA280();
-    extern void fn_8011FCA4();
-    extern void fn_80123110();
-    extern void fn_80123D58();
-    extern void fn_801240C4();
-    extern void fn_80124410();
-    extern void fn_80124978();
-    extern void fn_80125314();
-    extern void fn_8012546C();
+    extern void pokemonSetDarkPokemonStatus();
+    extern void pokemonDoItemSoubi();
+    extern void pokemonWazaCreate();
+    extern void pokemonCreate();
+    extern void pokemonCreateRndFit();
+    extern void pokemonSetTokuseiFlag();
+    extern void pokemonWazaInit();
+    extern void pokemonResetBasisStatus();
     extern void fn_80135938();
     extern void fn_801EE750();
     extern void fn_801EE7BC();
@@ -3752,7 +3752,7 @@ void fn_801F9F78(void) {
     r3 = r31;
     r4 = r23;
     r5 = r21;
-    fn_801240C4();
+    pokemonCreate();
     if (r22 != (u32)0x0) {
         r3 = r22;
         fn_800FA280();
@@ -3761,7 +3761,7 @@ void fn_801F9F78(void) {
         r4 = 0x0;
         r5 = 0x77;
         r6 = 0x0;
-        ((void(*)(void))fn_801254B4)();
+        ((void(*)(void))pokemonSetStatus)();
     }
     r23 = r30;
     r22 = 0x0;
@@ -3784,7 +3784,7 @@ void fn_801F9F78(void) {
                 r5 = *(u16*)(r4 + r0);
                 r4 = 0x0;
                 r6 = 0x0;
-                ((void(*)(void))fn_801254B4)();
+                ((void(*)(void))pokemonSetStatus)();
                 goto L_801FA250;
         }
         }
@@ -3800,7 +3800,7 @@ void fn_801F9F78(void) {
             r7 = (s8)r4;
             r4 = 0x0;
             r6 = 0x0;
-            ((void(*)(void))fn_801254B4)();
+            ((void(*)(void))pokemonSetStatus)();
         }
         L_801FA250: ;
         r22 = r22 + 0x1;
@@ -3820,7 +3820,7 @@ void fn_801F9F78(void) {
             r3 = r31;
             r4 = 0x0;
             r6 = 0x0;
-            ((void(*)(void))fn_801254B4)();
+            ((void(*)(void))pokemonSetStatus)();
         }
         r20 = r20 + 0x1;
 
@@ -3829,20 +3829,20 @@ void fn_801F9F78(void) {
     if (r0 >= (u32)0x6) {
         r3 = r31;
         r4 = r27 & 0xFF;
-        fn_80124978();
+        pokemonSetTokuseiFlag();
     }
     if ((s32)r24 >= (s32)0x0) {
         if ((s32)r24 == (s32)0x0) {
             r3 = r31;
             r4 = 0x0;
             r5 = 0x0;
-            fn_80123110();
+            pokemonDoItemSoubi();
             goto L_801FA2E8;
         }
         r3 = r31;
         r4 = r24 & 0xFFFF;
         r5 = 0x1;
-        fn_80123110();
+        pokemonDoItemSoubi();
     }
     L_801FA2E8: ;
     r20 = (u32)sp + 0x2c;
@@ -3858,7 +3858,7 @@ void fn_801F9F78(void) {
 
                 r3 = r31;
                 r4 = r21;
-                fn_80125314();
+                pokemonWazaInit();
                 goto L_801FA368;
             }
             r0 = *(u32*)(r20 + r0);
@@ -3866,14 +3866,14 @@ void fn_801F9F78(void) {
             r3 = r31;
             r4 = r22;
             r5 = r0 & 0xFFFF;
-            fn_80123D58();
+            pokemonWazaCreate();
             r4 = (u32)sp + 0x8;
             r3 = r31;
             r7 = *(u8*)(r4 + r21);
             r6 = r22;
             r4 = 0x0;
             r5 = 0x81;
-            ((void(*)(void))fn_801254B4)();
+            ((void(*)(void))pokemonSetStatus)();
         }
         L_801FA368: ;
         r24 = r24 + 0x1;
@@ -3886,7 +3886,7 @@ void fn_801F9F78(void) {
         r4 = 0x0;
         r5 = 0x99;
         r6 = 0x0;
-        ((void(*)(void))fn_801254B4)();
+        ((void(*)(void))pokemonSetStatus)();
     }
     if (r30 != (u32)0x0) {
         r3 = r23;
@@ -3900,7 +3900,7 @@ void fn_801F9F78(void) {
             r4 = 0x0;
             r5 = 0x6f;
             r6 = 0x0;
-            ((void(*)(void))fn_801254B4)();
+            ((void(*)(void))pokemonSetStatus)();
             goto L_801FA408;
     }
     }
@@ -3909,18 +3909,18 @@ void fn_801F9F78(void) {
     r5 = r28;
     r7 = r25;
     r6 = 0x0;
-    fn_80124410();
+    pokemonCreateRndFit();
     r7 = r3;
     r3 = r31;
     r4 = 0x0;
     r5 = 0x6f;
     r6 = 0x0;
-    ((void(*)(void))fn_801254B4)();
+    ((void(*)(void))pokemonSetStatus)();
     L_801FA408: ;
     if (r30 != (u32)0x0) {
         r3 = r31;
         r4 = r23;
-        fn_8011FCA4();
+        pokemonSetDarkPokemonStatus();
         r3 = r23;
         fn_801EE8F4();
         r0 = r3 & 0xFF;
@@ -3929,7 +3929,7 @@ void fn_801F9F78(void) {
             r4 = 0x0;
             r5 = 0x6f;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             r4 = r3;
             r3 = r23;
             fn_801EE7BC();
@@ -3943,7 +3943,7 @@ void fn_801F9F78(void) {
                 r5 = *(u16*)(r21 + r0);
                 r4 = 0x0;
                 r6 = 0x0;
-                ((void(*)(void))fn_8012640C)();
+                ((void(*)(void))pokemonGetStatus)();
                 r0 = r3 & 0xFFFF;
                 r3 = r23;
                 r4 = r20 & 0xFF;
@@ -3955,7 +3955,7 @@ void fn_801F9F78(void) {
     }
     }
     r3 = r31;
-    fn_8012546C();
+    pokemonResetBasisStatus();
     r3 = 0x1;
 
     return;
@@ -4035,8 +4035,8 @@ u32 fn_801FA634(void* context) {
 
 /* 0x801FA6D8 | size: 0x1F4 | medium */
 void fn_801FA6D8(void* trainer, void* arg1, u16 arg2, u32 arg3, u32 arg4) {
-    extern void fn_8012A248(void* ptr);
-    extern void fn_8012AC64(void* ptr, void* arg);
+    extern void heroInit(void* ptr);
+    extern void heroBiosCopy(void* ptr, void* arg);
     extern void fightActionInit(void* ptr);
     extern void fn_801F198C(void);
     extern void fn_801FAA58(void* ctx, u32 slot, u32 field, u32 idx, u32 val);
@@ -4049,7 +4049,7 @@ void fn_801FA6D8(void* trainer, void* arg1, u16 arg2, u32 arg3, u32 arg4) {
 
     if (trainer != NULL && arg1 != NULL) {
         if (trainer != NULL) {
-            fn_8012A248(fn_801FB1C0(trainer, 0, 0x44, 0));
+            heroInit(fn_801FB1C0(trainer, 0, 0x44, 0));
             fn_801FAA58(trainer, 0, 0x43, 0, 0);
             fn_802077D4(fn_801FB1C0(trainer, 0, 0x45, 0), 6);
             fn_80206C3C(fn_801FB1C0(trainer, 0, 0x46, 0), 2);
@@ -4067,7 +4067,7 @@ void fn_801FA6D8(void* trainer, void* arg1, u16 arg2, u32 arg3, u32 arg4) {
         }
         result = fn_801FB1C0(trainer, 0, 0x44, 0);
         if (result != NULL) {
-            fn_8012AC64(result, arg1);
+            heroBiosCopy(result, arg1);
             fn_801FAA58(trainer, 0, 0x43, 0, arg2);
             fn_801FAA58(trainer, 0, 0x4B, 0, arg3);
             if (arg4 != 0) {
@@ -4080,7 +4080,7 @@ void fn_801FA6D8(void* trainer, void* arg1, u16 arg2, u32 arg3, u32 arg4) {
 
 /* 0x801FA8CC | size: 0x18C */
 void fn_801FA8CC(void* base, u16 count) {
-    extern void fn_8012A248(void* ptr);
+    extern void heroInit(void* ptr);
     extern void fightActionInit(void* ptr);
     extern void fn_801FAA58(void* ctx, u32 slot, u32 field, u32 idx, u32 val);
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 idx);
@@ -4098,7 +4098,7 @@ void fn_801FA8CC(void* base, u16 count) {
     for (i = 0; i < count; i++) {
         trainer = (u8*)base + i * 0x28E4;
         if (trainer != NULL) {
-            fn_8012A248(fn_801FB1C0(trainer, 0, 0x44, 0));
+            heroInit(fn_801FB1C0(trainer, 0, 0x44, 0));
             fn_801FAA58(trainer, 0, 0x43, 0, 0);
             fn_802077D4(fn_801FB1C0(trainer, 0, 0x45, 0), 6);
             fn_80206C3C(fn_801FB1C0(trainer, 0, 0x46, 0), 2);
@@ -5341,7 +5341,7 @@ void fn_801FBC20(void* context, void* trainerCtx, u8 mode) {
     if ((data = fn_801FB1C0(context, 0, 0x4C, 0)) == NULL) {
         return;
     }
-    typeId = (u8)(u32)fn_8012640C(fn_80205B8C(trainerCtx), 0, 0x73, 0);
+    typeId = (u8)(u32)pokemonGetStatus(fn_80205B8C(trainerCtx), 0, 0x73, 0);
     animId = (u16)itemGetStatus(0, typeId, 0x11, 0);
     if (mode == 0) {
         fn_801DDD28(data, animId, 4, 0);
@@ -5899,7 +5899,7 @@ void fn_801FDB78(void) {
         r4 = 0x0;
         r5 = 0xd6;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         r26 = r3;
         r3 = 0x10;
         fn_80119ED0();
@@ -5918,7 +5918,7 @@ void fn_801FDB78(void) {
                 r4 = 0x0;
                 r5 = 0xcc;
                 r6 = 0x0;
-                ((void(*)(void))fn_8012640C)();
+                ((void(*)(void))pokemonGetStatus)();
             }
             r4 = 0x10;
             fn_80121ADC();
@@ -5969,7 +5969,7 @@ void fn_801FDB78(void) {
             r4 = 0x0;
             r5 = 0xd6;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             r26 = r3;
             r3 = 0x10;
             fn_80119ED0();
@@ -5988,7 +5988,7 @@ void fn_801FDB78(void) {
                     r4 = 0x0;
                     r5 = 0xcc;
                     r6 = 0x0;
-                    ((void(*)(void))fn_8012640C)();
+                    ((void(*)(void))pokemonGetStatus)();
                 }
                 r4 = 0x10;
                 fn_80121574();
@@ -6038,7 +6038,7 @@ void fn_801FDB78(void) {
             r4 = 0x0;
             r5 = 0xd6;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             r26 = r3;
             r3 = 0x10;
             fn_80119ED0();
@@ -6057,7 +6057,7 @@ void fn_801FDB78(void) {
                     r4 = 0x0;
                     r5 = 0xcc;
                     r6 = 0x0;
-                    ((void(*)(void))fn_8012640C)();
+                    ((void(*)(void))pokemonGetStatus)();
                 }
                 r4 = 0x10;
                 fn_8012189C();
@@ -6107,7 +6107,7 @@ void fn_801FDB78(void) {
             r4 = 0x0;
             r5 = 0xd6;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             r26 = r3;
             r3 = 0x10;
             fn_80119ED0();
@@ -6126,7 +6126,7 @@ void fn_801FDB78(void) {
                     r4 = 0x0;
                     r5 = 0xcc;
                     r6 = 0x0;
-                    ((void(*)(void))fn_8012640C)();
+                    ((void(*)(void))pokemonGetStatus)();
                 }
                 r4 = 0x10;
                 fn_8012182C();
@@ -6176,7 +6176,7 @@ void fn_801FDB78(void) {
             r4 = 0x0;
             r5 = 0xd6;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             r31 = r3;
             r3 = 0x10;
             fn_80119ED0();
@@ -6195,7 +6195,7 @@ void fn_801FDB78(void) {
                     r4 = 0x0;
                     r5 = 0xcc;
                     r6 = 0x0;
-                    ((void(*)(void))fn_8012640C)();
+                    ((void(*)(void))pokemonGetStatus)();
                 }
                 r4 = 0x10;
                 fn_8012165C();
@@ -6240,7 +6240,7 @@ void fn_801FDB78(void) {
             r4 = 0x0;
             r5 = 0xd6;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             if (r3 == (u32)0x0) {
                 r3 = 0x0;
             } else {
@@ -6248,7 +6248,7 @@ void fn_801FDB78(void) {
                 r4 = 0x0;
                 r5 = 0xcc;
                 r6 = 0x0;
-                ((void(*)(void))fn_8012640C)();
+                ((void(*)(void))pokemonGetStatus)();
             }
             r26 = r3;
         }
@@ -6256,14 +6256,14 @@ void fn_801FDB78(void) {
         r4 = 0x0;
         r5 = 0x75;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         r0 = r3;
         r3 = r26;
         r26 = r0;
         r4 = 0x0;
         r5 = 0x6f;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         r30 = r3;
     }
     if (r28 != (u32)0x0) {
@@ -6280,9 +6280,9 @@ void fn_801FE168(void) {
     extern void fn_8001D994();
     extern void fn_80119ED0();
     extern void fn_8011B67C();
-    extern void fn_8011F5FC();
-    extern void fn_8011FDC8();
-    extern void fn_801202CC();
+    extern void pokemonBiosCopy();
+    extern void pokemonToMenuPokemonStatus();
+    extern void pokemonToMenuPokemonStatusSubBar();
     extern void fn_80121ADC();
     extern void fn_801F4354();
     extern void fn_801F54A4();
@@ -6305,7 +6305,7 @@ void fn_801FE168(void) {
     r31 = r4;
     r30 = r3;
     r4 = 0x0;
-    ((void(*)(void))fn_8012640C)();
+    ((void(*)(void))pokemonGetStatus)();
     if (r3 == (u32)0x0) {
         r3 = 0x0;
     } else {
@@ -6313,11 +6313,11 @@ void fn_801FE168(void) {
         r4 = 0x0;
         r5 = 0xcc;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
     }
     r4 = r3;
     r3 = (u32)sp + 0x10;
-    fn_8011F5FC();
+    pokemonBiosCopy();
     r3 = 0x10;
     fn_80119ED0();
     r0 = r3 & 0xFFFF;
@@ -6336,7 +6336,7 @@ void fn_801FE168(void) {
         r4 = 0x0;
         r5 = 0xd6;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         r29 = r3;
         r3 = 0x10;
         fn_80119ED0();
@@ -6355,7 +6355,7 @@ void fn_801FE168(void) {
                 r4 = 0x0;
                 r5 = 0xcc;
                 r6 = 0x0;
-                ((void(*)(void))fn_8012640C)();
+                ((void(*)(void))pokemonGetStatus)();
             }
             r4 = 0x10;
             fn_80121ADC();
@@ -6396,21 +6396,21 @@ void fn_801FE168(void) {
         r4 = 0x0;
         r5 = 0x6f;
         r6 = 0x0;
-        ((void(*)(void))fn_801254B4)();
+        ((void(*)(void))pokemonSetStatus)();
         r3 = (u32)sp + 0x10;
         r4 = 0x0;
         r5 = 0x75;
         r6 = 0x0;
-        ((void(*)(void))fn_801254B4)();
+        ((void(*)(void))pokemonSetStatus)();
     }
     r4 = r31;
     r3 = (u32)sp + 0x10;
-    fn_8011FDC8();
+    pokemonToMenuPokemonStatus();
     r3 = r30;
     r4 = 0x0;
     r5 = 0xd5;
     r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
+    ((void(*)(void))pokemonGetStatus)();
     if (r3 == (u32)0x0) {
         r29 = 0x0;
     } else {
@@ -6418,13 +6418,13 @@ void fn_801FE168(void) {
         r4 = 0x0;
         r5 = 0xcc;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         r29 = r3;
     }
     if (r29 != (u32)0x0) {
         r3 = r29;
         r4 = r31;
-        fn_801202CC();
+        pokemonToMenuPokemonStatusSubBar();
         r3 = r29;
         fn_8001D994();
         *(u8*)((u8*)r31 + 0x28) = r3;
@@ -6467,18 +6467,18 @@ void fn_801FE168(void) {
 
 /* 0x801FE3F8 | size: 0x70 */
 void fn_801FE3F8(void* context, u8* dest) {
-    extern void fn_801204A8(void* pokemon, u8* dest);
+    extern void pokemonToMenuWazaStatus(void* pokemon, u8* dest);
     void* partyList;
     void* pokemon;
 
-    partyList = fn_8012640C(context, 0, 0xD6, 0);
+    partyList = pokemonGetStatus(context, 0, 0xD6, 0);
     if (partyList == NULL) {
         pokemon = NULL;
     } else {
-        pokemon = fn_8012640C(partyList, 0, 0xCC, 0);
+        pokemon = pokemonGetStatus(partyList, 0, 0xCC, 0);
     }
     if (pokemon != NULL) {
-        fn_801204A8(pokemon, dest);
+        pokemonToMenuWazaStatus(pokemon, dest);
     }
     *(u32*)(dest + 0x40) = (u32)context;
 }
@@ -6491,14 +6491,14 @@ void fn_801FE468(void* context, u8* dest) {
         if (context == NULL) {
             pokemon = NULL;
         } else {
-            pokemon = fn_8012640C(context, 0, 0xCC, 0);
+            pokemon = pokemonGetStatus(context, 0, 0xCC, 0);
         }
-        *(u16*)(dest + 0x2) = (u16)(u32)fn_8012640C(pokemon, 0, 0x87, 0);
-        *(u16*)(dest + 0x4) = (u16)(u32)fn_8012640C(pokemon, 0, 0x88, 0);
-        *(u16*)(dest + 0x6) = (u16)(u32)fn_8012640C(pokemon, 0, 0x89, 0);
-        *(u16*)(dest + 0xA) = (u16)(u32)fn_8012640C(pokemon, 0, 0x8A, 0);
-        *(u16*)(dest + 0xC) = (u16)(u32)fn_8012640C(pokemon, 0, 0x8B, 0);
-        *(u16*)(dest + 0x8) = (u16)(u32)fn_8012640C(pokemon, 0, 0x8C, 0);
+        *(u16*)(dest + 0x2) = (u16)(u32)pokemonGetStatus(pokemon, 0, 0x87, 0);
+        *(u16*)(dest + 0x4) = (u16)(u32)pokemonGetStatus(pokemon, 0, 0x88, 0);
+        *(u16*)(dest + 0x6) = (u16)(u32)pokemonGetStatus(pokemon, 0, 0x89, 0);
+        *(u16*)(dest + 0xA) = (u16)(u32)pokemonGetStatus(pokemon, 0, 0x8A, 0);
+        *(u16*)(dest + 0xC) = (u16)(u32)pokemonGetStatus(pokemon, 0, 0x8B, 0);
+        *(u16*)(dest + 0x8) = (u16)(u32)pokemonGetStatus(pokemon, 0, 0x8C, 0);
         *(u8*)(dest + 0x0) = 0;
     }
 }
@@ -6515,7 +6515,7 @@ void fn_801FE55C(void* self, void* other, u32 offset) {
     if (self != NULL) {
         if (other != NULL) {
             if (self != other) {
-                data = fn_8012640C(other, 0, 0x122, 0);
+                data = pokemonGetStatus(other, 0, 0x122, 0);
                 if ((result = fn_8020E57C(data, 4, self)) != NULL) {
                     val = fn_801FD0BC(result);
                     val += offset;
@@ -6530,12 +6530,12 @@ void fn_801FE55C(void* self, void* other, u32 offset) {
 typedef struct { u16 fields[18]; } FieldTable18;
 static inline void* fn_801FE5D4_getSrcSlot(void* context)
 {
-    return fn_8012640C(context, 0, 0xD5, 0);
+    return pokemonGetStatus(context, 0, 0xD5, 0);
 }
 
 static inline void* fn_801FE5D4_getPokemon(void* slot)
 {
-    return fn_8012640C(slot, 0, 0xCC, 0);
+    return pokemonGetStatus(slot, 0, 0xCC, 0);
 }
 
 void fn_801FE5D4(void* context) {
@@ -6552,13 +6552,13 @@ void fn_801FE5D4(void* context) {
     for (i = 0; i < 18; i++) {
         fieldId = table.fields[i];
         srcSlot = fn_801FE5D4_getSrcSlot(context);
-        destSlot = fn_8012640C(context, 0, 0xD7, 0);
+        destSlot = pokemonGetStatus(context, 0, 0xD7, 0);
         if (srcSlot != NULL && destSlot != NULL) {
             if (srcSlot == NULL) {
                 srcPokemon = NULL;
             } else {
                 {
-                    void* tmp = fn_8012640C(srcSlot, 0, 0xCC, 0);
+                    void* tmp = pokemonGetStatus(srcSlot, 0, 0xCC, 0);
                     srcPokemon = tmp;
                 }
             }
@@ -6569,7 +6569,7 @@ void fn_801FE5D4(void* context) {
             } else {
                 destPokemon = fn_801FE5D4_getPokemon(destSlot);
             }
-            fn_801254B4(destPokemon, 0, fieldId, 0, (u32)fn_8012640C(srcPokemon, 0, fieldId, 0));
+            pokemonSetStatus(destPokemon, 0, fieldId, 0, (u32)pokemonGetStatus(srcPokemon, 0, fieldId, 0));
         }
     }
 }
@@ -6581,11 +6581,11 @@ void fn_801FE710(void* trainer, u16 eventId, u32 param) {
     u32 val;
 
     if ((u8)param == 1) {
-        src = fn_8012640C(trainer, 0, 0xD5, 0);
-        dst = fn_8012640C(trainer, 0, 0xD7, 0);
+        src = pokemonGetStatus(trainer, 0, 0xD5, 0);
+        dst = pokemonGetStatus(trainer, 0, 0xD7, 0);
     } else {
-        src = fn_8012640C(trainer, 0, 0xD7, 0);
-        dst = fn_8012640C(trainer, 0, 0xD5, 0);
+        src = pokemonGetStatus(trainer, 0, 0xD7, 0);
+        dst = pokemonGetStatus(trainer, 0, 0xD5, 0);
     }
     if (src == NULL) {
         return;
@@ -6593,15 +6593,15 @@ void fn_801FE710(void* trainer, u16 eventId, u32 param) {
     if (dst == NULL) {
         return;
     }
-    val = (u32)fn_8012640C(src, 0, eventId, 0);
-    fn_801254B4(dst, 0, eventId, 0, val);
+    val = (u32)pokemonGetStatus(src, 0, eventId, 0);
+    pokemonSetStatus(dst, 0, eventId, 0, val);
 }
 
 /* 0x801FE91C | size: 0x2F4 | large */
 void fn_801FE91C(void) {
     extern u8 lbl_80279CB8[];
     extern u8 lbl_80279CD4[];
-    extern void fn_8011BEB4();
+    extern void wazaGetStatus();
     u8 sp[0x60];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -6653,7 +6653,7 @@ void fn_801FE91C(void) {
         r4 = 0x0;
         r5 = 0xd6;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         if (r3 == (u32)0x0) {
             r3 = 0x0;
         } else {
@@ -6661,7 +6661,7 @@ void fn_801FE91C(void) {
             r4 = 0x0;
             r5 = 0xcc;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
         }
         r28 = r3;
     }
@@ -6673,7 +6673,7 @@ void fn_801FE91C(void) {
         r4 = 0x0;
         r5 = 0xd6;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         if (r3 == (u32)0x0) {
             r3 = 0x0;
         } else {
@@ -6681,7 +6681,7 @@ void fn_801FE91C(void) {
             r4 = 0x0;
             r5 = 0xcc;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
         }
         r27 = r3;
     }
@@ -6696,14 +6696,14 @@ void fn_801FE91C(void) {
         r4 = 0x0;
         r6 = 0x0;
         r5 = r26;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         r0 = r3;
         r3 = r27;
         r7 = r0;
         r5 = r26;
         r4 = 0x0;
         r6 = 0x0;
-        ((void(*)(void))fn_801254B4)();
+        ((void(*)(void))pokemonSetStatus)();
         r25 = r25 + 0x1;
 
     }
@@ -6716,32 +6716,32 @@ void fn_801FE91C(void) {
         r6 = r26;
         r4 = 0x0;
         r5 = 0x7f;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         r25 = r3;
         r3 = r27;
         r6 = r26;
         r4 = 0x0;
         r7 = r25;
         r5 = 0x7f;
-        ((void(*)(void))fn_801254B4)();
+        ((void(*)(void))pokemonSetStatus)();
         r4 = r25 & 0xFFFF;
         r3 = 0x0;
         r5 = 0x2;
         r6 = 0x0;
-        fn_8011BEB4();
+        wazaGetStatus();
         r0 = r3 & 0xFF;
         if (r0 < (u32)0x5) {
             r3 = r28;
             r6 = r26;
             r4 = 0x0;
             r5 = 0x80;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             r7 = r3;
             r3 = r27;
             r6 = r26;
             r4 = 0x0;
             r5 = 0x80;
-            ((void(*)(void))fn_801254B4)();
+            ((void(*)(void))pokemonSetStatus)();
         } else {
 
             r3 = r27;
@@ -6749,7 +6749,7 @@ void fn_801FE91C(void) {
             r4 = 0x0;
             r5 = 0x80;
             r7 = 0x5;
-            ((void(*)(void))fn_801254B4)();
+            ((void(*)(void))pokemonSetStatus)();
         }
         r29 = r29 + 0x1;
 
@@ -6765,13 +6765,13 @@ void fn_801FE91C(void) {
         r4 = 0x0;
         r6 = 0x0;
         r5 = r26;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         r7 = r3;
         r3 = r31;
         r5 = r26;
         r4 = 0x0;
         r6 = 0x0;
-        ((void(*)(void))fn_801254B4)();
+        ((void(*)(void))pokemonSetStatus)();
         r27 = r27 + 0x1;
 
     }
@@ -6779,13 +6779,13 @@ void fn_801FE91C(void) {
     r4 = 0x0;
     r5 = 0x100;
     r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
+    ((void(*)(void))pokemonGetStatus)();
     r7 = r3 & 0xFFFF;
     r3 = r31;
     r4 = 0x0;
     r5 = 0x100;
     r6 = 0x0;
-    ((void(*)(void))fn_801254B4)();
+    ((void(*)(void))pokemonSetStatus)();
     r27 = 0x0;
     while (1) {
         r0 = r27 & 0xFF;
@@ -6795,13 +6795,13 @@ void fn_801FE91C(void) {
         r6 = r26;
         r4 = 0x0;
         r5 = 0xff;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         r7 = r3 & 0xFFFF;
         r3 = r31;
         r6 = r26;
         r4 = 0x0;
         r5 = 0xff;
-        ((void(*)(void))fn_801254B4)();
+        ((void(*)(void))pokemonSetStatus)();
         r27 = r27 + 0x1;
 
     }
@@ -6812,7 +6812,7 @@ void fn_801FE91C(void) {
 /* 0x801FEC10 | size: 0xC4 */
 typedef struct { u8 data[0x154]; } CopyBlock_0x154;
 u32 fn_801FEC10(void* context) {
-    extern u32 fn_801254B4();
+    extern u32 pokemonSetStatus();
     CopyBlock_0x154* src;
     CopyBlock_0x154* dest;
     register CopyBlock_0x154* dest2;
@@ -6820,8 +6820,8 @@ u32 fn_801FEC10(void* context) {
     if (context == NULL) {
         return 0;
     }
-    src = (CopyBlock_0x154*)fn_8012640C(context, 0, 0xD5, 0);
-    dest = (CopyBlock_0x154*)fn_8012640C(context, 0, 0xD7, 0);
+    src = (CopyBlock_0x154*)pokemonGetStatus(context, 0, 0xD5, 0);
+    dest = (CopyBlock_0x154*)pokemonGetStatus(context, 0, 0xD7, 0);
     dest2 = dest;
     if (src == NULL) {
         return 0;
@@ -6830,7 +6830,7 @@ u32 fn_801FEC10(void* context) {
         return 0;
     }
     *dest2 = *src;
-    fn_801254B4(context, 0, 0xD6, 0, (u32)dest2);
+    pokemonSetStatus(context, 0, 0xD6, 0, (u32)dest2);
     return 1;
 }
 
@@ -6842,8 +6842,8 @@ u8 fn_801FECD4(void* trainer) {
     if (trainer == NULL) {
         return 0;
     }
-    a = fn_8012640C(trainer, 0, 0xD6, 0);
-    b = fn_8012640C(trainer, 0, 0xD7, 0);
+    a = pokemonGetStatus(trainer, 0, 0xD6, 0);
+    b = pokemonGetStatus(trainer, 0, 0xD7, 0);
     return (u8)(a == b);
 }
 
@@ -6886,7 +6886,7 @@ void fn_801FED3C(void) {
         r4 = 0x0;
         r5 = 0xd6;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         r29 = r3;
         r3 = 0x14;
         fn_80119ED0();
@@ -6905,7 +6905,7 @@ void fn_801FED3C(void) {
                 r4 = 0x0;
                 r5 = 0xcc;
                 r6 = 0x0;
-                ((void(*)(void))fn_8012640C)();
+                ((void(*)(void))pokemonGetStatus)();
             }
             r4 = 0x14;
             fn_80121ADC();
@@ -6956,7 +6956,7 @@ void fn_801FED3C(void) {
         r4 = 0x0;
         r5 = 0xd6;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         r29 = r3;
         r3 = 0x14;
         fn_80119ED0();
@@ -6975,7 +6975,7 @@ void fn_801FED3C(void) {
                 r4 = 0x0;
                 r5 = 0xcc;
                 r6 = 0x0;
-                ((void(*)(void))fn_8012640C)();
+                ((void(*)(void))pokemonGetStatus)();
             }
             r5 = r31;
             r4 = 0x14;
@@ -7022,12 +7022,12 @@ u8 fn_801FEF74(void* trainer) {
         return 0;
     }
     if (fn_80119ED0(0x14) == 0x7C || fn_80119ED0(0x14) == 0xC8 || fn_80119ED0(0x14) == 0xCD) {
-        obj = fn_8012640C(trainer, 0, 0xD6, 0);
+        obj = pokemonGetStatus(trainer, 0, 0xD6, 0);
         if (fn_80119ED0(0x14) == 0x7C || fn_80119ED0(0x14) == 0xC8) {
             if (obj == NULL) {
                 target = NULL;
             } else {
-                target = fn_8012640C(obj, 0, 0xCC, 0);
+                target = pokemonGetStatus(obj, 0, 0xCC, 0);
             }
             status = fn_80121ADC(target, 0x14);
         } else if (fn_80119ED0(0x14) != 0xCD) {
@@ -7042,12 +7042,12 @@ u8 fn_801FEF74(void* trainer) {
     }
     if (status == 1) {
         if (fn_80119ED0(0x14) == 0x7C || fn_80119ED0(0x14) == 0xC8 || fn_80119ED0(0x14) == 0xCD) {
-            obj2 = fn_8012640C(trainer, 0, 0xD6, 0);
+            obj2 = pokemonGetStatus(trainer, 0, 0xD6, 0);
             if (fn_80119ED0(0x14) == 0x7C || fn_80119ED0(0x14) == 0xC8) {
                 if (obj2 == NULL) {
                     target2 = NULL;
                 } else {
-                    target2 = fn_8012640C(obj2, 0, 0xCC, 0);
+                    target2 = pokemonGetStatus(obj2, 0, 0xCC, 0);
                 }
                 return fn_80121574(target2, 0x14);
             } else if (fn_80119ED0(0x14) != 0xCD) {
@@ -7077,8 +7077,8 @@ void fn_801FF1BC(void) {
     extern void fn_8012165C();
     extern void fn_80121ADC();
     extern void fn_80121B4C();
-    extern void fn_801233F4();
-    extern void fn_80123FBC();
+    extern void pokemonCheckFightOut();
+    extern void pokemonCheckValid();
     extern void fn_801EF634();
     extern void fn_801F0134();
     extern void fn_801F11CC();
@@ -7128,7 +7128,7 @@ void fn_801FF1BC(void) {
     r4 = 0x0;
     r5 = 0xd6;
     r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
+    ((void(*)(void))pokemonGetStatus)();
     /* mr. r26, r3 */;
     if (r0 != (u32)0x1) {
 
@@ -7142,10 +7142,10 @@ void fn_801FF1BC(void) {
     r4 = 0x0;
     r5 = 0xcb;
     r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
+    ((void(*)(void))pokemonGetStatus)();
     if (r3 != (u32)0x0) {
 
-    fn_80123FBC();
+    pokemonCheckValid();
     r0 = r3 & 0xFF;
     if (r3 != (u32)0x0) {
 
@@ -7157,11 +7157,11 @@ void fn_801FF1BC(void) {
     r4 = 0x0;
     r5 = 0xcc;
     r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
+    ((void(*)(void))pokemonGetStatus)();
     }
     if (r3 != (u32)0x0) {
 
-    fn_80123FBC();
+    pokemonCheckValid();
     r0 = r3 & 0xFF;
     if (r3 != (u32)0x0) {
 
@@ -7169,7 +7169,7 @@ void fn_801FF1BC(void) {
     r4 = 0x0;
     r5 = 0xce;
     r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
+    ((void(*)(void))pokemonGetStatus)();
     if ((s32)r3 >= (s32)0x0) {
 
     r0 = 0x1;
@@ -7195,14 +7195,14 @@ void fn_801FF1BC(void) {
         r4 = 0x0;
         r5 = 0x120;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
     if ((s32)r3 != (s32)0x1) {
 
             r3 = r31;
             r4 = 0x0;
             r5 = 0xd6;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             /* mr. r26, r3 */;
             if ((s32)r3 != (s32)0x1) {
 
@@ -7216,10 +7216,10 @@ void fn_801FF1BC(void) {
             r4 = 0x0;
             r5 = 0xcb;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             if (r3 != (u32)0x0) {
 
-            fn_80123FBC();
+            pokemonCheckValid();
             r0 = r3 & 0xFF;
             if (r3 != (u32)0x0) {
 
@@ -7231,11 +7231,11 @@ void fn_801FF1BC(void) {
             r4 = 0x0;
             r5 = 0xcc;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             }
             if (r3 != (u32)0x0) {
 
-            fn_80123FBC();
+            pokemonCheckValid();
             r0 = r3 & 0xFF;
             if (r3 != (u32)0x0) {
 
@@ -7243,7 +7243,7 @@ void fn_801FF1BC(void) {
             r4 = 0x0;
             r5 = 0xce;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             if ((s32)r3 >= (s32)0x0) {
 
             r0 = 0x1;
@@ -7261,7 +7261,7 @@ void fn_801FF1BC(void) {
             r4 = 0x0;
             r5 = 0xd2;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             if ((s32)r3 != (s32)0x1) {
 
             if (r26 == (u32)0x0) {
@@ -7272,11 +7272,11 @@ void fn_801FF1BC(void) {
             r4 = 0x0;
             r5 = 0xcc;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             }
             if (r3 != (u32)0x0) {
 
-            fn_801233F4();
+            pokemonCheckFightOut();
             r0 = r3 & 0xFF;
             if (r3 != (u32)0x0) {
 
@@ -7307,7 +7307,7 @@ void fn_801FF1BC(void) {
         r4 = 0x0;
         r5 = 0xd6;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         if (r3 == (u32)0x0) {
             r3 = 0x0;
         } else {
@@ -7315,7 +7315,7 @@ void fn_801FF1BC(void) {
             r4 = 0x0;
             r5 = 0xcc;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
         }
         r29 = r3;
     }
@@ -7341,7 +7341,7 @@ void fn_801FF1BC(void) {
             r4 = 0x0;
             r5 = 0xd9;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             if (r3 != (u32)0x0) {
                 r6 = r26;
                 r4 = -0x1;
@@ -7352,7 +7352,7 @@ void fn_801FF1BC(void) {
                 r4 = 0x0;
                 r5 = 0xfe;
                 r6 = 0x0;
-                ((void(*)(void))fn_8012640C)();
+                ((void(*)(void))pokemonGetStatus)();
                 /* mr. r26, r3 */;
                 if (r3 != (u32)0x0) {
                     r4 = (u32)lbl_80375CA8;
@@ -7392,7 +7392,7 @@ void fn_801FF1BC(void) {
         r4 = 0x0;
         r5 = 0xd6;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         r26 = r3;
         r3 = 0x2a;
         fn_80119ED0();
@@ -7411,7 +7411,7 @@ void fn_801FF1BC(void) {
                 r4 = 0x0;
                 r5 = 0xcc;
                 r6 = 0x0;
-                ((void(*)(void))fn_8012640C)();
+                ((void(*)(void))pokemonGetStatus)();
             }
             r4 = 0x2a;
             fn_80121ADC();
@@ -7462,7 +7462,7 @@ void fn_801FF1BC(void) {
         r4 = 0x0;
         r5 = 0xd6;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         r26 = r3;
         r3 = 0x2a;
         fn_80119ED0();
@@ -7481,7 +7481,7 @@ void fn_801FF1BC(void) {
                 r4 = 0x0;
                 r5 = 0xcc;
                 r6 = 0x0;
-                ((void(*)(void))fn_8012640C)();
+                ((void(*)(void))pokemonGetStatus)();
             }
             r4 = 0x2a;
             fn_8012165C();
@@ -7533,7 +7533,7 @@ void fn_801FF1BC(void) {
         r4 = 0x0;
         r5 = 0xd6;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         r26 = r3;
         r3 = 0x2a;
         fn_80119ED0();
@@ -7552,7 +7552,7 @@ void fn_801FF1BC(void) {
                 r4 = 0x0;
                 r5 = 0xcc;
                 r6 = 0x0;
-                ((void(*)(void))fn_8012640C)();
+                ((void(*)(void))pokemonGetStatus)();
             }
             r4 = 0x2a;
             fn_80121574();
@@ -7590,7 +7590,7 @@ void fn_801FF1BC(void) {
     r6 = r26 & 0xFFFF;
     r4 = 0x0;
     r5 = 0x7f;
-    ((void(*)(void))fn_8012640C)();
+    ((void(*)(void))pokemonGetStatus)();
     r0 = r28 & 0xFF;
     r28 = r3 & 0xFFFF;
     if (r0 == (u32)0xd8) { r3 = 0x2; return; }
@@ -7601,7 +7601,7 @@ void fn_801FF1BC(void) {
     r4 = 0x0;
     r5 = 0xee;
     r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
+    ((void(*)(void))pokemonGetStatus)();
     r3 = 0x2a;
     fn_80119ED0();
     r0 = r3 & 0xFFFF;
@@ -7620,7 +7620,7 @@ void fn_801FF1BC(void) {
         r4 = 0x0;
         r5 = 0xd6;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         r27 = r3;
         r3 = 0x2a;
         fn_80119ED0();
@@ -7639,7 +7639,7 @@ void fn_801FF1BC(void) {
                 r4 = 0x0;
                 r5 = 0xcc;
                 r6 = 0x0;
-                ((void(*)(void))fn_8012640C)();
+                ((void(*)(void))pokemonGetStatus)();
             }
             r4 = 0x2a;
             fn_80121B4C();
@@ -7678,7 +7678,7 @@ void fn_801FF1BC(void) {
     r4 = 0x0;
     r5 = 0xd9;
     r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
+    ((void(*)(void))pokemonGetStatus)();
     if (r3 == (u32)0x0) { r3 = 0x2; return; }
     r4 = r27;
     r5 = r28;
@@ -7689,7 +7689,7 @@ void fn_801FF1BC(void) {
     r4 = 0x0;
     r5 = 0xfe;
     r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
+    ((void(*)(void))pokemonGetStatus)();
     /* mr. r26, r3 */;
     if (r3 == (u32)0x0) { r3 = 0x2; return; }
     r4 = (u32)lbl_80375CA8;
@@ -7720,7 +7720,7 @@ void fn_801FFB30(void) {
     extern void fn_8011B67C();
     extern void fn_80121574();
     extern void fn_80121ADC();
-    extern void fn_80123CD4();
+    extern void pokemonWazaCheckValid();
     extern void fn_801FFEC8();
     u8 sp[0x20];
     u32 r0 = 0;
@@ -7757,18 +7757,18 @@ void fn_801FFB30(void) {
             r4 = 0x0;
             r5 = 0xd6;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             if (r3 != (u32)0x0) {
 
                 r4 = 0x0;
                 r5 = 0xcc;
                 r6 = 0x0;
-                ((void(*)(void))fn_8012640C)();
+                ((void(*)(void))pokemonGetStatus)();
             }
         }
             r29 = r28 & 0xFF;
             r4 = r29;
-            fn_80123CD4();
+            pokemonWazaCheckValid();
             r0 = r3 & 0xFF;
             do {
             if (r3 == (u32)0x0) break;
@@ -7778,19 +7778,19 @@ void fn_801FFB30(void) {
             r4 = 0x0;
             r5 = 0xd6;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             if (r3 != (u32)0x0) {
 
                 r4 = 0x0;
                 r5 = 0xcc;
                 r6 = 0x0;
-                ((void(*)(void))fn_8012640C)();
+                ((void(*)(void))pokemonGetStatus)();
             }
         }
             r6 = r29;
             r4 = 0x0;
             r5 = 0x7f;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             r0 = r3 & 0xFFFF;
             if (r3 == (u32)0x0 || r0 == (u32)0x165 || r0 == (u32)0x163) break;
 
@@ -7830,7 +7830,7 @@ void fn_801FFB30(void) {
         r4 = 0x0;
         r5 = 0xd6;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         r30 = r3;
         r3 = 0x2a;
         fn_80119ED0();
@@ -7849,7 +7849,7 @@ void fn_801FFB30(void) {
                 r4 = 0x0;
                 r5 = 0xcc;
                 r6 = 0x0;
-                ((void(*)(void))fn_8012640C)();
+                ((void(*)(void))pokemonGetStatus)();
             }
             r4 = 0x2a;
             fn_80121ADC();
@@ -7900,7 +7900,7 @@ void fn_801FFB30(void) {
         r4 = 0x0;
         r5 = 0xd6;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         r30 = r3;
         r3 = 0x2a;
         fn_80119ED0();
@@ -7919,7 +7919,7 @@ void fn_801FFB30(void) {
                 r4 = 0x0;
                 r5 = 0xcc;
                 r6 = 0x0;
-                ((void(*)(void))fn_8012640C)();
+                ((void(*)(void))pokemonGetStatus)();
             }
             r4 = 0x2a;
             fn_80121574();
@@ -7975,12 +7975,12 @@ void fn_801FFEC8(void) {
     extern void fn_8011A6D4();
     extern void fn_8011B67C();
     extern void fn_8011B788();
-    extern void fn_8011BEB4();
+    extern void wazaGetStatus();
     extern void fn_8012165C();
     extern void fn_80121ADC();
     extern void fn_80121B4C();
-    extern void fn_80123090();
-    extern void fn_80123CD4();
+    extern void pokemonGetSoubiItemSoubiDataId();
+    extern void pokemonWazaCheckValid();
     extern void fn_801DA36C();
     extern void fn_801F1F30();
     u8 sp[0x50];
@@ -8021,7 +8021,7 @@ void fn_801FFEC8(void) {
         r4 = 0x0;
         r5 = 0xd6;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         if (r3 == (u32)0x0) {
             r3 = 0x0;
         } else {
@@ -8029,7 +8029,7 @@ void fn_801FFEC8(void) {
             r4 = 0x0;
             r5 = 0xcc;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
         }
         r26 = r3;
     }
@@ -8037,25 +8037,25 @@ void fn_801FFEC8(void) {
     r6 = r25;
     r4 = 0x0;
     r5 = 0x7f;
-    ((void(*)(void))fn_8012640C)();
+    ((void(*)(void))pokemonGetStatus)();
     r29 = r3 & 0xFFFF;
     r3 = 0x0;
     r4 = r29;
     r5 = 0x7;
     r6 = 0x0;
-    fn_8011BEB4();
+    wazaGetStatus();
     r22 = r3 & 0xFFFF;
     r3 = r26;
     r6 = r25;
     r4 = 0x0;
     r5 = 0x80;
-    ((void(*)(void))fn_8012640C)();
+    ((void(*)(void))pokemonGetStatus)();
     r21 = r3 & 0xFF;
     r3 = r31;
     r4 = 0x0;
     r5 = 0xd6;
     r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
+    ((void(*)(void))pokemonGetStatus)();
     /* mr. r28, r3 */;
     if (r3 == (u32)0x0) {
         r27 = 0x0;
@@ -8064,7 +8064,7 @@ void fn_801FFEC8(void) {
         r4 = 0x0;
         r5 = 0xcc;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         r27 = r3;
     }
     if (r27 != (u32)0x0) {
@@ -8086,7 +8086,7 @@ void fn_801FFEC8(void) {
         r4 = 0x0;
         r5 = 0xcc;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         }
         r4 = 0x3d;
         fn_80121ADC();
@@ -8108,7 +8108,7 @@ void fn_801FFEC8(void) {
     if (r0 != (u32)0x1) {
 
         r3 = r27;
-        fn_80123090();
+        pokemonGetSoubiItemSoubiDataId();
         r27 = r3;
     }
     }
@@ -8116,7 +8116,7 @@ void fn_801FFEC8(void) {
     r4 = 0x0;
     r5 = 0xf0;
     r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
+    ((void(*)(void))pokemonGetStatus)();
     r28 = r3 & 0xFFFF;
     r3 = 0x29;
     fn_80119ED0();
@@ -8136,7 +8136,7 @@ void fn_801FFEC8(void) {
         r4 = 0x0;
         r5 = 0xd6;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         r20 = r3;
         r3 = 0x29;
         fn_80119ED0();
@@ -8155,7 +8155,7 @@ void fn_801FFEC8(void) {
                 r4 = 0x0;
                 r5 = 0xcc;
                 r6 = 0x0;
-                ((void(*)(void))fn_8012640C)();
+                ((void(*)(void))pokemonGetStatus)();
             }
             r4 = 0x29;
             fn_80121ADC();
@@ -8206,7 +8206,7 @@ void fn_801FFEC8(void) {
             r4 = 0x0;
             r5 = 0xd6;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             r20 = r3;
             r3 = 0x29;
             fn_80119ED0();
@@ -8225,7 +8225,7 @@ void fn_801FFEC8(void) {
                     r4 = 0x0;
                     r5 = 0xcc;
                     r6 = 0x0;
-                    ((void(*)(void))fn_8012640C)();
+                    ((void(*)(void))pokemonGetStatus)();
                 }
                 r4 = 0x29;
                 fn_8012165C();
@@ -8280,7 +8280,7 @@ void fn_801FFEC8(void) {
         r4 = 0x0;
         r5 = 0xd6;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         r20 = r3;
         r3 = 0x1b;
         fn_80119ED0();
@@ -8299,7 +8299,7 @@ void fn_801FFEC8(void) {
                 r4 = 0x0;
                 r5 = 0xcc;
                 r6 = 0x0;
-                ((void(*)(void))fn_8012640C)();
+                ((void(*)(void))pokemonGetStatus)();
             }
             r4 = 0x1b;
             fn_80121ADC();
@@ -8375,7 +8375,7 @@ void fn_801FFEC8(void) {
                         r4 = 0x0;
                         r5 = 0xd6;
                         r6 = 0x0;
-                        ((void(*)(void))fn_8012640C)();
+                        ((void(*)(void))pokemonGetStatus)();
                         r20 = r3;
                         r3 = r28;
                         fn_80119ED0();
@@ -8394,7 +8394,7 @@ void fn_801FFEC8(void) {
                                 r4 = 0x0;
                                 r5 = 0xcc;
                                 r6 = 0x0;
-                                ((void(*)(void))fn_8012640C)();
+                                ((void(*)(void))pokemonGetStatus)();
                             }
                             r4 = r28;
                             fn_80121ADC();
@@ -8432,7 +8432,7 @@ void fn_801FFEC8(void) {
                     r4 = 0x0;
                     r5 = 0xee;
                     r6 = 0x0;
-                    ((void(*)(void))fn_8012640C)();
+                    ((void(*)(void))pokemonGetStatus)();
                     r20 = r3;
                     if (r28 == (u32)0x0) {
                         if (r20 != (u32)0x0) {
@@ -8474,7 +8474,7 @@ void fn_801FFEC8(void) {
                         r4 = 0x0;
                         r5 = 0xd6;
                         r6 = 0x0;
-                        ((void(*)(void))fn_8012640C)();
+                        ((void(*)(void))pokemonGetStatus)();
                         r20 = r3;
                         r3 = r28;
                         fn_80119ED0();
@@ -8493,7 +8493,7 @@ void fn_801FFEC8(void) {
                                 r4 = 0x0;
                                 r5 = 0xcc;
                                 r6 = 0x0;
-                                ((void(*)(void))fn_8012640C)();
+                                ((void(*)(void))pokemonGetStatus)();
                             }
                             r4 = r28;
                             fn_80121B4C();
@@ -8541,7 +8541,7 @@ void fn_801FFEC8(void) {
         r4 = 0x0;
         r5 = 0xd6;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         r20 = r3;
         r3 = 0x30;
         fn_80119ED0();
@@ -8560,7 +8560,7 @@ void fn_801FFEC8(void) {
                 r4 = 0x0;
                 r5 = 0xcc;
                 r6 = 0x0;
-                ((void(*)(void))fn_8012640C)();
+                ((void(*)(void))pokemonGetStatus)();
             }
             r4 = 0x30;
             fn_80121ADC();
@@ -8624,7 +8624,7 @@ void fn_801FFEC8(void) {
             r4 = 0x0;
             r5 = 0xd6;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             r20 = r3;
             r3 = 0x36;
             fn_80119ED0();
@@ -8643,7 +8643,7 @@ void fn_801FFEC8(void) {
                     r4 = 0x0;
                     r5 = 0xcc;
                     r6 = 0x0;
-                    ((void(*)(void))fn_8012640C)();
+                    ((void(*)(void))pokemonGetStatus)();
                 }
                 r4 = 0x36;
                 fn_80121ADC();
@@ -8694,7 +8694,7 @@ void fn_801FFEC8(void) {
                 r4 = 0x0;
                 r5 = 0xd6;
                 r6 = 0x0;
-                ((void(*)(void))fn_8012640C)();
+                ((void(*)(void))pokemonGetStatus)();
                 r20 = r3;
                 r3 = 0x36;
                 fn_80119ED0();
@@ -8713,7 +8713,7 @@ void fn_801FFEC8(void) {
                         r4 = 0x0;
                         r5 = 0xcc;
                         r6 = 0x0;
-                        ((void(*)(void))fn_8012640C)();
+                        ((void(*)(void))pokemonGetStatus)();
                     }
                     r4 = 0x36;
                     fn_8012165C();
@@ -8757,7 +8757,7 @@ void fn_801FFEC8(void) {
     }
     r3 = r26;
     r4 = r25;
-    fn_80123CD4();
+    pokemonWazaCheckValid();
     r0 = r3 & 0xFF;
     if (r23 != (u32)0x0) {
         if (r21 != (u32)0x0) { r3 = r30; return; }
@@ -8781,7 +8781,7 @@ u32 fightOutPokemonCheckNoAttackFlag(void* context) {
         return 0;
     }
     for (i = 0; i < 9; i++) {
-        if ((s32)fn_8012640C(context, 0, table.fields[i], 0) == 1) {
+        if ((s32)pokemonGetStatus(context, 0, table.fields[i], 0) == 1) {
             return 1;
         }
     }
@@ -8853,7 +8853,7 @@ void fn_80200B10(void) {
             r4 = 0x0;
             r5 = 0xd6;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             r27 = r3;
             r3 = r28;
             fn_80119ED0();
@@ -8872,7 +8872,7 @@ void fn_80200B10(void) {
                     r4 = 0x0;
                     r5 = 0xcc;
                     r6 = 0x0;
-                    ((void(*)(void))fn_8012640C)();
+                    ((void(*)(void))pokemonGetStatus)();
                 }
                 r4 = r28;
                 fn_80121ADC();
@@ -8910,7 +8910,7 @@ void fn_80200B10(void) {
         r4 = 0x0;
         r5 = 0xee;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         r27 = r3;
         if (r28 == (u32)0x0) {
             if (r27 != (u32)0x0) {
@@ -8952,7 +8952,7 @@ void fn_80200B10(void) {
             r4 = 0x0;
             r5 = 0xd6;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             r27 = r3;
             r3 = r28;
             fn_80119ED0();
@@ -8971,7 +8971,7 @@ void fn_80200B10(void) {
                     r4 = 0x0;
                     r5 = 0xcc;
                     r6 = 0x0;
-                    ((void(*)(void))fn_8012640C)();
+                    ((void(*)(void))pokemonGetStatus)();
                 }
                 r4 = r28;
                 fn_80121B4C();
@@ -9054,7 +9054,7 @@ void fn_80200E00(void) {
             r4 = 0x0;
             r5 = 0xd6;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             r27 = r3;
             r3 = r28;
             fn_80119ED0();
@@ -9073,7 +9073,7 @@ void fn_80200E00(void) {
                     r4 = 0x0;
                     r5 = 0xcc;
                     r6 = 0x0;
-                    ((void(*)(void))fn_8012640C)();
+                    ((void(*)(void))pokemonGetStatus)();
                 }
                 r4 = r28;
                 fn_80121ADC();
@@ -9111,7 +9111,7 @@ void fn_80200E00(void) {
         r4 = 0x0;
         r5 = 0xee;
         r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        ((void(*)(void))pokemonGetStatus)();
         r27 = r3;
         if (r28 == (u32)0x0) {
             if (r27 != (u32)0x0) {
@@ -9153,7 +9153,7 @@ void fn_80200E00(void) {
             r4 = 0x0;
             r5 = 0xd6;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             r27 = r3;
             r3 = r28;
             fn_80119ED0();
@@ -9172,7 +9172,7 @@ void fn_80200E00(void) {
                     r4 = 0x0;
                     r5 = 0xcc;
                     r6 = 0x0;
-                    ((void(*)(void))fn_8012640C)();
+                    ((void(*)(void))pokemonGetStatus)();
                 }
                 r4 = r28;
                 fn_80121B4C();
@@ -9255,7 +9255,7 @@ void fn_802010C8(void) {
             r4 = 0x0;
             r5 = 0xd6;
             r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
+            ((void(*)(void))pokemonGetStatus)();
             r27 = r3;
             r3 = r30;
             fn_80119ED0();
@@ -9274,7 +9274,7 @@ void fn_802010C8(void) {
                     r4 = 0x0;
                     r5 = 0xcc;
                     r6 = 0x0;
-                    ((void(*)(void))fn_8012640C)();
+                    ((void(*)(void))pokemonGetStatus)();
                 }
                 r4 = r30;
                 fn_80121ADC();
@@ -9331,7 +9331,7 @@ u8 fn_80201248(void* context, u16* output) {
     if (context == NULL) {
         return 0;
     }
-    entryList = (u8*)fn_8012640C(context, 0, 0x122, 0);
+    entryList = (u8*)pokemonGetStatus(context, 0, 0x122, 0);
     for (i = 0; i < 4; i++) {
         if (output != NULL) {
             output[i] = 0;
@@ -9368,8 +9368,8 @@ void fn_80201340(void* context, void* target, u16 value) {
     if (context == NULL) {
         return;
     }
-    fn_801254B4(context, 0, 0xF7, 0, value);
-    data = (u8*)fn_8012640C(context, 0, 0x122, 0);
+    pokemonSetStatus(context, 0, 0xF7, 0, value);
+    data = (u8*)pokemonGetStatus(context, 0, 0x122, 0);
     if (target != NULL) {
         if (fn_8020E57C((void*)data, 4, target) == NULL) {
             return;
@@ -9391,54 +9391,54 @@ void fn_80201340(void* context, void* target, u16 value) {
 
 /* 0x80201400 | size: 0x7C */
 s32 fn_80201400(void* arg0, u32 arg1) {
-    extern s32 fn_80120D6C(void*, u32);
+    extern s32 pokemonGetTasteLike(void*, u32);
     void* result;
 
-    result = fn_8012640C(arg0, 0, 0xD6, 0);
+    result = pokemonGetStatus(arg0, 0, 0xD6, 0);
     if (result == NULL) {
         return -1;
     }
     if (result == NULL) {
         result = NULL;
     } else {
-        result = fn_8012640C(result, 0, 0xCC, 0);
+        result = pokemonGetStatus(result, 0, 0xCC, 0);
     }
     if (result == NULL) {
         return -1;
     }
-    return fn_80120D6C(result, arg1);
+    return pokemonGetTasteLike(result, arg1);
 }
 
 /* 0x8020147C | size: 0xF0 */
 u16 fn_8020147C(void* context, u16 moveId, u8 slot, u8 updateFlag) {
-    extern u16 fn_80123110(void* pokemon, u16 moveId, u8 slot);
+    extern u16 pokemonDoItemSoubi(void* pokemon, u16 moveId, u8 slot);
     void* partyList;
     void* pokemon;
     u16 result;
 
-    partyList = fn_8012640C(context, 0, 0xD6, 0);
+    partyList = pokemonGetStatus(context, 0, 0xD6, 0);
     if (partyList == NULL) {
         return 0;
     }
     if (partyList == NULL) {
         pokemon = NULL;
     } else {
-        pokemon = fn_8012640C(partyList, 0, 0xCC, 0);
+        pokemon = pokemonGetStatus(partyList, 0, 0xCC, 0);
     }
     if (pokemon == NULL) {
         result = 0;
     } else {
-        result = fn_80123110(pokemon, moveId, slot);
+        result = pokemonDoItemSoubi(pokemon, moveId, slot);
     }
     if (updateFlag == 1) {
         if (slot == 0) {
             if (result != 0) {
-                fn_801254B4(context, 0, 0xFA, 0, result);
+                pokemonSetStatus(context, 0, 0xFA, 0, result);
             }
         }
         if (slot == 1) {
             if (moveId != 0) {
-                fn_801254B4(context, 0, 0xFA, 0, 0);
+                pokemonSetStatus(context, 0, 0xFA, 0, 0);
             }
         }
     }
@@ -9456,7 +9456,7 @@ u32 fightOutPokemonGetAllAbiCnt(void* context) {
     table = lbl_80279C80;
     sum = 0;
     for (i = 0; i < 7; i++) {
-        sum = (sum + (u32)fn_8012640C(context, 0, table.fields[i], 0)) & 0xFFFF;
+        sum = (sum + (u32)pokemonGetStatus(context, 0, table.fields[i], 0)) & 0xFFFF;
     }
     return sum;
 }
@@ -9471,44 +9471,44 @@ void fn_80201600(void* dest, void* src) {
     table = lbl_80279C70;
     for (i = 0; i < 7; i++) {
         fieldId = table.fields[i];
-        fn_801254B4(dest, 0, fieldId, 0, (u32)fn_8012640C(src, 0, fieldId, 0));
+        pokemonSetStatus(dest, 0, fieldId, 0, (u32)pokemonGetStatus(src, 0, fieldId, 0));
     }
 }
 
 /* 0x802016A4 | size: 0x60 */
 void* fn_802016A4(void* arg0) {
-    extern void* fn_801231A4(void*);
+    extern void* pokemonGetSex(void*);
     void* result;
 
-    result = fn_8012640C(arg0, 0, 0xD6, 0);
+    result = pokemonGetStatus(arg0, 0, 0xD6, 0);
     if (result == NULL) {
         result = NULL;
     } else {
-        result = fn_8012640C(result, 0, 0xCC, 0);
+        result = pokemonGetStatus(result, 0, 0xCC, 0);
     }
     if (result == NULL) {
         result = NULL;
     } else {
-        result = fn_801231A4(result);
+        result = pokemonGetSex(result);
     }
     return result;
 }
 
 /* 0x80201704 | size: 0x60 */
 void* fn_80201704(void* arg0) {
-    extern void* fn_80121410(void*);
+    extern void* pokemonIsHpMantan(void*);
     void* result;
 
-    result = fn_8012640C(arg0, 0, 0xD6, 0);
+    result = pokemonGetStatus(arg0, 0, 0xD6, 0);
     if (result == NULL) {
         result = NULL;
     } else {
-        result = fn_8012640C(result, 0, 0xCC, 0);
+        result = pokemonGetStatus(result, 0, 0xCC, 0);
     }
     if (result == NULL) {
         result = NULL;
     } else {
-        result = fn_80121410(result);
+        result = pokemonIsHpMantan(result);
     }
     return result;
 }

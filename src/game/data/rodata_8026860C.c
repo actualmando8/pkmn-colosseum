@@ -1,6 +1,6 @@
 #include "dolphin/types.h"
 
-extern u8 fn_8012795C[];
+extern u8 pokemonSetLevelBasisStatus[];
 extern u8 fn_80197C70[];
 extern u8 fn_80218018[];
 extern u8 lbl_80311D38[];
@@ -3713,7 +3713,7 @@ const void* lbl_8026C7F8[2676] = {
     (void*)0x7FF37FF9,
     (void*)0x98DC8006,
     (void*)0x8004800B,
-    (void*)((u8*)fn_8012795C + 0x6BC),
+    (void*)((u8*)pokemonSetLevelBasisStatus + 0x6BC),
     (void*)((u8*)fn_80197C70 + 0x3AC),
     (void*)((u8*)fn_80218018 + 0x10),
     (void*)lbl_803F803B,

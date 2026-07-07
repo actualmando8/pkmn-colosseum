@@ -38,7 +38,7 @@
  *
  * Address range: 0x80114CA8 - 0x80130CE0
  *
- * Note: fn_8012640C (5456 bytes) and fn_801254B4 (3928 bytes) are
+ * Note: pokemonGetStatus (5456 bytes) and pokemonSetStatus (3928 bytes) are
  * unmatched target slots that belong to this unit, but they are NOT
  * "field transition" / "field rendering" state machines -- that claim,
  * and fictional (void)-signature definitions named
@@ -46,9 +46,9 @@
  * GSfield_ProcessTriggers occupying their address comments, have been
  * removed. Cross-file call-site evidence (~1769 and ~350 call sites
  * respectively, consistently using a (context, slot, tableId, flags[,
- * value]) signature -- see trainer.c) shows fn_8012640C/fn_801254B4 are
+ * value]) signature -- see trainer.c) shows pokemonGetStatus/pokemonSetStatus are
  * the master data-table resolver/writer, still undecompiled. The other
- * two claimed addresses, fn_80124A60 and fn_8012CA84, are real and
+ * two claimed addresses, pokemonInit and fn_8012CA84, are real and
  * already implemented further below in this file (100% and ~71%
  * matched respectively).
  */
@@ -104,10 +104,10 @@ extern u32 lbl_80478B50;  /* field obj count (SDA) */
 extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
 extern u32 lbl_80478F94;  /* obj data base (SDA) */
 /* Field subsystems -- forward declarations (defined below) */
-u32  fn_80115094(void);
-u32 fn_80115A38(u8* entry);
+u32  _unloadFlare__FPvUlUl(void);
+u32 floorDataBiosGetFileGroupID(u8* entry);
 void fn_80117C84(void);
-void fn_8012546C(void* ptr);
+void pokemonResetBasisStatus(void* ptr);
 /* ===== String constants (rodata) ===== */
 extern const char lbl_80272770[]; /* "floorUpdateFieldCamera: error updating..." */
 extern const char lbl_802724E8[]; /* "floorReadMapPreFunc: can't alloc..." */
@@ -264,21 +264,21 @@ void floorUpdateFieldCamera_Pseudocode(void) {
     f26 = *(f64*)(sp + 0x40);
     return;
 }
-/* Note: fn_8012640C is the master data-table resolver called with a
+/* Note: pokemonGetStatus is the master data-table resolver called with a
  * (context, slot, tableId, flags) signature across ~1769 call sites
  * throughout the codebase (see trainer.c). It is not yet decompiled
  * (missing from this unit); a prior fictional (void)-signature
  * "GSfield_TransitionStateMachine" definition claiming this address
  * has been removed -- the real function takes arguments and its
  * body is unrelated to field transitions. */
-/* Note: fn_801254B4 is the master data-table writer called with a
+/* Note: pokemonSetStatus is the master data-table writer called with a
  * (context, slot, tableId, flags, value) signature across ~350 call
  * sites throughout the codebase (see trainer.c). It is not yet
  * decompiled (missing from this unit); a prior fictional
  * (void)-signature "GSfield_RenderPass" definition claiming this
  * address has been removed -- the real function takes arguments and
  * its body is unrelated to rendering. */
-/* Note: fn_80124A60 (field-object init, 2008 bytes) is implemented and
+/* Note: pokemonInit (field-object init, 2008 bytes) is implemented and
  * matched at 100% further below in this file. A prior fictional
  * (void)-signature "GSfield_ObjectBatchUpdate" duplicate claiming
  * this address has been removed. */
@@ -418,22 +418,22 @@ u16 fn_8011A090(u8* ptr) {
     return *(u16*)(&ptr[0x0]);
 }
 /* Address: 0x8011C420 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C420(u8* ptr, u8 val) {
+void wazaDataBiosSetRiskFlag(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0x13]) = val;
 }
 /* Address: 0x8011C570 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011C570(u8* ptr) {
+u8 wazaDataBiosGetRiskFlag(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0x13]);
 }
 /* Address: 0x8011C5B8 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C5B8(u8* ptr, u8 val) {
+void wazaDataBiosSetHidenFlag(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0x12]) = val;
 }
 /* Address: 0x8011C5C8 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011C5C8(u8* ptr) {
+u8 wazaDataBiosGetHidenFlag(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0x12]);
 }
@@ -448,127 +448,127 @@ void fn_8011C5F0(u8* ptr, u8 val) {
     *(u8*)(&ptr[0x14]) = val;
 }
 /* Address: 0x8011C600 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C600(u8* ptr, u32 val) {
+void wazaDataBiosSetDoc(u8* ptr, u32 val) {
     if (ptr == NULL) { return; }
     *(u32*)(&ptr[0x2C]) = val;
 }
 /* Address: 0x8011C610 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C610(u8* ptr, u32 val) {
+void wazaDataBiosSetWazawzxdataId(u8* ptr, u32 val) {
     if (ptr == NULL) { return; }
     *(u32*)(&ptr[0x30]) = val;
 }
 /* Address: 0x8011C620 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C620(u8* ptr, u8 val) {
+void wazaDataBiosSetPressure(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0x11]) = val;
 }
 /* Address: 0x8011C630 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C630(u8* ptr, u8 val) {
+void wazaDataBiosSetBouon(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0x10]) = val;
 }
 /* Address: 0x8011C640 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C640(u8* ptr, u8 val) {
+void wazaDataBiosSetNegoto(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0xF]) = val;
 }
 /* Address: 0x8011C650 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C650(u8* ptr, u8 val) {
+void wazaDataBiosSetNekonote(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0xE]) = val;
 }
 /* Address: 0x8011C660 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C660(u8* ptr, u8 val) {
+void wazaDataBiosSetMonomane(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0xD]) = val;
 }
 /* Address: 0x8011C670 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C670(u8* ptr, u8 val) {
+void wazaDataBiosSetYubiwohuru(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0xC]) = val;
 }
 /* Address: 0x8011C680 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C680(u8* ptr, u8 val) {
+void wazaDataBiosSetOujanosirusi(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0xB]) = val;
 }
 /* Address: 0x8011C690 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C690(u8* ptr, u8 val) {
+void wazaDataBiosSetOumugaesi(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0xA]) = val;
 }
 /* Address: 0x8011C6A0 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C6A0(u8* ptr, u8 val) {
+void wazaDataBiosSetYokodori(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0x9]) = val;
 }
 /* Address: 0x8011C6B0 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C6B0(u8* ptr, u8 val) {
+void wazaDataBiosSetMajikku(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0x8]) = val;
 }
 /* Address: 0x8011C6C0 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C6C0(u8* ptr, u8 val) {
+void wazaDataBiosSetMamoru(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0x7]) = val;
 }
 /* Address: 0x8011C6D0 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C6D0(u8* ptr, u8 val) {
+void wazaDataBiosSetDageki(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0x6]) = val;
 }
 /* Address: 0x8011C6E0 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C6E0(u8* ptr, u8 val) {
+void wazaDataBiosSetAddFightKoukaAvg(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0x5]) = val;
 }
 /* Address: 0x8011C6F0 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C6F0(u8* ptr, u32 val) {
+void wazaDataBiosSetFightAttackMsgId(u8* ptr, u32 val) {
     if (ptr == NULL) { return; }
     *(u32*)(&ptr[0x28]) = val;
 }
 /* Address: 0x8011C700 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C700(u8* ptr, u16 val) {
+void wazaDataBiosSetSeqId(u8* ptr, u16 val) {
     if (ptr == NULL) { return; }
     *(u16*)(&ptr[0x1A]) = val;
 }
 /* Address: 0x8011C710 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C710(u8* ptr, u16 val) {
+void wazaDataBiosSetFightKoukaDataId(u8* ptr, u16 val) {
     if (ptr == NULL) { return; }
     *(u16*)(&ptr[0x18]) = val;
 }
 /* Address: 0x8011C720 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C720(u8* ptr, u16 val) {
+void wazaDataBiosSetIryoku(u8* ptr, u16 val) {
     if (ptr == NULL) { return; }
     *(u16*)(&ptr[0x16]) = val;
 }
 /* Address: 0x8011C730 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C730(u8* ptr, u8 val) {
+void wazaDataBiosSetAvg(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0x4]) = val;
 }
 /* Address: 0x8011C740 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C740(u8* ptr, u8 val) {
+void wazaDataBiosSetRangeId(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0x3]) = val;
 }
 /* Address: 0x8011C750 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C750(u8* ptr, u8 val) {
+void wazaDataBiosSetPri(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0x0]) = val;
 }
 /* Address: 0x8011C760 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C760(u8* ptr, u8 val) {
+void wazaDataBiosSetZokuseiDataId(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0x2]) = val;
 }
 /* Address: 0x8011C770 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C770(u8* ptr, u8 val) {
+void wazaDataBiosSetPp(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0x1]) = val;
 }
 /* Address: 0x8011C780 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011C780(u8* ptr, u32 val) {
+void wazaDataBiosSetName(u8* ptr, u32 val) {
     if (ptr == NULL) { return; }
     *(u32*)(&ptr[0x20]) = val;
 }
@@ -583,132 +583,132 @@ u8 fn_8011C7A8(u8* ptr) {
     return *(u8*)(&ptr[0x14]);
 }
 /* Address: 0x8011C7C0 | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fn_8011C7C0(u8* ptr) {
+u32 wazaDataBiosGetDoc(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u32*)(&ptr[0x2C]);
 }
 /* Address: 0x8011C7D8 | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fn_8011C7D8(u8* ptr) {
+u32 wazaDataBiosGetWazawzxdataId(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u32*)(&ptr[0x30]);
 }
 /* Address: 0x8011C7F0 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011C7F0(u8* ptr) {
+u8 wazaDataBiosGetPressure(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0x11]);
 }
 /* Address: 0x8011C808 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011C808(u8* ptr) {
+u8 wazaDataBiosGetBouon(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0x10]);
 }
 /* Address: 0x8011C820 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011C820(u8* ptr) {
+u8 wazaDataBiosGetNegoto(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0xF]);
 }
 /* Address: 0x8011C838 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011C838(u8* ptr) {
+u8 wazaDataBiosGetNekonote(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0xE]);
 }
 /* Address: 0x8011C850 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011C850(u8* ptr) {
+u8 wazaDataBiosGetMonomane(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0xD]);
 }
 /* Address: 0x8011C868 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011C868(u8* ptr) {
+u8 wazaDataBiosGetYubiwohuru(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0xC]);
 }
 /* Address: 0x8011C880 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011C880(u8* ptr) {
+u8 wazaDataBiosGetOujanosirusi(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0xB]);
 }
 /* Address: 0x8011C898 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011C898(u8* ptr) {
+u8 wazaDataBiosGetOumugaesi(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0xA]);
 }
 /* Address: 0x8011C8B0 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011C8B0(u8* ptr) {
+u8 wazaDataBiosGetYokodori(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0x9]);
 }
 /* Address: 0x8011C8C8 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011C8C8(u8* ptr) {
+u8 wazaDataBiosGetMajikku(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0x8]);
 }
 /* Address: 0x8011C8E0 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011C8E0(u8* ptr) {
+u8 wazaDataBiosGetMamoru(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0x7]);
 }
 /* Address: 0x8011C8F8 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011C8F8(u8* ptr) {
+u8 wazaDataBiosGetDageki(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0x6]);
 }
 /* Address: 0x8011C910 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011C910(u8* ptr) {
+u8 wazaDataBiosGetAddFightKoukaAvg(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0x5]);
 }
 /* Address: 0x8011C928 | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fn_8011C928(u8* ptr) {
+u32 wazaDataBiosGetFightAttackMsgId(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u32*)(&ptr[0x28]);
 }
 /* Address: 0x8011C940 | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fn_8011C940(u8* ptr) {
+u32 wazaDataBiosGetFightAttackTunagiMsgId(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u32*)(&ptr[0x24]);
 }
 /* Address: 0x8011C958 | Size: 0x18 | Pattern: nullcheck_getter */
-u16 fn_8011C958(u8* ptr) {
+u16 wazaDataBiosGetSeqId(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u16*)(&ptr[0x1A]);
 }
 /* Address: 0x8011C970 | Size: 0x18 | Pattern: nullcheck_getter */
-u16 fn_8011C970(u8* ptr) {
+u16 wazaDataBiosGetFightKoukaDataId(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u16*)(&ptr[0x18]);
 }
 /* Address: 0x8011C988 | Size: 0x18 | Pattern: nullcheck_getter */
-s16 fn_8011C988(u8* ptr) {
+s16 wazaDataBiosGetIryoku(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(s16*)(&ptr[0x16]);
 }
 /* Address: 0x8011C9A0 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011C9A0(u8* ptr) {
+u8 wazaDataBiosGetAvg(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0x4]);
 }
 /* Address: 0x8011C9B8 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011C9B8(u8* ptr) {
+u8 wazaDataBiosGetRangeId(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0x3]);
 }
 /* Address: 0x8011C9D0 | Size: 0x1C | Pattern: nullcheck_getter_s8 */
-s32 fn_8011C9D0(u8* ptr) {
+s32 wazaDataBiosGetPri(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return (s8)ptr[0x0];
 }
 /* Address: 0x8011C9EC | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011C9EC(u8* ptr) {
+u8 wazaDataBiosGetZokuseiDataId(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0x2]);
 }
 /* Address: 0x8011CA04 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011CA04(u8* ptr) {
+u8 wazaDataBiosGetPp(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0x1]);
 }
 /* Address: 0x8011CA1C | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fn_8011CA1C(u8* ptr) {
+u32 wazaDataBiosGetName(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u32*)(&ptr[0x20]);
 }
@@ -1238,137 +1238,137 @@ u32 fn_8011F5B0(u8* ptr) {
     return *(u32*)(&ptr[0x4]);
 }
 /* Address: 0x8012A774 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8012A774(u8* ptr, u8 val) {
+void heroBiosSetHomePlace(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0xA81]) = val;
 }
 /* Address: 0x8012A784 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8012A784(u8* ptr) {
+u8 heroBiosGetHomePlace(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0xA81]);
 }
 /* Address: 0x8012A79C | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8012A79C(u8* ptr) {
+u8 heroBiosGetHizukiFlag(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0xA98]);
 }
 /* Address: 0x8012A7B4 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8012A7B4(u8* ptr, u8 val) {
+void heroBiosSetHizukiFlag(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0xA98]) = val;
 }
 /* Address: 0x8012A7C4 | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fn_8012A7C4(u8* ptr) {
+u32 heroBiosGetPokecouponAll(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u32*)(&ptr[0xA8C]);
 }
 /* Address: 0x8012A80C | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fn_8012A80C(u8* ptr) {
+u32 heroBiosGetPokecoupon(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u32*)(&ptr[0xA88]);
 }
 /* Address: 0x8012A854 | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fn_8012A854(u8* ptr) {
+u32 heroBiosGetPokedoru(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u32*)(&ptr[0xA84]);
 }
 /* Address: 0x8012A8EC | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8012A8EC(u8* ptr) {
+u8 heroBiosGetBadge08Flag(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0xA97]);
 }
 /* Address: 0x8012A904 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8012A904(u8* ptr) {
+u8 heroBiosGetBadge07Flag(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0xA96]);
 }
 /* Address: 0x8012A91C | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8012A91C(u8* ptr) {
+u8 heroBiosGetBadge06Flag(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0xA95]);
 }
 /* Address: 0x8012A934 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8012A934(u8* ptr) {
+u8 heroBiosGetBadge05Flag(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0xA94]);
 }
 /* Address: 0x8012A94C | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8012A94C(u8* ptr) {
+u8 heroBiosGetBadge04Flag(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0xA93]);
 }
 /* Address: 0x8012A964 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8012A964(u8* ptr) {
+u8 heroBiosGetBadge03Flag(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0xA92]);
 }
 /* Address: 0x8012A97C | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8012A97C(u8* ptr) {
+u8 heroBiosGetBadge02Flag(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0xA91]);
 }
 /* Address: 0x8012A994 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8012A994(u8* ptr) {
+u8 heroBiosGetBadge01Flag(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0xA90]);
 }
 /* Address: 0x8012A9AC | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8012A9AC(u8* ptr, u8 val) {
+void heroBiosSetBadge08Flag(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0xA97]) = val;
 }
 /* Address: 0x8012A9BC | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8012A9BC(u8* ptr, u8 val) {
+void heroBiosSetBadge07Flag(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0xA96]) = val;
 }
 /* Address: 0x8012A9CC | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8012A9CC(u8* ptr, u8 val) {
+void heroBiosSetBadge06Flag(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0xA95]) = val;
 }
 /* Address: 0x8012A9DC | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8012A9DC(u8* ptr, u8 val) {
+void heroBiosSetBadge05Flag(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0xA94]) = val;
 }
 /* Address: 0x8012A9EC | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8012A9EC(u8* ptr, u8 val) {
+void heroBiosSetBadge04Flag(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0xA93]) = val;
 }
 /* Address: 0x8012A9FC | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8012A9FC(u8* ptr, u8 val) {
+void heroBiosSetBadge03Flag(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0xA92]) = val;
 }
 /* Address: 0x8012AA0C | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8012AA0C(u8* ptr, u8 val) {
+void heroBiosSetBadge02Flag(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0xA91]) = val;
 }
 /* Address: 0x8012AA1C | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8012AA1C(u8* ptr, u8 val) {
+void heroBiosSetBadge01Flag(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0xA90]) = val;
 }
 /* Address: 0x8012AA2C | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8012AA2C(u8* ptr) {
+u8 heroBiosGetSexDataId(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0xA80]);
 }
 /* Address: 0x8012AA44 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8012AA44(u8* ptr, u8 val) {
+void heroBiosSetSexDataId(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0xA80]) = val;
 }
 /* Address: 0x8012AA54 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8012AA54(u8* ptr, u32 val) {
+void heroBiosSetRnd(u8* ptr, u32 val) {
     if (ptr == NULL) { return; }
     *(u32*)(&ptr[0x2C]) = val;
 }
 /* Address: 0x8012AC3C | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fn_8012AC3C(u8* ptr) {
+u32 heroBiosGetRnd(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u32*)(&ptr[0x2C]);
 }
@@ -1402,12 +1402,12 @@ extern void fn_801ED674(void);
 /* Forward declarations for functions called before definition */
 void fn_801193BC(void);
 /* Forward declarations for converted functions */
-s32 fn_80123E70(u8* ptr, u16 idx);
-void fn_8011BEB4(void);
+s32 pokemonWazaGetMaxPP(u8* ptr, u16 idx);
+void wazaGetStatus(void);
 void fn_8011F260(void);
-void fn_8012546C(void*);
-void fn_8012795C(void);
-void fn_80129BC8(void);
+void pokemonResetBasisStatus(void*);
+void pokemonSetLevelBasisStatus(void);
+void heroItemGetItemKindToItemAryPtr(void);
 void heroSetStatus();
 void heroGetStatus(void);
 /* 0x70 | floorReadMapPreFunc | alloc_wrapper */
@@ -1426,16 +1426,16 @@ void* floorReadMapPreFunc(void* owner, u32 param, u32 alloc_size) {
 #pragma pop
 /* 0x80114D6C | 0xA0 */
 extern u8 fn_800FF548(void);
-extern u32 fn_80115124();  /* K&R: asm void wrapper, used as function pointer */
-extern u32 fn_80115170();  /* K&R: asm void wrapper, used as function pointer */
-extern u32 fn_801151BC();  /* K&R: asm void wrapper, used as function pointer */
+extern u32 _unloadScript__FPvUlUl();  /* K&R: asm void wrapper, used as function pointer */
+extern u32 _unloadFont__FPvUlUl();  /* K&R: asm void wrapper, used as function pointer */
+extern u32 _unloadMsg__FPvUlUl();  /* K&R: asm void wrapper, used as function pointer */
 #pragma push
 #pragma peephole off
 void* floorReadScriptPreFunc(void* owner, u32 param, u32 alloc_size) {
     void* mem;
     if ((u8)fn_800FF548() != 0) { return NULL; }
     alloc_size = (alloc_size + 0x1F) & ~0x1F;
-    mem = (void*)GSresAllocResourceAlign(alloc_size, 0x20, (u32)owner, param, (u32)fn_80115124);
+    mem = (void*)GSresAllocResourceAlign(alloc_size, 0x20, (u32)owner, param, (u32)_unloadScript__FPvUlUl);
     if (mem == NULL) {
         GSlogWrite(lbl_80272520, alloc_size);
     }
@@ -1446,7 +1446,7 @@ void* floorReadFontPreFunc(void* owner, u32 param, u32 alloc_size) {
     void* mem;
     if ((u8)fn_800FF548() != 0) { return NULL; }
     alloc_size = (alloc_size + 0x1F) & ~0x1F;
-    mem = (void*)GSresAllocResourceAlign(alloc_size, 0x20, (u32)owner, param, (u32)fn_80115170);
+    mem = (void*)GSresAllocResourceAlign(alloc_size, 0x20, (u32)owner, param, (u32)_unloadFont__FPvUlUl);
     if (mem == NULL) {
         GSlogWrite(lbl_8027255C, alloc_size);
     }
@@ -1457,7 +1457,7 @@ void* floorReadMsgPreFunc(void* owner, u32 param, u32 alloc_size) {
     void* mem;
     if ((u8)fn_800FF548() != 0) { return NULL; }
     alloc_size = (alloc_size + 0x1F) & ~0x1F;
-    mem = (void*)GSresAllocResourceAlign(alloc_size, 0x20, (u32)owner, param, (u32)fn_801151BC);
+    mem = (void*)GSresAllocResourceAlign(alloc_size, 0x20, (u32)owner, param, (u32)_unloadMsg__FPvUlUl);
     if (mem == NULL) {
         GSlogWrite(lbl_80272594, alloc_size);
     }
@@ -1467,7 +1467,7 @@ void* floorReadMsgPreFunc(void* owner, u32 param, u32 alloc_size) {
 /* 0x80115094 | 0x24 | call_return_const */
 #pragma push
 #pragma scheduling off
-u32 fn_80115094(void) {
+u32 _unloadFlare__FPvUlUl(void) {
     fn_801ED674();
     return 1;
 }
@@ -1475,7 +1475,7 @@ u32 fn_80115094(void) {
 /* 0x801150B8 | 36 bytes | call_return_const */
 #pragma push
 #pragma scheduling off
-u32 fn_801150B8(void) {
+u32 _unloadParticles__FPvUlUl(void) {
     fn_801193BC();
     return 1;
 }
@@ -1483,7 +1483,7 @@ u32 fn_801150B8(void) {
 /* 0x801150DC | 36 bytes | call_return_const */
 #pragma push
 #pragma scheduling off
-u32 fn_801150DC(void) {
+u32 _unloadCamera__FPvUlUl(void) {
     fn_800D2738();
     return 1;
 }
@@ -1491,7 +1491,7 @@ u32 fn_801150DC(void) {
 /* 0x80115100 | 36 bytes | call_return_const */
 #pragma push
 #pragma scheduling off
-u32 fn_80115100(void) {
+u32 _unloadLight__FPvUlUl(void) {
     fn_800DCD98();
     return 1;
 }
@@ -1499,7 +1499,7 @@ u32 fn_80115100(void) {
 /* 0x80115208 | 36 bytes | call_return_const */
 #pragma push
 #pragma scheduling off
-u32 fn_80115208(void) {
+u32 _unloadColsys__FPvUlUl(void) {
     GScolsys2UnloadCCD();
     return 1;
 }
@@ -1508,31 +1508,31 @@ u32 fn_80115208(void) {
 extern void fn_800EF5A4(void);
 #pragma push
 #pragma scheduling off
-u32 fn_8011522C(void) {
+u32 _unloadTexture__FPvUlUl(void) {
     fn_800EF5A4();
     return 1;
 }
 #pragma pop
 /* 0x80115250 | 0xC */
-u32 fn_80115250(u32 val) {
+u32 floorReadMakeFogResID(u32 val) {
     return (val & 0x7FFF0000U) | 0x1A00;
 }
 /* 0x8011525C | 0xC */
-u32 fn_8011525C(u32 val) {
+u32 floorReadMakeCameraResID(u32 val) {
     return (val & 0x7FFF0000U) | 0x1800;
 }
 /* 0x80115268 | 0xC */
-u32 fn_80115268(u32 val) {
+u32 floorReadMakeLightResID(u32 val) {
     return (val & 0x7FFF0000U) | 0x1600;
 }
 /* 0x80115274 | 0xC */
-u32 fn_80115274(u32 val) {
+u32 floorReadMakeModelResID(u32 val) {
     return (val & 0x7FFF0000U) | 0x1000;
 }
 /* 0x80115280 | 0x10C */
 #pragma push
 #pragma peephole off
-u32 fn_80115280(void* ptr) {
+u32 floorDataBiosGetShadowReciveNum(void* ptr) {
     extern const char lbl_80272608[];
     extern const char lbl_8027262C[];
     extern u8 lbl_8035BB50[];
@@ -1569,7 +1569,7 @@ extern u8 lbl_8035BB30[];
 extern u8 lbl_8035BB50[];
 #pragma push
 #pragma peephole off
-void* fn_8011538C(void* ptr, u32 idx) {
+void* floorDataBiosGetShadowReciveID(void* ptr, u32 idx) {
     void* p1;
     if (ptr == NULL) {
         GSlogWrite(lbl_80272608, lbl_8035BB30);
@@ -1594,7 +1594,7 @@ extern u8 lbl_8035BB10[];
 #pragma push
 #pragma scheduling on
 #pragma peephole off
-void* fn_8011542C(void* ptr) {
+void* floorDataBiosGetShadowLightID(void* ptr) {
     void* p1;
     void* p2;
     if (ptr == NULL) {
@@ -1616,7 +1616,7 @@ extern u8 lbl_8035BAF4[];
 #pragma push
 #pragma scheduling on
 #pragma peephole off
-void* fn_801154B4(void* ptr) {
+void* floorDataBiosGetSunResID(void* ptr) {
     void* p1;
     void* p2;
     if (ptr == NULL) {
@@ -1646,12 +1646,12 @@ void fn_8011553C(void* obj, u32 val) {
     *(u32*)((u8*)obj + 0x34) = val;
 }
 #pragma pop
-/* 0x48 | fn_80115584 | nullcheck_store */
+/* 0x48 | floorDataBiosSetMapResID | nullcheck_store */
 extern const char lbl_80272680[];
 extern u8 lbl_8035BABC[];
 #pragma push
 #pragma peephole off
-void fn_80115584(void* obj, u32 val) {
+void floorDataBiosSetMapResID(void* obj, u32 val) {
     if (obj == NULL) {
         GSlogWrite(lbl_80272680, lbl_8035BABC, val);
         return;
@@ -1663,7 +1663,7 @@ void fn_80115584(void* obj, u32 val) {
 #pragma push
 #pragma scheduling on
 #pragma peephole off
-u32 fn_80115A38(u8* entry) {
+u32 floorDataBiosGetFileGroupID(u8* entry) {
     extern u8 lbl_8035B91C[];
     if (entry == 0) {
         GSlogWrite(lbl_80272608, (const char*)lbl_8035B91C);
@@ -1672,15 +1672,15 @@ u32 fn_80115A38(u8* entry) {
     return *(u32*)(entry + 0x4);
 }
 #pragma pop
-/* 0x70 | fn_80115BD8 | generic */
+/* 0x70 | floorDataBiosGetCurrentPtr | generic */
 extern u32 lbl_80478FB8;
 extern u32 lbl_80478FBC;
 extern u8 lbl_802726D4[];
 extern u8 lbl_8035B8A0[];
 /* Forward declarations for self-referencing asm blocks */
-extern void* fn_801155CC();
-extern u32 fn_80115A80();
-extern void* fn_80115C48(u32 key);
+extern void* floorDataBiosGetFieldCameraListPtr();
+extern u32 floorDataBiosGetGroupID();
+extern void* floorDataBiosGetPtr(u32 key);
 extern void fn_8011791C(void);
 extern void fn_80119930(void);
 extern void fn_80119BD0();
@@ -1692,73 +1692,73 @@ extern u8 fn_80119E90(u16 idx);
 extern u16 fn_80119ED0(u16 idx);
 extern u8 fn_80119F10(u16 idx);
 extern u32 fn_80119F50(u16 idx);
-extern void fn_8011C1D0(u8* ptr, u32 val);
-extern void fn_8011C220(u8* ptr, u32 val);
-extern u32 fn_8011C270(u8* ptr);
-extern u8 fn_8011C588(u8* ptr, u16 idx);
-extern u32 fn_8011C2D0(u8* ptr);
-extern void fn_8011C330(u8* ptr, u32 val);
-extern void fn_8011C380(u8* ptr, u32 val);
-extern void fn_8011C3D0(u8* ptr, u32 val);
-extern void fn_8011C430(u8* ptr, u16 idx, u8 val);
-extern u32 fn_8011C450(u8* ptr);
-extern u32 fn_8011C4B0(u8* ptr);
-extern u32 fn_8011C510(u8* ptr);
+extern void wazaDataBiosSetFightWazaWzxVariationFuncPtr(u8* ptr, u32 val);
+extern void wazaDataBiosSetFightWazaWzxTypeFuncPtr(u8* ptr, u32 val);
+extern u32 wazaDataBiosGetFightWazaWzxVariationFuncPtr(u8* ptr);
+extern u8 wazaDataBiosGetTypeId(u8* ptr, u16 idx);
+extern u32 wazaDataBiosGetFightWazaWzxTypeFuncPtr(u8* ptr);
+extern void wazaDataBiosSetFightTrainerAiWazaDamageFuncPtr(u8* ptr, u32 val);
+extern void wazaDataBiosSetFightTrainerAiWazaHitFuncPtr(u8* ptr, u32 val);
+extern void wazaDataBiosSetFightTrainerAiWazaValueFuncPtr(u8* ptr, u32 val);
+extern void wazaDataBiosSetTypeId(u8* ptr, u16 idx, u8 val);
+extern u32 wazaDataBiosGetFightTrainerAiWazaDamageFuncPtr(u8* ptr);
+extern u32 wazaDataBiosGetFightTrainerAiWazaHitFuncPtr(u8* ptr);
+extern u32 wazaDataBiosGetFightTrainerAiWazaValueFuncPtr(u8* ptr);
 extern void pokemonGetDarkPokemonLevel(void);
-extern u32  fn_80120C6C(u32 a, u16 key);
+extern u32  pokemonDataCheckValid(u32 a, u16 key);
 extern u8 fn_80121ADC(u8* ptr, u32 slot);
-extern void fn_801237B8(void);
-extern u32 fn_80123CD4(u8* ptr, u32 arg2);
-extern void fn_80124A60(u8* ptr);
-extern void fn_80128300(void);
-extern void fn_80128524(void);
-extern void fn_80129094(void);
+extern void pokemonSetWazaStatus(void);
+extern u32 pokemonWazaCheckValid(u8* ptr, u32 arg2);
+extern void pokemonInit(u8* ptr);
+extern void pokemonEvolutionCreateAddPokemon(void);
+extern void pokemonEvolution(void);
+extern void savedataInit(void);
 extern void heroAddPokedoru(u8* ptr, u32 offset);
-extern s32 fn_80129A78(u8* ptr, u32 arg2, u32 arg3, u32 arg4);
-extern u32 fn_8012A08C(u8* ptr, void* arg2);
-extern void fn_8012A1A4(u8* ptr, u32 arg2, u8 arg3);
-extern void fn_8012A248();
-extern void fn_8012A7DC();  /* K&R: typed impl or conflict */
-extern void fn_8012A824();  /* K&R: typed impl or conflict */
-extern void fn_8012A86C();  /* K&R: typed impl or conflict */
+extern s32 heroItemAddItemDataId(u8* ptr, u32 arg2, u32 arg3, u32 arg4);
+extern u32 heroAddPokemon(u8* ptr, void* arg2);
+extern void heroCreate(u8* ptr, u32 arg2, u8 arg3);
+extern void heroInit();
+extern void heroBiosSetPokecouponAll();  /* K&R: typed impl or conflict */
+extern void heroBiosSetPokecoupon();  /* K&R: typed impl or conflict */
+extern void heroBiosSetPokedoru();  /* K&R: typed impl or conflict */
 extern void heroBiosSetHizukiNamePtr();  /* K&R: typed impl or conflict */
 extern void heroBiosSetNamePtr();  /* K&R: typed impl or conflict */
-extern void fn_8012BBA8(void);
-extern void fn_8012BCA4(void);
+extern void heroMoveTermEvent(void);
+extern void heroMoveInitEvent(void);
 extern void fn_8012CA84();
 extern void heroPokemonGetEifie(u32 arg1);
 extern void heroPokemonGetBlacky(u32 arg1);
 extern s32 psGetGeneratorChildMaxLife(u32);
 extern void* wazaDataBiosGetPtr(u16 idx);
-extern u32 fn_8012640C();
-extern void fn_801254B4();
-extern void fn_8011BEB4(void);
+extern u32 pokemonGetStatus();
+extern void pokemonSetStatus();
+extern void wazaGetStatus(void);
 extern u16 fn_8011E36C(u8* ptr, u16 idx);
 extern u16 fn_8011E3B4(u8* ptr, u16 idx);
 extern u8 fn_8011E3FC(u8* ptr, u16 idx);
 extern void fn_8011F260(void);
-extern void fn_80129BC8(void);
+extern void heroItemGetItemKindToItemAryPtr(void);
 extern u8 floorUpdateFieldCamera();
 extern void heroSetStatus();
 extern void heroGetStatus(void);
-extern void fn_8012C660(void);
-extern void* fn_8012AC08(u8* ptr, u16 idx);
-extern void* fn_8012A8D4(void* ptr);
-extern void* fn_8012AA9C(u8* ptr, u16 idx);
-extern void* fn_8012AAD0(u8* ptr, u16 idx);
-extern void* fn_8012AB04(u8* ptr, u16 idx);
-extern void* fn_8012AB38(u8* ptr, u16 idx);
-extern void* fn_8012AB6C(u8* ptr, u16 idx);
-extern void* fn_8012ABA0(u8* ptr, u16 idx);
-extern void* fn_8012ABD4(u8* ptr, u16 idx);
-extern u32 fn_8012AC54(void* ptr);
+extern void updateAnimation__Ff15HEROMOVE_MEMBER(void);
+extern void* heroBiosGetPokemonPtr(u8* ptr, u16 idx);
+extern void* heroBiosGetHizukiNamePtr(void* ptr);
+extern void* heroBiosGetHizukiItemPtr(u8* ptr, u16 idx);
+extern void* heroBiosGetItemKoronPtr(u8* ptr, u16 idx);
+extern void* heroBiosGetItemSeedPtr(u8* ptr, u16 idx);
+extern void* heroBiosGetItemSkillPtr(u8* ptr, u16 idx);
+extern void* heroBiosGetItemBallPtr(u8* ptr, u16 idx);
+extern void* heroBiosGetExtraItemPtr(u8* ptr, u16 idx);
+extern void* heroBiosGetItemNormalPtr(u8* ptr, u16 idx);
+extern u32 heroBiosGetNamePtr(void* ptr);
 
 #if 0
-asm void fn_80115BD8(void) {
+asm void floorDataBiosGetCurrentPtr(void) {
 #include "src/game/gs_field_world_fn_80115BD8.inc"
 }
 #else
-void* fn_80115BD8(void) {
+void* floorDataBiosGetCurrentPtr(void) {
     /* refs: lbl_802726D4, lbl_8035B8A0, lbl_80478FB8, lbl_80478FBC */
     void* floorId;
     u8* entry;
@@ -1865,7 +1865,7 @@ extern void fn_801069FC(void);
 extern void pcboxDelItem(void);
 extern void fn_8001E184(void);
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_80115E6C(void);
+void floorEventGetTresure(void);
 /* 0x80116164 | 0x30C */
 extern void fn_8018B76C(void);
 extern void fn_8018C7C8(void);
@@ -1876,7 +1876,7 @@ extern void fn_80190528(void);
 extern u32 lbl_80478EBC;
 extern u32 lbl_80478EB8;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_80116164(void);
+void floorEventCtrlTresure(void);
 /* 0x80116470 | 0x4E8 */
 extern void floorGetResource(void);
 extern void fn_800ECCA8(void);
@@ -1910,7 +1910,7 @@ extern f64 lbl_8047CFB8;
 extern f32 lbl_8047CFB4;
 extern f32 lbl_8047CFB0;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_80116470(void);
+void floorEventCtrlElevator(void);
 /* 0x80116958 | 0x3D8 */
 extern void scriptSetCol(void);
 extern void fn_801903B0(void);
@@ -1922,7 +1922,7 @@ extern u32 lbl_80478ECC;
 extern f32 lbl_8047CFAC;
 extern f32 lbl_8047CFA4;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_80116958(void);
+void floorEventCtrlDoor(void);
 /* 0x80116D30 | 0x13C */
 extern void EvlogSet__FScUl();
 extern void scriptSetEventColID();
@@ -1983,7 +1983,7 @@ void fn_80116D30(u32 kind, u32 arg)
 }
 #endif
 /* 0x80116E6C | 0x18 */
-void fn_80116E6C(u8* ptr, u8 val) {
+void floorCharacterBiosSetVisibility(u8* ptr, u8 val) {
     u8 tmp;
     if (ptr == NULL) { return; }
     tmp = ptr[0];
@@ -1999,39 +1999,39 @@ void floorCharacterBiosSetPos(u8* dst, f32* src) {
     *(f32*)(&dst[0x20]) = src[2];
 }
 /* 0x80116EB0 | 24 bytes | beq_default_getter */
-u32 fn_80116EB0(void* ptr) {
+u32 floorCharacterBiosGetTalkSctID(void* ptr) {
     return (ptr != NULL) ? *(u32*)((u8*)ptr + 0x14) : 0;
 }
 /* 0x80116EC8 | 24 bytes | beq_default_getter */
-u32 fn_80116EC8(void* ptr) {
+u32 floorCharacterBiosGetMoveSctID(void* ptr) {
     return (ptr != NULL) ? *(u32*)((u8*)ptr + 0x10) : 0;
 }
 /* 0x80116EE0 | 24 bytes | beq_default_getter */
-u32 fn_80116EE0(void* ptr) {
+u32 floorCharacterBiosGetNameID(void* ptr) {
     return (ptr != NULL) ? *(u16*)((u8*)ptr + 0x8) : 0;
 }
 /* 0x80116EF8 | 0x1C */
-u32 fn_80116EF8(u8* ptr) {
+u32 floorCharacterBiosGetTalkWallThrough(u8* ptr) {
     return (ptr != NULL) ? (u32)((ptr[0] >> 4) & 1) : 0;
 }
 /* 0x80116F14 | 0x1C */
-u32 fn_80116F14(u8* ptr) {
+u32 floorCharacterBiosGetTalkEndType(u8* ptr) {
     return (ptr != NULL) ? (u32)((ptr[1] >> 4) & 3) : 0;
 }
 /* 0x80116F30 | 0x1C */
-u32 fn_80116F30(u8* ptr) {
+u32 floorCharacterBiosGetTalkStartType(u8* ptr) {
     return (ptr != NULL) ? (u32)((ptr[1] >> 6) & 3) : 0;
 }
 /* 0x80116F4C | 0x1C */
-u32 fn_80116F4C(u8* ptr) {
+u32 floorCharacterBiosGetMoveType(u8* ptr) {
     return (ptr != NULL) ? (u32)(ptr[0] & 7) : 0;
 }
 /* 0x80117038 | 0x1C */
-u32 fn_80117038(u8* ptr) {
+u32 floorCharacterBiosGetLoadInit(u8* ptr) {
     return (ptr != NULL) ? (u32)((ptr[0] >> 6) & 1) : 0;
 }
 /* 0x80117054 | 0x1C */
-u32 fn_80117054(u8* ptr) {
+u32 floorCharacterBiosGetVisibility(u8* ptr) {
     return (ptr != NULL) ? (u32)((ptr[0] >> 7) & 1) : 0;
 }
 /* 0x80117070 | 0x34 */
@@ -2050,9 +2050,9 @@ ret_null:
 /* 0x8011711C | 0x38 */
 void fn_8011711C(u32 arg) {
     extern void* fn_800FF56C(void);
-    extern void* fn_80115C48(u32 key);
-    extern void* fn_80115684(void* a, u32 b);
-    fn_80115684(fn_80115C48((u32)fn_800FF56C()), arg);
+    extern void* floorDataBiosGetPtr(u32 key);
+    extern void* floorDataBiosGetCharInfo(void* a, u32 b);
+    floorDataBiosGetCharInfo(floorDataBiosGetPtr((u32)fn_800FF56C()), arg);
 }
 /* 0x80117154 | 16 bytes | multi_sda_store */
 extern u32 lbl_8047AD68;
@@ -2083,7 +2083,7 @@ asm void fn_80117164(void) {
 #else
 void fn_80117164(void) {
     void* result;
-    result = fn_801155CC();
+    result = floorDataBiosGetFieldCameraListPtr();
     lbl_8047AD68 = 0;
     lbl_8047AD6C = 0;
     lbl_8047AD70 = 0;
@@ -4241,14 +4241,14 @@ u32 fn_8011BA0C(u8 type) {
 #endif
 /* 0x8011BAC0 | 0xAC */
 #if 0
-asm void fn_8011BAC0(void) {
+asm void wazaIsWazaTypeId(void) {
 #include "src/game/gs_field_world_fn_8011BAC0.inc"
 }
 #else
 /* key typed u32 so raw stays unmasked (mr r29,r3); dead k==0&&k==0x163&&k==0x165 chain
- * reproduces the folded cmplwi sequence; 3-iter fn_8011BEB4 scan. byte-match verified. */
-u32 fn_8011BAC0(u32 key, u8 target) {
-    extern u8 fn_8011BEB4(u32 a, u32 b, u32 c, u32 d);
+ * reproduces the folded cmplwi sequence; 3-iter wazaGetStatus scan. byte-match verified. */
+u32 wazaIsWazaTypeId(u32 key, u8 target) {
+    extern u8 wazaGetStatus(u32 a, u32 b, u32 c, u32 d);
     u32 raw = key;
     u8 t;
     u8 i;
@@ -4261,17 +4261,17 @@ u32 fn_8011BAC0(u32 key, u8 target) {
         return 0;
     }
     for (i = 0; i < 3; i++) {
-        if (t == fn_8011BEB4(0, raw, 0x1a, i)) {
+        if (t == wazaGetStatus(0, raw, 0x1a, i)) {
             return 1;
         }
     }
     return 0;
 }
 #endif
-/* 0x6C | fn_8011BB6C | single_call_straight */
-u8 fn_8011BB6C(u32 arg1, u8 arg2) {
-    extern u8 fn_8011BEB4(u32 a, u32 b, u32 c, u32 d);
-    u8 r = fn_8011BEB4(0, arg1, 2, 0);
+/* 0x6C | wazaGetMaxPP | single_call_straight */
+u8 wazaGetMaxPP(u32 arg1, u8 arg2) {
+    extern u8 wazaGetStatus(u32 a, u32 b, u32 c, u32 d);
+    u8 r = wazaGetStatus(0, arg1, 2, 0);
     u8 a2 = arg2;
     return (u8)(r + a2 * (r * 20) / 100);
 }
@@ -4290,7 +4290,7 @@ extern void fn_8020A0B4(void);
 extern void fn_8020A0A4(void);
 extern void jumptable_8035C290();
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8011BBD8(void);
+void wazaSetStatus(void);
 /* 0x8011BEB4 | 0x31C */
 extern void fn_8020A2A0(void);
 extern void fn_8020A288(void);
@@ -4307,15 +4307,15 @@ extern void fn_8020A17C(void);
 extern void fn_8020A164(void);
 extern void jumptable_8035C35C();
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8011BEB4(void);
+void wazaGetStatus(void);
 /* 0x8011C430 | 0x20 */
-void fn_8011C430(u8* ptr, u16 idx, u8 val) {
+void wazaDataBiosSetTypeId(u8* ptr, u16 idx, u8 val) {
     if (ptr == NULL) { return; }
     if (idx >= 3) { return; }
     ptr[idx + 0x34] = val;
 }
 /* 0x8011C588 | 0x30 */
-u8 fn_8011C588(u8* ptr, u16 idx) {
+u8 wazaDataBiosGetTypeId(u8* ptr, u16 idx) {
     if (ptr == NULL) { return 0; }
     if (idx >= 3) { return 0; }
     return ptr[idx + 0x34];
@@ -5233,16 +5233,16 @@ asm void fn_8011DCC4(void) {
 #else
 void fn_8011DCC4(u8* ptr, u32 arg2, u8 arg3) {
     extern u8* fn_8011F260(u8* a, u32 b, u32 c);
-    extern u32 fn_80123CD4(u8* a, u32 b);
+    extern u32 pokemonWazaCheckValid(u8* a, u32 b);
     extern void* wazaDataBiosGetPtr(u32 val);
     u8* result;
     result = fn_8011F260(ptr, arg2, 0);
     if (result == NULL) { return; }
     if ((u8)arg3 > 3) { arg3 = 3; }
-    if ((u8)fn_80123CD4(ptr, arg2) == 1) {
+    if ((u8)pokemonWazaCheckValid(ptr, arg2) == 1) {
         u8* tmp = fn_8011F260(ptr, arg2, 1);
         u32 val = tmp == NULL ? 0 : *(u16*)tmp;
-        if ((u8)fn_8011CA04(wazaDataBiosGetPtr(val)) <= 4) { return; }
+        if ((u8)wazaDataBiosGetPp(wazaDataBiosGetPtr(val)) <= 4) { return; }
     }
     result[3] = arg3;
 }
@@ -5250,12 +5250,12 @@ void fn_8011DCC4(u8* ptr, u32 arg2, u8 arg3) {
 /* 0x7C | fn_8011DD80 | call_clamp_store */
 void fn_8011DD80(u32 arg1, s32 arg2, u8 maxVal) {
     extern void* fn_8011F260();
-    extern u8 fn_80123E70(u8* ptr, s32 idx);
+    extern u8 pokemonWazaGetMaxPP(u8* ptr, s32 idx);
     u8* result;
     u8 val;
     result = fn_8011F260(arg1, arg2, 0);
     if (result == NULL) { return; }
-    val = fn_80123E70((u8*)arg1, arg2);
+    val = pokemonWazaGetMaxPP((u8*)arg1, arg2);
     if (val < maxVal) {
         maxVal = val;
     }
@@ -6000,7 +6000,7 @@ void fn_8011F5E0(u32* dst, u32* src) {
 #ifndef PCPORT
 typedef struct { u32 data[0x4E]; } GfwBuf0x138;
 #endif
-void fn_8011F5FC(u32* dst, u32* src) {
+void pokemonBiosCopy(u32* dst, u32* src) {
 #ifdef PCPORT
     u32 i;
 #endif
@@ -6021,15 +6021,15 @@ asm void fn_8011F634(void) {
 }
 #else
 u32 fn_8011F634(u8* ptr) {
-    extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
+    extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
     extern u32 pokemonGetDarkPokemonLevel(u8* a);
     extern void* fn_8011CE18(u32 val);
     extern u32 fn_8011CBF4(void* a, u32 b);
     u8 byte1;
     u32 val2;
     if (ptr == NULL) { return 0; }
-    if ((u8)fn_8012640C(ptr, 0, 0xc2, 0) == 0) { return 0; }
-    byte1 = (u8)fn_8012640C(ptr, 0, 0xbf, 0);
+    if ((u8)pokemonGetStatus(ptr, 0, 0xc2, 0) == 0) { return 0; }
+    byte1 = (u8)pokemonGetStatus(ptr, 0, 0xbf, 0);
     val2 = pokemonGetDarkPokemonLevel(ptr);
     if ((u8)val2 <= 7) {
         return fn_8011CBF4(fn_8011CE18(byte1), val2);
@@ -6044,15 +6044,15 @@ asm void fn_8011F6D8(void) {
 }
 #else
 u32 fn_8011F6D8(u8* ptr) {
-    extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
+    extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
     extern u32 pokemonGetDarkPokemonLevel(u8* a);
     extern void* fn_8011CE18(u32 val);
     extern u32 fn_8011CC24(void* a, u32 b);
     u8 byte1;
     u32 val2;
     if (ptr == NULL) { return 0; }
-    if ((u8)fn_8012640C(ptr, 0, 0xc2, 0) == 0) { return 0; }
-    byte1 = (u8)fn_8012640C(ptr, 0, 0xbf, 0);
+    if ((u8)pokemonGetStatus(ptr, 0, 0xc2, 0) == 0) { return 0; }
+    byte1 = (u8)pokemonGetStatus(ptr, 0, 0xbf, 0);
     val2 = pokemonGetDarkPokemonLevel(ptr);
     if ((u8)val2 <= 7) {
         return fn_8011CC24(fn_8011CE18(byte1), val2);
@@ -6081,36 +6081,36 @@ extern f32 lbl_8047CFF0;
 extern f32 lbl_8047CFF4;
 extern f32 lbl_8047D018;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8011F910(void);
-/* 0x48 | fn_8011FBCC | generic */
+void pokemonAddDpFormPokemonDpFilterId(void);
+/* 0x48 | pokemonSetDp | generic */
 extern f32 lbl_8047CFF4;
 #if 0
-asm void fn_8011FBCC(void) {
+asm void pokemonSetDp(void) {
 #include "src/game/gs_field_world_fn_8011FBCC.inc"
 }
 #else
-void fn_8011FBCC(u8* ptr, f32 f1) {
-    extern void fn_801254B4(u8* ptr, u32 a, u32 b, u32 c, u32 d);
+void pokemonSetDp(u8* ptr, f32 f1) {
+    extern void pokemonSetStatus(u8* ptr, u32 a, u32 b, u32 c, u32 d);
     if (ptr == NULL) { return; }
-    fn_801254B4(ptr, 0, 0xc5, 0, (u32)(s32)(lbl_8047CFF4 * f1));
+    pokemonSetStatus(ptr, 0, 0xc5, 0, (u32)(s32)(lbl_8047CFF4 * f1));
 }
 #endif
-/* 0x60 | fn_8011FC14 | generic */
+/* 0x60 | pokemonGetDp | generic */
 extern f32 lbl_8047CFF0;
 extern f64 lbl_8047D008;
 extern f32 lbl_8047CFF4;
 #if 0
-asm void fn_8011FC14(void) {
+asm void pokemonGetDp(void) {
 #include "src/game/gs_field_world_fn_8011FC14.inc"
 }
 #else
-f32 fn_8011FC14(u8* ptr) {
-    extern u32 fn_8012640C(u8* ptr, u32 a, u32 b, u32 c);
+f32 pokemonGetDp(u8* ptr) {
+    extern u32 pokemonGetStatus(u8* ptr, u32 a, u32 b, u32 c);
     u32 val;
     u32 sp[2];
     f32 result;
     if (ptr == NULL) { return lbl_8047CFF0; }
-    val = fn_8012640C(ptr, 0, 0xc5, 0);
+    val = pokemonGetStatus(ptr, 0, 0xc5, 0);
     sp[1] = val ^ 0x80000000;
     sp[0] = 0x43300000;
     result = *(f64*)sp - lbl_8047D008;
@@ -6119,15 +6119,15 @@ f32 fn_8011FC14(u8* ptr) {
 #endif
 /* 0x8011FC74 | 0x30 */
 u8 pokemonIsDarkPokemon(u32 arg) {
-    extern u32 fn_8012640C(u32 a, u32 b, u32 c, u32 d);
-    return (u8)fn_8012640C(arg, 0, 0xC2, 0);
+    extern u32 pokemonGetStatus(u32 a, u32 b, u32 c, u32 d);
+    return (u8)pokemonGetStatus(arg, 0, 0xC2, 0);
 }
 /* 0x8011FCA4 | 0x124 */
 extern void* fn_801EEEB8();
 extern f64 lbl_8047D010;
 extern f32 lbl_8047CFF4;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8011FCA4(void);
+void pokemonSetDarkPokemonStatus(void);
 /* 0x8011FDC8 | 0x504 */
 extern void GScharCpy(void);
 extern void fn_8010BBB8(void);
@@ -6137,19 +6137,19 @@ extern f32 lbl_8047CFF0;
 extern f64 lbl_8047D008;
 extern f32 lbl_8047CFF4;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8011FDC8(void);
+void pokemonToMenuPokemonStatus(void);
 /* 0x801202CC | 0x1DC */
 extern f64 lbl_8047D010;
 extern f32 lbl_8047CFF0;
 extern f64 lbl_8047D008;
 extern f32 lbl_8047CFF4;
 #if 0
-asm void fn_801202CC(void) {
+asm void pokemonToMenuPokemonStatusSubBar(void) {
 #include "src/game/gs_field_world_fn_801202CC.inc"
 }
 #else
-void fn_801202CC(u8* ptr, u8* out) {
-    extern u32 fn_8012640C(u8* ptr, u32 a, u32 b, u32 c);
+void pokemonToMenuPokemonStatusSubBar(u8* ptr, u8* out) {
+    extern u32 pokemonGetStatus(u8* ptr, u32 a, u32 b, u32 c);
     extern void* fn_8011CE74(u8 idx);
     extern u32 pokemonGrowDataBiosGetExp(void* ptr, u8 idx);
     u8 idx;
@@ -6160,11 +6160,11 @@ void fn_801202CC(u8* ptr, u8* out) {
     u32 val;
     f32 scale;
 
-    idx = (u8)fn_8012640C(ptr, 0, 0x7A, 0);
+    idx = (u8)pokemonGetStatus(ptr, 0, 0x7A, 0);
     if (ptr == NULL) {
         base = 0;
     } else {
-        table = fn_8011CE74((u8)fn_8012640C(0, (u16)fn_8012640C(ptr, 0, 0x6E, 0), 0x11, 0));
+        table = fn_8011CE74((u8)pokemonGetStatus(0, (u16)pokemonGetStatus(ptr, 0, 0x6E, 0), 0x11, 0));
         if (table == NULL) {
             base = 0;
         } else {
@@ -6172,11 +6172,11 @@ void fn_801202CC(u8* ptr, u8* out) {
         }
     }
 
-    if ((u8)fn_8012640C(ptr, 0, 0xC2, 0) == 0) {
+    if ((u8)pokemonGetStatus(ptr, 0, 0xC2, 0) == 0) {
         if (ptr == NULL) {
             next = 0;
         } else {
-            table = fn_8011CE74((u8)fn_8012640C(0, (u16)fn_8012640C(ptr, 0, 0x6E, 0), 0x11, 0));
+            table = fn_8011CE74((u8)pokemonGetStatus(0, (u16)pokemonGetStatus(ptr, 0, 0x6E, 0), 0x11, 0));
             if (table == NULL) {
                 next = 0;
             } else {
@@ -6184,9 +6184,9 @@ void fn_801202CC(u8* ptr, u8* out) {
             }
         }
         *(u32*)(out + 0x1C) = next - base;
-        *(u32*)(out + 0x20) = fn_8012640C(ptr, 0, 0x79, 0) - base;
+        *(u32*)(out + 0x20) = pokemonGetStatus(ptr, 0, 0x79, 0) - base;
     } else {
-        val = (u16)(u32)fn_801EEEB8((u16)fn_8012640C(ptr, 0, 0xC3, 0));
+        val = (u16)(u32)fn_801EEEB8((u16)pokemonGetStatus(ptr, 0, 0xC3, 0));
         sp[0] = 0x43300000;
         sp[1] = val;
         *(f32*)(out + 0x1C) = *(f64*)sp - lbl_8047D010;
@@ -6194,7 +6194,7 @@ void fn_801202CC(u8* ptr, u8* out) {
             scale = lbl_8047CFF0;
         } else {
             sp[0] = 0x43300000;
-            sp[1] = fn_8012640C(ptr, 0, 0xC5, 0) ^ 0x80000000;
+            sp[1] = pokemonGetStatus(ptr, 0, 0xC5, 0) ^ 0x80000000;
             scale = (*(f64*)sp - lbl_8047D008) / lbl_8047CFF4;
         }
         *(f32*)(out + 0x20) = scale;
@@ -6206,17 +6206,17 @@ extern void fn_800FA280(void);
 extern void fn_8010C4D4(void);
 extern void fn_8010C46C(void);
 #if 0
-asm void fn_801204A8(void) {
+asm void pokemonToMenuWazaStatus(void) {
 #include "src/game/gs_field_world_fn_801204A8.inc"
 }
 #else
-void fn_801204A8(u8* ptr, u8* out) {
+void pokemonToMenuWazaStatus(u8* ptr, u8* out) {
     extern u32 fn_800FA280();
     extern u32 fn_8010C46C();
     extern u32 fn_8010C4D4();
-    extern u32 fn_8011BB6C();
-    extern u32 fn_8011BEB4();
-    extern u32 fn_8012640C();
+    extern u32 wazaGetMaxPP();
+    extern u32 wazaGetStatus();
+    extern u32 pokemonGetStatus();
     u8 i;
     u8 valid;
     u32 slot2;
@@ -6227,14 +6227,14 @@ void fn_801204A8(u8* ptr, u8* out) {
     u8* slot;
 
     memset(out, 0, 0x48);
-    *(u32*)out = fn_8012640C(ptr, 0, 0x77, 0);
+    *(u32*)out = pokemonGetStatus(ptr, 0, 0x77, 0);
     for (i = 0; i < 4; i++) {
         slot = out + i * 0xC + 4;
         if (ptr == NULL) {
             valid = 0;
-        } else if ((s32)fn_8012640C(ptr, 0, 0x7F, i) == 0) {
+        } else if ((s32)pokemonGetStatus(ptr, 0, 0x7F, i) == 0) {
             valid = 0;
-        } else if ((s32)fn_8012640C(ptr, 0, 0x7F, i) == 0x163) {
+        } else if ((s32)pokemonGetStatus(ptr, 0, 0x7F, i) == 0x163) {
             valid = 0;
         } else {
             valid = 1;
@@ -6245,20 +6245,20 @@ void fn_801204A8(u8* ptr, u8* out) {
             *(u8*)(slot + 0xA) = 0;
             *(u8*)(slot + 0xB) = 0;
         } else {
-            id = (u16)fn_8012640C(ptr, 0, 0x7F, i);
-            resolved = (u16)fn_8011BEB4(0, id, 3, 0);
-            *(u32*)(slot + 0x0) = fn_800FA280(fn_8011BEB4(0, id, 1, 0));
+            id = (u16)pokemonGetStatus(ptr, 0, 0x7F, i);
+            resolved = (u16)wazaGetStatus(0, id, 3, 0);
+            *(u32*)(slot + 0x0) = fn_800FA280(wazaGetStatus(0, id, 1, 0));
             *(u32*)(slot + 0x4) = fn_800FA280(fn_8010C4D4(resolved));
             *(u16*)(slot + 0x8) = (u16)fn_8010C46C(resolved);
             if (ptr == NULL) {
                 byte = 0;
             } else {
                 slot2 = i + 4;
-                extra = (u16)fn_8012640C(ptr, 0, 0x7F, slot2);
-                byte = fn_8011BB6C(extra, (u8)fn_8012640C(ptr, 0, 0x81, slot2));
+                extra = (u16)pokemonGetStatus(ptr, 0, 0x7F, slot2);
+                byte = wazaGetMaxPP(extra, (u8)pokemonGetStatus(ptr, 0, 0x81, slot2));
             }
             *(u8*)(slot + 0xA) = byte;
-            *(u8*)(slot + 0xB) = (u8)fn_8012640C(ptr, 0, 0x80, i);
+            *(u8*)(slot + 0xB) = (u8)pokemonGetStatus(ptr, 0, 0x80, i);
         }
     }
 }
@@ -6267,24 +6267,24 @@ void fn_801204A8(u8* ptr, u8* out) {
 extern void fn_800E0C54(void);
 extern u8 lbl_8027296C[];
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_80120674(void);
+void pokemonCheckSetMonohiroi(void);
 /* 0x8012086C | 0x294 */
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8012086C(void);
+void pokemonAllKaihuku(void);
 /* 0x80120B00 | 0x16C */
 #if 0
-asm void fn_80120B00(void) {
+asm void pokemonGetMezamerupower(void) {
 #include "src/game/gs_field_world_fn_80120B00.inc"
 }
 #else
-void fn_80120B00(u8* ptr, u16* out1, u16* out2) {
-    extern u32 fn_8012640C(u8*, u32, u32, u32);
-    u16 v93 = (u16)fn_8012640C(ptr, 0, 0x93, 0);
-    u16 v94 = (u16)fn_8012640C(ptr, 0, 0x94, 0);
-    u16 v95 = (u16)fn_8012640C(ptr, 0, 0x95, 0);
-    u16 v96 = (u16)fn_8012640C(ptr, 0, 0x96, 0);
-    u16 v97 = (u16)fn_8012640C(ptr, 0, 0x97, 0);
-    u16 v98 = (u16)fn_8012640C(ptr, 0, 0x98, 0);
+void pokemonGetMezamerupower(u8* ptr, u16* out1, u16* out2) {
+    extern u32 pokemonGetStatus(u8*, u32, u32, u32);
+    u16 v93 = (u16)pokemonGetStatus(ptr, 0, 0x93, 0);
+    u16 v94 = (u16)pokemonGetStatus(ptr, 0, 0x94, 0);
+    u16 v95 = (u16)pokemonGetStatus(ptr, 0, 0x95, 0);
+    u16 v96 = (u16)pokemonGetStatus(ptr, 0, 0x96, 0);
+    u16 v97 = (u16)pokemonGetStatus(ptr, 0, 0x97, 0);
+    u16 v98 = (u16)pokemonGetStatus(ptr, 0, 0x98, 0);
     u8 hi = (u8)(((v93 & 2) >> 1) | (v94 & 2) | ((v95 << 1) & 4) |
                  ((v98 << 2) & 8) | ((v96 << 3) & 0x10) | ((v97 << 4) & 0x20));
     u8 lo = (u8)((v93 & 1) | ((v94 & 1) << 1) | ((v95 & 1) << 2) |
@@ -6305,18 +6305,18 @@ void fn_80120B00(u8* ptr, u16* out1, u16* out2) {
 #endif
 /* 0x80120CDC | 0x90 */
 #if 0
-asm void fn_80120CDC(void) {
+asm void pokemonGetNowLevelToExp(void) {
 #include "src/game/gs_field_world_fn_80120CDC.inc"
 }
 #else
-u32 fn_80120CDC(u8* ptr) {
-    extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
+u32 pokemonGetNowLevelToExp(u8* ptr) {
+    extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
     extern void* fn_8011CE74(u32 val);
     extern u32 pokemonGrowDataBiosGetExp(void* a, u32 b);
     u8 byte1, byte2;
     void* result;
-    byte1 = (u8)fn_8012640C(NULL, (u16)fn_8012640C(ptr, 0, 0x6e, 0), 0x11, 0);
-    byte2 = (u8)fn_8012640C(ptr, 0, 0x7a, 0);
+    byte1 = (u8)pokemonGetStatus(NULL, (u16)pokemonGetStatus(ptr, 0, 0x6e, 0), 0x11, 0);
+    byte2 = (u8)pokemonGetStatus(ptr, 0, 0x7a, 0);
     result = fn_8011CE74(byte1);
     if (result == NULL) { return 0; }
     return pokemonGrowDataBiosGetExp(result, byte2);
@@ -6324,11 +6324,11 @@ u32 fn_80120CDC(u8* ptr) {
 #endif
 /* 0x80120DD0 | 0x210 */
 #if 0
-asm void fn_80120DD0(void) {
+asm void pokemonGetJoutaiMsgId(void) {
 #include "src/game/gs_field_world_fn_80120DD0.inc"
 }
 #else
-u32 fn_80120DD0(u8* ptr) {
+u32 pokemonGetJoutaiMsgId(u8* ptr) {
     extern u16 fn_80119ED0(u32 val);
     extern u8 fn_8011B67C(u8* ptr, u32 val);
     extern void fn_80119F50(u32 val);
@@ -6365,11 +6365,11 @@ u32 fn_80120DD0(u8* ptr) {
 #endif
 /* 0x80120FE0 | 0x218 */
 #if 0
-asm void fn_80120FE0(void) {
+asm void pokemonGetJoutaiMenuSpriteId(void) {
 #include "src/game/gs_field_world_fn_80120FE0.inc"
 }
 #else
-u32 fn_80120FE0(u8* ptr) {
+u32 pokemonGetJoutaiMenuSpriteId(u8* ptr) {
     extern u16 fn_80119ED0(u32 val);
     extern u32 fn_8011B67C(u8* ptr, u32 val);
     u32 result;
@@ -6404,11 +6404,11 @@ u32 fn_80120FE0(u8* ptr) {
 #endif
 /* 0x801211F8 | 0x218 */
 #if 0
-asm void fn_801211F8(void) {
+asm void pokemonGetJoutaiDataId(void) {
 #include "src/game/gs_field_world_fn_801211F8.inc"
 }
 #else
-u32 fn_801211F8(u8* ptr) {
+u32 pokemonGetJoutaiDataId(u8* ptr) {
     extern u16 fn_80119ED0(u32 val);
     extern u32 fn_8011B67C(u8* ptr, u32 val);
     u32 result;
@@ -6513,14 +6513,14 @@ void fn_80121B4C(void* obj, u32 arg2) {
         fn_8011B788(obj, arg2);
     }
 }
-/* 0x64 | fn_80121BB4 | generic -- depends on fn_8011F5FC signature */
-void fn_80121BB4(u32* arg1, u32* arg2) {
+/* 0x64 | pokemonReplace | generic -- depends on pokemonBiosCopy signature */
+void pokemonReplace(u32* arg1, u32* arg2) {
     u32 tmp[0x4e];
     if (arg1 == NULL) { return; }
     if (arg2 == NULL) { return; }
-    fn_8011F5FC(tmp, arg1);
-    fn_8011F5FC(arg1, arg2);
-    fn_8011F5FC(arg2, tmp);
+    pokemonBiosCopy(tmp, arg1);
+    pokemonBiosCopy(arg1, arg2);
+    pokemonBiosCopy(arg2, tmp);
 }
 /* 0x80121C18 | 0x428 */
 extern u32 fn_801DE190(u32 idx, u32 base, u32 flag);
@@ -6528,12 +6528,12 @@ extern void fn_801DA3CC(void);
 extern void fn_801DA36C(void);
 extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
 #if 0
-asm void fn_80121C18(void) {
+asm void pokemonCreateSequence(void) {
 #include "src/game/gs_field_world_fn_80121C18.inc"
 }
 #else
-void* fn_80121C18(void* arg) {
-    extern u32 fn_8012640C(void* obj, u32 a, u32 b, u32 c);
+void* pokemonCreateSequence(void* arg) {
+    extern u32 pokemonGetStatus(void* obj, u32 a, u32 b, u32 c);
     extern u16 fn_80119ED0(u32 val);
     extern u32 fn_8011B67C(u8* ptr, u32 val);
     extern u32 fn_801DE190(u32 idx, u32 base, u32 flag);
@@ -6543,25 +6543,25 @@ void* fn_80121C18(void* arg) {
     u32 result, acc;
     u8 valid;
 
-    r30 = fn_8012640C(arg, 0, 0x6f, 0);
-    r28 = (u16)fn_8012640C(arg, 0, 0x6e, 0);
+    r30 = pokemonGetStatus(arg, 0, 0x6f, 0);
+    r28 = (u16)pokemonGetStatus(arg, 0, 0x6e, 0);
 
     if (r28 == 0) {
         valid = 0;
     } else {
-        if (fn_8012640C(NULL, r28, 1, 0) == 0) { valid = 0; }
+        if (pokemonGetStatus(NULL, r28, 1, 0) == 0) { valid = 0; }
         else if (r28 >= *(u32*)(u32)lbl_80478F90) { valid = 0; }
         else { valid = 1; }
     }
     if ((u8)valid == 0) { return 0; }
 
-    r28 = fn_8012640C(NULL, r28, 0x66, 0);
+    r28 = pokemonGetStatus(NULL, r28, 0x66, 0);
 
     if (arg == NULL) {
         r5 = 0;
     } else {
-        r29 = fn_8012640C(arg, 0, 0x75, 0);
-        tmp = fn_8012640C(arg, 0, 0x6f, 0);
+        r29 = pokemonGetStatus(arg, 0, 0x75, 0);
+        tmp = pokemonGetStatus(arg, 0, 0x6f, 0);
         xv = (r29 >> 16) ^ (r29 & 0xFFFF);
         tmp2 = (tmp >> 16) ^ (tmp & 0xFFFF);
         xv = xv ^ tmp2 ^ 8;
@@ -6617,7 +6617,7 @@ void* fn_80121C18(void* arg) {
 void fn_80121C18_old(void) {
     extern void fn_80119ED0();
     extern void fn_8011B67C();
-    extern u32 fn_8012640C();
+    extern u32 pokemonGetStatus();
     extern void fn_801DA36C();
     extern void fn_801DA3CC();
     extern void fn_801DE190();
@@ -6634,14 +6634,14 @@ void fn_80121C18_old(void) {
     r5 = 0x6f;
     r6 = 0x0;
     r31 = r3;
-    fn_8012640C();
+    pokemonGetStatus();
     r0 = r3;
     r3 = r31;
     r30 = r0;
     r4 = 0x0;
     r5 = 0x6e;
     r6 = 0x0;
-    fn_8012640C();
+    pokemonGetStatus();
     r28 = r3 & 0xFFFF;
     if ((s32)r0 == (s32)0) {
         r0 = 0x0;
@@ -6651,7 +6651,7 @@ void fn_80121C18_old(void) {
     r3 = 0x0;
     r5 = 0x1;
     r6 = 0x0;
-    fn_8012640C();
+    pokemonGetStatus();
     if (r3 == (u32)0x0) {
         r0 = 0x0;
         goto L_80121CB4;
@@ -6674,7 +6674,7 @@ do {
     r3 = 0x0;
     r5 = 0x66;
     r6 = 0x0;
-    fn_8012640C();
+    pokemonGetStatus();
     r28 = r3;
     if (r31 == (u32)0x0) {
         r5 = 0x0;
@@ -6683,13 +6683,13 @@ do {
         r4 = 0x0;
         r5 = 0x75;
         r6 = 0x0;
-        fn_8012640C();
+        pokemonGetStatus();
         r29 = r3;
         r3 = r31;
         r4 = 0x0;
         r5 = 0x6f;
         r6 = 0x0;
-        fn_8012640C();
+        pokemonGetStatus();
         r4 = (u32)r29 >> 16;
         r0 = r29 & 0xFFFF;
         r5 = (u32)r3 >> 16;
@@ -6852,11 +6852,11 @@ do {
 #endif
 /* 0x80122040 | 0x2F4 */
 #if 0
-asm void fn_80122040(void) {
+asm void pokemonSetSequenceStatus(void) {
 #include "src/game/gs_field_world_fn_80122040.inc"
 }
 #else
-void fn_80122040(u8* ptr, void* obj) {
+void pokemonSetSequenceStatus(u8* ptr, void* obj) {
     extern u16 fn_80119ED0(u32 val);
     extern u32 fn_8011B67C(u8* ptr, u32 val);
     extern void fn_801DA36C(void* obj, u32 val);
@@ -6910,21 +6910,21 @@ void fn_80122040(u8* ptr, void* obj) {
 extern void fn_80135530(void);
 extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_80122370(void);
+void pokemonGetFriendFormPokemonFriendFilterId(void);
 /* 0x801226D0 | 0x324 */
 extern u8 lbl_80272948[];
 extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_801226D0(void);
+void pokemonGetEffortFromPokemon(void);
 /* 0x80122BC0 | 0xA4 */
 #if 0
-asm void fn_80122BC0(void) {
+asm void pokemonIsNokoriHpFollowing(void) {
 #include "src/game/gs_field_world_fn_80122BC0.inc"
 }
 #else
 #pragma optimization_level 4
-u8 fn_80122BC0(u8* ptr, s32 b) {
-    extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
+u8 pokemonIsNokoriHpFollowing(u8* ptr, s32 b) {
+    extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
     s32 val1;
     s32 val2;
 
@@ -6934,18 +6934,18 @@ u8 fn_80122BC0(u8* ptr, s32 b) {
     if (ptr == NULL) {
         return 0;
     }
-    val1 = (s32)(u16)fn_8012640C(ptr, 0, 0x83, 0);
-    val2 = (s32)(u16)fn_8012640C(ptr, 0, 0x87, 0);
+    val1 = (s32)(u16)pokemonGetStatus(ptr, 0, 0x83, 0);
+    val2 = (s32)(u16)pokemonGetStatus(ptr, 0, 0x87, 0);
     return (u8)((s32)val2 / (s32)(u16)b >= val1);
 }
 #endif
 /* 0x80122C64 | 0x178 */
 #if 0
-asm void fn_80122C64(void) {
+asm void pokemonIsJoutaiKaragenki(void) {
 #include "src/game/gs_field_world_fn_80122C64.inc"
 }
 #else
-u32 fn_80122C64(u8* ptr) {
+u32 pokemonIsJoutaiKaragenki(u8* ptr) {
     extern u16 fn_80119ED0(u32 val);
     extern u8 fn_8011B67C(u8* ptr, u32 val);
     u8 result;
@@ -6972,11 +6972,11 @@ u32 fn_80122C64(u8* ptr) {
 #endif
 /* 0x80122DDC | 0x218 */
 #if 0
-asm void fn_80122DDC(void) {
+asm void pokemonIsJoutaiNormal(void) {
 #include "src/game/gs_field_world_fn_80122DDC.inc"
 }
 #else
-u32 fn_80122DDC(u8* ptr) {
+u32 pokemonIsJoutaiNormal(u8* ptr) {
     extern u16 fn_80119ED0(u32 val);
     extern u32 fn_8011B67C(u8* ptr, u32 val);
     u32 result;
@@ -7013,17 +7013,17 @@ u32 fn_80122DDC(u8* ptr) {
 extern void fn_80008154(void);
 extern void fn_80142CF4(void);
 #if 0
-asm void fn_80122FF4(void) {
+asm void pokemonGetSoubiItemBuff(void) {
 #include "src/game/gs_field_world_fn_80122FF4.inc"
 }
 #else
-u16 fn_80122FF4(u8* ptr) {
-    extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
+u16 pokemonGetSoubiItemBuff(u8* ptr) {
+    extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
     extern u32 fn_80008154(void);
     extern u32 itemGetStatus(u32 a, u32 b, u32 c, u32 d);
     u16 val;
     u16 check;
-    val = (u16)fn_8012640C(ptr, 0, 0x82, 0);
+    val = (u16)pokemonGetStatus(ptr, 0, 0x82, 0);
     if (val == 0) { return 0; }
     if ((u8)fn_80008154() == 1) {
         check = (u16)itemGetStatus(0, val, 7, 0);
@@ -7035,25 +7035,25 @@ u16 fn_80122FF4(u8* ptr) {
 }
 #endif
 /* 0x801230E0 | 0x30 */
-u16 fn_801230E0(u32 arg) {
-    extern u32 fn_8012640C(u32 a, u32 b, u32 c, u32 d);
-    return (u16)fn_8012640C(arg, 0, 0x82, 0);
+u16 pokemonGetSoubiItemDataId(u32 arg) {
+    extern u32 pokemonGetStatus(u32 a, u32 b, u32 c, u32 d);
+    return (u16)pokemonGetStatus(arg, 0, 0x82, 0);
 }
 /* 0x80123110 | 0x94 */
 #if 0
-asm void fn_80123110(void) {
+asm void pokemonDoItemSoubi(void) {
 #include "src/game/gs_field_world_fn_80123110.inc"
 }
 #else
-u32 fn_80123110(u8* ptr, register u32 arg2, u8 flag) {
-    extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
-    extern void fn_801254B4(u8* a, u32 b, u32 c, u32 d, u16 e);
+u32 pokemonDoItemSoubi(u8* ptr, register u32 arg2, u8 flag) {
+    extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
+    extern void pokemonSetStatus(u8* a, u32 b, u32 c, u32 d, u16 e);
     if (ptr == NULL) { return 0; }
     if ((u8)flag == 0) {
-        arg2 = (u16)fn_8012640C(ptr, 0, 0x82, 0);
-        fn_801254B4(ptr, 0, 0x82, 0, 0);
+        arg2 = (u16)pokemonGetStatus(ptr, 0, 0x82, 0);
+        pokemonSetStatus(ptr, 0, 0x82, 0, 0);
     } else {
-        fn_801254B4(ptr, 0, 0x82, 0, arg2);
+        pokemonSetStatus(ptr, 0, 0x82, 0, arg2);
     }
     return arg2;
 }
@@ -7061,11 +7061,11 @@ u32 fn_80123110(u8* ptr, register u32 arg2, u8 flag) {
 /* 0x801231A4 | 0x13C */
 extern u32 sexGetPokemonSexRaitoKotei(u32);
 #if 0
-asm void fn_801231A4(void) {
+asm void pokemonGetSex(void) {
 #include "src/game/gs_field_world_fn_801231A4.inc"
 }
 #else
-u8 fn_801231A4(u8* ptr)
+u8 pokemonGetSex(u8* ptr)
 {
     u32 count;
     u16 threshold;
@@ -7076,12 +7076,12 @@ u8 fn_801231A4(u8* ptr)
         return 2;
     }
 
-    count = fn_8012640C(ptr, 0, 0x6F, 0);
-    threshold = (u16)fn_8012640C(0, (u16)fn_8012640C(ptr, 0, 0x6E, 0), 0x13, 0);
+    count = pokemonGetStatus(ptr, 0, 0x6F, 0);
+    threshold = (u16)pokemonGetStatus(0, (u16)pokemonGetStatus(ptr, 0, 0x6E, 0), 0x13, 0);
     if (ptr == NULL) {
         result = 2;
     } else {
-        wanted = (u16)fn_8012640C(0, (u16)fn_8012640C(ptr, 0, 0x6E, 0), 0x13, 0);
+        wanted = (u16)pokemonGetStatus(0, (u16)pokemonGetStatus(ptr, 0, 0x6E, 0), 0x13, 0);
         if ((s32)wanted == (s32)(u8)sexGetPokemonSexRaitoKotei(0)) {
             result = 0;
         } else if ((s32)wanted == (s32)(u8)sexGetPokemonSexRaitoKotei(1)) {
@@ -7110,18 +7110,18 @@ done:
 extern void fn_801EE958(void);
 extern void fn_801EEB34(void);
 #if 0
-asm void fn_801232E0(void) {
+asm void pokemonSetOnDarkPokemonFlag(void) {
 #include "src/game/gs_field_world_fn_801232E0.inc"
 }
 #else
-void fn_801232E0(u8* ptr, u8 flag) {
-    extern u32 fn_8012640C(u8* ptr, u32 a, u32 b, u32 c);
+void pokemonSetOnDarkPokemonFlag(u8* ptr, u8 flag) {
+    extern u32 pokemonGetStatus(u8* ptr, u32 a, u32 b, u32 c);
     extern void fn_801EE958(u16 val, u32 a);
     extern void fn_801EEB34(u16 val, u32 a);
     u16 val;
     if (ptr == NULL) { return; }
-    if ((u8)fn_8012640C(ptr, 0, 0xc2, 0) == 0) { return; }
-    val = (u16)fn_8012640C(ptr, 0, 0xc3, 0);
+    if ((u8)pokemonGetStatus(ptr, 0, 0xc2, 0) == 0) { return; }
+    val = (u16)pokemonGetStatus(ptr, 0, 0xc3, 0);
     fn_801EE958(val, 1);
     if ((u8)flag == 0) { return; }
     fn_801EEB34(val, 1);
@@ -7130,43 +7130,43 @@ void fn_801232E0(u8* ptr, u8 flag) {
 /* 0x80123368 | 0x8C */
 extern void memoDataSet(void);
 #if 0
-asm void fn_80123368(void) {
+asm void pokemonSetOnZukanFlag(void) {
 #include "src/game/gs_field_world_fn_80123368.inc"
 }
 #else
-void fn_80123368(u8* ptr, u8 flag) {
-    extern u32 fn_8012640C(u8* ptr, u32 a, u32 b, u32 c);
+void pokemonSetOnZukanFlag(u8* ptr, u8 flag) {
+    extern u32 pokemonGetStatus(u8* ptr, u32 a, u32 b, u32 c);
     extern void memoDataSet(u32 a, u8* b);
-    extern void fn_801254B4(u8* ptr, u32 a, u32 b, u32 c, u32 d);
+    extern void pokemonSetStatus(u8* ptr, u32 a, u32 b, u32 c, u32 d);
     if (ptr == NULL) { return; }
-    fn_8012640C(ptr, 0, 0x6e, 0);
+    pokemonGetStatus(ptr, 0, 0x6e, 0);
     memoDataSet(0, ptr);
-    fn_801254B4(ptr, 0, 0x62, 0, 1);
+    pokemonSetStatus(ptr, 0, 0x62, 0, 1);
     if ((u8)flag == 0) { return; }
-    fn_801254B4(ptr, 0, 0x63, 0, 1);
+    pokemonSetStatus(ptr, 0, 0x63, 0, 1);
 }
 #endif
 /* 0x801233F4 | 0x190 */
 extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_801233F4(void);
+void pokemonCheckFightOut(void);
 /* 0x80123584 | 0x98 */
 #if 0
-asm void fn_80123584(void) {
+asm void pokemonGetOboeWazaDataBanme(void) {
 #include "src/game/gs_field_world_fn_80123584.inc"
 }
 #else
-u32 fn_80123584(u8* ptr, u32 arg2) {
-    extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
+u32 pokemonGetOboeWazaDataBanme(u8* ptr, u32 arg2) {
+    extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
     u32 val;
     u8 target;
     u32 i;
     if (ptr == NULL) { return 0; }
-    val = fn_8012640C(ptr, 0, 0x6e, 0) & 0xFFFF;
+    val = pokemonGetStatus(ptr, 0, 0x6e, 0) & 0xFFFF;
     target = (u8)arg2;
     i = 0;
     while ((u8)i < 0x14) {
-        if ((s32)fn_8012640C(NULL, val, 0x1d, i & 0xFF) == (s32)target) { break; }
+        if ((s32)pokemonGetStatus(NULL, val, 0x1d, i & 0xFF) == (s32)target) { break; }
         i++;
     }
     return i;
@@ -7174,13 +7174,13 @@ u32 fn_80123584(u8* ptr, u32 arg2) {
 #endif
 /* 0x8012361C | 0xDC */
 #if 0
-asm void fn_8012361C(void) {
+asm void pokemonOboeWaza(void) {
 #include "src/game/gs_field_world_fn_8012361C.inc"
 }
 #else
-s32 fn_8012361C(u8* ptr, u8 target, u8* buf_ptr, u8* counter_ptr) {
-    extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
-    extern s32 fn_801237B8(u8* a, u16 b, u8* c);
+s32 pokemonOboeWaza(u8* ptr, u8 target, u8* buf_ptr, u8* counter_ptr) {
+    extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
+    extern s32 pokemonSetWazaStatus(u8* a, u16 b, u8* c);
     u16 val;
     u16 result;
     if (ptr == NULL) { return -2; }
@@ -7188,11 +7188,11 @@ s32 fn_8012361C(u8* ptr, u8 target, u8* buf_ptr, u8* counter_ptr) {
         result = 0;
         goto _check;
     }
-    val = (u16)fn_8012640C(ptr, 0, 0x6e, 0);
+    val = (u16)pokemonGetStatus(ptr, 0, 0x6e, 0);
     target = (u8)target;
     while (*counter_ptr < 0x14) {
-        if ((s32)fn_8012640C(NULL, val, 0x1d, *counter_ptr) == (s32)target) {
-            result = (u16)fn_8012640C(NULL, val, 0x1e, *counter_ptr);
+        if ((s32)pokemonGetStatus(NULL, val, 0x1d, *counter_ptr) == (s32)target) {
+            result = (u16)pokemonGetStatus(NULL, val, 0x1e, *counter_ptr);
             goto _check;
         }
         (*counter_ptr)++;
@@ -7200,27 +7200,27 @@ s32 fn_8012361C(u8* ptr, u8 target, u8* buf_ptr, u8* counter_ptr) {
     result = 0;
 _check:
     if ((u16)result == 0) { return -3; }
-    return fn_801237B8(ptr, result, buf_ptr);
+    return pokemonSetWazaStatus(ptr, result, buf_ptr);
 }
 #endif
 /* 0x801236F8 | 0xC0 */
 #if 0
-asm void fn_801236F8(void) {
+asm void pokemonGetOboeWazaDataId(void) {
 #include "src/game/gs_field_world_fn_801236F8.inc"
 }
 #else
 inline u32 inline_fn(u16 val, u8* counter_ptr) {
-    return fn_8012640C(NULL, val, 0x1e, *counter_ptr);
+    return pokemonGetStatus(NULL, val, 0x1e, *counter_ptr);
 }
 
-u16 fn_801236F8(u8* ptr, u8 arg2, u8* counter_ptr) {
-    extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
+u16 pokemonGetOboeWazaDataId(u8* ptr, u8 arg2, u8* counter_ptr) {
+    extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
     u16 val;
     if (ptr == NULL || counter_ptr == NULL) { return 0; }
-    val = (u16)fn_8012640C(ptr, 0, 0x6e, 0);
+    val = (u16)pokemonGetStatus(ptr, 0, 0x6e, 0);
     arg2 = (0, (u8)arg2);
     while (*counter_ptr < 0x14) {
-        if ((s32)fn_8012640C(NULL, val, 0x1d, *counter_ptr) == (s32)arg2) {
+        if ((s32)pokemonGetStatus(NULL, val, 0x1d, *counter_ptr) == (s32)arg2) {
             return (u16)inline_fn(val, counter_ptr);
         }
         (*counter_ptr)++;
@@ -7230,15 +7230,15 @@ u16 fn_801236F8(u8* ptr, u8 arg2, u8* counter_ptr) {
 #endif
 /* 0x801237B8 | 0x3A4 */
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_801237B8(void);
+void pokemonSetWazaStatus(void);
 /* 0x80123B5C | 0xF8 */
 #if 0
-asm void fn_80123B5C(void) {
+asm void pokemonSearchWazaDataId(void) {
 #include "src/game/gs_field_world_fn_80123B5C.inc"
 }
 #else
-s32 fn_80123B5C(u8* ptr, u16 target) {
-    extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
+s32 pokemonSearchWazaDataId(u8* ptr, u16 target) {
+    extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
     s8 i;
     s32 ext_i;
     u8 flag;
@@ -7248,16 +7248,16 @@ s32 fn_80123B5C(u8* ptr, u16 target) {
         if (ptr == NULL) {
             flag = 0;
         } else {
-            if ((s32)fn_8012640C(ptr, 0, 0x7f, ext_i) == 0) {
+            if ((s32)pokemonGetStatus(ptr, 0, 0x7f, ext_i) == 0) {
                 flag = 0;
-            } else if ((s32)fn_8012640C(ptr, 0, 0x7f, ext_i) == 0x163) {
+            } else if ((s32)pokemonGetStatus(ptr, 0, 0x7f, ext_i) == 0x163) {
                 flag = 0;
             } else {
                 flag = 1;
             }
         }
         if ((u8)flag != 0) {
-            if ((s32)fn_8012640C(ptr, 0, 0x7f, (s8)i) == (s32)target) {
+            if ((s32)pokemonGetStatus(ptr, 0, 0x7f, (s8)i) == (s32)target) {
                 return i;
             }
         }
@@ -7265,8 +7265,8 @@ s32 fn_80123B5C(u8* ptr, u16 target) {
     return -1;
 }
 #endif
-/* 0x80 | fn_80123C54 | generic */
-void fn_80123C54(void* ptr, u32 idx, u32 arg) {
+/* 0x80 | pokemonWazaReplace | generic */
+void pokemonWazaReplace(void* ptr, u32 idx, u32 arg) {
     extern u32* fn_8011F260(void* a, u32 b, u32 c);
     extern void fn_8011F5E0(u32* dst, u32* src);
     u32 tmp;
@@ -7281,178 +7281,178 @@ void fn_80123C54(void* ptr, u32 idx, u32 arg) {
 }
 /* 0x80123CD4 | 0x84 */
 #if 0
-asm void fn_80123CD4(void) {
+asm void pokemonWazaCheckValid(void) {
 #include "src/game/gs_field_world_fn_80123CD4.inc"
 }
 #else
-u32 fn_80123CD4(u8* ptr, u32 arg2) {
-    extern u32 fn_8012640C(u8* ptr, u32 a, u32 b, u32 c);
+u32 pokemonWazaCheckValid(u8* ptr, u32 arg2) {
+    extern u32 pokemonGetStatus(u8* ptr, u32 a, u32 b, u32 c);
     if (ptr == NULL) { return 0; }
-    if ((s32)fn_8012640C(ptr, 0, 0x7f, arg2) == 0) { return 0; }
-    return fn_8012640C(ptr, 0, 0x7f, arg2) != 0x163;
+    if ((s32)pokemonGetStatus(ptr, 0, 0x7f, arg2) == 0) { return 0; }
+    return pokemonGetStatus(ptr, 0, 0x7f, arg2) != 0x163;
 }
 #endif
 /* 0x80123D58 | 0x118 */
 #if 0
-asm void fn_80123D58(void) {
+asm void pokemonWazaCreate(void) {
 #include "src/game/gs_field_world_fn_80123D58.inc"
 }
 #else
-void fn_80123D58(u8* ptr, u32 slot, u32 val) {
-    extern void fn_801254B4(u8* a, u32 b, u32 c, u32 d, u32 e);
-    extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
-    extern u32 fn_8011BB6C(u16 a, u8 b);
+void pokemonWazaCreate(u8* ptr, u32 slot, u32 val) {
+    extern void pokemonSetStatus(u8* a, u32 b, u32 c, u32 d, u32 e);
+    extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
+    extern u32 wazaGetMaxPP(u16 a, u8 b);
     u16 slot2;
     u16 result;
     u8 byte;
     if (ptr == NULL) { return; }
     if (ptr != NULL) {
-        fn_801254B4(ptr, 0, 0x7f, slot, 0);
-        fn_801254B4(ptr, 0, 0x80, slot, 0);
-        fn_801254B4(ptr, 0, 0x81, slot, 0);
+        pokemonSetStatus(ptr, 0, 0x7f, slot, 0);
+        pokemonSetStatus(ptr, 0, 0x80, slot, 0);
+        pokemonSetStatus(ptr, 0, 0x81, slot, 0);
     }
-    fn_801254B4(ptr, 0, 0x7f, slot, val);
+    pokemonSetStatus(ptr, 0, 0x7f, slot, val);
     if (ptr == NULL) {
         byte = 0;
     } else {
         slot2 = (u16)slot + 4;
-        result = (u16)fn_8012640C(ptr, 0, 0x7f, slot2);
-        byte = (u8)fn_8011BB6C(result, (u8)fn_8012640C(ptr, 0, 0x81, slot2));
+        result = (u16)pokemonGetStatus(ptr, 0, 0x7f, slot2);
+        byte = (u8)wazaGetMaxPP(result, (u8)pokemonGetStatus(ptr, 0, 0x81, slot2));
     }
-    fn_801254B4(ptr, 0, 0x80, slot, (u8)byte);
+    pokemonSetStatus(ptr, 0, 0x80, slot, (u8)byte);
 }
 #endif
 /* 0x80123EF0 | 0xCC */
 #if 0
-asm void fn_80123EF0(void) {
+asm void pokemonSetCatchStatus(void) {
 #include "src/game/gs_field_world_fn_80123EF0.inc"
 }
 #else
-void fn_80123EF0(u8* arg1, u32 arg2, u8 arg3, u16 arg4, u8 arg5, u32 arg6, u32 arg7) {
-    extern void fn_801254B4(u8* ptr, u32 a, u32 b, u32 c, u32 d);
+void pokemonSetCatchStatus(u8* arg1, u32 arg2, u8 arg3, u16 arg4, u8 arg5, u32 arg6, u32 arg7) {
+    extern void pokemonSetStatus(u8* ptr, u32 a, u32 b, u32 c, u32 d);
     if (arg1 == NULL) { return; }
-    fn_801254B4(arg1, 0, 0x71, 0, arg2);
-    fn_801254B4(arg1, 0, 0x72, 0, (u32)arg3);
-    fn_801254B4(arg1, 0, 0x73, 0, (u32)arg4);
-    fn_801254B4(arg1, 0, 0x74, 0, (u32)arg5);
-    fn_801254B4(arg1, 0, 0x75, 0, arg6);
-    fn_801254B4(arg1, 0, 0x76, 0, arg7);
+    pokemonSetStatus(arg1, 0, 0x71, 0, arg2);
+    pokemonSetStatus(arg1, 0, 0x72, 0, (u32)arg3);
+    pokemonSetStatus(arg1, 0, 0x73, 0, (u32)arg4);
+    pokemonSetStatus(arg1, 0, 0x74, 0, (u32)arg5);
+    pokemonSetStatus(arg1, 0, 0x75, 0, arg6);
+    pokemonSetStatus(arg1, 0, 0x76, 0, arg7);
 }
 #endif
 /* 0x80123FBC | 0x108 */
 extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
 #if 0
-asm void fn_80123FBC(void) {
+asm void pokemonCheckValid(void) {
 #include "src/game/gs_field_world_fn_80123FBC.inc"
 }
 #else
-u32 fn_80123FBC(u8* ptr) {
-    extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
+u32 pokemonCheckValid(u8* ptr) {
+    extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
     extern u32 gamedataAttestCheckValid(u32 val);
     u16 val;
     u8 flag;
     if (ptr == NULL) { return 0; }
-    val = (u16)fn_8012640C(ptr, 0, 0x6e, 0);
+    val = (u16)pokemonGetStatus(ptr, 0, 0x6e, 0);
     if (val == 0) { return 0; }
     flag = 0;
     if (val == 0) {
         flag = 0;
     } else {
-        if ((u32)fn_8012640C(NULL, val, 1, 0) == 0) { flag = 0; }
+        if ((u32)pokemonGetStatus(NULL, val, 1, 0) == 0) { flag = 0; }
         else if (val >= *(u32*)(u32)lbl_80478F90) { flag = 0; }
         else { flag = 1; }
     }
     if ((u8)flag == 0) { return 0; }
-    if ((u8)gamedataAttestCheckValid(fn_8012640C(ptr, 0, 0x70, 0)) == 0) { return 0; }
-    return (u8)fn_8012640C(ptr, 0, 0xb8, 0) != 1;
+    if ((u8)gamedataAttestCheckValid(pokemonGetStatus(ptr, 0, 0x70, 0)) == 0) { return 0; }
+    return (u8)pokemonGetStatus(ptr, 0, 0xb8, 0) != 1;
 }
 #endif
 /* 0x801240C4 | 0x34C */
 extern void fn_80135AD0(void);
 extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_801240C4(void);
+void pokemonCreate(void);
 /* 0x80124410 | 0x4B4 */
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_80124410(void);
+void pokemonCreateRndFit(void);
 /* 0x801248C4 | 0xB4 */
 #if 0
-asm void fn_801248C4(void) {
+asm void pokemonGetTokuseiDataId(void) {
 #include "src/game/gs_field_world_fn_801248C4.inc"
 }
 #else
-u16 fn_801248C4(u8* ptr) {
-    extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
+u16 pokemonGetTokuseiDataId(u8* ptr) {
+    extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
     u32 val;
     if (ptr == NULL) { return 0; }
-    val = fn_8012640C(ptr, 0, 0x6e, 0) & 0xFFFF;
-    if ((s32)fn_8012640C(NULL, val, 0x17, 1) == 0) {
-        return (u16)fn_8012640C(NULL, val, 0x17, 0);
+    val = pokemonGetStatus(ptr, 0, 0x6e, 0) & 0xFFFF;
+    if ((s32)pokemonGetStatus(NULL, val, 0x17, 1) == 0) {
+        return (u16)pokemonGetStatus(NULL, val, 0x17, 0);
     }
-    return (u16)fn_8012640C(NULL, val, 0x17, (u8)fn_8012640C(ptr, 0, 0xb7, 0));
+    return (u16)pokemonGetStatus(NULL, val, 0x17, (u8)pokemonGetStatus(ptr, 0, 0xb7, 0));
 }
 #endif
-/* 0x68 | fn_801249F8 | generic */
+/* 0x68 | pokemonInitAry | generic */
 #if 0
-asm void fn_801249F8(void) {
+asm void pokemonInitAry(void) {
 #include "src/game/gs_field_world_fn_801249F8.inc"
 }
 #else
-void fn_801249F8(u8* ptr, u16 count) {
-    extern void fn_80124A60(u8* ptr);
+void pokemonInitAry(u8* ptr, u16 count) {
+    extern void pokemonInit(u8* ptr);
     u16 i;
     if (ptr == NULL) { return; }
     for (i = 0; i < count; i++) {
-        fn_80124A60(ptr + (u16)i * 0x138);
+        pokemonInit(ptr + (u16)i * 0x138);
     }
 }
 #endif
 /* 0x80125238 | 0xA8 */
 #if 0
-asm void fn_80125238(void) {
+asm void pokemonInitDarkPokemon(void) {
 #include "src/game/gs_field_world_fn_80125238.inc"
 }
 #else
-void fn_80125238(u8* ptr) {
-    extern void fn_801254B4(u8* a, u32 b, u32 c, u32 d, u32 e);
-    extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
+void pokemonInitDarkPokemon(u8* ptr) {
+    extern void pokemonSetStatus(u8* a, u32 b, u32 c, u32 d, u32 e);
+    extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
     extern void fn_8011B950(u8* a, u32 b);
-    fn_801254B4(ptr, 0, 0xc3, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xc3, 0, 0);
     if (ptr != NULL) {
-        fn_801254B4(ptr, 0, 0xc5, 0, (u32)-100);
+        pokemonSetStatus(ptr, 0, 0xc5, 0, (u32)-100);
     }
-    fn_801254B4(ptr, 0, 0xc6, 0, 0);
-    fn_801254B4(ptr, 0, 0xc7, 0, 0);
-    fn_8011B950((u8*)fn_8012640C(ptr, 0, 0xc8, 0), 1);
+    pokemonSetStatus(ptr, 0, 0xc6, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xc7, 0, 0);
+    fn_8011B950((u8*)pokemonGetStatus(ptr, 0, 0xc8, 0), 1);
 }
 #endif
 /* 0x801252E0 | 0x34 */
-void fn_801252E0(u8* ptr) {
-    extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
+void pokemonInitJoutai(u8* ptr) {
+    extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
     extern void fn_8011B950(u8* a, u32 b);
-    fn_8011B950((u8*)fn_8012640C(ptr, 0, 0x7c, 0), 1);
+    fn_8011B950((u8*)pokemonGetStatus(ptr, 0, 0x7c, 0), 1);
 }
-/* 0x7C | fn_80125314 | generic */
-void fn_80125314(u8* ptr, u32 arg2) {
-    extern void fn_801254B4(u8* a, u32 b, u32 c, u32 d, u32 e);
+/* 0x7C | pokemonWazaInit | generic */
+void pokemonWazaInit(u8* ptr, u32 arg2) {
+    extern void pokemonSetStatus(u8* a, u32 b, u32 c, u32 d, u32 e);
     if (ptr == NULL) { return; }
-    fn_801254B4(ptr, 0, 0x7f, arg2, 0);
-    fn_801254B4(ptr, 0, 0x80, arg2, 0);
-    fn_801254B4(ptr, 0, 0x81, arg2, 0);
+    pokemonSetStatus(ptr, 0, 0x7f, arg2, 0);
+    pokemonSetStatus(ptr, 0, 0x80, arg2, 0);
+    pokemonSetStatus(ptr, 0, 0x81, arg2, 0);
 }
 /* 0x80125390 | 0x94 */
 #pragma push
 #pragma opt_propagation off
 #if 0
-asm void fn_80125390(void) {
+asm void pokemonCheckRare(void) {
 #include "src/game/gs_field_world_fn_80125390.inc"
 }
 #else
 /* w_sg2 2026-06-18: 100% byte-exact. Levers: inline a/b halves (correct emission order)
    + `eight` as a named temp (forces shared register for the `^8` xor and the `8<<n` slw)
    + declare `eight` BEFORE `lb` so it claims r3 (b's freed reg) while lb takes a fresh r6. */
-u32 fn_80125390(void* ctx) {
-    extern u32 fn_8012640C(void* a, u32 b, u32 c, u32 d);
+u32 pokemonCheckRare(void* ctx) {
+    extern u32 pokemonGetStatus(void* a, u32 b, u32 c, u32 d);
     u32 a;      /* r31 */
     u32 b;
     u32 eight;  /* declared BEFORE lb so it claims r3 (b's freed reg); lb -> r6 */
@@ -7460,57 +7460,57 @@ u32 fn_80125390(void* ctx) {
     if (ctx == NULL) {
         return 0;
     }
-    a = fn_8012640C(ctx, 0, 0x75, 0);
-    b = fn_8012640C(ctx, 0, 0x6F, 0);
+    a = pokemonGetStatus(ctx, 0, 0x75, 0);
+    b = pokemonGetStatus(ctx, 0, 0x6F, 0);
     eight = 8;
     lb = b & 0xFFFF;
     return (u32)(eight << __cntlzw((a >> 16) ^ (a & 0xFFFF) ^ (b >> 16) ^ lb ^ eight)) >> 31;
 }
 #endif
 #pragma pop
-/* 0x48 | fn_80125424 | null_guard_chain */
-void fn_80125424(void* ptr, u32 arg2) {
-    extern void fn_801254B4();
+/* 0x48 | pokemonGrowBasisStatus | null_guard_chain */
+void pokemonGrowBasisStatus(void* ptr, u32 arg2) {
+    extern void pokemonSetStatus();
     if (ptr == NULL) { return; }
-    fn_801254B4(ptr, 0, 0x79, 0, arg2);
-    fn_8012546C(ptr);
+    pokemonSetStatus(ptr, 0, 0x79, 0, arg2);
+    pokemonResetBasisStatus(ptr);
 }
-/* 0x48 | fn_8012546C | null_guard_chain */
-void fn_8012546C(void* ptr) {
-    extern u32 fn_8012640C();
-    extern void fn_8012795C();
+/* 0x48 | pokemonResetBasisStatus | null_guard_chain */
+void pokemonResetBasisStatus(void* ptr) {
+    extern u32 pokemonGetStatus();
+    extern void pokemonSetLevelBasisStatus();
     u8 val;
     if (ptr == NULL) { return; }
-    val = fn_8012640C(ptr, 0, 0xC0, 0);
-    fn_8012795C(ptr, val);
+    val = pokemonGetStatus(ptr, 0, 0xC0, 0);
+    pokemonSetLevelBasisStatus(ptr, val);
 }
 /* 0x8012795C | 0x700 */
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8012795C(void);
+void pokemonSetLevelBasisStatus(void);
 /* 0x8012805C | 0x2A4 */
 extern void fadeSet(void);
 extern void fadeCheck(void);
 extern void evolutionOpen(void);
 extern f32 lbl_8047D020;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8012805C(void);
+void pokemonEvolutionAll(void);
 /* 0x80128300 | 0x224 */
 extern u8 lbl_802729A4[];
 extern u8 lbl_80272998[];
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_80128300(void);
+void pokemonEvolutionCreateAddPokemon(void);
 /* 0x80128524 | 0x1A4 */
 extern void fn_800F9EE4(void);
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_80128524(void);
+void pokemonEvolution(void);
 /* 0x801286C8 | 0x39C */
 extern void jumptable_80363468();
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_801286C8(void);
+void getEvoPokemonLevelUp(void);
 /* 0x80128A64 | 0x25C */
 extern void itemDataBiosGetItemSoubiDataId(void);
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_80128A64(void);
+void pokemonEvolutionCheck(void);
 /* 0x80128CC0 | 0x1C */
 void* fn_80128CC0(void* ptr) {
     if (ptr == NULL) { return NULL; }
@@ -7592,7 +7592,7 @@ extern void fn_800F9D04(void);
 extern void gamedatasaveSetStatus(void);
 extern u8 lbl_8047D028[8];
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_80128E38(void);
+void savedataCreate(void);
 /* 0x80129094 | 0x1EC */
 extern void gamedataInit(void);
 extern void pcboxInit(void);
@@ -7605,15 +7605,15 @@ extern void fn_80083CBC(void);
 extern void fn_801EF128(void);
 extern void exribbonInit(void);
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_80129094(void);
+void savedataInit(void);
 /* 0x80129280 | 0x104 */
 extern void jumptable_803634A8();
 #if 0
-asm void fn_80129280(void) {
+asm void savedataGetStatus(void) {
 #include "src/game/gs_field_world_fn_80129280.inc"
 }
 #else
-u32 fn_80129280(u8* arg1, u16 arg2) {
+u32 savedataGetStatus(u8* arg1, u16 arg2) {
     extern u8* fn_80128E24(u8* ptr);
     extern u32 fn_80128E04(u8* ptr);
     extern u32 fn_80128DEC(u8* ptr);
@@ -7809,44 +7809,44 @@ u32 heroHizukiItemGetItemAryPtr(u8* ptr, u16* out_a, u16* out_b, u8* out_c, u8* 
 /* 0x78 | heroCheckSetMonohiroiAllTemotiPokemon | generic */
 void heroCheckSetMonohiroiAllTemotiPokemon(u8* arg1) {
     extern u32 heroGetStatus(u8* ptr, u32 a, u32 b);
-    extern u8 fn_80123FBC(u32 a);
-    extern void fn_80120674(u32 a);
+    extern u8 pokemonCheckValid(u32 a);
+    extern void pokemonCheckSetMonohiroi(u32 a);
     u32 result;
     u32 i;
     for (i = 0; (u16)i < 6; i++) {
         result = heroGetStatus(arg1, 3, i);
-        if (fn_80123FBC(result)) {
-            fn_80120674(result);
+        if (pokemonCheckValid(result)) {
+            pokemonCheckSetMonohiroi(result);
         }
     }
 }
 /* 0x801298B8 | 0x90 */
 extern void fn_80140588(void);
 #if 0
-asm void fn_801298B8(void) {
+asm void heroItemCheckAddItemDataId(void) {
 #include "src/game/gs_field_world_fn_801298B8.inc"
 }
 #else
-s32 fn_801298B8(u8* ptr, u32 arg2) {
+s32 heroItemCheckAddItemDataId(u8* ptr, u32 arg2) {
     extern u32 itemGetStatus(u32 a, u32 b, u32 c, u32 d);
-    extern void* fn_80129BC8(u8* ptr, u8 a, u16* b, u16* c, u32 d, u8* e);
+    extern void* heroItemGetItemKindToItemAryPtr(u8* ptr, u8 a, u16* b, u16* c, u32 d, u8* e);
     extern s32 fn_80140588(void* a, u16 b, u32 c, u16 d, u8 e);
     u16 local_c = 0;
     u16 local_a = 0;
     u8 local_8;
     void* result;
-    result = fn_80129BC8(ptr, (u8)itemGetStatus(0, arg2, 2, 0), &local_c, &local_a, 0, &local_8);
+    result = heroItemGetItemKindToItemAryPtr(ptr, (u8)itemGetStatus(0, arg2, 2, 0), &local_c, &local_a, 0, &local_8);
     if (result == NULL) { return -1; }
     return fn_80140588(result, local_c, arg2, local_a, local_8);
 }
 #endif
 /* 0x80 | fn_80129948 | generic */
 void fn_80129948(u8* arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5, u32 arg6, u32 arg7) {
-    extern void* fn_80129BC8(u8* a, u32 b, u16* c, u32 d, u32 e, u32 f);
+    extern void* heroItemGetItemKindToItemAryPtr(u8* a, u32 b, u16* c, u32 d, u32 e, u32 f);
     extern void fn_80140A9C(u8* a, u8* b);
     u16 local_8;
     u8* result;
-    result = (u8*)fn_80129BC8(arg1, arg2, &local_8, 0, 0, 0);
+    result = (u8*)heroItemGetItemKindToItemAryPtr(arg1, arg2, &local_8, 0, 0, 0);
     if (result == NULL) { return; }
     if ((u16)arg3 >= local_8) { return; }
     if ((u16)arg4 >= local_8) { return; }
@@ -7854,13 +7854,13 @@ void fn_80129948(u8* arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5, u32 arg6, u32
 }
 /* 0x801299C8 | 0xB0 */
 #if 0
-asm void fn_801299C8(void) {
+asm void heroItemDecItemDataId(void) {
 #include "src/game/gs_field_world_fn_801299C8.inc"
 }
 #else
-s32 fn_801299C8(u8* ptr, u32 arg2, u32 arg3, u32 arg4) {
+s32 heroItemDecItemDataId(u8* ptr, u32 arg2, u32 arg3, u32 arg4) {
     extern u32 itemGetStatus(u32 a, u32 b, u32 c, u32 d);
-    extern void* fn_80129BC8(u8* a, u8 b, u16* c, u16* d, u8* e, u32 f);
+    extern void* heroItemGetItemKindToItemAryPtr(u8* a, u8 b, u16* c, u16* d, u8* e, u32 f);
     extern s32 fn_80140ACC(void* a, u16 b, u32 c, u32 d, u32 e, u16 f, u8 g);
     u16 local_c = 0;
     u16 local_a = 0;
@@ -7868,20 +7868,20 @@ s32 fn_801299C8(u8* ptr, u32 arg2, u32 arg3, u32 arg4) {
     u8 tmp;
     void* result;
     tmp = (u8)itemGetStatus(0, arg2, 2, 0);
-    result = fn_80129BC8(ptr, tmp, &local_c, &local_a, &local_8, 0);
+    result = heroItemGetItemKindToItemAryPtr(ptr, tmp, &local_c, &local_a, &local_8, 0);
     if (result == NULL) { return -1; }
     return fn_80140ACC(result, local_c, arg2, arg3, arg4, local_a, local_8);
 }
 #endif
 /* 0x80129A78 | 0xB4 */
 #if 0
-asm void fn_80129A78(void) {
+asm void heroItemAddItemDataId(void) {
 #include "src/game/gs_field_world_fn_80129A78.inc"
 }
 #else
-s32 fn_80129A78(u8* ptr, u32 arg2, u32 arg3, u32 arg4) {
+s32 heroItemAddItemDataId(u8* ptr, u32 arg2, u32 arg3, u32 arg4) {
     extern u32 itemGetStatus(u32 a, u32 b, u32 c, u32 d);
-    extern void* fn_80129BC8(u8* a, u8 b, u16* c, u16* d, u8* e, u8* f);
+    extern void* heroItemGetItemKindToItemAryPtr(u8* a, u8 b, u16* c, u16* d, u8* e, u8* f);
     extern s32 fn_80141308(void* a, u16 b, u32 c, u32 d, u32 e, u16 f, u8 g, u8 h);
     u16 local_c = 0;
     u16 local_a = 0;
@@ -7890,32 +7890,32 @@ s32 fn_80129A78(u8* ptr, u32 arg2, u32 arg3, u32 arg4) {
     u8 tmp;
     void* result;
     tmp = (u8)itemGetStatus(0, arg2, 2, 0);
-    result = fn_80129BC8(ptr, tmp, &local_c, &local_a, &local_9, &local_8);
+    result = heroItemGetItemKindToItemAryPtr(ptr, tmp, &local_c, &local_a, &local_9, &local_8);
     if (result == NULL) { return -1; }
     return fn_80141308(result, local_c, arg2, arg3, arg4, local_a, local_9, local_8);
 }
 #endif
 /* 0x80129B2C | 0x9C */
 #if 0
-asm void fn_80129B2C(void) {
+asm void heroItemCheckHaveItemDataId(void) {
 #include "src/game/gs_field_world_fn_80129B2C.inc"
 }
 #else
-u32 fn_80129B2C(u8* ptr, u32 arg2) {
+u32 heroItemCheckHaveItemDataId(u8* ptr, u32 arg2) {
     extern u32 itemGetStatus(u32 a, u32 b, u32 c, u32 d);
-    extern void* fn_80129BC8(u8* ptr, u8 a, u16* b, u16* c, u32 d, u32 e);
+    extern void* heroItemGetItemKindToItemAryPtr(u8* ptr, u8 a, u16* b, u16* c, u32 d, u32 e);
     extern s32 fn_80142368(void* a, u16 b, u32 c, u32 d, u16 e);
     u16 local_a = 0;
     u16 local_8 = 0;
     void* result;
-    result = fn_80129BC8(ptr, (u8)itemGetStatus(0, arg2, 2, 0), &local_a, &local_8, 0, 0);
+    result = heroItemGetItemKindToItemAryPtr(ptr, (u8)itemGetStatus(0, arg2, 2, 0), &local_a, &local_8, 0, 0);
     if (result == NULL) { return 0; }
     return fn_80142368(result, local_a, arg2, 0, local_8) != 0;
 }
 #endif
 /* 0x80129BC8 | 0x19C */
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_80129BC8(void);
+void heroItemGetItemKindToItemAryPtr(void);
 /* 0x80129D64 | 0xBC */
 #if 0
 asm void fn_80129D64(void) {
@@ -7924,13 +7924,13 @@ asm void fn_80129D64(void) {
 #else
 u32 fn_80129D64(u8* ptr, u8* arg2) {
     extern u32 heroGetStatus(u8* a, u32 b, u32 c);
-    extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
+    extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
     extern u32 fn_800F9EE4(u32 a, u32 b);
     u32 val1, temp, val2, result2;
     val1 = heroGetStatus(ptr, 2, 0);
     temp = heroGetStatus(ptr, 1, 0);
-    val2 = fn_8012640C(arg2, 0, 0x75, 0);
-    result2 = fn_8012640C(arg2, 0, 0x76, 0);
+    val2 = pokemonGetStatus(arg2, 0, 0x75, 0);
+    result2 = pokemonGetStatus(arg2, 0, 0x76, 0);
     if (val1 != val2) { return 0; }
     return fn_800F9EE4(temp, result2) == 0;
 }
@@ -7938,14 +7938,14 @@ u32 fn_80129D64(u8* ptr, u8* arg2) {
 /* 0x80129E20 | 0x100 */
 extern void fn_80134BC0(void);
 #if 0
-asm void fn_80129E20(void) {
+asm void heroGetPokemon(void) {
 #include "src/game/gs_field_world_fn_80129E20.inc"
 }
 #else
-s32 fn_80129E20(u8* ptr, void* buf, u8 flag) {
+s32 heroGetPokemon(u8* ptr, void* buf, u8 flag) {
     extern void* heroGetStatus(u8* a, u32 b, u32 c);
-    extern u32 fn_80123FBC(void* val);
-    extern void fn_8011F5FC(void* a, void* b);
+    extern u32 pokemonCheckValid(void* val);
+    extern void pokemonBiosCopy(void* a, void* b);
     extern u32 fn_80134BC0(u32 a, void* b, s32 c);
     u8 local_buf[0x138];
     u8 i;
@@ -7953,12 +7953,12 @@ s32 fn_80129E20(u8* ptr, void* buf, u8 flag) {
     void* val;
 
     if (buf == NULL) { return 6; }
-    fn_8011F5FC(local_buf, buf);
+    pokemonBiosCopy(local_buf, buf);
     if (&local_buf == NULL) { i = 6; goto after_loop; }
     for (i = 0; i < 6; i++) {
         val = heroGetStatus(ptr, 3, i);
-        if ((u8)fn_80123FBC(val) != 1) {
-            fn_8011F5FC(val, local_buf);
+        if ((u8)pokemonCheckValid(val) != 1) {
+            pokemonBiosCopy(val, local_buf);
             goto after_loop;
         }
     }
@@ -7974,16 +7974,16 @@ after_loop:
 #endif
 /* 0x80129F20 | 0x16C */
 #if 0
-asm void fn_80129F20(void) {
+asm void heroCatchPokemon(void) {
 #include "src/game/gs_field_world_fn_80129F20.inc"
 }
 #else
-s32 fn_80129F20(u8* ptr, u8* buf, u32 arg3, u16 arg4, u8 flag) {
-    extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
+s32 heroCatchPokemon(u8* ptr, u8* buf, u32 arg3, u16 arg4, u8 flag) {
+    extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
     extern u32 heroGetStatus(u8* a, u32 b, u32 c);
-    extern u32 fn_80123FBC(u32 val);
-    extern void fn_8011F5FC(void* a, void* b);
-    extern void fn_80123EF0(u8* a, u32 b, u32 c, u32 d, u32 e, u32 f, u32 g);
+    extern u32 pokemonCheckValid(u32 val);
+    extern void pokemonBiosCopy(void* a, void* b);
+    extern void pokemonSetCatchStatus(u8* a, u32 b, u32 c, u32 d, u32 e, u32 f, u32 g);
     extern u32 fn_80134BC0(u32 a, void* b, s32 c);
     u8 local_buf[0x138];
     u8 field7a;
@@ -7994,12 +7994,12 @@ s32 fn_80129F20(u8* ptr, u8* buf, u32 arg3, u16 arg4, u8 flag) {
     void* slot;
 
     if (buf == NULL) { return 6; }
-    field7a = (u8)fn_8012640C(buf, 0, 0x7a, 0);
+    field7a = (u8)pokemonGetStatus(buf, 0, 0x7a, 0);
     status = (u8)heroGetStatus(ptr, 0xb, 0);
     val2 = heroGetStatus(ptr, 2, 0);
     val1 = heroGetStatus(ptr, 1, 0);
-    fn_8011F5FC(local_buf, buf);
-    fn_80123EF0(local_buf, arg3, field7a, arg4, status, val2, val1);
+    pokemonBiosCopy(local_buf, buf);
+    pokemonSetCatchStatus(local_buf, arg3, field7a, arg4, status, val2, val1);
 
     if (&local_buf == NULL) {
         i = 6;
@@ -8007,8 +8007,8 @@ s32 fn_80129F20(u8* ptr, u8* buf, u32 arg3, u16 arg4, u8 flag) {
         i = 0;
         while ((u8)i < 6) {
             slot = (void*)heroGetStatus(ptr, 3, (u8)i);
-            if ((u8)fn_80123FBC((u32)slot) != 1) {
-                fn_8011F5FC(slot, local_buf);
+            if ((u8)pokemonCheckValid((u32)slot) != 1) {
+                pokemonBiosCopy(slot, local_buf);
                 break;
             }
             i++;
@@ -8026,22 +8026,22 @@ s32 fn_80129F20(u8* ptr, u8* buf, u32 arg3, u16 arg4, u8 flag) {
 #endif
 /* 0x8012A08C | 0xA4 */
 #if 0
-asm void fn_8012A08C(void) {
+asm void heroAddPokemon(void) {
 #include "src/game/gs_field_world_fn_8012A08C.inc"
 }
 #else
-u32 fn_8012A08C(u8* ptr, void* arg2) {
+u32 heroAddPokemon(u8* ptr, void* arg2) {
     extern u32 heroGetStatus(u8* a, u32 b, u32 c);
-    extern u32 fn_80123FBC(u32 val);
-    extern void fn_8011F5FC(u32 a, void* b);
+    extern u32 pokemonCheckValid(u32 val);
+    extern void pokemonBiosCopy(u32 a, void* b);
     u32 val;
     u32 i;
     if (arg2 == NULL) { return 6; }
     i = 0;
     while ((u8)i < 6) {
         val = heroGetStatus(ptr, 3, i & 0xFF);
-        if ((u8)fn_80123FBC(val) != 1) {
-            fn_8011F5FC(val, arg2);
+        if ((u8)pokemonCheckValid(val) != 1) {
+            pokemonBiosCopy(val, arg2);
             return i;
         }
         i++;
@@ -8051,18 +8051,18 @@ u32 fn_8012A08C(u8* ptr, void* arg2) {
 #endif
 /* 0x8012A1A4 | 0xA4 */
 #if 0
-asm void fn_8012A1A4(void) {
+asm void heroCreate(void) {
 #include "src/game/gs_field_world_fn_8012A1A4.inc"
 }
 #else
-void fn_8012A1A4(u8* ptr, u32 arg2, u8 arg3) {
-    extern void fn_8012A248(u8* ptr);
+void heroCreate(u8* ptr, u32 arg2, u8 arg3) {
+    extern void heroInit(u8* ptr);
     extern u32 fn_800E0C54(void);
     extern void heroSetStatus(u8* ptr, u32 a, u32 b);
     extern u32 fn_800FA280(u32 val);
     u32 lo;
     u32 hi;
-    fn_8012A248(ptr);
+    heroInit(ptr);
     lo = fn_800E0C54() & 0xFFFF;
     hi = fn_800E0C54() << 16;
     heroSetStatus(ptr, 2, hi | lo);
@@ -8074,20 +8074,20 @@ void fn_8012A1A4(u8* ptr, u32 arg2, u8 arg3) {
 /* 0x8012A248 | 0x208 */
 extern void fn_80142A88(void);
 #if 0
-asm void fn_8012A248(void) {
+asm void heroInit(void) {
 #include "src/game/gs_field_world_fn_8012A248.inc"
 }
 #else
-void fn_8012A248(u8* ptr) {
+void heroInit(u8* ptr) {
     extern void heroSetStatus(u8* p, u32 a, u32 b);
     extern u8* heroGetStatus(u8* p, u32 a, u32 b);
-    extern void fn_801249F8(u8* p, u16 count);
+    extern void pokemonInitAry(u8* p, u16 count);
     extern void fn_80142A88(u8* p, u32 v);
     u16 local = 0;
 
     heroSetStatus(ptr, 1, (u32)&local);
     heroSetStatus(ptr, 2, 0);
-    fn_801249F8(heroGetStatus(ptr, 3, 0), 6);
+    pokemonInitAry(heroGetStatus(ptr, 3, 0), 6);
     fn_80142A88(heroGetStatus(ptr, 4, 0), 0x14);
     fn_80142A88(heroGetStatus(ptr, 5, 0), 0x2b);
     fn_80142A88(heroGetStatus(ptr, 6, 0), 0x10);
@@ -8120,16 +8120,16 @@ asm void heroSetStatus(void) {
 }
 #else
 void heroSetStatus(u8* ptr, u32 selector, u32 value) {
-    extern u32 fn_80129280(u8*, u16);
+    extern u32 savedataGetStatus(u8*, u16);
     u16 sel = (u16)selector;
 
     if (sel == 0) { return; }
     if (sel >= 0x1A) { return; }
 
     if (ptr == NULL) {
-        ptr = (u8*)fn_80129280(NULL, 0);
+        ptr = (u8*)savedataGetStatus(NULL, 0);
         if (ptr == NULL) { return; }
-        ptr = (u8*)fn_80129280(ptr, 2);
+        ptr = (u8*)savedataGetStatus(ptr, 2);
         if (ptr == NULL) { return; }
     }
 
@@ -8138,52 +8138,52 @@ void heroSetStatus(u8* ptr, u32 selector, u32 value) {
         heroBiosSetNamePtr(ptr, (void*)value);
         break;
     case 2:
-        fn_8012AA54(ptr, value);
+        heroBiosSetRnd(ptr, value);
         break;
     case 3:
-        fn_8012AA44(ptr, (u8)value);
+        heroBiosSetSexDataId(ptr, (u8)value);
         break;
     case 4:
-        fn_8012A86C(ptr, value);
+        heroBiosSetPokedoru(ptr, value);
         break;
     case 5:
-        fn_8012A824(ptr, value);
+        heroBiosSetPokecoupon(ptr, value);
         break;
     case 6:
-        fn_8012A7DC(ptr, value);
+        heroBiosSetPokecouponAll(ptr, value);
         break;
     case 7:
-        fn_8012AA1C(ptr, (u8)value);
+        heroBiosSetBadge01Flag(ptr, (u8)value);
         break;
     case 8:
-        fn_8012AA0C(ptr, (u8)value);
+        heroBiosSetBadge02Flag(ptr, (u8)value);
         break;
     case 9:
-        fn_8012A9FC(ptr, (u8)value);
+        heroBiosSetBadge03Flag(ptr, (u8)value);
         break;
     case 10:
-        fn_8012A9EC(ptr, (u8)value);
+        heroBiosSetBadge04Flag(ptr, (u8)value);
         break;
     case 11:
-        fn_8012A9DC(ptr, (u8)value);
+        heroBiosSetBadge05Flag(ptr, (u8)value);
         break;
     case 12:
-        fn_8012A9CC(ptr, (u8)value);
+        heroBiosSetBadge06Flag(ptr, (u8)value);
         break;
     case 13:
-        fn_8012A9BC(ptr, (u8)value);
+        heroBiosSetBadge07Flag(ptr, (u8)value);
         break;
     case 14:
-        fn_8012A9AC(ptr, (u8)value);
+        heroBiosSetBadge08Flag(ptr, (u8)value);
         break;
     case 15:
         heroBiosSetHizukiNamePtr(ptr, (void*)value);
         break;
     case 16:
-        fn_8012A7B4(ptr, (u8)value);
+        heroBiosSetHizukiFlag(ptr, (u8)value);
         break;
     case 17:
-        fn_8012A774(ptr, (u8)value);
+        heroBiosSetHomePlace(ptr, (u8)value);
         break;
     }
 }
@@ -8193,21 +8193,21 @@ extern void jumptable_80363558();
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void heroGetStatus(void);
 /* 0x8012A7DC | 0x30 */
-void fn_8012A7DC(u8* ptr, s32 val) {
+void heroBiosSetPokecouponAll(u8* ptr, s32 val) {
     if (ptr == NULL) { return; }
     if (val < 0) { val = 0; }
     if (val > 0x98967F) { val = 0x98967F; }
     *(s32*)(&ptr[0xA8C]) = val;
 }
 /* 0x8012A824 | 0x30 */
-void fn_8012A824(u8* ptr, s32 val) {
+void heroBiosSetPokecoupon(u8* ptr, s32 val) {
     if (ptr == NULL) { return; }
     if (val < 0) { val = 0; }
     if (val > 0x98967F) { val = 0x98967F; }
     *(s32*)(&ptr[0xA88]) = val;
 }
 /* 0x8012A86C | 0x30 */
-void fn_8012A86C(u8* ptr, s32 val) {
+void heroBiosSetPokedoru(u8* ptr, s32 val) {
     if (ptr == NULL) { return; }
     if (val < 0) { val = 0; }
     if (val > 0x98967F) { val = 0x98967F; }
@@ -8220,7 +8220,7 @@ void heroBiosSetHizukiNamePtr(u8* ptr, void* src) {
     GScharLenCpy(ptr + 0xAC2, src, 0xB);
 }
 /* 0x8012A8D4 | 24 bytes | nc_addi_ptr */
-void* fn_8012A8D4(void* ptr) {
+void* heroBiosGetHizukiNamePtr(void* ptr) {
     if (ptr == NULL) { return NULL; }
     return (u8*)ptr + 0xAC2;
 }
@@ -8232,55 +8232,55 @@ void heroBiosSetNamePtr(void* dst, void* src) {
     GScharLenCpy(dst, src, 0xB);
 }
 /* 0x8012AA9C | 0x34 */
-void* fn_8012AA9C(u8* ptr, u16 idx) {
+void* heroBiosGetHizukiItemPtr(u8* ptr, u16 idx) {
     if (ptr == NULL) { return NULL; }
     if (idx >= 0xA) { return NULL; }
     return ptr + (u32)idx * 4 + 0xA9A;
 }
 /* 0x8012AAD0 | 0x34 */
-void* fn_8012AAD0(u8* ptr, u16 idx) {
+void* heroBiosGetItemKoronPtr(u8* ptr, u16 idx) {
     if (ptr == NULL) { return NULL; }
     if (idx >= 0x3) { return NULL; }
     return ptr + (u32)idx * 4 + 0xA74;
 }
 /* 0x8012AB04 | 0x34 */
-void* fn_8012AB04(u8* ptr, u16 idx) {
+void* heroBiosGetItemSeedPtr(u8* ptr, u16 idx) {
     if (ptr == NULL) { return NULL; }
     if (idx >= 0x2E) { return NULL; }
     return ptr + (u32)idx * 4 + 0x9BC;
 }
 /* 0x8012AB38 | 0x34 */
-void* fn_8012AB38(u8* ptr, u16 idx) {
+void* heroBiosGetItemSkillPtr(u8* ptr, u16 idx) {
     if (ptr == NULL) { return NULL; }
     if (idx >= 0x40) { return NULL; }
     return ptr + (u32)idx * 4 + 0x8BC;
 }
 /* 0x8012AB6C | 0x34 */
-void* fn_8012AB6C(u8* ptr, u16 idx) {
+void* heroBiosGetItemBallPtr(u8* ptr, u16 idx) {
     if (ptr == NULL) { return NULL; }
     if (idx >= 0x10) { return NULL; }
     return ptr + (u32)idx * 4 + 0x87C;
 }
 /* 0x8012ABA0 | 0x34 */
-void* fn_8012ABA0(u8* ptr, u16 idx) {
+void* heroBiosGetExtraItemPtr(u8* ptr, u16 idx) {
     if (ptr == NULL) { return NULL; }
     if (idx >= 0x2B) { return NULL; }
     return ptr + (u32)idx * 4 + 0x7D0;
 }
 /* 0x8012ABD4 | 0x34 */
-void* fn_8012ABD4(u8* ptr, u16 idx) {
+void* heroBiosGetItemNormalPtr(u8* ptr, u16 idx) {
     if (ptr == NULL) { return NULL; }
     if (idx >= 0x14) { return NULL; }
     return ptr + (u32)idx * 4 + 0x780;
 }
 /* 0x8012AC08 | 0x34 */
-void* fn_8012AC08(u8* ptr, u16 idx) {
+void* heroBiosGetPokemonPtr(u8* ptr, u16 idx) {
     if (ptr == NULL) { return NULL; }
     if (idx >= 6) { return NULL; }
     return ptr + (u32)idx * 0x138 + 0x30;
 }
 /* 0x8012AC54 | 16 bytes | nc_bnelr */
-u32 fn_8012AC54(void* ptr) {
+u32 heroBiosGetNamePtr(void* ptr) {
     if (ptr != NULL) { return (u32)ptr; }
     return 0;
 }
@@ -8288,7 +8288,7 @@ u32 fn_8012AC54(void* ptr) {
 #ifndef PCPORT
 typedef struct { u32 data[0x2C6]; } GfwBuf0xB18;
 #endif
-void fn_8012AC64(u32* dst, u32* src) {
+void heroBiosCopy(u32* dst, u32* src) {
 #ifdef PCPORT
     u32 i;
 #endif
@@ -8305,17 +8305,17 @@ void fn_8012AC64(u32* dst, u32* src) {
 /* 0x8012AC9C | 0xB4 */
 extern u8 lbl_80426BD0[];
 #if 0
-asm void fn_8012AC9C(void) {
+asm void cbTsureFriend__Fl15FootStepCounterl(void) {
 #include "src/game/gs_field_world_fn_8012AC9C.inc"
 }
 #else
-void fn_8012AC9C(void) {
+void cbTsureFriend__Fl15FootStepCounterl(void) {
     extern u32 heroGetStatus(u8* a, u32 b, u32 c);
-    extern u32 fn_80123FBC(u32 val);
+    extern u32 pokemonCheckValid(u32 val);
     extern void fn_8011F1A0(u32 val);
     extern void* itemDataBiosGetPtr(void);
     extern u32 itemDataBiosGetItemSoubiDataId(void* a);
-    extern void fn_80122370(u32 a, u32 b, u32 c);
+    extern void pokemonGetFriendFormPokemonFriendFilterId(u32 a, u32 b, u32 c);
     u32* counter = (u32*)(lbl_80426BD0 + 0x184);
     u32 val;
     s32 i;
@@ -8329,7 +8329,7 @@ void fn_8012AC9C(void) {
     do {
         obj = heroGetStatus(NULL, 3, (u16)i);
         if (obj != 0) {
-            if ((u8)fn_80123FBC(obj) != 0) {
+            if ((u8)pokemonCheckValid(obj) != 0) {
                 fn_8011F1A0(obj);
                 result = itemDataBiosGetPtr();
                 if (result == NULL) {
@@ -8337,7 +8337,7 @@ void fn_8012AC9C(void) {
                 } else {
                     val = itemDataBiosGetItemSoubiDataId(result);
                 }
-                fn_80122370(obj, val, 5);
+                pokemonGetFriendFormPokemonFriendFilterId(obj, val, 5);
             }
         }
         i++;
@@ -8356,10 +8356,10 @@ extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 extern f32 lbl_8047D038;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8012AD50(void);
+void cbPoison__Fl15FootStepCounterl(void);
 /* 0x8012B184 | 0x18 */
 extern u8 lbl_80426BD0[];
-void fn_8012B184(s32 val) {
+void heroMoveSetLockFrame(s32 val) {
     if (val < 0) { return; }
     *(u32*)(lbl_80426BD0 + 0x188) = (u32)val;
 }
@@ -8394,9 +8394,9 @@ extern f64 lbl_8047D050;
 extern f64 lbl_8047D058;
 extern f32 lbl_8047D060;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8012B5E4(void);
+void heroMoveChkHinderClear(void);
 /* 0x8012BAD0 | 0x20 */
-void fn_8012BAD0(u32 a, u32 b, u32 c, u32 d, u32 e) {
+void heroMoveAddAutoEvent(u32 a, u32 b, u32 c, u32 d, u32 e) {
     u8* base = lbl_80426BD0;
     *(u32*)(base + 0x18C) = a;
     *(u32*)(base + 0x190) = b;
@@ -8432,11 +8432,11 @@ void fn_8012BAF0(u8 type, void* src, u32 val) {
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 #if 0
-asm void fn_8012BBA8(void) {
+asm void heroMoveTermEvent(void) {
 #include "src/game/gs_field_world_fn_8012BBA8.inc"
 }
 #else
-void fn_8012BBA8(void) {
+void heroMoveTermEvent(void) {
     extern u8 lbl_80426BD0[];
     extern void fn_8018CA20(u32 a, u32 b, u32 c);
     extern void fn_8018C7C8(u32 a, u32 b, u32 c);
@@ -8481,7 +8481,7 @@ extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 extern f32 lbl_8047D038;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8012BCA4(void);
+void heroMoveInitEvent(void);
 /* 0x8012BDE0 | 0xD4 */
 #if 0
 asm void fn_8012BDE0(void) {
@@ -8555,7 +8555,7 @@ extern f64 lbl_8047D068;
 extern f32 lbl_8047D038;
 extern f32 lbl_8047D040;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8012BEB4(void);
+void getStep__FP8FOOTSTEPP8_GSmodelPiP8FOOTWORK(void);
 /* 0x8012C0B4 | 0x48C */
 extern void fn_8018CD08(void);
 extern void fn_8018FCBC(void);
@@ -8583,7 +8583,7 @@ extern f32 lbl_8047D07C;
 extern f32 lbl_8047D038;
 extern f32 lbl_8047D080;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8012C0B4(void);
+void updateChat__F15HEROMOVE_MEMBER(void);
 /* 0x8012C540 | 0x120 */
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
@@ -8591,7 +8591,7 @@ extern f32 lbl_8047D078;
 extern f32 lbl_8047D07C;
 extern f32 lbl_8047D038;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8012C540(void);
+void heroMoveCheckEvent(void);
 /* 0x8012C660 | 0x424 */
 extern void fn_8018F4C8(void);
 extern void fn_800EC578(void);
@@ -8608,7 +8608,7 @@ extern f32 lbl_8047D08C;
 extern f32 lbl_8047D040;
 extern f32 lbl_8047D090;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8012C660(void);
+void updateAnimation__Ff15HEROMOVE_MEMBER(void);
 /* 0x8012D39C | 0x454 */
 extern f32 lbl_8047D0A8;
 extern f32 lbl_8047D038;
@@ -8679,7 +8679,7 @@ extern f64 lbl_8047D050;
 extern f64 lbl_8047D058;
 extern f32 lbl_8047D0D4;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8012E7B8(void);
+void moveLeader__F15HEROMOVE_MEMBER(void);
 /* 0x8012EBD4 | 0x3E4 */
 extern void dbgMenuIsOpen(void);
 extern void fn_80102620(void);
@@ -8690,18 +8690,18 @@ extern f32 lbl_8047D034;
 extern u8 lbl_80272A38[];
 extern f32 lbl_8047D064;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8012EBD4(void);
+void heroMoveMain(void);
 /* 0x8012F008 | 0x114 */
 extern void fn_80188AF4(u32, u32);
 extern void fn_80188F78(u32, u32);
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 #if 0
-asm void fn_8012F008(void) {
+asm void heroMoveSetNeckMode(void) {
 #include "src/game/gs_field_world_fn_8012F008.inc"
 }
 #else
-u32 fn_8012F008(s32 idx, s32 state)
+u32 heroMoveSetNeckMode(s32 idx, s32 state)
 {
     u32 values[2];
     u32 value;
@@ -8756,11 +8756,11 @@ u32 heroMoveIsMember(s32 idx) {
 extern f32 lbl_8047D038;
 extern f32 lbl_8047D0D4;
 #if 0
-asm void fn_8012F150(void) {
+asm void heroMoveDismissMember(void) {
 #include "src/game/gs_field_world_fn_8012F150.inc"
 }
 #else
-s32 fn_8012F150(s32 idx) {
+s32 heroMoveDismissMember(s32 idx) {
     f32 f1, f2;
     s32 i;
     if (idx < 0 || idx >= 2) return 0;
@@ -8806,14 +8806,14 @@ extern f32 lbl_8047D0D8;
 extern f32 lbl_8047D07C;
 extern f32 lbl_8047D038;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8012F610(void);
+void initFloor__Fv(void);
 /* 0x8012FAD8 | 0x1FC */
 extern void fn_8011393C(void);
 extern void fn_8006AE18(void);
 extern u8 lbl_802729C0[];
 extern u8 lbl_80272A10[];
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8012FAD8(void);
+void heroMoveGetKenObjID(void);
 /* 0x8012FCD4 | 0x380 */
 extern void fn_8018E050(void);
 extern void fn_800EB528(void);
@@ -8824,14 +8824,14 @@ extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 extern f32 lbl_8047D038;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8012FCD4(void);
+void heroMoveInit(void);
 /* 0x80130054 | 0x1F8 */
 extern f32 lbl_8047D034;
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D038;
 extern f32 lbl_8047D0D4;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_80130054(void);
+void heroMoveSyncWithHero(void);
 /* 0x8013024C | 0x414 */
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
@@ -8850,14 +8850,14 @@ asm void heroPokemonGetCelebi(void) {
 void heroPokemonGetCelebi(u8* arg1) {
     extern u32 gamedataGetStatus(u32 a, u32 b);
     extern void gamedataAttestCreate(u32* a, u32 b, u32 c, u8 d, u8 e);
-    extern void fn_801240C4(u8* a, u32 b, u32 c, u32* d);
-    extern void fn_801254B4(u8* a, u32 b, u32 c, u32 d, u32 e);
+    extern void pokemonCreate(u8* a, u32 b, u32 c, u32* d);
+    extern void pokemonSetStatus(u8* a, u32 b, u32 c, u32 d, u32 e);
     extern u32 fn_800FA280(u32 val);
-    extern void fn_80123EF0(u8* a, u32 b, u32 c, u32 d, u32 e, u32 f, u32 g);
-    extern u32 fn_80124410(u8* a, s32 b, s32 c, u32 d, u32 e);
-    extern void fn_8012546C(u8* a);
+    extern void pokemonSetCatchStatus(u8* a, u32 b, u32 c, u32 d, u32 e, u32 f, u32 g);
+    extern u32 pokemonCreateRndFit(u8* a, s32 b, s32 c, u32 d, u32 e);
+    extern void pokemonResetBasisStatus(u8* a);
     extern void memoDataSet(u32 a, u8* b);
-    extern s32 fn_80129E20(u8* a, u8* b, u32 c);
+    extern s32 heroGetPokemon(u8* a, u8* b, u32 c);
     u32 temp;
     u8 buf[0x13c];
     u8 r31, r30_u8;
@@ -8866,14 +8866,14 @@ void heroPokemonGetCelebi(u8* arg1) {
     r31 = (u8)gamedataGetStatus(0, 5);
     r30_u8 = (u8)gamedataGetStatus(0, 4);
     gamedataAttestCreate(&temp, 0x9, 3, r30_u8, r31);
-    fn_801240C4(buf, 0xfb, 0xa, &temp);
-    fn_801254B4(buf, 0, 0x99, 0, 0x46);
-    fn_80123EF0(buf, 0xff, 0xa, 4, 1, 0x7991, fn_800FA280(0x12af));
-    tmp = fn_80124410(buf, -1, -1, 0, 0x7991);
-    fn_801254B4(buf, 0, 0x6f, 0, tmp);
-    fn_8012546C(buf);
+    pokemonCreate(buf, 0xfb, 0xa, &temp);
+    pokemonSetStatus(buf, 0, 0x99, 0, 0x46);
+    pokemonSetCatchStatus(buf, 0xff, 0xa, 4, 1, 0x7991, fn_800FA280(0x12af));
+    tmp = pokemonCreateRndFit(buf, -1, -1, 0, 0x7991);
+    pokemonSetStatus(buf, 0, 0x6f, 0, tmp);
+    pokemonResetBasisStatus(buf);
     memoDataSet(0, buf);
-    fn_80129E20(arg1, buf, 1);
+    heroGetPokemon(arg1, buf, 1);
 }
 #endif
 /* 0x80130770 | 0x120 */
@@ -8885,15 +8885,15 @@ asm void fn_80130770(void) {
 void fn_80130770(u8* arg1) {
     extern u32 gamedataGetStatus(u32 a, u32 b);
     extern void gamedataAttestCreate(u32* a, u32 b, u32 c, u8 d, u8 e);
-    extern void fn_801240C4(u8* a, u32 b, u32 c, u32* d);
-    extern void fn_801254B4(u8* a, u32 b, u32 c, u32 d, u32 e);
+    extern void pokemonCreate(u8* a, u32 b, u32 c, u32* d);
+    extern void pokemonSetStatus(u8* a, u32 b, u32 c, u32 d, u32 e);
     extern u32 fn_800FA280(u32 val);
-    extern void fn_80123EF0(u8* a, u32 b, u32 c, u32 d, u32 e, u32 f, u32 g);
-    extern u32 fn_80124410(u8* a, s32 b, s32 c, u32 d, u32 e);
-    extern void fn_8012546C(u8* a);
+    extern void pokemonSetCatchStatus(u8* a, u32 b, u32 c, u32 d, u32 e, u32 f, u32 g);
+    extern u32 pokemonCreateRndFit(u8* a, s32 b, s32 c, u32 d, u32 e);
+    extern void pokemonResetBasisStatus(u8* a);
     extern void memoDataSet(u32 a, u8* b);
-    extern s32 fn_80129E20(u8* a, u8* b, u32 c);
-    extern u16 fn_80123110(u8* a, u32 b, u8 c);
+    extern s32 heroGetPokemon(u8* a, u8* b, u32 c);
+    extern u16 pokemonDoItemSoubi(u8* a, u32 b, u8 c);
     u32 temp;
     u8 buf[0x13c];
     u8 r31, r30_u8;
@@ -8902,15 +8902,15 @@ void fn_80130770(u8* arg1) {
     r31 = (u8)gamedataGetStatus(0, 5);
     r30_u8 = (u8)gamedataGetStatus(0, 4);
     gamedataAttestCreate(&temp, 0x9, 3, r30_u8, r31);
-    fn_801240C4(buf, 0x19, 0xa, &temp);
-    fn_801254B4(buf, 0, 0x99, 0, 0x46);
-    fn_80123EF0(buf, 0xff, 0xa, 4, 0, 0x7991, fn_800FA280(0x12ae));
-    tmp = fn_80124410(buf, -1, -1, 0, 0x7991);
-    fn_801254B4(buf, 0, 0x6f, 0, tmp);
-    fn_80123110(buf, 0xca, 1);
-    fn_8012546C(buf);
+    pokemonCreate(buf, 0x19, 0xa, &temp);
+    pokemonSetStatus(buf, 0, 0x99, 0, 0x46);
+    pokemonSetCatchStatus(buf, 0xff, 0xa, 4, 0, 0x7991, fn_800FA280(0x12ae));
+    tmp = pokemonCreateRndFit(buf, -1, -1, 0, 0x7991);
+    pokemonSetStatus(buf, 0, 0x6f, 0, tmp);
+    pokemonDoItemSoubi(buf, 0xca, 1);
+    pokemonResetBasisStatus(buf);
     memoDataSet(0, buf);
-    fn_80129E20(arg1, buf, 1);
+    heroGetPokemon(arg1, buf, 1);
 }
 #endif
 /* 0x80130890 | 0x110 */
@@ -8922,14 +8922,14 @@ asm void heroPokemonGetHouou(void) {
 void heroPokemonGetHouou(u8* arg1) {
     extern u32 gamedataGetStatus(u32 a, u32 b);
     extern void gamedataAttestCreate(u32* a, u32 b, u32 c, u8 d, u8 e);
-    extern void fn_801240C4(u8* a, u32 b, u32 c, u32* d);
-    extern void fn_801254B4(u8* a, u32 b, u32 c, u32 d, u32 e);
+    extern void pokemonCreate(u8* a, u32 b, u32 c, u32* d);
+    extern void pokemonSetStatus(u8* a, u32 b, u32 c, u32 d, u32 e);
     extern u32 fn_800FA280(u32 val);
-    extern void fn_80123EF0(u8* a, u32 b, u32 c, u32 d, u32 e, u32 f, u32 g);
-    extern u32 fn_80124410(u8* a, s32 b, s32 c, u32 d, u32 e);
-    extern void fn_8012546C(u8* a);
+    extern void pokemonSetCatchStatus(u8* a, u32 b, u32 c, u32 d, u32 e, u32 f, u32 g);
+    extern u32 pokemonCreateRndFit(u8* a, s32 b, s32 c, u32 d, u32 e);
+    extern void pokemonResetBasisStatus(u8* a);
     extern void memoDataSet(u32 a, u8* b);
-    extern s32 fn_80129E20(u8* a, u8* b, u32 c);
+    extern s32 heroGetPokemon(u8* a, u8* b, u32 c);
     u32 temp;
     u8 buf[0x13c];
     u8 r31, r30_u8;
@@ -8938,14 +8938,14 @@ void heroPokemonGetHouou(u8* arg1) {
     r31 = (u8)gamedataGetStatus(0, 5);
     r30_u8 = (u8)gamedataGetStatus(0, 4);
     gamedataAttestCreate(&temp, 0x8, 3, r30_u8, r31);
-    fn_801240C4(buf, 0xfa, 0x46, &temp);
-    fn_801254B4(buf, 0, 0x99, 0, 0x46);
-    fn_80123EF0(buf, 0xff, 0x46, 4, 0, 0x2740, fn_800FA280(0x12ad));
-    tmp = fn_80124410(buf, -1, -1, 0, 0x2740);
-    fn_801254B4(buf, 0, 0x6f, 0, tmp);
-    fn_8012546C(buf);
+    pokemonCreate(buf, 0xfa, 0x46, &temp);
+    pokemonSetStatus(buf, 0, 0x99, 0, 0x46);
+    pokemonSetCatchStatus(buf, 0xff, 0x46, 4, 0, 0x2740, fn_800FA280(0x12ad));
+    tmp = pokemonCreateRndFit(buf, -1, -1, 0, 0x2740);
+    pokemonSetStatus(buf, 0, 0x6f, 0, tmp);
+    pokemonResetBasisStatus(buf);
     memoDataSet(0, buf);
-    fn_80129E20(arg1, buf, 1);
+    heroGetPokemon(arg1, buf, 1);
 }
 #endif
 /* 0x801309A0 | 0xE8 */
@@ -8956,25 +8956,25 @@ asm void fn_801309A0(void) {
 #else
 void fn_801309A0(u32 arg1) {
     extern u32 gamedataGetStatus(u32 a, u32 b);
-    extern void fn_801240C4(u8* a, u32 b, u32 c, u32 d);
-    extern void fn_801254B4(u8* a, u32 b, u32 c, u32 d, u32 e);
+    extern void pokemonCreate(u8* a, u32 b, u32 c, u32 d);
+    extern void pokemonSetStatus(u8* a, u32 b, u32 c, u32 d, u32 e);
     extern u32 fn_800FA280(u32 val);
-    extern void fn_80123EF0(u8* a, u32 b, u32 c, u32 d, u32 e, u32 f, u32 g);
-    extern u32 fn_80124410(u8* a, s32 b, s32 c, u32 d, u32 e);
-    extern void fn_8012546C(u8* a);
+    extern void pokemonSetCatchStatus(u8* a, u32 b, u32 c, u32 d, u32 e, u32 f, u32 g);
+    extern u32 pokemonCreateRndFit(u8* a, s32 b, s32 c, u32 d, u32 e);
+    extern void pokemonResetBasisStatus(u8* a);
     extern void memoDataSet(u32 a, u8* b);
-    extern void fn_80129E20(u32 a, u8* b, u32 c);
+    extern void heroGetPokemon(u32 a, u8* b, u32 c);
     u8 local[0x144];
     u32 tmp;
-    fn_801240C4(local, 0x161, 0xd, gamedataGetStatus(0, 1));
-    fn_801254B4(local, 0, 0x99, 0, 0x46);
+    pokemonCreate(local, 0x161, 0xd, gamedataGetStatus(0, 1));
+    pokemonSetStatus(local, 0, 0x99, 0, 0x46);
     tmp = fn_800FA280(0x12ac);
-    fn_80123EF0(local, 0xfe, 0xd, 4, 0, 0x911D, tmp);
-    tmp = fn_80124410(local, -1, -1, 0, 0x911D);
-    fn_801254B4(local, 0, 0x6f, 0, tmp);
-    fn_8012546C(local);
+    pokemonSetCatchStatus(local, 0xfe, 0xd, 4, 0, 0x911D, tmp);
+    tmp = pokemonCreateRndFit(local, -1, -1, 0, 0x911D);
+    pokemonSetStatus(local, 0, 0x6f, 0, tmp);
+    pokemonResetBasisStatus(local);
     memoDataSet(0, local);
-    fn_80129E20(arg1, local, 1);
+    heroGetPokemon(arg1, local, 1);
 }
 #endif
 /* 0x80130A88 | 0x128 */
@@ -8986,26 +8986,26 @@ asm void heroPokemonGetEifie(void) {
 void heroPokemonGetEifie(u32 arg1) {
     extern u32 heroGetStatus(u8* a, u32 b, u32 c);
     extern u32 gamedataGetStatus(u32 a, u32 b);
-    extern void fn_801240C4(u8* a, u32 b, u32 c, u32 d);
-    extern void fn_80123D58(u8* a, u32 b, u32 c);
-    extern u32 fn_80124410(u8* a, u32 b, s32 c, u32 d, u32 e);
-    extern void fn_801254B4(u8* a, u32 b, u32 c, u32 d, u32 e);
-    extern void fn_8012546C(u8* a);
-    extern void fn_80129F20(u32 a, u8* b, u32 c, u32 d, u32 e);
+    extern void pokemonCreate(u8* a, u32 b, u32 c, u32 d);
+    extern void pokemonWazaCreate(u8* a, u32 b, u32 c);
+    extern u32 pokemonCreateRndFit(u8* a, u32 b, s32 c, u32 d, u32 e);
+    extern void pokemonSetStatus(u8* a, u32 b, u32 c, u32 d, u32 e);
+    extern void pokemonResetBasisStatus(u8* a);
+    extern void heroCatchPokemon(u32 a, u8* b, u32 c, u32 d, u32 e);
     u8 buf[0x140];
     u32 val, tmp;
     val = heroGetStatus((u8*)arg1, 2, 0);
-    fn_801240C4(buf, 0xc4, 0x19, gamedataGetStatus(0, 1));
-    fn_80123D58(buf, 0, 0x5d);
-    fn_80123D58(buf, 1, 0xd8);
-    fn_80123D58(buf, 2, 0x73);
-    fn_80123D58(buf, 3, 0x10e);
-    tmp = fn_80124410(buf, 0, -1, 0, val);
-    fn_801254B4(buf, 0, 0x6f, 0, tmp);
-    fn_801254B4(buf, 0, 0x79, 0, 0x3ff4);
-    fn_801254B4(buf, 0, 0x99, 0, 0xdc);
-    fn_8012546C(buf);
-    fn_80129F20(arg1, buf, 0xfe, 4, 0);
+    pokemonCreate(buf, 0xc4, 0x19, gamedataGetStatus(0, 1));
+    pokemonWazaCreate(buf, 0, 0x5d);
+    pokemonWazaCreate(buf, 1, 0xd8);
+    pokemonWazaCreate(buf, 2, 0x73);
+    pokemonWazaCreate(buf, 3, 0x10e);
+    tmp = pokemonCreateRndFit(buf, 0, -1, 0, val);
+    pokemonSetStatus(buf, 0, 0x6f, 0, tmp);
+    pokemonSetStatus(buf, 0, 0x79, 0, 0x3ff4);
+    pokemonSetStatus(buf, 0, 0x99, 0, 0xdc);
+    pokemonResetBasisStatus(buf);
+    heroCatchPokemon(arg1, buf, 0xfe, 4, 0);
 }
 #endif
 /* 0x80130BB0 | 0x128 */
@@ -9017,26 +9017,26 @@ asm void heroPokemonGetBlacky(void) {
 void heroPokemonGetBlacky(u32 arg1) {
     extern u32 heroGetStatus(u8* a, u32 b, u32 c);
     extern u32 gamedataGetStatus(u32 a, u32 b);
-    extern void fn_801240C4(u8* a, u32 b, u32 c, u32 d);
-    extern void fn_80123D58(u8* a, u32 b, u32 c);
-    extern u32 fn_80124410(u8* a, u32 b, s32 c, u32 d, u32 e);
-    extern void fn_801254B4(u8* a, u32 b, u32 c, u32 d, u32 e);
-    extern void fn_8012546C(u8* a);
-    extern void fn_80129F20(u32 a, u8* b, u32 c, u32 d, u32 e);
+    extern void pokemonCreate(u8* a, u32 b, u32 c, u32 d);
+    extern void pokemonWazaCreate(u8* a, u32 b, u32 c);
+    extern u32 pokemonCreateRndFit(u8* a, u32 b, s32 c, u32 d, u32 e);
+    extern void pokemonSetStatus(u8* a, u32 b, u32 c, u32 d, u32 e);
+    extern void pokemonResetBasisStatus(u8* a);
+    extern void heroCatchPokemon(u32 a, u8* b, u32 c, u32 d, u32 e);
     u8 buf[0x140];
     u32 val, tmp;
     val = heroGetStatus((u8*)arg1, 2, 0);
-    fn_801240C4(buf, 0xc5, 0x1a, gamedataGetStatus(0, 1));
-    fn_80123D58(buf, 0, 0x2c);
-    fn_80123D58(buf, 1, 0x122);
-    fn_80123D58(buf, 2, 0x10d);
-    fn_80123D58(buf, 3, 0x121);
-    tmp = fn_80124410(buf, 0, -1, 0, val);
-    fn_801254B4(buf, 0, 0x6f, 0, tmp);
-    fn_801254B4(buf, 0, 0x79, 0, 0x4a6f);
-    fn_801254B4(buf, 0, 0x99, 0, 0xdc);
-    fn_8012546C(buf);
-    fn_80129F20(arg1, buf, 0xfe, 4, 0);
+    pokemonCreate(buf, 0xc5, 0x1a, gamedataGetStatus(0, 1));
+    pokemonWazaCreate(buf, 0, 0x2c);
+    pokemonWazaCreate(buf, 1, 0x122);
+    pokemonWazaCreate(buf, 2, 0x10d);
+    pokemonWazaCreate(buf, 3, 0x121);
+    tmp = pokemonCreateRndFit(buf, 0, -1, 0, val);
+    pokemonSetStatus(buf, 0, 0x6f, 0, tmp);
+    pokemonSetStatus(buf, 0, 0x79, 0, 0x4a6f);
+    pokemonSetStatus(buf, 0, 0x99, 0, 0xdc);
+    pokemonResetBasisStatus(buf);
+    heroCatchPokemon(arg1, buf, 0xfe, 4, 0);
 }
 #endif
 extern void fn_800F76E4();
@@ -9128,14 +9128,14 @@ void* floorReadNormalPreFunc(u32 a, u32 b, u32 size) {
 extern u8 fn_800FF554(void);
 extern void fn_800F760C();
 #if 0
-asm void fn_80115124(void) {
+asm void _unloadScript__FPvUlUl(void) {
 #include "src/game/gs_field_world_fn_80115124.inc"
 }
 #else
 #pragma push
 #pragma peephole off
 #pragma optimization_level 4
-u32 fn_80115124(void* ptr) {
+u32 _unloadScript__FPvUlUl(void* ptr) {
     if (fn_800FF554() != 0) {
         return 0;
     }
@@ -9146,14 +9146,14 @@ u32 fn_80115124(void* ptr) {
 #endif
 extern void fn_800FC2A8();
 #if 0
-asm void fn_80115170(void) {
+asm void _unloadFont__FPvUlUl(void) {
 #include "src/game/gs_field_world_fn_80115170.inc"
 }
 #else
 #pragma push
 #pragma peephole off
 #pragma optimization_level 4
-u32 fn_80115170(void* ptr) {
+u32 _unloadFont__FPvUlUl(void* ptr) {
     if (fn_800FF554() != 0) {
         return 0;
     }
@@ -9164,14 +9164,14 @@ u32 fn_80115170(void* ptr) {
 #endif
 extern void GSmsgClose();
 #if 0
-asm void fn_801151BC(void) {
+asm void _unloadMsg__FPvUlUl(void) {
 #include "src/game/gs_field_world_fn_801151BC.inc"
 }
 #else
 #pragma push
 #pragma peephole off
 #pragma optimization_level 4
-u32 fn_801151BC(void* ptr) {
+u32 _unloadMsg__FPvUlUl(void* ptr) {
     if (fn_800FF554() != 0) {
         return 0;
     }
@@ -9183,7 +9183,7 @@ u32 fn_801151BC(void* ptr) {
 extern u8 lbl_8035BA98[];
 extern const char lbl_80272608[];
 #if 0
-asm void fn_801155CC(void) {
+asm void floorDataBiosGetFieldCameraListPtr(void) {
 #include "src/game/gs_field_world_fn_801155CC.inc"
 }
 #else
@@ -9191,7 +9191,7 @@ asm void fn_801155CC(void) {
 #pragma scheduling on
 #pragma peephole off
 #pragma optimization_level 4
-void* fn_801155CC(u8* ptr) {
+void* floorDataBiosGetFieldCameraListPtr(u8* ptr) {
     void* sub;
 
     if (ptr == NULL) {
@@ -9208,7 +9208,7 @@ void* fn_801155CC(u8* ptr) {
 #endif
 extern u8 lbl_8035BA7C[];
 #if 0
-asm void fn_80115628(void) {
+asm void floorDataBiosGetPosListPtr(void) {
 #include "src/game/gs_field_world_fn_80115628.inc"
 }
 #else
@@ -9216,7 +9216,7 @@ asm void fn_80115628(void) {
 #pragma scheduling on
 #pragma peephole off
 #pragma optimization_level 4
-void* fn_80115628(u8* ptr) {
+void* floorDataBiosGetPosListPtr(u8* ptr) {
     void* sub;
 
     if (ptr == NULL) {
@@ -9233,7 +9233,7 @@ void* fn_80115628(u8* ptr) {
 #endif
 extern u8 lbl_8035BA60[];
 #if 0
-asm void fn_80115684(void) {
+asm void floorDataBiosGetCharInfo(void) {
 #include "src/game/gs_field_world_fn_80115684.inc"
 }
 #else
@@ -9241,7 +9241,7 @@ asm void fn_80115684(void) {
 #pragma scheduling on
 #pragma peephole off
 #pragma optimization_level 4
-void* fn_80115684(u8* ptr, u32 idx) {
+void* floorDataBiosGetCharInfo(u8* ptr, u32 idx) {
     void* sub;
     void* arr;
 
@@ -9263,7 +9263,7 @@ void* fn_80115684(u8* ptr, u32 idx) {
 #endif
 extern u8 lbl_8035BA48[];
 #if 0
-asm void fn_80115704(void) {
+asm void floorDataBiosGetCharNum(void) {
 #include "src/game/gs_field_world_fn_80115704.inc"
 }
 #else
@@ -9271,7 +9271,7 @@ asm void fn_80115704(void) {
 #pragma scheduling on
 #pragma peephole off
 #pragma optimization_level 4
-u32 fn_80115704(u8* ptr) {
+u32 floorDataBiosGetCharNum(u8* ptr) {
     void* sub;
 
     if (ptr == NULL) {
@@ -9288,14 +9288,14 @@ u32 fn_80115704(u8* ptr) {
 #endif
 extern u8 lbl_8035BA2C[];
 #if 0
-asm void fn_80115768(void) {
+asm void floorDataBiosGetPostFunc(void) {
 #include "src/game/gs_field_world_fn_80115768.inc"
 }
 #else
 #pragma push
 #pragma peephole off
 #pragma optimization_level 4
-u32 fn_80115768(u8* ptr) {
+u32 floorDataBiosGetPostFunc(u8* ptr) {
     if (ptr == NULL) {
         GSlogWrite(lbl_80272608, lbl_8035BA2C);
         return 0;
@@ -9306,14 +9306,14 @@ u32 fn_80115768(u8* ptr) {
 #endif
 extern u8 lbl_8035BA10[];
 #if 0
-asm void fn_801157B0(void) {
+asm void floorDataBiosGetMainFunc(void) {
 #include "src/game/gs_field_world_fn_801157B0.inc"
 }
 #else
 #pragma push
 #pragma peephole off
 #pragma optimization_level 4
-u32 fn_801157B0(u8* ptr) {
+u32 floorDataBiosGetMainFunc(u8* ptr) {
     if (ptr == NULL) {
         GSlogWrite(lbl_80272608, lbl_8035BA10);
         return 0;
@@ -9324,14 +9324,14 @@ u32 fn_801157B0(u8* ptr) {
 #endif
 extern u8 lbl_8035B9F8[];
 #if 0
-asm void fn_801157F8(void) {
+asm void floorDataBiosGetPreFunc(void) {
 #include "src/game/gs_field_world_fn_801157F8.inc"
 }
 #else
 #pragma push
 #pragma peephole off
 #pragma optimization_level 4
-u32 fn_801157F8(u8* ptr) {
+u32 floorDataBiosGetPreFunc(u8* ptr) {
     if (ptr == NULL) {
         GSlogWrite(lbl_80272608, lbl_8035B9F8);
         return 0;
@@ -9450,14 +9450,14 @@ u32 fn_801159A8(u8* ptr) {
 #endif
 extern u8 lbl_8035B938[];
 #if 0
-asm void fn_801159F0(void) {
+asm void floorDataBiosGetFloorID(void) {
 #include "src/game/gs_field_world_fn_801159F0.inc"
 }
 #else
 #pragma push
 #pragma peephole off
 #pragma optimization_level 4
-u32 fn_801159F0(u8* ptr) {
+u32 floorDataBiosGetFloorID(u8* ptr) {
     if (ptr == NULL) {
         GSlogWrite(lbl_80272608, lbl_8035B938);
         return 0;
@@ -9468,14 +9468,14 @@ u32 fn_801159F0(u8* ptr) {
 #endif
 extern u8 lbl_8035B904[];
 #if 0
-asm void fn_80115A80(void) {
+asm void floorDataBiosGetGroupID(void) {
 #include "src/game/gs_field_world_fn_80115A80.inc"
 }
 #else
 #pragma push
 #pragma peephole off
 #pragma optimization_level 4
-u32 fn_80115A80(u8* ptr) {
+u32 floorDataBiosGetGroupID(u8* ptr) {
     if (ptr == NULL) {
         GSlogWrite(lbl_80272608, lbl_8035B904);
         return 0;
@@ -9487,14 +9487,14 @@ u32 fn_80115A80(u8* ptr) {
 extern u16 fn_801EF624();
 extern u8 lbl_8035B8E8[];
 #if 0
-asm void fn_80115AC8(void) {
+asm void floorDataBiosGetFloorKind(void) {
 #include "src/game/gs_field_world_fn_80115AC8.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma push
 #pragma peephole off
-u8 fn_80115AC8(u8* ptr) {
+u8 floorDataBiosGetFloorKind(u8* ptr) {
     u8 val;
 
     if (ptr == NULL) {
@@ -9515,14 +9515,14 @@ u8 fn_80115AC8(u8* ptr) {
 extern const char lbl_802726AC[];
 extern const char lbl_8035B8CC[];
 #if 0
-asm void fn_80115B48(void) {
+asm void floorDataBiosGetMapResID(void) {
 #include "src/game/gs_field_world_fn_80115B48.inc"
 }
 #else
 #pragma push
 #pragma peephole off
 #pragma optimization_level 4
-u32 fn_80115B48(u8* ptr) {
+u32 floorDataBiosGetMapResID(u8* ptr) {
     if (ptr == NULL) {
         GSlogWrite(lbl_802726AC, lbl_8035B8CC);
         return 0;
@@ -9533,14 +9533,14 @@ u32 fn_80115B48(u8* ptr) {
 #endif
 extern u8 lbl_8035B8B4[];
 #if 0
-asm void fn_80115B90(void) {
+asm void floorDataBiosGetArea(void) {
 #include "src/game/gs_field_world_fn_80115B90.inc"
 }
 #else
 #pragma push
 #pragma peephole off
 #pragma optimization_level 4
-u8 fn_80115B90(u8* ptr) {
+u8 floorDataBiosGetArea(u8* ptr) {
     if (ptr == NULL) {
         GSlogWrite(lbl_80272608, lbl_8035B8B4);
         return 0;
@@ -9552,14 +9552,14 @@ u8 fn_80115B90(u8* ptr) {
 extern u32 lbl_80478FB8;
 extern u32 lbl_80478FBC;
 #if 0
-asm void fn_80115C48(void) {
+asm void floorDataBiosGetPtr(void) {
 #include "src/game/gs_field_world_fn_80115C48.inc"
 }
 #else
 #pragma push
 #pragma peephole off
 #pragma scheduling on
-void* fn_80115C48(u32 key) {
+void* floorDataBiosGetPtr(u32 key) {
     u8* p = (u8*)lbl_80478FBC;
     u32 i;
     for (i = *(u32*)lbl_80478FB8; i != 0; i--) {
@@ -9645,14 +9645,14 @@ asm void fn_801170A4(void) {
 #pragma peephole off
 u32 fn_801170A4(u8* arg1, u32 arg2) {
     extern void* fn_800FF56C(void);
-    extern void* fn_80115C48(void* a);
-    extern u8* fn_80115A80(void* a);
-    extern u32 fn_80115684(void* a, u32 b);
+    extern void* floorDataBiosGetPtr(void* a);
+    extern u8* floorDataBiosGetGroupID(void* a);
+    extern u32 floorDataBiosGetCharInfo(void* a, u32 b);
     void* temp;
     if (arg1 == NULL) { return 0; }
-    temp = fn_80115C48(fn_800FF56C());
-    if (arg1 != fn_80115A80(temp)) { return 0; }
-    return fn_80115684(temp, arg2);
+    temp = floorDataBiosGetPtr(fn_800FF56C());
+    if (arg1 != floorDataBiosGetGroupID(temp)) { return 0; }
+    return floorDataBiosGetCharInfo(temp, arg2);
 }
 #pragma peephole on
 #endif
@@ -9778,12 +9778,12 @@ u32 fn_80119F50(u16 idx) {
 #endif
 extern u32 lbl_80478B50;  /* field obj count (SDA) */
 #if 0
-asm void fn_8011C1D0(void) {
+asm void wazaDataBiosSetFightWazaWzxVariationFuncPtr(void) {
 #include "src/game/gs_field_world_fn_8011C1D0.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_8011C1D0(u8* ptr, u32 val) {
+void wazaDataBiosSetFightWazaWzxVariationFuncPtr(u8* ptr, u32 val) {
     u16 idx; u8* entry;
     if (ptr == NULL) { return; }
     if (ptr == NULL) { idx = 0; } else { idx = *(u16*)(ptr + 0x1c); }
@@ -9794,12 +9794,12 @@ void fn_8011C1D0(u8* ptr, u32 val) {
 #endif
 extern u32 lbl_80478B50;  /* field obj count (SDA) */
 #if 0
-asm void fn_8011C220(void) {
+asm void wazaDataBiosSetFightWazaWzxTypeFuncPtr(void) {
 #include "src/game/gs_field_world_fn_8011C220.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_8011C220(u8* ptr, u32 val) {
+void wazaDataBiosSetFightWazaWzxTypeFuncPtr(u8* ptr, u32 val) {
     u16 idx; u8* entry;
     if (ptr == NULL) { return; }
     if (ptr == NULL) { idx = 0; } else { idx = *(u16*)(ptr + 0x1c); }
@@ -9810,12 +9810,12 @@ void fn_8011C220(u8* ptr, u32 val) {
 #endif
 extern u32 lbl_80478B50;  /* field obj count (SDA) */
 #if 0
-asm void fn_8011C270(void) {
+asm void wazaDataBiosGetFightWazaWzxVariationFuncPtr(void) {
 #include "src/game/gs_field_world_fn_8011C270.inc"
 }
 #else
 #pragma optimization_level 4
-u32 fn_8011C270(u8* ptr) {
+u32 wazaDataBiosGetFightWazaWzxVariationFuncPtr(u8* ptr) {
     u16 idx; u8* entry;
     if (ptr == NULL) { return 0; }
     if (ptr == NULL) { idx = 0; } else { idx = *(u16*)(ptr + 0x1c); }
@@ -9826,12 +9826,12 @@ u32 fn_8011C270(u8* ptr) {
 #endif
 extern u32 lbl_80478B50;  /* field obj count (SDA) */
 #if 0
-asm void fn_8011C2D0(void) {
+asm void wazaDataBiosGetFightWazaWzxTypeFuncPtr(void) {
 #include "src/game/gs_field_world_fn_8011C2D0.inc"
 }
 #else
 #pragma optimization_level 4
-u32 fn_8011C2D0(u8* ptr) {
+u32 wazaDataBiosGetFightWazaWzxTypeFuncPtr(u8* ptr) {
     u16 idx; u8* entry;
     if (ptr == NULL) { return 0; }
     if (ptr == NULL) { idx = 0; } else { idx = *(u16*)(ptr + 0x1c); }
@@ -9842,12 +9842,12 @@ u32 fn_8011C2D0(u8* ptr) {
 #endif
 extern u32 lbl_80478B50;  /* field obj count (SDA) */
 #if 0
-asm void fn_8011C330(void) {
+asm void wazaDataBiosSetFightTrainerAiWazaDamageFuncPtr(void) {
 #include "src/game/gs_field_world_fn_8011C330.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_8011C330(u8* ptr, u32 val) {
+void wazaDataBiosSetFightTrainerAiWazaDamageFuncPtr(u8* ptr, u32 val) {
     u16 idx; u8* entry;
     if (ptr == NULL) { return; }
     if (ptr == NULL) { idx = 0; } else { idx = *(u16*)(ptr + 0x1c); }
@@ -9858,12 +9858,12 @@ void fn_8011C330(u8* ptr, u32 val) {
 #endif
 extern u32 lbl_80478B50;  /* field obj count (SDA) */
 #if 0
-asm void fn_8011C380(void) {
+asm void wazaDataBiosSetFightTrainerAiWazaHitFuncPtr(void) {
 #include "src/game/gs_field_world_fn_8011C380.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_8011C380(u8* ptr, u32 val) {
+void wazaDataBiosSetFightTrainerAiWazaHitFuncPtr(u8* ptr, u32 val) {
     u16 idx; u8* entry;
     if (ptr == NULL) { return; }
     if (ptr == NULL) { idx = 0; } else { idx = *(u16*)(ptr + 0x1c); }
@@ -9874,12 +9874,12 @@ void fn_8011C380(u8* ptr, u32 val) {
 #endif
 extern u32 lbl_80478B50;  /* field obj count (SDA) */
 #if 0
-asm void fn_8011C3D0(void) {
+asm void wazaDataBiosSetFightTrainerAiWazaValueFuncPtr(void) {
 #include "src/game/gs_field_world_fn_8011C3D0.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_8011C3D0(u8* ptr, u32 val) {
+void wazaDataBiosSetFightTrainerAiWazaValueFuncPtr(u8* ptr, u32 val) {
     u16 idx; u8* entry;
     if (ptr == NULL) { return; }
     if (ptr == NULL) { idx = 0; } else { idx = *(u16*)(ptr + 0x1c); }
@@ -9890,12 +9890,12 @@ void fn_8011C3D0(u8* ptr, u32 val) {
 #endif
 extern u32 lbl_80478B50;  /* field obj count (SDA) */
 #if 0
-asm void fn_8011C450(void) {
+asm void wazaDataBiosGetFightTrainerAiWazaDamageFuncPtr(void) {
 #include "src/game/gs_field_world_fn_8011C450.inc"
 }
 #else
 #pragma optimization_level 4
-u32 fn_8011C450(u8* ptr) {
+u32 wazaDataBiosGetFightTrainerAiWazaDamageFuncPtr(u8* ptr) {
     u16 idx; u8* entry;
     if (ptr == NULL) { return 0; }
     if (ptr == NULL) { idx = 0; } else { idx = *(u16*)(ptr + 0x1c); }
@@ -9906,12 +9906,12 @@ u32 fn_8011C450(u8* ptr) {
 #endif
 extern u32 lbl_80478B50;  /* field obj count (SDA) */
 #if 0
-asm void fn_8011C4B0(void) {
+asm void wazaDataBiosGetFightTrainerAiWazaHitFuncPtr(void) {
 #include "src/game/gs_field_world_fn_8011C4B0.inc"
 }
 #else
 #pragma optimization_level 4
-u32 fn_8011C4B0(u8* ptr) {
+u32 wazaDataBiosGetFightTrainerAiWazaHitFuncPtr(u8* ptr) {
     u16 idx; u8* entry;
     if (ptr == NULL) { return 0; }
     if (ptr == NULL) { idx = 0; } else { idx = *(u16*)(ptr + 0x1c); }
@@ -9922,12 +9922,12 @@ u32 fn_8011C4B0(u8* ptr) {
 #endif
 extern u32 lbl_80478B50;  /* field obj count (SDA) */
 #if 0
-asm void fn_8011C510(void) {
+asm void wazaDataBiosGetFightTrainerAiWazaValueFuncPtr(void) {
 #include "src/game/gs_field_world_fn_8011C510.inc"
 }
 #else
 #pragma optimization_level 4
-u32 fn_8011C510(u8* ptr) {
+u32 wazaDataBiosGetFightTrainerAiWazaValueFuncPtr(u8* ptr) {
     u16 idx; u8* entry;
     if (ptr == NULL) { return 0; }
     if (ptr == NULL) { idx = 0; } else { idx = *(u16*)(ptr + 0x1c); }
@@ -10199,18 +10199,18 @@ u32 fn_8011ED68(u8* ptr) {
 #endif
 extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
 #if 0
-asm void fn_80120C6C(void) {
+asm void pokemonDataCheckValid(void) {
 #include "src/game/gs_field_world_fn_80120C6C.inc"
 }
 #else
-/* returns (obj-header[0] > key) after a fn_8012640C lookup; the obj-header ptr lbl_80478F90
+/* returns (obj-header[0] > key) after a pokemonGetStatus lookup; the obj-header ptr lbl_80478F90
  * is re-read via volatile cast. byte-match verified via objdiff. */
-u32 fn_80120C6C(u32 a, u16 key) {
-    extern u32 fn_8012640C(u32 a, u16 key, u32 c, u32 d);
+u32 pokemonDataCheckValid(u32 a, u16 key) {
+    extern u32 pokemonGetStatus(u32 a, u16 key, u32 c, u32 d);
     if ((u16)key == 0) {
         return 0;
     }
-    if (fn_8012640C(a, key, 1, 0) == 0) {
+    if (pokemonGetStatus(a, key, 1, 0) == 0) {
         return 0;
     }
     return (*(u32* volatile*)&lbl_80478F90)[0] > key;
@@ -10219,30 +10219,30 @@ u32 fn_80120C6C(u32 a, u16 key) {
 extern void* tasteDataGetPtr(void* ptr);
 extern void tasteDataGetAisyou(void* ptr, u8 val);
 #if 0
-asm void fn_80120D6C(void) {
+asm void pokemonGetTasteLike(void) {
 #include "src/game/gs_field_world_fn_80120D6C.inc"
 }
 #else
 #pragma optimization_level 4
-s32 fn_80120D6C(u8* ptr, void* arg2) {
+s32 pokemonGetTasteLike(u8* ptr, void* arg2) {
     u8 val; void* tmp;
     if (ptr == NULL) { return -1; }
-    val = (u8)fn_8012640C(ptr, 0, 0xbf, 0);
+    val = (u8)pokemonGetStatus(ptr, 0, 0xbf, 0);
     tmp = tasteDataGetPtr(arg2);
     tasteDataGetAisyou(tmp, val);
 }
 #endif
 #if 0
-asm void fn_80121410(void) {
+asm void pokemonIsHpMantan(void) {
 #include "src/game/gs_field_world_fn_80121410.inc"
 }
 #else
 #pragma optimization_level 4
-s32 fn_80121410(u8* ptr) {
+s32 pokemonIsHpMantan(u8* ptr) {
     u16 val1; u16 val2;
     if (ptr == NULL) { return 0; }
-    val1 = (u16)fn_8012640C(ptr, 0, 0x83, 0);
-    val2 = (u16)fn_8012640C(ptr, 0, 0x87, 0);
+    val1 = (u16)pokemonGetStatus(ptr, 0, 0x83, 0);
+    val2 = (u16)pokemonGetStatus(ptr, 0, 0x87, 0);
     return (u8)(val1 == val2);
 }
 #endif
@@ -10350,12 +10350,12 @@ u8 fn_80121ADC(u8* ptr, u32 slot) {
 }
 #endif
 #if 0
-asm void fn_80122334(void) {
+asm void pokemonGetAnnonKatati(void) {
 #include "src/game/gs_field_world_fn_80122334.inc"
 }
 #else
 #pragma optimization_level 1
-u8 fn_80122334(u32 val) {
+u8 pokemonGetAnnonKatati(u32 val) {
     u32 s;
     s = (val >> 12) & 0x30;
     s = (s & 0xFFFFFF3Fu) | ((val >> 18) & 0xC0);
@@ -10366,12 +10366,12 @@ u8 fn_80122334(u32 val) {
 #pragma optimization_level reset
 #endif
 #if 0
-asm void fn_801229F4(void) {
+asm void pokemonGetLevelToExp(void) {
 #include "src/game/gs_field_world_fn_801229F4.inc"
 }
 #else
 #pragma optimization_level 4
-u32 fn_801229F4(u8* ptr, u8 idx) {
+u32 pokemonGetLevelToExp(u8* ptr, u8 idx) {
     u16 val;
     u8 val2;
     void* sub;
@@ -10379,8 +10379,8 @@ u32 fn_801229F4(u8* ptr, u8 idx) {
     if (ptr == NULL) {
         return 0;
     }
-    val = (u16)fn_8012640C(ptr, 0, 0x6E, 0);
-    val2 = (u8)fn_8012640C(0, val, 0x11, 0);
+    val = (u16)pokemonGetStatus(ptr, 0, 0x6E, 0);
+    val2 = (u8)pokemonGetStatus(0, val, 0x11, 0);
     sub = fn_8011CE74(val2);
     if (sub == NULL) {
         return 0;
@@ -10389,30 +10389,30 @@ u32 fn_801229F4(u8* ptr, u8 idx) {
 }
 #endif
 #if 0
-asm void fn_80122A70(void) {
+asm void pokemonGetNowHpPercentage(void) {
 #include "src/game/gs_field_world_fn_80122A70.inc"
 }
 #else
 #pragma optimization_level 4
-s32 fn_80122A70(u8* ptr) {
+s32 pokemonGetNowHpPercentage(u8* ptr) {
     u16 val1;
     u16 val2;
 
     if (ptr == NULL) {
         return 0;
     }
-    val1 = (u16)fn_8012640C(ptr, 0, 0x83, 0);
-    val2 = (u16)fn_8012640C(ptr, 0, 0x87, 0);
+    val1 = (u16)pokemonGetStatus(ptr, 0, 0x83, 0);
+    val2 = (u16)pokemonGetStatus(ptr, 0, 0x87, 0);
     return (val1 * 100) / val2;
 }
 #endif
 #if 0
-asm void fn_80122AE0(void) {
+asm void pokemonGetNowHpWaruValue(void) {
 #include "src/game/gs_field_world_fn_80122AE0.inc"
 }
 #else
 #pragma optimization_level 4
-u16 fn_80122AE0(u8* ptr, s32 b) {
+u16 pokemonGetNowHpWaruValue(u8* ptr, s32 b) {
     u16 val;
 
     if (ptr == NULL) {
@@ -10421,7 +10421,7 @@ u16 fn_80122AE0(u8* ptr, s32 b) {
     if (!(u16)b) {
         return 0;
     }
-    val = (s32)(u16)fn_8012640C(ptr, 0, 0x83, 0) / (s32)(u16)b;
+    val = (s32)(u16)pokemonGetStatus(ptr, 0, 0x83, 0) / (s32)(u16)b;
     if (val == 0) {
         val = 1;
     }
@@ -10429,12 +10429,12 @@ u16 fn_80122AE0(u8* ptr, s32 b) {
 }
 #endif
 #if 0
-asm void fn_80122B50(void) {
+asm void pokemonGetMaxHpWaruValue(void) {
 #include "src/game/gs_field_world_fn_80122B50.inc"
 }
 #else
 #pragma optimization_level 4
-u16 fn_80122B50(u8* ptr, s32 b) {
+u16 pokemonGetMaxHpWaruValue(u8* ptr, s32 b) {
     u16 val;
 
     if (ptr == NULL) {
@@ -10443,7 +10443,7 @@ u16 fn_80122B50(u8* ptr, s32 b) {
     if (!(u16)b) {
         return 0;
     }
-    val = (s32)(u16)fn_8012640C(ptr, 0, 0x87, 0) / (s32)(u16)b;
+    val = (s32)(u16)pokemonGetStatus(ptr, 0, 0x87, 0) / (s32)(u16)b;
     if (val == 0) {
         val = 1;
     }
@@ -10451,59 +10451,59 @@ u16 fn_80122B50(u8* ptr, s32 b) {
 }
 #endif
 #if 0
-asm void fn_80123090(void) {
+asm void pokemonGetSoubiItemSoubiDataId(void) {
 #include "src/game/gs_field_world_fn_80123090.inc"
 }
 #else
 #pragma optimization_level 4
-u16 fn_80123090(u8* ptr) {
+u16 pokemonGetSoubiItemSoubiDataId(u8* ptr) {
     extern u32 itemGetStatus(u32 a, u16 b, u32 c, u32 d);
     u16 val;
-    val = (u16)fn_8012640C(ptr, 0, 0x82, 0);
+    val = (u16)pokemonGetStatus(ptr, 0, 0x82, 0);
     if (val == 0) { return 0; }
     return (u16)itemGetStatus(0, val, 7, 0);
 }
 #endif
 #if 0
-asm void fn_80123E70(void) {
+asm void pokemonWazaGetMaxPP(void) {
 #include "src/game/gs_field_world_fn_80123E70.inc"
 }
 #else
 #pragma optimization_level 4
-s32 fn_80123E70(u8* ptr, u16 idx) {
-    extern u8 fn_8011BB6C(u16 type_id, u8 val);
-    extern u32 fn_8012640C(u8* ptr, u32 a, u32 b, u16 c);
+s32 pokemonWazaGetMaxPP(u8* ptr, u16 idx) {
+    extern u8 wazaGetMaxPP(u16 type_id, u8 val);
+    extern u32 pokemonGetStatus(u8* ptr, u32 a, u32 b, u16 c);
     u32 sub; u16 val1;
     if (ptr == NULL) { return 0; }
     sub = (u16)idx + 4;
-    val1 = (u16)fn_8012640C(ptr, 0, 0x7f, (u16)sub);
-    fn_8011BB6C(val1, (u8)fn_8012640C(ptr, 0, 0x81, (u16)sub));
+    val1 = (u16)pokemonGetStatus(ptr, 0, 0x7f, (u16)sub);
+    wazaGetMaxPP(val1, (u8)pokemonGetStatus(ptr, 0, 0x81, (u16)sub));
 }
 #endif
 #if 0
-asm void fn_80124978(void) {
+asm void pokemonSetTokuseiFlag(void) {
 #include "src/game/gs_field_world_fn_80124978.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_80124978(u8* ptr, u32 arg2) {
-    extern void fn_801254B4(u8* ptr, u32 a, u32 b, u32 c, u8 d);
+void pokemonSetTokuseiFlag(u8* ptr, u32 arg2) {
+    extern void pokemonSetStatus(u8* ptr, u32 a, u32 b, u32 c, u8 d);
     u16 val1;
     if (ptr == NULL) { return; }
-    val1 = (u16)fn_8012640C(ptr, 0, 0x6e, 0);
-    if ((s32)fn_8012640C(0, val1, 0x17, 1) == 0) { arg2 = 0; }
-    fn_801254B4(ptr, 0, 0xb7, 0, (u8)arg2);
+    val1 = (u16)pokemonGetStatus(ptr, 0, 0x6e, 0);
+    if ((s32)pokemonGetStatus(0, val1, 0x17, 1) == 0) { arg2 = 0; }
+    pokemonSetStatus(ptr, 0, 0xb7, 0, (u8)arg2);
 }
 #endif
 extern void fn_80135708(void);
 #if 0
-asm void fn_80124A60(void) {
+asm void pokemonInit(void) {
 #include "src/game/gs_field_world_fn_80124A60.inc"
 }
 #else
-void fn_80124A60(u8* ptr) {
-    extern void fn_801254B4(u8* ptr, u32 a, u32 b, u32 c, u32 d);
-    extern u32 fn_8012640C(u8* ptr, u32 a, u32 b, u32 c);
+void pokemonInit(u8* ptr) {
+    extern void pokemonSetStatus(u8* ptr, u32 a, u32 b, u32 c, u32 d);
+    extern u32 pokemonGetStatus(u8* ptr, u32 a, u32 b, u32 c);
     extern void fn_8011B950(u32 base, u16 count);
     extern void gamedataAttestInit(u32 val);
     extern void fn_8011D480(u8* ptr, u8 val);
@@ -10511,94 +10511,94 @@ void fn_80124A60(u8* ptr) {
     u16 local;
     local = 0;
     if (ptr == NULL) { return; }
-    fn_801254B4(ptr, 0, 0xc9, 0, 0);
-    fn_801254B4(ptr, 0, 0xc3, 0, 0);
-    if (ptr != NULL) { fn_801254B4(ptr, 0, 0xc5, 0, (u32)-0x64); }
-    fn_801254B4(ptr, 0, 0xc6, 0, 0);
-    fn_801254B4(ptr, 0, 0xc7, 0, 0);
-    fn_8011B950(fn_8012640C(ptr, 0, 0xc8, 0), 1);
-    fn_801254B4(ptr, 0, 0x6e, 0, 0);
-    fn_801254B4(ptr, 0, 0x6f, 0, 0);
-    gamedataAttestInit(fn_8012640C(ptr, 0, 0x70, 0));
+    pokemonSetStatus(ptr, 0, 0xc9, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xc3, 0, 0);
+    if (ptr != NULL) { pokemonSetStatus(ptr, 0, 0xc5, 0, (u32)-0x64); }
+    pokemonSetStatus(ptr, 0, 0xc6, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xc7, 0, 0);
+    fn_8011B950(pokemonGetStatus(ptr, 0, 0xc8, 0), 1);
+    pokemonSetStatus(ptr, 0, 0x6e, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x6f, 0, 0);
+    gamedataAttestInit(pokemonGetStatus(ptr, 0, 0x70, 0));
     if (ptr != NULL) {
-        fn_801254B4(ptr, 0, 0x71, 0, 0);
-        fn_801254B4(ptr, 0, 0x72, 0, 0);
-        fn_801254B4(ptr, 0, 0x73, 0, 0);
-        fn_801254B4(ptr, 0, 0x74, 0, 2);
-        fn_801254B4(ptr, 0, 0x75, 0, 0);
-        fn_801254B4(ptr, 0, 0x76, 0, (u32)&local);
+        pokemonSetStatus(ptr, 0, 0x71, 0, 0);
+        pokemonSetStatus(ptr, 0, 0x72, 0, 0);
+        pokemonSetStatus(ptr, 0, 0x73, 0, 0);
+        pokemonSetStatus(ptr, 0, 0x74, 0, 2);
+        pokemonSetStatus(ptr, 0, 0x75, 0, 0);
+        pokemonSetStatus(ptr, 0, 0x76, 0, (u32)&local);
     }
-    fn_801254B4(ptr, 0, 0x77, 0, (u32)&local);
-    fn_801254B4(ptr, 0, 0x79, 0, 0);
-    fn_801254B4(ptr, 0, 0x7a, 0, 0);
-    fn_8011B950(fn_8012640C(ptr, 0, 0x7c, 0), 1);
-    fn_801254B4(ptr, 0, 0x7d, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x77, 0, (u32)&local);
+    pokemonSetStatus(ptr, 0, 0x79, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x7a, 0, 0);
+    fn_8011B950(pokemonGetStatus(ptr, 0, 0x7c, 0), 1);
+    pokemonSetStatus(ptr, 0, 0x7d, 0, 0);
     if (ptr != NULL) {
         for (i = 0; (u16)i < 4; i++) {
             if (ptr != NULL) {
-                fn_801254B4(ptr, 0, 0x7f, (u32)i, 0);
-                fn_801254B4(ptr, 0, 0x80, (u32)i, 0);
-                fn_801254B4(ptr, 0, 0x81, (u32)i, 0);
+                pokemonSetStatus(ptr, 0, 0x7f, (u32)i, 0);
+                pokemonSetStatus(ptr, 0, 0x80, (u32)i, 0);
+                pokemonSetStatus(ptr, 0, 0x81, (u32)i, 0);
             }
         }
     }
     if (ptr != NULL) {
-        fn_8012640C(ptr, 0, 0x82, 0);
-        fn_801254B4(ptr, 0, 0x82, 0, 0);
+        pokemonGetStatus(ptr, 0, 0x82, 0);
+        pokemonSetStatus(ptr, 0, 0x82, 0, 0);
     }
-    fn_801254B4(ptr, 0, 0x83, 0, 0);
-    fn_801254B4(ptr, 0, 0x87, 0, 0);
-    fn_801254B4(ptr, 0, 0x88, 0, 0);
-    fn_801254B4(ptr, 0, 0x89, 0, 0);
-    fn_801254B4(ptr, 0, 0x8a, 0, 0);
-    fn_801254B4(ptr, 0, 0x8b, 0, 0);
-    fn_801254B4(ptr, 0, 0x8c, 0, 0);
-    fn_801254B4(ptr, 0, 0x8d, 0, 0);
-    fn_801254B4(ptr, 0, 0x8e, 0, 0);
-    fn_801254B4(ptr, 0, 0x8f, 0, 0);
-    fn_801254B4(ptr, 0, 0x90, 0, 0);
-    fn_801254B4(ptr, 0, 0x91, 0, 0);
-    fn_801254B4(ptr, 0, 0x92, 0, 0);
-    fn_801254B4(ptr, 0, 0x93, 0, 0);
-    fn_801254B4(ptr, 0, 0x94, 0, 0);
-    fn_801254B4(ptr, 0, 0x95, 0, 0);
-    fn_801254B4(ptr, 0, 0x96, 0, 0);
-    fn_801254B4(ptr, 0, 0x97, 0, 0);
-    fn_801254B4(ptr, 0, 0x98, 0, 0);
-    fn_801254B4(ptr, 0, 0x99, 0, 0);
-    fn_801254B4(ptr, 0, 0x9c, 0, 0);
-    fn_801254B4(ptr, 0, 0x9d, 0, 0);
-    fn_801254B4(ptr, 0, 0x9e, 0, 0);
-    fn_801254B4(ptr, 0, 0x9f, 0, 0);
-    fn_801254B4(ptr, 0, 0xa0, 0, 0);
-    fn_801254B4(ptr, 0, 0xa1, 0, 0);
-    fn_801254B4(ptr, 0, 0xa3, 0, 0);
-    fn_801254B4(ptr, 0, 0xa4, 0, 0);
-    fn_801254B4(ptr, 0, 0xa5, 0, 0);
-    fn_801254B4(ptr, 0, 0xa6, 0, 0);
-    fn_801254B4(ptr, 0, 0xa7, 0, 0);
-    fn_801254B4(ptr, 0, 0xa8, 0, 0);
-    fn_801254B4(ptr, 0, 0xa9, 0, 0);
-    fn_801254B4(ptr, 0, 0xaa, 0, 0);
-    fn_801254B4(ptr, 0, 0xab, 0, 0);
-    fn_801254B4(ptr, 0, 0xac, 0, 0);
-    fn_801254B4(ptr, 0, 0xad, 0, 0);
-    fn_801254B4(ptr, 0, 0xae, 0, 0);
-    fn_801254B4(ptr, 0, 0xaf, 0, 0);
-    fn_801254B4(ptr, 0, 0xb0, 0, 0);
-    fn_801254B4(ptr, 0, 0xb1, 0, 0);
-    fn_801254B4(ptr, 0, 0xb2, 0, 0);
-    fn_801254B4(ptr, 0, 0xb3, 0, 0);
-    fn_801254B4(ptr, 0, 0xb4, 0, 0);
-    fn_801254B4(ptr, 0, 0xb5, 0, 0);
-    fn_801254B4(ptr, 0, 0xb6, 0, 0);
-    fn_801254B4(ptr, 0, 0xb7, 0, 0);
-    fn_801254B4(ptr, 0, 0xb8, 0, 0);
-    fn_801254B4(ptr, 0, 0xb9, 0, 0);
-    fn_801254B4(ptr, 0, 0xbb, 0, 0);
-    fn_801254B4(ptr, 0, 0xbc, 0, (u32)0xff);
-    fn_801254B4(ptr, 0, 0xbd, 0, 0);
-    fn_801254B4(ptr, 0, 0xbe, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x83, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x87, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x88, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x89, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x8a, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x8b, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x8c, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x8d, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x8e, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x8f, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x90, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x91, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x92, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x93, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x94, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x95, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x96, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x97, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x98, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x99, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x9c, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x9d, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x9e, 0, 0);
+    pokemonSetStatus(ptr, 0, 0x9f, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xa0, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xa1, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xa3, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xa4, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xa5, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xa6, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xa7, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xa8, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xa9, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xaa, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xab, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xac, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xad, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xae, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xaf, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xb0, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xb1, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xb2, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xb3, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xb4, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xb5, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xb6, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xb7, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xb8, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xb9, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xbb, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xbc, 0, (u32)0xff);
+    pokemonSetStatus(ptr, 0, 0xbd, 0, 0);
+    pokemonSetStatus(ptr, 0, 0xbe, 0, 0);
     fn_8011D480(ptr, 0);
 }
 #endif
@@ -10674,7 +10674,7 @@ extern void fn_801FD178(void);
 extern void fn_801FD150(void);
 extern void jumptable_8035E028();
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_801254B4(void);
+void pokemonSetStatus(void);
 extern void fn_8011E4A4(void);
 extern void fn_801FDB60(void);
 extern void fn_801FDB48(void);
@@ -10757,7 +10757,7 @@ extern void fn_801FD11C(void);
 extern void fn_802062FC(void);
 extern void jumptable_8035E4B0();
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-u32 fn_8012640C(void);
+u32 pokemonGetStatus(void);
 #if 0
 asm void heroCheckValid(void) {
 #include "src/game/gs_field_world_fn_8012A130.inc"
@@ -10816,7 +10816,7 @@ void fn_8012CA84(s32 playerIdx, f32* dirVec, f32* fwdVec) {
     extern void fn_800E3D6C(void*, void*);                /* getRotation(obj, out) */
     extern void fn_800E3D98(void*, void*);                /* getPosition(obj, out) */
     extern void* GSresGetResource(u32, u32);                   /* resolveHandle(group, id) */
-    extern void fn_8012C660(void*, s32, f32);             /* applyTurnResult(obj, idx, amt) */
+    extern void updateAnimation__Ff15HEROMOVE_MEMBER(void*, s32, f32);             /* applyTurnResult(obj, idx, amt) */
     extern void fn_8018790C(u32, u32);                    /* stopMovement(group, handle) */
     extern void fn_8018805C(u32, u32, f32, f32);          /* setHeading(grp, hdl, angle, spd) */
     extern void fn_801885C4(u32, u32, f32*, u32);         /* setMoveDirection(grp, hdl, dir, flags) */
@@ -11088,17 +11088,17 @@ void fn_8012CA84(s32 playerIdx, f32* dirVec, f32* fwdVec) {
         finalHandle = htbl[playerIdx];
     }
     obj = GSresGetResource(0, finalHandle);
-    fn_8012C660(obj, playerIdx, turnAmount);
+    updateAnimation__Ff15HEROMOVE_MEMBER(obj, playerIdx, turnAmount);
 }
 #endif
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 #if 0
-asm void fn_8012D2BC(void) {
+asm void heroMoveGetHeroRot(void) {
 #include "src/game/gs_field_world_fn_8012D2BC.inc"
 }
 #else
-void fn_8012D2BC(u32 param) {
+void heroMoveGetHeroRot(u32 param) {
     extern u8 lbl_80426BD0[];
     extern void* GSresGetResource(u32 a, u32 b);
     extern void fn_800E3D6C(void* a, u32 b);
@@ -11120,11 +11120,11 @@ void fn_8012D2BC(u32 param) {
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 #if 0
-asm void fn_8012D32C(void) {
+asm void heroMoveGetHeroPos(void) {
 #include "src/game/gs_field_world_fn_8012D32C.inc"
 }
 #else
-void fn_8012D32C(u32 param) {
+void heroMoveGetHeroPos(u32 param) {
     extern u8 lbl_80426BD0[];
     extern void* GSresGetResource(u32 a, u32 b);
     extern void fn_800E3D98(void* a, u32 b);
@@ -11146,11 +11146,11 @@ void fn_8012D32C(u32 param) {
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 #if 0
-asm void fn_8012EFB8(void) {
+asm void heroMoveGetResID(void) {
 #include "src/game/gs_field_world_fn_8012EFB8.inc"
 }
 #else
-u32 fn_8012EFB8(u32* out_zero, u32* out_val, s32 index) {
+u32 heroMoveGetResID(u32* out_zero, u32* out_val, s32 index) {
     u32 local[2];
     local[0] = *(u32*)&lbl_8047D030;
     local[1] = *(u32*)&lbl_8047D034;

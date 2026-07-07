@@ -833,7 +833,7 @@ void fn_801837D8(void) { /* TODO: match -- 384 bytes at 0x801837D8 */ }
 
 /* 0x80183958 | 0x24 */
 extern void fn_801170A4(void);
-extern void fn_80116EC8(void);
+extern void floorCharacterBiosGetMoveSctID(void);
 #if 0
 asm void fn_80183958(void) {
 #include "src/game/people/people_fn_80183958.inc"
@@ -842,7 +842,7 @@ asm void fn_80183958(void) {
 #pragma optimization_level 4
 void fn_80183958(void) {
     fn_801170A4();
-    fn_80116EC8();
+    floorCharacterBiosGetMoveSctID();
 }
 #endif
 
@@ -1132,7 +1132,7 @@ extern void fn_800D6728(void);
 extern void fn_800E0060(void);
 extern void fn_800E0000(void);
 extern void fn_8010F6A0(void);
-extern void fn_8012B184(void);
+extern void heroMoveSetLockFrame(void);
 extern u32 lbl_8047D840;
 extern u8 lbl_80314638[];
 extern u32 lbl_8047D844;
@@ -1556,8 +1556,8 @@ void fn_80183730(void) {
 /* fn_8018397C -- not recovered, gap in archive campaign (size 0x24) */
 u32 fn_8018397C(u8* arg1, u32 arg2) {
     extern u32 fn_801170A4(u8*, u32);
-    extern u32 fn_80116EB0(void*);
-    return fn_80116EB0((void*)fn_801170A4(arg1, arg2));
+    extern u32 floorCharacterBiosGetTalkSctID(void*);
+    return floorCharacterBiosGetTalkSctID((void*)fn_801170A4(arg1, arg2));
 }
 
 /* fn_80184470 -- not recovered, gap in archive campaign (size 0x174) */

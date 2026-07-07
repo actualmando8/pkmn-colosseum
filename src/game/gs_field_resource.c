@@ -111,9 +111,9 @@ extern const char lbl_80272460[]; /* floorReadObjPreFunc: can't alloc... -- stri
 extern u32 lbl_8047B0B0;  /* sound buffer size limit (floorReadBGMPreFunc, unproven) */
 
 /* ===== Internal callbacks referenced by pre-funcs ===== */
-extern void fn_80115094(void);  /* GFL resource completion callback */
-extern void fn_801150B8(void);  /* sound resource completion callback */
-extern void fn_80115208(void);  /* resource completion callback (Col/...) */
+extern void _unloadFlare__FPvUlUl(void);  /* GFL resource completion callback */
+extern void _unloadParticles__FPvUlUl(void);  /* sound resource completion callback */
+extern void _unloadColsys__FPvUlUl(void);  /* resource completion callback (Col/...) */
 
 extern void* GSresGetResource();        /* GSres simple alloc */
 extern void* GSresRegisterResource();        /* GSres install loader */
@@ -138,7 +138,7 @@ void* floorReadGFLPreFunc(u32 resId, u32 loadMode, u32 dataSize) {
     u32 alignedSize;
 
     alignedSize = (dataSize + 0x1F) & ~0x1F;
-    buf = GSresAllocResourceAlign(alignedSize, 0x20, resId, loadMode, (void*)fn_80115094);
+    buf = GSresAllocResourceAlign(alignedSize, 0x20, resId, loadMode, (void*)_unloadFlare__FPvUlUl);
     if (buf == (void*)0) {
         GSlogWrite(lbl_80272200, dataSize);
     }
@@ -164,7 +164,7 @@ void* floorReadNotLinkedParticlePostFunc(u32 resId, u32 param) {
     void* result = GSresGetResource(resId, (param & 0x7FFF0000) | 0x400);
     void* node = fn_801195AC(result);
     if (node != (void*)0) {
-        GSresRegisterResource(node, resId, param, (void*)fn_801150B8);
+        GSresRegisterResource(node, resId, param, (void*)_unloadParticles__FPvUlUl);
     }
     return result;
 }
@@ -285,7 +285,7 @@ void* floorReadColPreFunc(u32 resId, u32 loadMode, u32 dataSize) {
     u32 alignedSize;
 
     alignedSize = (dataSize + 0x1F) & ~0x1F;
-    buf = GSresAllocResourceAlign(alignedSize, 0x20, resId, loadMode, (void*)fn_80115208);
+    buf = GSresAllocResourceAlign(alignedSize, 0x20, resId, loadMode, (void*)_unloadColsys__FPvUlUl);
     if (buf == (void*)0) {
         GSlogWrite(lbl_80272394, alignedSize);
     }
@@ -303,7 +303,7 @@ void* floorReadCameraPostFunc(u32 resId, u32 loadMode, u32 dataSize) {
     extern void* HSD_ArchiveGetPublicAddress(void* archive, const char* sym);
     extern void* fn_800D27FC(void* model);
     extern void GSresRegisterResource(void* entry, u32 resId, u32 loadMode, void* callback);
-    extern u32 fn_801150DC(void);
+    extern u32 _unloadCamera__FPvUlUl(void);
     const u8* strings;
     HSDArchiveBuffer* archive;
     void* pub;
@@ -322,7 +322,7 @@ void* floorReadCameraPostFunc(u32 resId, u32 loadMode, u32 dataSize) {
         if (entry == (void*)0) {
             GSlogWrite((const char*)(strings + 0x200));
         } else {
-            GSresRegisterResource(entry, resId, loadMode, (void*)fn_801150DC);
+            GSresRegisterResource(entry, resId, loadMode, (void*)_unloadCamera__FPvUlUl);
         }
     }
     return pub;
