@@ -869,7 +869,7 @@ extern void itemDataBiosGetPtr(u16);
 extern u8   itemDataBiosGetHidenMachineNo(void);
 extern u8   itemDataBiosGetKind(void);
 extern s32  menuPokemonOpenItemGive(u8, u8, s32, s32);
-extern void fn_8001B184(void);
+extern void menuPokemonClose(void);
 #pragma push
 #pragma peephole off
 s32 fn_80013DFC(s32 entry_idx, s32 target_n, s32* out) {
@@ -914,7 +914,7 @@ after:
     x = (u8)itemDataBiosGetKind();
     menuCloseCustom(0x59, 0, 1);
     lbl_8047A2EC = menuPokemonOpenItemGive((u8)x, (u8)target_n, idx, 0);
-    fn_8001B184();
+    menuPokemonClose();
     if ((s32)lbl_8047A2EC < 0) {
         return 3;
     }
@@ -1021,10 +1021,10 @@ void fn_80014118(s32 arg, s32* out1, s32* out2) {
 
 /* fn_80014198 - 0x80014198 | size: 0x24 */
 extern u32 lbl_8047A2EC;
-extern void fn_8001B184(void);
+extern void menuPokemonClose(void);
 void fn_80014198(u32 val) {
     lbl_8047A2EC = val;
-    fn_8001B184();
+    menuPokemonClose();
 }
 
 /* fn_800141BC - 0x800141BC | size: 0x78 */

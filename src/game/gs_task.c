@@ -76,7 +76,7 @@
  *   - menuOpenCustom is the main event dispatch (takes slot, params, flags)
  *   - menuCloseCustom is the event cancel/cleanup function
  *   - menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs is a bounded random selection helper
- *   - fn_8001E200 is a random result commit function
+ *   - menuSubCloseNumberInput is a random result commit function
  */
 
 #include "dolphin/types.h"
@@ -118,7 +118,7 @@ extern u16   fightEncountDataBiosGetGSInputDevice(void* tbl, s32 slot);    /* Ge
 
 /* Random selection helpers */
 extern u8    menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs(volatile unsigned int count, u32* outResult, void* validationFn);
-extern void  fn_8001E200(void);
+extern void  menuSubCloseNumberInput(void);
 
 /* Callback function pointers used in validation */
 extern void* _dbgMenuFightGetFightKindDataIdSub(u32 id);   /* Validate NPC index (type byte) */
@@ -326,7 +326,7 @@ s32 fn_8000682C(void) {
  *   event type. Each case in the switch:
  *     - Gets a resource from the scene table via fightEncountDataBiosGetFightKind/fightEncountDataBiosGetTrainer
  *     - Validates the result using menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs with a callback
- *     - Commits the selection via fn_8001E200
+ *     - Commits the selection via menuSubCloseNumberInput
  *     - Updates the resource table via fightEncountDataBiosSetFightKind/fightEncountDataBiosSetTrainer/etc.
  *
  * fn_80006FAC - dbgMenuFightStopHostWin (accessor cluster):
@@ -1526,7 +1526,7 @@ s32 dbgMenuFightFightTrainerPokemonPartDataEdit(void) {
             if (result >= *(u32*)lbl_80478F08) {
                 result = *(u32*)lbl_80478F08 - 1;
             }
-            fn_8001E200();
+            menuSubCloseNumberInput();
             val = (s32)result;
         }
         if (val < 0) {
@@ -1652,7 +1652,7 @@ s32 fn_80007848(void) {
             if (result > *(u32*)lbl_80478F28) {
                 result = *(u32*)lbl_80478F28 - 1;
             }
-            fn_8001E200();
+            menuSubCloseNumberInput();
             val = (s32)result;
         }
         if (val < 0) {
@@ -1776,7 +1776,7 @@ s32 dbgMenuFightWazaEdit(void) {
             if (result >= 0x163) {
                 result = 0x162;
             }
-            fn_8001E200();
+            menuSubCloseNumberInput();
             val = (s32)result;
         }
         if (val < 0) {
@@ -1877,7 +1877,7 @@ s32 fn_80007B30(void) {
             u32 tmp;
             ret = fn_8001E224(lbl_80478828, &tmp, 1, 0x32, 0x32, 0);
             if (ret == 0) {
-                fn_8001E200();
+                menuSubCloseNumberInput();
                 continue;
             }
             {
@@ -1887,7 +1887,7 @@ s32 fn_80007B30(void) {
                 if ((u8)v > 9) v = 9;
                 lbl_80478828 = v;
             }
-            fn_8001E200();
+            menuSubCloseNumberInput();
             continue;
         }
 
@@ -1971,7 +1971,7 @@ s32 fn_80007B30(void) {
                         if (tmp >= 0x163) {
                             tmp = (u32)maxVal;
                         }
-                        fn_8001E200();
+                        menuSubCloseNumberInput();
                         sid = tmp;
                     }
                     if (sid < 0) break;
@@ -2056,7 +2056,7 @@ s32 fn_8000804C(void) {
             if (result >= *(u32*)(void*)lbl_80478F50) {
                 result = *(u32*)(void*)lbl_80478F50 - 1;
             }
-            fn_8001E200();
+            menuSubCloseNumberInput();
             val = (s32)result;
         }
         if (val < 0) {
@@ -2206,7 +2206,7 @@ s32 dbgMenuFightGetWazaTypeId(s32 id) {
     u32 result;
     if (menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs((u8)id, &result, _dbgMenuFightGetWazaTypeIdSub) == 0) return -1;
     if (result > 0xb) result = 0xb;
-    fn_8001E200();
+    menuSubCloseNumberInput();
     return (s32)result;
 }
 #pragma pop
@@ -2241,7 +2241,7 @@ s32 dbgMenuFightGetZokuseiDataId(u32 id) {
     u32 result;
     if (menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs((u16)id, &result, _dbgMenuFightGetZokuseiDataIdSub) == 0) return -1;
     if (result >= lbl_80478B38) result = lbl_80478B38 - 1;
-    fn_8001E200();
+    menuSubCloseNumberInput();
     return (s32)result;
 }
 #pragma pop

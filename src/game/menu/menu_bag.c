@@ -54,7 +54,7 @@ extern u32   fightTrainerGetStatus(u32 a, u32 b, u32 c, u32 d);
 
 /* ===== Text / Messages ===== */
 extern u8    fn_8001E224(u32 msgBank, s32* out, u32 a, u32 b, u32 c, u32 d);
-extern void  fn_8001E200(void);
+extern void  menuSubCloseNumberInput(void);
 
 typedef struct BagCacheEntry {
     u32 word0;
@@ -73,7 +73,7 @@ extern BagCacheEntry lbl_803A6AB0[];   /* Bag item cache (0x2B38 bytes) */
  *   fightTrainerGetStatus(0, slot_, 0x3E, 0)      -- resolve the widget's message bank
  *   fn_8001E224(bank, &value_, 0,0x32,0x32,0) -- read+validate the entered value
  *   fightTrainerSetStatus(0, slot_, 0x3E, 0, value_)     -- commit the clamped value
- *   fn_8001E200()                              -- close the widget
+ *   menuSubCloseNumberInput()                              -- close the widget
  */
 #define HANDLE_BAG_VALUE(slot_, value_)                                           \
         if (fn_8001E224(fightTrainerGetStatus(0, (slot_), 0x3E, 0),                         \
@@ -86,7 +86,7 @@ extern BagCacheEntry lbl_803A6AB0[];   /* Bag item cache (0x2B38 bytes) */
             }                                                                     \
             fightTrainerSetStatus(0, (slot_), 0x3E, 0, (value_));                           \
         }                                                                         \
-        fn_8001E200()
+        menuSubCloseNumberInput()
 
 /*
  * Functions in this translation unit (9 total):

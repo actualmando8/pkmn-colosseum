@@ -44,7 +44,7 @@ extern u8 fn_80011EA4[];
 extern u8 fn_8001329C[];
 extern u8 fn_80018F30[];
 extern u8 fn_800190D8[];
-extern u8 fn_8001BE38[];
+extern u8 menuPokemonMain[];
 extern u8 fn_8001E00C[];
 extern u8 fn_8001E184[];
 extern u8 fn_8001FD48[];
@@ -93856,7 +93856,7 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)menuPokemonOpen),
     (void*)0x01010100,
     (void*)0x00000000,
-    (void*)((u8*)fn_8001BE38),
+    (void*)((u8*)menuPokemonMain),
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)((u8*)fn_8001FD48),
