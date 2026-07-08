@@ -240,17 +240,17 @@ config.libs = [
         "Runtime.PPCEABI.H",
         "GC/1.2.5n",
         [
-            Object(CodeCandidate, "trk/ddh_cc_range_800C3E90.c", mw_version="GC/1.3", progress_category="runtime"),  # CALIB_TRK
-            Object(CodeCandidate, "hsd/hsd_mobj_range_801A8478.c", mw_version="GC/1.3", progress_category="hsd"),  # CALIB_HSD1
-            Object(CodeCandidate, "hsd/hsd_mobj_range_801A84B4.c", mw_version="GC/1.3", progress_category="hsd"),  # BANK_HSD_VECINIT
-            Object(CodeCandidate, "hsd/hsd_mtx.c", mw_version="GC/1.3", progress_category="hsd"),  # CALIB_HSD2
+            Object(Matching, "trk/ddh_cc_range_800C3E90.c", mw_version="GC/1.3", progress_category="runtime"),  # CALIB_TRK
+            Object(Matching, "hsd/hsd_mobj_range_801A8478.c", mw_version="GC/1.3", progress_category="hsd"),  # CALIB_HSD1
+            Object(Matching, "hsd/hsd_mobj_range_801A84B4.c", mw_version="GC/1.3", progress_category="hsd"),  # BANK_HSD_VECINIT
+            Object(Matching, "hsd/hsd_mtx.c", mw_version="GC/1.3", progress_category="hsd"),  # CALIB_HSD2
             Object(CodeCandidate, "crt/stdio_range_800C7558.c", mw_version="GC/1.3", progress_category="runtime"),  # CALIB_CRT
             Object(CodeCandidate, "trk/ddh_cc_range_800C3C00.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK
             Object(CodeCandidate, "trk/gdev_cc_range_800C41AC.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK
-            Object(CodeCandidate, "trk/gdev_cc_range_800C4444.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK
+            Object(Matching, "trk/gdev_cc_range_800C4444.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK
             Object(CodeCandidate, "hsd/hsd_mobj_range_801A86B4.c", mw_version="GC/1.3", progress_category="hsd"),  # BANK_HSD
             Object(CodeCandidate, "hsd/hsd_pobj_range_801AA608.c", mw_version="GC/1.3", progress_category="hsd"),  # BANK_HSD_POBJ
-            Object(CodeCandidate, "trk/TRKTarget_range_800C1310.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK2
+            Object(Matching, "trk/TRKTarget_range_800C1310.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK2
             Object(CodeCandidate, "trk/TRKComm_range_800C3678.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
             Object(CodeCandidate, "trk/TRKNub_range_800BE47C.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
             Object(CodeCandidate, "trk/TRKNub_range_800BEE74.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
@@ -283,17 +283,17 @@ config.libs = [
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "crt/mwtrace_helpers.c",
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "crt/critical_regions.c",
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "crt/stdio_atexit.c",
                 progress_category="runtime",
             ),
@@ -328,17 +328,17 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/exi/EXI2Stubs.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/vi/VI_fn_800AA280.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/vi/VI_fn_800AA498.c",
                 progress_category="sdk",
             ),
@@ -348,77 +348,77 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/exi/EXI2_range_800CEA3C.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/gx/GX_fn_800B71F0.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/gx/GX_fn_800B770C.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/gx/GX_fn_800B7714.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/gx/GX_fn_800B856C.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/gx/GX_fn_800BA198.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/gx/GX_fn_800BA414.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/gx/GX_fn_800BA424.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/gx/GX_fn_800BA440.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/gx/GX_fn_800BAE5C.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/gx/GX_fn_800BB2E4.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/gx/GX_fn_800BB2F8.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/os/PPCArch.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/os/OSGetExceptionHandler.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/os/OSAlarmCreate.c",
                 progress_category="sdk",
             ),
@@ -428,12 +428,12 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/os/OSContextCurrent.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/os/OSContextClear.c",
                 progress_category="sdk",
             ),
@@ -443,17 +443,17 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/os/OSEXI_fn_8009E7A8.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/os/OSEXI_fn_8009E7AC.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/os/OSState_fn_8009FAEC.c",
                 progress_category="sdk",
             ),
@@ -463,12 +463,12 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/os/OSReboot_WriteSram.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/os/OSThreadQueue.c",
                 progress_category="sdk",
             ),
@@ -478,47 +478,47 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/db/DBInit.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/db/DBGetFirstCallback.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/db/DBIsExceptionMarked.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/db/DBPrintf.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/si/SI_fn_800CF708.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/si/SI_fn_800CF728.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/si/SITypeDecode.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/si/SI_fn_800D0F44.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/si/SI_fn_800D104C.c",
                 progress_category="sdk",
             ),
@@ -530,12 +530,12 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/sound/sound.c",
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/effect/gs_effect.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -577,14 +577,14 @@ config.libs = [
                 progress_category="musyx",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "musyx/runtime/seq_api.c",
                 mw_version="GC/1.3.2",
                 extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
                 progress_category="musyx",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "musyx/runtime/snd_synthapi.c",
                 mw_version="GC/1.3.2",
                 extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
@@ -759,7 +759,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/menu_offscreen.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -1539,7 +1539,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/table_res_bios.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -1595,7 +1595,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/char_name_bios.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -1908,35 +1908,35 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/gs_math_mtx44.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/gs_math_quat.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/gs_math_init.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/gs_math_bezier.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/gs_math_lerp.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -2134,82 +2134,82 @@ config.libs = [
                 progress_category="hsd",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "hsd/hsd_mobj_clear_flags.c",
                 progress_category="hsd",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "hsd/hsd_mobj_set_flags.c",
                 progress_category="hsd",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "hsd/hsd_mobj_get_flags.c",
                 progress_category="hsd",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "hsd/hsd_mobj_set_current.c",
                 progress_category="hsd",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "hsd/hsd_mtx_get_alloc_data.c",
                 progress_category="hsd",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "hsd/hsd_vec_get_alloc_data.c",
                 progress_category="hsd",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "hsd/hsd_mtx_scaled_add.c",
                 progress_category="hsd",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "hsd/hsd_pobj_empty.c",
                 progress_category="hsd",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "hsd/hsd_robj_update_func.c",
                 progress_category="hsd",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "hsd/hsd_robj_find_by_type.c",
                 progress_category="hsd",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "hsd/hsd_robj_get_alloc_data.c",
                 progress_category="hsd",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "hsd/hsd_robj_get_alloc_data2.c",
                 progress_category="hsd",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "trk/TRKConstructEvent.c",
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "trk/TRKBufferReset.c",
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "trk/TRKGetBuffer.c",
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "trk/TRKTerminateSerialHandler.c",
                 progress_category="runtime",
             ),
@@ -2219,32 +2219,32 @@ config.libs = [
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "trk/usr_put_initialize.c",
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "trk/TRKDispatchInit.c",
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "trk/TRKDispatchConnected.c",
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "trk/TRKDispatchMutex.c",
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "trk/TRKTargetState.c",
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "trk/TRKTargetStopped.c",
                 progress_category="runtime",
             ),
@@ -2254,7 +2254,7 @@ config.libs = [
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "trk/TRKCommState.c",
                 progress_category="runtime",
             ),
@@ -2269,27 +2269,27 @@ config.libs = [
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "trk/ddh_cc_close.c",
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "trk/ddh_cc_shutdown.c",
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "trk/circle_buffer_count.c",
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "trk/gdev_cc_close.c",
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "trk/gdev_cc_shutdown.c",
                 progress_category="runtime",
             ),
