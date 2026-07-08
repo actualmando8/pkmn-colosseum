@@ -66,8 +66,8 @@ extern void* fn_800E27B0(u16 handle);
 extern u32 sndAuxCallbackUpdateSettingsReverbHI(u8* ptr);
 
 /* Model system */
-extern void  fn_800EE150(void* model, u32 param);
-extern void  fn_800EE828(void* model, u32 param);
+extern void  GSmodelGetPart(void* model, u32 param);
+extern void  GSpartFree(void* model, u32 param);
 extern void  fn_800E24B0(void* model, u32 param);
 extern void  fn_800E209C(void* model, u32 param);
 extern void  fn_800E01F4(void* dst, void* src);

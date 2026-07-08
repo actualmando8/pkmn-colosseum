@@ -37,12 +37,12 @@ extern void fn_800E209C();
 extern void fn_800E24B0();
 extern void fn_800E27B0();
 extern void fn_800E2C04();
-extern void fn_800EC960();
-extern void fn_800EC990();
-extern void fn_800EC9DC();
-extern void fn_800ECA78();
-extern void fn_800ECB74();
-extern void fn_800ECCA8();
+extern void GSmodelIsAnimating();
+extern void GSmodelStartAnimation();
+extern void GSmodelSetAnimRate();
+extern void GSmodelSetAnimFrame();
+extern void GSmodelSetAnimType();
+extern void GSmodelSetAnimIndex();
 extern void _threadSwitch();
 extern void fn_800F92D4();
 extern void fn_800F9AEC();
@@ -4568,15 +4568,15 @@ void fn_80087C64(void) {
                             if (r21 != 0) {
                                 if (r21 != 0) {
                                     r4 = (s16)r19;
-                                    ((void(*)(void))fn_800ECCA8)();
+                                    ((void(*)(void))GSmodelSetAnimIndex)();
                                     f1 = *(f32*)&lbl_8047C1CC;
                                     r3 = r21;
-                                    ((void(*)(void))fn_800ECA78)();
+                                    ((void(*)(void))GSmodelSetAnimFrame)();
                                     f1 = *(f32*)&lbl_8047C1C8;
                                     r3 = r21;
-                                    ((void(*)(void))fn_800EC9DC)();
+                                    ((void(*)(void))GSmodelSetAnimRate)();
                                     r3 = r21;
-                                    ((void(*)(void))fn_800EC990)();
+                                    ((void(*)(void))GSmodelStartAnimation)();
             }
             }
             }
@@ -4608,15 +4608,15 @@ void fn_80087C64(void) {
                         if (r20 != 0) {
                             if (r20 != 0) {
                                 r4 = (s16)r19;
-                                ((void(*)(void))fn_800ECCA8)();
+                                ((void(*)(void))GSmodelSetAnimIndex)();
                                 f1 = *(f32*)&lbl_8047C1CC;
                                 r3 = r20;
-                                ((void(*)(void))fn_800ECA78)();
+                                ((void(*)(void))GSmodelSetAnimFrame)();
                                 f1 = *(f32*)&lbl_8047C1C8;
                                 r3 = r20;
-                                ((void(*)(void))fn_800EC9DC)();
+                                ((void(*)(void))GSmodelSetAnimRate)();
                                 r3 = r20;
-                                ((void(*)(void))fn_800EC990)();
+                                ((void(*)(void))GSmodelStartAnimation)();
                 }
                 }
                 }
@@ -4722,15 +4722,15 @@ void fn_80087C64(void) {
                                                     if (r18 != 0) {
                                                         if (r18 != 0) {
                                                             r4 = (s16)r19;
-                                                            ((void(*)(void))fn_800ECCA8)();
+                                                            ((void(*)(void))GSmodelSetAnimIndex)();
                                                             f1 = *(f32*)&lbl_8047C1CC;
                                                             r3 = r18;
-                                                            ((void(*)(void))fn_800ECA78)();
+                                                            ((void(*)(void))GSmodelSetAnimFrame)();
                                                             f1 = *(f32*)&lbl_8047C1C8;
                                                             r3 = r18;
-                                                            ((void(*)(void))fn_800EC9DC)();
+                                                            ((void(*)(void))GSmodelSetAnimRate)();
                                                             r3 = r18;
-                                                            ((void(*)(void))fn_800EC990)();
+                                                            ((void(*)(void))GSmodelStartAnimation)();
                                     }
                                     }
                                     }
@@ -4760,15 +4760,15 @@ void fn_80087C64(void) {
                         if (r19 != 0 && r19 != 0) {
 
                             r4 = (s16)r20;
-                            ((void(*)(void))fn_800ECCA8)();
+                            ((void(*)(void))GSmodelSetAnimIndex)();
                             f1 = *(f32*)&lbl_8047C1CC;
                             r3 = r19;
-                            ((void(*)(void))fn_800ECA78)();
+                            ((void(*)(void))GSmodelSetAnimFrame)();
                             f1 = *(f32*)&lbl_8047C1C8;
                             r3 = r19;
-                            ((void(*)(void))fn_800EC9DC)();
+                            ((void(*)(void))GSmodelSetAnimRate)();
                             r3 = r19;
-                            ((void(*)(void))fn_800EC990)();
+                            ((void(*)(void))GSmodelStartAnimation)();
                     }
                     }
                     goto L_80088120;
@@ -4828,15 +4828,15 @@ void fn_80087C64(void) {
                             if (r19 != 0) {
                                 if (r19 != 0) {
                                     r4 = (s16)r21;
-                                    ((void(*)(void))fn_800ECCA8)();
+                                    ((void(*)(void))GSmodelSetAnimIndex)();
                                     f1 = *(f32*)&lbl_8047C1CC;
                                     r3 = r19;
-                                    ((void(*)(void))fn_800ECA78)();
+                                    ((void(*)(void))GSmodelSetAnimFrame)();
                                     f1 = *(f32*)&lbl_8047C1C8;
                                     r3 = r19;
-                                    ((void(*)(void))fn_800EC9DC)();
+                                    ((void(*)(void))GSmodelSetAnimRate)();
                                     r3 = r19;
-                                    ((void(*)(void))fn_800EC990)();
+                                    ((void(*)(void))GSmodelStartAnimation)();
             }
             }
             }
@@ -4858,15 +4858,15 @@ void fn_80087C64(void) {
                     if (r19 != 0) {
                         if (r19 != 0) {
                             r4 = (s16)r21;
-                            ((void(*)(void))fn_800ECCA8)();
+                            ((void(*)(void))GSmodelSetAnimIndex)();
                             f1 = *(f32*)&lbl_8047C1CC;
                             r3 = r19;
-                            ((void(*)(void))fn_800ECA78)();
+                            ((void(*)(void))GSmodelSetAnimFrame)();
                             f1 = *(f32*)&lbl_8047C1C8;
                             r3 = r19;
-                            ((void(*)(void))fn_800EC9DC)();
+                            ((void(*)(void))GSmodelSetAnimRate)();
                             r3 = r19;
-                            ((void(*)(void))fn_800EC990)();
+                            ((void(*)(void))GSmodelStartAnimation)();
             }
             }
             }
@@ -4930,22 +4930,22 @@ void fn_80087C64(void) {
                     if (r18 != 0) {
                         if (r18 != 0) {
                             r4 = (s16)r20;
-                            ((void(*)(void))fn_800ECCA8)();
+                            ((void(*)(void))GSmodelSetAnimIndex)();
                             f1 = *(f32*)&lbl_8047C1CC;
                             r3 = r18;
-                            ((void(*)(void))fn_800ECA78)();
+                            ((void(*)(void))GSmodelSetAnimFrame)();
                             f1 = *(f32*)&lbl_8047C1C8;
                             r3 = r18;
-                            ((void(*)(void))fn_800EC9DC)();
+                            ((void(*)(void))GSmodelSetAnimRate)();
                             r3 = r18;
-                            ((void(*)(void))fn_800EC990)();
+                            ((void(*)(void))GSmodelStartAnimation)();
                         }
                         r3 = r18;
                         r4 = 0x0;
-                        ((void(*)(void))fn_800ECB74)();
+                        ((void(*)(void))GSmodelSetAnimType)();
                         while (1) {
                             r3 = r18;
-                            ((void(*)(void))fn_800EC960)();
+                            ((void(*)(void))GSmodelIsAnimating)();
                             tmp = r3 & 0xFF;
                             if (tmp == 0) break;
                             ((void(*)(void))_threadSwitch)();

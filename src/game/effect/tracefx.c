@@ -48,10 +48,10 @@
 extern void  GSlogWrite(const char* fmt, ...);          /* OSReport / GSlog */
 extern u32   GSgfxGetFrameCount(void);                   /* fn_800D37CC */
 extern void* GSresGetResource(u32 group, u32 model);         /* GSfloor model load */
-extern void* fn_800EE150(void* model, u16 partIdx);     /* GSpart get sub-part */
+extern void* GSmodelGetPart(void* model, u16 partIdx);     /* GSpart get sub-part */
 extern void  GSpartGetTransform(void* part, void* outPos,
                           void* a, void* b);             /* GSpart get position */
-extern void  fn_800EE828(void* part);                    /* GSpart commit */
+extern void  GSpartFree(void* part);                    /* GSpart commit */
 extern void  fn_800E01D0(void* dst, void* src);         /* Vec3 copy */
 extern void  GSlerpGetLinearInterpolationVector(void* dst, void* srcA,
                           void* srcB, f32 t);            /* Vec3 lerp */
@@ -301,17 +301,17 @@ BOOL tracefxStartEffect(u8* w) {
         return FALSE;
     }
 
-    part = fn_800EE150(model, *(u16*)(w + 0x28));
+    part = GSmodelGetPart(model, *(u16*)(w + 0x28));
     if (part == (void*)0) {
         return FALSE;
     }
-    fn_800EE828(part);
+    GSpartFree(part);
 
-    part = fn_800EE150(model, *(u16*)(w + 0x2A));
+    part = GSmodelGetPart(model, *(u16*)(w + 0x2A));
     if (part == (void*)0) {
         return FALSE;
     }
-    fn_800EE828(part);
+    GSpartFree(part);
 
     if (count > (max_count >> 1)) {
         count = max_count >> 1;

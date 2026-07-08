@@ -80,26 +80,26 @@ extern void* memcpy(void* dst, const void* src, u32 size);
 extern void GSlightSetTarget(void);
 extern void GSlightSetPosition(void);
 extern void fn_800E01F4(void);
-extern void fn_800E3CF8(void*);
-extern void fn_800E3D00(void*);
-extern void fn_800E3D08(void*);
-extern void fn_800E3D6C(void*);
-extern void fn_800E3D98(void*, void*);
+extern void GSmodelGetRotationPtr(void*);
+extern void GSmodelGetPositionPtr(void*);
+extern void GSmodelGetVisibility(void*);
+extern void GSmodelGetRotation(void*);
+extern void GSmodelGetPosition(void*, void*);
 extern void GSmodelSetVisibility(void*, u8);
-extern void fn_800E4170(void*);
-extern void fn_800E43A4(void*);
+extern void GSmodelSetRotation(void*);
+extern void GSmodelSetPosition(void*);
 extern void fn_800E9B2C(void);
-extern void fn_800E9C6C(void);
-extern void fn_800EC2A4(void);
-extern void fn_800EC308(void);
-extern void fn_800EC35C(void);
-extern void fn_800EC578(void);
-extern void fn_800EC954(void);
-extern void fn_800EC960(void);
-extern void fn_800EC9DC(void);
-extern void fn_800ECA78(void);
-extern void fn_800ECB74(void);
-extern void fn_800ECCA8(void);
+extern void GSmodelPushState(void);
+extern void GSmodelSetTexAnimFrame(void);
+extern void GSmodelSetTexAnimRate(void);
+extern void GSmodelSetTexAnimIndex(void);
+extern void GSmodelGetAnimIndex(void);
+extern void GSmodelHasAnimationEnded(void);
+extern void GSmodelIsAnimating(void);
+extern void GSmodelSetAnimRate(void);
+extern void GSmodelSetAnimFrame(void);
+extern void GSmodelSetAnimType(void);
+extern void GSmodelSetAnimIndex(void);
 extern void fn_8010FFC4(void);
 
 /* GSmem allocator */
@@ -533,7 +533,7 @@ void peopleWaitSyncMotionBlend(void) {
 #endif
 
 /* 0x8018B220 | 0x148 */
-extern void fn_800EC96C(void*);
+extern void GSmodelStopAnimation(void*);
 #if 0
 asm void fn_8018B220(void) {
 #include "src/game/people/people_fn_8018B220.inc"
@@ -580,14 +580,14 @@ found_entry:
     if (entry != NULL) {
         void* model = peopleGetModel(entry);
         if (model != NULL) {
-            fn_800EC96C(model);
+            GSmodelStopAnimation(model);
         }
     }
 }
 #endif
 
 /* 0x8018B368 | 0x1F0 */
-extern void fn_800EC990(void);
+extern void GSmodelStartAnimation(void);
 extern f32 lbl_8047D7A0;
 extern u32 lbl_8047D7C8;
 extern u32 lbl_8047D7A4;
@@ -602,10 +602,10 @@ void fn_8018B368(void) {
 #endif
 
 /* 0x8018B558 | 0x214 */
-extern void fn_800EC5FC(void);
+extern void GSmodelSetAnimBlend(void);
 extern void GSmodelSetBlendFactor(void);
 extern void GSmodelGetFrameCount(void);
-extern void fn_800EC8C8(void);
+extern void GSmodelSetBlendAnimFrameForce(void);
 extern u32 lbl_8047D7D0;
 extern f32 lbl_8047D79C;
 extern f32 lbl_8047D7A0;
@@ -621,9 +621,9 @@ void fn_8018B558(void) {
 #endif
 
 /* 0x8018BC88 | 0x16C */
-extern void* fn_800EE150(void* modelHandle, s32 motionId);
+extern void* GSmodelGetPart(void* modelHandle, s32 motionId);
 extern void GSpartGetTransform(void* part, void* mtxOut, u32 param3, u32 param4);
-extern void fn_800EE828(void* part);
+extern void GSpartFree(void* part);
 
 /* Find a people entry by (groupId, index) and either copy its world
  * transform into *target (motionId < 0), or fetch the transform of a
@@ -668,9 +668,9 @@ found_entry:
         return;
     }
     if (motionId >= 0) {
-        part = fn_800EE150(entry->modelHandle, motionId);
+        part = GSmodelGetPart(entry->modelHandle, motionId);
         GSpartGetTransform(part, target, 0, 0);
-        fn_800EE828(part);
+        GSpartFree(part);
     } else {
         fn_800E01D0(target, fn_8018FCBC(entry));
     }
@@ -713,7 +713,7 @@ void fn_8018DB68(void) {
 extern void fn_800E24B0(void);
 extern void fn_800E209C(void);
 extern void fn_800F9210(void);
-extern void fn_800E4BF4(void);
+extern void GSmodelFree(void);
 #if 0
 asm void fn_8018DCA8(void) {
 #include "src/game/people/people_fn_8018DCA8.inc"
@@ -795,7 +795,7 @@ s32 fn_80181478(u32 groupId, u32 index, u8 doSetup) { /* TODO: match -- 984 byte
 extern void fn_80113F48(void);
 extern void fn_801CBA0C(void);
 extern void fn_800E3CC8(void);
-extern void fn_800E90C8(void);
+extern void GSmodelClearShadowFlags(void);
 extern void fn_801CB834(void);
 extern void fn_80166A28(void);
 extern void fn_800F7318(void);
@@ -1449,7 +1449,7 @@ asm void peopleGetPosition(void) {
 }
 #else
 void peopleGetPosition(PeopleEntry* entry) {
-    fn_800E3CF8(entry->modelHandle);
+    GSmodelGetRotationPtr(entry->modelHandle);
 }
 #endif
 #pragma pop
@@ -2236,31 +2236,31 @@ void fn_8018FB60(PeopleEntry* entry, u8 animId) {
  * (2-arg signature corrected from caller fn_8018BF24's disassembly: r3=entry,
  * r4=vec -- the 1-arg forward decl was a placeholder). */
 void fn_8018FC08(PeopleEntry* entry, void* vec) {
-    extern void fn_800E4170(void*, void*);
-    fn_800E4170(entry->modelHandle, vec);
+    extern void GSmodelSetRotation(void*, void*);
+    GSmodelSetRotation(entry->modelHandle, vec);
 }
 
 /* fn_8018FC2C = fn_8018FC2C (see people.h) -- not recovered, gap in archive campaign */
 void fn_8018FC2C(PeopleEntry* entry) {
-    extern void fn_800E3D6C(void*);
-    fn_800E3D6C(entry->modelHandle);
+    extern void GSmodelGetRotation(void*);
+    GSmodelGetRotation(entry->modelHandle);
 }
 
 /* fn_8018FC74 = fn_8018FC74 (see people.h) -- not recovered, gap in archive campaign
  * (2-arg signature corrected from caller fn_8018C0A8's disassembly). */
 void fn_8018FC74(PeopleEntry* entry, void* vec) {
-    extern void fn_800E43A4(void*, void*);
-    fn_800E43A4(entry->modelHandle, vec);
+    extern void GSmodelSetPosition(void*, void*);
+    GSmodelSetPosition(entry->modelHandle, vec);
 }
 
 /* fn_8018FC98 = fn_8018FC98 (see people.h) -- not recovered, gap in archive campaign */
 void fn_8018FC98(PeopleEntry* entry, void* pos) {
-    extern void fn_800E3D98(void*, void*);
-    fn_800E3D98(entry->modelHandle, pos);
+    extern void GSmodelGetPosition(void*, void*);
+    GSmodelGetPosition(entry->modelHandle, pos);
 }
 
 /* fn_8018FCBC = fn_8018FCBC (see people.h) -- not recovered, gap in archive campaign */
 void* fn_8018FCBC(PeopleEntry* entry) {
-    extern void* fn_800E3D00(void*);
-    return fn_800E3D00(entry->modelHandle);
+    extern void* GSmodelGetPositionPtr(void*);
+    return GSmodelGetPositionPtr(entry->modelHandle);
 }

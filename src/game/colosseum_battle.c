@@ -20965,14 +20965,14 @@ void fn_8025DD14(int *r3)
 /* Address: 0x8025DDAC | Size: 0x48 | Ghidra import */
 void fn_8025DDAC(u32 *r3,u32 r4)
 {
-    extern u32 fn_800E4170();
+    extern u32 GSmodelSetRotation();
     extern u32 fn_801DAC3C(u32);
   u32 iVar1;
   r3 = (u32*)*r3;
   if (r3 == 0) return;
   iVar1 = fn_801DAC3C((u32)r3);
   if (iVar1 == 0) return;
-  fn_800E4170(iVar1,r4);
+  GSmodelSetRotation(iVar1,r4);
 }
 
 /* Address: 0x8025DDF4 | Size: 0x18 | Ghidra import */
@@ -20989,14 +20989,14 @@ void fn_8025DDF4(u32 *r3)
 /* Address: 0x8025DE0C | Size: 0x48 | Ghidra import */
 void fn_8025DE0C(u32 *r3,u32 r4)
 {
-    extern u32 fn_800E43A4();
+    extern u32 GSmodelSetPosition();
     extern u32 fn_801DAC3C(u32);
   u32 iVar1;
   r3 = (u32*)*r3;
   if (r3 == 0) return;
   iVar1 = fn_801DAC3C((u32)r3);
   if (iVar1 == 0) return;
-  fn_800E43A4(iVar1,r4);
+  GSmodelSetPosition(iVar1,r4);
 }
 
 /* Address: 0x8025DE54 | Size: 0xE4 | Ghidra import */
@@ -21046,10 +21046,10 @@ u32 fn_8025DF38(int *r3,u32 r4,u16 *r5,int r6)
 {
     extern u32 _fadeEffectGetRandom__FUl();
     extern int GSmodelSetBoundCheck();
-    extern int fn_800E8FE8();
-    extern int fn_800E900C();
-    extern int fn_800E90C8();
-    extern int fn_800E9108();
+    extern int GSmodelSetShadowLight();
+    extern int GSmodelSetShadowSurface();
+    extern int GSmodelClearShadowFlags();
+    extern int GSmodelSetShadowFlags();
     extern u32 fn_800FF56C();
     extern int floorGetResource();
     extern int floorDataBiosGetShadowReciveNum();
@@ -21084,7 +21084,7 @@ u32 fn_8025DF38(int *r3,u32 r4,u16 *r5,int r6)
       r5 = r5 + 2;
     }
     if (((r3 != (int *)0x0) && (*(u32 *)r3 != 0)) && (iVar3 = fn_801DAC3C(), iVar3 != 0)) {
-      fn_800E90C8(iVar3,1);
+      GSmodelClearShadowFlags(iVar3,1);
       iVar4 = floorDataBiosGetCurrentPtr();
       if (iVar4 != 0) {
         uVar2 = fn_8018F470(1);
@@ -21101,9 +21101,9 @@ u32 fn_8025DF38(int *r3,u32 r4,u16 *r5,int r6)
               iVar10 = iVar10 + 4;
             }
           }
-          fn_800E9108(iVar3,1);
-          fn_800E8FE8(iVar3,uVar2);
-          fn_800E900C(iVar3,iVar9,local_68);
+          GSmodelSetShadowFlags(iVar3,1);
+          GSmodelSetShadowLight(iVar3,uVar2);
+          GSmodelSetShadowSurface(iVar3,iVar9,local_68);
           GSmodelSetBoundCheck(iVar3,1);
         }
       }
@@ -22288,7 +22288,7 @@ int fn_8026045C(u32 r3,u32 r4,int r5)
     extern int fn_80097A38();
     extern int GScameraGetPerspective();
     extern u32 GScameraGetActiveCamera();
-    extern int fn_800ECB74();
+    extern int GSmodelSetAnimType();
     extern int fn_801766A8();
     extern int GSscene_GetCameraRotationVector();
     extern int GSscene_SetCameraRotationVector();
@@ -22406,7 +22406,7 @@ int fn_8026045C(u32 r3,u32 r4,int r5)
     *(int *)(r5 + 4) = iVar7;
   }
   uVar1 = fn_801DAC3C(*(u32 *)(r5 + 4));
-  fn_800ECB74(uVar1,1);
+  GSmodelSetAnimType(uVar1,1);
   fn_801DA4E8(*(u32 *)(r5 + 4),1);
   GSscene_SetMode(2);
   GSscene_SetCameraDirectionVector(&local_58);
@@ -22902,7 +22902,7 @@ void fn_8026153C(void *rawOut)
 void fn_802615F4(short *r3)
 
 {
-    extern u32 fn_800E3D08();
+    extern u32 GSmodelGetVisibility();
     extern int fn_800E9B2C();
     extern int fn_801C3430();
     extern int fn_801DA224();
@@ -22936,7 +22936,7 @@ void fn_802615F4(short *r3)
     uVar2 = fn_801DAC3C();
     fn_800E9B2C(uVar2,piVar5 + 4);
     fn_801DA224(uVar3,*(u8 *)((int)piVar5 + 6));
-    uVar2 = fn_800E3D08(uVar2);
+    uVar2 = GSmodelGetVisibility(uVar2);
     fn_801DA4E8(uVar3,uVar2);
     piVar5 = piVar5 + 0x1f;
     sVar4 = sVar4 + -1;
@@ -22953,7 +22953,7 @@ void fn_802615F4(short *r3)
 u32 fn_80261708(u32 r3,u32 r4,char *r5)
 
 {
-    extern int fn_800E9C6C();
+    extern int GSmodelPushState();
     extern u8 fn_801D9E1C();
     extern u8 fn_801DA354();
     extern u16 fn_801DAC78();
@@ -23014,7 +23014,7 @@ u32 fn_80261708(u32 r3,u32 r4,char *r5)
 LAB_0025e7f4:
     puVar9[3] = iVar1;
     uVar3 = fn_801DAC3C(iVar2);
-    fn_800E9C6C(uVar3,puVar9 + 4);
+    GSmodelPushState(uVar3,puVar9 + 4);
     *(int *)(r5 + 8) = *(int *)(r5 + 8) + 0x7c;
   }
   if (r5[1] != '\0') {
@@ -23068,7 +23068,7 @@ u32 fn_8026184C(u32 r3,u32 r4,char *r5)
 LAB_0025e8fc:
     puVar7[2] = (u32)piVar6;
     uVar3 = fn_801DAC3C(iVar1);
-    fn_800E9C6C(uVar3,puVar7 + 3);
+    GSmodelPushState(uVar3,puVar7 + 3);
     *(int *)(r5 + 8) = *(int *)(r5 + 8) + 0x78;
   }
   if (r5[1] != '\0') {

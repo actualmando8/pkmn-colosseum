@@ -60,7 +60,7 @@ extern u32 lbl_80478B20;   /* max resource index (sda21) */
 extern u8  lbl_80315690[]; /* resource table, 8-byte entries */
 
 /* Additional externs used by various functions */
-extern void  fn_800E4BF4(u32);     /* GSmem release/unref */
+extern void  GSmodelFree(u32);     /* GSmem release/unref */
 extern void  fn_800D2738(void);
 extern void* menuDataBiosGetPtr(void);    /* linked list head */
 extern void* menuItemBiosGetPtr(s16 idx); /* node by index */
@@ -76,10 +76,10 @@ extern void  fn_800BD91C(s32, s32);
 extern void  fn_800B8C58(s32);
 extern void  GSgfxBeginBackFBCapture(u32, void*, void*);
 extern u32   GStextureCreate(s32, s32, s32, s32, s32);
-extern u32   fn_800EC1BC(u32);
-extern void  fn_800ECCA8(u32, u32);
-extern void  fn_800EC9DC(u32, f32);
-extern void  fn_800EC990(u32);
+extern u32   GSmodelCanAnimate(u32);
+extern void  GSmodelSetAnimIndex(u32, u32);
+extern void  GSmodelSetAnimRate(u32, f32);
+extern void  GSmodelStartAnimation(u32);
 extern void  fn_801DB100(u32);
 extern u32   OSGetTick(void);
 
@@ -1820,10 +1820,10 @@ s32 menuModelSetMotion(void* p, u32 val) {
             *(u32*)((u8*)r31 + 0x1c) = val;
             {
                 u32 r3 = *(u32*)((u8*)r31 + 0x24);
-                if ((u8)fn_800EC1BC(r3) != 0) {
-                    fn_800ECCA8(*(u32*)((u8*)r31 + 0x24), *(u32*)((u8*)r31 + 0x1c));
-                    fn_800EC9DC(*(u32*)((u8*)r31 + 0x24), lbl_8047CE70);
-                    fn_800EC990(*(u32*)((u8*)r31 + 0x24));
+                if ((u8)GSmodelCanAnimate(r3) != 0) {
+                    GSmodelSetAnimIndex(*(u32*)((u8*)r31 + 0x24), *(u32*)((u8*)r31 + 0x1c));
+                    GSmodelSetAnimRate(*(u32*)((u8*)r31 + 0x24), lbl_8047CE70);
+                    GSmodelStartAnimation(*(u32*)((u8*)r31 + 0x24));
                 }
             }
         }
@@ -1876,7 +1876,7 @@ s32 fn_80109BFC(void* p) {
         }
     } else {
         if (*(void**)((u8*)r31 + 0x24) != (void*)0) {
-            fn_800E4BF4(*(u32*)((u8*)r31 + 0x24));
+            GSmodelFree(*(u32*)((u8*)r31 + 0x24));
             *(u32*)((u8*)r31 + 0x24) = 0;
         }
     }

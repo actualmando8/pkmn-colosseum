@@ -5202,7 +5202,7 @@ void fightOutPokemonKizetuEffect(void)
 #pragma push
 #pragma peephole on
 void fightOutPokemonDamageEffect(void* ctx) {
-    extern u8 fn_800E3D08();
+    extern u8 GSmodelGetVisibility();
     extern void GSmodelSetVisibility();
     extern void fn_801DA4E8();
     extern void* fn_801DAC3C();
@@ -5214,7 +5214,7 @@ void fightOutPokemonDamageEffect(void* ctx) {
     eeData = pokemonGetStatus(ctx, 0, 0xEE, 0);
     resolved = !eeData ? NULL : fn_801DAC3C(eeData);
     if (resolved == NULL) { return; }
-    if ((u8)fn_800E3D08(resolved) == 0) { return; }
+    if ((u8)GSmodelGetVisibility(resolved) == 0) { return; }
     for (i = 0; i < 8; i++) {
         eeData = pokemonGetStatus(ctx, 0, 0xEE, 0);
         if (eeData != NULL) {

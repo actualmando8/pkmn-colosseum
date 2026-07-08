@@ -4463,10 +4463,10 @@ static void gappBackgroundCallback(void) {
 /* 0x800F0A74 | 0x4D8 */
 extern void fn_800F02F4(void);
 extern void threadExecute(void);
-extern u8 fn_800EEA50(void*);
+extern u8 GSscratchIsPtr(void*);
 extern void fn_800EEB34(void);
 extern void GSscratchStore(void*, void*, s32);
-extern void fn_800EEA6C(void);
+extern void GSscratchWaitForCompletion(void);
 extern void DCFlushRange(void*, s32);
 extern u32 lbl_8047AC08;
 extern u8 lbl_804019F0[];
@@ -4539,7 +4539,7 @@ void fn_800F0A74(arg0, arg1)
         lbl_8047AC00 = 0;
 
         if (thread->pad1 != 0) {
-            if (fn_800EEA50(scratchStack) != 0) {
+            if (GSscratchIsPtr(scratchStack) != 0) {
                 GSscratchFree(scratchStack);
             }
             fn_800E24B0(thread->ctxHandle);
@@ -4564,10 +4564,10 @@ void fn_800F0A74(arg0, arg1)
                 fn_800E209C(thread->ctxHandle);
             }
         } else {
-            if (fn_800EEA50(scratchStack) != 0) {
+            if (GSscratchIsPtr(scratchStack) != 0) {
                 DCFlushRange(stack, thread->stackSize);
                 GSscratchStore(stack, scratchStack, thread->stackSize);
-                fn_800EEA6C();
+                GSscratchWaitForCompletion();
                 GSscratchFree(scratchStack);
             }
             fn_800E24B0(thread->ctxHandle);

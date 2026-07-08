@@ -131,7 +131,7 @@ extern void _threadSwitch(void);
 extern void* GSresGetResource(u32 a, u32 b);
 extern void* fn_800F92D4(u32 a);
 extern void GScameraStopAnimation(void* a);
-extern void fn_800E3D98(void* a, void* b);
+extern void GSmodelGetPosition(void* a, void* b);
 
 /* ===== String constants (rodata) ===== */
 extern const char lbl_80273A00[]; /* "gs%04d.xfb" */
@@ -776,7 +776,7 @@ void fn_80177760(void* unused, u32 a, u32 b, f32 param) {
     }
     handle = GSresGetResource(a, b);
     if (handle != 0) {
-        fn_800E3D98(handle, local);
+        GSmodelGetPosition(handle, local);
     }
     {
         void* p = lbl_80478C40;

@@ -2064,9 +2064,9 @@ s32 fn_80025F74(void) {
  *        else:     use 0xC6C1000 variant
  *      Load it via fn_801CBA0C + fn_801CB954(activate=0).
  *   3. Set up TEV/sprite chain via fn_80113F48 + GSresGetResource composition:
- *        GSmodelSetBoundCheck, fn_800E9108(2), fn_800E8FE8, fn_800E900C(1, &obj_c),
- *        fn_800E8FA0(0x280, 0x1E0)  -- viewport 640x480
- *        fn_800E3C08, fn_800E3C00(4)
+ *        GSmodelSetBoundCheck, GSmodelSetShadowFlags(2), GSmodelSetShadowLight, GSmodelSetShadowSurface(1, &obj_c),
+ *        GSmodelSetShadowTextureSize(0x280, 0x1E0)  -- viewport 640x480
+ *        GSmodelLinkToGSparticleBank, GSmodelSetGSparticleLinkAttachMode(4)
  *      Activates tex handle, binds 0xC6A1000 slot 0, pushes animation.
  *      Stores handle in lbl_8047A384 (title active flag).
  *   4. Per lbl_8047A380 (debug flag?), pick one of two frame-sequence tables
@@ -2086,12 +2086,12 @@ extern void fn_801CBA0C(void);
 extern void fn_80113F48(void);
 extern void GSresGetResource(void);
 extern void GSmodelSetBoundCheck(void);
-extern void fn_800E9108(void);
-extern void fn_800E8FE8(void);
-extern void fn_800E900C(void);
-extern void fn_800E8FA0(void);
-extern void fn_800E3C08(void);
-extern void fn_800E3C00(void);
+extern void GSmodelSetShadowFlags(void);
+extern void GSmodelSetShadowLight(void);
+extern void GSmodelSetShadowSurface(void);
+extern void GSmodelSetShadowTextureSize(void);
+extern void GSmodelLinkToGSparticleBank(void);
+extern void GSmodelSetGSparticleLinkAttachMode(void);
 extern void fn_801CB61C(void);
 extern void fn_801CB834(void);
 extern void fn_80165A20(void);
@@ -2145,13 +2145,13 @@ void fn_80025F84(void) {
     extern u32 fn_800D3088(void);
     extern s32 fn_800D37CC(void);
     extern void GSgfxBeginBackFBCapture(u32, void*, s32);
-    extern void fn_800E3C00(u32, s32);
-    extern void fn_800E3C08(u32, u32);
+    extern void GSmodelSetGSparticleLinkAttachMode(u32, s32);
+    extern void GSmodelLinkToGSparticleBank(u32, u32);
     extern void GSmodelSetBoundCheck(u32, s32);
-    extern void fn_800E8FA0(s32, s32);
-    extern void fn_800E8FE8(u32, u32);
-    extern void fn_800E900C(u32, s32, void*);
-    extern void fn_800E9108(u32, s32);
+    extern void GSmodelSetShadowTextureSize(s32, s32);
+    extern void GSmodelSetShadowLight(u32, u32);
+    extern void GSmodelSetShadowSurface(u32, s32, void*);
+    extern void GSmodelSetShadowFlags(u32, s32);
     extern u32 GStextureCreate(s32, s32, s32, s32, s32);
     extern void _threadSwitch(void);
     extern u32 GSresGetResource(u32, u32);
@@ -2191,14 +2191,14 @@ void fn_80025F84(void) {
     obj_d = GSresGetResource(fn_80113F48(), 0xC6A1603);
     {
         u32 obj_c_local = obj_c;
-        fn_800E9108(obj_b, 2);
-        fn_800E8FE8(obj_b, obj_d);
-        fn_800E900C(obj_b, 1, &obj_c_local);
+        GSmodelSetShadowFlags(obj_b, 2);
+        GSmodelSetShadowLight(obj_b, obj_d);
+        GSmodelSetShadowSurface(obj_b, 1, &obj_c_local);
     }
-    fn_800E8FA0(0x280, 0x1e0);
+    GSmodelSetShadowTextureSize(0x280, 0x1e0);
     obj_e = GSresGetResource(fn_80113F48(), 0xC831400);
-    fn_800E3C08(GSresGetResource(fn_80113F48(), tex), obj_e);
-    fn_800E3C00(GSresGetResource(fn_80113F48(), tex), 4);
+    GSmodelLinkToGSparticleBank(GSresGetResource(fn_80113F48(), tex), obj_e);
+    GSmodelSetGSparticleLinkAttachMode(GSresGetResource(fn_80113F48(), tex), 4);
     fn_801CB954(tex, 1);
     fn_801CB61C(tex, 0xC6A1000, 0);
     fn_801CB834(tex, frame_a, 0, 1);

@@ -1606,7 +1606,7 @@ extern s32 heroMoveCheckEvent();
 extern void fn_80116D30(void);
 extern void heroMoveInitEvent(void);
 extern void mailMainReceiveTerminate(void);
-extern void fn_800EC918(void);
+extern void GSmodelAllPauseAnimation(void);
 extern s32 fn_800D37CC();
 extern void fn_8010206C(void);
 extern u8 fn_80102014();
@@ -1620,7 +1620,7 @@ extern void GSthreadBlockGroup(void);
 extern void GSthreadCreate(void);
 extern void GSgappUnblock(void);
 extern void fn_80102510();
-extern void fn_800EC8DC(void);
+extern void GSmodelAllUnpauseAnimation(void);
 extern void menuPokemonOpen(void);
 extern void menuPdaOpen(void);
 extern u32 fn_80018F88();
@@ -1652,7 +1652,7 @@ u32 fn_8000D710(u32 mode) {
     extern void fn_80116D30(s32 kind, u16 value);
     extern void heroMoveInitEvent(void);
     extern void mailMainReceiveTerminate(void);
-    extern void fn_800EC918(void);
+    extern void GSmodelAllPauseAnimation(void);
     extern s32 fn_800D37CC(void);
     extern void fn_8010206C(f32 value);
     extern u8 fn_80102014(void);
@@ -1666,7 +1666,7 @@ u32 fn_8000D710(u32 mode) {
     extern void GSthreadCreate(s32, void*, u32, s32, s32, void*);
     extern void GSgappUnblock(void);
     extern void fn_80102510(s32);
-    extern void fn_800EC8DC(void);
+    extern void GSmodelAllUnpauseAnimation(void);
     extern void menuPokemonOpen(s32, s32, s32);
     extern void menuPdaOpen(void);
     extern u32 fn_80018F88(s32, void*, s32);
@@ -1696,7 +1696,7 @@ u32 fn_8000D710(u32 mode) {
     heroMoveInitEvent();
     mailMainReceiveTerminate();
     _threadSwitch();
-    fn_800EC918();
+    GSmodelAllPauseAnimation();
     lbl_8047A2A0 = 1;
     tmp = fn_800D37CC();
     if (tmp != 0) {
@@ -1728,19 +1728,19 @@ u32 fn_8000D710(u32 mode) {
 
             if (lbl_8047A2B0 == 0) {
                 fn_80102510(dialogId);
-                fn_800EC8DC();
+                GSmodelAllUnpauseAnimation();
                 menuPokemonOpen(1, 0, 0);
-                fn_800EC918();
+                GSmodelAllPauseAnimation();
             } else if (lbl_8047A2B0 == 1) {
                 fn_80102510(dialogId);
-                fn_800EC8DC();
+                GSmodelAllUnpauseAnimation();
                 menuPdaOpen();
-                fn_800EC918();
+                GSmodelAllPauseAnimation();
             } else if (lbl_8047A2B0 == 2) {
                 fn_80102510(dialogId);
-                fn_800EC8DC();
+                GSmodelAllUnpauseAnimation();
                 result = fn_80018F88(0, &work, 0);
-                fn_800EC918();
+                GSmodelAllPauseAnimation();
                 if (((u16)result != 0) && (fn_80019070(result) != 0xFFFFFFFF)) {
                     heroMoveAddAutoEvent(fn_80019070(result), (u16)result, work, 0, 0);
                     break;
@@ -1770,7 +1770,7 @@ u32 fn_8000D710(u32 mode) {
     menuCloseSync(dialogId, 1);
     fn_800D3074(2);
     heroMoveTermEvent();
-    fn_800EC8DC();
+    GSmodelAllUnpauseAnimation();
     lbl_8047A2A0 = 0;
     return 0;
 }

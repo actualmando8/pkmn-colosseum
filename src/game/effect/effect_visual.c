@@ -114,7 +114,7 @@
  *   fn_80131200 (GSEffectRegister)   -- register callbacks
  *   fn_8013139C (GSEffectResetState) -- re-trigger effect
  *   GSresGetResource (floor resource lookup)
- *   fn_800E3D98 (GSmem / resource helper)
+ *   GSmodelGetPosition (GSmem / resource helper)
  *   _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID, GScameraGetActiveCamera, GScameraGetPosition, GScameraGetPerspective -- matrix/vector ops
  *   fn_800DA4C4, fn_800DA2BC, fn_800DA1E8, fn_800DA028 -- GX TEV/material setup
  *   fn_800D88DC, fn_800D888C -- GX blend/alpha mode
@@ -171,7 +171,7 @@ extern void  fn_8013139C(u32 effectId, u32 param);        /* GSEffectResetState 
 extern void* GSresGetResource(u32 group, u32 model);
 
 /* Matrix / vector operations */
-extern void  fn_800E3D98(void* dst, void* src);
+extern void  GSmodelGetPosition(void* dst, void* src);
 extern void  _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID(void);
 extern void* GScameraGetActiveCamera(void);
 extern void  GScameraGetPosition(void* mtx, void* vec);
@@ -443,7 +443,7 @@ u32 _lightningRenderMain(void* ptr) {
         return 0;
     }
 
-    fn_800E3D98(model, modelPos);
+    GSmodelGetPosition(model, modelPos);
     _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
     fn_800DA4C4(1, 6, 1);
     fn_800DA2BC(1, 1, 1);
@@ -614,7 +614,7 @@ void fn_80138838(void* ptr, u32 b) {
         return;
     }
 
-    fn_800E3D98(model, pos);
+    GSmodelGetPosition(model, pos);
     entry = *(u8**)(p + 0x4);
     count = *(u16*)(p + 0x8);
     for (i = 0; i < count; i++, entry += 0x97C) {
@@ -666,14 +666,14 @@ u32 fn_80138B74(void* ptr) {
 }
 #endif
 extern void GSmodelSetVisibility(void* a, u32 b);
-extern void fn_800E4BF4(void* entry);
+extern void GSmodelFree(void* entry);
 extern u32 fn_800EE0E8(void* entry);
-extern void* fn_800EE150(void* model, u32 mode);
+extern void* GSmodelGetPart(void* model, u32 mode);
 extern s32 GSpartGetMaterialCount(void* outerP);
-extern void* fn_800EE6B4(void* handle, u32 idx);
+extern void* GSpartGetMaterial(void* handle, u32 idx);
 extern void GSmaterialSetAlpha(void* obj, f32 val);
 extern void fn_800DF608(void* handle);
-extern void fn_800EE828(void* handle);
+extern void GSpartFree(void* handle);
 extern u32 lbl_8047D160;
 #if 0
 asm u32 fn_80138BBC(void* ptr) {
@@ -701,7 +701,7 @@ u32 fn_80138BBC(void* ptr) {
             obj = *(void**)(entry + 0x58);
             if (obj != NULL) {
                 GSmodelSetVisibility(obj, 0);
-                fn_800E4BF4(obj);
+                GSmodelFree(obj);
                 *(void**)(entry + 0x58) = NULL;
             }
         }
@@ -709,18 +709,18 @@ u32 fn_80138BBC(void* ptr) {
         model = *(void**)(p + 0x8);
         modelCount = fn_800EE0E8(model);
         for (i = 0; i < modelCount; i++) {
-            part = fn_800EE150(model, i);
+            part = GSmodelGetPart(model, i);
             if (part != NULL) {
                 partCount = GSpartGetMaterialCount(part);
                 while (partCount != 0) {
                     partCount--;
-                    obj = fn_800EE6B4(part, partCount);
+                    obj = GSpartGetMaterial(part, partCount);
                     if (obj != NULL) {
                         GSmaterialSetAlpha(obj, *(f32*)&lbl_8047D160);
                         fn_800DF608(obj);
                     }
                 }
-                fn_800EE828(part);
+                GSpartFree(part);
             }
         }
 
@@ -788,7 +788,7 @@ extern void fn_800E06B8(void);
 extern void fn_800E040C(void);
 extern void fn_800E02C4(void);
 extern void fn_800E03B4(void);
-extern void fn_800E4598(void);
+extern void GSmodelSetMatrix(void);
 extern u32 lbl_8047D170;
 extern u32 lbl_8047D164;
 extern u32 lbl_8047D178;
@@ -862,7 +862,7 @@ void fn_80139074(void* entry, void* parent) {
     }
 }
 #endif
-extern void* fn_800E4C98(void* model);
+extern void* GSmodelClone(void* model);
 extern void GSpartGetTransform(void* obj, void* a, void* b, void* c);
 extern u8 lbl_80272CC4[];
 extern u32 lbl_8047D168;
@@ -891,7 +891,7 @@ void _leaffxGenerateLeafData(void* ptr, void* entry) {
         return;
     }
 
-    clone = fn_800E4C98(source);
+    clone = GSmodelClone(source);
     if (clone == NULL) {
         GSlogWrite((const char*)lbl_80272CC4);
         return;
@@ -988,13 +988,13 @@ u32 fn_80139934(void* ptr) {
         }
         _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
         if (model != NULL) {
-            fn_800E3D98(model, pos);
+            GSmodelGetPosition(model, pos);
             if (*(s32*)(p + 0x50) > 0) {
-                part = fn_800EE150(model, *(u32*)(p + 0x50));
+                part = GSmodelGetPart(model, *(u32*)(p + 0x50));
                 if (part != NULL) {
                     if ((u8)fn_800EE7E0(part) != 0) {
                         GSpartGetTransform(part, pos, NULL, NULL);
-                        fn_800EE828(part);
+                        GSpartFree(part);
                     }
                 }
             }
@@ -1482,8 +1482,8 @@ u32 fn_8013B034(void* ptr) {
     return ret;
 }
 #endif
-extern void fn_800E5A74(void* texture);
-extern void fn_800E638C(void* texture);
+extern void GSmodelDisableModulation(void* texture);
+extern void GSmodelResetPEdescr(void* texture);
 extern void fn_801684F0(void* texture);
 #if 0
 asm void fn_8013B0A0(void) {
@@ -1511,10 +1511,10 @@ u32 fn_8013B0A0(void* ptr) {
         for (i = 0; i < count; i++, p += 4) {
             if (*(void**)p != NULL) {
                 if (flag2 == 0) {
-                    fn_800E5A74(*(void**)p);
+                    GSmodelDisableModulation(*(void**)p);
                 }
                 if (flag1 != 0) {
-                    fn_800E638C(*(void**)p);
+                    GSmodelResetPEdescr(*(void**)p);
                 }
             }
         }
@@ -1530,8 +1530,8 @@ fail:
     return 0;
 }
 #endif
-extern void fn_800E6478(void* texture, void* name);
-extern void fn_800E5BE0(void* texture, void* filter);
+extern void GSmodelSetPEdescr(void* texture, void* name);
+extern void GSmodelEnableModulation(void* texture, void* filter);
 extern void fn_80168570(void);
 extern u8 lbl_80363CA8[];
 extern u8 lbl_80272E30[];
@@ -1565,10 +1565,10 @@ u16 filterStart(void* arg) {
         for (i = 0; i < count; i++, p += 4) {
             if (*(void**)p != NULL) {
                 if (flag1 != 0) {
-                    fn_800E6478(*(void**)p, lbl_80363CA8);
+                    GSmodelSetPEdescr(*(void**)p, lbl_80363CA8);
                 }
                 if (flag2 == 0) {
-                    fn_800E5BE0(*(void**)p, *(void**)((u8*)ptr + 0x50));
+                    GSmodelEnableModulation(*(void**)p, *(void**)((u8*)ptr + 0x50));
                 }
             }
         }
@@ -1589,7 +1589,7 @@ report_null:
     return 0;
 }
 #endif
-extern void fn_800E5B68(void* obj, void* param);
+extern void GSmodelSetModulationColor(void* obj, void* param);
 extern u32 lbl_8047D1E8;
 extern u32 lbl_8047D1F8;
 extern u32 lbl_8047D1F0;
@@ -1616,7 +1616,7 @@ void fn_8013B268(void* ptr, u8* color) {
     materialColor = (*(u8*)(p + 0x4F) != 0) ? p + 0x44 : color;
     for (i = 0; i < count; i++) {
         if (textures[i] != NULL) {
-            fn_800E5B68(textures[i], materialColor);
+            GSmodelSetModulationColor(textures[i], materialColor);
         }
     }
 }
@@ -1686,13 +1686,13 @@ u32 fn_8013B558(void* ptr) {
 #endif
 extern void fn_800E2C04(void);
 extern void fn_800E0E14(void);
-extern void fn_800E4170(void);
-extern u8 fn_800EC1B0(void* model);
-extern void fn_800EC35C(void* model, u16 value);
-extern void fn_800EC308(void* model, f32 value);
-extern void fn_800EC2A4(void* model, f32 value);
-extern void fn_800EC208(void* model, u32 value);
-extern void fn_800EC1E4(void* model);
+extern void GSmodelSetRotation(void);
+extern u8 GSmodelCanTexAnimate(void* model);
+extern void GSmodelSetTexAnimIndex(void* model, u16 value);
+extern void GSmodelSetTexAnimRate(void* model, f32 value);
+extern void GSmodelSetTexAnimFrame(void* model, f32 value);
+extern void GSmodelSetTexAnimType(void* model, u32 value);
+extern void GSmodelStartTexAnimation(void* model);
 extern u32 lbl_8047D200;
 extern u32 lbl_8047D204;
 extern u8 lbl_80272EA0[];
@@ -1929,7 +1929,7 @@ u32 fn_8013C614(void* ptr) {
     return 1;
 }
 #endif
-extern void fn_800EC1D4(void* a);
+extern void GSmodelStopTexAnimation(void* a);
 #if 0
 asm void fn_8013C670(void) {
 #include "src/game/effect/effect_visual_fn_8013C670.inc"
@@ -1944,7 +1944,7 @@ u32 fn_8013C670(void* arg) {
     if (arg != 0) {
         ptr = arg;
         inner = *(void**)ptr;
-        fn_800EC1D4(inner);
+        GSmodelStopTexAnimation(inner);
         if (inner != 0) {
             GSmodelSetVisibility(inner, 0);
         }
@@ -1971,7 +1971,7 @@ u32 fn_8013C670(void* arg) {
 }
 #pragma pop
 #endif
-extern void fn_800EC188(void);
+extern void GSmodelLinkTexAnimToAnim(void);
 extern u32 lbl_8047D230;
 extern u32 lbl_8047D234;
 extern u32 lbl_8047D238;
@@ -2225,7 +2225,7 @@ u32 fn_8013D730(void* ptr) {
     return ret;
 }
 #endif
-extern void fn_800E5FFC(void* ptr);
+extern void GSmodelDisableEnvMap(void* ptr);
 #if 0
 asm u32 fn_8013D7CC(void* ptr) {
 #include "src/game/effect/effect_visual_fn_8013D7CC.inc"
@@ -2236,7 +2236,7 @@ u32 fn_8013D7CC(void* ptr) {
     if (ptr != NULL) {
         inner = *(void**)ptr;
         if (inner != NULL) {
-            fn_800E5FFC(inner);
+            GSmodelDisableEnvMap(inner);
         }
     }
     return 1;
@@ -2287,7 +2287,7 @@ u32 envMapEffectInit(void* ptr) {
     return 0;
 }
 #endif
-extern void fn_800E61BC(void* a, void* b, void* c, void* d, f32 e);
+extern void GSmodelEnableEnvMap(void* a, void* b, void* c, void* d, f32 e);
 extern u32 lbl_8047AEE0;
 extern u8 lbl_80272F38[];
 #if 0
@@ -2303,7 +2303,7 @@ u32 envMapEffectStart(void* ptr) {
         inner = *(void**)ptr;
         if (inner == NULL) { goto log; }
         if (lbl_8047AEE0 == 0) { goto log; }
-        fn_800E61BC(inner, *(void**)((u8*)ptr + 0x4), *(void**)((u8*)ptr + 0x8),
+        GSmodelEnableEnvMap(inner, *(void**)((u8*)ptr + 0x4), *(void**)((u8*)ptr + 0x8),
                     (void*)lbl_8047AEE0, *(f32*)*(void**)((u8*)ptr + 0x10));
         return 1;
     }
@@ -2318,10 +2318,10 @@ extern void fn_800D377C(u32 a);
 extern void fn_800D3410(void* texture, u32 a);
 extern void* fn_800E3B08(u32 index);
 extern void fn_800E3C64(void);
-extern void fn_800E3760(void* obj, u32 flags);
+extern void GSmodelDrawModel(void* obj, u32 flags);
 extern void fn_800D3190(void);
-extern void fn_800E5FAC(void);
-extern void fn_800E60F0(void);
+extern void GSmodelIsEnvMapEnabled(void);
+extern void GSmodelSetEnvMapBlendValue(void);
 extern u32 lbl_8047AEE0;
 extern u32 lbl_8047D260;
 #if 0
@@ -2354,7 +2354,7 @@ u32 fn_8013D984(void* ptr, u32 delta) {
 
     *(u32*)(p + 0x14) += delta;
     if (lbl_8047AEE0 != 0 && *(void**)p != NULL) {
-        fn_800E61BC(*(void**)p, *(void**)(p + 0x4), *(void**)(p + 0x8),
+        GSmodelEnableEnvMap(*(void**)p, *(void**)(p + 0x4), *(void**)(p + 0x8),
                     (void*)lbl_8047AEE0, *(f32*)node);
     }
     return 1;
@@ -2503,16 +2503,16 @@ u32 blurEffectStart(void* ptr) {
     return 0;
 }
 #endif
-extern void fn_800EC960(void);
+extern void GSmodelIsAnimating(void);
 extern void fn_800D3068(void);
 extern void GSmodelGetAnimFrame(void);
-extern void fn_800EC570(void);
+extern void GSmodelGetAnimRate(void);
 extern void fn_800D45F8(void);
 extern void GSmaterialGetFlags(void);
 extern void GSmaterialSetFlags(void);
 extern void GSmaterialStoreAlpha(void);
-extern void fn_800EC990(void* model);
-extern void fn_800ECA78(void* model, f32 value);
+extern void GSmodelStartAnimation(void* model);
+extern void GSmodelSetAnimFrame(void* model, f32 value);
 extern void fn_800EC134(void);
 extern void GSmaterialResetAlpha(void);
 extern void GSmaterialResetFlags(void);
@@ -2549,7 +2549,7 @@ u32 fn_8013DE6C(void* ptr) {
     _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
     if (model != NULL) {
         GSmodelSetVisibility(model, 1);
-        fn_800E3760(model, 0);
+        GSmodelDrawModel(model, 0);
     }
     if (*(void**)(p + 0xC) != NULL) {
         fn_800D85D4(0, *(void**)(p + 0xC));
@@ -2809,14 +2809,14 @@ u32 fn_8013E8A4(void* ptr, u32 delta) {
 }
 #endif
 extern void __assert(void);
-extern void* fn_800E3C5C(void* model);
-extern void fn_800E4514(void);
-extern void fn_800E69C4(void);
-extern void fn_800E66B8(void);
+extern void* GSmodelGetBound(void* model);
+extern void GSmodelGetMatrixPtr(void);
+extern void GSmodelSetRenderFlags(void);
+extern void GSmodelInitMaterialAlpha(void);
 extern void fn_8019D620(void);
-extern void fn_800E6804(void);
-extern void fn_800E65CC(void);
-extern void fn_800E68D8(void);
+extern void GSmodelSetMaterialAlpha(void);
+extern void GSmodelResetMaterialAlpha(void);
+extern void GSmodelResetRenderFlags(void);
 extern u8 lbl_80363CD8[];
 extern u8 lbl_8047D2E0[];
 extern u8 lbl_8047D2E8[];
@@ -2999,17 +2999,17 @@ u16 distortionEffectStart(void* ptr) {
         return 0;
     }
 
-    part = fn_800EE150(*(void**)(p + 0x8), *(u32*)(p + 0xC));
+    part = GSmodelGetPart(*(void**)(p + 0x8), *(u32*)(p + 0xC));
     if (part != NULL) {
         GSpartGetTransform(part, p + 0x2C, NULL, NULL);
-        fn_800EE828(part);
+        GSpartFree(part);
     } else {
-        fn_800E3D98(*(void**)(p + 0x8), p + 0x2C);
+        GSmodelGetPosition(*(void**)(p + 0x8), p + 0x2C);
     }
     return 1;
 }
 #endif
-extern u8 fn_800E3D08(void* obj);
+extern u8 GSmodelGetVisibility(void* obj);
 extern void fn_80118104(u32 a, u32 b);
 extern void fn_800D848C(u32 a, u32 b, u32 c, void* d);
 extern void fn_800E064C(void* dst);
@@ -3054,8 +3054,8 @@ u32 fn_8013F410(void* ptr) {
                 fn_800D3410((void*)lbl_8047AEE8, 0);
                 for (i = 0; i < count; i++) {
                     obj = fn_800E3B08(i);
-                    if (obj != NULL && fn_800E3D08(obj) != 0) {
-                        fn_800E3760(obj, 0x3010);
+                    if (obj != NULL && GSmodelGetVisibility(obj) != 0) {
+                        GSmodelDrawModel(obj, 0x3010);
                     }
                 }
                 if (*(u16*)(p + 0x28) != 0) {
@@ -3152,10 +3152,10 @@ u32 fn_8013F80C(void* ptr, u32 delta) {
 
     *(u16*)(p + 0xB0) = *(u16*)(p + 0xB0) + delta;
     if (*(void**)(p + 0x4) != NULL) {
-        part = fn_800EE150(*(void**)(p + 0x4), *(u32*)(p + 0xC));
+        part = GSmodelGetPart(*(void**)(p + 0x4), *(u32*)(p + 0xC));
         if (part != NULL) {
             GSpartGetTransform(part, p + 0x2C, NULL, NULL);
-            fn_800EE828(part);
+            GSpartFree(part);
         }
     }
     return 1;
@@ -3272,7 +3272,7 @@ u32 fn_8013FCC4(void* ptr) {
 }
 #endif
 extern void fn_80118874(void* a, u32 b);
-extern void fn_800EC96C(void* a);
+extern void GSmodelStopAnimation(void* a);
 #if 0
 asm u32 fn_8013FD68(void* ptr) {
 #include "src/game/effect/effect_visual_fn_8013FD68.inc"
@@ -3286,8 +3286,8 @@ u32 fn_8013FD68(void* ptr) {
             fn_80118874(inner, 0);
         }
         if (*(void**)((u8*)ptr + 0x10)) {
-            fn_800EC96C(*(void**)((u8*)ptr + 0x10));
-            fn_800EC1D4(*(void**)((u8*)ptr + 0x10));
+            GSmodelStopAnimation(*(void**)((u8*)ptr + 0x10));
+            GSmodelStopTexAnimation(*(void**)((u8*)ptr + 0x10));
             GSmodelSetVisibility(*(void**)((u8*)ptr + 0x10), 0);
         }
     }
@@ -3296,10 +3296,10 @@ u32 fn_8013FD68(void* ptr) {
 #endif
 extern void* fn_801190DC(void* ptr, u16 arg, u32 flag);
 extern void fn_800E3CC8(void* model, u32 flag);
-extern u8 fn_800EC1BC(void* model);
-extern void fn_800ECCA8(void* model, u16 value);
-extern void fn_800ECB74(void* model, u32 value);
-extern void fn_800EC9DC(void* model, f32 value);
+extern u8 GSmodelCanAnimate(void* model);
+extern void GSmodelSetAnimIndex(void* model, u16 value);
+extern void GSmodelSetAnimType(void* model, u32 value);
+extern void GSmodelSetAnimRate(void* model, f32 value);
 extern u32 lbl_8047D328;
 extern u32 lbl_8047D32C;
 extern u8 lbl_80273078[];
@@ -3327,19 +3327,19 @@ u16 billboardEffectStart(void* ptr) {
     if (model != NULL) {
         GSmodelSetVisibility(model, 1);
         fn_800E3CC8(model, 1);
-        if (fn_800EC1BC(model)) {
-            fn_800ECCA8(model, *(u16*)((u8*)ptr + 0x1c));
-            fn_800ECB74(model, *(u32*)((u8*)ptr + 0x18));
-            fn_800EC9DC(model, *(f32*)&lbl_8047D328);
-            fn_800ECA78(model, *(f32*)&lbl_8047D32C);
-            fn_800EC990(model);
+        if (GSmodelCanAnimate(model)) {
+            GSmodelSetAnimIndex(model, *(u16*)((u8*)ptr + 0x1c));
+            GSmodelSetAnimType(model, *(u32*)((u8*)ptr + 0x18));
+            GSmodelSetAnimRate(model, *(f32*)&lbl_8047D328);
+            GSmodelSetAnimFrame(model, *(f32*)&lbl_8047D32C);
+            GSmodelStartAnimation(model);
         }
-        if (fn_800EC1B0(model)) {
-            fn_800EC35C(model, *(u16*)((u8*)ptr + 0x1c));
-            fn_800EC208(model, *(u32*)((u8*)ptr + 0x18));
-            fn_800EC308(model, *(f32*)&lbl_8047D328);
-            fn_800EC2A4(model, *(f32*)&lbl_8047D32C);
-            fn_800EC1E4(model);
+        if (GSmodelCanTexAnimate(model)) {
+            GSmodelSetTexAnimIndex(model, *(u16*)((u8*)ptr + 0x1c));
+            GSmodelSetTexAnimType(model, *(u32*)((u8*)ptr + 0x18));
+            GSmodelSetTexAnimRate(model, *(f32*)&lbl_8047D328);
+            GSmodelSetTexAnimFrame(model, *(f32*)&lbl_8047D32C);
+            GSmodelStartTexAnimation(model);
         }
     }
     return 1;
@@ -3352,10 +3352,10 @@ report_null:
 extern f64 tan(f64 x);
 extern u32 fn_80118DA8(void* ptr);
 extern void fn_80118F04(void* arg1, void* arg2);
-extern u8 fn_800EC954(void* model);
-extern u8 fn_800EC1C8(void* model);
-extern void fn_800E43A4(void* entry, void* param);
-extern void fn_800E407C(void* entry, void* param);
+extern u8 GSmodelHasAnimationEnded(void* model);
+extern u8 GSmodelHasTexAnimationEnded(void* model);
+extern void GSmodelSetPosition(void* entry, void* param);
+extern void GSmodelSetScale(void* entry, void* param);
 extern u8 lbl_80273060[];
 extern u8 lbl_8027306C[];
 extern u32 lbl_8047D334;
@@ -3390,11 +3390,11 @@ u32 fn_8013FF0C(void* ptr) {
     }
 
     if (model != NULL) {
-        if (fn_800EC1BC(model) || fn_800EC1B0(model)) {
-            material = fn_800E3C5C(model);
+        if (GSmodelCanAnimate(model) || GSmodelCanTexAnimate(model)) {
+            material = GSmodelGetBound(model);
             if (material != NULL) {
-                fn_800E43A4(material, p + 0x38);
-                fn_800E407C(material, p + 0x44);
+                GSmodelSetPosition(material, p + 0x38);
+                GSmodelSetScale(material, p + 0x44);
             }
         }
     }
@@ -3436,14 +3436,14 @@ u32 fn_80140190(void** out, void* model, u32 arg) {
         return 0;
     }
 
-    handle = fn_800EE150(model, 2);
+    handle = GSmodelGetPart(model, 2);
     if (handle == NULL) {
         return 0;
     }
 
     out[0] = NULL;
     out[1] = NULL;
-    out[0] = fn_800EE6B4(handle, 0);
+    out[0] = GSpartGetMaterial(handle, 0);
     if (out[0] != NULL) {
         tex1 = GSresGetResource(0x387, 0x10561200);
         if (tex1 != NULL) {
@@ -3469,7 +3469,7 @@ u32 fn_80140190(void** out, void* model, u32 arg) {
         }
     }
 
-    fn_800EE828(handle);
+    GSpartFree(handle);
     return ret;
 }
 #endif

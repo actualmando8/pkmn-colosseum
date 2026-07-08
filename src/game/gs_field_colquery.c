@@ -1612,9 +1612,9 @@ void fn_80113B84(void) {
 #pragma scheduling off
 u32 fn_80113D10(u32 group) {
 #pragma optimization_level 4
-    extern void fn_800E4BF4();
+    extern void GSmodelFree();
 
-    fn_800E4BF4(group);
+    GSmodelFree(group);
     return 1;
 }
 #pragma scheduling on
@@ -1672,16 +1672,16 @@ void floorOpenObject(u32 modelIndex) {
     extern f32 lbl_8047CF98;
     extern void* fn_800F92D4(u32);
     extern void* HSD_ArchiveGetPublicAddress(void*, const char*);
-    extern void* fn_800E4D18(void*);
+    extern void* GSmodelLoad(void*);
     extern void GSmodelSetVisibility(void*, u32);
-    extern u32 fn_800EC1BC(void*);
-    extern void fn_800ECCA8(void*, u32);
-    extern void fn_800EC9DC(void*, f32);
-    extern void fn_800EC990(void*);
-    extern u32 fn_800EC1B0(void*);
-    extern void fn_800EC35C(void*, u32);
-    extern void fn_800EC308(void*, f32);
-    extern void fn_800EC1E4(void*);
+    extern u32 GSmodelCanAnimate(void*);
+    extern void GSmodelSetAnimIndex(void*, u32);
+    extern void GSmodelSetAnimRate(void*, f32);
+    extern void GSmodelStartAnimation(void*);
+    extern u32 GSmodelCanTexAnimate(void*);
+    extern void GSmodelSetTexAnimIndex(void*, u32);
+    extern void GSmodelSetTexAnimRate(void*, f32);
+    extern void GSmodelStartTexAnimation(void*);
     const char* strings;
     u32 archiveMode;
     void* archive;
@@ -1724,7 +1724,7 @@ void floorOpenObject(u32 modelIndex) {
         archive = *(void**)archive;
     }
 
-    model = fn_800E4D18(archive);
+    model = GSmodelLoad(archive);
     if (model == NULL) {
         GSlogWrite(strings + 0x64, lbl_8035B868);
         GSlogWrite(strings + 0x15C);
@@ -1732,15 +1732,15 @@ void floorOpenObject(u32 modelIndex) {
     }
 
     GSmodelSetVisibility(model, 1);
-    if (fn_800EC1BC(model) != 0) {
-        fn_800ECCA8(model, 0);
-        fn_800EC9DC(model, lbl_8047CF98);
-        fn_800EC990(model);
+    if (GSmodelCanAnimate(model) != 0) {
+        GSmodelSetAnimIndex(model, 0);
+        GSmodelSetAnimRate(model, lbl_8047CF98);
+        GSmodelStartAnimation(model);
     }
-    if (fn_800EC1B0(model) != 0) {
-        fn_800EC35C(model, 0);
-        fn_800EC308(model, lbl_8047CF98);
-        fn_800EC1E4(model);
+    if (GSmodelCanTexAnimate(model) != 0) {
+        GSmodelSetTexAnimIndex(model, 0);
+        GSmodelSetTexAnimRate(model, lbl_8047CF98);
+        GSmodelStartTexAnimation(model);
     }
 }
 #pragma pop

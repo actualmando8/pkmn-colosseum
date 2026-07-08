@@ -1588,7 +1588,7 @@
 "name": "fn_80011288",
 "addr": "0x80011288",
 "size": 540,
-"label": "gs-engine",
+"label": "fight",
 "confidence": 1.9,
 "seed": null
 },
@@ -1596,7 +1596,7 @@
 "name": "fn_800114A4",
 "addr": "0x800114A4",
 "size": 604,
-"label": "gs-engine",
+"label": "fight",
 "confidence": 1.9,
 "seed": null
 },
@@ -21905,7 +21905,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E3760",
+"name": "GSmodelDrawModel",
 "addr": "0x800E3760",
 "size": 292,
 "label": "gs-engine",
@@ -21953,7 +21953,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E3B6C",
+"name": "GSmodelSearchModelList",
 "addr": "0x800E3B6C",
 "size": 84,
 "label": "gs-engine",
@@ -21969,7 +21969,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E3BF0",
+"name": "GSmodelGetGSparticleLinkAttachMode",
 "addr": "0x800E3BF0",
 "size": 8,
 "label": "gs-engine",
@@ -21977,7 +21977,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E3BF8",
+"name": "GSmodelGetLinkedGSparticleBank",
 "addr": "0x800E3BF8",
 "size": 8,
 "label": "gs-engine",
@@ -21985,7 +21985,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E3C00",
+"name": "GSmodelSetGSparticleLinkAttachMode",
 "addr": "0x800E3C00",
 "size": 8,
 "label": "gs-engine",
@@ -21993,7 +21993,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E3C08",
+"name": "GSmodelLinkToGSparticleBank",
 "addr": "0x800E3C08",
 "size": 84,
 "label": "gs-engine",
@@ -22001,7 +22001,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E3C5C",
+"name": "GSmodelGetBound",
 "addr": "0x800E3C5C",
 "size": 8,
 "label": "gs-engine",
@@ -22041,7 +22041,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E3CF0",
+"name": "GSmodelGetScalePtr",
 "addr": "0x800E3CF0",
 "size": 8,
 "label": "gs-engine",
@@ -22049,7 +22049,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E3CF8",
+"name": "GSmodelGetRotationPtr",
 "addr": "0x800E3CF8",
 "size": 8,
 "label": "gs-engine",
@@ -22057,7 +22057,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E3D00",
+"name": "GSmodelGetPositionPtr",
 "addr": "0x800E3D00",
 "size": 8,
 "label": "gs-engine",
@@ -22065,7 +22065,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E3D08",
+"name": "GSmodelGetVisibility",
 "addr": "0x800E3D08",
 "size": 12,
 "label": "gs-engine",
@@ -22081,7 +22081,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E3D40",
+"name": "GSmodelGetScale",
 "addr": "0x800E3D40",
 "size": 44,
 "label": "gs-engine",
@@ -22089,7 +22089,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E3D6C",
+"name": "GSmodelGetRotation",
 "addr": "0x800E3D6C",
 "size": 44,
 "label": "gs-engine",
@@ -22097,7 +22097,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E3D98",
+"name": "GSmodelGetPosition",
 "addr": "0x800E3D98",
 "size": 44,
 "label": "gs-engine",
@@ -22121,7 +22121,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E407C",
+"name": "GSmodelSetScale",
 "addr": "0x800E407C",
 "size": 244,
 "label": "gs-engine",
@@ -22129,7 +22129,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E4170",
+"name": "GSmodelSetRotation",
 "addr": "0x800E4170",
 "size": 564,
 "label": "gs-engine",
@@ -22137,7 +22137,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E43A4",
+"name": "GSmodelSetPosition",
 "addr": "0x800E43A4",
 "size": 368,
 "label": "gs-engine",
@@ -22145,7 +22145,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E4514",
+"name": "GSmodelGetMatrixPtr",
 "addr": "0x800E4514",
 "size": 132,
 "label": "gs-engine",
@@ -22153,7 +22153,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E4598",
+"name": "GSmodelSetMatrix",
 "addr": "0x800E4598",
 "size": 196,
 "label": "gs-engine",
@@ -22161,7 +22161,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E465C",
+"name": "GSmodelDetachFromGSpart",
 "addr": "0x800E465C",
 "size": 1124,
 "label": "gs-engine",
@@ -22169,7 +22169,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E4AC0",
+"name": "GSmodelAttachToGSpart",
 "addr": "0x800E4AC0",
 "size": 308,
 "label": "gs-engine",
@@ -22177,7 +22177,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E4BF4",
+"name": "GSmodelFree",
 "addr": "0x800E4BF4",
 "size": 164,
 "label": "gs-engine",
@@ -22185,7 +22185,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E4C98",
+"name": "GSmodelClone",
 "addr": "0x800E4C98",
 "size": 128,
 "label": "gs-engine",
@@ -22193,7 +22193,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E4D18",
+"name": "GSmodelLoad",
 "addr": "0x800E4D18",
 "size": 36,
 "label": "gs-engine",
@@ -22201,7 +22201,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E4D3C",
+"name": "GSmodelInit",
 "addr": "0x800E4D3C",
 "size": 116,
 "label": "gs-engine",
@@ -22209,7 +22209,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E4DB0",
+"name": "modelSetScl",
 "addr": "0x800E4DB0",
 "size": 220,
 "label": "gs-engine",
@@ -22217,7 +22217,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E4E8C",
+"name": "modelSetRot",
 "addr": "0x800E4E8C",
 "size": 540,
 "label": "gs-engine",
@@ -22225,7 +22225,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E50A8",
+"name": "modelSetPos",
 "addr": "0x800E50A8",
 "size": 224,
 "label": "gs-engine",
@@ -22233,7 +22233,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E5188",
+"name": "modelGetRenderJObj",
 "addr": "0x800E5188",
 "size": 28,
 "label": "gs-engine",
@@ -22241,7 +22241,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E51A4",
+"name": "_modelLoad",
 "addr": "0x800E51A4",
 "size": 940,
 "label": "gs-engine",
@@ -22249,7 +22249,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E5550",
+"name": "GSmodelResetTextureChange",
 "addr": "0x800E5550",
 "size": 236,
 "label": "gs-engine",
@@ -22257,7 +22257,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E563C",
+"name": "GSmodelSetTextureChange",
 "addr": "0x800E563C",
 "size": 340,
 "label": "gs-engine",
@@ -22281,7 +22281,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E5978",
+"name": "GSmodelIsModulationEnabled",
 "addr": "0x800E5978",
 "size": 80,
 "label": "gs-engine",
@@ -22289,7 +22289,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E59C8",
+"name": "GSmodelGetModulationColor",
 "addr": "0x800E59C8",
 "size": 172,
 "label": "gs-engine",
@@ -22297,7 +22297,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E5A74",
+"name": "GSmodelDisableModulation",
 "addr": "0x800E5A74",
 "size": 244,
 "label": "gs-engine",
@@ -22305,7 +22305,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E5B68",
+"name": "GSmodelSetModulationColor",
 "addr": "0x800E5B68",
 "size": 120,
 "label": "gs-engine",
@@ -22313,7 +22313,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E5BE0",
+"name": "GSmodelEnableModulation",
 "addr": "0x800E5BE0",
 "size": 352,
 "label": "gs-engine",
@@ -22321,7 +22321,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E5D40",
+"name": "GSmodelDisableColorSwap",
 "addr": "0x800E5D40",
 "size": 244,
 "label": "gs-engine",
@@ -22329,7 +22329,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E5E34",
+"name": "GSmodelEnableColorSwap",
 "addr": "0x800E5E34",
 "size": 376,
 "label": "gs-engine",
@@ -22337,7 +22337,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E5FAC",
+"name": "GSmodelIsEnvMapEnabled",
 "addr": "0x800E5FAC",
 "size": 80,
 "label": "gs-engine",
@@ -22345,7 +22345,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E5FFC",
+"name": "GSmodelDisableEnvMap",
 "addr": "0x800E5FFC",
 "size": 244,
 "label": "gs-engine",
@@ -22353,7 +22353,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E60F0",
+"name": "GSmodelSetEnvMapBlendValue",
 "addr": "0x800E60F0",
 "size": 204,
 "label": "gs-engine",
@@ -22361,7 +22361,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E61BC",
+"name": "GSmodelEnableEnvMap",
 "addr": "0x800E61BC",
 "size": 464,
 "label": "gs-engine",
@@ -22369,7 +22369,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E638C",
+"name": "GSmodelResetPEdescr",
 "addr": "0x800E638C",
 "size": 236,
 "label": "gs-engine",
@@ -22377,7 +22377,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E6478",
+"name": "GSmodelSetPEdescr",
 "addr": "0x800E6478",
 "size": 340,
 "label": "gs-engine",
@@ -22385,7 +22385,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E65CC",
+"name": "GSmodelResetMaterialAlpha",
 "addr": "0x800E65CC",
 "size": 236,
 "label": "gs-engine",
@@ -22393,7 +22393,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E66B8",
+"name": "GSmodelInitMaterialAlpha",
 "addr": "0x800E66B8",
 "size": 332,
 "label": "gs-engine",
@@ -22401,7 +22401,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E6804",
+"name": "GSmodelSetMaterialAlpha",
 "addr": "0x800E6804",
 "size": 212,
 "label": "gs-engine",
@@ -22409,7 +22409,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E68D8",
+"name": "GSmodelResetRenderFlags",
 "addr": "0x800E68D8",
 "size": 236,
 "label": "gs-engine",
@@ -22417,7 +22417,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E69C4",
+"name": "GSmodelSetRenderFlags",
 "addr": "0x800E69C4",
 "size": 348,
 "label": "gs-engine",
@@ -22425,7 +22425,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E6B20",
+"name": "modelRemoveCenterNull",
 "addr": "0x800E6B20",
 "size": 168,
 "label": "gs-engine",
@@ -22433,7 +22433,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E6BC8",
+"name": "GSmodelCenterNull",
 "addr": "0x800E6BC8",
 "size": 504,
 "label": "gs-engine",
@@ -22441,7 +22441,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E6DC0",
+"name": "GSmodelIsRootNullAdded",
 "addr": "0x800E6DC0",
 "size": 12,
 "label": "gs-engine",
@@ -22449,7 +22449,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E6DCC",
+"name": "GSmodelRemoveNull",
 "addr": "0x800E6DCC",
 "size": 1220,
 "label": "gs-engine",
@@ -22457,7 +22457,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E7290",
+"name": "GSmodelGetRootPosition",
 "addr": "0x800E7290",
 "size": 156,
 "label": "gs-engine",
@@ -22465,7 +22465,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E732C",
+"name": "GSmodelAddNull",
 "addr": "0x800E732C",
 "size": 4796,
 "label": "gs-engine",
@@ -22489,7 +22489,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E8EFC",
+"name": "GSmodelFreeAllShadowTextures",
 "addr": "0x800E8EFC",
 "size": 108,
 "label": "gs-engine",
@@ -22497,7 +22497,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E8F68",
+"name": "GSmodelSetShadowBoundExpansion",
 "addr": "0x800E8F68",
 "size": 12,
 "label": "gs-engine",
@@ -22513,7 +22513,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E8F80",
+"name": "GSmodelSetShadowDebug",
 "addr": "0x800E8F80",
 "size": 32,
 "label": "gs-engine",
@@ -22521,7 +22521,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E8FA0",
+"name": "GSmodelSetShadowTextureSize",
 "addr": "0x800E8FA0",
 "size": 72,
 "label": "gs-engine",
@@ -22529,7 +22529,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E8FE8",
+"name": "GSmodelSetShadowLight",
 "addr": "0x800E8FE8",
 "size": 36,
 "label": "gs-engine",
@@ -22537,7 +22537,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E900C",
+"name": "GSmodelSetShadowSurface",
 "addr": "0x800E900C",
 "size": 188,
 "label": "gs-engine",
@@ -22545,7 +22545,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E90C8",
+"name": "GSmodelClearShadowFlags",
 "addr": "0x800E90C8",
 "size": 64,
 "label": "gs-engine",
@@ -22553,7 +22553,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E9108",
+"name": "GSmodelSetShadowFlags",
 "addr": "0x800E9108",
 "size": 64,
 "label": "gs-engine",
@@ -22561,7 +22561,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E9148",
+"name": "modelShadowPrepare__FP8_GSmodelb",
 "addr": "0x800E9148",
 "size": 320,
 "label": "gs-engine",
@@ -22569,7 +22569,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E9288",
+"name": "modelShadowFreeModelList__FP8_GSmodel",
 "addr": "0x800E9288",
 "size": 80,
 "label": "gs-engine",
@@ -22577,7 +22577,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E92D8",
+"name": "modelShadowInit__Fv",
 "addr": "0x800E92D8",
 "size": 128,
 "label": "gs-engine",
@@ -22585,7 +22585,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E9358",
+"name": "_modelShadowSetShadowFlag__FP9_HSD_JObjPPvi",
 "addr": "0x800E9358",
 "size": 96,
 "label": "gs-engine",
@@ -22593,7 +22593,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E93B8",
+"name": "_modelShadowAddAsNewReceiver__FP8_GSmodelP8_GSmodelP7GSlightP7GSbound",
 "addr": "0x800E93B8",
 "size": 1504,
 "label": "gs-engine",
@@ -22601,7 +22601,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E9998",
+"name": "_modelShadowFindValidReceiveModel__FP8_GSmodelP8_GSmodelP7GSlightP7GSbound",
 "addr": "0x800E9998",
 "size": 404,
 "label": "gs-engine",
@@ -22617,7 +22617,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E9C6C",
+"name": "GSmodelPushState",
 "addr": "0x800E9C6C",
 "size": 456,
 "label": "gs-engine",
@@ -22633,7 +22633,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E9E90",
+"name": "_modelParseJObjDispAll__FP9_HSD_JObjP5GSmtx12HSD_TrspMaskbPFP9_HSD_PObjP5GSmtxP5GSmtxP5GSmtxPv_vPv",
 "addr": "0x800E9E90",
 "size": 1916,
 "label": "gs-engine",
@@ -22649,7 +22649,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EA664",
+"name": "HSD_JObjSetupMatrix_800EA664",
 "addr": "0x800EA664",
 "size": 112,
 "label": "gs-engine",
@@ -22657,7 +22657,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EA6D4",
+"name": "_modelParseSetupInstanceMtx__FP5GSmtxP9_HSD_JObjP5GSmtx",
 "addr": "0x800EA6D4",
 "size": 272,
 "label": "gs-engine",
@@ -22673,7 +22673,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EA820",
+"name": "_modelParseJObjDispDObj__FP9_HSD_JObjP5GSmtx12HSD_TrspMaskbPFP9_HSD_PObjP5GSmtxP5GSmtxP5GSmtxPv_vPv",
 "addr": "0x800EA820",
 "size": 320,
 "label": "gs-engine",
@@ -22681,7 +22681,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EA960",
+"name": "_modelParseJObjDispSub__FP9_HSD_JObjP5GSmtxP5GSmtx12HSD_TrspMaskbPFP9_HSD_PObjP5GSmtxP5GSmtxP5GSmtxPv_vPv",
 "addr": "0x800EA960",
 "size": 880,
 "label": "gs-engine",
@@ -22689,7 +22689,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EACD0",
+"name": "_modelParseDObjDisp__FP9_HSD_DObjP5GSmtxP5GSmtxbPFP9_HSD_PObjP5GSmtxP5GSmtxP5GSmtxPv_vPv",
 "addr": "0x800EACD0",
 "size": 788,
 "label": "gs-engine",
@@ -22697,7 +22697,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EAFE4",
+"name": "_modelParseLoadEnvelopeMatrix__FP9_HSD_PObjP5GSmtxP5GSmtxP5GSmtx",
 "addr": "0x800EAFE4",
 "size": 644,
 "label": "gs-engine",
@@ -22713,7 +22713,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EB340",
+"name": "GSmodelRecalculateBound",
 "addr": "0x800EB340",
 "size": 212,
 "label": "gs-engine",
@@ -22729,7 +22729,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EB464",
+"name": "_modelBoundVertex__FUlPvPv",
 "addr": "0x800EB464",
 "size": 188,
 "label": "gs-engine",
@@ -22737,7 +22737,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EB520",
+"name": "_modelBoundBeginSurface__F13GSgfxPrimTypeUsUlPv",
 "addr": "0x800EB520",
 "size": 8,
 "label": "gs-engine",
@@ -22745,7 +22745,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EB528",
+"name": "GSmodelEnableAnimBlend",
 "addr": "0x800EB528",
 "size": 120,
 "label": "gs-engine",
@@ -22753,7 +22753,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EB5A0",
+"name": "modelCalculateBlendModel__FP8_GSmodelf",
 "addr": "0x800EB5A0",
 "size": 320,
 "label": "gs-engine",
@@ -22761,7 +22761,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EB6E0",
+"name": "_modelIntpJObjAll__FP8_GSmodelP9_HSD_JObjP9_HSD_JObjP9_HSD_JObjff",
 "addr": "0x800EB6E0",
 "size": 548,
 "label": "gs-engine",
@@ -22785,7 +22785,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EC0E8",
+"name": "GSmodelForceAnimTransformUpdate",
 "addr": "0x800EC0E8",
 "size": 76,
 "label": "gs-engine",
@@ -22801,7 +22801,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EC154",
+"name": "GSmodelSetAnimEndedCallback",
 "addr": "0x800EC154",
 "size": 12,
 "label": "gs-engine",
@@ -22809,7 +22809,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EC160",
+"name": "GSmodelSet60fpsAnimFlag",
 "addr": "0x800EC160",
 "size": 40,
 "label": "gs-engine",
@@ -22817,7 +22817,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EC188",
+"name": "GSmodelLinkTexAnimToAnim",
 "addr": "0x800EC188",
 "size": 40,
 "label": "gs-engine",
@@ -22825,7 +22825,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EC1B0",
+"name": "GSmodelCanTexAnimate",
 "addr": "0x800EC1B0",
 "size": 12,
 "label": "gs-engine",
@@ -22833,7 +22833,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EC1BC",
+"name": "GSmodelCanAnimate",
 "addr": "0x800EC1BC",
 "size": 12,
 "label": "gs-engine",
@@ -22841,7 +22841,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EC1C8",
+"name": "GSmodelHasTexAnimationEnded",
 "addr": "0x800EC1C8",
 "size": 12,
 "label": "gs-engine",
@@ -22849,7 +22849,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EC1D4",
+"name": "GSmodelStopTexAnimation",
 "addr": "0x800EC1D4",
 "size": 16,
 "label": "gs-engine",
@@ -22857,7 +22857,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EC1E4",
+"name": "GSmodelStartTexAnimation",
 "addr": "0x800EC1E4",
 "size": 36,
 "label": "gs-engine",
@@ -22865,7 +22865,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EC208",
+"name": "GSmodelSetTexAnimType",
 "addr": "0x800EC208",
 "size": 156,
 "label": "gs-engine",
@@ -22873,7 +22873,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EC2A4",
+"name": "GSmodelSetTexAnimFrame",
 "addr": "0x800EC2A4",
 "size": 100,
 "label": "gs-engine",
@@ -22881,7 +22881,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EC308",
+"name": "GSmodelSetTexAnimRate",
 "addr": "0x800EC308",
 "size": 84,
 "label": "gs-engine",
@@ -22889,7 +22889,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EC35C",
+"name": "GSmodelSetTexAnimIndex",
 "addr": "0x800EC35C",
 "size": 372,
 "label": "gs-engine",
@@ -22913,7 +22913,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EC568",
+"name": "GSmodelGetAnimType",
 "addr": "0x800EC568",
 "size": 8,
 "label": "gs-engine",
@@ -22921,7 +22921,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EC570",
+"name": "GSmodelGetAnimRate",
 "addr": "0x800EC570",
 "size": 8,
 "label": "gs-engine",
@@ -22929,7 +22929,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EC578",
+"name": "GSmodelGetAnimIndex",
 "addr": "0x800EC578",
 "size": 52,
 "label": "gs-engine",
@@ -22937,7 +22937,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EC5AC",
+"name": "GSmodelIsBlending",
 "addr": "0x800EC5AC",
 "size": 12,
 "label": "gs-engine",
@@ -22953,7 +22953,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EC5FC",
+"name": "GSmodelSetAnimBlend",
 "addr": "0x800EC5FC",
 "size": 716,
 "label": "gs-engine",
@@ -22961,7 +22961,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EC8C8",
+"name": "GSmodelSetBlendAnimFrameForce",
 "addr": "0x800EC8C8",
 "size": 20,
 "label": "gs-engine",
@@ -22969,7 +22969,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EC8DC",
+"name": "GSmodelAllUnpauseAnimation",
 "addr": "0x800EC8DC",
 "size": 60,
 "label": "gs-engine",
@@ -22977,7 +22977,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EC918",
+"name": "GSmodelAllPauseAnimation",
 "addr": "0x800EC918",
 "size": 60,
 "label": "gs-engine",
@@ -22985,7 +22985,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EC954",
+"name": "GSmodelHasAnimationEnded",
 "addr": "0x800EC954",
 "size": 12,
 "label": "gs-engine",
@@ -22993,7 +22993,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EC960",
+"name": "GSmodelIsAnimating",
 "addr": "0x800EC960",
 "size": 12,
 "label": "gs-engine",
@@ -23001,7 +23001,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EC96C",
+"name": "GSmodelStopAnimation",
 "addr": "0x800EC96C",
 "size": 36,
 "label": "gs-engine",
@@ -23009,7 +23009,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EC990",
+"name": "GSmodelStartAnimation",
 "addr": "0x800EC990",
 "size": 76,
 "label": "gs-engine",
@@ -23017,7 +23017,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EC9DC",
+"name": "GSmodelSetAnimRate",
 "addr": "0x800EC9DC",
 "size": 156,
 "label": "gs-engine",
@@ -23025,7 +23025,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800ECA78",
+"name": "GSmodelSetAnimFrame",
 "addr": "0x800ECA78",
 "size": 252,
 "label": "gs-engine",
@@ -23033,7 +23033,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800ECB74",
+"name": "GSmodelSetAnimType",
 "addr": "0x800ECB74",
 "size": 308,
 "label": "gs-engine",
@@ -23041,7 +23041,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800ECCA8",
+"name": "GSmodelSetAnimIndex",
 "addr": "0x800ECCA8",
 "size": 1064,
 "label": "gs-engine",
@@ -23049,7 +23049,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800ED0D0",
+"name": "GSmodelAdvanceAnimation",
 "addr": "0x800ED0D0",
 "size": 252,
 "label": "gs-engine",
@@ -23057,7 +23057,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800ED1CC",
+"name": "modelApplyAnimation__FP8_GSmodel",
 "addr": "0x800ED1CC",
 "size": 776,
 "label": "gs-engine",
@@ -23065,7 +23065,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800ED4D4",
+"name": "modelUpdateAttachments__FP8_GSmodel",
 "addr": "0x800ED4D4",
 "size": 472,
 "label": "gs-engine",
@@ -23073,7 +23073,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800ED6AC",
+"name": "modelProcessAt60fps__FP8_GSmodel",
 "addr": "0x800ED6AC",
 "size": 56,
 "label": "gs-engine",
@@ -23105,7 +23105,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EDA98",
+"name": "_modelResetPartAnimMixes__FP8_GSmodel",
 "addr": "0x800EDA98",
 "size": 1452,
 "label": "gs-engine",
@@ -23113,7 +23113,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EE044",
+"name": "_modelGetAObjFunc__FP9_HSD_AObjPv",
 "addr": "0x800EE044",
 "size": 16,
 "label": "gs-engine",
@@ -23121,7 +23121,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EE054",
+"name": "_modelSetLoopFlag__FP9_HSD_AObjUl",
 "addr": "0x800EE054",
 "size": 56,
 "label": "gs-engine",
@@ -23145,7 +23145,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EE150",
+"name": "GSmodelGetPart",
 "addr": "0x800EE150",
 "size": 188,
 "label": "gs-engine",
@@ -23193,7 +23193,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EE6B4",
+"name": "GSpartGetMaterial",
 "addr": "0x800EE6B4",
 "size": 164,
 "label": "gs-engine",
@@ -23217,7 +23217,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EE828",
+"name": "GSpartFree",
 "addr": "0x800EE828",
 "size": 12,
 "label": "gs-engine",
@@ -23233,7 +23233,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EE880",
+"name": "GSpartInit",
 "addr": "0x800EE880",
 "size": 112,
 "label": "gs-engine",
@@ -23249,7 +23249,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EE928",
+"name": "GSscratchSetValid",
 "addr": "0x800EE928",
 "size": 148,
 "label": "gs-engine",
@@ -23257,7 +23257,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EE9BC",
+"name": "GSscratchSetInvalid",
 "addr": "0x800EE9BC",
 "size": 148,
 "label": "gs-engine",
@@ -23265,7 +23265,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EEA50",
+"name": "GSscratchIsPtr",
 "addr": "0x800EEA50",
 "size": 28,
 "label": "gs-engine",
@@ -23273,7 +23273,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EEA6C",
+"name": "GSscratchWaitForCompletion",
 "addr": "0x800EEA6C",
 "size": 44,
 "label": "gs-engine",
@@ -23313,7 +23313,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800EEF48",
+"name": "GStextureConvertToHW",
 "addr": "0x800EEF48",
 "size": 336,
 "label": "gs-engine",
@@ -68927,14 +68927,8 @@
 {
 "label": "fight",
 "start": "0x800111C4",
-"end": "0x80011288",
-"count": 3
-},
-{
-"label": "gs-engine",
-"start": "0x80011288",
 "end": "0x80011700",
-"count": 2
+"count": 5
 },
 {
 "label": "menu",

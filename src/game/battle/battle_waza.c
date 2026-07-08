@@ -113,13 +113,13 @@ extern f32   fadeEffectHookFunction_trainer_Init(s32 slot);                     
 /* Waza effect functions (engine callbacks) */
 extern s32   fn_801190DC(s32, s32, s32);
 extern void  fn_80118C88(s32, s32);
-extern void* fn_800EE150(s32, s32);
+extern void* GSmodelGetPart(s32, s32);
 void  fn_800E01F4(void*, f32, f32, f32);
 extern void  fn_80118FB0(s32, s32, s32, s32, s32, s32);
 extern void  fn_80118D18(s32, s32);
 extern void  fn_80118DE0(s32, void*, s32, s32);
-extern void  fn_800EE828(s32);
-extern u8    fn_800E6BC8(s32);
+extern void  GSpartFree(s32);
+extern u8    GSmodelCenterNull(s32);
 extern s32   fn_800EE0E8(s32);
 extern void  fn_80118CAC(s32, s32);
 
@@ -1353,7 +1353,7 @@ void fn_801D9E8C(void* effect) {
     {
         s32 val_idx = *(s32*)(fx->table_bytes + fx->index * sizeof(WazaEffectTblEntry) + 0x50);
         if (val_idx > 0) {
-            target = fn_800EE150(fx->handle, val_idx);
+            target = GSmodelGetPart(fx->handle, val_idx);
         } else {
             target = NULL;
         }
@@ -1381,7 +1381,7 @@ void fn_801D9E8C(void* effect) {
     fn_80118FB0(fx->effect_handle, (s32)target, 4, 0, 1, 0);
     fn_80118D18(fx->effect_handle, 1);
     fn_80118DE0(fx->effect_handle, scale_buf, 1, 0);
-    fn_800EE828((s32)target);
+    GSpartFree((s32)target);
 }
 #undef WAZA_SDATA2_VALUE
 
@@ -1429,14 +1429,14 @@ void fn_801DA070(void* effect) {
     }
 
     entry = fx->table_bytes + fx->index * sizeof(WazaEffectTblEntry);
-    if ((u8)fn_800E6BC8(fx->handle) != 0) {
+    if ((u8)GSmodelCenterNull(fx->handle) != 0) {
         n = fn_800EE0E8(fx->handle) - 1;
     } else {
         n = *(s32*)((u8*)entry + 0x54);
     }
 
     if (n > 0) {
-        target = fn_800EE150(fx->handle, n);
+        target = GSmodelGetPart(fx->handle, n);
     } else {
         target = NULL;
     }
@@ -1464,7 +1464,7 @@ void fn_801DA070(void* effect) {
     fn_80118D18(fx->field_80, 1);
     fn_80118CAC(fx->field_80, 1);
     fn_80118DE0(fx->field_80, scale_buf, 1, 0);
-    fn_800EE828((s32)target);
+    GSpartFree((s32)target);
 }
 #undef WAZA_SDATA2_VALUE
 
@@ -2017,7 +2017,7 @@ void wazaSequenceUpdate(void) {
  * Address: 0x801DBB10 | Size: 0x120
  */
 void fn_801DBB10(void* obj) {
-    extern void fn_800E3C08(s32, s32);
+    extern void GSmodelLinkToGSparticleBank(s32, s32);
     extern void fn_800E3CC8(s32, s32);
     extern void fn_80118874();
     extern void fn_801C2B2C(void);
@@ -2041,7 +2041,7 @@ void fn_801DBB10(void* obj) {
             }
             fn_800E3CC8(*(s32*)(owner + 0x24), 0);
             if ((*(u32*)(effect + 0x8) & 0x08000000) != 0) {
-                fn_800E3C08(*(s32*)(owner + 0x24), *(s32*)(owner + 0x28));
+                GSmodelLinkToGSparticleBank(*(s32*)(owner + 0x24), *(s32*)(owner + 0x28));
             }
             if ((*(u32*)(effect + 0x8) & 0x04000000) != 0) {
                 fn_801C2B2C();
@@ -2102,7 +2102,7 @@ void fn_801DBCCC(s32 blendType) {
     extern void fn_801DBB10();
     extern void fn_801DB864();
     extern void fn_801DD100();
-    extern void fn_800E3C08(s32, s32);
+    extern void GSmodelLinkToGSparticleBank(s32, s32);
     extern void wazaSequencePokemonMotionStart();
     extern void fn_801C2BE0();
     extern void fn_801D30BC();
@@ -2133,7 +2133,7 @@ void fn_801DBCCC(s32 blendType) {
         }
         fn_801DD100(owner, obj);
         if ((*(u32*)(obj + 0x08) & 0x08000000) != 0) {
-            fn_800E3C08(handle, 0);
+            GSmodelLinkToGSparticleBank(handle, 0);
         }
         wazaSequencePokemonMotionStart(owner, bit);
         *(u8**)(owner + 0x6C) = obj;
@@ -2283,20 +2283,20 @@ s32 fn_801DCDCC(void* obj) {
  * Address: 0x801DCE0C | Size: 0x9C
  */
 void fn_801DCE0C(void* obj) {
-    extern void fn_800E5E34();
-    extern void fn_800E5BE0();
+    extern void GSmodelEnableColorSwap();
+    extern void GSmodelEnableModulation();
 
     s32 handle;
 
     if (obj != NULL && *(u8*)((u8*)obj + 0x4F) == 0 && *(u8*)((u8*)obj + 0x4E) != 0) {
         handle = *(s32*)((u8*)obj + 0x24);
         if (*(u8*)((u8*)obj + 0x4C) != 0) {
-            fn_800E5E34(handle, *(s32*)((u8*)obj + 0x38), *(s32*)((u8*)obj + 0x3C),
+            GSmodelEnableColorSwap(handle, *(s32*)((u8*)obj + 0x38), *(s32*)((u8*)obj + 0x3C),
                         *(s32*)((u8*)obj + 0x40), *(s32*)((u8*)obj + 0x44));
         }
         if (*(u8*)((u8*)obj + 0x4D) != 0) {
             *(u8*)((u8*)obj + 0x4B) = 0xFF;
-            fn_800E5BE0(handle, (u8*)obj + 0x48);
+            GSmodelEnableModulation(handle, (u8*)obj + 0x48);
         }
         *(u8*)((u8*)obj + 0x4F) = 1;
     }
@@ -2306,14 +2306,14 @@ void fn_801DCE0C(void* obj) {
  * fn_801DCEA8 - Waza field effect clear.
  * Address: 0x801DCEA8 | Size: 0x58
  */
-extern void fn_800E6DCC(void* obj);
+extern void GSmodelRemoveNull(void* obj);
 extern void fn_801DEF0C(void* obj, s32 arg1, s32 arg2);
 void fn_801DCEA8(void* obj) {
     u8 flags = *(u8*)((u8*)obj + 0x18);
 
     if ((flags & 2) == 2) {
         *(u8*)((u8*)obj + 0x18) = flags ^ 2;
-        fn_800E6DCC(*(void**)((u8*)obj + 0x24));
+        GSmodelRemoveNull(*(void**)((u8*)obj + 0x24));
         fn_801DEF0C(obj, 1, 0);
     }
 }
@@ -2323,9 +2323,9 @@ void fn_801DCEA8(void* obj) {
  * Address: 0x801DCF00 | Size: 0x84
  */
 void fn_801DCF00(u32 color, f32 intensity) {
-    extern u8 fn_800E6DC0(s32);
-    extern void fn_800E7290(s32, void*);
-    extern void fn_800E732C(s32, void*, s32, s32);
+    extern u8 GSmodelIsRootNullAdded(s32);
+    extern void GSmodelGetRootPosition(s32, void*);
+    extern void GSmodelAddNull(s32, void*, s32, s32);
     extern void fn_801DEF0C(void*, s32, s32);
 
     void* obj;
@@ -2335,10 +2335,10 @@ void fn_801DCF00(u32 color, f32 intensity) {
     flags = *(u8*)((u8*)obj + 0x18);
     if ((flags & 2) != 2) {
         *(u8*)((u8*)obj + 0x18) = flags | 2;
-        if (fn_800E6DC0(*(s32*)((u8*)obj + 0x24)) != 0) {
-            fn_800E7290(*(s32*)((u8*)obj + 0x24), (u8*)obj + 0x5C);
+        if (GSmodelIsRootNullAdded(*(s32*)((u8*)obj + 0x24)) != 0) {
+            GSmodelGetRootPosition(*(s32*)((u8*)obj + 0x24), (u8*)obj + 0x5C);
         } else {
-            fn_800E732C(*(s32*)((u8*)obj + 0x24), (u8*)obj + 0x5C, 0, 0);
+            GSmodelAddNull(*(s32*)((u8*)obj + 0x24), (u8*)obj + 0x5C, 0, 0);
         }
         fn_801DEF0C(obj, 1, 0);
     }
@@ -2362,13 +2362,13 @@ void fn_801DCF84(void* obj) {
  * fn_801DCFD8 - Waza lighting override get active.
  * Address: 0x801DCFD8 | Size: 0x50
  */
-extern void fn_800EC96C(void* obj);
+extern void GSmodelStopAnimation(void* obj);
 void fn_801DCFD8(void* obj) {
     u8 flags = *(u8*)((u8*)obj + 0x18);
 
     if ((flags & 8) != 8) {
         *(u8*)((u8*)obj + 0x18) = flags | 8;
-        fn_800EC96C(*(void**)((u8*)obj + 0x24));
+        GSmodelStopAnimation(*(void**)((u8*)obj + 0x24));
         fn_801DA070(obj);
     }
 }
@@ -2457,9 +2457,9 @@ void fn_801DD158(void* obj) {
 void fn_801DD23C(void* obj) {
     extern void fn_800E24B0(u16);
     extern void fn_800E209C(u16);
-    extern void fn_800E5D40(u32);
-    extern void fn_800E5A74(u32);
-    extern void fn_800EC154();
+    extern void GSmodelDisableColorSwap(u32);
+    extern void GSmodelDisableModulation(u32);
+    extern void GSmodelSetAnimEndedCallback();
     extern void fn_801DA4E8();
     extern void fn_801193BC(s32);
     extern void fn_800F9210();
@@ -2494,16 +2494,16 @@ void fn_801DD23C(void* obj) {
         if (enabled != 0 && data != NULL && *(u8*)(data + 0x4F) != 0 && *(u8*)(data + 0x4E) != 0) {
             handle = *(u32*)(data + 0x24);
             if (*(u8*)(data + 0x4C) != 0) {
-                fn_800E5D40(handle);
+                GSmodelDisableColorSwap(handle);
             }
             if (*(u8*)(data + 0x4D) != 0) {
-                fn_800E5A74(handle);
+                GSmodelDisableModulation(handle);
             }
             *(u8*)(data + 0x4F) = 0;
         }
 
         if (*(u32*)(data + 0x24) != 0) {
-            fn_800EC154(*(u32*)(data + 0x24), 0, 0);
+            GSmodelSetAnimEndedCallback(*(u32*)(data + 0x24), 0, 0);
         }
 
         fn_801DA4E8(data, 0);

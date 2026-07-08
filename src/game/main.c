@@ -90,8 +90,8 @@ extern u32  OSGetProgressiveMode(void);                         /* OSGetResetSwi
 extern void fn_800D37D4(u32, u32, u32, u32, u32, u32);/* GSgfx video mode config */
 extern void fn_800EFFC0(u32 numEntries);               /* GX FIFO init */
 extern void fn_80191484(u32 numSounds);                 /* Sound system init */
-extern void fn_800E4D3C(u32 maxObjects);                /* GSmem object pool */
-extern void fn_800EE880(u32 param);                     /* VI callback setup */
+extern void GSmodelInit(u32 maxObjects);                /* GSmem object pool */
+extern void GSpartInit(u32 param);                     /* VI callback setup */
 extern void fn_800DF854(u32 bufSize);                   /* Display list buffer init */
 extern void fn_800D2AD4(u32 count);                     /* GSgfx light init */
 extern void GSlightInit(u32 count);                     /* GSgfx texture init */
@@ -586,10 +586,10 @@ void fn_800057B0(void) {
     fn_80191484(0x8);
 
     /* Initialize GSmem object pool for 64 objects */
-    fn_800E4D3C(0x40);
+    GSmodelInit(0x40);
 
     /* Initialize VI retrace callback system with 8 callbacks */
-    fn_800EE880(0x8);
+    GSpartInit(0x8);
 
     /* Initialize display list buffer: 1024 bytes */
     fn_800DF854(0x400);

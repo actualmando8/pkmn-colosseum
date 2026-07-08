@@ -1841,14 +1841,14 @@ u32 fn_80133450(void) {
 }
 #endif
 
-/* 0x801334A8 | 0x34 -- toggle lbl_8047AED9 (cntlzw/extrwi), call fn_800E8F80 */
+/* 0x801334A8 | 0x34 -- toggle lbl_8047AED9 (cntlzw/extrwi), call GSmodelSetShadowDebug */
 extern u8   lbl_8047AED9;
-extern void fn_800E8F80(u32 val);
+extern void GSmodelSetShadowDebug(u32 val);
 u32 fn_801334A8(void) {
     u32 clz = __cntlzw(lbl_8047AED9);
     u8 val = (u8)((clz >> 5) & 0xFF);
     lbl_8047AED9 = val;
-    fn_800E8F80(val);
+    GSmodelSetShadowDebug(val);
     return 0;
 }
 

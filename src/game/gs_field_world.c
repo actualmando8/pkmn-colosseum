@@ -1879,23 +1879,23 @@ extern u32 lbl_80478EB8;
 void floorEventCtrlTresure(void);
 /* 0x80116470 | 0x4E8 */
 extern void floorGetResource(void);
-extern void fn_800ECCA8(void);
-extern void fn_800ECA78(void);
-extern void fn_800EC9DC(void);
-extern void fn_800ECB74(void);
-extern void fn_800EC990(void);
+extern void GSmodelSetAnimIndex(void);
+extern void GSmodelSetAnimFrame(void);
+extern void GSmodelSetAnimRate(void);
+extern void GSmodelSetAnimType(void);
+extern void GSmodelStartAnimation(void);
 extern void _threadSwitch(void);
-extern void fn_800EC960(void);
-extern void fn_800EE150(void);
+extern void GSmodelIsAnimating(void);
+extern void GSmodelGetPart(void);
 extern void GSpartGetTransform(void);
-extern void fn_800EE828();
+extern void GSpartFree();
 extern void fn_8018AACC(void);
 extern void peopleMoveCheck(u32 groupId, u32 index, u8 waitFlag);
 extern void fn_8018805C(void);
 extern void fn_80184470(void);
 extern void fn_8018C0A8(void);
 extern void fn_801669BC(void);
-extern void fn_800EC1BC(void);
+extern void GSmodelCanAnimate(void);
 extern void fn_801845E4(void);
 extern void fn_801860F8(void);
 extern void GSmodelGetFrameCount(void);
@@ -2187,7 +2187,7 @@ void fn_801171C8(void) {
 #pragma pop
 /* 0x80117330 | 0x194 */
 extern void* GSresGetResource();
-extern void fn_800E3D98(void*, void*);
+extern void GSmodelGetPosition(void*, void*);
 extern void GSscene_GetCameraViewVector(void*);
 extern f32 cameraGetHeight(void);
 extern f32 cameraGetDistance(void);
@@ -2230,7 +2230,7 @@ void fn_80117330(f32 arg) {
 
     obj = GSresGetResource(0, 0x64);
     if (obj != NULL) {
-        fn_800E3D98(obj, pos);
+        GSmodelGetPosition(obj, pos);
     } else {
         GSscene_GetCameraPositionVector(pos);
     }
@@ -2319,14 +2319,14 @@ u32 fn_80117AD4(void) {
     return ((GSFieldWorldResourceState*)lbl_804083D0)->field_10;
 }
 /* 0x80117AE4 | 0x1A0 */
-extern void fn_800E5550(void);
+extern void GSmodelResetTextureChange(void);
 extern void fn_800EF5A4(void);
-extern void fn_800E4BF4(void);
+extern void GSmodelFree(void);
 extern void GStextureCreate(void);
 extern void fn_80113D34(void);
 extern void GSmodelSetVisibility(void);
-extern void fn_800EC188(void);
-extern void fn_800E563C(void);
+extern void GSmodelLinkTexAnimToAnim(void);
+extern void GSmodelSetTextureChange(void);
 extern u32 lbl_80478B40;
 extern u32 lbl_8047AD88;
 extern u32 lbl_8047AD8C;
@@ -2344,29 +2344,29 @@ asm void fn_80117AE4(void) {
 u8 fn_80117AE4(u32 arg1) {
     extern u32 fn_80113F48(void);
     extern void* GSresGetResource(u32 a, u32 b);
-    extern void fn_800E5550(void* a);
+    extern void GSmodelResetTextureChange(void* a);
     extern void fn_800EF5A4(void* a);
-    extern void fn_800E4BF4(void* a);
+    extern void GSmodelFree(void* a);
     extern void* GStextureCreate(u16 a, u16 b, u32 c, u32 d, u32 e);
     extern void* fn_80113D34(u32 a, u32 b);
     extern void GSmodelSetVisibility(void* a, u32 b);
-    extern void fn_800EC188(void* a, u32 b);
-    extern void fn_800ECCA8(void* a, u32 b);
-    extern void fn_800EC990(void* a);
-    extern void fn_800E563C(void* a, void* b);
+    extern void GSmodelLinkTexAnimToAnim(void* a, u32 b);
+    extern void GSmodelSetAnimIndex(void* a, u32 b);
+    extern void GSmodelStartAnimation(void* a);
+    extern void GSmodelSetTextureChange(void* a, void* b);
     u32 count;
     u8 found;
 
     if ((s32)lbl_80478B40 == (s32)arg1) { return; }
 
     if (lbl_8047AD88 != 0) {
-        fn_800E5550(GSresGetResource(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 8)));
+        GSmodelResetTextureChange(GSresGetResource(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 8)));
         if (lbl_8047AD8C != 0) {
             fn_800EF5A4((void*)lbl_8047AD8C);
             lbl_8047AD8C = 0;
         }
         if (lbl_8047AD90 != 0) {
-            fn_800E4BF4((void*)lbl_8047AD90);
+            GSmodelFree((void*)lbl_8047AD90);
             lbl_8047AD90 = 0;
         }
         lbl_8047AD94 = 0;
@@ -2397,11 +2397,11 @@ u8 fn_80117AE4(u32 arg1) {
     }
     lbl_8047AD90 = (u32)fn_80113D34(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 0xc));
     GSmodelSetVisibility((void*)lbl_8047AD90, 0);
-    fn_800EC188((void*)lbl_8047AD90, 1);
-    fn_800ECCA8((void*)lbl_8047AD90, *(u32*)((u8*)lbl_8047AD88 + 0x10));
-    fn_800EC990((void*)lbl_8047AD90);
+    GSmodelLinkTexAnimToAnim((void*)lbl_8047AD90, 1);
+    GSmodelSetAnimIndex((void*)lbl_8047AD90, *(u32*)((u8*)lbl_8047AD88 + 0x10));
+    GSmodelStartAnimation((void*)lbl_8047AD90);
     lbl_8047AD94 = (u32)GSresGetResource(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 0x14));
-    fn_800E563C(GSresGetResource(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 8)), (void*)lbl_8047AD8C);
+    GSmodelSetTextureChange(GSresGetResource(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 8)), (void*)lbl_8047AD8C);
     lbl_80478B40 = arg1;
     return 1;
 }
@@ -2424,18 +2424,18 @@ asm void fn_80117C84(void) {
 void fn_80117C84(void) {
     extern u32 fn_80113F48(void);
     extern void* GSresGetResource(u32 a, u32 b);
-    extern void fn_800E5550(void* a);
+    extern void GSmodelResetTextureChange(void* a);
     extern void fn_800EF5A4(void* a);
-    extern void fn_800E4BF4(void* a);
+    extern void GSmodelFree(void* a);
     u8* ptr = (u8*)lbl_8047AD88;
     if (ptr != NULL) {
-        fn_800E5550(GSresGetResource(fn_80113F48(), *(u32*)(ptr + 8)));
+        GSmodelResetTextureChange(GSresGetResource(fn_80113F48(), *(u32*)(ptr + 8)));
         if (lbl_8047AD8C != 0) {
             fn_800EF5A4((void*)lbl_8047AD8C);
             lbl_8047AD8C = 0;
         }
         if (lbl_8047AD90 != 0) {
-            fn_800E4BF4((void*)lbl_8047AD90);
+            GSmodelFree((void*)lbl_8047AD90);
             lbl_8047AD90 = 0;
         }
         lbl_8047AD94 = 0;
@@ -2458,7 +2458,7 @@ extern void fn_800D258C();
 extern void fn_800D9D68();
 extern void fn_800D9C24();
 extern void _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID(void);
-extern void fn_800E3760();
+extern void GSmodelDrawModel();
 extern void fn_800D3190(void);
 extern u32 lbl_8047AD88;
 extern u32 lbl_8047AD90;
@@ -2504,7 +2504,7 @@ void fn_80117D14(void)
                         (u16)(*(u16*)(size + 0) - 1),
                         (u16)(*(u16*)(size + 2) - 1));
             _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
-            fn_800E3760(lbl_8047AD90, 0x3010);
+            GSmodelDrawModel(lbl_8047AD90, 0x3010);
             fn_800D3190();
             fn_800D377C(1);
             fn_800D258C(saved);
@@ -2535,16 +2535,16 @@ asm void fn_80117E58(void) {
 void fn_80117E58(void* arg) {
     extern u32 fn_80113F48(void);
     extern void* GSresGetResource(u32 a, u32 b);
-    extern void fn_800E5550(void* a);
+    extern void GSmodelResetTextureChange(void* a);
     extern void fn_800EF5A4(void* a);
-    extern void fn_800E4BF4(void* a);
+    extern void GSmodelFree(void* a);
     extern void* GStextureCreate(u16 a, u16 b, u32 c, u32 d, u32 e);
     extern void* fn_80113D34(u32 a, u32 b);
     extern void GSmodelSetVisibility(void* a, u32 b);
-    extern void fn_800EC188(void* a, u32 b);
-    extern void fn_800ECCA8(void* a, u32 b);
-    extern void fn_800EC990(void* a);
-    extern void fn_800E563C(void* a, void* b);
+    extern void GSmodelLinkTexAnimToAnim(void* a, u32 b);
+    extern void GSmodelSetAnimIndex(void* a, u32 b);
+    extern void GSmodelStartAnimation(void* a);
+    extern void GSmodelSetTextureChange(void* a, void* b);
     u8* p48;
     u8* ptr;
     u32 count;
@@ -2560,13 +2560,13 @@ void fn_80117E58(void* arg) {
 
     ptr = (u8*)lbl_8047AD88;
     if (ptr != NULL) {
-        fn_800E5550(GSresGetResource(fn_80113F48(), *(u32*)(ptr + 8)));
+        GSmodelResetTextureChange(GSresGetResource(fn_80113F48(), *(u32*)(ptr + 8)));
         if (lbl_8047AD8C != 0) {
             fn_800EF5A4((void*)lbl_8047AD8C);
             lbl_8047AD8C = 0;
         }
         if (lbl_8047AD90 != 0) {
-            fn_800E4BF4((void*)lbl_8047AD90);
+            GSmodelFree((void*)lbl_8047AD90);
             lbl_8047AD90 = 0;
         }
         lbl_8047AD94 = 0;
@@ -2597,11 +2597,11 @@ void fn_80117E58(void* arg) {
     }
     lbl_8047AD90 = (u32)fn_80113D34(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 0xc));
     GSmodelSetVisibility((void*)lbl_8047AD90, 0);
-    fn_800EC188((void*)lbl_8047AD90, 1);
-    fn_800ECCA8((void*)lbl_8047AD90, *(u32*)((u8*)lbl_8047AD88 + 0x10));
-    fn_800EC990((void*)lbl_8047AD90);
+    GSmodelLinkTexAnimToAnim((void*)lbl_8047AD90, 1);
+    GSmodelSetAnimIndex((void*)lbl_8047AD90, *(u32*)((u8*)lbl_8047AD88 + 0x10));
+    GSmodelStartAnimation((void*)lbl_8047AD90);
     lbl_8047AD94 = (u32)GSresGetResource(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 0x14));
-    fn_800E563C(GSresGetResource(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 8)), (void*)lbl_8047AD8C);
+    GSmodelSetTextureChange(GSresGetResource(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 8)), (void*)lbl_8047AD8C);
     lbl_80478B40 = 0;
 }
 #endif
@@ -2642,18 +2642,18 @@ asm void fn_80118070(void) {
 void fn_80118070(void) {
     extern u32 fn_80113F48(void);
     extern void* GSresGetResource(u32 a, u32 b);
-    extern void fn_800E5550(void* a);
+    extern void GSmodelResetTextureChange(void* a);
     extern void fn_800EF5A4(void* a);
-    extern void fn_800E4BF4(void* a);
+    extern void GSmodelFree(void* a);
     u8* ptr = (u8*)lbl_8047AD88;
     if (ptr != NULL) {
-        fn_800E5550(GSresGetResource(fn_80113F48(), *(u32*)(ptr + 8)));
+        GSmodelResetTextureChange(GSresGetResource(fn_80113F48(), *(u32*)(ptr + 8)));
         if (lbl_8047AD8C != 0) {
             fn_800EF5A4((void*)lbl_8047AD8C);
             lbl_8047AD8C = 0;
         }
         if (lbl_8047AD90 != 0) {
-            fn_800E4BF4((void*)lbl_8047AD90);
+            GSmodelFree((void*)lbl_8047AD90);
             lbl_8047AD90 = 0;
         }
         lbl_8047AD94 = 0;
@@ -2713,7 +2713,7 @@ void fn_80118104(u32 a, u8 b) {
 /* 0x801181B0 | 0x23C */
 extern void psGetParticleChildCount(void* ptr);
 extern void psKillFamily();
-extern void fn_800EC160();
+extern void GSmodelSet60fpsAnimFlag();
 extern void psUnlinkChildGensFromJObj();
 extern void psKillGenerator();
 extern u32 lbl_8047AD9C;
@@ -2756,7 +2756,7 @@ void fn_80118A68(u8* obj, u32 notify) {
 
     active = (s32*)(obj + 0x44);
     if (*active != 0 && *active != 0) {
-        fn_800EC160(*(u32*)(obj + 0x48), 0);
+        GSmodelSet60fpsAnimFlag(*(u32*)(obj + 0x48), 0);
         *(u32*)(obj + 0x48) = 0;
         *(u32*)(obj + 0x4C) = 0;
         obj[6] = 0;
@@ -3118,13 +3118,13 @@ void fn_80119824(void) {
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void fn_80119930(void);
 /* 0x80119BD0 | 0x1C0 */
-extern void fn_800E3B6C(void);
-extern void fn_800E3BF8(void);
-extern void fn_800E6DC0(void);
+extern void GSmodelSearchModelList(void);
+extern void GSmodelGetLinkedGSparticleBank(void);
+extern void GSmodelIsRootNullAdded(void);
 extern void GSpartGetJObjIndex(void);
 extern void fn_800E3CBC(void);
-extern void fn_800E3BF0(void);
-extern void fn_800E3D08(void);
+extern void GSmodelGetGSparticleLinkAttachMode(void);
+extern void GSmodelGetVisibility(void);
 extern void psSetParticleVisibility();
 extern f32 lbl_8047CFE8;
 extern f32 lbl_8047CFEC;
@@ -3134,15 +3134,15 @@ asm void fn_80119BD0(void) {
 }
 #else
 void fn_80119BD0(u32 arg1, u32 arg2, u32 arg5, u8* arg6) {
-    extern u8* fn_800E3B6C();
-    extern u8* fn_800E3BF8();
-    extern u32 fn_800E6DC0();
+    extern u8* GSmodelSearchModelList();
+    extern u8* GSmodelGetLinkedGSparticleBank();
+    extern u32 GSmodelIsRootNullAdded();
     extern u32 GSpartGetJObjIndex();
-    extern u8* fn_800EE150();
+    extern u8* GSmodelGetPart();
     extern u32 fn_800E3CBC();
     extern u8* fn_801190DC();
-    extern u32 fn_800E3BF0();
-    extern u32 fn_800E3D08();
+    extern u32 GSmodelGetGSparticleLinkAttachMode();
+    extern u32 GSmodelGetVisibility();
     u8* node = arg6;
     u8* resource;
     u8* texture;
@@ -3158,17 +3158,17 @@ void fn_80119BD0(u32 arg1, u32 arg2, u32 arg5, u8* arg6) {
         }
     }
 
-    resource = fn_800E3B6C(node);
+    resource = GSmodelSearchModelList(node);
     if (resource == NULL) {
         return;
     }
 
-    texture = fn_800E3BF8(resource);
+    texture = GSmodelGetLinkedGSparticleBank(resource);
     if (texture == NULL) {
         return;
     }
 
-    if ((fn_800E6DC0(resource) & 0xFF) != 0) {
+    if ((GSmodelIsRootNullAdded(resource) & 0xFF) != 0) {
         node = *(u8**)(node + 0x10);
     }
 
@@ -3177,14 +3177,14 @@ void fn_80119BD0(u32 arg1, u32 arg2, u32 arg5, u8* arg6) {
         return;
     }
 
-    entry = fn_800EE150(resource, index);
+    entry = GSmodelGetPart(resource, index);
     if (entry == NULL) {
         return;
     }
 
     node = fn_801190DC(texture, arg5, fn_800E3CBC(resource));
     if (node != NULL) {
-        handle = fn_800E3BF0(resource);
+        handle = GSmodelGetGSparticleLinkAttachMode(resource);
         if (*(s32*)(node + 0x44) == 0 && handle != 0) {
             *(u32*)(node + 0x48) = *(u32*)(entry + 0x04);
             *(u32*)(node + 0x4C) = *(u16*)(entry + 0x02);
@@ -3200,8 +3200,8 @@ void fn_80119BD0(u32 arg1, u32 arg2, u32 arg5, u8* arg6) {
         }
     }
 
-    fn_800EE828(entry);
-    if ((fn_800E3D08(resource) & 0xFF) == 0) {
+    GSpartFree(entry);
+    if ((GSmodelGetVisibility(resource) & 0xFF) == 0) {
         psSetParticleVisibility(*(void**)(node + 0x10), 0);
     }
 }
@@ -8594,9 +8594,9 @@ extern f32 lbl_8047D038;
 void heroMoveCheckEvent(void);
 /* 0x8012C660 | 0x424 */
 extern void fn_8018F4C8(void);
-extern void fn_800EC578(void);
+extern void GSmodelGetAnimIndex(void);
 extern void GSmodelGetAnimFrame(void);
-extern void fn_800EC5FC(void);
+extern void GSmodelSetAnimBlend(void);
 extern void GSmodelSetBlendFactor(void);
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
@@ -8796,9 +8796,9 @@ extern f32 lbl_8047D0D4;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void fn_8012F40C(void);
 /* 0x8012F610 | 0x4C8 */
-extern void fn_800E3D6C(void);
+extern void GSmodelGetRotation(void);
 extern void fn_8010E138(void);
-extern void fn_800E4170(void);
+extern void GSmodelSetRotation(void);
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 extern f32 lbl_8047D0AC;
@@ -8816,7 +8816,7 @@ extern u8 lbl_80272A10[];
 void heroMoveGetKenObjID(void);
 /* 0x8012FCD4 | 0x380 */
 extern void fn_8018E050(void);
-extern void fn_800EB528(void);
+extern void GSmodelEnableAnimBlend(void);
 extern void fn_8018CB5C(void);
 extern void fn_80189328(void);
 extern void fn_8018BF24(void);
@@ -10813,8 +10813,8 @@ void fn_8012CA84(s32 playerIdx, f32* dirVec, f32* fwdVec) {
     extern void PSVECScale(void*, void*, f32);           /* VECScale(in, out, s) */
     extern f32  PSVECDotProduct(void*, void*);                /* VECDotProduct */
     extern f64  atan2(f32, f32);                    /* atan2f(y, x) */
-    extern void fn_800E3D6C(void*, void*);                /* getRotation(obj, out) */
-    extern void fn_800E3D98(void*, void*);                /* getPosition(obj, out) */
+    extern void GSmodelGetRotation(void*, void*);                /* getRotation(obj, out) */
+    extern void GSmodelGetPosition(void*, void*);                /* getPosition(obj, out) */
     extern void* GSresGetResource(u32, u32);                   /* resolveHandle(group, id) */
     extern void updateAnimation__Ff15HEROMOVE_MEMBER(void*, s32, f32);             /* applyTurnResult(obj, idx, amt) */
     extern void fn_8018790C(u32, u32);                    /* stopMovement(group, handle) */
@@ -10869,7 +10869,7 @@ void fn_8012CA84(s32 playerIdx, f32* dirVec, f32* fwdVec) {
             h = htbl[playerIdx];
         }
         obj = GSresGetResource(0, h);
-        fn_800E3D98(obj, posA);
+        GSmodelGetPosition(obj, posA);
         posA[1] = lbl_8047D038;
 
         fn_801885C4(0, entityHandle, dirVec, 0);
@@ -10881,7 +10881,7 @@ void fn_8012CA84(s32 playerIdx, f32* dirVec, f32* fwdVec) {
             h = htbl[playerIdx];
         }
         obj = GSresGetResource(0, h);
-        fn_800E3D98(obj, posB);
+        GSmodelGetPosition(obj, posB);
         posB[1] = lbl_8047D038;
 
         PSVECSubtract(posB, posA, diffVec);
@@ -10946,7 +10946,7 @@ void fn_8012CA84(s32 playerIdx, f32* dirVec, f32* fwdVec) {
                 tgtH = htbl[targetIdx];
             }
             obj = GSresGetResource(0, tgtH);
-            fn_800E3D98(obj, targetPos);
+            GSmodelGetPosition(obj, targetPos);
 
             htbl[0] = *(u32*)&lbl_8047D030;
             htbl[1] = *(u32*)&lbl_8047D034;
@@ -10954,7 +10954,7 @@ void fn_8012CA84(s32 playerIdx, f32* dirVec, f32* fwdVec) {
                 plrH = htbl[playerIdx];
             }
             obj = GSresGetResource(0, plrH);
-            fn_800E3D98(obj, playerPos);
+            GSmodelGetPosition(obj, playerPos);
 
             htbl[0] = *(u32*)&lbl_8047D030;
             htbl[1] = *(u32*)&lbl_8047D034;
@@ -10962,7 +10962,7 @@ void fn_8012CA84(s32 playerIdx, f32* dirVec, f32* fwdVec) {
                 rotH = htbl[playerIdx];
             }
             obj = GSresGetResource(0, rotH);
-            fn_800E3D6C(obj, rotation);
+            GSmodelGetRotation(obj, rotation);
 
             heading = rotation[1];
             while (heading >= lbl_8047D094) { heading -= lbl_8047D094; }
@@ -11101,7 +11101,7 @@ asm void heroMoveGetHeroRot(void) {
 void heroMoveGetHeroRot(u32 param) {
     extern u8 lbl_80426BD0[];
     extern void* GSresGetResource(u32 a, u32 b);
-    extern void fn_800E3D6C(void* a, u32 b);
+    extern void GSmodelGetRotation(void* a, u32 b);
     s32 idx;
     u32 table[2];
     u32 val;
@@ -11114,7 +11114,7 @@ void heroMoveGetHeroRot(u32 param) {
         val = table[idx];
     }
     result = GSresGetResource(0, val);
-    fn_800E3D6C(result, param);
+    GSmodelGetRotation(result, param);
 }
 #endif
 extern f32 lbl_8047D030;
@@ -11127,7 +11127,7 @@ asm void heroMoveGetHeroPos(void) {
 void heroMoveGetHeroPos(u32 param) {
     extern u8 lbl_80426BD0[];
     extern void* GSresGetResource(u32 a, u32 b);
-    extern void fn_800E3D98(void* a, u32 b);
+    extern void GSmodelGetPosition(void* a, u32 b);
     s32 idx;
     u32 table[2];
     u32 val;
@@ -11140,7 +11140,7 @@ void heroMoveGetHeroPos(u32 param) {
         val = table[idx];
     }
     result = GSresGetResource(0, val);
-    fn_800E3D98(result, param);
+    GSmodelGetPosition(result, param);
 }
 #endif
 extern f32 lbl_8047D030;

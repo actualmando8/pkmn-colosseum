@@ -18,9 +18,9 @@ extern u8 lbl_80315668[];
 extern u8 _GSmaterialObjInit_800EF33C[];
 extern u8 fn_800DE128[];
 extern u8 fn_800DE680[];
-extern u8 fn_800EB464[];
-extern u8 fn_800EB520[];
-extern u8 fn_800ED4D4[];
+extern u8 _modelBoundVertex__FUlPvPv[];
+extern u8 _modelBoundBeginSurface__F13GSgfxPrimTypeUsUlPv[];
+extern u8 modelUpdateAttachments__FP8_GSmodel[];
 extern u8 fn_800F10E8[];
 extern u8 fn_800F13D0[];
 extern u8 fn_800F16C0[];
@@ -186,23 +186,23 @@ u8 lbl_80315568[48] = {
 };
 
 void* lbl_80315598[6] = {
-    (void*)((u8*)fn_800EB520),
+    (void*)((u8*)_modelBoundBeginSurface__F13GSgfxPrimTypeUsUlPv),
     (void*)0x00000000,
-    (void*)((u8*)fn_800EB464),
+    (void*)((u8*)_modelBoundVertex__FUlPvPv),
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)0x00000000,
 };
 
 void* jumptable_803155B0[8] = {
-    (void*)((u8*)fn_800ED4D4 + 0x194),
-    (void*)((u8*)fn_800ED4D4 + 0xEC),
-    (void*)((u8*)fn_800ED4D4 + 0xFC),
-    (void*)((u8*)fn_800ED4D4 + 0x10C),
-    (void*)((u8*)fn_800ED4D4 + 0x11C),
-    (void*)((u8*)fn_800ED4D4 + 0x138),
-    (void*)((u8*)fn_800ED4D4 + 0x154),
-    (void*)((u8*)fn_800ED4D4 + 0x170),
+    (void*)((u8*)modelUpdateAttachments__FP8_GSmodel + 0x194),
+    (void*)((u8*)modelUpdateAttachments__FP8_GSmodel + 0xEC),
+    (void*)((u8*)modelUpdateAttachments__FP8_GSmodel + 0xFC),
+    (void*)((u8*)modelUpdateAttachments__FP8_GSmodel + 0x10C),
+    (void*)((u8*)modelUpdateAttachments__FP8_GSmodel + 0x11C),
+    (void*)((u8*)modelUpdateAttachments__FP8_GSmodel + 0x138),
+    (void*)((u8*)modelUpdateAttachments__FP8_GSmodel + 0x154),
+    (void*)((u8*)modelUpdateAttachments__FP8_GSmodel + 0x170),
 };
 
 void* lbl_803155D0[38] = {

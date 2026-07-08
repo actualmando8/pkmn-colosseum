@@ -70,8 +70,8 @@ extern u8 fn_80089C54[];
 extern u8 fn_8008F91C[];
 extern u8 fn_80097BBC[];
 extern u8 fn_800AFFE0[];
-extern u8 fn_800E3D6C[];
-extern u8 fn_800E4170[];
+extern u8 GSmodelGetRotation[];
+extern u8 GSmodelSetRotation[];
 extern u8 fn_800FB43C[];
 extern u8 fn_800FEE68[];
 extern u8 fn_800FEF8C[];
@@ -94066,10 +94066,10 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)GSresGetResource),
     (void*)0x01010000,
     (void*)0x00000000,
-    (void*)((u8*)fn_800E3D6C),
+    (void*)((u8*)GSmodelGetRotation),
     (void*)0x01010000,
     (void*)0x00000000,
-    (void*)((u8*)fn_800E4170),
+    (void*)((u8*)GSmodelSetRotation),
     (void*)0x01010000,
     (void*)0x00000000,
     (void*)((u8*)fn_800FF56C),

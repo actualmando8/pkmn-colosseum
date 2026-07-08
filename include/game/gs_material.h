@@ -267,7 +267,7 @@ typedef struct GSmaterialEntry {
  * @param entry   Pointer to a GSmaterialEntry.
  * @param flags   Override bitfield (same as GSmaterialApplyAll).
  *
- * Corresponds to fn_800E3760. Size: 0x124.
+ * Corresponds to GSmodelDrawModel. Size: 0x124.
  */
 
 /**
@@ -378,7 +378,7 @@ void GSmaterialSetUserData(GSmaterialEntry* entry, void* data);
  * @param tex     GStextureHandle* or HSD_TObj* to bind.
  *
  * If the texture pointer changes, also calls the environment-map
- * update function (fn_800ECA78) with the material's alpha value,
+ * update function (GSmodelSetAnimFrame) with the material's alpha value,
  * and calls fn_800EC134 to refresh the GX state.
  *
  * Corresponds to GSmaterialSetTexture. Size: 0x54.
@@ -537,7 +537,7 @@ void GSmaterialLerpDiffuse(GSmaterialEntry* entry, void* param);
  * This is the core of the material -> GX hardware translation and is
  * critical for the PC port shader pipeline.
  *
- * Corresponds to fn_800E732C. Size: 0x12BC.
+ * Corresponds to GSmodelAddNull. Size: 0x12BC.
  */
 
 /**
@@ -560,7 +560,7 @@ void GSmaterialLerpDiffuse(GSmaterialEntry* entry, void* param);
  * Cleans up GX state (blend mode, z-mode, alpha compare) after
  * rendering with a custom material configuration.
  *
- * Corresponds to fn_800E8EFC. Size: 0x6C.
+ * Corresponds to GSmodelFreeAllShadowTextures. Size: 0x6C.
  */
 
 /**
@@ -597,7 +597,7 @@ void GSmaterialSetDistanceThreshold(f32 dist);
  * @param lockFlag  If non-zero, locks the slot.
  * @return          1 if the entry is in a render slot.
  *
- * Corresponds to fn_800E9148. Size: 0x140.
+ * Corresponds to modelShadowPrepare__FP8_GSmodelb. Size: 0x140.
  */
 
 /* ===================================================================
@@ -621,7 +621,7 @@ void GSmaterialSetDistanceThreshold(f32 dist);
  *   "GSmaterial: Unsupported texture format for environment map!"
  *   "GSmaterial: Error creating environment map: no texture defined!"
  *
- * Corresponds to fn_800E93B8. Size: 0x5E0.
+ * Corresponds to _modelShadowAddAsNewReceiver__FP8_GSmodelP8_GSmodelP7GSlightP7GSbound. Size: 0x5E0.
  */
 
 /**
@@ -630,7 +630,7 @@ void GSmaterialSetDistanceThreshold(f32 dist);
  * Called per-frame to update the environment map matrix based on the
  * current camera / view transform.
  *
- * Corresponds to fn_800E9998. Size: 0x194.
+ * Corresponds to _modelShadowFindValidReceiveModel__FP8_GSmodelP8_GSmodelP7GSlightP7GSbound. Size: 0x194.
  */
 
 /* ===================================================================
@@ -648,7 +648,7 @@ void GSmaterialSetDistanceThreshold(f32 dist);
  * @param entry   Pointer to a GSmaterialEntry.
  * @param stage   GX texture map index.
  *
- * Corresponds to fn_800EA6D4. Size: 0x110.
+ * Corresponds to _modelParseSetupInstanceMtx__FP5GSmtxP9_HSD_JObjP5GSmtx. Size: 0x110.
  */
 
 /**
@@ -658,7 +658,7 @@ void GSmaterialSetDistanceThreshold(f32 dist);
  * @param tevStage   TEV stage index.
  * @param desc       TEV stage descriptor.
  *
- * Corresponds to fn_800EA960. Size: 0x370.
+ * Corresponds to _modelParseJObjDispSub__FP9_HSD_JObjP5GSmtxP5GSmtx12HSD_TrspMaskbPFP9_HSD_PObjP5GSmtxP5GSmtxP5GSmtxPv_vPv. Size: 0x370.
  */
 
 /**
@@ -667,7 +667,7 @@ void GSmaterialSetDistanceThreshold(f32 dist);
  * Configures source/dest blend factors, logic operation, and compare mode
  * based on the material's PE descriptor.
  *
- * Corresponds to fn_800EACD0. Size: 0x314.
+ * Corresponds to _modelParseDObjDisp__FP9_HSD_DObjP5GSmtxP5GSmtxbPFP9_HSD_PObjP5GSmtxP5GSmtxP5GSmtxPv_vPv. Size: 0x314.
  */
 
 /**
@@ -675,7 +675,7 @@ void GSmaterialSetDistanceThreshold(f32 dist);
  *
  * @param entry   Pointer to a GSmaterialEntry.
  *
- * Corresponds to fn_800EAFE4. Size: 0x284.
+ * Corresponds to _modelParseLoadEnvelopeMatrix__FP9_HSD_PObjP5GSmtxP5GSmtxP5GSmtx. Size: 0x284.
  */
 
 /**
@@ -695,7 +695,7 @@ void GSmaterialSetDistanceThreshold(f32 dist);
  * @param entry   Pointer to a GSmaterialEntry.
  * @param alpha   Float alpha value (0.0 = fully transparent, 1.0 = opaque).
  *
- * Corresponds to fn_800EC0E8. Size: 0x4C.
+ * Corresponds to GSmodelForceAnimTransformUpdate. Size: 0x4C.
  */
 
 /**
@@ -711,7 +711,7 @@ void GSmaterialSetDistanceThreshold(f32 dist);
  * @param entry   Pointer to a GSmaterialEntry.
  * @return        HSD_MObj* (either primary or secondary based on render type).
  *
- * Corresponds to fn_800EC154. Size: 0xC.
+ * Corresponds to GSmodelSetAnimEndedCallback. Size: 0xC.
  */
 
 /**
@@ -720,37 +720,37 @@ void GSmaterialSetDistanceThreshold(f32 dist);
  * @param entry   Pointer to a GSmaterialEntry.
  * @param r,g,b,a Color components (0-255).
  *
- * Corresponds to fn_800EC160. Size: 0x28.
+ * Corresponds to GSmodelSet60fpsAnimFlag. Size: 0x28.
  */
 
 /**
  * GSmaterialSetAmbientRGBA -- Set the ambient color directly.
  *
- * Corresponds to fn_800EC188. Size: 0x28.
+ * Corresponds to GSmodelLinkTexAnimToAnim. Size: 0x28.
  */
 
 /**
  * GSmaterialGetDiffuseR -- Return the red component of diffuse color.
  *
- * Corresponds to fn_800EC1B0. Size: 0xC.
+ * Corresponds to GSmodelCanTexAnimate. Size: 0xC.
  */
 
 /**
  * GSmaterialGetDiffuseG -- Return the green component of diffuse color.
  *
- * Corresponds to fn_800EC1BC. Size: 0xC.
+ * Corresponds to GSmodelCanAnimate. Size: 0xC.
  */
 
 /**
  * GSmaterialGetDiffuseB -- Return the blue component of diffuse color.
  *
- * Corresponds to fn_800EC1C8. Size: 0xC.
+ * Corresponds to GSmodelHasTexAnimationEnded. Size: 0xC.
  */
 
 /**
  * GSmaterialGetDiffuseA -- Return the alpha component of diffuse color.
  *
- * Corresponds to fn_800EC1D4. Size: 0x10.
+ * Corresponds to GSmodelStopTexAnimation. Size: 0x10.
  */
 
 /* ===================================================================
@@ -774,7 +774,7 @@ void GSmaterialSetDistanceThreshold(f32 dist);
  * This is the primary entry point called by the model rendering system
  * when it needs to set up GX state for a material.
  *
- * Corresponds to fn_800EC5FC. Size: 0x2CC.
+ * Corresponds to GSmodelSetAnimBlend. Size: 0x2CC.
  */
 
 /**
@@ -783,13 +783,13 @@ void GSmaterialSetDistanceThreshold(f32 dist);
  * Called during the shadow rendering pass to set up simplified TEV
  * stages for shadow map generation.
  *
- * Corresponds to fn_800ECCA8. Size: 0x428.
+ * Corresponds to GSmodelSetAnimIndex. Size: 0x428.
  */
 
 /**
  * GSmaterialPostRender -- Restore GX state after material rendering.
  *
- * Corresponds to fn_800ED0D0. Size: 0xFC.
+ * Corresponds to GSmodelAdvanceAnimation. Size: 0xFC.
  */
 
 /**
@@ -799,7 +799,7 @@ void GSmaterialSetDistanceThreshold(f32 dist);
  * Orchestrates the entire material rendering sequence: setup, draw,
  * shadow pass, environment map pass, and cleanup.
  *
- * Corresponds to fn_800EDA98. Size: 0x5AC.
+ * Corresponds to _modelResetPartAnimMixes__FP8_GSmodel. Size: 0x5AC.
  */
 
 /**
@@ -807,7 +807,7 @@ void GSmaterialSetDistanceThreshold(f32 dist);
  *
  * Simple helper: if r3 != NULL, stores r3 into the address given by r4.
  *
- * Corresponds to fn_800EE044. Size: 0x10.
+ * Corresponds to _modelGetAObjFunc__FP9_HSD_AObjPv. Size: 0x10.
  */
 
 /**
@@ -817,7 +817,7 @@ void GSmaterialSetDistanceThreshold(f32 dist);
  * @param mode    If 0, calls fn_801C2A74; otherwise calls fn_801C2A90.
  *                Both use lis r4, 0x2000 as a flag parameter.
  *
- * Corresponds to fn_800EE054. Size: 0x38.
+ * Corresponds to _modelSetLoopFlag__FP9_HSD_AObjUl. Size: 0x38.
  */
 
 /**
@@ -836,7 +836,7 @@ void GSmaterialSetDistanceThreshold(f32 dist);
  * GSmaterialApplyPEDescr -- Apply the PE (Pixel Engine) descriptor
  * settings to the GX pipeline.
  *
- * Corresponds to fn_800EE150. Size: 0xBC.
+ * Corresponds to GSmodelGetPart. Size: 0xBC.
  */
 
 /**
