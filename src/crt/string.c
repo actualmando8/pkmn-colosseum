@@ -8,79 +8,6 @@
 #define K1 0x80808080
 #define K2 0xFEFEFEFF
 
-/*
- * strlen - Compute the length of a null-terminated string.
- *
- * @param str  Pointer to the null-terminated string
- * @return     Number of characters before the terminating null byte
- *
- * Assembly pattern uses lbzu pre-increment loop:
- *   subi r4, r3, 1    ; p = str - 1
- *   li r3, -1         ; len = -1
- *   lbzu r0, 1(r4)    ; load *++p
- *   addi r3, r3, 1    ; len++
- *   cmplwi r0, 0      ; check null
- *   bne loop
- */
-u32 strlen(const char* str) {
-    const u8* p = (const u8*)str - 1;
-    u32 len = (u32)-1;
-
-    do {
-        len++;
-    } while (*++p != 0);
-
-    return len;
-}
-
-/*
- * strchr - Locate the first occurrence of a character in a string.
- *
- * @param str  Pointer to the null-terminated string to search
- * @param c    Character to search for (only low 8 bits used)
- * @return     Pointer to the first occurrence of c in str,
- *             or NULL if c is not found. If c is '\0', returns
- *             a pointer to the terminating null byte.
- */
-/* Imported from MSL_C/MSL_Common/Src/string.c (zeldaret/tww); CW 1.3. Verified 100%. */
-char* strchr(const char* str, int c) {
-    const u8* p = (u8*)str - 1;
-    u32 chr = (c & 0xFF);
-
-    u32 ch;
-    while (ch = *++p) {
-        if (ch == chr) {
-            return (char*)p;
-        }
-    }
-
-    return chr ? NULL : (char*)p;
-}
-
-
-/* ========================================================== */
-/* Stub functions for coverage - TODO: decompile              */
-/* ========================================================== */
-
-/* strncmp = fn_800CA7BC @ 0x800CA7BC (size 0x40). MSL_C/MSL_Common/Src/string.c (zeldaret/tww); CW 1.3. Verified 100%. */
-int strncmp(const char* str1, const char* str2, size_t n) {
-    const u8* p1 = (u8*)str1 - 1;
-    const u8* p2 = (u8*)str2 - 1;
-    u32 c1, c2;
-
-    n++;
-    while (--n) {
-        if ((c1 = *++p1) != (c2 = *++p2)) {
-            return c1 - c2;
-        } else if (c1 == 0) {
-            break;
-        }
-    }
-
-    return 0;
-}
-
-
 /* strcmp @ 0x800CA7FC (size 0x128). MSL_C/MSL_Common/Src/string.c (zeldaret/tww); CW 1.3. Verified 100%. */
 int strcmp(const char* str1, const char* str2) {
     register u8* left = (u8*)str1;
@@ -177,23 +104,22 @@ bytecopy:
  * 0x800CA924 | size: 0x44
  */
 char* strncpy(char* dst, const char* src, u32 n) {
-    char* p = dst;
-    u32 i;
+    const u8* s = (const u8*)src - 1;
+    u8* d = (u8*)dst - 1;
+    u32 c;
 
-    for (i = 0; i < n; i++) {
-        char c = *src;
-        *p++ = c;
-        if (c == '\0') {
-            /* Pad remaining with nulls */
-            i++;
-            while (i < n) {
-                *p++ = '\0';
-                i++;
+    n++;
+    while (--n != 0) {
+        c = *++s;
+        *++d = c;
+        if (c == 0) {
+            while (--n != 0) {
+                *++d = 0;
             }
             return dst;
         }
-        src++;
     }
+
     return dst;
 }
 
@@ -266,6 +192,31 @@ adjust:
     return ret;
 }
 
+/*
+ * strlen - Compute the length of a null-terminated string.
+ *
+ * @param str  Pointer to the null-terminated string
+ * @return     Number of characters before the terminating null byte
+ *
+ * Assembly pattern uses lbzu pre-increment loop:
+ *   subi r4, r3, 1    ; p = str - 1
+ *   li r3, -1         ; len = -1
+ *   lbzu r0, 1(r4)    ; load *++p
+ *   addi r3, r3, 1    ; len++
+ *   cmplwi r0, 0      ; check null
+ *   bne loop
+ */
+u32 strlen(const char* str) {
+    const u8* p = (const u8*)str - 1;
+    u32 len = (u32)-1;
+
+    do {
+        len++;
+    } while (*++p != 0);
+
+    return len;
+}
+
 /* fn_800CAA3C - 0x800CAA3C | size: 0x1C
  * wcscpy - Copy a wide character string from src to dst.
  * MSL_C/MSL_Common/Src/wchar_io.c (CW pattern); CW 1.3.
@@ -282,4 +233,3 @@ u16* fn_800CAA3C(u16* dst, const u16* src) {
 
     return dst;
 }
-

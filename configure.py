@@ -266,20 +266,21 @@ config.libs = [
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "crt/mem.c",
                 mw_version="GC/2.0",
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "crt/string.c",
                 mw_version="GC/1.3",
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "crt/wchar.c",
+                mw_version="GC/1.3",
                 progress_category="runtime",
             ),
             Object(
