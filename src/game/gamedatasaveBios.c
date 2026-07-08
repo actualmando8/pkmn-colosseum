@@ -177,22 +177,27 @@ u32 gamedatasaveBiosGetSavernd(void* ptr) {
 }
 
 
+/** Raw bulk-copy view of an EffectParamBlock (0x28 bytes): the record is
+ *  moved 8 bytes at a time via the FPU rather than field-by-field, so it is
+ *  modelled as 5 doubles rather than as EffectParamBlock (whose narrower
+ *  fields/alignment would make MWCC emit word-at-a-time lwz/stw copies). */
+typedef struct RawBlock28 {
+    f64 d0, d1, d2, d3, d4;
+} RawBlock28;
+
+/** Save-data record: an (as yet undecompiled) 8-byte header followed by the
+ *  embedded EffectParamBlock, consistent with gamedatasaveBiosGetPtr()
+ *  returning ptr + 0x8 as the EffectParamBlock sub-pointer. */
+typedef struct GameDataSaveRecord {
+    u8 header[0x8];
+    RawBlock28 params;
+} GameDataSaveRecord;
+
 /* 0x40 | gamedatasaveBiosSetPtr | generic */
 void gamedatasaveBiosSetPtr(void* dst, void* src) {
-    if (dst == NULL) return;
-    if (src != NULL) goto _copy;
-    return;
-_copy: {
-    f64 f1 = *(f64*)((u8*)src + 0x00);
-    f64 f0 = *(f64*)((u8*)src + 0x08);
-    *(f64*)((u8*)dst + 0x08) = f1;
-    *(f64*)((u8*)dst + 0x10) = f0;
-    f1 = *(f64*)((u8*)src + 0x10);
-    f0 = *(f64*)((u8*)src + 0x18);
-    *(f64*)((u8*)dst + 0x18) = f1;
-    *(f64*)((u8*)dst + 0x20) = f0;
-    *(f64*)((u8*)dst + 0x28) = *(f64*)((u8*)src + 0x20);
-    }
+    GameDataSaveRecord* rec = (GameDataSaveRecord*)dst;
+    if (dst == NULL || src == NULL) return;
+    rec->params = *(RawBlock28*)src;
 }
 
 
