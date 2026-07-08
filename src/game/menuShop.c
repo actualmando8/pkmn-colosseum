@@ -1550,7 +1550,7 @@ seg_found:;
 
 /* fn_8002B880 - 0x8002B880 | size: 0x468 */
 extern void fn_800FE6D0(void);
-extern void fn_800FE4D4(void);
+extern void spriteSetEnv(void);
 extern f64 lbl_8047B998;
 extern f32 lbl_8047B98C;
 extern f32 lbl_8047B9A0;
@@ -1572,7 +1572,7 @@ asm void fn_8002B880(void) {
  * panel context), r4 = the draw/sprite entity. Only runs when the context's
  * primary flag word (*(u16*)*(void**)ctx) is zero. It first computes a sprite
  * column/alpha exactly like fn_8002BCE8 (5-entry lbl_802E4F68 lookup table,
- * keyed on entity->0x6), positions the panel via fn_800FE6D0/fn_800FE4D4, then
+ * keyed on entity->0x6), positions the panel via fn_800FE6D0/spriteSetEnv, then
  * draws four 45-step radial rings of icons by calling fn_8002B594 in a loop,
  * each ring starting from a different phase offset and advancing by a fixed
  * per-step increment that wraps at lbl_8047B97C.
@@ -1584,7 +1584,7 @@ s32 fn_8002B880(void* r3, u8* r4)
 {
     /* Cross-TU callees (real arg lists inferred from register state at each bl). */
     extern void fn_800FE6D0(s32 x, s32 y);
-    extern void fn_800FE4D4(void);
+    extern void spriteSetEnv(void);
     extern void fn_8002B594(void* panel, u8* entity, u32 mode, s32 step, f32 phase);
 
     /* r2-relative read-only float constants. */
@@ -1652,7 +1652,7 @@ s32 fn_8002B880(void* r3, u8* r4)
     /* ---- Position the panel ---- */
     fn_800FE6D0((s32)(s16)(*(s16*)(state + 0x84) + *(s16*)(entity + 0x50)),
                 (s32)(s16)(*(s16*)(state + 0x86) + *(s16*)(entity + 0x52)));
-    fn_800FE4D4();
+    spriteSetEnv();
 
     /* ---- Fixed per-step phase increment ---- */
     fx = (f32)(s16)*(s16*)(entity + 0x54);

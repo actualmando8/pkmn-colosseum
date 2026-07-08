@@ -100,7 +100,7 @@ u32 fn_801F8000(void* context) {
     extern void* fightTrainerGetStatus(void* ctx, u32 slot, u32 field, u32 index);
     extern u8* fightTrainerKindDataBiosGetPtr(u16 val);
     extern u32 fightTrainerKindDataBiosGetPrefixName(u8* ptr);
-    extern u32 fn_800FA280(u32 val);
+    extern u32 GSmsgGetGSchar(u32 val);
     int valid;
     void* result;
     u16 slot;
@@ -132,7 +132,7 @@ u32 fn_801F8000(void* context) {
     slot = (u16)(u32)fightTrainerGetStatus(context, 0, 0x43, 0);
     result = fightTrainerGetStatus(0, slot, 0x4, 0);
     result = fightTrainerKindDataBiosGetPtr((u16)(u32)result);
-    return fn_800FA280(fightTrainerKindDataBiosGetPrefixName((u8*)result));
+    return GSmsgGetGSchar(fightTrainerKindDataBiosGetPrefixName((u8*)result));
 }
 
 /* 0x801F8100 | size: 0xF8 */
@@ -1608,7 +1608,7 @@ void fightTrainerSortFightTrainerDataIdToHeroTemotiPokemon(void) {
 void fightTrainerCreateFightTrainerDataIdToHero(void) {
     extern void fn_800896B8();
     extern void fn_800896C8();
-    extern void fn_800FA280();
+    extern void GSmsgGetGSchar();
     extern void savedataGetStatus();
     extern void heroItemAddItemDataId();
     extern void heroCatchPokemon();
@@ -1697,7 +1697,7 @@ void fightTrainerCreateFightTrainerDataIdToHero(void) {
     r5 = 0x3;
     r6 = 0x0;
     fightTrainerGetStatus();
-    fn_800FA280();
+    GSmsgGetGSchar();
     r28 = r3;
     fn_800896B8();
     r0 = r30 & 0xFFFF;
@@ -1810,7 +1810,7 @@ void fightTrainerCreateFightTrainerDataIdToHero(void) {
 void fightTrainerCreateFightTrainerPokemonDataIdToPokemon(void) {
     extern u8 lbl_80279C48[];
     extern u8 lbl_80279C54[];
-    extern void fn_800FA280();
+    extern void GSmsgGetGSchar();
     extern void pokemonSetDarkPokemonStatus();
     extern void pokemonDoItemSoubi();
     extern void pokemonWazaCreate();
@@ -1985,7 +1985,7 @@ void fightTrainerCreateFightTrainerPokemonDataIdToPokemon(void) {
     pokemonCreate();
     if (r22 != (u32)0x0) {
         r3 = r22;
-        fn_800FA280();
+        GSmsgGetGSchar();
         r7 = r3;
         r3 = r31;
         r4 = 0x0;

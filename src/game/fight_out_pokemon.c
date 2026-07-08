@@ -707,7 +707,7 @@ u32 fightOutPokemonGetVoiceSndId(void* ctx) {
 
 /* 0x80203758 | size: 0x84 */
 u32 fightOutPokemonGetNamePtr(void* ctx) {
-    extern u32 fn_800FA280();
+    extern u32 GSmsgGetGSchar();
     void* resolved;
     u16 species;
     resolved = pokemonGetStatus(ctx, 0, 0xD6, 0);
@@ -721,7 +721,7 @@ u32 fightOutPokemonGetNamePtr(void* ctx) {
     }
     species = (u16)(u32)pokemonGetStatus(resolved, 0, 0x6E, 0);
     resolved = pokemonGetStatus(NULL, species, 0x01, 0);
-    return fn_800FA280(resolved);
+    return GSmsgGetGSchar(resolved);
 }
 
 /* 0x802037DC | size: 0x6C */

@@ -105,7 +105,7 @@ extern void fn_800F7E40(u32 padIdx, u32 param);        /* PAD deadzone config */
 extern void fn_800F7DE4(u32 padIdx, u32 param);        /* PAD stick config */
 
 extern void GSgappInit(u32 numTasks, u32 numQueues);  /* GSthread init */
-extern void fn_800F9670(u32 maxSteps);                  /* GSthread step limit */
+extern void GSresInit(u32 maxSteps);                  /* GSthread step limit */
 extern void fn_800FF828(u32 a, u32 b, u32 c, u32 d);  /* GSthread pool config */
 extern void fn_8010D170(void);                           /* GSthread scheduler init */
 extern void fn_800F7758(u32 maxPads);                   /* PAD system init */
@@ -177,7 +177,7 @@ extern u32 fn_800057A8(void);
 /* --- Miscellaneous engine functions --- */
 extern void fn_800366A8(void);    /* Scene/floor update tick */
 extern u32  fn_800FF81C(void* a, u32 b); /* GSthread set frame counter */
-extern void* fn_800F9544(u32 a, u32 b, u32 c, u32 d); /* GSthread alloc work area */
+extern void* GSresAllocResource(u32 a, u32 b, u32 c, u32 d); /* GSthread alloc work area */
 
 extern u32  fn_80128E24(void);    /* SoundSystemIsReady */
 extern void* fn_80128E04(void);   /* SoundSystemGetContext */
@@ -621,7 +621,7 @@ void fn_800057B0(void) {
     GSgappInit(0x10, 0x4);
 
     /* Set thread step limit to 300 */
-    fn_800F9670(0x12C);
+    GSresInit(0x12C);
 
     /* Configure thread pool: 4 threads, 16 priority levels each */
     fn_800FF828(0x4, 0x10, 0x10, 0x10);
@@ -755,7 +755,7 @@ void fn_80005AAC(void) {
 
     /* Allocate a 2-byte work area (for some per-frame state) */
     {
-        void* work = fn_800F9544(2, 0, 2, 0);
+        void* work = GSresAllocResource(2, 0, 2, 0);
         *(u8*)(work) = 0;
         *((u8*)(work) + 1) = 0;
     }

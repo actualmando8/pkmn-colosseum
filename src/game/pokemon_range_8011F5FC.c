@@ -435,7 +435,7 @@ extern void GScharCpy(void);
 extern void fn_8010BBB8(void);
 extern void fn_8001D994(void);
 void pokemonToMenuPokemonStatus(void);
-extern void fn_800FA280(void);
+extern void GSmsgGetGSchar(void);
 extern void fn_8010C4D4(void);
 extern void fn_8010C46C(void);
 extern void fn_800E0C54(void);
@@ -474,7 +474,7 @@ extern void itemDataBiosGetItemSoubiDataId(void);
 void pokemonEvolutionCheck(void);
 extern u8 lbl_80408400[];
 extern void fn_8013528C(void);
-extern void fn_800F9D04(void);
+extern void GScharMakeFromSJIS(void);
 extern void gamedatasaveSetStatus(void);
 extern u8 lbl_8047D028[8];
 void savedataCreate(void);
@@ -1640,7 +1640,7 @@ void pokemonToMenuPokemonStatusSubBar(u8* ptr, u8* out) {
 }
 #endif
 /* 0x801204A8 | 0x1CC */
-extern void fn_800FA280(void);
+extern void GSmsgGetGSchar(void);
 extern void fn_8010C4D4(void);
 extern void fn_8010C46C(void);
 #if 0
@@ -1649,7 +1649,7 @@ asm void pokemonToMenuWazaStatus(void) {
 }
 #else
 void pokemonToMenuWazaStatus(u8* ptr, u8* out) {
-    extern u32 fn_800FA280();
+    extern u32 GSmsgGetGSchar();
     extern u32 fn_8010C46C();
     extern u32 fn_8010C4D4();
     extern u32 wazaGetMaxPP();
@@ -1685,8 +1685,8 @@ void pokemonToMenuWazaStatus(u8* ptr, u8* out) {
         } else {
             id = (u16)pokemonGetStatus(ptr, 0, 0x7F, i);
             resolved = (u16)wazaGetStatus(0, id, 3, 0);
-            *(u32*)(slot + 0x0) = fn_800FA280(wazaGetStatus(0, id, 1, 0));
-            *(u32*)(slot + 0x4) = fn_800FA280(fn_8010C4D4(resolved));
+            *(u32*)(slot + 0x0) = GSmsgGetGSchar(wazaGetStatus(0, id, 1, 0));
+            *(u32*)(slot + 0x4) = GSmsgGetGSchar(fn_8010C4D4(resolved));
             *(u16*)(slot + 0x8) = (u16)fn_8010C46C(resolved);
             if (ptr == NULL) {
                 byte = 0;

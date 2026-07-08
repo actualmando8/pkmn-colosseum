@@ -367,7 +367,7 @@ s32 fn_8000682C(void) {
  * =================================================================== */
 
 /* External functions used by lookup helpers */
-extern void* fn_800FA280(u32 id);
+extern void* GSmsgGetGSchar(u32 id);
 extern void* fn_8010C4D4(u16 index);
 extern void* fightEncountDataBiosGetFightName(void* ptr);
 
@@ -379,7 +379,7 @@ extern u32 lbl_80478B38;
  *
  * Looks up a resource by ID. If ID is 9, uses a fixed constant.
  * If ID >= the global count (lbl_80478B38), also uses the constant.
- * Otherwise, converts via fn_8010C4D4 and passes to fn_800FA280.
+ * Otherwise, converts via fn_8010C4D4 and passes to GSmsgGetGSchar.
  *
  * Address: 0x8000857C  Size: 0x5C (92 bytes)
  * ======================================================================= */
@@ -388,15 +388,15 @@ extern u32 lbl_80478B38;
 void* _dbgMenuFightGetZokuseiDataIdSub(u32 id)
 {
     if (id == 9) {
-        return fn_800FA280(0x0000EB63);
+        return GSmsgGetGSchar(0x0000EB63);
     }
     if (id >= lbl_80478B38) {
-        return fn_800FA280(0x0000EB63);
+        return GSmsgGetGSchar(0x0000EB63);
     }
     {
         u32 idx;
         idx = (u16)id;
-        return fn_800FA280((u32)fn_8010C4D4(idx));
+        return GSmsgGetGSchar((u32)fn_8010C4D4(idx));
     }
 }
 #pragma pop
@@ -406,7 +406,7 @@ void* _dbgMenuFightGetZokuseiDataIdSub(u32 id)
  *
  * Looks up an event resource by ID. Returns NULL-equivalent constant
  * on invalid input or out-of-range. Otherwise, chains through
- * fightEncountDataBiosGetPtr -> fightEncountDataBiosGetFightName -> fn_800FA280.
+ * fightEncountDataBiosGetPtr -> fightEncountDataBiosGetFightName -> GSmsgGetGSchar.
  *
  * Address: 0x800087FC  Size: 0x6C (108 bytes)
  * ======================================================================= */
@@ -429,7 +429,7 @@ void* fn_800087FC(u32 id)
         result = 0x0000EB63;
     }
 
-    return fn_800FA280(result);
+    return GSmsgGetGSchar(result);
 }
 #pragma pop
 
@@ -2156,11 +2156,11 @@ void* _dbgMenuFightGetFightTrainerAiAddsubValueDataIdSub(u32 id) {
     if (r29 == 0) r29 = (void*)0xEB63;
     if (r31 == 0) r31 = (void*)0xEB63;
     if (r30 == 0) r30 = (void*)0xEB63;
-    msgctrlSetValue(0xd,  fn_800FA280((u32)r31));
-    msgctrlSetValue(0xe,  fn_800FA280((u32)r30));
-    msgctrlSetValue(0x4d, fn_800FA280((u32)r29));
+    msgctrlSetValue(0xd,  GSmsgGetGSchar((u32)r31));
+    msgctrlSetValue(0xe,  GSmsgGetGSchar((u32)r30));
+    msgctrlSetValue(0x4d, GSmsgGetGSchar((u32)r29));
     msgctrlSetValue(0x2f, r28);
-    return fn_800FA280(0xF159);
+    return GSmsgGetGSchar(0xF159);
 }
 #pragma peephole on
 #endif
@@ -2170,9 +2170,9 @@ extern u32 lbl_80478F08;
 #pragma push
 #pragma peephole off
 void* _dbgMenuFightGetFightTrainerPokemonPartDataIdSub(u32 id) {
-    if (id == 0) return fn_800FA280(0xEB63);
-    if (id >= *(u32*)(void*)lbl_80478F08) return fn_800FA280(0xEB63);
-    return fn_800FA280((u32)fightTrainerGetStatus(0, (u16)id, 0xb, 0));
+    if (id == 0) return GSmsgGetGSchar(0xEB63);
+    if (id >= *(u32*)(void*)lbl_80478F08) return GSmsgGetGSchar(0xEB63);
+    return GSmsgGetGSchar((u32)fightTrainerGetStatus(0, (u16)id, 0xb, 0));
 }
 #pragma pop
 
@@ -2186,9 +2186,9 @@ asm void _dbgMenuFightGetWazaDataIdSub(void) {
 #pragma push
 #pragma peephole off
 void* _dbgMenuFightGetWazaDataIdSub(u32 id) {
-    if (id == 0) return fn_800FA280(0xEB63);
-    if (id >= 0x163) return fn_800FA280(0xEB63);
-    return fn_800FA280((u32)wazaGetStatus(0, (u16)id, 1, 0));
+    if (id == 0) return GSmsgGetGSchar(0xEB63);
+    if (id >= 0x163) return GSmsgGetGSchar(0xEB63);
+    return GSmsgGetGSchar((u32)wazaGetStatus(0, (u16)id, 1, 0));
 }
 #pragma pop
 #endif
@@ -2222,9 +2222,9 @@ asm void _dbgMenuFightGetWazaTypeIdSub(void) {
 #pragma push
 #pragma peephole off
 void* _dbgMenuFightGetWazaTypeIdSub(u32 id) {
-    if (id == 0) return fn_800FA280(0xEB63);
-    if (id > 0xb) return fn_800FA280(0xEB63);
-    return fn_800FA280((u32)wazaGetWazaTypeIdName((u8)id));
+    if (id == 0) return GSmsgGetGSchar(0xEB63);
+    if (id > 0xb) return GSmsgGetGSchar(0xEB63);
+    return GSmsgGetGSchar((u32)wazaGetWazaTypeIdName((u8)id));
 }
 #pragma pop
 #endif
@@ -2270,7 +2270,7 @@ void* fn_800085D8(s32 difficulty) {
         id = v;
     }
     if (id == 0) id = 0xEB63;
-    return fn_800FA280(id);
+    return GSmsgGetGSchar(id);
 }
 #pragma pop
 #endif
@@ -2289,7 +2289,7 @@ void* fn_8000868C(u32 id) {
         result = (u32)fightTrainerGetStatus(0, (u16)id, 3, 0);
     }
     if (result == 0) result = 0xEB63;
-    return fn_800FA280(result);
+    return GSmsgGetGSchar(result);
 }
 #endif
 
@@ -2309,7 +2309,7 @@ void* fn_800086EC(u32 id) {
         result = (u32)fightTypeDataBiosGetName(fightTypeDataBiosGetPtr((u16)id));
     }
     if (result == 0) result = 0xEB63;
-    return fn_800FA280(result);
+    return GSmsgGetGSchar(result);
 }
 #endif
 
@@ -2329,7 +2329,7 @@ void* _dbgMenuFightGetFightKindDataIdSub(u32 id) {
         result = (u32)fightKindDataBiosGetName(fightKindDataBiosGetPtr((u16)id));
     }
     if (result == 0) result = 0xEB63;
-    return fn_800FA280(result);
+    return GSmsgGetGSchar(result);
 }
 #endif
 
@@ -2347,7 +2347,7 @@ void* _dbgMenuFightGetFightFloorDataIdSub(u32 id) {
         result = (u32)fightFloorGetStatus(0, (u16)id, 1, 0);
     }
     if (result == 0) result = 0xEB63;
-    return fn_800FA280(result);
+    return GSmsgGetGSchar(result);
 }
 #endif
 

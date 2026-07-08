@@ -1190,8 +1190,23 @@ game/gs_thread.c:
 game/input/input.c:
 	.text       start:0x800F75FC end:0x800F8268
 
-game/gs_thread_hi.c:
-	.text       start:0x800F8268 end:0x800FF0A0
+game/gs_thread_hi_range_800F8268.c:
+	.text       start:0x800F8268 end:0x800F9318
+
+game/gs_res.c:
+	.text       start:0x800F9318 end:0x800F96E4
+
+game/gs_msg.c:
+	.text       start:0x800F96E4 end:0x800FE35C
+
+game/gs_thread_hi_range_800FE35C.c:
+	.text       start:0x800FE35C end:0x800FE6DC
+
+game/gs_gapp.c:
+	.text       start:0x800FE6DC end:0x800FEC34
+
+game/gs_thread_hi_range_800FEC34.c:
+	.text       start:0x800FEC34 end:0x800FF0A0
 
 game/gs_floor_data.c:
 	.text       start:0x800FF0A0 end:0x800FF788

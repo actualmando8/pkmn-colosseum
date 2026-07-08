@@ -111,7 +111,7 @@ void toolentryDebugPokemonCreate(void* ctx, u32 param1, u32 param2, u32 param3) 
     extern void fn_800E24B0();
     extern void fn_800E27B0();
     extern void fn_800E2C04();
-    extern void fn_800FA280();
+    extern void GSmsgGetGSchar();
     extern void pokemonAllKaihuku();
     extern void pokemonSetCatchStatus();
     extern void pokemonCreate();
@@ -167,7 +167,7 @@ void toolentryDebugPokemonCreate(void* ctx, u32 param1, u32 param2, u32 param3) 
         r4 = r0 & 0xFFFF;
         pokemonCreate();
         r3 = r31 + 0x1004;
-        fn_800FA280();
+        GSmsgGetGSchar();
         r9 = r3;
         r3 = r30;
         r4 = 0x0;

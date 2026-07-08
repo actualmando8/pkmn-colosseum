@@ -221,7 +221,7 @@ void fn_80031228(u8* arg0, u8* arg1) {
 /* 0x80031404 | 0x244 */
 extern void menuSubGetPokemonSexForDisp(void);
 extern void pokemonBiosGetTamagoFlag(void);
-extern void fn_800FA280(void);
+extern void GSmsgGetGSchar(void);
 #if 0
 asm void fn_80031404(void) {
 #include "src/game/gs_npc_event_fn_80031404.inc"
@@ -271,7 +271,7 @@ void fn_80031404(u8* arg0, u8* arg1) {
             msg = 0;
         }
         if (msg != 0) {
-            msgctrlSetValue(0x37, ((s32 (*)(s32))fn_800FA280)(msg));
+            msgctrlSetValue(0x37, ((s32 (*)(s32))GSmsgGetGSchar)(msg));
             fn_800FB680(2, 0, combined, 0xCF);
             winSpriteSetDisp(arg1, 1);
         } else {
@@ -322,11 +322,11 @@ void fn_80031648(u8* arg0, u8* arg1) {
     }
 
     if (((u8 (*)(void*))pokemonBiosGetFuseiFlag)(obj) != 0) {
-        msgctrlSetValue(0x37, ((s32 (*)(s32))fn_800FA280)(0x56C));
+        msgctrlSetValue(0x37, ((s32 (*)(s32))GSmsgGetGSchar)(0x56C));
     } else if (((u8 (*)(void*))pokemonCheckValid)(obj) != 0 &&
                ((u8 (*)(void*))menuCBRule_CheckPokemonEventFlag)(obj) == 1) {
         if (((u8 (*)(void*))pokemonBiosGetTamagoFlag)(obj) != 0) {
-            msgctrlSetValue(0x37, ((s32 (*)(s32))fn_800FA280)(0x56B));
+            msgctrlSetValue(0x37, ((s32 (*)(s32))GSmsgGetGSchar)(0x56B));
         } else {
             msgctrlSetValue(0x37, ((s32 (*)(void*))pokemonBiosGetNicknamePtr)(obj));
         }
@@ -1919,7 +1919,7 @@ void fn_8003042C(u8* arg0, u8* arg1) {
         if (((u16 (*)(void*))pokemonGetSoubiItemDataId)(obj) != 0) {
             itemDataBiosGetPtr();
             itemDataBiosGetName();
-            msgctrlSetValue(0x37, ((s32 (*)(void))fn_800FA280)());
+            msgctrlSetValue(0x37, ((s32 (*)(void))GSmsgGetGSchar)());
             fn_800FB680(0, 0, combined, 0xE7);
             *(u32*)(arg1 + 0x4C) = 0;
             winSpriteSetDisp(arg1, 1);
@@ -2023,7 +2023,7 @@ void fn_80030574(u8* arg0, u8* arg1) {
     }
 
     if (value != 0) {
-        msgctrlSetValue(0x37, ((s32 (*)(u32))fn_800FA280)(value));
+        msgctrlSetValue(0x37, ((s32 (*)(u32))GSmsgGetGSchar)(value));
         fn_800FBB34(0, 0, *(s16*)(arg1 + 0x54), *(s16*)(arg1 + 0x56), combined, 0xE7);
         winSpriteSetDisp(arg1, 1);
     } else {
@@ -2092,7 +2092,7 @@ void fn_800308D4(u8* arg0, u8* arg1) {
     extern s32 pokemonDataBiosGetPtr(s32 v);
     extern s32 pokemonDataBiosGetName(s32 v);
     extern s32 GSmsgGetRect(s32 m);
-    extern s32 fn_800FA280(s32 m);
+    extern s32 GSmsgGetGSchar(s32 m);
     s32 hi;
     s32 kind;
     u32 combined;
@@ -2123,7 +2123,7 @@ void fn_800308D4(u8* arg0, u8* arg1) {
     if (obj != 0) {
         hi = (s16)((u32)GSmsgGetRect(0x2BD4) >> 16);
         fn_800FB680(0, 0, combined, 0x2BD4);
-        msgctrlSetValue(0x37, fn_800FA280(pokemonDataBiosGetName(pokemonDataBiosGetPtr(pokemonGetStatus(obj, 0, 0x6E, 0)))));
+        msgctrlSetValue(0x37, GSmsgGetGSchar(pokemonDataBiosGetName(pokemonDataBiosGetPtr(pokemonGetStatus(obj, 0, 0x6E, 0)))));
         fn_800FB680(hi, 0, combined, 0xE7);
         *(u32*)(arg1 + 0x4C) = 0;
         winSpriteSetDisp(arg1, 1);
@@ -2196,7 +2196,7 @@ void fn_80030A44(u8* arg0, u8* arg1) {
 
         if (msg != 0) {
             x = (s16)(((u32 (*)(s32))GSmsgGetRect)(0xE7) >> 16);
-            msgctrlSetValue(0x37, ((s32 (*)(s32))fn_800FA280)(msg));
+            msgctrlSetValue(0x37, ((s32 (*)(s32))GSmsgGetGSchar)(msg));
             fn_800FB680((u16)x + 2, 0, combined, 0xCF);
         }
     }

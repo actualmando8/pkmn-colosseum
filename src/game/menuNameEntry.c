@@ -468,7 +468,7 @@ extern void msgctrlSetValue(s32, void*);
 extern u32 GSmsgGetRect(u32);
 extern void fn_800FB680(s32, s32, s32, u32);
 extern s32 GSmsgGetLength(void*);
-extern void* fn_800FA280(u32);
+extern void* GSmsgGetGSchar(u32);
 extern f32 lbl_8047B934;
 extern f32 lbl_8047B938;
 #if 0
@@ -503,7 +503,7 @@ s32 fn_800268F0(void* r3, u8* r4)
     extern u32  GSmsgGetRect(u32 id);
     extern void fn_800FB680(s32 x, s32 y, s32 palette, u32 cmd);
     extern s32  GSmsgGetLength(void* handle);
-    extern void* fn_800FA280(u32 id);
+    extern void* GSmsgGetGSchar(u32 id);
 
     u8  *self  = (u8*)r3;
     u8  *ctx   = *(u8**)(self + 0x60);
@@ -590,7 +590,7 @@ s32 fn_800268F0(void* r3, u8* r4)
             goto L_check_handle;
         }
         /* read u16 at item_idx from the handle's array */
-        arr = (u8*)fn_800FA280(handle);
+        arr = (u8*)GSmsgGetGSchar(handle);
         handle = (u32)*(u16*)(arr + item_idx * 2);
 
     L_check_handle:
@@ -598,7 +598,7 @@ s32 fn_800268F0(void* r3, u8* r4)
 
         /* Compare against special list 0x2efc */
         {
-            u8   *special_arr = (u8*)fn_800FA280(0x2efc);
+            u8   *special_arr = (u8*)GSmsgGetGSchar(0x2efc);
             u16   special_id  = *(u16*)(special_arr + 0);
             u32   palette_off;
             f32  *pos_fptr;
@@ -692,7 +692,7 @@ s32 fn_80026B44(void *r3, u8 *r4)
     extern u32    GSmsgGetRect(u32 pool);            /* query pool metrics   */
     extern void   fn_800FB680(s32 x, s32 y, s32 color, u32 glyph_id); /* draw glyph */
     extern s32    GSmsgGetLength(void *tbl);           /* get entry count      */
-    extern void  *fn_800FA280(u32 key);             /* get base pointer     */
+    extern void  *GSmsgGetGSchar(u32 key);             /* get base pointer     */
 
     void  *ctx;       /* r30: *(void**)(r3 + 0x60) */
     u16   *name_ptr;  /* r24: pointer into u16 name string */
@@ -799,7 +799,7 @@ s32 fn_80026B44(void *r3, u8 *r4)
                 goto L_check_special;
             }
 
-            arr    = (u8 *)fn_800FA280((u32)tbl_ptr);
+            arr    = (u8 *)GSmsgGetGSchar((u32)tbl_ptr);
             special = (u32)*(u16 *)(arr + (u32)val_b * 2); /* lhzx, zero-extended */
 
         L_check_special:
@@ -808,7 +808,7 @@ s32 fn_80026B44(void *r3, u8 *r4)
 
             /* Compare against "current" glyph from pool 0x2efc */
             {
-                u16 *cur_base = (u16 *)fn_800FA280(0x2efc);
+                u16 *cur_base = (u16 *)GSmsgGetGSchar(0x2efc);
                 u16  cur_glyph = cur_base[0]; /* lhz r0, 0x0(r3) */
                 s32  flag;
 
@@ -896,7 +896,7 @@ s32 fn_80026D98(void* r3, u8* r4)
     extern u32   GSmsgGetRect(u32 id);
     extern void  fn_800FB680(s32 x, s32 y, s32 color, u32 id);
     extern s32   GSmsgGetLength(void* ptr);
-    extern void* fn_800FA280(u32 id);
+    extern void* GSmsgGetGSchar(u32 id);
 
     /* saved registers r23-r31 */
     u32  r23;     /* working value / species entry id / packed color word */
@@ -1039,7 +1039,7 @@ loop_check:
         }
 
         /* r23 = array[val_b] as u16 */
-        arr  = fn_800FA280(r23);
+        arr  = GSmsgGetGSchar(r23);
         r23  = (u32)*(u16*)((u8*)arr + (u32)(u32)val_b * 2);
     }
 
@@ -1050,12 +1050,12 @@ after_species:
 
     /* ---------------------------------------------------------------
      * Phase 4: compare against "currently displayed" species id.
-     * fn_800FA280(0x2efc) → array, lhz [0] = active species u16.
+     * GSmsgGetGSchar(0x2efc) → array, lhz [0] = active species u16.
      * If r23 matches → r0=0 (same species); else r0=6 (different).
      * Only draw when r0==6 (NOT the active species).
      * --------------------------------------------------------------- */
     {
-        void* cur_arr = fn_800FA280(0x2efc);
+        void* cur_arr = GSmsgGetGSchar(0x2efc);
         u16   cur_id  = *(u16*)((u8*)cur_arr);
         if ((u16)r23 == cur_id)
             r0 = 0;
@@ -1779,7 +1779,7 @@ s32 menuNameEntryDraw50Text(void* r3) {
             r21 = *(void**)r29;
             r0 = GSmsgGetLength(r21);
             if (r25 < 0 || r25 >= r0) { r6 = 0; continue; }
-            arr = (u8*)fn_800FA280((u32)r21);
+            arr = (u8*)GSmsgGetGSchar((u32)r21);
             r6 = *(u16*)(arr + r30);
         }
         r28 += 0x23;
@@ -1867,7 +1867,7 @@ u16 exchangeDakuon__FUs11DAKUON_MODE(u16 r26, s32 r27) {
         ptr = r29[r28];
         if (ptr == 0) goto next;
         r30 = GSmsgGetLength((void*)ptr);
-        r5 = (u16*)((u8*)fn_800FA280(r29[r28]) + 2);
+        r5 = (u16*)((u8*)GSmsgGetGSchar(r29[r28]) + 2);
         r4 = 1;
         if (r30 > 1) {
             s32 ctr = r30 >> 1;
@@ -1893,7 +1893,7 @@ found:
     r30 = r27 << 2;
     r29 = (u32*)lbl_8047B920;
     r31 = GSmsgGetLength((void*)r29[r27]);
-    r5 = (u16*)fn_800FA280(r29[r27]);
+    r5 = (u16*)GSmsgGetGSchar(r29[r27]);
     r4 = 0;
     if (r31 > 0) {
         s32 ctr = (r31 + 1) >> 1;
@@ -1929,7 +1929,7 @@ asm void selectLetter__FP14NAME_ENTRY_ARG(void) {
  */
 s32 selectLetter__FP14NAME_ENTRY_ARG(void* r3) {
     extern s32  GSmsgGetLength(void*);
-    extern void* fn_800FA280(u32);
+    extern void* GSmsgGetGSchar(u32);
     extern u16  exchangeDakuon__FUs11DAKUON_MODE(u16, s32);
     extern void fn_80166A28(u32);
     extern u8   lbl_80266DD8[];   /* array of 16-byte entries: [u32 id, u32 limit, ...] */
@@ -1988,18 +1988,18 @@ s32 selectLetter__FP14NAME_ENTRY_ARG(void* r3) {
         if (r27 < 0 || r27 >= list_count)
             return 0;
 
-        list_data = fn_800FA280((u32)list_obj);
+        list_data = GSmsgGetGSchar((u32)list_obj);
         looked_up = *(u16*)((u8*)list_data + (u32)r27 * 2);
         r31 = looked_up;
 
         /* if the looked-up ID is zero, use a hard-coded default */
         if ((u16)r31 == 0) {
-            void* def_ptr = fn_800FA280(0x2ef9u);
+            void* def_ptr = GSmsgGetGSchar(0x2ef9u);
             r31 = *(u16*)def_ptr;
         }
 
         /* compare against the "current" reference value */
-        current = *(u16*)fn_800FA280(0x2efcu);
+        current = *(u16*)GSmsgGetGSchar(0x2efcu);
         if ((u16)r31 == current)
             action = 0;
         else
@@ -2022,7 +2022,7 @@ s32 selectLetter__FP14NAME_ENTRY_ARG(void* r3) {
     case 0: {
         /* action 0: also used as the fall-through entry for case 6.
          * Load the default target ID then fall into the append logic. */
-        void* def_ptr = fn_800FA280(0x2ef9u);
+        void* def_ptr = GSmsgGetGSchar(0x2ef9u);
         r31 = *(u16*)def_ptr;
         /* FALL THROUGH */
     }
@@ -2166,7 +2166,7 @@ s32 menuNameEntryCursor(void* actor) {
     extern s32  selectLetter__FP14NAME_ENTRY_ARG(void* ctx);
     extern u16  exchangeDakuon__FUs11DAKUON_MODE(u16 value, s32 listIndex);
     extern s32  GSmsgGetLength(u32 list);
-    extern void* fn_800FA280(u32 list);
+    extern void* GSmsgGetGSchar(u32 list);
     extern u8 lbl_80266DD8[];  /* canonical; per-site reinterpret cast */
     extern u32 lbl_8047B920;  /* canonical; per-site reinterpret cast */
 
@@ -2244,7 +2244,7 @@ s32 menuNameEntryCursor(void* actor) {
                     continue;
                 }
                 count = GSmsgGetLength(list);
-                data  = (u16*)((u8*)fn_800FA280(list) + 2);  /* value half of key/value pairs */
+                data  = (u16*)((u8*)GSmsgGetGSchar(list) + 2);  /* value half of key/value pairs */
                 r4    = 1;
                 if (count > 1) {
                     ctr = count >> 1;
@@ -2534,14 +2534,14 @@ s32 inputName__FPUsPUsiii(u16 *existing_name, u8 *name_buf_in, void *arg2, void 
     s32  confirmed;           /* r30: 1 = player typed YES, 0 = NO/cancel        */
     u16 *scan;                /* r3/r24 reused: scan ptr through existing name    */
     s32  existing_len;        /* r25 reused: UTF-16 code-unit count               */
-    u16 *loaded;              /* r3 after fn_800FA280: resource name ptr          */
+    u16 *loaded;              /* r3 after GSmsgGetGSchar: resource name ptr          */
     s32  match_count;         /* r5: matched code units                           */
     s32  names_differ;        /* r0: 1 = names differ, 0 = same                  */
     u16 *name_to_use;         /* r31: pointer to the name we will commit          */
     s8   yn_result;           /* r24 reused: yes/no answer                        */
     s32  i;                   /* loop counter                                     */
 
-    extern void *fn_800FA280(u32 id);   /* resource lookup by ID                  */
+    extern void *GSmsgGetGSchar(u32 id);   /* resource lookup by ID                  */
 
     /* -----------------------------------------------------------------
      * Prologue: copy the caller's name into the local stack buffer,
@@ -2600,7 +2600,7 @@ s32 inputName__FPUsPUsiii(u16 *existing_name, u8 *name_buf_in, void *arg2, void 
             names_differ = 0;
         } else {
             /* Load the resource for ID 0x2ef9 (current box name data).   */
-            loaded      = (u16 *)fn_800FA280(0x2ef9);
+            loaded      = (u16 *)GSmsgGetGSchar(0x2ef9);
             match_count = 0;
 
             /* Compare up to existing_len code units.                     */
@@ -2708,7 +2708,7 @@ s32 menuNameEntrySelectDrawSelText3(void* r3, u8* r4) {
     ctx = *(void**)((u8*)r3 + 0x60);
     sub = *(void**)ctx;
     p = *(void**)((u8*)sub + 0x8);
-    msgctrlSetValue(0x37, fn_800FA280((u32)p));
+    msgctrlSetValue(0x37, GSmsgGetGSchar((u32)p));
     *(u32*)(r31 + 0x4c) = 0xcf;
     return 0;
 }
@@ -2731,7 +2731,7 @@ s32 menuNameEntrySelectDrawSelText2(void* r3, u8* r4) {
     ctx = *(void**)((u8*)r3 + 0x60);
     sub = *(void**)ctx;
     p = *(void**)((u8*)sub + 0x4);
-    msgctrlSetValue(0x37, fn_800FA280((u32)p));
+    msgctrlSetValue(0x37, GSmsgGetGSchar((u32)p));
     *(u32*)(r31 + 0x4c) = 0xcf;
     return 0;
 }
@@ -2754,7 +2754,7 @@ s32 menuNameEntrySelectDrawSelText1(void* r3, u8* r4) {
     ctx = *(void**)((u8*)r3 + 0x60);
     sub = *(void**)ctx;
     p = *(void**)sub;
-    msgctrlSetValue(0x37, fn_800FA280((u32)p));
+    msgctrlSetValue(0x37, GSmsgGetGSchar((u32)p));
     *(u32*)(r31 + 0x4c) = 0xcf;
     return 0;
 }
@@ -3199,7 +3199,7 @@ void menuNameEntry(void) {
     extern f32 lbl_8047B940;       /* 0.0f constant                  */
 
     /* --- callees (minimal real signatures inferred from each bl site) --- */
-    extern u32  fn_800FA280(u32 id);                       /* id -> resource ptr        */
+    extern u32  GSmsgGetGSchar(u32 id);                       /* id -> resource ptr        */
     extern u32  heroGetStatus(u8* ptr, u32 selector, u32 idx);
     extern u32  pokemonCheckValid(void);                         /* returns u8 status         */
     extern u32  pokemonBiosGetNicknamePtr(u32 a);
@@ -3266,10 +3266,10 @@ void menuNameEntry(void) {
     sel = 0;
     switch (mode) {
     case 0:
-        sel = fn_800FA280(*(u32*)(data + 0x0));
+        sel = GSmsgGetGSchar(*(u32*)(data + 0x0));
         break;
     case 1:
-        sel = fn_800FA280(*(u32*)(data + 0xc));
+        sel = GSmsgGetGSchar(*(u32*)(data + 0xc));
         break;
     case 2:
         r0 = (s32)heroGetStatus(0, 3, (u16)subIndex);
@@ -3380,7 +3380,7 @@ void menuNameEntry(void) {
                             continue;
                         }
                         {
-                            u32 choiceName = (u32)fn_800FA280((u32)listPtr[pick - 1]);
+                            u32 choiceName = (u32)GSmsgGetGSchar((u32)listPtr[pick - 1]);
                             s32 ans;
                             fn_80166A28(0x440);
                             msgctrlSetValue(0x4d, choiceName);

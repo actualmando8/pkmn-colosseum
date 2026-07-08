@@ -236,7 +236,7 @@ extern void winSpriteGetDisp();
 extern void fn_8001DACC();
 extern void fn_8010B9E8();
 extern void fightFloorGetStatus();
-extern void fn_800FA280();
+extern void GSmsgGetGSchar();
 extern void windowDrawSprite2();
 extern void fn_800D88DC();
 extern void fn_800D888C();
@@ -281,7 +281,7 @@ void fn_80011EA4(void) {
     extern void fn_800D7820();
     extern void fn_800D888C();
     extern void fn_800D88DC();
-    extern void fn_800FA280();
+    extern void GSmsgGetGSchar();
     extern void windowGetAllocPtr();
     extern void windowGetFreeWork();
     extern void windowDrawSprite2();
@@ -595,7 +595,7 @@ do {
     } while (0);
 
     if (r3 == 0) return;
-    fn_800FA280();
+    GSmsgGetGSchar();
     r4 = r3;
     r3 = 0x37;
     ((void(*)(void))msgctrlSetValue)();

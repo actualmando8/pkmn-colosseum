@@ -108,7 +108,7 @@ GSThread* GSthreadCreate(u32 affinity, u32 priority, u32 stackSize,
  *
  * @param maxSteps   Step count limit.
  *
- * Corresponds to fn_800F9670.
+ * Corresponds to GSresInit.
  */
 void GSthreadSetStepLimit(u32 maxSteps);
 

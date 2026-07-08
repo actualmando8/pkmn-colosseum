@@ -435,7 +435,7 @@ extern void GScharCpy(void);
 extern void fn_8010BBB8(void);
 extern void fn_8001D994(void);
 void pokemonToMenuPokemonStatus(void);
-extern void fn_800FA280(void);
+extern void GSmsgGetGSchar(void);
 extern void fn_8010C4D4(void);
 extern void fn_8010C46C(void);
 extern void fn_800E0C54(void);
@@ -474,7 +474,7 @@ extern void itemDataBiosGetItemSoubiDataId(void);
 void pokemonEvolutionCheck(void);
 extern u8 lbl_80408400[];
 extern void fn_8013528C(void);
-extern void fn_800F9D04(void);
+extern void GScharMakeFromSJIS(void);
 extern void gamedatasaveSetStatus(void);
 extern u8 lbl_8047D028[8];
 void savedataCreate(void);
@@ -1567,7 +1567,7 @@ u32 heroBiosGetRnd(u8* ptr) {
 }
 /* 0x80128E38 | 0x25C */
 extern void fn_8013528C(void);
-extern void fn_800F9D04(void);
+extern void GScharMakeFromSJIS(void);
 extern void gamedatasaveSetStatus(void);
 extern u8 lbl_8047D028[8];
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
@@ -2038,7 +2038,7 @@ void heroCreate(u8* ptr, u32 arg2, u8 arg3) {
     extern void heroInit(u8* ptr);
     extern u32 fn_800E0C54(void);
     extern void heroSetStatus(u8* ptr, u32 a, u32 b);
-    extern u32 fn_800FA280(u32 val);
+    extern u32 GSmsgGetGSchar(u32 val);
     u32 lo;
     u32 hi;
     heroInit(ptr);
@@ -2047,7 +2047,7 @@ void heroCreate(u8* ptr, u32 arg2, u8 arg3) {
     heroSetStatus(ptr, 2, hi | lo);
     heroSetStatus(ptr, 1, arg2);
     heroSetStatus(ptr, 0xb, arg3);
-    heroSetStatus(ptr, 0x17, fn_800FA280(0xfa2));
+    heroSetStatus(ptr, 0x17, GSmsgGetGSchar(0xfa2));
 }
 #endif
 /* 0x8012A248 | 0x208 */

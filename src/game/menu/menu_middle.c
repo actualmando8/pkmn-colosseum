@@ -46,8 +46,8 @@ extern void fn_800D888C();
 extern void fn_800D88DC();
 extern void fn_800E0C54();
 extern void _threadSwitch();
-extern void fn_800F9D04();
-extern void fn_800FA280();
+extern void GScharMakeFromSJIS();
+extern void GSmsgGetGSchar();
 extern void GSmsgGetRect();
 extern void fn_800FB680();
 extern void fn_800FE35C();
@@ -675,7 +675,7 @@ void fn_80069C0C(void* arg0) {
                 r0 = r5 - r0;
                 r0 = r0 << 1;
                 r3 = *(u16*)(r3 + r0);
-                ((void(*)(void))fn_800FA280)();
+                ((void(*)(void))GSmsgGetGSchar)();
                 r4 = (u32)sp + 0x8;
                 while (1) {
                     r0 = *(u16*)((u8*)r3 + 0x0);
@@ -3544,7 +3544,7 @@ void fn_8006C7D4(void) {
     ((void(*)(void))sprintf)();
     r3 = (u32)sp + 0x90;
     r4 = (u32)sp + 0x10;
-    ((void(*)(void))fn_800F9D04)();
+    ((void(*)(void))GScharMakeFromSJIS)();
     r4 = (u32)sp + 0x90;
     r3 = 0x37;
     msgctrlSetValue();
@@ -4366,7 +4366,7 @@ void fn_8006D550(void) {
     ((void(*)(void))sprintf)();
     r3 = (u32)sp + 0x90;
     r4 = (u32)sp + 0x10;
-    ((void(*)(void))fn_800F9D04)();
+    ((void(*)(void))GScharMakeFromSJIS)();
     r4 = (u32)sp + 0x90;
     r3 = 0x37;
     msgctrlSetValue();
@@ -5803,7 +5803,7 @@ void fn_8006E9A4(void) {
                     ((void(*)(void))sprintf)();
                     r3 = (u32)sp + 0x808;
                     r4 = (u32)sp + 0x288;
-                    ((void(*)(void))fn_800F9D04)();
+                    ((void(*)(void))GScharMakeFromSJIS)();
                     r4 = (u32)sp + 0x808;
                     r3 = 0x37;
                     msgctrlSetValue();
@@ -5822,7 +5822,7 @@ void fn_8006E9A4(void) {
                 ((void(*)(void))sprintf)();
                 r3 = (u32)sp + 0x708;
                 r4 = (u32)sp + 0x208;
-                ((void(*)(void))fn_800F9D04)();
+                ((void(*)(void))GScharMakeFromSJIS)();
                 r4 = (u32)sp + 0x708;
                 r3 = 0x37;
                 msgctrlSetValue();
@@ -5841,7 +5841,7 @@ void fn_8006E9A4(void) {
                 ((void(*)(void))sprintf)();
                 r3 = (u32)sp + 0x608;
                 r4 = (u32)sp + 0x188;
-                ((void(*)(void))fn_800F9D04)();
+                ((void(*)(void))GScharMakeFromSJIS)();
                 r4 = (u32)sp + 0x608;
                 r3 = 0x37;
                 msgctrlSetValue();
@@ -5876,7 +5876,7 @@ void fn_8006E9A4(void) {
             }
             r3 = (u32)sp + 0x508;
             r4 = (u32)sp + 0x108;
-            ((void(*)(void))fn_800F9D04)();
+            ((void(*)(void))GScharMakeFromSJIS)();
             r4 = (u32)sp + 0x508;
             r3 = 0x37;
             msgctrlSetValue();
@@ -5895,7 +5895,7 @@ void fn_8006E9A4(void) {
         ((void(*)(void))sprintf)();
         r3 = (u32)sp + 0x408;
         r4 = (u32)sp + 0x88;
-        ((void(*)(void))fn_800F9D04)();
+        ((void(*)(void))GScharMakeFromSJIS)();
         r4 = (u32)sp + 0x408;
         r3 = 0x37;
         msgctrlSetValue();
@@ -5930,7 +5930,7 @@ void fn_8006E9A4(void) {
     }
     r3 = (u32)sp + 0x308;
     r4 = (u32)sp + 0x8;
-    ((void(*)(void))fn_800F9D04)();
+    ((void(*)(void))GScharMakeFromSJIS)();
     r4 = (u32)sp + 0x308;
     r3 = 0x37;
     msgctrlSetValue();
@@ -7456,7 +7456,7 @@ void fn_80070428(void) {
     }
     r3 = *(u32*)((u8*)r31 + 0x4C);
     if (r3 == (u32)0x0) return;
-    ((void(*)(void))fn_800FA280)();
+    ((void(*)(void))GSmsgGetGSchar)();
     r0 = r3;
     r3 = 0x37;
     r4 = r0;

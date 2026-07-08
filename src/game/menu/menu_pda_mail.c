@@ -241,9 +241,9 @@ s32 fn_8004D590(PdaMailWindowA* window, PdaMailOutA* out)
 #endif
 
 /* mailGetSenderName (battle_waza.c): "Waza entry get field 0x0C by index".
- * fn_800FA280/msgctrlSetValue (gs_title.c): message/window callbacks. */
+ * GSmsgGetGSchar/msgctrlSetValue (gs_title.c): message/window callbacks. */
 extern u32 mailGetSenderName(s32 idx);
-extern void* fn_800FA280(u32);
+extern void* GSmsgGetGSchar(u32);
 extern void msgctrlSetValue(s32, void*);
 
 #if 0
@@ -251,7 +251,7 @@ asm s32 fn_8004D6F0(PdaMailWindowA* window, PdaMailOutA* out) {
 #include "src/game/menu/menu_pda_mail_fn_8004D6F0.inc"
 }
 #else
-/* WALL: W1 arg-shuffle register (target routes fn_800FA280's result
+/* WALL: W1 arg-shuffle register (target routes GSmsgGetGSchar's result
  * through r0 before moving to r4, ours keeps it in r3->r4 directly;
  * a plain and a volatile local both tried) + W2 epilogue-restore
  * order. 95.8% after 3 attempts. */
@@ -260,7 +260,7 @@ s32 fn_8004D6F0(PdaMailWindowA* window, PdaMailOutA* out)
 {
     u32 val = mailGetSenderName(pdaMailGetMailID(**window->field_0x60));
     if (val != 0) {
-        void* winPtr = fn_800FA280(val);
+        void* winPtr = GSmsgGetGSchar(val);
         msgctrlSetValue(0x37, winPtr);
         out->field_0x4c = 0xE7;
     } else {
@@ -286,7 +286,7 @@ s32 fn_8004D760(PdaMailWindowA* window, PdaMailOutA* out)
 {
     u32 val = mailGetSubject(pdaMailGetMailID(**window->field_0x60));
     if (val != 0) {
-        void* winPtr = fn_800FA280(val);
+        void* winPtr = GSmsgGetGSchar(val);
         msgctrlSetValue(0x37, winPtr);
         out->field_0x4c = 0xE7;
     } else {
@@ -389,8 +389,8 @@ s32 fn_8004BE90(u16* a, u16* b)
     s32 idA = *a;
     s32 idB = *b;
     s32 cmp;
-    void* msgA = fn_800FA280(mailGetSubject(idA));
-    void* msgB = fn_800FA280(mailGetSubject(idB));
+    void* msgA = GSmsgGetGSchar(mailGetSubject(idA));
+    void* msgB = GSmsgGetGSchar(mailGetSubject(idB));
     cmp = GScharCmp(msgA, msgB);
     if (cmp != 0) {
         return cmp;
@@ -411,8 +411,8 @@ s32 fn_8004BF20(u16* a, u16* b)
     s32 idA = *a;
     s32 idB = *b;
     s32 cmp;
-    void* msgA = fn_800FA280(mailGetSenderName(idA));
-    void* msgB = fn_800FA280(mailGetSenderName(idB));
+    void* msgA = GSmsgGetGSchar(mailGetSenderName(idA));
+    void* msgB = GSmsgGetGSchar(mailGetSenderName(idB));
     cmp = GScharCmp(msgA, msgB);
     if (cmp != 0) {
         return cmp;

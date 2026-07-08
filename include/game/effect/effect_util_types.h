@@ -395,7 +395,7 @@ extern void fightTrainerGetNamePtr(void);
 
 extern void fightOutPokemonGetNicknamePtr(void);
 
-extern void fn_800FA280(void);
+extern void GSmsgGetGSchar(void);
 
 extern u32 lbl_8047AE10;
 
@@ -667,7 +667,7 @@ extern void fn_80165A20(u16, u32, u32);
 
 extern void GSmsgAdjustAlign(void);
 
-extern void fn_800FA160(void);
+extern void GSmsgSetColor(void);
 
 extern void GSmsgInitRuby(void);
 

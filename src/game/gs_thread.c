@@ -536,12 +536,12 @@ extern void fn_800F8428();
 extern void fn_800F8654();
 extern void fn_800F8A54();
 extern u32 fn_800F92D4(u32 key);
-extern void fn_800F9670(u32 count);
+extern void GSresInit(u32 count);
 extern u8 * fn_800F96E4();
 extern u32 fn_800F9AEC(void* outbuf, u16* src, s32 mode);
-extern void fn_800F9D04(void);
+extern void GScharMakeFromSJIS(void);
 extern u8* GScharCpy(u8* dst, u8* src);
-extern void fn_800FA160(void* obj);
+extern void GSmsgSetColor(void* obj);
 extern s32 GSmsgGetRect();
 extern void GSmsgInitRuby();
 extern s32 fn_800FAEF8();
@@ -564,7 +564,7 @@ extern s32 _msgGetLength__FPCUs(const void* str);
 extern s32 _msgGetSize__FPCUs();
 extern void fn_800FE35C(void);
 extern void fn_800FE38C(s32 x1, s32 y1, s32 x2, s32 y2);
-extern void fn_800FE4D4(void);
+extern void spriteSetEnv(void);
 extern void fn_800FE6A0(f32 a, f32 b);
 extern void fn_800FE6AC(s16* outA, s16* outB);
 extern void fn_800FE6D0(s32 a, s32 b);
@@ -1242,12 +1242,12 @@ void* GSresAllocResourceAlign(u32 align, u32 size, u32 key1, u32 key2, u32 val) 
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800F9544(void) {
+asm void GSresAllocResource(void) {
 #include "src/game/gs_thread_fn_800F9544.inc"
 }
 #else
 #pragma optimization_level 2
-void* fn_800F9544(u32 size, u32 key1, u32 key2, u32 val) {
+void* GSresAllocResource(u32 size, u32 key1, u32 key2, u32 val) {
     u8* arr;
     u8* p;
     u8* slot;
@@ -1286,12 +1286,12 @@ void* fn_800F9544(u32 size, u32 key1, u32 key2, u32 val) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800F9670(void) {
+asm void GSresInit(void) {
 #include "src/game/gs_thread_fn_800F9670.inc"
 }
 #else
 #pragma optimization_level 2
-void fn_800F9670(u32 count) {
+void GSresInit(u32 count) {
     u16 handle;
     u32 off;
     u32 i;
@@ -1697,12 +1697,12 @@ u32 fn_800F9C04(void* outbuf, u8* src, u32 count, u32 mode) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800F9D04(void) {
+asm void GScharMakeFromSJIS(void) {
 #include "src/game/gs_thread_fn_800F9D04.inc"
 }
 #else
 #pragma optimization_level 2
-void fn_800F9D04(void) {
+void GScharMakeFromSJIS(void) {
     fn_80080ED8();
 }
 #endif
@@ -1900,13 +1900,13 @@ void fn_800FA064(void* obj) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800FA160(void) {
+asm void GSmsgSetColor(void) {
 #include "src/game/gs_thread_fn_800FA160.inc"
 }
 #else
 #pragma optimization_level 2
 #pragma peephole off
-void fn_800FA160(void* obj) {
+void GSmsgSetColor(void* obj) {
     u8 clr[8];
     u32 init = lbl_8047CD04;
     u32 color = *(u32*)((u8*)obj + 0x24);
@@ -1976,12 +1976,12 @@ void GSmsgSetFontInfo(void* obj) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800FA280(void) {
+asm void GSmsgGetGSchar(void) {
 #include "src/game/gs_thread_fn_800FA280.inc"
 }
 #else
 #pragma optimization_level 2
-void* fn_800FA280(u32 key) {
+void* GSmsgGetGSchar(u32 key) {
     u8* head;
     u16 group;
     u32 sub;
@@ -4071,12 +4071,12 @@ void fn_800FE38C(s32 x1, s32 y1, s32 x2, s32 y2) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800FE4D4(void) {
+asm void spriteSetEnv(void) {
 #include "src/game/gs_thread_fn_800FE4D4.inc"
 }
 #else
 #pragma optimization_level 2
-void fn_800FE4D4(void) {
+void spriteSetEnv(void) {
     f32 v0[3];
     f32 v1[3];
     f32 v2[3];

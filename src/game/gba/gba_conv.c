@@ -46,7 +46,7 @@ extern void GSmodelSetAnimIndex();
 extern void _threadSwitch();
 extern void fn_800F92D4();
 extern void fn_800F9AEC();
-extern void fn_800FA280();
+extern void GSmsgGetGSchar();
 extern void fn_800FF56C();
 extern void fn_800FF660();
 extern void fn_800FF730();
@@ -343,7 +343,7 @@ void fn_80083D30(void) {
             if (r26 != 0) {
                 r3 = r26;
                 ((void(*)(void))wazaDataBiosGetDoc)();
-                ((void(*)(void))fn_800FA280)();
+                ((void(*)(void))GSmsgGetGSchar)();
                 r4 = 0x0;
                 r26 = r3;
                 r3 = (u32)sp + 0xac;
@@ -446,7 +446,7 @@ void fn_80083ECC(void) {
     if (r30 == 0) { r3 = 0x0; return; }
     r3 = r30;
     ((void(*)(void))wazaDataBiosGetDoc)();
-    ((void(*)(void))fn_800FA280)();
+    ((void(*)(void))GSmsgGetGSchar)();
     r4 = 0x0;
     r30 = r3;
     r3 = (u32)sp + 0xac;

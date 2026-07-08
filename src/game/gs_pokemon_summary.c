@@ -199,7 +199,7 @@ extern void cursorBiosSetPos(u32, u16*);
 extern void fn_800FE38C(s32, s32, s32, s32);
 extern void fn_800FE35C(void);
 extern void fn_800FE6D0(s32, s32);
-extern void fn_800FE4D4(void);
+extern void spriteSetEnv(void);
 extern void windowDrawSprite2(s32, s32, s32, s32, u32, s32, s32, s32);
 extern void winSeqSetMenu(s32, s32);
 extern void fn_80166A50(s32, s32, s32, s32);
@@ -1283,7 +1283,7 @@ s32 fn_80016ABC(u8* ctx, u8* item) {
     SUMMARY_ITEM_U8(item, 0x67) = (u8)alpha;
     fn_800FE6D0((s16)(SUMMARY_ITEM_S16(ctx, 0x84) + SUMMARY_ITEM_S16(item, 0x50)),
                 (s16)(SUMMARY_ITEM_S16(ctx, 0x86) + SUMMARY_ITEM_S16(item, 0x52)));
-    fn_800FE4D4();
+    spriteSetEnv();
 
     step = SUMMARY_F32(lbl_8047B774) /
            (SUMMARY_F32(lbl_8047B774) *

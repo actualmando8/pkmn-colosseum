@@ -548,7 +548,7 @@ void fn_80211E18(u32 r3,u32 r4)
     extern u32 _DAT_80279e94;
     extern u32 _DAT_80375e24;
     extern u32 _DAT_80375e44;
-    extern u32 fn_800FA280();
+    extern u32 GSmsgGetGSchar();
     extern void heroItemDecItemDataId();
     extern void msgctrlSetValue();
     extern s8 itemParamGetHPUp();
@@ -792,45 +792,45 @@ void fn_80211E18(u32 r3,u32 r4)
                       uVar11 = itemParamGetSpAttackUp(uVar8);
                       uVar11 = uVar11 & 0xff;
                       if (uVar11 != 0) {
-                        uVar3 = fn_800FA280(_DAT_80279e8c);
+                        uVar3 = GSmsgGetGSchar(_DAT_80279e8c);
                         msgctrlSetValue(0xd,uVar3);
                         DAT_8038ff76 = 4;
                       }
                     }
                     else {
-                      uVar3 = fn_800FA280(_DAT_80279e94);
+                      uVar3 = GSmsgGetGSchar(_DAT_80279e94);
                       msgctrlSetValue(0xd,uVar3);
                       DAT_8038ff76 = 6;
                     }
                   }
                   else {
-                    uVar3 = fn_800FA280(_DAT_80279e88);
+                    uVar3 = GSmsgGetGSchar(_DAT_80279e88);
                     msgctrlSetValue(0xd,uVar3);
                     DAT_8038ff76 = 3;
                   }
                 }
                 else {
-                  uVar3 = fn_800FA280(_DAT_80279e84);
+                  uVar3 = GSmsgGetGSchar(_DAT_80279e84);
                   msgctrlSetValue(0xd,uVar3);
                   DAT_8038ff76 = 2;
                 }
               }
               else {
-                uVar3 = fn_800FA280(_DAT_80279e80);
+                uVar3 = GSmsgGetGSchar(_DAT_80279e80);
                 msgctrlSetValue(0xd,uVar3);
                 DAT_8038ff76 = 1;
               }
               if ((uVar11 == 1) || (uVar11 == 0xffff)) {
-                uVar3 = fn_800FA280(0x76bd);
+                uVar3 = GSmsgGetGSchar(0x76bd);
                 msgctrlSetValue(0xe,uVar3);
                 DAT_8038fffc = (DAT_8038ff76 & 0xf) + 0xe;
               }
               else {
-                uVar3 = fn_800FA280(0x7626);
+                uVar3 = GSmsgGetGSchar(0x7626);
                 msgctrlSetValue(0xe,uVar3);
                 DAT_8038fffc = (DAT_8038ff76 & 0xf) + 0x26;
               }
-              uVar3 = fn_800FA280(0x7627);
+              uVar3 = GSmsgGetGSchar(0x7627);
               msgctrlSetValue(0x41,uVar3);
             }
             uVar14 = *(u32 *)(&DAT_80375e24 + uVar15 * 4);
@@ -846,7 +846,7 @@ void fn_80211E18(u32 r3,u32 r4)
     uVar3 = fightTrainerGetNamePtr(uVar5);
     msgctrlSetValue(0x13,uVar3);
     itemGetStatus(0,r4 & 0xffff,1,0);
-    uVar3 = fn_800FA280();
+    uVar3 = GSmsgGetGSchar();
     msgctrlSetValue(0x29,uVar3);
     fn_801EF8F4(1);
     if (cVar12 == 0) {

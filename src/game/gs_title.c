@@ -168,7 +168,7 @@
  *     menuItemBiosGetPtr / menuDataBiosGetPtr -- linked-list/menu accessors
  *     fn_800D3088 / fn_800D37CC -- frame timing (returns u32/s32 ticks)
  *     fn_800E0CA0 / GSlerpGetLinearInterpolationVector -- vec3 transform helpers
- *     fn_800FA280 / msgctrlSetValue -- message/window callbacks
+ *     GSmsgGetGSchar / msgctrlSetValue -- message/window callbacks
  *     winMsgOpen / winMsgClose -- text print + wait
  *     fn_801902E0 -- config flag check (returns u8)
  *     fn_80165A20 / soundStop -- audio sequence control
@@ -379,7 +379,7 @@ void fn_80024698(void) { }
 #endif
 
 /* 0x8002469C | 0x30 */
-extern void* fn_800FA280(u32);
+extern void* GSmsgGetGSchar(u32);
 extern void msgctrlSetValue(s32, void*);
 #if 0
 asm void fn_8002469C(void) {
@@ -389,7 +389,7 @@ asm void fn_8002469C(void) {
 #pragma optimization_level 4
 #pragma scheduling off
 void fn_8002469C(void) {
-    msgctrlSetValue(0x37, fn_800FA280(0x3cdf));
+    msgctrlSetValue(0x37, GSmsgGetGSchar(0x3cdf));
 }
 #endif
 
@@ -402,7 +402,7 @@ asm void fn_800246CC(void) {
 #pragma optimization_level 4
 #pragma scheduling off
 void fn_800246CC(void) {
-    msgctrlSetValue(0x37, fn_800FA280(0x3ce4));
+    msgctrlSetValue(0x37, GSmsgGetGSchar(0x3ce4));
 }
 #endif
 
@@ -466,7 +466,7 @@ void fn_800246FC(u8* arg0, u8* arg1) {
     extern u8* menuItemBiosGetPtr(s32);
     extern u8* menuDataBiosGetPtr(u32);
     extern u32 fn_801902E0(void*);
-    extern void* fn_800FA280(u32);
+    extern void* GSmsgGetGSchar(u32);
     extern void msgctrlSetValue(s32, void*);
     u8* node;
     u8* found;
@@ -586,7 +586,7 @@ void fn_800246FC(u8* arg0, u8* arg1) {
                 }
                 msgctrlSetValue(
                     0x37,
-                    fn_800FA280(
+                    GSmsgGetGSchar(
                         *(u32*)(lbl_80478DE4 + slot_offset + (((u32)lbl_802E4F58[table_index]) << 2) + 4)
                     )
                 );
@@ -597,7 +597,7 @@ void fn_800246FC(u8* arg0, u8* arg1) {
         slot++;
     }
 
-    msgctrlSetValue(0x37, fn_800FA280(1));
+    msgctrlSetValue(0x37, GSmsgGetGSchar(1));
 }
 #pragma pop
 #endif

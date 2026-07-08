@@ -497,7 +497,7 @@ void msgctrlSideAttackNameha(void) {
 #pragma push
 #pragma optimization_level 1
 void _msgctrlSideName__FP15FightOutPokemonUc(u32 arg1, u32 arg2) {
-    extern void fn_800FA280();
+    extern void GSmsgGetGSchar();
     extern void msgctrlSetValue();
     extern void fightTargetIsHostSide();
     extern void fightTargetGetPtrAsNowFightType();
@@ -590,31 +590,31 @@ void _msgctrlSideName__FP15FightOutPokemonUc(u32 arg1, u32 arg2) {
             r0 = r31 & 0xFF;
             if (r0 == (u32)0x0) {
                 r3 = 0x7722;
-                fn_800FA280();
+                GSmsgGetGSchar();
                 return;
             }
             if (r0 == (u32)0x1) {
                 r3 = 0x7725;
-                fn_800FA280();
+                GSmsgGetGSchar();
                 return;
             }
             r3 = 0x7727;
-            fn_800FA280();
+            GSmsgGetGSchar();
             return;
         }
         r0 = r31 & 0xFF;
         if (r0 == (u32)0x0) {
             r3 = 0x7724;
-            fn_800FA280();
+            GSmsgGetGSchar();
             return;
         }
         if (r0 == (u32)0x1) {
             r3 = 0x7726;
-            fn_800FA280();
+            GSmsgGetGSchar();
             return;
         }
         r3 = 0x7728;
-        fn_800FA280();
+        GSmsgGetGSchar();
         return;
     }
     r3 = r24;
@@ -625,31 +625,31 @@ void _msgctrlSideName__FP15FightOutPokemonUc(u32 arg1, u32 arg2) {
         r0 = r31 & 0xFF;
         if (r0 == (u32)0x0) {
             r3 = 0x768a;
-            fn_800FA280();
+            GSmsgGetGSchar();
             return;
         }
         if (r0 == (u32)0x1) {
             r3 = 0x768c;
-            fn_800FA280();
+            GSmsgGetGSchar();
             return;
         }
         r3 = 0x7688;
-        fn_800FA280();
+        GSmsgGetGSchar();
         return;
     }
     r0 = r31 & 0xFF;
     if (r0 == (u32)0x0) {
         r3 = 0x7689;
-        fn_800FA280();
+        GSmsgGetGSchar();
         return;
     }
     if (r0 == (u32)0x1) {
         r3 = 0x768b;
-        fn_800FA280();
+        GSmsgGetGSchar();
         return;
     }
     r3 = 0x7687;
-    fn_800FA280();
+    GSmsgGetGSchar();
 
     return;
 }
@@ -673,7 +673,7 @@ void msgctrlClientnowork(void) {
     extern u32 fightTrainerGetNamePtr(u32);
     extern u32 fightOutPokemonGetNicknamePtr(u32);
     extern void msgctrlSetValue(u32, u32);
-    extern void fn_800FA280(u32);
+    extern void GSmsgGetGSchar(u32);
     int new_var;
     u32 result;
     u32 val = lbl_8047AE10;
@@ -682,7 +682,7 @@ void msgctrlClientnowork(void) {
     if (((u8)(new_var, fn_801F18DC(0)) == 1) && result != 0) {
         msgctrlSetValue(0x4D, fightTrainerGetNamePtr(result));
         msgctrlSetValue(0x57, fightOutPokemonGetNicknamePtr(val));
-        fn_800FA280(0x7721);
+        GSmsgGetGSchar(0x7721);
     } else {
         fightOutPokemonGetNicknamePtr(val);
     }
@@ -753,7 +753,7 @@ void msgctrlTsuikaMons(void) {
     extern u32 fightTrainerGetNamePtr(u32);
     extern u32 fightOutPokemonGetNicknamePtr(u32);
     extern void msgctrlSetValue(u32, u32);
-    extern void fn_800FA280(u32);
+    extern void GSmsgGetGSchar(u32);
     u32 result;
     u32 new_var;
     u32 val = lbl_8047ADE0;
@@ -762,7 +762,7 @@ void msgctrlTsuikaMons(void) {
     if (((u8)fn_801F18DC(0) == 1) && result != 0) {
         msgctrlSetValue(0x4D, fightTrainerGetNamePtr(result));
         msgctrlSetValue(0x57, fightOutPokemonGetNicknamePtr(new_var));
-        do { fn_800FA280(0x7721); } while (0);
+        do { GSmsgGetGSchar(0x7721); } while (0);
     } else {
         fightOutPokemonGetNicknamePtr(val);
     }
@@ -789,7 +789,7 @@ void msgctrlClientMos(void) {
     extern u32 fightTrainerGetNamePtr(u32);
     extern u32 fightOutPokemonGetNicknamePtr(u32);
     extern void msgctrlSetValue(u32, u32);
-    extern void fn_800FA280(u32);
+    extern void GSmsgGetGSchar(u32);
     u32 result;
     u32 val = lbl_8047ADDC;
     u32 new_var;
@@ -798,7 +798,7 @@ void msgctrlClientMos(void) {
     if (((u8)fn_801F18DC(0) == 1) && result != 0) {
         msgctrlSetValue(0x4D, fightTrainerGetNamePtr(result));
         msgctrlSetValue(0x57, fightOutPokemonGetNicknamePtr(new_var));
-        fn_800FA280(0x7721);
+        GSmsgGetGSchar(0x7721);
     } else {
         fightOutPokemonGetNicknamePtr(val);
     }
@@ -825,7 +825,7 @@ void msgctrlDeffenceMons(void) {
     extern u32 fightTrainerGetNamePtr(u32);
     extern u32 fightOutPokemonGetNicknamePtr(u32);
     extern void msgctrlSetValue(u32, u32);
-    extern void fn_800FA280(u32);
+    extern void GSmsgGetGSchar(u32);
     u32 result;
     u32 val = lbl_8047ADD8;
     u32 new_var;
@@ -834,7 +834,7 @@ void msgctrlDeffenceMons(void) {
     if (((u8)fn_801F18DC(0) == 1) && result != 0) {
         msgctrlSetValue(0x4D, fightTrainerGetNamePtr(result));
         msgctrlSetValue(0x57, fightOutPokemonGetNicknamePtr(new_var));
-        fn_800FA280(0x7721);
+        GSmsgGetGSchar(0x7721);
     } else {
         fightOutPokemonGetNicknamePtr(val);
     }
@@ -861,7 +861,7 @@ void msgctrlAttackMons(void) {
     extern u32 fightTrainerGetNamePtr(u32);
     extern u32 fightOutPokemonGetNicknamePtr(u32);
     extern void msgctrlSetValue(u32, u32);
-    extern void fn_800FA280(u32);
+    extern void GSmsgGetGSchar(u32);
     u32 result;
     u32 new_var;
     u32 val = lbl_8047ADD4;
@@ -870,7 +870,7 @@ void msgctrlAttackMons(void) {
     if (((u8)fn_801F18DC(0) == 1) && result != 0) {
         msgctrlSetValue(0x4D, fightTrainerGetNamePtr(result));
         msgctrlSetValue(0x57, fightOutPokemonGetNicknamePtr(new_var));
-        fn_800FA280(0x7721);
+        GSmsgGetGSchar(0x7721);
     } else {
         fightOutPokemonGetNicknamePtr(new_var);
     }
@@ -1063,7 +1063,7 @@ doneIncrement:
 void msgctrlPalette(EffectUtilCommandObj* obj) {
     extern u32* lbl_80478E88;
     extern u32 lbl_80478E8C;
-    extern void fn_800FA160(void*);
+    extern void GSmsgSetColor(void*);
     u8* stream;
     u8 idx;
     u8* colorPtr;
@@ -1081,7 +1081,7 @@ void msgctrlPalette(EffectUtilCommandObj* obj) {
                          ((u32)colorPtr[1] << 16) |
                          ((u32)colorPtr[2] << 8) |
                          (u32)colorPtr[3];
-        fn_800FA160(obj);
+        GSmsgSetColor(obj);
     }
     /* Advance stream pointer */
     obj->stream = obj->stream + 1;
@@ -1097,12 +1097,12 @@ asm void msgctrlColor(void) {
 #pragma peephole off
 #pragma scheduling on
 s32 msgctrlColor(EffectUtilCommandObj* obj) {
-    extern void fn_800FA160(void*);
+    extern void GSmsgSetColor(void*);
     u8* stream;
     if (obj->activeFlag != 0) {
         stream = obj->stream;
         obj->colorRgba = *(u32*)stream;
-        fn_800FA160(obj);
+        GSmsgSetColor(obj);
     }
     stream = obj->stream;
     obj->stream = stream + 4;

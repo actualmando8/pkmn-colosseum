@@ -1974,7 +1974,7 @@ void menuSubOpenSelect(void) {
 extern u32 pokemonBiosGetPokemonDataId();
 extern u32 pokemonDataBiosGetPtr();
 extern void pokemonDataBiosGetName(void);
-extern u32 fn_800FA280();
+extern u32 GSmsgGetGSchar();
 extern void fn_800F9EE4(void);
 extern void pokemonGetSex(void);
 #if 0
@@ -1984,7 +1984,7 @@ asm void fn_8001D994(void) {
 #else
 void fn_8001D994(void) {
     extern void fn_800F9EE4();
-    extern u32 fn_800FA280();
+    extern u32 GSmsgGetGSchar();
     extern void pokemonDataBiosGetName();
     extern u32 pokemonDataBiosGetPtr();
     extern u32 pokemonBiosGetPokemonDataId();
@@ -2023,7 +2023,7 @@ void fn_8001D994(void) {
         pokemonDataBiosGetPtr();
         if (r3 == 0) break;
         pokemonDataBiosGetName();
-        fn_800FA280();
+        GSmsgGetGSchar();
         tmp = r3;
         r3 = r30;
         r31 = tmp;
@@ -5801,7 +5801,7 @@ extern void windowDrawSprite2();
 extern u32 pokemonDataBiosGetPtr();
 extern void fn_8001DACC();
 extern u32 GSmsgGetRect(u32 a);
-extern u32 fn_800FA280();
+extern u32 GSmsgGetGSchar();
 extern u32 lbl_8047A308;
 extern u32 lbl_8047B7B8;
 extern u32 lbl_8047B7B0;
@@ -5991,7 +5991,7 @@ void menuPokemonDrawItem(u8* ctx, u8* pane) {
             msg = 0;
         }
         if (msg != 0) {
-            msgctrlSetValue(0x37, fn_800FA280(msg));
+            msgctrlSetValue(0x37, GSmsgGetGSchar(msg));
             fn_800FB680(x - 2, 0, color, 0xCF);
         }
         break;

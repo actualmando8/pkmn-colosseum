@@ -1534,11 +1534,11 @@ u32 fightMenuYesNo(void)
 u32 fightMenuWazaKoukaMsg(u32 msgId, u32 unused, u32 itemId)
 {
     extern u32 itemGetStatus(u32, u32, u32, u32);
-    extern u32 fn_800FA280(u32);
+    extern u32 GSmsgGetGSchar(u32);
     u32 itemName;
 
     msgctrlSetValue(0x10);
-    itemName = fn_800FA280(itemGetStatus(0, itemId, 1, 0));
+    itemName = GSmsgGetGSchar(itemGetStatus(0, itemId, 1, 0));
     msgctrlSetValue(0x29, itemName);
     if (msgId != 0) {
         winMsgOpenFight(msgId, 1, 1);
@@ -1551,14 +1551,14 @@ u32 fightMenuWazaKoukaMsg(u32 msgId, u32 unused, u32 itemId)
 u32 fightMenuWazaOutMsg(u32 msgId, u32 pokemon)
 {
     extern u32 wazaGetStatus(u32, u32, u32, u32);
-    extern u32 fn_800FA280(u32);
+    extern u32 GSmsgGetGSchar(u32);
     u32 name;
 
     msgctrlSetValue(0xf, msgId);
-    name = fn_800FA280(wazaGetStatus(0, pokemon, 0xa, 0));
+    name = GSmsgGetGSchar(wazaGetStatus(0, pokemon, 0xa, 0));
     msgctrlSetValue(0xd, name);
-    msgctrlSetValue(0x28, fn_800FA280(wazaGetStatus(0, pokemon, 1, 0)));
-    msgctrlSetValue(0xe, fn_800FA280(wazaGetStatus(0, pokemon, 0xb, 0)));
+    msgctrlSetValue(0x28, GSmsgGetGSchar(wazaGetStatus(0, pokemon, 1, 0)));
+    msgctrlSetValue(0xe, GSmsgGetGSchar(wazaGetStatus(0, pokemon, 0xb, 0)));
     winMsgOpenFight(0x768d, 1, 1);
     return 1;
 }
@@ -2719,7 +2719,7 @@ u32 _fightMenuFightTrainerGcHeroOpenMenuSubWaza__FP13FIGHT_TRAINERP15FightOutPok
         if (cVar9 != '\0') {
           msgctrlSetValue(0x11,r4);
           wazaGetStatus(0,uVar7,1,0);
-          uVar2 = fn_800FA280();
+          uVar2 = GSmsgGetGSchar();
           msgctrlSetValue(0x28,uVar2);
           uVar7 = fightOutPokemonGetSoubiItemDataId(r4);
           fightFloorSetStatus(0,0,0x56,0,uVar7);
@@ -2729,7 +2729,7 @@ u32 _fightMenuFightTrainerGcHeroOpenMenuSubWaza__FP13FIGHT_TRAINERP15FightOutPok
         }
         else if (cVar9 == '\x05') {
           wazaGetStatus(0,local_70[0],1,0);
-          uVar2 = fn_800FA280();
+          uVar2 = GSmsgGetGSchar();
           msgctrlSetValue(0x28,uVar2);
           saved_r27 = 0x76bb;
         }

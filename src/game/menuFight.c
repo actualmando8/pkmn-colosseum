@@ -1994,7 +1994,7 @@ u16 arg;
     extern u32 fightOutPokemonCheckCanOutOkWazaBanme(void*, u16, s32, void*);
     extern u32 pokemonGetStatus();
     extern u32 wazaGetStatus();
-    extern u32 fn_800FA280(void);
+    extern u32 GSmsgGetGSchar(void);
     extern u32 fightOutPokemonGetSoubiItemDataId(void*);
     u16 stackValue;
     u8* obj;
@@ -2011,7 +2011,7 @@ u16 arg;
     if ((u8)state != 0) {
         msgctrlSetValue(0x11, (s32)obj);
         msg = wazaGetStatus(0, (u16)result, 1, 0);
-        msgctrlSetValue(0x28, fn_800FA280());
+        msgctrlSetValue(0x28, GSmsgGetGSchar());
         fightFloorSetStatus(0, 0, 0x56, 0, (u16)fightOutPokemonGetSoubiItemDataId(obj));
     }
     switch ((u8)state) {
@@ -2020,7 +2020,7 @@ u16 arg;
         break;
     case 5:
         wazaGetStatus(0, stackValue, 1, 0);
-        msgctrlSetValue(0x28, fn_800FA280());
+        msgctrlSetValue(0x28, GSmsgGetGSchar());
         msg = 0x76BB;
         break;
     case 4:
