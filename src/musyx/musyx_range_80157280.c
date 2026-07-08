@@ -560,7 +560,7 @@ void* sndBSearch(u8* key, u8* base, s32 count, u32 size, PeopleCmpFn cmp) {
 #pragma pop
 extern u32  OSEnableInterrupts(void);
 extern u32  OSGetTick(void);
-extern void fn_80098034(void);
+extern void PPCSync(void);
 extern void AIStartDMA(void);
 extern void AIStopDMA(void);
 extern u32  fn_800AE794(void);
@@ -2318,7 +2318,7 @@ void salCtrlDsp(u32 arg) {
     fn_8015B250(arg, salGetStartDelay());
     arg = lbl_8047B010;
     lbl_8047B098 = 0;
-    fn_80098034();
+    PPCSync();
     DSPSendMailToDSP((u32)lbl_8047B00C | 0xBABE0000);
     while (fn_800AE794() != 0) {}
     DSPSendMailToDSP(arg);

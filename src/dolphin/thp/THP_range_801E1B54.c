@@ -2756,10 +2756,8 @@ BOOL THPInit(void)
     return TRUE;
 }
 
-/* symbols.txt has no name for this address yet (still "fn_801ECAB0"); kept
- * as-is here since this unit may not rename symbols.txt. This is the
- * reference SDK's THPAudioDecode. */
-u32 fn_801ECAB0(s16 *audioBuffer, u8 *audioFrame, s32 flag)
+/* Reference SDK's THPAudioDecode. */
+u32 THPAudioDecode(s16 *audioBuffer, u8 *audioFrame, s32 flag)
 {
     THPAudioRecordHeader *header;
     THPAudioDecodeInfo decInfo;
