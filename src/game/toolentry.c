@@ -491,7 +491,7 @@ u32 toolentryGetTrainerSamllFaceResID(void* ctx, u32 param1, u32 param2) {
     extern u32 lbl_80478E04;
     extern void* fn_8006B09C(void*);
     extern u32 fn_801FCBA4(void);
-    extern void fn_801FCCC4(u32);
+    extern void fightTrainerDataBiosGetPtr(u32);
     u32 id;
     u32 base;
     u32 offset;
@@ -502,7 +502,7 @@ u32 toolentryGetTrainerSamllFaceResID(void* ctx, u32 param1, u32 param2) {
     if (id == 0) {
         return 0;
     }
-    fn_801FCCC4(id);
+    fightTrainerDataBiosGetPtr(id);
     offset = fn_801FCBA4();
     offset *= 0x14;
     base = lbl_80478E04;
@@ -526,7 +526,7 @@ u32 toolentryGetTrainerBicFaceResID(void* ctx, u32 param1, u32 param2) {
     extern u32 lbl_80478E04;
     extern void* fn_8006B09C(void*);
     extern u32 fn_801FCBA4(void);
-    extern void fn_801FCCC4(u32);
+    extern void fightTrainerDataBiosGetPtr(u32);
     u16 id16;
     u32 id;
     u32 base;
@@ -543,7 +543,7 @@ u32 toolentryGetTrainerBicFaceResID(void* ctx, u32 param1, u32 param2) {
     if (id == 0) {
         return 0;
     }
-    fn_801FCCC4(id);
+    fightTrainerDataBiosGetPtr(id);
     offset = fn_801FCBA4();
     offset *= 0x14;
     base = lbl_80478E04;

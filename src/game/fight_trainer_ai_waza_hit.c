@@ -2194,7 +2194,7 @@ s32 fightTrainerAiWazaHit121(void* ctx, u32 param1, u32 param2, u32 param3) {
 
 /* Address: 0x80256ED0 | Size: 0x200 (512 bytes) */
 void fightTrainerAiWazaHit120(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_802016A4();
+    extern void fightOutPokemonGetSex();
     extern void fn_80236BFC();
     extern void fn_80237288();
     extern void fn_80237F74();
@@ -2218,10 +2218,10 @@ void fightTrainerAiWazaHit120(void* ctx, u32 param1, u32 param2, u32 param3) {
     r29 = r5;
     r28 = r6;
     r3 = r26;
-    fn_802016A4();
+    fightOutPokemonGetSex();
     r30 = r3;
     r3 = r28;
-    fn_802016A4();
+    fightOutPokemonGetSex();
     r31 = r3;
     r3 = r27;
     r4 = r26;

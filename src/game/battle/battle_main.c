@@ -108,9 +108,9 @@ extern s32 fn_801F54A4(s32 a, s32 b, s32 c, s32 d); /* check/setup sound */
 /* Battle poké-slot helpers */
 extern void* fn_801F47B4(s32 a, u16 b);                    /* get battle slot ptr */
 extern void* fn_801F7258(void* a, u16 b);                  /* get slot member ptr */
-extern void* fn_801FB1C0(void* a, s32 b, s32 c, s32 d);   /* get checked handle */
+extern void* fightTrainerGetStatus(void* a, s32 b, s32 c, s32 d);   /* get checked handle */
 extern void  fn_801DA4E8(void* a, void* b);                /* dispatch event */
-extern void* fn_801F981C(void* a, u16 b);                  /* get item ptr */
+extern void* fightTrainerGetValidFightOutPokemonPtr(void* a, u16 b);                  /* get item ptr */
 extern void* pokemonGetStatus(void* a, s32 b, s32 c, s32 d);   /* check item handle */
 
 /* =========================================================================
@@ -441,12 +441,12 @@ void fn_801EF7C4(void* arg) {
             r25 = fn_801F7258(r31, r30);
             if (r25 == 0) continue;
 
-            _h = fn_801FB1C0(r25, 0, 0x4c, 0);
+            _h = fightTrainerGetStatus(r25, 0, 0x4c, 0);
             if (_h == 0) continue;
             fn_801DA4E8(_h, arg);
 
             for (r29 = 0; (u16)r29 < r26; r29++) {
-                _h = fn_801F981C(r25, r29);
+                _h = fightTrainerGetValidFightOutPokemonPtr(r25, r29);
                 if (_h == 0) continue;
                 _h = pokemonGetStatus(_h, 0, 0xee, 0);
                 if (_h == 0) continue;

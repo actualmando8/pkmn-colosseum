@@ -264,7 +264,7 @@ void fn_80069C0C(void* arg0) {
     extern void heroBiosGetPokemonPtr();
     extern void heroBiosCopy();
     extern void __assert();
-    extern void fn_801F9CBC();
+    extern void fightTrainerCreateFightTrainerDataIdToHero();
     extern void fightEncountDataBiosSetSyoukaiWzxDataId();
     extern void fightEncountDataBiosSetBgmSndId();
     extern void fightEncountDataBiosSetGSInputDevice();
@@ -693,7 +693,7 @@ void fn_80069C0C(void* arg0) {
                 r4 = r3;
                 r3 = r28;
                 r5 = (u32)sp + 0x88;
-                fn_801F9CBC();
+                fightTrainerCreateFightTrainerDataIdToHero();
                 r3 = (u32)sp + 0x88;
                 r4 = (u32)sp + 0x8;
                 heroBiosSetNamePtr();
@@ -1215,7 +1215,7 @@ void fn_8006AABC(void) {
     extern void heroBiosGetPokemonPtr();
     extern void heroBiosCopy();
     extern void __assert();
-    extern void fn_801F9CBC();
+    extern void fightTrainerCreateFightTrainerDataIdToHero();
     u8 sp[0xB30];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -1238,7 +1238,7 @@ void fn_8006AABC(void) {
     r4 = *(u32*)((u8*)r31 + 0x0);
     r3 = r29;
     r5 = (u32)sp + 0x8;
-    fn_801F9CBC();
+    fightTrainerCreateFightTrainerDataIdToHero();
     r3 = (u32)sp + 0x8;
     heroCheckValid();
     r0 = r3 & 0xFF;

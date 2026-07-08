@@ -1588,7 +1588,7 @@
 "name": "fn_80011288",
 "addr": "0x80011288",
 "size": 540,
-"label": "gs-engine",
+"label": "fight",
 "confidence": 1.9,
 "seed": null
 },
@@ -1596,7 +1596,7 @@
 "name": "fn_800114A4",
 "addr": "0x800114A4",
 "size": 604,
-"label": "gs-engine",
+"label": "fight",
 "confidence": 1.9,
 "seed": null
 },
@@ -53209,7 +53209,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F7F80",
+"name": "fightTrainerSearchInvalidFightPokemonPtr",
 "addr": "0x801F7F80",
 "size": 128,
 "label": "fight",
@@ -53225,7 +53225,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F8100",
+"name": "fightTrainerGetNamePtr",
 "addr": "0x801F8100",
 "size": 248,
 "label": "fight",
@@ -53233,7 +53233,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F81F8",
+"name": "fightTrainerGetHikaeFightPokemonNum",
 "addr": "0x801F81F8",
 "size": 556,
 "label": "fight",
@@ -53249,7 +53249,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F849C",
+"name": "fightTrainerInitEnemyPokemonFightOutStatus",
 "addr": "0x801F849C",
 "size": 124,
 "label": "fight",
@@ -53257,7 +53257,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F8518",
+"name": "fightTrainerGetNoActionFightOutPokemonPtr",
 "addr": "0x801F8518",
 "size": 152,
 "label": "fight",
@@ -53265,7 +53265,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F85B0",
+"name": "fightTrainerGetFightOutPokemonToTemotiBanme",
 "addr": "0x801F85B0",
 "size": 136,
 "label": "fight",
@@ -53273,7 +53273,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F8638",
+"name": "fightTrainerGetFightPokemonToTemotiBanme",
 "addr": "0x801F8638",
 "size": 136,
 "label": "fight",
@@ -53281,7 +53281,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F86C0",
+"name": "fightTrainerBackFightPokemonToTemotiPokemon",
 "addr": "0x801F86C0",
 "size": 268,
 "label": "fight",
@@ -53305,7 +53305,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F8C00",
+"name": "fightTrainerCheckCanIrekaeFightPokemon",
 "addr": "0x801F8C00",
 "size": 384,
 "label": "fight",
@@ -53313,7 +53313,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F8D80",
+"name": "fightTrainerGetFightPokemonPtrToFightOutPokemonPtr",
 "addr": "0x801F8D80",
 "size": 180,
 "label": "fight",
@@ -53321,7 +53321,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F8E34",
+"name": "fightTrainerCheckFightPokemonFightOut",
 "addr": "0x801F8E34",
 "size": 240,
 "label": "fight",
@@ -53329,7 +53329,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F8F24",
+"name": "fightTrainerGetEntryIdToFightPokemonPtr",
 "addr": "0x801F8F24",
 "size": 180,
 "label": "fight",
@@ -53337,7 +53337,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F8FD8",
+"name": "fightTrainerCreateSequence",
 "addr": "0x801F8FD8",
 "size": 92,
 "label": "fight",
@@ -53345,7 +53345,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F9034",
+"name": "fightTrainerCheckCanGetExp",
 "addr": "0x801F9034",
 "size": 144,
 "label": "fight",
@@ -53353,7 +53353,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F90C4",
+"name": "fightTrainerIsMineFightPokemon",
 "addr": "0x801F90C4",
 "size": 108,
 "label": "fight",
@@ -53361,7 +53361,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F9130",
+"name": "fightTrainerTimeOutSelectFightAction",
 "addr": "0x801F9130",
 "size": 268,
 "label": "fight",
@@ -53369,7 +53369,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F923C",
+"name": "fightTrainerSelectFightAction",
 "addr": "0x801F923C",
 "size": 444,
 "label": "fight",
@@ -53377,7 +53377,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F93F8",
+"name": "fightTrainerTimeOutSelectIrekaeFightPokemon",
 "addr": "0x801F93F8",
 "size": 520,
 "label": "fight",
@@ -53385,7 +53385,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F9600",
+"name": "fightTrainerSelectIrekaeFightPokemon",
 "addr": "0x801F9600",
 "size": 400,
 "label": "fight",
@@ -53393,7 +53393,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F9790",
+"name": "fightTrainerAllInitFightActionBuff",
 "addr": "0x801F9790",
 "size": 140,
 "label": "fight",
@@ -53401,7 +53401,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F981C",
+"name": "fightTrainerGetValidFightOutPokemonPtr",
 "addr": "0x801F981C",
 "size": 80,
 "label": "fight",
@@ -53409,7 +53409,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F986C",
+"name": "fightTrainerGetValidFightPokemonPtr",
 "addr": "0x801F986C",
 "size": 80,
 "label": "fight",
@@ -53417,7 +53417,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F98BC",
+"name": "fightTrainerGetDoFightOutFightOutPokemonCount",
 "addr": "0x801F98BC",
 "size": 116,
 "label": "fight",
@@ -53425,7 +53425,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F9930",
+"name": "fightTrainerCheckTemotiPokemonFightEntry",
 "addr": "0x801F9930",
 "size": 152,
 "label": "fight",
@@ -53433,7 +53433,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F99C8",
+"name": "fightTrainerSortFightTrainerDataIdToHeroTemotiPokemon",
 "addr": "0x801F99C8",
 "size": 756,
 "label": "fight",
@@ -53441,7 +53441,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F9CBC",
+"name": "fightTrainerCreateFightTrainerDataIdToHero",
 "addr": "0x801F9CBC",
 "size": 700,
 "label": "fight",
@@ -53449,7 +53449,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801F9F78",
+"name": "fightTrainerCreateFightTrainerPokemonDataIdToPokemon",
 "addr": "0x801F9F78",
 "size": 1340,
 "label": "fight",
@@ -53457,7 +53457,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FA4B4",
+"name": "fightTrainerCheckTrainerDataIdValid",
 "addr": "0x801FA4B4",
 "size": 112,
 "label": "fight",
@@ -53465,7 +53465,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FA524",
+"name": "fightTrainerCheckDoFight",
 "addr": "0x801FA524",
 "size": 272,
 "label": "fight",
@@ -53473,7 +53473,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FA634",
+"name": "fightTrainerCheckValid",
 "addr": "0x801FA634",
 "size": 164,
 "label": "fight",
@@ -53481,7 +53481,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FA6D8",
+"name": "fightTrainerCreate",
 "addr": "0x801FA6D8",
 "size": 500,
 "label": "fight",
@@ -53489,7 +53489,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FA8CC",
+"name": "fightTrainerInit",
 "addr": "0x801FA8CC",
 "size": 396,
 "label": "fight",
@@ -53497,7 +53497,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FAA58",
+"name": "fightTrainerSetStatus",
 "addr": "0x801FAA58",
 "size": 1896,
 "label": "fight",
@@ -53505,7 +53505,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FB1C0",
+"name": "fightTrainerGetStatus",
 "addr": "0x801FB1C0",
 "size": 1848,
 "label": "fight",
@@ -53513,7 +53513,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FB8F8",
+"name": "fightTrainerIsGcHero",
 "addr": "0x801FB8F8",
 "size": 124,
 "label": "fight",
@@ -53537,7 +53537,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBAD4",
+"name": "fightTrainerHokakuThrowEffect",
 "addr": "0x801FBAD4",
 "size": 332,
 "label": "fight",
@@ -53545,7 +53545,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBC20",
+"name": "fightTrainerBallThrowEffect",
 "addr": "0x801FBC20",
 "size": 240,
 "label": "fight",
@@ -53553,7 +53553,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBD10",
+"name": "fightTrainerKindDataBiosGetBgmSndId",
 "addr": "0x801FBD10",
 "size": 24,
 "label": "fight",
@@ -53561,7 +53561,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBD28",
+"name": "fightTrainerKindDataBiosGetPrefixName",
 "addr": "0x801FBD28",
 "size": 24,
 "label": "fight",
@@ -53569,7 +53569,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBD40",
+"name": "fightTrainerKindDataBiosGetSyoukinBairitu",
 "addr": "0x801FBD40",
 "size": 24,
 "label": "fight",
@@ -53577,7 +53577,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBD58",
+"name": "fightTrainerKindDataBiosGetPtr",
 "addr": "0x801FBD58",
 "size": 44,
 "label": "fight",
@@ -53585,7 +53585,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBD84",
+"name": "fightTrainerEnemyPokemonBiosSetParam1bantakaiFlag",
 "addr": "0x801FBD84",
 "size": 16,
 "label": "fight",
@@ -53593,7 +53593,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBD94",
+"name": "fightTrainerEnemyPokemonBiosSetBadwazaHaveFlag",
 "addr": "0x801FBD94",
 "size": 16,
 "label": "fight",
@@ -53601,7 +53601,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBDA4",
+"name": "fightTrainerEnemyPokemonBiosSetDefense1banhikuiFlag",
 "addr": "0x801FBDA4",
 "size": 16,
 "label": "fight",
@@ -53609,7 +53609,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBDB4",
+"name": "fightTrainerEnemyPokemonBiosSetLv1banhikuiFlag",
 "addr": "0x801FBDB4",
 "size": 16,
 "label": "fight",
@@ -53617,7 +53617,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBDC4",
+"name": "fightTrainerEnemyPokemonBiosSetNowhp1banhikuiFlag",
 "addr": "0x801FBDC4",
 "size": 16,
 "label": "fight",
@@ -53625,7 +53625,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBDD4",
+"name": "fightTrainerEnemyPokemonBiosSetStoreTokuseiData",
 "addr": "0x801FBDD4",
 "size": 16,
 "label": "fight",
@@ -53633,7 +53633,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBDE4",
+"name": "fightTrainerEnemyPokemonBiosSetTokuseiFlag",
 "addr": "0x801FBDE4",
 "size": 16,
 "label": "fight",
@@ -53649,7 +53649,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBE18",
+"name": "fightTrainerEnemyPokemonBiosSetFightEntryeId",
 "addr": "0x801FBE18",
 "size": 16,
 "label": "fight",
@@ -53657,7 +53657,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBE28",
+"name": "fightTrainerEnemyPokemonBiosGetParam1bantakaiFlag",
 "addr": "0x801FBE28",
 "size": 24,
 "label": "fight",
@@ -53665,7 +53665,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBE40",
+"name": "fightTrainerEnemyPokemonBiosGetBadwazaHaveFlag",
 "addr": "0x801FBE40",
 "size": 24,
 "label": "fight",
@@ -53673,7 +53673,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBE58",
+"name": "fightTrainerEnemyPokemonBiosGetDefense1banhikuiFlag",
 "addr": "0x801FBE58",
 "size": 24,
 "label": "fight",
@@ -53681,7 +53681,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBE70",
+"name": "fightTrainerEnemyPokemonBiosGetLv1banhikuiFlag",
 "addr": "0x801FBE70",
 "size": 24,
 "label": "fight",
@@ -53689,7 +53689,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBE88",
+"name": "fightTrainerEnemyPokemonBiosGetNowhp1banhikuiFlag",
 "addr": "0x801FBE88",
 "size": 24,
 "label": "fight",
@@ -53697,7 +53697,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBEA0",
+"name": "fightTrainerEnemyPokemonBiosGetStoreTokuseiData",
 "addr": "0x801FBEA0",
 "size": 24,
 "label": "fight",
@@ -53705,7 +53705,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBEB8",
+"name": "fightTrainerEnemyPokemonBiosGetTokuseiFlag",
 "addr": "0x801FBEB8",
 "size": 24,
 "label": "fight",
@@ -53721,7 +53721,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBF04",
+"name": "fightTrainerEnemyPokemonBiosGetFightEntryeId",
 "addr": "0x801FBF04",
 "size": 24,
 "label": "fight",
@@ -53729,7 +53729,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBF1C",
+"name": "fightTrainerAiValueAddsubDataBiosSetPrefixName",
 "addr": "0x801FBF1C",
 "size": 16,
 "label": "fight",
@@ -53737,7 +53737,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBF2C",
+"name": "fightTrainerAiValueAddsubDataBiosSetKoudouName",
 "addr": "0x801FBF2C",
 "size": 16,
 "label": "fight",
@@ -53745,7 +53745,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBF3C",
+"name": "fightTrainerAiValueAddsubDataBiosSetName",
 "addr": "0x801FBF3C",
 "size": 16,
 "label": "fight",
@@ -53753,7 +53753,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBF4C",
+"name": "fightTrainerAiValueAddsubDataBiosSetValue",
 "addr": "0x801FBF4C",
 "size": 16,
 "label": "fight",
@@ -53761,7 +53761,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBF5C",
+"name": "fightTrainerAiValueAddsubDataBiosGetPrefixName",
 "addr": "0x801FBF5C",
 "size": 24,
 "label": "fight",
@@ -53769,7 +53769,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBF74",
+"name": "fightTrainerAiValueAddsubDataBiosGetKoudouName",
 "addr": "0x801FBF74",
 "size": 24,
 "label": "fight",
@@ -53777,7 +53777,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBF8C",
+"name": "fightTrainerAiValueAddsubDataBiosGetName",
 "addr": "0x801FBF8C",
 "size": 24,
 "label": "fight",
@@ -53785,7 +53785,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBFA4",
+"name": "fightTrainerAiValueAddsubDataBiosGetValue",
 "addr": "0x801FBFA4",
 "size": 24,
 "label": "fight",
@@ -53793,7 +53793,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBFBC",
+"name": "fightTrainerAiValueAddsubDataBiosGetPtr",
 "addr": "0x801FBFBC",
 "size": 44,
 "label": "fight",
@@ -53801,7 +53801,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBFE8",
+"name": "fightTrainerAiDataBiosSetLastValueRevise",
 "addr": "0x801FBFE8",
 "size": 16,
 "label": "fight",
@@ -53809,7 +53809,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FBFF8",
+"name": "fightTrainerAiDataBiosSetWazaNokoriPpValue",
 "addr": "0x801FBFF8",
 "size": 16,
 "label": "fight",
@@ -53817,7 +53817,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC008",
+"name": "fightTrainerAiDataBiosSetWazaRiskFlag",
 "addr": "0x801FC008",
 "size": 16,
 "label": "fight",
@@ -53825,7 +53825,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC018",
+"name": "fightTrainerAiDataBiosSetWazaAvgValue",
 "addr": "0x801FC018",
 "size": 16,
 "label": "fight",
@@ -53833,7 +53833,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC028",
+"name": "fightTrainerAiDataBiosSetWazaHitFlag",
 "addr": "0x801FC028",
 "size": 16,
 "label": "fight",
@@ -53841,7 +53841,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC038",
+"name": "fightTrainerAiDataBiosSetWazaTypeReviseValue",
 "addr": "0x801FC038",
 "size": 68,
 "label": "fight",
@@ -53849,7 +53849,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC07C",
+"name": "fightTrainerAiDataBiosSetWazaTypeReviseTypeDataId",
 "addr": "0x801FC07C",
 "size": 68,
 "label": "fight",
@@ -53857,7 +53857,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC0C0",
+"name": "fightTrainerAiDataBiosSetPartFlag",
 "addr": "0x801FC0C0",
 "size": 16,
 "label": "fight",
@@ -53865,7 +53865,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC0D0",
+"name": "fightTrainerAiDataBiosSetWazaInitValueFlag",
 "addr": "0x801FC0D0",
 "size": 16,
 "label": "fight",
@@ -53873,7 +53873,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC0E0",
+"name": "fightTrainerAiDataBiosSetWazaRndSelectFlag",
 "addr": "0x801FC0E0",
 "size": 16,
 "label": "fight",
@@ -53881,7 +53881,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC0F0",
+"name": "fightTrainerAiDataBiosSetDefensePokemonRndSelectFlag",
 "addr": "0x801FC0F0",
 "size": 16,
 "label": "fight",
@@ -53889,7 +53889,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC100",
+"name": "fightTrainerAiDataBiosSetAbicntMinValue",
 "addr": "0x801FC100",
 "size": 16,
 "label": "fight",
@@ -53897,7 +53897,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC110",
+"name": "fightTrainerAiDataBiosSetAbicntMaxValue",
 "addr": "0x801FC110",
 "size": 16,
 "label": "fight",
@@ -53905,7 +53905,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC120",
+"name": "fightTrainerAiDataBiosSetWazaDamageFlag",
 "addr": "0x801FC120",
 "size": 16,
 "label": "fight",
@@ -53913,7 +53913,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC130",
+"name": "fightTrainerAiDataBiosSetNokoriHpValue",
 "addr": "0x801FC130",
 "size": 16,
 "label": "fight",
@@ -53921,7 +53921,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC140",
+"name": "fightTrainerAiDataBiosSetTokuseiCheckFlag",
 "addr": "0x801FC140",
 "size": 16,
 "label": "fight",
@@ -53929,7 +53929,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC150",
+"name": "fightTrainerAiDataBiosSetZokuseiReviseValue",
 "addr": "0x801FC150",
 "size": 68,
 "label": "fight",
@@ -53937,7 +53937,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC194",
+"name": "fightTrainerAiDataBiosSetZokuseiReviseZokuseiDataId",
 "addr": "0x801FC194",
 "size": 68,
 "label": "fight",
@@ -53945,7 +53945,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC1D8",
+"name": "fightTrainerAiDataBiosSetZokuseiCheckFlag",
 "addr": "0x801FC1D8",
 "size": 16,
 "label": "fight",
@@ -53953,7 +53953,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC1E8",
+"name": "fightTrainerAiDataBiosSetParamStoreFlag",
 "addr": "0x801FC1E8",
 "size": 16,
 "label": "fight",
@@ -53961,7 +53961,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC1F8",
+"name": "fightTrainerAiDataBiosSetParamExpectFlag",
 "addr": "0x801FC1F8",
 "size": 16,
 "label": "fight",
@@ -53969,7 +53969,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC208",
+"name": "fightTrainerAiDataBiosSetItemValue",
 "addr": "0x801FC208",
 "size": 16,
 "label": "fight",
@@ -53977,7 +53977,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC218",
+"name": "fightTrainerAiDataBiosSetIrekaeValue",
 "addr": "0x801FC218",
 "size": 16,
 "label": "fight",
@@ -53985,7 +53985,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC228",
+"name": "fightTrainerAiDataBiosSetComboValue",
 "addr": "0x801FC228",
 "size": 16,
 "label": "fight",
@@ -53993,7 +53993,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC238",
+"name": "fightTrainerAiDataBiosSetPokemonJoutaiFlag",
 "addr": "0x801FC238",
 "size": 16,
 "label": "fight",
@@ -54001,7 +54001,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC248",
+"name": "fightTrainerAiDataBiosSetKeyPlayerFlag",
 "addr": "0x801FC248",
 "size": 16,
 "label": "fight",
@@ -54009,7 +54009,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC258",
+"name": "fightTrainerAiDataBiosSetPokemonDataOrderAceBossFlag",
 "addr": "0x801FC258",
 "size": 16,
 "label": "fight",
@@ -54017,7 +54017,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC268",
+"name": "fightTrainerAiDataBiosSetPokemonDataOrderOutFlag",
 "addr": "0x801FC268",
 "size": 16,
 "label": "fight",
@@ -54025,7 +54025,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC278",
+"name": "fightTrainerAiDataBiosSetPokemonSelectWeakPointFlag",
 "addr": "0x801FC278",
 "size": 16,
 "label": "fight",
@@ -54033,7 +54033,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC288",
+"name": "fightTrainerAiDataBiosSetPokemonSelectRandomFlag",
 "addr": "0x801FC288",
 "size": 16,
 "label": "fight",
@@ -54041,7 +54041,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC298",
+"name": "fightTrainerAiDataBiosGetLastValueRevise",
 "addr": "0x801FC298",
 "size": 24,
 "label": "fight",
@@ -54049,7 +54049,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC2B0",
+"name": "fightTrainerAiDataBiosGetWazaNokoriPpValue",
 "addr": "0x801FC2B0",
 "size": 24,
 "label": "fight",
@@ -54057,7 +54057,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC2C8",
+"name": "fightTrainerAiDataBiosGetWazaRiskFlag",
 "addr": "0x801FC2C8",
 "size": 24,
 "label": "fight",
@@ -54065,7 +54065,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC2E0",
+"name": "fightTrainerAiDataBiosGetWazaAvgValue",
 "addr": "0x801FC2E0",
 "size": 24,
 "label": "fight",
@@ -54073,7 +54073,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC2F8",
+"name": "fightTrainerAiDataBiosGetWazaHitFlag",
 "addr": "0x801FC2F8",
 "size": 24,
 "label": "fight",
@@ -54081,7 +54081,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC310",
+"name": "fightTrainerAiDataBiosGetWazaTypeReviseValue",
 "addr": "0x801FC310",
 "size": 84,
 "label": "fight",
@@ -54089,7 +54089,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC364",
+"name": "fightTrainerAiDataBiosGetWazaTypeReviseTypeDataId",
 "addr": "0x801FC364",
 "size": 84,
 "label": "fight",
@@ -54097,7 +54097,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC3B8",
+"name": "fightTrainerAiDataBiosGetPartFlag",
 "addr": "0x801FC3B8",
 "size": 24,
 "label": "fight",
@@ -54105,7 +54105,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC3D0",
+"name": "fightTrainerAiDataBiosGetWazaInitValueFlag",
 "addr": "0x801FC3D0",
 "size": 24,
 "label": "fight",
@@ -54113,7 +54113,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC3E8",
+"name": "fightTrainerAiDataBiosGetWazaRndSelectFlag",
 "addr": "0x801FC3E8",
 "size": 24,
 "label": "fight",
@@ -54121,7 +54121,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC400",
+"name": "fightTrainerAiDataBiosGetDefensePokemonRndSelectFlag",
 "addr": "0x801FC400",
 "size": 24,
 "label": "fight",
@@ -54129,7 +54129,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC418",
+"name": "fightTrainerAiDataBiosGetAbicntMinValue",
 "addr": "0x801FC418",
 "size": 24,
 "label": "fight",
@@ -54137,7 +54137,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC430",
+"name": "fightTrainerAiDataBiosGetAbicntMaxValue",
 "addr": "0x801FC430",
 "size": 24,
 "label": "fight",
@@ -54145,7 +54145,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC448",
+"name": "fightTrainerAiDataBiosGetWazaDamageFlag",
 "addr": "0x801FC448",
 "size": 24,
 "label": "fight",
@@ -54153,7 +54153,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC460",
+"name": "fightTrainerAiDataBiosGetNokoriHpValue",
 "addr": "0x801FC460",
 "size": 24,
 "label": "fight",
@@ -54161,7 +54161,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC478",
+"name": "fightTrainerAiDataBiosGetTokuseiCheckFlag",
 "addr": "0x801FC478",
 "size": 24,
 "label": "fight",
@@ -54169,7 +54169,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC490",
+"name": "fightTrainerAiDataBiosGetZokuseiReviseValue",
 "addr": "0x801FC490",
 "size": 84,
 "label": "fight",
@@ -54177,7 +54177,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC4E4",
+"name": "fightTrainerAiDataBiosGetZokuseiReviseZokuseiDataId",
 "addr": "0x801FC4E4",
 "size": 84,
 "label": "fight",
@@ -54185,7 +54185,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC538",
+"name": "fightTrainerAiDataBiosGetZokuseiCheckFlag",
 "addr": "0x801FC538",
 "size": 24,
 "label": "fight",
@@ -54193,7 +54193,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC550",
+"name": "fightTrainerAiDataBiosGetParamStoreFlag",
 "addr": "0x801FC550",
 "size": 24,
 "label": "fight",
@@ -54201,7 +54201,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC568",
+"name": "fightTrainerAiDataBiosGetParamExpectFlag",
 "addr": "0x801FC568",
 "size": 24,
 "label": "fight",
@@ -54209,7 +54209,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC580",
+"name": "fightTrainerAiDataBiosGetItemValue",
 "addr": "0x801FC580",
 "size": 24,
 "label": "fight",
@@ -54217,7 +54217,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC598",
+"name": "fightTrainerAiDataBiosGetIrekaeValue",
 "addr": "0x801FC598",
 "size": 24,
 "label": "fight",
@@ -54225,7 +54225,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC5B0",
+"name": "fightTrainerAiDataBiosGetComboValue",
 "addr": "0x801FC5B0",
 "size": 24,
 "label": "fight",
@@ -54233,7 +54233,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC5C8",
+"name": "fightTrainerAiDataBiosGetPokemonJoutaiFlag",
 "addr": "0x801FC5C8",
 "size": 24,
 "label": "fight",
@@ -54241,7 +54241,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC5E0",
+"name": "fightTrainerAiDataBiosGetKeyPlayerFlag",
 "addr": "0x801FC5E0",
 "size": 24,
 "label": "fight",
@@ -54249,7 +54249,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC5F8",
+"name": "fightTrainerAiDataBiosGetPokemonDataOrderAceBossFlag",
 "addr": "0x801FC5F8",
 "size": 24,
 "label": "fight",
@@ -54257,7 +54257,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC610",
+"name": "fightTrainerAiDataBiosGetPokemonDataOrderOutFlag",
 "addr": "0x801FC610",
 "size": 24,
 "label": "fight",
@@ -54265,7 +54265,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC628",
+"name": "fightTrainerAiDataBiosGetPokemonSelectWeakPointFlag",
 "addr": "0x801FC628",
 "size": 24,
 "label": "fight",
@@ -54273,7 +54273,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC640",
+"name": "fightTrainerAiDataBiosGetPokemonSelectRandomFlag",
 "addr": "0x801FC640",
 "size": 24,
 "label": "fight",
@@ -54281,7 +54281,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC658",
+"name": "fightTrainerAiDataBiosGetPtr",
 "addr": "0x801FC658",
 "size": 44,
 "label": "fight",
@@ -54289,7 +54289,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC684",
+"name": "fightTrainerPokemonDataBiosSetPartDataId",
 "addr": "0x801FC684",
 "size": 16,
 "label": "fight",
@@ -54297,7 +54297,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC694",
+"name": "fightTrainerPokemonDataBiosSetKeyPlayerFlag",
 "addr": "0x801FC694",
 "size": 16,
 "label": "fight",
@@ -54305,7 +54305,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC6A4",
+"name": "fightTrainerPokemonDataBiosGetPartDataId",
 "addr": "0x801FC6A4",
 "size": 24,
 "label": "fight",
@@ -54313,7 +54313,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC6BC",
+"name": "fightTrainerPokemonDataBiosGetKeyPlayerFlag",
 "addr": "0x801FC6BC",
 "size": 24,
 "label": "fight",
@@ -54321,7 +54321,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC6D4",
+"name": "fightTrainerPokemonDataBiosSetSeikakuDataId",
 "addr": "0x801FC6D4",
 "size": 16,
 "label": "fight",
@@ -54329,7 +54329,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC6E4",
+"name": "fightTrainerPokemonDataBiosSetSexDataId",
 "addr": "0x801FC6E4",
 "size": 16,
 "label": "fight",
@@ -54337,7 +54337,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC6F4",
+"name": "fightTrainerPokemonDataBiosSetFriend",
 "addr": "0x801FC6F4",
 "size": 16,
 "label": "fight",
@@ -54345,7 +54345,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC704",
+"name": "fightTrainerPokemonDataBiosSetPpCnt",
 "addr": "0x801FC704",
 "size": 64,
 "label": "fight",
@@ -54353,7 +54353,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC744",
+"name": "fightTrainerPokemonDataBiosSetWazaDataId",
 "addr": "0x801FC744",
 "size": 64,
 "label": "fight",
@@ -54361,7 +54361,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC784",
+"name": "fightTrainerPokemonDataBiosSetItemDataId",
 "addr": "0x801FC784",
 "size": 16,
 "label": "fight",
@@ -54369,7 +54369,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC794",
+"name": "fightTrainerPokemonDataBiosSetPokemonDataId",
 "addr": "0x801FC794",
 "size": 16,
 "label": "fight",
@@ -54377,7 +54377,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC7A4",
+"name": "fightTrainerPokemonDataBiosSetTokuseiFlag",
 "addr": "0x801FC7A4",
 "size": 16,
 "label": "fight",
@@ -54385,7 +54385,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC7B4",
+"name": "fightTrainerPokemonDataBiosSetDarkPokemonFlag",
 "addr": "0x801FC7B4",
 "size": 16,
 "label": "fight",
@@ -54393,7 +54393,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC7C4",
+"name": "fightTrainerPokemonDataBiosSetItemBallId",
 "addr": "0x801FC7C4",
 "size": 16,
 "label": "fight",
@@ -54401,7 +54401,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC7D4",
+"name": "fightTrainerPokemonDataBiosSetLevel",
 "addr": "0x801FC7D4",
 "size": 16,
 "label": "fight",
@@ -54409,7 +54409,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC7E4",
+"name": "fightTrainerPokemonDataBiosSetStatusEffort",
 "addr": "0x801FC7E4",
 "size": 36,
 "label": "fight",
@@ -54417,7 +54417,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC808",
+"name": "fightTrainerPokemonDataBiosSetStatusRnd",
 "addr": "0x801FC808",
 "size": 32,
 "label": "fight",
@@ -54425,7 +54425,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC828",
+"name": "fightTrainerPokemonDataBiosSetNickname",
 "addr": "0x801FC828",
 "size": 16,
 "label": "fight",
@@ -54433,7 +54433,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC838",
+"name": "fightTrainerPokemonDataBiosGetSeikakuDataId",
 "addr": "0x801FC838",
 "size": 28,
 "label": "fight",
@@ -54441,7 +54441,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC854",
+"name": "fightTrainerPokemonDataBiosGetSexDataId",
 "addr": "0x801FC854",
 "size": 28,
 "label": "fight",
@@ -54449,7 +54449,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC870",
+"name": "fightTrainerPokemonDataBiosGetFriend",
 "addr": "0x801FC870",
 "size": 24,
 "label": "fight",
@@ -54457,7 +54457,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC888",
+"name": "fightTrainerPokemonDataBiosGetPpCnt",
 "addr": "0x801FC888",
 "size": 72,
 "label": "fight",
@@ -54465,7 +54465,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC8D0",
+"name": "fightTrainerPokemonDataBiosGetWazaDataId",
 "addr": "0x801FC8D0",
 "size": 72,
 "label": "fight",
@@ -54473,7 +54473,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC918",
+"name": "fightTrainerPokemonDataBiosGetItemDataId",
 "addr": "0x801FC918",
 "size": 24,
 "label": "fight",
@@ -54481,7 +54481,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC930",
+"name": "fightTrainerPokemonDataBiosGetPokemonDataId",
 "addr": "0x801FC930",
 "size": 24,
 "label": "fight",
@@ -54489,7 +54489,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC948",
+"name": "fightTrainerPokemonDataBiosGetTokuseiFlag",
 "addr": "0x801FC948",
 "size": 28,
 "label": "fight",
@@ -54497,7 +54497,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC964",
+"name": "fightTrainerPokemonDataBiosGetDarkPokemonFlag",
 "addr": "0x801FC964",
 "size": 24,
 "label": "fight",
@@ -54505,7 +54505,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC97C",
+"name": "fightTrainerPokemonDataBiosGetItemBallId",
 "addr": "0x801FC97C",
 "size": 24,
 "label": "fight",
@@ -54513,7 +54513,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC994",
+"name": "fightTrainerPokemonDataBiosGetLevel",
 "addr": "0x801FC994",
 "size": 24,
 "label": "fight",
@@ -54521,7 +54521,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC9AC",
+"name": "fightTrainerPokemonDataBiosGetStatusEffort",
 "addr": "0x801FC9AC",
 "size": 52,
 "label": "fight",
@@ -54529,7 +54529,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FC9E0",
+"name": "fightTrainerPokemonDataBiosGetStatusRnd",
 "addr": "0x801FC9E0",
 "size": 52,
 "label": "fight",
@@ -54537,7 +54537,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCA14",
+"name": "fightTrainerPokemonDataBiosGetNickname",
 "addr": "0x801FCA14",
 "size": 24,
 "label": "fight",
@@ -54545,7 +54545,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCA2C",
+"name": "fightTrainerPokemonDataBiosGetPtr",
 "addr": "0x801FCA2C",
 "size": 44,
 "label": "fight",
@@ -54553,7 +54553,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCA58",
+"name": "fightTrainerPokemonPartDataBiosSetWazaTypeRevise",
 "addr": "0x801FCA58",
 "size": 32,
 "label": "fight",
@@ -54561,7 +54561,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCA78",
+"name": "fightTrainerPokemonPartDataBiosSetName",
 "addr": "0x801FCA78",
 "size": 16,
 "label": "fight",
@@ -54569,7 +54569,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCA88",
+"name": "fightTrainerPokemonPartDataBiosGetWazaTypeRevise",
 "addr": "0x801FCA88",
 "size": 48,
 "label": "fight",
@@ -54577,7 +54577,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCAB8",
+"name": "fightTrainerPokemonPartDataBiosGetName",
 "addr": "0x801FCAB8",
 "size": 24,
 "label": "fight",
@@ -54585,7 +54585,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCAD0",
+"name": "fightTrainerPokemonPartDataBiosGetPtr",
 "addr": "0x801FCAD0",
 "size": 44,
 "label": "fight",
@@ -54697,7 +54697,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCC54",
+"name": "fightTrainerDataBiosSetKindDataId",
 "addr": "0x801FCC54",
 "size": 16,
 "label": "fight",
@@ -54705,7 +54705,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCC64",
+"name": "fightTrainerDataBiosGetKindDataId",
 "addr": "0x801FCC64",
 "size": 24,
 "label": "fight",
@@ -54737,7 +54737,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCCC4",
+"name": "fightTrainerDataBiosGetPtr",
 "addr": "0x801FCCC4",
 "size": 44,
 "label": "fight",
@@ -54745,7 +54745,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCCF0",
+"name": "fightTrainer_GetFightActionBuffPtr",
 "addr": "0x801FCCF0",
 "size": 24,
 "label": "fight",
@@ -54753,7 +54753,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCD08",
+"name": "fightTrainer_SetControllerId",
 "addr": "0x801FCD08",
 "size": 16,
 "label": "fight",
@@ -54761,7 +54761,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCD18",
+"name": "fightTrainer_SetNigeruCount",
 "addr": "0x801FCD18",
 "size": 16,
 "label": "fight",
@@ -54769,7 +54769,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCD28",
+"name": "fightTrainer_SetKoban",
 "addr": "0x801FCD28",
 "size": 16,
 "label": "fight",
@@ -54777,7 +54777,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCD38",
+"name": "fightTrainer_SetOkaneBai",
 "addr": "0x801FCD38",
 "size": 16,
 "label": "fight",
@@ -54785,7 +54785,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCD48",
+"name": "fightTrainer_SetFightTrainerDataId",
 "addr": "0x801FCD48",
 "size": 16,
 "label": "fight",
@@ -54793,7 +54793,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCD58",
+"name": "fightTrainer_GetFightTrainerEnemyPokemonAryPtr",
 "addr": "0x801FCD58",
 "size": 52,
 "label": "fight",
@@ -54801,7 +54801,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCD8C",
+"name": "fightTrainer_SetSequencePtr",
 "addr": "0x801FCD8C",
 "size": 16,
 "label": "fight",
@@ -54809,7 +54809,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCD9C",
+"name": "fightTrainer_GetSequencePtr",
 "addr": "0x801FCD9C",
 "size": 24,
 "label": "fight",
@@ -54817,7 +54817,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCDB4",
+"name": "fightTrainer_GetControllerId",
 "addr": "0x801FCDB4",
 "size": 24,
 "label": "fight",
@@ -54825,7 +54825,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCDCC",
+"name": "fightTrainer_GetNigeruCount",
 "addr": "0x801FCDCC",
 "size": 24,
 "label": "fight",
@@ -54833,7 +54833,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCDE4",
+"name": "fightTrainer_GetKoban",
 "addr": "0x801FCDE4",
 "size": 24,
 "label": "fight",
@@ -54841,7 +54841,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCDFC",
+"name": "fightTrainer_GetOkaneBai",
 "addr": "0x801FCDFC",
 "size": 24,
 "label": "fight",
@@ -54849,7 +54849,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCE14",
+"name": "fightTrainer_GetFightoutPokemonBuffPtr",
 "addr": "0x801FCE14",
 "size": 24,
 "label": "fight",
@@ -54857,7 +54857,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCE2C",
+"name": "fightTrainer_GetFightoutPokemonPtr",
 "addr": "0x801FCE2C",
 "size": 52,
 "label": "fight",
@@ -54865,7 +54865,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCE60",
+"name": "fightTrainer_GetFightPokemonPtr",
 "addr": "0x801FCE60",
 "size": 52,
 "label": "fight",
@@ -54873,7 +54873,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCE94",
+"name": "fightTrainer_GetFightTrainerDataId",
 "addr": "0x801FCE94",
 "size": 24,
 "label": "fight",
@@ -54881,7 +54881,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCEAC",
+"name": "fightTrainer_GetHeroPtr",
 "addr": "0x801FCEAC",
 "size": 24,
 "label": "fight",
@@ -54897,7 +54897,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCEFC",
+"name": "fightOutPokemonBiosSetOumuWazaDataId",
 "addr": "0x801FCEFC",
 "size": 16,
 "label": "fight",
@@ -54905,7 +54905,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCF0C",
+"name": "fightOutPokemonBiosSetGamanDamageTargetId",
 "addr": "0x801FCF0C",
 "size": 16,
 "label": "fight",
@@ -54913,7 +54913,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCF1C",
+"name": "fightOutPokemonBiosSetGamanDamageValue",
 "addr": "0x801FCF1C",
 "size": 16,
 "label": "fight",
@@ -54921,7 +54921,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCF2C",
+"name": "fightOutPokemonBiosSetHitWazaZokuseiDataId",
 "addr": "0x801FCF2C",
 "size": 16,
 "label": "fight",
@@ -54929,7 +54929,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCF3C",
+"name": "fightOutPokemonBiosSetHitWazaDataId",
 "addr": "0x801FCF3C",
 "size": 16,
 "label": "fight",
@@ -54937,7 +54937,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCF4C",
+"name": "fightOutPokemonBiosSetLastReceiveWazaTargetDataId",
 "addr": "0x801FCF4C",
 "size": 16,
 "label": "fight",
@@ -54945,7 +54945,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCF5C",
+"name": "fightOutPokemonBiosSetLastUseWazaDataId",
 "addr": "0x801FCF5C",
 "size": 16,
 "label": "fight",
@@ -54953,7 +54953,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCF6C",
+"name": "fightOutPokemonBiosSetLastSelectWazaDataId",
 "addr": "0x801FCF6C",
 "size": 16,
 "label": "fight",
@@ -54961,7 +54961,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCF7C",
+"name": "fightOutPokemonBiosSetSketchWazaDataId",
 "addr": "0x801FCF7C",
 "size": 16,
 "label": "fight",
@@ -54969,7 +54969,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCF8C",
+"name": "fightOutPokemonBiosGetKeepFightWazaPtr",
 "addr": "0x801FCF8C",
 "size": 24,
 "label": "fight",
@@ -54977,7 +54977,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCFA4",
+"name": "fightOutPokemonBiosGetOumuWazaDataId",
 "addr": "0x801FCFA4",
 "size": 24,
 "label": "fight",
@@ -54985,7 +54985,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCFBC",
+"name": "fightOutPokemonBiosGetGamanDamageTargetId",
 "addr": "0x801FCFBC",
 "size": 24,
 "label": "fight",
@@ -54993,7 +54993,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCFD4",
+"name": "fightOutPokemonBiosGetGamanDamageValue",
 "addr": "0x801FCFD4",
 "size": 24,
 "label": "fight",
@@ -55001,7 +55001,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FCFEC",
+"name": "fightOutPokemonBiosGetHitWazaZokuseiDataId",
 "addr": "0x801FCFEC",
 "size": 24,
 "label": "fight",
@@ -55009,7 +55009,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD004",
+"name": "fightOutPokemonBiosGetHitWazaDataId",
 "addr": "0x801FD004",
 "size": 24,
 "label": "fight",
@@ -55017,7 +55017,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD01C",
+"name": "fightOutPokemonBiosGetLastReceiveWazaTargetDataId",
 "addr": "0x801FD01C",
 "size": 24,
 "label": "fight",
@@ -55025,7 +55025,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD034",
+"name": "fightOutPokemonBiosGetLastUseWazaDataId",
 "addr": "0x801FD034",
 "size": 24,
 "label": "fight",
@@ -55033,7 +55033,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD04C",
+"name": "fightOutPokemonBiosGetLastSelectWazaDataId",
 "addr": "0x801FD04C",
 "size": 24,
 "label": "fight",
@@ -55041,7 +55041,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD064",
+"name": "fightOutPokemonBiosGetSketchWazaDataId",
 "addr": "0x801FD064",
 "size": 24,
 "label": "fight",
@@ -55049,7 +55049,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD07C",
+"name": "fightOutPokemonEnemyBiosSetDamage",
 "addr": "0x801FD07C",
 "size": 16,
 "label": "fight",
@@ -55057,7 +55057,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD08C",
+"name": "fightOutPokemonEnemyBiosSetInitHp",
 "addr": "0x801FD08C",
 "size": 16,
 "label": "fight",
@@ -55065,7 +55065,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD09C",
+"name": "fightOutPokemonEnemyBiosSetOumuWazaDataId",
 "addr": "0x801FD09C",
 "size": 16,
 "label": "fight",
@@ -55073,7 +55073,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD0AC",
+"name": "fightOutPokemonEnemyBiosSetTargetFightOutPokemonPtr",
 "addr": "0x801FD0AC",
 "size": 16,
 "label": "fight",
@@ -55081,7 +55081,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD0BC",
+"name": "fightOutPokemonEnemyBiosGetDamage",
 "addr": "0x801FD0BC",
 "size": 24,
 "label": "fight",
@@ -55089,7 +55089,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD0D4",
+"name": "fightOutPokemonEnemyBiosGetInitHp",
 "addr": "0x801FD0D4",
 "size": 24,
 "label": "fight",
@@ -55097,7 +55097,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD0EC",
+"name": "fightOutPokemonEnemyBiosGetOumuWazaDataId",
 "addr": "0x801FD0EC",
 "size": 24,
 "label": "fight",
@@ -55105,7 +55105,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD104",
+"name": "fightOutPokemonEnemyBiosGetTargetFightOutPokemonPtr",
 "addr": "0x801FD104",
 "size": 24,
 "label": "fight",
@@ -55113,7 +55113,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD11C",
+"name": "fightOutPokemonBiosGetFightOutPokemonEnemyPtr",
 "addr": "0x801FD11C",
 "size": 52,
 "label": "fight",
@@ -55121,7 +55121,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD150",
+"name": "fightOutPokemonBiosSetIrekaeTargetEntryId",
 "addr": "0x801FD150",
 "size": 16,
 "label": "fight",
@@ -55129,7 +55129,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD160",
+"name": "fightOutPokemonBiosGetIrekaeTargetEntryId",
 "addr": "0x801FD160",
 "size": 24,
 "label": "fight",
@@ -55137,7 +55137,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD178",
+"name": "fightOutPokemonBiosSetKizetuFlag",
 "addr": "0x801FD178",
 "size": 16,
 "label": "fight",
@@ -55145,7 +55145,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD188",
+"name": "fightOutPokemonBiosGetKizetuFlag",
 "addr": "0x801FD188",
 "size": 24,
 "label": "fight",
@@ -55153,7 +55153,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD1A0",
+"name": "fightOutPokemonBiosSetMyselfDamageSpeTargetId",
 "addr": "0x801FD1A0",
 "size": 16,
 "label": "fight",
@@ -55161,7 +55161,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD1B0",
+"name": "fightOutPokemonBiosSetMyselfDamageSpeValue",
 "addr": "0x801FD1B0",
 "size": 16,
 "label": "fight",
@@ -55169,7 +55169,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD1C0",
+"name": "fightOutPokemonBiosSetMyselfDamageAtkTargetId",
 "addr": "0x801FD1C0",
 "size": 16,
 "label": "fight",
@@ -55177,7 +55177,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD1D0",
+"name": "fightOutPokemonBiosSetMyselfDamageAtkValue",
 "addr": "0x801FD1D0",
 "size": 16,
 "label": "fight",
@@ -55185,7 +55185,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD1E0",
+"name": "fightOutPokemonBiosSetKaigaraDamageValue",
 "addr": "0x801FD1E0",
 "size": 16,
 "label": "fight",
@@ -55193,7 +55193,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD1F0",
+"name": "fightOutPokemonBiosSetItemKoraetaFlag",
 "addr": "0x801FD1F0",
 "size": 16,
 "label": "fight",
@@ -55201,7 +55201,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD200",
+"name": "fightOutPokemonBiosSetIrekaetaFlag",
 "addr": "0x801FD200",
 "size": 16,
 "label": "fight",
@@ -55209,7 +55209,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD210",
+"name": "fightOutPokemonBiosSetNoPressureFlag",
 "addr": "0x801FD210",
 "size": 16,
 "label": "fight",
@@ -55217,7 +55217,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD220",
+"name": "fightOutPokemonBiosSetDoTraceFlag",
 "addr": "0x801FD220",
 "size": 16,
 "label": "fight",
@@ -55225,7 +55225,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD230",
+"name": "fightOutPokemonBiosSetDoIkakuFlag",
 "addr": "0x801FD230",
 "size": 16,
 "label": "fight",
@@ -55233,7 +55233,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD240",
+"name": "fightOutPokemonBiosSetVanishoffFlag",
 "addr": "0x801FD240",
 "size": 16,
 "label": "fight",
@@ -55241,7 +55241,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD250",
+"name": "fightOutPokemonBiosSetReceivesWazaHiraishinFlag",
 "addr": "0x801FD250",
 "size": 16,
 "label": "fight",
@@ -55249,7 +55249,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD260",
+"name": "fightOutPokemonBiosSetDoClearbodyFlag",
 "addr": "0x801FD260",
 "size": 16,
 "label": "fight",
@@ -55257,7 +55257,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD270",
+"name": "fightOutPokemonBiosSetFightActionFlag",
 "addr": "0x801FD270",
 "size": 16,
 "label": "fight",
@@ -55265,7 +55265,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD280",
+"name": "fightOutPokemonBiosSetPassPpdecFlag",
 "addr": "0x801FD280",
 "size": 16,
 "label": "fight",
@@ -55273,7 +55273,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD290",
+"name": "fightOutPokemonBiosSetHirumuNoAttackFlag",
 "addr": "0x801FD290",
 "size": 16,
 "label": "fight",
@@ -55281,7 +55281,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD2A0",
+"name": "fightOutPokemonBiosSetIchamonNoAttackFlag",
 "addr": "0x801FD2A0",
 "size": 16,
 "label": "fight",
@@ -55289,7 +55289,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD2B0",
+"name": "fightOutPokemonBiosSetChouhatsuNoAttackFlag",
 "addr": "0x801FD2B0",
 "size": 16,
 "label": "fight",
@@ -55297,7 +55297,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD2C0",
+"name": "fightOutPokemonBiosSetKanashibariNoAttackFlag",
 "addr": "0x801FD2C0",
 "size": 16,
 "label": "fight",
@@ -55305,7 +55305,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD2D0",
+"name": "fightOutPokemonBiosSetMeroMeroNoAttackFlag",
 "addr": "0x801FD2D0",
 "size": 16,
 "label": "fight",
@@ -55313,7 +55313,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD2E0",
+"name": "fightOutPokemonBiosSetHuuinNoAttackFlag",
 "addr": "0x801FD2E0",
 "size": 16,
 "label": "fight",
@@ -55321,7 +55321,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD2F0",
+"name": "fightOutPokemonBiosSetItemNigeruFlag",
 "addr": "0x801FD2F0",
 "size": 16,
 "label": "fight",
@@ -55329,7 +55329,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD300",
+"name": "fightOutPokemonBiosSetTameWazaFlag",
 "addr": "0x801FD300",
 "size": 16,
 "label": "fight",
@@ -55337,7 +55337,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD310",
+"name": "fightOutPokemonBiosSetOutWazaKoukanaiFlag",
 "addr": "0x801FD310",
 "size": 16,
 "label": "fight",
@@ -55345,7 +55345,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD320",
+"name": "fightOutPokemonBiosSetKonranMyselfAttackFlag",
 "addr": "0x801FD320",
 "size": 16,
 "label": "fight",
@@ -55353,7 +55353,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD330",
+"name": "fightOutPokemonBiosSetMahiNoAttackFlag",
 "addr": "0x801FD330",
 "size": 16,
 "label": "fight",
@@ -55361,7 +55361,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD340",
+"name": "fightOutPokemonBiosGetMyselfDamageSpeTargetId",
 "addr": "0x801FD340",
 "size": 24,
 "label": "fight",
@@ -55369,7 +55369,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD358",
+"name": "fightOutPokemonBiosGetMyselfDamageSpeValue",
 "addr": "0x801FD358",
 "size": 24,
 "label": "fight",
@@ -55377,7 +55377,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD370",
+"name": "fightOutPokemonBiosGetMyselfDamageAtkTargetId",
 "addr": "0x801FD370",
 "size": 24,
 "label": "fight",
@@ -55385,7 +55385,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD388",
+"name": "fightOutPokemonBiosGetMyselfDamageAtkValue",
 "addr": "0x801FD388",
 "size": 24,
 "label": "fight",
@@ -55393,7 +55393,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD3A0",
+"name": "fightOutPokemonBiosGetKaigaraDamageValue",
 "addr": "0x801FD3A0",
 "size": 24,
 "label": "fight",
@@ -55401,7 +55401,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD3B8",
+"name": "fightOutPokemonBiosGetItemKoraetaFlag",
 "addr": "0x801FD3B8",
 "size": 24,
 "label": "fight",
@@ -55409,7 +55409,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD3D0",
+"name": "fightOutPokemonBiosGetIrekaetaFlag",
 "addr": "0x801FD3D0",
 "size": 24,
 "label": "fight",
@@ -55417,7 +55417,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD3E8",
+"name": "fightOutPokemonBiosGetNoPressureFlag",
 "addr": "0x801FD3E8",
 "size": 24,
 "label": "fight",
@@ -55425,7 +55425,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD400",
+"name": "fightOutPokemonBiosGetDoTraceFlag",
 "addr": "0x801FD400",
 "size": 24,
 "label": "fight",
@@ -55433,7 +55433,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD418",
+"name": "fightOutPokemonBiosGetDoIkakuFlag",
 "addr": "0x801FD418",
 "size": 24,
 "label": "fight",
@@ -55441,7 +55441,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD430",
+"name": "fightOutPokemonBiosGetVanishoffFlag",
 "addr": "0x801FD430",
 "size": 24,
 "label": "fight",
@@ -55449,7 +55449,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD448",
+"name": "fightOutPokemonBiosGetReceivesWazaHiraishinFlag",
 "addr": "0x801FD448",
 "size": 24,
 "label": "fight",
@@ -55457,7 +55457,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD460",
+"name": "fightOutPokemonBiosGetDoClearbodyFlag",
 "addr": "0x801FD460",
 "size": 24,
 "label": "fight",
@@ -55465,7 +55465,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD478",
+"name": "fightOutPokemonBiosGetFightActionFlag",
 "addr": "0x801FD478",
 "size": 24,
 "label": "fight",
@@ -55473,7 +55473,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD490",
+"name": "fightOutPokemonBiosGetPassPpdecFlag",
 "addr": "0x801FD490",
 "size": 24,
 "label": "fight",
@@ -55481,7 +55481,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD4A8",
+"name": "fightOutPokemonBiosGetHirumuNoAttackFlag",
 "addr": "0x801FD4A8",
 "size": 24,
 "label": "fight",
@@ -55489,7 +55489,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD4C0",
+"name": "fightOutPokemonBiosGetIchamonNoAttackFlag",
 "addr": "0x801FD4C0",
 "size": 24,
 "label": "fight",
@@ -55497,7 +55497,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD4D8",
+"name": "fightOutPokemonBiosGetChouhatsuNoAttackFlag",
 "addr": "0x801FD4D8",
 "size": 24,
 "label": "fight",
@@ -55505,7 +55505,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD4F0",
+"name": "fightOutPokemonBiosGetKanashibariNoAttackFlag",
 "addr": "0x801FD4F0",
 "size": 24,
 "label": "fight",
@@ -55513,7 +55513,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD508",
+"name": "fightOutPokemonBiosGetMeroMeroNoAttackFlag",
 "addr": "0x801FD508",
 "size": 24,
 "label": "fight",
@@ -55521,7 +55521,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD520",
+"name": "fightOutPokemonBiosGetHuuinNoAttackFlag",
 "addr": "0x801FD520",
 "size": 24,
 "label": "fight",
@@ -55529,7 +55529,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD538",
+"name": "fightOutPokemonBiosGetItemNigeruFlag",
 "addr": "0x801FD538",
 "size": 24,
 "label": "fight",
@@ -55537,7 +55537,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD550",
+"name": "fightOutPokemonBiosGetTameWazaFlag",
 "addr": "0x801FD550",
 "size": 24,
 "label": "fight",
@@ -55545,7 +55545,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD568",
+"name": "fightOutPokemonBiosGetOutWazaKoukanaiFlag",
 "addr": "0x801FD568",
 "size": 24,
 "label": "fight",
@@ -55553,7 +55553,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD580",
+"name": "fightOutPokemonBiosGetKonranMyselfAttackFlag",
 "addr": "0x801FD580",
 "size": 24,
 "label": "fight",
@@ -55561,7 +55561,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD598",
+"name": "fightOutPokemonBiosGetMahiNoAttackFlag",
 "addr": "0x801FD598",
 "size": 24,
 "label": "fight",
@@ -55569,7 +55569,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD5B0",
+"name": "fightOutPokemonBiosGetWazaMenuCurPtr",
 "addr": "0x801FD5B0",
 "size": 24,
 "label": "fight",
@@ -55577,7 +55577,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD5C8",
+"name": "fightOutPokemonBiosSetTokuseiDataId",
 "addr": "0x801FD5C8",
 "size": 16,
 "label": "fight",
@@ -55585,7 +55585,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD5D8",
+"name": "fightOutPokemonBiosGetTokuseiDataId",
 "addr": "0x801FD5D8",
 "size": 24,
 "label": "fight",
@@ -55593,7 +55593,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD5F0",
+"name": "fightOutPokemonBiosSetZokuseiDataId",
 "addr": "0x801FD5F0",
 "size": 36,
 "label": "fight",
@@ -55601,7 +55601,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD614",
+"name": "fightOutPokemonBiosGetZokuseiDataId",
 "addr": "0x801FD614",
 "size": 52,
 "label": "fight",
@@ -55609,7 +55609,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD648",
+"name": "fightOutPokemonBiosGetFightActionBuffPtr",
 "addr": "0x801FD648",
 "size": 24,
 "label": "fight",
@@ -55617,7 +55617,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD660",
+"name": "fightOutPokemonBiosSetMeetEnemyFightPokemonEntryId",
 "addr": "0x801FD660",
 "size": 36,
 "label": "fight",
@@ -55625,7 +55625,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD684",
+"name": "fightOutPokemonBiosGetMeetEnemyFightPokemonEntryId",
 "addr": "0x801FD684",
 "size": 52,
 "label": "fight",
@@ -55633,7 +55633,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD6B8",
+"name": "fightOutPokemonBiosSetDamageSpeTargetId",
 "addr": "0x801FD6B8",
 "size": 16,
 "label": "fight",
@@ -55641,7 +55641,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD6C8",
+"name": "fightOutPokemonBiosSetDamageSpeValue",
 "addr": "0x801FD6C8",
 "size": 16,
 "label": "fight",
@@ -55649,7 +55649,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD6D8",
+"name": "fightOutPokemonBiosSetDamageAtkTargetId",
 "addr": "0x801FD6D8",
 "size": 16,
 "label": "fight",
@@ -55657,7 +55657,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD6E8",
+"name": "fightOutPokemonBiosSetDamageAtkValue",
 "addr": "0x801FD6E8",
 "size": 16,
 "label": "fight",
@@ -55665,7 +55665,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD6F8",
+"name": "fightOutPokemonBiosSetSuccessCnt",
 "addr": "0x801FD6F8",
 "size": 16,
 "label": "fight",
@@ -55673,7 +55673,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD708",
+"name": "fightOutPokemonBiosSetStockItemDataId",
 "addr": "0x801FD708",
 "size": 16,
 "label": "fight",
@@ -55681,7 +55681,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD718",
+"name": "fightOutPokemonBiosSetUsedItemDataId",
 "addr": "0x801FD718",
 "size": 16,
 "label": "fight",
@@ -55689,7 +55689,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD728",
+"name": "fightOutPokemonBiosSetNamakeFlag",
 "addr": "0x801FD728",
 "size": 16,
 "label": "fight",
@@ -55697,7 +55697,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD738",
+"name": "fightOutPokemonBiosGetDamageSpeTargetId",
 "addr": "0x801FD738",
 "size": 24,
 "label": "fight",
@@ -55705,7 +55705,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD750",
+"name": "fightOutPokemonBiosGetDamageSpeValue",
 "addr": "0x801FD750",
 "size": 24,
 "label": "fight",
@@ -55713,7 +55713,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD768",
+"name": "fightOutPokemonBiosGetDamageAtkTargetId",
 "addr": "0x801FD768",
 "size": 24,
 "label": "fight",
@@ -55721,7 +55721,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD780",
+"name": "fightOutPokemonBiosGetDamageAtkValue",
 "addr": "0x801FD780",
 "size": 24,
 "label": "fight",
@@ -55729,7 +55729,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD798",
+"name": "fightOutPokemonBiosGetSuccessCnt",
 "addr": "0x801FD798",
 "size": 24,
 "label": "fight",
@@ -55737,7 +55737,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD7B0",
+"name": "fightOutPokemonBiosGetStockItemDataId",
 "addr": "0x801FD7B0",
 "size": 24,
 "label": "fight",
@@ -55745,7 +55745,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD7C8",
+"name": "fightOutPokemonBiosGetUsedItemDataId",
 "addr": "0x801FD7C8",
 "size": 24,
 "label": "fight",
@@ -55753,7 +55753,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD7E0",
+"name": "fightOutPokemonBiosGetNamakeFlag",
 "addr": "0x801FD7E0",
 "size": 24,
 "label": "fight",
@@ -55761,7 +55761,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD7F8",
+"name": "fightOutPokemonBiosSetSequencePtr",
 "addr": "0x801FD7F8",
 "size": 16,
 "label": "fight",
@@ -55769,7 +55769,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD808",
+"name": "fightOutPokemonBiosGetSequencePtr",
 "addr": "0x801FD808",
 "size": 24,
 "label": "fight",
@@ -55777,7 +55777,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD820",
+"name": "fightOutPokemonBiosSetFightoutTurnCount",
 "addr": "0x801FD820",
 "size": 16,
 "label": "fight",
@@ -55793,7 +55793,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD840",
+"name": "fightOutPokemonBiosSetAbicntAvoid",
 "addr": "0x801FD840",
 "size": 16,
 "label": "fight",
@@ -55801,7 +55801,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD850",
+"name": "fightOutPokemonBiosSetAbicntAverage",
 "addr": "0x801FD850",
 "size": 16,
 "label": "fight",
@@ -55809,7 +55809,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD860",
+"name": "fightOutPokemonBiosSetAbicntNimbleness",
 "addr": "0x801FD860",
 "size": 16,
 "label": "fight",
@@ -55817,7 +55817,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD870",
+"name": "fightOutPokemonBiosSetAbicntSpeDef",
 "addr": "0x801FD870",
 "size": 16,
 "label": "fight",
@@ -55825,7 +55825,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD880",
+"name": "fightOutPokemonBiosSetAbicntSpeAtk",
 "addr": "0x801FD880",
 "size": 16,
 "label": "fight",
@@ -55833,7 +55833,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD890",
+"name": "fightOutPokemonBiosSetAbicntPhyDef",
 "addr": "0x801FD890",
 "size": 16,
 "label": "fight",
@@ -55841,7 +55841,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD8A0",
+"name": "fightOutPokemonBiosSetAbicntPhyAtk",
 "addr": "0x801FD8A0",
 "size": 16,
 "label": "fight",
@@ -55849,7 +55849,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD8B0",
+"name": "fightOutPokemonBiosSetFightPokemonPtr",
 "addr": "0x801FD8B0",
 "size": 16,
 "label": "fight",
@@ -55857,7 +55857,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD8C0",
+"name": "fightOutPokemonBiosSetMotoFightPokemonPtr",
 "addr": "0x801FD8C0",
 "size": 16,
 "label": "fight",
@@ -55865,7 +55865,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD8D0",
+"name": "fightPokemonBiosSetHokakuFlag",
 "addr": "0x801FD8D0",
 "size": 16,
 "label": "fight",
@@ -55873,7 +55873,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD8E0",
+"name": "fightPokemonBiosGetHokakuFlag",
 "addr": "0x801FD8E0",
 "size": 24,
 "label": "fight",
@@ -55881,7 +55881,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD8F8",
+"name": "fightPokemonBiosSetDarkOutFlag",
 "addr": "0x801FD8F8",
 "size": 16,
 "label": "fight",
@@ -55889,7 +55889,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD908",
+"name": "fightPokemonBiosSetLevelUpFlag",
 "addr": "0x801FD908",
 "size": 16,
 "label": "fight",
@@ -55897,7 +55897,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD918",
+"name": "fightPokemonBiosSetCatchEntryFlag",
 "addr": "0x801FD918",
 "size": 16,
 "label": "fight",
@@ -55905,7 +55905,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD928",
+"name": "fightPokemonBiosSetEntryId",
 "addr": "0x801FD928",
 "size": 16,
 "label": "fight",
@@ -55913,7 +55913,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD938",
+"name": "fightPokemonBiosSetMotoPokemonPtr",
 "addr": "0x801FD938",
 "size": 16,
 "label": "fight",
@@ -55921,7 +55921,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD948",
+"name": "fightOutPokemonBiosGetFightoutTurnCount",
 "addr": "0x801FD948",
 "size": 24,
 "label": "fight",
@@ -55929,7 +55929,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD960",
+"name": "fightOutPokemonBiosGetAbicntAvoid",
 "addr": "0x801FD960",
 "size": 24,
 "label": "fight",
@@ -55937,7 +55937,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD978",
+"name": "fightOutPokemonBiosGetAbicntAverage",
 "addr": "0x801FD978",
 "size": 24,
 "label": "fight",
@@ -55945,7 +55945,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD990",
+"name": "fightOutPokemonBiosGetAbicntNimbleness",
 "addr": "0x801FD990",
 "size": 24,
 "label": "fight",
@@ -55953,7 +55953,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD9A8",
+"name": "fightOutPokemonBiosGetAbicntSpeDef",
 "addr": "0x801FD9A8",
 "size": 24,
 "label": "fight",
@@ -55961,7 +55961,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD9C0",
+"name": "fightOutPokemonBiosGetAbicntSpeAtk",
 "addr": "0x801FD9C0",
 "size": 24,
 "label": "fight",
@@ -55969,7 +55969,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD9D8",
+"name": "fightOutPokemonBiosGetAbicntPhyDef",
 "addr": "0x801FD9D8",
 "size": 24,
 "label": "fight",
@@ -55977,7 +55977,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FD9F0",
+"name": "fightOutPokemonBiosGetAbicntPhyAtk",
 "addr": "0x801FD9F0",
 "size": 24,
 "label": "fight",
@@ -55985,7 +55985,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FDA08",
+"name": "fightOutPokemonBiosGetFightItemPtr",
 "addr": "0x801FDA08",
 "size": 24,
 "label": "fight",
@@ -55993,7 +55993,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FDA20",
+"name": "fightOutPokemonBiosGetFightWazaPtr",
 "addr": "0x801FDA20",
 "size": 24,
 "label": "fight",
@@ -56001,7 +56001,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FDA38",
+"name": "fightOutPokemonBiosGetFightoutJoutaiPtr",
 "addr": "0x801FDA38",
 "size": 52,
 "label": "fight",
@@ -56009,7 +56009,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FDA6C",
+"name": "fightOutPokemonBiosGetFightPokemonHensinBuffPtr",
 "addr": "0x801FDA6C",
 "size": 24,
 "label": "fight",
@@ -56017,7 +56017,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FDA84",
+"name": "fightOutPokemonBiosGetFightPokemonPtr",
 "addr": "0x801FDA84",
 "size": 24,
 "label": "fight",
@@ -56025,7 +56025,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FDA9C",
+"name": "fightOutPokemonBiosGetMotoFightPokemonPtr",
 "addr": "0x801FDA9C",
 "size": 24,
 "label": "fight",
@@ -56033,7 +56033,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FDAB4",
+"name": "fightPokemonBiosGetDarkOutFlag",
 "addr": "0x801FDAB4",
 "size": 24,
 "label": "fight",
@@ -56041,7 +56041,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FDACC",
+"name": "fightPokemonBiosGetLevelUpFlag",
 "addr": "0x801FDACC",
 "size": 24,
 "label": "fight",
@@ -56049,7 +56049,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FDAE4",
+"name": "fightPokemonBiosGetCatchEntryFlag",
 "addr": "0x801FDAE4",
 "size": 24,
 "label": "fight",
@@ -56057,7 +56057,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FDAFC",
+"name": "fightPokemonBiosGetEntryId",
 "addr": "0x801FDAFC",
 "size": 24,
 "label": "fight",
@@ -56065,7 +56065,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FDB14",
+"name": "fightPokemonBiosGetFightJoutaiPtr",
 "addr": "0x801FDB14",
 "size": 52,
 "label": "fight",
@@ -56073,7 +56073,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FDB48",
+"name": "fightPokemonBiosGetPokemonBuffPtr",
 "addr": "0x801FDB48",
 "size": 24,
 "label": "fight",
@@ -56081,7 +56081,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FDB60",
+"name": "fightPokemonBiosGetMotoPokemonPtr",
 "addr": "0x801FDB60",
 "size": 24,
 "label": "fight",
@@ -56089,7 +56089,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FDB78",
+"name": "fightOutPokemonGetRndStatus",
 "addr": "0x801FDB78",
 "size": 1520,
 "label": "fight",
@@ -56097,7 +56097,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FE168",
+"name": "fightOutPokemonToMenuPokemonStatus",
 "addr": "0x801FE168",
 "size": 656,
 "label": "fight",
@@ -56105,7 +56105,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FE3F8",
+"name": "fightOutPokemonToMenuWazaStatus",
 "addr": "0x801FE3F8",
 "size": 112,
 "label": "fight",
@@ -56113,7 +56113,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FE468",
+"name": "fightPokemonToMenuLvupStatus",
 "addr": "0x801FE468",
 "size": 244,
 "label": "fight",
@@ -56121,7 +56121,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FE55C",
+"name": "fightOutPokemonAddFightOutPokemonEnemyDamage",
 "addr": "0x801FE55C",
 "size": 120,
 "label": "fight",
@@ -56129,7 +56129,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FE5D4",
+"name": "fightOutPokemonSetHensinStatusAfterLevelUp",
 "addr": "0x801FE5D4",
 "size": 316,
 "label": "fight",
@@ -56137,7 +56137,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FE710",
+"name": "fightOutPokemonSetHensinFightPokemonStatusId",
 "addr": "0x801FE710",
 "size": 220,
 "label": "fight",
@@ -56145,7 +56145,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FE7EC",
+"name": "fightOutPokemonSetHensinPokemonStatusId",
 "addr": "0x801FE7EC",
 "size": 304,
 "label": "fight",
@@ -56153,7 +56153,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FE91C",
+"name": "fightOutPokemonCopyHensinStatus",
 "addr": "0x801FE91C",
 "size": 756,
 "label": "fight",
@@ -56161,7 +56161,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FEC10",
+"name": "fightOutPokemonUseHensinBuff",
 "addr": "0x801FEC10",
 "size": 196,
 "label": "fight",
@@ -56169,7 +56169,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FECD4",
+"name": "fightOutPokemonIsUseHensinBuff",
 "addr": "0x801FECD4",
 "size": 104,
 "label": "fight",
@@ -56177,7 +56177,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FED3C",
+"name": "fightOutPokemonSetJoutaiMigawariHp",
 "addr": "0x801FED3C",
 "size": 568,
 "label": "fight",
@@ -56185,7 +56185,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FEF74",
+"name": "fightOutPokemonGetJoutaiMigawariHp",
 "addr": "0x801FEF74",
 "size": 584,
 "label": "fight",
@@ -56193,7 +56193,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FF1BC",
+"name": "fightOutPokemonCheckFightActionWazaSelect",
 "addr": "0x801FF1BC",
 "size": 2420,
 "label": "fight",
@@ -56201,7 +56201,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FFB30",
+"name": "fightOutPokemonGetOutOkWazaBanmeAry",
 "addr": "0x801FFB30",
 "size": 920,
 "label": "fight",
@@ -56209,7 +56209,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801FFEC8",
+"name": "fightOutPokemonCheckCanOutOkWazaBanme",
 "addr": "0x801FFEC8",
 "size": 2964,
 "label": "fight",
@@ -56225,7 +56225,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80200B10",
+"name": "fightOutPokemonInitJoutaiKeep",
 "addr": "0x80200B10",
 "size": 752,
 "label": "fight",
@@ -56233,7 +56233,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80200E00",
+"name": "fightOutPokemonInitJoutaiKie",
 "addr": "0x80200E00",
 "size": 712,
 "label": "fight",
@@ -56241,7 +56241,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802010C8",
+"name": "fightOutPokemonIsJoutaiKie",
 "addr": "0x802010C8",
 "size": 384,
 "label": "fight",
@@ -56249,7 +56249,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80201248",
+"name": "fightOutPokemonGetFightOutPokemonEnemyOumuWazaDataIdAry",
 "addr": "0x80201248",
 "size": 248,
 "label": "fight",
@@ -56257,7 +56257,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80201340",
+"name": "fightOutPokemonSetOumuWazaDataId",
 "addr": "0x80201340",
 "size": 192,
 "label": "fight",
@@ -56265,7 +56265,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80201400",
+"name": "fightOutPokemonGetTasteLike",
 "addr": "0x80201400",
 "size": 124,
 "label": "fight",
@@ -56273,7 +56273,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8020147C",
+"name": "fightOutPokemonDoItemSoubi",
 "addr": "0x8020147C",
 "size": 240,
 "label": "fight",
@@ -56289,7 +56289,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80201600",
+"name": "fightOutPokemonCopyAllAbiCnt",
 "addr": "0x80201600",
 "size": 164,
 "label": "fight",
@@ -56297,7 +56297,7 @@
 "seed": "range"
 },
 {
-"name": "fn_802016A4",
+"name": "fightOutPokemonGetSex",
 "addr": "0x802016A4",
 "size": 96,
 "label": "fight",
@@ -56305,7 +56305,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80201704",
+"name": "fightOutPokemonIsHpMantan",
 "addr": "0x80201704",
 "size": 96,
 "label": "fight",
@@ -68927,14 +68927,8 @@
 {
 "label": "fight",
 "start": "0x800111C4",
-"end": "0x80011288",
-"count": 3
-},
-{
-"label": "gs-engine",
-"start": "0x80011288",
 "end": "0x80011700",
-"count": 2
+"count": 5
 },
 {
 "label": "menu",

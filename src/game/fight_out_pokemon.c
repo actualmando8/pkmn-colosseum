@@ -194,8 +194,8 @@ void fn_80202C1C(int r3,u32 r4)
     extern u16 fn_801EF634();
     extern u32 fn_801F54A4();
     extern u32 fightSideGetStatus();
-    extern s8 fn_801FA634();
-    extern int fn_801FB1C0();
+    extern s8 fightTrainerCheckValid();
+    extern int fightTrainerGetStatus();
     extern int fightOutPokemonEnemySearchAry();
     extern s8 fightOutPokemonEnemyCheckValid();
     extern void fightOutPokemonEnemyCreate();
@@ -217,10 +217,10 @@ void fn_80202C1C(int r3,u32 r4)
   uVar3 = fn_801F54A4(0,0,0x18,0);
   for (uVar12 = 0; (uVar12 & 0xffff) < (uVar2 & 0xffff); uVar12 = uVar12 + 1) {
     uVar4 = fightSideGetStatus(r4,0,7,uVar12);
-    cVar9 = fn_801FA634();
+    cVar9 = fightTrainerCheckValid();
     if (cVar9 != 0) {
       for (uVar11 = 0; (uVar11 & 0xffff) < (uVar3 & 0xffff); uVar11 = uVar11 + 1) {
-        iVar5 = fn_801FB1C0(uVar4,0,0x46,uVar11);
+        iVar5 = fightTrainerGetStatus(uVar4,0,0x46,uVar11);
         if (iVar5 == 0) {
           bVar1 = 0;
         }
@@ -469,7 +469,7 @@ void fn_80202C1C(int r3,u32 r4)
 /* 0x80203198 | size: 0x14C | medium */
 /* 0x80203198 | size: 0x14C */
 void fn_80203198(void* ctx, u32 param) {
-    extern u16 fn_801FD0EC();
+    extern u16 fightOutPokemonEnemyBiosGetOumuWazaDataId();
     extern void* fightOutPokemonEnemySearchAry();
     extern u8 fightOutPokemonEnemyCheckValid();
     extern void fightOutPokemonEnemyInit();
@@ -484,7 +484,7 @@ void fn_80203198(void* ctx, u32 param) {
     tableData = pokemonGetStatus(ctx, 0, 0x122, 0);
     entry = fightOutPokemonEnemySearchAry(tableData, 4, param);
     if (entry == NULL) { return; }
-    species = fn_801FD0EC(entry);
+    species = fightOutPokemonEnemyBiosGetOumuWazaDataId(entry);
     fightOutPokemonEnemyInit(entry);
     if (species == 0 || species == 0x165 || species == 0xFFFF) { return; }
     if ((s32)(u32)pokemonGetStatus(ctx, 0, 0xF7, 0) != 0) { return; }
@@ -495,7 +495,7 @@ void fn_80203198(void* ctx, u32 param) {
         for (i = 0; i < 4; i++) {
             entry = (void*)((u32)entryPtr + i * 0xC);
             if ((u8)fightOutPokemonEnemyCheckValid(entry) == 4) { continue; }
-            species = fn_801FD0EC(entry);
+            species = fightOutPokemonEnemyBiosGetOumuWazaDataId(entry);
             if (species == 4 || species == 0x165) { continue; }
             count++;
         }
@@ -1516,12 +1516,12 @@ void fn_80204970(void)
 #pragma peephole on
 u8 fightOutPokemonIsGcHeroFightOutPokemon(u32 slotId) {
     extern void* fn_801F4354(u32 context, u32 slot);
-    extern u8 fn_801FB8F8(void* trainer);
+    extern u8 fightTrainerIsGcHero(void* trainer);
     void* trainer = fn_801F4354(0, slotId);
     if (trainer == NULL) {
         return 0;
     }
-    return fn_801FB8F8(trainer) == 1;
+    return fightTrainerIsGcHero(trainer) == 1;
 }
 #pragma pop
 
@@ -1840,8 +1840,8 @@ void fightOutPokemonSetMeetEnemyFightPokemonEnemySideAll(int r3,u32 r4)
     extern short fn_801EF634();
     extern u32 fn_801F54A4();
     extern u32 fightSideGetStatus();
-    extern s8 fn_801FA634();
-    extern int fn_801FB1C0();
+    extern s8 fightTrainerCheckValid();
+    extern int fightTrainerGetStatus();
   u32 bVar1;
   u32 uVar2;
   u32 uVar3;
@@ -1865,10 +1865,10 @@ void fightOutPokemonSetMeetEnemyFightPokemonEnemySideAll(int r3,u32 r4)
       return;
     }
     uVar4 = fightSideGetStatus(r4,0,7,uVar12);
-    cVar10 = fn_801FA634();
+    cVar10 = fightTrainerCheckValid();
     if (cVar10 != 0) {
       for (uVar13 = 0; (uVar13 & 0xffff) < (uVar3 & 0xffff); uVar13 = uVar13 + 1) {
-        iVar5 = fn_801FB1C0(uVar4,0,0x46,uVar13);
+        iVar5 = fightTrainerGetStatus(uVar4,0,0x46,uVar13);
         if (iVar5 == 0) {
           bVar1 = 0;
         }
@@ -3407,7 +3407,7 @@ u32 fightOutPokemonCreateSequence(void)
     extern void pokemonSetSequenceStatus();
     extern u32 pokemonCheckRare();
     extern u32 fn_801DE190();
-    extern void fn_801FDB78();
+    extern void fightOutPokemonGetRndStatus();
   u32 uVar1;
   short sVar5;
   u32 uVar2;
@@ -3493,7 +3493,7 @@ LAB_00204d50:
     uVar1 = 0;
   }
   else {
-    fn_801FDB78(r3,&local_154,&local_158);
+    fightOutPokemonGetRndStatus(r3,&local_154,&local_158);
     pokemonSetStatus(auStack_150,0,0x6f,0,local_154);
     pokemonSetStatus(auStack_150,0,0x75,0,local_158);
     uVar1 = pokemonCheckRare(auStack_150);
@@ -3789,7 +3789,7 @@ void fightOutPokemonWazaEffect(u32 r3, u32 r4, u32 r5, u32 r6, int r7)
     extern void menuCloseCustom();
     extern void menuOpenCustom(int, ...);
     extern u32 fn_801F54A4();
-    extern void fn_801FE168();
+    extern void fightOutPokemonToMenuPokemonStatus();
     extern void fightWazaDoEffect();
     extern int fightMenuGetFightOutPokemonPtrToStatusMenuId();
   int iVar1;
@@ -3799,7 +3799,7 @@ void fightOutPokemonWazaEffect(u32 r3, u32 r4, u32 r5, u32 r6, int r7)
   uVar2 = fn_801F54A4(0,0,0x14,0);
   iVar1 = (int)pokemonGetStatus(r3,0,0xee,0);
   if (iVar1 != 0) {
-    fn_801FE168(r3,auStack_58);
+    fightOutPokemonToMenuPokemonStatus(r3,auStack_58);
     if (r7 >= 0) {
       r7 = fightMenuGetFightOutPokemonPtrToStatusMenuId(r3,uVar2,1);
       menuOpenCustom(r7,0,0,0,0,1,auStack_58);

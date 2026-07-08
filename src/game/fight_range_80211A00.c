@@ -639,18 +639,18 @@ void fn_8021C0F4(void) {
  * fn_8021D010 (0x8021D010)
  *
  * Clears field 0x83 of the slot-0x11 side's active Pokemon, then if
- * fn_801FECD4 reports 1, re-derives it via fn_801FE7EC. PC always
+ * fightOutPokemonIsUseHensinBuff reports 1, re-derives it via fightOutPokemonSetHensinPokemonStatusId. PC always
  * advances by 1.
  */
-extern u8 fn_801FECD4();
-extern void fn_801FE7EC();
+extern u8 fightOutPokemonIsUseHensinBuff();
+extern void fightOutPokemonSetHensinPokemonStatusId();
 void fn_8021D010(void) {
     u32 ctx1 = fn_801F025C(0x11, 0);
     u32 poke = fightOutPokemonGetPokemonPtr(ctx1);
 
     pokemonSetStatus(poke, 0, 0x83, 0, 0);
-    if (fn_801FECD4(ctx1) == 1) {
-        fn_801FE7EC(ctx1, 0x83, 0, 0);
+    if (fightOutPokemonIsUseHensinBuff(ctx1) == 1) {
+        fightOutPokemonSetHensinPokemonStatusId(ctx1, 0x83, 0, 0);
     }
     lbl_8047B610 = lbl_8047B610 + 1;
 }
@@ -779,78 +779,78 @@ s32 fightSeqGetItemType(u16 itemId) {
  * template family (0x802358AC-0x80236BFC) that differs only in the
  * final field constant.
  */
-extern u32 fn_801FB1C0();
+extern u32 fightTrainerGetStatus();
 /* Called via `bl` at every call site in the target binary despite being
  * trivially small (each is a single-use accessor consumed by exactly one
  * fightTrainerAiWazaValue* caller below) -- pragma'd not-inline to match. */
 #pragma dont_inline on
 u8 fn_802358AC(u32 ctx, u32 obj) {
-    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
-    fn_801FB1C0(0, tmp, 2, 0);
+    u16 tmp = (u16)fightTrainerGetStatus(ctx, 0, 0x43, 0);
+    fightTrainerGetStatus(0, tmp, 2, 0);
     return (u8)pokemonGetStatus(obj, 0, 0xeb, 0);
 }
 
 /* fn_80235910 (0x80235910): same shape as fn_802358AC, field 0xea. */
 u8 fn_80235910(u32 ctx, u32 obj) {
-    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
-    fn_801FB1C0(0, tmp, 2, 0);
+    u16 tmp = (u16)fightTrainerGetStatus(ctx, 0, 0x43, 0);
+    fightTrainerGetStatus(0, tmp, 2, 0);
     return (u8)pokemonGetStatus(obj, 0, 0xea, 0);
 }
 
 /* fn_80235974 (0x80235974): same shape as fn_802358AC, field 0xe9. */
 u8 fn_80235974(u32 ctx, u32 obj) {
-    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
-    fn_801FB1C0(0, tmp, 2, 0);
+    u16 tmp = (u16)fightTrainerGetStatus(ctx, 0, 0x43, 0);
+    fightTrainerGetStatus(0, tmp, 2, 0);
     return (u8)pokemonGetStatus(obj, 0, 0xe9, 0);
 }
 
 /* fn_802359D8 (0x802359D8): same shape as fn_802358AC, field 0xe8. */
 u8 fn_802359D8(u32 ctx, u32 obj) {
-    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
-    fn_801FB1C0(0, tmp, 2, 0);
+    u16 tmp = (u16)fightTrainerGetStatus(ctx, 0, 0x43, 0);
+    fightTrainerGetStatus(0, tmp, 2, 0);
     return (u8)pokemonGetStatus(obj, 0, 0xe8, 0);
 }
 
 /* fn_80235A3C (0x80235A3C): same shape as fn_802358AC, field 0xe7. */
 u8 fn_80235A3C(u32 ctx, u32 obj) {
-    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
-    fn_801FB1C0(0, tmp, 2, 0);
+    u16 tmp = (u16)fightTrainerGetStatus(ctx, 0, 0x43, 0);
+    fightTrainerGetStatus(0, tmp, 2, 0);
     return (u8)pokemonGetStatus(obj, 0, 0xe7, 0);
 }
 
 /* fn_80235AA0 (0x80235AA0): same shape as fn_802358AC, field 0xe6. */
 u8 fn_80235AA0(u32 ctx, u32 obj) {
-    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
-    fn_801FB1C0(0, tmp, 2, 0);
+    u16 tmp = (u16)fightTrainerGetStatus(ctx, 0, 0x43, 0);
+    fightTrainerGetStatus(0, tmp, 2, 0);
     return (u8)pokemonGetStatus(obj, 0, 0xe6, 0);
 }
 
 /* fn_80236458 (0x80236458): same shape as fn_802358AC, field 0xef,
  * but the return value is masked to u16 rather than u8. */
 u16 fn_80236458(u32 ctx, u32 obj) {
-    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
-    fn_801FB1C0(0, tmp, 2, 0);
+    u16 tmp = (u16)fightTrainerGetStatus(ctx, 0, 0x43, 0);
+    fightTrainerGetStatus(0, tmp, 2, 0);
     return (u16)pokemonGetStatus(obj, 0, 0xef, 0);
 }
 
 /* fn_802364BC (0x802364BC): same shape as fn_80236458, field 0xf0. */
 u16 fn_802364BC(u32 ctx, u32 obj) {
-    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
-    fn_801FB1C0(0, tmp, 2, 0);
+    u16 tmp = (u16)fightTrainerGetStatus(ctx, 0, 0x43, 0);
+    fightTrainerGetStatus(0, tmp, 2, 0);
     return (u16)pokemonGetStatus(obj, 0, 0xf0, 0);
 }
 
 /* fn_80236520 (0x80236520): same shape as fn_80236458, field 0xf1. */
 u16 fn_80236520(u32 ctx, u32 obj) {
-    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
-    fn_801FB1C0(0, tmp, 2, 0);
+    u16 tmp = (u16)fightTrainerGetStatus(ctx, 0, 0x43, 0);
+    fightTrainerGetStatus(0, tmp, 2, 0);
     return (u16)pokemonGetStatus(obj, 0, 0xf1, 0);
 }
 
 /* fn_80236B98 (0x80236B98): same shape as fn_80236458, field 0xfa. */
 u16 fn_80236B98(u32 ctx, u32 obj) {
-    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
-    fn_801FB1C0(0, tmp, 2, 0);
+    u16 tmp = (u16)fightTrainerGetStatus(ctx, 0, 0x43, 0);
+    fightTrainerGetStatus(0, tmp, 2, 0);
     return (u16)pokemonGetStatus(obj, 0, 0xfa, 0);
 }
 
@@ -862,15 +862,15 @@ u16 fn_80236B98(u32 ctx, u32 obj) {
  */
 extern s32 wazaGetStatus();
 u8 fn_802391E0(u32 ctx, u32 obj) {
-    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
-    fn_801FB1C0(0, tmp, 2, 0);
+    u16 tmp = (u16)fightTrainerGetStatus(ctx, 0, 0x43, 0);
+    fightTrainerGetStatus(0, tmp, 2, 0);
     return (u8)wazaGetStatus(0, obj, 2, 0);
 }
 
 /* fn_80239244 (0x80239244): same shape as fn_802391E0, field 0x5. */
 u8 fn_80239244(u32 ctx, u32 obj) {
-    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
-    fn_801FB1C0(0, tmp, 2, 0);
+    u16 tmp = (u16)fightTrainerGetStatus(ctx, 0, 0x43, 0);
+    fightTrainerGetStatus(0, tmp, 2, 0);
     return (u8)wazaGetStatus(0, obj, 5, 0);
 }
 
@@ -879,15 +879,15 @@ u8 fn_80239244(u32 ctx, u32 obj) {
  * the result is sign-extended to s16 rather than masked to u8.
  */
 s16 fn_80239500(u32 ctx, u32 obj) {
-    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
-    fn_801FB1C0(0, tmp, 2, 0);
+    u16 tmp = (u16)fightTrainerGetStatus(ctx, 0, 0x43, 0);
+    fightTrainerGetStatus(0, tmp, 2, 0);
     return (s16)wazaGetStatus(0, obj, 7, 0);
 }
 
 /* fn_80239564 (0x80239564): same shape as fn_802391E0, field 0xc. */
 u8 fn_80239564(u32 ctx, u32 obj) {
-    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
-    fn_801FB1C0(0, tmp, 2, 0);
+    u16 tmp = (u16)fightTrainerGetStatus(ctx, 0, 0x43, 0);
+    fightTrainerGetStatus(0, tmp, 2, 0);
     return (u8)wazaGetStatus(0, obj, 0xc, 0);
 }
 
@@ -899,8 +899,8 @@ u8 fn_80239564(u32 ctx, u32 obj) {
  * value at field 0x1a.
  */
 u8 fn_80239498(u32 ctx, u32 obj, u8 val) {
-    u16 tmp = (u16)fn_801FB1C0(ctx, 0, 0x43, 0);
-    fn_801FB1C0(0, tmp, 2, 0);
+    u16 tmp = (u16)fightTrainerGetStatus(ctx, 0, 0x43, 0);
+    fightTrainerGetStatus(0, tmp, 2, 0);
     return (u8)wazaGetStatus(0, obj, 0x1a, val);
 }
 #pragma dont_inline reset
@@ -920,7 +920,7 @@ u8 fn_80239498(u32 ctx, u32 obj, u8 val) {
  *     (message base+1)
  *   - whether fn_80235714(ctx, poke) reads 1 (message base+2)
  * Finally, a "count" derived from field byte v (clamped >=0 at 6,
- * scaled by fn_801FB1C0(0, base+3, 0x3e, 0)) is resolved through
+ * scaled by fightTrainerGetStatus(0, base+3, 0x3e, 0)) is resolved through
  * fightTrainerAiAddValue (the actual return value) and fn_80239CCC (side effect
  * only, message base+3).
  */
@@ -982,7 +982,7 @@ after_scan:
         if (count2 < 0) {
             count2 = 0;
         }
-        scale = fn_801FB1C0(0, 0x20b, 0x3e, 0);
+        scale = fightTrainerGetStatus(0, 0x20b, 0x3e, 0);
         count2 = count2 * scale;
         result = fightTrainerAiAddValue(acc, count2);
         fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(poke), 0, 0, msgArg, 0, 0x20b, count2);
@@ -1042,7 +1042,7 @@ after_scan_ryuunomai:
         if (count2 < 0) {
             count2 = 0;
         }
-        scale = fn_801FB1C0(0, 0x207, 0x3e, 0);
+        scale = fightTrainerGetStatus(0, 0x207, 0x3e, 0);
         count2 = count2 * scale;
         result = fightTrainerAiAddValue(acc, count2);
         fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(poke), 0, 0, msgArg, 0, 0x207, count2);
@@ -1102,7 +1102,7 @@ after_scan_birudoappu:
         if (count2 < 0) {
             count2 = 0;
         }
-        scale = fn_801FB1C0(0, 0x203, 0x3e, 0);
+        scale = fightTrainerGetStatus(0, 0x203, 0x3e, 0);
         count2 = count2 * scale;
         result = fightTrainerAiAddValue(acc, count2);
         fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(poke), 0, 0, msgArg, 0, 0x203, count2);
@@ -1162,7 +1162,7 @@ after_scan_kosumopawaa:
         if (count2 < 0) {
             count2 = 0;
         }
-        scale = fn_801FB1C0(0, 0x1ff, 0x3e, 0);
+        scale = fightTrainerGetStatus(0, 0x1ff, 0x3e, 0);
         count2 = count2 * scale;
         result = fightTrainerAiAddValue(acc, count2);
         fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(poke), 0, 0, msgArg, 0, 0x1ff, count2);
@@ -1222,7 +1222,7 @@ after_scan_kaihirituappu:
         if (count2 < 0) {
             count2 = 0;
         }
-        scale = fn_801FB1C0(0, 0x1fb, 0x3e, 0);
+        scale = fightTrainerGetStatus(0, 0x1fb, 0x3e, 0);
         count2 = count2 * scale;
         result = fightTrainerAiAddValue(acc, count2);
         fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(poke), 0, 0, msgArg, 0, 0x1fb, count2);
@@ -1282,7 +1282,7 @@ after_scan_dowasure:
         if (count2 < 0) {
             count2 = 0;
         }
-        scale = fn_801FB1C0(0, 0x1f7, 0x3e, 0);
+        scale = fightTrainerGetStatus(0, 0x1f7, 0x3e, 0);
         count2 = count2 * scale;
         result = fightTrainerAiAddValue(acc, count2);
         fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(poke), 0, 0, msgArg, 0, 0x1f7, count2);
@@ -1342,7 +1342,7 @@ after_scan_tokukouappu:
         if (count2 < 0) {
             count2 = 0;
         }
-        scale = fn_801FB1C0(0, 0x1f3, 0x3e, 0);
+        scale = fightTrainerGetStatus(0, 0x1f3, 0x3e, 0);
         count2 = count2 * scale;
         result = fightTrainerAiAddValue(acc, count2);
         fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(poke), 0, 0, msgArg, 0, 0x1f3, count2);
@@ -1402,7 +1402,7 @@ after_scan_kousokuidou:
         if (count2 < 0) {
             count2 = 0;
         }
-        scale = fn_801FB1C0(0, 0x1ef, 0x3e, 0);
+        scale = fightTrainerGetStatus(0, 0x1ef, 0x3e, 0);
         count2 = count2 * scale;
         result = fightTrainerAiAddValue(acc, count2);
         fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(poke), 0, 0, msgArg, 0, 0x1ef, count2);
@@ -1462,7 +1462,7 @@ after_scan_bougyoappu:
         if (count2 < 0) {
             count2 = 0;
         }
-        scale = fn_801FB1C0(0, 0x1eb, 0x3e, 0);
+        scale = fightTrainerGetStatus(0, 0x1eb, 0x3e, 0);
         count2 = count2 * scale;
         result = fightTrainerAiAddValue(acc, count2);
         fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(poke), 0, 0, msgArg, 0, 0x1eb, count2);
@@ -1522,7 +1522,7 @@ after_scan_kougekiappu:
         if (count2 < 0) {
             count2 = 0;
         }
-        scale = fn_801FB1C0(0, 0x1e7, 0x3e, 0);
+        scale = fightTrainerGetStatus(0, 0x1e7, 0x3e, 0);
         count2 = count2 * scale;
         result = fightTrainerAiAddValue(acc, count2);
         fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(poke), 0, 0, msgArg, 0, 0x1e7, count2);

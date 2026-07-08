@@ -216,15 +216,15 @@ s32 _fightTrainerAiCheckHorobinoutaSub(void* floor, u32 idx, HorobinoutaCtx* ctx
 
 /* Address: 0x8025C770 | Size: 0x98 */
 u32 fightTrainerAiCheckTextureZokusei(void* ctx, u32 param1, u32 param2) {
-    extern u32 fn_801FB1C0(void*, u32, u32, u32);
+    extern u32 fightTrainerGetStatus(void*, u32, u32, u32);
     extern u8 fn_8021B364(u32, void*);
     u8 out[0x10];
     u32 value;
     u32 result;
 
-    value = fn_801FB1C0(ctx, 0, 0x43, 0) & 0xFFFF;
-    value = fn_801FB1C0(0, value, 2, 0) & 0xFFFF;
-    if ((u8)fn_801FB1C0(0, value, 0x2a, 0) == 1) {
+    value = fightTrainerGetStatus(ctx, 0, 0x43, 0) & 0xFFFF;
+    value = fightTrainerGetStatus(0, value, 2, 0) & 0xFFFF;
+    if ((u8)fightTrainerGetStatus(0, value, 0x2a, 0) == 1) {
         value = fn_8021B364(param1, out) & 0xFF;
         result = value >= 1;
         return result & 0xFF;
@@ -236,7 +236,7 @@ u32 fightTrainerAiCheckTextureZokusei(void* ctx, u32 param1, u32 param2) {
 u32 fightTrainerAiCheckAbiCnt(void* ctx, u32 param1, u32 param2, u32 param3, u32 param4, u32 param5, u32 param6) {
     extern void fn_801F025C();
     extern void fightSideIsJoutaiDataId();
-    extern void fn_801FB1C0();
+    extern void fightTrainerGetStatus();
     extern void fightSeqCondChgActParaIdToValue();
     extern void fightSeqCondChgActTypeToPokemonStatusId();
     extern void fn_80229C28();
@@ -327,17 +327,17 @@ u32 fightTrainerAiCheckAbiCnt(void* ctx, u32 param1, u32 param2, u32 param3, u32
             r4 = 0x0;
             r5 = 0x43;
             r6 = 0x0;
-            fn_801FB1C0();
+            fightTrainerGetStatus();
             r4 = r3 & 0xFFFF;
             r3 = 0x0;
             r5 = 0x2;
             r6 = 0x0;
-            fn_801FB1C0();
+            fightTrainerGetStatus();
             r4 = r3 & 0xFFFF;
             r3 = 0x0;
             r5 = 0x24;
             r6 = 0x0;
-            fn_801FB1C0();
+            fightTrainerGetStatus();
             r0 = r3 & 0xFF;
             if (r0 == (u32)0x1) {
                 r3 = r23;
@@ -434,13 +434,13 @@ u32 fightTrainerAiCheckAbiCnt(void* ctx, u32 param1, u32 param2, u32 param3, u32
 
 /* Address: 0x8025CAA8 | Size: 0x94 */
 u32 fightTrainerAiCheckGuard(void* ctx, u32 param1, u32 param2) {
-    extern u32 fn_801FB1C0(void*, u32, u32, u32);
+    extern u32 fightTrainerGetStatus(void*, u32, u32, u32);
     extern u8 fn_80229C28(u32, u32);
     u32 value;
 
-    value = fn_801FB1C0(ctx, 0, 0x43, 0) & 0xFFFF;
-    value = fn_801FB1C0(0, value, 2, 0) & 0xFFFF;
-    if ((u8)fn_801FB1C0(0, value, 0x24, 0) == 1) {
+    value = fightTrainerGetStatus(ctx, 0, 0x43, 0) & 0xFFFF;
+    value = fightTrainerGetStatus(0, value, 2, 0) & 0xFFFF;
+    if ((u8)fightTrainerGetStatus(0, value, 0x24, 0) == 1) {
         if (fn_80229C28(param1, param2) == 1) {
             return 1;
         }
@@ -452,7 +452,7 @@ u32 fightTrainerAiCheckGuard(void* ctx, u32 param1, u32 param2) {
 u16 fightTrainerAiCheckOumu(void* ctx, u32 param1, u32 param2) {
     extern u32 fn_800E0C54(void);
     extern u32 pokemonGetStatus(u32, u32, u32, u32);
-    extern u8 fn_80201248(u32, u16*);
+    extern u8 fightOutPokemonGetFightOutPokemonEnemyOumuWazaDataIdAry(u32, u16*);
     u16 choices[4];
     u32 species;
     s32 random;
@@ -463,7 +463,7 @@ u16 fightTrainerAiCheckOumu(void* ctx, u32 param1, u32 param2) {
     if ((species != 0) && (species != 0x165) && (species != 0xFFFF)) {
         return species;
     }
-    count = fn_80201248(param1, choices);
+    count = fightOutPokemonGetFightOutPokemonEnemyOumuWazaDataIdAry(param1, choices);
     if (count != 0) {
         random = fn_800E0C54() & 0xFFFF;
         index = random % (s32)(u8)count;

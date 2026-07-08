@@ -6,14 +6,14 @@
  *
  * This module manages the task system that sits between the main loop and
  * the individual game subsystems. It handles:
- *   - FSYS archive loading via task callbacks (fn_801FB1C0)
+ *   - FSYS archive loading via task callbacks (fightTrainerGetStatus)
  *   - Scene transition sequencing with menuOpenCustom dispatch
  *   - Archive completion callbacks with scene ID routing
  *   - Resource group management (models, textures, scripts)
  *
  * The functions follow a clear pattern:
  *   1. Load an SDA global (lbl_8047A288) for the current scene/map ID
- *   2. Call fn_801FB1C0 to initiate an archive load with a priority level
+ *   2. Call fightTrainerGetStatus to initiate an archive load with a priority level
  *   3. On success, call winMsgOpenFight and winMsgCloseFight to activate the loaded data
  *   4. Return 1 on success, -1 on failure
  *
@@ -90,7 +90,7 @@ extern void  cameraResetFloor(void);                   /* GSscene_CameraSetPosit
 extern void  GSscene_SetMode(s32 mode);               /* GSscene_SetMode */
 
 /* FSYS archive loading */
-extern void* fn_801FB1C0(s32 slot, u16 sceneId, s32 priority, s32 group);
+extern void* fightTrainerGetStatus(s32 slot, u16 sceneId, s32 priority, s32 group);
 extern s32   winMsgOpenFight(void* handle, s32 a, s32 b);
 extern s32   winMsgCloseFight(s32 slot);
 
@@ -239,7 +239,7 @@ s32 dbgMenuCameraSetType(void* unused, s32 mode) {
 s32 fn_80006724(void) {
     void* result;
 
-    result = fn_801FB1C0(0, gCurrentSceneId, 8, 3);
+    result = fightTrainerGetStatus(0, gCurrentSceneId, 8, 3);
     if (result == NULL) {
         return -1;
     }
@@ -260,7 +260,7 @@ s32 fn_80006724(void) {
 s32 fn_8000677C(void) {
     void* result;
 
-    result = fn_801FB1C0(0, gCurrentSceneId, 8, 2);
+    result = fightTrainerGetStatus(0, gCurrentSceneId, 8, 2);
     if (result == NULL) {
         return -1;
     }
@@ -280,7 +280,7 @@ s32 fn_8000677C(void) {
 s32 fn_800067D4(void) {
     void* result;
 
-    result = fn_801FB1C0(0, gCurrentSceneId, 8, 1);
+    result = fightTrainerGetStatus(0, gCurrentSceneId, 8, 1);
     if (result == NULL) {
         return -1;
     }
@@ -300,7 +300,7 @@ s32 fn_800067D4(void) {
 s32 fn_8000682C(void) {
     void* result;
 
-    result = fn_801FB1C0(0, gCurrentSceneId, 8, 0);
+    result = fightTrainerGetStatus(0, gCurrentSceneId, 8, 0);
     if (result == NULL) {
         return -1;
     }
@@ -1260,7 +1260,7 @@ s32 dbgMenuFightStopHostWin(void) {
 
 /* dbgMenuFightFightPokemonSelect5 - 0x80007154 | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl menuFightPokemonSelectSub vs bl menuFightPokemonSelectSub (same addr) */
 extern s32  menuFightPokemonSelectSub(void);
-extern u32  fn_801F986C(u32 ptr, s32 slot);
+extern u32  fightTrainerGetValidFightPokemonPtr(u32 ptr, s32 slot);
 extern u32  lbl_8047A278;
 extern u32  lbl_8047A27C;
 #if 0
@@ -1272,7 +1272,7 @@ asm void dbgMenuFightFightPokemonSelect5(void) {
 #pragma peephole off
 s32 dbgMenuFightFightPokemonSelect5(void) {
     if (fn_801EF63C() == 0) return -1;
-    lbl_8047A27C = fn_801F986C(lbl_8047A278, 5);
+    lbl_8047A27C = fightTrainerGetValidFightPokemonPtr(lbl_8047A278, 5);
     if (lbl_8047A27C == 0) return -1;
     return menuFightPokemonSelectSub();
 }
@@ -1289,7 +1289,7 @@ asm void dbgMenuFightFightPokemonSelect4(void) {
 #pragma peephole off
 s32 dbgMenuFightFightPokemonSelect4(void) {
     if (fn_801EF63C() == 0) return -1;
-    lbl_8047A27C = fn_801F986C(lbl_8047A278, 4);
+    lbl_8047A27C = fightTrainerGetValidFightPokemonPtr(lbl_8047A278, 4);
     if (lbl_8047A27C == 0) return -1;
     return menuFightPokemonSelectSub();
 }
@@ -1306,7 +1306,7 @@ asm void dbgMenuFightFightPokemonSelect3(void) {
 #pragma peephole off
 s32 dbgMenuFightFightPokemonSelect3(void) {
     if (fn_801EF63C() == 0) return -1;
-    lbl_8047A27C = fn_801F986C(lbl_8047A278, 3);
+    lbl_8047A27C = fightTrainerGetValidFightPokemonPtr(lbl_8047A278, 3);
     if (lbl_8047A27C == 0) return -1;
     return menuFightPokemonSelectSub();
 }
@@ -1323,7 +1323,7 @@ asm void dbgMenuFightFightPokemonSelect2(void) {
 #pragma peephole off
 s32 dbgMenuFightFightPokemonSelect2(void) {
     if (fn_801EF63C() == 0) return -1;
-    lbl_8047A27C = fn_801F986C(lbl_8047A278, 2);
+    lbl_8047A27C = fightTrainerGetValidFightPokemonPtr(lbl_8047A278, 2);
     if (lbl_8047A27C == 0) return -1;
     return menuFightPokemonSelectSub();
 }
@@ -1340,7 +1340,7 @@ asm void dbgMenuFightFightPokemonSelect1(void) {
 #pragma peephole off
 s32 dbgMenuFightFightPokemonSelect1(void) {
     if (fn_801EF63C() == 0) return -1;
-    lbl_8047A27C = fn_801F986C(lbl_8047A278, 1);
+    lbl_8047A27C = fightTrainerGetValidFightPokemonPtr(lbl_8047A278, 1);
     if (lbl_8047A27C == 0) return -1;
     return menuFightPokemonSelectSub();
 }
@@ -1357,7 +1357,7 @@ asm void dbgMenuFightFightPokemonSelect0(void) {
 #pragma peephole off
 s32 dbgMenuFightFightPokemonSelect0(void) {
     if (fn_801EF63C() == 0) return -1;
-    lbl_8047A27C = fn_801F986C(lbl_8047A278, 0);
+    lbl_8047A27C = fightTrainerGetValidFightPokemonPtr(lbl_8047A278, 0);
     if (lbl_8047A27C == 0) return -1;
     return menuFightPokemonSelectSub();
 }
@@ -1369,9 +1369,9 @@ extern void* fn_801F54A4(s32 a, u16 b, s32 c, s32 d);
 extern void* fightPokemonGetPokemonPtr(u32 ctx);
 extern void* fn_801F4460(s32 a, u32 ctx);
 extern u8   figthPokemonGetLevel(u32 ctx);
-extern u8   fn_801F8C00(void* ptr, u32 ctx);
-extern void* fn_801F8D80(void* ptr, u32 ctx);
-extern u8   fn_801FECD4(void);
+extern u8   fightTrainerCheckCanIrekaeFightPokemon(void* ptr, u32 ctx);
+extern void* fightTrainerGetFightPokemonPtrToFightOutPokemonPtr(void* ptr, u32 ctx);
+extern u8   fightOutPokemonIsUseHensinBuff(void);
 extern void fightOutPokemonGetTokuseiDataId(void* ptr);
 extern void fightOutPokemonGetZokuseiDataId(void* ptr, s32 a);
 extern s32  fn_800096B4(void* ptr, s32 a, u8* b, u8* c, u8* d, u8* e);
@@ -1433,9 +1433,9 @@ s32 menuFightPokemonSelectSub(u32 ctx) {
 
     prevLevel = figthPokemonGetLevel(ctx);
 
-    if (fn_801F8C00(archive, ctx) == 2) {
-        encounter = fn_801F8D80(archive, ctx);
-        if (fn_801FECD4() == 1) {
+    if (fightTrainerCheckCanIrekaeFightPokemon(archive, ctx) == 2) {
+        encounter = fightTrainerGetFightPokemonPtrToFightOutPokemonPtr(archive, ctx);
+        if (fightOutPokemonIsUseHensinBuff() == 1) {
             return -1;
         }
 
@@ -1550,8 +1550,8 @@ asm void dbgMenuFightFightTrainerAiDataEdit(void) {
 s32 dbgMenuFightFightTrainerAiDataEdit(void) {
     u16 tmp;
     u16 slot;
-    tmp  = (u16)(u32)fn_801FB1C0((s32)lbl_8047A278, 0, 0x43, 0);
-    slot = (u16)(u32)fn_801FB1C0(0, tmp, 2, 0);
+    tmp  = (u16)(u32)fightTrainerGetStatus((s32)lbl_8047A278, 0, 0x43, 0);
+    slot = (u16)(u32)fightTrainerGetStatus(0, tmp, 2, 0);
     if (fn_801EF63C() == 0) return -1;
     return fn_80051E38(slot);
 }
@@ -2148,10 +2148,10 @@ void* _dbgMenuFightGetFightTrainerAiAddsubValueDataIdSub(u32 id) {
         r30 = r31;
         r29 = r31;
     } else {
-        r31 = fn_801FB1C0(0, (u16)id, 0x40, 0);
-        r30 = fn_801FB1C0(0, (u16)id, 0x41, 0);
-        r29 = fn_801FB1C0(0, (u16)id, 0x3f, 0);
-        r28 = fn_801FB1C0(0, (u16)id, 0x3e, 0);
+        r31 = fightTrainerGetStatus(0, (u16)id, 0x40, 0);
+        r30 = fightTrainerGetStatus(0, (u16)id, 0x41, 0);
+        r29 = fightTrainerGetStatus(0, (u16)id, 0x3f, 0);
+        r28 = fightTrainerGetStatus(0, (u16)id, 0x3e, 0);
     }
     if (r29 == 0) r29 = (void*)0xEB63;
     if (r31 == 0) r31 = (void*)0xEB63;
@@ -2172,7 +2172,7 @@ extern u32 lbl_80478F08;
 void* _dbgMenuFightGetFightTrainerPokemonPartDataIdSub(u32 id) {
     if (id == 0) return fn_800FA280(0xEB63);
     if (id >= *(u32*)(void*)lbl_80478F08) return fn_800FA280(0xEB63);
-    return fn_800FA280((u32)fn_801FB1C0(0, (u16)id, 0xb, 0));
+    return fn_800FA280((u32)fightTrainerGetStatus(0, (u16)id, 0xb, 0));
 }
 #pragma pop
 
@@ -2286,7 +2286,7 @@ void* fn_8000868C(u32 id) {
     if (id >= *(u32*)lbl_80478F20) {
         result = 0xEB63;
     } else {
-        result = (u32)fn_801FB1C0(0, (u16)id, 3, 0);
+        result = (u32)fightTrainerGetStatus(0, (u16)id, 3, 0);
     }
     if (result == 0) result = 0xEB63;
     return fn_800FA280(result);

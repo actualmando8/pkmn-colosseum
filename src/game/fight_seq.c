@@ -575,8 +575,8 @@ void fn_80211E18(u32 r3,u32 r4)
     extern void fn_801F4C14();
     extern u32 fn_801F54A4();
     extern u32 fn_801F8000();
-    extern u32 fn_801F8100();
-    extern u32 fn_801FB1C0();
+    extern u32 fightTrainerGetNamePtr();
+    extern u32 fightTrainerGetStatus();
     extern int fn_802026E4();
     extern void fightOutPokemonWriteJoutaiDataId();
     extern void fn_80211B94();
@@ -607,7 +607,7 @@ void fn_80211E18(u32 r3,u32 r4)
   uVar3 = fn_801F025C(0x11,0);
   uVar4 = fn_801F025C(0x12,0);
   uVar5 = fn_801F4354(0,uVar3);
-  uVar6 = fn_801FB1C0(uVar5,0,0x44,0);
+  uVar6 = fightTrainerGetStatus(uVar5,0,0x44,0);
   iVar7 = (int)pokemonGetStatus(uVar3,0,0xe5,0);
   if (iVar7 != 0) {
     itemGetStatus(iVar7,0,0x1f,0);
@@ -841,9 +841,9 @@ void fn_80211E18(u32 r3,u32 r4)
     lbl_8047B614 = 0;
     uVar3 = fn_801F8000(uVar5);
     fn_80132A38(0x22,uVar3);
-    uVar3 = fn_801F8100(uVar5);
+    uVar3 = fightTrainerGetNamePtr(uVar5);
     fn_80132A38(0x23,uVar3);
-    uVar3 = fn_801F8100(uVar5);
+    uVar3 = fightTrainerGetNamePtr(uVar5);
     fn_80132A38(0x13,uVar3);
     itemGetStatus(0,r4 & 0xffff,1,0);
     uVar3 = fn_800FA280();

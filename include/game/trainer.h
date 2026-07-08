@@ -3,7 +3,7 @@
  * @brief Trainer/party data access API for Pokemon Colosseum.
  *
  * The trainer data system provides a unified interface for querying trainer
- * and Pokemon party information. The core function TrainerDataGet (fn_801FB1C0)
+ * and Pokemon party information. The core function TrainerDataGet (fightTrainerGetStatus)
  * is the single most called function from the target range at 883 call sites.
  *
  * Subsystem map (0x801FB1C0 - 0x80200A8C, ~180 functions):
@@ -17,11 +17,11 @@
  * The TrainerDataGet dispatch works in two phases:
  *   Phase 1: Determine the "category" from the field ID (r5) and load
  *            the appropriate sub-object pointer via one of:
- *            fn_801FCCC4 (fields 0x01-0x09, battle trainer)
- *            fn_801FCAD0 (fields 0x0A-0x0C, party config)
- *            fn_801FCA2C (fields 0x0D-0x1D, team roster)
- *            fn_801FC658 (fields 0x1E-0x3C, story/event data)
- *            fn_801FBFBC (fields 0x3D-0x41, misc attributes)
+ *            fightTrainerDataBiosGetPtr (fields 0x01-0x09, battle trainer)
+ *            fightTrainerPokemonPartDataBiosGetPtr (fields 0x0A-0x0C, party config)
+ *            fightTrainerPokemonDataBiosGetPtr (fields 0x0D-0x1D, team roster)
+ *            fightTrainerAiDataBiosGetPtr (fields 0x1E-0x3C, story/event data)
+ *            fightTrainerAiValueAddsubDataBiosGetPtr (fields 0x3D-0x41, misc attributes)
  *
  *   Phase 2: Use jumptable_803757D8 (86 entries) to call the specific
  *            getter for the requested field.
@@ -71,7 +71,7 @@
  * ========================================================================= */
 
 /**
- * fn_801FB1C0 - TrainerDataGet
+ * fightTrainerGetStatus - TrainerDataGet
  * Read a field from a trainer or their party.
  *
  * @param pokemon  Pokemon context pointer (r3, can be from fn_801F025C)
@@ -85,7 +85,7 @@
 u32 TrainerDataGet(void* pokemon, u32 slot, u16 field, u32 extra);
 
 /**
- * fn_801FAA58 - TrainerDataSet
+ * fightTrainerSetStatus - TrainerDataSet
  * Write a field to a trainer or their party.
  *
  * @param pokemon  Pokemon context pointer (r3)

@@ -327,7 +327,7 @@ u32 _fightGSfloorTrainerCB__FPvUsPv(u32 r3,u32 r4,char *r5)
   int base;
   int iVar8;
   
-  iVar1 = fn_801FB1C0(r3,0,0x4c,0);
+  iVar1 = fightTrainerGetStatus(r3,0,0x4c,0);
   if (iVar1 == 0) {
     return 1;
   }

@@ -165,7 +165,7 @@ u32 fn_8020DAD0(u32 p1) {
     extern void fn_801F4C14();
     extern u32 fn_801F54A4();
     extern u32 fn_801FCC7C();
-    extern u32 fn_801FCCC4();
+    extern u32 fightTrainerDataBiosGetPtr();
     extern u16 fightEncountDataBiosGetWipeEffectSndID();
     extern f32 fightEncountDataBiosGetWipeEffectTime();
     extern u32 fightEncountDataBiosGetWipeSnapshotUse();
@@ -211,7 +211,7 @@ u32 fn_8020DAD0(u32 p1) {
         iVar3 = fightKindDataBiosGetPtr(uVar9);
         if ((iVar3 != 0) && (cVar10 = fightKindDataBiosGetPokemonStatusMenuSubbarFlag(), cVar10 != 0)) {
             fightEncountDataBiosGetFightTrainerDataId(uVar1, 1);
-            iVar3 = fn_801FCCC4();
+            iVar3 = fightTrainerDataBiosGetPtr();
             if (iVar3 != 0) {
                 uVar2 = fn_801FCC7C();
                 sVar8 = charNameBiosSearchIndex();
@@ -288,9 +288,9 @@ int fightEncountGetBgmSndDataId(void)
     u32 r3;
 
     extern int fn_801F54A4();
-    extern short fn_801FB1C0();
-    extern int fn_801FBD10();
-    extern void fn_801FBD58();
+    extern short fightTrainerGetStatus();
+    extern int fightTrainerKindDataBiosGetBgmSndId();
+    extern void fightTrainerKindDataBiosGetPtr();
     extern u32 fightEncountDataBiosGetBgmSndId();
     extern u16 fightEncountDataBiosGetFightTrainerDataId();
     extern u16 fightEncountDataBiosGetFightFloorDataId();
@@ -311,9 +311,9 @@ int fightEncountGetBgmSndDataId(void)
     if (iVar2 == 0) {
       for (uVar6 = 0; uVar6 < 4; uVar6 = uVar6 + 1) {
         uVar4 = fightEncountDataBiosGetFightTrainerDataId(uVar1,uVar6 & 0xff);
-        if (((uVar4 & 0xffff) != 0) && (sVar5 = fn_801FB1C0(0,uVar4,4,0), sVar5 != 0)) {
-          fn_801FBD58();
-          iVar2 = fn_801FBD10();
+        if (((uVar4 & 0xffff) != 0) && (sVar5 = fightTrainerGetStatus(0,uVar4,4,0), sVar5 != 0)) {
+          fightTrainerKindDataBiosGetPtr();
+          iVar2 = fightTrainerKindDataBiosGetBgmSndId();
           if (iVar2 != 0) {
             return iVar2;
           }

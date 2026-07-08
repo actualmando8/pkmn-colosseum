@@ -11,14 +11,14 @@
  *     This is the largest BSS allocation in the gap -- it stores cached copies
  *     of all item data for fast display (553 species * 0x14 bytes = 0x2B24).
  *   - fn_8004EADC and fn_8004EC54 are initialization functions that copy
- *     item data from the save file (via fn_801FBFBC) into the local cache,
+ *     item data from the save file (via fightTrainerAiValueAddsubDataBiosGetPtr) into the local cache,
  *     iterating 0x229 (553) times with 0x14-byte entries.
  *   - fn_8004EDCC, fn_8004F860, fn_8004FE3C and fn_80050844 share one
  *     template: reload the species cache, then run a scene-message loop
  *     (menuOpenCustom/menuGetCursorItemID) that dispatches per-message onto
  *     HANDLE_BAG_VALUE, which reads a numeric field from the on-screen input
  *     widget (fn_8001E224), clamps it to +-0xC8, and commits it
- *     (fn_801FAA58). Each of the four owns a distinct scene model
+ *     (fightTrainerSetStatus). Each of the four owns a distinct scene model
  *     (0x87/0x8A/0x8B/0x8C) and a distinct set of message-ID -> field-slot
  *     pairs; the message IDs are mostly a contiguous per-pocket range with
  *     one or two special IDs (e.g. registered/key-item actions) spliced in.
@@ -48,9 +48,9 @@ extern void  fn_800FB680(u32 a, u32 b, s32 c, u32 d); /* sound trigger */
 extern void  fn_80132A38(u32 effectId, u32 param);
 
 /* ===== Pokemon data ===== */
-extern void* fn_801FBFBC(u32 species);    /* Species base data get */
-extern void  fn_801FAA58(u32 a, u32 b, u32 c, u32 d, s32 e);
-extern u32   fn_801FB1C0(u32 a, u32 b, u32 c, u32 d);
+extern void* fightTrainerAiValueAddsubDataBiosGetPtr(u32 species);    /* Species base data get */
+extern void  fightTrainerSetStatus(u32 a, u32 b, u32 c, u32 d, s32 e);
+extern u32   fightTrainerGetStatus(u32 a, u32 b, u32 c, u32 d);
 
 /* ===== Text / Messages ===== */
 extern u8    fn_8001E224(u32 msgBank, s32* out, u32 a, u32 b, u32 c, u32 d);
@@ -70,13 +70,13 @@ extern BagCacheEntry lbl_803A6AB0[];   /* Bag item cache (0x2B38 bytes) */
 /*
  * Clamp a numeric bag-value field (IV/EV-style stat, quantity, etc.) read via
  * the on-screen numeric input widget, then write it back.
- *   fn_801FB1C0(0, slot_, 0x3E, 0)      -- resolve the widget's message bank
+ *   fightTrainerGetStatus(0, slot_, 0x3E, 0)      -- resolve the widget's message bank
  *   fn_8001E224(bank, &value_, 0,0x32,0x32,0) -- read+validate the entered value
- *   fn_801FAA58(0, slot_, 0x3E, 0, value_)     -- commit the clamped value
+ *   fightTrainerSetStatus(0, slot_, 0x3E, 0, value_)     -- commit the clamped value
  *   fn_8001E200()                              -- close the widget
  */
 #define HANDLE_BAG_VALUE(slot_, value_)                                           \
-        if (fn_8001E224(fn_801FB1C0(0, (slot_), 0x3E, 0),                         \
+        if (fn_8001E224(fightTrainerGetStatus(0, (slot_), 0x3E, 0),                         \
                         &(value_), 0, 0x32, 0x32, 0) == 1) {                      \
             if ((value_) > 0xC8) {                                                \
                 (value_) = 0xC8;                                                  \
@@ -84,7 +84,7 @@ extern BagCacheEntry lbl_803A6AB0[];   /* Bag item cache (0x2B38 bytes) */
             if ((value_) < -0xC8) {                                               \
                 (value_) = -0xC8;                                                 \
             }                                                                     \
-            fn_801FAA58(0, (slot_), 0x3E, 0, (value_));                           \
+            fightTrainerSetStatus(0, (slot_), 0x3E, 0, (value_));                           \
         }                                                                         \
         fn_8001E200()
 
@@ -113,7 +113,7 @@ s32 fn_8004EADC(void) {
 
     index = 0;
     while ((u16)index < 0x229) {
-        src = fn_801FBFBC(index);
+        src = fightTrainerAiValueAddsubDataBiosGetPtr(index);
         dst = &lbl_803A6AB0[(u16)index];
         index++;
         *dst = *src;
@@ -126,7 +126,7 @@ s32 fn_8004EADC(void) {
 
             index = 0;
             while ((u16)index < 0x229) {
-                dst = fn_801FBFBC(index);
+                dst = fightTrainerAiValueAddsubDataBiosGetPtr(index);
                 src = &lbl_803A6AB0[(u16)index];
                 index++;
                 *dst = *src;
@@ -157,7 +157,7 @@ s32 fn_8004EC54(void) {
 
     index = 0;
     while ((u16)index < 0x229) {
-        src = fn_801FBFBC(index);
+        src = fightTrainerAiValueAddsubDataBiosGetPtr(index);
         dst = &lbl_803A6AB0[(u16)index];
         index++;
         *dst = *src;
@@ -170,7 +170,7 @@ s32 fn_8004EC54(void) {
 
             index = 0;
             while ((u16)index < 0x229) {
-                dst = fn_801FBFBC(index);
+                dst = fightTrainerAiValueAddsubDataBiosGetPtr(index);
                 src = &lbl_803A6AB0[(u16)index];
                 index++;
                 *dst = *src;
@@ -228,7 +228,7 @@ s32 fn_80050844(void) {
     u32 msg;
 
     for (index = 0; (u16)index < 0x229; index++) {
-        src = fn_801FBFBC(index);
+        src = fightTrainerAiValueAddsubDataBiosGetPtr(index);
         dst = &lbl_803A6AB0[(u16)index];
         *dst = *src;
     }
@@ -239,7 +239,7 @@ s32 fn_80050844(void) {
             menuCloseCustom(0x8A, 0, 1);
 
             for (index = 0; (u16)index < 0x229; index++) {
-                dst = fn_801FBFBC(index);
+                dst = fightTrainerAiValueAddsubDataBiosGetPtr(index);
                 src = &lbl_803A6AB0[(u16)index];
                 *dst = *src;
             }
@@ -361,7 +361,7 @@ s32 fn_8004F860(void) {
     u32 msg;
 
     for (index = 0; (u16)index < 0x229; index++) {
-        src = fn_801FBFBC(index);
+        src = fightTrainerAiValueAddsubDataBiosGetPtr(index);
         dst = &lbl_803A6AB0[(u16)index];
         *dst = *src;
     }
@@ -372,7 +372,7 @@ s32 fn_8004F860(void) {
             menuCloseCustom(0x87, 0, 1);
 
             for (index = 0; (u16)index < 0x229; index++) {
-                dst = fn_801FBFBC(index);
+                dst = fightTrainerAiValueAddsubDataBiosGetPtr(index);
                 src = &lbl_803A6AB0[(u16)index];
                 *dst = *src;
             }
@@ -451,7 +451,7 @@ s32 fn_8004FE3C(void) {
     u32 msg;
 
     for (index = 0; (u16)index < 0x229; index++) {
-        src = fn_801FBFBC(index);
+        src = fightTrainerAiValueAddsubDataBiosGetPtr(index);
         dst = &lbl_803A6AB0[(u16)index];
         *dst = *src;
     }
@@ -462,7 +462,7 @@ s32 fn_8004FE3C(void) {
             menuCloseCustom(0x8B, 0, 1);
 
             for (index = 0; (u16)index < 0x229; index++) {
-                dst = fn_801FBFBC(index);
+                dst = fightTrainerAiValueAddsubDataBiosGetPtr(index);
                 src = &lbl_803A6AB0[(u16)index];
                 *dst = *src;
             }
@@ -566,7 +566,7 @@ s32 fn_8004EDCC(void) {
     u32 msg;
 
     for (index = 0; (u16)index < 0x229; index++) {
-        src = fn_801FBFBC(index);
+        src = fightTrainerAiValueAddsubDataBiosGetPtr(index);
         dst = &lbl_803A6AB0[(u16)index];
         *dst = *src;
     }
@@ -577,7 +577,7 @@ s32 fn_8004EDCC(void) {
             menuCloseCustom(0x8C, 0, 1);
 
             for (index = 0; (u16)index < 0x229; index++) {
-                dst = fn_801FBFBC(index);
+                dst = fightTrainerAiValueAddsubDataBiosGetPtr(index);
                 src = &lbl_803A6AB0[(u16)index];
                 *dst = *src;
             }

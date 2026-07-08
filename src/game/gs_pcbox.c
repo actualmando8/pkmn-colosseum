@@ -128,9 +128,9 @@ extern u32 fn_801906A0();
 extern void savedataGetStatus();
 extern u32 fn_8006AEEC();
 extern u32 fn_801F2A7C();
-extern u32 fn_801FB1C0();
+extern u32 fightTrainerGetStatus();
 extern u32 heroBiosGetPokemonPtr();
-extern u32 fn_801F986C();
+extern u32 fightTrainerGetValidFightPokemonPtr();
 extern u32 pokemonGetStatus();
 extern u32 pokemonCheckValid();
 extern void fn_80132A38();
@@ -173,8 +173,8 @@ void fn_8001C064(void) {
     extern void fn_80132A38();
     extern void fn_801906A0();
     extern void fn_801F2A7C();
-    extern void fn_801F986C();
-    extern void fn_801FB1C0();
+    extern void fightTrainerGetValidFightPokemonPtr();
+    extern void fightTrainerGetStatus();
     u8 sp[0x30];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -240,7 +240,7 @@ void fn_8001C064(void) {
         r4 = 0x0;
         r5 = 0x44;
         r6 = 0x0;
-        fn_801FB1C0();
+        fightTrainerGetStatus();
         goto L_8001C14C;
     L_8001C148:
         r3 = 0x0;
@@ -270,7 +270,7 @@ void fn_8001C064(void) {
     }
     r3 = r4;
     r4 = r25;
-    fn_801F986C();
+    fightTrainerGetValidFightPokemonPtr();
     if (r3 == 0) {
         r27 = 0x0;
         goto L_8001C204;
@@ -339,7 +339,7 @@ L_8001C204:
     r4 = 0x0;
     r5 = 0x44;
     r6 = 0x0;
-    fn_801FB1C0();
+    fightTrainerGetStatus();
     goto L_8001C2C0;
 L_8001C2BC:
     r3 = 0x0;
@@ -555,7 +555,7 @@ do {
             r4 = 0x0;
             r5 = 0x44;
             r6 = 0x0;
-            fn_801FB1C0();
+            fightTrainerGetStatus();
             goto L_8001C604;
         L_8001C600:
             r3 = 0x0;
@@ -581,7 +581,7 @@ do {
             break;
         }
         r4 = r27;
-        fn_801F986C();
+        fightTrainerGetValidFightPokemonPtr();
         if (r3 == 0) {
             r25 = 0x0;
             break;
@@ -734,8 +734,8 @@ void fn_8001C7B8(void) {
     extern void fadeCheck();
     extern void fadeSet();
     extern void fn_801F2A7C();
-    extern void fn_801F986C();
-    extern void fn_801FB1C0();
+    extern void fightTrainerGetValidFightPokemonPtr();
+    extern void fightTrainerGetStatus();
     extern void fn_80019D5C();
     u8 sp[0x60];
     u32 tmp = 0;
@@ -851,7 +851,7 @@ void fn_8001C7B8(void) {
                     r4 = 0x0;
                     r5 = 0x44;
                     r6 = 0x0;
-                    fn_801FB1C0();
+                    fightTrainerGetStatus();
                     goto L_8001C940;
                 L_8001C93C:
                     r3 = 0x0;
@@ -879,7 +879,7 @@ void fn_8001C7B8(void) {
                     break;
                 }
                 r4 = r23;
-                fn_801F986C();
+                fightTrainerGetValidFightPokemonPtr();
                 if (r3 == 0) {
                     r24 = 0x0;
                     break;
@@ -1014,7 +1014,7 @@ void fn_8001C7B8(void) {
                         r4 = 0x0;
                         r5 = 0x44;
                         r6 = 0x0;
-                        fn_801FB1C0();
+                        fightTrainerGetStatus();
                         goto L_8001CBB8;
                     L_8001CBB4:
                         r3 = 0x0;
@@ -1042,7 +1042,7 @@ void fn_8001C7B8(void) {
                         break;
                     }
                     r4 = r23;
-                    fn_801F986C();
+                    fightTrainerGetValidFightPokemonPtr();
                     if (r3 == 0) {
                         r27 = 0x0;
                         break;
@@ -1111,7 +1111,7 @@ void fn_8001C7B8(void) {
                         r4 = 0x0;
                         r5 = 0x44;
                         r6 = 0x0;
-                        fn_801FB1C0();
+                        fightTrainerGetStatus();
                         goto L_8001CD20;
                     L_8001CD1C:
                         r3 = 0x0;
@@ -1138,7 +1138,7 @@ void fn_8001C7B8(void) {
                         break;
                     }
                     r4 = r28 & 0xFFFF;
-                    fn_801F986C();
+                    fightTrainerGetValidFightPokemonPtr();
                     if (r3 == 0) {
                         r29 = 0x0;
                         break;
@@ -1287,7 +1287,7 @@ void fn_8001C7B8(void) {
                             r4 = 0x0;
                             r5 = 0x44;
                             r6 = 0x0;
-                            fn_801FB1C0();
+                            fightTrainerGetStatus();
                             goto L_8001CFB4;
                         L_8001CFB0:
                             r3 = 0x0;
@@ -1313,7 +1313,7 @@ void fn_8001C7B8(void) {
                             break;
                         }
                         r4 = r29;
-                        fn_801F986C();
+                        fightTrainerGetValidFightPokemonPtr();
                         if (r3 == 0) {
                             r23 = 0x0;
                             break;
@@ -1571,8 +1571,8 @@ void fn_8001D378(void) {
     extern void heroBiosGetPokemonPtr();
     extern void fn_801906A0();
     extern void fn_801F2A7C();
-    extern void fn_801F986C();
-    extern void fn_801FB1C0();
+    extern void fightTrainerGetValidFightPokemonPtr();
+    extern void fightTrainerGetStatus();
     u8 sp[0x20];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -1644,7 +1644,7 @@ void fn_8001D378(void) {
             r4 = 0x0;
             r5 = 0x44;
             r6 = 0x0;
-            fn_801FB1C0();
+            fightTrainerGetStatus();
             goto L_8001D474;
         L_8001D470:
             r3 = 0x0;
@@ -1670,7 +1670,7 @@ void fn_8001D378(void) {
             break;
         }
         r4 = r29;
-        fn_801F986C();
+        fightTrainerGetValidFightPokemonPtr();
         if (r3 == 0) {
             r27 = 0x0;
             break;
@@ -4979,7 +4979,7 @@ void fn_80018F54(u32 a, u32 b, u32 c) {
 #endif
 
 /* fn_80018F88 - 0x80018F88 | size: 0xdc */
-extern u32 fn_801FCEAC();
+extern u32 fightTrainer_GetHeroPtr();
 extern void _flagSet();
 extern void fn_800FF730();
 extern u32 lbl_8047A2F4;
@@ -4997,7 +4997,7 @@ asm void fn_80018F88(void) {
 u32 fn_80018F88(s32 mode, s32* ptr, u32 val) {
     if (mode == 1) {
         lbl_8047A2F4 = val;
-        lbl_8047A2F8 = fn_801FCEAC(val);
+        lbl_8047A2F8 = fightTrainer_GetHeroPtr(val);
         {
             s32 v = ptr[0];
             lbl_8047A2EC = v;
@@ -5638,7 +5638,7 @@ s32 fn_80019B48(s32 a) {
             } else {
                 r3 = r4;
                 r4 = 0x0; r5 = 0x44; r6 = 0x0;
-                fn_801FB1C0();
+                fightTrainerGetStatus();
                 r3 = 0;
             }
         } else {
@@ -5655,7 +5655,7 @@ s32 fn_80019B48(s32 a) {
         if (r4 == 0) { r3 = 0; fn_801F2A7C(); r4 = r3; }
         if (r4 == 0) { r31 = 0; goto L_80019CE0; }
         r3 = r4; r4 = (u32)r30;
-        fn_801F986C();
+        fightTrainerGetValidFightPokemonPtr();
         if (r3 == 0) { r31 = 0; goto L_80019CE0; }
         r4 = 0x0; r5 = 0xcc; r6 = 0x0;
         pokemonGetStatus();
@@ -5695,9 +5695,9 @@ u32 fn_80019D5C(u32 a, u32 b) {
     extern void savedataGetStatus();
     extern void fn_8006AEEC();
     extern void fn_801F2A7C();
-    extern void fn_801FB1C0();
+    extern void fightTrainerGetStatus();
     extern void heroBiosGetPokemonPtr();
-    extern void fn_801F986C();
+    extern void fightTrainerGetValidFightPokemonPtr();
     extern void pokemonGetStatus();
     u32 r3;
     u32 r4;
@@ -5747,7 +5747,7 @@ u32 fn_80019D5C(u32 a, u32 b) {
         L_80019E74:
         if (r3 == 0) { r3 = 0; goto L_80019E9C; }
         r4 = 0x0; r5 = 0x44; r6 = 0x0;
-        fn_801FB1C0();
+        fightTrainerGetStatus();
         goto L_80019E9C;
         L_80019E98:
         r3 = 0;
@@ -5762,7 +5762,7 @@ u32 fn_80019D5C(u32 a, u32 b) {
         if (r3 == 0) { r3 = 0; fn_801F2A7C(); }
         if (r3 == 0) { r27 = 0; goto L_80019F44; }
         r4 = (u32)r28;
-        fn_801F986C();
+        fightTrainerGetValidFightPokemonPtr();
         if (r3 == 0) { r27 = 0; goto L_80019F44; }
         r4 = 0x0; r5 = 0xcc; r6 = 0x0;
         pokemonGetStatus();
@@ -5892,7 +5892,7 @@ void menuPokemonDrawItem(u8* ctx, u8* pane) {
                             mon = (u8*)fn_801F2A7C(0);
                         }
                         if (mon != NULL) {
-                            mon = (u8*)fn_801F986C(mon, count);
+                            mon = (u8*)fightTrainerGetValidFightPokemonPtr(mon, count);
                             if (mon != NULL) {
                                 mon = (u8*)pokemonGetStatus(mon, 0, 0xCC, 0);
                             }
@@ -6197,7 +6197,7 @@ void fn_8001AB70(u8* ctx) {
                     mon = (u8*)fn_801F2A7C(0);
                 }
                 if (mon != NULL) {
-                    mon = (u8*)fn_801F986C(mon, (u16)index);
+                    mon = (u8*)fightTrainerGetValidFightPokemonPtr(mon, (u16)index);
                     if (mon != NULL) {
                         mon = (u8*)pokemonGetStatus(mon, 0, 0xCC, 0);
                     }
@@ -6463,7 +6463,7 @@ s32 fn_8001B1EC() {
                     mon = (u8*)fn_801F2A7C(0);
                 }
                 if (mon != NULL) {
-                    mon = (u8*)fn_801F986C(mon, i);
+                    mon = (u8*)fightTrainerGetValidFightPokemonPtr(mon, i);
                     if (mon != NULL) {
                         mon = (u8*)pokemonGetStatus(mon, 0, 0xCC, 0);
                     }
@@ -6589,7 +6589,7 @@ s32 fn_8001B1EC() {
                                 mon = (u8*)fn_801F2A7C(0);
                             }
                             if (mon != NULL) {
-                                mon = (u8*)fn_801F986C(mon, (s8)selection);
+                                mon = (u8*)fightTrainerGetValidFightPokemonPtr(mon, (s8)selection);
                                 if (mon != NULL) {
                                     mon = (u8*)pokemonGetStatus(mon, 0, 0xCC, 0);
                                 }
@@ -6657,7 +6657,7 @@ s32 fn_8001B1EC() {
                         mon = (u8*)fn_801F2A7C(0);
                     }
                     if (mon != NULL) {
-                        mon = (u8*)fn_801F986C(mon, i);
+                        mon = (u8*)fightTrainerGetValidFightPokemonPtr(mon, i);
                         if (mon != NULL) {
                             mon = (u8*)pokemonGetStatus(mon, 0, 0xCC, 0);
                         }
@@ -6918,9 +6918,9 @@ void fn_8001BEBC(void* a) {
     extern void savedataGetStatus();
     extern void fn_8006AEEC();
     extern void fn_801F2A7C();
-    extern void fn_801FB1C0();
+    extern void fightTrainerGetStatus();
     extern void heroBiosGetPokemonPtr();
-    extern void fn_801F986C();
+    extern void fightTrainerGetValidFightPokemonPtr();
     extern void pokemonGetStatus();
     extern void pokemonCheckValid();
     u32 tmp;
@@ -6970,7 +6970,7 @@ void fn_8001BEBC(void* a) {
     r4 = 0x0;
     r5 = 0x44;
     r6 = 0x0;
-    fn_801FB1C0();
+    fightTrainerGetStatus();
     goto L_8001BF98;
     L_8001BF94:
     r3 = 0x0;
@@ -6994,7 +6994,7 @@ void fn_8001BEBC(void* a) {
         goto L_8001C038;
     }
     r4 = r29;
-    fn_801F986C();
+    fightTrainerGetValidFightPokemonPtr();
     if (r3 == 0) {
         r30 = 0x0;
         goto L_8001C038;
