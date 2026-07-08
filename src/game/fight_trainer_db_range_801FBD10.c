@@ -38,8 +38,8 @@ extern void pokemonGrowBasisStatus(void* context, u32 value);
 /* itemGetStatus - Secondary data accessor (169 calls) */
 extern u32 itemGetStatus(u32 context, u32 param, u16 field, u32 flags);
 
-/* fn_801F02AC - PokemonSlotLookup (89 calls) */
-extern u32 fn_801F02AC(u32 type, void* ptr, u32 param);
+/* fightTargetGetPtr - PokemonSlotLookup (89 calls) */
+extern u32 fightTargetGetPtr(u32 type, void* ptr, u32 param);
 
 /* Category resolution sub-dispatchers (defined with real bodies at their
  * proper address-ordered locations, possibly in a sibling segment). */

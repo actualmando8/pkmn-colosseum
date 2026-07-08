@@ -49,7 +49,7 @@ extern void  fn_80119ED0(void);
 extern void  fn_80121ADC(void);
 extern void  fn_8011B67C(void);
 extern void  pokemonGetSoubiItemDataId(void);
-extern void* fn_801F0928(void* p);
+extern void* fightActionGetPri(void* p);
 extern void  wazaGetStatus(void);
 
 /* SDA table pointers for event data arrays */

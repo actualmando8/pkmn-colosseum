@@ -65,7 +65,7 @@
  *
  * Setup:
  *   - Gets party count via PokemonGet(0,0,0x14,0)
- *   - Gets player party via fn_801F453C(0,1)
+ *   - Gets player party via fightFloorGetNowTenkouDataId(0,1)
  *   - Resolves active trainer slots via PokemonSlotLookupDefault(0x11,0) and (0x12,0)
  *   - Checks flags at lbl_80478D78+3 bit 6 to determine player/enemy perspective
  *   - Sets up active Pokemon via PokemonSet with fields 0x47 and 0x4B

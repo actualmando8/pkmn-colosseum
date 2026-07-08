@@ -31,8 +31,8 @@ u32 fn_80135D10(u32 kind, u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
     extern u32 pcboxSetStatus();
     extern u32 fn_8013583C();
     extern u32 fn_80142B24();
-    extern u32 fn_801F4C14();
-    extern u32 fn_801F75F8();
+    extern u32 fightFloorSetStatus();
+    extern u32 fightSideSetStatus();
     extern u32 fightTrainerSetStatus();
     u32 result = 0;
 
@@ -58,10 +58,10 @@ u32 fn_80135D10(u32 kind, u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
         wazaSetStatus(arg1, arg2, arg3, arg4, arg5);
         break;
     case 7:
-        result = fn_801F4C14(arg1, arg2, arg3, arg4, arg5);
+        result = fightFloorSetStatus(arg1, arg2, arg3, arg4, arg5);
         break;
     case 8:
-        fn_801F75F8(arg1, arg2, arg3, arg4, arg5);
+        fightSideSetStatus(arg1, arg2, arg3, arg4, arg5);
         break;
     case 9:
         fightTrainerSetStatus(arg1, arg2, arg3, arg4, arg5);
@@ -99,7 +99,7 @@ u32 fn_80135E44(u32 kind, u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
     case 6:
         return wazaGetStatus(arg1, arg2, arg3, arg4);
     case 7:
-        return fn_801F54A4(arg1, arg2, arg3, arg4);
+        return fightFloorGetStatus(arg1, arg2, arg3, arg4);
     case 8:
         return fightSideGetStatus(arg1, arg2, arg3, arg4);
     case 9:

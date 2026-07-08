@@ -49,7 +49,7 @@ extern void  fn_80119ED0(void);
 extern void  fn_80121ADC(void);
 extern void  fn_8011B67C(void);
 extern void  pokemonGetSoubiItemDataId(void);
-extern void* fn_801F0928(void* p);
+extern void* fightActionGetPri(void* p);
 extern void  wazaGetStatus(void);
 
 /* SDA table pointers for event data arrays */
@@ -68,19 +68,19 @@ void fightWazaWzxTypeFuncOiuchi(void)
     u32 r6;
     u32 r7;
 
-    extern u32 fn_801F0204();
-    extern void fn_801F0234();
+    extern u32 fightTargetDataBiosGetBuff();
+    extern void fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
   u32 uVar1;
   
   fightOutPokemonLoadWazaEffect(r4,r3,1,0);
   fightOutPokemonLoadWazaEffect(r5,r3,2,r7);
-  fn_801F0234(0x11);
-  uVar1 = fn_801F0204();
+  fightTargetDataBiosGetPtr(0x11);
+  uVar1 = fightTargetDataBiosGetBuff();
   fightOutPokemonWazaEffect(r4,r3,1,1,uVar1);
-  fn_801F0234(0x12);
-  uVar1 = fn_801F0204();
+  fightTargetDataBiosGetPtr(0x12);
+  uVar1 = fightTargetDataBiosGetBuff();
   fightOutPokemonWazaEffect(r5,r3,2,0,uVar1);
   return;
 }
@@ -97,10 +97,10 @@ u8 fightWazaWzxVariationFuncOiuchi(void) { return (u8)(lbl_8047B600 == 1); }
 #pragma peephole on
 void fightWazaWzxTypeFuncHuuin(void* ctx1, void* ctx2, u32 p5, u32 p6, void* p7)
 {
-    extern u32 fn_801F0204();
-    extern void fn_801F0234();
-    extern u32 fn_801F02AC();
-    extern u32 fn_801F54A4();
+    extern u32 fightTargetDataBiosGetBuff();
+    extern void fightTargetDataBiosGetPtr();
+    extern u32 fightTargetGetPtr();
+    extern u32 fightFloorGetStatus();
     extern u8 fightOutPokemonCheckFightOut();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
@@ -109,36 +109,36 @@ void fightWazaWzxTypeFuncHuuin(void* ctx1, void* ctx2, u32 p5, u32 p6, void* p7)
     void* uVar2;
     u8 cVar5;
 
-    uVar1 = (void*)fn_801F02AC(0xf, ctx2, limit = fn_801F54A4(0, 0, 0x14, 0));
-    uVar2 = (void*)fn_801F02AC(0x10, ctx2, limit);
+    uVar1 = (void*)fightTargetGetPtr(0xf, ctx2, limit = fightFloorGetStatus(0, 0, 0x14, 0));
+    uVar2 = (void*)fightTargetGetPtr(0x10, ctx2, limit);
     fightOutPokemonLoadWazaEffect(ctx2, ctx1, 1, p7);
     fightOutPokemonLoadWazaEffect(uVar1, ctx1, 2, p7);
     fightOutPokemonLoadWazaEffect(uVar2, ctx1, 2, p7);
     cVar5 = fightOutPokemonCheckFightOut(uVar1);
     if ((cVar5 == 1) && (cVar5 = fightOutPokemonCheckFightOut(uVar2), cVar5 == 1)) {
-        fn_801F0234(0x11);
-        fightOutPokemonWazaEffect(ctx2, ctx1, 1, 1, fn_801F0204());
-        fn_801F0234(0x12);
-        fightOutPokemonWazaEffect(uVar1, ctx1, 2, 1, fn_801F0204());
-        fn_801F0234(0x12);
-        fightOutPokemonWazaEffect(uVar2, ctx1, 2, 0, fn_801F0204());
+        fightTargetDataBiosGetPtr(0x11);
+        fightOutPokemonWazaEffect(ctx2, ctx1, 1, 1, fightTargetDataBiosGetBuff());
+        fightTargetDataBiosGetPtr(0x12);
+        fightOutPokemonWazaEffect(uVar1, ctx1, 2, 1, fightTargetDataBiosGetBuff());
+        fightTargetDataBiosGetPtr(0x12);
+        fightOutPokemonWazaEffect(uVar2, ctx1, 2, 0, fightTargetDataBiosGetBuff());
     } else {
         cVar5 = fightOutPokemonCheckFightOut(uVar2);
         if (cVar5 == 1) {
-            fn_801F0234(0x11);
-            fightOutPokemonWazaEffect(ctx2, ctx1, 1, 1, fn_801F0204());
-            fn_801F0234(0x12);
-            fightOutPokemonWazaEffect(uVar2, ctx1, 2, 0, fn_801F0204());
+            fightTargetDataBiosGetPtr(0x11);
+            fightOutPokemonWazaEffect(ctx2, ctx1, 1, 1, fightTargetDataBiosGetBuff());
+            fightTargetDataBiosGetPtr(0x12);
+            fightOutPokemonWazaEffect(uVar2, ctx1, 2, 0, fightTargetDataBiosGetBuff());
         } else {
             cVar5 = fightOutPokemonCheckFightOut(uVar1);
             if (cVar5 == 1) {
-                fn_801F0234(0x11);
-                fightOutPokemonWazaEffect(ctx2, ctx1, 1, 1, fn_801F0204());
-                fn_801F0234(0x12);
-                fightOutPokemonWazaEffect(uVar1, ctx1, 2, 0, fn_801F0204());
+                fightTargetDataBiosGetPtr(0x11);
+                fightOutPokemonWazaEffect(ctx2, ctx1, 1, 1, fightTargetDataBiosGetBuff());
+                fightTargetDataBiosGetPtr(0x12);
+                fightOutPokemonWazaEffect(uVar1, ctx1, 2, 0, fightTargetDataBiosGetBuff());
             } else {
-                fn_801F0234(0x11);
-                fightOutPokemonWazaEffect(ctx2, ctx1, 1, 1, fn_801F0204());
+                fightTargetDataBiosGetPtr(0x11);
+                fightOutPokemonWazaEffect(ctx2, ctx1, 1, 1, fightTargetDataBiosGetBuff());
             }
         }
     }
@@ -154,7 +154,7 @@ void fightWazaWzxTypeFuncMigawari(void* battleCtx, void* ctx) {
     extern void battleGridUpdate();
     extern void battleGridReplacePokemon();
     extern void fn_801DB100();
-    extern u8 fn_801F453C();
+    extern u8 fightFloorGetNowTenkouDataId();
     extern void fn_801FCEC4();
     extern void* fightOutPokemonCreateSequence();
     extern void fightOutPokemonWazaEffect();
@@ -164,7 +164,7 @@ void fightWazaWzxTypeFuncMigawari(void* battleCtx, void* ctx) {
     void* resolved;
     u8 partySlot;
 
-    partySlot = (u8)fn_801F453C(0, 1);
+    partySlot = (u8)fightFloorGetNowTenkouDataId(0, 1);
     wazaGetStatus(0, battleCtx, 0x1F, 0);
     eeData = pokemonGetStatus(ctx, 0, 0xEE, 0);
     resolved = fightOutPokemonCreateSequence(ctx, partySlot);
@@ -189,7 +189,7 @@ void fightWazaWzxTypeFuncHensin(void* battleCtx, void* ctx) {
     extern void battleGridUpdate();
     extern void battleGridReplacePokemon();
     extern void fn_801DB100();
-    extern u8 fn_801F453C();
+    extern u8 fightFloorGetNowTenkouDataId();
     extern void fn_801FCEC4();
     extern void* fightOutPokemonCreateSequence();
     extern void fightOutPokemonWazaEffect();
@@ -199,7 +199,7 @@ void fightWazaWzxTypeFuncHensin(void* battleCtx, void* ctx) {
     void* resolved;
     u8 partySlot;
 
-    partySlot = (u8)fn_801F453C(0, 1);
+    partySlot = (u8)fightFloorGetNowTenkouDataId(0, 1);
     wazaGetStatus(0, battleCtx, 0x1F, 0);
     eeData = pokemonGetStatus(ctx, 0, 0xEE, 0);
     resolved = fightOutPokemonCreateSequence(ctx, partySlot);
@@ -223,8 +223,8 @@ u32 fightWazaWzxVariationFuncHensin(void) { return 0; }
 #pragma peephole on
 void fightWazaWzxTypeFuncMagiccort(void* ctx1, void* target1, void* sideCtx, u32 unused, void* p7)
 {
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
     extern int fn_802026E4();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
@@ -233,7 +233,7 @@ void fightWazaWzxTypeFuncMagiccort(void* ctx1, void* target1, void* sideCtx, u32
   fightOutPokemonLoadWazaEffect(target1,ctx1,1,p7);
   cVar2 = fn_802026E4(sideCtx,0x37);
   if (cVar2 == 1) {
-    fightOutPokemonWazaEffect(target1,ctx1,1,0,fn_801F0204(fn_801F0234(0x11)));
+    fightOutPokemonWazaEffect(target1,ctx1,1,0,fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
   }
   return;
 }
@@ -247,15 +247,15 @@ u32 fightWazaWzxVariationFuncMagiccort(void) { return 0; }
 #pragma peephole on
 void fightWazaWzxTypeFuncWeatherBall(void* ctx1, void* target1, void* target2, u32 unused, void* p7)
 {
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
 
     fightOutPokemonLoadWazaEffect(target1,ctx1,1,p7);
     fightOutPokemonLoadWazaEffect(target2,ctx1,2,p7);
-    fightOutPokemonWazaEffect(target1,ctx1,1,1,fn_801F0204(fn_801F0234(0x11)));
-    fightOutPokemonWazaEffect(target2,ctx1,2,0,fn_801F0204(fn_801F0234(0x12)));
+    fightOutPokemonWazaEffect(target1,ctx1,1,1,fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
+    fightOutPokemonWazaEffect(target2,ctx1,2,0,fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
 }
 #pragma pop
 
@@ -264,11 +264,11 @@ void fightWazaWzxTypeFuncWeatherBall(void* ctx1, void* target1, void* target2, u
 u32 fightWazaWzxVariationFuncWeatherBall(void)
 
 {
-    extern int fn_801F453C();
+    extern int fightFloorGetNowTenkouDataId();
   u8 bVar2;
   u32 uVar1;
   
-  bVar2 = fn_801F453C(0,1);
+  bVar2 = fightFloorGetNowTenkouDataId(0,1);
   if (bVar2 == 2) {
     uVar1 = 1;
   }
@@ -297,15 +297,15 @@ u32 fightWazaWzxVariationFuncWeatherBall(void)
 #pragma peephole on
 void fightWazaWzxTypeFuncIceball(void* ctx1, void* target1, void* target2, u32 unused, void* p7)
 {
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
 
     fightOutPokemonLoadWazaEffect(target1,ctx1,1,p7);
     fightOutPokemonLoadWazaEffect(target2,ctx1,2,p7);
-    fightOutPokemonWazaEffect(target1,ctx1,1,1,fn_801F0204(fn_801F0234(0x11)));
-    fightOutPokemonWazaEffect(target2,ctx1,2,0,fn_801F0204(fn_801F0234(0x12)));
+    fightOutPokemonWazaEffect(target1,ctx1,1,1,fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
+    fightOutPokemonWazaEffect(target2,ctx1,2,0,fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
 }
 #pragma pop
 
@@ -340,15 +340,15 @@ u32 fightWazaWzxVariationFuncIceball(u32 unused, void* typeObj)
 #pragma peephole on
 void fightWazaWzxTypeFuncKawarawari(void* ctx1, void* target1, void* target2, u32 unused, void* p7)
 {
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
 
     fightOutPokemonLoadWazaEffect(target1,ctx1,1,0);
     fightOutPokemonLoadWazaEffect(target2,ctx1,2,p7);
-    fightOutPokemonWazaEffect(target1,ctx1,1,1,fn_801F0204(fn_801F0234(0x11)));
-    fightOutPokemonWazaEffect(target2,ctx1,2,0,fn_801F0204(fn_801F0234(0x12)));
+    fightOutPokemonWazaEffect(target1,ctx1,1,1,fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
+    fightOutPokemonWazaEffect(target2,ctx1,2,0,fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
 }
 #pragma pop
 
@@ -370,13 +370,13 @@ s32 fightWazaWzxVariationFuncKawarawari(void) {
 #pragma push
 #pragma peephole on
 void fightWazaWzxTypeFuncNegaigoto(void* p1, void* p2, u32 unused1, u32 unused2, u32 p3) {
-    extern u32 fn_801F0204();
-    extern void fn_801F0234();
+    extern u32 fightTargetDataBiosGetBuff();
+    extern void fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
     fightOutPokemonLoadWazaEffect(p2, p1, 1, p3);
-    fn_801F0234(0x11);
-    fightOutPokemonWazaEffect(p2, p1, 1, 0, fn_801F0204());
+    fightTargetDataBiosGetPtr(0x11);
+    fightOutPokemonWazaEffect(p2, p1, 1, 0, fightTargetDataBiosGetBuff());
 }
 #pragma pop
 
@@ -387,10 +387,10 @@ u32 fightWazaWzxVariationFuncNegaigoto(void) { return 0; }
 void fightWazaWzxTypeFuncTedasuke(void* p1, void* p2, u32 p3, u32 p4) {
     extern u16 wazaGetStatus();
     extern void fightTargetGetRelativeHostSideFightTargetIdToTragetPtr();
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
-    extern void* fn_801F02AC();
-    extern u16 fn_801F54A4();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
+    extern void* fightTargetGetPtr();
+    extern u16 fightFloorGetStatus();
     extern u8 fightOutPokemonCheckFightOut();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
@@ -400,17 +400,17 @@ void fightWazaWzxTypeFuncTedasuke(void* p1, void* p2, u32 p3, u32 p4) {
     void* resolved;
     void* tablePtr;
 
-    partyCount = fn_801F54A4(0, 0, 0x14, 0);
+    partyCount = fightFloorGetStatus(0, 0, 0x14, 0);
     d9Data = pokemonGetStatus(p2, 0, 0xD9, 0);
     field29 = wazaGetStatus(d9Data, 0, 0x29, 0);
     fightTargetGetRelativeHostSideFightTargetIdToTragetPtr(field29, partyCount);
-    resolved = fn_801F02AC(0xE, p2, partyCount);
+    resolved = fightTargetGetPtr(0xE, p2, partyCount);
     fightOutPokemonLoadWazaEffect(p2, p1, 1, p4);
     fightOutPokemonLoadWazaEffect(resolved, p1, 3, p4);
-    tablePtr = fn_801F0204(fn_801F0234(0x11));
+    tablePtr = fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11));
     fightOutPokemonWazaEffect(p2, p1, 1, 1, tablePtr);
     if ((u8)fightOutPokemonCheckFightOut(resolved) == 1) {
-        tablePtr = fn_801F0204(fn_801F0234(0x11));
+        tablePtr = fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11));
         fightOutPokemonWazaEffect(resolved, p1, 3, 0, tablePtr);
     }
 }
@@ -423,13 +423,13 @@ u32 fightWazaWzxVariationFuncTedasuke(void) { return 0; }
 #pragma peephole on
 void fightWazaWzxTypeFuncWeatherHP(void* ctx1, void* target1, u32 unused1, u32 unused2, void* p7)
 {
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
 
     fightOutPokemonLoadWazaEffect(target1,ctx1,3,p7);
-    fightOutPokemonWazaEffect(target1,ctx1,3,0,fn_801F0204(fn_801F0234(0x11)));
+    fightOutPokemonWazaEffect(target1,ctx1,3,0,fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
 }
 #pragma pop
 
@@ -438,13 +438,13 @@ void fightWazaWzxTypeFuncWeatherHP(void* ctx1, void* target1, u32 unused1, u32 u
 #pragma peephole on
 void fightWazaWzxTypeFuncNomikomu(void* ctx1, void* target1, u32 unused1, u32 unused2, void* p7)
 {
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
 
     fightOutPokemonLoadWazaEffect(target1,ctx1,3,p7);
-    fightOutPokemonWazaEffect(target1,ctx1,3,0,fn_801F0204(fn_801F0234(0x11)));
+    fightOutPokemonWazaEffect(target1,ctx1,3,0,fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
 }
 #pragma pop
 
@@ -468,15 +468,15 @@ BOOL fightWazaWzxVariationFuncNomikomu(void) {
 #pragma peephole on
 void fightWazaWzxTypeFuncHakidasu(void* ctx1, void* target1, void* target2, u32 unused, void* p7)
 {
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
 
     fightOutPokemonLoadWazaEffect(target1,ctx1,1,p7);
     fightOutPokemonLoadWazaEffect(target2,ctx1,2,p7);
-    fightOutPokemonWazaEffect(target1,ctx1,1,1,fn_801F0204(fn_801F0234(0x11)));
-    fightOutPokemonWazaEffect(target2,ctx1,2,0,fn_801F0204(fn_801F0234(0x12)));
+    fightOutPokemonWazaEffect(target1,ctx1,1,1,fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
+    fightOutPokemonWazaEffect(target2,ctx1,2,0,fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
 }
 #pragma pop
 
@@ -499,14 +499,14 @@ BOOL fightWazaWzxVariationFuncHakidasu(void) {
 #pragma push
 #pragma peephole on
 void fightWazaWzxTypeFuncAtt(void* p1, void* p2, u32 unused1, u16 flag, u32 p4) {
-    extern u32 fn_801F0204();
-    extern void fn_801F0234();
+    extern u32 fightTargetDataBiosGetBuff();
+    extern void fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
     fightOutPokemonLoadWazaEffect(p2, p1, 1, p4);
     if (flag == 0) {
-        fn_801F0234(0x11);
-        fightOutPokemonWazaEffect(p2, p1, 1, 0, fn_801F0204());
+        fightTargetDataBiosGetPtr(0x11);
+        fightOutPokemonWazaEffect(p2, p1, 1, 0, fightTargetDataBiosGetBuff());
     }
 }
 #pragma pop
@@ -519,19 +519,19 @@ u32 fightWazaWzxVariationFuncAtt(void) { return 0; }
 #pragma peephole on
 void fightWazaWzxTypeFuncItamiwake(void* ctx1, void* target1, void* target2, u16 flag, void* p7)
 {
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
 
     if (flag != 0) {
         fightOutPokemonLoadWazaEffect(target2,ctx1,2,p7);
-        fightOutPokemonWazaEffect(target2,ctx1,2,0,fn_801F0204(fn_801F0234(0x12)));
+        fightOutPokemonWazaEffect(target2,ctx1,2,0,fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
     }
     else {
         fightOutPokemonLoadWazaEffect(target1,ctx1,1,p7);
         fightOutPokemonLoadWazaEffect(target2,ctx1,2,p7);
-        fightOutPokemonWazaEffect(target1,ctx1,1,0,fn_801F0204(fn_801F0234(0x11)));
+        fightOutPokemonWazaEffect(target1,ctx1,1,0,fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
     }
 }
 #pragma pop
@@ -544,11 +544,11 @@ u32 fightWazaWzxVariationFuncItamiwake(void) { return 0; }
 u32 fightWazaWzxVariationFuncWeatherHP(void)
 
 {
-    extern int fn_801F453C();
+    extern int fightFloorGetNowTenkouDataId();
   u8 bVar2;
   u32 uVar1;
   
-  bVar2 = fn_801F453C(0,1);
+  bVar2 = fightFloorGetNowTenkouDataId(0,1);
   if (bVar2 == 1) {
     uVar1 = 0;
   }
@@ -569,8 +569,8 @@ u32 fightWazaWzxVariationFuncWeatherHP(void)
 #pragma peephole on
 void fightWazaWzxTypeFuncMagnitude(void* p1, void* p2, void* p3, u16 mode, u32 p5) {
     extern u8 wazaGetStatus();
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
     u8 battleType;
@@ -578,12 +578,12 @@ void fightWazaWzxTypeFuncMagnitude(void* p1, void* p2, void* p3, u16 mode, u32 p
     battleType = (u8)wazaGetStatus(0, p1, 5, 0);
     if ((battleType == 4 || battleType == 6 || battleType == 1) && mode != 0) {
         fightOutPokemonLoadWazaEffect(p3, p1, 2, p5);
-        fightOutPokemonWazaEffect(p3, p1, 2, 0, fn_801F0204(fn_801F0234(0x12)));
+        fightOutPokemonWazaEffect(p3, p1, 2, 0, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
     } else {
         fightOutPokemonLoadWazaEffect(p2, p1, 1, 0);
         fightOutPokemonLoadWazaEffect(p3, p1, 2, p5);
-        fightOutPokemonWazaEffect(p2, p1, 1, 1, fn_801F0204(fn_801F0234(0x11)));
-        fightOutPokemonWazaEffect(p3, p1, 2, 0, fn_801F0204(fn_801F0234(0x12)));
+        fightOutPokemonWazaEffect(p2, p1, 1, 1, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
+        fightOutPokemonWazaEffect(p3, p1, 2, 0, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
     }
 }
 #pragma pop
@@ -638,15 +638,15 @@ u32 fightWazaWzxVariationFuncMagnitude(void)
 #pragma peephole on
 void fightWazaWzxTypeFuncYatuatari(void* ctx1, void* target1, void* target2, u32 unused, void* p7)
 {
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
 
     fightOutPokemonLoadWazaEffect(target1,ctx1,1,0);
     fightOutPokemonLoadWazaEffect(target2,ctx1,2,p7);
-    fightOutPokemonWazaEffect(target1,ctx1,1,1,fn_801F0204(fn_801F0234(0x11)));
-    fightOutPokemonWazaEffect(target2,ctx1,2,0,fn_801F0204(fn_801F0234(0x12)));
+    fightOutPokemonWazaEffect(target1,ctx1,1,1,fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
+    fightOutPokemonWazaEffect(target2,ctx1,2,0,fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
 }
 #pragma pop
 
@@ -683,15 +683,15 @@ char fightWazaWzxVariationFuncYatuatari()
 #pragma peephole on
 void fightWazaWzxTypeFuncPresent(void* ctx1, void* target1, void* target2, u32 unused, void* p7)
 {
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
 
     fightOutPokemonLoadWazaEffect(target1,ctx1,1,0);
     fightOutPokemonLoadWazaEffect(target2,ctx1,2,p7);
-    fightOutPokemonWazaEffect(target1,ctx1,1,1,fn_801F0204(fn_801F0234(0x11)));
-    fightOutPokemonWazaEffect(target2,ctx1,2,0,fn_801F0204(fn_801F0234(0x12)));
+    fightOutPokemonWazaEffect(target1,ctx1,1,1,fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
+    fightOutPokemonWazaEffect(target2,ctx1,2,0,fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
 }
 #pragma pop
 
@@ -727,15 +727,15 @@ LAB_0020d058:
 #pragma peephole on
 void fightWazaWzxTypeFuncOngaesi(void* ctx1, void* target1, void* target2, u32 unused, void* p7)
 {
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
 
     fightOutPokemonLoadWazaEffect(target1,ctx1,1,0);
     fightOutPokemonLoadWazaEffect(target2,ctx1,2,p7);
-    fightOutPokemonWazaEffect(target1,ctx1,1,1,fn_801F0204(fn_801F0234(0x11)));
-    fightOutPokemonWazaEffect(target2,ctx1,2,0,fn_801F0204(fn_801F0234(0x12)));
+    fightOutPokemonWazaEffect(target1,ctx1,1,1,fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
+    fightOutPokemonWazaEffect(target2,ctx1,2,0,fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
 }
 #pragma pop
 
@@ -769,14 +769,14 @@ int fightWazaWzxVariationFuncOngaesi(void)
 #pragma push
 #pragma peephole on
 void fightWazaWzxTypeFuncRenzokugiri(void* p1, void* p2, void* p3, u32 unused, void* p4) {
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
     fightOutPokemonLoadWazaEffect(p2, p1, 1, p4);
     fightOutPokemonLoadWazaEffect(p3, p1, 2, p4);
-    fightOutPokemonWazaEffect(p2, p1, 1, 1, fn_801F0204(fn_801F0234(0x11)));
-    fightOutPokemonWazaEffect(p3, p1, 2, 0, fn_801F0204(fn_801F0234(0x12)));
+    fightOutPokemonWazaEffect(p2, p1, 1, 1, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
+    fightOutPokemonWazaEffect(p3, p1, 2, 0, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
 }
 #pragma pop
 
@@ -803,15 +803,15 @@ u32 fightWazaWzxVariationFuncRenzokugiri(u32 unused, void* typeObj) {
 #pragma peephole on
 void fightWazaWzxTypeFuncKorogaru(void* ctx1, void* target1, void* target2, u32 unused, void* p7)
 {
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
 
     fightOutPokemonLoadWazaEffect(target1,ctx1,1,0);
     fightOutPokemonLoadWazaEffect(target2,ctx1,2,p7);
-    fightOutPokemonWazaEffect(target1,ctx1,1,1,fn_801F0204(fn_801F0234(0x11)));
-    fightOutPokemonWazaEffect(target2,ctx1,2,0,fn_801F0204(fn_801F0234(0x12)));
+    fightOutPokemonWazaEffect(target1,ctx1,1,1,fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
+    fightOutPokemonWazaEffect(target2,ctx1,2,0,fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
 }
 #pragma pop
 
@@ -846,20 +846,20 @@ u32 fightWazaWzxVariationFuncKorogaru(u32 unused, void* typeObj)
 #pragma peephole on
 void fightWazaWzxTypeFuncTripleKick(void* p1, void* p2, void* p3, u16 mode, u32 p5) {
     extern u8 wazaGetStatus();
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
 
     wazaGetStatus(0, p1, 5, 0);
     if (mode != 0) {
         fightOutPokemonLoadWazaEffect(p3, p1, 2, p5);
-        fightOutPokemonWazaEffect(p3, p1, 2, 0, fn_801F0204(fn_801F0234(0x12)));
+        fightOutPokemonWazaEffect(p3, p1, 2, 0, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
     } else {
         fightOutPokemonLoadWazaEffect(p2, p1, 1, p5);
         fightOutPokemonLoadWazaEffect(p3, p1, 2, p5);
-        fightOutPokemonWazaEffect(p2, p1, 1, 1, fn_801F0204(fn_801F0234(0x11)));
-        fightOutPokemonWazaEffect(p3, p1, 2, 0, fn_801F0204(fn_801F0234(0x12)));
+        fightOutPokemonWazaEffect(p2, p1, 1, 1, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
+        fightOutPokemonWazaEffect(p3, p1, 2, 0, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
     }
 }
 #pragma pop
@@ -899,15 +899,15 @@ u32 fightWazaWzxVariationFuncTripleKick(void)
 #pragma peephole on
 void fightWazaWzxTypeFuncTikyuunage(void* ctx1, void* target1, void* target2, u32 unused, void* p7)
 {
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
 
     fightOutPokemonLoadWazaEffect(target1,ctx1,1,0);
     fightOutPokemonLoadWazaEffect(target2,ctx1,2,p7);
-    fightOutPokemonWazaEffect(target1,ctx1,1,1,fn_801F0204(fn_801F0234(0x11)));
-    fightOutPokemonWazaEffect(target2,ctx1,2,0,fn_801F0204(fn_801F0234(0x12)));
+    fightOutPokemonWazaEffect(target1,ctx1,1,1,fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
+    fightOutPokemonWazaEffect(target2,ctx1,2,0,fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
 }
 #pragma pop
 
@@ -929,15 +929,15 @@ u32 fightWazaWzxVariationFuncTikyuunage(void* unused, void* param) {
 #pragma peephole on
 void fightWazaWzxTypeFuncKetaguri(void* ctx1, void* target1, void* target2, u32 unused, void* p7)
 {
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
 
     fightOutPokemonLoadWazaEffect(target1,ctx1,1,p7);
     fightOutPokemonLoadWazaEffect(target2,ctx1,2,p7);
-    fightOutPokemonWazaEffect(target1,ctx1,1,1,fn_801F0204(fn_801F0234(0x11)));
-    fightOutPokemonWazaEffect(target2,ctx1,2,0,fn_801F0204(fn_801F0234(0x12)));
+    fightOutPokemonWazaEffect(target1,ctx1,1,1,fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
+    fightOutPokemonWazaEffect(target2,ctx1,2,0,fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
 }
 #pragma pop
 
@@ -985,18 +985,18 @@ u32 fightWazaWzxVariationFuncKetaguri(void)
 #pragma push
 #pragma peephole on
 void fightWazaWzxTypeFuncAttDef(void* p1, void* p2, void* p3, u16 mode, u32 p5) {
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
 
     if (mode == 0) {
         fightOutPokemonLoadWazaEffect(p2, p1, 1, p5);
         fightOutPokemonLoadWazaEffect(p3, p1, 2, p5);
-        fightOutPokemonWazaEffect(p2, p1, 1, 0, fn_801F0204(fn_801F0234(0x11)));
+        fightOutPokemonWazaEffect(p2, p1, 1, 0, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
     } else {
         fightOutPokemonLoadWazaEffect(p3, p1, 2, p5);
-        fightOutPokemonWazaEffect(p3, p1, 2, 0, fn_801F0204(fn_801F0234(0x12)));
+        fightOutPokemonWazaEffect(p3, p1, 2, 0, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
     }
 }
 #pragma pop
@@ -1008,25 +1008,25 @@ u32 fightWazaWzxVariationFuncAttDef(void) { return 0; }
 #pragma push
 #pragma peephole on
 void fightWazaWzxTypeFuncAllAlly(void* p1, void* p2, u32 p3, u32 unused, u32 p4) {
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
-    extern void* fn_801F02AC();
-    extern u16 fn_801F54A4();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
+    extern void* fightTargetGetPtr();
+    extern u16 fightFloorGetStatus();
     extern u8 fightOutPokemonCheckFightOut();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
     u16 partyCount;
     void* resolved;
 
-    partyCount = fn_801F54A4(0, 0, 0x14, 0);
-    resolved = fn_801F02AC(0xE, p2, partyCount);
+    partyCount = fightFloorGetStatus(0, 0, 0x14, 0);
+    resolved = fightTargetGetPtr(0xE, p2, partyCount);
     fightOutPokemonLoadWazaEffect(p2, p1, 3, p4);
     fightOutPokemonLoadWazaEffect(resolved, p1, 3, p4);
     if ((u8)fightOutPokemonCheckFightOut(resolved) == 1) {
-        fightOutPokemonWazaEffect(p2, p1, 3, 1, fn_801F0204(fn_801F0234(0x11)));
-        fightOutPokemonWazaEffect(resolved, p1, 3, 0, fn_801F0204(fn_801F0234(0x11)));
+        fightOutPokemonWazaEffect(p2, p1, 3, 1, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
+        fightOutPokemonWazaEffect(resolved, p1, 3, 0, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
     } else {
-        fightOutPokemonWazaEffect(p2, p1, 3, 0, fn_801F0204(fn_801F0234(0x11)));
+        fightOutPokemonWazaEffect(p2, p1, 3, 0, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
     }
 }
 #pragma pop
@@ -1038,10 +1038,10 @@ u32 fightWazaWzxVariationFuncAllAlly(void) { return 0; }
 #pragma push
 #pragma peephole on
 void fightWazaWzxTypeFuncAllEnemy(void* p1, void* p2, void* p3, u32 unused, u32 p4) {
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
-    extern void* fn_801F02AC();
-    extern u16 fn_801F54A4();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
+    extern void* fightTargetGetPtr();
+    extern u16 fightFloorGetStatus();
     extern u8 fightOutPokemonCheckFightOut();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
@@ -1049,18 +1049,18 @@ void fightWazaWzxTypeFuncAllEnemy(void* p1, void* p2, void* p3, u32 unused, u32 
     void* resolved;
     void* tablePtr;
 
-    partyCount = fn_801F54A4(0, 0, 0x14, 0);
-    resolved = fn_801F02AC(0x10, p2, partyCount);
+    partyCount = fightFloorGetStatus(0, 0, 0x14, 0);
+    resolved = fightTargetGetPtr(0x10, p2, partyCount);
     fightOutPokemonLoadWazaEffect(p2, p1, 1, p4);
     fightOutPokemonLoadWazaEffect(p3, p1, 2, p4);
     fightOutPokemonLoadWazaEffect(resolved, p1, 2, p4);
     if ((u8)fightOutPokemonCheckFightOut(resolved) == 1) {
-        fightOutPokemonWazaEffect(p2, p1, 1, 1, fn_801F0204(fn_801F0234(0x11)));
-        fightOutPokemonWazaEffect(p3, p1, 2, 1, fn_801F0204(fn_801F0234(0x12)));
-        fightOutPokemonWazaEffect(resolved, p1, 2, 0, fn_801F0204(fn_801F0234(0x12)));
+        fightOutPokemonWazaEffect(p2, p1, 1, 1, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
+        fightOutPokemonWazaEffect(p3, p1, 2, 1, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
+        fightOutPokemonWazaEffect(resolved, p1, 2, 0, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
     } else {
-        fightOutPokemonWazaEffect(p2, p1, 1, 1, fn_801F0204(fn_801F0234(0x11)));
-        fightOutPokemonWazaEffect(p3, p1, 2, 0, fn_801F0204(fn_801F0234(0x12)));
+        fightOutPokemonWazaEffect(p2, p1, 1, 1, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
+        fightOutPokemonWazaEffect(p3, p1, 2, 0, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
     }
 }
 #pragma pop
@@ -1072,20 +1072,20 @@ u32 fightWazaWzxVariationFuncAllEnemy(void) { return 0; }
 #pragma push
 #pragma peephole on
 void fn_80210B08(void* p1, void* p2, void* p3, u16 mode, u32 p5) {
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
     void* tablePtr;
 
     if (mode != 0) {
         fightOutPokemonLoadWazaEffect(p3, p1, 2, p5);
-        fightOutPokemonWazaEffect(p3, p1, 2, 0, fn_801F0204(fn_801F0234(0x12)));
+        fightOutPokemonWazaEffect(p3, p1, 2, 0, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
     } else {
         fightOutPokemonLoadWazaEffect(p2, p1, 1, p5);
         fightOutPokemonLoadWazaEffect(p3, p1, 2, p5);
-        fightOutPokemonWazaEffect(p2, p1, 1, 1, fn_801F0204(fn_801F0234(0x11)));
-        fightOutPokemonWazaEffect(p3, p1, 2, 0, fn_801F0204(fn_801F0234(0x12)));
+        fightOutPokemonWazaEffect(p2, p1, 1, 1, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
+        fightOutPokemonWazaEffect(p3, p1, 2, 0, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
     }
 }
 #pragma pop
@@ -1097,8 +1097,8 @@ u32 fn_80210BF0(void) { return 0; }
 #pragma push
 #pragma peephole on
 void fightWazaWzxTypeFuncAttDefSpc(void* p1, void* p2, void* p3, u16 mode, u32 p5) {
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
 
@@ -1106,11 +1106,11 @@ void fightWazaWzxTypeFuncAttDefSpc(void* p1, void* p2, void* p3, u16 mode, u32 p
         fightOutPokemonLoadWazaEffect(p2, p1, 1, p5);
         fightOutPokemonLoadWazaEffect(p3, p1, 2, p5);
         fightOutPokemonLoadWazaEffect(p2, p1, 3, p5);
-        fightOutPokemonWazaEffect(p2, p1, 1, 1, fn_801F0204(fn_801F0234(0x11)));
-        fightOutPokemonWazaEffect(p3, p1, 2, 0, fn_801F0204(fn_801F0234(0x12)));
+        fightOutPokemonWazaEffect(p2, p1, 1, 1, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
+        fightOutPokemonWazaEffect(p3, p1, 2, 0, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
     } else if (mode == 1) {
         fightOutPokemonLoadWazaEffect(p2, p1, 3, p5);
-        fightOutPokemonWazaEffect(p2, p1, 3, 0, fn_801F0204(fn_801F0234(0x11)));
+        fightOutPokemonWazaEffect(p2, p1, 3, 0, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
     }
 }
 #pragma pop
@@ -1123,8 +1123,8 @@ u32 fightWazaWzxVariationFuncAttDefSpc(void) { return 0; }
 #pragma peephole on
 void fightWazaWzxTypeFuncVampire(void* p1, void* p2, void* p3, u16 mode, u32 p5) {
     extern s32 wazaGetStatus();
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
     extern void fn_802221EC();
@@ -1137,14 +1137,14 @@ void fightWazaWzxTypeFuncVampire(void* p1, void* p2, void* p3, u16 mode, u32 p5)
         fightOutPokemonLoadWazaEffect(p2, p1, 1, p5);
         fightOutPokemonLoadWazaEffect(p3, p1, 2, p5);
         fightOutPokemonLoadWazaEffect(p2, p1, 3, p5);
-        fightOutPokemonWazaEffect(p2, p1, 1, 1, fn_801F0204(fn_801F0234(0x11)));
-        fightOutPokemonWazaEffect(p3, p1, 2, 0, fn_801F0204(fn_801F0234(0x12)));
+        fightOutPokemonWazaEffect(p2, p1, 1, 1, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
+        fightOutPokemonWazaEffect(p3, p1, 2, 0, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
     } else if (mode == 1) {
         fightOutPokemonLoadWazaEffect(p2, p1, 3, p5);
         if (field2D > 0) {
             fn_802221EC(0x32, p2, 0, 1);
         } else {
-            fightOutPokemonWazaEffect(p2, p1, 3, 0, fn_801F0204(fn_801F0234(0x11)));
+            fightOutPokemonWazaEffect(p2, p1, 3, 0, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
         }
     }
 }
@@ -1158,13 +1158,13 @@ u32 fightWazaWzxVariationFuncVampire(void) { return 0; }
 #pragma peephole on
 void fightWazaWzxTypeFuncSpc(void* ctx1, void* target1, u32 unused1, u32 unused2, void* p7)
 {
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
 
     fightOutPokemonLoadWazaEffect(target1,ctx1,3,p7);
-    fightOutPokemonWazaEffect(target1,ctx1,3,0,fn_801F0204(fn_801F0234(0x11)));
+    fightOutPokemonWazaEffect(target1,ctx1,3,0,fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
 }
 #pragma pop
 
@@ -1178,8 +1178,8 @@ void fightWazaWzxTypeFuncTame(void* p1, void* p2, void* p3, u16 mode, u32 p5)
 {
     extern u8 lbl_80379F58[];
     extern u8 wazaGetStatus();
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
     u8 battleType;
@@ -1188,16 +1188,16 @@ void fightWazaWzxTypeFuncTame(void* p1, void* p2, void* p3, u16 mode, u32 p5)
         battleType = (u8)wazaGetStatus(0, p1, 5, 0);
         if ((battleType == 4 || battleType == 6 || battleType == 1) && mode != 0) {
             fightOutPokemonLoadWazaEffect(p3, p1, 2, p5);
-            fightOutPokemonWazaEffect(p3, p1, 2, 0, fn_801F0204(fn_801F0234(0x12)));
+            fightOutPokemonWazaEffect(p3, p1, 2, 0, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
         } else {
             fightOutPokemonLoadWazaEffect(p2, p1, 1, p5);
             fightOutPokemonLoadWazaEffect(p3, p1, 2, p5);
-            fightOutPokemonWazaEffect(p2, p1, 1, 1, fn_801F0204(fn_801F0234(0x11)));
-            fightOutPokemonWazaEffect(p3, p1, 2, 0, fn_801F0204(fn_801F0234(0x12)));
+            fightOutPokemonWazaEffect(p2, p1, 1, 1, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
+            fightOutPokemonWazaEffect(p3, p1, 2, 0, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
         }
     } else {
         fightOutPokemonLoadWazaEffect(p2, p1, 3, p5);
-        fightOutPokemonWazaEffect(p2, p1, 3, 0, fn_801F0204(fn_801F0234(0x11)));
+        fightOutPokemonWazaEffect(p2, p1, 3, 0, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
     }
 }
 #pragma pop
@@ -1210,8 +1210,8 @@ u32 fightWazaWzxVariationFuncTame(void) { return 0; }
 #pragma peephole on
 void fightWazaWzxTypeFuncNormal(void* p1, void* p2, void* p3, u16 mode, u32 p5) {
     extern u8 wazaGetStatus();
-    extern void* fn_801F0204();
-    extern void* fn_801F0234();
+    extern void* fightTargetDataBiosGetBuff();
+    extern void* fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
     u8 battleType;
@@ -1219,12 +1219,12 @@ void fightWazaWzxTypeFuncNormal(void* p1, void* p2, void* p3, u16 mode, u32 p5) 
     battleType = (u8)wazaGetStatus(0, p1, 5, 0);
     if ((battleType == 4 || battleType == 6 || battleType == 1) && mode != 0) {
         fightOutPokemonLoadWazaEffect(p3, p1, 2, p5);
-        fightOutPokemonWazaEffect(p3, p1, 2, 0, fn_801F0204(fn_801F0234(0x12)));
+        fightOutPokemonWazaEffect(p3, p1, 2, 0, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
     } else {
         fightOutPokemonLoadWazaEffect(p2, p1, 1, p5);
         fightOutPokemonLoadWazaEffect(p3, p1, 2, p5);
-        fightOutPokemonWazaEffect(p2, p1, 1, 1, fn_801F0204(fn_801F0234(0x11)));
-        fightOutPokemonWazaEffect(p3, p1, 2, 0, fn_801F0204(fn_801F0234(0x12)));
+        fightOutPokemonWazaEffect(p2, p1, 1, 1, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
+        fightOutPokemonWazaEffect(p3, p1, 2, 0, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x12)));
     }
 }
 #pragma pop

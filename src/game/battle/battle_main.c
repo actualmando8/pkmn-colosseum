@@ -2,7 +2,7 @@
  * @file battle_main.c
  * @brief Main battle loop, fight start/end, and core fight flow control.
  *
- * Address range: 0x801EF02C - 0x801F000C (26 functions), per
+ * Address range: 0x801EF02C - 0x801F0058 (27 functions), per
  * config/GC6E01/splits.txt.
  *
  * A prior transplant pass had introduced nine fictional `battle_*` wrapper
@@ -89,11 +89,11 @@ extern void fn_801DAEF8(s32 count);                 /* waza system init */
 extern void fn_801DB088(void);                      /* waza system reset */
 
 /* Battle init / render */
-extern void fn_801F0B00(void* sceneCtx, s32 arg1, s32 arg2,
+extern void fightActionCreateAndFlowFifo(void* sceneCtx, s32 arg1, s32 arg2,
                          s32 passType, s32 passIdx, void* tbl); /* scene pass config */
-extern void fn_801F09D0(void);                      /* scene pass finalize */
-extern void fn_801F108C(void);                      /* battle scene init */
-extern u8   fn_801F1758(s32 arg);                   /* check scene state */
+extern void fightActionDispFifoAll(void);                      /* scene pass finalize */
+extern void fightActionFifoInit(void);                      /* battle scene init */
+extern u8   fightFloorIsUseFightTimerAll(s32 arg);                   /* check scene state */
 
 /* Battle state machine */
 extern void fightActionFlowKaisiPreSubLoad(void);                      /* battle system init */
@@ -103,11 +103,11 @@ extern void fightTimerAllInit(void);
 extern void fightTimerAllStart(void);
 
 /* Sound check */
-extern s32 fn_801F54A4(s32 a, s32 b, s32 c, s32 d); /* check/setup sound */
+extern s32 fightFloorGetStatus(s32 a, s32 b, s32 c, s32 d); /* check/setup sound */
 
 /* Battle poké-slot helpers */
-extern void* fn_801F47B4(s32 a, u16 b);                    /* get battle slot ptr */
-extern void* fn_801F7258(void* a, u16 b);                  /* get slot member ptr */
+extern void* fightFloorGetValidFightSidePtr(s32 a, u16 b);                    /* get battle slot ptr */
+extern void* fightSideGetValidFightTrainerPtr(void* a, u16 b);                  /* get slot member ptr */
 extern void* fightTrainerGetStatus(void* a, s32 b, s32 c, s32 d);   /* get checked handle */
 extern void  fn_801DA4E8(void* a, void* b);                /* dispatch event */
 extern void* fightTrainerGetValidFightOutPokemonPtr(void* a, u16 b);                  /* get item ptr */
@@ -429,16 +429,16 @@ void fn_801EF7C4(void* arg) {
     void *r25;
     void *_h;
 
-    fn_801F54A4(0, 0, 0x14, 0);
-    r27 = fn_801F54A4(0, 0, 0x16, 0);
-    r26 = fn_801F54A4(0, 0, 0x18, 0);
+    fightFloorGetStatus(0, 0, 0x14, 0);
+    r27 = fightFloorGetStatus(0, 0, 0x16, 0);
+    r26 = fightFloorGetStatus(0, 0, 0x18, 0);
 
     for (r28 = 0; (u16)r28 < 2; r28++) {
-        r31 = fn_801F47B4(0, r28);
+        r31 = fightFloorGetValidFightSidePtr(0, r28);
         if (r31 == 0) continue;
 
         for (r30 = 0; (u16)r30 < r27; r30++) {
-            r25 = fn_801F7258(r31, r30);
+            r25 = fightSideGetValidFightTrainerPtr(r31, r30);
             if (r25 == 0) continue;
 
             _h = fightTrainerGetStatus(r25, 0, 0x4c, 0);
@@ -506,8 +506,8 @@ void fn_801EFA08(void) {
     extern void battleCameraDoFull();
     extern void fn_801EF2D4();
     extern void fn_801EF634();
-    extern void fn_801F1588();
-    extern void fn_801F1700();
+    extern void fightFloorSetTimeOutAllFightResult();
+    extern void fightFloorIsUseFightTimerCommand();
     extern void fightMenuCloseInfoMenu();
     extern void fightMenuOpenInfoMenu();
     extern void fightTimerCommandTerminate();
@@ -537,7 +537,7 @@ void fn_801EFA08(void) {
     r4 = 0x0;
     r5 = 0x12;
     r6 = 0x0;
-    ((void(*)(void))fn_801F54A4)();
+    ((void(*)(void))fightFloorGetStatus)();
     if (r3 != 0) {
         r4 = 0x3e8;
         r5 = 0xff;
@@ -555,7 +555,7 @@ void fn_801EFA08(void) {
     r5 = 0x0;
     r6 = 0x2;
     r7 = 0x0;
-    ((void(*)(void))fn_801F0B00)();
+    ((void(*)(void))fightActionCreateAndFlowFifo)();
     ((void(*)(void))battleCameraIsSimple)();
     ((void(*)(void))battleCameraDoSimple)();
     ((void(*)(void))fn_800FF56C)();
@@ -617,7 +617,7 @@ void fn_801EFA08(void) {
         r5 = 0x0;
         r6 = 0x4;
         r7 = 0x5;
-        ((void(*)(void))fn_801F0B00)();
+        ((void(*)(void))fightActionCreateAndFlowFifo)();
         ((void(*)(void))battleCameraIsSimple)();
         ((void(*)(void))battleCameraDoSimple)();
         ((void(*)(void))fn_800FF56C)();
@@ -635,7 +635,7 @@ void fn_801EFA08(void) {
         r5 = 0x0;
         r6 = 0x4;
         r7 = 0x4;
-        ((void(*)(void))fn_801F0B00)();
+        ((void(*)(void))fightActionCreateAndFlowFifo)();
         ((void(*)(void))battleCameraIsSimple)();
         ((void(*)(void))battleCameraDoSimple)();
         ((void(*)(void))fn_800FF56C)();
@@ -653,10 +653,10 @@ void fn_801EFA08(void) {
         r5 = 0x0;
         r6 = 0x5;
         r7 = 0x0;
-        ((void(*)(void))fn_801F0B00)();
-        ((void(*)(void))fn_801F09D0)();
+        ((void(*)(void))fightActionCreateAndFlowFifo)();
+        ((void(*)(void))fightActionDispFifoAll)();
         r3 = 0x0;
-        ((void(*)(void))fn_801F1758)();
+        ((void(*)(void))fightFloorIsUseFightTimerAll)();
         tmp = r3 & 0xFF;
         if (tmp == 1) {
             ((void(*)(void))fightTimerAllInit)();
@@ -711,7 +711,7 @@ void fn_801EFA08(void) {
             if (tmp != 4) break;
 
             r3 = 0x0;
-            ((void(*)(void))fn_801F1758)();
+            ((void(*)(void))fightFloorIsUseFightTimerAll)();
             tmp = r3 & 0xFF;
             if (tmp == 1) {
                 fightTimerAllIsOver();
@@ -729,7 +729,7 @@ void fn_801EFA08(void) {
                     r3 = 0x0;
                     fightMenuOpenInfoMenu();
                     r3 = 0x0;
-                    fn_801F1588();
+                    fightFloorSetTimeOutAllFightResult();
                     r3 = 0xb4;
                     dbgMenuFightGetMsgSpeedToFrame();
                     /* mr. r28, r3 */;
@@ -747,7 +747,7 @@ void fn_801EFA08(void) {
 
             /* Scene tick / render pass */
             r3 = 0x0;
-            fn_801F1700();
+            fightFloorIsUseFightTimerCommand();
             tmp = r3 & 0xFF;
             if (tmp == 1) {
                 fightTimerCommandInit();
@@ -764,20 +764,20 @@ void fn_801EFA08(void) {
             }
             r3 = -0x1;
             fightMenuOpenInfoMenu();
-            ((void(*)(void))fn_801F09D0)();
+            ((void(*)(void))fightActionDispFifoAll)();
             r3 = r28;
             r8 = r29;
             r4 = 0x0;
             r5 = 0x0;
             r6 = 0x7;
             r7 = 0x0;
-            ((void(*)(void))fn_801F0B00)();
-            ((void(*)(void))fn_801F09D0)();
+            ((void(*)(void))fightActionCreateAndFlowFifo)();
+            ((void(*)(void))fightActionDispFifoAll)();
             r3 = 0x0;
             fightMenuCloseInfoMenu();
             ((void(*)(void))battleCameraDoSimple)();
             r3 = 0x0;
-            fn_801F1700();
+            fightFloorIsUseFightTimerCommand();
             tmp = r3 & 0xFF;
             if (tmp == 1) {
                 fightTimerCommandBlock();
@@ -792,7 +792,7 @@ void fn_801EFA08(void) {
             r5 = 0x0;
             r6 = 0xb;
             r7 = 0x0;
-            ((void(*)(void))fn_801F0B00)();
+            ((void(*)(void))fightActionCreateAndFlowFifo)();
             fn_801EF634();
             tmp = r3 & 0xFFFF;
             if (tmp != 1) break;
@@ -802,12 +802,12 @@ void fn_801EFA08(void) {
             r5 = 0x0;
             r6 = 0xd;
             r7 = 0x0;
-            ((void(*)(void))fn_801F0B00)();
+            ((void(*)(void))fightActionCreateAndFlowFifo)();
             fn_801EF634();
             tmp = r3 & 0xFFFF;
             if (tmp != 1) break;
         }
-        ((void(*)(void))fn_801F09D0)();
+        ((void(*)(void))fightActionDispFifoAll)();
     }
     ((void(*)(void))battleCameraIsSimple)();
     ((void(*)(void))battleCameraDoSimple)();
@@ -820,7 +820,7 @@ void fn_801EFA08(void) {
     }
     fn_801EF2D4();
     r3 = 0x0;
-    ((void(*)(void))fn_801F1758)();
+    ((void(*)(void))fightFloorIsUseFightTimerAll)();
     tmp = r3 & 0xFF;
     if (tmp == 1) {
         fightTimerAllBlock();
@@ -834,7 +834,7 @@ void fn_801EFA08(void) {
     r5 = 0x0;
     r6 = 0xe;
     r7 = 0x0;
-    ((void(*)(void))fn_801F0B00)();
+    ((void(*)(void))fightActionCreateAndFlowFifo)();
     fn_801EF634();
     r5 = (u32)lbl_80375D80;
     r6 = (u32)lbl_8046D760;
@@ -844,13 +844,13 @@ void fn_801EFA08(void) {
     r8 = (u32)lbl_80375D80;
     r5 = 0x0;
     r6 = 0xf;
-    ((void(*)(void))fn_801F0B00)();
-    ((void(*)(void))fn_801F09D0)();
+    ((void(*)(void))fightActionCreateAndFlowFifo)();
+    ((void(*)(void))fightActionDispFifoAll)();
     r3 = 0x0;
     r4 = 0x0;
     r5 = 0x12;
     r6 = 0x0;
-    ((void(*)(void))fn_801F54A4)();
+    ((void(*)(void))fightFloorGetStatus)();
     if (r3 != 0) {
         r4 = 0x3e8;
         ((void(*)(void))soundStop)();
@@ -859,7 +859,7 @@ void fn_801EFA08(void) {
     r4 = 0x0;
     r5 = 0x12;
     r6 = 0x0;
-    ((void(*)(void))fn_801F54A4)();
+    ((void(*)(void))fightFloorGetStatus)();
     if (r3 == 0) {
         r3 = 0x1;
         r4 = 0x3e8;
@@ -880,7 +880,7 @@ void fn_801EFA08(void) {
     r5 = 0x0;
     r6 = 0x10;
     r7 = 0x0;
-    ((void(*)(void))fn_801F0B00)();
+    ((void(*)(void))fightActionCreateAndFlowFifo)();
     r3 = (u32)lbl_8046D760;
     r5 = (u32)lbl_80375D80;
     r8 = (u32)lbl_80375D80;
@@ -889,7 +889,7 @@ void fn_801EFA08(void) {
     r5 = 0x0;
     r6 = 0x11;
     r7 = 0x0;
-    ((void(*)(void))fn_801F0B00)();
+    ((void(*)(void))fightActionCreateAndFlowFifo)();
     fn_800FF660();
     r3 = 0x0;
     r4 = 0x0;
@@ -906,6 +906,22 @@ void fn_801EFFC4(u32 count) {
         while (i < count) {
             _threadSwitch();
             i += fn_800D3088();
+        }
+    }
+}
+
+/* 0x801F000C | size: 0x4C | small */
+void fightMainWaitFrame(void) {
+    extern u32 dbgMenuFightGetMsgSpeedToFrame(void);
+    extern u32 fn_800D3088(void);
+    u32 total;
+    u32 elapsed;
+    total = dbgMenuFightGetMsgSpeedToFrame();
+    if (total != 0) {
+        elapsed = 0;
+        while (elapsed < total) {
+            _threadSwitch();
+            elapsed += fn_800D3088();
         }
     }
 }

@@ -95,8 +95,8 @@ int fightGSfloorGetPushDataSize(void)
         u8 *nextEntry;
     } BattleScanContext;
     typedef u32 (*BattleScanCallback)(u32, u32, char *);
-    extern void fn_801F2B5C(u32, BattleScanCallback, void *, u32);
-    extern void fn_801F37B0(u32, BattleScanCallback, void *, u32);
+    extern void fightFloorLoopValidFightTrainer(u32, BattleScanCallback, void *, u32);
+    extern void fightFloorLoopValidFightOutPokemon(u32, BattleScanCallback, void *, u32);
     extern u32 _fightGSfloorPokemonCB__FPvUsPv(u32, u32, char *);
     extern u32 _fightGSfloorTrainerCB__FPvUsPv(u32, u32, char *);
     BattleScanContext scan;
@@ -107,10 +107,10 @@ int fightGSfloorGetPushDataSize(void)
     scan.consumeEntries = 0;
     scan.count = 0;
     scan.nextEntry = 0;
-    fn_801F2B5C(0, _fightGSfloorTrainerCB__FPvUsPv, &scan, 0);
+    fightFloorLoopValidFightTrainer(0, _fightGSfloorTrainerCB__FPvUsPv, &scan, 0);
     firstCount = scan.count;
     scan.count = 0;
-    fn_801F37B0(0, _fightGSfloorPokemonCB__FPvUsPv, &scan, 0);
+    fightFloorLoopValidFightOutPokemon(0, _fightGSfloorPokemonCB__FPvUsPv, &scan, 0);
     total = firstCount * 0x78;
     total += scan.count * 0x7C;
     return total + 0x48;
@@ -134,8 +134,8 @@ void fightGSfloorPushData(void *rawOut)
     } BattleScanContext;
     typedef u32 (*BattleScanCallback)(u32, u32, char *);
     extern void *battleGridGetPtr(void);
-    extern void fn_801F2B5C(u32, BattleScanCallback, void *, u32);
-    extern void fn_801F37B0(u32, BattleScanCallback, void *, u32);
+    extern void fightFloorLoopValidFightTrainer(u32, BattleScanCallback, void *, u32);
+    extern void fightFloorLoopValidFightOutPokemon(u32, BattleScanCallback, void *, u32);
     extern u32 _fightGSfloorPokemonCB__FPvUsPv(u32, u32, char *);
     extern u32 _fightGSfloorTrainerCB__FPvUsPv(u32, u32, char *);
     BattleScanOutput *out;
@@ -152,10 +152,10 @@ void fightGSfloorPushData(void *rawOut)
     scan.count = 0;
     scan.entries = entries;
     scan.nextEntry = entries + 0x44;
-    fn_801F2B5C(0, _fightGSfloorTrainerCB__FPvUsPv, &scan, 0);
+    fightFloorLoopValidFightTrainer(0, _fightGSfloorTrainerCB__FPvUsPv, &scan, 0);
     firstCount = scan.count;
     scan.count = 0;
-    fn_801F37B0(0, _fightGSfloorPokemonCB__FPvUsPv, &scan, 0);
+    fightFloorLoopValidFightOutPokemon(0, _fightGSfloorPokemonCB__FPvUsPv, &scan, 0);
     secondCount = scan.count;
     out->firstCount = firstCount;
     out->secondCount = secondCount;
@@ -197,7 +197,7 @@ void fightGSfloorPopData(BattleReplayHeader *header)
     extern int battleGridUpdate();
     extern int fn_801DAEF8(int);
     extern u32 fn_801DE418(u16);
-    extern int fn_801F198C();
+    extern int fightFloorSetShadow();
     u8 *entries;
     u16 firstCount;
     BattleReplayFirstEntry *firstEntry;
@@ -235,7 +235,7 @@ void fightGSfloorPopData(BattleReplayHeader *header)
     memcpy(battleGridGetPtr(), entries, 0x44);
     fn_801EF8F4(1);
     battleGridUpdate();
-    fn_801F198C();
+    fightFloorSetShadow();
 }
 
 /* Address: 0x80261708 | Size: 0x144 | Ghidra import */
@@ -370,10 +370,10 @@ LAB_0025e8fc:
 /* Address: 0x80261954 | Size: 0x17C | Ghidra import */
 void fightMenuCloseInfoMenu(u32 wait)
 {
-    extern void fn_801F2B5C();
-    extern u32 fn_801F37B0();
-    extern u8 fn_801F1700(u32);
-    extern u8 fn_801F1758(u32);
+    extern void fightFloorLoopValidFightTrainer();
+    extern u32 fightFloorLoopValidFightOutPokemon();
+    extern u8 fightFloorIsUseFightTimerCommand(u32);
+    extern u8 fightFloorIsUseFightTimerAll(u32);
     extern void menuFightCloseCountDown(void);
     extern void menuFightCloseTotalTimer(void);
     extern u8 menuFightCloseCheckCountDown(void);
@@ -384,32 +384,32 @@ void fightMenuCloseInfoMenu(u32 wait)
     extern u32 _fightMenuAllFightOutPokemonCloseStatusMenuSub__FPvUsPv();
     u8 done;
 
-    fn_801F2B5C(0, _fightMenuAllFightTrainerCloseStatusMenuSub__FPvUsPv, 0, 0);
-    fn_801F37B0(0, _fightMenuAllFightOutPokemonCloseStatusMenuSub__FPvUsPv, 0, 0);
-    if (fn_801F1700(0) == 1) {
+    fightFloorLoopValidFightTrainer(0, _fightMenuAllFightTrainerCloseStatusMenuSub__FPvUsPv, 0, 0);
+    fightFloorLoopValidFightOutPokemon(0, _fightMenuAllFightOutPokemonCloseStatusMenuSub__FPvUsPv, 0, 0);
+    if (fightFloorIsUseFightTimerCommand(0) == 1) {
         menuFightCloseCountDown();
     }
-    if (fn_801F1758(0) == 1) {
+    if (fightFloorIsUseFightTimerAll(0) == 1) {
         menuFightCloseTotalTimer();
     }
     if ((u8)wait == 1) {
-        fn_801F2B5C(0, _fightMenuAllFightTrainerCloseStatusMenuSub__FPvUsPv, 0, 0);
+        fightFloorLoopValidFightTrainer(0, _fightMenuAllFightTrainerCloseStatusMenuSub__FPvUsPv, 0, 0);
         do {
             done = 1;
-            fn_801F2B5C(0, _fightMenuAllFightTrainerCloseStatusMenuSubCloseCheck__FPvUsPv, &done, 0);
+            fightFloorLoopValidFightTrainer(0, _fightMenuAllFightTrainerCloseStatusMenuSubCloseCheck__FPvUsPv, &done, 0);
             if (done == 1) {
                 break;
             }
             _threadSwitch();
         } while (1);
-        fn_801F37B0(0, _fightMenuAllFightOutPokemonCloseStatusMenuSub__FPvUsPv, 0, 0);
+        fightFloorLoopValidFightOutPokemon(0, _fightMenuAllFightOutPokemonCloseStatusMenuSub__FPvUsPv, 0, 0);
         do {
-            if ((u8)fn_801F37B0(0, _fightMenuAllFightOutPokemonCloseStatusMenuSubCloseCheck__FPvUsPv, 0, 0) == 1) {
+            if ((u8)fightFloorLoopValidFightOutPokemon(0, _fightMenuAllFightOutPokemonCloseStatusMenuSubCloseCheck__FPvUsPv, 0, 0) == 1) {
                 break;
             }
             _threadSwitch();
         } while (1);
-        if (fn_801F1700(0) == 1) {
+        if (fightFloorIsUseFightTimerCommand(0) == 1) {
             do {
                 if (menuFightCloseCheckCountDown() == 0) {
                     break;
@@ -417,7 +417,7 @@ void fightMenuCloseInfoMenu(u32 wait)
                 _threadSwitch();
             } while (1);
         }
-        if (fn_801F1758(0) == 1) {
+        if (fightFloorIsUseFightTimerAll(0) == 1) {
             do {
                 if (menuFightCloseCheckTotalTimer() == 0) {
                     break;
@@ -431,25 +431,25 @@ void fightMenuCloseInfoMenu(u32 wait)
 /* Address: 0x80261AD0 | Size: 0x98 | Ghidra import */
 void fightMenuOpenInfoMenu(s8 timerMode)
 {
-    extern void fn_801F2B5C();
-    extern u32 fn_801F37B0();
-    extern u8 fn_801F1700(u32);
-    extern u8 fn_801F1758(u32);
+    extern void fightFloorLoopValidFightTrainer();
+    extern u32 fightFloorLoopValidFightOutPokemon();
+    extern u8 fightFloorIsUseFightTimerCommand(u32);
+    extern u8 fightFloorIsUseFightTimerAll(u32);
     extern void menuFightOpenCountDown(void);
     extern void menuFightOpenTotalTimer(void);
     extern u32 _fightMenuAllFightTrainerOpenStatusMenuSub__FPvUsPv();
     extern u32 _fightMenuAllFightOutPokemonOpenStatusMenuSub__FPvUsPv();
     u8 openStatus;
 
-    fn_801F2B5C(0, _fightMenuAllFightTrainerOpenStatusMenuSub__FPvUsPv, 0, 0);
+    fightFloorLoopValidFightTrainer(0, _fightMenuAllFightTrainerOpenStatusMenuSub__FPvUsPv, 0, 0);
     openStatus = 1;
-    fn_801F37B0(0, _fightMenuAllFightOutPokemonOpenStatusMenuSub__FPvUsPv, &openStatus, 0);
+    fightFloorLoopValidFightOutPokemon(0, _fightMenuAllFightOutPokemonOpenStatusMenuSub__FPvUsPv, &openStatus, 0);
     if (timerMode < 0) {
-        if (fn_801F1700(0) == 1) {
+        if (fightFloorIsUseFightTimerCommand(0) == 1) {
             menuFightOpenCountDown();
         }
     }
-    if (fn_801F1758(0) == 1) {
+    if (fightFloorIsUseFightTimerAll(0) == 1) {
         menuFightOpenTotalTimer();
     }
 }

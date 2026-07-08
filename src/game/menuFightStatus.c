@@ -46,14 +46,14 @@ extern u32   GSmsgGetRect();                           /* Get model dimensions *
 extern void  fn_800FB680();
 
 /* Map/warp */
-extern u8    fn_801F2020(s32 p1, void* warpId, void* outDest);
+extern u8    fightFloorCheckFightActionFightOutPokemonIrekaeSelect(s32 p1, void* warpId, void* outDest);
 extern void* fightOutPokemonGetNicknamePtr(void* mapData);              /* Get map name string */
 extern void  winMsgOpen(s32 slot, s32 msgId, s32 p3, s32 p4);
 extern void  winMsgClose(s32 slot);                   /* Close message box */
 
 /* Input/frame */
 extern u8    fn_801F18DC(s32 controller);             /* Check input ready */
-extern u8    fn_801F1700(s32 controller);             /* Check button pressed */
+extern u8    fightFloorIsUseFightTimerCommand(s32 controller);             /* Check button pressed */
 extern u8    fightTimerCommandIsOver(void);                       /* Check A button */
 extern u16   fn_801EF634(void);                       /* Get input state */
 extern void  _threadSwitch(void);                       /* Frame advance */
@@ -62,7 +62,7 @@ extern u32   fn_800F7BC4(s32 slot);                   /* Get VSync flags */
 
 /* Battle bridge */
 extern void  msgctrlSetValue();                           /* Set battle parameter */
-extern void  fn_801F4C14();                           /* Configure map object */
+extern void  fightFloorSetStatus();                           /* Configure map object */
 extern u32   windowGetParam();                           /* Get participant data */
 
 /* =========================================================================
@@ -235,7 +235,7 @@ void menuFightStatusSetHP(u32 npcId, u16 direction) {
 extern void winSpriteGetDisp();
 extern void fn_8001DACC();
 extern void fn_8010B9E8();
-extern void fn_801F54A4();
+extern void fightFloorGetStatus();
 extern void fn_800FA280();
 extern void windowDrawSprite2();
 extern void fn_800D88DC();
@@ -287,7 +287,7 @@ void fn_80011EA4(void) {
     extern void windowDrawSprite2();
     extern void winSpriteGetDisp();
     extern void fn_8010B9E8();
-    extern void fn_801F54A4();
+    extern void fightFloorGetStatus();
     u8 sp[0x70];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -480,7 +480,7 @@ do {
             r4 = 0x0;
             r5 = 0x32;
             r6 = 0x0;
-            fn_801F54A4();
+            fightFloorGetStatus();
             if ((s32)r3 != 0) {
                 tmp = *(u8*)((u8*)r30 + 0x16);
                 if (tmp != 0) return;

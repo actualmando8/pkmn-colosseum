@@ -3023,7 +3023,7 @@ void fn_80021B14(void) { /* TODO */ }
 extern s32 pcboxGetNbPokemonBox(void);
 extern s32 fn_801347E8(s32, s8);
 extern void fn_800140FC(s32*, s32*);
-extern s32 fn_801F7EF0(s32);
+extern s32 fightTrainerIsSelectedItemBall(s32);
 extern void fn_80023968(void);
 #if 0
 asm void fn_80022050(void) {
@@ -3068,7 +3068,7 @@ s32 fn_80022050(s32 arg0, s32* arg1) {
         }
     }
     fn_800140FC(&sp14, &sp10);
-    if ((u8)fn_801F7EF0(sp10) != 0) {
+    if ((u8)fightTrainerIsSelectedItemBall(sp10) != 0) {
         winMsgOpen(2, 0x426d, 1, 0);
         winMsgClose(1);
         return 1;

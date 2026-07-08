@@ -33,8 +33,8 @@ extern void pokemonGrowBasisStatus(void* context, u32 value);
 /* itemGetStatus - Secondary data accessor (169 calls) */
 extern u32 itemGetStatus(u32 context, u32 param, u16 field, u32 flags);
 
-/* fn_801F02AC - PokemonSlotLookup (89 calls) */
-extern u32 fn_801F02AC(u32 type, void* ptr, u32 param);
+/* fightTargetGetPtr - PokemonSlotLookup (89 calls) */
+extern u32 fightTargetGetPtr(u32 type, void* ptr, u32 param);
 
 /* Category resolution sub-dispatchers (defined with real bodies at their
  * proper address-ordered locations, possibly in a sibling segment). */
@@ -355,8 +355,8 @@ BOOL fightTrainerIsAllyFightTargetPtr(void* arg0, void* arg1, u32 arg2) {
     if (arg1 == NULL) {
         return FALSE;
     }
-    val0 = fn_801F02AC(2, arg0, arg2);
-    return (u8)(fn_801F02AC(2, arg1, arg2) - val0 == 0);
+    val0 = fightTargetGetPtr(2, arg0, arg2);
+    return (u8)(fightTargetGetPtr(2, arg1, arg2) - val0 == 0);
 }
 
 /* 0x801F849C | size: 0x7C */
@@ -385,7 +385,7 @@ void fightTrainerInitEnemyPokemonFightOutStatus(void* arg0, u32 arg1) {
 /* 0x801F8518 | size: 0x98 */
 void* fightTrainerGetNoActionFightOutPokemonPtr(void* context, u32 index) {
     extern u8 fightOutPokemonCheckValid(void* ptr);
-    extern u8 fn_801F1170(void* ptr);
+    extern u8 fightActionCheckValid(void* ptr);
     extern void* fightTrainerGetStatus(void* ctx, u32 slot, u32 field, u32 idx);
     void* pokemon;
     void* sub;
@@ -401,7 +401,7 @@ void* fightTrainerGetNoActionFightOutPokemonPtr(void* context, u32 index) {
     if (sub == NULL) {
         return NULL;
     }
-    if ((u8)fn_801F1170(sub) == 1) {
+    if ((u8)fightActionCheckValid(sub) == 1) {
         return NULL;
     }
     return pokemon;
@@ -1021,7 +1021,7 @@ void* fightTrainerIsMineFightPokemon(void* arg0, void* arg1) {
 #pragma optimization_level 2
 void fightTrainerTimeOutSelectFightAction(void* unused, void* trainer, void* pokemon) {
     extern u8 lbl_80375CA8[];
-    extern u32 fn_801F0134(void* ptr, void* pokemon);
+    extern u32 fightTargetGetTragetPtrToRelativeHostSideFightTargetId(void* ptr, void* pokemon);
     extern u8 fightOutPokemonCheckFightActionWazaSelect(void* trainer, u32 mode);
     extern u8 fightOutPokemonCheckCanOutOkWazaBanme(void* trainer, s32 slot, u32 field, u32 flags);
     extern void fightOutPokemonCreateFightActionAttackWaza(void* trainer, u32 p1, u32 p2, u32 p3, void* table, u16 moveId, u32 nameId, u32 slotIdx);
@@ -1043,7 +1043,7 @@ void fightTrainerTimeOutSelectFightAction(void* unused, void* trainer, void* pok
         }
     }
     fn_8022B2CC(trainer, moveId, pokemon, 0, 1, 0, -1);
-    fightOutPokemonCreateFightActionAttackWaza(trainer, 0, 0x13, 0, (void*)lbl_80375CA8, moveId, fn_801F0134(trainer, pokemon), (u32)i);
+    fightOutPokemonCreateFightActionAttackWaza(trainer, 0, 0x13, 0, (void*)lbl_80375CA8, moveId, fightTargetGetTragetPtrToRelativeHostSideFightTargetId(trainer, pokemon), (u32)i);
 }
 #pragma pop
 
@@ -2268,7 +2268,7 @@ void fightTrainerCreate(void* trainer, void* arg1, u16 arg2, u32 arg3, u32 arg4)
     extern void heroInit(void* ptr);
     extern void heroBiosCopy(void* ptr, void* arg);
     extern void fightActionInit(void* ptr);
-    extern void fn_801F198C(void);
+    extern void fightFloorSetShadow(void);
     extern void fightTrainerSetStatus(void* ctx, u32 slot, u32 field, u32 idx, u32 val);
     extern void* fightTrainerGetStatus(void* ctx, u32 slot, u32 field, u32 idx);
     extern void fightOutPokemonInitAry(void* ptr, u32 count);
@@ -2302,7 +2302,7 @@ void fightTrainerCreate(void* trainer, void* arg1, u16 arg2, u32 arg3, u32 arg4)
             fightTrainerSetStatus(trainer, 0, 0x4B, 0, arg3);
             if (arg4 != 0) {
                 fightTrainerSetStatus(trainer, 0, 0x4C, 0, arg4);
-                fn_801F198C();
+                fightFloorSetShadow();
             }
         }
     }

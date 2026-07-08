@@ -7,7 +7,7 @@ extern u8 lbl_80375240[];
 extern u8 lbl_803752A0[];
 extern void* jumptable_803752F8[];
 
-extern u8 fn_801F02AC[];
+extern u8 fightTargetGetPtr[];
 
 /* Auto-carved .data unit 0x80375230..0x8037532C (4 objects). Non-relocated data as byte-exact u8[]; pointer/jump tables as void*[] for R_PPC_ADDR32 relocations. */
 
@@ -39,18 +39,18 @@ u8 lbl_803752A0[88] = {
 };
 
 void* jumptable_803752F8[13] = {
-    (void*)((u8*)fn_801F02AC + 0x68),
-    (void*)((u8*)fn_801F02AC + 0x7C),
-    (void*)((u8*)fn_801F02AC + 0x90),
-    (void*)((u8*)fn_801F02AC + 0xA4),
-    (void*)((u8*)fn_801F02AC + 0xB8),
-    (void*)((u8*)fn_801F02AC + 0xCC),
-    (void*)((u8*)fn_801F02AC + 0xE0),
-    (void*)((u8*)fn_801F02AC + 0xF4),
-    (void*)((u8*)fn_801F02AC + 0x108),
-    (void*)((u8*)fn_801F02AC + 0x11C),
-    (void*)((u8*)fn_801F02AC + 0x130),
-    (void*)((u8*)fn_801F02AC + 0x144),
-    (void*)((u8*)fn_801F02AC + 0x158),
+    (void*)((u8*)fightTargetGetPtr + 0x68),
+    (void*)((u8*)fightTargetGetPtr + 0x7C),
+    (void*)((u8*)fightTargetGetPtr + 0x90),
+    (void*)((u8*)fightTargetGetPtr + 0xA4),
+    (void*)((u8*)fightTargetGetPtr + 0xB8),
+    (void*)((u8*)fightTargetGetPtr + 0xCC),
+    (void*)((u8*)fightTargetGetPtr + 0xE0),
+    (void*)((u8*)fightTargetGetPtr + 0xF4),
+    (void*)((u8*)fightTargetGetPtr + 0x108),
+    (void*)((u8*)fightTargetGetPtr + 0x11C),
+    (void*)((u8*)fightTargetGetPtr + 0x130),
+    (void*)((u8*)fightTargetGetPtr + 0x144),
+    (void*)((u8*)fightTargetGetPtr + 0x158),
 };
 

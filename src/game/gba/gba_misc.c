@@ -907,10 +907,10 @@ void fn_80089F78(void) {
     extern void pokemonGetSex();
     extern void gamedataAttestBiosGetLangareaId();
     extern void fn_801EF634();
-    extern void fn_801F02AC();
-    extern void fn_801F1700();
-    extern void fn_801F2020();
-    extern void fn_801F54A4();
+    extern void fightTargetGetPtr();
+    extern void fightFloorIsUseFightTimerCommand();
+    extern void fightFloorCheckFightActionFightOutPokemonIrekaeSelect();
+    extern void fightFloorGetStatus();
     extern void fightFloorBiosGetFightFloorPtr();
     extern void fightTrainerCheckCanIrekaeFightPokemon();
     extern void fightTrainerGetValidFightOutPokemonPtr();
@@ -968,7 +968,7 @@ void fn_80089F78(void) {
     r4 = 0x0;
     r5 = 0x14;
     r6 = 0x0;
-    fn_801F54A4();
+    fightFloorGetStatus();
     r24 = r3 & 0xFFFF;
     r3 = r24;
     fightTypeDataBiosGetPtr();
@@ -989,7 +989,7 @@ void fn_80089F78(void) {
     r3 = 0xb;
     tmp = tmp << 1;
     r23 = tmp & 0xFF;
-    fn_801F02AC();
+    fightTargetGetPtr();
     r4 = 0x0;
     r20 = r3;
     fightTrainerGetValidFightOutPokemonPtr();
@@ -1000,7 +1000,7 @@ void fn_80089F78(void) {
         r4 = r20;
         r5 = r24;
         r3 = 0x7;
-        fn_801F02AC();
+        fightTargetGetPtr();
         r4 = 0x0;
         r19 = r3;
         fightTrainerGetValidFightOutPokemonPtr();
@@ -1010,7 +1010,7 @@ void fn_80089F78(void) {
         r4 = r20;
         r5 = r24;
         r3 = 0x9;
-        fn_801F02AC();
+        fightTargetGetPtr();
         r4 = 0x0;
         r19 = r3;
         fightTrainerGetValidFightOutPokemonPtr();
@@ -1020,7 +1020,7 @@ void fn_80089F78(void) {
         r4 = r20;
         r5 = r24;
         r3 = 0xa;
-        fn_801F02AC();
+        fightTargetGetPtr();
         r4 = 0x0;
         r19 = r3;
         fightTrainerGetValidFightOutPokemonPtr();
@@ -1037,7 +1037,7 @@ void fn_80089F78(void) {
             r4 = r20;
             r5 = r24;
             r3 = 0x9;
-            fn_801F02AC();
+            fightTargetGetPtr();
             r4 = 0x0;
             r19 = r3;
             fightTrainerGetValidFightOutPokemonPtr();
@@ -1054,7 +1054,7 @@ void fn_80089F78(void) {
             r4 = r20;
             r5 = r24;
             r3 = 0x9;
-            fn_801F02AC();
+            fightTargetGetPtr();
             r4 = 0x0;
             fightTrainerGetValidFightOutPokemonPtr();
             tmp = 0x1;
@@ -1317,7 +1317,7 @@ void fn_80089F78(void) {
         fightFloorBiosGetFightFloorPtr();
         r4 = r22;
         r5 = (u32)sp + 0x18;
-        fn_801F2020();
+        fightFloorCheckFightActionFightOutPokemonIrekaeSelect();
         tmp = r3 & 0xFF;
         if (tmp == 2) {
             fightOutPokemonGetTokuseiDataId();
@@ -1550,7 +1550,7 @@ void fn_80089F78(void) {
             return;
         }
         r3 = 0x0;
-        fn_801F1700();
+        fightFloorIsUseFightTimerCommand();
         tmp = r3 & 0xFF;
         if (tmp == 1) {
             fightTimerCommandIsOver();

@@ -49,7 +49,7 @@ extern void  fn_80119ED0(void);
 extern void  fn_80121ADC(void);
 extern void  fn_8011B67C(void);
 extern void  pokemonGetSoubiItemDataId(void);
-extern void* fn_801F0928(void* p);
+extern void* fightActionGetPri(void* p);
 extern void  wazaGetStatus(void);
 
 /* SDA table pointers for event data arrays */
@@ -102,8 +102,8 @@ u32 fightKoukaDoFightKoukaJoukenAndKouka(void)
     u32 r4;
 
     extern void fn_80136078();
-    extern u32 fn_801F02AC();
-    extern u32 fn_801F54A4();
+    extern u32 fightTargetGetPtr();
+    extern u32 fightFloorGetStatus();
     extern int fn_8020A8E0();
     extern u16 fightKoukaDataBiosGetKoukaDataId();
     extern u16 fightKoukaDataBiosGetFightTargetDataId();
@@ -121,8 +121,8 @@ u32 fightKoukaDoFightKoukaJoukenAndKouka(void)
   uVar2 = fightKoukaDataBiosGetFightTargetDataId();
   fightKoukaDataBiosGetPtr(r4);
   uVar3 = fightKoukaDataBiosGetKoukaDataId();
-  uVar4 = fn_801F54A4(0,0,0x14,0);
-  uVar2 = fn_801F02AC(uVar2,r3,uVar4);
+  uVar4 = fightFloorGetStatus(0,0,0x14,0);
+  uVar2 = fightTargetGetPtr(uVar2,r3,uVar4);
   cVar5 = fn_8020A8E0(uVar1,r3);
   if (cVar5 == 1) {
     fn_80136078(uVar3,uVar2,r3,0);
@@ -161,9 +161,9 @@ u32 fn_8020DAD0(u32 p1) {
     extern void fn_801EF62C();
     extern u32 fn_801EF634();
     extern void fn_801EF7B4();
-    extern u8 fn_801F1DBC();
-    extern void fn_801F4C14();
-    extern u32 fn_801F54A4();
+    extern u8 fightFloorIsGcHeroWin();
+    extern void fightFloorSetStatus();
+    extern u32 fightFloorGetStatus();
     extern u32 fn_801FCC7C();
     extern u32 fightTrainerDataBiosGetPtr();
     extern u16 fightEncountDataBiosGetWipeEffectSndID();
@@ -203,9 +203,9 @@ u32 fn_8020DAD0(u32 p1) {
         fn_801903B0(0x9b0);
         fn_801EF61C(p1);
         uVar2 = fn_800FF56C();
-        fn_801F4C14(0, 0, 0x4a, 0, uVar2);
+        fightFloorSetStatus(0, 0, 0x4a, 0, uVar2);
         uVar2 = fightEncountDataBiosGetFightFloorDataId(uVar1);
-        uVar7 = fn_801F54A4(0, uVar2, 2, 0);
+        uVar7 = fightFloorGetStatus(0, uVar2, 2, 0);
         mailMainReceiveTerminate();
         uVar9 = fightEncountDataBiosGetFightKind(uVar1);
         iVar3 = fightKindDataBiosGetPtr(uVar9);
@@ -240,7 +240,7 @@ u32 fn_8020DAD0(u32 p1) {
         cVar10 = fightEncountDataBiosGetZenmetuFlag(uVar1);
         if (cVar10 != 0) {
             uVar1 = fn_801EF634();
-            cVar10 = fn_801F1DBC(0, uVar1);
+            cVar10 = fightFloorIsGcHeroWin(0, uVar1);
             if (cVar10 == 0) {
                 fn_801EF61C(0);
                 fn_801903B0(0xe05);
@@ -272,13 +272,13 @@ u32 fn_8020DAD0(u32 p1) {
 
 /* 0x8020DD44 | size: 0x3C | small */
 void fightEncountGetEnvSndDataId(void) {
-    extern void fn_801F54A4();
+    extern void fightFloorGetStatus();
     extern u32 fightEncountDataBiosGetFightFloorDataId();
     extern void fightEncountDataBiosGetPtr();
     u32 val;
     fightEncountDataBiosGetPtr();
     val = fightEncountDataBiosGetFightFloorDataId();
-    fn_801F54A4(0, val, 0x7, 0);
+    fightFloorGetStatus(0, val, 0x7, 0);
 }
 
 /* Address: 0x8020DD80 | Size: 0xd0 | Ghidra import */
@@ -287,7 +287,7 @@ int fightEncountGetBgmSndDataId(void)
 {
     u32 r3;
 
-    extern int fn_801F54A4();
+    extern int fightFloorGetStatus();
     extern short fightTrainerGetStatus();
     extern int fightTrainerKindDataBiosGetBgmSndId();
     extern void fightTrainerKindDataBiosGetPtr();
@@ -307,7 +307,7 @@ int fightEncountGetBgmSndDataId(void)
   if (iVar2 == 0) {
     fightEncountDataBiosGetPtr(r3);
     uVar3 = fightEncountDataBiosGetFightFloorDataId();
-    iVar2 = fn_801F54A4(0,uVar3,6,0);
+    iVar2 = fightFloorGetStatus(0,uVar3,6,0);
     if (iVar2 == 0) {
       for (uVar6 = 0; uVar6 < 4; uVar6 = uVar6 + 1) {
         uVar4 = fightEncountDataBiosGetFightTrainerDataId(uVar1,uVar6 & 0xff);

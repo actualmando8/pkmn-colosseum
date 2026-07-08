@@ -110,8 +110,8 @@ void _koukaOneExec__FUlPvPvPl(u32 index, void* arg1, void* arg2, s32* out) {
     }
 
     if (arg2 != NULL) {
-        handle = (u16)fn_801F54A4(0, 0, 0x14, 0);
-        extra = fn_801F0134(arg2, handle);
+        handle = (u16)fightFloorGetStatus(0, 0, 0x14, 0);
+        extra = fightTargetGetTragetPtrToRelativeHostSideFightTargetId(arg2, handle);
     } else {
         extra = 0;
     }

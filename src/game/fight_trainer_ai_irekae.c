@@ -99,9 +99,9 @@ s32 fightTrainerAiSelectIrekaeDasuFightPokemon(void* ctx, u32 param1, u32 param2
     extern u32 lbl_80478B38;
     extern void fn_8000815C();
     extern void fn_800E0C54();
-    extern void fn_801F1A6C();
+    extern void fightFloorGetFightTrainerFightPokemonPtrAry();
     extern void fightFloorGetFightTrainerFightOutPokemonPtrAry();
-    extern void fn_801F4460();
+    extern void fightFloorGetFightPokemonPtrToFightTrainerPtr();
     extern void fn_801F87CC();
     extern void fightTrainerCheckCanIrekaeFightPokemon();
     extern void fightTrainerGetStatus();
@@ -248,7 +248,7 @@ s32 fightTrainerAiSelectIrekaeDasuFightPokemon(void* ctx, u32 param1, u32 param2
     r3 = 0x0;
     r6 = 0x1;
     r7 = 0x1;
-    fn_801F1A6C();
+    fightFloorGetFightTrainerFightPokemonPtrAry();
     r0 = r20 & 0xFFFF;
     if (r0 == (u32)0x1) {
         r3 = -0x1;
@@ -283,7 +283,7 @@ s32 fightTrainerAiSelectIrekaeDasuFightPokemon(void* ctx, u32 param1, u32 param2
         if (r17 != (u32)0x0) {
             r4 = r17;
             r3 = 0x0;
-            fn_801F4460();
+            fightFloorGetFightPokemonPtrToFightTrainerPtr();
             r0 = r3;
             r3 = r17;
             r14 = r0;
@@ -379,7 +379,7 @@ s32 fightTrainerAiSelectIrekaeDasuFightPokemon(void* ctx, u32 param1, u32 param2
             if (r14 != (u32)0x0) {
                 r4 = r14;
                 r3 = 0x0;
-                fn_801F4460();
+                fightFloorGetFightPokemonPtrToFightTrainerPtr();
                 r15 = r3;
                 r3 = r14;
                 fightPokemonGetPokemonPtr();
@@ -478,7 +478,7 @@ s32 fightTrainerAiSelectIrekaeDasuFightPokemon(void* ctx, u32 param1, u32 param2
                 if (r24 >= (u32)0x0) {
                     r4 = r24;
                     r3 = 0x0;
-                    fn_801F4460();
+                    fightFloorGetFightPokemonPtrToFightTrainerPtr();
                     r3 = r24;
                     fightPokemonGetPokemonPtr();
                     r4 = 0x0;
@@ -490,7 +490,7 @@ s32 fightTrainerAiSelectIrekaeDasuFightPokemon(void* ctx, u32 param1, u32 param2
                     if (r0 >= (u32)r3) {
                         r4 = r24;
                         r3 = 0x0;
-                        fn_801F4460();
+                        fightFloorGetFightPokemonPtrToFightTrainerPtr();
                         r14 = r3;
                         r3 = r24;
                         fightPokemonGetPokemonPtr();
@@ -540,7 +540,7 @@ s32 fightTrainerAiSelectIrekaeDasuFightPokemon(void* ctx, u32 param1, u32 param2
             if (r27 >= (u32)0x0) {
                 r4 = r27;
                 r3 = 0x0;
-                fn_801F4460();
+                fightFloorGetFightPokemonPtrToFightTrainerPtr();
                 r26 = r3;
                 r3 = r16;
                 r4 = r27;
@@ -978,7 +978,7 @@ s32 fightTrainerAiSelectIrekaeDasuFightPokemon(void* ctx, u32 param1, u32 param2
                                     if (r24 != (u32)0x0) {
                                         r4 = r24;
                                         r3 = 0x0;
-                                        fn_801F4460();
+                                        fightFloorGetFightPokemonPtrToFightTrainerPtr();
                                         if (r3 != (u32)0x0) {
                                             r4 = r24;
                                             fightTrainerCheckCanIrekaeFightPokemon();
@@ -1253,7 +1253,7 @@ s32 fightTrainerAiSelectIrekaeDasuFightPokemon(void* ctx, u32 param1, u32 param2
     }
     r4 = r15;
     r3 = 0x0;
-    fn_801F4460();
+    fightFloorGetFightPokemonPtrToFightTrainerPtr();
     r16 = r3;
     r3 = r15;
     fightPokemonGetPokemonPtr();
@@ -1284,7 +1284,7 @@ s32 fightTrainerAiSelectIrekaeDasuFightPokemon(void* ctx, u32 param1, u32 param2
 /* Address: 0x8024E578 | Size: 0x118 (280 bytes) */
 u32 fightTrainerAiSelectFightActionIrekae(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u8 lbl_80375D30[];
-    extern u32 fn_801F4354(u32, u32);
+    extern u32 fightFloorGetFightOutPokemonPtrToFightTrainerPtr(u32, u32);
     extern u32 fightTrainerGetStatus(u32, u32, u32, u32);
     extern void fightOutPokemonCreateFightAction(u32, u32, u32, u32, void*, s32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
@@ -1296,7 +1296,7 @@ u32 fightTrainerAiSelectFightActionIrekae(void* ctx, u32 param1, u32 param2, u32
     u32 field;
 
     fightTrainerGetStatus(0, fightTrainerGetStatus((u32)ctx, 0, 0x43, 0) & 0xffff, 2, 0);
-    field = fn_801F4354(0, param1);
+    field = fightFloorGetFightOutPokemonPtrToFightTrainerPtr(0, param1);
     score = fightTrainerAiGetFightPokemonIrekaeModosuValue(ctx, param1, param2);
     if (score <= 0) {
         return 0;
@@ -1313,7 +1313,7 @@ u32 fightTrainerAiSelectFightActionIrekae(void* ctx, u32 param1, u32 param2, u32
 /* Address: 0x8024F8B4 | Size: 0x5CC (1484 bytes) */
 s32 fightTrainerAiGetFightPokemonIrekaeModosuValue(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fightFloorGetFightTrainerFightOutPokemonPtrAry();
-    extern void fn_801F4354();
+    extern void fightFloorGetFightOutPokemonPtrToFightTrainerPtr();
     extern void fightTrainerGetStatus();
     extern void fightOutPokemonGetPokemonPtr();
     extern void fn_8023565C();
@@ -1375,7 +1375,7 @@ s32 fightTrainerAiGetFightPokemonIrekaeModosuValue(void* ctx, u32 param1, u32 pa
     r4 = r16;
     r24 = 0x0;
     r3 = 0x0;
-    fn_801F4354();
+    fightFloorGetFightOutPokemonPtrToFightTrainerPtr();
     r0 = r3;
     r3 = r15;
     r20 = r0;
@@ -1926,10 +1926,10 @@ void fightTrainerAiSelectFightActionItem(void* ctx, u32 param1, u32 param2, u32 
     extern void pokemonIsDarkPokemon();
     extern void fn_80142984();
     extern void itemUse2PokemonSimulation();
-    extern void fn_801F0134();
-    extern void fn_801F1A6C();
+    extern void fightTargetGetTragetPtrToRelativeHostSideFightTargetId();
+    extern void fightFloorGetFightTrainerFightPokemonPtrAry();
     extern void fightFloorGetFightTrainerFightOutPokemonPtrAry();
-    extern void fn_801F7C54();
+    extern void fightTrainerGetTemotiNormalItemDataIdAry();
     extern void fightTrainerGetStatus();
     extern void fightOutPokemonCreateFightActionUseItem();
     extern void fightOutPokemonGetPokemonPtr();
@@ -1989,7 +1989,7 @@ void fightTrainerAiSelectFightActionItem(void* ctx, u32 param1, u32 param2, u32 
     r30 = 0x0;
     r5 = 0x14;
     r6 = 0x1;
-    fn_801F7C54();
+    fightTrainerGetTemotiNormalItemDataIdAry();
     r0 = r3 & 0xFFFF;
     r31 = r3;
     if ((s32)r0 == (s32)0) {
@@ -2008,7 +2008,7 @@ void fightTrainerAiSelectFightActionItem(void* ctx, u32 param1, u32 param2, u32 
     r3 = 0x0;
     r6 = 0x1;
     r7 = 0x1;
-    fn_801F1A6C();
+    fightFloorGetFightTrainerFightPokemonPtrAry();
     r26 = r3;
     r18 = (u32)sp + 0x18;
     r17 = r17 & 0xFFFF;
@@ -2362,7 +2362,7 @@ void fightTrainerAiSelectFightActionItem(void* ctx, u32 param1, u32 param2, u32 
     fn_8023A118();
     r3 = r29;
     r4 = r22;
-    fn_801F0134();
+    fightTargetGetTragetPtrToRelativeHostSideFightTargetId();
     r0 = 0x0;
     r4 = (u32)lbl_80375D70;
     *(u32*)(sp + 0x8) = r0;

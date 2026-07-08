@@ -35,7 +35,7 @@
 #define PARTY_MAX_POKEMON    6
 
 /* Pokemon field IDs used by PokemonGet/PokemonSet dispatch.
- * These are the r5 argument values passed to fn_801F54A4 / fn_801F4C14.
+ * These are the r5 argument values passed to fightFloorGetStatus / fightFloorSetStatus.
  * The values 0x00-0x5D map into the jumptables at 803754AC / 80375330. */
 #define POKE_FIELD_SPECIES        0x00  /* u16 species ID */
 #define POKE_FIELD_HELD_ITEM      0x01  /* u16 item ID */
@@ -78,7 +78,7 @@
 /* Total number of PokemonGet field IDs */
 #define POKE_FIELD_COUNT   0x5E
 
-/* Pokemon slot categories for fn_801F02AC dispatch.
+/* Pokemon slot categories for fightTargetGetPtr dispatch.
  * These are "slot type" IDs passed as r3 to PokemonSlotLookup.
  * Values 0x11-0x1D map into jumptable_803752F8. */
 #define POKE_SLOT_PARTY           0x11  /* Player party member */
@@ -107,7 +107,7 @@
  *   0xA488 : u32 field (set/get via fightFloorBiosSetTuikakoukaPokemonPtr/fightFloorBiosGetTuikakoukaPokemonPtr)
  *   0xA484 : u32 field (set/get via fightFloorBiosSetKizetuPokemonPtr/fightFloorBiosGetKizetuPokemonPtr)
  *   0xA4E4 : u16 field (set/get via fightFloorBiosSetFirstAttackRnd/fightFloorBiosGetFirstAttackRnd)
- *   0xA4C4 : u32[8] array (set/get via fightFloorBiosSetFightOutPokemonPtrAryPtr/fn_801F6544)
+ *   0xA4C4 : u32[8] array (set/get via fightFloorBiosSetFightOutPokemonPtrAryPtr/fightFloorBiosGetFightOutPokemonPtrAryPtr)
  *   0xA4C0 : u16 field (set/get via fightFloorBiosSetFightPokemonEntryCnt/fightFloorBiosGetFightPokemonEntryCnt)
  */
 struct Pokemon;
@@ -117,7 +117,7 @@ struct Pokemon;
  * ========================================================================= */
 
 /**
- * fn_801F54A4 - PokemonGet
+ * fightFloorGetStatus - PokemonGet
  * Read a field from a Pokemon structure.
  *
  * @param pokemon  Pointer to Pokemon structure, or 0 for "current context"
@@ -132,7 +132,7 @@ struct Pokemon;
 u32 PokemonGet(struct Pokemon* pokemon, u32 slot, u16 field, u32 extra);
 
 /**
- * fn_801F4C14 - PokemonSet
+ * fightFloorSetStatus - PokemonSet
  * Write a field to a Pokemon structure.
  *
  * @param pokemon  Pointer to Pokemon structure, or 0 for "current context"
@@ -147,7 +147,7 @@ u32 PokemonGet(struct Pokemon* pokemon, u32 slot, u16 field, u32 extra);
 u32 PokemonSet(struct Pokemon* pokemon, u32 slot, u16 field, u32 extra, u32 value);
 
 /**
- * fn_801F02AC - PokemonSlotLookup
+ * fightTargetGetPtr - PokemonSlotLookup
  * Resolve a slot type + index to a Pokemon pointer, then read data.
  *
  * @param slotType  Slot category (POKE_SLOT_* constant, r3)
@@ -160,10 +160,10 @@ u32 PokemonSet(struct Pokemon* pokemon, u32 slot, u16 field, u32 extra, u32 valu
 u32 PokemonSlotLookup(u16 slotType, u32 index, u16 count);
 
 /**
- * fn_801F025C - PokemonSlotLookupDefault
+ * fightTargetGetPtrAsNowFightType - PokemonSlotLookupDefault
  * Convenience wrapper that calls PokemonGet(0,0,0x14,0) to get the party
  * count, then calls PokemonSlotLookup with that count.
- * 438 call sites. Implemented in pokemon.c as fn_801F025C (matched 100%).
+ * 438 call sites. Implemented in pokemon.c as fightTargetGetPtrAsNowFightType (matched 100%).
  */
 
 /**

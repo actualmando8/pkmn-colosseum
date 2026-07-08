@@ -387,7 +387,7 @@ extern u32 lbl_8047AE18;
 
 extern u32 lbl_8047AE14;
 
-extern void fn_801F4354(void);
+extern void fightFloorGetFightOutPokemonPtrToFightTrainerPtr(void);
 
 extern void fn_801F18DC(void);
 
@@ -583,9 +583,9 @@ extern u32 pokemonSetStatus();
 
 extern u32 wazaSetStatus();
 
-extern u32 fn_801F4C14();
+extern u32 fightFloorSetStatus();
 
-extern u32 fn_801F75F8();
+extern u32 fightSideSetStatus();
 
 extern u32 fightTrainerSetStatus();
 
@@ -599,7 +599,7 @@ extern u32 pokemonGetStatus();
 
 extern u32 wazaGetStatus();
 
-extern u32 fn_801F54A4();
+extern u32 fightFloorGetStatus();
 
 extern u32 fightSideGetStatus();
 
@@ -611,7 +611,7 @@ extern u32 lbl_80478B90;
 
 extern EffectLinkedStatusRow lbl_80363B78[];
 
-extern u32 fn_801F0134(void* arg, u16 handle);
+extern u32 fightTargetGetTragetPtrToRelativeHostSideFightTargetId(void* arg, u16 handle);
 
 extern void fn_800D37CC(void);
 

@@ -650,13 +650,13 @@ u32 fightTrainerAiWazaDamage182(void* ctx, u32 param1, u32 param2, u32 param3) {
 u32 fightTrainerAiWazaDamage173(void* ctx, u32 slot, u32 param, u32 extra) {
     extern u32 wazaGetStatus(u32, u32, u32, u32);
     extern u32 tikeiDataBiosGetWazaId(u32);
-    extern u32 fn_801F54A4(u32, u32, u32, u32);
+    extern u32 fightFloorGetStatus(u32, u32, u32, u32);
     extern u32 fn_8023C370(void*, u32, u32, u32, u32);
     u32 paramType;
     u32 other;
     u32 otherType;
 
-    other = tikeiDataBiosGetWazaId(fn_801F54A4(0, 0, 0xf, 0) & 0xFFFF);
+    other = tikeiDataBiosGetWazaId(fightFloorGetStatus(0, 0, 0xf, 0) & 0xFFFF);
     paramType = wazaGetStatus(0, param, 9, 0) & 0xFFFF;
     param = other;
     otherType = wazaGetStatus(0, param, 9, 0) & 0xFFFF;
@@ -764,7 +764,7 @@ u32 fightTrainerAiWazaDamage155(void* ctx, u32 param1, u32 param2, u32 param3) {
 
 /* Address: 0x802516C4 | Size: 0xD4 (212 bytes) */
 u32 fightTrainerAiWazaDamage154(void* ctx, u32 unused, u32 param2, u32 param3) {
-    extern u16 fn_801F1A6C(u32, void*, u32*, u32, u32);
+    extern u16 fightFloorGetFightTrainerFightPokemonPtrAry(u32, void*, u32*, u32, u32);
     extern u32 fn_80216CF8(u32, u32, u8, u32, u8);
     extern u32 fn_80237774();
     extern u32 fn_802377E8();
@@ -780,7 +780,7 @@ u32 fightTrainerAiWazaDamage154(void* ctx, u32 unused, u32 param2, u32 param3) {
     u32 convertedState;
 
     total = 0;
-    count = fn_801F1A6C(0, ctx, entries, 1, 1);
+    count = fightFloorGetFightTrainerFightPokemonPtrAry(0, ctx, entries, 1, 1);
     index = 0;
     while (index < count) {
         mappedEntry = fn_80238980(ctx, entries[index]);
@@ -837,7 +837,7 @@ u32 fightTrainerAiWazaDamage149(void* ctx, u32 param1, u32 param2, u32 param3) {
 /* Address: 0x80251950 | Size: 0xBC */
 u32 fightTrainerAiWazaDamage148(void* ctx, u32 slot, u32 param, u32 extra) {
     extern u32 wazaGetStatus(u32, u32, u32, u32);
-    extern u32 fn_801F025C(u32, u32);
+    extern u32 fightTargetGetPtrAsNowFightType(u32, u32);
     extern u8 fn_802026E4(u32, u32);
     extern u32 fn_80232110(u32, u32, u32, u32, u32, u32);
     u32 damage;
@@ -847,7 +847,7 @@ u32 fightTrainerAiWazaDamage148(void* ctx, u32 slot, u32 param, u32 extra) {
 
     stat7 = wazaGetStatus(0, param, 7, 0) & 0xFFFF;
     stat3 = wazaGetStatus(0, param, 3, 0) & 0xFFFF;
-    target = fn_801F025C(2, extra);
+    target = fightTargetGetPtrAsNowFightType(2, extra);
     damage = fn_80232110(slot, extra, target, param, stat7, stat3);
     if (fn_802026E4(slot, 0x32) == 1) {
         damage = (s32)(damage * 0xf) / 0xa;

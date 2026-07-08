@@ -36,8 +36,8 @@ extern void pokemonGrowBasisStatus(void* context, u32 value);
 /* itemGetStatus - Secondary data accessor (169 calls) */
 extern u32 itemGetStatus(u32 context, u32 param, u16 field, u32 flags);
 
-/* fn_801F02AC - PokemonSlotLookup (89 calls) */
-extern u32 fn_801F02AC(u32 type, void* ptr, u32 param);
+/* fightTargetGetPtr - PokemonSlotLookup (89 calls) */
+extern u32 fightTargetGetPtr(u32 type, void* ptr, u32 param);
 
 /* Category resolution sub-dispatchers (defined with real bodies at their
  * proper address-ordered locations, possibly in a sibling segment). */
@@ -510,8 +510,8 @@ void fightOutPokemonToMenuPokemonStatus(void) {
     extern void pokemonToMenuPokemonStatus();
     extern void pokemonToMenuPokemonStatusSubBar();
     extern void fn_80121ADC();
-    extern void fn_801F4354();
-    extern void fn_801F54A4();
+    extern void fightFloorGetFightOutPokemonPtrToFightTrainerPtr();
+    extern void fightFloorGetStatus();
     extern void fightTrainerIsGcHero();
     extern void fightOutPokemonGetRndStatus();
     u8 sp[0x160];
@@ -659,7 +659,7 @@ void fightOutPokemonToMenuPokemonStatus(void) {
     r4 = r30;
     *(u8*)((u8*)r31 + 0x16) = r0;
     r3 = 0x0;
-    fn_801F4354();
+    fightFloorGetFightOutPokemonPtrToFightTrainerPtr();
     if (r3 == (u32)0x0) {
         r0 = 0x0;
 
@@ -682,7 +682,7 @@ void fightOutPokemonToMenuPokemonStatus(void) {
     r4 = 0x0;
     r5 = 0x32;
     r6 = 0x0;
-    fn_801F54A4();
+    fightFloorGetStatus();
     r0 = r3 & 0xFF;
     if (r0 == (u32)0x1) {
         r0 = 0x1;
@@ -1306,9 +1306,9 @@ void fightOutPokemonCheckFightActionWazaSelect(void) {
     extern void pokemonCheckFightOut();
     extern void pokemonCheckValid();
     extern void fn_801EF634();
-    extern void fn_801F0134();
-    extern void fn_801F11CC();
-    extern void fn_801F54A4();
+    extern void fightTargetGetTragetPtrToRelativeHostSideFightTargetId();
+    extern void fightActionCreate();
+    extern void fightFloorGetStatus();
     extern void fightOutPokemonGetOutOkWazaBanmeAry();
     extern void fightWazaCreate();
     extern void fightActionBiosSetBuffDataId();
@@ -1336,7 +1336,7 @@ void fightOutPokemonCheckFightActionWazaSelect(void) {
     r28 = r4;
     r3 = 0x0;
     r4 = 0x0;
-    fn_801F54A4();
+    fightFloorGetStatus();
     r30 = r3 & 0xFFFF;
     if (r31 == (u32)0x0) {
         r3 = 0x0;
@@ -1560,7 +1560,7 @@ void fightOutPokemonCheckFightActionWazaSelect(void) {
             r9 = -0x1;
             fn_8022B2CC();
             r4 = r30;
-            fn_801F0134();
+            fightTargetGetTragetPtrToRelativeHostSideFightTargetId();
             r0 = r3;
             r3 = r31;
             r26 = r0;
@@ -1587,7 +1587,7 @@ void fightOutPokemonCheckFightActionWazaSelect(void) {
                     r6 = 0x13;
                     r4 = 0x0;
                     r7 = 0x0;
-                    fn_801F11CC();
+                    fightActionCreate();
                     r0 = r3 & 0xFF;
                     if (r0 == (u32)0x1) {
                         r3 = r26;
@@ -1898,7 +1898,7 @@ void fightOutPokemonCheckFightActionWazaSelect(void) {
     r9 = -0x1;
     fn_8022B2CC();
     r4 = r30;
-    fn_801F0134();
+    fightTargetGetTragetPtrToRelativeHostSideFightTargetId();
     r26 = r3;
     r3 = r31;
     r4 = 0x0;
@@ -1924,7 +1924,7 @@ void fightOutPokemonCheckFightActionWazaSelect(void) {
     r6 = 0x13;
     r4 = 0x0;
     r7 = 0x0;
-    fn_801F11CC();
+    fightActionCreate();
     r0 = r3 & 0xFF;
     if (r0 != (u32)0x1) { r3 = 0x2; return; }
     r3 = r26;
@@ -2208,7 +2208,7 @@ void fightOutPokemonCheckCanOutOkWazaBanme(void) {
     extern void pokemonGetSoubiItemSoubiDataId();
     extern void pokemonWazaCheckValid();
     extern void fn_801DA36C();
-    extern void fn_801F1F30();
+    extern void fightFloorCheckHuuinWazaFightOutPokemon();
     u8 sp[0x50];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -2825,7 +2825,7 @@ void fightOutPokemonCheckCanOutOkWazaBanme(void) {
     r4 = r31;
     r5 = r29;
     r3 = 0x0;
-    fn_801F1F30();
+    fightFloorCheckHuuinWazaFightOutPokemon();
     r0 = r3 & 0xFF;
     if (r0 == (u32)0x1) {
         r30 = 0x4;

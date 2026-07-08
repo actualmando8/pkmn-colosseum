@@ -45,14 +45,14 @@ extern u32   GSmsgGetRect();                           /* Get model dimensions *
 extern void  fn_800FB680();
 
 /* Map/warp */
-extern u8    fn_801F2020(s32 p1, void* warpId, void* outDest);
+extern u8    fightFloorCheckFightActionFightOutPokemonIrekaeSelect(s32 p1, void* warpId, void* outDest);
 extern void* fightOutPokemonGetNicknamePtr(void* mapData);              /* Get map name string */
 extern void  winMsgOpen(s32 slot, s32 msgId, s32 p3, s32 p4);
 extern void  winMsgClose(s32 slot);                   /* Close message box */
 
 /* Input/frame */
 extern u8    fn_801F18DC(s32 controller);             /* Check input ready */
-extern u8    fn_801F1700(s32 controller);             /* Check button pressed */
+extern u8    fightFloorIsUseFightTimerCommand(s32 controller);             /* Check button pressed */
 extern u8    fightTimerCommandIsOver(void);                       /* Check A button */
 extern u16   fn_801EF634(void);                       /* Get input state */
 extern void  _threadSwitch(void);                       /* Frame advance */
@@ -61,7 +61,7 @@ extern u32   fn_800F7BC4(s32 slot);                   /* Get VSync flags */
 
 /* Battle bridge */
 extern void  msgctrlSetValue();                           /* Set battle parameter */
-extern void  fn_801F4C14();                           /* Configure map object */
+extern void  fightFloorSetStatus();                           /* Configure map object */
 extern u32   windowGetParam();                           /* Get participant data */
 
 /* =========================================================================
@@ -285,7 +285,7 @@ extern void fightTypeDataBiosGetPtr();
 extern void fightTypeDataBiosGetFightoutPokemonNum();
 extern void menuPokemonOpenFight();
 extern void menuCloseCustom();
-extern void fn_801F02AC();
+extern void fightTargetGetPtr();
 extern void fightOutPokemonCheckFightOut();
 extern void fightMenuGetFightOutPokemonPtrToStatusMenuId();
 extern u32 menuPokemonCheckPokemonChange();
@@ -303,7 +303,7 @@ void menuFightOpenPokemon(void) {
     extern void menuCloseCustom();
     extern void menuIsCheck();
     extern void menuOpenCustom();
-    extern void fn_801F02AC();
+    extern void fightTargetGetPtr();
     extern void fightOutPokemonCheckFightOut();
     extern void fightTypeDataBiosGetFightoutPokemonNum();
     extern void fightTypeDataBiosGetPtr();
@@ -389,7 +389,7 @@ L_80011500:
         r4 = r25;
         r5 = r26;
         r3 = 0xf;
-        fn_801F02AC();
+        fightTargetGetPtr();
         r23 = r3;
         fightOutPokemonCheckFightOut();
         tmp = r3 & 0xFF;
@@ -405,7 +405,7 @@ L_80011500:
         r4 = r25;
         r5 = r26;
         r3 = 0x10;
-        fn_801F02AC();
+        fightTargetGetPtr();
         r23 = r3;
         fightOutPokemonCheckFightOut();
         tmp = r3 & 0xFF;
@@ -421,7 +421,7 @@ L_80011500:
         r4 = r25;
         r5 = r26;
         r3 = 0xe;
-        fn_801F02AC();
+        fightTargetGetPtr();
         r23 = r3;
         fightOutPokemonCheckFightOut();
         tmp = r3 & 0xFF;
@@ -613,7 +613,7 @@ L_800117F0:
             do {
                 if (tmp == 0) break;
                 r3 = 0x0;
-                ((void(*)(void))fn_801F1700)();
+                ((void(*)(void))fightFloorIsUseFightTimerCommand)();
                 tmp = r3 & 0xFF;
                 do {
                     if (tmp != 1) break;
@@ -1058,13 +1058,13 @@ asm void menuFightButtonSecretKousan(void) {
 void menuFightButtonSecretKousan(u8* ptr) {
     extern void menuButtonNormal(u8* a);
     extern u8 fn_801F18DC(s32 a);
-    extern u8 fn_801F1700(s32 a);
+    extern u8 fightFloorIsUseFightTimerCommand(s32 a);
     extern u8 fightTimerCommandIsOver(void);
     extern u16 fn_801EF634(void);
     u8 flag;
     menuButtonNormal(ptr);
     if (!(u8)fn_801F18DC(0)) goto _zero;
-    if ((u8)fn_801F1700(0) == 1 && (u8)fightTimerCommandIsOver() == 1) { flag = 1; goto _check; }
+    if ((u8)fightFloorIsUseFightTimerCommand(0) == 1 && (u8)fightTimerCommandIsOver() == 1) { flag = 1; goto _check; }
     if ((u16)fn_801EF634() == 1) { flag = 1; goto _check; }
     _zero:
     flag = 0;
@@ -1201,7 +1201,7 @@ void menuFightButtonTargetSecret(u8* ctx) {
 
     pressed = 0;
     if ((u8)fn_801F18DC(0) != 0) {
-        if (((u8)fn_801F1700(0) == 1) && ((u8)fightTimerCommandIsOver() == 1)) {
+        if (((u8)fightFloorIsUseFightTimerCommand(0) == 1) && ((u8)fightTimerCommandIsOver() == 1)) {
             pressed = 1;
         } else if ((u16)fn_801EF634() == 1) {
             pressed = 1;
@@ -1252,7 +1252,7 @@ void menuFightCtrlTarget(void) {}
 #endif
 
 /* menuFightDrawSecretPokemon - 0x8000EA10 | size: 0x324 */
-extern u32 fn_801F2A7C(s32 arg);
+extern u32 fightFloorGetGcHeroFightTrainerPtr(s32 arg);
 extern u32 fightTrainerGetValidFightPokemonPtr(u32 warpId, u16 variant);
 extern u32 pokemonGetStatus();
 extern u32 pokemonCheckValid();
@@ -1291,7 +1291,7 @@ void menuFightDrawSecretPokemon(u8* ctx, u8* npc) {
     if (slot < 0) return;
     if ((u32)slot >= 6) return;
     if (handle == 0) {
-        handle = fn_801F2A7C(0);
+        handle = fightFloorGetGcHeroFightTrainerPtr(0);
     }
     if (handle == 0) return;
     handle = fightTrainerGetValidFightPokemonPtr(handle, (u16)slot);
@@ -1406,7 +1406,7 @@ void menuFightButtonSecretPokemonTop(u8* ctx) {
         handle = base;
         if ((u32)(u16)selected < 6) {
             if (handle == 0) {
-                handle = fn_801F2A7C(0);
+                handle = fightFloorGetGcHeroFightTrainerPtr(0);
             }
             if (handle != 0) {
                 handle = fightTrainerGetValidFightPokemonPtr(handle, (u16)selected);
@@ -1463,7 +1463,7 @@ void menuFightButtonSecretPokemonTop(u8* ctx) {
 
     pressed = 0;
     if ((u8)fn_801F18DC(0) != 0) {
-        if (((u8)fn_801F1700(0) == 1) && ((u8)fightTimerCommandIsOver() == 1)) {
+        if (((u8)fightFloorIsUseFightTimerCommand(0) == 1) && ((u8)fightTimerCommandIsOver() == 1)) {
             pressed = 1;
         } else if ((u16)fn_801EF634() == 1) {
             pressed = 1;
@@ -1778,7 +1778,7 @@ void menuFightButtonSecretWazaTop(u8* ctx) {
 
     pressed = 0;
     if ((u8)fn_801F18DC(0) != 0) {
-        if (((u8)fn_801F1700(0) == 1) && ((u8)fightTimerCommandIsOver() == 1)) {
+        if (((u8)fightFloorIsUseFightTimerCommand(0) == 1) && ((u8)fightTimerCommandIsOver() == 1)) {
             pressed = 1;
         } else if ((u16)fn_801EF634() == 1) {
             pressed = 1;
@@ -1844,7 +1844,7 @@ asm void menuFightButtonSecretMain(void) {
 void menuFightButtonSecretMain(u8* arg1) {
     extern void* windowGetKeyInfo(void);
     extern u8 fn_801F18DC(s32 a);
-    extern u8 fn_801F1700(s32 a);
+    extern u8 fightFloorIsUseFightTimerCommand(s32 a);
     extern u8 fightTimerCommandIsOver(void);
     extern u16 fn_801EF634(void);
     void* data;
@@ -1870,7 +1870,7 @@ void menuFightButtonSecretMain(u8* arg1) {
         *(s32*)(arg1 + 0x80) = flag_val;
     }
     if ((u8)fn_801F18DC(0) != 0) {
-        if ((u8)fn_801F1700(0) == 1) {
+        if ((u8)fightFloorIsUseFightTimerCommand(0) == 1) {
             if ((u8)fightTimerCommandIsOver() == 1) {
                 flag = 1;
                 goto got_flag;
@@ -2012,7 +2012,7 @@ u16 arg;
         msgctrlSetValue(0x11, (s32)obj);
         msg = wazaGetStatus(0, (u16)result, 1, 0);
         msgctrlSetValue(0x28, fn_800FA280());
-        fn_801F4C14(0, 0, 0x56, 0, (u16)fightOutPokemonGetSoubiItemDataId(obj));
+        fightFloorSetStatus(0, 0, 0x56, 0, (u16)fightOutPokemonGetSoubiItemDataId(obj));
     }
     switch ((u8)state) {
     case 6:
@@ -2486,7 +2486,7 @@ u32 menuPokemonCheckPokemonChange(void* npc, u32 warpId, u32 variant) {
 waitLabel: \
     advance = fn_801F18DC(0); \
     if (advance != 0) { \
-        if ((fn_801F1700(0) == 1) && (fightTimerCommandIsOver() == 1)) { \
+        if ((fightFloorIsUseFightTimerCommand(0) == 1) && (fightTimerCommandIsOver() == 1)) { \
             advance = 1; \
             goto haveLabel; \
         } else if (fn_801EF634() == 1) { \
@@ -2516,7 +2516,7 @@ doneLabel:
     u8 advance;
     u8 kind;
 
-    relation = fn_801F2020(0, npc, &linkedNpc);
+    relation = fightFloorCheckFightActionFightOutPokemonIrekaeSelect(0, npc, &linkedNpc);
     if (relation == 1) {
         msgctrlSetValue(0xD, (s32)fightOutPokemonGetNicknamePtr(npc));
         winMsgOpen(1, 0x76FB, 1, 0);
@@ -2525,7 +2525,7 @@ doneLabel:
         return 0;
     }
     if (relation == 2) {
-        fn_801F4C14(0, 0, 0x57, 0, (u16)fightOutPokemonGetTokuseiDataId(linkedNpc));
+        fightFloorSetStatus(0, 0, 0x57, 0, (u16)fightOutPokemonGetTokuseiDataId(linkedNpc));
         msgctrlSetValue(0xD, (s32)fightOutPokemonGetNicknamePtr(linkedNpc));
         msgctrlSetValue(0xE, (s32)fightOutPokemonGetNicknamePtr(npc));
         winMsgOpen(1, 0x761F, 1, 0);
@@ -2534,7 +2534,7 @@ doneLabel:
         return 0;
     }
     if (warpId == 0) {
-        warpId = fn_801F2A7C(0);
+        warpId = fightFloorGetGcHeroFightTrainerPtr(0);
     }
     if (warpId == 0) {
         return 0;

@@ -500,11 +500,11 @@ void _msgctrlSideName__FP15FightOutPokemonUc(u32 arg1, u32 arg2) {
     extern void fn_800FA280();
     extern void msgctrlSetValue();
     extern void fightTargetIsHostSide();
-    extern void fn_801F025C();
+    extern void fightTargetGetPtrAsNowFightType();
     extern void fn_801F18DC();
-    extern void fn_801F4354();
-    extern void fn_801F54A4();
-    extern void fn_801F7258();
+    extern void fightFloorGetFightOutPokemonPtrToFightTrainerPtr();
+    extern void fightFloorGetStatus();
+    extern void fightSideGetValidFightTrainerPtr();
     extern void fightTrainerGetNamePtr();
     extern void fightTrainerCheckDoFight();
     u8 sp[0x30];
@@ -529,15 +529,15 @@ void _msgctrlSideName__FP15FightOutPokemonUc(u32 arg1, u32 arg2) {
     r4 = 0x0;
     r5 = 0x14;
     r6 = 0x0;
-    fn_801F54A4();
+    fightFloorGetStatus();
     r30 = r3 & 0xFFFF;
     r4 = r24;
     r3 = 0x2;
-    fn_801F025C();
+    fightTargetGetPtrAsNowFightType();
     r29 = r3;
     r4 = r24;
     r3 = 0x0;
-    fn_801F4354();
+    fightFloorGetFightOutPokemonPtrToFightTrainerPtr();
     r26 = 0x0;
     r28 = r3;
     r25 = 0x0;
@@ -546,7 +546,7 @@ void _msgctrlSideName__FP15FightOutPokemonUc(u32 arg1, u32 arg2) {
         if (r0 >= (u32)0x2) break;
         r3 = r29;
         r4 = r25;
-        fn_801F7258();
+        fightSideGetValidFightTrainerPtr();
         r27 = r3;
         do {
             if (r27 == (u32)0x0) break;
@@ -668,7 +668,7 @@ asm void msgctrlClientnowork(void) {
 #pragma optimization_level 1
 void msgctrlClientnowork(void) {
     extern u32 lbl_8047AE10;
-    extern u32 fn_801F4354(u32, u32);
+    extern u32 fightFloorGetFightOutPokemonPtrToFightTrainerPtr(u32, u32);
     extern u32 fn_801F18DC(u32);
     extern u32 fightTrainerGetNamePtr(u32);
     extern u32 fightOutPokemonGetNicknamePtr(u32);
@@ -677,7 +677,7 @@ void msgctrlClientnowork(void) {
     int new_var;
     u32 result;
     u32 val = lbl_8047AE10;
-    result = fn_801F4354(0, val);
+    result = fightFloorGetFightOutPokemonPtrToFightTrainerPtr(0, val);
     new_var = 0;
     if (((u8)(new_var, fn_801F18DC(0)) == 1) && result != 0) {
         msgctrlSetValue(0x4D, fightTrainerGetNamePtr(result));
@@ -748,7 +748,7 @@ asm void msgctrlTsuikaMons(void) {
 #pragma optimization_level 1
 void msgctrlTsuikaMons(void) {
     extern u32 lbl_8047ADE0;
-    extern u32 fn_801F4354(u32, u32);
+    extern u32 fightFloorGetFightOutPokemonPtrToFightTrainerPtr(u32, u32);
     extern u32 fn_801F18DC(u32);
     extern u32 fightTrainerGetNamePtr(u32);
     extern u32 fightOutPokemonGetNicknamePtr(u32);
@@ -757,7 +757,7 @@ void msgctrlTsuikaMons(void) {
     u32 result;
     u32 new_var;
     u32 val = lbl_8047ADE0;
-    result = fn_801F4354(0, val);
+    result = fightFloorGetFightOutPokemonPtrToFightTrainerPtr(0, val);
     new_var = val;
     if (((u8)fn_801F18DC(0) == 1) && result != 0) {
         msgctrlSetValue(0x4D, fightTrainerGetNamePtr(result));
@@ -784,7 +784,7 @@ asm void msgctrlClientMos(void) {
 #pragma optimization_level 1
 void msgctrlClientMos(void) {
     extern u32 lbl_8047ADDC;
-    extern u32 fn_801F4354(u32, u32);
+    extern u32 fightFloorGetFightOutPokemonPtrToFightTrainerPtr(u32, u32);
     extern u32 fn_801F18DC(u32);
     extern u32 fightTrainerGetNamePtr(u32);
     extern u32 fightOutPokemonGetNicknamePtr(u32);
@@ -793,7 +793,7 @@ void msgctrlClientMos(void) {
     u32 result;
     u32 val = lbl_8047ADDC;
     u32 new_var;
-    result = fn_801F4354(0, val);
+    result = fightFloorGetFightOutPokemonPtrToFightTrainerPtr(0, val);
     new_var = val;
     if (((u8)fn_801F18DC(0) == 1) && result != 0) {
         msgctrlSetValue(0x4D, fightTrainerGetNamePtr(result));
@@ -820,7 +820,7 @@ asm void msgctrlDeffenceMons(void) {
 #pragma optimization_level 1
 void msgctrlDeffenceMons(void) {
     extern u32 lbl_8047ADD8;
-    extern u32 fn_801F4354(u32, u32);
+    extern u32 fightFloorGetFightOutPokemonPtrToFightTrainerPtr(u32, u32);
     extern u32 fn_801F18DC(u32);
     extern u32 fightTrainerGetNamePtr(u32);
     extern u32 fightOutPokemonGetNicknamePtr(u32);
@@ -829,7 +829,7 @@ void msgctrlDeffenceMons(void) {
     u32 result;
     u32 val = lbl_8047ADD8;
     u32 new_var;
-    result = fn_801F4354(0, val);
+    result = fightFloorGetFightOutPokemonPtrToFightTrainerPtr(0, val);
     new_var = val;
     if (((u8)fn_801F18DC(0) == 1) && result != 0) {
         msgctrlSetValue(0x4D, fightTrainerGetNamePtr(result));
@@ -856,7 +856,7 @@ asm void msgctrlAttackMons(void) {
 #pragma optimization_level 1
 void msgctrlAttackMons(void) {
     extern u32 lbl_8047ADD4;
-    extern u32 fn_801F4354(u32, u32);
+    extern u32 fightFloorGetFightOutPokemonPtrToFightTrainerPtr(u32, u32);
     extern u32 fn_801F18DC(u32);
     extern u32 fightTrainerGetNamePtr(u32);
     extern u32 fightOutPokemonGetNicknamePtr(u32);
@@ -865,7 +865,7 @@ void msgctrlAttackMons(void) {
     u32 result;
     u32 new_var;
     u32 val = lbl_8047ADD4;
-    result = fn_801F4354(0, val);
+    result = fightFloorGetFightOutPokemonPtrToFightTrainerPtr(0, val);
     new_var = val;
     if (((u8)fn_801F18DC(0) == 1) && result != 0) {
         msgctrlSetValue(0x4D, fightTrainerGetNamePtr(result));

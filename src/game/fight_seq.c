@@ -49,7 +49,7 @@ extern void  fn_80119ED0(void);
 extern void  fn_80121ADC(void);
 extern void  fn_8011B67C(void);
 extern void  pokemonGetSoubiItemDataId(void);
-extern void* fn_801F0928(void* p);
+extern void* fightActionGetPri(void* p);
 extern void  wazaGetStatus(void);
 
 /* SDA table pointers for event data arrays */
@@ -75,9 +75,9 @@ fightSeqGetNromalWazaDamage(void)
     extern u32 fn_800E0C54();
     extern void wazaSetStatus();
     extern u32 wazaGetStatus();
-    extern u32 fn_801F025C();
-    extern void fn_801F4C14();
-    extern u32 fn_801F54A4();
+    extern u32 fightTargetGetPtrAsNowFightType();
+    extern void fightFloorSetStatus();
+    extern u32 fightFloorGetStatus();
     extern void fn_801FCEC4();
     extern int fn_802026E4();
     extern u16 figthOutPokemonGetPokemonDataId();
@@ -130,8 +130,8 @@ fightSeqGetNromalWazaDamage(void)
   u32 local_54;
   u32 local_50;
   
-  local_54 = fn_801F54A4(0,0,0x36,0);
-  uVar2 = fn_801F54A4(0,0,0x42,0);
+  local_54 = fightFloorGetStatus(0,0,0x36,0);
+  uVar2 = fightFloorGetStatus(0,0,0x42,0);
   local_50 = lbl_8047B610;
   puVar20 = (u8 *)(lbl_80478D78);
   puVar19 = local_ec8;
@@ -146,8 +146,8 @@ fightSeqGetNromalWazaDamage(void)
   } while (iVar25 != 0);
   fn_801FCEC4(auStack_734,r5);
   fn_801FCEC4(auStack_e14,r6);
-  fn_801F4C14(0,0,0x36,0,r5);
-  fn_801F4C14(0,0,0x42,0,r6);
+  fightFloorSetStatus(0,0,0x36,0,r5);
+  fightFloorSetStatus(0,0,0x42,0,r6);
   uVar3 = (int)pokemonGetStatus(r5,0,0xd9,0);
   fightWazaBiosCopy(auStack_ec0,uVar3);
   fightWazaInit(uVar3);
@@ -164,13 +164,13 @@ fightSeqGetNromalWazaDamage(void)
     ((void (*)())r9)(r3,r4,r5,r6);
   }
   if (r7 != 1) goto LAB_0020e58c;
-  uVar4 = fn_801F025C(0x11,0);
+  uVar4 = fightTargetGetPtrAsNowFightType(0x11,0);
   fightOutPokemonGetTokuseiDataId();
   uVar15 = fightOutPokemonGetSoubiItemSoubiDataId(uVar4);
   uVar5 = (int)pokemonGetStatus(uVar4,0,0xd9,0);
   uVar6 = fightOutPokemonGetUseWazaDataId(uVar4);
   sVar16 = figthOutPokemonGetPokemonDataId(uVar4);
-  uVar7 = fn_801F025C(0x12,0);
+  uVar7 = fightTargetGetPtrAsNowFightType(0x12,0);
   iVar25 = 0;
   if ((uVar15 == 0x3f) && (sVar16 == 0x71)) {
     iVar25 = 1;
@@ -203,7 +203,7 @@ LAB_0020e568:
     wazaSetStatus(uVar5,0,0x2b,0,1);
   }
   else {
-    cVar18 = fn_801F54A4(0,0,0x29,0);
+    cVar18 = fightFloorGetStatus(0,0,0x29,0);
     if (cVar18 != 1) goto LAB_0020e568;
     fightWazaCriticalDataBiosGetPtr(uVar8);
     uVar8 = fightWazaCriticalDataBiosGetBunbo();
@@ -219,9 +219,9 @@ LAB_0020e568:
   }
   lbl_8047B610 = (int)lbl_8047B610 + 1;
 LAB_0020e58c:
-  uVar4 = fn_801F025C(0x11,0);
-  uVar5 = fn_801F025C(0x12,0);
-  uVar7 = fn_801F025C(2,uVar5);
+  uVar4 = fightTargetGetPtrAsNowFightType(0x11,0);
+  uVar5 = fightTargetGetPtrAsNowFightType(0x12,0);
+  uVar7 = fightTargetGetPtrAsNowFightType(2,uVar5);
   uVar13 = fightOutPokemonGetUseWazaDataId(uVar4);
   uVar14 = (int)pokemonGetStatus(uVar4,0,0xd9,0);
   uVar17 = wazaGetStatus(uVar14,0,0x2f,0);
@@ -255,8 +255,8 @@ LAB_0020e58c:
   else {
     uVar4 = 0;
   }
-  fn_801F4C14(0,0,0x36,0,local_54);
-  fn_801F4C14(0,0,0x42,0,uVar2);
+  fightFloorSetStatus(0,0,0x36,0,local_54);
+  fightFloorSetStatus(0,0,0x42,0,uVar2);
   fightWazaBiosCopy(uVar3,auStack_ec0);
   puVar19 = (u8 *)(lbl_80478D78);
   puVar20 = local_ec8;
@@ -299,8 +299,8 @@ void fightSeqSetEffectAminFlag(u8 enable) {
 void fightSeqInit(void) {
     extern u8 lbl_80478D78[1];
     extern u32 lbl_8047B62C;
-    extern void fn_801F37B0();
-    extern void* fn_801F47B4();
+    extern void fightFloorLoopValidFightOutPokemon();
+    extern void* fightFloorGetValidFightSidePtr();
     extern void fightSideInitJoutaiDataId();
     extern s32 _fightSeqInitSubFightOutPokemon__FPvUsPv();
     extern s32 fn_80213558();
@@ -310,19 +310,19 @@ void fightSeqInit(void) {
     void* slotData;
 
     localBuf[0] = 0;
-    fn_801F37B0(0, (u32)fn_80213558, &localBuf[0], 0);
+    fightFloorLoopValidFightOutPokemon(0, (u32)fn_80213558, &localBuf[0], 0);
     for (i = 0; i < 2; i++) {
-        slotData = fn_801F47B4(0, i);
+        slotData = fightFloorGetValidFightSidePtr(0, i);
         if (slotData != NULL) {
             fightSideInitJoutaiDataId(slotData, 0x4D);
         }
     }
-    fn_801F37B0(0, (u32)fn_802136A4, 0, 0);
+    fightFloorLoopValidFightOutPokemon(0, (u32)fn_802136A4, 0, 0);
     for (i = 0; i < 8; i++) {
         lbl_80478D78[i] = 0;
     }
     lbl_8047B62C = 0;
-    fn_801F37B0(0, (u32)_fightSeqInitSubFightOutPokemon__FPvUsPv, 0, 0);
+    fightFloorLoopValidFightOutPokemon(0, (u32)_fightSeqInitSubFightOutPokemon__FPvUsPv, 0, 0);
 }
 
 /* _fightSeqInitSubFightOutPokemon__FPvUsPv | Size: 0x4C | Check state and optionally trigger event 0x11 */
@@ -350,19 +350,19 @@ void fightSeqFightActionCreateAndFlowFifo(void)
     u32 r7;
     u32 r8;
 
-    extern void fn_801F0F04();
-    extern s8 fn_801F11CC();
+    extern void fightActionFlowFifo();
+    extern s8 fightActionCreate();
     extern void fightActionBiosSetBuffDataPtr();
   s8 cVar1;
   u8 auStack_38 [52];
   
-  cVar1 = fn_801F11CC(auStack_38,r3,r4,r5,r6,r7);
+  cVar1 = fightActionCreate(auStack_38,r3,r4,r5,r6,r7);
   if (cVar1 == 1) {
     fightActionBiosSetBuffDataPtr(auStack_38,r8);
     cVar1 = 1;
   }
   if (cVar1 == 1) {
-    fn_801F0F04(auStack_38);
+    fightActionFlowFifo(auStack_38);
   }
   return;
 }
@@ -382,15 +382,15 @@ void fn_80211A00(void)
     extern u32 DAT_8038ff5a;
     extern u32 DAT_8038fff9;
     extern void fn_801DA7AC();
-    extern void fn_801F37B0();
+    extern void fightFloorLoopValidFightOutPokemon();
     extern u8 lbl_80478D7B;
     extern u8 lbl_80478D7C;
     extern u8 lbl_8047B625;
     extern void fn_80211A78();
     extern void fn_8022FE20();
 
-  fn_801F37B0(0,(u32)fn_80211A78,0,1);
-  fn_801F37B0(0,(u32)fn_8022FE20,0,1);
+  fightFloorLoopValidFightOutPokemon(0,(u32)fn_80211A78,0,1);
+  fightFloorLoopValidFightOutPokemon(0,(u32)fn_8022FE20,0,1);
   lbl_80478D7B = 0;
   lbl_8047B625 = 0;
   lbl_80478D7C = 0;
@@ -406,9 +406,9 @@ u32 fn_80211A78(void* ctx) {
     extern u8 lbl_80375D30[];
     extern u8 lbl_803791FE[];
     extern u32 lbl_8047B62C;
-    extern void fn_801F0F04();
-    extern u8 fn_801F1170();
-    extern u8 fn_801F11CC();
+    extern void fightActionFlowFifo();
+    extern u8 fightActionCheckValid();
+    extern u8 fightActionCreate();
     extern u8 fn_802026E4();
     extern u16 fightOutPokemonGetMotoWazaDataId();
     extern u8 fightOutPokemonCheckFightOut();
@@ -422,18 +422,18 @@ u32 fn_80211A78(void* ctx) {
     if ((u8)fightOutPokemonCheckFightOut(ctx) == 0) { return 1; }
     feData = pokemonGetStatus(ctx, 0, 0xFE, 0);
     if (feData == NULL) { return 1; }
-    if ((u8)fn_801F1170(feData) == 0) { return 1; }
+    if ((u8)fightActionCheckValid(feData) == 0) { return 1; }
     if (fightOutPokemonGetMotoWazaDataId(ctx) != 0x108) { goto done; }
     if ((u8)fn_802026E4(ctx, 8) != 0) { goto done; }
     if ((u8)(u32)pokemonGetStatus(ctx, 0, 0xF9, 0) != 0) { goto done; }
     d920val = fightActionBiosGetFightActionDataPtr(lbl_8047B62C);
-    result = fn_801F11CC(localBuf, d920val, ctx, 0xC, 0, lbl_80375D30);
+    result = fightActionCreate(localBuf, d920val, ctx, 0xC, 0, lbl_80375D30);
     if (result == 1) {
         fightActionBiosSetBuffDataPtr(localBuf, (u32)lbl_803791FE);
         result = 1;
     }
     if (result == 1) {
-        fn_801F0F04(localBuf);
+        fightActionFlowFifo(localBuf);
     }
 done:
     return 1;
@@ -452,8 +452,8 @@ void fn_80211B94(void)
     extern u32 DAT_8038ff5a;
     extern u32 DAT_8038fff9;
     extern void wazaSetStatus();
-    extern u32 fn_801F025C();
-    extern void fn_801F37B0();
+    extern u32 fightTargetGetPtrAsNowFightType();
+    extern void fightFloorLoopValidFightOutPokemon();
     extern u8 lbl_80478D7B;
     extern u8 lbl_80478D7C;
     extern u32 lbl_8047B610;
@@ -487,7 +487,7 @@ void fn_80211B94(void)
       goto LAB_0020eddc;
     }
     if (lbl_8047B614 == 1) {
-      fn_801F37B0(0,0x8023011c,0,0);
+      fightFloorLoopValidFightOutPokemon(0,0x8023011c,0,0);
       uVar6 = lbl_8047B62C;
       uVar2 = lbl_8047B614;
       uVar7 = lbl_8047B610;
@@ -502,17 +502,17 @@ void fn_80211B94(void)
       lbl_8047B614 = uVar2;
       lbl_8047B610 = uVar7;
       local_37[0] = 1;
-      fn_801F37B0(0,0x8022e34c,local_37,0);
-      fn_801F37B0(0,0x8022e1f8,0,0);
-      fn_801F37B0(0,0x80230088,0,0);
+      fightFloorLoopValidFightOutPokemon(0,0x8022e34c,local_37,0);
+      fightFloorLoopValidFightOutPokemon(0,0x8022e1f8,0,0);
+      fightFloorLoopValidFightOutPokemon(0,0x80230088,0,0);
       local_38 = 0;
-      fn_801F37B0(0,0x8022eb9c,&local_38,0);
+      fightFloorLoopValidFightOutPokemon(0,0x8022eb9c,&local_38,0);
       lbl_8047B614 = 2;
     }
   } while ((char)lbl_8047B614 != 2);
-  uVar6 = fn_801F025C(0x11,0);
+  uVar6 = fightTargetGetPtrAsNowFightType(0x11,0);
   uVar7 = (int)pokemonGetStatus(uVar6,0,0xd9,0);
-  fn_801F37B0(0,0x802136a4,0,0);
+  fightFloorLoopValidFightOutPokemon(0,0x802136a4,0,0);
   lbl_80478D7B = 0;
   lbl_8047B618 = lbl_8047B618 & 0xf1e892af;
   lbl_8047B625 = 0;
@@ -570,10 +570,10 @@ void fn_80211E18(u32 r3,u32 r4)
     extern void itemDataBiosGetPtr();
     extern void fn_801DA7AC();
     extern void fn_801EF8F4();
-    extern u32 fn_801F025C();
-    extern u32 fn_801F4354();
-    extern void fn_801F4C14();
-    extern u32 fn_801F54A4();
+    extern u32 fightTargetGetPtrAsNowFightType();
+    extern u32 fightFloorGetFightOutPokemonPtrToFightTrainerPtr();
+    extern void fightFloorSetStatus();
+    extern u32 fightFloorGetStatus();
     extern u32 fn_801F8000();
     extern u32 fightTrainerGetNamePtr();
     extern u32 fightTrainerGetStatus();
@@ -603,10 +603,10 @@ void fn_80211E18(u32 r3,u32 r4)
   u32 uVar14;
   u32 uVar15;
   
-  uVar9 = fn_801F54A4(0,0,0x14,0);
-  uVar3 = fn_801F025C(0x11,0);
-  uVar4 = fn_801F025C(0x12,0);
-  uVar5 = fn_801F4354(0,uVar3);
+  uVar9 = fightFloorGetStatus(0,0,0x14,0);
+  uVar3 = fightTargetGetPtrAsNowFightType(0x11,0);
+  uVar4 = fightTargetGetPtrAsNowFightType(0x12,0);
+  uVar5 = fightFloorGetFightOutPokemonPtrToFightTrainerPtr(0,uVar3);
   uVar6 = fightTrainerGetStatus(uVar5,0,0x44,0);
   iVar7 = (int)pokemonGetStatus(uVar3,0,0xe5,0);
   if (iVar7 != 0) {
@@ -690,7 +690,7 @@ void fn_80211E18(u32 r3,u32 r4)
           }
           uVar14 = _DAT_80375e24;
           if (uVar15 != 7) {
-            fn_801F4C14(0,0,0x4b,0,uVar3);
+            fightFloorSetStatus(0,0,0x4b,0,uVar3);
             lbl_80478D7D = 0;
             if (uVar15 == 4) {
               lbl_80478D7D = 5;

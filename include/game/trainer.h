@@ -74,7 +74,7 @@
  * fightTrainerGetStatus - TrainerDataGet
  * Read a field from a trainer or their party.
  *
- * @param pokemon  Pokemon context pointer (r3, can be from fn_801F025C)
+ * @param pokemon  Pokemon context pointer (r3, can be from fightTargetGetPtrAsNowFightType)
  * @param slot     Trainer slot/index (r4)
  * @param field    Trainer field ID (r5)
  * @param extra    Extra parameter for sub-indexed fields (r6)

@@ -366,9 +366,9 @@ int fightTrainerAiWazaValueKuroikiri(void* ctx, u32 param1, u32 param2, u32 para
 /* TODO: Decompile fightTrainerAiWazaValueHimitunotikara (4228 bytes) */
 void fightTrainerAiWazaValueHimitunotikara(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void tikeiDataBiosGetFightKoukaId();
-    extern void fn_801F1990();
-    extern void fn_801F1A6C();
-    extern void fn_801F54A4();
+    extern void fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut();
+    extern void fightFloorGetFightTrainerFightPokemonPtrAry();
+    extern void fightFloorGetStatus();
     extern void fightTrainerGetStatus();
     extern void fightOutPokemonGetPokemonPtr();
     extern void fn_802358AC();
@@ -417,7 +417,7 @@ void fightTrainerAiWazaValueHimitunotikara(void* ctx, u32 param1, u32 param2, u3
     r4 = 0x0;
     r5 = 0xf;
     r6 = 0x0;
-    fn_801F54A4();
+    fightFloorGetStatus();
     r3 = r3 & 0xFFFF;
     tikeiDataBiosGetFightKoukaId();
     r0 = r3 & 0xFF;
@@ -458,7 +458,7 @@ void fightTrainerAiWazaValueHimitunotikara(void* ctx, u32 param1, u32 param2, u3
     r5 = 0x1;
     r6 = 0x1;
     r7 = 0x10e;
-    fn_801F1990();
+    fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut();
     r0 = r3 & 0xFF;
     if (r0 == (u32)0x1) {
         r3 = r26;
@@ -531,7 +531,7 @@ void fightTrainerAiWazaValueHimitunotikara(void* ctx, u32 param1, u32 param2, u3
     r3 = 0x0;
     r6 = 0x0;
     r7 = 0x1;
-    fn_801F1A6C();
+    fightFloorGetFightTrainerFightPokemonPtrAry();
     r26 = r3;
     r3 = r31;
     r4 = r30;
@@ -687,7 +687,7 @@ void fightTrainerAiWazaValueHimitunotikara(void* ctx, u32 param1, u32 param2, u3
     r5 = 0x1;
     r6 = 0x1;
     r7 = 0x10e;
-    fn_801F1990();
+    fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut();
     r0 = r3 & 0xFF;
     if (r0 == (u32)0x1) {
         r3 = r27;
@@ -825,7 +825,7 @@ void fightTrainerAiWazaValueHimitunotikara(void* ctx, u32 param1, u32 param2, u3
     r5 = 0x1;
     r6 = 0x1;
     r7 = 0x10e;
-    fn_801F1990();
+    fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut();
     r0 = r3 & 0xFF;
     if (r0 == (u32)0x1) {
         r3 = r27;
@@ -947,7 +947,7 @@ void fightTrainerAiWazaValueHimitunotikara(void* ctx, u32 param1, u32 param2, u3
     r5 = 0x1;
     r6 = 0x1;
     r7 = 0x10e;
-    fn_801F1990();
+    fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut();
     r0 = r3 & 0xFF;
     if (r0 == (u32)0x1) {
         r3 = r27;
@@ -1067,7 +1067,7 @@ void fightTrainerAiWazaValueHimitunotikara(void* ctx, u32 param1, u32 param2, u3
     r5 = 0x1;
     r6 = 0x1;
     r7 = 0x10e;
-    fn_801F1990();
+    fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut();
     r0 = r3 & 0xFF;
     if (r0 == (u32)0x1) {
         r3 = r27;
@@ -1221,7 +1221,7 @@ void fightTrainerAiWazaValueHimitunotikara(void* ctx, u32 param1, u32 param2, u3
     r5 = 0x1;
     r6 = 0x1;
     r7 = 0x10e;
-    fn_801F1990();
+    fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut();
     r0 = r3 & 0xFF;
     if (r0 == (u32)0x1) {
         r3 = r27;
@@ -1354,7 +1354,7 @@ void fightTrainerAiWazaValueHimitunotikara(void* ctx, u32 param1, u32 param2, u3
     r5 = 0x1;
     r6 = 0x1;
     r7 = 0x10e;
-    fn_801F1990();
+    fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut();
     r0 = r3 & 0xFF;
     if (r0 == (u32)0x1) {
         r3 = r25;
@@ -1517,7 +1517,7 @@ void fightTrainerAiWazaValueRandamuSentaku(void* ctx, u32 param1, u32 param2) {
 /* Address: 0x802401F0 | Size: 0x264 (612 bytes) */
 void fightTrainerAiWazaValueHurahuradansu(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fightFloorGetFightTrainerFightOutPokemonPtrAry();
-    extern void fn_801F54A4();
+    extern void fightFloorGetStatus();
     extern void fightOutPokemonGetPokemonPtr();
     extern void fn_80237F74();
     extern void fn_8023831C();
@@ -1558,7 +1558,7 @@ void fightTrainerAiWazaValueHurahuradansu(void* ctx, u32 param1, u32 param2, u32
     r4 = 0x0;
     r5 = 0x18;
     r6 = 0x0;
-    fn_801F54A4();
+    fightFloorGetStatus();
     r0 = r3 & 0xFFFF;
     if (r0 >= (u32)0x2) {
         r4 = r27;
@@ -1692,7 +1692,7 @@ void fightTrainerAiWazaValueHurahuradansu(void* ctx, u32 param1, u32 param2, u32
 
 /* Address: 0x80240454 | Size: 0x16C (364 bytes) */
 void fightTrainerAiWazaValueMakibisi(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F025C();
+    extern void fightTargetGetPtrAsNowFightType();
     extern void fightSideGetCountAsJoutaiDataId();
     extern void fightSideIsJoutaiDataId();
     extern void fightOutPokemonGetPokemonPtr();
@@ -1720,7 +1720,7 @@ void fightTrainerAiWazaValueMakibisi(void* ctx, u32 param1, u32 param2, u32 para
     r4 = r6;
     r29 = 0x0;
     r3 = 0x2;
-    fn_801F025C();
+    fightTargetGetPtrAsNowFightType();
     r4 = 0x4a;
     r28 = r3;
     fightSideIsJoutaiDataId();
@@ -2155,9 +2155,9 @@ void fightTrainerAiWazaValueJikoanji(void* ctx, u32 param1, u32 param2, u32 para
 /* Address: 0x80241660 | Size: 0x510 (1296 bytes) */
 void fightTrainerAiWazaValueTedasuke(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 lbl_80478DF8;
-    extern void fn_801F0898();
-    extern void fn_801F1170();
-    extern void fn_801F1990();
+    extern void fightActionGetKindDataId();
+    extern void fightActionCheckValid();
+    extern void fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut();
     extern void fightFloorGetFightTrainerFightOutPokemonPtrAry();
     extern void fn_80202108();
     extern void fn_80202234();
@@ -2227,7 +2227,7 @@ void fightTrainerAiWazaValueTedasuke(void* ctx, u32 param1, u32 param2, u32 para
                         r5 = 0x1;
                         r6 = 0x1;
                         r8 = 0x0;
-                        fn_801F1990();
+                        fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut();
                         r0 = r3 & 0xFF;
                         if (r0 == (u32)0x1) {
                             r21 = 0x1;
@@ -2326,11 +2326,11 @@ void fightTrainerAiWazaValueTedasuke(void* ctx, u32 param1, u32 param2, u32 para
             r6 = 0x0;
             ((void(*)(void))pokemonGetStatus)();
 
-            fn_801F1170();
+            fightActionCheckValid();
             r0 = r3 & 0xFF;
 
             r3 = r21;
-            fn_801F0898();
+            fightActionGetKindDataId();
             r0 = r3 & 0xFFFF;
             if (r0 != (u32)0x13) {
                 r25 = 0x0;
@@ -2522,7 +2522,7 @@ void fightTrainerAiWazaValueTedasuke(void* ctx, u32 param1, u32 param2, u32 para
 
 /* Address: 0x80241B70 | Size: 0x278 (632 bytes) */
 u32 fightTrainerAiWazaValueKyouseikoutai(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u32 fn_801F025C(u32, u32);
+    extern u32 fightTargetGetPtrAsNowFightType(u32, u32);
     extern u32 fightSideGetCountAsJoutaiDataId(u32, u32);
     extern u8 fightSideIsJoutaiDataId(u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
@@ -2542,7 +2542,7 @@ u32 fightTrainerAiWazaValueKyouseikoutai(void* ctx, u32 param1, u32 param2, u32 
     u8 i;
 
     handle = 0;
-    mode = fn_801F025C(2, param3);
+    mode = fightTargetGetPtrAsNowFightType(2, param3);
     if (fightSideIsJoutaiDataId(mode, 0x4a) == 1) {
         mode = fightSideGetCountAsJoutaiDataId(mode, 0x4a);
     } else {
@@ -3178,8 +3178,8 @@ s32 fightTrainerAiWazaValueAkumu(void* ctx, u32 param1, u32 param2, u32 param3) 
 
 /* Address: 0x802438CC | Size: 0x140 (320 bytes) */
 u32 fightTrainerAiWazaValueRokkuon(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u16 fn_801F0134(u32, u16);
-    extern u32 fn_801F54A4(u32, u32, u32, u32);
+    extern u16 fightTargetGetTragetPtrToRelativeHostSideFightTargetId(u32, u16);
+    extern u32 fightFloorGetStatus(u32, u32, u32, u32);
     extern u16 fn_80201D84(u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u8 fn_80236BFC(void*, u32, u32);
@@ -3189,7 +3189,7 @@ u32 fightTrainerAiWazaValueRokkuon(void* ctx, u32 param1, u32 param2, u32 param3
     u16 current;
 
     setup = 0;
-    current = fn_801F0134(param1, (u16)fn_801F54A4(0, 0, 0x14, 0));
+    current = fightTargetGetTragetPtrToRelativeHostSideFightTargetId(param1, (u16)fightFloorGetStatus(0, 0, 0x14, 0));
     if (fn_80236BFC(ctx, param3, 0x1d) == 0) {
         setup = fn_80239984(0, ctx, 0x179);
         fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0x179);
@@ -3255,7 +3255,7 @@ void fightTrainerAiWazaValueKoraeru(void* ctx, u32 param1, u32 param2, u32 param
     extern u32 lbl_80478DF8;
     extern f32 lbl_8047E630;
     extern void wazaGetStatus();
-    extern void fn_801F1990();
+    extern void fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut();
     extern void fightFloorGetFightTrainerFightOutPokemonPtrAry();
     extern void fightOutPokemonGetPokemonPtr();
     extern void fn_80235B04();
@@ -3499,7 +3499,7 @@ void fightTrainerAiWazaValueKoraeru(void* ctx, u32 param1, u32 param2, u32 param
             r5 = 0x1;
             r6 = 0x1;
             r8 = 0x0;
-            fn_801F1990();
+            fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut();
             r0 = r3 & 0xFF;
             if (r0 == (u32)0x1) {
                 r3 = r29;
@@ -3824,7 +3824,7 @@ u32 fightTrainerAiWazaValueKauntaa(void* ctx, u32 param1, u32 param2, u32 param3
 
 /* Address: 0x8024482C | Size: 0xD4 (212 bytes) */
 u32 fightTrainerAiWazaValueAroma(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u32 fn_801F1A6C(u32, void*, u32*, u32, u32);
+    extern u32 fightFloorGetFightTrainerFightPokemonPtrAry(u32, void*, u32*, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u8 fn_80238748(void*, u32);
     extern u32 fn_80239984(u32, void*, u32);
@@ -3838,7 +3838,7 @@ u32 fightTrainerAiWazaValueAroma(void* ctx, u32 param1, u32 param2, u32 param3) 
     u32 i;
     u32 count;
 
-    count = fn_801F1A6C(0, battleCtx, list, 1, 1);
+    count = fightFloorGetFightTrainerFightPokemonPtrAry(0, battleCtx, list, 1, 1);
     listPtr = list;
     count &= 0xFFFF;
     for (i = 0; (u16)i < count; i++) {
@@ -3869,7 +3869,7 @@ u32 fightTrainerAiWazaValueRihuressyu(void* ctx, u32 param1, u32 param2) {
 
 /* Address: 0x8024498C | Size: 0x318 (792 bytes) */
 void fightTrainerAiWazaValueSunaarasi(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1A6C();
+    extern void fightFloorGetFightTrainerFightPokemonPtrAry();
     extern void fightFloorGetFightTrainerFightOutPokemonPtrAry();
     extern void fightOutPokemonGetPokemonPtr();
     extern void fn_80235B04();
@@ -3915,7 +3915,7 @@ void fightTrainerAiWazaValueSunaarasi(void* ctx, u32 param1, u32 param2, u32 par
     r3 = 0x0;
     r6 = 0x1;
     r7 = 0x1;
-    fn_801F1A6C();
+    fightFloorGetFightTrainerFightPokemonPtrAry();
     r30 = r3;
     r4 = r25;
     r5 = (u32)sp + 0x8;
@@ -4094,7 +4094,7 @@ void fightTrainerAiWazaValueSunaarasi(void* ctx, u32 param1, u32 param2, u32 par
 
 /* Address: 0x80244CA4 | Size: 0x2C4 (708 bytes) */
 void fightTrainerAiWazaValueArare(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1A6C();
+    extern void fightFloorGetFightTrainerFightPokemonPtrAry();
     extern void fightFloorGetFightTrainerFightOutPokemonPtrAry();
     extern void fightOutPokemonGetPokemonPtr();
     extern void fn_80235B04();
@@ -4138,7 +4138,7 @@ void fightTrainerAiWazaValueArare(void* ctx, u32 param1, u32 param2, u32 param3)
     r3 = 0x0;
     r6 = 0x1;
     r7 = 0x1;
-    fn_801F1A6C();
+    fightFloorGetFightTrainerFightPokemonPtrAry();
     r30 = r3;
     r4 = r25;
     r5 = (u32)sp + 0x8;
@@ -4296,7 +4296,7 @@ void fightTrainerAiWazaValueArare(void* ctx, u32 param1, u32 param2, u32 param3)
 
 /* Address: 0x80244F68 | Size: 0x258 (600 bytes) */
 void fightTrainerAiWazaValueNihonbare(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1A6C();
+    extern void fightFloorGetFightTrainerFightPokemonPtrAry();
     extern void fightOutPokemonGetPokemonPtr();
     extern void fn_80235B04();
     extern void fn_80238980();
@@ -4339,7 +4339,7 @@ void fightTrainerAiWazaValueNihonbare(void* ctx, u32 param1, u32 param2, u32 par
     r3 = 0x0;
     r6 = 0x1;
     r7 = 0x1;
-    fn_801F1A6C();
+    fightFloorGetFightTrainerFightPokemonPtrAry();
     r0 = r30 & 0xFF;
     r31 = r3;
     if (r0 != (u32)0x1) {
@@ -4470,7 +4470,7 @@ void fightTrainerAiWazaValueNihonbare(void* ctx, u32 param1, u32 param2, u32 par
 
 /* Address: 0x802451C0 | Size: 0x258 (600 bytes) */
 void fightTrainerAiWazaValueAmagoi(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1A6C();
+    extern void fightFloorGetFightTrainerFightPokemonPtrAry();
     extern void fightOutPokemonGetPokemonPtr();
     extern void fn_80235B04();
     extern void fn_80238980();
@@ -4513,7 +4513,7 @@ void fightTrainerAiWazaValueAmagoi(void* ctx, u32 param1, u32 param2, u32 param3
     r3 = 0x0;
     r6 = 0x1;
     r7 = 0x1;
-    fn_801F1A6C();
+    fightFloorGetFightTrainerFightPokemonPtrAry();
     r0 = r30 & 0xFF;
     r31 = r3;
     if (r0 != (u32)0x2) {
@@ -4645,7 +4645,7 @@ void fightTrainerAiWazaValueAmagoi(void* ctx, u32 param1, u32 param2, u32 param3
 /* Address: 0x80245418 | Size: 0x160 (352 bytes) */
 u32 fightTrainerAiWazaValueNemurare(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 pokemonGetStatus(u32, u32, u32, u32);
-    extern u16 fn_801F1A6C(u32, void*, u32*, u32, u32);
+    extern u16 fightFloorGetFightTrainerFightPokemonPtrAry(u32, void*, u32*, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u8 fn_80237310(void*, u32);
     extern u8 fn_802384B4(void*, u32, u32);
@@ -4658,7 +4658,7 @@ u32 fightTrainerAiWazaValueNemurare(void* ctx, u32 param1, u32 param2, u32 param
     u16 index;
 
     setup = 0;
-    count = fn_801F1A6C(0, ctx, entries, 0, 1);
+    count = fightFloorGetFightTrainerFightPokemonPtrAry(0, ctx, entries, 0, 1);
     if (fn_80237310(ctx, param3) == 1) {
         setup = fn_80239984(0, ctx, 0x14c);
         fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0x14c);
@@ -4775,7 +4775,7 @@ u32 fightTrainerAiWazaValueKituke(void* ctx, u32 param1, u32 param2, u32 param3)
 
 /* Address: 0x802459B0 | Size: 0x44C (1100 bytes) */
 u32 fightTrainerAiWazaValueOiuti(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u32 fn_801F4354(u32, u32);
+    extern u32 fightFloorGetFightOutPokemonPtrToFightTrainerPtr(u32, u32);
     extern u32 fn_801F8A18(u32, u16*);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u32 fn_80235BE4(void*, u32, u32, u32);
@@ -4790,7 +4790,7 @@ u32 fightTrainerAiWazaValueOiuti(void* ctx, u32 param1, u32 param2, u32 param3) 
 
     handle = 0;
     status = fn_80235BE4(ctx, 0, param3, 0);
-    pokemon = fn_801F4354(0, param3);
+    pokemon = fightFloorGetFightOutPokemonPtrToFightTrainerPtr(0, param3);
     tmp = 0;
     found = fn_801F8A18(pokemon, &tmp);
     if (found == 0) {
@@ -4868,11 +4868,11 @@ u32 fightTrainerAiWazaValueUezaabooru(void* ctx, u32 param1, u32 param2, u32 par
 /* Address: 0x80245F48 | Size: 0x7C | Pattern: field_accessor */
 u32 fightTrainerAiWazaValueSizennotikara(void* ctx, u32 slot, u32 param, u32 extra) {
     extern u16 tikeiDataBiosGetWazaId(u16);
-    extern u32 fn_801F54A4(u32, u32, u32, u32);
+    extern u32 fightFloorGetStatus(u32, u32, u32, u32);
     extern u32 fn_8023CA9C(void*, u32, u16, u32);
     u16 value;
 
-    value = tikeiDataBiosGetWazaId((u16)fn_801F54A4(0, 0, 0xf, 0));
+    value = tikeiDataBiosGetWazaId((u16)fightFloorGetStatus(0, 0, 0xf, 0));
     if (value != (u16)param) {
         return fn_8023CA9C(ctx, slot, value, extra);
     }
@@ -4891,7 +4891,7 @@ s32 fightTrainerAiWazaValueItigekihissatu(void* ctx, u32 slot, u32 param) {
 
 /* Address: 0x802470C4 | Size: 0xEC (236 bytes) */
 u32 fightTrainerAiWazaValueZennouryokuappu(void* ctx, u32 slot, u32 param, u32 unused) {
-    extern u8 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u8 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(u32, void*, u32, u32, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u32 fn_80239984(u32, void*, u32);
     extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
@@ -4899,7 +4899,7 @@ u32 fightTrainerAiWazaValueZennouryokuappu(void* ctx, u32 slot, u32 param, u32 u
 
     handle = fn_80239984(0, ctx, 0x133);
     fn_80239EE8(0xEC64, ctx, fightOutPokemonGetPokemonPtr(slot), 0, 0, param, 0, 0x133);
-    if (fn_801F1990(0, ctx, 1, 1, 0x10e, slot) == 1) {
+    if (fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, ctx, 1, 1, 0x10e, slot) == 1) {
         handle = fn_80239984(handle, ctx, 0x134);
         fn_80239EE8(0xEC64, ctx, fightOutPokemonGetPokemonPtr(slot), 0, 0, param, 0, 0x134);
     }
@@ -4958,7 +4958,7 @@ u32 fightTrainerAiWazaValueHaganenotubasa(void* ctx, u32 param1, u32 param2, u32
 
 /* Address: 0x802473B4 | Size: 0x144 (324 bytes) */
 u32 fn_802473B4(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u8 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u8 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(u32, void*, u32, u32, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u32 fn_8023831C(void*);
     extern u32 fn_80239984(u32, void*, u32);
@@ -4972,7 +4972,7 @@ u32 fn_802473B4(void* ctx, u32 param1, u32 param2, u32 param3) {
         handle = fn_80239984(0, battleCtx, 0x12c);
         fn_80239EE8(0xEC64, battleCtx, fightOutPokemonGetPokemonPtr(trainer), 0, 0, sequenceArg, 0, 0x12c);
     }
-    if (fn_801F1990(0, battleCtx, 1, 1, 0x10e, trainer) == 1) {
+    if (fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, battleCtx, 1, 1, 0x10e, trainer) == 1) {
         handle = fn_80239984(handle, battleCtx, 0x12d);
         fn_80239EE8(0xEC64, battleCtx, fightOutPokemonGetPokemonPtr(trainer), 0, 0, sequenceArg, 0, 0x12d);
     }
@@ -4983,7 +4983,7 @@ u32 fn_802473B4(void* ctx, u32 param1, u32 param2, u32 param3) {
 
 /* Address: 0x802474F8 | Size: 0x1A8 (424 bytes) */
 u32 fightTrainerAiWazaValueOobaahiito(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u8 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u8 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(u32, void*, u32, u32, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u8 fn_80236BFC(void*, u32, u32);
     extern u32 fn_8023831C(void*);
@@ -4996,7 +4996,7 @@ u32 fightTrainerAiWazaValueOobaahiito(void* ctx, u32 param1, u32 param2, u32 par
         handle = fn_80239984(0, ctx, 0x128);
         fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0x128);
     }
-    if (fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+    if (fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, ctx, 1, 1, 0x10e, param1) == 1) {
         handle = fn_80239984(handle, ctx, 0x129);
         fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0x129);
     }
@@ -5071,7 +5071,7 @@ u32 fightTrainerAiWazaValueDouguUbau(void* ctx, u32 param1, u32 param2, u32 para
 
 /* Address: 0x80247908 | Size: 0x1C0 (448 bytes) */
 u32 fightTrainerAiWazaValueSooraabiimu(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u8 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u8 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(u32, void*, u32, u32, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u32 fn_80235B04(void*, u32, u32);
     extern u32 fn_80239984(u32, void*, u32);
@@ -5091,7 +5091,7 @@ u32 fightTrainerAiWazaValueSooraabiimu(void* ctx, u32 param1, u32 param2, u32 pa
         handle = fn_80239984(0, battleCtx, 0x120);
         fn_80239EE8(0xec64, battleCtx, fightOutPokemonGetPokemonPtr(trainer), 0, 0, sequenceArg, 0, 0x120);
     }
-    if (fn_801F1990(0, battleCtx, 1, 1, 0x10e, trainer) == 1) {
+    if (fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, battleCtx, 1, 1, 0x10e, trainer) == 1) {
         handle = fn_80239984(handle, battleCtx, 0x121);
         fn_80239EE8(0xec64, battleCtx, fightOutPokemonGetPokemonPtr(trainer), 0, 0, sequenceArg, 0, 0x121);
     }
@@ -5131,7 +5131,7 @@ u32 fightTrainerAiWazaValueToraiatakku(void* ctx, u32 param1, u32 param2, u32 pa
 
 /* Address: 0x80247C5C | Size: 0x184 (388 bytes) */
 u32 fightTrainerAiWazaValueDokudokunokiba(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u8 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u8 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(u32, void*, u32, u32, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u8 fn_80237310(void*, u32);
     extern u8 fn_80237F74(void*, u32, u32);
@@ -5141,7 +5141,7 @@ u32 fightTrainerAiWazaValueDokudokunokiba(void* ctx, u32 param1, u32 param2, u32
 
     handle = fn_80239984(0, ctx, 0x11a);
     fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0x11a);
-    if (fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+    if (fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, ctx, 1, 1, 0x10e, param1) == 1) {
         handle = fn_80239984(handle, ctx, 0x11b);
         fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0x11b);
     }
@@ -5155,7 +5155,7 @@ u32 fightTrainerAiWazaValueDokudokunokiba(void* ctx, u32 param1, u32 param2, u32
 
 /* Address: 0x80247DE0 | Size: 0x1C0 (448 bytes) */
 u32 fightTrainerAiWazaValuePoizunteeru(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u8 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u8 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(u32, void*, u32, u32, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u8 fn_80237310(void*, u32);
     extern u8 fn_80237F74(void*, u32, u32);
@@ -5167,7 +5167,7 @@ u32 fightTrainerAiWazaValuePoizunteeru(void* ctx, u32 param1, u32 param2, u32 pa
     fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0x116);
     handle = fn_80239984(handle, ctx, 0x117);
     fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0x117);
-    if (fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+    if (fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, ctx, 1, 1, 0x10e, param1) == 1) {
         handle = fn_80239984(handle, ctx, 0x118);
         fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0x118);
     }
@@ -5181,7 +5181,7 @@ u32 fightTrainerAiWazaValuePoizunteeru(void* ctx, u32 param1, u32 param2, u32 pa
 
 /* Address: 0x80247FA0 | Size: 0x1D0 (464 bytes) */
 u32 fightTrainerAiWazaValueTuikaDoku(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u8 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u8 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(u32, void*, u32, u32, u32, u32);
     extern s32 fightTrainerGetStatus(u32, u32, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u8 fn_80237310(void*, u32);
@@ -5205,7 +5205,7 @@ u32 fightTrainerAiWazaValueTuikaDoku(void* ctx, u32 param1, u32 param2, u32 para
     handle = fightTrainerAiAddValue(0, quotient);
     pokemonPtr = fightOutPokemonGetPokemonPtr(trainerParam);
     fn_80239CCC(0xec64, battleCtx, pokemonPtr, 0, 0, battleParam, 0, 0x113, quotient);
-    if (fn_801F1990(0, battleCtx, 1, 1, 0x10e, trainerParam) == 1) {
+    if (fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, battleCtx, 1, 1, 0x10e, trainerParam) == 1) {
         handle = fn_80239984(handle, battleCtx, 0x114);
         fn_80239EE8(0xec64, battleCtx, fightOutPokemonGetPokemonPtr(trainerParam), 0, 0, battleParam, 0, 0x114);
     }
@@ -5222,14 +5222,14 @@ u32 fightTrainerAiWazaValueTuikaDoku(void* ctx, u32 param1, u32 param2, u32 para
 
 /* Address: 0x80248170 | Size: 0x150 (336 bytes) */
 u32 fightTrainerAiWazaValueHandou(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u32 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u32 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(u32, void*, u32, u32, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u32 fn_80237F74(void*, u32, u32);
     extern u32 fn_80239984(u32, void*, u32);
     extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
     u32 handle = 0;
 
-    if ((fn_801F1990(0, ctx, 1, 1, 0x10e, param1) & 0xFF) == 1) {
+    if ((fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, ctx, 1, 1, 0x10e, param1) & 0xFF) == 1) {
         {
             u32 nextHandle = fn_80239984(0, ctx, 0x110);
             handle = nextHandle;
@@ -5250,8 +5250,8 @@ u32 fightTrainerAiWazaValueHandou(void* ctx, u32 param1, u32 param2, u32 param3)
 
 /* Address: 0x802482C0 | Size: 0x1A0 (416 bytes) */
 s32 fightTrainerAiWazaValueBakuretuPanti(void* ctx, void* param1, u32 param2, u32 param3) {
-    extern u16 fn_801F54A4();
-    extern u32 fn_801F0134();
+    extern u16 fightFloorGetStatus();
+    extern u32 fightTargetGetTragetPtrToRelativeHostSideFightTargetId();
     extern u8 fn_80236BFC();
     extern u16 fn_80201D84();
     extern u8 fn_80237F74();
@@ -5261,7 +5261,7 @@ s32 fightTrainerAiWazaValueBakuretuPanti(void* ctx, void* param1, u32 param2, u3
     s32 h = 0;
     u32 r28v;
 
-    r28v = fn_801F0134(param1, fn_801F54A4(0, 0, 0x14, 0));
+    r28v = fightTargetGetTragetPtrToRelativeHostSideFightTargetId(param1, fightFloorGetStatus(0, 0, 0x14, 0));
     if (fn_80236BFC(ctx, param3, 0x1d) == 1 &&
         (u16)r28v == (u16)fn_80201D84(param3, 0x1d)) {
         h = fn_80239984(0, ctx, 0x10a);
@@ -5278,9 +5278,9 @@ s32 fightTrainerAiWazaValueBakuretuPanti(void* ctx, void* param1, u32 param2, u3
 
 /* Address: 0x80248460 | Size: 0x22C (556 bytes) */
 s32 fightTrainerAiWazaValueDenjihou(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u16 fn_801F0134();
+    extern u16 fightTargetGetTragetPtrToRelativeHostSideFightTargetId();
     extern u16 fightFloorGetFightTrainerFightOutPokemonPtrAry();
-    extern u16 fn_801F54A4();
+    extern u16 fightFloorGetStatus();
     extern u16 fn_80201D84();
     extern void* fightOutPokemonGetPokemonPtr();
     extern u8 fn_80236BFC();
@@ -5295,7 +5295,7 @@ s32 fightTrainerAiWazaValueDenjihou(void* ctx, u32 param1, u32 param2, u32 param
     u16 count;
     u16 i;
 
-    someVal = fn_801F0134(param1, fn_801F54A4(0, 0, 0x14, 0));
+    someVal = fightTargetGetTragetPtrToRelativeHostSideFightTargetId(param1, fightFloorGetStatus(0, 0, 0x14, 0));
     count = fightFloorGetFightTrainerFightOutPokemonPtrAry(0, ctx, buf, 1, 1);
 
     for (i = 0; i < count; i++) {
@@ -5325,7 +5325,7 @@ s32 fightTrainerAiWazaValueDenjihou(void* ctx, u32 param1, u32 param2, u32 param
 
 /* Address: 0x8024868C | Size: 0x1D0 (464 bytes) */
 u32 fightTrainerAiWazaValueTuikaMahi(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u8 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u8 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(u32, void*, u32, u32, u32, u32);
     extern s32 fightTrainerGetStatus(u32, u32, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u8 fn_80237310(void*, u32);
@@ -5349,7 +5349,7 @@ u32 fightTrainerAiWazaValueTuikaMahi(void* ctx, u32 param1, u32 param2, u32 para
     handle = fightTrainerAiAddValue(0, quotient);
     pokemonPtr = fightOutPokemonGetPokemonPtr(trainerParam);
     fn_80239CCC(0xec64, battleCtx, pokemonPtr, 0, 0, battleParam, 0, 0x104, quotient);
-    if (fn_801F1990(0, battleCtx, 1, 1, 0x10e, trainerParam) == 1) {
+    if (fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, battleCtx, 1, 1, 0x10e, trainerParam) == 1) {
         handle = fn_80239984(handle, battleCtx, 0x105);
         fn_80239EE8(0xec64, battleCtx, fightOutPokemonGetPokemonPtr(trainerParam), 0, 0, battleParam, 0, 0x105);
     }
@@ -5366,8 +5366,8 @@ u32 fightTrainerAiWazaValueTuikaMahi(void* ctx, u32 param1, u32 param2, u32 para
 
 /* Address: 0x8024885C | Size: 0x2C0 (704 bytes) */
 void fightTrainerAiWazaValueTuikaKoori(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1990();
-    extern void fn_801F1A6C();
+    extern void fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut();
+    extern void fightFloorGetFightTrainerFightPokemonPtrAry();
     extern void fightTrainerGetStatus();
     extern void fightOutPokemonGetPokemonPtr();
     extern void fn_80237310();
@@ -5407,7 +5407,7 @@ void fightTrainerAiWazaValueTuikaKoori(void* ctx, u32 param1, u32 param2, u32 pa
     r5 = (u32)sp + 0x10;
     r3 = 0x0;
     r6 = 0x0;
-    fn_801F1A6C();
+    fightFloorGetFightTrainerFightPokemonPtrAry();
     r26 = r3;
     r3 = r27;
     r4 = r29;
@@ -5441,7 +5441,7 @@ void fightTrainerAiWazaValueTuikaKoori(void* ctx, u32 param1, u32 param2, u32 pa
     r5 = 0x1;
     r6 = 0x1;
     r7 = 0x10e;
-    fn_801F1990();
+    fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut();
     r0 = r3 & 0xFF;
     if (r0 == (u32)0x1) {
         r3 = r31;
@@ -5565,7 +5565,7 @@ void fightTrainerAiWazaValueTuikaKoori(void* ctx, u32 param1, u32 param2, u32 pa
 
 /* Address: 0x80248B1C | Size: 0x220 (544 bytes) */
 u32 fightTrainerAiWazaValueBureizukikku(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u32 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u32 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(u32, void*, u32, u32, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u32 fn_80236BFC(void*, u32, u32);
     extern u32 fn_80237310(void*, u32);
@@ -5578,7 +5578,7 @@ u32 fightTrainerAiWazaValueBureizukikku(void* ctx, u32 param1, u32 param2, u32 p
     fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xfb);
     handle = fn_80239984(handle, ctx, 0xfc);
     fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xfc);
-    if ((u8)fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+    if ((u8)fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, ctx, 1, 1, 0x10e, param1) == 1) {
         handle = fn_80239984(handle, ctx, 0xfd);
         fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xfd);
     }
@@ -5596,7 +5596,7 @@ u32 fightTrainerAiWazaValueBureizukikku(void* ctx, u32 param1, u32 param2, u32 p
 
 /* Address: 0x80248D3C | Size: 0x288 (648 bytes) */
 u32 fightTrainerAiWazaValueJikokaitou(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u32 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u32 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(u32, void*, u32, u32, u32, u32);
     extern s32 fightTrainerGetStatus(u32, u32, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u32 fn_80236BFC(void*, u32, u32);
@@ -5622,7 +5622,7 @@ u32 fightTrainerAiWazaValueJikokaitou(void* ctx, u32 param1, u32 param2, u32 par
     quotient = quotient / denom;
     handle = fightTrainerAiAddValue(handle, quotient);
     fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xf7, quotient);
-    if ((u8)fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+    if ((u8)fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, ctx, 1, 1, 0x10e, param1) == 1) {
         handle = fn_80239984(handle, ctx, 0xf8);
         fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xf8);
     }
@@ -5648,7 +5648,7 @@ done:
 
 /* Address: 0x80248FC4 | Size: 0x49C (1180 bytes) */
 u32 fightTrainerAiWazaValueHonoonouzu(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u32 fn_801F4354(u32, u32);
+    extern u32 fightFloorGetFightOutPokemonPtrToFightTrainerPtr(u32, u32);
     extern u32 fn_801F8A18(u32, u16*);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u32 fn_80235BE4(void*, u32, u32, u32);
@@ -5663,7 +5663,7 @@ u32 fightTrainerAiWazaValueHonoonouzu(void* ctx, u32 param1, u32 param2, u32 par
 
     handle = 0;
     status = fn_80235BE4(ctx, 0, param3, 0);
-    pokemon = fn_801F4354(0, param3);
+    pokemon = fightFloorGetFightOutPokemonPtrToFightTrainerPtr(0, param3);
     tmp = 0;
     found = fn_801F8A18(pokemon, &tmp);
     if (found == 0) {
@@ -5718,7 +5718,7 @@ u32 fightTrainerAiWazaValueHonoonouzu(void* ctx, u32 param1, u32 param2, u32 par
 
 /* Address: 0x80249460 | Size: 0x218 (536 bytes) */
 u32 fightTrainerAiWazaValueIryokuHonoo(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u32 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u32 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(u32, void*, u32, u32, u32, u32);
     extern s32 fightTrainerGetStatus(u32, u32, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u32 fn_80236BFC(void*, u32, u32);
@@ -5738,7 +5738,7 @@ u32 fightTrainerAiWazaValueIryokuHonoo(void* ctx, u32 param1, u32 param2, u32 pa
     quotient = quotient / denom;
     handle = fightTrainerAiAddValue(0, quotient);
     fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xe7, quotient);
-    if ((u8)fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+    if ((u8)fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, ctx, 1, 1, 0x10e, param1) == 1) {
         handle = fn_80239984(handle, ctx, 0xe8);
         fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xe8);
     }
@@ -5758,7 +5758,7 @@ u32 fightTrainerAiWazaValueIryokuHonoo(void* ctx, u32 param1, u32 param2, u32 pa
 
 /* Address: 0x80249678 | Size: 0x248 (584 bytes) */
 u32 fightTrainerAiWazaValueTuikouKonran(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u32 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u32 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(u32, void*, u32, u32, u32, u32);
     extern s32 fightTrainerGetStatus(u32, u32, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u32 fn_80236BFC(void*, u32, u32);
@@ -5779,7 +5779,7 @@ u32 fightTrainerAiWazaValueTuikouKonran(void* ctx, u32 param1, u32 param2, u32 p
     quotient = quotient / denom;
     handle = fightTrainerAiAddValue(0, quotient);
     fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xe3, quotient);
-    if ((u8)fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+    if ((u8)fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, ctx, 1, 1, 0x10e, param1) == 1) {
         handle = fn_80239984(handle, ctx, 0xe4);
         fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xe4);
     }
@@ -5833,7 +5833,7 @@ u32 fightTrainerAiWazaValueDorokake(void* ctx, u32 param1, u32 param2, u32 param
 
 /* Address: 0x80249AB4 | Size: 0x278 (632 bytes) */
 u32 fightTrainerAiWazaValueTuikouMeityuuDaun(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u32 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u32 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(u32, void*, u32, u32, u32, u32);
     extern s32 fightTrainerGetStatus(u32, u32, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u32 fn_802358AC(void*, u32);
@@ -5854,7 +5854,7 @@ u32 fightTrainerAiWazaValueTuikouMeityuuDaun(void* ctx, u32 param1, u32 param2, 
     quotient = quotient / denom;
     handle = fightTrainerAiAddValue(0, quotient);
     fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xdb, quotient);
-    if ((u8)fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+    if ((u8)fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, ctx, 1, 1, 0x10e, param1) == 1) {
         handle = fn_80239984(handle, ctx, 0xdc);
         fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xdc);
     }
@@ -5885,7 +5885,7 @@ done:
 
 /* Address: 0x80249D2C | Size: 0x25C (604 bytes) */
 u32 fightTrainerAiWazaValueTuikouTokubouDaun(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u32 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u32 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(u32, void*, u32, u32, u32, u32);
     extern s32 fightTrainerGetStatus(u32, u32, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u32 fn_80235974(void*, u32);
@@ -5906,7 +5906,7 @@ u32 fightTrainerAiWazaValueTuikouTokubouDaun(void* ctx, u32 param1, u32 param2, 
     quotient = quotient / denom;
     handle = fightTrainerAiAddValue(0, quotient);
     fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xd7, quotient);
-    if ((u8)fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+    if ((u8)fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, ctx, 1, 1, 0x10e, param1) == 1) {
         handle = fn_80239984(handle, ctx, 0xd8);
         fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xd8);
     }
@@ -5935,7 +5935,7 @@ done:
 
 /* Address: 0x80249F88 | Size: 0x1E8 (488 bytes) */
 u32 fightTrainerAiWazaValueTuikouTokukouDaun(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u32 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u32 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(u32, void*, u32, u32, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u32 fn_802359D8(void*, u32);
     extern u32 fn_80237F74(void*, u32, u32);
@@ -5945,7 +5945,7 @@ u32 fightTrainerAiWazaValueTuikouTokukouDaun(void* ctx, u32 param1, u32 param2, 
 
     handle = fn_80239984(0, ctx, 0xd3);
     fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xd3);
-    if ((u8)fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+    if ((u8)fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, ctx, 1, 1, 0x10e, param1) == 1) {
         handle = fn_80239984(handle, ctx, 0xd4);
         fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xd4);
     }
@@ -6336,7 +6336,7 @@ void fightTrainerAiWazaValueKanarazuSubayasaDaun(void* ctx, u32 param1, u32 para
 
 /* Address: 0x8024A664 | Size: 0x2C0 (704 bytes) */
 u32 fightTrainerAiWazaValueTuikouSubayasaDaun(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u32 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u32 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(u32, void*, u32, u32, u32, u32);
     extern s32 fightTrainerGetStatus(u32, u32, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u32 fn_80235910(void*, u32);
@@ -6358,7 +6358,7 @@ u32 fightTrainerAiWazaValueTuikouSubayasaDaun(void* ctx, u32 param1, u32 param2,
     quotient = quotient / denom;
     handle = fightTrainerAiAddValue(0, quotient);
     fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xc7, quotient);
-    if ((u8)fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+    if ((u8)fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, ctx, 1, 1, 0x10e, param1) == 1) {
         handle = fn_80239984(handle, ctx, 0xc8);
         fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xc8);
     }
@@ -6391,7 +6391,7 @@ done:
 
 /* Address: 0x8024A924 | Size: 0x25C (604 bytes) */
 u32 fightTrainerAiWazaValueTuikouBougyoDaun(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u32 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u32 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(u32, void*, u32, u32, u32, u32);
     extern s32 fightTrainerGetStatus(u32, u32, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u32 fn_80235A3C(void*, u32);
@@ -6412,7 +6412,7 @@ u32 fightTrainerAiWazaValueTuikouBougyoDaun(void* ctx, u32 param1, u32 param2, u
     quotient = quotient / denom;
     handle = fightTrainerAiAddValue(0, quotient);
     fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xc3, quotient);
-    if ((u8)fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+    if ((u8)fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, ctx, 1, 1, 0x10e, param1) == 1) {
         handle = fn_80239984(handle, ctx, 0xc4);
         fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xc4);
     }
@@ -6441,7 +6441,7 @@ done:
 
 /* Address: 0x8024AB80 | Size: 0x204 (516 bytes) */
 u32 fightTrainerAiWazaValueOororabiimu(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u32 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u32 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(u32, void*, u32, u32, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u32 fn_80235AA0(void*, u32);
     extern u32 fn_80237F74(void*, u32, u32);
@@ -6451,7 +6451,7 @@ u32 fightTrainerAiWazaValueOororabiimu(void* ctx, u32 param1, u32 param2, u32 pa
 
     handle = fn_80239984(0, ctx, 0xbf);
     fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xbf);
-    if ((u8)fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+    if ((u8)fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, ctx, 1, 1, 0x10e, param1) == 1) {
         handle = fn_80239984(handle, ctx, 0xc0);
         fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xc0);
     }
@@ -6514,7 +6514,7 @@ u32 fightTrainerAiWazaValueGoddobaado(void* ctx, u32 param1, u32 param2, u32 par
 
 /* Address: 0x8024AFC4 | Size: 0x4B0 (1200 bytes) */
 u32 fightTrainerAiWazaValueTuikaHirumi(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u32 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u32 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(u32, void*, u32, u32, u32, u32);
     extern s32 fightTrainerGetStatus(u32, u32, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u32 fn_80236BFC(void*, u32, u32);
@@ -6572,7 +6572,7 @@ u32 fightTrainerAiWazaValueTuikaHirumi(void* ctx, u32 param1, u32 param2, u32 pa
             fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xb9);
         }
     }
-    if ((u8)fn_801F1990(0, ctx, 1, 1, 0x10e, param1) == 1) {
+    if ((u8)fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, ctx, 1, 1, 0x10e, param1) == 1) {
         handle = fn_80239984(handle, ctx, 0xba);
         fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xba);
     }
@@ -6581,8 +6581,8 @@ u32 fightTrainerAiWazaValueTuikaHirumi(void* ctx, u32 param1, u32 param2, u32 pa
 
 /* Address: 0x8024B474 | Size: 0x5D0 (1488 bytes) */
 void fightTrainerAiWazaValueJisin(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1990();
-    extern void fn_801F1A6C();
+    extern void fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut();
+    extern void fightFloorGetFightTrainerFightPokemonPtrAry();
     extern void fightFloorGetFightTrainerFightOutPokemonPtrAry();
     extern void fightOutPokemonGetPokemonPtr();
     extern void fn_80236520();
@@ -6631,7 +6631,7 @@ void fightTrainerAiWazaValueJisin(void* ctx, u32 param1, u32 param2, u32 param3)
     r3 = 0x0;
     r6 = 0x1;
     r7 = 0x1;
-    fn_801F1A6C();
+    fightFloorGetFightTrainerFightPokemonPtrAry();
     r4 = r30;
     r5 = (u32)sp + 0x3c;
     r3 = 0x0;
@@ -6789,7 +6789,7 @@ void fightTrainerAiWazaValueJisin(void* ctx, u32 param1, u32 param2, u32 param3)
     r6 = 0x1;
     r7 = 0xb6;
     r8 = 0x0;
-    fn_801F1990();
+    fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut();
     r0 = r3 & 0xFF;
     if (r0 == (u32)0x1) {
         r3 = r31;
@@ -6817,7 +6817,7 @@ void fightTrainerAiWazaValueJisin(void* ctx, u32 param1, u32 param2, u32 param3)
         r6 = 0x1;
         r7 = 0xc5;
         r8 = 0x0;
-        fn_801F1990();
+        fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut();
         r0 = r3 & 0xFF;
         if (r0 == (u32)0x1) {
             r3 = r31;
@@ -6845,7 +6845,7 @@ void fightTrainerAiWazaValueJisin(void* ctx, u32 param1, u32 param2, u32 param3)
         r6 = 0x1;
         r7 = 0xcb;
         r8 = 0x0;
-        fn_801F1990();
+        fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut();
         r0 = r3 & 0xFF;
         if (r0 == (u32)0x1) {
             r3 = r31;
@@ -6874,7 +6874,7 @@ L_8024B878:
     r5 = 0x1;
     r6 = 0x1;
     r7 = 0x10e;
-    fn_801F1990();
+    fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut();
     r0 = r3 & 0xFF;
     if (r0 == (u32)0x1) {
         r3 = r31;
@@ -6979,7 +6979,7 @@ L_8024B878:
 
 /* Address: 0x8024BA44 | Size: 0x438 (1080 bytes) */
 u32 fightTrainerAiWazaValueSokubaku(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u32 fn_801F4354(u32, u32);
+    extern u32 fightFloorGetFightOutPokemonPtrToFightTrainerPtr(u32, u32);
     extern u32 fn_801F8A18(u32, u16*);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u32 fn_80235BE4(void*, u32, u32, u32);
@@ -6994,7 +6994,7 @@ u32 fightTrainerAiWazaValueSokubaku(void* ctx, u32 param1, u32 param2, u32 param
 
     handle = 0;
     status = fn_80235BE4(ctx, 0, param3, 0);
-    pokemon = fn_801F4354(0, param3);
+    pokemon = fightFloorGetFightOutPokemonPtrToFightTrainerPtr(0, param3);
     tmp = 0;
     found = fn_801F8A18(pokemon, &tmp);
     if (found == 0) {
@@ -7073,8 +7073,8 @@ u32 fightTrainerAiWazaValueKorogaru(void* ctx, u32 param1, u32 param2, u32 param
 
 /* Address: 0x8024BFC0 | Size: 0x5FC (1532 bytes) */
 void fightTrainerAiWazaValueJibaku(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_801F1990();
-    extern void fn_801F1A6C();
+    extern void fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut();
+    extern void fightFloorGetFightTrainerFightPokemonPtrAry();
     extern void fightFloorGetFightTrainerFightOutPokemonPtrAry();
     extern void fightOutPokemonGetPokemonPtr();
     extern void fn_80236520();
@@ -7125,7 +7125,7 @@ void fightTrainerAiWazaValueJibaku(void* ctx, u32 param1, u32 param2, u32 param3
     r3 = 0x0;
     r6 = 0x1;
     r7 = 0x1;
-    fn_801F1A6C();
+    fightFloorGetFightTrainerFightPokemonPtrAry();
     r4 = r30;
     r5 = (u32)sp + 0x3c;
     r3 = 0x0;
@@ -7284,7 +7284,7 @@ void fightTrainerAiWazaValueJibaku(void* ctx, u32 param1, u32 param2, u32 param3
     r6 = 0x1;
     r7 = 0xb6;
     r8 = 0x0;
-    fn_801F1990();
+    fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut();
     r0 = r3 & 0xFF;
     if (r0 == (u32)0x1) {
         r3 = r31;
@@ -7312,7 +7312,7 @@ void fightTrainerAiWazaValueJibaku(void* ctx, u32 param1, u32 param2, u32 param3
         r6 = 0x1;
         r7 = 0xc5;
         r8 = 0x0;
-        fn_801F1990();
+        fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut();
         r0 = r3 & 0xFF;
         if (r0 == (u32)0x1) {
             r3 = r31;
@@ -7340,7 +7340,7 @@ void fightTrainerAiWazaValueJibaku(void* ctx, u32 param1, u32 param2, u32 param3
         r6 = 0x1;
         r7 = 0xcb;
         r8 = 0x0;
-        fn_801F1990();
+        fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut();
         r0 = r3 & 0xFF;
         if (r0 == (u32)0x1) {
             r3 = r31;
@@ -8705,7 +8705,7 @@ u32 fightTrainerAiWazaValueAbareru(void* ctx, u32 param1, u32 param2, u32 param3
 
 /* Address: 0x8024D958 | Size: 0x1A4 (420 bytes) */
 u32 fightTrainerAiWazaValueKyuusyuu(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u32 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u32 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(u32, void*, u32, u32, u32, u32);
     extern s32 fightTrainerGetStatus(u32, u32, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u32 fn_802376EC();
@@ -8728,7 +8728,7 @@ u32 fightTrainerAiWazaValueKyuusyuu(void* ctx, u32 param1, u32 param2, u32 param
         handle = nextHandle;
     }
     fn_80239CCC(0xEC64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0x63, score);
-    if ((fn_801F1990(0, ctx, 1, 1, 0x10e, param1) & 0xFF) == 1) {
+    if ((fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, ctx, 1, 1, 0x10e, param1) & 0xFF) == 1) {
         {
             u32 nextHandle = fn_80239984(handle, ctx, 0x64);
             handle = nextHandle;
@@ -8894,7 +8894,7 @@ u32 fightTrainerAiWazaValueTokubetuYuusen(void* ctx, u32 slot, u32 param) {
 
 /* Address: 0x8024E148 | Size: 0xEC (236 bytes) */
 u32 fightTrainerAiWazaValueKouPuraioritii(void* ctx, u32 slot, u32 param, u32 unused) {
-    extern u8 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u8 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(u32, void*, u32, u32, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u32 fn_80239984(u32, void*, u32);
     extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
@@ -8902,7 +8902,7 @@ u32 fightTrainerAiWazaValueKouPuraioritii(void* ctx, u32 slot, u32 param, u32 un
 
     handle = fn_80239984(0, ctx, 0x53);
     fn_80239EE8(0xEC64, ctx, fightOutPokemonGetPokemonPtr(slot), 0, 0, param, 0, 0x53);
-    if (fn_801F1990(0, ctx, 1, 1, 0x10e, slot) == 1) {
+    if (fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, ctx, 1, 1, 0x10e, slot) == 1) {
         handle = fn_80239984(handle, ctx, 0x54);
         fn_80239EE8(0xEC64, ctx, fightOutPokemonGetPokemonPtr(slot), 0, 0, param, 0, 0x54);
     }
@@ -8911,7 +8911,7 @@ u32 fightTrainerAiWazaValueKouPuraioritii(void* ctx, u32 slot, u32 param, u32 un
 
 /* Address: 0x8024E234 | Size: 0xEC (236 bytes) */
 u32 fn_8024E234(void* ctx, u32 slot, u32 param, u32 unused) {
-    extern u8 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u8 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(u32, void*, u32, u32, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u32 fn_80239984(u32, void*, u32);
     extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
@@ -8919,7 +8919,7 @@ u32 fn_8024E234(void* ctx, u32 slot, u32 param, u32 unused) {
 
     handle = fn_80239984(0, ctx, 0x51);
     fn_80239EE8(0xEC64, ctx, fightOutPokemonGetPokemonPtr(slot), 0, 0, param, 0, 0x51);
-    if (fn_801F1990(0, ctx, 1, 1, 0x10e, slot) == 1) {
+    if (fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, ctx, 1, 1, 0x10e, slot) == 1) {
         handle = fn_80239984(handle, ctx, 0x52);
         fn_80239EE8(0xEC64, ctx, fightOutPokemonGetPokemonPtr(slot), 0, 0, param, 0, 0x52);
     }
@@ -8928,7 +8928,7 @@ u32 fn_8024E234(void* ctx, u32 slot, u32 param, u32 unused) {
 
 /* Address: 0x8024E320 | Size: 0x164 (356 bytes) */
 u32 fightTrainerAiWazaValueHittyuu(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u8 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u8 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(u32, void*, u32, u32, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u8 fn_802357CC(void*, u32);
     extern u8 fn_802358AC(void*, u32);
@@ -8947,7 +8947,7 @@ u32 fightTrainerAiWazaValueHittyuu(void* ctx, u32 param1, u32 param2, u32 param3
         handle = fn_80239984(handle, battleCtx, 0x4F);
         fn_80239EE8(0xEC64, battleCtx, fightOutPokemonGetPokemonPtr(trainer), 0, 0, sequenceArg, 0, 0x4F);
     }
-    if (fn_801F1990(0, battleCtx, 1, 1, 0x10E, trainer) == 1) {
+    if (fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, battleCtx, 1, 1, 0x10E, trainer) == 1) {
         handle = fn_80239984(handle, battleCtx, 0x50);
         fn_80239EE8(0xEC64, battleCtx, fightOutPokemonGetPokemonPtr(trainer), 0, 0, sequenceArg, 0, 0x50);
     }
@@ -8956,14 +8956,14 @@ u32 fightTrainerAiWazaValueHittyuu(void* ctx, u32 param1, u32 param2, u32 param3
 
 /* Address: 0x8024E484 | Size: 0xA8 */
 u32 fightTrainerAiWazaValueTuujouIryoku(void* ctx, u32 slot, u32 param) {
-    extern u8 fn_801F1990(u32, void*, u32, u32, u32, u32);
+    extern u8 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(u32, void*, u32, u32, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u32 fn_80239984(u32, void*, u32);
     extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
     u32 handle;
 
     handle = 0;
-    if (fn_801F1990(0, ctx, 1, 1, 0x10e, slot) == 1) {
+    if (fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, ctx, 1, 1, 0x10e, slot) == 1) {
         handle = fn_80239984(0, ctx, 0x4d);
         fn_80239EE8(0xEC64, ctx, fightOutPokemonGetPokemonPtr(slot), 0, 0, param, 0, 0x4d);
     }

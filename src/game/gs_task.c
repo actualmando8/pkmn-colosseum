@@ -1199,7 +1199,7 @@ void menuFightButtonNormal(u8* ctx) {
 
 /* dbgMenuFightStopTimeOut - 0x80007088 | size: 0x44 */
 extern u8   fn_801EF63C(void);
-extern void fn_801F1588(s32 mode);
+extern void fightFloorSetTimeOutAllFightResult(s32 mode);
 extern void dbgMenuClose(void);
 #if 0
 asm void dbgMenuFightStopTimeOut(void) {
@@ -1212,7 +1212,7 @@ s32 dbgMenuFightStopTimeOut(void) {
     if (fn_801EF63C() == 0) {
         return -1;
     }
-    fn_801F1588(0);
+    fightFloorSetTimeOutAllFightResult(0);
     dbgMenuClose();
     return 0;
 }
@@ -1365,9 +1365,9 @@ s32 dbgMenuFightFightPokemonSelect0(void) {
 #endif
 
 /* menuFightPokemonSelectSub - 0x80007364 | size: 0x2f8 */
-extern void* fn_801F54A4(s32 a, u16 b, s32 c, s32 d);
+extern void* fightFloorGetStatus(s32 a, u16 b, s32 c, s32 d);
 extern void* fightPokemonGetPokemonPtr(u32 ctx);
-extern void* fn_801F4460(s32 a, u32 ctx);
+extern void* fightFloorGetFightPokemonPtrToFightTrainerPtr(s32 a, u32 ctx);
 extern u8   figthPokemonGetLevel(u32 ctx);
 extern u8   fightTrainerCheckCanIrekaeFightPokemon(void* ptr, u32 ctx);
 extern void* fightTrainerGetFightPokemonPtrToFightOutPokemonPtr(void* ptr, u32 ctx);
@@ -1420,13 +1420,13 @@ s32 menuFightPokemonSelectSub(u32 ctx) {
     sp_9 = 0;
     sp_8 = 0;
 
-    savedId = (u16)(u32)fn_801F54A4(0, 0, 0x14, 0);
+    savedId = (u16)(u32)fightFloorGetStatus(0, 0, 0x14, 0);
     scene = fightPokemonGetPokemonPtr(ctx);
     if (scene == 0) {
         return -1;
     }
 
-    archive = fn_801F4460(0, ctx);
+    archive = fightFloorGetFightPokemonPtrToFightTrainerPtr(0, ctx);
     if (archive == 0) {
         return -1;
     }
@@ -1467,7 +1467,7 @@ s32 menuFightPokemonSelectSub(u32 ctx) {
                 }
                 {
                     u16 newId;
-                    newId = (u16)(u32)fn_801F54A4(0, 0, 0x14, 0);
+                    newId = (u16)(u32)fightFloorGetStatus(0, 0, 0x14, 0);
                     fightMenuFightOutPokemonRenewStatusMenu(encounter, newId, 1);
                 }
                 {
@@ -1666,7 +1666,7 @@ s32 fn_80007848(void) {
 #endif
 
 /* dbgMenuFightFightTrainerSelect1 - 0x800078EC | size: 0x58 */
-extern u32  fn_801F7258(u32 ptr, s32 mode);
+extern u32  fightSideGetValidFightTrainerPtr(u32 ptr, s32 mode);
 extern u32  lbl_8047A274;
 #if 0
 asm void dbgMenuFightFightTrainerSelect1(void) {
@@ -1677,7 +1677,7 @@ asm void dbgMenuFightFightTrainerSelect1(void) {
 #pragma peephole off
 s32 dbgMenuFightFightTrainerSelect1(void) {
     if (fn_801EF63C() == 0) return -1;
-    lbl_8047A278 = fn_801F7258(lbl_8047A274, 1);
+    lbl_8047A278 = fightSideGetValidFightTrainerPtr(lbl_8047A274, 1);
     if (lbl_8047A278 == 0) return -1;
     return 1;
 }
@@ -1694,7 +1694,7 @@ asm void dbgMenuFightFightTrainerSelect0(void) {
 #pragma peephole off
 s32 dbgMenuFightFightTrainerSelect0(void) {
     if (fn_801EF63C() == 0) return -1;
-    lbl_8047A278 = fn_801F7258(lbl_8047A274, 0);
+    lbl_8047A278 = fightSideGetValidFightTrainerPtr(lbl_8047A274, 0);
     if (lbl_8047A278 == 0) return -1;
     return 1;
 }
@@ -1702,7 +1702,7 @@ s32 dbgMenuFightFightTrainerSelect0(void) {
 #endif
 
 /* dbgMenuFightFightSideSelectHostEnemy - 0x8000799C | size: 0x58 */
-extern u32  fn_801F025C(s32 a, s32 b);
+extern u32  fightTargetGetPtrAsNowFightType(s32 a, s32 b);
 #if 0
 asm void dbgMenuFightFightSideSelectHostEnemy(void) {
 #include "src/game/gs_task_fn_8000799C.inc"
@@ -1712,7 +1712,7 @@ asm void dbgMenuFightFightSideSelectHostEnemy(void) {
 #pragma peephole off
 s32 dbgMenuFightFightSideSelectHostEnemy(void) {
     if (fn_801EF63C() == 0) return -1;
-    lbl_8047A274 = fn_801F025C(5, 0);
+    lbl_8047A274 = fightTargetGetPtrAsNowFightType(5, 0);
     if (lbl_8047A274 == 0) return -1;
     return 1;
 }
@@ -1729,7 +1729,7 @@ asm void dbgMenuFightFightSideSelectHost(void) {
 #pragma peephole off
 s32 dbgMenuFightFightSideSelectHost(void) {
     if (fn_801EF63C() == 0) return -1;
-    lbl_8047A274 = fn_801F025C(4, 0);
+    lbl_8047A274 = fightTargetGetPtrAsNowFightType(4, 0);
     if (lbl_8047A274 == 0) return -1;
     return 1;
 }
@@ -2344,7 +2344,7 @@ void* _dbgMenuFightGetFightFloorDataIdSub(u32 id) {
     if (id >= *(u32*)lbl_80478F48) {
         result = 0xEB63;
     } else {
-        result = (u32)fn_801F54A4(0, (u16)id, 1, 0);
+        result = (u32)fightFloorGetStatus(0, (u16)id, 1, 0);
     }
     if (result == 0) result = 0xEB63;
     return fn_800FA280(result);

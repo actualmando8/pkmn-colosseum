@@ -104,12 +104,12 @@ s32 fightTrainerAiCheckJoutaiKieWazaHitWazaDataId(void* ctx, u32 param1, u32 par
 
 /* Address: 0x8025C674 | Size: 0x48 | Pattern: field_accessor */
 u32 fightTrainerAiCheckHorobinouta(void* ctx, u32 slot, u32 param) {
-    extern u32 fn_801F37B0();
+    extern u32 fightFloorLoopValidFightOutPokemon();
     extern void _fightTrainerAiCheckHorobinoutaSub();
     u32 result[2];
     result[0] = (u32)ctx;
     result[1] = 0;
-    fn_801F37B0(0, (u32)_fightTrainerAiCheckHorobinoutaSub, (u32)result, 0);
+    fightFloorLoopValidFightOutPokemon(0, (u32)_fightTrainerAiCheckHorobinoutaSub, (u32)result, 0);
     return result[1] & 0xFFFF;
 }
 
@@ -181,7 +181,7 @@ typedef struct HorobinoutaCtx {
  * _fightTrainerAiCheckHorobinoutaSub (0x8025C6BC)
  *
  * Perish Song (Horobinouta) counter callback, invoked per-floor-slot via
- * fn_801F37B0 (see fightTrainerAiCheckHorobinouta). Runs 3 chained gate checks against
+ * fightFloorLoopValidFightOutPokemon (see fightTrainerAiCheckHorobinouta). Runs 3 chained gate checks against
  * ctx->field0/floor/idx; only when ALL 3 fail does it increment
  * ctx->counter. Always returns 1 (the enumeration driver doesn't use the
  * return value -- the counter in ctx is the real output).
@@ -234,7 +234,7 @@ u32 fightTrainerAiCheckTextureZokusei(void* ctx, u32 param1, u32 param2) {
 
 /* Address: 0x8025C808 | Size: 0x2A0 (672 bytes) */
 u32 fightTrainerAiCheckAbiCnt(void* ctx, u32 param1, u32 param2, u32 param3, u32 param4, u32 param5, u32 param6) {
-    extern void fn_801F025C();
+    extern void fightTargetGetPtrAsNowFightType();
     extern void fightSideIsJoutaiDataId();
     extern void fightTrainerGetStatus();
     extern void fightSeqCondChgActParaIdToValue();
@@ -279,7 +279,7 @@ u32 fightTrainerAiCheckAbiCnt(void* ctx, u32 param1, u32 param2, u32 param3, u32
     }
     r4 = r30;
     r3 = 0x2;
-    fn_801F025C();
+    fightTargetGetPtrAsNowFightType();
     r31 = r21 & 0xFF;
     r21 = r3;
     r0 = r31 & 0xbf;
@@ -477,13 +477,13 @@ u16 fightTrainerAiCheckOumu(void* ctx, u32 param1, u32 param2) {
 
 /* Address: 0x8025CBE8 | Size: 0x48 | Pattern: field_accessor */
 u32 fightTrainerAiCheckSimerike(void* ctx, u32 slot, u32 param) {
-    extern u32 fn_801F37B0();
+    extern u32 fightFloorLoopValidFightOutPokemon();
     extern void _fightTrainerAiSimerikeCheckSub();
     u32 buf[2];
     u32 r;
     u32 s;
     buf[0] = (u32)ctx;
-    r = fn_801F37B0(0, (u32)_fightTrainerAiSimerikeCheckSub, (u32)buf, 0) & 0xFF;
+    r = fightFloorLoopValidFightOutPokemon(0, (u32)_fightTrainerAiSimerikeCheckSub, (u32)buf, 0) & 0xFF;
     s = 1 - r;
     return (s != 0) ? 1 : 0;
 }
@@ -507,13 +507,13 @@ u32 _fightTrainerAiSimerikeCheckSub(void* ctx, u32 slot, u32* param) {
 
 /* Address: 0x8025CC90 | Size: 0x50 | Pattern: field_accessor */
 u32 fightTrainerAiCheckSawagu(void* ctx, u32 slot, u32 param) {
-    extern u32 fn_801F37B0();
+    extern u32 fightFloorLoopValidFightOutPokemon();
     extern u32 _fightTrainerAiSawaguCheckSub();
     u32 buf[2];
     u32 r;
     buf[0] = (u32)ctx;
     buf[1] = slot;
-    r = fn_801F37B0(0, (u32)_fightTrainerAiSawaguCheckSub, (u32)buf, 0) & 0xFF;
+    r = fightFloorLoopValidFightOutPokemon(0, (u32)_fightTrainerAiSawaguCheckSub, (u32)buf, 0) & 0xFF;
     return r != 1;
 }
 
