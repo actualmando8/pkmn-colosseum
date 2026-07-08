@@ -39,10 +39,10 @@ extern void* jumptable_803751B8[];
 
 extern u8 _wazaSequenceModelEntryStart[];
 extern u8 _wazaSequenceParticleEntryStart[];
-extern u8 fn_801D87B0[];
-extern u8 fn_801DB3F8[];
-extern u8 fn_801DC014[];
-extern u8 fn_801DC81C[];
+extern u8 _wazaSequenceEffectEntryStart[];
+extern u8 wazaSequenceSysGetWazaTime[];
+extern u8 wazaSequenceLoadData[];
+extern u8 _wazaSequenceEffectEntryLoad[];
 extern u8 fn_801DF474[];
 extern u8 fn_801DF790[];
 extern u8 fn_801DFC30[];
@@ -1573,20 +1573,20 @@ void* jumptable_8037260C[7] = {
 };
 
 void* jumptable_80372628[14] = {
-    (void*)((u8*)fn_801D87B0 + 0x32C),
-    (void*)((u8*)fn_801D87B0 + 0xA4),
-    (void*)((u8*)fn_801D87B0 + 0x1C4),
-    (void*)((u8*)fn_801D87B0 + 0x1E4),
-    (void*)((u8*)fn_801D87B0 + 0x1F8),
-    (void*)((u8*)fn_801D87B0 + 0x224),
-    (void*)((u8*)fn_801D87B0 + 0x258),
-    (void*)((u8*)fn_801D87B0 + 0x280),
-    (void*)((u8*)fn_801D87B0 + 0x2C4),
-    (void*)((u8*)fn_801D87B0 + 0x2D4),
-    (void*)((u8*)fn_801D87B0 + 0x2E0),
-    (void*)((u8*)fn_801D87B0 + 0x2F8),
-    (void*)((u8*)fn_801D87B0 + 0x348),
-    (void*)((u8*)fn_801D87B0 + 0x304),
+    (void*)((u8*)_wazaSequenceEffectEntryStart + 0x32C),
+    (void*)((u8*)_wazaSequenceEffectEntryStart + 0xA4),
+    (void*)((u8*)_wazaSequenceEffectEntryStart + 0x1C4),
+    (void*)((u8*)_wazaSequenceEffectEntryStart + 0x1E4),
+    (void*)((u8*)_wazaSequenceEffectEntryStart + 0x1F8),
+    (void*)((u8*)_wazaSequenceEffectEntryStart + 0x224),
+    (void*)((u8*)_wazaSequenceEffectEntryStart + 0x258),
+    (void*)((u8*)_wazaSequenceEffectEntryStart + 0x280),
+    (void*)((u8*)_wazaSequenceEffectEntryStart + 0x2C4),
+    (void*)((u8*)_wazaSequenceEffectEntryStart + 0x2D4),
+    (void*)((u8*)_wazaSequenceEffectEntryStart + 0x2E0),
+    (void*)((u8*)_wazaSequenceEffectEntryStart + 0x2F8),
+    (void*)((u8*)_wazaSequenceEffectEntryStart + 0x348),
+    (void*)((u8*)_wazaSequenceEffectEntryStart + 0x304),
 };
 
 void* jumptable_80372660[8] = {
@@ -1645,62 +1645,62 @@ void* jumptable_803726E0[8] = {
 };
 
 void* jumptable_80372700[8] = {
-    (void*)((u8*)fn_801DB3F8 + 0x3E4),
-    (void*)((u8*)fn_801DB3F8 + 0x3FC),
-    (void*)((u8*)fn_801DB3F8 + 0x404),
-    (void*)((u8*)fn_801DB3F8 + 0x3EC),
-    (void*)((u8*)fn_801DB3F8 + 0x3F4),
-    (void*)((u8*)fn_801DB3F8 + 0x3EC),
-    (void*)((u8*)fn_801DB3F8 + 0x404),
-    (void*)((u8*)fn_801DB3F8 + 0x3DC),
+    (void*)((u8*)wazaSequenceSysGetWazaTime + 0x3E4),
+    (void*)((u8*)wazaSequenceSysGetWazaTime + 0x3FC),
+    (void*)((u8*)wazaSequenceSysGetWazaTime + 0x404),
+    (void*)((u8*)wazaSequenceSysGetWazaTime + 0x3EC),
+    (void*)((u8*)wazaSequenceSysGetWazaTime + 0x3F4),
+    (void*)((u8*)wazaSequenceSysGetWazaTime + 0x3EC),
+    (void*)((u8*)wazaSequenceSysGetWazaTime + 0x404),
+    (void*)((u8*)wazaSequenceSysGetWazaTime + 0x3DC),
 };
 
 void* jumptable_80372720[8] = {
-    (void*)((u8*)fn_801DB3F8 + 0x25C),
-    (void*)((u8*)fn_801DB3F8 + 0x278),
-    (void*)((u8*)fn_801DB3F8 + 0x280),
-    (void*)((u8*)fn_801DB3F8 + 0x264),
-    (void*)((u8*)fn_801DB3F8 + 0x264),
-    (void*)((u8*)fn_801DB3F8 + 0x270),
-    (void*)((u8*)fn_801DB3F8 + 0x280),
-    (void*)((u8*)fn_801DB3F8 + 0x254),
+    (void*)((u8*)wazaSequenceSysGetWazaTime + 0x25C),
+    (void*)((u8*)wazaSequenceSysGetWazaTime + 0x278),
+    (void*)((u8*)wazaSequenceSysGetWazaTime + 0x280),
+    (void*)((u8*)wazaSequenceSysGetWazaTime + 0x264),
+    (void*)((u8*)wazaSequenceSysGetWazaTime + 0x264),
+    (void*)((u8*)wazaSequenceSysGetWazaTime + 0x270),
+    (void*)((u8*)wazaSequenceSysGetWazaTime + 0x280),
+    (void*)((u8*)wazaSequenceSysGetWazaTime + 0x254),
 };
 
 void* jumptable_80372740[8] = {
-    (void*)((u8*)fn_801DB3F8 + 0x140),
-    (void*)((u8*)fn_801DB3F8 + 0x164),
-    (void*)((u8*)fn_801DB3F8 + 0x16C),
-    (void*)((u8*)fn_801DB3F8 + 0x154),
-    (void*)((u8*)fn_801DB3F8 + 0x15C),
-    (void*)((u8*)fn_801DB3F8 + 0x148),
-    (void*)((u8*)fn_801DB3F8 + 0x16C),
-    (void*)((u8*)fn_801DB3F8 + 0x138),
+    (void*)((u8*)wazaSequenceSysGetWazaTime + 0x140),
+    (void*)((u8*)wazaSequenceSysGetWazaTime + 0x164),
+    (void*)((u8*)wazaSequenceSysGetWazaTime + 0x16C),
+    (void*)((u8*)wazaSequenceSysGetWazaTime + 0x154),
+    (void*)((u8*)wazaSequenceSysGetWazaTime + 0x15C),
+    (void*)((u8*)wazaSequenceSysGetWazaTime + 0x148),
+    (void*)((u8*)wazaSequenceSysGetWazaTime + 0x16C),
+    (void*)((u8*)wazaSequenceSysGetWazaTime + 0x138),
 };
 
 void* jumptable_80372760[7] = {
-    (void*)((u8*)fn_801DC014 + 0x234),
-    (void*)((u8*)fn_801DC014 + 0xD0),
-    (void*)((u8*)fn_801DC014 + 0x194),
-    (void*)((u8*)fn_801DC014 + 0x1AC),
-    (void*)((u8*)fn_801DC014 + 0x1C4),
-    (void*)((u8*)fn_801DC014 + 0x1D8),
-    (void*)((u8*)fn_801DC014 + 0x224),
+    (void*)((u8*)wazaSequenceLoadData + 0x234),
+    (void*)((u8*)wazaSequenceLoadData + 0xD0),
+    (void*)((u8*)wazaSequenceLoadData + 0x194),
+    (void*)((u8*)wazaSequenceLoadData + 0x1AC),
+    (void*)((u8*)wazaSequenceLoadData + 0x1C4),
+    (void*)((u8*)wazaSequenceLoadData + 0x1D8),
+    (void*)((u8*)wazaSequenceLoadData + 0x224),
 };
 
 void* jumptable_8037277C[13] = {
-    (void*)((u8*)fn_801DC81C + 0xCC),
-    (void*)((u8*)fn_801DC81C + 0xF8),
-    (void*)((u8*)fn_801DC81C + 0x114),
-    (void*)((u8*)fn_801DC81C + 0x128),
-    (void*)((u8*)fn_801DC81C + 0x144),
-    (void*)((u8*)fn_801DC81C + 0x168),
-    (void*)((u8*)fn_801DC81C + 0x184),
-    (void*)((u8*)fn_801DC81C + 0x198),
-    (void*)((u8*)fn_801DC81C + 0x1AC),
-    (void*)((u8*)fn_801DC81C + 0x1DC),
-    (void*)((u8*)fn_801DC81C + 0x20C),
-    (void*)((u8*)fn_801DC81C + 0x220),
-    (void*)((u8*)fn_801DC81C + 0x234),
+    (void*)((u8*)_wazaSequenceEffectEntryLoad + 0xCC),
+    (void*)((u8*)_wazaSequenceEffectEntryLoad + 0xF8),
+    (void*)((u8*)_wazaSequenceEffectEntryLoad + 0x114),
+    (void*)((u8*)_wazaSequenceEffectEntryLoad + 0x128),
+    (void*)((u8*)_wazaSequenceEffectEntryLoad + 0x144),
+    (void*)((u8*)_wazaSequenceEffectEntryLoad + 0x168),
+    (void*)((u8*)_wazaSequenceEffectEntryLoad + 0x184),
+    (void*)((u8*)_wazaSequenceEffectEntryLoad + 0x198),
+    (void*)((u8*)_wazaSequenceEffectEntryLoad + 0x1AC),
+    (void*)((u8*)_wazaSequenceEffectEntryLoad + 0x1DC),
+    (void*)((u8*)_wazaSequenceEffectEntryLoad + 0x20C),
+    (void*)((u8*)_wazaSequenceEffectEntryLoad + 0x220),
+    (void*)((u8*)_wazaSequenceEffectEntryLoad + 0x234),
 };
 
 u8 lbl_803727B0[12] = {

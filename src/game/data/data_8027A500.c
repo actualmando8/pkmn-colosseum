@@ -223,7 +223,7 @@ extern u8 fn_801CBA0C[];
 extern u8 fn_801CBA90[];
 extern u8 fn_801CBAB8[];
 extern u8 fn_801D0BD0[];
-extern u8 fn_801D2080[];
+extern u8 mailMainSendByScrpt[];
 extern u8 fn_801DF474[];
 extern u8 fn_801DF790[];
 extern u8 fn_801DFC30[];
@@ -94315,7 +94315,7 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)fn_8018BDF4),
     (void*)0x01010100,
     (void*)0x00000000,
-    (void*)((u8*)fn_801D2080),
+    (void*)((u8*)mailMainSendByScrpt),
     (void*)0x01000000,
     (void*)0x00000000,
     (void*)((u8*)evolution),

@@ -65,7 +65,7 @@ extern u16  fn_8011F5C8();
 extern u32  savedataGetStatus();
 extern int  fadeCheck();
 extern int  fadeSet();
-extern int  fn_801DAC90();
+extern int  wazaSequenceSysRelease();
 extern int  fn_801DADC0();
 extern void OSRegisterResetFunction();
 extern void OSInitAlarm();
@@ -100,7 +100,7 @@ int cbWazaForget(u32 r3,u32 r4,int r5)
     extern int GSscene_GetCameraViewVector();
     extern int GSscene_SetCameraViewVector();
     extern int GSscene_SetMode();
-    extern int fn_801DAC90();
+    extern int wazaSequenceSysRelease();
     extern int fn_801DADC0();
     extern f32 lbl_8047E6C0;
 
@@ -152,7 +152,7 @@ int cbWazaForget(u32 r3,u32 r4,int r5)
   savedView[1] = view[1];
   savedView[2] = view[2];
   ((volatile float *)savedView)[3] = local_98;
-  fn_801DAC90();
+  wazaSequenceSysRelease();
   iVar2 = fn_80097A38(r3,r4);
   if (iVar2 >= 4) {
     iVar2 = -1;
@@ -439,7 +439,7 @@ evolutionStart(u32 r3,u32 r4,u32 r5,u16 *r6,
       goto LAB_0025e130;
     }
   }
-  fn_801DAC90();
+  wazaSequenceSysRelease();
   bVar2 = 0;
 LAB_0025e130:
   if (bVar2) {
@@ -491,7 +491,7 @@ LAB_0025e130:
       fadeCheck(1);
       bVar2 = 1;
     }
-    fn_801DAC90();
+    wazaSequenceSysRelease();
     if (bVar2) {
       uVar3 = 0;
     }

@@ -449,10 +449,10 @@ typedef struct TypeMatchup {
 /* fn_801D2D28 */ void fn_801D2D28(s32 moveID, s32 attackerSlot, s32 targetSlot);
 
 /* Waza animation state machines */
-/* fn_801D30BC */ void fn_801D30BC(void);                        /* dispatcher 0x3E0 */
+/* battleCameraStartWaza */ void battleCameraStartWaza(void);                        /* dispatcher 0x3E0 */
 /* fn_801D349C */ void fn_801D349C(void);                        /* state machine A 0xAE0 */
 /* fn_801D3F7C */ void fn_801D3F7C(void);                        /* state machine B 0x548 */
-/* fn_801D44C4 */ void fn_801D44C4(void);                        /* state machine C 0x514 */
+/* _wazaSequenceCameraDoFOV__FP13ModelSequenceP24wazaSequenceCameraParamsif */ void _wazaSequenceCameraDoFOV__FP13ModelSequenceP24wazaSequenceCameraParamsif(void);                        /* state machine C 0x514 */
 /* fn_801D49D8 */ void fn_801D49D8(void);                        /* state machine D 0x3C8 */
 /* fn_801D624C */ void fn_801D624C(void);                        /* mega-function 0x818 */
 
@@ -462,13 +462,13 @@ typedef struct TypeMatchup {
 /* fn_801D7E58 */ void fn_801D7E58(void* entry);                 /* wazaSequenceEntryStop */
 /* fn_801D81CC */ void fn_801D81CC(void* entry);                 /* wazaSequenceEntryUpdate */
 /* fn_801D84F4 */ void fn_801D84F4(void);                        /* wazaSequenceEntryStart */
-/* fn_801D87B0 */ void fn_801D87B0(void* entry, s32 type);       /* wazaSequenceStartEntry */
+/* _wazaSequenceEffectEntryStart */ void _wazaSequenceEffectEntryStart(void* entry, s32 type);       /* wazaSequenceStartEntry */
 /* fn_801D8B38 */ void fn_801D8B38(void* entry);                 /* _wazaSequenceParticleEntryStart */
 /* _wazaSequenceModelEntryStart */ void _wazaSequenceModelEntryStart(void* entry);                 /* _wazaSequenceModelEntryStart */
 /* fn_801D9950 */ void fn_801D9950(s32 slot, s32 motionType);    /* wazaSequencePokemonMotionStart */
 
 /* Waza system lifecycle */
-/* fn_801DAC90 */ void fn_801DAC90(void);                        /* waza system cleanup */
+/* wazaSequenceSysRelease */ void wazaSequenceSysRelease(void);                        /* waza system cleanup */
 /* fn_801DADC0 */ void fn_801DADC0(void);                        /* waza partial reset */
 /* fn_801DAEF8 */ void fn_801DAEF8(s32 count);                   /* waza system init */
 /* wazaSequenceSysGetResID */ BOOL wazaSequenceSysGetResID(void);                        /* waza get initialized */

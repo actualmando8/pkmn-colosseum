@@ -1788,7 +1788,7 @@ u32 dbgMenuFrameRate30(void) {
 
 /* 0x80133328 | 36 bytes | call_return_const2 */
 u32 dbgMenuSendAllMail(void) {
-    fn_801D216C();
+    mailMainSendAllMail();
     return 0;
 }
 
@@ -4889,7 +4889,7 @@ u32 fn_8013327C(void) {
 #endif
 extern void mailChkReceiveMail(void);
 extern void mailAddMailbox(void);
-extern void fn_801D268C(void);
+extern void mailMainReceiveStart(void);
 #if 0
 asm void dbgMenuSendMail(void) {
 #include "src/game/effect/effect_util_dbgMenuSendMail.inc"
@@ -4905,7 +4905,7 @@ u32 dbgMenuSendMail(void) {
     while ((slot = menuOpen(2, 1)) != -1) {
         if (mailChkReceiveMail(slot) == 0) {
             mailAddMailbox(slot);
-            fn_801D268C();
+            mailMainReceiveStart();
         }
     }
     return 0;

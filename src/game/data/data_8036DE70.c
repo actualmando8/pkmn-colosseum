@@ -13,7 +13,7 @@ extern void* jumptable_8036E130[];
 extern u8 fn_801CDB04[];
 extern u8 fn_801CF9C8[];
 extern u8 fn_801D0090[];
-extern u8 fn_801D2764[];
+extern u8 chkMailSend[];
 
 /* Auto-carved .data unit 0x8036DE70..0x8036E14C (7 objects). Non-relocated data as byte-exact u8[]; pointer/jump tables as void*[] for R_PPC_ADDR32 relocations. */
 
@@ -170,12 +170,12 @@ u8 lbl_8036E0E0[80] = {
 };
 
 void* jumptable_8036E130[7] = {
-    (void*)((u8*)fn_801D2764 + 0x100),
-    (void*)((u8*)fn_801D2764 + 0x118),
-    (void*)((u8*)fn_801D2764 + 0x130),
-    (void*)((u8*)fn_801D2764 + 0x148),
-    (void*)((u8*)fn_801D2764 + 0x160),
-    (void*)((u8*)fn_801D2764 + 0x178),
-    (void*)((u8*)fn_801D2764 + 0x190),
+    (void*)((u8*)chkMailSend + 0x100),
+    (void*)((u8*)chkMailSend + 0x118),
+    (void*)((u8*)chkMailSend + 0x130),
+    (void*)((u8*)chkMailSend + 0x148),
+    (void*)((u8*)chkMailSend + 0x160),
+    (void*)((u8*)chkMailSend + 0x178),
+    (void*)((u8*)chkMailSend + 0x190),
 };
 

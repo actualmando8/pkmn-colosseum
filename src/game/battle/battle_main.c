@@ -84,7 +84,7 @@ extern void fadeCheck(s32 flag);                  /* battle grid set flag */
 extern void fadeSet(s32 mode);                  /* battle camera init */
 
 /* Battle scene */
-extern void fn_801DAC90(void);                      /* waza system cleanup */
+extern void wazaSequenceSysRelease(void);                      /* waza system cleanup */
 extern void fn_801DAEF8(s32 count);                 /* waza system init */
 extern void fn_801DB088(void);                      /* waza system reset */
 

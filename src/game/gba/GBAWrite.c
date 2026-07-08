@@ -65,7 +65,7 @@ extern u16  fn_8011F5C8();
 extern u32  savedataGetStatus();
 extern int  fadeCheck();
 extern int  fadeSet();
-extern int  fn_801DAC90();
+extern int  wazaSequenceSysRelease();
 extern int  fn_801DADC0();
 extern void OSRegisterResetFunction();
 extern void OSInitAlarm();

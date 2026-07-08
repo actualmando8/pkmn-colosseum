@@ -65,7 +65,7 @@ extern u16  fn_8011F5C8();
 extern u32  savedataGetStatus();
 extern int  fadeCheck();
 extern int  fadeSet();
-extern int  fn_801DAC90();
+extern int  wazaSequenceSysRelease();
 extern int  fn_801DADC0();
 extern void OSRegisterResetFunction();
 extern void OSInitAlarm();
@@ -161,7 +161,7 @@ void fightGSfloorPushData(void *rawOut)
     out->secondCount = secondCount;
     fn_801EF8F4(1);
     fn_801C3114();
-    fn_801DAC90();
+    wazaSequenceSysRelease();
 }
 
 typedef struct BattleReplayHeader {

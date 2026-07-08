@@ -65,7 +65,7 @@ extern u16  fn_8011F5C8();
 extern u32  savedataGetStatus();
 extern int  fadeCheck();
 extern int  fadeSet();
-extern int  fn_801DAC90();
+extern int  wazaSequenceSysRelease();
 extern int  fn_801DADC0();
 extern void OSRegisterResetFunction();
 extern void OSInitAlarm();
@@ -389,7 +389,7 @@ void fn_8025E1BC(float f1, float f2, float f3, float f4, float f5, float f6) {
       fadeCheck(1);
     }
   }
-  fn_801DAC90();
+  wazaSequenceSysRelease();
 }
 #pragma pop
 
@@ -770,7 +770,7 @@ int _cbWazaForget__FP7PokemonUsl(u32 r3,u32 r4)
   snapshot[10] = view[1];
   snapshot[11] = view[2];
   ((f32 *)snapshot)[12] = local_54;
-  fn_801DAC90();
+  wazaSequenceSysRelease();
   iVar2 = fn_80097A38(r3,r4);
   if (iVar2 >= 4) {
     iVar2 = -1;
@@ -862,7 +862,7 @@ void reliveCeremonyAll(u32 r3)
       if (((uVar4 & 0xffff) != 0) && ((uVar4 & 0xffff) != 0xffff)) {
         fadeSet((double)lbl_8047E680,3);
         fadeCheck(1);
-        fn_801DAC90();
+        wazaSequenceSysRelease();
         iVar3 = pokemonEvolutionAll(uVar1,uVar4,local_28[0],auStack_18,0,1,1,0);
         if (iVar3 == 0) {
           fn_801DADC0(1);
@@ -898,7 +898,7 @@ void reliveCeremonyAll(u32 r3)
       winMsgCloseField(1);
       fadeSet((double)lbl_8047E680,3);
       fadeCheck(1);
-      fn_801DAC90();
+      wazaSequenceSysRelease();
       fn_80029660(2,r3);
       fn_801DADC0(1);
       iVar3 = loadSequence((int*)auStack_24,uVar1,(u16*)&lbl_80478DB0,1);
@@ -978,7 +978,7 @@ void reliveMain(void)
     }
     fadeSet((double)lbl_8047E680,3);
     fadeCheck(1);
-				    fn_801DAC90();
+				    wazaSequenceSysRelease();
 						    lbl_804782BC[0] = -1;
 						    lbl_8047B668 = 0xffffffff;
 						    lbl_8047B66C = 0xffffffff;

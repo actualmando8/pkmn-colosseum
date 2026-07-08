@@ -65,7 +65,7 @@ extern u16  fn_8011F5C8();
 extern u32  savedataGetStatus();
 extern int  fadeCheck();
 extern int  fadeSet();
-extern int  fn_801DAC90();
+extern int  wazaSequenceSysRelease();
 extern int  fn_801DADC0();
 extern void OSRegisterResetFunction();
 extern void OSInitAlarm();
@@ -231,7 +231,7 @@ void fn_80266250(void)
     extern void scriptSoundStop();
     extern void fn_801659FC();
     extern void fn_801DADC0();
-    extern void fn_801DAC90();
+    extern void wazaSequenceSysRelease();
     extern void fn_80265F94();
     u32 iVar1;
     u32 uVar3;
@@ -256,7 +256,7 @@ void fn_80266250(void)
     }
     fn_801DADC0(1);
     fn_80265F94(uVar5);
-    fn_801DAC90();
+    wazaSequenceSysRelease();
     if (iVar1 != 0) {
         fn_80165A20(iVar1, 0x32, uVar3);
     }

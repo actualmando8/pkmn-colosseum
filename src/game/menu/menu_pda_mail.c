@@ -95,8 +95,8 @@ s32 fn_8004E144(void* window, PdaMailSpinWork* sprite)
  * a mailbox-slot index, returns the mail ID, or -1 out of range). */
 extern s32 pdaMailGetMailID(s32 index);
 
-/* fn_801D1A44 (battle_waza.c): "Waza entry get field 0x14 by index". */
-extern u32 fn_801D1A44(s32 idx);
+/* mailGetContents (battle_waza.c): "Waza entry get field 0x14 by index". */
+extern u32 mailGetContents(s32 idx);
 
 typedef struct PdaMailWindowA {
     u8 pad00;
@@ -120,7 +120,7 @@ asm s32 fn_8004D6AC(PdaMailWindowA* window, PdaMailOutA* out) {
 #else
 s32 fn_8004D6AC(PdaMailWindowA* window, PdaMailOutA* out)
 {
-    out->field_0x4c = fn_801D1A44(pdaMailGetMailID(**window->field_0x60));
+    out->field_0x4c = mailGetContents(pdaMailGetMailID(**window->field_0x60));
     return 0;
 }
 #endif
@@ -174,8 +174,8 @@ s32 fn_8004DB34(PdaMailWindowB* window, void* fieldHandle)
 #pragma scheduling reset
 #endif
 
-/* fn_801D16F0 (battle_waza.c): "Waza entry get field 0x18 by index". */
-extern u32 fn_801D16F0(s32 idx);
+/* mailGetAttachFileGroup (battle_waza.c): "Waza entry get field 0x18 by index". */
+extern u32 mailGetAttachFileGroup(s32 idx);
 
 #if 0
 asm s32 fn_8004D5EC(PdaMailWindowA* window, void* fieldHandle) {
@@ -186,7 +186,7 @@ asm s32 fn_8004D5EC(PdaMailWindowA* window, void* fieldHandle) {
 s32 fn_8004D5EC(PdaMailWindowA* window, void* fieldHandle)
 {
     u8 flag;
-    if (fn_801D16F0(pdaMailGetMailID(**window->field_0x60)) != 0) {
+    if (mailGetAttachFileGroup(pdaMailGetMailID(**window->field_0x60)) != 0) {
         flag = 1;
     } else {
         flag = 0;
@@ -206,7 +206,7 @@ asm s32 fn_8004D64C(PdaMailWindowA* window, void* fieldHandle) {
 s32 fn_8004D64C(PdaMailWindowA* window, void* fieldHandle)
 {
     u8 flag;
-    if (fn_801D16F0(pdaMailGetMailID(**window->field_0x60)) != 0) {
+    if (mailGetAttachFileGroup(pdaMailGetMailID(**window->field_0x60)) != 0) {
         flag = 1;
     } else {
         flag = 0;
@@ -230,7 +230,7 @@ asm s32 fn_8004D590(PdaMailWindowA* window, PdaMailOutA* out) {
 #pragma scheduling off
 s32 fn_8004D590(PdaMailWindowA* window, PdaMailOutA* out)
 {
-    if (fn_801D16F0(pdaMailGetMailID(**window->field_0x60)) != 0) {
+    if (mailGetAttachFileGroup(pdaMailGetMailID(**window->field_0x60)) != 0) {
         out->field_0x4c = 0x36B9;
     } else {
         out->field_0x4c = 0;
@@ -240,9 +240,9 @@ s32 fn_8004D590(PdaMailWindowA* window, PdaMailOutA* out)
 #pragma scheduling reset
 #endif
 
-/* fn_801D1A88 (battle_waza.c): "Waza entry get field 0x0C by index".
+/* mailGetSenderName (battle_waza.c): "Waza entry get field 0x0C by index".
  * fn_800FA280/fn_80132A38 (gs_title.c): message/window callbacks. */
-extern u32 fn_801D1A88(s32 idx);
+extern u32 mailGetSenderName(s32 idx);
 extern void* fn_800FA280(u32);
 extern void fn_80132A38(s32, void*);
 
@@ -258,7 +258,7 @@ asm s32 fn_8004D6F0(PdaMailWindowA* window, PdaMailOutA* out) {
 #pragma scheduling off
 s32 fn_8004D6F0(PdaMailWindowA* window, PdaMailOutA* out)
 {
-    u32 val = fn_801D1A88(pdaMailGetMailID(**window->field_0x60));
+    u32 val = mailGetSenderName(pdaMailGetMailID(**window->field_0x60));
     if (val != 0) {
         void* winPtr = fn_800FA280(val);
         fn_80132A38(0x37, winPtr);
@@ -271,8 +271,8 @@ s32 fn_8004D6F0(PdaMailWindowA* window, PdaMailOutA* out)
 #pragma scheduling reset
 #endif
 
-/* fn_801D1ACC (battle_waza.c): "Waza entry get field 0x10 by index". */
-extern u32 fn_801D1ACC(s32 idx);
+/* mailGetSubject (battle_waza.c): "Waza entry get field 0x10 by index". */
+extern u32 mailGetSubject(s32 idx);
 
 #if 0
 asm s32 fn_8004D760(PdaMailWindowA* window, PdaMailOutA* out) {
@@ -284,7 +284,7 @@ asm s32 fn_8004D760(PdaMailWindowA* window, PdaMailOutA* out) {
 #pragma scheduling off
 s32 fn_8004D760(PdaMailWindowA* window, PdaMailOutA* out)
 {
-    u32 val = fn_801D1ACC(pdaMailGetMailID(**window->field_0x60));
+    u32 val = mailGetSubject(pdaMailGetMailID(**window->field_0x60));
     if (val != 0) {
         void* winPtr = fn_800FA280(val);
         fn_80132A38(0x37, winPtr);
@@ -306,7 +306,7 @@ asm void fn_8004D8BC(PdaMailWindowA* window) {
 void fn_8004D8BC(PdaMailWindowA* window)
 {
     u8* state = windowGetKeyInfo();
-    if (fn_801D16F0(pdaMailGetMailID(**window->field_0x60)) != 0
+    if (mailGetAttachFileGroup(pdaMailGetMailID(**window->field_0x60)) != 0
         || (*(u16*) state & 0x10) == 0) {
         menuButtonNormal(window);
     }
@@ -389,8 +389,8 @@ s32 fn_8004BE90(u16* a, u16* b)
     s32 idA = *a;
     s32 idB = *b;
     s32 cmp;
-    void* msgA = fn_800FA280(fn_801D1ACC(idA));
-    void* msgB = fn_800FA280(fn_801D1ACC(idB));
+    void* msgA = fn_800FA280(mailGetSubject(idA));
+    void* msgB = fn_800FA280(mailGetSubject(idB));
     cmp = GScharCmp(msgA, msgB);
     if (cmp != 0) {
         return cmp;
@@ -411,8 +411,8 @@ s32 fn_8004BF20(u16* a, u16* b)
     s32 idA = *a;
     s32 idB = *b;
     s32 cmp;
-    void* msgA = fn_800FA280(fn_801D1A88(idA));
-    void* msgB = fn_800FA280(fn_801D1A88(idB));
+    void* msgA = fn_800FA280(mailGetSenderName(idA));
+    void* msgB = fn_800FA280(mailGetSenderName(idB));
     cmp = GScharCmp(msgA, msgB);
     if (cmp != 0) {
         return cmp;
@@ -744,7 +744,7 @@ s32 fn_8004D9C0(s32 a)
         }
         {
             s32 mailId = pdaMailGetMailID(lbl_8047A518);
-            if (fn_801D16F0(mailId) != 0) {
+            if (mailGetAttachFileGroup(mailId) != 0) {
                 fn_8004E9C0(mailId);
             }
         }
