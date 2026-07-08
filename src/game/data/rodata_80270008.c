@@ -286,9 +286,9 @@ extern u8 fn_8022808C[];
 extern u8 fn_802282D8[];
 extern u8 fn_802284B0[];
 extern u8 fn_80229C90[];
-extern u8 fn_802614B4[];
-extern u8 fn_8026153C[];
-extern u8 fn_802615F4[];
+extern u8 fightGSfloorGetPushDataSize[];
+extern u8 fightGSfloorPushData[];
+extern u8 fightGSfloorPopData[];
 extern u8 lbl_80004000[];
 extern u8 lbl_803A3F3F[];
 extern u8 lbl_8047DAB0[];
@@ -7394,9 +7394,9 @@ const u8 lbl_80279AE8[144] = {
 };
 
 const void* lbl_80279B78[3] = {
-    (void*)fn_802615F4,
-    (void*)fn_8026153C,
-    (void*)fn_802614B4,
+    (void*)fightGSfloorPopData,
+    (void*)fightGSfloorPushData,
+    (void*)fightGSfloorGetPushDataSize,
 };
 
 const u8 lbl_80279B84[84] = {

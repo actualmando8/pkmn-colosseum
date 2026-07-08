@@ -20,9 +20,9 @@
 
 /* ===== External function declarations (fn_80065A48 only) ===== */
 extern void fn_8010B9E8();
-extern s32  fn_8025D89C();
-extern s32  fn_8025D9F0();
-extern s32  fn_8025DA88();
+extern s32  toolentryTaisenGetPokemonNum();
+extern s32  toolentryTaisenGetHomePlace();
+extern s32  toolentryTaisenGetBattleType();
 extern s32  fn_8006B1D4();
 extern void fn_80068794();
 extern void fn_800688C4();
@@ -60,7 +60,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     s32 i2;
     s32 i3;
 
-    switch (fn_8025DA88()) {
+    switch (toolentryTaisenGetBattleType()) {
     case 0:
     case 1:
         i0 = 0;
@@ -84,7 +84,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     switch (msg->cmd) {
     case 0xB74: {
         s32 ok = 1;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i0 >= 2) {
@@ -104,7 +104,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     }
     case 0xB75: {
         s32 ok = 1;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i0 >= 2) {
@@ -124,7 +124,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     }
     case 0xB76: {
         s32 ok = 1;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i0 >= 2) {
@@ -144,7 +144,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     }
     case 0xB77: {
         s32 ok = 1;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i0 >= 2) {
@@ -164,7 +164,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     }
     case 0xB78: {
         s32 ok = 1;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i0 >= 2) {
@@ -184,7 +184,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     }
     case 0xB79: {
         s32 ok = 1;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i0 >= 2) {
@@ -204,7 +204,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     }
     case 0xBB2: {
         s32 ok = 1;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i2 >= 2) {
@@ -224,7 +224,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     }
     case 0xBB3: {
         s32 ok = 1;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i2 >= 2) {
@@ -244,7 +244,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     }
     case 0xBB4: {
         s32 ok = 1;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i2 >= 2) {
@@ -264,7 +264,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     }
     case 0xBB5: {
         s32 ok = 1;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i2 >= 2) {
@@ -284,7 +284,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     }
     case 0xBB6: {
         s32 ok = 1;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i2 >= 2) {
@@ -304,7 +304,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     }
     case 0xBB7: {
         s32 ok = 1;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i2 >= 2) {
@@ -324,7 +324,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     }
     case 0xB93: {
         s32 ok = 1;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i1 >= 2) {
@@ -344,7 +344,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     }
     case 0xB94: {
         s32 ok = 1;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i1 >= 2) {
@@ -364,7 +364,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     }
     case 0xB95: {
         s32 ok = 1;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i1 >= 2) {
@@ -384,7 +384,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     }
     case 0xB96: {
         s32 ok = 1;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i1 >= 2) {
@@ -404,7 +404,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     }
     case 0xB97: {
         s32 ok = 1;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i1 >= 2) {
@@ -424,7 +424,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     }
     case 0xB98: {
         s32 ok = 1;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i1 >= 2) {
@@ -444,7 +444,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     }
     case 0xBD1: {
         s32 ok = 1;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i3 >= 2) {
@@ -464,7 +464,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     }
     case 0xBD2: {
         s32 ok = 1;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i3 >= 2) {
@@ -484,7 +484,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     }
     case 0xBD3: {
         s32 ok = 1;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i3 >= 2) {
@@ -504,7 +504,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     }
     case 0xBD4: {
         s32 ok = 1;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i3 >= 2) {
@@ -524,7 +524,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     }
     case 0xBD5: {
         s32 ok = 1;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i3 >= 2) {
@@ -544,7 +544,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     }
     case 0xBD6: {
         s32 ok = 1;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i3 >= 2) {
@@ -590,7 +590,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         s32 ok = 1;
         u16 n;
         u16 m;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i0 >= 2) {
@@ -602,7 +602,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         }
         if ((u8) ok != 0) {
             n = fn_8006B1D4();
-            m = fn_8025D89C(i0);
+            m = toolentryTaisenGetPokemonNum(i0);
             m = (m < n) ? m : n;
             if ((s32) m > 0) {
                 msg->flags4 |= 2;
@@ -616,7 +616,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         s32 ok = 1;
         u16 n;
         u16 m;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i0 >= 2) {
@@ -628,7 +628,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         }
         if ((u8) ok != 0) {
             n = fn_8006B1D4();
-            m = fn_8025D89C(i0);
+            m = toolentryTaisenGetPokemonNum(i0);
             m = (m < n) ? m : n;
             if ((s32) m > 1) {
                 msg->flags4 |= 2;
@@ -642,7 +642,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         s32 ok = 1;
         u16 n;
         u16 m;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i0 >= 2) {
@@ -654,7 +654,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         }
         if ((u8) ok != 0) {
             n = fn_8006B1D4();
-            m = fn_8025D89C(i0);
+            m = toolentryTaisenGetPokemonNum(i0);
             m = (m < n) ? m : n;
             if ((s32) m > 2) {
                 msg->flags4 |= 2;
@@ -668,7 +668,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         s32 ok = 1;
         u16 n;
         u16 m;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i0 >= 2) {
@@ -680,7 +680,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         }
         if ((u8) ok != 0) {
             n = fn_8006B1D4();
-            m = fn_8025D89C(i0);
+            m = toolentryTaisenGetPokemonNum(i0);
             m = (m < n) ? m : n;
             if ((s32) m > 3) {
                 msg->flags4 |= 2;
@@ -694,7 +694,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         s32 ok = 1;
         u16 n;
         u16 m;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i0 >= 2) {
@@ -706,7 +706,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         }
         if ((u8) ok != 0) {
             n = fn_8006B1D4();
-            m = fn_8025D89C(i0);
+            m = toolentryTaisenGetPokemonNum(i0);
             m = (m < n) ? m : n;
             if ((s32) m > 4) {
                 msg->flags4 |= 2;
@@ -720,7 +720,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         s32 ok = 1;
         u16 n;
         u16 m;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i0 >= 2) {
@@ -732,7 +732,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         }
         if ((u8) ok != 0) {
             n = fn_8006B1D4();
-            m = fn_8025D89C(i0);
+            m = toolentryTaisenGetPokemonNum(i0);
             m = (m < n) ? m : n;
             if ((s32) m > 5) {
                 msg->flags4 |= 2;
@@ -788,7 +788,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         s32 ok = 1;
         u16 n;
         u16 m;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i2 >= 2) {
@@ -800,7 +800,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         }
         if ((u8) ok != 0) {
             n = fn_8006B1D4();
-            m = fn_8025D89C(i2);
+            m = toolentryTaisenGetPokemonNum(i2);
             m = (m < n) ? m : n;
             if ((s32) m > 0) {
                 msg->flags4 |= 2;
@@ -814,7 +814,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         s32 ok = 1;
         u16 n;
         u16 m;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i2 >= 2) {
@@ -826,7 +826,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         }
         if ((u8) ok != 0) {
             n = fn_8006B1D4();
-            m = fn_8025D89C(i2);
+            m = toolentryTaisenGetPokemonNum(i2);
             m = (m < n) ? m : n;
             if ((s32) m > 1) {
                 msg->flags4 |= 2;
@@ -840,7 +840,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         s32 ok = 1;
         u16 n;
         u16 m;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i2 >= 2) {
@@ -852,7 +852,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         }
         if ((u8) ok != 0) {
             n = fn_8006B1D4();
-            m = fn_8025D89C(i2);
+            m = toolentryTaisenGetPokemonNum(i2);
             m = (m < n) ? m : n;
             if ((s32) m > 2) {
                 msg->flags4 |= 2;
@@ -866,7 +866,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         s32 ok = 1;
         u16 n;
         u16 m;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i2 >= 2) {
@@ -878,7 +878,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         }
         if ((u8) ok != 0) {
             n = fn_8006B1D4();
-            m = fn_8025D89C(i2);
+            m = toolentryTaisenGetPokemonNum(i2);
             m = (m < n) ? m : n;
             if ((s32) m > 3) {
                 msg->flags4 |= 2;
@@ -892,7 +892,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         s32 ok = 1;
         u16 n;
         u16 m;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i2 >= 2) {
@@ -904,7 +904,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         }
         if ((u8) ok != 0) {
             n = fn_8006B1D4();
-            m = fn_8025D89C(i2);
+            m = toolentryTaisenGetPokemonNum(i2);
             m = (m < n) ? m : n;
             if ((s32) m > 4) {
                 msg->flags4 |= 2;
@@ -918,7 +918,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         s32 ok = 1;
         u16 n;
         u16 m;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i2 >= 2) {
@@ -930,7 +930,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         }
         if ((u8) ok != 0) {
             n = fn_8006B1D4();
-            m = fn_8025D89C(i2);
+            m = toolentryTaisenGetPokemonNum(i2);
             m = (m < n) ? m : n;
             if ((s32) m > 5) {
                 msg->flags4 |= 2;
@@ -986,7 +986,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         s32 ok = 1;
         u16 n;
         u16 m;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i1 >= 2) {
@@ -998,7 +998,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         }
         if ((u8) ok != 0) {
             n = fn_8006B1D4();
-            m = fn_8025D89C(i1);
+            m = toolentryTaisenGetPokemonNum(i1);
             m = (m < n) ? m : n;
             if ((s32) m > 0) {
                 msg->flags4 |= 2;
@@ -1012,7 +1012,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         s32 ok = 1;
         u16 n;
         u16 m;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i1 >= 2) {
@@ -1024,7 +1024,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         }
         if ((u8) ok != 0) {
             n = fn_8006B1D4();
-            m = fn_8025D89C(i1);
+            m = toolentryTaisenGetPokemonNum(i1);
             m = (m < n) ? m : n;
             if ((s32) m > 1) {
                 msg->flags4 |= 2;
@@ -1038,7 +1038,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         s32 ok = 1;
         u16 n;
         u16 m;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i1 >= 2) {
@@ -1050,7 +1050,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         }
         if ((u8) ok != 0) {
             n = fn_8006B1D4();
-            m = fn_8025D89C(i1);
+            m = toolentryTaisenGetPokemonNum(i1);
             m = (m < n) ? m : n;
             if ((s32) m > 2) {
                 msg->flags4 |= 2;
@@ -1064,7 +1064,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         s32 ok = 1;
         u16 n;
         u16 m;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i1 >= 2) {
@@ -1076,7 +1076,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         }
         if ((u8) ok != 0) {
             n = fn_8006B1D4();
-            m = fn_8025D89C(i1);
+            m = toolentryTaisenGetPokemonNum(i1);
             m = (m < n) ? m : n;
             if ((s32) m > 3) {
                 msg->flags4 |= 2;
@@ -1090,7 +1090,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         s32 ok = 1;
         u16 n;
         u16 m;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i1 >= 2) {
@@ -1102,7 +1102,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         }
         if ((u8) ok != 0) {
             n = fn_8006B1D4();
-            m = fn_8025D89C(i1);
+            m = toolentryTaisenGetPokemonNum(i1);
             m = (m < n) ? m : n;
             if ((s32) m > 4) {
                 msg->flags4 |= 2;
@@ -1116,7 +1116,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         s32 ok = 1;
         u16 n;
         u16 m;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i1 >= 2) {
@@ -1128,7 +1128,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         }
         if ((u8) ok != 0) {
             n = fn_8006B1D4();
-            m = fn_8025D89C(i1);
+            m = toolentryTaisenGetPokemonNum(i1);
             m = (m < n) ? m : n;
             if ((s32) m > 5) {
                 msg->flags4 |= 2;
@@ -1184,7 +1184,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         s32 ok = 1;
         u16 n;
         u16 m;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i3 >= 2) {
@@ -1196,7 +1196,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         }
         if ((u8) ok != 0) {
             n = fn_8006B1D4();
-            m = fn_8025D89C(i3);
+            m = toolentryTaisenGetPokemonNum(i3);
             m = (m < n) ? m : n;
             if ((s32) m > 0) {
                 msg->flags4 |= 2;
@@ -1210,7 +1210,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         s32 ok = 1;
         u16 n;
         u16 m;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i3 >= 2) {
@@ -1222,7 +1222,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         }
         if ((u8) ok != 0) {
             n = fn_8006B1D4();
-            m = fn_8025D89C(i3);
+            m = toolentryTaisenGetPokemonNum(i3);
             m = (m < n) ? m : n;
             if ((s32) m > 1) {
                 msg->flags4 |= 2;
@@ -1236,7 +1236,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         s32 ok = 1;
         u16 n;
         u16 m;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i3 >= 2) {
@@ -1248,7 +1248,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         }
         if ((u8) ok != 0) {
             n = fn_8006B1D4();
-            m = fn_8025D89C(i3);
+            m = toolentryTaisenGetPokemonNum(i3);
             m = (m < n) ? m : n;
             if ((s32) m > 2) {
                 msg->flags4 |= 2;
@@ -1262,7 +1262,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         s32 ok = 1;
         u16 n;
         u16 m;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i3 >= 2) {
@@ -1274,7 +1274,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         }
         if ((u8) ok != 0) {
             n = fn_8006B1D4();
-            m = fn_8025D89C(i3);
+            m = toolentryTaisenGetPokemonNum(i3);
             m = (m < n) ? m : n;
             if ((s32) m > 3) {
                 msg->flags4 |= 2;
@@ -1288,7 +1288,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         s32 ok = 1;
         u16 n;
         u16 m;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i3 >= 2) {
@@ -1300,7 +1300,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         }
         if ((u8) ok != 0) {
             n = fn_8006B1D4();
-            m = fn_8025D89C(i3);
+            m = toolentryTaisenGetPokemonNum(i3);
             m = (m < n) ? m : n;
             if ((s32) m > 4) {
                 msg->flags4 |= 2;
@@ -1314,7 +1314,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         s32 ok = 1;
         u16 n;
         u16 m;
-        switch (fn_8025DA88()) {
+        switch (toolentryTaisenGetBattleType()) {
         case 0:
         case 1:
             if (i3 >= 2) {
@@ -1326,7 +1326,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         }
         if ((u8) ok != 0) {
             n = fn_8006B1D4();
-            m = fn_8025D89C(i3);
+            m = toolentryTaisenGetPokemonNum(i3);
             m = (m < n) ? m : n;
             if ((s32) m > 5) {
                 msg->flags4 |= 2;
@@ -1367,7 +1367,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         fn_800688C4(ctx, msg, i3, 3);
         break;
     case 0xBF0:
-        switch ((u16) fn_8025D9F0(0)) {
+        switch ((u16) toolentryTaisenGetHomePlace(0)) {
         case 0:
             msg->flags4 |= 2;
             break;
@@ -1377,7 +1377,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
         }
         break;
     case 0xB3B:
-        switch ((u16) fn_8025D9F0(0)) {
+        switch ((u16) toolentryTaisenGetHomePlace(0)) {
         case 0:
             msg->flags4 |= 2;
             break;
@@ -1393,7 +1393,7 @@ void fn_80065A48(void* ctx, void* arg1, s32 arg2)
     case 0xB7E:
     case 0xB7F:
     case 0xBEF:
-        switch ((u16) fn_8025D9F0(0)) {
+        switch ((u16) toolentryTaisenGetHomePlace(0)) {
         case 0:
             msg->flags4 |= 2;
             break;

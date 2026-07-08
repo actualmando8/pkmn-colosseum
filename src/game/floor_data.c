@@ -484,7 +484,7 @@ extern void fn_801908D4(void);
 extern void mailInitMailbox(void);
 extern void sodateyaInit(void);
 extern void fn_8006B6B4(void);
-extern void fn_80260070(void);
+extern void memoInit(void);
 extern void fn_80083CBC(void);
 extern void fn_801EF128(void);
 extern void exribbonInit(void);

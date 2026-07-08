@@ -3256,7 +3256,7 @@ extern void fn_8011F228(void);
 extern void fn_8011F5C8(s32);
 extern void fn_8011E778(void);
 extern void fn_8011E2AC(void);
-extern void fn_802600E4(void);
+extern void evolutionWazaLearn(void);
 extern void pokemonWazaCreate(void);
 extern void pokemonGetSoubiItemSoubiDataId(void);
 extern void pokemonGetFriendFormPokemonFriendFilterId(void);
@@ -3277,7 +3277,7 @@ s32 fn_80022834(u32 arg0, u32* arg1) {
     extern void fn_8011F5C8(s32);
     extern s32 fn_8011E778(void);
     extern u8 fn_8011E2AC(s32, s32);
-    extern s32 fn_802600E4(s32, u32, void*, s32, void*, s32);
+    extern s32 evolutionWazaLearn(s32, u32, void*, s32, void*, s32);
     extern void pokemonWazaCreate(s32, u32, u32);
     extern u32 pokemonGetSoubiItemSoubiDataId(s32);
     extern void pokemonGetFriendFormPokemonFriendFilterId(s32, u32, s32);
@@ -3355,7 +3355,7 @@ s32 fn_80022834(u32 arg0, u32* arg1) {
                     winMsgClose(1);
                     tmp = 0;
                 } else {
-                    tmp = fn_802600E4(c, v2, &buf, 1, cbForgetWazaSelect__FP7PokemonUsl, 0);
+                    tmp = evolutionWazaLearn(c, v2, &buf, 1, cbForgetWazaSelect__FP7PokemonUsl, 0);
                     if (tmp != 0) {
                         pokemonWazaCreate(c, buf, (u16)v2);
                         pokemonGetFriendFormPokemonFriendFilterId(c, pokemonGetSoubiItemSoubiDataId(c), 4);

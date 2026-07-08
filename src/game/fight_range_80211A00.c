@@ -688,18 +688,18 @@ void fn_80222ADC(void) {
  *
  * If field 0x2b of the field-0xD9 object is 2 and the slot-0x11 side
  * is shadow (fightWazaIsHit), stashes 0x7631 into slot 0x52 and, if
- * fn_802624CC(0x7631) reports 1, marks lbl_80478D78[7]=1. PC always
+ * fightMenuOpenMsg(0x7631) reports 1, marks lbl_80478D78[7]=1. PC always
  * advances by 1.
  */
 extern u8 fightWazaIsHit();
-extern u8 fn_802624CC();
+extern u8 fightMenuOpenMsg();
 void fn_80226730(void) {
     extern u8 wazaGetStatus();
     u32 fieldD9 = pokemonGetStatus(fn_801F025C(0x11, 0), 0, 0xD9, 0);
 
     if (wazaGetStatus(fieldD9, 0, 0x2b, 0) == 2 && fightWazaIsHit(fieldD9) == 1) {
         fn_801F4C14(0, 0, 0x52, 0, 0x7631);
-        if (fn_802624CC(0x7631) == 1) {
+        if (fightMenuOpenMsg(0x7631) == 1) {
             lbl_80478D78[7] = 1;
         }
     }

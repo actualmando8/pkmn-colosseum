@@ -99,8 +99,8 @@ extern u8   fn_801F1758(s32 arg);                   /* check scene state */
 extern void fightActionFlowKaisiPreSubLoad(void);                      /* battle system init */
 
 /* GBA link */
-extern void fn_80265C84(void);
-extern void fn_80265C10(void);
+extern void fightTimerAllInit(void);
+extern void fightTimerAllStart(void);
 
 /* Sound check */
 extern s32 fn_801F54A4(s32 a, s32 b, s32 c, s32 d); /* check/setup sound */
@@ -508,15 +508,15 @@ void fn_801EFA08(void) {
     extern void fn_801EF634();
     extern void fn_801F1588();
     extern void fn_801F1700();
-    extern void fn_80261954();
-    extern void fn_80261AD0();
-    extern void fn_802658C8();
-    extern void fn_802659A4();
-    extern void fn_802659F8();
-    extern void fn_80265A6C();
-    extern void fn_80265B3C();
-    extern void fn_80265BBC();
-    extern void fn_80265D54();
+    extern void fightMenuCloseInfoMenu();
+    extern void fightMenuOpenInfoMenu();
+    extern void fightTimerCommandTerminate();
+    extern void fightTimerCommandBlock();
+    extern void fightTimerCommandStart();
+    extern void fightTimerCommandInit();
+    extern void fightTimerAllIsOver();
+    extern void fightTimerAllBlock();
+    extern void fightTimerAllTerminate();
     u8 sp[0x60];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -659,8 +659,8 @@ void fn_801EFA08(void) {
         ((void(*)(void))fn_801F1758)();
         tmp = r3 & 0xFF;
         if (tmp == 1) {
-            ((void(*)(void))fn_80265C84)();
-            ((void(*)(void))fn_80265C10)();
+            ((void(*)(void))fightTimerAllInit)();
+            ((void(*)(void))fightTimerAllStart)();
         }
         r4 = (u32)lbl_8046D760;
         r3 = (u32)lbl_80375D30;
@@ -714,7 +714,7 @@ void fn_801EFA08(void) {
             ((void(*)(void))fn_801F1758)();
             tmp = r3 & 0xFF;
             if (tmp == 1) {
-                fn_80265B3C();
+                fightTimerAllIsOver();
                 tmp = r3 & 0xFF;
                 if (tmp == 1) {
                     ((void(*)(void))fn_801C2D54)();
@@ -727,7 +727,7 @@ void fn_801EFA08(void) {
                         ((void(*)(void))fn_801C2F00)();
                     }
                     r3 = 0x0;
-                    fn_80261AD0();
+                    fightMenuOpenInfoMenu();
                     r3 = 0x0;
                     fn_801F1588();
                     r3 = 0xb4;
@@ -750,8 +750,8 @@ void fn_801EFA08(void) {
             fn_801F1700();
             tmp = r3 & 0xFF;
             if (tmp == 1) {
-                fn_80265A6C();
-                fn_802659F8();
+                fightTimerCommandInit();
+                fightTimerCommandStart();
             }
             ((void(*)(void))fn_801C2D54)();
             fn_801C2D5C();
@@ -763,7 +763,7 @@ void fn_801EFA08(void) {
                 ((void(*)(void))fn_801C2F00)();
             }
             r3 = -0x1;
-            fn_80261AD0();
+            fightMenuOpenInfoMenu();
             ((void(*)(void))fn_801F09D0)();
             r3 = r28;
             r8 = r29;
@@ -774,14 +774,14 @@ void fn_801EFA08(void) {
             ((void(*)(void))fn_801F0B00)();
             ((void(*)(void))fn_801F09D0)();
             r3 = 0x0;
-            fn_80261954();
+            fightMenuCloseInfoMenu();
             ((void(*)(void))fn_801C2D68)();
             r3 = 0x0;
             fn_801F1700();
             tmp = r3 & 0xFF;
             if (tmp == 1) {
-                fn_802659A4();
-                fn_802658C8();
+                fightTimerCommandBlock();
+                fightTimerCommandTerminate();
             }
             fn_801EF634();
             tmp = r3 & 0xFFFF;
@@ -823,8 +823,8 @@ void fn_801EFA08(void) {
     ((void(*)(void))fn_801F1758)();
     tmp = r3 & 0xFF;
     if (tmp == 1) {
-        fn_80265BBC();
-        fn_80265D54();
+        fightTimerAllBlock();
+        fightTimerAllTerminate();
     }
     r3 = (u32)lbl_8046D760;
     r5 = (u32)lbl_80375D80;

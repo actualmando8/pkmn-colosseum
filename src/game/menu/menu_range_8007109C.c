@@ -18,7 +18,7 @@ extern void gbaCommandSetKeyState(s32 mode, s32 flag);
 extern s32 fn_80073C38(s32 chan);
 extern u32 GBAWrite(s32 chan, u32 srcPtr, u32 lenPtr);
 extern u32 GBARead(s32 chan, u32 destPtr, u32 lenPtr);
-extern u32 fn_8025F3F4(s32 chan, u32 statusPtr);
+extern u32 GBAGetStatus(s32 chan, u32 statusPtr);
 
 typedef struct GbaIdleCallback {
     void (*func)(s32 chan, void* arg);
@@ -175,7 +175,7 @@ s32 fn_80071700(s32 chan) {
             result = 1;
             break;
         }
-        if (fn_8025F3F4(chan, (u32)&statusA) != 0) {
+        if (GBAGetStatus(chan, (u32)&statusA) != 0) {
             result = 2;
             break;
         }
@@ -214,7 +214,7 @@ s32 fn_80071700(s32 chan) {
             result = 1;
             break;
         }
-        if (fn_8025F3F4(chan, (u32)&statusB) != 0) {
+        if (GBAGetStatus(chan, (u32)&statusB) != 0) {
             result = 2;
             break;
         }
@@ -283,7 +283,7 @@ s32 fn_800722A0(s32 chan) {
             result = 1;
             break;
         }
-        if (fn_8025F3F4(chan, (u32)&statusA) != 0) {
+        if (GBAGetStatus(chan, (u32)&statusA) != 0) {
             result = 2;
             break;
         }
@@ -322,7 +322,7 @@ s32 fn_800722A0(s32 chan) {
             result = 1;
             break;
         }
-        if (fn_8025F3F4(chan, (u32)&statusB) != 0) {
+        if (GBAGetStatus(chan, (u32)&statusB) != 0) {
             result = 2;
             break;
         }

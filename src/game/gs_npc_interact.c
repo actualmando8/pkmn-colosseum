@@ -123,7 +123,7 @@ extern void  winMsgClose(s32 slot);                   /* Close message box */
 /* Input/frame */
 extern u8    fn_801F18DC(s32 controller);             /* Check input ready */
 extern u8    fn_801F1700(s32 controller);             /* Check button pressed */
-extern u8    fn_80265924(void);                       /* Check A button */
+extern u8    fightTimerCommandIsOver(void);                       /* Check A button */
 extern u16   fn_801EF634(void);                       /* Get input state */
 extern void  _threadSwitch(void);                       /* Frame advance */
 extern u32   fn_800F7AF0(s32 slot);                   /* Get render flags */
@@ -404,7 +404,7 @@ extern void menuPokemonOpenFight();
 extern void menuCloseCustom();
 extern void fn_801F02AC();
 extern void fightOutPokemonCheckFightOut();
-extern void fn_802656AC();
+extern void fightMenuGetFightOutPokemonPtrToStatusMenuId();
 extern u32 menuPokemonCheckPokemonChange();
 extern void fn_80011288();
 extern s32 menuOpenCustom(s32, ...);
@@ -424,7 +424,7 @@ void fn_800114A4(void) {
     extern void fightOutPokemonCheckFightOut();
     extern void fightTypeDataBiosGetFightoutPokemonNum();
     extern void fightTypeDataBiosGetPtr();
-    extern void fn_802656AC();
+    extern void fightMenuGetFightOutPokemonPtrToStatusMenuId();
     u8 sp[0x60];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -514,7 +514,7 @@ L_80011500:
             r3 = r23;
             r4 = r26;
             r5 = 0x0;
-            fn_802656AC();
+            fightMenuGetFightOutPokemonPtrToStatusMenuId();
         } else {
 
             r3 = 0x0;
@@ -530,7 +530,7 @@ L_80011500:
             r3 = r23;
             r4 = r26;
             r5 = 0x0;
-            fn_802656AC();
+            fightMenuGetFightOutPokemonPtrToStatusMenuId();
         } else {
 
             r3 = 0x0;
@@ -546,7 +546,7 @@ L_80011500:
             r3 = r23;
             r4 = r26;
             r5 = 0x0;
-            fn_802656AC();
+            fightMenuGetFightOutPokemonPtrToStatusMenuId();
         } else {
 
             r3 = 0x0;
@@ -734,7 +734,7 @@ L_800117F0:
                 tmp = r3 & 0xFF;
                 do {
                     if (tmp != 1) break;
-                    ((void(*)(void))fn_80265924)();
+                    ((void(*)(void))fightTimerCommandIsOver)();
                     tmp = r3 & 0xFF;
                     if (tmp != 1) break;
                     tmp = 0x1;
@@ -1848,9 +1848,9 @@ void fn_8000DAE8(u8* ctx, u8* npc) {
 #endif
 
 /* fn_8000DC88 - 0x8000DC88 | size: 0x84 */
-extern void fn_80265B74(void);
+extern void fightTimerAllGetNokoriTime(void);
 extern void windowSetParam(void);
-extern void fn_8026595C(void);
+extern void fightTimerCommandGetNokoriTime(void);
 #if 0
 asm void fn_8000DC88(void) {
 #include "src/game/gs_npc_interact_fn_8000DC88.inc"
@@ -1858,15 +1858,15 @@ asm void fn_8000DC88(void) {
 #else
 #pragma peephole off
 u32 fn_8000DC88(u8* ptr) {
-    extern f64 fn_80265B74(void);
-    extern f64 fn_8026595C(void);
+    extern f64 fightTimerAllGetNokoriTime(void);
+    extern f64 fightTimerCommandGetNokoriTime(void);
     extern void windowSetParam(u8* a, u32 b, s32 c);
     switch (*(s32*)(ptr + 4)) {
         case 0x10a:
-            windowSetParam(ptr, 0, (s32)fn_80265B74());
+            windowSetParam(ptr, 0, (s32)fightTimerAllGetNokoriTime());
             break;
         case 0x10b:
-            windowSetParam(ptr, 0, (s32)fn_8026595C());
+            windowSetParam(ptr, 0, (s32)fightTimerCommandGetNokoriTime());
             break;
     }
     return 0;
@@ -1956,12 +1956,12 @@ void fn_8000DE24(u8* ptr) {
     extern void menuButtonNormal(u8* a);
     extern u8 fn_801F18DC(s32 a);
     extern u8 fn_801F1700(s32 a);
-    extern u8 fn_80265924(void);
+    extern u8 fightTimerCommandIsOver(void);
     extern u16 fn_801EF634(void);
     u8 flag;
     menuButtonNormal(ptr);
     if (!(u8)fn_801F18DC(0)) goto _zero;
-    if ((u8)fn_801F1700(0) == 1 && (u8)fn_80265924() == 1) { flag = 1; goto _check; }
+    if ((u8)fn_801F1700(0) == 1 && (u8)fightTimerCommandIsOver() == 1) { flag = 1; goto _check; }
     if ((u16)fn_801EF634() == 1) { flag = 1; goto _check; }
     _zero:
     flag = 0;
@@ -2098,7 +2098,7 @@ void fn_8000DFF0(u8* ctx) {
 
     pressed = 0;
     if ((u8)fn_801F18DC(0) != 0) {
-        if (((u8)fn_801F1700(0) == 1) && ((u8)fn_80265924() == 1)) {
+        if (((u8)fn_801F1700(0) == 1) && ((u8)fightTimerCommandIsOver() == 1)) {
             pressed = 1;
         } else if ((u16)fn_801EF634() == 1) {
             pressed = 1;
@@ -2360,7 +2360,7 @@ void fn_8000ED34(u8* ctx) {
 
     pressed = 0;
     if ((u8)fn_801F18DC(0) != 0) {
-        if (((u8)fn_801F1700(0) == 1) && ((u8)fn_80265924() == 1)) {
+        if (((u8)fn_801F1700(0) == 1) && ((u8)fightTimerCommandIsOver() == 1)) {
             pressed = 1;
         } else if ((u16)fn_801EF634() == 1) {
             pressed = 1;
@@ -2675,7 +2675,7 @@ void fn_8000F964(u8* ctx) {
 
     pressed = 0;
     if ((u8)fn_801F18DC(0) != 0) {
-        if (((u8)fn_801F1700(0) == 1) && ((u8)fn_80265924() == 1)) {
+        if (((u8)fn_801F1700(0) == 1) && ((u8)fightTimerCommandIsOver() == 1)) {
             pressed = 1;
         } else if ((u16)fn_801EF634() == 1) {
             pressed = 1;
@@ -2742,7 +2742,7 @@ void fn_8000FE38(u8* arg1) {
     extern void* windowGetKeyInfo(void);
     extern u8 fn_801F18DC(s32 a);
     extern u8 fn_801F1700(s32 a);
-    extern u8 fn_80265924(void);
+    extern u8 fightTimerCommandIsOver(void);
     extern u16 fn_801EF634(void);
     void* data;
     u16 flags;
@@ -2768,7 +2768,7 @@ void fn_8000FE38(u8* arg1) {
     }
     if ((u8)fn_801F18DC(0) != 0) {
         if ((u8)fn_801F1700(0) == 1) {
-            if ((u8)fn_80265924() == 1) {
+            if ((u8)fightTimerCommandIsOver() == 1) {
                 flag = 1;
                 goto got_flag;
             }
@@ -3383,7 +3383,7 @@ u32 menuPokemonCheckPokemonChange(void* npc, u32 warpId, u32 variant) {
 waitLabel: \
     advance = fn_801F18DC(0); \
     if (advance != 0) { \
-        if ((fn_801F1700(0) == 1) && (fn_80265924() == 1)) { \
+        if ((fn_801F1700(0) == 1) && (fightTimerCommandIsOver() == 1)) { \
             advance = 1; \
             goto haveLabel; \
         } else if (fn_801EF634() == 1) { \

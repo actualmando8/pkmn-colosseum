@@ -853,7 +853,7 @@ extern void fn_801EF02C(void);
 extern void fn_801EF080(void);
 extern void fn_801EF0D4(void);
 extern void memoDataSetMemoFlag(u32);
-extern void fn_8025FBCC(u32);
+extern void memoInitDebug(u32);
 extern void fn_80190528(u32);
 extern void fn_800884BC(u32, u32, u32);
 extern void fn_800FF660(void);
@@ -1158,7 +1158,7 @@ s32 fn_8000CCA8(void) {
 /* fn_8000CCD0 - 0x8000CCD0 | size: 0x28 */
 /* GSparty_GetPersonality */
 s32 fn_8000CCD0(void) {
-    fn_8025FBCC(0);
+    memoInitDebug(0);
     return 1;
 }
 

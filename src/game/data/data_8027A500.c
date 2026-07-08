@@ -234,9 +234,9 @@ extern u8 fn_801EF6FC[];
 extern u8 fn_801EF758[];
 extern u8 fn_8020DAD0[];
 extern u8 fn_8025E1BC[];
-extern u8 fn_8025E5F4[];
-extern u8 fn_8025ED4C[];
-extern u8 fn_8025F2C0[];
+extern u8 preReliveDisplayHokoraParticle[];
+extern u8 reliveMain[];
+extern u8 preReliveSetParameter[];
 extern u8 fn_80266250[];
 extern u8 lbl_80003FF0[];
 extern u8 lbl_80266448[];
@@ -94378,7 +94378,7 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)fn_801C9CDC),
     (void*)0x01010000,
     (void*)0x00000000,
-    (void*)((u8*)fn_8025F2C0),
+    (void*)((u8*)preReliveSetParameter),
     (void*)0x01010000,
     (void*)0x00000000,
     (void*)((u8*)fn_8011392C),
@@ -94477,7 +94477,7 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)scriptCheckTemochiPokemon),
     (void*)0x01000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_8025ED4C),
+    (void*)((u8*)reliveMain),
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)((u8*)fn_801653C4),
@@ -94519,7 +94519,7 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)menuPokemonStatus),
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_8025E5F4),
+    (void*)((u8*)preReliveDisplayHokoraParticle),
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)((u8*)scriptGetDarkPointZeroPokemonNum),

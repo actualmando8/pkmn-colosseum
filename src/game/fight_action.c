@@ -317,9 +317,9 @@ u32 fightActionFlowSyuuryou(void* ctx)
     extern void fn_80211B94();
     extern u8 lbl_80378801[];
     extern u8 lbl_8037880F[];
-    extern void fn_8026246C();
-    extern void fn_80262490();
-    extern void fn_802624CC();
+    extern void fightMenuCloseMsg();
+    extern void fightMenuOpenTrainerMsg();
+    extern void fightMenuOpenMsg();
     u16 sVar9;
     u32 uVar1;
     u32 uVar2;
@@ -368,18 +368,18 @@ u32 fightActionFlowSyuuryou(void* ctx)
             }
             fn_80165668(0x3f5, 0, 0xff);
             fn_80132A38(0x5d, 0);
-            fn_802624CC(0x766c);
-            fn_8026246C();
+            fightMenuOpenMsg(0x766c);
+            fightMenuCloseMsg();
             if (iVar7 != 0) {
                 fn_801DA9E8(uVar4, 0x5a, 4);
-                fn_80262490(iVar7);
+                fightMenuOpenTrainerMsg(iVar7);
                 while (1) {
                     cVar10 = fn_801DA94C(uVar4, 0x5a, 4);
                     if (cVar10 == 0) break;
                     _threadSwitch();
                 }
                 fn_801EF8F4(saved_r27);
-                fn_8026246C();
+                fightMenuCloseMsg();
                 fn_801DA8C4(uVar4, 0x5a, 4);
             }
         } else if (sVar9 == 3) {
@@ -387,26 +387,26 @@ u32 fightActionFlowSyuuryou(void* ctx)
                 fn_801DDD28(uVar4, 0x59, 4, 0);
                 saved_r27 = fn_801C2D54();
             }
-            fn_802624CC(0x7547);
-            fn_8026246C();
+            fightMenuOpenMsg(0x7547);
+            fightMenuCloseMsg();
             if (iVar5 != 0) {
                 fn_801DA9E8(uVar4, 0x59, 4);
-                fn_80262490(iVar5);
+                fightMenuOpenTrainerMsg(iVar5);
                 while (1) {
                     cVar10 = fn_801DA94C(uVar4, 0x59, 4);
                     if (cVar10 == 0) break;
                     _threadSwitch();
                 }
                 fn_801EF8F4(saved_r27);
-                fn_8026246C();
+                fightMenuCloseMsg();
                 fn_801DA8C4(uVar4, 0x59, 4);
             }
-            fn_802624CC(0x7548);
-            fn_8026246C();
+            fightMenuOpenMsg(0x7548);
+            fightMenuCloseMsg();
         } else if ((1 < (u16)(sVar9 - 4U)) && ((sVar9 == 7 || (sVar9 == 6)))) {
-            fn_802624CC(0x7640);
+            fightMenuOpenMsg(0x7640);
             fn_801F000C(0x40);
-            fn_8026246C();
+            fightMenuCloseMsg();
         }
     }
     uVar1 = fn_801EF634();
@@ -735,7 +735,7 @@ u32 fightActionFlowAllFightTrainerSelectFightAction(void) {
     extern void* fn_801F47B4();
     extern u16 fn_801F54A4();
     extern void* fn_801F7258();
-    extern u8 fn_8026316C();
+    extern u8 fightMenuFightTrainerGcHeroOpenMenu();
     extern u32 _fightActionFlowFightTrainerSelectFightAction__FPvUsPv();
     u8 checkResult;
     u16 partyCount;
@@ -757,7 +757,7 @@ u32 fightActionFlowAllFightTrainerSelectFightAction(void) {
             for (j = 0; j < slotCount; j++) {
                 entry = fn_801F7258(slotData, j);
                 if (entry == NULL) { continue; }
-                if ((u8)fn_8026316C(entry, partyCount, checkResult) != 0) { continue; }
+                if ((u8)fightMenuFightTrainerGcHeroOpenMenu(entry, partyCount, checkResult) != 0) { continue; }
                 if (i == 0) { continue; }
                 i--;
                 break;
@@ -889,8 +889,8 @@ u32 fightActionFlowKaisiPre(void)
     extern u32 fn_801FB1C0();
     extern u32 fightEncountDataBiosGetSyoukaiWzxDataId();
     extern void* fightEncountDataBiosGetPtr();
-    extern void fn_8026246C();
-    extern void fn_80262490();
+    extern void fightMenuCloseMsg();
+    extern void fightMenuOpenTrainerMsg();
     extern u16 lbl_8047B5F8;
     extern f32 lbl_8047E520;
   u32 bVar1;
@@ -1014,11 +1014,11 @@ LAB_00209430:
         fadeSet((double)lbl_8047E520,2);
         bVar2 = 0;
       }
-      fn_80262490(iVar9);
+      fightMenuOpenTrainerMsg(iVar9);
       while (cVar14 = fn_801DA94C(uVar5,0x5f,4), cVar14 != 0) {
         _threadSwitch();
       }
-      fn_8026246C();
+      fightMenuCloseMsg();
     }
     iVar10 = fn_801F54A4(0,0,0x11,0);
     if (iVar10 != 0) {
@@ -1035,11 +1035,11 @@ LAB_00209430:
         fadeSet((double)lbl_8047E520,2);
         bVar2 = 0;
       }
-      fn_80262490(0x766d);
+      fightMenuOpenTrainerMsg(0x766d);
       while (cVar14 = fn_801DA94C(uVar5,uVar8 & 0xffff,4), cVar14 != 0) {
         _threadSwitch();
       }
-      fn_8026246C();
+      fightMenuCloseMsg();
     }
     if (bVar2) {
       fadeSet((double)lbl_8047E520,2);
@@ -1078,14 +1078,14 @@ LAB_00209430:
       fn_80132A38(0x22,uVar11);
       uVar3 = fn_801F8100(uVar3);
       fn_80132A38(0x23,uVar3);
-      fn_80262490(0x766d);
+      fightMenuOpenTrainerMsg(0x766d);
     }
     while (cVar14 = fn_801DA94C(uVar5,0x55,4), cVar14 != 0) {
       _threadSwitch();
     }
     cVar14 = fn_801F54A4(0,0,0x33,0);
     if (cVar14 == 1) {
-      fn_8026246C();
+      fightMenuCloseMsg();
     }
     fn_801EF7C4(1);
     fn_801DA9E8(uVar4,0x56,4);
@@ -1135,7 +1135,7 @@ u32 fightActionFlowKaisiNyuujouPokemon(void)
     extern void _fightActionFlowKaisiNyuujouPokemonSubAppearMsg__FP13FIGHT_TRAINERP15FightOutPokemonUsUsUsUsUc();
     extern u32 fightActionDataBiosGetBuff();
     extern u32 fightActionBiosGetFightActionDataPtr();
-    extern void fn_8026246C();
+    extern void fightMenuCloseMsg();
     extern void fn_8026532C();
     extern void fn_80265598();
     u32 saved_r26 = 0;
@@ -1282,7 +1282,7 @@ u32 fightActionFlowKaisiNyuujouPokemon(void)
       }
       uVar13 = uVar13 + 1;
     }
-    fn_8026246C();
+    fightMenuCloseMsg();
     uVar13 = 0;
     while (1) {
       if (uVar2 <= (uVar13 & 0xffff)) break;
@@ -1329,7 +1329,7 @@ void _fightActionFlowKaisiNyuujouPokemonSubAppearMsg__FP13FIGHT_TRAINERP15FightO
     extern int fn_801F8000();
     extern u32 fightOutPokemonIsGcHeroFightOutPokemon();
     extern u32 fightOutPokemonGetPokemonPtr();
-    extern void fn_802624CC();
+    extern void fightMenuOpenMsg();
   u32 uVar1;
   u32 uVar2;
   int iVar3;
@@ -1402,7 +1402,7 @@ void _fightActionFlowKaisiNyuujouPokemonSubAppearMsg__FP13FIGHT_TRAINERP15FightO
         uVar4 = 0x7670;
       }
     }
-    fn_802624CC(uVar4);
+    fightMenuOpenMsg(uVar4);
   }
   return;
 }

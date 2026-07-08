@@ -582,7 +582,7 @@ void fn_80211E18(u32 r3,u32 r4)
     extern void fn_80211B94();
     extern void fightMenuAllFightTrainerCloseStatusMenu();
     extern void fightMenuAllFightOutPokemonCloseStatusMenu();
-    extern void fn_8026246C();
+    extern void fightMenuCloseMsg();
     extern void fn_80265598();
     extern u8 lbl_80478D7D;
     extern u8 lbl_8047B614;
@@ -861,7 +861,7 @@ void fn_80211E18(u32 r3,u32 r4)
     fn_801DA7AC();
     fightMenuAllFightTrainerCloseStatusMenu(0);
     fightMenuAllFightOutPokemonCloseStatusMenu(0);
-    fn_8026246C();
+    fightMenuCloseMsg();
   }
   return;
 }

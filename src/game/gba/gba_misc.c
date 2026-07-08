@@ -929,7 +929,7 @@ void fn_80089F78(void) {
     extern void fightTypeDataBiosGetTrainerNum();
     extern void fightTypeDataBiosGetPtr();
     extern void fn_8022B2CC();
-    extern void fn_80265924();
+    extern void fightTimerCommandIsOver();
     extern void fn_8008A99C();
     u8 sp[0x8D0];
     u32 tmp = 0;
@@ -1553,7 +1553,7 @@ void fn_80089F78(void) {
         fn_801F1700();
         tmp = r3 & 0xFF;
         if (tmp == 1) {
-            fn_80265924();
+            fightTimerCommandIsOver();
             tmp = r3 & 0xFF;
             if (tmp == 1) {
                 r3 = r15;

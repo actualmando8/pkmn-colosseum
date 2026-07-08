@@ -3593,8 +3593,8 @@ void fn_802080A8(void)
     extern void fn_801DA9E8();
     extern void fn_801DDD28();
     extern u32 fn_801F54A4();
-    extern void fn_802624CC();
-    extern void fn_802653FC();
+    extern void fightMenuOpenMsg();
+    extern void fightMenuFightOutPokemonRenewStatusMenu();
     u32 saved_r25 = 0;
   u16 uVar4;
   int iVar1;
@@ -3635,9 +3635,9 @@ void fn_802080A8(void)
         uVar5 = (int)pokemonGetStatus(uVar2,0,0x6e,0);
         uVar5 = (int)pokemonGetStatus(0,uVar5,0x61,0);
         fn_80166A50(uVar5,0,0xff,0);
-        fn_802624CC(r6);
+        fightMenuOpenMsg(r6);
         if (r5 == 0) {
-          fn_802653FC(r3,uVar4,1);
+          fightMenuFightOutPokemonRenewStatusMenu(r3,uVar4,1);
         }
       }
       if (r5 == 1) {
@@ -3665,13 +3665,13 @@ void fn_802080A8(void)
           uVar5 = (int)pokemonGetStatus(uVar2,0,0x6e,0);
           uVar5 = (int)pokemonGetStatus(0,uVar5,0x61,0);
           fn_80166A50(uVar5,0,0xff,0);
-          fn_802624CC(r6);
+          fightMenuOpenMsg(r6);
         }
-        fn_802653FC(r3,uVar4,1);
+        fightMenuFightOutPokemonRenewStatusMenu(r3,uVar4,1);
       }
       if ((r4 == 0) && (r5 == 0)) {
         fn_801DA9E8(iVar1,0x57,4);
-        fn_802624CC(r6);
+        fightMenuOpenMsg(r6);
       }
     }
     else if (r7 == 2) {
@@ -3791,7 +3791,7 @@ void fightOutPokemonWazaEffect(u32 r3, u32 r4, u32 r5, u32 r6, int r7)
     extern u32 fn_801F54A4();
     extern void fn_801FE168();
     extern void fightWazaDoEffect();
-    extern int fn_802656AC();
+    extern int fightMenuGetFightOutPokemonPtrToStatusMenuId();
   int iVar1;
   u16 uVar2;
   u8 auStack_58 [44];
@@ -3801,7 +3801,7 @@ void fightOutPokemonWazaEffect(u32 r3, u32 r4, u32 r5, u32 r6, int r7)
   if (iVar1 != 0) {
     fn_801FE168(r3,auStack_58);
     if (r7 >= 0) {
-      r7 = fn_802656AC(r3,uVar2,1);
+      r7 = fightMenuGetFightOutPokemonPtrToStatusMenuId(r3,uVar2,1);
       menuOpenCustom(r7,0,0,0,0,1,auStack_58);
     }
     fightWazaDoEffect(iVar1,r4,r5,r6);

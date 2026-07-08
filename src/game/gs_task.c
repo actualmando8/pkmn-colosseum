@@ -1387,12 +1387,12 @@ extern void pokemonSetStatus(void* ptr, s32 a, s32 b, s32 c, s32 d);
 extern void fn_801DB100(void* ptr);
 extern void fn_801DA4E8(void* ptr, s32 a);
 extern void fightOutPokemonWriteJoutaiDataId(void* ptr, s32 a);
-extern void fn_802653FC(void* ptr, u16 a, s32 b);
+extern void fightMenuFightOutPokemonRenewStatusMenu(void* ptr, u16 a, s32 b);
 extern void pokemonSetSequenceStatus(void* a, u16 b);
 extern void* pokemonGetTokuseiDataId(void* ptr);
 extern void fightOutPokemonSetTokuseiDataId(void* ptr, void* a);
 extern void fightOutPokemonSetZokuseiDataId(void* ptr, u8 a, u16 b);
-extern void fn_80265754(void* ptr, u16 a);
+extern void fightMenuFightTrainerRenewStatusMenu(void* ptr, u16 a);
 #if 1
 #if 0
 asm s32 menuFightPokemonSelectSub(void) {
@@ -1468,7 +1468,7 @@ s32 menuFightPokemonSelectSub(u32 ctx) {
                 {
                     u16 newId;
                     newId = (u16)(u32)fn_801F54A4(0, 0, 0x14, 0);
-                    fn_802653FC(encounter, newId, 1);
+                    fightMenuFightOutPokemonRenewStatusMenu(encounter, newId, 1);
                 }
                 {
                     u16 eeItem;
@@ -1494,7 +1494,7 @@ s32 menuFightPokemonSelectSub(u32 ctx) {
         pokemonSetStatus((void*)ctx, 0, 0xd0, 0, 1);
     }
 
-    fn_80265754(archive, savedId);
+    fightMenuFightTrainerRenewStatusMenu(archive, savedId);
     return result;
 }
 #pragma peephole on
