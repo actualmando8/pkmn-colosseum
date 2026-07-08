@@ -1082,8 +1082,62 @@ game/gs_render_util.c:
 game/gs_gfx.c:
 	.text       start:0x800D3074 end:0x800D3E4C
 
-game/gs_render.c:
-	.text       start:0x800D3E4C end:0x800E202C
+game/gs_gfx_core.c:
+	.text       start:0x800D3E4C end:0x800D3FA4
+
+game/gs_gfx_range_800D3FA4.c:
+	.text       start:0x800D3FA4 end:0x800D6B00
+
+game/gs_gfx_layer_state.c:
+	.text       start:0x800D6B00 end:0x800D9AF0
+
+game/gs_gfx_range_800D9AF0.c:
+	.text       start:0x800D9AF0 end:0x800DA578
+
+game/gs_gfx_dl.c:
+	.text       start:0x800DA578 end:0x800DB098
+
+game/gs_gfx_range_800DB098.c:
+	.text       start:0x800DB098 end:0x800DC298
+
+game/gs_gfx_backfb.c:
+	.text       start:0x800DC298 end:0x800DC560
+
+game/gs_light.c:
+	.text       start:0x800DC560 end:0x800DD270
+
+game/gs_log.c:
+	.text       start:0x800DD270 end:0x800DF028
+
+game/gs_material.c:
+	.text       start:0x800DF028 end:0x800DFEEC
+
+game/gs_math_vec.c:
+	.text       start:0x800DFEEC end:0x800E0678
+
+game/gs_math_mtx44.c:
+	.text       start:0x800E0678 end:0x800E06B8
+
+game/gs_math_quat.c:
+	.text       start:0x800E06B8 end:0x800E0790
+
+game/gs_math_init.c:
+	.text       start:0x800E0790 end:0x800E07E4
+
+game/gs_math_bezier.c:
+	.text       start:0x800E07E4 end:0x800E090C
+
+game/gs_math_lerp.c:
+	.text       start:0x800E090C end:0x800E09E8
+
+game/gs_math_range_800E09E8.c:
+	.text       start:0x800E09E8 end:0x800E0D24
+
+game/gs_math_util.c:
+	.text       start:0x800E0D24 end:0x800E0DDC
+
+game/gs_range_800E0DDC.c:
+	.text       start:0x800E0DDC end:0x800E202C
 
 game/gs_mem.c:
 	.text       start:0x800E202C end:0x800E3604
