@@ -303,27 +303,27 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/dvd/DVDFs.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/dvd/DVDQueue.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/dvd/DVDError.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/dvd/DVDLowInitWA.c",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/dvd/DVDLowSetWAType.c",
                 progress_category="sdk",
             ),
@@ -438,7 +438,7 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/os/OSInterruptHandlers.c",
                 progress_category="sdk",
             ),
@@ -458,7 +458,7 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/os/OSReboot_fn_800A064C.c",
                 progress_category="sdk",
             ),

@@ -170,27 +170,6 @@ game/data/bss_803D6E40.c:
 game/data/bss_803F6E40.c:
 	.bss        start:0x803F6E40 end:0x803FB380
 
-game/data/bss_80402480.c:
-	.bss        start:0x80402480 end:0x80408400
-
-game/data/bss_80408400.c:
-	.bss        start:0x80408400 end:0x80448440
-
-game/data/bss_80448440.c:
-	.bss        start:0x80448440 end:0x80452500
-
-game/data/bss_80452500.c:
-	.bss        start:0x80452500 end:0x80465080
-
-game/data/bss_80465080.c:
-	.bss        start:0x80465080 end:0x8046A440
-
-game/data/bss_8046A440.c:
-	.bss        start:0x8046A440 end:0x8046D500
-
-game/data/bss_8046D500.c:
-	.bss        start:0x8046D500 end:0x80478800
-
 game/data/data_8027A500.c:
 	.data       start:0x8027A500 end:0x802E28EC
 
@@ -703,6 +682,7 @@ dolphin/sdk_range_8009BD84.c:
 
 dolphin/os/OSInterruptHandlers.c:
 	.text       start:0x8009DF88 end:0x8009DFB8
+	.sbss       start:0x8047A710 end:0x8047A714
 
 dolphin/os/OSInterrupt.c:
 	.text       start:0x8009DFB8 end:0x8009E7A8
@@ -733,6 +713,7 @@ dolphin/sdk_range_800A03B4.c:
 
 dolphin/os/OSReboot_fn_800A064C.c:
 	.text       start:0x800A064C end:0x800A06AC
+	.bss        start:0x803FB840 end:0x803FB894
 
 dolphin/os/OSReboot_WriteSram.c:
 	.text       start:0x800A06AC end:0x800A07C4
@@ -775,15 +756,18 @@ dolphin/sdk_range_800A2D38.c:
 
 dolphin/dvd/DVDLowInitWA.c:
 	.text       start:0x800A3EB0 end:0x800A3EF0
+	.bss        start:0x803FC290 end:0x803FC2CC
 
 dolphin/dvd/DVDLow.c:
 	.text       start:0x800A3EF0 end:0x800A4CAC
 
 dolphin/dvd/DVDLowSetWAType.c:
 	.text       start:0x800A4CAC end:0x800A4CF0
+	.sbss       start:0x8047A7A0 end:0x8047A7AC
 
 dolphin/dvd/DVDFs.c:
 	.text       start:0x800A4CF0 end:0x800A4D28
+	.sbss       start:0x8047A7C8 end:0x8047A7D8
 
 dolphin/dvd/dvdfs_range_800A4D28.c:
 	.text       start:0x800A4D28 end:0x800A5624
@@ -796,6 +780,28 @@ dolphin/sdk_range_800A7820.c:
 
 dolphin/dvd/DVDQueue.c:
 	.text       start:0x800A7F28 end:0x800A7F80
+	.bss        start:0x803FC3F8 end:0x803FC418
+
+game/data/bss_80402480.c:
+	.bss        start:0x80402480 end:0x80408400
+
+game/data/bss_80408400.c:
+	.bss        start:0x80408400 end:0x80448440
+
+game/data/bss_80448440.c:
+	.bss        start:0x80448440 end:0x80452500
+
+game/data/bss_80452500.c:
+	.bss        start:0x80452500 end:0x80465080
+
+game/data/bss_80465080.c:
+	.bss        start:0x80465080 end:0x8046A440
+
+game/data/bss_8046A440.c:
+	.bss        start:0x8046A440 end:0x8046D500
+
+game/data/bss_8046D500.c:
+	.bss        start:0x8046D500 end:0x80478800
 
 dolphin/dvd/DVDFsExtras.c:
 	.text       start:0x800A7F80 end:0x800A7FE0

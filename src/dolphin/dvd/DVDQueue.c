@@ -6,7 +6,7 @@ typedef struct DVDQueueNode {
     struct DVDQueueNode* prev;
 } DVDQueueNode;
 
-extern DVDQueueNode WaitingQueue[4];
+DVDQueueNode WaitingQueue_803FC3F8[4];
 
 BOOL __DVDCheckWaitingQueue(void) {
     BOOL enabled;
@@ -16,7 +16,7 @@ BOOL __DVDCheckWaitingQueue(void) {
     enabled = OSDisableInterrupts();
 
     for (i = 0; i < 4; i++) {
-        sentinel = &WaitingQueue[i];
+        sentinel = &WaitingQueue_803FC3F8[i];
 
         if (sentinel->next != sentinel) {
             OSRestoreInterrupts(enabled);

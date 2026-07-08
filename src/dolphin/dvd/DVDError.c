@@ -1,6 +1,6 @@
 #include "dolphin/dvd/dvd.h"
 
-extern u32 ErrorCode2Num(u32 error);
+extern u32 ErrorCode2Num_800A7FE0(u32 error);
 extern void* __OSLockSramEx(void);
 extern BOOL __OSUnlockSramEx(u32 offset);
 
@@ -16,7 +16,7 @@ void __DVDStoreErrorCode(u32 error) {
         code = 0xFE;
     } else {
         severity = error >> 24;
-        errNum = ErrorCode2Num(error & 0x00FFFFFF);
+        errNum = ErrorCode2Num_800A7FE0(error & 0x00FFFFFF);
 
         if (severity >= 6) {
             severity = 6;

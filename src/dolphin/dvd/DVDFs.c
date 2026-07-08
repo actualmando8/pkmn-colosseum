@@ -6,17 +6,17 @@ typedef struct DVDFstEntry {
     u32 nextOrLength;
 } DVDFstEntry;
 
-extern u32* BootInfo;
-extern DVDFstEntry* FstStart;
-extern char* FstStringStart;
-extern u32 MaxEntryNum;
+u32 MaxEntryNum;
+char* FstStringStart_8047A7D0;
+DVDFstEntry* FstStart_8047A7CC;
+u32* BootInfo;
 
 void __DVDFSInit(void) {
     BootInfo = (u32*)0x80000000;
-    FstStart = (DVDFstEntry*)BootInfo[0x38 / 4];
+    FstStart_8047A7CC = (DVDFstEntry*)BootInfo[0x38 / 4];
 
-    if (FstStart != NULL) {
-        MaxEntryNum = FstStart[0].nextOrLength;
-        FstStringStart = (char*)&FstStart[MaxEntryNum];
+    if (FstStart_8047A7CC != NULL) {
+        MaxEntryNum = FstStart_8047A7CC[0].nextOrLength;
+        FstStringStart_8047A7D0 = (char*)&FstStart_8047A7CC[MaxEntryNum];
     }
 }
