@@ -6,24 +6,24 @@
     "total_code": 2495108,
     "total_data": 2196124,
     "total_functions": 8603,
-    "total_units": 540
+    "total_units": 545
   },
   "topology_status": {
     "auto_units": 59,
-    "named_units": 481,
-    "source_backed_units": 461,
+    "named_units": 486,
+    "source_backed_units": 466,
     "auto_code": 0,
     "auto_data": 58535,
     "auto_functions": 0
   },
   "baseline_progress": {
-    "matched_code": "427620",
-    "matched_code_percent": 17.138336,
+    "matched_code": "427492",
+    "matched_code_percent": 17.133205,
     "matched_data": "2137589",
     "matched_data_percent": 97.334625,
     "matched_functions": 3984,
     "matched_functions_percent": 46.309425,
-    "fuzzy_match_percent": 32.751152
+    "fuzzy_match_percent": 32.764587
   },
   "unit_topology": [
     {
@@ -6982,17 +6982,82 @@
       "total_functions": 14
     },
     {
-      "name": "main/game/colosseum_event",
+      "name": "main/game/fight_out_pokemon",
       "sections": [
         {
           "name": ".text",
-          "size": 61936,
+          "size": 34336,
           "virtual_address": 2149591056
         }
       ],
-      "total_code": 61936,
+      "total_code": 34336,
       "total_data": 0,
-      "total_functions": 385
+      "total_functions": 163
+    },
+    {
+      "name": "main/game/fight_action",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 11064,
+          "virtual_address": 2149625392
+        }
+      ],
+      "total_code": 11064,
+      "total_data": 0,
+      "total_functions": 69
+    },
+    {
+      "name": "main/game/fight",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2944,
+          "virtual_address": 2149636456
+        }
+      ],
+      "total_code": 2944,
+      "total_data": 0,
+      "total_functions": 66
+    },
+    {
+      "name": "main/game/fight_trainer",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2356,
+          "virtual_address": 2149639400
+        }
+      ],
+      "total_code": 2356,
+      "total_data": 0,
+      "total_functions": 12
+    },
+    {
+      "name": "main/game/fight_waza",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 9044,
+          "virtual_address": 2149641756
+        }
+      ],
+      "total_code": 9044,
+      "total_data": 0,
+      "total_functions": 68
+    },
+    {
+      "name": "main/game/fight_seq",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2192,
+          "virtual_address": 2149650800
+        }
+      ],
+      "total_code": 2192,
+      "total_data": 0,
+      "total_functions": 7
     },
     {
       "name": "main/game/fight_range_80211A00",
