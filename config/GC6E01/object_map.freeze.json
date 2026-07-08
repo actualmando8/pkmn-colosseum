@@ -6,12 +6,12 @@
     "total_code": 2495108,
     "total_data": 2196124,
     "total_functions": 8603,
-    "total_units": 591
+    "total_units": 593
   },
   "topology_status": {
     "auto_units": 59,
-    "named_units": 532,
-    "source_backed_units": 512,
+    "named_units": 534,
+    "source_backed_units": 514,
     "auto_code": 0,
     "auto_data": 58535,
     "auto_functions": 0
@@ -7320,17 +7320,43 @@
       "total_functions": 200
     },
     {
-      "name": "main/game/trainer",
+      "name": "main/game/fight_trainer_range_801F7F80",
       "sections": [
         {
           "name": ".text",
-          "size": 38884,
+          "size": 15760,
           "virtual_address": 2149547904
         }
       ],
-      "total_code": 38884,
+      "total_code": 15760,
       "total_data": 0,
-      "total_functions": 388
+      "total_functions": 43
+    },
+    {
+      "name": "main/game/fight_trainer_db_range_801FBD10",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 7784,
+          "virtual_address": 2149563664
+        }
+      ],
+      "total_code": 7784,
+      "total_data": 0,
+      "total_functions": 317
+    },
+    {
+      "name": "main/game/fight_pokemon_range_801FDB78",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 15340,
+          "virtual_address": 2149571448
+        }
+      ],
+      "total_code": 15340,
+      "total_data": 0,
+      "total_functions": 28
     },
     {
       "name": "main/game/fight_range_80201764",

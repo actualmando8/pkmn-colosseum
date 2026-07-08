@@ -1517,8 +1517,14 @@ game/battle/battle_main.c:
 game/pokemon.c:
 	.text       start:0x801F000C end:0x801F7F80
 
-game/trainer.c:
-	.text       start:0x801F7F80 end:0x80201764
+game/fight_trainer_range_801F7F80.c:
+	.text       start:0x801F7F80 end:0x801FBD10
+
+game/fight_trainer_db_range_801FBD10.c:
+	.text       start:0x801FBD10 end:0x801FDB78
+
+game/fight_pokemon_range_801FDB78.c:
+	.text       start:0x801FDB78 end:0x80201764
 
 game/fight_range_80201764.c:
 	.text       start:0x80201764 end:0x80202810
