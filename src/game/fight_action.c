@@ -295,7 +295,7 @@ u32 fightActionFlowSyuuryou(void* ctx)
     extern u32 fn_800896B8();
     extern u32 fn_800896C0();
     extern void _threadSwitch();
-    extern void fn_80132A38();
+    extern void msgctrlSetValue();
     extern void fn_80165668();
     extern u32 battleCameraIsSimple();
     extern void fn_801DA8C4();
@@ -342,7 +342,7 @@ u32 fightActionFlowSyuuryou(void* ctx)
         if (iVar7 == 0) {
             iVar7 = 0;
         } else {
-            fn_80132A38(0x24, iVar7);
+            msgctrlSetValue(0x24, iVar7);
             iVar7 = 0x7531;
         }
     } else {
@@ -355,10 +355,10 @@ u32 fightActionFlowSyuuryou(void* ctx)
             }
         }
     }
-    fn_80132A38(0x22, fn_801F8000(uVar2));
-    fn_80132A38(0x23, fightTrainerGetNamePtr(uVar2));
-    fn_80132A38(0x13, fightTrainerGetNamePtr(uVar1));
-    fn_80132A38(0x25, fightTrainerGetNamePtr(uVar2));
+    msgctrlSetValue(0x22, fn_801F8000(uVar2));
+    msgctrlSetValue(0x23, fightTrainerGetNamePtr(uVar2));
+    msgctrlSetValue(0x13, fightTrainerGetNamePtr(uVar1));
+    msgctrlSetValue(0x25, fightTrainerGetNamePtr(uVar2));
     cVar10 = fn_801F54A4(0, 0, 0x33, 0);
     if (cVar10 == 1) {
         if (sVar9 == 2) {
@@ -367,7 +367,7 @@ u32 fightActionFlowSyuuryou(void* ctx)
                 saved_r27 = battleCameraIsSimple();
             }
             fn_80165668(0x3f5, 0, 0xff);
-            fn_80132A38(0x5d, 0);
+            msgctrlSetValue(0x5d, 0);
             fightMenuOpenMsg(0x766c);
             fightMenuCloseMsg();
             if (iVar7 != 0) {
@@ -871,7 +871,7 @@ u32 fightActionFlowKaisiPre(void)
 {
     extern void _threadSwitch();
     extern void menuGetKeyInfo();
-    extern void fn_80132A38();
+    extern void msgctrlSetValue();
     extern void fn_80165A20();
     extern s8 fadeCheck();
     extern void fadeSet();
@@ -1027,9 +1027,9 @@ LAB_00209430:
     cVar14 = fn_801F54A4(0,0,0x33,0);
     if (cVar14 == 1) {
       uVar4 = fn_801F8000(uVar3);
-      fn_80132A38(0x22,uVar4);
+      msgctrlSetValue(0x22,uVar4);
       uVar3 = fightTrainerGetNamePtr(uVar3);
-      fn_80132A38(0x23,uVar3);
+      msgctrlSetValue(0x23,uVar3);
       fn_801DA9E8(uVar5,uVar8 & 0xffff,4);
       if (bVar2) {
         fadeSet((double)lbl_8047E520,2);
@@ -1075,9 +1075,9 @@ LAB_00209430:
     cVar14 = fn_801F54A4(0,0,0x33,0);
     if (cVar14 == 1) {
       uVar11 = fn_801F8000(uVar3);
-      fn_80132A38(0x22,uVar11);
+      msgctrlSetValue(0x22,uVar11);
       uVar3 = fightTrainerGetNamePtr(uVar3);
-      fn_80132A38(0x23,uVar3);
+      msgctrlSetValue(0x23,uVar3);
       fightMenuOpenTrainerMsg(0x766d);
     }
     while (cVar14 = fn_801DA94C(uVar5,0x55,4), cVar14 != 0) {
@@ -1109,7 +1109,7 @@ u32 fightActionFlowKaisiNyuujouPokemon(void)
 {
     extern void fn_8010AE2C();
     extern u32 pokemonCreateSequence();
-    extern void fn_80132A38();
+    extern void msgctrlSetValue();
     extern void battleGridUpdate();
     extern void battleGridAddPokemon();
     extern u32 fn_801F02AC();
@@ -1249,11 +1249,11 @@ u32 fightActionFlowKaisiNyuujouPokemon(void)
         battleGridUpdate();
         fightTrainerBallThrowEffect(iVar7,saved_r26,1);
         uVar6 = fn_801F8000(iVar7);
-        fn_80132A38(0x22,uVar6);
+        msgctrlSetValue(0x22,uVar6);
         uVar6 = fightTrainerGetNamePtr(iVar7);
-        fn_80132A38(0x23,uVar6);
+        msgctrlSetValue(0x23,uVar6);
         uVar6 = fightTrainerGetNamePtr(iVar7);
-        fn_80132A38(0x25,uVar6);
+        msgctrlSetValue(0x25,uVar6);
         _fightActionFlowKaisiNyuujouPokemonSubAppearMsg__FP13FIGHT_TRAINERP15FightOutPokemonUsUsUsUsUc(iVar7,saved_r26,uVar11,uVar12,uVar13,uVar14,1);
         fightTrainerBallThrowEffect(iVar7,saved_r26,2);
         uVar14 = 0;
@@ -1324,7 +1324,7 @@ void _fightActionFlowKaisiNyuujouPokemonSubAppearMsg__FP13FIGHT_TRAINERP15FightO
     short r8;
     char r9;
 
-    extern void fn_80132A38();
+    extern void msgctrlSetValue();
     extern u32 fn_801F18DC();
     extern int fn_801F8000();
     extern u32 fightOutPokemonIsGcHeroFightOutPokemon();
@@ -1350,31 +1350,31 @@ void _fightActionFlowKaisiNyuujouPokemonSubAppearMsg__FP13FIGHT_TRAINERP15FightO
   if (r9 == 0) {
     if ((uVar2 & 0xff) == 1) {
       if (r8 == 0) {
-        fn_80132A38(0x14,uVar4);
-        fn_80132A38(0x16,uVar4);
+        msgctrlSetValue(0x14,uVar4);
+        msgctrlSetValue(0x16,uVar4);
       }
       else {
-        fn_80132A38(0x15,uVar4);
-        fn_80132A38(0x17,uVar4);
+        msgctrlSetValue(0x15,uVar4);
+        msgctrlSetValue(0x17,uVar4);
       }
     }
     else if ((uVar1 & 0xff) == 1) {
       if (r8 == 0) {
-        fn_80132A38(0x15,uVar4);
-        fn_80132A38(0x17,uVar4);
+        msgctrlSetValue(0x15,uVar4);
+        msgctrlSetValue(0x17,uVar4);
       }
       else {
-        fn_80132A38(0x14,uVar4);
-        fn_80132A38(0x16,uVar4);
+        msgctrlSetValue(0x14,uVar4);
+        msgctrlSetValue(0x16,uVar4);
       }
     }
     else if (r8 == 0) {
-      fn_80132A38(0x14,uVar4);
-      fn_80132A38(0x16,uVar4);
+      msgctrlSetValue(0x14,uVar4);
+      msgctrlSetValue(0x16,uVar4);
     }
     else {
-      fn_80132A38(0x15,uVar4);
-      fn_80132A38(0x17,uVar4);
+      msgctrlSetValue(0x15,uVar4);
+      msgctrlSetValue(0x17,uVar4);
     }
   }
   else if (r9 == 1) {
@@ -1390,8 +1390,8 @@ void _fightActionFlowKaisiNyuujouPokemonSubAppearMsg__FP13FIGHT_TRAINERP15FightO
       }
     }
     else {
-      fn_80132A38(0x14,uVar4);
-      fn_80132A38(0x16,uVar4);
+      msgctrlSetValue(0x14,uVar4);
+      msgctrlSetValue(0x16,uVar4);
       if ((uVar2 & 0xff) == 1) {
         uVar4 = 0x7673;
       }

@@ -168,7 +168,7 @@
  *     menuItemBiosGetPtr / menuDataBiosGetPtr -- linked-list/menu accessors
  *     fn_800D3088 / fn_800D37CC -- frame timing (returns u32/s32 ticks)
  *     fn_800E0CA0 / GSlerpGetLinearInterpolationVector -- vec3 transform helpers
- *     fn_800FA280 / fn_80132A38 -- message/window callbacks
+ *     fn_800FA280 / msgctrlSetValue -- message/window callbacks
  *     winMsgOpen / winMsgClose -- text print + wait
  *     fn_801902E0 -- config flag check (returns u8)
  *     fn_80165A20 / soundStop -- audio sequence control
@@ -380,7 +380,7 @@ void fn_80024698(void) { }
 
 /* 0x8002469C | 0x30 */
 extern void* fn_800FA280(u32);
-extern void fn_80132A38(s32, void*);
+extern void msgctrlSetValue(s32, void*);
 #if 0
 asm void fn_8002469C(void) {
 #include "src/game/gs_title_fn_8002469C.inc"
@@ -389,7 +389,7 @@ asm void fn_8002469C(void) {
 #pragma optimization_level 4
 #pragma scheduling off
 void fn_8002469C(void) {
-    fn_80132A38(0x37, fn_800FA280(0x3cdf));
+    msgctrlSetValue(0x37, fn_800FA280(0x3cdf));
 }
 #endif
 
@@ -402,7 +402,7 @@ asm void fn_800246CC(void) {
 #pragma optimization_level 4
 #pragma scheduling off
 void fn_800246CC(void) {
-    fn_80132A38(0x37, fn_800FA280(0x3ce4));
+    msgctrlSetValue(0x37, fn_800FA280(0x3ce4));
 }
 #endif
 
@@ -420,7 +420,7 @@ void fn_800246CC(void) {
  *       uses lbl_8047A36C as target index; alpha = lbl_8047B8DC * ((b-t)/b)
  *   default (lbl_8047A370 != 1):
  *       uses lbl_8047A368; alpha = 0xFF (fully opaque)
- * After matching, writes alpha to arg1[0x67] and invokes fn_80132A38(0x37,..)
+ * After matching, writes alpha to arg1[0x67] and invokes msgctrlSetValue(0x37,..)
  * with a value pulled from lbl_80478DE4 indexed by lbl_802E4F58[table_index].
  *
  * The three inner blocks are deliberate duplicates (not a helper) -- matches
@@ -467,7 +467,7 @@ void fn_800246FC(u8* arg0, u8* arg1) {
     extern u8* menuDataBiosGetPtr(u32);
     extern u32 fn_801902E0(void*);
     extern void* fn_800FA280(u32);
-    extern void fn_80132A38(s32, void*);
+    extern void msgctrlSetValue(s32, void*);
     u8* node;
     u8* found;
     u32 slot;
@@ -584,7 +584,7 @@ void fn_800246FC(u8* arg0, u8* arg1) {
                 if ((u32)table_index > 9) {
                     table_index = 0;
                 }
-                fn_80132A38(
+                msgctrlSetValue(
                     0x37,
                     fn_800FA280(
                         *(u32*)(lbl_80478DE4 + slot_offset + (((u32)lbl_802E4F58[table_index]) << 2) + 4)
@@ -597,7 +597,7 @@ void fn_800246FC(u8* arg0, u8* arg1) {
         slot++;
     }
 
-    fn_80132A38(0x37, fn_800FA280(1));
+    msgctrlSetValue(0x37, fn_800FA280(1));
 }
 #pragma pop
 #endif
@@ -2886,9 +2886,9 @@ void fn_800216E8(void* arg0, s32 arg1, u8* arg2, s16 arg3, s32 arg4) {
         }
     }
 
-    fn_80132A38(0x32, (void*)fn_8011F4F0(arg4));
-    fn_80132A38(0x2F, (void*)(s32)x);
-    fn_80132A38(0x30, (void*)(s32)y);
+    msgctrlSetValue(0x32, (void*)fn_8011F4F0(arg4));
+    msgctrlSetValue(0x2F, (void*)(s32)x);
+    msgctrlSetValue(0x30, (void*)(s32)y);
     fn_800F96E4(arg0, arg1 + 1, (void*)msg);
 }
 #endif
@@ -3159,11 +3159,11 @@ s32 fn_80022478(u32 arg0, u32* arg1) {
                     fn_8001D378();
                 }
                 ((void(*)(void*, s32, u8*, s16, s32))fn_800216E8)(name_buf, 0x40, (u8*)sd, effect, sc);
-                fn_80132A38(0x4D, name_buf);
+                msgctrlSetValue(0x4D, name_buf);
                 winMsgOpen(2, 0xE0, 1, 0);
                 winMsgClose(1);
             } else {
-                fn_80132A38(0x32, (void*)fn_8011F4F0(sc));
+                msgctrlSetValue(0x32, (void*)fn_8011F4F0(sc));
                 winMsgOpen(2, 0x424D, 1, 0);
                 winMsgClose(1);
                 effect = 0;
@@ -3310,7 +3310,7 @@ s32 fn_80022834(u32 arg0, u32* arg1) {
     } else {
         msg = 0x4265;
     }
-    fn_80132A38(0x39, (void*)value16);
+    msgctrlSetValue(0x39, (void*)value16);
     winMsgOpen(2, msg, 1, 0);
     winMsgClose(1);
     winMsgOpen(2, 0x426B, 1, 0);
@@ -3341,16 +3341,16 @@ s32 fn_80022834(u32 arg0, u32* arg1) {
                 }
             }
             if (i < 4) {
-                fn_80132A38(0x32, fn_8011F4F0(c));
-                fn_80132A38(0x39, (void*)(u16)v2);
+                msgctrlSetValue(0x32, fn_8011F4F0(c));
+                msgctrlSetValue(0x39, (void*)(u16)v2);
                 winMsgOpen(2, 0x4244, 1, 0);
                 winMsgClose(1);
                 tmp = 0;
             } else {
                 fn_8011F5C8(c);
                 if (fn_8011E2AC(fn_8011E778(), status) == 0) {
-                    fn_80132A38(0x32, fn_8011F4F0(c));
-                    fn_80132A38(0x39, (void*)(u16)v2);
+                    msgctrlSetValue(0x32, fn_8011F4F0(c));
+                    msgctrlSetValue(0x39, (void*)(u16)v2);
                     winMsgOpen(2, 0x423F, 1, 0);
                     winMsgClose(1);
                     tmp = 0;
@@ -3456,8 +3456,8 @@ s32 fn_80022B3C(s32 arg0, s32 arg1) {
     
     /* Play particle sound effects */
     fn_8011F4F0(spC);
-    fn_80132A38(0x32, (void*)result);
-    fn_80132A38(0x2D, (void*)temp_r30);
+    msgctrlSetValue(0x32, (void*)result);
+    msgctrlSetValue(0x2D, (void*)temp_r30);
     
     result = *(s32*)((u8*)(&sp10) + temp_r29 * 0xC);
     winMsgOpen(2, result, 1, 0);
@@ -3676,7 +3676,7 @@ s32 fn_80023068(u32 arg0, u32* arg1) {
 
     if (slot >= 0) {
         if (((s8)blocked & 0xFF) != 0) {
-            fn_80132A38(0x32, (void*)fn_8011F4F0(sc));
+            msgctrlSetValue(0x32, (void*)fn_8011F4F0(sc));
             winMsgOpen(2, 0x424D, 1, 0);
             winMsgClose(1);
             effect = 0;
@@ -3706,7 +3706,7 @@ s32 fn_80023068(u32 arg0, u32* arg1) {
             { extern void fn_800216E8(void*, s32, void*, s32, s32);
               fn_800216E8(name_buf, 0x40, text_buf, effect, sc);
             }
-            fn_80132A38(0x4D, name_buf);
+            msgctrlSetValue(0x4D, name_buf);
             winMsgOpen(2, 0xE0, 1, 0);
             winMsgClose(1);
         }
@@ -3815,7 +3815,7 @@ s32 fn_80023760(u32 arg0, u32* arg1) {
                         fn_80166A50(species, 0, 0xFF, 0);
                         fn_8001D378();
                         fn_800216E8(buf, 0x40, (u8*)sd, effect, sc);
-                        fn_80132A38(0x4D, buf);
+                        msgctrlSetValue(0x4D, buf);
                         winMsgOpen(2, 0xE0, 1, 0);
                         winMsgClose(1);
                         total = (u16)(total + effect);
@@ -3905,12 +3905,12 @@ s32 fn_80023B9C(u32 arg0, u32* arg1) {
                 fn_8001D378();
             }
             fn_800216E8(name_buf, 0x40, text_buf, effect, sc);
-            fn_80132A38(0x4D, name_buf);
+            msgctrlSetValue(0x4D, name_buf);
             winMsgOpen(2, 0xE0, 1, 0);
             winMsgClose(1);
         } else {
             msg = fn_8011F4F0(sc);
-            fn_80132A38(0x32, msg);
+            msgctrlSetValue(0x32, msg);
             winMsgOpen(2, 0x424D, 1, 0);
             winMsgClose(1);
             effect = 0;

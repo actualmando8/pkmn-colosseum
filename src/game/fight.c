@@ -144,7 +144,7 @@ u32 fn_8020DAD0(u32 p1) {
     extern void fn_801140C8();
     extern void heroDecPokedoru();
     extern u32 heroGetStatus();
-    extern void fn_80132A38();
+    extern void msgctrlSetValue();
     extern void scriptSoundStop();
     extern void fn_80165A20();
     extern void fn_80166AB8();
@@ -218,7 +218,7 @@ u32 fn_8020DAD0(u32 p1) {
                 if ((sVar8 != 0) && (sVar8 = charNameBiosGetHearFlag(), sVar8 != 0)) {
                     fn_80190528();
                 }
-                fn_80132A38(0x59, uVar2);
+                msgctrlSetValue(0x59, uVar2);
             }
         }
         fn_80165A20(1, 1000, 0xff);

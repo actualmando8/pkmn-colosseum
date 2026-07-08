@@ -109,7 +109,7 @@ extern u8 heroMoveInitEvent[];
 extern u8 heroMoveMain[];
 extern u8 heroMoveSetNeckMode[];
 extern u8 heroMoveInit[];
-extern u8 fn_80132A38[];
+extern u8 msgctrlSetValue[];
 extern u8 fn_801653C4[];
 extern u8 fn_80165668[];
 extern u8 fn_801656F8[];
@@ -94192,7 +94192,7 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)fn_80181EB0),
     (void*)0x01010100,
     (void*)0x00000000,
-    (void*)((u8*)fn_80132A38),
+    (void*)((u8*)msgctrlSetValue),
     (void*)0x01010000,
     (void*)0x00000000,
     (void*)((u8*)scriptAddPokedoru),

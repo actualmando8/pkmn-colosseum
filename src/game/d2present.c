@@ -184,11 +184,11 @@ void fn_80265F94(int r3)
   }
   winMsgCloseField(1);
   if (r3 == 1) {
-    fn_80132A38(0x5d,0x3d2);
+    msgctrlSetValue(0x5d,0x3d2);
     uVar5 = 0x44bb;
   }
   else if ((r3 < 1) && (-1 < r3)) {
-    fn_80132A38(0x5d,0x3d2);
+    msgctrlSetValue(0x5d,0x3d2);
     uVar5 = 0x44bc;
   }
   else {

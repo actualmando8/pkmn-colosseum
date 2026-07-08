@@ -591,7 +591,7 @@ s32 fn_80026860(void* r3, u8* r4)
 #endif
 
 /* fn_800268F0 - 0x800268F0 | size: 0x254 */
-extern void fn_80132A38(s32, void*);
+extern void msgctrlSetValue(s32, void*);
 extern u32 GSmsgGetRect(u32);
 extern void fn_800FB680(s32, s32, s32, u32);
 extern s32 GSmsgGetLength(void*);
@@ -613,7 +613,7 @@ asm void fn_800268F0(void) {
  *   1. Look up state-entry word[1] for the current index in lbl_80266DD8.
  *      If it != 7 → clear r4[0x67] and return.
  *   2. Walk the u16 item list at ctx->0x18, emitting each icon with
- *      fn_80132A38 + fn_800FB680.
+ *      msgctrlSetValue + fn_800FB680.
  *   3. If fewer items were drawn than the entry capacity AND r3[0x98]==0:
  *      look up a "next" item through lbl_80266E18[row][col].item_list,
  *      validate it, optionally draw a special computed-X icon.
@@ -626,7 +626,7 @@ s32 fn_800268F0(void* r3, u8* r4)
     extern f32 lbl_8047B934;     /* map center X (float) */
     extern f32 lbl_8047B938;     /* map X scale (float) */
 
-    extern void fn_80132A38(s32 cmd, void* buf);
+    extern void msgctrlSetValue(s32 cmd, void* buf);
     extern u32  GSmsgGetRect(u32 id);
     extern void fn_800FB680(s32 x, s32 y, s32 palette, u32 cmd);
     extern s32  GSmsgGetLength(void* handle);
@@ -671,7 +671,7 @@ s32 fn_800268F0(void* r3, u8* r4)
 
         buf[0] = item_id;
         buf[1] = 0;
-        fn_80132A38(0x37, buf);
+        msgctrlSetValue(0x37, buf);
 
         /* compute X offset: signed upper-16 of GSmsgGetRect(0xce), floor-div */
         raw_x = GSmsgGetRect(0xce);
@@ -764,7 +764,7 @@ s32 fn_800268F0(void* r3, u8* r4)
 
             draw_buf[0] = (u16)handle;                      /* sth r23, sp+8  */
             draw_buf[1] = 0;                                 /* sth r0, sp+0xa */
-            fn_80132A38(0x37, draw_buf);
+            msgctrlSetValue(0x37, draw_buf);
 
             /* X offset computation (same arithmetic as Phase 1) */
             raw_x2 = GSmsgGetRect(0xce);
@@ -815,7 +815,7 @@ s32 fn_80026B44(void *r3, u8 *r4)
     extern f32 lbl_8047B934;     /* float constant: animation reference value        */
     extern f32 lbl_8047B938;     /* float constant: animation scale                  */
 
-    extern void   fn_80132A38(s32 cmd, void *buf); /* set glyph draw param */
+    extern void   msgctrlSetValue(s32 cmd, void *buf); /* set glyph draw param */
     extern u32    GSmsgGetRect(u32 pool);            /* query pool metrics   */
     extern void   fn_800FB680(s32 x, s32 y, s32 color, u32 glyph_id); /* draw glyph */
     extern s32    GSmsgGetLength(void *tbl);           /* get entry count      */
@@ -867,7 +867,7 @@ s32 fn_80026B44(void *r3, u8 *r4)
 
         buf[0] = glyph_id;
         buf[1] = 0;
-        fn_80132A38(0x37, buf);
+        msgctrlSetValue(0x37, buf);
 
         /* measured width: upper 16 bits of GSmsgGetRect return, sign-extended */
         measured = (s32)(s16)(u16)((u32)GSmsgGetRect(0xce) >> 16);
@@ -969,7 +969,7 @@ s32 fn_80026B44(void *r3, u8 *r4)
 
                 buf[0] = (u16)special;
                 buf[1] = 0;
-                fn_80132A38(0x37, buf);
+                msgctrlSetValue(0x37, buf);
 
                 measured = (s32)(s16)(u16)((u32)GSmsgGetRect(0xce) >> 16);
                 {
@@ -1019,7 +1019,7 @@ s32 fn_80026D98(void* r3, u8* r4)
     extern u8  lbl_80266E18[];          /* species-colour table; each row 0x18 bytes */
     extern f32 lbl_8047B934;            /* float const: base animation phase    */
     extern f32 lbl_8047B938;            /* float const: animation scale factor  */
-    extern void  fn_80132A38(s32 cmd, void* buf);
+    extern void  msgctrlSetValue(s32 cmd, void* buf);
     extern u32   GSmsgGetRect(u32 id);
     extern void  fn_800FB680(s32 x, s32 y, s32 color, u32 id);
     extern s32   GSmsgGetLength(void* ptr);
@@ -1085,7 +1085,7 @@ loop_body:
     text_buf[0] = r6;
     text_buf[1] = 0;
 
-    fn_80132A38(0x37, r28);
+    msgctrlSetValue(0x37, r28);
 
     /* get half-width of the glyph: upper s16 of GSmsgGetRect(0xce) */
     r0 = (s32)(s16)(u16)( GSmsgGetRect(0xce) >> 16 );
@@ -1225,7 +1225,7 @@ after_species:
         text_buf[0] = (u16)(r23 & 0xFFFF);  /* sth r23, 0x8(r1) — only low 16 written */
         text_buf[1] = 0;                      /* sth r0=0, 0xa(r1)                      */
 
-        fn_80132A38(0x37, r28);
+        msgctrlSetValue(0x37, r28);
 
         /* half-width centering */
         r0 = (s32)(s16)(u16)(GSmsgGetRect(0xce) >> 16);
@@ -1892,7 +1892,7 @@ s32 fn_800275F4(void* r3) {
         goto inner_check;
         while (r6 != 0) {
             r26[0] = r6; r26[1] = 0;
-            fn_80132A38(0x37, r26);
+            msgctrlSetValue(0x37, r26);
             r0 = (s32)(s16)(u16)((u32)GSmsgGetRect(0xce) >> 16);
             r0 = (0x1b - r0);
             r0 = (r0 + (s32)((u32)r0 >> 31)) >> 1;
@@ -1967,7 +1967,7 @@ s32 fn_800278A4(void* r3) {
         } else {
             r4 = 1;
         }
-        fn_80132A38(0x4e, (void*)(u32)(u16)r4);
+        msgctrlSetValue(0x4e, (void*)(u32)(u16)r4);
     }
     entry = (u32*)(lbl_80266DD8 + (*(s32*)r31 << 4));
     fn_800FB680(0, 0, (s32)r29[0x8b] | (s32)(-0x100), entry[0]);
@@ -2619,7 +2619,7 @@ s32 inputName__FPUsPUsiii(u16 *existing_name, u8 *name_buf_in, void *arg2, void 
     extern u32  windowGetActiveID(void);                     /* get current scene handle         */
     extern void menuOpenCustom(s32 sceneId, u32 handle, s32 a, s32 b, s32 c, s32 d, ...); /* open GS scene with descriptor */
     extern void fn_80166A28(u32 arg);                  /* audio/effect trigger             */
-    extern void fn_80132A38(s32 effect, void *param);  /* UI effect dispatcher             */
+    extern void msgctrlSetValue(s32 effect, void *param);  /* UI effect dispatcher             */
     extern void winMsgOpen(s32 slot, s32 msgId, s32 p3, s32 p4); /* open dialog message */
     extern s8 menuSubOpenYesNo(s32 max, s32 a, s32 b, s32 initial); /* blocking yes/no picker */
     extern void winMsgClose(s32 slot);                 /* close dialog slot               */
@@ -2766,7 +2766,7 @@ s32 inputName__FPUsPUsiii(u16 *existing_name, u8 *name_buf_in, void *arg2, void 
          * Show the "Are you sure?" dialog (message 0x2ef6).
          * ------------------------------------------------------------- */
         fn_80166A28(0x440);
-        fn_80132A38(0x4d, name_to_use);
+        msgctrlSetValue(0x4d, name_to_use);
         winMsgOpen(2, 0x2ef6, 1, 0);
         yn_result = menuSubOpenYesNo(0, -1, -1, 0);
         winMsgClose(1);
@@ -2835,7 +2835,7 @@ s32 fn_80028444(void* r3, u8* r4) {
     ctx = *(void**)((u8*)r3 + 0x60);
     sub = *(void**)ctx;
     p = *(void**)((u8*)sub + 0x8);
-    fn_80132A38(0x37, fn_800FA280((u32)p));
+    msgctrlSetValue(0x37, fn_800FA280((u32)p));
     *(u32*)(r31 + 0x4c) = 0xcf;
     return 0;
 }
@@ -2858,7 +2858,7 @@ s32 fn_80028494(void* r3, u8* r4) {
     ctx = *(void**)((u8*)r3 + 0x60);
     sub = *(void**)ctx;
     p = *(void**)((u8*)sub + 0x4);
-    fn_80132A38(0x37, fn_800FA280((u32)p));
+    msgctrlSetValue(0x37, fn_800FA280((u32)p));
     *(u32*)(r31 + 0x4c) = 0xcf;
     return 0;
 }
@@ -2881,7 +2881,7 @@ s32 fn_800284E4(void* r3, u8* r4) {
     ctx = *(void**)((u8*)r3 + 0x60);
     sub = *(void**)ctx;
     p = *(void**)sub;
-    fn_80132A38(0x37, fn_800FA280((u32)p));
+    msgctrlSetValue(0x37, fn_800FA280((u32)p));
     *(u32*)(r31 + 0x4c) = 0xcf;
     return 0;
 }
@@ -3265,7 +3265,7 @@ s32 fn_80028948(void* r3)
 
 /* fn_80028FBC - 0x80028FBC | size: 0x59c */
 extern void fn_8011F4F0(void);
-extern void fn_80134A98(void);
+extern void pcboxGetPokemonBoxName(void);
 extern void menuItemBiosGetPtr(void);
 extern void menuModelInit(void);
 extern void fn_8010A010(void);
@@ -3330,7 +3330,7 @@ void fn_80028FBC(void) {
     extern u32  heroGetStatus(u8* ptr, u32 selector, u32 idx);
     extern u32  pokemonCheckValid(void);                         /* returns u8 status         */
     extern u32  fn_8011F4F0(u32 a);
-    extern u32  fn_80134A98(s32 a, s32 b);
+    extern u32  pcboxGetPokemonBoxName(s32 a, s32 b);
     extern void GScharCpy(void* dst, u8* src);           /* copy/build name struct    */
     extern void* menuItemBiosGetPtr(s32 id);                      /* returns struct ptr        */
     extern void menuModelInit(void* handle, s16 a, s16 b);
@@ -3346,7 +3346,7 @@ void fn_80028FBC(void) {
     extern u32  windowGetActiveID(void);                         /* returns context handle    */
     extern s32  menuOpenCustom(s32 id, u32 ctx, s32 a, s32 b, s32 c, s32 d, void* arg);
     extern u32  fn_80166A28(s32 size);
-    extern void fn_80132A38(s32 id, u32 name);
+    extern void msgctrlSetValue(s32 id, u32 name);
     extern void winMsgOpen(s32 a, s32 b, s32 c, s32 d);
     extern s32  menuSubOpenYesNo(s32 a, s32 b, s32 c, s32 d);
     extern void winMsgClose(s32 a);
@@ -3407,7 +3407,7 @@ void fn_80028FBC(void) {
         }
         break;
     case 3:
-        sel = fn_80134A98(0, (s32)(s8)subIndex);
+        sel = pcboxGetPokemonBoxName(0, (s32)(s8)subIndex);
         break;
     default:
         sel = 0;
@@ -3510,7 +3510,7 @@ void fn_80028FBC(void) {
                             u32 choiceName = (u32)fn_800FA280((u32)listPtr[pick - 1]);
                             s32 ans;
                             fn_80166A28(0x440);
-                            fn_80132A38(0x4d, choiceName);
+                            msgctrlSetValue(0x4d, choiceName);
                             winMsgOpen(2, 0x2ef6, 1, 0);
                             ans = (s32)(s8)menuSubOpenYesNo(0, -1, -1, 0);
                             winMsgClose(1);
@@ -4069,7 +4069,7 @@ u32 fn_80029FAC(u8* r3, s32 r4, s32 r5, s32 r6, ...) {
             r30 = 0;
         } else {
             r30 = 1;
-            fn_80132A38(r29, (void*)r6);
+            msgctrlSetValue(r29, (void*)r6);
         }
         r6 = *(s32*)__va_arg(list, 1);
     }
@@ -4118,7 +4118,7 @@ u32 fn_8002A0B8(u8* r3, s32 r4, s32 r5, s32 r6, ...) {
             r30 = 0;
         } else {
             r30 = 1;
-            fn_80132A38(r29, (void*)r6);
+            msgctrlSetValue(r29, (void*)r6);
         }
         r6 = *(s32*)__va_arg(list, 1);
     }
@@ -4164,7 +4164,7 @@ void fn_8002A1C4(u8* r3, s32 r4, s32 r5, ...) {
             r30 = 0;
         } else {
             r30 = 1;
-            fn_80132A38(r29, (void*)r5);
+            msgctrlSetValue(r29, (void*)r5);
         }
         r5 = *(s32*)__va_arg(list, 1);
     }
@@ -4211,7 +4211,7 @@ void fn_8002A2CC(u8* r3, s32 r4, s32 r5, ...) {
             r30 = 0;
         } else {
             r30 = 1;
-            fn_80132A38(r29, (void*)r5);
+            msgctrlSetValue(r29, (void*)r5);
         }
         r5 = *(s32*)__va_arg(list, 1);
     }
@@ -4252,7 +4252,7 @@ s32 fn_8002A400(void* r3, u8* r4) {
     u32 ret;
     r30 = r4;
     r31 = *(void**)((u8*)r3 + 0x60);
-    fn_80132A38(0x50, (void*)(*(s32*)((u8*)r31 + 0x8) * *(s32*)(*(u32*)((u8*)r31 + 0xc))));
+    msgctrlSetValue(0x50, (void*)(*(s32*)((u8*)r31 + 0x8) * *(s32*)(*(u32*)((u8*)r31 + 0xc))));
     if (*(s32*)((u8*)r31 + 0x14) != 0) {
         id = 0x153;
     } else {
@@ -4314,7 +4314,7 @@ s32 fn_8002A48C(void* r3, u8* r4) {
     r4v = r4v / r8;
     r0 = r4v / 10 * 10;
     r4v = r4v - r0;
-    fn_80132A38(0x34, (void*)r4v);
+    msgctrlSetValue(0x34, (void*)r4v);
     fn_800FB8C8(0, 0, *(s16*)(r31 + 0x54), *(s16*)(r31 + 0x56), -1, 0xc9);
     return 0;
 }
@@ -4501,7 +4501,7 @@ s32 fn_8002ACB8(void* r3, u8* r4) {
     }
 
     if (ctx[0x1C] == 0 || ctx[0x1C] == 1) {
-        fn_80132A38(0x50, heroGetStatus(0, 0xC, 0));
+        msgctrlSetValue(0x50, heroGetStatus(0, 0xC, 0));
         text_id = 0x151;
         x = (s32)*(s16*)(r4 + 0x54) - (s32)(s16)(GSmsgGetRect(text_id) >> 16);
         fn_800FB680(x, 0, -1, text_id);
@@ -4534,7 +4534,7 @@ s32 fn_8002ACB8(void* r3, u8* r4) {
         break;
     }
 
-    fn_80132A38(0x50, (void*)value);
+    msgctrlSetValue(0x50, (void*)value);
     text_id = 0x153;
     x = (s32)*(s16*)(r4 + 0x54) - (s32)(s16)(GSmsgGetRect(text_id) >> 16);
     fn_800FB680(x + 6, 0, -1, text_id);
@@ -4654,8 +4654,8 @@ s32 fn_8002AEF8(void* r3, u8* r4) {
             r27 += 4;
         }
     }
-    fn_80132A38(0x2d, (void*)(u32)(u16)r30);
-    fn_80132A38(0x34, (void*)r29);
+    msgctrlSetValue(0x2d, (void*)(u32)(u16)r30);
+    msgctrlSetValue(0x34, (void*)r29);
     fn_800FB680(0, 0, -1, 0x2b2f);
     return 0;
 }
@@ -4793,7 +4793,7 @@ void menuShopDrawListText(void* arg0, u8* arg1)
     extern void fn_800FE35C(void);
     extern f32  lbl_8047B980;
 
-    extern void fn_80132A38(s32, void*);
+    extern void msgctrlSetValue(s32, void*);
     extern u32  GSmsgGetRect(u32);
     extern void fn_800FB680(s32, s32, s32, u32);
     extern void itemDataBiosGetPtr(u32);
@@ -4857,7 +4857,7 @@ void menuShopDrawListText(void* arg0, u8* arg1)
     scroll_px = 0;                         /* r22: scroll pixel offset */
 
     /* ---- format-print arg: max possible value (0x270f = 9999) ---- */
-    fn_80132A38(0x50, (void*)0x270f);
+    msgctrlSetValue(0x50, (void*)0x270f);
 
     /* ---- measure two reference strings to compute the text x-centre ---- */
     w_0xdb  = (s32)(GSmsgGetRect(0xdb)  >> 16);
@@ -4926,7 +4926,7 @@ void menuShopDrawListText(void* arg0, u8* arg1)
                     itemDataBiosGetPtr(slot_id);
                     {
                         u32 val = itemDataBiosGetPrice();
-                        fn_80132A38(0x50, (void*)(u32)(u16)val);
+                        msgctrlSetValue(0x50, (void*)(u32)(u16)val);
                     }
                     {
                         s32 tw = (s32)(GSmsgGetRect(0xdb) >> 16);
@@ -4938,7 +4938,7 @@ void menuShopDrawListText(void* arg0, u8* arg1)
                     itemDataBiosGetPtr(slot_id);
                     {
                         u32 val = itemDataBiosGetCoupon();
-                        fn_80132A38(0x50, (void*)(u32)(u16)val);
+                        msgctrlSetValue(0x50, (void*)(u32)(u16)val);
                     }
                     {
                         s32 tw = (s32)(GSmsgGetRect(0x153) >> 16);
@@ -8303,7 +8303,7 @@ void fn_8002EA5C(void)
     extern u8   itemDataBiosCheckImportable(void);                             /* gate result          */
     extern void fn_801021F8(u32 id, u32 flag);                 /* list show/hide       */
     extern s32  fn_8011F4F0(u32 ref);                          /* get species          */
-    extern void fn_80132A38(u32 prop, u32 value);              /* set display property */
+    extern void msgctrlSetValue(u32 prop, u32 value);              /* set display property */
     extern u8*  windowSearchID(s32 key);                          /* find list/window     */
     extern u8*  windowSearchItemID(u8* head, s32 key);                /* find child element   */
     extern void winSpriteSetDisp(u8* elem, u32 flag);              /* set element flag      */
@@ -8345,7 +8345,7 @@ void fn_8002EA5C(void)
     if ((u8)available == 0) {
         /* ---- blocked: map not selectable ---------------------------- */
         fn_801021F8(0xD9, 0);
-        fn_80132A38(0x32, (u32)fn_8011F4F0((u32)mapRef));
+        msgctrlSetValue(0x32, (u32)fn_8011F4F0((u32)mapRef));
 
         window  = windowSearchID(0xD9);
         element = windowSearchItemID(window, 0x10B2);
@@ -8406,7 +8406,7 @@ void fn_8002EA5C(void)
     if ((u8)found == 0) {
         /* ---- no eligible member: timeout (marker 0x44E8) ------------ */
         fn_801021F8(0xD9, 0);
-        fn_80132A38(0x32, (u32)fn_8011F4F0((u32)mapRef));
+        msgctrlSetValue(0x32, (u32)fn_8011F4F0((u32)mapRef));
 
         window  = windowSearchID(0xD9);
         element = windowSearchItemID(window, 0x10B2);
@@ -9173,7 +9173,7 @@ void fn_8002F79C(void) {
     extern u8   itemDataBiosGetPtr(u16 handle);                  /* effect/UI helper */
     extern u8   itemDataBiosCheckExportable(void);                        /* arrival-ready query */
     extern s32  fn_8011F4F0(s32 pokemon);                 /* get species/id */
-    extern void fn_80132A38(s32 msgType, s32 species);    /* show message */
+    extern void msgctrlSetValue(s32 msgType, s32 species);    /* show message */
     extern void* windowSearchID(s32 key);                    /* lookup effect object */
     extern void* windowSearchItemID(void* obj, s32 sub);         /* sub-object lookup */
     extern void winSpriteSetDisp(void* elem, u32 flag);        /* activate effect element */
@@ -9225,7 +9225,7 @@ void fn_8002F79C(void) {
     if (ready == 0) {
         /* ---- (A) party not ready: abort cue + delay, redo this step ---- */
         species = fn_8011F4F0((s32)interact);
-        fn_80132A38(0x32, species);
+        msgctrlSetValue(0x32, species);
 
         effRoot = windowSearchID(0xD9);
         effElem = windowSearchItemID(effRoot, 0x10B2);
@@ -9261,7 +9261,7 @@ void fn_8002F79C(void) {
         fn_801021F8(0xD9, 0);
 
         species = fn_8011F4F0((s32)interact);
-        fn_80132A38(0x32, species);
+        msgctrlSetValue(0x32, species);
 
         effRoot = windowSearchID(0xD9);
         effElem = windowSearchItemID(effRoot, 0x10B2);
@@ -9323,7 +9323,7 @@ void fn_8002F79C(void) {
         fn_801021F8(0xD9, 0);
 
         species = fn_8011F4F0((s32)interact);
-        fn_80132A38(0x32, species);
+        msgctrlSetValue(0x32, species);
 
         effRoot = windowSearchID(0xD9);
         effElem = windowSearchItemID(effRoot, 0x10B2);

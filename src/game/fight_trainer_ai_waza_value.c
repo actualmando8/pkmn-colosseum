@@ -365,7 +365,7 @@ int fightTrainerAiWazaValueKuroikiri(void* ctx, u32 param1, u32 param2, u32 para
  * ========================================================================= */
 /* TODO: Decompile fightTrainerAiWazaValueHimitunotikara (4228 bytes) */
 void fightTrainerAiWazaValueHimitunotikara(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_80136468();
+    extern void tikeiDataBiosGetFightKoukaId();
     extern void fn_801F1990();
     extern void fn_801F1A6C();
     extern void fn_801F54A4();
@@ -419,7 +419,7 @@ void fightTrainerAiWazaValueHimitunotikara(void* ctx, u32 param1, u32 param2, u3
     r6 = 0x0;
     fn_801F54A4();
     r3 = r3 & 0xFFFF;
-    fn_80136468();
+    tikeiDataBiosGetFightKoukaId();
     r0 = r3 & 0xFF;
     if (r0 > (u32)0x1b) { r3 = r24; return; }
     r3 = (u32)jumptable_8039A5D8;
@@ -4867,12 +4867,12 @@ u32 fightTrainerAiWazaValueUezaabooru(void* ctx, u32 param1, u32 param2, u32 par
 
 /* Address: 0x80245F48 | Size: 0x7C | Pattern: field_accessor */
 u32 fightTrainerAiWazaValueSizennotikara(void* ctx, u32 slot, u32 param, u32 extra) {
-    extern u16 fn_801363E8(u16);
+    extern u16 tikeiDataBiosGetWazaId(u16);
     extern u32 fn_801F54A4(u32, u32, u32, u32);
     extern u32 fn_8023CA9C(void*, u32, u16, u32);
     u16 value;
 
-    value = fn_801363E8((u16)fn_801F54A4(0, 0, 0xf, 0));
+    value = tikeiDataBiosGetWazaId((u16)fn_801F54A4(0, 0, 0xf, 0));
     if (value != (u16)param) {
         return fn_8023CA9C(ctx, slot, value, extra);
     }

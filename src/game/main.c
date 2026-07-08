@@ -181,9 +181,9 @@ extern void* fn_800F9544(u32 a, u32 b, u32 c, u32 d); /* GSthread alloc work are
 
 extern u32  fn_80128E24(void);    /* SoundSystemIsReady */
 extern void* fn_80128E04(void);   /* SoundSystemGetContext */
-extern void* fn_80135CD0(void);   /* SoundGetMixer */
-extern void fn_80135B5C(void* mixer, f64 volume); /* SoundSetMasterVolume */
-extern f32  fn_80135C10(void* mixer);  /* SoundGetMasterVolume */
+extern void* gamedatasaveBiosGetPtr(void);   /* SoundGetMixer */
+extern void gamedatasaveBiosSetPlaytime(void* mixer, f64 volume); /* SoundSetMasterVolume */
+extern f32  gamedatasaveBiosGetPlaytime(void* mixer);  /* SoundGetMasterVolume */
 
 extern u32  fn_80128E2C(void);     /* RNG get seed */
 extern void fn_80128E14(u32 seed); /* RNG set seed */
@@ -478,13 +478,13 @@ void fn_800056EC(f64 volume) {
 
     /* Check if sound system is ready */
     if (fn_80128E24() != 0 && fn_80128E04() != 0) {
-        mixer = fn_80135CD0();
+        mixer = gamedatasaveBiosGetPtr();
     } else {
         mixer = NULL;
     }
 
     if (mixer != NULL) {
-        fn_80135B5C(mixer, volume);
+        gamedatasaveBiosSetPlaytime(mixer, volume);
     }
 }
 
@@ -501,13 +501,13 @@ f32 fn_80005748(void) {
     f32 volume;
 
     if (fn_80128E24() != 0 && fn_80128E04() != 0) {
-        mixer = fn_80135CD0();
+        mixer = gamedatasaveBiosGetPtr();
     } else {
         mixer = NULL;
     }
 
     if (mixer != NULL) {
-        volume = fn_80135C10(mixer);
+        volume = gamedatasaveBiosGetPlaytime(mixer);
     } else {
         volume = lbl_8047B6A0; /* 0.0f */
     }
@@ -765,12 +765,12 @@ void fn_80005AAC(void) {
 
     /* If sound system is ready, reset master volume to 0.0 */
     if (fn_80128E24() != 0 && fn_80128E04() != 0) {
-        mixer = fn_80135CD0();
+        mixer = gamedatasaveBiosGetPtr();
     } else {
         mixer = NULL;
     }
     if (mixer != NULL) {
-        fn_80135B5C(mixer, (f64)lbl_8047B6A0); /* 0.0f */
+        gamedatasaveBiosSetPlaytime(mixer, (f64)lbl_8047B6A0); /* 0.0f */
     }
 
     /* Reset rumble flag */
@@ -993,18 +993,18 @@ void fn_80005E00(void) {
     GSmsgDaemon();
 
     if (fn_80128E24() != 0 && fn_80128E04() != 0) {
-        mixer = fn_80135CD0();
+        mixer = gamedatasaveBiosGetPtr();
     } else {
         mixer = NULL;
     }
 
     if (mixer != NULL && lbl_80478DC8 == 1 && fn_801906A0(0x8AE) == 0) {
-        vol = fn_80135C10(mixer);
+        vol = gamedatasaveBiosGetPlaytime(mixer);
         v = vol + (f32)fn_800D3088() / (f32)fn_800D37CC();
         if (v >= lbl_8047B6A4) {
             v = lbl_8047B6A4;
         }
-        fn_80135B5C(mixer, v);
+        gamedatasaveBiosSetPlaytime(mixer, v);
     }
 }
 #pragma pop

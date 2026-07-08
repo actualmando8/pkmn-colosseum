@@ -88,7 +88,7 @@ extern u32  heroBiosGetRnd(void*);
 extern u8*  heroBiosGetNamePtr(void*);
 extern void heroBiosCopy();
 extern void heroMoveSyncWithHero();
-extern void fn_80132A38();
+extern void msgctrlSetValue();
 extern void gamedatasaveGetStatus();
 extern void fn_80166A28();
 extern void fn_8019075C();
@@ -1217,7 +1217,7 @@ void menuColosseumBattleMain(void) {
                     }
                     break;
                 default:
-                    fn_80132A38(0x2F, e);
+                    msgctrlSetValue(0x2F, e);
                     winMsgOpen(2, 0x44B8, 1, 0);
                     break;
                 }
@@ -1254,7 +1254,7 @@ void menuColosseumBattleMain(void) {
                     }
                     break;
                 default:
-                    fn_80132A38(0x2F, e);
+                    msgctrlSetValue(0x2F, e);
                     winMsgOpen(2, 0x44B8, 1, 0);
                     break;
                 }
@@ -1320,7 +1320,7 @@ void menuColosseumBattleMain(void) {
                     }
                     break;
                 default:
-                    fn_80132A38(0x2F, e);
+                    msgctrlSetValue(0x2F, e);
                     winMsgOpen(2, 0x44B8, 1, 0);
                     break;
                 }

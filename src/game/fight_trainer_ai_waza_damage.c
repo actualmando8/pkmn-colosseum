@@ -649,14 +649,14 @@ u32 fightTrainerAiWazaDamage182(void* ctx, u32 param1, u32 param2, u32 param3) {
 /* Address: 0x802512A4 | Size: 0xAC */
 u32 fightTrainerAiWazaDamage173(void* ctx, u32 slot, u32 param, u32 extra) {
     extern u32 wazaGetStatus(u32, u32, u32, u32);
-    extern u32 fn_801363E8(u32);
+    extern u32 tikeiDataBiosGetWazaId(u32);
     extern u32 fn_801F54A4(u32, u32, u32, u32);
     extern u32 fn_8023C370(void*, u32, u32, u32, u32);
     u32 paramType;
     u32 other;
     u32 otherType;
 
-    other = fn_801363E8(fn_801F54A4(0, 0, 0xf, 0) & 0xFFFF);
+    other = tikeiDataBiosGetWazaId(fn_801F54A4(0, 0, 0xf, 0) & 0xFFFF);
     paramType = wazaGetStatus(0, param, 9, 0) & 0xFFFF;
     param = other;
     otherType = wazaGetStatus(0, param, 9, 0) & 0xFFFF;

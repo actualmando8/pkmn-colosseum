@@ -1,0 +1,955 @@
+/**
+ * @file dbgMenu.c
+ * @brief Decompiled functions.
+ *
+ * Address range: 0x80132C6C - 0x8013433C
+ *
+ * Split out of the former game/effect/effect_util.c CodeCandidate
+ * bucket (0x8013151C - 0x80137114); see effect_util_types.h for
+ * shared cross-TU declarations.
+ */
+
+#include "dolphin/types.h"
+#include "game/effect/effect_util_types.h"
+
+
+/* 0x80132C6C | 0x310 */
+#if 0
+asm void fn_80132C6C(void) {
+#include "src/game/effect/effect_util_fn_80132C6C.inc"
+}
+#else
+void fn_80132C6C(u32 count, u32 maxPerSlot, u32 arg2, u32 arg3) {
+    extern u32 lbl_8047AEB0;
+    extern u32 lbl_8047AEB4;
+    extern u16 lbl_8047AEB8;
+    extern u32 lbl_8047AEBC;
+    extern u32 lbl_8047AEC0;
+    extern u16 lbl_8047AEC4;
+    extern u32 lbl_8047AEC8;
+    extern u32 lbl_8047AECC;
+    u32 total;
+    u32 i;
+    u32 ofs;
+    u8* e;
+
+    if (count == 0 || maxPerSlot == 0) return;
+
+    lbl_8047AEB4 = count;
+    lbl_8047AEC0 = maxPerSlot;
+    lbl_8047AECC = arg3;
+    lbl_8047AEC8 = arg2;
+
+    lbl_8047AEB8 = (u16)_toolentryAlloc__FUl(count * 0x18);
+    if (lbl_8047AEB8 == 0) return;
+    lbl_8047AEB0 = fn_800E27B0(lbl_8047AEB8);
+
+    i = 0; ofs = 0;
+    while (i < lbl_8047AEB4) {
+        e = (u8*)lbl_8047AEB0 + ofs;
+        i++; ofs += 0x18;
+        *(u32*)(e + 0x00) = 0;
+        *(u32*)(e + 0x04) = 0;
+        *(u32*)(e + 0x08) = 0;
+        *(u32*)(e + 0x0C) = 0;
+        *(u32*)(e + 0x10) = 0;
+        *(u8*)(e + 0x14) = 0;
+        *(u8*)(e + 0x15) = 0;
+    }
+
+    total = lbl_8047AEB4 * lbl_8047AEC0;
+    lbl_8047AEC4 = (u16)_toolentryAlloc__FUl(total << 5);
+    if (lbl_8047AEC4 == 0) return;
+    lbl_8047AEBC = fn_800E27B0(lbl_8047AEC4);
+    if (total == 0) return;
+
+    i = 0; ofs = 0;
+    while (i < total) {
+        e = (u8*)lbl_8047AEBC + ofs;
+        i++; ofs += 0x20;
+        *(u32*)(e + 0x00) = -1;
+        *(u16*)(e + 0x04) = 0;
+        *(u16*)(e + 0x06) = 0;
+        *(u32*)(e + 0x08) = 0;
+        *(u32*)(e + 0x0C) = 0;
+        *(u32*)(e + 0x10) = -1;
+        *(u8*)(e + 0x14) = 0;
+        *(u32*)(e + 0x18) = 0;
+        *(u32*)(e + 0x1C) = 0;
+    }
+}
+#endif
+
+#if 0
+asm void fn_80132F7C(void) {
+#include "src/game/effect/effect_util_fn_80132F7C.inc"
+}
+#else
+#pragma optimization_level 4
+#pragma scheduling on
+u32 fn_80132F7C(void) {
+    if (menuIsCheck(0xab) & 0xFF) {
+        menuClose(0xab);
+    } else {
+        menuOpenCustom(0xab, 0, 0, 0, 0, 0);
+    }
+    return 0;
+}
+#pragma scheduling off
+#endif
+
+#if 0
+asm void dbgMenuMovieTest(void) {
+#include "src/game/effect/effect_util_fn_80132FD8.inc"
+}
+#else
+#pragma scheduling on
+u32 dbgMenuMovieTest(void) {
+    u8 buf[0x18];
+    s32 id;
+    while ((u32)(fn_801E1874() & 0xFF) == 1) {
+        fn_801E1810();
+        _threadSwitch();
+    }
+    id = menuOpen(2, 1);
+    if (id != -1) {
+        sprintf(buf, lbl_80272AA8, lbl_8047D0E8, id);
+        fn_801E189C(buf, 0);
+    }
+    return 0;
+}
+#pragma scheduling off
+#endif
+
+
+/* 0x80133050 | 0x3C -- fn_800D37D4(3, 2, 0, 2, 0, 0), return 0 */
+u32 fn_80133050(void) {
+    fn_800D37D4(3, 2, 0, 2, 0, 0);
+    return 0;
+}
+
+
+/* 0x8013308C | 0x3C -- fn_800D37D4(2, 2, 0, 2, 0, 0), return 0 */
+u32 fn_8013308C(void) {
+    fn_800D37D4(2, 2, 0, 2, 0, 0);
+    return 0;
+}
+
+
+/* 0x801330C8 | 0x150 */
+#if 0
+asm void fn_801330C8(void) {
+#include "src/game/effect/effect_util_fn_801330C8.inc"
+}
+#else
+u32 fn_801330C8(void) {
+    fn_800D88DC(1);
+    fn_800D888C(6);
+    fn_800D9B58(lbl_8047D0F0, lbl_8047D0F0, lbl_8047D0F4, lbl_8047D0F8);
+    fn_800DA4C4(0, 6, 7);
+    fn_800DA2BC(1, 1, 0);
+    fn_800DA1E8(0, 1, 1);
+    fn_800DA028(0);
+    fn_800D6A00(4);
+    fn_800D7820(0);
+    fn_800D67BC(3);
+    fn_800D6680(lbl_8047D0FC, -*(f32*)lbl_80478AC0, lbl_8047D0F0);
+    fn_800D5CB8(0, 0xFF, 0x80, 0x40, 0);
+    fn_800D6680(*(f32*)lbl_80478AC4, lbl_8047D100, lbl_8047D0F0);
+    fn_800D5CB8(0, 0x40, 0xFF, 0, 0);
+    fn_800D6680(lbl_8047D104, *(f32*)lbl_80478AC4, lbl_8047D0F0);
+    fn_800D5CB8(0, 0, 0x40, 0xFF, 0);
+    fn_800D6680(lbl_8047D0FC, -*(f32*)lbl_80478AC0, lbl_8047D0F0);
+    fn_800D5CB8(0, 0xFF, 0x80, 0x40, 0);
+    fn_800D6728();
+    return 0;
+}
+#endif
+
+
+/* 0x80133218 | 0x38 -- fn_800E1544() then print result, return 0 */
+u32 dbgMenuGSmemOptimize(void) {
+    u32 val = fn_800E1544();
+    GSlogWrite(lbl_80272AB8, val);
+    return 0;
+}
+
+
+/* 0x80133250 | 0x2C -- fn_800E0E14(1, 1), return 0 */
+u32 dbgMenuGSmemDispMap(void) {
+    fn_800E0E14(1, 1);
+    return 0;
+}
+
+#if 0
+asm void dbgMenuGSmemCheck(void) {
+#include "src/game/effect/effect_util_fn_8013327C.inc"
+}
+#else
+#pragma optimization_level 4
+#pragma scheduling on
+u32 dbgMenuGSmemCheck(void) {
+    if ((u32)(fn_800E0E14(1, 0) & 0xFF) == 1) {
+        GSlogWrite(lbl_80272AE0);
+    } else {
+        GSlogWrite(lbl_80272AF0);
+    }
+    return 0;
+}
+#pragma scheduling off
+#endif
+
+
+/* 0x5C | dbgMenuGSmemCheck -- fn_800E0E14(1,0) check then print */
+/* 0x801332D8 | 0x28 -- fn_800D3074(2), return 0 */
+u32 dbgMenuFrameRate20(void) {
+    fn_800D3074(2);
+    return 0;
+}
+
+
+/* 0x80133300 | 0x28 -- fn_800D3074(1), return 0 */
+u32 dbgMenuFrameRate30(void) {
+    fn_800D3074(1);
+    return 0;
+}
+
+
+/* 0x80133328 | 36 bytes | call_return_const2 */
+u32 dbgMenuSendAllMail(void) {
+    mailMainSendAllMail();
+    return 0;
+}
+
+#if 0
+asm void dbgMenuSendMail(void) {
+#include "src/game/effect/effect_util_dbgMenuSendMail.inc"
+}
+#else
+#pragma optimization_level 4
+#pragma scheduling on
+u32 dbgMenuSendMail(void) {
+    extern s32 menuOpen(u32, u32);
+    extern s32 mailChkReceiveMail(s32);
+    extern void mailAddMailbox(s32);
+    s32 slot;
+    while ((slot = menuOpen(2, 1)) != -1) {
+        if (mailChkReceiveMail(slot) == 0) {
+            mailAddMailbox(slot);
+            mailMainReceiveStart();
+        }
+    }
+    return 0;
+}
+#pragma scheduling off
+#endif
+
+
+/* 0x801333AC | 0xA4 */
+#if 0
+asm void dbgMenuColisionDisp(void) {
+#include "src/game/effect/effect_util_dbgMenuColisionDisp.inc"
+}
+#else
+#pragma optimization_level 4
+u32 dbgMenuColisionDisp(s32 arg) {
+    extern void* GSresGetResource(u32, u32);
+    u8* ptr;
+    ptr = (u8*)GSresGetResource(0, 2);
+    if (ptr == 0) return 0;
+    switch (arg) {
+    case 0xb8:
+        if (ptr[0] != 0) {
+            ptr[0] = 0;
+        } else {
+            ptr[0] = 1;
+        }
+        break;
+    case 0xb9:
+        if (ptr[1] != 0) {
+            ptr[1] = 0;
+        } else {
+            ptr[1] = 1;
+        }
+        break;
+    }
+    return 0;
+}
+#endif
+
+
+/* 0x58 | debugMenuColorBarDisp | call_sequence */
+#if 0
+asm void debugMenuColorBarDisp(void) {
+#include "src/game/effect/effect_util_fn_80133450.inc"
+}
+#else
+u32 debugMenuColorBarDisp(void) {
+    *(u8*)&lbl_80478820 = 0;
+    menuOpenCustom(5, 0, 0, 0, 1, 0);
+    menuClose(5);
+    *(u8*)&lbl_80478820 = 1;
+    return 0;
+}
+#endif
+
+
+/* 0x801334A8 | 0x34 -- toggle lbl_8047AED9 (cntlzw/extrwi), call GSmodelSetShadowDebug */
+u32 debugMenuShadowBorderDisp(void) {
+    u32 clz = __cntlzw(lbl_8047AED9);
+    u8 val = (u8)((clz >> 5) & 0xFF);
+    lbl_8047AED9 = val;
+    GSmodelSetShadowDebug(val);
+    return 0;
+}
+
+
+/* 0x801334DC | 0x34 -- toggle lbl_8047AED8 (cntlzw/extrwi), call fn_800D4610 */
+u32 fn_801334DC(void) {
+    u32 clz = __cntlzw(lbl_8047AED8);
+    u8 val = (u8)((clz >> 5) & 0xFF);
+    lbl_8047AED8 = val;
+    fn_800D4610(val);
+    return 0;
+}
+
+#if 0
+asm void debugMenuNodrawArea(void) {
+#include "src/game/effect/effect_util_fn_80133510.inc"
+}
+#else
+#pragma optimization_level 4
+#pragma scheduling on
+u32 debugMenuNodrawArea(void) {
+    if (menuIsCheck(0x7) & 0xFF) {
+        menuClose(0x7);
+    } else {
+        menuOpenCustom(0x7, 0, 0, 0, 0, 0);
+    }
+    return 0;
+}
+#pragma scheduling off
+#endif
+
+#if 0
+asm void fn_8013356C(void) {
+#include "src/game/effect/effect_util_fn_8013356C.inc"
+}
+#else
+#pragma optimization_level 4
+#pragma scheduling on
+u32 fn_8013356C(u32 arg1, s32 arg2) {
+    extern u32 heroMoveIsMember(s32);
+    extern void heroMoveDismissMember(s32);
+    extern void fn_8012F1FC(s32);
+    s32 r31 = (arg2 == 0) ? 1 : -1;
+    if (r31 >= 0) {
+        if (heroMoveIsMember(r31) & 0xFF) {
+            heroMoveDismissMember(r31);
+        } else {
+            fn_8012F1FC(r31);
+        }
+    }
+    return 0;
+}
+#pragma scheduling off
+#endif
+
+#if 0
+asm void debugMenuChangeMemInfo(void) {
+#include "src/game/effect/effect_util_fn_801335D4.inc"
+}
+#else
+#pragma optimization_level 4
+#pragma scheduling on
+u32 debugMenuChangeMemInfo(void) {
+    if (menuIsCheck(0x4) & 0xFF) {
+        menuClose(0x4);
+    } else {
+        menuOpenCustom(0x4, 0, 0, 0, 0, 0);
+    }
+    return 0;
+}
+#pragma scheduling off
+#endif
+
+
+/* 0x80133630 | 0x34 -- toggle lbl_8047AED4 (cntlzw>>5), call fn_80101B88 */
+u32 fn_80133630(void) {
+    u32 clz = __cntlzw(lbl_8047AED4);
+    lbl_8047AED4 = clz >> 5;
+    fn_80101B88(clz >> 5);
+    return 0;
+}
+
+
+/* 0x80133664 | 0x13C */
+#if 0
+asm void dbgMenuCursor(void) {
+#include "src/game/effect/effect_util_dbgMenuCursor.inc"
+}
+#else
+void dbgMenuCursor(void* obj) {
+    u8 pair[2];
+    s32 entryCount;
+    s32 maxCount;
+    u16 flags;
+    s8 major;
+    s8 minor;
+
+    flags = *(u16*)((u8*)windowGetKeyInfo() + 0x6);
+    entryCount = (s8)_dbgMenuGetMenuNum__FP14tagWINDOW_WORKPl((u32)obj, NULL);
+    maxCount = (s8)menuDataBiosGetType(*(u32*)((u8*)obj + 0x04));
+    if (entryCount < maxCount) {
+        maxCount = entryCount;
+    }
+
+    *(u16*)pair = *(u16*)((u8*)obj + 0x94);
+    if (flags & 1) {
+        pair[1]--;
+    } else if (flags & 2) {
+        pair[1]++;
+    }
+
+    major = (s8)pair[0];
+    minor = (s8)pair[1];
+    if (minor < 0) {
+        pair[1] = 0;
+        pair[0] = (u8)(major + minor);
+        if ((s8)pair[0] < 0) {
+            pair[1] = (u8)((s8)maxCount - 1);
+            pair[0] = (u8)(entryCount - (s8)maxCount);
+        }
+    } else if (minor >= (s8)maxCount) {
+        pair[1] = (u8)((s8)maxCount - 1);
+        pair[0] = (u8)(major + (minor - ((s8)maxCount - 1)));
+        if (((s8)pair[0] + (s8)pair[1]) >= entryCount) {
+            pair[0] = 0;
+            pair[1] = 0;
+        }
+    }
+
+    *(u16*)((u8*)obj + 0x94) = *(u16*)pair;
+}
+#endif
+
+
+/* 0x801337A0 | 0x8 | sda_getter */
+u8 dbgMenuGetEnable(void) { return lbl_8047AED0; }
+
+
+/* 0x801337A8 | 0x8 | sda_setter */
+void dbgMenuSetEnable(u8 val) { lbl_8047AED0 = val; }
+
+
+/* 0x801337B0 | 0x34 -- check menuIsCheck(lbl_80478848) != 0, return 0 or 1 */
+u32 dbgMenuIsOpen(void) {
+    u8 result = menuIsCheck(lbl_80478848);
+    return (result != 0) ? 1 : 0;
+}
+
+
+/* 0x801337E4 | 0x2C -- set lbl_8047AED1 = 0, call menuClose(lbl_80478848) */
+#if 0
+asm void dbgMenuClose(void) {
+#include "src/game/effect/effect_util_dbgMenuClose.inc"
+}
+#else
+void dbgMenuClose(void) {
+    lbl_8047AED1 = 0;
+    menuClose(lbl_80478848);
+}
+#endif
+
+
+/* 0x80133810 | 0x94 */
+#if 0
+asm void dbgMenuMain(void) {
+#include "src/game/effect/effect_util_dbgMenuMain.inc"
+}
+#else
+#pragma push
+#pragma peephole off
+void dbgMenuMain(u8 flag) {
+    extern s32 _dbgMenuSub__Fl(u32);
+    u32 (*fp)(void);
+    u32 result;
+    fp = (u32 (*)(void))lbl_80478F88;
+    if (fp == NULL) {
+        result = 0;
+    } else {
+        result = fp();
+    }
+    if (result == 0) {
+        return;
+    }
+    if (lbl_8047AED0 == 0) {
+        return;
+    }
+    if (menuIsCheck(lbl_80478848)) {
+        return;
+    }
+    lbl_8047AED1 = flag;
+    do {
+        if (_dbgMenuSub__Fl(0) < 0) {
+            return;
+        }
+    } while (lbl_8047AED1 == 1);
+}
+#pragma pop
+#endif
+
+
+/* 0x801338A4 | 0x2AC */
+#if 0
+asm void _dbgMenuSub__Fl(void) {
+#include "src/game/effect/effect_util__dbgMenuSub__Fl.inc"
+}
+#else
+s32 _dbgMenuSub__Fl(s32 offset) {
+    s32 prevOffset;
+    s32 result;
+    s32 sceneId;
+    s32 key;
+    s32 valueIndex;
+    s32 link;
+    s32 callbackResult;
+    s32* outValue;
+    u8* obj;
+    EffectUtilEntry* entry;
+    EffectUtilCountFunc countFunc;
+    EffectUtilEntryFunc entryFunc;
+    EffectUtilEntryCallback callback;
+
+    prevOffset = offset - 1;
+    result = 0;
+    sceneId = (s32)lbl_80478848 + offset;
+
+retry:
+    if (offset < 0) {
+        key = 0;
+    } else {
+        key = (s32)lbl_80478848 + prevOffset;
+    }
+
+    outValue = (s32*)(lbl_8047AEDC + _dbgMenuGetMenuNo__Fl(key) * 4);
+    valueIndex = menuOpenCustom(sceneId, key, outValue, 0, 1, 0);
+    obj = (u8*)windowSearchID(sceneId);
+    if (obj != NULL) {
+        *outValue = (s8)obj[0x94] + (s8)obj[0x95];
+    } else {
+        *outValue = 0;
+    }
+
+    if (valueIndex == -1) {
+        if (offset == 0) {
+            result = -1;
+        }
+        menuClose(sceneId);
+        return result;
+    }
+
+    valueIndex = _dbgMenuGetItemNo__FP14tagWINDOW_WORKl(obj, (s8)obj[0x94] + (s8)obj[0x95]);
+    link = 0;
+    if (valueIndex > 0) {
+        countFunc = (EffectUtilCountFunc)lbl_80478F88;
+        if (countFunc != NULL && countFunc() > valueIndex) {
+            entryFunc = (EffectUtilEntryFunc)lbl_80478F8C;
+            entry = entryFunc != NULL ? entryFunc(valueIndex) : NULL;
+            if (entry != NULL) {
+                link = entry->link;
+            }
+            if (link > 0) {
+                countFunc = (EffectUtilCountFunc)lbl_80478F88;
+                if (countFunc == NULL || countFunc() <= link) {
+                    link = 0;
+                }
+            } else {
+                link = 0;
+            }
+        }
+    }
+
+    if ((s16)link != 0) {
+        entryFunc = (EffectUtilEntryFunc)lbl_80478F8C;
+        entry = entryFunc != NULL ? entryFunc(valueIndex) : NULL;
+        callback = entry != NULL ? entry->callback : NULL;
+        if (callback != NULL) {
+            callbackResult = callback(valueIndex, (s8)obj[0x94] + (s8)obj[0x95]);
+        } else {
+            callbackResult = 1;
+        }
+        if (callbackResult == 0) {
+            menuClose(lbl_80478848);
+            return 1;
+        }
+        if (callbackResult == -1 || (s16)link == 1) {
+            goto retry;
+        }
+        if (_dbgMenuSub__Fl(offset + 1) != 1) {
+            goto retry;
+        }
+        return 1;
+    }
+
+    menuClose(lbl_80478848);
+    entryFunc = (EffectUtilEntryFunc)lbl_80478F8C;
+    entry = entryFunc != NULL ? entryFunc(valueIndex) : NULL;
+    callback = entry != NULL ? entry->callback : NULL;
+    if (callback != NULL) {
+        callback(valueIndex, (s8)obj[0x94] + (s8)obj[0x95]);
+    }
+    return 1;
+}
+#endif
+
+
+/* 0x80133B50 | 0x94 */
+#if 0
+asm void _dbgMenuGetMenuNum__FP14tagWINDOW_WORKPl(void) {
+#include "src/game/effect/effect_util_fn_80133B50.inc"
+}
+#else
+u32 _dbgMenuGetMenuNum__FP14tagWINDOW_WORKPl(u32 arg0, u32* outMax) {
+    u32 index;
+    u32 value;
+    u32 max;
+    s32 done;
+
+    if (outMax != NULL) {
+        *outMax = 0;
+    }
+    index = 0;
+    do {
+        value = _dbgMenuGetMsgID__FP14tagWINDOW_WORKl((void*)arg0, index);
+        if (outMax != NULL) {
+            value = GSmsgGetRect(value) >> 16;
+            max = *outMax;
+            if ((s32)max < (s32)value) {
+                *outMax = value;
+            }
+        }
+        done = _dbgMenuCheckTerminate__FP14tagWINDOW_WORKl((void*)arg0, index++);
+    } while (done == 0);
+    return index;
+}
+#endif
+
+#if 0
+asm u8 _dbgMenuCheckTerminate__FP14tagWINDOW_WORKl(void) {
+#include "src/game/effect/effect_util__dbgMenuCheckTerminate__FP14tagWINDOW_WORKl.inc"
+}
+#else
+u32 _dbgMenuCheckTerminate__FP14tagWINDOW_WORKl(void* obj, s32 offset) {
+    EffectUtilEntry* result;
+    u32 ret;
+    s32 index = _dbgMenuGetItemNo__FP14tagWINDOW_WORKl(obj, offset);
+    {
+        EffectUtilEntryFunc fp = (EffectUtilEntryFunc)lbl_80478F8C;
+        if (fp == NULL) {
+            result = NULL;
+        } else {
+            result = fp(index);
+        }
+    }
+    if (result == NULL) {
+        ret = 1;
+    } else {
+        ret = (result->flags >> 7) & 1;
+    }
+    return (u8)ret;
+}
+#endif
+
+
+/* 0x80133C3C | 0x1E0 */
+#if 0
+asm void _dbgMenuGetMenuNo__Fl(void) {
+#include "src/game/effect/effect_util__dbgMenuGetMenuNo__Fl.inc"
+}
+#else
+s32 _dbgMenuGetMenuNo__Fl(s32 key) {
+    s32 count;
+    s32 index;
+    s32 selected;
+    u8* obj;
+    EffectUtilEntry* entry;
+    EffectUtilCountFunc countFunc;
+    EffectUtilEntryFunc entryFunc;
+
+    obj = (u8*)windowSearchID(key);
+    if (obj != NULL) {
+        selected = _dbgMenuGetItemNo__FP14tagWINDOW_WORKl(obj, (s8)obj[0x94] + (s8)obj[0x95]);
+        if (selected > 0) {
+            countFunc = (EffectUtilCountFunc)lbl_80478F88;
+            if (countFunc != NULL && countFunc() > selected) {
+                entryFunc = (EffectUtilEntryFunc)lbl_80478F8C;
+                entry = entryFunc != NULL ? entryFunc(selected) : NULL;
+                selected = entry != NULL ? entry->link : 0;
+                if (selected > 0) {
+                    countFunc = (EffectUtilCountFunc)lbl_80478F88;
+                    if (countFunc == NULL || countFunc() <= selected) {
+                        selected = 0;
+                    }
+                } else {
+                    selected = 0;
+                }
+            } else {
+                selected = 0;
+            }
+        } else {
+            selected = 0;
+        }
+        count = 0;
+        for (index = 0; index < (s16)selected; index++) {
+            entryFunc = (EffectUtilEntryFunc)lbl_80478F8C;
+            entry = entryFunc != NULL ? entryFunc(index) : NULL;
+            if (entry == NULL || (entry->flags & 0x80)) {
+                count++;
+            }
+        }
+    } else {
+        count = 0;
+        for (index = 0; index < (s32)dbgMenuGetRootMenu(); index++) {
+            entryFunc = (EffectUtilEntryFunc)lbl_80478F8C;
+            entry = entryFunc != NULL ? entryFunc(index) : NULL;
+            if (entry == NULL || (entry->flags & 0x80)) {
+                count++;
+            }
+        }
+    }
+    return count;
+}
+#endif
+
+#if 0
+asm void _dbgMenuGetMsgID__FP14tagWINDOW_WORKl(void) {
+#include "src/game/effect/effect_util_fn_80133E1C.inc"
+}
+#else
+#pragma peephole off
+u32 _dbgMenuGetMsgID__FP14tagWINDOW_WORKl(void* obj, s32 offset) {
+    EffectUtilEntry* result;
+    s32 index = _dbgMenuGetItemNo__FP14tagWINDOW_WORKl(obj, offset);
+    {
+        EffectUtilEntryFunc fp = (EffectUtilEntryFunc)lbl_80478F8C;
+        if (fp == NULL) {
+            result = NULL;
+        } else {
+            result = fp(index);
+        }
+    }
+    if (result == NULL) {
+        return 0;
+    }
+    return result->value;
+}
+#pragma peephole on
+#endif
+
+
+/* 0x80133E6C | 0x2F8 */
+#if 0
+asm void _dbgMenuGetItemNo__FP14tagWINDOW_WORKl(void) {
+#include "src/game/effect/effect_util__dbgMenuGetItemNo__FP14tagWINDOW_WORKl.inc"
+}
+#else
+s32 _dbgMenuGetItemNo__FP14tagWINDOW_WORKl(void* obj, s32 offset) {
+    s32 rel;
+    s32 value;
+    s32 baseValue;
+    s32 linked;
+    u8* prev;
+    u8* prior;
+    EffectUtilCountFunc countFunc;
+    EffectUtilEntryFunc entryFunc;
+    EffectUtilEntry* entry;
+
+    rel = _dbgMenuGetIndex__FP14tagWINDOW_WORK(obj);
+    if (rel < 0) {
+        return 0;
+    }
+    if (rel == 0) {
+        return (s32)dbgMenuGetRootMenu() + offset;
+    }
+
+    prev = (u8*)_dbgMenuGetWin__Fl(rel - 1);
+    if (prev == NULL) {
+        value = dbgMenuGetRootMenu();
+    } else {
+        baseValue = (s8)prev[0x94] + (s8)prev[0x95];
+        rel = _dbgMenuGetIndex__FP14tagWINDOW_WORK(prev);
+        if (rel < 0) {
+            value = 0;
+        } else if (rel == 0) {
+            value = (s32)dbgMenuGetRootMenu() + baseValue;
+        } else {
+            prior = (u8*)_dbgMenuGetWin__Fl(rel - 1);
+            if (prior == NULL) {
+                linked = dbgMenuGetRootMenu();
+            } else {
+                linked = (s8)prior[0x94] + (s8)prior[0x95];
+                rel = _dbgMenuGetIndex__FP14tagWINDOW_WORK(prior);
+                if (rel < 0) {
+                    linked = 0;
+                } else if (rel == 0) {
+                    linked += dbgMenuGetRootMenu();
+                } else {
+                    u8* earlier = (u8*)_dbgMenuGetWin__Fl(rel - 1);
+                    if (earlier == NULL) {
+                        linked += dbgMenuGetRootMenu();
+                    } else {
+                        linked += (s16)_dbgMenuGetLink__Fl(_dbgMenuGetItemNo__FP14tagWINDOW_WORKl(earlier, (s8)earlier[0x94] + (s8)earlier[0x95]));
+                    }
+                }
+            }
+
+            if (linked > 0 && (s32)debugMenuGetNum__Fv() > linked) {
+                linked = dbgMenuGetLink__Fl(linked);
+                if ((s16)linked <= 0 || (s32)debugMenuGetNum__Fv() <= (s16)linked) {
+                    linked = 0;
+                }
+            } else {
+                linked = 0;
+            }
+            value = (s16)linked + baseValue;
+        }
+    }
+
+    if (value > 0) {
+        countFunc = (EffectUtilCountFunc)lbl_80478F88;
+        if (countFunc != NULL && countFunc() > value) {
+            entryFunc = (EffectUtilEntryFunc)lbl_80478F8C;
+            entry = entryFunc != NULL ? entryFunc(value) : NULL;
+            value = entry != NULL ? entry->link : 0;
+            if ((s16)value > 0) {
+                countFunc = (EffectUtilCountFunc)lbl_80478F88;
+                if (countFunc != NULL && countFunc() > (s16)value) {
+                    return (s16)value + offset;
+                }
+            }
+        }
+    }
+
+    return offset;
+}
+#endif
+
+
+/* 0x80134164 | 0xC4 */
+#if 0
+asm void _dbgMenuGetLink__Fl(void) {
+#include "src/game/effect/effect_util_fn_80134164.inc"
+}
+#else
+s32 _dbgMenuGetLink__Fl(s32 idx) {
+    s32 count;
+    EffectUtilEntry* result;
+
+    if (idx <= 0) { return 0; }
+
+    {
+        s32 (*fp)(void) = (s32 (*)(void))lbl_80478F88;
+        if (fp == NULL) { count = 0; } else { count = fp(); }
+    }
+    if (count <= idx) { return 0; }
+
+    {
+        EffectUtilEntryFunc fp = (EffectUtilEntryFunc)lbl_80478F8C;
+        if (fp == NULL) { result = NULL; } else { result = fp(idx); }
+    }
+    if (result == NULL) { idx = 0; } else { idx = result->link; }
+
+    if ((s16)idx <= 0) {
+        idx = 0;
+    } else {
+        s32 (*fp)(void) = (s32 (*)(void))lbl_80478F88;
+        if (fp == NULL) { count = 0; } else { count = fp(); }
+        if (count <= (s16)idx) { idx = 0; }
+    }
+    return idx;
+}
+#endif
+
+
+/* 0x80134228 | 0x30 -- saturate add: max(0, lbl_80478848 + arg) then windowSearchID */
+/* extern void* windowSearchID(s32 key); -- forward-declared K&R style above */
+#pragma push
+#pragma optimization_level 1
+void* _dbgMenuGetWin__Fl(s32 offset) {
+    s32 key;
+    s32 mask;
+    mask = offset >> 31;
+    key = (s32)lbl_80478848 + offset;
+    return windowSearchID(key & ~mask);
+}
+#pragma pop
+
+
+/* 0x80134258 | 0x1C -- get relative key from obj->0x04, return (key - lbl_80478848), or -1 */
+s32 _dbgMenuGetIndex__FP14tagWINDOW_WORK(void* obj) {
+    u32 val = *(u32*)((u8*)obj + 0x04);
+    if ((s32)val < (s32)lbl_80478848) return -1;
+    return (s32)(val - lbl_80478848);
+}
+
+#if 0
+asm void dbgMenuGetRootMenu(void) {
+#include "src/game/effect/effect_util_fn_80134274.inc"
+}
+#else
+#pragma optimization_level 4
+#pragma push
+#pragma scheduling on
+u32 dbgMenuGetRootMenu(void) {
+    int new_var;
+    extern u32 fn_800057A8(void);
+    s32 val = (s32)fn_800057A8();
+    if (val == 1) goto _ret2;
+    if (val >= 1) goto _chk3;
+    new_var = 2;
+    goto _ret2;
+_chk3:
+    if (val >= 3) goto _ret2;
+    return 0x115;
+_ret2:
+    return new_var;
+}
+#pragma pop
+#endif
+
+#if 0
+asm void dbgMenuGetLink__Fl(void) {
+#include "src/game/effect/effect_util_fn_801342B8.inc"
+}
+#else
+s32 dbgMenuGetLink__Fl(s32 idx) {
+    EffectUtilEntryFunc fp = (EffectUtilEntryFunc)lbl_80478F8C;
+    EffectUtilEntry* result;
+    if (fp == NULL) {
+        result = NULL;
+    } else {
+        result = fp(idx);
+    }
+    if (result == NULL) {
+        return 0;
+    }
+    return result->link;
+}
+#endif
+
+
+/* 0x80134304 | 0x38 */
+#if 0
+asm u32 debugMenuGetNum__Fv(void) {
+#include "src/game/effect/effect_util_debugMenuGetNum__Fv.inc"
+}
+#else
+u32 debugMenuGetNum__Fv(void) {
+    u32 (*fp)(void) = (u32 (*)(void))lbl_80478F88;
+    if (fp == NULL) {
+        return 0;
+    }
+    return fp();
+}
+#endif

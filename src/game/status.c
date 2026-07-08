@@ -1,0 +1,111 @@
+/**
+ * @file status.c
+ * @brief Decompiled functions.
+ *
+ * Address range: 0x80135D10 - 0x80135F58
+ *
+ * Split out of the former game/effect/effect_util.c CodeCandidate
+ * bucket (0x8013151C - 0x80137114); see effect_util_types.h for
+ * shared cross-TU declarations.
+ */
+
+#include "dolphin/types.h"
+#include "game/effect/effect_util_types.h"
+
+
+/* 0x80135D10 | 0x134 */
+#if 0
+asm void fn_80135D10(void) {
+#include "src/game/effect/effect_util_fn_80135D10.inc"
+}
+#else
+#pragma scheduling on
+#pragma push
+#pragma optimization_level 2
+#pragma peephole off
+#pragma scheduling on
+u32 fn_80135D10(u32 kind, u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
+    extern u32 wazaSetStatus();
+    extern u32 pokemonSetStatus();
+    extern u32 heroSetStatus();
+    extern u32 pcboxSetStatus();
+    extern u32 fn_8013583C();
+    extern u32 fn_80142B24();
+    extern u32 fn_801F4C14();
+    extern u32 fn_801F75F8();
+    extern u32 fightTrainerSetStatus();
+    u32 result = 0;
+
+    switch ((u8)kind) {
+    case 0:
+        break;
+    case 1:
+        fn_8013583C(arg1, arg3, arg5);
+        break;
+    case 2:
+        pcboxSetStatus(arg1, arg3, arg5);
+        break;
+    case 3:
+        heroSetStatus(arg1, arg3, arg5);
+        break;
+    case 4:
+        fn_80142B24(arg1, arg2, arg3, arg4, arg5);
+        break;
+    case 5:
+        pokemonSetStatus(arg1, arg2, arg3, arg4, arg5);
+        break;
+    case 6:
+        wazaSetStatus(arg1, arg2, arg3, arg4, arg5);
+        break;
+    case 7:
+        result = fn_801F4C14(arg1, arg2, arg3, arg4, arg5);
+        break;
+    case 8:
+        fn_801F75F8(arg1, arg2, arg3, arg4, arg5);
+        break;
+    case 9:
+        fightTrainerSetStatus(arg1, arg2, arg3, arg4, arg5);
+        break;
+    default:
+        break;
+    }
+    return result;
+}
+#pragma pop
+#pragma scheduling off
+#endif
+
+
+/* 0x80135E44 | 0x114 */
+#if 0
+asm void fn_80135E44(void) {
+#include "src/game/effect/effect_util_fn_80135E44.inc"
+}
+#else
+u32 fn_80135E44(u32 kind, u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
+    switch ((u8)kind) {
+    case 0:
+        return 0;
+    case 1:
+        return fn_80135938((void*)arg1, (u16)arg3);
+    case 2:
+        return pcboxGetStatus(arg1, arg3, arg4);
+    case 3:
+        return heroGetStatus(arg1, arg3, arg4);
+    case 4:
+        return itemGetStatus(arg1, arg2, arg3, arg4);
+    case 5:
+        return pokemonGetStatus(arg1, arg2, arg3, arg4);
+    case 6:
+        return wazaGetStatus(arg1, arg2, arg3, arg4);
+    case 7:
+        return fn_801F54A4(arg1, arg2, arg3, arg4);
+    case 8:
+        return fightSideGetStatus(arg1, arg2, arg3, arg4);
+    case 9:
+        return fightTrainerGetStatus(arg1, arg2, arg3, arg4);
+    default:
+        return 0;
+    }
+}
+#endif

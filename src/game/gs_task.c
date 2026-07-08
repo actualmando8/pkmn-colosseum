@@ -2129,7 +2129,7 @@ u32 dbgMenuFightGetMsgSpeedToFrame(u32 value) {
 #endif
 
 /* _dbgMenuFightGetFightTrainerAiAddsubValueDataIdSub - 0x80008244 | size: 0x14c */
-extern void fn_80132A38(s32 slot, void* ptr);
+extern void msgctrlSetValue(s32 slot, void* ptr);
 extern u32 lbl_80478F28;
 #if 0
 asm void _dbgMenuFightGetFightTrainerAiAddsubValueDataIdSub(void) {
@@ -2156,10 +2156,10 @@ void* _dbgMenuFightGetFightTrainerAiAddsubValueDataIdSub(u32 id) {
     if (r29 == 0) r29 = (void*)0xEB63;
     if (r31 == 0) r31 = (void*)0xEB63;
     if (r30 == 0) r30 = (void*)0xEB63;
-    fn_80132A38(0xd,  fn_800FA280((u32)r31));
-    fn_80132A38(0xe,  fn_800FA280((u32)r30));
-    fn_80132A38(0x4d, fn_800FA280((u32)r29));
-    fn_80132A38(0x2f, r28);
+    msgctrlSetValue(0xd,  fn_800FA280((u32)r31));
+    msgctrlSetValue(0xe,  fn_800FA280((u32)r30));
+    msgctrlSetValue(0x4d, fn_800FA280((u32)r29));
+    msgctrlSetValue(0x2f, r28);
     return fn_800FA280(0xF159);
 }
 #pragma peephole on

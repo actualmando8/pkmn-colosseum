@@ -61,7 +61,7 @@ extern u32   fn_800F7AF0(s32 slot);                   /* Get render flags */
 extern u32   fn_800F7BC4(s32 slot);                   /* Get VSync flags */
 
 /* Battle bridge */
-extern void  fn_80132A38();                           /* Set battle parameter */
+extern void  msgctrlSetValue();                           /* Set battle parameter */
 extern void  fn_801F4C14();                           /* Configure map object */
 extern u32   windowGetParam();                           /* Get participant data */
 
@@ -518,7 +518,7 @@ do {
             ((void(*)(void))fn_800FB680)();
             r4 = (s16)r27;
             r3 = 0x34;
-            ((void(*)(void))fn_80132A38)();
+            ((void(*)(void))msgctrlSetValue)();
             r3 = 0xcb;
             ((void(*)(void))GSmsgGetRect)();
             tmp = (u32)r3 >> 16;
@@ -531,7 +531,7 @@ do {
             ((void(*)(void))fn_800FB680)();
             r4 = *(s16*)((u8*)r30 + 0x18);
             r3 = 0x34;
-            ((void(*)(void))fn_80132A38)();
+            ((void(*)(void))msgctrlSetValue)();
             r3 = 0xcb;
             ((void(*)(void))GSmsgGetRect)();
             r3 = (u32)r3 >> 16;
@@ -547,7 +547,7 @@ do {
 
             r4 = *(u8*)((u8*)r30 + 0x17);
             r3 = 0x34;
-            ((void(*)(void))fn_80132A38)();
+            ((void(*)(void))msgctrlSetValue)();
             r3 = 0xcb;
             ((void(*)(void))GSmsgGetRect)();
             r3 = (u32)r3 >> 16;
@@ -566,7 +566,7 @@ do {
             }
     r4 = r30;
     r3 = 0x37;
-    ((void(*)(void))fn_80132A38)();
+    ((void(*)(void))msgctrlSetValue)();
     r5 = r29;
     r3 = 0x0;
     r4 = -0x1;
@@ -598,7 +598,7 @@ do {
     fn_800FA280();
     r4 = r3;
     r3 = 0x37;
-    ((void(*)(void))fn_80132A38)();
+    ((void(*)(void))msgctrlSetValue)();
     r3 = r27;
     r5 = r29;
     r4 = -0x1;

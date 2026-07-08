@@ -39,7 +39,12 @@
  *   - fn_80130F68 (effectRenderTask) at priority 0x7F (render pass)
  *   - fn_80130F04 (effectUpdateTask) at priority 0x80 (after rendering)
  *
- * Address range: 0x80130CE0 - 0x8013151C
+ * fn_8013151C (GSEffectGetUserData) was merged in from the former
+ * game/effect/effect_util.c CodeCandidate bucket: it is a boundary function
+ * that operates on the same lbl_803635C0 state table as the rest of this
+ * file and was misattributed to the neighboring TU.
+ *
+ * Address range: 0x80130CE0 - 0x80131574
  */
 
 #include "dolphin/types.h"
@@ -79,6 +84,7 @@ void fn_80131200(u32 effectId, GSEffectStartFunc startFunc,
 void fn_80131268(u32 effectId);
 void fn_8013139C(u32 effectId, u32 param);
 u16 fn_80131428(void* callbacks, u16 dataSize);
+void* fn_8013151C(u32 arg);
 
 
 
@@ -521,5 +527,35 @@ u16 fn_80131428(void* callbacks, u16 dataSize) {
 
     return slot->id;
 _retNull:
+    return 0;
+}
+
+/* =======================================================================
+ * fn_8013151C / GSEffectGetUserData
+ * Address: 0x8013151C, Size: 0x58
+ *
+ * Merged in from the former game/effect/effect_util.c CodeCandidate
+ * bucket (0x8013151C - 0x80137114): this boundary function operates on
+ * the same lbl_803635C0 state table as the rest of this file.
+ * ======================================================================= */
+void* fn_8013151C(u32 arg) {
+    GSEffectInstance* entry;
+    unsigned int new_var;
+    GSEffectGlobals* globals;
+    if (arg == 0) goto _ret0;
+    globals = (GSEffectGlobals*)(void*)lbl_803635C0;
+    if (arg > globals->maxEffects) goto _ret0;
+    entry = &((GSEffectInstance*)globals->instanceTable)[arg - 1];
+    new_var = entry->state == GSEFFECT_STATE_UNINIT;
+    if (new_var) goto _ret0;
+    if ((arg && arg) && arg) {
+    }
+    goto _compute;
+_ret0:
+    entry = 0;
+_compute:
+    if (entry == 0) goto _null_ret;
+    return entry->userData;
+_null_ret:
     return 0;
 }

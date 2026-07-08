@@ -330,7 +330,7 @@ void fn_800896E0(u32 v) {
 /* 0x800896E8 | size: 0x290 */
 void fn_800896E8(void) {
     extern void fn_80089978();
-    extern void fn_80132A38();
+    extern void msgctrlSetValue();
     extern void fn_80189990();
     extern void fn_8018C1E8();
     extern void fadeCheck();
@@ -373,7 +373,7 @@ void fn_800896E8(void) {
     if (tmp == 1) {
         r4 = r31 + 0x4004;
         r3 = 0x4d;
-        fn_80132A38();
+        msgctrlSetValue();
         r3 = r30;
         r4 = r26;
         r5 = 0xe0;
@@ -382,7 +382,7 @@ void fn_800896E8(void) {
     } else {
         r4 = r31 + 0x4060;
         r3 = 0x4d;
-        fn_80132A38();
+        msgctrlSetValue();
         r3 = r30;
         r4 = r26;
         r5 = 0xe0;

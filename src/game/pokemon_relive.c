@@ -469,7 +469,7 @@ u32 _expRecover__FP7PokemonUl(u32 r3,int r4)
     extern s8 pokemonSearchWazaDataId();
     extern int pokemonWazaCreate();
     extern int pokemonResetBasisStatus();
-    extern int fn_80132A38();
+    extern int msgctrlSetValue();
     extern int fn_80165668();
     /* evolutionWazaLearn forward-declared at file scope */
   u32 bVar11;
@@ -511,7 +511,7 @@ u32 _expRecover__FP7PokemonUl(u32 r3,int r4)
       pokemonGetFriendFormPokemonFriendFilterId(r3,uVar3,0);
       uVar2 = fn_8011F4A8(r3);
       fn_80165668(0x4ca,0,0xff);
-      fn_80132A38(0x2f,uVar2 & 0xff);
+      msgctrlSetValue(0x2f,uVar2 & 0xff);
       winMsgOpenField(0x44ce,1,0);
       pokemonGetStatus(r3,0,0x87,0);
       pokemonGetStatus(r3,0,0x88,0);
@@ -843,13 +843,13 @@ void reliveCeremonyAll(u32 r3)
     sVar5 = fn_8011F228(uVar1,0);
     if (sVar5 != 0) {
       uVar2 = fn_8011F4F0(uVar1);
-      fn_80132A38(0x32,uVar2);
-      fn_80132A38(0x39,sVar5);
+      msgctrlSetValue(0x32,uVar2);
+      msgctrlSetValue(0x39,sVar5);
       winMsgOpenField(0x3b10,1,0);
     }
     uVar4 = fn_8011EE10(uVar1);
     uVar2 = uVar4;
-    fn_80132A38(0x2f,uVar2);
+    msgctrlSetValue(0x2f,uVar2);
     winMsgOpenField(0x3b0b,1,0);
     winMsgCloseField(1);
     sVar7 = fn_8011EE58(uVar1);
@@ -872,11 +872,11 @@ void reliveCeremonyAll(u32 r3)
             fn_8025DE54((u32*)auStack_1c,(u16*)&lbl_80478DB0,1,1,1,0);
           }
           uVar2 = fn_8011F4F0(uVar1);
-          fn_80132A38(0x32,uVar2);
+          msgctrlSetValue(0x32,uVar2);
         }
         else {
           uVar2 = fn_8011F4F0(uVar1);
-          fn_80132A38(0x32,uVar2);
+          msgctrlSetValue(0x32,uVar2);
           fn_801DADC0(1);
           iVar3 = loadSequence((int*)auStack_20,uVar1,(u16*)&lbl_80478DB0,1);
           if (iVar3 == 1) {

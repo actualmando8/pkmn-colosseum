@@ -451,7 +451,7 @@ s32 menuPanelCursorDecimalInput(u8* ctx) {
 
 /* fn_8001329C - 0x8001329C | size: 0x3cc */
 extern void fn_8001EC08(s32, s32, s32, s32, s32, s32);
-extern void fn_80132A38(s32, s32);
+extern void msgctrlSetValue(s32, s32);
 extern void jumptable_802E4D90();
 #if 0
 asm void fn_8001329C(void) {
@@ -483,7 +483,7 @@ s32 fn_8001329C(u8* ctx, u8* tgt) {
             width = GSmsgGetRect(0x1A0);
             fn_800FB680((*(s16*)(tgt + 0x54) - 0x20) - (s32)(s16)((u32)width >> 16), 0, color, 0x1A0);
         }
-        fn_80132A38(0x34, value);
+        msgctrlSetValue(0x34, value);
         width = GSmsgGetRect(0xC9);
         fn_800FB680(*(s16*)(tgt + 0x54) - (s32)(s16)((u32)width >> 16), 0, color, 0xC9);
         break;
@@ -493,7 +493,7 @@ s32 fn_8001329C(u8* ctx, u8* tgt) {
             width = GSmsgGetRect(0x1A0);
             fn_800FB680((*(s16*)(tgt + 0x54) - 0x20) - (s32)(s16)((u32)width >> 16), 0, color, 0x1A0);
         }
-        fn_80132A38(0x34, value);
+        msgctrlSetValue(0x34, value);
         width = GSmsgGetRect(0xC9);
         fn_800FB680(*(s16*)(tgt + 0x54) - (s32)(s16)((u32)width >> 16), 0, color, 0xC9);
         break;
@@ -503,7 +503,7 @@ s32 fn_8001329C(u8* ctx, u8* tgt) {
             width = GSmsgGetRect(0x1A0);
             fn_800FB680((*(s16*)(tgt + 0x54) - 0x20) - (s32)(s16)((u32)width >> 16), 0, color, 0x1A0);
         }
-        fn_80132A38(0x34, value);
+        msgctrlSetValue(0x34, value);
         width = GSmsgGetRect(0xC9);
         fn_800FB680(*(s16*)(tgt + 0x54) - (s32)(s16)((u32)width >> 16), 0, color, 0xC9);
         break;
@@ -513,7 +513,7 @@ s32 fn_8001329C(u8* ctx, u8* tgt) {
             width = GSmsgGetRect(0x1A0);
             fn_800FB680((*(s16*)(tgt + 0x54) - 0x20) - (s32)(s16)((u32)width >> 16), 0, color, 0x1A0);
         }
-        fn_80132A38(0x34, value);
+        msgctrlSetValue(0x34, value);
         width = GSmsgGetRect(0xC9);
         fn_800FB680(*(s16*)(tgt + 0x54) - (s32)(s16)((u32)width >> 16), 0, color, 0xC9);
         break;
@@ -523,7 +523,7 @@ s32 fn_8001329C(u8* ctx, u8* tgt) {
             width = GSmsgGetRect(0x1A0);
             fn_800FB680((*(s16*)(tgt + 0x54) - 0x20) - (s32)(s16)((u32)width >> 16), 0, color, 0x1A0);
         }
-        fn_80132A38(0x34, value);
+        msgctrlSetValue(0x34, value);
         width = GSmsgGetRect(0xC9);
         fn_800FB680(*(s16*)(tgt + 0x54) - (s32)(s16)((u32)width >> 16), 0, color, 0xC9);
         break;
@@ -533,7 +533,7 @@ s32 fn_8001329C(u8* ctx, u8* tgt) {
             width = GSmsgGetRect(0x1A0);
             fn_800FB680((*(s16*)(tgt + 0x54) - 0x20) - (s32)(s16)((u32)width >> 16), 0, color, 0x1A0);
         }
-        fn_80132A38(0x34, value);
+        msgctrlSetValue(0x34, value);
         width = GSmsgGetRect(0xC9);
         fn_800FB680(*(s16*)(tgt + 0x54) - (s32)(s16)((u32)width >> 16), 0, color, 0xC9);
         break;
@@ -622,7 +622,7 @@ after:
         return 0;
     }
     fn_8012959C(lbl_8047A2F8, idx, 1, (s16)target_n);
-    fn_80132A38(0x2d, (u16)idx);
+    msgctrlSetValue(0x2d, (u16)idx);
     winMsgOpen(2, 0x4268, 1, 0);
     winMsgClose(1);
     *out = 0;
@@ -673,7 +673,7 @@ after:
         return 2;
     }
     fn_80129650(lbl_8047A2F8, idx, 1, -1);
-    fn_80132A38(0x2d, (u16)idx);
+    msgctrlSetValue(0x2d, (u16)idx);
     winMsgOpen(2, 0x4264, 1, 0);
     winMsgClose(1);
     *out = 1;
@@ -829,8 +829,8 @@ have_quantity:
     idx = 0;
 
 have_item:
-    fn_80132A38(0x2D, idx);
-    fn_80132A38(0x2F, choice);
+    msgctrlSetValue(0x2D, idx);
+    msgctrlSetValue(0x2F, choice);
 
     confirm_arg.bytes[0] = entry[0];
     confirm_arg.bytes[1] = entry[1];
@@ -854,8 +854,8 @@ have_item:
         return 0;
     }
 
-    fn_80132A38(0x2D, idx);
-    fn_80132A38(0x2F, choice);
+    msgctrlSetValue(0x2D, idx);
+    msgctrlSetValue(0x2F, choice);
     winMsgOpen(2, 0x4269, 1, 0);
     winMsgClose(1);
     *out = choice;
@@ -904,7 +904,7 @@ s32 fn_80013DFC(s32 entry_idx, s32 target_n, s32* out) {
 after:
     itemDataBiosGetPtr(idx);
     if (itemDataBiosGetHidenMachineNo() != 0xFF) {
-        fn_80132A38(0x2d, (u16)idx);
+        msgctrlSetValue(0x2d, (u16)idx);
         winMsgOpen(2, 0x4262, 1, 0);
         winMsgClose(1);
         *out = 0;
@@ -1107,7 +1107,7 @@ s32 fn_8001431C(void* arg0, u8* arg1) {
     s32 count = *(s32*)((u8*)p + 0x10);
     s32 rand;
     if (count <= 0) return 0;
-    fn_80132A38(0x50, count * (s32)lbl_8047A2FC);
+    msgctrlSetValue(0x50, count * (s32)lbl_8047A2FC);
     rand = GSmsgGetRect(0x151);
     fn_800FB680(*(s16*)(arg1 + 0x54) - (s32)(s16)((u32)rand >> 16), 0, -1, 0x151);
     return 0;
@@ -1172,7 +1172,7 @@ s32 fn_80014398(u8* ctx, u8* arg1) {
         }
     }
     tmp = (s32)lbl_8047A2FC / iv;
-    fn_80132A38(0x34, tmp - (tmp / 10) * 10);
+    msgctrlSetValue(0x34, tmp - (tmp / 10) * 10);
     fn_800FB8C8(0, 0, *(s16*)(arg1 + 0x54), *(s16*)(arg1 + 0x56), -1, 0xC9);
     return 0;
 }

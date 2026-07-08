@@ -160,13 +160,13 @@ u32 fightTrainerAiWazaHitNull(void) { return 1; }
 
 /* Address: 0x80253950 | Size: 0x6C | Pattern: field_accessor */
 u32 fightTrainerAiWazaHit213(void* ctx, u32 slot, u32 param) {
-    extern u32 fn_80136428(u32);
+    extern u32 tikeiDataBiosGetZokuseiDataId(u32);
     extern u32 fn_801F54A4(u32, u32, u32, u32);
     extern u8 fn_80237DBC(void*, u32, u32);
     u32 value;
     u32 result;
 
-    value = fn_80136428(fn_801F54A4(0, 0, 0xf, 0) & 0xFFFF);
+    value = tikeiDataBiosGetZokuseiDataId(fn_801F54A4(0, 0, 0xf, 0) & 0xFFFF);
     result = fn_80237DBC(ctx, slot, value & 0xFF);
     result = result != 1;
     return result;
@@ -1196,14 +1196,14 @@ u32 fightTrainerAiWazaHit175(void* ctx, u32 slot, u32 param, u32 param3) {
 /* Address: 0x80255220 | Size: 0xA8 */
 u32 fightTrainerAiWazaHit173(void* ctx, u32 slot, u32 param, u32 extra) {
     extern u32 wazaGetStatus(u32, u32, u32, u32);
-    extern u32 fn_801363E8(u32);
+    extern u32 tikeiDataBiosGetWazaId(u32);
     extern u32 fn_801F54A4(u32, u32, u32, u32);
     extern u32 fn_8023C530(void*, u32, u32, u32);
     u32 paramType;
     u32 other;
     u32 otherType;
 
-    other = fn_801363E8(fn_801F54A4(0, 0, 0xf, 0) & 0xFFFF);
+    other = tikeiDataBiosGetWazaId(fn_801F54A4(0, 0, 0xf, 0) & 0xFFFF);
     paramType = wazaGetStatus(0, param, 9, 0) & 0xFFFF;
     param = other;
     otherType = wazaGetStatus(0, param, 9, 0) & 0xFFFF;

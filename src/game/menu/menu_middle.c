@@ -3221,7 +3221,7 @@ void fn_8006C7D4(void) {
     extern void heroBiosGetSexDataId();
     extern void heroBiosGetRnd();
     extern void heroBiosGetNamePtr();
-    extern void fn_80132A38();
+    extern void msgctrlSetValue();
     extern u8 jumptable_802EDF20[];
     u8 sp[0x1A0];
     u32 r0 = 0;
@@ -3385,7 +3385,7 @@ void fn_8006C7D4(void) {
         heroBiosGetNamePtr();
         r4 = r3;
         r3 = 0x37;
-        fn_80132A38();
+        msgctrlSetValue();
         r5 = r29;
         r3 = 0x0;
         r4 = 0x0;
@@ -3547,7 +3547,7 @@ void fn_8006C7D4(void) {
     ((void(*)(void))fn_800F9D04)();
     r4 = (u32)sp + 0x90;
     r3 = 0x37;
-    fn_80132A38();
+    msgctrlSetValue();
     r5 = r31;
     r3 = 0x0;
     r4 = 0x0;
@@ -3567,7 +3567,7 @@ void fn_8006CCC0(void) {
     extern void pokemonGetStatus();
     extern void heroBiosGetPokemonPtr();
     extern void heroBiosGetNamePtr();
-    extern void fn_80132A38();
+    extern void msgctrlSetValue();
     extern void __assert();
     extern u8 jumptable_802EDFB0[];
     u8 sp[0x40];
@@ -3975,7 +3975,7 @@ void fn_8006CCC0(void) {
                     }
                 r4 = r3 + 0x1;
                 r3 = 0x2f;
-                fn_80132A38();
+                msgctrlSetValue();
                 r21 = 0x3d9f;
                 goto L_8006D280;
             }
@@ -3987,7 +3987,7 @@ void fn_8006CCC0(void) {
         }
         r4 = *(u32*)((u8*)r22 + 0x14);
         r3 = 0x2f;
-        fn_80132A38();
+        msgctrlSetValue();
         r21 = 0x3da2;
         L_8006D280: ;
         r5 = *(u32*)((u8*)r24 + 0x64);
@@ -4002,7 +4002,7 @@ void fn_8006CCC0(void) {
         r0 = r3 + 0x24;
         r3 = 0x2f;
         r21 = (s16)r0;
-        fn_80132A38();
+        msgctrlSetValue();
         r5 = *(u32*)((u8*)r24 + 0x64);
         r3 = r21;
         r4 = 0x0;
@@ -4077,7 +4077,7 @@ void fn_8006CCC0(void) {
             if (r0 != (u32)0x0) {
                 r4 = r3;
                 r3 = 0x37;
-                fn_80132A38();
+                msgctrlSetValue();
                 r5 = *(u32*)((u8*)r24 + 0x64);
                 r3 = 0x0;
                 r4 = 0x0;
@@ -4123,7 +4123,7 @@ void fn_8006CCC0(void) {
     pokemonGetStatus();
     r4 = r3;
     r3 = 0x2f;
-    fn_80132A38();
+    msgctrlSetValue();
     do {
     if (r29 == (u32)0x0) break;
 
@@ -4165,7 +4165,7 @@ void fn_8006CCC0(void) {
     if (r25 == (u32)0x0) return;
     r4 = r25;
     r3 = 0x37;
-    fn_80132A38();
+    msgctrlSetValue();
     r5 = *(u32*)((u8*)r24 + 0x64);
     r3 = 0x0;
     r4 = 0x0;
@@ -4185,7 +4185,7 @@ void fn_8006D550(void) {
     extern void heroBiosGetSexDataId();
     extern void heroBiosGetRnd();
     extern void heroBiosGetNamePtr();
-    extern void fn_80132A38();
+    extern void msgctrlSetValue();
     extern void __assert();
     extern u8 jumptable_802EDFCC[];
     u8 sp[0x1B0];
@@ -4301,7 +4301,7 @@ void fn_8006D550(void) {
         heroBiosGetNamePtr();
         r4 = r3;
         r3 = 0x37;
-        fn_80132A38();
+        msgctrlSetValue();
         r5 = r29;
         r3 = 0x0;
         r4 = 0x0;
@@ -4369,7 +4369,7 @@ void fn_8006D550(void) {
     ((void(*)(void))fn_800F9D04)();
     r4 = (u32)sp + 0x90;
     r3 = 0x37;
-    fn_80132A38();
+    msgctrlSetValue();
     r5 = r31;
     r3 = 0x0;
     r4 = 0x0;
@@ -5629,7 +5629,7 @@ void fn_8006E798(void) {
 void fn_8006E9A4(void) {
     extern void fn_8006B3C8();
     extern void winSpriteGetDisp();
-    extern void fn_80132A38();
+    extern void msgctrlSetValue();
     u8 sp[0x910];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -5806,7 +5806,7 @@ void fn_8006E9A4(void) {
                     ((void(*)(void))fn_800F9D04)();
                     r4 = (u32)sp + 0x808;
                     r3 = 0x37;
-                    fn_80132A38();
+                    msgctrlSetValue();
                     r5 = r31;
                     r3 = 0xa;
                     r4 = 0x0;
@@ -5825,7 +5825,7 @@ void fn_8006E9A4(void) {
                 ((void(*)(void))fn_800F9D04)();
                 r4 = (u32)sp + 0x708;
                 r3 = 0x37;
-                fn_80132A38();
+                msgctrlSetValue();
                 r5 = r31;
                 r3 = 0xa;
                 r4 = 0x0;
@@ -5844,7 +5844,7 @@ void fn_8006E9A4(void) {
                 ((void(*)(void))fn_800F9D04)();
                 r4 = (u32)sp + 0x608;
                 r3 = 0x37;
-                fn_80132A38();
+                msgctrlSetValue();
                 r5 = r31;
                 r3 = 0xa;
                 r4 = 0x0;
@@ -5879,7 +5879,7 @@ void fn_8006E9A4(void) {
             ((void(*)(void))fn_800F9D04)();
             r4 = (u32)sp + 0x508;
             r3 = 0x37;
-            fn_80132A38();
+            msgctrlSetValue();
             r5 = r31;
             r3 = 0xa;
             r4 = 0x0;
@@ -5898,7 +5898,7 @@ void fn_8006E9A4(void) {
         ((void(*)(void))fn_800F9D04)();
         r4 = (u32)sp + 0x408;
         r3 = 0x37;
-        fn_80132A38();
+        msgctrlSetValue();
         r5 = r31;
         r3 = 0xa;
         r4 = 0x0;
@@ -5933,7 +5933,7 @@ void fn_8006E9A4(void) {
     ((void(*)(void))fn_800F9D04)();
     r4 = (u32)sp + 0x308;
     r3 = 0x37;
-    fn_80132A38();
+    msgctrlSetValue();
     r5 = r31;
     r3 = 0xa;
     r4 = 0x0;
@@ -5948,7 +5948,7 @@ void fn_8006E9A4(void) {
     r0 = (u32)r0 >> 3;
     r0 = r0 * 0xa;
     r4 = r5 - r0;
-    fn_80132A38();
+    msgctrlSetValue();
     r5 = *(u32*)((u8*)r31 + 0x64);
     r3 = 0x0;
     r4 = 0x0;
@@ -7438,7 +7438,7 @@ void fn_80070318(void) {
 
 /* 0x80070428 | size: 0x7C */
 void fn_80070428(void) {
-    extern void fn_80132A38();
+    extern void msgctrlSetValue();
     u8 sp[0x10];
     u32 r0 = 0;
     u32 r3 = 0;
@@ -7460,7 +7460,7 @@ void fn_80070428(void) {
     r0 = r3;
     r3 = 0x37;
     r4 = r0;
-    fn_80132A38();
+    msgctrlSetValue();
     r5 = *(u32*)((u8*)r31 + 0x64);
     r3 = 0x0;
     r4 = 0x0;

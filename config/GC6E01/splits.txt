@@ -1278,13 +1278,46 @@ game/hero_pokemon.c:
 	.text       start:0x80130660 end:0x80130CE0
 
 game/effect/gs_effect.c:
-	.text       start:0x80130CE0 end:0x8013151C
+	.text       start:0x80130CE0 end:0x80131574
 
-game/effect/effect_util.c:
-	.text       start:0x8013151C end:0x80137114
+game/sex.c:
+	.text       start:0x80131574 end:0x80131588
+
+game/msgctrl.c:
+	.text       start:0x80131588 end:0x80132C6C
+
+game/dbgMenu.c:
+	.text       start:0x80132C6C end:0x8013433C
+
+game/pcbox.c:
+	.text       start:0x8013433C end:0x80135030
+
+game/gamedata.c:
+	.text       start:0x80135030 end:0x80135A30
+
+game/gamedataBios.c:
+	.text       start:0x80135A30 end:0x80135B1C
+
+game/gamedatasaveBios.c:
+	.text       start:0x80135B1C end:0x80135D10
+
+game/status.c:
+	.text       start:0x80135D10 end:0x80135F58
+
+game/koukaBios.c:
+	.text       start:0x80135F58 end:0x80136078
+
+game/kouka.c:
+	.text       start:0x80136078 end:0x80136368
+
+game/tenkouBios.c:
+	.text       start:0x80136368 end:0x801363E8
+
+game/tikeiBios.c:
+	.text       start:0x801363E8 end:0x801364A8
 
 game/effect/tracefx.c:
-	.text       start:0x80137114 end:0x801380D4
+	.text       start:0x801364A8 end:0x801380D4
 
 game/effect/effect_visual.c:
 	.text       start:0x801380D4 end:0x80140588

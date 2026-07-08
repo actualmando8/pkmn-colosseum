@@ -133,7 +133,7 @@ extern u32 heroBiosGetPokemonPtr();
 extern u32 fightTrainerGetValidFightPokemonPtr();
 extern u32 pokemonGetStatus();
 extern u32 pokemonCheckValid();
-extern void fn_80132A38();
+extern void msgctrlSetValue();
 extern void pokemonGetSoubiItemDataId(void);
 extern void heroItemCheckAddItemDataId(void);
 extern void winMsgOpen();
@@ -170,7 +170,7 @@ void fn_8001C064(void) {
     extern void heroItemDecItemDataId();
     extern void heroItemAddItemDataId();
     extern void heroBiosGetPokemonPtr();
-    extern void fn_80132A38();
+    extern void msgctrlSetValue();
     extern void fn_801906A0();
     extern void fn_801F2A7C();
     extern void fightTrainerGetValidFightPokemonPtr();
@@ -304,7 +304,7 @@ L_8001C204:
     r4 = (s8)r5;
     r4 = r4 * 0x30;
     r4 = tmp + r4;
-    fn_80132A38();
+    msgctrlSetValue();
     r3 = r27;
     pokemonGetSoubiItemDataId();
     tmp = *(u32*)((u8*)r31 + 0x8);
@@ -380,7 +380,7 @@ do {
             }
             r4 = r3 & 0xFFFF;
             r3 = 0x2d;
-            fn_80132A38();
+            msgctrlSetValue();
             r3 = 0x2;
             r4 = 0x2b69;
             r5 = 0x1;
@@ -398,7 +398,7 @@ do {
     r4 = r26 & 0xFFFF;
     if (r4 != 0) {
         r3 = 0x2d;
-        fn_80132A38();
+        msgctrlSetValue();
         r3 = 0x2;
         r4 = 0x2b66;
         r5 = 0x1;
@@ -465,10 +465,10 @@ do {
         pokemonDoItemSoubi();
         r4 = r26 & 0xFFFF;
         r3 = 0x2d;
-        fn_80132A38();
+        msgctrlSetValue();
         r4 = r30 & 0xFFFF;
         r3 = 0x2e;
-        fn_80132A38();
+        msgctrlSetValue();
         r3 = 0x2;
         r4 = 0x2b67;
         r5 = 0x1;
@@ -488,7 +488,7 @@ do {
         pokemonDoItemSoubi();
         r4 = r30 & 0xFFFF;
         r3 = 0x2d;
-        fn_80132A38();
+        msgctrlSetValue();
         r3 = 0x2;
         r4 = 0x2b68;
         r5 = 0x1;
@@ -4726,7 +4726,7 @@ s32 fn_800188E0(s32 mode, u32 ptr, u32 r5, u32 r6, u16* out) {
         }
         r0 = fn_80143FCC();
         if ((u8)r0 != 0) {
-            fn_80132A38(0x2d, (u16)r5);
+            msgctrlSetValue(0x2d, (u16)r5);
             winMsgOpen(2, 0x4262, 1, 0);
             winMsgClose(1);
             r0 = 0;
@@ -5190,7 +5190,7 @@ asm void fn_800192A8(void) {
 #pragma optimization_level 4
 s32 fn_800192A8(u8* a, u8* b) {
     extern void heroItemGetItemKindToItemAryPtr();
-    extern void fn_80132A38();
+    extern void msgctrlSetValue();
     u32 sp8_tbl;
     u32 sp12_tbl;
     u32 sp16_tbl;
@@ -5236,7 +5236,7 @@ s32 fn_800192A8(u8* a, u8* b) {
     r4 = (u32)itemDataBiosGetPtr(r3u);
     r4 = (u32)itemDataBiosGetKind(r4);
     heroItemGetItemKindToItemAryPtr(0, r4, &sp_a, 0, 0, 0);
-    ((void(*)(u32,u32))fn_80132A38)(0x34, (u32)(u16)sp_a);
+    ((void(*)(u32,u32))msgctrlSetValue)(0x34, (u32)(u16)sp_a);
     r29  = (s32)(s16)(u16)(((u32)((u32(*)(u32))GSmsgGetRect)(0xca)) >> 16);
     r29 += (s32)(s16)(u16)(((u32)((u32(*)(u32))GSmsgGetRect)(0x12e)) >> 16);
     r6 = (u32)(s32)(0xc3 - r29);
@@ -5259,7 +5259,7 @@ s32 fn_800192A8(u8* a, u8* b) {
             r30++;
             r29 += 4;
         }
-        ((void(*)(u32,u32))fn_80132A38)(0x34, r31_acc);
+        ((void(*)(u32,u32))msgctrlSetValue)(0x34, r31_acc);
     }
     r29 = (s32)(s16)(u16)(((u32)((u32(*)(u32))GSmsgGetRect)(0xca)) >> 16);
     r6 = (u32)(s32)(0xc3 - r29);
@@ -5488,7 +5488,7 @@ asm void fn_80019938(void) {
 #else
 #pragma optimization_level 4
 void fn_80019938(u8* a, u8* b) {
-    extern void fn_80132A38(s32, u32);
+    extern void msgctrlSetValue(s32, u32);
     extern void fn_800FB680(s32, s32, s32, u32);
     u8* base;
     s16 r0;
@@ -5504,7 +5504,7 @@ void fn_80019938(u8* a, u8* b) {
     base = base + r4 * 0xc;
     r4v = *(u32*)(base + 0x4);
     if (r4v == 0) return;
-    fn_80132A38(0x37, r4v);
+    msgctrlSetValue(0x37, r4v);
     fn_800FB680(0x0, 0x0, (s32)*(u8*)(a + 0x8b) | (s32)(-0x100), 0xe7);
 }
 #endif
@@ -5961,26 +5961,26 @@ void menuPokemonDrawItem(u8* ctx, u8* pane) {
         break;
     case 0x3BF:
         fn_800FB680(0x2E, 0, color, 0x2BD4);
-        fn_80132A38(0x34, *(s16*)(entry + 0x1A));
+        msgctrlSetValue(0x34, *(s16*)(entry + 0x1A));
         fn_800FBB34(0, 0, 0x2C, *(s16*)(pane + 0x56), color, 0xDE);
-        fn_80132A38(0x34, *(s16*)(entry + 0x18));
+        msgctrlSetValue(0x34, *(s16*)(entry + 0x18));
         fn_800FBB34(0, 0, (s16)(*(s16*)(pane + 0x54) - 2), *(s16*)(pane + 0x56), color, 0xDE);
         break;
     case 0x545:
         fn_800FB680(0x1B, 0, color, 0x195);
-        fn_80132A38(0x34, *(s16*)(entry + 0x1A));
+        msgctrlSetValue(0x34, *(s16*)(entry + 0x1A));
         fn_800FBB34(0, 0, 0x1B, *(s16*)(pane + 0x56), color, 0xDF);
-        fn_80132A38(0x34, *(s16*)(entry + 0x18));
+        msgctrlSetValue(0x34, *(s16*)(entry + 0x18));
         fn_800FBB34(0, 0, (s16)(*(s16*)(pane + 0x54) - 2), *(s16*)(pane + 0x56), color, 0xDF);
         break;
     case 0x3C0:
     case 0x546:
-        fn_80132A38(0x34, entry[0x17]);
+        msgctrlSetValue(0x34, entry[0x17]);
         fn_800FBB34(0, 0, *(s16*)(pane + 0x54), *(s16*)(pane + 0x56), color, 0xD3);
         break;
     case 0x3C1:
     case 0x547:
-        fn_80132A38(0x37, entry);
+        msgctrlSetValue(0x37, entry);
         fn_800FB680(0, 0, color, 0xE7);
         x = (s16)(GSmsgGetRect(0xE7) >> 16);
         if (entry[0x28] == 0) {
@@ -5991,7 +5991,7 @@ void menuPokemonDrawItem(u8* ctx, u8* pane) {
             msg = 0;
         }
         if (msg != 0) {
-            fn_80132A38(0x37, fn_800FA280(msg));
+            msgctrlSetValue(0x37, fn_800FA280(msg));
             fn_800FB680(x - 2, 0, color, 0xCF);
         }
         break;
@@ -6070,7 +6070,7 @@ void menuPokemonDrawHelp(u8* a) {
     extern u8 lbl_803A1D40[];
     extern u8 lbl_803A1C20[];
     extern u32 itemDataBiosGetPtr();
-    extern void fn_80132A38();
+    extern void msgctrlSetValue();
     extern void fn_800FB680();
     u32 r6;
     u32 r0;
@@ -6090,7 +6090,7 @@ void menuPokemonDrawHelp(u8* a) {
         }
     } else if ((s32)r0 == 0x1) {
         r3 = lbl_803A1C20 + (s32)((s8)*(u8*)(lbl_803A1D40 + 0x6)) * 0x30;
-        fn_80132A38(0x32, r3);
+        msgctrlSetValue(0x32, r3);
         r6 = 0x2b5e;
     } else if ((s32)r0 == 0x2) {
         r6 = 0x2b5f;

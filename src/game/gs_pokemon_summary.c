@@ -85,7 +85,7 @@ extern u16   itemDataBiosGetPtr(u16 speciesId);      /* Get species data */
 extern u16   itemDataBiosGetPrice(void);               /* Get display field count */
 
 /* Text rendering */
-extern void  fn_80132A38(s32 paramId, s32 value);
+extern void  msgctrlSetValue(s32 paramId, s32 value);
 extern u32   GSmsgGetRect(s32 resourceId);
 extern void  fn_800FB680(s32 x, s32 y, s32 flags, u32 color);
 
@@ -305,10 +305,10 @@ s32 fn_800150E4(s32 x, s32 pageIndex, u16* packedRange) {
             y = displayLine * 0x1F - scrollPixels;
             textX = x;
             if (itemIndex + 1 < 10) {
-                fn_80132A38(0x34, 0);
+                msgctrlSetValue(0x34, 0);
                 textX += (s32)(u16)(GSmsgGetRect(0xCA) >> 16);
             }
-            fn_80132A38(0x34, itemIndex + 1);
+            msgctrlSetValue(0x34, itemIndex + 1);
             fn_800FB680(textX, y, -1, 0xCA);
             textX += (s32)(u16)(GSmsgGetRect(0xCA) >> 16);
 
@@ -546,11 +546,11 @@ s32 fn_800155B0(s32 x, s32 pageIndex, u16* packedRange) {
 
             level = (u8)(itemDataBiosGetKinomiNo((u16)species) + 1);
             if (level < 10) {
-                fn_80132A38(0x34, 0);
+                msgctrlSetValue(0x34, 0);
                 fn_800FB680(textX, y, -1, 0xCA);
                 textX += (s32)(u16)(GSmsgGetRect(0xCA) >> 16);
             }
-            fn_80132A38(0x34, level);
+            msgctrlSetValue(0x34, level);
             fn_800FB680(textX, y, -1, 0xCA);
             textX += (s32)(u16)(GSmsgGetRect(0xCA) >> 16);
             itemDataBiosGetPtr((u16)species);
@@ -559,7 +559,7 @@ s32 fn_800155B0(s32 x, s32 pageIndex, u16* packedRange) {
 
             dataSource = SUMMARY_ENTRY_FIELD(entry);
             field = heroItemGetItemKindToItemAryPtr((void*)lbl_8047A2F8, (u8)dataSource, &totalCount, 0, 0, 0);
-            fn_80132A38(0x34, totalCount);
+            msgctrlSetValue(0x34, totalCount);
             textX = x + 0x11A - ((s16)(GSmsgGetRect(0xCA) >> 16) + (s16)(GSmsgGetRect(0x12E) >> 16));
             fn_800FB680(textX, y, -1, 0x12E);
 
@@ -579,7 +579,7 @@ s32 fn_800155B0(s32 x, s32 pageIndex, u16* packedRange) {
                 }
                 field = (u8*)field + 4;
             }
-            fn_80132A38(0x34, (u16)value);
+            msgctrlSetValue(0x34, (u16)value);
             fn_800FB680(x + 0x11A - (s16)(GSmsgGetRect(0xCA) >> 16), y, -1, 0xCA);
             itemIndex += listIndex + 1;
         }
@@ -693,16 +693,16 @@ s32 fn_800159BC(s32 x, s32 pageIndex, u16* packedRange) {
             fn_800FB680(x, y, -1, messageId);
             textX = x + (s32)(u16)(GSmsgGetRect(messageId) >> 16);
             if (subRank != 0xFF) {
-                fn_80132A38(0x34, (u8)(subRank + 1));
+                msgctrlSetValue(0x34, (u8)(subRank + 1));
                 fn_800FB680(textX, y, -1, 0xCA);
                 textX += (s32)(u16)(GSmsgGetRect(0xCA) >> 16);
             } else {
                 if ((s32)(rank + 1) < 10) {
-                    fn_80132A38(0x34, 0);
+                    msgctrlSetValue(0x34, 0);
                     fn_800FB680(textX, y, -1, 0xCA);
                     textX += (s32)(u16)(GSmsgGetRect(0xCA) >> 16);
                 }
-                fn_80132A38(0x34, rank + 1);
+                msgctrlSetValue(0x34, rank + 1);
                 fn_800FB680(textX, y, -1, 0xCA);
                 textX += (s32)(u16)(GSmsgGetRect(0xCA) >> 16);
             }
@@ -712,7 +712,7 @@ s32 fn_800159BC(s32 x, s32 pageIndex, u16* packedRange) {
 
             dataSource = SUMMARY_ENTRY_FIELD(entry);
             heroItemGetItemKindToItemAryPtr((void*)lbl_8047A2F8, (u8)dataSource, &totalCount, 0, 0, 0);
-            fn_80132A38(0x34, totalCount);
+            msgctrlSetValue(0x34, totalCount);
             textX = x + 0x11A - ((s16)(GSmsgGetRect(0xCA) >> 16) + (s16)(GSmsgGetRect(0x12E) >> 16));
             fn_800FB680(textX, y, -1, 0x12E);
 
@@ -732,7 +732,7 @@ s32 fn_800159BC(s32 x, s32 pageIndex, u16* packedRange) {
                 }
                 field = (u8*)field + 4;
             }
-            fn_80132A38(0x34, (u16)value);
+            msgctrlSetValue(0x34, (u16)value);
             fn_800FB680(x + 0x11A - (s16)(GSmsgGetRect(0xCA) >> 16), y, -1, 0xCA);
             itemIndex += listIndex + 1;
         }
@@ -841,7 +841,7 @@ s32 fn_80015E3C(s32 x, s32 pageIndex, u16* packedRange) {
 
             dataSource = SUMMARY_ENTRY_FIELD(entry);
             heroItemGetItemKindToItemAryPtr((void*)lbl_8047A2F8, (u8)dataSource, &totalCount, 0, 0, 0);
-            fn_80132A38(0x34, totalCount);
+            msgctrlSetValue(0x34, totalCount);
             textX = x + 0x11A - ((s16)(GSmsgGetRect(0xCA) >> 16) + (s16)(GSmsgGetRect(0x12E) >> 16));
             fn_800FB680(textX, y, -1, 0x12E);
 
@@ -861,7 +861,7 @@ s32 fn_80015E3C(s32 x, s32 pageIndex, u16* packedRange) {
                 }
                 field = (u8*)field + 4;
             }
-            fn_80132A38(0x34, (u16)value);
+            msgctrlSetValue(0x34, (u16)value);
             fn_800FB680(x + 0x11A - (s16)(GSmsgGetRect(0xCA) >> 16), y, -1, 0xCA);
             itemIndex += listIndex + 1;
         }
@@ -1649,7 +1649,7 @@ s32 fn_80017868(u32 unused, u8* ctx) {
     u32 r;
     r = heroGetStatus(lbl_8047A2F8, 0xC, 0);
     if ((s32)lbl_8047A2E0 != 3) return 0;
-    fn_80132A38(0x50, (s32)r);
+    msgctrlSetValue(0x50, (s32)r);
     fn_800FB680((s32)*(s16*)(ctx + 0x54) - (s32)(s16)(GSmsgGetRect(0x151) >> 16), 0, -1, 0x151);
     return 0;
 }
@@ -1945,7 +1945,7 @@ s32 fn_80017E8C(s32 pageIndex, u16 species, s16 slotIndex) {
 
     itemDataBiosGetPtr(species);
     if ((u8)fn_80143F9C() == 0) {
-        fn_80132A38(0x2D, species);
+        msgctrlSetValue(0x2D, species);
         winMsgOpen(2, 0x426C, 1, 0);
         winMsgClose(1);
         return 0;
@@ -2018,7 +2018,7 @@ s32 fn_80017E8C(s32 pageIndex, u16 species, s16 slotIndex) {
     }
 
     if ((u16)pcboxGetItemCapacity(0, species) < result) {
-        fn_80132A38(0x2D, species);
+        msgctrlSetValue(0x2D, species);
         winMsgOpen(2, 0x2B49, 1, 0);
         winMsgClose(1);
         return 0;
@@ -2031,8 +2031,8 @@ s32 fn_80017E8C(s32 pageIndex, u16 species, s16 slotIndex) {
         heroItemDecItemDataId((void*)lbl_8047A2F8, species, (u16)result, slotIndex);
     }
 
-    fn_80132A38(0x2D, species);
-    fn_80132A38(0x2F, result);
+    msgctrlSetValue(0x2D, species);
+    msgctrlSetValue(0x2F, result);
     winMsgOpen(2, 0x4266, 1, 0);
     winMsgClose(1);
     return 1;

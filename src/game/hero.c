@@ -194,7 +194,7 @@ extern u32 lbl_80478EB8;
 extern void fn_80113F48(void);
 extern void fn_8018C1E8(void);
 extern void fn_801653CC(void);
-extern void fn_80132A38(void);
+extern void msgctrlSetValue(void);
 extern void winMsgOpen(void);
 extern void winMsgClose(void);
 extern void pcboxDelItem(void);
@@ -457,7 +457,7 @@ extern void fn_801EE958(void);
 extern void fn_801EEB34(void);
 extern void memoDataSet(void);
 void pokemonCheckFightOut(void);
-extern void fn_80135AD0(void);
+extern void gamedataAttestBiosCopy(void);
 void pokemonCreate(void);
 void pokemonCreateRndFit(void);
 extern void fadeSet(void);
@@ -494,7 +494,7 @@ extern void fn_80140ACC(void);
 extern void fn_80141308(void);
 extern void fn_80142368(void);
 extern void fn_80140588(void);
-extern void fn_80134BC0(void);
+extern void pcboxAddPokemon(void);
 extern void fn_80142A88(void);
 extern void jumptable_803634F0();
 extern void jumptable_80363558();
@@ -1915,7 +1915,7 @@ u32 fn_80129D64(u8* ptr, u8* arg2) {
 }
 #endif
 /* 0x80129E20 | 0x100 */
-extern void fn_80134BC0(void);
+extern void pcboxAddPokemon(void);
 #if 0
 asm void heroGetPokemon(void) {
 #include "src/game/gs_field_world_fn_80129E20.inc"
@@ -1925,7 +1925,7 @@ s32 heroGetPokemon(u8* ptr, void* buf, u8 flag) {
     extern void* heroGetStatus(u8* a, u32 b, u32 c);
     extern u32 pokemonCheckValid(void* val);
     extern void pokemonBiosCopy(void* a, void* b);
-    extern u32 fn_80134BC0(u32 a, void* b, s32 c);
+    extern u32 pcboxAddPokemon(u32 a, void* b, s32 c);
     u8 local_buf[0x138];
     u8 i;
     s16 ret;
@@ -1946,7 +1946,7 @@ after_loop:
     ret = (s16)(u8)i;
     if ((u8)i >= 6) {
         if ((u8)flag == 0) { return -2; }
-        return (fn_80134BC0(0, local_buf, -1) == 1) ? -1 : -2;
+        return (pcboxAddPokemon(0, local_buf, -1) == 1) ? -1 : -2;
     }
     return ret;
 }
@@ -1963,7 +1963,7 @@ s32 heroCatchPokemon(u8* ptr, u8* buf, u32 arg3, u16 arg4, u8 flag) {
     extern u32 pokemonCheckValid(u32 val);
     extern void pokemonBiosCopy(void* a, void* b);
     extern void pokemonSetCatchStatus(u8* a, u32 b, u32 c, u32 d, u32 e, u32 f, u32 g);
-    extern u32 fn_80134BC0(u32 a, void* b, s32 c);
+    extern u32 pcboxAddPokemon(u32 a, void* b, s32 c);
     u8 local_buf[0x138];
     u8 field7a;
     u8 status;
@@ -1998,7 +1998,7 @@ s32 heroCatchPokemon(u8* ptr, u8* buf, u32 arg3, u16 arg4, u8 flag) {
     }
     if ((u8)i >= 6) {
         if ((u8)flag == 0) { return -2; }
-        return (fn_80134BC0(0, local_buf, -1) == 1) ? -1 : -2;
+        return (pcboxAddPokemon(0, local_buf, -1) == 1) ? -1 : -2;
     }
     return (s16)(u8)i;
 }

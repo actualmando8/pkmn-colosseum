@@ -644,7 +644,7 @@ extern void fadeCheck(u32 a);
 extern void winMsgOpenError(u32 a, u32 b, u32 c);
 extern void winMsgCloseFight(u32 a);
 extern void winMsgCloseError(u32 a);
-extern void fn_80132A38(u32 a, u32 b);
+extern void msgctrlSetValue(u32 a, u32 b);
 extern f32 lbl_8047B6E0;
 #if 0
 asm void fn_8000C3D4(void) {
@@ -675,7 +675,7 @@ s32 fn_8000C3D4(u32 arg1, u32 type) {
         _threadSwitch();
         break;
     case 3:
-        fn_80132A38(0x31, 0x7da);
+        msgctrlSetValue(0x31, 0x7da);
         break;
     }
     return 0;

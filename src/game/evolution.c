@@ -567,8 +567,8 @@ evolutionWazaLearn(u32 r3,u32 r4,u8 *r5,int r6,void *r7,
 LAB_0025d3c4:
     fn_80165668(0x4ca,0,0xff);
     uVar2 = fn_8011F4F0(r3);
-    fn_80132A38(0x32,uVar2);
-    fn_80132A38(0x39,r4 & 0xffff);
+    msgctrlSetValue(0x32,uVar2);
+    msgctrlSetValue(0x39,r4 & 0xffff);
     if (r6 == 0) {
       winMsgOpenField(0x423d,1,0);
       winMsgCloseField(1);
@@ -582,8 +582,8 @@ LAB_0025d3c4:
   }
   else {
     uVar2 = fn_8011F4F0(r3);
-    fn_80132A38(0x32,uVar2);
-    fn_80132A38(0x39,r4 & 0xffff);
+    msgctrlSetValue(0x32,uVar2);
+    msgctrlSetValue(0x39,r4 & 0xffff);
     do {
       if (r6 == 0) {
         winMsgOpenField(0x4243,1,0);
@@ -614,10 +614,10 @@ LAB_0025d3c4:
         }
         if (-1 < (int)uVar6) {
           uVar2 = fn_8011F4F0(r3);
-          fn_80132A38(0x32,uVar2);
-          fn_80132A38(0x5d,0x468);
+          msgctrlSetValue(0x32,uVar2);
+          msgctrlSetValue(0x5d,0x468);
           uVar4 = fn_8011F228(r3,uVar6 & 0xffff);
-          fn_80132A38(0x39,uVar4);
+          msgctrlSetValue(0x39,uVar4);
           if (r6 == 0) {
             winMsgOpenField(0x4248,1,0);
           }
@@ -627,8 +627,8 @@ LAB_0025d3c4:
           goto LAB_0025d3c4;
         }
       }
-      fn_80132A38(0x32,uVar2);
-      fn_80132A38(0x39,r4 & 0xffff);
+      msgctrlSetValue(0x32,uVar2);
+      msgctrlSetValue(0x39,r4 & 0xffff);
       if (r6 == 0) {
         winMsgOpenField(0x4242,1,0);
         cVar5 = fn_8001E184();
@@ -700,7 +700,7 @@ u32 evolutionDemo(u32 *r3,int r4,u32 r5,u32 r6)
 
   fn_801DA4E8(*r3,1);
   uVar5 = fn_8011F4F0(r5);
-  fn_80132A38(0x32,uVar5);
+  msgctrlSetValue(0x32,uVar5);
   winMsgOpenField(0x4401,1,0);
   if (r5 == 0) {
     iVar6 = 0;
@@ -846,7 +846,7 @@ LAB_0025db60:
       _threadSwitch();
     }
     uVar5 = fn_8011F4F0(r5);
-    fn_80132A38(0x32,uVar5);
+    msgctrlSetValue(0x32,uVar5);
     winMsgOpenField(0x43ff,1,0);
     winMsgCloseField(1);
     fadeSet((double)lbl_8047E6C0,3);
@@ -883,10 +883,10 @@ LAB_0025db60:
       _threadSwitch();
     }
     uVar5 = fn_8011F4F0(r5);
-    fn_80132A38(0x32,uVar5);
+    msgctrlSetValue(0x32,uVar5);
     uVar9 = fn_8011F5C8(r6);
-    fn_80132A38(0x4e,uVar9);
-    fn_80132A38(0x5d,0x3d2);
+    msgctrlSetValue(0x4e,uVar9);
+    msgctrlSetValue(0x5d,0x3d2);
     winMsgOpenField(0x4400,1,0);
     winMsgCloseField(1);
     dVar14 = lbl_8047E6B8;

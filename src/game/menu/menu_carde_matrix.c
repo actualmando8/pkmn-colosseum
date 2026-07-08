@@ -32,7 +32,7 @@ extern void windowGetKeyInfo();
 extern void fn_801081F8();
 extern void winSpriteGetDisp();
 extern void winSpriteSetDisp();
-extern void fn_80132A38();
+extern void msgctrlSetValue();
 extern void fn_80166A28();
 extern void __assert();
 extern void* memset(void* dst, int val, u32 size);
@@ -1188,7 +1188,7 @@ do {
             *(u32*)((u8*)r31 + 0x4C) = tmp;
             r4 = r3 + r4;
             r3 = 0x37;
-            ((void(*)(void))fn_80132A38)();
+            ((void(*)(void))msgctrlSetValue)();
             break;
         } else {
             tmp = r25 << 2;
@@ -1209,7 +1209,7 @@ do {
     if (tmp != 0) {
         r4 = r27;
         r3 = 0x37;
-        ((void(*)(void))fn_80132A38)();
+        ((void(*)(void))msgctrlSetValue)();
     }
     if ((s32)r26 < 0 || (s32)r26 >= 3) {
         break;
@@ -1220,7 +1220,7 @@ do {
         r4 = r27;
         *(u32*)((u8*)r31 + 0x4C) = tmp;
         r3 = 0x37;
-        ((void(*)(void))fn_80132A38)();
+        ((void(*)(void))msgctrlSetValue)();
         break;
     } else if ((s32)r26 >= 2) {
         tmp = r25 << 2;
@@ -1277,7 +1277,7 @@ do {
         tmp = tmp & 0xFFFF;
         *(u16*)((u8*)r7 + 0x2) = r5;
         *(u16*)((u8*)r7 + 0x4) = tmp;
-        ((void(*)(void))fn_80132A38)();
+        ((void(*)(void))msgctrlSetValue)();
         break;
         return;
     }
@@ -1317,7 +1317,7 @@ void fn_8007D4FC(void) {
         tmp = 0xe4;
         r3 = 0x37;
         *(u32*)((u8*)r31 + 0x4C) = tmp;
-        ((void(*)(void))fn_80132A38)();
+        ((void(*)(void))msgctrlSetValue)();
     } else {
 
         tmp = 0x0;
@@ -1470,7 +1470,7 @@ void fn_8007D564(void) {
             r4 = r3;
             *(u32*)((u8*)r30 + 0x4C) = tmp;
             r3 = 0x37;
-            ((void(*)(void))fn_80132A38)();
+            ((void(*)(void))msgctrlSetValue)();
             return;
     }
     }
@@ -1540,10 +1540,10 @@ void fn_8007D79C(void) {
     r3 = 0x58;
     *(u32*)((u8*)r31 + 0x4C) = tmp;
     r4 = *(u8*)((u8*)r30 + 0x70);
-    ((void(*)(void))fn_80132A38)();
+    ((void(*)(void))msgctrlSetValue)();
     r4 = r30 + 0x64;
     r3 = 0x23;
-    ((void(*)(void))fn_80132A38)();
+    ((void(*)(void))msgctrlSetValue)();
 
     return;
 }
@@ -1599,7 +1599,7 @@ void fn_8007D89C(void) {
         tmp = 0xe3;
         r3 = 0x37;
         *(u32*)((u8*)r31 + 0x4C) = tmp;
-        ((void(*)(void))fn_80132A38)();
+        ((void(*)(void))msgctrlSetValue)();
         return;
     }
     tmp = 0x0;

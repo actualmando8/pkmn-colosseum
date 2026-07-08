@@ -1223,7 +1223,7 @@ void fn_80084A8C(void) {
     extern void savedataGetStatus();
     extern void heroInit();
     extern void heroBiosCopy();
-    extern void fn_80132A38();
+    extern void msgctrlSetValue();
     extern void gamedataAttestBiosGetLangareaId();
     extern void gamedataBiosGetGamedataAtttestPtr();
     extern void fn_80166A28();
@@ -1376,7 +1376,7 @@ void fn_80084A8C(void) {
         if (tmp != 0) {
             r3 = 0x2f;
             r4 = 0x1;
-            fn_80132A38();
+            msgctrlSetValue();
             r3 = 0x7;
             r4 = 0x3d88;
             r5 = 0x0;
@@ -1473,7 +1473,7 @@ void fn_80084A8C(void) {
             r4 = r26;
             *(u32*)(r27 + r24) = tmp;
             r3 = 0x2f;
-            fn_80132A38();
+            msgctrlSetValue();
             r3 = 0x7;
             r4 = 0x3c42;
             r5 = 0x0;
@@ -1557,7 +1557,7 @@ void fn_80084A8C(void) {
                 ((void(*)(void))menuSetEnablePort)();
                 r4 = r15 + 0x1;
                 r3 = 0x2f;
-                fn_80132A38();
+                msgctrlSetValue();
                 if ((s32)r15 == 0) {
                     r3 = 0x7;
                     r4 = 0x44c0;
@@ -1608,7 +1608,7 @@ void fn_80084A8C(void) {
         }
         r4 = r26;
         r3 = 0x2f;
-        fn_80132A38();
+        msgctrlSetValue();
         r3 = 0x7;
         r4 = 0x3c43;
         r5 = 0x0;
@@ -1729,7 +1729,7 @@ void fn_80084A8C(void) {
                 ((void(*)(void))menuSetEnablePort)();
                 r4 = r15 + 0x1;
                 r3 = 0x2f;
-                fn_80132A38();
+                msgctrlSetValue();
                 if ((s32)r15 == 0) {
                     r3 = 0x7;
                     r4 = 0x44c0;
@@ -1903,7 +1903,7 @@ void fn_80084A8C(void) {
             ((void(*)(void))menuSetEnablePort)();
             r4 = r15 + 0x1;
             r3 = 0x2f;
-            fn_80132A38();
+            msgctrlSetValue();
             if ((s32)r15 == 0) {
                 r3 = 0x7;
                 r4 = 0x44c0;
@@ -2022,7 +2022,7 @@ void fn_80084A8C(void) {
             ((void(*)(void))menuSetEnablePort)();
             r4 = r16 + 0x1;
             r3 = 0x2f;
-            fn_80132A38();
+            msgctrlSetValue();
             if ((s32)r16 == 0) {
                 r3 = 0x7;
                 r4 = 0x44c0;
@@ -2062,7 +2062,7 @@ void fn_80084A8C(void) {
             tmp = *(u8*)((u8*)r24 + 0x21);
             r4 = (s8)tmp;
             r4 = r4 + 0x1;
-            fn_80132A38();
+            msgctrlSetValue();
             r3 = 0x7;
             r4 = 0x3c47;
             r5 = 0x0;
@@ -2118,7 +2118,7 @@ void fn_80084A8C(void) {
         if (tmp == 0) {
             r4 = r26;
             r3 = 0x2f;
-            fn_80132A38();
+            msgctrlSetValue();
             r3 = 0x7;
             r4 = 0x3c4d;
             r5 = 0x0;
@@ -2264,7 +2264,7 @@ void fn_80084A8C(void) {
         ((void(*)(void))menuSetEnablePort)();
         r4 = r15 + 0x1;
         r3 = 0x2f;
-        fn_80132A38();
+        msgctrlSetValue();
         if ((s32)r15 == 0) {
             r3 = 0x7;
             r4 = 0x44c0;
@@ -2385,7 +2385,7 @@ void fn_80084A8C(void) {
             ((void(*)(void))menuSetEnablePort)();
             r4 = r16 + 0x1;
             r3 = 0x2f;
-            fn_80132A38();
+            msgctrlSetValue();
             if ((s32)r16 == 0) {
                 r3 = 0x7;
                 r4 = 0x44c0;
@@ -2425,7 +2425,7 @@ void fn_80084A8C(void) {
             tmp = *(u8*)((u8*)r24 + 0x21);
             r4 = (s8)tmp;
             r4 = r4 + 0x1;
-            fn_80132A38();
+            msgctrlSetValue();
             r3 = 0x7;
             r4 = 0x3c49;
             r5 = 0x0;
@@ -2563,7 +2563,7 @@ void fn_80084A8C(void) {
             ((void(*)(void))menuSetEnablePort)();
             r4 = r16 + 0x1;
             r3 = 0x2f;
-            fn_80132A38();
+            msgctrlSetValue();
             if ((s32)r16 == 0) {
                 r3 = 0x7;
                 r4 = 0x44c0;
@@ -2603,7 +2603,7 @@ void fn_80084A8C(void) {
             tmp = *(u8*)((u8*)r24 + 0x21);
             r4 = (s8)tmp;
             r4 = r4 + 0x1;
-            fn_80132A38();
+            msgctrlSetValue();
             r3 = 0x7;
             r4 = 0x44f0;
             r5 = 0x0;
@@ -2713,7 +2713,7 @@ void fn_80084A8C(void) {
         ((void(*)(void))menuSetEnablePort)();
         r4 = r16 + 0x1;
         r3 = 0x2f;
-        fn_80132A38();
+        msgctrlSetValue();
         if ((s32)r16 == 0) {
             r3 = 0x7;
             r4 = 0x44c0;
@@ -2753,7 +2753,7 @@ void fn_80084A8C(void) {
         tmp = *(u8*)((u8*)r24 + 0x21);
         r4 = (s8)tmp;
         r4 = r4 + 0x1;
-        fn_80132A38();
+        msgctrlSetValue();
         r3 = 0x7;
         r4 = 0x3c49;
         r5 = 0x0;
@@ -2875,7 +2875,7 @@ void fn_80084A8C(void) {
             ((void(*)(void))menuSetEnablePort)();
             r4 = r16 + 0x1;
             r3 = 0x2f;
-            fn_80132A38();
+            msgctrlSetValue();
             if ((s32)r16 == 0) {
                 r3 = 0x7;
                 r4 = 0x44c0;
@@ -2915,7 +2915,7 @@ void fn_80084A8C(void) {
             tmp = *(u8*)((u8*)r24 + 0x21);
             r4 = (s8)tmp;
             r4 = r4 + 0x1;
-            fn_80132A38();
+            msgctrlSetValue();
             r3 = 0x7;
             r4 = 0x44c3;
             r5 = 0x0;
@@ -3023,7 +3023,7 @@ void fn_80084A8C(void) {
                 ((void(*)(void))menuSetEnablePort)();
                 r4 = r16 + 0x1;
                 r3 = 0x2f;
-                fn_80132A38();
+                msgctrlSetValue();
                 if ((s32)r16 == 0) {
                     r3 = 0x7;
                     r4 = 0x44c0;
@@ -3063,7 +3063,7 @@ void fn_80084A8C(void) {
                 tmp = *(u8*)((u8*)r24 + 0x21);
                 r4 = (s8)tmp;
                 r4 = r4 + 0x1;
-                fn_80132A38();
+                msgctrlSetValue();
                 r3 = 0x7;
                 r4 = 0x44c3;
                 r5 = 0x0;
@@ -3317,7 +3317,7 @@ void fn_80084A8C(void) {
         ((void(*)(void))menuSetEnablePort)();
         r4 = r15 + 0x1;
         r3 = 0x2f;
-        fn_80132A38();
+        msgctrlSetValue();
         if ((s32)r15 == 0) {
             r3 = 0x7;
             r4 = 0x44c0;
@@ -3436,7 +3436,7 @@ void fn_80084A8C(void) {
         ((void(*)(void))menuSetEnablePort)();
         r4 = r16 + 0x1;
         r3 = 0x2f;
-        fn_80132A38();
+        msgctrlSetValue();
         if ((s32)r16 == 0) {
             r3 = 0x7;
             r4 = 0x44c0;
@@ -3476,7 +3476,7 @@ void fn_80084A8C(void) {
         tmp = *(u8*)((u8*)r24 + 0x21);
         r4 = (s8)tmp;
         r4 = r4 + 0x1;
-        fn_80132A38();
+        msgctrlSetValue();
         r3 = 0x7;
         r4 = 0x3c47;
         r5 = 0x0;
@@ -3585,7 +3585,7 @@ void fn_80084A8C(void) {
             ((void(*)(void))menuSetEnablePort)();
             r4 = r16 + 0x1;
             r3 = 0x2f;
-            fn_80132A38();
+            msgctrlSetValue();
             if ((s32)r16 == 0) {
                 r3 = 0x7;
                 r4 = 0x44c0;
@@ -3625,7 +3625,7 @@ void fn_80084A8C(void) {
             tmp = *(u8*)((u8*)r24 + 0x21);
             r4 = (s8)tmp;
             r4 = r4 + 0x1;
-            fn_80132A38();
+            msgctrlSetValue();
             r3 = 0x7;
             r4 = 0x4417;
             r5 = 0x0;
@@ -3657,7 +3657,7 @@ void fn_80084A8C(void) {
             if (tmp != 0) goto L_80084E44;
             r3 = 0x2f;
             r4 = 0x0;
-            fn_80132A38();
+            msgctrlSetValue();
             r3 = 0x7;
             r4 = 0x44cf;
             r5 = 0x0;
@@ -3684,7 +3684,7 @@ void fn_80084A8C(void) {
         ((void(*)(void))menuSetEnablePort)();
         r4 = r26;
         r3 = 0x2f;
-        fn_80132A38();
+        msgctrlSetValue();
         r3 = 0x7;
         r4 = 0x3c4b;
         r5 = 0x0;
@@ -3780,7 +3780,7 @@ void fn_80084A8C(void) {
                 ((void(*)(void))menuSetEnablePort)();
                 r4 = r15 + 0x1;
                 r3 = 0x2f;
-                fn_80132A38();
+                msgctrlSetValue();
                 if ((s32)r15 == 0) {
                     r3 = 0x7;
                     r4 = 0x44c0;
@@ -3911,7 +3911,7 @@ void fn_80084A8C(void) {
             ((void(*)(void))menuSetEnablePort)();
             r4 = r15 + 0x1;
             r3 = 0x2f;
-            fn_80132A38();
+            msgctrlSetValue();
             if ((s32)r15 == 0) {
                 r3 = 0x7;
                 r4 = 0x44c0;
@@ -4042,7 +4042,7 @@ void fn_80084A8C(void) {
         ((void(*)(void))menuSetEnablePort)();
         r4 = r15 + 0x1;
         r3 = 0x2f;
-        fn_80132A38();
+        msgctrlSetValue();
         if ((s32)r15 == 0) {
             r3 = 0x7;
             r4 = 0x44c0;
@@ -4173,7 +4173,7 @@ void fn_80084A8C(void) {
             ((void(*)(void))menuSetEnablePort)();
             r4 = r15 + 0x1;
             r3 = 0x2f;
-            fn_80132A38();
+            msgctrlSetValue();
             if ((s32)r15 == 0) {
                 r3 = 0x7;
                 r4 = 0x44c0;
@@ -4302,7 +4302,7 @@ void fn_80084A8C(void) {
             ((void(*)(void))menuSetEnablePort)();
             r4 = r15 + 0x1;
             r3 = 0x2f;
-            fn_80132A38();
+            msgctrlSetValue();
             if ((s32)r15 == 0) {
                 r3 = 0x7;
                 r4 = 0x44c0;

@@ -861,7 +861,7 @@ u32 _fightMenuFightTrainerGcHeroOpenMenuSubMain__FP13FIGHT_TRAINERP15FightOutPok
 {
     extern u8 fightOutPokemonCheckFightActionWazaSelect(u32, u32);
     extern u8 fn_801F54A4(u32, u32, u32, u32);
-    extern void fn_80132A38(u32, u32);
+    extern void msgctrlSetValue(u32, u32);
     extern void winMsgOpenFight(u32, u32, u32);
     extern void fn_801F000C(u32);
     extern void winMsgCloseFight(u32);
@@ -878,7 +878,7 @@ u32 _fightMenuFightTrainerGcHeroOpenMenuSubMain__FP13FIGHT_TRAINERP15FightOutPok
     case 0:
         flag = fightOutPokemonCheckFightActionWazaSelect(r4, 1);
         if (flag == 1) {
-            fn_80132A38(0x11, r4);
+            msgctrlSetValue(0x11, r4);
             winMsgOpenFight(0x75fc, 1, 1);
             fn_801F000C(0x40);
             winMsgCloseFight(0);
@@ -1537,9 +1537,9 @@ u32 fightMenuWazaKoukaMsg(u32 msgId, u32 unused, u32 itemId)
     extern u32 fn_800FA280(u32);
     u32 itemName;
 
-    fn_80132A38(0x10);
+    msgctrlSetValue(0x10);
     itemName = fn_800FA280(itemGetStatus(0, itemId, 1, 0));
-    fn_80132A38(0x29, itemName);
+    msgctrlSetValue(0x29, itemName);
     if (msgId != 0) {
         winMsgOpenFight(msgId, 1, 1);
         return 1;
@@ -1554,11 +1554,11 @@ u32 fightMenuWazaOutMsg(u32 msgId, u32 pokemon)
     extern u32 fn_800FA280(u32);
     u32 name;
 
-    fn_80132A38(0xf, msgId);
+    msgctrlSetValue(0xf, msgId);
     name = fn_800FA280(wazaGetStatus(0, pokemon, 0xa, 0));
-    fn_80132A38(0xd, name);
-    fn_80132A38(0x28, fn_800FA280(wazaGetStatus(0, pokemon, 1, 0)));
-    fn_80132A38(0xe, fn_800FA280(wazaGetStatus(0, pokemon, 0xb, 0)));
+    msgctrlSetValue(0xd, name);
+    msgctrlSetValue(0x28, fn_800FA280(wazaGetStatus(0, pokemon, 1, 0)));
+    msgctrlSetValue(0xe, fn_800FA280(wazaGetStatus(0, pokemon, 0xb, 0)));
     winMsgOpenFight(0x768d, 1, 1);
     return 1;
 }
@@ -2717,10 +2717,10 @@ u32 _fightMenuFightTrainerGcHeroOpenMenuSubWaza__FP13FIGHT_TRAINERP15FightOutPok
         cVar9 = fightOutPokemonCheckCanOutOkWazaBanme(r4,(u16)uVar3,1,local_70);
         uVar7 = (int)pokemonGetStatus(uVar1,0,0x7f,uVar3 & 0xffff);
         if (cVar9 != '\0') {
-          fn_80132A38(0x11,r4);
+          msgctrlSetValue(0x11,r4);
           wazaGetStatus(0,uVar7,1,0);
           uVar2 = fn_800FA280();
-          fn_80132A38(0x28,uVar2);
+          msgctrlSetValue(0x28,uVar2);
           uVar7 = fightOutPokemonGetSoubiItemDataId(r4);
           fn_801F4C14(0,0,0x56,0,uVar7);
         }
@@ -2730,7 +2730,7 @@ u32 _fightMenuFightTrainerGcHeroOpenMenuSubWaza__FP13FIGHT_TRAINERP15FightOutPok
         else if (cVar9 == '\x05') {
           wazaGetStatus(0,local_70[0],1,0);
           uVar2 = fn_800FA280();
-          fn_80132A38(0x28,uVar2);
+          msgctrlSetValue(0x28,uVar2);
           saved_r27 = 0x76bb;
         }
         else if (cVar9 == '\x04') {

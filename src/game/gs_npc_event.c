@@ -53,7 +53,7 @@
  *     0x0FBC: Generic NPC dialog event
  *     0x0FBD: Special NPC battle trigger
  *   For battle triggers, looks up the trainer data from lbl_803A2688,
- *   sets the battle parameter via fn_80132A38 (param 0x4D), then
+ *   sets the battle parameter via msgctrlSetValue (param 0x4D), then
  *   initiates a trainer model render via fn_800FB680.
  *
  * fn_80030388 (GSnpcEvt_ProcessMirorB):
@@ -97,7 +97,7 @@ extern void  fn_800D6728(void);                    /* Commit render state */
 /* NPC/interaction */
 extern void* menuModelRender(void* data);              /* Get model from data */
 extern s32   heroGetStatus(void* partyData, s32 slot, s32 p3);
-extern void  fn_80132A38(s32 paramId, s32 value);
+extern void  msgctrlSetValue(s32 paramId, s32 value);
 extern void  fn_800FB680(s32, s32, u32, u16);
 
 /* Event queue */
@@ -157,7 +157,7 @@ void fn_80031188(u8* r3, u8* r4) {
     case 0xF6A:
         {
             s32 val = heroGetStatus((void*)lbl_803A2688, 1, 0);
-            fn_80132A38(0x4D, val);
+            msgctrlSetValue(0x4D, val);
             fn_800FB680(0, 0, combined, 0x4413);
         }
         break;
@@ -271,7 +271,7 @@ void fn_80031404(u8* arg0, u8* arg1) {
             msg = 0;
         }
         if (msg != 0) {
-            fn_80132A38(0x37, ((s32 (*)(s32))fn_800FA280)(msg));
+            msgctrlSetValue(0x37, ((s32 (*)(s32))fn_800FA280)(msg));
             fn_800FB680(2, 0, combined, 0xCF);
             winSpriteSetDisp(arg1, 1);
         } else {
@@ -322,13 +322,13 @@ void fn_80031648(u8* arg0, u8* arg1) {
     }
 
     if (((u8 (*)(void*))fn_8011E850)(obj) != 0) {
-        fn_80132A38(0x37, ((s32 (*)(s32))fn_800FA280)(0x56C));
+        msgctrlSetValue(0x37, ((s32 (*)(s32))fn_800FA280)(0x56C));
     } else if (((u8 (*)(void*))pokemonCheckValid)(obj) != 0 &&
                ((u8 (*)(void*))menuCBRule_CheckPokemonEventFlag)(obj) == 1) {
         if (((u8 (*)(void*))fn_8011E8DC)(obj) != 0) {
-            fn_80132A38(0x37, ((s32 (*)(s32))fn_800FA280)(0x56B));
+            msgctrlSetValue(0x37, ((s32 (*)(s32))fn_800FA280)(0x56B));
         } else {
-            fn_80132A38(0x37, ((s32 (*)(void*))fn_8011F4F0)(obj));
+            msgctrlSetValue(0x37, ((s32 (*)(void*))fn_8011F4F0)(obj));
         }
     } else {
         winSpriteSetDisp(arg1, 0);
@@ -1075,7 +1075,7 @@ void fn_8003258C(void) {
             }
             fn_80166AB8(0x3cc, 0, 0);
             heroAddPokecoupon(0, r31);
-            fn_80132A38(0x2f, r31);
+            msgctrlSetValue(0x2f, r31);
             winMsgOpen(8, 0x3b60, 1, 0);
             winMsgClose(1);
         } else {
@@ -1083,7 +1083,7 @@ void fn_8003258C(void) {
             case 0x1e:
                 fn_80166AB8(0x3cc, 0, 0);
                 heroAddPokecoupon(0, 0x2580);
-                fn_80132A38(0x2f, 0x2580);
+                msgctrlSetValue(0x2f, 0x2580);
                 winMsgOpen(8, 0x3b8c, 1, 0);
                 winMsgClose(1);
                 break;
@@ -1862,7 +1862,7 @@ void fn_80030388(u8* r3, u8* r4) {
     case 0x10CA:
         {
             s32 val = heroGetStatus((void*)lbl_803A2688, 1, 0);
-            fn_80132A38(0x4D, val);
+            msgctrlSetValue(0x4D, val);
             fn_800FB680(0, 0, combined, 0x4413);
         }
         break;
@@ -1919,7 +1919,7 @@ void fn_8003042C(u8* arg0, u8* arg1) {
         if (((u16 (*)(void*))pokemonGetSoubiItemDataId)(obj) != 0) {
             itemDataBiosGetPtr();
             itemDataBiosGetName();
-            fn_80132A38(0x37, ((s32 (*)(void))fn_800FA280)());
+            msgctrlSetValue(0x37, ((s32 (*)(void))fn_800FA280)());
             fn_800FB680(0, 0, combined, 0xE7);
             *(u32*)(arg1 + 0x4C) = 0;
             winSpriteSetDisp(arg1, 1);
@@ -2023,7 +2023,7 @@ void fn_80030574(u8* arg0, u8* arg1) {
     }
 
     if (value != 0) {
-        fn_80132A38(0x37, ((s32 (*)(u32))fn_800FA280)(value));
+        msgctrlSetValue(0x37, ((s32 (*)(u32))fn_800FA280)(value));
         fn_800FBB34(0, 0, *(s16*)(arg1 + 0x54), *(s16*)(arg1 + 0x56), combined, 0xE7);
         winSpriteSetDisp(arg1, 1);
     } else {
@@ -2065,7 +2065,7 @@ void fn_800307A8(u8* arg0, u8* arg1) {
     }
 
     if (obj != 0) {
-        fn_80132A38(0x2F, ((u8 (*)(void*, s32, s32, s32))pokemonGetStatus)(obj, 0, 0x7A, 0));
+        msgctrlSetValue(0x2F, ((u8 (*)(void*, s32, s32, s32))pokemonGetStatus)(obj, 0, 0x7A, 0));
         fn_800FBB34(0, 0, *(s16*)(arg1 + 0x54), *(s16*)(arg1 + 0x56), combined, 0x4414);
         winSpriteSetDisp(arg1, 1);
     } else {
@@ -2123,7 +2123,7 @@ void fn_800308D4(u8* arg0, u8* arg1) {
     if (obj != 0) {
         hi = (s16)((u32)GSmsgGetRect(0x2BD4) >> 16);
         fn_800FB680(0, 0, combined, 0x2BD4);
-        fn_80132A38(0x37, fn_800FA280(fn_8011E760(fn_8011E778(pokemonGetStatus(obj, 0, 0x6E, 0)))));
+        msgctrlSetValue(0x37, fn_800FA280(fn_8011E760(fn_8011E778(pokemonGetStatus(obj, 0, 0x6E, 0)))));
         fn_800FB680(hi, 0, combined, 0xE7);
         *(u32*)(arg1 + 0x4C) = 0;
         winSpriteSetDisp(arg1, 1);
@@ -2176,7 +2176,7 @@ void fn_80030A44(u8* arg0, u8* arg1) {
         return;
     }
 
-    fn_80132A38(0x37, ((s32 (*)(void*))fn_8011F4F0)(obj));
+    msgctrlSetValue(0x37, ((s32 (*)(void*))fn_8011F4F0)(obj));
     fn_800FB680(0, 0, combined, 0xE7);
     winSpriteSetDisp(arg1, 1);
 
@@ -2196,7 +2196,7 @@ void fn_80030A44(u8* arg0, u8* arg1) {
 
         if (msg != 0) {
             x = (s16)(((u32 (*)(s32))GSmsgGetRect)(0xE7) >> 16);
-            fn_80132A38(0x37, ((s32 (*)(s32))fn_800FA280)(msg));
+            msgctrlSetValue(0x37, ((s32 (*)(s32))fn_800FA280)(msg));
             fn_800FB680((u16)x + 2, 0, combined, 0xCF);
         }
     }
@@ -2437,7 +2437,7 @@ void fn_80034DC0(u8* arg0, u8* arg1) {
     mask = -0x100;
     combined = byte | mask;
     fn_800FB680(0, 0, combined, 0x3CC8);
-    fn_80132A38(0x34, lbl_8047A44C);
+    msgctrlSetValue(0x34, lbl_8047A44C);
     fn_800FBB34(0, 0, *(s16*)(arg1 + 0x54), *(s16*)(arg1 + 0x56), combined, 0x3CC9);
 }
 #pragma pop

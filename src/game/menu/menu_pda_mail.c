@@ -241,10 +241,10 @@ s32 fn_8004D590(PdaMailWindowA* window, PdaMailOutA* out)
 #endif
 
 /* mailGetSenderName (battle_waza.c): "Waza entry get field 0x0C by index".
- * fn_800FA280/fn_80132A38 (gs_title.c): message/window callbacks. */
+ * fn_800FA280/msgctrlSetValue (gs_title.c): message/window callbacks. */
 extern u32 mailGetSenderName(s32 idx);
 extern void* fn_800FA280(u32);
-extern void fn_80132A38(s32, void*);
+extern void msgctrlSetValue(s32, void*);
 
 #if 0
 asm s32 fn_8004D6F0(PdaMailWindowA* window, PdaMailOutA* out) {
@@ -261,7 +261,7 @@ s32 fn_8004D6F0(PdaMailWindowA* window, PdaMailOutA* out)
     u32 val = mailGetSenderName(pdaMailGetMailID(**window->field_0x60));
     if (val != 0) {
         void* winPtr = fn_800FA280(val);
-        fn_80132A38(0x37, winPtr);
+        msgctrlSetValue(0x37, winPtr);
         out->field_0x4c = 0xE7;
     } else {
         out->field_0x4c = 0;
@@ -287,7 +287,7 @@ s32 fn_8004D760(PdaMailWindowA* window, PdaMailOutA* out)
     u32 val = mailGetSubject(pdaMailGetMailID(**window->field_0x60));
     if (val != 0) {
         void* winPtr = fn_800FA280(val);
-        fn_80132A38(0x37, winPtr);
+        msgctrlSetValue(0x37, winPtr);
         out->field_0x4c = 0xE7;
     } else {
         out->field_0x4c = 0;
@@ -901,7 +901,7 @@ s32 fn_8004C2D8(u8* ctx, u8* p)
     if ((pages = (count + 9) / 10) <= 0) {
         pages = 1;
     }
-    fn_80132A38(0x34, (void*) pages);
+    msgctrlSetValue(0x34, (void*) pages);
     fn_800FB680(*(s16*) (p + 0x54) - (s32) (GSmsgGetRect(0xca) >> 16), 0, color, 0xca);
     return 0;
 }
@@ -917,7 +917,7 @@ asm s32 fn_8004C36C(void* ctx, void* p) {
 s32 fn_8004C36C(u8* ctx, u8* p)
 {
     u32 color = (u32) ctx[0x8b] | 0xe66e0000u;
-    fn_80132A38(0x34, (void*) ((s8) ctx[0x94] + 1));
+    msgctrlSetValue(0x34, (void*) ((s8) ctx[0x94] + 1));
     fn_800FB680(*(s16*) (p + 0x54) - (s32) (GSmsgGetRect(0xca) >> 16), 0, color, 0xca);
     return 0;
 }
