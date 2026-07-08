@@ -569,8 +569,14 @@ game/gs_pcbox.c:
 game/gs_title.c:
 	.text       start:0x80020328 end:0x80026370
 
-game/gs_worldmap.c:
-	.text       start:0x80026370 end:0x80030170
+game/menuNameEntry.c:
+	.text       start:0x80026370 end:0x80029850
+
+game/menuShop.c:
+	.text       start:0x80029850 end:0x8002DD24
+
+game/menuPokemonChange.c:
+	.text       start:0x8002DD24 end:0x80030170
 
 game/gs_npc_event.c:
 	.text       start:0x80030170 end:0x80033278

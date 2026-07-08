@@ -792,7 +792,7 @@ void reliveCeremonyAll(u32 r3)
 
 {
     extern s8 fn_8001E184();
-    extern int fn_80029660();
+    extern int menuNameEntryOpenNoFade();
     extern int pokemonBiosSetFriend();
     extern int pokemonBiosSetPoolFriend();
     extern u16 pokemonBiosGetPoolFriend();
@@ -899,7 +899,7 @@ void reliveCeremonyAll(u32 r3)
       fadeSet((double)lbl_8047E680,3);
       fadeCheck(1);
       wazaSequenceSysRelease();
-      fn_80029660(2,r3);
+      menuNameEntryOpenNoFade(2,r3);
       fn_801DADC0(1);
       iVar3 = loadSequence((int*)auStack_24,uVar1,(u16*)&lbl_80478DB0,1);
       if (iVar3 == 1) {

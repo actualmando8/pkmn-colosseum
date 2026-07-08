@@ -51,8 +51,8 @@ extern u8 fn_8001FD48[];
 extern u8 fn_80021B14[];
 extern u8 fn_80022B3C[];
 extern u8 fn_80023E5C[];
-extern u8 fn_80028FBC[];
-extern u8 fn_80029760[];
+extern u8 menuNameEntry[];
+extern u8 menuNameEntryOpen[];
 extern u8 fn_8002CE6C[];
 extern u8 fn_8002D5D4[];
 extern u8 menuShopOpen[];
@@ -93862,10 +93862,10 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)fn_8001FD48),
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_80029760),
+    (void*)((u8*)menuNameEntryOpen),
     (void*)0x01010000,
     (void*)0x00000000,
-    (void*)((u8*)fn_80028FBC),
+    (void*)((u8*)menuNameEntry),
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)((u8*)fn_8003842C),

@@ -42,11 +42,11 @@ extern u8 fn_80020618[];
 extern u8 fn_80020E9C[];
 extern u8 fn_80023E60[];
 extern u8 fn_80024308[];
-extern u8 fn_80027D58[];
-extern u8 fn_800281F0[];
-extern u8 fn_80028534[];
+extern u8 menuNameEntryCursor[];
+extern u8 menuNameEntryButton[];
+extern u8 menuNameEntrySelectButton[];
 extern u8 menuNameEntrySelectCtrl[];
-extern u8 fn_80028948[];
+extern u8 menuNameEntryBackCtrl[];
 extern u8 fn_8002A618[];
 extern u8 fn_8002AA68[];
 extern u8 fn_8002BE08[];
@@ -1047,8 +1047,8 @@ void* lbl_802E2DB8[1904] = {
     (void*)0x60900000,
     (void*)0x03EF0000,
     (void*)0x00000000,
-    (void*)((u8*)fn_80027D58),
-    (void*)((u8*)fn_800281F0),
+    (void*)((u8*)menuNameEntryCursor),
+    (void*)((u8*)menuNameEntryButton),
     (void*)((u8*)menuNameEntryCtrl),
     (void*)0x00000000,
     (void*)0x60000000,
@@ -1056,13 +1056,13 @@ void* lbl_802E2DB8[1904] = {
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_80028948),
+    (void*)((u8*)menuNameEntryBackCtrl),
     (void*)0x00000000,
     (void*)0x64300000,
     (void*)0x04240000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_80028534),
+    (void*)((u8*)menuNameEntrySelectButton),
     (void*)((u8*)menuNameEntrySelectCtrl),
     (void*)0x00000000,
     (void*)0x65240000,

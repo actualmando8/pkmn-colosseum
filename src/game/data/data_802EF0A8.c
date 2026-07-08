@@ -106,19 +106,19 @@ extern u8 fn_80026D98[];
 extern u8 fn_80026FEC[];
 extern u8 fn_8002717C[];
 extern u8 fn_8002730C[];
-extern u8 fn_8002749C[];
-extern u8 fn_800275F4[];
+extern u8 menuNameEntryDraw50Cursor[];
+extern u8 menuNameEntryDraw50Text[];
 extern u8 fn_80027740[];
 extern u8 fn_8002777C[];
 extern u8 fn_800277B8[];
-extern u8 fn_800277F4[];
-extern u8 fn_800278A4[];
-extern u8 fn_80028444[];
-extern u8 fn_80028494[];
-extern u8 fn_800284E4[];
-extern u8 fn_80028620[];
-extern u8 fn_80028728[];
-extern u8 fn_80028830[];
+extern u8 menuNameEntryDrawXButtonText[];
+extern u8 menuNameEntryDrawTitle[];
+extern u8 menuNameEntrySelectDrawSelText3[];
+extern u8 menuNameEntrySelectDrawSelText2[];
+extern u8 menuNameEntrySelectDrawSelText1[];
+extern u8 menuNameEntryBackDrawHumanModel[];
+extern u8 menuNameEntryBackDrawPokemonModel[];
+extern u8 menuNameEntryBackDrawBall[];
 extern u8 fn_8002A3D4[];
 extern u8 fn_8002A400[];
 extern u8 fn_8002A48C[];
@@ -7371,7 +7371,7 @@ void* lbl_802EF0A8[33726] = {
     (void*)0x00100000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_800278A4),
+    (void*)((u8*)menuNameEntryDrawTitle),
     (void*)0x03EF0000,
     (void*)0x80FF0013,
     (void*)0x010B01D4,
@@ -7483,7 +7483,7 @@ void* lbl_802EF0A8[33726] = {
     (void*)0x001D0084,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_8002749C),
+    (void*)((u8*)menuNameEntryDraw50Cursor),
     (void*)0x03FF0000,
     (void*)0x00FF013F,
     (void*)0x008D002B,
@@ -7602,7 +7602,7 @@ void* lbl_802EF0A8[33726] = {
     (void*)0x00770000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_800275F4),
+    (void*)((u8*)menuNameEntryDraw50Text),
     (void*)0x04100000,
     (void*)0x00FF016E,
     (void*)0x009D00B2,
@@ -7616,7 +7616,7 @@ void* lbl_802EF0A8[33726] = {
     (void*)0x00120000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_800277F4),
+    (void*)((u8*)menuNameEntryDrawXButtonText),
     (void*)0x04120000,
     (void*)0x00FF0228,
     (void*)0x014E0038,
@@ -7784,21 +7784,21 @@ void* lbl_802EF0A8[33726] = {
     (void*)0x00120000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_80028444),
+    (void*)((u8*)menuNameEntrySelectDrawSelText3),
     (void*)0x042A0000,
     (void*)0x00FF0177,
     (void*)0x00CF0036,
     (void*)0x00120000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_80028494),
+    (void*)((u8*)menuNameEntrySelectDrawSelText2),
     (void*)0x042B0000,
     (void*)0x00FF0177,
     (void*)0x00B00036,
     (void*)0x00120000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_800284E4),
+    (void*)((u8*)menuNameEntrySelectDrawSelText1),
     (void*)0x042C0000,
     (void*)0x00FF0177,
     (void*)0x0091007E,
@@ -24024,21 +24024,21 @@ void* lbl_802EF0A8[33726] = {
     (void*)0x02300000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_80028620),
+    (void*)((u8*)menuNameEntryBackDrawHumanModel),
     (void*)0x0D3A0000,
     (void*)0x00FF0046,
     (void*)0x003C00C8,
     (void*)0x00C80000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_80028728),
+    (void*)((u8*)menuNameEntryBackDrawPokemonModel),
     (void*)0x03EB0000,
     (void*)0x00FF0000,
     (void*)0x00000280,
     (void*)0x01E00000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_80028830),
+    (void*)((u8*)menuNameEntryBackDrawBall),
     (void*)0x0D390000,
     (void*)0x40FF00EF,
     (void*)0x005700AA,

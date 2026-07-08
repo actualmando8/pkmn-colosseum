@@ -868,7 +868,7 @@ extern void menuPokemonOpen(s32, s32, s32);
 extern void fn_800F0654(u32, s32, ...);
 extern void evolutionOpen(u32, u32, s32, u16*, s32, u32*);
 extern void menuShopOpen(u32);
-extern void fn_80029760(u32, s32);
+extern void menuNameEntryOpen(u32, s32);
 extern void fn_80165A20(u32, s32, s32);
 extern u8 lbl_804673F8[];
 extern u32 lbl_80478E10;
@@ -1368,7 +1368,7 @@ idx_done:
         return 0;
     }
     val = table[idx * 2 + 1];
-    fn_80029760(val, 0);
+    menuNameEntryOpen(val, 0);
     return 0;
 }
 #pragma peephole reset
