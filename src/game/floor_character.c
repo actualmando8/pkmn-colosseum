@@ -269,7 +269,7 @@ extern void GSscene_GetCameraViewVector(void*);
 extern f32 cameraGetHeight(void);
 extern f32 cameraGetDistance(void);
 extern f32 cameraGetRotY(void);
-extern void fn_800E01F4(void* obj, f32 f1, f32 f2, f32 f3);
+extern void set__5GSvecFfff(void* obj, f32 f1, f32 f2, f32 f3);
 extern void GSmtxMakeYRotation(void*, f32);
 extern void GSvecTransform(void*, void*, void*);
 extern void GSvecAdd(void*, void*, void*);
@@ -1633,7 +1633,7 @@ asm void floorCharacterBiosGetRot(void) {
 s32 floorCharacterBiosGetRot(void* a, void* b) {
     if (a == 0) return 0;
     if (b == 0) return 0;
-    fn_800E01F4(b, *(f32*)&lbl_8047CFC0,
+    set__5GSvecFfff(b, *(f32*)&lbl_8047CFC0,
                 *(f32*)&lbl_8047CFC4 * (f32)(s32)*(s16*)((u8*)a + 4),
                 *(f32*)&lbl_8047CFC0);
     return 1;
@@ -1655,7 +1655,7 @@ u32 floorCharacterBiosGetPos(u8* ptr, void* obj) {
     if (obj == NULL) {
         return 0;
     }
-    fn_800E01F4(obj, *(f32*)(ptr + 0x18), *(f32*)(ptr + 0x1C), *(f32*)(ptr + 0x20));
+    set__5GSvecFfff(obj, *(f32*)(ptr + 0x18), *(f32*)(ptr + 0x1C), *(f32*)(ptr + 0x20));
     return 1;
 }
 #pragma pop

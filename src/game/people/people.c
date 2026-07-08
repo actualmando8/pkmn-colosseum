@@ -79,7 +79,7 @@ extern void* memcpy(void* dst, const void* src, u32 size);
 /* External functions referenced from asm wrappers */
 extern void GSlightSetTarget(void);
 extern void GSlightSetPosition(void);
-extern void fn_800E01F4(void);
+extern void set__5GSvecFfff(void);
 extern void GSmodelGetRotationPtr(void*);
 extern void GSmodelGetPositionPtr(void*);
 extern void GSmodelGetVisibility(void*);

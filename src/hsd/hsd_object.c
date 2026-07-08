@@ -209,7 +209,7 @@ s32 fn_80191118(HSD_ObjectTransformData* data) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_800E01F4(void* vec, f32 x, f32 y, f32 z);
+extern void set__5GSvecFfff(void* vec, f32 x, f32 y, f32 z);
 extern void fn_800E0168(void* dst, void* max, void* min);
 #if 0
 asm void fn_80191358(void) {
@@ -220,8 +220,8 @@ asm void fn_80191358(void) {
 void fn_80191358(HSD_BBox* bbox, f32 x, f32 y, f32 z) {
     if (bbox->init_flag != 0) {
         bbox->init_flag = 0;
-        fn_800E01F4(bbox->min, x, y, z);
-        fn_800E01F4(bbox->max, x, y, z);
+        set__5GSvecFfff(bbox->min, x, y, z);
+        set__5GSvecFfff(bbox->max, x, y, z);
     } else {
         if (x < bbox->min[0]) { bbox->min[0] = x; }
         if (y < bbox->min[1]) { bbox->min[1] = y; }

@@ -256,7 +256,7 @@ asm void cameraMovePositionXYZ(void) {
 void cameraMovePositionXYZ(f32 a, f32 b, f32 c, f32 angle) {
     f32 tmp[3];
     void* p;
-    fn_800E01F4(tmp, a, b, c);
+    set__5GSvecFfff(tmp, a, b, c);
     p = lbl_80478C40;
     *((u8*)p + 0x01) = 1;
     {
@@ -326,7 +326,7 @@ asm void cameraMoveTargetXYZ(void) {
 void cameraMoveTargetXYZ(f32 a, f32 b, f32 c, f32 angle) {
     f32 tmp[3];
     void* p;
-    fn_800E01F4(tmp, a, b, c);
+    set__5GSvecFfff(tmp, a, b, c);
     p = lbl_80478C40;
     *((u8*)p + 0x01) = 1;
     {

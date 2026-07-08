@@ -57,7 +57,7 @@ u32  __GBATransfer(int r3, u32 r4, u32 r5, u32 r6);
 
 /* Forward declarations for asm wrapper bl targets (use () form for compat) */
 extern void DSPInit();
-extern void fn_800E01F4();
+extern void set__5GSvecFfff();
 extern int  _fadeEffectGetRandom__FUl();
 extern u32  pokemonBiosGetCatchTrainerRnd();
 extern u32  pokemonBiosGetRnd();

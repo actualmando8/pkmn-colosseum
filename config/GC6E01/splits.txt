@@ -1116,7 +1116,10 @@ game/gs_material.c:
 	.text       start:0x800DF028 end:0x800DFEEC
 
 game/gs_math_vec.c:
-	.text       start:0x800DFEEC end:0x800E0678
+	.text       start:0x800DFEEC end:0x800E0218
+
+game/gs_math_mtx.c:
+	.text       start:0x800E0218 end:0x800E0678
 
 game/gs_math_mtx44.c:
 	.text       start:0x800E0678 end:0x800E06B8

@@ -57,7 +57,7 @@ u32  __GBATransfer(int r3, u32 r4, u32 r5, u32 r6);
 
 /* Forward declarations for asm wrapper bl targets (use () form for compat) */
 extern void DSPInit();
-extern void fn_800E01F4();
+extern void set__5GSvecFfff();
 extern int  _fadeEffectGetRandom__FUl();
 extern u32  pokemonBiosGetCatchTrainerRnd();
 extern u32  pokemonBiosGetRnd();
@@ -354,7 +354,7 @@ void fn_8025E1BC(float f1, float f2, float f3, float f4, float f5, float f6) {
   extern void fn_8025DE0C();
   extern void fn_8025DDAC();
   extern void fn_8025DE54();
-  extern void fn_800E01F4();
+  extern void set__5GSvecFfff();
   u32 *r31;
   u32 *r30;
   float out_buf[3];
@@ -369,7 +369,7 @@ void fn_8025E1BC(float f1, float f2, float f3, float f4, float f5, float f6) {
     r31 = validptr_8025E1BC(&lbl_8047B658);
     r30 = validptr_8025E1BC(&lbl_8047B658);
     if (r30 != (u32 *)0 && *r30 != 0) {
-      fn_800E01F4(sv1, out_buf, sv2, sv3);
+      set__5GSvecFfff(sv1, out_buf, sv2, sv3);
       fn_8025DE0C(r30, (u32)out_buf);
     }
     {

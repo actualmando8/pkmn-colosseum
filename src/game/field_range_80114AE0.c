@@ -271,7 +271,7 @@ extern void GSscene_GetCameraViewVector(void*);
 extern f32 cameraGetHeight(void);
 extern f32 cameraGetDistance(void);
 extern f32 cameraGetRotY(void);
-extern void fn_800E01F4(void* obj, f32 f1, f32 f2, f32 f3);
+extern void set__5GSvecFfff(void* obj, f32 f1, f32 f2, f32 f3);
 extern void GSmtxMakeYRotation(void*, f32);
 extern void GSvecTransform(void*, void*, void*);
 extern void GSvecAdd(void*, void*, void*);
@@ -1454,7 +1454,7 @@ void floorUpdateFieldCamera_Pseudocode(void) {
     extern f32 lbl_8047CFDC;
     extern f32 lbl_8047CFE0;
     extern void GSvecSquareDistance();
-    extern void fn_800E01F4();
+    extern void set__5GSvecFfff();
     extern u32 lbl_8047AD68;
     extern u32 lbl_8047AD6C;
     u8 sp[0xA0];
@@ -1525,7 +1525,7 @@ void floorUpdateFieldCamera_Pseudocode(void) {
     f1 = *(f32*)((u8*)r29 + 0x0);
     f2 = *(f32*)((u8*)r29 + 0x4);
     f3 = *(f32*)((u8*)r29 + 0x8);
-    fn_800E01F4();
+    set__5GSvecFfff();
     r4 = r25;
     r3 = (u32)sp + 0x8;
     GSvecSquareDistance();

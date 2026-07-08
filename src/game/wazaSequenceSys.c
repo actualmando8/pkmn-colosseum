@@ -103,7 +103,7 @@ void fn_801D9E8C(void* effect) {
     default: val = WAZA_SDATA2_VALUE(8047E39C); break;
     }
 
-    fn_800E01F4(scale_buf, val, val, val);
+    set__5GSvecFfff(scale_buf, val, val, val);
 
     fn_80118FB0(fx->effect_handle, (s32)target, 4, 0, 1, 0);
     fn_80118D18(fx->effect_handle, 1);
@@ -185,7 +185,7 @@ void fn_801DA070(void* effect) {
     default: val = WAZA_SDATA2_VALUE(8047E39C); break;
     }
 
-    fn_800E01F4(scale_buf, val, val, val);
+    set__5GSvecFfff(scale_buf, val, val, val);
 
     fn_80118FB0(fx->field_80, (s32)target, 4, 0, 1, 0);
     fn_80118D18(fx->field_80, 1);

@@ -71,7 +71,7 @@ extern void  GSmodelGetPart(void* model, u32 param);
 extern void  GSpartFree(void* model, u32 param);
 extern void  fn_800E24B0(void* model, u32 param);
 extern void  fn_800E209C(void* model, u32 param);
-extern void  fn_800E01F4(void* dst, void* src);
+extern void  set__5GSvecFfff(void* dst, void* src);
 extern void  GSvecCopy(void* dst, void* src);
 extern void  GSvecAdd(void* model, void* param);
 extern void  fn_800E0BA0(void* param);

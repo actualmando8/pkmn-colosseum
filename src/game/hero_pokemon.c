@@ -269,7 +269,7 @@ extern void GSscene_GetCameraViewVector(void*);
 extern f32 cameraGetHeight(void);
 extern f32 cameraGetDistance(void);
 extern f32 cameraGetRotY(void);
-extern void fn_800E01F4(void* obj, f32 f1, f32 f2, f32 f3);
+extern void set__5GSvecFfff(void* obj, f32 f1, f32 f2, f32 f3);
 extern void GSmtxMakeYRotation(void*, f32);
 extern void GSvecTransform(void*, void*, void*);
 extern void GSvecAdd(void*, void*, void*);

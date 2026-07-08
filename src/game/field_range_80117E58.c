@@ -269,7 +269,7 @@ extern void GSscene_GetCameraViewVector(void*);
 extern f32 cameraGetHeight(void);
 extern f32 cameraGetDistance(void);
 extern f32 cameraGetRotY(void);
-extern void fn_800E01F4(void* obj, f32 f1, f32 f2, f32 f3);
+extern void set__5GSvecFfff(void* obj, f32 f1, f32 f2, f32 f3);
 extern void GSmtxMakeYRotation(void*, f32);
 extern void GSvecTransform(void*, void*, void*);
 extern void GSvecAdd(void*, void*, void*);
@@ -1893,7 +1893,7 @@ void fn_80118F7C(u8* obj, void* arg) {
     f32 f1 = *(f32*)(&obj[0x38]);
     f32 f2 = *(f32*)(&obj[0x3C]);
     f32 f3 = *(f32*)(&obj[0x40]);
-    fn_800E01F4(arg, f1, f2, f3);
+    set__5GSvecFfff(arg, f1, f2, f3);
 }
 /* 0x80118FB0 | 0x12C */
 extern void psLinkChildGensToJObj(void);
@@ -1906,7 +1906,7 @@ asm void fn_80118FB0(void) {
 #else
 void fn_80118FB0(u8* obj, u8* desc, u32 state, u32 byte5, u32 init_from_zero, u32 attach_model) {
     extern void GSvecCopy(void* dst, void* src);
-    extern void fn_800E01F4(void* dst, f32 x, f32 y, f32 z);
+    extern void set__5GSvecFfff(void* dst, f32 x, f32 y, f32 z);
     extern void psLinkChildGensToJObj(u32 model, u32 value);
     f32 zero;
     f32 one;
@@ -1916,22 +1916,22 @@ void fn_80118FB0(u8* obj, u8* desc, u32 state, u32 byte5, u32 init_from_zero, u3
         *(u32*)(obj + 0x4C) = *(u16*)(desc + 0x2);
         if ((u8)init_from_zero == 1) {
             zero = lbl_8047CFE8;
-            fn_800E01F4(obj + 0x50, zero, zero, zero);
+            set__5GSvecFfff(obj + 0x50, zero, zero, zero);
             zero = lbl_8047CFE8;
-            fn_800E01F4(obj + 0x5C, zero, zero, zero);
+            set__5GSvecFfff(obj + 0x5C, zero, zero, zero);
             one = lbl_8047CFEC;
-            fn_800E01F4(obj + 0x68, one, one, one);
+            set__5GSvecFfff(obj + 0x68, one, one, one);
         } else {
             GSvecCopy(obj + 0x50, obj + 0x14);
             GSvecCopy(obj + 0x5C, obj + 0x20);
             GSvecCopy(obj + 0x68, obj + 0x2C);
         }
         zero = lbl_8047CFE8;
-        fn_800E01F4(obj + 0x14, zero, zero, zero);
+        set__5GSvecFfff(obj + 0x14, zero, zero, zero);
         zero = lbl_8047CFE8;
-        fn_800E01F4(obj + 0x20, zero, zero, zero);
+        set__5GSvecFfff(obj + 0x20, zero, zero, zero);
         one = lbl_8047CFEC;
-        fn_800E01F4(obj + 0x2C, one, one, one);
+        set__5GSvecFfff(obj + 0x2C, one, one, one);
         if ((u8)attach_model != 0) {
             psLinkChildGensToJObj(*(u32*)(obj + 0x10), *(u32*)(desc + 0x8));
         }
@@ -2173,12 +2173,12 @@ void fn_80119BD0(u32 arg1, u32 arg2, u32 arg5, u8* arg6) {
         if (*(s32*)(node + 0x44) == 0 && handle != 0) {
             *(u32*)(node + 0x48) = *(u32*)(entry + 0x04);
             *(u32*)(node + 0x4C) = *(u16*)(entry + 0x02);
-            fn_800E01F4(node + 0x50, lbl_8047CFE8, lbl_8047CFE8, lbl_8047CFE8);
-            fn_800E01F4(node + 0x5C, lbl_8047CFE8, lbl_8047CFE8, lbl_8047CFE8);
-            fn_800E01F4(node + 0x68, lbl_8047CFEC, lbl_8047CFEC, lbl_8047CFEC);
-            fn_800E01F4(node + 0x14, lbl_8047CFE8, lbl_8047CFE8, lbl_8047CFE8);
-            fn_800E01F4(node + 0x20, lbl_8047CFE8, lbl_8047CFE8, lbl_8047CFE8);
-            fn_800E01F4(node + 0x2C, lbl_8047CFEC, lbl_8047CFEC, lbl_8047CFEC);
+            set__5GSvecFfff(node + 0x50, lbl_8047CFE8, lbl_8047CFE8, lbl_8047CFE8);
+            set__5GSvecFfff(node + 0x5C, lbl_8047CFE8, lbl_8047CFE8, lbl_8047CFE8);
+            set__5GSvecFfff(node + 0x68, lbl_8047CFEC, lbl_8047CFEC, lbl_8047CFEC);
+            set__5GSvecFfff(node + 0x14, lbl_8047CFE8, lbl_8047CFE8, lbl_8047CFE8);
+            set__5GSvecFfff(node + 0x20, lbl_8047CFE8, lbl_8047CFE8, lbl_8047CFE8);
+            set__5GSvecFfff(node + 0x2C, lbl_8047CFEC, lbl_8047CFEC, lbl_8047CFEC);
             *(u32*)(node + 0x44) = handle;
             *(u8*)(node + 0x05) = 0;
             *(u8*)(node + 0x06) = 1;

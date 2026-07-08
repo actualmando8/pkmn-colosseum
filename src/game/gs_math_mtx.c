@@ -1,22 +1,23 @@
 /**
- * @file gs_math_vec.c
- * @brief GS render engine segment -- split from gs_render.c.
+ * @file gs_math_mtx.c
+ * @brief GS render engine segment -- split from gs_math_vec.c.
  *
- * XD source unit: game/pxdvs/GSAPI/GSmath/GSvec.cpp
- * Address range: 0x800DFEEC - 0x800E0218 (17 functions)
+ * XD source unit: game/pxdvs/GSAPI/GSmath/GSmtx.cpp
+ * Address range: 0x800E0218 - 0x800E0678 (20 functions)
  *
- * ~17 tiny vector methods (0x10-0xAC). One real TU: Colosseum's GSvec.cpp
- * with all methods out-of-line; XD moved them to header inlines so the
- * linker's surviving weak copies live in floorFieldCamera.cpp/floor.cpp
- * (0x8012481C/4C/7C, 0x80121004) - hence some anchors are non-monotonic
- * dedup artifacts, NOT ordering evidence.
+ * ~20 tiny matrix methods (0x20-0x68), all thin wrappers around SDK
+ * PSMTX/C_MTX calls; references one read-only identity-matrix constant
+ * (lbl_80315568). Colosseum compiled these C++ methods out-of-line; XD's
+ * GSmtx.cpp .text is only the static-init (0x9C) since the methods moved
+ * to header inlines there.
  *
  * Split from src/game/gs_render.c (physical XD source-unit split), then
- * further split from the combined game/gs_math_vec.c bucket
- * (0x800DFEEC-0x800E0678) into this GSvec.cpp segment and the sibling
- * GSmtx.cpp segment (game/gs_math_mtx.c, 0x800E0218-0x800E0678).
+ * further split out of the combined game/gs_math_vec.c bucket
+ * (0x800DFEEC-0x800E0678) as the GSmtx.cpp segment, sibling to the
+ * GSvec.cpp segment retained in game/gs_math_vec.c
+ * (0x800DFEEC-0x800E0218).
  * The dead #ifdef PCPORT reference block (never defined in configure.py,
- * same situation as gs_gfx.c) was stripped during the split.
+ * same situation as gs_gfx.c) was stripped during the original split.
  */
 
 #include "dolphin/types.h"
@@ -478,203 +479,220 @@ extern u32 lbl_8047CB50;
 extern u32 lbl_8047CB48;
 extern u32 lbl_8047AB3C;
 
+extern void C_MTXLookAt(void);
 #if 0
-asm void GSvecTransformQuat(void) {
-#include "src/game/gs_render_fn_800DFEEC.inc"
+asm void fn_800E0218(void) {
+#include "src/game/gs_render_fn_800E0218.inc"
 }
 #else
-#pragma push
-#pragma fp_contract on
-void GSvecTransformQuat(f32* r3, f32* r4, f32* r5) {
-    f32 f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12;
-    f6 = r5[1];
-    f12 = r4[1];
-    f10 = r5[2];
-    f11 = r4[0];
-    f0 = f6 * f12;
-    f5 = r5[0];
-    f2 = f10 * f12;
-    f8 = r4[2];
-    f1 = f6 * f11;
-    f9 = r4[3];
-    f0 = f5 * f11 + f0;
-    f3 = f5 * f9 + f2;
-    f2 = f5 * f8;
-    f7 = f10 * f8 + f0;
-    f1 = f10 * f9 + f1;
-    f4 = -(f6 * f8 - f3);
-    f0 = f11 * f7;
-    f2 = f6 * f9 + f2;
-    f6 = -(f5 * f12 - f1);
-    f0 = f9 * f4 + f0;
-    f5 = -(f10 * f11 - f2);
-    f0 = f12 * f6 + f0;
-    f0 = -(f8 * f5 - f0);
-    r3[0] = f0;
-    f0 = r4[1];
-    f1 = r4[3];
-    f0 = f0 * f7;
-    f2 = r4[2];
-    f3 = r4[0];
-    f0 = f1 * f5 + f0;
-    f0 = f2 * f4 + f0;
-    f0 = -(f3 * f6 - f0);
-    r3[1] = f0;
-    f0 = r4[2];
-    f1 = r4[3];
-    f0 = f0 * f7;
-    f2 = r4[0];
-    f3 = r4[1];
-    f0 = f1 * f6 + f0;
-    f0 = f2 * f5 + f0;
-    f0 = -(f3 * f4 - f0);
-    r3[2] = f0;
+void fn_800E0218(void)
+{
+    C_MTXLookAt();
 }
-#pragma pop
 #endif
 
-extern void PSMTXMultVec(void*, void*, void*);
+extern void PSMTXTranspose(void*, void*);
 #if 0
-asm void GSvecTransform(void) {
-#include "src/game/gs_render_GSvecTransform.inc"
+asm void fn_800E0238(void) {
+#include "src/game/gs_render_fn_800E0238.inc"
 }
 #else
-void GSvecTransform(void* a, void* b, void* c) { PSMTXMultVec(b, c, a); }
+void fn_800E0238(void* a, void* b) { PSMTXTranspose(b, a); }
 #endif
 
-extern void PSVECCrossProduct(void*, void*, void*);
+extern void PSMTXInverse(void*, void*);
 #if 0
-asm void fn_800DFFCC(void) {
-#include "src/game/gs_render_fn_800DFFCC.inc"
+asm void fn_800E0264(void) {
+#include "src/game/gs_render_fn_800E0264.inc"
 }
 #else
-void fn_800DFFCC(void* a, void* b, void* c) { PSVECCrossProduct(b, c, a); }
+void fn_800E0264(void* a, void* b)
+{
+    PSMTXInverse(b, a);
+}
 #endif
 
-extern void PSVECDotProduct(void);
+extern void PSMTXConcat(void*, void*, void*);
 #if 0
-asm void fn_800E0000(void) {
-#include "src/game/gs_render_fn_800E0000.inc"
+asm void fn_800E0290(void* a, void* b, void* c) {
+#include "src/game/gs_render_fn_800E0290.inc"
 }
 #else
-void fn_800E0000(void) { PSVECDotProduct(); }
+void fn_800E0290(void* a, void* b, void* c)
+{
+    PSMTXConcat(b, c, a);
+}
 #endif
 
-extern void PSVECSquareDistance(void);
+extern void PSMTXScaleApply(void*, void*);
 #if 0
-asm void GSvecSquareDistance(void) {
-#include "src/game/gs_render_GSvecSquareDistance.inc"
+asm void fn_800E02C4(void) {
+#include "src/game/gs_render_fn_800E02C4.inc"
 }
 #else
-void GSvecSquareDistance(void) { PSVECSquareDistance(); }
+void fn_800E02C4(void* a) { PSMTXScaleApply(a, a); }
 #endif
 
-extern void PSVECDistance(void);
+extern void PSMTXRotRad(void*, u32);
 #if 0
-asm void GSvecDistance(void) {
-#include "src/game/gs_render_fn_800E0040.inc"
+asm void fn_800E02E8(void* obj) {
+#include "src/game/gs_render_fn_800E02E8.inc"
 }
 #else
-void GSvecDistance(void) { PSVECDistance(); }
-#endif
-
-extern void PSVECNormalize(void*, void*);
-#if 0
-asm void fn_800E0060(void) {
-#include "src/game/gs_render_fn_800E0060.inc"
-}
-#else
-void fn_800E0060(void* a, void* b) { PSVECNormalize(b, a); }
-#endif
-
-extern void PSVECMag(void);
-#if 0
-asm void fn_800E008C(void) {
-#include "src/game/gs_render_fn_800E008C.inc"
-}
-#else
-void fn_800E008C(void) { PSVECMag(); }
-#endif
-
-extern void PSVECScale(void*, void*, f32);
-extern const f32 lbl_8047CAD8;
-#if 0
-asm void fn_800E00AC(void) {
-#include "src/game/gs_render_fn_800E00AC.inc"
-}
-#else
-void fn_800E00AC(void* a, void* b, f32 scale) {
-    PSVECScale(b, a, lbl_8047CAD8 / scale);
+void fn_800E02E8(void* obj, f32 angle)
+{
+    u8 tmp[0x30];
+    PSMTXRotRad(tmp, 0x5a);
+    PSMTXConcat(obj, tmp, obj);
 }
 #endif
 
 #if 0
-asm void fn_800E00E0(void) {
-#include "src/game/gs_render_fn_800E00E0.inc"
+asm void fn_800E032C(void* obj) {
+#include "src/game/gs_render_fn_800E032C.inc"
 }
 #else
-void fn_800E00E0(f32* dst, f32* src) { dst[0] = -src[0]; dst[1] = -src[1]; dst[2] = -src[2]; }
-#endif
-
-#if 0
-asm void fn_800E0108(void) {
-#include "src/game/gs_render_fn_800E0108.inc"
-}
-#else
-void fn_800E0108(f32* dst, f32* a, f32* b) {
-    dst[0] = a[0] * b[0];
-    dst[1] = a[1] * b[1];
-    dst[2] = a[2] * b[2];
+void fn_800E032C(void* obj, f32 angle)
+{
+    u8 tmp[0x30];
+    PSMTXRotRad(tmp, 0x59);
+    PSMTXConcat(obj, tmp, obj);
 }
 #endif
 
 #if 0
-asm void fn_800E013C(void* a, void* b, f32 c) {
-#include "src/game/gs_render_fn_800E013C.inc"
+asm void fn_800E0370(void* obj) {
+#include "src/game/gs_render_fn_800E0370.inc"
 }
 #else
-void fn_800E013C(void* a, void* b, f32 c) { PSVECScale(b, a, c); }
+void fn_800E0370(void* obj, f32 angle)
+{
+    u8 tmp[0x30];
+    PSMTXRotRad(tmp, 0x58);
+    PSMTXConcat(obj, tmp, obj);
+}
 #endif
 
-extern void PSVECSubtract(void*, void*, void*);
+extern void PSMTXTransApply(void*, void*, f32, f32, f32);
 #if 0
-asm void fn_800E0168(void) {
-#include "src/game/gs_render_fn_800E0168.inc"
+asm void fn_800E03B4(void) {
+#include "src/game/gs_render_fn_800E03B4.inc"
 }
 #else
-void fn_800E0168(void* a, void* b, void* c) { PSVECSubtract(b, c, a); }
-#endif
-
-extern void PSVECAdd(void*, void*, void*);
-#if 0
-asm void GSvecAdd(void) {
-#include "src/game/gs_render_GSvecAdd.inc"
+void fn_800E03B4(void* dst, f32* src) {
+    PSMTXTransApply(dst, dst, src[0], src[1], src[2]);
 }
-#else
-void GSvecAdd(void* a, void* b, void* c) { PSVECAdd(b, c, a); }
-#endif
-
-#if 0
-asm void GSvecCopy(void) {
-#include "src/game/gs_render_fn_800E01D0.inc"
-}
-#else
-void GSvecCopy(void* dst, void* src) { memcpy(dst, src, 0xc); }
 #endif
 
 #if 0
-asm void set__5GSvecFfff(void) {
-#include "src/game/gs_render_fn_800E01F4.inc"
+asm void fn_800E03E8(void* a, f32 b, f32 c, f32 d) {
+#include "src/game/gs_render_fn_800E03E8.inc"
 }
 #else
-void set__5GSvecFfff(f32* arr, f32 x, f32 y, f32 z) { arr[0] = x; arr[1] = y; arr[2] = z; }
+void fn_800E03E8(void* a, f32 b, f32 c, f32 d) { PSMTXTransApply(a, a, b, c, d); }
 #endif
 
-extern f32 lbl_8047CADC;
+extern void PSMTXQuat(void);
 #if 0
-asm void clear__5GSvecFv(void) {
-#include "src/game/gs_render_clear__5GSvecFv.inc"
+asm void fn_800E040C(void) {
+#include "src/game/gs_render_fn_800E040C.inc"
 }
 #else
-void clear__5GSvecFv(f32* arr) { f32 v = lbl_8047CADC; arr[0] = v; arr[1] = v; arr[2] = v; }
+void fn_800E040C(void)
+{
+    PSMTXQuat();
+}
+#endif
+
+extern u8 lbl_80315568[];
+#if 0
+asm void fn_800E042C(void) {
+#include "src/game/gs_render_fn_800E042C.inc"
+}
+#else
+void fn_800E042C(u8* dst, f32* src) {
+    memcpy(dst, lbl_80315568, 0x30);
+    *(f32*)(dst + 0x00) = src[0];
+    *(f32*)(dst + 0x14) = src[1];
+    *(f32*)(dst + 0x28) = src[2];
+}
+#endif
+
+#if 0
+asm void fn_800E048C(void) {
+#include "src/game/gs_render_fn_800E048C.inc"
+}
+#else
+void fn_800E048C(u8* dst, f32 x, f32 y, f32 z) {
+    memcpy(dst, lbl_80315568, 0x30);
+    *(f32*)(dst + 0x00) = x;
+    *(f32*)(dst + 0x14) = y;
+    *(f32*)(dst + 0x28) = z;
+}
+#endif
+
+#if 0
+asm void GSmtxMakeZRotation(void) {
+#include "src/game/gs_render_fn_800E04F4.inc"
+}
+#else
+void GSmtxMakeZRotation(void* a) { PSMTXRotRad(a, 0x5a); }
+#endif
+
+#if 0
+asm void GSmtxMakeYRotation(void) {
+#include "src/game/gs_render_fn_800E0518.inc"
+}
+#else
+void GSmtxMakeYRotation(void* a) { PSMTXRotRad(a, 0x59); }
+#endif
+
+#if 0
+asm void GSmtxMakeXRotation(void) {
+#include "src/game/gs_render_fn_800E053C.inc"
+}
+#else
+void GSmtxMakeXRotation(void* a) { PSMTXRotRad(a, 0x58); }
+#endif
+
+#if 0
+asm void fn_800E0560(void) {
+#include "src/game/gs_render_fn_800E0560.inc"
+}
+#else
+void fn_800E0560(u8* dst, f32* src) {
+    memcpy(dst, lbl_80315568, 0x30);
+    *(f32*)(dst + 0x0c) = src[0];
+    *(f32*)(dst + 0x1c) = src[1];
+    *(f32*)(dst + 0x2c) = src[2];
+}
+#endif
+
+#if 0
+asm void fn_800E05C0(void) {
+#include "src/game/gs_render_fn_800E05C0.inc"
+}
+#else
+void fn_800E05C0(u8* dst, f32 x, f32 y, f32 z) {
+    memcpy(dst, lbl_80315568, 0x30);
+    *(f32*)(dst + 0x0c) = x;
+    *(f32*)(dst + 0x1c) = y;
+    *(f32*)(dst + 0x2c) = z;
+}
+#endif
+
+#if 0
+asm void fn_800E0628(void) {
+#include "src/game/gs_render_fn_800E0628.inc"
+}
+#else
+void fn_800E0628(void* dst, void* src) { memcpy(dst, src, 0x30); }
+#endif
+
+#if 0
+asm void fn_800E064C(void) {
+#include "src/game/gs_render_fn_800E064C.inc"
+}
+#else
+void fn_800E064C(void* dst) { memcpy(dst, lbl_80315568, 0x30); }
 #endif

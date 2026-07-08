@@ -205,7 +205,7 @@ extern void fn_800DA100(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f);
 extern void fn_800DA1E8(s32 a, s32 b, s32 c);
 extern void fn_800DA2BC(s32 a, s32 b, s32 c);
 extern void fn_800DA4C4(s32 a, s32 b, s32 c);
-extern void fn_800E01F4(void* dst, f32 x, f32 y, f32 z);
+extern void set__5GSvecFfff(void* dst, f32 x, f32 y, f32 z);
 extern void fn_800E0218(void* dst, void* a, void* b, void* c);
 extern void* memset(void* dest, int val, u32 n);
 extern void* memcpy(void* dst, const void* src, u32 n);
@@ -4095,15 +4095,15 @@ void fn_800FE4D4(void) {
     t = (f32)tan();
     z = y / t;
 
-    fn_800E01F4(v0,
+    set__5GSvecFfff(v0,
                 x - (f32)(s32)*(s16*)&lbl_8047AC70,
                 y - (f32)(s32)*(s16*)&lbl_8047AC72,
                 z);
-    fn_800E01F4(v1,
+    set__5GSvecFfff(v1,
                 x - (f32)(s32)*(s16*)&lbl_8047AC70,
                 y - (f32)(s32)*(s16*)&lbl_8047AC72,
                 lbl_8047CD68);
-    fn_800E01F4(v2, lbl_8047CD68, lbl_8047CD6C, lbl_8047CD68);
+    set__5GSvecFfff(v2, lbl_8047CD68, lbl_8047CD6C, lbl_8047CD68);
     fn_800E0218(mtx, v0, v2, v1);
 
     fn_800D9BD0(lbl_8047CD70, -(sx / sy), lbl_8047CD74, lbl_8047CD78);

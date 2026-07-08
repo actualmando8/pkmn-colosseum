@@ -27,7 +27,7 @@ extern void* fn_800E27B0(u16 handle);                   /* GSmemGetPtr */
 extern void  fn_800E209C(u16 handle);                   /* GSmemFree */
 
 /* GSgfx math/render */
-extern void  fn_800E01F4(void* out, f32 angle, f32 a, f32 b); /* rotation matrix */
+extern void  set__5GSvecFfff(void* out, f32 angle, f32 a, f32 b); /* rotation matrix */
 extern void  GSmtxMakeYRotation(void* out, f32 angle);         /* angle to vector */
 extern void  GSvecAdd(void* out, void* a, void* b);  /* cross product */
 extern void  GSvecTransform(void* out, void* a, void* b);  /* vector subtract */

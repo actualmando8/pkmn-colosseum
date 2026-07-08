@@ -137,7 +137,7 @@ extern f32   fadeEffectHookFunction_trainer_Init(s32 slot);                     
 extern s32   fn_801190DC(s32, s32, s32);
 extern void  fn_80118C88(s32, s32);
 extern void* GSmodelGetPart(s32, s32);
-void  fn_800E01F4(void*, f32, f32, f32);
+void  set__5GSvecFfff(void*, f32, f32, f32);
 extern void  fn_80118FB0(s32, s32, s32, s32, s32, s32);
 extern void  fn_80118D18(s32, s32);
 extern void  fn_80118DE0(s32, void*, s32, s32);

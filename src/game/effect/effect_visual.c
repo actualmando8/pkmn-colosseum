@@ -579,7 +579,7 @@ fail:
 extern void fn_800E0BE4(void);
 extern void fn_800CDBE0(void);
 extern void fn_800CE148(void);
-extern void fn_800E01F4(void* dst, f32 x, f32 y, f32 z);
+extern void set__5GSvecFfff(void* dst, f32 x, f32 y, f32 z);
 extern void GSvecCopy(void);
 extern void fn_800DFFCC(void);
 extern void fn_800E0718(void);
@@ -999,7 +999,7 @@ u32 fn_80139934(void* ptr) {
                 }
             }
         } else {
-            fn_800E01F4(pos, *(f32*)&lbl_8047D190, *(f32*)&lbl_8047D190, *(f32*)&lbl_8047D190);
+            set__5GSvecFfff(pos, *(f32*)&lbl_8047D190, *(f32*)&lbl_8047D190, *(f32*)&lbl_8047D190);
         }
         GScameraGetPosition(camera, cameraPos);
         fn_800DA4C4(1, 6, 1);
@@ -1128,8 +1128,8 @@ u32 fn_80139D10(void* ptr) {
         *(u16*)(entry + 0x12DC) = i * span;
         *(u16*)(entry + 0x12DE) = i * span + gap;
         *(u16*)(entry + 0x12E2) = i;
-        fn_800E01F4(entry + 0xC4, *(f32*)(p + 0x20), *(f32*)(p + 0x24), *(f32*)(p + 0x28));
-        fn_800E01F4(entry + 0x12CC, *(f32*)(p + 0x20), *(f32*)(p + 0x24), *(f32*)(p + 0x28));
+        set__5GSvecFfff(entry + 0xC4, *(f32*)(p + 0x20), *(f32*)(p + 0x24), *(f32*)(p + 0x28));
+        set__5GSvecFfff(entry + 0x12CC, *(f32*)(p + 0x20), *(f32*)(p + 0x24), *(f32*)(p + 0x28));
         fn_8013A1D4(entry, p, entry + 0xC4, i, *(f32*)&lbl_8047D190);
     }
     return 1;
@@ -2052,7 +2052,7 @@ u32 fn_8013CA48(void* ptr, u32 delta) {
     *(u16*)(p + 0xA4) = *(u16*)(p + 0xA4) + delta;
     GXDrawDone();
     fn_800B856C();
-    fn_800E01F4(p + 0x80, t, *(f32*)&lbl_8047D23C, *(f32*)&lbl_8047D240);
+    set__5GSvecFfff(p + 0x80, t, *(f32*)&lbl_8047D23C, *(f32*)&lbl_8047D240);
     fn_800E0CA0();
     return 1;
 }
