@@ -121,8 +121,8 @@ extern void  fn_8016A644(void* obj);                    /* resource cleanup */
 extern void  fn_800D305C(s32 param);                     /* gs_render_util: set render mode */
 extern void  fn_800E24B0(u16 handle);                  /* GSmemLock */
 extern void  fn_800E01D0(void* dst, void* src);
-extern u32  fn_80102620(u32 a);
-extern void fn_801026A4(u32 a, u32 b, u32 c, u32 d, u32 e, u32 f, ...);
+extern u32  menuIsCheck(u32 a);
+extern void menuOpenCustom(u32 a, u32 b, u32 c, u32 d, u32 e, u32 f, ...);
 extern void fn_800D13C8(void* a, void* b);
 extern void fn_800D258C(void* a);
 extern void fn_800D1674(void* a, void* b);
@@ -1090,8 +1090,8 @@ void fn_80179F4C(u32 param) {
     volatile u32* saved = &param;
 
     lbl_80478C4C = *saved;
-    if ((u8)fn_80102620(0xFE) == 0) {
-        fn_801026A4(0xFE, 0, 0, 0, 0, 0);
+    if ((u8)menuIsCheck(0xFE) == 0) {
+        menuOpenCustom(0xFE, 0, 0, 0, 0, 0);
     }
 }
 #pragma pop

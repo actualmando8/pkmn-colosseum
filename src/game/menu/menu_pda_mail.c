@@ -125,10 +125,10 @@ s32 fn_8004D6AC(PdaMailWindowA* window, PdaMailOutA* out)
 }
 #endif
 
-/* fn_80105624 (gs_event_exec.c): returns the current input-device
+/* windowGetKeyInfo (gs_event_exec.c): returns the current input-device
  * state pointer; menuButtonNormal (gs_model.c): resets a widget's
  * button sprite to its normal (unpressed) state. */
-extern u8* fn_80105624(void);
+extern u8* windowGetKeyInfo(void);
 extern void menuButtonNormal(void* p);
 
 #if 0
@@ -139,7 +139,7 @@ asm void fn_8004E89C(void* widget) {
 #pragma peephole off
 void fn_8004E89C(void* widget)
 {
-    u8* state = fn_80105624();
+    u8* state = windowGetKeyInfo();
     if (!(*(u16*) state & 0x10)) {
         menuButtonNormal(widget);
     }
@@ -305,7 +305,7 @@ asm void fn_8004D8BC(PdaMailWindowA* window) {
 #pragma peephole off
 void fn_8004D8BC(PdaMailWindowA* window)
 {
-    u8* state = fn_80105624();
+    u8* state = windowGetKeyInfo();
     if (fn_801D16F0(pdaMailGetMailID(**window->field_0x60)) != 0
         || (*(u16*) state & 0x10) == 0) {
         menuButtonNormal(window);
@@ -421,13 +421,13 @@ s32 fn_8004BF20(u16* a, u16* b)
 }
 #endif
 
-/* fn_801080CC (gs_event_exec.c): fires a scripted SE/event by (ctx, id). */
-extern void fn_801080CC(s32 ctx, s32 id);
+/* winSeqSetMenu (gs_event_exec.c): fires a scripted SE/event by (ctx, id). */
+extern void winSeqSetMenu(s32 ctx, s32 id);
 
 /* Small widget/state-machine record shared by the phase-triggered SE
  * callbacks below: phase drives a switch (only phases 0 and 3 do
  * anything), guard is a one-shot latch, msgObj is passed straight
- * through to fn_801080CC as its first (context) argument. */
+ * through to winSeqSetMenu as its first (context) argument. */
 typedef struct PdaMailPhaseWidget {
     u8 pad00;
     s8 phase;
@@ -447,13 +447,13 @@ s32 fn_8004D928(PdaMailPhaseWidget* w)
     switch (w->phase) {
     case 0:
         if (w->guard == 0) {
-            fn_801080CC(w->msgObj, 0x1c2);
+            winSeqSetMenu(w->msgObj, 0x1c2);
             w->guard = 1;
         }
         break;
     case 3:
         if (w->guard == 0) {
-            fn_801080CC(w->msgObj, 0x1c6);
+            winSeqSetMenu(w->msgObj, 0x1c6);
             w->guard = 1;
         }
         break;
@@ -475,13 +475,13 @@ s32 fn_8004DB80(PdaMailPhaseWidget* w)
     switch (w->phase) {
     case 0:
         if (w->guard == 0) {
-            fn_801080CC(w->msgObj, 0x1c2);
+            winSeqSetMenu(w->msgObj, 0x1c2);
             w->guard = 1;
         }
         break;
     case 3:
         if (w->guard == 0) {
-            fn_801080CC(w->msgObj, 0x1c6);
+            winSeqSetMenu(w->msgObj, 0x1c6);
             w->guard = 1;
         }
         break;
@@ -503,13 +503,13 @@ s32 fn_8004DF34(PdaMailPhaseWidget* w)
     switch (w->phase) {
     case 0:
         if (w->guard == 0) {
-            fn_801080CC(w->msgObj, 0x1c2);
+            winSeqSetMenu(w->msgObj, 0x1c2);
             w->guard = 1;
         }
         break;
     case 3:
         if (w->guard == 0) {
-            fn_801080CC(w->msgObj, 0x1c6);
+            winSeqSetMenu(w->msgObj, 0x1c6);
             w->guard = 1;
         }
         break;
@@ -546,7 +546,7 @@ s32 fn_8004D26C(PdaMailWindowA* window)
     switch (window->phase) {
     case 0:
         if (window->guard == 0) {
-            fn_801080CC(window->msgObj, 0x1c2);
+            winSeqSetMenu(window->msgObj, 0x1c2);
             window->guard = 1;
         }
         break;
@@ -559,7 +559,7 @@ s32 fn_8004D26C(PdaMailWindowA* window)
     }
     case 3:
         if (window->guard == 0) {
-            fn_801080CC(window->msgObj, 0x1c6);
+            winSeqSetMenu(window->msgObj, 0x1c6);
             window->guard = 1;
         }
         break;
@@ -584,7 +584,7 @@ s32 fn_8004E8E0(PdaMailWindowA* window)
     switch (window->phase) {
     case 0:
         if (window->guard == 0) {
-            fn_801080CC(0x77, 0x86);
+            winSeqSetMenu(0x77, 0x86);
             window->guard = 1;
         }
         break;
@@ -597,7 +597,7 @@ s32 fn_8004E8E0(PdaMailWindowA* window)
     }
     case 3:
         if (window->guard == 0) {
-            fn_801080CC(0x77, 0x8a);
+            winSeqSetMenu(0x77, 0x8a);
             window->guard = 1;
         }
         break;
@@ -608,14 +608,14 @@ s32 fn_8004E8E0(PdaMailWindowA* window)
 #pragma peephole reset
 #endif
 
-/* fn_801046B8/fn_801026A4/fn_80102510/menuCloseSync (gs_event_exec.c):
+/* windowGetActiveID/menuOpenCustom/menuClose/menuCloseSync (gs_event_exec.c):
  * modal list-menu open/poll/close idiom -- same call skeleton as the
  * gs_event_exec.c item-quantity-picker (menu_id, input-state,
  * &config, 0, 1, 1, &out), open by id, close by id. */
-extern u32 fn_801046B8(void);
-extern s32 fn_801026A4(s32 menuId, u32 inputState, s32* config, s32 zero,
+extern u32 windowGetActiveID(void);
+extern s32 menuOpenCustom(s32 menuId, u32 inputState, s32* config, s32 zero,
                         s32 one1, s32 one2, s32* out, ...);
-extern void fn_80102510(s32 menuId);
+extern void menuClose(s32 menuId);
 extern void menuCloseSync(s32 menuId, s32 flag);
 
 /* mailGetSortMode (battle_waza.c): Waza party mailbox-sort-mode byte
@@ -698,11 +698,11 @@ s32 fn_8004DC18(s32 a)
 {
     s32 out = 0;
     s32 localA = a;
-    s32 choice = fn_801026A4(0x75, fn_801046B8(), &localA, 0, 1, 1, &out);
+    s32 choice = menuOpenCustom(0x75, windowGetActiveID(), &localA, 0, 1, 1, &out);
     if (choice != -1 && choice != localA) {
         out = 1;
     }
-    fn_80102510(0x75);
+    menuClose(0x75);
     menuCloseSync(0x75, 1);
     if (choice < 0 || choice >= 4) {
         return -1;
@@ -713,7 +713,7 @@ s32 fn_8004DC18(s32 a)
 
 /* lbl_8047A518: persistent "current mailbox cursor" slot -- read/written
  * across menu-reopen cycles by fn_8004D9C0 below (in/out selection index
- * for the fn_801026A4 modal-list idiom) and (per XD skeleton) by sibling
+ * for the menuOpenCustom modal-list idiom) and (per XD skeleton) by sibling
  * cursor helpers elsewhere in the PDA subsystem. fn_8004E9C0 (defined
  * later in this TU): per-selection SE/animation pump for the mailbox
  * list cursor -- asm-only still, called here only by symbol. */
@@ -738,7 +738,7 @@ s32 fn_8004D9C0(s32 a)
     lbl_8047A518 = a;
     for (;;) {
         s32* cfg = &lbl_8047A518;
-        s32 choice = fn_801026A4(0x74, fn_801046B8(), 0, 0, 1, 1, (s32*) &cfg);
+        s32 choice = menuOpenCustom(0x74, windowGetActiveID(), 0, 0, 1, 1, (s32*) &cfg);
         if (choice == -1) {
             break;
         }
@@ -749,7 +749,7 @@ s32 fn_8004D9C0(s32 a)
             }
         }
     }
-    fn_80102510(0x74);
+    menuClose(0x74);
     menuCloseSync(0x74, 1);
     return lbl_8047A518;
 }
@@ -839,7 +839,7 @@ s32 fn_8004D7D0(PdaMailWindowA* window)
 {
     extern s32 mailGetNbMailInMailbox(void);
     s32** field = window->field_0x60;
-    u8* state = fn_80105624();
+    u8* state = windowGetKeyInfo();
     s32 index = **field;
     s32 cur = index;
     u16 flags;

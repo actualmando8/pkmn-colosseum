@@ -2788,9 +2788,9 @@ u32 fn_8026316C(void* ctx, u32 param1, u32 param2) {
     extern void fn_800119A8();
     extern void fn_80011A1C();
     extern void fn_80011D9C();
-    extern void fn_80102568();
-    extern void fn_80102620();
-    extern void fn_801026A4();
+    extern void menuCloseCustom();
+    extern void menuIsCheck();
+    extern void menuOpenCustom();
     extern void fn_801EF634();
     extern void fn_801F0134();
     extern void fn_801F0204();
@@ -2904,7 +2904,7 @@ u32 fn_8026316C(void* ctx, u32 param1, u32 param2) {
         r6 = 0x0;
         r7 = 0x0;
         r8 = 0x0;
-        fn_801026A4();
+        menuOpenCustom();
     }
     r30 = 0x0;
     r26 = 0x0;
@@ -3459,7 +3459,7 @@ while (1) {
         r24 = 0x103;
     } while (0);
         r3 = r24;
-        fn_80102620();
+        menuIsCheck();
         r0 = r3 & 0xFF;
         if ((s32)r3 != (s32)0xf5) {
         do {
@@ -3521,7 +3521,7 @@ while (1) {
             r3 = r24;
             r4 = 0x0;
             r5 = 0x1;
-            fn_80102568();
+            menuCloseCustom();
     }
     }
     r24 = 0x0;
@@ -3552,9 +3552,9 @@ u32 fn_80263BC8(u32 r3, u32 r4, u32 r5, s32 mode)
     extern u8 fn_801FF1BC(u32, u32);
     extern u8 fn_801F54A4(u32, u32, u32, u32);
     extern void fn_80132A38(u32, u32);
-    extern void fn_80106394(u32, u32, u32);
+    extern void winMsgOpenFight(u32, u32, u32);
     extern void fn_801F000C(u32);
-    extern void fn_80106080(u32);
+    extern void winMsgCloseFight(u32);
     extern u8 fn_80264D58(u32, u32, u32);
     extern u8 fn_80264488(u32, u32, u32);
     extern s32 fn_80263DE4(u32, u32, u32, u32, u32);
@@ -3569,9 +3569,9 @@ u32 fn_80263BC8(u32 r3, u32 r4, u32 r5, s32 mode)
         flag = fn_801FF1BC(r4, 1);
         if (flag == 1) {
             fn_80132A38(0x11, r4);
-            fn_80106394(0x75fc, 1, 1);
+            winMsgOpenFight(0x75fc, 1, 1);
             fn_801F000C(0x40);
-            fn_80106080(0);
+            winMsgCloseFight(0);
         }
         if (flag == 0) {
             if (fn_80264D58(r3, r4, r5) == 0) {
@@ -3581,9 +3581,9 @@ u32 fn_80263BC8(u32 r3, u32 r4, u32 r5, s32 mode)
         break;
     case 1:
         if (fn_801F54A4(0, 0, 0x20, 0) == 0) {
-            fn_80106394(0x75f5, 1, 1);
+            winMsgOpenFight(0x75f5, 1, 1);
             fn_801F000C(0x40);
-            fn_80106080(0);
+            winMsgCloseFight(0);
             result = 2;
         }
         else if (fn_80264488(r3, r4, r5) == 0) {
@@ -3634,9 +3634,9 @@ s32 fn_80263DE4(u32 r3, u32 r4, u32 r5, u32 retry, u32 reopen)
     extern u16 fn_801F0134(u32, u32);
     extern void fn_801F0234(void);
     extern s32 fn_801F0204(void);
-    extern void fn_801026A4(u32, u32, u32, u32, u32, u32, ...);
-    extern u8 fn_80102620(u32);
-    extern void fn_80102568(u32, u32, u32);
+    extern void menuOpenCustom(u32, u32, u32, u32, u32, u32, ...);
+    extern u8 menuIsCheck(u32);
+    extern void menuCloseCustom(u32, u32, u32);
     extern void fn_80261954(u32);
     extern void fn_80261AD0(s8);
     extern s32 fn_800114A4(u32, u32, u32, u32, u32);
@@ -3709,7 +3709,7 @@ s32 fn_80263DE4(u32 r3, u32 r4, u32 r5, u32 retry, u32 reopen)
                 msg = 0x103;
                 break;
             }
-            fn_801026A4(msg, 0, 0, 0, 0, 0);
+            menuOpenCustom(msg, 0, 0, 0, 0, 0);
         }
         if (fn_801F18DC(0) == 0) {
             fn_80261954(1);
@@ -3778,7 +3778,7 @@ s32 fn_80263DE4(u32 r3, u32 r4, u32 r5, u32 retry, u32 reopen)
                 msg = 0x103;
                 break;
             }
-            if (fn_80102620(msg) != 0) {
+            if (menuIsCheck(msg) != 0) {
                 msg = 0x100;
                 found = fn_801F02AC(2, ctx, param);
                 if (found == 0) {
@@ -3814,7 +3814,7 @@ s32 fn_80263DE4(u32 r3, u32 r4, u32 r5, u32 retry, u32 reopen)
                     msg = 0x103;
                     break;
                 }
-                fn_80102568(msg, 0, 1);
+                menuCloseCustom(msg, 0, 1);
             }
         }
         if ((u16)fn_801EF634() == 1) {
@@ -21294,9 +21294,9 @@ void fn_8025E5F4(void)
 u32 fn_8025E640(u32 r3,int r4)
 
 {
-    extern int fn_80105C68();
-    extern int fn_80105E7C();
-    extern int fn_801067E8();
+    extern int winMsgCloseLevelUpStatus();
+    extern int winMsgOpenLevelUpStatus();
+    extern int winMsgOpenField();
     extern int fn_8011DE98();
     extern u32 fn_8011F4A8();
     extern int pokemonGetFriendFormPokemonFriendFilterId();
@@ -21349,7 +21349,7 @@ u32 fn_8025E640(u32 r3,int r4)
       uVar2 = fn_8011F4A8(r3);
       fn_80165668(0x4ca,0,0xff);
       fn_80132A38(0x2f,uVar2 & 0xff);
-      fn_801067E8(0x44ce,1,0);
+      winMsgOpenField(0x44ce,1,0);
       pokemonGetStatus(r3,0,0x87,0);
       pokemonGetStatus(r3,0,0x88,0);
       pokemonGetStatus(r3,0,0x89,0);
@@ -21357,10 +21357,10 @@ u32 fn_8025E640(u32 r3,int r4)
       pokemonGetStatus(r3,0,0x8b,0);
       pokemonGetStatus(r3,0,0x8c,0);
       local_44[0] = 1;
-      fn_80105E7C(local_44,1);
+      winMsgOpenLevelUpStatus(local_44,1);
       local_54[0] = 0;
-      fn_80105E7C(local_54,1);
-      fn_80105C68(1);
+      winMsgOpenLevelUpStatus(local_54,1);
+      winMsgCloseLevelUpStatus(1);
       local_58[0] = '\0';
       while (uVar4 = pokemonGetOboeWazaDataId(r3,uVar2,local_58), (uVar4 & 0xffff) != 0) {
         cVar12 = pokemonSearchWazaDataId(r3,uVar4);
@@ -21389,7 +21389,7 @@ void fn_8025EF58(void)
     extern u32 _DAT_804782c4;
     extern u32 menuPokemonOpen();
     extern int fn_800FF730();
-    extern int fn_801065B8();
+    extern int winMsgCloseField();
     extern int fn_8011288C();
     extern int fn_8011EE40();
     extern s8 heroItemCheckHaveItemDataId();
@@ -21498,8 +21498,8 @@ void fn_8025EF58(void)
         ((u32*)&lbl_8047B668)[1] = 0xffffffff;
       }
       else {
-        fn_801067E8(0x3b0f,1,0);
-        fn_801065B8(1);
+        winMsgOpenField(0x3b0f,1,0);
+        winMsgCloseField(1);
         uVar4 = menuPokemonOpen(7,0,0);
         if (uVar4 != 0xffffffff) {
           uVar2 = heroGetStatus(0,3,uVar4 & 0xffff);
@@ -23223,7 +23223,7 @@ u32 fn_80261BEC(u32 r3,u32 r4,u8 *r5)
       }
     }
   }
-  cVar6 = fn_80102620(uVar2);
+  cVar6 = menuIsCheck(uVar2);
   if ((cVar6 == '\x01') && (r5 != (u8 *)0x0)) {
     *r5 = 0;
   }
@@ -23262,9 +23262,9 @@ u32 fn_80261CBC(u32 r3,u32 r4)
       }
     }
   }
-  cVar5 = fn_80102620(uVar6);
+  cVar5 = menuIsCheck(uVar6);
   if (cVar5 != '\0') {
-    fn_80102568(uVar6,0,0);
+    menuCloseCustom(uVar6,0,0);
   }
   return 1;
 }
@@ -23273,7 +23273,7 @@ u32 fn_80261CBC(u32 r3,u32 r4)
 u32 fn_80261D8C(u32 r3, u32 r4)
 {
     extern int fn_801F7954();
-    extern void fn_801026A4(u32, u32, u32, u32, u32, u32, ...);
+    extern void menuOpenCustom(u32, u32, u32, u32, u32, u32, ...);
     u32 iVar1;
     u16 uVar3;
     u16 sVar4;
@@ -23303,7 +23303,7 @@ u32 fn_80261D8C(u32 r3, u32 r4)
     fn_801F7954(r3, local_28);
     local_20[0] = local_28[0];
     *(u16 *)&local_20[1] = *(u16 *)&local_28[1];
-    fn_801026A4(uVar5, 0, 0, 0, 0, 1, local_20);
+    menuOpenCustom(uVar5, 0, 0, 0, 0, 1, local_20);
   return 1;
 }
 
@@ -23357,7 +23357,7 @@ int fn_80261EF8(u32 r3,u32 r4)
       }
     }
   }
-  uVar3 = fn_80102620(uVar2);
+  uVar3 = menuIsCheck(uVar2);
   result = (uVar3 & 0xff) != 1;
   return result;
 }
@@ -23394,9 +23394,9 @@ u32 fn_80261FB4(u32 r3,u32 r4)
       }
     }
   }
-  cVar5 = fn_80102620(uVar6);
+  cVar5 = menuIsCheck(uVar6);
   if (cVar5 != '\0') {
-    fn_80102568(uVar6,0,0);
+    menuCloseCustom(uVar6,0,0);
   }
   return 1;
 }
@@ -23406,7 +23406,7 @@ u32 fn_80262084(u32 r3,u32 r4,char *r5)
 
 {
     extern int fn_801FE168();
-  extern void fn_801026A4(u32, u32, u32, u32, u32, u32, ...);
+  extern void menuOpenCustom(u32, u32, u32, u32, u32, u32, ...);
   u32 *puVar1;
   u32 uVar2;
   u8 cVar7;
@@ -23467,18 +23467,18 @@ u32 fn_80262084(u32 r3,u32 r4,char *r5)
       puVar9 = puVar9 + 2;
       *puVar9 = *puVar8;
     }
-    fn_801026A4(uVar11,0xffffffff,0,0,0,1,local_48);
+    menuOpenCustom(uVar11,0xffffffff,0,0,0,1,local_48);
   return 1;
 }
 
 /* Address: 0x802621C4 | Size: 0x30 | Ghidra import */
 void fightMenuOpenLevelUpStatusMenu(u8 *dst, u8 value)
 {
-    extern void fn_80105E7C(u8 *, u32);
+    extern void winMsgOpenLevelUpStatus(u8 *, u32);
 
     if (dst != NULL) {
         *dst = value;
-        fn_80105E7C(dst, 1);
+        winMsgOpenLevelUpStatus(dst, 1);
     }
 }
 
@@ -23523,9 +23523,9 @@ s32 fightMenuWazaWasure(u32 r3, u32 r4)
 /* Address: 0x802622E4 | Size: 0x24 | Ghidra import */
 void fn_802622E4(void)
 {
-    extern void fn_80105C68(u32);
+    extern void winMsgCloseLevelUpStatus(u32);
 
-    fn_80105C68(1);
+    winMsgCloseLevelUpStatus(1);
 }
 
 /* Address: 0x80262308 | Size: 0x2C | Ghidra import */
@@ -23547,7 +23547,7 @@ u32 fn_80262334(u32 msgId, u32 unused, u32 itemId)
     itemName = fn_800FA280(itemGetStatus(0, itemId, 1, 0));
     fn_80132A38(0x29, itemName);
     if (msgId != 0) {
-        fn_80106394(msgId, 1, 1);
+        winMsgOpenFight(msgId, 1, 1);
         return 1;
     }
     return 0;
@@ -23565,21 +23565,21 @@ u32 fn_802623B4(u32 msgId, u32 pokemon)
     fn_80132A38(0xd, name);
     fn_80132A38(0x28, fn_800FA280(wazaGetStatus(0, pokemon, 1, 0)));
     fn_80132A38(0xe, fn_800FA280(wazaGetStatus(0, pokemon, 0xb, 0)));
-    fn_80106394(0x768d, 1, 1);
+    winMsgOpenFight(0x768d, 1, 1);
     return 1;
 }
 
 /* Address: 0x8026246C | Size: 0x24 | Ghidra import */
 void fn_8026246C(void)
 {
-    fn_80106080(0);
+    winMsgCloseFight(0);
 }
 
 /* Address: 0x80262490 | Size: 0x3C | Ghidra import */
 u32 fn_80262490(u32 msgId)
 {
     if (msgId != 0) {
-        fn_80106244(msgId, 1, 1);
+        winMsgOpenFightNoWait(msgId, 1, 1);
         return 1;
     }
     return 0;
@@ -23589,7 +23589,7 @@ u32 fn_80262490(u32 msgId)
 u32 fn_802624CC(u32 msgId)
 {
     if (msgId != 0) {
-        fn_80106394(msgId, 1, 1);
+        winMsgOpenFight(msgId, 1, 1);
         return 1;
     }
     return 0;
@@ -23605,7 +23605,7 @@ u32 fn_80262508(u32 r3, u32 r4)
     extern u16 fn_801F0134(u32, u32);
     extern void fn_801F0234(void);
     extern s32 fn_801F0204(void);
-    extern void fn_801026A4(u32, u32, u32, u32, u32, u32, ...);
+    extern void menuOpenCustom(u32, u32, u32, u32, u32, u32, ...);
     extern u16 fn_801F54A4(u32, u32, u32, u32);
     extern void fightTypeDataBiosGetPtr(u32);
     extern u32 fightTypeDataBiosGetFightoutPokemonNum(void);
@@ -23631,8 +23631,8 @@ u32 fn_80262508(u32 r3, u32 r4)
     extern void fightOutPokemonCreateFightAction(u32, u32, u32, u32, void *, s32);
     extern void fn_801F9130(u32, u32, u32);
     extern void fn_801F9790(u32);
-    extern u8 fn_80102620(u32);
-    extern void fn_80102568(u32, u32, u32);
+    extern u8 menuIsCheck(u32);
+    extern void menuCloseCustom(u32, u32, u32);
     extern char lbl_80375D30[];
     extern char lbl_80375CA8[];
     u32 ctx;
@@ -23700,7 +23700,7 @@ u32 fn_80262508(u32 r3, u32 r4)
             msg = 0x103;
             break;
         }
-        fn_801026A4(msg, 0, 0, 0, 0, 0);
+        menuOpenCustom(msg, 0, 0, 0, 0, 0);
     }
     optionCount = fn_801F54A4(0, 0, 0x16, 0);
     fightTypeDataBiosGetPtr(param);
@@ -23754,8 +23754,8 @@ u32 fn_80262508(u32 r3, u32 r4)
                         msg = 0x103;
                         break;
                     }
-                    if (fn_80102620(msg) != 0) {
-                        fn_80102568(msg, 0, 1);
+                    if (menuIsCheck(msg) != 0) {
+                        menuCloseCustom(msg, 0, 1);
                     }
                 }
                 return 0;
@@ -23889,7 +23889,7 @@ u32 fn_80262508(u32 r3, u32 r4)
             msg = 0x103;
             break;
         }
-        if (fn_80102620(msg) != 0) {
+        if (menuIsCheck(msg) != 0) {
             msg = 0x100;
             found = fn_801F02AC(2, ctx, param);
             if (found == 0) {
@@ -23920,7 +23920,7 @@ u32 fn_80262508(u32 r3, u32 r4)
                 msg = 0x103;
                 break;
             }
-            fn_80102568(msg, 0, 1);
+            menuCloseCustom(msg, 0, 1);
         }
     }
     return 1;
@@ -23941,14 +23941,14 @@ s32 fn_80262D3C(u32 r3, u32 r4, u32 r5, s32 r6)
     extern u16 fn_801F0134(u32, u32);
     extern void fn_801F0234(void);
     extern s32 fn_801F0204(void);
-    extern void fn_801026A4(u32, u32, u32, u32, u32, u32, ...);
+    extern void menuOpenCustom(u32, u32, u32, u32, u32, u32, ...);
     extern u32 fn_800111E8(u32, u32, u32, u32);
     extern s32 fn_80089F70(u32);
     extern u16 fn_80089F58(u32);
     extern s16 pokemonGetStatus(u32, u32, u32, u32);
     extern s32 fn_801F93F8(u32, s32, u32);
-    extern u8 fn_80102620(u32);
-    extern void fn_80102568(u32, u32, u32);
+    extern u8 menuIsCheck(u32);
+    extern void menuCloseCustom(u32, u32, u32);
     u32 ctx;
     u32 param1;
     u32 param2;
@@ -24026,7 +24026,7 @@ s32 fn_80262D3C(u32 r3, u32 r4, u32 r5, s32 r6)
                 msg = 0x103;
                 break;
             }
-            fn_801026A4(msg, 0, 0, 0, 0, 0);
+            menuOpenCustom(msg, 0, 0, 0, 0, 0);
         }
         entry = fn_800111E8(battle, ctx, (u16)i, param1);
         kind = fn_80089F70(entry);
@@ -24088,7 +24088,7 @@ after_select:
             msg = 0x103;
             break;
         }
-        if (fn_80102620(msg) != 0) {
+        if (menuIsCheck(msg) != 0) {
             msg = 0x100;
             found = fn_801F02AC(2, ctx, param1);
             if (found == 0) {
@@ -24124,7 +24124,7 @@ after_select:
                 msg = 0x103;
                 break;
             }
-            fn_80102568(msg, 0, 1);
+            menuCloseCustom(msg, 0, 1);
         }
     }
     return target;
@@ -24136,8 +24136,8 @@ u32 fn_80264ADC(u32 r3,u32 r4,u32 r5)
 {
     extern int fn_8001120C();
     extern int fn_80011288();
-    extern int fn_80106080();
-    extern int fn_80106394();
+    extern int winMsgCloseFight();
+    extern int winMsgOpenFight();
     extern int fn_801906A0();
     extern int fn_801F000C();
   u32 uVar1;
@@ -24237,13 +24237,13 @@ LAB_00261ccc:
       if (cVar6 == '\0') {
         uVar3 = fn_801906A0(0x99f);
         if (uVar3 == 0) {
-          fn_80106394(0x7716,1,1);
+          winMsgOpenFight(0x7716,1,1);
         }
         else {
-          fn_80106394(0x7702,1,1);
+          winMsgOpenFight(0x7702,1,1);
         }
         fn_801F000C(0x40);
-        fn_80106080(0);
+        winMsgCloseFight(0);
         goto LAB_00261af4;
       }
       fn_8001120C(1);
@@ -24420,8 +24420,8 @@ void fn_8026532C(u32 r3, u32 r4, u32 r5)
       }
     }
   }
-  if ((u8)fn_80102620(uVar6) != 0) {
-    fn_80102568(uVar6, 0, r5);
+  if ((u8)menuIsCheck(uVar6) != 0) {
+    menuCloseCustom(uVar6, 0, r5);
   }
 }
 
@@ -24436,7 +24436,7 @@ void fn_802653FC(u32 r3, u32 r4, u32 r5)
     u32 pad[2];
   } StatusMenuOut;
   extern int fn_801FE168();
-  extern void fn_801026A4(u32, u32, u32, u32, u32, u32, ...);
+  extern void menuOpenCustom(u32, u32, u32, u32, u32, u32, ...);
   u32 r28;
   u32 r29;
   u32 r30;
@@ -24473,7 +24473,7 @@ void fn_802653FC(u32 r3, u32 r4, u32 r5)
       }
     }
   }
-  if ((u8)fn_80102620(checkStatus) != 0) {
+  if ((u8)menuIsCheck(checkStatus) != 0) {
     iVar3 = fn_801F02AC(2, r28, r29);
     if (iVar3 == 0) {
       uVar11 = 0;
@@ -24500,7 +24500,7 @@ void fn_802653FC(u32 r3, u32 r4, u32 r5)
       *(u8 *)((u8 *)&local_78 + 0x29) = 0;
     }
     local_48.copy = local_78;
-    fn_801026A4(uVar11, -1, 0, 0, 0, 1, &local_48.copy);
+    menuOpenCustom(uVar11, -1, 0, 0, 0, 1, &local_48.copy);
   }
 }
 
@@ -24515,7 +24515,7 @@ void fn_80265598(u32 r3, u32 r4, u32 r5)
     u32 pad[2];
   } StatusMenuOut;
   extern int fn_801FE168();
-  extern void fn_801026A4(u32, u32, u32, u32, u32, u32, ...);
+  extern void menuOpenCustom(u32, u32, u32, u32, u32, u32, ...);
   u32 r28;
   u32 r29;
   u32 r30;
@@ -24556,7 +24556,7 @@ void fn_80265598(u32 r3, u32 r4, u32 r5)
     *(u8 *)((u8 *)&local_78 + 0x29) = 0;
   }
   local_48.copy = local_78;
-  fn_801026A4(uVar11, -1, 0, 0, 0, 1, &local_48.copy);
+  menuOpenCustom(uVar11, -1, 0, 0, 0, 1, &local_48.copy);
 }
 
 /* Address: 0x802656AC | Size: 0xA8 | Ghidra import */
@@ -24600,7 +24600,7 @@ void fn_80265754(u32 r3,u32 r4)
       u32 unk0;
       u16 unk4;
   } BattleStatusPair;
-  extern void fn_801026A4(u32, u32, u32, u32, u32, u32, ...);
+  extern void menuOpenCustom(u32, u32, u32, u32, u32, u32, ...);
   u32 iVar1;
   u32 uVar2;
   u8 cVar6;
@@ -24631,7 +24631,7 @@ void fn_80265754(u32 r3,u32 r4)
       }
     }
   }
-  cVar6 = fn_80102620(uVar2);
+  cVar6 = menuIsCheck(uVar2);
   if (cVar6 != '\0') {
     iVar1 = fn_801F02AC(2,r3,r4);
     if (iVar1 == 0) {
@@ -24657,7 +24657,7 @@ void fn_80265754(u32 r3,u32 r4)
     fn_801F7954(r3,&local_28);
     local_20.unk0 = local_28.unk0;
     local_20.unk4 = local_28.unk4;
-    fn_801026A4(uVar2,0,0,0,0,1,&local_20);
+    menuOpenCustom(uVar2,0,0,0,0,1,&local_20);
   }
   return;
 }
@@ -24961,7 +24961,7 @@ u32 fn_80265E7C(u32 r3)
 void fn_80265F94(int r3)
 
 {
-    extern s8 fn_80106934();
+    extern s8 winMsgCheck();
     extern u16 fn_8011E15C();
     extern int fn_8011E778();
     extern int fn_801666BC();
@@ -25014,9 +25014,9 @@ void fn_80265F94(int r3)
     }
     _threadSwitch();
   }
-  fn_801067E8(0x44ba,0,0);
+  winMsgOpenField(0x44ba,0,0);
   while (1) {
-    cVar9 = fn_80106934();
+    cVar9 = winMsgCheck();
     uVar2 = __cntlzw(1 - cVar9);
     if ((uVar2 >> 5 & 0xff) == 0) break;
     fn_801DB088();
@@ -25026,7 +25026,7 @@ void fn_80265F94(int r3)
     }
     _threadSwitch();
   }
-  fn_801065B8(1);
+  winMsgCloseField(1);
   if (r3 == 1) {
     fn_80132A38(0x5d,0x3d2);
     uVar5 = 0x44bb;
@@ -25038,9 +25038,9 @@ void fn_80265F94(int r3)
   else {
     uVar5 = 0x44b9;
   }
-  fn_801067E8(uVar5,0,0);
+  winMsgOpenField(uVar5,0,0);
   while (1) {
-    cVar9 = fn_80106934();
+    cVar9 = winMsgCheck();
     uVar2 = __cntlzw(1 - cVar9);
     if ((uVar2 >> 5 & 0xff) == 0) break;
     fn_801DB088();
@@ -25050,7 +25050,7 @@ void fn_80265F94(int r3)
     }
     _threadSwitch();
   }
-  fn_801065B8(1);
+  winMsgCloseField(1);
   fadeSet((double)lbl_8047E6FC,3);
   while (cVar9 = fadeCheck(0), cVar9 != '\0') {
     fn_801DB088();
@@ -25246,12 +25246,12 @@ void fn_8025E9BC(u32 r3)
       uVar2 = fn_8011F4F0(uVar1);
       fn_80132A38(0x32,uVar2);
       fn_80132A38(0x39,sVar5);
-      fn_801067E8(0x3b10,1,0);
+      winMsgOpenField(0x3b10,1,0);
     }
     uVar2 = fn_8011EE10(uVar1);
     fn_80132A38(0x2f,uVar2);
-    fn_801067E8(0x3b0b,1,0);
-    fn_801065B8(1);
+    winMsgOpenField(0x3b0b,1,0);
+    winMsgCloseField(1);
     sVar7 = fn_8011EE58(uVar1);
     sVar6 = fn_8011EDF8(uVar1);
     fn_8011D904(uVar1,(u16)((sVar6 + sVar7) + 0x46));
@@ -25288,14 +25288,14 @@ void fn_8025E9BC(u32 r3)
     }
     fn_80165668(0x3ca,0,0xff);
     fn_80265E7C(uVar1);
-    fn_801067E8(0x3b0c,1,0);
-    fn_801067E8(0x3b0d,1,1);
+    winMsgOpenField(0x3b0c,1,0);
+    winMsgOpenField(0x3b0d,1,1);
     cVar7 = fn_8001E184();
     if (cVar7 != '\0') {
-      fn_801065B8(1);
+      winMsgCloseField(1);
     }
     else {
-      fn_801065B8(1);
+      winMsgCloseField(1);
       fadeSet((double)lbl_8047E680,3);
       fadeCheck(1);
       fn_801DAC90();
@@ -25464,10 +25464,10 @@ u32 fn_80264D58(u32 r3,u32 r4,u32 r5)
         }
         if (cVar9 == '\0') break;
         if (saved_r27 != 0) {
-          fn_80106394(saved_r27,1,1);
+          winMsgOpenFight(saved_r27,1,1);
         }
         fn_801F000C(0x40);
-        fn_80106080(0);
+        winMsgCloseFight(0);
       }
       uVar4 = (int)pokemonGetStatus(uVar1,0,0x7f,uVar3 & 0xffff);
       uVar4 = uVar4 & 0xffff;
@@ -25505,8 +25505,8 @@ fn_802600E4(u32 r3,u32 r4,u8 *r5,int r6,void *r7,
 
 {
     extern s8 fn_8001E074();
-    extern int fn_801069FC();
-    extern int fn_80106D3C();
+    extern int winMsgClose();
+    extern int winMsgOpen();
   int iVar1;
   short sVar3;
   u32 uVar2;
@@ -25527,12 +25527,12 @@ LAB_0025d3c4:
     fn_80132A38(0x32,uVar2);
     fn_80132A38(0x39,r4 & 0xffff);
     if (r6 == 0) {
-      fn_801067E8(0x423d,1,0);
-      fn_801065B8(1);
+      winMsgOpenField(0x423d,1,0);
+      winMsgCloseField(1);
     }
     else {
-      fn_80106D3C(2,0x423d,1,0);
-      fn_801069FC(1);
+      winMsgOpen(2,0x423d,1,0);
+      winMsgClose(1);
     }
     *r5 = (char)uVar6;
     uVar2 = 1;
@@ -25543,14 +25543,14 @@ LAB_0025d3c4:
     fn_80132A38(0x39,r4 & 0xffff);
     do {
       if (r6 == 0) {
-        fn_801067E8(0x4243,1,0);
+        winMsgOpenField(0x4243,1,0);
         cVar5 = fn_8001E184();
-        fn_801065B8(1);
+        winMsgCloseField(1);
       }
       else {
-        fn_80106D3C(2,0x4243,1,0);
+        winMsgOpen(2,0x4243,1,0);
         cVar5 = fn_8001E074(0,0xffffffff,0xffffffff,0);
-        fn_801069FC(1);
+        winMsgClose(1);
       }
       if (cVar5 == '\x01') {
         iVar1 = 1;
@@ -25576,10 +25576,10 @@ LAB_0025d3c4:
           uVar4 = fn_8011F228(r3,uVar6 & 0xffff);
           fn_80132A38(0x39,uVar4);
           if (r6 == 0) {
-            fn_801067E8(0x4248,1,0);
+            winMsgOpenField(0x4248,1,0);
           }
           else {
-            fn_80106D3C(2,0x4248,1,0);
+            winMsgOpen(2,0x4248,1,0);
           }
           goto LAB_0025d3c4;
         }
@@ -25587,14 +25587,14 @@ LAB_0025d3c4:
       fn_80132A38(0x32,uVar2);
       fn_80132A38(0x39,r4 & 0xffff);
       if (r6 == 0) {
-        fn_801067E8(0x4242,1,0);
+        winMsgOpenField(0x4242,1,0);
         cVar5 = fn_8001E184();
-        fn_801065B8(1);
+        winMsgCloseField(1);
       }
       else {
-        fn_80106D3C(2,0x4242,1,0);
+        winMsgOpen(2,0x4242,1,0);
         cVar5 = fn_8001E074(0,0xffffffff,0xffffffff,0);
-        fn_801069FC(1);
+        winMsgClose(1);
       }
       if (cVar5 == '\x01') {
         iVar1 = 1;
@@ -25607,12 +25607,12 @@ LAB_0025d3c4:
       }
     } while (iVar1 != 0);
     if (r6 == 0) {
-      fn_801067E8(0x4241,1,0);
-      fn_801065B8(1);
+      winMsgOpenField(0x4241,1,0);
+      winMsgCloseField(1);
     }
     else {
-      fn_80106D3C(2,0x4241,1,0);
-      fn_801069FC(1);
+      winMsgOpen(2,0x4241,1,0);
+      winMsgClose(1);
     }
     uVar2 = 0;
   }
@@ -25685,7 +25685,7 @@ u32 fn_80260910(u32 *r3,u32 r4,u32 r5,u32 r6)
   fn_801DA4E8(*r3,1);
   uVar5 = fn_8011F4F0(r5);
   fn_80132A38(0x32,uVar5);
-  fn_801067E8(0x4401,1,0);
+  winMsgOpenField(0x4401,1,0);
   if (r5 == 0) {
     iVar6 = 0;
   }
@@ -25751,7 +25751,7 @@ LAB_0025db60:
         fVar1 = (float)(dVar13 + (double)(float)((double)(((u64)(0x43300000) << 32) | (u32)(uVar5)) - dVar15));
       }
       if (bVar4) {
-        fn_801065B8(1);
+        winMsgCloseField(1);
         soundStop(0x3d4,0x32);
           iVar6 = 0;
         if ((*(u32 *)lbl_8027A4B0 < uVar12) && (iVar6 = 1, *(u32 *)(lbl_8027A4B0 + 8) < uVar12)) {
@@ -25783,8 +25783,8 @@ LAB_0025db60:
         }
         uVar5 = fn_8011F4F0(r5);
         fn_80132A38(0x32,uVar5);
-        fn_801067E8(0x43ff,1,0);
-        fn_801065B8(1);
+        winMsgOpenField(0x43ff,1,0);
+        winMsgCloseField(1);
         fadeSet((double)lbl_8047E6C0,3);
         fadeCheck(1);
         uVar5 = 0;
@@ -25793,7 +25793,7 @@ LAB_0025db60:
         fn_801DA4E8(*r3,0);
         fn_801DA4E8(r3[1],1);
         fn_802606D8(r3,1,0,8);
-        fn_801065B8(1);
+        winMsgCloseField(1);
         soundStop(0x3d4,0x32);
         if (r6 == 0) {
           iVar6 = 0;
@@ -25823,8 +25823,8 @@ LAB_0025db60:
         uVar9 = fn_8011F5C8(r6);
         fn_80132A38(0x4e,uVar9);
         fn_80132A38(0x5d,0x3d2);
-        fn_801067E8(0x4400,1,0);
-        fn_801065B8(1);
+        winMsgOpenField(0x4400,1,0);
+        winMsgCloseField(1);
         dVar14 = lbl_8047E6B8;
         dVar15 = (double)lbl_8047E6C4;
         fVar1 = lbl_8047E6B0;
@@ -25898,7 +25898,7 @@ u32 fn_80264488(u32 r3,int r4,u32 r5)
     extern u8 fn_80019064();
     extern u32 fn_800D37CC();
     extern int menuReleaseOffScreen();
-    extern int fn_8010206C();
+    extern int menuCreateOffScreen();
     extern s8 fn_80142CF4();
     extern int fn_801DA36C();
     extern int fn_801EFFC4();
@@ -26000,7 +26000,7 @@ LAB_0026160c:
     uStack_64 = fn_800D37CC();
     uStack_64 = uStack_64 ^ 0x80000000;
     local_68 = 0x43300000;
-    fn_8010206C((double)(float)(dVar12 / (double)(float)((double)(((u64)(0x43300000) << 32) | (u32)(uStack_64)) -
+    menuCreateOffScreen((double)(float)(dVar12 / (double)(float)((double)(((u64)(0x43300000) << 32) | (u32)(uStack_64)) -
                                                          dVar11)));
     uVar9 = fn_80018F88(1,local_70,r3);
     fn_801EFFC4(10);

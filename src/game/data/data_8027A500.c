@@ -78,14 +78,14 @@ extern u8 fn_800FEF8C[];
 extern u8 fn_800FF56C[];
 extern u8 fn_800FF660[];
 extern u8 fn_800FF730[];
-extern u8 fn_80102398[];
+extern u8 menuSetCursor[];
 extern u8 menuGetCursor[];
-extern u8 fn_80102510[];
-extern u8 fn_80106080[];
-extern u8 fn_80106394[];
-extern u8 fn_801065B8[];
-extern u8 fn_80106698[];
-extern u8 fn_801067E8[];
+extern u8 menuClose[];
+extern u8 winMsgCloseFight[];
+extern u8 winMsgOpenFight[];
+extern u8 winMsgCloseField[];
+extern u8 winMsgOpenFieldWithSE[];
+extern u8 winMsgOpenField[];
 extern u8 fn_8011288C[];
 extern u8 fn_80113828[];
 extern u8 fn_8011388C[];
@@ -93817,16 +93817,16 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)fn_801CB3B8),
     (void*)0x01000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_801067E8),
+    (void*)((u8*)winMsgOpenField),
     (void*)0x01010100,
     (void*)0x00000000,
-    (void*)((u8*)fn_801065B8),
+    (void*)((u8*)winMsgCloseField),
     (void*)0x01000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_80106394),
+    (void*)((u8*)winMsgOpenFight),
     (void*)0x01010100,
     (void*)0x00000000,
-    (void*)((u8*)fn_80106080),
+    (void*)((u8*)winMsgCloseFight),
     (void*)0x01000000,
     (void*)0x00000000,
     (void*)((u8*)fn_8001E184),
@@ -93835,13 +93835,13 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)menuOpen),
     (void*)0x01010000,
     (void*)0x00000000,
-    (void*)((u8*)fn_80102510),
+    (void*)((u8*)menuClose),
     (void*)0x01000000,
     (void*)0x00000000,
     (void*)((u8*)menuGetCursor),
     (void*)0x01000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_80102398),
+    (void*)((u8*)menuSetCursor),
     (void*)0x01010000,
     (void*)0x00000000,
     (void*)((u8*)fn_80018F30),
@@ -94468,7 +94468,7 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)fn_801CBAB8),
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_80106698),
+    (void*)((u8*)winMsgOpenFieldWithSE),
     (void*)0x01010101,
     (void*)0x00000000,
     (void*)((u8*)scriptStoreTemochiPokemon),

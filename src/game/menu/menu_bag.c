@@ -15,7 +15,7 @@
  *     iterating 0x229 (553) times with 0x14-byte entries.
  *   - fn_8004EDCC, fn_8004F860, fn_8004FE3C and fn_80050844 share one
  *     template: reload the species cache, then run a scene-message loop
- *     (fn_801026A4/fn_801022B8) that dispatches per-message onto
+ *     (menuOpenCustom/menuGetCursorItemID) that dispatches per-message onto
  *     HANDLE_BAG_VALUE, which reads a numeric field from the on-screen input
  *     widget (fn_8001E224), clamps it to +-0xC8, and commits it
  *     (fn_801FAA58). Each of the four owns a distinct scene model
@@ -38,11 +38,11 @@
 
 /* ===== GS Engine ===== */
 extern void  _threadSwitch(void);           /* GSthread yield */
-extern u32   fn_80102568(u32 a, u32 b, u32 c); /* scene load */
+extern u32   menuCloseCustom(u32 a, u32 b, u32 c); /* scene load */
 extern s32   menuOpen(u32 a, u32 b);        /* scene query */
-extern s32   fn_801026A4(u32 sceneId, u32 a, u32 b, u32 c,
+extern s32   menuOpenCustom(u32 sceneId, u32 a, u32 b, u32 c,
                          u32 d, u32 e, ...);
-extern u32   fn_801022B8(u32 a);                /* scene message get */
+extern u32   menuGetCursorItemID(u32 a);                /* scene message get */
 extern void  winSpriteSetDisp(u32 obj, u8 visible);  /* model visibility */
 extern void  fn_800FB680(u32 a, u32 b, s32 c, u32 d); /* sound trigger */
 extern void  fn_80132A38(u32 effectId, u32 param);
@@ -120,9 +120,9 @@ s32 fn_8004EADC(void) {
     }
 
     while (1) {
-        result = fn_801026A4(0x89, 0, 0, 0, 1, 0);
+        result = menuOpenCustom(0x89, 0, 0, 0, 1, 0);
         if (result == -1) {
-            fn_80102568(0x89, 0, 1);
+            menuCloseCustom(0x89, 0, 1);
 
             index = 0;
             while ((u16)index < 0x229) {
@@ -137,10 +137,10 @@ s32 fn_8004EADC(void) {
 
         if (result == -2) {
             if (menuOpen(0x44, 1) != 0) {
-                fn_80102568(0x44, 0, 1);
+                menuCloseCustom(0x44, 0, 1);
             } else {
-                fn_80102568(0x44, 0, 1);
-                fn_80102568(0x89, 0, 1);
+                menuCloseCustom(0x44, 0, 1);
+                menuCloseCustom(0x89, 0, 1);
                 return 1;
             }
         }
@@ -164,9 +164,9 @@ s32 fn_8004EC54(void) {
     }
 
     while (1) {
-        result = fn_801026A4(0x88, 0, 0, 0, 1, 0);
+        result = menuOpenCustom(0x88, 0, 0, 0, 1, 0);
         if (result == -1) {
-            fn_80102568(0x88, 0, 1);
+            menuCloseCustom(0x88, 0, 1);
 
             index = 0;
             while ((u16)index < 0x229) {
@@ -181,10 +181,10 @@ s32 fn_8004EC54(void) {
 
         if (result == -2) {
             if (menuOpen(0x44, 1) != 0) {
-                fn_80102568(0x44, 0, 1);
+                menuCloseCustom(0x44, 0, 1);
             } else {
-                fn_80102568(0x44, 0, 1);
-                fn_80102568(0x88, 0, 1);
+                menuCloseCustom(0x44, 0, 1);
+                menuCloseCustom(0x88, 0, 1);
                 return 1;
             }
         }
@@ -234,9 +234,9 @@ s32 fn_80050844(void) {
     }
 
     while (1) {
-        result = fn_801026A4(0x8A, 0, 0, 0, 1, 0);
+        result = menuOpenCustom(0x8A, 0, 0, 0, 1, 0);
         if (result == -1) {
-            fn_80102568(0x8A, 0, 1);
+            menuCloseCustom(0x8A, 0, 1);
 
             for (index = 0; (u16)index < 0x229; index++) {
                 dst = fn_801FBFBC(index);
@@ -249,15 +249,15 @@ s32 fn_80050844(void) {
 
         if (result == -2) {
             if (menuOpen(0x44, 1) != 0) {
-                fn_80102568(0x44, 0, 1);
+                menuCloseCustom(0x44, 0, 1);
                 continue;
             }
 
-            fn_80102568(0x44, 0, 1);
+            menuCloseCustom(0x44, 0, 1);
             break;
         }
 
-        msg = fn_801022B8(0x8A);
+        msg = menuGetCursorItemID(0x8A);
         switch (msg) {
         case 0x5BC:
             HANDLE_BAG_VALUE(1, value24);
@@ -339,7 +339,7 @@ s32 fn_80050844(void) {
         }
     }
 
-    fn_80102568(0x8A, 0, 1);
+    menuCloseCustom(0x8A, 0, 1);
     return 1;
 }
 
@@ -367,9 +367,9 @@ s32 fn_8004F860(void) {
     }
 
     while (1) {
-        result = fn_801026A4(0x87, 0, 0, 0, 1, 0);
+        result = menuOpenCustom(0x87, 0, 0, 0, 1, 0);
         if (result == -1) {
-            fn_80102568(0x87, 0, 1);
+            menuCloseCustom(0x87, 0, 1);
 
             for (index = 0; (u16)index < 0x229; index++) {
                 dst = fn_801FBFBC(index);
@@ -382,15 +382,15 @@ s32 fn_8004F860(void) {
 
         if (result == -2) {
             if (menuOpen(0x44, 1) != 0) {
-                fn_80102568(0x44, 0, 1);
+                menuCloseCustom(0x44, 0, 1);
                 continue;
             }
 
-            fn_80102568(0x44, 0, 1);
+            menuCloseCustom(0x44, 0, 1);
             break;
         }
 
-        msg = fn_801022B8(0x87);
+        msg = menuGetCursorItemID(0x87);
         switch (msg) {
         case 0x5E3:
             HANDLE_BAG_VALUE(0x34, value7);
@@ -421,7 +421,7 @@ s32 fn_8004F860(void) {
         }
     }
 
-    fn_80102568(0x87, 0, 1);
+    menuCloseCustom(0x87, 0, 1);
     return 1;
 }
 
@@ -457,9 +457,9 @@ s32 fn_8004FE3C(void) {
     }
 
     while (1) {
-        result = fn_801026A4(0x8B, 0, 0, 0, 1, 0);
+        result = menuOpenCustom(0x8B, 0, 0, 0, 1, 0);
         if (result == -1) {
-            fn_80102568(0x8B, 0, 1);
+            menuCloseCustom(0x8B, 0, 1);
 
             for (index = 0; (u16)index < 0x229; index++) {
                 dst = fn_801FBFBC(index);
@@ -472,15 +472,15 @@ s32 fn_8004FE3C(void) {
 
         if (result == -2) {
             if (menuOpen(0x44, 1) != 0) {
-                fn_80102568(0x44, 0, 1);
+                menuCloseCustom(0x44, 0, 1);
                 continue;
             }
 
-            fn_80102568(0x44, 0, 1);
+            menuCloseCustom(0x44, 0, 1);
             break;
         }
 
-        msg = fn_801022B8(0x8B);
+        msg = menuGetCursorItemID(0x8B);
         switch (msg) {
         case 0x5D4:
             HANDLE_BAG_VALUE(0x1A, value15);
@@ -535,7 +535,7 @@ s32 fn_8004FE3C(void) {
         }
     }
 
-    fn_80102568(0x8B, 0, 1);
+    menuCloseCustom(0x8B, 0, 1);
     return 1;
 }
 
@@ -572,9 +572,9 @@ s32 fn_8004EDCC(void) {
     }
 
     while (1) {
-        result = fn_801026A4(0x8C, 0, 0, 0, 1, 0);
+        result = menuOpenCustom(0x8C, 0, 0, 0, 1, 0);
         if (result == -1) {
-            fn_80102568(0x8C, 0, 1);
+            menuCloseCustom(0x8C, 0, 1);
 
             for (index = 0; (u16)index < 0x229; index++) {
                 dst = fn_801FBFBC(index);
@@ -587,15 +587,15 @@ s32 fn_8004EDCC(void) {
 
         if (result == -2) {
             if (menuOpen(0x44, 1) != 0) {
-                fn_80102568(0x44, 0, 1);
+                menuCloseCustom(0x44, 0, 1);
                 continue;
             }
 
-            fn_80102568(0x44, 0, 1);
+            menuCloseCustom(0x44, 0, 1);
             break;
         }
 
-        msg = fn_801022B8(0x8C);
+        msg = menuGetCursorItemID(0x8C);
         switch (msg) {
         case 0x5E8:
             HANDLE_BAG_VALUE(0x3C, value16);
@@ -653,6 +653,6 @@ s32 fn_8004EDCC(void) {
         }
     }
 
-    fn_80102568(0x8C, 0, 1);
+    menuCloseCustom(0x8C, 0, 1);
     return 1;
 }

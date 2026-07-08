@@ -78,7 +78,7 @@ s32 fn_8007169C(void) {
 extern s32 fn_80190528(s32);
 extern s32 fn_801902E0(s32);
 extern s32 fadeCheck(s32);
-extern s32 fn_80102510(s32);
+extern s32 menuClose(s32);
 extern s32 fn_801906A0(s32);
 extern void _flagSet();
 
@@ -131,7 +131,7 @@ s32 fn_80075C44(void) { return fn_801902E0(0xa14); }
 #pragma scheduling off
 s32 fn_80075C68(void) {
     fadeCheck(1);
-    return fn_80102510(0xe0);
+    return menuClose(0xe0);
 }
 #pragma pop
 
@@ -375,11 +375,11 @@ s32 fn_80073E84(void) {
     return 1;
 }
 
-extern s32 fn_80102620(s32);
+extern s32 menuIsCheck(s32);
 /* fn_80075638 (0x80075638): tail-call wrapper. */
 #pragma push
 #pragma scheduling off
-s32 fn_80075638(void) { return fn_80102620(0xd8); }
+s32 fn_80075638(void) { return menuIsCheck(0xd8); }
 #pragma pop
 
 extern void fn_801CB9D8(u32);
@@ -395,13 +395,13 @@ void fn_80075D98(void) {
 }
 
 extern s32 fadeCheck(s32);
-extern s32 fn_80102510(s32);
+extern s32 menuClose(s32);
 /* fn_80075D9C (0x80075D9C): tail-call wrapper. */
 #pragma push
 #pragma scheduling off
 s32 fn_80075D9C(void) {
     fadeCheck(1);
-    return fn_80102510(0xe2);
+    return menuClose(0xe2);
 }
 #pragma pop
 

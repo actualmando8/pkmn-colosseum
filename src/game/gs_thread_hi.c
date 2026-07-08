@@ -176,7 +176,7 @@ extern void fn_800DC04C(void);
 extern void fn_800DC0D4(void);
 extern void fn_800DC14C(void);
 extern void fn_800DC224(void);
-extern void fn_801040F0(void);
+extern void windowDrawSprite(void);
 extern void fn_80166A28(void);
 extern void fn_800D59B8(void);
 extern void fn_800D5BA0(void);

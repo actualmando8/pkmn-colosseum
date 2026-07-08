@@ -53,8 +53,8 @@ extern void fn_800D3088(void);                      /* GSgfx tick */
 extern void GSlogWrite(const char* fmt, ...);      /* GSlog_Print */
 
 /* Scene management */
-extern void fn_80102568(s32 objID, s32 arg1, s32 arg2);   /* release scene object */
-extern u8   fn_80102620(s32 objID);                        /* check scene object active */
+extern void menuCloseCustom(s32 objID, s32 arg1, s32 arg2);   /* release scene object */
+extern u8   menuIsCheck(s32 objID);                        /* check scene object active */
 extern void menuGetKeyInfo(void* padData, s32 port);          /* read pad input */
 extern void fn_80113FB4(void);                             /* check floor loaded */
 
@@ -328,8 +328,8 @@ u32 fn_801EF274(void) {
 
 /* 0x801EF2D4 | size: 0xA0 | medium */
 void fn_801EF2D4(void) {
-    extern u8 fn_80102620(s32 objID);
-    extern void fn_80102568(s32 objID, s32 arg1, s32 arg2);
+    extern u8 menuIsCheck(s32 objID);
+    extern void menuCloseCustom(s32 objID, s32 arg1, s32 arg2);
     typedef struct BattleSceneIdList {
         u32 ids[21];
     } BattleSceneIdList;
@@ -340,8 +340,8 @@ void fn_801EF2D4(void) {
     ids = *(const BattleSceneIdList*)lbl_80279B84;
     for (i = 0; i < 21; i++) {
         objID = ids.ids[i];
-        if (fn_80102620(objID) == 1) {
-            fn_80102568(objID, 0, 0);
+        if (menuIsCheck(objID) == 1) {
+            menuCloseCustom(objID, 0, 0);
         }
     }
 }

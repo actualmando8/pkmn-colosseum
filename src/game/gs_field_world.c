@@ -1860,8 +1860,8 @@ void fn_80115D64(u32 r25, u32 r26) {
 /* 0x80115E6C | 0x2F8 */
 extern void fn_801653CC(void);
 extern void fn_80132A38(void);
-extern void fn_80106D3C(void);
-extern void fn_801069FC(void);
+extern void winMsgOpen(void);
+extern void winMsgClose(void);
 extern void pcboxDelItem(void);
 extern void fn_8001E184(void);
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
@@ -8348,8 +8348,8 @@ void cbTsureFriend__Fl15FootStepCounterl(void) {
 extern void fadeEffectDokuStart(void);
 extern void fn_8018C69C(void);
 extern void fn_8018CA20(void);
-extern void fn_801067E8(void);
-extern void fn_801065B8(void);
+extern void winMsgOpenField(void);
+extern void winMsgCloseField(void);
 extern void fn_801D0AFC(void);
 extern void fn_80113FE8(void);
 extern f32 lbl_8047D030;
@@ -8682,7 +8682,7 @@ extern f32 lbl_8047D0D4;
 void moveLeader__F15HEROMOVE_MEMBER(void);
 /* 0x8012EBD4 | 0x3E4 */
 extern void dbgMenuIsOpen(void);
-extern void fn_80102620(void);
+extern void menuIsCheck(void);
 extern void fn_8018C424(void);
 extern void fn_8000D710(void);
 extern f32 lbl_8047D030;

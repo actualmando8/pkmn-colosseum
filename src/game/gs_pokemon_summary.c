@@ -94,7 +94,7 @@ extern f32   sin(f32);
 extern f32   cos(f32);
 extern void  fn_800E0CA0(f32 angle);          /* Set camera rotation */
 extern void  GSlerpGetLinearInterpolationVector(void* outVec, void* posA, void* posB); /* Vector subtract */
-extern void  fn_80106ADC(s32 p1, void* data, s32 p3, s32 p4, u8 p5);
+extern void  winMsgOpenWithSE(s32 p1, void* data, s32 p3, s32 p4, u8 p5);
 
 /* =========================================================================
  * SDA globals
@@ -126,7 +126,7 @@ s32 fn_8001501C(void) {
 #endif
 
 /* fn_80015050 - 0x80015050 | size: 0x94 */
-extern u32 fn_80103E68(u32 a);
+extern u32 cursorBiosGetPos(u32 a);
 extern u8 lbl_80266918[];
 #define sSummaryPageEntries lbl_80266918
 typedef struct SummaryPageEntry {
@@ -194,21 +194,21 @@ extern u32 fn_80143F9C(void);
 extern u32 itemDataBiosGetBattleUseFunc(void);
 extern u32 wazaDataBiosGetPtr(u16);
 extern u32 wazaDataBiosGetName(u32);
-extern u8* fn_80105624(void);
-extern void fn_80103EAC(u32, u16*);
+extern u8* windowGetKeyInfo(void);
+extern void cursorBiosSetPos(u32, u16*);
 extern void fn_800FE38C(s32, s32, s32, s32);
 extern void fn_800FE35C(void);
 extern void fn_800FE6D0(s32, s32);
 extern void fn_800FE4D4(void);
-extern void fn_80104160(s32, s32, s32, s32, u32, s32, s32, s32);
-extern void fn_801080CC(s32, s32);
+extern void windowDrawSprite2(s32, s32, s32, s32, u32, s32, s32, s32);
+extern void winSeqSetMenu(s32, s32);
 extern void fn_80166A50(s32, s32, s32, s32);
-extern void fn_80106D3C(s32, s32, s32, s32);
-extern void* fn_801046B8(void);
-extern s32 fn_801026A4(s32, void*, ...);
-extern void fn_80102510(s32);
+extern void winMsgOpen(s32, s32, s32, s32);
+extern void* windowGetActiveID(void);
+extern s32 menuOpenCustom(s32, void*, ...);
+extern void menuClose(s32);
 extern void menuCloseSync(s32, s32);
-extern void fn_801069FC(s32);
+extern void winMsgClose(s32);
 extern u32 pcboxGetItemCapacity(s32, u16);
 extern void pcboxDelItem(s32, u16, u16);
 extern void fn_8012959C(void*, u16, u16, s16);
@@ -229,7 +229,7 @@ s32 fn_80015050(u8* src, u8* param) {
     entry += (s32)(s8)src[0x95] * 0x4C;
     fp = *(DrawHandlerFn*)(entry + 0x18);
     if (fp != NULL) {
-        tmp = fn_80103E68((u16)*(u32*)(entry + 0x1C)) >> 16;
+        tmp = cursorBiosGetPos((u16)*(u32*)(entry + 0x1C)) >> 16;
         return fp(src, param, &tmp);
     }
     return 0;
@@ -910,7 +910,7 @@ s32 fn_800161B0(u8* ctx, u8* item) {
 
     pageIndex = SUMMARY_CTX_S8(ctx, 0x95);
     entry = SUMMARY_ENTRY_RAW(pageIndex);
-    messageParam = (u16)(fn_80103E68((u16)SUMMARY_ENTRY_LABEL(entry)) >> 16);
+    messageParam = (u16)(cursorBiosGetPos((u16)SUMMARY_ENTRY_LABEL(entry)) >> 16);
     pageFn = SUMMARY_ENTRY_PAGE_FN(entry);
     if (pageFn != NULL) {
         pageFn((s32)SUMMARY_F32(lbl_8047A2D4), pageIndex, &messageParam);
@@ -934,7 +934,7 @@ s32 fn_800161B0(u8* ctx, u8* item) {
         neighborEntry = SUMMARY_ENTRY_RAW(neighborIndex);
         pageFn = SUMMARY_ENTRY_PAGE_FN(neighborEntry);
         if (pageFn != NULL) {
-            messageParam = (u16)(fn_80103E68((u16)SUMMARY_ENTRY_LABEL(neighborEntry)) >> 16);
+            messageParam = (u16)(cursorBiosGetPos((u16)SUMMARY_ENTRY_LABEL(neighborEntry)) >> 16);
             x = (s32)neighborX;
             pageFn(x, neighborIndex, &messageParam);
         }
@@ -1027,7 +1027,7 @@ s32 fn_800164D0(u8* ctx, u8* item) {
     s32 dataSource;
 
     entry = SUMMARY_ENTRY_RAW(SUMMARY_CTX_S8(ctx, 0x95));
-    packed = (u16)(fn_80103E68((u16)SUMMARY_ENTRY_LABEL(entry)) >> 16);
+    packed = (u16)(cursorBiosGetPos((u16)SUMMARY_ENTRY_LABEL(entry)) >> 16);
     threshold = (s32)(s8)((u8*)&packed)[0] + 8;
     dataSource = SUMMARY_ENTRY_FIELD(entry);
 
@@ -1074,7 +1074,7 @@ s32 fn_80016618(u8* src, u8* dst) {
     u16 tmp;
     entry = (u8*)sSummaryPageEntries;
     entry = entry + (s32)(SUMMARY_CTX_S8(src, 0x95)) * SUMMARY_ENTRY_STRIDE;
-    tmp = (u16)(fn_80103E68((u16)SUMMARY_ENTRY_LABEL(entry)) >> 16);
+    tmp = (u16)(cursorBiosGetPos((u16)SUMMARY_ENTRY_LABEL(entry)) >> 16);
     if ((s32)(s8)*(u8*)&tmp > 0 && (s32)lbl_8047A2D8 == -1) {
         dst[0x67] = *(f32*)&lbl_8047B740 * (*(f32*)&lbl_8047B744 - *(f32*)&lbl_8047A2C4);
     } else {
@@ -1109,7 +1109,7 @@ s32 fn_800166BC(u8* ctx, u8* item) {
     f32 angle;
 
     entry = SUMMARY_ENTRY_RAW(SUMMARY_CTX_S8(ctx, 0x95));
-    packed = (u16)(fn_80103E68((u16)SUMMARY_ENTRY_LABEL(entry)) >> 16);
+    packed = (u16)(cursorBiosGetPos((u16)SUMMARY_ENTRY_LABEL(entry)) >> 16);
     row = (s32)(s8)((u8*)&packed)[1];
     column = (s32)(s8)((u8*)&packed)[0];
 
@@ -1213,7 +1213,7 @@ void fn_800167D0(u8* owner, u8* item, f32 phase, u16 iconId, u8 alpha) {
                       SUMMARY_F32(lbl_8047B770) + height * SUMMARY_F32(lbl_8047B770));
     }
 
-    fn_80104160(drawX, drawY, 2, 2, 0xFFFFFF00 | alpha, (s32)owner, iconId, 0);
+    windowDrawSprite2(drawX, drawY, 2, 2, 0xFFFFFF00 | alpha, (s32)owner, iconId, 0);
 }
 #pragma pop
 #endif
@@ -1259,7 +1259,7 @@ s32 fn_80016ABC(u8* ctx, u8* item) {
     }
 
     entry = SUMMARY_ENTRY_RAW(SUMMARY_CTX_S8(ctx, 0x95));
-    packed = (u16)(fn_80103E68((u16)SUMMARY_ENTRY_LABEL(entry)) >> 16);
+    packed = (u16)(cursorBiosGetPos((u16)SUMMARY_ENTRY_LABEL(entry)) >> 16);
     selected = (s32)lbl_8047A2E8;
     if (selected >= 0) {
         y = (selected - (s32)(s8)((u8*)&packed)[0]) * 0x1F + 0x95;
@@ -1332,7 +1332,7 @@ s32 fn_80016F14(u8* src, u8* dst) {
     u16 tmp;
     s32 v;
     s32 col;
-    tmp = (u16)(fn_80103E68((u16)*(u32*)(&sSummaryPageEntries[(s32)(s8)src[0x95] * 0x4C + 0x1C])) >> 16);
+    tmp = (u16)(cursorBiosGetPos((u16)*(u32*)(&sSummaryPageEntries[(s32)(s8)src[0x95] * 0x4C + 0x1C])) >> 16);
     if ((s32)lbl_8047A2E8 >= 0) {
         v = ((s32)lbl_8047A2E8 - (s32)(s8)*(u8*)&tmp) * 0x1f + 0x95;
         if ((s32)lbl_8047A2C8 != 0) {
@@ -1406,7 +1406,7 @@ s32 fn_80017028(u8* ctx) {
     u32 species;
     s32 moved;
 
-    input = fn_80105624();
+    input = windowGetKeyInfo();
     for (i = 0; i < 5; i++) {
         fallbackLabels[i] = ((u32*)lbl_80266B88)[i];
     }
@@ -1418,7 +1418,7 @@ s32 fn_80017028(u8* ctx) {
 
     pageIndex = SUMMARY_CTX_S8(ctx, 0x95);
     entry = SUMMARY_ENTRY_RAW(pageIndex);
-    packed = (u16)(fn_80103E68((u16)SUMMARY_ENTRY_LABEL(entry)) >> 16);
+    packed = (u16)(cursorBiosGetPos((u16)SUMMARY_ENTRY_LABEL(entry)) >> 16);
     dataSource = SUMMARY_ENTRY_FIELD(entry);
     if (dataSource >= 0) {
         list = heroItemGetItemKindToItemAryPtr((void*)lbl_8047A2F8, (u8)dataSource, &count, 0, 0, 0);
@@ -1530,7 +1530,7 @@ s32 fn_80017028(u8* ctx) {
         }
     }
 
-    fn_80103EAC((u16)SUMMARY_ENTRY_LABEL(entry), &currentPacked);
+    cursorBiosSetPos((u16)SUMMARY_ENTRY_LABEL(entry), &currentPacked);
 
     if ((s32)lbl_8047A2E8 < 0 && moved == 0) {
         if ((SUMMARY_ITEM_U16(input, 0x06) & 8) != 0) {
@@ -1557,7 +1557,7 @@ s32 fn_80017028(u8* ctx) {
         lbl_8047A2DC = 0x2B2B;
     } else {
         entry = SUMMARY_ENTRY_RAW(SUMMARY_CTX_S8(ctx, 0x95));
-        packed = (u16)(fn_80103E68((u16)SUMMARY_ENTRY_LABEL(entry)) >> 16);
+        packed = (u16)(cursorBiosGetPos((u16)SUMMARY_ENTRY_LABEL(entry)) >> 16);
         cursorIndex = (s32)(s8)((u8*)&packed)[0] + (s32)(s8)((u8*)&packed)[1];
         dataSource = SUMMARY_ENTRY_FIELD(entry);
         if (dataSource >= 0) {
@@ -1754,10 +1754,10 @@ s32 fn_80017A0C(u8* ctx) {
     switch (SUMMARY_CTX_S8(ctx, 0x01)) {
     case 0:
         if (SUMMARY_CTX_S8(ctx, 0x02) == 0) {
-            fn_801080CC(0x59, 0x5E);
+            winSeqSetMenu(0x59, 0x5E);
 
             entry = SUMMARY_ENTRY_RAW(SUMMARY_CTX_S8(ctx, 0x95));
-            packed = (u16)(fn_80103E68((u16)SUMMARY_ENTRY_LABEL(entry)) >> 16);
+            packed = (u16)(cursorBiosGetPos((u16)SUMMARY_ENTRY_LABEL(entry)) >> 16);
             cursorIndex = (s32)(s8)((u8*)&packed)[0] + (s32)(s8)((u8*)&packed)[1];
             dataSource = SUMMARY_ENTRY_FIELD(entry);
             if (dataSource >= 0) {
@@ -1829,7 +1829,7 @@ s32 fn_80017A0C(u8* ctx) {
 
     case 3:
         if (SUMMARY_CTX_S8(ctx, 0x02) == 0) {
-            fn_801080CC(0x59, 0x62);
+            winSeqSetMenu(0x59, 0x62);
             ctx[0x02] = 1;
         }
         break;
@@ -1946,8 +1946,8 @@ s32 fn_80017E8C(s32 pageIndex, u16 species, s16 slotIndex) {
     itemDataBiosGetPtr(species);
     if ((u8)fn_80143F9C() == 0) {
         fn_80132A38(0x2D, species);
-        fn_80106D3C(2, 0x426C, 1, 0);
-        fn_801069FC(1);
+        winMsgOpen(2, 0x426C, 1, 0);
+        winMsgClose(1);
         return 0;
     }
 
@@ -2000,8 +2000,8 @@ s32 fn_80017E8C(s32 pageIndex, u16 species, s16 slotIndex) {
             menuArg[3] = 1;
             menuArg[4] = 0;
             lbl_8047A2FC = 1;
-            menuResult = fn_801026A4(menuId, fn_801046B8(), &mode, 0, 1, 1, menuArg);
-            fn_80102510(menuId);
+            menuResult = menuOpenCustom(menuId, windowGetActiveID(), &mode, 0, 1, 1, menuArg);
+            menuClose(menuId);
             menuCloseSync(menuId, 1);
             if (menuResult == -1) {
                 result = -1;
@@ -2019,8 +2019,8 @@ s32 fn_80017E8C(s32 pageIndex, u16 species, s16 slotIndex) {
 
     if ((u16)pcboxGetItemCapacity(0, species) < result) {
         fn_80132A38(0x2D, species);
-        fn_80106D3C(2, 0x2B49, 1, 0);
-        fn_801069FC(1);
+        winMsgOpen(2, 0x2B49, 1, 0);
+        winMsgClose(1);
         return 0;
     }
 
@@ -2033,8 +2033,8 @@ s32 fn_80017E8C(s32 pageIndex, u16 species, s16 slotIndex) {
 
     fn_80132A38(0x2D, species);
     fn_80132A38(0x2F, result);
-    fn_80106D3C(2, 0x4266, 1, 0);
-    fn_801069FC(1);
+    winMsgOpen(2, 0x4266, 1, 0);
+    winMsgClose(1);
     return 1;
 }
 #pragma pop

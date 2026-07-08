@@ -56,7 +56,7 @@
  *   - Takes party slot index, species ID, and box position as parameters
  *   - Looks up the species data via itemDataBiosGetPtr / itemDataBiosGetPrice
  *   - If the count (from itemDataBiosGetPrice) is 0, shows "no Pokemon here" message
- *     via fn_8002A0B8 (format text) and fn_80106ADC (display)
+ *     via fn_8002A0B8 (format text) and winMsgOpenWithSE (display)
  *   - Otherwise, opens the detail view with move list, stats, etc.
  *   - References sSummaryPageEntries event/page table with 0x4C stride per entry
  *
@@ -65,7 +65,7 @@
  *   - Uses lbl_803A1D40 as the box data array base address
  *   - Uses lbl_802E4E58 as the Pokemon slot layout table
  *   - Iterates over 6 party slots with a 0x30-byte stride per slot
- *   - Calls fn_801080CC to set dialog/UI display states
+ *   - Calls winSeqSetMenu to set dialog/UI display states
  *
  * SDA globals:
  *   lbl_8047A2A8-A2F8: PC box state variables
@@ -101,9 +101,9 @@ extern void  fn_8002A0B8(void* outBuf, void* fmt, s32 p3, s32 p4,
 extern s32   heroGetStatus(void* partyData, s32 slot, s32 p3);
 
 /* Dialog/rendering */
-extern void  fn_80106ADC(s32 p1, void* text, s32 p3, s32 p4, u8 p5);
-extern void  fn_801069FC(s32 slot);
-extern void  fn_801080CC(void* ctx, s32 state);
+extern void  winMsgOpenWithSE(s32 p1, void* text, s32 p3, s32 p4, u8 p5);
+extern void  winMsgClose(s32 slot);
+extern void  winSeqSetMenu(void* ctx, s32 state);
 extern void  menuDataBiosGetXY(s16 npcId, u16* outX, u16* outY);
 extern void  menuDataBiosSetXY(s16 x, s16 y, s16 z);
 extern void* menuDataBiosGetPtr(void* data);
@@ -136,7 +136,7 @@ extern u32 pokemonCheckValid();
 extern void fn_80132A38();
 extern void pokemonGetSoubiItemDataId(void);
 extern void heroItemCheckAddItemDataId(void);
-extern void fn_80106D3C();
+extern void winMsgOpen();
 extern void heroItemAddItemDataId(void);
 extern void pokemonDoItemSoubi(void);
 extern void heroItemDecItemDataId(void);
@@ -158,7 +158,7 @@ void fn_8001C064(void) {
     extern u8 lbl_803A1D40[];
     extern s8 fn_8001E074(u8, s16, s16, u32);
     extern void fn_8006AEEC();
-    extern void fn_80106D3C();
+    extern void winMsgOpen();
     extern void pokemonToMenuPokemonStatus();
     extern void pokemonGetJoutaiMenuSpriteId();
     extern void pokemonGetSoubiItemDataId();
@@ -363,7 +363,7 @@ do {
                 r4 = 0x2b6b;
                 r5 = 0x1;
                 r6 = 0x1;
-                fn_80106D3C();
+                winMsgOpen();
                 break;
             }
             r3 = r25;
@@ -385,14 +385,14 @@ do {
             r4 = 0x2b69;
             r5 = 0x1;
             r6 = 0x1;
-            fn_80106D3C();
+            winMsgOpen();
             break;
         }
         r3 = 0x2;
         r4 = 0x2b6a;
         r5 = 0x1;
         r6 = 0x1;
-        fn_80106D3C();
+        winMsgOpen();
         break;
     }
     r4 = r26 & 0xFFFF;
@@ -403,14 +403,14 @@ do {
         r4 = 0x2b66;
         r5 = 0x1;
         r6 = 0x0;
-        fn_80106D3C();
+        winMsgOpen();
         r3 = 0x0;
         r4 = -0x1;
         r5 = -0x1;
         r6 = 0x0;
         r24 = fn_8001E074((u8)r3, (s16)r4, (s16)r5, (u32)r6);
         r3 = 0x1;
-        ((void(*)(void))fn_801069FC)();
+        ((void(*)(void))winMsgClose)();
         if ((s32)r24 != 0) {
             r3 = -0x1;
             return;
@@ -425,7 +425,7 @@ do {
             r4 = 0x2b6b;
             r5 = 0x1;
             r6 = 0x1;
-            fn_80106D3C();
+            winMsgOpen();
             break;
         }
         r3 = r25;
@@ -443,7 +443,7 @@ do {
             r4 = 0x2b6b;
             r5 = 0x1;
             r6 = 0x1;
-            fn_80106D3C();
+            winMsgOpen();
             break;
         }
         r3 = r25;
@@ -473,7 +473,7 @@ do {
         r4 = 0x2b67;
         r5 = 0x1;
         r6 = 0x0;
-        fn_80106D3C();
+        winMsgOpen();
         break;
     }
     r3 = r25;
@@ -493,11 +493,11 @@ do {
         r4 = 0x2b68;
         r5 = 0x1;
         r6 = 0x0;
-        fn_80106D3C();
+        winMsgOpen();
     }
 } while (0);
     r3 = 0x1;
-    ((void(*)(void))fn_801069FC)();
+    ((void(*)(void))winMsgClose)();
     r3 = (u32)lbl_803A1C20;
     r4 = 0x0;
     r3 = (u32)lbl_803A1C20;
@@ -681,14 +681,14 @@ do {
 
 /* 0x8001C7B8 | 0xBC0 */
 extern s32 menuOpen();
-extern void fn_80102510();
-extern void fn_80102568();
+extern void menuClose();
+extern void menuCloseCustom();
 extern void fadeSet();
 extern void fadeCheck();
 extern void fn_80097F08(void);
-extern s32 fn_801026A4();
+extern s32 menuOpenCustom();
 extern u8* windowSearchID();
-extern s32 fn_801022B8();
+extern s32 menuGetCursorItemID();
 extern u32 _threadSwitch(void);
 extern void winSeqCheckMove(void);
 extern void pokemonReplace(void);
@@ -716,11 +716,11 @@ void fn_8001C7B8(void) {
     extern void fn_8006AEEC();
     extern void fn_80097F08();
     extern void _threadSwitch();
-    extern void fn_801022B8();
-    extern void fn_80102510();
-    extern void fn_80102568();
+    extern void menuGetCursorItemID();
+    extern void menuClose();
+    extern void menuCloseCustom();
     extern void menuOpen();
-    extern void fn_801026A4();
+    extern void menuOpenCustom();
     extern void windowSearchID();
     extern void winSeqCheckMove();
     extern void pokemonToMenuPokemonStatus();
@@ -772,7 +772,7 @@ void fn_8001C7B8(void) {
             menuOpen();
             r23 = r3;
             r3 = 0x6b;
-            fn_80102510();
+            menuClose();
         } else {
 
             r3 = 0x10f;
@@ -780,7 +780,7 @@ void fn_8001C7B8(void) {
             menuOpen();
             r23 = r3;
             r3 = 0x10f;
-            fn_80102510();
+            menuClose();
         }
         do {
             if ((s32)r23 == 0x3d2) break;
@@ -807,7 +807,7 @@ void fn_8001C7B8(void) {
             do {
                 r4 = 0x0;
                 r5 = 0x1;
-                fn_80102568();
+                menuCloseCustom();
                 r4 = *(u32*)((u8*)r31 + 0x8);
                 r24 = 0x0;
                 r3 = *(u32*)((u8*)r31 + 0xC);
@@ -925,7 +925,7 @@ void fn_8001C7B8(void) {
                 r6 = 0x0;
                 r7 = 0x0;
                 r8 = 0x1;
-                fn_801026A4();
+                menuOpenCustom();
                 r3 = 0x63;
                 windowSearchID();
                 if (r3 != 0) {
@@ -955,7 +955,7 @@ void fn_8001C7B8(void) {
                 r6 = 0x0;
                 r7 = 0x1;
                 r8 = 0x1;
-                fn_801026A4();
+                menuOpenCustom();
                 tmp = *(u8*)((u8*)r31 + 0x1);
                 r3 = (s8)r3;
                 if (tmp == 0) {
@@ -965,7 +965,7 @@ void fn_8001C7B8(void) {
                 r28 = (s8)r3;
                 *(u8*)((u8*)r31 + 0x7) = tmp;
                 r3 = 0x63;
-                fn_801022B8();
+                menuGetCursorItemID();
                 do {
                 if ((s32)r3 == 0x3b6 || (s32)r28 == (s32)-0x1) break;
                 do {
@@ -1185,7 +1185,7 @@ void fn_8001C7B8(void) {
 
                         r4 = 0x122;
                     }
-                    ((void(*)(void))fn_801080CC)();
+                    ((void(*)(void))winSeqSetMenu)();
                     r4 = *(u8*)((u8*)r31 + 0x4);
                     r3 = (u32)lbl_802E4E58;
                     tmp = (u32)lbl_802E4E58;
@@ -1206,7 +1206,7 @@ void fn_8001C7B8(void) {
 
                         r4 = 0x122;
                     }
-                    ((void(*)(void))fn_801080CC)();
+                    ((void(*)(void))winSeqSetMenu)();
                     r3 = (u32)lbl_802E4E58;
                     r4 = r30 << 3;
                     tmp = (u32)lbl_802E4E58;
@@ -1426,7 +1426,7 @@ void fn_8001C7B8(void) {
 
                         r4 = 0x11e;
                     }
-                    ((void(*)(void))fn_801080CC)();
+                    ((void(*)(void))winSeqSetMenu)();
                     r5 = *(u8*)((u8*)r31 + 0x4);
                     r3 = (u32)lbl_802E4E58;
                     tmp = (u32)lbl_802E4E58;
@@ -1446,7 +1446,7 @@ void fn_8001C7B8(void) {
 
                         r4 = 0x11e;
                     }
-                    ((void(*)(void))fn_801080CC)();
+                    ((void(*)(void))winSeqSetMenu)();
                     while (1) {
                         tmp = *(u8*)((u8*)r31 + 0x4);
                         r4 = (u32)sp + 0xa;
@@ -1475,7 +1475,7 @@ void fn_8001C7B8(void) {
             menuOpen();
             r24 = r3;
             r3 = 0x6c;
-            fn_80102510();
+            menuClose();
             if ((s32)r24 != 1) {
                 if ((s32)r24 < 1) {
                     if ((s32)r24 != (s32)-0x1) {
@@ -1487,7 +1487,7 @@ void fn_8001C7B8(void) {
                     goto L_8001D338;
                     }
                 r3 = 0x63;
-                fn_80102510();
+                menuClose();
                 r3 = 0x2;
                 r4 = 0x0;
                 r5 = 0x0;
@@ -1506,7 +1506,7 @@ void fn_8001C7B8(void) {
                 r6 = 0x0;
                 r7 = 0x0;
                 r8 = 0x1;
-                fn_801026A4();
+                menuOpenCustom();
                 r3 = 0x63;
                 windowSearchID();
                 if (r3 != 0) {
@@ -1903,7 +1903,7 @@ void fn_8001D834(void) {
 #endif
 
 /* 0x8001D8E8 | 0xAC */
-extern void fn_801046B8();
+extern void windowGetActiveID();
 extern void menuSetPosition(void);
 extern void windowCheckCursor(void);
 extern void windowGetValue(void);
@@ -1913,12 +1913,12 @@ asm void menuSubOpenSelect(void) {
 }
 #else
 void menuSubOpenSelect(void) {
-    extern void fn_80102568();
-    extern void fn_801026A4();
+    extern void menuCloseCustom();
+    extern void menuOpenCustom();
     extern void menuSetPosition();
     extern void windowGetValue();
     extern void windowCheckCursor();
-    extern void fn_801046B8();
+    extern void windowGetActiveID();
     u8 sp[0x30];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -1940,7 +1940,7 @@ void menuSubOpenSelect(void) {
     r29 = r5;
     r30 = r6;
     r31 = r7;
-    fn_801046B8();
+    windowGetActiveID();
     r4 = r3;
     r10 = r28;
     r5 = (u32)sp + 0x10;
@@ -1949,7 +1949,7 @@ void menuSubOpenSelect(void) {
     r6 = 0x0;
     r7 = 0x0;
     r8 = 0x3;
-    fn_801026A4();
+    menuOpenCustom();
     r4 = (s16)r30;
     r5 = (s16)r31;
     r3 = 0xe7;
@@ -1964,7 +1964,7 @@ void menuSubOpenSelect(void) {
     r31 = tmp;
     r4 = 0x0;
     r5 = 0x1;
-    fn_80102568();
+    menuCloseCustom();
     r3 = r31;
     return;
 }
@@ -2405,12 +2405,12 @@ asm void fn_8001E00C(void) {
 #pragma push
 #pragma peephole off
 s32 fn_8001E00C(u32 sp8) {
-    extern void* fn_801046B8();
-    extern s32 fn_801026A4(s32, ...);
-    extern void fn_80102568(s32, s32, s32);
+    extern void* windowGetActiveID();
+    extern s32 menuOpenCustom(s32, ...);
+    extern void menuCloseCustom(s32, s32, s32);
     s32 r31;
-    r31 = fn_801026A4(0x43, fn_801046B8(), &sp8, 0, 1, 0);
-    fn_80102568(0x43, 0, 1);
+    r31 = menuOpenCustom(0x43, windowGetActiveID(), &sp8, 0, 1, 0);
+    menuCloseCustom(0x43, 0, 1);
     return r31;
 }
 #pragma pop
@@ -2425,21 +2425,21 @@ asm void fn_8001E3E0(void) {
 #pragma peephole off
 #pragma optimization_level 4
 s32 fn_8001E3E0(void* a, u32* b) {
-    extern void* fn_801046B8();
-    extern void fn_801026A4(s32, ...);
+    extern void* windowGetActiveID();
+    extern void menuOpenCustom(s32, ...);
     extern void menuSetPosition();
     extern void windowGetValue();
     extern void windowCheckCursor();
     extern u8* windowSearchID();
-    extern void fn_80102510();
+    extern void menuClose();
     void* r4_tmp;
     u8* r3;
     s32 r31;
     void* a_save;
     r31 = 0;
-    r4_tmp = fn_801046B8();
+    r4_tmp = windowGetActiveID();
     a_save = a;
-    fn_801026A4(0x2, r4_tmp, 0, 0, 0, 0x3, a_save, 0x1, 0);
+    menuOpenCustom(0x2, r4_tmp, 0, 0, 0, 0x3, a_save, 0x1, 0);
     menuSetPosition(0x2, 0x32, 0x3c);
     windowCheckCursor(0x2, 0x1);
     windowGetValue(0x2);
@@ -2447,7 +2447,7 @@ s32 fn_8001E3E0(void* a, u32* b) {
     if (r3 != 0) {
         if (b != 0) *b = *(u32*)(r3 + 0x80);
         if (*(u8*)(r3 + 0x99) == 0) r31 = 1;
-        fn_80102510(0x2);
+        menuClose(0x2);
     }
     return r31;
 }
@@ -2490,9 +2490,9 @@ void fn_8001E4B4(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f) {
 extern void fn_800D5BA0(void);
 extern void fn_800D5648(void);
 extern void fn_8005D858(void);
-extern void fn_801040F0(void);
+extern void windowDrawSprite(void);
 extern void menuItemBiosGetPtr(void);
-extern void fn_80104160(void);
+extern void windowDrawSprite2(void);
 extern u8 lbl_80266C20[];
 extern f64 lbl_8047B7D8;
 extern f32 lbl_8047B7E4;
@@ -2519,8 +2519,8 @@ void fn_8001E644(void) {
     extern void fn_800D7820();
     extern void fn_800D888C();
     extern void fn_800D88DC();
-    extern void fn_801040F0();
-    extern void fn_80104160();
+    extern void windowDrawSprite();
+    extern void windowDrawSprite2();
     u8 sp[0x80];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -2683,25 +2683,25 @@ void fn_8001E644(void) {
     r8 = tmp - r8;
     tmp = r8 + 0xa;
     r26 = (s16)tmp;
-    fn_801040F0();
+    windowDrawSprite();
     r3 = r29;
     r4 = r28;
     r5 = 0x0;
     r6 = 0xbb;
     r7 = 0x1;
-    fn_801040F0();
+    windowDrawSprite();
     r3 = r31;
     r4 = r26;
     r5 = 0x0;
     r6 = 0xb8;
     r7 = 0x0;
-    fn_801040F0();
+    windowDrawSprite();
     r3 = r29;
     r4 = r26;
     r5 = 0x0;
     r6 = 0xb8;
     r7 = 0x1;
-    fn_801040F0();
+    windowDrawSprite();
     r3 = 0xba;
     fn_8005D858();
     r24 = r3;
@@ -2724,7 +2724,7 @@ void fn_8001E644(void) {
     r9 = 0xba;
     r3 = (s16)tmp;
     r10 = 0x0;
-    fn_80104160();
+    windowDrawSprite2();
     r3 = 0x85;
     menuItemBiosGetPtr();
     r25 = r3;
@@ -2743,7 +2743,7 @@ void fn_8001E644(void) {
     tmp = r29 + tmp;
     r10 = 0x0;
     r3 = (s16)tmp;
-    fn_80104160();
+    windowDrawSprite2();
     r3 = 0xb7;
     fn_8005D858();
     r27 = r3;
@@ -2767,7 +2767,7 @@ void fn_8001E644(void) {
     tmp = r28 + tmp;
     r10 = 0x0;
     r4 = (s16)tmp;
-    fn_80104160();
+    windowDrawSprite2();
     r3 = 0x88;
     menuItemBiosGetPtr();
     r25 = r3;
@@ -2786,7 +2786,7 @@ void fn_8001E644(void) {
     tmp = r26 + tmp;
     r10 = 0x0;
     r4 = (s16)tmp;
-    fn_80104160();
+    windowDrawSprite2();
     return;
 }
 #endif
@@ -3349,7 +3349,7 @@ void fn_8001EF78(void) {
 /* 0x8001F1E8 | 0x11C */
 extern void dbgMenuSetEnable(void);
 extern void fn_801669E4(void);
-extern u8* fn_80105624();
+extern u8* windowGetKeyInfo();
 extern void fn_80166AB8(void);
 extern u32 lbl_8047A31C;
 extern u32 lbl_8047A328;
@@ -3359,7 +3359,7 @@ void fn_8001F1E8(u8* arg) {
     extern u32 lbl_8047A328;
     extern u32 fn_800F7AF0(s32);
     extern u32 fn_800F7BC4(s32);
-    extern u8* fn_80105624(void);
+    extern u8* windowGetKeyInfo(void);
     extern void dbgMenuSetEnable(s32);
     extern void fn_801669E4(s32, s32, s32);
     extern void fn_80166AB8(s32, s32, s32);
@@ -3390,7 +3390,7 @@ void fn_8001F1E8(u8* arg) {
     dbgMenuSetEnable(1);
     if (arg == 0) return;
     menuDataBiosGetPtr(*(u32*)(arg + 0x4));
-    obj = fn_80105624();
+    obj = windowGetKeyInfo();
     if ((*(u16*)(obj + 0x4) & 0x810) == 0) return;
     *(u8*)(arg + 0x98) = 1;
     fn_80166AB8(0x4c2, 0, 0);
@@ -4140,8 +4140,8 @@ void fn_8001FD48(void) {
     extern void _threadSwitch();
     extern void fn_800F92D4();
     extern void menuOpen();
-    extern void fn_801026A4();
-    extern void fn_801046B8();
+    extern void menuOpenCustom();
+    extern void windowGetActiveID();
     extern void fn_80113828();
     extern void savedataCreate();
     extern void gamedatasaveGetStatus();
@@ -4474,14 +4474,14 @@ void fn_8001FD48(void) {
         lbl_8047A31C = tmp;
         break;
     L_80020200:
-        fn_801046B8();
+        windowGetActiveID();
         r4 = r3;
         r3 = 0x13;
         r5 = 0x0;
         r6 = 0x0;
         r7 = 0x1;
         r8 = 0x0;
-        fn_801026A4();
+        menuOpenCustom();
         if ((s32)r3 < 0) break;
         f0 = lbl_8047B814;
         tmp = 0x1f;
@@ -4570,9 +4570,9 @@ asm s32 fn_80018594() {
 }
 #else
 s32 fn_80018594(u32 boxIndex, u32 speciesId, u32 slotIndex, u16* outSpecies) {
-    extern void* fn_801046B8();
-    extern s32 fn_801026A4();
-    extern void fn_80102510();
+    extern void* windowGetActiveID();
+    extern s32 menuOpenCustom();
+    extern void menuClose();
     struct {
         u8 r;
         u8 g;
@@ -4610,8 +4610,8 @@ s32 fn_80018594(u32 boxIndex, u32 speciesId, u32 slotIndex, u16* outSpecies) {
             speciesCallback = (s32 (*)())itemDataBiosGetBattleUseFunc();
         }
         if (speciesCallback == 0) {
-            fn_80106D3C(2, 0x4261, 1, 0);
-            fn_801069FC(1);
+            winMsgOpen(2, 0x4261, 1, 0);
+            winMsgClose(1);
             return 0;
         }
 
@@ -4635,8 +4635,8 @@ s32 fn_80018594(u32 boxIndex, u32 speciesId, u32 slotIndex, u16* outSpecies) {
     menuArg.entries = menuEntries;
     menuArg.count = count;
 
-    choice = fn_801026A4(0x5A, fn_801046B8(), 0, 0, 1, 1, &menuArg);
-    fn_80102510(0x5A);
+    choice = menuOpenCustom(0x5A, windowGetActiveID(), 0, 0, 1, 1, &menuArg);
+    menuClose(0x5A);
     menuCloseSync(0x5A, 1);
     if (choice < 0 || choice >= count) {
         return 1;
@@ -4727,8 +4727,8 @@ s32 fn_800188E0(s32 mode, u32 ptr, u32 r5, u32 r6, u16* out) {
         r0 = fn_80143FCC();
         if ((u8)r0 != 0) {
             fn_80132A38(0x2d, (u16)r5);
-            fn_80106D3C(2, 0x4262, 1, 0);
-            fn_801069FC(1);
+            winMsgOpen(2, 0x4262, 1, 0);
+            winMsgClose(1);
             r0 = 0;
         } else {
             lbl_8047A2B8 = r6;
@@ -4759,8 +4759,8 @@ s32 fn_800188E0(s32 mode, u32 ptr, u32 r5, u32 r6, u16* out) {
 #endif
 
 /* fn_80018A68 - 0x80018A68 | size: 0x4c8 */
-extern u32 fn_80103E68();
-extern void fn_80103EAC();
+extern u32 cursorBiosGetPos();
+extern void cursorBiosSetPos();
 extern u16 itemBiosGetItemDataId();
 extern void fn_800FF660(void);
 extern void fn_8011288C();
@@ -4778,9 +4778,9 @@ asm u16 fn_80018A68(void) {
 }
 #else
 u16 fn_80018A68(void) {
-    extern void* fn_801046B8();
-    extern s32 fn_801026A4();
-    extern void fn_80102568();
+    extern void* windowGetActiveID();
+    extern s32 menuOpenCustom();
+    extern void menuCloseCustom();
     u32 filterValue;
     u32* filterPtr;
     u32 selectedOffset;
@@ -4821,7 +4821,7 @@ u16 fn_80018A68(void) {
         *(u8*)&lbl_80478860 = 0;
     }
 
-    encoded = (u16)(fn_80103E68(2) >> 16);
+    encoded = (u16)(cursorBiosGetPos(2) >> 16);
     if ((s8)encoded <= 0) {
         filterValue = 5;
         filterPtr = &filterValue;
@@ -4836,7 +4836,7 @@ u16 fn_80018A68(void) {
 
         summaryEntry = sSummaryPageEntries;
         for (i = 0; i < 6; i++, summaryEntry += 0x4C) {
-            encoded = (u16)(fn_80103E68((u16)*(u32*)(summaryEntry + 0x1C)) >> 16);
+            encoded = (u16)(cursorBiosGetPos((u16)*(u32*)(summaryEntry + 0x1C)) >> 16);
             leftCount = (s8)(encoded >> 8);
             rightCount = (s8)encoded;
             if (rightCount < 0) {
@@ -4877,17 +4877,17 @@ u16 fn_80018A68(void) {
             }
 
             adjusted = ((u8)leftCount << 8) | (u8)rightCount;
-            fn_80103EAC((u16)*(u32*)(summaryEntry + 0x1C), &adjusted);
+            cursorBiosSetPos((u16)*(u32*)(summaryEntry + 0x1C), &adjusted);
         }
 
         lbl_8047A2D8 = -1;
-        selection = fn_801026A4(0x59, fn_801046B8(), filterPtr, 0, 1, 0);
+        selection = menuOpenCustom(0x59, windowGetActiveID(), filterPtr, 0, 1, 0);
         lbl_8047A2D8 = selection;
         if (selection == -1) {
             selectedSpecies = 0;
         } else {
             summaryEntry = sSummaryPageEntries + selection * 0x4C;
-            encoded = (u16)(fn_80103E68((u16)*(u32*)(summaryEntry + 0x1C)) >> 16);
+            encoded = (u16)(cursorBiosGetPos((u16)*(u32*)(summaryEntry + 0x1C)) >> 16);
             targetIndex = (s8)(encoded >> 8) + (s8)encoded;
             fieldId = *(s32*)(summaryEntry + 4);
             fieldCount = 0;
@@ -4938,7 +4938,7 @@ u16 fn_80018A68(void) {
         }
     }
 
-    fn_80102568(0x59, 0, 1);
+    menuCloseCustom(0x59, 0, 1);
     if ((s32)lbl_8047A2E4 != 0) {
         fn_800FF660();
         fn_8011288C(0, 0);
@@ -5337,7 +5337,7 @@ asm void fn_800195E0(void) {
 #pragma peephole off
 #pragma optimization_level 4
 s32 fn_800195E0(u8* a) {
-    extern u8* fn_80105624();
+    extern u8* windowGetKeyInfo();
     u8* r3;
     u8* r30;
     u32 r31;
@@ -5346,7 +5346,7 @@ s32 fn_800195E0(u8* a) {
     s32 r4;
     r30 = a;
     r31 = *(u32*)(a + 0x60);
-    r3 = fn_80105624();
+    r3 = windowGetKeyInfo();
     r5 = *(s32*)((u8*)r31 + 0xC);
     r0 = *(u16*)(r3 + 0x6) & 0x2;
     if (r0 != 0) {
@@ -5384,7 +5384,7 @@ s32 fn_80019680(u8* arg) {
     switch (val) {
     case 0:
         if ((s8)arg[2] == 0) {
-            fn_801080CC((void*)0x5f, 0x66);
+            winSeqSetMenu((void*)0x5f, 0x66);
             *(f32*)&lbl_8047A300 = *(f32*)&lbl_8047B7A8;
             arg[2] = 1;
         }
@@ -5400,7 +5400,7 @@ s32 fn_80019680(u8* arg) {
     }
     case 3:
         if ((s8)arg[2] == 0) {
-            fn_801080CC((void*)0x5f, 0x6a);
+            winSeqSetMenu((void*)0x5f, 0x6a);
             arg[2] = 1;
         }
         break;
@@ -5422,9 +5422,9 @@ asm void fn_80019754(void) {
 }
 #else
 s32 fn_80019754(void* arg) {
-    extern s32 fn_801046B8(void);
-    extern s32 fn_801026A4(s32, s32, s32, s32, s32, s32, void*, ...);
-    extern void fn_80102510(s32);
+    extern s32 windowGetActiveID(void);
+    extern s32 menuOpenCustom(s32, s32, s32, s32, s32, s32, void*, ...);
+    extern void menuClose(s32);
     extern void menuCloseSync(s32, s32);
     u8* e;
     s16* p4;
@@ -5468,9 +5468,9 @@ s32 fn_80019754(void* arg) {
     ids[count] = 0;
     count_plus_one = count + 1;
 
-    r4 = fn_801046B8();
-    sel = fn_801026A4(0x5f, r4, 0, 0, 1, 1, &arg);
-    fn_80102510(0x5f);
+    r4 = windowGetActiveID();
+    sel = menuOpenCustom(0x5f, r4, 0, 0, 1, 1, &arg);
+    menuClose(0x5f);
     menuCloseSync(0x5f, 1);
     if (sel >= 0 && sel < count_plus_one) {
         return ids[sel];
@@ -5510,7 +5510,7 @@ void fn_80019938(u8* a, u8* b) {
 #endif
 
 /* fn_800199F4 - 0x800199F4 | size: 0x128 */
-extern void* fn_80103FFC();
+extern void* windowAllocMemory();
 extern void menuItemBiosSetSelectFlag();
 extern void* memcpy(void* dst, const void* src, u32 n);
 extern u32 lbl_80478870;
@@ -5527,7 +5527,7 @@ s32 fn_800199F4(u8* arg) {
     void* dst;
 
     if ((s8)arg[1] == 0) {
-        dst = fn_80103FFC(arg, 0x48);
+        dst = windowAllocMemory(arg, 0x48);
         if (dst != NULL) {
             memcpy(dst, *(void**)(arg + 0x60), 0x48);
         }
@@ -5551,7 +5551,7 @@ s32 fn_800199F4(u8* arg) {
     }
     {
         s32 val;
-        val = fn_801022B8(*(u32*)(arg + 4));
+        val = menuGetCursorItemID(*(u32*)(arg + 4));
         switch (val) {
         case 0xe93:
             *(u32*)(arg + 0x80) = 0;
@@ -5585,8 +5585,8 @@ asm void fn_80019B1C(void) {
 #pragma optimization_level 4
 #pragma scheduling off
 void fn_80019B1C(void) {
-    extern void fn_80102568();
-    fn_80102568(0x42, 0x0, 0x1);
+    extern void menuCloseCustom();
+    menuCloseCustom(0x42, 0x0, 0x1);
 }
 #pragma pop
 #endif
@@ -5602,8 +5602,8 @@ asm void fn_80019B48(void) {
 #pragma optimization_level 4
 s32 fn_80019B48(s32 a) {
     extern u8 lbl_803A1D40[];
-    extern void fn_801026A4();
-    extern void fn_80102568();
+    extern void menuOpenCustom();
+    extern void menuCloseCustom();
     u32 r5;
     u32 r4;
     u32 r3;
@@ -5675,9 +5675,9 @@ s32 fn_80019B48(s32 a) {
     L_80019CE0:
     if (r31 == 0) return -1;
     ((void(*)(u32,u8*))pokemonToMenuWazaStatus)(r31, lbl_803A1BD8);
-    fn_801026A4(0x42, 0x0, 0x0, 0x0, 0x1, 0x1, lbl_803A1BD8);
+    menuOpenCustom(0x42, 0x0, 0x0, 0x0, 0x1, 0x1, lbl_803A1BD8);
     r30 = r3;
-    fn_80102568(0x42, 0x0, 0x1);
+    menuCloseCustom(0x42, 0x0, 0x1);
     return r30;
 }
 #endif
@@ -5797,7 +5797,7 @@ extern void fn_800FBB34();
 extern void fn_8010B9E8();
 extern u32 fn_80107E78();
 extern void fn_801081F8();
-extern void fn_80104160();
+extern void windowDrawSprite2();
 extern u32 fn_8011E778();
 extern void fn_8001DACC();
 extern u32 GSmsgGetRect(u32 a);
@@ -5952,7 +5952,7 @@ void menuPokemonDrawItem(u8* ctx, u8* pane) {
     case 0x3BA:
     case 0x3CB:
         if (*(u16*)(entry + 0x24) != 0) {
-            fn_80104160(0, 0, *(s16*)(pane + 0x54), *(s16*)(pane + 0x56), *(u16*)(entry + 0x24), color, ctx, 0, 0);
+            windowDrawSprite2(0, 0, *(s16*)(pane + 0x54), *(s16*)(pane + 0x56), *(u16*)(entry + 0x24), color, ctx, 0, 0);
         }
         break;
     case 0x3BB:
@@ -6013,7 +6013,7 @@ void menuPokemonDrawItem(u8* ctx, u8* pane) {
             grade = 0x64;
         }
         if ((u16)grade != 0) {
-            fn_80104160(0, 0, (s16)((x * *(s16*)(pane + 0x54) + y - 1) / y), *(s16*)(pane + 0x56), grade, color, ctx, 0, 0);
+            windowDrawSprite2(0, 0, (s16)((x * *(s16*)(pane + 0x54) + y - 1) / y), *(s16*)(pane + 0x56), grade, color, ctx, 0, 0);
         }
         break;
     case 0x543:
@@ -6116,8 +6116,8 @@ asm void menuPokemonButton(void) {
 #pragma peephole off
 void menuPokemonButton(u8* a) {
     extern u8 lbl_803A1D40[];
-    extern u32 fn_80105624();
-    extern u32 fn_801022B8();
+    extern u32 windowGetKeyInfo();
+    extern u32 menuGetCursorItemID();
     extern void fn_80166A28(u32);
     extern void menuButtonNormal(u8*);
     s32 r3;
@@ -6128,10 +6128,10 @@ void menuPokemonButton(u8* a) {
         *(u8*)(a + 0x98) = 0x1;
         return;
     }
-    r3 = fn_80105624();
+    r3 = windowGetKeyInfo();
     r3 = *(u16*)((u8*)r3 + 0x4);
     if ((r3 & 0x10) != 0) {
-        r3b = fn_801022B8(*(u32*)(a + 0x4));
+        r3b = menuGetCursorItemID(*(u32*)(a + 0x4));
         if ((r3b & 0xFFFF) == 0x3b6) r31 = 1;
     } else if ((r3 & 0x20) != 0) {
         r31 = 1;
@@ -6217,7 +6217,7 @@ void fn_8001AB70(u8* ctx) {
     }
     valid[6] = 1;
 
-    input = fn_80105624();
+    input = windowGetKeyInfo();
     buttons = *(u16*)(input + 6);
     if ((buttons & 8) != 0) {
         step = 1;
@@ -6303,7 +6303,7 @@ asm void fn_8001AF44(void) {
 s32 fn_8001AF44(s32 ctx) {
     extern u8 lbl_803A1D40[];
     extern u8 lbl_802E4E58[];
-    extern s32 fn_801026A4(s32, s32, s32, s32, s32, s32, void*, ...);
+    extern s32 menuOpenCustom(s32, s32, s32, s32, s32, s32, void*, ...);
     u32 result;
     s32 byte_off;
     u8* iter;
@@ -6330,19 +6330,19 @@ s32 fn_8001AF44(s32 ctx) {
                 menuDataBiosSetXY(*(s16*)(slot + 0), *(s16*)(slot + 4), *(s16*)(slot + 6));
 
                 slot = lbl_802E4E58 + (s32)(s8)lbl_803A1D40[4] * 0x30;
-                fn_801026A4((s32)*(s16*)(slot + byte_off), 0x63, 0, 0, 0, 2, (void*)iter, i);
+                menuOpenCustom((s32)*(s16*)(slot + byte_off), 0x63, 0, 0, 0, 2, (void*)iter, i);
 
                 slot = lbl_802E4E58 + (s32)(s8)lbl_803A1D40[4] * 0x30;
                 npcId = *(s16*)(slot + byte_off);
                 menuDataBiosGetXY(npcId, (u16*)&sx, (u16*)&sy);
                 if (sx > 0xfa) state = 0x116;
                 else state = 0x11e;
-                fn_801080CC((void*)(s32)npcId, state);
+                winSeqSetMenu((void*)(s32)npcId, state);
 
                 byte_off += 8;
                 iter += 0x30;
             }
-            fn_801080CC(*(void**)((u8*)ctx + 4), 1);
+            winSeqSetMenu(*(void**)((u8*)ctx + 4), 1);
             *((s8*)ctx + 2) = 1;
         }
     } else if ((s8)*((u8*)ctx + 1) == 3) {
@@ -6359,11 +6359,11 @@ s32 fn_8001AF44(s32 ctx) {
                 menuDataBiosGetXY(npcId, (u16*)&sx, (u16*)&sy);
                 if (sx > 0xfa) state = 0x11a;
                 else state = 0x122;
-                fn_801080CC((void*)(s32)npcId, state);
+                winSeqSetMenu((void*)(s32)npcId, state);
 
                 i += 8;
             }
-            fn_801080CC(*(void**)((u8*)ctx + 4), 7);
+            winSeqSetMenu(*(void**)((u8*)ctx + 4), 7);
             *((s8*)ctx + 2) = 1;
         }
     }
@@ -6384,11 +6384,11 @@ asm void fn_8001B184(void) {
 #pragma scheduling off
 void fn_8001B184(void) {
     extern u8 lbl_803A1D40[];
-    extern void fn_80102568();
+    extern void menuCloseCustom();
     extern void fn_800FF660();
     extern void fn_8011288C();
     extern void _threadSwitch();
-    fn_80102568(0x63, 0x0, 0x1);
+    menuCloseCustom(0x63, 0x0, 0x1);
     if (*(u8*)(lbl_803A1D40 + 0x2) != 0) {
         fn_800FF660();
         if (*(u8*)(lbl_803A1D40 + 0x3) != 0x1) fn_8011288C(0x0, 0x0);
@@ -6522,7 +6522,7 @@ s32 fn_8001B1EC() {
     while (1) {
         ctx[0x14] = 0;
         menuArg = (s32)(s8)ctx[6];
-        selection = (s8)fn_801026A4(0x63, 0, &menuArg, 0, 1, 1, entries);
+        selection = (s8)menuOpenCustom(0x63, 0, &menuArg, 0, 1, 1, entries);
         if (ctx[1] == 0) {
             selection = -2;
         }
@@ -6531,7 +6531,7 @@ s32 fn_8001B1EC() {
             break;
         }
 
-        if (fn_801022B8(0x63) == 0x3B6 || (s8)selection == -1) {
+        if (menuGetCursorItemID(0x63) == 0x3B6 || (s8)selection == -1) {
             ctx[6] = (u8)-1;
             break;
         }
@@ -6546,10 +6546,10 @@ s32 fn_8001B1EC() {
             while (1) {
                 if (ctx[0x15] != 0) {
                     action = menuOpen(0x6D, 1);
-                    fn_80102510(0x6D);
+                    menuClose(0x6D);
                 } else {
                     action = menuOpen(0x108, 1);
-                    fn_80102510(0x108);
+                    menuClose(0x108);
                 }
 
                 if (action == -1 || action == 2) {
@@ -6565,7 +6565,7 @@ s32 fn_8001B1EC() {
                     break;
                 }
                 if (action == 1) {
-                    fn_80102568(0x63, 0, 1);
+                    menuCloseCustom(0x63, 0, 1);
                     mon = NULL;
                     mode = *(s32*)(ctx + 8);
                     switch (mode) {
@@ -6609,7 +6609,7 @@ s32 fn_8001B1EC() {
                     fadeCheck(1);
                     fn_80097E58(*(u32*)(ctx + 0xC), mon, entries + (s32)(s8)selection * 0x30, 0);
                     menuArg = (s32)(s8)ctx[6];
-                    fn_801026A4(0x63, 0, &menuArg, 0, 0, 1, entries + (s32)(s8)selection * 0x30);
+                    menuOpenCustom(0x63, 0, &menuArg, 0, 0, 1, entries + (s32)(s8)selection * 0x30);
                     mon = (u8*)windowSearchID(0x63);
                     if (mon != NULL) {
                         mon[0x98] = 1;
@@ -6674,14 +6674,14 @@ s32 fn_8001B1EC() {
                 continue;
             }
             if ((u8)pokemonIsDarkPokemon(mon) == 0) {
-                fn_80106D3C(2, 0x44DD, 1, 0);
-                fn_801069FC(1);
+                winMsgOpen(2, 0x44DD, 1, 0);
+                winMsgClose(1);
                 continue;
             }
             shadowGauge = pokemonGetDp(mon);
             if (*(f32*)&lbl_8047B7C4 != shadowGauge) {
-                fn_80106D3C(2, 0x44DE, 1, 0);
-                fn_801069FC(1);
+                winMsgOpen(2, 0x44DE, 1, 0);
+                winMsgClose(1);
                 continue;
             }
             result = -1;
@@ -6704,7 +6704,7 @@ s32 fn_8001B1EC() {
 #endif
 
 /* fn_8001BAC4 - 0x8001BAC4 | size: 0x228 */
-extern void fn_8010206C();
+extern void menuCreateOffScreen();
 extern void menuReleaseOffScreen();
 extern u32 lbl_8047B7B8;
 extern u32 lbl_8047B7C4;
@@ -6771,7 +6771,7 @@ u32 fn_8001BAC4(u32 a0, u8 a1, u8 a2, u16 a3, u32 a4, u8 a5) {
         break;
     }
 BBDC:
-    fn_8010206C(*(f32*)&lbl_8047B7C4 / (f32)(u32)fn_800D37CC());
+    menuCreateOffScreen(*(f32*)&lbl_8047B7C4 / (f32)(u32)fn_800D37CC());
     *(u8*)(lbl_803A1D40 + 0x2) = 1;
     *(u8*)(lbl_803A1D40 + 0x3) = 2;
 BC20:
@@ -6883,7 +6883,7 @@ asm void fn_8001BE38(void) {
 s32 fn_8001BE38(void) {
     extern u8 lbl_803A1D40[];
     extern void fn_8001B1EC();
-    extern void fn_80102568();
+    extern void menuCloseCustom();
     extern void fn_800FF660();
     extern void fn_8011288C();
     extern void _threadSwitch();
@@ -6894,7 +6894,7 @@ s32 fn_8001BE38(void) {
     r4 = *(u16*)(lbl_803A1D40 + 0x12);
     r5 = *(u32*)(lbl_803A1D40 + 0xC);
     fn_8001B1EC((u32)r3, (u32)r4, r5);
-    fn_80102568(0x63, 0x0, 0x1);
+    menuCloseCustom(0x63, 0x0, 0x1);
     if (*(u8*)(lbl_803A1D40 + 0x2) != 0) {
         fn_800FF660();
         if (*(u8*)(lbl_803A1D40 + 0x3) != 0x1) fn_8011288C(0x0, 0x0);
@@ -7089,12 +7089,12 @@ asm void fn_8001E074(void) {
 #else
 #pragma optimization_level 4
 s8 fn_8001E074(u8 arg1, s16 arg2, s16 arg3, u32 arg4) {
-    extern void* fn_801046B8();
-    extern s32 fn_801026A4(s32, ...);
+    extern void* windowGetActiveID();
+    extern s32 menuOpenCustom(s32, ...);
     extern void menuSetPosition(s32, s16, s16);
     extern void windowCheckCursor(s32, s32);
     extern u32 windowGetValue(s32);
-    extern void fn_80102568(s32, s32, s32);
+    extern void menuCloseCustom(s32, s32, s32);
     u32 sp8;
     s16 r30;
     s16 r31;
@@ -7104,11 +7104,11 @@ s8 fn_8001E074(u8 arg1, s16 arg2, s16 arg3, u32 arg4) {
     else if ((u8)arg1 == 0x1) r30 = 0x12;
     else r30 = 0x44;
     r31 = r30;
-    fn_801026A4((s32)r31, fn_801046B8(), &sp8, 0, 0, 0);
+    menuOpenCustom((s32)r31, windowGetActiveID(), &sp8, 0, 0, 0);
     if (arg2 >= 0 && arg3 >= 0) menuSetPosition((s32)r31, arg2, arg3);
     windowCheckCursor((s32)r31, 0x1);
     r30 = (s8)windowGetValue((s32)r31);
-    fn_80102568((s32)r31, 0x0, 0x1);
+    menuCloseCustom((s32)r31, 0x0, 0x1);
     return (s8)r30;
 }
 #endif
@@ -7123,18 +7123,18 @@ asm void fn_8001E184(void) {
 #pragma push
 #pragma peephole off
 s32 fn_8001E184(void) {
-    extern void* fn_801046B8();
-    extern void fn_801026A4(s32, ...);
+    extern void* windowGetActiveID();
+    extern void menuOpenCustom(s32, ...);
     extern void windowCheckCursor();
     extern u32 windowGetValue();
-    extern void fn_80102568();
+    extern void menuCloseCustom();
     u32 sp8;
     s8 r31;
     sp8 = 0;
-    fn_801026A4(0x12, fn_801046B8(), &sp8, 0, 0, 0);
+    menuOpenCustom(0x12, windowGetActiveID(), &sp8, 0, 0, 0);
     windowCheckCursor(0x12, 0x1);
     r31 = (s8)windowGetValue(0x12);
-    fn_80102568(0x12, 0x0, 0x1);
+    menuCloseCustom(0x12, 0x0, 0x1);
     return r31;
 }
 #pragma pop
@@ -7150,8 +7150,8 @@ asm void fn_8001E200(void) {
 #pragma optimization_level 4
 #pragma scheduling off
 void fn_8001E200(void) {
-    extern void fn_80102510();
-    fn_80102510(0x2);
+    extern void menuClose();
+    menuClose(0x2);
 }
 #pragma pop
 #endif
@@ -7165,21 +7165,21 @@ asm void fn_8001E224(void) {
 #pragma peephole off
 #pragma optimization_level 4
 s32 fn_8001E224(void* a, u32* b, u8 c, void* d, void* e, u8 f) {
-    extern void* fn_801046B8();
-    extern void fn_801026A4(s32, ...);
+    extern void* windowGetActiveID();
+    extern void menuOpenCustom(s32, ...);
     extern void menuSetPosition();
     extern void windowCheckCursor();
     extern void windowGetValue();
     extern u8* windowSearchID();
-    extern void fn_80102510();
+    extern void menuClose();
     void* r4;
     u8* r3;
     s32 r31;
     u8 c_val;
     r31 = 0;
-    r4 = fn_801046B8();
+    r4 = windowGetActiveID();
     c_val = c;
-    fn_801026A4(0x2, r4, 0, 0, 0, 0x3, a, c_val, 0);
+    menuOpenCustom(0x2, r4, 0, 0, 0, 0x3, a, c_val, 0);
     menuSetPosition(0x2, d, e);
     windowCheckCursor(0x2, 0x1);
     windowGetValue(0x2);
@@ -7187,7 +7187,7 @@ s32 fn_8001E224(void* a, u32* b, u8 c, void* d, void* e, u8 f) {
     if (r3 != 0) {
         if (b != 0) *b = *(u32*)(r3 + 0x80);
         if (*(u8*)(r3 + 0x99) == 0) r31 = 1;
-        if (f != 0) fn_80102510(0x2);
+        if (f != 0) menuClose(0x2);
     }
     return r31;
 }
@@ -7203,19 +7203,19 @@ asm void menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs(void) {
 #pragma peephole off
 #pragma optimization_level 4
 s32 menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs(void* a, u32* b, void* c) {
-    extern void* fn_801046B8();
-    extern void fn_801026A4(s32, ...);
+    extern void* windowGetActiveID();
+    extern void menuOpenCustom(s32, ...);
     extern void menuSetPosition();
     extern void windowCheckCursor();
     extern void windowGetValue();
     extern u8* windowSearchID();
-    extern void fn_80102510();
+    extern void menuClose();
     void* r4_tmp;
     u8* r3;
     s32 r31;
     r31 = 0;
-    r4_tmp = fn_801046B8();
-    fn_801026A4(0x2, r4_tmp, 0, 0, 0, 0x3, a, 0x1, c);
+    r4_tmp = windowGetActiveID();
+    menuOpenCustom(0x2, r4_tmp, 0, 0, 0, 0x3, a, 0x1, c);
     menuSetPosition(0x2, 0x32, 0x3c);
     windowCheckCursor(0x2, 0x1);
     windowGetValue(0x2);
@@ -7223,7 +7223,7 @@ s32 menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs(void* a, u32* b, void* c) {
     if (r3 != 0) {
         if (b != 0) *b = *(u32*)(r3 + 0x80);
         if (*(u8*)(r3 + 0x99) == 0) r31 = 1;
-        fn_80102510(0x2);
+        menuClose(0x2);
     }
     return r31;
 }

@@ -54,18 +54,18 @@ extern void fn_800FE35C();
 extern void fn_800FE38C();
 extern void fn_800FF730();
 extern void menuGetCursorFromItemID();
-extern void fn_801022B8();
-extern void fn_80102398();
+extern void menuGetCursorItemID();
+extern void menuSetCursor();
 extern void menuSetPosition();
 extern void menuButtonNormal();
 extern void menuCursorNormal();
 extern void windowGetParam();
 extern void fn_801044D0();
-extern void fn_801046B8();
+extern void windowGetActiveID();
 extern void windowSearchItemID();
 extern void windowSearchID();
-extern void fn_80104CA0();
-extern void fn_80105624();
+extern void windowCreateCursorSprite();
+extern void windowGetKeyInfo();
 extern void fn_80107F38();
 extern void fn_801081F8();
 extern void winSetSequence();
@@ -2392,7 +2392,7 @@ void fn_8006BB34(void) {
     r22 = r3;
     r3 = (u32)&lbl_80267EA8;
     r25 = (u32)&lbl_80267EA8;
-    ((void(*)(void))fn_80105624)();
+    ((void(*)(void))windowGetKeyInfo)();
     r0 = *(u8*)((u8*)r22 + 0xA);
     r26 = r3;
     if (r0 != (u32)0x0) return;
@@ -2428,7 +2428,7 @@ void fn_8006BB34(void) {
         }
     r3 = *(u32*)((u8*)r22 + 0x4);
     r23 = r4 & 0xFF;
-    ((void(*)(void))fn_801022B8)();
+    ((void(*)(void))menuGetCursorItemID)();
     r30 = r3;
     ((void(*)(void))fn_80077BD0)();
     r0 = r3 & 0xFF;
@@ -2598,7 +2598,7 @@ void fn_8006BB34(void) {
             ((void(*)(void))menuGetCursorFromItemID)();
             r4 = r3;
             r3 = *(u32*)((u8*)r22 + 0x4);
-            ((void(*)(void))fn_80102398)();
+            ((void(*)(void))menuSetCursor)();
             return;
                         }
         if (r24 != (u32)0x0) {
@@ -2632,7 +2632,7 @@ void fn_8006BB34(void) {
         ((void(*)(void))menuGetCursorFromItemID)();
         r4 = r3;
         r3 = *(u32*)((u8*)r22 + 0x4);
-        ((void(*)(void))fn_80102398)();
+        ((void(*)(void))menuSetCursor)();
         return;
         L_8006BF10: ;
         r0 = r28 & 0xFF;
@@ -2653,7 +2653,7 @@ void fn_8006BB34(void) {
         ((void(*)(void))menuGetCursorFromItemID)();
         r4 = r3;
         r3 = *(u32*)((u8*)r22 + 0x4);
-        ((void(*)(void))fn_80102398)();
+        ((void(*)(void))menuSetCursor)();
         return;
         L_8006BF64: ;
         r0 = r28 & 0xFF;
@@ -2674,7 +2674,7 @@ void fn_8006BB34(void) {
         ((void(*)(void))menuGetCursorFromItemID)();
         r4 = r3;
         r3 = *(u32*)((u8*)r22 + 0x4);
-        ((void(*)(void))fn_80102398)();
+        ((void(*)(void))menuSetCursor)();
         return;
     }
     r0 = r27 & 0xFF;
@@ -2703,7 +2703,7 @@ void fn_8006BB34(void) {
 
 /* 0x8006C018 | size: 0xC4 */
 void fn_8006C018(void) {
-    /* Conservative view of the object returned by fn_80105624: only the
+    /* Conservative view of the object returned by windowGetKeyInfo: only the
      * flags field at offset 0x4 is exercised by this function. */
     typedef struct {
         u8 unk0[4];
@@ -2722,10 +2722,10 @@ void fn_8006C018(void) {
     if ((s32)r0 != (s32)0x2) {
         return;
     }
-    ((void(*)(void))fn_80105624)();
+    ((void(*)(void))windowGetKeyInfo)();
     r31 = (unk_menustate_8006C018*)r3;
     r3 = *(u32*)((u8*)r30 + 0x4);
-    ((void(*)(void))fn_801022B8)();
+    ((void(*)(void))menuGetCursorItemID)();
     do {
         if ((s32)r3 >= (s32)0xe35) break;
         if ((s32)r3 >= (s32)0xa0e) {
@@ -2768,10 +2768,10 @@ void fn_8006C0DC(void) {
     if ((s32)r0 != (s32)0x2) {
         return;
     }
-    ((void(*)(void))fn_80105624)();
+    ((void(*)(void))windowGetKeyInfo)();
     r31 = r3;
     r3 = *(u32*)((u8*)r30 + 0x4);
-    ((void(*)(void))fn_801022B8)();
+    ((void(*)(void))menuGetCursorItemID)();
     do {
     if ((s32)r3 >= (s32)0x9d2) break;
     if ((s32)r3 < (s32)0x9ca) {
@@ -2816,25 +2816,25 @@ void fn_8006C164(void) {
     r24 = r3;
     r0 = *(u8*)((u8*)r24 + 0xA);
     if (r0 != (u32)0x0) return;
-    ((void(*)(void))fn_80105624)();
+    ((void(*)(void))windowGetKeyInfo)();
     r0 = *(u16*)((u8*)r3 + 0x6);
     r3 = r0 & 0x1;
     r0 = -r3;
     r0 = r0 | r3;
     r27 = (u32)r0 >> 31;
-    ((void(*)(void))fn_80105624)();
+    ((void(*)(void))windowGetKeyInfo)();
     r0 = *(u16*)((u8*)r3 + 0x6);
     r3 = r0 & 0x00000002;
     r0 = -r3;
     r0 = r0 | r3;
     r28 = (u32)r0 >> 31;
-    ((void(*)(void))fn_80105624)();
+    ((void(*)(void))windowGetKeyInfo)();
     r0 = *(u16*)((u8*)r3 + 0x6);
     r3 = r0 & 0x00000004;
     r0 = -r3;
     r0 = r0 | r3;
     r29 = (u32)r0 >> 31;
-    ((void(*)(void))fn_80105624)();
+    ((void(*)(void))windowGetKeyInfo)();
     r4 = *(u16*)((u8*)r3 + 0x6);
     r0 = r29 & 0xFF;
     r3 = 0x0;
@@ -2882,7 +2882,7 @@ void fn_8006C164(void) {
     ((void(*)(void))windowGetParam)();
     r31 = r3;
     r3 = *(u32*)((u8*)r24 + 0x4);
-    ((void(*)(void))fn_801022B8)();
+    ((void(*)(void))menuGetCursorItemID)();
     r0 = r28 & 0xFF;
     r5 = 0x0;
     if (r0 != (u32)0x0) {
@@ -5975,7 +5975,7 @@ void fn_8006EE7C(void) {
     if ((s32)r0 != (s32)0x2) {
 
     } else {
-    ((void(*)(void))fn_80105624)();
+    ((void(*)(void))windowGetKeyInfo)();
     r0 = *(u16*)((u8*)r3 + 0x4);
     r0 = r0 & 0x00000010;
     if ((s32)r0 != (s32)0x0) {
@@ -6023,7 +6023,7 @@ void fn_8006EF24(void) {
     r0 = *(u8*)((u8*)r31 + 0x95);
     r0 = (s8)r0;
     if ((s32)r0 == (s32)0x0) {
-        ((void(*)(void))fn_80105624)();
+        ((void(*)(void))windowGetKeyInfo)();
         r0 = *(u16*)((u8*)r3 + 0x6);
         r0 = r0 & 0x1;
         if ((s32)r0 == (s32)0x0) goto L_8006EFDC;
@@ -6038,7 +6038,7 @@ void fn_8006EF24(void) {
         return;
     }
     if ((s32)r0 == (s32)0xa) {
-        ((void(*)(void))fn_80105624)();
+        ((void(*)(void))windowGetKeyInfo)();
         r0 = *(u16*)((u8*)r3 + 0x6);
         r0 = r0 & 0x00000002;
         if ((s32)r0 != (s32)0x0) {
@@ -6316,12 +6316,12 @@ void fn_8006F284(void) {
             r3 = *(u32*)((u8*)r31 + 0x4);
             ((void(*)(void))fn_801044D0)();
             r3 = r31;
-            ((void(*)(void))fn_80104CA0)();
+            ((void(*)(void))windowCreateCursorSprite)();
         }
 
     } else {
     r3 = *(u32*)((u8*)r31 + 0x4);
-    ((void(*)(void))fn_801022B8)();
+    ((void(*)(void))menuGetCursorItemID)();
     if ((s32)r3 == (s32)0xe35) {
         r0 = 0x1;
         *(u8*)((u8*)r31 + 0x98) = r0;
@@ -6329,7 +6329,7 @@ void fn_8006F284(void) {
     }
     L_8006F370: ;
     r3 = *(u32*)((u8*)r31 + 0x4);
-    ((void(*)(void))fn_801022B8)();
+    ((void(*)(void))menuGetCursorItemID)();
     if ((s32)r3 < (s32)0x9fe) {
         if ((s32)r3 != (s32)0x9f9) {
             if ((s32)r3 < (s32)0x9f9) {
@@ -6461,10 +6461,10 @@ void fn_8006F284(void) {
     r26 = 0x0;
     if (r28 != (u32)0x0) {
         r3 = *(u32*)((u8*)r31 + 0x4);
-        ((void(*)(void))fn_801022B8)();
+        ((void(*)(void))menuGetCursorItemID)();
         if ((s32)r3 != (s32)0xa0c) {
             r3 = *(u32*)((u8*)r31 + 0x4);
-            ((void(*)(void))fn_801022B8)();
+            ((void(*)(void))menuGetCursorItemID)();
             if ((s32)r3 != (s32)0xa0d) {
                 r26 = 0x1;
     }
@@ -6487,10 +6487,10 @@ void fn_8006F284(void) {
     r26 = 0x0;
     if (r27 != (u32)0x0) {
         r3 = *(u32*)((u8*)r31 + 0x4);
-        ((void(*)(void))fn_801022B8)();
+        ((void(*)(void))menuGetCursorItemID)();
         if ((s32)r3 != (s32)0xe34) {
             r3 = *(u32*)((u8*)r31 + 0x4);
-            ((void(*)(void))fn_801022B8)();
+            ((void(*)(void))menuGetCursorItemID)();
             if ((s32)r3 != (s32)0xe33) {
                 r26 = 0x1;
     }
@@ -6534,7 +6534,7 @@ void fn_8006F284(void) {
     if (r29 != (u32)0x0) {
         if (r28 != (u32)0x0) {
             r3 = *(u32*)((u8*)r31 + 0x4);
-            ((void(*)(void))fn_801022B8)();
+            ((void(*)(void))menuGetCursorItemID)();
             if ((s32)r3 == (s32)0x9fa) {
                 r26 = 0x1;
     }
@@ -6551,7 +6551,7 @@ void fn_8006F284(void) {
     if (r29 != (u32)0x0) {
         if (r27 != (u32)0x0) {
             r3 = *(u32*)((u8*)r31 + 0x4);
-            ((void(*)(void))fn_801022B8)();
+            ((void(*)(void))menuGetCursorItemID)();
             if ((s32)r3 == (s32)0x9fb) {
                 r28 = 0x1;
     }
@@ -6610,7 +6610,7 @@ void fn_8006F720(void) {
         *(u32*)((u8*)r3 + 0x4C) = r0;
     } while (r26 < (u32)0x1a);
     r3 = *(u32*)((u8*)r29 + 0x4);
-    ((void(*)(void))fn_801022B8)();
+    ((void(*)(void))menuGetCursorItemID)();
     /* subi r0, r3, 0x9ca */;
     if (r0 <= (u32)0x20) {
         r3 = (u32)jumptable_802EE06C;
@@ -6778,7 +6778,7 @@ void fn_8006F720(void) {
     r0 = r3 & 0xFF;
     if (r0 == (u32)0x0) {
         r3 = *(u32*)((u8*)r29 + 0x4);
-        ((void(*)(void))fn_801022B8)();
+        ((void(*)(void))menuGetCursorItemID)();
         if ((s32)r3 == (s32)0x9cd) {
             r0 = *(u32*)((u8*)r31 + 0x8);
             if ((s32)r0 == (s32)0x2) {
@@ -6840,12 +6840,12 @@ void fn_8006F720(void) {
         goto L_8006FBD8;
     }
     r3 = *(u32*)((u8*)r29 + 0x4);
-    ((void(*)(void))fn_801022B8)();
+    ((void(*)(void))menuGetCursorItemID)();
     if ((s32)r3 == (s32)0x9d2) {
         r0 = 0x1;
         *(u8*)((u8*)r29 + 0x98) = r0;
     }
-    ((void(*)(void))fn_80105624)();
+    ((void(*)(void))windowGetKeyInfo)();
     r0 = *(u16*)((u8*)r3 + 0x4);
     r0 = r0 & 0x00000010;
     if ((s32)r0 == (s32)0x0) goto L_8006FBD8;
@@ -6935,7 +6935,7 @@ void fn_8006FBFC(void) {
         } while (r30 < (u32)0x8);
 
     } else {
-    ((void(*)(void))fn_80105624)();
+    ((void(*)(void))windowGetKeyInfo)();
     r0 = *(u16*)((u8*)r3 + 0x4);
     r0 = r0 & 0x00000400;
     if ((s32)r0 != (s32)0x0) {
@@ -7054,7 +7054,7 @@ void fn_8006FE64(void) {
     r0 = (s8)r0;
     if ((s32)r0 < (s32)0x6) {
         r31 = r0;
-        ((void(*)(void))fn_80105624)();
+        ((void(*)(void))windowGetKeyInfo)();
         r0 = *(u16*)((u8*)r3 + 0x4);
         r0 = r0 & 0x00000010;
         if ((s32)r0 != (s32)0x0) {
@@ -7597,7 +7597,7 @@ void fn_800704AC(void) {
         ((void(*)(void))fn_8007162C)();
         ((void(*)(void))windowSearchID)();
         if (r3 == (u32)0x0) {
-            ((void(*)(void))fn_801046B8)();
+            ((void(*)(void))windowGetActiveID)();
             ((void(*)(void))windowSearchID)();
         }
         if (r3 == (u32)0x0) return;

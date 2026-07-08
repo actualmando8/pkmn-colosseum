@@ -80,8 +80,8 @@ extern void* fn_800DB940(u32 size);                        /* GSmem_Alloc */
 extern void  fn_800DB9A4(void* ptr);                       /* GSmem_Free */
 
 /* Scene management */
-extern void  fn_80102568(s32 objID, s32 arg1, s32 arg2);  /* release scene object */
-extern u8    fn_80102620(s32 objID);                       /* check scene object active */
+extern void  menuCloseCustom(s32 objID, s32 arg1, s32 arg2);  /* release scene object */
+extern u8    menuIsCheck(s32 objID);                       /* check scene object active */
 extern void* fn_801025C0(s32 objID);                       /* get scene object pointer */
 
 /* HSD model/animation */

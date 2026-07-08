@@ -377,9 +377,9 @@ s32 fn_8000BFA0(void) {
 #endif
 
 /* fn_8000C06C - 0x8000C06C | size: 0x70 */
-extern u32 fn_80102620(s32);
-extern void fn_80102510(s32);
-extern void fn_801026A4(s32, ...);
+extern u32 menuIsCheck(s32);
+extern void menuClose(s32);
+extern void menuOpenCustom(s32, ...);
 extern void menuSetPosition(s32, s32, s32);
 #if 0
 asm void fn_8000C06C(void) {
@@ -388,14 +388,14 @@ asm void fn_8000C06C(void) {
 #else
 #pragma peephole off
 u32 fn_8000C06C(void) {
-    extern u32 fn_80102620(u32 a);
-    extern void fn_80102510(u32 a);
-    extern void fn_801026A4(u32 a, u32 b, u32 c, u32 d, u32 e, u32 f, ...);
+    extern u32 menuIsCheck(u32 a);
+    extern void menuClose(u32 a);
+    extern void menuOpenCustom(u32 a, u32 b, u32 c, u32 d, u32 e, u32 f, ...);
     extern void menuSetPosition(u32 a, u32 b, u32 c);
-    if ((u8)fn_80102620(8) != 0) {
-        fn_80102510(8);
+    if ((u8)menuIsCheck(8) != 0) {
+        menuClose(8);
     } else {
-        fn_801026A4(8, 0, 0, 0, 1, 0);
+        menuOpenCustom(8, 0, 0, 0, 1, 0);
         menuSetPosition(8, 0x17c, 0x20);
     }
     return 0;
@@ -607,8 +607,8 @@ u32 fn_8000C328(void) {
 #endif
 
 /* fn_8000C358 - 0x8000C358 | size: 0x4c */
-extern void fn_80106D3C(u32 a, u32 b, u32 c, u32 d);
-extern void fn_801069FC(u32 a);
+extern void winMsgOpen(u32 a, u32 b, u32 c, u32 d);
+extern void winMsgClose(u32 a);
 #if 0
 asm void fn_8000C358(void) {
 #include "src/game/gs_party_access_fn_8000C358.inc"
@@ -617,8 +617,8 @@ asm void fn_8000C358(void) {
 #pragma peephole off
 u32 fn_8000C358(void) {
     fn_801D0748(2, 2, 0);
-    fn_80106D3C(2, 0x17a7, 1, 1);
-    fn_801069FC(1);
+    winMsgOpen(2, 0x17a7, 1, 1);
+    winMsgClose(1);
     return 0;
 }
 #pragma peephole on
@@ -641,9 +641,9 @@ u32 fn_8000C3A4(void) {
 /* fn_8000C3D4 - 0x8000C3D4 | size: 0xcc */
 extern void fadeSet(u32 a, f32 b);
 extern void fadeCheck(u32 a);
-extern void fn_80105FF8(u32 a, u32 b, u32 c);
-extern void fn_80106080(u32 a);
-extern void fn_80105FB0(u32 a);
+extern void winMsgOpenError(u32 a, u32 b, u32 c);
+extern void winMsgCloseFight(u32 a);
+extern void winMsgCloseError(u32 a);
 extern void fn_80132A38(u32 a, u32 b);
 extern f32 lbl_8047B6E0;
 #if 0
@@ -657,20 +657,20 @@ s32 fn_8000C3D4(u32 arg1, u32 type) {
     case 0:
         fadeSet(3, lbl_8047B6E0);
         fadeCheck(1);
-        fn_80105FF8(0x44c5, 1, 0);
-        fn_801069FC(1);
+        winMsgOpenError(0x44c5, 1, 0);
+        winMsgClose(1);
         fadeSet(2, lbl_8047B6E0);
         fadeCheck(1);
         break;
     case 1:
-        fn_80106080(1);
-        fn_80105FB0(1);
+        winMsgCloseFight(1);
+        winMsgCloseError(1);
         break;
     case 2:
         _threadSwitch();
         _threadSwitch();
         _threadSwitch();
-        fn_80106080(0);
+        winMsgCloseFight(0);
         _threadSwitch();
         _threadSwitch();
         break;
@@ -686,9 +686,9 @@ s32 fn_8000C3D4(u32 arg1, u32 type) {
 /* dbgMenuMsgCheck - 0x8000C4A0 | size: 0x78 */
 extern u32 fn_800F7BC4(u32 a);
 extern u32 fn_8001E3E0(u32 a, u32* b);
-extern void fn_801067E8(u32 a, u32 b, u32 c);
+extern void winMsgOpenField(u32 a, u32 b, u32 c);
 extern void menuSubKeyWait(void);
-extern void fn_801065B8(u32 a);
+extern void winMsgCloseField(u32 a);
 #pragma peephole off
 #if 0
 asm void dbgMenuMsgCheck(void) {
@@ -699,9 +699,9 @@ s32 dbgMenuMsgCheck(void) {
     u32 local;
     if ((fn_800F7BC4(1) & 0x20) == 0) { goto ret1; }
     if ((u8)fn_8001E3E0(0, &local) == 0) { return -1; }
-    fn_801067E8(local, 1, 0);
+    winMsgOpenField(local, 1, 0);
     menuSubKeyWait();
-    fn_801065B8(1);
+    winMsgCloseField(1);
     return 0;
 ret1:
     return 1;
@@ -717,14 +717,14 @@ asm void fn_8000C518(void) {
 #else
 #pragma peephole off
 u32 fn_8000C518(void) {
-    extern u32 fn_80102620(u32 a);
-    extern void fn_80102510(u32 a);
-    extern void fn_801026A4(u32 a, u32 b, u32 c, u32 d, u32 e, u32 f, ...);
+    extern u32 menuIsCheck(u32 a);
+    extern void menuClose(u32 a);
+    extern void menuOpenCustom(u32 a, u32 b, u32 c, u32 d, u32 e, u32 f, ...);
     extern void menuSetPosition(u32 a, u32 b, u32 c);
-    if ((u8)fn_80102620(0xc) != 0) {
-        fn_80102510(0xc);
+    if ((u8)menuIsCheck(0xc) != 0) {
+        menuClose(0xc);
     } else {
-        fn_801026A4(0xc, 0, 0, 0, 1, 0);
+        menuOpenCustom(0xc, 0, 0, 0, 1, 0);
         menuSetPosition(0xc, 0x190, 0x28);
     }
     return 0;
@@ -748,15 +748,15 @@ asm void fn_8000C588(void) {
 #else
 u32 fn_8000C588(void) {
     u8* obj = (u8*)floorDataBiosGetPtr(fn_800FF56C());
-    if ((u8)fn_80102620(0xa) != 0) {
+    if ((u8)menuIsCheck(0xa) != 0) {
         if ((u8)fn_801174C4() != 0) {
             fn_80117500();
         }
-        fn_80102510(0xa);
+        menuClose(0xa);
         fn_800FEC34(*(u32*)(obj + 0x34));
     } else {
         fn_801174F4();
-        fn_801026A4(0xa, 0, 0, 0, 0, 0);
+        menuOpenCustom(0xa, 0, 0, 0, 0, 0);
         fn_800FECB8(*(u32*)(obj + 0x34));
     }
     return 0;
@@ -841,7 +841,7 @@ do_else:
 loop_check:
     val = menuOpen(2, 1);
     if (val != -1) { goto loop_body; }
-    fn_80102510(2);
+    menuClose(2);
     return -1;
 }
 #endif
@@ -909,7 +909,7 @@ do_else:
 loop_check:
     val = menuOpen(2, 1);
     if (val != -1) { goto loop_body; }
-    fn_80102510(2);
+    menuClose(2);
     return -1;
 }
 #endif
@@ -954,7 +954,7 @@ do_else:
 loop_check:
     val = menuOpen(2, 1);
     if (val != -1) { goto loop_body; }
-    fn_80102510(2);
+    menuClose(2);
     return -1;
 }
 #endif
@@ -999,7 +999,7 @@ do_else:
 loop_check:
     val = menuOpen(2, 1);
     if (val != -1) { goto loop_body; }
-    fn_80102510(2);
+    menuClose(2);
     return -1;
 }
 #endif
@@ -1010,11 +1010,11 @@ loop_check:
 /* GSparty_GetMarkings */
 s32 fn_8000CA34(void) {
     u32 r;
-    r = fn_80102620(0x9);
+    r = menuIsCheck(0x9);
     if ((u8)r != 0) {
-        fn_80102510(0x9);
+        menuClose(0x9);
     } else {
-        fn_801026A4(0x9, 0, 0, 0, 1, 0);
+        menuOpenCustom(0x9, 0, 0, 0, 1, 0);
         menuSetPosition(0x9, 0xC, 0xA);
     }
     return 0;
@@ -1458,11 +1458,11 @@ s32 dbgMenuWazaDebugStop(void) {
 #pragma peephole off
 s32 fn_8000D154(void) {
     u32 r;
-    r = fn_80102620(0xCF);
+    r = menuIsCheck(0xCF);
     if ((u8)r != 0) {
-        fn_80102510(0xCF);
+        menuClose(0xCF);
     } else {
-        fn_801026A4(0xCF, 0, 0, 0, 1, 0);
+        menuOpenCustom(0xCF, 0, 0, 0, 1, 0);
         menuSetPosition(0xCF, 0xC, 0xA);
     }
     return 0;
@@ -1514,11 +1514,11 @@ s32 fn_8000D154(void) {
 #pragma peephole off
 s32 fn_8000D1C4(void) {
     u32 r;
-    r = fn_80102620(0x78);
+    r = menuIsCheck(0x78);
     if ((u8)r != 0) {
-        fn_80102510(0x78);
+        menuClose(0x78);
     } else {
-        fn_801026A4(0x78, 0, 0, 0, 1, 0);
+        menuOpenCustom(0x78, 0, 0, 0, 1, 0);
         menuSetPosition(0x78, 0xC, 0xA);
     }
     return 0;
@@ -1570,9 +1570,9 @@ s32 fn_8000D1C4(void) {
 #pragma peephole off
 s32 dbgMenuWazaDebugStart(void) {
     u32 r;
-    r = fn_80102620(0x13);
+    r = menuIsCheck(0x13);
     if ((u8)r != 0) {
-        fn_80102510(0x13);
+        menuClose(0x13);
     }
     if (((BattleAnimState*)lbl_804673F8)->activeFlag == 0) {
         fn_800FF730(0x3E7);

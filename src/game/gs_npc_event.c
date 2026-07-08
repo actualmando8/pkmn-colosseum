@@ -95,7 +95,7 @@ extern void  fn_800D59B8(s32 slot, f32 scaleX, f32 scaleY);     /* Set scale */
 extern void  fn_800D6728(void);                    /* Commit render state */
 
 /* NPC/interaction */
-extern void* fn_80109934(void* data);              /* Get model from data */
+extern void* menuModelRender(void* data);              /* Get model from data */
 extern s32   heroGetStatus(void* partyData, s32 slot, s32 p3);
 extern void  fn_80132A38(s32 paramId, s32 value);
 extern void  fn_800FB680(s32, s32, u32, u16);
@@ -483,14 +483,14 @@ extern void fn_801D036C(void);
 extern void fn_800849B4(void);
 extern void fn_8002FC58(void);
 extern void fn_801021F8(void);
-extern void fn_801046B8(void);
-extern void fn_801026A4(void);
+extern void windowGetActiveID(void);
+extern void menuOpenCustom(void);
 extern void windowSearchID(void);
 extern void windowSearchItemID(void);
 extern void windowCheckCursor(void);
 extern void windowGetValue(void);
 extern void menuGetCursor(void);
-extern void fn_80102510(void);
+extern void menuClose(void);
 extern void fadeSet(void);
 extern void fadeCheck(void);
 extern void GSmodelSetVisibility(void);
@@ -500,14 +500,14 @@ extern void fn_8002F79C(void);
 extern void fn_8002F284(void);
 extern void fn_8002EE74(void);
 extern void menuSetEnablePort(void);
-extern void fn_80102004(void);
-extern void fn_80106D3C(s32, s32, s32, s32);
+extern void menuGetLastError(void);
+extern void winMsgOpen(s32, s32, s32, s32);
 extern void fn_8002EA5C(void);
 extern void fn_8002E460(void);
 extern void menuOpen(void);
 extern void menuModelInit(void);
 extern void fn_80109C88(void);
-extern void fn_801069FC(s32);
+extern void winMsgClose(s32);
 extern void fn_8002E26C(void);
 extern void fn_8010A420(void);
 extern void fn_8011D904(void);
@@ -571,22 +571,22 @@ void fn_80031B4C(void) {
     extern void GSmodelSetVisibility();
     extern void fn_800FF52C();
     extern void fn_800FF660();
-    extern void fn_80102004();
+    extern void menuGetLastError();
     extern void fn_801021F8();
     extern void menuSetDisp();
     extern void menuGetCursor();
     extern void fn_801024E8();
-    extern void fn_80102510();
+    extern void menuClose();
     extern void menuOpen();
-    extern void fn_801026A4();
+    extern void menuOpenCustom();
     extern void menuSetEnablePort();
     extern void windowGetValue();
     extern void windowCheckCursor();
-    extern void fn_801046B8();
+    extern void windowGetActiveID();
     extern void windowSearchItemID();
     extern void windowSearchID();
-    extern void fn_801069FC();
-    extern void fn_80106D3C();
+    extern void winMsgClose();
+    extern void winMsgOpen();
     extern void winSpriteSetDisp();
     extern void fn_80109C88();
     extern void fn_8010A420();
@@ -659,14 +659,14 @@ void fn_80031B4C(void) {
 
 
                 *(u32*)(sp + 0xC) = tmp;
-                fn_801046B8();
+                windowGetActiveID();
                 r4 = r3;
                 r5 = (u32)sp + 0xc;
                 r3 = 0xe3;
                 r6 = 0x0;
                 r7 = 0x0;
                 r8 = 0x0;
-                fn_801026A4();
+                menuOpenCustom();
                 r3 = 0xe3;
                 windowSearchID();
                 r29 = r3;
@@ -703,7 +703,7 @@ void fn_80031B4C(void) {
                 menuGetCursor();
                 r26 = r3;
                 r3 = 0xe3;
-                fn_80102510();
+                menuClose();
                 if ((s32)r29 == (s32)-0x1) {
                     r26 = -0x1;
                 }
@@ -736,14 +736,14 @@ void fn_80031B4C(void) {
                 }
                 tmp = 0x1;
                 *(u32*)(sp + 0x8) = tmp;
-                fn_801046B8();
+                windowGetActiveID();
                 r4 = r3;
                 r5 = (u32)sp + 0x8;
                 r3 = 0xe3;
                 r6 = 0x0;
                 r7 = 0x0;
                 r8 = 0x0;
-                fn_801026A4();
+                menuOpenCustom();
                 r3 = 0xe3;
                 windowSearchID();
                 r29 = r3;
@@ -780,7 +780,7 @@ void fn_80031B4C(void) {
                 menuGetCursor();
                 r26 = r3;
                 r3 = 0xe3;
-                fn_80102510();
+                menuClose();
                 if ((s32)r29 == (s32)-0x1) {
                     r26 = -0x1;
                 }
@@ -833,9 +833,9 @@ void fn_80031B4C(void) {
                     r4 = 0x4448;
                     r5 = 0x1;
                     r6 = 0x0;
-                    fn_80106D3C();
+                    winMsgOpen();
                     r3 = 0xd9;
-                    fn_80102510();
+                    menuClose();
                     tmp = 0x0;
                     lbl_8047A42C = tmp;
                     goto L_800323E4;
@@ -866,7 +866,7 @@ void fn_80031B4C(void) {
 
                         } else {
                             r3 = 0xde;
-                            fn_80102510();
+                            menuClose();
                             tmp = -0x1;
                             r3 = r31 + 0xd18;
                             lbl_8047A428 = tmp;
@@ -883,7 +883,7 @@ void fn_80031B4C(void) {
                         goto L_800323E4;
                     }
                     r3 = 0xde;
-                    fn_80102510();
+                    menuClose();
                     r3 = r31 + 0xd18;
                     fn_8010A420();
                     r3 = r31 + 0xcd0;
@@ -893,7 +893,7 @@ void fn_80031B4C(void) {
                     goto L_800323E4;
                         }
                 r3 = 0xde;
-                fn_80102510();
+                menuClose();
                 r3 = r31 + 0xd18;
                 fn_8010A420();
                 r3 = r31 + 0xcd0;
@@ -914,18 +914,18 @@ void fn_80031B4C(void) {
                 r4 = 0x44d0;
                 r5 = 0x1;
                 r6 = 0x0;
-                fn_80106D3C();
+                winMsgOpen();
                 r3 = 0x1;
-                fn_801069FC();
+                winMsgClose();
                 goto L_80032458;
             }
             r3 = 0x2;
             r4 = 0x44f1;
             r5 = 0x1;
             r6 = 0x0;
-            fn_80106D3C();
+            winMsgOpen();
             r3 = 0x1;
-            fn_801069FC();
+            winMsgClose();
 
         } else {
             tmp = 0x1;
@@ -1029,8 +1029,8 @@ void fn_80032564(void) {
 /* 0x8003258C | 0x270 */
 extern void fn_80166AB8(s32, s32, s32);
 extern void heroAddPokecoupon(s32, s32);
-extern void fn_80106D3C(s32, s32, s32, s32);
-extern void fn_801069FC(s32);
+extern void winMsgOpen(s32, s32, s32, s32);
+extern void winMsgClose(s32);
 extern void jumptable_802E4FE0();
 extern u32 lbl_8047A450;
 extern u32 lbl_8047A458;
@@ -1076,32 +1076,32 @@ void fn_8003258C(void) {
             fn_80166AB8(0x3cc, 0, 0);
             heroAddPokecoupon(0, r31);
             fn_80132A38(0x2f, r31);
-            fn_80106D3C(8, 0x3b60, 1, 0);
-            fn_801069FC(1);
+            winMsgOpen(8, 0x3b60, 1, 0);
+            winMsgClose(1);
         } else {
             switch (ctr) {
             case 0x1e:
                 fn_80166AB8(0x3cc, 0, 0);
                 heroAddPokecoupon(0, 0x2580);
                 fn_80132A38(0x2f, 0x2580);
-                fn_80106D3C(8, 0x3b8c, 1, 0);
-                fn_801069FC(1);
+                winMsgOpen(8, 0x3b8c, 1, 0);
+                winMsgClose(1);
                 break;
             case 0x3c:
-                fn_80106D3C(8, 0x3b8f, 1, 0);
-                fn_801069FC(1);
+                winMsgOpen(8, 0x3b8f, 1, 0);
+                winMsgClose(1);
                 break;
             case 0x5a:
-                fn_80106D3C(8, 0x3b53, 1, 0);
-                fn_801069FC(1);
+                winMsgOpen(8, 0x3b53, 1, 0);
+                winMsgClose(1);
                 break;
             case 0x78:
-                fn_80106D3C(8, 0x3b56, 1, 0);
-                fn_801069FC(1);
+                winMsgOpen(8, 0x3b56, 1, 0);
+                winMsgClose(1);
                 break;
             case 0x96:
-                fn_80106D3C(8, 0x3b59, 1, 0);
-                fn_801069FC(1);
+                winMsgOpen(8, 0x3b59, 1, 0);
+                winMsgClose(1);
                 break;
             }
         }
@@ -1132,7 +1132,7 @@ extern void _fadeEffectGetRandom__FUl(void);
 extern void GScharCpy(void);
 extern u16 pokemonGetStatus(void*, s32, s32, s32);
 extern void fn_80082EA4(void);
-extern void fn_80102620(void);
+extern void menuIsCheck(void);
 extern void fn_800D37CC(void);
 extern void fn_800D3088(void);
 extern u8 lbl_8047A44A;
@@ -1176,8 +1176,8 @@ void fn_800327FC(void) {
     extern void _fadeEffectGetRandom__FUl();
     extern void _threadSwitch();
     extern void GScharCpy();
-    extern void fn_80102510();
-    extern void fn_80102620();
+    extern void menuClose();
+    extern void menuIsCheck();
     extern void menuOpen();
     extern void pokemonCheckValid();
     extern void pokemonGetStatus();
@@ -1454,11 +1454,11 @@ void fn_800327FC(void) {
         r15 = r3;
     }
     r3 = 0xa5;
-    fn_80102620();
+    menuIsCheck();
     tmp = r3 & 0xFF;
     if (tmp != 0) {
         r3 = 0xa5;
-        fn_80102510();
+        menuClose();
     }
     f1 = lbl_8047BA00;
     r3 = 0x2;
@@ -2221,10 +2221,10 @@ void fn_80030C14(void* r3, u8* r4) {
     s32 evtype = *(s16*)(r4 + 0x6);
     switch (evtype) {
     case 0x10CC:
-        model = fn_80109934(lbl_803A3230);
+        model = menuModelRender(lbl_803A3230);
         break;
     case 0x10CD:
-        model = fn_80109934(lbl_803A31E8);
+        model = menuModelRender(lbl_803A31E8);
         break;
     }
     if (model != NULL) {

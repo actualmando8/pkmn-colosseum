@@ -7,14 +7,14 @@
  * This module manages the task system that sits between the main loop and
  * the individual game subsystems. It handles:
  *   - FSYS archive loading via task callbacks (fn_801FB1C0)
- *   - Scene transition sequencing with fn_801026A4 dispatch
+ *   - Scene transition sequencing with menuOpenCustom dispatch
  *   - Archive completion callbacks with scene ID routing
  *   - Resource group management (models, textures, scripts)
  *
  * The functions follow a clear pattern:
  *   1. Load an SDA global (lbl_8047A288) for the current scene/map ID
  *   2. Call fn_801FB1C0 to initiate an archive load with a priority level
- *   3. On success, call fn_80106394 and fn_80106080 to activate the loaded data
+ *   3. On success, call winMsgOpenFight and winMsgCloseFight to activate the loaded data
  *   4. Return 1 on success, -1 on failure
  *
  * Key functions:
@@ -73,8 +73,8 @@
  *
  * Code patterns:
  *   - SDA globals lbl_8047A288 (current scene halfword), lbl_80478F50 (scene table ptr)
- *   - fn_801026A4 is the main event dispatch (takes slot, params, flags)
- *   - fn_80102568 is the event cancel/cleanup function
+ *   - menuOpenCustom is the main event dispatch (takes slot, params, flags)
+ *   - menuCloseCustom is the event cancel/cleanup function
  *   - menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs is a bounded random selection helper
  *   - fn_8001E200 is a random result commit function
  */
@@ -91,15 +91,15 @@ extern void  GSscene_SetMode(s32 mode);               /* GSscene_SetMode */
 
 /* FSYS archive loading */
 extern void* fn_801FB1C0(s32 slot, u16 sceneId, s32 priority, s32 group);
-extern s32   fn_80106394(void* handle, s32 a, s32 b);
-extern s32   fn_80106080(s32 slot);
+extern s32   winMsgOpenFight(void* handle, s32 a, s32 b);
+extern s32   winMsgCloseFight(s32 slot);
 
 /* Event dispatch */
-extern u8    fn_80102620(s32 slot);               /* Check if event slot busy */
-extern s32   fn_80102510(s32 slot);               /* Cancel active event */
-extern s32   fn_801026A4(s32 slot, ...);           /* Dispatch scene event */
-extern void  fn_80102568(s32 slot, s32 p1, s32 p2);  /* Event cleanup */
-extern s32   fn_801022B8(s32 slot);               /* Get event result code */
+extern u8    menuIsCheck(s32 slot);               /* Check if event slot busy */
+extern s32   menuClose(s32 slot);               /* Cancel active event */
+extern s32   menuOpenCustom(s32 slot, ...);           /* Dispatch scene event */
+extern void  menuCloseCustom(s32 slot, s32 p1, s32 p2);  /* Event cleanup */
+extern s32   menuGetCursorItemID(s32 slot);               /* Get event result code */
 extern s32   menuOpen(s32 slot, s32 p1);       /* Query event state */
 extern void  menuSetPosition(s32 slot, s32 p1, s32 p2);  /* Set event params */
 
@@ -180,10 +180,10 @@ s32 dbgMenuCameraResetFloor(void) {
 #pragma scheduling off
 #pragma peephole off
 s32 dbgMenuCameraChangeDisp(void) {
-    if (fn_80102620(6) != 0) {
-        fn_80102510(6);
+    if (menuIsCheck(6) != 0) {
+        menuClose(6);
     } else {
-        fn_801026A4(6, 0, 0, 0, 1, 0);
+        menuOpenCustom(6, 0, 0, 0, 1, 0);
         menuSetPosition(6, 0x14, 0x104);
     }
     return 0;
@@ -243,8 +243,8 @@ s32 fn_80006724(void) {
     if (result == NULL) {
         return -1;
     }
-    fn_80106394(result, 1, 1);
-    fn_80106080(1);
+    winMsgOpenFight(result, 1, 1);
+    winMsgCloseFight(1);
     return 1;
 }
 
@@ -264,8 +264,8 @@ s32 fn_8000677C(void) {
     if (result == NULL) {
         return -1;
     }
-    fn_80106394(result, 1, 1);
-    fn_80106080(1);
+    winMsgOpenFight(result, 1, 1);
+    winMsgCloseFight(1);
     return 1;
 }
 
@@ -284,8 +284,8 @@ s32 fn_800067D4(void) {
     if (result == NULL) {
         return -1;
     }
-    fn_80106394(result, 1, 1);
-    fn_80106080(1);
+    winMsgOpenFight(result, 1, 1);
+    winMsgCloseFight(1);
     return 1;
 }
 
@@ -304,8 +304,8 @@ s32 fn_8000682C(void) {
     if (result == NULL) {
         return -1;
     }
-    fn_80106394(result, 1, 1);
-    fn_80106080(1);
+    winMsgOpenFight(result, 1, 1);
+    winMsgCloseFight(1);
     return 1;
 }
 #pragma pop
@@ -320,7 +320,7 @@ s32 fn_8000682C(void) {
  *
  * fn_80006908 (GStask_ProcessSceneEvent):
  *   The largest function (0x6A4 bytes) - a massive switch statement that
- *   dispatches scene events based on event codes returned by fn_801022B8.
+ *   dispatches scene events based on event codes returned by menuGetCursorItemID.
  *   Uses jumptable_802E28D0 for the initial dispatch, then performs
  *   NPC selection, resource loading, and encounter setup based on the
  *   event type. Each case in the switch:
@@ -773,7 +773,7 @@ void fn_80008868(void) {
 #endif
 
 /* 0x80008C40 | 0x538 */
-extern void fn_80105624(void);
+extern void windowGetKeyInfo(void);
 extern void fn_80190528(void);
 extern void fn_801903B0(void);
 extern u32 lbl_80478F98;
@@ -790,7 +790,7 @@ void fn_80008C40(void) {
     extern u32 lbl_80478F98;
     extern u32 lbl_80478F9C;
     extern void menuDataBiosGetType();
-    extern void fn_80105624();
+    extern void windowGetKeyInfo();
     extern void fn_801903B0();
     extern void fn_80190528();
     u8 sp[0x30];
@@ -809,9 +809,9 @@ void fn_80008C40(void) {
     u32 ctr = 0;
 
     r28 = r3;
-    fn_80105624();
+    windowGetKeyInfo();
     r27 = *(u16*)((u8*)r3 + 0x6);
-    fn_80105624();
+    windowGetKeyInfo();
     r4 = lbl_80478F98;
     r31 = *(u16*)((u8*)r3 + 0x0);
     tmp = *(u32*)((u8*)r4 + 0x0);
@@ -1176,7 +1176,7 @@ void menuFightButtonNormal(u8* ctx) {
     held = fn_800F7BC4(1);
     if ((held & buttons) & 0x100) {
         *(u8*)(ctx + 0x98) = 1;
-        *(u32*)(ctx + 0x80) = fn_801022B8(*(u32*)(ctx + 0x4));
+        *(u32*)(ctx + 0x80) = menuGetCursorItemID(*(u32*)(ctx + 0x4));
     }
 
     buttons = fn_800F7AF0(1);
@@ -1835,9 +1835,9 @@ s32 fn_80007B30(void) {
     save_nickname = lbl_8047882E;
 
     for (;;) {
-        evt = fn_801026A4(0xe, 0, 0, 0, 1, 0, 0);
+        evt = menuOpenCustom(0xe, 0, 0, 0, 1, 0, 0);
         if (evt == -1) {
-            fn_80102568(0xe, 0, 1);
+            menuCloseCustom(0xe, 0, 1);
             if (save_vol < 1) save_vol = 1;
             if ((u8)save_vol > 9) save_vol = 9;
             lbl_80478828 = save_vol;
@@ -1854,10 +1854,10 @@ s32 fn_80007B30(void) {
         }
         if (evt == -2) {
             if (menuOpen(0x44, 1) != 0) {
-                fn_80102568(0x44, 0, 1);
+                menuCloseCustom(0x44, 0, 1);
                 continue;
             }
-            fn_80102568(0x44, 0, 1);
+            menuCloseCustom(0x44, 0, 1);
             break;
         }
 
@@ -1996,7 +1996,7 @@ s32 fn_80007B30(void) {
         }
     }
 
-    fn_80102568(0xe, 0, 1);
+    menuCloseCustom(0xe, 0, 1);
     return 1;
 }
 #pragma peephole on
@@ -2089,7 +2089,7 @@ s32 fn_8000804C(void) {
 #endif
 
 /* dbgMenuFightGetMsgSpeedToFrame - 0x80008184 | size: 0xc0 */
-extern u8 fn_80106160(void);
+extern u8 winMsgCloseCheckFight(void);
 extern u8 lbl_80266678[];
 #if 0
 asm void dbgMenuFightGetMsgSpeedToFrame(void) {
@@ -2108,7 +2108,7 @@ u32 dbgMenuFightGetMsgSpeedToFrame(u32 value) {
     *(u32*)&buf[4] = *(u32*)&lbl_80266678[4];
     *(u16*)&buf[8] = *(u16*)&lbl_80266678[8];
 
-    if (fn_80106160() == 1) {
+    if (winMsgCloseCheckFight() == 1) {
         value = (value * buf[idx]) / 100;
         if (lbl_8047A270 == 1) {
             value = 0;

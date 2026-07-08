@@ -144,27 +144,27 @@ extern void fn_800D6728(void);
 
 /* Forward declarations for functions defined later in this TU */
 extern u8    menuOffScreenCheckEnable(u8 param);
-extern void  fn_80104828(void* ptr, u32 flags);
+extern void  windowClose(void* ptr, u32 flags);
 extern void* windowSearchID(s32 param);
 extern s32   _menuCBOffScreen__FP9GStextureUlPv(void);
 extern void  winSpriteSetDisp(void* node, u32 enable);
 extern void  windowGetValue(s32 param);
 extern void  windowCheckCursor(void* p, u8 flags);
-extern void  fn_80104160(void* r3, void* r4, s16 r5, s16 r6, s32 r7, s32 r8, s32 r9, s32 r10);
+extern void  windowDrawSprite2(void* r3, void* r4, s16 r5, s16 r6, s32 r7, s32 r8, s32 r9, s32 r10);
 extern u8    menuOffScreenFadeSync(u8 param);
 extern void  menuOffScreenFadeSet(f32 f1, f32 f2);
-extern u8    fn_8010977C(u32 param);
-extern void  fn_80109764(void);
-extern u32   fn_801046B8(void);
-extern void* fn_80105624(void);
+extern u8    menuOffScreenCreate(u32 param);
+extern void  menuOffScreenRelease(void);
+extern u32   windowGetActiveID(void);
+extern void* windowGetKeyInfo(void);
 extern void* fn_8005D830(u32 idx);
 extern void* windowSearchItemID(void* head, s32 key);
-extern void  fn_801026A4(void* p, u32 r4, s32 r5, s32 r6, void* r7, s32 r8, ...);
+extern void  menuOpenCustom(void* p, u32 r4, s32 r5, s32 r6, void* r7, s32 r8, ...);
 extern u8    menuOffScreenSetPriority(u8 val);
 extern u8    menuOffScreenSetDisp(u8 val);
 extern u32   fn_800D3088(void);
 extern u8    lbl_80404B68[];  /* scratch table for fn_80107F38, fn_801081F8 */
-extern u8    lbl_80404B8C[];  /* scratch table for fn_801080CC */
+extern u8    lbl_80404B8C[];  /* scratch table for winSeqSetMenu */
 extern u8    lbl_8047AD10;     /* resource request gate byte (sda21) — authoritative decl, use as-is */
 
 /* 0x801019F8 | 0x30 */
@@ -259,7 +259,7 @@ void fn_80101FB8(u8 param) {
 /* 0x80102014 | 0x24 */
 #pragma push
 #pragma scheduling off
-void fn_80102014(void) {
+void menuGetOffScreenFlag(void) {
     menuOffScreenCheckEnable(0);
 }
 #pragma pop
@@ -272,14 +272,14 @@ void menuReleaseOffScreen(f32 f1) {
     f2 = f1;
     menuOffScreenFadeSet(lbl_8047CDC0, f2);
     menuOffScreenFadeSync(1);
-    fn_80109764();
+    menuOffScreenRelease();
 }
 #pragma pop
 
 /* 0x8010206C | 0x54 */
-void fn_8010206C(f32 param) {
+void menuCreateOffScreen(f32 param) {
     f32 f31 = param;
-    fn_8010977C(1);
+    menuOffScreenCreate(1);
     menuOffScreenSetDisp(1);
     menuOffScreenSetPriority(0);
     menuOffScreenFadeSet(lbl_8047CDC4, f31);
@@ -378,7 +378,7 @@ void menuSetDisp(void* p, u32 enable) {
 /* 0x801022B8 | 0xE0 */
 #pragma push
 #pragma peephole off
-void* fn_801022B8(void* p, u32 target) {
+void* menuGetCursorItemID(void* p, u32 target) {
     void* r29 = p;
     void* r3 = windowSearchID((s32)p);
     s32 r31;
@@ -420,7 +420,7 @@ void* fn_801022B8(void* p, u32 target) {
 /* 0x80102398 | 0x4C */
 #pragma push
 #pragma peephole off
-s32 fn_80102398(void* p, u32 val) {
+s32 menuSetCursor(void* p, u32 val) {
     u32 r31 = val;
     void* r3 = windowSearchID((s32)p);
     if (r3 == (void*)0) goto ret_m1;
@@ -484,7 +484,7 @@ ret0:
 #pragma push
 #pragma scheduling off
 void menuCloseFloor(void) {
-    fn_80104828(0, 4);
+    windowClose(0, 4);
 }
 #pragma pop
 
@@ -492,22 +492,22 @@ void menuCloseFloor(void) {
 #pragma push
 #pragma scheduling off
 void fn_801024E8(void) {
-    fn_80104828(0, 4);
+    windowClose(0, 4);
 }
 #pragma pop
 
 /* 0x80102510 | 0x58 */
 #pragma push
 #pragma peephole off
-void fn_80102510(s32 p) {
+void menuClose(s32 p) {
     s32 r31 = p;
     if (r31 == 0) {
-        r31 = (s32)fn_801046B8();
+        r31 = (s32)windowGetActiveID();
     }
     {
         void* r3 = windowSearchID(r31);
         if (r3 != (void*)0) {
-            fn_80104828(r3, 0);
+            windowClose(r3, 0);
             windowSearchID(r31);
         }
     }
@@ -515,13 +515,13 @@ void fn_80102510(s32 p) {
 #pragma pop
 
 /* 0x80102568 | 0xB8 */
-s32 fn_80102568(void* p, u32 mode, u8 wait) {
+s32 menuCloseCustom(void* p, u32 mode, u8 wait) {
     void* r29 = p;
     void* r30 = (void*)mode;
     u8 r31 = (u8)wait;
     void* r3 = windowSearchID((s32)p);
     if (r3 == (void*)0) { return 1; }
-    fn_80104828(r29, (u32)r30);
+    windowClose(r29, (u32)r30);
     if ((u8)r31 != 0) {
         while (1) {
             r3 = windowSearchID((s32)r29);
@@ -539,7 +539,7 @@ s32 fn_80102568(void* p, u32 mode, u8 wait) {
 }
 
 /* 0x80102620 | 0x2C */
-s32 fn_80102620(s32 param) {
+s32 menuIsCheck(s32 param) {
     s32 r = (s32)windowSearchID(param);
     return (u32)((-r) | r) >> 31;
 }
@@ -550,7 +550,7 @@ s32 fn_80102620(s32 param) {
 void menuOpen(void* p, void* q) {
     void* r30 = p;
     void* r31 = q;
-    fn_801026A4(r30, fn_801046B8(), 0, 0, r31, 0);
+    menuOpenCustom(r30, windowGetActiveID(), 0, 0, r31, 0);
 }
 #pragma pop
 
@@ -558,7 +558,7 @@ void menuOpen(void* p, void* q) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_801026A4(void* p, u32 r4, s32 r5, s32 r6, void* r7, s32 r8, ...) {
+void menuOpenCustom(void* p, u32 r4, s32 r5, s32 r6, void* r7, s32 r8, ...) {
     /* TODO: match -- 452 bytes at 0x801026A4 */
     (void)p; (void)r4; (void)r5; (void)r6; (void)r7; (void)r8;
 }
@@ -584,7 +584,7 @@ void menuButtonNormal(void* p) {
     void* r31;
     if ((r31 = p) == (void*)0) { return; }
     {
-        void* base = fn_80105624();
+        void* base = windowGetKeyInfo();
         u16 r3 = *(u16*)((u8*)base + 0x4);
         s32 bits = (s32)r3;
         if (bits & 0x10) {
@@ -601,7 +601,7 @@ void menuButtonNormal(void* p) {
 /* 0x80103484 | 0x58 */
 #pragma push
 #pragma peephole off
-void fn_80103484(void* p, void* q) {
+void menuPlaySe(void* p, void* q) {
     s32 r31 = (s32)q;
     void* r3 = menuDataBiosGetPtr();
     void* r3c = menuSeBiosGetPtr((s32)(*(u8*)((u8*)r3 + 0x0) & 0x7));
@@ -627,7 +627,7 @@ void fn_801034DC(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80103614(void) {
+void _menuGetGcKeyInfo__FlPUs(void) {
     /* TODO: match -- 740 bytes at 0x80103614 */
 }
 #pragma pop
@@ -636,7 +636,7 @@ void fn_80103614(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_801038F8(void) {
+void _menuUpdateKeyInfo__FP15WINDOW_SYS_WORK(void) {
     /* TODO: match -- 688 bytes at 0x801038F8 */
 }
 #pragma pop
@@ -666,7 +666,7 @@ u8 menuSetEnablePort(u8 val) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80103CD8(void) {
+void menuInit(void) {
     /* TODO: match -- 400 bytes at 0x80103CD8 */
 }
 #pragma pop
@@ -674,7 +674,7 @@ void fn_80103CD8(void) {
 /* 0x80103E68 | 0x44 -- read and maybe lookup from table */
 #pragma push
 #pragma peephole off
-u32 fn_80103E68(u16 idx) {
+u32 cursorBiosGetPos(u16 idx) {
     struct { volatile u16 a; u8 _pad[2]; volatile u16 b; } sp;
     u16 r3 = lbl_8047CDE4;
     sp.a = r3;
@@ -690,7 +690,7 @@ u32 fn_80103E68(u16 idx) {
 /* 0x80103EAC | 0x48 */
 #pragma push
 #pragma peephole off
-u32 fn_80103EAC(u16 idx, u16* out) {
+u32 cursorBiosSetPos(u16 idx, u16* out) {
     u16 g = lbl_8047CDE0;
     u32 n = idx & 0xFFFFu;
     volatile u16 sp[3];
@@ -708,7 +708,7 @@ u32 fn_80103EAC(u16 idx, u16* out) {
 #pragma pop
 
 /* 0x80103EF4 | 0x80 */
-void fn_80103EF4(void) {
+void cursorBiosInit(void) {
     if (0 >= 0xc) { return; }
     {
         u8* p = lbl_80404A98;
@@ -753,7 +753,7 @@ void* windowGetAllocPtr(void* ptr) {
 /* 0x80103FFC | 0xA4 */
 #pragma push
 #pragma peephole off
-void* fn_80103FFC(void* p, s32 size) {
+void* windowAllocMemory(void* p, s32 size) {
     s32 r31 = size;
     void* r30 = p;
     if (r30 == (void*)0) { return (void*)0; }
@@ -801,7 +801,7 @@ u32 windowGetParam(void* ptr, u32 idx) {
 
 /* 0x801040F0 | 0x70 */
 /* fn_8005D858 already declared above */
-void fn_801040F0(void* p, void* a, void* b, u16 key, u32 data) {
+void windowDrawSprite(void* p, void* a, void* b, u16 key, u32 data) {
     void* r27 = p;
     void* r28 = a;
     void* r29 = b;
@@ -809,7 +809,7 @@ void fn_801040F0(void* p, void* a, void* b, u16 key, u32 data) {
     u32 r31 = data;
     if ((u16)r30 != 0) {
         void* r6 = fn_8005D858((s32)(u16)r30);
-        fn_80104160(r27, r28, *(s16*)((u8*)r6 + 0xc), *(s16*)((u8*)r6 + 0xe), (s32)r29, (s32)(u16)r30, (s32)r31, -1);
+        windowDrawSprite2(r27, r28, *(s16*)((u8*)r6 + 0xc), *(s16*)((u8*)r6 + 0xe), (s32)r29, (s32)(u16)r30, (s32)r31, -1);
     }
 }
 
@@ -817,7 +817,7 @@ void fn_801040F0(void* p, void* a, void* b, u16 key, u32 data) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80104160(void* r3, void* r4, s16 r5, s16 r6, s32 r7, s32 r8, s32 r9, s32 r10) {
+void windowDrawSprite2(void* r3, void* r4, s16 r5, s16 r6, s32 r7, s32 r8, s32 r9, s32 r10) {
     /* TODO: match -- 440 bytes at 0x80104160 */
     (void)r3; (void)r4; (void)r5; (void)r6; (void)r7; (void)r8; (void)r9; (void)r10;
 }
@@ -892,7 +892,7 @@ s32 fn_801044D0(s32 param, u16* val) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80104530(void) {
+void windowGetCursor(void) {
     /* TODO: match -- 120 bytes at 0x80104530 */
 }
 #pragma pop
@@ -908,7 +908,7 @@ void windowCheckCursor(void* p, u8 flags) {
 #pragma pop
 
 /* 0x801046B8 | 0x10 */
-u32 fn_801046B8(void) {
+u32 windowGetActiveID(void) {
     return *(u32*)(lbl_80404ACC + 0x4);
 }
 
@@ -948,7 +948,7 @@ void* windowSearchID(s32 param) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_8010474C(void* obj) {
+void windowCloseMain(void* obj) {
 #pragma optimization_level 4
 #pragma peephole off
     void* h;
@@ -986,7 +986,7 @@ void fn_8010474C(void* obj) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80104828(void* ptr, u32 flags) {
+void windowClose(void* ptr, u32 flags) {
     /* TODO: match -- 620 bytes at 0x80104828 */
 }
 #pragma pop
@@ -1004,7 +1004,7 @@ void _windowCreateItemSprite__FP14tagWINDOW_WORK(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80104CA0(void) {
+void windowCreateCursorSprite(void) {
     /* TODO: match -- 480 bytes at 0x80104CA0 */
 }
 #pragma pop
@@ -1013,7 +1013,7 @@ void fn_80104CA0(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80104E80(void) {
+void windowOpen(void) {
     /* TODO: match -- 1140 bytes at 0x80104E80 */
 }
 #pragma pop
@@ -1022,7 +1022,7 @@ void fn_80104E80(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_801052F4(void) {
+void _winCalcWindowSize__FlPC13MENU_ITEM_dd_PsPs(void) {
     /* TODO: match -- 284 bytes at 0x801052F4 */
 }
 #pragma pop
@@ -1031,11 +1031,11 @@ void fn_801052F4(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80105410(u16 count) {
+void windowInit(u16 count) {
 #pragma optimization_level 4
 #pragma peephole off
     extern u8 lbl_80271EC4[];
-    extern void fn_80109358(void);
+    extern void winSpriteInit(void);
     u32 size;
     u16 handle;
     void* ptr;
@@ -1051,7 +1051,7 @@ void fn_80105410(u16 count) {
         GS_MODEL_STATE->entries = ptr;
         GS_MODEL_STATE->count = count;
         memset(ptr, 0, size);
-        fn_80109358();
+        winSpriteInit();
     }
 }
 #pragma pop
@@ -1060,13 +1060,13 @@ void fn_80105410(u16 count) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_801054B8(void) {
+void windowGetPortKeyInfo(void) {
     /* TODO: match -- 364 bytes at 0x801054B8 */
 }
 #pragma pop
 
 /* 0x80105624 | 0x10 */
-void* fn_80105624(void) {
+void* windowGetKeyInfo(void) {
     return (void*)(lbl_80404ACC + 0x10);
 }
 
@@ -1083,7 +1083,7 @@ void fn_80105634(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_801058CC(void) {
+void winMsgDraw(void) {
     /* TODO: match -- 368 bytes at 0x801058CC */
 }
 #pragma pop
@@ -1100,7 +1100,7 @@ void winMsgCtrl(void) {
 /* 0x80105C30 | 0x38 */
 void winMsgButton(void* p) {
     void* r31 = windowGetFreeWork(p);
-    void* r3 = fn_80105624();
+    void* r3 = windowGetKeyInfo();
     *(u32*)((u8*)r31 + 0x8) = *(u16*)((u8*)r3 + 0x4);
 }
 
@@ -1108,7 +1108,7 @@ void winMsgButton(void* p) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80105C68(void) {
+void winMsgCloseLevelUpStatus(void) {
     /* TODO: match -- 224 bytes at 0x80105C68 */
 }
 #pragma pop
@@ -1117,7 +1117,7 @@ void fn_80105C68(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80105D48(void) {
+void winMsgOpenLevelUpFiledStatus(void) {
     /* TODO: match -- 308 bytes at 0x80105D48 */
 }
 #pragma pop
@@ -1126,7 +1126,7 @@ void fn_80105D48(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80105E7C(void) {
+void winMsgOpenLevelUpStatus(void) {
     /* TODO: match -- 308 bytes at 0x80105E7C */
 }
 #pragma pop
@@ -1135,11 +1135,11 @@ void fn_80105E7C(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80105FB0(void) {
+void winMsgCloseError(void) {
 #pragma peephole off
 #pragma scheduling off
-    if ((u8)fn_80102620(0x10C)) {
-        fn_80102568((void*)0x10C, 2, 0);
+    if ((u8)menuIsCheck(0x10C)) {
+        menuCloseCustom((void*)0x10C, 2, 0);
     }
     lbl_8047AD10 = 0;
 }
@@ -1149,7 +1149,7 @@ void fn_80105FB0(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80105FF8(void) {
+void winMsgOpenError(void) {
     /* TODO: match -- 136 bytes at 0x80105FF8 */
 }
 #pragma pop
@@ -1158,7 +1158,7 @@ void fn_80105FF8(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80106080(void) {
+void winMsgCloseFight(void) {
     /* TODO: match -- 224 bytes at 0x80106080 */
 }
 #pragma pop
@@ -1167,7 +1167,7 @@ void fn_80106080(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80106160(void) {
+void winMsgCloseCheckFight(void) {
     /* TODO: match -- 228 bytes at 0x80106160 */
 }
 #pragma pop
@@ -1176,7 +1176,7 @@ void fn_80106160(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80106244(void) {
+void winMsgOpenFightNoWait(void) {
     /* TODO: match -- 336 bytes at 0x80106244 */
 }
 #pragma pop
@@ -1185,7 +1185,7 @@ void fn_80106244(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80106394(void) {
+void winMsgOpenFight(void) {
     /* TODO: match -- 332 bytes at 0x80106394 */
 }
 #pragma pop
@@ -1194,7 +1194,7 @@ void fn_80106394(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_801064E0(void) {
+void winMsgCheckField(void) {
     /* TODO: match -- 216 bytes at 0x801064E0 */
 }
 #pragma pop
@@ -1203,7 +1203,7 @@ void fn_801064E0(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_801065B8(void) {
+void winMsgCloseField(void) {
     /* TODO: match -- 224 bytes at 0x801065B8 */
 }
 #pragma pop
@@ -1212,7 +1212,7 @@ void fn_801065B8(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80106698(void) {
+void winMsgOpenFieldWithSE(void) {
     /* TODO: match -- 336 bytes at 0x80106698 */
 }
 #pragma pop
@@ -1221,7 +1221,7 @@ void fn_80106698(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_801067E8(void) {
+void winMsgOpenField(void) {
     /* TODO: match -- 332 bytes at 0x801067E8 */
 }
 #pragma pop
@@ -1230,7 +1230,7 @@ void fn_801067E8(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80106934(void) {
+void winMsgCheck(void) {
     /* TODO: match -- 200 bytes at 0x80106934 */
 }
 #pragma pop
@@ -1239,7 +1239,7 @@ void fn_80106934(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_801069FC(void) {
+void winMsgClose(void) {
     /* TODO: match -- 224 bytes at 0x801069FC */
 }
 #pragma pop
@@ -1248,7 +1248,7 @@ void fn_801069FC(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80106ADC(void) {
+void winMsgOpenWithSE(void) {
     /* TODO: match -- 608 bytes at 0x80106ADC */
 }
 #pragma pop
@@ -1257,7 +1257,7 @@ void fn_80106ADC(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80106D3C(void) {
+void winMsgOpen(void) {
     /* TODO: match -- 604 bytes at 0x80106D3C */
 }
 #pragma pop
@@ -1304,7 +1304,7 @@ _ret0:
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_801071D0(void) {
+void winSeqMoveMenu(void) {
     /* TODO: match -- 772 bytes at 0x801071D0 */
 }
 #pragma pop
@@ -1377,7 +1377,7 @@ void fn_80107F38(s32 param, u32 key) {
             *(s16*)(r31 + 0xa) = *(s16*)((u8*)menuItemBiosGetPtr(*(s16*)((u8*)r29 + 0x6)) + 0x4);
             r28 = 0;
             while (r28 < fn_800D3088()) {
-                fn_801074D4(r31, (u8*)r29 + 0xc);
+                _winSeqMoveSub(r31, (u8*)r29 + 0xc);
                 r28++;
             }
             *(s16*)((u8*)r29 + 0x50) = *(s16*)(r31 + 0x0);
@@ -1402,7 +1402,7 @@ void fn_80107F38(s32 param, u32 key) {
 #pragma push
 #pragma optimization_level 2
 #pragma peephole off
-void fn_801080CC(s32 param, u32 key) {
+void winSeqSetMenu(s32 param, u32 key) {
     u32 r28 = key;
     void* r31 = windowSearchID(param);
     if (r31 == (void*)0) { goto _ret80CC; }
@@ -1428,7 +1428,7 @@ void fn_801080CC(s32 param, u32 key) {
           r28 = 0;
           *(s16*)(r30 + 0xa) = *(s16*)((u8*)t + 0x8); }
         while (r28 < fn_800D3088()) {
-            fn_801074D4(r30, (u8*)r31 + 0x24);
+            _winSeqMoveSub(r30, (u8*)r31 + 0x24);
             r28++;
         }
         *(s16*)((u8*)r31 + 0x84) = *(s16*)(r29 + 0x0);
@@ -1481,7 +1481,7 @@ void fn_801081F8(void* r3_arg, u16 r4, u16 r5) {
                     u8* r24 = lbl_80404B68;
                     s32 r23 = 0;
                     do {
-                        fn_801074D4(r24, r27 + 0xc);
+                        _winSeqMoveSub(r24, r27 + 0xc);
                         r23++;
                     } while ((u32)r23 < fn_800D3088());
                 }
@@ -1533,7 +1533,7 @@ void fn_801081F8(void* r3_arg, u16 r4, u16 r5) {
                     s32 r23 = 0;
                     *(s16*)(r25b + 0xa) = *(s16*)((u8*)t + 0x4);
                     do {
-                        fn_801074D4(r25b, (u8*)r30 + 0xc);
+                        _winSeqMoveSub(r25b, (u8*)r30 + 0xc);
                         r23++;
                     } while ((u32)r23 < fn_800D3088());
                 }
@@ -1656,7 +1656,7 @@ void* fn_80109290(void* root) {
 /* 0x80109358 | 0x70 */
 #pragma push
 #pragma peephole off
-void fn_80109358(void) {
+void winSpriteInit(void) {
     u16 h = _toolentryAlloc__FUl(0x10000 - 0x5740);
     lbl_8047AD18 = h;
     if ((u16)h == 0) {
@@ -1747,7 +1747,7 @@ done:
 #pragma pop
 
 /* 0x80109764 | 0x18 */
-void fn_80109764(void) {
+void menuOffScreenRelease(void) {
     lbl_8047AD24 = 0;
     lbl_8047AD21 = 0;
     lbl_8047AD20 = 0;
@@ -1757,7 +1757,7 @@ void fn_80109764(void) {
 /* 0x8010977C | 0x94 */
 #pragma push
 #pragma peephole off
-u8 fn_8010977C(u32 param) {
+u8 menuOffScreenCreate(u32 param) {
     u32 r31 = param;
     lbl_8047AD24 = 0;
     lbl_8047AD28 = lbl_8047AD28;  /* read */
@@ -1783,7 +1783,7 @@ done:
 #pragma pop
 
 /* 0x80109810 | 0x74 */
-void fn_80109810(void) {
+void menuOffScreenInit(void) {
     if (lbl_8047AD28 == 0) {
         lbl_8047AD28 = GStextureCreate(0, 0, 0x44, 0, 0);
     }
@@ -1836,7 +1836,7 @@ s32 menuModelSetMotion(void* p, u32 val) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80109934(void) {
+void menuModelRender(void) {
     /* TODO: match -- 604 bytes at 0x80109934 */
 }
 #pragma pop
@@ -1844,7 +1844,7 @@ void fn_80109934(void) {
 /* 0x80109B90 | 0x6C */
 #pragma push
 #pragma peephole off
-s32 fn_80109B90(void* obj, u8 wait) {
+s32 menuModelCheck(void* obj, u8 wait) {
     void* r30 = obj;
     if (r30 == (void*)0) { return 0; }
     {
@@ -1864,7 +1864,7 @@ s32 fn_80109B90(void* obj, u8 wait) {
 /* 0x80109BFC | 0x8C */
 #pragma push
 #pragma peephole off
-s32 fn_80109BFC(void* p) {
+s32 menuModelFree(void* p) {
     void* r31 = p;
     if (r31 == (void*)0) { return 0; }
     *(u8*)((u8*)r31 + 0x1) = 0;

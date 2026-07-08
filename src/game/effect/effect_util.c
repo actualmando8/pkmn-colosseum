@@ -132,8 +132,8 @@ extern u32 lbl_80478B98;  /* effect count (SDA) */
 extern u32 lbl_80478BA0;  /* trace count (SDA) */
 
 /* External function declarations */
-extern u8   fn_80102620(u32 objID);
-extern void fn_80102510(u32 arg1);
+extern u8   menuIsCheck(u32 objID);
+extern void menuClose(u32 arg1);
 
 /* Forward declarations for converted functions */
 void _msgctrlSideName__FP15FightOutPokemonUc(u32 arg1, u32 arg2);
@@ -243,7 +243,7 @@ extern u32 koukaDataBiosGetStatusKind(u32 index);
 extern u32 koukaDataBiosGetVar(u32 index);
 extern s32 koukaDataBiosGetValue(u32 index, u32 subIndex);
 extern u32 koukaDataBiosGetStatus(u32 index);
-extern s32 fn_801026A4(u32, ...);
+extern s32 menuOpenCustom(u32, ...);
 extern void* fn_80132834(void* table, u32 stride, u32 count, u32 type);
 extern void fn_80132A38(u32 id, u32 value);
 extern s32 _dbgMenuSub__Fl(s32 offset);
@@ -1265,7 +1265,7 @@ u32 msgctrlKeyWait(void* obj) {
         p[0x45] = 1;
     }
     /* If scene object 0xA is active, clear the flag */
-    if ((u32)(fn_80102620(0x0A) & 0xFF) != 0) {
+    if ((u32)(menuIsCheck(0x0A) & 0xFF) != 0) {
         p[0x45] = 0;
     }
 
@@ -1303,7 +1303,7 @@ u32 msgctrlKeyEnd(void* obj) {
     if (p[0x44] & 0x02) {
         p[0x45] = 1;
     }
-    if ((u32)(fn_80102620(0x0A) & 0xFF) != 0) {
+    if ((u32)(menuIsCheck(0x0A) & 0xFF) != 0) {
         p[0x45] = 0;
     }
     if (p[0x45] != 0) {
@@ -1834,8 +1834,8 @@ asm void fn_80133450(void) {
 #else
 u32 fn_80133450(void) {
     *(u8*)&lbl_80478820 = 0;
-    fn_801026A4(5, 0, 0, 0, 1, 0);
-    fn_80102510(5);
+    menuOpenCustom(5, 0, 0, 0, 1, 0);
+    menuClose(5);
     *(u8*)&lbl_80478820 = 1;
     return 0;
 }
@@ -1873,7 +1873,7 @@ u32 fn_80133630(void) {
 }
 
 /* 0x80133664 | 0x13C */
-extern void* fn_80105624(void);
+extern void* windowGetKeyInfo(void);
 extern u32 menuDataBiosGetType(u32 arg);
 #if 0
 asm void dbgMenuCursor(void) {
@@ -1888,7 +1888,7 @@ void dbgMenuCursor(void* obj) {
     s8 major;
     s8 minor;
 
-    flags = *(u16*)((u8*)fn_80105624() + 0x6);
+    flags = *(u16*)((u8*)windowGetKeyInfo() + 0x6);
     entryCount = (s8)_dbgMenuGetMenuNum__FP14tagWINDOW_WORKPl((u32)obj, NULL);
     maxCount = (s8)menuDataBiosGetType(*(u32*)((u8*)obj + 0x04));
     if (entryCount < maxCount) {
@@ -1930,14 +1930,14 @@ u8 dbgMenuGetEnable(void) { return lbl_8047AED0; }
 /* 0x801337A8 | 0x8 | sda_setter */
 void dbgMenuSetEnable(u8 val) { lbl_8047AED0 = val; }
 
-/* 0x801337B0 | 0x34 -- check fn_80102620(lbl_80478848) != 0, return 0 or 1 */
+/* 0x801337B0 | 0x34 -- check menuIsCheck(lbl_80478848) != 0, return 0 or 1 */
 extern u32  lbl_80478848;
 u32 dbgMenuIsOpen(void) {
-    u8 result = fn_80102620(lbl_80478848);
+    u8 result = menuIsCheck(lbl_80478848);
     return (result != 0) ? 1 : 0;
 }
 
-/* 0x801337E4 | 0x2C -- set lbl_8047AED1 = 0, call fn_80102510(lbl_80478848) */
+/* 0x801337E4 | 0x2C -- set lbl_8047AED1 = 0, call menuClose(lbl_80478848) */
 extern u8   lbl_8047AED1;
 extern u32  lbl_80478848;
 extern u8   lbl_8047AED1;
@@ -1948,7 +1948,7 @@ asm void dbgMenuClose(void) {
 #else
 void dbgMenuClose(void) {
     lbl_8047AED1 = 0;
-    fn_80102510(lbl_80478848);
+    menuClose(lbl_80478848);
 }
 #endif
 
@@ -1980,7 +1980,7 @@ void dbgMenuMain(u8 flag) {
     if (lbl_8047AED0 == 0) {
         return;
     }
-    if (fn_80102620(lbl_80478848)) {
+    if (menuIsCheck(lbl_80478848)) {
         return;
     }
     lbl_8047AED1 = flag;
@@ -2030,7 +2030,7 @@ retry:
     }
 
     outValue = (s32*)(lbl_8047AEDC + _dbgMenuGetMenuNo__Fl(key) * 4);
-    valueIndex = fn_801026A4(sceneId, key, outValue, 0, 1, 0);
+    valueIndex = menuOpenCustom(sceneId, key, outValue, 0, 1, 0);
     obj = (u8*)windowSearchID(sceneId);
     if (obj != NULL) {
         *outValue = (s8)obj[0x94] + (s8)obj[0x95];
@@ -2042,7 +2042,7 @@ retry:
         if (offset == 0) {
             result = -1;
         }
-        fn_80102510(sceneId);
+        menuClose(sceneId);
         return result;
     }
 
@@ -2077,7 +2077,7 @@ retry:
             callbackResult = 1;
         }
         if (callbackResult == 0) {
-            fn_80102510(lbl_80478848);
+            menuClose(lbl_80478848);
             return 1;
         }
         if (callbackResult == -1 || (s16)link == 1) {
@@ -2089,7 +2089,7 @@ retry:
         return 1;
     }
 
-    fn_80102510(lbl_80478848);
+    menuClose(lbl_80478848);
     entryFunc = (EffectUtilEntryFunc)lbl_80478F8C;
     entry = entryFunc != NULL ? entryFunc(valueIndex) : NULL;
     callback = entry != NULL ? entry->callback : NULL;
@@ -4831,10 +4831,10 @@ asm void fn_80132F7C(void) {
 #pragma optimization_level 4
 #pragma scheduling on
 u32 fn_80132F7C(void) {
-    if (fn_80102620(0xab) & 0xFF) {
-        fn_80102510(0xab);
+    if (menuIsCheck(0xab) & 0xFF) {
+        menuClose(0xab);
     } else {
-        fn_801026A4(0xab, 0, 0, 0, 0, 0);
+        menuOpenCustom(0xab, 0, 0, 0, 0, 0);
     }
     return 0;
 }
@@ -4920,10 +4920,10 @@ asm void fn_80133510(void) {
 #pragma optimization_level 4
 #pragma scheduling on
 u32 fn_80133510(void) {
-    if (fn_80102620(0x7) & 0xFF) {
-        fn_80102510(0x7);
+    if (menuIsCheck(0x7) & 0xFF) {
+        menuClose(0x7);
     } else {
-        fn_801026A4(0x7, 0, 0, 0, 0, 0);
+        menuOpenCustom(0x7, 0, 0, 0, 0, 0);
     }
     return 0;
 }
@@ -4963,10 +4963,10 @@ asm void fn_801335D4(void) {
 #pragma optimization_level 4
 #pragma scheduling on
 u32 fn_801335D4(void) {
-    if (fn_80102620(0x4) & 0xFF) {
-        fn_80102510(0x4);
+    if (menuIsCheck(0x4) & 0xFF) {
+        menuClose(0x4);
     } else {
-        fn_801026A4(0x4, 0, 0, 0, 0, 0);
+        menuOpenCustom(0x4, 0, 0, 0, 0, 0);
     }
     return 0;
 }

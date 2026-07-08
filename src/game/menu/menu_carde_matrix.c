@@ -26,9 +26,9 @@ extern void _threadSwitch();
 extern void GScharLenCpy();
 extern void windowGetFreeWork();
 extern void windowGetParam();
-extern void fn_801046B8();
+extern void windowGetActiveID();
 extern void windowSearchID();
-extern void fn_80105624();
+extern void windowGetKeyInfo();
 extern void fn_801081F8();
 extern void winSpriteGetDisp();
 extern void winSpriteSetDisp();
@@ -1842,7 +1842,7 @@ do {
     r3 = *(u32*)((u8*)r18 + 0x4D4);
     r4 = 0x0;
     winSpriteSetDisp();
-    fn_801046B8();
+    windowGetActiveID();
     tmp = *(u32*)((u8*)r14 + 0x4);
     if ((s32)tmp == (s32)r3) {
         tmp = *(u8*)((u8*)r18 + 0xC8);
@@ -1870,7 +1870,7 @@ do {
             } while (r16 < 2);
     }
     }
-    fn_80105624();
+    windowGetKeyInfo();
     r4 = *(u16*)((u8*)r3 + 0x0);
     r3 = *(u16*)((u8*)r18 + 0xCC);
     tmp = r4 & 0xFFFF;
@@ -1899,12 +1899,12 @@ do {
         r3 = *(u32*)((u8*)r18 + 0x4D4);
         r4 = 0x1;
         winSpriteSetDisp();
-        fn_801046B8();
+        windowGetActiveID();
         tmp = *(u32*)((u8*)r14 + 0x4);
         if ((s32)tmp != (s32)r3) return;
         tmp = *(u8*)((u8*)r18 + 0xC8);
         if (tmp == 0) return;
-        fn_80105624();
+        windowGetKeyInfo();
         tmp = *(u16*)((u8*)r3 + 0x6);
         tmp = tmp & 0xF;
         if ((s32)tmp == 0) return;
@@ -1941,12 +1941,12 @@ do {
     *(u32*)((u8*)r18 + 0xA0) = tmp;
     tmp = *(u8*)((u8*)r18 + 0xB5);
     *(u8*)((u8*)r18 + 0xB4) = tmp;
-    fn_801046B8();
+    windowGetActiveID();
     tmp = *(u32*)((u8*)r14 + 0x4);
     if ((s32)tmp == (s32)r3) {
         tmp = *(u8*)((u8*)r18 + 0xC8);
         if (tmp == 0) break;
-        fn_80105624();
+        windowGetKeyInfo();
         tmp = *(u16*)((u8*)r3 + 0x6);
         tmp = tmp & 0x1;
         if ((s32)tmp != 0) {
@@ -1969,7 +1969,7 @@ do {
             *(u8*)((u8*)r18 + 0xB6) = tmp;
             break;
         }
-        fn_80105624();
+        windowGetKeyInfo();
         tmp = *(u16*)((u8*)r3 + 0x6);
         tmp = tmp & 0x00000002;
         if ((s32)tmp != 0) {
@@ -1994,7 +1994,7 @@ do {
             *(u8*)((u8*)r18 + 0xB6) = tmp;
             break;
         }
-        fn_80105624();
+        windowGetKeyInfo();
         tmp = *(u16*)((u8*)r3 + 0x6);
         tmp = tmp & 0x00000004;
         if ((s32)tmp != 0) {
@@ -2018,7 +2018,7 @@ do {
             *(u8*)((u8*)r18 + 0xB6) = tmp;
             break;
         }
-        fn_80105624();
+        windowGetKeyInfo();
         tmp = *(u16*)((u8*)r3 + 0x6);
         tmp = tmp & 0x00000008;
         if ((s32)tmp == 0) break;

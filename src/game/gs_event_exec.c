@@ -82,8 +82,8 @@ extern void fn_80190048(s32 flagId, s32 value);    /* GSflagSet */
 extern s32  fn_80190118(s32 flagId);                /* GSflagGet */
 
 /* Text system */
-extern void fn_80106D3C(s32 slot, s32 msgId, s32 p3, s32 p4);
-extern void fn_801069FC(s32 slot);
+extern void winMsgOpen(s32 slot, s32 msgId, s32 p3, s32 p4);
+extern void winMsgClose(s32 slot);
 
 /* Sound system */
 extern void fn_80166AB8(s32 soundId, s32 p2, s32 p3);   /* Play SE */
@@ -135,7 +135,7 @@ u32 fn_80014110(void) {
 
 /* fn_800129A8 - 0x800129A8 | size: 0x1ec */
 extern u8*  windowGetFreeWork(void);
-extern void* fn_80103FFC(void*, s32);
+extern void* windowAllocMemory(void*, s32);
 extern void* windowGetAllocPtr(void*);
 extern u8   windowSearchID(s32);
 extern void fn_80103F74(s32, s32, s32);
@@ -150,7 +150,7 @@ s32 fn_800129A8(u8* ctx) {
     void* buf;
     p = windowGetFreeWork();
     if ((s32)(s8)ctx[1] == 0) {
-        buf = fn_80103FFC(ctx, 0x30);
+        buf = windowAllocMemory(ctx, 0x30);
         if (buf != 0) memcpy(buf, *(void**)(ctx + 0x60), 0x30);
     }
     windowGetAllocPtr(ctx);
@@ -199,7 +199,7 @@ extern s32   GSmsgGetRect(s32);
 extern void  fn_800FB680(s32, s32, s32, s32);
 extern void fn_8001E644(s32, s32, s32, s32, u8);
 extern void fn_8001EA98(s32, s32, s32, s32);
-extern void fn_801040F0(s32, s16, void*, s32, s32);
+extern void windowDrawSprite(s32, s16, void*, s32, s32);
 #pragma push
 #pragma peephole off
 s32 fn_80012B94(u8* ctx) {
@@ -255,7 +255,7 @@ s32 fn_80012B94(u8* ctx) {
             delay = 0x14;
         }
         if ((s32)(s8)ctx[0x95] == i) {
-            fn_801040F0(0x20, (s16)acc, ctx, 0x157, 0);
+            windowDrawSprite(0x20, (s16)acc, ctx, 0x157, 0);
         }
         acc += delay;
         iter += 4;
@@ -266,7 +266,7 @@ s32 fn_80012B94(u8* ctx) {
 #pragma pop
 
 /* fn_80012D20 - 0x80012D20 | size: 0xf8 */
-extern void fn_801080CC(s32, s32);
+extern void winSeqSetMenu(s32, s32);
 #pragma push
 #pragma peephole off
 #pragma push
@@ -281,17 +281,17 @@ s32 fn_80012D20(u8* arg) {
         if ((s32)(s8)ctx[2] == 0) {
             src  = windowGetParam(arg, 1);
             size = (s32)windowGetParam(ctx, 2) << 2;
-            buf  = fn_80103FFC(ctx, size);
+            buf  = windowAllocMemory(ctx, size);
             if (buf != 0) {
                 memcpy(buf, src, size);
             }
-            fn_801080CC(*(s32*)(ctx + 4), 0x26);
+            winSeqSetMenu(*(s32*)(ctx + 4), 0x26);
             ctx[2] = 1;
         }
         break;
     case 3:
         if ((s32)(s8)ctx[2] == 0) {
-            fn_801080CC(*(s32*)(ctx + 4), 0x2a);
+            winSeqSetMenu(*(s32*)(ctx + 4), 0x2a);
             ctx[2] = 1;
         }
         break;
@@ -305,7 +305,7 @@ s32 fn_80012D20(u8* arg) {
 #pragma pop
 
 /* fn_80012E18 - 0x80012E18 | size: 0x198 */
-extern u8* fn_80105624(void);
+extern u8* windowGetKeyInfo(void);
 #pragma push
 #pragma peephole off
 s32 fn_80012E18(u8* ctx) {
@@ -317,7 +317,7 @@ s32 fn_80012E18(u8* ctx) {
     u8  hi, lo;
     u16 pair;
     u8  saved_hi, saved_lo;
-    state = fn_80105624();
+    state = windowGetKeyInfo();
     bits = *(u16*)(state + 6);
     v1 = (s32)(s8)(s32)windowGetParam(ctx, 2);
     v2 = (s32)(s8)(s32)menuDataBiosGetType(*(s32*)(ctx + 4));
@@ -394,7 +394,7 @@ s32 menuPanelCursorDecimalInput(u8* ctx) {
         radix = 0xA;
     }
 
-    state = fn_80105624();
+    state = windowGetKeyInfo();
     bits = *(u16*)(state + 6);
     if (bits & 8) {
         *(s32*)cursor = *(s32*)cursor - 1;
@@ -554,13 +554,13 @@ s32 menuPanelCtrlLvUp(u8* ctx) {
         if ((s32)(s8)ctx[2] == 0) flag = 1;
         if ((u8)winSeqIsCheck(*(s32*)(ctx + 4), 0x2a) == 1) flag = 1;
         if ((u8)flag != 0) {
-            fn_801080CC(*(s32*)(ctx + 4), 0x26);
+            winSeqSetMenu(*(s32*)(ctx + 4), 0x26);
             ctx[2] = 1;
         }
         break;
     case 3:
         if ((s32)(s8)ctx[2] == 0) {
-            fn_801080CC(*(s32*)(ctx + 4), 0x2a);
+            winSeqSetMenu(*(s32*)(ctx + 4), 0x2a);
             ctx[2] = 1;
         }
         break;
@@ -616,15 +616,15 @@ s32 fn_8001374C(s32 entry_idx, s32 target_n, s32* out) {
     idx = 0;
 after:
     if (heroItemAddItemDataId(lbl_8047A2F8, idx, 1, -1) > 0) {
-        fn_80106D3C(2, 0x4263, 1, 0);
-        fn_801069FC(1);
+        winMsgOpen(2, 0x4263, 1, 0);
+        winMsgClose(1);
         *out = 0;
         return 0;
     }
     fn_8012959C(lbl_8047A2F8, idx, 1, (s16)target_n);
     fn_80132A38(0x2d, (u16)idx);
-    fn_80106D3C(2, 0x4268, 1, 0);
-    fn_801069FC(1);
+    winMsgOpen(2, 0x4268, 1, 0);
+    winMsgClose(1);
     *out = 0;
     return 0;
 }
@@ -667,15 +667,15 @@ s32 fn_800138B4(s32 entry_idx, s32 target_n, s32* out) {
     idx = 0;
 after:
     if (fn_80129718(lbl_8047A2F8, idx) == 0) {
-        fn_80106D3C(2, 0x425F, 1, 0);
-        fn_801069FC(1);
+        winMsgOpen(2, 0x425F, 1, 0);
+        winMsgClose(1);
         *out = 0;
         return 2;
     }
     fn_80129650(lbl_8047A2F8, idx, 1, -1);
     fn_80132A38(0x2d, (u16)idx);
-    fn_80106D3C(2, 0x4264, 1, 0);
-    fn_801069FC(1);
+    winMsgOpen(2, 0x4264, 1, 0);
+    winMsgClose(1);
     *out = 1;
     return 0;
 }
@@ -683,9 +683,9 @@ after:
 
 /* fn_80013A18 - 0x80013A18 | size: 0x3e4 */
 extern s32 itemBiosGetNum(void*);
-extern u32 fn_801046B8(void);
-extern s32 fn_801026A4(s32, u32, void*, s32, s32, s32, ...);
-extern void fn_80102510(s32);
+extern u32 windowGetActiveID(void);
+extern s32 menuOpenCustom(s32, u32, void*, s32, s32, s32, ...);
+extern void menuClose(s32);
 extern void menuCloseSync(s32, s32);
 extern u32 lbl_80266BD8[];
 extern u32 lbl_8047A2F8;
@@ -791,9 +791,9 @@ have_quantity:
         menu_arg.zero = 0;
         lbl_8047A2FC = 1;
 
-        result = fn_801026A4(menu_id, fn_801046B8(), &menu_config, 0, 1, 1, &menu_arg);
+        result = menuOpenCustom(menu_id, windowGetActiveID(), &menu_config, 0, 1, 1, &menu_arg);
         choice = result;
-        fn_80102510(menu_id);
+        menuClose(menu_id);
         menuCloseSync(menu_id, 1);
         if (choice == -1) {
             choice = -1;
@@ -839,8 +839,8 @@ have_item:
     confirm_arg.mode = 2;
     lbl_8047A2DC = 0x2B1D;
 
-    result = fn_801026A4(0x5A, fn_801046B8(), 0, 0, 1, 1, &confirm_arg);
-    fn_80102510(0x5A);
+    result = menuOpenCustom(0x5A, windowGetActiveID(), 0, 0, 1, 1, &confirm_arg);
+    menuClose(0x5A);
     menuCloseSync(0x5A, 1);
 
     if (result == -1) {
@@ -856,8 +856,8 @@ have_item:
 
     fn_80132A38(0x2D, idx);
     fn_80132A38(0x2F, choice);
-    fn_80106D3C(2, 0x4269, 1, 0);
-    fn_801069FC(1);
+    winMsgOpen(2, 0x4269, 1, 0);
+    winMsgClose(1);
     *out = choice;
     return 0;
 }
@@ -905,14 +905,14 @@ after:
     itemDataBiosGetPtr(idx);
     if (itemDataBiosGetHidenMachineNo() != 0xFF) {
         fn_80132A38(0x2d, (u16)idx);
-        fn_80106D3C(2, 0x4262, 1, 0);
-        fn_801069FC(1);
+        winMsgOpen(2, 0x4262, 1, 0);
+        winMsgClose(1);
         *out = 0;
         return 0;
     }
     itemDataBiosGetPtr(idx);
     x = (u8)itemDataBiosGetKind();
-    fn_80102568(0x59, 0, 1);
+    menuCloseCustom(0x59, 0, 1);
     lbl_8047A2EC = menuPokemonOpenItemGive((u8)x, (u8)target_n, idx, 0);
     fn_8001B184();
     if ((s32)lbl_8047A2EC < 0) {
@@ -972,8 +972,8 @@ after:
         fp = itemDataBiosGetBattleUseFunc();
     }
     if (fp == 0) {
-        fn_80106D3C(2, 0x4261, 1, 0);
-        fn_801069FC(1);
+        winMsgOpen(2, 0x4261, 1, 0);
+        winMsgClose(1);
         *out = 0;
         return 3;
     }
@@ -1034,7 +1034,7 @@ extern s32 menuPokemonOpenItemUse(s32 mode, u8 a, u16 b, u32 p);
 s32 fn_800141BC(s32 arg0, s32 arg1) {
     s32 mode;
     s32 result;
-    fn_80102568(0x59, 0, 1);
+    menuCloseCustom(0x59, 0, 1);
     if ((s32)lbl_8047A2E0 == 1) {
         mode = 4;
     } else {
@@ -1223,7 +1223,7 @@ s32 fn_80014574(u8* ctx) {
     s32 value;
 
     p = *(u8**)(ctx + 0x60);
-    state = fn_80105624();
+    state = windowGetKeyInfo();
     bits = *(u16*)(state + 6);
     if ((bits & 0xF) == 0) {
         return 0;
@@ -1376,13 +1376,13 @@ s32 menuPocket2NumCtrl(u8* ctx) {
     switch ((s32)(s8)ctx[0x1]) {
     case 0:
         if ((s32)(s8)ctx[0x2] == 0) {
-            fn_801080CC(*(s32*)(p + 0x4), 0x6e);
+            winSeqSetMenu(*(s32*)(p + 0x4), 0x6e);
             ctx[0x2] = 1;
         }
         break;
     case 3:
         if ((s32)(s8)ctx[0x2] == 0) {
-            fn_801080CC(*(s32*)(p + 0x4), 0x72);
+            winSeqSetMenu(*(s32*)(p + 0x4), 0x72);
             ctx[0x2] = 1;
         }
         break;
@@ -1555,7 +1555,7 @@ s32 fn_80014E50(u8* ctx) {
     u8* inner;
 
     p     = *(u8**)(ctx + 0x60);
-    state = fn_80105624();
+    state = windowGetKeyInfo();
     count = *(s32*)(p + 8);
 
     if ((*(volatile u16*)(state + 6) & 2) != 0) {
@@ -1602,7 +1602,7 @@ s32 fn_80014F48(u8* ctx) {
     switch ((s32)(s8)ctx[1]) {
     case 0:
         if ((s32)(s8)ctx[2] == 0) {
-            fn_801080CC(0x5a, 0x66);
+            winSeqSetMenu(0x5a, 0x66);
             lbl_8047A2C0 = lbl_8047B748;
             ctx[2] = 1;
         }
@@ -1616,7 +1616,7 @@ s32 fn_80014F48(u8* ctx) {
         break;
     case 3:
         if ((s32)(s8)ctx[2] == 0) {
-            fn_801080CC(0x5a, 0x6a);
+            winSeqSetMenu(0x5a, 0x6a);
             ctx[2] = 1;
         }
         break;

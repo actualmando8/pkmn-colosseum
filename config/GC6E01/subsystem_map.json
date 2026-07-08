@@ -25017,7 +25017,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80102004",
+"name": "menuGetLastError",
 "addr": "0x80102004",
 "size": 16,
 "label": "gs-engine",
@@ -25025,7 +25025,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80102014",
+"name": "menuGetOffScreenFlag",
 "addr": "0x80102014",
 "size": 36,
 "label": "gs-engine",
@@ -25041,7 +25041,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8010206C",
+"name": "menuCreateOffScreen",
 "addr": "0x8010206C",
 "size": 84,
 "label": "gs-engine",
@@ -25081,7 +25081,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801022B8",
+"name": "menuGetCursorItemID",
 "addr": "0x801022B8",
 "size": 224,
 "label": "gs-engine",
@@ -25089,7 +25089,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80102398",
+"name": "menuSetCursor",
 "addr": "0x80102398",
 "size": 76,
 "label": "gs-engine",
@@ -25129,7 +25129,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80102510",
+"name": "menuClose",
 "addr": "0x80102510",
 "size": 88,
 "label": "gs-engine",
@@ -25137,7 +25137,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80102568",
+"name": "menuCloseCustom",
 "addr": "0x80102568",
 "size": 184,
 "label": "gs-engine",
@@ -25145,7 +25145,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80102620",
+"name": "menuIsCheck",
 "addr": "0x80102620",
 "size": 44,
 "label": "gs-engine",
@@ -25161,7 +25161,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801026A4",
+"name": "menuOpenCustom",
 "addr": "0x801026A4",
 "size": 452,
 "label": "gs-engine",
@@ -25177,7 +25177,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801028B0",
+"name": "menuDaemon",
 "addr": "0x801028B0",
 "size": 1572,
 "label": "gs-engine",
@@ -25201,7 +25201,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80103484",
+"name": "menuPlaySe",
 "addr": "0x80103484",
 "size": 88,
 "label": "gs-engine",
@@ -25217,7 +25217,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80103614",
+"name": "_menuGetGcKeyInfo__FlPUs",
 "addr": "0x80103614",
 "size": 740,
 "label": "gs-engine",
@@ -25225,7 +25225,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801038F8",
+"name": "_menuUpdateKeyInfo__FP15WINDOW_SYS_WORK",
 "addr": "0x801038F8",
 "size": 688,
 "label": "gs-engine",
@@ -25257,7 +25257,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80103CD8",
+"name": "menuInit",
 "addr": "0x80103CD8",
 "size": 400,
 "label": "gs-engine",
@@ -25265,7 +25265,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80103E68",
+"name": "cursorBiosGetPos",
 "addr": "0x80103E68",
 "size": 68,
 "label": "gs-engine",
@@ -25273,7 +25273,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80103EAC",
+"name": "cursorBiosSetPos",
 "addr": "0x80103EAC",
 "size": 72,
 "label": "gs-engine",
@@ -25281,7 +25281,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80103EF4",
+"name": "cursorBiosInit",
 "addr": "0x80103EF4",
 "size": 128,
 "label": "gs-engine",
@@ -25305,7 +25305,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80103FFC",
+"name": "windowAllocMemory",
 "addr": "0x80103FFC",
 "size": 164,
 "label": "gs-engine",
@@ -25337,7 +25337,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801040F0",
+"name": "windowDrawSprite",
 "addr": "0x801040F0",
 "size": 112,
 "label": "gs-engine",
@@ -25345,7 +25345,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80104160",
+"name": "windowDrawSprite2",
 "addr": "0x80104160",
 "size": 440,
 "label": "gs-engine",
@@ -25377,7 +25377,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80104530",
+"name": "windowGetCursor",
 "addr": "0x80104530",
 "size": 120,
 "label": "gs-engine",
@@ -25393,7 +25393,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801046B8",
+"name": "windowGetActiveID",
 "addr": "0x801046B8",
 "size": 16,
 "label": "gs-engine",
@@ -25417,7 +25417,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8010474C",
+"name": "windowCloseMain",
 "addr": "0x8010474C",
 "size": 220,
 "label": "gs-engine",
@@ -25425,7 +25425,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80104828",
+"name": "windowClose",
 "addr": "0x80104828",
 "size": 620,
 "label": "gs-engine",
@@ -25441,7 +25441,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80104CA0",
+"name": "windowCreateCursorSprite",
 "addr": "0x80104CA0",
 "size": 480,
 "label": "gs-engine",
@@ -25449,7 +25449,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80104E80",
+"name": "windowOpen",
 "addr": "0x80104E80",
 "size": 1140,
 "label": "gs-engine",
@@ -25457,7 +25457,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801052F4",
+"name": "_winCalcWindowSize__FlPC13MENU_ITEM_dd_PsPs",
 "addr": "0x801052F4",
 "size": 284,
 "label": "gs-engine",
@@ -25465,7 +25465,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80105410",
+"name": "windowInit",
 "addr": "0x80105410",
 "size": 168,
 "label": "gs-engine",
@@ -25473,7 +25473,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801054B8",
+"name": "windowGetPortKeyInfo",
 "addr": "0x801054B8",
 "size": 364,
 "label": "gs-engine",
@@ -25481,7 +25481,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80105624",
+"name": "windowGetKeyInfo",
 "addr": "0x80105624",
 "size": 16,
 "label": "gs-engine",
@@ -25497,7 +25497,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801058CC",
+"name": "winMsgDraw",
 "addr": "0x801058CC",
 "size": 368,
 "label": "gs-engine",
@@ -25521,7 +25521,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80105C68",
+"name": "winMsgCloseLevelUpStatus",
 "addr": "0x80105C68",
 "size": 224,
 "label": "gs-engine",
@@ -25529,7 +25529,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80105D48",
+"name": "winMsgOpenLevelUpFiledStatus",
 "addr": "0x80105D48",
 "size": 308,
 "label": "gs-engine",
@@ -25537,7 +25537,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80105E7C",
+"name": "winMsgOpenLevelUpStatus",
 "addr": "0x80105E7C",
 "size": 308,
 "label": "gs-engine",
@@ -25545,7 +25545,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80105FB0",
+"name": "winMsgCloseError",
 "addr": "0x80105FB0",
 "size": 72,
 "label": "gs-engine",
@@ -25553,7 +25553,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80105FF8",
+"name": "winMsgOpenError",
 "addr": "0x80105FF8",
 "size": 136,
 "label": "gs-engine",
@@ -25561,7 +25561,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80106080",
+"name": "winMsgCloseFight",
 "addr": "0x80106080",
 "size": 224,
 "label": "gs-engine",
@@ -25569,7 +25569,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80106160",
+"name": "winMsgCloseCheckFight",
 "addr": "0x80106160",
 "size": 228,
 "label": "gs-engine",
@@ -25577,7 +25577,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80106244",
+"name": "winMsgOpenFightNoWait",
 "addr": "0x80106244",
 "size": 336,
 "label": "gs-engine",
@@ -25585,7 +25585,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80106394",
+"name": "winMsgOpenFight",
 "addr": "0x80106394",
 "size": 332,
 "label": "gs-engine",
@@ -25593,7 +25593,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801064E0",
+"name": "winMsgCheckField",
 "addr": "0x801064E0",
 "size": 216,
 "label": "gs-engine",
@@ -25601,7 +25601,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801065B8",
+"name": "winMsgCloseField",
 "addr": "0x801065B8",
 "size": 224,
 "label": "gs-engine",
@@ -25609,7 +25609,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80106698",
+"name": "winMsgOpenFieldWithSE",
 "addr": "0x80106698",
 "size": 336,
 "label": "gs-engine",
@@ -25617,7 +25617,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801067E8",
+"name": "winMsgOpenField",
 "addr": "0x801067E8",
 "size": 332,
 "label": "gs-engine",
@@ -25625,7 +25625,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80106934",
+"name": "winMsgCheck",
 "addr": "0x80106934",
 "size": 200,
 "label": "gs-engine",
@@ -25633,7 +25633,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801069FC",
+"name": "winMsgClose",
 "addr": "0x801069FC",
 "size": 224,
 "label": "gs-engine",
@@ -25641,7 +25641,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80106ADC",
+"name": "winMsgOpenWithSE",
 "addr": "0x80106ADC",
 "size": 608,
 "label": "gs-engine",
@@ -25649,7 +25649,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80106D3C",
+"name": "winMsgOpen",
 "addr": "0x80106D3C",
 "size": 604,
 "label": "gs-engine",
@@ -25681,7 +25681,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801071D0",
+"name": "winSeqMoveMenu",
 "addr": "0x801071D0",
 "size": 772,
 "label": "gs-engine",
@@ -25689,7 +25689,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801074D4",
+"name": "_winSeqMoveSub",
 "addr": "0x801074D4",
 "size": 2468,
 "label": "gs-engine",
@@ -25721,7 +25721,7 @@
 "seed": "range"
 },
 {
-"name": "fn_801080CC",
+"name": "winSeqSetMenu",
 "addr": "0x801080CC",
 "size": 300,
 "label": "gs-engine",
@@ -25745,7 +25745,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80108580",
+"name": "winSpriteDrawTexture",
 "addr": "0x80108580",
 "size": 1684,
 "label": "gs-engine",
@@ -25753,7 +25753,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80108C14",
+"name": "winSpriteDraw",
 "addr": "0x80108C14",
 "size": 1504,
 "label": "gs-engine",
@@ -25793,7 +25793,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80109358",
+"name": "winSpriteInit",
 "addr": "0x80109358",
 "size": 112,
 "label": "gs-engine",
@@ -25865,7 +25865,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80109764",
+"name": "menuOffScreenRelease",
 "addr": "0x80109764",
 "size": 24,
 "label": "gs-engine",
@@ -25873,7 +25873,7 @@
 "seed": "range"
 },
 {
-"name": "fn_8010977C",
+"name": "menuOffScreenCreate",
 "addr": "0x8010977C",
 "size": 148,
 "label": "gs-engine",
@@ -25881,7 +25881,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80109810",
+"name": "menuOffScreenInit",
 "addr": "0x80109810",
 "size": 116,
 "label": "gs-engine",
@@ -25905,7 +25905,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80109934",
+"name": "menuModelRender",
 "addr": "0x80109934",
 "size": 604,
 "label": "gs-engine",
@@ -25913,7 +25913,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80109B90",
+"name": "menuModelCheck",
 "addr": "0x80109B90",
 "size": 108,
 "label": "gs-engine",
@@ -25921,7 +25921,7 @@
 "seed": "range"
 },
 {
-"name": "fn_80109BFC",
+"name": "menuModelFree",
 "addr": "0x80109BFC",
 "size": 140,
 "label": "gs-engine",
@@ -50212,7 +50212,7 @@
 "name": "fn_801E075C",
 "addr": "0x801E075C",
 "size": 644,
-"label": "gs-engine",
+"label": "field",
 "confidence": 1.9,
 "seed": null
 },
@@ -70781,14 +70781,14 @@
 {
 "label": "field",
 "start": "0x801DF790",
-"end": "0x801e075c",
-"count": 3
+"end": "0x801e09e0",
+"count": 4
 },
 {
 "label": "gs-engine",
-"start": "0x801E075C",
+"start": "0x801E09E0",
 "end": "0x801e11cc",
-"count": 8
+"count": 7
 },
 {
 "label": "particle",

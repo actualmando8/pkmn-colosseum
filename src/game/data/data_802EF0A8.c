@@ -319,7 +319,7 @@ extern u8 fn_8009567C[];
 extern u8 fn_800965C8[];
 extern u8 fn_80096C48[];
 extern u8 fn_80105634[];
-extern u8 fn_801058CC[];
+extern u8 winMsgDraw[];
 
 /* Auto-carved .data unit 0x802EF0A8..0x8030FFA0 (1 objects). Non-relocated data as byte-exact u8[]; pointer/jump tables as void*[] for R_PPC_ADDR32 relocations. */
 
@@ -1043,14 +1043,14 @@ void* lbl_802EF0A8[33726] = {
     (void*)0x00790000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_801058CC),
+    (void*)((u8*)winMsgDraw),
     (void*)0x00670000,
     (void*)0xC0FF0035,
     (void*)0x017A0217,
     (void*)0x00400000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_801058CC),
+    (void*)((u8*)winMsgDraw),
     (void*)0x00680000,
     (void*)0x00FF0027,
     (void*)0x0140023A,
@@ -1141,7 +1141,7 @@ void* lbl_802EF0A8[33726] = {
     (void*)0x00580000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_801058CC),
+    (void*)((u8*)winMsgDraw),
     (void*)0x00750000,
     (void*)0x00FF0027,
     (void*)0x0116023A,
@@ -1232,7 +1232,7 @@ void* lbl_802EF0A8[33726] = {
     (void*)0x00790000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_801058CC),
+    (void*)((u8*)winMsgDraw),
     (void*)0x00820000,
     (void*)0x00FF000D,
     (void*)0x000D0096,
@@ -29162,7 +29162,7 @@ void* lbl_802EF0A8[33726] = {
     (void*)0x00720000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_801058CC),
+    (void*)((u8*)winMsgDraw),
     (void*)0x10180000,
     (void*)0x00FF00BB,
     (void*)0x00D0FFE2,
@@ -30849,7 +30849,7 @@ void* lbl_802EF0A8[33726] = {
     (void*)0x00720000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_801058CC),
+    (void*)((u8*)winMsgDraw),
     (void*)0x08010000,
     (void*)0x00FFFFDD,
     (void*)0x00F500CA,
@@ -30947,7 +30947,7 @@ void* lbl_802EF0A8[33726] = {
     (void*)0x00720000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_801058CC),
+    (void*)((u8*)winMsgDraw),
     (void*)0x07F70000,
     (void*)0x00FF00F0,
     (void*)0x00FC0012,

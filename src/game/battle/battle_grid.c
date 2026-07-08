@@ -63,8 +63,8 @@ extern void* GSthreadCreate(s32 priority, void* parent, s32 stackSize,
 extern void  fn_800F04C4(void);                       /* stop particle system */
 
 /* Scene management */
-extern void  fn_80102568(s32 objID, s32 arg1, s32 arg2);   /* release scene object */
-extern u8    fn_80102620(s32 objID);                        /* check scene object active */
+extern void  menuCloseCustom(s32 objID, s32 arg1, s32 arg2);   /* release scene object */
+extern u8    menuIsCheck(s32 objID);                        /* check scene object active */
 extern void* fn_801025C0(s32 objID);                        /* get scene object pointer */
 extern void  menuGetKeyInfo(void* padData, s32 port);          /* read pad input */
 

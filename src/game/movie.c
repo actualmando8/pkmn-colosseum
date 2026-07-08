@@ -52,7 +52,7 @@ extern void gamedatasaveSetStatus(void* ctx, u32 a, u32 b);     /* effect parame
 extern void* gamedatasaveGetStatus(void* ctx, u32 a);            /* effect query */
 extern void heroSetStatus(u32 a, u32 b, u32 c);         /* effect system control */
 extern void* heroGetStatus(u32 a, u32 b, u32 c);        /* effect system query */
-extern void fn_80106D3C(u32 a, u32 b, u32 c, u32 d);  /* floor transition trigger */
+extern void winMsgOpen(u32 a, u32 b, u32 c, u32 d);  /* floor transition trigger */
 extern s8   fn_8001E074(u32 a, u32 b, u32 c, u32 d);  /* input poll / wait */
 extern void* fn_801D036C(void);                        /* battle state query */
 extern u32  fn_801D0748(u32 a, u32 b, u32 c);         /* battle mode set */
@@ -314,7 +314,7 @@ void fn_80035F64(void) {
     }
 
     /* Load floor/transition for credits */
-    fn_80106D3C(2, 0x444C, 1, 0);
+    winMsgOpen(2, 0x444C, 1, 0);
 
     /* Poll input: wait for button press or timeout */
     inputResult = fn_8001E074(0, 0x3C, 0xAA, 0);
@@ -355,7 +355,7 @@ void fn_80035F64(void) {
             }
 
             /* Load special credits floor */
-            fn_80106D3C(2, 0x3C02, 1, 0);
+            winMsgOpen(2, 0x3C02, 1, 0);
             inputResult = fn_8001E074(0, 0x3C, 0xAA, 1);
         }
     }
@@ -734,7 +734,7 @@ extern u32 menuOpen(u32 sceneId, u32 arg);
 extern s32 fn_8003708C(void);
 extern void fn_8017B370(u32 arg);
 extern void fn_8003686C(void);
-extern void fn_80102510(u32 sceneId);
+extern void menuClose(u32 sceneId);
 extern s32 fn_800D37CC(void);
 extern u16 __cvt_fp2unsigned(f32 value);
 extern void fn_800A0FC8(u32 arg);
@@ -781,7 +781,7 @@ void fn_800366A8(void) {
 
     fadeSet(3, lbl_8047BA4C);
     fadeCheck(1);
-    fn_80102510(0x85);
+    menuClose(0x85);
 
     if (lbl_804788B8 != (u32)-1) {
         size = __cvt_fp2unsigned(lbl_8047BA50[0] * (f32)fn_800D37CC());

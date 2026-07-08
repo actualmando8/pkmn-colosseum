@@ -65,19 +65,19 @@ extern void fn_80088D84();
 extern void fn_80089028();
 extern void fn_80092C90();
 extern void fn_80093574();
-extern void fn_801022B8();
+extern void menuGetCursorItemID();
 extern void menuSubOpenYesNo();
-extern void fn_80102510();
-extern void fn_80102568();
-extern void fn_80102620();
+extern void menuClose();
+extern void menuCloseCustom();
+extern void menuIsCheck();
 extern s32  fn_8010264C();
-extern void fn_801026A4();
+extern void menuOpenCustom();
 extern void menuSetPosition();
 extern u8*  fn_80104704(u32);
-extern void fn_801046B8();
-extern u8*  fn_80105624(void);
-extern void fn_80106D3C();
-extern void fn_801069FC();
+extern void windowGetActiveID();
+extern u8*  windowGetKeyInfo(void);
+extern void winMsgOpen();
+extern void winMsgClose();
 extern void fn_8010B9E8();
 extern void fn_80108518();
 extern void fn_80113828();
@@ -141,8 +141,8 @@ void fn_80059BDC(void) {
     extern s32 fn_80071398();
     extern s32 fn_800714C8(void);
     extern s32 fn_80071160(void);
-    extern s32 fn_801026A4(s32, s32, void*, s32, s32, s32, ...);
-    extern s32 fn_80102620(s32);
+    extern s32 menuOpenCustom(s32, s32, void*, s32, s32, s32, ...);
+    extern s32 menuIsCheck(s32);
     extern s32 fn_800F7EF8(s32);
     extern s32 fn_8008ABA0(s32);
     extern u8* fn_8006AFC4(void*);
@@ -158,8 +158,8 @@ void fn_80059BDC(void) {
     extern u32 fn_800FF540(void);
     extern u32 fn_801906A0(s32);
     extern u8* fn_80104704(u32);
-    extern s32 fn_801046B8(void);
-    extern u8* fn_80105624(void);
+    extern s32 windowGetActiveID(void);
+    extern u8* windowGetKeyInfo(void);
     extern s32 fn_80076054(void*, void*);
     extern s32 GScharCmp(void*, void*);
     extern s32 fn_80089028(void);
@@ -167,7 +167,7 @@ void fn_80059BDC(void) {
     extern s32 fn_800849B4(s32, s32, void*, void*);
     extern u32 heroBiosGetRnd(void*);
     extern u8* heroBiosGetNamePtr(void*);
-    extern s32 fn_801022B8(s32);
+    extern s32 menuGetCursorItemID(s32);
     extern u32 gamedatasaveGetStatus(s32, s32);
     extern s32 fn_80088C60(void);
     extern s32 fn_80088964(void);
@@ -206,7 +206,7 @@ void fn_80059BDC(void) {
         s32 mode;
         first = fn_8007162C();
         cmd = fn_8007162C();
-        fn_801026A4(0xBE, 0, NULL, 0x10, 0, 1, first);
+        menuOpenCustom(0xBE, 0, NULL, 0x10, 0, 1, first);
         switch (fn_8007162C()) {
         case 0xAA: {
             s32 v = fn_80071344();
@@ -262,8 +262,8 @@ void fn_80059BDC(void) {
                 prevCmd = (*(s32(*)[6])(dat + 0x18))[v];
             }
             if (fn_8006AFC4(WORKP) == 0 && (prevCmd == 0xAE || prevCmd == 0xAF)) {
-                fn_80106D3C(2, 0x3BFE, 1, 0);
-                fn_801069FC(1);
+                winMsgOpen(2, 0x3BFE, 1, 0);
+                winMsgClose(1);
                 break;
             }
             switch (prevCmd) {
@@ -286,8 +286,8 @@ void fn_80059BDC(void) {
             }
             case 0xAD:
                 if ((u8)fn_8006A7BC(WORKP) == 0 || fn_8006AFC4(WORKP) == 0) {
-                    fn_80106D3C(2, 0x4415, 1, 0);
-                    fn_801069FC(1);
+                    winMsgOpen(2, 0x4415, 1, 0);
+                    winMsgClose(1);
                     break;
                 }
                 cmd = prevCmd;
@@ -312,27 +312,27 @@ void fn_80059BDC(void) {
             }
             cmd = (s32)(WORKP + 0xC98C);
             st = fn_8006AFC4(WORKP);
-            if ((u8)fn_80102620(0xC8)) {
-                fn_80102510(0xC8);
-                while ((u8)fn_80102620(0xC8)) {
+            if ((u8)menuIsCheck(0xC8)) {
+                menuClose(0xC8);
+                while ((u8)menuIsCheck(0xC8)) {
                     _threadSwitch();
                 }
             }
             r = fn_8006A7E8(st);
-            fn_801026A4(0xC8, 0, NULL, 0x10, 0, 4, fn_8006A7C8(st), r, 0, cmd);
-            if ((u8)fn_80102620(0xD6)) {
-                fn_80102510(0xD6);
-                while ((u8)fn_80102620(0xD6)) {
+            menuOpenCustom(0xC8, 0, NULL, 0x10, 0, 4, fn_8006A7C8(st), r, 0, cmd);
+            if ((u8)menuIsCheck(0xD6)) {
+                menuClose(0xD6);
+                while ((u8)menuIsCheck(0xD6)) {
                     _threadSwitch();
                 }
             }
             {
                 u32 modeAd = 1;
-                r = fn_801026A4(0xD6, 0, &modeAd, 0x10, 1, 4, 0x3DB0, 0x3DB1, 0x3D89, 0);
+                r = menuOpenCustom(0xD6, 0, &modeAd, 0x10, 1, 4, 0x3DB0, 0x3DB1, 0x3D89, 0);
             }
-            fn_80102510(0xD6);
+            menuClose(0xD6);
             if (r != 0) {
-                fn_80102568(0xC8, 0, 0);
+                menuCloseCustom(0xC8, 0, 0);
                 fn_8006E0CC();
                 cmd = -1;
                 break;
@@ -343,13 +343,13 @@ void fn_80059BDC(void) {
             } else {
                 s32 wasOpen = fn_8006A7BC(WORKP);
                 fn_8006A79C(WORKP);
-                fn_80106D3C(2, 0x44D9, 1, 0);
-                fn_801069FC(1);
+                winMsgOpen(2, 0x44D9, 1, 0);
+                winMsgClose(1);
                 if (fn_80088C60() < 0) {
                     if ((u8)wasOpen != 0) {
                         fn_8006A7AC(WORKP);
                     }
-                    fn_80102568(0xC8, 0, 0);
+                    menuCloseCustom(0xC8, 0, 0);
                     fn_8006E0CC();
                     cmd = -1;
                     break;
@@ -424,7 +424,7 @@ void fn_80059BDC(void) {
                 posFlag = 1;
                 cmd = 0x105;
             }
-            fn_80102568(0xC8, 0, 0);
+            menuCloseCustom(0xC8, 0, 0);
             fn_8006E0CC();
             break;
         }
@@ -479,7 +479,7 @@ void fn_80059BDC(void) {
                     mem = NULL;
                 }
                 fn_80108518(mem + 0xC, 0x1CE);
-                r = fn_801026A4(0xBC, 0, NULL, 0x10, 1, 1, prevCmd);
+                r = menuOpenCustom(0xBC, 0, NULL, 0x10, 1, 1, prevCmd);
                 switch (r) {
                 case 0:
                 case 1:
@@ -492,11 +492,11 @@ void fn_80059BDC(void) {
                     t = 0;
                     *(s32*)(WORKP + 0xC) = t;
                     cmd = 0xCC;
-                    fn_80102568(0xBC, 0, 0);
+                    menuCloseCustom(0xBC, 0, 0);
                     break;
                 }
                 default:
-                    fn_80102568(0xBC, 0, 1);
+                    menuCloseCustom(0xBC, 0, 1);
                     fn_80108518(mem + 0xC, 0x1CA);
                     break;
                 }
@@ -516,13 +516,13 @@ void fn_80059BDC(void) {
             switch (fn_80071344()) {
             case 0:
                 if ((u8)fn_801D04E8() == 0) {
-                    fn_80106D3C(2, 0x44EB, 1, 0);
-                    fn_801069FC(1);
+                    winMsgOpen(2, 0x44EB, 1, 0);
+                    winMsgClose(1);
                     break;
                 }
                 if (gamedatasaveGetStatus(0, 4) == 0) {
-                    fn_80106D3C(2, 0x444D, 1, 0);
-                    fn_801069FC(1);
+                    winMsgOpen(2, 0x444D, 1, 0);
+                    winMsgClose(1);
                     break;
                 }
                 heroBiosCopy(lbl_8047A5A0 + 0x1660, savedataGetStatus(0, 2));
@@ -541,22 +541,22 @@ void fn_80059BDC(void) {
             fn_8006B4AC(2);
             if ((u8)fn_800776E4((u8*)prevCmd) == 0) {
                 s32 m;
-                fn_801026A4(0xBE, 0, NULL, 0x10, 0, 1, 0xF5);
-                fn_801026A4(0xDA, 0, NULL, 0x10, 0, 4, prevCmd, 0, fn_8006B420(), 0);
+                menuOpenCustom(0xBE, 0, NULL, 0x10, 0, 1, 0xF5);
+                menuOpenCustom(0xDA, 0, NULL, 0x10, 0, 4, prevCmd, 0, fn_8006B420(), 0);
                 menuSetPosition(0xDA, 0, -0x28);
                 m = fn_80076054((u8*)prevCmd, fn_8006B420());
                 if ((u16)m == 0) {
                     __assert((char*)(dat + 0x98), 0x1BB, (char*)(dat + 0x1E0));
                 }
                 fn_80166A28(0x26);
-                fn_80106D3C(7, (u16)m, 1, 0);
-                fn_80106D3C(7, 0x440A, 1, 0);
-                fn_80102568(0xDA, 0, 0);
-                fn_80102568(0xBE, 0, 1);
-                fn_80102568(0xDA, 0, 1);
+                winMsgOpen(7, (u16)m, 1, 0);
+                winMsgOpen(7, 0x440A, 1, 0);
+                menuCloseCustom(0xDA, 0, 0);
+                menuCloseCustom(0xBE, 0, 1);
+                menuCloseCustom(0xDA, 0, 1);
                 fn_8006E0CC();
                 fn_8006B4AC(0);
-                fn_801069FC(1);
+                winMsgClose(1);
                 fn_800714C8();
                 cmd = -1;
                 break;
@@ -600,110 +600,110 @@ void fn_80059BDC(void) {
         case 0xB2: {
             u8* sv = lbl_8047A5A0;
             s32 r;
-            if ((u8)fn_80102620(0xDA)) {
-                fn_80102510(0xDA);
-                while ((u8)fn_80102620(0xDA)) {
+            if ((u8)menuIsCheck(0xDA)) {
+                menuClose(0xDA);
+                while ((u8)menuIsCheck(0xDA)) {
                     _threadSwitch();
                 }
             }
             r = fn_8006A7E8(sv);
-            fn_801026A4(0xDA, 0, NULL, 0x10, 0, 4, fn_8006A7C8(sv), r, 0, 0);
-            if ((u8)fn_80102620(0xD6)) {
-                fn_80102510(0xD6);
-                while ((u8)fn_80102620(0xD6)) {
+            menuOpenCustom(0xDA, 0, NULL, 0x10, 0, 4, fn_8006A7C8(sv), r, 0, 0);
+            if ((u8)menuIsCheck(0xD6)) {
+                menuClose(0xD6);
+                while ((u8)menuIsCheck(0xD6)) {
                     _threadSwitch();
                 }
             }
             {
                 u32 modeB2 = 0;
-                r = fn_801026A4(0xD6, 0, &modeB2, 0x10, 1, 4, 0x3D47, 0x3D49, 0, -0x2A);
+                r = menuOpenCustom(0xD6, 0, &modeB2, 0x10, 1, 4, 0x3D47, 0x3D49, 0, -0x2A);
             }
-            fn_80102510(0xD6);
+            menuClose(0xD6);
             if (r == 0) {
                 if (fn_8006AFC4(WORKP) != 0) {
                     u8* p;
-                    fn_80102568(0xDA, 0, 0);
+                    menuCloseCustom(0xDA, 0, 0);
                     fn_8006E0CC();
-                    fn_80102568(0xBE, 0, 1);
-                    fn_801026A4(0xBE, 0, NULL, 0x10, 0, 1, 0xEB);
+                    menuCloseCustom(0xBE, 0, 1);
+                    menuOpenCustom(0xBE, 0, NULL, 0x10, 0, 1, 0xEB);
                     p = fn_8006AFC4(WORKP);
-                    if ((u8)fn_80102620(0xDA)) {
-                        fn_80102510(0xDA);
-                        while ((u8)fn_80102620(0xDA)) {
+                    if ((u8)menuIsCheck(0xDA)) {
+                        menuClose(0xDA);
+                        while ((u8)menuIsCheck(0xDA)) {
                             _threadSwitch();
                         }
                     }
                     r = fn_8006A7E8(p);
-                    fn_801026A4(0xDA, 0, NULL, 0x10, 0, 4, fn_8006A7C8(p), r, 0, 0);
-                    if ((u8)fn_80102620(0xD6)) {
-                        fn_80102510(0xD6);
-                        while ((u8)fn_80102620(0xD6)) {
+                    menuOpenCustom(0xDA, 0, NULL, 0x10, 0, 4, fn_8006A7C8(p), r, 0, 0);
+                    if ((u8)menuIsCheck(0xD6)) {
+                        menuClose(0xD6);
+                        while ((u8)menuIsCheck(0xD6)) {
                             _threadSwitch();
                         }
                     }
                     {
                         u32 modeB2b = 1;
-                        r = fn_801026A4(0xD6, 0, &modeB2b, 0x10, 1, 4, 0x3D47, 0x3D49, 0x3C54, -0x28);
+                        r = menuOpenCustom(0xD6, 0, &modeB2b, 0x10, 1, 4, 0x3D47, 0x3D49, 0x3C54, -0x28);
                     }
-                    fn_80102510(0xD6);
+                    menuClose(0xD6);
                     if (r != 0) {
                         goto b2_cancel;
                     }
                     if ((u8)fn_8006A7BC(WORKP) != 0) {
-                        fn_80106D3C(2, 0x44C2, 1, 0);
+                        winMsgOpen(2, 0x44C2, 1, 0);
                         prevCmd = menuSubOpenYesNo(0, 0x3C, 0x9E, 1);
-                        fn_801069FC(1);
+                        winMsgClose(1);
                         if (prevCmd != 0) {
                             goto b2_cancel;
                         }
                     }
-                    fn_80102568(0xDA, 0, 0);
+                    menuCloseCustom(0xDA, 0, 0);
                     fn_8006E0CC();
-                    fn_80102568(0xBE, 0, 1);
-                    fn_801026A4(0xBE, 0, NULL, 0x10, 0, 1, first);
+                    menuCloseCustom(0xBE, 0, 1);
+                    menuOpenCustom(0xBE, 0, NULL, 0x10, 0, 1, first);
                     {
                         u8* sv2 = lbl_8047A5A0;
-                        if ((u8)fn_80102620(0xDA)) {
-                            fn_80102510(0xDA);
-                            while ((u8)fn_80102620(0xDA)) {
+                        if ((u8)menuIsCheck(0xDA)) {
+                            menuClose(0xDA);
+                            while ((u8)menuIsCheck(0xDA)) {
                                 _threadSwitch();
                             }
                         }
                         r = fn_8006A7E8(sv2);
-                        fn_801026A4(0xDA, 0, NULL, 0x10, 0, 4, fn_8006A7C8(sv2), r, 0, 0);
+                        menuOpenCustom(0xDA, 0, NULL, 0x10, 0, 4, fn_8006A7C8(sv2), r, 0, 0);
                     }
                 }
                 memcpy(lbl_8047A5A0 + 0x4318, savedataGetStatus(0, 0xE), 0xCC2C);
                 fn_8006AF44(savedataGetStatus(0, 0xE), lbl_8047A5A0);
                 if ((u8)fn_801D04E8() == 0) {
                     fn_80166A28(0x26);
-                    fn_80106D3C(2, 0x3C60, 1, 0);
+                    winMsgOpen(2, 0x3C60, 1, 0);
                     if (fn_8006A7E8(lbl_8047A5A0) != 0) {
-                        fn_80106D3C(2, 0x3D55, 1, 0);
+                        winMsgOpen(2, 0x3D55, 1, 0);
                     }
                 } else if (fn_800889A4() < 0) {
                     memcpy(savedataGetStatus(0, 0xE), lbl_8047A5A0 + 0x4318, 0xCC2C);
                     if (fn_8006A7E8(lbl_8047A5A0) != 0) {
-                        fn_80106D3C(2, 0x3D55, 1, 0);
+                        winMsgOpen(2, 0x3D55, 1, 0);
                     }
                 } else if (fn_8006A7E8(lbl_8047A5A0) == 0) {
-                    fn_80106D3C(2, 0x3C5E, 1, 0);
+                    winMsgOpen(2, 0x3C5E, 1, 0);
                 } else {
-                    fn_80106D3C(2, 0x3D44, 1, 0);
+                    winMsgOpen(2, 0x3D44, 1, 0);
                 }
-                fn_80102568(0xDA, 0, 0);
+                menuCloseCustom(0xDA, 0, 0);
                 fn_8006E0CC();
                 fn_800714C8();
-                fn_801069FC(1);
+                winMsgClose(1);
                 cmd = -1;
                 break;
             }
         b2_cancel:
             if (fn_8006A7E8(lbl_8047A5A0) != 0) {
-                fn_80106D3C(2, 0x3D55, 1, 0);
-                fn_80102568(0xDA, 0, 0);
+                winMsgOpen(2, 0x3D55, 1, 0);
+                menuCloseCustom(0xDA, 0, 0);
                 fn_8006E0CC();
-                fn_801069FC(1);
+                winMsgClose(1);
             }
             cmd = -1;
             break;
@@ -713,26 +713,26 @@ void fn_80059BDC(void) {
             s32 r;
             fn_80069C0C(savedataGetStatus(0, 0xE));
             p = fn_8006B09C(0);
-            if ((u8)fn_80102620(0xDA)) {
-                fn_80102510(0xDA);
-                while ((u8)fn_80102620(0xDA)) {
+            if ((u8)menuIsCheck(0xDA)) {
+                menuClose(0xDA);
+                while ((u8)menuIsCheck(0xDA)) {
                     _threadSwitch();
                 }
             }
             r = fn_8006A7E8(p);
-            fn_801026A4(0xDA, 0, NULL, 0x10, 0, 4, fn_8006A7C8(p), r, 0, 0);
-            if ((u8)fn_80102620(0xD6)) {
-                fn_80102510(0xD6);
-                while ((u8)fn_80102620(0xD6)) {
+            menuOpenCustom(0xDA, 0, NULL, 0x10, 0, 4, fn_8006A7C8(p), r, 0, 0);
+            if ((u8)menuIsCheck(0xD6)) {
+                menuClose(0xD6);
+                while ((u8)menuIsCheck(0xD6)) {
                     _threadSwitch();
                 }
             }
             {
                 u32 modeCc = 0;
-                r = fn_801026A4(0xD6, 0, &modeCc, 0x10, 1, 4, 0x3D47, 0x3D49, 0, -0x2A);
+                r = menuOpenCustom(0xD6, 0, &modeCc, 0x10, 1, 4, 0x3D47, 0x3D49, 0, -0x2A);
             }
-            fn_80102510(0xD6);
-            fn_80102568(0xDA, 0, 0);
+            menuClose(0xD6);
+            menuCloseCustom(0xDA, 0, 0);
             fn_8006E0CC();
             if (r != 0) {
                 cmd = -1;
@@ -753,37 +753,37 @@ void fn_80059BDC(void) {
                 __assert((char*)(dat + 0x98), 0x4BA, (char*)&lbl_8047BF20);
             }
             wm = fn_8006B420();
-            if ((u8)fn_80102620(0xDA)) {
-                fn_80102510(0xDA);
-                while ((u8)fn_80102620(0xDA)) {
+            if ((u8)menuIsCheck(0xDA)) {
+                menuClose(0xDA);
+                while ((u8)menuIsCheck(0xDA)) {
                     _threadSwitch();
                 }
             }
             r = fn_8006A7E8((void*)cmd);
-            fn_801026A4(0xDA, 0, NULL, 0x10, 0, 4, fn_8006A7C8((void*)cmd), r, wm, 0);
+            menuOpenCustom(0xDA, 0, NULL, 0x10, 0, 4, fn_8006A7C8((void*)cmd), r, wm, 0);
             m = fn_80076054((u8*)cmd + 0xB44, fn_8006B420());
             if ((u16)m != 0) {
-                fn_80106D3C(1, (u16)m, 1, 0);
-                fn_801069FC(1);
-                fn_80102568(0xDA, 0, 0);
+                winMsgOpen(1, (u16)m, 1, 0);
+                winMsgClose(1);
+                menuCloseCustom(0xDA, 0, 0);
                 fn_8006E0CC();
                 fn_800714C8();
                 cmd = -1;
                 break;
             }
-            if ((u8)fn_80102620(0xD6)) {
-                fn_80102510(0xD6);
-                while ((u8)fn_80102620(0xD6)) {
+            if ((u8)menuIsCheck(0xD6)) {
+                menuClose(0xD6);
+                while ((u8)menuIsCheck(0xD6)) {
                     _threadSwitch();
                 }
             }
             {
                 u32 modeB1 = 0;
-                r = fn_801026A4(0xD6, 0, &modeB1, 0x10, 1, 4, 0x3D47, 0x3D49, 0, -0x2A);
+                r = menuOpenCustom(0xD6, 0, &modeB1, 0x10, 1, 4, 0x3D47, 0x3D49, 0, -0x2A);
             }
-            fn_80102510(0xD6);
+            menuClose(0xD6);
             if (r != 0) {
-                fn_80102568(0xDA, 0, 0);
+                menuCloseCustom(0xDA, 0, 0);
                 fn_8006E0CC();
                 cmd = -1;
                 break;
@@ -796,48 +796,48 @@ void fn_80059BDC(void) {
                 *dstSaveImage = *srcSaveImage;
                 prevCmd = (s32)fn_8006AFC4(dst);
                 if ((u8)fn_8006A7BC(dst) != 0 && (u32)prevCmd != 0) {
-                    fn_80102568(0xDA, 0, 0);
+                    menuCloseCustom(0xDA, 0, 0);
                     fn_8006E0CC();
-                    fn_80102568(0xBE, 0, 1);
-                    fn_801026A4(0xBE, 0, NULL, 0x10, 0, 1, 0xD7);
-                    if ((u8)fn_80102620(0xC8)) {
-                        fn_80102510(0xC8);
-                        while ((u8)fn_80102620(0xC8)) {
+                    menuCloseCustom(0xBE, 0, 1);
+                    menuOpenCustom(0xBE, 0, NULL, 0x10, 0, 1, 0xD7);
+                    if ((u8)menuIsCheck(0xC8)) {
+                        menuClose(0xC8);
+                        while ((u8)menuIsCheck(0xC8)) {
                             _threadSwitch();
                         }
                     }
                     r = fn_8006A7E8((void*)prevCmd);
-                    fn_801026A4(0xC8, 0, NULL, 0x10, 0, 4, fn_8006A7C8((void*)prevCmd), r, 0, dst + 0xC98C);
-                    if ((u8)fn_80102620(0xD6)) {
-                        fn_80102510(0xD6);
-                        while ((u8)fn_80102620(0xD6)) {
+                    menuOpenCustom(0xC8, 0, NULL, 0x10, 0, 4, fn_8006A7C8((void*)prevCmd), r, 0, dst + 0xC98C);
+                    if ((u8)menuIsCheck(0xD6)) {
+                        menuClose(0xD6);
+                        while ((u8)menuIsCheck(0xD6)) {
                             _threadSwitch();
                         }
                     }
                     {
                         u32 modeB1b = 1;
-                        r = fn_801026A4(0xD6, 0, &modeB1b, 0x10, 1, 4, 0x3D47, 0x3D49, 0x44C8, 0);
+                        r = menuOpenCustom(0xD6, 0, &modeB1b, 0x10, 1, 4, 0x3D47, 0x3D49, 0x44C8, 0);
                     }
-                    fn_80102510(0xD6);
-                    fn_80102568(0xC8, 0, 0);
+                    menuClose(0xD6);
+                    menuCloseCustom(0xC8, 0, 0);
                     fn_8006E0CC();
-                    fn_80102568(0xBE, 0, 1);
+                    menuCloseCustom(0xBE, 0, 1);
                     if (r != 0) {
                         cmd = -1;
                         break;
                     }
                     if ((u8)fn_8006A76C(WORKP) == 0) {
                         u8* wm2;
-                        fn_801026A4(0xBE, 0, NULL, 0x10, 0, 1, first);
+                        menuOpenCustom(0xBE, 0, NULL, 0x10, 0, 1, first);
                         wm2 = fn_8006B420();
-                        if ((u8)fn_80102620(0xDA)) {
-                            fn_80102510(0xDA);
-                            while ((u8)fn_80102620(0xDA)) {
+                        if ((u8)menuIsCheck(0xDA)) {
+                            menuClose(0xDA);
+                            while ((u8)menuIsCheck(0xDA)) {
                                 _threadSwitch();
                             }
                         }
                         r = fn_8006A7E8((void*)cmd);
-                        fn_801026A4(0xDA, 0, NULL, 0x10, 0, 4, fn_8006A7C8((void*)cmd), r, wm2, 0);
+                        menuOpenCustom(0xDA, 0, NULL, 0x10, 0, 4, fn_8006A7C8((void*)cmd), r, wm2, 0);
                     }
                 }
             }
@@ -850,7 +850,7 @@ void fn_80059BDC(void) {
                     if ((u8)wasOpen != 0) {
                         fn_8006A7AC(WORKP);
                     }
-                    fn_80102568(0xDA, 0, 0);
+                    menuCloseCustom(0xDA, 0, 0);
                     fn_8006E0CC();
                     cmd = -1;
                     break;
@@ -934,7 +934,7 @@ void fn_80059BDC(void) {
                     cmd = 0xD1;
                 }
             }
-            fn_80102568(0xDA, 0, 0);
+            menuCloseCustom(0xDA, 0, 0);
             fn_8006E0CC();
             break;
         }
@@ -952,13 +952,13 @@ void fn_80059BDC(void) {
                 st = (s32*)(e + 8);
                 if (*st == 0) {
                     if ((u8)fn_801D04E8() == 0) {
-                        fn_80106D3C(2, 0x44EA, 1, 0);
-                        fn_801069FC(1);
+                        winMsgOpen(2, 0x44EA, 1, 0);
+                        winMsgClose(1);
                         break;
                     }
                     if (gamedatasaveGetStatus(0, 4) == 0) {
-                        fn_80106D3C(2, 0x44DB, 1, 0);
-                        fn_801069FC(1);
+                        winMsgOpen(2, 0x44DB, 1, 0);
+                        winMsgClose(1);
                         break;
                     }
                 }
@@ -998,7 +998,7 @@ void fn_80059BDC(void) {
                 fn_80077E80(lbl_8047A5A0 + 0x42C0, fn_8006B420());
             }
             for (;;) {
-                r = fn_801026A4(fn_8007162C(), 0, &mode, 0x10, 1, 1, lbl_8047A5A0 + 0x42C0);
+                r = menuOpenCustom(fn_8007162C(), 0, &mode, 0x10, 1, 1, lbl_8047A5A0 + 0x42C0);
                 if (r < 0) {
                     cmd = -1;
                     goto c0_end;
@@ -1009,8 +1009,8 @@ void fn_80059BDC(void) {
                         u8 tmp[0x3C];
                         s32 r2;
                         memcpy(tmp, lbl_8047A5A0 + 0x42D8, 0x3C);
-                        r2 = fn_801026A4(0xB4, 0, NULL, 0x10, 1, 1, tmp);
-                        fn_80102510(0xB4);
+                        r2 = menuOpenCustom(0xB4, 0, NULL, 0x10, 1, 1, tmp);
+                        menuClose(0xB4);
                         if (r2 >= 0) {
                             memcpy(lbl_8047A5A0 + 0x42D8, tmp, 0x3C);
                         }
@@ -1030,7 +1030,7 @@ void fn_80059BDC(void) {
             break;
         }
         case 0xC1: {
-            s32 r = fn_801026A4(fn_8007162C(), 0, NULL, 0x10, 1, 1, lbl_8047A5A0 + 0x42C0);
+            s32 r = menuOpenCustom(fn_8007162C(), 0, NULL, 0x10, 1, 1, lbl_8047A5A0 + 0x42C0);
             if (r < 0) {
                 cmd = -1;
                 break;
@@ -1041,7 +1041,7 @@ void fn_80059BDC(void) {
                 cmd = 0xC0;
                 break;
             case 6:
-                if (fn_801022B8(fn_8007162C()) == 0x9FC) {
+                if (menuGetCursorItemID(fn_8007162C()) == 0x9FC) {
                     fn_80077E80(lbl_8047A5A0 + 0x42C0, fn_8006B51C(0));
                     *(s16*)(lbl_8047A5A0 + 0x42C6) = 6;
                     break;
@@ -1056,7 +1056,7 @@ void fn_80059BDC(void) {
                         if ((u8)fn_801D04E8() == 0) {
                             break;
                         }
-                        fn_80106D3C(2, 0x44B1, 1, 0);
+                        winMsgOpen(2, 0x44B1, 1, 0);
                         if (menuSubOpenYesNo(0, 0x3C, 0x9E, 0) != 0) {
                             break;
                         }
@@ -1064,7 +1064,7 @@ void fn_80059BDC(void) {
                             break;
                         }
                     }
-                    fn_801069FC(1);
+                    winMsgClose(1);
                 }
                 cmd = -1;
                 break;
@@ -1086,7 +1086,7 @@ void fn_80059BDC(void) {
             case 4:
             case 5:
                 *(s32*)(WORKP + 8) = v;
-                if (*(u16*)(fn_80105624() + 4) & 0x400) {
+                if (*(u16*)(windowGetKeyInfo() + 4) & 0x400) {
                     cmd = 0xC0;
                 } else {
                     cmd = 0xC2;
@@ -1221,69 +1221,69 @@ void fn_80059BDC(void) {
                 switch (e) {
                 case 0:
                     if ((u8)fn_8008ABA0(1) != 0) {
-                        fn_80106D3C(2, 0x4445, 1, 0);
+                        winMsgOpen(2, 0x4445, 1, 0);
                         while ((u8)fn_800F7EF8(1) == 0) {
                             _threadSwitch();
                         }
                     } else {
-                        fn_80106D3C(2, 0x3D55, 1, 0);
+                        winMsgOpen(2, 0x3D55, 1, 0);
                     }
                     break;
                 case 1:
-                    fn_80106D3C(2, 0x44C0, 1, 0);
+                    winMsgOpen(2, 0x44C0, 1, 0);
                     while ((u8)fn_800F7EF8(1) == 0) {
                         _threadSwitch();
                     }
                     break;
                 default:
                     fn_80132A38(0x2F, e);
-                    fn_80106D3C(2, 0x44B8, 1, 0);
+                    winMsgOpen(2, 0x44B8, 1, 0);
                     break;
                 }
-                fn_801069FC(1);
+                winMsgClose(1);
                 if ((u8)fn_800F7EF8(1) == 0) {
-                    fn_80106D3C(2, (u8)fn_8008ABA0(1) ? 0x4445 : 0x3C4F, 1, 0);
+                    winMsgOpen(2, (u8)fn_8008ABA0(1) ? 0x4445 : 0x3C4F, 1, 0);
                     while ((u8)fn_800F7EF8(1) == 0) {
                         _threadSwitch();
                     }
-                    fn_801069FC(1);
+                    winMsgClose(1);
                 }
                 cmd = fn_80071398(0xB3);
                 break;
             }
             r = fn_8010264C(0xD0, 1);
-            fn_80102510(0xD0);
+            menuClose(0xD0);
             if (r < 0) {
                 s32 e = fn_80071160();
                 switch (e) {
                 case 0:
                     if ((u8)fn_8008ABA0(1) != 0) {
-                        fn_80106D3C(2, 0x4445, 1, 0);
+                        winMsgOpen(2, 0x4445, 1, 0);
                         while ((u8)fn_800F7EF8(1) == 0) {
                             _threadSwitch();
                         }
                     } else {
-                        fn_80106D3C(2, 0x3D55, 1, 0);
+                        winMsgOpen(2, 0x3D55, 1, 0);
                     }
                     break;
                 case 1:
-                    fn_80106D3C(2, 0x44C0, 1, 0);
+                    winMsgOpen(2, 0x44C0, 1, 0);
                     while ((u8)fn_800F7EF8(1) == 0) {
                         _threadSwitch();
                     }
                     break;
                 default:
                     fn_80132A38(0x2F, e);
-                    fn_80106D3C(2, 0x44B8, 1, 0);
+                    winMsgOpen(2, 0x44B8, 1, 0);
                     break;
                 }
-                fn_801069FC(1);
+                winMsgClose(1);
                 if ((u8)fn_800F7EF8(1) == 0) {
-                    fn_80106D3C(2, (u8)fn_8008ABA0(1) ? 0x4445 : 0x3C4F, 1, 0);
+                    winMsgOpen(2, (u8)fn_8008ABA0(1) ? 0x4445 : 0x3C4F, 1, 0);
                     while ((u8)fn_800F7EF8(1) == 0) {
                         _threadSwitch();
                     }
-                    fn_801069FC(1);
+                    winMsgClose(1);
                 }
                 cmd = fn_80071398(0xB3);
                 break;
@@ -1324,32 +1324,32 @@ void fn_80059BDC(void) {
                 switch (e) {
                 case 0:
                     if ((u8)fn_8008ABA0(1) != 0) {
-                        fn_80106D3C(2, 0x4445, 1, 0);
+                        winMsgOpen(2, 0x4445, 1, 0);
                         while ((u8)fn_800F7EF8(1) == 0) {
                             _threadSwitch();
                         }
                     } else {
-                        fn_80106D3C(2, 0x3D55, 1, 0);
+                        winMsgOpen(2, 0x3D55, 1, 0);
                     }
                     break;
                 case 1:
-                    fn_80106D3C(2, 0x44C0, 1, 0);
+                    winMsgOpen(2, 0x44C0, 1, 0);
                     while ((u8)fn_800F7EF8(1) == 0) {
                         _threadSwitch();
                     }
                     break;
                 default:
                     fn_80132A38(0x2F, e);
-                    fn_80106D3C(2, 0x44B8, 1, 0);
+                    winMsgOpen(2, 0x44B8, 1, 0);
                     break;
                 }
-                fn_801069FC(1);
+                winMsgClose(1);
                 if ((u8)fn_800F7EF8(1) == 0) {
-                    fn_80106D3C(2, (u8)fn_8008ABA0(1) ? 0x4445 : 0x3C4F, 1, 0);
+                    winMsgOpen(2, (u8)fn_8008ABA0(1) ? 0x4445 : 0x3C4F, 1, 0);
                     while ((u8)fn_800F7EF8(1) == 0) {
                         _threadSwitch();
                     }
-                    fn_801069FC(1);
+                    winMsgClose(1);
                 }
                 cmd = fn_80071398(0xB3);
                 break;
@@ -1369,29 +1369,29 @@ void fn_80059BDC(void) {
             break;
         case 0xB9: {
             s32 r = fn_8010264C(0xB9, 1);
-            fn_80102568(0xB9, 0, 0);
-            fn_80102568(0xBE, 0, 1);
+            menuCloseCustom(0xB9, 0, 0);
+            menuCloseCustom(0xBE, 0, 1);
             switch (r) {
             case 0:
                 if ((u8)fn_801D04E8() == 0) {
-                    fn_80106D3C(2, 0x44EA, 1, 0);
-                    fn_801069FC(1);
+                    winMsgOpen(2, 0x44EA, 1, 0);
+                    winMsgClose(1);
                     break;
                 }
                 if (gamedatasaveGetStatus(0, 4) == 0) {
-                    fn_80106D3C(2, 0x44DB, 1, 0);
-                    fn_801069FC(1);
+                    winMsgOpen(2, 0x44DB, 1, 0);
+                    winMsgClose(1);
                     break;
                 }
                 fn_8002D91C(0xB);
                 break;
             case 1:
                 if ((u8)fn_8008ABA0(1) != 0) {
-                    fn_80106D3C(2, 0x4445, 1, 0);
+                    winMsgOpen(2, 0x4445, 1, 0);
                     while ((u8)fn_800F7EF8(1) == 0) {
                         _threadSwitch();
                     }
-                    fn_801069FC(1);
+                    winMsgClose(1);
                 }
                 fn_8002D91C(0xC);
                 break;
@@ -1422,14 +1422,14 @@ void fn_80059BDC(void) {
                     prevCmd = coins;
                     fn_801293FC(0, coins);
                     for (;;) {
-                        fn_80106D3C(2, 0x3C03, 1, 0);
+                        winMsgOpen(2, 0x3C03, 1, 0);
                         if (menuSubOpenYesNo(0, 0x3C, 0x9E, 0) == 0) {
                             if (fn_80088D84() >= 0) {
                                 goto quit105;
                             }
                             continue;
                         }
-                        fn_80106D3C(2, 0x3D54, 1, 0);
+                        winMsgOpen(2, 0x3D54, 1, 0);
                         if (menuSubOpenYesNo(0, 0x3C, 0x9E, 1) != 0) {
                             continue;
                         }
@@ -1438,7 +1438,7 @@ void fn_80059BDC(void) {
                     }
                 }
                 for (;;) {
-                    fn_80106D3C(7, 0x3C23, 1, 0);
+                    winMsgOpen(7, 0x3C23, 1, 0);
                     if (menuSubOpenYesNo(0, 0x3C, 0x9E, 0) != 0) {
                         goto ask105;
                     }
@@ -1464,7 +1464,7 @@ void fn_80059BDC(void) {
                         if (GScharCmp(heroBiosGetNamePtr(lbl_8047A5A0 + 0x1660), nm) != 0) {
                             goto mismatch105;
                         }
-                        fn_80106D3C(7, 0x3D51, 0, 1);
+                        winMsgOpen(7, 0x3D51, 0, 1);
                         money[0] += coins;
                         money[1] += coins;
                         if (money[0] > 9999999) {
@@ -1476,17 +1476,17 @@ void fn_80059BDC(void) {
                         fn_80093574(1);
                         fn_80092C90(1, money, 0);
                         if (fn_80093574(1) == 0xC) {
-                            fn_80106D3C(7, 0x3D52, 1, 0);
+                            winMsgOpen(7, 0x3D52, 1, 0);
                             break;
                         }
-                        fn_80106D3C(7, 0x3D53, 1, 0);
+                        winMsgOpen(7, 0x3D53, 1, 0);
                         continue;
                     }
                 mismatch105:
-                    fn_80106D3C(7, 0x44DA, 1, 0);
+                    winMsgOpen(7, 0x44DA, 1, 0);
                     continue;
                 ask105:
-                    fn_80106D3C(7, 0x3D54, 1, 0);
+                    winMsgOpen(7, 0x3D54, 1, 0);
                     if (menuSubOpenYesNo(0, 0x3C, 0x9E, 1) != 0) {
                         continue;
                     }
@@ -1494,14 +1494,14 @@ void fn_80059BDC(void) {
                 }
                 if ((u8)fn_8006A76C(savedataGetStatus(0, 0xE)) == 0) {
                     do {
-                        fn_80106D3C(2, 0x44EC, 1, 0);
+                        winMsgOpen(2, 0x44EC, 1, 0);
                         if (menuSubOpenYesNo(0, 0x3C, 0x9E, 0) != 0) {
                             break;
                         }
                     } while (fn_80088C60() < 0);
                 }
             quit105:
-                fn_801069FC(1);
+                winMsgClose(1);
             }
             st = *(s32*)(WORKP + 0);
             switch (st) {
@@ -1519,34 +1519,34 @@ void fn_80059BDC(void) {
             break;
         }
         if ((u8)fn_800F7EF8(1) == 0 && (u8)fn_8008ABA0(1) == 0) {
-            fn_80106D3C(2, 0x3C4F, 1, 0);
+            winMsgOpen(2, 0x3C4F, 1, 0);
             while ((u8)fn_800F7EF8(1) == 0) {
                 _threadSwitch();
             }
-            fn_801069FC(1);
+            winMsgClose(1);
         }
         prevCmd = first;
         if (cmd < 0) {
             s32 r = fn_800714C8();
-            fn_80102568(0xBE, 0, 1);
+            menuCloseCustom(0xBE, 0, 1);
             if (r < 0) {
                 goto done;
             }
         } else if (cmd != fn_8007162C()) {
             s32 r = fn_8007162C();
-            if (r == fn_801046B8()) {
-                fn_80102568(fn_8007162C(), 0, 0);
+            if (r == windowGetActiveID()) {
+                menuCloseCustom(fn_8007162C(), 0, 0);
             }
-            fn_80102568(0xBE, 0, 1);
+            menuCloseCustom(0xBE, 0, 1);
             fn_800715BC(cmd);
         }
         if (floorId != 0) {
             s32 r = fn_8007162C();
-            if (r != fn_801046B8()) {
+            if (r != windowGetActiveID()) {
                 goto done;
             }
-            fn_80102568(fn_8007162C(), 0, 0);
-            fn_80102568(0xBE, 0, 1);
+            menuCloseCustom(fn_8007162C(), 0, 0);
+            menuCloseCustom(0xBE, 0, 1);
             goto done;
         }
     }
@@ -1561,11 +1561,11 @@ done:
         if (floorId == 0x3A1) {
             fn_8006B8F0();
             if ((u8)fn_800F7EF8(1) == 0) {
-                fn_80106D3C(2, (u8)fn_8008ABA0(1) ? 0x4445 : 0x3C4F, 1, 0);
+                winMsgOpen(2, (u8)fn_8008ABA0(1) ? 0x4445 : 0x3C4F, 1, 0);
                 while ((u8)fn_800F7EF8(1) == 0) {
                     _threadSwitch();
                 }
-                fn_801069FC(1);
+                winMsgClose(1);
             }
         } else {
             fn_8006B8FC();

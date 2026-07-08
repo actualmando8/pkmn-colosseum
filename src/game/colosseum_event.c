@@ -4683,8 +4683,8 @@ void fn_80208554(void)
 void fightOutPokemonWazaEffect(u32 r3, u32 r4, u32 r5, u32 r6, int r7)
 
 {
-    extern void fn_80102568();
-    extern void fn_801026A4(int, ...);
+    extern void menuCloseCustom();
+    extern void menuOpenCustom(int, ...);
     extern u32 fn_801F54A4();
     extern void fn_801FE168();
     extern void fightWazaDoEffect();
@@ -4699,11 +4699,11 @@ void fightOutPokemonWazaEffect(u32 r3, u32 r4, u32 r5, u32 r6, int r7)
     fn_801FE168(r3,auStack_58);
     if (r7 >= 0) {
       r7 = fn_802656AC(r3,uVar2,1);
-      fn_801026A4(r7,0,0,0,0,1,auStack_58);
+      menuOpenCustom(r7,0,0,0,0,1,auStack_58);
     }
     fightWazaDoEffect(iVar1,r4,r5,r6);
     if (((r6 & 0xff) == 1) && (r7 >= 0)) {
-      fn_80102568(r7,0,0);
+      menuCloseCustom(r7,0,0);
     }
   }
   return;

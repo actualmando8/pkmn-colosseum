@@ -2265,7 +2265,7 @@ s32 selectLetter__FP14NAME_ENTRY_ARG(void* r3) {
 #endif
 
 /* fn_80027D58 - 0x80027D58 | size: 0x3a4 */
-extern u16* fn_80105624(void);
+extern u16* windowGetKeyInfo(void);
 #if 0
 asm void fn_80027D58(void) {
 #include "src/game/gs_worldmap_fn_80027D58.inc"
@@ -2273,7 +2273,7 @@ asm void fn_80027D58(void) {
 #else
 /* fn_80027D58 - GSmap_ArrivalSequence (0x80027D58, 0x3A4 bytes)
  * Overworld map party-slot edit dispatcher. Reads the global input-state
- * object (fn_80105624), then dispatches on its two bitfields:
+ * object (windowGetKeyInfo), then dispatches on its two bitfields:
  *   state->f4 (u16) bits select one mutually-exclusive action (each returns):
  *     bit 0x40 - cycle a per-slot toggle 0..1 and play SE 0x27
  *     bit 0x10 - commit/leave; if selectLetter__FP14NAME_ENTRY_ARG says "exit" set actor[0x98],
@@ -2288,7 +2288,7 @@ asm void fn_80027D58(void) {
  *                   with a +2/-2 step when the column cursor is at 15
  * Returns 0 in all paths. */
 s32 fn_80027D58(void* actor) {
-    extern u16* fn_80105624(void);
+    extern u16* windowGetKeyInfo(void);
     extern void fn_80166A28(s32 se);
     extern s32  selectLetter__FP14NAME_ENTRY_ARG(void* ctx);
     extern u16  fn_80027960(u16 value, s32 listIndex);
@@ -2302,7 +2302,7 @@ s32 fn_80027D58(void* actor) {
     u16  flags4;
     u16  flags6;
 
-    state = fn_80105624();
+    state = windowGetKeyInfo();
     ctx   = *(u8**)((u8*)actor + 0x60);
     flags4 = state[2];              /* *(u16*)(state + 0x4) */
 
@@ -2492,7 +2492,7 @@ s32 fn_80027D58(void* actor) {
 #endif
 
 /* menuNameEntryCtrl - 0x800280FC | size: 0xf4 */
-extern void fn_801080CC(void*, s32);
+extern void winSeqSetMenu(void*, s32);
 extern f32 lbl_8047B930;
 extern f32 lbl_8047B950;
 extern f32 lbl_8047B934;
@@ -2521,7 +2521,7 @@ s32 menuNameEntryCtrl(void* r3) {
     case 0:
         flag = (s32)(s8)*(volatile u8*)(r30 + 2);
         if (flag == 0) {
-            fn_801080CC(*(void**)(r30 + 4), 0x56);
+            winSeqSetMenu(*(void**)(r30 + 4), 0x56);
             one = 1;
             **(f32**)(r31 + 0x30) = lbl_8047B930;
             r30[2] = one;
@@ -2542,7 +2542,7 @@ s32 menuNameEntryCtrl(void* r3) {
     case 3:
         flag = (s32)(s8)*(volatile u8*)(r30 + 2);
         if (flag == 0) {
-            fn_801080CC(*(void**)(r30 + 4), 0x5a);
+            winSeqSetMenu(*(void**)(r30 + 4), 0x5a);
             r30[2] = 1;
         }
         break;
@@ -2564,12 +2564,12 @@ void fn_800281F0(void) { }
 /* inputName__FPUsPUsiii - 0x800281F4 | size: 0x250 */
 extern void GScharCpy(void*, u8*);
 extern void dbgMenuSetEnable(void);
-extern void fn_801046B8(void);
-extern void fn_801026A4(void);
-extern void fn_80106D3C(void);
+extern void windowGetActiveID(void);
+extern void menuOpenCustom(void);
+extern void winMsgOpen(void);
 extern void fn_8001E074(void);
-extern void fn_801069FC(s32);
-extern void fn_80102510(void);
+extern void winMsgClose(s32);
+extern void menuClose(void);
 extern void menuCloseSync(void);
 extern void menuSubOpenYesNo(void);
 extern void pcboxSetPokemonBoxName(void);
@@ -2616,14 +2616,14 @@ s32 inputName__FPUsPUsiii(u16 *existing_name, u8 *name_buf_in, void *arg2, void 
     /* --- block-scope extern declarations (TU convention) --- */
     extern u8  *GScharCpy(u8 *dst, u8 *src);        /* GS string copy                  */
     extern void dbgMenuSetEnable(s32 mode);                 /* set VSync mode (0=off, 1=on)    */
-    extern u32  fn_801046B8(void);                     /* get current scene handle         */
-    extern void fn_801026A4(s32 sceneId, u32 handle, s32 a, s32 b, s32 c, s32 d, ...); /* open GS scene with descriptor */
+    extern u32  windowGetActiveID(void);                     /* get current scene handle         */
+    extern void menuOpenCustom(s32 sceneId, u32 handle, s32 a, s32 b, s32 c, s32 d, ...); /* open GS scene with descriptor */
     extern void fn_80166A28(u32 arg);                  /* audio/effect trigger             */
     extern void fn_80132A38(s32 effect, void *param);  /* UI effect dispatcher             */
-    extern void fn_80106D3C(s32 slot, s32 msgId, s32 p3, s32 p4); /* open dialog message */
+    extern void winMsgOpen(s32 slot, s32 msgId, s32 p3, s32 p4); /* open dialog message */
     extern s8 menuSubOpenYesNo(s32 max, s32 a, s32 b, s32 initial); /* blocking yes/no picker */
-    extern void fn_801069FC(s32 slot);                 /* close dialog slot               */
-    extern void fn_80102510(s32 sceneId);              /* close GS scene                  */
+    extern void winMsgClose(s32 slot);                 /* close dialog slot               */
+    extern void menuClose(s32 sceneId);              /* close GS scene                  */
     extern void menuCloseSync(s32 sceneId, s32 flag);  /* sync-close menu                 */
 
     /* lbl_* globals accessed in this function */
@@ -2702,7 +2702,7 @@ s32 inputName__FPUsPUsiii(u16 *existing_name, u8 *name_buf_in, void *arg2, void 
         /* Open the GS name-input scene (scene ID 0x6e).
          * r9 = name_buf (sp+8) is the 7th integer arg; crxor clears
          * cr1.eq so no float args are signalled.                         */
-        fn_801026A4(0x6e, fn_801046B8(),
+        menuOpenCustom(0x6e, windowGetActiveID(),
                     0, 0, 1, 1,
                     name_buf);      /* r9 = 7th arg = working name buffer */
 
@@ -2767,9 +2767,9 @@ s32 inputName__FPUsPUsiii(u16 *existing_name, u8 *name_buf_in, void *arg2, void 
          * ------------------------------------------------------------- */
         fn_80166A28(0x440);
         fn_80132A38(0x4d, name_to_use);
-        fn_80106D3C(2, 0x2ef6, 1, 0);
+        winMsgOpen(2, 0x2ef6, 1, 0);
         yn_result = menuSubOpenYesNo(0, -1, -1, 0);
-        fn_801069FC(1);
+        winMsgClose(1);
 
         /* ---------------------------------------------------------------
          * Interpret the yes/no answer.
@@ -2801,7 +2801,7 @@ s32 inputName__FPUsPUsiii(u16 *existing_name, u8 *name_buf_in, void *arg2, void 
      * Cleanup: restore VSync and close the name-input scene.
      * ----------------------------------------------------------------- */
     dbgMenuSetEnable(1);
-    fn_80102510(0x6e);
+    menuClose(0x6e);
     menuCloseSync(0x6e, 1);
 
     /* -----------------------------------------------------------------
@@ -2899,7 +2899,7 @@ void fn_80028534(void* r3) {
     u8* r31;
     u16* pad;
     r31 = (u8*)r3;
-    pad = fn_80105624();
+    pad = windowGetKeyInfo();
     if (!(pad[0] & 0x20)) {
         if (pad[2] & 0x10) {
             r31[0x98] = 1;
@@ -2923,13 +2923,13 @@ s32 menuNameEntrySelectCtrl(void* r3) {
     switch (state) {
     case 0:
         if ((s8)r31[2] == 0) {
-            fn_801080CC(*(void**)(r31 + 4), 0x56);
+            winSeqSetMenu(*(void**)(r31 + 4), 0x56);
             r31[2] = 1;
         }
         break;
     case 3:
         if ((s8)r31[2] == 0) {
-            fn_801080CC(*(void**)(r31 + 4), 0x5a);
+            winSeqSetMenu(*(void**)(r31 + 4), 0x5a);
             r31[2] = 1;
         }
         break;
@@ -2939,7 +2939,7 @@ s32 menuNameEntrySelectCtrl(void* r3) {
 #endif
 
 /* fn_80028620 - 0x80028620 | size: 0x108 */
-extern void* fn_80109934(void*);
+extern void* menuModelRender(void*);
 extern void fn_800D888C(s32);
 extern void fn_800D88DC(s32);
 extern void fn_800D7820(void*);
@@ -2970,7 +2970,7 @@ s32 fn_80028620(void* r3, u8* r4) {
     if (*(s32*)r3 == 2) {
         return 0;
     }
-    r31 = fn_80109934(lbl_803A2094);
+    r31 = menuModelRender(lbl_803A2094);
     if (r31 != (void*)0) {
         fn_800D888C(4);
         fn_800D88DC(3);
@@ -3009,7 +3009,7 @@ s32 fn_80028728(void* r3, u8* r4) {
     if (*(s32*)r3 != 2) {
         return 0;
     }
-    r31 = fn_80109934(lbl_803A2094);
+    r31 = menuModelRender(lbl_803A2094);
     if (r31 != (void*)0) {
         fn_800D888C(4);
         fn_800D88DC(3);
@@ -3032,7 +3032,7 @@ s32 fn_80028728(void* r3, u8* r4) {
 
 /* fn_80028830 - 0x80028830 | size: 0x118 */
 extern void* fn_8005D858(s32);
-extern void fn_80104160(s32, s32, s32, s32, u32, void*, s32, s32);
+extern void windowDrawSprite2(s32, s32, s32, s32, u32, void*, s32, s32);
 extern f64 lbl_8047B948;
 extern f32 lbl_8047B940;
 typedef struct WorldMapOverlay {
@@ -3084,7 +3084,7 @@ s32 fn_80028830(void* r3) {
             x0 = (s32)(lbl_8047B940 + (r31->x - sx * lbl_8047B940));
             y1 = (s32)(lbl_8047B940 + sy);
             y0 = (s32)(lbl_8047B940 + (r31->y - sy * lbl_8047B940));
-            fn_80104160(x0, y0, x1, y1, r31->color | r31->alpha, r27, 0x98, 0);
+            windowDrawSprite2(x0, y0, x1, y1, r31->color | r31->alpha, r27, 0x98, 0);
         }
         r31++;
         r30++;
@@ -3273,7 +3273,7 @@ extern void peopleInfoBiosGetPtr(void);
 extern void fn_8018F4C8(void);
 extern void menuModelSetMotion(void);
 extern void fn_80109C88(void);
-extern void fn_80109B90(void);
+extern void menuModelCheck(void);
 extern void fadeSet(void);
 extern void fadeCheck(void);
 extern void fn_8010A420(void);
@@ -3339,18 +3339,18 @@ void fn_80028FBC(void) {
     extern void fn_8018F4C8(s32 a, s32* outA, s32* outB);
     extern void menuModelSetMotion(void* handle, s32 motion);
     extern void fn_80109C88(void* handle, u32 v);
-    extern void fn_80109B90(void* handle, s32 v);
+    extern void menuModelCheck(void* handle, s32 v);
     extern void fn_8010A420(void* handle);
     extern void fadeSet(s32 mode, f32 v);
     extern void fadeCheck(s32 v);
-    extern u32  fn_801046B8(void);                         /* returns context handle    */
-    extern s32  fn_801026A4(s32 id, u32 ctx, s32 a, s32 b, s32 c, s32 d, void* arg);
+    extern u32  windowGetActiveID(void);                         /* returns context handle    */
+    extern s32  menuOpenCustom(s32 id, u32 ctx, s32 a, s32 b, s32 c, s32 d, void* arg);
     extern u32  fn_80166A28(s32 size);
     extern void fn_80132A38(s32 id, u32 name);
-    extern void fn_80106D3C(s32 a, s32 b, s32 c, s32 d);
+    extern void winMsgOpen(s32 a, s32 b, s32 c, s32 d);
     extern s32  menuSubOpenYesNo(s32 a, s32 b, s32 c, s32 d);
-    extern void fn_801069FC(s32 a);
-    extern void fn_80102510(s32 id);
+    extern void winMsgClose(s32 a);
+    extern void menuClose(s32 id);
     extern void menuCloseSync(s32 id, s32 a);
     extern s32  inputName__FPUsPUsiii(u8* ctx, void* nameBuf, s32 mode, s32 subIndex, s32 last);
     extern void heroSetStatus(s32 a, s32 b, u8* ctx);
@@ -3463,12 +3463,12 @@ void fn_80028FBC(void) {
     default:
         break;
     }
-    fn_80109B90(lbl_803A2094, 1);
+    menuModelCheck(lbl_803A2094, 1);
 
     /* --- Open the primary menu window (id 0x6f) seeded with the context. --- */
     nameBuf[6] = *(s32*)(ctx + 0x18);   /* sp+0x18 */
     nameBuf[7] = *(s32*)(ctx + 0x1c);   /* sp+0x1c */
-    fn_801026A4(0x6f, fn_801046B8(), 0, 0, 1, 1, &nameBuf[6]);
+    menuOpenCustom(0x6f, windowGetActiveID(), 0, 0, 1, 1, &nameBuf[6]);
 
     /* On async/render frames, prime the transition. */
     ctx = lbl_803A2068;
@@ -3497,7 +3497,7 @@ void fn_80028FBC(void) {
                         s32 pick;
                         nameBuf[4] = (s32)listPtr; /* sp+0x10 */
                         nameBuf[5] = count;        /* sp+0x14 */
-                        pick = fn_801026A4(0x70, fn_801046B8(), 0, 0, 1, 1, &nameBuf[4]);
+                        pick = menuOpenCustom(0x70, windowGetActiveID(), 0, 0, 1, 1, &nameBuf[4]);
                         if (pick == 0) {
                             fn_80166A28(0x24);
                             accepted = 0;
@@ -3511,15 +3511,15 @@ void fn_80028FBC(void) {
                             s32 ans;
                             fn_80166A28(0x440);
                             fn_80132A38(0x4d, choiceName);
-                            fn_80106D3C(2, 0x2ef6, 1, 0);
+                            winMsgOpen(2, 0x2ef6, 1, 0);
                             ans = (s32)(s8)menuSubOpenYesNo(0, -1, -1, 0);
-                            fn_801069FC(1);
+                            winMsgClose(1);
                             if (ans == 1 || ans == -1) {
                                 /* yes/cancel sentinel -> not accepted, retry */
                                 continue;
                             }
                             /* accepted */
-                            fn_80102510(0x70);
+                            menuClose(0x70);
                             menuCloseSync(0x70, 1);
                             accepted = 1;
                             GScharCpy(lbl_803A2068, (u8*)choiceName);
@@ -3528,7 +3528,7 @@ void fn_80028FBC(void) {
                         }
                     }
                     /* not accepted: close the sub-window and continue/abort. */
-                    fn_80102510(0x70);
+                    menuClose(0x70);
                     menuCloseSync(0x70, 1);
                 after_inner:;
                     if (done != 0) {
@@ -3552,7 +3552,7 @@ void fn_80028FBC(void) {
     fadeSet(3, lbl_8047B940);
     fadeCheck(1);
     fn_8010A420(lbl_803A2094);
-    fn_80102510(0x6f);
+    menuClose(0x6f);
     menuCloseSync(0x6f, 1);
 
     mode = *(s32*)(ctx + 0x18);
@@ -4127,7 +4127,7 @@ u32 fn_8002A0B8(u8* r3, s32 r4, s32 r5, s32 r6, ...) {
 #endif
 
 /* fn_8002A1C4 - 0x8002A1C4 | size: 0x108 | WALL 97%: slwi scheduling */
-extern void fn_80106ADC(s32, u32, s32, s32, u8);
+extern void winMsgOpenWithSE(s32, u32, s32, s32, u8);
 extern u32 lbl_80478E54;
 extern u32 lbl_80478E4C;
 #if 0
@@ -4168,8 +4168,8 @@ void fn_8002A1C4(u8* r3, s32 r4, s32 r5, ...) {
         }
         r5 = *(s32*)__va_arg(list, 1);
     }
-    fn_80106ADC(2, *(u32*)(r28 + r31), 1, 0, r27);
-    fn_801069FC(1);
+    winMsgOpenWithSE(2, *(u32*)(r28 + r31), 1, 0, r27);
+    winMsgClose(1);
 }
 #endif
 
@@ -4215,8 +4215,8 @@ void fn_8002A2CC(u8* r3, s32 r4, s32 r5, ...) {
         }
         r5 = *(s32*)__va_arg(list, 1);
     }
-    fn_80106ADC(2, *(u32*)(r28 + r31), 1, 0, r27);
-    fn_801069FC(1);
+    winMsgOpenWithSE(2, *(u32*)(r28 + r31), 1, 0, r27);
+    winMsgClose(1);
 }
 #endif
 
@@ -4359,13 +4359,13 @@ s32 fn_8002AA68(void* r3) {
     switch (state) {
     case 0:
         if ((s8)r31[2] == 0) {
-            fn_801080CC((void*)0x61, 0x7e);
+            winSeqSetMenu((void*)0x61, 0x7e);
             r31[2] = 1;
         }
         break;
     case 3:
         if ((s8)r31[2] == 0) {
-            fn_801080CC((void*)0x61, 0x82);
+            winSeqSetMenu((void*)0x61, 0x82);
             r31[2] = 1;
         }
         break;
@@ -5101,12 +5101,12 @@ asm void fn_8002B594(void) {
  * computed from the two s16 fields (at +0x54/+0x56) in the data packet.
  * For each segment a normalised fractional parameter f31 is computed and
  * segment-specific x/y screen positions are derived (some use cos/sin arcs).
- * Finally fn_80104160 is called to emit the actual sprite draw call.
+ * Finally windowDrawSprite2 is called to emit the actual sprite draw call.
  *
  * Parameters (CW EABI):
- *   ctx        r3  – sprite/render context pointer passed through to fn_80104160
+ *   ctx        r3  – sprite/render context pointer passed through to windowDrawSprite2
  *   data       r4  – sprite data packet; s16 at +0x56 = vert coord, s16 at +0x54 = horiz coord
- *   sprite_id  r5  – sprite index; lower 16 bits passed to fn_80104160
+ *   sprite_id  r5  – sprite index; lower 16 bits passed to windowDrawSprite2
  *   color_byte r6  – low 8 bits = alpha/colour value; OR-merged with 0xFFFFFF00 to form r7
  *   pos        f1  – continuous position parameter along the curve
  *
@@ -5117,7 +5117,7 @@ void fn_8002B594(void *ctx, u8 *data, u32 sprite_id, u32 color_byte, f32 pos)
 {
     extern f32 cos(f32);
     extern f32 sin(f32);
-    extern void fn_80104160(s32, s32, s32, s32, s32, void *, u32, s32);
+    extern void windowDrawSprite2(s32, s32, s32, s32, s32, void *, u32, s32);
 
     /* sdata2 / r2-relative float constants */
     extern f32 lbl_8047B980;   /* threshold[0]: curve start */
@@ -5239,9 +5239,9 @@ seg_found:;
 
     /* ----------------------------------------------------------------
      * Segment-specific x/y screen position computation.
-     * r30 → final x argument, r4_out → final y argument to fn_80104160. */
-    x_out = 0;  /* r30 in asm; passed as fn_80104160 arg0 (r3 at call site) */
-    y_out = 0;  /* r4  in asm; passed as fn_80104160 arg1 (r4 at call site) */
+     * r30 → final x argument, r4_out → final y argument to windowDrawSprite2. */
+    x_out = 0;  /* r30 in asm; passed as windowDrawSprite2 arg0 (r3 at call site) */
+    y_out = 0;  /* r4  in asm; passed as windowDrawSprite2 arg1 (r4 at call site) */
 
     if (seg == 0) {
         /* segment 0: linear vertical ramp */
@@ -5287,7 +5287,7 @@ seg_found:;
      *   r7 = (u8)color_byte | 0xFFFFFF00,
      *   r8 = ctx (r27), r9 = (u16)sprite_id (r28), r10 = 0 */
     color_arg = (s32)((color_byte & 0xFF) | 0xFFFFFF00u);
-    fn_80104160(x_out, y_out, 2, 2, color_arg, ctx, (u32)(u16)sprite_id, 0);
+    windowDrawSprite2(x_out, y_out, 2, 2, color_arg, ctx, (u32)(u16)sprite_id, 0);
 }
 #endif
 
@@ -5525,7 +5525,7 @@ u32 fn_8002BE08(u8* arg0) {
     s32 limit;
 
     ctx = *(u8**)(arg0 + 0x60);
-    state = fn_80105624();
+    state = windowGetKeyInfo();
     if (lbl_8047B980 != *(f32*)(*(u32*)(ctx + 0xc))) {
         return 0;
     }
@@ -5602,7 +5602,7 @@ s32 fn_8002C014(void* r3) {
     u16 r3val;
     r31 = (u8*)r3;
     r30 = (u8*)*(void**)((u8*)r3 + 0x60);
-    pad = fn_80105624();
+    pad = windowGetKeyInfo();
     if (pad[2] & 0x10) {
         s32 a = (s8)r31[0x94];
         s32 b = (s8)r31[0x95];
@@ -5651,7 +5651,7 @@ asm void fn_8002C0E4(void) {
  */
 s32 fn_8002C0E4(u8 *self)
 {
-    extern void fn_801080CC(s32 param, u32 key);
+    extern void winSeqSetMenu(s32 param, u32 key);
 
     /* lbl_ float constants declared block-scope per TU convention */
     extern f32 lbl_8047B980;   /* 0.0f - zero reference                     */
@@ -5686,7 +5686,7 @@ phase0:
     if ((s8)self[0x2] != 0) {
         return 0;
     }
-    fn_801080CC(0x60, 0x76);
+    winSeqSetMenu(0x60, 0x76);
 
     /* Zero all animated fields */
     *(f32 *)(*(u32 *)(ctx + 0x0C)) = lbl_8047B980;   /* pan offset = 0 */
@@ -5766,14 +5766,14 @@ phase3:
     if ((s8)self[0x2] != 0) {
         return 0;
     }
-    fn_801080CC(0x60, 0x7a);
+    winSeqSetMenu(0x60, 0x7a);
     self[0x2] = 1;
     return 0;
 }
 #endif
 
 /* fn_8002C284 - 0x8002C284 | size: 0x184 */
-extern void fn_80102568(void);
+extern void menuCloseCustom(void);
 extern u32 lbl_804788A8;
 extern u16 lbl_8047A3F8;
 extern u32 lbl_80478E54;
@@ -5798,9 +5798,9 @@ asm void fn_8002C284(void) {
 void fn_8002C284(u32 loc_idx, u32 mode)
 {
     extern void   fn_8002A1C4(u8* r3, s32 r4, s32 r5, ...); /* GSmap_FormatText2 */
-    extern void*  fn_801046B8(void);                          /* get current scene context */
-    extern void   fn_801026A4(void* p, u32 r4, s32 r5, s32 r6, void* r7, s32 r8, ...); /* scene event dispatch */
-    extern void   fn_80102568(u32 slot, u32 p1, u32 p2);     /* scene event release */
+    extern void*  windowGetActiveID(void);                          /* get current scene context */
+    extern void   menuOpenCustom(void* p, u32 r4, s32 r5, s32 r6, void* r7, s32 r8, ...); /* scene event dispatch */
+    extern void   menuCloseCustom(u32 slot, u32 p1, u32 p2);     /* scene event release */
 
     /* lbl_802E4F68: array of 5 entries at stride 8: { u32 key; s16 val; u16 pad; } */
     extern u8     lbl_802E4F68[];
@@ -5826,7 +5826,7 @@ void fn_8002C284(u32 loc_idx, u32 mode)
     u16  zero_count;
     void *ctx;
 
-    /* Dialog params struct built on the (conceptual) stack, passed as vararg to fn_801026A4 */
+    /* Dialog params struct built on the (conceptual) stack, passed as vararg to menuOpenCustom */
     struct {
         u16  *p_a3f8;     /* +0x00 */
         u16  *u16_base_p; /* +0x04 */
@@ -5895,11 +5895,11 @@ void fn_8002C284(u32 loc_idx, u32 mode)
     sp_data.flag1      = 1;
 
     /* Open scene dialog 0x60 with the parameter block */
-    ctx = fn_801046B8();
-    fn_801026A4((void*)0x60, (u32)ctx, 0, 0, (void*)1, 1, &sp_data);
+    ctx = windowGetActiveID();
+    menuOpenCustom((void*)0x60, (u32)ctx, 0, 0, (void*)1, 1, &sp_data);
 
     /* Release / wait for scene dialog 0x60 */
-    fn_80102568(0x60, 0, 1);
+    menuCloseCustom(0x60, 0, 1);
 }
 #endif
 
@@ -5962,14 +5962,14 @@ void fn_8002C408(s32 mapIdx, u32 mode)
     extern void  fn_80029EF4(void* a, s32 b, s32 c, u8 d, void* e); /* commit purchase */
     extern void  fn_8002A1C4(u8* idx, s32 msgId, s32 term, ...);    /* show message line */
     extern u32   fn_80029FAC(u8* idx, s32 a, s32 b, s32 c, ...);    /* format text -> string ptr */
-    extern void  fn_80106ADC(s32 a, u32 str, s32 c, s32 d, u8 alpha);/* display formatted string */
+    extern void  winMsgOpenWithSE(s32 a, u32 str, s32 c, s32 d, u8 alpha);/* display formatted string */
     extern u8    menuSubOpenYesNo(s32 a, s32 b, s32 c, s32 d);      /* yes/no prompt */
-    extern u32   fn_801046B8(void);                        /* current menu owner handle */
-    extern s32   fn_801026A4(void* p, u32 owner, s32 c, s32 d, void* e, s32 f, ...); /* open list menu */
-    extern void  fn_80102510(s32 slot);                    /* refresh menu slot */
+    extern u32   windowGetActiveID(void);                        /* current menu owner handle */
+    extern s32   menuOpenCustom(void* p, u32 owner, s32 c, s32 d, void* e, s32 f, ...); /* open list menu */
+    extern void  menuClose(s32 slot);                    /* refresh menu slot */
     extern s32   menuCloseSync(void* slot, u8 flag);       /* close menu (sync) */
-    extern void  fn_801069FC(s32 slot);                    /* close message box */
-    extern s32   fn_80102568(void* slot, u32 m, u8 wait);  /* close menu group */
+    extern void  winMsgClose(s32 slot);                    /* close message box */
+    extern s32   menuCloseCustom(void* slot, u32 m, u8 wait);  /* close menu group */
     extern void  fn_80166AB8(s32 soundId, s32 p2, s32 p3); /* play SE */
     extern s32   fn_801D0748(u32 a, u32 b, u32 c);         /* confirm-state query */
     extern void  fn_80093574(s32 a);                       /* inventory list ops */
@@ -6159,7 +6159,7 @@ L_628:
         desc1.f125      = 0;
     }
     {
-        s32 r = fn_801026A4((void*)0x60, fn_801046B8(), 0, 0, (void*)1, 1, &desc1);
+        s32 r = menuOpenCustom((void*)0x60, windowGetActiveID(), 0, 0, (void*)1, 1, &desc1);
         if (r == -1) r25 = 0;
         else         r25 = (s32)*(u16*)desc1.selOut;
     }
@@ -6204,8 +6204,8 @@ L_628:
         qty.colB      = colorEntry[2];
         qty.f2c       = 1;
         qtyTitle      = 1;
-        yn = fn_801026A4((void*)0x61, fn_801046B8(), 0, 1, &qtyTitle, (s32)&qty);
-        fn_80102510(0x61);
+        yn = menuOpenCustom((void*)0x61, windowGetActiveID(), 0, 1, &qtyTitle, (s32)&qty);
+        menuClose(0x61);
         menuCloseSync((void*)0x61, 1);
         if (yn == -1) chosenQty = -1;
         else          chosenQty = (s32)lbl_8047A3E0;
@@ -6219,9 +6219,9 @@ L_628:
     /* (5) total cost, confirm yes/no */
     totalCost = chosenQty * unitPrice;
     fn_80029FAC(&msgBuf[1], mapIdx, 5, 0x2d, species, 0x2f, totalCost, -1, chosenQty, 0x4b);
-    fn_80106ADC(2, lbl_8047A3E4, 1, 0, msgBuf[1]);
+    winMsgOpenWithSE(2, lbl_8047A3E4, 1, 0, msgBuf[1]);
     yn = (s8)menuSubOpenYesNo(0, -1, -1, 0);
-    fn_801069FC(1);
+    winMsgClose(1);
     if (yn == 1) goto L_628;     /* cancel */
     if (yn == -1) goto L_628;    /* aborted */
 
@@ -6260,9 +6260,9 @@ L_628:
     if ((mode & 0xff) == 4) {
         /* mode-4 "buy another?" loop */
         fn_80029FAC(&msgBuf[1], mapIdx, 7, -1);
-        fn_80106ADC(2, lbl_8047A3E4, 1, 0, msgBuf[1]);
+        winMsgOpenWithSE(2, lbl_8047A3E4, 1, 0, msgBuf[1]);
         yn = (s8)menuSubOpenYesNo(0, -1, -1, 0);
-        fn_801069FC(1);
+        winMsgClose(1);
         if (yn == -1) goto L_CB40;
         if (yn != 1)  goto L_628;
     }
@@ -6276,9 +6276,9 @@ L_CB40:
 
     if (buf.exitFlag == 0) {
         fn_80029FAC(&msgBuf[0], mapIdx, 0xd, -1);
-        fn_80106ADC(2, lbl_8047A3E4, 1, 0, msgBuf[0]);
+        winMsgOpenWithSE(2, lbl_8047A3E4, 1, 0, msgBuf[0]);
         yn = (s8)menuSubOpenYesNo(0, -1, -1, 0);
-        fn_801069FC(1);
+        winMsgClose(1);
         if (yn == 1 || yn == -1) {
             next = 0;
         } else {
@@ -6291,9 +6291,9 @@ L_CB40:
         goto loop_test;
     } else {
         fn_80029FAC(&msgBuf[0], mapIdx, 0xf, -1);
-        fn_80106ADC(2, lbl_8047A3E4, 1, 0, msgBuf[0]);
+        winMsgOpenWithSE(2, lbl_8047A3E4, 1, 0, msgBuf[0]);
         yn = (s8)menuSubOpenYesNo(0, -1, -1, 0);
-        fn_801069FC(1);
+        winMsgClose(1);
         if (yn == 1 || yn == -1) {
             next = 0;
             r25 = next;
@@ -6315,7 +6315,7 @@ L_CB40:
             u8* recBase = (u8*)lbl_80478E4C +
                           (u32)(*(u8*)((u8*)lbl_80478E54 + (u32)idxX4)) * 0x4c;
             itemType = recBase[0];
-            fn_80106ADC(2, 0x3d83, 0, 0, itemType);
+            winMsgOpenWithSE(2, 0x3d83, 0, 0, itemType);
 
             memset(&inv, 0, 0xd8);
             inv.a = buf.credit0;
@@ -6353,12 +6353,12 @@ L_CB40:
             fn_80093574(1);
             if (fn_80093610(1) == 0xc) {
                 fn_80093698(1);
-                fn_80106ADC(2, 0x3d84, 1, 0, itemType);
-                fn_801069FC(1);
+                winMsgOpenWithSE(2, 0x3d84, 1, 0, itemType);
+                winMsgClose(1);
             } else {
                 fn_80093698(1);
-                fn_80106ADC(2, 0x3d85, 1, 0, itemType);
-                fn_801069FC(1);
+                winMsgOpenWithSE(2, 0x3d85, 1, 0, itemType);
+                winMsgClose(1);
             }
             fn_8002A1C4((u8*)mapIdx, 0xe, -1);
         }
@@ -6372,7 +6372,7 @@ loop_test:
     }
 
     /* selection made -> close menu group and return */
-    fn_80102568((void*)0x60, 0, 1);
+    menuCloseCustom((void*)0x60, 0, 1);
 
 done:
     return;
@@ -6403,7 +6403,7 @@ asm void fn_8002CE6C(void) {
  *  2. If a pending key-remap flag is set, refresh the 5 dialog-key
  *     entries from the lbl_802EF0A8 lookup table.
  *  3. Count available items, build a menu descriptor on the stack,
- *     call fn_801046B8 + fn_801026A4 to show the selection dialog.
+ *     call windowGetActiveID + menuOpenCustom to show the selection dialog.
  *  4. On cancel (-1) → post "cancel" message and return.
  *  5. On selection:
  *       - look up species data (itemDataBiosGetPtr) and get trade count (itemDataBiosGetPrice).
@@ -6414,13 +6414,13 @@ asm void fn_8002CE6C(void) {
  *  6. Close display engine and return.
  */
 void fn_8002CE6C(u8* obj, u8 slot) {
-    extern u32  fn_80102568(u32 a, u32 b, u32 c);    /* display engine open/close */
+    extern u32  menuCloseCustom(u32 a, u32 b, u32 c);    /* display engine open/close */
     extern void fn_8002A2CC(u8* obj, s32 msgId, s32 arg2, ...); /* post format message */
     extern void _threadSwitch(void);                     /* GSthread yield */
     extern void fn_800D3088(void);                     /* GSgfx tick / frame advance */
     extern u32  heroGetStatus(u8* ptr, u32 sel, u32 idx); /* interaction getter */
-    extern u32  fn_801046B8(void);                    /* get display context handle */
-    extern s32 fn_801026A4(u32 sceneId, u32 a, u32 b, u32 c, u32 d, u32 e, ...); /* show menu dialog */
+    extern u32  windowGetActiveID(void);                    /* get display context handle */
+    extern s32 menuOpenCustom(u32 sceneId, u32 a, u32 b, u32 c, u32 d, u32 e, ...); /* show menu dialog */
     extern void itemDataBiosGetPtr(u32 speciesId);            /* load species data */
     extern u16  itemDataBiosGetPrice(void);                    /* get trade/field count */
     extern s32  heroItemCheckAddItemDataId(u8* ptr, u32 itemId);     /* check trade precondition */
@@ -6478,7 +6478,7 @@ void fn_8002CE6C(u8* obj, u8 slot) {
 
 _loop_top:
     /* 1. Open display engine, get nearest interaction partner, start message */
-    fn_80102568(0x60, 0, 1);
+    menuCloseCustom(0x60, 0, 1);
     {
         u32 nearest = heroGetStatus(NULL, 0xc, 0);
         fn_8002A2CC(obj, 0, 0x4b, (s32)nearest, -1);
@@ -6587,8 +6587,8 @@ _loop_top:
         desc.npc_slot = slot;
         desc._pad     = 0;
 
-        disp_handle = fn_801046B8();
-        menu_result = (u32)fn_801026A4(0x60, disp_handle, 0, 0, 1, 1, &desc);
+        disp_handle = windowGetActiveID();
+        menu_result = (u32)menuOpenCustom(0x60, disp_handle, 0, 0, 1, 1, &desc);
 
         /* 5a. Cancelled */
         if ((s32)menu_result == -1) {
@@ -6642,7 +6642,7 @@ _loop_top:
 
 _done:
     /* 10. Close display engine */
-    fn_80102568(0x60, 0, 1);
+    menuCloseCustom(0x60, 0, 1);
 }
 #endif
 
@@ -6700,13 +6700,13 @@ void fn_8002D154(s32 mapIndex, u8 colorIndex)
     extern u8 lbl_802EF0A8[];  /* canonical; per-site reinterpret cast */
 
     /* callees */
-    extern u32  fn_801046B8(void);                                  /* menu ctx handle */
-    extern s32 fn_801026A4(s32 a, u32 b, void* c, s32 d, s32 e, s32 f, void* desc); /* open list menu */
-    extern void fn_80102510(s32 menuId);                           /* menu post-step  */
+    extern u32  windowGetActiveID(void);                                  /* menu ctx handle */
+    extern s32 menuOpenCustom(s32 a, u32 b, void* c, s32 d, s32 e, s32 f, void* desc); /* open list menu */
+    extern void menuClose(s32 menuId);                           /* menu post-step  */
     extern void menuCloseSync(s32 menuId, s32 flag);
     extern s8 menuSubOpenYesNo(s32 a, s32 b, s32 c, s32 d);
-    extern void fn_801069FC(s32 a);
-    extern void fn_80102568(s32 a, s32 b, s32 c);                  /* close/release   */
+    extern void winMsgClose(s32 a);
+    extern void menuCloseCustom(s32 a, s32 b, s32 c);                  /* close/release   */
     extern u32  itemDataBiosGetPtr(u32 itemId);                           /* select item     */
     extern u32  itemDataBiosGetKind(void);                                 /* item category   */
     extern u32  itemDataBiosGetPrice(void);                                 /* item price/value*/
@@ -6716,14 +6716,14 @@ void fn_8002D154(s32 mapIndex, u8 colorIndex)
     extern void heroDecPokedoru(s32 a, s32 amount);                    /* spend money     */
     extern void heroItemAddItemDataId(s32 a, s32 item, u16 qty, s32 d);      /* add item        */
     extern void fn_80166AB8(s32 sfx, s32 b, s32 c);               /* play sound      */
-    extern void fn_80106ADC(s32 a, u32 b, s32 c, s32 d, u8 e);
+    extern void winMsgOpenWithSE(s32 a, u32 b, s32 c, s32 d, u8 e);
     extern u32  fn_8002A0B8(u8* buf, s32 idx, s32 a, s32 b, ...);  /* format text     */
     extern void fn_8002A2CC(u8* idx, s32 a, s32 b, ...);          /* format/print txt*/
 
     /* RGB tint for this color index */
     u8*  rgb = &lbl_80266E70[(colorIndex & 0xff) * 3];
 
-    /* item-list menu descriptor (consumed by fn_801026A4 via the pointer block) */
+    /* item-list menu descriptor (consumed by menuOpenCustom via the pointer block) */
     struct {
         u16* result;        /* +0x00 -> lbl_8047A3F8        */
         u16* list;          /* +0x04 destination/shop list  */
@@ -6796,8 +6796,8 @@ void fn_8002D154(s32 mapIndex, u8 colorIndex)
             itemDesc.flag   = 0;
         }
 
-        ctx     = fn_801046B8();
-        menuRet = fn_801026A4(0x60, ctx, (void*)0, 0, 1, 1, &itemDesc);
+        ctx     = windowGetActiveID();
+        menuRet = menuOpenCustom(0x60, ctx, (void*)0, 0, 1, 1, &itemDesc);
         if (menuRet == -1) {
             selectedItem = 0;
         } else {
@@ -6806,7 +6806,7 @@ void fn_8002D154(s32 mapIndex, u8 colorIndex)
 
         /* (3) empty selection -> back out and close the menu */
         if ((selectedItem & 0xffff) == 0) {
-            fn_80102568(0x60, 0, 1);
+            menuCloseCustom(0x60, 0, 1);
             return;
         }
 
@@ -6861,9 +6861,9 @@ void fn_8002D154(s32 mapIndex, u8 colorIndex)
                 qtyHeader         = 1;
                 (*(s32*)&lbl_8047A3E0)      = 1;
 
-                ctx     = fn_801046B8();
-                menuRet = fn_801026A4(0x61, ctx, &qtyHeader, 0, 1, 1, &qtyDesc);
-                fn_80102510(0x61);
+                ctx     = windowGetActiveID();
+                menuRet = menuOpenCustom(0x61, ctx, &qtyHeader, 0, 1, 1, &qtyDesc);
+                menuClose(0x61);
                 menuCloseSync(0x61, 1);
                 if (menuRet == -1) {
                     chosenQty = -1;
@@ -6881,9 +6881,9 @@ void fn_8002D154(s32 mapIndex, u8 colorIndex)
             /* (5) build the confirmation string and prompt Yes/No */
             menuRet = fn_8002A0B8(fmtBuf, mapIndex, 3, 0x2d,
                                   itemId16, 0x2f, chosenQty, 0x4b, totalCost, -1);
-            fn_80106ADC(2, (u32)menuRet, 1, 0, fmtBuf[0]);
+            winMsgOpenWithSE(2, (u32)menuRet, 1, 0, fmtBuf[0]);
             yesNo = (s8)menuSubOpenYesNo(0, -1, -1, 0);
-            fn_801069FC(1);
+            winMsgClose(1);
             if (yesNo == 1 || yesNo == -1) {
                 continue;
             }
@@ -6939,9 +6939,9 @@ asm void fn_8002D5D4(void) {
  * Callee conventions used here:
  *   fn_8002A0B8 / fn_80029FAC : vararg text formatters
  *       (u8* outBuf, s32 locIdx, s32 p2, s32 first_va, ..., -1 terminator)
- *   fn_80106ADC               : (s32 kind, u32 tableVal, s32 p3, s32 p4, u8 fmtId)
+ *   winMsgOpenWithSE               : (s32 kind, u32 tableVal, s32 p3, s32 p4, u8 fmtId)
  *   menuOpen               : (s32 menuId, s32 flag) -> s32 result
- *   fn_80102510               : (s32 menuId)
+ *   menuClose               : (s32 menuId)
  *   menuCloseSync             : (s32 menuId, s32 flag)
  *   _toolentryAlloc__FUl / GSmemAllocRaw : (u32 size) -> u16 handle
  *   fn_800E27B0 / GSmemGetPtr   : (u16 handle) -> void*
@@ -6954,10 +6954,10 @@ void fn_8002D5D4(void)
     extern u32  lbl_8047A3FC;          /* current location index */
     extern u32  lbl_80478E54;          /* pointer to location map array */
     extern u32  lbl_8047A3DC;          /* scratch pointer for GSmemGetPtr result */
-    extern void fn_801069FC(s32);
-    extern void fn_80106ADC(s32, u32, s32, s32, u8);
+    extern void winMsgClose(s32);
+    extern void winMsgOpenWithSE(s32, u32, s32, s32, u8);
     extern s32  menuOpen(s32, s32);
-    extern void fn_80102510(s32);
+    extern void menuClose(s32);
     extern s32  menuCloseSync(s32, s32);
     extern void fn_80018F54(u32, u32, u32);
     extern u16  _toolentryAlloc__FUl(u32);       /* GSmemAllocRaw */
@@ -6998,12 +6998,12 @@ void fn_8002D5D4(void)
             u32 nearLoc = heroGetStatus(NULL, 0xc, 0);
             /* format text: first_va = 0x4b, then nearLoc, then -1 */
             fmtTableVal = fn_8002A0B8(&fmtId, locIdx, 0, 0x4b, (s32)nearLoc, -1);
-            fn_80106ADC(2, fmtTableVal, 1, 0, fmtId);
+            winMsgOpenWithSE(2, fmtTableVal, 1, 0, fmtId);
         }
         /* menu 0x62 loop */
         for (;;) {
             menuResult = menuOpen(0x62, 1);
-            fn_80102510(0x62);
+            menuClose(0x62);
             menuCloseSync(0x62, 1);
 
             if (menuResult == -1 || menuResult == 2) {
@@ -7021,7 +7021,7 @@ void fn_8002D5D4(void)
             }
 
             /* choice 0 or 1: process, then re-show dialog */
-            fn_801069FC(1);
+            winMsgClose(1);
             if (choice == 0) {
                 fn_8002D154(locIdx, npcState);
             } else if (choice == 1) {
@@ -7031,7 +7031,7 @@ void fn_8002D5D4(void)
 
             /* reformat and re-open dialog */
             fmtTableVal = fn_8002A0B8(&fmtId, locIdx, 1, -1);
-            fn_80106ADC(2, fmtTableVal, 1, 0, fmtId);
+            winMsgOpenWithSE(2, fmtTableVal, 1, 0, fmtId);
         }
         /* unreachable */
     }
@@ -7044,7 +7044,7 @@ void fn_8002D5D4(void)
 
         /* initial format and open */
         fmtTableVal = fn_80029FAC(&fmtId, locIdx, 0, -1);
-        fn_80106ADC(2, fmtTableVal, 1, 0, fmtId);
+        winMsgOpenWithSE(2, fmtTableVal, 1, 0, fmtId);
 
         /* menu 0x83 loop */
         for (;;) {
@@ -7053,11 +7053,11 @@ void fn_8002D5D4(void)
 
             /* only re-format on entry and after a "no-op" choice */
             fmtTableVal = fn_80029FAC(&fmtId, locIdx, 1, -1);
-            fn_80106ADC(2, fmtTableVal, 1, 0, fmtId);
+            winMsgOpenWithSE(2, fmtTableVal, 1, 0, fmtId);
 
         _after_reformat:
             menuResult = menuOpen(0x83, 1);
-            fn_80102510(0x83);
+            menuClose(0x83);
             menuCloseSync(0x83, 1);
 
             /* normalise menuResult into 0..3 */
@@ -7076,7 +7076,7 @@ void fn_8002D5D4(void)
             if (menuResult == 3)
                 break; /* exit loop */
 
-            fn_801069FC(1);
+            winMsgClose(1);
 
             if (menuResult == 0) {
                 fn_8002C408(locIdx, npcState);
@@ -7097,7 +7097,7 @@ void fn_8002D5D4(void)
 
         /* L_8002D8A8: decide how to close */
         if (npcState == 2 || npcState == 3) {
-            fn_801069FC(1);
+            winMsgClose(1);
         } else {
             fn_8002A1C4((u8*)&locIdx, 2, -1);
         }
@@ -7146,10 +7146,10 @@ void fn_8002D91C(u32 arg0)
     extern u32  lbl_8047A400;  /* word at lbl_8047A3FC+4, flag checked at tail */
 
     extern s32  menuOpen(u32 sceneId, u32 p1);  /* scene/menu query */
-    extern void fn_80102510(u32 sceneId);           /* scene unload     */
+    extern void menuClose(u32 sceneId);           /* scene unload     */
     extern void menuCloseSync(u32 sceneId, u32 p1); /* sync-close menu  */
-    extern void fn_801069FC(s32 p);                 /* yield / wait frame */
-    extern void fn_80106ADC(s32 a, u32 b, s32 c, s32 d, u8 e); /* text display helper */
+    extern void winMsgClose(s32 p);                 /* yield / wait frame */
+    extern void winMsgOpenWithSE(s32 a, u32 b, s32 c, s32 d, u8 e); /* text display helper */
 
     extern u32  heroGetStatus(u8 *ptr, u32 selector, u32 idx); /* interaction getter */
 
@@ -7206,14 +7206,14 @@ void fn_8002D91C(u32 arg0)
         {
             u32 text_entry = fn_8002A0B8(&text_buf1, (s32)arg0, 0, 0x4b,
                                          (s32)interact, (s32)-1);
-            fn_80106ADC(2, text_entry, 1, 0, text_buf1);
+            winMsgOpenWithSE(2, text_entry, 1, 0, text_buf1);
         }
 
         /* ---- menu-0x62 wait-loop ---- */
         loop_state = 0;  /* initialise loop exit flag */
         do {
             /* Wait one frame before re-querying */
-            fn_801069FC(1);
+            winMsgClose(1);
 
             /* Branch on previous normalised menu result */
             if (loop_state == 0) {
@@ -7230,12 +7230,12 @@ void fn_8002D91C(u32 arg0)
                 /* FUNCTIONAL-TODO: The va_arg terminator is -1 in r6; r7
                  * coming from heroGetStatus at entry is gone by this second
                  * call site -- the asm does NOT pass r7 here.             */
-                fn_80106ADC(2, text_entry, 1, 0, text_buf1);
+                winMsgOpenWithSE(2, text_entry, 1, 0, text_buf1);
             }
 
             /* Query menu 0x62, then unload/close it */
             menu_res = menuOpen(0x62, 1);
-            fn_80102510(0x62);
+            menuClose(0x62);
             menuCloseSync(0x62, 1);
 
             /* Normalise raw menu result -> loop_state in {0, 1, 2} */
@@ -7273,14 +7273,14 @@ void fn_8002D91C(u32 arg0)
         /* Format the initial "arrival at" text line */
         {
             u32 text_entry = fn_80029FAC(&text_buf0, (s32)arg0, 0, (s32)-1);
-            fn_80106ADC(2, text_entry, 1, 0, text_buf0);
+            winMsgOpenWithSE(2, text_entry, 1, 0, text_buf0);
         }
 
         /* ---- menu-0x83 wait-loop ---- */
         loop_state = 0;
         do {
             /* Wait one frame before re-querying */
-            fn_801069FC(1);
+            winMsgClose(1);
 
             /* Dispatch on the normalised menu result from the previous
              * iteration (first time through we skip straight to the menu
@@ -7308,13 +7308,13 @@ void fn_8002D91C(u32 arg0)
             /* Re-format the arrival text (update pass, field=1) */
             {
                 u32 text_entry = fn_80029FAC(&text_buf0, (s32)arg0, 1, (s32)-1);
-                fn_80106ADC(2, text_entry, 1, 0, text_buf0);
+                winMsgOpenWithSE(2, text_entry, 1, 0, text_buf0);
             }
 
         query_menu_83:
             /* Query menu 0x83, then unload/close it */
             menu_res = menuOpen(0x83, 1);
-            fn_80102510(0x83);
+            menuClose(0x83);
             menuCloseSync(0x83, 1);
 
             /* Normalise raw result -> 0/1/2/3 */
@@ -7334,7 +7334,7 @@ void fn_8002D91C(u32 arg0)
 
         /* Post-loop: close sub-dialogs based on type_byte */
         if (type_byte == 2 || type_byte == 3) {
-            fn_801069FC(1);
+            winMsgClose(1);
         } else {
             fn_8002A1C4((u8 *)(u32)arg0, 2, (s32)-1);
         }
@@ -7358,7 +7358,7 @@ void fn_8002D91C(u32 arg0)
 /* menuShopOpen - 0x8002DC6C | size: 0xb8 | WALL 71%: fsub/fdiv double vs fsubs/fdivs single + sda21 store */
 extern void mailMainReceiveTerminate(void);
 extern u32 fn_800D37CC(void);
-extern void fn_8010206C(f32);
+extern void menuCreateOffScreen(f32);
 extern void _flagSet(s32, s32);
 extern void menuReleaseOffScreen(f32);
 extern f64 lbl_8047B998;
@@ -7386,7 +7386,7 @@ void menuShopOpen(u32 flag)
 {
     extern void mailMainReceiveTerminate(void);
     extern u32  fn_800D37CC(void);
-    extern void fn_8010206C(f32);
+    extern void menuCreateOffScreen(f32);
     extern void _flagSet(s32, s32);
     extern void fn_800FF730(s32);
     extern void fn_8011288C(s32, u32);
@@ -7409,7 +7409,7 @@ void menuShopOpen(u32 flag)
         extern f32 lbl_8047B9CC;
         t = lbl_8047B9CC / t;
     }
-    fn_8010206C(t);
+    menuCreateOffScreen(t);
 
     /* store flag and mark slot active */
     lbl_8047A3FC = flag;
@@ -7477,8 +7477,8 @@ void fn_8002DD24(void *arg)
     extern void *heroGetStatus(u8 *ptr, u32 selector, u32 idx);
 
     /* Message/dialog trigger:
-       fn_80106D3C(s32 slot, s32 msgId, s32 p3, s32 p4)             */
-    extern void fn_80106D3C(s32 slot, s32 msgId, s32 p3, s32 p4);
+       winMsgOpen(s32 slot, s32 msgId, s32 p3, s32 p4)             */
+    extern void winMsgOpen(s32 slot, s32 msgId, s32 p3, s32 p4);
 
     /* GBA encounter / state checkers */
     extern s32  fn_80089E20(s32 mode, void *pkm, u32 slotB, u32 flags);
@@ -7498,7 +7498,7 @@ void fn_8002DD24(void *arg)
     /* Save-data helpers */
     extern void *savedataGetStatus(s32 side, s32 slotType); /* get party/save ptr */
     extern void  menuSubKeyWait(void);                    /* save commit flush  */
-    extern void  fn_801069FC(s32 slot);                /* save slot finalize */
+    extern void  winMsgClose(s32 slot);                /* save slot finalize */
     extern void  fn_8010A420(u8 *ptr);                 /* archive release    */
 
     /* Timer helper: _fadeEffectGetRandom__FUl(s32 frames) -> u32 countdown value */
@@ -7524,7 +7524,7 @@ void fn_8002DD24(void *arg)
     confirmed  = 0;
 
     /* Notify the message system that a new encounter dialog is starting */
-    fn_80106D3C(2, 0x44d7, 1, 1);
+    winMsgOpen(2, 0x44d7, 1, 1);
 
     /* Check whether the GBA encounter is already ready */
     if (fn_80089E20(2, pkm_b, lbl_8047A420, lbl_8047A40C) != 0) {
@@ -7599,9 +7599,9 @@ L_save_copy:
             src += 8;
         }
 
-        fn_80106D3C(2, 0x44d6, 1, 0);
+        winMsgOpen(2, 0x44d6, 1, 0);
         menuSubKeyWait();
-        fn_801069FC(1);
+        winMsgClose(1);
         fn_8010A420(save_base + 0xd18);
         fn_8010A420(save_base + 0xcd0);
         (*(u8*)&lbl_804788B0) = 0;
@@ -7617,9 +7617,9 @@ L_delay:
             _threadSwitch();
             timer--;
         }
-        fn_80106D3C(2, 0x44d5, 1, 0);
+        winMsgOpen(2, 0x44d5, 1, 0);
         menuSubKeyWait();
-        fn_801069FC(1);
+        winMsgClose(1);
         lbl_8047A42C = 0x13;
     }
 }
@@ -7692,8 +7692,8 @@ void fn_8002DF10(void)
     extern void fadeSet(f32 vol, s32 mode);
     /* fadeCheck - BGM enable  (s32 flag) */
     extern void fadeCheck(s32 flag);
-    /* fn_80102510 - menu show  (s32 id) */
-    extern void fn_80102510(s32 id);
+    /* menuClose - menu show  (s32 id) */
+    extern void menuClose(s32 id);
     /* fn_8010A420 - model marker hide  (u8* obj) */
     extern void fn_8010A420(u8 *obj);
     /* fn_801CB9D8 - scene trainer anim state  (u32 handle) */
@@ -7777,7 +7777,7 @@ void fn_8002DF10(void)
     fadeSet(lbl_8047B9D0, 3);
     fadeCheck(1);
 
-    fn_80102510(0xde);
+    menuClose(0xde);
 
     fn_8010A420(base + 0xd18);
     fn_8010A420(base + 0xcd0);
@@ -7903,7 +7903,7 @@ void fn_8002E26C(void)
     /* interaction/sound helpers */
     extern void pokemonInit(u8 *ctx);
     extern void pokemonBiosCopy(void *a, void *b);
-    extern void fn_80102510(s32 sound_id);
+    extern void menuClose(s32 sound_id);
     extern void fn_8010A420(void *widget);
     extern void GSmodelSetVisibility(u32 handle, s32 flag);
     extern void fadeSet(f32 duration, s32 mode);
@@ -7938,7 +7938,7 @@ void fn_8002E26C(void)
     pokemonBiosCopy(obj_a, base);
 
     /* --- Play worldmap entry sound, hide UI widgets --- */
-    fn_80102510(0xde);
+    menuClose(0xde);
     fn_8010A420(base + 0xd18);
     fn_8010A420(base + 0xcd0);
 
@@ -8047,17 +8047,17 @@ void fn_8002E460(void* mapCtx)
     extern void fn_80109C88(void* widget, void* item);          /* bind item to widget */
     extern void fn_8010A420(void* widget);                      /* destroy widget */
     extern void menuOpen(s32 menuId, s32 flag);              /* menu open */
-    extern void fn_80102510(s32 menuId);                        /* menu close */
+    extern void menuClose(s32 menuId);                        /* menu close */
     extern u8*  windowSearchID(s32 menuId);                        /* select menu object */
     extern u8*  windowSearchItemID(void* menuObj, s32 fieldId);        /* select field -> handle */
     extern void winSpriteSetDisp(void* fieldHandle, s32 value);     /* set field value */
     extern void fadeSet(f32 value, s32 mode);               /* camera anim init */
     extern void fadeCheck(s32 flag);                          /* camera anim start */
-    extern u8*  fn_80105624(void);                              /* current input/state base */
+    extern u8*  windowGetKeyInfo(void);                              /* current input/state base */
     extern s32  fn_80073A44(s32 mode, u16* outFlags);          /* poll input -> status, writes flags */
     extern u32  fn_8017B1AC(void);                              /* input-mode status query */
     extern void fn_80166AB8(s32 soundId, s32 p2, s32 p3);       /* play SE */
-    extern void fn_80106D3C(s32 a, s32 b, s32 c, s32 d);        /* dialog/sound event */
+    extern void winMsgOpen(s32 a, s32 b, s32 c, s32 d);        /* dialog/sound event */
     extern void _threadSwitch(void);                             /* vsync / scheduler yield */
     extern void* savedataGetStatus(s32 a, s32 sel);                  /* staged-record getter */
 
@@ -8067,7 +8067,7 @@ void fn_8002E460(void* mapCtx)
     s32 doneA;          /* r30: first selection committed */
     s32 doneB;          /* r29: second selection committed */
     u16 prevFlags;      /* r28: previous raw input-flag word */
-    u16 rawFlags;       /* r26: per-tick raw flags from fn_80105624 */
+    u16 rawFlags;       /* r26: per-tick raw flags from windowGetKeyInfo */
     u16 newPress;       /* r25: newly set bits (rawFlags & ~prevFlags) */
     u16 pollFlags;      /* sp+0x8: flag word written by fn_80073A44 */
     s32 status;
@@ -8113,13 +8113,13 @@ void fn_8002E460(void* mapCtx)
         }
 
         /* ---- loop body (L_8002E604) ---- */
-        rawFlags = *(u16*)(fn_80105624() + 0x4);
+        rawFlags = *(u16*)(windowGetKeyInfo() + 0x4);
 
         status = fn_80073A44(1, &pollFlags);
         if (status != 0) {
             /* hard cancel via input system */
-            fn_80106D3C(2, 0x4448, 1, 0);
-            fn_80102510(0xDB);
+            winMsgOpen(2, 0x4448, 1, 0);
+            menuClose(0xDB);
             fn_8010A420(state + 0xD18);
             fn_8010A420(state + 0xCD0);
             lbl_8047A42C = 0;
@@ -8219,10 +8219,10 @@ void fn_8002E460(void* mapCtx)
         lbl_8047A42C = 0xD;
         fadeSet(lbl_8047B9D0, 3);
         fadeCheck(1);
-        fn_80102510(0xDB);
+        menuClose(0xDB);
     } else {
         /* ---- abort path (L_8002E9A8) ---- */
-        fn_80102510(0xDB);
+        menuClose(0xDB);
         lbl_8047A428 = (u32)-1;
         lbl_8047A424 = (u32)-1;
         lbl_8047A420 = (u32)-1;
@@ -8275,7 +8275,7 @@ asm void fn_8002EA5C(void) {
  *      (identical shape, marker 0x44E8) and set state 7.
  *   3. If a member qualifies, commit the destination (lbl_8047A420 =
  *      lbl_8047A428), run the transition frame-wait, kick the field
- *      camera/fade (fadeSet/fadeCheck) and sound (fn_80102510), and
+ *      camera/fade (fadeSet/fadeCheck) and sound (menuClose), and
  *      advance state lbl_8047A42C = 0xC.
  *
  * The triple frame-wait loop is the engine's time-integration idiom:
@@ -8319,7 +8319,7 @@ void fn_8002EA5C(void)
     extern u32  pokemonGetStatus(u8* obj, u32 id, u32 selector, u32 d); /* property getter  */
     extern void fadeSet(f32 target, s32 mode);            /* camera/fade target   */
     extern void fadeCheck(s32 flag);                        /* camera/fade enable   */
-    extern void fn_80102510(u32 id);                          /* sound/window kick    */
+    extern void menuClose(u32 id);                          /* sound/window kick    */
 
     u8*  mapRef;
     u8*  window;
@@ -8450,7 +8450,7 @@ void fn_8002EA5C(void)
 
     fadeSet(lbl_8047B9D0, 3);
     fadeCheck(1);
-    fn_80102510(0xD9);
+    menuClose(0xD9);
     lbl_8047A42C = 0xC;
 }
 #endif
@@ -8460,7 +8460,7 @@ extern void menuSetEnablePort(void);
 extern void windowCheckCursor(void);
 extern void windowGetValue(void);
 extern void menuGetCursor(void);
-extern void fn_80102004(void);
+extern void menuGetLastError(void);
 extern u32 lbl_8047A428;
 extern f32 lbl_8047B9D4;
 extern f64 lbl_8047B9E0;
@@ -8506,14 +8506,14 @@ void fn_8002EE74(void)
     extern s32   fn_800D37CC(void);                             /* timer read A */
     extern u32   fn_800D3088(void);                             /* timer read B (tick) */
     extern void  menuSetEnablePort(s32 mode);
-    extern void  fn_801026A4(void* p, u32 r4, s32 r5, s32 r6, void* r7, s32 r8, ...);
-    extern u32   fn_801046B8(void);
+    extern void  menuOpenCustom(void* p, u32 r4, s32 r5, s32 r6, void* r7, s32 r8, ...);
+    extern u32   windowGetActiveID(void);
     extern void  windowCheckCursor(void* p, u8 flags);
     extern s32   windowGetValue(s32 key);
     extern s32   menuGetCursor(void* p);
-    extern void  fn_80102510(s32 p);
-    extern u32   fn_80102004(void);
-    extern void  fn_80106D3C(s32 a, s32 b, s32 c, s32 d);
+    extern void  menuClose(s32 p);
+    extern u32   menuGetLastError(void);
+    extern void  winMsgOpen(s32 a, s32 b, s32 c, s32 d);
 
     /* --- SDA / sdata2 data (block-scope typed externs) --- */
     extern u32 lbl_8047A428;     /* current map index / state */
@@ -8599,7 +8599,7 @@ void fn_8002EE74(void)
         s32 flag = 1;
 
         menuSetEnablePort(2);
-        fn_801026A4((void*)0xe3, fn_801046B8(), (s32)&flag, 0, (void*)0, 0);
+        menuOpenCustom((void*)0xe3, windowGetActiveID(), (s32)&flag, 0, (void*)0, 0);
 
         node  = windowSearchID(0xe3);
         child = windowSearchItemID(node, 0x102a);
@@ -8618,15 +8618,15 @@ void fn_8002EE74(void)
         windowCheckCursor((void*)0xe3, 1);
         branchResult = windowGetValue(0xe3);
         destResult   = menuGetCursor((void*)0xe3);
-        fn_80102510(0xe3);
+        menuClose(0xe3);
         if (branchResult == -1) {
             destResult = -1;
         }
 
         menuSetEnablePort(1);
-        if ((s32)fn_80102004() == 1) {
-            fn_80106D3C(2, 0x4448, 1, 0);
-            fn_80102510(0xd9);
+        if ((s32)menuGetLastError() == 1) {
+            winMsgOpen(2, 0x4448, 1, 0);
+            menuClose(0xd9);
             lbl_8047A42C = 0;
             return;
         }
@@ -8651,7 +8651,7 @@ void fn_8002EE74(void)
 /* fn_8002F284 - 0x8002F284 | size: 0x518 */
 extern void menuItemBiosSetSelectFlag(void);
 extern void menuGetCursorFromItemID(void);
-extern void fn_801022B8(void);
+extern void menuGetCursorItemID(void);
 extern u32 lbl_8047A410;
 extern u32 lbl_8047A42C;
 extern const u8 lbl_80266E90[];
@@ -8672,17 +8672,17 @@ void fn_8002F284(void)
     extern s32   menuGetCursorFromItemID(void* p, u32 param);  /* lazy load -> handle/result */
     extern void  fn_801021F8(void* p, u32 val);    /* set visibility on subtree */
     extern u8    menuSetEnablePort(u8 mode);             /* push render mode, ret old */
-    extern u32   fn_801046B8(void);                /* current context handle */
-    extern void  fn_801026A4(void* p, u32 a, ...); /* submit/build */
+    extern u32   windowGetActiveID(void);                /* current context handle */
+    extern void  menuOpenCustom(void* p, u32 a, ...); /* submit/build */
     extern void* windowSearchID(s32 p);               /* resolve node by id */
     extern void* windowSearchItemID(void* head, s32 key); /* find child node by key */
     extern void  winSpriteSetDisp(void* node, u32 enable); /* enable flag on node */
     extern void  windowCheckCursor(void* p, u8 flags);   /* show/commit object */
-    extern s32   fn_80102004(void);                /* arrival/joint-count query */
-    extern void  fn_80106D3C(s32 a, s32 b, s32 c, s32 d); /* trigger arrival fx */
-    extern void  fn_80102510(s32 p);               /* unload/release object */
+    extern s32   menuGetLastError(void);                /* arrival/joint-count query */
+    extern void  winMsgOpen(s32 a, s32 b, s32 c, s32 d); /* trigger arrival fx */
+    extern void  menuClose(s32 p);               /* unload/release object */
     extern s32   windowGetValue(s32 param);           /* dest id */
-    extern s32   fn_801022B8(s32 p);               /* map key */
+    extern s32   menuGetCursorItemID(s32 p);               /* map key */
 
     /* --- small-data globals --- */
     extern u32 lbl_8047A410;  /* canonical; per-site reinterpret cast */
@@ -8700,7 +8700,7 @@ void fn_8002F284(void)
     void* node;
     void* child;
     s32  destId;          /* windowGetValue result (treated as s32) */
-    s32  mapKey;          /* fn_801022B8 result (table lookup key) */
+    s32  mapKey;          /* menuGetCursorItemID result (table lookup key) */
     s32  resolvedMapId;   /* table-scan result, default 0 */
     s32  stateValue;
     u32  predicate;
@@ -8820,9 +8820,9 @@ void fn_8002F284(void)
 
     /* Build/submit the object; the nonzero-local path passes &local8. */
     if (local8 != 0) {
-        fn_801026A4((void*)0xD9, fn_801046B8(), &local8, 0, (void*)0, 0);
+        menuOpenCustom((void*)0xD9, windowGetActiveID(), &local8, 0, (void*)0, 0);
     } else {
-        fn_801026A4((void*)0xD9, fn_801046B8(), (void*)0, 0, (void*)0, 0);
+        menuOpenCustom((void*)0xD9, windowGetActiveID(), (void*)0, 0, (void*)0, 0);
     }
 
     /* Resolve the object node and poke its child (key 0x10B2). */
@@ -8837,9 +8837,9 @@ void fn_8002F284(void)
     menuSetEnablePort(1);
 
     /* Early "already arrived" branch. */
-    if (fn_80102004() == 1) {
-        fn_80106D3C(2, 0x4448, 1, 0);
-        fn_80102510(0xD9);
+    if (menuGetLastError() == 1) {
+        winMsgOpen(2, 0x4448, 1, 0);
+        menuClose(0xD9);
         (*(s32*)&lbl_8047A42C) = 0;
         return;
     }
@@ -8849,9 +8849,9 @@ void fn_8002F284(void)
     resolvedMapId = 0;
 
     /* Scan the 12-entry destination table for the map key returned by
-     * fn_801022B8(0xD9).  Each entry is 0x12 bytes: key halfword at +0x10,
+     * menuGetCursorItemID(0xD9).  Each entry is 0x12 bytes: key halfword at +0x10,
      * resolved map id byte at +0x01. */
-    mapKey = fn_801022B8(0xD9);
+    mapKey = menuGetCursorItemID(0xD9);
     for (e = 0; e < 12; e++) {
         if (mapKey == (s32)*(u16*)(lbl_80266E90 + (e * 0x12) + 0x10)) {  /* ENDIAN-QA */
             resolvedMapId = (s32)*(u8*)(lbl_80266E90 + (e * 0x12) + 0x01);
@@ -8859,7 +8859,7 @@ void fn_8002F284(void)
     }
 
     /* Special-case: travel key 0xFF9 maps to internal id 0x3E8. */
-    if (fn_801022B8(0xD9) == 0xFF9) {
+    if (menuGetCursorItemID(0xD9) == 0xFF9) {
         resolvedMapId = 0x3E8;
     }
 
@@ -8913,7 +8913,7 @@ valid_destination:
  * It then ensures scene/object 0xD9 is loaded (lazy-load via menuGetCursorFromItemID if
  * not already present), shows it, looks up child node 0x10B2 and pokes a tag,
  * and finally resolves the chosen travel destination either through an early
- * "already arrived" path (fn_80102004()==1 -> sets state (*(s32*)&lbl_8047A42C)=0) or by
+ * "already arrived" path (menuGetLastError()==1 -> sets state (*(s32*)&lbl_8047A42C)=0) or by
  * scanning the 12-entry destination table lbl_80266E90 (stride 0x12, key at
  * +0x10, map id at +0x01) and writing the resolved id / UI state code into the
  * (*(s32*)&lbl_8047A428) / (*(s32*)&lbl_8047A42C) small-data globals.
@@ -8934,17 +8934,17 @@ void fn_8002F284(void)
     extern s32   menuGetCursorFromItemID(void* p, u32 param);  /* lazy load -> handle/result */
     extern void  fn_801021F8(void* p, u32 val);    /* set visibility on subtree */
     extern u8    menuSetEnablePort(u8 mode);             /* push render mode, ret old */
-    extern u32   fn_801046B8(void);                /* current context handle */
-    extern void  fn_801026A4(void* p, u32 a, void* b, s32 c, void* d, s32 e); /* submit/build */
+    extern u32   windowGetActiveID(void);                /* current context handle */
+    extern void  menuOpenCustom(void* p, u32 a, void* b, s32 c, void* d, s32 e); /* submit/build */
     extern void* windowSearchID(s32 p);               /* resolve node by id */
     extern void* windowSearchItemID(void* head, s32 key); /* find child node by key */
     extern void  winSpriteSetDisp(void* node, u32 enable); /* enable flag on node */
     extern void  windowCheckCursor(void* p, u8 flags);   /* show/commit object */
-    extern s32   fn_80102004(void);                /* arrival/joint-count query */
-    extern void  fn_80106D3C(s32 a, s32 b, s32 c, s32 d); /* trigger arrival fx */
-    extern void  fn_80102510(s32 p);               /* unload/release object */
+    extern s32   menuGetLastError(void);                /* arrival/joint-count query */
+    extern void  winMsgOpen(s32 a, s32 b, s32 c, s32 d); /* trigger arrival fx */
+    extern void  menuClose(s32 p);               /* unload/release object */
     extern void* windowGetValue(s32 param);           /* (here used as s32 dest id) */
-    extern void* fn_801022B8(void* p, u32 target); /* (here used as s32 map key) */
+    extern void* menuGetCursorItemID(void* p, u32 target); /* (here used as s32 map key) */
 
     /* --- small-data globals --- */
     extern u32 lbl_8047A410;  /* canonical; per-site reinterpret cast */
@@ -8962,7 +8962,7 @@ void fn_8002F284(void)
     void* node;
     void* child;
     s32  destId;          /* windowGetValue result (treated as s32) */
-    s32  mapKey;          /* fn_801022B8 result (table lookup key) */
+    s32  mapKey;          /* menuGetCursorItemID result (table lookup key) */
     s32  resolvedMapId;   /* table-scan result, default 0 */
     u8*  ent;
     s32  e;
@@ -9056,9 +9056,9 @@ void fn_8002F284(void)
 
     /* Build/submit the object; the nonzero-local path passes &local8. */
     if (local8 != 0) {
-        fn_801026A4((void*)0xD9, fn_801046B8(), &local8, 0, (void*)0, 0);
+        menuOpenCustom((void*)0xD9, windowGetActiveID(), &local8, 0, (void*)0, 0);
     } else {
-        fn_801026A4((void*)0xD9, fn_801046B8(), (void*)0, 0, (void*)0, 0);
+        menuOpenCustom((void*)0xD9, windowGetActiveID(), (void*)0, 0, (void*)0, 0);
     }
 
     /* Resolve the object node and poke its child (key 0x10B2). */
@@ -9073,9 +9073,9 @@ void fn_8002F284(void)
     menuSetEnablePort(1);
 
     /* Early "already arrived" branch. */
-    if (fn_80102004() == 1) {
-        fn_80106D3C(2, 0x4448, 1, 0);
-        fn_80102510(0xD9);
+    if (menuGetLastError() == 1) {
+        winMsgOpen(2, 0x4448, 1, 0);
+        menuClose(0xD9);
         (*(s32*)&lbl_8047A42C) = 0;
         return;
     }
@@ -9085,9 +9085,9 @@ void fn_8002F284(void)
     resolvedMapId = 0;
 
     /* Scan the 12-entry destination table for the map key returned by
-     * fn_801022B8(0xD9).  Each entry is 0x12 bytes: key halfword at +0x10,
+     * menuGetCursorItemID(0xD9).  Each entry is 0x12 bytes: key halfword at +0x10,
      * resolved map id byte at +0x01. */
-    mapKey = (s32)fn_801022B8((void*)0xD9, 0);  /* selector 0 (li r5,0) */
+    mapKey = (s32)menuGetCursorItemID((void*)0xD9, 0);  /* selector 0 (li r5,0) */
     ent = lbl_80266E90;
     for (e = 0; e < 12; e++) {
         if (mapKey == (s32)*(s16*)(ent + 0x10)) {  /* ENDIAN-QA */
@@ -9097,7 +9097,7 @@ void fn_8002F284(void)
     }
 
     /* Special-case: travel key 0xFF9 maps to internal id 0x3E8. */
-    if (fn_801022B8((void*)0xD9, 0) == (void*)0xFF9) {
+    if (menuGetCursorItemID((void*)0xD9, 0) == (void*)0xFF9) {
         resolvedMapId = 0x3E8;
     }
 
