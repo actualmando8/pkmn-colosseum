@@ -6,7 +6,7 @@
  * static linkage, call chains) - mixed-block split pass, 2026-07-01.
  * All functions asm-only until matched.
  *
- * fn_80059BDC and fn_80065A48 (below) are reintroduced from the previous
+ * menuColosseumBattleMain and fn_80065A48 (below) are reintroduced from the previous
  * campaign's ui_core.c (archive/previous_campaign/src/game/ui/ui_core.c,
  * commits 745775c5 and 9f9727ef) through the current dtk-template pipeline:
  * ported into this unit's split and re-verified against this unit's own
@@ -15,7 +15,7 @@
  */
 #include "dolphin/types.h"
 
-/* ===== External function declarations (fn_80059BDC, fn_80065A48 only) ===== */
+/* ===== External function declarations (menuColosseumBattleMain, fn_80065A48 only) ===== */
 extern void fn_8002D91C();
 extern void fn_80062948(void);
 extern void fn_80068794();
@@ -135,7 +135,7 @@ typedef struct UICmdMsg {
 #pragma optimization_level 4
 #pragma scheduling on
 #pragma peephole off
-void fn_80059BDC(void) {
+void menuColosseumBattleMain(void) {
     extern s32 fn_8007162C(void);
     extern s32 fn_80071344(void);
     extern s32 fn_80071398();

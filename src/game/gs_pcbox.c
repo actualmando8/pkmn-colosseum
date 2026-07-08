@@ -2489,7 +2489,7 @@ void fn_8001E4B4(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f) {
 /* 0x8001E644 | 0x454 */
 extern void fn_800D5BA0(void);
 extern void fn_800D5648(void);
-extern void fn_8005D858(void);
+extern void menuSpriteBiosGetPtr(void);
 extern void windowDrawSprite(void);
 extern void menuItemBiosGetPtr(void);
 extern void windowDrawSprite2(void);
@@ -2508,7 +2508,7 @@ void fn_8001E644(void) {
     extern f64 lbl_8047B7D8;
     extern f32 lbl_8047B7E0;
     extern f32 lbl_8047B7E4;
-    extern void fn_8005D858();
+    extern void menuSpriteBiosGetPtr();
     extern void menuItemBiosGetPtr();
     extern void fn_800D5648();
     extern void fn_800D5BA0();
@@ -2648,7 +2648,7 @@ void fn_8001E644(void) {
 
     }
     r3 = 0xbb;
-    fn_8005D858();
+    menuSpriteBiosGetPtr();
     r6 = *(s16*)((u8*)r3 + 0xC);
     r5 = r28 + r27;
     r4 = *(s16*)((u8*)r3 + 0xE);
@@ -2669,7 +2669,7 @@ void fn_8001E644(void) {
     r29 = (s16)r5;
     r28 = (s16)r4;
     r27 = (s16)tmp;
-    fn_8005D858();
+    menuSpriteBiosGetPtr();
     r7 = *(s16*)((u8*)r3 + 0xE);
     tmp = r25 + r26;
     r3 = r31;
@@ -2703,7 +2703,7 @@ void fn_8001E644(void) {
     r7 = 0x1;
     windowDrawSprite();
     r3 = 0xba;
-    fn_8005D858();
+    menuSpriteBiosGetPtr();
     r24 = r3;
     r3 = 0x84;
     menuItemBiosGetPtr();
@@ -2745,7 +2745,7 @@ void fn_8001E644(void) {
     r3 = (s16)tmp;
     windowDrawSprite2();
     r3 = 0xb7;
-    fn_8005D858();
+    menuSpriteBiosGetPtr();
     r27 = r3;
     r3 = 0x84;
     menuItemBiosGetPtr();

@@ -3821,7 +3821,7 @@
 "addr": "0x8002AB40",
 "size": 376,
 "label": "gs-engine",
-"confidence": 1.9,
+"confidence": 1.89,
 "seed": null
 },
 {
@@ -4133,7 +4133,7 @@
 "addr": "0x80030370",
 "size": 12,
 "label": "gs-engine",
-"confidence": 1.89,
+"confidence": 1.88,
 "seed": null
 },
 {
@@ -6945,36 +6945,36 @@
 "seed": null
 },
 {
-"name": "fn_80059BDC",
+"name": "menuColosseumBattleMain",
 "addr": "0x80059BDC",
 "size": 12532,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_8005CCD0",
+"name": "menuColosseumBattleExit",
 "addr": "0x8005CCD0",
 "size": 184,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_8005CD88",
+"name": "menuColosseumBattleInit",
 "addr": "0x8005CD88",
 "size": 352,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_8005CEE8",
+"name": "menuColosseumBattle",
 "addr": "0x8005CEE8",
 "size": 68,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_8005CF2C",
@@ -7121,20 +7121,20 @@
 "seed": "prefix"
 },
 {
-"name": "fn_8005D830",
+"name": "menuSeqBiosGetPtr",
 "addr": "0x8005D830",
 "size": 40,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_8005D858",
+"name": "menuSpriteBiosGetPtr",
 "addr": "0x8005D858",
 "size": 40,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "menuItemBiosSetXY",
@@ -7201,20 +7201,20 @@
 "seed": "prefix"
 },
 {
-"name": "fn_8005DA48",
+"name": "dbgMenuLogDraw",
 "addr": "0x8005DA48",
 "size": 380,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_8005DBC4",
+"name": "dbgMenuLogChangeDisp",
 "addr": "0x8005DBC4",
 "size": 96,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "dbgMenuFieldCameraChangeDisp",
@@ -7225,12 +7225,12 @@
 "seed": "prefix"
 },
 {
-"name": "fn_8005DCC4",
+"name": "menuDbgItemCreateCursor",
 "addr": "0x8005DCC4",
 "size": 548,
 "label": "menu",
-"confidence": 1.9,
-"seed": null
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "menuDbgItemCreate",
@@ -7281,12 +7281,12 @@
 "seed": null
 },
 {
-"name": "fn_8005FFE4",
+"name": "_menuCBBattleStartSetIndex__Fv",
 "addr": "0x8005FFE4",
 "size": 1104,
-"label": "fight",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_80060434",
@@ -7337,12 +7337,12 @@
 "seed": null
 },
 {
-"name": "fn_80061018",
+"name": "menuCBBattleStartGetStatus",
 "addr": "0x80061018",
 "size": 16,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_80061028",
@@ -7420,23 +7420,23 @@
 "name": "fn_80061D34",
 "addr": "0x80061D34",
 "size": 568,
-"label": "fight",
+"label": "gs-engine",
 "confidence": 1.9,
 "seed": null
 },
 {
-"name": "fn_80061F6C",
+"name": "menuCBBattleStartInit",
 "addr": "0x80061F6C",
 "size": 792,
-"label": "fight",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_80062284",
 "addr": "0x80062284",
 "size": 176,
-"label": "fight",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
@@ -7444,7 +7444,7 @@
 "name": "fn_80062334",
 "addr": "0x80062334",
 "size": 920,
-"label": "fight",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
@@ -7457,12 +7457,12 @@
 "seed": "prefix"
 },
 {
-"name": "fn_80062834",
+"name": "menuCBBattleStartTrainerFaceFree",
 "addr": "0x80062834",
 "size": 276,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_80062948",
@@ -7601,12 +7601,12 @@
 "seed": null
 },
 {
-"name": "fn_800681B4",
+"name": "_menuCBPokemonEntryEntCheckGBA__F13GSinputDevicel",
 "addr": "0x800681B4",
 "size": 612,
-"label": "fight",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_80068418",
@@ -7668,17 +7668,17 @@
 "name": "fn_80068F84",
 "addr": "0x80068F84",
 "size": 196,
-"label": "fight",
-"confidence": 1.9,
+"label": "menu",
+"confidence": 1.5,
 "seed": null
 },
 {
-"name": "fn_80069048",
+"name": "menuCBPokemonEntryGetReadFlag",
 "addr": "0x80069048",
 "size": 20,
-"label": "fight",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_8006905C",
@@ -7721,44 +7721,44 @@
 "seed": null
 },
 {
-"name": "fn_800697C4",
+"name": "menuCBPokemonEntryLoadTex",
 "addr": "0x800697C4",
 "size": 48,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_800697F4",
+"name": "_menuCBPokemonEntryLoadCallBack__FPv",
 "addr": "0x800697F4",
 "size": 336,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_80069944",
+"name": "menuCBPokemonEntryTexWorkInit",
 "addr": "0x80069944",
 "size": 196,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_80069A08",
+"name": "menuCBPokemonEntryDispPokemonFace",
 "addr": "0x80069A08",
 "size": 88,
-"label": "gs-engine",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
-"name": "fn_80069A60",
+"name": "menuCB_Battle",
 "addr": "0x80069A60",
 "size": 428,
-"label": "fight",
-"confidence": 1.9,
-"seed": null
+"label": "menu",
+"confidence": 2.0,
+"seed": "prefix"
 },
 {
 "name": "fn_80069C0C",
@@ -7788,7 +7788,7 @@
 "name": "fn_8006A76C",
 "addr": "0x8006A76C",
 "size": 48,
-"label": "gs-engine",
+"label": "field",
 "confidence": 1.9,
 "seed": null
 },
@@ -7796,7 +7796,7 @@
 "name": "fn_8006A79C",
 "addr": "0x8006A79C",
 "size": 16,
-"label": "gs-engine",
+"label": "field",
 "confidence": 1.9,
 "seed": null
 },
@@ -7804,7 +7804,7 @@
 "name": "fn_8006A7AC",
 "addr": "0x8006A7AC",
 "size": 16,
-"label": "gs-engine",
+"label": "field",
 "confidence": 1.9,
 "seed": null
 },
@@ -7812,7 +7812,7 @@
 "name": "fn_8006A7BC",
 "addr": "0x8006A7BC",
 "size": 12,
-"label": "gs-engine",
+"label": "field",
 "confidence": 1.9,
 "seed": null
 },
@@ -7820,8 +7820,8 @@
 "name": "fn_8006A7C8",
 "addr": "0x8006A7C8",
 "size": 8,
-"label": "gs-engine",
-"confidence": 1.9,
+"label": "field",
+"confidence": 0.95,
 "seed": null
 },
 {
@@ -7829,7 +7829,7 @@
 "addr": "0x8006A7D0",
 "size": 8,
 "label": "gs-engine",
-"confidence": 1.9,
+"confidence": 0.47,
 "seed": null
 },
 {
@@ -7837,7 +7837,7 @@
 "addr": "0x8006A7D8",
 "size": 8,
 "label": "gs-engine",
-"confidence": 1.9,
+"confidence": 0.71,
 "seed": null
 },
 {
@@ -7845,7 +7845,7 @@
 "addr": "0x8006A7E0",
 "size": 8,
 "label": "gs-engine",
-"confidence": 1.9,
+"confidence": 1.31,
 "seed": null
 },
 {
@@ -7861,7 +7861,7 @@
 "addr": "0x8006A7F0",
 "size": 36,
 "label": "gs-engine",
-"confidence": 1.9,
+"confidence": 1.87,
 "seed": null
 },
 {
@@ -7869,14 +7869,14 @@
 "addr": "0x8006A814",
 "size": 8,
 "label": "gs-engine",
-"confidence": 1.9,
+"confidence": 1.89,
 "seed": null
 },
 {
 "name": "fn_8006A81C",
 "addr": "0x8006A81C",
 "size": 8,
-"label": "gs-engine",
+"label": "field",
 "confidence": 1.42,
 "seed": null
 },
@@ -7916,23 +7916,23 @@
 "name": "fn_8006AC6C",
 "addr": "0x8006AC6C",
 "size": 96,
-"label": "gs-engine",
-"confidence": 1.42,
+"label": "menu",
+"confidence": 1.0,
 "seed": null
 },
 {
 "name": "fn_8006ACCC",
 "addr": "0x8006ACCC",
 "size": 232,
-"label": "gs-engine",
-"confidence": 1.9,
+"label": "field",
+"confidence": 1.45,
 "seed": null
 },
 {
 "name": "fn_8006ADB4",
 "addr": "0x8006ADB4",
 "size": 56,
-"label": "gs-engine",
+"label": "field",
 "confidence": 1.9,
 "seed": null
 },
@@ -7940,7 +7940,7 @@
 "name": "fn_8006ADEC",
 "addr": "0x8006ADEC",
 "size": 44,
-"label": "gs-engine",
+"label": "field",
 "confidence": 1.9,
 "seed": null
 },
@@ -8060,7 +8060,7 @@
 "name": "fn_8006B420",
 "addr": "0x8006B420",
 "size": 140,
-"label": "field",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
@@ -8068,7 +8068,7 @@
 "name": "fn_8006B4AC",
 "addr": "0x8006B4AC",
 "size": 112,
-"label": "field",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
@@ -8076,7 +8076,7 @@
 "name": "fn_8006B51C",
 "addr": "0x8006B51C",
 "size": 96,
-"label": "field",
+"label": "menu",
 "confidence": 1.45,
 "seed": null
 },
@@ -8100,23 +8100,23 @@
 "name": "fn_8006B5D0",
 "addr": "0x8006B5D0",
 "size": 228,
-"label": "field",
-"confidence": 1.63,
+"label": "menu",
+"confidence": 1.9,
 "seed": null
 },
 {
 "name": "fn_8006B6B4",
 "addr": "0x8006B6B4",
 "size": 564,
-"label": "field",
-"confidence": 1.32,
+"label": "menu",
+"confidence": 1.9,
 "seed": null
 },
 {
 "name": "fn_8006B8E8",
 "addr": "0x8006B8E8",
 "size": 8,
-"label": "gs-engine",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
@@ -8124,7 +8124,7 @@
 "name": "fn_8006B8F0",
 "addr": "0x8006B8F0",
 "size": 12,
-"label": "gs-engine",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
@@ -8132,8 +8132,8 @@
 "name": "fn_8006B8FC",
 "addr": "0x8006B8FC",
 "size": 12,
-"label": "gs-engine",
-"confidence": 1.9,
+"label": "menu",
+"confidence": 1.45,
 "seed": null
 },
 {
@@ -8141,7 +8141,7 @@
 "addr": "0x8006B908",
 "size": 40,
 "label": "gs-engine",
-"confidence": 1.9,
+"confidence": 1.42,
 "seed": null
 },
 {
@@ -8604,8 +8604,8 @@
 "name": "fn_80071344",
 "addr": "0x80071344",
 "size": 84,
-"label": "gs-engine",
-"confidence": 1.9,
+"label": "menu",
+"confidence": 1.5,
 "seed": null
 },
 {
@@ -9116,7 +9116,7 @@
 "name": "fn_80076054",
 "addr": "0x80076054",
 "size": 736,
-"label": "field",
+"label": "menu",
 "confidence": 1.9,
 "seed": null
 },
@@ -9196,8 +9196,8 @@
 "name": "fn_80077AAC",
 "addr": "0x80077AAC",
 "size": 36,
-"label": "field",
-"confidence": 1.42,
+"label": "fight",
+"confidence": 1.45,
 "seed": null
 },
 {
@@ -9205,7 +9205,7 @@
 "addr": "0x80077AD0",
 "size": 36,
 "label": "fight",
-"confidence": 1.45,
+"confidence": 1.9,
 "seed": null
 },
 {
@@ -9308,16 +9308,16 @@
 "name": "fn_80077E80",
 "addr": "0x80077E80",
 "size": 36,
-"label": "gs-engine",
-"confidence": 1.42,
+"label": "menu",
+"confidence": 1.9,
 "seed": null
 },
 {
 "name": "fn_80077EA4",
 "addr": "0x80077EA4",
 "size": 48,
-"label": "gs-engine",
-"confidence": 1.9,
+"label": "menu",
+"confidence": 1.45,
 "seed": null
 },
 {
@@ -9933,14 +9933,14 @@
 "addr": "0x800889A4",
 "size": 64,
 "label": "gs-engine",
-"confidence": 1.9,
+"confidence": 1.42,
 "seed": null
 },
 {
 "name": "fn_800889E4",
 "addr": "0x800889E4",
 "size": 636,
-"label": "gs-engine",
+"label": "field",
 "confidence": 1.9,
 "seed": null
 },
@@ -9948,7 +9948,7 @@
 "name": "fn_80088C60",
 "addr": "0x80088C60",
 "size": 292,
-"label": "gs-engine",
+"label": "field",
 "confidence": 1.9,
 "seed": null
 },
@@ -9956,7 +9956,7 @@
 "name": "fn_80088D84",
 "addr": "0x80088D84",
 "size": 292,
-"label": "gs-engine",
+"label": "field",
 "confidence": 1.9,
 "seed": null
 },
@@ -10013,7 +10013,7 @@
 "addr": "0x80089028",
 "size": 8,
 "label": "menu",
-"confidence": 1.58,
+"confidence": 1.9,
 "seed": null
 },
 {
@@ -10021,7 +10021,7 @@
 "addr": "0x80089030",
 "size": 24,
 "label": "menu",
-"confidence": 1.26,
+"confidence": 1.42,
 "seed": null
 },
 {
@@ -33085,7 +33085,7 @@
 "addr": "0x801316E8",
 "size": 44,
 "label": "gs-engine",
-"confidence": 0.6,
+"confidence": 0.55,
 "seed": null
 },
 {
@@ -33093,7 +33093,7 @@
 "addr": "0x80131714",
 "size": 84,
 "label": "gs-engine",
-"confidence": 1.42,
+"confidence": 1.22,
 "seed": null
 },
 {
@@ -33101,7 +33101,7 @@
 "addr": "0x80131768",
 "size": 44,
 "label": "gs-engine",
-"confidence": 1.54,
+"confidence": 1.07,
 "seed": null
 },
 {
@@ -33109,7 +33109,7 @@
 "addr": "0x80131794",
 "size": 52,
 "label": "gs-engine",
-"confidence": 1.9,
+"confidence": 1.01,
 "seed": null
 },
 {
@@ -33117,7 +33117,7 @@
 "addr": "0x801317C8",
 "size": 52,
 "label": "gs-engine",
-"confidence": 1.42,
+"confidence": 0.98,
 "seed": null
 },
 {
@@ -33125,7 +33125,7 @@
 "addr": "0x801317FC",
 "size": 40,
 "label": "field",
-"confidence": 1.38,
+"confidence": 1.69,
 "seed": null
 },
 {
@@ -33133,7 +33133,7 @@
 "addr": "0x80131824",
 "size": 8,
 "label": "field",
-"confidence": 0.69,
+"confidence": 1.34,
 "seed": null
 },
 {
@@ -33141,7 +33141,7 @@
 "addr": "0x8013182C",
 "size": 520,
 "label": "gs-engine",
-"confidence": 1.32,
+"confidence": 0.81,
 "seed": null
 },
 {
@@ -33149,7 +33149,7 @@
 "addr": "0x80131A34",
 "size": 52,
 "label": "gs-engine",
-"confidence": 1.9,
+"confidence": 1.42,
 "seed": null
 },
 {
@@ -33157,7 +33157,7 @@
 "addr": "0x80131A68",
 "size": 52,
 "label": "gs-engine",
-"confidence": 1.9,
+"confidence": 1.86,
 "seed": null
 },
 {
@@ -33197,7 +33197,7 @@
 "addr": "0x80131B6C",
 "size": 52,
 "label": "gs-engine",
-"confidence": 1.9,
+"confidence": 1.84,
 "seed": null
 },
 {
@@ -33205,7 +33205,7 @@
 "addr": "0x80131BA0",
 "size": 8,
 "label": "gs-engine",
-"confidence": 1.33,
+"confidence": 1.15,
 "seed": null
 },
 {
@@ -33213,7 +33213,7 @@
 "addr": "0x80131BA8",
 "size": 8,
 "label": "gs-engine",
-"confidence": 0.89,
+"confidence": 0.7,
 "seed": null
 },
 {
@@ -33221,7 +33221,7 @@
 "addr": "0x80131BB0",
 "size": 8,
 "label": "gs-engine",
-"confidence": 0.58,
+"confidence": 0.42,
 "seed": null
 },
 {
@@ -33229,7 +33229,7 @@
 "addr": "0x80131BB8",
 "size": 8,
 "label": "gs-engine",
-"confidence": 0.37,
+"confidence": 0.25,
 "seed": null
 },
 {
@@ -33237,7 +33237,7 @@
 "addr": "0x80131BC0",
 "size": 8,
 "label": "gs-engine",
-"confidence": 0.23,
+"confidence": 0.14,
 "seed": null
 },
 {
@@ -33245,7 +33245,7 @@
 "addr": "0x80131BC8",
 "size": 8,
 "label": "gs-engine",
-"confidence": 0.14,
+"confidence": 0.08,
 "seed": null
 },
 {
@@ -33253,15 +33253,15 @@
 "addr": "0x80131BD0",
 "size": 8,
 "label": "gs-engine",
-"confidence": 0.09,
+"confidence": 0.05,
 "seed": null
 },
 {
 "name": "msgctrlTrainerEnename",
 "addr": "0x80131BD8",
 "size": 8,
-"label": "gs-engine",
-"confidence": 0.04,
+"label": "fight",
+"confidence": 0.03,
 "seed": null
 },
 {
@@ -33269,7 +33269,7 @@
 "addr": "0x80131BE0",
 "size": 8,
 "label": "fight",
-"confidence": 0.15,
+"confidence": 0.16,
 "seed": null
 },
 {
@@ -33277,7 +33277,7 @@
 "addr": "0x80131BE8",
 "size": 8,
 "label": "fight",
-"confidence": 0.5,
+"confidence": 0.51,
 "seed": null
 },
 {
@@ -33509,7 +33509,7 @@
 "addr": "0x80132294",
 "size": 8,
 "label": "field",
-"confidence": 1.41,
+"confidence": 1.44,
 "seed": null
 },
 {
@@ -33517,15 +33517,15 @@
 "addr": "0x8013229C",
 "size": 8,
 "label": "field",
-"confidence": 0.93,
+"confidence": 0.96,
 "seed": null
 },
 {
 "name": "msgctrlMenuPokemon",
 "addr": "0x801322A4",
 "size": 8,
-"label": "gs-engine",
-"confidence": 0.49,
+"label": "field",
+"confidence": 0.48,
 "seed": null
 },
 {
@@ -33533,7 +33533,7 @@
 "addr": "0x801322AC",
 "size": 52,
 "label": "gs-engine",
-"confidence": 1.35,
+"confidence": 0.97,
 "seed": null
 },
 {
@@ -33541,7 +33541,7 @@
 "addr": "0x801322E0",
 "size": 52,
 "label": "gs-engine",
-"confidence": 1.55,
+"confidence": 1.25,
 "seed": null
 },
 {
@@ -33549,7 +33549,7 @@
 "addr": "0x80132314",
 "size": 8,
 "label": "gs-engine",
-"confidence": 1.08,
+"confidence": 0.77,
 "seed": null
 },
 {
@@ -33557,23 +33557,23 @@
 "addr": "0x8013231C",
 "size": 8,
 "label": "gs-engine",
-"confidence": 0.86,
+"confidence": 0.38,
 "seed": null
 },
 {
 "name": "msgctrlMsgID",
 "addr": "0x80132324",
 "size": 8,
-"label": "gs-engine",
-"confidence": 0.83,
+"label": "item",
+"confidence": 0.39,
 "seed": null
 },
 {
 "name": "msgctrlDigit2",
 "addr": "0x8013232C",
 "size": 52,
-"label": "gs-engine",
-"confidence": 0.89,
+"label": "item",
+"confidence": 0.86,
 "seed": null
 },
 {
@@ -33581,7 +33581,7 @@
 "addr": "0x80132360",
 "size": 52,
 "label": "item",
-"confidence": 0.95,
+"confidence": 1.38,
 "seed": null
 },
 {
@@ -48149,14 +48149,14 @@
 "addr": "0x801CA708",
 "size": 32,
 "label": "fight",
-"confidence": 1.9,
+"confidence": 1.45,
 "seed": null
 },
 {
 "name": "fn_801CA728",
 "addr": "0x801CA728",
 "size": 132,
-"label": "fight",
+"label": "field",
 "confidence": 1.9,
 "seed": null
 },
@@ -48164,8 +48164,8 @@
 "name": "fn_801CA7AC",
 "addr": "0x801CA7AC",
 "size": 32,
-"label": "fight",
-"confidence": 0.95,
+"label": "field",
+"confidence": 1.9,
 "seed": null
 },
 {
@@ -48173,7 +48173,7 @@
 "addr": "0x801CA7CC",
 "size": 32,
 "label": "field",
-"confidence": 0.95,
+"confidence": 1.9,
 "seed": null
 },
 {
@@ -69377,38 +69377,26 @@
 {
 "label": "gs-engine",
 "start": "0x8005344C",
+"end": "0x80059bdc",
+"count": 102
+},
+{
+"label": "menu",
+"start": "0x80059BDC",
+"end": "0x8005cf2c",
+"count": 4
+},
+{
+"label": "gs-engine",
+"start": "0x8005CF2C",
 "end": "0x8005d7f8",
-"count": 123
+"count": 17
 },
 {
 "label": "menu",
 "start": "0x8005D7F8",
-"end": "0x8005d830",
-"count": 1
-},
-{
-"label": "gs-engine",
-"start": "0x8005D830",
-"end": "0x8005d880",
-"count": 2
-},
-{
-"label": "menu",
-"start": "0x8005D880",
-"end": "0x8005da48",
-"count": 8
-},
-{
-"label": "gs-engine",
-"start": "0x8005DA48",
-"end": "0x8005dc24",
-"count": 2
-},
-{
-"label": "menu",
-"start": "0x8005DC24",
 "end": "0x8005dfc8",
-"count": 3
+"count": 16
 },
 {
 "label": "gs-engine",
@@ -69417,7 +69405,7 @@
 "count": 5
 },
 {
-"label": "fight",
+"label": "menu",
 "start": "0x8005FFE4",
 "end": "0x80060434",
 "count": 1
@@ -69425,32 +69413,44 @@
 {
 "label": "gs-engine",
 "start": "0x80060434",
-"end": "0x80061d34",
-"count": 16
-},
-{
-"label": "fight",
-"start": "0x80061D34",
-"end": "0x800626cc",
-"count": 4
+"end": "0x80061018",
+"count": 6
 },
 {
 "label": "menu",
-"start": "0x800626CC",
-"end": "0x80062834",
+"start": "0x80061018",
+"end": "0x80061028",
 "count": 1
 },
 {
 "label": "gs-engine",
-"start": "0x80062834",
+"start": "0x80061028",
+"end": "0x80061f6c",
+"count": 10
+},
+{
+"label": "menu",
+"start": "0x80061F6C",
+"end": "0x80062948",
+"count": 5
+},
+{
+"label": "gs-engine",
+"start": "0x80062948",
 "end": "0x80065628",
-"count": 11
+"count": 10
 },
 {
 "label": "fight",
 "start": "0x80065628",
+"end": "0x800681b4",
+"count": 7
+},
+{
+"label": "menu",
+"start": "0x800681B4",
 "end": "0x80068418",
-"count": 8
+"count": 1
 },
 {
 "label": "gs-engine",
@@ -69461,56 +69461,62 @@
 {
 "label": "fight",
 "start": "0x80068794",
+"end": "0x80068f84",
+"count": 5
+},
+{
+"label": "menu",
+"start": "0x80068F84",
+"end": "0x8006905c",
+"count": 2
+},
+{
+"label": "fight",
+"start": "0x8006905C",
 "end": "0x80069220",
-"count": 8
+"count": 1
 },
 {
 "label": "gs-engine",
 "start": "0x80069220",
-"end": "0x80069a60",
-"count": 8
+"end": "0x800697c4",
+"count": 4
 },
 {
-"label": "fight",
-"start": "0x80069A60",
+"label": "menu",
+"start": "0x800697C4",
 "end": "0x80069c0c",
-"count": 1
+"count": 5
 },
 {
 "label": "field",
 "start": "0x80069C0C",
-"end": "0x8006a76c",
-"count": 3
+"end": "0x8006a7d0",
+"count": 8
 },
 {
 "label": "gs-engine",
-"start": "0x8006A76C",
-"end": "0x8006a824",
-"count": 12
+"start": "0x8006A7D0",
+"end": "0x8006a81c",
+"count": 6
 },
 {
 "label": "field",
-"start": "0x8006A824",
+"start": "0x8006A81C",
 "end": "0x8006ac28",
-"count": 3
+"count": 4
 },
 {
 "label": "menu",
 "start": "0x8006AC28",
-"end": "0x8006ac6c",
-"count": 1
-},
-{
-"label": "gs-engine",
-"start": "0x8006AC6C",
-"end": "0x8006ae18",
-"count": 4
+"end": "0x8006accc",
+"count": 2
 },
 {
 "label": "field",
-"start": "0x8006AE18",
+"start": "0x8006ACCC",
 "end": "0x8006b09c",
-"count": 5
+"count": 8
 },
 {
 "label": "fight",
@@ -69537,7 +69543,7 @@
 "count": 4
 },
 {
-"label": "field",
+"label": "menu",
 "start": "0x8006B420",
 "end": "0x8006b57c",
 "count": 3
@@ -69549,22 +69555,22 @@
 "count": 2
 },
 {
-"label": "field",
+"label": "menu",
 "start": "0x8006B5D0",
-"end": "0x8006b8e8",
-"count": 2
+"end": "0x8006b908",
+"count": 5
 },
 {
 "label": "gs-engine",
-"start": "0x8006B8E8",
-"end": "0x80071398",
-"count": 62
+"start": "0x8006B908",
+"end": "0x80071344",
+"count": 58
 },
 {
 "label": "menu",
-"start": "0x80071398",
+"start": "0x80071344",
 "end": "0x800716c8",
-"count": 6
+"count": 7
 },
 {
 "label": "dolphin-sdk",
@@ -69623,44 +69629,32 @@
 {
 "label": "menu",
 "start": "0x80075FEC",
-"end": "0x80076054",
-"count": 1
-},
-{
-"label": "field",
-"start": "0x80076054",
-"end": "0x80076334",
-"count": 1
-},
-{
-"label": "menu",
-"start": "0x80076334",
 "end": "0x80076398",
-"count": 1
+"count": 3
 },
 {
 "label": "field",
 "start": "0x80076398",
-"end": "0x80077ad0",
-"count": 9
+"end": "0x80077aac",
+"count": 8
 },
 {
 "label": "fight",
-"start": "0x80077AD0",
+"start": "0x80077AAC",
 "end": "0x80077ba8",
-"count": 6
+"count": 7
 },
 {
 "label": "menu",
 "start": "0x80077BA8",
-"end": "0x80077e80",
-"count": 7
+"end": "0x80077ed4",
+"count": 9
 },
 {
 "label": "gs-engine",
-"start": "0x80077E80",
+"start": "0x80077ED4",
 "end": "0x8007b0d8",
-"count": 22
+"count": 20
 },
 {
 "label": "dolphin-sdk",
@@ -69701,14 +69695,14 @@
 {
 "label": "gs-engine",
 "start": "0x80084038",
-"end": "0x80088ea8",
-"count": 13
+"end": "0x800889e4",
+"count": 10
 },
 {
 "label": "field",
-"start": "0x80088EA8",
+"start": "0x800889E4",
 "end": "0x80088f88",
-"count": 3
+"count": 6
 },
 {
 "label": "menu",
@@ -70109,32 +70103,32 @@
 {
 "label": "gs-engine",
 "start": "0x8013182C",
-"end": "0x80131be0",
-"count": 16
+"end": "0x80131bd8",
+"count": 15
 },
 {
 "label": "fight",
-"start": "0x80131BE0",
+"start": "0x80131BD8",
 "end": "0x80132264",
-"count": 28
+"count": 29
 },
 {
 "label": "field",
 "start": "0x80132264",
-"end": "0x801322a4",
-"count": 4
+"end": "0x801322ac",
+"count": 5
 },
 {
 "label": "gs-engine",
-"start": "0x801322A4",
-"end": "0x80132360",
-"count": 7
+"start": "0x801322AC",
+"end": "0x80132324",
+"count": 4
 },
 {
 "label": "item",
-"start": "0x80132360",
+"start": "0x80132324",
 "end": "0x801323fc",
-"count": 3
+"count": 5
 },
 {
 "label": "field",
@@ -70649,14 +70643,14 @@
 {
 "label": "fight",
 "start": "0x801CA5C4",
-"end": "0x801ca7cc",
-"count": 4
+"end": "0x801ca728",
+"count": 2
 },
 {
 "label": "field",
-"start": "0x801CA7CC",
+"start": "0x801CA728",
 "end": "0x801cb180",
-"count": 28
+"count": 30
 },
 {
 "label": "gs-engine",

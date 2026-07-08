@@ -66,7 +66,7 @@ extern void* menuDataBiosGetPtr(void);    /* linked list head */
 extern void* menuItemBiosGetPtr(s16 idx); /* node by index */
 extern void* menuSeBiosGetPtr(s32);
 extern u16   fn_8005D798(void*, s32);
-extern void* fn_8005D858(s32);
+extern void* menuSpriteBiosGetPtr(s32);
 extern int   fn_80166A28(u16);
 extern s32   fn_800F037C(void);    /* poll/yield -- 0 if pending */
 extern void  _threadSwitch(void);    /* yield */
@@ -157,7 +157,7 @@ extern u8    menuOffScreenCreate(u32 param);
 extern void  menuOffScreenRelease(void);
 extern u32   windowGetActiveID(void);
 extern void* windowGetKeyInfo(void);
-extern void* fn_8005D830(u32 idx);
+extern void* menuSeqBiosGetPtr(u32 idx);
 extern void* windowSearchItemID(void* head, s32 key);
 extern void  menuOpenCustom(void* p, u32 r4, s32 r5, s32 r6, void* r7, s32 r8, ...);
 extern u8    menuOffScreenSetPriority(u8 val);
@@ -800,7 +800,7 @@ u32 windowGetParam(void* ptr, u32 idx) {
 }
 
 /* 0x801040F0 | 0x70 */
-/* fn_8005D858 already declared above */
+/* menuSpriteBiosGetPtr already declared above */
 void windowDrawSprite(void* p, void* a, void* b, u16 key, u32 data) {
     void* r27 = p;
     void* r28 = a;
@@ -808,7 +808,7 @@ void windowDrawSprite(void* p, void* a, void* b, u16 key, u32 data) {
     u16 r30 = key;
     u32 r31 = data;
     if ((u16)r30 != 0) {
-        void* r6 = fn_8005D858((s32)(u16)r30);
+        void* r6 = menuSpriteBiosGetPtr((s32)(u16)r30);
         windowDrawSprite2(r27, r28, *(s16*)((u8*)r6 + 0xc), *(s16*)((u8*)r6 + 0xe), (s32)r29, (s32)(u16)r30, (s32)r31, -1);
     }
 }
@@ -1316,7 +1316,7 @@ s32 fn_80107E78(void* r3, s32 r4, u16 r30) {
     void* r31 = windowSearchItemID(r3, r4);
     if (r31 == (void*)0) { goto _ret0; }
     {
-        void* r3b = fn_8005D830((u32)(u16)r30);
+        void* r3b = menuSeqBiosGetPtr((u32)(u16)r30);
         if (*(void**)((u8*)r31 + 0xc) != r3b) { goto _ret0; }
         return 1;
     }
@@ -1332,7 +1332,7 @@ s32 winSeqIsCheck(s32 r3, u16 r30) {
     void* r31 = windowSearchID(r3);
     if (r31 == (void*)0) { goto _ret0; }
     {
-        void* r3b = fn_8005D830((u32)(u16)r30);
+        void* r3b = menuSeqBiosGetPtr((u32)(u16)r30);
         if (*(void**)((u8*)r31 + 0x24) != r3b) { goto _ret0; }
         return 1;
     }
@@ -1360,7 +1360,7 @@ void fn_80107F38(s32 param, u32 key) {
                 *(u16*)((u8*)r29 + 0x10) = 0;
             } else {
                 memset((u8*)r29 + 0xc, 0, 0x3c);
-                *(void**)((u8*)r29 + 0xc) = fn_8005D830(r30);
+                *(void**)((u8*)r29 + 0xc) = menuSeqBiosGetPtr(r30);
             }
             *(s16*)(r31 + 0x0) = *(s16*)((u8*)r29 + 0x50);
             *(s16*)(r31 + 0x2) = *(s16*)((u8*)r29 + 0x52);
@@ -1411,7 +1411,7 @@ void winSeqSetMenu(s32 param, u32 key) {
         *(u16*)((u8*)r31 + 0x28) = 0;
     } else {
         memset((u8*)r31 + 0x24, 0, 0x3c);
-        *(void**)((u8*)r31 + 0x24) = fn_8005D830((u32)(u16)r28);
+        *(void**)((u8*)r31 + 0x24) = menuSeqBiosGetPtr((u32)(u16)r28);
     }
     {
         u8* r29 = lbl_80404B8C;
@@ -1457,7 +1457,7 @@ void fn_801081F8(void* r3_arg, u16 r4, u16 r5) {
                     *(u16*)(r27 + 0x10) = 0;
                 } else {
                     memset(r27 + 0xc, 0, 0x3c);
-                    *(void**)(r27 + 0xc) = fn_8005D830(r28);
+                    *(void**)(r27 + 0xc) = menuSeqBiosGetPtr(r28);
                 }
                 *(s16*)(r30 + 0x0) = *(s16*)(r27 + 0x50);
                 *(s16*)(r30 + 0x2) = *(s16*)(r27 + 0x52);
@@ -1508,7 +1508,7 @@ void fn_801081F8(void* r3_arg, u16 r4, u16 r5) {
             *(u16*)((u8*)r30 + 0x10) = 0;
         } else {
             memset((u8*)r30 + 0xc, 0, 0x3c);
-            *(void**)((u8*)r30 + 0xc) = fn_8005D830((u32)(u16)r25);
+            *(void**)((u8*)r30 + 0xc) = menuSeqBiosGetPtr((u32)(u16)r25);
         }
         {
             u8* r31 = lbl_80404B68;
@@ -1565,7 +1565,7 @@ void winSetSequence(void* out, u32 idx) {
         *(u16*)((u8*)out + 0x4) = 0;
     } else {
         memset(out, 0, 0x3c);
-        *(void**)((u8*)out + 0x0) = fn_8005D830((u32)(u16)idx);
+        *(void**)((u8*)out + 0x0) = menuSeqBiosGetPtr((u32)(u16)idx);
     }
 }
 #pragma pop

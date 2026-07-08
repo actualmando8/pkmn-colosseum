@@ -2720,7 +2720,7 @@ void fn_80020F54(u8* arg0, u8* arg1) {
 #endif
 
 /* fn_800210F0 - 0x800210F0 | size: 0x4d4 */
-extern void fn_8005CEE8(void);
+extern void menuColosseumBattle(void);
 extern void fn_800FF58C(void);
 extern void fn_8006A718(void);
 extern void fn_801CB9D8(u32);

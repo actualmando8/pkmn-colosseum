@@ -10,8 +10,8 @@
 
 /* ===== External function declarations ===== */
 extern void menuSubGetPokemonSexForDisp();
-extern void fn_8005D830();
-extern void fn_8005D858();
+extern void menuSeqBiosGetPtr();
+extern void menuSpriteBiosGetPtr();
 extern void menuItemBiosSetSelectFlag();
 extern void fn_80071160();
 extern void fn_80071208();
@@ -3474,7 +3474,7 @@ void fn_8006C7D4(void) {
     L_8006CB5C: ;
     if (r31 == (u32)0x0) return;
     r3 = r31;
-    ((void(*)(void))fn_8005D858)();
+    ((void(*)(void))menuSpriteBiosGetPtr)();
     r0 = r3;
     r3 = r28;
     r4 = r0;
@@ -4452,7 +4452,7 @@ void fn_8006D550(void) {
     L_8006D8F8: ;
     if (r26 == (u32)0x0) return;
     r3 = r26;
-    ((void(*)(void))fn_8005D858)();
+    ((void(*)(void))menuSpriteBiosGetPtr)();
     r4 = r3;
     r3 = r31;
     ((void(*)(void))fn_80071318)();
@@ -4825,7 +4825,7 @@ void fn_8006DC28(void) {
                 if (r22 == (u32)0x0) break;
                 if (r24 != (u32)0x0) {
                     r3 = 0x375;
-                    ((void(*)(void))fn_8005D858)();
+                    ((void(*)(void))menuSpriteBiosGetPtr)();
                     r4 = r3;
                     r3 = r22;
                     ((void(*)(void))fn_80071318)();
@@ -4834,7 +4834,7 @@ void fn_8006DC28(void) {
                 r0 = r23 & 0xFF;
                 if (r0 == (u32)0x0) break;
                 r3 = 0x25b;
-                ((void(*)(void))fn_8005D858)();
+                ((void(*)(void))menuSpriteBiosGetPtr)();
                 r4 = r3;
                 r3 = r22;
                 ((void(*)(void))fn_80071318)();
@@ -4856,7 +4856,7 @@ void fn_8006DC28(void) {
                         r22 = 0x341;
                     }
                     r3 = r22;
-                    ((void(*)(void))fn_8005D858)();
+                    ((void(*)(void))menuSpriteBiosGetPtr)();
                     r4 = r3;
                     r3 = r24;
                     ((void(*)(void))fn_80071318)();
@@ -5315,12 +5315,12 @@ void fn_8006E338(void) {
 
                 r3 = 0x2ae;
             }
-            ((void(*)(void))fn_8005D858)();
+            ((void(*)(void))menuSpriteBiosGetPtr)();
             r0 = r3;
             r4 = r0;
             ((void(*)(void))fn_80071318)();
             r3 = *(u16*)((u8*)r27 + 0x0);
-            ((void(*)(void))fn_8005D858)();
+            ((void(*)(void))menuSpriteBiosGetPtr)();
             r4 = r3;
             ((void(*)(void))fn_80071318)();
             r3 = 0x0;
@@ -5447,7 +5447,7 @@ void fn_8006E338(void) {
     r0 = *(u32*)((u8*)r3 + 0x59CC);
     if ((s32)r0 != (s32)0x1) {
         r3 = 0x2ae;
-        ((void(*)(void))fn_8005D858)();
+        ((void(*)(void))menuSpriteBiosGetPtr)();
         r4 = r28 + 0x628;
         r21 = r3;
         r4 = *(u16*)((u8*)r4 + 0x8);
@@ -6388,7 +6388,7 @@ void fn_8006F284(void) {
         r3 = r29;
         winSpriteSetDisp();
         r3 = 0x191;
-        ((void(*)(void))fn_8005D830)();
+        ((void(*)(void))menuSeqBiosGetPtr)();
         r0 = *(u32*)((u8*)r29 + 0xC);
         if (r0 != (u32)r3) {
             r4 = *(u16*)((u8*)r27 + 0x0);
@@ -6654,7 +6654,7 @@ void fn_8006F720(void) {
             r4 = r0 & 0xFF;
             winSpriteSetDisp();
             r3 = 0x191;
-            ((void(*)(void))fn_8005D830)();
+            ((void(*)(void))menuSeqBiosGetPtr)();
             r0 = *(u32*)((u8*)r28 + 0xC);
             if (r0 != (u32)r3) {
                 r4 = *(u16*)((u8*)r27 + 0x0);
@@ -7126,7 +7126,7 @@ void fn_8006FEE4(void) {
 
             r3 = 0x26c;
         }
-        ((void(*)(void))fn_8005D858)();
+        ((void(*)(void))menuSpriteBiosGetPtr)();
         r0 = r3;
         r3 = r25;
         r4 = r0;

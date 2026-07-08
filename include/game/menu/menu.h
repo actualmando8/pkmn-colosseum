@@ -392,7 +392,7 @@ s32 menuCB_Common_GetCursorPos(void);
  * ========================================================================= */
 
 /**
- * fn_80069A60: Battle menu callback with rule validation.
+ * menuCB_Battle: Battle menu callback with rule validation.
  * Assert: "FIGHT_ENCOUNTER_DATA_null != null"
  * Assert: "0 <= eRuleType && _LENGTH(_CB.m_aRule) > eRuleType"
  * File: "menuCB_Battle.c"
@@ -407,13 +407,13 @@ void menuCB_Battle_ValidateEncounter(void);
 s32 menuCB_Battle_Update(void);
 
 /**
- * fn_80069A08: Battle menu initialization.
+ * menuCBPokemonEntryDispPokemonFace: Battle menu initialization.
  * Size: 0x58
  */
 void menuCB_Battle_Init(void);
 
 /**
- * fn_80069944: Battle menu input handler.
+ * menuCBPokemonEntryTexWorkInit: Battle menu input handler.
  * Size: 0xC4
  */
 s32 menuCB_Battle_HandleInput(void);

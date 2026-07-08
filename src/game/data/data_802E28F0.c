@@ -94,8 +94,8 @@ extern u8 fn_80058880[];
 extern u8 fn_80058AB0[];
 extern u8 fn_80058DCC[];
 extern u8 fn_8005D6A8[];
-extern u8 fn_8005DA48[];
-extern u8 fn_8005DCC4[];
+extern u8 dbgMenuLogDraw[];
+extern u8 menuDbgItemCreateCursor[];
 extern u8 fn_8005E690[];
 extern u8 fn_8005E730[];
 extern u8 fn_80063D10[];
@@ -1589,7 +1589,7 @@ void* lbl_802E2DB8[1904] = {
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_8005DA48),
+    (void*)((u8*)dbgMenuLogDraw),
     (void*)0x61240000,
     (void*)0x08ED0000,
     (void*)0x00000000,
@@ -1698,7 +1698,7 @@ void* lbl_802E2DB8[1904] = {
     (void*)0x61840000,
     (void*)0x0CB50028,
     (void*)0x00320000,
-    (void*)((u8*)fn_8005DCC4),
+    (void*)((u8*)menuDbgItemCreateCursor),
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)0x00000000,

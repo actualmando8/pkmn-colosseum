@@ -9,7 +9,7 @@
 #include "dolphin/types.h"
 
 /* ===== External function declarations ===== */
-extern void fn_8005D858();
+extern void menuSpriteBiosGetPtr();
 extern void fn_8007FDBC();
 extern void fn_80082A88();
 extern void fn_80082EA4();
@@ -1194,7 +1194,7 @@ do {
             tmp = r25 << 2;
             r3 = r29 + 0x1d0;
             r3 = *(u32*)(r3 + tmp);
-            ((void(*)(void))fn_8005D858)();
+            ((void(*)(void))menuSpriteBiosGetPtr)();
             r30 = r3;
             break;
         }
@@ -1226,7 +1226,7 @@ do {
         tmp = r25 << 2;
         r3 = r29 + 0x1b0;
         r3 = *(u32*)(r3 + tmp);
-        ((void(*)(void))fn_8005D858)();
+        ((void(*)(void))menuSpriteBiosGetPtr)();
         r30 = r3;
         break;
     }

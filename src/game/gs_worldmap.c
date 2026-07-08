@@ -3031,7 +3031,7 @@ s32 fn_80028728(void* r3, u8* r4) {
 #endif
 
 /* fn_80028830 - 0x80028830 | size: 0x118 */
-extern void* fn_8005D858(s32);
+extern void* menuSpriteBiosGetPtr(s32);
 extern void windowDrawSprite2(s32, s32, s32, s32, u32, void*, s32, s32);
 extern f64 lbl_8047B948;
 extern f32 lbl_8047B940;
@@ -3072,8 +3072,8 @@ s32 fn_80028830(void* r3) {
     s32 y1;
 
     r27 = r3;
-    r29 = *(s16*)((u8*)fn_8005D858(0x98) + 0xc);
-    r28 = *(s16*)((u8*)fn_8005D858(0x98) + 0xe);
+    r29 = *(s16*)((u8*)menuSpriteBiosGetPtr(0x98) + 0xc);
+    r28 = *(s16*)((u8*)menuSpriteBiosGetPtr(0x98) + 0xe);
     r31 = lbl_803A20DC;
     r30 = 0;
     while (r30 < 0x1e) {
