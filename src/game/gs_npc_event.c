@@ -519,8 +519,8 @@ extern void fn_801D0314(void);
 extern void fn_801024E8(void);
 extern void fn_800FF52C(void);
 extern void fn_800FF660(void);
-extern void fn_8011394C(void);
-extern void fn_80113828(void);
+extern void floorGetPrevFloorID(void);
+extern void floorLink(void);
 extern void jumptable_802E4F90();
 extern u8 lbl_8047A409;
 extern u8 lbl_803A2518[];
@@ -591,8 +591,8 @@ void fn_80031B4C(void) {
     extern void fn_80109C88();
     extern void fn_8010A420();
     extern void menuModelInit();
-    extern void fn_80113828();
-    extern void fn_8011394C();
+    extern void floorLink();
+    extern void floorGetPrevFloorID();
     extern void pokemonBiosSetFriend();
     extern void pokemonBiosGetNicknamePtr();
     extern void fadeCheck();
@@ -940,9 +940,9 @@ void fn_80031B4C(void) {
             fn_800FF660();
             goto L_80032484;
         }
-        fn_8011394C();
+        floorGetPrevFloorID();
         r4 = 0x0;
-        fn_80113828();
+        floorLink();
     }
 L_80032484:
     tmp = 0x1;

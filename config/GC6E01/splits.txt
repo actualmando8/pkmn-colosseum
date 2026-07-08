@@ -1268,8 +1268,23 @@ game/gs_colsys.c:
 game/gs_range_8010CBD0.c:
 	.text       start:0x8010CBD0 end:0x8010F6A0
 
-game/gs_field_colquery.c:
-	.text       start:0x8010F6A0 end:0x801140DC
+game/GScolsys2Util.c:
+	.text       start:0x8010F6A0 end:0x8010FAF4
+
+game/GScolsys2Human_range_8010FAF4.c:
+	.text       start:0x8010FAF4 end:0x80110084
+
+game/GScolsys2Thru_range_80110084.c:
+	.text       start:0x80110084 end:0x80111B9C
+
+game/GScolsys2Check.c:
+	.text       start:0x80111B9C end:0x80111C24
+
+game/GScolsys2Sun_range_80111C24.c:
+	.text       start:0x80111C24 end:0x80112380
+
+game/floor.c:
+	.text       start:0x80112380 end:0x801140DC
 
 game/field_range_801140DC.c:
 	.text       start:0x801140DC end:0x8011432C

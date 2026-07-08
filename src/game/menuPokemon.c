@@ -1948,7 +1948,7 @@ extern u32 cursorBiosGetPos();
 extern void cursorBiosSetPos();
 extern u16 itemBiosGetItemDataId();
 extern void fn_800FF660(void);
-extern void fn_8011288C();
+extern void floorSetFadeScript();
 extern u32 lbl_80478860;
 extern u8 lbl_802E4DB0[];
 extern u8 lbl_802EF0A8[];
@@ -2126,7 +2126,7 @@ u16 fn_80018A68(void) {
     menuCloseCustom(0x59, 0, 1);
     if ((s32)lbl_8047A2E4 != 0) {
         fn_800FF660();
-        fn_8011288C(0, 0);
+        floorSetFadeScript(0, 0);
     }
     return (u16)selectedSpecies;
 }
@@ -2199,7 +2199,7 @@ u32 fn_80018F88(s32 mode, s32* ptr, u32 val) {
     lbl_8047A2E4 = 1;
     _flagSet(1, 0);
     fn_800FF730(0x38f);
-    fn_8011288C(0, 0);
+    floorSetFadeScript(0, 0);
     _threadSwitch();
     if (*(u16*)&lbl_8047A2F0 == 0) {
         return 0;
@@ -3572,12 +3572,12 @@ void menuPokemonClose(void) {
     extern u8 lbl_803A1D40[];
     extern void menuCloseCustom();
     extern void fn_800FF660();
-    extern void fn_8011288C();
+    extern void floorSetFadeScript();
     extern void _threadSwitch();
     menuCloseCustom(0x63, 0x0, 0x1);
     if (*(u8*)(lbl_803A1D40 + 0x2) != 0) {
         fn_800FF660();
-        if (*(u8*)(lbl_803A1D40 + 0x3) != 0x1) fn_8011288C(0x0, 0x0);
+        if (*(u8*)(lbl_803A1D40 + 0x3) != 0x1) floorSetFadeScript(0x0, 0x0);
         _threadSwitch();
     }
 }
@@ -3906,7 +3906,7 @@ u32 menuPokemonOpenSub(u32 a0, u8 a1, u8 a2, u16 a3, u32 a4, u8 a5) {
     extern u32 fn_800D37CC(void);
     extern void _flagSet();
     extern void fn_800FF730();
-    extern void fn_8011288C();
+    extern void floorSetFadeScript();
     extern void _threadSwitch();
     extern void menuPokemonSub();
     s32 v;
@@ -3965,7 +3965,7 @@ BC20:
         _flagSet(1, 1);
         fn_800FF730(0x38f);
         if (*(u8*)(lbl_803A1D40 + 0x3) != 1) {
-            fn_8011288C(0, 0);
+            floorSetFadeScript(0, 0);
         }
         _threadSwitch();
         if (*(u8*)(lbl_803A1D40 + 0x3) == 2) {
@@ -4071,7 +4071,7 @@ s32 menuPokemonMain(void) {
     extern void menuPokemonSub();
     extern void menuCloseCustom();
     extern void fn_800FF660();
-    extern void fn_8011288C();
+    extern void floorSetFadeScript();
     extern void _threadSwitch();
     u8 r3;
     u16 r4;
@@ -4083,7 +4083,7 @@ s32 menuPokemonMain(void) {
     menuCloseCustom(0x63, 0x0, 0x1);
     if (*(u8*)(lbl_803A1D40 + 0x2) != 0) {
         fn_800FF660();
-        if (*(u8*)(lbl_803A1D40 + 0x3) != 0x1) fn_8011288C(0x0, 0x0);
+        if (*(u8*)(lbl_803A1D40 + 0x3) != 0x1) floorSetFadeScript(0x0, 0x0);
         _threadSwitch();
     }
     return 0;

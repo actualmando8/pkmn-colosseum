@@ -78,7 +78,7 @@ extern u8*  windowGetKeyInfo(void);
 extern void winMsgOpen();
 extern void winMsgClose();
 extern void fn_80108518();
-extern void fn_80113828();
+extern void floorLink();
 extern void* savedataGetStatus();
 extern void fn_80129384();
 extern void fn_801293FC();
@@ -1551,7 +1551,7 @@ done:
         } else {
             fn_8006B8FC();
         }
-        fn_80113828(floorId, 0);
+        floorLink(floorId, 0);
     }
 #undef WORKP
 }

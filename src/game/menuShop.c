@@ -3222,7 +3222,7 @@ void fn_8002D5D4(void)
     extern void fn_800E24B0(u16);       /* GSmemLock */
     extern void fn_800E209C(u16);       /* GSmemFree */
     extern void fn_800FF660(void);
-    extern void fn_8011288C(s32, u32);
+    extern void floorSetFadeScript(s32, u32);
     extern u32  heroGetStatus(u8*, u32, u32);  /* GSmap_GetNearestLocation */
     extern u32  fn_8002A0B8(u8*, s32, s32, s32, ...); /* GSmap_FormatText1 */
     extern void fn_8002A1C4(u8*, s32, s32, ...); /* GSmap_FormatText2 */
@@ -3367,7 +3367,7 @@ _epilogue:
     /* if lbl_8047A3FC[+4] is nonzero, fire story event */
     if (*(u32*)((u8*)&lbl_8047A3FC + 4) != 0) {
         fn_800FF660();
-        fn_8011288C(0, 0);
+        floorSetFadeScript(0, 0);
     }
 }
 #endif
@@ -3433,7 +3433,7 @@ void fn_8002D91C(u32 arg0)
 
     /* exit-path helpers */
     extern void fn_800FF660(void);
-    extern void fn_8011288C(s32 a, u32 b);
+    extern void floorSetFadeScript(s32 a, u32 b);
 
     /* ---- local variables ------------------------------------------------ */
     u8  type_byte;  /* r28: lbl_80478E54[arg0*4 + 1]                        */
@@ -3607,7 +3607,7 @@ void fn_8002D91C(u32 arg0)
      * ================================================================ */
     if (lbl_8047A400 != 0) {
         fn_800FF660();
-        fn_8011288C(0, 0);
+        floorSetFadeScript(0, 0);
     }
 }
 #endif
@@ -3646,7 +3646,7 @@ void menuShopOpen(u32 flag)
     extern void menuCreateOffScreen(f32);
     extern void _flagSet(s32, s32);
     extern void fn_800FF730(s32);
-    extern void fn_8011288C(s32, u32);
+    extern void floorSetFadeScript(s32, u32);
     extern void _threadSwitch(void);
     extern void menuReleaseOffScreen(f32);
 
@@ -3674,7 +3674,7 @@ void menuShopOpen(u32 flag)
 
     _flagSet(1, 2);
     fn_800FF730(0x38f);
-    fn_8011288C(0, 0);
+    floorSetFadeScript(0, 0);
     _threadSwitch();   /* GSthreadYield / vsync yield */
 
     /* post-yield timer sample -> fade-out parameter */

@@ -264,5 +264,5 @@ void fn_80266250(void)
         fn_801659FC(iVar2, 0x32, uVar4);
     }
     fn_800FF660();
-    fn_8011288C(0, 0x5960008);
+    floorSetFadeScript(0, 0x5960008);
 }

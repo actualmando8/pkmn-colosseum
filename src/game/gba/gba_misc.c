@@ -88,7 +88,7 @@ extern void GSresGetResource();
 extern void fn_800F9AEC();
 extern void fn_800F9C04();
 extern void fn_800FF58C();
-extern void fn_8011288C();
+extern void floorSetFadeScript();
 extern void fn_80113F48();
 extern void fn_80118874();
 extern void pokemonBiosSetEventGetFlag();
@@ -3889,7 +3889,7 @@ void fn_8008C7B0(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -4097,7 +4097,7 @@ void fn_8008CACC(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -4288,7 +4288,7 @@ void fn_8008CDD8(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -4470,7 +4470,7 @@ void fn_8008D0A0(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -4879,7 +4879,7 @@ void fn_8008D348(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -5545,7 +5545,7 @@ void fn_8008D938(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -5870,7 +5870,7 @@ void fn_8008E320(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -6170,7 +6170,7 @@ void fn_8008E7D4(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -6352,7 +6352,7 @@ void fn_8008EC28(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -6541,7 +6541,7 @@ void fn_8008EED0(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -6786,7 +6786,7 @@ void fn_8008F190(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -7063,7 +7063,7 @@ void fn_8008F524(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -7265,7 +7265,7 @@ void fn_8008F91C(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -7446,7 +7446,7 @@ void fn_8008FBF4(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -7614,7 +7614,7 @@ void fn_8008FE94(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -8039,7 +8039,7 @@ void fn_80090100(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -8230,7 +8230,7 @@ void fn_80090720(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -8462,7 +8462,7 @@ void fn_800909E4(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -8663,7 +8663,7 @@ void fn_80090D34(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -9032,7 +9032,7 @@ void fn_8009100C(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -9175,7 +9175,7 @@ void fn_80091564(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -9318,7 +9318,7 @@ void fn_80091774(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -9461,7 +9461,7 @@ void fn_80091984(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -9604,7 +9604,7 @@ void fn_80091B94(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -9718,7 +9718,7 @@ void fn_80091DA4(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -9861,7 +9861,7 @@ void fn_80091F48(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -10097,7 +10097,7 @@ void fn_80092140(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -10221,7 +10221,7 @@ void fn_80092498(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -10457,7 +10457,7 @@ void fn_80092664(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -10558,7 +10558,7 @@ void fn_800929BC(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }
 
@@ -10656,6 +10656,6 @@ void fn_80092B2C(void) {
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
     r4 = 0x0;
-    ((void(*)(void))fn_8011288C)();
+    ((void(*)(void))floorSetFadeScript)();
     return;
 }

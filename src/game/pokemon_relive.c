@@ -555,7 +555,7 @@ void preReliveMain(void)
     extern u32 menuPokemonOpen();
     extern int fn_800FF730();
     extern int winMsgCloseField();
-    extern int fn_8011288C();
+    extern int floorSetFadeScript();
     extern int pokemonBiosGetDarkpokemonDataId();
     extern s8 heroItemCheckHaveItemDataId();
     extern u32 heroGetStatus();
@@ -645,7 +645,7 @@ void preReliveMain(void)
       fadeSet((double)lbl_8047E680,3);
       fadeCheck(1);
       fn_800FF730(0x385);
-      fn_8011288C(0,0);
+      floorSetFadeScript(0,0);
       _threadSwitch();
       fadeSet((double)lbl_8047E68C,2);
       fadeCheck(1);
@@ -675,7 +675,7 @@ void preReliveMain(void)
           fadeCheck(1);
           fn_8025DD14((int*)auStack_28);
           fn_800FF730(0x385);
-          fn_8011288C(0,0);
+          floorSetFadeScript(0,0);
           _threadSwitch();
           fadeSet((double)lbl_8047E68C,2);
           fadeCheck(1);
@@ -985,7 +985,7 @@ void reliveMain(void)
 				    *(u16 *)((u8 *)lbl_804782BC + 4) = 0;
     lbl_804782BC[2] = 0;
     fn_800FF660();
-    fn_8011288C(0,0);
+    floorSetFadeScript(0,0);
     _threadSwitch();
   }
   return;

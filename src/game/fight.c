@@ -138,8 +138,8 @@ u32 fn_8020DAD0(u32 p1) {
     extern u32 fn_800FF56C();
     extern void fn_800FF730();
     extern void fn_80112700();
-    extern void fn_8011288C();
-    extern void fn_8011395C();
+    extern void floorSetFadeScript();
+    extern void floorSetPrevFloorID();
     extern void fn_80113FE8();
     extern void fn_801140C8();
     extern void heroDecPokedoru();
@@ -234,9 +234,9 @@ u32 fn_8020DAD0(u32 p1) {
         }
         fn_801EF7B4();
         fn_800FF730(uVar7);
-        fn_8011288C(0, 0);
+        floorSetFadeScript(0, 0);
         _threadSwitch();
-        fn_8011395C(uVar7);
+        floorSetPrevFloorID(uVar7);
         cVar10 = fightEncountDataBiosGetZenmetuFlag(uVar1);
         if (cVar10 != 0) {
             uVar1 = fn_801EF634();
@@ -249,7 +249,7 @@ u32 fn_8020DAD0(u32 p1) {
                 fn_801D0AFC(1);
                 fn_8018DA88();
                 fn_80113FE8();
-                fn_8011288C(0, 0x5960008);
+                floorSetFadeScript(0, 0x5960008);
                 _threadSwitch();
                 uVar1 = fn_801EF634();
                 return uVar1;

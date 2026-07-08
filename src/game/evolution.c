@@ -510,7 +510,7 @@ u32 evolutionOpen(u32 r3, u32 r4, u32 r5, u16 *r6, u32 r7, u8 *r8)
 {
     extern u32 lbl_804787E0[];
     extern void fn_800FF730(u32);
-    extern void fn_8011288C(u32, u32);
+    extern void floorSetFadeScript(u32, u32);
     extern void _threadSwitch(void);
     u32 *base;
 
@@ -522,7 +522,7 @@ u32 evolutionOpen(u32 r3, u32 r4, u32 r5, u16 *r6, u32 r7, u8 *r8)
     base[4] = (u32)r6;
     base[5] = (u32)r8;
     fn_800FF730(0x386);
-    fn_8011288C(0, 0);
+    floorSetFadeScript(0, 0);
     _threadSwitch();
     return base[6];
 }
@@ -534,11 +534,11 @@ void evolution(void)
     extern u32 lbl_804787E0[];
     extern u32 evolutionStart();
     extern void fn_800FF660();
-    extern void fn_8011288C();
+    extern void floorSetFadeScript();
     u32 *base = lbl_804787E0;
     base[6] = evolutionStart(base[0], base[1], base[2], (u16*)base[4], base[3], (u8*)base[5]);
     fn_800FF660();
-    fn_8011288C(0, 0);
+    floorSetFadeScript(0, 0);
 }
 
 /* Address: 0x802600E4 | Size: 0x378 | Ghidra import */

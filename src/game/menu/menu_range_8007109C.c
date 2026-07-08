@@ -28,7 +28,7 @@ typedef struct GbaIdleCallback {
 extern GbaIdleCallback lbl_803B6E18[5];
 extern s32 lbl_803B6E08[4];
 extern u8 lbl_803B6D88[0x58];
-extern void fn_80113828(s32, s32);
+extern void floorLink(s32, s32);
 
 /*
  * Small helpers ported from the previous campaign's archive
@@ -65,7 +65,7 @@ s32 fn_800716E8(s32 channel, s32 value) {
 #pragma push
 #pragma peephole off
 s32 fn_8007169C(void) {
-    fn_80113828(0x385, 0);
+    floorLink(0x385, 0);
     return 0;
 }
 #pragma pop

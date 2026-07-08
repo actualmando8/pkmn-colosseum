@@ -69,7 +69,7 @@
  * fn_800203B4 (GStitle_MainLoop) structure:
  *   while (1) {
  *       if (gTitleState == 0x28) {  // TITLE_STATE_AUTODEMO_TIMEOUT
- *           fn_80113828(0x39C, 0);  // load autodemo camera
+ *           floorLink(0x39C, 0);  // load autodemo camera
  *           gTitleState = 0x3E8;   // TITLE_STATE_PLAY_AUTODEMO
  *           continue;
  *       }
@@ -190,7 +190,7 @@ extern void  _threadSwitch(void);
 extern void  GSthreadTerminate(void* threadCtx);
 
 /* Scene/camera */
-extern void  fn_80113828(s32 cameraId, s32 mode);
+extern void  floorLink(s32 cameraId, s32 mode);
 extern u8    fn_800FF548(void);
 extern void  fn_800FF56C(s32 floorId);
 
@@ -199,7 +199,7 @@ extern void  fn_80166AB8(s32 soundId, s32 p2, s32 p3);
 extern void  fn_801669E4(s32 soundId, s32 p2, s32 p3);
 
 /* Save system */
-extern void  fn_8011288C(s32 p1, s32 p2);
+extern void  floorSetFadeScript(s32 p1, s32 p2);
 
 /* Input */
 extern void  fn_801EF644(s32 result);
@@ -1425,7 +1425,7 @@ void fn_800255A4(void) {
 extern void menuItemBiosSetSelectFlag(void);
 extern void windowGetActiveID(void);
 extern void menuOpenCustom(void);
-extern void fn_8011394C(void);
+extern void floorGetPrevFloorID(void);
 extern void fn_800D3074(void);
 extern void GStextureCreate(void);
 extern void menuOpen(void);
@@ -1459,7 +1459,7 @@ void fn_80025730(void) {
     extern void menuOpen();
     extern void menuOpenCustom();
     extern void windowGetActiveID();
-    extern void fn_8011394C();
+    extern void floorGetPrevFloorID();
     extern void fn_801902E0();
     extern void fn_80025F74();
     u8 sp[0x20];
@@ -1533,7 +1533,7 @@ void fn_80025730(void) {
     r8 = 0x0;
     menuOpenCustom();
     if ((s32)r3 < 0) {
-        fn_8011394C();
+        floorGetPrevFloorID();
         r30 = r3;
 
     } else {
@@ -1571,11 +1571,11 @@ void fn_80025730(void) {
         r3 = tmp + r31;
         r30 = *(u32*)((u8*)r3 + 0x4);
     }
-    fn_8011394C();
+    floorGetPrevFloorID();
     if (r30 != r3) {
         do {
             if (r30 != 0x7a) break;
-            fn_8011394C();
+            floorGetPrevFloorID();
             if (r3 != 0xf) break;
             tmp = 0x0;
             goto L_80025910;
@@ -1583,7 +1583,7 @@ void fn_80025730(void) {
 
         do {
             if (r30 != 0xf) break;
-            fn_8011394C();
+            floorGetPrevFloorID();
             if (r3 != 0x7a) break;
             tmp = 0x0;
             break;
@@ -1626,7 +1626,7 @@ L_80025910:
     }
     r3 = r30;
     r4 = 0x0;
-    ((void(*)(void))fn_80113828)();
+    ((void(*)(void))floorLink)();
     return;
 }
 #endif
@@ -1661,7 +1661,7 @@ void fn_800259B0(void) {
     extern u8 lbl_803A2058[];
     extern u8 lbl_803A204C[];
     extern void fn_801CB954(s32, s32);
-    extern u32 fn_8011394C(void);
+    extern u32 floorGetPrevFloorID(void);
     f32* vec1 = (f32*)lbl_803A2058;
     f32* vec2 = (f32*)lbl_803A204C;
     u32 result;
@@ -1686,7 +1686,7 @@ void fn_800259B0(void) {
     fn_801CB954(0x0C6A1000, 0);
     fn_801CB954(0x0C6A1001, 0);
     fn_801CB954(0x0C6A1002, 0);
-    result = fn_8011394C();
+    result = floorGetPrevFloorID();
     lbl_8047A3AC = result;
     if (result == 0x7b) {
         lbl_8047A3AC = 0x66;
@@ -1714,7 +1714,7 @@ void fn_800259B0_old(void) {
     extern f32 lbl_8047B8AC;
     extern f32 lbl_8047B8E8;
     extern f32 lbl_8047B8EC;
-    extern void fn_8011394C();
+    extern void floorGetPrevFloorID();
     extern void fn_801CB954();
     u8 sp[0x10];
     u32 tmp = 0;
@@ -1765,7 +1765,7 @@ void fn_800259B0_old(void) {
     r4 = 0x0;
     r3 = r3 + 0x1002;
     fn_801CB954();
-    fn_8011394C();
+    floorGetPrevFloorID();
     lbl_8047A3AC = r3;
     if (r3 == 0x7b) {
         tmp = 0x66;

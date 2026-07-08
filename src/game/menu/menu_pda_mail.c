@@ -314,11 +314,11 @@ void fn_8004D8BC(PdaMailWindowA* window)
 #pragma peephole reset
 #endif
 
-/* fn_800FF730 (gs_floor_data.c): floor-transition trigger; fn_8011288C
+/* fn_800FF730 (gs_floor_data.c): floor-transition trigger; floorSetFadeScript
  * (gs_field_colquery.c, GSfield_IsTransitioning): floor resource-alloc
  * helper; _threadSwitch: cooperative thread yield. */
 extern void fn_800FF730(s32 floorId);
-extern void fn_8011288C(s32 a, u32 b);
+extern void floorSetFadeScript(s32 a, u32 b);
 extern void _threadSwitch(void);
 
 #if 0
@@ -330,7 +330,7 @@ asm void menuPdaOpen(void) {
 void menuPdaOpen(void)
 {
     fn_800FF730(0x392);
-    fn_8011288C(0, 0);
+    floorSetFadeScript(0, 0);
     _threadSwitch();
 }
 #pragma scheduling reset

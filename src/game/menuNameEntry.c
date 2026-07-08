@@ -3155,7 +3155,7 @@ extern void pokemonBiosSetNicknamePtr(void);
 extern void fn_801349DC(void);
 extern void fn_800F9EE4(void);
 extern void fn_800FF660(void);
-extern void fn_8011288C(s32, u32);
+extern void floorSetFadeScript(s32, u32);
 extern u32 lbl_804788A0;
 extern u8 lbl_80266DC0[];
 extern f32 lbl_8047B940;
@@ -3231,7 +3231,7 @@ void menuNameEntry(void) {
     extern void pcboxSetPokemonBoxName(s32 a, s32 name, u8* ctx);
     extern s32  GScharCmp(u8* ctx, void* nameBuf);
     extern void fn_800FF660(void);
-    extern void fn_8011288C(s32 a, u32 b);
+    extern void floorSetFadeScript(s32 a, u32 b);
 
     u8* ctx;        /* lbl_803A2068 context block          */
     u8* data;       /* lbl_80266DC0 map data blob          */
@@ -3460,9 +3460,9 @@ void menuNameEntry(void) {
     if (*(s32*)(ctx + 0x28) != 0) {
         fn_800FF660();
         if (*(s32*)(lbl_803A2068 + 0x24) != 0) {
-            fn_8011288C(0, 0x05960008);
+            floorSetFadeScript(0, 0x05960008);
         } else {
-            fn_8011288C(0, 0);
+            floorSetFadeScript(0, 0);
         }
     }
 }
@@ -3535,7 +3535,7 @@ void menuNameEntryGetLastName(void* r3) {
 /* menuNameEntryOpenNoFade - 0x80029660 | size: 0x100 */
 extern void fn_800FF730(s32);
 extern void _threadSwitch(void);
-extern void fn_8011288C(s32, u32);
+extern void floorSetFadeScript(s32, u32);
 #if 0
 asm void menuNameEntryOpenNoFade(void) {
 #include "src/game/gs_worldmap_fn_80029660.inc"
@@ -3580,7 +3580,7 @@ s32 menuNameEntryOpenNoFade(s32 r3, s32 r4) {
     *(s32*)(ctx + 0x24) = 0;
     *(s32*)(ctx + 0x28) = 1;
     fn_800FF730(0x390);
-    fn_8011288C(0, 0x05960008);
+    floorSetFadeScript(0, 0x05960008);
     _threadSwitch();
     return *(s32*)(ctx + 0x20);
 }

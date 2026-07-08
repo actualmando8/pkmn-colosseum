@@ -501,7 +501,7 @@ void fn_801EFA08(void) {
     extern void fn_8000816C();
     extern void dbgMenuFightGetMsgSpeedToFrame();
     extern void fn_800FF660();
-    extern void fn_8011288C();
+    extern void floorSetFadeScript();
     extern void fn_8016597C();
     extern void battleCameraDoFull();
     extern void fn_801EF2D4();
@@ -893,7 +893,7 @@ void fn_801EFA08(void) {
     fn_800FF660();
     r3 = 0x0;
     r4 = 0x0;
-    fn_8011288C();
+    floorSetFadeScript();
     return;
 }
 

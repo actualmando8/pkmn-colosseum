@@ -100,7 +100,7 @@ extern void GSmodelSetAnimRate(void);
 extern void GSmodelSetAnimFrame(void);
 extern void GSmodelSetAnimType(void);
 extern void GSmodelSetAnimIndex(void);
-extern void fn_8010FFC4(void);
+extern void GScolsys2HumanEnable(void);
 
 /* GSmem allocator */
 extern u16   _toolentryAlloc__FUl(u32 size);                 /* GSmemAllocRaw */
@@ -728,9 +728,9 @@ void fn_8018DCA8(void) {
 extern void GSresGetResource(void);
 extern void fn_800F7BC4(void);
 extern void fn_80101B90(void);
-extern void fn_8011163C(void);
+extern void GScolsys2ThruGetEventID(void);
 extern void fn_8012BAF0(void);
-extern void fn_8010FDF8(void);
+extern void GScolsys2HumanCollision(void);
 extern void fn_8010F320(void);
 extern void PSVECSubtract(void);
 extern void PSVECAdd(void);
@@ -1131,7 +1131,7 @@ extern void fn_800D5CB8(void);
 extern void fn_800D6728(void);
 extern void fn_800E0060(void);
 extern void fn_800E0000(void);
-extern void fn_8010F6A0(void);
+extern void GScolsy2UtilGetPointExtentionLine(void);
 extern void heroMoveSetLockFrame(void);
 extern u32 lbl_8047D840;
 extern u8 lbl_80314638[];

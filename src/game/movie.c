@@ -44,9 +44,9 @@ extern void fadeSet(u32 mode, f32 speed);         /* fade set mode+speed */
 extern void fadeCheck(u32 enable);                   /* fade enable */
 extern void fn_80190528(u32 flagId);                   /* GSflagSet (used for cutscene flags) */
 extern u32  fn_801902E0(u32 flagId);                   /* GSflagGet */
-extern void fn_80113828(u32 a, u32 b);                /* floor resource unload helper */
-extern void fn_8011288C(u32 a, u32 b);                /* floor resource alloc helper */
-extern u32  fn_8011394C(void);                         /* floor state query */
+extern void floorLink(u32 a, u32 b);                /* floor resource unload helper */
+extern void floorSetFadeScript(u32 a, u32 b);                /* floor resource alloc helper */
+extern u32  floorGetPrevFloorID(void);                         /* floor state query */
 extern void* savedataGetStatus(u32 a, u32 b);               /* battle/effect state setup */
 extern void gamedatasaveSetStatus(void* ctx, u32 a, u32 b);     /* effect parameter set */
 extern void* gamedatasaveGetStatus(void* ctx, u32 a);            /* effect query */
@@ -158,13 +158,13 @@ void fn_80035F34(void) {
  *    ; Unload floor resources
  *    li r3, 1
  *    li r4, 0
- *    bl fn_80113828
+ *    bl floorLink
  *
  *    ; Reset floor allocation (0x59608)
  *    li r3, 0
  *    lis r4, 0x596
  *    addi r4, r4, 8
- *    bl fn_8011288C
+ *    bl floorSetFadeScript
  * ======================================================================= */
 void fn_80035E04(void) {
     u8 state;
@@ -183,10 +183,10 @@ void fn_80035E04(void) {
     fn_80190528(0x08D0);
 
     /* Unload floor resources that were active during movie */
-    fn_80113828(1, 0);
+    floorLink(1, 0);
 
     /* Reset floor allocation parameters */
-    fn_8011288C(0, 0x59608);
+    floorSetFadeScript(0, 0x59608);
 }
 
 /* =======================================================================
@@ -220,7 +220,7 @@ void fn_80035E04(void) {
  *    bl fn_80165A20
  *
  *    ; Check floor state
- *    bl fn_8011394C
+ *    bl floorGetPrevFloorID
  *    cmplwi r3, 0x76          ; floor 0x76 = credits floor?
  *    bne .skipSpecial
  *
@@ -270,7 +270,7 @@ void fn_80035F64(void) {
     fn_80165A20(1, 0, 0x7F);
 
     /* Step 3: Check floor state */
-    floorState = (u32)fn_8011394C();
+    floorState = (u32)floorGetPrevFloorID();
     if (floorState != 0x76) {
         goto openMovie;
     }
@@ -390,16 +390,16 @@ openMovie:
     /* Stop sound and restore state */
     fn_80165A20(1, 0, 0x7F);
     fn_80190528(0x08D0);
-    fn_80113828(1, 0);
-    fn_8011288C(0, 0x59608);
+    floorLink(1, 0);
+    floorSetFadeScript(0, 0x59608);
     return;
 
 cleanup:
     /* Early exit cleanup path */
     fn_80165A20(1, 0, 0x7F);
     fn_80190528(0x08D0);
-    fn_80113828(1, 0);
-    fn_8011288C(0, 0x59608);
+    floorLink(1, 0);
+    floorSetFadeScript(0, 0x59608);
 }
 
 /* No-op functions (6) */
@@ -557,7 +557,7 @@ void fn_80036240(void) {
     loop_exit:
     fn_8016597C(1, 0x3e8, 0, 0x7f);
     fn_800FF58C(0x384);
-    fn_8011288C(0, 0x5960008);
+    floorSetFadeScript(0, 0x5960008);
 }
 #pragma peephole reset
 #endif
@@ -630,7 +630,7 @@ void fn_80036468(void) {
         }
     }
     fn_800FF58C(0x384);
-    fn_8011288C(0, 0x5960008);
+    floorSetFadeScript(0, 0x5960008);
     lbl_8047A468 = 1;
 }
 #pragma pop
@@ -704,7 +704,7 @@ void fn_800365E0(void) {
         }
     }
     fn_800FF58C(0x39A);
-    fn_8011288C(0, 0);
+    floorSetFadeScript(0, 0);
     lbl_8047A468 = 1;
 }
 #pragma pop

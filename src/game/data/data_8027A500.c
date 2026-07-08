@@ -86,12 +86,12 @@ extern u8 winMsgOpenFight[];
 extern u8 winMsgCloseField[];
 extern u8 winMsgOpenFieldWithSE[];
 extern u8 winMsgOpenField[];
-extern u8 fn_8011288C[];
-extern u8 fn_80113828[];
-extern u8 fn_8011388C[];
-extern u8 fn_8011392C[];
-extern u8 fn_8011393C[];
-extern u8 fn_8011394C[];
+extern u8 floorSetFadeScript[];
+extern u8 floorLink[];
+extern u8 floorLinkWithSE[];
+extern u8 floorGetNextPosIndex[];
+extern u8 floorGetNextFloorID[];
+extern u8 floorGetPrevFloorID[];
 extern u8 fn_80113F48[];
 extern u8 fn_801140C8[];
 extern u8 fn_801140DC[];
@@ -94078,10 +94078,10 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)fn_80113F48),
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_8011394C),
+    (void*)((u8*)floorGetPrevFloorID),
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_80113828),
+    (void*)((u8*)floorLink),
     (void*)0x01010000,
     (void*)0x00000000,
     (void*)((u8*)floorEventCtrlDoor),
@@ -94171,7 +94171,7 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)scriptGetDarkPokemonNum),
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_8011388C),
+    (void*)((u8*)floorLinkWithSE),
     (void*)0x01010100,
     (void*)0x00000000,
     (void*)((u8*)heroMoveSetNeckMode),
@@ -94228,7 +94228,7 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)fn_80117330),
     (void*)0x02000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_8011288C),
+    (void*)((u8*)floorSetFadeScript),
     (void*)0x01010000,
     (void*)0x00000000,
     (void*)((u8*)fn_801EF758),
@@ -94336,7 +94336,7 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)cameraReturn),
     (void*)0x02010000,
     (void*)0x00000000,
-    (void*)((u8*)fn_8011393C),
+    (void*)((u8*)floorGetNextFloorID),
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)((u8*)fn_80188FA0),
@@ -94381,7 +94381,7 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)preReliveSetParameter),
     (void*)0x01010000,
     (void*)0x00000000,
-    (void*)((u8*)fn_8011392C),
+    (void*)((u8*)floorGetNextPosIndex),
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)((u8*)fn_801C9C9C),

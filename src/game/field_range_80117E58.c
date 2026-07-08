@@ -287,7 +287,7 @@ extern void fn_80177A38(void); /* referenced by asm .inc wrappers (fn_801171C8/8
 extern void GSmodelResetTextureChange(void);
 extern void GSmodelFree(void);
 extern void GStextureCreate(void);
-extern void fn_80113D34(void);
+extern void floorOpenModel(void);
 extern void GSmodelSetVisibility(void);
 extern void GSmodelLinkTexAnimToAnim(void);
 extern void GSmodelSetTextureChange(void);
@@ -517,7 +517,7 @@ extern void fn_8018F5E4(void);
 extern void fn_8010F320(void);
 extern void PSVECScale(void);
 extern void PSVECAdd(void);
-extern void fn_8010FDF8(void);
+extern void GScolsys2HumanCollision(void);
 extern f32 lbl_8047D03C;
 extern f32 lbl_8047D040;
 extern f64 lbl_8047D048;
@@ -604,7 +604,7 @@ extern void fn_8010E138(void);
 extern void GSmodelSetRotation(void);
 extern f32 lbl_8047D0D8;
 void initFloor__Fv(void);
-extern void fn_8011393C(void);
+extern void floorGetNextFloorID(void);
 extern void fn_8006AE18(void);
 extern u8 lbl_802729C0[];
 extern u8 lbl_80272A10[];
@@ -1524,7 +1524,7 @@ void fn_80117E58(void* arg) {
     extern void GStextureFree(void* a);
     extern void GSmodelFree(void* a);
     extern void* GStextureCreate(u16 a, u16 b, u32 c, u32 d, u32 e);
-    extern void* fn_80113D34(u32 a, u32 b);
+    extern void* floorOpenModel(u32 a, u32 b);
     extern void GSmodelSetVisibility(void* a, u32 b);
     extern void GSmodelLinkTexAnimToAnim(void* a, u32 b);
     extern void GSmodelSetAnimIndex(void* a, u32 b);
@@ -1580,7 +1580,7 @@ void fn_80117E58(void* arg) {
         lbl_8047AD88 = 0;
         return;
     }
-    lbl_8047AD90 = (u32)fn_80113D34(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 0xc));
+    lbl_8047AD90 = (u32)floorOpenModel(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 0xc));
     GSmodelSetVisibility((void*)lbl_8047AD90, 0);
     GSmodelLinkTexAnimToAnim((void*)lbl_8047AD90, 1);
     GSmodelSetAnimIndex((void*)lbl_8047AD90, *(u32*)((u8*)lbl_8047AD88 + 0x10));

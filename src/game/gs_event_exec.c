@@ -90,7 +90,7 @@ extern void fn_80166AB8(s32 soundId, s32 p2, s32 p3);   /* Play SE */
 extern void fn_801669E4(s32 soundId, s32 p2, s32 p3);   /* Play BGM */
 
 /* Scene/camera */
-extern void fn_80113828(s32 cameraId, s32 mode);
+extern void floorLink(s32 cameraId, s32 mode);
 extern u8   fn_800FF548(void);                     /* Scene transition check */
 extern void fn_800FF56C(s32 floorId);              /* Floor load */
 

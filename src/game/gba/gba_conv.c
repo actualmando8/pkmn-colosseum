@@ -66,7 +66,7 @@ extern void winMsgClose();
 extern void winMsgOpen();
 extern void fn_801081F8();
 extern void winSpriteSetDisp();
-extern void fn_8011394C();
+extern void floorGetPrevFloorID();
 extern void wazaDataBiosGetDoc();
 extern void wazaDataBiosGetPtr();
 /* ... and 27 more external functions */
@@ -5396,7 +5396,7 @@ void fn_800889E4(void) {
         *(f32*)((u8*)r28 + 0x20) = f0;
         ((void(*)(void))fn_800FF56C)();
         *(u32*)((u8*)r28 + 0x4) = r3;
-        ((void(*)(void))fn_8011394C)();
+        ((void(*)(void))floorGetPrevFloorID)();
         *(u32*)((u8*)r28 + 0x8) = r3;
         tmp = 0x1;
         r3 = 0xafc;
@@ -5646,7 +5646,7 @@ void fn_80088EA8(u8* p) {
     extern void heroMoveGetHeroRot(f32*);
     extern void heroMoveGetHeroPos(f32*);
     extern u32 fn_800FF56C(void);
-    extern u32 fn_8011394C(void);
+    extern u32 floorGetPrevFloorID(void);
     extern u32 fn_801906A0(s32);
     f32 a[3];
     f32 b[3];
@@ -5660,7 +5660,7 @@ void fn_80088EA8(u8* p) {
     *(f32*)(p + 0x1C) = b[1];
     *(f32*)(p + 0x20) = b[2];
     *(u32*)(p + 0x4) = fn_800FF56C();
-    *(u32*)(p + 0x8) = fn_8011394C();
+    *(u32*)(p + 0x8) = floorGetPrevFloorID();
     *(u8*)(p + 0x0) = 1;
     *(u32*)(p + 0x24) = fn_801906A0(0xafc);
     *(u32*)(p + 0x28) = fn_801906A0(0xafd);

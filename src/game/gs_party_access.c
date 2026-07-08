@@ -300,7 +300,7 @@ s32 fn_8000BE08(void) {
 /* fn_8000BE74 - 0x8000BE74 | size: 0x12c */
 extern u32 fn_800F7BC4(u32 a);
 extern u32 fn_8001E3E0(u32 a, u32* b);
-extern void fn_80113828(u32 a, u32 b);
+extern void floorLink(u32 a, u32 b);
 extern u32 lbl_802E28F0[];
 #if 0
 asm void fn_8000BE74(void) {
@@ -326,7 +326,7 @@ s32 fn_8000BE74(s32 arg) {
                 case 0x68: local = 0x0; break;
                 default: break;
             }
-            fn_80113828(lbl_802E28F0[idx * 2 + 1], local);
+            floorLink(lbl_802E28F0[idx * 2 + 1], local);
             goto done;
         }
     }
@@ -367,7 +367,7 @@ s32 fn_8000BFA0(void) {
     }
     if ((fn_800F7BC4(1) & 0x20) != 0) {
         if ((u8)fn_8001E3E0(0, &local) == 0) { return -1; }
-        fn_80113828(local, 0);
+        floorLink(local, 0);
         return 0;
     }
     return 1;
