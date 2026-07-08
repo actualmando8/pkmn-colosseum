@@ -6,24 +6,24 @@
     "total_code": 2495108,
     "total_data": 2196124,
     "total_functions": 8603,
-    "total_units": 515
+    "total_units": 524
   },
   "topology_status": {
     "auto_units": 59,
-    "named_units": 456,
-    "source_backed_units": 436,
+    "named_units": 465,
+    "source_backed_units": 445,
     "auto_code": 0,
     "auto_data": 58535,
     "auto_functions": 0
   },
   "baseline_progress": {
-    "matched_code": "418060",
-    "matched_code_percent": 16.755186,
+    "matched_code": "421948",
+    "matched_code_percent": 16.911013,
     "matched_data": "2137589",
     "matched_data_percent": 97.334625,
-    "matched_functions": 3950,
-    "matched_functions_percent": 45.914215,
-    "fuzzy_match_percent": 32.629124
+    "matched_functions": 3969,
+    "matched_functions_percent": 46.135067,
+    "fuzzy_match_percent": 32.63695
   },
   "unit_topology": [
     {
@@ -5357,17 +5357,134 @@
       "total_functions": 277
     },
     {
-      "name": "main/game/gs_range_800E202C",
+      "name": "main/game/gs_mem",
       "sections": [
         {
           "name": ".text",
-          "size": 53356,
+          "size": 5592,
           "virtual_address": 2148409388
         }
       ],
-      "total_code": 53356,
+      "total_code": 5592,
       "total_data": 0,
-      "total_functions": 189
+      "total_functions": 11
+    },
+    {
+      "name": "main/game/gs_model_main",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 20608,
+          "virtual_address": 2148414980
+        }
+      ],
+      "total_code": 20608,
+      "total_data": 0,
+      "total_functions": 73
+    },
+    {
+      "name": "main/game/gs_model_shadow",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 5288,
+          "virtual_address": 2148435588
+        }
+      ],
+      "total_code": 5288,
+      "total_data": 0,
+      "total_functions": 16
+    },
+    {
+      "name": "main/game/gs_model_state",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 776,
+          "virtual_address": 2148440876
+        }
+      ],
+      "total_code": 776,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/gs_model_parse",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 5172,
+          "virtual_address": 2148441652
+        }
+      ],
+      "total_code": 5172,
+      "total_data": 0,
+      "total_functions": 10
+    },
+    {
+      "name": "main/game/gs_model_bound",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 3204,
+          "virtual_address": 2148446824
+        }
+      ],
+      "total_code": 3204,
+      "total_data": 0,
+      "total_functions": 9
+    },
+    {
+      "name": "main/game/gs_model_anim",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8804,
+          "virtual_address": 2148450028
+        }
+      ],
+      "total_code": 8804,
+      "total_data": 0,
+      "total_functions": 46
+    },
+    {
+      "name": "main/game/gs_part",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2008,
+          "virtual_address": 2148458832
+        }
+      ],
+      "total_code": 2008,
+      "total_data": 0,
+      "total_functions": 13
+    },
+    {
+      "name": "main/game/gs_scratch",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1568,
+          "virtual_address": 2148460840
+        }
+      ],
+      "total_code": 1568,
+      "total_data": 0,
+      "total_functions": 8
+    },
+    {
+      "name": "main/game/gs_texture_range_800EEF48",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 336,
+          "virtual_address": 2148462408
+        }
+      ],
+      "total_code": 336,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/game/gs_texture",

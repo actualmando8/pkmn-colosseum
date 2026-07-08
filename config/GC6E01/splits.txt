@@ -1064,8 +1064,35 @@ game/gs_gfx.c:
 game/gs_render.c:
 	.text       start:0x800D3E4C end:0x800E202C
 
-game/gs_range_800E202C.c:
-	.text       start:0x800E202C end:0x800EF098
+game/gs_mem.c:
+	.text       start:0x800E202C end:0x800E3604
+
+game/gs_model_main.c:
+	.text       start:0x800E3604 end:0x800E8684
+
+game/gs_model_shadow.c:
+	.text       start:0x800E8684 end:0x800E9B2C
+
+game/gs_model_state.c:
+	.text       start:0x800E9B2C end:0x800E9E34
+
+game/gs_model_parse.c:
+	.text       start:0x800E9E34 end:0x800EB268
+
+game/gs_model_bound.c:
+	.text       start:0x800EB268 end:0x800EBEEC
+
+game/gs_model_anim.c:
+	.text       start:0x800EBEEC end:0x800EE150
+
+game/gs_part.c:
+	.text       start:0x800EE150 end:0x800EE928
+
+game/gs_scratch.c:
+	.text       start:0x800EE928 end:0x800EEF48
+
+game/gs_texture_range_800EEF48.c:
+	.text       start:0x800EEF48 end:0x800EF098
 
 game/gs_texture.c:
 	.text       start:0x800EF098 end:0x800F07A8
