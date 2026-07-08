@@ -2052,15 +2052,22 @@ u8* fightTrainer_GetHeroPtr(u8* ptr) {
     return ptr + 0x4;
 }
 
+/* FightOutPokemon: the per-slot "out" battle record copied wholesale by
+ * fn_801FCEC4 below (0x6E0 bytes; matches the stride used throughout this
+ * file, e.g. fightTrainer_GetFightoutPokemonPtr's idx * 0x6E0). Not yet
+ * broken out field-by-field elsewhere in the codebase (still referenced
+ * only via mangled names like _fightOutPokemonCheckFightActionSelectSub__
+ * FP15FightOutPokemonUsUs), so this local definition only models the size
+ * needed for the struct-assignment copy performed here. */
+typedef struct FightOutPokemon {
+    u8 data[0x6E0];
+} FightOutPokemon;
+
 /* 0x801FCEC4 | size: 0x38 */
-void fn_801FCEC4(u32* dst, u32* src) {
-    s32 i;
-    if (dst == 0) { return; }
-    if (src == 0) { return; }
-    for (i = 0; i < 0xDC; i++) {
-        dst[i * 2] = src[i * 2];
-        dst[i * 2 + 1] = src[i * 2 + 1];
-    }
+void fn_801FCEC4(FightOutPokemon* dst, FightOutPokemon* src) {
+    if (dst == NULL) { return; }
+    if (src == NULL) { return; }
+    *dst = *src;
 }
 
 /* 0x801FCF8C | size: 0x18 */
