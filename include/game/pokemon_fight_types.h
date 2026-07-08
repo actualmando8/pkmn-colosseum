@@ -29,11 +29,37 @@ extern void _threadSwitch(void);
 /* fn_800D3088: Returns frame delta or similar timing value */
 extern u32 fn_800D3088(void);
 
-/* fightFloorDataBiosGetPtr: Resolve party slot to Pokemon pointer by index */
-extern struct Pokemon* fightFloorDataBiosGetPtr(u32 index);
+/**
+ * FightFloorData: static floor-definition record used by the
+ * fightFloorDataBios* accessors (game/fight_floor_bios.c). Table stride
+ * confirmed at 0x18 bytes by fightFloorDataBiosGetPtr's index scaling and
+ * corroborated by every fightFloorDataBiosGet/Set field offset in that
+ * file (0x0, 0x2, 0x4, 0x8, 0xC, 0x10, 0x14/0x16).
+ */
+typedef struct FightFloorData {
+    u8  tikeiDataId;         /* 0x0 */
+    u16 floorDataId;         /* 0x2 */
+    u32 name;                /* 0x4 */
+    u32 syoukaiWzxDataId;    /* 0x8 */
+    u32 bgmSndId;            /* 0xC */
+    u32 envSndId;            /* 0x10 */
+    u16 fightSideDataId[2];  /* 0x14, 0x16 */
+} FightFloorData; /* size 0x18 */
 
-/* fightFloorBiosGetFightFloorPtr: Get currently selected/active Pokemon */
-extern struct Pokemon* fightFloorBiosGetFightFloorPtr(void);
+/* lbl_80478F48: pointer to the u32 entry count for the FightFloorData table */
+extern u32 *lbl_80478F48;
+/* lbl_80478F4C: pointer to the base of the FightFloorData table */
+extern FightFloorData *lbl_80478F4C;
+/* lbl_8046DD90: singleton runtime FightFloor object (defined in
+ * game/data/bss_8046D500.c); accessed as an opaque byte buffer by every
+ * fightFloorBios* Get/Set accessor in game/fight_floor_bios.c. */
+extern u8 lbl_8046DD90[0xA4E8];
+
+/* fightFloorDataBiosGetPtr: Resolve floor id to static FightFloorData record */
+extern FightFloorData* fightFloorDataBiosGetPtr(u16 idx);
+
+/* fightFloorBiosGetFightFloorPtr: Get pointer to the singleton FightFloor object */
+extern u8* fightFloorBiosGetFightFloorPtr(void);
 
 /* fightFloorGetNowPtr: Get Pokemon system context pointer */
 extern struct Pokemon* fightFloorGetNowPtr(void);

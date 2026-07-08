@@ -215,6 +215,12 @@ u16 fightFloorDataBiosGetFloorDataId(u8* ptr) {
     return *(u16*)(&ptr[0x2]);
 }
 
+/* Address: 0x801F6738 | Size: 0x2C */
+FightFloorData* fightFloorDataBiosGetPtr(u16 idx) {
+    if (idx >= *lbl_80478F48) { return NULL; }
+    return &lbl_80478F4C[idx];
+}
+
 /* Address: 0x801F6764 | Size: 0x14 | Pattern: nullcheck_addis_setter */
 void fightFloorBiosSetAppointTokuseiDataId(u8* ptr, u16 val) {
     if (ptr == NULL) { return; }
@@ -455,4 +461,9 @@ u8* fightFloorBiosGetJoutaiPtr(u8* ptr, u16 idx) {
     if (ptr == NULL) { return NULL; }
     if (idx >= 1) { return NULL; }
     return ptr + idx * 0x10;
+}
+
+/* Address: 0x801F6B48 | Size: 0xC */
+u8* fightFloorBiosGetFightFloorPtr(void) {
+    return lbl_8046DD90;
 }
