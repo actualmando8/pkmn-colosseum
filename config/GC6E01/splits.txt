@@ -593,8 +593,29 @@ game/menu/menu_bag.c:
 game/fight_range_80051710.c:
 	.text       start:0x80051710 end:0x8005344C
 
+game/menu/menuCB_range_8005344C.c:
+	.text       start:0x8005344C end:0x80055E38
+
+game/menu/menuCB_range_80055E38.c:
+	.text       start:0x80055E38 end:0x80057B34
+
+game/menu/menuColosseumBattle.c:
+	.text       start:0x80057B34 end:0x8005D7F8
+
+game/menu/menu_bios_range_8005D7F8.c:
+	.text       start:0x8005D7F8 end:0x8005DA48
+
+game/menu/menu_debug_range_8005DA48.c:
+	.text       start:0x8005DA48 end:0x8005DFC8
+
+game/menu/menuCB_BattleStart.c:
+	.text       start:0x8005DFC8 end:0x80062948
+
+game/menu/menuCB_range_80062948.c:
+	.text       start:0x80062948 end:0x80069A60
+
 game/menu/menuCB_Battle.c:
-	.text       start:0x8005344C end:0x80069C0C
+	.text       start:0x80069A60 end:0x80069C0C
 
 game/menu/menu_middle.c:
 	.text       start:0x80069C0C end:0x8007109C

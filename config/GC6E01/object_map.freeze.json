@@ -6,24 +6,24 @@
     "total_code": 2495108,
     "total_data": 2196124,
     "total_functions": 8603,
-    "total_units": 524
+    "total_units": 531
   },
   "topology_status": {
     "auto_units": 59,
-    "named_units": 465,
-    "source_backed_units": 445,
+    "named_units": 472,
+    "source_backed_units": 452,
     "auto_code": 0,
     "auto_data": 58535,
     "auto_functions": 0
   },
   "baseline_progress": {
-    "matched_code": "421948",
-    "matched_code_percent": 16.911013,
+    "matched_code": "427080",
+    "matched_code_percent": 17.116693,
     "matched_data": "2137589",
     "matched_data_percent": 97.334625,
-    "matched_functions": 3969,
-    "matched_functions_percent": 46.135067,
-    "fuzzy_match_percent": 32.63695
+    "matched_functions": 3978,
+    "matched_functions_percent": 46.23968,
+    "fuzzy_match_percent": 32.72791
   },
   "unit_topology": [
     {
@@ -3316,17 +3316,108 @@
       "total_functions": 4
     },
     {
+      "name": "main/game/menu/menuCB_range_8005344C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 10732,
+          "virtual_address": 2147824716
+        }
+      ],
+      "total_code": 10732,
+      "total_data": 0,
+      "total_functions": 45
+    },
+    {
+      "name": "main/game/menu/menuCB_range_80055E38",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 7420,
+          "virtual_address": 2147835448
+        }
+      ],
+      "total_code": 7420,
+      "total_data": 0,
+      "total_functions": 38
+    },
+    {
+      "name": "main/game/menu/menuColosseumBattle",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 23748,
+          "virtual_address": 2147842868
+        }
+      ],
+      "total_code": 23748,
+      "total_data": 0,
+      "total_functions": 40
+    },
+    {
+      "name": "main/game/menu/menu_bios_range_8005D7F8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 592,
+          "virtual_address": 2147866616
+        }
+      ],
+      "total_code": 592,
+      "total_data": 0,
+      "total_functions": 11
+    },
+    {
+      "name": "main/game/menu/menu_debug_range_8005DA48",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1408,
+          "virtual_address": 2147867208
+        }
+      ],
+      "total_code": 1408,
+      "total_data": 0,
+      "total_functions": 5
+    },
+    {
+      "name": "main/game/menu/menuCB_BattleStart",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 18816,
+          "virtual_address": 2147868616
+        }
+      ],
+      "total_code": 18816,
+      "total_data": 0,
+      "total_functions": 28
+    },
+    {
+      "name": "main/game/menu/menuCB_range_80062948",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 28952,
+          "virtual_address": 2147887432
+        }
+      ],
+      "total_code": 28952,
+      "total_data": 0,
+      "total_functions": 36
+    },
+    {
       "name": "main/game/menu/menuCB_Battle",
       "sections": [
         {
           "name": ".text",
-          "size": 92096,
-          "virtual_address": 2147824716
+          "size": 428,
+          "virtual_address": 2147916384
         }
       ],
-      "total_code": 92096,
+      "total_code": 428,
       "total_data": 0,
-      "total_functions": 204
+      "total_functions": 1
     },
     {
       "name": "main/game/menu/menu_middle",
