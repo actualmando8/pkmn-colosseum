@@ -6,12 +6,12 @@
     "total_code": 2495108,
     "total_data": 2196124,
     "total_functions": 8603,
-    "total_units": 573
+    "total_units": 591
   },
   "topology_status": {
     "auto_units": 59,
-    "named_units": 514,
-    "source_backed_units": 494,
+    "named_units": 532,
+    "source_backed_units": 512,
     "auto_code": 0,
     "auto_data": 58535,
     "auto_functions": 0
@@ -7437,17 +7437,251 @@
       "total_functions": 470
     },
     {
-      "name": "main/game/colosseum_battle",
+      "name": "main/game/fight_trainer_ai_waza_value",
       "sections": [
         {
           "name": ".text",
-          "size": 153860,
+          "size": 57272,
           "virtual_address": 2149844416
         }
       ],
-      "total_code": 153860,
+      "total_code": 57272,
       "total_data": 0,
-      "total_functions": 675
+      "total_functions": 104
+    },
+    {
+      "name": "main/game/fight_trainer_ai_irekae",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 9224,
+          "virtual_address": 2149901688
+        }
+      ],
+      "total_code": 9224,
+      "total_data": 0,
+      "total_functions": 6
+    },
+    {
+      "name": "main/game/fight_trainer_ai_waza_damage",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 12240,
+          "virtual_address": 2149910912
+        }
+      ],
+      "total_code": 12240,
+      "total_data": 0,
+      "total_functions": 212
+    },
+    {
+      "name": "main/game/fight_trainer_ai_waza_hit",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 35924,
+          "virtual_address": 2149923152
+        }
+      ],
+      "total_code": 35924,
+      "total_data": 0,
+      "total_functions": 200
+    },
+    {
+      "name": "main/game/fight_trainer_ai2",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1984,
+          "virtual_address": 2149959076
+        }
+      ],
+      "total_code": 1984,
+      "total_data": 0,
+      "total_functions": 11
+    },
+    {
+      "name": "main/game/toolentry",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 3696,
+          "virtual_address": 2149961060
+        }
+      ],
+      "total_code": 3696,
+      "total_data": 0,
+      "total_functions": 34
+    },
+    {
+      "name": "main/game/table_res_bios",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 88,
+          "virtual_address": 2149964756
+        }
+      ],
+      "total_code": 88,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/pokemon_relive",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 5840,
+          "virtual_address": 2149964844
+        }
+      ],
+      "total_code": 5840,
+      "total_data": 0,
+      "total_functions": 19
+    },
+    {
+      "name": "main/game/gba/GBA",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 552,
+          "virtual_address": 2149970684
+        }
+      ],
+      "total_code": 552,
+      "total_data": 0,
+      "total_functions": 5
+    },
+    {
+      "name": "main/game/gba/GBARead",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 244,
+          "virtual_address": 2149971236
+        }
+      ],
+      "total_code": 244,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/gba/GBAWrite",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 244,
+          "virtual_address": 2149971480
+        }
+      ],
+      "total_code": 244,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/gba/GBAXfer",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 788,
+          "virtual_address": 2149971724
+        }
+      ],
+      "total_code": 788,
+      "total_data": 0,
+      "total_functions": 5
+    },
+    {
+      "name": "main/game/memo",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1732,
+          "virtual_address": 2149972512
+        }
+      ],
+      "total_code": 1732,
+      "total_data": 0,
+      "total_functions": 9
+    },
+    {
+      "name": "main/game/evolution",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 4772,
+          "virtual_address": 2149974244
+        }
+      ],
+      "total_code": 4772,
+      "total_data": 0,
+      "total_functions": 7
+    },
+    {
+      "name": "main/game/char_name_bios",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 300,
+          "virtual_address": 2149979016
+        }
+      ],
+      "total_code": 300,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/game/fight_gsfloor",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1716,
+          "virtual_address": 2149979316
+        }
+      ],
+      "total_code": 1716,
+      "total_data": 0,
+      "total_functions": 7
+    },
+    {
+      "name": "main/game/fight_menu",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 15712,
+          "virtual_address": 2149981032
+        }
+      ],
+      "total_code": 15712,
+      "total_data": 0,
+      "total_functions": 33
+    },
+    {
+      "name": "main/game/fight_timer",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1388,
+          "virtual_address": 2149996744
+        }
+      ],
+      "total_code": 1388,
+      "total_data": 0,
+      "total_functions": 13
+    },
+    {
+      "name": "main/game/d2present",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 144,
+          "virtual_address": 2149998132
+        }
+      ],
+      "total_code": 144,
+      "total_data": 0,
+      "total_functions": 2
     },
     {
       "name": "main/game/gs_range_80265EC4",

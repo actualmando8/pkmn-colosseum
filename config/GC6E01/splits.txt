@@ -1544,8 +1544,62 @@ game/fight_seq.c:
 game/fight_range_80211A00.c:
 	.text       start:0x80211A00 end:0x802405C0
 
-game/colosseum_battle.c:
-	.text       start:0x802405C0 end:0x80265EC4
+game/fight_trainer_ai_waza_value.c:
+	.text       start:0x802405C0 end:0x8024E578
+
+game/fight_trainer_ai_irekae.c:
+	.text       start:0x8024E578 end:0x80250980
+
+game/fight_trainer_ai_waza_damage.c:
+	.text       start:0x80250980 end:0x80253950
+
+game/fight_trainer_ai_waza_hit.c:
+	.text       start:0x80253950 end:0x8025C5A4
+
+game/fight_trainer_ai2.c:
+	.text       start:0x8025C5A4 end:0x8025CD64
+
+game/toolentry.c:
+	.text       start:0x8025CD64 end:0x8025DBD4
+
+game/table_res_bios.c:
+	.text       start:0x8025DBD4 end:0x8025DC2C
+
+game/pokemon_relive.c:
+	.text       start:0x8025DC2C end:0x8025F2FC
+
+game/gba/GBA.c:
+	.text       start:0x8025F2FC end:0x8025F524
+
+game/gba/GBARead.c:
+	.text       start:0x8025F524 end:0x8025F618
+
+game/gba/GBAWrite.c:
+	.text       start:0x8025F618 end:0x8025F70C
+
+game/gba/GBAXfer.c:
+	.text       start:0x8025F70C end:0x8025FA20
+
+game/memo.c:
+	.text       start:0x8025FA20 end:0x802600E4
+
+game/evolution.c:
+	.text       start:0x802600E4 end:0x80261388
+
+game/char_name_bios.c:
+	.text       start:0x80261388 end:0x802614B4
+
+game/fight_gsfloor.c:
+	.text       start:0x802614B4 end:0x80261B68
+
+game/fight_menu.c:
+	.text       start:0x80261B68 end:0x802658C8
+
+game/fight_timer.c:
+	.text       start:0x802658C8 end:0x80265E34
+
+game/d2present.c:
+	.text       start:0x80265E34 end:0x80265EC4
 
 game/gs_range_80265EC4.c:
 	.text       start:0x80265EC4 end:0x8026635C
