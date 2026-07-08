@@ -151,7 +151,7 @@ u32 fn_8020F100(void) { return 0; }
 /* 0x8020F108 | size: 0x128 */
 void fightWazaWzxTypeFuncMigawari(void* battleCtx, void* ctx) {
     extern void wazaGetStatus();
-    extern void fn_801C3430();
+    extern void battleGridUpdate();
     extern void battleGridReplacePokemon();
     extern void fn_801DB100();
     extern u8 fn_801F453C();
@@ -174,7 +174,7 @@ void fightWazaWzxTypeFuncMigawari(void* battleCtx, void* ctx) {
     fightOutPokemonLoadWazaEffect(localBuf, battleCtx, 3, 0);
     fightOutPokemonWazaEffect(ctx, battleCtx, 1, 1, 0);
     battleGridReplacePokemon(eeData, resolved);
-    fn_801C3430();
+    battleGridUpdate();
     pokemonSetStatus(ctx, 0, 0xEE, 0, (u32)resolved);
     fightOutPokemonWazaEffect(ctx, battleCtx, 3, 0, 0);
     fn_801DB100(eeData);
@@ -186,7 +186,7 @@ u32 fn_8020F230(void) { return 0; }
 /* 0x8020F238 | size: 0x128 */
 void fightWazaWzxTypeFuncHensin(void* battleCtx, void* ctx) {
     extern void wazaGetStatus();
-    extern void fn_801C3430();
+    extern void battleGridUpdate();
     extern void battleGridReplacePokemon();
     extern void fn_801DB100();
     extern u8 fn_801F453C();
@@ -209,7 +209,7 @@ void fightWazaWzxTypeFuncHensin(void* battleCtx, void* ctx) {
     fightOutPokemonLoadWazaEffect(localBuf, battleCtx, 3, 1);
     fightOutPokemonWazaEffect(ctx, battleCtx, 3, 1, 0);
     battleGridReplacePokemon(eeData, resolved);
-    fn_801C3430();
+    battleGridUpdate();
     pokemonSetStatus(ctx, 0, 0xEE, 0, (u32)resolved);
     fightOutPokemonWazaEffect(ctx, battleCtx, 3, 0, 0);
     fn_801DB100(eeData);

@@ -1382,7 +1382,7 @@ extern void fn_8010BBB8(void* ptr);
 extern s8   fn_8010BCE4(void);
 extern void* pokemonCreateSequence(void* ptr);
 extern void battleGridReplacePokemon(void* ptr, void* src);
-extern void fn_801C3430(void);
+extern void battleGridUpdate(void);
 extern void pokemonSetStatus(void* ptr, s32 a, s32 b, s32 c, s32 d);
 extern void fn_801DB100(void* ptr);
 extern void fn_801DA4E8(void* ptr, s32 a);
@@ -1459,7 +1459,7 @@ s32 menuFightPokemonSelectSub(u32 ctx) {
                     } while (fn_8010BCE4() == 0);
                     animPtr = pokemonCreateSequence(scene);
                     battleGridReplacePokemon((void*)(u32)subItem, animPtr);
-                    fn_801C3430();
+                    battleGridUpdate();
                     pokemonSetStatus(encounter, 0, 0xee, 0, (s32)animPtr);
                     fn_801DB100((void*)(u32)subItem);
                     fn_801DA4E8(animPtr, 1);

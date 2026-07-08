@@ -297,7 +297,7 @@ u32 fightActionFlowSyuuryou(void* ctx)
     extern void _threadSwitch();
     extern void fn_80132A38();
     extern void fn_80165668();
-    extern u32 fn_801C2D54();
+    extern u32 battleCameraIsSimple();
     extern void fn_801DA8C4();
     extern u8 fn_801DA94C();
     extern void fn_801DA9E8();
@@ -364,7 +364,7 @@ u32 fightActionFlowSyuuryou(void* ctx)
         if (sVar9 == 2) {
             if (iVar7 != 0) {
                 fn_801DDD28(uVar4, 0x5a, 4, 0);
-                saved_r27 = fn_801C2D54();
+                saved_r27 = battleCameraIsSimple();
             }
             fn_80165668(0x3f5, 0, 0xff);
             fn_80132A38(0x5d, 0);
@@ -385,7 +385,7 @@ u32 fightActionFlowSyuuryou(void* ctx)
         } else if (sVar9 == 3) {
             if (iVar5 != 0) {
                 fn_801DDD28(uVar4, 0x59, 4, 0);
-                saved_r27 = fn_801C2D54();
+                saved_r27 = battleCameraIsSimple();
             }
             fightMenuOpenMsg(0x7547);
             fightMenuCloseMsg();
@@ -1110,8 +1110,8 @@ u32 fightActionFlowKaisiNyuujouPokemon(void)
     extern void fn_8010AE2C();
     extern u32 pokemonCreateSequence();
     extern void fn_80132A38();
-    extern void fn_801C3430();
-    extern void fn_801C3E3C();
+    extern void battleGridUpdate();
+    extern void battleGridAddPokemon();
     extern u32 fn_801F02AC();
     extern void fn_801F4C14();
     extern u32 fn_801F54A4();
@@ -1194,7 +1194,7 @@ u32 fightActionFlowKaisiNyuujouPokemon(void)
               fightOutPokemonSetOnZukanFlag(saved_r26,0);
               fightOutPokemonSetOnDarkPokemonFlag(saved_r26,0);
             }
-            fn_801C3E3C(iVar4,uVar5);
+            battleGridAddPokemon(iVar4,uVar5);
           }
           uVar14 = uVar14 + 1;
         }
@@ -1246,7 +1246,7 @@ u32 fightActionFlowKaisiNyuujouPokemon(void)
              (saved_r26 = fightTrainerGetValidFightOutPokemonPtr(iVar7,uVar14), saved_r26 != 0)) break;
           uVar14 = uVar14 + 1;
         }
-        fn_801C3430();
+        battleGridUpdate();
         fightTrainerBallThrowEffect(iVar7,saved_r26,1);
         uVar6 = fn_801F8000(iVar7);
         fn_80132A38(0x22,uVar6);
@@ -1417,8 +1417,8 @@ u32 fightActionFlowKaisiNyuujouTrainer(void)
     extern s8 pokemonCheckValid();
     extern u32 heroGetStatus();
     extern void heroBiosCopy();
-    extern void fn_801C3430();
-    extern void fn_801C3FBC();
+    extern void battleGridUpdate();
+    extern void battleGridAddTrainer();
     extern void fn_801DA4E8();
     extern u32 fn_801F02AC();
     extern u32 fn_801F4804();
@@ -1556,8 +1556,8 @@ u32 fightActionFlowKaisiNyuujouTrainer(void)
       iVar13 = fn_801F7258(uVar6,uVar4);
       if ((iVar13 != 0) && (iVar13 = fightTrainerGetStatus(iVar13,0,0x4c,0), iVar13 != 0)) {
         fn_801F72B0(uVar14,uVar17,uVar4,local_b57,&local_b58);
-        fn_801C3FBC(iVar13,local_b57[0],local_b58);
-        fn_801C3430();
+        battleGridAddTrainer(iVar13,local_b57[0],local_b58);
+        battleGridUpdate();
         fn_801DA4E8(iVar13,1);
       }
     }

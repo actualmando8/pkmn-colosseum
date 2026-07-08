@@ -133,7 +133,7 @@ void fightGSfloorPushData(void *rawOut)
         u8 *nextEntry;
     } BattleScanContext;
     typedef u32 (*BattleScanCallback)(u32, u32, char *);
-    extern void *fn_801C3108(void);
+    extern void *battleGridGetPtr(void);
     extern void fn_801F2B5C(u32, BattleScanCallback, void *, u32);
     extern void fn_801F37B0(u32, BattleScanCallback, void *, u32);
     extern u32 _fightGSfloorPokemonCB__FPvUsPv(u32, u32, char *);
@@ -146,7 +146,7 @@ void fightGSfloorPushData(void *rawOut)
 
     out = rawOut;
     entries = out->entries;
-    memcpy(entries, fn_801C3108(), 0x44);
+    memcpy(entries, battleGridGetPtr(), 0x44);
     scan.collectEntries = 1;
     scan.consumeEntries = 1;
     scan.count = 0;
@@ -194,7 +194,7 @@ void fightGSfloorPopData(BattleReplayHeader *header)
 {
     extern u32 GSmodelGetVisibility();
     extern int fn_800E9B2C();
-    extern int fn_801C3430();
+    extern int battleGridUpdate();
     extern int fn_801DAEF8(int);
     extern u32 fn_801DE418(u16);
     extern int fn_801F198C();
@@ -232,9 +232,9 @@ void fightGSfloorPopData(BattleReplayHeader *header)
         fn_801DA4E8(model, state);
         secondEntry++;
     }
-    memcpy(fn_801C3108(), entries, 0x44);
+    memcpy(battleGridGetPtr(), entries, 0x44);
     fn_801EF8F4(1);
-    fn_801C3430();
+    battleGridUpdate();
     fn_801F198C();
 }
 

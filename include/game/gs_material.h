@@ -814,7 +814,8 @@ void GSmaterialSetDistanceThreshold(f32 dist);
  * GSmaterialSetRenderMode -- Configure a render mode via GX command.
  *
  * @param entry   Pointer to a GSmaterialEntry.
- * @param mode    If 0, calls fn_801C2A74; otherwise calls fn_801C2A90.
+ * @param mode    If 0, calls HSD_AObjClearFlags; otherwise calls HSD_AObjSetFlags
+ *                (renamed from fn_801C2A74/fn_801C2A90, naming pass 2026-07-07).
  *                Both use lis r4, 0x2000 as a flag parameter.
  *
  * Corresponds to _modelSetLoopFlag__FP9_HSD_AObjUl. Size: 0x38.

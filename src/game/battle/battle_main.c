@@ -75,9 +75,9 @@ extern void dbgMenuClose(void);                      /* disable VSync */
 extern void dbgMenuMain(s32 mode);                  /* force VSync */
 
 /* Battle subsystems */
-extern void fn_801C2D54(void);                      /* battle grid tick 1 */
-extern void fn_801C2D68(void);                      /* battle grid tick 2 */
-extern void fn_801C2D80(void);                      /* battle grid cleanup */
+extern void battleCameraIsSimple(void);                      /* battle grid tick 1 */
+extern void battleCameraDoSimple(void);                      /* battle grid tick 2 */
+extern void battleCameraStartRandom(void);                      /* battle grid cleanup */
 extern void fn_801C2F00(void* data, u32 size);      /* battle grid load data */
 extern void fn_801C31EC(void);                      /* battle grid release */
 extern void fadeCheck(s32 flag);                  /* battle grid set flag */
@@ -503,7 +503,7 @@ void fn_801EFA08(void) {
     extern void fn_800FF660();
     extern void fn_8011288C();
     extern void fn_8016597C();
-    extern void fn_801C2D5C();
+    extern void battleCameraDoFull();
     extern void fn_801EF2D4();
     extern void fn_801EF634();
     extern void fn_801F1588();
@@ -556,8 +556,8 @@ void fn_801EFA08(void) {
     r6 = 0x2;
     r7 = 0x0;
     ((void(*)(void))fn_801F0B00)();
-    ((void(*)(void))fn_801C2D54)();
-    ((void(*)(void))fn_801C2D68)();
+    ((void(*)(void))battleCameraIsSimple)();
+    ((void(*)(void))battleCameraDoSimple)();
     ((void(*)(void))fn_800FF56C)();
     ((void(*)(void))fn_80113FB4)();
     if (r3 != 0) {
@@ -600,8 +600,8 @@ void fn_801EFA08(void) {
     fn_801EF634();
     tmp = r3 & 0xFFFF;
     if (tmp == 4) {
-        ((void(*)(void))fn_801C2D54)();
-        ((void(*)(void))fn_801C2D68)();
+        ((void(*)(void))battleCameraIsSimple)();
+        ((void(*)(void))battleCameraDoSimple)();
         ((void(*)(void))fn_800FF56C)();
         ((void(*)(void))fn_80113FB4)();
         if (r3 != 0) {
@@ -618,8 +618,8 @@ void fn_801EFA08(void) {
         r6 = 0x4;
         r7 = 0x5;
         ((void(*)(void))fn_801F0B00)();
-        ((void(*)(void))fn_801C2D54)();
-        ((void(*)(void))fn_801C2D68)();
+        ((void(*)(void))battleCameraIsSimple)();
+        ((void(*)(void))battleCameraDoSimple)();
         ((void(*)(void))fn_800FF56C)();
         ((void(*)(void))fn_80113FB4)();
         if (r3 != 0) {
@@ -636,8 +636,8 @@ void fn_801EFA08(void) {
         r6 = 0x4;
         r7 = 0x4;
         ((void(*)(void))fn_801F0B00)();
-        ((void(*)(void))fn_801C2D54)();
-        ((void(*)(void))fn_801C2D68)();
+        ((void(*)(void))battleCameraIsSimple)();
+        ((void(*)(void))battleCameraDoSimple)();
         ((void(*)(void))fn_800FF56C)();
         ((void(*)(void))fn_80113FB4)();
         if (r3 != 0) {
@@ -717,8 +717,8 @@ void fn_801EFA08(void) {
                 fightTimerAllIsOver();
                 tmp = r3 & 0xFF;
                 if (tmp == 1) {
-                    ((void(*)(void))fn_801C2D54)();
-                    ((void(*)(void))fn_801C2D68)();
+                    ((void(*)(void))battleCameraIsSimple)();
+                    ((void(*)(void))battleCameraDoSimple)();
                     ((void(*)(void))fn_800FF56C)();
                     ((void(*)(void))fn_80113FB4)();
                     if (r3 != 0) {
@@ -753,8 +753,8 @@ void fn_801EFA08(void) {
                 fightTimerCommandInit();
                 fightTimerCommandStart();
             }
-            ((void(*)(void))fn_801C2D54)();
-            fn_801C2D5C();
+            ((void(*)(void))battleCameraIsSimple)();
+            battleCameraDoFull();
             ((void(*)(void))fn_800FF56C)();
             ((void(*)(void))fn_80113FB4)();
             if (r3 != 0) {
@@ -775,7 +775,7 @@ void fn_801EFA08(void) {
             ((void(*)(void))fn_801F09D0)();
             r3 = 0x0;
             fightMenuCloseInfoMenu();
-            ((void(*)(void))fn_801C2D68)();
+            ((void(*)(void))battleCameraDoSimple)();
             r3 = 0x0;
             fn_801F1700();
             tmp = r3 & 0xFF;
@@ -809,8 +809,8 @@ void fn_801EFA08(void) {
         }
         ((void(*)(void))fn_801F09D0)();
     }
-    ((void(*)(void))fn_801C2D54)();
-    ((void(*)(void))fn_801C2D68)();
+    ((void(*)(void))battleCameraIsSimple)();
+    ((void(*)(void))battleCameraDoSimple)();
     ((void(*)(void))fn_800FF56C)();
     ((void(*)(void))fn_80113FB4)();
     if (r3 != 0) {

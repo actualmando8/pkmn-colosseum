@@ -1482,10 +1482,19 @@ hsd/hsd_video.c:
 	.text       start:0x801BF6AC end:0x801C01C8
 
 hsd/hsd_aobj_range_801C01C8.c:
-	.text       start:0x801C01C8 end:0x801C0F20
+	.text       start:0x801C01C8 end:0x801C2AE8
+
+game/battle/battle_camera.c:
+	.text       start:0x801C2AE8 end:0x801C3108
 
 game/battle/battle_grid.c:
-	.text       start:0x801C0F20 end:0x801C4CB8
+	.text       start:0x801C3108 end:0x801C4078
+
+game/effect/fade.c:
+	.text       start:0x801C4078 end:0x801C4814
+
+game/effect/fade_effect.c:
+	.text       start:0x801C4814 end:0x801C4CB8
 
 game/effect/fade_range_801C4CB8.c:
 	.text       start:0x801C4CB8 end:0x801C766C

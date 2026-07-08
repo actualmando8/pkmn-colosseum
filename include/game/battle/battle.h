@@ -167,7 +167,7 @@ typedef struct BattleCameraState {
 
 /**
  * Battle grid entry for a single position on the field.
- * Used by battleGridSetup (fn_801C3430) for scene layout.
+ * Used by battleGridUpdate (was fn_801C3430) for scene layout.
  */
 typedef struct BattleGridSlot {
     void*  pModel;           /* 0x00: HSD JObj pointer for the model */
@@ -288,7 +288,13 @@ typedef struct TypeMatchup {
  */
 
 /* =========================================================================
- * Pre-Grid / Field Setup (0x801C01C8 - 0x801C3108) [battle_grid.c]
+ * Pre-Grid / Field Setup (0x801C01C8 - 0x801C3108)
+ * [hsd/hsd_aobj_range_801C01C8.c, game/battle/battle_camera.c]
+ *
+ * battle_grid.c (0x801C0F20 - 0x801C4CB8) was split (2026-07-07) into 5
+ * true XD translation units: hsd/hsd_aobj_range_801C01C8.c (extended),
+ * game/battle/battle_camera.c, game/battle/battle_grid.c (shrunk),
+ * game/effect/fade.c, and game/effect/fade_effect.c.
  * ========================================================================= */
 
 /* fn_801C01C8 */ void fn_801C01C8(void* arg0, s32 arg1);
@@ -298,59 +304,60 @@ typedef struct TypeMatchup {
 /* fn_801C028C */ void fn_801C028C(void* ctx);                   /* 0xC94 pre-grid state machine */
 /* 0x801C0F20-0x801C25E4: the HSD sysdolphin ForeachAnim dispatch family
  * (JObj/DObj/LObj/CObjForeachAnim), NOT battle-grid code. Real signatures
- * use HSD_TypeMask/HSD_ForeachArgType/HSD_ForeachArg, currently local to
- * battle_grid.c; declare there. Old "pre-grid" descriptions were fiction. */
-/* fn_801C25E4 */ void fn_801C25E4(void* ctx, s32 mode);
-/* fn_801C2670 */ void fn_801C2670(void* ctx, s32 objType, s32 param);
-/* fn_801C27F4 */ void fn_801C27F4(void* ctx, f32 posX, f32 posZ);
+ * use HSD_TypeMask/HSD_ForeachArgType/HSD_ForeachArg, local to
+ * hsd/hsd_aobj_range_801C01C8.c. Old "pre-grid" descriptions were fiction. */
+/* HSD_AObjRemove (was fn_801C25E4) */ void HSD_AObjRemove(void* ctx, s32 mode);
+/* HSD_AObjLoadDesc (was fn_801C2670) */ void HSD_AObjLoadDesc(void* ctx, s32 objType, s32 param);
+/* HSD_AObjInterpretAnim (was fn_801C27F4) */ void HSD_AObjInterpretAnim(void* ctx, f32 posX, f32 posZ);
 /* HSD_AObjReqAnim */ void HSD_AObjReqAnim(void* obj, f32 value);
 /* HSD_AObjInvokeCallBacks */ void HSD_AObjInvokeCallBacks(void);
-/* fn_801C2A60 */ s32  fn_801C2A60(void);
-/* fn_801C2A74 */ s32  fn_801C2A74(s32 slot);
-/* fn_801C2A90 */ s32  fn_801C2A90(s32 slot);
+/* HSD_AObjInitEndCallBack (was fn_801C2A60) */ s32  HSD_AObjInitEndCallBack(void);
+/* HSD_AObjClearFlags (was fn_801C2A74) */ s32  HSD_AObjClearFlags(s32 slot);
+/* HSD_AObjSetFlags (was fn_801C2A90) */ s32  HSD_AObjSetFlags(s32 slot);
 /* HSD_AObjGetAllocData */ void* HSD_AObjGetAllocData(void);
-/* fn_801C2AB8 */ void fn_801C2AB8(s32 slot, s32 animState);
-/* fn_801C2AE8 */ u16 fn_801C2AE8(u32 id);
-/* fn_801C2B2C */ void fn_801C2B2C(void);
-/* fn_801C2Be0 */ void fn_801C2Be0(void* ctx, s32 arg1);
+/* HSD_AObjInitAllocData (was fn_801C2AB8) */ void HSD_AObjInitAllocData(s32 slot, s32 animState);
+/* battleGridGetNumPokemonsForTrainer (was fn_801C2AE8) */ u16 battleGridGetNumPokemonsForTrainer(u32 id);
+/* battleGridResetModelVisibilityFlags (was fn_801C2B2C) */ void battleGridResetModelVisibilityFlags(void);
+/* battleGridHideModelsExcept (was fn_801C2Be0) */ void battleGridHideModelsExcept(void* ctx, s32 arg1);
 
-/* Grid tick / state (0x801C2D54 - 0x801C3108) */
-/* fn_801C2D54 */ void fn_801C2D54(void);                        /* grid tick 1 */
-/* fn_801C2D5C */ void fn_801C2D5C(void);                        /* grid tick wrapper */
-/* fn_801C2D68 */ void fn_801C2D68(void);                        /* grid tick 2 */
-/* fn_801C2D74 */ void fn_801C2D74(void);                        /* grid tick 3 */
-/* fn_801C2D80 */ void fn_801C2D80(void);                        /* grid cleanup 0x180 */
+/* Grid tick / state (0x801C2D54 - 0x801C3108) [game/battle/battle_camera.c] */
+/* battleCameraIsSimple (was fn_801C2D54) */ void battleCameraIsSimple(void);                        /* grid tick 1 */
+/* battleCameraDoFull (was fn_801C2D5C) */ void battleCameraDoFull(void);                        /* grid tick wrapper */
+/* battleCameraDoSimple (was fn_801C2D68) */ void battleCameraDoSimple(void);                        /* grid tick 2 */
+/* battleCameraDisable (was fn_801C2D74) */ void battleCameraDisable(void);                        /* grid tick 3 */
+/* battleCameraStartRandom (was fn_801C2D80) */ void battleCameraStartRandom(void);                        /* grid cleanup 0x180 */
 /* fn_801C2F00 */ void fn_801C2F00(void* data, u32 size);        /* grid load data 0x208 */
 
 /* =========================================================================
- * Battle Grid Core (0x801C3108 - 0x801C53BC) [battle_grid.c]
+ * Battle Grid Core (0x801C3108 - 0x801C53BC)
+ * [game/battle/battle_grid.c, game/effect/fade.c, game/effect/fade_effect.c]
  * ========================================================================= */
 
-/* fn_801C3108 */ s32  fn_801C3108(void);                        /* battleGrid_GetState */
+/* battleGridGetPtr (was fn_801C3108) */ s32  battleGridGetPtr(void);                        /* battleGrid_GetState */
 /* fn_801C3114 */ void fn_801C3114(void);                        /* battleGrid_Init */
 /* fn_801C31EC */ void fn_801C31EC(void);                        /* battleGrid_Setup */
-/* fn_801C3430 */ void fn_801C3430(void);                        /* battleGridSetup 0x634 */
-/* fn_801C3A64 */ void fn_801C3A64(void);                        /* battleGridLoadModels 0x11C */
-/* fn_801C3B80 */ void fn_801C3B80(void);                        /* battleGridUpdatePositions */
-/* fn_801C3C98 */ void fn_801C3C98(s32 slot);
+/* battleGridUpdate (was fn_801C3430) */ void battleGridUpdate(void);                        /* battleGridSetup 0x634 */
+/* battleGridGetDistance (was fn_801C3A64) */ void battleGridGetDistance(void);                        /* battleGridLoadModels 0x11C */
+/* battleGridGetNormalisedScale (was fn_801C3B80) */ void battleGridGetNormalisedScale(void);                        /* battleGridUpdatePositions */
+/* battleGridRemovePokemon (was fn_801C3C98) */ void battleGridRemovePokemon(s32 slot);
 /* fn_801C3D64 */ void fn_801C3D64(void* model);                 /* battleGridReplacePokemon */
-/* fn_801C3E3C */ void fn_801C3E3C(s32 slot, s32 animType);
+/* battleGridAddPokemon (was fn_801C3E3C) */ void battleGridAddPokemon(s32 slot, s32 animType);
 /* fn_801C3F10 */ void fn_801C3F10(void* model);                 /* battleGridReplaceTrainer */
-/* fn_801C3FBC */ void fn_801C3FBC(u8* slot, u8 arg1, u8 arg2);
-/* fn_801C4078 */ void* fn_801C4078(s32 slot);
+/* battleGridAddTrainer (was fn_801C3FBC) */ void battleGridAddTrainer(u8* slot, u8 arg1, u8 arg2);
+/* fadeEffectDokuStop (was fn_801C4078) */ void* fadeEffectDokuStop(s32 slot);
 /* fadeEffectDokuStart */ void fadeEffectDokuStart(void);
 /* fadeCheck */ void fadeCheck(s32 flag);                    /* grid set rendering flag */
 /* fadeSetEX */ void fadeSetEX(s32 mode, void* callback, s32 flags, f32 a, f32 b);
 /* fadeSet */ void fadeSet(s32 mode);                    /* battle camera init */
-/* fn_801C423C */ void* fn_801C423C(void (*callback)(void), u8 mode, u32 arg, f32 value);
-/* fn_801C431C */ void fn_801C431C(s32 arg0);
-/* fn_801C432C */ void fn_801C432C(f32 angle, f32 blend);
-/* fn_801C43E4 */ void* fn_801C43E4(void);
-/* fn_801C43F4 */ void fn_801C43F4(s32 seqType, f32 param1, f32 param2); /* 0x3DC */
+/* fadeSetFunction__FPFv_vbUsf (was fn_801C423C) */ void* fadeSetFunction__FPFv_vbUsf(void (*callback)(void), u8 mode, u32 arg, f32 value);
+/* fadeSetFunctionOnly (was fn_801C431C) */ void fadeSetFunctionOnly(s32 arg0);
+/* _fadeSnapshot__Fv (was fn_801C432C) */ void _fadeSnapshot__Fv(f32 angle, f32 blend);
+/* myBackFB__FP9GStextureUlPv (was fn_801C43E4) */ void* myBackFB__FP9GStextureUlPv(void);
+/* fadeDaemon (was fn_801C43F4) */ void fadeDaemon(s32 seqType, f32 param1, f32 param2); /* 0x3DC */
 /* fadeInit */ s32  fadeInit(void);
-/* fn_801C4814 */ f32  fn_801C4814(s32 slot);
-/* fadeEffectHookFunction_fadein_Init */ f32  fadeEffectHookFunction_fadein_Init(s32 slot);
-/* fadeEffectHookFunction_trainer_Init */ f32  fadeEffectHookFunction_trainer_Init(s32 slot);
+/* fadeEffectHookFunction_Doku_Init (was fn_801C4814) */ f32  fadeEffectHookFunction_Doku_Init(s32 slot);
+/* fadeEffectHookFunction_trainer_Init (symbol swap fix: was named fadein_Init) */ f32  fadeEffectHookFunction_trainer_Init(s32 slot);
+/* fadeEffectHookFunction_fadein_Init (symbol swap fix: was named trainer_Init) */ f32  fadeEffectHookFunction_fadein_Init(s32 slot);
 /* fadeEffectHookFunction_fadeout_in_Init */ void fadeEffectHookFunction_fadeout_in_Init(s32 slot, f32 x);
 /* fadeEffectHookFunction_carde_Init */ void fadeEffectHookFunction_carde_Init(s32 slot, f32 y);
 /* fadeEffectHookFunction_boss_Init */ void fadeEffectHookFunction_boss_Init(s32 slot, f32 z);
@@ -359,9 +366,9 @@ typedef struct TypeMatchup {
 /* fadeEffectHookFunction_yoko_or_tate_Init */ void fadeEffectHookFunction_yoko_or_tate_Init(s32 slot, f32 rotation);
 /* fadeEffectHookFunction_tate_Init */ f32  fadeEffectHookFunction_tate_Init(s32 slot);
 /* fadeEffectHookFunction_yoko_Init */ void fadeEffectHookFunction_yoko_Init(s32 slot, f32 scale);
-/* fn_801C4A44 */ void fn_801C4A44(s32 slot, f32 x, f32 y, f32 z, f32 rot, f32 scale);
-/* fn_801C4C98 */ f32  fn_801C4C98(void);
-/* fn_801C4CB8 */ void fn_801C4CB8(void);                        /* grid full render 0x704 */
+/* fadeEffectHookFunction_Doku (was fn_801C4A44) */ void fadeEffectHookFunction_Doku(s32 slot, f32 x, f32 y, f32 z, f32 rot, f32 scale);
+/* fadeEffectHookFunction_carde (was fn_801C4C98) */ f32  fadeEffectHookFunction_carde(void);
+/* fn_801C4CB8 */ void fn_801C4CB8(void);                        /* grid full render 0x704 (game/effect/fade_range_801C4CB8.c) */
 
 /* =========================================================================
  * Battle Scene (0x801C53BC - 0x801D1338) [battle_scene.c]

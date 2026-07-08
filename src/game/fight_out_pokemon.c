@@ -3871,7 +3871,7 @@ void fightOutPokemonHokakuEffect(void)
     u8 *r7;
 
     extern void _threadSwitch();
-    extern void fn_801C3C98();
+    extern void battleGridRemovePokemon();
     extern void fn_801DA224();
     extern void fn_801DA2C4();
     extern u32 fn_801DA354();
@@ -4006,7 +4006,7 @@ void fightOutPokemonHokakuEffect(void)
             fn_801DA4E8(iVar3,0);
           }
           pokemonSetStatus(r3,0,0xee,0,0);
-          fn_801C3C98(iVar1);
+          battleGridRemovePokemon(iVar1);
           fn_801DB100(iVar1);
         }
         uVar4 = fn_801F54A4(0,0,0x14,0);
@@ -4121,7 +4121,7 @@ void fightOutPokemonModosuEffect(void)
     char r4;
 
     extern void _threadSwitch();
-    extern void fn_801C3C98();
+    extern void battleGridRemovePokemon();
     extern void fn_801DA4E8();
     extern void fn_801DA8C4();
     extern s8 fn_801DA94C();
@@ -4201,7 +4201,7 @@ void fightOutPokemonModosuEffect(void)
           fn_801DA4E8(iVar3,0);
         }
         pokemonSetStatus(r3,0,0xee,0,0);
-        fn_801C3C98(iVar1);
+        battleGridRemovePokemon(iVar1);
         fn_801DB100(iVar1);
       }
       uVar4 = fn_801F54A4(0,0,0x14,0);
@@ -4219,7 +4219,7 @@ void fightOutPokemonKizetuEffect(void)
     char r4;
 
     extern void _threadSwitch();
-    extern void fn_801C3C98();
+    extern void battleGridRemovePokemon();
     extern void fn_801DA4E8();
     extern void fn_801DA8C4();
     extern s8 fn_801DA94C();
@@ -4299,7 +4299,7 @@ void fightOutPokemonKizetuEffect(void)
           fn_801DA4E8(iVar3,0);
         }
         pokemonSetStatus(r3,0,0xee,0,0);
-        fn_801C3C98(iVar1);
+        battleGridRemovePokemon(iVar1);
         fn_801DB100(iVar1);
       }
     }

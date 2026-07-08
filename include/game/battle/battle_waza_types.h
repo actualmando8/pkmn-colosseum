@@ -128,8 +128,8 @@ extern void  fn_80122048(void* particle, f32 x, f32 y, f32 z); /* set particle p
 
 /* Battle grid/scene */
 extern void* savedataGetStatus(s32 side, s32 slotType);
-extern void* fn_801C4078(s32 slot);                        /* get grid slot model */
-extern f32   fn_801C4814(s32 slot);                        /* get slot X */
+extern void* fadeEffectDokuStop(s32 slot);                 /* get grid slot model (was fn_801C4078) */
+extern f32   fadeEffectHookFunction_Doku_Init(s32 slot);   /* get slot X (was fn_801C4814) */
 extern f32   fadeEffectHookFunction_fadein_Init(s32 slot);                        /* get slot Y */
 extern f32   fadeEffectHookFunction_trainer_Init(s32 slot);                        /* get slot Z */
 

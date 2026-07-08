@@ -28,7 +28,7 @@ void wazaSequenceApplyStop(void* obj) {
     extern void GSmodelLinkToGSparticleBank(s32, s32);
     extern void fn_800E3CC8(s32, s32);
     extern void fn_80118874();
-    extern void fn_801C2B2C(void);
+    extern void battleGridResetModelVisibilityFlags(void);
     extern void fn_801D3034();
     extern void wazaSequenceEntryStop();
     extern void fn_801DEF0C(void*, s32, s32);
@@ -52,7 +52,7 @@ void wazaSequenceApplyStop(void* obj) {
                 GSmodelLinkToGSparticleBank(*(s32*)(owner + 0x24), *(s32*)(owner + 0x28));
             }
             if ((*(u32*)(effect + 0x8) & 0x04000000) != 0) {
-                fn_801C2B2C();
+                battleGridResetModelVisibilityFlags();
             }
             node = *(void**)(effect + 0x24);
             while (node != NULL) {
@@ -112,7 +112,7 @@ void wazaSequenceStart(s32 blendType) {
     extern void fn_801DD100();
     extern void GSmodelLinkToGSparticleBank(s32, s32);
     extern void wazaSequencePokemonMotionStart();
-    extern void fn_801C2BE0();
+    extern void battleGridHideModelsExcept();
     extern void battleCameraStartWaza();
     extern void wazaSequenceUpdate();
 
@@ -147,7 +147,7 @@ void wazaSequenceStart(s32 blendType) {
         *(u8**)(owner + 0x6C) = obj;
         *(u8*)(obj + 0x14) = 1;
         if ((*(u32*)(obj + 0x08) & 0x04000000) != 0) {
-            fn_801C2BE0(owner);
+            battleGridHideModelsExcept(owner);
         }
         if (*(u8*)(obj + 0x16) != 0) {
             battleCameraStartWaza(owner, obj);
