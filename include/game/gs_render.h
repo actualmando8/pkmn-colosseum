@@ -92,7 +92,7 @@
  * Public API -- GSmaterial
  * =================================================================== */
 
-/** fn_800DE680 */ void GSmaterial_Create(void* params);
+/** logVsnprintf_float */ void GSmaterial_Create(void* params);
 
 /* ===================================================================
  * Public API -- Draw

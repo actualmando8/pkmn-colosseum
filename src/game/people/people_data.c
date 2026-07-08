@@ -144,7 +144,7 @@ extern void  GSpartFree(void* model, u32 param);
 extern void  fn_800E24B0(void* model, u32 param);
 extern void  fn_800E209C(void* model, u32 param);
 extern void  fn_800E01F4(void* dst, void* src);
-extern void  fn_800E01D0(void* dst, void* src);
+extern void  GSvecCopy(void* dst, void* src);
 extern void  GSvecAdd(void* model, void* param);
 extern void  __cvt_fp2unsigned(void* param1, void* param2);
 

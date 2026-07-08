@@ -3848,7 +3848,7 @@ void _koukaOneExec__FUlPvPvPl(u32 index, void* arg1, void* arg2, s32* out) {
 /* 0x801364A8 | 0xC6C */
 extern void fn_800D37CC(void);
 extern void fn_80137780(void);
-extern void fn_800E01D0(void);
+extern void GSvecCopy(void);
 extern void fn_800E2C04(void);
 extern void fn_800EFD3C(void);
 extern void fn_800EFD14(void);
@@ -3885,7 +3885,7 @@ void fn_801364A8(void) {
     extern f32 lbl_8047D120;
     extern f64 lbl_8047D128;
     extern void fn_800D37CC();
-    extern void fn_800E01D0();
+    extern void GSvecCopy();
     extern void fn_800E27B0();
     extern void fn_800E2C04();
     extern void GSmodelSetVisibility();
@@ -4008,16 +4008,16 @@ void fn_801364A8(void) {
         *(f32*)((u8*)r28 + 0x44) = f0;
         f0 = *(f32*)((u8*)r29 + 0x30);
         *(f32*)((u8*)r28 + 0x40) = f0;
-        fn_800E01D0();
+        GSvecCopy();
         r3 = r28 + 0x34;
         r4 = r29 + 0x24;
-        fn_800E01D0();
+        GSvecCopy();
         r3 = r28 + 0x1c;
         r4 = r29 + 0xc;
-        fn_800E01D0();
+        GSvecCopy();
         r3 = r28 + 0x28;
         r4 = r29 + 0x18;
-        fn_800E01D0();
+        GSvecCopy();
         r3 = *(u32*)((u8*)r29 + 0x4C);
         r0 = r29 + 0x73;
         /* clrrwi r27, r0, 5 */;

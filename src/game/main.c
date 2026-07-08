@@ -92,7 +92,7 @@ extern void fn_800EFFC0(u32 numEntries);               /* GX FIFO init */
 extern void fn_80191484(u32 numSounds);                 /* Sound system init */
 extern void GSmodelInit(u32 maxObjects);                /* GSmem object pool */
 extern void GSpartInit(u32 param);                     /* VI callback setup */
-extern void fn_800DF854(u32 bufSize);                   /* Display list buffer init */
+extern void GSmaterialInit(u32 bufSize);                   /* Display list buffer init */
 extern void fn_800D2AD4(u32 count);                     /* GSgfx light init */
 extern void GSlightInit(u32 count);                     /* GSgfx texture init */
 extern void fn_80119824(u32 a, u32 b);                  /* GSmaterial init */
@@ -592,7 +592,7 @@ void fn_800057B0(void) {
     GSpartInit(0x8);
 
     /* Initialize display list buffer: 1024 bytes */
-    fn_800DF854(0x400);
+    GSmaterialInit(0x400);
 
     /* Initialize lighting system with 32 lights */
     fn_800D2AD4(0x20);

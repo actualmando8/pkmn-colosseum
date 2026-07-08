@@ -83,13 +83,13 @@ extern void* fn_80362D0C(void* jobj);  /* HSD_JObjAnimAll */
 extern void fn_80363CF4(void* jobj);   /* HSD_JObjRemoveAll */
 
 /* GS render util internal functions */
-extern void fn_800E01D0(void* dst, void* src);
+extern void GSvecCopy(void* dst, void* src);
 extern void fn_800E0168(void* dst, void* src1, void* src2);
 extern void fn_800E0628(void* dst, void* src);
 extern void fn_800E0218(void* a, void* b, void* c, void* d);
-extern void fn_800E053C(void* a, f32 b);
-extern void fn_800E0518(void* a, f32 b);
-extern void fn_800E04F4(void* a, f32 b);
+extern void GSmtxMakeXRotation(void* a, f32 b);
+extern void GSmtxMakeYRotation(void* a, f32 b);
+extern void GSmtxMakeZRotation(void* a, f32 b);
 extern void fn_800E05C0(void* a, f32 b, f32 c, f32 d);
 extern void fn_800E0290(void* a, void* b, void* c);
 extern void* fn_800E0264(void* dst, void* src);
@@ -191,7 +191,7 @@ void fn_800D1070(u32 dtUnk) {
                 f32 lastFrame;
                 f32 fov;
                 s32 mode;
-                fn_800E01D0((u8*)obj + 0x7c, (u8*)obj + 0x70);
+                GSvecCopy((u8*)obj + 0x7c, (u8*)obj + 0x70);
                 HSD_CObjReqAnim(*(void**)((u8*)obj + 0xc), *(f32*)((u8*)obj + 0x11c));
                 HSD_CObjAnim(*(void**)((u8*)obj + 0xc));
                 HSD_CObjGetEyePosition(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
@@ -260,9 +260,9 @@ void fn_800D1070(u32 dtUnk) {
                 f32 tmp1[3][4];
                 f32 tmp2[3][4];
                 f32 tmp3[3][4];
-                fn_800E053C((u8*)obj + 0x94, -*(f32*)((u8*)obj + 0x88));
-                fn_800E0518(tmp1, -*(f32*)((u8*)obj + 0x8c));
-                fn_800E04F4(tmp2, -*(f32*)((u8*)obj + 0x90));
+                GSmtxMakeXRotation((u8*)obj + 0x94, -*(f32*)((u8*)obj + 0x88));
+                GSmtxMakeYRotation(tmp1, -*(f32*)((u8*)obj + 0x8c));
+                GSmtxMakeZRotation(tmp2, -*(f32*)((u8*)obj + 0x90));
                 fn_800E05C0(tmp3, -*(f32*)((u8*)obj + 0x70), -*(f32*)((u8*)obj + 0x74), -*(f32*)((u8*)obj + 0x78));
                 fn_800E0290((u8*)obj + 0x94, (u8*)obj + 0x94, tmp1);
                 fn_800E0290((u8*)obj + 0x94, (u8*)obj + 0x94, tmp2);
@@ -292,13 +292,13 @@ void fn_800D13C4(void) {
 #pragma scheduling on
 void fn_800D13C8(void* dst, void* src) {
     f32 fov;
-    fn_800E01D0((u8*)dst + 0x70, (u8*)src + 0x4);
-    fn_800E01D0((u8*)dst + 0x7c, (u8*)src + 0x10);
-    fn_800E01D0((u8*)dst + 0x88, (u8*)src + 0x1c);
+    GSvecCopy((u8*)dst + 0x70, (u8*)src + 0x4);
+    GSvecCopy((u8*)dst + 0x7c, (u8*)src + 0x10);
+    GSvecCopy((u8*)dst + 0x88, (u8*)src + 0x1c);
     fn_800E0628((u8*)dst + 0x94, (u8*)src + 0x28);
     fn_800E0628((u8*)dst + 0xc4, (u8*)src + 0x58);
-    fn_800E01D0((u8*)dst + 0xf4, (u8*)src + 0x88);
-    fn_800E01D0((u8*)dst + 0x100, (u8*)src + 0x94);
+    GSvecCopy((u8*)dst + 0xf4, (u8*)src + 0x88);
+    GSvecCopy((u8*)dst + 0x100, (u8*)src + 0x94);
     *(u8*)((u8*)dst + 0x124) = *(u8*)((u8*)src + 0x1);
     if (*(u8*)((u8*)src + 0x1) != 0) {
         return;
@@ -365,13 +365,13 @@ done:
  * ================================================================== */
 void fn_800D1674(void* src, void* dst) {
     *(u8*)dst = *(u8*)((u8*)src + 0x4);
-    fn_800E01D0((u8*)dst + 0x4, (u8*)src + 0x70);
-    fn_800E01D0((u8*)dst + 0x10, (u8*)src + 0x7c);
-    fn_800E01D0((u8*)dst + 0x1c, (u8*)src + 0x88);
+    GSvecCopy((u8*)dst + 0x4, (u8*)src + 0x70);
+    GSvecCopy((u8*)dst + 0x10, (u8*)src + 0x7c);
+    GSvecCopy((u8*)dst + 0x1c, (u8*)src + 0x88);
     fn_800E0628((u8*)dst + 0x28, (u8*)src + 0x94);
     fn_800E0628((u8*)dst + 0x58, (u8*)src + 0xc4);
-    fn_800E01D0((u8*)dst + 0x88, (u8*)src + 0xf4);
-    fn_800E01D0((u8*)dst + 0x94, (u8*)src + 0x100);
+    GSvecCopy((u8*)dst + 0x88, (u8*)src + 0xf4);
+    GSvecCopy((u8*)dst + 0x94, (u8*)src + 0x100);
     *(u32*)((u8*)dst + 0xa0) = *(u32*)((u8*)src + 0x10c);
     *(u32*)((u8*)dst + 0xa4) = *(u32*)((u8*)src + 0x114);
     *(f32*)((u8*)dst + 0xa8) = *(f32*)((u8*)src + 0x118);
@@ -568,9 +568,9 @@ void* fn_800D1B3C(void* obj) {
             f32 tmp1[3][4];
             f32 tmp2[3][4];
             f32 tmp3[3][4];
-            fn_800E053C((u8*)obj + 0x94, -*(f32*)((u8*)obj + 0x88));
-            fn_800E0518(tmp1, -*(f32*)((u8*)obj + 0x8c));
-            fn_800E04F4(tmp2, -*(f32*)((u8*)obj + 0x90));
+            GSmtxMakeXRotation((u8*)obj + 0x94, -*(f32*)((u8*)obj + 0x88));
+            GSmtxMakeYRotation(tmp1, -*(f32*)((u8*)obj + 0x8c));
+            GSmtxMakeZRotation(tmp2, -*(f32*)((u8*)obj + 0x90));
             fn_800E05C0(tmp3, -*(f32*)((u8*)obj + 0x70), -*(f32*)((u8*)obj + 0x74), -*(f32*)((u8*)obj + 0x78));
             fn_800E0290((u8*)obj + 0x94, (u8*)obj + 0x94, tmp1);
             fn_800E0290((u8*)obj + 0x94, (u8*)obj + 0x94, tmp2);
@@ -619,9 +619,9 @@ void fn_800D1D00(void* obj) {
         f32 tmp1[3][4];
         f32 tmp2[3][4];
         f32 tmp3[3][4];
-        fn_800E053C((u8*)obj + 0x94, -*(f32*)((u8*)obj + 0x88));
-        fn_800E0518(tmp1, -*(f32*)((u8*)obj + 0x8c));
-        fn_800E04F4(tmp2, -*(f32*)((u8*)obj + 0x90));
+        GSmtxMakeXRotation((u8*)obj + 0x94, -*(f32*)((u8*)obj + 0x88));
+        GSmtxMakeYRotation(tmp1, -*(f32*)((u8*)obj + 0x8c));
+        GSmtxMakeZRotation(tmp2, -*(f32*)((u8*)obj + 0x90));
         fn_800E05C0(tmp3, -*(f32*)((u8*)obj + 0x70), -*(f32*)((u8*)obj + 0x74), -*(f32*)((u8*)obj + 0x78));
         fn_800E0290((u8*)obj + 0x94, (u8*)obj + 0x94, tmp1);
         fn_800E0290((u8*)obj + 0x94, (u8*)obj + 0x94, tmp2);
@@ -635,8 +635,8 @@ void fn_800D1D00(void* obj) {
  * Address: 0x800D1EB8, Size: 0x4C
  * ================================================================== */
 void GScameraGetLookAt(GSRenderCamera* camera, void* dest1, void* dest2) {
-    fn_800E01D0(dest1, &camera->upVector);
-    fn_800E01D0(dest2, &camera->interest);
+    GSvecCopy(dest1, &camera->upVector);
+    GSvecCopy(dest2, &camera->interest);
 }
 
 /* ==================================================================
@@ -644,8 +644,8 @@ void GScameraGetLookAt(GSRenderCamera* camera, void* dest1, void* dest2) {
  * Address: 0x800D1F04, Size: 0x54
  * ================================================================== */
 void GScameraLookAt(GSRenderCamera* camera, void* src1, void* src2) {
-    fn_800E01D0(&camera->upVector, src1);
-    fn_800E01D0(&camera->interest, src2);
+    GSvecCopy(&camera->upVector, src1);
+    GSvecCopy(&camera->interest, src2);
     camera->dirty = 1;
     camera->useLookAt = 1;
 }
@@ -655,7 +655,7 @@ void GScameraLookAt(GSRenderCamera* camera, void* src1, void* src2) {
  * Address: 0x800D1F58, Size: 0x2C
  * ================================================================== */
 void GScameraGetRotation(GSRenderCamera* camera, void* dest) {
-    fn_800E01D0(dest, &camera->rotation);
+    GSvecCopy(dest, &camera->rotation);
 }
 
 /* ==================================================================
@@ -666,7 +666,7 @@ void GScameraGetPosition(GSRenderCamera* camera, void* dest) {
     if (camera->isAnimating != 0) {
         HSD_CObjGetEyePosition(camera->cobj, &camera->eye);
     }
-    fn_800E01D0(dest, &camera->eye);
+    GSvecCopy(dest, &camera->eye);
 }
 
 /* ==================================================================
@@ -684,7 +684,7 @@ void GScameraGetPerspective(GSRenderCamera* camera, void* a, void* b, f32* outA,
  * Address: 0x800D203C, Size: 0x40
  * ================================================================== */
 void GScameraSetRotation(GSRenderCamera* camera, void* src) {
-    fn_800E01D0(&camera->rotation, src);
+    GSvecCopy(&camera->rotation, src);
     camera->dirty = 1;
     camera->useLookAt = 0;
 }
@@ -695,7 +695,7 @@ void GScameraSetRotation(GSRenderCamera* camera, void* src) {
  * ================================================================== */
 void GScameraSetPosition(GSRenderCamera* camera, void* src) {
     HSD_CObjSetEyePosition(camera->cobj);
-    fn_800E01D0(&camera->eye, src);
+    GSvecCopy(&camera->eye, src);
     camera->dirty = 1;
 }
 
@@ -807,9 +807,9 @@ void _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID(void) {
             f32 tmp1[3][4];
             f32 tmp2[3][4];
             f32 tmp3[3][4];
-            fn_800E053C((u8*)obj + 0x94, -*(f32*)((u8*)obj + 0x88));
-            fn_800E0518(tmp1, -*(f32*)((u8*)obj + 0x8c));
-            fn_800E04F4(tmp2, -*(f32*)((u8*)obj + 0x90));
+            GSmtxMakeXRotation((u8*)obj + 0x94, -*(f32*)((u8*)obj + 0x88));
+            GSmtxMakeYRotation(tmp1, -*(f32*)((u8*)obj + 0x8c));
+            GSmtxMakeZRotation(tmp2, -*(f32*)((u8*)obj + 0x90));
             fn_800E05C0(tmp3, -*(f32*)((u8*)obj + 0x70), -*(f32*)((u8*)obj + 0x74), -*(f32*)((u8*)obj + 0x78));
             fn_800E0290((u8*)obj + 0x94, (u8*)obj + 0x94, tmp1);
             fn_800E0290((u8*)obj + 0x94, (u8*)obj + 0x94, tmp2);
@@ -878,9 +878,9 @@ void fn_800D258C(void* obj) {
         f32 tmp1[3][4];
         f32 tmp2[3][4];
         f32 tmp3[3][4];
-        fn_800E053C((u8*)obj + 0x94, -*(f32*)((u8*)obj + 0x88));
-        fn_800E0518(tmp1, -*(f32*)((u8*)obj + 0x8c));
-        fn_800E04F4(tmp2, -*(f32*)((u8*)obj + 0x90));
+        GSmtxMakeXRotation((u8*)obj + 0x94, -*(f32*)((u8*)obj + 0x88));
+        GSmtxMakeYRotation(tmp1, -*(f32*)((u8*)obj + 0x8c));
+        GSmtxMakeZRotation(tmp2, -*(f32*)((u8*)obj + 0x90));
         fn_800E05C0(tmp3, -*(f32*)((u8*)obj + 0x70), -*(f32*)((u8*)obj + 0x74), -*(f32*)((u8*)obj + 0x78));
         fn_800E0290((u8*)obj + 0x94, (u8*)obj + 0x94, tmp1);
         fn_800E0290((u8*)obj + 0x94, (u8*)obj + 0x94, tmp2);
@@ -968,8 +968,8 @@ found:
         *(u8*)((u8*)slot + 0x3) = 0;
         *(u8*)((u8*)slot + 0x0) = 1;
         *(u8*)((u8*)slot + 0x1) = 0;
-        fn_800E01D0((u8*)slot + 0x70, (u8*)*(void**)((u8*)*(void**)((u8*)slot + 0xc) + 0x24) + 0xc);
-        fn_800E01D0((u8*)slot + 0x100, (u8*)*(void**)((u8*)*(void**)((u8*)slot + 0xc) + 0x28) + 0xc);
+        GSvecCopy((u8*)slot + 0x70, (u8*)*(void**)((u8*)*(void**)((u8*)slot + 0xc) + 0x24) + 0xc);
+        GSvecCopy((u8*)slot + 0x100, (u8*)*(void**)((u8*)*(void**)((u8*)slot + 0xc) + 0x28) + 0xc);
     }
     return slot;
 }

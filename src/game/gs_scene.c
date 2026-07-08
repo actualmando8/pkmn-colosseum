@@ -81,7 +81,7 @@
  *   - Object entry size 0x50+ bytes (offsets seen up to 0x50)
  *   - fn_80169520 called for status updates
  *   - fn_8016A644 called for resource cleanup
- *   - Calls to fn_800E01F4, fn_800E0518, GSvecAdd, GSvecTransform
+ *   - Calls to fn_800E01F4, GSmtxMakeYRotation, GSvecAdd, GSvecTransform
  *     (GSgfx vector/matrix operations)
  *   - Camera state at lbl_80478C40 (sda21)
  *   - fn_800FF56C (GSfloor get active) called from camera code
@@ -107,7 +107,7 @@ extern void  fn_800E209C(u16 handle);                   /* GSmemFree */
 
 /* GSgfx math/render */
 extern void  fn_800E01F4(void* out, f32 angle, f32 a, f32 b); /* rotation matrix */
-extern void  fn_800E0518(void* out, f32 angle);         /* angle to vector */
+extern void  GSmtxMakeYRotation(void* out, f32 angle);         /* angle to vector */
 extern void  GSvecAdd(void* out, void* a, void* b);  /* cross product */
 extern void  GSvecTransform(void* out, void* a, void* b);  /* vector subtract */
 extern void  GScameraSetPosition(void* obj, void* mtx);         /* set model matrix */
@@ -120,7 +120,7 @@ extern void  fn_80169520(void* obj);                    /* status flag update */
 extern void  fn_8016A644(void* obj);                    /* resource cleanup */
 extern void  fn_800D305C(s32 param);                     /* gs_render_util: set render mode */
 extern void  fn_800E24B0(u16 handle);                  /* GSmemLock */
-extern void  fn_800E01D0(void* dst, void* src);
+extern void  GSvecCopy(void* dst, void* src);
 extern u32  menuIsCheck(u32 a);
 extern void menuOpenCustom(u32 a, u32 b, u32 c, u32 d, u32 e, u32 f, ...);
 extern void fn_800D13C8(void* a, void* b);
@@ -430,7 +430,7 @@ asm void fn_8017662C(void) {
 #pragma pop
 #else
 void fn_8017662C(void* src) {
-    fn_800E01D0((u8*)lbl_80478C40 + 0xE4, src);
+    GSvecCopy((u8*)lbl_80478C40 + 0xE4, src);
 }
 #endif
 #if 0
@@ -443,7 +443,7 @@ asm void fn_80176658(void) {
 #pragma pop
 #else
 void fn_80176658(void* src) {
-    fn_800E01D0((u8*)lbl_80478C40 + 0xD8, src);
+    GSvecCopy((u8*)lbl_80478C40 + 0xD8, src);
 }
 #endif
 #if 0
@@ -560,7 +560,7 @@ void fn_80177478(void* unused, void* src, f32 param) {
     p = lbl_80478C40;
     *((u8*)p + 0x01) = 1;
     p = lbl_80478C40;
-    fn_800E01D0((u8*)p + 0xB0, src);
+    GSvecCopy((u8*)p + 0xB0, src);
     {
         void* q = lbl_80478C40;
         *(f32*)((u8*)q + 0xCC) = lbl_8047D740;
@@ -571,7 +571,7 @@ void fn_80177478(void* unused, void* src, f32 param) {
     }
     {
         void* q = lbl_80478C40;
-        fn_800E01D0((u8*)q + 0xBC, (u8*)q + 0x10);
+        GSvecCopy((u8*)q + 0xBC, (u8*)q + 0x10);
     }
 }
 #endif
@@ -595,7 +595,7 @@ void fn_801774F0(f32 a, f32 b, f32 c, f32 angle) {
     *((u8*)p + 0x01) = 1;
     {
         void* q = lbl_80478C40;
-        fn_800E01D0((u8*)q + 0x90, tmp);
+        GSvecCopy((u8*)q + 0x90, tmp);
     }
     {
         void* q = lbl_80478C40;
@@ -607,7 +607,7 @@ void fn_801774F0(f32 a, f32 b, f32 c, f32 angle) {
     }
     {
         void* q = lbl_80478C40;
-        fn_800E01D0((u8*)q + 0x9C, (u8*)q + 0x4);
+        GSvecCopy((u8*)q + 0x9C, (u8*)q + 0x4);
     }
 }
 #pragma pop
@@ -629,7 +629,7 @@ void fn_80177574(void* unused, void* src, f32 param) {
     p = lbl_80478C40;
     *((u8*)p + 0x01) = 1;
     p = lbl_80478C40;
-    fn_800E01D0((u8*)p + 0x90, src);
+    GSvecCopy((u8*)p + 0x90, src);
     {
         void* q = lbl_80478C40;
         *(f32*)((u8*)q + 0xAC) = lbl_8047D740;
@@ -640,7 +640,7 @@ void fn_80177574(void* unused, void* src, f32 param) {
     }
     {
         void* q = lbl_80478C40;
-        fn_800E01D0((u8*)q + 0x9C, (u8*)q + 0x4);
+        GSvecCopy((u8*)q + 0x9C, (u8*)q + 0x4);
     }
 }
 #pragma pop
@@ -665,7 +665,7 @@ void fn_801775EC(f32 a, f32 b, f32 c, f32 angle) {
     *((u8*)p + 0x01) = 1;
     {
         void* q = lbl_80478C40;
-        fn_800E01D0((u8*)q + 0x50, tmp);
+        GSvecCopy((u8*)q + 0x50, tmp);
     }
     {
         void* q = lbl_80478C40;
@@ -677,7 +677,7 @@ void fn_801775EC(f32 a, f32 b, f32 c, f32 angle) {
     }
     {
         void* q = lbl_80478C40;
-        fn_800E01D0((u8*)q + 0x5C, (u8*)q + 0x1C);
+        GSvecCopy((u8*)q + 0x5C, (u8*)q + 0x1C);
     }
 }
 #pragma pop
@@ -699,7 +699,7 @@ void fn_801776E8(void* unused, void* src, f32 param) {
     p = lbl_80478C40;
     *((u8*)p + 0x01) = 1;
     p = lbl_80478C40;
-    fn_800E01D0((u8*)p + 0x50, src);
+    GSvecCopy((u8*)p + 0x50, src);
     {
         void* q = lbl_80478C40;
         *(f32*)((u8*)q + 0x6C) = lbl_8047D740;
@@ -710,7 +710,7 @@ void fn_801776E8(void* unused, void* src, f32 param) {
     }
     {
         void* q = lbl_80478C40;
-        fn_800E01D0((u8*)q + 0x5C, (u8*)q + 0x1C);
+        GSvecCopy((u8*)q + 0x5C, (u8*)q + 0x1C);
     }
 }
 #pragma pop
@@ -732,7 +732,7 @@ void fn_80177670(void* unused, void* src, f32 param) {
     p = lbl_80478C40;
     *((u8*)p + 0x01) = 1;
     p = lbl_80478C40;
-    fn_800E01D0((u8*)p + 0x70, src);
+    GSvecCopy((u8*)p + 0x70, src);
     {
         void* q = lbl_80478C40;
         *(f32*)((u8*)q + 0x8C) = lbl_8047D740;
@@ -743,7 +743,7 @@ void fn_80177670(void* unused, void* src, f32 param) {
     }
     {
         void* q = lbl_80478C40;
-        fn_800E01D0((u8*)q + 0x7C, (u8*)q + 0x28);
+        GSvecCopy((u8*)q + 0x7C, (u8*)q + 0x28);
     }
 }
 #pragma pop
@@ -782,7 +782,7 @@ void fn_80177760(void* unused, u32 a, u32 b, f32 param) {
         void* p = lbl_80478C40;
         *((u8*)p + 0x01) = 1;
         p = lbl_80478C40;
-        fn_800E01D0((u8*)p + 0x50, local);
+        GSvecCopy((u8*)p + 0x50, local);
     }
     {
         void* q = lbl_80478C40;
@@ -794,7 +794,7 @@ void fn_80177760(void* unused, u32 a, u32 b, f32 param) {
     }
     {
         void* q = lbl_80478C40;
-        fn_800E01D0((u8*)q + 0x5C, (u8*)q + 0x1C);
+        GSvecCopy((u8*)q + 0x5C, (u8*)q + 0x1C);
     }
 }
 #pragma pop
@@ -812,7 +812,7 @@ asm void GSscene_GetCameraRotationVector(void) {
 #pragma push
 #pragma optimization_level 4
 void GSscene_GetCameraRotationVector(void* dst) {
-    fn_800E01D0(dst, (u8*)lbl_80478C40 + 0x10);
+    GSvecCopy(dst, (u8*)lbl_80478C40 + 0x10);
 }
 #pragma pop
 #endif
@@ -827,7 +827,7 @@ asm void GSscene_SetCameraRotationVector(void) {
 void GSscene_SetCameraRotationVector(void* src) {
     void* handle;
     handle = GSresGetResource(0, 0);
-    fn_800E01D0((u8*)lbl_80478C40 + 0x10, src);
+    GSvecCopy((u8*)lbl_80478C40 + 0x10, src);
     GScameraSetRotation(handle, src);
 }
 #endif
@@ -845,7 +845,7 @@ asm void GSscene_GetCameraDirectionVector(void) {
 #pragma push
 #pragma optimization_level 4
 void GSscene_GetCameraDirectionVector(void* dst) {
-    fn_800E01D0(dst, (u8*)lbl_80478C40 + 0x4);
+    GSvecCopy(dst, (u8*)lbl_80478C40 + 0x4);
 }
 #pragma pop
 #endif
@@ -862,7 +862,7 @@ asm void GSscene_SetCameraDirectionVector(void) {
 #pragma push
 #pragma optimization_level 4
 void GSscene_SetCameraDirectionVector(void* src) {
-    fn_800E01D0((u8*)lbl_80478C40 + 0x4, src);
+    GSvecCopy((u8*)lbl_80478C40 + 0x4, src);
 }
 #pragma pop
 #endif
@@ -879,7 +879,7 @@ asm void GSscene_GetCameraPositionVector(void) {
 #pragma push
 #pragma optimization_level 4
 void GSscene_GetCameraPositionVector(void* dst) {
-    fn_800E01D0(dst, (u8*)lbl_80478C40 + 0x1C);
+    GSvecCopy(dst, (u8*)lbl_80478C40 + 0x1C);
 }
 #pragma pop
 #endif
@@ -896,7 +896,7 @@ asm void GSscene_SetCameraPositionVector(void) {
 #pragma push
 #pragma optimization_level 4
 void GSscene_SetCameraPositionVector(void* src) {
-    fn_800E01D0((u8*)lbl_80478C40 + 0x1C, src);
+    GSvecCopy((u8*)lbl_80478C40 + 0x1C, src);
 }
 #pragma pop
 #endif
@@ -913,7 +913,7 @@ asm void GSscene_GetCameraViewVector(void) {
 #pragma push
 #pragma optimization_level 4
 void GSscene_GetCameraViewVector(void* dst) {
-    fn_800E01D0(dst, (u8*)lbl_80478C40 + 0x28);
+    GSvecCopy(dst, (u8*)lbl_80478C40 + 0x28);
 }
 #pragma pop
 #endif
@@ -930,7 +930,7 @@ asm void GSscene_SetCameraViewVector(void) {
 #pragma push
 #pragma optimization_level 4
 void GSscene_SetCameraViewVector(void* src) {
-    fn_800E01D0((u8*)lbl_80478C40 + 0x28, src);
+    GSvecCopy((u8*)lbl_80478C40 + 0x28, src);
 }
 #pragma pop
 #endif

@@ -52,7 +52,7 @@ typedef u8 M2C_UNK;
     do { \
         s32 _sp = GS_VM_STACK_COUNT(ctx); \
         if (_sp > 0x40) { \
-            fn_800DD38C((const char *)lbl_80271068); \
+            GSlogWritef((const char *)lbl_80271068); \
         } else { \
             GS_VM_STACK_COUNT(ctx) = _sp + 1; \
             GS_VM_STACK(ctx)[_sp] = (u32)(value); \
@@ -62,7 +62,7 @@ typedef u8 M2C_UNK;
     do { \
         s32 _sp = GS_VM_STACK_COUNT(ctx); \
         if (_sp <= 0) { \
-            fn_800DD38C((const char *)lbl_8027107C); \
+            GSlogWritef((const char *)lbl_8027107C); \
             (out) = GS_VM_STACK(ctx)[0]; \
         } else { \
             _sp--; \
@@ -88,7 +88,7 @@ typedef u8 M2C_UNK;
     do { \
         u16 _desc = (u16)(desc); \
         if (_desc == 0) { \
-            fn_800DD38C((const char *)lbl_80271068 + 0x28, _desc); \
+            GSlogWritef((const char *)lbl_80271068 + 0x28, _desc); \
             (out) = lbl_8047E710; \
         } else if (_desc & 0x80) { \
             GS_VM_POP(ctx, out); \
@@ -102,7 +102,7 @@ typedef u8 M2C_UNK;
     do { \
         u16 _desc = (u16)(desc); \
         if (_desc == 0) { \
-            fn_800DD38C((const char *)lbl_80271068 + 0x28, _desc); \
+            GSlogWritef((const char *)lbl_80271068 + 0x28, _desc); \
             (out) = lbl_8047E710; \
         } else if (_desc & 0x80) { \
             GS_VM_POP(ctx, out); \
@@ -178,7 +178,7 @@ extern void fn_800D888C(u32 mask, ...);
 extern void fn_800D88DC(u32 mask);
 extern void fn_800D9ED8(void);
 extern void fn_800DC1D4(s32 a);
-extern void fn_800DE680(void);
+extern void logVsnprintf_float(void);
 extern void GStextureUnlockImage(void* ctx);
 extern void GStextureLockImage(void);
 extern void fn_801669BC(u32 type);
@@ -4625,7 +4625,7 @@ u32 fn_800F106C(void) {
 #endif
 
 /* 0x800F10E8 | 0x2E8 */
-extern void fn_800DD38C(const char* fmt, ...);
+extern void GSlogWritef(const char* fmt, ...);
 extern u8 lbl_80271068[];
 extern u32 lbl_80478B00;
 extern u32 lbl_8047AC38;
@@ -4692,7 +4692,7 @@ s32 fn_800F10E8(arg0)
     GS_VM_FRAME(arg0) = oldFrame;
     for (i = 0; i < discardCount; i++) {
         if (GS_VM_STACK_COUNT(arg0) <= 0) {
-            fn_800DD38C((const char *)lbl_8027107C);
+            GSlogWritef((const char *)lbl_8027107C);
         } else {
             GS_VM_STACK_COUNT(arg0) = GS_VM_STACK_COUNT(arg0) - 1;
         }
@@ -4728,13 +4728,13 @@ s32 fn_800F13D0(void* obj) {
 
     /* push 0x1C and r29 to stack */
     if (*(u32*)(p+0x28) > 0x40) {
-        fn_800DD38C((const char*)lbl_80271068);
+        GSlogWritef((const char*)lbl_80271068);
     } else {
         *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4) = *(u32*)(p+0x1C);
         *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1;
     }
     if (*(u32*)(p+0x28) > 0x40) {
-        fn_800DD38C((const char*)lbl_80271068);
+        GSlogWritef((const char*)lbl_80271068);
     } else {
         *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4) = r29;
         *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1;
@@ -4753,7 +4753,7 @@ s32 fn_800F13D0(void* obj) {
         if (*(u8*)(p+0x4) == 3) {
             /* pop stackVal1 */
             if (*(u32*)(p+0x28) <= 0) {
-                fn_800DD38C((const char*)lbl_8027107C);
+                GSlogWritef((const char*)lbl_8027107C);
                 stackVal1 = *(u32*)(p+0x6C);
             } else {
                 *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
@@ -4761,7 +4761,7 @@ s32 fn_800F13D0(void* obj) {
             }
             /* pop stackVal0 */
             if (*(u32*)(p+0x28) <= 0) {
-                fn_800DD38C((const char*)lbl_8027107C);
+                GSlogWritef((const char*)lbl_8027107C);
                 stackVal0 = *(u32*)(p+0x6C);
             } else {
                 *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
@@ -4772,7 +4772,7 @@ s32 fn_800F13D0(void* obj) {
             *(u32*)(p+0x1C) = stackVal0;
             while (r28b < (s32)stackVal1) {
                 if (*(u32*)(p+0x28) <= 0) {
-                    fn_800DD38C((const char*)errStr);
+                    GSlogWritef((const char*)errStr);
                 } else {
                     *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
                 }
@@ -4787,14 +4787,14 @@ s32 fn_800F13D0(void* obj) {
     /* exit loop: state=1, pop twice, drain */
     *(u8*)(p+0x4) = 1;
     if (*(u32*)(p+0x28) <= 0) {
-        fn_800DD38C((const char*)lbl_8027107C);
+        GSlogWritef((const char*)lbl_8027107C);
         stackVal1 = *(u32*)(p+0x6C);
     } else {
         *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
         stackVal1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4);
     }
     if (*(u32*)(p+0x28) <= 0) {
-        fn_800DD38C((const char*)lbl_8027107C);
+        GSlogWritef((const char*)lbl_8027107C);
         stackVal0 = *(u32*)(p+0x6C);
     } else {
         *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
@@ -4805,7 +4805,7 @@ s32 fn_800F13D0(void* obj) {
     errStr = (u8*)lbl_8027107C;
     while (r28b < (s32)stackVal1) {
         if (*(u32*)(p+0x28) <= 0) {
-            fn_800DD38C((const char*)errStr);
+            GSlogWritef((const char*)errStr);
         } else {
             *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
         }
@@ -4853,13 +4853,13 @@ s32 fn_800F16C0(void* obj) {
 
     /* push 0x1C and r30 to stack */
     if (*(u32*)(p+0x28) > 0x40) {
-        fn_800DD38C((const char*)lbl_80271068);
+        GSlogWritef((const char*)lbl_80271068);
     } else {
         *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4) = *(u32*)(p+0x1C);
         *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1;
     }
     if (*(u32*)(p+0x28) > 0x40) {
-        fn_800DD38C((const char*)lbl_80271068);
+        GSlogWritef((const char*)lbl_80271068);
     } else {
         *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4) = r30;
         *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1;
@@ -4929,14 +4929,14 @@ s32 fn_800F16C0(void* obj) {
 
     /* pop twice, drain */
     if (*(u32*)(p+0x28) <= 0) {
-        fn_800DD38C((const char*)lbl_8027107C);
+        GSlogWritef((const char*)lbl_8027107C);
         stackVal1 = *(u32*)(p+0x6C);
     } else {
         *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
         stackVal1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4);
     }
     if (*(u32*)(p+0x28) <= 0) {
-        fn_800DD38C((const char*)lbl_8027107C);
+        GSlogWritef((const char*)lbl_8027107C);
         stackVal0 = *(u32*)(p+0x6C);
     } else {
         *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
@@ -4947,7 +4947,7 @@ s32 fn_800F16C0(void* obj) {
     r28b = 0;
     while (r28b < (s32)stackVal1) {
         if (*(u32*)(p+0x28) <= 0) {
-            fn_800DD38C((const char*)errStr);
+            GSlogWritef((const char*)errStr);
         } else {
             *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
         }
@@ -5031,7 +5031,7 @@ s32 fn_800F2264(arg0)
     GS_VM_READ_U8(arg0, dstDesc);
     GS_VM_READ_U16(arg0, count);
     if (dstDesc & 0x80) {
-        fn_800DD38C((const char *)lbl_80271068 + 0x48);
+        GSlogWritef((const char *)lbl_80271068 + 0x48);
         return 1;
     }
     if (srcDesc & 0x80) {
@@ -5086,9 +5086,9 @@ s32 fn_800F24F4(arg0)
         }
     }
     if (dstDesc == 0) {
-        fn_800DD38C((const char *)lbl_80271068 + 0x84, (u16)dstDesc);
+        GSlogWritef((const char *)lbl_80271068 + 0x84, (u16)dstDesc);
     } else if (dstDesc & 0x80) {
-        fn_800DD38C((const char *)lbl_80271068 + 0xA0);
+        GSlogWritef((const char *)lbl_80271068 + 0xA0);
     } else {
         GS_VM_POP(arg0, dstIndex);
         dst = (dstDesc & 0x40) ? (GS_VM_STACK(arg0) + GS_VM_FRAME(arg0) + dstIndex) : (GS_VM_GLOBALS(arg0) + dstIndex);
@@ -5128,12 +5128,12 @@ s32 fn_800F27D4(void* obj) {
     }
     def = lbl_8047E710;
     if (leftDesc == 0) {
-        fn_800DD38C((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        GSlogWritef((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
         leftValue = def;
     } else {
         idx = leftDesc & 0xFFFF;
         if (leftDesc & 0x80) {
-            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
             else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
         } else {
             u32 fieldIdx = idx & 0x3F;
@@ -5151,12 +5151,12 @@ s32 fn_800F27D4(void* obj) {
     }
     def = lbl_8047E710;
     if (rightDesc == 0) {
-        fn_800DD38C((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        GSlogWritef((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
         rightValue = def;
     } else {
         idx = rightDesc & 0xFFFF;
         if (rightDesc & 0x80) {
-            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
             else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
         } else {
             u32 fieldIdx = idx & 0x3F;
@@ -5189,7 +5189,7 @@ s32 fn_800F27D4(void* obj) {
             result = (f1 != f0) ? 1 : 0;
         }
     }
-    if (ctx->stackCount > 0x40) { fn_800DD38C((const char*)errBase); }
+    if (ctx->stackCount > 0x40) { GSlogWritef((const char*)errBase); }
     else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
@@ -5223,12 +5223,12 @@ s32 fn_800F2BE8(void* obj) {
     }
     def = lbl_8047E710;
     if (leftDesc == 0) {
-        fn_800DD38C((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        GSlogWritef((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
         leftValue = def;
     } else {
         idx = leftDesc & 0xFFFF;
         if (leftDesc & 0x80) {
-            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
             else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
         } else {
             u32 fieldIdx = idx & 0x3F;
@@ -5246,12 +5246,12 @@ s32 fn_800F2BE8(void* obj) {
     }
     def = lbl_8047E710;
     if (rightDesc == 0) {
-        fn_800DD38C((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        GSlogWritef((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
         rightValue = def;
     } else {
         idx = rightDesc & 0xFFFF;
         if (rightDesc & 0x80) {
-            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
             else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
         } else {
             u32 fieldIdx = idx & 0x3F;
@@ -5284,7 +5284,7 @@ s32 fn_800F2BE8(void* obj) {
             result = (f1 == f0) ? 1 : 0;
         }
     }
-    if (ctx->stackCount > 0x40) { fn_800DD38C((const char*)errBase); }
+    if (ctx->stackCount > 0x40) { GSlogWritef((const char*)errBase); }
     else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
@@ -5319,12 +5319,12 @@ s32 fn_800F2FF8(void* obj) {
     }
     def = lbl_8047E710;
     if (leftDesc == 0) {
-        fn_800DD38C((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        GSlogWritef((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
         leftValue = def;
     } else {
         idx = leftDesc & 0xFFFF;
         if (leftDesc & 0x80) {
-            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
             else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
         } else {
             u32 fieldIdx = idx & 0x3F;
@@ -5342,12 +5342,12 @@ s32 fn_800F2FF8(void* obj) {
     }
     def = lbl_8047E710;
     if (rightDesc == 0) {
-        fn_800DD38C((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        GSlogWritef((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
         rightValue = def;
     } else {
         idx = rightDesc & 0xFFFF;
         if (rightDesc & 0x80) {
-            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
             else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
         } else {
             u32 fieldIdx = idx & 0x3F;
@@ -5380,7 +5380,7 @@ s32 fn_800F2FF8(void* obj) {
             result = (f1 >= f0) ? 1 : 0;
         }
     }
-    if (ctx->stackCount > 0x40) { fn_800DD38C((const char*)errBase); }
+    if (ctx->stackCount > 0x40) { GSlogWritef((const char*)errBase); }
     else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
@@ -5414,12 +5414,12 @@ s32 fn_800F3418(void* obj) {
     }
     def = lbl_8047E710;
     if (leftDesc == 0) {
-        fn_800DD38C((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        GSlogWritef((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
         leftValue = def;
     } else {
         idx = leftDesc & 0xFFFF;
         if (leftDesc & 0x80) {
-            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
             else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
         } else {
             u32 fieldIdx = idx & 0x3F;
@@ -5437,12 +5437,12 @@ s32 fn_800F3418(void* obj) {
     }
     def = lbl_8047E710;
     if (rightDesc == 0) {
-        fn_800DD38C((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        GSlogWritef((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
         rightValue = def;
     } else {
         idx = rightDesc & 0xFFFF;
         if (rightDesc & 0x80) {
-            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
             else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
         } else {
             u32 fieldIdx = idx & 0x3F;
@@ -5475,7 +5475,7 @@ s32 fn_800F3418(void* obj) {
             result = (f1 > f0) ? 1 : 0;
         }
     }
-    if (ctx->stackCount > 0x40) { fn_800DD38C((const char*)errBase); }
+    if (ctx->stackCount > 0x40) { GSlogWritef((const char*)errBase); }
     else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
@@ -5509,12 +5509,12 @@ s32 fn_800F3830(void* obj) {
     }
     def = lbl_8047E710;
     if (leftDesc == 0) {
-        fn_800DD38C((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        GSlogWritef((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
         leftValue = def;
     } else {
         idx = leftDesc & 0xFFFF;
         if (leftDesc & 0x80) {
-            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
             else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
         } else {
             u32 fieldIdx = idx & 0x3F;
@@ -5532,12 +5532,12 @@ s32 fn_800F3830(void* obj) {
     }
     def = lbl_8047E710;
     if (rightDesc == 0) {
-        fn_800DD38C((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        GSlogWritef((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
         rightValue = def;
     } else {
         idx = rightDesc & 0xFFFF;
         if (rightDesc & 0x80) {
-            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
             else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
         } else {
             u32 fieldIdx = idx & 0x3F;
@@ -5570,7 +5570,7 @@ s32 fn_800F3830(void* obj) {
             result = (f1 <= f0) ? 1 : 0;
         }
     }
-    if (ctx->stackCount > 0x40) { fn_800DD38C((const char*)errBase); }
+    if (ctx->stackCount > 0x40) { GSlogWritef((const char*)errBase); }
     else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
@@ -5604,12 +5604,12 @@ s32 fn_800F3C50(void* obj) {
     }
     def = lbl_8047E710;
     if (leftDesc == 0) {
-        fn_800DD38C((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        GSlogWritef((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
         leftValue = def;
     } else {
         idx = leftDesc & 0xFFFF;
         if (leftDesc & 0x80) {
-            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
             else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
         } else {
             u32 fieldIdx = idx & 0x3F;
@@ -5627,12 +5627,12 @@ s32 fn_800F3C50(void* obj) {
     }
     def = lbl_8047E710;
     if (rightDesc == 0) {
-        fn_800DD38C((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        GSlogWritef((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
         rightValue = def;
     } else {
         idx = rightDesc & 0xFFFF;
         if (rightDesc & 0x80) {
-            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
             else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
         } else {
             u32 fieldIdx = idx & 0x3F;
@@ -5665,7 +5665,7 @@ s32 fn_800F3C50(void* obj) {
             result = (f1 < f0) ? 1 : 0;
         }
     }
-    if (ctx->stackCount > 0x40) { fn_800DD38C((const char*)errBase); }
+    if (ctx->stackCount > 0x40) { GSlogWritef((const char*)errBase); }
     else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
@@ -5699,12 +5699,12 @@ s32 fn_800F4068(void* obj) {
     }
     def = lbl_8047E710;
     if (leftDesc == 0) {
-        fn_800DD38C((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        GSlogWritef((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
         leftValue = def;
     } else {
         idx = leftDesc & 0xFFFF;
         if (leftDesc & 0x80) {
-            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
             else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
         } else {
             u32 fieldIdx = idx & 0x3F;
@@ -5722,12 +5722,12 @@ s32 fn_800F4068(void* obj) {
     }
     def = lbl_8047E710;
     if (rightDesc == 0) {
-        fn_800DD38C((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        GSlogWritef((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
         rightValue = def;
     } else {
         idx = rightDesc & 0xFFFF;
         if (rightDesc & 0x80) {
-            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
             else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
         } else {
             u32 fieldIdx = idx & 0x3F;
@@ -5761,7 +5761,7 @@ s32 fn_800F4068(void* obj) {
             f32 tmp = f1 - f0; result = *(u32*)&tmp;
         }
     }
-    if (ctx->stackCount > 0x40) { fn_800DD38C((const char*)errBase); }
+    if (ctx->stackCount > 0x40) { GSlogWritef((const char*)errBase); }
     else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
@@ -5795,12 +5795,12 @@ s32 fn_800F4440(void* obj) {
     }
     def = lbl_8047E710;
     if (leftDesc == 0) {
-        fn_800DD38C((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        GSlogWritef((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
         leftValue = def;
     } else {
         idx = leftDesc & 0xFFFF;
         if (leftDesc & 0x80) {
-            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
             else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
         } else {
             u32 fieldIdx = idx & 0x3F;
@@ -5818,12 +5818,12 @@ s32 fn_800F4440(void* obj) {
     }
     def = lbl_8047E710;
     if (rightDesc == 0) {
-        fn_800DD38C((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        GSlogWritef((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
         rightValue = def;
     } else {
         idx = rightDesc & 0xFFFF;
         if (rightDesc & 0x80) {
-            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
             else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
         } else {
             u32 fieldIdx = idx & 0x3F;
@@ -5857,7 +5857,7 @@ s32 fn_800F4440(void* obj) {
             f32 tmp = f1 + f0; result = *(u32*)&tmp;
         }
     }
-    if (ctx->stackCount > 0x40) { fn_800DD38C((const char*)errBase); }
+    if (ctx->stackCount > 0x40) { GSlogWritef((const char*)errBase); }
     else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
@@ -5892,12 +5892,12 @@ s32 fn_800F4818(void* obj) {
     }
     def = lbl_8047E710;
     if (leftDesc == 0) {
-        fn_800DD38C((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        GSlogWritef((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
         leftValue = def;
     } else {
         idx = leftDesc & 0xFFFF;
         if (leftDesc & 0x80) {
-            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
             else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
         } else {
             u32 fieldIdx = idx & 0x3F;
@@ -5915,12 +5915,12 @@ s32 fn_800F4818(void* obj) {
     }
     def = lbl_8047E710;
     if (rightDesc == 0) {
-        fn_800DD38C((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        GSlogWritef((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
         rightValue = def;
     } else {
         idx = rightDesc & 0xFFFF;
         if (rightDesc & 0x80) {
-            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
             else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
         } else {
             u32 fieldIdx = idx & 0x3F;
@@ -5938,7 +5938,7 @@ s32 fn_800F4818(void* obj) {
     }
     /* MOD: rightValue % leftValue, leftValue must be nonzero */
     if (leftValue == 0) {
-        fn_800DD38C((const char*)(errBase+0xD8));
+        GSlogWritef((const char*)(errBase+0xD8));
         result = 0;
     } else {
         if ((rightDesc & 0x3F) == 2) {
@@ -5955,7 +5955,7 @@ s32 fn_800F4818(void* obj) {
             result = *(u32*)&f0;
         }
     }
-    if (ctx->stackCount > 0x40) { fn_800DD38C((const char*)errBase); }
+    if (ctx->stackCount > 0x40) { GSlogWritef((const char*)errBase); }
     else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
@@ -5989,12 +5989,12 @@ s32 fn_800F4C38(void* obj) {
     }
     def = lbl_8047E710;
     if (leftDesc == 0) {
-        fn_800DD38C((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        GSlogWritef((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
         leftValue = def;
     } else {
         idx = leftDesc & 0xFFFF;
         if (leftDesc & 0x80) {
-            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
             else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
         } else {
             u32 fieldIdx = idx & 0x3F;
@@ -6012,12 +6012,12 @@ s32 fn_800F4C38(void* obj) {
     }
     def = lbl_8047E710;
     if (rightDesc == 0) {
-        fn_800DD38C((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        GSlogWritef((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
         rightValue = def;
     } else {
         idx = rightDesc & 0xFFFF;
         if (rightDesc & 0x80) {
-            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
             else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
         } else {
             u32 fieldIdx = idx & 0x3F;
@@ -6035,7 +6035,7 @@ s32 fn_800F4C38(void* obj) {
     }
     /* DIV: rightValue / leftValue, leftValue must be nonzero */
     if (leftValue == 0) {
-        fn_800DD38C((const char*)(errBase+0xD8));
+        GSlogWritef((const char*)(errBase+0xD8));
         result = 0;
     } else {
         if ((rightDesc & 0x3F) == 2) {
@@ -6056,7 +6056,7 @@ s32 fn_800F4C38(void* obj) {
             }
         }
     }
-    if (ctx->stackCount > 0x40) { fn_800DD38C((const char*)errBase); }
+    if (ctx->stackCount > 0x40) { GSlogWritef((const char*)errBase); }
     else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
@@ -6090,12 +6090,12 @@ s32 fn_800F502C(void* obj) {
     }
     def = lbl_8047E710;
     if (leftDesc == 0) {
-        fn_800DD38C((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        GSlogWritef((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
         leftValue = def;
     } else {
         idx = leftDesc & 0xFFFF;
         if (leftDesc & 0x80) {
-            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
             else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
         } else {
             u32 fieldIdx = idx & 0x3F;
@@ -6113,12 +6113,12 @@ s32 fn_800F502C(void* obj) {
     }
     def = lbl_8047E710;
     if (rightDesc == 0) {
-        fn_800DD38C((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        GSlogWritef((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
         rightValue = def;
     } else {
         idx = rightDesc & 0xFFFF;
         if (rightDesc & 0x80) {
-            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
             else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
         } else {
             u32 fieldIdx = idx & 0x3F;
@@ -6152,7 +6152,7 @@ s32 fn_800F502C(void* obj) {
             f32 tmp = f1 * f0; result = *(u32*)&tmp;
         }
     }
-    if (ctx->stackCount > 0x40) { fn_800DD38C((const char*)errBase); }
+    if (ctx->stackCount > 0x40) { GSlogWritef((const char*)errBase); }
     else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
@@ -6192,14 +6192,14 @@ s32 fn_800F5404(void* obj) {
 
     if (r4 == 0) {
         /* invalid operand */
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r4 & 0xFFFF));
+        GSlogWritef((const char*)(r31+0x28), (u32)(r4 & 0xFFFF));
         result = def;
     } else {
         r30 = r4 & 0xFFFF;
         if (r4 & 0x80) {
             /* pop from stack */
             if (*(u32*)(p+0x28) <= 0) {
-                fn_800DD38C((const char*)(r31+0x14));
+                GSlogWritef((const char*)(r31+0x14));
                 result = *(u32*)(p+0x6C);
             } else {
                 *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
@@ -6234,7 +6234,7 @@ s32 fn_800F5404(void* obj) {
 
     /* push result to stack */
     if (*(u32*)(p+0x28) > 0x40) {
-        fn_800DD38C((const char*)r31);
+        GSlogWritef((const char*)r31);
     } else {
         *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1;
         *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result;
@@ -6274,13 +6274,13 @@ s32 fn_800F55DC(void* obj) {
     def = lbl_8047E710;
 
     if (r29 == 0) {
-        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
+        GSlogWritef((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
         result = def;
     } else {
         r30 = r29 & 0xFFFF;
         if (r29 & 0x80) {
             if (*(u32*)(p+0x28) <= 0) {
-                fn_800DD38C((const char*)(r31+0x14));
+                GSlogWritef((const char*)(r31+0x14));
                 result = *(u32*)(p+0x6C);
             } else {
                 *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
@@ -6322,7 +6322,7 @@ s32 fn_800F55DC(void* obj) {
 
     /* push negated result */
     if (*(u32*)(p+0x28) > 0x40) {
-        fn_800DD38C((const char*)r31);
+        GSlogWritef((const char*)r31);
     } else {
         *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1;
         *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = negResult;
@@ -6436,12 +6436,12 @@ s32 fn_800F5EEC(void* obj) {
     }
     def = lbl_8047E710;
     if (leftDesc == 0) {
-        fn_800DD38C((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        GSlogWritef((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
         leftValue = def;
     } else {
         idx = leftDesc & 0xFFFF;
         if (leftDesc & 0x80) {
-            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
             else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
         } else {
             u32 fieldIdx = idx & 0x3F;
@@ -6459,12 +6459,12 @@ s32 fn_800F5EEC(void* obj) {
     }
     def = lbl_8047E710;
     if (rightDesc == 0) {
-        fn_800DD38C((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        GSlogWritef((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
         rightValue = def;
     } else {
         idx = rightDesc & 0xFFFF;
         if (rightDesc & 0x80) {
-            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
             else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
         } else {
             u32 fieldIdx = idx & 0x3F;
@@ -6495,7 +6495,7 @@ s32 fn_800F5EEC(void* obj) {
             result = (u32)(s32)*(f32*)&rightValue | (u32)(s32)*(f32*)&leftValue;
         }
     }
-    if (ctx->stackCount > 0x40) { fn_800DD38C((const char*)errBase); }
+    if (ctx->stackCount > 0x40) { GSlogWritef((const char*)errBase); }
     else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
@@ -6529,12 +6529,12 @@ s32 fn_800F62BC(void* obj) {
     }
     def = lbl_8047E710;
     if (leftDesc == 0) {
-        fn_800DD38C((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        GSlogWritef((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
         leftValue = def;
     } else {
         idx = leftDesc & 0xFFFF;
         if (leftDesc & 0x80) {
-            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
             else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
         } else {
             u32 fieldIdx = idx & 0x3F;
@@ -6552,12 +6552,12 @@ s32 fn_800F62BC(void* obj) {
     }
     def = lbl_8047E710;
     if (rightDesc == 0) {
-        fn_800DD38C((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        GSlogWritef((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
         rightValue = def;
     } else {
         idx = rightDesc & 0xFFFF;
         if (rightDesc & 0x80) {
-            if (ctx->stackCount <= 0) { fn_800DD38C((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
             else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
         } else {
             u32 fieldIdx = idx & 0x3F;
@@ -6588,7 +6588,7 @@ s32 fn_800F62BC(void* obj) {
             result = (u32)(s32)*(f32*)&rightValue & (u32)(s32)*(f32*)&leftValue;
         }
     }
-    if (ctx->stackCount > 0x40) { fn_800DD38C((const char*)errBase); }
+    if (ctx->stackCount > 0x40) { GSlogWritef((const char*)errBase); }
     else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
@@ -6610,7 +6610,7 @@ s32 fn_800F668C(void* obj) {
     count = *(s32*)(p + 0x28);
     val = *(u32*)*(u32*)(p + 0x14);
     if (count > 0x40) {
-        fn_800DD38C((const char*)lbl_80271068);
+        GSlogWritef((const char*)lbl_80271068);
     } else {
         *(s32*)(p + 0x28) = count + 1;
         ((u32*)(p + 0x6C))[count] = val;
@@ -6632,7 +6632,7 @@ s32 fn_800F670C(u8* ptr) {
     volatile u32 val;
     s32 count = *(s32*)(ptr + 0x28);
     if (count <= 0) {
-        fn_800DD38C((const char*)lbl_8027107C);
+        GSlogWritef((const char*)lbl_8027107C);
         val = *(u32*)(ptr + 0x6c);
     } else {
         count--;
@@ -6687,7 +6687,7 @@ s32 fn_800F67C8(void* obj) {
     /* Pop 1 (into val1) */
     count = *(s32*)(p + 0x28);
     if ((s32)count <= 0) {
-        fn_800DD38C((const char*)lbl_8027107C);
+        GSlogWritef((const char*)lbl_8027107C);
         val1 = *(u32*)(p + 0x6C);
     } else {
         count = count - 1;
@@ -6698,7 +6698,7 @@ s32 fn_800F67C8(void* obj) {
     /* Pop 2 (into val2) -> store to obj->0x1C */
     count = *(s32*)(p + 0x28);
     if ((s32)count <= 0) {
-        fn_800DD38C((const char*)lbl_8027107C);
+        GSlogWritef((const char*)lbl_8027107C);
         val2 = *(u32*)(p + 0x6C);
     } else {
         count = count - 1;
@@ -6710,7 +6710,7 @@ s32 fn_800F67C8(void* obj) {
     /* Pop 3 (return address) -> store to obj->0x14 */
     count = *(s32*)(p + 0x28);
     if ((s32)count <= 0) {
-        fn_800DD38C((const char*)lbl_8027107C);
+        GSlogWritef((const char*)lbl_8027107C);
         val3 = *(u32*)(p + 0x6C);
     } else {
         count = count - 1;
@@ -6725,7 +6725,7 @@ s32 fn_800F67C8(void* obj) {
     for (i = 0; i < loopCount; i++) {
         count = *(s32*)(p + 0x28);
         if ((s32)count <= 0) {
-            fn_800DD38C(errStr);
+            GSlogWritef(errStr);
         } else {
             *(s32*)(p + 0x28) = count - 1;
         }
@@ -6772,7 +6772,7 @@ s32 fn_800F694C(void* obj) {
     count = *(s32*)(p + 0x28);
     value = *(u32*)(p + 0x14);
     if (count > 0x40) {
-        fn_800DD38C((const char*)lbl_80271068);
+        GSlogWritef((const char*)lbl_80271068);
     } else {
         *(u32*)(p + 0x28) = count + 1;
         *((u32*)(p + 0x6C) + count) = value;
@@ -6782,7 +6782,7 @@ s32 fn_800F694C(void* obj) {
     count = *(s32*)(p + 0x28);
     value = *(u32*)(p + 0x1C);
     if (count > 0x40) {
-        fn_800DD38C((const char*)lbl_80271068);
+        GSlogWritef((const char*)lbl_80271068);
     } else {
         *(u32*)(p + 0x28) = count + 1;
         *((u32*)(p + 0x6C) + count) = value;
@@ -6791,7 +6791,7 @@ s32 fn_800F694C(void* obj) {
     /* Push stackBase (argCount) */
     count = *(s32*)(p + 0x28);
     if (count > 0x40) {
-        fn_800DD38C((const char*)lbl_80271068);
+        GSlogWritef((const char*)lbl_80271068);
     } else {
         *(u32*)(p + 0x28) = count + 1;
         *((u32*)(p + 0x6C) + count) = (u32)stackBase;
@@ -6803,7 +6803,7 @@ s32 fn_800F694C(void* obj) {
     /* Look up jump target via funcIdx in head table */
     head = (u8*)*(u32*)(p + 0x0);
     if (funcIdx >= (u32)*(u16*)(head + 0x4)) {
-        fn_800DD38C((const char*)lbl_8027115C, funcIdx);
+        GSlogWritef((const char*)lbl_8027115C, funcIdx);
     } else {
         *(u32*)(p + 0x14) = (u32)head + *((u32*)(head + 0x18) + funcIdx);
     }
@@ -6838,7 +6838,7 @@ s32 fn_800F6AB4(obj)
     for (i = 0; i < (u32)n; i++) {
         count = *(u32*)(p + 0x28);
         if ((s32)count <= 0) {
-            fn_800DD38C((const char*)lbl_8027107C);
+            GSlogWritef((const char*)lbl_8027107C);
         } else {
             *(u32*)(p + 0x28) = count - 1;
         }
@@ -6857,7 +6857,7 @@ asm s32 fn_800F6B54(void* obj) {
 u32 fn_800F6B54(u8* ptr) {
     s32 count = *(s32*)(ptr + 0x28);
     if (count > 0x40) {
-        fn_800DD38C((const char*)lbl_80271068);
+        GSlogWritef((const char*)lbl_80271068);
     } else {
         *(s32*)(ptr + 0x28) = count + 1;
         ptr = ptr + count * 4;
@@ -6928,7 +6928,7 @@ u32 fn_800F6BC4(void* obj) {
         *(u32*)(p + 0x14) = (u32)(ip + 1);
         opcode = (u32)*ip;
         if (opcode >= 0x26) {
-            fn_800DD38C((const char*)(strBase + 0x150));
+            GSlogWritef((const char*)(strBase + 0x150));
         } else {
             dispatch = (void (*)(void*))*(u32*)((u8*)lbl_803155D0 + (opcode & 0xFF) * 4);
             if (dispatch != NULL) {
@@ -6947,7 +6947,7 @@ done:
     }
     count = *(u32*)(p + 0x28);
     if ((s32)count <= 0) {
-        fn_800DD38C((const char*)(strBase + 0x14));
+        GSlogWritef((const char*)(strBase + 0x14));
         val = *(u32*)(p + 0x6C);
     } else {
         count--;
@@ -7009,7 +7009,7 @@ u8 *fn_800F6D18(arg0, arg1, arg2)
         }
     }
     if (entry == NULL) {
-        fn_800DD38C((const char *)lbl_80271068 + 0x178, (u16)arg0);
+        GSlogWritef((const char *)lbl_80271068 + 0x178, (u16)arg0);
         return NULL;
     }
 
@@ -7024,7 +7024,7 @@ u8 *fn_800F6D18(arg0, arg1, arg2)
         bank = (u8 *)*(u32 *)(bank + 0x14);
     }
     if (bank == NULL) {
-        fn_800DD38C((const char *)lbl_80271068 + 0x1B4, (u16)arg0);
+        GSlogWritef((const char *)lbl_80271068 + 0x1B4, (u16)arg0);
         return NULL;
     }
 
@@ -7053,13 +7053,13 @@ u8 *fn_800F6D18(arg0, arg1, arg2)
         }
     }
     if (attempts == 0x10000 || key == oldKey) {
-        fn_800DD38C((const char *)lbl_80271068 + 0x1F0, (u16)arg0);
+        GSlogWritef((const char *)lbl_80271068 + 0x1F0, (u16)arg0);
         return NULL;
     }
 
     lowId = arg0 & 0xFFFF;
     if (lowId >= *(u16 *)(bank + 0x04)) {
-        fn_800DD38C((const char *)lbl_80271068 + 0xF4);
+        GSlogWritef((const char *)lbl_80271068 + 0xF4);
     } else {
         *(u32 *)(entry + 0x14) = (u32)(bank + *(s32 *)(bank + 0x18 + lowId * 4));
     }
@@ -7394,7 +7394,7 @@ u32 fn_800F7434(void* callback, u32 arg, ...) {
         *(u32*)(entry + 0x14) = (u32)(ip + 1);
         opcode = (u32)*ip;
         if (opcode >= 0x26) {
-            fn_800DD38C((const char*)(strBase + 0x150));
+            GSlogWritef((const char*)(strBase + 0x150));
         } else {
             dispatch = (void (*)(void*))*(u32*)((u8*)lbl_803155D0 + (opcode & 0xFF) * 4);
             if (dispatch != NULL) {
@@ -7413,7 +7413,7 @@ done:
     }
     count = *(u32*)(entry + 0x28);
     if ((s32)count <= 0) {
-        fn_800DD38C((const char*)(strBase + 0x14));
+        GSlogWritef((const char*)(strBase + 0x14));
         val = *(u32*)(entry + 0x6C);
     } else {
         count--;

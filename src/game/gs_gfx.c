@@ -57,7 +57,7 @@ void fn_800D30AC(void) {
 extern void GXSetDrawDone(void);
 extern void OSYieldThread(void);
 extern void fn_8019C6FC(void);
-extern void fn_800DC560(void);
+extern void GSgfxBackFBDoFrame(void);
 extern void fn_801BF8A0(s32 a);
 extern void fn_801E16F0(void);
 extern void fn_801BF6AC(void);
@@ -123,7 +123,7 @@ void fn_800D3190(void) {
         r29b = 1;
         if (chk != 0xFEFEU) {
             if (((u8*)s4)[0x49D] == 0) {
-                fn_800DC560();
+                GSgfxBackFBDoFrame();
                 fn_801BF8A0(0);
                 fn_801E16F0();
                 fn_801BF6AC();
@@ -225,7 +225,7 @@ void fn_800D3410(void* arg0, u8 arg1) {
             sc = s4[0xC / 4];
             if ((u32)(sc + 0x01020000U) != 0xFEFEU) {
                 if (((u8*)s4)[0x49D] == 0) {
-                    fn_800DC560();
+                    GSgfxBackFBDoFrame();
                     fn_801BF8A0(0);
                     fn_801E16F0();
                     fn_801BF6AC();

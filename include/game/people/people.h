@@ -127,7 +127,7 @@ typedef enum PeopleMoveType {
  *   0x94: (unknown)
  *   0x95: u8   isTalkable      -- cached talkability check result
  *   0x96: u8   moveType        -- PeopleMoveType enum
- *   0x9C: Vec3 transform       -- position/transform (set via fn_800E01D0)
+ *   0x9C: Vec3 transform       -- position/transform (set via GSvecCopy)
  *   0xA8: f32  targetX         -- walk target X position
  *   0xAC: f32  targetY         -- walk target Y position
  *   0xB0: f32  targetZ         -- walk target Z position

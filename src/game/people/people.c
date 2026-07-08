@@ -124,7 +124,7 @@ extern void  fn_8017BC90(void* floorObj, u32 modelId, u32 param, void* extraData
 extern BOOL  fn_800F7108(u16 flagId);               /* GSflagGet (bit check) */
 
 /* Collision/model helpers */
-extern void  fn_800E01D0(void* dst, void* src);     /* matrix/vector copy */
+extern void  GSvecCopy(void* dst, void* src);     /* matrix/vector copy */
 extern void  fn_800E0168(void* dst, void* srcA, void* srcB);  /* cross/setup */
 
 /* ===== Rodata string references ===== */
@@ -350,14 +350,14 @@ void peopleWriteFlags(PeopleEntry* entry, u32 flags)
  * fn_8018FBDC -- peopleSetTransform
  *
  * Copy a 3x3 matrix (or vector) into the entry's transform at +0x9C.
- * Delegates to fn_800E01D0 (matrix/vector copy).
+ * Delegates to GSvecCopy (matrix/vector copy).
  *
  * r3 = PeopleEntry*
  * r4 = source matrix pointer
  * ======================================================================= */
 void peopleSetTransform(PeopleEntry* entry, void* mtx)
 {
-    fn_800E01D0((u8*)entry + 0x9C, mtx);
+    GSvecCopy((u8*)entry + 0x9C, mtx);
 }
 
 /* =======================================================================
@@ -440,10 +440,10 @@ void fn_80181850(void)
             void* modelPos;
             void* modelTrans;
             modelPos = fn_8018FCBC(entry);
-            fn_800E01D0((u8*)entry + 0x2C, modelPos);  /* simplified */
+            GSvecCopy((u8*)entry + 0x2C, modelPos);  /* simplified */
 
             modelTrans = peopleGetTransform(entry);
-            fn_800E01D0((u8*)entry + 0x38, modelTrans); /* simplified */
+            GSvecCopy((u8*)entry + 0x38, modelTrans); /* simplified */
         }
 
         /* Update entry position tracking */
@@ -672,7 +672,7 @@ found_entry:
         GSpartGetTransform(part, target, 0, 0);
         GSpartFree(part);
     } else {
-        fn_800E01D0(target, fn_8018FCBC(entry));
+        GSvecCopy(target, fn_8018FCBC(entry));
     }
 }
 
@@ -680,8 +680,8 @@ found_entry:
 extern void atan2(void);
 extern f64 fmod(f64 angle);
 extern void fn_800E0718(void);
-extern void fn_800DFEEC(void);
-extern void fn_800E0040(void);
+extern void GSvecTransformQuat(void);
+extern void GSvecDistance(void);
 extern u32 lbl_8047D7A4;
 extern f32 lbl_8047D7A0;
 extern f64 lbl_8047D7F0;

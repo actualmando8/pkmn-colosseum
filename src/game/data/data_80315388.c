@@ -17,7 +17,7 @@ extern u8 lbl_80315668[];
 
 extern u8 _GSmaterialObjInit_800EF33C[];
 extern u8 fn_800DE128[];
-extern u8 fn_800DE680[];
+extern u8 logVsnprintf_float[];
 extern u8 _modelBoundVertex__FUlPvPv[];
 extern u8 _modelBoundBeginSurface__F13GSgfxPrimTypeUsUlPv[];
 extern u8 modelUpdateAttachments__FP8_GSmodel[];
@@ -95,39 +95,39 @@ void* jumptable_80315388[33] = {
 };
 
 void* jumptable_8031540C[33] = {
-    (void*)((u8*)fn_800DE680 + 0x590),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0xC8),
-    (void*)((u8*)fn_800DE680 + 0xF0),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0x1E0),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0x578),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0x6D8),
-    (void*)((u8*)fn_800DE680 + 0x590),
+    (void*)((u8*)logVsnprintf_float + 0x590),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0xC8),
+    (void*)((u8*)logVsnprintf_float + 0xF0),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0x1E0),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0x578),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0x6D8),
+    (void*)((u8*)logVsnprintf_float + 0x590),
 };
 
 void* lbl_80315490[21] = {

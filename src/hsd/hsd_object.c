@@ -44,9 +44,9 @@ void ObjInfoInit(void)
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_800E053C(void* dst, f32 angle);
-extern void fn_800E0518(void* dst, f32 angle);
-extern void fn_800E04F4(void* dst, f32 angle);
+extern void GSmtxMakeXRotation(void* dst, f32 angle);
+extern void GSmtxMakeYRotation(void* dst, f32 angle);
+extern void GSmtxMakeZRotation(void* dst, f32 angle);
 extern void fn_800E048C(void* dst, f32 x, f32 y, f32 z);
 extern void fn_800E0560(void* dst, f32* src);
 extern void fn_800E0290(void* dst, void* lhs, void* rhs);
@@ -78,9 +78,9 @@ void fn_80190E60(HSD_ObjectTransformData* data) {
     f32 mtx_y[3][4];
     f32 mtx[3][4];
 
-    fn_800E053C(mtx, data->rotate[0]);
-    fn_800E0518(mtx_y, data->rotate[1]);
-    fn_800E04F4(mtx_z, data->rotate[2]);
+    GSmtxMakeXRotation(mtx, data->rotate[0]);
+    GSmtxMakeYRotation(mtx_y, data->rotate[1]);
+    GSmtxMakeZRotation(mtx_z, data->rotate[2]);
     fn_800E048C(mtx_translate, data->translate[0], data->translate[1],
                 data->translate[2]);
     fn_800E0560(mtx_scale, data->scale);
@@ -152,9 +152,9 @@ s32 fn_80191118(HSD_ObjectTransformData* data) {
     s32 result0;
     s32 result1;
 
-    fn_800E053C(mtx, data->rotate[0]);
-    fn_800E0518(mtx_y, data->rotate[1]);
-    fn_800E04F4(mtx_z, data->rotate[2]);
+    GSmtxMakeXRotation(mtx, data->rotate[0]);
+    GSmtxMakeYRotation(mtx_y, data->rotate[1]);
+    GSmtxMakeZRotation(mtx_z, data->rotate[2]);
     fn_800E048C(mtx_translate, data->translate[0], data->translate[1],
                 data->translate[2]);
     fn_800E0560(mtx_scale, data->scale);

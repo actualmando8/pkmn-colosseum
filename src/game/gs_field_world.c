@@ -2193,7 +2193,7 @@ extern f32 cameraGetHeight(void);
 extern f32 cameraGetDistance(void);
 extern f32 cameraGetRotY(void);
 extern void fn_800E01F4(void* obj, f32 f1, f32 f2, f32 f3);
-extern void fn_800E0518(void*, f32);
+extern void GSmtxMakeYRotation(void*, f32);
 extern void GSvecTransform(void*, void*, void*);
 extern void GSvecAdd(void*, void*, void*);
 extern f64 atan2(f32, f32);
@@ -2249,7 +2249,7 @@ void fn_80117330(f32 arg) {
     }
 
     fn_800E01F4(mat, lbl_8047CFD0, x, y);
-    fn_800E0518(tmp, z);
+    GSmtxMakeYRotation(tmp, z);
     GSvecTransform(mat, tmp, mat);
     GSvecAdd(rot, pos, view);
     GSvecAdd(rot, rot, mat);
@@ -2303,7 +2303,7 @@ extern u8 lbl_804083D0[0x30];
 void fn_801176C8(void);
 /* 0x8011791C | 0x1B8 */
 extern void* GScameraGetActiveCamera();
-extern void fn_800E01D0();
+extern void GSvecCopy();
 extern u8 lbl_804083D0[0x30];
 extern u8 lbl_802727B8[];
 extern void fn_80177A38(void);  /* referenced by asm .inc wrappers (fn_801171C8/80117330/8011791C/8012E388/8012EBD4); was undefined -> broke the TU parse */
@@ -2722,7 +2722,7 @@ extern u32 lbl_8047ADA0;
 void fn_801181B0(void);
 /* 0x801183EC | 0x488 */
 extern void fn_800E06EC(void);
-extern void fn_800DFEEC(void);
+extern void GSvecTransformQuat(void);
 extern void fn_800E0108(void);
 extern void psInterpretParticles(void);
 extern void psExecGenerator(void);
@@ -2765,30 +2765,30 @@ void fn_80118A68(u8* obj, u32 notify) {
         *active = 0;
 
         if (*active == 0) {
-            fn_800E01D0(obj + 0x14, obj + 0x50);
+            GSvecCopy(obj + 0x14, obj + 0x50);
             *(f32*)(*(u8**)(obj + 0x10) + 0x20) = *(f32*)(obj + 0x50);
             *(f32*)(*(u8**)(obj + 0x10) + 0x24) = *(f32*)(obj + 0x54);
             *(f32*)(*(u8**)(obj + 0x10) + 0x28) = *(f32*)(obj + 0x58);
         } else {
-            fn_800E01D0(obj + 0x50, obj + 0x50);
+            GSvecCopy(obj + 0x50, obj + 0x50);
         }
 
         if (*active == 0) {
-            fn_800E01D0(obj + 0x20, obj + 0x5C);
+            GSvecCopy(obj + 0x20, obj + 0x5C);
             *(f32*)(*(u8**)(obj + 0x10) + 0x8C) = *(f32*)(obj + 0x5C);
             *(f32*)(*(u8**)(obj + 0x10) + 0x90) = *(f32*)(obj + 0x60);
             *(f32*)(*(u8**)(obj + 0x10) + 0x94) = *(f32*)(obj + 0x64);
         } else {
-            fn_800E01D0(obj + 0x5C, obj + 0x5C);
+            GSvecCopy(obj + 0x5C, obj + 0x5C);
         }
 
         if (*active == 0) {
-            fn_800E01D0(obj + 0x2C, obj + 0x68);
+            GSvecCopy(obj + 0x2C, obj + 0x68);
             *(f32*)(*(u8**)(obj + 0x10) + 0x98) = *(f32*)(obj + 0x68);
             *(f32*)(*(u8**)(obj + 0x10) + 0x9C) = *(f32*)(obj + 0x6C);
             *(f32*)(*(u8**)(obj + 0x10) + 0xA0) = *(f32*)(obj + 0x70);
         } else {
-            fn_800E01D0(obj + 0x68, obj + 0x68);
+            GSvecCopy(obj + 0x68, obj + 0x68);
         }
     }
 
@@ -2866,15 +2866,15 @@ asm void fn_80118DE0(void) {
 }
 #else
 void fn_80118DE0(u8* arg1, f32* arg2, u32 arg3, u32 arg4) {
-    extern void fn_800E01D0();
+    extern void GSvecCopy();
     extern void psSetGeneratorAngleRadiusScale();
     if ((s32)*(u32*)(arg1 + 0x44) == 0) {
-        fn_800E01D0(arg1 + 0x2c);
+        GSvecCopy(arg1 + 0x2c);
         *(f32*)(*(u8**)(arg1 + 0x10) + 0x98) = arg2[0];
         *(f32*)(*(u8**)(arg1 + 0x10) + 0x9c) = arg2[1];
         *(f32*)(*(u8**)(arg1 + 0x10) + 0xa0) = arg2[2];
     } else {
-        fn_800E01D0(arg1 + 0x68);
+        GSvecCopy(arg1 + 0x68);
     }
     if ((arg3 & 0xFF) == 1) {
         psSetGeneratorAngleRadiusScale(*(void**)(arg1 + 0x10), arg2, (void*)arg4);
@@ -2884,23 +2884,23 @@ void fn_80118DE0(u8* arg1, f32* arg2, u32 arg3, u32 arg4) {
 /* 0x78 | fn_80118E8C | two_call_arg_check */
 void fn_80118E8C(u8* arg1, f32* arg2, u32 arg3, u32 arg4, u32 arg5) {
     if ((s32)*(u32*)(arg1 + 0x44) == 0) {
-        fn_800E01D0(arg1 + 0x20);
+        GSvecCopy(arg1 + 0x20);
         *(f32*)(*(u8**)(arg1 + 0x10) + 0x8c) = arg2[0];
         *(f32*)(*(u8**)(arg1 + 0x10) + 0x90) = arg2[1];
         *(f32*)(*(u8**)(arg1 + 0x10) + 0x94) = arg2[2];
     } else {
-        fn_800E01D0(arg1 + 0x5c);
+        GSvecCopy(arg1 + 0x5c);
     }
 }
 /* 0x78 | fn_80118F04 | two_call_arg_check */
 void fn_80118F04(u8* arg1, f32* arg2, u32 arg3, u32 arg4, u32 arg5) {
     if ((s32)*(u32*)(arg1 + 0x44) == 0) {
-        fn_800E01D0(arg1 + 0x14);
+        GSvecCopy(arg1 + 0x14);
         *(f32*)(*(u8**)(arg1 + 0x10) + 0x20) = arg2[0];
         *(f32*)(*(u8**)(arg1 + 0x10) + 0x24) = arg2[1];
         *(f32*)(*(u8**)(arg1 + 0x10) + 0x28) = arg2[2];
     } else {
-        fn_800E01D0(arg1 + 0x50);
+        GSvecCopy(arg1 + 0x50);
     }
 }
 /* 0x80118F7C | 0x34 */
@@ -2920,7 +2920,7 @@ asm void fn_80118FB0(void) {
 }
 #else
 void fn_80118FB0(u8* obj, u8* desc, u32 state, u32 byte5, u32 init_from_zero, u32 attach_model) {
-    extern void fn_800E01D0(void* dst, void* src);
+    extern void GSvecCopy(void* dst, void* src);
     extern void fn_800E01F4(void* dst, f32 x, f32 y, f32 z);
     extern void psLinkChildGensToJObj(u32 model, u32 value);
     f32 zero;
@@ -2937,9 +2937,9 @@ void fn_80118FB0(u8* obj, u8* desc, u32 state, u32 byte5, u32 init_from_zero, u3
             one = lbl_8047CFEC;
             fn_800E01F4(obj + 0x68, one, one, one);
         } else {
-            fn_800E01D0(obj + 0x50, obj + 0x14);
-            fn_800E01D0(obj + 0x5C, obj + 0x20);
-            fn_800E01D0(obj + 0x68, obj + 0x2C);
+            GSvecCopy(obj + 0x50, obj + 0x14);
+            GSvecCopy(obj + 0x5C, obj + 0x20);
+            GSvecCopy(obj + 0x68, obj + 0x2C);
         }
         zero = lbl_8047CFE8;
         fn_800E01F4(obj + 0x14, zero, zero, zero);

@@ -56,7 +56,7 @@
  *    - fn_800DC0D4: Light command via GSlog_QueueCommand
  *
  * 7. GSmaterial system (0x800DC224 - 0x800DE680)
- *    - fn_800DE680: GSmaterial_Create (0x948 bytes -- very large)
+ *    - logVsnprintf_float: GSmaterial_Create (0x948 bytes -- very large)
  *    - Material setup, PE descriptor config, texture binding
  *    - References:
  *      "GSmaterialSetPEdescr: Warning: already using a custom description!"
@@ -388,7 +388,7 @@ void fn_800D892C(u32 pipelineId) {
     }
 }
 
-void fn_800DAD10(void* objArg) {
+void GSgfxDLDraw(void* objArg) {
     PCPortGSDrawObject* obj = (PCPortGSDrawObject*)objArg;
 
     if (obj == NULL) {
@@ -679,7 +679,7 @@ void GSgfx_ConfigurePipeline(void) {
 #pragma pop
 
 /* ==================================================================
- * fn_800DE680 -- GSmaterial_Create
+ * logVsnprintf_float -- GSmaterial_Create
  *
  * Create and configure a new material. At 2376 bytes, this function
  * handles the full material setup including:
@@ -3495,11 +3495,11 @@ calc_direct_or_indexed:
 extern void fn_800E24B0(u16);
 extern void fn_800E209C(u16);
 #if 0
-asm void fn_800DACC0(void) {
+asm void GSgfxDLFree(void) {
 #include "src/game/gs_render_fn_800DACC0.inc"
 }
 #else
-void fn_800DACC0(u8* obj) {
+void GSgfxDLFree(u8* obj) {
     if (*(u8**)(lbl_8047AA80 + 0x480) != obj) {
         fn_800E24B0(*(u16*)(obj + 0x2));
         fn_800E209C(*(u16*)(obj + 0x2));
@@ -3509,11 +3509,11 @@ void fn_800DACC0(u8* obj) {
 #endif
 extern void GXCallDisplayList(u32, u32);
 #if 0
-asm void fn_800DAD10(void) {
+asm void GSgfxDLDraw(void) {
 #include "src/game/gs_render_fn_800DAD10.inc"
 }
 #else
-void fn_800DAD10(u32 obj) {
+void GSgfxDLDraw(u32 obj) {
     u32 state = lbl_8047AA80;
     if (*(s32*)state == 1) {
         fn_800D4F98(0x2a, 1, obj);
@@ -3529,11 +3529,11 @@ void fn_800DAD10(u32 obj) {
 #endif
 extern void fn_800E2AF8(u16);
 #if 0
-asm void fn_800DADB4(void) {
+asm void GSgfxDLEnd(void) {
 #include "src/game/gs_render_fn_800DADB4.inc"
 }
 #else
-u32 fn_800DADB4(void) {
+u32 GSgfxDLEnd(void) {
     u32 state; u32 obj; u32 wptr; u32 aligned; u32 limit; u32 size; u32 rem; u32 i;
     state = lbl_8047AA80;
     if (!*(u8*)(state + 0x47e)) { return 0; }
@@ -3613,14 +3613,14 @@ static inline GSgfxDLCapture* GSgfxFindFreeDLCapture(GSgfxDLCapture* capture) {
     return 0;
 }
 
-/* fn_800DAF60: inlined free-capture helper preserves target mtctr/bdnz
+/* GSgfxDLBegin: inlined free-capture helper preserves target mtctr/bdnz
  * slot scan and the un-fused found/not-found branch shape. */
 #if 0
-asm void fn_800DAF60(void) {
+asm void GSgfxDLBegin(void) {
 #include "src/game/gs_render_fn_800DAF60.inc"
 }
 #else
-u32 fn_800DAF60(u32 a, u32 b) {
+u32 GSgfxDLBegin(u32 a, u32 b) {
     u32 r29; u32 r30;
     GSgfxDLCapture* r31;
     r29 = a; r30 = b;
@@ -4106,11 +4106,11 @@ void GSgfxBackFBInit__Fv(void) {
 extern void fn_800EF1E8(void);
 extern u8 lbl_8047AAE0;
 #if 0
-asm void fn_800DC560(void) {
+asm void GSgfxBackFBDoFrame(void) {
 #include "src/game/gs_render_fn_800DC560.inc"
 }
 #else
-void fn_800DC560(void) {
+void GSgfxBackFBDoFrame(void) {
     GSgfxBackFBInit__Fv();
     fn_800EF1E8();
 }
@@ -4271,11 +4271,11 @@ asm void GSlightSetAnimType(void) {
 void GSlightSetAnimType(u8* obj, u32 val) { *(u32*)((u8*)obj + 0x5c) = val; }
 #endif
 #if 0
-asm void fn_800DCADC(void) {
+asm void GSlightSetAnimFrame(void) {
 #include "src/game/gs_render_fn_800DCADC.inc"
 }
 #else
-void fn_800DCADC(u8* obj, f32 val) { if (obj[0x2]) *(f32*)((u8*)obj + 0x68) = val; }
+void GSlightSetAnimFrame(u8* obj, f32 val) { if (obj[0x2]) *(f32*)((u8*)obj + 0x68) = val; }
 #endif
 extern f32 lbl_8047CA88;
 #if 0
@@ -4663,11 +4663,11 @@ extern u32 lbl_8047AB08;
 extern u32 lbl_8047AAFA;
 extern u32 lbl_8047AAFC;
 #if 0
-asm void fn_800DD270(void) {
+asm void GSlogGetLine(void) {
 #include "src/game/gs_render_fn_800DD270.inc"
 }
 #else
-u32 fn_800DD270(u32 count) {
+u32 GSlogGetLine(u32 count) {
     u16* entries;
     u32 sum;
     u32 i;
@@ -4692,14 +4692,14 @@ u32 fn_800DD270(u32 count) {
 #endif
 extern u32 lbl_8047AB08;
 #if 0
-asm void fn_800DD384(void) {
+asm void GSlogGetLineCount(void) {
 #include "src/game/gs_render_fn_800DD384.inc"
 }
 #else
-u32 fn_800DD384(void) { return lbl_8047AB08; }
+u32 GSlogGetLineCount(void) { return lbl_8047AB08; }
 #endif
 extern void OSTicksToCalendarTime(void);
-extern void fn_800DE680(void);
+extern void logVsnprintf_float(void);
 extern u32 strlen(const char* s);
 extern u32 lbl_8047AB11;
 extern u8 lbl_80400F30[];
@@ -4711,11 +4711,11 @@ extern u32 lbl_8047AB0C;
 extern u32 lbl_8047AB00;
 extern u32 lbl_8047AB04;
 #if 0
-asm void fn_800DD38C(void) {
+asm void GSlogWritef(void) {
 #include "src/game/gs_render_fn_800DD38C.inc"
 }
 #else
-void fn_800DD38C(const char* fmt, ...) {
+void GSlogWritef(const char* fmt, ...) {
     (void)fmt;
 }
 #endif
@@ -4846,11 +4846,11 @@ void fn_800DE128(void) {
 extern void GXDrawDone(u32);
 extern void HSD_ImageDescFree(u32);
 #if 0
-asm void fn_800DEFC8(void) {
+asm void GSmaterialResetTexture(void) {
 #include "src/game/gs_render_fn_800DEFC8.inc"
 }
 #else
-void fn_800DEFC8(u8* obj) {
+void GSmaterialResetTexture(u8* obj) {
     u32 sentinel = *(u32*)(obj + 0x38);
     u8* target;
     u32 prev;
@@ -4954,11 +4954,11 @@ asm void GSmaterialSetModulate(void) {
 void GSmaterialSetModulate(u8* dst, u8* src) { dst[0xc] = src[0]; dst[0xd] = src[1]; dst[0xe] = src[2]; dst[0xf] = src[3]; }
 #endif
 #if 0
-asm void fn_800DF208(void) {
+asm void GSmaterialSetColorChannels(void) {
 #include "src/game/gs_render_fn_800DF208.inc"
 }
 #else
-void fn_800DF208(u8* obj, u32 a, u32 b, u32 c, u32 d) { *(u32*)(obj+0x10) = a; *(u32*)(obj+0x14) = b; *(u32*)(obj+0x18) = c; *(u32*)(obj+0x1c) = d; }
+void GSmaterialSetColorChannels(u8* obj, u32 a, u32 b, u32 c, u32 d) { *(u32*)(obj+0x10) = a; *(u32*)(obj+0x14) = b; *(u32*)(obj+0x18) = c; *(u32*)(obj+0x1c) = d; }
 #endif
 #if 0
 asm void GSmaterialSetAlpha(void) {
@@ -5216,11 +5216,11 @@ extern u16 lbl_8047AB18;
 extern u32 lbl_8047AB1C;
 extern u8 lbl_80315490[];
 #if 0
-asm void fn_800DF854(void) {
+asm void GSmaterialInit(void) {
 #include "src/game/gs_render_fn_800DF854.inc"
 }
 #else
-void fn_800DF854(u32 count) {
+void GSmaterialInit(u32 count) {
     u16 handle;
     u16 new_var;
     lbl_8047AB20 = count;
@@ -5345,13 +5345,13 @@ s32 _matGSmatObjLoad(u8* obj) {
 }
 #endif
 #if 0
-asm void fn_800DFEEC(void) {
+asm void GSvecTransformQuat(void) {
 #include "src/game/gs_render_fn_800DFEEC.inc"
 }
 #else
 #pragma push
 #pragma fp_contract on
-void fn_800DFEEC(f32* r3, f32* r4, f32* r5) {
+void GSvecTransformQuat(f32* r3, f32* r4, f32* r5) {
     f32 f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12;
     f6 = r5[1];
     f12 = r4[1];
@@ -5432,11 +5432,11 @@ void GSvecSquareDistance(void) { PSVECSquareDistance(); }
 #endif
 extern void PSVECDistance(void);
 #if 0
-asm void fn_800E0040(void) {
+asm void GSvecDistance(void) {
 #include "src/game/gs_render_fn_800E0040.inc"
 }
 #else
-void fn_800E0040(void) { PSVECDistance(); }
+void GSvecDistance(void) { PSVECDistance(); }
 #endif
 extern void PSVECNormalize(void*, void*);
 #if 0
@@ -5507,11 +5507,11 @@ asm void GSvecAdd(void) {
 void GSvecAdd(void* a, void* b, void* c) { PSVECAdd(b, c, a); }
 #endif
 #if 0
-asm void fn_800E01D0(void) {
+asm void GSvecCopy(void) {
 #include "src/game/gs_render_fn_800E01D0.inc"
 }
 #else
-void fn_800E01D0(void* dst, void* src) { memcpy(dst, src, 0xc); }
+void GSvecCopy(void* dst, void* src) { memcpy(dst, src, 0xc); }
 #endif
 #if 0
 asm void fn_800E01F4(void) {
@@ -5668,25 +5668,25 @@ void fn_800E048C(u8* dst, f32 x, f32 y, f32 z) {
 }
 #endif
 #if 0
-asm void fn_800E04F4(void) {
+asm void GSmtxMakeZRotation(void) {
 #include "src/game/gs_render_fn_800E04F4.inc"
 }
 #else
-void fn_800E04F4(void* a) { PSMTXRotRad(a, 0x5a); }
+void GSmtxMakeZRotation(void* a) { PSMTXRotRad(a, 0x5a); }
 #endif
 #if 0
-asm void fn_800E0518(void) {
+asm void GSmtxMakeYRotation(void) {
 #include "src/game/gs_render_fn_800E0518.inc"
 }
 #else
-void fn_800E0518(void* a) { PSMTXRotRad(a, 0x59); }
+void GSmtxMakeYRotation(void* a) { PSMTXRotRad(a, 0x59); }
 #endif
 #if 0
-asm void fn_800E053C(void) {
+asm void GSmtxMakeXRotation(void) {
 #include "src/game/gs_render_fn_800E053C.inc"
 }
 #else
-void fn_800E053C(void* a) { PSMTXRotRad(a, 0x58); }
+void GSmtxMakeXRotation(void* a) { PSMTXRotRad(a, 0x58); }
 #endif
 #if 0
 asm void fn_800E0560(void) {
@@ -5864,9 +5864,9 @@ asm void GSlerpGetLinearInterpolationVector(void) {
 #else
 void GSlerpGetLinearInterpolationVector(void* dst, void* src, void* target, f32 t) {
     if (t <= lbl_8047CAF0) {
-        fn_800E01D0(dst, src);
+        GSvecCopy(dst, src);
     } else if (t >= lbl_8047CAF4) {
-        fn_800E01D0(dst, target);
+        GSvecCopy(dst, target);
     } else {
         fn_800E0168(dst, target, src);
         fn_800E013C(dst, dst, t);
@@ -5916,7 +5916,7 @@ void fn_800E09E8(void* dst, void* src, u32 count) {
 
     out = (u8*)dst;
     control = (u8*)src;
-    fn_800E01D0(out, control);
+    GSvecCopy(out, control);
     if (count == 1) {
         return;
     }
@@ -5946,7 +5946,7 @@ void fn_800E09E8(void* dst, void* src, u32 count) {
         GSvecAdd(out, out, scratch);
     }
 
-    fn_800E01D0(out, control + 0xc);
+    GSvecCopy(out, control + 0xc);
 }
 #endif
 extern f32 fn_801ADC7C(void);

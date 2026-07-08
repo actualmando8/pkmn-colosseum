@@ -47,7 +47,7 @@ extern void* memset(void* dst, int val, u32 size);
 s32 fn_800F760C(u8* target) {
     extern u8 lbl_802712B8[];
     extern u8* lbl_80478B00;
-    extern void fn_800DD38C(const char* msg, ...);
+    extern void GSlogWritef(const char* msg, ...);
     u8* state = lbl_80478B00;
     u8* prev;
     u8* cur;
@@ -74,7 +74,7 @@ s32 fn_800F760C(u8* target) {
         }
         if (cur == NULL) {
             /* Not found in list */
-            fn_800DD38C((const char*)lbl_802712B8, target);
+            GSlogWritef((const char*)lbl_802712B8, target);
             return -1;
         }
     }
@@ -220,7 +220,7 @@ void fn_800F76E4(u8* arg) {
 }
 #endif
 extern void _toolentryAlloc__FUl(void);
-extern void fn_800DD38C(void);
+extern void GSlogWritef(void);
 extern u8 lbl_80401BF8[];
 extern u8* lbl_80478B00;
 extern u8 lbl_802712E4[];
@@ -229,7 +229,7 @@ s32 fn_800F7758(u32 count) {
     extern void* memset(void* dst, int val, u32 size);
     extern u16 _toolentryAlloc__FUl(u32 size);
     extern void* fn_800E27B0(u16 handle);
-    extern void fn_800DD38C(const char* msg, ...);
+    extern void GSlogWritef(const char* msg, ...);
     extern u8 lbl_80401BF8[];
     extern u8* lbl_80478B00;
     extern u8 lbl_802712E4[];
@@ -242,7 +242,7 @@ s32 fn_800F7758(u32 count) {
     lbl_80478B00 = lbl_80401BF8;
     *(u16*)(lbl_80478B00 + 2) = _toolentryAlloc__FUl(count16 * 0x16c);
     if (*(u16*)(lbl_80478B00 + 2) == 0) {
-        fn_800DD38C((const char*)lbl_802712E4);
+        GSlogWritef((const char*)lbl_802712E4);
         return -1;
     }
 

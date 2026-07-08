@@ -1588,7 +1588,7 @@
 "name": "fn_80011288",
 "addr": "0x80011288",
 "size": 540,
-"label": "fight",
+"label": "gs-engine",
 "confidence": 1.9,
 "seed": null
 },
@@ -1596,7 +1596,7 @@
 "name": "fn_800114A4",
 "addr": "0x800114A4",
 "size": 604,
-"label": "fight",
+"label": "gs-engine",
 "confidence": 1.9,
 "seed": null
 },
@@ -20641,7 +20641,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800DACC0",
+"name": "GSgfxDLFree",
 "addr": "0x800DACC0",
 "size": 80,
 "label": "gs-engine",
@@ -20649,7 +20649,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800DAD10",
+"name": "GSgfxDLDraw",
 "addr": "0x800DAD10",
 "size": 164,
 "label": "gs-engine",
@@ -20657,7 +20657,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800DADB4",
+"name": "GSgfxDLEnd",
 "addr": "0x800DADB4",
 "size": 428,
 "label": "gs-engine",
@@ -20665,7 +20665,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800DAF60",
+"name": "GSgfxDLBegin",
 "addr": "0x800DAF60",
 "size": 312,
 "label": "gs-engine",
@@ -20881,7 +20881,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800DC560",
+"name": "GSgfxBackFBDoFrame",
 "addr": "0x800DC560",
 "size": 376,
 "label": "gs-engine",
@@ -20953,7 +20953,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800DCADC",
+"name": "GSlightSetAnimFrame",
 "addr": "0x800DCADC",
 "size": 20,
 "label": "gs-engine",
@@ -21073,7 +21073,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800DD270",
+"name": "GSlogGetLine",
 "addr": "0x800DD270",
 "size": 276,
 "label": "gs-engine",
@@ -21081,7 +21081,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800DD384",
+"name": "GSlogGetLineCount",
 "addr": "0x800DD384",
 "size": 8,
 "label": "gs-engine",
@@ -21089,7 +21089,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800DD38C",
+"name": "GSlogWritef",
 "addr": "0x800DD38C",
 "size": 1508,
 "label": "gs-engine",
@@ -21129,7 +21129,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800DE680",
+"name": "logVsnprintf_float",
 "addr": "0x800DE680",
 "size": 2376,
 "label": "gs-engine",
@@ -21137,7 +21137,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800DEFC8",
+"name": "GSmaterialResetTexture",
 "addr": "0x800DEFC8",
 "size": 96,
 "label": "gs-engine",
@@ -21201,7 +21201,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800DF208",
+"name": "GSmaterialSetColorChannels",
 "addr": "0x800DF208",
 "size": 20,
 "label": "gs-engine",
@@ -21297,7 +21297,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800DF854",
+"name": "GSmaterialInit",
 "addr": "0x800DF854",
 "size": 120,
 "label": "gs-engine",
@@ -21337,7 +21337,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800DFEEC",
+"name": "GSvecTransformQuat",
 "addr": "0x800DFEEC",
 "size": 172,
 "label": "gs-engine",
@@ -21377,7 +21377,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E0040",
+"name": "GSvecDistance",
 "addr": "0x800E0040",
 "size": 32,
 "label": "gs-engine",
@@ -21449,7 +21449,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E01D0",
+"name": "GSvecCopy",
 "addr": "0x800E01D0",
 "size": 36,
 "label": "gs-engine",
@@ -21577,7 +21577,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E04F4",
+"name": "GSmtxMakeZRotation",
 "addr": "0x800E04F4",
 "size": 36,
 "label": "gs-engine",
@@ -21585,7 +21585,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E0518",
+"name": "GSmtxMakeYRotation",
 "addr": "0x800E0518",
 "size": 36,
 "label": "gs-engine",
@@ -21593,7 +21593,7 @@
 "seed": "range"
 },
 {
-"name": "fn_800E053C",
+"name": "GSmtxMakeXRotation",
 "addr": "0x800E053C",
 "size": 36,
 "label": "gs-engine",
@@ -50212,7 +50212,7 @@
 "name": "fn_801E075C",
 "addr": "0x801E075C",
 "size": 644,
-"label": "field",
+"label": "gs-engine",
 "confidence": 1.9,
 "seed": null
 },
@@ -68927,8 +68927,14 @@
 {
 "label": "fight",
 "start": "0x800111C4",
+"end": "0x80011288",
+"count": 3
+},
+{
+"label": "gs-engine",
+"start": "0x80011288",
 "end": "0x80011700",
-"count": 5
+"count": 2
 },
 {
 "label": "menu",
@@ -70775,14 +70781,14 @@
 {
 "label": "field",
 "start": "0x801DF790",
-"end": "0x801e09e0",
-"count": 4
+"end": "0x801e075c",
+"count": 3
 },
 {
 "label": "gs-engine",
-"start": "0x801E09E0",
+"start": "0x801E075C",
 "end": "0x801e11cc",
-"count": 7
+"count": 8
 },
 {
 "label": "particle",

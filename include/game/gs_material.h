@@ -207,7 +207,7 @@ typedef struct GSmaterialEntry {
  * lbl_8047AB1C, and zeros each entry's first byte (marking inactive).
  * Also registers the GSmaterial class descriptor with HSD at lbl_80315490.
  *
- * Corresponds to fn_800DF854.
+ * Corresponds to GSmaterialInit.
  * (Note: init function is in gs_render.c; pool is consumed by this module.)
  */
 
@@ -483,7 +483,7 @@ u32 GSmaterialIsActive(GSmaterialEntry* entry);
  * Public API -- Color Interpolation (GSmaterialLerpPEColor - GSmaterialLerpDiffuse)
  *
  * These four functions pass material sub-structures and an interpolation
- * parameter to fn_800E01D0 (a GXColor lerp utility).
+ * parameter to GSvecCopy (a GXColor lerp utility).
  * =================================================================== */
 
 /** Lerp custom PE descriptor color. Corresponds to GSmaterialLerpPEColor. */
