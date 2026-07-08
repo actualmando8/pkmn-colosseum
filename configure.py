@@ -298,7 +298,7 @@ config.libs = [
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/dvd/DVDFsExtras.c",
                 progress_category="sdk",
             ),
@@ -2292,7 +2292,7 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "crt/exit.c",
                 mw_version="GC/1.3.2",
                 progress_category="runtime",

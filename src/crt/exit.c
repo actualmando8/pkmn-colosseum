@@ -5,6 +5,24 @@
  *
  * Implements C library exit(), the static constructor/destructor
  * initialization, and program termination support.
+ *
+ * Per config/GC6E01/splits.txt this unit's real address range is only
+ * 0x800C4E44 - 0x800C5458, i.e. exit, free, __pool_free,
+ * deallocate_from_fixed_pools, deallocate_from_var_pools and
+ * __flush_all below, which exactly fill the range byte-for-byte.
+ *
+ * 2026-07-08 reclaim-for-linking pass: removed stray definitions of
+ * __init_cpp/__init_user/_ExitProcess (real addresses 0x800A2BBC /
+ * 0x800A2B9C / 0x800A2C10, inside dolphin/sdk_range_800A2B9C.c),
+ * MWTRACE (real address 0x800C44F8, inside trk/trk_range_800C4470.c)
+ * and usr_put_initialize (real address 0x800BF338, already provided
+ * by the Matching unit trk/usr_put_initialize.c). All of these names
+ * exist in symbols.txt but at addresses belonging to other splits;
+ * defining them here too caused
+ * 'mwldeppc.exe Linker Error: multiply-defined' when this unit was
+ * flipped to Matching. exit() still calls _ExitProcess() via the bare
+ * extern declaration below; the other two removed functions had no
+ * remaining callers in this file.
  */
 
 /* Linker-defined constructor/destructor tables */
@@ -25,36 +43,6 @@ extern void __kill_critical_regions(void);
 extern void __destroy_global_chain(void);
 extern void _ExitProcess(void);
 extern void PPCHalt(void);
-
-/*
- * __init_cpp - Call all static constructors.
- *
- * Iterates the _ctors table (NULL-terminated array of function
- * pointers) and calls each constructor in order.
- */
-static void __init_cpp(void) {
-    FuncPtr* p;
-
-    for (p = _ctors; *p != NULL; p++) {
-        (*p)();
-    }
-}
-
-/*
- * __init_user - Initialize user-level CRT state.
- * Calls __init_cpp to run static constructors.
- */
-void __init_user(void) {
-    __init_cpp();
-}
-
-/*
- * _ExitProcess - Halt the processor.
- * Final termination point; never returns.
- */
-void _ExitProcess(void) {
-    PPCHalt();
-}
 
 /*
  * exit - Standard C library exit function.
@@ -108,45 +96,6 @@ void exit(int status) {
     }
 
     _ExitProcess();
-}
-
-/*
- * MWTRACE - MetroWerks trace/debug output function.
- *
- * Variadic no-op stub in release builds. The register spill
- * is required for ABI compliance with varargs on PPC.
- */
-asm void MWTRACE(s32 level, const char* fmt, ...) {
-    nofralloc
-    stwu   r1, -0x70(r1)
-    bne    cr1, @skip_fp
-    stfd   f1, 0x28(r1)
-    stfd   f2, 0x30(r1)
-    stfd   f3, 0x38(r1)
-    stfd   f4, 0x40(r1)
-    stfd   f5, 0x48(r1)
-    stfd   f6, 0x50(r1)
-    stfd   f7, 0x58(r1)
-    stfd   f8, 0x60(r1)
-@skip_fp:
-    stw    r3, 0x08(r1)
-    stw    r4, 0x0c(r1)
-    stw    r5, 0x10(r1)
-    stw    r6, 0x14(r1)
-    stw    r7, 0x18(r1)
-    stw    r8, 0x1c(r1)
-    stw    r9, 0x20(r1)
-    stw    r10, 0x24(r1)
-    addi   r1, r1, 0x70
-    blr
-}
-
-/*
- * usr_put_initialize - Initialize user put (trace output) system.
- * No-op on GameCube.
- */
-void usr_put_initialize(void) {
-    /* empty */
 }
 
 /* ========================================================== */
