@@ -548,8 +548,11 @@ game/gs_party_access.c:
 game/gs_range_8000D290.c:
 	.text       start:0x8000D290 end:0x8000DAA8
 
-game/gs_npc_interact.c:
-	.text       start:0x8000DAA8 end:0x80011EA4
+game/menuFight.c:
+	.text       start:0x8000DAA8 end:0x80011B4C
+
+game/menuFightStatus.c:
+	.text       start:0x80011B4C end:0x80011EA4
 
 game/gs_range_80011EA4.c:
 	.text       start:0x80011EA4 end:0x80012D20

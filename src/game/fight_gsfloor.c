@@ -374,10 +374,10 @@ void fightMenuCloseInfoMenu(u32 wait)
     extern u32 fn_801F37B0();
     extern u8 fn_801F1700(u32);
     extern u8 fn_801F1758(u32);
-    extern void fn_8000DDBC(void);
-    extern void fn_8000DD30(void);
-    extern u8 fn_8000DD98(void);
-    extern u8 fn_8000DD0C(void);
+    extern void menuFightCloseCountDown(void);
+    extern void menuFightCloseTotalTimer(void);
+    extern u8 menuFightCloseCheckCountDown(void);
+    extern u8 menuFightCloseCheckTotalTimer(void);
     extern u32 _fightMenuAllFightTrainerCloseStatusMenuSubCloseCheck__FPvUsPv();
     extern u32 _fightMenuAllFightTrainerCloseStatusMenuSub__FPvUsPv();
     extern u32 _fightMenuAllFightOutPokemonCloseStatusMenuSubCloseCheck__FPvUsPv();
@@ -387,10 +387,10 @@ void fightMenuCloseInfoMenu(u32 wait)
     fn_801F2B5C(0, _fightMenuAllFightTrainerCloseStatusMenuSub__FPvUsPv, 0, 0);
     fn_801F37B0(0, _fightMenuAllFightOutPokemonCloseStatusMenuSub__FPvUsPv, 0, 0);
     if (fn_801F1700(0) == 1) {
-        fn_8000DDBC();
+        menuFightCloseCountDown();
     }
     if (fn_801F1758(0) == 1) {
-        fn_8000DD30();
+        menuFightCloseTotalTimer();
     }
     if ((u8)wait == 1) {
         fn_801F2B5C(0, _fightMenuAllFightTrainerCloseStatusMenuSub__FPvUsPv, 0, 0);
@@ -411,7 +411,7 @@ void fightMenuCloseInfoMenu(u32 wait)
         } while (1);
         if (fn_801F1700(0) == 1) {
             do {
-                if (fn_8000DD98() == 0) {
+                if (menuFightCloseCheckCountDown() == 0) {
                     break;
                 }
                 _threadSwitch();
@@ -419,7 +419,7 @@ void fightMenuCloseInfoMenu(u32 wait)
         }
         if (fn_801F1758(0) == 1) {
             do {
-                if (fn_8000DD0C() == 0) {
+                if (menuFightCloseCheckTotalTimer() == 0) {
                     break;
                 }
                 _threadSwitch();
@@ -435,8 +435,8 @@ void fightMenuOpenInfoMenu(s8 timerMode)
     extern u32 fn_801F37B0();
     extern u8 fn_801F1700(u32);
     extern u8 fn_801F1758(u32);
-    extern void fn_8000DDE8(void);
-    extern void fn_8000DD5C(void);
+    extern void menuFightOpenCountDown(void);
+    extern void menuFightOpenTotalTimer(void);
     extern u32 _fightMenuAllFightTrainerOpenStatusMenuSub__FPvUsPv();
     extern u32 _fightMenuAllFightOutPokemonOpenStatusMenuSub__FPvUsPv();
     u8 openStatus;
@@ -446,10 +446,10 @@ void fightMenuOpenInfoMenu(s8 timerMode)
     fn_801F37B0(0, _fightMenuAllFightOutPokemonOpenStatusMenuSub__FPvUsPv, &openStatus, 0);
     if (timerMode < 0) {
         if (fn_801F1700(0) == 1) {
-            fn_8000DDE8();
+            menuFightOpenCountDown();
         }
     }
     if (fn_801F1758(0) == 1) {
-        fn_8000DD5C();
+        menuFightOpenTotalTimer();
     }
 }

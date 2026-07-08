@@ -10,16 +10,16 @@ extern u8 fn_80008C40[];
 extern u8 fn_80009178[];
 extern u8 fn_800094A4[];
 extern u8 fn_8000D3AC[];
-extern u8 fn_8000DC88[];
-extern u8 fn_8000DE24[];
-extern u8 fn_8000DFF0[];
-extern u8 fn_8000E28C[];
-extern u8 fn_8000ED34[];
-extern u8 fn_8000F964[];
-extern u8 fn_8000FE38[];
-extern u8 fn_80010844[];
-extern u8 fn_800109A0[];
-extern u8 fn_80010B30[];
+extern u8 menuFightCtrlTimer[];
+extern u8 menuFightButtonSecretKousan[];
+extern u8 menuFightButtonTargetSecret[];
+extern u8 menuFightCtrlTarget[];
+extern u8 menuFightButtonSecretPokemonTop[];
+extern u8 menuFightButtonSecretWazaTop[];
+extern u8 menuFightButtonSecretMain[];
+extern u8 menuFightWazaButton[];
+extern u8 menuFightWazaCtrl[];
+extern u8 menuFightMainCtrl[];
 extern u8 fn_800129A8[];
 extern u8 fn_80012B94[];
 extern u8 fn_80012D20[];
@@ -804,14 +804,14 @@ void* lbl_802E2DB8[1904] = {
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_80010B30),
+    (void*)((u8*)menuFightMainCtrl),
     (void*)0x00000000,
     (void*)0xA6300000,
     (void*)0x00B90000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_80010844),
-    (void*)((u8*)fn_800109A0),
+    (void*)((u8*)menuFightWazaButton),
+    (void*)((u8*)menuFightWazaCtrl),
     (void*)0x00000000,
     (void*)0x60240000,
     (void*)0x00C80000,
@@ -2000,21 +2000,21 @@ void* lbl_802E2DB8[1904] = {
     (void*)0x11C30000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_8000FE38),
+    (void*)((u8*)menuFightButtonSecretMain),
     (void*)((u8*)menuFightCtrlSecretMain),
     (void*)0x00000000,
     (void*)0xA6100000,
     (void*)0x11CE0000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_8000F964),
+    (void*)((u8*)menuFightButtonSecretWazaTop),
     (void*)((u8*)menuFightCtrlSecretWazaTop),
     (void*)0x00000000,
     (void*)0xA6100000,
     (void*)0x11CE0000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_8000ED34),
+    (void*)((u8*)menuFightButtonSecretPokemonTop),
     (void*)((u8*)menuFightCtrlSecretPokemonTop),
     (void*)0x00000000,
     (void*)0x00000000,
@@ -2035,7 +2035,7 @@ void* lbl_802E2DB8[1904] = {
     (void*)0x12000000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_8000DE24),
+    (void*)((u8*)menuFightButtonSecretKousan),
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)0x00000000,
@@ -2064,7 +2064,7 @@ void* lbl_802E2DB8[1904] = {
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_8000E28C),
+    (void*)((u8*)menuFightCtrlTarget),
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)0x125F0000,
@@ -2098,7 +2098,7 @@ void* lbl_802E2DB8[1904] = {
     (void*)0x125C0000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_8000DFF0),
+    (void*)((u8*)menuFightButtonTargetSecret),
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)0x61240000,
@@ -2141,14 +2141,14 @@ void* lbl_802E2DB8[1904] = {
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_8000DC88),
+    (void*)((u8*)menuFightCtrlTimer),
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)0x12AE0000,
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_8000DC88),
+    (void*)((u8*)menuFightCtrlTimer),
     (void*)0x00000000,
     (void*)0x78100000,
     (void*)0x00660000,

@@ -37,9 +37,9 @@ extern u8 fn_80006908[];
 extern u8 dbgMenuFightStop[];
 extern u8 fn_80008C40[];
 extern u8 fn_800096B4[];
-extern u8 fn_8000ED34[];
-extern u8 fn_8000FE38[];
-extern u8 fn_8000FFA8[];
+extern u8 menuFightButtonSecretPokemonTop[];
+extern u8 menuFightButtonSecretMain[];
+extern u8 menuFightDrawBall[];
 extern u8 fn_80011EA4[];
 extern u8 fn_8001329C[];
 extern u8 fn_80018F30[];
@@ -25046,7 +25046,7 @@ void* lbl_8027A500[68440] = {
     (void*)0x6E300000,
     (void*)0x00009E30,
     (void*)0xEFE000CE,
-    (void*)((u8*)fn_8000FFA8 + 0x8),
+    (void*)((u8*)menuFightDrawBall + 0x8),
     (void*)0xBFE006FF,
     (void*)0xE005FF50,
     (void*)0x3FF30CFF,
@@ -29770,7 +29770,7 @@ void* lbl_8027A500[68440] = {
     (void*)0x00000000,
     (void*)0x01000000,
     (void*)0x000008DD,
-    (void*)((u8*)fn_8000FFA8 + 0x58),
+    (void*)((u8*)menuFightDrawBall + 0x58),
     (void*)0x0000008F,
     (void*)0xFFF801EF,
     (void*)0xFFFFE1D3,
@@ -74391,7 +74391,7 @@ void* lbl_802C0CB0[15064] = {
     (void*)0xFFFFFF80,
     (void*)0x008FECFF,
     (void*)0xFFFFFFFF,
-    (void*)((u8*)fn_8000ED34 + 0x25C),
+    (void*)((u8*)menuFightButtonSecretPokemonTop + 0x25C),
     (void*)0x0000AF80,
     (void*)0x000007FF,
     (void*)0x18809FFF,
@@ -74418,7 +74418,7 @@ void* lbl_802C0CB0[15064] = {
     (void*)0x00000000,
     (void*)0x00FF0FFF,
     (void*)0xFFFFFFFF,
-    (void*)((u8*)fn_8000FE38 + 0xD0),
+    (void*)((u8*)menuFightButtonSecretMain + 0xD0),
     (void*)0xFFFFFFFF,
     (void*)0xFF800044,
     (void*)0x00000000,
@@ -74571,7 +74571,7 @@ void* lbl_802C0CB0[15064] = {
     (void*)0xFFFFFFC0,
     (void*)0x00FF4BBF,
     (void*)0xFBBCFDDD,
-    (void*)((u8*)fn_8000FE38 + 0xC8),
+    (void*)((u8*)menuFightButtonSecretMain + 0xC8),
     (void*)0x0FF796F7,
     (void*)0xBA0000FF,
     (void*)0x7DFFFFF8,
@@ -86497,7 +86497,7 @@ void* lbl_802C0CB0[15064] = {
     (void*)0x00000000,
     (void*)0x00440000,
     (void*)0x000CFFFF,
-    (void*)((u8*)fn_8000FE38 + 0xC8),
+    (void*)((u8*)menuFightButtonSecretMain + 0xC8),
     (void*)0x00000FFF,
     (void*)0xFFD777FF,
     (void*)0x7777200F,
