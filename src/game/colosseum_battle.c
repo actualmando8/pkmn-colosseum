@@ -3596,7 +3596,7 @@ u32 fn_80263BC8(u32 r3, u32 r4, u32 r5, s32 mode)
             flag = 0;
         }
         else {
-            fightOutPokemonCreateFightAction(r4, 0, 9, 0, lbl_80375D30, (s16)r5);
+            fightOutPokemonCreateFightAction(r4, 0, 9, 0, lbl_80375D30, (s16)(r5 & 0xFFFFFFFFFFFFFFFFu));
             flag = 1;
         }
         if (flag == 0) {
@@ -3649,7 +3649,7 @@ s32 fn_80263DE4(u32 r3, u32 r4, u32 r5, u32 retry, u32 reopen)
     u32 ctx;
     u32 actor;
     u32 param;
-    s32 choice;
+    u32 choice;
     u32 msg;
     u32 found;
     u32 status;
@@ -6515,7 +6515,7 @@ u32 fightTrainerAiWazaValueMajikkukooto(void* ctx, u32 param1, u32 param2) {
 /* Address: 0x80244514 | Size: 0x18C (396 bytes) */
 u32 fightTrainerAiWazaValueMiraakooto(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_8010C4A0(u32);
-    extern u16 fightFloorGetFightTrainerFightOutPokemonPtrAry(u32, void*, u32*, u32, u32);
+    extern u32 fightFloorGetFightTrainerFightOutPokemonPtrAry(u32, void*, u32*, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u32 fn_80236520(void*, u32);
     extern u32 fn_80236FFC(void*, u32);
@@ -6526,8 +6526,8 @@ u32 fightTrainerAiWazaValueMiraakooto(void* ctx, u32 param1, u32 param2, u32 par
     u32 entries[8];
     u32 rawCount;
     u32 count;
-    u32 move;
     u32* entriesPtr;
+    u32 move;
     u32 index;
     u32 current;
     u32 handle;
@@ -6559,7 +6559,7 @@ u32 fightTrainerAiWazaValueMiraakooto(void* ctx, u32 param1, u32 param2, u32 par
 /* Address: 0x802446A0 | Size: 0x18C (396 bytes) */
 u32 fightTrainerAiWazaValueKauntaa(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_8010C4A0(u32);
-    extern u16 fightFloorGetFightTrainerFightOutPokemonPtrAry(u32, void*, u32*, u32, u32);
+    extern u32 fightFloorGetFightTrainerFightOutPokemonPtrAry(u32, void*, u32*, u32, u32);
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u32 fn_80236520(void*, u32);
     extern u32 fn_80236FFC(void*, u32);
@@ -6570,8 +6570,8 @@ u32 fightTrainerAiWazaValueKauntaa(void* ctx, u32 param1, u32 param2, u32 param3
     u32 entries[8];
     u32 rawCount;
     u32 count;
-    u32 move;
     u32* entriesPtr;
+    u32 move;
     u32 index;
     u32 current;
     u32 handle;
@@ -8386,7 +8386,7 @@ u32 fightTrainerAiWazaValueJikokaitou(void* ctx, u32 param1, u32 param2, u32 par
     extern void fn_80239CCC(u32, void*, u32, u32, u32, u32, u32, u32, s32);
     extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
     s32 denom;
-    s32 numerator;
+    u8 numerator;
     s32 quotient;
     u32 handle;
 
@@ -8547,8 +8547,9 @@ u32 fightTrainerAiWazaValueTuikouKonran(void* ctx, u32 param1, u32 param2, u32 p
     extern void fn_80239CCC(u32, void*, u32, u32, u32, u32, u32, u32, s32);
     extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
     s32 denom;
-    s32 numerator;
+    u8 numerator;
     s32 quotient;
+    s32 finalQuotient;
     u32 handle;
 
     quotient = (s32)(fn_80239564(ctx, param2) & 0xff);
@@ -8574,9 +8575,9 @@ u32 fightTrainerAiWazaValueTuikouKonran(void* ctx, u32 param1, u32 param2, u32 p
     }
     numerator = (s32)(fn_80239564(ctx, param2) & 0xff);
     denom = fn_801FB1C0(0, 0xe6, 0x3e, 0);
-    quotient = numerator / denom;
-    handle = fightTrainerAiAddValue(handle, quotient);
-    fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xe6, quotient);
+    finalQuotient = numerator / denom;
+    handle = fightTrainerAiAddValue(handle, finalQuotient);
+    fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xe6, finalQuotient);
 done:
     return handle;
 }
@@ -8621,8 +8622,9 @@ u32 fightTrainerAiWazaValueTuikouMeityuuDaun(void* ctx, u32 param1, u32 param2, 
     extern void fn_80239CCC(u32, void*, u32, u32, u32, u32, u32, u32, s32);
     extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
     s32 denom;
-    s32 numerator;
+    u8 numerator;
     s32 quotient;
+    s32 finalQuotient;
     u32 handle;
 
     quotient = (s32)(fn_80239564(ctx, param2) & 0xff);
@@ -8634,7 +8636,7 @@ u32 fightTrainerAiWazaValueTuikouMeityuuDaun(void* ctx, u32 param1, u32 param2, 
         handle = fn_80239984(handle, ctx, 0xdc);
         fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xdc);
     }
-    if (fn_802358AC(ctx, param3) == 1) {
+    if ((u8)fn_802358AC(ctx, param3) == 0) {
         quotient = (s32)(fn_80239564(ctx, param2) & 0xff);
         denom = fn_801FB1C0(0, 0xdd, 0x3e, 0);
         quotient = quotient / denom;
@@ -8652,9 +8654,9 @@ u32 fightTrainerAiWazaValueTuikouMeityuuDaun(void* ctx, u32 param1, u32 param2, 
     }
     numerator = (s32)(fn_80239564(ctx, param2) & 0xff);
     denom = fn_801FB1C0(0, 0xde, 0x3e, 0);
-    quotient = numerator / denom;
-    handle = fightTrainerAiAddValue(handle, quotient);
-    fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xde, quotient);
+    finalQuotient = numerator / denom;
+    handle = fightTrainerAiAddValue(handle, finalQuotient);
+    fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xde, finalQuotient);
 done:
     return handle;
 }
@@ -8672,8 +8674,9 @@ u32 fightTrainerAiWazaValueTuikouTokubouDaun(void* ctx, u32 param1, u32 param2, 
     extern void fn_80239CCC(u32, void*, u32, u32, u32, u32, u32, u32, s32);
     extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
     s32 denom;
-    s32 numerator;
+    u8 numerator;
     s32 quotient;
+    s32 finalQuotient;
     u32 handle;
 
     quotient = (s32)(fn_80239564(ctx, param2) & 0xff);
@@ -8685,7 +8688,7 @@ u32 fightTrainerAiWazaValueTuikouTokubouDaun(void* ctx, u32 param1, u32 param2, 
         handle = fn_80239984(handle, ctx, 0xd8);
         fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xd8);
     }
-    if (fn_80235974(ctx, param3) == 1) {
+    if ((u8)fn_80235974(ctx, param3) == 0) {
         quotient = (s32)(fn_80239564(ctx, param2) & 0xff);
         denom = fn_801FB1C0(0, 0xd9, 0x3e, 0);
         quotient = quotient / denom;
@@ -8701,9 +8704,9 @@ u32 fightTrainerAiWazaValueTuikouTokubouDaun(void* ctx, u32 param1, u32 param2, 
     }
     numerator = (s32)(fn_80239564(ctx, param2) & 0xff);
     denom = fn_801FB1C0(0, 0xda, 0x3e, 0);
-    quotient = numerator / denom;
-    handle = fightTrainerAiAddValue(handle, quotient);
-    fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xda, quotient);
+    finalQuotient = numerator / denom;
+    handle = fightTrainerAiAddValue(handle, finalQuotient);
+    fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xda, finalQuotient);
 done:
     return handle;
 }
@@ -9123,8 +9126,9 @@ u32 fightTrainerAiWazaValueTuikouSubayasaDaun(void* ctx, u32 param1, u32 param2,
     extern void fn_80239CCC(u32, void*, u32, u32, u32, u32, u32, u32, s32);
     extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
     s32 denom;
-    s32 numerator;
+    u8 numerator;
     s32 quotient;
+    s32 finalQuotient;
     u32 handle;
 
     quotient = (s32)(fn_80239564(ctx, param2) & 0xff);
@@ -9140,7 +9144,7 @@ u32 fightTrainerAiWazaValueTuikouSubayasaDaun(void* ctx, u32 param1, u32 param2,
         handle = fn_80239984(handle, ctx, 0xc9);
         fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xc9);
     }
-    if (fn_80235910(ctx, param3) == 1) {
+    if ((u8)fn_80235910(ctx, param3) == 0) {
         quotient = (s32)(fn_80239564(ctx, param2) & 0xff);
         denom = fn_801FB1C0(0, 0xca, 0x3e, 0);
         quotient = quotient / denom;
@@ -9156,9 +9160,9 @@ u32 fightTrainerAiWazaValueTuikouSubayasaDaun(void* ctx, u32 param1, u32 param2,
     }
     numerator = (s32)(fn_80239564(ctx, param2) & 0xff);
     denom = fn_801FB1C0(0, 0xcb, 0x3e, 0);
-    quotient = numerator / denom;
-    handle = fightTrainerAiAddValue(handle, quotient);
-    fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xcb, quotient);
+    finalQuotient = numerator / denom;
+    handle = fightTrainerAiAddValue(handle, finalQuotient);
+    fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xcb, finalQuotient);
 done:
     return handle;
 }
@@ -9176,8 +9180,9 @@ u32 fightTrainerAiWazaValueTuikouBougyoDaun(void* ctx, u32 param1, u32 param2, u
     extern void fn_80239CCC(u32, void*, u32, u32, u32, u32, u32, u32, s32);
     extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
     s32 denom;
-    s32 numerator;
+    u8 numerator;
     s32 quotient;
+    s32 finalQuotient;
     u32 handle;
 
     quotient = (s32)(fn_80239564(ctx, param2) & 0xff);
@@ -9189,7 +9194,7 @@ u32 fightTrainerAiWazaValueTuikouBougyoDaun(void* ctx, u32 param1, u32 param2, u
         handle = fn_80239984(handle, ctx, 0xc4);
         fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xc4);
     }
-    if (fn_80235A3C(ctx, param3) == 1) {
+    if ((u8)fn_80235A3C(ctx, param3) == 0) {
         quotient = (s32)(fn_80239564(ctx, param2) & 0xff);
         denom = fn_801FB1C0(0, 0xc5, 0x3e, 0);
         quotient = quotient / denom;
@@ -9205,9 +9210,9 @@ u32 fightTrainerAiWazaValueTuikouBougyoDaun(void* ctx, u32 param1, u32 param2, u
     }
     numerator = (s32)(fn_80239564(ctx, param2) & 0xff);
     denom = fn_801FB1C0(0, 0xc6, 0x3e, 0);
-    quotient = numerator / denom;
-    handle = fightTrainerAiAddValue(handle, quotient);
-    fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xc6, quotient);
+    finalQuotient = numerator / denom;
+    handle = fightTrainerAiAddValue(handle, finalQuotient);
+    fn_80239CCC(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xc6, finalQuotient);
 done:
     return handle;
 }
@@ -16731,8 +16736,8 @@ s32 fightTrainerAiWazaHit102(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u8 fn_80238748(void* ctx, u32 elem);
     u32 buf[0x17];
     u32 count = fn_801F1A6C(0, ctx, buf, 1, 1);
-    u16 count16;
     u16 target;
+    u16 count16;
     u32 *bufPtr;
     u16 i;
     u8 flag;
@@ -20022,7 +20027,7 @@ void fn_8025CDB8(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void savedataGetStatus();
     extern void heroInit();
     extern void heroBiosGetPokemonPtr();
-    extern void fn_80135938();
+    extern void gamedataGetStatus();
     u8 sp[0x20];
     u32 r0 = 0;
     u32 r3 = (u32)ctx;
@@ -20062,7 +20067,7 @@ void fn_8025CDB8(void* ctx, u32 param1, u32 param2, u32 param3) {
         if ((s32)r31 >= (s32)r0) break;
         r3 = 0x0;
         r4 = 0x1;
-        fn_80135938();
+        gamedataGetStatus();
         r0 = r31 + 0x1;
         r6 = r3;
         r3 = r30;
@@ -20240,10 +20245,10 @@ f32 fn_8025D0A8(void* ctx, u32 param1, u32 param2) {
     extern u8 pokemonCheckValid(void*);
     extern void* savedataGetStatus(u32, u32);
     extern void* heroBiosGetPokemonPtr(void*, u32);
-    void* party;
-    void* member;
-    u32 count;
     u32 i;
+    u32 count;
+    void* member;
+    void* party;
     u32 offset;
     u32 masked;
     u16 idx;
@@ -20252,9 +20257,8 @@ f32 fn_8025D0A8(void* ctx, u32 param1, u32 param2) {
     f32 scale;
     f32 factor;
 
-    party = ctx;
     count = 0;
-    if (party == 0) {
+    if ((party = ctx) == 0) {
         party = savedataGetStatus(0, 2);
     }
     for (i = 0; (s32)i < 6; i++) {
@@ -21064,13 +21068,12 @@ u32 fn_8025DF38(int *r3,u32 r4,u16 *r5,int r6)
   int iVar4;
   u32 iVar5;
   u32 uVar6;
-  u32 uVar7;
-  int iVar9;
-  int iVar10;
-  int local_68 [17];
+	  u32 uVar7;
+	  int iVar9;
+	  int local_68 [13];
   
-  uVar2 = _fadeEffectGetRandom__FUl(0xffffffff);
-  iVar3 = fn_801DE190(r4,uVar2,0);
+	  uVar2 = _fadeEffectGetRandom__FUl(0xffffffff);
+	  iVar3 = fn_801DE190(r4,uVar2,0);
   *r3 = iVar3;
   if ((u32)iVar3 == 0) {
     uVar2 = 0;
@@ -21089,16 +21092,14 @@ u32 fn_8025DF38(int *r3,u32 r4,u16 *r5,int r6)
       if (iVar4 != 0) {
         uVar2 = fn_8018F470(1);
         iVar5 = floorDataBiosGetShadowReciveNum(iVar4);
-        iVar9 = 0;
-        iVar10 = 0;
-        if (iVar5 == 1) {
-          for (uVar7 = 0; uVar7 < iVar5; uVar7 = uVar7 + 1) {
-            uVar6 = floorDataBiosGetShadowReciveID(iVar4,uVar7);
-            uVar6 = floorGetResource(fn_800FF56C(),uVar6);
-            if (uVar6 != 0) {
-              *(int *)((int)local_68 + iVar10) = uVar6;
+	        iVar9 = 0;
+	        if (iVar5 == 1) {
+	          for (uVar7 = 0; uVar7 < iVar5; uVar7 = uVar7 + 1) {
+	            uVar6 = floorDataBiosGetShadowReciveID(iVar4,uVar7);
+	            uVar6 = floorGetResource(fn_800FF56C(),uVar6);
+	            if (uVar6 != 0) {
+	              local_68[iVar9] = uVar6;
               iVar9 = iVar9 + 1;
-              iVar10 = iVar10 + 4;
             }
           }
           GSmodelSetShadowFlags(iVar3,1);
@@ -21379,6 +21380,8 @@ u32 fn_8025E640(u32 r3,int r4)
   return uVar13;
 }
 
+#pragma push
+#pragma optimize_for_size off
 /* Address: 0x8025EF58 | Size: 0x354 | Ghidra import */
 
 void fn_8025EF58(void)
@@ -21525,6 +21528,7 @@ void fn_8025EF58(void)
   }
   return;
 }
+#pragma pop
 
 #pragma push
 #pragma optimization_level 0
@@ -21589,11 +21593,11 @@ asm void fn_8025F350(void) {
 #endif
 #pragma pop
 void GBAInit(void) {
-  int i;
-  u32 r0;
   u32 r30;
   u8 *r29;
   u8 *r28;
+  int i;
+  u32 r0;
   r0 = *(u32 *)0x800000F8;
   r0 = r0 >> 2;
   r0 = __mulhwu(0x431BDE83u, r0);
@@ -21706,8 +21710,8 @@ void ReadProc(int r3)
   if (*(s32 *)(entry + 0x20) == 0) {
     memcpy(*(void **)(entry + 0x18), entry + 0x5, 4);
     **(u8 **)(entry + 0x14) = *(u8 *)(entry + 0x9) & 0x3a;
-  }
-}
+	  }
+	}
 
 #pragma push
 #pragma optimization_level 0
@@ -21797,6 +21801,8 @@ u32 GBAWrite(int r3, u32 r4, u32 r5) {
 }
 #pragma pop
 
+#pragma push
+#pragma peephole off
 /* Address: 0x8025F70C | Size: 0xDC | Ghidra import */
 void __GBAHandler(int chan, u32 status, void* currentContext)
 
@@ -21804,7 +21810,6 @@ void __GBAHandler(int chan, u32 status, void* currentContext)
     extern void OSClearContext(void*);
     extern void OSSetCurrentContext(void*);
   u8* entry;
-  void (*callback0)(int);
   void (*callback1)(int, u32);
   u8 context[0x2d0];
 
@@ -21818,29 +21823,32 @@ void __GBAHandler(int chan, u32 status, void* currentContext)
   else {
     *(u32 *)(entry + 0x20) = 0;
   }
-  callback0 = *(void (**)(int))(entry + 0x38);
-  if (callback0 != NULL) {
+  if (*(u32 *)(entry + 0x38) != 0) {
+    void (*callback0)(int) = *(void (**)(int))(entry + 0x38);
     *(u32 *)(entry + 0x38) = 0;
     callback0(chan);
   }
-  callback1 = *(void (**)(int, u32))(entry + 0x1c);
-  if (callback1 != NULL) {
+  if (*(u32 *)(entry + 0x1c) != 0) {
     OSClearContext(context);
     OSSetCurrentContext(context);
+    callback1 = *(void (**)(int, u32))(entry + 0x1c);
     *(u32 *)(entry + 0x1c) = 0;
     callback1(chan, *(u32 *)(entry + 0x20));
     OSClearContext(context);
     OSSetCurrentContext(currentContext);
   }
 }
+#pragma pop
 
 /* Address: 0x8025F7E8 | Size: 0x34 | Ghidra import */
+#pragma peephole off
 void __GBASyncCallback(int r3)
 
 {
     extern void OSWakeupThread(void *);
   OSWakeupThread(lbl_804783E0 + r3 * 0x100 + 0x24);
 }
+#pragma peephole on
 
 /* Address: 0x8025F81C | Size: 0x6C | Ghidra import */
 #pragma push
@@ -21876,7 +21884,6 @@ void TypeAndStatusCallback(int r3,u32 r4)
   extern void __OSReschedule(void);
   extern int SITransfer(int, void *, u32, void *, u32, u32, u32, u32);
   u8 *entry;
-  void (*callback0)(int);
   void (*callback1)(int, u32);
   void *currentContext;
   u8 context[0x2d0];
@@ -21895,16 +21902,16 @@ void TypeAndStatusCallback(int r3,u32 r4)
       }
       *(u32 *)(entry + 0x20) = 2;
     }
-    callback0 = *(void (**)(int))(entry + 0x38);
-    if (callback0 != (void *)0x0) {
+    if (*(u32 *)(entry + 0x38) != 0) {
+      void (*callback0)(int) = *(void (**)(int))(entry + 0x38);
       *(u32 *)(entry + 0x38) = 0;
       callback0(r3);
     }
-    callback1 = *(void (**)(int, u32))(entry + 0x1c);
-    if (callback1 != (void *)0x0) {
+    if (*(u32 *)(entry + 0x1c) != 0) {
       currentContext = OSGetCurrentContext();
       OSClearContext(context);
       OSSetCurrentContext(context);
+      callback1 = *(void (**)(int, u32))(entry + 0x1c);
       *(u32 *)(entry + 0x1c) = 0;
       callback1(r3, *(u32 *)(entry + 0x20));
       OSClearContext(context);
@@ -21959,78 +21966,90 @@ void fn_8025FA20(u16 r3, f32 *r4, f32 *r5)
 
   id = (u16)r3;
   fVar1 = lbl_8047E690;
-  if (id == 0x92) {
-    fVar1 = lbl_8047E6A4;
-  }
-  else if (id < 0x92) {
-    if (id == 0x4a) {
+  if (id != 0x92) {
+    if (id < 0x92) {
+      if (id != 0x4a) {
+        if (id < 0x4a) {
+          if (id != 0x26) {
+            if (id < 0x26) {
+              if (id != 0x1a) {
+                if ((id < 0x1a) && (id == 6)) {
+                  fVar1 = lbl_8047E6A0;
+                }
+              }
+              else {
+                fVar1 = lbl_8047E6A0;
+              }
+            }
+            else if (id == 0x44) {
+              fVar1 = lbl_8047E6A8;
+            }
+          }
+          else {
+            fVar1 = lbl_8047E694;
+          }
+        }
+        else if (id != 0x8e) {
+          if (id < 0x8e) {
+            if (id != 0x85) {
+              if ((id < 0x85) && (id < 0x4c)) {
+                fVar1 = lbl_8047E698;
+              }
+            }
+            else {
+              fVar1 = lbl_8047E698;
+            }
+          }
+          else if (id == 0x90) {
+            fVar1 = lbl_8047E6A4;
+          }
+          else if (0x8f < id) {
+            fVar1 = lbl_8047E69C;
+          }
+        }
+        else {
+          fVar1 = lbl_8047E69C;
+        }
+      }
+      else {
+        fVar1 = lbl_8047E698;
+      }
+    }
+    else if (id == 0x136) {
+      fVar1 = lbl_8047E69C;
+    }
+    else if (id < 0x136) {
+      if (id == 0xfa) {
+        fVar1 = lbl_8047E698;
+      }
+      else if (id < 0xfa) {
+        if (id == 0xe2) {
+          fVar1 = lbl_8047E69C;
+        }
+        else if ((id < 0xe2) && (id == 0xd9)) {
+          fVar1 = lbl_8047E69C;
+        }
+      }
+      else if (id == 300) {
+        fVar1 = lbl_8047E6A0;
+      }
+    }
+    else if (id == 0x16b) {
       fVar1 = lbl_8047E698;
     }
-    else if (id < 0x4a) {
-      if (id == 0x26) {
-        fVar1 = lbl_8047E694;
-      }
-      else if (id < 0x26) {
-        if (id == 0x1a) {
-          fVar1 = lbl_8047E6A0;
-        }
-        else if ((id < 0x1a) && (id == 6)) {
-          fVar1 = lbl_8047E6A0;
-        }
-      }
-      else if (id == 0x44) {
+    else if (id < 0x16b) {
+      if (id == 0x14b) {
         fVar1 = lbl_8047E6A8;
       }
     }
-    else if (id == 0x8e) {
-      fVar1 = lbl_8047E69C;
-    }
-    else if (id < 0x8e) {
-      if (id == 0x85) {
-        fVar1 = lbl_8047E698;
-      }
-      else if ((id < 0x85) && (id < 0x4c)) {
-        fVar1 = lbl_8047E698;
-      }
-    }
-    else if (id == 0x90) {
+    else if (id == 0x198) {
       fVar1 = lbl_8047E6A4;
     }
-    else if (0x8f < id) {
-      fVar1 = lbl_8047E69C;
+    else if ((id < 0x198) && (0x196 < id)) {
+      fVar1 = lbl_8047E6A4;
     }
   }
-  else if (id == 0x136) {
-    fVar1 = lbl_8047E69C;
-  }
-  else if (id < 0x136) {
-    if (id == 0xfa) {
-      fVar1 = lbl_8047E698;
-    }
-    else if (id < 0xfa) {
-      if (id == 0xe2) {
-        fVar1 = lbl_8047E69C;
-      }
-      else if ((id < 0xe2) && (id == 0xd9)) {
-        fVar1 = lbl_8047E69C;
-      }
-    }
-    else if (id == 300) {
-      fVar1 = lbl_8047E6A0;
-    }
-  }
-  else if (id == 0x16b) {
-    fVar1 = lbl_8047E698;
-  }
-  else if (id < 0x16b) {
-    if (id == 0x14b) {
-      fVar1 = lbl_8047E6A8;
-    }
-  }
-  else if (id == 0x198) {
-    fVar1 = lbl_8047E6A4;
-  }
-  else if ((id < 0x198) && (0x196 < id)) {
+  else {
     fVar1 = lbl_8047E6A4;
   }
   if (r5 != (f32 *)0x0) {
@@ -22096,7 +22115,7 @@ asm void fn_8025FD34(void) {
 u32 fn_8025FD34(u16 *r3, u16 r4) {
 	  u16 *queue;
 	  u16 *countQueue;
-	  u32 count;
+	  u16 count;
 	  u32 r5;
 	  u32 i;
 	  s32 r0;
@@ -22113,10 +22132,10 @@ u32 fn_8025FD34(u16 *r3, u16 r4) {
     r5 = (i & 0xffff) * 12;
     r0 = r5 + 4;
     r0 = (u32)*(u16 *)((u8 *)queue + r0) & 0x3FFF;
-		    if (r0 == (u16)r4) {
-	      r0 = r5 + 8;
-	      return *(u32 *)((u8 *)queue + r0);
-	    }
+			    if (r0 == (u16)r4) {
+		      r0 = r5 + 8;
+		      return *(u32 *)((u8 *)queue + r0);
+		    }
   }
   return 0;
 }
@@ -22135,7 +22154,7 @@ u32 fn_8025FDDC(u16 *r3, u16 r4) {
   u16 *countQueue;
   u32 r5;
   u32 i;
-  u32 count;
+  u16 count;
   s32 r0;
   queue = r3;
   if (queue == (u16 *)0) {
@@ -22150,10 +22169,10 @@ u32 fn_8025FDDC(u16 *r3, u16 r4) {
 	    r5 = (i & 0xffff) * 12;
 	    r0 = r5 + 4;
 	    r0 = (u32)*(u16 *)((u8 *)queue + r0) & 0x3FFF;
-	    if (r0 == (u16)r4) {
-	      r0 = r5 + 0xC;
-	      return *(u32 *)((u8 *)queue + r0);
-	    }
+		    if (r0 == (u16)r4) {
+		      r0 = r5 + 0xC;
+		      return *(u32 *)((u8 *)queue + r0);
+		    }
   }
   return 0;
 }
@@ -22219,34 +22238,38 @@ asm void fn_8025FF9C(void) {
 #endif
 #pragma pop
 void memoDataSet(u16 *r3, u32 r4) {
-			  u16 *queue;
-			  u32 r30;
-			  u32 count;
-			  u32 lookup;
-			  u32 r5;
-			  u32 i;
+  extern u32 fn_8011F5C8();
+  u16 *queue;
+  u32 r30;
+		  u32 count;
+		  u32 rawLookup;
+		  u16 lookup;
+		  u32 r5;
+		  u32 i;
 		  u32 r0;
-	  queue = r3;
+
+  queue = r3;
   r30 = r4;
-	  if (queue == (u16 *)0) {
-	    queue = (u16 *)savedataGetStatus(0, 0xC);
+  if (queue == (u16 *)0) {
+    queue = (u16 *)savedataGetStatus(0, 0xC);
+  }
+  rawLookup = fn_8011F5C8(r30);
+	  lookup = rawLookup;
+	  count = *queue;
+	  for (i = 0; (u32)(u16)i < (u32)count; i = i + 1) {
+	    r5 = (i & 0xffff) * 12;
+	    r0 = (u32)*(u16 *)((u8 *)queue + r5 + 4) & 0x3FFF;
+	    if (r0 == lookup) {
+	      return;
+	    }
 	  }
-		  lookup = fn_8011F5C8(r30) & 0xffff;
-		  count = *queue;
-		  for (i = 0; (u32)(u16)i < (u32)count; i = i + 1) {
-		    r5 = (i & 0xffff) * 12;
-		    r0 = (u32)*(u16 *)((u8 *)queue + r5 + 4) & 0x3FFF;
-		    if (r0 == lookup) {
-		      return;
-		    }
-			  }
-					  *(u16 *)((u8 *)queue + ((u32)count * 12 + 4)) = (u16)(lookup | 0x8000);
-				  r5 = fn_8011F5B0(r30);
-				  *(u32 *)((u8 *)queue + ((u32)*queue * 12 + 0xC)) = r5;
-				  r5 = fn_8011F520(r30);
-				  *(u32 *)((u8 *)queue + ((u32)*queue * 12 + 0x8)) = r5;
-	  *queue = (u16)(*queue + 1);
-	}
+		  *(u16 *)((u8 *)queue + ((u32)count * 12 + 4)) = (u16)(rawLookup | 0x8000);
+	  r5 = fn_8011F5B0(r30);
+	  *(u32 *)((u8 *)queue + ((u32)*queue * 12 + 0xC)) = r5;
+	  r5 = fn_8011F520(r30);
+	  *(u32 *)((u8 *)queue + ((u32)*queue * 12 + 0x8)) = r5;
+  *queue = (u16)(*queue + 1);
+}
 
 #pragma push
 #pragma optimization_level 0
@@ -22284,7 +22307,7 @@ void fn_80260070(u16 *r3) {
 int fn_8026045C(u32 r3,u32 r4,int r5)
 
 {
-    extern u32 DAT_8027a488;
+    extern u8 lbl_8027A488[];
     extern int fn_80097A38();
     extern int GScameraGetPerspective();
     extern u32 GScameraGetActiveCamera();
@@ -22304,93 +22327,83 @@ int fn_8026045C(u32 r3,u32 r4,int r5)
     extern f32 lbl_8047E6C0;
 
   u32 uVar1;
+  u32 *savedRotationPtr;
+  u32 *savedPositionPtr;
+  u32 *savedViewPtr;
   int iVar2;
-  short sVar4;
+  u16 sVar4;
   u32 uVar3;
-  s8 cVar5;
+  u8 cVar5;
   u16 *puVar6;
-  int iVar7;
+  u32 iVar7;
   int iVar8;
-  float local_98;
-  u8 auStack_94 [4];
-  u8 auStack_90 [4];
+  u32 savedView[4];
+  u32 savedPosition[3];
+  u32 savedRotation[3];
+  u32 savedDirection[3];
+  u32 view[3];
+  u32 position[3];
+  u32 rotation[3];
+  u32 direction[3];
   u8 auStack_8c [4];
-  u32 local_88;
-  u32 local_84;
-  u32 local_80;
-  u32 local_7c;
-  u32 local_78;
-  u32 local_74;
-  u32 local_70;
-  u32 local_6c;
-  u32 local_68;
-  u32 local_64;
-  u32 local_60;
-  u32 local_5c;
-  u32 local_58;
-  u32 local_54;
-  u32 local_50;
-  u32 local_4c;
-  u32 local_48;
-  u32 local_44;
-  u32 local_40;
-  u32 local_3c;
-  u32 local_38;
-  u32 local_34;
-  u32 local_30;
-  u32 local_2c;
-  float local_28;
+  u8 auStack_90 [4];
+  u8 auStack_94 [4];
+  float local_98;
   
   fadeSet((double)lbl_8047E6C0,3);
   fadeCheck(1);
-  GSscene_GetCameraDirectionVector(&local_88);
-  GSscene_GetCameraRotationVector(&local_7c);
-  GSscene_GetCameraPositionVector(&local_70);
-  GSscene_GetCameraViewVector(&local_64);
+  GSscene_GetCameraDirectionVector(direction);
+  GSscene_GetCameraRotationVector(rotation);
+  GSscene_GetCameraPositionVector(position);
+  GSscene_GetCameraViewVector(view);
   uVar1 = GScameraGetActiveCamera();
   GScameraGetPerspective(uVar1,&local_98,auStack_94,auStack_90,auStack_8c);
-  local_58 = local_88;
-  local_54 = local_84;
-  local_50 = local_80;
-  local_4c = local_7c;
-  local_48 = local_78;
-  local_44 = local_74;
-  local_40 = local_70;
-  local_3c = local_6c;
-  local_38 = local_68;
-  local_34 = local_64;
-  local_30 = local_60;
-  local_2c = local_5c;
-  local_28 = local_98;
+  savedDirection[0] = direction[0];
+  savedDirection[1] = direction[1];
+  savedDirection[2] = direction[2];
+  savedRotationPtr = savedRotation;
+  savedPositionPtr = savedPosition;
+  savedViewPtr = savedView;
+  savedRotation[0] = rotation[0];
+  savedRotation[1] = rotation[1];
+  savedRotation[2] = rotation[2];
+  savedPosition[0] = position[0];
+  savedPosition[1] = position[1];
+  savedPosition[2] = position[2];
+  savedView[0] = view[0];
+  savedView[1] = view[1];
+  savedView[2] = view[2];
+  ((volatile float *)savedView)[3] = local_98;
   fn_801DAC90();
   iVar2 = fn_80097A38(r3,r4);
-  if (3 < iVar2) {
+  if (iVar2 >= 4) {
     iVar2 = -1;
   }
   fn_801DADC0(2);
   sVar4 = (int)pokemonGetStatus(r3,0,0x6e,0);
   if (sVar4 == 0) {
-    sVar4 = -1;
+    sVar4 = 0xffff;
   }
   else {
     sVar4 = (int)pokemonGetStatus(0,sVar4,0x66,0);
     if (sVar4 == 0) {
-      sVar4 = -1;
+      sVar4 = 0xffff;
     }
   }
-  if (sVar4 == -1) {
+  if (sVar4 == 0xffff) {
     iVar7 = 0;
   }
   else {
     uVar1 = fn_8011F5B0(r3);
     uVar3 = (int)pokemonGetStatus(r3,0,0xc1,0);
-    iVar7 = fn_801DE190(sVar4,uVar1,(-uVar3 | uVar3) >> 0x1f);
+    uVar3 = (-uVar3 | uVar3) >> 0x1f;
+    iVar7 = fn_801DE190(sVar4,uVar1,uVar3);
     if (iVar7 == 0) {
       iVar7 = 0;
     }
     else {
       iVar8 = 0;
-      puVar6 = (u16 *)&DAT_8027a488;
+      puVar6 = (u16 *)lbl_8027A488;
       do {
         if ((*(int *)(puVar6 + 2) == 1) && (cVar5 = fn_801DDD28(iVar7,*puVar6,4,0), cVar5 == '\0'))
         break;
@@ -22409,22 +22422,21 @@ int fn_8026045C(u32 r3,u32 r4,int r5)
   GSmodelSetAnimType(uVar1,1);
   fn_801DA4E8(*(u32 *)(r5 + 4),1);
   GSscene_SetMode(2);
-  GSscene_SetCameraDirectionVector(&local_58);
-  GSscene_SetCameraRotationVector(&local_4c);
-  GSscene_SetCameraPositionVector(&local_40);
-  GSscene_SetCameraViewVector(&local_34);
-  fn_801766A8((double)local_28);
+  GSscene_SetCameraDirectionVector(savedDirection);
+  GSscene_SetCameraRotationVector(savedRotationPtr);
+  GSscene_SetCameraPositionVector(savedPositionPtr);
+  GSscene_SetCameraViewVector(savedViewPtr);
+  cameraSetFov((double)((volatile float *)savedView)[3]);
   fadeSet((double)lbl_8047E6C0,2);
   fadeCheck(1);
-  return (int)(char)iVar2;
+  return (int)(signed char)iVar2;
 }
 
 /* Address: 0x802606D8 | Size: 0x238 | Ghidra import */
 int fn_802606D8(u32 *r3,int r4,int r5,u32 r6)
 
 {
-    extern u32 DAT_8027a488;
-    extern u32 DAT_8027a48c;
+    extern u8 lbl_8027A488[];
     extern int fn_800D3088();
     extern u32 fn_800F7AF0();
     extern u32 fn_800F7BC4();
@@ -22432,57 +22444,46 @@ int fn_802606D8(u32 *r3,int r4,int r5,u32 r6)
   u16 uVar1;
   BOOL bVar2;
 
-  s8 cVar7;
+  u8 cVar7;
   int iVar3;
   u32 uVar4;
   u32 uVar5;
   u32 uVar6;
   int iVar8;
   u32 uVar9;
-  float local_a8;
-  u8 auStack_a4 [4];
-  u8 auStack_a0 [4];
+  u32 *savedRotationPtr;
+  u32 *savedPositionPtr;
+  u32 *savedViewPtr;
+  u32 savedView[4];
+  u32 savedPosition[3];
+  u32 savedRotation[3];
+  u32 savedDirection[3];
+  u32 view[3];
+  u32 position[3];
+  u32 rotation[3];
+  u32 direction[3];
   u8 auStack_9c [4];
-  u32 local_98;
-  u32 local_94;
-  u32 local_90;
-  u32 local_8c;
-  u32 local_88;
-  u32 local_84;
-  u32 local_80;
-  u32 local_7c;
-  u32 local_78;
-  u32 local_74;
-  u32 local_70;
-  u32 local_6c;
-  u32 local_68;
-  u32 local_64;
-  u32 local_60;
-  u32 local_5c;
-  u32 local_58;
-  u32 local_54;
-  u32 local_50;
-  u32 local_4c;
-  u32 local_48;
-  u32 local_44;
-  u32 local_40;
-  u32 local_3c;
-  float local_38;
+  u8 auStack_a0 [4];
+  u8 auStack_a4 [4];
+  float local_a8;
   
   iVar8 = 0;
   bVar2 = 0;
-  if ((r4 < 0) || (4 < r4)) {
+  if ((r4 < 0) || (r4 >= 5)) {
     iVar8 = 0;
   }
   else {
-    uVar1 = *(u16 *)(&DAT_8027a488 + r4 * 8);
-    if (*(int *)(&DAT_8027a48c + r4 * 8) == 0) {
-      uVar9 = *r3;
-    }
-    else {
+    uVar1 = *(u16 *)(lbl_8027A488 + r4 * 8);
+    if (*(int *)(lbl_8027A488 + r4 * 8 + 4) != 0) {
       uVar9 = r3[1];
     }
+    else {
+      uVar9 = *r3;
+    }
     fn_801DA9E8(uVar9,uVar1,4);
+    savedRotationPtr = savedRotation;
+    savedPositionPtr = savedPosition;
+    savedViewPtr = savedView;
     while (!bVar2) {
       fn_801DB088();
       if ((r6 & 10) != 0) {
@@ -22496,25 +22497,25 @@ int fn_802606D8(u32 *r3,int r4,int r5,u32 r6)
       cVar7 = fn_801DA94C(uVar9,uVar1,4);
       if (cVar7 == '\0') break;
       _threadSwitch();
-      GSscene_GetCameraDirectionVector(&local_98);
-      GSscene_GetCameraRotationVector(&local_8c);
-      GSscene_GetCameraPositionVector(&local_80);
-      GSscene_GetCameraViewVector(&local_74);
+      GSscene_GetCameraDirectionVector(direction);
+      GSscene_GetCameraRotationVector(rotation);
+      GSscene_GetCameraPositionVector(position);
+      GSscene_GetCameraViewVector(view);
       uVar6 = GScameraGetActiveCamera();
       GScameraGetPerspective(uVar6,&local_a8,auStack_a4,auStack_a0,auStack_9c);
-      local_68 = local_98;
-      local_64 = local_94;
-      local_60 = local_90;
-      local_5c = local_8c;
-      local_58 = local_88;
-      local_54 = local_84;
-      local_50 = local_80;
-      local_4c = local_7c;
-      local_48 = local_78;
-      local_44 = local_74;
-      local_40 = local_70;
-      local_3c = local_6c;
-      local_38 = local_a8;
+      savedDirection[0] = direction[0];
+      savedDirection[1] = direction[1];
+      savedDirection[2] = direction[2];
+      savedRotation[0] = rotation[0];
+      savedRotation[1] = rotation[1];
+      savedRotation[2] = rotation[2];
+      savedPosition[0] = position[0];
+      savedPosition[1] = position[1];
+      savedPosition[2] = position[2];
+      savedView[0] = view[0];
+      savedView[1] = view[1];
+      savedView[2] = view[2];
+      ((volatile float *)savedView)[3] = local_a8;
       iVar3 = fn_800D3088();
       iVar8 = iVar8 + iVar3;
       if (r5 != 0) {
@@ -22526,11 +22527,11 @@ int fn_802606D8(u32 *r3,int r4,int r5,u32 r6)
       }
     }
     GSscene_SetMode(2);
-    GSscene_SetCameraDirectionVector(&local_68);
-    GSscene_SetCameraRotationVector(&local_5c);
-    GSscene_SetCameraPositionVector(&local_50);
-    GSscene_SetCameraViewVector(&local_44);
-    fn_801766A8((double)local_38);
+    GSscene_SetCameraDirectionVector(savedDirection);
+    GSscene_SetCameraRotationVector(savedRotationPtr);
+    GSscene_SetCameraPositionVector(savedPositionPtr);
+    GSscene_SetCameraViewVector(savedViewPtr);
+    cameraSetFov((double)((volatile float *)savedView)[3]);
     if ((r6 & 0x14) != 0) {
       uVar6 = 5;
       if ((r6 & 4) != 0) {
@@ -22540,9 +22541,10 @@ int fn_802606D8(u32 *r3,int r4,int r5,u32 r6)
       fadeCheck(1);
     }
     fn_801DA8C4(uVar9,uVar1,4);
-    if (bVar2 == 0) {
-      iVar8 = -1;
+    if (bVar2 != 0) {
+      return iVar8;
     }
+    iVar8 = -1;
   }
   return iVar8;
 }
@@ -22553,7 +22555,7 @@ fn_80260EBC(u32 r3,u32 r4,u32 r5,u16 *r6,
             int r7,u8 *r8)
 
 {
-    extern u32 DAT_8027a488;
+    extern u8 lbl_8027A488[];
     extern int pokemonBiosCopy();
     extern int scriptSoundStop();
     extern int fn_80260910();
@@ -22561,8 +22563,8 @@ fn_80260EBC(u32 r3,u32 r4,u32 r5,u16 *r6,
   u16 uVar1;
   BOOL bVar2;
 
-  short sVar7;
-  s8 cVar8;
+  u16 sVar7;
+  u8 cVar8;
   u32 uVar3;
   u32 uVar4;
   u32 uVar5;
@@ -22572,10 +22574,10 @@ fn_80260EBC(u32 r3,u32 r4,u32 r5,u16 *r6,
   u8 local_188 [4];
   int local_184;
   int local_180;
-  int local_178;
-  int local_174;
-  u32 local_170;
-  u32 local_16c;
+  volatile int local_178;
+  volatile int local_174;
+  volatile u32 local_170;
+  volatile u32 local_16c;
   u8 auStack_168 [320];
   
   fn_801DADC0(2);
@@ -22583,27 +22585,28 @@ fn_80260EBC(u32 r3,u32 r4,u32 r5,u16 *r6,
   local_180 = 0;
   sVar7 = (int)pokemonGetStatus(r3,0,0x6e,0);
   if (sVar7 == 0) {
-    sVar7 = -1;
+    sVar7 = 0xffff;
   }
   else {
     sVar7 = (int)pokemonGetStatus(0,sVar7,0x66,0);
     if (sVar7 == 0) {
-      sVar7 = -1;
+      sVar7 = 0xffff;
     }
   }
-  if (sVar7 == -1) {
+  if (sVar7 == 0xffff) {
     iVar9 = 0;
   }
   else {
     uVar3 = fn_8011F5B0(r3);
     uVar4 = (int)pokemonGetStatus(r3,0,0xc1,0);
-    iVar9 = fn_801DE190(sVar7,uVar3,(-uVar4 | uVar4) >> 0x1f);
+    uVar4 = (-uVar4 | uVar4) >> 0x1f;
+    iVar9 = fn_801DE190(sVar7,uVar3,uVar4);
     if (iVar9 == 0) {
       iVar9 = 0;
     }
     else {
       iVar6 = 0;
-      puVar10 = (u16 *)&DAT_8027a488;
+      puVar10 = (u16 *)lbl_8027A488;
       do {
         if ((*(int *)(puVar10 + 2) == 0) &&
            (cVar8 = fn_801DDD28(iVar9,*puVar10,4,0), cVar8 == '\0')) break;
@@ -22619,27 +22622,28 @@ fn_80260EBC(u32 r3,u32 r4,u32 r5,u16 *r6,
     local_184 = iVar9;
     sVar7 = (int)pokemonGetStatus(r4,0,0x6e,0);
     if (sVar7 == 0) {
-      sVar7 = -1;
+      sVar7 = 0xffff;
     }
     else {
       sVar7 = (int)pokemonGetStatus(0,sVar7,0x66,0);
       if (sVar7 == 0) {
-        sVar7 = -1;
+        sVar7 = 0xffff;
       }
     }
-    if (sVar7 == -1) {
+    if (sVar7 == 0xffff) {
       iVar9 = 0;
     }
     else {
       uVar3 = fn_8011F5B0(r4);
       uVar4 = (int)pokemonGetStatus(r4,0,0xc1,0);
-      iVar9 = fn_801DE190(sVar7,uVar3,(-uVar4 | uVar4) >> 0x1f);
+      uVar4 = (-uVar4 | uVar4) >> 0x1f;
+      iVar9 = fn_801DE190(sVar7,uVar3,uVar4);
       if (iVar9 == 0) {
         iVar9 = 0;
       }
       else {
         iVar6 = 0;
-        puVar10 = (u16 *)&DAT_8027a488;
+        puVar10 = (u16 *)lbl_8027A488;
         do {
           if ((*(int *)(puVar10 + 2) == 1) &&
              (cVar8 = fn_801DDD28(iVar9,*puVar10,4,0), cVar8 == '\0')) break;
@@ -22745,31 +22749,31 @@ u32 evolutionOpen(u32 r3, u32 r4, u32 r5, u16 *r6, u32 r7, u8 *r8)
     return base[6];
 }
 
+#pragma peephole off
+#pragma opt_common_subs off
 /* Address: 0x80261388 | Size: 0x4C | Ghidra import */
 u32 charNameBiosSearchIndex(u32 value)
 {
     extern u32 *lbl_80478F80;
     extern u32 *lbl_80478F84;
-    u32 count;
     u32 *table;
+    u32 count;
     u32 i;
     u32 offset;
-    u16 idx;
 
-    count = *lbl_80478F80;
     table = lbl_80478F84;
+    count = *lbl_80478F80;
     for (i = 0; (u16)i < count; i++) {
         offset = ((u16)i) << 3;
-        idx = (u16)i;
         if (*(u32 *)((u8 *)table + offset + 4) == value) {
-            return idx;
+            return i;
         }
     }
     return 0;
 }
 
 /* Address: 0x802613D4 | Size: 0x70 | Ghidra import */
-#pragma peephole off
+#pragma opt_common_subs on
 u32 fn_802613D4(u32 idx) {
     extern void* lbl_80478F80;
     extern void* lbl_80478F84;
@@ -22898,55 +22902,78 @@ void fn_8026153C(void *rawOut)
     fn_801DAC90();
 }
 
-/* Address: 0x802615F4 | Size: 0x114 | Ghidra import */
-void fn_802615F4(short *r3)
+typedef struct BattleReplayHeader {
+    u16 firstCount;
+    u16 secondCount;
+    u8 entries[0x44];
+} BattleReplayHeader;
 
+typedef struct BattleReplayFirstEntry {
+    u32 target;
+    u16 modelId;
+    u8 attr;
+    u8 pad7;
+    u32 *modelOut;
+    u8 state[0x6C];
+} BattleReplayFirstEntry;
+
+typedef struct BattleReplaySecondEntry {
+    u32 target;
+    u16 modelId;
+    u8 attr;
+    u8 variant;
+    u32 arg;
+    u32 *modelOut;
+    u8 state[0x6C];
+} BattleReplaySecondEntry;
+
+/* Address: 0x802615F4 | Size: 0x114 | Ghidra import */
+void fn_802615F4(BattleReplayHeader *header)
 {
     extern u32 GSmodelGetVisibility();
     extern int fn_800E9B2C();
     extern int fn_801C3430();
-    extern int fn_801DA224();
-    extern int fn_801DAEF8();
-    extern u32 fn_801DE418();
+    extern int fn_801DAEF8(int);
+    extern u32 fn_801DE418(u16);
     extern int fn_801F198C();
-  u32 uVar2;
-  u32 uVar3;
-  int sVar4;
-  int sVar6;
-  int *piVar5;
-  
-  fn_801DAEF8(10);
-  sVar6 = *r3;
-  piVar5 = (int *)(r3 + 0x24);
-  sVar4 = r3[1];
-  while (sVar6 != 0) {
-    uVar3 = fn_801DE418(*(u16 *)(piVar5 + 1));
-    *(u32 *)(*piVar5 + 0x27c0) = uVar3;
-    *(u32 *)piVar5[2] = uVar3;
-    uVar2 = fn_801DAC3C();
-    fn_800E9B2C(uVar2,piVar5 + 3);
-    fn_801DA224(uVar3,*(u8 *)((int)piVar5 + 6));
-    piVar5 = piVar5 + 0x1e;
-    sVar6 = sVar6 + -1;
-  }
-  while (sVar4 != 0) {
-    uVar3 = fn_801DE190(*(u16 *)(piVar5 + 1),piVar5[2],*(u8 *)((int)piVar5 + 7));
-    *(u32 *)(*piVar5 + 0x600) = uVar3;
-    *(u32 *)piVar5[3] = uVar3;
-    uVar2 = fn_801DAC3C();
-    fn_800E9B2C(uVar2,piVar5 + 4);
-    fn_801DA224(uVar3,*(u8 *)((int)piVar5 + 6));
-    uVar2 = GSmodelGetVisibility(uVar2);
-    fn_801DA4E8(uVar3,uVar2);
-    piVar5 = piVar5 + 0x1f;
-    sVar4 = sVar4 + -1;
-  }
-  uVar3 = fn_801C3108();
-  fn_800054F4(uVar3,r3 + 2,0x44);
-  fn_801EF8F4(1);
-  fn_801C3430();
-  fn_801F198C();
-  return;
+    u8 *entries;
+    u16 firstCount;
+    BattleReplayFirstEntry *firstEntry;
+    u16 secondCount;
+    BattleReplaySecondEntry *secondEntry;
+    u32 model;
+    u32 state;
+
+    entries = header->entries;
+    fn_801DAEF8(10);
+    firstCount = header->firstCount;
+    firstEntry = (BattleReplayFirstEntry *)(entries + 0x44);
+    secondCount = header->secondCount;
+    while (firstCount-- != 0) {
+        model = fn_801DE418(firstEntry->modelId);
+        *(u32 *)(firstEntry->target + 0x27C0) = model;
+        *firstEntry->modelOut = model;
+        state = fn_801DAC3C();
+        fn_800E9B2C(state, firstEntry->state);
+        fn_801DA224(model, firstEntry->attr);
+        firstEntry++;
+    }
+    secondEntry = (BattleReplaySecondEntry *)firstEntry;
+    while (secondCount-- != 0) {
+        model = fn_801DE190(secondEntry->modelId, secondEntry->arg, secondEntry->variant);
+        *(u32 *)(secondEntry->target + 0x600) = model;
+        *secondEntry->modelOut = model;
+        state = fn_801DAC3C();
+        fn_800E9B2C(state, secondEntry->state);
+        fn_801DA224(model, secondEntry->attr);
+        state = GSmodelGetVisibility(state);
+        fn_801DA4E8(model, state);
+        secondEntry++;
+    }
+    memcpy(fn_801C3108(), entries, 0x44);
+    fn_801EF8F4(1);
+    fn_801C3430();
+    fn_801F198C();
 }
 
 /* Address: 0x80261708 | Size: 0x144 | Ghidra import */
@@ -22964,9 +22991,9 @@ u32 fn_80261708(u32 r3,u32 r4,char *r5)
   u32 iVar2;
   u16 sVar5;
   u8 uVar6;
-  u32 uVar3;
-	  int iVar8;
+	  u32 uVar3;
 	  int iVar4;
+	  int iVar8;
 	  int iVar7;
 	  int iVar10;
 	  int base;
@@ -22994,21 +23021,21 @@ u32 fn_80261708(u32 r3,u32 r4,char *r5)
       iVar1 = 0;
     }
     else {
-		      iVar8 = 0;
-		      iVar4 = 0;
-		      do {
-		        iVar7 = 0;
-		        for (iVar10 = 2; iVar10 != 0; iVar10--) {
-		          iVar1 = base + iVar4 + iVar7;
-	          if (*(int *)(iVar1 + 4) == iVar2) {
-	            iVar1 = iVar1 + 4;
-	            goto LAB_0025e7f4;
-          }
-          iVar7 = iVar7 + 4;
-        }
-        iVar8 = iVar8 + 1;
-        iVar4 = iVar4 + 0x10;
-      } while (iVar8 < 4);
+			      iVar8 = 0;
+			      iVar4 = 0;
+			      do {
+			        iVar7 = 0;
+			        for (iVar10 = 2; iVar10 != 0; iVar10--) {
+			          iVar1 = base + iVar4 + iVar7;
+		          if (*(int *)(iVar1 + 4) == iVar2) {
+		            iVar1 = iVar1 + 4;
+		            goto LAB_0025e7f4;
+	          }
+	          iVar7 = iVar7 + 4;
+	        }
+	        iVar8 = iVar8 + 1;
+	        iVar4 = iVar4 + 0x10;
+	      } while (iVar8 < 4);
       iVar1 = 0;
     }
 LAB_0025e7f4:
@@ -23057,12 +23084,12 @@ u32 fn_8026184C(u32 r3,u32 r4,char *r5)
       piVar6 = (int *)0x0;
     }
 	    else {
-	      iVar2 = 0;
-		      for (iVar8 = 4; iVar8 != 0; iVar8--) {
-                piVar6 = (int *)(base + iVar2);
-                    if (*piVar6 == iVar1) goto LAB_0025e8fc;
-                iVar2 = iVar2 + 0x10;
-		      }
+		      iVar2 = 0;
+				      for (iVar8 = 4; iVar8 != 0; iVar8--) {
+	                piVar6 = (int *)(base + iVar2);
+	                    if (*piVar6 == iVar1) goto LAB_0025e8fc;
+	                iVar2 = iVar2 + 0x10;
+				      }
 	      piVar6 = (int *)0x0;
 	    }
 LAB_0025e8fc:
@@ -23417,9 +23444,9 @@ u32 fn_80262084(u32 r3,u32 r4,char *r5)
   u32 *puVar8;
   u32 *puVar9;
   u8 cVar10;
-	  u32 uVar11;
-	  u32 local_48[12];
-	  u32 local_78[12];
+		  u32 uVar11;
+		  u32 local_48[12];
+		  u32 local_78[12];
 
 	  if (r5 == (char *)0x0) {
 	    cVar10 = '\x01';
@@ -23437,7 +23464,7 @@ u32 fn_80262084(u32 r3,u32 r4,char *r5)
     }
     else {
       uVar5 = fightSideGetStatus(iVar3,0,5,0);
-	      sVar6 = fn_801F0134(r3,r4);
+		      sVar6 = fn_801F0134(r3,r4);
       if (sVar6 == 0) {
         uVar11 = 0;
       }
@@ -23452,7 +23479,7 @@ u32 fn_80262084(u32 r3,u32 r4,char *r5)
         }
       }
     }
-	    fn_801FE168(r3,local_78);
+		    fn_801FE168(r3,local_78);
     if (cVar10 == '\0') {
       ((u8 *)local_78)[0x29] = 0;
     }
@@ -24140,10 +24167,10 @@ u32 fn_80264ADC(u32 r3,u32 r4,u32 r5)
     extern int winMsgOpenFight();
     extern int fn_801906A0();
     extern int fn_801F000C();
+  u16 uVar4;
   u32 uVar1;
   u8 cVar6;
   int iVar2;
-  u16 uVar4;
   u16 sVar5;
   u32 uVar3;
   u32 found;
@@ -24185,33 +24212,38 @@ LAB_00261af4:
     uVar3 = 0;
   }
   *(u32 *)(auStack_38 + 4) = uVar3;
-  uVar1 = fn_801F02AC(0x10,r3,r5);
-  cVar6 = fightOutPokemonCheckFightOut();
-  if (cVar6 == '\x01') {
-    found = fn_801F02AC(2,uVar1,r5);
-    if (found == 0) {
-      uVar3 = 0;
-    }
-    else {
-      uVar4 = fightSideGetStatus(found,0,5,0);
-      sVar5 = fn_801F0134(uVar1,r5);
-      if (sVar5 == 0) {
+  {
+    u32 uVar1b;
+    u16 uVar4b;
+
+    uVar1b = fn_801F02AC(0x10,r3,r5);
+    cVar6 = fightOutPokemonCheckFightOut();
+    if (cVar6 == '\x01') {
+      found = fn_801F02AC(2,uVar1b,r5);
+      if (found == 0) {
         uVar3 = 0;
       }
       else {
-        fn_801F0234();
-        uVar3 = fn_801F0204();
-        if ((int)uVar3 < 0) {
+        uVar4b = fightSideGetStatus(found,0,5,0);
+        sVar5 = fn_801F0134(uVar1b,r5);
+        if (sVar5 == 0) {
           uVar3 = 0;
         }
         else {
-          uVar3 = fightSideGetStatus(0,uVar4,3,uVar3 & 0xffff);
+          fn_801F0234();
+          uVar3 = fn_801F0204();
+          if ((int)uVar3 < 0) {
+            uVar3 = 0;
+          }
+          else {
+            uVar3 = fightSideGetStatus(0,uVar4b,3,uVar3 & 0xffff);
+          }
         }
       }
     }
-  }
-  else {
-    uVar3 = 0;
+    else {
+      uVar3 = 0;
+    }
   }
   *(u32 *)(auStack_38 + 0xc) = uVar3;
   *(u32 *)(auStack_38 + 0x14) = 0;
@@ -24258,10 +24290,10 @@ u32 fn_8026503C(u32 r3,u32 r4,u32 r5)
 
 {
     extern u8 lbl_8047B678;
+  u16 uVar4;
   u32 uVar1;
   u8 cVar6;
   int iVar2;
-  u16 uVar4;
   u16 sVar5;
   u32 uVar3;
   u32 found;
@@ -24305,62 +24337,72 @@ LAB_00262054:
       uVar3 = 0;
     }
     *(u32 *)(auStack_38 + 4) = uVar3;
-    uVar1 = fn_801F02AC(0x10,r3,r5);
-    cVar6 = fightOutPokemonCheckFightOut();
-    if (cVar6 == '\x01') {
-      found = fn_801F02AC(2,uVar1,r5);
-      if (found == 0) {
-        uVar3 = 0;
-      }
-      else {
-        uVar4 = fightSideGetStatus(found,0,5,0);
-        sVar5 = fn_801F0134(uVar1,r5);
-        if (sVar5 == 0) {
+    {
+      u32 uVar1b;
+      u16 uVar4b;
+
+      uVar1b = fn_801F02AC(0x10,r3,r5);
+      cVar6 = fightOutPokemonCheckFightOut();
+      if (cVar6 == '\x01') {
+        found = fn_801F02AC(2,uVar1b,r5);
+        if (found == 0) {
           uVar3 = 0;
         }
         else {
-          fn_801F0234();
-          uVar3 = fn_801F0204();
-          if ((int)uVar3 < 0) {
+          uVar4b = fightSideGetStatus(found,0,5,0);
+          sVar5 = fn_801F0134(uVar1b,r5);
+          if (sVar5 == 0) {
             uVar3 = 0;
           }
           else {
-            uVar3 = fightSideGetStatus(0,uVar4,3,uVar3 & 0xffff);
+            fn_801F0234();
+            uVar3 = fn_801F0204();
+            if ((int)uVar3 < 0) {
+              uVar3 = 0;
+            }
+            else {
+              uVar3 = fightSideGetStatus(0,uVar4b,3,uVar3 & 0xffff);
+            }
           }
         }
       }
-    }
-    else {
-      uVar3 = 0;
+      else {
+        uVar3 = 0;
+      }
     }
     *(u32 *)(auStack_38 + 0xc) = uVar3;
-    uVar1 = fn_801F02AC(0xe,r3,r5);
-    cVar6 = fightOutPokemonCheckFightOut();
-    if (cVar6 == '\x01') {
-      found = fn_801F02AC(2,uVar1,r5);
-      if (found == 0) {
-        uVar3 = 0;
-      }
-      else {
-        uVar4 = fightSideGetStatus(found,0,5,0);
-        sVar5 = fn_801F0134(uVar1,r5);
-        if (sVar5 == 0) {
+    {
+      u32 uVar1c;
+      u16 uVar4c;
+
+      uVar1c = fn_801F02AC(0xe,r3,r5);
+      cVar6 = fightOutPokemonCheckFightOut();
+      if (cVar6 == '\x01') {
+        found = fn_801F02AC(2,uVar1c,r5);
+        if (found == 0) {
           uVar3 = 0;
         }
         else {
-          fn_801F0234();
-          uVar3 = fn_801F0204();
-          if ((int)uVar3 < 0) {
+          uVar4c = fightSideGetStatus(found,0,5,0);
+          sVar5 = fn_801F0134(uVar1c,r5);
+          if (sVar5 == 0) {
             uVar3 = 0;
           }
           else {
-            uVar3 = fightSideGetStatus(0,uVar4,3,uVar3 & 0xffff);
+            fn_801F0234();
+            uVar3 = fn_801F0204();
+            if ((int)uVar3 < 0) {
+              uVar3 = 0;
+            }
+            else {
+              uVar3 = fightSideGetStatus(0,uVar4c,3,uVar3 & 0xffff);
+            }
           }
         }
       }
-    }
-    else {
-      uVar3 = 0;
+      else {
+        uVar3 = 0;
+      }
     }
     *(u32 *)(auStack_38 + 0x14) = uVar3;
     *(u32 *)(auStack_38 + 0x1c) = 0;
@@ -25110,84 +25152,71 @@ void fn_80266250(void)
     fn_800FF660();
     fn_8011288C(0, 0x5960008);
 }
+#pragma push
+#pragma optimize_for_size off
 /* Address: 0x8025E3B0 | Size: 0x184 | Ghidra import */
 
 int fn_8025E3B0(u32 r3,u32 r4)
 
 {
-    extern u32 _DAT_80478288;
-    extern u32 _DAT_8047828c;
-    extern u32 _DAT_80478290;
-    extern u32 _DAT_80478294;
-    extern u32 _DAT_80478298;
-    extern u32 _DAT_8047829c;
-    extern u32 _DAT_804782a0;
-    extern u32 _DAT_804782a4;
-    extern u32 _DAT_804782a8;
-    extern u32 _DAT_804782ac;
-    extern u32 _DAT_804782b0;
-    extern u32 _DAT_804782b4;
-    extern u32 _DAT_804782b8;
+    extern u8 lbl_80478288[];
     extern u32 lbl_80478DB0;
     extern f32 lbl_8047E680;
 
   u32 uVar1;
   int iVar2;
   int iVar3;
+  u32 *snapshot;
 
-  u8 auStack_58 [4];
-  u32 local_54;
-  u8 auStack_50 [4];
-  u8 auStack_4c [4];
+  u32 view[3];
+  u32 position[3];
+  u32 rotation[3];
+  u32 direction[3];
   u8 auStack_48 [4];
-  u32 local_44;
-  u32 local_40;
-  u32 local_3c;
-  u32 local_38;
-  u32 local_34;
-  u32 local_30;
-  u32 local_2c;
-  u32 local_28;
-  u32 local_24;
-  u32 local_20;
-  u32 local_1c;
-  u32 local_18;
+  u8 auStack_4c [4];
+  u8 auStack_50 [4];
+  f32 local_54;
+  u8 auStack_58 [4];
   
   fadeSet((double)lbl_8047E680,3);
   fadeCheck(1);
-  GSscene_GetCameraDirectionVector(&local_44);
-  GSscene_GetCameraRotationVector(&local_38);
-  GSscene_GetCameraPositionVector(&local_2c);
-  GSscene_GetCameraViewVector(&local_20);
+  GSscene_GetCameraDirectionVector(direction);
+  GSscene_GetCameraRotationVector(rotation);
+  GSscene_GetCameraPositionVector(position);
+  GSscene_GetCameraViewVector(view);
   uVar1 = GScameraGetActiveCamera();
   GScameraGetPerspective(uVar1,&local_54,auStack_50,auStack_4c,auStack_48);
-  _DAT_80478288 = local_44;
-  _DAT_8047828c = local_40;
-  _DAT_80478290 = local_3c;
-  _DAT_80478294 = local_38;
-  _DAT_80478298 = local_34;
-  _DAT_8047829c = local_30;
-  _DAT_804782a0 = local_2c;
-  _DAT_804782a4 = local_28;
-  _DAT_804782a8 = local_24;
-  _DAT_804782ac = local_20;
-  _DAT_804782b0 = local_1c;
-  _DAT_804782b4 = local_18;
-  _DAT_804782b8 = local_54;
+  snapshot = (u32 *)lbl_80478288;
+  snapshot[0] = direction[0];
+  snapshot[1] = direction[1];
+  snapshot[2] = direction[2];
+  snapshot[3] = rotation[0];
+  snapshot[4] = rotation[1];
+  snapshot[5] = rotation[2];
+  snapshot[6] = position[0];
+  snapshot[7] = position[1];
+  snapshot[8] = position[2];
+  snapshot[9] = view[0];
+  snapshot[10] = view[1];
+  snapshot[11] = view[2];
+  ((f32 *)snapshot)[12] = local_54;
   fn_801DAC90();
   iVar2 = fn_80097A38(r3,r4);
-  if (3 < iVar2) {
+  if (iVar2 >= 4) {
     iVar2 = -1;
   }
   pokemonGetStatus(r3,0,0x6e,0);
   fn_801DADC0(1);
-  iVar3 = fn_8025E0B0((int*)auStack_58,r3,(u16*)lbl_80478DB0,1);
+  iVar3 = fn_8025E0B0((int*)auStack_58,r3,(u16*)&lbl_80478DB0,1);
   if (iVar3 == 1) {
     fadeSet((double)lbl_8047E680,2);
-    fn_8025DE54((u32*)auStack_58,(u16*)lbl_80478DB0,1,1,1,0);
+    fn_8025DE54((u32*)auStack_58,(u16*)&lbl_80478DB0,1,1,1,0);
   }
-  return (int)(char)iVar2;
+  return (int)(signed char)iVar2;
 }
+#pragma pop
+#pragma push
+#pragma optimize_for_size off
 /* Address: 0x8025E9BC | Size: 0x390 | Ghidra import */
 void fn_8025E9BC(u32 r3)
 
@@ -25248,7 +25277,8 @@ void fn_8025E9BC(u32 r3)
       fn_80132A38(0x39,sVar5);
       winMsgOpenField(0x3b10,1,0);
     }
-    uVar2 = fn_8011EE10(uVar1);
+    uVar4 = fn_8011EE10(uVar1);
+    uVar2 = uVar4;
     fn_80132A38(0x2f,uVar2);
     winMsgOpenField(0x3b0b,1,0);
     winMsgCloseField(1);
@@ -25310,7 +25340,10 @@ void fn_8025E9BC(u32 r3)
   }
   return;
 }
+#pragma pop
 
+#pragma push
+#pragma optimize_for_size off
 /* Address: 0x8025ED4C | Ghidra import */
 
 void fn_8025ED4C(void)
@@ -25322,9 +25355,9 @@ void fn_8025ED4C(void)
     extern f32 lbl_8047E680;
   BOOL bVar1;
 
-  u32 uVar2;
-  u8 cVar4;
-  int iVar3;
+		  u32 uVar2;
+		  u8 cVar4;
+		  int iVar3;
 
   u8 auStack_18 [16];
   
@@ -25375,11 +25408,11 @@ void fn_8025ED4C(void)
     }
     fadeSet((double)lbl_8047E680,3);
     fadeCheck(1);
-			    fn_801DAC90();
-			    lbl_804782BC[0] = -1;
-			    lbl_8047B668 = 0xffffffff;
-			    lbl_8047B66C = 0xffffffff;
-			    *(u16 *)((u8 *)lbl_804782BC + 4) = 0;
+				    fn_801DAC90();
+						    lbl_804782BC[0] = -1;
+						    lbl_8047B668 = 0xffffffff;
+						    lbl_8047B66C = 0xffffffff;
+				    *(u16 *)((u8 *)lbl_804782BC + 4) = 0;
     lbl_804782BC[2] = 0;
     fn_800FF660();
     fn_8011288C(0,0);
@@ -25387,6 +25420,7 @@ void fn_8025ED4C(void)
   }
   return;
 }
+#pragma pop
 
 /* Address: 0x80264D58 | Size: 0x2E4 | Ghidra import */
 u32 fn_80264D58(u32 r3,u32 r4,u32 r5)
@@ -25396,31 +25430,32 @@ u32 fn_80264D58(u32 r3,u32 r4,u32 r5)
     extern u32 fn_800117BC();
     extern int fn_801F4C14();
     extern int fn_801FE3F8();
-    extern s8 fn_801FFEC8();
+    extern u8 fn_801FFEC8();
     extern u16 fightOutPokemonGetSoubiItemDataId();
     extern int fightOutPokemonCreateFightActionAttackWaza();
     extern int fn_8022B2CC();
-    extern u32 lbl_80478DF8;
+    extern u32 fn_8026503C();
+    extern char lbl_80375CA8[];
+    extern u32 *lbl_80478DF8;
     extern u8 lbl_8047B678;
-    u32 saved_r27 = 0;
+    u32 saved_r27;
   u8 bVar8;
   u32 uVar1;
   u32 uVar2;
   u32 uVar3;
-  s8 cVar9;
+  u8 cVar9;
   u16 uVar7;
   u32 uVar4;
-  int iVar5;
-  int iVar6;
+  u32 iVar5;
+  u32 iVar6;
 
   u16 local_70 [2];
-  u8 auStack_6c [68];
-  u8 local_28;
+  u8 auStack_6c [69];
   
   fightTypeDataBiosGetPtr(r5);
   bVar8 = fightTypeDataBiosGetFightoutPokemonNum();
   fn_801FE3F8(r4,auStack_6c);
-  local_28 = fn_801F18DC(0);
+  auStack_6c[68] = fn_801F18DC(0);
   uVar1 = fightOutPokemonGetPokemonPtr(r4);
   do {
     do {
@@ -25431,7 +25466,7 @@ u32 fn_80264D58(u32 r3,u32 r4,u32 r5)
           menuFightCloseWaza(1);
           return 0;
         }
-        cVar9 = fn_801FFEC8(r4,uVar3 & 0xffff,1,local_70);
+        cVar9 = fn_801FFEC8(r4,(u16)uVar3,1,local_70);
         uVar7 = (int)pokemonGetStatus(uVar1,0,0x7f,uVar3 & 0xffff);
         if (cVar9 != '\0') {
           fn_80132A38(0x11,r4);
@@ -25469,18 +25504,18 @@ u32 fn_80264D58(u32 r3,u32 r4,u32 r5)
         fn_801F000C(0x40);
         winMsgCloseFight(0);
       }
-      uVar4 = (int)pokemonGetStatus(uVar1,0,0x7f,uVar3 & 0xffff);
+      uVar4 = (int)pokemonGetStatus(uVar1,0,0x7f,(u16)uVar3);
       uVar4 = uVar4 & 0xffff;
-    } while (((uVar4 == 0) || (lbl_80478DF8 <= uVar4)) || (uVar4 == 0x165));
+    } while (((uVar4 == 0) || (uVar4 >= *lbl_80478DF8)) || (uVar4 == 0x165));
     lbl_8047B678 = 0;
-    iVar5 = fn_8022B2CC(r4,uVar4,r5,0x8026503c,1,0,0xffffffff);
+    iVar5 = fn_8022B2CC(r4,uVar4,r5,fn_8026503C,1,0,0xffffffff);
     cVar9 = fn_801F18DC(0);
   } while ((((cVar9 == '\x01') && (lbl_8047B678 == '\0')) &&
-           ((1 < bVar8 && (iVar6 = fn_8026503C(r4,uVar4,r5), iVar6 == 0)))) ||
+           ((bVar8 >= 2 && (iVar6 = fn_8026503C(r4,uVar4,r5), iVar6 == 0)))) ||
           (iVar5 == 0));
   uVar1 = fn_801F0134(iVar5,r5);
   menuFightCloseWaza(1);
-  fightOutPokemonCreateFightActionAttackWaza(r4,0,0x13,0,0x80375ca8,uVar4,uVar1,(int)(char)uVar3,0);
+  fightOutPokemonCreateFightActionAttackWaza(r4,0,0x13,0,lbl_80375CA8,uVar4,uVar1,(int)(s8)uVar3,0);
   return 1;
 }
 
@@ -25647,7 +25682,7 @@ void waitTime__Ff(float r3)
 /* Address: 0x80260910 | Size: 0x5AC | Ghidra import (PSQ removed) */
 
 
-u32 fn_80260910(u32 *r3,u32 r4,u32 r5,u32 r6)
+u32 fn_80260910(u32 *r3,int r4,u32 r5,u32 r6)
 
 {
     extern u8 lbl_8027A488[];
@@ -25657,30 +25692,28 @@ u32 fn_80260910(u32 *r3,u32 r4,u32 r5,u32 r6)
     extern f64 lbl_8047E6B8;
     extern f32 lbl_8047E6C0;
     extern f32 lbl_8047E6C4;
-    u32 saved_r29;
+    int saved_r29;
   float fVar1;
   u16 uVar2;
   BOOL bVar3;
   BOOL bVar4;
+  BOOL bVar5;
 
   u32 uVar5;
-  u32 iVar6;
+  int iVar6;
   u32 uVar7;
   u32 uVar8;
   u8 cVar10;
+  s8 cVar13;
   u16 uVar9;
-  u32 uVar11;
+  int uVar11;
   u32 uVar12;
 
-  u64 f29;
   double dVar13;
-  u64 f30;
   double dVar14;
-  u64 f31;
   double dVar15;
-  u8 auStack_28 [16];
-  u8 auStack_18 [16];
-  u8 auStack_8 [8];
+  volatile u32 local_8;
+  volatile u32 local_c;
 
   fn_801DA4E8(*r3,1);
   uVar5 = fn_8011F4F0(r5);
@@ -25719,125 +25752,8 @@ u32 fn_80260910(u32 *r3,u32 r4,u32 r5,u32 r6)
   bVar4 = 0;
   uVar11 = 0;
   uVar12 = 0;
-  do {
-    if (0x239 < uVar12) {
-LAB_0025db60:
-      fadeSet((double)lbl_8047E6C0,5);
-      while (cVar10 = fadeCheck(0), cVar10 != '\0') {
-        if (*(int *)(lbl_8027A488 + r3[2] * 8 + 4) == 0) {
-          uVar5 = *r3;
-        }
-        else {
-          uVar5 = r3[1];
-        }
-        uVar9 = *(u16 *)(lbl_8027A488 + r3[2] * 8);
-        fn_801DB088();
-        fn_801DA94C(uVar5,uVar9,4);
-        _threadSwitch();
-      }
-      if (*(int *)(lbl_8027A488 + r3[2] * 8 + 4) == 0) {
-        uVar5 = *r3;
-      }
-      else {
-        uVar5 = r3[1];
-      }
-      fn_801DA8C4(uVar5,*(u16 *)(lbl_8027A488 + r3[2] * 8),4);
-      dVar15 = lbl_8047E6B8;
-      dVar14 = (double)lbl_8047E6B4;
-      fVar1 = lbl_8047E6B0;
-      while (dVar13 = (double)fVar1, dVar13 < dVar14) {
-        _threadSwitch();
-        uVar5 = fn_800D3088();
-        fVar1 = (float)(dVar13 + (double)(float)((double)(((u64)(0x43300000) << 32) | (u32)(uVar5)) - dVar15));
-      }
-      if (bVar4) {
-        winMsgCloseField(1);
-        soundStop(0x3d4,0x32);
-          iVar6 = 0;
-        if ((*(u32 *)lbl_8027A4B0 < uVar12) && (iVar6 = 1, *(u32 *)(lbl_8027A4B0 + 8) < uVar12)) {
-          iVar6 = 2;
-        }
-        fn_802606D8(r3,*(u32 *)(lbl_8027A4B0 + iVar6 * 8 + 4),0,8);
-        if (r5 == 0) {
-          iVar6 = 0;
-        }
-        else {
-          cVar10 = pokemonCheckValid(r5);
-          if (cVar10 == '\0') {
-            iVar6 = 0;
-          }
-          else {
-            fn_8011F5C8(r5);
-            iVar6 = fn_8011E778();
-          }
-        }
-        if (iVar6 == 0) {
-          uVar9 = 0;
-        }
-        else {
-          uVar9 = fn_8011E15C();
-          fn_80166A28(uVar9);
-        }
-        while (iVar6 = fn_801666BC(uVar9), iVar6 == 2) {
-          _threadSwitch();
-        }
-        uVar5 = fn_8011F4F0(r5);
-        fn_80132A38(0x32,uVar5);
-        winMsgOpenField(0x43ff,1,0);
-        winMsgCloseField(1);
-        fadeSet((double)lbl_8047E6C0,3);
-        fadeCheck(1);
-        uVar5 = 0;
-      }
-      else {
-        fn_801DA4E8(*r3,0);
-        fn_801DA4E8(r3[1],1);
-        fn_802606D8(r3,1,0,8);
-        winMsgCloseField(1);
-        soundStop(0x3d4,0x32);
-        if (r6 == 0) {
-          iVar6 = 0;
-        }
-        else {
-          cVar10 = pokemonCheckValid(r6);
-          if (cVar10 == '\0') {
-            iVar6 = 0;
-          }
-          else {
-            fn_8011F5C8(r6);
-            iVar6 = fn_8011E778();
-          }
-        }
-        if (iVar6 == 0) {
-          uVar9 = 0;
-        }
-        else {
-          uVar9 = fn_8011E15C();
-          fn_80166A28(uVar9);
-        }
-        while (iVar6 = fn_801666BC(uVar9), iVar6 == 2) {
-          _threadSwitch();
-        }
-        uVar5 = fn_8011F4F0(r5);
-        fn_80132A38(0x32,uVar5);
-        uVar9 = fn_8011F5C8(r6);
-        fn_80132A38(0x4e,uVar9);
-        fn_80132A38(0x5d,0x3d2);
-        winMsgOpenField(0x4400,1,0);
-        winMsgCloseField(1);
-        dVar14 = lbl_8047E6B8;
-        dVar15 = (double)lbl_8047E6C4;
-        fVar1 = lbl_8047E6B0;
-        while (dVar13 = (double)fVar1, dVar13 < dVar15) {
-          _threadSwitch();
-          uVar5 = fn_800D3088();
-          fVar1 = (float)(dVar13 + (double)(float)((double)(((u64)(0x43300000) << 32) | (u32)(uVar5)) - dVar14));
-        }
-        uVar5 = 1;
-      }
-
-      return uVar5;
-    }
+  goto LAB_0025db58;
+  while (1) {
     if (((r4 != 0) && (0x77 < uVar12)) && (1 < uVar11)) {
       uVar7 = fn_800F7AF0(1);
       uVar8 = fn_800F7BC4(1);
@@ -25855,7 +25771,8 @@ LAB_0025db60:
     uVar2 = *(u16 *)(lbl_8027A488 + r3[2] * 8);
     fn_801DB088();
     uVar7 = fn_801DA94C(uVar5,uVar2,4);
-    if (-1 < (int)-(uVar7 & 0xff)) goto LAB_0025db60;
+    bVar5 = (uVar7 & 0xff) != 0;
+    if (!bVar5) goto LAB_0025db60;
     if (uVar11 == 1) {
       iVar6 = fn_801666BC(0x3d3);
       if (iVar6 != 2) {
@@ -25879,7 +25796,130 @@ LAB_0025db60:
     _threadSwitch();
     iVar6 = fn_800D3088();
     uVar12 = uVar12 + iVar6;
-  } while (1);
+LAB_0025db58:
+    if (uVar12 >= 0x23a) break;
+  }
+
+LAB_0025db60:
+  fadeSet((double)lbl_8047E6C0,5);
+  while (cVar13 = fadeCheck(0), cVar13 != '\0') {
+    if (*(int *)(lbl_8027A488 + r3[2] * 8 + 4) == 0) {
+      uVar5 = *r3;
+    }
+    else {
+      uVar5 = r3[1];
+    }
+    uVar9 = *(u16 *)(lbl_8027A488 + r3[2] * 8);
+    fn_801DB088();
+    fn_801DA94C(uVar5,uVar9,4);
+    _threadSwitch();
+  }
+  if (*(int *)(lbl_8027A488 + r3[2] * 8 + 4) == 0) {
+    uVar5 = *r3;
+  }
+  else {
+    uVar5 = r3[1];
+  }
+  fn_801DA8C4(uVar5,*(u16 *)(lbl_8027A488 + r3[2] * 8),4);
+  dVar15 = lbl_8047E6B8;
+  dVar14 = (double)lbl_8047E6B4;
+  fVar1 = lbl_8047E6B0;
+  while (dVar13 = (double)fVar1, dVar13 < dVar14) {
+    _threadSwitch();
+    uVar5 = fn_800D3088();
+    local_8 = 0x43300000;
+    local_c = uVar5;
+    fVar1 = (float)(dVar13 + (double)(float)(*(double *)&local_8 - dVar15));
+  }
+  if (bVar4) {
+    winMsgCloseField(1);
+    soundStop(0x3d4,0x32);
+      iVar6 = 0;
+    if ((*(u32 *)lbl_8027A4B0 < uVar12) && (iVar6 = 1, *(u32 *)(lbl_8027A4B0 + 8) < uVar12)) {
+      iVar6 = 2;
+    }
+    fn_802606D8(r3,*(u32 *)(lbl_8027A4B0 + iVar6 * 8 + 4),0,8);
+    if (r5 == 0) {
+      iVar6 = 0;
+    }
+    else {
+      cVar10 = pokemonCheckValid(r5);
+      if (cVar10 == '\0') {
+        iVar6 = 0;
+      }
+      else {
+        fn_8011F5C8(r5);
+        iVar6 = fn_8011E778();
+      }
+    }
+    if (iVar6 == 0) {
+      uVar9 = 0;
+    }
+    else {
+      uVar9 = fn_8011E15C();
+      fn_80166A28(uVar9);
+    }
+    while (iVar6 = fn_801666BC(uVar9), iVar6 == 2) {
+      _threadSwitch();
+    }
+    uVar5 = fn_8011F4F0(r5);
+    fn_80132A38(0x32,uVar5);
+    winMsgOpenField(0x43ff,1,0);
+    winMsgCloseField(1);
+    fadeSet((double)lbl_8047E6C0,3);
+    fadeCheck(1);
+    uVar5 = 0;
+  }
+  else {
+    fn_801DA4E8(*r3,0);
+    fn_801DA4E8(r3[1],1);
+    fn_802606D8(r3,1,0,8);
+    winMsgCloseField(1);
+    soundStop(0x3d4,0x32);
+    if (r6 == 0) {
+      iVar6 = 0;
+    }
+    else {
+      cVar10 = pokemonCheckValid(r6);
+      if (cVar10 == '\0') {
+        iVar6 = 0;
+      }
+      else {
+        fn_8011F5C8(r6);
+        iVar6 = fn_8011E778();
+      }
+    }
+    if (iVar6 == 0) {
+      uVar9 = 0;
+    }
+    else {
+      uVar9 = fn_8011E15C();
+      fn_80166A28(uVar9);
+    }
+    while (iVar6 = fn_801666BC(uVar9), iVar6 == 2) {
+      _threadSwitch();
+    }
+    uVar5 = fn_8011F4F0(r5);
+    fn_80132A38(0x32,uVar5);
+    uVar9 = fn_8011F5C8(r6);
+    fn_80132A38(0x4e,uVar9);
+    fn_80132A38(0x5d,0x3d2);
+    winMsgOpenField(0x4400,1,0);
+    winMsgCloseField(1);
+    dVar14 = lbl_8047E6B8;
+    dVar15 = (double)lbl_8047E6C4;
+    fVar1 = lbl_8047E6B0;
+    while (dVar13 = (double)fVar1, dVar13 < dVar15) {
+      _threadSwitch();
+      uVar5 = fn_800D3088();
+      local_8 = 0x43300000;
+      local_c = uVar5;
+      fVar1 = (float)(dVar13 + (double)(float)(*(double *)&local_8 - dVar14));
+    }
+    uVar5 = 1;
+  }
+
+  return uVar5;
 }
 
 /* Address: 0x80264488 | Size: 0x654 | Ghidra import (PSQ removed) */
@@ -26005,7 +26045,7 @@ LAB_0026160c:
     uVar9 = fn_80018F88(1,local_70,r3);
     fn_801EFFC4(10);
     uVar7 = fn_80019064();
-    if (((uVar9 & 0xffff) != 0) && (cVar6 = fn_80142CF4(0,uVar9,2,0), cVar6 == '\x02')) {
+    if (((uVar9 & 0xffff) != 0) && (cVar6 = itemGetStatus(0,uVar9,2,0), cVar6 == '\x02')) {
       for (uVar10 = 0; (uVar10 & 0xffff) < 2; uVar10 = uVar10 + 1) {
         iVar1 = fn_801FB1C0(r3,0,0x46,uVar10);
         if ((iVar1 != 0) && (iVar3 = (int)pokemonGetStatus(iVar1,0,0xee,0), iVar3 != 0)) {
@@ -26062,9 +26102,9 @@ LAB_0026160c:
                                                          dVar11)));
     fn_801EFFC4(10);
     if ((uVar9 & 0xffff) != 0) {
-      cVar6 = fn_80142CF4(0,uVar9,2,0);
+      cVar6 = itemGetStatus(0,uVar9,2,0);
       if (cVar6 == '\x01') goto code_r0x002619ac;
-      cVar6 = fn_80142CF4(0,uVar9,2,0);
+      cVar6 = itemGetStatus(0,uVar9,2,0);
       if (cVar6 == '\x02') {
         fn_8022FF90();
         for (uVar10 = 0; (uVar10 & 0xffff) < 2; uVar10 = uVar10 + 1) {
@@ -26113,7 +26153,7 @@ void fn_80265DB0(ColosseumBattleTimerState *r3)
   while (r3->elapsed < scale * r3->limit) {
     _threadSwitch();
     ticks = fn_800D3088();
-	    r3->elapsed = (f32)ticks + r3->elapsed;
+    r3->elapsed = (f32)ticks + r3->elapsed;
   }
   r3->done = 1;
   do {
