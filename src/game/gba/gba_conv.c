@@ -304,7 +304,7 @@ void fn_80083CFC(void) {
 
 /* 0x80083D30 | size: 0x19C */
 void fn_80083D30(void) {
-    extern void fn_8011F228();
+    extern void pokemonBiosGetPokemonWazaDataId();
     extern void heroBiosGetPokemonPtr();
     extern void fn_80135938();
     u8 sp[0x170];
@@ -333,7 +333,7 @@ void fn_80083D30(void) {
         do {
             r3 = r29;
             r4 = r30 & 0xFFFF;
-            fn_8011F228();
+            pokemonBiosGetPokemonWazaDataId();
             ((void(*)(void))wazaDataBiosGetPtr)();
             r26 = r3;
             r3 = r28;

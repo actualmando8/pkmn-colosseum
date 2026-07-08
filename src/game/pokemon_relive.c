@@ -59,9 +59,9 @@ u32  __GBATransfer(int r3, u32 r4, u32 r5, u32 r6);
 extern void DSPInit();
 extern void fn_800E01F4();
 extern int  _fadeEffectGetRandom__FUl();
-extern u32  fn_8011F520();
-extern u32  fn_8011F5B0();
-extern u16  fn_8011F5C8();
+extern u32  pokemonBiosGetCatchTrainerRnd();
+extern u32  pokemonBiosGetRnd();
+extern u16  pokemonBiosGetPokemonDataId();
 extern u32  savedataGetStatus();
 extern int  fadeCheck();
 extern int  fadeSet();
@@ -280,7 +280,7 @@ u32 fn_8025DF38(int *r3,u32 r4,u16 *r5,int r6)
 u32 loadSequence(int *r3,u32 r4,u16 *r5,int r6)
 
 {
-    extern u32 fn_8011F5B0();
+    extern u32 pokemonBiosGetRnd();
   u32 uVar1;
   u32 uVar2;
   u16 sVar4;
@@ -299,7 +299,7 @@ u32 loadSequence(int *r3,u32 r4,u16 *r5,int r6)
       uVar1 = 0;
     }
     else {
-      uVar1 = fn_8011F5B0(r4);
+      uVar1 = pokemonBiosGetRnd(r4);
       uVar2 = (int)pokemonGetStatus(r4,0,0xc1,0);
       uVar2 = (-uVar2 | uVar2) >> 0x1f;
       iResult = fn_801DE190(sVar6,uVar1,uVar2);
@@ -460,8 +460,8 @@ u32 _expRecover__FP7PokemonUl(u32 r3,int r4)
     extern int winMsgCloseLevelUpStatus();
     extern int winMsgOpenLevelUpStatus();
     extern int winMsgOpenField();
-    extern int fn_8011DE98();
-    extern u32 fn_8011F4A8();
+    extern int pokemonBiosSetExp();
+    extern u32 pokemonBiosGetLevel();
     extern int pokemonGetFriendFormPokemonFriendFilterId();
     extern u32 pokemonGetLevelToExp();
     extern u32 pokemonGetSoubiItemSoubiDataId();
@@ -505,11 +505,11 @@ u32 _expRecover__FP7PokemonUl(u32 r3,int r4)
     if ((u32)(iVar1 + r4) >= uVar2) {
       r4 = (iVar1 + r4) - uVar2;
       uVar13 = 1;
-      fn_8011DE98(r3,uVar2);
+      pokemonBiosSetExp(r3,uVar2);
       pokemonResetBasisStatus(r3);
       uVar3 = pokemonGetSoubiItemSoubiDataId(r3);
       pokemonGetFriendFormPokemonFriendFilterId(r3,uVar3,0);
-      uVar2 = fn_8011F4A8(r3);
+      uVar2 = pokemonBiosGetLevel(r3);
       fn_80165668(0x4ca,0,0xff);
       msgctrlSetValue(0x2f,uVar2 & 0xff);
       winMsgOpenField(0x44ce,1,0);
@@ -556,7 +556,7 @@ void preReliveMain(void)
     extern int fn_800FF730();
     extern int winMsgCloseField();
     extern int fn_8011288C();
-    extern int fn_8011EE40();
+    extern int pokemonBiosGetDarkpokemonDataId();
     extern s8 heroItemCheckHaveItemDataId();
     extern u32 heroGetStatus();
     extern int fadeCheck();
@@ -591,7 +591,7 @@ void preReliveMain(void)
       if (cVar7 != '\0') {
         cVar7 = pokemonIsDarkPokemon(uVar3);
         if (cVar7 == '\x01') {
-          fn_8011EE40(uVar3);
+          pokemonBiosGetDarkpokemonDataId(uVar3);
           cVar7 = fn_801EEC74();
           if (cVar7 == '\0') {
             sVar6 = sVar6 + 1;
@@ -793,13 +793,13 @@ void reliveCeremonyAll(u32 r3)
 {
     extern s8 fn_8001E184();
     extern int fn_80029660();
-    extern int fn_8011D904();
-    extern int fn_8011DE68();
-    extern u16 fn_8011EDF8();
-    extern u32 fn_8011EE10();
-    extern u16 fn_8011EE58();
-    extern u16 fn_8011F228();
-    extern u32 fn_8011F4F0();
+    extern int pokemonBiosSetFriend();
+    extern int pokemonBiosSetPoolFriend();
+    extern u16 pokemonBiosGetPoolFriend();
+    extern u32 pokemonBiosGetPoolExp();
+    extern u16 pokemonBiosGetFriend();
+    extern u16 pokemonBiosGetPokemonWazaDataId();
+    extern u32 pokemonBiosGetNicknamePtr();
     extern int pokemonSetDp();
     extern u8 fn_80121ADC();
     extern int fn_80121B4C();
@@ -832,7 +832,7 @@ void reliveCeremonyAll(u32 r3)
   uVar8 = pokemonCheckValid();
   if (uVar8 == 1) {
     pokemonGetStatus(uVar1,0,0x6e,0);
-    uVar2 = fn_8011EE40(uVar1);
+    uVar2 = pokemonBiosGetDarkpokemonDataId(uVar1);
     fn_801EECD8(uVar2,1);
     uVar8 = fn_80121ADC(uVar1,0x3e);
     if (uVar8 != 0) {
@@ -840,22 +840,22 @@ void reliveCeremonyAll(u32 r3)
     }
     pokemonSetDp((double)lbl_8047E688,uVar1);
     fn_80165668(0x3f7,0,0xff);
-    sVar5 = fn_8011F228(uVar1,0);
+    sVar5 = pokemonBiosGetPokemonWazaDataId(uVar1,0);
     if (sVar5 != 0) {
-      uVar2 = fn_8011F4F0(uVar1);
+      uVar2 = pokemonBiosGetNicknamePtr(uVar1);
       msgctrlSetValue(0x32,uVar2);
       msgctrlSetValue(0x39,sVar5);
       winMsgOpenField(0x3b10,1,0);
     }
-    uVar4 = fn_8011EE10(uVar1);
+    uVar4 = pokemonBiosGetPoolExp(uVar1);
     uVar2 = uVar4;
     msgctrlSetValue(0x2f,uVar2);
     winMsgOpenField(0x3b0b,1,0);
     winMsgCloseField(1);
-    sVar7 = fn_8011EE58(uVar1);
-    sVar6 = fn_8011EDF8(uVar1);
-    fn_8011D904(uVar1,(u16)((sVar6 + sVar7) + 0x46));
-    fn_8011DE68(uVar1,0);
+    sVar7 = pokemonBiosGetFriend(uVar1);
+    sVar6 = pokemonBiosGetPoolFriend(uVar1);
+    pokemonBiosSetFriend(uVar1,(u16)((sVar6 + sVar7) + 0x46));
+    pokemonBiosSetPoolFriend(uVar1,0);
     iVar3 = _expRecover__FP7PokemonUl(uVar1,uVar2);
     if (iVar3 == 1) {
       uVar4 = pokemonEvolutionCheck(uVar1,0,0,local_28,auStack_18);
@@ -871,11 +871,11 @@ void reliveCeremonyAll(u32 r3)
             fadeSet((double)lbl_8047E680,2);
             fn_8025DE54((u32*)auStack_1c,(u16*)&lbl_80478DB0,1,1,1,0);
           }
-          uVar2 = fn_8011F4F0(uVar1);
+          uVar2 = pokemonBiosGetNicknamePtr(uVar1);
           msgctrlSetValue(0x32,uVar2);
         }
         else {
-          uVar2 = fn_8011F4F0(uVar1);
+          uVar2 = pokemonBiosGetNicknamePtr(uVar1);
           msgctrlSetValue(0x32,uVar2);
           fn_801DADC0(1);
           iVar3 = loadSequence((int*)auStack_20,uVar1,(u16*)&lbl_80478DB0,1);

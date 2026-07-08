@@ -59,9 +59,9 @@ u32  __GBATransfer(int r3, u32 r4, u32 r5, u32 r6);
 extern void DSPInit();
 extern void fn_800E01F4();
 extern int  _fadeEffectGetRandom__FUl();
-extern u32  fn_8011F520();
-extern u32  fn_8011F5B0();
-extern u16  fn_8011F5C8();
+extern u32  pokemonBiosGetCatchTrainerRnd();
+extern u32  pokemonBiosGetRnd();
+extern u16  pokemonBiosGetPokemonDataId();
 extern u32  savedataGetStatus();
 extern int  fadeCheck();
 extern int  fadeSet();
@@ -85,10 +85,10 @@ u32 fightMenuFightTrainerGcHeroOpenMenu(void* ctx, u32 param1, u32 param2);
 u32 exribbonSetEarthRibbon(u32 r3)
 
 {
-    extern int fn_8011D5D4();
+    extern int pokemonBiosSetEarthRibbon();
   int iVar1;
   
-  fn_8011D5D4(r3,1);
+  pokemonBiosSetEarthRibbon(r3,1);
   iVar1 = savedataGetStatus(0,0x10);
   if (*(char *)(iVar1 + 5) == '\0') {
     *(u8 *)(iVar1 + 5) = 0x2d;
@@ -101,10 +101,10 @@ u32 exribbonSetEarthRibbon(u32 r3)
 u32 exribbonSetNarionalRibbon(u32 r3)
 
 {
-    extern int fn_8011D5F8();
+    extern int pokemonBiosSetNationalRibbon();
   int iVar1;
   
-  fn_8011D5F8(r3,1);
+  pokemonBiosSetNationalRibbon(r3,1);
   iVar1 = savedataGetStatus(0,0x10);
   if (*(char *)(iVar1 + 4) == '\0') {
     *(u8 *)(iVar1 + 4) = 0x2c;
@@ -118,8 +118,8 @@ void fn_80265F94(int r3)
 
 {
     extern s8 winMsgCheck();
-    extern u16 fn_8011E15C();
-    extern int fn_8011E778();
+    extern u16 pokemonDataBiosGetVoice();
+    extern int pokemonDataBiosGetPtr();
     extern int fn_801666BC();
     extern int fn_80166A28();
     extern u16 lbl_8047E6F8;
@@ -154,12 +154,12 @@ void fn_80265F94(int r3)
     }
     _threadSwitch();
   }
-  iVar4 = fn_8011E778(0xfa);
+  iVar4 = pokemonDataBiosGetPtr(0xfa);
   if (iVar4 == 0) {
     uVar8 = 0;
   }
   else {
-    uVar8 = fn_8011E15C();
+    uVar8 = pokemonDataBiosGetVoice();
     fn_80166A28(uVar8);
   }
   while (iVar4 = fn_801666BC(uVar8), iVar4 == 2) {

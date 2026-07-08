@@ -3320,8 +3320,8 @@ u8 fn_801F4C14(u32 p1, u16 p2, u32 p3, u16 p4, u32 p5) {
     extern u32 fightOutPokemonCheckValid(u32);
     extern void msgctrlSetValue(u32, u32);
     extern u32 fightOutPokemonGetTokuseiDataId(u32);
-    extern u32 fn_8011CB6C(u16);
-    extern void fn_8011CB54(void);
+    extern u32 pokemonTokuseiDataBiosGetPtr(u16);
+    extern void pokemonTokuseiDataBiosGetName(void);
     extern u32 fn_800FA280(void);
     extern void fightFloorBiosSetAttackPokemonPtr(u32, u32);
     extern u32 fightFloorBiosGetAttackPokemonPtr(u32);
@@ -3421,8 +3421,8 @@ u8 fn_801F4C14(u32 p1, u16 p2, u32 p3, u16 p4, u32 p5) {
                 {
                     u32 _v;
                     _v = fightOutPokemonGetTokuseiDataId(p5);
-                    _v = fn_8011CB6C((u16)_v);
-                    fn_8011CB54();
+                    _v = pokemonTokuseiDataBiosGetPtr((u16)_v);
+                    pokemonTokuseiDataBiosGetName();
                     _v = fn_800FA280();
                     msgctrlSetValue(0x1a, _v);
                 }
@@ -3485,8 +3485,8 @@ u8 fn_801F4C14(u32 p1, u16 p2, u32 p3, u16 p4, u32 p5) {
                 {
                     u32 _v;
                     _v = fightOutPokemonGetTokuseiDataId(p5);
-                    _v = fn_8011CB6C((u16)_v);
-                    fn_8011CB54();
+                    _v = pokemonTokuseiDataBiosGetPtr((u16)_v);
+                    pokemonTokuseiDataBiosGetName();
                     _v = fn_800FA280();
                     msgctrlSetValue(0x1b, _v);
                 }
@@ -3533,8 +3533,8 @@ u8 fn_801F4C14(u32 p1, u16 p2, u32 p3, u16 p4, u32 p5) {
                 {
                     u32 _v;
                     _v = fightOutPokemonGetTokuseiDataId(p5);
-                    _v = fn_8011CB6C((u16)_v);
-                    fn_8011CB54();
+                    _v = pokemonTokuseiDataBiosGetPtr((u16)_v);
+                    pokemonTokuseiDataBiosGetName();
                     _v = fn_800FA280();
                     msgctrlSetValue(0x1d, _v);
                 }
@@ -3569,8 +3569,8 @@ u8 fn_801F4C14(u32 p1, u16 p2, u32 p3, u16 p4, u32 p5) {
                 {
                     u32 _v;
                     _v = fightOutPokemonGetTokuseiDataId(p5);
-                    _v = fn_8011CB6C((u16)_v);
-                    fn_8011CB54();
+                    _v = pokemonTokuseiDataBiosGetPtr((u16)_v);
+                    pokemonTokuseiDataBiosGetName();
                     _v = fn_800FA280();
                     msgctrlSetValue(0x1c, _v);
                 }
@@ -3620,8 +3620,8 @@ u8 fn_801F4C14(u32 p1, u16 p2, u32 p3, u16 p4, u32 p5) {
         fightFloorBiosSetAppointItemDataId(p1, (u16)p5);
         break;
     case 0x57:
-        fn_8011CB6C((u16)p5);
-        fn_8011CB54();
+        pokemonTokuseiDataBiosGetPtr((u16)p5);
+        pokemonTokuseiDataBiosGetName();
         msgctrlSetValue(0x1c, fn_800FA280());
         fightFloorBiosSetAppointTokuseiDataId(p1, (u16)p5);
         break;

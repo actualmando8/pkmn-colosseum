@@ -251,13 +251,13 @@ void fn_80069C0C(void* arg0) {
     extern void fn_8006AFC4();
     extern void fn_8006B1C0();
     extern void pokemonGrowDataBiosGetExp();
-    extern void fn_8011CE74();
-    extern void fn_8011DCB4();
-    extern void fn_8011DE98();
-    extern void fn_8011E520();
-    extern void fn_8011E778();
-    extern void fn_8011F4A8();
-    extern void fn_8011F5C8();
+    extern void pokemonGrowDataBiosGetPtr();
+    extern void pokemonBiosSetItemDataId();
+    extern void pokemonBiosSetExp();
+    extern void pokemonDataBiosGetGrowDataId();
+    extern void pokemonDataBiosGetPtr();
+    extern void pokemonBiosGetLevel();
+    extern void pokemonBiosGetPokemonDataId();
     extern void pokemonCheckValid();
     extern void pokemonResetBasisStatus();
     extern void heroBiosSetNamePtr();
@@ -646,7 +646,7 @@ void fn_80069C0C(void* arg0) {
                     r3 = r31 + 0x16b0;
                     heroBiosGetPokemonPtr();
                     r4 = 0x0;
-                    fn_8011DCB4();
+                    pokemonBiosSetItemDataId();
                     r25 = r25 + 0x1;
 
 
@@ -659,7 +659,7 @@ void fn_80069C0C(void* arg0) {
                     r3 = r31 + 0x21c8;
                     heroBiosGetPokemonPtr();
                     r4 = 0x0;
-                    fn_8011DCB4();
+                    pokemonBiosSetItemDataId();
                     r25 = r25 + 0x1;
 
 
@@ -705,7 +705,7 @@ void fn_80069C0C(void* arg0) {
                     r3 = (u32)sp + 0x88;
                     heroBiosGetPokemonPtr();
                     r4 = 0x0;
-                    fn_8011DCB4();
+                    pokemonBiosSetItemDataId();
                     r25 = r25 + 0x1;
 
 
@@ -786,11 +786,11 @@ void fn_80069C0C(void* arg0) {
                 r0 = r3 & 0xFF;
                 if (r0 != (u32)0x0) {
                     r3 = r25;
-                    fn_8011F4A8();
+                    pokemonBiosGetLevel();
                     r0 = r3 & 0xFF;
                     if ((s32)r27 < (s32)r0) {
                         r3 = r25;
-                        fn_8011F4A8();
+                        pokemonBiosGetLevel();
                         r27 = r3 & 0xFF;
                 }
                 }
@@ -810,19 +810,19 @@ void fn_80069C0C(void* arg0) {
                 r0 = r3 & 0xFF;
                 if (r0 != (u32)0x0) {
                     r3 = r25;
-                    fn_8011F4A8();
+                    pokemonBiosGetLevel();
                     r0 = r3 & 0xFF;
                     if (r27 > r0) {
                         r3 = r25;
-                        fn_8011F5C8();
-                        fn_8011E778();
-                        fn_8011E520();
-                        fn_8011CE74();
+                        pokemonBiosGetPokemonDataId();
+                        pokemonDataBiosGetPtr();
+                        pokemonDataBiosGetGrowDataId();
+                        pokemonGrowDataBiosGetPtr();
                         r4 = r27 & 0xFF;
                         pokemonGrowDataBiosGetExp();
                         r4 = r3;
                         r3 = r25;
-                        fn_8011DE98();
+                        pokemonBiosSetExp();
                         r3 = r25;
                         pokemonResetBasisStatus();
                 }
@@ -3561,8 +3561,8 @@ void fn_8006C7D4(void) {
 /* 0x8006CCC0 | size: 0x890 */
 void fn_8006CCC0(void) {
     extern void fn_8010B718();
-    extern void fn_8011E8DC();
-    extern void fn_8011F4F0();
+    extern void pokemonBiosGetTamagoFlag();
+    extern void pokemonBiosGetNicknamePtr();
     extern void pokemonCheckValid();
     extern void pokemonGetStatus();
     extern void heroBiosGetPokemonPtr();
@@ -4031,7 +4031,7 @@ void fn_8006CCC0(void) {
 
     } else {
     r3 = r28;
-    fn_8011E8DC();
+    pokemonBiosGetTamagoFlag();
     r27 = r3;
     }
     }
@@ -4071,7 +4071,7 @@ void fn_8006CCC0(void) {
         }
         if (r28 == (u32)0x0) return;
         r3 = r28;
-        fn_8011F4F0();
+        pokemonBiosGetNicknamePtr();
         if (r3 != (u32)0x0) {
             r0 = *(u16*)((u8*)r3 + 0x0);
             if (r0 != (u32)0x0) {
@@ -4662,7 +4662,7 @@ void fn_8006DC28(void) {
     extern void fn_80070D84();
     extern void winSpriteSetDisp();
     extern void fn_8010B01C();
-    extern void fn_8011F1A0();
+    extern void pokemonBiosGetItemDataId();
     extern void pokemonIsDarkPokemon();
     extern void pokemonCheckValid();
     extern void heroBiosGetPokemonPtr();
@@ -4915,7 +4915,7 @@ void fn_8006DC28(void) {
             if (r0 == (u32)0x0) break;
 
             r3 = r22;
-            fn_8011F1A0();
+            pokemonBiosGetItemDataId();
             r24 = 0x0;
             r25 = r3;
             ((void(*)(void))menuCBRule_CheckValidItem)();

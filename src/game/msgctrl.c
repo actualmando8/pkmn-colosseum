@@ -209,15 +209,15 @@ void msgctrlMenuFullDigit(void) {
 #endif
 
 
-/* 0x801317FC | 0x28 -- calls fn_8011E778(lbl_8047AE90) then fn_8011E760 */
+/* 0x801317FC | 0x28 -- calls pokemonDataBiosGetPtr(lbl_8047AE90) then pokemonDataBiosGetName */
 #if 0
 asm void msgctrlPokemonID(void) {
 #include "src/game/effect/effect_util_fn_801317FC.inc"
 }
 #else
 void msgctrlPokemonID(void) {
-    fn_8011E778(lbl_8047AE90);
-    fn_8011E760();
+    pokemonDataBiosGetPtr(lbl_8047AE90);
+    pokemonDataBiosGetName();
 }
 #endif
 

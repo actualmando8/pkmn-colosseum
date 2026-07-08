@@ -1971,9 +1971,9 @@ void menuSubOpenSelect(void) {
 #endif
 
 /* 0x8001D994 | 0xCC */
-extern u32 fn_8011F5C8();
-extern u32 fn_8011E778();
-extern void fn_8011E760(void);
+extern u32 pokemonBiosGetPokemonDataId();
+extern u32 pokemonDataBiosGetPtr();
+extern void pokemonDataBiosGetName(void);
 extern u32 fn_800FA280();
 extern void fn_800F9EE4(void);
 extern void pokemonGetSex(void);
@@ -1985,9 +1985,9 @@ asm void fn_8001D994(void) {
 void fn_8001D994(void) {
     extern void fn_800F9EE4();
     extern u32 fn_800FA280();
-    extern void fn_8011E760();
-    extern u32 fn_8011E778();
-    extern u32 fn_8011F5C8();
+    extern void pokemonDataBiosGetName();
+    extern u32 pokemonDataBiosGetPtr();
+    extern u32 pokemonBiosGetPokemonDataId();
     extern void pokemonGetSex();
     extern void pokemonCheckValid();
     extern void pokemonGetStatus();
@@ -2008,7 +2008,7 @@ void fn_8001D994(void) {
         return;
     }
     r3 = r30;
-    fn_8011F5C8();
+    pokemonBiosGetPokemonDataId();
     tmp = r3 & 0xFFFF;
 
     do {
@@ -2020,9 +2020,9 @@ void fn_8001D994(void) {
         r6 = 0x0;
         pokemonGetStatus();
         r3 = r3 & 0xFFFF;
-        fn_8011E778();
+        pokemonDataBiosGetPtr();
         if (r3 == 0) break;
-        fn_8011E760();
+        pokemonDataBiosGetName();
         fn_800FA280();
         tmp = r3;
         r3 = r30;
@@ -5792,13 +5792,13 @@ u32 fn_80019D5C(u32 a, u32 b) {
 extern s32 windowGetParam(s32, s32);
 extern u32 itemDataBiosGetWazaMachineNo();
 extern u32 pokemonIsDarkPokemon();
-extern u32 fn_8011E2AC();
+extern u32 pokemonDataBiosGetWazaMcn();
 extern void fn_800FBB34();
 extern void fn_8010B9E8();
 extern u32 fn_80107E78();
 extern void fn_801081F8();
 extern void windowDrawSprite2();
-extern u32 fn_8011E778();
+extern u32 pokemonDataBiosGetPtr();
 extern void fn_8001DACC();
 extern u32 GSmsgGetRect(u32 a);
 extern u32 fn_800FA280();
@@ -5910,7 +5910,7 @@ void menuPokemonDrawItem(u8* ctx, u8* pane) {
                 }
                 if ((u8)pokemonIsDarkPokemon(mon) != 0) {
                     msg = 0x2B65;
-                } else if ((u8)fn_8011E2AC(fn_8011E778(fn_8011F5C8(mon)), value) != 0) {
+                } else if ((u8)pokemonDataBiosGetWazaMcn(pokemonDataBiosGetPtr(pokemonBiosGetPokemonDataId(mon)), value) != 0) {
                     msg = 0x2B64;
                 } else {
                     msg = 0x2B65;
@@ -7069,12 +7069,12 @@ asm void menuSubGetPokemonSexForDisp(void) {
 #pragma optimization_level 4
 s32 menuSubGetPokemonSexForDisp(void* a) {
     extern u8 pokemonCheckValid();
-    extern u32 fn_8011F5C8();
+    extern u32 pokemonBiosGetPokemonDataId();
     extern u32 pokemonGetSex();
     u32 r3;
     r3 = pokemonCheckValid();
     if ((r3 & 0xFF) == 0) return (s32)0xFF;
-    r3 = fn_8011F5C8(a);
+    r3 = pokemonBiosGetPokemonDataId(a);
     if ((r3 & 0xFFFF) == 0x1d || (r3 & 0xFFFF) == 0x20) return 0x2;
     return (s32)pokemonGetSex(a);
 }

@@ -59,9 +59,9 @@ u32  __GBATransfer(int r3, u32 r4, u32 r5, u32 r6);
 extern void DSPInit();
 extern void fn_800E01F4();
 extern int  _fadeEffectGetRandom__FUl();
-extern u32  fn_8011F520();
-extern u32  fn_8011F5B0();
-extern u16  fn_8011F5C8();
+extern u32  pokemonBiosGetCatchTrainerRnd();
+extern u32  pokemonBiosGetRnd();
+extern u16  pokemonBiosGetPokemonDataId();
 extern u32  savedataGetStatus();
 extern int  fadeCheck();
 extern int  fadeSet();
@@ -333,7 +333,7 @@ f32 fn_8025D0A8(void* ctx, u32 param1, u32 param2) {
     extern u32 lbl_80478EAC;
     extern f32 lbl_8047E658;
     extern f32 lbl_8047E65C;
-    extern u16 fn_8011F5C8(void*);
+    extern u16 pokemonBiosGetPokemonDataId(void*);
     extern u8 pokemonCheckValid(void*);
     extern void* savedataGetStatus(u32, u32);
     extern void* heroBiosGetPokemonPtr(void*, u32);
@@ -356,7 +356,7 @@ f32 fn_8025D0A8(void* ctx, u32 param1, u32 param2) {
     for (i = 0; (s32)i < 6; i++) {
         member = heroBiosGetPokemonPtr(party, i & 0xFFFF);
         if (pokemonCheckValid(member) != 0) {
-            species = fn_8011F5C8(member);
+            species = pokemonBiosGetPokemonDataId(member);
             offset = 0;
             while (1) {
                 entry = *(u16*)(lbl_80478EAC + offset);
@@ -388,7 +388,7 @@ void fn_8025D164(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern f32 lbl_8047E65C;
     extern void fn_8006B09C();
     extern void fn_8006B5A8();
-    extern void fn_8011F5C8();
+    extern void pokemonBiosGetPokemonDataId();
     extern void pokemonCheckValid();
     extern void heroBiosGetPokemonPtr();
     u8 sp[0x30];
@@ -427,7 +427,7 @@ void fn_8025D164(void* ctx, u32 param1, u32 param2, u32 param3) {
         r0 = r3 & 0xFF;
         if ((s32)r0 != (s32)0) {
             r3 = r31;
-            fn_8011F5C8();
+            pokemonBiosGetPokemonDataId();
             r4 = lbl_80478EAC;
             r0 = r3 & 0xFFFF;
             r3 = 0x0;

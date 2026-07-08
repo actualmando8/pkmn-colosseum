@@ -2819,7 +2819,7 @@ void fn_80021644(void) {
 
 /* fn_800216E8 - 0x800216E8 | size: 0x1d4 */
 extern void fn_800F96E4(void*, s32, void*);
-extern void* fn_8011F4F0(s32);
+extern void* pokemonBiosGetNicknamePtr(s32);
 extern u8 lbl_80266C7C[];
 #if 0
 asm void fn_800216E8(void) {
@@ -2886,7 +2886,7 @@ void fn_800216E8(void* arg0, s32 arg1, u8* arg2, s16 arg3, s32 arg4) {
         }
     }
 
-    msgctrlSetValue(0x32, (void*)fn_8011F4F0(arg4));
+    msgctrlSetValue(0x32, (void*)pokemonBiosGetNicknamePtr(arg4));
     msgctrlSetValue(0x2F, (void*)(s32)x);
     msgctrlSetValue(0x30, (void*)(s32)y);
     fn_800F96E4(arg0, arg1 + 1, (void*)msg);
@@ -3163,7 +3163,7 @@ s32 fn_80022478(u32 arg0, u32* arg1) {
                 winMsgOpen(2, 0xE0, 1, 0);
                 winMsgClose(1);
             } else {
-                msgctrlSetValue(0x32, (void*)fn_8011F4F0(sc));
+                msgctrlSetValue(0x32, (void*)pokemonBiosGetNicknamePtr(sc));
                 winMsgOpen(2, 0x424D, 1, 0);
                 winMsgClose(1);
                 effect = 0;
@@ -3252,10 +3252,10 @@ extern void itemDataBiosGetPtr(void);
 extern void itemDataBiosGetWazaMachineNo(void);
 extern void itemDataBiosGetWazaIDByWazaMachineNo(void);
 extern void itemDataBiosGetHidenMachineNo(void);
-extern void fn_8011F228(void);
-extern void fn_8011F5C8(s32);
-extern void fn_8011E778(void);
-extern void fn_8011E2AC(void);
+extern void pokemonBiosGetPokemonWazaDataId(void);
+extern void pokemonBiosGetPokemonDataId(s32);
+extern void pokemonDataBiosGetPtr(void);
+extern void pokemonDataBiosGetWazaMcn(void);
 extern void evolutionWazaLearn(void);
 extern void pokemonWazaCreate(void);
 extern void pokemonGetSoubiItemSoubiDataId(void);
@@ -3273,10 +3273,10 @@ s32 fn_80022834(u32 arg0, u32* arg1) {
     extern u32 itemDataBiosGetWazaIDByWazaMachineNo(u32);
     extern u32 itemDataBiosGetHidenMachineNo(void*);
     extern s32 menuSubOpenYesNo(s32, s32, s32, s32);
-    extern u32 fn_8011F228(s32, u32);
-    extern void fn_8011F5C8(s32);
-    extern s32 fn_8011E778(void);
-    extern u8 fn_8011E2AC(s32, s32);
+    extern u32 pokemonBiosGetPokemonWazaDataId(s32, u32);
+    extern void pokemonBiosGetPokemonDataId(s32);
+    extern s32 pokemonDataBiosGetPtr(void);
+    extern u8 pokemonDataBiosGetWazaMcn(s32, s32);
     extern s32 evolutionWazaLearn(s32, u32, void*, s32, void*, s32);
     extern void pokemonWazaCreate(s32, u32, u32);
     extern u32 pokemonGetSoubiItemSoubiDataId(s32);
@@ -3336,20 +3336,20 @@ s32 fn_80022834(u32 arg0, u32* arg1) {
         } else {
             v2 = itemDataBiosGetWazaIDByWazaMachineNo(status);
             for (i = 0; i < 4; i++) {
-                if ((u16)v2 == (u16)fn_8011F228(c, (u16)i)) {
+                if ((u16)v2 == (u16)pokemonBiosGetPokemonWazaDataId(c, (u16)i)) {
                     break;
                 }
             }
             if (i < 4) {
-                msgctrlSetValue(0x32, fn_8011F4F0(c));
+                msgctrlSetValue(0x32, pokemonBiosGetNicknamePtr(c));
                 msgctrlSetValue(0x39, (void*)(u16)v2);
                 winMsgOpen(2, 0x4244, 1, 0);
                 winMsgClose(1);
                 tmp = 0;
             } else {
-                fn_8011F5C8(c);
-                if (fn_8011E2AC(fn_8011E778(), status) == 0) {
-                    msgctrlSetValue(0x32, fn_8011F4F0(c));
+                pokemonBiosGetPokemonDataId(c);
+                if (pokemonDataBiosGetWazaMcn(pokemonDataBiosGetPtr(), status) == 0) {
+                    msgctrlSetValue(0x32, pokemonBiosGetNicknamePtr(c));
                     msgctrlSetValue(0x39, (void*)(u16)v2);
                     winMsgOpen(2, 0x423F, 1, 0);
                     winMsgClose(1);
@@ -3380,7 +3380,7 @@ s32 fn_80022834(u32 arg0, u32* arg1) {
 #endif
 
 /* fn_80022B3C - 0x80022B3C | size: 0x318 */
-extern s32 fn_8011E15C(void);
+extern s32 pokemonDataBiosGetVoice(void);
 extern void fn_80166A28(s32);
 extern s32 fn_801666BC(s32);
 extern void fn_80121B4C(s32, s32);
@@ -3455,7 +3455,7 @@ s32 fn_80022B3C(s32 arg0, s32 arg1) {
     }
     
     /* Play particle sound effects */
-    fn_8011F4F0(spC);
+    pokemonBiosGetNicknamePtr(spC);
     msgctrlSetValue(0x32, (void*)result);
     msgctrlSetValue(0x2D, (void*)temp_r30);
     
@@ -3497,10 +3497,10 @@ s32 fn_80022B3C(s32 arg0, s32 arg1) {
         return 0;
     }
     
-    fn_8011F5C8(temp_r29);
-    fn_8011E778();
+    pokemonBiosGetPokemonDataId(temp_r29);
+    pokemonDataBiosGetPtr();
     
-    result = fn_8011E15C();
+    result = pokemonDataBiosGetVoice();
     if (result == 0) {
         temp_r29 = 0;
     } else {
@@ -3514,7 +3514,7 @@ s32 fn_80022B3C(s32 arg0, s32 arg1) {
     }
     
     /* Update particle state */
-    fn_8011F4F0(spC);
+    pokemonBiosGetNicknamePtr(spC);
     result = fn_80121ADC(spC, 0x3E);
     
     if ((result & 0xFF000000) != 0) {
@@ -3529,7 +3529,7 @@ s32 fn_80022B3C(s32 arg0, s32 arg1) {
     
     if (f1 > f0) {
         pokemonAddDpFormPokemonDpFilterId(spC, temp_r30 & 0xFFFF, 4);
-        fn_8011F4F0(spC);
+        pokemonBiosGetNicknamePtr(spC);
         result = fn_80121ADC(spC, 0x3E);
         
         if ((result & 0xFF000000) != 0) {
@@ -3676,7 +3676,7 @@ s32 fn_80023068(u32 arg0, u32* arg1) {
 
     if (slot >= 0) {
         if (((s8)blocked & 0xFF) != 0) {
-            msgctrlSetValue(0x32, (void*)fn_8011F4F0(sc));
+            msgctrlSetValue(0x32, (void*)pokemonBiosGetNicknamePtr(sc));
             winMsgOpen(2, 0x424D, 1, 0);
             winMsgClose(1);
             effect = 0;
@@ -3750,7 +3750,7 @@ s32 cbForgetWazaSelect__FP7PokemonUsl(s32 r3, s32 r4) {
 /* fn_800232F0 - 0x800232F0 | size: 0x470 */
 extern s32 pokemonGetStatus(u32, s32, s32, s32);
 extern void fn_80165668(void);
-extern void fn_8011F4A8(void);
+extern void pokemonBiosGetLevel(void);
 extern void winMsgOpenLevelUpFiledStatus(void);
 extern void winMsgCloseLevelUpStatus(void);
 extern void pokemonSearchWazaDataId(void);
@@ -3909,7 +3909,7 @@ s32 fn_80023B9C(u32 arg0, u32* arg1) {
             winMsgOpen(2, 0xE0, 1, 0);
             winMsgClose(1);
         } else {
-            msg = fn_8011F4F0(sc);
+            msg = pokemonBiosGetNicknamePtr(sc);
             msgctrlSetValue(0x32, msg);
             winMsgOpen(2, 0x424D, 1, 0);
             winMsgClose(1);

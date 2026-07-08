@@ -167,7 +167,7 @@ void fn_80031188(u8* r3, u8* r4) {
 #endif
 
 /* 0x80031228 | 0x1DC */
-extern void fn_8011E850(void);
+extern void pokemonBiosGetFuseiFlag(void);
 extern void fn_8010B718(void);
 extern void winSpriteSetDisp(void*, s32);
 extern void pokemonCheckValid(void);
@@ -205,7 +205,7 @@ void fn_80031228(u8* arg0, u8* arg1) {
         obj = (void*)heroGetStatus(lbl_803A2688, 3, (u16)arg);
     }
 
-    if (((u8 (*)(void*))fn_8011E850)(obj) != 0) {
+    if (((u8 (*)(void*))pokemonBiosGetFuseiFlag)(obj) != 0) {
         ((void (*)(u8*, u8*, void*))fn_8010B718)(arg0, arg1, obj);
         winSpriteSetDisp(arg1, 1);
     } else if (((u8 (*)(void*))pokemonCheckValid)(obj) != 0 && ((u8 (*)(void))menuCBRule_CheckPokemonEventFlag)() == 1) {
@@ -220,7 +220,7 @@ void fn_80031228(u8* arg0, u8* arg1) {
 
 /* 0x80031404 | 0x244 */
 extern void menuSubGetPokemonSexForDisp(void);
-extern void fn_8011E8DC(void);
+extern void pokemonBiosGetTamagoFlag(void);
 extern void fn_800FA280(void);
 #if 0
 asm void fn_80031404(void) {
@@ -267,7 +267,7 @@ void fn_80031404(u8* arg0, u8* arg1) {
         } else {
             msg = 0;
         }
-        if (((u8 (*)(void*))fn_8011E8DC)(obj) == 1) {
+        if (((u8 (*)(void*))pokemonBiosGetTamagoFlag)(obj) == 1) {
             msg = 0;
         }
         if (msg != 0) {
@@ -286,7 +286,7 @@ void fn_80031404(u8* arg0, u8* arg1) {
 
 /* 0x80031648 | 0x290 */
 extern void GSmsgGetRect(void);
-extern void fn_8011F4F0(void);
+extern void pokemonBiosGetNicknamePtr(void);
 #if 0
 asm void fn_80031648(void) {
 #include "src/game/gs_npc_event_fn_80031648.inc"
@@ -321,14 +321,14 @@ void fn_80031648(u8* arg0, u8* arg1) {
         obj = (void*)heroGetStatus(lbl_803A2688, 3, (u16)arg);
     }
 
-    if (((u8 (*)(void*))fn_8011E850)(obj) != 0) {
+    if (((u8 (*)(void*))pokemonBiosGetFuseiFlag)(obj) != 0) {
         msgctrlSetValue(0x37, ((s32 (*)(s32))fn_800FA280)(0x56C));
     } else if (((u8 (*)(void*))pokemonCheckValid)(obj) != 0 &&
                ((u8 (*)(void*))menuCBRule_CheckPokemonEventFlag)(obj) == 1) {
-        if (((u8 (*)(void*))fn_8011E8DC)(obj) != 0) {
+        if (((u8 (*)(void*))pokemonBiosGetTamagoFlag)(obj) != 0) {
             msgctrlSetValue(0x37, ((s32 (*)(s32))fn_800FA280)(0x56B));
         } else {
-            msgctrlSetValue(0x37, ((s32 (*)(void*))fn_8011F4F0)(obj));
+            msgctrlSetValue(0x37, ((s32 (*)(void*))pokemonBiosGetNicknamePtr)(obj));
         }
     } else {
         winSpriteSetDisp(arg1, 0);
@@ -510,7 +510,7 @@ extern void fn_80109C88(void);
 extern void winMsgClose(s32);
 extern void fn_8002E26C(void);
 extern void fn_8010A420(void);
-extern void fn_8011D904(void);
+extern void pokemonBiosSetFriend(void);
 extern void fn_8025FF9C(void);
 extern void fn_8002DF10(void);
 extern void fn_8002DD24(void);
@@ -593,8 +593,8 @@ void fn_80031B4C(void) {
     extern void menuModelInit();
     extern void fn_80113828();
     extern void fn_8011394C();
-    extern void fn_8011D904();
-    extern void fn_8011F4F0();
+    extern void pokemonBiosSetFriend();
+    extern void pokemonBiosGetNicknamePtr();
     extern void fadeCheck();
     extern void fadeSet();
     extern void fn_801D0314();
@@ -2076,8 +2076,8 @@ void fn_800307A8(u8* arg0, u8* arg1) {
 #endif
 
 /* fn_800308D4 - 0x800308D4 | size: 0x170 */
-extern void fn_8011E778(void);
-extern void fn_8011E760(void);
+extern void pokemonDataBiosGetPtr(void);
+extern void pokemonDataBiosGetName(void);
 extern u32 lbl_8047A424;
 extern u32 lbl_8047A420;
 #if 0
@@ -2089,8 +2089,8 @@ asm void fn_800308D4(void) {
 #pragma peephole off
 void fn_800308D4(u8* arg0, u8* arg1) {
     extern u16 pokemonGetStatus(void* obj, s32 a, s32 b, s32 c);
-    extern s32 fn_8011E778(s32 v);
-    extern s32 fn_8011E760(s32 v);
+    extern s32 pokemonDataBiosGetPtr(s32 v);
+    extern s32 pokemonDataBiosGetName(s32 v);
     extern s32 GSmsgGetRect(s32 m);
     extern s32 fn_800FA280(s32 m);
     s32 hi;
@@ -2123,7 +2123,7 @@ void fn_800308D4(u8* arg0, u8* arg1) {
     if (obj != 0) {
         hi = (s16)((u32)GSmsgGetRect(0x2BD4) >> 16);
         fn_800FB680(0, 0, combined, 0x2BD4);
-        msgctrlSetValue(0x37, fn_800FA280(fn_8011E760(fn_8011E778(pokemonGetStatus(obj, 0, 0x6E, 0)))));
+        msgctrlSetValue(0x37, fn_800FA280(pokemonDataBiosGetName(pokemonDataBiosGetPtr(pokemonGetStatus(obj, 0, 0x6E, 0)))));
         fn_800FB680(hi, 0, combined, 0xE7);
         *(u32*)(arg1 + 0x4C) = 0;
         winSpriteSetDisp(arg1, 1);
@@ -2176,7 +2176,7 @@ void fn_80030A44(u8* arg0, u8* arg1) {
         return;
     }
 
-    msgctrlSetValue(0x37, ((s32 (*)(void*))fn_8011F4F0)(obj));
+    msgctrlSetValue(0x37, ((s32 (*)(void*))pokemonBiosGetNicknamePtr)(obj));
     fn_800FB680(0, 0, combined, 0xE7);
     winSpriteSetDisp(arg1, 1);
 
@@ -2247,7 +2247,7 @@ void fn_80030C14(void* r3, u8* r4) {
 #endif
 
 /* fn_80030D34 - 0x80030D34 | size: 0x1d8 */
-extern void fn_8011F1A0(void);
+extern void pokemonBiosGetItemDataId(void);
 #if 0
 asm void fn_80030D34(void) {
 #include "src/game/gs_npc_event_fn_80030D34.inc"
@@ -2281,8 +2281,8 @@ void fn_80030D34(u8* arg0, u8* arg1) {
         obj = (void*)heroGetStatus(lbl_803A2688, 3, (u16)arg);
     }
 
-    if (((u8 (*)(void*))fn_8011E850)(obj) != 0) {
-        side = ((u16 (*)(void*))fn_8011F1A0)(obj);
+    if (((u8 (*)(void*))pokemonBiosGetFuseiFlag)(obj) != 0) {
+        side = ((u16 (*)(void*))pokemonBiosGetItemDataId)(obj);
         if (side != 0) {
             winSpriteSetDisp(arg1, 1);
         } else {
@@ -2290,7 +2290,7 @@ void fn_80030D34(u8* arg0, u8* arg1) {
         }
     } else if (((u8 (*)(void*))pokemonCheckValid)(obj) != 0 &&
                ((u8 (*)(void))menuCBRule_CheckPokemonEventFlag)() == 1) {
-        side = ((u16 (*)(void*))fn_8011F1A0)(obj);
+        side = ((u16 (*)(void*))pokemonBiosGetItemDataId)(obj);
         if (side != 0) {
             winSpriteSetDisp(arg1, 1);
         } else {
@@ -2304,7 +2304,7 @@ void fn_80030D34(u8* arg0, u8* arg1) {
 #endif
 
 /* fn_80030F0C - 0x80030F0C | size: 0x27c */
-extern void fn_8011ED68(void);
+extern void pokemonBiosGetDarkFlag(void);
 #if 0
 asm void fn_80030F0C(void) {
 #include "src/game/gs_npc_event_fn_80030F0C.inc"
@@ -2344,15 +2344,15 @@ void fn_80030F0C(u8* arg0, u8* arg1) {
         obj = (void*)heroGetStatus(lbl_803A2688, 3, (u16)arg);
     }
 
-    if (((u8 (*)(void*))fn_8011E850)(obj) != 0) {
-        if (((u8 (*)(void*))fn_8011ED68)(obj) == 1) {
+    if (((u8 (*)(void*))pokemonBiosGetFuseiFlag)(obj) != 0) {
+        if (((u8 (*)(void*))pokemonBiosGetDarkFlag)(obj) == 1) {
             winSpriteSetDisp(arg1, side == 2);
         } else {
             winSpriteSetDisp(arg1, side == 1);
         }
     } else if (((u8 (*)(void*))pokemonCheckValid)(obj) != 0 &&
                ((u8 (*)(void*))menuCBRule_CheckPokemonEventFlag)(obj) == 1) {
-        if (((u8 (*)(void*))fn_8011ED68)(obj) == 1) {
+        if (((u8 (*)(void*))pokemonBiosGetDarkFlag)(obj) == 1) {
             winSpriteSetDisp(arg1, side == 2);
         } else {
             winSpriteSetDisp(arg1, side == 1);

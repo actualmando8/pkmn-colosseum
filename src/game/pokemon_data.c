@@ -94,7 +94,7 @@ extern void fn_801ED674(void);
 void fn_801193BC(void);
 extern s32 pokemonWazaGetMaxPP(u8* ptr, u16 idx);
 extern void wazaGetStatus(void);
-extern void fn_8011F260(void);
+extern void pokemonBiosGetPokemonWazaPtr(void);
 extern void pokemonResetBasisStatus(void* ptr);
 void pokemonSetLevelBasisStatus(void);
 extern void heroItemGetItemKindToItemAryPtr(void);
@@ -174,9 +174,9 @@ extern s32 psGetGeneratorChildMaxLife(u32);
 extern void* wazaDataBiosGetPtr(u16 idx);
 extern u32 pokemonGetStatus();
 extern void pokemonSetStatus();
-extern u16 fn_8011E36C(u8* ptr, u16 idx);
-extern u16 fn_8011E3B4(u8* ptr, u16 idx);
-extern u8 fn_8011E3FC(u8* ptr, u16 idx);
+extern u16 pokemonDataBiosGetSinkaPokemonDataId(u8* ptr, u16 idx);
+extern u16 pokemonDataBiosGetSinkaBuff(u8* ptr, u16 idx);
+extern u8 pokemonDataBiosGetSinkaKind(u8* ptr, u16 idx);
 extern u8 floorUpdateFieldCamera();
 extern void updateAnimation__Ff15HEROMOVE_MEMBER(void);
 extern void* heroBiosGetPokemonPtr(u8* ptr, u16 idx);
@@ -730,7 +730,7 @@ extern void fightOutPokemonBiosSetMyselfDamageSpeTargetId(void);
 extern void fightOutPokemonBiosSetKizetuFlag(void);
 extern void fightOutPokemonBiosSetIrekaeTargetEntryId(void);
 extern void jumptable_8035E028();
-extern void fn_8011E4A4(void);
+extern void pokemonDataBiosGetItemDataId(void);
 extern void fightPokemonBiosGetMotoPokemonPtr(void);
 extern void fightPokemonBiosGetPokemonBuffPtr(void);
 extern void fightPokemonBiosGetFightJoutaiPtr(void);
@@ -894,11 +894,11 @@ extern s32 wazaDataBiosGetPri(u8* ptr);
 extern u8 wazaDataBiosGetZokuseiDataId(u8* ptr);
 extern u8 wazaDataBiosGetPp(u8* ptr);
 extern u32 wazaDataBiosGetName(u8* ptr);
-extern s32 fn_8011CA9C(u8* ptr);
-extern u32 fn_8011CB3C(u8* ptr);
-extern u32 fn_8011CB54(u8* ptr);
-extern u8 fn_8011CB98(u8* ptr);
-extern u8 fn_8011CBB0(u8* ptr);
+extern s32 pokemonDpFilterDataBiosGetValue(u8* ptr);
+extern u32 pokemonTokuseiDataBiosGetDoc(u8* ptr);
+extern u32 pokemonTokuseiDataBiosGetName(u8* ptr);
+extern u8 pokemonSeikakuRateDataBiosGetWaru(u8* ptr);
+extern u8 pokemonSeikakuRateDataBiosGetKake(u8* ptr);
 extern u8 fn_8011CC54(u8* ptr);
 extern u8 fn_8011CC6C(u8* ptr);
 extern u8 fn_8011CC84(u8* ptr);
@@ -906,99 +906,99 @@ extern u8 fn_8011CC9C(u8* ptr);
 extern u8 fn_8011CCB4(u8* ptr);
 extern u8 fn_8011CCCC(u8* ptr);
 extern u8 fn_8011CCE4(u8* ptr);
-extern s32 fn_8011CCFC(u8* ptr);
-extern s32 fn_8011CD18(u8* ptr);
-extern s32 fn_8011CD34(u8* ptr);
-extern s32 fn_8011CD50(u8* ptr);
-extern s32 fn_8011CD6C(u8* ptr);
-extern u8 fn_8011CD88(u8* ptr);
-extern u8 fn_8011CDA0(u8* ptr);
-extern u8 fn_8011CDB8(u8* ptr);
-extern u8 fn_8011CDD0(u8* ptr);
-extern u8 fn_8011CDE8(u8* ptr);
-extern u32 fn_8011CE00(u8* ptr);
+extern s32 pokemonSeikakuDataBiosGetReliveNadenade(u8* ptr);
+extern s32 pokemonSeikakuDataBiosGetReliveSodateya(u8* ptr);
+extern s32 pokemonSeikakuDataBiosGetReliveCall(u8* ptr);
+extern s32 pokemonSeikakuDataBiosGetReliveWalk(u8* ptr);
+extern s32 pokemonSeikakuDataBiosGetReliveFightout(u8* ptr);
+extern u8 pokemonSeikakuDataBiosGetNimblenessRateDataId(u8* ptr);
+extern u8 pokemonSeikakuDataBiosGetSpeDefRateDataId(u8* ptr);
+extern u8 pokemonSeikakuDataBiosGetSpeAtkRateDataId(u8* ptr);
+extern u8 pokemonSeikakuDataBiosGetPhyDefRateDataId(u8* ptr);
+extern u8 pokemonSeikakuDataBiosGetPhyAtkRateDataId(u8* ptr);
+extern u32 pokemonSeikakuDataBiosGetName(u8* ptr);
 extern void fn_8011CEA0(u8* ptr, u8 val);
 extern void fn_8011CEB0(u8* ptr, u8 val);
 extern void fn_8011CEC0(u8* ptr, u16 val);
-extern void fn_8011CF14(u8* ptr, u32 val);
-extern void fn_8011CF24(u8* ptr, u16 val);
-extern void fn_8011CF34(u8* ptr, u16 val);
-extern void fn_8011CF9C(u8* ptr, u16 val);
-extern void fn_8011CFAC(u8* ptr, u32 val);
-extern void fn_8011CFBC(u8* ptr, u16 val);
-extern void fn_8011CFCC(u8* ptr, u16 val);
-extern void fn_8011CFDC(u8* ptr, u32 val);
-extern void fn_8011D270(u8* ptr, u16 val);
-extern void fn_8011D280(u8* ptr, u8 val);
-extern void fn_8011D290(u8* ptr, u8 val);
-extern void fn_8011D2A0(u8* ptr, u8 val);
-extern void fn_8011D2B0(u8* ptr, u16 val);
-extern void fn_8011D470(u8* ptr, u32 val);
-extern void fn_8011D494(u8* ptr, u16 val);
-extern void fn_8011D4A4(u8* ptr, u16 val);
-extern void fn_8011D4B4(u8* ptr, u16 val);
-extern void fn_8011D4C4(u8* ptr, u8 val);
-extern void fn_8011D4D4(u8* ptr, u8 val);
-extern void fn_8011D4E4(u8* ptr, u8 val);
-extern void fn_8011D4F4(u8* ptr, u8 val);
-extern void fn_8011D56C(u8* ptr, u8 val);
-extern void fn_8011D57C(u8* ptr, u8 val);
-extern void fn_8011D760(u8* ptr, u8 val);
-extern void fn_8011D8F4(u8* ptr, u16 val);
-extern void fn_8011DCB4(u8* ptr, u16 val);
-extern void fn_8011DE38(u8* ptr, u32 val);
-extern void fn_8011DE88(u8* ptr, u32 val);
-extern void fn_8011DE98(u8* ptr, u32 val);
-extern void fn_8011DF90(u8* ptr, u32 val);
-extern void fn_8011DFA0(u8* ptr, u8 val);
-extern void fn_8011DFB0(u8* ptr, u8 val);
-extern void fn_8011DFC0(u8* ptr, u8 val);
-extern void fn_8011DFD0(u8* ptr, u16 val);
-extern void fn_8011DFE0(u8* ptr, u32 val);
-extern void fn_8011DFF0(u8* ptr, u16 val);
+extern void pokemonDataBiosSetPkxDataId(u8* ptr, u32 val);
+extern void pokemonDataBiosSetNumPokemon(u8* ptr, u16 val);
+extern void pokemonDataBiosSetNumZukan(u8* ptr, u16 val);
+extern void pokemonDataBiosSetVoice(u8* ptr, u16 val);
+extern void pokemonDataBiosSetDoc(u8* ptr, u32 val);
+extern void pokemonDataBiosSetWeight(u8* ptr, u16 val);
+extern void pokemonDataBiosSetHeight(u8* ptr, u16 val);
+extern void pokemonDataBiosSetTypeName(u8* ptr, u32 val);
+extern void pokemonDataBiosSetInitFriend(u8* ptr, u16 val);
+extern void pokemonDataBiosSetSexRatio(u8* ptr, u8 val);
+extern void pokemonDataBiosSetGet(u8* ptr, u8 val);
+extern void pokemonDataBiosSetGrowDataId(u8* ptr, u8 val);
+extern void pokemonDataBiosSetGiveExp(u8* ptr, u16 val);
+extern void pokemonDataBiosSetName(u8* ptr, u32 val);
+extern void pokemonBiosSetFightTrainerPokemonDataId(u8* ptr, u16 val);
+extern void pokemonBiosSetPara1Amari(u8* ptr, u16 val);
+extern void pokemonBiosSetAmari(u8* ptr, u16 val);
+extern void pokemonBiosSetMailId(u8* ptr, u8 val);
+extern void pokemonBiosSetPcboxMark(u8* ptr, u8 val);
+extern void pokemonBiosSetFlagAmari(u8* ptr, u8 val);
+extern void pokemonBiosSetFuseiFlag(u8* ptr, u8 val);
+extern void pokemonBiosSetTamagoFlag(u8* ptr, u8 val);
+extern void pokemonBiosSetPokerus(u8* ptr, u8 val);
+extern void pokemonBiosSetFur(u8* ptr, u8 val);
+extern void pokemonBiosSetDarkpokemonDataId(u8* ptr, u16 val);
+extern void pokemonBiosSetItemDataId(u8* ptr, u16 val);
+extern void pokemonBiosSetConditionAmari(u8* ptr, u32 val);
+extern void pokemonBiosSetPoolExp(u8* ptr, u32 val);
+extern void pokemonBiosSetExp(u8* ptr, u32 val);
+extern void pokemonBiosSetCatchTrainerRnd(u8* ptr, u32 val);
+extern void pokemonBiosSetCatchTrainerSex(u8* ptr, u8 val);
+extern void pokemonBiosSetCatchBallId(u8* ptr, u8 val);
+extern void pokemonBiosSetCatchLevel(u8* ptr, u8 val);
+extern void pokemonBiosSetCatchFloorId(u8* ptr, u16 val);
+extern void pokemonBiosSetRnd(u8* ptr, u32 val);
+extern void pokemonBiosSetPokemonDataId(u8* ptr, u16 val);
 extern u8 fn_8011E000(u8* ptr);
 extern u8 fn_8011E018(u8* ptr);
 extern u16 fn_8011E030(u8* ptr);
-extern u32 fn_8011E0AC(u8* ptr);
-extern u16 fn_8011E0C4(u8* ptr);
-extern u16 fn_8011E0DC(u8* ptr);
-extern u16 fn_8011E15C(u8* ptr);
-extern u32 fn_8011E174(u8* ptr);
-extern u16 fn_8011E18C(u8* ptr);
-extern u16 fn_8011E1A4(u8* ptr);
-extern u32 fn_8011E1BC(u8* ptr);
-extern u16 fn_8011E4D8(u8* ptr);
-extern u8 fn_8011E4F0(u8* ptr);
-extern u8 fn_8011E508(u8* ptr);
-extern u8 fn_8011E520(u8* ptr);
-extern u16 fn_8011E538(u8* ptr);
-extern u32 fn_8011E760(u8* ptr);
-extern u16 fn_8011E7C0(u8* ptr);
-extern u16 fn_8011E7D8(u8* ptr);
-extern u16 fn_8011E7F0(u8* ptr);
-extern u8 fn_8011E808(u8* ptr);
-extern u8 fn_8011E820(u8* ptr);
-extern u8 fn_8011E838(u8* ptr);
-extern u8 fn_8011E850(u8* ptr);
-extern u8 fn_8011E8DC(u8* ptr);
-extern u8 fn_8011E8F4(u8* ptr);
-extern u8 fn_8011EB48(u8* ptr);
-extern u16 fn_8011EDF8(u8* ptr);
-extern u32 fn_8011EE10(u8* ptr);
-extern u32 fn_8011EE28(u8* ptr);
-extern u16 fn_8011EE40(u8* ptr);
-extern u16 fn_8011EE58(u8* ptr);
-extern u16 fn_8011F188(u8* ptr);
-extern u16 fn_8011F1A0(u8* ptr);
-extern u32 fn_8011F45C(u8* ptr);
-extern u8 fn_8011F4A8(u8* ptr);
-extern u32 fn_8011F4C0(u8* ptr);
-extern u32 fn_8011F520(u8* ptr);
-extern u8 fn_8011F538(u8* ptr);
-extern u8 fn_8011F550(u8* ptr);
-extern u8 fn_8011F568(u8* ptr);
-extern u16 fn_8011F580(u8* ptr);
-extern u32 fn_8011F5B0(u8* ptr);
+extern u32 pokemonDataBiosGetPkxDataId(u8* ptr);
+extern u16 pokemonDataBiosGetNumPokemon(u8* ptr);
+extern u16 pokemonDataBiosGetNumZukan(u8* ptr);
+extern u16 pokemonDataBiosGetVoice(u8* ptr);
+extern u32 pokemonDataBiosGetDoc(u8* ptr);
+extern u16 pokemonDataBiosGetWeight(u8* ptr);
+extern u16 pokemonDataBiosGetHeight(u8* ptr);
+extern u32 pokemonDataBiosGetTypeName(u8* ptr);
+extern u16 pokemonDataBiosGetInitFriend(u8* ptr);
+extern u8 pokemonDataBiosGetSexRatio(u8* ptr);
+extern u8 pokemonDataBiosGetGet(u8* ptr);
+extern u8 pokemonDataBiosGetGrowDataId(u8* ptr);
+extern u16 pokemonDataBiosGetGiveExp(u8* ptr);
+extern u32 pokemonDataBiosGetName(u8* ptr);
+extern u16 pokemonBiosGetFightTrainerPokemonDataId(u8* ptr);
+extern u16 pokemonBiosGetPara1Amari(u8* ptr);
+extern u16 pokemonBiosGetAmari(u8* ptr);
+extern u8 pokemonBiosGetMailId(u8* ptr);
+extern u8 pokemonBiosGetPcboxMark(u8* ptr);
+extern u8 pokemonBiosGetFlagAmari(u8* ptr);
+extern u8 pokemonBiosGetFuseiFlag(u8* ptr);
+extern u8 pokemonBiosGetTamagoFlag(u8* ptr);
+extern u8 pokemonBiosGetPokerus(u8* ptr);
+extern u8 pokemonBiosGetFur(u8* ptr);
+extern u16 pokemonBiosGetPoolFriend(u8* ptr);
+extern u32 pokemonBiosGetPoolExp(u8* ptr);
+extern u32 pokemonBiosGetDp(u8* ptr);
+extern u16 pokemonBiosGetDarkpokemonDataId(u8* ptr);
+extern u16 pokemonBiosGetFriend(u8* ptr);
+extern u16 pokemonBiosGetHp(u8* ptr);
+extern u16 pokemonBiosGetItemDataId(u8* ptr);
+extern u32 pokemonBiosGetConditionAmari(u8* ptr);
+extern u8 pokemonBiosGetLevel(u8* ptr);
+extern u32 pokemonBiosGetExp(u8* ptr);
+extern u32 pokemonBiosGetCatchTrainerRnd(u8* ptr);
+extern u8 pokemonBiosGetCatchTrainerSex(u8* ptr);
+extern u8 pokemonBiosGetCatchBallId(u8* ptr);
+extern u8 pokemonBiosGetCatchLevel(u8* ptr);
+extern u16 pokemonBiosGetCatchFloorId(u8* ptr);
+extern u32 pokemonBiosGetRnd(u8* ptr);
 extern void heroBiosSetHomePlace(u8* ptr, u8 val);
 extern u8 heroBiosGetHomePlace(u8* ptr);
 extern u8 heroBiosGetHizukiFlag(u8* ptr);
@@ -1027,7 +1027,7 @@ extern void heroBiosSetSexDataId(u8* ptr, u8 val);
 extern void heroBiosSetRnd(u8* ptr, u32 val);
 extern u32 heroBiosGetRnd(u8* ptr);
 extern u32 fn_80130CD8(void);
-extern u16 fn_8011F5C8(u8* ptr);
+extern u16 pokemonBiosGetPokemonDataId(u8* ptr);
 extern u32 fn_80128E24(void);
 extern void* floorReadMapPreFunc(void* owner, u32 param, u32 alloc_size);
 extern void* floorReadScriptPreFunc(void* owner, u32 param, u32 alloc_size);
@@ -1122,167 +1122,167 @@ extern u8 wazaGetMaxPP(u32 arg1, u8 arg2);
 extern u32 pokemonNakigoeDataBiosGetDataAddress(u8* ptr);
 extern void* pokemonDpFilterDataBiosGetPtr(u16 idx);
 extern s8 pokemonFriendFilterDataBiosGetValue(u8* ptr, u8 idx);
-extern void* fn_8011CB10(u16 idx);
-extern void* fn_8011CB6C(u16 idx);
+extern void* pokemonFriendFilterDataBiosGetPtr(u16 idx);
+extern void* pokemonTokuseiDataBiosGetPtr(u16 idx);
 extern void* pokemonSeikakuRateDataBiosGetPtr(u8 idx);
 extern u8 fn_8011CBF4(u8* ptr, u8 idx);
 extern u8 fn_8011CC24(u8* ptr, u8 idx);
-extern void* fn_8011CE18(u8 idx);
+extern void* pokemonSeikakuDataBiosGetPtr(u8 idx);
 extern u32 pokemonGrowDataBiosGetExp(u8* ptr, u8 idx);
-extern void* fn_8011CE74(u8 idx);
+extern void* pokemonGrowDataBiosGetPtr(u8 idx);
 extern void fn_8011CED0(u8* ptr, u16 idx, u8 val);
-extern void fn_8011CEF0(u8* ptr, u16 idx, u16 val);
-extern void fn_8011CF44(u8* ptr);
-extern void fn_8011CF70(u8* ptr);
-extern void fn_8011CFEC(u8* ptr, u16 idx, u8 val);
-extern void fn_8011D02C(u8* ptr, u16 idx, u16 val);
-extern void fn_8011D06C(u8* ptr, u16 idx, u32 val);
-extern void fn_8011D0AC(u8* ptr, u16 idx, u8 val);
-extern void fn_8011D0CC(u8* ptr, u16 idx, u16 val);
-extern void fn_8011D10C(u8* ptr, u16 idx, u8 val);
-extern void fn_8011D14C(u8* ptr, u16 idx, u16 val);
-extern void fn_8011D18C(u8* ptr, u16 idx, u16 val);
-extern void fn_8011D1CC(u8* ptr, u16 idx, u8 val);
-extern void fn_8011D20C(u8* ptr, u16 idx, u8 val);
-extern void fn_8011D22C(u8* ptr, u16 idx, u8 val);
-extern void fn_8011D24C(u8* ptr, u16 idx, u16 val);
-extern void fn_8011D2C0(void* ptr, u16 val);
-extern void fn_8011D2E4(void* ptr, u16 val);
-extern void fn_8011D308(void* ptr, u16 val);
-extern void fn_8011D32C(void* ptr, u16 val);
-extern void fn_8011D350(void* ptr, u16 val);
-extern void fn_8011D374(void* ptr, u16 val);
-extern void fn_8011D398(void* ptr, u16 val);
-extern void fn_8011D3BC(void* ptr, u16 val);
-extern void fn_8011D3E0(void* ptr, u16 val);
-extern void fn_8011D404(void* ptr, u16 val);
-extern void fn_8011D428(void* ptr, u16 val);
-extern void fn_8011D44C(void* ptr, u16 val);
-extern void fn_8011D480(u8* ptr, u8 val);
-extern void fn_8011D504(u8* ptr, u8 val);
-extern void fn_8011D58C(void* ptr, u8 val);
-extern void fn_8011D5B0(void* ptr, u8 val);
-extern void fn_8011D5D4(void* ptr, u8 val);
-extern void fn_8011D5F8(void* ptr, u8 val);
-extern void fn_8011D61C(void* ptr, u8 val);
-extern void fn_8011D640(void* ptr, u8 val);
-extern void fn_8011D664(void* ptr, u8 val);
-extern void fn_8011D688(void* ptr, u8 val);
-extern void fn_8011D6AC(void* ptr, u8 val);
-extern void fn_8011D6D0(void* ptr, u8 val);
-extern void fn_8011D6F4(void* ptr, u8 val);
-extern void fn_8011D718(void* ptr, u8 val);
-extern void fn_8011D73C(void* ptr, u8 val);
-extern void fn_8011D770(void* ptr, u8 val);
-extern void fn_8011D794(void* ptr, u8 val);
-extern void fn_8011D7B8(void* ptr, u8 val);
-extern void fn_8011D7DC(void* ptr, u8 val);
-extern void fn_8011D800(void* ptr, u8 val);
-extern void fn_8011D824(void* ptr, u8 val);
-extern void fn_8011D848(void* ptr, u8 val);
-extern void fn_8011D86C(void* ptr, u8 val);
-extern void fn_8011D890(void* ptr, u8 val);
-extern void fn_8011D8B4(void* ptr, u8 val);
-extern void fn_8011D8D8(u8* ptr, s32 val);
-extern void fn_8011D904(u8* ptr, u16 val);
-extern void fn_8011D924(u8* ptr, u16 val);
-extern void fn_8011D958(u8* ptr, u16 val);
-extern void fn_8011D98C(u8* ptr, u16 val);
-extern void fn_8011D9C0(u8* ptr, u16 val);
-extern void fn_8011D9F4(u8* ptr, u16 val);
-extern void fn_8011DA28(u8* ptr, u16 val);
-extern void fn_8011DA5C(u8* ptr, u16 val);
-extern void fn_8011DA90(u8* ptr, u16 val);
-extern void fn_8011DAC4(u8* ptr, u16 val);
-extern void fn_8011DAF8(u8* ptr, u16 val);
-extern void fn_8011DB2C(u8* ptr, u16 val);
-extern void fn_8011DB60(u8* ptr, u16 val);
-extern void fn_8011DB94(void* ptr, u16 val);
-extern void fn_8011DBB8(void* ptr, u16 val);
-extern void fn_8011DBDC(void* ptr, u16 val);
-extern void fn_8011DC00(void* ptr, u16 val);
-extern void fn_8011DC24(void* ptr, u16 val);
-extern void fn_8011DC48(void* ptr, u16 val);
-extern void fn_8011DC6C(u8* ptr, u16 val);
-extern void fn_8011DCC4(u8* ptr, u32 arg2, u8 arg3);
-extern void fn_8011DD80(u32 arg1, s32 arg2, u8 maxVal);
-extern void fn_8011DDFC(void* ctx, u32 p1, u32 value);
-extern void fn_8011DE48(u8* ptr, u8 val);
-extern void fn_8011DE68(u8* ptr, u16 val);
-extern void fn_8011DEA8(u8* ptr, void* src);
-extern void fn_8011DEE4(u8* ptr, void* src);
-extern void fn_8011DF54(u8* ptr, void* src);
+extern void pokemonDataBiosSetKowaza(u8* ptr, u16 idx, u16 val);
+extern void pokemonDataBiosSetTukamaetaFlag(u8* ptr);
+extern void pokemonDataBiosSetMitaFlag(u8* ptr);
+extern void pokemonDataBiosSetColor(u8* ptr, u16 idx, u8 val);
+extern void pokemonDataBiosSetStatusFaceMenuSpriteId(u8* ptr, u16 idx, u16 val);
+extern void pokemonDataBiosSetPokebodyId(u8* ptr, u16 idx, u32 val);
+extern void pokemonDataBiosSetWazaMcn(u8* ptr, u16 idx, u8 val);
+extern void pokemonDataBiosSetGetWazaDataId(u8* ptr, u16 idx, u16 val);
+extern void pokemonDataBiosSetGetWazaLevel(u8* ptr, u16 idx, u8 val);
+extern void pokemonDataBiosSetSinkaPokemonDataId(u8* ptr, u16 idx, u16 val);
+extern void pokemonDataBiosSetSinkaBuff(u8* ptr, u16 idx, u16 val);
+extern void pokemonDataBiosSetSinkaKind(u8* ptr, u16 idx, u8 val);
+extern void pokemonDataBiosSetTokuseiDataId(u8* ptr, u16 idx, u8 val);
+extern void pokemonDataBiosSetZokuseiDataId(u8* ptr, u16 idx, u8 val);
+extern void pokemonDataBiosSetItemDataId(u8* ptr, u16 idx, u16 val);
+extern void pokemonDataBiosSetGiveNimblenessEffort(void* ptr, u16 val);
+extern void pokemonDataBiosSetGiveSpeDefEffort(void* ptr, u16 val);
+extern void pokemonDataBiosSetGiveSpeAtkEffort(void* ptr, u16 val);
+extern void pokemonDataBiosSetGivePhyDefEffort(void* ptr, u16 val);
+extern void pokemonDataBiosSetGivePhyAtkEffort(void* ptr, u16 val);
+extern void pokemonDataBiosSetGiveMaxHpEffort(void* ptr, u16 val);
+extern void pokemonDataBiosSetBasisNimbleness(void* ptr, u16 val);
+extern void pokemonDataBiosSetBasisSpeDef(void* ptr, u16 val);
+extern void pokemonDataBiosSetBasisSpeAtk(void* ptr, u16 val);
+extern void pokemonDataBiosSetBasisPhyDef(void* ptr, u16 val);
+extern void pokemonDataBiosSetBasisPhyAtk(void* ptr, u16 val);
+extern void pokemonDataBiosSetBasisMaxHp(void* ptr, u16 val);
+extern void pokemonBiosSetEventGetFlag(u8* ptr, u8 val);
+extern void pokemonBiosSetTokuseiFlag(u8* ptr, u8 val);
+extern void pokemonBiosSetAmariRibbon(void* ptr, u8 val);
+extern void pokemonBiosSetWorldRibbon(void* ptr, u8 val);
+extern void pokemonBiosSetEarthRibbon(void* ptr, u8 val);
+extern void pokemonBiosSetNationalRibbon(void* ptr, u8 val);
+extern void pokemonBiosSetCountryRibbon(void* ptr, u8 val);
+extern void pokemonBiosSetSkyRibbon(void* ptr, u8 val);
+extern void pokemonBiosSetLandRibbon(void* ptr, u8 val);
+extern void pokemonBiosSetMarineRibbon(void* ptr, u8 val);
+extern void pokemonBiosSetGanbaRibbon(void* ptr, u8 val);
+extern void pokemonBiosSetBromideRibbon(void* ptr, u8 val);
+extern void pokemonBiosSetVictoryRibbon(void* ptr, u8 val);
+extern void pokemonBiosSetWinningRibbon(void* ptr, u8 val);
+extern void pokemonBiosSetChampRibbon(void* ptr, u8 val);
+extern void pokemonBiosSetStrongMedal(void* ptr, u8 val);
+extern void pokemonBiosSetCleverMedal(void* ptr, u8 val);
+extern void pokemonBiosSetCuteMedal(void* ptr, u8 val);
+extern void pokemonBiosSetBeautifulMedal(void* ptr, u8 val);
+extern void pokemonBiosSetStyleMedal(void* ptr, u8 val);
+extern void pokemonBiosSetStrong(void* ptr, u8 val);
+extern void pokemonBiosSetClever(void* ptr, u8 val);
+extern void pokemonBiosSetCute(void* ptr, u8 val);
+extern void pokemonBiosSetBeautiful(void* ptr, u8 val);
+extern void pokemonBiosSetStyle(void* ptr, u8 val);
+extern void pokemonBiosSetDp(u8* ptr, s32 val);
+extern void pokemonBiosSetFriend(u8* ptr, u16 val);
+extern void pokemonBiosSetNimblenessRnd(u8* ptr, u16 val);
+extern void pokemonBiosSetSpeDefRnd(u8* ptr, u16 val);
+extern void pokemonBiosSetSpeAtkRnd(u8* ptr, u16 val);
+extern void pokemonBiosSetPhyDefRnd(u8* ptr, u16 val);
+extern void pokemonBiosSetPhyAtkRnd(u8* ptr, u16 val);
+extern void pokemonBiosSetMaxHpRnd(u8* ptr, u16 val);
+extern void pokemonBiosSetNimblenessEffort(u8* ptr, u16 val);
+extern void pokemonBiosSetSpeDefEffort(u8* ptr, u16 val);
+extern void pokemonBiosSetSpeAtkEffort(u8* ptr, u16 val);
+extern void pokemonBiosSetPhyDefEffort(u8* ptr, u16 val);
+extern void pokemonBiosSetPhyAtkEffort(u8* ptr, u16 val);
+extern void pokemonBiosSetMaxHpEffort(u8* ptr, u16 val);
+extern void pokemonBiosSetNimbleness(void* ptr, u16 val);
+extern void pokemonBiosSetSpeDef(void* ptr, u16 val);
+extern void pokemonBiosSetSpeAtk(void* ptr, u16 val);
+extern void pokemonBiosSetPhyDef(void* ptr, u16 val);
+extern void pokemonBiosSetPhyAtk(void* ptr, u16 val);
+extern void pokemonBiosSetMaxHp(void* ptr, u16 val);
+extern void pokemonBiosSetHp(u8* ptr, u16 val);
+extern void pokemonBiosSetPokemonWazaPpCount(u8* ptr, u32 arg2, u8 arg3);
+extern void pokemonBiosSetPokemonWazaPp(u32 arg1, s32 arg2, u8 maxVal);
+extern void pokemonBiosSetPokemonWazaDataId(void* ctx, u32 p1, u32 value);
+extern void pokemonBiosSetLevel(u8* ptr, u8 val);
+extern void pokemonBiosSetPoolFriend(u8* ptr, u16 val);
+extern void pokemonBiosSetNicknameOrgPtr(u8* ptr, void* src);
+extern void pokemonBiosSetNicknamePtr(u8* ptr, void* src);
+extern void pokemonBiosSetCatchTrainerNamePtr(u8* ptr, void* src);
 extern u8 fn_8011E048(u8* ptr, u16 idx);
-extern u16 fn_8011E078(u8* ptr, u16 idx);
-extern void* fn_8011E0F4(u8* ptr);
-extern void* fn_8011E128(u8* ptr);
-extern u8 fn_8011E2AC(u8* ptr, u16 idx);
-extern u8 fn_8011E444(u8* ptr, u16 idx);
-extern u8 fn_8011E474(u8* ptr, u16 idx);
-extern u16 fn_8011E57C(void* ptr);
-extern u16 fn_8011E5A8(void* ptr);
-extern u16 fn_8011E5D4(void* ptr);
-extern u16 fn_8011E600(void* ptr);
-extern u16 fn_8011E62C(void* ptr);
-extern u16 fn_8011E658(void* ptr);
-extern u16 fn_8011E684(void* ptr);
-extern u16 fn_8011E6B0(void* ptr);
-extern u16 fn_8011E6DC(void* ptr);
-extern u16 fn_8011E708(void* ptr);
-extern u16 fn_8011E734(void* ptr);
-extern void* fn_8011E778(u16 idx);
-extern u8 fn_8011E7A4(u8* ptr);
-extern u8 fn_8011E90C(void* ptr);
-extern u8 fn_8011E938(void* ptr);
-extern u8 fn_8011E964(void* ptr);
-extern u8 fn_8011E990(void* ptr);
-extern u8 fn_8011E9BC(void* ptr);
-extern u8 fn_8011E9E8(void* ptr);
-extern u8 fn_8011EA14(void* ptr);
-extern u8 fn_8011EA40(void* ptr);
-extern u8 fn_8011EA6C(void* ptr);
-extern u8 fn_8011EA98(void* ptr);
-extern u8 fn_8011EAC4(void* ptr);
-extern u8 fn_8011EAF0(void* ptr);
-extern u8 fn_8011EB1C(void* ptr);
-extern u8 fn_8011EB60(void* ptr);
-extern u8 fn_8011EB8C(void* ptr);
-extern u8 fn_8011EBB8(void* ptr);
-extern u8 fn_8011EBE4(void* ptr);
-extern u8 fn_8011EC10(void* ptr);
-extern u8 fn_8011EC3C(void* ptr);
-extern u8 fn_8011EC68(void* ptr);
-extern u8 fn_8011EC94(void* ptr);
-extern u8 fn_8011ECC0(void* ptr);
-extern u8 fn_8011ECEC(void* ptr);
+extern u16 pokemonDataBiosGetKowaza(u8* ptr, u16 idx);
+extern void* pokemonDataBiosGetTukamaetaFlag(u8* ptr);
+extern void* pokemonDataBiosGetMitaFlag(u8* ptr);
+extern u8 pokemonDataBiosGetWazaMcn(u8* ptr, u16 idx);
+extern u8 pokemonDataBiosGetTokuseiDataId(u8* ptr, u16 idx);
+extern u8 pokemonDataBiosGetZokuseiDataId(u8* ptr, u16 idx);
+extern u16 pokemonDataBiosGetGiveSpeDefEffort(void* ptr);
+extern u16 pokemonDataBiosGetGiveSpeAtkEffort(void* ptr);
+extern u16 pokemonDataBiosGetGivePhyDefEffort(void* ptr);
+extern u16 pokemonDataBiosGetGivePhyAtkEffort(void* ptr);
+extern u16 pokemonDataBiosGetGiveMaxHpEffort(void* ptr);
+extern u16 pokemonDataBiosGetBasisNimbleness(void* ptr);
+extern u16 pokemonDataBiosGetBasisSpeDef(void* ptr);
+extern u16 pokemonDataBiosGetBasisSpeAtk(void* ptr);
+extern u16 pokemonDataBiosGetBasisPhyDef(void* ptr);
+extern u16 pokemonDataBiosGetBasisPhyAtk(void* ptr);
+extern u16 pokemonDataBiosGetBasisMaxHp(void* ptr);
+extern void* pokemonDataBiosGetPtr(u16 idx);
+extern u8 pokemonBiosGetEventGetFlag(u8* ptr);
+extern u8 pokemonBiosGetAmariRibbon(void* ptr);
+extern u8 pokemonBiosGetWorldRibbon(void* ptr);
+extern u8 pokemonBiosGetEarthRibbon(void* ptr);
+extern u8 pokemonBiosGetNationalRibbon(void* ptr);
+extern u8 pokemonBiosGetCountryRibbon(void* ptr);
+extern u8 pokemonBiosGetSkyRibbon(void* ptr);
+extern u8 pokemonBiosGetLandRibbon(void* ptr);
+extern u8 pokemonBiosGetMarineRibbon(void* ptr);
+extern u8 pokemonBiosGetGanbaRibbon(void* ptr);
+extern u8 pokemonBiosGetBromideRibbon(void* ptr);
+extern u8 pokemonBiosGetVictoryRibbon(void* ptr);
+extern u8 pokemonBiosGetWinningRibbon(void* ptr);
+extern u8 pokemonBiosGetChampRibbon(void* ptr);
+extern u8 pokemonBiosGetStrongMedal(void* ptr);
+extern u8 pokemonBiosGetCleverMedal(void* ptr);
+extern u8 pokemonBiosGetCuteMedal(void* ptr);
+extern u8 pokemonBiosGetBeautifulMedal(void* ptr);
+extern u8 pokemonBiosGetStyleMedal(void* ptr);
+extern u8 pokemonBiosGetStrong(void* ptr);
+extern u8 pokemonBiosGetClever(void* ptr);
+extern u8 pokemonBiosGetCute(void* ptr);
+extern u8 pokemonBiosGetBeautiful(void* ptr);
+extern u8 pokemonBiosGetStyle(void* ptr);
 extern void* fn_8011EDC4(u8* ptr, u16 idx);
-extern u16 fn_8011EE70(void* ptr);
-extern u16 fn_8011EE9C(void* ptr);
-extern u16 fn_8011EEC8(void* ptr);
-extern u16 fn_8011EEF4(void* ptr);
-extern u16 fn_8011EF20(void* ptr);
-extern u16 fn_8011EF4C(void* ptr);
-extern u16 fn_8011EF78(void* ptr);
-extern u16 fn_8011EFA4(void* ptr);
-extern u16 fn_8011EFD0(void* ptr);
-extern u16 fn_8011EFFC(void* ptr);
-extern u16 fn_8011F028(void* ptr);
-extern u16 fn_8011F054(void* ptr);
-extern u16 fn_8011F080(void* ptr);
-extern u16 fn_8011F0AC(void* ptr);
-extern u16 fn_8011F0D8(void* ptr);
-extern u16 fn_8011F104(void* ptr);
-extern u16 fn_8011F130(void* ptr);
-extern u16 fn_8011F15C(void* ptr);
-extern u8 fn_8011F1B8(void* ctx, u32 p1);
-extern u8 fn_8011F1F0(void* ctx, u32 p1);
-extern u16 fn_8011F228(void* ctx, u32 p1);
+extern u16 pokemonBiosGetNimblenessRnd(void* ptr);
+extern u16 pokemonBiosGetSpeDefRnd(void* ptr);
+extern u16 pokemonBiosGetSpeAtkRnd(void* ptr);
+extern u16 pokemonBiosGetPhyDefRnd(void* ptr);
+extern u16 pokemonBiosGetPhyAtkRnd(void* ptr);
+extern u16 pokemonBiosGetMaxHpRnd(void* ptr);
+extern u16 pokemonBiosGetNimblenessEffort(void* ptr);
+extern u16 pokemonBiosGetSpeDefEffort(void* ptr);
+extern u16 pokemonBiosGetSpeAtkEffort(void* ptr);
+extern u16 pokemonBiosGetPhyDefEffort(void* ptr);
+extern u16 pokemonBiosGetPhyAtkEffort(void* ptr);
+extern u16 pokemonBiosGetMaxHpEffort(void* ptr);
+extern u16 pokemonBiosGetNimbleness(void* ptr);
+extern u16 pokemonBiosGetSpeDef(void* ptr);
+extern u16 pokemonBiosGetSpeAtk(void* ptr);
+extern u16 pokemonBiosGetPhyDef(void* ptr);
+extern u16 pokemonBiosGetPhyAtk(void* ptr);
+extern u16 pokemonBiosGetMaxHp(void* ptr);
+extern u8 pokemonBiosGetPokemonWazaPpCount(void* ctx, u32 p1);
+extern u8 pokemonBiosGetPokemonWazaPp(void* ctx, u32 p1);
+extern u16 pokemonBiosGetPokemonWazaDataId(void* ctx, u32 p1);
 extern void* fn_8011F474(u8* ptr, u16 idx);
-extern void* fn_8011F4D8(void* ptr);
-extern void* fn_8011F4F0(void* ptr);
-extern void* fn_8011F508(void* ptr);
-extern void* fn_8011F598(void* ptr);
-extern void fn_8011F5E0(u32* dst, u32* src);
+extern void* pokemonBiosGetNicknameOrgPtr(void* ptr);
+extern void* pokemonBiosGetNicknamePtr(void* ptr);
+extern void* pokemonBiosGetCatchTrainerNamePtr(void* ptr);
+extern void* pokemonBiosGetAttest(void* ptr);
+extern void pokemonWazaBiosCopy(u32* dst, u32* src);
 extern void pokemonBiosCopy(u32* dst, u32* src);
 extern u32 fn_8011F634(u8* ptr);
 extern u32 fn_8011F6D8(u8* ptr);
@@ -1400,15 +1400,15 @@ extern s32 floorEventChangeTresure(u32 index, u16 val, u8 byte);
 extern s32 floorCharacterBiosGetRot(void* a, void* b);
 extern u32 floorCharacterBiosGetPos(u8* ptr, void* obj);
 extern u32 fn_801170A4(u8* arg1, u32 arg2);
-extern u8 fn_8011E1D4(u8* ptr, s32 idx);
-extern u16 fn_8011E21C(u8* ptr, s32 idx);
-extern u32 fn_8011E264(u8* ptr, s32 idx);
-extern u16 fn_8011E2DC(u8* ptr, s32 idx);
-extern u8 fn_8011E324(u8* ptr, s32 idx);
-extern u16 fn_8011E550(u8* ptr);
-extern u8 fn_8011E868(u8* ptr);
-extern void* fn_8011ED18(u8* ptr);
-extern u32 fn_8011ED68(u8* ptr);
+extern u8 pokemonDataBiosGetColor(u8* ptr, s32 idx);
+extern u16 pokemonDataBiosGetStatusFaceMenuSpriteId(u8* ptr, s32 idx);
+extern u32 pokemonDataBiosGetPokebodyId(u8* ptr, s32 idx);
+extern u16 pokemonDataBiosGetGetWazaDataId(u8* ptr, s32 idx);
+extern u8 pokemonDataBiosGetGetWazaLevel(u8* ptr, s32 idx);
+extern u16 pokemonDataBiosGetGiveNimblenessEffort(u8* ptr);
+extern u8 pokemonBiosGetTokuseiFlag(u8* ptr);
+extern void* pokemonBiosGetInitDp(u8* ptr);
+extern u32 pokemonBiosGetDarkFlag(u8* ptr);
 extern s32 pokemonGetTasteLike(u8* ptr, void* arg2);
 extern s32 pokemonIsHpMantan(u8* ptr);
 extern s32 fn_80121574(void* a, u16 b);
@@ -1459,7 +1459,7 @@ extern u32 heroMoveGetResID(u32* out_zero, u32* out_val, s32 index);
  * functions that read specific fields from a field object struct.
  * Pattern: null check, then load from fixed offset and return.
  *
- * Example (fn_8011E4D8, 0x18 bytes):
+ * Example (pokemonDataBiosGetInitFriend, 0x18 bytes):
  *   cmplwi r3, 0x0
  *   bne .ok
  *   li r3, 0x0
@@ -1468,32 +1468,32 @@ extern u32 heroMoveGetResID(u32* out_zero, u32* out_val, s32 index);
  *   lhz r3, 0x8(r3)    ; read u16 at offset 0x8
  *   blr
  * ================================================================== */
-/* fn_8011E4A4 */ u16 GSfield_GetObjAttrU16(void* obj, u16 slot) {
+/* pokemonDataBiosGetItemDataId */ u16 GSfield_GetObjAttrU16(void* obj, u16 slot) {
     if (obj == NULL) { return 0; }
     if (slot >= 2) { return 0; }
     return *(u16*)((u8*)obj + slot * 2 + 0x70);
 }
-/* fn_8011E4D8 */ u16 GSfield_GetObjType(void* obj) {
+/* pokemonDataBiosGetInitFriend */ u16 GSfield_GetObjType(void* obj) {
     if (obj == NULL) { return 0; }
     return *(u16*)((u8*)obj + 0x8);
 }
-/* fn_8011E4F0 */ u8 GSfield_GetObjSubtype(void* obj) {
+/* pokemonDataBiosGetSexRatio */ u8 GSfield_GetObjSubtype(void* obj) {
     if (obj == NULL) { return 0; }
     return *(u8*)((u8*)obj + 0x2);
 }
-/* fn_8011E508 */ u8 GSfield_GetObjFlags(void* obj) {
+/* pokemonDataBiosGetGet */ u8 GSfield_GetObjFlags(void* obj) {
     if (obj == NULL) { return 0; }
     return *(u8*)((u8*)obj + 0x1);
 }
-/* fn_8011E520 */ u8 GSfield_GetObjState(void* obj) {
+/* pokemonDataBiosGetGrowDataId */ u8 GSfield_GetObjState(void* obj) {
     if (obj == NULL) { return 0; }
     return *(u8*)((u8*)obj + 0x0);
 }
-/* fn_8011E538 */ u16 GSfield_GetObjGroupId(void* obj) {
+/* pokemonDataBiosGetGiveExp */ u16 GSfield_GetObjGroupId(void* obj) {
     if (obj == NULL) { return 0; }
     return *(u16*)((u8*)obj + 0x6);
 }
-/* fn_8011E550 */ u16 GSfield_GetObjRegionId(void* obj) {
+/* pokemonDataBiosGetGiveNimblenessEffort */ u16 GSfield_GetObjRegionId(void* obj) {
     u8* sub;
     if (obj == NULL) { return 0; }
     sub = (u8*)obj + 0x90;
@@ -1501,27 +1501,27 @@ extern u32 heroMoveGetResID(u32* out_zero, u32* out_val, s32 index);
     return *(u16*)(sub + 0xA);
 }
 /* Address: 0x8011CA9C | Size: 0x1C | Pattern: nullcheck_getter_s8 */
-s32 fn_8011CA9C(u8* ptr) {
+s32 pokemonDpFilterDataBiosGetValue(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return (s8)ptr[0x0];
 }
 /* Address: 0x8011CB3C | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fn_8011CB3C(u8* ptr) {
+u32 pokemonTokuseiDataBiosGetDoc(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u32*)(&ptr[0x8]);
 }
 /* Address: 0x8011CB54 | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fn_8011CB54(u8* ptr) {
+u32 pokemonTokuseiDataBiosGetName(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u32*)(&ptr[0x4]);
 }
 /* Address: 0x8011CB98 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011CB98(u8* ptr) {
+u8 pokemonSeikakuRateDataBiosGetWaru(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0x1]);
 }
 /* Address: 0x8011CBB0 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011CBB0(u8* ptr) {
+u8 pokemonSeikakuRateDataBiosGetKake(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0x0]);
 }
@@ -1561,57 +1561,57 @@ u8 fn_8011CCE4(u8* ptr) {
     return *(u8*)(&ptr[0xB]);
 }
 /* Address: 0x8011CCFC | Size: 0x1C | Pattern: nullcheck_getter_s8 */
-s32 fn_8011CCFC(u8* ptr) {
+s32 pokemonSeikakuDataBiosGetReliveNadenade(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return (s8)ptr[0x4];
 }
 /* Address: 0x8011CD18 | Size: 0x1C | Pattern: nullcheck_getter_s8 */
-s32 fn_8011CD18(u8* ptr) {
+s32 pokemonSeikakuDataBiosGetReliveSodateya(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return (s8)ptr[0x3];
 }
 /* Address: 0x8011CD34 | Size: 0x1C | Pattern: nullcheck_getter_s8 */
-s32 fn_8011CD34(u8* ptr) {
+s32 pokemonSeikakuDataBiosGetReliveCall(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return (s8)ptr[0x2];
 }
 /* Address: 0x8011CD50 | Size: 0x1C | Pattern: nullcheck_getter_s8 */
-s32 fn_8011CD50(u8* ptr) {
+s32 pokemonSeikakuDataBiosGetReliveWalk(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return (s8)ptr[0x1];
 }
 /* Address: 0x8011CD6C | Size: 0x1C | Pattern: nullcheck_getter_s8 */
-s32 fn_8011CD6C(u8* ptr) {
+s32 pokemonSeikakuDataBiosGetReliveFightout(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return (s8)ptr[0x0];
 }
 /* Address: 0x8011CD88 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011CD88(u8* ptr) {
+u8 pokemonSeikakuDataBiosGetNimblenessRateDataId(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0x9]);
 }
 /* Address: 0x8011CDA0 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011CDA0(u8* ptr) {
+u8 pokemonSeikakuDataBiosGetSpeDefRateDataId(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0x8]);
 }
 /* Address: 0x8011CDB8 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011CDB8(u8* ptr) {
+u8 pokemonSeikakuDataBiosGetSpeAtkRateDataId(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0x7]);
 }
 /* Address: 0x8011CDD0 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011CDD0(u8* ptr) {
+u8 pokemonSeikakuDataBiosGetPhyDefRateDataId(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0x6]);
 }
 /* Address: 0x8011CDE8 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011CDE8(u8* ptr) {
+u8 pokemonSeikakuDataBiosGetPhyAtkRateDataId(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0x5]);
 }
 /* Address: 0x8011CE00 | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fn_8011CE00(u8* ptr) {
+u32 pokemonSeikakuDataBiosGetName(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u32*)(&ptr[0x14]);
 }
@@ -1631,182 +1631,182 @@ void fn_8011CEC0(u8* ptr, u16 val) {
     *(u16*)(&ptr[0x16]) = val;
 }
 /* Address: 0x8011CF14 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011CF14(u8* ptr, u32 val) {
+void pokemonDataBiosSetPkxDataId(u8* ptr, u32 val) {
     if (ptr == NULL) { return; }
     *(u32*)(&ptr[0x2C]) = val;
 }
 /* Address: 0x8011CF24 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011CF24(u8* ptr, u16 val) {
+void pokemonDataBiosSetNumPokemon(u8* ptr, u16 val) {
     if (ptr == NULL) { return; }
     *(u16*)(&ptr[0x12]) = val;
 }
 /* Address: 0x8011CF34 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011CF34(u8* ptr, u16 val) {
+void pokemonDataBiosSetNumZukan(u8* ptr, u16 val) {
     if (ptr == NULL) { return; }
     *(u16*)(&ptr[0x14]) = val;
 }
 /* Address: 0x8011CF9C | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011CF9C(u8* ptr, u16 val) {
+void pokemonDataBiosSetVoice(u8* ptr, u16 val) {
     if (ptr == NULL) { return; }
     *(u16*)(&ptr[0xE]) = val;
 }
 /* Address: 0x8011CFAC | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011CFAC(u8* ptr, u32 val) {
+void pokemonDataBiosSetDoc(u8* ptr, u32 val) {
     if (ptr == NULL) { return; }
     *(u32*)(&ptr[0x20]) = val;
 }
 /* Address: 0x8011CFBC | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011CFBC(u8* ptr, u16 val) {
+void pokemonDataBiosSetWeight(u8* ptr, u16 val) {
     if (ptr == NULL) { return; }
     *(u16*)(&ptr[0xC]) = val;
 }
 /* Address: 0x8011CFCC | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011CFCC(u8* ptr, u16 val) {
+void pokemonDataBiosSetHeight(u8* ptr, u16 val) {
     if (ptr == NULL) { return; }
     *(u16*)(&ptr[0xA]) = val;
 }
 /* Address: 0x8011CFDC | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011CFDC(u8* ptr, u32 val) {
+void pokemonDataBiosSetTypeName(u8* ptr, u32 val) {
     if (ptr == NULL) { return; }
     *(u32*)(&ptr[0x1C]) = val;
 }
 /* Address: 0x8011D270 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011D270(u8* ptr, u16 val) {
+void pokemonDataBiosSetInitFriend(u8* ptr, u16 val) {
     if (ptr == NULL) { return; }
     *(u16*)(&ptr[0x8]) = val;
 }
 /* Address: 0x8011D280 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011D280(u8* ptr, u8 val) {
+void pokemonDataBiosSetSexRatio(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0x2]) = val;
 }
 /* Address: 0x8011D290 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011D290(u8* ptr, u8 val) {
+void pokemonDataBiosSetGet(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0x1]) = val;
 }
 /* Address: 0x8011D2A0 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011D2A0(u8* ptr, u8 val) {
+void pokemonDataBiosSetGrowDataId(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0x0]) = val;
 }
 /* Address: 0x8011D2B0 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011D2B0(u8* ptr, u16 val) {
+void pokemonDataBiosSetGiveExp(u8* ptr, u16 val) {
     if (ptr == NULL) { return; }
     *(u16*)(&ptr[0x6]) = val;
 }
 /* Address: 0x8011D470 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011D470(u8* ptr, u32 val) {
+void pokemonDataBiosSetName(u8* ptr, u32 val) {
     if (ptr == NULL) { return; }
     *(u32*)(&ptr[0x18]) = val;
 }
 /* Address: 0x8011D494 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011D494(u8* ptr, u16 val) {
+void pokemonBiosSetFightTrainerPokemonDataId(u8* ptr, u16 val) {
     if (ptr == NULL) { return; }
     *(u16*)(&ptr[0xD6]) = val;
 }
 /* Address: 0x8011D4A4 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011D4A4(u8* ptr, u16 val) {
+void pokemonBiosSetPara1Amari(u8* ptr, u16 val) {
     if (ptr == NULL) { return; }
     *(u16*)(&ptr[0xD2]) = val;
 }
 /* Address: 0x8011D4B4 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011D4B4(u8* ptr, u16 val) {
+void pokemonBiosSetAmari(u8* ptr, u16 val) {
     if (ptr == NULL) { return; }
     *(u16*)(&ptr[0xD4]) = val;
 }
 /* Address: 0x8011D4C4 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011D4C4(u8* ptr, u8 val) {
+void pokemonBiosSetMailId(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0xD0]) = val;
 }
 /* Address: 0x8011D4D4 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011D4D4(u8* ptr, u8 val) {
+void pokemonBiosSetPcboxMark(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0xCF]) = val;
 }
 /* Address: 0x8011D4E4 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011D4E4(u8* ptr, u8 val) {
+void pokemonBiosSetFlagAmari(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0xCE]) = val;
 }
 /* Address: 0x8011D4F4 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011D4F4(u8* ptr, u8 val) {
+void pokemonBiosSetFuseiFlag(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0xCD]) = val;
 }
 /* Address: 0x8011D56C | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011D56C(u8* ptr, u8 val) {
+void pokemonBiosSetTamagoFlag(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0xCB]) = val;
 }
 /* Address: 0x8011D57C | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011D57C(u8* ptr, u8 val) {
+void pokemonBiosSetPokerus(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0xCA]) = val;
 }
 /* Address: 0x8011D760 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011D760(u8* ptr, u8 val) {
+void pokemonBiosSetFur(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0xBC]) = val;
 }
 /* Address: 0x8011D8F4 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011D8F4(u8* ptr, u16 val) {
+void pokemonBiosSetDarkpokemonDataId(u8* ptr, u16 val) {
     if (ptr == NULL) { return; }
     *(u16*)(&ptr[0xD8]) = val;
 }
 /* Address: 0x8011DCB4 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011DCB4(u8* ptr, u16 val) {
+void pokemonBiosSetItemDataId(u8* ptr, u16 val) {
     if (ptr == NULL) { return; }
     *(u16*)(&ptr[0x88]) = val;
 }
 /* Address: 0x8011DE38 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011DE38(u8* ptr, u32 val) {
+void pokemonBiosSetConditionAmari(u8* ptr, u32 val) {
     if (ptr == NULL) { return; }
     *(u32*)(&ptr[0x74]) = val;
 }
 /* Address: 0x8011DE88 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011DE88(u8* ptr, u32 val) {
+void pokemonBiosSetPoolExp(u8* ptr, u32 val) {
     if (ptr == NULL) { return; }
     *(u32*)(&ptr[0xE0]) = val;
 }
 /* Address: 0x8011DE98 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011DE98(u8* ptr, u32 val) {
+void pokemonBiosSetExp(u8* ptr, u32 val) {
     if (ptr == NULL) { return; }
     *(u32*)(&ptr[0x5C]) = val;
 }
 /* Address: 0x8011DF90 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011DF90(u8* ptr, u32 val) {
+void pokemonBiosSetCatchTrainerRnd(u8* ptr, u32 val) {
     if (ptr == NULL) { return; }
     *(u32*)(&ptr[0x14]) = val;
 }
 /* Address: 0x8011DFA0 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011DFA0(u8* ptr, u8 val) {
+void pokemonBiosSetCatchTrainerSex(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0x10]) = val;
 }
 /* Address: 0x8011DFB0 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011DFB0(u8* ptr, u8 val) {
+void pokemonBiosSetCatchBallId(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0xF]) = val;
 }
 /* Address: 0x8011DFC0 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011DFC0(u8* ptr, u8 val) {
+void pokemonBiosSetCatchLevel(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0xE]) = val;
 }
 /* Address: 0x8011DFD0 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011DFD0(u8* ptr, u16 val) {
+void pokemonBiosSetCatchFloorId(u8* ptr, u16 val) {
     if (ptr == NULL) { return; }
     *(u16*)(&ptr[0xC]) = val;
 }
 /* Address: 0x8011DFE0 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011DFE0(u8* ptr, u32 val) {
+void pokemonBiosSetRnd(u8* ptr, u32 val) {
     if (ptr == NULL) { return; }
     *(u32*)(&ptr[0x4]) = val;
 }
 /* Address: 0x8011DFF0 | Size: 0x10 | Pattern: nullcheck_setter */
-void fn_8011DFF0(u8* ptr, u16 val) {
+void pokemonBiosSetPokemonDataId(u8* ptr, u16 val) {
     if (ptr == NULL) { return; }
     *(u16*)(&ptr[0x0]) = val;
 }
@@ -1826,202 +1826,202 @@ u16 fn_8011E030(u8* ptr) {
     return *(u16*)(&ptr[0x16]);
 }
 /* Address: 0x8011E0AC | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fn_8011E0AC(u8* ptr) {
+u32 pokemonDataBiosGetPkxDataId(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u32*)(&ptr[0x2C]);
 }
 /* Address: 0x8011E0C4 | Size: 0x18 | Pattern: nullcheck_getter */
-u16 fn_8011E0C4(u8* ptr) {
+u16 pokemonDataBiosGetNumPokemon(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u16*)(&ptr[0x12]);
 }
 /* Address: 0x8011E0DC | Size: 0x18 | Pattern: nullcheck_getter */
-u16 fn_8011E0DC(u8* ptr) {
+u16 pokemonDataBiosGetNumZukan(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u16*)(&ptr[0x14]);
 }
 /* Address: 0x8011E15C | Size: 0x18 | Pattern: nullcheck_getter */
-u16 fn_8011E15C(u8* ptr) {
+u16 pokemonDataBiosGetVoice(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u16*)(&ptr[0xE]);
 }
 /* Address: 0x8011E174 | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fn_8011E174(u8* ptr) {
+u32 pokemonDataBiosGetDoc(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u32*)(&ptr[0x20]);
 }
 /* Address: 0x8011E18C | Size: 0x18 | Pattern: nullcheck_getter */
-u16 fn_8011E18C(u8* ptr) {
+u16 pokemonDataBiosGetWeight(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u16*)(&ptr[0xC]);
 }
 /* Address: 0x8011E1A4 | Size: 0x18 | Pattern: nullcheck_getter */
-u16 fn_8011E1A4(u8* ptr) {
+u16 pokemonDataBiosGetHeight(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u16*)(&ptr[0xA]);
 }
 /* Address: 0x8011E1BC | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fn_8011E1BC(u8* ptr) {
+u32 pokemonDataBiosGetTypeName(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u32*)(&ptr[0x1C]);
 }
 /* Address: 0x8011E4D8 | Size: 0x18 | Pattern: nullcheck_getter */
-u16 fn_8011E4D8(u8* ptr) {
+u16 pokemonDataBiosGetInitFriend(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u16*)(&ptr[0x8]);
 }
 /* Address: 0x8011E4F0 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011E4F0(u8* ptr) {
+u8 pokemonDataBiosGetSexRatio(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0x2]);
 }
 /* Address: 0x8011E508 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011E508(u8* ptr) {
+u8 pokemonDataBiosGetGet(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0x1]);
 }
 /* Address: 0x8011E520 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011E520(u8* ptr) {
+u8 pokemonDataBiosGetGrowDataId(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0x0]);
 }
 /* Address: 0x8011E538 | Size: 0x18 | Pattern: nullcheck_getter */
-u16 fn_8011E538(u8* ptr) {
+u16 pokemonDataBiosGetGiveExp(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u16*)(&ptr[0x6]);
 }
 /* Address: 0x8011E760 | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fn_8011E760(u8* ptr) {
+u32 pokemonDataBiosGetName(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u32*)(&ptr[0x18]);
 }
 /* Address: 0x8011E7C0 | Size: 0x18 | Pattern: nullcheck_getter */
-u16 fn_8011E7C0(u8* ptr) {
+u16 pokemonBiosGetFightTrainerPokemonDataId(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u16*)(&ptr[0xD6]);
 }
 /* Address: 0x8011E7D8 | Size: 0x18 | Pattern: nullcheck_getter */
-u16 fn_8011E7D8(u8* ptr) {
+u16 pokemonBiosGetPara1Amari(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u16*)(&ptr[0xD2]);
 }
 /* Address: 0x8011E7F0 | Size: 0x18 | Pattern: nullcheck_getter */
-u16 fn_8011E7F0(u8* ptr) {
+u16 pokemonBiosGetAmari(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u16*)(&ptr[0xD4]);
 }
 /* Address: 0x8011E808 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011E808(u8* ptr) {
+u8 pokemonBiosGetMailId(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0xD0]);
 }
 /* Address: 0x8011E820 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011E820(u8* ptr) {
+u8 pokemonBiosGetPcboxMark(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0xCF]);
 }
 /* Address: 0x8011E838 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011E838(u8* ptr) {
+u8 pokemonBiosGetFlagAmari(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0xCE]);
 }
 /* Address: 0x8011E850 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011E850(u8* ptr) {
+u8 pokemonBiosGetFuseiFlag(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0xCD]);
 }
 /* Address: 0x8011E8DC | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011E8DC(u8* ptr) {
+u8 pokemonBiosGetTamagoFlag(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0xCB]);
 }
 /* Address: 0x8011E8F4 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011E8F4(u8* ptr) {
+u8 pokemonBiosGetPokerus(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0xCA]);
 }
 /* Address: 0x8011EB48 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011EB48(u8* ptr) {
+u8 pokemonBiosGetFur(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0xBC]);
 }
 /* Address: 0x8011EDF8 | Size: 0x18 | Pattern: nullcheck_getter */
-u16 fn_8011EDF8(u8* ptr) {
+u16 pokemonBiosGetPoolFriend(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u16*)(&ptr[0xE4]);
 }
 /* Address: 0x8011EE10 | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fn_8011EE10(u8* ptr) {
+u32 pokemonBiosGetPoolExp(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u32*)(&ptr[0xE0]);
 }
 /* Address: 0x8011EE28 | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fn_8011EE28(u8* ptr) {
+u32 pokemonBiosGetDp(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u32*)(&ptr[0xDC]);
 }
 /* Address: 0x8011EE40 | Size: 0x18 | Pattern: nullcheck_getter */
-u16 fn_8011EE40(u8* ptr) {
+u16 pokemonBiosGetDarkpokemonDataId(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u16*)(&ptr[0xD8]);
 }
 /* Address: 0x8011EE58 | Size: 0x18 | Pattern: nullcheck_getter */
-u16 fn_8011EE58(u8* ptr) {
+u16 pokemonBiosGetFriend(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u16*)(&ptr[0xB0]);
 }
 /* Address: 0x8011F188 | Size: 0x18 | Pattern: nullcheck_getter */
-u16 fn_8011F188(u8* ptr) {
+u16 pokemonBiosGetHp(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u16*)(&ptr[0x8A]);
 }
 /* Address: 0x8011F1A0 | Size: 0x18 | Pattern: nullcheck_getter */
-u16 fn_8011F1A0(u8* ptr) {
+u16 pokemonBiosGetItemDataId(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u16*)(&ptr[0x88]);
 }
 /* Address: 0x8011F45C | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fn_8011F45C(u8* ptr) {
+u32 pokemonBiosGetConditionAmari(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u32*)(&ptr[0x74]);
 }
 /* Address: 0x8011F4A8 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011F4A8(u8* ptr) {
+u8 pokemonBiosGetLevel(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0x60]);
 }
 /* Address: 0x8011F4C0 | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fn_8011F4C0(u8* ptr) {
+u32 pokemonBiosGetExp(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u32*)(&ptr[0x5C]);
 }
 /* Address: 0x8011F520 | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fn_8011F520(u8* ptr) {
+u32 pokemonBiosGetCatchTrainerRnd(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u32*)(&ptr[0x14]);
 }
 /* Address: 0x8011F538 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011F538(u8* ptr) {
+u8 pokemonBiosGetCatchTrainerSex(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0x10]);
 }
 /* Address: 0x8011F550 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011F550(u8* ptr) {
+u8 pokemonBiosGetCatchBallId(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0xF]);
 }
 /* Address: 0x8011F568 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fn_8011F568(u8* ptr) {
+u8 pokemonBiosGetCatchLevel(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u8*)(&ptr[0xE]);
 }
 /* Address: 0x8011F580 | Size: 0x18 | Pattern: nullcheck_getter */
-u16 fn_8011F580(u8* ptr) {
+u16 pokemonBiosGetCatchFloorId(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u16*)(&ptr[0xC]);
 }
 /* Address: 0x8011F5B0 | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fn_8011F5B0(u8* ptr) {
+u32 pokemonBiosGetRnd(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u32*)(&ptr[0x4]);
 }
@@ -2032,7 +2032,7 @@ u32 fn_8011F5B0(u8* ptr) {
  * =================================================================== */
 extern u32 lbl_8047ADB8;
 /* Address: 0x8011F5C8 | Size: 0x18 | Pattern: nullcheck_getter */
-u16 fn_8011F5C8(u8* ptr) {
+u16 pokemonBiosGetPokemonDataId(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u16*)(&ptr[0x0]);
 }
@@ -2066,14 +2066,14 @@ s8 pokemonFriendFilterDataBiosGetValue(u8* ptr, u8 idx) {
 /* 0x8011CB10 | 0x2C */
 extern u32 lbl_80478B70;
 extern u8 lbl_8035F988[];
-void* fn_8011CB10(u16 idx) {
+void* pokemonFriendFilterDataBiosGetPtr(u16 idx) {
     if (idx >= lbl_80478B70) { return NULL; }
     return (u8*)lbl_8035F988 + (u32)idx * 3;
 }
 /* 0x8011CB6C | 0x2C */
 extern u32 lbl_80478B68;
 extern u8 lbl_8035F5E0[];
-void* fn_8011CB6C(u16 idx) {
+void* pokemonTokuseiDataBiosGetPtr(u16 idx) {
     if (idx >= lbl_80478B68) { return NULL; }
     return (u8*)lbl_8035F5E0 + (u32)idx * 0xC;
 }
@@ -2103,7 +2103,7 @@ u8 fn_8011CC24(u8* ptr, u8 idx) {
 /* 0x8011CE18 | 0x2C */
 extern u32 lbl_80478E60;
 extern u32 lbl_80478E64;
-void* fn_8011CE18(u8 idx) {
+void* pokemonSeikakuDataBiosGetPtr(u8 idx) {
     u32* hdr = (u32*)lbl_80478E60;
     if (idx >= hdr[0]) { return NULL; }
     return (u8*)lbl_80478E64 + (u32)idx * 0x28;
@@ -2117,7 +2117,7 @@ u32 pokemonGrowDataBiosGetExp(u8* ptr, u8 idx) {
 /* 0x8011CE74 | 0x2C */
 extern u32 lbl_80478B60;
 extern u8 lbl_8035E940[];
-void* fn_8011CE74(u8 idx) {
+void* pokemonGrowDataBiosGetPtr(u8 idx) {
     if (idx >= lbl_80478B60) { return NULL; }
     return (u8*)lbl_8035E940 + (u32)idx * 0x194;
 }
@@ -2128,7 +2128,7 @@ void fn_8011CED0(u8* ptr, u16 idx, u8 val) {
     ptr[idx + 0x6E] = val;
 }
 /* 0x8011CEF0 | 0x24 */
-void fn_8011CEF0(u8* ptr, u16 idx, u16 val) {
+void pokemonDataBiosSetKowaza(u8* ptr, u16 idx, u16 val) {
     if (ptr == NULL) { return; }
     if (idx >= 8) { return; }
     ptr += idx * 2;
@@ -2136,17 +2136,17 @@ void fn_8011CEF0(u8* ptr, u16 idx, u16 val) {
 }
 /* 0x8011CF44 | 0x2C */
 extern void _flagSet(u32);
-void fn_8011CF44(u8* ptr) {
+void pokemonDataBiosSetTukamaetaFlag(u8* ptr) {
     if (ptr == NULL) { return; }
     _flagSet(*(u32*)(&ptr[0x28]));
 }
 /* 0x8011CF70 | 0x2C */
-void fn_8011CF70(u8* ptr) {
+void pokemonDataBiosSetMitaFlag(u8* ptr) {
     if (ptr == NULL) { return; }
     _flagSet(*(u32*)(&ptr[0x24]));
 }
-/* 0x40 | fn_8011CFEC | compound_indexed_setter */
-void fn_8011CFEC(u8* ptr, u16 idx, u8 val) {
+/* 0x40 | pokemonDataBiosSetColor | compound_indexed_setter */
+void pokemonDataBiosSetColor(u8* ptr, u16 idx, u8 val) {
     u8* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2158,8 +2158,8 @@ void fn_8011CFEC(u8* ptr, u16 idx, u8 val) {
     if (sub == NULL) { return; }
     *(u8*)(sub + 0x0) = val;
 }
-/* 0x40 | fn_8011D02C | compound_indexed_setter */
-void fn_8011D02C(u8* ptr, u16 idx, u16 val) {
+/* 0x40 | pokemonDataBiosSetStatusFaceMenuSpriteId | compound_indexed_setter */
+void pokemonDataBiosSetStatusFaceMenuSpriteId(u8* ptr, u16 idx, u16 val) {
     u8* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2171,8 +2171,8 @@ void fn_8011D02C(u8* ptr, u16 idx, u16 val) {
     if (sub == NULL) { return; }
     *(u16*)(sub + 0x2) = val;
 }
-/* 0x40 | fn_8011D06C | compound_indexed_setter */
-void fn_8011D06C(u8* ptr, u16 idx, u32 val) {
+/* 0x40 | pokemonDataBiosSetPokebodyId | compound_indexed_setter */
+void pokemonDataBiosSetPokebodyId(u8* ptr, u16 idx, u32 val) {
     u8* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2185,13 +2185,13 @@ void fn_8011D06C(u8* ptr, u16 idx, u32 val) {
     *(u32*)(sub + 0x4) = val;
 }
 /* 0x8011D0AC | 0x20 */
-void fn_8011D0AC(u8* ptr, u16 idx, u8 val) {
+void pokemonDataBiosSetWazaMcn(u8* ptr, u16 idx, u8 val) {
     if (ptr == NULL) { return; }
     if (idx >= 0x3A) { return; }
     ptr[idx + 0x34] = val;
 }
-/* 0x40 | fn_8011D0CC | compound_indexed_setter */
-void fn_8011D0CC(u8* ptr, u16 idx, u16 val) {
+/* 0x40 | pokemonDataBiosSetGetWazaDataId | compound_indexed_setter */
+void pokemonDataBiosSetGetWazaDataId(u8* ptr, u16 idx, u16 val) {
     u8* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2203,8 +2203,8 @@ void fn_8011D0CC(u8* ptr, u16 idx, u16 val) {
     if (sub == NULL) { return; }
     *(u16*)(sub + 0x2) = val;
 }
-/* 0x40 | fn_8011D10C | compound_indexed_setter */
-void fn_8011D10C(u8* ptr, u16 idx, u8 val) {
+/* 0x40 | pokemonDataBiosSetGetWazaLevel | compound_indexed_setter */
+void pokemonDataBiosSetGetWazaLevel(u8* ptr, u16 idx, u8 val) {
     u8* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2216,8 +2216,8 @@ void fn_8011D10C(u8* ptr, u16 idx, u8 val) {
     if (sub == NULL) { return; }
     *(u8*)(sub + 0x0) = val;
 }
-/* 0x40 | fn_8011D14C | compound_indexed_setter */
-void fn_8011D14C(u8* ptr, u16 idx, u16 val) {
+/* 0x40 | pokemonDataBiosSetSinkaPokemonDataId | compound_indexed_setter */
+void pokemonDataBiosSetSinkaPokemonDataId(u8* ptr, u16 idx, u16 val) {
     u8* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2229,8 +2229,8 @@ void fn_8011D14C(u8* ptr, u16 idx, u16 val) {
     if (sub == NULL) { return; }
     *(u16*)(sub + 0x4) = val;
 }
-/* 0x40 | fn_8011D18C | compound_indexed_setter */
-void fn_8011D18C(u8* ptr, u16 idx, u16 val) {
+/* 0x40 | pokemonDataBiosSetSinkaBuff | compound_indexed_setter */
+void pokemonDataBiosSetSinkaBuff(u8* ptr, u16 idx, u16 val) {
     u8* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2242,8 +2242,8 @@ void fn_8011D18C(u8* ptr, u16 idx, u16 val) {
     if (sub == NULL) { return; }
     *(u16*)(sub + 0x2) = val;
 }
-/* 0x40 | fn_8011D1CC | compound_indexed_setter */
-void fn_8011D1CC(u8* ptr, u16 idx, u8 val) {
+/* 0x40 | pokemonDataBiosSetSinkaKind | compound_indexed_setter */
+void pokemonDataBiosSetSinkaKind(u8* ptr, u16 idx, u8 val) {
     u8* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2256,26 +2256,26 @@ void fn_8011D1CC(u8* ptr, u16 idx, u8 val) {
     *(u8*)(sub + 0x0) = val;
 }
 /* 0x8011D20C | 0x20 */
-void fn_8011D20C(u8* ptr, u16 idx, u8 val) {
+void pokemonDataBiosSetTokuseiDataId(u8* ptr, u16 idx, u8 val) {
     if (ptr == NULL) { return; }
     if (idx >= 2) { return; }
     ptr[idx + 0x32] = val;
 }
 /* 0x8011D22C | 0x20 */
-void fn_8011D22C(u8* ptr, u16 idx, u8 val) {
+void pokemonDataBiosSetZokuseiDataId(u8* ptr, u16 idx, u8 val) {
     if (ptr == NULL) { return; }
     if (idx >= 2) { return; }
     ptr[idx + 0x30] = val;
 }
 /* 0x8011D24C | 0x24 */
-void fn_8011D24C(u8* ptr, u16 idx, u16 val) {
+void pokemonDataBiosSetItemDataId(u8* ptr, u16 idx, u16 val) {
     if (ptr == NULL) { return; }
     if (idx >= 2) { return; }
     ptr += idx * 2;
     *(u16*)(&ptr[0x70]) = val;
 }
 /* 0x8011D2C0 | 36 bytes | compound_setter */
-void fn_8011D2C0(void* ptr, u16 val) {
+void pokemonDataBiosSetGiveNimblenessEffort(void* ptr, u16 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2286,7 +2286,7 @@ void fn_8011D2C0(void* ptr, u16 val) {
     *(u16*)((u8*)sub + 0xA) = val;
 }
 /* 0x8011D2E4 | 36 bytes | compound_setter */
-void fn_8011D2E4(void* ptr, u16 val) {
+void pokemonDataBiosSetGiveSpeDefEffort(void* ptr, u16 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2297,7 +2297,7 @@ void fn_8011D2E4(void* ptr, u16 val) {
     *(u16*)((u8*)sub + 0x8) = val;
 }
 /* 0x8011D308 | 36 bytes | compound_setter */
-void fn_8011D308(void* ptr, u16 val) {
+void pokemonDataBiosSetGiveSpeAtkEffort(void* ptr, u16 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2308,7 +2308,7 @@ void fn_8011D308(void* ptr, u16 val) {
     *(u16*)((u8*)sub + 0x6) = val;
 }
 /* 0x8011D32C | 36 bytes | compound_setter */
-void fn_8011D32C(void* ptr, u16 val) {
+void pokemonDataBiosSetGivePhyDefEffort(void* ptr, u16 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2319,7 +2319,7 @@ void fn_8011D32C(void* ptr, u16 val) {
     *(u16*)((u8*)sub + 0x4) = val;
 }
 /* 0x8011D350 | 36 bytes | compound_setter */
-void fn_8011D350(void* ptr, u16 val) {
+void pokemonDataBiosSetGivePhyAtkEffort(void* ptr, u16 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2330,7 +2330,7 @@ void fn_8011D350(void* ptr, u16 val) {
     *(u16*)((u8*)sub + 0x2) = val;
 }
 /* 0x8011D374 | 36 bytes | compound_setter */
-void fn_8011D374(void* ptr, u16 val) {
+void pokemonDataBiosSetGiveMaxHpEffort(void* ptr, u16 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2341,7 +2341,7 @@ void fn_8011D374(void* ptr, u16 val) {
     *(u16*)((u8*)sub + 0x0) = val;
 }
 /* 0x8011D398 | 36 bytes | compound_setter */
-void fn_8011D398(void* ptr, u16 val) {
+void pokemonDataBiosSetBasisNimbleness(void* ptr, u16 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2352,7 +2352,7 @@ void fn_8011D398(void* ptr, u16 val) {
     *(u16*)((u8*)sub + 0xA) = val;
 }
 /* 0x8011D3BC | 36 bytes | compound_setter */
-void fn_8011D3BC(void* ptr, u16 val) {
+void pokemonDataBiosSetBasisSpeDef(void* ptr, u16 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2363,7 +2363,7 @@ void fn_8011D3BC(void* ptr, u16 val) {
     *(u16*)((u8*)sub + 0x8) = val;
 }
 /* 0x8011D3E0 | 36 bytes | compound_setter */
-void fn_8011D3E0(void* ptr, u16 val) {
+void pokemonDataBiosSetBasisSpeAtk(void* ptr, u16 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2374,7 +2374,7 @@ void fn_8011D3E0(void* ptr, u16 val) {
     *(u16*)((u8*)sub + 0x6) = val;
 }
 /* 0x8011D404 | 36 bytes | compound_setter */
-void fn_8011D404(void* ptr, u16 val) {
+void pokemonDataBiosSetBasisPhyDef(void* ptr, u16 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2385,7 +2385,7 @@ void fn_8011D404(void* ptr, u16 val) {
     *(u16*)((u8*)sub + 0x4) = val;
 }
 /* 0x8011D428 | 36 bytes | compound_setter */
-void fn_8011D428(void* ptr, u16 val) {
+void pokemonDataBiosSetBasisPhyAtk(void* ptr, u16 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2396,7 +2396,7 @@ void fn_8011D428(void* ptr, u16 val) {
     *(u16*)((u8*)sub + 0x2) = val;
 }
 /* 0x8011D44C | 36 bytes | compound_setter */
-void fn_8011D44C(void* ptr, u16 val) {
+void pokemonDataBiosSetBasisMaxHp(void* ptr, u16 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2407,12 +2407,12 @@ void fn_8011D44C(void* ptr, u16 val) {
     *(u16*)((u8*)sub + 0x0) = val;
 }
 /* 0x8011D480 | 0x14 */
-void fn_8011D480(u8* ptr, u8 val) {
+void pokemonBiosSetEventGetFlag(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     *(u32*)(&ptr[0xF8]) = (u32)val;
 }
-/* 0x68 | fn_8011D504 | compound_chained_setter */
-void fn_8011D504(u8* ptr, u8 val) {
+/* 0x68 | pokemonBiosSetTokuseiFlag | compound_chained_setter */
+void pokemonBiosSetTokuseiFlag(u8* ptr, u8 val) {
     u16 idx;
     void* entry;
     u8 check;
@@ -2438,7 +2438,7 @@ void fn_8011D504(u8* ptr, u8 val) {
     *(u8*)(ptr + 0xCC) = val;
 }
 /* 0x8011D58C | 36 bytes | compound_setter */
-void fn_8011D58C(void* ptr, u8 val) {
+void pokemonBiosSetAmariRibbon(void* ptr, u8 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2449,7 +2449,7 @@ void fn_8011D58C(void* ptr, u8 val) {
     *(u8*)((u8*)sub + 0xC) = val;
 }
 /* 0x8011D5B0 | 36 bytes | compound_setter */
-void fn_8011D5B0(void* ptr, u8 val) {
+void pokemonBiosSetWorldRibbon(void* ptr, u8 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2460,7 +2460,7 @@ void fn_8011D5B0(void* ptr, u8 val) {
     *(u8*)((u8*)sub + 0xB) = val;
 }
 /* 0x8011D5D4 | 36 bytes | compound_setter */
-void fn_8011D5D4(void* ptr, u8 val) {
+void pokemonBiosSetEarthRibbon(void* ptr, u8 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2471,7 +2471,7 @@ void fn_8011D5D4(void* ptr, u8 val) {
     *(u8*)((u8*)sub + 0xA) = val;
 }
 /* 0x8011D5F8 | 36 bytes | compound_setter */
-void fn_8011D5F8(void* ptr, u8 val) {
+void pokemonBiosSetNationalRibbon(void* ptr, u8 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2482,7 +2482,7 @@ void fn_8011D5F8(void* ptr, u8 val) {
     *(u8*)((u8*)sub + 0x9) = val;
 }
 /* 0x8011D61C | 36 bytes | compound_setter */
-void fn_8011D61C(void* ptr, u8 val) {
+void pokemonBiosSetCountryRibbon(void* ptr, u8 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2493,7 +2493,7 @@ void fn_8011D61C(void* ptr, u8 val) {
     *(u8*)((u8*)sub + 0x8) = val;
 }
 /* 0x8011D640 | 36 bytes | compound_setter */
-void fn_8011D640(void* ptr, u8 val) {
+void pokemonBiosSetSkyRibbon(void* ptr, u8 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2504,7 +2504,7 @@ void fn_8011D640(void* ptr, u8 val) {
     *(u8*)((u8*)sub + 0x7) = val;
 }
 /* 0x8011D664 | 36 bytes | compound_setter */
-void fn_8011D664(void* ptr, u8 val) {
+void pokemonBiosSetLandRibbon(void* ptr, u8 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2515,7 +2515,7 @@ void fn_8011D664(void* ptr, u8 val) {
     *(u8*)((u8*)sub + 0x6) = val;
 }
 /* 0x8011D688 | 36 bytes | compound_setter */
-void fn_8011D688(void* ptr, u8 val) {
+void pokemonBiosSetMarineRibbon(void* ptr, u8 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2526,7 +2526,7 @@ void fn_8011D688(void* ptr, u8 val) {
     *(u8*)((u8*)sub + 0x5) = val;
 }
 /* 0x8011D6AC | 36 bytes | compound_setter */
-void fn_8011D6AC(void* ptr, u8 val) {
+void pokemonBiosSetGanbaRibbon(void* ptr, u8 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2537,7 +2537,7 @@ void fn_8011D6AC(void* ptr, u8 val) {
     *(u8*)((u8*)sub + 0x4) = val;
 }
 /* 0x8011D6D0 | 36 bytes | compound_setter */
-void fn_8011D6D0(void* ptr, u8 val) {
+void pokemonBiosSetBromideRibbon(void* ptr, u8 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2548,7 +2548,7 @@ void fn_8011D6D0(void* ptr, u8 val) {
     *(u8*)((u8*)sub + 0x3) = val;
 }
 /* 0x8011D6F4 | 36 bytes | compound_setter */
-void fn_8011D6F4(void* ptr, u8 val) {
+void pokemonBiosSetVictoryRibbon(void* ptr, u8 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2559,7 +2559,7 @@ void fn_8011D6F4(void* ptr, u8 val) {
     *(u8*)((u8*)sub + 0x2) = val;
 }
 /* 0x8011D718 | 36 bytes | compound_setter */
-void fn_8011D718(void* ptr, u8 val) {
+void pokemonBiosSetWinningRibbon(void* ptr, u8 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2570,7 +2570,7 @@ void fn_8011D718(void* ptr, u8 val) {
     *(u8*)((u8*)sub + 0x1) = val;
 }
 /* 0x8011D73C | 36 bytes | compound_setter */
-void fn_8011D73C(void* ptr, u8 val) {
+void pokemonBiosSetChampRibbon(void* ptr, u8 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2581,7 +2581,7 @@ void fn_8011D73C(void* ptr, u8 val) {
     *(u8*)((u8*)sub + 0x0) = val;
 }
 /* 0x8011D770 | 36 bytes | compound_setter */
-void fn_8011D770(void* ptr, u8 val) {
+void pokemonBiosSetStrongMedal(void* ptr, u8 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2592,7 +2592,7 @@ void fn_8011D770(void* ptr, u8 val) {
     *(u8*)((u8*)sub + 0x4) = val;
 }
 /* 0x8011D794 | 36 bytes | compound_setter */
-void fn_8011D794(void* ptr, u8 val) {
+void pokemonBiosSetCleverMedal(void* ptr, u8 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2603,7 +2603,7 @@ void fn_8011D794(void* ptr, u8 val) {
     *(u8*)((u8*)sub + 0x3) = val;
 }
 /* 0x8011D7B8 | 36 bytes | compound_setter */
-void fn_8011D7B8(void* ptr, u8 val) {
+void pokemonBiosSetCuteMedal(void* ptr, u8 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2614,7 +2614,7 @@ void fn_8011D7B8(void* ptr, u8 val) {
     *(u8*)((u8*)sub + 0x2) = val;
 }
 /* 0x8011D7DC | 36 bytes | compound_setter */
-void fn_8011D7DC(void* ptr, u8 val) {
+void pokemonBiosSetBeautifulMedal(void* ptr, u8 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2625,7 +2625,7 @@ void fn_8011D7DC(void* ptr, u8 val) {
     *(u8*)((u8*)sub + 0x1) = val;
 }
 /* 0x8011D800 | 36 bytes | compound_setter */
-void fn_8011D800(void* ptr, u8 val) {
+void pokemonBiosSetStyleMedal(void* ptr, u8 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2636,7 +2636,7 @@ void fn_8011D800(void* ptr, u8 val) {
     *(u8*)((u8*)sub + 0x0) = val;
 }
 /* 0x8011D824 | 36 bytes | compound_setter */
-void fn_8011D824(void* ptr, u8 val) {
+void pokemonBiosSetStrong(void* ptr, u8 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2647,7 +2647,7 @@ void fn_8011D824(void* ptr, u8 val) {
     *(u8*)((u8*)sub + 0x4) = val;
 }
 /* 0x8011D848 | 36 bytes | compound_setter */
-void fn_8011D848(void* ptr, u8 val) {
+void pokemonBiosSetClever(void* ptr, u8 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2658,7 +2658,7 @@ void fn_8011D848(void* ptr, u8 val) {
     *(u8*)((u8*)sub + 0x3) = val;
 }
 /* 0x8011D86C | 36 bytes | compound_setter */
-void fn_8011D86C(void* ptr, u8 val) {
+void pokemonBiosSetCute(void* ptr, u8 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2669,7 +2669,7 @@ void fn_8011D86C(void* ptr, u8 val) {
     *(u8*)((u8*)sub + 0x2) = val;
 }
 /* 0x8011D890 | 36 bytes | compound_setter */
-void fn_8011D890(void* ptr, u8 val) {
+void pokemonBiosSetBeautiful(void* ptr, u8 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2680,7 +2680,7 @@ void fn_8011D890(void* ptr, u8 val) {
     *(u8*)((u8*)sub + 0x1) = val;
 }
 /* 0x8011D8B4 | 36 bytes | compound_setter */
-void fn_8011D8B4(void* ptr, u8 val) {
+void pokemonBiosSetStyle(void* ptr, u8 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2691,19 +2691,19 @@ void fn_8011D8B4(void* ptr, u8 val) {
     *(u8*)((u8*)sub + 0x0) = val;
 }
 /* 0x8011D8D8 | 0x1C */
-void fn_8011D8D8(u8* ptr, s32 val) {
+void pokemonBiosSetDp(u8* ptr, s32 val) {
     if (ptr == NULL) { return; }
     if (val >= 0x639C) { val = 0x639C; }
     *(u32*)(&ptr[0xDC]) = (u32)val;
 }
 /* 0x8011D904 | 0x20 */
-void fn_8011D904(u8* ptr, u16 val) {
+void pokemonBiosSetFriend(u8* ptr, u16 val) {
     if (ptr == NULL) { return; }
     if (val > 0xFF) { val = 0xFF; }
     *(u16*)(&ptr[0xB0]) = val;
 }
 /* 0x8011D924 | 0x34 */
-void fn_8011D924(u8* ptr, u16 val) {
+void pokemonBiosSetNimblenessRnd(u8* ptr, u16 val) {
     u8* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2715,7 +2715,7 @@ void fn_8011D924(u8* ptr, u16 val) {
     *(u16*)(sub + 0xA) = val;
 }
 /* 0x8011D958 | 0x34 */
-void fn_8011D958(u8* ptr, u16 val) {
+void pokemonBiosSetSpeDefRnd(u8* ptr, u16 val) {
     u8* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2727,7 +2727,7 @@ void fn_8011D958(u8* ptr, u16 val) {
     *(u16*)(sub + 0x8) = val;
 }
 /* 0x8011D98C | 0x34 */
-void fn_8011D98C(u8* ptr, u16 val) {
+void pokemonBiosSetSpeAtkRnd(u8* ptr, u16 val) {
     u8* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2739,7 +2739,7 @@ void fn_8011D98C(u8* ptr, u16 val) {
     *(u16*)(sub + 0x6) = val;
 }
 /* 0x8011D9C0 | 0x34 */
-void fn_8011D9C0(u8* ptr, u16 val) {
+void pokemonBiosSetPhyDefRnd(u8* ptr, u16 val) {
     u8* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2751,7 +2751,7 @@ void fn_8011D9C0(u8* ptr, u16 val) {
     *(u16*)(sub + 0x4) = val;
 }
 /* 0x8011D9F4 | 0x34 */
-void fn_8011D9F4(u8* ptr, u16 val) {
+void pokemonBiosSetPhyAtkRnd(u8* ptr, u16 val) {
     u8* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2763,7 +2763,7 @@ void fn_8011D9F4(u8* ptr, u16 val) {
     *(u16*)(sub + 0x2) = val;
 }
 /* 0x8011DA28 | 0x34 */
-void fn_8011DA28(u8* ptr, u16 val) {
+void pokemonBiosSetMaxHpRnd(u8* ptr, u16 val) {
     u8* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2775,7 +2775,7 @@ void fn_8011DA28(u8* ptr, u16 val) {
     *(u16*)(sub + 0x0) = val;
 }
 /* 0x8011DA5C | 0x34 */
-void fn_8011DA5C(u8* ptr, u16 val) {
+void pokemonBiosSetNimblenessEffort(u8* ptr, u16 val) {
     u8* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2787,7 +2787,7 @@ void fn_8011DA5C(u8* ptr, u16 val) {
     *(u16*)(sub + 0xA) = val;
 }
 /* 0x8011DA90 | 0x34 */
-void fn_8011DA90(u8* ptr, u16 val) {
+void pokemonBiosSetSpeDefEffort(u8* ptr, u16 val) {
     u8* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2799,7 +2799,7 @@ void fn_8011DA90(u8* ptr, u16 val) {
     *(u16*)(sub + 0x8) = val;
 }
 /* 0x8011DAC4 | 0x34 */
-void fn_8011DAC4(u8* ptr, u16 val) {
+void pokemonBiosSetSpeAtkEffort(u8* ptr, u16 val) {
     u8* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2811,7 +2811,7 @@ void fn_8011DAC4(u8* ptr, u16 val) {
     *(u16*)(sub + 0x6) = val;
 }
 /* 0x8011DAF8 | 0x34 */
-void fn_8011DAF8(u8* ptr, u16 val) {
+void pokemonBiosSetPhyDefEffort(u8* ptr, u16 val) {
     u8* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2823,7 +2823,7 @@ void fn_8011DAF8(u8* ptr, u16 val) {
     *(u16*)(sub + 0x4) = val;
 }
 /* 0x8011DB2C | 0x34 */
-void fn_8011DB2C(u8* ptr, u16 val) {
+void pokemonBiosSetPhyAtkEffort(u8* ptr, u16 val) {
     u8* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2835,7 +2835,7 @@ void fn_8011DB2C(u8* ptr, u16 val) {
     *(u16*)(sub + 0x2) = val;
 }
 /* 0x8011DB60 | 0x34 */
-void fn_8011DB60(u8* ptr, u16 val) {
+void pokemonBiosSetMaxHpEffort(u8* ptr, u16 val) {
     u8* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2847,7 +2847,7 @@ void fn_8011DB60(u8* ptr, u16 val) {
     *(u16*)(sub + 0x0) = val;
 }
 /* 0x8011DB94 | 36 bytes | compound_setter */
-void fn_8011DB94(void* ptr, u16 val) {
+void pokemonBiosSetNimbleness(void* ptr, u16 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2858,7 +2858,7 @@ void fn_8011DB94(void* ptr, u16 val) {
     *(u16*)((u8*)sub + 0xA) = val;
 }
 /* 0x8011DBB8 | 36 bytes | compound_setter */
-void fn_8011DBB8(void* ptr, u16 val) {
+void pokemonBiosSetSpeDef(void* ptr, u16 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2869,7 +2869,7 @@ void fn_8011DBB8(void* ptr, u16 val) {
     *(u16*)((u8*)sub + 0x8) = val;
 }
 /* 0x8011DBDC | 36 bytes | compound_setter */
-void fn_8011DBDC(void* ptr, u16 val) {
+void pokemonBiosSetSpeAtk(void* ptr, u16 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2880,7 +2880,7 @@ void fn_8011DBDC(void* ptr, u16 val) {
     *(u16*)((u8*)sub + 0x6) = val;
 }
 /* 0x8011DC00 | 36 bytes | compound_setter */
-void fn_8011DC00(void* ptr, u16 val) {
+void pokemonBiosSetPhyDef(void* ptr, u16 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2891,7 +2891,7 @@ void fn_8011DC00(void* ptr, u16 val) {
     *(u16*)((u8*)sub + 0x4) = val;
 }
 /* 0x8011DC24 | 36 bytes | compound_setter */
-void fn_8011DC24(void* ptr, u16 val) {
+void pokemonBiosSetPhyAtk(void* ptr, u16 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2902,7 +2902,7 @@ void fn_8011DC24(void* ptr, u16 val) {
     *(u16*)((u8*)sub + 0x2) = val;
 }
 /* 0x8011DC48 | 36 bytes | compound_setter */
-void fn_8011DC48(void* ptr, u16 val) {
+void pokemonBiosSetMaxHp(void* ptr, u16 val) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -2912,8 +2912,8 @@ void fn_8011DC48(void* ptr, u16 val) {
     if (sub == NULL) return;
     *(u16*)((u8*)sub + 0x0) = val;
 }
-/* 0x48 | fn_8011DC6C | compound_clamp_setter */
-void fn_8011DC6C(u8* ptr, u16 val) {
+/* 0x48 | pokemonBiosSetHp | compound_clamp_setter */
+void pokemonBiosSetHp(u8* ptr, u16 val) {
     void* sub;
     u16 subVal;
     if (ptr == NULL) { return; }
@@ -2933,33 +2933,33 @@ void fn_8011DC6C(u8* ptr, u16 val) {
 }
 /* 0x8011DCC4 | 0xBC */
 #if 0
-asm void fn_8011DCC4(void) {
+asm void pokemonBiosSetPokemonWazaPpCount(void) {
 #include "src/game/gs_field_world_fn_8011DCC4.inc"
 }
 #else
-void fn_8011DCC4(u8* ptr, u32 arg2, u8 arg3) {
-    extern u8* fn_8011F260(u8* a, u32 b, u32 c);
+void pokemonBiosSetPokemonWazaPpCount(u8* ptr, u32 arg2, u8 arg3) {
+    extern u8* pokemonBiosGetPokemonWazaPtr(u8* a, u32 b, u32 c);
     extern u32 pokemonWazaCheckValid(u8* a, u32 b);
     extern void* wazaDataBiosGetPtr(u32 val);
     u8* result;
-    result = fn_8011F260(ptr, arg2, 0);
+    result = pokemonBiosGetPokemonWazaPtr(ptr, arg2, 0);
     if (result == NULL) { return; }
     if ((u8)arg3 > 3) { arg3 = 3; }
     if ((u8)pokemonWazaCheckValid(ptr, arg2) == 1) {
-        u8* tmp = fn_8011F260(ptr, arg2, 1);
+        u8* tmp = pokemonBiosGetPokemonWazaPtr(ptr, arg2, 1);
         u32 val = tmp == NULL ? 0 : *(u16*)tmp;
         if ((u8)wazaDataBiosGetPp(wazaDataBiosGetPtr(val)) <= 4) { return; }
     }
     result[3] = arg3;
 }
 #endif
-/* 0x7C | fn_8011DD80 | call_clamp_store */
-void fn_8011DD80(u32 arg1, s32 arg2, u8 maxVal) {
-    extern void* fn_8011F260();
+/* 0x7C | pokemonBiosSetPokemonWazaPp | call_clamp_store */
+void pokemonBiosSetPokemonWazaPp(u32 arg1, s32 arg2, u8 maxVal) {
+    extern void* pokemonBiosGetPokemonWazaPtr();
     extern u8 pokemonWazaGetMaxPP(u8* ptr, s32 idx);
     u8* result;
     u8 val;
-    result = fn_8011F260(arg1, arg2, 0);
+    result = pokemonBiosGetPokemonWazaPtr(arg1, arg2, 0);
     if (result == NULL) { return; }
     val = pokemonWazaGetMaxPP((u8*)arg1, arg2);
     if (val < maxVal) {
@@ -2968,34 +2968,34 @@ void fn_8011DD80(u32 arg1, s32 arg2, u8 maxVal) {
     *(u8*)(result + 0x2) = maxVal;
 }
 /* 0x8011DDFC | 0x3C */
-void fn_8011DDFC(void* ctx, u32 p1, u32 value) {
-    extern void* fn_8011F260();
-    void* result = fn_8011F260(ctx, p1, 0);
+void pokemonBiosSetPokemonWazaDataId(void* ctx, u32 p1, u32 value) {
+    extern void* pokemonBiosGetPokemonWazaPtr();
+    void* result = pokemonBiosGetPokemonWazaPtr(ctx, p1, 0);
     if (result != 0) {
         *(u16*)result = value;
     }
 }
 /* 0x8011DE48 | 0x20 */
-void fn_8011DE48(u8* ptr, u8 val) {
+void pokemonBiosSetLevel(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
     if (val > 0x64) { val = 0x64; }
     ptr[0x60] = val;
 }
 /* 0x8011DE68 | 0x20 */
-void fn_8011DE68(u8* ptr, u16 val) {
+void pokemonBiosSetPoolFriend(u8* ptr, u16 val) {
     if (ptr == NULL) { return; }
     if (val > 0xFF) { val = 0xFF; }
     *(u16*)(&ptr[0xE4]) = val;
 }
 /* 0x8011DEA8 | 0x3C */
-void fn_8011DEA8(u8* ptr, void* src) {
+void pokemonBiosSetNicknameOrgPtr(u8* ptr, void* src) {
     extern void GScharLenCpy();
     if (ptr == NULL) { return; }
     if (src == NULL) { return; }
     GScharLenCpy(ptr + 0x44, src, 0xB);
 }
-/* 0x70 | fn_8011DEE4 | dual_memcpy_setter */
-void fn_8011DEE4(u8* ptr, void* src) {
+/* 0x70 | pokemonBiosSetNicknamePtr | dual_memcpy_setter */
+void pokemonBiosSetNicknamePtr(u8* ptr, void* src) {
     extern void GScharLenCpy();
     if (ptr == NULL) { return; }
     if (src == NULL) { return; }
@@ -3005,7 +3005,7 @@ void fn_8011DEE4(u8* ptr, void* src) {
     GScharLenCpy(ptr + 0x44, src, 0xB);
 }
 /* 0x8011DF54 | 0x3C */
-void fn_8011DF54(u8* ptr, void* src) {
+void pokemonBiosSetCatchTrainerNamePtr(u8* ptr, void* src) {
     extern void GScharLenCpy();
     if (ptr == NULL) { return; }
     if (src == NULL) { return; }
@@ -3018,7 +3018,7 @@ u8 fn_8011E048(u8* ptr, u16 idx) {
     return ptr[idx + 0x6E];
 }
 /* 0x8011E078 | 0x34 */
-u16 fn_8011E078(u8* ptr, u16 idx) {
+u16 pokemonDataBiosGetKowaza(u8* ptr, u16 idx) {
     if (ptr == NULL) { return 0; }
     if (idx >= 8) { return 0; }
     ptr += idx * 2;
@@ -3026,35 +3026,35 @@ u16 fn_8011E078(u8* ptr, u16 idx) {
 }
 /* 0x8011E0F4 | 0x34 */
 extern void* fn_801906A0(u32);
-void* fn_8011E0F4(u8* ptr) {
+void* pokemonDataBiosGetTukamaetaFlag(u8* ptr) {
     if (ptr == NULL) { return NULL; }
     return fn_801906A0(*(u32*)(&ptr[0x28]));
 }
 /* 0x8011E128 | 0x34 */
-void* fn_8011E128(u8* ptr) {
+void* pokemonDataBiosGetMitaFlag(u8* ptr) {
     if (ptr == NULL) { return NULL; }
     return fn_801906A0(*(u32*)(&ptr[0x24]));
 }
 /* 0x8011E2AC | 0x30 */
-u8 fn_8011E2AC(u8* ptr, u16 idx) {
+u8 pokemonDataBiosGetWazaMcn(u8* ptr, u16 idx) {
     if (ptr == NULL) { return 0; }
     if (idx >= 0x3A) { return 0; }
     return ptr[idx + 0x34];
 }
 /* 0x8011E444 | 0x30 */
-u8 fn_8011E444(u8* ptr, u16 idx) {
+u8 pokemonDataBiosGetTokuseiDataId(u8* ptr, u16 idx) {
     if (ptr == NULL) { return 0; }
     if (idx >= 2) { return 0; }
     return ptr[idx + 0x32];
 }
 /* 0x8011E474 | 0x30 */
-u8 fn_8011E474(u8* ptr, u16 idx) {
+u8 pokemonDataBiosGetZokuseiDataId(u8* ptr, u16 idx) {
     if (ptr == NULL) { return 0; }
     if (idx >= 2) { return 0; }
     return ptr[idx + 0x30];
 }
 /* 0x8011E57C | 44 bytes | compound_getter */
-u16 fn_8011E57C(void* ptr) {
+u16 pokemonDataBiosGetGiveSpeDefEffort(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3065,7 +3065,7 @@ u16 fn_8011E57C(void* ptr) {
     return *(u16*)((u8*)sub + 0x8);
 }
 /* 0x8011E5A8 | 44 bytes | compound_getter */
-u16 fn_8011E5A8(void* ptr) {
+u16 pokemonDataBiosGetGiveSpeAtkEffort(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3076,7 +3076,7 @@ u16 fn_8011E5A8(void* ptr) {
     return *(u16*)((u8*)sub + 0x6);
 }
 /* 0x8011E5D4 | 44 bytes | compound_getter */
-u16 fn_8011E5D4(void* ptr) {
+u16 pokemonDataBiosGetGivePhyDefEffort(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3087,7 +3087,7 @@ u16 fn_8011E5D4(void* ptr) {
     return *(u16*)((u8*)sub + 0x4);
 }
 /* 0x8011E600 | 44 bytes | compound_getter */
-u16 fn_8011E600(void* ptr) {
+u16 pokemonDataBiosGetGivePhyAtkEffort(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3098,7 +3098,7 @@ u16 fn_8011E600(void* ptr) {
     return *(u16*)((u8*)sub + 0x2);
 }
 /* 0x8011E62C | 44 bytes | compound_getter */
-u16 fn_8011E62C(void* ptr) {
+u16 pokemonDataBiosGetGiveMaxHpEffort(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3109,7 +3109,7 @@ u16 fn_8011E62C(void* ptr) {
     return *(u16*)((u8*)sub + 0x0);
 }
 /* 0x8011E658 | 44 bytes | compound_getter */
-u16 fn_8011E658(void* ptr) {
+u16 pokemonDataBiosGetBasisNimbleness(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3120,7 +3120,7 @@ u16 fn_8011E658(void* ptr) {
     return *(u16*)((u8*)sub + 0xA);
 }
 /* 0x8011E684 | 44 bytes | compound_getter */
-u16 fn_8011E684(void* ptr) {
+u16 pokemonDataBiosGetBasisSpeDef(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3131,7 +3131,7 @@ u16 fn_8011E684(void* ptr) {
     return *(u16*)((u8*)sub + 0x8);
 }
 /* 0x8011E6B0 | 44 bytes | compound_getter */
-u16 fn_8011E6B0(void* ptr) {
+u16 pokemonDataBiosGetBasisSpeAtk(void* ptr) {
     void* sub;
     if (ptr == NULL) {
         sub = NULL;
@@ -3142,7 +3142,7 @@ u16 fn_8011E6B0(void* ptr) {
     return *(u16*)((u8*)sub + 0x6);
 }
 /* 0x8011E6DC | 44 bytes | compound_getter */
-u16 fn_8011E6DC(void* ptr) {
+u16 pokemonDataBiosGetBasisPhyDef(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3153,7 +3153,7 @@ u16 fn_8011E6DC(void* ptr) {
     return *(u16*)((u8*)sub + 0x4);
 }
 /* 0x8011E708 | 44 bytes | compound_getter */
-u16 fn_8011E708(void* ptr) {
+u16 pokemonDataBiosGetBasisPhyAtk(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3164,7 +3164,7 @@ u16 fn_8011E708(void* ptr) {
     return *(u16*)((u8*)sub + 0x2);
 }
 /* 0x8011E734 | 44 bytes | compound_getter */
-u16 fn_8011E734(void* ptr) {
+u16 pokemonDataBiosGetBasisMaxHp(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3177,18 +3177,18 @@ u16 fn_8011E734(void* ptr) {
 /* 0x8011E778 | 0x2C */
 extern u32 lbl_80478F90;
 extern u32 lbl_80478F94;
-void* fn_8011E778(u16 idx) {
+void* pokemonDataBiosGetPtr(u16 idx) {
     u32* hdr = (u32*)lbl_80478F90;
     if (idx >= hdr[0]) { return NULL; }
     return (u8*)lbl_80478F94 + (u32)idx * 0x11C;
 }
 /* 0x8011E7A4 | 0x1C */
-u8 fn_8011E7A4(u8* ptr) {
+u8 pokemonBiosGetEventGetFlag(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return (u8)(*(u32*)(&ptr[0xF8]));
 }
 /* 0x8011E90C | 44 bytes | compound_getter */
-u8 fn_8011E90C(void* ptr) {
+u8 pokemonBiosGetAmariRibbon(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3199,7 +3199,7 @@ u8 fn_8011E90C(void* ptr) {
     return *(u8*)((u8*)sub + 0xC);
 }
 /* 0x8011E938 | 44 bytes | compound_getter */
-u8 fn_8011E938(void* ptr) {
+u8 pokemonBiosGetWorldRibbon(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3210,7 +3210,7 @@ u8 fn_8011E938(void* ptr) {
     return *(u8*)((u8*)sub + 0xB);
 }
 /* 0x8011E964 | 44 bytes | compound_getter */
-u8 fn_8011E964(void* ptr) {
+u8 pokemonBiosGetEarthRibbon(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3221,7 +3221,7 @@ u8 fn_8011E964(void* ptr) {
     return *(u8*)((u8*)sub + 0xA);
 }
 /* 0x8011E990 | 44 bytes | compound_getter */
-u8 fn_8011E990(void* ptr) {
+u8 pokemonBiosGetNationalRibbon(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3232,7 +3232,7 @@ u8 fn_8011E990(void* ptr) {
     return *(u8*)((u8*)sub + 0x9);
 }
 /* 0x8011E9BC | 44 bytes | compound_getter */
-u8 fn_8011E9BC(void* ptr) {
+u8 pokemonBiosGetCountryRibbon(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3243,7 +3243,7 @@ u8 fn_8011E9BC(void* ptr) {
     return *(u8*)((u8*)sub + 0x8);
 }
 /* 0x8011E9E8 | 44 bytes | compound_getter */
-u8 fn_8011E9E8(void* ptr) {
+u8 pokemonBiosGetSkyRibbon(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3254,7 +3254,7 @@ u8 fn_8011E9E8(void* ptr) {
     return *(u8*)((u8*)sub + 0x7);
 }
 /* 0x8011EA14 | 44 bytes | compound_getter */
-u8 fn_8011EA14(void* ptr) {
+u8 pokemonBiosGetLandRibbon(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3265,7 +3265,7 @@ u8 fn_8011EA14(void* ptr) {
     return *(u8*)((u8*)sub + 0x6);
 }
 /* 0x8011EA40 | 44 bytes | compound_getter */
-u8 fn_8011EA40(void* ptr) {
+u8 pokemonBiosGetMarineRibbon(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3276,7 +3276,7 @@ u8 fn_8011EA40(void* ptr) {
     return *(u8*)((u8*)sub + 0x5);
 }
 /* 0x8011EA6C | 44 bytes | compound_getter */
-u8 fn_8011EA6C(void* ptr) {
+u8 pokemonBiosGetGanbaRibbon(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3287,7 +3287,7 @@ u8 fn_8011EA6C(void* ptr) {
     return *(u8*)((u8*)sub + 0x4);
 }
 /* 0x8011EA98 | 44 bytes | compound_getter */
-u8 fn_8011EA98(void* ptr) {
+u8 pokemonBiosGetBromideRibbon(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3298,7 +3298,7 @@ u8 fn_8011EA98(void* ptr) {
     return *(u8*)((u8*)sub + 0x3);
 }
 /* 0x8011EAC4 | 44 bytes | compound_getter */
-u8 fn_8011EAC4(void* ptr) {
+u8 pokemonBiosGetVictoryRibbon(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3309,7 +3309,7 @@ u8 fn_8011EAC4(void* ptr) {
     return *(u8*)((u8*)sub + 0x2);
 }
 /* 0x8011EAF0 | 44 bytes | compound_getter */
-u8 fn_8011EAF0(void* ptr) {
+u8 pokemonBiosGetWinningRibbon(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3320,7 +3320,7 @@ u8 fn_8011EAF0(void* ptr) {
     return *(u8*)((u8*)sub + 0x1);
 }
 /* 0x8011EB1C | 44 bytes | compound_getter */
-u8 fn_8011EB1C(void* ptr) {
+u8 pokemonBiosGetChampRibbon(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3331,7 +3331,7 @@ u8 fn_8011EB1C(void* ptr) {
     return *(u8*)((u8*)sub + 0x0);
 }
 /* 0x8011EB60 | 44 bytes | compound_getter */
-u8 fn_8011EB60(void* ptr) {
+u8 pokemonBiosGetStrongMedal(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3342,7 +3342,7 @@ u8 fn_8011EB60(void* ptr) {
     return *(u8*)((u8*)sub + 0x4);
 }
 /* 0x8011EB8C | 44 bytes | compound_getter */
-u8 fn_8011EB8C(void* ptr) {
+u8 pokemonBiosGetCleverMedal(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3353,7 +3353,7 @@ u8 fn_8011EB8C(void* ptr) {
     return *(u8*)((u8*)sub + 0x3);
 }
 /* 0x8011EBB8 | 44 bytes | compound_getter */
-u8 fn_8011EBB8(void* ptr) {
+u8 pokemonBiosGetCuteMedal(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3364,7 +3364,7 @@ u8 fn_8011EBB8(void* ptr) {
     return *(u8*)((u8*)sub + 0x2);
 }
 /* 0x8011EBE4 | 44 bytes | compound_getter */
-u8 fn_8011EBE4(void* ptr) {
+u8 pokemonBiosGetBeautifulMedal(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3375,7 +3375,7 @@ u8 fn_8011EBE4(void* ptr) {
     return *(u8*)((u8*)sub + 0x1);
 }
 /* 0x8011EC10 | 44 bytes | compound_getter */
-u8 fn_8011EC10(void* ptr) {
+u8 pokemonBiosGetStyleMedal(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3386,7 +3386,7 @@ u8 fn_8011EC10(void* ptr) {
     return *(u8*)((u8*)sub + 0x0);
 }
 /* 0x8011EC3C | 44 bytes | compound_getter */
-u8 fn_8011EC3C(void* ptr) {
+u8 pokemonBiosGetStrong(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3397,7 +3397,7 @@ u8 fn_8011EC3C(void* ptr) {
     return *(u8*)((u8*)sub + 0x4);
 }
 /* 0x8011EC68 | 44 bytes | compound_getter */
-u8 fn_8011EC68(void* ptr) {
+u8 pokemonBiosGetClever(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3408,7 +3408,7 @@ u8 fn_8011EC68(void* ptr) {
     return *(u8*)((u8*)sub + 0x3);
 }
 /* 0x8011EC94 | 44 bytes | compound_getter */
-u8 fn_8011EC94(void* ptr) {
+u8 pokemonBiosGetCute(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3419,7 +3419,7 @@ u8 fn_8011EC94(void* ptr) {
     return *(u8*)((u8*)sub + 0x2);
 }
 /* 0x8011ECC0 | 44 bytes | compound_getter */
-u8 fn_8011ECC0(void* ptr) {
+u8 pokemonBiosGetBeautiful(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3430,7 +3430,7 @@ u8 fn_8011ECC0(void* ptr) {
     return *(u8*)((u8*)sub + 0x1);
 }
 /* 0x8011ECEC | 44 bytes | compound_getter */
-u8 fn_8011ECEC(void* ptr) {
+u8 pokemonBiosGetStyle(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3447,7 +3447,7 @@ void* fn_8011EDC4(u8* ptr, u16 idx) {
     return ptr + (u32)idx * 16 + 0xE8;
 }
 /* 0x8011EE70 | 44 bytes | compound_getter */
-u16 fn_8011EE70(void* ptr) {
+u16 pokemonBiosGetNimblenessRnd(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3458,7 +3458,7 @@ u16 fn_8011EE70(void* ptr) {
     return *(u16*)((u8*)sub + 0xA);
 }
 /* 0x8011EE9C | 44 bytes | compound_getter */
-u16 fn_8011EE9C(void* ptr) {
+u16 pokemonBiosGetSpeDefRnd(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3469,7 +3469,7 @@ u16 fn_8011EE9C(void* ptr) {
     return *(u16*)((u8*)sub + 0x8);
 }
 /* 0x8011EEC8 | 44 bytes | compound_getter */
-u16 fn_8011EEC8(void* ptr) {
+u16 pokemonBiosGetSpeAtkRnd(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3480,7 +3480,7 @@ u16 fn_8011EEC8(void* ptr) {
     return *(u16*)((u8*)sub + 0x6);
 }
 /* 0x8011EEF4 | 44 bytes | compound_getter */
-u16 fn_8011EEF4(void* ptr) {
+u16 pokemonBiosGetPhyDefRnd(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3491,7 +3491,7 @@ u16 fn_8011EEF4(void* ptr) {
     return *(u16*)((u8*)sub + 0x4);
 }
 /* 0x8011EF20 | 44 bytes | compound_getter */
-u16 fn_8011EF20(void* ptr) {
+u16 pokemonBiosGetPhyAtkRnd(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3502,7 +3502,7 @@ u16 fn_8011EF20(void* ptr) {
     return *(u16*)((u8*)sub + 0x2);
 }
 /* 0x8011EF4C | 44 bytes | compound_getter */
-u16 fn_8011EF4C(void* ptr) {
+u16 pokemonBiosGetMaxHpRnd(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3513,7 +3513,7 @@ u16 fn_8011EF4C(void* ptr) {
     return *(u16*)((u8*)sub + 0x0);
 }
 /* 0x8011EF78 | 44 bytes | compound_getter */
-u16 fn_8011EF78(void* ptr) {
+u16 pokemonBiosGetNimblenessEffort(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3524,7 +3524,7 @@ u16 fn_8011EF78(void* ptr) {
     return *(u16*)((u8*)sub + 0xA);
 }
 /* 0x8011EFA4 | 44 bytes | compound_getter */
-u16 fn_8011EFA4(void* ptr) {
+u16 pokemonBiosGetSpeDefEffort(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3535,7 +3535,7 @@ u16 fn_8011EFA4(void* ptr) {
     return *(u16*)((u8*)sub + 0x8);
 }
 /* 0x8011EFD0 | 44 bytes | compound_getter */
-u16 fn_8011EFD0(void* ptr) {
+u16 pokemonBiosGetSpeAtkEffort(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3546,7 +3546,7 @@ u16 fn_8011EFD0(void* ptr) {
     return *(u16*)((u8*)sub + 0x6);
 }
 /* 0x8011EFFC | 44 bytes | compound_getter */
-u16 fn_8011EFFC(void* ptr) {
+u16 pokemonBiosGetPhyDefEffort(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3557,7 +3557,7 @@ u16 fn_8011EFFC(void* ptr) {
     return *(u16*)((u8*)sub + 0x4);
 }
 /* 0x8011F028 | 44 bytes | compound_getter */
-u16 fn_8011F028(void* ptr) {
+u16 pokemonBiosGetPhyAtkEffort(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3568,7 +3568,7 @@ u16 fn_8011F028(void* ptr) {
     return *(u16*)((u8*)sub + 0x2);
 }
 /* 0x8011F054 | 44 bytes | compound_getter */
-u16 fn_8011F054(void* ptr) {
+u16 pokemonBiosGetMaxHpEffort(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3579,7 +3579,7 @@ u16 fn_8011F054(void* ptr) {
     return *(u16*)((u8*)sub + 0x0);
 }
 /* 0x8011F080 | 44 bytes | compound_getter */
-u16 fn_8011F080(void* ptr) {
+u16 pokemonBiosGetNimbleness(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3590,7 +3590,7 @@ u16 fn_8011F080(void* ptr) {
     return *(u16*)((u8*)sub + 0xA);
 }
 /* 0x8011F0AC | 44 bytes | compound_getter */
-u16 fn_8011F0AC(void* ptr) {
+u16 pokemonBiosGetSpeDef(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3601,7 +3601,7 @@ u16 fn_8011F0AC(void* ptr) {
     return *(u16*)((u8*)sub + 0x8);
 }
 /* 0x8011F0D8 | 44 bytes | compound_getter */
-u16 fn_8011F0D8(void* ptr) {
+u16 pokemonBiosGetSpeAtk(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3612,7 +3612,7 @@ u16 fn_8011F0D8(void* ptr) {
     return *(u16*)((u8*)sub + 0x6);
 }
 /* 0x8011F104 | 44 bytes | compound_getter */
-u16 fn_8011F104(void* ptr) {
+u16 pokemonBiosGetPhyDef(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3623,7 +3623,7 @@ u16 fn_8011F104(void* ptr) {
     return *(u16*)((u8*)sub + 0x4);
 }
 /* 0x8011F130 | 44 bytes | compound_getter */
-u16 fn_8011F130(void* ptr) {
+u16 pokemonBiosGetPhyAtk(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3634,7 +3634,7 @@ u16 fn_8011F130(void* ptr) {
     return *(u16*)((u8*)sub + 0x2);
 }
 /* 0x8011F15C | 44 bytes | compound_getter */
-u16 fn_8011F15C(void* ptr) {
+u16 pokemonBiosGetMaxHp(void* ptr) {
     void* sub;
     if (ptr == NULL) {
     sub = NULL;
@@ -3645,23 +3645,23 @@ u16 fn_8011F15C(void* ptr) {
     return *(u16*)((u8*)sub + 0x0);
 }
 /* 0x8011F1B8 | 0x38 */
-u8 fn_8011F1B8(void* ctx, u32 p1) {
-    extern void* fn_8011F260();
-    void* result = fn_8011F260(ctx, p1, 1);
+u8 pokemonBiosGetPokemonWazaPpCount(void* ctx, u32 p1) {
+    extern void* pokemonBiosGetPokemonWazaPtr();
+    void* result = pokemonBiosGetPokemonWazaPtr(ctx, p1, 1);
     if (result == 0) return 0;
     return *((u8*)result + 0x3);
 }
 /* 0x8011F1F0 | 0x38 */
-u8 fn_8011F1F0(void* ctx, u32 p1) {
-    extern void* fn_8011F260();
-    void* result = fn_8011F260(ctx, p1, 1);
+u8 pokemonBiosGetPokemonWazaPp(void* ctx, u32 p1) {
+    extern void* pokemonBiosGetPokemonWazaPtr();
+    void* result = pokemonBiosGetPokemonWazaPtr(ctx, p1, 1);
     if (result == 0) return 0;
     return *((u8*)result + 0x2);
 }
 /* 0x8011F228 | 0x38 */
-u16 fn_8011F228(void* ctx, u32 p1) {
-    extern void* fn_8011F260();
-    void* result = fn_8011F260(ctx, p1, 1);
+u16 pokemonBiosGetPokemonWazaDataId(void* ctx, u32 p1) {
+    extern void* pokemonBiosGetPokemonWazaPtr();
+    void* result = pokemonBiosGetPokemonWazaPtr(ctx, p1, 1);
     if (result == 0) return 0;
     return *(u16*)result;
 }
@@ -3669,7 +3669,7 @@ u16 fn_8011F228(void* ctx, u32 p1) {
 extern u8 lbl_80478B58[4];
 extern u8 lbl_80478B5C[4];
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8011F260(void);
+void pokemonBiosGetPokemonWazaPtr(void);
 /* 0x8011F474 | 0x34 */
 void* fn_8011F474(u8* ptr, u16 idx) {
     if (ptr == NULL) { return NULL; }
@@ -3677,38 +3677,38 @@ void* fn_8011F474(u8* ptr, u16 idx) {
     return ptr + (u32)idx * 16 + 0x64;
 }
 /* 0x8011F4D8 | 24 bytes | nc_addi_ptr */
-void* fn_8011F4D8(void* ptr) {
+void* pokemonBiosGetNicknameOrgPtr(void* ptr) {
     if (ptr == NULL) { return NULL; }
     return (u8*)ptr + 0x44;
 }
 /* 0x8011F4F0 | 24 bytes | nc_addi_ptr */
-void* fn_8011F4F0(void* ptr) {
+void* pokemonBiosGetNicknamePtr(void* ptr) {
     if (ptr == NULL) { return NULL; }
     return (u8*)ptr + 0x2E;
 }
 /* 0x8011F508 | 24 bytes | nc_addi_ptr */
-void* fn_8011F508(void* ptr) {
+void* pokemonBiosGetCatchTrainerNamePtr(void* ptr) {
     if (ptr == NULL) { return NULL; }
     return (u8*)ptr + 0x18;
 }
 /* 0x8011F598 | 24 bytes | nc_addi_ptr */
-void* fn_8011F598(void* ptr) {
+void* pokemonBiosGetAttest(void* ptr) {
     if (ptr == NULL) { return NULL; }
     return (u8*)ptr + 0x8;
 }
 /* 0x8011F5E0 | 0x1C */
-void fn_8011F5E0(u32* dst, u32* src) {
+void pokemonWazaBiosCopy(u32* dst, u32* src) {
     if (dst == NULL) { return; }
     if (src == NULL) { return; }
     *dst = *src;
 }
 #if 0
-asm void fn_8011E1D4(void) {
+asm void pokemonDataBiosGetColor(void) {
 #include "src/game/gs_field_world_fn_8011E1D4.inc"
 }
 #else
 #pragma optimization_level 4
-u8 fn_8011E1D4(u8* ptr, s32 idx) {
+u8 pokemonDataBiosGetColor(u8* ptr, s32 idx) {
     u8* elem;
 
     if (ptr == NULL) {
@@ -3725,12 +3725,12 @@ u8 fn_8011E1D4(u8* ptr, s32 idx) {
 }
 #endif
 #if 0
-asm void fn_8011E21C(void) {
+asm void pokemonDataBiosGetStatusFaceMenuSpriteId(void) {
 #include "src/game/gs_field_world_fn_8011E21C.inc"
 }
 #else
 #pragma optimization_level 4
-u16 fn_8011E21C(u8* ptr, s32 idx) {
+u16 pokemonDataBiosGetStatusFaceMenuSpriteId(u8* ptr, s32 idx) {
     u8* elem;
 
     if (ptr == NULL) {
@@ -3747,12 +3747,12 @@ u16 fn_8011E21C(u8* ptr, s32 idx) {
 }
 #endif
 #if 0
-asm void fn_8011E264(void) {
+asm void pokemonDataBiosGetPokebodyId(void) {
 #include "src/game/gs_field_world_fn_8011E264.inc"
 }
 #else
 #pragma optimization_level 4
-u32 fn_8011E264(u8* ptr, s32 idx) {
+u32 pokemonDataBiosGetPokebodyId(u8* ptr, s32 idx) {
     u8* elem;
 
     if (ptr == NULL) {
@@ -3769,12 +3769,12 @@ u32 fn_8011E264(u8* ptr, s32 idx) {
 }
 #endif
 #if 0
-asm void fn_8011E2DC(void) {
+asm void pokemonDataBiosGetGetWazaDataId(void) {
 #include "src/game/gs_field_world_fn_8011E2DC.inc"
 }
 #else
 #pragma optimization_level 4
-u16 fn_8011E2DC(u8* ptr, s32 idx) {
+u16 pokemonDataBiosGetGetWazaDataId(u8* ptr, s32 idx) {
     u8* elem;
 
     if (ptr == NULL) {
@@ -3791,12 +3791,12 @@ u16 fn_8011E2DC(u8* ptr, s32 idx) {
 }
 #endif
 #if 0
-asm void fn_8011E324(void) {
+asm void pokemonDataBiosGetGetWazaLevel(void) {
 #include "src/game/gs_field_world_fn_8011E324.inc"
 }
 #else
 #pragma optimization_level 4
-u8 fn_8011E324(u8* ptr, s32 idx) {
+u8 pokemonDataBiosGetGetWazaLevel(u8* ptr, s32 idx) {
     u8* elem;
 
     if (ptr == NULL) {
@@ -3813,12 +3813,12 @@ u8 fn_8011E324(u8* ptr, s32 idx) {
 }
 #endif
 #if 0
-asm void fn_8011E36C(void) {
+asm void pokemonDataBiosGetSinkaPokemonDataId(void) {
 #include "src/game/gs_field_world_fn_8011E36C.inc"
 }
 #else
 #pragma optimization_level 4
-u16 fn_8011E36C(u8* ptr, u16 idx) {
+u16 pokemonDataBiosGetSinkaPokemonDataId(u8* ptr, u16 idx) {
     u8* elem;
 
     if (ptr == NULL) {
@@ -3835,12 +3835,12 @@ u16 fn_8011E36C(u8* ptr, u16 idx) {
 }
 #endif
 #if 0
-asm void fn_8011E3B4(void) {
+asm void pokemonDataBiosGetSinkaBuff(void) {
 #include "src/game/gs_field_world_fn_8011E3B4.inc"
 }
 #else
 #pragma optimization_level 4
-u16 fn_8011E3B4(u8* ptr, u16 idx) {
+u16 pokemonDataBiosGetSinkaBuff(u8* ptr, u16 idx) {
     u8* elem;
 
     if (ptr == NULL) {
@@ -3857,12 +3857,12 @@ u16 fn_8011E3B4(u8* ptr, u16 idx) {
 }
 #endif
 #if 0
-asm void fn_8011E3FC(void) {
+asm void pokemonDataBiosGetSinkaKind(void) {
 #include "src/game/gs_field_world_fn_8011E3FC.inc"
 }
 #else
 #pragma optimization_level 4
-u8 fn_8011E3FC(u8* ptr, u16 idx) {
+u8 pokemonDataBiosGetSinkaKind(u8* ptr, u16 idx) {
     u8* elem;
 
     if (ptr == NULL) {
@@ -3879,12 +3879,12 @@ u8 fn_8011E3FC(u8* ptr, u16 idx) {
 }
 #endif
 #if 0
-asm void fn_8011E550(void) {
+asm void pokemonDataBiosGetGiveNimblenessEffort(void) {
 #include "src/game/gs_field_world_fn_8011E550.inc"
 }
 #else
 #pragma optimization_level 4
-u16 fn_8011E550(u8* ptr) {
+u16 pokemonDataBiosGetGiveNimblenessEffort(u8* ptr) {
     u8* sub;
 
     if (ptr == NULL) {
@@ -3901,12 +3901,12 @@ u16 fn_8011E550(u8* ptr) {
 extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
 extern u32 lbl_80478F94;  /* obj data base (SDA) */
 #if 0
-asm void fn_8011E868(void) {
+asm void pokemonBiosGetTokuseiFlag(void) {
 #include "src/game/gs_field_world_fn_8011E868.inc"
 }
 #else
 #pragma optimization_level 4
-u8 fn_8011E868(u8* ptr) {
+u8 pokemonBiosGetTokuseiFlag(u8* ptr) {
     u16 idx; u8* entry; u8 flag;
     if (ptr == NULL) { return 0; }
     if (ptr == NULL) { idx = 0; } else { idx = *(u16*)ptr; }
@@ -3921,12 +3921,12 @@ u8 fn_8011E868(u8* ptr) {
 }
 #endif
 #if 0
-asm void fn_8011ED18(void) {
+asm void pokemonBiosGetInitDp(void) {
 #include "src/game/gs_field_world_fn_8011ED18.inc"
 }
 #else
 #pragma optimization_level 4
-void* fn_8011ED18(u8* ptr) {
+void* pokemonBiosGetInitDp(u8* ptr) {
     u32 val;
 
     if (ptr == NULL) {
@@ -3940,12 +3940,12 @@ void* fn_8011ED18(u8* ptr) {
 }
 #endif
 #if 0
-asm void fn_8011ED68(void) {
+asm void pokemonBiosGetDarkFlag(void) {
 #include "src/game/gs_field_world_fn_8011ED68.inc"
 }
 #else
 #pragma optimization_level 4
-u32 fn_8011ED68(u8* ptr) {
+u32 pokemonBiosGetDarkFlag(u8* ptr) {
     u16 val;
     s32 val2;
 

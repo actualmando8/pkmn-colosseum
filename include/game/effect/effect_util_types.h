@@ -345,9 +345,9 @@ extern u32 lbl_8047AE68;
 
 extern u16  lbl_8047AE90;
 
-extern void fn_8011E778(u16 handle);
+extern void pokemonDataBiosGetPtr(u16 handle);
 
-extern void fn_8011E760(void);
+extern void pokemonDataBiosGetName(void);
 
 extern u32 lbl_8047AE84;
 

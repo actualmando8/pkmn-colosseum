@@ -59,9 +59,9 @@ u32  __GBATransfer(int r3, u32 r4, u32 r5, u32 r6);
 extern void DSPInit();
 extern void fn_800E01F4();
 extern int  _fadeEffectGetRandom__FUl();
-extern u32  fn_8011F520();
-extern u32  fn_8011F5B0();
-extern u16  fn_8011F5C8();
+extern u32  pokemonBiosGetCatchTrainerRnd();
+extern u32  pokemonBiosGetRnd();
+extern u16  pokemonBiosGetPokemonDataId();
 extern u32  savedataGetStatus();
 extern int  fadeCheck();
 extern int  fadeSet();
@@ -172,7 +172,7 @@ int cbWazaForget(u32 r3,u32 r4,int r5)
     iVar7 = 0;
   }
   else {
-    uVar1 = fn_8011F5B0(r3);
+    uVar1 = pokemonBiosGetRnd(r3);
     uVar3 = (int)pokemonGetStatus(r3,0,0xc1,0);
     uVar3 = (-uVar3 | uVar3) >> 0x1f;
     iVar7 = fn_801DE190(sVar4,uVar1,uVar3);
@@ -375,7 +375,7 @@ evolutionStart(u32 r3,u32 r4,u32 r5,u16 *r6,
     iVar9 = 0;
   }
   else {
-    uVar3 = fn_8011F5B0(r3);
+    uVar3 = pokemonBiosGetRnd(r3);
     uVar4 = (int)pokemonGetStatus(r3,0,0xc1,0);
     uVar4 = (-uVar4 | uVar4) >> 0x1f;
     iVar9 = fn_801DE190(sVar7,uVar3,uVar4);
@@ -412,7 +412,7 @@ evolutionStart(u32 r3,u32 r4,u32 r5,u16 *r6,
       iVar9 = 0;
     }
     else {
-      uVar3 = fn_8011F5B0(r4);
+      uVar3 = pokemonBiosGetRnd(r4);
       uVar4 = (int)pokemonGetStatus(r4,0,0xc1,0);
       uVar4 = (-uVar4 | uVar4) >> 0x1f;
       iVar9 = fn_801DE190(sVar7,uVar3,uVar4);
@@ -559,14 +559,14 @@ evolutionWazaLearn(u32 r3,u32 r4,u8 *r5,int r6,void *r7,
   
   uVar6 = 0;
   do {
-    sVar3 = fn_8011F228(r3,uVar6 & 0xffff);
+    sVar3 = pokemonBiosGetPokemonWazaDataId(r3,uVar6 & 0xffff);
     if (sVar3 == 0) break;
     uVar6 = uVar6 + 1;
   } while ((int)uVar6 < 4);
   if ((int)uVar6 < 4) {
 LAB_0025d3c4:
     fn_80165668(0x4ca,0,0xff);
-    uVar2 = fn_8011F4F0(r3);
+    uVar2 = pokemonBiosGetNicknamePtr(r3);
     msgctrlSetValue(0x32,uVar2);
     msgctrlSetValue(0x39,r4 & 0xffff);
     if (r6 == 0) {
@@ -581,7 +581,7 @@ LAB_0025d3c4:
     uVar2 = 1;
   }
   else {
-    uVar2 = fn_8011F4F0(r3);
+    uVar2 = pokemonBiosGetNicknamePtr(r3);
     msgctrlSetValue(0x32,uVar2);
     msgctrlSetValue(0x39,r4 & 0xffff);
     do {
@@ -613,10 +613,10 @@ LAB_0025d3c4:
           uVar6 = (u32)cVar5;
         }
         if (-1 < (int)uVar6) {
-          uVar2 = fn_8011F4F0(r3);
+          uVar2 = pokemonBiosGetNicknamePtr(r3);
           msgctrlSetValue(0x32,uVar2);
           msgctrlSetValue(0x5d,0x468);
-          uVar4 = fn_8011F228(r3,uVar6 & 0xffff);
+          uVar4 = pokemonBiosGetPokemonWazaDataId(r3,uVar6 & 0xffff);
           msgctrlSetValue(0x39,uVar4);
           if (r6 == 0) {
             winMsgOpenField(0x4248,1,0);
@@ -699,7 +699,7 @@ u32 evolutionDemo(u32 *r3,int r4,u32 r5,u32 r6)
   volatile u32 local_c;
 
   fn_801DA4E8(*r3,1);
-  uVar5 = fn_8011F4F0(r5);
+  uVar5 = pokemonBiosGetNicknamePtr(r5);
   msgctrlSetValue(0x32,uVar5);
   winMsgOpenField(0x4401,1,0);
   if (r5 == 0) {
@@ -711,15 +711,15 @@ u32 evolutionDemo(u32 *r3,int r4,u32 r5,u32 r6)
       iVar6 = 0;
     }
     else {
-      fn_8011F5C8(r5);
-      iVar6 = fn_8011E778();
+      pokemonBiosGetPokemonDataId(r5);
+      iVar6 = pokemonDataBiosGetPtr();
     }
   }
   if (iVar6 == 0) {
     uVar9 = 0;
   }
   else {
-    uVar9 = fn_8011E15C();
+    uVar9 = pokemonDataBiosGetVoice();
     fn_80166A28(uVar9);
   }
   if (*(u32 *)(lbl_8027A488 + 4) == 0) {
@@ -831,21 +831,21 @@ LAB_0025db60:
         iVar6 = 0;
       }
       else {
-        fn_8011F5C8(r5);
-        iVar6 = fn_8011E778();
+        pokemonBiosGetPokemonDataId(r5);
+        iVar6 = pokemonDataBiosGetPtr();
       }
     }
     if (iVar6 == 0) {
       uVar9 = 0;
     }
     else {
-      uVar9 = fn_8011E15C();
+      uVar9 = pokemonDataBiosGetVoice();
       fn_80166A28(uVar9);
     }
     while (iVar6 = fn_801666BC(uVar9), iVar6 == 2) {
       _threadSwitch();
     }
-    uVar5 = fn_8011F4F0(r5);
+    uVar5 = pokemonBiosGetNicknamePtr(r5);
     msgctrlSetValue(0x32,uVar5);
     winMsgOpenField(0x43ff,1,0);
     winMsgCloseField(1);
@@ -868,23 +868,23 @@ LAB_0025db60:
         iVar6 = 0;
       }
       else {
-        fn_8011F5C8(r6);
-        iVar6 = fn_8011E778();
+        pokemonBiosGetPokemonDataId(r6);
+        iVar6 = pokemonDataBiosGetPtr();
       }
     }
     if (iVar6 == 0) {
       uVar9 = 0;
     }
     else {
-      uVar9 = fn_8011E15C();
+      uVar9 = pokemonDataBiosGetVoice();
       fn_80166A28(uVar9);
     }
     while (iVar6 = fn_801666BC(uVar9), iVar6 == 2) {
       _threadSwitch();
     }
-    uVar5 = fn_8011F4F0(r5);
+    uVar5 = pokemonBiosGetNicknamePtr(r5);
     msgctrlSetValue(0x32,uVar5);
-    uVar9 = fn_8011F5C8(r6);
+    uVar9 = pokemonBiosGetPokemonDataId(r6);
     msgctrlSetValue(0x4e,uVar9);
     msgctrlSetValue(0x5d,0x3d2);
     winMsgOpenField(0x4400,1,0);

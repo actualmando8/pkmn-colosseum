@@ -317,7 +317,7 @@ void gba_LinkInit(void);
 
 /* Pokemon validation */
 /* pokemonCheckValid */ extern u8    pokemon_IsValid(void* pSaveCtx);
-/* fn_8011F5C8 */ extern u16   pokemon_GetSpecies(void* pSaveCtx);
+/* pokemonBiosGetPokemonDataId */ extern u16   pokemon_GetSpecies(void* pSaveCtx);
 
 /* Data extraction */
 /* fn_8008AE18 */ extern void  pokemon_ExtractData(void* pSaveCtx, void* pDst);

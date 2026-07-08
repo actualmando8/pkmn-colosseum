@@ -59,9 +59,9 @@ u32  __GBATransfer(int r3, u32 r4, u32 r5, u32 r6);
 extern void DSPInit();
 extern void fn_800E01F4();
 extern int  _fadeEffectGetRandom__FUl();
-extern u32  fn_8011F520();
-extern u32  fn_8011F5B0();
-extern u16  fn_8011F5C8();
+extern u32  pokemonBiosGetCatchTrainerRnd();
+extern u32  pokemonBiosGetRnd();
+extern u16  pokemonBiosGetPokemonDataId();
 extern u32  savedataGetStatus();
 extern int  fadeCheck();
 extern int  fadeSet();
@@ -370,7 +370,7 @@ asm void fn_8025FF9C(void) {
 #endif
 #pragma pop
 void memoDataSet(u16 *r3, u32 r4) {
-  extern u32 fn_8011F5C8();
+  extern u32 pokemonBiosGetPokemonDataId();
   u16 *queue;
   u32 r30;
 		  u32 count;
@@ -385,7 +385,7 @@ void memoDataSet(u16 *r3, u32 r4) {
   if (queue == (u16 *)0) {
     queue = (u16 *)savedataGetStatus(0, 0xC);
   }
-  rawLookup = fn_8011F5C8(r30);
+  rawLookup = pokemonBiosGetPokemonDataId(r30);
 	  lookup = rawLookup;
 	  count = *queue;
 	  for (i = 0; (u32)(u16)i < (u32)count; i = i + 1) {
@@ -396,9 +396,9 @@ void memoDataSet(u16 *r3, u32 r4) {
 	    }
 	  }
 		  *(u16 *)((u8 *)queue + ((u32)count * 12 + 4)) = (u16)(rawLookup | 0x8000);
-	  r5 = fn_8011F5B0(r30);
+	  r5 = pokemonBiosGetRnd(r30);
 	  *(u32 *)((u8 *)queue + ((u32)*queue * 12 + 0xC)) = r5;
-	  r5 = fn_8011F520(r30);
+	  r5 = pokemonBiosGetCatchTrainerRnd(r30);
 	  *(u32 *)((u8 *)queue + ((u32)*queue * 12 + 0x8)) = r5;
   *queue = (u16)(*queue + 1);
 }
