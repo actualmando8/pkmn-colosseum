@@ -266,11 +266,11 @@ void fn_8001D994(void) {
 
 /* 0x8001DACC | 0x4DC */
 extern void fn_800F92D4(void);
-extern void fn_800EF4FC(void);
-extern void fn_800EF4F4(void);
+extern void GStextureGetXsize(void);
+extern void GStextureGetYsize(void);
 extern void fn_800D88DC(void);
 extern void fn_800D888C(void);
-extern void fn_800EF590(void);
+extern void GStextureSetWrap(void);
 extern void fn_800D848C(void);
 extern void fn_800DC1D4(void);
 extern void fn_800D85D4(void);
@@ -317,9 +317,9 @@ void fn_8001DACC(void) {
     extern void fn_800DC14C();
     extern void fn_800DC1D4();
     extern void fn_800DC224();
-    extern void fn_800EF4F4();
-    extern void fn_800EF4FC();
-    extern void fn_800EF590();
+    extern void GStextureGetYsize();
+    extern void GStextureGetXsize();
+    extern void GStextureSetWrap();
     extern void fn_800F92D4();
     u8 sp[0xF0];
     u32 tmp = 0;
@@ -355,7 +355,7 @@ void fn_8001DACC(void) {
     if ((r31 != 0) && (r30 != 0)) {
 
         r3 = r31;
-        fn_800EF4FC();
+        GStextureGetXsize();
         tmp = *(s16*)((u8*)r29 + 0x5C);
         r3 = r3 & 0xFFFF;
         r4 = 0x43300000;
@@ -366,7 +366,7 @@ void fn_8001DACC(void) {
         f2 = f0 - f2;
         f0 = f0 - f1;
         f31 = f0 / f2;
-        fn_800EF4FC();
+        GStextureGetXsize();
         r4 = *(s16*)((u8*)r29 + 0x5C);
         r3 = r3 & 0xFFFF;
         tmp = *(s16*)((u8*)r29 + 0x60);
@@ -379,7 +379,7 @@ void fn_8001DACC(void) {
         f2 = f0 - f2;
         f0 = f0 - f1;
         f30 = f0 / f2;
-        fn_800EF4F4();
+        GStextureGetYsize();
         tmp = *(s16*)((u8*)r29 + 0x5E);
         r3 = r3 & 0xFFFF;
         r4 = 0x43300000;
@@ -390,7 +390,7 @@ void fn_8001DACC(void) {
         f2 = f0 - f2;
         f0 = f0 - f1;
         f27 = f0 / f2;
-        fn_800EF4F4();
+        GStextureGetYsize();
         r4 = *(s16*)((u8*)r29 + 0x5E);
         r5 = 0x43300000;
         tmp = *(s16*)((u8*)r29 + 0x62);
@@ -410,7 +410,7 @@ void fn_8001DACC(void) {
         r3 = r30;
         r4 = 0x1;
         r5 = 0x1;
-        fn_800EF590();
+        GStextureSetWrap();
         r6 = (u32)sp + 0x8;
         r3 = 0x0;
         r4 = 0x0;

@@ -107,7 +107,7 @@ extern u8 fn_800FF548(void);
 extern u32 _unloadScript__FPvUlUl(); /* K&R: asm void wrapper, used as function pointer */
 extern u32 _unloadFont__FPvUlUl(); /* K&R: asm void wrapper, used as function pointer */
 extern u32 _unloadMsg__FPvUlUl(); /* K&R: asm void wrapper, used as function pointer */
-extern void fn_800EF5A4(void);
+extern void GStextureFree(void);
 extern const char lbl_80272608[];
 extern const char lbl_8027262C[];
 extern u8 lbl_8035BB30[];
@@ -1695,11 +1695,11 @@ u32 _unloadColsys__FPvUlUl(void) {
 }
 #pragma pop
 /* 0x8011522C | 36 bytes | call_return_const */
-extern void fn_800EF5A4(void);
+extern void GStextureFree(void);
 #pragma push
 #pragma scheduling off
 u32 _unloadTexture__FPvUlUl(void) {
-    fn_800EF5A4();
+    GStextureFree();
     return 1;
 }
 #pragma pop

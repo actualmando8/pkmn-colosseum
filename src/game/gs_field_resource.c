@@ -118,7 +118,7 @@ extern void _unloadColsys__FPvUlUl(void);  /* resource completion callback (Col/
 extern void* GSresGetResource();        /* GSres simple alloc */
 extern void* GSresRegisterResource();        /* GSres install loader */
 extern void  fn_8010CFE4();        /* PKX overlap setup */
-extern u32   fn_800EFD3C();        /* WZX overlap check */
+extern u32   GStextureLoad();        /* WZX overlap check */
 extern void* fn_801195AC();        /* node lookup */
 
 typedef struct HSDArchiveBuffer {
@@ -251,7 +251,7 @@ void* floorReadPKXPreFunc(u32 resId, u32 loadMode, u32 dataSize) {
 #pragma peephole off
 void* floorReadTexPostFunc(void) {
     void* result = GSresGetResource();
-    if (fn_800EFD3C(result) == 0) {
+    if (GStextureLoad(result) == 0) {
         GSlogWrite(lbl_80272328);
     }
     return result;

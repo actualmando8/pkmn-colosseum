@@ -45,7 +45,7 @@ extern void* memcpy(void* dst, const void* src, u32 size);
 extern u8   fn_800FF548(void);                      /* check if floor is loaded */
 extern void* fn_800FF560(void);                     /* get parent thread */
 extern void fn_800FF56C(void);                      /* tick floor */
-extern void fn_800F04C4(void);                      /* stop particle system */
+extern void GSthreadTerminateGroup(void);                      /* stop particle system */
 extern void _threadSwitch(void);                      /* tick render */
 extern void* GSthreadCreate(s32 priority, void* parent, s32 stackSize,
                           u8 usesFPU, void* entry, s32 arg); /* GSthread_Create */

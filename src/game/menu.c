@@ -58,7 +58,7 @@ extern void* menuSeBiosGetPtr(s32);
 extern u16   fn_8005D798(void*, s32);
 extern void* menuSpriteBiosGetPtr(s32);
 extern int   fn_80166A28(u16);
-extern s32   fn_800F037C(void);    /* poll/yield -- 0 if pending */
+extern s32   GSthreadGetCurrentThread(void);    /* poll/yield -- 0 if pending */
 extern void  _threadSwitch(void);    /* yield */
 extern u32   fn_800BE31C(void);    /* rand or tick */
 extern u32   fn_800B8FD8(void*);   /* register fn, returns handle */
@@ -484,7 +484,7 @@ s32 menuCloseSync(void* p, u8 flag) {
             if (r3 != (void*)0) goto step2;
             return 0;
         step2:
-            if ((u32)fn_800F037C() != 0) goto do_yield;
+            if ((u32)GSthreadGetCurrentThread() != 0) goto do_yield;
             GSlogWrite((const char*)lbl_80271E10, (const char*)lbl_8035B060, r31);
             goto ret0;
         do_yield:
@@ -548,7 +548,7 @@ s32 menuCloseCustom(void* p, u32 mode, u8 wait) {
         while (1) {
             r3 = windowSearchID((s32)r29);
             if (r3 == (void*)0) { return 0; }
-            if (fn_800F037C() != 0) {
+            if (GSthreadGetCurrentThread() != 0) {
                 _threadSwitch();
                 continue;
             }

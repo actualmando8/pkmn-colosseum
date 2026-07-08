@@ -105,7 +105,7 @@ extern u8 fn_800FF548(void);
 extern u32 _unloadScript__FPvUlUl(); /* K&R: asm void wrapper, used as function pointer */
 extern u32 _unloadFont__FPvUlUl(); /* K&R: asm void wrapper, used as function pointer */
 extern u32 _unloadMsg__FPvUlUl(); /* K&R: asm void wrapper, used as function pointer */
-extern void fn_800EF5A4(void);
+extern void GStextureFree(void);
 extern const char lbl_80272608[];
 extern const char lbl_8027262C[];
 extern u8 lbl_8035BB30[];

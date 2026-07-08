@@ -75,7 +75,7 @@ extern void  fn_801013A0(u32 memOffset, u32 size,
 extern void  memset(void* dst, u32 val, u32 size);
 extern void  GXDrawDone(void);
 extern void  fn_800B856C(void);
-extern void  fn_800EF5A4(void* p);
+extern void  GStextureFree(void* p);
 extern void* fn_80131428(void* owner, u32 size);
 extern void  fn_80131200();
 extern void  fn_8013139C(void* obj, u32 flag);
@@ -134,9 +134,9 @@ void fn_801364A8(void) {
     extern void fn_800E27B0();
     extern void fn_800E2C04();
     extern void GSmodelSetVisibility();
-    extern void fn_800EF590();
+    extern void GStextureSetWrap();
     extern void fn_800EFD14();
-    extern void fn_800EFD3C();
+    extern void GStextureLoad();
     extern void GSresGetResource();
     extern void fn_801013A0();
     extern void fn_8010147C();
@@ -282,7 +282,7 @@ void fn_801364A8(void) {
             /* clrrwi r5, r0, 5 */;
             memcpy((void*)r3, (const void*)r4, (u32)r5);
             r3 = r30;
-            fn_800EFD3C();
+            GStextureLoad();
             *(u32*)((u8*)r28 + 0x60) = r3;
             r4 = r31;
             r3 = *(u32*)((u8*)r28 + 0x60);
@@ -408,7 +408,7 @@ void fn_801364A8(void) {
             /* clrrwi r5, r0, 5 */;
             memcpy((void*)r3, (const void*)r4, (u32)r5);
             r3 = r27;
-            fn_800EFD3C();
+            GStextureLoad();
             *(u32*)((u8*)r28 + 0x1C) = r3;
             r4 = r30;
             r3 = *(u32*)((u8*)r28 + 0x1C);
@@ -426,7 +426,7 @@ void fn_801364A8(void) {
         if (r3 != (u32)0x0) {
             r4 = 0x0;
             r5 = 0x0;
-            fn_800EF590();
+            GStextureSetWrap();
         }
         r3 = (u32)lbl_80314AE8;
         r29 = r31;
@@ -881,7 +881,7 @@ void fn_801364A8(void) {
             /* clrrwi r5, r0, 5 */;
             memcpy((void*)r3, (const void*)r4, (u32)r5);
             r3 = r27;
-            fn_800EFD3C();
+            GStextureLoad();
             *(u32*)((u8*)r28 + 0xC) = r3;
             r4 = r30;
             r3 = *(u32*)((u8*)r28 + 0xC);
@@ -1035,7 +1035,7 @@ BOOL fn_801379E4(u8* w) {
         GXDrawDone();
         fn_800B856C();
         if (*(void**)(w + 0x14) != (void*)0) {
-            fn_800EF5A4(*(void**)(w + 0x14));
+            GStextureFree(*(void**)(w + 0x14));
         }
     }
     return TRUE;

@@ -187,7 +187,7 @@
 extern void  GSthreadCreate(s32 priority, void* stack, s32 stackSize,
                           s32 flags, s32 p5, void* entry);
 extern void  _threadSwitch(void);
-extern void  fn_800F05A0(void* threadCtx);
+extern void  GSthreadTerminate(void* threadCtx);
 
 /* Scene/camera */
 extern void  fn_80113828(s32 cameraId, s32 mode);
@@ -1341,7 +1341,7 @@ LAB_80025564:
  *     fadeSet(lbl_8047B8E8, 3)     -- different fade curve
  *     fn_801653C4(); fn_801656F8(0x1f4, 0)
  *   Check sound channels 0xbd and 0xc3; stop them if still active.
- *   If lbl_8047A388/38C particle handles set, free them via fn_800EF5A4.
+ *   If lbl_8047A388/38C particle handles set, free them via GStextureFree.
  *
  * fn_800D37CC returns s32 (signed ticks; negative if paused).
  * fn_800D3088 returns u32 (absolute frame count).
@@ -1360,7 +1360,7 @@ extern void fn_801656F8(void);
 extern void fadeCheck(s32);
 extern void menuIsCheck(void);
 extern void menuClose(void);
-extern void fn_800EF5A4(void);
+extern void GStextureFree(void);
 extern u32 lbl_8047A384;
 extern f32 lbl_8047B8E4;
 extern f32 lbl_8047B8AC;
@@ -1385,7 +1385,7 @@ void fn_800255A4(void) {
     extern f32 lbl_8047B8E8;
     extern u32 fn_800D3088(void);
     extern s32 fn_800D37CC(void);
-    extern void fn_800EF5A4(u32);
+    extern void GStextureFree(u32);
     extern void _threadSwitch(void);
     extern u8 menuIsCheck(s32);
     extern void menuClose(s32);
@@ -1415,8 +1415,8 @@ void fn_800255A4(void) {
     if (menuIsCheck(0xbd) == 1) menuClose(0xbd);
     if (menuIsCheck(0xc3) == 1) menuClose(0xc3);
     if (lbl_8047A384 != 0) {
-        if (lbl_8047A388 != 0) fn_800EF5A4(lbl_8047A388);
-        if (lbl_8047A38C != 0) fn_800EF5A4(lbl_8047A38C);
+        if (lbl_8047A388 != 0) GStextureFree(lbl_8047A388);
+        if (lbl_8047A38C != 0) GStextureFree(lbl_8047A38C);
     }
 }
 #endif

@@ -44,7 +44,7 @@
 #include "game/gs_colsys.h"
 
 /* ===== External SDK / engine functions ===== */
-extern void  fn_800EF5A4(void);                        /* GStexture trigger (fn_8010C364) */
+extern void  GStextureFree(void);                        /* GStexture trigger (fn_8010C364) */
 
 /* ===== Static data tables (data section) ===== */
 extern GSColSurfaceType lbl_8035B500[]; /* Surface type table (0x12 entries, 0x2C each) */
@@ -102,7 +102,7 @@ void fn_8010C224(void) {
 #pragma scheduling off
 #pragma scheduling off
 s32 fn_8010C364(void) {
-    fn_800EF5A4();
+    GStextureFree();
     return 1;
 }
 #pragma scheduling on

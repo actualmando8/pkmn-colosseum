@@ -621,13 +621,13 @@ extern void GSvecCopy(void);
 
 extern void fn_800E2C04(void);
 
-extern void fn_800EFD3C(void);
+extern void GStextureLoad(void);
 
 extern void fn_800EFD14(void);
 
 extern void fn_8013757C(void);
 
-extern void fn_800EF590(void);
+extern void GStextureSetWrap(void);
 
 extern void wazaSequenceSysGetResID(void);
 

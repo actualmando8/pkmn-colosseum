@@ -105,7 +105,7 @@ extern u8 fn_800FF548(void);
 extern u32 _unloadScript__FPvUlUl(); /* K&R: asm void wrapper, used as function pointer */
 extern u32 _unloadFont__FPvUlUl(); /* K&R: asm void wrapper, used as function pointer */
 extern u32 _unloadMsg__FPvUlUl(); /* K&R: asm void wrapper, used as function pointer */
-extern void fn_800EF5A4(void);
+extern void GStextureFree(void);
 extern const char lbl_80272608[];
 extern const char lbl_8027262C[];
 extern u8 lbl_8035BB30[];
@@ -1714,7 +1714,7 @@ u32 fn_80117AD4(void) {
 }
 /* 0x80117AE4 | 0x1A0 */
 extern void GSmodelResetTextureChange(void);
-extern void fn_800EF5A4(void);
+extern void GStextureFree(void);
 extern void GSmodelFree(void);
 extern void GStextureCreate(void);
 extern void fn_80113D34(void);
@@ -1739,7 +1739,7 @@ u8 fn_80117AE4(u32 arg1) {
     extern u32 fn_80113F48(void);
     extern void* GSresGetResource(u32 a, u32 b);
     extern void GSmodelResetTextureChange(void* a);
-    extern void fn_800EF5A4(void* a);
+    extern void GStextureFree(void* a);
     extern void GSmodelFree(void* a);
     extern void* GStextureCreate(u16 a, u16 b, u32 c, u32 d, u32 e);
     extern void* fn_80113D34(u32 a, u32 b);
@@ -1756,7 +1756,7 @@ u8 fn_80117AE4(u32 arg1) {
     if (lbl_8047AD88 != 0) {
         GSmodelResetTextureChange(GSresGetResource(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 8)));
         if (lbl_8047AD8C != 0) {
-            fn_800EF5A4((void*)lbl_8047AD8C);
+            GStextureFree((void*)lbl_8047AD8C);
             lbl_8047AD8C = 0;
         }
         if (lbl_8047AD90 != 0) {
@@ -1819,13 +1819,13 @@ void fn_80117C84(void) {
     extern u32 fn_80113F48(void);
     extern void* GSresGetResource(u32 a, u32 b);
     extern void GSmodelResetTextureChange(void* a);
-    extern void fn_800EF5A4(void* a);
+    extern void GStextureFree(void* a);
     extern void GSmodelFree(void* a);
     u8* ptr = (u8*)lbl_8047AD88;
     if (ptr != NULL) {
         GSmodelResetTextureChange(GSresGetResource(fn_80113F48(), *(u32*)(ptr + 8)));
         if (lbl_8047AD8C != 0) {
-            fn_800EF5A4((void*)lbl_8047AD8C);
+            GStextureFree((void*)lbl_8047AD8C);
             lbl_8047AD8C = 0;
         }
         if (lbl_8047AD90 != 0) {

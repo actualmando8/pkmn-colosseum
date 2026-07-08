@@ -88,7 +88,7 @@ extern void GSgfxInit__FP15_GSgfxInitParms(u32 memSize, u32 a, u32 b,   /* GSgfx
                          u32 c, u32 d, u32 e);
 extern u32  OSGetProgressiveMode(void);                         /* OSGetResetSwitchState (checks warm boot) */
 extern void fn_800D37D4(u32, u32, u32, u32, u32, u32);/* GSgfx video mode config */
-extern void fn_800EFFC0(u32 numEntries);               /* GX FIFO init */
+extern void GStextureInit(u32 numEntries);               /* GX FIFO init */
 extern void fn_80191484(u32 numSounds);                 /* Sound system init */
 extern void GSmodelInit(u32 maxObjects);                /* GSmem object pool */
 extern void GSpartInit(u32 param);                     /* VI callback setup */
@@ -216,7 +216,7 @@ extern void fn_800A8850(u32 a);   /* AIStopDMA */
 extern void OSSetIdleFunction(u32 a, u32 b, u32 c, u32 d); /* OSClearStack or thread cleanup */
 extern void VIWaitForRetrace(void);    /* AIReset */
 
-extern void fn_800F0448(void);    /* GSthread begin frame */
+extern void GSthreadExecuteAll(void);    /* GSthread begin frame */
 extern u8   fn_8000DAA8(void);    /* IsLanguageJapanese or locale check */
 extern void fn_80181850(u32 a, u32 b); /* Retry/reconnect handler */
 
@@ -580,7 +580,7 @@ void fn_800057B0(void) {
     }
 
     /* Initialize GX command FIFO with 16 entries */
-    fn_800EFFC0(0x10);
+    GStextureInit(0x10);
 
     /* Initialize sound system with 8 channels */
     fn_80191484(0x8);
@@ -1022,7 +1022,7 @@ void fn_80005E00(void) {
 #pragma peephole off
 void fn_80005FA8(u32 a, u32 b)
 {
-    fn_800F0448();
+    GSthreadExecuteAll();
     if (fn_8000DAA8() == 0) {
         fn_80181850(a, b);
     }

@@ -125,7 +125,7 @@
  *   fn_800D67BC, fn_800D6680, fn_800D5CB8 -- GX position/color/texcoord
  *   fn_800B9404 -- fog setup
  *   GXDrawDone, fn_800B856C -- GX begin/end frame
- *   fn_800EF5A4 -- model release
+ *   GStextureFree -- model release
  *   cameraGetActive -- camera matrix helper
  *
  * All 12 sub-modules follow the same pattern:
@@ -198,7 +198,7 @@ extern void  fn_800D5CB8(u32 a, u8 r, u8 g, u8 b, u8 alpha);
 extern void  fn_800B9404(u32 index, u32 param);
 extern void  GXDrawDone(void);
 extern void  fn_800B856C(void);
-extern void  fn_800EF5A4(void* model);
+extern void  GStextureFree(void* model);
 extern void  fn_800D9B58(f32 a, f32 b, f32 c, f32 d);
 extern void  fn_800D9ED8(u32 param);
 
@@ -484,7 +484,7 @@ u32 fn_80138630(void* ptr) {
         GXDrawDone();
         fn_800B856C();
         if (*(void**)((u8*)ptr + 0x1c) != NULL) {
-            fn_800EF5A4(*(void**)((u8*)ptr + 0x1c));
+            GStextureFree(*(void**)((u8*)ptr + 0x1c));
         }
         return 1;
     }
@@ -938,7 +938,7 @@ u32 fn_80139898(void* ptr) {
         GXDrawDone();
         fn_800B856C();
         if (*(void**)((u8*)ptr + 0x58) != NULL) {
-            fn_800EF5A4(*(void**)((u8*)ptr + 0x58));
+            GStextureFree(*(void**)((u8*)ptr + 0x58));
         }
     }
     return 1;
@@ -2208,7 +2208,7 @@ u32 fn_8013D730(void* ptr) {
             lbl_8047AEE4 -= 1;
             if (lbl_8047AEE4 == 0) {
                 GXDrawDone();
-                fn_800EF5A4((void*)lbl_8047AEE0);
+                GStextureFree((void*)lbl_8047AEE0);
                 lbl_8047AEE0 = 0;
             }
         }
@@ -2266,7 +2266,7 @@ u32 envMapEffectInit(void* ptr) {
                         lbl_8047AEE4 -= 1;
                         if (lbl_8047AEE4 == 0) {
                             GXDrawDone();
-                            fn_800EF5A4((void*)lbl_8047AEE0);
+                            GStextureFree((void*)lbl_8047AEE0);
                             lbl_8047AEE0 = 0;
                         }
                     }
@@ -2424,7 +2424,7 @@ u32 fn_8013DC94(void* ptr) {
         if (*(void**)((u8*)ptr + 0xc) != NULL) {
             GXDrawDone();
             fn_800B856C();
-            fn_800EF5A4(*(void**)((u8*)ptr + 0xc));
+            GStextureFree(*(void**)((u8*)ptr + 0xc));
         }
         while (node) {
             val = *(u16*)((u8*)node + 0xc);
@@ -2661,7 +2661,7 @@ u32 fn_8013E54C(void* arg) {
         if (*(void**)((u8*)ptr + 4) != 0) {
             GXDrawDone();
             fn_800B856C();
-            fn_800EF5A4(*(void**)((u8*)ptr + 4));
+            GStextureFree(*(void**)((u8*)ptr + 4));
         }
         memset(ptr, 0, 0x34);
     }
@@ -2882,7 +2882,7 @@ u32 fn_8013F078(void* ptr) {
         GXDrawDone();
         fn_800B856C();
         if (*(void**)((u8*)ptr + 0x4) != NULL) {
-            fn_800EF5A4(*(void**)((u8*)ptr + 0x4));
+            GStextureFree(*(void**)((u8*)ptr + 0x4));
             *(u32*)((u8*)ptr + 0x4) = 0;
         }
         if (*(void**)ptr != NULL) {
@@ -2893,7 +2893,7 @@ u32 fn_8013F078(void* ptr) {
             *(u16*)&lbl_8047AEEC = *(u16*)&lbl_8047AEEC - 1;
             if (*(u16*)&lbl_8047AEEC == 0) {
                 GXDrawDone();
-                fn_800EF5A4((void*)lbl_8047AEE8);
+                GStextureFree((void*)lbl_8047AEE8);
                 lbl_8047AEE8 = 0;
             }
         }
@@ -2922,7 +2922,7 @@ u32 fn_8013F114(void* ptr) {
                     GXDrawDone();
                     fn_800B856C();
                     if (*(void**)(p + 0x4) != NULL) {
-                        fn_800EF5A4(*(void**)(p + 0x4));
+                        GStextureFree(*(void**)(p + 0x4));
                         *(u32*)(p + 0x4) = 0;
                     }
                     if (*(void**)p != NULL) {
@@ -2933,7 +2933,7 @@ u32 fn_8013F114(void* ptr) {
                         *(u16*)&lbl_8047AEEC = *(u16*)&lbl_8047AEEC - 1;
                         if (*(u16*)&lbl_8047AEEC == 0) {
                             GXDrawDone();
-                            fn_800EF5A4((void*)lbl_8047AEE8);
+                            GStextureFree((void*)lbl_8047AEE8);
                             lbl_8047AEE8 = 0;
                         }
                     }
@@ -2948,7 +2948,7 @@ u32 fn_8013F114(void* ptr) {
                 GXDrawDone();
                 fn_800B856C();
                 if (*(void**)(p + 0x4) != NULL) {
-                    fn_800EF5A4(*(void**)(p + 0x4));
+                    GStextureFree(*(void**)(p + 0x4));
                     *(u32*)(p + 0x4) = 0;
                 }
                 if (*(void**)p != NULL) {
@@ -2959,7 +2959,7 @@ u32 fn_8013F114(void* ptr) {
                     *(u16*)&lbl_8047AEEC = *(u16*)&lbl_8047AEEC - 1;
                     if (*(u16*)&lbl_8047AEEC == 0) {
                         GXDrawDone();
-                        fn_800EF5A4((void*)lbl_8047AEE8);
+                        GStextureFree((void*)lbl_8047AEE8);
                         lbl_8047AEE8 = 0;
                     }
                 }
@@ -3166,8 +3166,8 @@ extern void GScameraGetLookAt(void* mtx, void* lookAt, void* eye);
 extern void fn_800E0628(void);
 extern void fn_800E0238(void);
 extern void fn_800D2DE8(void);
-extern void fn_800EF4FC(void);
-extern void fn_800EF4F4(void);
+extern void GStextureGetXsize(void);
+extern void GStextureGetYsize(void);
 extern void fn_800E03E8(void);
 extern u32 lbl_8047D300;
 extern u32 lbl_8047D304;
@@ -3413,7 +3413,7 @@ void Unload__13ModelSequenceFPUc(u8* ptr) {
         *(u32*)(ptr) = 0;
     }
     if (*(u32*)(ptr + 0x4) != 0) {
-        fn_800EF5A4(*(void**)(ptr + 0x4));
+        GStextureFree(*(void**)(ptr + 0x4));
         *(u32*)(ptr + 0x4) = 0;
     }
 }
@@ -3460,7 +3460,7 @@ u32 fn_80140190(void** out, void* model, u32 arg) {
 
     if ((u8)ret == 0) {
         if (out[1] != NULL) {
-            fn_800EF5A4(out[1]);
+            GStextureFree(out[1]);
             out[1] = NULL;
         }
         if (out[0] != NULL) {

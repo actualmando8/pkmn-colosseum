@@ -865,7 +865,7 @@ extern u32 pokemonCheckValid(u32);
 extern void fn_80097A38(u32, s32);
 extern void fn_800FF730(u32);
 extern void menuPokemonOpen(s32, s32, s32);
-extern void fn_800F0654(u32, s32, ...);
+extern void GSthreadSetArgs(u32, s32, ...);
 extern void evolutionOpen(u32, u32, s32, u16*, s32, u32*);
 extern void menuShopOpen(u32);
 extern void menuNameEntryOpen(u32, s32);
@@ -1095,7 +1095,7 @@ void fn_8000CB54(void) {
 }
 
 /* fn_8000CB74 - 0x8000CB74 | size: 0xc8 */
-/* GSparty_GetShadowGauge -- load table, search, call GSthreadCreate + fn_800F0654 */
+/* GSparty_GetShadowGauge -- load table, search, call GSthreadCreate + GSthreadSetArgs */
 #if 0
 asm void fn_8000CB74(void) {
 #include "src/game/gs_party_access_fn_8000CB74.inc"
@@ -1122,7 +1122,7 @@ u32 fn_8000CB74(u32 arg) {
 idx_done:
     val = table[idx * 2 + 1];
     r = GSthreadCreate(1, fn_800FF560(), 0x4000, 1, 1, (u32)(void(*)(void))fn_8000CB54);
-    fn_800F0654(r, 1, val);
+    GSthreadSetArgs(r, 1, val);
     return 0;
 }
 #endif

@@ -126,7 +126,7 @@ void* fadeSetFunction__FPFv_vbUsf(void (*callback)(void), u8 mode, u32 arg, f32 
     extern u8 lbl_80466E30[];
     extern volatile const f32 lbl_8047DFB8;
     extern u32 menuOffScreenGetPtr(void);
-    extern void fn_800EF5A4(void* texture);
+    extern void GStextureFree(void* texture);
     extern void _fadeSnapshot__Fv(); /* renamed from fn_801C432C */
     extern void fn_801C6928(void);
     void* previous;
@@ -156,7 +156,7 @@ void* fadeSetFunction__FPFv_vbUsf(void (*callback)(void), u8 mode, u32 arg, f32 
         _fadeSnapshot__Fv();
     } else if (*(void* volatile *)(gridState + 0x10) != (0, NULL)) {
         if (*(u32 volatile *)(lbl_80466E30 + 0x10) != menuOffScreenGetPtr()) {
-            fn_800EF5A4(*(void* volatile *)(lbl_80466E30 + 0x10));
+            GStextureFree(*(void* volatile *)(lbl_80466E30 + 0x10));
         }
         new_var = 0x10;
         *(void* volatile *)(lbl_80466E30 + new_var) = NULL;

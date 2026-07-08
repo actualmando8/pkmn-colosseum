@@ -1188,10 +1188,10 @@ game/gs_texture_range_800EEF48.c:
 	.text       start:0x800EEF48 end:0x800EF098
 
 game/gs_texture.c:
-	.text       start:0x800EF098 end:0x800F07A8
+	.text       start:0x800EF098 end:0x800F0030
 
 game/gs_thread.c:
-	.text       start:0x800F07A8 end:0x800F75FC
+	.text       start:0x800F0030 end:0x800F75FC
 
 game/input/input.c:
 	.text       start:0x800F75FC end:0x800F8268

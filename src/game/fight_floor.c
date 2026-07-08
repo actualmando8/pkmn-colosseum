@@ -863,11 +863,11 @@ u32 fightFloorGetGcHeroFightTrainerPtr(u32 ctx) {
 /* 0x801F2B5C | size: 0x3E0 | large -- variant 3 */
 void fightFloorLoopValidFightTrainer(u32 param_1, void (*param_2)(u32, u32, u32), u32 param_3, u8 param_4) {
     extern void _threadSwitch(void);
-    extern u32 fn_800F04BC(u32 task);
-    extern void fn_800F0494(u32 task);
+    extern u32 GSthreadIsRunning(u32 task);
+    extern void GSthreadClose(u32 task);
     extern u32 fn_800FF560(void);
     extern u32 GSthreadCreate(u32 type, u32 data, u32 flags, u32 unk1, u32 unk2, u32 unk3, u32 mon_out);
-    extern void fn_800F0654(u32 task, u32 b, u32 mon, u32 count, u32 ctx);
+    extern void GSthreadSetArgs(u32 task, u32 b, u32 mon, u32 count, u32 ctx);
     extern u32 fightFloorGetStatus(u32 poke, u32 b, u32 field, u32 d);
     extern u32 fightTrainerGetStatus(u32 mon, u32 b, u32 field, u32 d);
     extern u32 fightSideGetValidFightTrainerPtr(u32, u32);
@@ -909,7 +909,7 @@ void fightFloorLoopValidFightTrainer(u32 param_1, void (*param_2)(u32, u32, u32)
                             if ((u16)r22 < 4) {
                                 { u32 task = fn_800FF560(); arr[r22] = GSthreadCreate(0x12, task, 0x2000, 1, 0, (u32)param_2, r21); }
                                 if (arr[r22] != 0) {
-                                    fn_800F0654(arr[r22], 3, r21, r25, r29);
+                                    GSthreadSetArgs(arr[r22], 3, r21, r25, r29);
                                     r22++;
                                 }
                             }
@@ -925,7 +925,7 @@ void fightFloorLoopValidFightTrainer(u32 param_1, void (*param_2)(u32, u32, u32)
             r22 = 0;
             while ((u16)r22 < 4) {
                 if (arr[r22] != 0) {
-                    if ((u8)fn_800F04BC(arr[r22]) == 1) break;
+                    if ((u8)GSthreadIsRunning(arr[r22]) == 1) break;
                 }
                 r22++;
             }
@@ -935,7 +935,7 @@ void fightFloorLoopValidFightTrainer(u32 param_1, void (*param_2)(u32, u32, u32)
         while ((u16)r24 < 4) {
             r22 = (u16)r24 * 4;
             if (arr[r24] != 0) {
-                fn_800F0494(arr[r24]);
+                GSthreadClose(arr[r24]);
                 arr[r24] = r21;
             }
             r24++;

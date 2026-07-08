@@ -2036,7 +2036,7 @@ s32 dbgMenuFightFightFloorEdit(void) {
 extern void* fn_800FF560(void);
 extern void fn_8020DAD0(void);
 extern void* GSthreadCreate(s32 a, void* b, s32 c, s32 d, s32 e, void* f);
-extern void fn_800F0654(void* task, s32 a, ...);
+extern void GSthreadSetArgs(void* task, s32 a, ...);
 extern u16 lbl_8047882C;
 extern u32 lbl_80478F50;
 #if 0
@@ -2078,7 +2078,7 @@ s32 fn_8000804C(void) {
             saved = lbl_8047882C;
             taskPtr = GSthreadCreate(1, fn_800FF560(), 0x4000, 1, 1, (void*)fn_8020DAD0);
             if (taskPtr != 0) {
-                fn_800F0654(taskPtr, 1, saved);
+                GSthreadSetArgs(taskPtr, 1, saved);
             }
             return 0;
         }

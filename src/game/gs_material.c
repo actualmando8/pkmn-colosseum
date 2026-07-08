@@ -302,11 +302,11 @@ extern void jumptable_80315364();
 extern u32 GStextureUnlockImage(void*);
 extern u8 lbl_80400EE0[];
 extern u8 lbl_8047AAE0;
-extern void fn_800EF4DC(void);
-extern void fn_800EF590(void);
-extern void fn_800EF578(void);
+extern void GStextureGetFormat(void);
+extern void GStextureSetWrap(void);
+extern void GStextureSetFilter(void);
 extern void* GStextureLockImage(void*, u32);
-extern void fn_800EF1E8(void);
+extern void GStextureConvertFromHW(void);
 extern void HSD_LObjReqAnimAll(void*, f32);
 extern void HSD_LObjAnimAll(void*);
 extern u32 lbl_8047AAEC;
@@ -366,10 +366,10 @@ extern u8 lbl_8047CAA8[];
 extern void GXDrawDone(u32);
 extern void HSD_ImageDescFree(u32);
 extern void* HSD_ImageDescAlloc(void);
-extern u16 fn_800EF4FC(void*);
-extern u16 fn_800EF4F4(void*);
-extern void* fn_800EF3E0(void*, u32);
-extern u8 fn_800EF4E4(void*);
+extern u16 GStextureGetXsize(void*);
+extern u16 GStextureGetYsize(void*);
+extern void* GStextureGetGXformat(void*, u32);
+extern u8 GStextureGetMiplevels(void*);
 extern f32 lbl_8047CAC8;
 extern void HSD_MObjSetAlpha(u32, ...);
 extern f64 lbl_8047CAD0;
@@ -472,10 +472,10 @@ extern u32 lbl_8047CB48;
 extern u32 lbl_8047AB3C;
 
 extern void* HSD_ImageDescAlloc(void);
-extern u16 fn_800EF4FC(void*);
-extern u16 fn_800EF4F4(void*);
-extern void* fn_800EF3E0(void*, u32);
-extern u8 fn_800EF4E4(void*);
+extern u16 GStextureGetXsize(void*);
+extern u16 GStextureGetYsize(void*);
+extern void* GStextureGetGXformat(void*, u32);
+extern u8 GStextureGetMiplevels(void*);
 extern f32 lbl_8047CAC8;
 #if 0
 asm void GSmaterialSetTexture(void) {
@@ -496,10 +496,10 @@ void GSmaterialSetTexture(u8* obj, void* image) {
 
     if (desc != 0) {
         *(void**)desc = GStextureLockImage(image, 0);
-        *(u16*)((u8*)desc + 0x4) = fn_800EF4FC(image);
-        *(u16*)((u8*)desc + 0x6) = fn_800EF4F4(image);
-        *(void**)((u8*)desc + 0x8) = fn_800EF3E0(image, 1);
-        transparent = fn_800EF4E4(image);
+        *(u16*)((u8*)desc + 0x4) = GStextureGetXsize(image);
+        *(u16*)((u8*)desc + 0x6) = GStextureGetYsize(image);
+        *(void**)((u8*)desc + 0x8) = GStextureGetGXformat(image, 1);
+        transparent = GStextureGetMiplevels(image);
         scale = lbl_8047CAC8;
         *(u32*)((u8*)desc + 0xc) = ((0 - transparent) | transparent) >> 31;
         *(f32*)((u8*)desc + 0x10) = scale;

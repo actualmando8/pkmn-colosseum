@@ -95,12 +95,12 @@ void fightTimerCommandTerminate(void)
 {
     extern ColosseumBattleTimerState lbl_80478800;
     extern f32 lbl_8047E6D8;
-    extern void fn_800F05A0(u32);
+    extern void GSthreadTerminate(u32);
     ColosseumBattleTimerState *state;
 
     state = &lbl_80478800;
     if (state->thread != 0) {
-        fn_800F05A0(state->thread);
+        GSthreadTerminate(state->thread);
     }
     lbl_80478800.done = 0;
     state->thread = 0;
@@ -148,7 +148,7 @@ f32 fightTimerCommandGetNokoriTime(void)
 u32 fightTimerCommandBlock(void)
 {
     extern ColosseumBattleTimerState lbl_80478800;
-    extern void fn_800F0438(u32);
+    extern void GSthreadBlock(u32);
     ColosseumBattleTimerState *state;
 
     state = &lbl_80478800;
@@ -158,7 +158,7 @@ u32 fightTimerCommandBlock(void)
     if (state->thread == 0) {
         return 0;
     }
-    fn_800F0438(state->thread);
+    GSthreadBlock(state->thread);
     return 1;
 }
 
@@ -168,7 +168,7 @@ void fightTimerCommandStart(void)
     extern ColosseumBattleTimerState lbl_80478800;
     extern u32 fn_800FF560(void);
     extern u32 GSthreadCreate(u32, u32, u32, u32, u32, u32);
-    extern void fn_800F0654(u32, u32, ...);
+    extern void GSthreadSetArgs(u32, u32, ...);
     extern void fightTimerThreadFunc(u8 *);
     u32 thread;
 
@@ -176,7 +176,7 @@ void fightTimerCommandStart(void)
         thread = GSthreadCreate(1, fn_800FF560(), 0x4000, 1, 0, (u32)fightTimerThreadFunc);
         if (thread != 0) {
             lbl_80478800.thread = thread;
-            fn_800F0654(thread, 1);
+            GSthreadSetArgs(thread, 1);
         }
     }
 }
@@ -188,7 +188,7 @@ void fightTimerCommandInit(void)
     extern f32 lbl_8047E6D8;
     extern f32 lbl_8047E6E8;
     extern s32 fn_80077B84(void);
-    extern void fn_800F05A0(u32);
+    extern void GSthreadTerminate(u32);
     ColosseumBattleTimerState *state;
     f32 limit;
 
@@ -196,7 +196,7 @@ void fightTimerCommandInit(void)
     state = &lbl_80478800;
     if (state->thread != 0) {
         if (state->thread != 0) {
-            fn_800F05A0(state->thread);
+            GSthreadTerminate(state->thread);
         }
         lbl_80478800.done = 0;
         state->thread = 0;
@@ -256,7 +256,7 @@ f32 fightTimerAllGetNokoriTime(void)
 u32 fightTimerAllBlock(void)
 {
     extern ColosseumBattleTimerState lbl_80478810;
-    extern void fn_800F0438(u32);
+    extern void GSthreadBlock(u32);
     ColosseumBattleTimerState *state;
 
     state = &lbl_80478810;
@@ -266,7 +266,7 @@ u32 fightTimerAllBlock(void)
     if (state->thread == 0) {
         return 0;
     }
-    fn_800F0438(state->thread);
+    GSthreadBlock(state->thread);
     return 1;
 }
 
@@ -276,7 +276,7 @@ void fightTimerAllStart(void)
     extern ColosseumBattleTimerState lbl_80478810;
     extern u32 fn_800FF560(void);
     extern u32 GSthreadCreate(u32, u32, u32, u32, u32, u32);
-    extern void fn_800F0654(u32, u32, ...);
+    extern void GSthreadSetArgs(u32, u32, ...);
     extern void fightTimerThreadFunc(u8 *);
     u32 thread;
 
@@ -284,7 +284,7 @@ void fightTimerAllStart(void)
         thread = GSthreadCreate(1, fn_800FF560(), 0x4000, 1, 0, (u32)fightTimerThreadFunc);
         if (thread != 0) {
             lbl_80478810.thread = thread;
-            fn_800F0654(thread, 1);
+            GSthreadSetArgs(thread, 1);
         }
     }
 }
@@ -296,7 +296,7 @@ void fightTimerAllInit(void)
     extern f32 lbl_8047E6D8;
     extern f32 lbl_8047E6E8;
     extern s32 menuCBRule_GetBattleTimeLimit(void);
-    extern void fn_800F05A0(u32);
+    extern void GSthreadTerminate(u32);
     ColosseumBattleTimerState *state;
     f32 limit;
 
@@ -304,7 +304,7 @@ void fightTimerAllInit(void)
     state = &lbl_80478810;
     if (state->thread != 0) {
         if (state->thread != 0) {
-            fn_800F05A0(state->thread);
+            GSthreadTerminate(state->thread);
         }
         lbl_80478810.done = 0;
         state->thread = 0;
@@ -330,12 +330,12 @@ void fightTimerAllTerminate(void)
 {
     extern ColosseumBattleTimerState lbl_80478810;
     extern f32 lbl_8047E6D8;
-    extern void fn_800F05A0(u32);
+    extern void GSthreadTerminate(u32);
     ColosseumBattleTimerState *state;
 
     state = &lbl_80478810;
     if (state->thread != 0) {
-        fn_800F05A0(state->thread);
+        GSthreadTerminate(state->thread);
     }
     lbl_80478810.done = 0;
     state->thread = 0;
