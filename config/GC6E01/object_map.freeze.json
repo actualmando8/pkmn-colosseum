@@ -6,24 +6,24 @@
     "total_code": 2495108,
     "total_data": 2196124,
     "total_functions": 8603,
-    "total_units": 531
+    "total_units": 540
   },
   "topology_status": {
     "auto_units": 59,
-    "named_units": 472,
-    "source_backed_units": 452,
+    "named_units": 481,
+    "source_backed_units": 461,
     "auto_code": 0,
     "auto_data": 58535,
     "auto_functions": 0
   },
   "baseline_progress": {
-    "matched_code": "427080",
-    "matched_code_percent": 17.116693,
+    "matched_code": "427620",
+    "matched_code_percent": 17.138336,
     "matched_data": "2137589",
     "matched_data_percent": 97.334625,
-    "matched_functions": 3978,
-    "matched_functions_percent": 46.23968,
-    "fuzzy_match_percent": 32.72791
+    "matched_functions": 3984,
+    "matched_functions_percent": 46.309425,
+    "fuzzy_match_percent": 32.751152
   },
   "unit_topology": [
     {
@@ -5660,26 +5660,143 @@
       "sections": [
         {
           "name": ".text",
-          "size": 232,
+          "size": 352,
           "virtual_address": 2148538640
         }
       ],
-      "total_code": 232,
+      "total_code": 352,
       "total_data": 0,
-      "total_functions": 1
+      "total_functions": 4
     },
     {
-      "name": "main/game/gs_model",
+      "name": "main/game/kaisuu",
       "sections": [
         {
           "name": ".text",
-          "size": 33424,
-          "virtual_address": 2148538872
+          "size": 196,
+          "virtual_address": 2148538992
         }
       ],
-      "total_code": 33424,
+      "total_code": 196,
       "total_data": 0,
-      "total_functions": 126
+      "total_functions": 3
+    },
+    {
+      "name": "main/game/gapp_range_80101B34",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1232,
+          "virtual_address": 2148539188
+        }
+      ],
+      "total_code": 1232,
+      "total_data": 0,
+      "total_functions": 6
+    },
+    {
+      "name": "main/game/menu",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 7780,
+          "virtual_address": 2148540420
+        }
+      ],
+      "total_code": 7780,
+      "total_data": 0,
+      "total_functions": 31
+    },
+    {
+      "name": "main/game/cursor_bios",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 380,
+          "virtual_address": 2148548200
+        }
+      ],
+      "total_code": 380,
+      "total_data": 0,
+      "total_functions": 4
+    },
+    {
+      "name": "main/game/window",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 6376,
+          "virtual_address": 2148548580
+        }
+      ],
+      "total_code": 6376,
+      "total_data": 0,
+      "total_functions": 25
+    },
+    {
+      "name": "main/game/win_msg",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 5836,
+          "virtual_address": 2148554956
+        }
+      ],
+      "total_code": 5836,
+      "total_data": 0,
+      "total_functions": 20
+    },
+    {
+      "name": "main/game/win_sequence",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 5608,
+          "virtual_address": 2148560792
+        }
+      ],
+      "total_code": 5608,
+      "total_data": 0,
+      "total_functions": 11
+    },
+    {
+      "name": "main/game/win_sprite",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 4324,
+          "virtual_address": 2148566400
+        }
+      ],
+      "total_code": 4324,
+      "total_data": 0,
+      "total_functions": 8
+    },
+    {
+      "name": "main/game/menu_offscreen",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 560,
+          "virtual_address": 2148570724
+        }
+      ],
+      "total_code": 560,
+      "total_data": 0,
+      "total_functions": 11
+    },
+    {
+      "name": "main/game/menu_model",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1012,
+          "virtual_address": 2148571284
+        }
+      ],
+      "total_code": 1012,
+      "total_data": 0,
+      "total_functions": 4
     },
     {
       "name": "main/game/gs_range_80109C88",

@@ -1134,10 +1134,37 @@ game/gs_floor.c:
 	.text       start:0x800FF788 end:0x80101910
 
 game/gs_range_80101910.c:
-	.text       start:0x80101910 end:0x801019F8
+	.text       start:0x80101910 end:0x80101A70
 
-game/gs_model.c:
-	.text       start:0x801019F8 end:0x80109C88
+game/kaisuu.c:
+	.text       start:0x80101A70 end:0x80101B34
+
+game/gapp_range_80101B34.c:
+	.text       start:0x80101B34 end:0x80102004
+
+game/menu.c:
+	.text       start:0x80102004 end:0x80103E68
+
+game/cursor_bios.c:
+	.text       start:0x80103E68 end:0x80103FE4
+
+game/window.c:
+	.text       start:0x80103FE4 end:0x801058CC
+
+game/win_msg.c:
+	.text       start:0x801058CC end:0x80106F98
+
+game/win_sequence.c:
+	.text       start:0x80106F98 end:0x80108580
+
+game/win_sprite.c:
+	.text       start:0x80108580 end:0x80109664
+
+game/menu_offscreen.c:
+	.text       start:0x80109664 end:0x80109894
+
+game/menu_model.c:
+	.text       start:0x80109894 end:0x80109C88
 
 game/gs_range_80109C88.c:
 	.text       start:0x80109C88 end:0x8010C364
