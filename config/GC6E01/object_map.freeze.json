@@ -6,24 +6,24 @@
     "total_code": 2495108,
     "total_data": 2196124,
     "total_functions": 8603,
-    "total_units": 563
+    "total_units": 573
   },
   "topology_status": {
     "auto_units": 59,
-    "named_units": 504,
-    "source_backed_units": 484,
+    "named_units": 514,
+    "source_backed_units": 494,
     "auto_code": 0,
     "auto_data": 58535,
     "auto_functions": 0
   },
   "baseline_progress": {
-    "matched_code": "428240",
-    "matched_code_percent": 17.163185,
+    "matched_code": "429532",
+    "matched_code_percent": 17.214966,
     "matched_data": "2137589",
     "matched_data_percent": 97.334625,
-    "matched_functions": 3988,
-    "matched_functions_percent": 46.355923,
-    "fuzzy_match_percent": 32.78667
+    "matched_functions": 3999,
+    "matched_functions_percent": 46.483784,
+    "fuzzy_match_percent": 32.829308
   },
   "unit_topology": [
     {
@@ -6115,26 +6115,156 @@
       "sections": [
         {
           "name": ".text",
-          "size": 652,
+          "size": 1952,
           "virtual_address": 2148616928
         }
       ],
-      "total_code": 652,
+      "total_code": 1952,
       "total_data": 0,
-      "total_functions": 3
+      "total_functions": 22
     },
     {
-      "name": "main/game/gs_field_world",
+      "name": "main/game/floor_data",
       "sections": [
         {
           "name": ".text",
-          "size": 114548,
-          "virtual_address": 2148617580
+          "size": 2612,
+          "virtual_address": 2148618880
         }
       ],
-      "total_code": 114548,
+      "total_code": 2612,
       "total_data": 0,
-      "total_functions": 734
+      "total_functions": 27
+    },
+    {
+      "name": "main/game/floor_event",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 4220,
+          "virtual_address": 2148621492
+        }
+      ],
+      "total_code": 4220,
+      "total_data": 0,
+      "total_functions": 7
+    },
+    {
+      "name": "main/game/floor_character",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1004,
+          "virtual_address": 2148625712
+        }
+      ],
+      "total_code": 1004,
+      "total_data": 0,
+      "total_functions": 16
+    },
+    {
+      "name": "main/game/field_camera",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 3388,
+          "virtual_address": 2148626716
+        }
+      ],
+      "total_code": 3388,
+      "total_data": 0,
+      "total_functions": 16
+    },
+    {
+      "name": "main/game/field_range_80117E58",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 15284,
+          "virtual_address": 2148630104
+        }
+      ],
+      "total_code": 15284,
+      "total_data": 0,
+      "total_functions": 70
+    },
+    {
+      "name": "main/game/waza",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 4180,
+          "virtual_address": 2148645388
+        }
+      ],
+      "total_code": 4180,
+      "total_data": 0,
+      "total_functions": 77
+    },
+    {
+      "name": "main/game/pokemon_data",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 11164,
+          "virtual_address": 2148649568
+        }
+      ],
+      "total_code": 11164,
+      "total_data": 0,
+      "total_functions": 284
+    },
+    {
+      "name": "main/game/pokemon_range_8011F5FC",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 38972,
+          "virtual_address": 2148660732
+        }
+      ],
+      "total_code": 38972,
+      "total_data": 0,
+      "total_functions": 106
+    },
+    {
+      "name": "main/game/hero",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 7780,
+          "virtual_address": 2148699704
+        }
+      ],
+      "total_code": 7780,
+      "total_data": 0,
+      "total_functions": 71
+    },
+    {
+      "name": "main/game/hero_move",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 22980,
+          "virtual_address": 2148707484
+        }
+      ],
+      "total_code": 22980,
+      "total_data": 0,
+      "total_functions": 34
+    },
+    {
+      "name": "main/game/hero_pokemon",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1664,
+          "virtual_address": 2148730464
+        }
+      ],
+      "total_code": 1664,
+      "total_data": 0,
+      "total_functions": 7
     },
     {
       "name": "main/game/effect/gs_effect",

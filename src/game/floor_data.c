@@ -1,16 +1,14 @@
 /**
- * @file field_range_80114AE0.c
- * @brief field code, 0x80114AE0 - 0x80115280 (merged: original range-file +
- *        the floorRead / _unload tail segment split from gs_field_world.c).
+ * @file floor_data.c
+ * @brief GSfield world segment -- split from gs_field_world.c.
  *
- * Range unit assigned from the propagated subsystem map
- * (tools/subsystem_propagation.py, >=80% single-label dominance;
- * campaign 2026-07-01). The 0x80114D6C-0x80115280 tail is the floorRead*
- * resource-handler module (floorReadGFL/Particle/WZX/PKX/Tex/Script/Font/
- * Msg/Normal PreFunc + matching _unload*__FPvUlUl family), physically split
- * from gs_field_world.c (XD 0x8002E524-0x8002F120). All functions asm-only
- * until matched; the range name stays honest until internal TU structure
- * is fully proven.
+ * XD source unit: floorDataBios* (floordata module)
+ * Address range: 0x80115280 - 0x80115CB4 (~27 functions)
+ *
+ * Split from src/game/gs_field_world.c (physical XD source-unit split of
+ * the 734-function field-world bucket into its 12 constituent XD source
+ * units). See gs_field_world.c split history for the address-range
+ * evidence (anchor-name monotonicity checks) used to place this boundary.
  */
 #include "dolphin/types.h"
 #include "game/world/gs_field.h"
@@ -1432,431 +1430,642 @@ extern void heroMoveGetHeroRot(u32 param);
 extern void heroMoveGetHeroPos(u32 param);
 extern u32 heroMoveGetResID(u32* out_zero, u32* out_val, s32 index);
 
-/* ==================================================================
- * floorUpdateFieldCamera_Pseudocode -- floorUpdateFieldCamera notes
- *
- * Update the field camera each frame. Interpolates position, target,
- * and FOV toward their destination values. Includes safety check for
- * divide-by-zero when computing distance-based interpolation.
- *
- * This function is 0x1B4 bytes (436 bytes) and uses extensive float
- * math for smooth camera transitions.
- *
- * From disassembly:
- *   - Loads camera state from a BSS pointer
- *   - Computes direction vector from current to destination
- *   - Normalizes and scales by interpSpeed
- *   - If distance is near-zero, snaps to destination (avoids /0)
- *   - On divide-by-zero path: logs lbl_80272770
- * ================================================================== */
-void floorUpdateFieldCamera_Pseudocode(void) {
-    extern f32 lbl_8047CFD0;
-    extern f32 lbl_8047CFDC;
-    extern f32 lbl_8047CFE0;
-    extern void GSvecSquareDistance();
-    extern void fn_800E01F4();
-    extern u32 lbl_8047AD68;
-    extern u32 lbl_8047AD6C;
-    u8 sp[0xA0];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f0 = 0.0f;
-    f32 f1 = 0.0f;
-    f32 f2 = 0.0f;
-    f32 f3 = 0.0f;
-    f32 f26 = 0.0f;
-    f32 f27 = 0.0f;
-    f32 f28 = 0.0f;
-    f32 f29 = 0.0f;
-    f32 f30 = 0.0f;
-    f32 f31 = 0.0f;
-    *(f64*)(sp + 0x90) = f31;
-    /* psq_st f31, 0x98((u32)sp), 0, qr0 */;
-    *(f64*)(sp + 0x80) = f30;
-    /* psq_st f30, 0x88((u32)sp), 0, qr0 */;
-    *(f64*)(sp + 0x70) = f29;
-    /* psq_st f29, 0x78((u32)sp), 0, qr0 */;
-    *(f64*)(sp + 0x60) = f28;
-    /* psq_st f28, 0x68((u32)sp), 0, qr0 */;
-    *(f64*)(sp + 0x50) = f27;
-    /* psq_st f27, 0x58((u32)sp), 0, qr0 */;
-    *(f64*)(sp + 0x40) = f26;
-    /* psq_st f26, 0x48((u32)sp), 0, qr0 */;
-    r25 = r3;
-    r26 = r4;
-    r27 = r5;
-    r28 = r6;
-    r0 = lbl_8047AD68;
-    if (r0 == (u32)0x1) {
-        r4 = lbl_8047AD6C;
-        r3 = 0x1;
-        f0 = *(f32*)((u8*)r4 + 0x10);
-        *(f32*)((u8*)r26 + 0x0) = f0;
-        r4 = lbl_8047AD6C;
-        f0 = *(f32*)((u8*)r4 + 0xC);
-        *(f32*)((u8*)r27 + 0x0) = f0;
-        r4 = lbl_8047AD6C;
-        f0 = *(f32*)((u8*)r4 + 0x14);
-        *(f32*)((u8*)r28 + 0x0) = f0;
-    } else {
-    f29 = lbl_8047CFD0;
-    r30 = 0x0;
-    r31 = 0x0;
-    f28 = f29;
-    f27 = f29;
-    f26 = f29;
-    f30 = lbl_8047CFDC;
-    f31 = lbl_8047CFE0;
-    while (r0 = lbl_8047AD68, r30 < r0) {
-
-    r0 = lbl_8047AD6C;
-    r3 = (u32)sp + 0x8;
-    r29 = r0 + r31;
-    f1 = *(f32*)((u8*)r29 + 0x0);
-    f2 = *(f32*)((u8*)r29 + 0x4);
-    f3 = *(f32*)((u8*)r29 + 0x8);
-    fn_800E01F4();
-    r4 = r25;
-    r3 = (u32)sp + 0x8;
-    GSvecSquareDistance();
-    if (f1 > f30) {
-        f3 = f31 / f1;
-        f2 = *(f32*)((u8*)r29 + 0xC);
-        f1 = *(f32*)((u8*)r29 + 0x10);
-        f0 = *(f32*)((u8*)r29 + 0x14);
-        f29 = f29 + f3;
-        f28 = f2 * f3 + f28;
-        f27 = f1 * f3 + f27;
-        f26 = f0 * f3 + f26;
-    r31 = r31 + 0x18;
-    r30 = r30 + 0x1;
-        continue;
-    }
-    f29 = f30;
-    f27 = *(f32*)((u8*)r29 + 0x10);
-    f28 = *(f32*)((u8*)r29 + 0xC);
-    f26 = *(f32*)((u8*)r29 + 0x14);
-    break;
-    }
-
-    f0 = lbl_8047CFD0;
-    if (f0 == f29) {
-        r3 = (u32)&lbl_80272770;
-        r3 = (u32)&lbl_80272770;
-        ((void(*)(void))GSlogWrite)();
-        r3 = 0x0;
-    } else {
-    f0 = lbl_8047CFDC;
-    r3 = 0x1;
-    f0 = f0 / f29;
-    f2 = f27 * f0;
-    f1 = f28 * f0;
-    f0 = f26 * f0;
-    *(f32*)((u8*)r26 + 0x0) = f2;
-    *(f32*)((u8*)r27 + 0x0) = f1;
-    *(f32*)((u8*)r28 + 0x0) = f0;
-    }
-    }
-    /* psq_l f31, 0x98((u32)sp), 0, qr0 */;
-    f31 = *(f64*)(sp + 0x90);
-    /* psq_l f30, 0x88((u32)sp), 0, qr0 */;
-    f30 = *(f64*)(sp + 0x80);
-    /* psq_l f29, 0x78((u32)sp), 0, qr0 */;
-    f29 = *(f64*)(sp + 0x70);
-    /* psq_l f28, 0x68((u32)sp), 0, qr0 */;
-    f28 = *(f64*)(sp + 0x60);
-    /* psq_l f27, 0x58((u32)sp), 0, qr0 */;
-    f27 = *(f64*)(sp + 0x50);
-    /* psq_l f26, 0x48((u32)sp), 0, qr0 */;
-    f26 = *(f64*)(sp + 0x40);
-    return;
-}
-/* ===================================================================
- * Generated: 1 pattern-matched + 515 stubs
- * Range: 0x80114CA8 - 0x80130CD8
- * =================================================================== */
-extern u8 lbl_804083D0[0x30];
-extern u32 lbl_8047AD68;
-extern u32 lbl_8047AD6C;
-extern void fn_801ED674(void);
-/* Forward declarations for functions called before definition */
-void fn_801193BC(void);
-/* Forward declarations for converted functions */
-s32 pokemonWazaGetMaxPP(u8* ptr, u16 idx);
-void wazaGetStatus(void);
-void fn_8011F260(void);
-void pokemonResetBasisStatus(void*);
-void pokemonSetLevelBasisStatus(void);
-void heroItemGetItemKindToItemAryPtr(void);
-void heroSetStatus();
-void heroGetStatus(void);
-/* 0x70 | floorReadMapPreFunc | alloc_wrapper */
-extern void* GSresAllocResourceAlign();  /* K&R: called with 5 args, returns void* */
+/* 0x80115280 | 0x10C */
 #pragma push
 #pragma peephole off
-void* floorReadMapPreFunc(void* owner, u32 param, u32 alloc_size) {
-    u32 total = ((alloc_size + 0x1F) & ~0x1F) + 0x60;
-    void* mem = (void*)GSresAllocResourceAlign(total, 0x20, (u32)owner, (u32)param, 0);
-    if (mem == NULL) {
-        GSlogWrite(lbl_802724E8, total);
-        return NULL;
-    }
-    return (u8*)mem + 0x60;
-}
-#pragma pop
-/* 0x80114D6C | 0xA0 */
-extern u8 fn_800FF548(void);
-extern u32 _unloadScript__FPvUlUl();  /* K&R: asm void wrapper, used as function pointer */
-extern u32 _unloadFont__FPvUlUl();  /* K&R: asm void wrapper, used as function pointer */
-extern u32 _unloadMsg__FPvUlUl();  /* K&R: asm void wrapper, used as function pointer */
-#pragma push
-#pragma peephole off
-void* floorReadScriptPreFunc(void* owner, u32 param, u32 alloc_size) {
-    void* mem;
-    if ((u8)fn_800FF548() != 0) { return NULL; }
-    alloc_size = (alloc_size + 0x1F) & ~0x1F;
-    mem = (void*)GSresAllocResourceAlign(alloc_size, 0x20, (u32)owner, param, (u32)_unloadScript__FPvUlUl);
-    if (mem == NULL) {
-        GSlogWrite(lbl_80272520, alloc_size);
-    }
-    return mem;
-}
-/* 0x80114E78 | 0xA0 */
-void* floorReadFontPreFunc(void* owner, u32 param, u32 alloc_size) {
-    void* mem;
-    if ((u8)fn_800FF548() != 0) { return NULL; }
-    alloc_size = (alloc_size + 0x1F) & ~0x1F;
-    mem = (void*)GSresAllocResourceAlign(alloc_size, 0x20, (u32)owner, param, (u32)_unloadFont__FPvUlUl);
-    if (mem == NULL) {
-        GSlogWrite(lbl_8027255C, alloc_size);
-    }
-    return mem;
-}
-/* 0x80114F84 | 0xA0 */
-void* floorReadMsgPreFunc(void* owner, u32 param, u32 alloc_size) {
-    void* mem;
-    if ((u8)fn_800FF548() != 0) { return NULL; }
-    alloc_size = (alloc_size + 0x1F) & ~0x1F;
-    mem = (void*)GSresAllocResourceAlign(alloc_size, 0x20, (u32)owner, param, (u32)_unloadMsg__FPvUlUl);
-    if (mem == NULL) {
-        GSlogWrite(lbl_80272594, alloc_size);
-    }
-    return mem;
-}
-#pragma pop
-/* 0x80115094 | 0x24 | call_return_const */
-#pragma push
-#pragma scheduling off
-u32 _unloadFlare__FPvUlUl(void) {
-    fn_801ED674();
-    return 1;
-}
-#pragma pop
-/* 0x801150B8 | 36 bytes | call_return_const */
-#pragma push
-#pragma scheduling off
-u32 _unloadParticles__FPvUlUl(void) {
-    fn_801193BC();
-    return 1;
-}
-#pragma pop
-/* 0x801150DC | 36 bytes | call_return_const */
-#pragma push
-#pragma scheduling off
-u32 _unloadCamera__FPvUlUl(void) {
-    fn_800D2738();
-    return 1;
-}
-#pragma pop
-/* 0x80115100 | 36 bytes | call_return_const */
-#pragma push
-#pragma scheduling off
-u32 _unloadLight__FPvUlUl(void) {
-    GSlightFree();
-    return 1;
-}
-#pragma pop
-/* 0x80115208 | 36 bytes | call_return_const */
-#pragma push
-#pragma scheduling off
-u32 _unloadColsys__FPvUlUl(void) {
-    GScolsys2UnloadCCD();
-    return 1;
-}
-#pragma pop
-/* 0x8011522C | 36 bytes | call_return_const */
-extern void fn_800EF5A4(void);
-#pragma push
-#pragma scheduling off
-u32 _unloadTexture__FPvUlUl(void) {
-    fn_800EF5A4();
-    return 1;
-}
-#pragma pop
-/* 0x80115250 | 0xC */
-u32 floorReadMakeFogResID(u32 val) {
-    return (val & 0x7FFF0000U) | 0x1A00;
-}
-/* 0x8011525C | 0xC */
-u32 floorReadMakeCameraResID(u32 val) {
-    return (val & 0x7FFF0000U) | 0x1800;
-}
-/* 0x80115268 | 0xC */
-u32 floorReadMakeLightResID(u32 val) {
-    return (val & 0x7FFF0000U) | 0x1600;
-}
-/* 0x80115274 | 0xC */
-u32 floorReadMakeModelResID(u32 val) {
-    return (val & 0x7FFF0000U) | 0x1000;
-}
-extern void fn_800F76E4();
-extern void fn_80112700(void);
-#if 0
-asm void floorReadScriptPostFunc(void) {
-#include "src/game/gs_field_world_fn_80114D18.inc"
-}
-#else
-#pragma optimization_level 4
-#pragma peephole off
-void* floorReadScriptPostFunc(u32 a, u32 b) {
-    void* result;
-
-    result = GSresGetResource(a, b);
-    if (fn_800FF548() == 0 && result != NULL) {
-        fn_800F76E4(result);
-        fn_80112700();
-    }
-    return result;
-}
-#pragma peephole reset
-#endif
-extern void GSmsgFontOpen();
-#if 0
-asm void floorReadFontPostFunc(void) {
-#include "src/game/gs_field_world_fn_80114E0C.inc"
-}
-#else
-#pragma push
-#pragma peephole off
-#pragma optimization_level 4
-void* floorReadFontPostFunc(u32 a, u32 b) {
-    void* result;
-
-    if (fn_800FF548() != 0) {
-        return NULL;
-    }
-    result = GSresGetResource(a, b);
-    if (result != NULL) {
-        GSmsgFontOpen(result);
-    }
-    return result;
-}
-#pragma pop
-#endif
-extern void GSmsgOpen();
-#if 0
-asm void floorReadMsgPostFunc(void) {
-#include "src/game/gs_field_world_fn_80114F18.inc"
-}
-#else
-#pragma push
-#pragma peephole off
-#pragma optimization_level 4
-void* floorReadMsgPostFunc(u32 a, u32 b) {
-    void* result;
-
-    if (fn_800FF548() != 0) {
-        return NULL;
-    }
-    result = GSresGetResource(a, b);
-    if (result != NULL) {
-        GSmsgOpen(result);
-    }
-    return result;
-}
-#pragma pop
-#endif
-#if 0
-asm void floorReadNormalPreFunc(void) {
-#include "src/game/gs_field_world_fn_80115024.inc"
-}
-#else
-#pragma push
-#pragma peephole off
-#pragma optimization_level 4
-void* floorReadNormalPreFunc(u32 a, u32 b, u32 size) {
-    void* result;
-
-    result = GSresAllocResourceAlign((size + 0x1F) & ~0x1F, 0x20, a, b, 0);
-    if (result == NULL) {
-        GSlogWrite(lbl_802725CC, size);
-    }
-    return result;
-}
-#pragma pop
-#endif
-extern u8 fn_800FF554(void);
-extern void fn_800F760C();
-#if 0
-asm void _unloadScript__FPvUlUl(void) {
-#include "src/game/gs_field_world_fn_80115124.inc"
-}
-#else
-#pragma push
-#pragma peephole off
-#pragma optimization_level 4
-u32 _unloadScript__FPvUlUl(void* ptr) {
-    if (fn_800FF554() != 0) {
+u32 floorDataBiosGetShadowReciveNum(void* ptr) {
+    extern const char lbl_80272608[];
+    extern const char lbl_8027262C[];
+    extern u8 lbl_8035BB50[];
+    u32* data;
+    u32 count = 0;
+    if (ptr == NULL) {
+        GSlogWrite(lbl_80272608, lbl_8035BB50);
         return 0;
     }
-    fn_800F760C(ptr);
-    return 1;
+    data = *(u32**)((u8*)ptr + 0x10);
+    if (data == NULL) {
+        return 0;
+    }
+    data = *(u32**)data;
+    if (data == NULL) {
+        GSlogWrite(lbl_8027262C, lbl_8035BB50);
+        return 0;
+    }
+    if (data[2] != 0) { count++; }
+    if (data[3] != 0) { count++; }
+    if (data[4] != 0) { count++; }
+    if (data[5] != 0) { count++; }
+    if (data[6] != 0) { count++; }
+    if (data[7] != 0) { count++; }
+    if (data[8] != 0) { count++; }
+    if (data[9] != 0) { count++; }
+    return count;
+}
+#pragma pop
+/* 0x8011538C | 0xA0 */
+extern const char lbl_80272608[];
+extern const char lbl_8027262C[];
+extern u8 lbl_8035BB30[];
+extern u8 lbl_8035BB50[];
+#pragma push
+#pragma peephole off
+void* floorDataBiosGetShadowReciveID(void* ptr, u32 idx) {
+    void* p1;
+    if (ptr == NULL) {
+        GSlogWrite(lbl_80272608, lbl_8035BB30);
+        return NULL;
+    }
+    p1 = *(void**)((u8*)ptr + 0x10);
+    if (p1 == NULL) { return NULL; }
+    if (idx >= 8) { return NULL; }
+    p1 = *(void**)p1;
+    if (p1 == NULL) {
+        GSlogWrite(lbl_8027262C, lbl_8035BB30);
+        return NULL;
+    }
+    (u8*)p1 += idx * 4;
+    return *(void**)((u8*)p1 + 8);
+}
+#pragma pop
+/* 0x8011542C | 0x88 */
+extern const char lbl_80272608[];
+extern const char lbl_8027262C[];
+extern u8 lbl_8035BB10[];
+#pragma push
+#pragma scheduling on
+#pragma peephole off
+void* floorDataBiosGetShadowLightID(void* ptr) {
+    void* p1;
+    void* p2;
+    if (ptr == NULL) {
+        GSlogWrite(lbl_80272608, lbl_8035BB10);
+        return NULL;
+    }
+    p1 = *(void**)((u8*)ptr + 0x10);
+    if (p1 == NULL) { return NULL; }
+    p2 = *(void**)p1;
+    if (p2 == NULL) {
+        GSlogWrite(lbl_8027262C, lbl_8035BB10);
+        return NULL;
+    }
+    return *(void**)((u8*)p2 + 0x4);
+}
+#pragma pop
+/* 0x801154B4 | 0x88 */
+extern u8 lbl_8035BAF4[];
+#pragma push
+#pragma scheduling on
+#pragma peephole off
+void* floorDataBiosGetSunResID(void* ptr) {
+    void* p1;
+    void* p2;
+    if (ptr == NULL) {
+        GSlogWrite(lbl_80272608, lbl_8035BAF4);
+        return NULL;
+    }
+    p1 = *(void**)((u8*)ptr + 0x10);
+    if (p1 == NULL) { return NULL; }
+    p2 = *(void**)p1;
+    if (p2 == NULL) {
+        GSlogWrite(lbl_8027262C, lbl_8035BAF4);
+        return NULL;
+    }
+    return *(void**)p2;
+}
+#pragma pop
+/* 0x48 | fn_8011553C | nullcheck_store */
+extern const char lbl_80272658[];
+extern u8 lbl_8035BAD8[];
+#pragma push
+#pragma peephole off
+void fn_8011553C(void* obj, u32 val) {
+    if (obj == NULL) {
+        GSlogWrite(lbl_80272658, lbl_8035BAD8, val);
+        return;
+    }
+    *(u32*)((u8*)obj + 0x34) = val;
+}
+#pragma pop
+/* 0x48 | floorDataBiosSetMapResID | nullcheck_store */
+extern const char lbl_80272680[];
+extern u8 lbl_8035BABC[];
+#pragma push
+#pragma peephole off
+void floorDataBiosSetMapResID(void* obj, u32 val) {
+    if (obj == NULL) {
+        GSlogWrite(lbl_80272680, lbl_8035BABC, val);
+        return;
+    }
+    *(u32*)((u8*)obj + 0x8) = val;
+}
+#pragma pop
+/* 0xfn_80115A38 | global_cond_call */
+#pragma push
+#pragma scheduling on
+#pragma peephole off
+u32 floorDataBiosGetFileGroupID(u8* entry) {
+    extern u8 lbl_8035B91C[];
+    if (entry == 0) {
+        GSlogWrite(lbl_80272608, (const char*)lbl_8035B91C);
+        return 0;
+    }
+    return *(u32*)(entry + 0x4);
+}
+#pragma pop
+/* 0x70 | floorDataBiosGetCurrentPtr | generic */
+extern u32 lbl_80478FB8;
+extern u32 lbl_80478FBC;
+extern u8 lbl_802726D4[];
+extern u8 lbl_8035B8A0[];
+/* Forward declarations for self-referencing asm blocks */
+extern void* floorDataBiosGetFieldCameraListPtr();
+extern u32 floorDataBiosGetGroupID();
+extern void* floorDataBiosGetPtr(u32 key);
+extern void fn_8011791C(void);
+extern void fn_80119930(void);
+extern void fn_80119BD0();
+extern u8 fn_80119D90(u16 idx);
+extern u8 fn_80119DD0(u16 idx);
+extern u16 fn_80119E10(u16 idx);
+extern u8 fn_80119E50(u16 idx);
+extern u8 fn_80119E90(u16 idx);
+extern u16 fn_80119ED0(u16 idx);
+extern u8 fn_80119F10(u16 idx);
+extern u32 fn_80119F50(u16 idx);
+extern void wazaDataBiosSetFightWazaWzxVariationFuncPtr(u8* ptr, u32 val);
+extern void wazaDataBiosSetFightWazaWzxTypeFuncPtr(u8* ptr, u32 val);
+extern u32 wazaDataBiosGetFightWazaWzxVariationFuncPtr(u8* ptr);
+extern u8 wazaDataBiosGetTypeId(u8* ptr, u16 idx);
+extern u32 wazaDataBiosGetFightWazaWzxTypeFuncPtr(u8* ptr);
+extern void wazaDataBiosSetFightTrainerAiWazaDamageFuncPtr(u8* ptr, u32 val);
+extern void wazaDataBiosSetFightTrainerAiWazaHitFuncPtr(u8* ptr, u32 val);
+extern void wazaDataBiosSetFightTrainerAiWazaValueFuncPtr(u8* ptr, u32 val);
+extern void wazaDataBiosSetTypeId(u8* ptr, u16 idx, u8 val);
+extern u32 wazaDataBiosGetFightTrainerAiWazaDamageFuncPtr(u8* ptr);
+extern u32 wazaDataBiosGetFightTrainerAiWazaHitFuncPtr(u8* ptr);
+extern u32 wazaDataBiosGetFightTrainerAiWazaValueFuncPtr(u8* ptr);
+extern void pokemonGetDarkPokemonLevel(void);
+extern u32  pokemonDataCheckValid(u32 a, u16 key);
+extern u8 fn_80121ADC(u8* ptr, u32 slot);
+extern void pokemonSetWazaStatus(void);
+extern u32 pokemonWazaCheckValid(u8* ptr, u32 arg2);
+extern void pokemonInit(u8* ptr);
+extern void pokemonEvolutionCreateAddPokemon(void);
+extern void pokemonEvolution(void);
+extern void savedataInit(void);
+extern void heroAddPokedoru(u8* ptr, u32 offset);
+extern s32 heroItemAddItemDataId(u8* ptr, u32 arg2, u32 arg3, u32 arg4);
+extern u32 heroAddPokemon(u8* ptr, void* arg2);
+extern void heroCreate(u8* ptr, u32 arg2, u8 arg3);
+extern void heroInit();
+extern void heroBiosSetPokecouponAll();  /* K&R: typed impl or conflict */
+extern void heroBiosSetPokecoupon();  /* K&R: typed impl or conflict */
+extern void heroBiosSetPokedoru();  /* K&R: typed impl or conflict */
+extern void heroBiosSetHizukiNamePtr();  /* K&R: typed impl or conflict */
+extern void heroBiosSetNamePtr();  /* K&R: typed impl or conflict */
+extern void heroMoveTermEvent(void);
+extern void heroMoveInitEvent(void);
+extern void fn_8012CA84();
+extern void heroPokemonGetEifie(u32 arg1);
+extern void heroPokemonGetBlacky(u32 arg1);
+extern s32 psGetGeneratorChildMaxLife(u32);
+extern void* wazaDataBiosGetPtr(u16 idx);
+extern u32 pokemonGetStatus();
+extern void pokemonSetStatus();
+extern void wazaGetStatus(void);
+extern u16 fn_8011E36C(u8* ptr, u16 idx);
+extern u16 fn_8011E3B4(u8* ptr, u16 idx);
+extern u8 fn_8011E3FC(u8* ptr, u16 idx);
+extern void fn_8011F260(void);
+extern void heroItemGetItemKindToItemAryPtr(void);
+extern u8 floorUpdateFieldCamera();
+extern void heroSetStatus();
+extern void heroGetStatus(void);
+extern void updateAnimation__Ff15HEROMOVE_MEMBER(void);
+extern void* heroBiosGetPokemonPtr(u8* ptr, u16 idx);
+extern void* heroBiosGetHizukiNamePtr(void* ptr);
+extern void* heroBiosGetHizukiItemPtr(u8* ptr, u16 idx);
+extern void* heroBiosGetItemKoronPtr(u8* ptr, u16 idx);
+extern void* heroBiosGetItemSeedPtr(u8* ptr, u16 idx);
+extern void* heroBiosGetItemSkillPtr(u8* ptr, u16 idx);
+extern void* heroBiosGetItemBallPtr(u8* ptr, u16 idx);
+extern void* heroBiosGetExtraItemPtr(u8* ptr, u16 idx);
+extern void* heroBiosGetItemNormalPtr(u8* ptr, u16 idx);
+extern u32 heroBiosGetNamePtr(void* ptr);
+
+#if 0
+asm void floorDataBiosGetCurrentPtr(void) {
+#include "src/game/gs_field_world_fn_80115BD8.inc"
+}
+#else
+void* floorDataBiosGetCurrentPtr(void) {
+    /* refs: lbl_802726D4, lbl_8035B8A0, lbl_80478FB8, lbl_80478FBC */
+    void* floorId;
+    u8* entry;
+    u32 count;
+
+    floorId = fn_800FF56C();
+    entry = (u8*)lbl_80478FBC;
+    for (count = *(u32*)lbl_80478FB8; count != 0; count--) {
+        if (*(u32*)(entry + 0xC) == (u32)floorId) {
+            return entry;
+        }
+        entry += 0x4C;
+    }
+    GSlogWrite((const char*)lbl_802726D4, (const char*)lbl_8035B8A0);
+    entry = (u8*)0;
+    return (void*)entry;
+}
+#endif
+extern u8 lbl_8035BA98[];
+extern const char lbl_80272608[];
+#if 0
+asm void floorDataBiosGetFieldCameraListPtr(void) {
+#include "src/game/gs_field_world_fn_801155CC.inc"
+}
+#else
+#pragma push
+#pragma scheduling on
+#pragma peephole off
+#pragma optimization_level 4
+void* floorDataBiosGetFieldCameraListPtr(u8* ptr) {
+    void* sub;
+
+    if (ptr == NULL) {
+        GSlogWrite(lbl_80272608, lbl_8035BA98);
+        return NULL;
+    }
+    sub = *(void**)(ptr + 0x1C);
+    if (sub == NULL) {
+        return NULL;
+    }
+    return *(void**)sub;
 }
 #pragma pop
 #endif
-extern void fn_800FC2A8();
+extern u8 lbl_8035BA7C[];
 #if 0
-asm void _unloadFont__FPvUlUl(void) {
-#include "src/game/gs_field_world_fn_80115170.inc"
+asm void floorDataBiosGetPosListPtr(void) {
+#include "src/game/gs_field_world_fn_80115628.inc"
+}
+#else
+#pragma push
+#pragma scheduling on
+#pragma peephole off
+#pragma optimization_level 4
+void* floorDataBiosGetPosListPtr(u8* ptr) {
+    void* sub;
+
+    if (ptr == NULL) {
+        GSlogWrite(lbl_80272608, lbl_8035BA7C);
+        return NULL;
+    }
+    sub = *(void**)(ptr + 0x18);
+    if (sub == NULL) {
+        return NULL;
+    }
+    return *(void**)sub;
+}
+#pragma pop
+#endif
+extern u8 lbl_8035BA60[];
+#if 0
+asm void floorDataBiosGetCharInfo(void) {
+#include "src/game/gs_field_world_fn_80115684.inc"
+}
+#else
+#pragma push
+#pragma scheduling on
+#pragma peephole off
+#pragma optimization_level 4
+void* floorDataBiosGetCharInfo(u8* ptr, u32 idx) {
+    void* sub;
+    void* arr;
+
+    if (ptr == NULL) {
+        GSlogWrite(lbl_80272608, lbl_8035BA60);
+        return NULL;
+    }
+    sub = *(void**)(ptr + 0x14);
+    if (sub == NULL) {
+        return NULL;
+    }
+    arr = *(void**)sub;
+    if (idx >= *(u32*)*(void**)arr) {
+        return NULL;
+    }
+    return (u8*)*(void**)((u8*)arr + 4) + idx * 0x24;
+}
+#pragma pop
+#endif
+extern u8 lbl_8035BA48[];
+#if 0
+asm void floorDataBiosGetCharNum(void) {
+#include "src/game/gs_field_world_fn_80115704.inc"
+}
+#else
+#pragma push
+#pragma scheduling on
+#pragma peephole off
+#pragma optimization_level 4
+u32 floorDataBiosGetCharNum(u8* ptr) {
+    void* sub;
+
+    if (ptr == NULL) {
+        GSlogWrite(lbl_80272608, lbl_8035BA48);
+        return 0;
+    }
+    sub = *(void**)(ptr + 0x14);
+    if (sub == NULL) {
+        return 0;
+    }
+    return *(u32*)*(u32*)*(u32*)sub;
+}
+#pragma pop
+#endif
+extern u8 lbl_8035BA2C[];
+#if 0
+asm void floorDataBiosGetPostFunc(void) {
+#include "src/game/gs_field_world_fn_80115768.inc"
 }
 #else
 #pragma push
 #pragma peephole off
 #pragma optimization_level 4
-u32 _unloadFont__FPvUlUl(void* ptr) {
-    if (fn_800FF554() != 0) {
+u32 floorDataBiosGetPostFunc(u8* ptr) {
+    if (ptr == NULL) {
+        GSlogWrite(lbl_80272608, lbl_8035BA2C);
         return 0;
     }
-    GSmsgFontClose(ptr);
-    return 1;
+    return *(u32*)(ptr + 0x44);
 }
 #pragma pop
 #endif
-extern void GSmsgClose();
+extern u8 lbl_8035BA10[];
 #if 0
-asm void _unloadMsg__FPvUlUl(void) {
-#include "src/game/gs_field_world_fn_801151BC.inc"
+asm void floorDataBiosGetMainFunc(void) {
+#include "src/game/gs_field_world_fn_801157B0.inc"
 }
 #else
 #pragma push
 #pragma peephole off
 #pragma optimization_level 4
-u32 _unloadMsg__FPvUlUl(void* ptr) {
-    if (fn_800FF554() != 0) {
+u32 floorDataBiosGetMainFunc(u8* ptr) {
+    if (ptr == NULL) {
+        GSlogWrite(lbl_80272608, lbl_8035BA10);
         return 0;
     }
-    GSmsgClose(ptr);
-    return 1;
+    return *(u32*)(ptr + 0x40);
+}
+#pragma pop
+#endif
+extern u8 lbl_8035B9F8[];
+#if 0
+asm void floorDataBiosGetPreFunc(void) {
+#include "src/game/gs_field_world_fn_801157F8.inc"
+}
+#else
+#pragma push
+#pragma peephole off
+#pragma optimization_level 4
+u32 floorDataBiosGetPreFunc(u8* ptr) {
+    if (ptr == NULL) {
+        GSlogWrite(lbl_80272608, lbl_8035B9F8);
+        return 0;
+    }
+    return *(u32*)(ptr + 0x3C);
+}
+#pragma pop
+#endif
+extern u8 lbl_8035B9DC[];
+#if 0
+asm void fn_80115840(void) {
+#include "src/game/gs_field_world_fn_80115840.inc"
+}
+#else
+#pragma push
+#pragma peephole off
+#pragma optimization_level 4
+u32 fn_80115840(u8* ptr) {
+    if (ptr == NULL) {
+        GSlogWrite(lbl_80272608, lbl_8035B9DC);
+        return 0;
+    }
+    return *(u32*)(ptr + 0x24);
+}
+#pragma pop
+#endif
+extern u8 lbl_8035B9C0[];
+#if 0
+asm void fn_80115888(void) {
+#include "src/game/gs_field_world_fn_80115888.inc"
+}
+#else
+#pragma push
+#pragma peephole off
+#pragma optimization_level 4
+u32 fn_80115888(u8* ptr) {
+    if (ptr == NULL) {
+        GSlogWrite(lbl_80272608, lbl_8035B9C0);
+        return 0;
+    }
+    return *(u32*)(ptr + 0x38);
+}
+#pragma pop
+#endif
+extern u8 lbl_8035B9A4[];
+#if 0
+asm void fn_801158D0(void) {
+#include "src/game/gs_field_world_fn_801158D0.inc"
+}
+#else
+#pragma push
+#pragma peephole off
+#pragma optimization_level 4
+u32 fn_801158D0(u8* ptr) {
+    if (ptr == NULL) {
+        GSlogWrite(lbl_80272608, lbl_8035B9A4);
+        return 0;
+    }
+    return *(u32*)(ptr + 0x34);
+}
+#pragma pop
+#endif
+extern u8 lbl_8035B988[];
+#if 0
+asm void fn_80115918(void) {
+#include "src/game/gs_field_world_fn_80115918.inc"
+}
+#else
+#pragma push
+#pragma peephole off
+#pragma optimization_level 4
+u32 fn_80115918(u8* ptr) {
+    if (ptr == NULL) {
+        GSlogWrite(lbl_80272608, lbl_8035B988);
+        return 0;
+    }
+    return *(u32*)(ptr + 0x30);
+}
+#pragma pop
+#endif
+extern u8 lbl_8035B96C[];
+#if 0
+asm void fn_80115960(void) {
+#include "src/game/gs_field_world_fn_80115960.inc"
+}
+#else
+#pragma push
+#pragma peephole off
+#pragma optimization_level 4
+u32 fn_80115960(u8* ptr) {
+    if (ptr == NULL) {
+        GSlogWrite(lbl_80272608, lbl_8035B96C);
+        return 0;
+    }
+    return *(u32*)(ptr + 0x2C);
+}
+#pragma pop
+#endif
+extern u8 lbl_8035B950[];
+#if 0
+asm void fn_801159A8(void) {
+#include "src/game/gs_field_world_fn_801159A8.inc"
+}
+#else
+#pragma push
+#pragma peephole off
+#pragma optimization_level 4
+u32 fn_801159A8(u8* ptr) {
+    if (ptr == NULL) {
+        GSlogWrite(lbl_80272608, lbl_8035B950);
+        return 0;
+    }
+    return *(u32*)(ptr + 0x28);
+}
+#pragma pop
+#endif
+extern u8 lbl_8035B938[];
+#if 0
+asm void floorDataBiosGetFloorID(void) {
+#include "src/game/gs_field_world_fn_801159F0.inc"
+}
+#else
+#pragma push
+#pragma peephole off
+#pragma optimization_level 4
+u32 floorDataBiosGetFloorID(u8* ptr) {
+    if (ptr == NULL) {
+        GSlogWrite(lbl_80272608, lbl_8035B938);
+        return 0;
+    }
+    return *(u32*)(ptr + 0x0C);
+}
+#pragma pop
+#endif
+extern u8 lbl_8035B904[];
+#if 0
+asm void floorDataBiosGetGroupID(void) {
+#include "src/game/gs_field_world_fn_80115A80.inc"
+}
+#else
+#pragma push
+#pragma peephole off
+#pragma optimization_level 4
+u32 floorDataBiosGetGroupID(u8* ptr) {
+    if (ptr == NULL) {
+        GSlogWrite(lbl_80272608, lbl_8035B904);
+        return 0;
+    }
+    return *(u32*)(ptr + 0x4);
+}
+#pragma pop
+#endif
+extern u16 fn_801EF624();
+extern u8 lbl_8035B8E8[];
+#if 0
+asm void floorDataBiosGetFloorKind(void) {
+#include "src/game/gs_field_world_fn_80115AC8.inc"
+}
+#else
+#pragma optimization_level 4
+#pragma push
+#pragma peephole off
+u8 floorDataBiosGetFloorKind(u8* ptr) {
+    u8 val;
+
+    if (ptr == NULL) {
+        GSlogWrite(lbl_80272608, lbl_8035B8E8);
+        return 0;
+    }
+    val = (ptr[0] >> 5) & 7;
+    if (val == 2) {
+        if ((u16)fn_801EF624(ptr) == 0) {
+            return 1;
+        }
+    }
+    val = (ptr[0] >> 5) & 7;
+    return val;
+}
+#pragma pop
+#endif
+extern const char lbl_802726AC[];
+extern const char lbl_8035B8CC[];
+#if 0
+asm void floorDataBiosGetMapResID(void) {
+#include "src/game/gs_field_world_fn_80115B48.inc"
+}
+#else
+#pragma push
+#pragma peephole off
+#pragma optimization_level 4
+u32 floorDataBiosGetMapResID(u8* ptr) {
+    if (ptr == NULL) {
+        GSlogWrite(lbl_802726AC, lbl_8035B8CC);
+        return 0;
+    }
+    return *(u32*)(ptr + 0x8);
+}
+#pragma pop
+#endif
+extern u8 lbl_8035B8B4[];
+#if 0
+asm void floorDataBiosGetArea(void) {
+#include "src/game/gs_field_world_fn_80115B90.inc"
+}
+#else
+#pragma push
+#pragma peephole off
+#pragma optimization_level 4
+u8 floorDataBiosGetArea(u8* ptr) {
+    if (ptr == NULL) {
+        GSlogWrite(lbl_80272608, lbl_8035B8B4);
+        return 0;
+    }
+    return *(u8*)(ptr + 0x1);
+}
+#pragma pop
+#endif
+extern u32 lbl_80478FB8;
+extern u32 lbl_80478FBC;
+#if 0
+asm void floorDataBiosGetPtr(void) {
+#include "src/game/gs_field_world_fn_80115C48.inc"
+}
+#else
+#pragma push
+#pragma peephole off
+#pragma scheduling on
+void* floorDataBiosGetPtr(u32 key) {
+    u8* p = (u8*)lbl_80478FBC;
+    u32 i;
+    for (i = *(u32*)lbl_80478FB8; i != 0; i--) {
+        if (*(u32*)(p + 0xC) == key) return p;
+        p += 0x4C;
+    }
+    GSlogWrite((char*)lbl_802726D4, lbl_8035B8A0);
+    return 0;
 }
 #pragma pop
 #endif

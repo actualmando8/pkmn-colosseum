@@ -1,16 +1,14 @@
 /**
- * @file field_range_80114AE0.c
- * @brief field code, 0x80114AE0 - 0x80115280 (merged: original range-file +
- *        the floorRead / _unload tail segment split from gs_field_world.c).
+ * @file hero.c
+ * @brief GSfield world segment -- split from gs_field_world.c.
  *
- * Range unit assigned from the propagated subsystem map
- * (tools/subsystem_propagation.py, >=80% single-label dominance;
- * campaign 2026-07-01). The 0x80114D6C-0x80115280 tail is the floorRead*
- * resource-handler module (floorReadGFL/Particle/WZX/PKX/Tex/Script/Font/
- * Msg/Normal PreFunc + matching _unload*__FPvUlUl family), physically split
- * from gs_field_world.c (XD 0x8002E524-0x8002F120). All functions asm-only
- * until matched; the range name stays honest until internal TU structure
- * is fully proven.
+ * XD source unit: hero / heroBios (hero module)
+ * Address range: 0x80128E38 - 0x8012AC9C (~67 functions)
+ *
+ * Split from src/game/gs_field_world.c (physical XD source-unit split of
+ * the 734-function field-world bucket into its 12 constituent XD source
+ * units). See gs_field_world.c split history for the address-range
+ * evidence (anchor-name monotonicity checks) used to place this boundary.
  */
 #include "dolphin/types.h"
 #include "game/world/gs_field.h"
@@ -1432,431 +1430,1023 @@ extern void heroMoveGetHeroRot(u32 param);
 extern void heroMoveGetHeroPos(u32 param);
 extern u32 heroMoveGetResID(u32* out_zero, u32* out_val, s32 index);
 
-/* ==================================================================
- * floorUpdateFieldCamera_Pseudocode -- floorUpdateFieldCamera notes
- *
- * Update the field camera each frame. Interpolates position, target,
- * and FOV toward their destination values. Includes safety check for
- * divide-by-zero when computing distance-based interpolation.
- *
- * This function is 0x1B4 bytes (436 bytes) and uses extensive float
- * math for smooth camera transitions.
- *
- * From disassembly:
- *   - Loads camera state from a BSS pointer
- *   - Computes direction vector from current to destination
- *   - Normalizes and scales by interpSpeed
- *   - If distance is near-zero, snaps to destination (avoids /0)
- *   - On divide-by-zero path: logs lbl_80272770
- * ================================================================== */
-void floorUpdateFieldCamera_Pseudocode(void) {
-    extern f32 lbl_8047CFD0;
-    extern f32 lbl_8047CFDC;
-    extern f32 lbl_8047CFE0;
-    extern void GSvecSquareDistance();
-    extern void fn_800E01F4();
-    extern u32 lbl_8047AD68;
-    extern u32 lbl_8047AD6C;
-    u8 sp[0xA0];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f0 = 0.0f;
-    f32 f1 = 0.0f;
-    f32 f2 = 0.0f;
-    f32 f3 = 0.0f;
-    f32 f26 = 0.0f;
-    f32 f27 = 0.0f;
-    f32 f28 = 0.0f;
-    f32 f29 = 0.0f;
-    f32 f30 = 0.0f;
-    f32 f31 = 0.0f;
-    *(f64*)(sp + 0x90) = f31;
-    /* psq_st f31, 0x98((u32)sp), 0, qr0 */;
-    *(f64*)(sp + 0x80) = f30;
-    /* psq_st f30, 0x88((u32)sp), 0, qr0 */;
-    *(f64*)(sp + 0x70) = f29;
-    /* psq_st f29, 0x78((u32)sp), 0, qr0 */;
-    *(f64*)(sp + 0x60) = f28;
-    /* psq_st f28, 0x68((u32)sp), 0, qr0 */;
-    *(f64*)(sp + 0x50) = f27;
-    /* psq_st f27, 0x58((u32)sp), 0, qr0 */;
-    *(f64*)(sp + 0x40) = f26;
-    /* psq_st f26, 0x48((u32)sp), 0, qr0 */;
-    r25 = r3;
-    r26 = r4;
-    r27 = r5;
-    r28 = r6;
-    r0 = lbl_8047AD68;
-    if (r0 == (u32)0x1) {
-        r4 = lbl_8047AD6C;
-        r3 = 0x1;
-        f0 = *(f32*)((u8*)r4 + 0x10);
-        *(f32*)((u8*)r26 + 0x0) = f0;
-        r4 = lbl_8047AD6C;
-        f0 = *(f32*)((u8*)r4 + 0xC);
-        *(f32*)((u8*)r27 + 0x0) = f0;
-        r4 = lbl_8047AD6C;
-        f0 = *(f32*)((u8*)r4 + 0x14);
-        *(f32*)((u8*)r28 + 0x0) = f0;
-    } else {
-    f29 = lbl_8047CFD0;
-    r30 = 0x0;
-    r31 = 0x0;
-    f28 = f29;
-    f27 = f29;
-    f26 = f29;
-    f30 = lbl_8047CFDC;
-    f31 = lbl_8047CFE0;
-    while (r0 = lbl_8047AD68, r30 < r0) {
-
-    r0 = lbl_8047AD6C;
-    r3 = (u32)sp + 0x8;
-    r29 = r0 + r31;
-    f1 = *(f32*)((u8*)r29 + 0x0);
-    f2 = *(f32*)((u8*)r29 + 0x4);
-    f3 = *(f32*)((u8*)r29 + 0x8);
-    fn_800E01F4();
-    r4 = r25;
-    r3 = (u32)sp + 0x8;
-    GSvecSquareDistance();
-    if (f1 > f30) {
-        f3 = f31 / f1;
-        f2 = *(f32*)((u8*)r29 + 0xC);
-        f1 = *(f32*)((u8*)r29 + 0x10);
-        f0 = *(f32*)((u8*)r29 + 0x14);
-        f29 = f29 + f3;
-        f28 = f2 * f3 + f28;
-        f27 = f1 * f3 + f27;
-        f26 = f0 * f3 + f26;
-    r31 = r31 + 0x18;
-    r30 = r30 + 0x1;
-        continue;
-    }
-    f29 = f30;
-    f27 = *(f32*)((u8*)r29 + 0x10);
-    f28 = *(f32*)((u8*)r29 + 0xC);
-    f26 = *(f32*)((u8*)r29 + 0x14);
-    break;
-    }
-
-    f0 = lbl_8047CFD0;
-    if (f0 == f29) {
-        r3 = (u32)&lbl_80272770;
-        r3 = (u32)&lbl_80272770;
-        ((void(*)(void))GSlogWrite)();
-        r3 = 0x0;
-    } else {
-    f0 = lbl_8047CFDC;
-    r3 = 0x1;
-    f0 = f0 / f29;
-    f2 = f27 * f0;
-    f1 = f28 * f0;
-    f0 = f26 * f0;
-    *(f32*)((u8*)r26 + 0x0) = f2;
-    *(f32*)((u8*)r27 + 0x0) = f1;
-    *(f32*)((u8*)r28 + 0x0) = f0;
-    }
-    }
-    /* psq_l f31, 0x98((u32)sp), 0, qr0 */;
-    f31 = *(f64*)(sp + 0x90);
-    /* psq_l f30, 0x88((u32)sp), 0, qr0 */;
-    f30 = *(f64*)(sp + 0x80);
-    /* psq_l f29, 0x78((u32)sp), 0, qr0 */;
-    f29 = *(f64*)(sp + 0x70);
-    /* psq_l f28, 0x68((u32)sp), 0, qr0 */;
-    f28 = *(f64*)(sp + 0x60);
-    /* psq_l f27, 0x58((u32)sp), 0, qr0 */;
-    f27 = *(f64*)(sp + 0x50);
-    /* psq_l f26, 0x48((u32)sp), 0, qr0 */;
-    f26 = *(f64*)(sp + 0x40);
-    return;
+/* Address: 0x8012A774 | Size: 0x10 | Pattern: nullcheck_setter */
+void heroBiosSetHomePlace(u8* ptr, u8 val) {
+    if (ptr == NULL) { return; }
+    *(u8*)(&ptr[0xA81]) = val;
 }
-/* ===================================================================
- * Generated: 1 pattern-matched + 515 stubs
- * Range: 0x80114CA8 - 0x80130CD8
- * =================================================================== */
-extern u8 lbl_804083D0[0x30];
-extern u32 lbl_8047AD68;
-extern u32 lbl_8047AD6C;
-extern void fn_801ED674(void);
-/* Forward declarations for functions called before definition */
-void fn_801193BC(void);
-/* Forward declarations for converted functions */
-s32 pokemonWazaGetMaxPP(u8* ptr, u16 idx);
-void wazaGetStatus(void);
-void fn_8011F260(void);
-void pokemonResetBasisStatus(void*);
-void pokemonSetLevelBasisStatus(void);
+/* Address: 0x8012A784 | Size: 0x18 | Pattern: nullcheck_getter */
+u8 heroBiosGetHomePlace(u8* ptr) {
+    if (ptr == NULL) { return 0; }
+    return *(u8*)(&ptr[0xA81]);
+}
+/* Address: 0x8012A79C | Size: 0x18 | Pattern: nullcheck_getter */
+u8 heroBiosGetHizukiFlag(u8* ptr) {
+    if (ptr == NULL) { return 0; }
+    return *(u8*)(&ptr[0xA98]);
+}
+/* Address: 0x8012A7B4 | Size: 0x10 | Pattern: nullcheck_setter */
+void heroBiosSetHizukiFlag(u8* ptr, u8 val) {
+    if (ptr == NULL) { return; }
+    *(u8*)(&ptr[0xA98]) = val;
+}
+/* Address: 0x8012A7C4 | Size: 0x18 | Pattern: nullcheck_getter */
+u32 heroBiosGetPokecouponAll(u8* ptr) {
+    if (ptr == NULL) { return 0; }
+    return *(u32*)(&ptr[0xA8C]);
+}
+/* Address: 0x8012A80C | Size: 0x18 | Pattern: nullcheck_getter */
+u32 heroBiosGetPokecoupon(u8* ptr) {
+    if (ptr == NULL) { return 0; }
+    return *(u32*)(&ptr[0xA88]);
+}
+/* Address: 0x8012A854 | Size: 0x18 | Pattern: nullcheck_getter */
+u32 heroBiosGetPokedoru(u8* ptr) {
+    if (ptr == NULL) { return 0; }
+    return *(u32*)(&ptr[0xA84]);
+}
+/* Address: 0x8012A8EC | Size: 0x18 | Pattern: nullcheck_getter */
+u8 heroBiosGetBadge08Flag(u8* ptr) {
+    if (ptr == NULL) { return 0; }
+    return *(u8*)(&ptr[0xA97]);
+}
+/* Address: 0x8012A904 | Size: 0x18 | Pattern: nullcheck_getter */
+u8 heroBiosGetBadge07Flag(u8* ptr) {
+    if (ptr == NULL) { return 0; }
+    return *(u8*)(&ptr[0xA96]);
+}
+/* Address: 0x8012A91C | Size: 0x18 | Pattern: nullcheck_getter */
+u8 heroBiosGetBadge06Flag(u8* ptr) {
+    if (ptr == NULL) { return 0; }
+    return *(u8*)(&ptr[0xA95]);
+}
+/* Address: 0x8012A934 | Size: 0x18 | Pattern: nullcheck_getter */
+u8 heroBiosGetBadge05Flag(u8* ptr) {
+    if (ptr == NULL) { return 0; }
+    return *(u8*)(&ptr[0xA94]);
+}
+/* Address: 0x8012A94C | Size: 0x18 | Pattern: nullcheck_getter */
+u8 heroBiosGetBadge04Flag(u8* ptr) {
+    if (ptr == NULL) { return 0; }
+    return *(u8*)(&ptr[0xA93]);
+}
+/* Address: 0x8012A964 | Size: 0x18 | Pattern: nullcheck_getter */
+u8 heroBiosGetBadge03Flag(u8* ptr) {
+    if (ptr == NULL) { return 0; }
+    return *(u8*)(&ptr[0xA92]);
+}
+/* Address: 0x8012A97C | Size: 0x18 | Pattern: nullcheck_getter */
+u8 heroBiosGetBadge02Flag(u8* ptr) {
+    if (ptr == NULL) { return 0; }
+    return *(u8*)(&ptr[0xA91]);
+}
+/* Address: 0x8012A994 | Size: 0x18 | Pattern: nullcheck_getter */
+u8 heroBiosGetBadge01Flag(u8* ptr) {
+    if (ptr == NULL) { return 0; }
+    return *(u8*)(&ptr[0xA90]);
+}
+/* Address: 0x8012A9AC | Size: 0x10 | Pattern: nullcheck_setter */
+void heroBiosSetBadge08Flag(u8* ptr, u8 val) {
+    if (ptr == NULL) { return; }
+    *(u8*)(&ptr[0xA97]) = val;
+}
+/* Address: 0x8012A9BC | Size: 0x10 | Pattern: nullcheck_setter */
+void heroBiosSetBadge07Flag(u8* ptr, u8 val) {
+    if (ptr == NULL) { return; }
+    *(u8*)(&ptr[0xA96]) = val;
+}
+/* Address: 0x8012A9CC | Size: 0x10 | Pattern: nullcheck_setter */
+void heroBiosSetBadge06Flag(u8* ptr, u8 val) {
+    if (ptr == NULL) { return; }
+    *(u8*)(&ptr[0xA95]) = val;
+}
+/* Address: 0x8012A9DC | Size: 0x10 | Pattern: nullcheck_setter */
+void heroBiosSetBadge05Flag(u8* ptr, u8 val) {
+    if (ptr == NULL) { return; }
+    *(u8*)(&ptr[0xA94]) = val;
+}
+/* Address: 0x8012A9EC | Size: 0x10 | Pattern: nullcheck_setter */
+void heroBiosSetBadge04Flag(u8* ptr, u8 val) {
+    if (ptr == NULL) { return; }
+    *(u8*)(&ptr[0xA93]) = val;
+}
+/* Address: 0x8012A9FC | Size: 0x10 | Pattern: nullcheck_setter */
+void heroBiosSetBadge03Flag(u8* ptr, u8 val) {
+    if (ptr == NULL) { return; }
+    *(u8*)(&ptr[0xA92]) = val;
+}
+/* Address: 0x8012AA0C | Size: 0x10 | Pattern: nullcheck_setter */
+void heroBiosSetBadge02Flag(u8* ptr, u8 val) {
+    if (ptr == NULL) { return; }
+    *(u8*)(&ptr[0xA91]) = val;
+}
+/* Address: 0x8012AA1C | Size: 0x10 | Pattern: nullcheck_setter */
+void heroBiosSetBadge01Flag(u8* ptr, u8 val) {
+    if (ptr == NULL) { return; }
+    *(u8*)(&ptr[0xA90]) = val;
+}
+/* Address: 0x8012AA2C | Size: 0x18 | Pattern: nullcheck_getter */
+u8 heroBiosGetSexDataId(u8* ptr) {
+    if (ptr == NULL) { return 0; }
+    return *(u8*)(&ptr[0xA80]);
+}
+/* Address: 0x8012AA44 | Size: 0x10 | Pattern: nullcheck_setter */
+void heroBiosSetSexDataId(u8* ptr, u8 val) {
+    if (ptr == NULL) { return; }
+    *(u8*)(&ptr[0xA80]) = val;
+}
+/* Address: 0x8012AA54 | Size: 0x10 | Pattern: nullcheck_setter */
+void heroBiosSetRnd(u8* ptr, u32 val) {
+    if (ptr == NULL) { return; }
+    *(u32*)(&ptr[0x2C]) = val;
+}
+/* Address: 0x8012AC3C | Size: 0x18 | Pattern: nullcheck_getter */
+u32 heroBiosGetRnd(u8* ptr) {
+    if (ptr == NULL) { return 0; }
+    return *(u32*)(&ptr[0x2C]);
+}
+/* 0x80128E38 | 0x25C */
+extern void fn_8013528C(void);
+extern void fn_800F9D04(void);
+extern void gamedatasaveSetStatus(void);
+extern u8 lbl_8047D028[8];
+/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
+void savedataCreate(void);
+/* 0x80129094 | 0x1EC */
+extern void gamedataInit(void);
+extern void pcboxInit(void);
+extern void fn_801908D4(void);
+extern void mailInitMailbox(void);
+extern void sodateyaInit(void);
+extern void fn_8006B6B4(void);
+extern void fn_80260070(void);
+extern void fn_80083CBC(void);
+extern void fn_801EF128(void);
+extern void exribbonInit(void);
+/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
+void savedataInit(void);
+/* 0x80129280 | 0x104 */
+extern void jumptable_803634A8();
+#if 0
+asm void savedataGetStatus(void) {
+#include "src/game/gs_field_world_fn_80129280.inc"
+}
+#else
+u32 savedataGetStatus(u8* arg1, u16 arg2) {
+    extern u8* fn_80128E24(u8* ptr);
+    extern u32 fn_80128E04(u8* ptr);
+    extern u32 fn_80128DEC(u8* ptr);
+    extern u32 fn_80128DD4(u8* ptr);
+    extern u32 fn_80128DB8(u8* ptr);
+    extern u32 fn_80128D9C(u8* ptr);
+    extern u32 fn_80128D80(u8* ptr);
+    extern u32 fn_80128D68(u8* ptr);
+    extern u32 fn_80128D4C(u8* ptr);
+    extern u32 fn_80128D30(u8* ptr);
+    extern u32 fn_80128D14(u8* ptr);
+    extern u32 fn_80128CF8(u8* ptr);
+    extern u32 fn_80128CDC(u8* ptr);
+    extern u32 fn_80128CC0(u8* ptr);
+    if ((u32)arg2 >= 0x11) { return 0; }
+    if (arg1 == NULL) {
+        arg1 = fn_80128E24(arg1);
+        if (arg1 == NULL) { return 0; }
+    }
+    switch (arg2) {
+        case 0x0: return (u32)arg1;
+        case 0x1: return fn_80128E04(arg1);
+        case 0x2: return fn_80128DEC(arg1);
+        case 0x3: return fn_80128DD4(arg1);
+        case 0x4: return fn_80128DB8(arg1);
+        case 0x5: return fn_80128D9C(arg1);
+        case 0x6: return fn_80128D80(arg1);
+        case 0x7: return 0x8;
+        case 0x8: return 0x20;
+        case 0x9: return 0x180;
+        case 0xa: return fn_80128D68(arg1);
+        case 0xb: return fn_80128D4C(arg1);
+        case 0xc: return fn_80128D30(arg1);
+        case 0xd: return fn_80128D14(arg1);
+        case 0xe: return fn_80128CF8(arg1);
+        case 0xf: return fn_80128CDC(arg1);
+        case 0x10: return fn_80128CC0(arg1);
+        default: return 0;
+    }
+}
+#endif
+/* 0x78 | heroDecPokecoupon | multi_call_guarded */
+void heroDecPokecoupon(u8* ptr, s32 offset) {
+    extern u32 heroGetStatus(u8* ptr, u32 a, u32 b);
+    extern void heroSetStatus(u8* ptr, u32 a, u32 b);
+    heroSetStatus(ptr, 0xd, heroGetStatus(ptr, 0xd, 0) - offset);
+    if (offset <= 0) {
+        heroSetStatus(ptr, 0xe, heroGetStatus(ptr, 0xe, 0) - offset);
+    }
+}
+/* 0x78 | heroAddPokecoupon | multi_call_guarded */
+void heroAddPokecoupon(u8* ptr, s32 offset) {
+    extern u32 heroGetStatus(u8* ptr, u32 a, u32 b);
+    extern void heroSetStatus(u8* ptr, u32 a, u32 b);
+    u32 val;
+    val = heroGetStatus(ptr, 0xd, 0);
+    val += offset;
+    heroSetStatus(ptr, 0xd, val);
+    if (offset >= 0) {
+        val = heroGetStatus(ptr, 0xe, 0);
+        val += offset;
+        heroSetStatus(ptr, 0xe, val);
+    }
+}
+/* 0x50 | heroDecPokedoru | call_sequence */
+#if 0
+asm void heroDecPokedoru(void) {
+#include "src/game/gs_field_world_fn_80129474.inc"
+}
+#else
+void heroDecPokedoru(u8* ptr, u32 offset) {
+    extern u32 heroGetStatus(u8* ptr, u32 a, u32 b);
+    extern void heroSetStatus(u8* ptr, u32 a, u32 b);
+    heroSetStatus(ptr, 0xc, heroGetStatus(ptr, 0xc, 0) - offset);
+}
+#endif
+/* 0x50 | heroAddPokedoru | call_sequence */
+#if 0
+asm void heroAddPokedoru(void) {
+#include "src/game/gs_field_world_fn_801294C4.inc"
+}
+#else
+void heroAddPokedoru(u8* ptr, u32 offset) {
+    extern u32 heroGetStatus(u8* ptr, u32 a, u32 b);
+    extern void heroSetStatus(u8* ptr, u32 a, u32 b);
+    u32 val = heroGetStatus(ptr, 0xc, 0);
+    val += offset;
+    heroSetStatus(ptr, 0xc, val);
+}
+#endif
+/* 0x80129514 | 0x88 */
+extern void fn_80140A9C(void);
+#if 0
+asm void fn_80129514(void) {
+#include "src/game/gs_field_world_fn_80129514.inc"
+}
+#else
+void fn_80129514(u8* ptr, s32 arg2, s32 arg3) {
+    extern void* heroGetStatus(u8* a, u32 b, u32 c);
+    extern void fn_80140A9C(u8* a, u8* b);
+    u16 local;
+    u8* val;
+    if (&local != NULL) { local = 0xa; }
+    val = (u8*)heroGetStatus(ptr, 0xa, 0);
+    if (val == NULL) { return; }
+    if ((u16)arg2 >= local) { return; }
+    if ((u16)arg3 >= local) { return; }
+    fn_80140A9C(val + (u16)arg2 * 4, val + (u16)arg3 * 4);
+}
+#endif
+/* 0x8012959C | 0xB4 */
+extern void fn_80140ACC(void);
+#if 0
+asm void fn_8012959C(void) {
+#include "src/game/gs_field_world_fn_8012959C.inc"
+}
+#else
+s32 fn_8012959C(u8* ptr, u32 arg2, u32 arg3, u32 arg4) {
+    extern void* heroGetStatus(u8* a, u32 b, u32 c);
+    extern s32 fn_80140ACC(void* a, u16 b, u32 c, u32 d, u32 e, u16 f, u8 g);
+    u16 local_c = 0;
+    u16 local_a = 0;
+    u8 local_8;
+    void* val;
+    if (&local_c != NULL) { local_c = 0xa; }
+    if (&local_a != NULL) { local_a = 1; }
+    if (&local_8 != NULL) { local_8 = 0; }
+    val = heroGetStatus(ptr, 0xa, 0);
+    if (val == NULL) { return -1; }
+    return fn_80140ACC(val, local_c, arg2, arg3, arg4, local_a, local_8);
+}
+#endif
+/* 0x80129650 | 0xC8 */
+extern void fn_80141308(void);
+#if 0
+asm void fn_80129650(void) {
+#include "src/game/gs_field_world_fn_80129650.inc"
+}
+#else
+s32 fn_80129650(u8* ptr, u32 arg2, u32 arg3, u32 arg4) {
+    extern void* heroGetStatus(u8* a, u32 b, u32 c);
+    extern s32 fn_80141308(void* a, u16 b, u32 c, u32 d, u32 e, u16 f, u8 g, u8 h);
+    u16 local_c = 0;
+    u16 local_a = 0;
+    u8 local_9;
+    u8 local_8;
+    void* val;
+    if (&local_c != NULL) { local_c = 0xa; }
+    if (&local_a != NULL) { local_a = 1; }
+    if (&local_9 != NULL) { local_9 = 0; }
+    if (&local_8 != NULL) { local_8 = 1; }
+    val = heroGetStatus(ptr, 0xa, 0);
+    if (val == NULL) { return -1; }
+    return fn_80141308(val, local_c, arg2, arg3, arg4, local_a, local_9, local_8);
+}
+#endif
+/* 0x80129718 | 0xC0 */
+extern void fn_80142368(void);
+#if 0
+asm void fn_80129718(void) {
+#include "src/game/gs_field_world_fn_80129718.inc"
+}
+#else
+u32 fn_80129718(u8* ptr, u32 arg2) {
+    extern void* heroGetStatus(u8* a, u32 b, u32 c);
+    extern s32 fn_80142368(void* a, u16 b, u32 c, u32 d, u16 e);
+    u16 local_a = 0;
+    u16 local_8 = 0;
+    void* val;
+    if (&local_a != NULL) { local_a = 0xa; }
+    if (&local_8 != NULL) { local_8 = 1; }
+    val = heroGetStatus(ptr, 0xa, 0);
+    if (val == NULL) { return 0; }
+    if ((u32)fn_80142368(val, local_a, arg2, 1, local_8) != 0) { return 1; }
+    return fn_80142368(val, local_a, arg2, 2, local_8) != 0;
+}
+#endif
+/* 0x68 | heroHizukiItemGetItemAryPtr | guarded_call */
+#if 0
+asm void heroHizukiItemGetItemAryPtr(void) {
+#include "src/game/gs_field_world_fn_801297D8.inc"
+}
+#else
+u32 heroHizukiItemGetItemAryPtr(u8* ptr, u16* out_a, u16* out_b, u8* out_c, u8* out_d) {
+    extern u32 heroGetStatus(u8* ptr, u32 a, u32 b);
+    if (out_a != NULL) { *out_a = 0xa; }
+    if (out_b != NULL) { *out_b = 1; }
+    if (out_c != NULL) { *out_c = 0; }
+    if (out_d != NULL) { *out_d = 1; }
+    return heroGetStatus(ptr, 0xa, 0);
+}
+#endif
+/* 0x78 | heroCheckSetMonohiroiAllTemotiPokemon | generic */
+void heroCheckSetMonohiroiAllTemotiPokemon(u8* arg1) {
+    extern u32 heroGetStatus(u8* ptr, u32 a, u32 b);
+    extern u8 pokemonCheckValid(u32 a);
+    extern void pokemonCheckSetMonohiroi(u32 a);
+    u32 result;
+    u32 i;
+    for (i = 0; (u16)i < 6; i++) {
+        result = heroGetStatus(arg1, 3, i);
+        if (pokemonCheckValid(result)) {
+            pokemonCheckSetMonohiroi(result);
+        }
+    }
+}
+/* 0x801298B8 | 0x90 */
+extern void fn_80140588(void);
+#if 0
+asm void heroItemCheckAddItemDataId(void) {
+#include "src/game/gs_field_world_fn_801298B8.inc"
+}
+#else
+s32 heroItemCheckAddItemDataId(u8* ptr, u32 arg2) {
+    extern u32 itemGetStatus(u32 a, u32 b, u32 c, u32 d);
+    extern void* heroItemGetItemKindToItemAryPtr(u8* ptr, u8 a, u16* b, u16* c, u32 d, u8* e);
+    extern s32 fn_80140588(void* a, u16 b, u32 c, u16 d, u8 e);
+    u16 local_c = 0;
+    u16 local_a = 0;
+    u8 local_8;
+    void* result;
+    result = heroItemGetItemKindToItemAryPtr(ptr, (u8)itemGetStatus(0, arg2, 2, 0), &local_c, &local_a, 0, &local_8);
+    if (result == NULL) { return -1; }
+    return fn_80140588(result, local_c, arg2, local_a, local_8);
+}
+#endif
+/* 0x80 | fn_80129948 | generic */
+void fn_80129948(u8* arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5, u32 arg6, u32 arg7) {
+    extern void* heroItemGetItemKindToItemAryPtr(u8* a, u32 b, u16* c, u32 d, u32 e, u32 f);
+    extern void fn_80140A9C(u8* a, u8* b);
+    u16 local_8;
+    u8* result;
+    result = (u8*)heroItemGetItemKindToItemAryPtr(arg1, arg2, &local_8, 0, 0, 0);
+    if (result == NULL) { return; }
+    if ((u16)arg3 >= local_8) { return; }
+    if ((u16)arg4 >= local_8) { return; }
+    fn_80140A9C(result + (u16)arg3 * 4, result + (u16)arg4 * 4);
+}
+/* 0x801299C8 | 0xB0 */
+#if 0
+asm void heroItemDecItemDataId(void) {
+#include "src/game/gs_field_world_fn_801299C8.inc"
+}
+#else
+s32 heroItemDecItemDataId(u8* ptr, u32 arg2, u32 arg3, u32 arg4) {
+    extern u32 itemGetStatus(u32 a, u32 b, u32 c, u32 d);
+    extern void* heroItemGetItemKindToItemAryPtr(u8* a, u8 b, u16* c, u16* d, u8* e, u32 f);
+    extern s32 fn_80140ACC(void* a, u16 b, u32 c, u32 d, u32 e, u16 f, u8 g);
+    u16 local_c = 0;
+    u16 local_a = 0;
+    u8 local_8;
+    u8 tmp;
+    void* result;
+    tmp = (u8)itemGetStatus(0, arg2, 2, 0);
+    result = heroItemGetItemKindToItemAryPtr(ptr, tmp, &local_c, &local_a, &local_8, 0);
+    if (result == NULL) { return -1; }
+    return fn_80140ACC(result, local_c, arg2, arg3, arg4, local_a, local_8);
+}
+#endif
+/* 0x80129A78 | 0xB4 */
+#if 0
+asm void heroItemAddItemDataId(void) {
+#include "src/game/gs_field_world_fn_80129A78.inc"
+}
+#else
+s32 heroItemAddItemDataId(u8* ptr, u32 arg2, u32 arg3, u32 arg4) {
+    extern u32 itemGetStatus(u32 a, u32 b, u32 c, u32 d);
+    extern void* heroItemGetItemKindToItemAryPtr(u8* a, u8 b, u16* c, u16* d, u8* e, u8* f);
+    extern s32 fn_80141308(void* a, u16 b, u32 c, u32 d, u32 e, u16 f, u8 g, u8 h);
+    u16 local_c = 0;
+    u16 local_a = 0;
+    u8 local_9;
+    u8 local_8;
+    u8 tmp;
+    void* result;
+    tmp = (u8)itemGetStatus(0, arg2, 2, 0);
+    result = heroItemGetItemKindToItemAryPtr(ptr, tmp, &local_c, &local_a, &local_9, &local_8);
+    if (result == NULL) { return -1; }
+    return fn_80141308(result, local_c, arg2, arg3, arg4, local_a, local_9, local_8);
+}
+#endif
+/* 0x80129B2C | 0x9C */
+#if 0
+asm void heroItemCheckHaveItemDataId(void) {
+#include "src/game/gs_field_world_fn_80129B2C.inc"
+}
+#else
+u32 heroItemCheckHaveItemDataId(u8* ptr, u32 arg2) {
+    extern u32 itemGetStatus(u32 a, u32 b, u32 c, u32 d);
+    extern void* heroItemGetItemKindToItemAryPtr(u8* ptr, u8 a, u16* b, u16* c, u32 d, u32 e);
+    extern s32 fn_80142368(void* a, u16 b, u32 c, u32 d, u16 e);
+    u16 local_a = 0;
+    u16 local_8 = 0;
+    void* result;
+    result = heroItemGetItemKindToItemAryPtr(ptr, (u8)itemGetStatus(0, arg2, 2, 0), &local_a, &local_8, 0, 0);
+    if (result == NULL) { return 0; }
+    return fn_80142368(result, local_a, arg2, 0, local_8) != 0;
+}
+#endif
+/* 0x80129BC8 | 0x19C */
+/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void heroItemGetItemKindToItemAryPtr(void);
-void heroSetStatus();
+/* 0x80129D64 | 0xBC */
+#if 0
+asm void fn_80129D64(void) {
+#include "src/game/gs_field_world_fn_80129D64.inc"
+}
+#else
+u32 fn_80129D64(u8* ptr, u8* arg2) {
+    extern u32 heroGetStatus(u8* a, u32 b, u32 c);
+    extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
+    extern u32 fn_800F9EE4(u32 a, u32 b);
+    u32 val1, temp, val2, result2;
+    val1 = heroGetStatus(ptr, 2, 0);
+    temp = heroGetStatus(ptr, 1, 0);
+    val2 = pokemonGetStatus(arg2, 0, 0x75, 0);
+    result2 = pokemonGetStatus(arg2, 0, 0x76, 0);
+    if (val1 != val2) { return 0; }
+    return fn_800F9EE4(temp, result2) == 0;
+}
+#endif
+/* 0x80129E20 | 0x100 */
+extern void fn_80134BC0(void);
+#if 0
+asm void heroGetPokemon(void) {
+#include "src/game/gs_field_world_fn_80129E20.inc"
+}
+#else
+s32 heroGetPokemon(u8* ptr, void* buf, u8 flag) {
+    extern void* heroGetStatus(u8* a, u32 b, u32 c);
+    extern u32 pokemonCheckValid(void* val);
+    extern void pokemonBiosCopy(void* a, void* b);
+    extern u32 fn_80134BC0(u32 a, void* b, s32 c);
+    u8 local_buf[0x138];
+    u8 i;
+    s16 ret;
+    void* val;
+
+    if (buf == NULL) { return 6; }
+    pokemonBiosCopy(local_buf, buf);
+    if (&local_buf == NULL) { i = 6; goto after_loop; }
+    for (i = 0; i < 6; i++) {
+        val = heroGetStatus(ptr, 3, i);
+        if ((u8)pokemonCheckValid(val) != 1) {
+            pokemonBiosCopy(val, local_buf);
+            goto after_loop;
+        }
+    }
+    i = 6;
+after_loop:
+    ret = (s16)(u8)i;
+    if ((u8)i >= 6) {
+        if ((u8)flag == 0) { return -2; }
+        return (fn_80134BC0(0, local_buf, -1) == 1) ? -1 : -2;
+    }
+    return ret;
+}
+#endif
+/* 0x80129F20 | 0x16C */
+#if 0
+asm void heroCatchPokemon(void) {
+#include "src/game/gs_field_world_fn_80129F20.inc"
+}
+#else
+s32 heroCatchPokemon(u8* ptr, u8* buf, u32 arg3, u16 arg4, u8 flag) {
+    extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
+    extern u32 heroGetStatus(u8* a, u32 b, u32 c);
+    extern u32 pokemonCheckValid(u32 val);
+    extern void pokemonBiosCopy(void* a, void* b);
+    extern void pokemonSetCatchStatus(u8* a, u32 b, u32 c, u32 d, u32 e, u32 f, u32 g);
+    extern u32 fn_80134BC0(u32 a, void* b, s32 c);
+    u8 local_buf[0x138];
+    u8 field7a;
+    u8 status;
+    u32 val2;
+    u32 val1;
+    u8 i;
+    void* slot;
+
+    if (buf == NULL) { return 6; }
+    field7a = (u8)pokemonGetStatus(buf, 0, 0x7a, 0);
+    status = (u8)heroGetStatus(ptr, 0xb, 0);
+    val2 = heroGetStatus(ptr, 2, 0);
+    val1 = heroGetStatus(ptr, 1, 0);
+    pokemonBiosCopy(local_buf, buf);
+    pokemonSetCatchStatus(local_buf, arg3, field7a, arg4, status, val2, val1);
+
+    if (&local_buf == NULL) {
+        i = 6;
+    } else {
+        i = 0;
+        while ((u8)i < 6) {
+            slot = (void*)heroGetStatus(ptr, 3, (u8)i);
+            if ((u8)pokemonCheckValid((u32)slot) != 1) {
+                pokemonBiosCopy(slot, local_buf);
+                break;
+            }
+            i++;
+        }
+        if ((u8)i >= 6) {
+            i = 6;
+        }
+    }
+    if ((u8)i >= 6) {
+        if ((u8)flag == 0) { return -2; }
+        return (fn_80134BC0(0, local_buf, -1) == 1) ? -1 : -2;
+    }
+    return (s16)(u8)i;
+}
+#endif
+/* 0x8012A08C | 0xA4 */
+#if 0
+asm void heroAddPokemon(void) {
+#include "src/game/gs_field_world_fn_8012A08C.inc"
+}
+#else
+u32 heroAddPokemon(u8* ptr, void* arg2) {
+    extern u32 heroGetStatus(u8* a, u32 b, u32 c);
+    extern u32 pokemonCheckValid(u32 val);
+    extern void pokemonBiosCopy(u32 a, void* b);
+    u32 val;
+    u32 i;
+    if (arg2 == NULL) { return 6; }
+    i = 0;
+    while ((u8)i < 6) {
+        val = heroGetStatus(ptr, 3, i & 0xFF);
+        if ((u8)pokemonCheckValid(val) != 1) {
+            pokemonBiosCopy(val, arg2);
+            return i;
+        }
+        i++;
+    }
+    return 6;
+}
+#endif
+/* 0x8012A1A4 | 0xA4 */
+#if 0
+asm void heroCreate(void) {
+#include "src/game/gs_field_world_fn_8012A1A4.inc"
+}
+#else
+void heroCreate(u8* ptr, u32 arg2, u8 arg3) {
+    extern void heroInit(u8* ptr);
+    extern u32 fn_800E0C54(void);
+    extern void heroSetStatus(u8* ptr, u32 a, u32 b);
+    extern u32 fn_800FA280(u32 val);
+    u32 lo;
+    u32 hi;
+    heroInit(ptr);
+    lo = fn_800E0C54() & 0xFFFF;
+    hi = fn_800E0C54() << 16;
+    heroSetStatus(ptr, 2, hi | lo);
+    heroSetStatus(ptr, 1, arg2);
+    heroSetStatus(ptr, 0xb, arg3);
+    heroSetStatus(ptr, 0x17, fn_800FA280(0xfa2));
+}
+#endif
+/* 0x8012A248 | 0x208 */
+extern void fn_80142A88(void);
+#if 0
+asm void heroInit(void) {
+#include "src/game/gs_field_world_fn_8012A248.inc"
+}
+#else
+void heroInit(u8* ptr) {
+    extern void heroSetStatus(u8* p, u32 a, u32 b);
+    extern u8* heroGetStatus(u8* p, u32 a, u32 b);
+    extern void pokemonInitAry(u8* p, u16 count);
+    extern void fn_80142A88(u8* p, u32 v);
+    u16 local = 0;
+
+    heroSetStatus(ptr, 1, (u32)&local);
+    heroSetStatus(ptr, 2, 0);
+    pokemonInitAry(heroGetStatus(ptr, 3, 0), 6);
+    fn_80142A88(heroGetStatus(ptr, 4, 0), 0x14);
+    fn_80142A88(heroGetStatus(ptr, 5, 0), 0x2b);
+    fn_80142A88(heroGetStatus(ptr, 6, 0), 0x10);
+    fn_80142A88(heroGetStatus(ptr, 7, 0), 0x40);
+    fn_80142A88(heroGetStatus(ptr, 8, 0), 0x2e);
+    fn_80142A88(heroGetStatus(ptr, 9, 0), 0x3);
+    heroSetStatus(ptr, 0xb, 2);
+    heroSetStatus(ptr, 0xc, 0);
+    heroSetStatus(ptr, 0xd, 0);
+    heroSetStatus(ptr, 0xe, 0);
+    heroSetStatus(ptr, 0xf, 1);
+    heroSetStatus(ptr, 0x10, 1);
+    heroSetStatus(ptr, 0x11, 1);
+    heroSetStatus(ptr, 0x12, 1);
+    heroSetStatus(ptr, 0x13, 1);
+    heroSetStatus(ptr, 0x14, 1);
+    heroSetStatus(ptr, 0x15, 1);
+    heroSetStatus(ptr, 0x16, 1);
+    heroSetStatus(ptr, 0x17, (u32)&local);
+    heroSetStatus(ptr, 0x18, 0);
+    fn_80142A88(heroGetStatus(ptr, 0xa, 0), 0xa);
+    heroSetStatus(ptr, 0x19, 0);
+}
+#endif
+/* 0x8012A450 | 0x160 */
+extern void jumptable_803634F0();
+#if 0
+asm void heroSetStatus(void) {
+#include "src/game/gs_field_world_fn_8012A450.inc"
+}
+#else
+void heroSetStatus(u8* ptr, u32 selector, u32 value) {
+    extern u32 savedataGetStatus(u8*, u16);
+    u16 sel = (u16)selector;
+
+    if (sel == 0) { return; }
+    if (sel >= 0x1A) { return; }
+
+    if (ptr == NULL) {
+        ptr = (u8*)savedataGetStatus(NULL, 0);
+        if (ptr == NULL) { return; }
+        ptr = (u8*)savedataGetStatus(ptr, 2);
+        if (ptr == NULL) { return; }
+    }
+
+    switch (sel) {
+    case 1:
+        heroBiosSetNamePtr(ptr, (void*)value);
+        break;
+    case 2:
+        heroBiosSetRnd(ptr, value);
+        break;
+    case 3:
+        heroBiosSetSexDataId(ptr, (u8)value);
+        break;
+    case 4:
+        heroBiosSetPokedoru(ptr, value);
+        break;
+    case 5:
+        heroBiosSetPokecoupon(ptr, value);
+        break;
+    case 6:
+        heroBiosSetPokecouponAll(ptr, value);
+        break;
+    case 7:
+        heroBiosSetBadge01Flag(ptr, (u8)value);
+        break;
+    case 8:
+        heroBiosSetBadge02Flag(ptr, (u8)value);
+        break;
+    case 9:
+        heroBiosSetBadge03Flag(ptr, (u8)value);
+        break;
+    case 10:
+        heroBiosSetBadge04Flag(ptr, (u8)value);
+        break;
+    case 11:
+        heroBiosSetBadge05Flag(ptr, (u8)value);
+        break;
+    case 12:
+        heroBiosSetBadge06Flag(ptr, (u8)value);
+        break;
+    case 13:
+        heroBiosSetBadge07Flag(ptr, (u8)value);
+        break;
+    case 14:
+        heroBiosSetBadge08Flag(ptr, (u8)value);
+        break;
+    case 15:
+        heroBiosSetHizukiNamePtr(ptr, (void*)value);
+        break;
+    case 16:
+        heroBiosSetHizukiFlag(ptr, (u8)value);
+        break;
+    case 17:
+        heroBiosSetHomePlace(ptr, (u8)value);
+        break;
+    }
+}
+#endif
+/* 0x8012A5B0 | 0x1C4 */
+extern void jumptable_80363558();
+/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void heroGetStatus(void);
-/* 0x70 | floorReadMapPreFunc | alloc_wrapper */
-extern void* GSresAllocResourceAlign();  /* K&R: called with 5 args, returns void* */
-#pragma push
-#pragma peephole off
-void* floorReadMapPreFunc(void* owner, u32 param, u32 alloc_size) {
-    u32 total = ((alloc_size + 0x1F) & ~0x1F) + 0x60;
-    void* mem = (void*)GSresAllocResourceAlign(total, 0x20, (u32)owner, (u32)param, 0);
-    if (mem == NULL) {
-        GSlogWrite(lbl_802724E8, total);
-        return NULL;
-    }
-    return (u8*)mem + 0x60;
+/* 0x8012A7DC | 0x30 */
+void heroBiosSetPokecouponAll(u8* ptr, s32 val) {
+    if (ptr == NULL) { return; }
+    if (val < 0) { val = 0; }
+    if (val > 0x98967F) { val = 0x98967F; }
+    *(s32*)(&ptr[0xA8C]) = val;
 }
-#pragma pop
-/* 0x80114D6C | 0xA0 */
-extern u8 fn_800FF548(void);
-extern u32 _unloadScript__FPvUlUl();  /* K&R: asm void wrapper, used as function pointer */
-extern u32 _unloadFont__FPvUlUl();  /* K&R: asm void wrapper, used as function pointer */
-extern u32 _unloadMsg__FPvUlUl();  /* K&R: asm void wrapper, used as function pointer */
-#pragma push
-#pragma peephole off
-void* floorReadScriptPreFunc(void* owner, u32 param, u32 alloc_size) {
-    void* mem;
-    if ((u8)fn_800FF548() != 0) { return NULL; }
-    alloc_size = (alloc_size + 0x1F) & ~0x1F;
-    mem = (void*)GSresAllocResourceAlign(alloc_size, 0x20, (u32)owner, param, (u32)_unloadScript__FPvUlUl);
-    if (mem == NULL) {
-        GSlogWrite(lbl_80272520, alloc_size);
-    }
-    return mem;
+/* 0x8012A824 | 0x30 */
+void heroBiosSetPokecoupon(u8* ptr, s32 val) {
+    if (ptr == NULL) { return; }
+    if (val < 0) { val = 0; }
+    if (val > 0x98967F) { val = 0x98967F; }
+    *(s32*)(&ptr[0xA88]) = val;
 }
-/* 0x80114E78 | 0xA0 */
-void* floorReadFontPreFunc(void* owner, u32 param, u32 alloc_size) {
-    void* mem;
-    if ((u8)fn_800FF548() != 0) { return NULL; }
-    alloc_size = (alloc_size + 0x1F) & ~0x1F;
-    mem = (void*)GSresAllocResourceAlign(alloc_size, 0x20, (u32)owner, param, (u32)_unloadFont__FPvUlUl);
-    if (mem == NULL) {
-        GSlogWrite(lbl_8027255C, alloc_size);
-    }
-    return mem;
+/* 0x8012A86C | 0x30 */
+void heroBiosSetPokedoru(u8* ptr, s32 val) {
+    if (ptr == NULL) { return; }
+    if (val < 0) { val = 0; }
+    if (val > 0x98967F) { val = 0x98967F; }
+    *(s32*)(&ptr[0xA84]) = val;
 }
-/* 0x80114F84 | 0xA0 */
-void* floorReadMsgPreFunc(void* owner, u32 param, u32 alloc_size) {
-    void* mem;
-    if ((u8)fn_800FF548() != 0) { return NULL; }
-    alloc_size = (alloc_size + 0x1F) & ~0x1F;
-    mem = (void*)GSresAllocResourceAlign(alloc_size, 0x20, (u32)owner, param, (u32)_unloadMsg__FPvUlUl);
-    if (mem == NULL) {
-        GSlogWrite(lbl_80272594, alloc_size);
-    }
-    return mem;
+/* 0x8012A89C | 0x38 */
+void heroBiosSetHizukiNamePtr(u8* ptr, void* src) {
+    if (ptr == NULL) { return; }
+    if (src == NULL) { return; }
+    GScharLenCpy(ptr + 0xAC2, src, 0xB);
 }
-#pragma pop
-/* 0x80115094 | 0x24 | call_return_const */
-#pragma push
-#pragma scheduling off
-u32 _unloadFlare__FPvUlUl(void) {
-    fn_801ED674();
-    return 1;
+/* 0x8012A8D4 | 24 bytes | nc_addi_ptr */
+void* heroBiosGetHizukiNamePtr(void* ptr) {
+    if (ptr == NULL) { return NULL; }
+    return (u8*)ptr + 0xAC2;
 }
-#pragma pop
-/* 0x801150B8 | 36 bytes | call_return_const */
-#pragma push
-#pragma scheduling off
-u32 _unloadParticles__FPvUlUl(void) {
-    fn_801193BC();
-    return 1;
+/* 0x8012AA64 | 0x38 */
+void heroBiosSetNamePtr(void* dst, void* src) {
+    extern void GScharLenCpy();
+    if (dst == NULL) { return; }
+    if (src == NULL) { return; }
+    GScharLenCpy(dst, src, 0xB);
 }
-#pragma pop
-/* 0x801150DC | 36 bytes | call_return_const */
-#pragma push
-#pragma scheduling off
-u32 _unloadCamera__FPvUlUl(void) {
-    fn_800D2738();
-    return 1;
+/* 0x8012AA9C | 0x34 */
+void* heroBiosGetHizukiItemPtr(u8* ptr, u16 idx) {
+    if (ptr == NULL) { return NULL; }
+    if (idx >= 0xA) { return NULL; }
+    return ptr + (u32)idx * 4 + 0xA9A;
 }
-#pragma pop
-/* 0x80115100 | 36 bytes | call_return_const */
-#pragma push
-#pragma scheduling off
-u32 _unloadLight__FPvUlUl(void) {
-    GSlightFree();
-    return 1;
+/* 0x8012AAD0 | 0x34 */
+void* heroBiosGetItemKoronPtr(u8* ptr, u16 idx) {
+    if (ptr == NULL) { return NULL; }
+    if (idx >= 0x3) { return NULL; }
+    return ptr + (u32)idx * 4 + 0xA74;
 }
-#pragma pop
-/* 0x80115208 | 36 bytes | call_return_const */
-#pragma push
-#pragma scheduling off
-u32 _unloadColsys__FPvUlUl(void) {
-    GScolsys2UnloadCCD();
-    return 1;
+/* 0x8012AB04 | 0x34 */
+void* heroBiosGetItemSeedPtr(u8* ptr, u16 idx) {
+    if (ptr == NULL) { return NULL; }
+    if (idx >= 0x2E) { return NULL; }
+    return ptr + (u32)idx * 4 + 0x9BC;
 }
-#pragma pop
-/* 0x8011522C | 36 bytes | call_return_const */
-extern void fn_800EF5A4(void);
-#pragma push
-#pragma scheduling off
-u32 _unloadTexture__FPvUlUl(void) {
-    fn_800EF5A4();
-    return 1;
+/* 0x8012AB38 | 0x34 */
+void* heroBiosGetItemSkillPtr(u8* ptr, u16 idx) {
+    if (ptr == NULL) { return NULL; }
+    if (idx >= 0x40) { return NULL; }
+    return ptr + (u32)idx * 4 + 0x8BC;
 }
-#pragma pop
-/* 0x80115250 | 0xC */
-u32 floorReadMakeFogResID(u32 val) {
-    return (val & 0x7FFF0000U) | 0x1A00;
+/* 0x8012AB6C | 0x34 */
+void* heroBiosGetItemBallPtr(u8* ptr, u16 idx) {
+    if (ptr == NULL) { return NULL; }
+    if (idx >= 0x10) { return NULL; }
+    return ptr + (u32)idx * 4 + 0x87C;
 }
-/* 0x8011525C | 0xC */
-u32 floorReadMakeCameraResID(u32 val) {
-    return (val & 0x7FFF0000U) | 0x1800;
+/* 0x8012ABA0 | 0x34 */
+void* heroBiosGetExtraItemPtr(u8* ptr, u16 idx) {
+    if (ptr == NULL) { return NULL; }
+    if (idx >= 0x2B) { return NULL; }
+    return ptr + (u32)idx * 4 + 0x7D0;
 }
-/* 0x80115268 | 0xC */
-u32 floorReadMakeLightResID(u32 val) {
-    return (val & 0x7FFF0000U) | 0x1600;
+/* 0x8012ABD4 | 0x34 */
+void* heroBiosGetItemNormalPtr(u8* ptr, u16 idx) {
+    if (ptr == NULL) { return NULL; }
+    if (idx >= 0x14) { return NULL; }
+    return ptr + (u32)idx * 4 + 0x780;
 }
-/* 0x80115274 | 0xC */
-u32 floorReadMakeModelResID(u32 val) {
-    return (val & 0x7FFF0000U) | 0x1000;
+/* 0x8012AC08 | 0x34 */
+void* heroBiosGetPokemonPtr(u8* ptr, u16 idx) {
+    if (ptr == NULL) { return NULL; }
+    if (idx >= 6) { return NULL; }
+    return ptr + (u32)idx * 0x138 + 0x30;
 }
-extern void fn_800F76E4();
-extern void fn_80112700(void);
-#if 0
-asm void floorReadScriptPostFunc(void) {
-#include "src/game/gs_field_world_fn_80114D18.inc"
+/* 0x8012AC54 | 16 bytes | nc_bnelr */
+u32 heroBiosGetNamePtr(void* ptr) {
+    if (ptr != NULL) { return (u32)ptr; }
+    return 0;
 }
-#else
-#pragma optimization_level 4
-#pragma peephole off
-void* floorReadScriptPostFunc(u32 a, u32 b) {
-    void* result;
-
-    result = GSresGetResource(a, b);
-    if (fn_800FF548() == 0 && result != NULL) {
-        fn_800F76E4(result);
-        fn_80112700();
-    }
-    return result;
-}
-#pragma peephole reset
+/* 0x8012AC64 | 0x38 */
+#ifndef PCPORT
+typedef struct { u32 data[0x2C6]; } GfwBuf0xB18;
 #endif
-extern void GSmsgFontOpen();
-#if 0
-asm void floorReadFontPostFunc(void) {
-#include "src/game/gs_field_world_fn_80114E0C.inc"
-}
-#else
-#pragma push
-#pragma peephole off
-#pragma optimization_level 4
-void* floorReadFontPostFunc(u32 a, u32 b) {
-    void* result;
-
-    if (fn_800FF548() != 0) {
-        return NULL;
-    }
-    result = GSresGetResource(a, b);
-    if (result != NULL) {
-        GSmsgFontOpen(result);
-    }
-    return result;
-}
-#pragma pop
+void heroBiosCopy(u32* dst, u32* src) {
+#ifdef PCPORT
+    u32 i;
 #endif
-extern void GSmsgOpen();
-#if 0
-asm void floorReadMsgPostFunc(void) {
-#include "src/game/gs_field_world_fn_80114F18.inc"
-}
+    if (dst == NULL) { return; }
+    if (src == NULL) { return; }
+#ifdef PCPORT
+    for (i = 0; i < 0x2C6; i++) {
+        dst[i] = src[i];
+    }
 #else
-#pragma push
-#pragma peephole off
-#pragma optimization_level 4
-void* floorReadMsgPostFunc(u32 a, u32 b) {
-    void* result;
-
-    if (fn_800FF548() != 0) {
-        return NULL;
-    }
-    result = GSresGetResource(a, b);
-    if (result != NULL) {
-        GSmsgOpen(result);
-    }
-    return result;
-}
-#pragma pop
+    *(GfwBuf0xB18*)dst = *(GfwBuf0xB18*)src;
 #endif
+}
+extern void fn_801FD938(void);
+extern void fn_801FD928(void);
+extern void fn_801FD918(void);
+extern void fn_801FD908(void);
+extern void fn_801FD8F8(void);
+extern void fn_801FD8D0(void);
+extern void fn_801FD8C0(void);
+extern void fn_801FD8B0(void);
+extern void fightWazaCheckWriteJoutaiDataId(void);
+extern void fightWazaWriteJoutaiDataId(void);
+extern void fightWazaIsJoutaiDataId(void);
+extern void fightWazaInitJoutaiDataId(void);
+extern void fightWazaInitJoutai(void);
+extern void fn_801FD8A0(void);
+extern void fn_801FD890(void);
+extern void fn_801FD880(void);
+extern void fn_801FD870(void);
+extern void fn_801FD860(void);
+extern void fn_801FD850(void);
+extern void fn_801FD840(void);
+extern void fn_801FD820(void);
+extern void fn_801FD7F8(void);
+extern void fn_801FCF7C(void);
+extern void fn_801FCF6C(void);
+extern void fn_801FCF5C(void);
+extern void fn_801FCF4C(void);
+extern void fn_801FCF3C(void);
+extern void fn_801FCF2C(void);
+extern void fn_801FCF1C(void);
+extern void fn_801FCF0C(void);
+extern void fn_801FCEFC(void);
+extern void fn_801FD728(void);
+extern void fn_801FD718(void);
+extern void fn_801FD708(void);
+extern void fn_801FD6F8(void);
+extern void fn_801FD660(void);
+extern void fn_801FD5F0(void);
+extern void fn_801FD5C8(void);
+extern void fn_801FD6E8(void);
+extern void fn_801FD6D8(void);
+extern void fn_801FD6C8(void);
+extern void fn_801FD6B8(void);
+extern void fn_801FD330(void);
+extern void fn_801FD320(void);
+extern void fn_801FD310(void);
+extern void fn_801FD300(void);
+extern void fn_801FD2F0(void);
+extern void fn_801FD2E0(void);
+extern void fn_801FD2D0(void);
+extern void fn_801FD2C0(void);
+extern void fn_801FD2B0(void);
+extern void fn_801FD2A0(void);
+extern void fn_801FD290(void);
+extern void fn_801FD280(void);
+extern void fn_801FD270(void);
+extern void fn_801FD260(void);
+extern void fn_801FD250(void);
+extern void fn_801FD240(void);
+extern void fn_801FD230(void);
+extern void fn_801FD220(void);
+extern void fn_801FD210(void);
+extern void fn_801FD200(void);
+extern void fn_801FD1F0(void);
+extern void fn_801FD1E0(void);
+extern void fn_801FD1D0(void);
+extern void fn_801FD1C0(void);
+extern void fn_801FD1B0(void);
+extern void fn_801FD1A0(void);
+extern void fn_801FD178(void);
+extern void fn_801FD150(void);
+extern void jumptable_8035E028();
+/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
+void pokemonSetStatus(void);
+extern void fn_8011E4A4(void);
+extern void fn_801FDB60(void);
+extern void fn_801FDB48(void);
+extern void fn_801FDB14(void);
+extern void fn_801FDAFC(void);
+extern void fn_801FDAE4(void);
+extern void fn_801FDACC(void);
+extern void fn_801FDAB4(void);
+extern void fn_801FD8E0(void);
+extern void fn_801FDA9C(void);
+extern void fn_801FDA84(void);
+extern void fn_801FDA6C(void);
+extern void fn_801FDA38(void);
+extern void fn_801FDA20(void);
+extern void fightOutPokemonGetUseWazaDataId(void);
+extern void fightOutPokemonGetMotoWazaDataId(void);
+extern void fightWazaIsHit(void);
+extern void fn_801FDA08(void);
+extern void fn_801FD9F0(void);
+extern void fn_801FD9D8(void);
+extern void fn_801FD9C0(void);
+extern void fn_801FD9A8(void);
+extern void fn_801FD990(void);
+extern void fn_801FD978(void);
+extern void fn_801FD960(void);
+extern void fn_801FD948(void);
+extern void fn_801FD808(void);
+extern void fn_801FD064(void);
+extern void fn_801FD04C(void);
+extern void fn_801FD034(void);
+extern void fn_801FD01C(void);
+extern void fn_801FD004(void);
+extern void fn_801FCFEC(void);
+extern void fn_801FCFD4(void);
+extern void fn_801FCFBC(void);
+extern void fn_801FCFA4(void);
+extern void fn_801FCF8C(void);
+extern void fn_801FD7E0(void);
+extern void fn_801FD7C8(void);
+extern void fn_801FD7B0(void);
+extern void fn_801FD798(void);
+extern void fn_801FD684(void);
+extern void fn_801FD648(void);
+extern void fn_801FD614(void);
+extern void fn_801FD5D8(void);
+extern void fn_801FD5B0(void);
+extern void fn_801FD780(void);
+extern void fn_801FD768(void);
+extern void fn_801FD750(void);
+extern void fn_801FD738(void);
+extern void fn_801FD598(void);
+extern void fn_801FD580(void);
+extern void fn_801FD568(void);
+extern void fn_801FD550(void);
+extern void fn_801FD538(void);
+extern void fn_801FD520(void);
+extern void fn_801FD508(void);
+extern void fn_801FD4F0(void);
+extern void fn_801FD4D8(void);
+extern void fn_801FD4C0(void);
+extern void fn_801FD4A8(void);
+extern void fn_801FD490(void);
+extern void fn_801FD478(void);
+extern void fn_801FD460(void);
+extern void fn_801FD448(void);
+extern void fn_801FD430(void);
+extern void fn_801FD418(void);
+extern void fn_801FD400(void);
+extern void fn_801FD3E8(void);
+extern void fn_801FD3D0(void);
+extern void fn_801FD3B8(void);
+extern void fn_801FD3A0(void);
+extern void fn_801FD388(void);
+extern void fn_801FD370(void);
+extern void fn_801FD358(void);
+extern void fn_801FD340(void);
+extern void fn_801FD188(void);
+extern void fn_801FD160(void);
+extern void fn_801FD11C(void);
+extern void fightOutPokemonCheckFightOut(void);
+extern void jumptable_8035E4B0();
+/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
+u32 pokemonGetStatus(void);
 #if 0
-asm void floorReadNormalPreFunc(void) {
-#include "src/game/gs_field_world_fn_80115024.inc"
+asm void heroCheckValid(void) {
+#include "src/game/gs_field_world_fn_8012A130.inc"
 }
 #else
-#pragma push
-#pragma peephole off
-#pragma optimization_level 4
-void* floorReadNormalPreFunc(u32 a, u32 b, u32 size) {
-    void* result;
-
-    result = GSresAllocResourceAlign((size + 0x1F) & ~0x1F, 0x20, a, b, 0);
-    if (result == NULL) {
-        GSlogWrite(lbl_802725CC, size);
-    }
-    return result;
+u32 heroCheckValid(u8* ptr) {
+    extern u32 heroGetStatus(u8* ptr, u32 a, u32 b);
+    extern s32 GScharCmp(u32 val, u16* out);
+    u16 local = 0;
+    if (GScharCmp(heroGetStatus(ptr, 1, 0), &local) == 0) { return 0; }
+    return heroGetStatus(ptr, 0xb, 0) != 2;
 }
-#pragma pop
-#endif
-extern u8 fn_800FF554(void);
-extern void fn_800F760C();
-#if 0
-asm void _unloadScript__FPvUlUl(void) {
-#include "src/game/gs_field_world_fn_80115124.inc"
-}
-#else
-#pragma push
-#pragma peephole off
-#pragma optimization_level 4
-u32 _unloadScript__FPvUlUl(void* ptr) {
-    if (fn_800FF554() != 0) {
-        return 0;
-    }
-    fn_800F760C(ptr);
-    return 1;
-}
-#pragma pop
-#endif
-extern void fn_800FC2A8();
-#if 0
-asm void _unloadFont__FPvUlUl(void) {
-#include "src/game/gs_field_world_fn_80115170.inc"
-}
-#else
-#pragma push
-#pragma peephole off
-#pragma optimization_level 4
-u32 _unloadFont__FPvUlUl(void* ptr) {
-    if (fn_800FF554() != 0) {
-        return 0;
-    }
-    GSmsgFontClose(ptr);
-    return 1;
-}
-#pragma pop
-#endif
-extern void GSmsgClose();
-#if 0
-asm void _unloadMsg__FPvUlUl(void) {
-#include "src/game/gs_field_world_fn_801151BC.inc"
-}
-#else
-#pragma push
-#pragma peephole off
-#pragma optimization_level 4
-u32 _unloadMsg__FPvUlUl(void* ptr) {
-    if (fn_800FF554() != 0) {
-        return 0;
-    }
-    GSmsgClose(ptr);
-    return 1;
-}
-#pragma pop
 #endif

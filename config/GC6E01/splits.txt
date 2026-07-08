@@ -1239,10 +1239,40 @@ game/gs_field_resource.c:
 	.text       start:0x8011432C end:0x80114AE0
 
 game/field_range_80114AE0.c:
-	.text       start:0x80114AE0 end:0x80114D6C
+	.text       start:0x80114AE0 end:0x80115280
 
-game/gs_field_world.c:
-	.text       start:0x80114D6C end:0x80130CE0
+game/floor_data.c:
+	.text       start:0x80115280 end:0x80115CB4
+
+game/floor_event.c:
+	.text       start:0x80115CB4 end:0x80116D30
+
+game/floor_character.c:
+	.text       start:0x80116D30 end:0x8011711C
+
+game/field_camera.c:
+	.text       start:0x8011711C end:0x80117E58
+
+game/field_range_80117E58.c:
+	.text       start:0x80117E58 end:0x8011BA0C
+
+game/waza.c:
+	.text       start:0x8011BA0C end:0x8011CA60
+
+game/pokemon_data.c:
+	.text       start:0x8011CA60 end:0x8011F5FC
+
+game/pokemon_range_8011F5FC.c:
+	.text       start:0x8011F5FC end:0x80128E38
+
+game/hero.c:
+	.text       start:0x80128E38 end:0x8012AC9C
+
+game/hero_move.c:
+	.text       start:0x8012AC9C end:0x80130660
+
+game/hero_pokemon.c:
+	.text       start:0x80130660 end:0x80130CE0
 
 game/effect/gs_effect.c:
 	.text       start:0x80130CE0 end:0x8013151C

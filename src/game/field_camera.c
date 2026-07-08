@@ -1,16 +1,14 @@
 /**
- * @file field_range_80114AE0.c
- * @brief field code, 0x80114AE0 - 0x80115280 (merged: original range-file +
- *        the floorRead / _unload tail segment split from gs_field_world.c).
+ * @file field_camera.c
+ * @brief GSfield world segment -- split from gs_field_world.c.
  *
- * Range unit assigned from the propagated subsystem map
- * (tools/subsystem_propagation.py, >=80% single-label dominance;
- * campaign 2026-07-01). The 0x80114D6C-0x80115280 tail is the floorRead*
- * resource-handler module (floorReadGFL/Particle/WZX/PKX/Tex/Script/Font/
- * Msg/Normal PreFunc + matching _unload*__FPvUlUl family), physically split
- * from gs_field_world.c (XD 0x8002E524-0x8002F120). All functions asm-only
- * until matched; the range name stays honest until internal TU structure
- * is fully proven.
+ * XD source unit: floorFieldCamera / fieldCamera module
+ * Address range: 0x8011711C - 0x80117E58 (~13 functions)
+ *
+ * Split from src/game/gs_field_world.c (physical XD source-unit split of
+ * the 734-function field-world bucket into its 12 constituent XD source
+ * units). See gs_field_world.c split history for the address-range
+ * evidence (anchor-name monotonicity checks) used to place this boundary.
  */
 #include "dolphin/types.h"
 #include "game/world/gs_field.h"
@@ -1432,431 +1430,484 @@ extern void heroMoveGetHeroRot(u32 param);
 extern void heroMoveGetHeroPos(u32 param);
 extern u32 heroMoveGetResID(u32* out_zero, u32* out_val, s32 index);
 
-/* ==================================================================
- * floorUpdateFieldCamera_Pseudocode -- floorUpdateFieldCamera notes
- *
- * Update the field camera each frame. Interpolates position, target,
- * and FOV toward their destination values. Includes safety check for
- * divide-by-zero when computing distance-based interpolation.
- *
- * This function is 0x1B4 bytes (436 bytes) and uses extensive float
- * math for smooth camera transitions.
- *
- * From disassembly:
- *   - Loads camera state from a BSS pointer
- *   - Computes direction vector from current to destination
- *   - Normalizes and scales by interpSpeed
- *   - If distance is near-zero, snaps to destination (avoids /0)
- *   - On divide-by-zero path: logs lbl_80272770
- * ================================================================== */
-void floorUpdateFieldCamera_Pseudocode(void) {
-    extern f32 lbl_8047CFD0;
-    extern f32 lbl_8047CFDC;
-    extern f32 lbl_8047CFE0;
-    extern void GSvecSquareDistance();
-    extern void fn_800E01F4();
-    extern u32 lbl_8047AD68;
-    extern u32 lbl_8047AD6C;
-    u8 sp[0xA0];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f0 = 0.0f;
-    f32 f1 = 0.0f;
-    f32 f2 = 0.0f;
-    f32 f3 = 0.0f;
-    f32 f26 = 0.0f;
-    f32 f27 = 0.0f;
-    f32 f28 = 0.0f;
-    f32 f29 = 0.0f;
-    f32 f30 = 0.0f;
-    f32 f31 = 0.0f;
-    *(f64*)(sp + 0x90) = f31;
-    /* psq_st f31, 0x98((u32)sp), 0, qr0 */;
-    *(f64*)(sp + 0x80) = f30;
-    /* psq_st f30, 0x88((u32)sp), 0, qr0 */;
-    *(f64*)(sp + 0x70) = f29;
-    /* psq_st f29, 0x78((u32)sp), 0, qr0 */;
-    *(f64*)(sp + 0x60) = f28;
-    /* psq_st f28, 0x68((u32)sp), 0, qr0 */;
-    *(f64*)(sp + 0x50) = f27;
-    /* psq_st f27, 0x58((u32)sp), 0, qr0 */;
-    *(f64*)(sp + 0x40) = f26;
-    /* psq_st f26, 0x48((u32)sp), 0, qr0 */;
-    r25 = r3;
-    r26 = r4;
-    r27 = r5;
-    r28 = r6;
-    r0 = lbl_8047AD68;
-    if (r0 == (u32)0x1) {
-        r4 = lbl_8047AD6C;
-        r3 = 0x1;
-        f0 = *(f32*)((u8*)r4 + 0x10);
-        *(f32*)((u8*)r26 + 0x0) = f0;
-        r4 = lbl_8047AD6C;
-        f0 = *(f32*)((u8*)r4 + 0xC);
-        *(f32*)((u8*)r27 + 0x0) = f0;
-        r4 = lbl_8047AD6C;
-        f0 = *(f32*)((u8*)r4 + 0x14);
-        *(f32*)((u8*)r28 + 0x0) = f0;
-    } else {
-    f29 = lbl_8047CFD0;
-    r30 = 0x0;
-    r31 = 0x0;
-    f28 = f29;
-    f27 = f29;
-    f26 = f29;
-    f30 = lbl_8047CFDC;
-    f31 = lbl_8047CFE0;
-    while (r0 = lbl_8047AD68, r30 < r0) {
-
-    r0 = lbl_8047AD6C;
-    r3 = (u32)sp + 0x8;
-    r29 = r0 + r31;
-    f1 = *(f32*)((u8*)r29 + 0x0);
-    f2 = *(f32*)((u8*)r29 + 0x4);
-    f3 = *(f32*)((u8*)r29 + 0x8);
-    fn_800E01F4();
-    r4 = r25;
-    r3 = (u32)sp + 0x8;
-    GSvecSquareDistance();
-    if (f1 > f30) {
-        f3 = f31 / f1;
-        f2 = *(f32*)((u8*)r29 + 0xC);
-        f1 = *(f32*)((u8*)r29 + 0x10);
-        f0 = *(f32*)((u8*)r29 + 0x14);
-        f29 = f29 + f3;
-        f28 = f2 * f3 + f28;
-        f27 = f1 * f3 + f27;
-        f26 = f0 * f3 + f26;
-    r31 = r31 + 0x18;
-    r30 = r30 + 0x1;
-        continue;
-    }
-    f29 = f30;
-    f27 = *(f32*)((u8*)r29 + 0x10);
-    f28 = *(f32*)((u8*)r29 + 0xC);
-    f26 = *(f32*)((u8*)r29 + 0x14);
-    break;
-    }
-
-    f0 = lbl_8047CFD0;
-    if (f0 == f29) {
-        r3 = (u32)&lbl_80272770;
-        r3 = (u32)&lbl_80272770;
-        ((void(*)(void))GSlogWrite)();
-        r3 = 0x0;
-    } else {
-    f0 = lbl_8047CFDC;
-    r3 = 0x1;
-    f0 = f0 / f29;
-    f2 = f27 * f0;
-    f1 = f28 * f0;
-    f0 = f26 * f0;
-    *(f32*)((u8*)r26 + 0x0) = f2;
-    *(f32*)((u8*)r27 + 0x0) = f1;
-    *(f32*)((u8*)r28 + 0x0) = f0;
-    }
-    }
-    /* psq_l f31, 0x98((u32)sp), 0, qr0 */;
-    f31 = *(f64*)(sp + 0x90);
-    /* psq_l f30, 0x88((u32)sp), 0, qr0 */;
-    f30 = *(f64*)(sp + 0x80);
-    /* psq_l f29, 0x78((u32)sp), 0, qr0 */;
-    f29 = *(f64*)(sp + 0x70);
-    /* psq_l f28, 0x68((u32)sp), 0, qr0 */;
-    f28 = *(f64*)(sp + 0x60);
-    /* psq_l f27, 0x58((u32)sp), 0, qr0 */;
-    f27 = *(f64*)(sp + 0x50);
-    /* psq_l f26, 0x48((u32)sp), 0, qr0 */;
-    f26 = *(f64*)(sp + 0x40);
-    return;
-}
 /* ===================================================================
- * Generated: 1 pattern-matched + 515 stubs
- * Range: 0x80114CA8 - 0x80130CD8
+ * AUTO-GENERATED accessor functions
+ * Generated by tools/gen_accessors.py
+ * 208 functions matched
  * =================================================================== */
-extern u8 lbl_804083D0[0x30];
+extern u8 lbl_8047AD71;
+extern u32 lbl_8047ADC0;
+/* Address: 0x801174EC | Size: 0x8 | Pattern: sda_getter */
+u8 fn_801174EC(void) {
+    return lbl_8047AD71;
+}
+/* 0x8011711C | 0x38 */
+void fn_8011711C(u32 arg) {
+    extern void* fn_800FF56C(void);
+    extern void* floorDataBiosGetPtr(u32 key);
+    extern void* floorDataBiosGetCharInfo(void* a, u32 b);
+    floorDataBiosGetCharInfo(floorDataBiosGetPtr((u32)fn_800FF56C()), arg);
+}
+/* 0x80117154 | 16 bytes | multi_sda_store */
 extern u32 lbl_8047AD68;
 extern u32 lbl_8047AD6C;
-extern void fn_801ED674(void);
-/* Forward declarations for functions called before definition */
-void fn_801193BC(void);
-/* Forward declarations for converted functions */
-s32 pokemonWazaGetMaxPP(u8* ptr, u16 idx);
-void wazaGetStatus(void);
-void fn_8011F260(void);
-void pokemonResetBasisStatus(void*);
-void pokemonSetLevelBasisStatus(void);
-void heroItemGetItemKindToItemAryPtr(void);
-void heroSetStatus();
-void heroGetStatus(void);
-/* 0x70 | floorReadMapPreFunc | alloc_wrapper */
-extern void* GSresAllocResourceAlign();  /* K&R: called with 5 args, returns void* */
+#if 0
+asm void fn_80117154(void) {
+#include "src/game/gs_field_world_fn_80117154.inc"
+}
+#else
+void fn_80117154(void) {
+    lbl_8047AD68 = 0;
+    lbl_8047AD6C = 0;
+}
+#endif
+/* 0x64 | fn_80117164 | generic */
+extern f32 lbl_8047CFD0;
+extern u32 lbl_8047AD68;
+extern u32 lbl_8047AD6C;
+extern u8 lbl_8047AD70;
+extern u8 lbl_8047AD71;
+extern f32 lbl_8047AD74;
+extern f32 lbl_8047AD78;
+extern f32 lbl_8047AD7C;
+#if 0
+asm void fn_80117164(void) {
+#include "src/game/gs_field_world_fn_80117164.inc"
+}
+#else
+void fn_80117164(void) {
+    void* result;
+    result = floorDataBiosGetFieldCameraListPtr();
+    lbl_8047AD68 = 0;
+    lbl_8047AD6C = 0;
+    lbl_8047AD70 = 0;
+    lbl_8047AD71 = 1;
+    lbl_8047AD74 = lbl_8047CFD0;
+    lbl_8047AD78 = lbl_8047CFD0;
+    lbl_8047AD7C = lbl_8047CFD0;
+    if (result != NULL) {
+        lbl_8047AD68 = *(u32*)(*(u32*)result);
+        lbl_8047AD6C = *(u32*)((u8*)result + 4);
+    }
+}
+#endif
+/* 0x801171C8 | 0x168 */
+extern u8 GSscene_GetMode(void);
+extern void cameraSetHeight(f32);
+extern void cameraSetDistance(f32);
+extern void cameraSetRotY(f32);
+extern void GSscene_GetCameraPositionVector(void*);
+extern u8 lbl_8047AD71;
+extern u32 lbl_8047AD68;
+extern u32 lbl_8047AD6C;
+extern f32 lbl_8047AD74;
+extern f32 lbl_8047AD78;
+extern f32 lbl_8047AD7C;
+extern u8 lbl_8047AD70;
+extern f32 lbl_8047CFD8;
+extern f32 lbl_8047CFD4;
+#pragma push
+#pragma fp_contract on
+#pragma peephole off
+#if 0
+asm void fn_801171C8(void) {
+#include "src/game/gs_field_world_fn_801171C8.inc"
+}
+#else
+void fn_801171C8(void) {
+    u8 pos[0xC];
+    f32 y;
+    f32 x;
+    f32 z;
+
+    if (lbl_8047AD71 == 0) { return; }
+    if (GSscene_GetMode() != 0) { return; }
+    if (lbl_8047AD68 == 0) { return; }
+
+    if (lbl_8047AD68 == 1) {
+        f32* ptr = (f32*)lbl_8047AD6C;
+        f32 direct_x;
+        f32 direct_z;
+        direct_z = ptr[5];
+        direct_x = ptr[3];
+        cameraSetHeight(ptr[4]);
+        cameraSetDistance(direct_x);
+        cameraSetRotY(direct_z);
+        return;
+    }
+
+    GSscene_GetCameraPositionVector(pos);
+    x = lbl_8047AD74;
+    y = lbl_8047AD78;
+    z = lbl_8047AD7C;
+    if (floorUpdateFieldCamera(pos, &x, &y, &z) == 0) { return; }
+
+    if (lbl_8047AD70 != 0) {
+        f32 f3 = lbl_8047CFD8;
+        f32 f2 = x;
+        f32 f1 = y;
+        f32 f0 = z;
+        f32 f4 = f3 * f2;
+        f2 = f3 * f1;
+        {
+            f32 f6 = lbl_8047CFD4;
+            f32 f5 = lbl_8047AD74;
+            f0 = f3 * f0;
+            f3 = lbl_8047AD78;
+            f1 = lbl_8047AD7C;
+            f4 = f6 * f5 + f4;
+            f2 = f6 * f3 + f2;
+            f0 = f6 * f1 + f0;
+        }
+        lbl_8047AD74 = f4;
+        lbl_8047AD78 = f2;
+        lbl_8047AD7C = f0;
+    } else {
+        lbl_8047AD74 = x;
+        lbl_8047AD78 = y;
+        lbl_8047AD7C = z;
+        lbl_8047AD70 = 1;
+    }
+
+    {
+        f32 out_y = lbl_8047AD78;
+        f32 out_z = lbl_8047AD7C;
+        cameraSetHeight(lbl_8047AD74);
+        cameraSetDistance(out_y);
+        cameraSetRotY(out_z);
+    }
+}
+#endif
+#pragma pop
+/* 0x80117330 | 0x194 */
+extern void* GSresGetResource();
+extern void GSmodelGetPosition(void*, void*);
+extern void GSscene_GetCameraViewVector(void*);
+extern f32 cameraGetHeight(void);
+extern f32 cameraGetDistance(void);
+extern f32 cameraGetRotY(void);
+extern void fn_800E01F4(void* obj, f32 f1, f32 f2, f32 f3);
+extern void GSmtxMakeYRotation(void*, f32);
+extern void GSvecTransform(void*, void*, void*);
+extern void GSvecAdd(void*, void*, void*);
+extern f64 atan2(f32, f32);
+extern void fn_801776E8(u32, void*, f32);
+extern void fn_80177574(u32, void*, f32);
+extern void fn_80177478(u32, void*, f32);
+extern u8 lbl_8047AD71;
+extern u32 lbl_8047AD68;
+extern u32 lbl_8047AD6C;
+extern f32 lbl_8047CFD0;
+#if 0
+asm void fn_80117330(void) {
+#include "src/game/gs_field_world_fn_80117330.inc"
+}
+#else
 #pragma push
 #pragma peephole off
-void* floorReadMapPreFunc(void* owner, u32 param, u32 alloc_size) {
-    u32 total = ((alloc_size + 0x1F) & ~0x1F) + 0x60;
-    void* mem = (void*)GSresAllocResourceAlign(total, 0x20, (u32)owner, (u32)param, 0);
-    if (mem == NULL) {
-        GSlogWrite(lbl_802724E8, total);
-        return NULL;
+void fn_80117330(f32 arg) {
+    extern u8 GSscene_GetMode(void);
+    extern void GSscene_GetCameraPositionVector(void*);
+    u8 tmp[0x30];
+    u8 pos[0xC];
+    u8 view[0xC];
+    u8 rot[0xC];
+    u8 mat[0x18];
+    f32 y;
+    f32 x;
+    f32 z;
+    void* obj;
+
+    if (lbl_8047AD71 == 0) { return; }
+    if (GSscene_GetMode() != 0) { return; }
+    if (lbl_8047AD68 == 0) { return; }
+
+    obj = GSresGetResource(0, 0x64);
+    if (obj != NULL) {
+        GSmodelGetPosition(obj, pos);
+    } else {
+        GSscene_GetCameraPositionVector(pos);
     }
-    return (u8*)mem + 0x60;
-}
-#pragma pop
-/* 0x80114D6C | 0xA0 */
-extern u8 fn_800FF548(void);
-extern u32 _unloadScript__FPvUlUl();  /* K&R: asm void wrapper, used as function pointer */
-extern u32 _unloadFont__FPvUlUl();  /* K&R: asm void wrapper, used as function pointer */
-extern u32 _unloadMsg__FPvUlUl();  /* K&R: asm void wrapper, used as function pointer */
-#pragma push
-#pragma peephole off
-void* floorReadScriptPreFunc(void* owner, u32 param, u32 alloc_size) {
-    void* mem;
-    if ((u8)fn_800FF548() != 0) { return NULL; }
-    alloc_size = (alloc_size + 0x1F) & ~0x1F;
-    mem = (void*)GSresAllocResourceAlign(alloc_size, 0x20, (u32)owner, param, (u32)_unloadScript__FPvUlUl);
-    if (mem == NULL) {
-        GSlogWrite(lbl_80272520, alloc_size);
+    GSscene_GetCameraViewVector(view);
+
+    if (lbl_8047AD68 == 1) {
+        f32* ptr = (f32*)lbl_8047AD6C;
+        x = ptr[4];
+        y = ptr[3];
+        z = ptr[5];
+    } else {
+        x = cameraGetHeight();
+        y = cameraGetDistance();
+        z = cameraGetRotY();
+        if (floorUpdateFieldCamera(pos, &x, &y, &z) == 0) { return; }
     }
-    return mem;
+
+    fn_800E01F4(mat, lbl_8047CFD0, x, y);
+    GSmtxMakeYRotation(tmp, z);
+    GSvecTransform(mat, tmp, mat);
+    GSvecAdd(rot, pos, view);
+    GSvecAdd(rot, rot, mat);
+    *(f32*)(&mat[0x10]) = z;
+    *(f32*)(&mat[0xC]) = -(f32)atan2(x, y);
+    *(f32*)(&mat[0x14]) = lbl_8047CFD0;
+    fn_801776E8(0, pos, arg);
+    fn_80177574(0, rot, arg);
+    fn_80177478(0, &mat[0xC], arg);
 }
-/* 0x80114E78 | 0xA0 */
-void* floorReadFontPreFunc(void* owner, u32 param, u32 alloc_size) {
-    void* mem;
-    if ((u8)fn_800FF548() != 0) { return NULL; }
-    alloc_size = (alloc_size + 0x1F) & ~0x1F;
-    mem = (void*)GSresAllocResourceAlign(alloc_size, 0x20, (u32)owner, param, (u32)_unloadFont__FPvUlUl);
-    if (mem == NULL) {
-        GSlogWrite(lbl_8027255C, alloc_size);
+#pragma pop
+#endif
+/* 0x801174C4 | 0x28 */
+u32 fn_801174C4(void) {
+    u8 result = 0;
+    if (lbl_8047AD68 != 0 && lbl_8047AD6C != 0) {
+        result = 1;
     }
-    return mem;
+    return result;
 }
-/* 0x80114F84 | 0xA0 */
-void* floorReadMsgPreFunc(void* owner, u32 param, u32 alloc_size) {
-    void* mem;
-    if ((u8)fn_800FF548() != 0) { return NULL; }
-    alloc_size = (alloc_size + 0x1F) & ~0x1F;
-    mem = (void*)GSresAllocResourceAlign(alloc_size, 0x20, (u32)owner, param, (u32)_unloadMsg__FPvUlUl);
-    if (mem == NULL) {
-        GSlogWrite(lbl_80272594, alloc_size);
-    }
-    return mem;
+/* 0x801174F4 | 0xC */
+extern u8 lbl_8047AD71;
+#if 0
+asm void fn_801174F4(void) {
+#include "src/game/gs_field_world_fn_801174F4.inc"
 }
-#pragma pop
-/* 0x80115094 | 0x24 | call_return_const */
-#pragma push
-#pragma scheduling off
-u32 _unloadFlare__FPvUlUl(void) {
-    fn_801ED674();
-    return 1;
+#else
+void fn_801174F4(void) {
+    lbl_8047AD71 = 0;
 }
-#pragma pop
-/* 0x801150B8 | 36 bytes | call_return_const */
-#pragma push
-#pragma scheduling off
-u32 _unloadParticles__FPvUlUl(void) {
-    fn_801193BC();
-    return 1;
+#endif
+/* 0x80117500 | 0x14 */
+extern u8 lbl_8047AD70;
+extern u8 lbl_8047AD71;
+extern u8 lbl_8047AD70;
+#if 0
+asm void fn_80117500(void) {
+#include "src/game/gs_field_world_fn_80117500.inc"
 }
-#pragma pop
-/* 0x801150DC | 36 bytes | call_return_const */
-#pragma push
-#pragma scheduling off
-u32 _unloadCamera__FPvUlUl(void) {
-    fn_800D2738();
-    return 1;
+#else
+void fn_80117500(void) {
+    lbl_8047AD71 = 1;
+    lbl_8047AD70 = 0;
 }
-#pragma pop
-/* 0x80115100 | 36 bytes | call_return_const */
-#pragma push
-#pragma scheduling off
-u32 _unloadLight__FPvUlUl(void) {
-    GSlightFree();
-    return 1;
+#endif
+/* 0x801176C8 | 0x254 */
+extern void GSgappTerminate(void);
+extern void GSgappCreate(void);
+extern u8 lbl_804083D0[0x30];
+/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
+void fn_801176C8(void);
+/* 0x8011791C | 0x1B8 */
+extern void* GScameraGetActiveCamera();
+extern void GSvecCopy();
+extern u8 lbl_804083D0[0x30];
+extern u8 lbl_802727B8[];
+extern void fn_80177A38(void);  /* referenced by asm .inc wrappers (fn_801171C8/80117330/8011791C/8012E388/8012EBD4); was undefined -> broke the TU parse */
+/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
+void fn_8011791C(void);
+typedef struct GSFieldWorldResourceState {
+    u8 unk_00[0x10];
+    u32 field_10; /* 0x10 */
+} GSFieldWorldResourceState;
+
+/* 0x80117AD4 | 16 bytes | global_getter */
+u32 fn_80117AD4(void) {
+    return ((GSFieldWorldResourceState*)lbl_804083D0)->field_10;
 }
-#pragma pop
-/* 0x80115208 | 36 bytes | call_return_const */
-#pragma push
-#pragma scheduling off
-u32 _unloadColsys__FPvUlUl(void) {
-    GScolsys2UnloadCCD();
-    return 1;
-}
-#pragma pop
-/* 0x8011522C | 36 bytes | call_return_const */
+/* 0x80117AE4 | 0x1A0 */
+extern void GSmodelResetTextureChange(void);
 extern void fn_800EF5A4(void);
+extern void GSmodelFree(void);
+extern void GStextureCreate(void);
+extern void fn_80113D34(void);
+extern void GSmodelSetVisibility(void);
+extern void GSmodelLinkTexAnimToAnim(void);
+extern void GSmodelSetTextureChange(void);
+extern u32 lbl_80478B40;
+extern u32 lbl_8047AD88;
+extern u32 lbl_8047AD8C;
+extern u32 lbl_8047AD90;
+extern u32 lbl_8047AD94;
+extern u32 lbl_8047AD80;
+extern u32 lbl_8047AD84;
 #pragma push
-#pragma scheduling off
-u32 _unloadTexture__FPvUlUl(void) {
-    fn_800EF5A4();
-    return 1;
-}
-#pragma pop
-/* 0x80115250 | 0xC */
-u32 floorReadMakeFogResID(u32 val) {
-    return (val & 0x7FFF0000U) | 0x1A00;
-}
-/* 0x8011525C | 0xC */
-u32 floorReadMakeCameraResID(u32 val) {
-    return (val & 0x7FFF0000U) | 0x1800;
-}
-/* 0x80115268 | 0xC */
-u32 floorReadMakeLightResID(u32 val) {
-    return (val & 0x7FFF0000U) | 0x1600;
-}
-/* 0x80115274 | 0xC */
-u32 floorReadMakeModelResID(u32 val) {
-    return (val & 0x7FFF0000U) | 0x1000;
-}
-extern void fn_800F76E4();
-extern void fn_80112700(void);
+#pragma peephole off
 #if 0
-asm void floorReadScriptPostFunc(void) {
-#include "src/game/gs_field_world_fn_80114D18.inc"
+asm void fn_80117AE4(void) {
+#include "src/game/gs_field_world_fn_80117AE4.inc"
 }
 #else
-#pragma optimization_level 4
-#pragma peephole off
-void* floorReadScriptPostFunc(u32 a, u32 b) {
-    void* result;
+u8 fn_80117AE4(u32 arg1) {
+    extern u32 fn_80113F48(void);
+    extern void* GSresGetResource(u32 a, u32 b);
+    extern void GSmodelResetTextureChange(void* a);
+    extern void fn_800EF5A4(void* a);
+    extern void GSmodelFree(void* a);
+    extern void* GStextureCreate(u16 a, u16 b, u32 c, u32 d, u32 e);
+    extern void* fn_80113D34(u32 a, u32 b);
+    extern void GSmodelSetVisibility(void* a, u32 b);
+    extern void GSmodelLinkTexAnimToAnim(void* a, u32 b);
+    extern void GSmodelSetAnimIndex(void* a, u32 b);
+    extern void GSmodelStartAnimation(void* a);
+    extern void GSmodelSetTextureChange(void* a, void* b);
+    u32 count;
+    u8 found;
 
-    result = GSresGetResource(a, b);
-    if (fn_800FF548() == 0 && result != NULL) {
-        fn_800F76E4(result);
-        fn_80112700();
-    }
-    return result;
-}
-#pragma peephole reset
-#endif
-extern void GSmsgFontOpen();
-#if 0
-asm void floorReadFontPostFunc(void) {
-#include "src/game/gs_field_world_fn_80114E0C.inc"
-}
-#else
-#pragma push
-#pragma peephole off
-#pragma optimization_level 4
-void* floorReadFontPostFunc(u32 a, u32 b) {
-    void* result;
+    if ((s32)lbl_80478B40 == (s32)arg1) { return; }
 
-    if (fn_800FF548() != 0) {
-        return NULL;
+    if (lbl_8047AD88 != 0) {
+        GSmodelResetTextureChange(GSresGetResource(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 8)));
+        if (lbl_8047AD8C != 0) {
+            fn_800EF5A4((void*)lbl_8047AD8C);
+            lbl_8047AD8C = 0;
+        }
+        if (lbl_8047AD90 != 0) {
+            GSmodelFree((void*)lbl_8047AD90);
+            lbl_8047AD90 = 0;
+        }
+        lbl_8047AD94 = 0;
+        lbl_80478B40 = (u32)-1;
     }
-    result = GSresGetResource(a, b);
-    if (result != NULL) {
-        GSmsgFontOpen(result);
-    }
-    return result;
-}
-#pragma pop
-#endif
-extern void GSmsgOpen();
-#if 0
-asm void floorReadMsgPostFunc(void) {
-#include "src/game/gs_field_world_fn_80114F18.inc"
-}
-#else
-#pragma push
-#pragma peephole off
-#pragma optimization_level 4
-void* floorReadMsgPostFunc(u32 a, u32 b) {
-    void* result;
 
-    if (fn_800FF548() != 0) {
-        return NULL;
+    count = lbl_8047AD84;
+    found = 0;
+    lbl_8047AD88 = lbl_8047AD80;
+    while (count != 0) {
+        u8* e = (u8*)lbl_8047AD88;
+        if (*(u32*)(e + 4) == arg1) {
+            found = 1;
+            break;
+        }
+        lbl_8047AD88 = (u32)e + 0x18;
+        count--;
     }
-    result = GSresGetResource(a, b);
-    if (result != NULL) {
-        GSmsgOpen(result);
-    }
-    return result;
-}
-#pragma pop
-#endif
-#if 0
-asm void floorReadNormalPreFunc(void) {
-#include "src/game/gs_field_world_fn_80115024.inc"
-}
-#else
-#pragma push
-#pragma peephole off
-#pragma optimization_level 4
-void* floorReadNormalPreFunc(u32 a, u32 b, u32 size) {
-    void* result;
-
-    result = GSresAllocResourceAlign((size + 0x1F) & ~0x1F, 0x20, a, b, 0);
-    if (result == NULL) {
-        GSlogWrite(lbl_802725CC, size);
-    }
-    return result;
-}
-#pragma pop
-#endif
-extern u8 fn_800FF554(void);
-extern void fn_800F760C();
-#if 0
-asm void _unloadScript__FPvUlUl(void) {
-#include "src/game/gs_field_world_fn_80115124.inc"
-}
-#else
-#pragma push
-#pragma peephole off
-#pragma optimization_level 4
-u32 _unloadScript__FPvUlUl(void* ptr) {
-    if (fn_800FF554() != 0) {
+    if (!found) {
+        lbl_8047AD88 = 0;
         return 0;
     }
-    fn_800F760C(ptr);
+
+    lbl_8047AD8C = (u32)GStextureCreate(*(u16*)((u8*)lbl_8047AD88 + 0), *(u16*)((u8*)lbl_8047AD88 + 2), 0x44, 0, 0);
+    if (lbl_8047AD8C == 0) {
+        lbl_8047AD88 = 0;
+        return 0;
+    }
+    lbl_8047AD90 = (u32)fn_80113D34(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 0xc));
+    GSmodelSetVisibility((void*)lbl_8047AD90, 0);
+    GSmodelLinkTexAnimToAnim((void*)lbl_8047AD90, 1);
+    GSmodelSetAnimIndex((void*)lbl_8047AD90, *(u32*)((u8*)lbl_8047AD88 + 0x10));
+    GSmodelStartAnimation((void*)lbl_8047AD90);
+    lbl_8047AD94 = (u32)GSresGetResource(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 0x14));
+    GSmodelSetTextureChange(GSresGetResource(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 8)), (void*)lbl_8047AD8C);
+    lbl_80478B40 = arg1;
     return 1;
 }
-#pragma pop
 #endif
-extern void fn_800FC2A8();
+#pragma pop
+/* 0x80117C84 | 0x90 */
+extern u32 lbl_8047AD88;
+extern u32 lbl_8047AD8C;
+extern u32 lbl_8047AD90;
+extern u32 lbl_8047AD94;
+extern u32 lbl_80478B40;
+extern u32 lbl_8047AD80;
+extern u32 lbl_8047AD84;
 #if 0
-asm void _unloadFont__FPvUlUl(void) {
-#include "src/game/gs_field_world_fn_80115170.inc"
+asm void fn_80117C84(void) {
+#include "src/game/gs_field_world_fn_80117C84.inc"
+}
+#else
+#pragma peephole off
+void fn_80117C84(void) {
+    extern u32 fn_80113F48(void);
+    extern void* GSresGetResource(u32 a, u32 b);
+    extern void GSmodelResetTextureChange(void* a);
+    extern void fn_800EF5A4(void* a);
+    extern void GSmodelFree(void* a);
+    u8* ptr = (u8*)lbl_8047AD88;
+    if (ptr != NULL) {
+        GSmodelResetTextureChange(GSresGetResource(fn_80113F48(), *(u32*)(ptr + 8)));
+        if (lbl_8047AD8C != 0) {
+            fn_800EF5A4((void*)lbl_8047AD8C);
+            lbl_8047AD8C = 0;
+        }
+        if (lbl_8047AD90 != 0) {
+            GSmodelFree((void*)lbl_8047AD90);
+            lbl_8047AD90 = 0;
+        }
+        lbl_8047AD94 = 0;
+        lbl_8047AD88 = 0;
+        lbl_80478B40 = (u32)-1;
+    }
+    lbl_8047AD80 = 0;
+    lbl_8047AD84 = 0;
+}
+#pragma peephole on
+#endif
+/* 0x80117D14 | 0x144 */
+extern void fn_800EC134(u32);
+extern void fn_800D4604();
+extern void fn_800D377C();
+extern void fn_800D3410();
+extern void fn_800D9B24();
+extern void fn_800D9AF0();
+extern void fn_800D258C();
+extern void fn_800D9D68();
+extern void fn_800D9C24();
+extern void _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID(void);
+extern void GSmodelDrawModel();
+extern void fn_800D3190(void);
+extern u32 lbl_8047AD88;
+extern u32 lbl_8047AD90;
+extern u32 lbl_8047AD8C;
+extern u32 lbl_8047AD94;
+#if 0
+asm void fn_80117D14(void) {
+#include "src/game/gs_field_world_fn_80117D14.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-#pragma optimization_level 4
-u32 _unloadFont__FPvUlUl(void* ptr) {
-    if (fn_800FF554() != 0) {
-        return 0;
+void fn_80117D14(void)
+{
+    u16 a0;
+    u16 a1;
+    u16 a2;
+    u16 a3;
+    u16 b0;
+    u16 b1;
+    u16 b2;
+    u16 b3;
+    u32 saved;
+    u8* size;
+
+    if (lbl_8047AD88 != 0) {
+        if (lbl_8047AD90 != 0) {
+            fn_800EC134(lbl_8047AD90);
+            saved = (u32)GScameraGetActiveCamera();
+            fn_800D4604(2);
+            fn_800D377C(1);
+            fn_800D3410(lbl_8047AD8C, 0);
+            fn_800D9B24(&a0, &a1, &a2, &a3);
+            fn_800D9AF0(&b0, &b1, &b2, &b3);
+            fn_800D258C(lbl_8047AD94);
+
+            size = (u8*)lbl_8047AD88;
+            fn_800D9D68(0, 0,
+                        (u16)(*(u16*)(size + 0) - 1),
+                        (u16)(*(u16*)(size + 2) - 1));
+            size = (u8*)lbl_8047AD88;
+            fn_800D9C24(0, 0,
+                        (u16)(*(u16*)(size + 0) - 1),
+                        (u16)(*(u16*)(size + 2) - 1));
+            _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
+            GSmodelDrawModel(lbl_8047AD90, 0x3010);
+            fn_800D3190();
+            fn_800D377C(1);
+            fn_800D258C(saved);
+            fn_800D9D68(a0, a1, a2, a3);
+            fn_800D9C24(b0, b1, b2, b3);
+            _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
+            fn_800D4604(1);
+        }
     }
-    GSmsgFontClose(ptr);
-    return 1;
-}
-#pragma pop
-#endif
-extern void GSmsgClose();
-#if 0
-asm void _unloadMsg__FPvUlUl(void) {
-#include "src/game/gs_field_world_fn_801151BC.inc"
-}
-#else
-#pragma push
-#pragma peephole off
-#pragma optimization_level 4
-u32 _unloadMsg__FPvUlUl(void* ptr) {
-    if (fn_800FF554() != 0) {
-        return 0;
-    }
-    GSmsgClose(ptr);
-    return 1;
 }
 #pragma pop
 #endif
