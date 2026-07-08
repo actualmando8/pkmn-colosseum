@@ -76,9 +76,9 @@ extern u8 fn_8011207C[];
 extern u8 fn_80118068[];
 extern u8 fn_80118070[];
 extern u8 fn_80118100[];
-extern u8 fn_80179DFC[];
-extern u8 fn_80179E04[];
-extern u8 fn_80179EA4[];
+extern u8 _cameraGetStateSize[];
+extern u8 _cameraMakeStateData[];
+extern u8 _cameraRestoreStateData[];
 extern u8 fn_80213A28[];
 extern u8 fn_80213A38[];
 extern u8 fn_80213A48[];
@@ -2181,9 +2181,9 @@ const void* lbl_80273D98[12] = {
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)0x42C80000,
-    (void*)fn_80179EA4,
-    (void*)fn_80179E04,
-    (void*)fn_80179DFC,
+    (void*)_cameraRestoreStateData,
+    (void*)_cameraMakeStateData,
+    (void*)_cameraGetStateSize,
 };
 
 const u8 lbl_80273DC8[364] = {

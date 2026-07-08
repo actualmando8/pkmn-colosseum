@@ -124,15 +124,15 @@ extern u8 cameraSetRotY[];
 extern u8 cameraSetDistance[];
 extern u8 cameraSetHeight[];
 extern u8 fn_80176948[];
-extern u8 fn_8017697C[];
-extern u8 fn_801769B0[];
+extern u8 cameraSetTargetPosXYZ[];
+extern u8 cameraSetTargetOfsXYZ[];
 extern u8 cameraPlayAnime[];
-extern u8 fn_80177004[];
-extern u8 fn_8017707C[];
-extern u8 fn_801773F4[];
-extern u8 fn_801774F0[];
-extern u8 fn_801775EC[];
-extern u8 fn_80177760[];
+extern u8 cameraMoveEndCheck[];
+extern u8 cameraReturn[];
+extern u8 cameraMoveRotationXYZ[];
+extern u8 cameraMovePositionXYZ[];
+extern u8 cameraMoveTargetXYZ[];
+extern u8 cameraMoveTarget[];
 extern u8 cameraSetTarget[];
 extern u8 cameraUpdate[];
 extern u8 fn_80181478[];
@@ -93910,10 +93910,10 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)cameraSetTarget),
     (void*)0x01010000,
     (void*)0x00000000,
-    (void*)((u8*)fn_8017697C),
+    (void*)((u8*)cameraSetTargetPosXYZ),
     (void*)0x02020200,
     (void*)0x00000000,
-    (void*)((u8*)fn_801769B0),
+    (void*)((u8*)cameraSetTargetOfsXYZ),
     (void*)0x02020200,
     (void*)0x00000000,
     (void*)((u8*)fn_80176948),
@@ -93940,7 +93940,7 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)cameraSetAnimeRate),
     (void*)0x01000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_80177760),
+    (void*)((u8*)cameraMoveTarget),
     (void*)0x01010102,
     (void*)0x00000000,
     (void*)((u8*)cameraUpdate),
@@ -94216,10 +94216,10 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)fn_801658FC),
     (void*)0x01010101,
     (void*)0x00000000,
-    (void*)((u8*)fn_801774F0),
+    (void*)((u8*)cameraMovePositionXYZ),
     (void*)0x01020202,
     (void*)0x02000000,
-    (void*)((u8*)fn_801773F4),
+    (void*)((u8*)cameraMoveRotationXYZ),
     (void*)0x01020202,
     (void*)0x02000000,
     (void*)((u8*)fn_80097BBC),
@@ -94264,7 +94264,7 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)fn_80188984),
     (void*)0x01010100,
     (void*)0x00000000,
-    (void*)((u8*)fn_801775EC),
+    (void*)((u8*)cameraMoveTargetXYZ),
     (void*)0x01020202,
     (void*)0x02000000,
     (void*)((u8*)fn_801CA4F8),
@@ -94276,7 +94276,7 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)scriptGetPokemonNickName),
     (void*)0x01000000,
     (void*)0x00000000,
-    (void*)((u8*)fn_80177004),
+    (void*)((u8*)cameraMoveEndCheck),
     (void*)0x01000000,
     (void*)0x00000000,
     (void*)((u8*)fn_8011416C),
@@ -94333,7 +94333,7 @@ void* lbl_802E1CF0[742] = {
     (void*)((u8*)fn_801821B8),
     (void*)0x01010200,
     (void*)0x00000000,
-    (void*)((u8*)fn_8017707C),
+    (void*)((u8*)cameraReturn),
     (void*)0x02010000,
     (void*)0x00000000,
     (void*)((u8*)fn_8011393C),

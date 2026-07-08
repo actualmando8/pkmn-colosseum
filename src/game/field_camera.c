@@ -274,9 +274,9 @@ extern void GSmtxMakeYRotation(void*, f32);
 extern void GSvecTransform(void*, void*, void*);
 extern void GSvecAdd(void*, void*, void*);
 extern f64 atan2(f32, f32);
-extern void fn_801776E8(u32, void*, f32);
-extern void fn_80177574(u32, void*, f32);
-extern void fn_80177478(u32, void*, f32);
+extern void cameraMoveTargetPos(u32, void*, f32);
+extern void cameraMovePosition(u32, void*, f32);
+extern void cameraMoveRotation(u32, void*, f32);
 extern void GSgappTerminate(void);
 extern void GSgappCreate(void);
 void fn_801176C8(void);
@@ -1591,9 +1591,9 @@ extern void GSmtxMakeYRotation(void*, f32);
 extern void GSvecTransform(void*, void*, void*);
 extern void GSvecAdd(void*, void*, void*);
 extern f64 atan2(f32, f32);
-extern void fn_801776E8(u32, void*, f32);
-extern void fn_80177574(u32, void*, f32);
-extern void fn_80177478(u32, void*, f32);
+extern void cameraMoveTargetPos(u32, void*, f32);
+extern void cameraMovePosition(u32, void*, f32);
+extern void cameraMoveRotation(u32, void*, f32);
 extern u8 lbl_8047AD71;
 extern u32 lbl_8047AD68;
 extern u32 lbl_8047AD6C;
@@ -1650,9 +1650,9 @@ void fn_80117330(f32 arg) {
     *(f32*)(&mat[0x10]) = z;
     *(f32*)(&mat[0xC]) = -(f32)atan2(x, y);
     *(f32*)(&mat[0x14]) = lbl_8047CFD0;
-    fn_801776E8(0, pos, arg);
-    fn_80177574(0, rot, arg);
-    fn_80177478(0, &mat[0xC], arg);
+    cameraMoveTargetPos(0, pos, arg);
+    cameraMovePosition(0, rot, arg);
+    cameraMoveRotation(0, &mat[0xC], arg);
 }
 #pragma pop
 #endif

@@ -193,7 +193,7 @@ extern u32  savedataGetStatus(u32 a, u32 b); /* RNG or calendar read */
 extern void fn_801909A8(u32 a, u32 b, u32 c, u32 d, u32 e, u32 f); /* Calendar/RTC set */
 extern void GSvtrLoadTexture(void);    /* Card system tick */
 extern void fn_8010C220(void);    /* Effect system tick */
-extern void fn_80179BEC(void);    /* World/map system init */
+extern void cameraInit(void);    /* World/map system init */
 extern void fn_8013024C(void);    /* 3D model system init */
 extern void fn_8018E920(u32 a);   /* Pokemon data/model init */
 extern void fn_801ED388(void);    /* GBA link init */
@@ -230,7 +230,7 @@ extern void fn_80101D8C(void);       /* GX render flush */
 extern void fn_80101D5C(void);       /* GX render end */
 extern void fn_800D361C(u8 mode);    /* GSgfx set draw mode */
 extern void fn_800D30F0(u32 flag);   /* GSgfx swap buffers */
-extern void fn_80175F6C(void);       /* World/scene render tick */
+extern void GSgfxCaptureUpdate(void);       /* World/scene render tick */
 
 extern void fn_801E0FB4(s32 unk, u32 a, u32 b); /* Save/card per-frame update */
 
@@ -806,7 +806,7 @@ void fn_80005AAC(void) {
     fn_8000609C();
 
     /* Initialize world/map system */
-    fn_80179BEC();
+    cameraInit();
 
     /* Initialize 3D model system */
     fn_8013024C();
@@ -926,7 +926,7 @@ void fn_80005D80(void) {
     fn_800D30F0(0);
 
     /* Tick world/scene renderer */
-    fn_80175F6C();
+    GSgfxCaptureUpdate();
 
     /* Update save/card system based on lbl_80478820 flag */
     if (lbl_80478820 == 0) {

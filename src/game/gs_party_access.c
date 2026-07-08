@@ -405,8 +405,8 @@ u32 fn_8000C06C(void) {
 
 /* fn_8000C0DC - 0x8000C0DC | size: 0x68 */
 extern u32 fn_80175FFC(void);
-extern void fn_80176004(void);
-extern void fn_80176030(u32 val);
+extern void GSgfxCaptureMovieStop(void);
+extern void GSgfxCaptureMovieStart(u32 val);
 extern u8 lbl_8047A298;
 extern u8 lbl_8047A299;
 #if 0
@@ -417,15 +417,15 @@ asm void fn_8000C0DC(void) {
 void fn_8000C0DC(void) {
     if (lbl_8047A298 == 0) { return; }
     if ((u8)fn_80175FFC() == 1) {
-        fn_80176004();
+        GSgfxCaptureMovieStop();
         return;
     }
     if (lbl_8047A299 == 0) {
-        fn_80176030(0);
+        GSgfxCaptureMovieStart(0);
         return;
     }
     if (lbl_8047A299 == 1) {
-        fn_80176030(1);
+        GSgfxCaptureMovieStart(1);
     }
 }
 #endif
@@ -443,7 +443,7 @@ asm void fn_8000C144(void) {
 #pragma peephole off
 u32 fn_8000C144(void) {
     extern u32 fn_80175FFC(void);
-    extern void fn_80176004(void);
+    extern void GSgfxCaptureMovieStop(void);
     extern u32 fn_801E11CC(void);
     extern void fn_801E11D4(u32 a, u8 b);
     extern u8 lbl_8047A298;
@@ -454,7 +454,7 @@ u32 fn_8000C144(void) {
     } else {
         lbl_8047A298 = 0;
         if ((u8)fn_80175FFC() == 1) {
-            fn_80176004();
+            GSgfxCaptureMovieStop();
         }
     }
     fn_801E11D4(fn_801E11CC(), lbl_8047A298);
@@ -474,7 +474,7 @@ asm void fn_8000C1A8(void) {
 #pragma peephole off
 u32 fn_8000C1A8(void) {
     extern u32 fn_80175FFC(void);
-    extern void fn_80176004(void);
+    extern void GSgfxCaptureMovieStop(void);
     extern u32 fn_801E11CC(void);
     extern void fn_801E11D4(u32 a, u8 b);
     extern u8 lbl_8047A298;
@@ -485,7 +485,7 @@ u32 fn_8000C1A8(void) {
     } else {
         lbl_8047A298 = 0;
         if ((u8)fn_80175FFC() == 1) {
-            fn_80176004();
+            GSgfxCaptureMovieStop();
         }
     }
     fn_801E11D4(fn_801E11CC(), lbl_8047A298);
