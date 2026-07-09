@@ -2771,9 +2771,9 @@ u32 fightTrainerAiWazaValueKanasibari(void* ctx, u32 param1, u32 param2, u32 par
 
 /* Address: 0x80242730 | Size: 0x170 (368 bytes) */
 u32 fightTrainerAiWazaValueMitizure(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern f32 lbl_8047E630;
-    extern f32 lbl_8047E638;
-    extern f32 lbl_8047E63C;
+    extern const f32 lbl_8047E630;
+    extern const f32 lbl_8047E638;
+    extern const f32 lbl_8047E63C;
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u8 fn_802373B0(void*, u32, s32, f32);
     extern u32 fn_80239984(u32, void*, u32);
@@ -2915,7 +2915,7 @@ u32 fightTrainerAiWazaValueAnkooru(void* ctx, u32 param1, u32 param2, u32 param3
 
 /* Address: 0x80242DB0 | Size: 0x9C */
 u32 fightTrainerAiWazaValueIkarinomaeba(void* ctx, u32 param1, u32 param2, u32 extra) {
-    extern f32 lbl_8047E630;
+    extern const f32 lbl_8047E630;
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u8 fn_802373B0(void*, u32, s32, f32);
     extern u32 fn_80239984(u32, void*, u32);
@@ -4715,7 +4715,7 @@ u32 fightTrainerAiWazaValueNemuru(void* ctx, u32 param1, u32 param2, u32 param3)
 
 /* Address: 0x80245718 | Size: 0x98 */
 u32 fightTrainerAiWazaValueKaihuku2(void* ctx, u32 param1, u32 param2) {
-    extern f32 lbl_8047E630;
+    extern const f32 lbl_8047E630;
     extern u32 fightOutPokemonGetPokemonPtr(u32);
     extern u8 fn_802373B0(void*, u32, s32, f32);
     extern u32 fn_80239984(u32, void*, u32);
