@@ -188,9 +188,11 @@ asm void msgctrlMenuMoney(void) {
 }
 #else
 #pragma peephole off
+#pragma scheduling on
 void msgctrlMenuMoney(void) {
     _msgctrlMakeDigit__FPUslUll(lbl_80426FF0, 0x10, lbl_8047AE94, 4);
 }
+#pragma scheduling off
 #pragma peephole on
 #endif
 
@@ -202,9 +204,11 @@ asm void msgctrlMenuFullDigit(void) {
 }
 #else
 #pragma peephole off
+#pragma scheduling on
 void msgctrlMenuFullDigit(void) {
     _msgctrlMakeDigit__FPUslUll(lbl_80427010, 0x10, lbl_8047AE68, 5);
 }
+#pragma scheduling off
 #pragma peephole on
 #endif
 
@@ -274,9 +278,11 @@ asm void msgctrlMoney(void) {
 }
 #else
 #pragma peephole off
+#pragma scheduling on
 void msgctrlMoney(void) {
     _msgctrlMakeDigit__FPUslUll(lbl_80427070, 0x10, lbl_8047AE80, 4);
 }
+#pragma scheduling off
 #pragma peephole on
 #endif
 
@@ -288,9 +294,11 @@ asm void msgctrlMenuZDigit2(void) {
 }
 #else
 #pragma peephole off
+#pragma scheduling on
 void msgctrlMenuZDigit2(void) {
     _msgctrlMakeDigit__FPUslUll(lbl_80427090, 0x10, lbl_8047AE6C, 2);
 }
+#pragma scheduling off
 #pragma peephole on
 #endif
 
@@ -302,9 +310,11 @@ asm void msgctrlMenuZDigit(void) {
 }
 #else
 #pragma peephole off
+#pragma scheduling on
 void msgctrlMenuZDigit(void) {
     _msgctrlMakeDigit__FPUslUll(lbl_804270B0, 0x10, lbl_8047AE68, 2);
 }
+#pragma scheduling off
 #pragma peephole on
 #endif
 
@@ -316,9 +326,11 @@ asm void msgctrlMenuHex2(void) {
 }
 #else
 #pragma peephole off
+#pragma scheduling on
 void msgctrlMenuHex2(void) {
     _msgctrlMakeDigit__FPUslUll(lbl_804270D0, 0x10, lbl_8047AE68, 3);
 }
+#pragma scheduling off
 #pragma peephole on
 #endif
 
@@ -330,9 +342,11 @@ asm void msgctrlMenuHex(void) {
 }
 #else
 #pragma peephole off
+#pragma scheduling on
 void msgctrlMenuHex(void) {
     _msgctrlMakeDigit__FPUslUll(lbl_804270F0, 0x10, lbl_8047AE68, 3);
 }
+#pragma scheduling off
 #pragma peephole on
 #endif
 
@@ -344,9 +358,11 @@ asm void msgctrlMenuUDigit2(void) {
 }
 #else
 #pragma peephole off
+#pragma scheduling on
 void msgctrlMenuUDigit2(void) {
     _msgctrlMakeDigit__FPUslUll(lbl_80427110, 0x10, lbl_8047AE6C, 1);
 }
+#pragma scheduling off
 #pragma peephole on
 #endif
 
@@ -358,9 +374,11 @@ asm void msgctrlMenuUDigit(void) {
 }
 #else
 #pragma peephole off
+#pragma scheduling on
 void msgctrlMenuUDigit(void) {
     _msgctrlMakeDigit__FPUslUll(lbl_80427130, 0x10, lbl_8047AE68, 1);
 }
+#pragma scheduling off
 #pragma peephole on
 #endif
 
@@ -664,6 +682,7 @@ asm void msgctrlClientnowork(void) {
 #else
 #pragma push
 #pragma peephole off
+#pragma scheduling on
 #pragma push
 #pragma optimization_level 1
 void msgctrlClientnowork(void) {
@@ -688,6 +707,7 @@ void msgctrlClientnowork(void) {
     }
 }
 #pragma pop
+#pragma scheduling off
 #pragma pop
 #endif
 
@@ -744,6 +764,7 @@ asm void msgctrlTsuikaMons(void) {
 #else
 #pragma push
 #pragma peephole off
+#pragma scheduling on
 #pragma push
 #pragma optimization_level 1
 void msgctrlTsuikaMons(void) {
@@ -768,6 +789,7 @@ void msgctrlTsuikaMons(void) {
     }
 }
 #pragma pop
+#pragma scheduling off
 #pragma pop
 #endif
 
@@ -780,6 +802,7 @@ asm void msgctrlClientMos(void) {
 #else
 #pragma push
 #pragma peephole off
+#pragma scheduling on
 #pragma push
 #pragma optimization_level 1
 void msgctrlClientMos(void) {
@@ -804,6 +827,7 @@ void msgctrlClientMos(void) {
     }
 }
 #pragma pop
+#pragma scheduling off
 #pragma pop
 #endif
 
@@ -816,6 +840,7 @@ asm void msgctrlDeffenceMons(void) {
 #else
 #pragma push
 #pragma peephole off
+#pragma scheduling on
 #pragma push
 #pragma optimization_level 1
 void msgctrlDeffenceMons(void) {
@@ -840,6 +865,7 @@ void msgctrlDeffenceMons(void) {
     }
 }
 #pragma pop
+#pragma scheduling off
 #pragma pop
 #endif
 
@@ -852,6 +878,7 @@ asm void msgctrlAttackMons(void) {
 #else
 #pragma push
 #pragma peephole off
+#pragma scheduling on
 #pragma push
 #pragma optimization_level 1
 void msgctrlAttackMons(void) {
@@ -876,6 +903,7 @@ void msgctrlAttackMons(void) {
     }
 }
 #pragma pop
+#pragma scheduling off
 #pragma pop
 #endif
 
@@ -926,9 +954,11 @@ asm void msgctrlMenuDigit2(void) {
 }
 #else
 #pragma peephole off
+#pragma scheduling on
 void msgctrlMenuDigit2(void) {
     _msgctrlMakeDigit__FPUslUll(lbl_80427150, 0x10, lbl_8047AE6C, 0);
 }
+#pragma scheduling off
 #pragma peephole on
 #endif
 
@@ -940,9 +970,11 @@ asm void msgctrlMenuDigit(void) {
 }
 #else
 #pragma peephole off
+#pragma scheduling on
 void msgctrlMenuDigit(void) {
     _msgctrlMakeDigit__FPUslUll(lbl_80427170, 0x10, lbl_8047AE68, 0);
 }
+#pragma scheduling off
 #pragma peephole on
 #endif
 
@@ -966,9 +998,11 @@ asm void msgctrlDigit2(void) {
 }
 #else
 #pragma peephole off
+#pragma scheduling on
 void msgctrlDigit2(void) {
     _msgctrlMakeDigit__FPUslUll(lbl_80427190, 0x10, lbl_8047AE58, 0);
 }
+#pragma scheduling off
 #pragma peephole on
 #endif
 
@@ -980,9 +1014,11 @@ asm void msgctrlDigit(void) {
 }
 #else
 #pragma peephole off
+#pragma scheduling on
 void msgctrlDigit(void) {
     _msgctrlMakeDigit__FPUslUll(lbl_804271B0, 0x10, lbl_8047AE54, 0);
 }
+#pragma scheduling off
 #pragma peephole on
 #endif
 
@@ -1114,6 +1150,10 @@ s32 msgctrlColor(EffectUtilCommandObj* obj) {
 
 
 /* 0x801325C4 | 0x68 -- read byte command into u16 field and apply */
+#pragma push
+#pragma optimization_level 4
+#pragma peephole off
+#pragma scheduling on
 s32 msgctrlFont(EffectUtilCommandObj* obj) {
     u8* stream;
 
@@ -1130,6 +1170,8 @@ s32 msgctrlFont(EffectUtilCommandObj* obj) {
     obj->stream = stream + 1;
     return 0;
 }
+#pragma scheduling off
+#pragma pop
 
 
 /* 0x8013262C | 16 bytes | set_field_return */
@@ -1170,39 +1212,39 @@ s32 msgctrlRubyStart(EffectUtilCommandObj* obj) {
 /* 0x80132690 | 0xCC -- effect tick with flag-based logic */
 #pragma push
 #pragma peephole off
-u32 msgctrlKeyWait(void* obj) {
+#pragma scheduling on
+u32 msgctrlKeyWait(EffectUtilCommandObj* obj) {
     extern void fn_80166A28(u32);
-    u8* p = (u8*)obj;
+    u8* stream;
+    u8 done;
 
-    /* Check flag bit 1 at offset 0x44 */
-    if (p[0x44] & 0x02) {
-        p[0x45] = 1;
+    if (obj->flags & 0x02) {
+        obj->pendingFlag = 1;
     }
-    /* If scene object 0xA is active, clear the flag */
     if ((u32)(menuIsCheck(0x0A) & 0xFF) != 0) {
-        p[0x45] = 0;
+        obj->pendingFlag = 0;
     }
 
-    if (p[0x01] == 0) {
-        /* Not active */
-        if (p[0x45] != 0) {
-            p[0x45] = 0;
-            *(u32*)(p + 0x2C) = *(u32*)(p + 0x30);
-            if ((p[0x44] & 0x02) == 0) {
+    if (obj->activeFlag == 0) {
+        if (obj->pendingFlag != 0) {
+            obj->pendingFlag = 0;
+            obj->savedStream = obj->stream;
+            if ((obj->flags & 0x02) == 0) {
                 fn_80166A28(0x24);
             }
         } else {
-            /* No trigger: rewind stream by 3, mark done */
-            *(u32*)(p + 0x30) = *(u32*)(p + 0x30) - 3;
-            *(u8*)(p + 0x46) = 1;
+            stream = obj->stream;
+            done = 1;
+            obj->stream = stream - 3;
+            obj->doneFlag = done;
         }
     } else {
-        /* Active: copy position floats */
-        *(f32*)(p + 0x0C) = *(f32*)(p + 0x04);
-        *(f32*)(p + 0x10) = *(f32*)(p + 0x08);
+        obj->field_0C = obj->field_04;
+        obj->field_10 = obj->field_08;
     }
     return 1;
 }
+#pragma scheduling off
 #pragma pop
 
 
@@ -1213,21 +1255,22 @@ asm void msgctrlKeyEnd(void) {
 }
 #else
 #pragma peephole off
-u32 msgctrlKeyEnd(void* obj) {
-    u8* p = (u8*)obj;
-    if (p[0x44] & 0x02) {
-        p[0x45] = 1;
+#pragma scheduling on
+u32 msgctrlKeyEnd(EffectUtilCommandObj* obj) {
+    if (obj->flags & 0x02) {
+        obj->pendingFlag = 1;
     }
     if ((u32)(menuIsCheck(0x0A) & 0xFF) != 0) {
-        p[0x45] = 0;
+        obj->pendingFlag = 0;
     }
-    if (p[0x45] != 0) {
-        p[0x45] = 0;
+    if (obj->pendingFlag != 0) {
+        obj->pendingFlag = 0;
     } else {
-        *(u32*)(p + 0x30) = *(u32*)(p + 0x30) - 3;
+        obj->stream = obj->stream - 3;
     }
     return 1;
 }
+#pragma scheduling off
 #pragma peephole on
 #endif
 
@@ -1398,6 +1441,7 @@ asm void msgctrlSetValue(void) {
 #else
 #pragma push
 #pragma peephole off
+#pragma scheduling on
 void msgctrlSetValue(u32 id, u32 value) {
     switch (id) {
     case 0x0D: lbl_8047AE50 = (u16)value; return;
@@ -1460,6 +1504,7 @@ void msgctrlSetValue(u32 id, u32 value) {
     case 0x5D: lbl_8047AE4C = value; return;
     }
 }
+#pragma scheduling off
 #pragma pop
 #endif
 

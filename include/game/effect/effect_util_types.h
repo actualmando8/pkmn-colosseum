@@ -143,9 +143,14 @@ typedef struct EffectUtilCommandObj {
     /* 0x01 */ u8 activeFlag;
     /* 0x02 */ u8 field_02;
     /* 0x03 */ u8 field_03;
-    /* 0x04 */ u8 pad_04[0x1C];
+    /* 0x04 */ f32 field_04;
+    /* 0x08 */ f32 field_08;
+    /* 0x0C */ f32 field_0C;
+    /* 0x10 */ f32 field_10;
+    /* 0x14 */ u8 pad_14[0x0C];
     /* 0x20 */ u16 commandValue;
-    /* 0x22 */ u8 pad_22[2];
+    /* 0x22 */ u8 pad_22;
+    /* 0x23 */ u8 field_23;
     /* 0x24 */ u32 colorRgba;
     /* 0x28 */ u8 pad_28[4];
     /* 0x2C */ u8* savedStream;
@@ -161,6 +166,8 @@ typedef struct EffectUtilCommandObj {
     /* 0x48 */ s16 waitCounter;
     /* 0x4A */ u8 alignMode;
     /* 0x4B */ u8 field_4B;
+    /* 0x4C */ u8 pad_4C[0x18];
+    /* 0x64 */ f32 field_64;
 } EffectUtilCommandObj;
 
 /* lbl_803635C0 (GSEffectGlobals) is only used by fn_8013151C, which was
