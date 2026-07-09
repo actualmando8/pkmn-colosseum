@@ -3582,36 +3582,42 @@ u8 fightOutPokemonGetFightOutPokemonEnemyOumuWazaDataIdAry(void* context, u16* o
 }
 
 /* 0x80201340 | size: 0xC0 */
+typedef struct FightOutPokemonEnemyEntry {
+    u8 bytes[0xC];
+} FightOutPokemonEnemyEntry;
+
+typedef struct FightOutPokemonEnemyList {
+    FightOutPokemonEnemyEntry entries[4];
+} FightOutPokemonEnemyList;
+
 void fightOutPokemonSetOumuWazaDataId(void* context, void* target, u16 value) {
     extern void fightOutPokemonEnemyBiosSetOumuWazaDataId(void* entry, u16 val);
     extern void* fightOutPokemonEnemySearchAry(void* data, u32 mode, void* key);
     extern u8 fightOutPokemonEnemyCheckValid(void* entry);
-    u8* data;
-    u8* entry;
-    u32 offset;
+    FightOutPokemonEnemyList* enemies;
+    FightOutPokemonEnemyEntry* entry;
     u32 i;
 
     if (context == NULL) {
         return;
     }
     pokemonSetStatus(context, 0, 0xF7, 0, value);
-    data = (u8*)pokemonGetStatus(context, 0, 0x122, 0);
+    enemies = (FightOutPokemonEnemyList*)pokemonGetStatus(context, 0, 0x122, 0);
     if (target != NULL) {
-        if (fightOutPokemonEnemySearchAry((void*)data, 4, target) == NULL) {
+        entry = (FightOutPokemonEnemyEntry*)fightOutPokemonEnemySearchAry(enemies, 4, target);
+        if (entry == NULL) {
             return;
         }
-        fightOutPokemonEnemyBiosSetOumuWazaDataId(fightOutPokemonEnemySearchAry((void*)data, 4, target), value);
+        fightOutPokemonEnemyBiosSetOumuWazaDataId(entry, value);
         return;
     }
     i = 0;
-    offset = 0;
     do {
-        entry = data + offset;
-        if ((u8)fightOutPokemonEnemyCheckValid((void*)entry) != 0) {
-            fightOutPokemonEnemyBiosSetOumuWazaDataId((void*)entry, value);
+        entry = &enemies->entries[i];
+        if ((u8)fightOutPokemonEnemyCheckValid(entry) != 0) {
+            fightOutPokemonEnemyBiosSetOumuWazaDataId(entry, value);
         }
         i++;
-        offset += 0xC;
     } while (i < 4);
 }
 
