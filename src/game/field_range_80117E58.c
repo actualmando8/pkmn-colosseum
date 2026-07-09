@@ -61,6 +61,19 @@ extern u32 lbl_80478B48;  /* NPC count (SDA) */
 extern u32 lbl_80478B50;  /* field obj count (SDA) */
 extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
 extern u32 lbl_80478F94;  /* obj data base (SDA) */
+
+typedef struct FieldStatusEntry {
+    u16 id;
+    u16 sub_id;
+    u8 byte4;
+    u8 byte5;
+    u8 count;
+    u8 pad7;
+    u32 value;
+    u16 half_c;
+    u16 pad_e;
+} FieldStatusEntry;
+
 /* Field subsystems -- forward declarations (defined below) */
 u32  _unloadFlare__FPvUlUl(void);
 u32 floorDataBiosGetFileGroupID(u8* entry);
@@ -1114,7 +1127,7 @@ extern s32 fn_8011B130(void* obj, u16 val);
 extern void fn_8011B2C0(void* obj, u16 id, u16 arg3);
 extern s32 fn_8011B444(void* obj, u16 val);
 extern s32 fn_8011B67C(void* obj, u16 val);
-extern void fn_8011B788(void* obj, u16 id);
+extern void fn_8011B788(u8* obj, u16 id);
 extern void fn_8011B950(u8* base, u16 count);
 extern u32 fn_8011BA0C(u8 type);
 extern u32 wazaIsWazaTypeId(u32 key, u8 target);
@@ -1434,73 +1447,87 @@ extern u32 heroMoveGetResID(u32* out_zero, u32* out_val, s32 index);
 u32 fn_80118068(void) { return 0; }
 /* Address: 0x80119F90 | Size: 0x10 | Pattern: nullcheck_setter */
 void fn_80119F90(u8* ptr, u16 val) {
-    if (ptr == NULL) { return; }
-    *(u16*)(&ptr[0xC]) = val;
+    FieldStatusEntry* entry = (FieldStatusEntry*)ptr;
+    if (entry == NULL) { return; }
+    entry->half_c = val;
 }
 /* Address: 0x80119FA0 | Size: 0x10 | Pattern: nullcheck_setter */
 void fn_80119FA0(u8* ptr, u32 val) {
-    if (ptr == NULL) { return; }
-    *(u32*)(&ptr[0x8]) = val;
+    FieldStatusEntry* entry = (FieldStatusEntry*)ptr;
+    if (entry == NULL) { return; }
+    entry->value = val;
 }
 /* Address: 0x80119FB0 | Size: 0x10 | Pattern: nullcheck_setter */
 void fn_80119FB0(u8* ptr, u8 val) {
-    if (ptr == NULL) { return; }
-    *(u8*)(&ptr[0x6]) = val;
+    FieldStatusEntry* entry = (FieldStatusEntry*)ptr;
+    if (entry == NULL) { return; }
+    entry->count = val;
 }
 /* Address: 0x80119FC0 | Size: 0x10 | Pattern: nullcheck_setter */
 void fn_80119FC0(u8* ptr, u8 val) {
-    if (ptr == NULL) { return; }
-    *(u8*)(&ptr[0x5]) = val;
+    FieldStatusEntry* entry = (FieldStatusEntry*)ptr;
+    if (entry == NULL) { return; }
+    entry->byte5 = val;
 }
 /* Address: 0x80119FD0 | Size: 0x10 | Pattern: nullcheck_setter */
 void fn_80119FD0(u8* ptr, u8 val) {
-    if (ptr == NULL) { return; }
-    *(u8*)(&ptr[0x4]) = val;
+    FieldStatusEntry* entry = (FieldStatusEntry*)ptr;
+    if (entry == NULL) { return; }
+    entry->byte4 = val;
 }
 /* Address: 0x80119FE0 | Size: 0x10 | Pattern: nullcheck_setter */
 void fn_80119FE0(u8* ptr, u16 val) {
-    if (ptr == NULL) { return; }
-    *(u16*)(&ptr[0x2]) = val;
+    FieldStatusEntry* entry = (FieldStatusEntry*)ptr;
+    if (entry == NULL) { return; }
+    entry->sub_id = val;
 }
 /* Address: 0x80119FF0 | Size: 0x10 | Pattern: nullcheck_setter */
 void fn_80119FF0(u8* ptr, u16 val) {
-    if (ptr == NULL) { return; }
-    *(u16*)(&ptr[0x0]) = val;
+    FieldStatusEntry* entry = (FieldStatusEntry*)ptr;
+    if (entry == NULL) { return; }
+    entry->id = val;
 }
 /* Address: 0x8011A000 | Size: 0x18 | Pattern: nullcheck_getter */
 u16 fn_8011A000(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u16*)(&ptr[0xC]);
+    FieldStatusEntry* entry = (FieldStatusEntry*)ptr;
+    if (entry == NULL) { return 0; }
+    return entry->half_c;
 }
 /* Address: 0x8011A018 | Size: 0x18 | Pattern: nullcheck_getter */
 u32 fn_8011A018(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u32*)(&ptr[0x8]);
+    FieldStatusEntry* entry = (FieldStatusEntry*)ptr;
+    if (entry == NULL) { return 0; }
+    return entry->value;
 }
 /* Address: 0x8011A030 | Size: 0x18 | Pattern: nullcheck_getter */
 u8 fn_8011A030(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x6]);
+    FieldStatusEntry* entry = (FieldStatusEntry*)ptr;
+    if (entry == NULL) { return 0; }
+    return entry->count;
 }
 /* Address: 0x8011A048 | Size: 0x18 | Pattern: nullcheck_getter */
 u8 fn_8011A048(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x5]);
+    FieldStatusEntry* entry = (FieldStatusEntry*)ptr;
+    if (entry == NULL) { return 0; }
+    return entry->byte5;
 }
 /* Address: 0x8011A060 | Size: 0x18 | Pattern: nullcheck_getter */
 u8 fn_8011A060(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x4]);
+    FieldStatusEntry* entry = (FieldStatusEntry*)ptr;
+    if (entry == NULL) { return 0; }
+    return entry->byte4;
 }
 /* Address: 0x8011A078 | Size: 0x18 | Pattern: nullcheck_getter */
 u16 fn_8011A078(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u16*)(&ptr[0x2]);
+    FieldStatusEntry* entry = (FieldStatusEntry*)ptr;
+    if (entry == NULL) { return 0; }
+    return entry->sub_id;
 }
 /* Address: 0x8011A090 | Size: 0x18 | Pattern: nullcheck_getter */
 u16 fn_8011A090(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u16*)(&ptr[0x0]);
+    FieldStatusEntry* entry = (FieldStatusEntry*)ptr;
+    if (entry == NULL) { return 0; }
+    return entry->id;
 }
 /* 0x80117E58 | 0x1C8 */
 extern u32 lbl_8047AD80;
@@ -2216,8 +2243,8 @@ void fn_8011A280(u8* arg1, u16 arg2, u32 arg3) {
     if (arg2 != 0) { goto body_start; }
     flag = 0; goto flag_check;
 body_start:
-    idx = fn_80119E90(arg2);
-    base = fn_80119F10(arg2);
+    idx = (u8)fn_80119E90(arg2);
+    base = (0, fn_80119F10(arg2));
     base = statusGetStatus(base, arg1, 0, fn_80119ED0(arg2), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
@@ -2341,8 +2368,8 @@ void fn_8011A570(u8* arg1, u16 arg2, u32 arg3) {
     if (arg2 != 0) { goto body_start; }
     flag = 0; goto flag_check;
 body_start:
-    idx = fn_80119E90(arg2);
-    base = fn_80119F10(arg2);
+    idx = (u8)fn_80119E90(arg2);
+    base = (0, fn_80119F10(arg2));
     base = statusGetStatus(base, arg1, 0, fn_80119ED0(arg2), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
@@ -2395,7 +2422,7 @@ s32 fn_8011A6D4(void* obj, u16 val) {
     extern u32 fn_80119ED0(u16 val);
     extern u8* statusGetStatus(u8* a, void* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
-    extern void fn_8011A000(u8* ptr);
+    extern s32 fn_8011A000(u8* ptr);
     u8* base;
     u16 idx;
     u8 flag;
@@ -2404,8 +2431,8 @@ s32 fn_8011A6D4(void* obj, u16 val) {
     if (val != 0) { goto body_start; }
     flag = 0; goto flag_check;
 body_start:
-    idx = fn_80119E90(val);
-    base = fn_80119F10(val);
+    idx = (u8)fn_80119E90(val);
+    base = (0, fn_80119F10(val));
     base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
@@ -2442,10 +2469,10 @@ flag_check:
 p2_offset:
     base = base + idx * 16;
 p2_check:
-    if (base != NULL) {
-        fn_8011A000(base);
-    }
+    if (base != NULL) { goto p2_return; }
     return 0;
+p2_return:
+    return fn_8011A000(base);
 }
 /* 0x8011A860 | 0x18C */
 s32 fn_8011A860(void* obj, u16 val) {
@@ -2454,7 +2481,7 @@ s32 fn_8011A860(void* obj, u16 val) {
     extern u32 fn_80119ED0(u16 val);
     extern u8* statusGetStatus(u8* a, void* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
-    extern void fn_8011A078(u8* ptr);
+    extern s32 fn_8011A078(u8* ptr);
     u8* base;
     u16 idx;
     u8 flag;
@@ -2463,8 +2490,8 @@ s32 fn_8011A860(void* obj, u16 val) {
     if (val != 0) { goto body_start; }
     flag = 0; goto flag_check;
 body_start:
-    idx = fn_80119E90(val);
-    base = fn_80119F10(val);
+    idx = (u8)fn_80119E90(val);
+    base = (0, fn_80119F10(val));
     base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
@@ -2501,10 +2528,10 @@ flag_check:
 p2_offset:
     base = base + idx * 16;
 p2_check:
-    if (base != NULL) {
-        fn_8011A078(base);
-    }
+    if (base != NULL) { goto p2_return; }
     return 0;
+p2_return:
+    return fn_8011A078(base);
 }
 /* 0x8011A9EC | 0x164 */
 #if 0
@@ -2527,8 +2554,8 @@ void fn_8011A9EC(u8* arg1, u16 arg2, u32 arg3) {
     if (arg2 != 0) { goto body_start; }
     flag = 0; goto flag_check;
 body_start:
-    idx = fn_80119E90(arg2);
-    base = fn_80119F10(arg2);
+    idx = (u8)fn_80119E90(arg2);
+    base = (0, fn_80119F10(arg2));
     base = statusGetStatus(base, arg1, 0, fn_80119ED0(arg2), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
@@ -2595,8 +2622,8 @@ void fn_8011AB50(u8* arg1, u16 arg2, u32 arg3) {
     if (arg2 != 0) { goto body_start; }
     flag = 0; goto flag_check;
 body_start:
-    idx = fn_80119E90(arg2);
-    base = fn_80119F10(arg2);
+    idx = (u8)fn_80119E90(arg2);
+    base = (0, fn_80119F10(arg2));
     base = statusGetStatus(base, arg1, 0, fn_80119ED0(arg2), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
@@ -2649,7 +2676,7 @@ s32 fn_8011ACB4(void* obj, u16 val) {
     extern u32 fn_80119ED0(u16 val);
     extern u8* statusGetStatus(u8* a, void* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
-    extern void fn_8011A048(u8* ptr);
+    extern s32 fn_8011A048(u8* ptr);
     u8* base;
     u16 idx;
     u8 flag;
@@ -2658,8 +2685,8 @@ s32 fn_8011ACB4(void* obj, u16 val) {
     if (val != 0) { goto body_start; }
     flag = 0; goto flag_check;
 body_start:
-    idx = fn_80119E90(val);
-    base = fn_80119F10(val);
+    idx = (u8)fn_80119E90(val);
+    base = (0, fn_80119F10(val));
     base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
@@ -2696,10 +2723,10 @@ flag_check:
 p2_offset:
     base = base + idx * 16;
 p2_check:
-    if (base != NULL) {
-        fn_8011A048(base);
-    }
+    if (base != NULL) { goto p2_return; }
     return -1;
+p2_return:
+    return fn_8011A048(base);
 }
 /* 0x8011AE40 | 0x18C */
 s32 fn_8011AE40(void* obj, u16 val) {
@@ -2708,7 +2735,7 @@ s32 fn_8011AE40(void* obj, u16 val) {
     extern u32 fn_80119ED0(u16 val);
     extern u8* statusGetStatus(u8* a, void* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
-    extern void fn_8011A060(u8* ptr);
+    extern s32 fn_8011A060(u8* ptr);
     u8* base;
     u16 idx;
     u8 flag;
@@ -2717,8 +2744,8 @@ s32 fn_8011AE40(void* obj, u16 val) {
     if (val != 0) { goto body_start; }
     flag = 0; goto flag_check;
 body_start:
-    idx = fn_80119E90(val);
-    base = fn_80119F10(val);
+    idx = (u8)fn_80119E90(val);
+    base = (0, fn_80119F10(val));
     base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
@@ -2755,10 +2782,10 @@ flag_check:
 p2_offset:
     base = base + idx * 16;
 p2_check:
-    if (base != NULL) {
-        fn_8011A060(base);
-    }
+    if (base != NULL) { goto p2_return; }
     return -1;
+p2_return:
+    return fn_8011A060(base);
 }
 /* 0x8011AFCC | 0x164 */
 #if 0
@@ -2781,8 +2808,8 @@ void fn_8011AFCC(u8* arg1, u16 arg2, u32 arg3) {
     if (arg2 != 0) { goto body_start; }
     flag = 0; goto flag_check;
 body_start:
-    idx = fn_80119E90(arg2);
-    base = fn_80119F10(arg2);
+    idx = (u8)fn_80119E90(arg2);
+    base = (0, fn_80119F10(arg2));
     base = statusGetStatus(base, arg1, 0, fn_80119ED0(arg2), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
@@ -3083,7 +3110,7 @@ asm void fn_8011B788(void) {
 #include "src/game/gs_field_world_fn_8011B788.inc"
 }
 #else
-void fn_8011B788(void* obj, u16 id) {
+void fn_8011B788(u8* obj, u16 id) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
@@ -3104,8 +3131,8 @@ void fn_8011B788(void* obj, u16 id) {
     if (id != 0) { goto body_start; }
     flag = 0; goto flag_check;
 body_start:
-    idx = fn_80119E90(id);
-    base = fn_80119F10(id);
+    idx = (u8)fn_80119E90(id);
+    base = (0, fn_80119F10(id));
     base = statusGetStatus(base, obj, 0, fn_80119ED0(id), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
@@ -3135,22 +3162,22 @@ flag_check:
 
     idx = fn_80119E90(id);
     base = fn_80119F10(id);
-    base = statusGetStatus(base, obj, 0, fn_80119ED0(id), 0);
-    if (base != NULL) { goto p2_offset; }
-    base = NULL;
+    obj = statusGetStatus(base, obj, 0, fn_80119ED0(id), 0);
+    if (obj != NULL) { goto p2_offset; }
+    obj = NULL;
     goto p2_check;
 p2_offset:
-    base = base + idx * 16;
+    obj = obj + idx * 16;
 p2_check:
-    if (base == NULL) { goto exit; }
-    if (base == NULL) { goto exit; }
-    fn_80119FF0(base, 0);
-    fn_80119FE0(base, 0);
-    fn_80119FD0(base, 0);
-    fn_80119FC0(base, 0);
-    fn_80119FB0(base, 0);
-    fn_80119FA0(base, 0);
-    fn_80119F90(base, 0);
+    if (obj == NULL) { goto exit; }
+    if (obj == NULL) { goto exit; }
+    fn_80119FF0(obj, 0);
+    fn_80119FE0(obj, 0);
+    fn_80119FD0(obj, 0);
+    fn_80119FC0(obj, 0);
+    fn_80119FB0(obj, 0);
+    fn_80119FA0(obj, 0);
+    fn_80119F90(obj, 0);
 
 exit:
     return;
