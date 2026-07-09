@@ -141,8 +141,8 @@ extern void* fn_800E27B0(u16 handle);
 /* Model system */
 extern void  GSmodelGetPart(void* model, u32 param);
 extern void  GSpartFree(void* model, u32 param);
-extern void  fn_800E24B0(void* model, u32 param);
-extern void  fn_800E209C(void* model, u32 param);
+extern void  fn_800E24B0(u16 handle);
+extern void  fn_800E209C(u16 handle);
 extern void  set__5GSvecFfff(void* dst, void* src);
 extern void  GSvecCopy(void* dst, void* src);
 extern void  GSvecAdd(void* model, void* param);
@@ -150,6 +150,8 @@ extern void  __cvt_fp2unsigned(void* param1, void* param2);
 
 /* Floor resource system */
 extern void* GSresGetResource(u16 group, u16 model, u16 param);
+extern void* fightFloorGetNowPtr(void);
+extern s32   fn_80144574(void* arg0, void* arg1, void* arg2, void* arg3, void* arg4);
 
 /* Thread/task system */
 extern void* GSgappCreate(u32 pri, u32 type, void* buf, void* callback);
@@ -183,6 +185,72 @@ typedef struct PeopleFieldEntry {
     /* 0x20 */ f32    scale;
     /* 0x24 */ u32    modelRef;
 } PeopleFieldEntry;
+
+typedef struct ItemParamData {
+    /* 0x00 */ u8  recoveryAndAttackFlags;
+    /* 0x01 */ u8  defenceQuickUp;
+    /* 0x02 */ u8  hitSpAttackUp;
+    /* 0x03 */ u8  statusFlags;
+    /* 0x04 */ u8  miscFlags;
+    /* 0x05 */ s8  friend1Up;
+    /* 0x06 */ s8  friend2Up;
+    /* 0x07 */ s8  friend3Up;
+    /* 0x08 */ u8  hpEffortUp;
+    /* 0x09 */ u8  attackEffortUp;
+    /* 0x0A */ u8  hpUp;
+    /* 0x0B */ u8  ppUp;
+    /* 0x0C */ u8  defenceEffortUp;
+    /* 0x0D */ u8  quickEffortUp;
+    /* 0x0E */ u8  spDefenceEffortUp;
+    /* 0x0F */ u8  spAttackEffortUp;
+} ItemParamData;
+
+typedef struct ItemBiosData {
+    /* 0x00 */ u16 itemDataId;
+    /* 0x02 */ u16 num;
+} ItemBiosData;
+
+typedef struct ItemBallDataBios {
+    /* 0x00 */ u16 fightKoukaDataId;
+    /* 0x02 */ u16 padding_02;
+    /* 0x04 */ u32 inWzxDataId;
+    /* 0x08 */ u32 openWzxDataId;
+    /* 0x0C */ u32 outWzxDataId;
+    /* 0x10 */ u32 downinWzxDataId;
+    /* 0x14 */ u32 throwWzxDataId;
+    /* 0x18 */ u32 snatchAttackWzxDataId;
+    /* 0x1C */ u32 snatchBalllandWzxDataId;
+    /* 0x20 */ u32 snatchMissWzxDataId;
+    /* 0x24 */ u32 snatchPokeoutWzxDataId;
+    /* 0x28 */ u32 snatchShakeWzxDataId;
+    /* 0x2C */ u32 snatchSnatchWzxDataId;
+} ItemBallDataBios;
+
+typedef struct ItemDataBios {
+    /* 0x00 */ u8  kind;
+    /* 0x01 */ u8  important;
+    /* 0x02 */ u8  useful;
+    /* 0x03 */ u8  field_03;
+    /* 0x04 */ u8  itemEffectParam;
+    /* 0x05 */ u8  padding_05;
+    /* 0x06 */ u16 price;
+    /* 0x08 */ u16 coupon;
+    /* 0x0A */ u16 itemSoubiDataId;
+    /* 0x0C */ u16 fightUseKoukaDataId;
+    /* 0x0E */ u16 padding_0E;
+    /* 0x10 */ u32 name;
+    /* 0x14 */ u32 doc;
+    /* 0x18 */ u32 buff;
+    /* 0x1C */ u32 fieldUseFunc;
+    /* 0x20 */ u32 battleUseFunc;
+    /* 0x24 */ s8  useFriend[3];
+    /* 0x27 */ u8  padding_27;
+} ItemDataBios;
+
+typedef struct WazaMachineData {
+    /* 0x00 */ u32 field_00;
+    /* 0x04 */ u32 wazaId;
+} WazaMachineData;
 
 /* ===================================================================
  * DECOMPILED: itemDataBiosGetPtr (aka "peopleFieldGetByIndex" in cross-file
@@ -1394,6 +1462,15 @@ returnSixteen:
     return 0x16;
 }
 #endif
+#pragma optimization_level 4
+s8 itemParamGetFriend3Up(u8* p) {
+    ItemParamData* itemParam;
+
+    itemParam = (ItemParamData*)p;
+    if (itemParam == NULL) return 0;
+    return (s8)((u8)itemParam->friend3Up);
+}
+
 #if 0
 asm void itemParamGetFriend2Up(void) {
 #include "src/game/people/people_data_fn_801436B8.inc"
@@ -2021,3 +2098,338 @@ void itemDataBiosSetName(u8* p, u32 val) {
     *(u32*)(p + 0x10) = val;
 }
 #endif
+
+extern u32 lbl_80478BB8;
+extern u32 lbl_80478BD0;
+extern ItemBallDataBios lbl_80367AF0[];
+extern WazaMachineData lbl_80368018[];
+
+#pragma optimization_level 4
+u32 itemBiosGetNum(u8* p) {
+    ItemBiosData* item;
+
+    item = (ItemBiosData*)p;
+    if (item == NULL) return 0;
+    return item->num;
+}
+
+u32 itemBiosGetItemDataId(u8* p) {
+    ItemBiosData* item;
+
+    item = (ItemBiosData*)p;
+    if (item == NULL) return 0;
+    return item->itemDataId;
+}
+
+u32 itemBallDataBiosGetSnatchSnatchWzxDataId(u8* p) {
+    ItemBallDataBios* ballData;
+
+    ballData = (ItemBallDataBios*)p;
+    if (ballData == NULL) return 0;
+    return ballData->snatchSnatchWzxDataId;
+}
+
+u32 itemBallDataBiosGetSnatchShakeWzxDataId(u8* p) {
+    ItemBallDataBios* ballData;
+
+    ballData = (ItemBallDataBios*)p;
+    if (ballData == NULL) return 0;
+    return ballData->snatchShakeWzxDataId;
+}
+
+u32 itemBallDataBiosGetSnatchPokeoutWzxDataId(u8* p) {
+    ItemBallDataBios* ballData;
+
+    ballData = (ItemBallDataBios*)p;
+    if (ballData == NULL) return 0;
+    return ballData->snatchPokeoutWzxDataId;
+}
+
+u32 itemBallDataBiosGetSnatchMissWzxDataId(u8* p) {
+    ItemBallDataBios* ballData;
+
+    ballData = (ItemBallDataBios*)p;
+    if (ballData == NULL) return 0;
+    return ballData->snatchMissWzxDataId;
+}
+
+u32 itemBallDataBiosGetSnatchBalllandWzxDataId(u8* p) {
+    ItemBallDataBios* ballData;
+
+    ballData = (ItemBallDataBios*)p;
+    if (ballData == NULL) return 0;
+    return ballData->snatchBalllandWzxDataId;
+}
+
+u32 itemBallDataBiosGetSnatchAttackWzxDataId(u8* p) {
+    ItemBallDataBios* ballData;
+
+    ballData = (ItemBallDataBios*)p;
+    if (ballData == NULL) return 0;
+    return ballData->snatchAttackWzxDataId;
+}
+
+u32 itemBallDataBiosGetThrowWzxDataId(u8* p) {
+    ItemBallDataBios* ballData;
+
+    ballData = (ItemBallDataBios*)p;
+    if (ballData == NULL) return 0;
+    return ballData->throwWzxDataId;
+}
+
+u32 itemBallDataBiosGetDowninWzxDataId(u8* p) {
+    ItemBallDataBios* ballData;
+
+    ballData = (ItemBallDataBios*)p;
+    if (ballData == NULL) return 0;
+    return ballData->downinWzxDataId;
+}
+
+u32 itemBallDataBiosGetOutWzxDataId(u8* p) {
+    ItemBallDataBios* ballData;
+
+    ballData = (ItemBallDataBios*)p;
+    if (ballData == NULL) return 0;
+    return ballData->outWzxDataId;
+}
+
+u32 itemBallDataBiosGetOpenWzxDataId(u8* p) {
+    ItemBallDataBios* ballData;
+
+    ballData = (ItemBallDataBios*)p;
+    if (ballData == NULL) return 0;
+    return ballData->openWzxDataId;
+}
+
+u32 itemBallDataBiosGetInWzxDataId(u8* p) {
+    ItemBallDataBios* ballData;
+
+    ballData = (ItemBallDataBios*)p;
+    if (ballData == NULL) return 0;
+    return ballData->inWzxDataId;
+}
+
+u32 itemBallDataBiosGetFightKoukaDataId(u8* p) {
+    ItemBallDataBios* ballData;
+
+    ballData = (ItemBallDataBios*)p;
+    if (ballData == NULL) return 0;
+    return ballData->fightKoukaDataId;
+}
+
+u8* itemBallDataBiosGetPtr(u16 idx) {
+    u16 ballId;
+
+    ballId = idx;
+    if (ballId >= lbl_80478BB8) return NULL;
+    return (u8*)&lbl_80367AF0[ballId];
+}
+
+u32 itemDataBiosGetBattleUseFunc(u8* p) {
+    ItemDataBios* itemData;
+
+    itemData = (ItemDataBios*)p;
+    if (itemData == NULL) return 0;
+    return itemData->battleUseFunc;
+}
+
+u32 itemDataBiosGetFieldUseFunc(u8* p) {
+    ItemDataBios* itemData;
+
+    itemData = (ItemDataBios*)p;
+    if (itemData == NULL) return 0;
+    return itemData->fieldUseFunc;
+}
+
+u32 itemDataBiosGetItemEffectParam(u8* p) {
+    ItemDataBios* itemData;
+
+    itemData = (ItemDataBios*)p;
+    if (itemData == NULL) return 0;
+    return itemData->itemEffectParam;
+}
+
+u32 itemDataBiosGetBuff(u8* p) {
+    ItemDataBios* itemData;
+
+    itemData = (ItemDataBios*)p;
+    if (itemData == NULL) return 0;
+    return itemData->buff;
+}
+
+s32 itemDataBiosGetUseFriend(u8* p, u16 idx) {
+    ItemDataBios* itemData;
+    u16 friendIdx;
+
+    itemData = (ItemDataBios*)p;
+    if (itemData == NULL) return 0;
+
+    friendIdx = idx;
+    if (friendIdx >= 3) return 0;
+    return (s8)((u8)itemData->useFriend[friendIdx]);
+}
+
+u32 itemDataBiosGetKinomiNo(u16 itemId) {
+    u16 itemNo;
+
+    itemNo = itemId;
+    if (itemNo < 0x85 || itemNo > 0xAF) return 0xFF;
+    return (u8)(itemId - 0x85);
+}
+
+u32 itemDataBiosGetHidenMachineNo(u8* p) {
+    ItemDataBios* itemData;
+    u8 machineNo;
+
+    itemData = (ItemDataBios*)p;
+    if (itemData == NULL) {
+        machineNo = 0;
+    } else if (itemData->kind != 4) {
+        machineNo = 0xFF;
+    } else {
+        machineNo = (u8)itemData->buff;
+    }
+
+    if (machineNo == 0xFF) return 0xFF;
+    if (machineNo < 0x32 || machineNo >= lbl_80478BD0) return 0xFF;
+    return (u8)(machineNo - 0x32);
+}
+
+u32 itemDataBiosGetWazaIDByWazaMachineNo(u32 machineNo) {
+    if ((u8)machineNo >= lbl_80478BD0) return 0;
+    return (u16)lbl_80368018[(u8)machineNo].wazaId;
+}
+
+u32 itemDataBiosGetWazaMachineNo(u8* p) {
+    ItemDataBios* itemData;
+
+    itemData = (ItemDataBios*)p;
+    if (itemData == NULL) return 0;
+    if (itemData->kind != 4) return 0xFF;
+    return (u8)itemData->buff;
+}
+
+u32 itemDataBiosGetFightUseKoukaDataId(u8* p) {
+    ItemDataBios* itemData;
+
+    itemData = (ItemDataBios*)p;
+    if (itemData == NULL) return 0;
+    return itemData->fightUseKoukaDataId;
+}
+
+u32 itemDataBiosGetItemSoubiDataId(u8* p) {
+    ItemDataBios* itemData;
+
+    itemData = (ItemDataBios*)p;
+    if (itemData == NULL) return 0;
+    return itemData->itemSoubiDataId;
+}
+
+u32 itemDataBiosGetDoc(u8* p) {
+    ItemDataBios* itemData;
+
+    itemData = (ItemDataBios*)p;
+    if (itemData == NULL) return 0;
+    return itemData->doc;
+}
+
+u8 fn_80143F9C(u8* p) {
+    ItemDataBios* itemData;
+
+    itemData = (ItemDataBios*)p;
+    if (itemData == NULL) return 0;
+    return itemData->field_03;
+}
+
+u8 fn_80143FB4(u8* p) {
+    ItemDataBios* itemData;
+
+    itemData = (ItemDataBios*)p;
+    if (itemData == NULL) return 0;
+    return itemData->useful;
+}
+
+u8 fn_80143FCC(u8* p) {
+    ItemDataBios* itemData;
+
+    itemData = (ItemDataBios*)p;
+    if (itemData == NULL) return 0;
+    return itemData->important;
+}
+
+u32 itemDataBiosGetCoupon(u8* p) {
+    ItemDataBios* itemData;
+
+    itemData = (ItemDataBios*)p;
+    if (itemData == NULL) return 0;
+    return itemData->coupon;
+}
+
+u32 itemDataBiosGetPrice(u8* p) {
+    ItemDataBios* itemData;
+
+    itemData = (ItemDataBios*)p;
+    if (itemData == NULL) return 0;
+    return itemData->price;
+}
+
+u8 itemDataBiosGetKind(u8* p) {
+    ItemDataBios* itemData;
+
+    itemData = (ItemDataBios*)p;
+    if (itemData == NULL) return 0;
+    return itemData->kind;
+}
+
+s32 itemDataBiosCheckExportable(u8* p) {
+    ItemDataBios* itemData;
+    u8 important;
+
+    itemData = (ItemDataBios*)p;
+    if (itemData == NULL) return 0;
+    if (itemData == NULL) {
+        important = 0;
+    } else {
+        important = itemData->important;
+    }
+    if (important != 0) return 0;
+    return 1;
+}
+
+s32 itemDataBiosCheckImportable(u8* p) {
+    ItemDataBios* itemData;
+
+    itemData = (ItemDataBios*)p;
+    if (itemData == NULL) return 0;
+    return itemData->name != 0;
+}
+
+u32 itemDataBiosGetName(u8* p) {
+    ItemDataBios* itemData;
+
+    itemData = (ItemDataBios*)p;
+    if (itemData == NULL) return 0;
+    return itemData->name;
+}
+
+s32 itemUse2PokemonSimulation(void* arg0, void* arg1, void* arg2, void* arg3, void* arg4) {
+    void* savedFightFloor;
+    void* fightFloor;
+    u16 memHandle;
+    s32 result;
+
+    fightFloor = fightFloorGetNowPtr();
+    if (fightFloor == NULL) {
+        return 0;
+    }
+
+    memHandle = _toolentryAlloc__FUl(0xA4E8);
+    savedFightFloor = fn_800E27B0(memHandle);
+    memcpy(savedFightFloor, fightFloor, 0xA4E8);
+    result = fn_80144574(arg0, arg1, arg2, arg3, arg4);
+    memcpy(fightFloor, savedFightFloor, 0xA4E8);
+    fn_800E24B0(memHandle);
+    fn_800E209C(memHandle);
+
+    return result;
+}
