@@ -456,7 +456,7 @@ extern u32 sexGetPokemonSexRaitoKotei(u32);
 extern void fn_801EE958(void);
 extern void fn_801EEB34(void);
 extern void memoDataSet(void);
-void pokemonCheckFightOut(void);
+u32 pokemonCheckFightOut(u8* ptr);
 extern void gamedataAttestBiosCopy(void);
 void pokemonCreate(void);
 void pokemonCreateRndFit(void);
@@ -2586,8 +2586,52 @@ void pokemonSetOnZukanFlag(u8* ptr, u8 flag) {
 #endif
 /* 0x801233F4 | 0x190 */
 extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
-/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void pokemonCheckFightOut(void);
+typedef struct PokemonRangeObjHeader {
+    u32 count;
+} PokemonRangeObjHeader;
+
+u32 pokemonCheckFightOut(u8* ptr) {
+    extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
+    extern u32 gamedataAttestCheckValid(u32 val);
+    PokemonRangeObjHeader* header;
+    u16 val;
+    u8 flag;
+
+    if (ptr == NULL) {
+        flag = 0;
+    } else {
+        val = (u16)pokemonGetStatus(ptr, 0, 0x6e, 0);
+        if (val == 0) {
+            flag = 0;
+        } else {
+            if (val == 0) {
+                flag = 0;
+            } else if ((u32)pokemonGetStatus(NULL, val, 1, 0) == 0) {
+                flag = 0;
+            } else if (val >= (header = (PokemonRangeObjHeader*)lbl_80478F90)->count) {
+                flag = 0;
+            } else {
+                flag = 1;
+            }
+            if ((u8)flag == 0) {
+                flag = 0;
+            } else if ((u8)gamedataAttestCheckValid(pokemonGetStatus(ptr, 0, 0x70, 0)) == 0) {
+                flag = 0;
+            } else if ((u8)pokemonGetStatus(ptr, 0, 0xb8, 0) == 1) {
+                flag = 0;
+            } else {
+                flag = 1;
+            }
+        }
+    }
+    if ((u8)flag == 0) { return 0; }
+    if ((s32)pokemonGetStatus(ptr, 0, 0x6e, 0) == 0x19c) { return 0; }
+    if ((u8)pokemonGetStatus(ptr, 0, 0xb6, 0) == 1) { return 0; }
+    {
+        u32 value = (u8)pokemonGetStatus(ptr, 0, 0x7b, 0);
+        return ((1 - value) | (value - 1)) >> 31;
+    }
+}
 /* 0x80123584 | 0x98 */
 #if 0
 asm void pokemonGetOboeWazaDataBanme(void) {
