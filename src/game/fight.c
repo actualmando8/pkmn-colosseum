@@ -37,6 +37,82 @@ typedef struct ColosseumEventPairRow {
     ColosseumEventSubRow slots[2];
 } ColosseumEventPairRow;
 
+typedef struct FightTypeData {
+    u8 trainerNum;
+    u8 entryPokemonNum;
+    u8 fightoutPokemonNum;
+    u8 pad_03;
+    u32 name;
+} FightTypeData;
+
+typedef struct FightKindData {
+    u8 backSaveDataFlag;
+    u8 doBadgeCheckFlag;
+    u8 doZukanMitaFlag;
+    u8 doZukanTukamaetaFlag;
+    u8 useItemFlag;
+    u8 callFlag;
+    u8 nigeruFlag;
+    u8 drawFlag;
+    u8 getExpFlag;
+    u8 getOkaneFlag;
+    u8 okanePoolFlag;
+    u8 getNekoniKobanFlag;
+    u8 getFriendFlag;
+    u8 getInfectPokerusFlag;
+    u8 doCriticalAttackFlag;
+    u8 doHizukiAiFlag;
+    u8 doHizukiMiyaburiFlag;
+    u8 doItemSoubiTokukoutokubouupFlag;
+    u8 keikentihueruFlag;
+    u8 bossFlag;
+    u8 dorobouFlag;
+    u8 monohiroiFlag;
+    u8 darkpokemonHypermodeFlag;
+    u8 pokemonStatusMenuSubbarFlag;
+    u8 hostEnemyMsgFlag;
+    u8 pad_19[3];
+    u32 name;
+} FightKindData;
+
+typedef struct FightKoukaData {
+    u16 fightJoukenDataId;
+    u16 fightTargetDataId;
+    u16 koukaDataId;
+} FightKoukaData;
+
+typedef struct FightEncountWipeData {
+    u8 snapshotUse;
+    u8 pad_01;
+    u16 wipeEffectSndId;
+    f32 wipeEffectTime;
+    u32 wipeFunction;
+} FightEncountWipeData;
+
+typedef struct FightEncountTrainerSlot {
+    u16 fightTrainerDataId;
+    u16 pad_02;
+    u32 gsInputDevice;
+} FightEncountTrainerSlot;
+
+typedef struct FightEncountData {
+    u8 fightKind;
+    u8 trainer;
+    u8 zenmetuFlag;
+    u8 pad_03;
+    u16 fightFloorDataId;
+    u16 pad_06;
+    u32 fightName;
+    u32 bgmSndId;
+    u32 wipeId;
+    u32 syoukaiWzxDataId;
+    FightEncountTrainerSlot trainerSlots[4];
+} FightEncountData;
+
+typedef struct FightCopyBlock {
+    u32 data[12];
+} FightCopyBlock;
+
 /* =========================================================================
  * External declarations
  * ========================================================================= */
@@ -57,78 +133,75 @@ extern u32 lbl_80478D38;   /* Event table count */
 extern ColosseumEventRow6 lbl_80478D30[]; /* Event table base (6 bytes per entry) */
 extern u32 lbl_80478D28; /* Pair-row table count */
 extern ColosseumEventPairRow lbl_80375A08[]; /* 0x18-byte pair rows */
+extern FightKoukaData lbl_80375CB8[];
+extern FightEncountWipeData fight_encount_wipe_data[];
+extern u32* lbl_80478F00;
+extern FightTypeData* lbl_80478F04;
+extern u32* lbl_80478F40;
+extern FightKindData* lbl_80478F44;
 
 /* 0x8020D968 | size: 0x38 | small */
-void fn_8020D968(void* dst, void* src) {
-    struct CopyBlk8020D968 { u32 data[12]; };
+void fn_8020D968(FightCopyBlock* dst, FightCopyBlock* src) {
     if (dst == 0) return;
     if (src == 0) return;
-    *(struct CopyBlk8020D968*)dst = *(struct CopyBlk8020D968*)src;
+    *dst = *src;
 }
 
 /* Address: 0x8020D9A0 | Size: 0x18 | Pattern: nullcheck_getter */
-u16 fightKoukaDataBiosGetKoukaDataId(u8* ptr) {
+u16 fightKoukaDataBiosGetKoukaDataId(FightKoukaData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u16*)(&ptr[0x4]);
+    return ptr->koukaDataId;
 }
 
 /* Address: 0x8020D9B8 | Size: 0x18 | Pattern: nullcheck_getter */
-u16 fightKoukaDataBiosGetFightTargetDataId(u8* ptr) {
+u16 fightKoukaDataBiosGetFightTargetDataId(FightKoukaData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u16*)(&ptr[0x2]);
+    return ptr->fightTargetDataId;
 }
 
 /* Address: 0x8020D9D0 | Size: 0x18 | Pattern: nullcheck_getter */
-u16 fightKoukaDataBiosGetFightJoukenDataId(u8* ptr) {
+u16 fightKoukaDataBiosGetFightJoukenDataId(FightKoukaData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u16*)(&ptr[0x0]);
+    return ptr->fightJoukenDataId;
 }
 
 /* fightKoukaDataBiosGetPtr | Size: 0x2C | Look up entry in 6-byte table (u16 index) */
-void* fightKoukaDataBiosGetPtr(u16 index) {
-    extern u8 lbl_80375CB8[];
+FightKoukaData* fightKoukaDataBiosGetPtr(u16 index) {
     extern u32 lbl_80478D50;
     if (index >= lbl_80478D50) {
         return NULL;
     }
-    return &lbl_80375CB8[index * 6];
+    return &lbl_80375CB8[index];
 }
 
-/* Address: 0x8020DA14 | Size: 0xbc | Ghidra import */
-u32 fightKoukaDoFightKoukaJoukenAndKouka(void)
+/* Address: 0x8020DA14 | Size: 0xbc */
+#pragma dont_inline on
+u32 fightKoukaDoFightKoukaJoukenAndKouka(void* target, u16 koukaDataIndex) {
+    extern void koukaExec(u16 koukaDataId, void* fightTarget, void* target, u32 flags);
+    extern void* fightTargetGetPtr(u32 targetDataId, void* target, u16 fightType);
+    extern u32 fightFloorGetStatus(u32, u16, u32, u16);
+    extern u8 fn_8020A8E0(u32 joukenDataId, void* target);
 
-{
-    u32 r3;
-    u32 r4;
+    u32 koukaDataId;
+    u32 targetDataId;
+    void* fightTarget;
+    u32 result;
+    u32 joukenDataId;
+    u16 fightType;
 
-    extern void fn_80136078();
-    extern u32 fightTargetGetPtr();
-    extern u32 fightFloorGetStatus();
-    extern int fn_8020A8E0();
-    extern u16 fightKoukaDataBiosGetKoukaDataId();
-    extern u16 fightKoukaDataBiosGetFightTargetDataId();
-    extern u16 fightKoukaDataBiosGetFightJoukenDataId();
-    extern void* fightKoukaDataBiosGetPtr();
-  u32 uVar1;
-  u32 uVar2;
-  u16 uVar3;
-  u16 uVar4;
-  s8 cVar5;
-  
-  fightKoukaDataBiosGetPtr(r4);
-  uVar1 = fightKoukaDataBiosGetFightJoukenDataId();
-  fightKoukaDataBiosGetPtr(r4);
-  uVar2 = fightKoukaDataBiosGetFightTargetDataId();
-  fightKoukaDataBiosGetPtr(r4);
-  uVar3 = fightKoukaDataBiosGetKoukaDataId();
-  uVar4 = fightFloorGetStatus(0,0,0x14,0);
-  uVar2 = fightTargetGetPtr(uVar2,r3,uVar4);
-  cVar5 = fn_8020A8E0(uVar1,r3);
-  if (cVar5 == 1) {
-    fn_80136078(uVar3,uVar2,r3,0);
-  }
-  return cVar5 == 1;
+    joukenDataId = fightKoukaDataBiosGetFightJoukenDataId(fightKoukaDataBiosGetPtr(koukaDataIndex));
+    targetDataId = fightKoukaDataBiosGetFightTargetDataId(fightKoukaDataBiosGetPtr(koukaDataIndex));
+    koukaDataId = fightKoukaDataBiosGetKoukaDataId(fightKoukaDataBiosGetPtr(koukaDataIndex));
+    result = 0;
+    fightType = fightFloorGetStatus(0, 0, 0x14, 0);
+    fightTarget = fightTargetGetPtr(targetDataId, target, fightType);
+    if (fn_8020A8E0(joukenDataId, target) == 1) {
+        koukaExec((u16)koukaDataId, fightTarget, target, 0);
+        result = 1;
+    }
+    return result;
 }
+#pragma dont_inline reset
 
 /* Address: 0x8020DAD0 | Size: 0x274 | Ghidra import */
 #pragma push
@@ -177,8 +250,8 @@ u32 fn_8020DAD0(u32 p1) {
     extern u32 fightEncountDataBiosGetFightFloorDataId();
     extern u8 fightEncountDataBiosGetFightKind();
     extern u32 fightEncountDataBiosGetPtr();
-    extern u8 fightKindDataBiosGetPokemonStatusMenuSubbarFlag();
-    extern u32 fightKindDataBiosGetPtr();
+    extern u8 fightKindDataBiosGetPokemonStatusMenuSubbarFlag(FightKindData* ptr);
+    extern FightKindData* fightKindDataBiosGetPtr(u16 index);
     extern u16 charNameBiosSearchIndex();
     extern u16 charNameBiosGetHearFlag();
     extern f32 lbl_8047E528;
@@ -188,7 +261,8 @@ u32 fn_8020DAD0(u32 p1) {
     u32 uVar2;
     u16 uVar7;
     u8 uVar9;
-    u32 iVar3;
+    FightKindData* iVar3;
+    u32 trainerData;
     u8 cVar10;
     u16 sVar8;
     u32 uVar4;
@@ -209,10 +283,10 @@ u32 fn_8020DAD0(u32 p1) {
         mailMainReceiveTerminate();
         uVar9 = fightEncountDataBiosGetFightKind(uVar1);
         iVar3 = fightKindDataBiosGetPtr(uVar9);
-        if ((iVar3 != 0) && (cVar10 = fightKindDataBiosGetPokemonStatusMenuSubbarFlag(), cVar10 != 0)) {
+        if ((iVar3 != 0) && (cVar10 = fightKindDataBiosGetPokemonStatusMenuSubbarFlag(iVar3), cVar10 != 0)) {
             fightEncountDataBiosGetFightTrainerDataId(uVar1, 1);
-            iVar3 = fightTrainerDataBiosGetPtr();
-            if (iVar3 != 0) {
+            trainerData = fightTrainerDataBiosGetPtr();
+            if (trainerData != 0) {
                 uVar2 = fn_801FCC7C();
                 sVar8 = charNameBiosSearchIndex();
                 if ((sVar8 != 0) && (sVar8 = charNameBiosGetHearFlag(), sVar8 != 0)) {
@@ -281,500 +355,475 @@ void fightEncountGetEnvSndDataId(void) {
     fightFloorGetStatus(0, val, 0x7, 0);
 }
 
-/* Address: 0x8020DD80 | Size: 0xd0 | Ghidra import */
-int fightEncountGetBgmSndDataId(void)
+/* Address: 0x8020DD80 | Size: 0xd0 */
+u32 fightEncountGetBgmSndDataId(u16 encountDataIndex) {
+    extern u32 fightFloorGetStatus(u32, u16, u32, u16);
+    extern u32 fightTrainerGetStatus(u32, u16, u32, u16);
+    extern u32 fightTrainerKindDataBiosGetBgmSndId(void);
+    extern void fightTrainerKindDataBiosGetPtr(void);
+    extern u32 fightEncountDataBiosGetBgmSndId(FightEncountData* ptr);
+    extern u16 fightEncountDataBiosGetFightTrainerDataId(FightEncountData* base, u8 slot);
+    extern u16 fightEncountDataBiosGetFightFloorDataId(FightEncountData* ptr);
+    extern FightEncountData* fightEncountDataBiosGetPtr(u16 index);
 
-{
-    u32 r3;
+    FightEncountData* encountData;
+    u32 bgmSndId;
+    u16 fightFloorDataId;
+    u16 fightTrainerDataId;
+    u16 trainerStatus;
+    u16 i;
 
-    extern int fightFloorGetStatus();
-    extern short fightTrainerGetStatus();
-    extern int fightTrainerKindDataBiosGetBgmSndId();
-    extern void fightTrainerKindDataBiosGetPtr();
-    extern u32 fightEncountDataBiosGetBgmSndId();
-    extern u16 fightEncountDataBiosGetFightTrainerDataId();
-    extern u16 fightEncountDataBiosGetFightFloorDataId();
-    extern u32 fightEncountDataBiosGetPtr();
-  u32 uVar1;
-  int iVar2;
-  u32 uVar3;
-  u32 uVar4;
-  short sVar5;
-  u16 uVar6;
-  
-  uVar1 = fightEncountDataBiosGetPtr();
-  iVar2 = fightEncountDataBiosGetBgmSndId();
-  if (iVar2 == 0) {
-    fightEncountDataBiosGetPtr(r3);
-    uVar3 = fightEncountDataBiosGetFightFloorDataId();
-    iVar2 = fightFloorGetStatus(0,uVar3,6,0);
-    if (iVar2 == 0) {
-      for (uVar6 = 0; uVar6 < 4; uVar6 = uVar6 + 1) {
-        uVar4 = fightEncountDataBiosGetFightTrainerDataId(uVar1,uVar6 & 0xff);
-        if (((uVar4 & 0xffff) != 0) && (sVar5 = fightTrainerGetStatus(0,uVar4,4,0), sVar5 != 0)) {
-          fightTrainerKindDataBiosGetPtr();
-          iVar2 = fightTrainerKindDataBiosGetBgmSndId();
-          if (iVar2 != 0) {
-            return iVar2;
-          }
-        }
-      }
-      iVar2 = 1;
+    encountData = fightEncountDataBiosGetPtr(encountDataIndex);
+    bgmSndId = fightEncountDataBiosGetBgmSndId(encountData);
+    if (bgmSndId != 0) {
+        return bgmSndId;
     }
-  }
-  return iVar2;
+    fightFloorDataId = fightEncountDataBiosGetFightFloorDataId(fightEncountDataBiosGetPtr(encountDataIndex));
+    bgmSndId = fightFloorGetStatus(0, fightFloorDataId, 6, 0);
+    if (bgmSndId != 0) {
+        return bgmSndId;
+    }
+    for (i = 0; i < 4; i++) {
+        fightTrainerDataId = fightEncountDataBiosGetFightTrainerDataId(encountData, (u8)i);
+        if (fightTrainerDataId != 0) {
+            trainerStatus = fightTrainerGetStatus(0, fightTrainerDataId, 4, 0);
+            if (trainerStatus != 0) {
+                fightTrainerKindDataBiosGetPtr();
+                bgmSndId = fightTrainerKindDataBiosGetBgmSndId();
+                if (bgmSndId != 0) {
+                    return bgmSndId;
+                }
+            }
+        }
+    }
+    return 1;
 }
 
 /* Address: 0x8020DE50 | Size: 0x18 | Pattern: nullcheck_getter */
-u16 fightEncountDataBiosGetWipeEffectSndID(u8* ptr) {
+u16 fightEncountDataBiosGetWipeEffectSndID(FightEncountWipeData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u16*)(&ptr[0x2]);
+    return ptr->wipeEffectSndId;
 }
 
 /* fightEncountDataBiosGetWipeEffectTime | Size: 0x18 | Get float from ptr+4, or default if NULL */
-f32 fightEncountDataBiosGetWipeEffectTime(u8* ptr) {
+f32 fightEncountDataBiosGetWipeEffectTime(FightEncountWipeData* ptr) {
     extern f32 lbl_8047E530;
     if (ptr == NULL) {
         return lbl_8047E530;
     }
-    return *(f32*)(ptr + 0x4);
+    return ptr->wipeEffectTime;
 }
 
 /* Address: 0x8020DE80 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightEncountDataBiosGetWipeSnapshotUse(u8* ptr) {
+u8 fightEncountDataBiosGetWipeSnapshotUse(FightEncountWipeData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x0]);
+    return ptr->snapshotUse;
 }
 
 /* Address: 0x8020DE98 | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fightEncountDataBiosGetWipeFunction(u8* ptr) {
+u32 fightEncountDataBiosGetWipeFunction(FightEncountWipeData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u32*)(&ptr[0x8]);
+    return ptr->wipeFunction;
 }
 
 /* fightEncountWipeDataBiosGetPtr | Size: 0x28 | Look up entry in 12-byte table */
-void* fightEncountWipeDataBiosGetPtr(u32 index) {
-    extern u8 fight_encount_wipe_data[];
+FightEncountWipeData* fightEncountWipeDataBiosGetPtr(u32 index) {
     extern u32 lbl_80478D20;
     if (index >= lbl_80478D20) {
         return NULL;
     }
-    return &fight_encount_wipe_data[index * 12];
+    return &fight_encount_wipe_data[index];
 }
 
 /* Address: 0x8020DED8 | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fightEncountDataBiosGetFightName(u8* ptr) {
+u32 fightEncountDataBiosGetFightName(FightEncountData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u32*)(&ptr[0x8]);
+    return ptr->fightName;
 }
 
 /* Address: 0x8020DEF0 | Size: 0x10 | Pattern: nullcheck_setter */
-void fightEncountDataBiosSetSyoukaiWzxDataId(u8* ptr, u32 val) {
+void fightEncountDataBiosSetSyoukaiWzxDataId(FightEncountData* ptr, u32 val) {
     if (ptr == NULL) { return; }
-    *(u32*)(&ptr[0x14]) = val;
+    ptr->syoukaiWzxDataId = val;
 }
 
 /* Address: 0x8020DF00 | Size: 0x10 | Pattern: nullcheck_setter */
-void fightEncountDataBiosSetBgmSndId(u8* ptr, u32 val) {
+void fightEncountDataBiosSetBgmSndId(FightEncountData* ptr, u32 val) {
     if (ptr == NULL) { return; }
-    *(u32*)(&ptr[0xC]) = val;
+    ptr->bgmSndId = val;
 }
 
 /* fightEncountDataBiosSetGSInputDevice | Size: 0x40 | Write u32 to slot in 8-byte array at offset 0x18 */
 #pragma push
 #pragma peephole on
-void fightEncountDataBiosSetGSInputDevice(u8* base, u8 slot, u32 value) {
-    u8* entry;
+void fightEncountDataBiosSetGSInputDevice(FightEncountData* base, u8 slot, u32 value) {
+    FightEncountTrainerSlot* entry;
     if (base == NULL) {
         entry = NULL;
     } else if (slot >= 4) {
         entry = NULL;
     } else {
-        entry = base + slot * 8 + 0x18;
+        entry = &base->trainerSlots[slot];
     }
     if (entry == NULL) {
         return;
     }
-    *(u32*)(entry + 0x4) = value;
+    entry->gsInputDevice = value;
 }
 #pragma pop
 
 /* fightEncountDataBiosSetFightTrainerDataId | Size: 0x40 | Write u16 to slot in 8-byte array at offset 0x18 */
 #pragma push
 #pragma peephole on
-void fightEncountDataBiosSetFightTrainerDataId(u8* base, u8 slot, u16 value) {
-    u8* entry;
+void fightEncountDataBiosSetFightTrainerDataId(FightEncountData* base, u8 slot, u16 value) {
+    FightEncountTrainerSlot* entry;
     if (base == NULL) {
         entry = NULL;
     } else if (slot >= 4) {
         entry = NULL;
     } else {
-        entry = base + slot * 8 + 0x18;
+        entry = &base->trainerSlots[slot];
     }
     if (entry == NULL) {
         return;
     }
-    *(u16*)(entry) = value;
+    entry->fightTrainerDataId = value;
 }
 #pragma pop
 
 /* Address: 0x8020DF90 | Size: 0x10 | Pattern: nullcheck_setter */
-void fightEncountDataBiosSetFightFloorDataId(u8* ptr, u16 val) {
+void fightEncountDataBiosSetFightFloorDataId(FightEncountData* ptr, u16 val) {
     if (ptr == NULL) { return; }
-    *(u16*)(&ptr[0x4]) = val;
+    ptr->fightFloorDataId = val;
 }
 
 /* Address: 0x8020DFA0 | Size: 0x10 | Pattern: nullcheck_setter */
-void fightEncountDataBiosSetTrainer(u8* ptr, u8 val) {
+void fightEncountDataBiosSetTrainer(FightEncountData* ptr, u8 val) {
     if (ptr == NULL) { return; }
-    *(u8*)(&ptr[0x1]) = val;
+    ptr->trainer = val;
 }
 
 /* Address: 0x8020DFB0 | Size: 0x10 | Pattern: nullcheck_setter */
-void fightEncountDataBiosSetFightKind(u8* ptr, u8 val) {
+void fightEncountDataBiosSetFightKind(FightEncountData* ptr, u8 val) {
     if (ptr == NULL) { return; }
-    *(u8*)(&ptr[0x0]) = val;
+    ptr->fightKind = val;
 }
 
 /* Address: 0x8020DFC0 | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fightEncountDataBiosGetSyoukaiWzxDataId(u8* ptr) {
+u32 fightEncountDataBiosGetSyoukaiWzxDataId(FightEncountData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u32*)(&ptr[0x14]);
+    return ptr->syoukaiWzxDataId;
 }
 
 /* Address: 0x8020DFD8 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightEncountDataBiosGetZenmetuFlag(u8* ptr) {
+u8 fightEncountDataBiosGetZenmetuFlag(FightEncountData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x2]);
+    return ptr->zenmetuFlag;
 }
 
 /* Address: 0x8020DFF0 | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fightEncountDataBiosGetWipeId(u8* ptr) {
+u32 fightEncountDataBiosGetWipeId(FightEncountData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u32*)(&ptr[0x10]);
+    return ptr->wipeId;
 }
 
 /* Address: 0x8020E008 | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fightEncountDataBiosGetBgmSndId(u8* ptr) {
+u32 fightEncountDataBiosGetBgmSndId(FightEncountData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u32*)(&ptr[0xC]);
+    return ptr->bgmSndId;
 }
 
 /* fightEncountDataBiosGetGSInputDevice | Size: 0x48 | Read u32 from slot in 8-byte array at offset 0x18 */
 #pragma push
 #pragma peephole on
-u32 fightEncountDataBiosGetGSInputDevice(u8* base, u8 slot) {
-    u8* entry;
+u32 fightEncountDataBiosGetGSInputDevice(FightEncountData* base, u8 slot) {
+    FightEncountTrainerSlot* entry;
     if (base == NULL) {
         entry = NULL;
     } else if (slot >= 4) {
         entry = NULL;
     } else {
-        entry = base + slot * 8 + 0x18;
+        entry = &base->trainerSlots[slot];
     }
     if (entry == NULL) {
         return 0;
     }
-    return *(u32*)(entry + 0x4);
+    return entry->gsInputDevice;
 }
 #pragma pop
 
 /* fightEncountDataBiosGetFightTrainerDataId | Size: 0x48 | Read u16 from slot in 8-byte array at offset 0x18 */
 #pragma push
 #pragma peephole on
-u16 fightEncountDataBiosGetFightTrainerDataId(u8* base, u8 slot) {
-    u8* entry;
+u16 fightEncountDataBiosGetFightTrainerDataId(FightEncountData* base, u8 slot) {
+    FightEncountTrainerSlot* entry;
     if (base == NULL) {
         entry = NULL;
     } else if (slot >= 4) {
         entry = NULL;
     } else {
-        entry = base + slot * 8 + 0x18;
+        entry = &base->trainerSlots[slot];
     }
     if (entry == NULL) {
         return 0;
     }
-    return *(u16*)(entry);
+    return entry->fightTrainerDataId;
 }
 #pragma pop
 
 /* Address: 0x8020E0B0 | Size: 0x18 | Pattern: nullcheck_getter */
-u16 fightEncountDataBiosGetFightFloorDataId(u8* ptr) {
+u16 fightEncountDataBiosGetFightFloorDataId(FightEncountData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u16*)(&ptr[0x4]);
+    return ptr->fightFloorDataId;
 }
 
 /* Address: 0x8020E0C8 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightEncountDataBiosGetTrainer(u8* ptr) {
+u8 fightEncountDataBiosGetTrainer(FightEncountData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x1]);
+    return ptr->trainer;
 }
 
 /* Address: 0x8020E0E0 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightEncountDataBiosGetFightKind(u8* ptr) {
+u8 fightEncountDataBiosGetFightKind(FightEncountData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x0]);
+    return ptr->fightKind;
 }
 
 /* fightEncountDataBiosGetPtr | Size: 0x2C | Look up entry in 0x38-byte table (indirect) */
-void* fightEncountDataBiosGetPtr(u16 index) {
+FightEncountData* fightEncountDataBiosGetPtr(u16 index) {
     extern u32* lbl_80478F50;
-    extern u8* lbl_80478F54;
+    extern FightEncountData* lbl_80478F54;
     if (index >= *lbl_80478F50) {
         return NULL;
     }
-    return lbl_80478F54 + index * 0x38;
+    return &lbl_80478F54[index];
 }
 
 /* 0x8020E124 | size: 0x80 | small */
-void fightTypeGetFightSideFightOutPokemonMax(void) {
-    extern u32 lbl_80478F00;
-    extern u32 lbl_80478F04;
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
+u16 fightTypeGetFightSideFightOutPokemonMax(u16 index) {
+    FightTypeData* type;
+    u32 count;
+    u8 trainerNum;
+    u8 fightoutPokemonNum;
 
-    r4 = lbl_80478F00;
-    r7 = r3 & 0xFFFF;
-    r6 = *(u32*)((u8*)r4 + 0x0);
-    if (r7 > r6) {
-        r4 = 0x0;
+    count = *lbl_80478F00;
+    if (index > count) {
+        type = NULL;
     } else {
-
-        r4 = lbl_80478F04;
-        /* clrlslwi r0, r3, 16, 3 */;
-        r4 = r4 + r0;
+        type = &lbl_80478F04[index];
     }
-    if (r4 == (u32)0x0) {
-        r5 = 0x0;
+    if (type == NULL) {
+        trainerNum = 0;
     } else {
-
-        r5 = *(u8*)((u8*)r4 + 0x0);
+        trainerNum = type->trainerNum;
     }
-    if (r7 > r6) {
-        r4 = 0x0;
+    if (index > count) {
+        type = NULL;
     } else {
-
-        r4 = lbl_80478F04;
-        /* clrlslwi r0, r3, 16, 3 */;
-        r4 = r4 + r0;
+        type = &lbl_80478F04[index];
     }
-    r3 = r5 & 0xFF;
-    if (r4 == (u32)0x0) {
-        r0 = 0x0;
+    if (type == NULL) {
+        fightoutPokemonNum = 0;
     } else {
-
-        r0 = *(u8*)((u8*)r4 + 0x2);
+        fightoutPokemonNum = type->fightoutPokemonNum;
     }
-    r0 = r0 & 0xFF;
-    r0 = r3 * r0;
-    r3 = r0 & 0xFFFF;
-    return;
+    return (u8)trainerNum * (u8)fightoutPokemonNum;
 }
 
 /* Address: 0x8020E1A4 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightTypeDataBiosGetFightoutPokemonNum(u8* ptr) {
+u8 fightTypeDataBiosGetFightoutPokemonNum(FightTypeData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x2]);
+    return ptr->fightoutPokemonNum;
 }
 
 /* Address: 0x8020E1BC | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightTypeDataBiosGetEntryPokemonNum(u8* ptr) {
+u8 fightTypeDataBiosGetEntryPokemonNum(FightTypeData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x1]);
+    return ptr->entryPokemonNum;
 }
 
 /* Address: 0x8020E1D4 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightTypeDataBiosGetTrainerNum(u8* ptr) {
+u8 fightTypeDataBiosGetTrainerNum(FightTypeData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x0]);
+    return ptr->trainerNum;
 }
 
 /* Address: 0x8020E1EC | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fightTypeDataBiosGetName(u8* ptr) {
+u32 fightTypeDataBiosGetName(FightTypeData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u32*)(&ptr[0x4]);
+    return ptr->name;
 }
 
 /* fightTypeDataBiosGetPtr | Size: 0x2C | Look up entry in 8-byte table (indirect) */
-void* fightTypeDataBiosGetPtr(u16 index) {
-    extern u32 lbl_80478F00;
-    extern u32 lbl_80478F04;
-    u32* countPtr = (u32*)lbl_80478F00;
-    if (index > *countPtr) {
+FightTypeData* fightTypeDataBiosGetPtr(u16 index) {
+    if (index > *lbl_80478F00) {
         return NULL;
     }
-    return (u8*)lbl_80478F04 + (u32)index * 8;
+    return &lbl_80478F04[index];
 }
 
 /* Address: 0x8020E230 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightKindDataBiosGetHostEnemyMsgFlag(u8* ptr) {
+u8 fightKindDataBiosGetHostEnemyMsgFlag(FightKindData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x18]);
+    return ptr->hostEnemyMsgFlag;
 }
 
 /* Address: 0x8020E248 | Size: 0x18 | Pattern: nullcheck_getter */
-u32 fightKindDataBiosGetName(u8* ptr) {
+u32 fightKindDataBiosGetName(FightKindData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u32*)(&ptr[0x1C]);
+    return ptr->name;
 }
 
 /* Address: 0x8020E260 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightKindDataBiosGetPokemonStatusMenuSubbarFlag(u8* ptr) {
+u8 fightKindDataBiosGetPokemonStatusMenuSubbarFlag(FightKindData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x17]);
+    return ptr->pokemonStatusMenuSubbarFlag;
 }
 
 /* Address: 0x8020E278 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightKindDataBiosGetDarkpokemonHypermodeFlag(u8* ptr) {
+u8 fightKindDataBiosGetDarkpokemonHypermodeFlag(FightKindData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x16]);
+    return ptr->darkpokemonHypermodeFlag;
 }
 
 /* Address: 0x8020E290 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightKindDataBiosGetMonohiroiFlag(u8* ptr) {
+u8 fightKindDataBiosGetMonohiroiFlag(FightKindData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x15]);
+    return ptr->monohiroiFlag;
 }
 
 /* Address: 0x8020E2A8 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightKindDataBiosGetDorobouFlag(u8* ptr) {
+u8 fightKindDataBiosGetDorobouFlag(FightKindData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x14]);
+    return ptr->dorobouFlag;
 }
 
 /* Address: 0x8020E2C0 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightKindDataBiosGetBossFlag(u8* ptr) {
+u8 fightKindDataBiosGetBossFlag(FightKindData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x13]);
+    return ptr->bossFlag;
 }
 
 /* Address: 0x8020E2D8 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightKindDataBiosGetKeikentihueruFlag(u8* ptr) {
+u8 fightKindDataBiosGetKeikentihueruFlag(FightKindData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x12]);
+    return ptr->keikentihueruFlag;
 }
 
 /* Address: 0x8020E2F0 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightKindDataBiosGetDoItemSoubiTokukoutokubouupFlag(u8* ptr) {
+u8 fightKindDataBiosGetDoItemSoubiTokukoutokubouupFlag(FightKindData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x11]);
+    return ptr->doItemSoubiTokukoutokubouupFlag;
 }
 
 /* Address: 0x8020E308 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightKindDataBiosGetDoHizukiMiyaburiFlag(u8* ptr) {
+u8 fightKindDataBiosGetDoHizukiMiyaburiFlag(FightKindData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x10]);
+    return ptr->doHizukiMiyaburiFlag;
 }
 
 /* Address: 0x8020E320 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightKindDataBiosGetDoHizukiAiFlag(u8* ptr) {
+u8 fightKindDataBiosGetDoHizukiAiFlag(FightKindData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0xF]);
+    return ptr->doHizukiAiFlag;
 }
 
 /* Address: 0x8020E338 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightKindDataBiosGetDoCriticalAttackFlag(u8* ptr) {
+u8 fightKindDataBiosGetDoCriticalAttackFlag(FightKindData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0xE]);
+    return ptr->doCriticalAttackFlag;
 }
 
 /* Address: 0x8020E350 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightKindDataBiosGetGetInfectPokerusFlag(u8* ptr) {
+u8 fightKindDataBiosGetGetInfectPokerusFlag(FightKindData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0xD]);
+    return ptr->getInfectPokerusFlag;
 }
 
 /* Address: 0x8020E368 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightKindDataBiosGetGetFriendFlag(u8* ptr) {
+u8 fightKindDataBiosGetGetFriendFlag(FightKindData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0xC]);
+    return ptr->getFriendFlag;
 }
 
 /* Address: 0x8020E380 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightKindDataBiosGetGetNekoniKobanFlag(u8* ptr) {
+u8 fightKindDataBiosGetGetNekoniKobanFlag(FightKindData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0xB]);
+    return ptr->getNekoniKobanFlag;
 }
 
 /* Address: 0x8020E398 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightKindDataBiosGetGetOkaneFlag(u8* ptr) {
+u8 fightKindDataBiosGetGetOkaneFlag(FightKindData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x9]);
+    return ptr->getOkaneFlag;
 }
 
 /* Address: 0x8020E3B0 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightKindDataBiosGetOkanePoolFlag(u8* ptr) {
+u8 fightKindDataBiosGetOkanePoolFlag(FightKindData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0xA]);
+    return ptr->okanePoolFlag;
 }
 
 /* Address: 0x8020E3C8 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightKindDataBiosGetGetExpFlag(u8* ptr) {
+u8 fightKindDataBiosGetGetExpFlag(FightKindData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x8]);
+    return ptr->getExpFlag;
 }
 
 /* Address: 0x8020E3E0 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightKindDataBiosGetDrawFlag(u8* ptr) {
+u8 fightKindDataBiosGetDrawFlag(FightKindData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x7]);
+    return ptr->drawFlag;
 }
 
 /* Address: 0x8020E3F8 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightKindDataBiosGetNigeruFlag(u8* ptr) {
+u8 fightKindDataBiosGetNigeruFlag(FightKindData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x6]);
+    return ptr->nigeruFlag;
 }
 
 /* Address: 0x8020E410 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightKindDataBiosGetCallFlag(u8* ptr) {
+u8 fightKindDataBiosGetCallFlag(FightKindData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x5]);
+    return ptr->callFlag;
 }
 
 /* Address: 0x8020E428 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightKindDataBiosGetUseItemFlag(u8* ptr) {
+u8 fightKindDataBiosGetUseItemFlag(FightKindData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x4]);
+    return ptr->useItemFlag;
 }
 
 /* Address: 0x8020E440 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightKindDataBiosGetDoZukanTukamaetaFlag(u8* ptr) {
+u8 fightKindDataBiosGetDoZukanTukamaetaFlag(FightKindData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x3]);
+    return ptr->doZukanTukamaetaFlag;
 }
 
 /* Address: 0x8020E458 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightKindDataBiosGetDoZukanMitaFlag(u8* ptr) {
+u8 fightKindDataBiosGetDoZukanMitaFlag(FightKindData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x2]);
+    return ptr->doZukanMitaFlag;
 }
 
 /* Address: 0x8020E470 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightKindDataBiosGetDoBadgeCheckFlag(u8* ptr) {
+u8 fightKindDataBiosGetDoBadgeCheckFlag(FightKindData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x1]);
+    return ptr->doBadgeCheckFlag;
 }
 
 /* fightKindDataBiosGetPtr | Size: 0x2C | Look up entry in 32-byte table (indirect) */
-void* fightKindDataBiosGetPtr(u16 index) {
-    extern u32 lbl_80478F40;
-    extern u32 lbl_80478F44;
-    u32* countPtr = (u32*)lbl_80478F40;
-    if (index > *countPtr) {
+FightKindData* fightKindDataBiosGetPtr(u16 index) {
+    if (index > *lbl_80478F40) {
         return NULL;
     }
-    return (u8*)lbl_80478F44 + (u32)index * 32;
+    return &lbl_80478F44[index];
 }
 
 /* Address: 0x8020E4B4 | Size: 0x18 | Pattern: nullcheck_getter */
-u8 fightKindDataBiosGetBackSaveDataFlag(u8* ptr) {
+u8 fightKindDataBiosGetBackSaveDataFlag(FightKindData* ptr) {
     if (ptr == NULL) { return 0; }
-    return *(u8*)(&ptr[0x0]);
+    return ptr->backSaveDataFlag;
 }
 
 /* 0x8020E4CC | size: 0x1C | tiny */
