@@ -1473,10 +1473,16 @@ void iref_INC_801A0C9C(void* o)
 /* 0x801A0CE8 | 0x54 -- out-of-line emitted copy of hsd_class.h's hsdDelete. */
 void hsdDelete_801A0CE8(void* object)
 {
+    void (*new_var)(HSD_Class* c);
     HSD_Class* o;
-    if ((o = (HSD_Class*) object) != NULL) {
-        HSD_CLASS_METHOD(o)->release(o);
-        HSD_CLASS_METHOD(o)->destroy(o);
+
+    if ((o = (HSD_Class*) object) != ((void*) 0)) {
+        if (!o) {
+            o = (HSD_Class*) object;
+        }
+        new_var = ((HSD_Class*) o)->class_info->release;
+        new_var(o);
+        ((HSD_Class*) o)->class_info->destroy(o);
     }
 }
 

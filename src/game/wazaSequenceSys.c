@@ -572,15 +572,15 @@ BOOL wazaSequenceSysGetResID(void) {
  * Address: 0x801DB088 | Size: 0x78
  * Referenced by battle_main.c (battle_FightCleanup).
  */
-void fn_801DB088(void) {
+void fn_801DB088(void)
+{
     u8* pool = lbl_80467CC0;
-    s32 i = 0;
     WazaEffect* entry;
-    u16 count;
+    s32 i = 0;
+    int count;
 
-    entry = *(WazaEffect**)pool;
-    count = *(u16*)(pool + 4);
-
+    entry = *((WazaEffect**) pool);
+    count = *((u16*) (pool + 4));
     for (; i < count; i++, entry++) {
         if (entry->active != 0) {
             fn_801DD158(entry);

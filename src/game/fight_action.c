@@ -288,8 +288,10 @@ u32 fightActionFlowSyuuryou(void* ctx)
     extern void fn_801DA8C4();
     extern u8 fn_801DA94C();
     extern void fn_801DA9E8();
+    void** new_var;
     extern void fn_801DDD28();
     extern void fn_801EF2D4();
+    u16 uVar3;
     extern u32 fn_801EF634();
     extern void fn_801EF8F4();
     extern void fightMainWaitFrame();
@@ -302,17 +304,16 @@ u32 fightActionFlowSyuuryou(void* ctx)
     extern s16 fightActionDataBiosGetBuff();
     extern void fightActionBiosGetFightActionDataPtr();
     extern void fn_80211B94();
-    extern u8 lbl_80378801[];
     extern u8 lbl_8037880F[];
     extern void fightMenuCloseMsg();
     extern void fightMenuOpenTrainerMsg();
+    extern u8 lbl_80378801[];
     extern void fightMenuOpenMsg();
     u16 sVar9;
     u32 uVar1;
     u32 uVar2;
     u32 uVar4;
     u32 iVar5;
-    u16 uVar3;
     u8 cVar10;
     u32 saved_r27;
     u32 iVar7;
@@ -325,21 +326,19 @@ u32 fightActionFlowSyuuryou(void* ctx)
     uVar4 = fightTrainerGetStatus(uVar2, 0, 0x4c, 0);
     iVar5 = fightTrainerGetStatus(0, uVar3, 8, 1);
     if (uVar3 == fn_800896B8()) {
-        iVar7 = fn_800896C0();
-        if (iVar7 == 0) {
+        iVar7 = (0, fn_800896C0());
+        if (0 == iVar7) {
             iVar7 = 0;
         } else {
             msgctrlSetValue(0x24, iVar7);
             iVar7 = 0x7531;
         }
+    } else if (((s32) fightTrainerGetStatus(uVar2, 0, 0x4a, 0)) == 0) {
+        iVar7 = fightTrainerGetStatus(0, uVar3, 8, 2);
     } else {
-        if ((s32)fightTrainerGetStatus(uVar2, 0, 0x4a, 0) == 0) {
+        iVar7 = fightTrainerGetStatus(0, uVar3, 8, 3);
+        if (iVar7 == 0) {
             iVar7 = fightTrainerGetStatus(0, uVar3, 8, 2);
-        } else {
-            iVar7 = fightTrainerGetStatus(0, uVar3, 8, 3);
-            if (iVar7 == 0) {
-                iVar7 = fightTrainerGetStatus(0, uVar3, 8, 2);
-            }
         }
     }
     msgctrlSetValue(0x22, fn_801F8000(uVar2));
@@ -362,9 +361,12 @@ u32 fightActionFlowSyuuryou(void* ctx)
                 fightMenuOpenTrainerMsg(iVar7);
                 while (1) {
                     cVar10 = fn_801DA94C(uVar4, 0x5a, 4);
-                    if (cVar10 == 0) break;
+                    if (cVar10 == 0) {
+                        break;
+                    }
                     _threadSwitch();
                 }
+
                 fn_801EF8F4(saved_r27);
                 fightMenuCloseMsg();
                 fn_801DA8C4(uVar4, 0x5a, 4);
@@ -381,16 +383,19 @@ u32 fightActionFlowSyuuryou(void* ctx)
                 fightMenuOpenTrainerMsg(iVar5);
                 while (1) {
                     cVar10 = fn_801DA94C(uVar4, 0x59, 4);
-                    if (cVar10 == 0) break;
+                    if (cVar10 == 0) {
+                        break;
+                    }
                     _threadSwitch();
                 }
+
                 fn_801EF8F4(saved_r27);
                 fightMenuCloseMsg();
                 fn_801DA8C4(uVar4, 0x59, 4);
             }
             fightMenuOpenMsg(0x7548);
             fightMenuCloseMsg();
-        } else if ((1 < (u16)(sVar9 - 4U)) && ((sVar9 == 7 || (sVar9 == 6)))) {
+        } else if ((1 < ((u16) (sVar9 - 4U))) && ((sVar9 == 7) || (sVar9 == 6))) {
             fightMenuOpenMsg(0x7640);
             fightMainWaitFrame(0x40);
             fightMenuCloseMsg();
@@ -398,9 +403,10 @@ u32 fightActionFlowSyuuryou(void* ctx)
     }
     uVar1 = fn_801EF634();
     cVar10 = fightFloorIsGcHeroWin(0, uVar1);
-    if ((cVar10 == 1) && (cVar10 = fightFloorGetStatus(0, 0, 0x25, 0), cVar10 == 1)) {
-        fn_80211B94(ctx, (u32)lbl_80378801, 0);
-        fn_80211B94(ctx, (u32)lbl_8037880F, 0);
+    if ((cVar10 == 1) && ((cVar10 = fightFloorGetStatus(0, 0, 0x25, 0), cVar10 == 1))) {
+        fn_80211B94(ctx, (u32) lbl_80378801, 0);
+        new_var = &ctx;
+        fn_80211B94(*new_var, (u32) lbl_8037880F, 0);
     }
     fn_801EF2D4();
     return 1;

@@ -698,7 +698,7 @@ void msgctrlClientnowork(void) {
     u32 val = lbl_8047AE10;
     result = fightFloorGetFightOutPokemonPtrToFightTrainerPtr(0, val);
     new_var = 0;
-    if (((u8)(new_var, fn_801F18DC(0)) == 1) && result != 0) {
+    if ((((u8) ((new_var, fn_801F18DC(0)))) == 1) && (result != 0)) {
         msgctrlSetValue(0x4D, fightTrainerGetNamePtr(result));
         msgctrlSetValue(0x57, fightOutPokemonGetNicknamePtr(val));
         GSmsgGetGSchar(0x7721);
@@ -770,17 +770,17 @@ asm void msgctrlTsuikaMons(void) {
 void msgctrlTsuikaMons(void) {
     extern u32 lbl_8047ADE0;
     extern u32 fightFloorGetFightOutPokemonPtrToFightTrainerPtr(u32, u32);
+    u32 result;
     extern u32 fn_801F18DC(u32);
     extern u32 fightTrainerGetNamePtr(u32);
     extern u32 fightOutPokemonGetNicknamePtr(u32);
+    u32 new_var;
     extern void msgctrlSetValue(u32, u32);
     extern void GSmsgGetGSchar(u32);
-    u32 result;
-    u32 new_var;
     u32 val = lbl_8047ADE0;
     result = fightFloorGetFightOutPokemonPtrToFightTrainerPtr(0, val);
     new_var = val;
-    if (((u8)fn_801F18DC(0) == 1) && result != 0) {
+    if ((((u8) fn_801F18DC(0)) == 1) && (result != 0)) {
         msgctrlSetValue(0x4D, fightTrainerGetNamePtr(result));
         msgctrlSetValue(0x57, fightOutPokemonGetNicknamePtr(new_var));
         do { GSmsgGetGSchar(0x7721); } while (0);
@@ -818,7 +818,7 @@ void msgctrlClientMos(void) {
     u32 new_var;
     result = fightFloorGetFightOutPokemonPtrToFightTrainerPtr(0, val);
     new_var = val;
-    if (((u8)fn_801F18DC(0) == 1) && result != 0) {
+    if ((((u8) fn_801F18DC(0)) == 1) && (result != 0)) {
         msgctrlSetValue(0x4D, fightTrainerGetNamePtr(result));
         msgctrlSetValue(0x57, fightOutPokemonGetNicknamePtr(new_var));
         GSmsgGetGSchar(0x7721);
@@ -856,7 +856,7 @@ void msgctrlDeffenceMons(void) {
     u32 new_var;
     result = fightFloorGetFightOutPokemonPtrToFightTrainerPtr(0, val);
     new_var = val;
-    if (((u8)fn_801F18DC(0) == 1) && result != 0) {
+    if ((((u8) fn_801F18DC(0)) == 1) && (result != 0)) {
         msgctrlSetValue(0x4D, fightTrainerGetNamePtr(result));
         msgctrlSetValue(0x57, fightOutPokemonGetNicknamePtr(new_var));
         GSmsgGetGSchar(0x7721);
@@ -894,7 +894,7 @@ void msgctrlAttackMons(void) {
     u32 val = lbl_8047ADD4;
     result = fightFloorGetFightOutPokemonPtrToFightTrainerPtr(0, val);
     new_var = val;
-    if (((u8)fn_801F18DC(0) == 1) && result != 0) {
+    if ((((u8) fn_801F18DC(0)) == 1) && (result != 0)) {
         msgctrlSetValue(0x4D, fightTrainerGetNamePtr(result));
         msgctrlSetValue(0x57, fightOutPokemonGetNicknamePtr(new_var));
         GSmsgGetGSchar(0x7721);
