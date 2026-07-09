@@ -6,6 +6,14 @@
 
 #define HID2 920
 
+#define ASSERTMSGLINE(line, cond, msg) (void)0
+
+#define HID2_DCHERR 0x00800000
+#define HID2_DNCERR 0x00400000
+#define HID2_DCMERR 0x00200000
+#define HID2_DQOERR 0x00100000
+#define SRR1_DMA_BIT 0x00200000
+
 /*
  * OSCache.c - Data cache, instruction cache, and L2 cache management.
  *
@@ -166,6 +174,9 @@ _loop_lcd:
 }
 #pragma pop
 
+#pragma push
+#pragma peephole off
+#pragma dont_inline on
 void L2GlobalInvalidate(void) {
     asm { sync }
     PPCMtl2cr(PPCMfl2cr() & 0x7FFFFFFF);
@@ -182,40 +193,46 @@ void L2GlobalInvalidate(void) {
         DBPrintf(">>> L2 INVALIDATE : SHOULD NEVER HAPPEN\n");
     }
 }
+#pragma pop
 
+#pragma push
+#pragma peephole off
 void DMAErrorHandler(u16 error, OSContext* context, ...) {
-    u32 hid2;
-
-    hid2 = PPCMfhid2();
+    u32 hid2 = PPCMfhid2();
 
     OSReport("Machine check received\n");
-    OSReport("HID2 = 0x%08x   SRR1 = 0x%08x\n", hid2, context->srr1);
-
-    if (!(hid2 & 0x00F00000) || !(context->srr1 & 0x00200000)) {
-        OSReport("Unrecoverable DMA error\n");
+    OSReport("HID2 = 0x%x   SRR1 = 0x%x\n", hid2, context->srr1);
+    if (!(hid2 & (HID2_DCHERR | HID2_DNCERR | HID2_DCMERR | HID2_DQOERR)) || !(context->srr1 & SRR1_DMA_BIT)) {
+        OSReport("Machine check was not DMA/locked cache related\n");
         OSDumpContext(context);
         PPCHalt();
     }
 
-    OSReport("DMA error handler: recovering\n");
-    OSReport("Resetting write gather pipe\n");
+    OSReport("DMAErrorHandler(): An error occurred while processing DMA.\n");
+    OSReport("The following errors have been detected and cleared :\n");
 
-    if (hid2 & 0x01000000) {
-        OSReport("  Write gather pipe overflow\n");
+    if (hid2 & HID2_DCHERR) {
+        OSReport("\t- Requested a locked cache tag that was already in the cache\n");
     }
-    if (hid2 & 0x00800000) {
-        OSReport("  Write gather pipe underflow\n");
+
+    if (hid2 & HID2_DNCERR) {
+        OSReport("\t- DMA attempted to access normal cache\n");
     }
-    if (hid2 & 0x00400000) {
-        OSReport("  Write gather pipe parity error\n");
+
+    if (hid2 & HID2_DCMERR) {
+        OSReport("\t- DMA missed in data cache\n");
     }
-    if (hid2 & 0x00200000) {
-        OSReport("  Write gather pipe error\n");
+
+    if (hid2 & HID2_DQOERR) {
+        OSReport("\t- DMA queue overflowed\n");
     }
 
     PPCMthid2(hid2);
 }
+#pragma pop
 
+#pragma push
+#pragma peephole off
 void __OSCacheInit(void) {
     u32 hid0;
 
@@ -223,14 +240,14 @@ void __OSCacheInit(void) {
     hid0 = PPCMfhid0();
     if (!(hid0 & 0x8000)) {
         ICEnable();
-        DBPrintf("L1 I-Cache has been enabled\n");
+        DBPrintf("L1 i-caches initialized\n");
     }
 
     /* Enable D-cache if not already enabled */
     hid0 = PPCMfhid0();
     if (!(hid0 & 0x4000)) {
         DCEnable();
-        DBPrintf("L1 D-Cache has been enabled\n");
+        DBPrintf("L1 d-caches initialized\n");
     }
 
     /* Enable L2 cache if not already enabled */
@@ -263,7 +280,7 @@ void __OSCacheInit(void) {
             l2cr = (l2cr | 0x80000000) & ~0x00200000;
             PPCMtl2cr(l2cr);
 
-            DBPrintf("L2 Cache has been enabled\n");
+            DBPrintf("L2 cache initialized\n");
         }
     }
 
@@ -271,6 +288,7 @@ void __OSCacheInit(void) {
     OSSetErrorHandler(1, (OSErrorHandler)DMAErrorHandler);
     DBPrintf("Locked cache machine check handler installed\n");
 }
+#pragma pop
 
 /* ===================================================================
  * Stub functions for coverage -- TODO: decompile
@@ -463,23 +481,24 @@ void LCEnable(void) {
 }
 
 /*
- * LCLoadData - Initiate a locked cache DMA load.
+ * LCStoreBlocks - Initiate a locked cache DMA store transfer.
  *
- * Constructs DMA_U/DMA_L register values from the source address,
- * destination address, and block count, then starts the transfer.
+ * Constructs DMA_U/DMA_L register values from the destination address,
+ * source tag address, and block count, then starts the transfer.
  *
  * 0x8009B538 | size: 0x24
  */
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-asm void LCLoadData(register void* destAddr, register void* srcAddr, register u32 nBlocks) {
+asm void LCStoreBlocks(register void* destAddr, register void* srcAddr, register u32 nBlocks) {
     nofralloc
-    extrwi  r6, r5, 5, 25
-    clrlwi  r3, r3, 4
-    or      r6, r6, r3
+    rlwinm  r6, nBlocks, 30, 27, 31
+    rlwinm  destAddr, destAddr, 0, 4, 31
+    or      r6, r6, destAddr
     mtspr   DMA_U, r6
-    or      r6, r6, r4
+    rlwinm  r6, nBlocks, 2, 28, 29
+    or      r6, r6, srcAddr
     ori     r6, r6, 0x0002
     mtspr   DMA_L, r6
     blr
@@ -489,43 +508,35 @@ asm void LCLoadData(register void* destAddr, register void* srcAddr, register u3
 /*
  * LCStoreData - DMA-transfer multiple blocks via the locked cache.
  *
- * 2026-07-02 reconciliation: renamed from the orphan "LCLoadBlocks"
- * (not present in symbols.txt) to its real name, LCStoreData, on
- * address/size evidence: symbols.txt has LCStoreData at this exact
- * address (0x8009B55C) and size (0xAC), matching the unmatched
- * "LCStoreData" slot in this unit's objdiff report. src/game/gs_field_world.c
- * also already declares `extern void LCStoreData();`, corroborating
- * that this is the real, in-use name elsewhere in the tree. The
- * "Load" vs "Store" naming mismatch with this body's current content
- * (and with the LCLoadData() calls it makes) is a known oddity flagged
- * here rather than silently resolved - not restructured this pass.
- *
  * Splits large transfers into 128-block (0x1000 byte) chunks,
- * calling LCLoadData for each chunk. Returns the number of
+ * calling LCStoreBlocks for each chunk. Returns the number of
  * full 128-block transfers performed.
  *
  * 0x8009B55C | size: 0xAC
  */
+#pragma push
+#pragma peephole off
 u32 LCStoreData(void* destAddr, void* srcAddr, u32 nBytes) {
-    u32 dest = (u32)destAddr;
+    u32 numBlocks = (nBytes + 0x1F) >> 5;
+    u32 numTransactions = (numBlocks + 0x7F) >> 7;
     u32 src = (u32)srcAddr;
-    u32 blocks = (nBytes + 0x1F) >> 5;
-    u32 fullTransfers = (blocks + 0x7F) >> 7;
+    u32 dest = (u32)destAddr;
 
-    while (blocks != 0) {
-        if (blocks < 0x80) {
-            LCLoadData((void*)dest, (void*)src, blocks);
-            blocks = 0;
+    while (numBlocks != 0) {
+        if (numBlocks < 0x80) {
+            LCStoreBlocks((void*)dest, (void*)src, numBlocks);
+            numBlocks = 0;
         } else {
-            LCLoadData((void*)dest, (void*)src, 0);
+            LCStoreBlocks((void*)dest, (void*)src, 0);
+            numBlocks -= 0x80;
             dest += 0x1000;
             src += 0x1000;
-            blocks -= 0x80;
         }
     }
 
-    return fullTransfers;
+    return numTransactions;
 }
+#pragma pop
 
 /*
  * LCQueueLength - Get the current locked cache DMA queue length.
