@@ -81,6 +81,10 @@ s32 fightTrainerAiSelectIrekaeDasuFightPokemon(void* ctx, u32 param1, u32 param2
 u32 fightTrainerAiWazaHit045(void* trainerCtx, u32 trainerSlot, u32 resultSlot, u32 resultType);
 u32 fightMenuFightTrainerGcHeroOpenMenu(void* ctx, u32 param1, u32 param2);
 
+typedef struct ToolentrySpeciesList {
+    u16 speciesId[1];
+} ToolentrySpeciesList;
+
 /* Address: 0x8025CD64 | Size: 0x54 | Pattern: field_accessor */
 void toolentryTaisenFreePokemonData(void* ctx, u32 slot, u32 param) {
     extern u32 lbl_8047B650;
@@ -330,7 +334,7 @@ u32 fn_8025D06C(void)
 
 /* Address: 0x8025D0A8 | Size: 0xBC */
 f32 fn_8025D0A8(void* ctx, u32 param1, u32 param2) {
-    extern u32 lbl_80478EAC;
+    extern ToolentrySpeciesList* lbl_80478EAC;
     extern f32 lbl_8047E658;
     extern f32 lbl_8047E65C;
     extern u16 pokemonBiosGetPokemonDataId(void*);
@@ -341,8 +345,8 @@ f32 fn_8025D0A8(void* ctx, u32 param1, u32 param2) {
     u32 count;
     void* member;
     void* party;
+    ToolentrySpeciesList* speciesList;
     u32 offset;
-    u32 masked;
     u16 idx;
     u16 species;
     u16 entry;
@@ -357,16 +361,17 @@ f32 fn_8025D0A8(void* ctx, u32 param1, u32 param2) {
         member = heroBiosGetPokemonPtr(party, i & 0xFFFF);
         if (pokemonCheckValid(member) != 0) {
             species = pokemonBiosGetPokemonDataId(member);
+            speciesList = lbl_80478EAC;
             offset = 0;
             while (1) {
-                entry = *(u16*)(lbl_80478EAC + offset);
+                entry = speciesList->speciesId[offset];
                 if (entry == 0) {
                     break;
                 }
                 if (species == entry) {
                     count++;
                 }
-                offset += 2;
+                offset++;
             }
         }
     }
