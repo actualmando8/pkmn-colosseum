@@ -6,3 +6,588 @@
  * segment (Fable re-split, 2026-07-07). Functions asm-only until matched.
  */
 #include "dolphin/types.h"
+#include "hsd/hsd_aobj.h"
+#include "hsd/hsd_jobj.h"
+
+#define MODEL_FLAG_IN_USE              0x00000001
+#define MODEL_FLAG_HAS_ANIM            0x00000004
+#define MODEL_FLAG_HAS_TEX_ANIM        0x00000008
+#define MODEL_FLAG_ANIMATING           0x00000020
+#define MODEL_FLAG_TEX_ANIMATING       0x00000040
+#define MODEL_FLAG_BLENDING            0x00000080
+#define MODEL_FLAG_PAUSED              0x00000100
+#define MODEL_FLAG_60FPS_ANIM          0x00000800
+#define MODEL_FLAG_SKIP_APPLY          0x00001000
+#define MODEL_FLAG_LINK_TEX_TO_ANIM    0x00002000
+#define MODEL_FLAG_ANIM_ENDED          0x00004000
+#define MODEL_FLAG_TEX_ANIM_ENDED      0x00008000
+#define MODEL_FLAG_FORCE_UPDATE        0x00010000
+#define MODEL_FLAG_USE_JOBJ_CHILD      0x00020000
+
+typedef struct GSmodel GSmodel;
+typedef void (*GSmodelAnimEndedCallback)(GSmodel*, void*);
+
+typedef struct GSmodelResource {
+    void* header;
+    void** anims;
+    void** tex_anims;
+    void** shape_anims;
+} GSmodelResource;
+
+struct GSmodel {
+    u32 flags;
+    GSmodelResource* resource;
+    HSD_JObj* jobj;
+    u8 pad0C[0x10 - 0x0C];
+    HSD_JObj* blend_jobj_a;
+    HSD_JObj* blend_jobj_b;
+    u8 pad18[0x84 - 0x18];
+    u32 anim_count;
+    u32 tex_anim_count;
+    u32 anim_type;
+    u32 anim_index;
+    f32 anim_rate;
+    f32 anim_frame;
+    f32 anim_req_frame;
+    f32 anim_end_frame;
+    u32 tex_anim_type;
+    u32 tex_anim_index;
+    f32 tex_anim_rate;
+    f32 tex_anim_frame;
+    f32 tex_anim_req_frame;
+    f32 tex_anim_end_frame;
+    u32 blend_anim_index_a;
+    u32 blend_anim_index_b;
+    f32 blend_anim_frame_a;
+    f32 blend_anim_frame_b;
+    f32 blend_anim_end_frame_a;
+    f32 blend_anim_end_frame_b;
+    f32 blend_factor;
+    f32 blend_frame_scale;
+    GSmodelAnimEndedCallback anim_ended_callback;
+    void* anim_ended_callback_arg;
+    u8 padE4[0x114 - 0xE4];
+    s32 force_fractional_frames;
+    void* fractional_frame_data;
+    u8 pad11C[0x170 - 0x11C];
+};
+
+extern GSmodel* lbl_8047AB74;
+extern u32 lbl_8047AB78;
+
+extern const f32 lbl_8047CC58;
+extern const f32 lbl_8047CC5C;
+extern const f32 lbl_8047CC60;
+extern const f32 lbl_8047CC64;
+extern char lbl_8047CC90[] __attribute__((section(".sdata2")));
+extern char lbl_8047CC98[] __attribute__((section(".sdata2")));
+
+void HSD_ForeachAnim(void* obj, u32 type, u32 mask, void* func, u32 arg_type, ...);
+void fn_801A32A0(HSD_JObj* jobj, u32 flags, f32 frame);
+void fn_801A2B5C(HSD_JObj* jobj, u32 flags, void* anim, void* shape_anim);
+s32 fn_800D37CC(void);
+void modelApplyAnimation__FP8_GSmodel(GSmodel* model);
+void modelUpdateAttachments__FP8_GSmodel(GSmodel* model);
+void _modelSetLoopFlag__FP9_HSD_AObjUl(HSD_AObj* aobj, u32 enable);
+void _modelGetEndFrame(HSD_AObj* aobj, f32* end_frame);
+void fn_800ED6E4(GSmodel* model, u8 tex_anim);
+void fn_800ED7E4(GSmodel* model, u8 tex_anim, f32 delta);
+
+void GSmodelForceAnimTransformUpdate(GSmodel* model)
+{
+    u32 flags = model->flags;
+
+    if (!(flags & MODEL_FLAG_FORCE_UPDATE) ||
+        !(flags & MODEL_FLAG_SKIP_APPLY)) {
+        modelApplyAnimation__FP8_GSmodel(model);
+        modelUpdateAttachments__FP8_GSmodel(model);
+    }
+}
+
+void fn_800EC134(GSmodel* model)
+{
+    modelApplyAnimation__FP8_GSmodel(model);
+}
+
+void GSmodelSetAnimEndedCallback(GSmodel* model,
+                                 GSmodelAnimEndedCallback callback, void* arg)
+{
+    model->anim_ended_callback = callback;
+    model->anim_ended_callback_arg = arg;
+}
+
+void GSmodelSet60fpsAnimFlag(GSmodel* model, u8 enable)
+{
+    if (enable) {
+        model->flags |= MODEL_FLAG_60FPS_ANIM;
+    } else {
+        model->flags &= ~MODEL_FLAG_60FPS_ANIM;
+    }
+}
+
+void GSmodelLinkTexAnimToAnim(GSmodel* model, u8 enable)
+{
+    if (enable) {
+        model->flags |= MODEL_FLAG_LINK_TEX_TO_ANIM;
+    } else {
+        model->flags &= ~MODEL_FLAG_LINK_TEX_TO_ANIM;
+    }
+}
+
+u32 GSmodelCanTexAnimate(GSmodel* model)
+{
+    return (model->flags >> 3) & 1;
+}
+
+u32 GSmodelCanAnimate(GSmodel* model)
+{
+    return (model->flags >> 2) & 1;
+}
+
+u32 GSmodelHasTexAnimationEnded(GSmodel* model)
+{
+    return (model->flags >> 15) & 1;
+}
+
+void GSmodelStopTexAnimation(GSmodel* model)
+{
+    model->flags &= ~MODEL_FLAG_TEX_ANIMATING;
+}
+
+void GSmodelStartTexAnimation(GSmodel* model)
+{
+    u32 flags = model->flags;
+
+    if (flags & MODEL_FLAG_HAS_TEX_ANIM) {
+        model->flags = flags | MODEL_FLAG_TEX_ANIMATING;
+        model->flags &= ~MODEL_FLAG_TEX_ANIM_ENDED;
+    }
+}
+
+void GSmodelSetTexAnimType(GSmodel* model, u32 type)
+{
+    HSD_JObj* jobj = model->jobj;
+
+    if (model->flags & MODEL_FLAG_USE_JOBJ_CHILD) {
+        jobj = jobj->child;
+    }
+
+    model->tex_anim_type = type;
+    switch (model->tex_anim_type) {
+    case 0:
+        HSD_ForeachAnim(jobj, 6, 0x64DB,
+                        (void*)_modelSetLoopFlag__FP9_HSD_AObjUl, 3, 0);
+        break;
+    case 1:
+        HSD_ForeachAnim(jobj, 6, 0x64DB,
+                        (void*)_modelSetLoopFlag__FP9_HSD_AObjUl, 3, 1);
+        break;
+    }
+}
+
+void GSmodelSetTexAnimFrame(GSmodel* model, f32 frame)
+{
+    HSD_JObj* jobj;
+    u32 flags = model->flags;
+
+    jobj = model->jobj;
+    if (flags & MODEL_FLAG_HAS_TEX_ANIM) {
+        if (flags & MODEL_FLAG_USE_JOBJ_CHILD) {
+            jobj = jobj->child;
+        }
+        model->tex_anim_frame = frame;
+        model->tex_anim_req_frame = frame;
+        fn_801A32A0(jobj, 0x634, model->tex_anim_req_frame);
+        model->flags &= ~MODEL_FLAG_TEX_ANIM_ENDED;
+    }
+}
+
+void GSmodelSetTexAnimIndex(GSmodel* model, u32 index)
+{
+    HSD_JObj* jobj = model->jobj;
+    u32 flags = model->flags;
+
+    if (!(flags & MODEL_FLAG_HAS_TEX_ANIM)) {
+        return;
+    }
+    if (index >= model->tex_anim_count) {
+        return;
+    }
+    if (index != model->tex_anim_index) {
+        if (flags & MODEL_FLAG_USE_JOBJ_CHILD) {
+            jobj = jobj->child;
+        }
+        model->tex_anim_index = index;
+        fn_801A2B5C(jobj, 0, model->resource->tex_anims[model->tex_anim_index],
+                    NULL);
+        model->tex_anim_end_frame = lbl_8047CC5C;
+        HSD_ForeachAnim(jobj, 6, 0x64DB, (void*)_modelGetEndFrame, 2,
+                        &model->tex_anim_end_frame);
+    }
+
+    flags = model->flags;
+    jobj = model->jobj;
+    if (flags & MODEL_FLAG_HAS_TEX_ANIM) {
+        if (flags & MODEL_FLAG_USE_JOBJ_CHILD) {
+            jobj = jobj->child;
+        }
+        model->tex_anim_frame = lbl_8047CC5C;
+        model->tex_anim_req_frame = lbl_8047CC5C;
+        fn_801A32A0(jobj, 0x634, model->tex_anim_req_frame);
+        model->flags &= ~MODEL_FLAG_TEX_ANIM_ENDED;
+    }
+
+    flags = model->flags;
+    jobj = model->jobj;
+    if (flags & MODEL_FLAG_USE_JOBJ_CHILD) {
+        jobj = jobj->child;
+    }
+
+    model->tex_anim_type = model->tex_anim_type;
+    switch (model->tex_anim_type) {
+    case 0:
+        HSD_ForeachAnim(jobj, 6, 0x64DB,
+                        (void*)_modelSetLoopFlag__FP9_HSD_AObjUl, 3, 0);
+        break;
+    case 1:
+        HSD_ForeachAnim(jobj, 6, 0x64DB,
+                        (void*)_modelSetLoopFlag__FP9_HSD_AObjUl, 3, 1);
+        break;
+    }
+}
+
+u32 GSmodelGetAnimType(GSmodel* model)
+{
+    return model->anim_type;
+}
+
+f32 GSmodelGetAnimRate(GSmodel* model)
+{
+    return model->anim_rate;
+}
+
+f32 GSmodelGetAnimFrame(GSmodel* model)
+{
+    u32 flags = model->flags;
+
+    if (!(flags & MODEL_FLAG_HAS_ANIM)) {
+        return lbl_8047CC5C;
+    }
+    if (flags & MODEL_FLAG_BLENDING) {
+        return model->blend_anim_frame_b;
+    }
+    return model->anim_frame;
+}
+
+void GSmodelGetAnimIndex(GSmodel* model, u32* index_a, u32* index_b)
+{
+    if (!(model->flags & MODEL_FLAG_BLENDING)) {
+        *index_a = model->anim_index;
+        *index_b = -1;
+    } else {
+        *index_a = model->blend_anim_index_a;
+        *index_b = model->blend_anim_index_b;
+    }
+}
+
+u32 GSmodelIsBlending(GSmodel* model)
+{
+    return (model->flags >> 7) & 1;
+}
+
+void GSmodelSetBlendFactor(GSmodel* model, f32 factor)
+{
+    u32 flags = model->flags;
+
+    if (!(flags & MODEL_FLAG_HAS_ANIM)) {
+        return;
+    }
+    if (flags & MODEL_FLAG_BLENDING) {
+        goto clamp_factor;
+    }
+    return;
+
+clamp_factor:
+    if (factor < lbl_8047CC5C) {
+        factor = lbl_8047CC5C;
+    } else if (factor > lbl_8047CC60) {
+        factor = lbl_8047CC60;
+    }
+    model->blend_factor = factor;
+}
+
+void GSmodelSetBlendAnimFrameForce(GSmodel* model, f32 frame_a, f32 frame_b)
+{
+    model->blend_frame_scale = lbl_8047CC5C;
+    model->blend_anim_frame_a = frame_a;
+    model->blend_anim_frame_b = frame_b;
+}
+
+void GSmodelAllUnpauseAnimation(void)
+{
+    u32 i;
+
+    for (i = 0; i < lbl_8047AB78; i++) {
+        if (lbl_8047AB74[i].flags & MODEL_FLAG_IN_USE) {
+            lbl_8047AB74[i].flags &= ~MODEL_FLAG_PAUSED;
+        }
+    }
+}
+
+void GSmodelAllPauseAnimation(void)
+{
+    u32 i;
+
+    for (i = 0; i < lbl_8047AB78; i++) {
+        if (lbl_8047AB74[i].flags & MODEL_FLAG_IN_USE) {
+            lbl_8047AB74[i].flags |= MODEL_FLAG_PAUSED;
+        }
+    }
+}
+
+u32 GSmodelHasAnimationEnded(GSmodel* model)
+{
+    return (model->flags >> 14) & 1;
+}
+
+u32 GSmodelIsAnimating(GSmodel* model)
+{
+    return (model->flags >> 5) & 1;
+}
+
+void GSmodelStopAnimation(GSmodel* model)
+{
+    model->flags &= ~MODEL_FLAG_ANIMATING;
+
+    if (model->flags & MODEL_FLAG_LINK_TEX_TO_ANIM) {
+        model->flags &= ~MODEL_FLAG_TEX_ANIMATING;
+    }
+}
+
+void GSmodelStartAnimation(GSmodel* model)
+{
+    u32 flags = model->flags;
+
+    if (!(flags & MODEL_FLAG_HAS_ANIM)) {
+        return;
+    }
+
+    model->flags = flags | MODEL_FLAG_ANIMATING;
+    model->flags &= ~MODEL_FLAG_ANIM_ENDED;
+
+    flags = model->flags;
+    if (!(flags & MODEL_FLAG_LINK_TEX_TO_ANIM)) {
+        return;
+    }
+    if (!(flags & MODEL_FLAG_HAS_TEX_ANIM)) {
+        return;
+    }
+
+    model->flags = flags | MODEL_FLAG_TEX_ANIMATING;
+    model->flags &= ~MODEL_FLAG_TEX_ANIM_ENDED;
+}
+
+void GSmodelGetFrameCount(GSmodel* model, f32* anim_frames, f32* tex_frames)
+{
+    if (!(model->flags & MODEL_FLAG_BLENDING)) {
+        if (anim_frames != NULL) {
+            *anim_frames = lbl_8047CC60 + model->anim_end_frame;
+        }
+        if (tex_frames != NULL) {
+            *tex_frames = lbl_8047CC64;
+        }
+    } else {
+        if (anim_frames != NULL) {
+            *anim_frames = lbl_8047CC60 + model->blend_anim_end_frame_a;
+        }
+        if (tex_frames != NULL) {
+            *tex_frames = lbl_8047CC60 + model->blend_anim_end_frame_b;
+        }
+    }
+}
+
+void GSmodelSetTexAnimRate(GSmodel* model, f32 rate)
+{
+    if (model->flags & MODEL_FLAG_HAS_TEX_ANIM) {
+        model->tex_anim_rate = rate;
+        if (fn_800D37CC() == 50) {
+            model->tex_anim_rate *= lbl_8047CC58;
+        }
+    }
+}
+
+void GSmodelSetAnimRate(GSmodel* model, f32 rate)
+{
+    if (model->flags & MODEL_FLAG_HAS_ANIM) {
+        model->anim_rate = rate;
+        if (fn_800D37CC() == 50) {
+            model->anim_rate *= lbl_8047CC58;
+        }
+
+        if ((model->flags & MODEL_FLAG_LINK_TEX_TO_ANIM) &&
+            (model->flags & MODEL_FLAG_HAS_TEX_ANIM)) {
+            model->tex_anim_rate = rate;
+            if (fn_800D37CC() == 50) {
+                model->tex_anim_rate *= lbl_8047CC58;
+            }
+        }
+    }
+}
+
+void GSmodelSetAnimFrame(GSmodel* model, f32 frame)
+{
+    HSD_JObj* jobj;
+    u32 flags = model->flags;
+
+    jobj = model->jobj;
+    if (!(flags & MODEL_FLAG_HAS_ANIM)) {
+        return;
+    }
+
+    if (!(flags & MODEL_FLAG_BLENDING)) {
+        if (flags & MODEL_FLAG_USE_JOBJ_CHILD) {
+            jobj = jobj->child;
+        }
+        model->anim_frame = frame;
+        model->anim_req_frame = frame;
+        fn_801A32A0(jobj, 0x1CB, model->anim_req_frame);
+    } else {
+        model->blend_anim_frame_a = frame * model->blend_frame_scale;
+        model->blend_anim_frame_b = frame;
+        fn_801A32A0(model->blend_jobj_a, 0x1CB, model->blend_anim_frame_a);
+        fn_801A32A0(model->blend_jobj_b, 0x1CB, model->blend_anim_frame_b);
+    }
+
+    model->flags &= ~(MODEL_FLAG_SKIP_APPLY | MODEL_FLAG_ANIM_ENDED);
+
+    flags = model->flags;
+    jobj = model->jobj;
+    if ((flags & MODEL_FLAG_LINK_TEX_TO_ANIM) &&
+        (flags & MODEL_FLAG_HAS_TEX_ANIM)) {
+        if (flags & MODEL_FLAG_USE_JOBJ_CHILD) {
+            jobj = jobj->child;
+        }
+        model->tex_anim_frame = frame;
+        model->tex_anim_req_frame = frame;
+        fn_801A32A0(jobj, 0x634, model->tex_anim_req_frame);
+        model->flags &= ~MODEL_FLAG_TEX_ANIM_ENDED;
+    }
+}
+
+void GSmodelSetAnimType(GSmodel* model, u32 type)
+{
+    HSD_JObj* jobj;
+
+    jobj = model->jobj;
+    if (model->flags & MODEL_FLAG_USE_JOBJ_CHILD) {
+        jobj = jobj->child;
+    }
+
+    model->anim_type = type;
+    switch (model->anim_type) {
+    case 0:
+        HSD_ForeachAnim(jobj, 6, 0x9B2F,
+                        (void*)_modelSetLoopFlag__FP9_HSD_AObjUl, 3, 0);
+        break;
+    case 1:
+        HSD_ForeachAnim(jobj, 6, 0x9B2F,
+                        (void*)_modelSetLoopFlag__FP9_HSD_AObjUl, 3, 1);
+        break;
+    }
+
+    if (model->flags & MODEL_FLAG_LINK_TEX_TO_ANIM) {
+        jobj = model->jobj;
+        if (model->flags & MODEL_FLAG_USE_JOBJ_CHILD) {
+            jobj = jobj->child;
+        }
+        model->tex_anim_type = type;
+        switch (model->tex_anim_type) {
+        case 0:
+            HSD_ForeachAnim(jobj, 6, 0x64DB,
+                            (void*)_modelSetLoopFlag__FP9_HSD_AObjUl, 3, 0);
+            break;
+        case 1:
+            HSD_ForeachAnim(jobj, 6, 0x64DB,
+                            (void*)_modelSetLoopFlag__FP9_HSD_AObjUl, 3, 1);
+            break;
+        }
+    }
+}
+
+void GSmodelAdvanceAnimation(GSmodel* model, f32 delta)
+{
+    u32 flags = model->flags;
+
+    if (flags & MODEL_FLAG_PAUSED) {
+        return;
+    }
+
+    if (flags & MODEL_FLAG_ANIM_ENDED) {
+        fn_800ED6E4(model, FALSE);
+    }
+    if (model->flags & MODEL_FLAG_TEX_ANIM_ENDED) {
+        fn_800ED6E4(model, TRUE);
+    }
+
+    flags = model->flags;
+    if (flags & MODEL_FLAG_BLENDING) {
+        if (flags & MODEL_FLAG_ANIMATING) {
+            fn_800ED7E4(model, FALSE, delta * model->anim_rate);
+            model->blend_anim_frame_a =
+                model->blend_anim_frame_b * model->blend_frame_scale;
+        }
+    } else {
+        if (flags & MODEL_FLAG_ANIMATING) {
+            fn_800ED7E4(model, FALSE, delta * model->anim_rate);
+        }
+        if (model->flags & MODEL_FLAG_TEX_ANIMATING) {
+            fn_800ED7E4(model, TRUE, delta * model->tex_anim_rate);
+        }
+    }
+
+    model->flags &= ~(MODEL_FLAG_FORCE_UPDATE | MODEL_FLAG_SKIP_APPLY);
+}
+
+u32 modelProcessAt60fps__FP8_GSmodel(GSmodel* model)
+{
+    if ((model->flags & MODEL_FLAG_60FPS_ANIM) == MODEL_FLAG_60FPS_ANIM) {
+        goto yes;
+    }
+    if (model->force_fractional_frames == 0) {
+        goto no;
+    }
+    if (model->fractional_frame_data == NULL) {
+        goto no;
+    }
+yes:
+    return TRUE;
+no:
+    return FALSE;
+}
+
+void _modelGetAObjFunc__FP9_HSD_AObjPv(HSD_AObj* aobj, HSD_AObj** out)
+{
+    if (aobj != NULL) {
+        *out = aobj;
+    }
+}
+
+void _modelSetLoopFlag__FP9_HSD_AObjUl(HSD_AObj* aobj, u32 enable)
+{
+    if (enable == 0) {
+        HSD_AObjClearFlags(aobj, AOBJ_LOOP);
+    } else {
+        HSD_AObjSetFlags(aobj, AOBJ_LOOP);
+    }
+}
+
+void _modelGetEndFrame(HSD_AObj* aobj, f32* end_frame)
+{
+    if (aobj == NULL) {
+        __assert(lbl_8047CC90, 0xAB, lbl_8047CC98);
+    }
+
+    if (aobj->end_frame > *end_frame) {
+        *end_frame = aobj->end_frame;
+    }
+}
