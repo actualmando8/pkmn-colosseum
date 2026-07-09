@@ -75,6 +75,7 @@ extern void __fstLoad(void);
  * 0x800A5624 | size: 0xCC
  */
 void DVDInit(void) {
+    u32* new_var;
     u32 debugMonSize;
 
     if (DVDInitialized_8047A828) {
@@ -89,8 +90,9 @@ void DVDInit(void) {
     __DVDClearWaitingQueue();
     __DVDInitWA();
 
-    bootInfo_8047A7F0 = BOOT_INFO;
-    IDShouldBe_8047A7EC = BOOT_INFO;
+    debugMonSize = 0x80000000;
+    bootInfo_8047A7F0 = (u32*)debugMonSize;
+    IDShouldBe_8047A7EC = (u32*)0x80000000;
 
     /* Register DVD interrupt handler (interrupt 0x15 = DVD) */
     {
@@ -105,16 +107,17 @@ void DVDInit(void) {
     OSInitThreadQueue(&__DVDThreadQueue);
 
     /* Set initial DVD status register */
-    DVD_STATUS = 0x2A;
-    DVD_COVER = 0;
+    *((volatile u32*)0xCC006000) = 0x2A;
+    *((volatile u32*)(debugMonSize = 0xCC006004)) = 0;
 
     /* Check if booting from DVD or NDEV */
-    debugMonSize = bootInfo_8047A7F0[0x20 / 4];
+    new_var = &bootInfo_8047A7F0[0x20 / 4];
+    debugMonSize = *new_var;
     if (debugMonSize + 0x1AE00000 == 0x7C22) {
         /* Debugging monitor detected */
         OSReport("@18_80311AC8");
         __fstLoad();
-    } else if (debugMonSize + 0xF2EB0000 != 0xEA5E) {
+    } else if ((*new_var) + 0xF2EB0000 != 0xEA5E) {
         /* Not running from NDEV, first time in bootrom */
         FirstTimeInBootrom_8047A824 = TRUE;
     }
@@ -841,4 +844,3 @@ void __DVDStoreErrorCode(u32 error) {
     static u32 lastError;
     lastError = error;
 }
-

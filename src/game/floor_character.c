@@ -1631,11 +1631,16 @@ asm void floorCharacterBiosGetRot(void) {
 #pragma push
 #pragma peephole off
 s32 floorCharacterBiosGetRot(void* a, void* b) {
+    void* new_var;
+    void* new_var2;
     if (a == 0) return 0;
+    new_var = a;
+    new_var2 = new_var;
     if (b == 0) return 0;
-    set__5GSvecFfff(b, *(f32*)&lbl_8047CFC0,
-                *(f32*)&lbl_8047CFC4 * (f32)(s32)*(s16*)((u8*)a + 4),
-                *(f32*)&lbl_8047CFC0);
+    new_var = &lbl_8047CFC0;
+    set__5GSvecFfff(b, *((f32*)new_var),
+                    (*((f32*)(&lbl_8047CFC4))) * ((f32)((s32)(*((s16*)(((u8*)new_var2) - -4))))),
+                    *((f32*)(&lbl_8047CFC0)));
     return 1;
 }
 #pragma pop

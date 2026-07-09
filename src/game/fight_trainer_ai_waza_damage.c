@@ -698,11 +698,13 @@ u32 fightTrainerAiWazaDamage169(void* ctx, u32 slot, u32 param, u32 extra) {
     extern u8 fn_8023720C(void*, u32);
     u32 savedSlot;
     void* savedCtx;
+    u32 new_var;
     u32 damage;
 
     savedSlot = slot;
+    new_var = fightSeqGetNromalWazaDamage(ctx, param, savedSlot, extra, 0, 0, 0, 0);
     savedCtx = ctx;
-    damage = fightSeqGetNromalWazaDamage(ctx, param, savedSlot, extra, 0, 0, 0, 0);
+    damage = new_var;
     if (fn_8023720C(savedCtx, savedSlot) == 1) {
         damage <<= 1;
     }

@@ -5195,24 +5195,24 @@ u32 fightTrainerAiWazaValueTuikaDoku(void* ctx, u32 param1, u32 param2, u32 para
     u32 trainerParam = param1;
     void* battleCtx = ctx;
     u32 target = param3;
-    s32 quotient;
     u32 handle;
+    s32 quotient;
     u32 pokemonPtr;
     u32 statusValue;
 
     statusValue = fn_80239564(battleCtx, battleParam);
-    quotient = (s32)statusValue / fightTrainerGetStatus(0, 0x113, 0x3e, 0);
+    quotient = ((s32)statusValue) / fightTrainerGetStatus(0, 0x113, 0x3e, 0);
     handle = fightTrainerAiAddValue(0, quotient);
-    pokemonPtr = fightOutPokemonGetPokemonPtr(trainerParam);
-    fn_80239CCC(0xec64, battleCtx, pokemonPtr, 0, 0, battleParam, 0, 0x113, quotient);
+    ;
+    fn_80239CCC(0xec64, battleCtx, fightOutPokemonGetPokemonPtr(trainerParam), 0, 0, battleParam, 0, 0x113, quotient);
     if (fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, battleCtx, 1, 1, 0x10e, trainerParam) == 1) {
         handle = fn_80239984(handle, battleCtx, 0x114);
         fn_80239EE8(0xec64, battleCtx, fightOutPokemonGetPokemonPtr(trainerParam), 0, 0, battleParam, 0, 0x114);
     }
-    if (fn_80237310(battleCtx, target) == 0 || fn_80237F74(battleCtx, target, 0x11) == 1 ||
-        fn_80237F74(battleCtx, target, 0x13) == 1) {
+    if (((fn_80237310(battleCtx, target) == 0) || (fn_80237F74(battleCtx, target, 0x11) == 1)) ||
+        (fn_80237F74(battleCtx, target, 0x13) == 1)) {
         statusValue = fn_80239564(battleCtx, battleParam);
-        quotient = (s32)statusValue / fightTrainerGetStatus(0, 0x115, 0x3e, 0);
+        quotient = ((s32)statusValue) / fightTrainerGetStatus(0, 0x115, 0x3e, 0);
         handle = fightTrainerAiAddValue(handle, quotient);
         pokemonPtr = fightOutPokemonGetPokemonPtr(trainerParam);
         fn_80239CCC(0xec64, battleCtx, pokemonPtr, 0, 0, battleParam, 0, 0x115, quotient);

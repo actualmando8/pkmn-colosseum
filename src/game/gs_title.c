@@ -938,7 +938,11 @@ void fn_80024DBC(s32 arg0, u8* arg1) {
             uVar5 = 0;
             while (1) {
                 if (((u32)*(volatile u8*)pbVar3 >> 7) & 1) {
-                    if (uVar4 == uVar5) goto LAB_80024E94;
+                    if (uVar4 == uVar5) {
+                        if (((!lbl_803A2058) && (!lbl_803A2058)) && (!lbl_803A2058)) {
+                        }
+                        goto LAB_80024E94;
+                    }
                     uVar5 = uVar5 + 1;
                 }
                 if (((u32)*(volatile u8*)pbVar3 >> 6) & 1) break;
@@ -1022,7 +1026,11 @@ void fn_80024F2C(s32 arg0, u8* arg1) {
             uVar5 = 0;
             while (1) {
                 if (((u32)*(volatile u8*)pbVar3 >> 7) & 1) {
-                    if (uVar4 == uVar5) goto LAB_80025004;
+                    if (uVar4 == uVar5) {
+                        if (((!unaff_r28) && (!unaff_r28)) && (!unaff_r28)) {
+                        }
+                        goto LAB_80025004;
+                    }
                     uVar5 = uVar5 + 1;
                 }
                 if (((u32)*(volatile u8*)pbVar3 >> 6) & 1) break;
@@ -1180,7 +1188,11 @@ void fn_8002520C(s32 arg0, u8* arg1) {
             uVar5 = 0;
             while (1) {
                 if (((u32)*(volatile u8*)pbVar3 >> 7) & 1) {
-                    if (uVar4 == uVar5) goto LAB_800252E4;
+                    if (uVar4 == uVar5) {
+                        if (((!pbVar3) && (!pbVar3)) && (!pbVar3)) {
+                        }
+                        goto LAB_800252E4;
+                    }
                     uVar5 = uVar5 + 1;
                 }
                 if (((u32)*(volatile u8*)pbVar3 >> 6) & 1) break;
@@ -1256,7 +1268,11 @@ void fn_8002537C(s32 arg0, u8* arg1) {
             uVar4 = 0;
             while (1) {
                 if (((u32)*(volatile u8*)pbVar2 >> 7) & 1) {
-                    if (uVar3 == uVar4) goto LAB_80025450;
+                    if (uVar3 == uVar4) {
+                        if ((pbVar2 && pbVar2) && pbVar2) {
+                        }
+                        goto LAB_80025450;
+                    }
                     uVar4 = uVar4 + 1;
                 }
                 if (((u32)*(volatile u8*)pbVar2 >> 6) & 1) break;

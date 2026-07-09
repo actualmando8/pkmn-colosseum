@@ -380,22 +380,22 @@ asm s32 fn_8004BE90(u16* a, u16* b) {
 #include "src/game/menu/menu_pda_mail_fn_8004BE90.inc"
 }
 #else
-/* WALL: W1 register-letter (idA/idB swap r31<->r30 vs target regardless
- * of local decl order/type -- u16 default order, swapped decl order,
- * s32 widen all tried); everything else (control flow, call order,
- * scheduling, subf formula) matches. Parked at 99.2% after 3 attempts. */
 s32 fn_8004BE90(u16* a, u16* b)
 {
     s32 idA = *a;
     s32 idB = *b;
+    s32 new_var2;
     s32 cmp;
+    s32* new_var;
     void* msgA = GSmsgGetGSchar(mailGetSubject(idA));
     void* msgB = GSmsgGetGSchar(mailGetSubject(idB));
     cmp = GScharCmp(msgA, msgB);
     if (cmp != 0) {
-        return cmp;
+        new_var = &cmp;
+        return *new_var;
     }
-    return mailGetReceiveNumber(idB) - mailGetReceiveNumber(idA);
+    new_var2 = mailGetReceiveNumber(idA);
+    return mailGetReceiveNumber(idB) - new_var2;
 }
 #endif
 
@@ -404,20 +404,20 @@ asm s32 fn_8004BF20(u16* a, u16* b) {
 #include "src/game/menu/menu_pda_mail_fn_8004BF20.inc"
 }
 #else
-/* WALL: same class as fn_8004BE90 (W1 register-letter idA/idB swap).
- * Parked at 99.2% (see fn_8004BE90 for attempts). */
 s32 fn_8004BF20(u16* a, u16* b)
 {
     s32 idA = *a;
     s32 idB = *b;
     s32 cmp;
     void* msgA = GSmsgGetGSchar(mailGetSenderName(idA));
+    s32 new_var;
     void* msgB = GSmsgGetGSchar(mailGetSenderName(idB));
     cmp = GScharCmp(msgA, msgB);
     if (cmp != 0) {
         return cmp;
     }
-    return mailGetReceiveNumber(idB) - mailGetReceiveNumber(idA);
+    new_var = mailGetReceiveNumber(idA);
+    return mailGetReceiveNumber(idB) - new_var;
 }
 #endif
 
