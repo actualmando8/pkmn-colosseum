@@ -96,6 +96,7 @@ FightOutPokemonEnemyEntry* fightOutPokemonEnemySearchAry(FightOutPokemonEnemyEnt
 {
     extern u32 fightOutPokemonEnemyBiosGetTargetFightOutPokemonPtr(FightOutPokemonEnemyEntry* ptr);
     FightOutPokemonEnemyEntry* entry;
+    u32 target;
     u16 i;
 
     if (ctx == NULL) {
@@ -105,7 +106,11 @@ FightOutPokemonEnemyEntry* fightOutPokemonEnemySearchAry(FightOutPokemonEnemyEnt
         entry = &ctx[i];
         {
             u8 valid = -fightOutPokemonEnemyBiosGetTargetFightOutPokemonPtr(entry) != 0;
-            if (valid && fightOutPokemonEnemyBiosGetTargetFightOutPokemonPtr(entry) == matchVal) {
+            if (valid) {
+                target = fightOutPokemonEnemyBiosGetTargetFightOutPokemonPtr(entry);
+                if (target != matchVal) {
+                    continue;
+                }
                 return entry;
             }
         }
