@@ -70,8 +70,16 @@ extern void LCDisable(void);
 extern void ICFlashInvalidate(void);
 extern void* memset(void* dest, int val, u32 n);
 
-#define __VIRegs     ((volatile u32*)0xCC002000)
+#define AT_ADDRESS(addr) : addr
+
+volatile u16 __VIRegs[59] AT_ADDRESS(0xCC002000);
 #define __PIRegs     ((volatile u32*)0xCC003000)
+
+#define OS_BUS_CLOCK   (*(u32*)0x800000F8)
+#define OS_TIMER_CLOCK (OS_BUS_CLOCK / 4)
+#define OSMicrosecondsToTicks(usec) (((usec) * (OS_TIMER_CLOCK / 125000)) / 8)
+
+#define OS_INTERRUPTMASK_PI_RSW 0x200
 
 static int CallResetFunctions(int final);
 static void CancelThreads(void);
@@ -82,13 +90,19 @@ void OSRegisterResetFunction(OSResetFunctionInfo* info) {
 
 static int CallResetFunctions(int final) {
     OSResetFunctionInfo* info;
-    int err = 0;
+    int err;
 
-    for (info = ResetFunctionQueue.head; info; info = info->next) {
+    err = 0;
+    info = ResetFunctionQueue.head;
+
+    while (info != NULL && err == 0) {
         err |= !info->func(final);
+        info = info->next;
     }
+
     err |= !__OSSyncSram();
-    if (err) {
+
+    if (err != 0) {
         return 0;
     }
     return 1;
@@ -156,16 +170,19 @@ static void CancelThreads(void) {
     }
 }
 
+#pragma push
+#pragma peephole off
 void __OSDoHotReset(u32 resetCode) {
     OSDisableInterrupts();
     __VIRegs[1] = 0;
     ICFlashInvalidate();
     Reset(resetCode * 8);
 }
+#pragma pop
 
+#pragma push
+#pragma peephole off
 void OSResetSystem(u32 reset, u32 resetCode, BOOL forceMenu) {
-    int rc;
-    BOOL enabled;
     BOOL padcal;
 
     OSDisableScheduler();
@@ -185,12 +202,12 @@ void OSResetSystem(u32 reset, u32 resetCode, BOOL forceMenu) {
         do {} while (__OSSyncSram() == 0);
     }
 
-    enabled = OSDisableInterrupts();
-    rc = CallResetFunctions(1);
+    OSDisableInterrupts();
+    CallResetFunctions(1);
     LCDisable();
 
     if (reset == 1) {
-        enabled = OSDisableInterrupts();
+        OSDisableInterrupts();
         __VIRegs[1] = 0;
         ICFlashInvalidate();
         Reset(resetCode * 8);
@@ -207,40 +224,54 @@ void OSResetSystem(u32 reset, u32 resetCode, BOOL forceMenu) {
     memset((void*)0x800000F4, 0, 4);
     memset((void*)0x80003000, 0, 0xC0);
     memset((void*)0x800030C8, 0, 0xC);
+    memset((void*)0x800030E2, 0, 1);
 
-    if (reset == 2) {
-        __PADDisableRecalibration(padcal);
-    }
+    __PADDisableRecalibration(padcal);
 }
+#pragma pop
 
+#pragma push
+#pragma peephole off
 u32 OSGetResetCode(void) {
+    u32 resetCode;
+
     if (*(volatile u8*)0x800030E2 != 0) {
-        return 0x80000000;
+        resetCode = 0x80000000;
+    } else {
+        resetCode = (__PIRegs[9] & 0xFFFFFFF8) / 8;
     }
-    return (__PIRegs[9] & ~7) >> 3;
+    return resetCode;
 }
+#pragma pop
+
+typedef void (*OSResetSWCallback)(void);
+
+static OSResetSWCallback ResetCallback;
+static BOOL Down;
+static BOOL LastState;
+static OSTime HoldUp;
+static OSTime HoldDown;
 
 void __OSResetSWInterruptHandler(s16 interrupt, OSContext* context) {
-    u32 piIntSr;
+    OSResetSWCallback callback;
+    u32 timeout;
 
-    piIntSr = __PIRegs[0];
-
-    if (!(piIntSr & 0x00000010)) {
-        return;
+    HoldDown = __OSGetSystemTime();
+    timeout = OSMicrosecondsToTicks(100);
+    while (__OSGetSystemTime() - HoldDown < timeout &&
+           !(__PIRegs[0] & 0x00010000)) {
+        ;
     }
-
-    __PIRegs[0] = piIntSr;
-
-    {
-        OSErrorHandler handler;
-        handler = ((OSErrorHandler*)0x80003040)[OS_ERROR_SYSTEM_INTERRUPT];
-        if (handler != NULL) {
-            handler(OS_ERROR_SYSTEM_INTERRUPT, context);
-            return;
+    if (!(__PIRegs[0] & 0x00010000)) {
+        LastState = Down = TRUE;
+        __OSMaskInterrupts(OS_INTERRUPTMASK_PI_RSW);
+        if (ResetCallback) {
+            callback = ResetCallback;
+            ResetCallback = NULL;
+            callback();
         }
     }
-
-    OSResetSystem(0, 0, FALSE);
+    __PIRegs[0] = 2;
 }
 
 /* ===================================================================
