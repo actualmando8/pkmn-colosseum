@@ -710,6 +710,8 @@ u32 fightTrainerAiWazaDamage169(void* ctx, u32 slot, u32 param, u32 extra) {
 }
 
 /* Address: 0x802514EC | Size: 0x98 */
+#pragma push
+#pragma global_optimizer off
 s32 fightTrainerAiWazaDamage162(void* ctx, u32 param1, u32 param2) {
     extern u8 fn_80119DD0(u32);
     extern s16 fn_80202360(u32, u32);
@@ -731,6 +733,7 @@ s32 fightTrainerAiWazaDamage162(void* ctx, u32 param1, u32 param2) {
     hp = fn_80237664(ctx, param1) & 0xFFFF;
     return -((s32)hp / multiplier);
 }
+#pragma pop
 
 /* Address: 0x80251584 | Size: 0x88 */
 s32 fightTrainerAiWazaDamage161(void* ctx, u32 param1, u32 param2, u32 param3) {
