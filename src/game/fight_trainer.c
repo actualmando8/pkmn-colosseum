@@ -37,6 +37,20 @@ typedef struct ColosseumEventPairRow {
     ColosseumEventSubRow slots[2];
 } ColosseumEventPairRow;
 
+typedef struct FightAbicntRatio {
+    u8 numerator;
+    u8 denominator;
+} FightAbicntRatio;
+
+/* fightOutPokemonEnemy DB row (0xC bytes); fields accessed via the
+ * fightOutPokemonEnemyBios* getter/setter family in fight_trainer_db_range_801FBD10.c */
+typedef struct FightOutPokemonEnemyEntry {
+    u32 targetFightOutPokemonPtr; /* 0x0 */
+    u16 oumuWazaDataId;           /* 0x4 */
+    u16 initHp;                   /* 0x6 */
+    u16 damage;                   /* 0x8 */
+} FightOutPokemonEnemyEntry;
+
 /* =========================================================================
  * External declarations
  * ========================================================================= */
@@ -52,70 +66,53 @@ extern void  pokemonGetSoubiItemDataId(void);
 extern void* fightActionGetPri(void* p);
 extern void  wazaGetStatus(void);
 
-/* SDA table pointers for event data arrays */
-extern u32 lbl_80478D38;   /* Event table count */
-extern ColosseumEventRow6 lbl_80478D30[]; /* Event table base (6 bytes per entry) */
-extern u32 lbl_80478D28; /* Pair-row table count */
-extern ColosseumEventPairRow lbl_80375A08[]; /* 0x18-byte pair rows */
+/* Ability-count numerator/denominator table (16 entries) */
+extern FightAbicntRatio lbl_80375D10[];
+extern u32 lbl_80478D68; /* table entry count */
 
 /* Address: 0x8020E4E8 | Size: 0x94 | Ghidra import */
-
-u32 fightAbicntDoKakeWaru(u32 r3,int r4)
-
+#pragma push
+#pragma peephole on
+u32 fightAbicntDoKakeWaru(u16 id, u32 val)
 {
-    extern u32 lbl_80478D68;
-  u32 uVar1;
-  u8 *pbVar2;
-  int iVar3;
-  u32 uVar4;
+    FightAbicntRatio *p = &lbl_80375D10[id];
+    u8 num;
+    u8 den;
 
-  pbVar2 = (u8 *)((r3 & 0xffff) * 2 + -0x7fc8a2f0);
-  if (lbl_80478D68 <= (r3 & 0xffff)) {
-    pbVar2 = (u8 *)0x0;
-  }
-  if (pbVar2 == (void *)0) {
-    uVar4 = 0;
-  }
-  else {
-    uVar4 = (u32)*pbVar2;
-  }
-  iVar3 = (r3 & 0xffff) * 2 + -0x7fc8a2f0;
-  if (lbl_80478D68 <= (r3 & 0xffff)) {
-    iVar3 = 0;
-  }
-  if (iVar3 == 0) {
-    uVar1 = 1;
-  }
-  else {
-    uVar1 = (u32)*(u8 *)(iVar3 + 1);
-  }
-  return (r4 * uVar4) / uVar1;
+    if (id >= lbl_80478D68) {
+        p = NULL;
+    }
+    num = (p == NULL) ? 0 : p->numerator;
+    den = (p == NULL) ? 1 : p->denominator;
+
+    return (val * num) / den;
 }
+#pragma pop
 
 /* Address: 0x8020E57C | Size: 0x98 | Ghidra import */
-int fightOutPokemonEnemySearchAry(void)
-
+#pragma push
+#pragma peephole on
+FightOutPokemonEnemyEntry* fightOutPokemonEnemySearchAry(FightOutPokemonEnemyEntry* ctx, u16 count, u32 matchVal)
 {
-    int r3;
-    u16 r4;
-    int r5;
+    extern u32 fightOutPokemonEnemyBiosGetTargetFightOutPokemonPtr(FightOutPokemonEnemyEntry* ptr);
+    FightOutPokemonEnemyEntry* entry;
+    u16 i;
 
-    extern int fightOutPokemonEnemyBiosGetTargetFightOutPokemonPtr();
-  int iVar1;
-  u16 uVar2;
-  int iVar3;
-
-  if (r3 != 0) {
-    for (uVar2 = 0; uVar2 < r4; uVar2 = uVar2 + 1) {
-      iVar3 = r3 + (u32)uVar2 * 0xc;
-      iVar1 = fightOutPokemonEnemyBiosGetTargetFightOutPokemonPtr(iVar3);
-      if ((iVar1 != 0) && (iVar1 = fightOutPokemonEnemyBiosGetTargetFightOutPokemonPtr(iVar3), iVar1 == r5)) {
-        return iVar3;
-      }
+    if (ctx == NULL) {
+        return NULL;
     }
-  }
-  return 0;
+    for (i = 0; i < count; i++) {
+        entry = &ctx[i];
+        {
+            u8 valid = -fightOutPokemonEnemyBiosGetTargetFightOutPokemonPtr(entry) != 0;
+            if (valid && fightOutPokemonEnemyBiosGetTargetFightOutPokemonPtr(entry) == matchVal) {
+                return entry;
+            }
+        }
+    }
+    return NULL;
 }
+#pragma pop
 
 /* fightOutPokemonEnemyCheckValid | Size: 0x2C | Check if fightOutPokemonEnemyBiosGetTargetFightOutPokemonPtr returns non-zero */
 BOOL fightOutPokemonEnemyCheckValid(void) {
@@ -124,58 +121,56 @@ BOOL fightOutPokemonEnemyCheckValid(void) {
 }
 
 /* Address: 0x8020E640 | Size: 0x94 | Ghidra import */
-void fightOutPokemonEnemyCreate(void)
-
+#pragma push
+#pragma peephole on
+void fightOutPokemonEnemyCreate(FightOutPokemonEnemyEntry* ctx, u32 pokemonSlot)
 {
-    int r3;
-    int r4;
+    extern void fightOutPokemonEnemyBiosSetDamage(FightOutPokemonEnemyEntry* ptr, u16 val);
+    extern void fightOutPokemonEnemyBiosSetInitHp(FightOutPokemonEnemyEntry* ptr, u16 val);
+    extern void fightOutPokemonEnemyBiosSetOumuWazaDataId(FightOutPokemonEnemyEntry* ptr, u16 val);
+    extern void fightOutPokemonEnemyBiosSetTargetFightOutPokemonPtr(FightOutPokemonEnemyEntry* ptr, u32 val);
+    extern u32 fightOutPokemonGetPokemonPtr(u32 slot);
+    u32 pokePtr;
+    u16 hp;
 
-    extern void fightOutPokemonEnemyBiosSetDamage();
-    extern void fightOutPokemonEnemyBiosSetInitHp();
-    extern void fightOutPokemonEnemyBiosSetOumuWazaDataId();
-    extern void fightOutPokemonEnemyBiosSetTargetFightOutPokemonPtr();
-    extern u32 fightOutPokemonGetPokemonPtr();
-  u32 uVar1;
-  u16 uVar2;
-  
-  if ((r3 != 0) && (r4 != 0)) {
-    fightOutPokemonEnemyBiosSetTargetFightOutPokemonPtr(r3,0);
-    fightOutPokemonEnemyBiosSetOumuWazaDataId(r3,0);
-    fightOutPokemonEnemyBiosSetInitHp(r3,0);
-    fightOutPokemonEnemyBiosSetDamage(r3,0);
-    fightOutPokemonEnemyBiosSetTargetFightOutPokemonPtr(r3,r4);
-    uVar1 = fightOutPokemonGetPokemonPtr(r4);
-    uVar2 = (int)pokemonGetStatus(uVar1,0,0x83,0);
-    fightOutPokemonEnemyBiosSetInitHp(r3,uVar2);
-  }
-  return;
+    if ((ctx != NULL) && (pokemonSlot != 0)) {
+        fightOutPokemonEnemyBiosSetTargetFightOutPokemonPtr(ctx, 0);
+        fightOutPokemonEnemyBiosSetOumuWazaDataId(ctx, 0);
+        fightOutPokemonEnemyBiosSetInitHp(ctx, 0);
+        fightOutPokemonEnemyBiosSetDamage(ctx, 0);
+        fightOutPokemonEnemyBiosSetTargetFightOutPokemonPtr(ctx, pokemonSlot);
+        pokePtr = fightOutPokemonGetPokemonPtr(pokemonSlot);
+        hp = (u16)pokemonGetStatus(pokePtr, 0, 0x83, 0);
+        fightOutPokemonEnemyBiosSetInitHp(ctx, hp);
+    }
+    return;
 }
+#pragma pop
 
 /* Address: 0x8020E6D4 | Size: 0x84 | Ghidra import */
-void fightOutPokemonEnemyInitAry(void)
-
+#pragma push
+#pragma peephole on
+void fightOutPokemonEnemyInitAry(FightOutPokemonEnemyEntry* ctx, u16 count)
 {
-    int r3;
-    u16 r4;
+    extern void fightOutPokemonEnemyBiosSetDamage(FightOutPokemonEnemyEntry* ptr, u16 val);
+    extern void fightOutPokemonEnemyBiosSetInitHp(FightOutPokemonEnemyEntry* ptr, u16 val);
+    extern void fightOutPokemonEnemyBiosSetOumuWazaDataId(FightOutPokemonEnemyEntry* ptr, u16 val);
+    extern void fightOutPokemonEnemyBiosSetTargetFightOutPokemonPtr(FightOutPokemonEnemyEntry* ptr, u32 val);
+    FightOutPokemonEnemyEntry* entry;
+    u16 i;
 
-    extern void fightOutPokemonEnemyBiosSetDamage();
-    extern void fightOutPokemonEnemyBiosSetInitHp();
-    extern void fightOutPokemonEnemyBiosSetOumuWazaDataId();
-    extern void fightOutPokemonEnemyBiosSetTargetFightOutPokemonPtr();
-  u16 uVar1;
-  int iVar2;
-
-  if (r3 != 0) {
-    for (uVar1 = 0; uVar1 < r4; uVar1 = uVar1 + 1) {
-      iVar2 = r3 + (u32)uVar1 * 0xc;
-      fightOutPokemonEnemyBiosSetTargetFightOutPokemonPtr(iVar2,0);
-      fightOutPokemonEnemyBiosSetOumuWazaDataId(iVar2,0);
-      fightOutPokemonEnemyBiosSetInitHp(iVar2,0);
-      fightOutPokemonEnemyBiosSetDamage(iVar2,0);
+    if (ctx != NULL) {
+        for (i = 0; i < count; i++) {
+            entry = &ctx[i];
+            fightOutPokemonEnemyBiosSetTargetFightOutPokemonPtr(entry, 0);
+            fightOutPokemonEnemyBiosSetOumuWazaDataId(entry, 0);
+            fightOutPokemonEnemyBiosSetInitHp(entry, 0);
+            fightOutPokemonEnemyBiosSetDamage(entry, 0);
+        }
     }
-  }
-  return;
+    return;
 }
+#pragma pop
 
 /* Address: 0x8020E758 | Size: 0x54 | Ghidra import */
 #pragma push
@@ -208,79 +203,82 @@ u32 fightTrainerEnemyPokemonEraseAry(void* ctx, u16 count, short matchVal)
     extern void fn_801FBDF4();
     extern void fightTrainerEnemyPokemonBiosSetFightEntryeId();
     extern short fightTrainerEnemyPokemonBiosGetFightEntryeId();
-  u32 bVar1;
-  u32 uVar2;
-  short sVar3;
-  u16 uVar6;
-  void* iVar4;
-  u32 uVar5;
+    u8 bVar1;
+    u32 uVar2;
+    short sVar3;
+    void* iVar4;
+    u16 uVar6;
+    u32 uVar5;
 
-  if (ctx == NULL) {
-    uVar2 = 0;
-  }
-  else if (matchVal < 0) {
-    uVar2 = 0;
-  }
-  else {
     if (ctx == NULL) {
-      iVar4 = NULL;
+        uVar2 = 0;
+    }
+    else if (matchVal < 0) {
+        uVar2 = 0;
     }
     else {
-      for (uVar6 = 0; uVar6 < count; uVar6 = uVar6 + 1) {
-        iVar4 = (void*)((u32)ctx + (u32)uVar6 * 0x14);
-        if (matchVal < 0) {
-          if (iVar4 == NULL) {
-            bVar1 = 0;
-          }
-          else {
-            sVar3 = fightTrainerEnemyPokemonBiosGetFightEntryeId(iVar4);
-            if (sVar3 < 0) {
-              bVar1 = 0;
-            }
-            else {
-              bVar1 = 1;
-            }
-          }
-          if (bVar1 == 0) goto LAB_0020b8ac;
+        if (ctx == NULL) {
+            iVar4 = NULL;
         }
         else {
-          if (iVar4 == NULL) {
-            bVar1 = 0;
-          }
-          else {
-            sVar3 = fightTrainerEnemyPokemonBiosGetFightEntryeId(iVar4);
-            if (sVar3 < 0) {
-              bVar1 = 0;
+            for (uVar6 = 0; uVar6 < count; uVar6 = uVar6 + 1) {
+                iVar4 = (void*)((u32)ctx + (u32)uVar6 * 0x14);
+                if (matchVal < 0) {
+                    if (iVar4 == NULL) {
+                        bVar1 = 0;
+                    }
+                    else {
+                        sVar3 = fightTrainerEnemyPokemonBiosGetFightEntryeId(iVar4);
+                        if (sVar3 < 0) {
+                            bVar1 = 0;
+                        }
+                        else {
+                            bVar1 = 1;
+                        }
+                    }
+                    if (bVar1 != 0) {
+                        continue;
+                    }
+                    goto LAB_0020b8ac;
+                }
+                else {
+                    if (iVar4 == NULL) {
+                        bVar1 = 0;
+                    }
+                    else {
+                        sVar3 = fightTrainerEnemyPokemonBiosGetFightEntryeId(iVar4);
+                        if (sVar3 < 0) {
+                            bVar1 = 0;
+                        }
+                        else {
+                            bVar1 = 1;
+                        }
+                    }
+                    if ((bVar1) && (sVar3 = fightTrainerEnemyPokemonBiosGetFightEntryeId(iVar4), matchVal == sVar3)) goto LAB_0020b8ac;
+                }
             }
-            else {
-              bVar1 = 1;
-            }
-          }
-          if ((bVar1) && (sVar3 = fightTrainerEnemyPokemonBiosGetFightEntryeId(iVar4), matchVal == sVar3)) goto LAB_0020b8ac;
+            iVar4 = NULL;
         }
-      }
-      iVar4 = NULL;
-    }
 LAB_0020b8ac:
-    if (iVar4 == NULL) {
-      uVar2 = 0;
+        if (iVar4 == NULL) {
+            uVar2 = 0;
+        }
+        else {
+            fightTrainerEnemyPokemonBiosSetFightEntryeId(iVar4, (void*)0xffffffff);
+            for (uVar5 = 0; (uVar5 & 0xff) < 4; uVar5 = uVar5 + 1) {
+                fn_801FBDF4(iVar4, uVar5, 0);
+            }
+            fightTrainerEnemyPokemonBiosSetTokuseiFlag(iVar4, 0);
+            fightTrainerEnemyPokemonBiosSetStoreTokuseiData(iVar4, 0);
+            fightTrainerEnemyPokemonBiosSetNowhp1banhikuiFlag(iVar4, 0);
+            fightTrainerEnemyPokemonBiosSetLv1banhikuiFlag(iVar4, 0);
+            fightTrainerEnemyPokemonBiosSetDefense1banhikuiFlag(iVar4, 0);
+            fightTrainerEnemyPokemonBiosSetBadwazaHaveFlag(iVar4, 0);
+            fightTrainerEnemyPokemonBiosSetParam1bantakaiFlag(iVar4, 0);
+            uVar2 = 1;
+        }
     }
-    else {
-      fightTrainerEnemyPokemonBiosSetFightEntryeId(iVar4, (void*)0xffffffff);
-      for (uVar5 = 0; (uVar5 & 0xff) < 4; uVar5 = uVar5 + 1) {
-        fn_801FBDF4(iVar4,uVar5,0);
-      }
-      fightTrainerEnemyPokemonBiosSetTokuseiFlag(iVar4,0);
-      fightTrainerEnemyPokemonBiosSetStoreTokuseiData(iVar4,0);
-      fightTrainerEnemyPokemonBiosSetNowhp1banhikuiFlag(iVar4,0);
-      fightTrainerEnemyPokemonBiosSetLv1banhikuiFlag(iVar4,0);
-      fightTrainerEnemyPokemonBiosSetDefense1banhikuiFlag(iVar4,0);
-      fightTrainerEnemyPokemonBiosSetBadwazaHaveFlag(iVar4,0);
-      fightTrainerEnemyPokemonBiosSetParam1bantakaiFlag(iVar4,0);
-      uVar2 = 1;
-    }
-  }
-  return uVar2;
+    return uVar2;
 }
 #pragma pop
 
@@ -299,112 +297,115 @@ u32 fightTrainerEnemyPokemonRegistAry(void* ctx, u16 count, u32 matchVal)
     extern void fn_801FBDF4();
     extern void fightTrainerEnemyPokemonBiosSetFightEntryeId();
     extern short fightTrainerEnemyPokemonBiosGetFightEntryeId();
-  u32 bVar1;
-  u32 uVar2;
-  short sVar3;
-  void* iVar4;
-  u16 uVar6;
-  u32 uVar5;
+    u8 bVar1;
+    u32 uVar2;
+    short sVar3;
+    void* iVar4;
+    u16 uVar6;
+    u32 uVar5;
 
-  if (ctx == NULL) {
-    uVar2 = 0;
-  }
-  else {
-    if ((short)matchVal < 0) {
-      uVar2 = 0;
+    if (ctx == NULL) {
+        uVar2 = 0;
     }
     else {
-      if (ctx == NULL) {
-        iVar4 = NULL;
-      }
-      else {
-        for (uVar6 = 0; uVar6 < count; uVar6 = uVar6 + 1) {
-          iVar4 = (void*)((u32)ctx + (u32)uVar6 * 0x14);
-          if ((short)matchVal < 0) {
-            if (iVar4 == NULL) {
-              bVar1 = 0;
-            }
-            else {
-              sVar3 = fightTrainerEnemyPokemonBiosGetFightEntryeId(iVar4);
-              if (sVar3 < 0) {
-                bVar1 = 0;
-              }
-              else {
-                bVar1 = 1;
-              }
-            }
-            if (bVar1 == 0) goto LAB_0020ba60;
-          }
-          else {
-            if (iVar4 == NULL) {
-              bVar1 = 0;
-            }
-            else {
-              sVar3 = fightTrainerEnemyPokemonBiosGetFightEntryeId(iVar4);
-              if (sVar3 < 0) {
-                bVar1 = 0;
-              }
-              else {
-                bVar1 = 1;
-              }
-            }
-            if ((bVar1) && (sVar3 = fightTrainerEnemyPokemonBiosGetFightEntryeId(iVar4), (short)matchVal == sVar3)) goto LAB_0020ba60;
-          }
+        if ((short)matchVal < 0) {
+            uVar2 = 0;
         }
-        iVar4 = NULL;
-      }
+        else {
+            if (ctx == NULL) {
+                iVar4 = NULL;
+            }
+            else {
+                for (uVar6 = 0; uVar6 < count; uVar6 = uVar6 + 1) {
+                    iVar4 = (void*)((u32)ctx + (u32)uVar6 * 0x14);
+                    if ((short)matchVal < 0) {
+                        if (iVar4 == NULL) {
+                            bVar1 = 0;
+                        }
+                        else {
+                            sVar3 = fightTrainerEnemyPokemonBiosGetFightEntryeId(iVar4);
+                            if (sVar3 < 0) {
+                            bVar1 = 0;
+                        }
+                        else {
+                            bVar1 = 1;
+                        }
+                        }
+                        if (bVar1 != 0) {
+                            continue;
+                        }
+                        goto LAB_0020ba60;
+                    }
+                    else {
+                        if (iVar4 == NULL) {
+                            bVar1 = 0;
+                        }
+                        else {
+                            sVar3 = fightTrainerEnemyPokemonBiosGetFightEntryeId(iVar4);
+                            if (sVar3 < 0) {
+                            bVar1 = 0;
+                        }
+                        else {
+                            bVar1 = 1;
+                        }
+                        }
+                        if ((bVar1) && (sVar3 = fightTrainerEnemyPokemonBiosGetFightEntryeId(iVar4), (short)matchVal == sVar3)) goto LAB_0020ba60;
+                    }
+                }
+                iVar4 = NULL;
+            }
 LAB_0020ba60:
-      if (iVar4 == NULL) {
-        if (ctx == NULL) {
-          iVar4 = NULL;
-        }
-        else {
-          for (uVar6 = 0; uVar6 < count; uVar6 = uVar6 + 1) {
-            iVar4 = (void*)((u32)ctx + (u32)uVar6 * 0x14);
             if (iVar4 == NULL) {
-              bVar1 = 0;
+                if (ctx == NULL) {
+                    iVar4 = NULL;
+                }
+                else {
+                    for (uVar6 = 0; uVar6 < count; uVar6 = uVar6 + 1) {
+                        iVar4 = (void*)((u32)ctx + (u32)uVar6 * 0x14);
+                        if (iVar4 == NULL) {
+                            bVar1 = 0;
+                        }
+                        else {
+                            sVar3 = fightTrainerEnemyPokemonBiosGetFightEntryeId(iVar4);
+                            if (sVar3 < 0) {
+                            bVar1 = 0;
+                        }
+                        else {
+                            bVar1 = 1;
+                        }
+                        }
+                        if (bVar1 == 0) goto LAB_0020bae0;
+                    }
+                    iVar4 = NULL;
+                }
+LAB_0020bae0:
+                if (iVar4 == NULL) {
+                    uVar2 = 0;
+                }
+                else {
+                    if (-1 < (short)matchVal) {
+                        fightTrainerEnemyPokemonBiosSetFightEntryeId(iVar4, (void*)0xffffffff);
+                        for (uVar5 = 0; (uVar5 & 0xff) < 4; uVar5 = uVar5 + 1) {
+                            fn_801FBDF4(iVar4, uVar5, 0);
+                        }
+                        fightTrainerEnemyPokemonBiosSetTokuseiFlag(iVar4, 0);
+                        fightTrainerEnemyPokemonBiosSetStoreTokuseiData(iVar4, 0);
+                        fightTrainerEnemyPokemonBiosSetNowhp1banhikuiFlag(iVar4, 0);
+                        fightTrainerEnemyPokemonBiosSetLv1banhikuiFlag(iVar4, 0);
+                        fightTrainerEnemyPokemonBiosSetDefense1banhikuiFlag(iVar4, 0);
+                        fightTrainerEnemyPokemonBiosSetBadwazaHaveFlag(iVar4, 0);
+                        fightTrainerEnemyPokemonBiosSetParam1bantakaiFlag(iVar4, 0);
+                        fightTrainerEnemyPokemonBiosSetFightEntryeId(iVar4, matchVal);
+                    }
+                    uVar2 = 1;
+                }
             }
             else {
-              sVar3 = fightTrainerEnemyPokemonBiosGetFightEntryeId(iVar4);
-              if (sVar3 < 0) {
-                bVar1 = 0;
-              }
-              else {
-                bVar1 = 1;
-              }
+                uVar2 = 0;
             }
-            if (bVar1 == 0) goto LAB_0020bae0;
-          }
-          iVar4 = NULL;
         }
-LAB_0020bae0:
-        if (iVar4 == NULL) {
-          uVar2 = 0;
-        }
-        else {
-          if (-1 < (short)matchVal) {
-            fightTrainerEnemyPokemonBiosSetFightEntryeId(iVar4, (void*)0xffffffff);
-            for (uVar5 = 0; (uVar5 & 0xff) < 4; uVar5 = uVar5 + 1) {
-              fn_801FBDF4(iVar4,uVar5,0);
-            }
-            fightTrainerEnemyPokemonBiosSetTokuseiFlag(iVar4,0);
-            fightTrainerEnemyPokemonBiosSetStoreTokuseiData(iVar4,0);
-            fightTrainerEnemyPokemonBiosSetNowhp1banhikuiFlag(iVar4,0);
-            fightTrainerEnemyPokemonBiosSetLv1banhikuiFlag(iVar4,0);
-            fightTrainerEnemyPokemonBiosSetDefense1banhikuiFlag(iVar4,0);
-            fightTrainerEnemyPokemonBiosSetBadwazaHaveFlag(iVar4,0);
-            fightTrainerEnemyPokemonBiosSetParam1bantakaiFlag(iVar4,0);
-            fightTrainerEnemyPokemonBiosSetFightEntryeId(iVar4,matchVal);
-          }
-          uVar2 = 1;
-        }
-      }
-      else {
-        uVar2 = 0;
-      }
     }
-  }
-  return uVar2;
+    return uVar2;
 }
 #pragma pop
 
