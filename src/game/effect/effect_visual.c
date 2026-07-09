@@ -349,6 +349,10 @@ extern u32 lbl_8047D158;
 extern u32 lbl_8047D154;
 /* Forward declarations for self-referencing asm blocks */
 extern u32 _lightningRenderMain(void* ptr);
+extern u32 fn_80138630(void* ptr);
+extern u32 fn_80138680(void* ptr);
+extern u32 fn_801386DC(void* ptr);
+extern u32 fn_801387C0(void* ptr, u32 delta);
 extern void fn_80138838(void* ptr, u32 b);
 extern u32 fn_80138B74(void* ptr);
 extern u32 fn_80138BBC(void* ptr);
@@ -417,6 +421,22 @@ extern u32 fn_8013FCC4(void* ptr);
 extern u32 fn_8013FD68(void* ptr);
 extern u16 billboardEffectStart(void* ptr);
 extern u32 fn_8013FF0C(void* ptr);
+
+u32 fn_801380D4(void* callbacks) {
+    u32 effectId = fn_80131428(callbacks, 0x70);
+    if (effectId) {
+        fn_80131200(effectId,
+            0,
+            (GSEffectStopFunc)fn_80138630,
+            (GSEffectStartFunc)fn_801386DC,
+            (GSEffectStopFunc)fn_80138680,
+            0,
+            (GSEffectUpdateFunc)fn_801387C0,
+            (GSEffectRenderFunc)_lightningRenderMain);
+        fn_8013139C(effectId, 0);
+    }
+    return effectId;
+}
 
 #if 0
 asm void _lightningRenderMain(void) {
