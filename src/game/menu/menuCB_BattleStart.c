@@ -10,3 +10,22 @@
  * proving same-TU membership. All functions asm-only.
  */
 #include "dolphin/types.h"
+
+typedef struct MenuCBBattleStartState {
+    void* menu;
+    s32 status;
+    u8 pad8[0x3D8];
+} MenuCBBattleStartState;
+
+extern MenuCBBattleStartState lbl_803A9A60;
+
+extern void fn_8005DFC8(void* arg);
+
+void fn_8005E730(void* arg) {
+    fn_8005DFC8(arg);
+}
+
+s32 menuCBBattleStartGetStatus(void) {
+    MenuCBBattleStartState* state = &lbl_803A9A60;
+    return state->status;
+}
