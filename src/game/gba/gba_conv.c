@@ -7,6 +7,7 @@
  */
 
 #include "dolphin/types.h"
+#include "game/gba/gba_conv.h"
 
 /* ===== External function declarations ===== */
 extern void fn_8001E074();
@@ -4979,6 +4980,7 @@ void fn_80088428(void) {
     extern void cameraWaitSyncAnime(s32);
     extern void cameraPlayAnime(s32, s32, s32, s32);
     extern void fn_800FF660(void);
+    GbaConvChannelState* state = (GbaConvChannelState*)&lbl_803FB2F8;
     u32 r31;
 
     fn_80166A28(0x27);
@@ -4989,7 +4991,7 @@ void fn_80088428(void) {
     cameraPlayAnime(0x62d, 0x107D1800, 0, 0);
     cameraWaitSyncAnime(1);
     fn_800FF660();
-    *(u32*)((u8*)&lbl_803FB2F8 + 0x8) = r31;
+    state->result = r31;
 }
 
 /* 0x800884BC | size: 0x214 */
@@ -5648,24 +5650,25 @@ void fn_80088EA8(u8* p) {
     extern u32 fn_800FF56C(void);
     extern u32 floorGetPrevFloorID(void);
     extern u32 fn_801906A0(s32);
+    GbaConvPlayerMemo* memo = (GbaConvPlayerMemo*)p;
     f32 a[3];
     f32 b[3];
 
     heroMoveGetHeroPos(a);
     heroMoveGetHeroRot(b);
-    *(f32*)(p + 0xC) = a[0];
-    *(f32*)(p + 0x10) = a[1];
-    *(f32*)(p + 0x14) = a[2];
-    *(f32*)(p + 0x18) = b[0];
-    *(f32*)(p + 0x1C) = b[1];
-    *(f32*)(p + 0x20) = b[2];
-    *(u32*)(p + 0x4) = fn_800FF56C();
-    *(u32*)(p + 0x8) = floorGetPrevFloorID();
-    *(u8*)(p + 0x0) = 1;
-    *(u32*)(p + 0x24) = fn_801906A0(0xafc);
-    *(u32*)(p + 0x28) = fn_801906A0(0xafd);
-    *(u32*)(p + 0x2C) = fn_801906A0(0xb11);
-    *(u32*)(p + 0x30) = fn_801906A0(0xde1);
+    memo->posX = a[0];
+    memo->posY = a[1];
+    memo->posZ = a[2];
+    memo->rotX = b[0];
+    memo->rotY = b[1];
+    memo->rotZ = b[2];
+    memo->unk04 = fn_800FF56C();
+    memo->prevFloorId = floorGetPrevFloorID();
+    memo->valid = 1;
+    memo->flagAfc = fn_801906A0(0xafc);
+    memo->flagAfd = fn_801906A0(0xafd);
+    memo->flagB11 = fn_801906A0(0xb11);
+    memo->flagDe1 = fn_801906A0(0xde1);
 }
 
 /* 0x80088F58 | size: 0x1C */
