@@ -18,7 +18,7 @@ extern void C_MTXLookAt();
 extern void C_MTXPerspective();
 extern void OSFillFPUContext();
 extern int setupTopHalfCamera();   /* wrk7: was `void` asm-wrapper decl; typed-C returns int */
-extern void CObjUpdateFunc();
+extern void CObjUpdateFunc(HSD_CObj*, u32, f32*);
 extern char lbl_80465080[];
 
 static HSD_ClassInfo* default_class;
@@ -235,7 +235,7 @@ void HSD_CObjAnim_Early(HSD_CObj* cobj)
 /*  Alloc                                                                    */
 /* ========================================================================= */
 
-HSD_CObj* HSD_CObjAlloc(void)
+HSD_CObj* HSD_CObjAlloc_Early(void)
 {
     HSD_CObj* cobj;
     cobj = (HSD_CObj*) hsdNew(
@@ -256,7 +256,7 @@ void HSD_CObjSetDefaultClass(HSD_ClassInfo* info)
 /*  Class lifecycle                                                          */
 /* ========================================================================= */
 
-static void CObjRelease(HSD_Class* o)
+static void CObjRelease_Early(HSD_Class* o)
 {
     HSD_CObj* cobj = (HSD_CObj*) o;
     HSD_WObjUnref(cobj->eyepos);
@@ -265,7 +265,7 @@ static void CObjRelease(HSD_Class* o)
     HSD_OBJECT_PARENT_INFO(&hsdCObj)->release(o);
 }
 
-static void CObjAmnesia(HSD_ClassInfo* info)
+static void CObjAmnesia_Early(HSD_ClassInfo* info)
 {
     if (info == HSD_CLASS_INFO(default_class)) {
         default_class = NULL;
@@ -279,8 +279,8 @@ static void CObjInfoInit(void)
     hsdInitClassInfo(HSD_CLASS_INFO(&hsdCObj), HSD_CLASS_INFO(&hsdObj),
                      "sysdolphin_base_library", "hsd_cobj",
                      sizeof(HSD_CObjInfo), sizeof(HSD_CObj));
-    HSD_CLASS_INFO(&hsdCObj)->release = CObjRelease;
-    HSD_CLASS_INFO(&hsdCObj)->amnesia = CObjAmnesia;
+    HSD_CLASS_INFO(&hsdCObj)->release = CObjRelease_Early;
+    HSD_CLASS_INFO(&hsdCObj)->amnesia = CObjAmnesia_Early;
     HSD_COBJ_INFO(&hsdCObj)->load =
         (int (*)(HSD_CObj*, HSD_CObjDesc*)) setupTopHalfCamera;
     HSD_COBJ_INFO(&hsdCObj)->update =
@@ -296,15 +296,18 @@ asm void fn_80193CD0(void) {
 #include "src/hsd/hsd_cobj_fn_80193CD0.inc"
 }
 #else
-void fn_80193CD0(u8* ptr) {
-    extern u32 lbl_8047B230;
-    extern u32 lbl_8047B234;
+void CObjAmnesia(HSD_ClassInfo* info) {
+    extern HSD_ClassInfo* lbl_8047B230;
+    extern HSD_CObj* lbl_8047B234;
     extern HSD_CObjInfo lbl_8036C678;
-    u32 class_info;
-    if (ptr == (u8*)lbl_8047B230) { lbl_8047B230 = 0; }
-    if (ptr == (u8*)&lbl_8036C678) { lbl_8047B234 = 0; }
-    class_info = *(u32*)((u8*)&lbl_8036C678 + 0x14);
-    ((void(*)(u8*))*(u32*)(class_info + 0x38))(ptr);
+
+    if (info == lbl_8047B230) {
+        lbl_8047B230 = NULL;
+    }
+    if (info == &lbl_8036C678.parent.parent) {
+        lbl_8047B234 = NULL;
+    }
+    lbl_8036C678.parent.parent.head.parent->amnesia(info);
 }
 #endif
 #pragma pop
@@ -335,35 +338,32 @@ asm void fn_80193D30(void) {
 /* decompiled wrk5: functional (TU not byte-measurable) - CObj destructor:
    removes its anim, releases the eye/interest WObjs (ref-counted), frees the
    projection matrix, then chains to the parent class destroy method. */
-void fn_80193D30(HSD_CObj* cobj) {
-    extern void fn_801C25E4(void*);
+void CObjRelease(HSD_CObj* cobj) {
     extern void HSD_MtxFree(void*);
     HSD_WObj* eyepos;
     HSD_WObj* interest;
-    fn_801C25E4(cobj->aobj);
+
+    HSD_AObjRemove(cobj->aobj);
     if (cobj == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
     eyepos = cobj->eyepos;
     if (eyepos != NULL) {
         if (ref_DEC_v(eyepos) && eyepos != NULL) {
-            HSD_OBJECT_METHOD(eyepos)->release((HSD_Class*)eyepos);
-            HSD_OBJECT_METHOD(eyepos)->destroy((HSD_Class*)eyepos);
+            eyepos->parent.parent.class_info->release(&eyepos->parent.parent);
+            eyepos->parent.parent.class_info->destroy(&eyepos->parent.parent);
         }
     }
     if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
     interest = cobj->interest;
     if (interest != NULL) {
         if (ref_DEC_v(interest) && interest != NULL) {
-            HSD_OBJECT_METHOD(interest)->release((HSD_Class*)interest);
-            HSD_OBJECT_METHOD(interest)->destroy((HSD_Class*)interest);
+            interest->parent.parent.class_info->release(&interest->parent.parent);
+            interest->parent.parent.class_info->destroy(&interest->parent.parent);
         }
     }
     if (cobj->proj_mtx != NULL) {
         HSD_MtxFree(cobj->proj_mtx);
     }
-    {
-        u32 class_info = *(u32*)((u8*)&lbl_8036C678 + 0x14);
-        ((void (*)(HSD_CObj*)) *(u32*)(class_info + 0x30))(cobj);
-    }
+    lbl_8036C678.parent.parent.head.parent->release(&cobj->parent.parent);
 }
 #endif
 #pragma pop
@@ -406,45 +406,44 @@ asm void fn_80193F44(void) {
 #include "src/hsd/hsd_cobj_fn_80193F44.inc"
 }
 #else
-void* fn_80193F44(u8* ptr) {
-    extern u32 lbl_8047B230;
+HSD_CObj* HSD_CObjLoadDesc(HSD_CObjDesc* desc) {
+    extern HSD_ClassInfo* lbl_8047B230;
     extern HSD_CObjInfo lbl_8036C678;
     extern char lbl_8047D958;
     extern char lbl_8047D960;
-    void* cobj_result;
-    void* alloc_arg;
+    HSD_CObj* cobj;
     HSD_ClassInfo* info;
-    if (ptr == NULL) goto return_null;
-    if (*(u32*)ptr != 0) {
-        info = fn_80193748(*(const char**)ptr);
-        if (info != 0) goto do_alloc_from_info;
+
+    if (desc == NULL) {
+        goto return_null;
     }
-default_alloc:
-    if (lbl_8047B230 == 0) {
-        goto use_default;
+
+    if (desc->class_name != NULL) {
+        info = fn_80193748(desc->class_name);
+        if (info != NULL) {
+            goto do_alloc_from_info;
+        }
     }
-    alloc_arg = (void*)lbl_8047B230;
-    goto have_arg;
-use_default:
-    info = HSD_CLASS_INFO(&lbl_8036C678);
-    alloc_arg = info;
-have_arg:
-    cobj_result = fn_80193828(alloc_arg);
-    if (cobj_result == NULL) {
+
+    if (lbl_8047B230 != NULL) {
+        info = lbl_8047B230;
+    } else {
+        info = &lbl_8036C678.parent.parent;
+    }
+    cobj = fn_80193828(info);
+    if (cobj == NULL) {
         __assert(&lbl_8047D958, 0x7a4, &lbl_8047D960);
     }
     goto setup;
+
 do_alloc_from_info:
-    cobj_result = fn_80193828(info);
-    if (cobj_result == NULL) {
+    cobj = fn_80193828(info);
+    if (cobj == NULL) {
         __assert(&lbl_8047D958, 0x7f9, &lbl_8047D960);
     }
 setup:
-    {
-        void** vtable = *(void***)cobj_result;
-        ((void(*)(void*, u8*))vtable[0x3c / 4])(cobj_result, ptr);
-    }
-    return cobj_result;
+    HSD_COBJ_METHOD(cobj)->load(cobj, desc);
+    return cobj;
 return_null:
     return NULL;
 }
@@ -456,8 +455,8 @@ return_null:
 #pragma optimization_level 1
 #pragma optimizewithasm off
 extern void HSD_WObjInit(HSD_WObj*, HSD_WObjDesc*);
-extern void fn_801947C8(HSD_CObj*, f32);   /* wrk8: typed-C takes (HSD_CObj*, f32) */
-extern void fn_80194DA4();   /* wrk7: was `(void)`; typed-C takes (HSD_CObj*, f32*) */
+extern void HSD_CObjSetRoll(HSD_CObj*, f32);
+extern void HSD_CObjSetUpVector(HSD_CObj*, f32*);
 extern f32 lbl_8036C6D4[]; /* default up vector (Vec3) */
 #if 0
 asm void CObjLoad(void) {
@@ -500,9 +499,9 @@ int CObjLoad(HSD_CObj* cobj, HSD_CObjDesc* desc)
         if (up == NULL) {
             up = lbl_8036C6D4;
         }
-        ((void (*)(HSD_CObj*, void*)) fn_80194DA4)(cobj, up);
+        HSD_CObjSetUpVector(cobj, up);
     } else {
-        ((void (*)(HSD_CObj*, f32)) fn_801947C8)(cobj, desc->common.roll);
+        HSD_CObjSetRoll(cobj, desc->common.roll);
     }
     switch (desc->common.projection_type) {
     case PROJ_PERSPECTIVE:
@@ -543,19 +542,20 @@ int CObjLoad(HSD_CObj* cobj, HSD_CObjDesc* desc)
 #pragma push
 #pragma optimization_level 1
 #pragma optimizewithasm off
-#pragma peephole off
+#pragma peephole on
 #if 0
 asm void fn_80194258(void) {
 #include "src/hsd/hsd_cobj_fn_80194258.inc"
 }
 #else
-void* fn_80194258(void) {
-    extern u32 lbl_8047B230;
+HSD_CObj* HSD_CObjAlloc(void) {
+    extern HSD_ClassInfo* lbl_8047B230;
     extern HSD_CObjInfo lbl_8036C678;
     extern char lbl_8047D958;
     extern char lbl_8047D960;
-    void* result;
-    result = fn_80193828(lbl_8047B230 != 0 ? (void*)lbl_8047B230 : (void*)&lbl_8036C678);
+    HSD_CObj* result;
+
+    result = fn_80193828(lbl_8047B230 != NULL ? lbl_8047B230 : &lbl_8036C678.parent.parent);
     if (result == NULL) {
         __assert(&lbl_8047D958, 0x7a4, &lbl_8047D960);
     }
@@ -1023,7 +1023,7 @@ asm void fn_801947C8(void) {
    INFERRED: the near-vertical threshold and the sqrt-degenerate fallback are
    anonymous SDA2 doubles reconstructed by value; lbl_80274654 (up-path assert msg)
    is an anonymous SDA2 string - all flagged for review. */
-void fn_801947C8(HSD_CObj* cobj, f32 roll)
+void HSD_CObjSetRoll(HSD_CObj* cobj, f32 roll)
 {
     extern f32 lbl_80478AC0;   /* sqrt-degenerate fallback (anonymous SDA2, ~0.0f) - INFERRED */
     extern f32 lbl_80478AC8;   /* degenerate-vector epsilon */
@@ -1122,7 +1122,7 @@ void fn_801947C8(HSD_CObj* cobj, f32 roll)
         }
         if (cobj->flags & 1) {
             ((void (*)(HSD_CObj*, f32, f32*)) roll2upvec)(cobj, roll, tmp);
-            ((void (*)(HSD_CObj*, f32*)) fn_80194DA4)(cobj, tmp);
+            HSD_CObjSetUpVector(cobj, tmp);
         } else {
             if (cobj->u.roll != roll) {
                 HSD_CObjSetMtxDirty(cobj);
@@ -1186,11 +1186,13 @@ asm void HSD_CObjGetViewingMtxPtr(void) {
 #include "src/hsd/hsd_cobj_HSD_CObjGetViewingMtxPtr.inc"
 }
 #else
+#pragma dont_inline on
 f32* HSD_CObjGetViewingMtxPtr(HSD_CObj* cobj)
 {
     HSD_CObjSetupViewingMtx(cobj);
     return cobj->view_mtx[0];
 }
+#pragma dont_inline reset
 #endif
 #pragma pop
 
@@ -1224,14 +1226,14 @@ f32* HSD_CObjGetInvViewingMtxPtrDirect(HSD_CObj* cobj) {
 #pragma push
 #pragma optimization_level 4
 #pragma optimizewithasm off
-extern void fn_800A2D64(void*, void*);
+extern void PSMTXCopy(f32*, f32*);
 #if 0
 asm void HSD_CObjGetViewingMtx(void) {
 #include "src/hsd/hsd_cobj_HSD_CObjGetViewingMtx.inc"
 }
 #else
-void HSD_CObjGetViewingMtx(HSD_CObj* ptr, f32 arg2[3][4]) {
-    fn_800A2D64(HSD_CObjGetViewingMtxPtr((HSD_CObj*) ptr), arg2);
+void HSD_CObjGetViewingMtx(HSD_CObj* cobj, f32 mtx[3][4]) {
+    PSMTXCopy(HSD_CObjGetViewingMtxPtr(cobj), mtx[0]);
 }
 #endif
 #pragma pop
@@ -1279,7 +1281,7 @@ asm void fn_80194DA4(void) {
      roll angle exactly as upvec2roll does, then commit it via fn_801947C8.
    The +/-PI/2 results below are anonymous SDA2 literals reconstructed by value;
    flagged for orchestrator review. */
-void fn_80194DA4(HSD_CObj* cobj, f32* up)
+void HSD_CObjSetUpVector(HSD_CObj* cobj, f32* up)
 {
     extern f32 lbl_80478AC8;    /* degenerate-vector epsilon */
     extern f32 lbl_8036C6BC[];  /* look-at reference eye vector (shared with upvec2roll) */
@@ -1367,7 +1369,7 @@ void fn_80194DA4(HSD_CObj* cobj, f32* up)
                 }
             }
         }
-        ((void (*)(HSD_CObj*, f32)) fn_801947C8)(cobj, roll);
+        HSD_CObjSetRoll(cobj, roll);
     }
 }
 #endif
@@ -2251,7 +2253,7 @@ void HSD_CObjAnim(HSD_CObj* cobj) {
 
 /* 0x8019674C | 0x3C4 */
 #pragma push
-#pragma optimization_level 2
+#pragma optimization_level 1
 #pragma optimizewithasm off
 #if 0
 asm void CObjUpdateFunc(void) {
@@ -2265,92 +2267,94 @@ asm void CObjUpdateFunc(void) {
    match the recovered instruction flow. NOTE: interest channels 5/6/7 all overwrite
    component 0 (eye channels 1/2/3 write X/Y/Z) - reproduced verbatim,
    FLAGGED for review (likely an original-game copy/paste artefact). */
-void CObjUpdateFunc(HSD_CObj* cobj, u32 type, void* value)
+void CObjUpdateFunc(HSD_CObj* cobj, u32 type, f32* value)
 {
+    HSD_CObj* c = cobj;
+    f32* val = value;
     f32 v[3];
 
-    if (cobj == NULL) {
+    if (c == NULL) {
         return;
     }
     switch (type) {
     case 1: /* eye position, component X */
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
-        fn_80191688(cobj->eyepos, v);
-        v[0] = *(f32*)value;
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x324, &lbl_8047D960);
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
-        HSD_WObjSetPosition(cobj->eyepos, v);
+        if (c == NULL) __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
+        if (c == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
+        HSD_WObjGetPosition(c->eyepos, v);
+        v[0] = *val;
+        if (c == NULL) __assert(&lbl_8047D958, 0x324, &lbl_8047D960);
+        if (c == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
+        HSD_WObjSetPosition(c->eyepos, v);
         break;
     case 2: /* eye position, component Y */
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
-        fn_80191688(cobj->eyepos, v);
-        v[1] = *(f32*)value;
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x324, &lbl_8047D960);
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
-        HSD_WObjSetPosition(cobj->eyepos, v);
+        if (c == NULL) __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
+        if (c == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
+        HSD_WObjGetPosition(c->eyepos, v);
+        v[1] = *val;
+        if (c == NULL) __assert(&lbl_8047D958, 0x324, &lbl_8047D960);
+        if (c == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
+        HSD_WObjSetPosition(c->eyepos, v);
         break;
     case 3: /* eye position, component Z */
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
-        fn_80191688(cobj->eyepos, v);
-        v[2] = *(f32*)value;
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x324, &lbl_8047D960);
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
-        HSD_WObjSetPosition(cobj->eyepos, v);
+        if (c == NULL) __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
+        if (c == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
+        HSD_WObjGetPosition(c->eyepos, v);
+        v[2] = *val;
+        if (c == NULL) __assert(&lbl_8047D958, 0x324, &lbl_8047D960);
+        if (c == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
+        HSD_WObjSetPosition(c->eyepos, v);
         break;
     case 5: /* interest position (asm writes component 0) */
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
-        fn_80191688(cobj->interest, v);
-        v[0] = *(f32*)value;
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x30c, &lbl_8047D960);
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
-        HSD_WObjSetPosition(cobj->interest, v);
+        if (c == NULL) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
+        if (c == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
+        HSD_WObjGetPosition(c->interest, v);
+        v[0] = *val;
+        if (c == NULL) __assert(&lbl_8047D958, 0x30c, &lbl_8047D960);
+        if (c == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
+        HSD_WObjSetPosition(c->interest, v);
         break;
     case 6: /* interest position (asm writes component 0) */
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
-        fn_80191688(cobj->interest, v);
-        v[0] = *(f32*)value;
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x30c, &lbl_8047D960);
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
-        HSD_WObjSetPosition(cobj->interest, v);
+        if (c == NULL) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
+        if (c == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
+        HSD_WObjGetPosition(c->interest, v);
+        v[0] = *val;
+        if (c == NULL) __assert(&lbl_8047D958, 0x30c, &lbl_8047D960);
+        if (c == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
+        HSD_WObjSetPosition(c->interest, v);
         break;
     case 7: /* interest position (asm writes component 0) */
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
-        fn_80191688(cobj->interest, v);
-        v[0] = *(f32*)value;
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x30c, &lbl_8047D960);
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
-        HSD_WObjSetPosition(cobj->interest, v);
+        if (c == NULL) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
+        if (c == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
+        HSD_WObjGetPosition(c->interest, v);
+        v[0] = *val;
+        if (c == NULL) __assert(&lbl_8047D958, 0x30c, &lbl_8047D960);
+        if (c == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
+        HSD_WObjSetPosition(c->interest, v);
         break;
     case 9: /* roll */
-        fn_801947C8(cobj, *(f32*)value);
+        HSD_CObjSetRoll(c, *val);
         break;
     case 10: /* field of view (perspective only) */
     {
-        f32 temp = *(f32*)value;
-        if (cobj != NULL && cobj->projection_type == PROJ_PERSPECTIVE) {
-            cobj->projection_param.perspective.fov = temp;
+        f32 temp = *val;
+        if (c != NULL && c->projection_type == PROJ_PERSPECTIVE) {
+            c->projection_param.perspective.fov = temp;
         }
         break;
     }
     case 11: /* near clip plane */
     {
-        f32 temp = *(f32*)value;
-        if (cobj != NULL) {
-            cobj->near = temp;
+        f32 temp = *val;
+        if (c != NULL) {
+            c->near = temp;
         }
         break;
     }
     case 12: /* far clip plane */
     {
-        f32 temp = *(f32*)value;
-        if (cobj != NULL) {
-            cobj->far = temp;
+        f32 temp = *val;
+        if (c != NULL) {
+            c->far = temp;
         }
         break;
     }
@@ -2478,11 +2482,13 @@ asm void fn_80196CE0(void) {
 #include "src/hsd/hsd_cobj_fn_80196CE0.inc"
 }
 #else
+#pragma dont_inline on
 void fn_80196CE0(void) {
     /* PPC live-register SPR/GQR save is not expressible in portable C. */
     *(u16*)(lbl_80465080 + 0x1A2) |= 1;
     OSFillFPUContext(lbl_80465080);
 }
+#pragma dont_inline reset
 #endif
 #pragma pop
 
