@@ -93,7 +93,7 @@ extern u32 lbl_8047AD6C;
 extern void fn_801ED674(void);
 void fn_801193BC(void);
 extern s32 pokemonWazaGetMaxPP(u8* ptr, u16 idx);
-extern void wazaGetStatus(void);
+extern u32 wazaGetStatus(void* ptr, u16 dataId, u16 status, u32 index);
 extern void pokemonBiosGetPokemonWazaPtr(void);
 extern void pokemonResetBasisStatus(void* ptr);
 void pokemonSetLevelBasisStatus(void);
@@ -366,33 +366,33 @@ extern void fn_80135E44(void);
 void fn_8011A0A8(void);
 extern s32 kaisuuGetKaisuu(u32);
 extern void jumptable_8035C260();
-extern void fightWazaBiosSetWazaBanme(void);
-extern void fightWazaBiosSetMotoWazaDataId(void);
-extern void fightWazaBiosSetUseWazaDataId(void);
-extern void fightWazaBiosSetTargetDataId(void);
-extern void fightWazaBiosSetCritical(void);
-extern void fightWazaBiosSetDamageValue(void);
-extern void fightWazaBiosSetDamage(void);
-extern void fightWazaBiosSetHitDamage(void);
-extern void fightWazaBiosSetIryoku(void);
-extern void fightWazaBiosSetZokusei(void);
-extern void fightWazaBiosSetKaisuu(void);
-extern void fightWazaBiosSetAutoMakeFlag(void);
+extern void fightWazaBiosSetWazaBanme(void* ptr, s8 val);
+extern void fightWazaBiosSetMotoWazaDataId(void* ptr, u16 val);
+extern void fightWazaBiosSetUseWazaDataId(void* ptr, u16 val);
+extern void fightWazaBiosSetTargetDataId(void* ptr, u16 val);
+extern void fightWazaBiosSetCritical(void* ptr, u8 val);
+extern void fightWazaBiosSetDamageValue(void* ptr, u8 val);
+extern void fightWazaBiosSetDamage(void* ptr, u32 val);
+extern void fightWazaBiosSetHitDamage(void* ptr, u32 val);
+extern void fightWazaBiosSetIryoku(void* ptr, u16 val);
+extern void fightWazaBiosSetZokusei(void* ptr, u16 val);
+extern void fightWazaBiosSetKaisuu(void* ptr, u8 val);
+extern void fightWazaBiosSetAutoMakeFlag(void* ptr, u8 val);
 extern void jumptable_8035C290();
-void wazaSetStatus(void);
-extern void fightWazaBiosGetWazaBanme(void);
-extern void fightWazaBiosGetMotoWazaDataId(void);
-extern void fightWazaBiosGetUseWazaDataId(void);
-extern void fightWazaBiosGetTargetDataId(void);
-extern void fightWazaBiosGetJoutaiPtr(void);
-extern void fightWazaBiosGetCritical(void);
-extern void fightWazaBiosGetDamageValue(void);
-extern void fightWazaBiosGetDamage(void);
-extern void fightWazaBiosGetHitDamage(void);
-extern void fightWazaBiosGetIryoku(void);
-extern void fightWazaBiosGetZokusei(void);
-extern void fightWazaBiosGetKaisuu(void);
-extern void fightWazaBiosGetAutoMakeFlag(void);
+void wazaSetStatus(void* ptr, u16 dataId, u16 status, u32 index, u32 value);
+extern s8 fightWazaBiosGetWazaBanme(void* ptr);
+extern u16 fightWazaBiosGetMotoWazaDataId(void* ptr);
+extern u16 fightWazaBiosGetUseWazaDataId(void* ptr);
+extern u16 fightWazaBiosGetTargetDataId(void* ptr);
+extern void* fightWazaBiosGetJoutaiPtr(void* ptr, u32 index);
+extern u8 fightWazaBiosGetCritical(void* ptr);
+extern u8 fightWazaBiosGetDamageValue(void* ptr);
+extern u32 fightWazaBiosGetDamage(void* ptr);
+extern u32 fightWazaBiosGetHitDamage(void* ptr);
+extern u16 fightWazaBiosGetIryoku(void* ptr);
+extern u16 fightWazaBiosGetZokusei(void* ptr);
+extern u8 fightWazaBiosGetKaisuu(void* ptr);
+extern u8 fightWazaBiosGetAutoMakeFlag(void* ptr);
 extern void jumptable_8035C35C();
 extern u32 lbl_80478DF8;
 extern u32 lbl_80478DFC;
@@ -859,10 +859,10 @@ extern void wazaDataBiosSetAddFightKoukaAvg(u8* ptr, u8 val);
 extern void wazaDataBiosSetFightAttackMsgId(u8* ptr, u32 val);
 extern void wazaDataBiosSetSeqId(u8* ptr, u16 val);
 extern void wazaDataBiosSetFightKoukaDataId(u8* ptr, u16 val);
-extern void wazaDataBiosSetIryoku(u8* ptr, u16 val);
+extern void wazaDataBiosSetIryoku(u8* ptr, s16 val);
 extern void wazaDataBiosSetAvg(u8* ptr, u8 val);
 extern void wazaDataBiosSetRangeId(u8* ptr, u8 val);
-extern void wazaDataBiosSetPri(u8* ptr, u8 val);
+extern void wazaDataBiosSetPri(u8* ptr, s8 val);
 extern void wazaDataBiosSetZokuseiDataId(u8* ptr, u8 val);
 extern void wazaDataBiosSetPp(u8* ptr, u8 val);
 extern void wazaDataBiosSetName(u8* ptr, u32 val);
@@ -1551,7 +1551,7 @@ void wazaDataBiosSetFightKoukaDataId(u8* ptr, u16 val) {
     *(u16*)(&ptr[0x18]) = val;
 }
 /* Address: 0x8011C720 | Size: 0x10 | Pattern: nullcheck_setter */
-void wazaDataBiosSetIryoku(u8* ptr, u16 val) {
+void wazaDataBiosSetIryoku(u8* ptr, s16 val) {
     if (ptr == NULL) { return; }
     *(u16*)(&ptr[0x16]) = val;
 }
@@ -1566,7 +1566,7 @@ void wazaDataBiosSetRangeId(u8* ptr, u8 val) {
     *(u8*)(&ptr[0x3]) = val;
 }
 /* Address: 0x8011C750 | Size: 0x10 | Pattern: nullcheck_setter */
-void wazaDataBiosSetPri(u8* ptr, u8 val) {
+void wazaDataBiosSetPri(u8* ptr, s8 val) {
     if (ptr == NULL) { return; }
     *(u8*)(&ptr[0x0]) = val;
 }
@@ -1800,38 +1800,326 @@ u8 wazaGetMaxPP(u32 arg1, u8 arg2) {
     return (u8)(r + a2 * (r * 20) / 100);
 }
 /* 0x8011BBD8 | 0x2DC */
-extern void fightWazaBiosSetWazaBanme(void);
-extern void fightWazaBiosSetMotoWazaDataId(void);
-extern void fightWazaBiosSetUseWazaDataId(void);
-extern void fightWazaBiosSetTargetDataId(void);
-extern void fightWazaBiosSetCritical(void);
-extern void fightWazaBiosSetDamageValue(void);
-extern void fightWazaBiosSetDamage(void);
-extern void fightWazaBiosSetHitDamage(void);
-extern void fightWazaBiosSetIryoku(void);
-extern void fightWazaBiosSetZokusei(void);
-extern void fightWazaBiosSetKaisuu(void);
-extern void fightWazaBiosSetAutoMakeFlag(void);
+extern void fightWazaBiosSetWazaBanme(void* ptr, s8 val);
+extern void fightWazaBiosSetMotoWazaDataId(void* ptr, u16 val);
+extern void fightWazaBiosSetUseWazaDataId(void* ptr, u16 val);
+extern void fightWazaBiosSetTargetDataId(void* ptr, u16 val);
+extern void fightWazaBiosSetCritical(void* ptr, u8 val);
+extern void fightWazaBiosSetDamageValue(void* ptr, u8 val);
+extern void fightWazaBiosSetDamage(void* ptr, u32 val);
+extern void fightWazaBiosSetHitDamage(void* ptr, u32 val);
+extern void fightWazaBiosSetIryoku(void* ptr, u16 val);
+extern void fightWazaBiosSetZokusei(void* ptr, u16 val);
+extern void fightWazaBiosSetKaisuu(void* ptr, u8 val);
+extern void fightWazaBiosSetAutoMakeFlag(void* ptr, u8 val);
 extern void jumptable_8035C290();
-/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void wazaSetStatus(void);
+#pragma dont_inline on
+void wazaSetStatus(void* ptr, u16 dataId, u16 status, u32 index, u32 value) {
+    if (status == 0 || status >= 0x35) {
+        return;
+    }
+    if (status < 0x25) {
+        ptr = wazaDataBiosGetPtr(dataId);
+        if (ptr == NULL) {
+            return;
+        }
+    } else if (ptr == NULL) {
+        return;
+    }
+    switch (status) {
+    case 1:
+        wazaDataBiosSetName(ptr, value);
+        break;
+    case 2:
+        wazaDataBiosSetPp(ptr, (u8)value);
+        break;
+    case 3:
+        wazaDataBiosSetZokuseiDataId(ptr, (u8)value);
+        break;
+    case 4:
+        wazaDataBiosSetPri(ptr, (s8)value);
+        break;
+    case 5:
+        wazaDataBiosSetRangeId(ptr, (u8)value);
+        break;
+    case 6:
+        wazaDataBiosSetAvg(ptr, (u8)value);
+        break;
+    case 7:
+        wazaDataBiosSetIryoku(ptr, (s16)value);
+        break;
+    case 8:
+        wazaDataBiosSetFightKoukaDataId(ptr, (u16)value);
+        break;
+    case 9:
+        wazaDataBiosSetSeqId(ptr, (u16)value);
+        break;
+    case 10:
+        wazaDataBiosSetFightAttackMsgId(ptr, (u16)value);
+        break;
+    case 11:
+        wazaDataBiosSetFightAttackMsgId(ptr, (u16)value);
+        break;
+    case 12:
+        wazaDataBiosSetAddFightKoukaAvg(ptr, (u8)value);
+        break;
+    case 13:
+        wazaDataBiosSetDageki(ptr, (u8)value);
+        break;
+    case 14:
+        wazaDataBiosSetMamoru(ptr, (u8)value);
+        break;
+    case 15:
+        wazaDataBiosSetMajikku(ptr, (u8)value);
+        break;
+    case 16:
+        wazaDataBiosSetYokodori(ptr, (u8)value);
+        break;
+    case 17:
+        wazaDataBiosSetOumugaesi(ptr, (u8)value);
+        break;
+    case 18:
+        wazaDataBiosSetOujanosirusi(ptr, (u8)value);
+        break;
+    case 19:
+        wazaDataBiosSetYubiwohuru(ptr, (u8)value);
+        break;
+    case 20:
+        wazaDataBiosSetMonomane(ptr, (u8)value);
+        break;
+    case 21:
+        wazaDataBiosSetNekonote(ptr, (u8)value);
+        break;
+    case 22:
+        wazaDataBiosSetNegoto(ptr, (u8)value);
+        break;
+    case 23:
+        wazaDataBiosSetBouon(ptr, (u8)value);
+        break;
+    case 24:
+        wazaDataBiosSetPressure(ptr, (u8)value);
+        break;
+    case 25:
+        wazaDataBiosSetHidenFlag(ptr, (u8)value);
+        break;
+    case 26:
+    {
+        extern void wazaDataBiosSetTypeId(u8* ptr, u32 idx, u8 val);
+        wazaDataBiosSetTypeId(ptr, index, (u8)value);
+        break;
+    }
+    case 27:
+        wazaDataBiosSetRiskFlag(ptr, (u8)value);
+        break;
+    case 28:
+        wazaDataBiosSetFightTrainerAiWazaValueFuncPtr(ptr, value);
+        break;
+    case 29:
+        wazaDataBiosSetFightTrainerAiWazaHitFuncPtr(ptr, value);
+        break;
+    case 30:
+        wazaDataBiosSetFightTrainerAiWazaDamageFuncPtr(ptr, value);
+        break;
+    case 31:
+        wazaDataBiosSetFightWazaWzxTypeFuncPtr(ptr, value);
+        break;
+    case 32:
+        wazaDataBiosSetFightWazaWzxVariationFuncPtr(ptr, value);
+        break;
+    case 33:
+        wazaDataBiosSetWazawzxdataId(ptr, value);
+        break;
+    case 34:
+        wazaDataBiosSetDoc(ptr, value);
+        break;
+    case 35:
+        fn_8011C5F0(ptr, (u8)value);
+        break;
+    case 36:
+        fn_8011C5E0(ptr, (u8)value);
+        break;
+    case 38:
+        fightWazaBiosSetWazaBanme(ptr, (s8)value);
+        break;
+    case 39:
+        fightWazaBiosSetMotoWazaDataId(ptr, (u16)value);
+        break;
+    case 40:
+        fightWazaBiosSetUseWazaDataId(ptr, (u16)value);
+        break;
+    case 41:
+        fightWazaBiosSetTargetDataId(ptr, (u16)value);
+        break;
+    case 43:
+        fightWazaBiosSetCritical(ptr, (u8)value);
+        break;
+    case 44:
+        fightWazaBiosSetDamageValue(ptr, (u8)value);
+        break;
+    case 45:
+        fightWazaBiosSetDamage(ptr, value);
+        break;
+    case 46:
+        fightWazaBiosSetHitDamage(ptr, value);
+        break;
+    case 47:
+        fightWazaBiosSetIryoku(ptr, (u16)value);
+        break;
+    case 48:
+        fightWazaBiosSetZokusei(ptr, (u16)value);
+        break;
+    case 49:
+        fightWazaBiosSetKaisuu(ptr, (u8)value);
+        break;
+    case 50:
+        fightWazaBiosSetAutoMakeFlag(ptr, (u8)value);
+        break;
+    }
+}
+#pragma dont_inline reset
 /* 0x8011BEB4 | 0x31C */
-extern void fightWazaBiosGetWazaBanme(void);
-extern void fightWazaBiosGetMotoWazaDataId(void);
-extern void fightWazaBiosGetUseWazaDataId(void);
-extern void fightWazaBiosGetTargetDataId(void);
-extern void fightWazaBiosGetJoutaiPtr(void);
-extern void fightWazaBiosGetCritical(void);
-extern void fightWazaBiosGetDamageValue(void);
-extern void fightWazaBiosGetDamage(void);
-extern void fightWazaBiosGetHitDamage(void);
-extern void fightWazaBiosGetIryoku(void);
-extern void fightWazaBiosGetZokusei(void);
-extern void fightWazaBiosGetKaisuu(void);
-extern void fightWazaBiosGetAutoMakeFlag(void);
+extern s8 fightWazaBiosGetWazaBanme(void* ptr);
+extern u16 fightWazaBiosGetMotoWazaDataId(void* ptr);
+extern u16 fightWazaBiosGetUseWazaDataId(void* ptr);
+extern u16 fightWazaBiosGetTargetDataId(void* ptr);
+extern void* fightWazaBiosGetJoutaiPtr(void* ptr, u32 index);
+extern u8 fightWazaBiosGetCritical(void* ptr);
+extern u8 fightWazaBiosGetDamageValue(void* ptr);
+extern u32 fightWazaBiosGetDamage(void* ptr);
+extern u32 fightWazaBiosGetHitDamage(void* ptr);
+extern u16 fightWazaBiosGetIryoku(void* ptr);
+extern u16 fightWazaBiosGetZokusei(void* ptr);
+extern u8 fightWazaBiosGetKaisuu(void* ptr);
+extern u8 fightWazaBiosGetAutoMakeFlag(void* ptr);
 extern void jumptable_8035C35C();
-/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void wazaGetStatus(void);
+#pragma dont_inline on
+u32 wazaGetStatus(void* ptr, u16 dataId, u16 status, u32 index) {
+    u32 value;
+
+    if (status == 0 || status >= 0x35) {
+        return 0;
+    }
+    if (status < 0x25) {
+        ptr = wazaDataBiosGetPtr(dataId);
+        if (ptr == NULL) {
+            return 0;
+        }
+    } else if (ptr == NULL) {
+        return 0;
+    }
+
+    switch (status) {
+    case 1:
+        return wazaDataBiosGetName(ptr);
+    case 2:
+        return (u8)wazaDataBiosGetPp(ptr);
+    case 3:
+        return (u8)wazaDataBiosGetZokuseiDataId(ptr);
+    case 4:
+        return (s8)wazaDataBiosGetPri(ptr);
+    case 5:
+        return (u8)wazaDataBiosGetRangeId(ptr);
+    case 6:
+        return (u8)wazaDataBiosGetAvg(ptr);
+    case 7:
+        return (s16)wazaDataBiosGetIryoku(ptr);
+    case 8:
+        return (u16)wazaDataBiosGetFightKoukaDataId(ptr);
+    case 9:
+        return (u16)wazaDataBiosGetSeqId(ptr);
+    case 10:
+        return wazaDataBiosGetFightAttackTunagiMsgId(ptr);
+    case 11:
+        return wazaDataBiosGetFightAttackMsgId(ptr);
+    case 12:
+        return (u8)wazaDataBiosGetAddFightKoukaAvg(ptr);
+    case 13:
+        return (u8)wazaDataBiosGetDageki(ptr);
+    case 14:
+        return (u8)wazaDataBiosGetMamoru(ptr);
+    case 15:
+        return (u8)wazaDataBiosGetMajikku(ptr);
+    case 16:
+        return (u8)wazaDataBiosGetYokodori(ptr);
+    case 17:
+        return (u8)wazaDataBiosGetOumugaesi(ptr);
+    case 18:
+        return (u8)wazaDataBiosGetOujanosirusi(ptr);
+    case 19:
+        return (u8)wazaDataBiosGetYubiwohuru(ptr);
+    case 20:
+        return (u8)wazaDataBiosGetMonomane(ptr);
+    case 21:
+        return (u8)wazaDataBiosGetNekonote(ptr);
+    case 22:
+        return (u8)wazaDataBiosGetNegoto(ptr);
+    case 23:
+        return (u8)wazaDataBiosGetBouon(ptr);
+    case 24:
+        return (u8)wazaDataBiosGetPressure(ptr);
+    case 25:
+        return (u8)wazaDataBiosGetHidenFlag(ptr);
+    case 26:
+    {
+        extern u8 wazaDataBiosGetTypeId();
+        return (u8)wazaDataBiosGetTypeId(ptr, index);
+    }
+    case 27:
+        return (u8)wazaDataBiosGetRiskFlag(ptr);
+    case 28:
+        return wazaDataBiosGetFightTrainerAiWazaValueFuncPtr(ptr);
+    case 29:
+        return wazaDataBiosGetFightTrainerAiWazaHitFuncPtr(ptr);
+    case 30:
+        return wazaDataBiosGetFightTrainerAiWazaDamageFuncPtr(ptr);
+    case 31:
+        return wazaDataBiosGetFightWazaWzxTypeFuncPtr(ptr);
+    case 32:
+        return wazaDataBiosGetFightWazaWzxVariationFuncPtr(ptr);
+    case 33:
+        return wazaDataBiosGetWazawzxdataId(ptr);
+    case 34:
+        return wazaDataBiosGetDoc(ptr);
+    case 35:
+        return (u8)fn_8011C7A8(ptr);
+    case 36:
+        return (u8)fn_8011C790(ptr);
+    case 38:
+        return (s8)fightWazaBiosGetWazaBanme(ptr);
+    case 39:
+        return (u16)fightWazaBiosGetMotoWazaDataId(ptr);
+    case 40:
+        return (u16)fightWazaBiosGetUseWazaDataId(ptr);
+    case 41:
+        return (u16)fightWazaBiosGetTargetDataId(ptr);
+    case 42:
+        return (u32)fightWazaBiosGetJoutaiPtr(ptr, index);
+    case 43:
+        return (u8)fightWazaBiosGetCritical(ptr);
+    case 44:
+        return (u8)fightWazaBiosGetDamageValue(ptr);
+    case 45:
+        return fightWazaBiosGetDamage(ptr);
+    case 46:
+        return fightWazaBiosGetHitDamage(ptr);
+    case 47:
+        return (u16)fightWazaBiosGetIryoku(ptr);
+    case 48:
+        return (u16)fightWazaBiosGetZokusei(ptr);
+    case 49:
+        return (u8)fightWazaBiosGetKaisuu(ptr);
+    case 50:
+        return (u8)fightWazaBiosGetAutoMakeFlag(ptr);
+    case 51:
+        value = wazaGetStatus(ptr, 0, 0x27, 0);
+        return wazaGetStatus(NULL, (u16)value, 3, 0);
+    case 52:
+        value = wazaGetStatus(ptr, 0, 0x28, 0);
+        return wazaGetStatus(NULL, (u16)value, 3, 0);
+    }
+    return 0;
+}
+#pragma dont_inline reset
 /* 0x8011C430 | 0x20 */
 void wazaDataBiosSetTypeId(u8* ptr, u16 idx, u8 val) {
     if (ptr == NULL) { return; }
