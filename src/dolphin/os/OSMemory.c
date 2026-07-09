@@ -3,6 +3,7 @@
 #include "dolphin/os/OSCache.h"
 #include "dolphin/os/OSInterrupt.h"
 #include "dolphin/os/OSReset.h"
+#include "dolphin/os/OSThread.h"
 
 /*
  * OSMemory.c - Memory protection and BAT configuration.
@@ -13,13 +14,28 @@
  * Matches: 0x8009F1B8 - 0x8009F77C
  */
 
-/* Hardware registers */
-#define MI_BASE     ((volatile u16*)0xCC004000)
-#define MI_MARR_HI  (*(volatile u16*)0xCC00401E)
-#define MI_MARR_LO  (*(volatile u16*)0xCC004020)
-#define MI_MARR_CTL (*(volatile u16*)0xCC004022)
-#define MI_PROT     (*(volatile u16*)0xCC004010)
-#define MI_INTMSK   (*(volatile u16*)0xCC004028)
+#define TRUNC(n, a) (((u32)(n)) & ~((a)-1))
+#define ROUND(n, a) (((u32)(n) + (a)-1) & ~((a)-1))
+
+/* Memory protection hardware registers */
+volatile u16 __MEMRegs[64] : (0xCC004000);
+
+#define OS_PROTECT_CONTROL_RDWR 0x03
+
+#define __OS_INTERRUPT_MEM_0       0
+#define __OS_INTERRUPT_MEM_1       1
+#define __OS_INTERRUPT_MEM_2       2
+#define __OS_INTERRUPT_MEM_3       3
+#define __OS_INTERRUPT_MEM_ADDRESS 4
+
+#define OS_INTERRUPTMASK(interrupt) (0x80000000u >> (interrupt))
+#define OS_INTERRUPTMASK_MEM_0       OS_INTERRUPTMASK(__OS_INTERRUPT_MEM_0)
+#define OS_INTERRUPTMASK_MEM_1       OS_INTERRUPTMASK(__OS_INTERRUPT_MEM_1)
+#define OS_INTERRUPTMASK_MEM_2       OS_INTERRUPTMASK(__OS_INTERRUPT_MEM_2)
+#define OS_INTERRUPTMASK_MEM_3       OS_INTERRUPTMASK(__OS_INTERRUPT_MEM_3)
+#define OS_INTERRUPTMASK_MEM_ADDRESS OS_INTERRUPTMASK(__OS_INTERRUPT_MEM_ADDRESS)
+#define OS_INTERRUPTMASK_MEM_RESET \
+    (OS_INTERRUPTMASK_MEM_0 | OS_INTERRUPTMASK_MEM_1 | OS_INTERRUPTMASK_MEM_2 | OS_INTERRUPTMASK_MEM_3)
 
 /* Error table for memory protection */
 extern OSErrorHandler __OSErrorTable[];
@@ -32,11 +48,18 @@ static void Config24MB(void);
 static void Config48MB(void);
 static void RealMode(void* target);
 
+typedef struct OSModuleInfo OSModuleInfo;
+typedef struct OSModuleQueue {
+    OSModuleInfo* head;
+    OSModuleInfo* tail;
+} OSModuleQueue;
+
+OSModuleQueue __OSModuleInfoList : (0x800030C8);
+const void* __OSStringTable : (0x800030D0);
+
 void __OSModuleInit(void) {
-    volatile u32* bootInfo = (volatile u32*)0x80000000;
-    bootInfo[0x30CC / 4] = 0;
-    bootInfo[0x30C8 / 4] = 0;
-    bootInfo[0x30D0 / 4] = 0;
+    __OSModuleInfoList.head = __OSModuleInfoList.tail = 0;
+    __OSStringTable = 0;
 }
 
 extern void OSInitThreadQueue();
@@ -50,24 +73,19 @@ void fn_8009F1D0(u8* ptr, u32 val1, u32 val2) {
 }
 
 static void MEMIntrruptHandler(s16 interrupt, OSContext* context) {
-    volatile u16* mi = (volatile u16*)0xCC004000;
     u32 cause;
-    u16 hi, lo;
+    u32 addr;
 
-    hi  = mi[0x24 / 2];
-    lo  = mi[0x22 / 2];
-
-    /* Combine address */
-    cause = ((u32)hi << 16) | lo;
-
-    /* Clear the interrupt */
-    mi[0x20 / 2] = 0;
+    cause = __MEMRegs[0xF];
+    addr = (((u32)__MEMRegs[0x12] & 0x3FF) << 16) | __MEMRegs[0x11];
+    __MEMRegs[0x10] = 0;
 
     if (__OSErrorTable[OS_ERROR_PROTECTION] != NULL) {
-        __OSErrorTable[OS_ERROR_PROTECTION](OS_ERROR_PROTECTION, context, cause, 0);
-    } else {
-        __OSUnhandledException(OS_ERROR_PROTECTION, context, 0, 0);
+        __OSErrorTable[OS_ERROR_PROTECTION](OS_ERROR_PROTECTION, context, cause, addr);
+        return;
     }
+
+    __OSUnhandledException(OS_ERROR_PROTECTION, context, cause, addr);
 }
 
 #if 0
@@ -75,41 +93,41 @@ asm void fn_8009F488(void) {
 #include "src/dolphin/os/OSMemory_fn_8009F488.inc"
 }
 #else
-void fn_8009F488(u32 region, u32 addr, u32 size, u32 perm) {
-    volatile u16* mi;
+void fn_8009F488(u32 chan, void* addr, u32 nBytes, u32 control) {
+    BOOL enabled;
     u32 start;
     u32 end;
-    u32 enabled;
-    u32 interrupt;
-    u32 shift;
-    u16 prot;
+    u16 reg;
 
-    if (region < 4) {
-        start = addr & ~0x3FF;
-        end = (addr + size + 0x3FF) & ~0x3FF;
-        perm &= 3;
-
-        DCFlushRange((void*)start, end - start);
-        enabled = OSDisableInterrupts();
-
-        interrupt = 0x80000000u >> region;
-        __OSMaskInterrupts(interrupt);
-
-        mi = (volatile u16*)0xCC004000;
-        *(volatile u16*)((u8*)mi + (region << 2)) = (u16)(start >> 10);
-        *(volatile u16*)((u8*)mi + (region << 2) + 2) = (u16)(end >> 10);
-
-        shift = region << 1;
-        prot = mi[0x10 / 2];
-        prot = (prot & ~(3 << shift)) | (perm << shift);
-        mi[0x10 / 2] = prot;
-
-        if (perm != 3) {
-            __OSUnmaskInterrupts(interrupt);
-        }
-
-        OSRestoreInterrupts(enabled);
+    if (4 <= chan) {
+        return;
     }
+
+    control &= 3;
+
+    end = (u32)addr + nBytes;
+    start = TRUNC(addr, 1u << 10);
+    end = ROUND(end, 1u << 10);
+
+    DCFlushRange((void*)start, end - start);
+
+    enabled = OSDisableInterrupts();
+
+    __OSMaskInterrupts(OS_INTERRUPTMASK(__OS_INTERRUPT_MEM_0 + chan));
+
+    __MEMRegs[0 + 2 * chan] = (u16)(start >> 10);
+    __MEMRegs[1 + 2 * chan] = (u16)(end >> 10);
+
+    reg = __MEMRegs[8];
+    reg &= ~(3 << 2 * chan);
+    reg |= control << 2 * chan;
+    __MEMRegs[8] = reg;
+
+    if (control != 3) {
+        __OSUnmaskInterrupts(OS_INTERRUPTMASK(__OS_INTERRUPT_MEM_0 + chan));
+    }
+
+    OSRestoreInterrupts(enabled);
 }
 #endif
 
@@ -225,56 +243,48 @@ static asm void RealMode(register void* target) {
 #pragma pop
 
 void __OSInitMemoryProtection(void) {
+#ifndef DEBUG
+    u32 padding[11];
+    u32 temp;
+#endif
+    u32 size;
     BOOL enabled;
-    u32  memSize;
-    volatile u16* mi = (volatile u16*)0xCC004000;
 
-    memSize = *(volatile u32*)0x800000F0;
+    size = *(volatile u32*)0x800000F0;
 
     enabled = OSDisableInterrupts();
 
-    /* Clear protection registers */
-    mi[0x20 / 2] = 0;
-    mi[0x10 / 2] = 0x00FF;
+    __MEMRegs[16] = 0;
+    __MEMRegs[8] = 0xFF;
 
-    /* Mask all memory protection interrupts initially */
-    __OSMaskInterrupts(0xF0000000);
-
-    /* Install memory interrupt handler for all 5 channels */
-    __OSSetInterruptHandler(0, (__OSInterruptHandler)MEMIntrruptHandler);
-    __OSSetInterruptHandler(1, (__OSInterruptHandler)MEMIntrruptHandler);
-    __OSSetInterruptHandler(2, (__OSInterruptHandler)MEMIntrruptHandler);
-    __OSSetInterruptHandler(3, (__OSInterruptHandler)MEMIntrruptHandler);
-    __OSSetInterruptHandler(4, (__OSInterruptHandler)MEMIntrruptHandler);
-
-    /* Register reset function */
+    __OSMaskInterrupts(OS_INTERRUPTMASK_MEM_0 | OS_INTERRUPTMASK_MEM_1 | OS_INTERRUPTMASK_MEM_2 |
+                        OS_INTERRUPTMASK_MEM_3);
+    __OSSetInterruptHandler(__OS_INTERRUPT_MEM_0, (__OSInterruptHandler)MEMIntrruptHandler);
+    __OSSetInterruptHandler(__OS_INTERRUPT_MEM_1, (__OSInterruptHandler)MEMIntrruptHandler);
+    __OSSetInterruptHandler(__OS_INTERRUPT_MEM_2, (__OSInterruptHandler)MEMIntrruptHandler);
+    __OSSetInterruptHandler(__OS_INTERRUPT_MEM_3, (__OSInterruptHandler)MEMIntrruptHandler);
+    __OSSetInterruptHandler(__OS_INTERRUPT_MEM_ADDRESS, (__OSInterruptHandler)MEMIntrruptHandler);
     OSRegisterResetFunction(&ResetFunctionInfo);
 
-    /* Check for extended memory and configure BATs */
     {
         u32 physMemSize = *(volatile u32*)0x800000F0;
         u32 memSizeField = *(volatile u32*)0x80000028;
 
         if (physMemSize < memSizeField) {
-            /* Check for 24MB expansion */
             if (physMemSize - 0x01800000 == 0) {
                 DCInvalidateRange((void*)0x81800000, 0x01800000);
-                mi[0x28 / 2] = 2;
+                __MEMRegs[20] = 2;
             }
         }
     }
 
-    /* Set BAT registers based on physical memory size */
-    if (memSize <= 0x01800000) {
-        /* 24 MB or less */
+    if (size <= 0x01800000) {
         RealMode((void*)Config24MB);
-    } else if (memSize <= 0x03000000) {
-        /* 48 MB or less */
+    } else if (size <= 0x03000000) {
         RealMode((void*)Config48MB);
     }
 
-    /* Unmask the memory protection interrupt */
-    __OSUnmaskInterrupts(0x00000800);
+    __OSUnmaskInterrupts(OS_INTERRUPTMASK_MEM_ADDRESS);
 
     OSRestoreInterrupts(enabled);
 }
@@ -284,91 +294,63 @@ void __OSInitMemoryProtection(void) {
  * 4 function(s)
  * =================================================================== */
 
+typedef struct OSMessageQueue {
+    OSThreadQueue queueSend;
+    OSThreadQueue queueReceive;
+    u32* msgArray;
+    s32 msgCount;
+    s32 firstIndex;
+    s32 usedCount;
+} OSMessageQueue;
+
 /* fn_8009F230 - 0x8009F230 | size: 0xC8
- * OSEnqueueMessage - Enqueue a message into an OS message queue.
- * queue+0x10 = buffer, queue+0x14 = capacity, queue+0x18 = head,
- * queue+0x1C = count. If blocking (flags & 1), waits when full.
+ * OSSendMessage - Enqueue a message into an OS message queue.
+ * If blocking (flags & 1), waits when full.
  * Returns TRUE on success, FALSE if non-blocking and queue is full.
  */
-BOOL fn_8009F230(u8* queue, u32 msg, u32 flags) {
-    typedef struct OSMessageQueue {
-        u8 sendQueue[0x8];
-        u8 recvQueue[0x8];
-        u32* buffer;
-        s32 capacity;
-        s32 head;
-        s32 count;
-    } OSMessageQueue;
-    extern void OSSleepThread(u8* queue);
-    extern void OSWakeupThread(u8* queue);
-    OSMessageQueue* mq;
-    s32 blocking;
+BOOL fn_8009F230(OSMessageQueue* mq, void* msg, s32 flags) {
     BOOL enabled;
+    s32 lastIndex;
 
-    mq = (OSMessageQueue*)queue;
-    blocking = flags;
     enabled = OSDisableInterrupts();
-    blocking = blocking & 1;
-
-    while (mq->capacity <= mq->count) {
-        if (blocking == 0) {
+    while (mq->msgCount <= mq->usedCount) {
+        if (!(flags & 1)) {
             OSRestoreInterrupts(enabled);
             return FALSE;
         }
-        OSSleepThread(queue);
+        OSSleepThread(&mq->queueSend);
     }
-
-    mq->buffer[(mq->head + mq->count) % mq->capacity] = msg;
-    mq->count++;
-
-    OSWakeupThread(mq->recvQueue);
+    lastIndex = (mq->firstIndex + mq->usedCount) % mq->msgCount;
+    mq->msgArray[lastIndex] = (u32)msg;
+    mq->usedCount++;
+    OSWakeupThread(&mq->queueReceive);
     OSRestoreInterrupts(enabled);
     return TRUE;
 }
 
 /* fn_8009F2F8 - 0x8009F2F8 | size: 0xDC
  * OSReceiveMessage - Dequeue a message from an OS message queue.
- * If msgOut is non-NULL, stores the dequeued message there.
+ * If msg is non-NULL, stores the dequeued message there.
  * If blocking (flags & 1), waits when empty.
  * Returns TRUE on success, FALSE if non-blocking and queue is empty.
  */
-BOOL fn_8009F2F8(u8* queue, u32* msgOut, u32 flags) {
-    extern void OSSleepThread(u8* condvar);
-    extern void OSWakeupThread(u8* queue);
-    BOOL enabled;
-    u32 count;
-    u32 head;
-    u32 capacity;
+BOOL fn_8009F2F8(OSMessageQueue* mq, void* msg, s32 flags) {
+    BOOL enabled = OSDisableInterrupts();
 
-    flags = flags & 1;
-    enabled = OSDisableInterrupts();
-
-    while (1) {
-        count = *(u32*)(queue + 0x1C);
-        if ((s32)count != 0) {
-            break;
-        }
-        if (flags == 0) {
+    while (mq->usedCount == 0) {
+        if (!(flags & 1)) {
             OSRestoreInterrupts(enabled);
             return FALSE;
         }
-        OSSleepThread(queue + 0x8);
+        OSSleepThread(&mq->queueReceive);
+    }
+    if (msg != NULL) {
+        *(u32*)msg = mq->msgArray[mq->firstIndex];
     }
 
-    if (msgOut != NULL) {
-        u32* buf;
-        head = *(u32*)(queue + 0x18);
-        buf = (u32*)(*(u32*)(queue + 0x10));
-        *msgOut = buf[head];
-    }
-
-    /* Advance head pointer with wraparound */
-    head = *(u32*)(queue + 0x18);
-    capacity = *(u32*)(queue + 0x14);
-    head = (head + 1) % capacity;
-    *(u32*)(queue + 0x18) = head;
-    *(u32*)(queue + 0x1C) = head;  /* Note: original stores head back to count field */
-    OSWakeupThread(queue);
+    mq->firstIndex = (mq->firstIndex + 1) % mq->msgCount;
+    mq->usedCount--;
+    OSWakeupThread(&mq->queueSend);
     OSRestoreInterrupts(enabled);
     return TRUE;
 }
@@ -385,10 +367,10 @@ u32 fn_8009F3D4(void) {
  * when the system is being reset (final == TRUE).
  * Returns TRUE always.
  */
-BOOL OnReset_800AF628(s32 final) {
-    if (final != 0) {
-        *(volatile u16*)0xCC004010 = 0xFF;
-        __OSMaskInterrupts(0xF0000000);
+BOOL OnReset_800AF628(BOOL final) {
+    if (final != FALSE) {
+        __MEMRegs[8] = 0xFF;
+        __OSMaskInterrupts(OS_INTERRUPTMASK_MEM_RESET);
     }
     return TRUE;
 }
