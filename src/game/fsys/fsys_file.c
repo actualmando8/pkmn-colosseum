@@ -706,7 +706,7 @@ u32 fn_8017D408(void) { return 1; }
 extern void fn_80167E34(void);
 extern void fn_80167E34(void);
 extern u32 lbl_8047B1B4;
-extern u8 lbl_80453FEC[];
+extern FSYSManager lbl_80453FEC;
 void fn_8017B1AC(void) {
     fn_80167E34();
 }
@@ -723,7 +723,7 @@ s32 fn_8017B2CC(u32 fileHandle) {
     u32 i;
 
     slot = (FSYSSlot*)lbl_8047B1B4;
-    for (i = 0; i < *(u32*)lbl_80453FEC; i++, slot++) {
+    for (i = 0; i < lbl_80453FEC.maxSlots; i++, slot++) {
         if (slot->status != FSYS_STATUS_FREE && slot->fileHandle == fileHandle) {
             if (slot->status == FSYS_STATUS_LOADED) {
                 return 0;
@@ -743,7 +743,6 @@ s32 fn_8017B2CC(u32 fileHandle) {
 
 /* 0x8017B448 | 0x74 */
 extern u32 lbl_8047B1B4;
-extern u8 lbl_80453FEC[];
 #if 0
 asm void fn_8017B448(void) {
 #include "src/game/fsys/fsys_file_fn_8017B448.inc"
@@ -759,7 +758,7 @@ typedef struct fn8017B448_Node {
     u8 _pad60[0xf8 - 0x60];
     u32 fieldf8;    /* 0xf8 */
 } fn8017B448_Node;
-#define COUNT_8017B448 (*(volatile u32*)lbl_80453FEC)
+#define COUNT_8017B448 lbl_80453FEC.maxSlots
 #pragma push
 #pragma optimization_level 0
 s32 fn_8017B448(u32 handle) {
@@ -796,7 +795,7 @@ extern u32 lbl_8047B1BC;
 
 #define FSYS_COMPRESSED_FLAG 0x80000000u
 #define FSYS_LZSS_MAGIC 0x4C5A5353u
-#define FSYS_SLOT_FILE0(slot) (*(u32*)((u8*)(slot) + 0x68))
+#define FSYS_SLOT_FILE0(slot) ((slot)->fileInfo0)
 #define FSYS_SLOT_FILE1(slot) (*(u32*)((u8*)(slot) + 0x6C))
 #define FSYS_SLOT_CURRENT_SUB(slot) (*(FSYSSubEntry**)((u8*)(slot) + 0xFC))
 #define FSYS_POOL_ALLOC_CB(pool) (*(void**)((u8*)(pool) + 0x08))
@@ -1074,7 +1073,7 @@ u32 fn_8017B4BC(u32 fileHandle, u32 index) {
     u32 i;
 
     slot = (FSYSSlot*)lbl_8047B1B4;
-    for (i = 0; i < *(u32*)lbl_80453FEC; i++, slot++) {
+    for (i = 0; i < lbl_80453FEC.maxSlots; i++, slot++) {
         if (slot->status != FSYS_STATUS_FREE &&
             slot->fileHandle == fileHandle &&
             slot->padding05C != 0) {
@@ -1091,9 +1090,15 @@ u32 fn_8017B4BC(u32 fileHandle, u32 index) {
 #endif
 
 /* 0x8017B5A4 | 0x1C */
+#pragma push
+#pragma optimization_level 0
 u32 fn_8017B5A4(u32 val) {
-    return (val >> 9) & 0x3F;
+    u32 result;
+
+    result = (val >> 9) & 0x3F;
+    return result;
 }
+#pragma pop
 
 /* 0x8017B5C0 | 0xF8 */
 extern void fn_8017BD34();
@@ -1339,7 +1344,7 @@ u32 fn_8017C414(void* arg) {
 
     if (fn_8017A624(arg) != 0) {
         enabled = OSDisableInterrupts();
-        mgr = (FSYSManager*)lbl_80453FEC;
+        mgr = &lbl_80453FEC;
         slot = mgr->activeSlot;
 
         switch (slot->status) {
@@ -1762,11 +1767,6 @@ void fn_8017D624(void) {
 /* 0x8017D68C | 0x174 */
 extern u32 lbl_8047B1B8;
 extern u32 lbl_8047B1BC;
-#if 0
-asm void fn_8017D68C(void) {
-#include "src/game/fsys/fsys_file_fn_8017D68C.inc"
-}
-#else
 #pragma optimization_level 0
 FSYSFileHandle* fn_8017D68C(FSYSSlot* slot) {
     FSYSFileHandle* table;
@@ -1804,7 +1804,6 @@ FSYSFileHandle* fn_8017D68C(FSYSSlot* slot) {
         }
         table[i].handleID = saved.handleID;
         table[i].userData = saved.userData;
-        table = &table[i];
     } else {
         table = (FSYSFileHandle*)lbl_8047B1B8;
         if ((s32)lbl_8047B1BC == 0x64) {
@@ -1815,16 +1814,13 @@ FSYSFileHandle* fn_8017D68C(FSYSSlot* slot) {
             }
             lbl_8047B1BC = lbl_8047B1BC - 1;
         }
-        i = lbl_8047B1BC;
-        lbl_8047B1BC = i + 1;
-        table = &((FSYSFileHandle*)lbl_8047B1B8)[i];
+        table = &((FSYSFileHandle*)lbl_8047B1B8)[lbl_8047B1BC++];
         table->handleID = handleID;
         table->userData = 0;
     }
 
     return table;
 }
-#endif
 
 /* 0x8017D800 | 0xF8 */
 extern void fn_8017DEA4();
@@ -1842,7 +1838,7 @@ void fn_8017D800(void) {
     FSYSSlot* slot;
 
     slot = (FSYSSlot*)lbl_8047B1B4;
-    for (i = 0; i < *(u32*)lbl_80453FEC; i++) {
+    for (i = 0; i < lbl_80453FEC.maxSlots; i++) {
         if ((s32)slot->status == FSYS_STATUS_PENDING) {
             switch (slot->loadMode) {
                 case 0:
@@ -1877,6 +1873,7 @@ asm void fn_8017D8F8(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma dont_inline on
 void fn_8017D8F8(FSYSSlot* slot) {
     fn_8017D960(slot);
     slot->status = FSYS_STATUS_FREE;
@@ -1895,6 +1892,7 @@ void fn_8017D92C(FSYSSlot* slot) {
     fn_8017D960(slot);
     slot->status = FSYS_STATUS_FREE;
 }
+#pragma dont_inline reset
 #endif
 
 /* 0x8017D960 | 0x158 */
@@ -2024,16 +2022,14 @@ void fn_8017DB74(FSYSSlot* slot) {
 
 /* 0x8017DEA4 | 0xA8 */
 extern void fn_80167DD8();
-#if 0
-asm void fn_8017DEA4(void) {
-#include "src/game/fsys/fsys_file_fn_8017DEA4.inc"
-}
-#else
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
 void fn_8017DEA4(FSYSSlot* slot, u32 fileHandle, u32 callbackA,
                  u32 callbackB, u32 callbackC) {
     _fsysGetFilename(slot, fileHandle, callbackA, callbackB, callbackC, 1);
 
-    if (gFSYSManager.activeSlot == slot) {
+    if (lbl_80453FEC.activeSlot == slot) {
         if (FSYS_SLOT_FILE0(slot) == 0) {
             FSYS_SLOT_FILE0(slot) = fn_80167F28(slot->filename);
         }
@@ -2045,7 +2041,7 @@ void fn_8017DEA4(FSYSSlot* slot, u32 fileHandle, u32 callbackA,
         }
     }
 }
-#endif
+#pragma pop
 
 /* 0x8017DF4C | 0xA8 */
 #if 0
@@ -2132,12 +2128,16 @@ void fn_8017E09C(FSYSSlot* slot, u32 fileHandle, u32 callbackA,
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_8017F25C(s32 param1, u8* param2) {
-    u32 enabled = OSDisableInterrupts();
-    if (param1 == 1) {
-        *(u32*)(param2 + 0x48) = 0xA2;
+void fn_8017F25C(s32 result, FSYSSlot* slot) {
+    FSYSSlot* savedSlot;
+    u32 enabled;
+
+    savedSlot = slot;
+    enabled = OSDisableInterrupts();
+    if (result == 1) {
+        savedSlot->status = 0xA2;
     } else {
-        *(u32*)(param2 + 0x48) = 0x98;
+        savedSlot->status = 0x98;
     }
     OSRestoreInterrupts(enabled);
 }

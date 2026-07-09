@@ -155,7 +155,7 @@ typedef struct FSYSSlot {
     /* 0x05C */ u32  padding05C;
     /* 0x060 */ u32  refCount;          /* reference count */
     /* 0x064 */ u32  padding064;
-    /* 0x068 */ u32  padding068;
+    /* 0x068 */ u32  fileInfo0;
     /* 0x06C */ void* tocBuffer;        /* internal TOC working buffer */
     /* 0x070 */ char filename[0x80];    /* archive filename (filled by sprintf) */
     /* 0x0F0 */ u8   padding0F0[0x04];
