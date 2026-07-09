@@ -94,7 +94,6 @@ extern void fn_801ED674(void);
 void fn_801193BC(void);
 extern s32 pokemonWazaGetMaxPP(u8* ptr, u16 idx);
 extern void wazaGetStatus(void);
-extern void pokemonBiosGetPokemonWazaPtr(void);
 extern void pokemonResetBasisStatus(void* ptr);
 void pokemonSetLevelBasisStatus(void);
 extern void heroItemGetItemKindToItemAryPtr(void);
@@ -730,7 +729,6 @@ extern void fightOutPokemonBiosSetMyselfDamageSpeTargetId(void);
 extern void fightOutPokemonBiosSetKizetuFlag(void);
 extern void fightOutPokemonBiosSetIrekaeTargetEntryId(void);
 extern void jumptable_8035E028();
-extern void pokemonDataBiosGetItemDataId(void);
 extern void fightPokemonBiosGetMotoPokemonPtr(void);
 extern void fightPokemonBiosGetPokemonBuffPtr(void);
 extern void fightPokemonBiosGetFightJoutaiPtr(void);
@@ -1468,10 +1466,10 @@ extern u32 heroMoveGetResID(u32* out_zero, u32* out_val, s32 index);
  *   lhz r3, 0x8(r3)    ; read u16 at offset 0x8
  *   blr
  * ================================================================== */
-/* pokemonDataBiosGetItemDataId */ u16 GSfield_GetObjAttrU16(void* obj, u16 slot) {
+u16 pokemonDataBiosGetItemDataId(void* obj, u16 slot) {
     if (obj == NULL) { return 0; }
     if (slot >= 2) { return 0; }
-    return *(u16*)((u8*)obj + slot * 2 + 0x70);
+    return ((u16*)((u8*)obj + 0x70))[slot];
 }
 /* pokemonDataBiosGetInitFriend */ u16 GSfield_GetObjType(void* obj) {
     if (obj == NULL) { return 0; }
@@ -2990,15 +2988,13 @@ void pokemonBiosSetPoolFriend(u8* ptr, u16 val) {
 /* 0x8011DEA8 | 0x3C */
 void pokemonBiosSetNicknameOrgPtr(u8* ptr, void* src) {
     extern void GScharLenCpy();
-    if (ptr == NULL) { return; }
-    if (src == NULL) { return; }
+    if (ptr == NULL || src == NULL) { return; }
     GScharLenCpy(ptr + 0x44, src, 0xB);
 }
 /* 0x70 | pokemonBiosSetNicknamePtr | dual_memcpy_setter */
 void pokemonBiosSetNicknamePtr(u8* ptr, void* src) {
     extern void GScharLenCpy();
-    if (ptr == NULL) { return; }
-    if (src == NULL) { return; }
+    if (ptr == NULL || src == NULL) { return; }
     GScharLenCpy(ptr + 0x2E, src, 0xB);
     if (ptr == NULL) { return; }
     if (src == NULL) { return; }
@@ -3007,8 +3003,7 @@ void pokemonBiosSetNicknamePtr(u8* ptr, void* src) {
 /* 0x8011DF54 | 0x3C */
 void pokemonBiosSetCatchTrainerNamePtr(u8* ptr, void* src) {
     extern void GScharLenCpy();
-    if (ptr == NULL) { return; }
-    if (src == NULL) { return; }
+    if (ptr == NULL || src == NULL) { return; }
     GScharLenCpy(ptr + 0x18, src, 0xB);
 }
 /* 0x8011E048 | 0x30 */
@@ -3668,8 +3663,67 @@ u16 pokemonBiosGetPokemonWazaDataId(void* ctx, u32 p1) {
 /* 0x8011F260 | 0x1FC */
 extern u8 lbl_80478B58[4];
 extern u8 lbl_80478B5C[4];
-/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void pokemonBiosGetPokemonWazaPtr(void);
+u8* pokemonBiosGetPokemonWazaPtr(u8* ptr, u16 idx, u8 mode) {
+    extern s32 pokemonGetDarkPokemonLevel(u8* ptr);
+    u16 t0;
+    s32 t1;
+    u8 cond;
+    u16 v;
+    s32 level;
+    u8 flag = FALSE;
+
+    if (ptr == NULL) { return NULL; }
+
+    if (ptr == NULL) {
+        cond = FALSE;
+    } else {
+        t0 = (ptr == NULL) ? 0 : *(u16*)(ptr + 0xD8);
+        if (t0 == 0) {
+            cond = FALSE;
+        } else {
+            t1 = (ptr == NULL) ? 0 : *(s32*)(ptr + 0xDC);
+            if (t1 < 0) { cond = FALSE; } else { cond = TRUE; }
+        }
+    }
+    if (cond == TRUE) {
+        v = (ptr == NULL) ? 0 : *(u16*)(ptr + 0xD6);
+        if (v == 0 && mode == 1) { flag = TRUE; }
+    }
+
+    if (ptr == NULL) {
+        cond = FALSE;
+    } else {
+        t0 = (ptr == NULL) ? 0 : *(u16*)(ptr + 0xD8);
+        if (t0 == 0) {
+            cond = FALSE;
+        } else {
+            t1 = (ptr == NULL) ? 0 : *(s32*)(ptr + 0xDC);
+            if (t1 < 0) { cond = FALSE; } else { cond = TRUE; }
+        }
+    }
+    if (cond == TRUE) {
+        if (idx == 0 && mode == 1) { flag = TRUE; }
+    }
+
+    level = pokemonGetDarkPokemonLevel(ptr);
+
+    if (flag == TRUE) {
+        if (idx == 0) { return lbl_80478B58; }
+        if (idx == 1) {
+            if ((u8)level < 2) { return lbl_80478B5C; }
+        } else if (idx == 2) {
+            if ((u8)level < 4) { return lbl_80478B5C; }
+        } else if (idx == 3) {
+            if ((u8)level < 5) { return lbl_80478B5C; }
+        }
+    }
+
+    if (idx >= 4) {
+        idx -= 4;
+        if (idx >= 4) { return NULL; }
+    }
+    return ptr + (u32)idx * 4 + 0x78;
+}
 /* 0x8011F474 | 0x34 */
 void* fn_8011F474(u8* ptr, u16 idx) {
     if (ptr == NULL) { return NULL; }
