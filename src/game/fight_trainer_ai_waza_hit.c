@@ -459,140 +459,53 @@ s32 fightTrainerAiWazaHit200(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x80254268 | Size: 0x1F8 (504 bytes) */
-void fightTrainerAiWazaHit199(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fightTargetGetPtrAsNowFightType();
-    extern void fightSideIsJoutaiDataId();
-    extern void fn_80236BFC();
-    extern void fn_80237F74();
-    extern void _fightTrainerAiWazaHitCheck();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+s32 fightTrainerAiWazaHit199(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fightTargetGetPtrAsNowFightType(u32 type, u32 elem);
+    extern u8 fightSideIsJoutaiDataId(u32 a, u32 b);
+    extern u8 fn_80236BFC(void* ctx, u32 elem, u32 type);
+    extern u8 fn_80237F74(void* ctx, u32 elem, u32 type);
+    extern s32 _fightTrainerAiWazaHitCheck(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    u32 side = fightTargetGetPtrAsNowFightType(2, param3);
+    s32 gate;
+    u8 flag;
 
-    r27 = r3;
-    r31 = r6;
-    r28 = r4;
-    r29 = r5;
-    r3 = 0x2;
-    r4 = r31;
-    fightTargetGetPtrAsNowFightType();
-    r0 = r3;
-    r3 = r27;
-    r30 = r0;
-    r4 = r31;
-    r5 = 0x14;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80237F74(ctx, param3, 0x14) == 1) {
+        return 0;
     }
-    r3 = r27;
-    r4 = r31;
-    r5 = 0x11;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1 && r0 != (u32)0x1 && r0 != (u32)0x1 && r0 != (u32)0x1 && r0 != (u32)0x1 && r0 != (u32)0x1) {
-        r3 = r27;
-        r4 = r31;
-        r5 = 0x14;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-        if (r0 == (u32)0x1) {
-            r0 = 0x0;
-            goto L_802543A0;
-        }
-        r3 = r27;
-        r4 = r31;
-        r5 = 0x7;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-
-        r3 = r27;
-        r4 = r31;
-        r5 = 0xf;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-
-        r3 = r27;
-        r4 = r31;
-        r5 = 0x48;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-
-        r3 = r27;
-        r4 = r31;
-        r5 = 0x29;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-
-        r3 = r27;
-        r4 = r31;
-        r5 = 0x28;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-
-        r3 = r27;
-        r4 = r31;
-        r5 = 0xc;
-        fn_80237F74();
+    if (fn_80237F74(ctx, param3, 0x11) == 1) goto allowedLabel;
+    if (fn_80237F74(ctx, param3, 0x14) == 1) {
+        flag = 0;
+        goto flagCheckDone;
     }
-    r0 = 0x1;
-L_802543A0:
-    r0 = r0 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80237F74(ctx, param3, 0x7) == 1) goto allowedLabel;
+    if (fn_80237F74(ctx, param3, 0xf) == 1) goto allowedLabel;
+    if (fn_80237F74(ctx, param3, 0x48) == 1) goto allowedLabel;
+    if (fn_80237F74(ctx, param3, 0x29) == 1) goto allowedLabel;
+    if (fn_80237F74(ctx, param3, 0x28) == 1) goto allowedLabel;
+    fn_80237F74(ctx, param3, 0xc);
+allowedLabel:
+    flag = 1;
+flagCheckDone:
+    if (flag == 0) {
+        return 0;
     }
-    r3 = r27;
-    r4 = r31;
-    r5 = 0x14;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80236BFC(ctx, param3, 0x14) == 1) {
+        return 0;
     }
-    r3 = r27;
-    r4 = r31;
-    r5 = 0x9;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80236BFC(ctx, param3, 0x9) == 1) {
+        return 0;
     }
-    r3 = r27;
-    r4 = r28;
-    r5 = r29;
-    r6 = r31;
-    r7 = 0x0;
-    _fightTrainerAiWazaHitCheck();
-    r31 = r3;
-    r3 = r30;
-    r4 = 0x4b;
-    fightSideIsJoutaiDataId();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    gate = _fightTrainerAiWazaHitCheck(ctx, param1, param2, param3, 0);
+    if (fightSideIsJoutaiDataId(side, 0x4b) == 1) {
+        return 0;
     }
-    if ((s32)r31 == (s32)0x0) {
-        r3 = 0x0;
-        return;
+    if (gate == 0) {
+        return 0;
     }
-    r3 = 0x1;
-
-    return;
+    if (gate == -1) {
+        return 1;
+    }
+    return 1;
 }
 
 /* Address: 0x80254460 | Size: 0xB4 */
@@ -867,114 +780,49 @@ s32 fightTrainerAiWazaHit188(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x80254B24 | Size: 0x178 (376 bytes) */
-void fightTrainerAiWazaHit187(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fightTargetGetPtrAsNowFightType();
-    extern void fightSideIsJoutaiDataId();
-    extern void fn_80229704();
-    extern void fn_80236BFC();
-    extern void fn_80237310();
-    extern void fn_80237F74();
-    extern void _fightTrainerAiWazaHitCheck();
-    extern void fightTrainerAiCheckSawagu();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+s32 fightTrainerAiWazaHit187(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u8 fn_80237F74(void* ctx, u32 elem, u32 type);
+    extern u8 fn_80236BFC(void* ctx, u32 elem, u32 type);
+    extern u32 fightTargetGetPtrAsNowFightType(u32 type, u32 elem);
+    extern u8 fightSideIsJoutaiDataId(u32 a, u32 b);
+    extern s32 _fightTrainerAiWazaHitCheck(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    extern u8 fightTrainerAiCheckSawagu(void* ctx, u32 a);
+    extern u8 fn_80237310(void* ctx, u32 a);
+    extern u8 fn_80229704(u32 type, u32 elem);
+    s32 gate;
 
-    r31 = r5;
-    r30 = r6;
-    r29 = r4;
-    r28 = r3;
-    r5 = 0x48;
-    r4 = r30;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80237F74(ctx, param3, 0x48) == 1) {
+        return 0;
     }
-    r3 = r28;
-    r4 = r30;
-    r5 = 0xf;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80237F74(ctx, param3, 0xf) == 1) {
+        return 0;
     }
-    r3 = r28;
-    r4 = r30;
-    r5 = 0x14;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80236BFC(ctx, param3, 0x14) == 1) {
+        return 0;
     }
-    r4 = r30;
-    r3 = 0x2;
-    fightTargetGetPtrAsNowFightType();
-    r4 = 0x4b;
-    fightSideIsJoutaiDataId();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fightSideIsJoutaiDataId(fightTargetGetPtrAsNowFightType(2, param3), 0x4b) == 1) {
+        return 0;
     }
-    r3 = r28;
-    r4 = r29;
-    r5 = r31;
-    r6 = r30;
-    r7 = 0x0;
-    _fightTrainerAiWazaHitCheck();
-    r31 = r3;
-    r3 = r28;
-    r4 = r30;
-    fightTrainerAiCheckSawagu();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    gate = _fightTrainerAiWazaHitCheck(ctx, param1, param2, param3, 0);
+    if (fightTrainerAiCheckSawagu(ctx, param3) == 1) {
+        return 0;
     }
-    r3 = r28;
-    r4 = r30;
-    r5 = 0x26;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80236BFC(ctx, param3, 0x26) == 1) {
+        return 0;
     }
-    r3 = r28;
-    r4 = r30;
-    fn_80237310();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80237310(ctx, param3) == 0) {
+        return 0;
     }
-    r4 = r30;
-    r3 = 0x8;
-    fn_80229704();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80229704(8, param3) != 1) {
+        return 0;
     }
-    if ((s32)r31 == (s32)0x0) {
-        r3 = 0x0;
-        return;
+    if (gate == 0) {
+        return 0;
     }
-    r3 = 0x1;
-
-    return;
+    if (gate == -1) {
+        return 1;
+    }
+    return 1;
 }
 
 /* Address: 0x80254C9C | Size: 0xB0 */
@@ -1346,155 +1194,54 @@ check:
 }
 
 /* Address: 0x80255820 | Size: 0x218 (536 bytes) */
-void fightTrainerAiWazaHit166(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fightTargetGetPtrAsNowFightType();
-    extern void fightSideIsJoutaiDataId();
-    extern void fn_80235910();
-    extern void fn_80236BFC();
-    extern void fn_80237F74();
-    extern void _fightTrainerAiWazaHitCheck();
-    extern void fightTrainerAiCheckAbiCnt();
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+s32 fightTrainerAiWazaHit166(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fightTargetGetPtrAsNowFightType(u32 type, u32 elem);
+    extern u8 fightSideIsJoutaiDataId(u32 a, u32 b);
+    extern u8 fn_80235910(void* ctx, u32 elem);
+    extern u8 fn_80236BFC(void* ctx, u32 elem, u32 type);
+    extern u8 fn_80237F74(void* ctx, u32 elem, u32 type);
+    extern s32 _fightTrainerAiWazaHitCheck(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    extern u8 fightTrainerAiCheckAbiCnt(void* ctx, u32 param1, u32 param3, u32 param2, u32 a, u32 b, u32 c);
+    u32 side = fightTargetGetPtrAsNowFightType(2, param3);
+    u8 abiVal = fn_80235910(ctx, param3);
+    s32 gate = _fightTrainerAiWazaHitCheck(ctx, param1, param2, param3, 0);
+    u8 flag;
 
-    r31 = r3;
-    r27 = r6;
-    r25 = r4;
-    r26 = r5;
-    r3 = 0x2;
-    r4 = r27;
-    fightTargetGetPtrAsNowFightType();
-    r0 = r3;
-    r3 = r31;
-    r28 = r0;
-    r4 = r27;
-    fn_80235910();
-    r29 = r3;
-    r3 = r31;
-    r4 = r25;
-    r5 = r26;
-    r6 = r27;
-    r7 = 0x0;
-    _fightTrainerAiWazaHitCheck();
-    r30 = r3;
-    r3 = r31;
-    r4 = r27;
-    r5 = 0x9;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r0 = r29 & 0xFF;
-        if (r0 >= (u32)0xc) {
-            r3 = r31;
-            r4 = r25;
-            r5 = r27;
-            r6 = r26;
-            r7 = 0x10;
-            r8 = 0x4;
-            r9 = 0x1;
-            fightTrainerAiCheckAbiCnt();
-            r0 = r3 & 0xFF;
-            if (r0 == (u32)0xc) {
-                r3 = 0x0;
-                return;
-    }
-    }
-    }
-    r3 = r31;
-    r4 = r27;
-    r5 = 0x14;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
-    }
-    r3 = r31;
-    r4 = r27;
-    r5 = 0x11;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1 && r0 != (u32)0x1 && r0 != (u32)0x1 && r0 != (u32)0x1 && r0 != (u32)0x1 && r0 != (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0x14;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-        if (r0 == (u32)0x1) {
-            r0 = 0x0;
-            goto L_802559DC;
+    if (fn_80236BFC(ctx, param3, 0x9) == 1 && abiVal >= 0xc) {
+        if (fightTrainerAiCheckAbiCnt(ctx, param1, param3, param2, 0x10, 4, 1) == 0) {
+            return 0;
         }
-        r3 = r31;
-        r4 = r27;
-        r5 = 0x7;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-
-        r3 = r31;
-        r4 = r27;
-        r5 = 0xf;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-
-        r3 = r31;
-        r4 = r27;
-        r5 = 0x48;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-
-        r3 = r31;
-        r4 = r27;
-        r5 = 0x29;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-
-        r3 = r31;
-        r4 = r27;
-        r5 = 0x28;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-
-        r3 = r31;
-        r4 = r27;
-        r5 = 0xc;
-        fn_80237F74();
     }
-    r0 = 0x1;
-L_802559DC:
-    r0 = r0 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80237F74(ctx, param3, 0x14) == 1) {
+        return 0;
     }
-    r3 = r28;
-    r4 = 0x4b;
-    fightSideIsJoutaiDataId();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80237F74(ctx, param3, 0x11) == 1) goto allowedLabel;
+    if (fn_80237F74(ctx, param3, 0x14) == 1) {
+        flag = 0;
+        goto flagCheckDone;
     }
-    if ((s32)r30 == (s32)0x0) {
-        r3 = 0x0;
-        return;
+    if (fn_80237F74(ctx, param3, 0x7) == 1) goto allowedLabel;
+    if (fn_80237F74(ctx, param3, 0xf) == 1) goto allowedLabel;
+    if (fn_80237F74(ctx, param3, 0x48) == 1) goto allowedLabel;
+    if (fn_80237F74(ctx, param3, 0x29) == 1) goto allowedLabel;
+    if (fn_80237F74(ctx, param3, 0x28) == 1) goto allowedLabel;
+    fn_80237F74(ctx, param3, 0xc);
+allowedLabel:
+    flag = 1;
+flagCheckDone:
+    if (flag == 0) {
+        return 0;
     }
-    r3 = 0x1;
-
-    return;
+    if (fightSideIsJoutaiDataId(side, 0x4b) == 1) {
+        return 0;
+    }
+    if (gate == 0) {
+        return 0;
+    }
+    if (gate == -1) {
+        return 1;
+    }
+    return 1;
 }
 
 /* Address: 0x80255A38 | Size: 0x74 | Pattern: field_accessor */
@@ -2336,7 +2083,6 @@ L_80257034:
 
     return;
 }
-
 /* Address: 0x802570D0 | Size: 0xB0 */
 s32 fightTrainerAiWazaHit119(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fn_802395C8(void* ctx, u32 param2, u32 param1);
@@ -2360,164 +2106,58 @@ s32 fightTrainerAiWazaHit119(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x80257180 | Size: 0x23C (572 bytes) */
-void fightTrainerAiWazaHit118(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fightTargetGetPtrAsNowFightType();
-    extern void fightSideIsJoutaiDataId();
-    extern void fn_80235AA0();
-    extern void fn_80236BFC();
-    extern void fn_80237F74();
-    extern void _fightTrainerAiWazaHitCheck();
-    extern void fightTrainerAiCheckAbiCnt();
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+s32 fightTrainerAiWazaHit118(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fightTargetGetPtrAsNowFightType(u32 type, u32 elem);
+    extern u8 fightSideIsJoutaiDataId(u32 a, u32 b);
+    extern u8 fn_80235AA0(void* ctx, u32 elem);
+    extern u8 fn_80236BFC(void* ctx, u32 elem, u32 type);
+    extern u8 fn_80237F74(void* ctx, u32 elem, u32 type);
+    extern s32 _fightTrainerAiWazaHitCheck(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    extern u8 fightTrainerAiCheckAbiCnt(void* ctx, u32 param1, u32 param3, u32 param2, u32 a, u32 b, u32 c);
+    u32 side = fightTargetGetPtrAsNowFightType(2, param3);
+    u8 abiVal = fn_80235AA0(ctx, param3);
+    s32 gate;
+    u8 flag;
 
-    r31 = r3;
-    r27 = r6;
-    r25 = r4;
-    r26 = r5;
-    r3 = 0x2;
-    r4 = r27;
-    fightTargetGetPtrAsNowFightType();
-    r0 = r3;
-    r3 = r31;
-    r28 = r0;
-    r4 = r27;
-    fn_80235AA0();
-    r29 = r3;
-    r3 = r31;
-    r4 = r27;
-    r5 = 0x14;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80236BFC(ctx, param3, 0x14) == 1) {
+        return 0;
     }
-    r3 = r31;
-    r4 = r25;
-    r5 = r26;
-    r6 = r27;
-    r7 = 0x0;
-    _fightTrainerAiWazaHitCheck();
-    r30 = r3;
-    r3 = r31;
-    r4 = r27;
-    r5 = 0x9;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r0 = r29 & 0xFF;
-        if (r0 >= (u32)0xc) {
-            r3 = r31;
-            r4 = r25;
-            r5 = r27;
-            r6 = r26;
-            r7 = 0x20;
-            r8 = 0x1;
-            r9 = 0x1;
-            fightTrainerAiCheckAbiCnt();
-            r0 = r3 & 0xFF;
-            if (r0 == (u32)0xc) {
-                r3 = 0x0;
-                return;
-    }
-    }
-    }
-    r3 = r31;
-    r4 = r27;
-    r5 = 0x14;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
-    }
-    r3 = r31;
-    r4 = r27;
-    r5 = 0x11;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1 && r0 != (u32)0x1 && r0 != (u32)0x1 && r0 != (u32)0x1 && r0 != (u32)0x1 && r0 != (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0x14;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-        if (r0 == (u32)0x1) {
-            r0 = 0x0;
-            goto L_80257360;
+    gate = _fightTrainerAiWazaHitCheck(ctx, param1, param2, param3, 0);
+    if (fn_80236BFC(ctx, param3, 0x9) == 1 && abiVal >= 0xc) {
+        if (fightTrainerAiCheckAbiCnt(ctx, param1, param3, param2, 0x20, 1, 1) == 0) {
+            return 0;
         }
-        r3 = r31;
-        r4 = r27;
-        r5 = 0x7;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-
-        r3 = r31;
-        r4 = r27;
-        r5 = 0xf;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-
-        r3 = r31;
-        r4 = r27;
-        r5 = 0x48;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-
-        r3 = r31;
-        r4 = r27;
-        r5 = 0x29;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-
-        r3 = r31;
-        r4 = r27;
-        r5 = 0x28;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-
-        r3 = r31;
-        r4 = r27;
-        r5 = 0xc;
-        fn_80237F74();
     }
-    r0 = 0x1;
-L_80257360:
-    r0 = r0 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80237F74(ctx, param3, 0x14) == 1) {
+        return 0;
     }
-    r3 = r28;
-    r4 = 0x4b;
-    fightSideIsJoutaiDataId();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80237F74(ctx, param3, 0x11) == 1) goto allowedLabel;
+    if (fn_80237F74(ctx, param3, 0x14) == 1) {
+        flag = 0;
+        goto flagCheckDone;
     }
-    if ((s32)r30 == (s32)0x0) {
-        r3 = 0x0;
-        return;
+    if (fn_80237F74(ctx, param3, 0x7) == 1) goto allowedLabel;
+    if (fn_80237F74(ctx, param3, 0xf) == 1) goto allowedLabel;
+    if (fn_80237F74(ctx, param3, 0x48) == 1) goto allowedLabel;
+    if (fn_80237F74(ctx, param3, 0x29) == 1) goto allowedLabel;
+    if (fn_80237F74(ctx, param3, 0x28) == 1) goto allowedLabel;
+    fn_80237F74(ctx, param3, 0xc);
+allowedLabel:
+    flag = 1;
+flagCheckDone:
+    if (flag == 0) {
+        return 0;
     }
-    r3 = 0x1;
-
-    return;
+    if (fightSideIsJoutaiDataId(side, 0x4b) == 1) {
+        return 0;
+    }
+    if (gate == 0) {
+        return 0;
+    }
+    if (gate == -1) {
+        return 1;
+    }
+    return 1;
 }
 
 /* Address: 0x802573BC | Size: 0xB0 */
@@ -3516,172 +3156,64 @@ s32 fightTrainerAiWazaHit068(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x802591D8 | Size: 0x260 (608 bytes) */
-void fightTrainerAiWazaHit067(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fightTargetGetPtrAsNowFightType();
-    extern void fightSideIsJoutaiDataId();
-    extern void fn_80236BFC();
-    extern void fn_80237310();
-    extern void fn_8023793C();
-    extern void fn_80237F74();
-    extern void fn_80239500();
-    extern void fn_802395C8();
-    extern void _fightTrainerAiWazaHitCheck();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+s32 fightTrainerAiWazaHit067(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fightTargetGetPtrAsNowFightType(u32 type, u32 elem);
+    extern u8 fightSideIsJoutaiDataId(u32 a, u32 b);
+    extern u32 fn_802395C8(void* ctx, u32 param2, u32 param1);
+    extern u32 fn_80239500(void* ctx, u32 param2);
+    extern u16 fn_8023793C(void* ctx, u32 param3, u32 v1, u32 v3);
+    extern u8 fn_80236BFC(void* ctx, u32 elem, u32 type);
+    extern u8 fn_80237F74(void* ctx, u32 elem, u32 type);
+    extern u8 fn_80237310(void* ctx, u32 elem);
+    extern s32 _fightTrainerAiWazaHitCheck(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    u32 side = fightTargetGetPtrAsNowFightType(2, param3);
+    u32 v1 = fn_802395C8(ctx, param2, param1);
+    s32 gate;
+    u8 flag;
 
-    r27 = r3;
-    r30 = r6;
-    r28 = r4;
-    r29 = r5;
-    r3 = 0x2;
-    r4 = r30;
-    fightTargetGetPtrAsNowFightType();
-    r0 = r3;
-    r3 = r27;
-    r31 = r0;
-    r4 = r29;
-    r5 = r28;
-    fn_802395C8();
-    r0 = r3;
-    r3 = r27;
-    r26 = r0;
-    r4 = r30;
-    r5 = 0x7;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80237F74(ctx, param3, 0x7) == 1) {
+        return 0;
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0x11;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1 && r0 != (u32)0x1 && r0 != (u32)0x1 && r0 != (u32)0x1 && r0 != (u32)0x1 && r0 != (u32)0x1) {
-        r3 = r27;
-        r4 = r30;
-        r5 = 0x14;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-
-        r3 = r27;
-        r4 = r30;
-        r5 = 0x7;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-        if (r0 == (u32)0x1) {
-            r0 = 0x0;
-            goto L_80259328;
-        }
-        r3 = r27;
-        r4 = r30;
-        r5 = 0xf;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-
-        r3 = r27;
-        r4 = r30;
-        r5 = 0x48;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-
-        r3 = r27;
-        r4 = r30;
-        r5 = 0x29;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-
-        r3 = r27;
-        r4 = r30;
-        r5 = 0x28;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-
-        r3 = r27;
-        r4 = r30;
-        r5 = 0xc;
-        fn_80237F74();
+    if (fn_80237F74(ctx, param3, 0x11) == 1) goto allowedLabel;
+    if (fn_80237F74(ctx, param3, 0x14) == 1) goto allowedLabel;
+    if (fn_80237F74(ctx, param3, 0x7) == 1) {
+        flag = 0;
+        goto flagCheckDone;
     }
-    r0 = 0x1;
-L_80259328:
-    r0 = r0 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80237F74(ctx, param3, 0xf) == 1) goto allowedLabel;
+    if (fn_80237F74(ctx, param3, 0x48) == 1) goto allowedLabel;
+    if (fn_80237F74(ctx, param3, 0x29) == 1) goto allowedLabel;
+    if (fn_80237F74(ctx, param3, 0x28) == 1) goto allowedLabel;
+    fn_80237F74(ctx, param3, 0xc);
+allowedLabel:
+    flag = 1;
+flagCheckDone:
+    if (flag == 0) {
+        return 0;
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0x14;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80236BFC(ctx, param3, 0x14) == 1) {
+        return 0;
     }
-    r3 = r27;
-    r4 = r29;
-    fn_80239500();
-    r6 = r3;
-    r3 = r27;
-    r4 = r30;
-    r5 = r26;
-    fn_8023793C();
-    r0 = r3 & 0xFFFF;
-    if (r0 == (u32)0x43) {
-        r3 = 0x0;
-        return;
+    if (fn_8023793C(ctx, param3, v1, fn_80239500(ctx, param2)) == 0x43) {
+        return 0;
     }
-    r3 = r27;
-    r4 = r30;
-    r5 = 0x5;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80236BFC(ctx, param3, 0x5) == 1) {
+        return 0;
     }
-    r3 = r27;
-    r4 = r30;
-    fn_80237310();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80237310(ctx, param3) == 0) {
+        return 0;
     }
-    r3 = r27;
-    r4 = r28;
-    r5 = r29;
-    r6 = r30;
-    r7 = 0x0;
-    _fightTrainerAiWazaHitCheck();
-    r27 = r3;
-    r3 = r31;
-    r4 = 0x4b;
-    fightSideIsJoutaiDataId();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    gate = _fightTrainerAiWazaHitCheck(ctx, param1, param2, param3, 0);
+    if (fightSideIsJoutaiDataId(side, 0x4b) == 1) {
+        return 0;
     }
-    if ((s32)r27 == (s32)0x0) {
-        r3 = 0x0;
-        return;
+    if (gate == 0) {
+        return 0;
     }
-    r3 = 0x1;
-
-    return;
+    if (gate == -1) {
+        return 1;
+    }
+    return 1;
 }
 
 /* Address: 0x80259438 | Size: 0x270 (624 bytes) */
@@ -4037,140 +3569,53 @@ s32 fightTrainerAiWazaHit050(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x80259F74 | Size: 0x1F8 (504 bytes) */
-void fightTrainerAiWazaHit049(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fightTargetGetPtrAsNowFightType();
-    extern void fightSideIsJoutaiDataId();
-    extern void fn_80236BFC();
-    extern void fn_80237F74();
-    extern void _fightTrainerAiWazaHitCheck();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+s32 fightTrainerAiWazaHit049(void* ctx, u32 param1, u32 param2, u32 param3) {
+    extern u32 fightTargetGetPtrAsNowFightType(u32 type, u32 elem);
+    extern u8 fightSideIsJoutaiDataId(u32 a, u32 b);
+    extern u8 fn_80236BFC(void* ctx, u32 elem, u32 type);
+    extern u8 fn_80237F74(void* ctx, u32 elem, u32 type);
+    extern s32 _fightTrainerAiWazaHitCheck(void* ctx, u32 param1, u32 param2, u32 param3, u32 zero);
+    u32 side = fightTargetGetPtrAsNowFightType(2, param3);
+    s32 gate;
+    u8 flag;
 
-    r27 = r3;
-    r31 = r6;
-    r28 = r4;
-    r29 = r5;
-    r3 = 0x2;
-    r4 = r31;
-    fightTargetGetPtrAsNowFightType();
-    r0 = r3;
-    r3 = r27;
-    r30 = r0;
-    r4 = r31;
-    r5 = 0x14;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80237F74(ctx, param3, 0x14) == 1) {
+        return 0;
     }
-    r3 = r27;
-    r4 = r31;
-    r5 = 0x14;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80236BFC(ctx, param3, 0x14) == 1) {
+        return 0;
     }
-    r3 = r27;
-    r4 = r31;
-    r5 = 0x9;
-    fn_80236BFC();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80236BFC(ctx, param3, 0x9) == 1) {
+        return 0;
     }
-    r3 = r27;
-    r4 = r31;
-    r5 = 0x11;
-    fn_80237F74();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x1 && r0 != (u32)0x1 && r0 != (u32)0x1 && r0 != (u32)0x1 && r0 != (u32)0x1 && r0 != (u32)0x1) {
-        r3 = r27;
-        r4 = r31;
-        r5 = 0x14;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-        if (r0 == (u32)0x1) {
-            r0 = 0x0;
-            goto L_8025A0F4;
-        }
-        r3 = r27;
-        r4 = r31;
-        r5 = 0x7;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-
-        r3 = r27;
-        r4 = r31;
-        r5 = 0xf;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-
-        r3 = r27;
-        r4 = r31;
-        r5 = 0x48;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-
-        r3 = r27;
-        r4 = r31;
-        r5 = 0x29;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-
-        r3 = r27;
-        r4 = r31;
-        r5 = 0x28;
-        fn_80237F74();
-        r0 = r3 & 0xFF;
-
-        r3 = r27;
-        r4 = r31;
-        r5 = 0xc;
-        fn_80237F74();
+    if (fn_80237F74(ctx, param3, 0x11) == 1) goto allowedLabel;
+    if (fn_80237F74(ctx, param3, 0x14) == 1) {
+        flag = 0;
+        goto flagCheckDone;
     }
-    r0 = 0x1;
-L_8025A0F4:
-    r0 = r0 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    if (fn_80237F74(ctx, param3, 0x7) == 1) goto allowedLabel;
+    if (fn_80237F74(ctx, param3, 0xf) == 1) goto allowedLabel;
+    if (fn_80237F74(ctx, param3, 0x48) == 1) goto allowedLabel;
+    if (fn_80237F74(ctx, param3, 0x29) == 1) goto allowedLabel;
+    if (fn_80237F74(ctx, param3, 0x28) == 1) goto allowedLabel;
+    fn_80237F74(ctx, param3, 0xc);
+allowedLabel:
+    flag = 1;
+flagCheckDone:
+    if (flag == 0) {
+        return 0;
     }
-    r3 = r27;
-    r4 = r28;
-    r5 = r29;
-    r6 = r31;
-    r7 = 0x0;
-    _fightTrainerAiWazaHitCheck();
-    r31 = r3;
-    r3 = r30;
-    r4 = 0x4b;
-    fightSideIsJoutaiDataId();
-    r0 = r3 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    gate = _fightTrainerAiWazaHitCheck(ctx, param1, param2, param3, 0);
+    if (fightSideIsJoutaiDataId(side, 0x4b) == 1) {
+        return 0;
     }
-    if ((s32)r31 == (s32)0x0) {
-        r3 = 0x0;
-        return;
+    if (gate == 0) {
+        return 0;
     }
-    r3 = 0x1;
-
-    return;
+    if (gate == -1) {
+        return 1;
+    }
+    return 1;
 }
 
 /* Address: 0x8025A16C | Size: 0xB4 */
