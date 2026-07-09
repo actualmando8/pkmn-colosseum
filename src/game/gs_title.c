@@ -200,6 +200,8 @@ extern void  fn_801669E4(s32 soundId, s32 p2, s32 p3);
 
 /* Save system */
 extern void  floorSetFadeScript(s32 p1, s32 p2);
+extern void  menuCloseCustom(s32 menuId, s32 mode, s32 force);
+extern void  winMsgClose(s32 wait);
 
 /* Input */
 extern void  fn_801EF644(s32 result);
@@ -239,6 +241,9 @@ extern s32   gFrameCycleCount;   /* lbl_80478878 */
  * Size:     0xF0
  * ========================================================================= */
 
+extern u8 lbl_8047A32C;
+extern void* lbl_8047A330;
+
 /* =========================================================================
  * Function: GStitle_MainLoop
  * Address:  0x800203B4
@@ -253,6 +258,29 @@ extern s32   gFrameCycleCount;   /* lbl_80478878 */
  * Cancels active events on slots 0x13, 0x15, 0x16, closes any open
  * message boxes, then waits for the title thread to complete.
  * ========================================================================= */
+
+#pragma push
+#pragma optimization_level 4
+void fn_80020328(void) {
+    menuCloseCustom(0x13, 0, 1);
+    menuCloseCustom(0x15, 0, 1);
+    menuCloseCustom(0x16, 0, 1);
+    winMsgClose(1);
+
+    if (lbl_8047A330 != NULL) {
+        for (;;) {
+            if (lbl_8047A32C == 1) {
+                GSthreadTerminate(lbl_8047A330);
+                break;
+            }
+            _threadSwitch();
+        }
+    }
+
+    lbl_8047A330 = NULL;
+    lbl_8047A32C = 0;
+}
+#pragma pop
 
 /* ===================================================================
  * AUTO-GENERATED accessor functions
