@@ -59,30 +59,20 @@ extern u32 lbl_80478D28; /* Pair-row table count */
 extern ColosseumEventPairRow lbl_80375A08[]; /* 0x18-byte pair rows */
 
 /* Address: 0x8020EE1C | Size: 0xa4 | Ghidra import */
-void fightWazaWzxTypeFuncOiuchi(void)
+void fightWazaWzxTypeFuncOiuchi(void* ctx, void* user, void* target, u32 unused1, u32 unused2)
 
 {
-    u32 r3;
-    u32 r4;
-    u32 r5;
-    u32 r6;
-    u32 r7;
-
     extern u32 fightTargetDataBiosGetBuff();
     extern void fightTargetDataBiosGetPtr();
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
-  u32 uVar1;
   
-  fightOutPokemonLoadWazaEffect(r4,r3,1,0);
-  fightOutPokemonLoadWazaEffect(r5,r3,2,r7);
-  fightTargetDataBiosGetPtr(0x11);
-  uVar1 = fightTargetDataBiosGetBuff();
-  fightOutPokemonWazaEffect(r4,r3,1,1,uVar1);
-  fightTargetDataBiosGetPtr(0x12);
-  uVar1 = fightTargetDataBiosGetBuff();
-  fightOutPokemonWazaEffect(r5,r3,2,0,uVar1);
-  return;
+    fightOutPokemonLoadWazaEffect(user, ctx, 1, 0);
+    fightOutPokemonLoadWazaEffect(target, ctx, 2, unused2);
+    fightTargetDataBiosGetPtr(0x11);
+    fightOutPokemonWazaEffect(user, ctx, 1, 1, fightTargetDataBiosGetBuff());
+    fightTargetDataBiosGetPtr(0x12);
+    fightOutPokemonWazaEffect(target, ctx, 2, 0, fightTargetDataBiosGetBuff());
 }
 
 /* 0x8020EEC0 | size: 0x14 | tiny */
@@ -265,31 +255,22 @@ u32 fightWazaWzxVariationFuncWeatherBall(void)
 
 {
     extern int fightFloorGetNowTenkouDataId();
-  u8 bVar2;
-  u32 uVar1;
+  s32 bVar2;
   
-  bVar2 = fightFloorGetNowTenkouDataId(0,1);
-  if (bVar2 == 2) {
-    uVar1 = 1;
+  bVar2 = (u8)fightFloorGetNowTenkouDataId(0,1);
+  switch (bVar2) {
+  case 0:
+    return 0;
+  case 2:
+    return 1;
+  case 4:
+    return 2;
+  case 1:
+    return 3;
+  case 3:
+    return 4;
   }
-  else if (bVar2 < 2) {
-    if (bVar2 == 0) {
-      uVar1 = 0;
-    }
-    else {
-      uVar1 = 3;
-    }
-  }
-  else if (bVar2 == 4) {
-    uVar1 = 2;
-  }
-  else if (bVar2 < 4) {
-    uVar1 = 4;
-  }
-  else {
-    uVar1 = 0;
-  }
-  return uVar1;
+  return 0;
 }
 
 /* Address: 0x8020F518 | Size: 0xa4 | Ghidra import */
@@ -384,7 +365,7 @@ void fightWazaWzxTypeFuncNegaigoto(void* p1, void* p2, u32 unused1, u32 unused2,
 u32 fightWazaWzxVariationFuncNegaigoto(void) { return 0; }
 
 /* 0x8020F7B8 | size: 0x114 */
-void fightWazaWzxTypeFuncTedasuke(void* p1, void* p2, u32 p3, u32 p4) {
+void fightWazaWzxTypeFuncTedasuke(void* p1, void* p2, u32 unused1, u32 unused2, u32 p4) {
     extern u16 wazaGetStatus();
     extern void fightTargetGetRelativeHostSideFightTargetIdToTragetPtr();
     extern void* fightTargetDataBiosGetBuff();
@@ -396,22 +377,19 @@ void fightWazaWzxTypeFuncTedasuke(void* p1, void* p2, u32 p3, u32 p4) {
     extern void fightOutPokemonLoadWazaEffect();
     u16 partyCount;
     void* d9Data;
-    u16 field29;
+    u32 field29;
     void* resolved;
-    void* tablePtr;
 
-    partyCount = fightFloorGetStatus(0, 0, 0x14, 0);
+    partyCount = (u16)fightFloorGetStatus(0, 0, 0x14, 0);
     d9Data = pokemonGetStatus(p2, 0, 0xD9, 0);
-    field29 = wazaGetStatus(d9Data, 0, 0x29, 0);
+    field29 = wazaGetStatus(d9Data, 0, 0x29, 0) & 0xFFFF;
     fightTargetGetRelativeHostSideFightTargetIdToTragetPtr(field29, partyCount);
     resolved = fightTargetGetPtr(0xE, p2, partyCount);
     fightOutPokemonLoadWazaEffect(p2, p1, 1, p4);
     fightOutPokemonLoadWazaEffect(resolved, p1, 3, p4);
-    tablePtr = fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11));
-    fightOutPokemonWazaEffect(p2, p1, 1, 1, tablePtr);
+    fightOutPokemonWazaEffect(p2, p1, 1, 1, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
     if ((u8)fightOutPokemonCheckFightOut(resolved) == 1) {
-        tablePtr = fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11));
-        fightOutPokemonWazaEffect(resolved, p1, 3, 0, tablePtr);
+        fightOutPokemonWazaEffect(resolved, p1, 3, 0, fightTargetDataBiosGetBuff(fightTargetDataBiosGetPtr(0x11)));
     }
 }
 
@@ -545,23 +523,20 @@ u32 fightWazaWzxVariationFuncWeatherHP(void)
 
 {
     extern int fightFloorGetNowTenkouDataId();
-  u8 bVar2;
-  u32 uVar1;
+  s32 bVar2;
   
-  bVar2 = fightFloorGetNowTenkouDataId(0,1);
-  if (bVar2 == 1) {
-    uVar1 = 0;
+  bVar2 = (u8)fightFloorGetNowTenkouDataId(0,1);
+  switch (bVar2) {
+  case 1:
+    return 0;
+  case 0:
+    return 1;
+  case 2:
+  case 3:
+  case 4:
+    return 2;
   }
-  else if (bVar2 == 0) {
-    uVar1 = 1;
-  }
-  else if (bVar2 < 5) {
-    uVar1 = 2;
-  }
-  else {
-    uVar1 = 0;
-  }
-  return uVar1;
+  return 0;
 }
 
 /* 0x8020FC70 | size: 0x11C */
@@ -589,46 +564,26 @@ void fightWazaWzxTypeFuncMagnitude(void* p1, void* p2, void* p3, u16 mode, u32 p
 #pragma pop
 
 /* Address: 0x8020FD8C | Size: 0xb4 | Ghidra import */
-u32 fightWazaWzxVariationFuncMagnitude(void)
+u32 fightWazaWzxVariationFuncMagnitude(void* unused, void* pokemon)
 
 {
-    u32 r3;
-    u32 r4;
-
     extern u32 wazaGetStatus();
   u32 uVar1;
-  u16 uVar2;
+  s32 uVar2;
   
-  uVar1 = (int)pokemonGetStatus(r4,0,0xd9,0);
-  uVar2 = wazaGetStatus(uVar1,0,0x2f,0);
-  if (uVar2 == 0x46) {
+  uVar1 = (int)pokemonGetStatus(pokemon,0,0xd9,0);
+  uVar2 = (u16)wazaGetStatus(uVar1,0,0x2f,0);
+  switch (uVar2) {
+  case 0x1e:
+  case 10:
+    return 0;
+  case 0x46:
+  case 0x32:
+  case 0x5a:
     return 1;
-  }
-  if (uVar2 < 0x46) {
-    if (uVar2 == 0x1e) {
-      return 0;
-    }
-    if (uVar2 < 0x1e) {
-      if (uVar2 == 10) {
-        return 0;
-      }
-    }
-    else if (uVar2 == 0x32) {
-      return 1;
-    }
-  }
-  else {
-    if (uVar2 == 0x6e) {
-      return 2;
-    }
-    if (uVar2 < 0x6e) {
-      if (uVar2 == 0x5a) {
-        return 1;
-      }
-    }
-    else if (uVar2 == 0x96) {
-      return 2;
-    }
+  case 0x6e:
+  case 0x96:
+    return 2;
   }
   return 0;
 }
@@ -651,31 +606,22 @@ void fightWazaWzxTypeFuncYatuatari(void* ctx1, void* target1, void* target2, u32
 #pragma pop
 
 /* Address: 0x8020FEE4 | Size: 0x78 | Ghidra import */
-char fightWazaWzxVariationFuncYatuatari()
+char fightWazaWzxVariationFuncYatuatari(void* unused, void* pokemon)
 
 {
-    u32 r3;
-    u32 r4;
-
     extern u32 wazaGetStatus();
-  s8 cVar1;
   u32 uVar2;
-  u16 uVar3;
+  u32 uVar3;
   
-  uVar2 = (int)pokemonGetStatus(r4,0,0xd9,0);
-  uVar3 = wazaGetStatus(uVar2,0,0x2f,0);
-  if (uVar3 < 0x5a) {
-    if (uVar3 < 0x3e) {
-      cVar1 = -((uVar3 < 0x16) + -1);
-    }
-    else {
-      cVar1 = 2;
-    }
+  uVar2 = (int)pokemonGetStatus(pokemon,0,0xd9,0);
+  uVar3 = (u16)wazaGetStatus(uVar2,0,0x2f,0);
+  if (uVar3 > 0x59) {
+    return 3;
   }
-  else {
-    cVar1 = 3;
+  if (uVar3 >= 0x3e) {
+    return 2;
   }
-  return cVar1;
+  return (u8)(uVar3 >= 0x16);
 }
 
 /* Address: 0x8020FF5C | Size: 0xa4 | Ghidra import */
@@ -696,28 +642,24 @@ void fightWazaWzxTypeFuncPresent(void* ctx1, void* target1, void* target2, u32 u
 #pragma pop
 
 /* Address: 0x80210000 | Size: 0x74 | Ghidra import */
-u32 fightWazaWzxVariationFuncPresent(void)
+u32 fightWazaWzxVariationFuncPresent(void* unused, void* pokemon)
 
 {
-    u32 r3;
-    u32 r4;
-
     extern u32 wazaGetStatus();
   u32 uVar1;
-  u16 uVar2;
+  s32 uVar2;
   
-  uVar1 = (int)pokemonGetStatus(r4,0,0xd9,0);
-  uVar2 = wazaGetStatus(uVar1,0,0x2f,0);
-  if (uVar2 == 0x50) {
-LAB_0020d058:
+  uVar1 = (int)pokemonGetStatus(pokemon,0,0xd9,0);
+  uVar2 = (u16)wazaGetStatus(uVar1,0,0x2f,0);
+  switch (uVar2) {
+  case 0x28:
+  case 0x50:
+  case 0x78:
     uVar1 = 0;
-  }
-  else {
-    if (uVar2 < 0x50) {
-      if (uVar2 == 0x28) goto LAB_0020d058;
-    }
-    else if (uVar2 == 0x78) goto LAB_0020d058;
+    break;
+  default:
     uVar1 = 1;
+    break;
   }
   return uVar1;
 }
@@ -740,29 +682,22 @@ void fightWazaWzxTypeFuncOngaesi(void* ctx1, void* target1, void* target2, u32 u
 #pragma pop
 
 /* Address: 0x80210118 | Size: 0x78 | Ghidra import */
-int fightWazaWzxVariationFuncOngaesi(void)
+int fightWazaWzxVariationFuncOngaesi(void* unused, void* pokemon)
 
 {
-    u32 r3;
-    u32 r4;
-
     extern u32 wazaGetStatus();
   u32 uVar1;
-  u16 uVar3;
-  int iVar2;
+  u32 uVar3;
   
-  uVar1 = (int)pokemonGetStatus(r4,0,0xd9,0);
-  uVar3 = wazaGetStatus(uVar1,0,0x2f,0);
+  uVar1 = (int)pokemonGetStatus(pokemon,0,0xd9,0);
+  uVar3 = (u16)wazaGetStatus(uVar1,0,0x2f,0);
   if (uVar3 <= 0x18) {
-    iVar2 = 0;
+    return 0;
   }
-  else if (uVar3 <= 0x24) {
-    iVar2 = 1;
+  if (uVar3 <= 0x24) {
+    return 1;
   }
-  else {
-    iVar2 = 3 - (u32)(uVar3 < 0x51);
-  }
-  return iVar2;
+  return (u32)-(uVar3 <= 0x50) + 3;
 }
 
 /* 0x80210190 | size: 0xA4 */
@@ -865,31 +800,27 @@ void fightWazaWzxTypeFuncTripleKick(void* p1, void* p2, void* p3, u16 mode, u32 
 #pragma pop
 
 /* Address: 0x802104E8 | Size: 0x84 | Ghidra import */
-u32 fightWazaWzxVariationFuncTripleKick(void)
+u32 fightWazaWzxVariationFuncTripleKick(void* unused, void* pokemon)
 
 {
-    u32 r3;
-    u32 r4;
-
     extern u32 wazaGetStatus();
   u32 uVar1;
-  u16 uVar2;
+  s32 uVar2;
   
-  uVar1 = (int)pokemonGetStatus(r4,0,0xd9,0);
-  uVar2 = wazaGetStatus(uVar1,0,0x2f,0);
-  if (uVar2 == 0x14) {
+  uVar1 = (int)pokemonGetStatus(pokemon,0,0xd9,0);
+  uVar2 = (u16)wazaGetStatus(uVar1,0,0x2f,0);
+  switch (uVar2) {
+  case 10:
+    return 0;
+  case 0x14:
     uVar1 = 1;
-  }
-  else {
-    if (uVar2 < 0x14) {
-      if (uVar2 == 10) {
-        return 0;
-      }
-    }
-    else if (uVar2 == 0x1e) {
-      return 2;
-    }
+    break;
+  case 0x1e:
+    uVar1 = 2;
+    break;
+  default:
     uVar1 = 0;
+    break;
   }
   return uVar1;
 }
@@ -914,14 +845,11 @@ void fightWazaWzxTypeFuncTikyuunage(void* ctx1, void* target1, void* target2, u3
 /* fightWazaWzxVariationFuncTikyuunage | Size: 0x48 | Get level category from figthOutPokemonGetLevel result */
 u32 fightWazaWzxVariationFuncTikyuunage(void* unused, void* param) {
     extern u8 figthOutPokemonGetLevel(void* param);
-    u8 val = figthOutPokemonGetLevel(param);
+    u32 val = (u8)figthOutPokemonGetLevel(param);
     if (val < 0x21) {
         return 0;
     }
-    if (val >= 0x42) {
-        return 2;
-    }
-    return 1;
+    return (u32)-(val < 0x42) + 2;
 }
 
 /* Address: 0x80210658 | Size: 0xa4 | Ghidra import */
@@ -942,41 +870,28 @@ void fightWazaWzxTypeFuncKetaguri(void* ctx1, void* target1, void* target2, u32 
 #pragma pop
 
 /* Address: 0x802106FC | Size: 0xc0 | Ghidra import */
-u32 fightWazaWzxVariationFuncKetaguri(void)
+u32 fightWazaWzxVariationFuncKetaguri(void* unused, void* pokemon)
 
 {
-    u32 r3;
-    u32 r4;
-
     extern u32 wazaGetStatus();
   u32 uVar1;
-  u16 uVar2;
+  s32 uVar2;
   
-  uVar1 = (int)pokemonGetStatus(r4,0,0xd9,0);
-  uVar2 = wazaGetStatus(uVar1,0,0x2f,0);
-  if (uVar2 == 0x50) {
+  uVar1 = (int)pokemonGetStatus(pokemon,0,0xd9,0);
+  uVar2 = (u16)wazaGetStatus(uVar1,0,0x2f,0);
+  switch (uVar2) {
+  case 0x14:
+    return 0;
+  case 0x28:
+    return 1;
+  case 0x3c:
+    return 2;
+  case 0x50:
     return 3;
-  }
-  if (uVar2 < 0x50) {
-    if (uVar2 == 0x28) {
-      return 1;
-    }
-    if (uVar2 < 0x28) {
-      if (uVar2 == 0x14) {
-        return 0;
-      }
-    }
-    else if (uVar2 == 0x3c) {
-      return 2;
-    }
-  }
-  else {
-    if (uVar2 == 0x78) {
-      return 5;
-    }
-    if ((uVar2 < 0x78) && (uVar2 == 100)) {
-      return 4;
-    }
+  case 100:
+    return 4;
+  case 0x78:
+    return 5;
   }
   return 0;
 }
