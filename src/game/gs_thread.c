@@ -293,7 +293,7 @@ extern u32 lbl_8047AC18;
 extern u32 lbl_8047AC1C;
 extern u32 lbl_8047AC20;
 extern u32 lbl_8047AC24;
-extern u32 lbl_8047AC28;
+extern GSThread* lbl_8047AC28;
 extern u32 lbl_8047AC2C;
 extern u32 lbl_8047AC30;
 extern u32 lbl_8047AC34;
@@ -724,7 +724,7 @@ u32 GSthreadGetCurrentThread(void) {
 #endif
 
 /* 0x800F0384 | 0x50 */
-extern u32 lbl_8047AC28;
+extern GSThread* lbl_8047AC28;
 extern u32 lbl_8047AC30;
 extern u32 lbl_8047AC0C;
 #if 0
@@ -740,27 +740,17 @@ asm void GSthreadUnblockGroup(void) {
  */
 void GSthreadUnblockGroup(u32 priority) {
     u32 i;
-    u32 offset;
-    GSThread* arr;
-    u32 count;
     GSThread* thr;
 
     if (priority == 0) {
         return;
     }
 
-    arr = (GSThread*)lbl_8047AC28;
-    count = lbl_8047AC30;
-    offset = 0;
-    i = 0;
-
-    while (i < count) {
-        thr = (GSThread*)((u8*)arr + offset);
+    for (i = 0; i < lbl_8047AC30; i++) {
+        thr = &lbl_8047AC28[i];
         if (thr->priority == priority) {
             thr->sleeping = 0;
         }
-        offset += 0x24;
-        i++;
     }
 
     *(u8*)&lbl_8047AC0C = 1;
@@ -768,7 +758,7 @@ void GSthreadUnblockGroup(u32 priority) {
 #endif
 
 /* 0x800F03D4 | 0x50 */
-extern u32 lbl_8047AC28;
+extern GSThread* lbl_8047AC28;
 extern u32 lbl_8047AC30;
 extern u32 lbl_8047AC0C;
 #if 0
@@ -781,27 +771,17 @@ asm void GSthreadBlockGroup(void) {
  */
 void GSthreadBlockGroup(u32 priority) {
     u32 i;
-    u32 offset;
-    GSThread* arr;
-    u32 count;
     GSThread* thr;
 
     if (priority == 0) {
         return;
     }
 
-    arr = (GSThread*)lbl_8047AC28;
-    count = lbl_8047AC30;
-    offset = 0;
-    i = 0;
-
-    while (i < count) {
-        thr = (GSThread*)((u8*)arr + offset);
+    for (i = 0; i < lbl_8047AC30; i++) {
+        thr = &lbl_8047AC28[i];
         if (thr->priority == priority) {
             thr->sleeping = 1;
         }
-        offset += 0x24;
-        i++;
     }
 
     *(u8*)&lbl_8047AC0C = 1;
