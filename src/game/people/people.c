@@ -725,7 +725,7 @@ void fn_8018DCA8(void) {
 #endif
 
 /* 0x8018E9B4 | 0x338 */
-extern void GSresGetResource(void);
+extern void* GSresGetResource();
 extern void fn_800F7BC4(void);
 extern void fn_80101B90(void);
 extern void GScolsys2ThruGetEventID(void);
@@ -1569,11 +1569,23 @@ void fn_801845E4(void) {
 }
 
 /* fn_801848D0 -- not recovered, gap in archive campaign (size 0x78) */
-void fn_801848D0(void) {
+void fn_801848D0(void* a, s32 b, s32 c, s32 d) {
+    void GSmodelAttachToGSpart();
+    void* res = GSresGetResource(b, c);
+    if (res != 0) {
+        void* part = GSmodelGetPart(res, d);
+        GSmodelAttachToGSpart(a, part, 7, 0, 1);
+        GSpartFree(part);
+    }
 }
 
 /* fn_80185EE8 -- not recovered, gap in archive campaign (size 0x5C) */
-void fn_80185EE8(void) {
+void fn_80185EE8(u32 a, u32 b, u32 c) {
+    void fn_800E01F4();
+    void fn_8018AACC();
+    u8 local[24];
+    fn_800E01F4(local);
+    fn_8018AACC(a, b, c, local);
 }
 
 /* fn_801860F8 -- not recovered, gap in archive campaign (size 0x15C) */
@@ -1676,7 +1688,8 @@ void fn_80188CA0(u32 groupId, u32 index, u32 targetX, u32 targetY, u32 targetZ) 
 }
 
 /* fn_80188F78 -- not recovered, gap in archive campaign (size 0x28) */
-void fn_80188F78(void) {
+void fn_80188F78(u32 groupId, u32 index) {
+    fn_80188FA0(groupId, index, 0, 100);
 }
 
 /* fn_80188FA0 = fn_80188FA0 (see people.h) -- not recovered, gap in archive campaign */
@@ -2141,7 +2154,15 @@ void fn_8018D7D0(void) {
 }
 
 /* peopleSearchID -- not recovered, gap in archive campaign (size 0x70) */
-void peopleSearchID(void) {
+void* peopleSearchID(u32 id) {
+    s32 i;
+    for (i = 0; i < peopleGetMaxCount(); i++) {
+        u8* entry = (u8*)peopleGetEntry(i);
+        if (entry[0] != 0 && *(u32*)(entry + 4) == id) {
+            return entry;
+        }
+    }
+    return NULL;
 }
 
 /* fn_8018D998 -- not recovered, gap in archive campaign (size 0xF0) */
@@ -2150,10 +2171,31 @@ void fn_8018D998(void) {
 
 /* fn_8018DA88 -- not recovered, gap in archive campaign (size 0x7C) */
 void fn_8018DA88(void) {
+    void GSthreadBlock();
+    s32 i;
+    for (i = 0; i < peopleGetMaxCount(); i++) {
+        u8* entry = (u8*)peopleGetEntry(i);
+        if (entry[0] != 0 && entry != NULL) {
+            void* r;
+            entry[32] = 0;
+            r = (void*)fn_800F7108(*(u16*)(entry + 76));
+            if (r != NULL) {
+                GSthreadBlock(r);
+            }
+        }
+    }
 }
 
 /* fn_8018DB04 -- not recovered, gap in archive campaign (size 0x64) */
-void fn_8018DB04(void) {
+void fn_8018DB04(void* param) {
+    void fn_8018DCA8();
+    s32 i;
+    for (i = 0; i < peopleGetMaxCount(); i++) {
+        u8* entry = (u8*)peopleGetEntry(i);
+        if (entry[0] != 0) {
+            fn_8018DCA8(entry, param);
+        }
+    }
 }
 
 /* fn_8018E050 -- not recovered, gap in archive campaign (size 0x174) */
@@ -2219,17 +2261,36 @@ s32 fn_8018F698(void* ptr) {
 
 /* peopleInfoBiosGetPtr = peopleInfoBiosGetPtr (see people.h) -- not recovered, gap in archive campaign */
 void* peopleInfoBiosGetPtr(void* scriptObj) {
+    u32 count = *(u32*)lbl_80478E78;
+    u8* entry = (u8*)lbl_80478E7C;
+    while (count != 0) {
+        if (*(void**)(entry + 12) == scriptObj) {
+            return entry;
+        }
+        entry += 0x2C;
+        count--;
+    }
     return NULL;
 }
 
 /* fn_8018FB2C = fn_8018FB2C (see people.h) -- not recovered, gap in archive campaign */
 void fn_8018FB2C(PeopleEntry* entry, u8 animId) {
-
+    void GScolsys2HumanEnable();
+    s32 f80;
+    *((u8*)entry + 35) = animId;
+    f80 = *(s32*)((u8*)entry + 80);
+    if (f80 >= 0) {
+        GScolsys2HumanEnable(f80, animId);
+    }
 }
 
 /* fn_8018FB60 = fn_8018FB60 (see people.h) -- not recovered, gap in archive campaign */
 void fn_8018FB60(PeopleEntry* entry, u8 animId) {
-
+    void* f8 = *(void**)((u8*)entry + 8);
+    if (f8 != NULL) {
+        *((u8*)entry + 33) = animId;
+        GSmodelSetVisibility(f8, animId);
+    }
 }
 
 /* fn_8018FC08 = fn_8018FC08 (see people.h) -- not recovered, gap in archive campaign

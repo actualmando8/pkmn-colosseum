@@ -72,16 +72,28 @@ void fn_801765F4(u8 value) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 
-f32 fn_80176948(void* obj) {
-    /* TODO: match -- 52 bytes at 0x80176948 */
+void fn_80176948(void) {
+    extern void fn_800E01D0(void* dst, void* src);
+    void fn_800E01F4();
+    u8 local[24];
+    fn_800E01F4(local);
+    fn_800E01D0((u8*)lbl_80478C40 + 4, local);
 }
 
-f32 cameraSetTargetPosXYZ(void* obj) {
-    /* TODO: match -- 52 bytes at 0x8017697C */
+void cameraSetTargetPosXYZ(void) {
+    extern void fn_800E01D0(void* dst, void* src);
+    void fn_800E01F4();
+    u8 local[24];
+    fn_800E01F4(local);
+    fn_800E01D0((u8*)lbl_80478C40 + 28, local);
 }
 
-f32 cameraSetTargetOfsXYZ(void* obj) {
-    /* TODO: match -- 52 bytes at 0x801769B0 */
+void cameraSetTargetOfsXYZ(void) {
+    extern void fn_800E01D0(void* dst, void* src);
+    void fn_800E01F4();
+    u8 local[24];
+    fn_800E01F4(local);
+    fn_800E01D0((u8*)lbl_80478C40 + 40, local);
 }
 
 #pragma pop
