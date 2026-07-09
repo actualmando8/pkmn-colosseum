@@ -2289,50 +2289,77 @@ asm void menuFightWazaButton(void) {
 #pragma push
 #pragma peephole off
 u32 menuFightWazaButton(u8* ctx) {
-    extern u8* windowGetAllocPtr(u8* a);
-    extern u8* windowGetFreeWork(u8* a);
-    extern u8* windowGetKeyInfo(void);
+    typedef struct MenuWindow {
+        u8 pad_00[0x95];
+        s8 selectedWaza;
+        u8 pad_96[2];
+        u8 done;
+        u8 canceled;
+    } MenuWindow;
+    typedef struct MenuFightWazaStatus {
+        u8 pad_00[0x40];
+        void* outPokemon;
+    } MenuFightWazaStatus;
+    typedef struct MenuFightWazaWork {
+        u8 mode;
+        u8 unk_01;
+        s8 selectedSlot;
+    } MenuFightWazaWork;
+    typedef struct MenuKeyInfo {
+        u8 pad_00[4];
+        u16 buttons;
+    } MenuKeyInfo;
+    extern MenuFightWazaStatus* windowGetAllocPtr(u8* a);
+    extern MenuFightWazaWork* windowGetFreeWork(u8* a);
+    extern MenuKeyInfo* windowGetKeyInfo(void);
     extern u32 fightOutPokemonGetPokemonPtr(void*);
     extern u32 pokemonGetStatus();
     extern void menuButtonNormal(u8* a);
     extern void pokemonWazaReplace(void*, s32, s32);
-    extern void pokemonToMenuWazaStatus(void*, void*);
-    u8* participant;
-    u8* state;
-    u8* flagsObj;
+    extern void pokemonToMenuWazaStatus(void*, MenuFightWazaStatus*);
+    MenuWindow* window;
+    MenuFightWazaStatus* participant;
+    MenuFightWazaWork* state;
+    MenuKeyInfo* flagsObj;
     u32 model;
     u16 flags;
-    u32 saved;
+    void* saved;
 
+    window = (MenuWindow*)ctx;
     participant = windowGetAllocPtr(ctx);
     state = windowGetFreeWork(ctx);
-    model = fightOutPokemonGetPokemonPtr(*(void**)(participant + 0x40));
+    model = fightOutPokemonGetPokemonPtr(participant->outPokemon);
     flagsObj = windowGetKeyInfo();
-    flags = *(u16*)(flagsObj + 4);
+    flags = flagsObj->buttons;
 
-    if (state[0] == 0) {
-        if (model != 0 &&
-            ((u16)pokemonGetStatus(model, 0, 0x7F, (s8)ctx[0x95]) == 0x165) &&
-            (*(u16*)(windowGetKeyInfo() + 4) & 0x40)) {
-            ctx[0x98] = 1;
-            ctx[0x99] = 1;
+    switch (state->mode) {
+    case 0:
+        if (model != 0 && ((u16)pokemonGetStatus(model, 0, 0x7F, window->selectedWaza) == 0x165)) {
+            if ((windowGetKeyInfo()->buttons & 0x20) != 0) {
+                window->done = 1;
+                window->canceled = 1;
+            }
         } else {
             menuButtonNormal(ctx);
         }
-    } else if (state[0] == 1) {
-        if ((flags & 0xD0) != 0) {
+        break;
+    case 1: {
+        s32 flagBits = flags & 0xFFFF;
+        if ((flagBits & 0xD0) != 0) {
             if (model != 0) {
-                pokemonWazaReplace((void*)model, (s8)state[2], (s8)ctx[0x95]);
-                saved = *(u32*)(participant + 0x40);
+                pokemonWazaReplace((void*)model, state->selectedSlot, window->selectedWaza);
+                saved = participant->outPokemon;
                 pokemonToMenuWazaStatus((void*)model, participant);
-                *(u32*)(participant + 0x40) = saved;
+                participant->outPokemon = saved;
             }
-            state[2] = 0xFF;
-            state[0] = 0;
-        } else if ((flags & 0x40) != 0) {
-            state[2] = 0xFF;
-            state[0] = 0;
+            state->selectedSlot = -1;
+            state->mode = 0;
+        } else if ((flagBits & 0x20) != 0) {
+            state->selectedSlot = -1;
+            state->mode = 0;
         }
+        break;
+    }
     }
     return 0;
 }
@@ -2340,7 +2367,7 @@ u32 menuFightWazaButton(u8* ctx) {
 #endif
 
 /* menuFightWazaCtrl - 0x800109A0 | size: 0x190 */
-extern u8 lbl_80478850[8];
+extern u16 lbl_80478850[4];
 #if 0
 asm void menuFightWazaCtrl(void) {
 #include "src/game/gs_npc_interact_fn_800109A0.inc"
@@ -2349,56 +2376,79 @@ asm void menuFightWazaCtrl(void) {
 #pragma push
 #pragma peephole off
 u32 menuFightWazaCtrl(u8* ctx) {
+    typedef struct MenuWindow {
+        u8 pad_00;
+        s8 state;
+        u8 pad_02[2];
+        u32 menuId;
+        u8 pad_08[0x78];
+        s32 selected;
+    } MenuWindow;
+    typedef struct MenuFightWazaRow {
+        u32 unk_00;
+        u32 wazaId;
+        u32 unk_08;
+    } MenuFightWazaRow;
+    typedef struct MenuFightWazaWork {
+        u8 mode;
+        u8 unk_01;
+        s8 selectedSlot;
+    } MenuFightWazaWork;
     extern void* windowAllocMemory(u8* a, u32 size);
     extern u32 windowGetParam(u8* a, s32 b);
-    extern u8* windowGetFreeWork(u8* a);
-    extern u8* windowGetAllocPtr(u8* a);
+    extern MenuFightWazaWork* windowGetFreeWork(u8* a);
+    extern MenuFightWazaRow* windowGetAllocPtr(u8* a);
     extern s32 menuGetCursorItemID(u32 val);
+    MenuWindow* window;
     void* dst;
-    u8* state;
-    u8* party;
+    MenuFightWazaWork* state;
+    MenuFightWazaRow* party;
     s32 i;
     s32 id;
 
-    if ((s8)ctx[1] == 0) {
+    window = (MenuWindow*)ctx;
+    if (window->state == 0) {
         dst = windowAllocMemory(ctx, 0x48);
         if (dst != NULL) {
             memcpy(dst, (void*)windowGetParam(ctx, 0), 0x48);
         }
         state = windowGetFreeWork(ctx);
-        state[0] = 0;
-        state[1] = 0;
-        state[2] = 0xFF;
+        state->mode = 0;
+        state->unk_01 = 0;
+        state->selectedSlot = -1;
     }
 
     party = windowGetAllocPtr(ctx);
-    if ((s8)ctx[1] == 5) {
+    if (window->state == 5) {
         for (i = 0; i < 4; i++) {
-            menuItemBiosSetSelectFlag(*(u16*)(lbl_80478850 + (i * 2)), 1);
+            menuItemBiosSetSelectFlag(lbl_80478850[i], 1);
         }
     } else {
         for (i = 0; i < 4; i++) {
-            menuItemBiosSetSelectFlag(*(u16*)(lbl_80478850 + (i * 2)),
-                         (*(u32*)(party + (i * 0xC) + 4) != 0) ? 1 : 0);
+            if (party[i].wazaId != 0) {
+                menuItemBiosSetSelectFlag(lbl_80478850[i], 1);
+            } else {
+                menuItemBiosSetSelectFlag(lbl_80478850[i], 0);
+            }
         }
     }
 
-    id = menuGetCursorItemID(*(u32*)(ctx + 4));
+    id = menuGetCursorItemID(window->menuId);
     switch (id) {
     case 0xC4:
-        *(s32*)(ctx + 0x80) = 0;
+        window->selected = 0;
         break;
     case 0xC5:
-        *(s32*)(ctx + 0x80) = 1;
+        window->selected = 1;
         break;
     case 0xC6:
-        *(s32*)(ctx + 0x80) = 2;
+        window->selected = 2;
         break;
     case 0xC7:
-        *(s32*)(ctx + 0x80) = 3;
+        window->selected = 3;
         break;
     default:
-        *(s32*)(ctx + 0x80) = -1;
+        window->selected = -1;
         break;
     }
     return 0;
