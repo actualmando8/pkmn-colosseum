@@ -100,6 +100,24 @@ u32 fightFloorIsUseFightTimerCommand(void* param) {
     return 0;
 }
 
+/* 0x801F1758 | size: 0x58 | small */
+u32 fightFloorIsUseFightTimerAll(void* param) {
+    extern u32 fightFloorGetStatus(void*, u32, u32, u32);
+    extern s32 menuCBRule_GetBattleTimeLimit(u32);
+    u32 val;
+    u8 flag;
+    s32 r;
+
+    val = fightFloorGetStatus(param, 0, 0x34, 0);
+    r = val;
+    flag = r & 0xFF;
+    r = menuCBRule_GetBattleTimeLimit(r);
+    if (flag == 1 && r > 0) {
+        return 1;
+    }
+    return 0;
+}
+
 /* 0x801F17B0 | size: 0xD8 | medium */
 void fightFloorInitFightStart(void* obj) {
     extern void* fightFloorGetStatus(void*, u32, u32, u32);
@@ -1824,6 +1842,43 @@ void* fightFloorGetFightPokemonPtrToFightTrainerPtr(void* obj, void* search_val)
     return 0;
 }
 
+/* 0x801F453C | size: 0x1DC */
+s32 fightFloorGetNowTenkouDataId(void* param_1, u32 param_2) {
+    extern u32 fightFloorLoopValidFightOutPokemon(void*, void*, void*, u32);
+    extern void _fightFloorCheckFightOutPokemonPtrAryPokemonTokuseiDataIdSub__FPvUsPv(void*, u32, void*);
+    extern s32 fightFloorGetStatus(void*, u32, u32, u32);
+    void* pkmn;
+    u32 buf1[4];
+    u32 buf2[4];
+
+    pkmn = param_1;
+    if ((u8)param_2 == 1) {
+        buf1[0] = 13;
+        buf1[1] = 0;
+        buf1[2] = 0;
+        buf1[3] = 0;
+        fightFloorLoopValidFightOutPokemon(pkmn, (void*)_fightFloorCheckFightOutPokemonPtrAryPokemonTokuseiDataIdSub__FPvUsPv, buf1, 0);
+        if ((u16)buf1[1] != 0)
+            return 0;
+
+        buf2[0] = 0x4d;
+        buf2[1] = 0;
+        buf2[2] = 0;
+        buf2[3] = 0;
+        fightFloorLoopValidFightOutPokemon(pkmn, (void*)_fightFloorCheckFightOutPokemonPtrAryPokemonTokuseiDataIdSub__FPvUsPv, buf2, 0);
+        if ((u16)buf2[1] != 0)
+            return 0;
+    }
+    if (fightFloorGetStatus(pkmn, 0, 0xa, 0x4e) == 1) return 0;
+    if (fightFloorGetStatus(pkmn, 0, 0xa, 0x4f) == 1) return 1;
+    if (fightFloorGetStatus(pkmn, 0, 0xa, 0x50) == 1) return 2;
+    if (fightFloorGetStatus(pkmn, 0, 0xa, 0x51) == 1) return 3;
+    if (fightFloorGetStatus(pkmn, 0, 0xa, 0x52) == 1) return 4;
+    if (fightFloorGetStatus(pkmn, 0, 0xa, 0x53) == 1) return 1;
+    if (fightFloorGetStatus(pkmn, 0, 0xa, 0x54) == 1) return 2;
+    return (fightFloorGetStatus(pkmn, 0, 0xa, 0x55) == 1) ? 3 : 0;
+}
+
 /* 0x801F4718 | size: 0x9C | medium */
 void* fightFloorCreateFightOutPokemonPtrAry(void* obj) {
     extern u32 fightFloorGetStatus(void*, int, int, int);
@@ -2696,6 +2751,12 @@ s32 fightFloorGetStatus(u8* pkm, u32 slot, u32 field, u32 arg) {
 }
 #endif
 #pragma pop
+
+/* 0x801F61BC | size: 0x30 */
+struct Pokemon* fightFloorGetNowPtr(void) {
+    extern u32 fightFloorGetStatus(void*, u32, u32, u32);
+    return (struct Pokemon*)fightFloorGetStatus(0, 0, 0, 0);
+}
 
 /* 0x801F61EC | size: 0x220 | large */
 u32 _fightFloorCreateFightOutPokemonPtrAry__FP11FIGHT_FLOORPP15FightOutPokemonbUcP15FightOutPokemon(u32 param_1, u32 *param_2, u32 param_3, u32 param_4, u32 param_5) {
