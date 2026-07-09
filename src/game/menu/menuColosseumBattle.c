@@ -20,7 +20,80 @@
  */
 #include "dolphin/types.h"
 
+typedef struct MenuKeyInfo {
+    u8 pad_00[4];
+    u16 buttons;
+    u16 repeatButtons;
+} MenuKeyInfo;
+
+typedef struct MenuWindow {
+    u8 pad_00[0x4C];
+    s32 nextMenu;
+    u8 pad_50[0x45];
+    s8 cursor;
+    u8 pad_96[2];
+    u8 accepted;
+    u8 canceled;
+} MenuWindow;
+
+typedef struct MenuSprite {
+    u8 pad_00[6];
+    s16 tag;
+} MenuSprite;
+
+typedef struct MenuSeTable {
+    u16 field_00;
+    u16 field_02;
+    u16 field_04;
+    u16 field_06;
+    u16 field_08;
+} MenuSeTable;
+
+typedef struct ColosseumBattleConnectState {
+    s32 active;
+    s32 connected;
+    s32 busyRequest;
+    s32 reserved;
+} ColosseumBattleConnectState;
+
+typedef struct ColosseumSaveWork {
+    s32 battleKind;
+    u8 pad_04[0x18];
+    u8 exitPending;
+} ColosseumSaveWork;
+
+typedef struct ColosseumMenuHeap {
+    u8 pad_0000[0x4314];
+    void* resourceHandle;
+} ColosseumMenuHeap;
+
+typedef struct ColosseumMessageBuffer {
+    u16 text[0x24];
+} ColosseumMessageBuffer;
+
+typedef struct ColosseumRosterRow {
+    s32 mode;
+    s32 menuId;
+    s32 partyIndex;
+    s32 action;
+} ColosseumRosterRow;
+
+typedef union ColosseumBitMasks {
+    u32 word;
+    u8 bytes[4];
+} ColosseumBitMasks;
+
 /* ===== External function declarations (menuColosseumBattleMain only) ===== */
+extern void fn_800347B8(void);
+extern void fn_800347C4(void);
+extern void fn_800347E8(s32);
+extern void fn_8003480C(s32);
+extern s32 fn_800573C0(void);
+extern u8 fn_8006B8E8(void);
+extern u32 fn_800E202C(void*);
+extern void fn_800E209C(u32);
+extern void fn_800E24B0(u32);
+extern void fn_800F96E4(void*, s32, void*);
 extern void fn_8002D91C();
 extern void fn_80062948(void);
 extern void fn_80069C0C();
@@ -46,6 +119,7 @@ extern void fn_8006B51C();
 extern void fn_8006B8F0();
 extern void fn_8006B8FC();
 extern void fn_8006E0CC();
+extern void fn_800FF58C(s32);
 extern void fn_80071160();
 extern void fn_80071344();
 extern void fn_80071398();
@@ -68,7 +142,9 @@ extern void menuGetCursorItemID();
 extern void menuSubOpenYesNo();
 extern void menuClose();
 extern void menuCloseCustom();
+extern s32 menuCloseSync(s32, s32);
 extern void menuIsCheck();
+extern s32 menuOpen(s32, s32);
 extern s32  fn_8010264C();
 extern void menuOpenCustom();
 extern void menuSetPosition();
@@ -91,25 +167,143 @@ extern void heroMoveSyncWithHero();
 extern void msgctrlSetValue();
 extern void gamedatasaveGetStatus();
 extern void fn_80166A28();
+extern void fn_80166A50(s32, s32, s32, s32);
 extern void fn_8019075C();
+extern void fn_801CB9D8(void*);
+extern u8 pokemonCheckValid(void*);
+extern u8 pokemonIsDarkPokemon(void*);
 extern void __assert();
 extern void _threadSwitch();
+extern void _flagSet(s32, s32);
 extern void floorChangePos();
 extern s32  GScharCmp(void*, void*);
 extern void* memset(void* dst, int val, u32 size);
 extern void* memcpy(void* dst, const void* src, u32 size);
+extern void menuButtonNormal(void*);
+extern void winSpriteSetDisp(void*, u32);
+extern void fadeCheck(s32);
+extern void toolentryTaisenFreePokemonData(void);
 
 /* ===== SDA globals ===== */
-extern u8  lbl_8047A5A0[];
+extern u8* lbl_8047A5A0;
+extern u8  lbl_8047A5A8;
 extern f32 lbl_8047BF18;
 extern u8  lbl_8047BF1C;
 extern u8  lbl_8047BF20;
 extern u8  lbl_8047BF24;
+extern const u32 lbl_8047BF30;
+extern const u32 lbl_8047BF34;
+extern const u32 lbl_8047BF38;
+extern const u32 lbl_8047BF3C;
+extern const ColosseumBitMasks lbl_8047BF40;
+extern const char lbl_8047BF28;
 
 /* ===== Rodata / data labels ===== */
 extern u8 lbl_80267840[];
+extern char lbl_802678D8[];
+extern const ColosseumRosterRow lbl_802677D0[7];
+extern u8 lbl_803A9A08[];
+extern u8 lbl_803A9A18[];
 
 /* ===== Function implementations ===== */
+
+/* Address: 0x80057DE8 | Size: 0x58 */
+#pragma push
+#pragma peephole off
+s32 fn_80057DE8(void* pokemon) {
+    if (pokemonCheckValid(pokemon) == 0) {
+        return 0;
+    }
+    return pokemonIsDarkPokemon(pokemon) != 0;
+}
+#pragma pop
+
+/* Address: 0x80057E40 | Size: 0x30 */
+#pragma push
+#pragma scheduling off
+#pragma peephole off
+s32 fn_80057E40(void) {
+    ColosseumBattleConnectState* state = (ColosseumBattleConnectState*)lbl_803A9A08;
+
+    if (state->active != 0) {
+        return state->connected != 0;
+    }
+    return 2;
+}
+#pragma pop
+
+/* Address: 0x80058754 | Size: 0x44 */
+#pragma push
+#pragma scheduling off
+#pragma peephole off
+s32 fn_80058754(void* unused, MenuWindow* window) {
+    ColosseumMessageBuffer* message = (ColosseumMessageBuffer*)lbl_803A9A18;
+
+    (void)unused;
+    msgctrlSetValue(0x37, message);
+    window->nextMenu = 0xCE;
+    return 0;
+}
+#pragma pop
+
+/* Address: 0x80058798 | Size: 0x40 */
+void fn_80058798(MenuWindow* window) {
+    MenuKeyInfo* keys = (MenuKeyInfo*)windowGetKeyInfo();
+
+    if (keys->buttons != 0) {
+        window->accepted = 1;
+    }
+}
+
+/* Address: 0x800587D8 | Size: 0x2C */
+#pragma push
+#pragma scheduling off
+void fn_800587D8(void) {
+    menuCloseCustom(0x9B, 2, 1);
+}
+#pragma pop
+
+/* Address: 0x80058804 | Size: 0x7C */
+#pragma push
+#pragma peephole off
+void fn_80058804(void* text, s32 closeAfterOpen) {
+    if (text == NULL) {
+        ColosseumMessageBuffer* message = (ColosseumMessageBuffer*)lbl_803A9A18;
+
+        message->text[0] = 0;
+    } else {
+        ColosseumMessageBuffer* message = (ColosseumMessageBuffer*)lbl_803A9A18;
+
+        fn_800F96E4(message, 0x21, text);
+    }
+
+    menuOpen(0x9B, (u8)closeAfterOpen);
+    if (closeAfterOpen != 0) {
+        menuCloseCustom(0x9B, 2, 1);
+    }
+}
+#pragma pop
+
+/* Address: 0x80058AB0 | Size: 0x40 */
+void fn_80058AB0(MenuWindow* window) {
+    windowGetKeyInfo();
+    if (fn_800573C0() == 0) {
+        menuButtonNormal(window);
+    }
+}
+
+/* Address: 0x80058F08 | Size: 0x38 */
+s32 fn_80058F08(s32* partyIndex, s32 cursor) {
+    const ColosseumRosterRow* row;
+
+    if (cursor < 0 || cursor >= 7) {
+        return 2;
+    }
+
+    row = &lbl_802677D0[cursor];
+    *partyIndex = row->partyIndex;
+    return row->menuId;
+}
 
 /* Address: 0x80059BDC | Size: 0x30F4 */
 #pragma push
@@ -1556,3 +1750,244 @@ done:
 #undef WORKP
 }
 #pragma pop
+
+/* Address: 0x8005CCD0 | Size: 0xB8 */
+#pragma push
+#pragma peephole off
+void menuColosseumBattleExit(void) {
+    u32 handle;
+
+    fadeCheck(1);
+    if (fn_8006B8E8() == 0) {
+        ColosseumSaveWork* work;
+
+        handle = 0;
+        work = (ColosseumSaveWork*)savedataGetStatus(0, 0xE);
+        work->exitPending = handle;
+        _flagSet(0x8AE, handle);
+    }
+
+    menuClose(0xD3);
+    toolentryTaisenFreePokemonData();
+    fn_801CB9D8(((ColosseumMenuHeap*)lbl_8047A5A0)->resourceHandle);
+    handle = fn_800E202C(lbl_8047A5A0);
+    if ((u16)handle == 0) {
+        __assert(lbl_802678D8, 0x252, &lbl_8047BF28);
+    }
+    fn_800E24B0(handle);
+    fn_800E209C(handle);
+    lbl_8047A5A0 = NULL;
+}
+#pragma pop
+
+/* Address: 0x8005CEE8 | Size: 0x44 */
+void menuColosseumBattle(s32 battleKind) {
+    ColosseumSaveWork* work;
+
+    fn_8006B8F0();
+    work = (ColosseumSaveWork*)savedataGetStatus(0, 0xE);
+    work->battleKind = battleKind;
+    fn_800FF58C(0x395);
+}
+
+/* Address: 0x8005D094 | Size: 0x24 */
+#pragma push
+#pragma scheduling off
+s32 fn_8005D094(void) {
+    fn_800347B8();
+    return -1;
+}
+#pragma pop
+
+/* Address: 0x8005D0B8 | Size: 0x24 */
+#pragma push
+#pragma scheduling off
+s32 fn_8005D0B8(void) {
+    fn_800347C4();
+    return 0;
+}
+#pragma pop
+
+/* Address: 0x8005D0DC | Size: 0x54 */
+#pragma push
+#pragma peephole off
+s32 fn_8005D0DC(void) {
+    s32 menuResult = menuOpen(2, 1);
+
+    menuClose(2);
+    if (menuResult >= 0) {
+        fn_800347E8(menuResult);
+    }
+    return 0;
+}
+#pragma pop
+
+/* Address: 0x8005D130 | Size: 0x54 */
+#pragma push
+#pragma peephole off
+s32 fn_8005D130(void) {
+    s32 menuResult = menuOpen(2, 1);
+
+    menuClose(2);
+    if (menuResult >= 0) {
+        fn_8003480C(menuResult);
+    }
+    return 0;
+}
+#pragma pop
+
+/* Address: 0x8005D26C | Size: 0x7C */
+#pragma push
+#pragma peephole off
+s32 fn_8005D26C(void) {
+    s32 menuResult;
+    s32 results[2];
+
+    results[0] = lbl_8047BF30;
+    results[1] = lbl_8047BF34;
+    menuResult = menuOpen(0x9E, 1);
+    menuClose(0x9E);
+    menuCloseSync(0x9E, 1);
+    if (menuResult < -1 || menuResult >= 2) {
+        return 1;
+    }
+    return results[menuResult];
+}
+#pragma pop
+
+/* Address: 0x8005D4AC | Size: 0x48 */
+#pragma push
+#pragma scheduling off
+#pragma peephole off
+s32 fn_8005D4AC(void* menu, void* sprite) {
+    s32 visible;
+    u8 flags = lbl_8047A5A8;
+
+    (void)menu;
+    if ((flags & 0x8) != 0) {
+        visible = 1;
+    } else {
+        visible = 0;
+    }
+    winSpriteSetDisp(sprite, (u8)visible);
+    return 0;
+}
+#pragma pop
+
+/* Address: 0x8005D4F4 | Size: 0x48 */
+#pragma push
+#pragma scheduling off
+#pragma peephole off
+s32 fn_8005D4F4(void* menu, void* sprite) {
+    s32 visible;
+    u8 flags = lbl_8047A5A8;
+
+    (void)menu;
+    if ((flags & 0x4) != 0) {
+        visible = 1;
+    } else {
+        visible = 0;
+    }
+    winSpriteSetDisp(sprite, (u8)visible);
+    return 0;
+}
+#pragma pop
+
+/* Address: 0x8005D53C | Size: 0x48 */
+#pragma push
+#pragma scheduling off
+#pragma peephole off
+s32 fn_8005D53C(void* menu, void* sprite) {
+    s32 visible;
+    u8 flags = lbl_8047A5A8;
+
+    (void)menu;
+    if ((flags & 0x2) != 0) {
+        visible = 1;
+    } else {
+        visible = 0;
+    }
+    winSpriteSetDisp(sprite, (u8)visible);
+    return 0;
+}
+#pragma pop
+
+/* Address: 0x8005D584 | Size: 0x48 */
+#pragma push
+#pragma scheduling off
+#pragma peephole off
+s32 fn_8005D584(void* menu, void* sprite) {
+    s32 visible;
+    u8 flags = lbl_8047A5A8;
+
+    (void)menu;
+    if ((flags & 0x1) != 0) {
+        visible = 1;
+    } else {
+        visible = 0;
+    }
+    winSpriteSetDisp(sprite, (u8)visible);
+    return 0;
+}
+#pragma pop
+
+/* Address: 0x8005D6A8 | Size: 0x90 */
+#pragma push
+#pragma peephole off
+void fn_8005D6A8(MenuWindow* window) {
+    MenuKeyInfo* keys = (MenuKeyInfo*)windowGetKeyInfo();
+    ColosseumBitMasks masks;
+    s32 cursor = window->cursor;
+
+    masks.word = lbl_8047BF40.word;
+    if (cursor >= 0 && cursor <= 3 && (keys->buttons & 0x10) != 0) {
+        lbl_8047A5A8 ^= masks.bytes[cursor];
+        fn_80166A50(0x3C6, 0, 0xFF, 0);
+    } else {
+        menuButtonNormal(window);
+    }
+}
+#pragma pop
+
+/* Address: 0x8005D738 | Size: 0x60 */
+#pragma push
+#pragma peephole off
+u32 fn_8005D738(u8 flags) {
+    s32 menuResult;
+
+    lbl_8047A5A8 = flags;
+    menuResult = menuOpen(0x9D, 1);
+    menuClose(0x9D);
+    menuCloseSync(0x9D, 1);
+    if (menuResult == 0x73D) {
+        return lbl_8047A5A8;
+    } else {
+        return 0xFF;
+    }
+}
+#pragma pop
+
+/* Address: 0x8005D798 | Size: 0x60 */
+u32 fn_8005D798(MenuSeTable* table, u8 index) {
+    u32 value = 0;
+
+    switch (index) {
+    case 1:
+        value = table->field_04;
+        break;
+    case 2:
+        value = table->field_06;
+        break;
+    case 3:
+        value = table->field_08;
+        break;
+    case 4:
+        value = table->field_00;
+        break;
+    case 5:
+        value = table->field_02;
+        break;
+    }
+
+    return value;
+}
