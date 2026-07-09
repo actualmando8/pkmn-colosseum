@@ -133,12 +133,11 @@ u32 fightActionFlowWazaKiaipantiPre(void* ctx) {
 }
 #pragma pop
 
-/* Address: 0x8020AF30 | Size: 0xc4 | Ghidra import */
-u32 fightActionFlowTenkouInit(void)
+u32 _fightActionFlowTenkouInitSubGetSeqFightOutPokemonPtr__FPvUsPv(void* fightOutPokemon, u16 index, void** outFightOutPokemon);
 
+/* Address: 0x8020AF30 | Size: 0xc4 */
+u32 fightActionFlowTenkouInit(void* ctx)
 {
-    u32 r3;
-
     extern u32 tenkouDataBiosGetFightInitMsgId();
     extern void fightFloorLoopValidFightOutPokemon();
     extern s8 fightFloorGetNowTenkouDataId();
@@ -146,46 +145,34 @@ u32 fightActionFlowTenkouInit(void)
     extern u32 fightActionBiosGetBuffDataPtr();
     extern void fightKoukaDoFightKoukaJoukenAndKouka();
     extern void fn_80211B94();
-  s8 cVar2;
-  u32 uVar1;
-  u32 local_18 [4];
-  
-  fightKoukaDoFightKoukaJoukenAndKouka(0,1);
-  cVar2 = fightFloorGetNowTenkouDataId(0,0);
-  local_18[0] = 0;
-  fightFloorLoopValidFightOutPokemon(0,0x8020aff4,local_18,0);
-  if (cVar2 != 0) {
-    fightFloorSetStatus(0,0,0x36,0,local_18[0]);
-    uVar1 = tenkouDataBiosGetFightInitMsgId(cVar2);
-    fightFloorSetStatus(0,0,0x50,0,uVar1);
-    uVar1 = fightActionBiosGetBuffDataPtr(r3);
-    fn_80211B94(r3,uVar1,0);
-  }
-  return 1;
+    u8 tenkouDataId;
+    void* seqPokemon;
+    u32 msgId;
+
+    fightKoukaDoFightKoukaJoukenAndKouka(0, 1);
+    tenkouDataId = fightFloorGetNowTenkouDataId(0, 0);
+    seqPokemon = NULL;
+    fightFloorLoopValidFightOutPokemon(
+        0, _fightActionFlowTenkouInitSubGetSeqFightOutPokemonPtr__FPvUsPv, &seqPokemon, 0);
+    if (tenkouDataId != 0) {
+        fightFloorSetStatus(0, 0, 0x36, 0, seqPokemon);
+        msgId = tenkouDataBiosGetFightInitMsgId(tenkouDataId);
+        fightFloorSetStatus(0, 0, 0x50, 0, msgId);
+        fn_80211B94(ctx, fightActionBiosGetBuffDataPtr(ctx), 0);
+    }
+    return 1;
 }
 
-/* Address: 0x8020AFF4 | Size: 0x5c | Ghidra import */
-u32 _fightActionFlowTenkouInitSubGetSeqFightOutPokemonPtr__FPvUsPv(void)
-
+/* Address: 0x8020AFF4 | Size: 0x5c */
+u32 _fightActionFlowTenkouInitSubGetSeqFightOutPokemonPtr__FPvUsPv(void* fightOutPokemon, u16 index, void** outFightOutPokemon)
 {
-    u32 r3;
-    u32 r4;
-    u32 *r5;
-
-  int iVar1;
-  u32 uVar2;
-  
-  iVar1 = (int)pokemonGetStatus(r3,0,0xee,0);
-  if (iVar1 == 0) {
-    uVar2 = 1;
-  }
-  else {
-    if (r5 != (void *)0) {
-      *r5 = r3;
+    if (pokemonGetStatus(fightOutPokemon, 0, 0xEE, 0) != NULL) {
+        if (outFightOutPokemon != NULL) {
+            *outFightOutPokemon = fightOutPokemon;
+        }
+        return 0;
     }
-    uVar2 = 0;
-  }
-  return uVar2;
+    return 1;
 }
 
 /* Address: 0x8020B050 | Size: 0x8 | Pattern: return_constant */
@@ -508,9 +495,9 @@ u32 fightActionFlowFightTrainerUseItem(void* ctx) {
     extern u16 fightFloorGetStatus();
     extern u32 fightActionBiosGetActorFightTargetPtr();
     extern void fn_80211E18();
-    u32 d908val;
     void* e5Data;
     u16 field1E;
+    u32 d908val;
     u32 partyCount;
     u8 slotType;
     u32 finalVal;
@@ -518,10 +505,10 @@ u32 fightActionFlowFightTrainerUseItem(void* ctx) {
     d908val = fightActionBiosGetActorFightTargetPtr(ctx);
     fightFloorSetStatus(0, 0, 0x36, 0, d908val);
     e5Data = pokemonGetStatus((void*)d908val, 0, 0xE5, 0);
-    field1E = (u16)itemGetStatus((u32)e5Data, 0, 0x1E, 0);
+    field1E = (u16)itemGetStatus(e5Data, 0, 0x1E, 0);
     slotType = (u8)itemGetStatus(0, field1E, 0x2, 0);
     if (slotType == 1) {
-        finalVal = (u32)fightTargetGetRelativeHostSideFightTargetIdToTragetPtr((u16)itemGetStatus((u32)e5Data, 0, 0x1F, 0), partyCount);
+        finalVal = (u32)fightTargetGetRelativeHostSideFightTargetIdToTragetPtr((u16)itemGetStatus(e5Data, 0, 0x1F, 0), partyCount);
     } else {
         finalVal = d908val;
     }
@@ -570,15 +557,15 @@ u32 fightActionFlowFightOutPokemonIrekae(void* ctx)
 #pragma pop
 
 /* 0x8020BAF8 | size: 0xAC */
-void fightActionFlowFightNigeru(void* ctx) {
+u32 fightActionFlowFightNigeru(void* ctx) {
     extern u8 fightTargetIsHostSide();
     extern u8 fightFloorSetFightResultId();
     extern void fightFloorSetStatus();
-    extern u16 fightFloorGetStatus();
+    extern u32 fightFloorGetStatus();
     extern u32 fightActionBiosGetActorFightTargetPtr();
     extern void fightSeqSpecificationActionCounterInit();
-    u16 tableId;
     u32 obj;
+    u16 tableId;
     u8 result;
     tableId = fightFloorGetStatus(NULL, 0, 0x14, 0);
     obj = fightActionBiosGetActorFightTargetPtr(ctx);
@@ -591,6 +578,7 @@ void fightActionFlowFightNigeru(void* ctx) {
     if (result == 1) {
         fightFloorSetStatus(0, 0, 0x44, 0, obj);
     }
+    return 1;
 }
 
 /* Address: 0x8020BBA4 | Size: 0x58 | Ghidra import */
@@ -640,12 +628,8 @@ u32 fightActionFlowAllFightOutPokemonDoFightAction(void* ctx) {
 #pragma pop
 
 /* Address: 0x8020BC94 | Size: 0x1a4 | Ghidra import */
-u32 _fightActionFlowAllFightOutPokemonDoFightActionOneLoop__FP11FIGHT_FLOORUc(void)
-
+u32 _fightActionFlowAllFightOutPokemonDoFightActionOneLoop__FP11FIGHT_FLOORUc(void* fightFloor, u8 phase)
 {
-    u32 r3;
-    char r4;
-
     extern short fn_801EF634();
     extern short fightActionGetKindDataId();
     extern void fightActionFlowFifo();
@@ -671,7 +655,7 @@ u32 _fightActionFlowAllFightOutPokemonDoFightActionOneLoop__FP11FIGHT_FLOORUc(vo
     if (7 < (uVar10 & 0xffff)) {
       return 1;
     }
-    iVar3 = fightFloorGetStatus(r3,0,0x59,uVar10);
+    iVar3 = fightFloorGetStatus(fightFloor,0,0x59,uVar10);
     if (iVar3 != 0) {
       cVar7 = fightOutPokemonCheckFightOut();
       if (cVar7 == 0) {
@@ -687,7 +671,7 @@ u32 _fightActionFlowAllFightOutPokemonDoFightActionOneLoop__FP11FIGHT_FLOORUc(vo
           if (cVar7 == 0) {
             pokemonSetStatus(iVar3,0,0x112,0,1);
           }
-          else if (r4 == 0) {
+          else if (phase == 0) {
             sVar6 = fightActionGetKindDataId(iVar4);
             if (sVar6 == 8) {
 LAB_00208d8c:
@@ -707,7 +691,7 @@ LAB_00208d8c:
                   iVar3 = iVar3 + -1;
                 } while (iVar3 != 0);
                 fightActionFlowFifo(local_48);
-                if (r4 != 0) {
+                if (phase != 0) {
                   fightFloorInitFightTarget(0);
                   sVar6 = fn_801EF634();
                   if (sVar6 != 0) {
@@ -825,7 +809,7 @@ u32 fightActionFlowKaisiPost(void* ctx) {
     fightFloorSetMeetEnemyFightPokemonEnemySideAll(0);
     fightFloorRegistFightTrainerEnemyPokemonFightSideAll(0);
     fightFloorCreateFightPokemonEnemyAryEnemySideAll(0);
-    fightFloorSetStatus(0, 0, 0x5B, 0, (u32)fn_800E0C54());
+    fightFloorSetStatus(0, 0, 0x5B, 0, fn_800E0C54());
     fn_801DA7AC();
     return 1;
 }
@@ -1312,99 +1296,78 @@ u32 fightActionFlowKaisiNyuujouPokemon(void)
   return uVar3;
 }
 
-/* Address: 0x8020CFE0 | Size: 0x21c | Ghidra import */
-void _fightActionFlowKaisiNyuujouPokemonSubAppearMsg__FP13FIGHT_TRAINERP15FightOutPokemonUsUsUsUsUc(void)
-
+/* Address: 0x8020CFE0 | Size: 0x21c */
+void _fightActionFlowKaisiNyuujouPokemonSubAppearMsg__FP13FIGHT_TRAINERP15FightOutPokemonUsUsUsUsUc(
+    u32 trainer, u32 fightOutPokemon, u16 trainerCount, u16 fightOutCount, u16 trainerIndex,
+    u16 pokemonIndex, u8 mode)
 {
-    u32 r3;
-    u32 r4;
-    u16 r5;
-    u16 r6;
-    u32 r7;
-    short r8;
-    char r9;
-
     extern void msgctrlSetValue();
     extern u32 fn_801F18DC();
     extern int fn_801F8000();
     extern u32 fightOutPokemonIsGcHeroFightOutPokemon();
     extern u32 fightOutPokemonGetPokemonPtr();
     extern void fightMenuOpenMsg();
-  u32 uVar1;
-  u32 uVar2;
-  int iVar3;
-  u32 uVar4;
-  
-  uVar1 = fightOutPokemonIsGcHeroFightOutPokemon(r4);
-  uVar1 = __cntlzw(1 - (uVar1 & 0xff));
-  uVar1 = uVar1 >> 5;
-  uVar2 = fn_801F18DC(0);
-  uVar2 = __cntlzw(1 - (uVar2 & 0xff));
-  uVar2 = uVar2 >> 5;
-  iVar3 = fn_801F8000(r3);
-  if ((iVar3 == 0) && ((uVar1 & 0xff) == 0)) {
-    uVar2 = 1;
-  }
-  uVar4 = fightOutPokemonGetPokemonPtr(r4);
-  uVar4 = (int)pokemonGetStatus(uVar4,0,0x77,0);
-  if (r9 == 0) {
-    if ((uVar2 & 0xff) == 1) {
-      if (r8 == 0) {
-        msgctrlSetValue(0x14,uVar4);
-        msgctrlSetValue(0x16,uVar4);
-      }
-      else {
-        msgctrlSetValue(0x15,uVar4);
-        msgctrlSetValue(0x17,uVar4);
-      }
+    u32 pokemonName;
+    u32 isHero;
+    u32 playerFlag;
+    int trainerKind;
+
+    isHero = fightOutPokemonIsGcHeroFightOutPokemon(fightOutPokemon);
+    isHero = __cntlzw(1 - (isHero & 0xff)) >> 5;
+    playerFlag = fn_801F18DC(0);
+    playerFlag = __cntlzw(1 - (playerFlag & 0xff)) >> 5;
+    trainerKind = fn_801F8000(trainer);
+    if ((trainerKind == 0) && ((isHero & 0xff) == 0)) {
+        playerFlag = 1;
     }
-    else if ((uVar1 & 0xff) == 1) {
-      if (r8 == 0) {
-        msgctrlSetValue(0x15,uVar4);
-        msgctrlSetValue(0x17,uVar4);
-      }
-      else {
-        msgctrlSetValue(0x14,uVar4);
-        msgctrlSetValue(0x16,uVar4);
-      }
+    pokemonName = fightOutPokemonGetPokemonPtr(fightOutPokemon);
+    pokemonName = (int)pokemonGetStatus(pokemonName, 0, 0x77, 0);
+    if (mode == 0) {
+        if ((playerFlag & 0xff) == 1) {
+            if (pokemonIndex == 0) {
+                msgctrlSetValue(0x14, pokemonName);
+                msgctrlSetValue(0x16, pokemonName);
+            } else {
+                msgctrlSetValue(0x15, pokemonName);
+                msgctrlSetValue(0x17, pokemonName);
+            }
+        } else if ((isHero & 0xff) == 1) {
+            if (pokemonIndex == 0) {
+                msgctrlSetValue(0x15, pokemonName);
+                msgctrlSetValue(0x17, pokemonName);
+            } else {
+                msgctrlSetValue(0x14, pokemonName);
+                msgctrlSetValue(0x16, pokemonName);
+            }
+        } else if (pokemonIndex == 0) {
+            msgctrlSetValue(0x14, pokemonName);
+            msgctrlSetValue(0x16, pokemonName);
+        } else {
+            msgctrlSetValue(0x15, pokemonName);
+            msgctrlSetValue(0x17, pokemonName);
+        }
+    } else if (mode == 1) {
+        if ((trainerCount < 2) && (1 < fightOutCount)) {
+            if ((playerFlag & 0xff) == 1) {
+                pokemonName = 0x7674;
+            } else if ((isHero & 0xff) == 1) {
+                pokemonName = 0x7679;
+            } else {
+                pokemonName = 0x7671;
+            }
+        } else {
+            msgctrlSetValue(0x14, pokemonName);
+            msgctrlSetValue(0x16, pokemonName);
+            if ((playerFlag & 0xff) == 1) {
+                pokemonName = 0x7673;
+            } else if ((isHero & 0xff) == 1) {
+                pokemonName = 0x7678;
+            } else {
+                pokemonName = 0x7670;
+            }
+        }
+        fightMenuOpenMsg(pokemonName);
     }
-    else if (r8 == 0) {
-      msgctrlSetValue(0x14,uVar4);
-      msgctrlSetValue(0x16,uVar4);
-    }
-    else {
-      msgctrlSetValue(0x15,uVar4);
-      msgctrlSetValue(0x17,uVar4);
-    }
-  }
-  else if (r9 == 1) {
-    if ((r5 < 2) && (1 < r6)) {
-      if ((uVar2 & 0xff) == 1) {
-        uVar4 = 0x7674;
-      }
-      else if ((uVar1 & 0xff) == 1) {
-        uVar4 = 0x7679;
-      }
-      else {
-        uVar4 = 0x7671;
-      }
-    }
-    else {
-      msgctrlSetValue(0x14,uVar4);
-      msgctrlSetValue(0x16,uVar4);
-      if ((uVar2 & 0xff) == 1) {
-        uVar4 = 0x7673;
-      }
-      else if ((uVar1 & 0xff) == 1) {
-        uVar4 = 0x7678;
-      }
-      else {
-        uVar4 = 0x7670;
-      }
-    }
-    fightMenuOpenMsg(uVar4);
-  }
-  return;
 }
 
 /* Address: 0x8020D1FC | Size: 0x49c | Ghidra import */
@@ -1568,7 +1531,6 @@ u32 fightActionFlowKaisiNyuujouTrainer(void)
 
 /* Address: 0x8020D698 | Size: 0xec | Ghidra import */
 u32 fightActionFlowKaijou(void)
-
 {
     extern u32 fn_801EF624();
     extern u32 fightTargetGetPtr();
