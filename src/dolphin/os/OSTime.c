@@ -72,6 +72,8 @@ s64 __OSGetSystemTime(void) {
 /* ========================================================== */
 
 /* GetDates - 0x800A27FC | size: 0x19C */
+#pragma push
+#pragma dont_inline on
 void GetDates(s32 days, OSCalendarTime* td) {
     extern int lbl_80311878[];
     extern int lbl_803118A8[];
@@ -100,6 +102,7 @@ void GetDates(s32 days, OSCalendarTime* td) {
     td->mon = month;
     td->mday = days - md[month] + 1;
 }
+#pragma pop
 
 /* OSTicksToCalendarTime - 0x800A2998 | size: 0x204 */
 void OSTicksToCalendarTime(s64 ticks, OSCalendarTime* td) {
