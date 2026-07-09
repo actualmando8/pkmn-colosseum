@@ -471,6 +471,16 @@ extern u32 lbl_8047CB50;
 extern u32 lbl_8047CB48;
 extern u32 lbl_8047AB3C;
 
+typedef struct GSgfxStatePartial {
+    /* 0x000 */ s32 recordMode;
+    /* 0x004 */ u8 pad_004[0x4A0];
+    /* 0x4A4 */ u8 fifoAttrBase;
+    /* 0x4A5 */ u8 pad_4A5[0x13];
+    /* 0x4B8 */ f32 fifoVecX;
+    /* 0x4BC */ f32 fifoVecY;
+    /* 0x4C0 */ f32 fifoVecZ;
+} GSgfxStatePartial;
+
 
 /* ==================================================================
  * Matrix accessor functions (0x800D7230 - 0x800D75D0)
@@ -489,6 +499,13 @@ extern u32 lbl_8047AB3C;
  *     stw r3, field(r4)        ; store value
  *     blr
  * ================================================================== */
+
+void fn_800D7230(void) {
+    GSgfxStatePartial* state = (GSgfxStatePartial*)lbl_8047AA80;
+    u8 value = state->fifoAttrBase;
+
+    *(volatile u8*)0xCC008000 = value + (value << 1);
+}
 
 /* ==================================================================
  * fn_800D892C -- GSgfx_ConfigurePipeline
@@ -973,6 +990,21 @@ asm void fn_800D75F4(void) {
 #include "src/game/gs_render_fn_800D75F4.inc"
 }
 #else
+void fn_800D75D0(void) {
+    GSgfxStatePartial* state = (GSgfxStatePartial*)lbl_8047AA80;
+    f32 x;
+    f32 y;
+    f32 z;
+
+    z = state->fifoVecZ;
+    y = state->fifoVecY;
+    x = state->fifoVecX;
+
+    *(volatile f32*)0xCC008000 = x;
+    *(volatile f32*)0xCC008000 = y;
+    *(volatile f32*)0xCC008000 = z;
+}
+
 void fn_800D75F4(u8* obj) {
     if (*(u32*)(lbl_8047AA80 + 0x24) == (u32)obj) *(u32*)(lbl_8047AA80 + 0x24) = 0;
     obj[0x008] = 0; obj[0x024] = 0; obj[0x040] = 0; obj[0x05c] = 0;
@@ -1881,4 +1913,3 @@ void fn_800D963C(u32 idx, s32 mode) {
     *(u32*)(state + 0x414) |= 4;
 }
 #endif
-
