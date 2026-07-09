@@ -2,7 +2,1632 @@
  * @file gs_model_main.c
  * @brief GSmodel core (render/update/list/API/null-joints; XD model.c mid-section)
  *
- * Split from gs_range_800E202C.c (0x800E3604-0x800E8684) — one XD source unit per
- * segment (Fable re-split, 2026-07-07). Functions asm-only until matched.
+ * Split from gs_range_800E202C.c (0x800E3604-0x800E8684) - one XD source unit per
+ * segment (Fable re-split, 2026-07-07). Functions are decompiled incrementally.
  */
 #include "dolphin/types.h"
+
+#define GSMODEL_FLAG_ACTIVE 0x00000001U
+#define GSMODEL_FLAG_VISIBLE 0x00000002U
+#define GSMODEL_FLAG_RENDER_ALT_JOBJ 0x00000080U
+#define GSMODEL_FLAG_PARTICLE_TEXSTAGE 0x00000200U
+#define GSMODEL_FLAG_PARTICLE_LINKED 0x00000400U
+#define GSMODEL_FLAG_BOUND_CHECK 0x00100000U
+#define GSMODEL_FLAG_ROOT_NULL_ADDED 0x00020000U
+#define GSJOBJ_DESC_FLAG_INSTANCE 0x00001000U
+#define JOBJ_MTX_DIRTY 0x00000040U
+#define JOBJ_USE_QUATERNION 0x00020000U
+#define JOBJ_USER_DEF_MTX 0x00800000U
+#define JOBJ_MTX_INDEP_SRT 0x02000000U
+#define JOBJ_SET_MTX_FLAGS 0x03800000U
+
+typedef struct GSvec {
+    f32 x;
+    f32 y;
+    f32 z;
+} GSvec;
+
+typedef struct GScolor {
+    u8 r;
+    u8 g;
+    u8 b;
+    u8 a;
+} GScolor;
+
+typedef struct GSmaterial {
+    u8 _pad0;
+    u8 alpha;
+} GSmaterial;
+
+typedef struct GSbound {
+    u8 _pad[0x34];
+} GSbound;
+
+typedef struct GSmodelMaterialList {
+    GSmaterial* materials[1];
+} GSmodelMaterialList;
+
+typedef struct GSjobjDesc {
+    void* className;
+    u32 flags;
+    struct GSjobjDesc* child;
+    struct GSjobjDesc* next;
+    void* dobj;
+    GSvec rotation;
+    GSvec scale;
+    GSvec position;
+    void* robj;
+    void* aobj;
+} GSjobjDesc;
+
+typedef struct GSmodelResource {
+    GSjobjDesc* joint;
+} GSmodelResource;
+
+typedef struct GSpart GSpart;
+
+typedef struct HSDJObj {
+    /* 0x000 */ u8 _pad000[0x10];
+    /* 0x010 */ struct HSDJObj* child;
+    /* 0x014 */ u32 flags;
+    /* 0x018 */ void* data;
+    /* 0x01C */ GSvec rotation;
+    /* 0x028 */ f32 rotationW;
+    /* 0x02C */ GSvec scale;
+    /* 0x038 */ GSvec translate;
+    /* 0x044 */ f32 matrix[3][4];
+} HSDJObj;
+
+typedef union GSmodelFlags {
+    u32 raw;
+    struct {
+        u32 pad00_10 : 11;
+        u32 boundCheck : 1;
+        u32 pad12_13 : 2;
+        u32 rootNullAdded : 1;
+        u32 pad15_20 : 6;
+        u32 particleLinked : 1;
+        u32 particleTexStage : 1;
+        u32 pad23 : 1;
+        u32 renderAltJObj : 1;
+        u32 pad25_29 : 5;
+        u32 visible : 1;
+        u32 active : 1;
+    } bits;
+} GSmodelFlags;
+
+typedef struct GSmodel {
+    /* 0x000 */ GSmodelFlags flags;
+    /* 0x004 */ void* resource;
+    /* 0x008 */ HSDJObj* renderJObj;
+    /* 0x00C */ HSDJObj* renderJObjAlt;
+    /* 0x010 */ HSDJObj* jobj10;
+    /* 0x014 */ HSDJObj* jobj14;
+    /* 0x018 */ GSvec position;
+    /* 0x024 */ GSvec rotation;
+    /* 0x030 */ GSvec scale;
+    /* 0x03C */ GSvec boundCenter;
+    /* 0x048 */ f32 boundYOffset;
+    /* 0x04C */ GSbound bound;
+    /* 0x080 */ u8 centerNullState;
+    /* 0x081 */ u8 _pad081[0x17];
+    /* 0x098 */ f32 animFrame;
+    /* 0x09C */ u8 _pad09C[0x78];
+    /* 0x114 */ s32 transformOverride;
+    /* 0x118 */ u8 _pad118[0x08];
+    /* 0x120 */ GSvec overridePosition;
+    /* 0x12C */ GSvec overrideRotation;
+    /* 0x138 */ GSvec overrideScale;
+    /* 0x144 */ void* linkedGSparticleBank;
+    /* 0x148 */ u32 gsParticleLinkAttachMode;
+    /* 0x14C */ GSmodelMaterialList* materialList;
+    /* 0x150 */ u16 materialCount;
+    /* 0x152 */ u16 modulationRefCount;
+    /* 0x154 */ u16 materialListHandle;
+    /* 0x156 */ u8 _pad156[0x1A];
+} GSmodel;
+
+extern GSmodel* lbl_8047AB74;
+extern u32 lbl_8047AB78;
+extern u16 lbl_8047AB70;
+
+extern void GSvecCopy(GSvec* dst, const GSvec* src);
+extern void GSmodelSetAnimFrame(GSmodel* model, f32 frame);
+extern GSmodel* _modelLoad(GSmodelResource* resource, void* joint, void* boundAnim);
+extern u32 _toolentryAlloc__FUl(u32 size);
+extern void* fn_800E27B0(u32 handle);
+extern void modelShadowInit__Fv(void);
+extern void fn_800EC134(GSmodel* model);
+extern void fn_80118874(void* bank, u32 destroyChildren);
+extern void fn_80118C20(void* bank, u32 visible);
+extern u32 fn_80191118(GSbound* bound);
+extern u32 GSmaterialGetEnabledExtensions(void* material);
+extern void GSmaterialGetModulate(void* material, GScolor* color);
+extern void GSmaterialSetModulate(void* material, const GScolor* color);
+extern void GSmaterialSetEnvMapBlendValue(void* material, f32 value);
+extern void GSmaterialSetAlpha(void* material, f32 alpha);
+extern void GSmaterialDisableExtension(void* material, u32 extension);
+extern void GSmaterialResetTexture(void* material);
+extern void GSmaterialResetPEdescr(void* material);
+extern void GSmaterialResetAlpha(void* material);
+extern void GSmaterialResetFlags(void* material);
+extern void fn_800DF608(void* material);
+extern void fn_800E24B0(u32 handle);
+extern void fn_800E209C(u32 handle);
+extern void modelShadowFreeModelList__FP8_GSmodel(GSmodel* model);
+extern void GSmodelRemoveNull(GSmodel* model);
+extern void modelRemoveCenterNull(GSmodel* model);
+extern void fn_801A05EC(void* object);
+extern void* memset(void* dst, int value, u32 size);
+extern void* memcpy(void* dst, const void* src, u32 size);
+extern void fn_8019D9DC(HSDJObj* jobj);
+extern void __assert(const char* file, u32 line, const char* message);
+extern char lbl_8047CB60[] __attribute__((section(".sdata2")));
+extern char lbl_8047CB68[] __attribute__((section(".sdata2")));
+extern char lbl_8047CB70[] __attribute__((section(".sdata2")));
+extern char lbl_8047CB78[] __attribute__((section(".sdata2")));
+extern char lbl_8047CB9C[] __attribute__((section(".sdata2")));
+extern char lbl_8047CBA4[] __attribute__((section(".sdata2")));
+extern char lbl_80270E28[];
+extern char lbl_80270E50[];
+extern char lbl_80270E60[];
+extern void clear__5GSvecFv(GSvec* vec);
+extern u8 modelProcessAt60fps__FP8_GSmodel(GSmodel* model);
+extern void GSmodelAdvanceAnimation(GSmodel* model, f32 frames);
+extern void PSMTXCopy(const f32 src[3][4], f32 dst[3][4]);
+extern void fn_8019D620(HSDJObj* jobj);
+extern GSpart* GSmodelGetPart(GSmodel* model, s32 index);
+extern void GSpartGetTransform(GSpart* part, GSvec* position, GSvec* rotation, GSvec* scale);
+extern void GSpartFree(GSpart* part);
+
+void fn_800E85E8(GSmodel* model);
+
+GSmodel* fn_800E3B08(u32 index)
+{
+    GSmodel* model;
+
+    if (index >= lbl_8047AB78) {
+        return NULL;
+    }
+
+    model = &lbl_8047AB74[index];
+    if (model->flags.raw & GSMODEL_FLAG_ACTIVE) {
+        return model;
+    }
+
+    return NULL;
+}
+
+u32 fn_800E3B3C(void)
+{
+    return lbl_8047AB78;
+}
+
+void fn_800E3B44(GSmodel* model, u8 enable)
+{
+    if (enable) {
+        model->flags.raw |= GSMODEL_FLAG_PARTICLE_LINKED;
+        return;
+    }
+
+    model->flags.raw &= ~GSMODEL_FLAG_PARTICLE_LINKED;
+}
+
+void fn_800E3884(u32 frames, u8 phase)
+{
+    u32 i;
+
+    i = 0;
+    while (i < lbl_8047AB78) {
+        GSmodel* model;
+
+        model = &lbl_8047AB74[i];
+        if (model->flags.raw & GSMODEL_FLAG_ACTIVE) {
+            if (modelProcessAt60fps__FP8_GSmodel(model) == phase) {
+                GSmodelAdvanceAnimation(model, (f32)frames);
+            }
+        }
+
+        i++;
+    }
+}
+
+GSmodel* GSmodelSearchModelList(void* jobj)
+{
+    u32 count;
+    GSmodel* model;
+    u32 flags;
+
+    count = lbl_8047AB78;
+    model = lbl_8047AB74;
+
+    while (count > 0) {
+        flags = model->flags.raw;
+        if (flags & GSMODEL_FLAG_ACTIVE) {
+            void* renderJObj;
+
+            if (flags & GSMODEL_FLAG_RENDER_ALT_JOBJ) {
+                renderJObj = model->renderJObjAlt;
+            } else {
+                renderJObj = model->renderJObj;
+            }
+
+            if (renderJObj == jobj) {
+                return model;
+            }
+        }
+
+        model++;
+        count--;
+    }
+
+    return NULL;
+}
+
+void GSmodelDestroyLinkedParticles(GSmodel* model)
+{
+    void* bank;
+
+    bank = model->linkedGSparticleBank;
+    if (bank != NULL) {
+        fn_80118874(bank, 1);
+    }
+}
+
+u32 GSmodelGetGSparticleLinkAttachMode(GSmodel* model)
+{
+    return model->gsParticleLinkAttachMode;
+}
+
+void* GSmodelGetLinkedGSparticleBank(GSmodel* model)
+{
+    return model->linkedGSparticleBank;
+}
+
+void GSmodelSetGSparticleLinkAttachMode(GSmodel* model, u32 mode)
+{
+    model->gsParticleLinkAttachMode = mode;
+}
+
+void GSmodelLinkToGSparticleBank(GSmodel* model, void* bank)
+{
+    if (model->linkedGSparticleBank != bank) {
+        model->linkedGSparticleBank = bank;
+        if (model->linkedGSparticleBank != NULL) {
+            GSmodelSetAnimFrame(model, model->animFrame);
+            fn_800EC134(model);
+        }
+    }
+}
+
+GSbound* GSmodelGetBound(GSmodel* model)
+{
+    return &model->bound;
+}
+
+u32 fn_800E3C64(GSmodel* model)
+{
+    return fn_80191118(&model->bound) != 0;
+}
+
+void GSmodelSetBoundCheck(GSmodel* model, u8 enable)
+{
+    if (enable) {
+        model->flags.raw |= GSMODEL_FLAG_BOUND_CHECK;
+        return;
+    }
+
+    model->flags.raw &= ~GSMODEL_FLAG_BOUND_CHECK;
+}
+
+u32 fn_800E3CBC(GSmodel* model)
+{
+    return (model->flags.raw & GSMODEL_FLAG_PARTICLE_TEXSTAGE) != 0;
+}
+
+void fn_800E3CC8(GSmodel* model, u8 enable)
+{
+    if (enable) {
+        model->flags.raw |= GSMODEL_FLAG_PARTICLE_TEXSTAGE;
+        return;
+    }
+
+    model->flags.raw &= ~GSMODEL_FLAG_PARTICLE_TEXSTAGE;
+}
+
+GSvec* GSmodelGetScalePtr(GSmodel* model)
+{
+    return &model->scale;
+}
+
+GSvec* GSmodelGetRotationPtr(GSmodel* model)
+{
+    return &model->rotation;
+}
+
+GSvec* GSmodelGetPositionPtr(GSmodel* model)
+{
+    return &model->position;
+}
+
+u32 GSmodelGetVisibility(GSmodel* model)
+{
+    return (model->flags.raw & GSMODEL_FLAG_VISIBLE) != 0;
+}
+
+void fn_800E3D14(GSmodel* model, GSvec* out)
+{
+    GSvecCopy(out, &model->boundCenter);
+}
+
+void GSmodelGetScale(GSmodel* model, GSvec* out)
+{
+    GSvecCopy(out, &model->scale);
+}
+
+void GSmodelGetRotation(GSmodel* model, GSvec* out)
+{
+    GSvecCopy(out, &model->rotation);
+}
+
+void GSmodelGetPosition(GSmodel* model, GSvec* out)
+{
+    GSvecCopy(out, &model->position);
+}
+
+void GSmodelSetVisibility(GSmodel* model, u8 visible)
+{
+    if (visible) {
+        model->flags.raw |= GSMODEL_FLAG_VISIBLE;
+        if (model->linkedGSparticleBank != NULL) {
+            fn_80118C20(model->linkedGSparticleBank, 1);
+        }
+    } else {
+        model->flags.raw &= ~GSMODEL_FLAG_VISIBLE;
+        if (model->linkedGSparticleBank != NULL) {
+            fn_80118C20(model->linkedGSparticleBank, 0);
+        }
+    }
+}
+
+void* modelGetRenderJObj(GSmodel* model)
+{
+    if (model->flags.raw & GSMODEL_FLAG_RENDER_ALT_JOBJ) {
+        return model->renderJObjAlt;
+    }
+
+    return model->renderJObj;
+}
+
+GSmodel* GSmodelLoad(GSmodelResource* resource, void* unused, void* boundAnim)
+{
+    (void)unused;
+    return _modelLoad(resource, resource->joint, boundAnim);
+}
+
+void GSmodelInit(u32 count)
+{
+    u16 handle;
+
+    lbl_8047AB78 = count;
+    handle = _toolentryAlloc__FUl(count * sizeof(GSmodel));
+    lbl_8047AB70 = handle;
+
+    if (handle != 0) {
+        u32 i;
+
+        lbl_8047AB74 = fn_800E27B0(handle);
+
+        i = 0;
+        while (i < lbl_8047AB78) {
+            lbl_8047AB74[i].flags.raw = 0;
+            i++;
+        }
+
+        modelShadowInit__Fv();
+    }
+}
+
+void GSmodelFree(GSmodel* model)
+{
+    modelShadowFreeModelList__FP8_GSmodel(model);
+    fn_800E85E8(model);
+    GSmodelRemoveNull(model);
+
+    if (model->centerNullState != 0) {
+        model->centerNullState = 1;
+        modelRemoveCenterNull(model);
+    }
+
+    fn_801A05EC(model->renderJObj);
+
+    if (model->renderJObjAlt != NULL) {
+        fn_801A05EC(model->renderJObjAlt);
+        fn_801A05EC(model->jobj10);
+        fn_801A05EC(model->jobj14);
+    }
+
+    if (model->linkedGSparticleBank != NULL) {
+        fn_80118874(model->linkedGSparticleBank, 1);
+    }
+
+    memset(model, 0, sizeof(GSmodel));
+}
+
+GSmodel* GSmodelClone(GSmodel* model)
+{
+    GSjobjDesc desc;
+    GSmodelResource* resource;
+    GSjobjDesc* root;
+
+    desc.className = NULL;
+    resource = model->resource;
+    root = resource->joint;
+    desc.flags = root->flags | GSJOBJ_DESC_FLAG_INSTANCE;
+    desc.child = root;
+    desc.next = NULL;
+    desc.dobj = NULL;
+    desc.rotation.x = 0.0f;
+    desc.rotation.y = 0.0f;
+    desc.rotation.z = 0.0f;
+    desc.scale.x = 1.0f;
+    desc.scale.y = 1.0f;
+    desc.scale.z = 1.0f;
+    desc.position.x = 0.0f;
+    desc.position.y = 0.0f;
+    desc.position.z = 0.0f;
+    desc.robj = NULL;
+    desc.aobj = NULL;
+
+    return _modelLoad(resource, &desc, root);
+}
+
+void* GSmodelGetMatrixPtr(GSmodel* model)
+{
+    HSDJObj* jobj;
+
+    jobj = model->renderJObj;
+    if (jobj != NULL) {
+        s32 dirty;
+        u32 flags;
+
+        if (jobj == NULL) {
+            __assert(lbl_8047CB60, 0x25D, lbl_8047CB68);
+        }
+
+        flags = jobj->flags;
+        dirty = 0;
+        if (!(flags & JOBJ_USER_DEF_MTX)) {
+            if (flags & JOBJ_MTX_DIRTY) {
+                dirty = 1;
+            }
+        }
+
+        if (dirty != 0) {
+            fn_8019D9DC(jobj);
+        }
+    }
+
+    return &model->renderJObj->matrix;
+}
+
+void GSmodelSetMatrix(GSmodel* model, const f32 matrix[3][4])
+{
+    HSDJObj* jobj;
+
+    jobj = model->renderJObj;
+    if (jobj == NULL) {
+        __assert(lbl_8047CB60, 0x495, lbl_8047CB68);
+    }
+
+    if (matrix == NULL) {
+        __assert(lbl_8047CB60, 0x496, lbl_8047CB78);
+    }
+
+    PSMTXCopy(matrix, jobj->matrix);
+    jobj->flags |= JOBJ_SET_MTX_FLAGS;
+
+    if (jobj != NULL) {
+        s32 dirty;
+        u32 flags;
+
+        if (jobj == NULL) {
+            __assert(lbl_8047CB60, 0x25D, lbl_8047CB68);
+        }
+
+        flags = jobj->flags;
+        dirty = 0;
+        if (!(flags & JOBJ_USER_DEF_MTX)) {
+            if (flags & JOBJ_MTX_DIRTY) {
+                dirty = 1;
+            }
+        }
+
+        if (dirty == 0) {
+            fn_8019D620(jobj);
+        }
+    }
+}
+
+void modelSetScl(GSmodel* model, GSvec* scale)
+{
+    HSDJObj* jobj;
+
+    GSvecCopy(&model->scale, scale);
+
+    jobj = model->renderJObj;
+    if (jobj == NULL) {
+        __assert(lbl_8047CB60, 0x316, lbl_8047CB68);
+    }
+
+    if (scale == NULL) {
+        __assert(lbl_8047CB60, 0x317, lbl_8047CB70);
+    }
+
+    jobj->scale = *scale;
+
+    if (!(jobj->flags & JOBJ_MTX_INDEP_SRT)) {
+        if (jobj != NULL) {
+            s32 dirty;
+            u32 flags;
+
+            if (jobj == NULL) {
+                __assert(lbl_8047CB60, 0x25D, lbl_8047CB68);
+            }
+
+            flags = jobj->flags;
+            dirty = 0;
+            if (!(flags & JOBJ_USER_DEF_MTX)) {
+                if (flags & JOBJ_MTX_DIRTY) {
+                    dirty = 1;
+                }
+            }
+
+            if (dirty == 0) {
+                fn_8019D620(jobj);
+            }
+        }
+    }
+}
+
+void GSmodelSetScale(GSmodel* model, GSvec* scale)
+{
+    if (model->transformOverride == 0) {
+        HSDJObj* jobj;
+
+        GSvecCopy(&model->scale, scale);
+
+        jobj = model->renderJObj;
+        if (jobj == NULL) {
+            __assert(lbl_8047CB60, 0x316, lbl_8047CB68);
+        }
+
+        if (scale == NULL) {
+            __assert(lbl_8047CB60, 0x317, lbl_8047CB70);
+        }
+
+        jobj->scale = *scale;
+
+        if (!(jobj->flags & JOBJ_MTX_INDEP_SRT)) {
+            if (jobj != NULL) {
+                s32 dirty;
+                u32 flags;
+
+                if (jobj == NULL) {
+                    __assert(lbl_8047CB60, 0x25D, lbl_8047CB68);
+                }
+
+                flags = jobj->flags;
+                dirty = 0;
+                if (!(flags & JOBJ_USER_DEF_MTX)) {
+                    if (flags & JOBJ_MTX_DIRTY) {
+                        dirty = 1;
+                    }
+                }
+
+                if (dirty == 0) {
+                    fn_8019D620(jobj);
+                }
+            }
+        }
+    } else {
+        GSvecCopy(&model->overrideScale, scale);
+    }
+}
+
+void GSmodelSetRotation(GSmodel* model, GSvec* rotation)
+{
+    HSDJObj* jobj;
+    f32 value;
+
+    if (model->transformOverride == 0) {
+        GSvecCopy(&model->rotation, rotation);
+
+        jobj = model->renderJObj;
+        value = rotation->x;
+        if (jobj == NULL) {
+            __assert(lbl_8047CB60, 0x2A4, lbl_8047CB68);
+        }
+
+        if (jobj->flags & JOBJ_USE_QUATERNION) {
+            __assert(lbl_8047CB60, 0x2A5, lbl_80270E28);
+        }
+
+        jobj->rotation.x = value;
+        if (!(jobj->flags & JOBJ_MTX_INDEP_SRT)) {
+            if (jobj != NULL) {
+                s32 dirty;
+                u32 flags;
+
+                if (jobj == NULL) {
+                    __assert(lbl_8047CB60, 0x25D, lbl_8047CB68);
+                }
+
+                flags = jobj->flags;
+                dirty = 0;
+                if (!(flags & JOBJ_USER_DEF_MTX)) {
+                    if (flags & JOBJ_MTX_DIRTY) {
+                        dirty = 1;
+                    }
+                }
+
+                if (dirty == 0) {
+                    fn_8019D620(jobj);
+                }
+            }
+        }
+
+        jobj = model->renderJObj;
+        value = rotation->y;
+        if (jobj == NULL) {
+            __assert(lbl_8047CB60, 0x2B8, lbl_8047CB68);
+        }
+
+        if (jobj->flags & JOBJ_USE_QUATERNION) {
+            __assert(lbl_8047CB60, 0x2B9, lbl_80270E28);
+        }
+
+        jobj->rotation.y = value;
+        if (!(jobj->flags & JOBJ_MTX_INDEP_SRT)) {
+            if (jobj != NULL) {
+                s32 dirty;
+                u32 flags;
+
+                if (jobj == NULL) {
+                    __assert(lbl_8047CB60, 0x25D, lbl_8047CB68);
+                }
+
+                flags = jobj->flags;
+                dirty = 0;
+                if (!(flags & JOBJ_USER_DEF_MTX)) {
+                    if (flags & JOBJ_MTX_DIRTY) {
+                        dirty = 1;
+                    }
+                }
+
+                if (dirty == 0) {
+                    fn_8019D620(jobj);
+                }
+            }
+        }
+
+        {
+            HSDJObj* zJObj;
+
+            zJObj = model->renderJObj;
+            value = rotation->z;
+            if (zJObj == NULL) {
+                __assert(lbl_8047CB60, 0x2CC, lbl_8047CB68);
+            }
+
+            if (zJObj->flags & JOBJ_USE_QUATERNION) {
+                __assert(lbl_8047CB60, 0x2CD, lbl_80270E28);
+            }
+
+            zJObj->rotation.z = value;
+            if (!(zJObj->flags & JOBJ_MTX_INDEP_SRT)) {
+                if (zJObj != NULL) {
+                s32 dirty;
+                u32 flags;
+
+                if (zJObj == NULL) {
+                    __assert(lbl_8047CB60, 0x25D, lbl_8047CB68);
+                }
+
+                flags = zJObj->flags;
+                dirty = 0;
+                if (!(flags & JOBJ_USER_DEF_MTX)) {
+                    if (flags & JOBJ_MTX_DIRTY) {
+                        dirty = 1;
+                    }
+                }
+
+                if (dirty == 0) {
+                    fn_8019D620(zJObj);
+                }
+            }
+        }
+        }
+    } else {
+        GSvecCopy(&model->overrideRotation, rotation);
+    }
+}
+
+void modelSetRot(GSmodel* model, GSvec* rotation)
+{
+    HSDJObj* jobj;
+    f32 value;
+
+    GSvecCopy(&model->rotation, rotation);
+
+    jobj = model->renderJObj;
+    value = rotation->x;
+    if (jobj == NULL) {
+        __assert(lbl_8047CB60, 0x2A4, lbl_8047CB68);
+    }
+
+    if (jobj->flags & JOBJ_USE_QUATERNION) {
+        __assert(lbl_8047CB60, 0x2A5, lbl_80270E28);
+    }
+
+    jobj->rotation.x = value;
+    if (!(jobj->flags & JOBJ_MTX_INDEP_SRT)) {
+        if (jobj != NULL) {
+            s32 dirty;
+            u32 flags;
+
+            if (jobj == NULL) {
+                __assert(lbl_8047CB60, 0x25D, lbl_8047CB68);
+            }
+
+            flags = jobj->flags;
+            dirty = 0;
+            if (!(flags & JOBJ_USER_DEF_MTX)) {
+                if (flags & JOBJ_MTX_DIRTY) {
+                    dirty = 1;
+                }
+            }
+
+            if (dirty == 0) {
+                fn_8019D620(jobj);
+            }
+        }
+    }
+
+    jobj = model->renderJObj;
+    value = rotation->y;
+    if (jobj == NULL) {
+        __assert(lbl_8047CB60, 0x2B8, lbl_8047CB68);
+    }
+
+    if (jobj->flags & JOBJ_USE_QUATERNION) {
+        __assert(lbl_8047CB60, 0x2B9, lbl_80270E28);
+    }
+
+    jobj->rotation.y = value;
+    if (!(jobj->flags & JOBJ_MTX_INDEP_SRT)) {
+        if (jobj != NULL) {
+            s32 dirty;
+            u32 flags;
+
+            if (jobj == NULL) {
+                __assert(lbl_8047CB60, 0x25D, lbl_8047CB68);
+            }
+
+            flags = jobj->flags;
+            dirty = 0;
+            if (!(flags & JOBJ_USER_DEF_MTX)) {
+                if (flags & JOBJ_MTX_DIRTY) {
+                    dirty = 1;
+                }
+            }
+
+            if (dirty == 0) {
+                fn_8019D620(jobj);
+            }
+        }
+    }
+
+    {
+        HSDJObj* zJObj;
+
+        zJObj = model->renderJObj;
+        value = rotation->z;
+        if (zJObj == NULL) {
+            __assert(lbl_8047CB60, 0x2CC, lbl_8047CB68);
+        }
+
+        if (zJObj->flags & JOBJ_USE_QUATERNION) {
+            __assert(lbl_8047CB60, 0x2CD, lbl_80270E28);
+        }
+
+        zJObj->rotation.z = value;
+        if (!(zJObj->flags & JOBJ_MTX_INDEP_SRT)) {
+            if (zJObj != NULL) {
+                s32 dirty;
+                u32 flags;
+
+                if (zJObj == NULL) {
+                    __assert(lbl_8047CB60, 0x25D, lbl_8047CB68);
+                }
+
+                flags = zJObj->flags;
+                dirty = 0;
+                if (!(flags & JOBJ_USER_DEF_MTX)) {
+                    if (flags & JOBJ_MTX_DIRTY) {
+                        dirty = 1;
+                    }
+                }
+
+                if (dirty == 0) {
+                    fn_8019D620(zJObj);
+                }
+            }
+        }
+    }
+}
+
+void modelSetPos(GSmodel* model, GSvec* position)
+{
+    HSDJObj* jobj;
+
+    GSvecCopy(&model->position, position);
+
+    jobj = model->renderJObj;
+    if (jobj == NULL) {
+        __assert(lbl_8047CB60, 0x3A9, lbl_8047CB68);
+    }
+
+    if (position == NULL) {
+        __assert(lbl_8047CB60, 0x3AA, lbl_80270E50);
+    }
+
+    jobj->translate = *position;
+
+    if (!(jobj->flags & JOBJ_MTX_INDEP_SRT)) {
+        if (jobj != NULL) {
+            s32 dirty;
+            u32 flags;
+
+            if (jobj == NULL) {
+                __assert(lbl_8047CB60, 0x25D, lbl_8047CB68);
+            }
+
+            flags = jobj->flags;
+            dirty = 0;
+            if (!(flags & JOBJ_USER_DEF_MTX)) {
+                if (flags & JOBJ_MTX_DIRTY) {
+                    dirty = 1;
+                }
+            }
+
+            if (dirty == 0) {
+                fn_8019D620(jobj);
+            }
+        }
+    }
+}
+
+void GSmodelSetPosition(GSmodel* model, GSvec* position)
+{
+    if (model->transformOverride == 0) {
+        HSDJObj* jobj;
+
+        GSvecCopy(&model->position, position);
+
+        jobj = model->renderJObj;
+        if (jobj == NULL) {
+            __assert(lbl_8047CB60, 0x3A9, lbl_8047CB68);
+        }
+
+        if (position == NULL) {
+            __assert(lbl_8047CB60, 0x3AA, lbl_80270E50);
+        }
+
+        jobj->translate = *position;
+
+        if (!(jobj->flags & JOBJ_MTX_INDEP_SRT)) {
+            if (jobj != NULL) {
+                s32 dirty;
+                u32 flags;
+
+                if (jobj == NULL) {
+                    __assert(lbl_8047CB60, 0x25D, lbl_8047CB68);
+                }
+
+                flags = jobj->flags;
+                dirty = 0;
+                if (!(flags & JOBJ_USER_DEF_MTX)) {
+                    if (flags & JOBJ_MTX_DIRTY) {
+                        dirty = 1;
+                    }
+                }
+
+                if (dirty == 0) {
+                    fn_8019D620(jobj);
+                }
+            }
+        }
+    } else {
+        GSvecCopy(&model->overridePosition, position);
+    }
+
+    if (model->flags.raw & GSMODEL_FLAG_RENDER_ALT_JOBJ) {
+        memcpy(&model->boundCenter, &model->position, sizeof(GSvec));
+    } else {
+        GSpart* part;
+
+        part = GSmodelGetPart(model, 1);
+        if (part == NULL) {
+            memcpy(&model->boundCenter, &model->position, sizeof(GSvec));
+        } else {
+            GSpartGetTransform(part, &model->boundCenter, NULL, NULL);
+            GSpartFree(part);
+            model->boundCenter.y -= model->boundYOffset;
+        }
+    }
+}
+
+void GSmodelGetRootPosition(GSmodel* model, GSvec* out)
+{
+    HSDJObj* jobj;
+
+    jobj = model->renderJObj;
+    if (model->flags.raw & GSMODEL_FLAG_ROOT_NULL_ADDED) {
+        HSDJObj* child;
+
+        child = jobj->child;
+        if (child == NULL) {
+            __assert(lbl_8047CB9C, 0x3E4, lbl_8047CBA4);
+        }
+
+        if (out == NULL) {
+            __assert(lbl_8047CB9C, 0x3E5, lbl_80270E60);
+        }
+
+        *out = child->translate;
+    } else {
+        clear__5GSvecFv(out);
+    }
+}
+
+u32 GSmodelIsModulationEnabled(GSmodel* model)
+{
+    void* material;
+
+    if (model->materialCount == 0) {
+        return 0;
+    }
+
+    material = model->materialList->materials[0];
+    if (material == NULL) {
+        return 0;
+    }
+
+    return GSmaterialGetEnabledExtensions(material) & 1;
+}
+
+void GSmodelGetModulationColor(GSmodel* model, GScolor* color)
+{
+    u8 enabled;
+
+    if (model->materialCount == 0) {
+        enabled = 0;
+    } else {
+        void* material;
+
+        material = model->materialList->materials[0];
+        if (material == NULL) {
+            enabled = 0;
+        } else if (GSmaterialGetEnabledExtensions(material) & 1) {
+            enabled = 1;
+        } else {
+            enabled = 0;
+        }
+    }
+
+    if (enabled) {
+        GSmaterialGetModulate(model->materialList->materials[0], color);
+    } else {
+        color->b = 0x7f;
+        color->g = 0x7f;
+        color->r = 0x7f;
+        color->a = 0xff;
+    }
+}
+
+void GSmodelSetModulationColor(GSmodel* model, const GScolor* color)
+{
+    u32 i;
+    u16 count;
+    GSmodelMaterialList* materialEntry;
+
+    i = 0;
+    count = model->materialCount;
+    materialEntry = model->materialList;
+
+    while ((u16)i < count) {
+        void* material;
+
+        material = materialEntry->materials[0];
+        if (material != NULL) {
+            GSmaterialSetModulate(material, color);
+        }
+
+        i++;
+        materialEntry++;
+    }
+}
+
+u32 GSmodelIsEnvMapEnabled(GSmodel* model)
+{
+    void* material;
+
+    if (model->materialCount == 0) {
+        return 0;
+    }
+
+    material = model->materialList->materials[0];
+    if (material == NULL) {
+        return 0;
+    }
+
+    return (GSmaterialGetEnabledExtensions(material) >> 2) & 1;
+}
+
+void GSmodelSetEnvMapBlendValue(GSmodel* model, f32 value)
+{
+    u8 enabled;
+
+    if (model->materialCount == 0) {
+        enabled = 0;
+    } else {
+        void* material;
+
+        material = model->materialList->materials[0];
+        if (material == NULL) {
+            enabled = 0;
+        } else if (GSmaterialGetEnabledExtensions(material) & 4) {
+            enabled = 1;
+        } else {
+            enabled = 0;
+        }
+    }
+
+    if (enabled) {
+        u32 i;
+        s32 count;
+
+        count = model->materialCount;
+        if (count != 0) {
+            GSmodelMaterialList* materialEntry;
+
+            materialEntry = model->materialList;
+            i = 0;
+            while ((s32)i < count) {
+                void* material;
+
+                material = materialEntry->materials[0];
+                if (material != NULL) {
+                    GSmaterialSetEnvMapBlendValue(material, value);
+                }
+
+                i++;
+                materialEntry++;
+            }
+        }
+    }
+}
+
+void GSmodelResetTextureChange(GSmodel* model)
+{
+    u16 refs;
+
+    refs = model->modulationRefCount;
+    if (refs != 0) {
+        u32 handle;
+        s32 i;
+        s32 count;
+        GSmodelMaterialList* materialEntry;
+
+        materialEntry = model->materialList;
+        count = model->materialCount;
+        i = 0;
+        model->modulationRefCount = refs - 1;
+
+        while (i < count) {
+            void* material;
+
+            material = materialEntry->materials[0];
+            if (material != NULL) {
+                GSmaterialResetTexture(material);
+            }
+
+            i++;
+            materialEntry++;
+        }
+
+        if (model->modulationRefCount == 0) {
+            count = model->materialCount;
+            i = 0;
+            materialEntry = model->materialList;
+
+            while (i < count) {
+                void* material;
+
+                material = materialEntry->materials[0];
+                if (material != NULL) {
+                    fn_800DF608(material);
+                }
+
+                i++;
+                materialEntry++;
+            }
+
+            handle = model->materialListHandle;
+            if (handle != 0) {
+                fn_800E24B0(handle);
+                fn_800E209C(handle);
+            }
+
+            model->materialListHandle = 0;
+            model->materialCount = 0;
+            model->materialList = NULL;
+        }
+    }
+}
+
+void fn_800E5790(GSmodel* model)
+{
+    u16 refs;
+
+    refs = model->modulationRefCount;
+    if (refs != 0) {
+        GSmodelMaterialList* materialEntry;
+        s32 count;
+        s32 i;
+        u32 handle;
+
+        model->modulationRefCount = refs - 1;
+
+        if (model->modulationRefCount == 0) {
+            count = model->materialCount;
+            i = 0;
+            materialEntry = model->materialList;
+
+            while (i < count) {
+                GSmaterial* material;
+
+                material = materialEntry->materials[0];
+                if (material != NULL) {
+                    fn_800DF608(material);
+                }
+
+                i++;
+                materialEntry++;
+            }
+
+            handle = model->materialListHandle;
+            if (handle != 0) {
+                fn_800E24B0(handle);
+                fn_800E209C(handle);
+            }
+
+            model->materialListHandle = 0;
+            model->materialCount = 0;
+            model->materialList = NULL;
+        }
+    }
+}
+
+void GSmodelDisableModulation(GSmodel* model)
+{
+    u16 refs;
+
+    refs = model->modulationRefCount;
+    if (refs != 0) {
+        GSmodelMaterialList* materialEntry;
+        s32 count;
+        s32 i;
+        u32 handle;
+
+        materialEntry = model->materialList;
+        count = model->materialCount;
+        model->modulationRefCount = refs - 1;
+
+        if (model->modulationRefCount == 0) {
+            count = model->materialCount;
+            i = 0;
+            materialEntry = model->materialList;
+
+            while (i < count) {
+                GSmaterial* material;
+
+                material = materialEntry->materials[0];
+                if (material != NULL) {
+                    fn_800DF608(material);
+                }
+
+                i++;
+                materialEntry++;
+            }
+
+            handle = model->materialListHandle;
+            if (handle != 0) {
+                fn_800E24B0(handle);
+                fn_800E209C(handle);
+            }
+
+            model->materialListHandle = 0;
+            model->materialCount = 0;
+            model->materialList = NULL;
+        } else {
+            i = 0;
+            while (i < count) {
+                GSmaterial* material;
+
+                material = materialEntry->materials[0];
+                if (material != NULL) {
+                    GSmaterialDisableExtension(material, 1);
+                }
+
+                i++;
+                materialEntry++;
+            }
+        }
+    }
+}
+
+void GSmodelDisableColorSwap(GSmodel* model)
+{
+    u16 refs;
+
+    refs = model->modulationRefCount;
+    if (refs != 0) {
+        GSmodelMaterialList* materialEntry;
+        s32 count;
+        s32 i;
+        u32 handle;
+
+        materialEntry = model->materialList;
+        count = model->materialCount;
+        model->modulationRefCount = refs - 1;
+
+        if (model->modulationRefCount == 0) {
+            count = model->materialCount;
+            i = 0;
+            materialEntry = model->materialList;
+
+            while (i < count) {
+                GSmaterial* material;
+
+                material = materialEntry->materials[0];
+                if (material != NULL) {
+                    fn_800DF608(material);
+                }
+
+                i++;
+                materialEntry++;
+            }
+
+            handle = model->materialListHandle;
+            if (handle != 0) {
+                fn_800E24B0(handle);
+                fn_800E209C(handle);
+            }
+
+            model->materialListHandle = 0;
+            model->materialCount = 0;
+            model->materialList = NULL;
+        } else {
+            i = 0;
+            while (i < count) {
+                GSmaterial* material;
+
+                material = materialEntry->materials[0];
+                if (material != NULL) {
+                    GSmaterialDisableExtension(material, 2);
+                }
+
+                i++;
+                materialEntry++;
+            }
+        }
+    }
+}
+
+void GSmodelDisableEnvMap(GSmodel* model)
+{
+    u16 refs;
+
+    refs = model->modulationRefCount;
+    if (refs != 0) {
+        GSmodelMaterialList* materialEntry;
+        s32 count;
+        s32 i;
+        u32 handle;
+
+        materialEntry = model->materialList;
+        count = model->materialCount;
+        model->modulationRefCount = refs - 1;
+
+        if (model->modulationRefCount == 0) {
+            count = model->materialCount;
+            i = 0;
+            materialEntry = model->materialList;
+
+            while (i < count) {
+                GSmaterial* material;
+
+                material = materialEntry->materials[0];
+                if (material != NULL) {
+                    fn_800DF608(material);
+                }
+
+                i++;
+                materialEntry++;
+            }
+
+            handle = model->materialListHandle;
+            if (handle != 0) {
+                fn_800E24B0(handle);
+                fn_800E209C(handle);
+            }
+
+            model->materialListHandle = 0;
+            model->materialCount = 0;
+            model->materialList = NULL;
+        } else {
+            i = 0;
+            while (i < count) {
+                GSmaterial* material;
+
+                material = materialEntry->materials[0];
+                if (material != NULL) {
+                    GSmaterialDisableExtension(material, 4);
+                }
+
+                i++;
+                materialEntry++;
+            }
+        }
+    }
+}
+
+void GSmodelResetPEdescr(GSmodel* model)
+{
+    u16 refs;
+
+    refs = model->modulationRefCount;
+    if (refs != 0) {
+        u32 handle;
+        s32 i;
+        s32 count;
+        GSmodelMaterialList* materialEntry;
+
+        materialEntry = model->materialList;
+        count = model->materialCount;
+        i = 0;
+        model->modulationRefCount = refs - 1;
+
+        while (i < count) {
+            void* material;
+
+            material = materialEntry->materials[0];
+            if (material != NULL) {
+                GSmaterialResetPEdescr(material);
+            }
+
+            i++;
+            materialEntry++;
+        }
+
+        if (model->modulationRefCount == 0) {
+            count = model->materialCount;
+            i = 0;
+            materialEntry = model->materialList;
+
+            while (i < count) {
+                void* material;
+
+                material = materialEntry->materials[0];
+                if (material != NULL) {
+                    fn_800DF608(material);
+                }
+
+                i++;
+                materialEntry++;
+            }
+
+            handle = model->materialListHandle;
+            if (handle != 0) {
+                fn_800E24B0(handle);
+                fn_800E209C(handle);
+            }
+
+            model->materialListHandle = 0;
+            model->materialCount = 0;
+            model->materialList = NULL;
+        }
+    }
+}
+
+void GSmodelResetMaterialAlpha(GSmodel* model)
+{
+    u16 refs;
+
+    refs = model->modulationRefCount;
+    if (refs != 0) {
+        u32 handle;
+        s32 i;
+        s32 count;
+        GSmodelMaterialList* materialEntry;
+
+        materialEntry = model->materialList;
+        count = model->materialCount;
+        i = 0;
+        model->modulationRefCount = refs - 1;
+
+        while (i < count) {
+            void* material;
+
+            material = materialEntry->materials[0];
+            if (material != NULL) {
+                GSmaterialResetAlpha(material);
+            }
+
+            i++;
+            materialEntry++;
+        }
+
+        if (model->modulationRefCount == 0) {
+            count = model->materialCount;
+            i = 0;
+            materialEntry = model->materialList;
+
+            while (i < count) {
+                void* material;
+
+                material = materialEntry->materials[0];
+                if (material != NULL) {
+                    fn_800DF608(material);
+                }
+
+                i++;
+                materialEntry++;
+            }
+
+            handle = model->materialListHandle;
+            if (handle != 0) {
+                fn_800E24B0(handle);
+                fn_800E209C(handle);
+            }
+
+            model->materialListHandle = 0;
+            model->materialCount = 0;
+            model->materialList = NULL;
+        }
+    }
+}
+
+void GSmodelSetMaterialAlpha(GSmodel* model, f32 alpha)
+{
+    if (model->modulationRefCount != 0) {
+        s32 i;
+        s32 count;
+        GSmodelMaterialList* materialEntry;
+
+        count = model->materialCount;
+        i = 0;
+        materialEntry = model->materialList;
+
+        while (i < count) {
+            GSmaterial* material;
+
+            material = materialEntry->materials[0];
+            if (material != NULL) {
+                GSmaterialSetAlpha(material, ((f32)material->alpha * alpha) / 255.0f);
+            }
+
+            i++;
+            materialEntry++;
+        }
+    }
+}
+
+void GSmodelResetRenderFlags(GSmodel* model)
+{
+    u16 refs;
+
+    refs = model->modulationRefCount;
+    if (refs != 0) {
+        u32 handle;
+        s32 i;
+        s32 count;
+        GSmodelMaterialList* materialEntry;
+
+        materialEntry = model->materialList;
+        count = model->materialCount;
+        i = 0;
+        model->modulationRefCount = refs - 1;
+
+        while (i < count) {
+            void* material;
+
+            material = materialEntry->materials[0];
+            if (material != NULL) {
+                GSmaterialResetFlags(material);
+            }
+
+            i++;
+            materialEntry++;
+        }
+
+        if (model->modulationRefCount == 0) {
+            count = model->materialCount;
+            i = 0;
+            materialEntry = model->materialList;
+
+            while (i < count) {
+                void* material;
+
+                material = materialEntry->materials[0];
+                if (material != NULL) {
+                    fn_800DF608(material);
+                }
+
+                i++;
+                materialEntry++;
+            }
+
+            handle = model->materialListHandle;
+            if (handle != 0) {
+                fn_800E24B0(handle);
+                fn_800E209C(handle);
+            }
+
+            model->materialListHandle = 0;
+            model->materialCount = 0;
+            model->materialList = NULL;
+        }
+    }
+}
+
+void fn_800E85E8(GSmodel* model)
+{
+    u32 handle;
+    s32 i;
+    s32 count;
+    GSmodelMaterialList* materialEntry;
+
+    i = 0;
+    count = model->materialCount;
+    materialEntry = model->materialList;
+
+    while (i < count) {
+        void* material;
+
+        material = materialEntry->materials[0];
+        if (material != NULL) {
+            fn_800DF608(material);
+        }
+
+        i++;
+        materialEntry++;
+    }
+
+    handle = model->materialListHandle;
+    if (handle != 0) {
+        fn_800E24B0(handle);
+        fn_800E209C(handle);
+    }
+
+    model->materialListHandle = 0;
+    model->materialCount = 0;
+    model->materialList = NULL;
+}
+
+u32 GSmodelIsRootNullAdded(GSmodel* model)
+{
+    return (model->flags.raw & GSMODEL_FLAG_ROOT_NULL_ADDED) != 0;
+}
