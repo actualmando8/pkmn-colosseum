@@ -16,6 +16,45 @@
 extern void  GSlogWrite(const char* fmt, ...);         /* OSReport / GSlog */
 extern void* memcpy(void* dst, const void* src, u32 n);
 extern void* memset(void* dst, int val, u32 size);
+
+typedef struct HeroPokemonData {
+    u8 bytes[0x138];
+} HeroPokemonData;
+
+typedef struct HeroItemSlot {
+    u16 id;
+    u16 count;
+} HeroItemSlot;
+
+typedef struct HeroSaveData {
+    u8 name[0x2C];
+    u32 rnd;
+    HeroPokemonData pokemon[6];
+    HeroItemSlot normalItems[0x14];
+    HeroItemSlot extraItems[0x2B];
+    HeroItemSlot ballItems[0x10];
+    HeroItemSlot skillItems[0x40];
+    HeroItemSlot seedItems[0x2E];
+    HeroItemSlot koronItems[3];
+    u8 sexDataId;
+    u8 homePlace;
+    u8 padA82[2];
+    s32 pokedoru;
+    s32 pokecoupon;
+    s32 pokecouponAll;
+    u8 badge01Flag;
+    u8 badge02Flag;
+    u8 badge03Flag;
+    u8 badge04Flag;
+    u8 badge05Flag;
+    u8 badge06Flag;
+    u8 badge07Flag;
+    u8 badge08Flag;
+    u8 hizukiFlag;
+    u8 padA99;
+    HeroItemSlot hizukiItems[0xA];
+    u8 hizukiName[0x56];
+} HeroSaveData;
 /* GSmem */
 extern u16   _toolentryAlloc__FUl(u32 size);                     /* GSmemAllocRaw */
 extern void* fn_800E27B0(u16 handle);                   /* GSmemGetPtr */
@@ -97,9 +136,8 @@ extern void wazaGetStatus(void);
 extern void pokemonBiosGetPokemonWazaPtr(void);
 extern void pokemonResetBasisStatus(void* ptr);
 void pokemonSetLevelBasisStatus(void);
-extern void heroItemGetItemKindToItemAryPtr(void);
 extern void heroSetStatus();
-extern void heroGetStatus(void);
+extern u32 heroGetStatus();
 extern void* GSresAllocResourceAlign(); /* K&R: called with 5 args, returns void* */
 extern u8 fn_800FF548(void);
 extern u32 _unloadScript__FPvUlUl(); /* K&R: asm void wrapper, used as function pointer */
@@ -1360,9 +1398,9 @@ extern s32 heroItemCheckAddItemDataId(u8* ptr, u32 arg2);
 extern void fn_80129948(u8* arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5, u32 arg6, u32 arg7);
 extern s32 heroItemDecItemDataId(u8* ptr, u32 arg2, u32 arg3, u32 arg4);
 extern u32 heroItemCheckHaveItemDataId(u8* ptr, u32 arg2);
-extern u32 fn_80129D64(u8* ptr, u8* arg2);
+extern u32 heroIsMinePokemon(u8* ptr, u8* arg2);
 extern s32 heroGetPokemon(u8* ptr, void* buf, u8 flag);
-extern s32 heroCatchPokemon(u8* ptr, u8* buf, u32 arg3, u16 arg4, u8 flag);
+extern s32 heroCatchPokemon(u8* ptr, u8* buf, u32 arg3, u32 arg4, u8 flag);
 extern void heroBiosCopy(u32* dst, u32* src);
 extern void cbTsureFriend__Fl15FootStepCounterl(void);
 extern void heroMoveSetLockFrame(s32 val);
@@ -1430,6 +1468,7 @@ extern void heroMoveGetHeroRot(u32 param);
 extern void heroMoveGetHeroPos(u32 param);
 extern u32 heroMoveGetResID(u32* out_zero, u32* out_val, s32 index);
 
+#pragma dont_inline on
 /* Address: 0x8012A774 | Size: 0x10 | Pattern: nullcheck_setter */
 void heroBiosSetHomePlace(u8* ptr, u8 val) {
     if (ptr == NULL) { return; }
@@ -1565,6 +1604,7 @@ u32 heroBiosGetRnd(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u32*)(&ptr[0x2C]);
 }
+#pragma dont_inline reset
 /* 0x80128E38 | 0x25C */
 extern void fn_8013528C(void);
 extern void GScharMakeFromSJIS(void);
@@ -1893,15 +1933,71 @@ u32 heroItemCheckHaveItemDataId(u8* ptr, u32 arg2) {
 }
 #endif
 /* 0x80129BC8 | 0x19C */
-/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void heroItemGetItemKindToItemAryPtr(void);
+void* heroItemGetItemKindToItemAryPtr(HeroSaveData* hero, u8 kind, u16* out_count, u16* out_max, u8* out_flag1, u8* out_flag2) {
+    extern void* heroGetStatus(HeroSaveData* hero, u32 selector, u32 index);
+    void* item_array = NULL;
+    u16 count = 0;
+    u16 max = 0;
+    u8 flag1 = 0;
+    u8 flag2;
+
+    switch (kind) {
+    case 1:
+        item_array = heroGetStatus(hero, 6, 0);
+        count = 0x10;
+        max = 0x63;
+        flag1 = 0;
+        flag2 = 1;
+        break;
+    case 2:
+        item_array = heroGetStatus(hero, 4, 0);
+        count = 0x14;
+        max = 0x63;
+        flag1 = 0;
+        flag2 = 1;
+        break;
+    case 3:
+        item_array = heroGetStatus(hero, 8, 0);
+        count = 0x2E;
+        max = 0x3E7;
+        flag1 = 1;
+        flag2 = 1;
+        break;
+    case 4:
+        item_array = heroGetStatus(hero, 7, 0);
+        count = 0x40;
+        max = 0x63;
+        flag1 = 1;
+        flag2 = 0;
+        break;
+    case 5:
+        item_array = heroGetStatus(hero, 5, 0);
+        count = 0x2B;
+        max = 0x63;
+        flag1 = 0;
+        flag2 = 0;
+        break;
+    case 6:
+        item_array = heroGetStatus(hero, 9, 0);
+        count = 3;
+        max = 0x63;
+        flag1 = 1;
+        flag2 = 0;
+        break;
+    }
+    if (out_count != NULL) { *out_count = count; }
+    if (out_max != NULL) { *out_max = max; }
+    if (out_flag1 != NULL) { *out_flag1 = flag1; }
+    if (out_flag2 != NULL) { *out_flag2 = flag2; }
+    return item_array;
+}
 /* 0x80129D64 | 0xBC */
 #if 0
-asm void fn_80129D64(void) {
+asm void heroIsMinePokemon(void) {
 #include "src/game/gs_field_world_fn_80129D64.inc"
 }
 #else
-u32 fn_80129D64(u8* ptr, u8* arg2) {
+u32 heroIsMinePokemon(u8* ptr, u8* arg2) {
     extern u32 heroGetStatus(u8* a, u32 b, u32 c);
     extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
     extern u32 fn_800F9EE4(u32 a, u32 b);
@@ -1957,7 +2053,7 @@ asm void heroCatchPokemon(void) {
 #include "src/game/gs_field_world_fn_80129F20.inc"
 }
 #else
-s32 heroCatchPokemon(u8* ptr, u8* buf, u32 arg3, u16 arg4, u8 flag) {
+s32 heroCatchPokemon(u8* ptr, u8* buf, u32 arg3, u32 arg4, u8 flag) {
     extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
     extern u32 heroGetStatus(u8* a, u32 b, u32 c);
     extern u32 pokemonCheckValid(u32 val);
@@ -1965,12 +2061,12 @@ s32 heroCatchPokemon(u8* ptr, u8* buf, u32 arg3, u16 arg4, u8 flag) {
     extern void pokemonSetCatchStatus(u8* a, u32 b, u32 c, u32 d, u32 e, u32 f, u32 g);
     extern u32 pcboxAddPokemon(u32 a, void* b, s32 c);
     u8 local_buf[0x138];
-    u8 field7a;
     u8 status;
+    u8 field7a;
+    void* slot;
     u32 val2;
     u32 val1;
-    u8 i;
-    void* slot;
+    s16 ret;
 
     if (buf == NULL) { return 6; }
     field7a = (u8)pokemonGetStatus(buf, 0, 0x7a, 0);
@@ -1981,26 +2077,25 @@ s32 heroCatchPokemon(u8* ptr, u8* buf, u32 arg3, u16 arg4, u8 flag) {
     pokemonSetCatchStatus(local_buf, arg3, field7a, arg4, status, val2, val1);
 
     if (&local_buf == NULL) {
-        i = 6;
-    } else {
-        i = 0;
-        while ((u8)i < 6) {
-            slot = (void*)heroGetStatus(ptr, 3, (u8)i);
-            if ((u8)pokemonCheckValid((u32)slot) != 1) {
-                pokemonBiosCopy(slot, local_buf);
-                break;
-            }
-            i++;
-        }
-        if ((u8)i >= 6) {
-            i = 6;
+        status = 6;
+        goto after_loop;
+    }
+    status = 0;
+    for (status = 0; status < 6; status++) {
+        slot = (void*)heroGetStatus(ptr, 3, status);
+        if ((u8)pokemonCheckValid((u32)slot) != 1) {
+            pokemonBiosCopy(slot, local_buf);
+            goto after_loop;
         }
     }
-    if ((u8)i >= 6) {
+    status = 6;
+after_loop:
+    ret = (s16)(u8)status;
+    if (status >= 6) {
         if ((u8)flag == 0) { return -2; }
         return (pcboxAddPokemon(0, local_buf, -1) == 1) ? -1 : -2;
     }
-    return (s16)(u8)i;
+    return ret;
 }
 #endif
 /* 0x8012A08C | 0xA4 */
@@ -2100,77 +2195,174 @@ asm void heroSetStatus(void) {
 #else
 void heroSetStatus(u8* ptr, u32 selector, u32 value) {
     extern u32 savedataGetStatus(u8*, u16);
-    u16 sel = (u16)selector;
 
-    if (sel == 0) { return; }
-    if (sel >= 0x1A) { return; }
+    if ((u16)selector == 0) { goto done; }
+    if ((u16)selector < 0x1A) { goto valid; }
+    goto done;
 
+valid:
     if (ptr == NULL) {
         ptr = (u8*)savedataGetStatus(NULL, 0);
-        if (ptr == NULL) { return; }
+        if (ptr == NULL) { goto done; }
         ptr = (u8*)savedataGetStatus(ptr, 2);
-        if (ptr == NULL) { return; }
+        if (ptr == NULL) { goto done; }
     }
 
-    switch (sel) {
+    switch ((u16)selector) {
     case 1:
         heroBiosSetNamePtr(ptr, (void*)value);
         break;
     case 2:
         heroBiosSetRnd(ptr, value);
         break;
-    case 3:
+    case 11:
         heroBiosSetSexDataId(ptr, (u8)value);
         break;
-    case 4:
+    case 12:
         heroBiosSetPokedoru(ptr, value);
         break;
-    case 5:
+    case 13:
         heroBiosSetPokecoupon(ptr, value);
         break;
-    case 6:
+    case 14:
         heroBiosSetPokecouponAll(ptr, value);
         break;
-    case 7:
+    case 15:
         heroBiosSetBadge01Flag(ptr, (u8)value);
         break;
-    case 8:
+    case 16:
         heroBiosSetBadge02Flag(ptr, (u8)value);
         break;
-    case 9:
+    case 17:
         heroBiosSetBadge03Flag(ptr, (u8)value);
         break;
-    case 10:
+    case 18:
         heroBiosSetBadge04Flag(ptr, (u8)value);
         break;
-    case 11:
+    case 19:
         heroBiosSetBadge05Flag(ptr, (u8)value);
         break;
-    case 12:
+    case 20:
         heroBiosSetBadge06Flag(ptr, (u8)value);
         break;
-    case 13:
+    case 21:
         heroBiosSetBadge07Flag(ptr, (u8)value);
         break;
-    case 14:
+    case 22:
         heroBiosSetBadge08Flag(ptr, (u8)value);
         break;
-    case 15:
+    case 23:
         heroBiosSetHizukiNamePtr(ptr, (void*)value);
         break;
-    case 16:
+    case 24:
         heroBiosSetHizukiFlag(ptr, (u8)value);
         break;
-    case 17:
+    case 25:
         heroBiosSetHomePlace(ptr, (u8)value);
         break;
     }
+done:
+    return;
 }
 #endif
 /* 0x8012A5B0 | 0x1C4 */
 extern void jumptable_80363558();
-/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void heroGetStatus(void);
+u32 heroGetStatus(u8* ptr, u32 selector, u32 index) {
+    extern u32 savedataGetStatus(u8*, u16);
+    extern u32 heroBiosGetNamePtr(u8*);
+    extern u32 heroBiosGetRnd(u8*);
+    extern u32 heroBiosGetPokemonPtr(u8*, u32);
+    extern u32 heroBiosGetItemNormalPtr(u8*, u32);
+    extern u32 heroBiosGetExtraItemPtr(u8*, u32);
+    extern u32 heroBiosGetItemBallPtr(u8*, u32);
+    extern u32 heroBiosGetItemSkillPtr(u8*, u32);
+    extern u32 heroBiosGetItemSeedPtr(u8*, u32);
+    extern u32 heroBiosGetItemKoronPtr(u8*, u32);
+    extern u32 heroBiosGetHizukiItemPtr(u8*, u32);
+    extern u8 heroBiosGetSexDataId(u8*);
+    extern u32 heroBiosGetPokedoru(u8*);
+    extern u32 heroBiosGetPokecoupon(u8*);
+    extern u32 heroBiosGetPokecouponAll(u8*);
+    extern u8 heroBiosGetBadge01Flag(u8*);
+    extern u8 heroBiosGetBadge02Flag(u8*);
+    extern u8 heroBiosGetBadge03Flag(u8*);
+    extern u8 heroBiosGetBadge04Flag(u8*);
+    extern u8 heroBiosGetBadge05Flag(u8*);
+    extern u8 heroBiosGetBadge06Flag(u8*);
+    extern u8 heroBiosGetBadge07Flag(u8*);
+    extern u8 heroBiosGetBadge08Flag(u8*);
+    extern u32 heroBiosGetHizukiNamePtr(u8*);
+    extern u8 heroBiosGetHizukiFlag(u8*);
+    extern u8 heroBiosGetHomePlace(u8*);
+
+    if ((u16)selector == 0) { goto invalid; }
+    if ((u16)selector < 0x1A) { goto valid; }
+
+invalid:
+    return 0;
+
+valid:
+    if (ptr == NULL) {
+        ptr = (u8*)savedataGetStatus(NULL, 0);
+        if (ptr == NULL) { return 0; }
+        ptr = (u8*)savedataGetStatus(ptr, 2);
+        if (ptr == NULL) { return 0; }
+    }
+
+    switch ((u16)selector) {
+    case 1:
+        return heroBiosGetNamePtr(ptr);
+    case 2:
+        return heroBiosGetRnd(ptr);
+    case 3:
+        return heroBiosGetPokemonPtr(ptr, index);
+    case 4:
+        return heroBiosGetItemNormalPtr(ptr, index);
+    case 5:
+        return heroBiosGetExtraItemPtr(ptr, index);
+    case 6:
+        return heroBiosGetItemBallPtr(ptr, index);
+    case 7:
+        return heroBiosGetItemSkillPtr(ptr, index);
+    case 8:
+        return heroBiosGetItemSeedPtr(ptr, index);
+    case 9:
+        return heroBiosGetItemKoronPtr(ptr, index);
+    case 10:
+        return heroBiosGetHizukiItemPtr(ptr, index);
+    case 11:
+        return heroBiosGetSexDataId(ptr);
+    case 12:
+        return heroBiosGetPokedoru(ptr);
+    case 13:
+        return heroBiosGetPokecoupon(ptr);
+    case 14:
+        return heroBiosGetPokecouponAll(ptr);
+    case 15:
+        return heroBiosGetBadge01Flag(ptr);
+    case 16:
+        return heroBiosGetBadge02Flag(ptr);
+    case 17:
+        return heroBiosGetBadge03Flag(ptr);
+    case 18:
+        return heroBiosGetBadge04Flag(ptr);
+    case 19:
+        return heroBiosGetBadge05Flag(ptr);
+    case 20:
+        return heroBiosGetBadge06Flag(ptr);
+    case 21:
+        return heroBiosGetBadge07Flag(ptr);
+    case 22:
+        return heroBiosGetBadge08Flag(ptr);
+    case 23:
+        return heroBiosGetHizukiNamePtr(ptr);
+    case 24:
+        return heroBiosGetHizukiFlag(ptr);
+    case 25:
+        return heroBiosGetHomePlace(ptr);
+    }
+    return 0;
+}
 /* 0x8012A7DC | 0x30 */
 void heroBiosSetPokecouponAll(u8* ptr, s32 val) {
     if (ptr == NULL) { return; }
@@ -2204,11 +2396,13 @@ void* heroBiosGetHizukiNamePtr(void* ptr) {
     return (u8*)ptr + 0xAC2;
 }
 /* 0x8012AA64 | 0x38 */
-void heroBiosSetNamePtr(void* dst, void* src) {
+void heroBiosSetNamePtr(HeroSaveData* hero, void* src) {
     extern void GScharLenCpy();
-    if (dst == NULL) { return; }
-    if (src == NULL) { return; }
-    GScharLenCpy(dst, src, 0xB);
+    if (hero == NULL) { return; }
+    if (src == NULL) {
+    } else {
+        GScharLenCpy(hero->name, src, 0xB);
+    }
 }
 /* 0x8012AA9C | 0x34 */
 void* heroBiosGetHizukiItemPtr(u8* ptr, u16 idx) {
