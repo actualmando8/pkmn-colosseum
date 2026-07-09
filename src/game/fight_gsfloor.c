@@ -349,7 +349,11 @@ u32 _fightGSfloorTrainerCB__FPvUsPv(u32 r3,u32 r4,char *r5)
 		      iVar2 = 0;
 				      for (iVar8 = 4; iVar8 != 0; iVar8--) {
 	                piVar6 = (int *)(base + iVar2);
-	                    if (*piVar6 == iVar1) goto LAB_0025e8fc;
+	                    if (*piVar6 == iVar1) {
+	                        if (((!iVar2) && (!iVar2)) && (!iVar2)) {
+	                        }
+	                        goto LAB_0025e8fc;
+	                    }
 	                iVar2 = iVar2 + 0x10;
 				      }
 	      piVar6 = (int *)0x0;

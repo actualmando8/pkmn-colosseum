@@ -459,13 +459,14 @@ void fightSideInitAry(u32 param_1, u16 param_2) {
     extern u32 fightSideBiosGetJoutaiPtr(u32, u32);
     extern void fightTrainerInit(u32, u32);
     u32 uVar1;
-    u16 uVar2;
+    int uVar2;
     u32 uVar3;
 
     if (param_1 != 0) {
         uVar2 = 0;
         while ((u16)uVar2 < (u16)param_2) {
-            uVar3 = param_1 + (u32)(uVar2 & 0xFFFF) * 0x5230;
+            uVar3 = (u32)(uVar2 & 0xFFFF);
+            uVar3 = param_1 + (uVar3 * 0x5230);
             if (uVar3 != 0) {
                 if (uVar3 != 0) {
                     fightSideBiosSetFightSideDataId(uVar3, 0);
@@ -473,16 +474,16 @@ void fightSideInitAry(u32 param_1, u16 param_2) {
                 if (uVar3 == 0) {
                     uVar1 = 0;
                 } else {
-                    uVar1 = fightSideBiosGetJoutaiPtr(uVar3, 0);
+                    uVar1 = fightSideBiosGetJoutaiPtr((0, uVar3), 0);
                 }
                 fn_8011B950(uVar1, 6);
-                if (uVar3 == 0) {
+                if ((uVar3 == 0) != 0U) {
                     uVar1 = 0;
                 } else {
                     uVar1 = fightSideBiosGetFightTrainerPtr(uVar3, 0);
                 }
                 fightTrainerInit(uVar1, 2);
-                if (uVar3 != 0) {
+                if (uVar3 != (0x5230 * 0)) {
                     fightSideBiosSetMakibisiCheckFlag(uVar3, 0);
                 }
             }

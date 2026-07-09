@@ -508,18 +508,28 @@ u32 fightTrainerAiWazaDamage200(void* ctx, u32 param1, u32 param2, u32 param3) {
     return v1;
 }
 
+static inline u32 fightTrainerAiWazaDamage198_helper1(u32 arg0, int arg1) {
+    return arg0 << arg1;
+}
+
+static inline u32 fightTrainerAiWazaDamage198_helper2(u32 arg0) {
+    return arg0;
+}
+
 /* Address: 0x80250D7C | Size: 0x84 | Pattern: field_accessor */
 u32 fightTrainerAiWazaDamage198(void* ctx, u32 param1, u32 param2, u32 param3) {
+    u32 new_var;
     extern u32 fightSeqGetNromalWazaDamage(void* ctx, u32 param2, u32 param1, u32 param3, u32 zero1, u32 zero2, u32 zero3, u32 zero4);
     extern u8 fn_80236BFC(void* ctx, u32 param3, u32 flag);
-    u32 v1 = fightSeqGetNromalWazaDamage(ctx, param2, param1, param3, 0, 0, 0, 0);
+    u32 v1 = fightTrainerAiWazaDamage198_helper2(fightSeqGetNromalWazaDamage(ctx, param2, param1, param3, 0, 0, 0, 0));
 
     if (fn_80236BFC(ctx, param3, 0x21) == 1) {
         if ((u16)param2 == 0x39) {
-            v1 = v1 << 1;
+            v1 = fightTrainerAiWazaDamage198_helper1(v1, 1);
         }
     }
-    return v1;
+    new_var = v1;
+    return new_var;
 }
 
 /* Address: 0x80250E00 | Size: 0x84 | Pattern: field_accessor */
@@ -632,15 +642,22 @@ u32 fightTrainerAiWazaDamage185(void* ctx, u32 param1, u32 param2, u32 param3) {
     return fightSeqGetNromalWazaDamage(ctx, param2, param1, param3, 0, 0, 0, 0);
 }
 
+static inline u32 fightTrainerAiWazaDamage182_helper(void* ctx, u32 arg1, u32 arg2, u32 arg3) {
+    extern u32 fightSeqGetNromalWazaDamage(void* ctx, u32 param2, u32 param1, u32 param3, u32 zero1, u32 zero2, u32 zero3, u32 zero4);
+    return fightSeqGetNromalWazaDamage(ctx, arg1, arg2, arg3, 0, 0, 0, 0);
+}
+
 /* Address: 0x802511E0 | Size: 0x84 | Pattern: field_accessor */
 u32 fightTrainerAiWazaDamage182(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u32 fightSeqGetNromalWazaDamage(void* ctx, u32 param2, u32 param1, u32 param3, u32 zero1, u32 zero2, u32 zero3, u32 zero4);
+    int new_var;
     extern u8 fn_80236BFC(void* ctx, u32 param3, u32 flag);
-    u32 v1 = fightSeqGetNromalWazaDamage(ctx, param2, param1, param3, 0, 0, 0, 0);
+    u32 v1 = fightTrainerAiWazaDamage182_helper(ctx, param2, param1, param3);
 
     if (fn_80236BFC(ctx, param3, 0x21) == 1) {
-        if ((u16)param2 == 0x39) {
-            v1 = v1 << 1;
+        new_var = ((u16)param2) == 0x39;
+        if (new_var) {
+            v1 = ((0, v1)) << 1;
+            new_var = ((u16)param2) == 0x39;
         }
     }
     return v1;
@@ -1157,15 +1174,22 @@ void _fightTrainerAiWazaDamage117SubPre__FP13FIGHT_TRAINERUsP15FightOutPokemonP1
     wazaSetStatus(value, 0, 0x2f, 0, amount & 0xFFFF);
 }
 
+static inline u32 fightTrainerAiWazaDamage105_helper(void* ctx, u32 arg1, u32 arg2, u32 arg3, int arg4, int arg5, int arg6) {
+    extern u32 fightSeqGetNromalWazaDamage(void* ctx, u32 param2, u32 param1, u32 param3, u32 zero1, u32 zero2, u32 zero3, u32 zero4);
+    return fightSeqGetNromalWazaDamage(ctx, arg1, arg2, arg3, arg4, 0, arg5, arg6);
+}
+
 /* Address: 0x802524B8 | Size: 0x84 | Pattern: field_accessor */
 u32 fightTrainerAiWazaDamage105(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u32 fightSeqGetNromalWazaDamage(void* ctx, u32 param2, u32 param1, u32 param3, u32 zero1, u32 zero2, u32 zero3, u32 zero4);
     extern u8 fn_80236BFC(void* ctx, u32 param3, u32 flag);
-    u32 v1 = fightSeqGetNromalWazaDamage(ctx, param2, param1, param3, 0, 0, 0, 0);
+    int new_var;
+    u32 v1 = fightTrainerAiWazaDamage105_helper(ctx, param2, param1, param3, 0, 0, 0);
+    u32 new_var2;
+    new_var2 = param2;
 
     if (fn_80236BFC(ctx, param3, 0x21) == 1) {
-        if ((u16)param2 == 0x39) {
-            v1 = v1 << 1;
+        if (new_var = ((u16)new_var2) == 0x39) {
+            v1 = ((0, v1)) << 1;
         }
     }
     return v1;
@@ -1206,15 +1230,21 @@ u32 _fightTrainerAiWazaDamage104SubPre1__FP13FIGHT_TRAINERUsP15FightOutPokemonP1
     return (u32)wazaSetStatus(val, 0, 0x2f, 0, 0xa);
 }
 
+static inline u32 fightTrainerAiWazaDamage103_helper(u32 arg0, int arg1) {
+    return arg0 << arg1;
+}
+
 /* Address: 0x802526BC | Size: 0x84 | Pattern: field_accessor */
 u32 fightTrainerAiWazaDamage103(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fightSeqGetNromalWazaDamage(void* ctx, u32 param2, u32 param1, u32 param3, u32 zero1, u32 zero2, u32 zero3, u32 zero4);
+    u32 v1 = (0, fightSeqGetNromalWazaDamage(ctx, param2, param1, param3, 0, 0, 0, 0));
     extern u8 fn_80236BFC(void* ctx, u32 param3, u32 flag);
-    u32 v1 = fightSeqGetNromalWazaDamage(ctx, param2, param1, param3, 0, 0, 0, 0);
 
     if (fn_80236BFC(ctx, param3, 0x21) == 1) {
+        if (param3) {
+        }
         if ((u16)param2 == 0x39) {
-            v1 = v1 << 1;
+            v1 = fightTrainerAiWazaDamage103_helper(v1, 1);
         }
     }
     return v1;
@@ -1382,15 +1412,24 @@ u32 fightTrainerAiWazaDamage071(void* ctx, u32 param1, u32 param2, u32 param3) {
     return v1;
 }
 
+static inline u32 fightTrainerAiWazaDamage070_helper1(u32 arg0) {
+    return arg0 << 1;
+}
+
+static inline u32 fightTrainerAiWazaDamage070_helper2(void* ctx, u32 arg1, u32 arg2, u32 arg3) {
+    extern u32 fightSeqGetNromalWazaDamage(void* ctx, u32 param2, u32 param1, u32 param3, u32 zero1, u32 zero2, u32 zero3, u32 zero4);
+    return fightSeqGetNromalWazaDamage(ctx, arg1, arg2, arg3, 0, 0, 0, 0);
+}
+
 /* Address: 0x80252D90 | Size: 0x84 | Pattern: field_accessor */
 u32 fightTrainerAiWazaDamage070(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u32 fightSeqGetNromalWazaDamage(void* ctx, u32 param2, u32 param1, u32 param3, u32 zero1, u32 zero2, u32 zero3, u32 zero4);
+    extern u32 fightSeqGetNromalWazaDamage(void* ctx, u32 param2, u32 param1, volatile unsigned int param3, u32 zero1, u32 zero2, u32 zero3, u32 zero4);
     extern u8 fn_80236BFC(void* ctx, u32 param3, u32 flag);
-    u32 v1 = fightSeqGetNromalWazaDamage(ctx, param2, param1, param3, 0, 0, 0, 0);
+    u32 v1 = fightTrainerAiWazaDamage070_helper2(ctx, param2, param1, param3);
 
-    if (fn_80236BFC(ctx, param3, 0x21) == 1) {
-        if ((u16)param2 == 0x39) {
-            v1 = v1 << 1;
+    if (1 == fn_80236BFC(ctx, param3, 0x21)) {
+        if (0x39 == (u16)param2) {
+            v1 = fightTrainerAiWazaDamage070_helper1(v1);
         }
     }
     return v1;
@@ -1438,15 +1477,30 @@ u32 fightTrainerAiWazaDamage048(void* ctx, u32 param1, u32 param2, u32 param3) {
     return v1;
 }
 
+static inline u32 fightTrainerAiWazaDamage045_helper1(u32 arg0) {
+    return arg0 << 1;
+}
+
+static inline u32 fightTrainerAiWazaDamage045_helper2(void* ctx, u32 arg1, u32 arg2, u32 arg3, int arg4, int arg5) {
+    extern u32 fightSeqGetNromalWazaDamage(void* ctx, u32 param2, u32 param1, u32 param3, u32 zero1, u32 zero2, u32 zero3, u32 zero4);
+    return fightSeqGetNromalWazaDamage(ctx, arg1, arg2, arg3, arg4, 0, arg5, 0);
+}
+
 /* Address: 0x80253020 | Size: 0x84 | Pattern: field_accessor */
 u32 fightTrainerAiWazaDamage045(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u32 fightSeqGetNromalWazaDamage(void* ctx, u32 param2, u32 param1, u32 param3, u32 zero1, u32 zero2, u32 zero3, u32 zero4);
+    u8 new_var;
     extern u8 fn_80236BFC(void* ctx, u32 param3, u32 flag);
-    u32 v1 = fightSeqGetNromalWazaDamage(ctx, param2, param1, param3, 0, 0, 0, 0);
+    u32 v1 = fightTrainerAiWazaDamage045_helper2(ctx, param2, param1, param3, 0, 0);
+    int new_var2;
+    new_var2 = 0x21;
 
-    if (fn_80236BFC(ctx, param3, 0x21) == 1) {
+    if (!param2) {
+    }
+    if ((new_var = fn_80236BFC(ctx, param3, new_var2)) == 1) {
         if ((u16)param2 == 0x39) {
-            v1 = v1 << 1;
+            v1 = (0, fightTrainerAiWazaDamage045_helper1(v1));
+            new_var2++;
+            new_var2--;
         }
     }
     return v1;
@@ -1509,29 +1563,39 @@ int fightTrainerAiWazaDamage037(void)
   uVar1 = fn_80237664();
   return -(uVar1 & 0xffff);
 }
+static inline u32 fightTrainerAiWazaDamage036_helper(u32 arg0) {
+    return arg0 << 1;
+}
+
 /* Address: 0x802532C0 | Size: 0x84 | Pattern: field_accessor */
 u32 fightTrainerAiWazaDamage036(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u32 fightSeqGetNromalWazaDamage(void* ctx, u32 param2, u32 param1, u32 param3, u32 zero1, u32 zero2, u32 zero3, u32 zero4);
+    extern u32 fightSeqGetNromalWazaDamage(void* ctx, u32 param2, u32 param1, volatile int param3, u32 zero1, u32 zero2, u32 zero3, u32 zero4);
     extern u8 fn_80236BFC(void* ctx, u32 param3, u32 flag);
-    u32 v1 = fightSeqGetNromalWazaDamage(ctx, param2, param1, param3, 0, 0, 0, 0);
+    u32 v1 = (0, fightSeqGetNromalWazaDamage(ctx, param2, param1, param3, 0, 0, 0, 0));
 
     if (fn_80236BFC(ctx, param3, 0x21) == 1) {
         if ((u16)param2 == 0x39) {
-            v1 = v1 << 1;
+            v1 = fightTrainerAiWazaDamage036_helper(v1);
         }
     }
     return v1;
 }
 
+static inline u32 fightTrainerAiWazaDamage034_helper(void* ctx, u32 arg1, u32 arg2, u32 arg3) {
+    extern u32 fightSeqGetNromalWazaDamage(void* ctx, u32 param2, u32 param1, u32 param3, u32 zero1, u32 zero2, u32 zero3, u32 zero4);
+    return fightSeqGetNromalWazaDamage(ctx, arg1, arg2, arg3, 0, 0, 0, 0);
+}
+
 /* Address: 0x8025334C | Size: 0x84 | Pattern: field_accessor */
 u32 fightTrainerAiWazaDamage034(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern u32 fightSeqGetNromalWazaDamage(void* ctx, u32 param2, u32 param1, u32 param3, u32 zero1, u32 zero2, u32 zero3, u32 zero4);
+    u32 *new_var;
     extern u8 fn_80236BFC(void* ctx, u32 param3, u32 flag);
-    u32 v1 = fightSeqGetNromalWazaDamage(ctx, param2, param1, param3, 0, 0, 0, 0);
+    u32 v1 = fightTrainerAiWazaDamage034_helper(ctx, param2, param1, param3);
 
     if (fn_80236BFC(ctx, param3, 0x21) == 1) {
         if ((u16)param2 == 0x39) {
-            v1 = v1 << 1;
+            new_var = &v1;
+            v1 = (*new_var) << 1;
         }
     }
     return v1;

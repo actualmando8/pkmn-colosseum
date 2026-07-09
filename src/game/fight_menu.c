@@ -1366,14 +1366,16 @@ u32 _fightMenuAllFightOutPokemonCloseStatusMenuSub__FPvUsPv(u32 r3,u32 r4)
   u32 uVar2;
   u8 cVar5;
   u32 uVar6;
+  long new_var;
 
-  iVar1 = fightTargetGetPtr(2,r3,r4);
+  new_var = r3;
+  iVar1 = fightTargetGetPtr(2,new_var,r4);
   if (iVar1 == 0) {
     uVar6 = 0;
   }
   else {
     uVar3 = fightSideGetStatus(iVar1,0,5,0);
-    sVar4 = fightTargetGetTragetPtrToRelativeHostSideFightTargetId(r3,r4);
+    sVar4 = fightTargetGetTragetPtrToRelativeHostSideFightTargetId(new_var,r4);
     if (sVar4 == 0) {
       uVar6 = 0;
     }
