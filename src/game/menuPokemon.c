@@ -2225,6 +2225,17 @@ u32 fn_80019064(void) {
 #endif
 
 /* fn_80019070 - 0x80019070 | size: 0x68 */
+typedef struct MenuPokemonSpeciesCacheEntry {
+    u16 species;
+    u16 pad;
+    u32 data;
+} MenuPokemonSpeciesCacheEntry;
+
+typedef struct MenuPokemonSpeciesCache {
+    MenuPokemonSpeciesCacheEntry entries[8];
+    s32 count;
+} MenuPokemonSpeciesCache;
+
 extern u8 lbl_803A1B90[];
 #if 0
 asm void fn_80019070(void) {
@@ -2267,13 +2278,20 @@ asm void fn_800190D8(void) {
 #else
 #pragma push
 #pragma optimization_level 4
-void fn_800190D8(u16 species, u32 data) {
+#pragma peephole off
+void fn_800190D8(u32 species, u32 data) {
+    MenuPokemonSpeciesCache* cache;
     s32 count;
-    count = *(u32*)(lbl_803A1B90 + 0x40);
-    if (count >= 0x8) return;
-    *(u16*)(lbl_803A1B90 + *(s32*)(lbl_803A1B90 + 0x40) * 8) = species;
-    *(u32*)(lbl_803A1B90 + *(s32*)(lbl_803A1B90 + 0x40) * 8 + 4) = data;
-    *(u32*)(lbl_803A1B90 + 0x40) = *(s32*)(lbl_803A1B90 + 0x40) + 1;
+
+    cache = (MenuPokemonSpeciesCache*)lbl_803A1B90;
+    count = cache->count;
+    if (count >= 8) {
+        return;
+    }
+    species = (u16)species;
+    cache->entries[count].species = species;
+    cache->entries[cache->count].data = data;
+    cache->count = cache->count + 1;
 }
 #pragma pop
 #endif
@@ -4242,4 +4260,3 @@ u16 fn_8001D624(void* a, u8 b) {
 }
 #pragma pop
 #endif
-
