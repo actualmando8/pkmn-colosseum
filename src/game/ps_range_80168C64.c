@@ -82,6 +82,52 @@ extern f32 lbl_8047D63C; /* 0.5f */
 extern f32 lbl_8047D640; /* 2.0f */
 extern f64 lbl_8047D660; /* int->float bias (0x4330000000000000) */
 extern f64 lbl_8047D668; /* signed int->float bias */
+extern f32 lbl_8047D690; /* 255.0f */
+
+typedef union PSFloatBytes {
+    u8 bytes[4];
+    f32 value;
+} PSFloatBytes;
+
+extern s32 lbl_8047B170;
+extern PSFloatBytes lbl_8047B178;
+
+typedef struct PSGeneratorState {
+    /* 0x00 */ struct PSGeneratorState* next;
+    /* 0x04 */ u32 flags;
+    /* 0x08 */ u8 pad08[0x08];
+    /* 0x10 */ u16 maxLife;
+    /* 0x12 */ u16 angleFlags;
+    /* 0x14 */ u8 bankIndex;
+    /* 0x15 */ u8 linkNo;
+    /* 0x16 */ u8 pad16[0x02];
+    /* 0x18 */ u16 familyId;
+    /* 0x1A */ u8 pad1A[0x32];
+    /* 0x4C */ u32 childCount;
+    /* 0x50 */ void* appSRT;
+    /* 0x54 */ u8 pad54[0x34];
+    /* 0x88 */ u16 generatorFlags;
+    /* 0x8A */ u8 pad8A[0x1A];
+    /* 0xA4 */ void* linkedJObj;
+} PSGeneratorState;
+
+typedef struct PSAppSRT {
+    /* 0x00 */ struct PSAppSRT* next;
+    /* 0x04 */ void* owner;
+    /* 0x08 */ u8 pad08[0x2A];
+    /* 0x32 */ u16 refCount;
+    /* 0x34 */ u8 pad34[0x38];
+    /* 0x6C */ void (*destroy)(struct PSAppSRT* appSRT);
+} PSAppSRT;
+
+extern PSGeneratorState* lbl_8047B188;
+extern PSAppSRT* lbl_8047B124;
+extern PSParticle* lbl_80452788[];
+extern const char lbl_802737B8[];
+extern const char lbl_802737C4[];
+extern u16 lbl_8047B110;
+extern u16 lbl_8047B116;
+extern u16 lbl_8047B120;
 
 /* ======================================================================
  * External functions - real symbol names per config/GC6E01/symbols.txt.
@@ -98,17 +144,17 @@ extern PSParticle* psGenerateParticleID0(PSParticle* pp, u8 linkNo, u8 bankIdx,
                                           u16 scriptId, void* arg);      /* 0x80169A48 */
 extern PSParticle* psCreateGeneratorID(PSParticle* pp, u8 linkNo, u8 bankIdx, u16 scriptId);
 extern void psCopyGeneratorData(PSParticle* gen, void* peopleObj);       /* 0x80172930 */
-extern void psChangeParticleAppSRT(PSParticle* pp, void* parentObj);    /* 0x8016A878 */
-extern void psAttachParticleAppSRT(PSParticle* pp, void* parentObj);
-extern void psChangeGeneratorAppSRT(PSParticle* gen);                   /* 0x8016A79C */
-extern void psAttachGeneratorAppSRT(PSParticle* gen);
+extern s32 psChangeParticleAppSRT(PSParticle* pp, PSAppSRT* parentObj); /* 0x8016A878 */
+extern s32 psAttachParticleAppSRT(PSParticle* pp, PSAppSRT* parentObj);
+extern s32 psChangeGeneratorAppSRT(PSGeneratorState* gen, PSAppSRT* parentObj); /* 0x8016A79C */
+extern s32 psAttachGeneratorAppSRT(PSGeneratorState* gen, PSAppSRT* parentObj);
 extern void genPosUpdate(void* obj);                                    /* 0x80175E88 */
 extern void modifyDir(PSParticle* pp, f32 param);                       /* 0x80172FA8 */
 extern void modifyDirGenBase(PSParticle* pp, f32 a, f32 b, f32 c, f32 d); /* 0x801732A0 */
 extern f32 sqrtf(f32 x);
 extern void applyForceJObj(void* jobj, f32 a, f32 b);                   /* 0x80172BBC */
 extern void setVelToJObj(void* jobj, void* camData);                    /* 0x80172D00 */
-extern u8 U8ClampAdd(u8 cur, s32 delta);                                /* 0x801728B0 */
+extern u8 U8ClampAdd(u8 cur, f32 delta);                                /* 0x801728B0 */
 extern PSParticle* _psListGetNext(PSParticle* pp);                         /* psCleanup, 0x80172928 */
 extern s32 psRemoveParticleAppSRT(PSParticle* pp);                      /* 0x?? */
 extern void psDeletePntJObjwithParticle(PSParticle* pp);
@@ -124,6 +170,363 @@ extern void HSD_JObjSetupMatrix(void* camSlot);
 extern void HSD_JObjAddTx(void* camSlot, f32 dx);
 extern void HSD_JObjAddTy(void* camSlot, f32 dy);
 extern void HSD_JObjAddTz(void* camSlot, f32 dz);
+extern void HSD_MtxSRT(void* dst, void* scale, void* rot, void* trans, void* order);
+extern void fn_801A6960(void* ptr);
+extern void* fn_801A6928(s32 size);
+extern void __assert(const char* file, u32 line, const char* msg);
+extern void* memset(void* dst, s32 value, u32 size);
+
+PSParticle* _psListGetFirst(s32 linkNo) {
+    s32 valid = FALSE;
+
+    if (linkNo >= 0 && linkNo < PS_NUM_LINK) {
+        valid = TRUE;
+    }
+
+    if (valid == FALSE) {
+        __assert(lbl_802737B8, 0x98, lbl_802737C4);
+    }
+
+    return lbl_80452788[linkNo];
+}
+
+void psSetRandomVelocityScaling(PSGeneratorState* gen, u8 enabled) {
+    if (enabled) {
+        gen->generatorFlags |= 0x200;
+    } else {
+        gen->generatorFlags = (u32)gen->generatorFlags & ~0x200;
+    }
+}
+
+void psSetNodeScaling(PSGeneratorState* gen, u8 enabled) {
+    if (enabled) {
+        gen->generatorFlags |= 0x100;
+    } else {
+        gen->generatorFlags = (u32)gen->generatorFlags & ~0x100;
+    }
+}
+
+void psSetTornadoScaling(PSGeneratorState* gen, u8 enabledA, u8 enabledB) {
+    if (enabledA) {
+        gen->generatorFlags |= 0x40;
+    } else {
+        gen->generatorFlags = (u32)gen->generatorFlags & ~0x40;
+    }
+
+    if (enabledB) {
+        gen->generatorFlags |= 0x80;
+    } else {
+        gen->generatorFlags = (u32)gen->generatorFlags & ~0x80;
+    }
+}
+
+void psSetParticleTexScaling(PSGeneratorState* gen, u8 enabled) {
+    if (enabled) {
+        gen->generatorFlags |= 0x20;
+    } else {
+        gen->generatorFlags = (u32)gen->generatorFlags & ~0x20;
+    }
+}
+
+void psSetOffsetRotationInLocal(PSGeneratorState* gen, u8 enabledA, u8 enabledB) {
+    if (enabledA) {
+        gen->generatorFlags |= 0x8;
+        if (enabledB) {
+            gen->generatorFlags |= 0x10;
+        } else {
+            gen->generatorFlags = (u32)gen->generatorFlags & ~0x10;
+        }
+    } else {
+        gen->generatorFlags = (u32)gen->generatorFlags & ~0x8;
+        gen->generatorFlags = (u32)gen->generatorFlags & ~0x10;
+    }
+}
+
+void psSetVelocityRotationInLocal(PSGeneratorState* gen, u8 enabled) {
+    if (enabled) {
+        gen->generatorFlags |= 0x4;
+    } else {
+        gen->generatorFlags = (u32)gen->generatorFlags & ~0x4;
+    }
+}
+
+void psUnlinkChildGensFromJObj(PSGeneratorState* gen) {
+    gen->generatorFlags = (u32)gen->generatorFlags & ~0x1;
+}
+
+void psLinkChildGensToJObj(PSGeneratorState* gen, void* jobj) {
+    gen->generatorFlags |= 0x1;
+    gen->linkedJObj = jobj;
+}
+
+u32 psGetParticleChildCount(PSGeneratorState* gen) {
+    u32 count = 0;
+    PSGeneratorState* child = lbl_8047B188;
+
+    while (child != NULL) {
+        if (child->familyId == gen->familyId) {
+            count += child->childCount;
+        }
+        child = child->next;
+    }
+
+    return count;
+}
+
+u32 psGetGeneratorChildMaxLife(PSGeneratorState* gen) {
+    u32 maxLife = gen->maxLife;
+    PSGeneratorState* child = lbl_8047B188;
+
+    while (child != NULL) {
+        if (child->familyId == gen->familyId && child->maxLife > maxLife) {
+            maxLife = child->maxLife;
+        }
+        child = child->next;
+    }
+
+    return maxLife;
+}
+
+s32 psAttachGeneratorAppSRT(PSGeneratorState* gen, PSAppSRT* appSRT) {
+    u16 refCount;
+
+    if (appSRT == NULL || gen == NULL || gen->appSRT != NULL) {
+        return -1;
+    }
+
+    gen->appSRT = appSRT;
+    refCount = appSRT->refCount + 1;
+    appSRT->refCount = refCount;
+    return refCount;
+}
+
+s32 psAttachParticleAppSRT(PSParticle* pp, PSAppSRT* appSRT) {
+    u16 refCount;
+
+    if (appSRT == NULL || pp == NULL || pp->parentObj != NULL) {
+        return -1;
+    }
+
+    pp->parentObj = appSRT;
+    refCount = appSRT->refCount + 1;
+    appSRT->refCount = refCount;
+    return refCount;
+}
+
+s32 psRemoveParticleAppSRT(PSParticle* pp) {
+    PSAppSRT* appSRT = (PSAppSRT*)pp->parentObj;
+    u16 refCount;
+
+    if (appSRT == NULL) {
+        return -1;
+    }
+
+    refCount = appSRT->refCount - 1;
+    appSRT->refCount = refCount;
+
+    if (refCount == 0) {
+        appSRT = (PSAppSRT*)pp->parentObj;
+        if (appSRT->destroy != NULL) {
+            appSRT->destroy(appSRT);
+        }
+        appSRT->next = lbl_8047B124;
+        lbl_8047B124 = appSRT;
+        lbl_8047B116--;
+    }
+
+    pp->parentObj = NULL;
+    return refCount;
+}
+
+s32 psRemoveGeneratorAppSRT(PSGeneratorState* gen) {
+    PSAppSRT* appSRT = (PSAppSRT*)gen->appSRT;
+    u16 refCount;
+
+    if (appSRT == NULL) {
+        return -1;
+    }
+
+    if (appSRT->owner == gen) {
+        appSRT->owner = NULL;
+    }
+
+    appSRT = (PSAppSRT*)gen->appSRT;
+    refCount = appSRT->refCount - 1;
+    appSRT->refCount = refCount;
+
+    if (refCount == 0) {
+        appSRT = (PSAppSRT*)gen->appSRT;
+        if (appSRT->destroy != NULL) {
+            appSRT->destroy(appSRT);
+        }
+        appSRT->next = lbl_8047B124;
+        lbl_8047B124 = appSRT;
+        lbl_8047B116--;
+    }
+
+    gen->appSRT = NULL;
+    return refCount;
+}
+
+s32 psChangeGeneratorAppSRT(PSGeneratorState* gen, PSAppSRT* newAppSRT) {
+    PSAppSRT* oldAppSRT;
+    u16 refCount;
+
+    if (newAppSRT == NULL || gen == NULL) {
+        return -1;
+    }
+
+    oldAppSRT = (PSAppSRT*)gen->appSRT;
+    if (oldAppSRT != NULL && oldAppSRT != NULL) {
+        if (oldAppSRT->owner == gen) {
+            oldAppSRT->owner = NULL;
+        }
+
+        oldAppSRT = (PSAppSRT*)gen->appSRT;
+        refCount = oldAppSRT->refCount - 1;
+        oldAppSRT->refCount = refCount;
+
+        if (refCount == 0) {
+            oldAppSRT = (PSAppSRT*)gen->appSRT;
+            if (oldAppSRT->destroy != NULL) {
+                oldAppSRT->destroy(oldAppSRT);
+            }
+            oldAppSRT->next = lbl_8047B124;
+            lbl_8047B124 = oldAppSRT;
+            lbl_8047B116--;
+        }
+
+        gen->appSRT = NULL;
+    }
+
+    gen->appSRT = newAppSRT;
+    refCount = newAppSRT->refCount + 1;
+    newAppSRT->refCount = refCount;
+    return refCount;
+}
+
+s32 psChangeParticleAppSRT(PSParticle* pp, PSAppSRT* newAppSRT) {
+    PSAppSRT* oldAppSRT;
+    u16 refCount;
+
+    if (newAppSRT == NULL || pp == NULL) {
+        return -1;
+    }
+
+    oldAppSRT = (PSAppSRT*)pp->parentObj;
+    if (oldAppSRT != NULL && oldAppSRT != NULL) {
+        refCount = oldAppSRT->refCount - 1;
+        oldAppSRT->refCount = refCount;
+
+        if (refCount == 0) {
+            oldAppSRT = (PSAppSRT*)pp->parentObj;
+            if (oldAppSRT->destroy != NULL) {
+                oldAppSRT->destroy(oldAppSRT);
+            }
+            oldAppSRT->next = lbl_8047B124;
+            lbl_8047B124 = oldAppSRT;
+            lbl_8047B116--;
+        }
+
+        pp->parentObj = NULL;
+    }
+
+    pp->parentObj = newAppSRT;
+    refCount = newAppSRT->refCount + 1;
+    newAppSRT->refCount = refCount;
+    return refCount;
+}
+
+void psRemoveAppSRT(void) {
+    PSAppSRT* appSRT = lbl_8047B124;
+
+    while (appSRT != NULL) {
+        PSAppSRT* next = appSRT->next;
+        fn_801A6960(appSRT);
+        appSRT = next;
+    }
+
+    lbl_8047B124 = NULL;
+}
+
+s32 psInitAppSRT(s32 count, s32 size) {
+    s32 i = 0;
+
+    lbl_8047B116 = 0;
+    lbl_8047B110 = 0;
+    lbl_8047B120 = size;
+    lbl_8047B124 = NULL;
+
+    while (i < count) {
+        PSAppSRT* appSRT = fn_801A6928(size);
+
+        if (appSRT == NULL) {
+            return i;
+        }
+
+        memset(appSRT, 0, size);
+        appSRT->next = lbl_8047B124;
+        lbl_8047B124 = appSRT;
+        i++;
+    }
+
+    return i;
+}
+
+void psDeletePntJObjwithParticle(PSParticle* pp) {
+    if (pp->flags & PS_FLAG_ATTACH_CAMERA) {
+        u32 slotIdx = (pp->flags >> 12) & 0x7;
+        void* camSlot = lbl_80452DC8[slotIdx];
+
+        if (camSlot != NULL) {
+            fn_801A05EC(camSlot);
+            lbl_80452DC8[slotIdx] = NULL;
+        }
+    }
+}
+
+void psSetupTevInvalidState(void) {
+    lbl_8047B170 = -1;
+}
+
+u8 U8ClampAdd(u8 cur, f32 delta) {
+    f32 value = (f32)cur + delta;
+
+    if (value < 0.0f) {
+        value = 0.0f;
+    }
+    if (value > lbl_8047D690) {
+        value = lbl_8047D690;
+    }
+
+    return (u8)value;
+}
+
+void HSD_MTXSRT(void* dst, void* scale, void* rot, void* trans, void* order) {
+    HSD_MtxSRT(dst, scale, rot, trans, order);
+}
+
+PSParticle* _psListGetNext(PSParticle* pp) {
+    return pp->next;
+}
+
+u8* getTime(u8* stream, u16* out) {
+    *out = *stream++;
+    if (*out & 0x80) {
+        *out = ((*out & 0x7F) << 8) + *stream++;
+    }
+
+    return stream;
+}
+
+u8* getFloat(u8* stream, f32* out) {
+    lbl_8047B178.bytes[0] = *stream++;
+    lbl_8047B178.bytes[1] = *stream++;
+    lbl_8047B178.bytes[2] = *stream++;
+    lbl_8047B178.bytes[3] = *stream++;
+    *out = lbl_8047B178.value;
+    return stream;
+}
 
 /* ======================================================================
  * psInterpretParticle0 | psinterpret_Main
@@ -402,9 +805,9 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
                         if (pp->peopleObj != NULL &&
                             (pp->peopleObj != NULL) &&
                             (*(u16*)((u8*)pp->peopleObj + 0x12) & 0x40)) {
-                            psChangeParticleAppSRT(spawned, pp->parentObj);
+                            psChangeParticleAppSRT(spawned, (PSAppSRT*)pp->parentObj);
                         } else {
-                            psAttachParticleAppSRT(spawned, pp->parentObj);
+                            psAttachParticleAppSRT(spawned, (PSAppSRT*)pp->parentObj);
                         }
                         spawned->positionX = pp->positionX;
                         spawned->positionY = pp->positionY;
@@ -431,9 +834,9 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
                         psApplyVelocityLocalRotation(spawned);
                         if (pp->peopleObj != NULL &&
                             (*(u16*)((u8*)pp->peopleObj + 0x12) & 0x40)) {
-                            psChangeParticleAppSRT(spawned, pp->parentObj);
+                            psChangeParticleAppSRT(spawned, (PSAppSRT*)pp->parentObj);
                         } else {
-                            psAttachParticleAppSRT(spawned, pp->parentObj);
+                            psAttachParticleAppSRT(spawned, (PSAppSRT*)pp->parentObj);
                         }
                         spawned->positionX = pp->positionX;
                         spawned->positionY = pp->positionY;
@@ -499,9 +902,9 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
                         if (pp->parentObj != NULL) {
                             if (pp->peopleObj != NULL &&
                                 (*(u16*)((u8*)pp->peopleObj + 0x12) & 0x40)) {
-                                psChangeGeneratorAppSRT(gen);
+                                psChangeGeneratorAppSRT((PSGeneratorState*)gen, (PSAppSRT*)pp->parentObj);
                             } else {
-                                psAttachGeneratorAppSRT(gen);
+                                psAttachGeneratorAppSRT((PSGeneratorState*)gen, (PSAppSRT*)pp->parentObj);
                             }
                         }
                         gen->flags = (gen->flags & ~0x1F8) | ((loopArg & 0x7) << 3);
