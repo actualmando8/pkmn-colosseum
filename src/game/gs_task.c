@@ -132,6 +132,7 @@ extern void* fn_800085D8(s32 difficulty);   /* Validate encounter difficulty */
  * ========================================================================= */
 
 extern u16  gCurrentSceneId;     /* lbl_8047A288 : .sbss -- current scene/map halfword */
+extern u16  lbl_8047A288;
 extern void* gSceneTable;       /* lbl_80478F50 : .sbss -- scene definition table ptr */
 extern void* gSceneItemTable;   /* lbl_80478F20 : .sbss -- scene item lookup table ptr */
 extern void* gNPCIndexTable;    /* lbl_80478F40 : .sbss -- NPC type lookup table ptr */
@@ -207,17 +208,18 @@ s32 dbgMenuCameraChangeDisp(void) {
  * ========================================================================= */
 #pragma push
 #pragma scheduling off
+#pragma peephole off
 s32 dbgMenuCameraSetType(void* unused, s32 mode) {
     switch (mode) {
+    case 0:
+    default:
+        GSscene_SetMode(0);
+        break;
     case 1:
         GSscene_SetMode(5);
         break;
     case 2:
         GSscene_SetMode(6);
-        break;
-    case 0:
-    default:
-        GSscene_SetMode(0);
         break;
     }
     return 0;
@@ -307,6 +309,41 @@ s32 fn_8000682C(void) {
     winMsgOpenFight(result, 1, 1);
     winMsgCloseFight(1);
     return 1;
+}
+#pragma pop
+
+typedef struct GsTaskCountTable {
+    u32 count;
+} GsTaskCountTable;
+
+extern GsTaskCountTable* lbl_80478F20;
+
+#pragma push
+#pragma peephole off
+s32 fn_80006884(void) {
+    u32 result;
+    s32 val;
+    s32 ret;
+    u16 selected;
+
+    if (menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs(lbl_8047A288, &result, fn_8000868C) == 0) {
+        val = -1;
+    } else {
+        if (result >= lbl_80478F20->count) {
+            result = lbl_80478F20->count - 1;
+        }
+        menuSubCloseNumberInput();
+        val = (s32)result;
+    }
+
+    if (val < 0) {
+        return -1;
+    }
+
+    selected = (u16)val;
+    ret = 1;
+    lbl_8047A288 = selected;
+    return ret;
 }
 #pragma pop
 
@@ -1146,7 +1183,6 @@ extern u32 lbl_80478F50;
 extern u32 lbl_80478F40;
 extern u32 lbl_80478F00;
 extern u32 lbl_80478F48;
-extern u32 lbl_80478F20;
 #if 1
 #if 0
 asm s32 fn_80006908(u16 id) {
@@ -2350,4 +2386,3 @@ void* _dbgMenuFightGetFightFloorDataIdSub(u32 id) {
     return GSmsgGetGSchar(result);
 }
 #endif
-
