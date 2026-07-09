@@ -37,6 +37,11 @@ extern void  fn_800BD640(void);                        /* GXSetProjection */
 extern void  fn_800BD744(void);                        /* GXLoadPosMtxImm */
 extern void  GXInvalidateTexAll(void);                        /* GXInvalidateTexAll */
 
+typedef struct GSgfxState {
+    u8 pad_000[0x49c];
+    u8 requestBufferFlag;
+} GSgfxState;
+
 /* ===== String constants (rodata) ===== */
 extern const char lbl_80270440[]; /* "GSgfx: invalid matrix index" */
 extern const char lbl_80270460[]; /* "GSgfx: matrix stack underflow!" */
@@ -541,6 +546,12 @@ asm void fn_800D4604(void) {
 #else
 void fn_800D4604(u32 val) { *(u32*)lbl_8047AA80 = val; }
 #endif
+
+void fn_800D4610(u8 val) {
+    GSgfxState* state = (GSgfxState*)lbl_8047AA80;
+
+    state->requestBufferFlag = val;
+}
 
 extern void fn_800B944C(u32, u32);
 extern f32 lbl_8047CA30;
@@ -1261,4 +1272,3 @@ void fn_800D6A80(u16 vertCount, s32 type, u32* totalVerts, u32* totalPrims) {
     }
 }
 #endif
-
