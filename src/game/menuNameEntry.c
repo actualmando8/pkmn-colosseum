@@ -15,6 +15,11 @@
 
 /* ===== Phase 2 recovery stubs ===== */
 
+typedef struct MenuNameEntryObject {
+    u8 pad_00[0x8b];
+    u8 alpha;
+} MenuNameEntryObject;
+
 /* fn_80026370 - 0x80026370 | size: 0x20 */
 #if 0
 asm void fn_80026370(void) {
@@ -29,6 +34,7 @@ s32 fn_80026370(void* r3, u8* r4) {
     return 0;
 }
 #endif
+
 
 /* fn_80026390 - 0x80026390 | size: 0x20 */
 #if 0
@@ -1792,30 +1798,28 @@ s32 menuNameEntryDraw50Text(void* r3) {
 #endif
 
 /* fn_8002777C - 0x8002777C | size: 0x3c */
-#if 0
-asm void fn_8002777C(void) {
-#include "src/game/gs_worldmap_fn_8002777C.inc"
-}
-#else
-#pragma optimization_level 4
+#pragma push
+#pragma peephole off
+#pragma optimization_level 1
 s32 fn_8002777C(void* r3) {
-    fn_800FB680(0, 0, (s32)(((u8*)r3)[0x8b]) | (s32)(-0x100), 0x2ef3);
+    s32 mask = -0x100;
+    u32 alpha = ((MenuNameEntryObject*)r3)->alpha;
+    fn_800FB680(0, 0, alpha | mask, 0x2ef3);
     return 0;
 }
-#endif
+#pragma pop
 
 /* fn_800277B8 - 0x800277B8 | size: 0x3c */
-#if 0
-asm void fn_800277B8(void) {
-#include "src/game/gs_worldmap_fn_800277B8.inc"
-}
-#else
-#pragma optimization_level 4
+#pragma push
+#pragma peephole off
+#pragma optimization_level 1
 s32 fn_800277B8(void* r3) {
-    fn_800FB680(0, 0, (s32)(((u8*)r3)[0x8b]) | (s32)(-0x100), 0x2ef4);
+    s32 mask = -0x100;
+    u32 alpha = ((MenuNameEntryObject*)r3)->alpha;
+    fn_800FB680(0, 0, alpha | mask, 0x2ef4);
     return 0;
 }
-#endif
+#pragma pop
 
 /* menuNameEntryDrawTitle - 0x800278A4 | size: 0xbc */
 extern s32 pokemonBiosGetPokemonDataId(void*);
@@ -3635,4 +3639,3 @@ s32 menuNameEntryOpen(s32 r3, s32 r4) {
     return *(s32*)(ctx + 0x20);
 }
 #endif
-
