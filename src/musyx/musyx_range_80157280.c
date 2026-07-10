@@ -29,7 +29,7 @@ void InitStreamBuffers(void);
 extern void aramQueueCallback();
 extern void aramUploadData();
 extern u16 inpGetMidiCtrl(u8 ctrl, u8 channel, u8 set); /* true signature, verified via disassembly */
-extern void salCalcVolume(u32 volumeArg, f32* out, u32 voiceIndex, f32 a, f32 b, f32 c, u32 hasPan, u32 studioFlag);
+extern void salCalcVolume(u32 volumeArg, f32* out, u32 pan, u32 span, f32 a, f32 b, f32 c, u32 hasPan, u32 studioFlag);
 extern void salCallback();
 extern u8 jumptable_80369CB0[];
 extern u8 jumptable_80369CD4[];
@@ -96,6 +96,177 @@ extern void  fn_80142984(u32 id);       /* peopleFieldGetByID */
 
 /* shared with synthdata.c (sndBSearch comparator signature) */
 typedef s32 (*PeopleCmpFn)(u8* a, u8* b);
+
+extern f64 fmod(f64 x, f64 y);
+extern u8 lbl_8036984C[];
+extern u8 lbl_80369A68[];
+extern f32 lbl_8047D430;
+extern f32 lbl_8047D434;
+extern f32 lbl_8047D438;
+extern f32 lbl_8047D448;
+extern f64 lbl_8047D450;
+extern f32 lbl_8047D458;
+extern f32 lbl_8047D45C;
+extern f32 lbl_8047D460[];
+
+static f32 salLerpPair(f32* table, u32 idx, f32 frac) {
+    return (lbl_8047D434 - frac) * table[idx] + frac * table[idx + 1];
+}
+
+void salCalcVolume(u32 tableSelect, f32* out, u32 panArg, u32 spanArg, f32 volume,
+                   f32 auxA, f32 auxB, u32 hasPan, u32 studioFlag) {
+    f32* volTable;
+    f32* baseTable;
+    f32* panTable;
+    f32 pan;
+    f32 span;
+    f32 panFrac;
+    f32 spanFrac;
+    f32 invPanFrac;
+    f32 invSpanFrac;
+    f32 invPan;
+    f32 invSpan;
+    u32 panIdx;
+    u32 spanIdx;
+    u32 invPanIdx;
+    u32 invSpanIdx;
+    f32 preInvPan;
+    f32 preInvPanFrac;
+    f32 prePanFrac;
+    u32 preInvPanIdx;
+    u32 prePanIdx;
+    f32 spanMix;
+    f32 invSpanMix;
+    f32 panMix;
+    f32 invPanMix;
+    f32 amp;
+    f32 gain;
+    f32 scaled;
+    u32 volIdx;
+    f32 volFrac;
+
+    volTable = tableSelect != 0 ? (f32*)lbl_8036984C : (f32*)lbl_80369A68;
+    baseTable = (f32*)lbl_80369A68;
+
+    if (panArg == 0x800000) {
+        panArg = 0;
+        spanArg = 0x7f0000;
+    }
+
+    if (panArg > 0x10000) {
+        pan = (f32)(panArg - 0x10000) * lbl_8047D448;
+    } else {
+        pan = 0.0f;
+    }
+    if (spanArg > 0x10000) {
+        span = (f32)(spanArg - 0x10000) * lbl_8047D448;
+    } else {
+        span = 0.0f;
+    }
+
+    if (studioFlag != 0) {
+        prePanFrac = (f32)fmod(pan, lbl_8047D450);
+        prePanIdx = __cvt_fp2unsigned(pan);
+        preInvPan = lbl_8047D458 - pan;
+        preInvPanFrac = (f32)fmod(preInvPan, lbl_8047D450);
+        preInvPanIdx = __cvt_fp2unsigned(preInvPan);
+    } else {
+        prePanFrac = 0.0f;
+        prePanIdx = 0;
+        preInvPan = 0.0f;
+        preInvPanFrac = 0.0f;
+        preInvPanIdx = 0;
+    }
+
+    if (hasPan != 0) {
+        pan = lbl_8047D434 + lbl_8047D45C * (pan - lbl_8047D434);
+    }
+
+    panFrac = (f32)fmod(pan, lbl_8047D450);
+    panIdx = __cvt_fp2unsigned(pan);
+    spanFrac = (f32)fmod(span, lbl_8047D450);
+    spanIdx = __cvt_fp2unsigned(span);
+
+    invPan = lbl_8047D458 - pan;
+    invSpan = lbl_8047D458 - span;
+    invPanFrac = (f32)fmod(invPan, lbl_8047D450);
+    invPanIdx = __cvt_fp2unsigned(invPan);
+    invSpanFrac = (f32)fmod(invSpan, lbl_8047D450);
+    invSpanIdx = __cvt_fp2unsigned(invSpan);
+
+    panTable = baseTable + 0x81;
+
+    if (studioFlag == 0) {
+        scaled = lbl_8047D430 * volume;
+        volIdx = __cvt_fp2unsigned(scaled);
+        volFrac = scaled - (f32)volIdx;
+        gain = salLerpPair(volTable, volIdx, volFrac);
+        spanMix = salLerpPair(panTable, spanIdx, spanFrac);
+        out[2] = gain * spanMix * lbl_8047D438;
+        invSpanMix = salLerpPair(panTable, invSpanIdx, invSpanFrac);
+        panMix = salLerpPair(panTable, panIdx, panFrac);
+        amp = gain * invSpanMix;
+        out[1] = amp * panMix;
+        invPanMix = salLerpPair(panTable, invPanIdx, invPanFrac);
+        out[0] = amp * invPanMix;
+
+        scaled = lbl_8047D430 * auxA;
+        volIdx = __cvt_fp2unsigned(scaled);
+        volFrac = scaled - (f32)volIdx;
+        gain = salLerpPair(volTable, volIdx, volFrac);
+        spanMix = salLerpPair(panTable, spanIdx, spanFrac);
+        out[5] = gain * spanMix * lbl_8047D438;
+        amp = gain * invSpanMix;
+        out[4] = amp * panMix;
+        out[3] = amp * invPanMix;
+
+        scaled = lbl_8047D430 * auxB;
+        volIdx = __cvt_fp2unsigned(scaled);
+        volFrac = scaled - (f32)volIdx;
+        gain = salLerpPair(volTable, volIdx, volFrac);
+        spanMix = salLerpPair(panTable, spanIdx, spanFrac);
+        out[8] = gain * spanMix * lbl_8047D438;
+        amp = gain * invSpanMix;
+        out[7] = amp * panMix;
+        out[6] = amp * invPanMix;
+    } else {
+        f32* itdTable;
+        f32* itdTable2;
+        f32 prePanMix;
+        f32 preInvPanMix;
+
+        itdTable = panTable + 4;
+        itdTable2 = panTable + 4;
+        spanMix = salLerpPair(itdTable, spanIdx, spanFrac);
+        invSpanMix = salLerpPair(itdTable, invSpanIdx, invSpanFrac);
+        prePanMix = salLerpPair(panTable, prePanIdx, prePanFrac);
+        preInvPanMix = salLerpPair(panTable, preInvPanIdx, preInvPanFrac);
+        panMix = salLerpPair(itdTable, panIdx, panFrac);
+        invPanMix = salLerpPair(itdTable, invPanIdx, invPanFrac);
+
+        scaled = lbl_8047D430 * volume;
+        volIdx = __cvt_fp2unsigned(scaled);
+        volFrac = scaled - (f32)volIdx;
+        gain = salLerpPair(volTable, volIdx, volFrac);
+        amp = gain * spanMix;
+        out[1] = amp * invSpanMix * panMix;
+        out[0] = amp * invPanMix;
+        out[7] = gain * prePanMix * salLerpPair(itdTable2, prePanIdx, prePanFrac);
+        out[6] = gain * preInvPanMix * salLerpPair(itdTable2, preInvPanIdx, preInvPanFrac);
+
+        scaled = lbl_8047D430 * auxA;
+        volIdx = __cvt_fp2unsigned(scaled);
+        volFrac = scaled - (f32)volIdx;
+        gain = salLerpPair(volTable, volIdx, volFrac);
+        amp = gain * spanMix;
+        out[5] = amp * lbl_8047D438;
+        out[4] = amp * invSpanMix * panMix;
+        out[3] = amp * invPanMix;
+
+        out[2] = lbl_8047D460[0];
+        out[8] = lbl_8047D460[0];
+    }
+}
 
 extern u32 _GetInputValue(u8* obj, u8* motionBase, u8 p1, u8 p2); /* true return type IS
                                                                       * u32 -- the callee
@@ -589,6 +760,12 @@ extern void fn_800AE630(void);
 extern u32  ARQGetChunkSize(void);
 extern u32  adsrConvertTimeCents(s32 tc); /* verified true signature via synth_adsr.c reference + callsite (see below) */
 extern void salActivateStudio(void);
+extern u8 lbl_8047B033;
+extern u8 lbl_8047B034;
+extern u8 lbl_8047B035;
+extern void dataInit(u32 smpBase, u32 smpLength);
+extern void dataExit(void);
+extern void synthExit(void);
 extern void fn_8015AAA0(void);
 extern void salActivateVoice(u8* ptr, u8 unused2);
 extern void salDeactivateVoice(void);
@@ -1228,7 +1405,7 @@ asm void fn_80162A58(void) {
 #include "src/game/people/people_field_fn_80162A58.inc"
 }
 #else
-void fn_80162A58(u32 index, u32 volumeArg, u32 voiceIndex, f32 a, f32 b, f32 c) {
+void fn_80162A58(u32 index, u32 volumeArg, u32 voiceIndex, u32 spanArg, f32 a, f32 b, f32 c) {
     u8* entry;
     f32 work[9];
     u32 studioFlag;
@@ -1249,7 +1426,7 @@ void fn_80162A58(u32 index, u32 volumeArg, u32 voiceIndex, f32 a, f32 b, f32 c) 
 
     studioFlag = (*(u32*)(lbl_80447E60 + (u32)entry[0xEF] * 0xBC + 0x54) == 1);
     hasPan = (*(u32*)(entry + 0xF0) >> 31) & 1;
-    salCalcVolume(volumeArg, work, voiceIndex, a, b, c, hasPan, studioFlag);
+    salCalcVolume(volumeArg, work, voiceIndex, spanArg, a, b, c, hasPan, studioFlag);
 
     for (i = 0; i < 3; i++) {
         u16* dst;
@@ -5102,6 +5279,58 @@ void fn_8015B250(u32 dest, u32 nsDelay) {
 #undef dspSRCCycles
 #undef dspStudio
 
+void fn_80159C48(void) {
+    extern u16 lbl_8047AFE8;
+    lbl_8047AFE8 = 0;
+}
+
+void fn_80159ED0(void) {
+    ((void (*)(void))fn_801630E4)();
+}
+
+
+
+u8 fn_8015E890(void* emitter) {
+    extern u8 lbl_8047AF18;
+    if (lbl_8047AF18 == 0) {
+        return 0;
+    }
+    return (u8)((((u32*)emitter)[4] >> 15) & 1);
+}
+
+void fn_8015FE4C(u32 arg) {
+    extern u8 lbl_8047B033;
+    extern u8 lbl_8047B034;
+    extern u8 lbl_8047B035;
+    extern u32 lbl_8047B038;
+    extern u32 lbl_8047B03C;
+    extern u32 lbl_8047B040;
+    extern u32 lbl_8047B044;
+    extern u32 lbl_8047B048;
+    lbl_8047B038 = 0;
+    lbl_8047B03C = 0;
+    lbl_8047B040 = 0;
+    lbl_8047B044 = 0;
+    lbl_8047B048 = 0;
+    lbl_8047B035 = 1;
+    lbl_8047B034 = 3;
+    lbl_8047B033 = (u8)((arg >> 30) & 1);
+}
+
+void fn_8015FE84(void) { }
+
+void sndQuit(void) {
+    hwExit();
+    dataExit();
+    fn_8015FE84();
+    synthExit();
+    lbl_8047AF18 = 0;
+}
+
+u8 fn_8015FFD4(void) {
+    extern u8 lbl_8047AF18;
+    return lbl_8047AF18;
+}
 
 /* ===== snd_midictrl.c: inp* cluster, 0x8015FFD4-0x801610F4 =====
  * identity: reference snd_midictrl.c. Statics identified via symbol-map

@@ -46,6 +46,45 @@ extern u8 lbl_8047C1B8;
 /* ===== Rodata / data labels ===== */
 extern u8 jumptable_802EEB78[];
 extern u8 lbl_8026F2E8[];
+extern u8 lbl_8026F488[];
+extern f32 lbl_8047C1C8;
+extern f32 lbl_8047C1CC;
+
+typedef struct CardEPadState {
+    /* 0x00 */ u8 pad00[4];
+    /* 0x04 */ u16 trigger;
+    /* 0x06 */ u16 repeat;
+} CardEPadState;
+
+typedef struct CardEModelAnim {
+    /* 0x00 */ u32 modelId;
+    /* 0x04 */ s16 anim;
+    /* 0x06 */ s16 animAlt;
+} CardEModelAnim;
+
+typedef struct CardEGridTable {
+    /* 0x00 */ u32 selectedIconModel[4];
+    /* 0x10 */ u16 selectedIconAnim;
+    /* 0x12 */ u8 pad12[2];
+    /* 0x14 */ CardEModelAnim cell[3][3];
+    /* 0x5C */ u32 cursorModel[4];
+    /* 0x6C */ u16 cursorAnim;
+} CardEGridTable;
+
+typedef struct CardESelection {
+    /* 0x00 */ u16 id[3];
+} CardESelection;
+
+extern void* fn_801054B8();
+extern void* fn_800F92D4(u32);
+extern void fn_800ECCA8(void*, s16);
+extern void fn_800ECA78(void*, f32);
+extern void fn_800EC9DC(void*, f32);
+extern void fn_800EC990(void*);
+extern void fn_800ECB74(void*, u32);
+extern u8 fn_800EC960(void*);
+extern void fn_80166A28();
+extern s32 fn_801666BC();
 
 /* 0x8007FD64 | size: 0x58
  * menuCardE_CompareEntryPtrs: qsort-style comparator for MenuCardEEntry*
@@ -75,6 +114,180 @@ s32 menuCardE_CompareEntryPtrs(u32 r3, u32 r4) {
     r0 = r0 - r3;
     r3 = (u32)r0 >> 31;
     return r3;
+}
+
+extern void GScharCpy(void* dst, const void* src);
+extern const u8 lbl_80268DC0[];
+
+/* Apply one decoded card-e field and reject values outside its domain. */
+s32 fn_8008102C(void** object_ref, const u32* descriptor, s32 index,
+                s32 value, const char* text, s32 subindex)
+{
+    u8* object = (u8*)*object_ref;
+    u32 field = descriptor[0];
+    s32 i;
+    u8* record;
+    u16 half;
+
+    switch (field) {
+    case 0:
+        *(s32*)object = value;
+        return value >= 0 && value < 2;
+    case 1:
+        object[4] = (u8)value;
+        return value > 0 && value < 6;
+    case 2:
+        object[5] = (u8)value;
+        return value > 0 && value < 4;
+    case 3:
+        object[6] = (u8)value;
+        return value > 0 && value < 10;
+    case 4:
+        object[7] = (u8)value;
+        return value >= 0 && value <= 12;
+    case 5:
+        object[8] = (u8)value;
+        return 1;
+    case 6:
+        GScharCpy(object + 0x0A, text);
+        return 1;
+    case 7:
+        object[0x24] = (s8)(value - 1);
+        return value >= 0 && value < 6;
+    case 8:
+        object[0x25] = (u8)value;
+        return 1;
+    case 9:
+        object[0x26] = (s8)(value - 1);
+        return (s8)object[0x26] >= 0 && (s8)object[0x26] < 5;
+    case 10:
+        GScharCpy(object + 0x28, text);
+        return 1;
+    case 11:
+        GScharCpy(object + 0x38, text);
+        return 1;
+    case 12:
+        GScharCpy(object + 0x48, text);
+        return 1;
+    case 13:
+        object[0x58] = (s8)value;
+        return value >= 1 && value <= 3;
+    case 14:
+        object[0x59] = (s8)value;
+        return value >= 1 && value <= 6;
+    case 15:
+        object[0x5A] = (s8)value;
+        return value >= 1 && value <= 5;
+    case 16:
+    case 17:
+    case 18:
+    case 19:
+    case 20:
+    case 21:
+    case 22:
+    case 23:
+    case 24:
+        object[0x5B + field - 16] = (s8)(value - 1);
+        return value >= 0 && value <= 9;
+    case 25:
+    case 26:
+    case 27:
+        half = (u16)value;
+        *(u16*)(object + 0x64 + (field - 25) * 2) = half;
+        for (i = 0; i < 0x2F; i++) {
+            if (((const u16*)(lbl_80268DC0 + 0x384))[i] == half) {
+                return 1;
+            }
+        }
+        return 0;
+    case 28:
+        object[0x6A] = (u8)value;
+        return value >= 0 && value <= 0x24;
+    case 29:
+        object[0x6B] = (u8)value;
+        return value >= 0 && value <= 0x24;
+    case 30:
+        object[0x6C] = (u8)value;
+        return value >= 0 && value <= 0x24;
+    case 31:
+        GScharCpy(object + 0x6E, text);
+        return 1;
+    case 32:
+        GScharCpy(object + 0x182, text);
+        return 1;
+    case 33:
+        GScharCpy(object + 0x296, text);
+        return 1;
+    case 34:
+        GScharCpy(object + 0xCA, text);
+        return 1;
+    case 35:
+        GScharCpy(object + 0x1DE, text);
+        return 1;
+    case 36:
+        GScharCpy(object + 0x2F2, text);
+        return 1;
+    case 37:
+        GScharCpy(object + 0x126, text);
+        return 1;
+    case 38:
+        GScharCpy(object + 0x23A, text);
+        return 1;
+    case 39:
+        GScharCpy(object + 0x34E, text);
+        return 1;
+    case 40:
+        GScharCpy(object + 0x3AC + index * 0x28, text);
+        return 1;
+    case 41:
+        record = object + 0x3AC + index * 0x28;
+        if (value == 2) {
+            record[0x0C] = 1;
+        } else if (value == 3) {
+            record[0x0C] = 2;
+        } else {
+            record[0x0C] = 0;
+        }
+        return 1;
+    case 42:
+        record = object + 0x3AC + index * 0x28;
+        record[0x0D + subindex] = (s8)value;
+        return value >= 0 && value <= 0x24;
+    case 43:
+        record = object + 0x3AC + index * 0x28;
+        half = (u16)value;
+        *(u16*)(record + 0x12 + subindex * 2) = half;
+        for (i = 0; i < 0x2F; i++) {
+            if (((const u16*)(lbl_80268DC0 + 0x384))[i] == half) {
+                return 1;
+            }
+        }
+        return 0;
+    case 44:
+        *(u32*)(object + 0x3C8 + index * 0x28) = (u32)value;
+        return 1;
+    case 45:
+        record = object + 0x3AC + index * 0x28;
+        half = (u16)value;
+        *(u16*)(record + 0x20) = half;
+        for (i = 0; i < 0x13; i++) {
+            if (((const u16*)(lbl_80268DC0 + 0x618))[i] == half) {
+                return 1;
+            }
+        }
+        return 0;
+    case 46:
+        record = object + 0x3AC + index * 0x28;
+        *(u16*)(record + 0x22) = (u16)value;
+        for (i = 0; i < 9; i++) {
+            if ((s8)object[0x5B + i] == index) {
+                return 1;
+            }
+        }
+        return 0;
+    default:
+        return 0;
+    }
 }
 
 /* 0x80084034 | size: 0x4 */
@@ -3222,3 +3435,179 @@ void fn_80084A8C(void) {
 
     return;
 }
+
+#define CARDE_GRID_TABLE ((CardEGridTable*)lbl_8026F488)
+#define CARDE_SHOW_MODEL(model_id, anim_id)                                      \
+    do {                                                                         \
+        void* model_;                                                            \
+        model_ = fn_800F92D4((model_id));                                        \
+        if (model_ != 0) {                                                       \
+            fn_800ECCA8(model_, (anim_id));                                      \
+            fn_800ECA78(model_, lbl_8047C1CC);                                   \
+            fn_800EC9DC(model_, lbl_8047C1C8);                                   \
+            fn_800EC990(model_);                                                 \
+        }                                                                        \
+    } while (0)
+
+/* 0x80087C64 | size: 0x7C4 */
+u32 fn_80087C64(CardESelection* selection) {
+    CardEGridTable* table;
+    CardEPadState* pad;
+    CardEModelAnim* cell;
+    s32 marked[3][3];
+    s32 chosen[3][2];
+    s32 col;
+    s32 row;
+    s32 count;
+    s32 consumed;
+    s32 matchCount;
+    s32 x;
+    s32 y;
+    s32 i;
+    s32 result;
+    u16 buttons;
+    void* model;
+
+    table = CARDE_GRID_TABLE;
+    fn_801054B8(1, table);
+
+    col = 1;
+    row = 1;
+    count = 0;
+    result = 0;
+
+    for (y = 0; y < 3; y++) {
+        for (x = 0; x < 3; x++) {
+            marked[y][x] = 0;
+        }
+    }
+
+    while (count < 3) {
+        pad = fn_801054B8(1);
+        consumed = 0;
+        buttons = pad->repeat;
+
+        if ((buttons & 0x10) != 0) {
+            if (marked[row][col] == 0) {
+                cell = &table->cell[row][col];
+                CARDE_SHOW_MODEL(cell->modelId, cell->anim);
+
+                marked[row][col] = 1;
+                chosen[count][0] = col;
+                chosen[count][1] = row;
+                count++;
+
+                if (count >= 0 && count < 4) {
+                    CARDE_SHOW_MODEL(0x107E100B, ((s16*)&table->selectedIconAnim)[count]);
+                }
+
+                if (count >= 3) {
+                    matchCount = 0;
+                    for (y = 0; y < 3; y++) {
+                        for (x = 0; x < 3; x++) {
+                            if (marked[y][x] != 0) {
+                                u16 id;
+                                id = table->cell[y][x].anim;
+                                if (id == selection->id[0]) {
+                                    matchCount++;
+                                } else if (id == selection->id[1]) {
+                                    matchCount++;
+                                } else if (id == selection->id[2]) {
+                                    matchCount++;
+                                }
+                            }
+                        }
+                    }
+
+                    if (matchCount < 3) {
+                        fn_80166A28(0x26);
+                        while (fn_801666BC(0x26) == 2) {
+                            _threadSwitch();
+                        }
+
+                        for (y = 0; y < 3; y++) {
+                            for (x = 0; x < 3; x++) {
+                                if (marked[y][x] != 0) {
+                                    cell = &table->cell[y][x];
+                                    CARDE_SHOW_MODEL(cell->modelId, cell->animAlt);
+                                    marked[y][x] = 0;
+                                }
+                            }
+                        }
+
+                        CARDE_SHOW_MODEL(0x107E100B, table->selectedIconAnim);
+                        count = 0;
+                    } else {
+                        fn_80166A28(0x4A1);
+                        while (fn_801666BC(0x4A1) == 2) {
+                            _threadSwitch();
+                        }
+                    }
+                } else {
+                    fn_80166A28(0x3C6);
+                }
+                consumed = 1;
+            }
+        }
+
+        if (((pad->trigger & 0x20) != 0) && consumed == 0) {
+            count--;
+            if (count < 0) {
+                result = 1;
+                break;
+            }
+
+            fn_80166A28(0x3C7);
+            col = chosen[count][0];
+            row = chosen[count][1];
+            cell = &table->cell[row][col];
+            CARDE_SHOW_MODEL(cell->modelId, cell->animAlt);
+            CARDE_SHOW_MODEL(0x107E100B, ((s16*)&table->selectedIconAnim)[count]);
+            marked[row][col] = 0;
+            consumed = 1;
+        }
+
+        if (consumed == 0) {
+            x = col;
+            y = row;
+            i = 0;
+
+            if (((buttons & 0x1) != 0) && x > 0) {
+                x--;
+                i = 1;
+            }
+            if (((buttons & 0x2) != 0) && x < 2) {
+                x++;
+                i = 1;
+            }
+            if (((buttons & 0x4) != 0) && y > 0) {
+                y--;
+                i = 1;
+            }
+            if (((buttons & 0x8) != 0) && y < 2) {
+                y++;
+                i = 1;
+            }
+
+            if (i != 0) {
+                CARDE_SHOW_MODEL(0x107E1009, table->cell[y][x].anim);
+                model = fn_800F92D4(0x107E1009);
+                if (model != 0) {
+                    fn_800ECB74(model, 0);
+                    while (fn_800EC960(model) != 0) {
+                        _threadSwitch();
+                    }
+                }
+                col = x;
+                row = y;
+            }
+        }
+
+        _threadSwitch();
+    }
+
+    return result;
+}
+
+#undef CARDE_SHOW_MODEL
+#undef CARDE_GRID_TABLE
