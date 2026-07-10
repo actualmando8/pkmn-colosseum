@@ -960,7 +960,8 @@ void fn_80069C0C(void* arg0) {
 
 
 /* 0x8006A65C | size: 0xBC */
-#pragma scheduling off
+#pragma push
+#pragma peephole off
 u16 fn_8006A65C(void) {
     extern void* savedataGetStatus(int, int);
     extern void scriptSoundStop(int);
@@ -984,7 +985,7 @@ u16 fn_8006A65C(void) {
     _threadSwitch();
     return (u16) * (u32*)((u8*)savedataGetStatus(0, 0xe) + 0x20);
 }
-#pragma scheduling reset
+#pragma pop
 
 
 /* 0x8006A718 | size: 0x54 */
