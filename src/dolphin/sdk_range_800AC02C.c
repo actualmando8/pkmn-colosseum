@@ -120,6 +120,32 @@ extern u32 lbl_8047A948;
 extern u32 lbl_8047A94C;
 extern u32 lbl_8047A950;
 extern u16 lbl_8047A970;
+
+typedef struct DSPTaskInfo DSPTaskInfo;
+typedef void (*DSPCallback)(void* task);
+struct DSPTaskInfo {
+    /* 0x00 */ u32 state;
+    /* 0x04 */ u32 priority;
+    /* 0x08 */ u32 flags;
+    /* 0x0C */ u16* iram_mmem_addr;
+    /* 0x10 */ u32 iram_length;
+    /* 0x14 */ u32 iram_addr;
+    /* 0x18 */ u16* dram_mmem_addr;
+    /* 0x1C */ u32 dram_length;
+    /* 0x20 */ u32 dram_addr;
+    /* 0x24 */ u16 dsp_init_vector;
+    /* 0x26 */ u16 dsp_resume_vector;
+    /* 0x28 */ DSPCallback init_cb;
+    /* 0x2C */ DSPCallback res_cb;
+    /* 0x30 */ DSPCallback done_cb;
+    /* 0x34 */ DSPCallback req_cb;
+    /* 0x38 */ DSPTaskInfo* next;
+    /* 0x3C */ DSPTaskInfo* prev;
+    /* 0x40 */ u8 _40[0x10];
+};
+extern DSPTaskInfo* lbl_8047A964; /* __DSP_last_task */
+extern DSPTaskInfo* lbl_8047A968; /* __DSP_first_task */
+extern DSPTaskInfo* lbl_8047A96C; /* __DSP_curr_task */
 extern CARDControl lbl_803FC620[2];
 extern u8 lbl_803FC840[];
 extern GXData* gx;
@@ -293,6 +319,34 @@ u32 fn_800AE92C(void) {
 }
 
 void __DSP_debug_printf(char* fmt, ...) {
+}
+
+void __DSP_remove_task(DSPTaskInfo* task) {
+    task->flags = 0;
+    task->state = 3;
+
+    if (lbl_8047A968 == task) {
+        if (task->next != NULL) {
+            lbl_8047A968 = task->next;
+            task->next->prev = NULL;
+        } else {
+            lbl_8047A96C = NULL;
+            lbl_8047A964 = NULL;
+            lbl_8047A968 = NULL;
+        }
+        return;
+    }
+
+    if (lbl_8047A964 == task) {
+        lbl_8047A964 = task->prev;
+        task->prev->next = NULL;
+        lbl_8047A96C = lbl_8047A968;
+        return;
+    }
+
+    lbl_8047A96C = task->next;
+    task->prev->next = task->next;
+    task->next->prev = task->prev;
 }
 
 void __CARDDefaultApiCallback(s32 chan, s32 result) {

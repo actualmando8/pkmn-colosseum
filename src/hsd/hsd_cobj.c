@@ -19,14 +19,16 @@ extern void C_MTXPerspective();
 extern void OSFillFPUContext();
 extern int setupTopHalfCamera();   /* wrk7: was `void` asm-wrapper decl; typed-C returns int */
 extern void CObjUpdateFunc(HSD_CObj*, u32, f32*);
+extern void HSD_MtxFree(void*);
+extern void HSD_ObjFree(void*, void*);
 extern char lbl_80465080[];
 
 static HSD_ClassInfo* default_class;
 static HSD_CObj* current;
 
-static void CObjInfoInit(void);
+static void fn_80193C24(void);
 
-HSD_CObjInfo hsdCObj = { CObjInfoInit };
+HSD_CObjInfo hsdCObj = { fn_80193C24 };
 
 /* ========================================================================= */
 /*  Accessors                                                                */
@@ -274,18 +276,32 @@ static void CObjAmnesia_Early(HSD_ClassInfo* info)
     HSD_OBJECT_PARENT_INFO(&hsdCObj)->amnesia(info);
 }
 
-static void CObjInfoInit(void)
+extern int CObjInit(HSD_CObj*);
+extern void CObjRelease(HSD_CObj*);
+extern void CObjAmnesia(HSD_ClassInfo*);
+extern int CObjLoad(HSD_CObj*, HSD_CObjDesc*);
+extern void CObjUpdateFunc(HSD_CObj*, u32, f32*);
+
+extern HSD_CObjInfo lbl_8036C678;
+extern HSD_ClassInfo lbl_8036CC00;
+/* lbl_80274628 / lbl_80274640 are declared in include/hsd/hsd_cobj.h
+ * (cross-TU rodata; hsd_cobj.c has no .rodata split of its own). */
+
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+static void fn_80193C24(void)
 {
-    hsdInitClassInfo(HSD_CLASS_INFO(&hsdCObj), HSD_CLASS_INFO(&hsdObj),
-                     "sysdolphin_base_library", "hsd_cobj",
+    hsdInitClassInfo(HSD_CLASS_INFO(&lbl_8036C678), HSD_CLASS_INFO(&lbl_8036CC00),
+                     lbl_80274628, lbl_80274640,
                      sizeof(HSD_CObjInfo), sizeof(HSD_CObj));
-    HSD_CLASS_INFO(&hsdCObj)->release = CObjRelease_Early;
-    HSD_CLASS_INFO(&hsdCObj)->amnesia = CObjAmnesia_Early;
-    HSD_COBJ_INFO(&hsdCObj)->load =
-        (int (*)(HSD_CObj*, HSD_CObjDesc*)) setupTopHalfCamera;
-    HSD_COBJ_INFO(&hsdCObj)->update =
-        (void (*)(HSD_CObj*, u32, void*)) CObjUpdateFunc;
+    HSD_CLASS_INFO(&lbl_8036C678)->init = (int (*)(HSD_Class*)) CObjInit;
+    HSD_CLASS_INFO(&lbl_8036C678)->release = (void (*)(HSD_Class*)) CObjRelease;
+    HSD_CLASS_INFO(&lbl_8036C678)->amnesia = CObjAmnesia;
+    HSD_COBJ_INFO(&lbl_8036C678)->load = CObjLoad;
+    HSD_COBJ_INFO(&lbl_8036C678)->update = (void (*)(HSD_CObj*, u32, void*)) CObjUpdateFunc;
 }
+#pragma pop
 
 /* 0x80193CD0 | 0x60 */
 #pragma push
@@ -1544,9 +1560,9 @@ f32 upvec2roll(HSD_CObj* cobj, f32* arg) {
         if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
         fn_80191688(cobj->interest, interest);
         PSVECSubtract(interest, eye, dir);
-        if (__fabs(dir[0]) <= lbl_80478AC8 &&
-            __fabs(dir[1]) <= lbl_80478AC8 &&
-            __fabs(dir[2]) <= lbl_80478AC8) {
+        if ((dir[0] < 0.0f ? -dir[0] : dir[0]) <= lbl_80478AC8 &&
+            (dir[1] < 0.0f ? -dir[1] : dir[1]) <= lbl_80478AC8 &&
+            (dir[2] < 0.0f ? -dir[2] : dir[2]) <= lbl_80478AC8) {
             ok = -1; /* direction ~= 0: unusable */
         } else {
             fn_800A3ADC(dir, dir); /* normalize in place */
@@ -1560,7 +1576,7 @@ f32 upvec2roll(HSD_CObj* cobj, f32* arg) {
     {
         f32 dot;
         dot = PSVECDotProduct(arg, dir);
-        dot = __fabs(dot);
+        dot = (dot < 0.0f ? -dot : dot);
         if (lbl_8047D9B0 - dot < lbl_80478AC8) {
             return lbl_8047D978; /* dir nearly parallel to arg: unusable */
         }
@@ -2476,20 +2492,47 @@ void fn_80196C54(int flag, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_8009C1B4(void);
-#if 0
-asm void fn_80196CE0(void) {
-#include "src/hsd/hsd_cobj_fn_80196CE0.inc"
+asm void HSD_SaveContext(void) {
+    nofralloc
+    mtsprg 0, r3
+    lis r3, lbl_80465080@ha
+    addi r3, r3, lbl_80465080@l
+    stmw r0, 0(r3)
+    mfsprg r4, 0
+    stw r4, 0xc(r3)
+    mfspr r4, GQR0
+    stw r4, 0x1a4(r3)
+    mfspr r4, GQR1
+    stw r4, 0x1a8(r3)
+    mfspr r4, GQR2
+    stw r4, 0x1ac(r3)
+    mfspr r4, GQR3
+    stw r4, 0x1b0(r3)
+    mfspr r4, GQR4
+    stw r4, 0x1b4(r3)
+    mfspr r4, GQR5
+    stw r4, 0x1b8(r3)
+    mfspr r4, GQR6
+    stw r4, 0x1bc(r3)
+    mfspr r4, GQR7
+    stw r4, 0x1c0(r3)
+    mfcr r4
+    stw r4, 0x80(r3)
+    mflr r4
+    stw r4, 0x84(r3)
+    mfctr r4
+    stw r4, 0x88(r3)
+    mfxer r4
+    stw r4, 0x8c(r3)
+    mfsrr0 r4
+    stw r4, 0x198(r3)
+    mfsrr1 r4
+    stw r4, 0x19c(r3)
+    lhz r4, 0x1a2(r3)
+    ori r4, r4, 1
+    sth r4, 0x1a2(r3)
+    b OSFillFPUContext
 }
-#else
-#pragma dont_inline on
-void fn_80196CE0(void) {
-    /* PPC live-register SPR/GQR save is not expressible in portable C. */
-    *(u16*)(lbl_80465080 + 0x1A2) |= 1;
-    OSFillFPUContext(lbl_80465080);
-}
-#pragma dont_inline reset
-#endif
 #pragma pop
 
 /* 0x80196D78 | 0x98 */
@@ -2497,7 +2540,6 @@ void fn_80196CE0(void) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 extern void fn_800060F0(const char*, u32, const char*, ...);
-extern void fn_80196CE0(void);
 extern void OSReport(const char* fmt, ...);
 extern char lbl_802746A0[];
 extern char lbl_80465080[];
@@ -2509,7 +2551,7 @@ asm void HSD_Panic(void) {
 void HSD_Panic(const char* file, u32 line, const char* expr) {
     extern u32 lbl_8047B238;
     if (lbl_8047B238 != 0) {
-        fn_80196CE0();
+        HSD_SaveContext();
         OSReport(lbl_802746A0, expr, file, line);
         ((void(*)(char*, ...))lbl_8047B238)(lbl_80465080);
     }
@@ -2533,7 +2575,7 @@ void __assert(const char* file, u32 line, const char* expr) {
     extern u32 lbl_8047B238;
     OSReport(lbl_802746B8, expr);
     if (lbl_8047B238 != 0) {
-        fn_80196CE0();
+        HSD_SaveContext();
         OSReport(lbl_802746A0, &lbl_8047D9D8, file, line);
         ((void(*)(char*, ...))lbl_8047B238)(lbl_80465080);
     }
@@ -2743,6 +2785,79 @@ void fn_8019733C(u32 val) { extern u32 lbl_8047B240; lbl_8047B240 = val; }
 #endif
 #pragma pop
 
+/* 0x80197344 | 0xBC */
+void fn_80197784(u32);
+#pragma push
+#pragma optimization_level 1
+#pragma peephole on
+void fn_80197344(u32 obj) {
+    extern void (*lbl_8047B240)(u32, u32, u32, u32);
+    u32 base;
+    u32 node;
+
+    if ((base = obj) == 0) {
+        return;
+    }
+    if (((u32)__cntlzw(*(u32*)(base + 0x14) & 0x4020) >> 5) != 0) {
+        fn_80197784(base);
+        return;
+    }
+    if ((*(u32*)(base + 0x14) & 0x20) == 0) {
+        return;
+    }
+    if (lbl_8047B240 == 0) {
+        return;
+    }
+
+    node = *(u32*)(base + 0x18);
+    while (node != 0) {
+        if ((*(u32*)(node + 4) & 0x80000000) != 0) {
+            lbl_8047B240(0, *(u32*)(node + 4) & 0x3F,
+                         (*(u32*)(node + 4) & 0x3FFFFFC0) >> 6, base);
+        }
+        *(u32*)(node + 4) = *(u32*)(node + 4) & 0x7FFFFFFF;
+        node = *(u32*)node;
+    }
+}
+#pragma pop
+
+/* 0x80197400 | 0xA8 */
+#pragma push
+#pragma optimization_level 1
+#pragma optimizewithasm off
+void fn_80197400(void) {
+    extern u8* lbl_8047B24C;
+    extern u32 lbl_8047B250;
+    extern u32 lbl_8047B254;
+    extern u32 lbl_8047B258;
+    extern u32 lbl_8047B25C;
+    extern u32 lbl_80478C64;
+    extern u32 lbl_80478C68;
+    extern u32 lbl_80478C6C;
+    /* lbl_80465348 is an HSD_ObjAllocData handle in .bss (size 0x30 per
+     * symbols.txt / bss_80465080.c); NOT a string literal. Same declaration
+     * form used by src/hsd/hsd_displayfunc.c for this address. */
+    extern unsigned char lbl_80465348[];
+    u8* p;
+    u8* next;
+    for (p = lbl_8047B24C; p != NULL; p = next) {
+        next = *(u8**)(p + 0x44);
+        if (*(u32*)(p + 0x30) != 0) {
+            HSD_MtxFree(*(void**)(p + 0x30));
+        }
+        HSD_ObjFree(lbl_80465348, p);
+    }
+    lbl_8047B24C = 0;
+    lbl_80478C64 = (u32)&lbl_8047B24C;
+    lbl_8047B250 = 0;
+    lbl_80478C68 = (u32)&lbl_8047B250;
+    lbl_8047B254 = 0;
+    lbl_8047B258 = 0;
+    lbl_80478C6C = (u32)&lbl_8047B258;
+    lbl_8047B25C = 0;
+}
+#pragma pop
+
 /* 0x801975FC | 0x54 */
 #pragma push
 #pragma optimization_level 1
@@ -2764,4 +2879,46 @@ void fn_801975FC(void) {
     lbl_8047B258 = fn_80197650(lbl_8047B258, lbl_8047B25C, 0x40);
 }
 #endif
+#pragma pop
+
+/* 0x80197998 | 0xCC */
+#pragma push
+#pragma optimization_level 1
+#pragma use_lmw_stmw on
+void fn_80197998(u32 obj, u32 arg1, u32 arg2, u32 mask, u32 flags) {
+    /* Out-of-TU HSD_Render/DObj helpers used by the draw walk; declared here
+       to satisfy fix_includes.py without adding TU-scope externs that could
+       hide bodies (these symbols live in other TUs). */
+    extern void HSD_DObjSetCurrent(u32);
+    extern void fn_8019F024(u32);
+    extern void fn_801A5DCC(u32);
+    extern void fn_801AB63C(u32, u32);
+    u32 child;
+    u32 drawMask;
+    u32 vtbl;
+    void (*callback)(u32, u32, u32, u32);
+
+    fn_8019F024(obj);
+    drawMask = mask << 1;
+    if ((flags & 0x04000000) == 0) {
+        if ((*(u32*)(obj + 0x14) & 0x00010000) != 0) {
+            fn_801A5DCC(arg2);
+        }
+    }
+    fn_801AB63C(0, 0);
+    child = *(u32*)(obj + 0x18);
+    while (child != 0) {
+        if ((*(volatile u32*)(child + 0x14) & 1) == 0) {
+            if ((*(volatile u32*)(child + 0x14) & drawMask) != 0) {
+                HSD_DObjSetCurrent(child);
+                vtbl = *(u32*)child;
+                callback = *(void (**)(u32, u32, u32, u32))(vtbl + 0x3C);
+                callback(child, arg1, arg2, flags);
+            }
+        }
+        child = *(u32*)(child + 4);
+    }
+    HSD_DObjSetCurrent(0);
+    fn_8019F024(0);
+}
 #pragma pop

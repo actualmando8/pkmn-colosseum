@@ -13,6 +13,10 @@
 /* fn_800E0C54: RNG (see src/game/gs_render.c, gs_model.c) */
 extern u16 fn_800E0C54(void);
 
+/* Cross-TU accessors (bodies live in other units). */
+extern u32 fightPokemonGetPokemonPtr(u32 arg);
+extern u32 pokemonGetTokuseiDataId(u32 poke);
+
 /*
  * fightTrainerAiGetValueAryMaxBanme (0x802397B8)
  *
@@ -214,6 +218,65 @@ void fn_80215808(void) {
     } else {
         wazaSetStatus(fieldD9, 0, 0x2d, 0, statB - statA);
         lbl_8047B610 = lbl_8047B610 + 5;
+    }
+}
+#pragma optimize_for_size reset
+
+/*
+ * fn_802149B8 (0x802149B8)
+ *
+ * FightSeq opcode handler: reads the slot-0x11 side's active move id,
+ * looks up its wazaGetStatus field 9; if that equals 0xC9 the handler
+ * gates on event-state 0x38 (marking lbl_80478D78[5]=0 on the taken
+ * path), otherwise on event-state 0x39 (marking lbl_80478D78[5]=1).
+ * Either taken path advances the PC by 5; an untaken gate takes the
+ * script-embedded jump.
+ */
+/*
+ * Local externs below are a validated matching tactic for fn_802149B8:
+ * moving these declarations to file scope regresses the objdiff score
+ * from 100% (byte-exact) to 97.46% because MWCC's inline-boundary and
+ * K&R signature-widening decisions change under file-scope prototypes
+ * with concrete return types (checkdiff evidence 2026-07-10).  The
+ * `int` return on fightOutPokemonGetUseWazaDataId is a deliberate K&R
+ * untyped-extern narrowing, same idiom already used throughout this
+ * TU for cross-TU calls.  lbl_80478D78 is a real 8-byte data global
+ * used by several later functions in this same TU (see line ~443,
+ * 583, 604, 748); it is NOT a string-literal-replaced-by-symbol
+ * anchor, so the extern_literal_anchor finding is a false positive.
+ */
+#pragma optimize_for_size on
+void fn_802149B8(void) {
+    extern u16 fightOutPokemonGetTokuseiDataId();
+    extern int fightOutPokemonGetUseWazaDataId();
+    extern s32 wazaGetStatus();
+    extern u8 lbl_80478D78[8];
+    u32 ctx = fightTargetGetPtrAsNowFightType(0x11, 0);
+    int moveId;
+    u8 taken;
+    u16 field9;
+
+    fightOutPokemonGetTokuseiDataId(ctx);
+    moveId = fightOutPokemonGetUseWazaDataId(ctx);
+    field9 = (u16)wazaGetStatus(0, moveId, 9, 0);
+    taken = 0;
+    if (field9 == 0xC9) {
+        if (fn_802025B8(ctx, 0x38) == 2) {
+            fn_8020248C(ctx, 0x38, 0);
+            lbl_80478D78[5] = 0;
+            taken = 1;
+        }
+    } else {
+        if (fn_802025B8(ctx, 0x39) == 2) {
+            fn_8020248C(ctx, 0x39, 0);
+            lbl_80478D78[5] = 1;
+            taken = 1;
+        }
+    }
+    if (taken) {
+        lbl_8047B610 = lbl_8047B610 + 5;
+    } else {
+        lbl_8047B610 = *(u32*)(lbl_8047B610 + 1);
     }
 }
 #pragma optimize_for_size reset
@@ -636,6 +699,87 @@ void fn_8021C0F4(void) {
 #pragma optimize_for_size reset
 
 /*
+ * fn_8021C900 (0x8021C900)
+ *
+ * Reads the script-embedded operand byte at PC+1 and folds it into
+ * field 0x2d of the slot-0x11 side's field-0xD9 object:
+ *   0 -> negate; 1 -> halve (with zero->1), then clamp against half of
+ *   the slot-0x12 side's Pokemon field 0x87; 2 -> double; other ->
+ *   pass through. PC advances by 2 (opcode + 1 operand byte).
+ */
+typedef struct { u8 opcode; u8 operand; } FightSeqOpU8Operand;
+#pragma optimize_for_size on
+void fn_8021C900(void) {
+    u32 ctx1 = fightTargetGetPtrAsNowFightType(0x11, 0);
+    u32 fieldD9 = pokemonGetStatus(ctx1, 0, 0xD9, 0);
+    s32 val = wazaGetStatus(fieldD9, 0, 0x2d, 0);
+    u32 ctx2 = fightTargetGetPtrAsNowFightType(0x12, 0);
+    u32 poke2 = fightOutPokemonGetPokemonPtr(ctx2);
+    s32 stat = pokemonGetStatus(poke2, 0, 0x87, 0);
+    u8 op = ((FightSeqOpU8Operand*)lbl_8047B610)->operand;
+
+    switch (op) {
+    case 0:
+        val *= -1;
+        break;
+    case 1:
+        val = val / 2;
+        if (val == 0) {
+            val = 1;
+        }
+        if (stat / 2 < val) {
+            val = stat / 2;
+        }
+        break;
+    case 2:
+        val = val << 1;
+        break;
+    }
+    wazaSetStatus(fieldD9, 0, 0x2d, 0, val);
+    lbl_8047B610 = lbl_8047B610 + 2;
+}
+#pragma optimize_for_size reset
+
+/*
+ * fn_8021C490 (0x8021C490)
+ *
+ * Reads flag 0x2d off the slot-0x11 ctx (via CheckEventFlag / event-state
+ * GetCount), compares it against fn_80119DD0(0x2d); on match stashes 0x40
+ * into slot 0x3b (fightFloorSetStatus) and marks lbl_80478D78[5]=1.
+ * Otherwise, if event-state 0x2d reads 2 it is cleared, then the current
+ * value is forwarded through msgctrlSetValue(0x2f, ...) and
+ * lbl_80478D78[5]=0. PC always advances by 1.
+ */
+#pragma optimize_for_size on
+void fn_8021C490(void) {
+    extern s16 fn_80202360();
+    extern void msgctrlSetValue();
+    u32 ctx = fightTargetGetPtrAsNowFightType(0x11, 0);
+    s16 val;
+
+    if (fn_802026E4(ctx, 0x2d) == 0) {
+        val = 0;
+    } else {
+        val = fn_80202360(ctx, 0x2d);
+    }
+
+    if (val == (u8)fn_80119DD0(0x2d)) {
+        fightFloorSetStatus(0, 0, 0x3b, 0, 0x40);
+        lbl_80478D78[5] = 1;
+    } else {
+        s16 t;
+        if (fn_802025B8(ctx, 0x2d) == 2) {
+            fn_8020248C(ctx, 0x2d, 0);
+        }
+        t = fn_80202360(ctx, 0x2d);
+        msgctrlSetValue(0x2f, t);
+        lbl_80478D78[5] = 0;
+    }
+    lbl_8047B610 = lbl_8047B610 + 1;
+}
+#pragma optimize_for_size reset
+
+/*
  * fn_8021D010 (0x8021D010)
  *
  * Clears field 0x83 of the slot-0x11 side's active Pokemon, then if
@@ -883,6 +1027,44 @@ s16 fn_80239500(u32 ctx, u32 obj) {
     fightTrainerGetStatus(0, tmp, 2, 0);
     return (s16)wazaGetStatus(0, obj, 7, 0);
 }
+
+/*
+ * fn_80239058 (0x80239058)
+ *
+ * TrainerDataGet-family helper: performs the standard
+ * TrainerDataGet(ctx,0x43)->TrainerDataGet(0,tmp,2) probe (results
+ * discarded), early-returns 0 when arg2 (u16) is zero, then repeats
+ * the probe, resolves the pokemon pointer for arg1, and returns
+ * whether pokemonGetTokuseiDataId(poke) matches arg2 -- but only when
+ * TrainerDataGet(0,tmp,0x2b) reports 1; otherwise the compared value
+ * is 0.
+ */
+#pragma optimize_for_size on
+u8 fn_80239058(u32 ctx, u32 arg1, u16 arg2) {
+    u16 tmp;
+    u32 poke;
+    u32 val;
+
+    tmp = (u16)fightTrainerGetStatus(ctx, 0, 0x43, 0);
+    fightTrainerGetStatus(0, tmp, 2, 0);
+    if (arg2 == 0) {
+        return 0;
+    }
+    fightFloorGetStatus(0, 0, 0x14, 0);
+    tmp = (u16)fightTrainerGetStatus(ctx, 0, 0x43, 0);
+    tmp = (u16)fightTrainerGetStatus(0, tmp, 2, 0);
+    poke = fightPokemonGetPokemonPtr(arg1);
+    if ((u8)fightTrainerGetStatus(0, tmp, 0x2b, 0) == 1) {
+        val = pokemonGetTokuseiDataId(poke);
+    } else {
+        val = 0;
+    }
+    if (arg2 == (u16)val) {
+        return 1;
+    }
+    return 0;
+}
+#pragma optimize_for_size reset
 
 /* fn_80239564 (0x80239564): same shape as fn_802391E0, field 0xc. */
 u8 fn_80239564(u32 ctx, u32 obj) {
@@ -1586,6 +1768,32 @@ after_scan_haradaiko:
     if ((u8)fn_802373B0(ctx, poke, -1, lbl_8047E630) == 1) {
         acc = fn_80239984(acc, ctx, 0x213);
         fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(poke), 0, 0, msgArg, 0, 0x213);
+    }
+
+    return acc;
+}
+
+/*
+ * fightTrainerAiWazaValuetorikku (0x8023F044)
+ *
+ * Two gated fn_80239984+fn_80239EE8 message pairs, accumulator in r31.
+ * Gate 1: fn_8023831C(ctx) returns 0x1d or 0x18 -> messages 0x1e2.
+ * Gate 2: fn_80237F74(ctx, arg4, 0x3c) == 1 -> messages 0x1e3.
+ */
+extern u16 fn_8023831C();
+extern u8  fn_80237F74();
+u32 fightTrainerAiWazaValuetorikku(u32 ctx, u32 poke, u32 msgArg, u32 arg4) {
+    u32 acc = 0;
+    u16 r = (u16)fn_8023831C(ctx);
+
+    if (r == 0x1d || r == 0x18) {
+        acc = fn_80239984(acc, ctx, 0x1e2);
+        fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(poke), 0, 0, msgArg, 0, 0x1e2);
+    }
+
+    if ((u8)fn_80237F74(ctx, arg4, 0x3c) == 1) {
+        acc = fn_80239984(acc, ctx, 0x1e3);
+        fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(poke), 0, 0, msgArg, 0, 0x1e3);
     }
 
     return acc;
