@@ -129,13 +129,12 @@ s32 fn_801CB1C4(void)
     s32 axis;
     s32 buttons;
 
-    buttons = fn_800F7BC4(1) & 0xF;
-    if (buttons != 0) {
+    if ((fn_800F7BC4(1) & 0xF) != 0) {
         pushed = 1;
     }
 
     axis = (s8)fn_800F7A7C(1, 0);
-    if (axis > 0) {
+    if (axis > (1 * 0)) {
         axis = (s8)fn_800F7A7C(1, 0);
     } else {
         axis = -(s8)fn_800F7A7C(1, 0);
