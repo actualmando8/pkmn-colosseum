@@ -29,7 +29,6 @@ extern void fn_800B884C(u32 value);
 extern u8 lbl_804656E0[];
 extern u8 lbl_80465588[];
 extern u8 lbl_804655B4[];
-extern u8 lbl_8036CFE8[];
 extern u8 lbl_80465710[];
 extern u8 lbl_8047B350;
 extern u8 lbl_8047B351;
@@ -1328,7 +1327,7 @@ void fn_801B3168(void) {
 void fn_801B3174(void) {
     u32 i;
     for (i = 0; i < 4; i++) {
-        *(u32*)(lbl_8036CFE8 + i * 0xC + 0x8) = 0;
+        *(u32*)((u8*)lbl_8036CFE8 + i * 0xC + 0x8) = 0;
     }
 }
 

@@ -2446,6 +2446,7 @@ extern unsigned char lbl_8047B05D;
  * 0x8015A870). Preferred over #pragma dont_inline per global standard
  * global_standard:avoid-pragmas-register-asm. */
 u32 salExitDspCtrl(void) {
+    extern u32 lbl_8047B010;
     u8 i;
 
     fn_80164400(lbl_8047B018);
