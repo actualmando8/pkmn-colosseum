@@ -791,38 +791,27 @@ asm void fn_800FA064(void) {
 #include "src/game/gs_thread_fn_800FA064.inc"
 }
 #else
-#pragma optimization_level 2
-void fn_800FA064(void* obj) {
-    u8* o;
-    u32 rv;
+#pragma optimization_level 4
+#pragma peephole off
+void GSmsgAdjustAlign(u8* o) {
     s16 r5;
-    u8 type;
-    f32 base;
-    f64 bias;
 
-    o = (u8*)obj;
     if (*(s16*)(o + 0x18) == 0) return;
-    rv = GSmsgGetRect(*(void**)(o + 0x1C));
-    r5 = (s16)(rv >> 16);
-    type = *(u8*)(o + 0x4A);
-    base = *(f32*)(o + 0x4);
-    bias = lbl_8047CD10;
+    r5 = (s16)((u32)GSmsgGetRect(*(u32*)(o + 0x1C)) >> 16);
 
-    if (type == 0) {
-        *(f32*)(o + 0xC) = base;
-    } else if (type == 1) {
-        s16 target;
-        s32 diff;
-        target = *(s16*)(o + 0x18);
-        diff = (s32)(target - r5);
-        diff = (diff + (diff >> 31)) >> 1;
-        *(f32*)(o + 0xC) = base + (f32)((f64)diff - bias + bias);
-    } else if (type < 4) {
-        s16 target;
-        target = *(s16*)(o + 0x18);
-        *(f32*)(o + 0xC) = base + (f32)target - (f32)r5;
+    switch (o[0x4A]) {
+    case 0:
+        *(f32*)(o + 0xC) = *(f32*)(o + 0x4);
+        break;
+    case 1:
+        *(f32*)(o + 0xC) = *(f32*)(o + 0x4) + (f32)((*(s16*)(o + 0x18) - r5) / 2);
+        break;
+    case 2:
+        *(f32*)(o + 0xC) = *(f32*)(o + 0x4) + (f32)*(s16*)(o + 0x18) - (f32)r5;
+        break;
     }
 }
+#pragma peephole on
 #endif
 #pragma pop
 
