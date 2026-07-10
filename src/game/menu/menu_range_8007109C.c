@@ -13,6 +13,7 @@
 #define OS_TIMER_CLOCK (OS_BUS_CLOCK / 4)
 #define OSMillisecondsToTicks(msec) ((msec) * (OS_TIMER_CLOCK / 1000))
 
+extern u8 lbl_803F7A30[];
 extern u32 OSGetTick(void);
 extern void gbaCommandSetKeyState(s32 mode, s32 flag);
 extern s32 fn_80073C38(s32 chan);
@@ -648,3 +649,44 @@ u8 fn_80079EF4(s32 arg0, u32 value) {
 #undef CLOSE_AND_ABORT
 #undef SHOW_CANCEL_MESSAGE
 #undef WAIT_MENU_TIME
+
+void fn_80071318(u8* dst, u8* src) {
+    s16 upperX;
+    s16 upperY;
+    u32 entryWord;
+    s16 lowerX;
+    s16 lowerY;
+
+    upperX = *(s16*)(src + 0xC);
+    upperY = *(s16*)(src + 0xE);
+    *(s16*)(dst + 0x54) = upperX;
+    entryWord = *(u32*)(src + 0x10);
+    *(s16*)(dst + 0x56) = upperY;
+    lowerX = *(s16*)(src + 0x8);
+    *(u32*)(dst + 0x58) = entryWord;
+    lowerY = *(s16*)(src + 0xA);
+    *(s16*)(dst + 0x5C) = lowerX;
+    *(s16*)(dst + 0x5E) = lowerY;
+}
+
+s32 fn_8007A82C(void) {
+    extern s32 fn_801C40F0(s32);
+    return fn_801C40F0(1);
+}
+
+void fn_8007AAFC(void) {
+    lbl_803F7A30[0x342] = 1;
+}
+
+void fn_8007B6A4(u8* r3) {
+    extern void fn_8007B6D8(u8* p);
+    u8* r31 = r3;
+
+    fn_8007B6D8(r31);
+    *(u8*)(r31 + 0x345) = 0x1;
+}
+
+void fn_8007C23C(u8* r3) {
+    extern void fn_800A1F94(u8* p);
+    fn_800A1F94(r3 + 0x28);
+}
