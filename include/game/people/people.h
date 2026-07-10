@@ -194,6 +194,24 @@ typedef struct PeopleEntry {
 } PeopleEntry;
 
 /**
+ * PeopleInfoBiosEntry -- entry in the separate "info bios" table referenced
+ * by lbl_80478E78 (count, indirected through a stored pointer value) /
+ * lbl_80478E7C (array base). This is NOT a PeopleEntry: distinct base
+ * pointer, distinct stride (0x2C bytes vs PeopleEntry's 0xDC).
+ *
+ * Field offsets recovered from disassembly:
+ *   0x00-0x0B: (unknown)
+ *   0x0C: void* scriptRef -- script object pointer, compared for identity
+ *                            in peopleInfoBiosGetPtr
+ *   0x10-0x2B: (unknown)
+ */
+typedef struct PeopleInfoBiosEntry {
+    u8    field_00[0x0C];   /* 0x00 - 0x0B */
+    void* scriptRef;        /* 0x0C */
+    u8    field_10[0x1C];   /* 0x10 - 0x2B */
+} PeopleInfoBiosEntry;
+
+/**
  * PeopleOpenWork -- transient work structure used during peopleOpen.
  * Passed in the "generator" thread context.
  *

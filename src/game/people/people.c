@@ -2157,8 +2157,8 @@ void fn_8018D7D0(void) {
 void* peopleSearchID(u32 id) {
     s32 i;
     for (i = 0; i < peopleGetMaxCount(); i++) {
-        u8* entry = (u8*)peopleGetEntry(i);
-        if (entry[0] != 0 && *(u32*)(entry + 4) == id) {
+        PeopleEntry* entry = peopleGetEntry(i);
+        if (entry->active != 0 && (u32)entry->selfPtr == id) {
             return entry;
         }
     }
@@ -2174,11 +2174,11 @@ void fn_8018DA88(void) {
     void GSthreadBlock();
     s32 i;
     for (i = 0; i < peopleGetMaxCount(); i++) {
-        u8* entry = (u8*)peopleGetEntry(i);
-        if (entry[0] != 0 && entry != NULL) {
+        PeopleEntry* entry = peopleGetEntry(i);
+        if (entry->active != 0 && entry != NULL) {
             void* r;
-            entry[32] = 0;
-            r = (void*)fn_800F7108(*(u16*)(entry + 76));
+            entry->visible = 0;
+            r = (void*)fn_800F7108(entry->flagId);
             if (r != NULL) {
                 GSthreadBlock(r);
             }
@@ -2191,8 +2191,8 @@ void fn_8018DB04(void* param) {
     void fn_8018DCA8();
     s32 i;
     for (i = 0; i < peopleGetMaxCount(); i++) {
-        u8* entry = (u8*)peopleGetEntry(i);
-        if (entry[0] != 0) {
+        PeopleEntry* entry = peopleGetEntry(i);
+        if (entry->active != 0) {
             fn_8018DCA8(entry, param);
         }
     }
@@ -2262,12 +2262,12 @@ s32 fn_8018F698(void* ptr) {
 /* peopleInfoBiosGetPtr = peopleInfoBiosGetPtr (see people.h) -- not recovered, gap in archive campaign */
 void* peopleInfoBiosGetPtr(void* scriptObj) {
     u32 count = *(u32*)lbl_80478E78;
-    u8* entry = (u8*)lbl_80478E7C;
+    PeopleInfoBiosEntry* entry = (PeopleInfoBiosEntry*)lbl_80478E7C;
     while (count != 0) {
-        if (*(void**)(entry + 12) == scriptObj) {
+        if (entry->scriptRef == scriptObj) {
             return entry;
         }
-        entry += 0x2C;
+        entry++;
         count--;
     }
     return NULL;
@@ -2277,8 +2277,8 @@ void* peopleInfoBiosGetPtr(void* scriptObj) {
 void fn_8018FB2C(PeopleEntry* entry, u8 animId) {
     void GScolsys2HumanEnable();
     s32 f80;
-    *((u8*)entry + 35) = animId;
-    f80 = *(s32*)((u8*)entry + 80);
+    entry->shadowAnimId = animId;
+    f80 = entry->shadowId;
     if (f80 >= 0) {
         GScolsys2HumanEnable(f80, animId);
     }
@@ -2286,9 +2286,9 @@ void fn_8018FB2C(PeopleEntry* entry, u8 animId) {
 
 /* fn_8018FB60 = fn_8018FB60 (see people.h) -- not recovered, gap in archive campaign */
 void fn_8018FB60(PeopleEntry* entry, u8 animId) {
-    void* f8 = *(void**)((u8*)entry + 8);
+    void* f8 = entry->modelHandle;
     if (f8 != NULL) {
-        *((u8*)entry + 33) = animId;
+        entry->animId = animId;
         GSmodelSetVisibility(f8, animId);
     }
 }
