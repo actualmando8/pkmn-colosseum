@@ -433,11 +433,11 @@ s32 CARDClose(CARDFileInfo* fileInfo) {
     s32 result;
 
     result = __CARDGetControlBlock(fileInfo->chan, &card);
-    if (result >= 0) {
-        fileInfo->chan = -1;
-        result = __CARDPutControlBlock(card, 0);
+    if (result < 0) {
+        return result;
     }
-    return result;
+    fileInfo->chan = -1;
+    return __CARDPutControlBlock(card, 0);
 }
 
 s32 __CARDPutControlBlock(CARDControl* card, s32 result) {

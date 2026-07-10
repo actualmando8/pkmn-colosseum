@@ -999,6 +999,110 @@ u16 fn_80236B98(u32 ctx, u32 obj) {
 }
 
 /*
+ * fn_8023793C (0x8023793C)
+ *
+ * Trainer-AI held-item/type selection helper. Given the AI's active
+ * trainer ctx, its acting fightOutPokemon, a proposed item/type code
+ * (waza) and a signed hint (val), returns one of the item-type codes
+ * {0x3f, 0x43, waza-derived} depending on the trainer's held-item
+ * flags (0x2a/0x2b/0x24), the pokemon's dual type readout gated by
+ * fightTrainerIsAllyFightTargetPtr, and its tokusei (ability). The
+ * body chains fightTrainerGetStatus lookups off field 0x43 -> field 2
+ * -> a per-check field (0x2a, 0x2b, 0x24) in the standard AI-config
+ * accessor idiom already used throughout this file.
+ */
+extern u8  fightTrainerIsAllyFightTargetPtr(u32 ctx, u32 poke, u16 floorVal);
+extern u16 fightOutPokemonGetZokuseiDataId(u32 poke, u8 idx);
+extern u16 fightOutPokemonGetTokuseiDataId(u32 poke);
+extern u16 fn_8010C650(u16 waza, u16* types, u16 typeCount);
+#pragma optimize_for_size on
+u32 fn_8023793C(u32 ctx, u32 poke, u16 waza, s32 val) {
+    u16 types[2];
+    u16 tmp;
+    u16 tk;
+    u16 typeCount;
+    u16 z;
+    u8  i;
+    u16 j;
+    u16 floorVal;
+    u16 origWaza;
+
+    if (waza == 9) {
+        return 0x3f;
+    }
+
+    tmp = (u16)fightTrainerGetStatus(ctx, 0, 0x43, 0);
+    fightTrainerGetStatus(0, tmp, 2, 0);
+    fightFloorGetStatus(0, 0, 0x14, 0);
+
+    tmp = (u16)fightTrainerGetStatus(ctx, 0, 0x43, 0);
+    tmp = (u16)fightTrainerGetStatus(0, tmp, 2, 0);
+    if ((u8)fightTrainerGetStatus(0, tmp, 0x2b, 0) == 1) {
+        tk = fightOutPokemonGetTokuseiDataId(poke);
+    } else {
+        tk = 0;
+    }
+    if (tk == 0x1a && waza == 4) {
+        return 0x43;
+    }
+
+    typeCount = 0;
+    for (i = 0; i < 2; i++) {
+        floorVal = (u16)fightFloorGetStatus(0, 0, 0x14, 0);
+        tmp = (u16)fightTrainerGetStatus(ctx, 0, 0x43, 0);
+        tmp = (u16)fightTrainerGetStatus(0, tmp, 2, 0);
+        if ((u8)fightTrainerGetStatus(0, tmp, 0x2a, 0) == 1) {
+            if ((u8)fightTrainerIsAllyFightTargetPtr(ctx, poke, floorVal) == 0) {
+                z = fightOutPokemonGetZokuseiDataId(poke, i);
+            } else {
+                z = fightOutPokemonGetZokuseiDataId(poke, i);
+            }
+        } else {
+            z = 9;
+        }
+        if (z != 9) {
+            types[typeCount] = z;
+            typeCount++;
+        }
+    }
+    if (typeCount == 0) {
+        return 0x3f;
+    }
+
+    origWaza = waza;
+    waza = fn_8010C650(waza, types, typeCount);
+    if (origWaza == 0 || origWaza == 1) {
+        tmp = (u16)fightTrainerGetStatus(ctx, 0, 0x43, 0);
+        tmp = (u16)fightTrainerGetStatus(0, tmp, 2, 0);
+        if ((u8)fightTrainerGetStatus(0, tmp, 0x24, 0) == 1 &&
+            (u8)fn_802026E4(poke, 0x19) == 1) {
+            for (j = 0; j < typeCount; j++) {
+                u16 v = types[j];
+                if (v != 9 && v == 7) {
+                    waza = 0x3f;
+                }
+            }
+        }
+    }
+
+    tmp = (u16)fightTrainerGetStatus(ctx, 0, 0x43, 0);
+    fightTrainerGetStatus(0, tmp, 2, 0);
+    fightFloorGetStatus(0, 0, 0x14, 0);
+    tmp = (u16)fightTrainerGetStatus(ctx, 0, 0x43, 0);
+    tmp = (u16)fightTrainerGetStatus(0, tmp, 2, 0);
+    if ((u8)fightTrainerGetStatus(0, tmp, 0x2b, 0) == 1) {
+        tk = fightOutPokemonGetTokuseiDataId(poke);
+    } else {
+        tk = 0;
+    }
+    if (tk == 0x19 && waza != 0x41 && (s16)val > 0) {
+        return 0x43;
+    }
+    return waza;
+}
+#pragma optimize_for_size reset
+
+/*
  * fn_802391E0 (0x802391E0)
  *
  * Same TrainerDataGet lookup shape as fn_802358AC, but the third call

@@ -1,0 +1,37 @@
+name: Regression Guard
+# Fails a PR if any function's objdiff match % drops vs the base branch.
+# DOL byte-exactness alone is a dtk invariant (asm fallback), NOT a match signal —
+# this checks per-function fuzzy_match_percent, which the build's report.json holds.
+on:
+  pull_request:
+
+jobs:
+  regression:
+    container: ghcr.io/dougchansan/pkmn-colosseum-build:main
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: [GC6E01]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - name: Git config
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Prepare orig
+        run: cp -a /orig .
+      - name: Build BASE report
+        run: |
+          git checkout -q ${{ github.event.pull_request.base.sha }}
+          python configure.py --map --version ${{ matrix.version }} --binutils /binutils --compilers /compilers
+          ninja build/${{ matrix.version }}/report.json
+          cp build/${{ matrix.version }}/report.json /tmp/base_report.json
+      - name: Build HEAD report
+        run: |
+          git checkout -q ${{ github.sha }}
+          python configure.py --map --version ${{ matrix.version }} --binutils /binutils --compilers /compilers
+          ninja build/${{ matrix.version }}/report.json
+          cp build/${{ matrix.version }}/report.json /tmp/head_report.json
+      - name: Fail on any per-function regression
+        run: python3 .github/scripts/check_regression.py /tmp/base_report.json /tmp/head_report.json

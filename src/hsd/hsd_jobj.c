@@ -1888,3 +1888,116 @@ f32* fn_801A1980(HSD_JObj* jobj) {
 }
 #endif
 #pragma pop
+
+/* 0x801A39AC | 0x358 */
+#pragma push
+#pragma optimization_level 4
+#pragma use_lmw_stmw on
+#pragma inline_depth(6)
+typedef void (*HSD_JObjWalkTreeCallback)(HSD_JObj* jobj, void* user_data,
+                                         s32 type);
+
+void HSD_JObjWalkTree0(HSD_JObj* jobj, HSD_JObjWalkTreeCallback callback,
+                       void* user_data)
+{
+    HSD_JObj* child2;
+    HSD_JObj* child1;
+    HSD_JObj* child3;
+    HSD_JObj* child4;
+    HSD_JObj* child5;
+    HSD_JObj* child6;
+    s32 type;
+
+    if (jobj != NULL) {
+        if (jobj->parent == NULL) {
+            __assert(&lbl_8047DB20, 0xAD, "jobj->parent");
+        }
+        type = (jobj->parent->child == jobj) ? 1 : 2;
+        if (callback != NULL) {
+            callback(jobj, user_data, type);
+        }
+        if (!(jobj->flags & JOBJ_INSTANCE)) {
+            child1 = jobj->child;
+            while (child1 != NULL) {
+                if (child1 != NULL) {
+                    if (child1->parent == NULL) {
+                        __assert(&lbl_8047DB20, 0xAD, "jobj->parent");
+                    }
+                    type = (child1->parent->child == child1) ? 1 : 2;
+                    if (callback != NULL) {
+                        callback(child1, user_data, type);
+                    }
+                    if (!(child1->flags & JOBJ_INSTANCE)) {
+                        child2 = child1->child;
+                        while (child2 != NULL) {
+                            if (child2 != NULL) {
+                                if (child2->parent == NULL) {
+                                    __assert(&lbl_8047DB20, 0xAD, "jobj->parent");
+                                }
+                                type = (child2->parent->child == child2) ? 1 : 2;
+                                if (callback != NULL) {
+                                    callback(child2, user_data, type);
+                                }
+                                if (!(child2->flags & JOBJ_INSTANCE)) {
+                                    child3 = child2->child;
+                                    while (child3 != NULL) {
+                                        if (child3 != NULL) {
+                                            if (child3->parent == NULL) {
+                                                __assert(&lbl_8047DB20, 0xAD, "jobj->parent");
+                                            }
+                                            type = (child3->parent->child == child3) ? 1 : 2;
+                                            if (callback != NULL) {
+                                                callback(child3, user_data, type);
+                                            }
+                                            if (!(child3->flags & JOBJ_INSTANCE)) {
+                                                child4 = child3->child;
+                                                while (child4 != NULL) {
+                                                    if (child4 != NULL) {
+                                                        if (child4->parent == NULL) {
+                                                            __assert(&lbl_8047DB20, 0xAD, "jobj->parent");
+                                                        }
+                                                        type = (child4->parent->child == child4) ? 1 : 2;
+                                                        if (callback != NULL) {
+                                                            callback(child4, user_data, type);
+                                                        }
+                                                        if (!(child4->flags & JOBJ_INSTANCE)) {
+                                                            child5 = child4->child;
+                                                            while (child5 != NULL) {
+                                                                if (child5 != NULL) {
+                                                                    if (child5->parent == NULL) {
+                                                                        __assert(&lbl_8047DB20, 0xAD, "jobj->parent");
+                                                                    }
+                                                                    type = (child5->parent->child == child5) ? 1 : 2;
+                                                                    if (callback != NULL) {
+                                                                        callback(child5, user_data, type);
+                                                                    }
+                                                                    if (!(child5->flags & JOBJ_INSTANCE)) {
+                                                                        child6 = child5->child;
+                                                                        while (child6 != NULL) {
+                                                                            HSD_JObjWalkTree0(child6, callback, user_data);
+                                                                            child6 = child6->next;
+                                                                        }
+                                                                    }
+                                                                }
+                                                                child5 = child5->next;
+                                                            }
+                                                        }
+                                                    }
+                                                    child4 = child4->next;
+                                                }
+                                            }
+                                        }
+                                        child3 = child3->next;
+                                    }
+                                }
+                            }
+                            child2 = child2->next;
+                        }
+                    }
+                }
+                child1 = child1->next;
+            }
+        }
+    }
+}
+#pragma pop
