@@ -3056,6 +3056,49 @@ u32 fn_80222ACC(void) { u32 r = lbl_8047B610; lbl_8047B610 = *(u32 *)(r + 1); re
 u32 fn_8023C368(void) { return 0; }
 
 /*
+ * fn_80224060 (0x80224060) -- likely WS_KIZETSU
+ *
+ * FightSeq opcode handler: reads the slot index from PC+1, resolves
+ * ctx, and if the pokemon has flag 0x14 with substitute HP > 0, clears
+ * it via the Migawari (substitute) waza sequence, waiting on
+ * fn_801DA5C4(6) between _threadSwitch calls. Then unconditionally
+ * frees the ctx's queued waza, plays the faint effect twice, and
+ * runs fn_80265598 with the floor's field 0x14 value. PC advances
+ * by 2 (opcode + slot operand byte).
+ */
+extern u32 fightOutPokemonGetJoutaiMigawariHp();
+extern void fightOutPokemonFreeAllSequenceWaza();
+extern void fightWazaWzxTypeFuncMigawari();
+extern u8 fn_801DA5C4();
+extern void _threadSwitch();
+extern void fightOutPokemonKizetuEffect();
+extern void fn_80265598();
+#pragma optimize_for_size on
+void fn_80224060(void) {
+    u32 ctx;
+    u16 floorVal;
+
+    floorVal = (u16)fightFloorGetStatus(0, 0, 0x14, 0);
+    ctx = fightTargetGetPtrAsNowFightType(((FightSeqOpU8Operand*)lbl_8047B610)->operand, 0);
+
+    if (fn_802026E4(ctx, 0x14) == 1 && (s32)fightOutPokemonGetJoutaiMigawariHp(ctx) > 0) {
+        fightOutPokemonWriteJoutaiDataId(ctx, 0x14);
+        fightOutPokemonFreeAllSequenceWaza(ctx);
+        fightWazaWzxTypeFuncMigawari(0xa4, ctx, ctx, 0, 0);
+        while (1) {
+            if (fn_801DA5C4(6) == 1) break;
+            _threadSwitch();
+        }
+    }
+    fightOutPokemonFreeAllSequenceWaza(ctx);
+    fightOutPokemonKizetuEffect(ctx, 0);
+    fightOutPokemonKizetuEffect(ctx, 1);
+    fn_80265598(ctx, floorVal, 1);
+    lbl_8047B610 = lbl_8047B610 + 2;
+}
+#pragma optimize_for_size reset
+
+/*
  * Applies the held item's battle effect.  The effect implementation table is
  * shared with the original battle-sequence dispatcher; entries outside the
  * 44 defined effect kinds are ignored.

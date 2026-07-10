@@ -2084,3 +2084,31 @@ void HSD_JObjWalkTree0(HSD_JObj* jobj, HSD_JObjWalkTreeCallback callback,
     }
 }
 #pragma pop
+
+/* 0x801A3EB4 | 0x94 */
+extern void* HSD_ObjAlloc(void* list);
+extern void* memset(void* dst, int c, u32 n);
+extern char lbl_8047DBA0;
+extern char lbl_8047DBA8;
+extern char lbl_8047DBB0;
+
+static HSD_SList* HSD_SListAlloc(void)
+{
+    HSD_SList* list = (HSD_SList*) HSD_ObjAlloc(&lbl_804655B4);
+    if (list == NULL) {
+        __assert(&lbl_8047DBA0, 0x4C, &lbl_8047DBB0);
+    }
+    memset(list, 0, sizeof(HSD_SList));
+    return list;
+}
+
+HSD_SList* HSD_SListPrepend(HSD_SList* next, void* data)
+{
+    HSD_SList* prev = HSD_SListAlloc();
+    prev->data = data;
+    if (prev == NULL) {
+        __assert(&lbl_8047DBA0, 0xCA, &lbl_8047DBA8);
+    }
+    prev->next = next;
+    return prev;
+}

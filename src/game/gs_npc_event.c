@@ -1804,6 +1804,25 @@ void fn_800330B8(s32 arg0, u8* arg1) {
 
 /* ===== Phase 2 recovery stubs ===== */
 
+/* fn_80030170 - 0x80030170 | size: 0x38 */
+typedef struct GSnpcEventQueue {
+    void* items[13];
+    u32 idx;
+} GSnpcEventQueue;
+
+void* fn_80030170(GSnpcEventQueue* q) {
+    u32 idx;
+    if (q == NULL) {
+        return NULL;
+    }
+    idx = q->idx;
+    if (idx >= 13) {
+        return NULL;
+    }
+    q->idx = idx + 1;
+    return q->items[idx];
+}
+
 /* fn_800301A8 - 0x800301A8 | size: 0x4 */
 #if 0
 asm void fn_800301A8(void) {

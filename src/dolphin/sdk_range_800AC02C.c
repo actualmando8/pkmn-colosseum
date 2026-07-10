@@ -67,7 +67,14 @@ typedef struct CARDControl {
     /* 0x080 */ void* workArea;
     /* 0x084 */ void* dirBlock;
     /* 0x088 */ void* fatBlock;
-    /* 0x08C */ u8 _08C[0x44];
+    /* 0x08C */ u8 _08C[0x08];
+    /* 0x094 */ u8 cmd[5];
+    /* 0x099 */ u8 _099[0x07];
+    /* 0x0A0 */ s32 cmdLen;
+    /* 0x0A4 */ s32 field_A4;
+    /* 0x0A8 */ s32 field_A8;
+    /* 0x0AC */ u8 _0AC[0x20];
+    /* 0x0CC */ void* callback_CC;
     /* 0x0D0 */ void* apiCallback;
     /* 0x0D4 */ u8 _0D4[0x38];
     /* 0x10C */ void* diskId;
@@ -160,6 +167,7 @@ extern void __ARQInterruptServiceRoutine(void);
 extern void OSRegisterVersion(const char* version);
 u32 __CARDGetFontEncode(void);
 s32 __CARDPutControlBlock(CARDControl* card, s32 result);
+s32 fn_800AFBDC(s32 chan, void* buf, void* callback);
 
 AIDCallback AIRegisterDMACallback(AIDCallback callback) {
     AIDCallback old = lbl_8047A8CC;
@@ -602,6 +610,32 @@ s32 fn_800B5BE4(s32 chan, s32 fileNo, u8 attr, void* callback) {
     }
     entry.permission = attr;
     return fn_800B588C(chan, fileNo, &entry, callback);
+}
+
+s32 fn_800AFFE0(s32 chan, u32 addr, void* callback) {
+    CARDControl* card = &lbl_803FC620[chan];
+    s32 result;
+
+    card->cmd[0] = 0xf1;
+    card->cmd[1] = (addr >> 17) & 0x7f;
+    card->cmd[2] = (addr >> 9) & 0xff;
+    card->cmdLen = 3;
+    card->field_A4 = -1;
+    card->field_A8 = 3;
+    result = fn_800AFBDC(chan, NULL, callback);
+    if (result == -1) {
+        result = 0;
+    } else if (result >= 0) {
+        if (fn_80098368(chan, card->cmd, card->cmdLen, 1) == 0) {
+            card->callback_CC = NULL;
+            result = -3;
+        } else {
+            result = 0;
+        }
+        EXIDeselect(chan);
+        EXIUnlock(chan);
+    }
+    return result;
 }
 
 GXTlutRegion* __GXDefaultTlutRegionCallback(u32 index) {

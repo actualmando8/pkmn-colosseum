@@ -29,7 +29,6 @@ extern void fn_800B884C(u32 value);
 extern u8 lbl_804656E0[];
 extern u8 lbl_80465588[];
 extern u8 lbl_804655B4[];
-extern u8 lbl_8036CFE8[];
 extern u8 lbl_80465710[];
 extern u8 lbl_8047B350;
 extern u8 lbl_8047B351;
@@ -223,6 +222,40 @@ void fn_801B3638(HSD_TevDesc* desc) {
 extern s32 lbl_8047B35C;
 extern u32 lbl_8047B370;
 void fn_800BA6B0(u8);
+
+typedef struct KColorEntry {
+    /* 0x0 */ u32 color0;
+    /* 0x4 */ u32 color1;
+    /* 0x8 */ s32 dirty;
+} KColorEntry;
+extern KColorEntry lbl_8036CFE8[4];
+void fn_800BC36C(u32 id, void* color);
+
+/* Address: 0x801B3258 | Size: 0xE0 */
+#pragma push
+#pragma optimization_level 1
+void fn_801B3258(void) {
+    u32 i;
+    u32 tmp[2];
+    for (i = 0; i < 4; i++) {
+        if (lbl_8036CFE8[i].dirty != 0) {
+            KColorEntry* e = &lbl_8036CFE8[i];
+            u32 id;
+            tmp[0] = e->color0;
+            tmp[1] = e->color1;
+            switch (i) {
+            case 0: id = 1; break;
+            case 1: id = 2; break;
+            case 2: id = 3; break;
+            case 3: id = 0; break;
+            default: id = 1; break;
+            }
+            fn_800BC36C(id, &tmp);
+            lbl_8036CFE8[i].dirty = 0;
+        }
+    }
+}
+#pragma pop
 
 /* Address: 0x801B3770 | Size: 0x30 */
 
@@ -1294,7 +1327,7 @@ void fn_801B3168(void) {
 void fn_801B3174(void) {
     u32 i;
     for (i = 0; i < 4; i++) {
-        *(u32*)(lbl_8036CFE8 + i * 0xC + 0x8) = 0;
+        *(u32*)((u8*)lbl_8036CFE8 + i * 0xC + 0x8) = 0;
     }
 }
 
