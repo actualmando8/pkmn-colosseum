@@ -1085,7 +1085,7 @@ void fn_8006A81C(u32 r3, u32 r4) {
 
 /* 0x8006A824 | size: 0x16C */
 #pragma push
-#pragma scheduling off
+#pragma peephole off
 void fn_8006A824(u32 r28, u32 r29) {
     extern void fn_8006A990();
     extern u8 heroBiosGetHomePlace(u32);
@@ -1111,6 +1111,7 @@ void fn_8006A824(u32 r28, u32 r29) {
             switch ((s32)r0) {
                 case 0: r30 = 0x2; break;
                 case 1: r30 = 0x3; break;
+                case 2:
                 default:
                     __assert(r31 + 0x10, 0x28a, r31 + 0x4c);
                     break;
@@ -1121,6 +1122,7 @@ void fn_8006A824(u32 r28, u32 r29) {
             switch ((s32)r0) {
                 case 0: r30 = 0x309; break;
                 case 1: r30 = 0x308; break;
+                case 2:
                 default:
                     __assert(r31 + 0x10, 0x294, r31 + 0x4c);
                     break;
