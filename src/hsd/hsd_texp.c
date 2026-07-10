@@ -225,6 +225,40 @@ extern u32 lbl_8047B370;
 void fn_800BA6B0(u8);
 void fn_800BC8C8(u8);
 
+typedef struct KColorEntry {
+    /* 0x0 */ u32 color0;
+    /* 0x4 */ u32 color1;
+    /* 0x8 */ s32 dirty;
+} KColorEntry;
+extern KColorEntry lbl_8036CFE8[4];
+void fn_800BC36C(u32 id, void* color);
+
+/* Address: 0x801B3258 | Size: 0xE0 */
+#pragma push
+#pragma optimization_level 1
+void fn_801B3258(void) {
+    u32 i;
+    u32 tmp[2];
+    for (i = 0; i < 4; i++) {
+        if (lbl_8036CFE8[i].dirty != 0) {
+            KColorEntry* e = &lbl_8036CFE8[i];
+            u32 id;
+            tmp[0] = e->color0;
+            tmp[1] = e->color1;
+            switch (i) {
+            case 0: id = 1; break;
+            case 1: id = 2; break;
+            case 2: id = 3; break;
+            case 3: id = 0; break;
+            default: id = 1; break;
+            }
+            fn_800BC36C(id, &tmp);
+            lbl_8036CFE8[i].dirty = 0;
+        }
+    }
+}
+#pragma pop
+
 /* Address: 0x801B3770 | Size: 0x30 */
 void fn_801B3770(void) {
     fn_800BC8C8((u8)lbl_8047B370);
