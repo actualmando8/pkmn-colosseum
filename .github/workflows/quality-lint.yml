@@ -1,0 +1,27 @@
+name: Quality Lint
+# Blocks match-cheating patterns in newly added source: asm-wrappers and .inc
+# includes embed raw target asm instead of real C. Scans only the PR's added lines.
+on:
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Git config
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Scan added lines for asm-wrappers / .inc includes
+        run: |
+          BASE='${{ github.event.pull_request.base.sha }}'
+          HEAD='${{ github.sha }}'
+          ADDED=$(git diff "$BASE...$HEAD" -- 'src/**/*.c' 'src/**/*.h' | grep -E '^\+' | grep -vE '^\+\+\+' || true)
+          FAIL=0
+          if echo "$ADDED" | grep -nE '^\+[[:space:]]*asm[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*\(' ; then
+            echo "::error::asm-wrapper function added — embeds raw target asm, not real C. Decompile it instead."; FAIL=1; fi
+          if echo "$ADDED" | grep -nE '^\+.*#include[[:space:]]*"[^"]*\.inc"' ; then
+            echo "::error::.inc include added in src/ — raw-asm shim, not a real match."; FAIL=1; fi
+          if [ "$FAIL" = 0 ]; then echo "No asm-wrapper / .inc cheats in added source."; fi
+          exit $FAIL
