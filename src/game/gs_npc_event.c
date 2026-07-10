@@ -1805,11 +1805,6 @@ void fn_800330B8(s32 arg0, u8* arg1) {
 /* ===== Phase 2 recovery stubs ===== */
 
 /* fn_80030170 - 0x80030170 | size: 0x38 */
-#if 0
-asm void fn_80030170(void) {
-#include "src/game/gs_npc_event_fn_80030170.inc"
-}
-#else
 typedef struct GSnpcEventQueue {
     void* items[13];
     u32 idx;
@@ -1827,7 +1822,6 @@ void* fn_80030170(GSnpcEventQueue* q) {
     q->idx = idx + 1;
     return q->items[idx];
 }
-#endif
 
 /* fn_800301A8 - 0x800301A8 | size: 0x4 */
 #if 0
