@@ -21,6 +21,21 @@
 /* hsdAllocMemPiece/hsdFreeMemPiece declared in hsd_class.h with s32 */
 extern void* hsdNew(HSD_ClassInfo* info);
 extern void HSD_JObjDispAll(void* jobj, f32 mtx[3][4], s32 flags);
+extern void HSD_ClearVtxDesc(void);
+extern void fn_800B94F0(u32 value);
+extern void fn_800BC8C8(u32 value);
+extern void fn_800B884C(u32 value);
+
+extern u8 lbl_804656E0[];
+extern u8 lbl_80465588[];
+extern u8 lbl_804655B4[];
+extern u8 lbl_8036CFE8[];
+extern u8 lbl_80465710[];
+extern u8 lbl_8047B350;
+extern u8 lbl_8047B351;
+extern u32 lbl_8047B34C;
+extern u32 lbl_8047B358;
+extern u32 lbl_8047B370;
 
 /* GObj system globals */
 static HSD_GObj* gobj_list[64];
@@ -1244,4 +1259,62 @@ void fn_801BB4C4(void) {
     for (pass = 0; pass < 5; pass++) {
         fn_801B9048(pass);
     }
+}
+
+/* 0x801B1854 | 0x30 */
+void fn_801B1854(void) {
+    HSD_ObjAllocInit(lbl_804656E0, 0x28, 4);
+}
+
+/* 0x801B1884 | 0xC */
+void* HSD_ShadowGetAllocData(void) {
+    return lbl_804656E0;
+}
+
+/* 0x801B26F8 | 0x20 */
+void fn_801B26F8(void) {
+    HSD_ClearVtxDesc();
+}
+
+/* 0x801B2718 | 0x24 */
+void fn_801B2718(void) {
+    lbl_8047B351 = 0;
+    lbl_8047B350 = 0;
+    lbl_8047B34C = -1;
+    lbl_8047B351 = 0xFF;
+}
+
+/* 0x801B28B8 | 0x10 */
+void fn_801B28B8(f32 value) {
+    *(f32*)(lbl_80465710 + 0x10) = value;
+}
+
+/* 0x801B3168 | 0xC */
+void fn_801B3168(void) {
+    lbl_8047B358 = 0;
+}
+
+/* 0x801B3174 | 0x30 */
+void fn_801B3174(void) {
+    u32 i;
+    for (i = 0; i < 4; i++) {
+        *(u32*)(lbl_8036CFE8 + i * 0xC + 0x8) = 0;
+    }
+}
+
+/* 0x801B3770 | 0x30 */
+void fn_801B3770(void) {
+    fn_800BC8C8((u32)(u8)lbl_8047B370);
+    lbl_8047B370 = 0;
+}
+
+/* 0x801B3884 | 0xC */
+void fn_801B3884(void) {
+    lbl_8047B370 = 0;
+}
+
+/* 0x801B3890 | 0x30 */
+void fn_801B3890(void) {
+    fn_800B884C((u32)(u8)lbl_8047B358);
+    lbl_8047B358 = 0;
 }

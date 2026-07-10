@@ -499,3 +499,152 @@ u8 fn_80077EA4(u16* s1, u16* s2) {
     return memcmp(s1, s2, 0x54) == 0;
 }
 #pragma pop
+
+extern void _threadSwitch(void);
+extern s32 fn_800D37CC(void);
+extern u32 fn_800D3088(void);
+extern s32 menuOpen(s32, s32);
+extern void winMsgOpenField(s32, s32, s32);
+extern void winMsgOpen(s32, s32, s32, s32);
+extern void winMsgClose(s32);
+extern s32 fn_8001E184(void);
+
+extern u32 lbl_804788F0;
+extern u32 lbl_802E61D8[];
+extern u8 lbl_8047A630;
+extern u8 lbl_8047A631;
+extern u8 lbl_8047A632;
+extern u8 lbl_8047A633;
+extern u8 lbl_8047A634;
+extern u8 lbl_8047A635;
+extern u32 lbl_8047A638;
+extern f32 lbl_8047C108;
+extern f32 lbl_8047C114;
+extern f64 lbl_8047C118;
+extern f64 lbl_8047C120;
+extern f32 lbl_8047C128;
+
+#define WAIT_MENU_TIME(limit_)           \
+    do {                                 \
+        f32 elapsed_ = lbl_8047C114;     \
+        while (elapsed_ < (limit_)) {    \
+            s32 frames_;                 \
+            u32 ticks_;                  \
+            _threadSwitch();             \
+            frames_ = fn_800D37CC();     \
+            ticks_ = fn_800D3088();      \
+            elapsed_ += (f32)ticks_ / (f32)frames_; \
+        }                                \
+    } while (0)
+
+#define SHOW_CANCEL_MESSAGE()    \
+    do {                         \
+        if (arg0 == 0) {         \
+            winMsgOpen(2, 0x44cf, 1, 0); \
+            winMsgClose(1);      \
+        }                        \
+    } while (0)
+
+#define CLOSE_AND_ABORT()        \
+    do {                         \
+        menuClose(0xef);         \
+        WAIT_MENU_TIME(lbl_8047C108); \
+        lbl_8047A638 = 1;        \
+        return 0;                \
+    } while (0)
+
+#define SHOW_BLOCKING_MESSAGE(msg_) \
+    do {                            \
+        winMsgOpenField((msg_), 1, 0); \
+        winMsgClose(1);             \
+        SHOW_CANCEL_MESSAGE();      \
+        CLOSE_AND_ABORT();          \
+    } while (0)
+
+u8 fn_80079EF4(s32 arg0, u32 value) {
+    s32 rank;
+    s8 choice;
+
+    lbl_8047A630 = 0;
+    lbl_8047A631 = 0;
+    lbl_8047A632 = 0;
+
+    rank = lbl_804788F0 - 1;
+    while (rank >= 0 && lbl_802E61D8[rank] > value) {
+        rank--;
+    }
+    if (rank < 0) {
+        rank = 0;
+    }
+
+    menuClose(0xe1);
+    WAIT_MENU_TIME(lbl_8047C128);
+    menuOpen(0xef, 0);
+    WAIT_MENU_TIME(lbl_8047C108);
+
+    if (rank < 1) {
+        SHOW_BLOCKING_MESSAGE(0x43a7);
+    }
+
+    switch (rank) {
+    case 1:
+        if (lbl_8047A635 != 0) {
+            SHOW_BLOCKING_MESSAGE(0x43ae);
+        }
+        winMsgOpenField(0x43b4, 1, 0);
+        lbl_8047A632 = 1;
+        break;
+    case 2:
+        if (lbl_8047A635 != 0 && lbl_8047A634 != 0) {
+            SHOW_BLOCKING_MESSAGE(0x43ab);
+        }
+        if (lbl_8047A635 != 0) {
+            winMsgOpenField(0x43b3, 1, 0);
+            lbl_8047A631 = 1;
+        } else {
+            winMsgOpenField(0x43b6, 1, 0);
+            lbl_8047A632 = 1;
+            lbl_8047A631 = 1;
+        }
+        break;
+    case 3:
+        if (lbl_8047A635 != 0 && lbl_8047A634 != 0 && lbl_8047A633 != 0) {
+            SHOW_BLOCKING_MESSAGE(0x43a9);
+        }
+        if (lbl_8047A634 != 0) {
+            winMsgOpenField(0x43b1, 1, 0);
+            lbl_8047A630 = 1;
+        } else if (lbl_8047A635 != 0) {
+            winMsgOpenField(0x43b5, 1, 0);
+            lbl_8047A630 = 1;
+            lbl_8047A631 = 1;
+        } else {
+            winMsgOpenField(0x43c2, 1, 0);
+            lbl_8047A630 = 1;
+            lbl_8047A631 = 1;
+            lbl_8047A632 = 1;
+        }
+        break;
+    default:
+        menuClose(0xef);
+        winMsgClose(1);
+        WAIT_MENU_TIME(lbl_8047C108);
+        lbl_8047A638 = 1;
+        return 0;
+    }
+
+    winMsgOpenField(0x43d1, 1, 0);
+    choice = (s8)fn_8001E184();
+    winMsgClose(1);
+    if (choice == 0 || choice < -1 || choice >= 2) {
+        return 1;
+    }
+
+    SHOW_CANCEL_MESSAGE();
+    CLOSE_AND_ABORT();
+}
+
+#undef SHOW_BLOCKING_MESSAGE
+#undef CLOSE_AND_ABORT
+#undef SHOW_CANCEL_MESSAGE
+#undef WAIT_MENU_TIME

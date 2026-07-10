@@ -1251,6 +1251,277 @@ asm void menuFightCtrlTarget(void) {
 void menuFightCtrlTarget(void) {}
 #endif
 
+/* menuFightDrawSecretPokemonStatus - 0x8000E290 | size: 0x780 */
+extern void* pokemonDataBiosGetPtr();
+extern u8 pokemonDataBiosGetZokuseiDataId();
+extern u16 fn_8010C46C();
+extern u32 wazaGetStatus();
+extern u8 pokemonWazaGetMaxPP();
+extern u32 GSmsgGetGSchar();
+extern u16 pokemonGetSoubiItemDataId();
+extern void* itemDataBiosGetPtr();
+extern u32 itemDataBiosGetName();
+extern u32 pokemonDataBiosGetName();
+extern u8 menuSubGetPokemonSexForDisp();
+#pragma push
+#pragma peephole off
+void menuFightDrawSecretPokemonStatus(u8* ctx, u8* npc) {
+    extern u32 windowGetParam(u8* a, s32 b);
+    extern u32 fightFloorGetGcHeroFightTrainerPtr(s32 arg);
+    extern u32 fightTrainerGetValidFightPokemonPtr(u32 trainer, u16 slot);
+    extern u32 pokemonGetStatus(u32 status, s32 a, s32 id, s32 b);
+    extern u8 pokemonCheckValid(void);
+    extern s32 menuSubCalcColor(u8* ctx, u8* npc);
+    extern u32 fn_8001D624(u32 status, s32 mode);
+    extern void windowDrawSprite(s32 a, s32 b, u8* ctx, u16 sprite, s32 c);
+    extern void winSpriteSetDisp(u8* npc, s32 disp);
+    extern u32 GSmsgGetRect(u32 id);
+    extern void fn_800FB680(s32 x, s32 y, s32 color, s32 msg);
+    extern void fn_800FBB34(s32 a, s32 b, s32 x, s32 y, s32 color, s32 msg);
+    extern void msgctrlSetValue(s32 id, s32 value);
+    u32 trainer;
+    s32* selected;
+    u32 status;
+    s32 cursorSlot;
+    s32 color;
+    s32 npcId;
+    s32 moveIdx;
+    s32 x;
+    s32 delta;
+    void* data;
+    u32 value;
+
+    cursorSlot = -1;
+    trainer = windowGetParam(ctx, 0);
+    selected = (s32*)windowGetParam(ctx, 1);
+
+    if (selected[0] < 0) {
+        return;
+    }
+
+    status = (u16)selected[0];
+    if (status >= 6) {
+        status = 0;
+    } else {
+        if (trainer == 0) {
+            trainer = fightFloorGetGcHeroFightTrainerPtr(0);
+        }
+        if (trainer == 0) {
+            status = 0;
+        } else {
+            status = fightTrainerGetValidFightPokemonPtr(trainer, (u16)status);
+            if (status == 0) {
+                status = 0;
+            } else {
+                status = pokemonGetStatus(status, 0, 0xCC, 0);
+                if ((u8)pokemonCheckValid() == 0) {
+                    status = 0;
+                }
+            }
+        }
+    }
+
+    if (status == 0) {
+        return;
+    }
+
+    color = menuSubCalcColor(ctx, npc);
+    npcId = *(s16*)(npc + 6);
+
+    switch (npcId) {
+    case 0x1235:
+        cursorSlot = 1;
+        if (cursorSlot == selected[0]) winSpriteSetDisp(npc, 1);
+        else winSpriteSetDisp(npc, 0);
+        return;
+    case 0x1236:
+        cursorSlot = 3;
+        if (cursorSlot == selected[0]) winSpriteSetDisp(npc, 1);
+        else winSpriteSetDisp(npc, 0);
+        return;
+    case 0x1237:
+        cursorSlot = 2;
+        if (cursorSlot == selected[0]) winSpriteSetDisp(npc, 1);
+        else winSpriteSetDisp(npc, 0);
+        return;
+    case 0x1238:
+        cursorSlot = 0;
+        if (cursorSlot == selected[0]) winSpriteSetDisp(npc, 1);
+        else winSpriteSetDisp(npc, 0);
+        return;
+    case 0x1239:
+        cursorSlot = 5;
+        if (cursorSlot == selected[0]) winSpriteSetDisp(npc, 1);
+        else winSpriteSetDisp(npc, 0);
+        return;
+    case 0x123A:
+        cursorSlot = 4;
+        if (cursorSlot == selected[0]) winSpriteSetDisp(npc, 1);
+        else winSpriteSetDisp(npc, 0);
+        return;
+    case 0x123B:
+        windowDrawSprite(0, 0, ctx, (u16)fn_8001D624(status, 1), 0);
+        return;
+    case 0x123D:
+        data = pokemonDataBiosGetPtr((u16)pokemonGetStatus(status, 0, 0x6E, 0));
+        windowDrawSprite(0, 0, ctx, fn_8010C46C(pokemonDataBiosGetZokuseiDataId(data, 0)), 0);
+        return;
+    case 0x123C:
+        data = pokemonDataBiosGetPtr((u16)pokemonGetStatus(status, 0, 0x6E, 0));
+        value = pokemonDataBiosGetZokuseiDataId(data, 0);
+        if (value == pokemonDataBiosGetZokuseiDataId(data, 1)) {
+            return;
+        }
+        windowDrawSprite(0, 0, ctx, fn_8010C46C(pokemonDataBiosGetZokuseiDataId(data, 1)), 0);
+        return;
+    case 0x123E:
+        moveIdx = 3;
+        break;
+    case 0x123F:
+        moveIdx = 2;
+        break;
+    case 0x1240:
+        moveIdx = 1;
+        break;
+    case 0x1241:
+        moveIdx = 0;
+        break;
+    case 0x1242:
+        moveIdx = 3;
+        if ((u16)pokemonGetStatus(status, 0, 0x7F, (u16)moveIdx) == 0) return;
+        x = ((s16)*(s16*)(npc + 0x54) - (s16)(GSmsgGetRect(0x197) >> 16));
+        x = (s16)((x + ((u32)x >> 31)) >> 1);
+        fn_800FB680(x, 0, color, 0x197);
+        msgctrlSetValue(0x34, pokemonGetStatus(status, 0, 0x80, (u16)moveIdx));
+        fn_800FBB34(0, 0, x, *(s16*)(npc + 0x56), color, 0xDE);
+        msgctrlSetValue(0x34, (u8)pokemonWazaGetMaxPP(status, (u16)moveIdx));
+        fn_800FBB34(0, 0, *(s16*)(npc + 0x54), *(s16*)(npc + 0x56), color, 0xDE);
+        return;
+    case 0x1243:
+        moveIdx = 2;
+        if ((u16)pokemonGetStatus(status, 0, 0x7F, (u16)moveIdx) == 0) return;
+        x = ((s16)*(s16*)(npc + 0x54) - (s16)(GSmsgGetRect(0x197) >> 16));
+        x = (s16)((x + ((u32)x >> 31)) >> 1);
+        fn_800FB680(x, 0, color, 0x197);
+        msgctrlSetValue(0x34, pokemonGetStatus(status, 0, 0x80, (u16)moveIdx));
+        fn_800FBB34(0, 0, x, *(s16*)(npc + 0x56), color, 0xDE);
+        msgctrlSetValue(0x34, (u8)pokemonWazaGetMaxPP(status, (u16)moveIdx));
+        fn_800FBB34(0, 0, *(s16*)(npc + 0x54), *(s16*)(npc + 0x56), color, 0xDE);
+        return;
+    case 0x1244:
+        moveIdx = 1;
+        if ((u16)pokemonGetStatus(status, 0, 0x7F, (u16)moveIdx) == 0) return;
+        x = ((s16)*(s16*)(npc + 0x54) - (s16)(GSmsgGetRect(0x197) >> 16));
+        x = (s16)((x + ((u32)x >> 31)) >> 1);
+        fn_800FB680(x, 0, color, 0x197);
+        msgctrlSetValue(0x34, pokemonGetStatus(status, 0, 0x80, (u16)moveIdx));
+        fn_800FBB34(0, 0, x, *(s16*)(npc + 0x56), color, 0xDE);
+        msgctrlSetValue(0x34, (u8)pokemonWazaGetMaxPP(status, (u16)moveIdx));
+        fn_800FBB34(0, 0, *(s16*)(npc + 0x54), *(s16*)(npc + 0x56), color, 0xDE);
+        return;
+    case 0x1245:
+        moveIdx = 0;
+        if ((u16)pokemonGetStatus(status, 0, 0x7F, (u16)moveIdx) == 0) return;
+        x = ((s16)*(s16*)(npc + 0x54) - (s16)(GSmsgGetRect(0x197) >> 16));
+        x = (s16)((x + ((u32)x >> 31)) >> 1);
+        fn_800FB680(x, 0, color, 0x197);
+        msgctrlSetValue(0x34, pokemonGetStatus(status, 0, 0x80, (u16)moveIdx));
+        fn_800FBB34(0, 0, x, *(s16*)(npc + 0x56), color, 0xDE);
+        msgctrlSetValue(0x34, (u8)pokemonWazaGetMaxPP(status, (u16)moveIdx));
+        fn_800FBB34(0, 0, *(s16*)(npc + 0x54), *(s16*)(npc + 0x56), color, 0xDE);
+        return;
+    case 0x1246:
+        moveIdx = 3;
+        break;
+    case 0x1247:
+        moveIdx = 2;
+        break;
+    case 0x1248:
+        moveIdx = 1;
+        break;
+    case 0x1249:
+        moveIdx = 0;
+        break;
+    case 0x124A:
+        value = pokemonGetSoubiItemDataId(status);
+        if ((u16)value == 0) {
+            return;
+        }
+        msgctrlSetValue(0x37, GSmsgGetGSchar(itemDataBiosGetName(itemDataBiosGetPtr((u16)value))));
+        fn_800FBB34(0, 0, *(s16*)(npc + 0x54), *(s16*)(npc + 0x56), color, 0xE7);
+        return;
+    case 0x124B:
+        x = (s16)(GSmsgGetRect(0x1A8) >> 16) + 2;
+        fn_800FB680(0, 0, color, 0x1A8);
+        delta = *(s16*)(npc + 0x54) - x - (s16)(GSmsgGetRect(0x197) >> 16);
+        x += (s16)((delta + ((u32)delta >> 31)) >> 1);
+        fn_800FB680(x, 0, color, 0x197);
+        msgctrlSetValue(0x34, (s16)pokemonGetStatus(status, 0, 0x83, 0));
+        fn_800FBB34(0, 0, (s16)x, *(s16*)(npc + 0x56), color, 0xDE);
+        msgctrlSetValue(0x34, (s16)pokemonGetStatus(status, 0, 0x87, 0));
+        fn_800FBB34(0, 0, *(s16*)(npc + 0x54), *(s16*)(npc + 0x56), color, 0xDE);
+        return;
+    case 0x124C:
+        x = (s16)(GSmsgGetRect(0x1A7) >> 16);
+        fn_800FB680(0, 0, color, 0x1A7);
+        msgctrlSetValue(0x34, (u8)pokemonGetStatus(status, 0, 0x7A, 0));
+        fn_800FBB34(x, 0, *(s16*)(npc + 0x54), *(s16*)(npc + 0x56), color, 0xD2);
+        return;
+    case 0x124D:
+        x = 0;
+        data = pokemonDataBiosGetPtr((u16)pokemonGetStatus(status, 0, 0x6E, 0));
+        if (data == NULL) {
+            return;
+        }
+        value = pokemonDataBiosGetName(data);
+        if (value != 0) {
+            msgctrlSetValue(0x37, GSmsgGetGSchar(value));
+            fn_800FB680(0, 0, color, 0xE7);
+            x = (s16)(GSmsgGetRect(0xE7) >> 16);
+        }
+        switch ((u8)menuSubGetPokemonSexForDisp(status)) {
+        case 0:
+            value = 0xD67;
+            break;
+        case 1:
+            value = 0xD68;
+            break;
+        default:
+            value = 0;
+            break;
+        }
+        if (value != 0) {
+            msgctrlSetValue(0x37, GSmsgGetGSchar(value));
+            fn_800FB680((s16)x, 0, color, 0xCF);
+        }
+        return;
+    case 0x124E:
+        msgctrlSetValue(0x37, pokemonGetStatus(status, 0, 0x77, 0));
+        fn_800FBB34(0, 0, *(s16*)(npc + 0x54), *(s16*)(npc + 0x56), color, 0xE7);
+        return;
+    default:
+        return;
+    }
+
+    value = pokemonGetStatus(status, 0, 0x7F, (u16)moveIdx);
+    if ((u16)value == 0) {
+        return;
+    }
+
+    if (npcId >= 0x123E && npcId <= 0x1241) {
+        windowDrawSprite(0, 0, ctx,
+                         fn_8010C46C((u16)wazaGetStatus(0, (u16)value, 3, 0)),
+                         0);
+    } else {
+        value = wazaGetStatus(0, (u16)value, 1, 0);
+        if (value != 0) {
+            msgctrlSetValue(0x37, GSmsgGetGSchar(value));
+            fn_800FBB34(0, 0, *(s16*)(npc + 0x54), *(s16*)(npc + 0x56), color, 0xE7);
+        }
+    }
+}
+#pragma pop
+
 /* menuFightDrawSecretPokemon - 0x8000EA10 | size: 0x324 */
 extern u32 fightFloorGetGcHeroFightTrainerPtr(s32 arg);
 extern u32 fightTrainerGetValidFightPokemonPtr(u32 warpId, u16 variant);
