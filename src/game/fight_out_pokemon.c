@@ -3037,14 +3037,11 @@ void fightOutPokemonInitAry(u32 param_1, u16 param_2) {
 /* Address: 0x80206C94 | Size: 0x72c | Ghidra import */
 #pragma push
 #pragma peephole on
-#pragma optimization_level 1
+#pragma optimization_level 2
 void fightOutPokemonInit(int r3)
 
 {
-    extern u32 _DAT_80279c60;
-    extern u32 _DAT_80279c64;
-    extern u32 _DAT_80279c68;
-    extern u32 _DAT_80279c6c;
+    extern StatusIdTable7 lbl_80279C60;
     extern void fn_8011B950();
     extern void pokemonInit();
     extern void fightActionInit();
@@ -3052,24 +3049,21 @@ void fightOutPokemonInit(int r3)
     extern void fightWazaInit();
     extern void fightItemInit();
     extern void fightOutPokemonEnemyInitAry();
-  int iVar1;
   u32 uVar2;
   u32 *puVar3;
+  u16 *puVar4;
   u8 bVar4;
-  u32 local_28;
-  u32 local_24;
-  u32 local_20;
-  u16 local_1c;
+  void* iVar1;
+  StatusIdTable7 local_28;
 
-  if (r3 != 0) {
+  if (r3) {
     pokemonSetStatus(r3,0,0xd5,0,0);
     pokemonSetStatus(r3,0,0xd6,0,0);
-    iVar1 = (int)pokemonGetStatus(r3,0,0xd7,0);
-    if (iVar1 != 0) {
+    if ((iVar1 = pokemonGetStatus(r3,0,0xd7,0)) != NULL) {
       pokemonSetStatus(iVar1,0,0xcb,0,0);
       pokemonGetStatus(iVar1,0,0xcc,0);
       pokemonInit();
-      uVar2 = (int)pokemonGetStatus(iVar1,0,0xcd,0);
+      uVar2 = (u32)pokemonGetStatus(iVar1,0,0xcd,0);
       fn_8011B950(uVar2,1);
       pokemonSetStatus(iVar1,0,0xce,0, (void*)0xffffffff);
       pokemonSetStatus(iVar1,0,0xcf,0,0);
@@ -3079,21 +3073,19 @@ void fightOutPokemonInit(int r3)
     }
     uVar2 = (int)pokemonGetStatus(r3,0,0xd8,0);
     fn_8011B950(uVar2,0x34);
-    local_28 = _DAT_80279c60;
-    local_24 = _DAT_80279c64;
-    local_20 = _DAT_80279c68;
-    local_1c = _DAT_80279c6c;
-    for (bVar4 = 0; bVar4 < 7; bVar4 = bVar4 + 1) {
-      pokemonSetStatus(r3,0,*(u16 *)((int)&local_28 + (u32)bVar4 * 2),0,6);
+    local_28 = lbl_80279C60;
+    puVar4 = local_28.id;
+    for (bVar4 = 0; bVar4 < 7; bVar4++) {
+      pokemonSetStatus(r3,0,puVar4[bVar4],0,6);
     }
     fn_801FD830(r3,0);
     pokemonSetStatus(r3,0,0xed,0,2);
     pokemonSetStatus(r3,0,0xee,0,0);
-    for (bVar4 = 0; bVar4 < 0xc; bVar4 = bVar4 + 1) {
+    for (bVar4 = 0; bVar4 < 0xc; bVar4++) {
       pokemonSetStatus(r3,0,0xfd,bVar4, (void*)0xffffffff);
     }
-    iVar1 = (int)pokemonGetStatus(r3,0,0xfe,0);
-    if (iVar1 != 0) {
+    iVar1 = pokemonGetStatus(r3,0,0xfe,0);
+    if (iVar1 != NULL) {
       fightActionInit();
       pokemonGetStatus(r3,0,0xd9,0);
       fightWazaInit();
@@ -3102,7 +3094,7 @@ void fightOutPokemonInit(int r3)
     }
     pokemonGetStatus(r3,0,0xf8,0);
     fightWazaInit();
-    for (bVar4 = 0; bVar4 < 2; bVar4 = bVar4 + 1) {
+    for (bVar4 = 0; bVar4 < 2; bVar4++) {
       pokemonSetStatus(r3,0,0xff,bVar4,9);
     }
     pokemonSetStatus(r3,0,0x100,0,0);
