@@ -81,8 +81,8 @@ typedef struct GSSceneRenderEntry {
 /** 0x80177A38 */ u32    GSscene_GetMode(void);
 /** 0x80177A44 */ u32    GSscene_SetMode(u32 mode);
 /** unnamed scaffold */ void   fn_80179FA4(void);
-/** unnamed scaffold */ f32    fn_80176948(void* obj);
-/** unnamed scaffold */ f32    cameraSetTargetPosXYZ(void* obj);
-/** unnamed scaffold */ f32    cameraSetTargetOfsXYZ(void* obj);
+/** unnamed scaffold */ void   fn_80176948(void);
+/** unnamed scaffold */ void   cameraSetTargetPosXYZ(void);
+/** unnamed scaffold */ void   cameraSetTargetOfsXYZ(void);
 
 #endif /* GS_SCENE_H */

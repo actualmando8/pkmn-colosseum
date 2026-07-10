@@ -194,11 +194,21 @@ void* GetWaza__12NullSequenceCFUsUs(void* obj, s32 search_key1, s32 search_key2)
 }
 
 /**
- * fn_801DD100 - Waza color filter apply.
- * Address: 0x801DD100 | Size: 0x58
+ * fn_801DD100 - 0x801DD100 | Size: 0x58
+ * Two-arg (owner, obj) per the caller in wazaSequence.c; the prior
+ * (u32 filterColor) signature was a placeholder.
  */
-void fn_801DD100(u32 filterColor) {
-    /* Apply color filter to scene during waza */
+void fn_801DD100(u8* p, u8* q) {
+    if (p == NULL) return;
+    if (q == NULL) {
+        *(u16*)(p + 50) = 0;
+        *(u16*)(p + 52) = 0;
+        *(s32*)(*(u8**)(p + 44) + 144) = 0;
+    } else {
+        *(u16*)(p + 50) = (u8)*(u32*)(q + 12);
+        *(u16*)(p + 52) = 0;
+        *(s32*)(*(u8**)(p + 44) + *(u32*)(q + 12) * 212 + 144) = *(s32*)(q + 16);
+    }
 }
 
 /**

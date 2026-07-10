@@ -47,6 +47,10 @@ void* psRemoveGenerator(u32 type, u32 param) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 u32 psGetNewIDNum(void) {
-    /* TODO: match -- 40 bytes at 0x80175F44 */
+    extern u16 lbl_80478C38;
+    if (++lbl_80478C38 < 256) {
+        lbl_80478C38 = 256;
+    }
+    return lbl_80478C38;
 }
 #pragma pop

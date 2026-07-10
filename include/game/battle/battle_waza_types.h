@@ -340,7 +340,7 @@ extern void fn_801DCFD8(void* obj);
 extern void fn_801DD028(void* obj);
 extern void fn_801DD078(void* obj);
 extern void* GetWaza__12NullSequenceCFUsUs(void* obj, s32 search_key1, s32 search_key2);
-extern void fn_801DD100(u32 filterColor);
+extern void fn_801DD100(u8* p, u8* q);
 extern void fn_801DD158(void* obj);
 extern void fn_801DD23C(void* obj);
 extern void fn_801DD3E4(void* obj);

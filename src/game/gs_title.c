@@ -2821,10 +2821,13 @@ asm void fn_80021624(void) {
 #include "src/game/gs_title_fn_80021624.inc"
 }
 #else
+#pragma push
 #pragma optimization_level 4
+#pragma dont_inline on
 void fn_80021624(void) {
     fn_800210F0();
 }
+#pragma pop
 #endif
 
 /* fn_80021644 - 0x80021644 | size: 0x9c */
