@@ -1109,7 +1109,13 @@ void fn_8002509C(s32 arg0, u8* arg1) {
             uVar5 = 0;
             while (1) {
                 if (((u32)*(volatile u8*)pbVar3 >> 7) & 1) {
-                    if (uVar4 == uVar5) goto LAB_80025174;
+                    if (uVar4 == uVar5) {
+                        if (arg1) {
+                            goto LAB_80025174;
+                        } else {
+                            goto LAB_80025174;
+                        }
+                    }
                     uVar5 = uVar5 + 1;
                 }
                 if (((u32)*(volatile u8*)pbVar3 >> 6) & 1) break;

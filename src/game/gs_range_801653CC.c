@@ -742,7 +742,7 @@ u32 fn_801666BC(u32 id)
         return 0;
     }
 
-    if (((flags >> 4) & 1U) == 1U) {
+    if (((*entry >> 4) & 1U) == 1U) {
         return 3;
     }
 
