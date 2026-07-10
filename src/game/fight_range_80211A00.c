@@ -3956,3 +3956,16 @@ LAB_0021f0bc:
   }
   return;
 }
+
+u32 fn_802136A4(void) {
+    extern void fn_80207448();
+    fn_80207448();
+    return 1;
+}
+
+void fn_8021B610(void) {
+    u32 pc = lbl_8047B610;
+    extern u8 lbl_8047B626;
+    lbl_8047B626 = 0;
+    lbl_8047B610 = pc + 1;
+}

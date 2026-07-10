@@ -187,6 +187,7 @@ BOOL EXIUnlock(s32 chan) {
 #pragma push
 #pragma optimization_level 0
 #pragma peephole off
+void OSRegisterVersion(const char* version);
 u32 fn_800993A8(s32 chan) {
     EXIControl* exi = &lbl_803FB3C8[chan];
     return exi->state;
@@ -238,3 +239,27 @@ OSExceptionHandler __OSSetExceptionHandler(u8 exception, OSExceptionHandler hand
     return old;
 }
 #pragma peephole reset
+
+/* 0x80098108 | size: 0x8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void PPCSetFpNonIEEEMode(void) {
+    nofralloc
+    mtfsb1 29
+    blr
+}
+#pragma pop
+
+/* 0x8009A09C | size: 0x24 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+
+
+#pragma optimization_level 0
+void fn_8009A0C0(void) {
+    extern void __OSDBINTEND(void);
+    __OSDBINTEND();
+}
+#pragma pop
