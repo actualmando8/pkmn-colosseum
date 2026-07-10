@@ -824,6 +824,27 @@ ret_null:
 #endif
 #pragma pop
 
+/* 0x8019B490 | 0x98 */
+#pragma push
+#pragma optimization_level 4
+extern void HSD_FObjInterpretAnim(HSD_FObj* fobj, void* obj,
+                                  HSD_ObjUpdateFunc obj_update, f32 rate);
+void HSD_FObjStopAnimAll(HSD_FObj* fobj, void* obj,
+                         HSD_ObjUpdateFunc obj_update, f32 rate) {
+    while (fobj != NULL) {
+        if (fobj != NULL) {
+            if (fobj->op_intrp == 6) {
+                HSD_FObjInterpretAnim(fobj, obj, obj_update, rate);
+            }
+            if (fobj != NULL) {
+                fobj->flags &= 0xF0;
+            }
+        }
+        fobj = fobj->next;
+    }
+}
+#pragma pop
+
 /* ===================================================================
  * Generated: 0 pattern-matched + 5 stubs
  * Range: 0x8019B528 - 0x8019B7C0

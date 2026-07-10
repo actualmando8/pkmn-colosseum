@@ -698,3 +698,23 @@ void _modelGetEndFrame(HSD_AObj* aobj, f32* end_frame)
         *end_frame = aobj->end_frame;
     }
 }
+
+/* sModelJObjCount / sModelJObjLastIndex are .sbss globals owned by the
+ * gs_model_anim split (config/GC6E01/symbols.txt). fn_800EE0E8 uses them
+ * as a shared counter/scratch during a JObj traversal driven by fn_800EE20C. */
+extern s32 sModelJObjCount;
+extern s32 sModelJObjLastIndex;
+typedef void (*GSmodelAObjApplyFunc)(HSD_AObj* aobj, void* arg);
+void fn_801A3918(HSD_JObj* jobj, GSmodelAObjApplyFunc func, u32 arg);
+void fn_800EE20C(HSD_AObj* aobj, void* arg);
+
+s32 fn_800EE0E8(GSmodel* model)
+{
+    sModelJObjCount = 0;
+    sModelJObjLastIndex = -1;
+    fn_801A3918(model->jobj, fn_800EE20C, 0);
+    if (model->flags & MODEL_FLAG_USE_JOBJ_CHILD) {
+        sModelJObjCount = sModelJObjCount - 1;
+    }
+    return sModelJObjCount;
+}
