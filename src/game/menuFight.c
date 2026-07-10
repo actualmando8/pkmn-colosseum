@@ -1263,11 +1263,6 @@ extern void* itemDataBiosGetPtr();
 extern u32 itemDataBiosGetName();
 extern u32 pokemonDataBiosGetName();
 extern u8 menuSubGetPokemonSexForDisp();
-#if 0
-asm void menuFightDrawSecretPokemonStatus(void) {
-#include "src/game/gs_npc_interact_menuFightDrawSecretPokemonStatus.inc"
-}
-#else
 #pragma push
 #pragma peephole off
 void menuFightDrawSecretPokemonStatus(u8* ctx, u8* npc) {
@@ -1526,7 +1521,6 @@ void menuFightDrawSecretPokemonStatus(u8* ctx, u8* npc) {
     }
 }
 #pragma pop
-#endif
 
 /* menuFightDrawSecretPokemon - 0x8000EA10 | size: 0x324 */
 extern u32 fightFloorGetGcHeroFightTrainerPtr(s32 arg);
