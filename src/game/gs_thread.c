@@ -163,6 +163,7 @@ extern void cos();   /* MSL trig (renamed fn_800CDBE0) -- referenced by asm incs
 
 /* ===== String constants (rodata references) ===== */
 extern const char lbl_80271008[]; /* "GSthreadCreate. Warning: 'usesFPU==FALE' OK?\n" */
+extern const char lbl_80271038[]; /* "GSthread: Init OK, maximum of %d threads\n" */
 
 /* ===== Forward declarations for internal functions ===== */
 extern void gappVSyncCallback(void);            /* GStaskSwapCallback */
@@ -532,6 +533,50 @@ found:
 
     gsThreadActive = 1;
     return thread;
+}
+
+
+/* =======================================================================
+ *  GSthread / GSthread
+ *  Address: 0x800F09D8, Size: 0x9C
+ *
+ *  Allocates the cooperative thread pool from GSmem and clears each slot.
+ *
+ *  r3 = maxThreads
+ *
+ *  Assembly:
+ *    allocSize = maxThreads * 0x24 (sizeof GSThread)
+ *    gsThreadMaxCount = maxThreads
+ *    handle = GSmemAllocRaw(allocSize)
+ *    gsThreadArray = GSmemGetPtr(handle)
+ *    // Zero the 'active' byte at offset 0x08 of each thread entry
+ *    gsThreadCurrent (label 0x8047AC00) = NULL
+ *    gsThreadListHead = NULL
+ *    Print "GSthread: Init OK, maximum of %d threads\n"
+ */
+s32 GSthread(u32 maxThreads) {
+    u16 handle;
+    u32 offset;
+    u32 i;
+
+    lbl_8047AC30 = maxThreads;
+    handle = _toolentryAlloc__FUl(maxThreads * 0x24);
+    *(u16*)&lbl_8047AC2C = handle;
+    if ((handle & 0xFFFF) == 0) {
+        return 0;
+    }
+    lbl_8047AC28 = fn_800E27B0(handle & 0xFFFF);
+
+    offset = 0;
+    for (i = 0; i < lbl_8047AC30; i++) {
+        lbl_8047AC28[i].active = 0;
+        offset += 0x24;
+    }
+
+    lbl_8047AC00 = 0;
+    lbl_8047AC08 = 0;
+    GSlogWrite(lbl_80271038, lbl_8047AC30);
+    return 1;
 }
 
 
