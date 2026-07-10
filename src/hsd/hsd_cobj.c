@@ -1391,6 +1391,7 @@ asm void HSD_CObjGetUpVector(void) {
    vector from the stored roll angle via roll2upvec and return its result.
    Returns 0 when cobj or the output pointer is NULL.
    `up` is a 3-float Vec (no Vec type in these headers - inferred f32[3]). */
+#pragma dont_inline on
 int HSD_CObjGetUpVector(HSD_CObj* cobj, f32* up)
 {
     if (cobj == NULL || up == NULL) {
@@ -1404,6 +1405,7 @@ int HSD_CObjGetUpVector(HSD_CObj* cobj, f32* up)
     }
     return ((int (*)(HSD_CObj*, f32, f32*)) roll2upvec)(cobj, cobj->u.roll, up);
 }
+#pragma dont_inline reset
 #endif
 #pragma pop
 
@@ -1912,7 +1914,6 @@ int HSD_CObjSetCurrent(HSD_CObj* cobj)
 #pragma optimizewithasm off
 extern int HSD_CObjGetUpVector(HSD_CObj*, f32*);   /* wrk8: real sig (was `void (void)`) */
 extern void __assert(const char*, u32, const char*);
-extern void fn_80191688(HSD_WObj*, void*);
 extern char lbl_8047D958;
 extern char lbl_8047D960;
 #if 0
@@ -1927,18 +1928,21 @@ void HSD_CObjSetupViewingMtx(HSD_CObj* cobj) {
     f32 eye[3];
     f32 up[3];
     f32 interest[3];
-    int interest_dirty;
     int update;
+    int interest_dirty;
+    int eye_dirty;
 
     if (cobj->flags & 0x2) {
         return;
     }
-    interest_dirty = 1;
     update = 1;
+    interest_dirty = 1;
     if (!(cobj->flags & 0x40000000)) {
-        int eye_dirty = 0;
-        if (cobj->eyepos != NULL && (cobj->eyepos->flags & 0x2)) {
-            eye_dirty = 1;
+        eye_dirty = 0;
+        if (cobj->eyepos != NULL) {
+            if (cobj->eyepos->flags & 0x2) {
+                eye_dirty = 1;
+            }
         }
         if (eye_dirty == 0) {
             interest_dirty = 0;
@@ -1946,8 +1950,10 @@ void HSD_CObjSetupViewingMtx(HSD_CObj* cobj) {
     }
     if (interest_dirty == 0) {
         interest_dirty = 0;
-        if (cobj->interest != NULL && (cobj->interest->flags & 0x2)) {
-            interest_dirty = 1;
+        if (cobj->interest != NULL) {
+            if (cobj->interest->flags & 0x2) {
+                interest_dirty = 1;
+            }
         }
         if (interest_dirty == 0) {
             update = 0;
@@ -1958,8 +1964,8 @@ void HSD_CObjSetupViewingMtx(HSD_CObj* cobj) {
     }
     if (cobj == NULL) __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
     if (cobj == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
-    fn_80191688(cobj->eyepos, eye);
-    if (((int (*)(HSD_CObj*, f32*)) HSD_CObjGetUpVector)(cobj, up) == 0) {
+    HSD_WObjGetPosition(cobj->eyepos, eye);
+    if (HSD_CObjGetUpVector(cobj, up) == 0) {
         extern f32 lbl_8047D978;   /* 0.0f named SDA2 constant */
         extern f32 lbl_8047D9B0;   /* 1.0f named SDA2 constant */
         up[0] = lbl_8047D978;
@@ -1968,7 +1974,7 @@ void HSD_CObjSetupViewingMtx(HSD_CObj* cobj) {
     }
     if (cobj == NULL) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
     if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
-    fn_80191688(cobj->interest, interest);
+    HSD_WObjGetPosition(cobj->interest, interest);
     C_MTXLookAt(cobj->view_mtx, eye, up, interest);
     {
         HSD_WObj* w;
