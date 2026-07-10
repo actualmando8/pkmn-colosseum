@@ -3132,6 +3132,31 @@ extern void fn_8014E7D0(u32 voice); /* streamKill (stream.c) */
 static void voiceRemovePriority(SynthVoiceMini* svoice);
 static void vidRemove(VidListFull** list);
 
+/* ===== synthvoice.c: vidInit, 0x80157280 =====
+ * Reference synthvoice.c vidInit: initializes the 128-entry vidList as a
+ * doubly-linked free list. */
+#pragma push
+#pragma optimization_level 4
+void vidInit(void) {
+    VidListFull* vl;
+    u32 i;
+    VidListFull* prev;
+
+    prev = NULL;
+    lbl_8047AFD8 = 0;
+    lbl_8047AFD4 = NULL;
+    lbl_8047AFD0 = vl = (VidListFull*)lbl_80445F50;
+    for (i = 0; i < 128; i++) {
+        vl->prev = prev;
+        if (prev != NULL) {
+            prev->next = vl;
+        }
+        prev = vl++;
+    }
+    prev->next = NULL;
+}
+#pragma pop
+
 static u32 get_newvid(void) {
     u32 vid;
 

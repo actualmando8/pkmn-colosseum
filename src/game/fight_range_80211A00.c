@@ -96,6 +96,53 @@ extern void fn_8020248C();
 extern u8  fn_802026E4();
 extern u32 lbl_8047B610;
 extern u32 lbl_8047B618;
+extern u16 lbl_8047B60C;
+
+/*
+ * fn_80214F10 (0x80214F10)
+ *
+ * FightSeq opcode handler: picks a random target index from the ally
+ * pokemon-ptr list (fn_80215008 fills a u16[12] buffer via the ctx's
+ * fightFloorGetFightOutPokemonPtrToFightTrainerPtr trainer object)
+ * and forwards it through fn_8022B2CC to compute a value stashed via
+ * fightFloorSetStatus(...,0x43,...). The picked u16 is also recorded
+ * in lbl_8047B60C and flag bit 0x400 of lbl_8047B618 is cleared. If
+ * the buffer came back empty the script-embedded jump is taken.
+ */
+extern u32 fightFloorGetFightOutPokemonPtrToFightTrainerPtr();
+extern s32 fn_80215008();
+extern u32 fn_8022B2CC();
+extern u32 fightFloorGetStatus();
+extern void fightFloorSetStatus();
+#pragma optimize_for_size on
+void fn_80214F10(void) {
+    u16 buf[22];
+    u32 ctx;
+    u16 floorVal;
+    u32 trainer;
+    s32 count;
+    u32 idx;
+    u16 pick;
+    u32 tmp;
+
+    floorVal = (u16)fightFloorGetStatus(0, 0, 0x14, 0);
+    ctx = fightTargetGetPtrAsNowFightType(0x11, 0);
+    trainer = fightFloorGetFightOutPokemonPtrToFightTrainerPtr(0, ctx);
+    count = fn_80215008(trainer, buf, 0x18, ctx);
+
+    if (count != 0) {
+        idx = (u16)fn_800E0C54() % count;
+        lbl_8047B618 &= ~0x400u;
+        pick = buf[idx];
+        lbl_8047B60C = pick;
+        tmp = fn_8022B2CC(ctx, pick, floorVal, 0, 1, 1, -1);
+        fightFloorSetStatus(0, 0, 0x43, 0, tmp);
+        lbl_8047B610 = lbl_8047B610 + 5;
+    } else {
+        lbl_8047B610 = *(u32*)(lbl_8047B610 + 1);
+    }
+}
+#pragma optimize_for_size reset
 
 /*
  * WS_ONNEN (0x80215300)

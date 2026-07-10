@@ -146,10 +146,8 @@ extern s32 menuCloseSync(s32, s32);
 extern void menuIsCheck();
 extern s32 menuOpen(s32, s32);
 extern s32  fn_8010264C();
-extern void menuOpenCustom();
 extern void menuSetPosition();
 extern u8*  fn_80104704(u32);
-extern void windowGetActiveID();
 extern u8*  windowGetKeyInfo(void);
 extern void winMsgOpen();
 extern void winMsgClose();
@@ -202,6 +200,7 @@ extern const char lbl_8047BF28;
 extern u8 lbl_80267840[];
 extern char lbl_802678D8[];
 extern const ColosseumRosterRow lbl_802677D0[7];
+extern const s32 lbl_80267A98[6];
 extern u8 lbl_803A9A08[];
 extern u8 lbl_803A9A18[];
 
@@ -1892,6 +1891,82 @@ s32 fn_8005D26C(void) {
     menuClose(0x9E);
     menuCloseSync(0x9E, 1);
     if (menuResult < -1 || menuResult >= 2) {
+        return 1;
+    }
+    return results[menuResult];
+}
+#pragma pop
+
+/* Address: 0x8005D2E8 | Size: 0xE8 */
+#pragma push
+#pragma peephole off
+#pragma optimize_for_size on
+s32 fn_8005D2E8(MenuWindow* menu, MenuSprite* sprite) {
+    s32 tags[6];
+    s32* p;
+    s32 i;
+    s32 j;
+    s32 visible;
+
+    tags[0] = lbl_80267A98[0];
+    tags[1] = lbl_80267A98[1];
+    tags[2] = lbl_80267A98[2];
+    tags[3] = lbl_80267A98[3];
+    tags[4] = lbl_80267A98[4];
+    tags[5] = lbl_80267A98[5];
+
+    p = tags;
+    for (i = 0; i < 2; i++) {
+        j = 0;
+        if (sprite->tag != p[0]) {
+            j = 1;
+            if (sprite->tag != p[1]) {
+                j = 2;
+                if (sprite->tag != p[2]) {
+                    j = 3;
+                }
+            }
+        }
+        if (j < 3) break;
+        p += 3;
+    }
+    if (i >= 2) {
+        return 0;
+    }
+    if (menu->cursor == i) {
+        visible = 1;
+    } else {
+        visible = 0;
+    }
+    winSpriteSetDisp(sprite, visible);
+    return 0;
+}
+#pragma pop
+
+/* Address: 0x8005D3D0 | Size: 0xDC */
+#pragma push
+#pragma peephole off
+s32 fn_8005D3D0(s32 target) {
+    extern s32 menuOpenCustom(s32, s32, void*, s32, s32, s32, ...);
+    extern s32 windowGetActiveID(void);
+    s32 i;
+    s32 results[2];
+    s32 menuResult;
+
+    results[0] = lbl_8047BF38;
+    results[1] = lbl_8047BF3C;
+    for (i = 0; i < 2; i++) {
+        if (target == results[i]) {
+            break;
+        }
+    }
+    if (i >= 2) {
+        i = 0;
+    }
+    menuResult = menuOpenCustom(0xA7, windowGetActiveID(), &i, 0, 1, 0);
+    menuClose(0xA7);
+    menuCloseSync(0xA7, 1);
+    if (menuResult <= -1 || menuResult >= 2) {
         return 1;
     }
     return results[menuResult];
