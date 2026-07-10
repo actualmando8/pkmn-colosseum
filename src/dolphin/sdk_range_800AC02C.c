@@ -482,11 +482,10 @@ s32 fn_800B5BE4(s32 chan, s32 fileNo, u8 attr, void* callback) {
 
     result = fn_800B57D0(chan, fileNo, &entry);
     if (result < 0) {
-    } else {
-        entry.permission = attr;
-        result = fn_800B588C(chan, fileNo, &entry, callback);
+        return result;
     }
-    return result;
+    entry.permission = attr;
+    return fn_800B588C(chan, fileNo, &entry, callback);
 }
 
 GXTlutRegion* __GXDefaultTlutRegionCallback(u32 index) {
