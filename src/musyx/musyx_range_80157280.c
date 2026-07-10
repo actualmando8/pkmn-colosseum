@@ -4250,8 +4250,42 @@ extern void SortVoices(DSPvoice** voices, s32 l, s32 r);
 extern void DoDepopFade(s32* dspStart, s16* dspDelta, s32* hostSum);
 extern void sal_setup_dspvol(u16* dsp_delta, u16* last_vol, u16 vol);
 extern void sal_update_hostplayinfo(DSPvoice* dsp_vptr);
-extern u32 salCheckVolErrorAndResetDelta(u16* dsp_vol, u16* dsp_delta, u16* last_vol, u16 targetVol,
-                                          u16* resetFlags, u16 resetMask);
+u32 salCheckVolErrorAndResetDelta(u16* dsp_vol, u16* dsp_delta, u16* last_vol, u16 targetVol,
+                                  u16* resetFlags, u16 resetMask) {
+  s16 d;
+  s16 x;
+
+  if (targetVol != *last_vol) {
+    d = (s16)targetVol - (s16)*last_vol;
+    if ((s16)d >= 32 && (s16)d < 160) {
+      x = (s16)d >> 5;
+      if ((s16)x < 5) {
+        resetFlags[x] |= resetMask;
+      }
+
+      *dsp_delta = 1;
+      *last_vol += (x << 5);
+      return 1;
+    }
+
+    if (-32 >= (s16)d && -160 < (s16)d) {
+      x = -(s16)d >> 5;
+      if (x < 5) {
+        resetFlags[x] |= resetMask;
+      }
+      *dsp_delta = 0xFFFF;
+      *last_vol -= x << 5;
+      return 1;
+    }
+
+    if (targetVol == 0 && (s16)d > -32) {
+      *dsp_vol = *last_vol = 0;
+    }
+  }
+
+  *dsp_delta = 0;
+  return 0;
+}
 extern void fn_8015AD1C(DSPstudioinfo* stp, DSPvoice* dsp_vptr); /* HandleDepopVoice */
 extern void DCStoreRangeNoSync(void* addr, u32 nBytes);
 extern void DCFlushRangeNoSync(void* addr, u32 nBytes);

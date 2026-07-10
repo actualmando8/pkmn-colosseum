@@ -270,21 +270,18 @@ asm void fn_801990B8(void) {
 }
 #else
 #pragma optimization_level 4
-static void DObjDisp(HSD_DObj* dobj, void* vmtx, void* pmtx, u32 rendermode)
+static void fn_801990B8(HSD_DObj* dobj, f32 vmtx[3][4], f32 pmtx[3][4], u32 rendermode)
 {
     HSD_PObj* pobj;
     HSD_MObjSetCurrent(dobj->mobj);
     if (!(rendermode & 0x04000000)) {
-        void (**vtbl)(void) = (void (**)(void)) HSD_CLASS_METHOD(dobj->mobj);
-        ((void (*)(HSD_MObj*, u32)) vtbl[0x3C / 4])(dobj->mobj, rendermode);
+        HSD_MOBJ_METHOD(dobj->mobj)->setup(dobj->mobj, rendermode);
     }
     for (pobj = dobj->pobj; pobj != NULL; pobj = pobj->next) {
-        void (**vtbl)(void) = (void (**)(void)) HSD_CLASS_METHOD(pobj);
-        ((void (*)(HSD_PObj*, void*, void*, u32)) vtbl[0x3C / 4])(pobj, vmtx, pmtx, rendermode);
+        HSD_POBJ_METHOD(pobj)->disp(pobj, vmtx, pmtx, rendermode);
     }
     if (!(rendermode & 0x04000000)) {
-        void (**vtbl)(void) = (void (**)(void)) HSD_CLASS_METHOD(dobj->mobj);
-        ((void (*)(HSD_MObj*, u32)) vtbl[0x50 / 4])(dobj->mobj, rendermode);
+        HSD_MOBJ_METHOD(dobj->mobj)->unset(dobj->mobj, rendermode);
     }
     HSD_MObjSetCurrent(NULL);
 }
