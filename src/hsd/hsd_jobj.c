@@ -1077,6 +1077,29 @@ void fn_8019FAEC(HSD_JObj* jobj, u32 flags) {
 }
 #pragma pop
 
+/* 0x8019FE8C | 0xA4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimization_level 1
+void fn_8019FE8C(HSD_JObj* jobj, u32 flags) {
+    s32 result;
+    if (!jobj) return;
+    if (((jobj->flags ^ flags) & 0x8) && jobj != NULL) {
+        if (!jobj) __assert(&lbl_8047DB34, 0x25d, &lbl_8047DB3C);
+        result = 0;
+        if (!(jobj->flags & 0x00800000)) {
+            if (jobj->flags & 0x00000040) {
+                result = 1;
+            }
+        }
+        if (result == 0) {
+            fn_8019D620(jobj);
+        }
+    }
+    jobj->flags |= flags;
+}
+#pragma pop
+
 /* 0x8019FF30 | 0x18 */
 #pragma push
 #pragma optimization_level 0
@@ -1896,6 +1919,31 @@ f32* fn_801A1980(HSD_JObj* jobj) {
 #pragma inline_depth(6)
 typedef void (*HSD_JObjWalkTreeCallback)(HSD_JObj* jobj, void* user_data,
                                          s32 type);
+
+void HSD_JObjWalkTree0(HSD_JObj* jobj, HSD_JObjWalkTreeCallback callback,
+                       void* user_data);
+
+/* 0x801A3918 | 0x94 */
+#pragma push
+#pragma optimization_level 1
+void fn_801A3918(HSD_JObj* jobj, HSD_JObjWalkTreeCallback callback,
+                 void* user_data)
+{
+    HSD_JObj* child;
+    if (jobj == NULL) {
+        return;
+    }
+    if (callback != NULL) {
+        callback(jobj, user_data, 0);
+    }
+    if (jobj->flags & JOBJ_INSTANCE) {
+        return;
+    }
+    for (child = jobj->child; child != NULL; child = child->next) {
+        HSD_JObjWalkTree0(child, callback, user_data);
+    }
+}
+#pragma pop
 
 void HSD_JObjWalkTree0(HSD_JObj* jobj, HSD_JObjWalkTreeCallback callback,
                        void* user_data)

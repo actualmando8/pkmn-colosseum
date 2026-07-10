@@ -10,6 +10,7 @@
 #include "dolphin/types.h"
 #include "dolphin/ai/AI.h"
 #include "dolphin/ar/AR.h"
+#include "dolphin/exi/EXI.h"
 #include "dolphin/os/OSInterrupt.h"
 
 typedef struct AIDmaRegisters {
@@ -186,6 +187,48 @@ u32 AIGetStreamPlayState(void) {
     return AI_REGS->control & 1;
 }
 
+u32 AIGetDSPSampleRate(void);
+
+void __AI_SRC_INIT(void);
+u32 AIGetStreamSampleRate(void);
+u32 AIGetStreamVolLeft(void);
+u32 AIGetStreamVolRight(void);
+void AISetStreamVolLeft(u32 volume);
+void AISetStreamVolRight(u32 volume);
+
+void AISetDSPSampleRate(u32 rate) {
+    BOOL enabled;
+    u32 oldVolL;
+    u32 oldVolR;
+    u32 oldStreamPlay;
+    u32 oldStreamRate;
+
+    if (rate == AIGetDSPSampleRate()) {
+        return;
+    }
+    AI_REGS->control &= ~0x40;
+    if (rate != 0) {
+        return;
+    }
+
+    oldVolL = AIGetStreamVolLeft();
+    oldVolR = AIGetStreamVolRight();
+    oldStreamPlay = AIGetStreamPlayState();
+    oldStreamRate = AIGetStreamSampleRate();
+
+    AISetStreamVolLeft(0);
+    AISetStreamVolRight(0);
+    enabled = OSDisableInterrupts();
+    __AI_SRC_INIT();
+    AI_REGS->control = (AI_REGS->control & ~0x20) | 0x20;
+    AI_REGS->control = (AI_REGS->control & ~0x2) | (oldStreamRate << 1);
+    AI_REGS->control = (AI_REGS->control & ~0x1) | oldStreamPlay;
+    AI_REGS->control |= 0x40;
+    OSRestoreInterrupts(enabled);
+    AISetStreamVolLeft(oldVolL);
+    AISetStreamVolRight(oldVolR);
+}
+
 u32 AIGetDSPSampleRate(void) {
     return ((AI_REGS->control >> 6) & 1) ^ 1;
 }
@@ -350,6 +393,25 @@ void __DSP_remove_task(DSPTaskInfo* task) {
 }
 
 void __CARDDefaultApiCallback(s32 chan, s32 result) {
+}
+
+s32 fn_800AF660(s32 chan, u8* status) {
+    u32 cmd;
+    s32 err;
+
+    if (!EXISelect(chan, 0, 4)) {
+        return -3;
+    }
+    cmd = 0x83000000;
+    err  = !EXIImm(chan, &cmd, 2, 1, NULL);
+    err |= !EXISync(chan);
+    err |= !EXIImm(chan, status, 1, 0, NULL);
+    err |= !EXISync(chan);
+    err |= !EXIDeselect(chan);
+    if (err) {
+        return -3;
+    }
+    return 0;
 }
 
 s32 CARDCheckAsync(s32 chan, void* callback) {
