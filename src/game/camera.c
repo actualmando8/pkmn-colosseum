@@ -77,7 +77,7 @@ void fn_80176948(void) {
     void fn_800E01F4();
     u8 local[24];
     fn_800E01F4(local);
-    fn_800E01D0((u8*)lbl_80478C40 + 4, local);
+    fn_800E01D0(&((GSCameraStateVectors*)lbl_80478C40)->direction, local);
 }
 
 void cameraSetTargetPosXYZ(void) {
@@ -85,7 +85,7 @@ void cameraSetTargetPosXYZ(void) {
     void fn_800E01F4();
     u8 local[24];
     fn_800E01F4(local);
-    fn_800E01D0((u8*)lbl_80478C40 + 28, local);
+    fn_800E01D0(&((GSCameraStateVectors*)lbl_80478C40)->position, local);
 }
 
 void cameraSetTargetOfsXYZ(void) {
@@ -93,7 +93,7 @@ void cameraSetTargetOfsXYZ(void) {
     void fn_800E01F4();
     u8 local[24];
     fn_800E01F4(local);
-    fn_800E01D0((u8*)lbl_80478C40 + 40, local);
+    fn_800E01D0(&((GSCameraStateVectors*)lbl_80478C40)->view, local);
 }
 
 #pragma pop

@@ -201,13 +201,15 @@ void* GetWaza__12NullSequenceCFUsUs(void* obj, s32 search_key1, s32 search_key2)
 void fn_801DD100(u8* p, u8* q) {
     if (p == NULL) return;
     if (q == NULL) {
-        *(u16*)(p + 50) = 0;
-        *(u16*)(p + 52) = 0;
-        *(s32*)(*(u8**)(p + 44) + 144) = 0;
+        ((WazaEffect*)p)->index = 0;
+        ((WazaEffect*)p)->field_34 = 0;
+        ((WazaEffect*)p)->table[0].field_90 = 0;
     } else {
-        *(u16*)(p + 50) = (u8)*(u32*)(q + 12);
-        *(u16*)(p + 52) = 0;
-        *(s32*)(*(u8**)(p + 44) + *(u32*)(q + 12) * 212 + 144) = *(s32*)(q + 16);
+        WazaEffectTblEntry* tblEntry;
+        ((WazaEffect*)p)->index = (u8)((WazaBlendEntry*)q)->field_0C;
+        ((WazaEffect*)p)->field_34 = 0;
+        tblEntry = &((WazaEffect*)p)->table[((WazaBlendEntry*)q)->field_0C];
+        tblEntry->field_90 = ((WazaBlendEntry*)q)->field_10;
     }
 }
 

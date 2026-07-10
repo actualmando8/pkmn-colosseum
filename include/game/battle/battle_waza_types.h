@@ -48,7 +48,9 @@ typedef struct WazaPartyScratch {
 
 /* Waza effect data table entry (stride 0xD4) */
 typedef struct WazaEffectTblEntry {
-    /* 0x00 */ u8 bytes[0xD4];
+    /* 0x00 */ u8  pad_00[0x90];
+    /* 0x90 */ s32 field_90;                 /* set by fn_801DD100 */
+    /* 0x94 */ u8  pad_94[0xD4 - 0x94];
 } WazaEffectTblEntry;
 
 /* Waza battle effect object (size 0x8C) */
@@ -66,13 +68,24 @@ typedef struct WazaEffect {
     };
     /* 0x30 */ u8 pad_30[0x02];
     /* 0x32 */ u16 index;                    /* table index */
-    /* 0x34 */ u8 pad_34[0x40];
+    /* 0x34 */ u16 field_34;                 /* set by fn_801DD100 */
+    /* 0x36 */ u8 pad_36[0x3E];
     /* 0x74 */ u8 active;
     /* 0x75 */ u8 pad_75[0x0B];
     /* 0x80 */ u32 field_80;                 /* secondary motion/effect handle */
     /* 0x84 */ u32 effect_handle;            /* effect handle */
     /* 0x88 */ u8 pad_88[0x04];
 } WazaEffect;
+
+/* Sequence-entry ("obj") fields read by fn_801DD100 when linking a waza
+ * blend effect to its owner; see wazaSequence.c's wazaSequenceStart for
+ * the many other offsets accessed on this same pointer (obj/blendType,
+ * not yet consolidated into a full struct). */
+typedef struct WazaBlendEntry {
+    /* 0x00 */ u8  pad_00[0x0C];
+    /* 0x0C */ u32 field_0C;                 /* WazaEffect::table index */
+    /* 0x10 */ s32 field_10;                 /* value stored into WazaEffect::table[index].field_90 */
+} WazaBlendEntry;
 
 typedef struct WazaFxNode {
     u8 pad_00[0x2C];

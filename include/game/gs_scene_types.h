@@ -104,4 +104,27 @@ typedef struct GSSceneRenderEntry {
     /* 0x08 */ u8   pad[0x20];
 } GSSceneRenderEntry;
 
+/* ===================================================================
+ * Camera state block pointed to by lbl_80478C40 (428 bytes total, see
+ * _cameraGetStateSize). Only the leading vector quad is named here --
+ * offsets/names taken directly from the byte-matched
+ * GSscene_Get/SetCameraDirectionVector/RotationVector/PositionVector/
+ * ViewVector accessors in camera.c (see include/game/gs_scene.h). The
+ * remainder of the block is untouched/still offset-cast pending further
+ * decompilation.
+ * =================================================================== */
+typedef struct GSSceneVec3 {
+    f32 x;
+    f32 y;
+    f32 z;
+} GSSceneVec3;
+
+typedef struct GSCameraStateVectors {
+    /* 0x00 */ u8         pad00[0x04];
+    /* 0x04 */ GSSceneVec3 direction;  /* GSscene_Get/SetCameraDirectionVector */
+    /* 0x10 */ GSSceneVec3 rotation;   /* GSscene_Get/SetCameraRotationVector */
+    /* 0x1C */ GSSceneVec3 position;   /* GSscene_Get/SetCameraPositionVector */
+    /* 0x28 */ GSSceneVec3 view;       /* GSscene_Get/SetCameraViewVector */
+} GSCameraStateVectors;
+
 #endif /* GAME_GS_SCENE_TYPES_H */
