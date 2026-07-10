@@ -3370,6 +3370,15 @@ u32 fightOutPokemonSetTokuseiDataId(void* context, u16 value) {
 }
 #pragma pop
 
+/* 0x80207BF4 | size: 0x30 */
+#pragma push
+#pragma scheduling on
+#pragma peephole on
+u16 fightOutPokemonGetTokuseiDataId(void* context) {
+    return (u16)(u32)pokemonGetStatus(context, 0, 0x100, 0);
+}
+#pragma pop
+
 /* 0x80207C24 | size: 0x48 | small */
 #pragma push
 #pragma scheduling on
