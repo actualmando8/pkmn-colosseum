@@ -25,7 +25,7 @@ extern void  OSRestoreInterrupts(u32 level);
 
 /* renamed symbols referenced by asm incs (symbolmap port) */
 extern void ARQPostRequest();
-extern void InitStreamBuffers();
+void InitStreamBuffers(void);
 extern void aramQueueCallback();
 extern void aramUploadData();
 extern u16 inpGetMidiCtrl(u8 ctrl, u8 channel, u8 set); /* true signature, verified via disassembly */
@@ -606,7 +606,6 @@ extern void fn_80163794(void);
 extern void aramSetUploadCallback(u8* ptr, u32 size);
 extern u32  fn_80163810(u32 ptr, u32 size);
 extern void fn_80163BCC(u8* a, u32 b);
-extern void fn_80163BE4(void);
 extern u8   fn_80163CA8();
 extern u32  aramGetStreamBufferAddress(u32 idx, u32 *out);
 extern void aramFreeStreamBuffer();
@@ -1952,13 +1951,13 @@ extern u32 lbl_8047B074, lbl_8047B07C;
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_80163BE4(void) {
+asm void InitStreamBuffers(void) {
 #include "src/game/people/people_field_fn_80163BE4.inc"
 }
 #else
 /* peopleFieldMoveSetState: init the 0x40-entry free list (node[i].next=&node[i+1],
  * tail NULL; head ptrs reset). byte-match verified via objdiff. */
-void fn_80163BE4(void) {
+void InitStreamBuffers(void) {
     u32 i;
     lbl_8047B068 = 0;
     lbl_8047B064 = 0;
