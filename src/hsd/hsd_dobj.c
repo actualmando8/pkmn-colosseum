@@ -13,12 +13,13 @@
 #include "hsd/hsd_mobj.h"
 #include "hsd/hsd_pobj.h"
 
-static void DObjInfoInit(void);
+static void fn_80198F7C(void);
 
-static HSD_DObjInfo lbl_8036C7A0 = { DObjInfoInit };
-#define hsdDObj lbl_8036C7A0
-static HSD_ClassInfo* lbl_8047B260 = NULL;
-#define default_class lbl_8047B260
+extern HSD_DObjInfo hsdDObj;
+extern u8 lbl_8036C638[];
+extern char lbl_80274708[];
+extern char lbl_80274720[];
+static HSD_ClassInfo* default_class = NULL;
 
 /* ========================================================================= */
 /*  Flag accessors                                                           */
@@ -187,28 +188,25 @@ void HSD_DObjSetDefaultClass(HSD_ClassInfo* info)
 /*  Class lifecycle                                                          */
 /* ========================================================================= */
 
-/* NOTE: DObjRelease's real body lives in the address-scaffolded section
- * below (0x8019905C); that's the disassembled target. Forward-declared
- * here so DObjInfoInit() can wire it into the vtable. */
+/* Forward decls of vtable entries wired by DObjInfoInit. */
 static void DObjRelease(HSD_Class* o);
+static void fn_80199014(HSD_Class* o);
+static void fn_801990B8(HSD_DObj* dobj, f32 vmtx[3][4], f32 pmtx[3][4], u32 rendermode);
+static int DObjLoad(HSD_DObj* dobj, HSD_DObjDesc* desc);
 
-static void DObjAmnesia(HSD_ClassInfo* info)
+#pragma push
+#pragma optimization_level 0
+static void fn_80198F7C(void)
 {
-    if (info == HSD_CLASS_INFO(default_class)) {
-        default_class = NULL;
-    }
-    HSD_PARENT_INFO(&hsdDObj)->amnesia(info);
-}
-
-static void DObjInfoInit(void)
-{
-    hsdInitClassInfo((HSD_ClassInfo*) &hsdDObj, &hsdClass,
-                     "sysdolphin_base_library", "hsd_dobj",
+    hsdInitClassInfo((HSD_ClassInfo*) &hsdDObj, (HSD_ClassInfo*) lbl_8036C638,
+                     lbl_80274708, lbl_80274720,
                      sizeof(HSD_DObjInfo), sizeof(HSD_DObj));
-    ((HSD_ClassInfo*) &hsdDObj)->release = DObjRelease;
-    ((HSD_ClassInfo*) &hsdDObj)->amnesia = DObjAmnesia;
-    hsdDObj.load = DObjLoad_Early;
+    hsdDObj.parent.release = DObjRelease;
+    hsdDObj.parent.amnesia = (void (*)(HSD_ClassInfo*)) fn_80199014;
+    hsdDObj.disp = fn_801990B8;
+    hsdDObj.load = DObjLoad;
 }
+#pragma pop
 
 /* ===================================================================
  * WP-0061: asm wrappers
@@ -363,9 +361,7 @@ asm void HSD_DObjRemoveAll(void) {
 /* inc-label externs, hoisted before asm blocks (add_inc_externs.py) */
 extern u8 lbl_80274758[];
 extern u8 lbl_802747AC[];
-extern HSD_DObjInfo lbl_8036C7A0;
 extern u8 lbl_80465378[];
-extern HSD_ClassInfo* lbl_8047B260;
 
 void HSD_DObjRemoveAll(HSD_DObj* dobj) {
     HSD_DObj* next;
@@ -444,8 +440,6 @@ HSD_DObj* HSD_DObjLoadDesc(HSD_DObjDesc* desc)
 extern void OSReport(const char* fmt, ...);
 extern HSD_PObj* HSD_PObjLoadDesc(HSD_PObjDesc* pobjdesc);
 extern void HSD_Panic(const char* file, s32 line, const char* msg);
-extern HSD_ClassInfo* lbl_8047B260;
-extern HSD_DObjInfo lbl_8036C7A0;
 extern char lbl_8027472C[];
 extern char lbl_8047DA28;
 extern char lbl_8047DA18;
@@ -475,7 +469,7 @@ static int DObjLoad(HSD_DObj* dobj_arg, HSD_DObjDesc* desc_arg)
         if (subdesc->class_name == NULL
             || (info = fn_80193748(subdesc->class_name)) == NULL)
         {
-            info = lbl_8047B260 ? lbl_8047B260 : (HSD_ClassInfo*) &lbl_8036C7A0;
+            info = default_class ? default_class : (HSD_ClassInfo*) &hsdDObj;
             sub = (HSD_DObj*) fn_80193828(info);
             if (sub == NULL) {
                 __assert(&lbl_8047DA18, 0x214, &lbl_8047DA20);

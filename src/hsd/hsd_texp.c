@@ -205,6 +205,17 @@ void fn_801B3638(HSD_TevDesc* desc) {
 }
 #pragma optimization_level 4
 
+extern s32 lbl_8047B35C;
+void fn_800BA6B0(u8);
+
+/* Address: 0x801B3AA8 | Size: 0x40 */
+void HSD_StateSetNumChans(s32 n) {
+    if (lbl_8047B35C != n) {
+        fn_800BA6B0((u8)n);
+        lbl_8047B35C = n;
+    }
+}
+
 /*
  * HSD_TExpValidateInputs - 0x801B45A4 | Size: 0x70
  * Validate that all inputs are properly connected.

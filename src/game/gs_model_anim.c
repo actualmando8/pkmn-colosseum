@@ -79,6 +79,7 @@ extern const f32 lbl_8047CC58;
 extern const f32 lbl_8047CC5C;
 extern const f32 lbl_8047CC60;
 extern const f32 lbl_8047CC64;
+extern const f32 lbl_8047CC78; /* defined SDATA2 in src/game/data/sdata2_8047CBE0.c = 0.0001f */
 extern char lbl_8047CC90[] __attribute__((section(".sdata2")));
 extern char lbl_8047CC98[] __attribute__((section(".sdata2")));
 
@@ -92,6 +93,54 @@ void _modelSetLoopFlag__FP9_HSD_AObjUl(HSD_AObj* aobj, u32 enable);
 void _modelGetEndFrame(HSD_AObj* aobj, f32* end_frame);
 void fn_800ED6E4(GSmodel* model, u8 tex_anim);
 void fn_800ED7E4(GSmodel* model, u8 tex_anim, f32 delta);
+
+void fn_800ED7E4(GSmodel* model, u8 tex_anim, f32 delta)
+{
+    u32 ended_flag;
+    f32* frame_ptr;
+    f32* req_ptr;
+    s32 type;
+    f32 end_frame;
+
+    if (!(model->flags & MODEL_FLAG_BLENDING)) {
+        if (!tex_anim) {
+            end_frame = model->anim_end_frame;
+            frame_ptr = &model->anim_frame;
+            type = model->anim_type;
+            req_ptr = &model->anim_req_frame;
+            ended_flag = MODEL_FLAG_ANIM_ENDED;
+        } else {
+            end_frame = model->tex_anim_end_frame;
+            type = model->tex_anim_type;
+            frame_ptr = &model->tex_anim_frame;
+            req_ptr = &model->tex_anim_req_frame;
+            ended_flag = MODEL_FLAG_TEX_ANIM_ENDED;
+        }
+    } else if (!tex_anim) {
+        frame_ptr = &model->blend_anim_frame_b;
+        end_frame = model->blend_anim_end_frame_b;
+        type = model->anim_type;
+        req_ptr = frame_ptr;
+        ended_flag = MODEL_FLAG_ANIM_ENDED;
+    }
+
+    *frame_ptr += delta;
+    if (*frame_ptr >= end_frame - lbl_8047CC78) {
+        switch (type) {
+        case 0:
+            *frame_ptr = end_frame;
+            break;
+        case 1:
+            *frame_ptr -= end_frame;
+            break;
+        }
+    }
+    if (*req_ptr >= end_frame - lbl_8047CC78) {
+        if (type == 0) {
+            model->flags |= ended_flag;
+        }
+    }
+}
 
 void GSmodelForceAnimTransformUpdate(GSmodel* model)
 {
