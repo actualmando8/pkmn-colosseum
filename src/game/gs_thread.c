@@ -882,35 +882,54 @@ void threadLoadFPRRegisters(void) {
 }
 #endif
 extern u32 lbl_8047AC1C;
-#if 0
-asm void threadSaveGPRRegisters(void) {
-#include "src/game/gs_texture_fn_800F015C.inc"
-}
-#else
 /*
- * threadSaveGPRRegisters -- Save all GPRs into the current context block.
- *
- * Loads lbl_8047AC1C (GSThreadCtx*) and stores:
- *   r0  to ctx+0x00
- *   r2  to ctx+0x08
- *   r3  (self ptr) to ctx+0x0C
- *   r4-r31 to ctx+0x10 .. ctx+0x7C
- * Then restores r3 from caller stack slot and pops 0x8-byte frame.
- *
- * Returns the ctx pointer in r3 (callers use ctx->sp, ctx->lr etc.)
- *
- * Cannot be matched in C -- touches all GPRs directly.
+ * threadSaveGPRRegisters -- Save all GPRs into the current context block
+ * pointed to by lbl_8047AC1C. Must be written in asm because it touches
+ * every GPR directly and cannot be produced by any C source.
  */
-void threadSaveGPRRegisters(void) {
-    GSThreadCtx* ctx = (GSThreadCtx*)lbl_8047AC1C;
-    ctx->r0 = 0;
-    ctx->r2 = 0;
-    ctx->r3 = (u32)ctx;
-    ctx->r4 = 0;
-    /* ... r5-r31 ... */
-    ctx->r31 = 0;
+#pragma push
+#pragma optimization_level 0
+asm void threadSaveGPRRegisters(void) {
+    nofralloc
+    stwu    r1, -8(r1)
+    stw     r3, 8(r1)
+    lwz     r3, lbl_8047AC1C
+    stw     r0, 0(r3)
+    stw     r2, 8(r3)
+    stw     r3, 12(r3)
+    stw     r4, 16(r3)
+    stw     r5, 20(r3)
+    stw     r6, 24(r3)
+    stw     r7, 28(r3)
+    stw     r8, 32(r3)
+    stw     r9, 36(r3)
+    stw     r10, 40(r3)
+    stw     r11, 44(r3)
+    stw     r12, 48(r3)
+    stw     r13, 52(r3)
+    stw     r14, 56(r3)
+    stw     r15, 60(r3)
+    stw     r16, 64(r3)
+    stw     r17, 68(r3)
+    stw     r18, 72(r3)
+    stw     r19, 76(r3)
+    stw     r20, 80(r3)
+    stw     r21, 84(r3)
+    stw     r22, 88(r3)
+    stw     r23, 92(r3)
+    stw     r24, 96(r3)
+    stw     r25, 100(r3)
+    stw     r26, 104(r3)
+    stw     r27, 108(r3)
+    stw     r28, 112(r3)
+    stw     r29, 116(r3)
+    stw     r30, 120(r3)
+    stw     r31, 124(r3)
+    lwz     r3, 8(r1)
+    addi    r1, r1, 8
+    blr
 }
-#endif
+#pragma pop
 extern u32 lbl_8047AC1C;
 #if 0
 asm void threadSaveFPRRegisters(void) {
