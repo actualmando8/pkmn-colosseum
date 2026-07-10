@@ -27,7 +27,7 @@ extern void fn_80076F2C();
 extern void fn_800772AC();
 extern void fn_800774D4();
 extern void fn_80077A5C();
-extern void fn_80077BD0();
+extern u8 fn_80077BD0(void);
 extern void menuCBRule_CheckValidItem();
 extern void fn_80077C68();
 extern void fn_80077D88();
@@ -54,19 +54,19 @@ extern void fn_800FB680();
 extern void fn_800FE35C();
 extern void fn_800FE38C();
 extern void fn_800FF730();
-extern void menuGetCursorFromItemID();
-extern void menuGetCursorItemID();
-extern void menuSetCursor();
+extern s32 menuGetCursorFromItemID(s32 id, s32 itemId);
+extern s32 menuGetCursorItemID(s32 id);
+extern void menuSetCursor(s32 id, s32 cursor);
 extern void menuSetPosition();
 extern void menuButtonNormal();
-extern void menuCursorNormal();
-extern void windowGetParam();
-extern void fn_801044D0();
+extern void menuCursorNormal(void* menu);
+extern void* windowGetParam(void* menu, s32 idx);
+extern void fn_801044D0(s32 id, void* arg);
 extern void windowGetActiveID();
 extern void windowSearchItemID();
 extern void windowSearchID();
 extern void windowCreateCursorSprite();
-extern void windowGetKeyInfo();
+extern void* windowGetKeyInfo(void);
 extern void fn_80107F38();
 extern void fn_801081F8();
 extern void winSetSequence();
@@ -188,7 +188,7 @@ void fn_8006B8FC(void);
 void fn_8006B908(u32 r3);
 void fn_8006B930(void);
 void fn_8006B9B8(void);
-void fn_8006BB34(void);
+void fn_8006BB34(void* menu);
 void fn_8006C018(void);
 void fn_8006C0DC(void);
 void fn_8006C164(void);
@@ -2370,36 +2370,234 @@ void fn_8006B9B8(void) {
 
 
 /* 0x8006BB34 | size: 0x4E4 */
-void fn_8006BB34(void) {
-    extern void fn_80166A28();
-    extern void __assert();
-    u8 sp[0x40];
+extern void fn_80166A28(s32 sndId);
+extern void __assert(const void* file, s32 line, const void* expr);
+
+typedef struct MenuState_8006BB34 {
+    u8 pad0[4];
+    s32 menuId;   /* 0x04 */
+    u8 pad8[2];
+    u8 disabled;  /* 0x0A */
+    u8 padB[0x89];
+    u8 pad_val;   /* 0x94 */
+    s8 pad_cur;   /* 0x95 */
+} MenuState_8006BB34;
+
+typedef struct KeyInfo_8006BB34 {
+    u8 pad0[4];
+    u16 flags4;
+    u16 flags6;
+    u8 padA[2];
+} KeyInfo_8006BB34;
+
+typedef struct Param_8006BB34 {
+    u8 pad0[0x11];
+    u8 sel11;
+    u8 sel12;
+    u8 sel13;
+    s16 val14;
+    s16 val16;
+} Param_8006BB34;
+
+typedef struct CursorArg_8006BB34 {
+    u8 pad;
+    s8 cursor;
+} CursorArg_8006BB34;
+
+void fn_8006BB34(void* menu) {
+    MenuState_8006BB34* m = (MenuState_8006BB34*)menu;
+    KeyInfo_8006BB34* ki;
+    Param_8006BB34* p;
+    u8* asrt = lbl_80267EA8;
+    s32 cur;
+    int inc, confirm, dec;
+    int pressed;
+    int dir;
+    s32 delta;
+    s32 signOld;
+    s32 absVal;
+    s16 v;
+    CursorArg_8006BB34 argA;
+    CursorArg_8006BB34 argB;
+    CursorArg_8006BB34 srcA;
+    CursorArg_8006BB34 srcB;
+
+    ki = (KeyInfo_8006BB34*)windowGetKeyInfo();
+    if (m->disabled != 0) return;
+
+    {
+        u32 _f = ki->flags6;
+        u32 inc_bit = _f & 4;
+        u32 confirm_bit = _f & 1;
+        u32 dec_bit = _f & 8;
+        u32 inc_b = ((u32)(-(s32)inc_bit) | inc_bit) >> 31;
+        u32 confirm_b = ((u32)(-(s32)confirm_bit) | confirm_bit) >> 31;
+        u32 dec_b = ((u32)(-(s32)dec_bit) | dec_bit) >> 31;
+        inc = (int)inc_b;
+        confirm = (int)confirm_b;
+        dec = (int)dec_b;
+
+        pressed = 0;
+        if (inc_b != 0 || dec_b != 0) pressed = 1;
+
+        dir = 0;
+        if (inc_b != 0 || dec_b == 0) dir = 1;
+    }
+
+    cur = menuGetCursorItemID(m->menuId);
+    if (fn_80077BD0()) {
+        s32 c;
+        if (!confirm) return;
+        c = menuGetCursorFromItemID(m->menuId, 0xE35);
+        srcA.cursor = (s8)c;
+        srcA.pad = 0;
+        argA = srcA;
+        fn_801044D0(m->menuId, &argA);
+        return;
+    }
+
+    p = (Param_8006BB34*)windowGetParam(menu, 0);
+
+    delta = 0;
+    if (ki->flags6 & 2) delta = -1;
+    else if (ki->flags6 & 1) delta = 1;
+
+    switch (cur) {
+    case 0xA0C:
+        delta = delta * 10;
+        /* fallthrough */
+    case 0xA0D:
+        v = p->val14;
+        if (v >= 0) {
+            s32 nv = v + delta;
+            if (nv < 1) nv = 1;
+            else if (nv > 99) nv = 99;
+            p->val14 = (s16)nv;
+        }
+        break;
+    case 0xE34:
+        delta = delta * 10;
+        /* fallthrough */
+    case 0xE33:
+        v = p->val16;
+        if (v >= 0) {
+            s32 nv = v + delta;
+            if (nv < 1) nv = 1;
+            else if (nv > 99) nv = 99;
+            p->val16 = (s16)nv;
+        }
+        break;
+    default:
+        delta = 0;
+        break;
+    }
+    if (delta != 0) return;
+
+    srcB.pad = m->pad_val;
+    srcB.cursor = m->pad_cur;
+
+    switch (cur) {
+    case 0x9F7:
+        if (!pressed) break;
+        if (p->sel11 != dir) fn_80166A28(0x24);
+        p->sel11 = dir;
+        return;
+    case 0x9F8:
+        if (!pressed) break;
+        if (p->sel12 != dir) fn_80166A28(0x24);
+        p->sel12 = dir;
+        return;
+    case 0x9F9:
+        if (!pressed) break;
+        if (p->sel13 != dir) fn_80166A28(0x24);
+        p->sel13 = dir;
+        return;
+    case 0x9FA:
+        if (pressed) {
+            s16 vv = p->val14;
+            signOld = (u32)vv >> 31;
+            absVal = ((s32)vv >> 31) ^ vv;
+            absVal = absVal - ((s32)vv >> 31);
+            if ((u32)signOld == dir) fn_80166A28(0x24);
+            p->val14 = (s16)(dir ? absVal : -absVal);
+            return;
+        }
+        if (p->val14 < 0) break;
+        if (!(ki->flags4 & 0x10)) break;
+        {
+            s32 c = menuGetCursorFromItemID(m->menuId, 0xA0C);
+            menuSetCursor(m->menuId, c);
+        }
+        return;
+    case 0x9FB:
+        if (pressed) {
+            s16 vv = p->val16;
+            signOld = (u32)vv >> 31;
+            absVal = ((s32)vv >> 31) ^ vv;
+            absVal = absVal - ((s32)vv >> 31);
+            if ((u32)signOld == dir) fn_80166A28(0x24);
+            p->val16 = (s16)(dir ? absVal : -absVal);
+            return;
+        }
+        if (p->val16 < 0) break;
+        if (!(ki->flags4 & 0x10)) break;
+        {
+            s32 c = menuGetCursorFromItemID(m->menuId, 0xE34);
+            menuSetCursor(m->menuId, c);
+        }
+        return;
+    case 0xA0C:
+        if (inc) return;
+        /* fallthrough */
+    case 0xA0D:
+        if (p->val14 < 0) {
+            __assert(asrt + 0x7d8, 0xE73, asrt + 0x7e8);
+        }
+        if (!(ki->flags4 & 0x30)) break;
+        {
+            s32 c = menuGetCursorFromItemID(m->menuId, 0x9FA);
+            menuSetCursor(m->menuId, c);
+        }
+        return;
+    case 0xE34:
+        if (inc) return;
+        /* fallthrough */
+    case 0xE33:
+        if (p->val16 < 0) {
+            __assert(asrt + 0x7d8, 0xE7F, asrt + 0x808);
+        }
+        if (!(ki->flags4 & 0x30)) break;
+        {
+            s32 c = menuGetCursorFromItemID(m->menuId, 0x9FB);
+            menuSetCursor(m->menuId, c);
+        }
+        return;
+    case 0x9FD:
+        if (confirm) {
+            s32 c = menuGetCursorFromItemID(m->menuId, 0x9FB);
+            srcB.cursor = (s8)c;
+            argB = srcB;
+            fn_801044D0(m->menuId, &argB);
+            return;
+        }
+        if (dec) return;
+        break;
+    default:
+        break;
+    }
+
+    menuCursorNormal(menu);
+}
+
+#if 0
+static void fn_8006BB34_deadcode(void) {
     u32 r0 = 0;
-    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
     u32 r6 = 0;
     u32 r7 = 0;
     u32 r22 = 0;
-    u32 r23 = 0;
-    u32 r24 = 0;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    
-    r22 = r3;
-    r3 = (u32)&lbl_80267EA8;
-    r25 = (u32)&lbl_80267EA8;
-    ((void(*)(void))windowGetKeyInfo)();
-    r0 = MENU_MIDDLE_U8_000A(r22)->unk_000A;
-    r26 = r3;
-    if (r0 != (u32)0x0) return;
     r5 = MENU_MIDDLE_U16_0006(r26)->unk_0006;
     r3 = 0x0;
     r4 = r5 & 0x00000004;
@@ -2703,6 +2901,7 @@ void fn_8006BB34(void) {
 
     return;
 }
+#endif
 
 
 /* 0x8006C018 | size: 0xC4 */

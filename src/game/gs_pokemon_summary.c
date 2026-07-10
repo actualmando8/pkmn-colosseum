@@ -1742,22 +1742,23 @@ asm void fn_80017A0C(void) {
 s32 fn_80017A0C(u8* ctx) {
     u8* entry;
     void* list;
-    void* field;
-    u16 packed;
+    s32 packed;
     u16 count;
-    s32 cursorIndex;
     s32 dataSource;
+    u32 species;
     s32 visibleIndex;
     s32 i;
-    u32 species;
+    void* field;
+    s32 cursorIndex;
 
     switch (SUMMARY_CTX_S8(ctx, 0x01)) {
     case 0:
         if (SUMMARY_CTX_S8(ctx, 0x02) == 0) {
             winSeqSetMenu(0x59, 0x5E);
 
+            entry = SUMMARY_ENTRY_RAW(lbl_8047A2D8);
+            *(u16*)&packed = (u16)(cursorBiosGetPos((u16)SUMMARY_ENTRY_LABEL(entry)) >> 16);
             entry = SUMMARY_ENTRY_RAW(SUMMARY_CTX_S8(ctx, 0x95));
-            packed = (u16)(cursorBiosGetPos((u16)SUMMARY_ENTRY_LABEL(entry)) >> 16);
             cursorIndex = (s32)(s8)((u8*)&packed)[0] + (s32)(s8)((u8*)&packed)[1];
             dataSource = SUMMARY_ENTRY_FIELD(entry);
             if (dataSource >= 0) {
@@ -1779,7 +1780,6 @@ s32 fn_80017A0C(u8* ctx) {
                 }
                 field = (u8*)field + 4;
             }
-
             itemDataBiosGetPtr((u16)species);
             lbl_8047A2DC = itemDataBiosGetDoc();
             SUMMARY_STORE_F32(lbl_8047A2D4, SUMMARY_F32(lbl_8047B748));

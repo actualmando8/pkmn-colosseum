@@ -550,21 +550,22 @@ void fn_801660D8(u32 volume, u32 includeBgm, u32 includeSe)
 
 u32 fn_80166168(u32 id, u32 volume)
 {
-    u32 offset = id * sizeof(GSsndEntry);
-    GSsndWork* work = *(GSsndWork**)((u8*)lbl_80478FAC + offset + 8);
-    u32 depth;
-
-    if (work == 0) {
-        return 0;
-    }
-
-    depth = work->stackDepth;
-    if (depth == 0) {
-        return 0;
-    }
-
-    work->stackDepth = depth - 1;
-    return fn_80166670(id, volume, work->volumeStack[work->stackDepth]);
+  u32 offset = id * (sizeof(GSsndEntry));
+  u32 depth;
+  int new_var;
+  GSsndWork *work = *((GSsndWork **) ((((u8 *) lbl_80478FAC) + offset) + 8));
+  if (work == 0)
+  {
+    return 0;
+  }
+  depth = work->stackDepth;
+  if (depth == 0)
+  {
+    return 0;
+  }
+  new_var = depth - 1;
+  work->stackDepth = new_var;
+  return fn_80166670(id, volume, work->volumeStack[work->stackDepth]);
 }
 
 void fn_801661D0(u32 limit, u32 volume, u32 includeBgm, u32 includeSe)
@@ -716,44 +717,43 @@ u32 fn_80166670(u32 id, u32 volume, u32 arg2)
 
 u32 fn_801666BC(u32 id)
 {
-    u32 offset = id * sizeof(GSsndEntry);
-    u8* entry = (u8*)lbl_80478FAC + offset;
-    u32 flags = *entry;
-    GSsndWork* work;
-    u32 handle;
-
-    if (((flags >> 5) & 1U) != 1U) {
-        return 0;
-    }
-
-    work = *(GSsndWork**)(entry + 8);
-    if (work == 0) {
-        return 0;
-    }
-
-    if (((flags >> 7) & 1U) == 1U) {
-        handle = work->handle;
-        if (handle != (u32)-1 && sndFXCheck(handle) != (u32)-1) {
-            return 2;
-        }
-
-        GSlogWrite(lbl_802736F0, id);
-        fn_80167070(id, 1);
-        return 0;
-    }
-
-    if (((flags >> 4) & 1U) == 1U) {
-        return 3;
-    }
-
+  u32 offset = id * (sizeof(GSsndEntry));
+  u8 *entry = ((u8 *) lbl_80478FAC) + offset;
+  u32 flags = *entry;
+  GSsndWork *work;
+  u32 handle;
+  if (((flags >> 5) & 1U) != 1U)
+  {
+    return 0;
+  }
+  work = *((GSsndWork **) (entry + 8));
+  if (work == 0)
+  {
+    return 0;
+  }
+  if (((flags >> 7) & 1U) == 1U)
+  {
     handle = work->handle;
-    if (handle != (u32)-1 && (u8)fn_8014D598(handle) == 1) {
-        return 2;
+    if ((handle != ((u32) (-1))) && (sndFXCheck(handle) != ((u32) (-1))))
+    {
+      return 2;
     }
-
-    GSlogWrite(lbl_8027371C, id);
+    GSlogWrite(lbl_802736F0, id);
     fn_80167070(id, 1);
     return 0;
+  }
+  if ((((*entry) >> 4) & 1U) == 1U)
+  {
+    return 3;
+  }
+  handle = work->handle;
+  if ((handle != ((u32) (-1))) && (((u8) fn_8014D598(handle)) == 1))
+  {
+    return 2;
+  }
+  GSlogWrite(lbl_8027371C, id);
+  fn_80167070(id, 1);
+  return 0;
 }
 
 u32 fn_801667D8(u32 id, u32 volume, u32 arg2)
