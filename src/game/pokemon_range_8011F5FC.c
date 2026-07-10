@@ -96,7 +96,7 @@ extern s32 pokemonWazaGetMaxPP(u8* ptr, u16 idx);
 extern void wazaGetStatus(void);
 extern void pokemonBiosGetPokemonWazaPtr(void);
 extern void pokemonResetBasisStatus(void* ptr);
-void pokemonSetLevelBasisStatus(void);
+void pokemonSetLevelBasisStatus(u8* ptr, u8 level);
 extern void heroItemGetItemKindToItemAryPtr(void);
 extern void heroSetStatus();
 extern void heroGetStatus(void);
@@ -2960,15 +2960,105 @@ void pokemonGrowBasisStatus(void* ptr, u32 arg2) {
 /* 0x48 | pokemonResetBasisStatus | null_guard_chain */
 void pokemonResetBasisStatus(void* ptr) {
     extern u32 pokemonGetStatus();
-    extern void pokemonSetLevelBasisStatus();
+    extern void pokemonSetLevelBasisStatus(u8* ptr, u8 level);
     u8 val;
     if (ptr == NULL) { return; }
     val = pokemonGetStatus(ptr, 0, 0xC0, 0);
     pokemonSetLevelBasisStatus(ptr, val);
 }
 /* 0x8012795C | 0x700 */
-/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void pokemonSetLevelBasisStatus(void);
+extern u8 pokemonSeikakuDataBiosGetPhyAtkRateDataId();
+extern u8 pokemonSeikakuDataBiosGetPhyDefRateDataId();
+extern u8 pokemonSeikakuDataBiosGetNimblenessRateDataId();
+extern u8 pokemonSeikakuDataBiosGetSpeAtkRateDataId();
+extern u8 pokemonSeikakuDataBiosGetSpeDefRateDataId();
+extern void* pokemonSeikakuDataBiosGetPtr(u8 idx);
+extern void* pokemonSeikakuRateDataBiosGetPtr(u8 idx);
+extern u8 pokemonSeikakuRateDataBiosGetKake();
+extern u8 pokemonSeikakuRateDataBiosGetWaru();
+
+#define POKEMON_LEVEL_STAT(base_field, iv_field, ev_field, out_field, rate_getter) \
+    do {                                                                          \
+        u16 species_;                                                             \
+        u8 nature_;                                                               \
+        u16 base_;                                                                \
+        u16 iv_;                                                                  \
+        u32 ev_;                                                                  \
+        u32 value_;                                                               \
+        void* natureData_;                                                        \
+        void* rateData_;                                                          \
+        species_ = (u16)pokemonGetStatus(ptr, 0, 0x6e, 0);                        \
+        nature_ = (u8)pokemonGetStatus(ptr, 0, 0xbf, 0);                          \
+        base_ = (u16)pokemonGetStatus(0, species_, (base_field), 0);              \
+        iv_ = (u16)pokemonGetStatus(ptr, 0, (iv_field), 0);                       \
+        ev_ = ((u32)pokemonGetStatus(ptr, 0, (ev_field), 0) >> 2) & 0x3fff;       \
+        value_ = ((((u8)level) * (iv_ + ((base_ << 1) + ev_))) / 100) + 5;        \
+        natureData_ = pokemonSeikakuDataBiosGetPtr(nature_);                      \
+        if (natureData_ != NULL) {                                                \
+            rateData_ = pokemonSeikakuRateDataBiosGetPtr(rate_getter(natureData_)); \
+            if (rateData_ == NULL) {                                              \
+                value_ = 0;                                                       \
+            } else {                                                              \
+                u8 kake_ = pokemonSeikakuRateDataBiosGetKake(rateData_);          \
+                u8 waru_ = pokemonSeikakuRateDataBiosGetWaru(rateData_);          \
+                value_ *= kake_;                                                  \
+                if (waru_ != 0) {                                                 \
+                    value_ /= waru_;                                              \
+                }                                                                 \
+            }                                                                     \
+        }                                                                         \
+        pokemonSetStatus(ptr, 0, (out_field), 0, value_);                         \
+    } while (0)
+
+void pokemonSetLevelBasisStatus(u8* ptr, u8 level) {
+    u16 species;
+    u16 oldMaxHp;
+    u16 newMaxHp;
+    u8 nature;
+    u16 base;
+    u16 iv;
+    u32 ev;
+    u32 value;
+    u32 currentHp;
+
+    species = (u16)pokemonGetStatus(ptr, 0, 0x6e, 0);
+    oldMaxHp = (u16)pokemonGetStatus(ptr, 0, 0x87, 0);
+    pokemonSetStatus(ptr, 0, 0x7a, 0, (u8)level);
+
+    if (species == 0x12f) {
+        newMaxHp = 1;
+        pokemonSetStatus(ptr, 0, 0x87, 0, 1);
+    } else {
+        species = (u16)pokemonGetStatus(ptr, 0, 0x6e, 0);
+        nature = (u8)pokemonGetStatus(ptr, 0, 0xbf, 0);
+        base = (u16)pokemonGetStatus(0, species, 3, 0);
+        iv = (u16)pokemonGetStatus(ptr, 0, 0x93, 0);
+        ev = ((u32)pokemonGetStatus(ptr, 0, 0x8d, 0) >> 2) & 0x3fff;
+        value = (u8)level;
+        value = value + (((value * (iv + ((base << 1) + ev))) / 100) + 10);
+        pokemonSeikakuDataBiosGetPtr(nature);
+        pokemonSetStatus(ptr, 0, 0x87, 0, value);
+        newMaxHp = (u16)value;
+    }
+
+    POKEMON_LEVEL_STAT(4, 0x94, 0x8e, 0x88, pokemonSeikakuDataBiosGetPhyAtkRateDataId);
+    POKEMON_LEVEL_STAT(5, 0x95, 0x8f, 0x89, pokemonSeikakuDataBiosGetPhyDefRateDataId);
+    POKEMON_LEVEL_STAT(8, 0x98, 0x92, 0x8c, pokemonSeikakuDataBiosGetNimblenessRateDataId);
+    POKEMON_LEVEL_STAT(6, 0x96, 0x90, 0x8a, pokemonSeikakuDataBiosGetSpeAtkRateDataId);
+    POKEMON_LEVEL_STAT(7, 0x97, 0x91, 0x8b, pokemonSeikakuDataBiosGetSpeDefRateDataId);
+
+    currentHp = (u16)pokemonGetStatus(ptr, 0, 0x83, 0);
+    if (currentHp != 0 || oldMaxHp == 0) {
+        if (species == 0x12f) {
+            value = 1;
+        } else {
+            value = (u16)(currentHp + (newMaxHp - oldMaxHp));
+        }
+        pokemonSetStatus(ptr, 0, 0x83, 0, value);
+    }
+}
+
+#undef POKEMON_LEVEL_STAT
 /* 0x8012805C | 0x2A4 */
 extern void fadeSet(void);
 extern void fadeCheck(void);
@@ -3473,3 +3563,626 @@ void pokemonInit(u8* ptr) {
     pokemonBiosSetEventGetFlag(ptr, 0);
 }
 #endif
+
+u32 pokemonGetStatus(u8* obj, u32 id, u32 selector, u32 d) {
+    extern void* fn_8011E778(u32 idx);
+    extern u32  fn_8011E760(u8* ptr);
+    extern u16  fn_8011E734(u8* ptr);
+    extern u16  fn_8011E708(u8* ptr);
+    extern u16  fn_8011E6DC(u8* ptr);
+    extern u16  fn_8011E6B0(u8* ptr);
+    extern u16  fn_8011E684(u8* ptr);
+    extern u16  fn_8011E658(u8* ptr);
+    extern u16  fn_8011E62C(u8* ptr);
+    extern u16  fn_8011E600(u8* ptr);
+    extern u16  fn_8011E5D4(u8* ptr);
+    extern u16  fn_8011E5A8(u8* ptr);
+    extern u16  fn_8011E57C(u8* ptr);
+    extern u16  fn_8011E550(u8* ptr);
+    extern u16  fn_8011E538(u8* ptr);
+    extern u8   fn_8011E520(u8* ptr);
+    extern u8   fn_8011E508(u8* ptr);
+    extern u8   fn_8011E4F0(u8* ptr);
+    extern u16  fn_8011E4D8(u8* ptr);
+    extern u16  fn_8011E4A4(u8* ptr, u32 idx);
+    extern u8   fn_8011E474(u8* ptr, u32 idx);
+    extern u8   fn_8011E444(u8* ptr, u32 idx);
+    extern u8   fn_8011E3FC(u8* ptr, u32 idx);
+    extern u16  fn_8011E3B4(u8* ptr, u32 idx);
+    extern u16  fn_8011E36C(u8* ptr, u32 idx);
+    extern u8   fn_8011E324(u8* ptr, u32 idx);
+    extern u16  fn_8011E2DC(u8* ptr, u32 idx);
+    extern u8   fn_8011E2AC(u8* ptr, u32 idx);
+    extern u32  fn_8011E264(u8* ptr, u32 val);
+    extern u32  fn_8011E21C(u8* ptr, u32 val);
+    extern u8   fn_8011E1D4(u8* ptr, u32 val);
+    extern u32  fn_8011E1BC(u8* ptr);
+    extern u16  fn_8011E1A4(u8* ptr);
+    extern u16  fn_8011E18C(u8* ptr);
+    extern u32  fn_8011E174(u8* ptr);
+    extern u16  fn_8011E15C(u8* ptr);
+    extern u32  fn_8011E128(u8* ptr);
+    extern u32  fn_8011E0F4(u8* ptr);
+    extern u16  fn_8011E0DC(u8* ptr);
+    extern u16  fn_8011E0C4(u8* ptr);
+    extern u32  fn_8011E0AC(u8* ptr);
+    extern u16  fn_8011E078(u8* ptr, u32 idx);
+    extern u8   fn_8011E048(u8* ptr, u32 idx);
+    extern u16  fn_8011E030(u8* ptr);
+    extern u8   fn_8011E018(u8* ptr);
+    extern u8   fn_8011E000(u8* ptr);
+    extern u16  fn_8011F5C8(u8* ptr);
+    extern u32  fn_8011F5B0(u8* ptr);
+    extern u32  fn_8011F598(u8* ptr);
+    extern u16  fn_8011F580(u8* ptr);
+    extern u8   fn_8011F568(u8* ptr);
+    extern u8   fn_8011F550(u8* ptr);
+    extern u8   fn_8011F538(u8* ptr);
+    extern u32  fn_8011F520(u8* ptr);
+    extern u32  fn_8011F508(u8* ptr);
+    extern u32  fn_8011F4F0(u8* ptr);
+    extern u32  fn_8011F4D8(u8* ptr);
+    extern u32  fn_8011F4C0(u8* ptr);
+    extern u8   fn_8011F4A8(u8* ptr);
+    extern u32  fn_8011F474(u8* ptr, u32 val);
+    extern u32  fn_8011F45C(u8* ptr);
+    extern u16  fn_8011F228(u8* ptr, u32 val);
+    extern u8   fn_8011F1F0(u8* ptr, u32 val);
+    extern u8   fn_8011F1B8(u8* ptr, u32 val);
+    extern u16  fn_8011F1A0(u8* ptr);
+    extern u16  fn_8011F188(u8* ptr);
+    extern u16  fn_8011F15C(u8* ptr);
+    extern u16  fn_8011F130(u8* ptr);
+    extern u16  fn_8011F104(u8* ptr);
+    extern u16  fn_8011F0D8(u8* ptr);
+    extern u16  fn_8011F0AC(u8* ptr);
+    extern u16  fn_8011F080(u8* ptr);
+    extern u16  fn_8011F054(u8* ptr);
+    extern u16  fn_8011F028(u8* ptr);
+    extern u16  fn_8011EFFC(u8* ptr);
+    extern u16  fn_8011EFD0(u8* ptr);
+    extern u16  fn_8011EFA4(u8* ptr);
+    extern u16  fn_8011EF78(u8* ptr);
+    extern u16  fn_8011EF4C(u8* ptr);
+    extern u16  fn_8011EF20(u8* ptr);
+    extern u16  fn_8011EEF4(u8* ptr);
+    extern u16  fn_8011EEC8(u8* ptr);
+    extern u16  fn_8011EE9C(u8* ptr);
+    extern u16  fn_8011EE70(u8* ptr);
+    extern u16  fn_8011EE58(u8* ptr);
+    extern u8   fn_8011ECEC(u8* ptr);
+    extern u8   fn_8011ECC0(u8* ptr);
+    extern u8   fn_8011EC94(u8* ptr);
+    extern u8   fn_8011EC68(u8* ptr);
+    extern u8   fn_8011EC3C(u8* ptr);
+    extern u8   fn_8011EB48(u8* ptr);
+    extern u8   fn_8011EB1C(u8* ptr);
+    extern u8   fn_8011EAF0(u8* ptr);
+    extern u8   fn_8011EAC4(u8* ptr);
+    extern u8   fn_8011EA98(u8* ptr);
+    extern u8   fn_8011EA6C(u8* ptr);
+    extern u8   fn_8011EA40(u8* ptr);
+    extern u8   fn_8011EA14(u8* ptr);
+    extern u8   fn_8011E9E8(u8* ptr);
+    extern u8   fn_8011E9BC(u8* ptr);
+    extern u8   fn_8011E990(u8* ptr);
+    extern u8   fn_8011E964(u8* ptr);
+    extern u8   fn_8011E938(u8* ptr);
+    extern u8   fn_8011E90C(u8* ptr);
+    extern u8   fn_8011EC10(u8* ptr);
+    extern u8   fn_8011EBE4(u8* ptr);
+    extern u8   fn_8011EBB8(u8* ptr);
+    extern u8   fn_8011EB8C(u8* ptr);
+    extern u8   fn_8011EB60(u8* ptr);
+    extern u8   fn_8011E8F4(u8* ptr);
+    extern u8   fn_8011E8DC(u8* ptr);
+    extern u8   fn_8011E868(u8* ptr);
+    extern u8   fn_8011E850(u8* ptr);
+    extern u8   fn_8011E838(u8* ptr);
+    extern u8   fn_8011E820(u8* ptr);
+    extern u8   fn_8011E808(u8* ptr);
+    extern u16  fn_8011E7D8(u8* ptr);
+    extern u16  fn_8011E7F0(u8* ptr);
+    extern u16  fn_8011E7C0(u8* ptr);
+    extern u16  fn_8011EE40(u8* ptr);
+    extern u32  fn_8011ED18(u8* ptr);
+    extern u32  fn_8011EE28(u8* ptr);
+    extern u32  fn_8011EE10(u8* ptr);
+    extern u16  fn_8011EDF8(u8* ptr);
+    extern u8   fn_8011ED68(u8* ptr);
+    extern u32  fn_8011EDC4(u8* ptr, u32 val);
+    extern void* fn_8011CE74(u32 idx);
+    extern u32  fn_8011CE44(void* tbl, u8 level);
+    extern u8   fn_80131574(u32 idx);
+    extern u32  fn_8011BEB4(u32 a, u32 b, u32 c, u32 d);
+    extern u32  fn_801FDB60(u8* ptr);
+    extern u32  fn_801FDB48(u8* ptr);
+    extern u32  fn_801FDB14(u8* ptr, u32 val);
+    extern u32  fn_801FDAFC(u8* ptr);
+    extern u8   fn_801FDAE4(u8* ptr);
+    extern u8   fn_801FDACC(u8* ptr);
+    extern u8   fn_801FDAB4(u8* ptr);
+    extern u8   fn_801FD8E0(u8* ptr);
+    extern u32  fn_801FDA9C(u8* ptr);
+    extern u32  fn_801FDA84(u8* ptr);
+    extern u32  fn_801FDA6C(u8* ptr);
+    extern u32  fn_801FDA38(u8* ptr, u32 val);
+    extern u32  fn_801FDA20(u8* ptr);
+    extern u16  fn_80205184(u8* ptr);
+    extern u16  fn_80205224(u8* ptr);
+    extern u8   fn_8020990C(u32 ctx, u32 param);
+    extern u8   fn_802096E8(u32 ctx);
+    extern u32  fn_801FDA08(u8* ptr);
+    extern u8   fn_801FD9F0(u8* ptr);
+    extern u8   fn_801FD9D8(u8* ptr);
+    extern u8   fn_801FD9C0(u8* ptr);
+    extern u8   fn_801FD9A8(u8* ptr);
+    extern u8   fn_801FD990(u8* ptr);
+    extern u8   fn_801FD978(u8* ptr);
+    extern u8   fn_801FD960(u8* ptr);
+    extern u16  fn_801FD948(u8* ptr);
+    extern u32  fn_801FD808(u8* ptr);
+    extern u16  fn_801FD064(u8* ptr);
+    extern u16  fn_801FD04C(u8* ptr);
+    extern u16  fn_801FD034(u8* ptr);
+    extern u16  fn_801FD01C(u8* ptr);
+    extern u16  fn_801FD004(u8* ptr);
+    extern u16  fn_801FCFEC(u8* ptr);
+    extern s16  fn_801FCFD4(u8* ptr);
+    extern u16  fn_801FCFBC(u8* ptr);
+    extern u16  fn_801FCFA4(u8* ptr);
+    extern u32  fn_801FCF8C(u8* ptr);
+    extern u8   fn_801FD7E0(u8* ptr);
+    extern u16  fn_801FD7C8(u8* ptr);
+    extern u16  fn_801FD7B0(u8* ptr);
+    extern u8   fn_801FD798(u8* ptr);
+    extern s16  fn_801FD684(u8* ptr, u8 idx);
+    extern u32  fn_801FD648(u8* ptr);
+    extern u16  fn_801FD614(u8* ptr, u8 idx);
+    extern u16  fn_801FD5D8(u8* ptr);
+    extern u32  fn_801FD5B0(u8* ptr);
+    extern s16  fn_801FD780(u8* ptr);
+    extern u16  fn_801FD768(u8* ptr);
+    extern s16  fn_801FD750(u8* ptr);
+    extern u16  fn_801FD738(u8* ptr);
+    extern u8   fn_801FD598(u8* ptr);
+    extern u8   fn_801FD580(u8* ptr);
+    extern u8   fn_801FD568(u8* ptr);
+    extern u8   fn_801FD550(u8* ptr);
+    extern u8   fn_801FD538(u8* ptr);
+    extern u8   fn_801FD520(u8* ptr);
+    extern u8   fn_801FD508(u8* ptr);
+    extern u8   fn_801FD4F0(u8* ptr);
+    extern u8   fn_801FD4D8(u8* ptr);
+    extern u8   fn_801FD4C0(u8* ptr);
+    extern u8   fn_801FD4A8(u8* ptr);
+    extern u8   fn_801FD490(u8* ptr);
+    extern u8   fn_801FD478(u8* ptr);
+    extern u8   fn_801FD460(u8* ptr);
+    extern u8   fn_801FD448(u8* ptr);
+    extern u8   fn_801FD430(u8* ptr);
+    extern u8   fn_801FD418(u8* ptr);
+    extern u8   fn_801FD400(u8* ptr);
+    extern u8   fn_801FD3E8(u8* ptr);
+    extern u8   fn_801FD3D0(u8* ptr);
+    extern u8   fn_801FD3B8(u8* ptr);
+    extern u32  fn_801FD3A0(u8* ptr);
+    extern s16  fn_801FD388(u8* ptr);
+    extern u16  fn_801FD370(u8* ptr);
+    extern s16  fn_801FD358(u8* ptr);
+    extern u16  fn_801FD340(u8* ptr);
+    extern u8   fn_801FD188(u8* ptr);
+    extern s16  fn_801FD160(u8* ptr);
+    extern u32  fn_801FD11C(u8* ptr, u32 val);
+    extern u8   fn_802062FC(u8* ptr);
+
+    if ((u16)selector == 0 || (u16)selector >= 0x124) {
+        return 0;
+    }
+
+    if ((u16)selector < 0x6D) {
+        obj = (u8*)fn_8011E778(id);
+        if (obj == NULL) {
+            return 0;
+        }
+    } else {
+        if (obj == NULL) {
+            return 0;
+        }
+    }
+
+    switch ((u16)selector) {
+    case 0x01: return fn_8011E760(obj);
+    case 0x03: return (u32)(u16)fn_8011E734(obj);
+    case 0x04: return (u32)(u16)fn_8011E708(obj);
+    case 0x05: return (u32)(u16)fn_8011E6DC(obj);
+    case 0x06: return (u32)(u16)fn_8011E6B0(obj);
+    case 0x07: return (u32)(u16)fn_8011E684(obj);
+    case 0x08: return (u32)(u16)fn_8011E658(obj);
+    case 0x0A: return (u32)(u16)fn_8011E62C(obj);
+    case 0x0B: return (u32)(u16)fn_8011E600(obj);
+    case 0x0C: return (u32)(u16)fn_8011E5D4(obj);
+    case 0x0D: return (u32)(u16)fn_8011E5A8(obj);
+    case 0x0E: return (u32)(u16)fn_8011E57C(obj);
+    case 0x0F: return (u32)(u16)fn_8011E550(obj);
+    case 0x10: return (u32)(u16)fn_8011E538(obj);
+    case 0x11: return (u32)(u8)fn_8011E520(obj);
+    case 0x12: return (u32)(u8)fn_8011E508(obj);
+    case 0x13: return (u32)(u8)fn_8011E4F0(obj);
+    case 0x14: return (u32)(u16)fn_8011E4D8(obj);
+    case 0x15: return (u32)(u16)fn_8011E4A4(obj, d);
+    case 0x16: return (u32)(u8)fn_8011E474(obj, d);
+    case 0x17: return (u32)(u8)fn_8011E444(obj, d);
+    case 0x19: return (u32)(u8)fn_8011E3FC(obj, d);
+    case 0x1A: return (u32)(u16)fn_8011E3B4(obj, d);
+    case 0x1B: return (u32)(u16)fn_8011E36C(obj, d);
+    case 0x1D: return (u32)(u8)fn_8011E324(obj, d);
+    case 0x1E: return (u32)(u16)fn_8011E2DC(obj, d);
+    case 0x20: return (u32)(u8)fn_8011E2AC(obj, 0x00);
+    case 0x21: return (u32)(u8)fn_8011E2AC(obj, 0x01);
+    case 0x22: return (u32)(u8)fn_8011E2AC(obj, 0x02);
+    case 0x23: return (u32)(u8)fn_8011E2AC(obj, 0x03);
+    case 0x24: return (u32)(u8)fn_8011E2AC(obj, 0x04);
+    case 0x25: return (u32)(u8)fn_8011E2AC(obj, 0x05);
+    case 0x26: return (u32)(u8)fn_8011E2AC(obj, 0x06);
+    case 0x27: return (u32)(u8)fn_8011E2AC(obj, 0x07);
+    case 0x28: return (u32)(u8)fn_8011E2AC(obj, 0x08);
+    case 0x29: return (u32)(u8)fn_8011E2AC(obj, 0x09);
+    case 0x2A: return (u32)(u8)fn_8011E2AC(obj, 0x0A);
+    case 0x2B: return (u32)(u8)fn_8011E2AC(obj, 0x0B);
+    case 0x2C: return (u32)(u8)fn_8011E2AC(obj, 0x0C);
+    case 0x2D: return (u32)(u8)fn_8011E2AC(obj, 0x0D);
+    case 0x2E: return (u32)(u8)fn_8011E2AC(obj, 0x0E);
+    case 0x2F: return (u32)(u8)fn_8011E2AC(obj, 0x0F);
+    case 0x30: return (u32)(u8)fn_8011E2AC(obj, 0x10);
+    case 0x31: return (u32)(u8)fn_8011E2AC(obj, 0x11);
+    case 0x32: return (u32)(u8)fn_8011E2AC(obj, 0x12);
+    case 0x33: return (u32)(u8)fn_8011E2AC(obj, 0x13);
+    case 0x34: return (u32)(u8)fn_8011E2AC(obj, 0x14);
+    case 0x35: return (u32)(u8)fn_8011E2AC(obj, 0x15);
+    case 0x36: return (u32)(u8)fn_8011E2AC(obj, 0x16);
+    case 0x37: return (u32)(u8)fn_8011E2AC(obj, 0x17);
+    case 0x38: return (u32)(u8)fn_8011E2AC(obj, 0x18);
+    case 0x39: return (u32)(u8)fn_8011E2AC(obj, 0x1A); /* 0x39 maps to slot 0x1A, skips 0x19 */
+    case 0x3A: return (u32)(u8)fn_8011E2AC(obj, 0x1B);
+    case 0x3B: return (u32)(u8)fn_8011E2AC(obj, 0x1C);
+    case 0x3C: return (u32)(u8)fn_8011E2AC(obj, 0x1D);
+    case 0x3D: return (u32)(u8)fn_8011E2AC(obj, 0x1E);
+    case 0x3E: return (u32)(u8)fn_8011E2AC(obj, 0x1F);
+    case 0x3F: return (u32)(u8)fn_8011E2AC(obj, 0x20);
+    case 0x40: return (u32)(u8)fn_8011E2AC(obj, 0x21);
+    case 0x41: return (u32)(u8)fn_8011E2AC(obj, 0x22);
+    case 0x42: return (u32)(u8)fn_8011E2AC(obj, 0x23);
+    case 0x43: return (u32)(u8)fn_8011E2AC(obj, 0x24);
+    case 0x44: return (u32)(u8)fn_8011E2AC(obj, 0x25);
+    case 0x45: return (u32)(u8)fn_8011E2AC(obj, 0x26);
+    case 0x46: return (u32)(u8)fn_8011E2AC(obj, 0x27);
+    case 0x47: return (u32)(u8)fn_8011E2AC(obj, 0x28);
+    case 0x48: return (u32)(u8)fn_8011E2AC(obj, 0x29);
+    case 0x49: return (u32)(u8)fn_8011E2AC(obj, 0x2A);
+    case 0x4A: return (u32)(u8)fn_8011E2AC(obj, 0x2B);
+    case 0x4B: return (u32)(u8)fn_8011E2AC(obj, 0x2C);
+    case 0x4C: return (u32)(u8)fn_8011E2AC(obj, 0x2D);
+    case 0x4D: return (u32)(u8)fn_8011E2AC(obj, 0x2E);
+    case 0x4E: return (u32)(u8)fn_8011E2AC(obj, 0x2F);
+    case 0x4F: return (u32)(u8)fn_8011E2AC(obj, 0x30);
+    case 0x50: return (u32)(u8)fn_8011E2AC(obj, 0x31);
+    case 0x51: return (u32)(u8)fn_8011E2AC(obj, 0x32);
+    case 0x52: return (u32)(u8)fn_8011E2AC(obj, 0x33);
+    case 0x53: return (u32)(u8)fn_8011E2AC(obj, 0x34);
+    case 0x54: return (u32)(u8)fn_8011E2AC(obj, 0x35);
+    case 0x55: return (u32)(u8)fn_8011E2AC(obj, 0x36);
+    case 0x56: return (u32)(u8)fn_8011E2AC(obj, 0x37);
+    case 0x57: return (u32)(u8)fn_8011E2AC(obj, 0x38);
+    case 0x58: return (u32)(u8)fn_8011E2AC(obj, 0x39);
+    case 0x59: return (u32)(u8)fn_8011E2AC(obj, 0x3A);
+    case 0x5A: return fn_8011E264(obj, d);
+    case 0x5B: return fn_8011E21C(obj, d);
+    case 0x5C: return (u32)(u8)fn_8011E1D4(obj, d);
+    case 0x5D: return fn_8011E1BC(obj);
+    case 0x5E: return (u32)(u16)fn_8011E1A4(obj);
+    case 0x5F: return (u32)(u16)fn_8011E18C(obj);
+    case 0x60: return fn_8011E174(obj);
+    case 0x61: return (u32)(u16)fn_8011E15C(obj);
+    case 0x62: return fn_8011E128(obj);
+    case 0x63: return fn_8011E0F4(obj);
+    case 0x64: return (u32)(u16)fn_8011E0DC(obj);
+    case 0x65: return (u32)(u16)fn_8011E0C4(obj);
+    case 0x66: return fn_8011E0AC(obj);
+    case 0x68: return (u32)(u16)fn_8011E078(obj, d);
+    case 0x69: return (u32)(u8)fn_8011E048(obj, d);
+    case 0x6A: return (u32)(u16)fn_8011E030(obj);
+    case 0x6B: return (u32)(u8)fn_8011E018(obj);
+    case 0x6C: return (u32)(u8)fn_8011E000(obj);
+    case 0x6E: return (u32)(u16)fn_8011F5C8(obj);
+    case 0x6F: return fn_8011F5B0(obj);
+    case 0x70: return fn_8011F598(obj);
+    case 0x71: return (u32)(u16)fn_8011F580(obj);
+    case 0x72: return (u32)(u8)fn_8011F568(obj);
+    case 0x73: return (u32)(u8)fn_8011F550(obj);
+    case 0x74: return (u32)(u8)fn_8011F538(obj);
+    case 0x75: return fn_8011F520(obj);
+    case 0x76: return fn_8011F508(obj);
+    case 0x77: return fn_8011F4F0(obj);
+    case 0x78: return fn_8011F4D8(obj);
+    case 0x79: return fn_8011F4C0(obj);
+    case 0x7A: return (u32)(u8)fn_8011F4A8(obj);
+
+    case 0x7B: { /* is_species_zero: recursive self-call to check if species (0x83) is zero */
+        u16 species = (u16)pokemonGetStatus(obj, 0, 0x83, 0);
+        return (u32)(u8)(species == 0 ? 1 : 0);
+    }
+
+    case 0x7C: return fn_8011F474(obj, d);
+    case 0x7D: return fn_8011F45C(obj);
+    case 0x7F: return (u32)(u16)fn_8011F228(obj, d);
+    case 0x80: return (u32)(u8)fn_8011F1F0(obj, d);
+    case 0x81: return (u32)(u8)fn_8011F1B8(obj, d);
+    case 0x82: return (u32)(u16)fn_8011F1A0(obj);
+    case 0x83: return (u32)(u16)fn_8011F188(obj);
+    case 0x87: return (u32)(u16)fn_8011F15C(obj);
+    case 0x88: return (u32)(u16)fn_8011F130(obj);
+    case 0x89: return (u32)(u16)fn_8011F104(obj);
+    case 0x8A: return (u32)(u16)fn_8011F0D8(obj);
+    case 0x8B: return (u32)(u16)fn_8011F0AC(obj);
+    case 0x8C: return (u32)(u16)fn_8011F080(obj);
+    case 0x8D: return (u32)(u16)fn_8011F054(obj);
+    case 0x8E: return (u32)(u16)fn_8011F028(obj);
+    case 0x8F: return (u32)(u16)fn_8011EFFC(obj);
+    case 0x90: return (u32)(u16)fn_8011EFD0(obj);
+    case 0x91: return (u32)(u16)fn_8011EFA4(obj);
+    case 0x92: return (u32)(u16)fn_8011EF78(obj);
+    case 0x93: return (u32)(u16)fn_8011EF4C(obj);
+    case 0x94: return (u32)(u16)fn_8011EF20(obj);
+    case 0x95: return (u32)(u16)fn_8011EEF4(obj);
+    case 0x96: return (u32)(u16)fn_8011EEC8(obj);
+    case 0x97: return (u32)(u16)fn_8011EE9C(obj);
+    case 0x98: return (u32)(u16)fn_8011EE70(obj);
+    case 0x99: return (u32)(u16)fn_8011EE58(obj);
+    case 0x9C: return (u32)(u8)fn_8011ECEC(obj);
+    case 0x9D: return (u32)(u8)fn_8011ECC0(obj);
+    case 0x9E: return (u32)(u8)fn_8011EC94(obj);
+    case 0x9F: return (u32)(u8)fn_8011EC68(obj);
+    case 0xA0: return (u32)(u8)fn_8011EC3C(obj);
+    case 0xA1: return (u32)(u8)fn_8011EB48(obj);
+    case 0xA3: return (u32)(u8)fn_8011EB1C(obj);
+    case 0xA4: return (u32)(u8)fn_8011EAF0(obj);
+    case 0xA5: return (u32)(u8)fn_8011EAC4(obj);
+    case 0xA6: return (u32)(u8)fn_8011EA98(obj);
+    case 0xA7: return (u32)(u8)fn_8011EA6C(obj);
+    case 0xA8: return (u32)(u8)fn_8011EA40(obj);
+    case 0xA9: return (u32)(u8)fn_8011EA14(obj);
+    case 0xAA: return (u32)(u8)fn_8011E9E8(obj);
+    case 0xAB: return (u32)(u8)fn_8011E9BC(obj);
+    case 0xAC: return (u32)(u8)fn_8011E990(obj);
+    case 0xAD: return (u32)(u8)fn_8011E964(obj);
+    case 0xAE: return (u32)(u8)fn_8011E938(obj);
+    case 0xAF: return (u32)(u8)fn_8011E90C(obj);
+    case 0xB0: return (u32)(u8)fn_8011EC10(obj);
+    case 0xB1: return (u32)(u8)fn_8011EBE4(obj);
+    case 0xB2: return (u32)(u8)fn_8011EBB8(obj);
+    case 0xB3: return (u32)(u8)fn_8011EB8C(obj);
+    case 0xB4: return (u32)(u8)fn_8011EB60(obj);
+    case 0xB5: return (u32)(u8)fn_8011E8F4(obj);
+    case 0xB6: return (u32)(u8)fn_8011E8DC(obj);
+    case 0xB7: return (u32)(u8)fn_8011E868(obj);
+    case 0xB8: return (u32)(u8)fn_8011E850(obj);
+    case 0xB9: return (u32)(u8)fn_8011E838(obj);
+
+    case 0xBA: { /* gender determination */
+        u32 personality;
+        u32 gender_ratio;
+        s32 gender_val;
+        s32 gender_class;
+        u8 result;
+
+        if (obj == NULL) {
+            return (u32)(u8)2;
+        }
+        personality = pokemonGetStatus(obj, 0, 0x6F, 0);
+        {
+            u16 species_id = (u16)pokemonGetStatus(obj, 0, 0x6E, 0);
+            gender_ratio = (u16)pokemonGetStatus(NULL, (u32)species_id, 0x13, 0);
+        }
+        if (obj == NULL) {
+            return (u32)(u8)2;
+        }
+        {
+            u16 species_id2 = (u16)pokemonGetStatus(obj, 0, 0x6E, 0);
+            gender_val = (u16)pokemonGetStatus(NULL, (u32)species_id2, 0x13, 0);
+            if (gender_val == (u16)fn_80131574(0)) {
+                gender_class = 0;
+            } else if (gender_val == (u16)fn_80131574(1)) {
+                gender_class = 1;
+            } else if (gender_val == (u16)fn_80131574(2)) {
+                gender_class = 2;
+            } else {
+                gender_class = -1;
+            }
+        }
+        if ((s8)gender_class < 0) {
+            if (gender_ratio > (u8)personality) {
+                gender_class = 1;
+            } else {
+                gender_class = 0;
+            }
+        }
+        result = (u8)gender_class;
+        return (u32)result;
+    }
+
+    case 0xBB: return (u32)(u8)fn_8011E820(obj);
+    case 0xBC: return (u32)(u8)fn_8011E808(obj);
+    case 0xBD: return (u32)(u16)fn_8011E7D8(obj);
+    case 0xBE: return (u32)(u16)fn_8011E7F0(obj);
+
+    case 0xBF: { /* nature = personality % 25 */
+        u32 pv = pokemonGetStatus(obj, 0, 0x6F, 0);
+        return (u32)(u8)(pv % 25);
+    }
+
+    case 0xC0: { /* level from exp */
+        u16 species_id;
+        u8 growth_type;
+        u32 exp;
+        void* growth_tbl;
+        s32 level;
+        u8 result;
+
+        species_id = (u16)pokemonGetStatus(obj, 0, 0x6E, 0);
+        growth_type = (u8)pokemonGetStatus(NULL, (u32)species_id, 0x11, 0);
+        exp = pokemonGetStatus(obj, 0, 0x79, 0);
+        growth_tbl = fn_8011CE74((u32)growth_type);
+        if (growth_tbl == NULL) {
+            return (u32)(u8)0;
+        }
+        for (level = 1; level < 0x65; level++) {
+            if (fn_8011CE44(growth_tbl, (u8)level) > exp) {
+                break;
+            }
+        }
+        result = (u8)(level - 1);
+        return (u32)result;
+    }
+
+    case 0xC1: { /* shiny check */
+        u32 tid;
+        u32 pid;
+        u32 xv;
+        u8 result;
+
+        if (obj == NULL) {
+            return (u32)(u8)0;
+        }
+        tid = pokemonGetStatus(obj, 0, 0x75, 0);
+        pid = pokemonGetStatus(obj, 0, 0x6F, 0);
+        xv = (tid >> 16) ^ (tid & 0xFFFF) ^ (pid >> 16) ^ (pid & 0xFFFF);
+        result = (u8)(xv < 8 ? 1 : 0);
+        return (u32)result;
+    }
+
+    case 0xC2: return (u32)(u16)fn_8011E7C0(obj);
+    case 0xC3: return (u32)(u16)fn_8011EE40(obj);
+    case 0xC4: return fn_8011ED18(obj);
+    case 0xC5: return fn_8011EE28(obj);
+    case 0xC6: return fn_8011EE10(obj);
+    case 0xC7: return (u32)(u16)fn_8011EDF8(obj);
+    case 0xC8: return (u32)(u8)fn_8011ED68(obj);
+    case 0xC9: return fn_8011EDC4(obj, d);
+    case 0xCB: return fn_801FDB60(obj);
+    case 0xCC: return fn_801FDB48(obj);
+    case 0xCD: return fn_801FDB14(obj, d);
+    case 0xCE: return (u32)(s32)(s16)fn_801FDAFC(obj); /* extsh */
+    case 0xCF: return (u32)(u8)fn_801FDAE4(obj);
+    case 0xD0: return (u32)(u8)fn_801FDACC(obj);
+    case 0xD1: return (u32)(u8)fn_801FDAB4(obj);
+    case 0xD2: return (u32)(u8)fn_801FD8E0(obj);
+    case 0xD5: return fn_801FDA9C(obj);
+    case 0xD6: return fn_801FDA84(obj);
+    case 0xD7: return fn_801FDA6C(obj);
+    case 0xD8: return fn_801FDA38(obj, d);
+    case 0xD9: return fn_801FDA20(obj);
+    case 0xDA: return (u32)(u16)fn_80205184(obj);
+    case 0xDB: return (u32)(u16)fn_80205224(obj);
+
+    case 0xDC: {
+        u32 ctx = pokemonGetStatus(obj, 0, 0xD9, 0);
+        return fn_8011BEB4(ctx, 0, 0x2C, 0);
+    }
+    case 0xDD: {
+        u32 ctx = pokemonGetStatus(obj, 0, 0xD9, 0);
+        return fn_8011BEB4(ctx, 0, 0x2B, 0);
+    }
+    case 0xDE: {
+        u32 ctx = pokemonGetStatus(obj, 0, 0xD9, 0);
+        return (u32)(u8)fn_8020990C(ctx, d);
+    }
+    case 0xE0: {
+        u32 ctx = pokemonGetStatus(obj, 0, 0xD9, 0);
+        return (u32)(u8)fn_802096E8(ctx);
+    }
+    case 0xE1: {
+        u32 ctx = pokemonGetStatus(obj, 0, 0xD9, 0);
+        return fn_8011BEB4(ctx, 0, 0x2D, 0);
+    }
+    case 0xE2: {
+        u32 ctx = pokemonGetStatus(obj, 0, 0xD9, 0);
+        return fn_8011BEB4(ctx, 0, 0x2F, 0);
+    }
+    case 0xE3: {
+        u32 ctx = pokemonGetStatus(obj, 0, 0xD9, 0);
+        return fn_8011BEB4(ctx, 0, 0x29, 0);
+    }
+    case 0xE4: {
+        u32 ctx = pokemonGetStatus(obj, 0, 0xD9, 0);
+        return fn_8011BEB4(ctx, 0, 0x2E, 0);
+    }
+
+    case 0xE5: return fn_801FDA08(obj);
+    case 0xE6: return (u32)(u8)fn_801FD9F0(obj);
+    case 0xE7: return (u32)(u8)fn_801FD9D8(obj);
+    case 0xE8: return (u32)(u8)fn_801FD9C0(obj);
+    case 0xE9: return (u32)(u8)fn_801FD9A8(obj);
+    case 0xEA: return (u32)(u8)fn_801FD990(obj);
+    case 0xEB: return (u32)(u8)fn_801FD978(obj);
+    case 0xEC: return (u32)(u8)fn_801FD960(obj);
+    case 0xED: return (u32)(u16)fn_801FD948(obj);
+    case 0xEE: return fn_801FD808(obj);
+    case 0xEF: return (u32)(u16)fn_801FD064(obj);
+    case 0xF0: return (u32)(u16)fn_801FD04C(obj);
+    case 0xF1: return (u32)(u16)fn_801FD034(obj);
+    case 0xF2: return (u32)(u16)fn_801FD01C(obj);
+    case 0xF3: return (u32)(u16)fn_801FD004(obj);
+    case 0xF4: return (u32)(u16)fn_801FCFEC(obj);
+    case 0xF5: return (u32)(s32)(s16)fn_801FCFD4(obj); /* extsh */
+    case 0xF6: return (u32)(u16)fn_801FCFBC(obj);
+    case 0xF7: return (u32)(u16)fn_801FCFA4(obj);
+    case 0xF8: return fn_801FCF8C(obj);
+    case 0xF9: return (u32)(u8)fn_801FD7E0(obj);
+    case 0xFA: return (u32)(u16)fn_801FD7C8(obj);
+    case 0xFB: return (u32)(u16)fn_801FD7B0(obj);
+    case 0xFC: return (u32)(u8)fn_801FD798(obj);
+    case 0xFD: return (u32)(s32)(s16)fn_801FD684(obj, (u8)d); /* extsh */
+    case 0xFE: return fn_801FD648(obj);
+    case 0xFF: return (u32)(u16)fn_801FD614(obj, (u8)d);
+    case 0x100: return (u32)(u16)fn_801FD5D8(obj);
+    case 0x101: return fn_801FD5B0(obj);
+    case 0x102: return (u32)(s32)(s16)fn_801FD780(obj); /* extsh */
+    case 0x103: return (u32)(u16)fn_801FD768(obj);
+    case 0x104: return (u32)(s32)(s16)fn_801FD750(obj); /* extsh */
+    case 0x105: return (u32)(u16)fn_801FD738(obj);
+    case 0x106: return (u32)(u8)fn_801FD598(obj);
+    case 0x107: return (u32)(u8)fn_801FD580(obj);
+    case 0x108: return (u32)(u8)fn_801FD568(obj);
+    case 0x109: return (u32)(u8)fn_801FD550(obj);
+    case 0x10A: return (u32)(u8)fn_801FD538(obj);
+    case 0x10B: return (u32)(u8)fn_801FD520(obj);
+    case 0x10C: return (u32)(u8)fn_801FD508(obj);
+    case 0x10D: return (u32)(u8)fn_801FD4F0(obj);
+    case 0x10E: return (u32)(u8)fn_801FD4D8(obj);
+    case 0x10F: return (u32)(u8)fn_801FD4C0(obj);
+    case 0x110: return (u32)(u8)fn_801FD4A8(obj);
+    case 0x111: return (u32)(u8)fn_801FD490(obj);
+    case 0x112: return (u32)(u8)fn_801FD478(obj);
+    case 0x113: return (u32)(u8)fn_801FD460(obj);
+    case 0x114: return (u32)(u8)fn_801FD448(obj);
+    case 0x115: return (u32)(u8)fn_801FD430(obj);
+    case 0x116: return (u32)(u8)fn_801FD418(obj);
+    case 0x117: return (u32)(u8)fn_801FD400(obj);
+    case 0x118: return (u32)(u8)fn_801FD3E8(obj);
+    case 0x119: return (u32)(u8)fn_801FD3D0(obj);
+    case 0x11A: return (u32)(u8)fn_801FD3B8(obj);
+    case 0x11B: return fn_801FD3A0(obj);
+    case 0x11C: return (u32)(s32)(s16)fn_801FD388(obj); /* extsh */
+    case 0x11D: return (u32)(u16)fn_801FD370(obj);
+    case 0x11E: return (u32)(s32)(s16)fn_801FD358(obj); /* extsh */
+    case 0x11F: return (u32)(u16)fn_801FD340(obj);
+    case 0x120: return (u32)(u8)fn_801FD188(obj);
+    case 0x121: return (u32)(s32)(s16)fn_801FD160(obj); /* extsh */
+    case 0x122: return fn_801FD11C(obj, d);
+    case 0x123: return (u32)(u8)fn_802062FC(obj);
+
+    default:
+        return 0;
+    }
+}

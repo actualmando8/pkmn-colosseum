@@ -14,7 +14,11 @@
 #include "hsd/hsd_class.h"
 #include "hsd/hsd_debug.h"
 
-/* NOTE: fn_801B06D4 is already in hsd_pobj.c as a simple getter */
+extern u8 lbl_8047B310;
+void fn_801B06D4(u8 value)
+{
+    lbl_8047B310 = value;
+}
 
 typedef struct HSDShadowOwner {
     u8 unk_00[0x8];

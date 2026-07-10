@@ -9,13 +9,14 @@
  * JObj manages the skeletal hierarchy that drives all 3D models.
  */
 
+#define iref_DEC hsd_inline_iref_DEC
 #include "hsd/hsd_jobj.h"
+#undef iref_DEC
 #include "hsd/hsd_aobj.h"
 #include "hsd/hsd_class.h"
 #include "hsd/hsd_debug.h"
 #include "hsd/hsd_pobj.h"
 #include "hsd/hsd_dobj.h"
-#include "hsd/hsd_object.h"
 #include "hsd/hsd_robj.h"
 
 static void JObjInfoInit(void);
@@ -137,6 +138,28 @@ void HSD_JObjAddDObj(HSD_JObj* jobj, HSD_DObj* dobj)
 void iref_INC_801A0C9C(void* o);
 void hsdDelete_801A0CE8(void* object);
 BOOL ref_DEC_801A0D48(void* o);
+extern u8 lbl_80465588[];
+extern u8 lbl_804655B4[];
+
+void* HSD_DListGetAllocData(void)
+{
+    return lbl_80465588;
+}
+
+void* HSD_SListGetAllocData(void)
+{
+    return lbl_804655B4;
+}
+
+BOOL iref_DEC(void* o)
+{
+    BOOL r;
+    if ((r = (HSD_OBJ(o)->ref_count_individual == 0))) {
+        return r;
+    }
+    HSD_OBJ(o)->ref_count_individual -= 1;
+    return HSD_OBJ(o)->ref_count_individual == 0;
+}
 
 void HSD_JObjUnref(HSD_JObj* jobj)
 {
@@ -542,6 +565,18 @@ static HSD_JObj* JObj_GetPrev(HSD_JObj* jobj)
     }
     HSD_Panic(&lbl_8047DB20, 0x5F8, &lbl_8047DB28);
     return NULL;
+}
+
+extern void* lbl_8047B2A8;
+extern void* lbl_8047B2A0;
+void fn_8019D610(void* value)
+{
+    lbl_8047B2A8 = value;
+}
+
+void fn_8019D618(void* value)
+{
+    lbl_8047B2A0 = value;
 }
 
 static void JObj_RecalcParentRootBits(HSD_JObj* jobj)

@@ -61,6 +61,8 @@ typedef struct FadeFluidWork {
 
 extern void fn_801C6688(f32 t);
 extern void fn_801C63C0(void* tex, GSvec* pos, f32 scale, f32 offset, f32 t, f32 alpha);
+extern void fn_801C53BC(void* texture);
+extern void fn_800D75F4(void* ptr);
 extern void fn_800D9ED8(u32 enable);
 extern void fn_800D88DC(u32 mask);
 extern void fn_800D888C(u32 mask);
@@ -73,6 +75,23 @@ extern void fn_800DA028(u32 arg0);
 extern void fn_800D6A00(u32 arg0);
 extern void fn_800D7820(void* ptr);
 extern void fn_800D85D4(u32 arg0, void* ptr);
+extern void fn_800D848C(u32 arg0, u32 arg1, u32 arg2, void* ptr);
+extern void fn_800DC1D4(u32 arg0);
+extern void fn_800DC224(u32 arg0, u32 arg1, u32 arg2, u32 arg3, u32 arg4);
+extern void fn_800DC14C(u32 arg0, u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5);
+extern void fn_800DC0D4(u32 arg0, u32 arg1, u32 arg2, u32 arg3, u32 arg4);
+extern void fn_800DC04C(u32 arg0, u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5);
+extern void fn_800DBFD4(u32 arg0, u32 arg1, u32 arg2, u32 arg3, u32 arg4);
+extern void fn_800E042C(void* mtx, GSvec* scale);
+extern void fn_800E02E8(void* mtx, f32 angle);
+extern void fn_800E03B4(void* mtx, GSvec* trans);
+extern void GSvecTransform(GSvec* dst, void* mtx, GSvec* src);
+extern void fn_800D67BC(u32 arg0);
+extern void fn_800D6680(f32 x, f32 y, f32 z);
+extern void fn_800D5CB8(u32 arg0, u32 r, u32 g, u32 b, u32 a);
+extern void fn_800D59B8(u32 arg0, f32 s, f32 t);
+extern void fn_800D6728(void);
+extern void GSgfxEndBackFBCapture(void* texture);
 extern u32 _fadeEffectGetRandom__FUl(u32 range);
 extern u32 fn_800E202C(void* ptr);
 extern void fn_800E24B0(u32 handle);
@@ -84,18 +103,199 @@ extern u8 lbl_80467030[0x20];
 extern u8 lbl_80467050[0x40];
 extern u8 lbl_80314AE8[];
 extern u8 lbl_8047B3B0;
+extern void* lbl_8047B3B4;
 extern u32 lbl_8047B3B8;
+extern const f32 lbl_8047DFDC;
 extern const f32 lbl_8047DFE0;
 extern const f32 lbl_8047DFE4;
+extern const f32 lbl_8047DFF0;
 extern const f32 lbl_8047DFF4;
 extern const f32 lbl_8047DFF8;
+extern const f64 lbl_8047E000;
 extern const f32 lbl_8047E008;
 extern const f32 lbl_8047E00C;
+extern const f32 lbl_8047E010;
+extern const f32 lbl_8047E014;
+extern const f32 lbl_8047E018;
 extern const f32 lbl_8047E0A4;
 extern const f32 lbl_8047E0A8;
 extern const f32 lbl_8047E0C4;
 extern const f32 lbl_8047E0C8;
 extern const f32 lbl_8047E0CC;
+
+#pragma optimize_for_size on
+u32 fn_801C4CB8(u32 mode, void* texture, f32 frame, f32 duration) {
+    f32 frameLocal;
+    u32 modeLocal;
+    f32 durationLocal;
+    void* tex;
+    FadeCameraWork* cam;
+    GSvec pos;
+    GSvec scale;
+    GSvec point;
+    GSvec out;
+    f32 mtx[3][4];
+    u8 tev[0x34];
+    f32 t;
+    f32 alpha;
+    f32 x0;
+    f32 x1;
+    f32 y0;
+    f32 y1;
+
+    frameLocal = frame;
+    modeLocal = mode;
+    durationLocal = duration;
+    tex = texture;
+
+    if (tex == NULL) {
+        return modeLocal;
+    }
+
+    if (lbl_8047B3B0 == 1) {
+        lbl_8047B3B0 = 0;
+        fn_801C53BC(tex);
+    }
+
+    if (lbl_8047B3B0 == 0 && (u8)modeLocal == 0 && lbl_8047B3B4 != NULL) {
+        fn_800D75F4(lbl_8047B3B4);
+        lbl_8047B3B4 = NULL;
+    }
+
+    t = frameLocal / durationLocal;
+    cam = (FadeCameraWork*)lbl_80467030;
+    cam->frame++;
+    cam->value += cam->step;
+    if (cam->step >= lbl_8047DFE0) {
+        cam->step += lbl_8047DFDC * t;
+        if (cam->value >= cam->target) {
+            cam->value = cam->target;
+        }
+    } else {
+        cam->step -= lbl_8047DFDC * t;
+        if (cam->value <= cam->target) {
+            cam->value = cam->target;
+        }
+    }
+
+    pos.x = lbl_8047E008;
+    pos.y = lbl_8047E00C;
+    pos.z = lbl_8047DFE0;
+    fn_801C63C0(tex, &pos, lbl_8047DFE4, lbl_8047DFE0, t, lbl_8047DFE0);
+
+    pos.x = lbl_8047E008 + cam->value;
+    pos.y = lbl_8047E00C;
+    pos.z = lbl_8047DFE0;
+    fn_801C63C0(tex, &pos, lbl_8047DFE4, lbl_8047DFE0, t, lbl_8047DFDC);
+
+    pos.x = lbl_8047E008 - cam->value;
+    pos.y = lbl_8047E00C;
+    pos.z = lbl_8047DFE0;
+    fn_801C63C0(tex, &pos, lbl_8047DFE4, lbl_8047DFE0, t, lbl_8047DFDC);
+
+    if (lbl_8047B3B4 != NULL) {
+        fn_800D9ED8(1);
+        fn_800D88DC(0x80000003);
+        fn_800D888C(4);
+        fn_800D9B58(lbl_8047DFE0, lbl_8047DFE0, lbl_8047DFF4, lbl_8047DFF8);
+        fn_800DA4C4(1, 6, 7);
+        fn_800DA2BC(1, 1, 0);
+        fn_800DA1E8(0, 1, 1);
+        fn_800DA100(0, 7, 0, 1, 7, 0);
+        fn_800DA028(0);
+        fn_800D848C(0, 0, 4, tev);
+        fn_800D848C(1, 0, 5, tev);
+        fn_800DC1D4(2);
+        fn_800D85D4(0, ((FadeCameraWork*)lbl_80467030)->tex1);
+        fn_800DC224(0, 0, 0, 0, 0);
+        fn_800DC14C(0, 8, 0, 0, 0, 1);
+        fn_800DC0D4(0, 9, 0xd, 0xc, 0xf);
+        fn_800DC04C(0, 0, 0, 0, 0, 1);
+        fn_800DBFD4(0, 7, 4, 5, 7);
+        fn_800D85D4(1, tex);
+        fn_800DC224(1, 0, 1, 1, 0);
+        fn_800DC14C(1, 0, 0, 0, 0, 0);
+        fn_800DC0D4(1, 0xf, 8, 2, 0xf);
+        fn_800DC04C(1, 0, 0, 0, 0, 0);
+        fn_800DBFD4(1, 7, 7, 7, 1);
+        fn_800D7820(lbl_8047B3B4);
+        fn_800D6A00(4);
+
+        alpha = lbl_8047DFF0 *
+                (lbl_8047DFE4 - t);
+        scale.x = lbl_8047DFE4 + ((f32)cam->frame / lbl_8047E010);
+        scale.y = scale.x;
+        scale.z = scale.x;
+        pos.x = lbl_8047E008;
+        pos.y = lbl_8047E00C;
+        pos.z = lbl_8047DFE0;
+        fn_800E042C(mtx, &scale);
+        fn_800E02E8(mtx, lbl_8047DFE0);
+        fn_800E03B4(mtx, &pos);
+
+        point.x = lbl_8047E014;
+        point.y = lbl_8047E014;
+        point.z = lbl_8047DFE0;
+        GSvecTransform(&out, mtx, &point);
+        x0 = lbl_8047E008 - (out.x - lbl_8047E008);
+        x1 = lbl_8047E008 + (out.x - lbl_8047E008);
+        y0 = lbl_8047E00C - (out.y - lbl_8047E00C);
+        y1 = lbl_8047E00C + (out.y - lbl_8047E00C);
+        x0 = x0 / lbl_8047DFF4;
+        x1 = x1 / lbl_8047DFF4;
+        y0 = y0 / lbl_8047DFF8;
+        y1 = y1 / lbl_8047DFF8;
+
+        fn_800D67BC(4);
+
+        point.x = lbl_8047E018;
+        point.y = lbl_8047E018;
+        point.z = lbl_8047DFE0;
+        GSvecTransform(&out, mtx, &point);
+        fn_800D6680(out.x, out.y, out.z);
+        fn_800D5CB8(0, 0xff, 0xff, 0xff, (u32)alpha);
+        fn_800D59B8(0, lbl_8047DFE0, lbl_8047DFE0);
+        fn_800D59B8(1, x0, y0);
+
+        point.x = lbl_8047E014;
+        point.y = lbl_8047E018;
+        point.z = lbl_8047DFE0;
+        GSvecTransform(&out, mtx, &point);
+        fn_800D6680(out.x, out.y, out.z);
+        fn_800D5CB8(0, 0xff, 0xff, 0xff, (u32)alpha);
+        fn_800D59B8(0, lbl_8047DFE4, lbl_8047DFE0);
+        fn_800D59B8(1, x1, y0);
+
+        point.x = lbl_8047E018;
+        point.y = lbl_8047E014;
+        point.z = lbl_8047DFE0;
+        GSvecTransform(&out, mtx, &point);
+        fn_800D6680(out.x, out.y, out.z);
+        fn_800D5CB8(0, 0xff, 0xff, 0xff, (u32)alpha);
+        fn_800D59B8(0, lbl_8047DFE0, lbl_8047DFE4);
+        fn_800D59B8(1, x0, y1);
+
+        point.x = lbl_8047E014;
+        point.y = lbl_8047E014;
+        point.z = lbl_8047DFE0;
+        GSvecTransform(&out, mtx, &point);
+        fn_800D6680(out.x, out.y, out.z);
+        fn_800D5CB8(0, 0xff, 0xff, 0xff, (u32)alpha);
+        fn_800D59B8(0, lbl_8047DFE4, lbl_8047DFE4);
+        fn_800D59B8(1, x1, y1);
+
+        fn_800D6728();
+        fn_800DC1D4(1);
+        fn_800D888C(0x80000000);
+        fn_800D9ED8(0);
+    }
+
+    if (lbl_8047B3B0 == 0 && (u8)modeLocal == 0) {
+        GSgfxEndBackFBCapture(tex);
+    }
+    return modeLocal;
+}
+#pragma optimize_for_size reset
 
 #pragma peephole off
 u32 fn_801C54FC(u32 arg0, f32 frame, f32 duration) {
