@@ -31,7 +31,8 @@ typedef struct MenuWindow {
     s32 nextMenu;
     u8 pad_50[0x45];
     s8 cursor;
-    u8 pad_96[2];
+    u8 pad_96;
+    s8 previousCursor;
     u8 accepted;
     u8 canceled;
 } MenuWindow;
@@ -40,6 +41,12 @@ typedef struct MenuSprite {
     u8 pad_00[6];
     s16 tag;
 } MenuSprite;
+
+typedef struct MenuCursorItem {
+    u8 pad_00[2];
+    s16 field_02;
+    s16 field_04;
+} MenuCursorItem;
 
 typedef struct MenuSeTable {
     u16 field_00;
@@ -88,7 +95,11 @@ extern void fn_800347B8(void);
 extern void fn_800347C4(void);
 extern void fn_800347E8(s32);
 extern void fn_8003480C(s32);
+s32 fn_800566E8(void);
 extern s32 fn_800573C0(void);
+s32 fn_80057694(void);
+void fn_800576A4(s32);
+void fn_80057830(s32, s32, s32);
 extern u8 fn_8006B8E8(void);
 extern u32 fn_800E202C(void*);
 extern void fn_800E209C(u32);
@@ -148,6 +159,7 @@ extern s32 menuOpen(s32, s32);
 extern s32  fn_8010264C();
 extern void menuSetPosition();
 extern u8*  fn_80104704(u32);
+MenuCursorItem* windowGetCursorToItem(MenuWindow*);
 extern u8*  windowGetKeyInfo(void);
 extern void winMsgOpen();
 extern void winMsgClose();
@@ -183,6 +195,8 @@ extern void fadeCheck(s32);
 extern void toolentryTaisenFreePokemonData(void);
 
 /* ===== SDA globals ===== */
+extern s32 lbl_8047A598;
+extern s32 lbl_8047A59C;
 extern u8* lbl_8047A5A0;
 extern u8  lbl_8047A5A8;
 extern f32 lbl_8047BF18;
@@ -280,6 +294,99 @@ void fn_80058804(void* text, s32 closeAfterOpen) {
     if (closeAfterOpen != 0) {
         menuCloseCustom(0x9B, 2, 1);
     }
+}
+#pragma pop
+
+/* Address: 0x80058880 | Size: 0x230 */
+#pragma push
+#pragma peephole off
+s32 fn_80058880(MenuWindow* window) {
+    MenuKeyInfo* keys;
+    s32 cursor;
+    s32 action;
+
+    keys = (MenuKeyInfo*)windowGetKeyInfo();
+    if (fn_800573C0() != 0) {
+        return 0;
+    }
+    if (fn_800566E8() != 0) {
+        return 0;
+    }
+
+    if ((keys->repeatButtons & 0xC0) != 0) {
+        if (fn_80057694() != 0) {
+            cursor = 0;
+        } else {
+            cursor = 1;
+        }
+        fn_800576A4(cursor);
+    }
+
+    if ((keys->repeatButtons & 2) != 0) {
+        if (++window->cursor >= 7) {
+            window->cursor = 0;
+        }
+    }
+
+    if ((keys->repeatButtons & 1) != 0) {
+        if (--window->cursor < 0) {
+            window->cursor = 6;
+        }
+    }
+
+    if (keys->repeatButtons == 8) {
+        cursor = window->cursor;
+        if (cursor < 0 || cursor >= 7) {
+            action = 2;
+        } else {
+            action = lbl_802677D0[cursor].action;
+        }
+
+        switch (action) {
+        case 0:
+            window->cursor = (s8)lbl_8047A598;
+            break;
+        case 1:
+            window->accepted = 1;
+            window->canceled = 1;
+            break;
+        }
+    }
+
+    if (keys->repeatButtons == 4) {
+        cursor = window->cursor;
+        if (cursor < 0 || cursor >= 7) {
+            action = 2;
+        } else {
+            action = lbl_802677D0[cursor].action;
+        }
+
+        if (action == 1) {
+            window->cursor = (s8)lbl_8047A59C;
+        }
+    }
+
+    cursor = (u8)window->cursor;
+    if ((s8)cursor != window->previousCursor) {
+        cursor = (s8)cursor;
+        if (cursor < 0 || cursor >= 7) {
+            action = 2;
+        } else {
+            action = lbl_802677D0[cursor].action;
+        }
+
+        if (action == 0) {
+            lbl_8047A59C = cursor;
+        }
+        if (action != 0) {
+            lbl_8047A598 = cursor;
+        }
+        {
+            MenuCursorItem* item = windowGetCursorToItem(window);
+            fn_80057830(item->field_02, item->field_04, 0);
+        }
+    }
+    return 0;
 }
 #pragma pop
 
