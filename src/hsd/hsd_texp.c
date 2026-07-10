@@ -127,6 +127,84 @@ void HSD_TExpCompile(u8* root, u32* tex_count, u32* ras_count) {
     if (ras_count) *ras_count = r_count;
 }
 
+typedef struct HSD_TevDesc {
+    /* 0x00 */ u32 pad0;
+    /* 0x04 */ u32 flag;
+    /* 0x08 */ u32 stage;
+    /* 0x0C */ u32 coord;
+    /* 0x10 */ u32 map;
+    /* 0x14 */ u32 color;
+    /* 0x18 */ u32 color_op;
+    /* 0x1C */ u32 color_a;
+    /* 0x20 */ u32 color_b;
+    /* 0x24 */ u32 color_c;
+    /* 0x28 */ u32 color_d;
+    /* 0x2C */ u32 color_scale;
+    /* 0x30 */ u32 color_bias;
+    /* 0x34 */ u8  color_clamp;
+    /* 0x35 */ u8  pad35[3];
+    /* 0x38 */ u32 color_tevreg;
+    /* 0x3C */ u32 alpha_op;
+    /* 0x40 */ u32 alpha_a;
+    /* 0x44 */ u32 alpha_b;
+    /* 0x48 */ u32 alpha_c;
+    /* 0x4C */ u32 alpha_d;
+    /* 0x50 */ u32 alpha_scale;
+    /* 0x54 */ u32 alpha_bias;
+    /* 0x58 */ u8  alpha_clamp;
+    /* 0x59 */ u8  pad59[3];
+    /* 0x5C */ u32 alpha_tevreg;
+    /* 0x60 */ u32 pad60;
+    /* 0x64 */ s32 kcolor0;
+    /* 0x68 */ s32 kcolor1;
+    /* 0x6C */ u32 swap0;
+    /* 0x70 */ u32 swap1;
+    /* 0x74 */ u32 kr;
+    /* 0x78 */ u32 kg;
+    /* 0x7C */ u32 kb;
+    /* 0x80 */ u32 ka;
+} HSD_TevDesc;
+
+void fn_800BC6F0();
+void fn_800BC228();
+void fn_800BC290();
+void fn_800BC1A0();
+void fn_800BC1E4();
+void fn_800BC454();
+void fn_800BC4C0();
+void fn_800BC52C();
+void fn_800BC580(u32, u32, u32, u32, u32);
+void GXSetTevOp(u32 id, u32 op);
+
+/*
+ * HSD_SetupTevStage - 0x801B3638 | Size: 0x138
+ */
+#pragma optimization_level 1
+void fn_801B3638(HSD_TevDesc* desc) {
+    fn_800BC6F0(desc->stage, desc->coord, desc->map, desc->color);
+    if (desc->flag == 0) {
+        GXSetTevOp(desc->stage, desc->color_op);
+        fn_800BC52C(desc->stage, 0, 0);
+        return;
+    }
+    fn_800BC228(desc->stage, desc->color_op, desc->color_bias,
+                desc->color_scale, desc->color_clamp, desc->color_tevreg);
+    fn_800BC1A0(desc->stage, desc->color_a, desc->color_b, desc->color_c,
+                desc->color_d);
+    fn_800BC290(desc->stage, desc->alpha_op, desc->alpha_bias,
+                desc->alpha_scale, desc->alpha_clamp, desc->alpha_tevreg);
+    fn_800BC1E4(desc->stage, desc->alpha_a, desc->alpha_b, desc->alpha_c,
+                desc->alpha_d);
+    fn_800BC580(desc->kcolor0, desc->kr, desc->kg, desc->kb, desc->ka);
+    if (desc->kcolor1 != desc->kcolor0) {
+        fn_800BC580(desc->kcolor1, desc->kr, desc->kg, desc->kb, desc->ka);
+    }
+    fn_800BC52C(desc->stage, desc->kcolor0, desc->kcolor1);
+    fn_800BC454(desc->stage, desc->swap0);
+    fn_800BC4C0(desc->stage, desc->swap1);
+}
+#pragma optimization_level 4
+
 /*
  * HSD_TExpValidateInputs - 0x801B45A4 | Size: 0x70
  * Validate that all inputs are properly connected.
