@@ -305,6 +305,49 @@ s32 fn_80058F08(s32* partyIndex, s32 cursor) {
     return row->menuId;
 }
 
+/* Address: 0x80058F40 | Size: 0xF4 */
+#pragma push
+#pragma peephole off
+void* fn_80058F40(void* dflt, s32 dir, s32* state) {
+    extern void* heroGetStatus(void*, s32, u16);
+    void* hero;
+    s32 i;
+
+    if (state[0] != 0) {
+        return dflt;
+    }
+    if (dir == 1) {
+        for (i = state[1] - 1; i >= 0; i--) {
+            u32 v;
+            hero = heroGetStatus(NULL, 3, (u16)i);
+            v = pokemonCheckValid(hero);
+            if (v != 0) {
+                break;
+            }
+        }
+        if (i >= 0) {
+            state[1] = i;
+            return hero;
+        }
+    }
+    if (dir == 2) {
+        for (i = state[1] + 1; i < 6; i++) {
+            u32 v;
+            hero = heroGetStatus(NULL, 3, (u16)i);
+            v = pokemonCheckValid(hero);
+            if (v != 0) {
+                break;
+            }
+        }
+        if (i < 6) {
+            state[1] = i;
+            return hero;
+        }
+    }
+    return dflt;
+}
+#pragma pop
+
 /* Address: 0x80059BDC | Size: 0x30F4 */
 #pragma push
 #pragma optimization_level 4

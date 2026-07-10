@@ -514,6 +514,64 @@ void GSmodelSetAnimType(GSmodel* model, u32 type)
     }
 }
 
+typedef struct GSmodelAnimEndedInfo {
+    u32 event_flags;
+    u32 anim_index;
+    void* arg;
+} GSmodelAnimEndedInfo;
+
+void fn_800ED6E4(GSmodel* model, u8 tex_anim)
+{
+    u32 end_flag_mask;
+    u32 anim_flag_mask;
+    s32 anim_type;
+    u32 anim_index;
+    GSmodelAnimEndedInfo info;
+
+    if (!(model->flags & MODEL_FLAG_BLENDING)) {
+        if (!tex_anim) {
+            anim_index = model->anim_index;
+            end_flag_mask = MODEL_FLAG_ANIM_ENDED;
+            anim_type = model->anim_type;
+            anim_flag_mask = MODEL_FLAG_ANIMATING;
+        } else {
+            end_flag_mask = MODEL_FLAG_TEX_ANIM_ENDED;
+            anim_index = model->tex_anim_index;
+            anim_type = model->tex_anim_type;
+            anim_flag_mask = MODEL_FLAG_TEX_ANIMATING;
+        }
+    } else if (!tex_anim) {
+        anim_index = model->blend_anim_index_b;
+        end_flag_mask = MODEL_FLAG_ANIM_ENDED;
+        anim_type = model->anim_type;
+        anim_flag_mask = MODEL_FLAG_ANIMATING;
+    }
+
+    switch (anim_type) {
+    case 0:
+        model->flags &= ~anim_flag_mask;
+        break;
+    case 1:
+        model->flags &= ~end_flag_mask;
+        break;
+    }
+
+    if (model->anim_ended_callback != NULL) {
+        info.event_flags = 0;
+        if (tex_anim == 0) {
+            info.event_flags |= 1;
+        } else {
+            info.event_flags |= 2;
+        }
+        if (anim_type == 1) {
+            info.event_flags |= 4;
+        }
+        info.anim_index = anim_index;
+        info.arg = model->anim_ended_callback_arg;
+        model->anim_ended_callback(model, &info);
+    }
+}
+
 void GSmodelAdvanceAnimation(GSmodel* model, f32 delta)
 {
     u32 flags = model->flags;

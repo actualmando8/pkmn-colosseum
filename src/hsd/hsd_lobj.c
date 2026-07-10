@@ -1455,8 +1455,22 @@ void HSD_LObjSetFlags(HSD_LObj* lobj, u32 flags) {
 }
 #endif
 
-/* 0x801A6990 | 0x30 */
+/* 0x801A6928 | 0x38 */
 extern u8 lbl_80465608[];
+void fn_801A6928(HSD_LObj* lobj) {
+    void (*func)(HSD_LObj*, u32, u32);
+    func = ((void (**)(HSD_LObj*, u32, u32)) lbl_80465608)[0];
+    func(lobj, 0x20, 0);
+}
+
+/* 0x801A6960 | 0x30 */
+void fn_801A6960(HSD_LObj* lobj) {
+    void (*func)(HSD_LObj*);
+    func = ((void (**)(HSD_LObj*)) lbl_80465608)[1];
+    func(lobj);
+}
+
+/* 0x801A6990 | 0x30 */
 #if 0
 asm void fn_801A6990(void) {
 #include "src/hsd/hsd_lobj_fn_801A6990.inc"

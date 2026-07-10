@@ -184,8 +184,8 @@
  * ========================================================================= */
 
 /* Thread management */
-extern void  GSthreadCreate(s32 priority, void* stack, s32 stackSize,
-                          s32 flags, s32 p5, void* entry);
+extern void* GSthreadCreate(s32 priority, void* stack, s32 stackSize,
+                            s32 flags, s32 p5, void (*entry)(void));
 extern void  _threadSwitch(void);
 extern void  GSthreadTerminate(void* threadCtx);
 
@@ -241,8 +241,67 @@ extern s32   gFrameCycleCount;   /* lbl_80478878 */
  * Size:     0xF0
  * ========================================================================= */
 
+/* External declarations required by fn_8002049C.
+ *
+ * The sdata2 float anchors (lbl_8047B814..lbl_8047B860) and the sbss/bss
+ * anchors (lbl_8047A344, lbl_803A1F88) reference data whose ownership lives
+ * outside this translation unit (see split map + symbols.txt).
+ * These externs are the standard access pattern for cross-TU sdata2/bss
+ * anchors -- they do not create new data, they just name existing symbols.
+ */
 extern u8 lbl_8047A32C;
 extern void* lbl_8047A330;
+extern s32 lbl_8047A314;
+extern void* lbl_8047A324;
+extern f32 lbl_8047A344;
+extern u32 lbl_80478878;
+extern u8 lbl_803A1F88[];
+extern f32 lbl_8047B814;
+extern f32 lbl_8047B84C;
+extern f32 lbl_8047B850;
+extern f32 lbl_8047B854;
+extern f32 lbl_8047B858;
+extern f32 lbl_8047B85C;
+extern f32 lbl_8047B860;
+extern void* fn_800FF560(void);
+
+/* Forward declarations for same-TU callees used before their definitions. */
+void fn_8002058C(void);
+void fn_8002060C(void);
+
+void fn_8002049C(void) {
+    void* ctx;
+
+    lbl_8047A32C = 0;
+    ctx = fn_800FF560();
+    lbl_8047A330 = GSthreadCreate(0x14, ctx, 0x2000, 1, 0, fn_8002058C);
+    lbl_8047A314 = 0;
+    lbl_8047A344 = lbl_8047B814;
+    lbl_8047A324 = NULL;
+    floorSetFadeScript(0, 0);
+    lbl_80478878 = lbl_80478878 + 1;
+    if ((s32)lbl_80478878 >= 4) {
+        lbl_80478878 = 0;
+    }
+    {
+        u8* base = lbl_803A1F88;
+        *(f32*)(base + 0x10) = lbl_8047B84C;
+        *(f32*)(base + 0x1c) = lbl_8047B850;
+        *(f32*)(base + 0x28) = lbl_8047B814;
+        *(f32*)(base + 0x34) = lbl_8047B814;
+        *(f32*)(base + 0x14) = lbl_8047B854;
+        *(f32*)(base + 0x20) = lbl_8047B858;
+        *(f32*)(base + 0x2c) = lbl_8047B814;
+        *(f32*)(base + 0x38) = lbl_8047B814;
+        *(f32*)(base + 0x18) = lbl_8047B85C;
+        *(f32*)(base + 0x24) = lbl_8047B860;
+        *(f32*)(base + 0x30) = lbl_8047B814;
+        *(f32*)(base + 0x3c) = lbl_8047B814;
+    }
+    if (fn_800FF548() == 0) {
+        fn_8002060C();
+    }
+}
 
 /* =========================================================================
  * Function: GStitle_MainLoop

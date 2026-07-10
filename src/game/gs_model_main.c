@@ -67,7 +67,9 @@ typedef struct GSmodelResource {
 typedef struct GSpart GSpart;
 
 typedef struct HSDJObj {
-    /* 0x000 */ u8 _pad000[0x10];
+    /* 0x000 */ u8 _pad000[0x08];
+    /* 0x008 */ struct HSDJObj* next;
+    /* 0x00C */ u8 _pad00C[0x04];
     /* 0x010 */ struct HSDJObj* child;
     /* 0x014 */ u32 flags;
     /* 0x018 */ void* data;
@@ -157,6 +159,7 @@ extern void fn_800E209C(u32 handle);
 extern void modelShadowFreeModelList__FP8_GSmodel(GSmodel* model);
 extern void GSmodelRemoveNull(GSmodel* model);
 extern void modelRemoveCenterNull(GSmodel* model);
+extern HSDJObj* fn_801A02B0(HSDJObj* jobj);
 extern void fn_801A05EC(void* object);
 extern void* memset(void* dst, int value, u32 size);
 extern void* memcpy(void* dst, const void* src, u32 size);
@@ -1625,6 +1628,35 @@ void fn_800E85E8(GSmodel* model)
     model->materialListHandle = 0;
     model->materialCount = 0;
     model->materialList = NULL;
+}
+
+void modelRemoveCenterNull(GSmodel* model)
+{
+    HSDJObj* jobj;
+    HSDJObj* cur;
+
+    if (model->centerNullState == 0) {
+        return;
+    }
+
+    model->centerNullState--;
+    if (model->centerNullState != 0) {
+        return;
+    }
+
+    jobj = model->renderJObj;
+    if (model->flags.raw & GSMODEL_FLAG_ROOT_NULL_ADDED) {
+        jobj = jobj->child;
+    }
+
+    cur = (jobj == NULL) ? NULL : jobj->child;
+    if (cur == NULL) {
+        return;
+    }
+    for (; ((cur == NULL) ? NULL : cur->next) != NULL;
+         cur = (cur == NULL) ? NULL : cur->next) {
+    }
+    fn_801A02B0(cur);
 }
 
 u32 GSmodelIsRootNullAdded(GSmodel* model)

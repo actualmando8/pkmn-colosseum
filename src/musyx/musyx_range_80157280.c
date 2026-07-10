@@ -25,7 +25,7 @@ extern void  OSRestoreInterrupts(u32 level);
 
 /* renamed symbols referenced by asm incs (symbolmap port) */
 extern void ARQPostRequest();
-extern void InitStreamBuffers();
+void InitStreamBuffers(void);
 extern void aramQueueCallback();
 extern void aramUploadData();
 extern u16 inpGetMidiCtrl(u8 ctrl, u8 channel, u8 set); /* true signature, verified via disassembly */
@@ -606,7 +606,6 @@ extern void fn_80163794(void);
 extern void aramSetUploadCallback(u8* ptr, u32 size);
 extern u32  fn_80163810(u32 ptr, u32 size);
 extern void fn_80163BCC(u8* a, u32 b);
-extern void fn_80163BE4(void);
 extern u8   fn_80163CA8();
 extern u32  aramGetStreamBufferAddress(u32 idx, u32 *out);
 extern void aramFreeStreamBuffer();
@@ -1952,13 +1951,13 @@ extern u32 lbl_8047B074, lbl_8047B07C;
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_80163BE4(void) {
+asm void InitStreamBuffers(void) {
 #include "src/game/people/people_field_fn_80163BE4.inc"
 }
 #else
 /* peopleFieldMoveSetState: init the 0x40-entry free list (node[i].next=&node[i+1],
  * tail NULL; head ptrs reset). byte-match verified via objdiff. */
-void fn_80163BE4(void) {
+void InitStreamBuffers(void) {
     u32 i;
     lbl_8047B068 = 0;
     lbl_8047B064 = 0;
@@ -4251,8 +4250,42 @@ extern void SortVoices(DSPvoice** voices, s32 l, s32 r);
 extern void DoDepopFade(s32* dspStart, s16* dspDelta, s32* hostSum);
 extern void sal_setup_dspvol(u16* dsp_delta, u16* last_vol, u16 vol);
 extern void sal_update_hostplayinfo(DSPvoice* dsp_vptr);
-extern u32 salCheckVolErrorAndResetDelta(u16* dsp_vol, u16* dsp_delta, u16* last_vol, u16 targetVol,
-                                          u16* resetFlags, u16 resetMask);
+u32 salCheckVolErrorAndResetDelta(u16* dsp_vol, u16* dsp_delta, u16* last_vol, u16 targetVol,
+                                  u16* resetFlags, u16 resetMask) {
+  s16 d;
+  s16 x;
+
+  if (targetVol != *last_vol) {
+    d = (s16)targetVol - (s16)*last_vol;
+    if ((s16)d >= 32 && (s16)d < 160) {
+      x = (s16)d >> 5;
+      if ((s16)x < 5) {
+        resetFlags[x] |= resetMask;
+      }
+
+      *dsp_delta = 1;
+      *last_vol += (x << 5);
+      return 1;
+    }
+
+    if (-32 >= (s16)d && -160 < (s16)d) {
+      x = -(s16)d >> 5;
+      if (x < 5) {
+        resetFlags[x] |= resetMask;
+      }
+      *dsp_delta = 0xFFFF;
+      *last_vol -= x << 5;
+      return 1;
+    }
+
+    if (targetVol == 0 && (s16)d > -32) {
+      *dsp_vol = *last_vol = 0;
+    }
+  }
+
+  *dsp_delta = 0;
+  return 0;
+}
 extern void fn_8015AD1C(DSPstudioinfo* stp, DSPvoice* dsp_vptr); /* HandleDepopVoice */
 extern void DCStoreRangeNoSync(void* addr, u32 nBytes);
 extern void DCFlushRangeNoSync(void* addr, u32 nBytes);

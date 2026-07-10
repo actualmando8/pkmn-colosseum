@@ -1054,6 +1054,29 @@ void fn_8019F778(HSD_JObj* jobj) {
 #endif
 #pragma pop
 
+/* 0x8019FAEC | 0xA4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimization_level 1
+void fn_8019FAEC(HSD_JObj* jobj, u32 flags) {
+    s32 result;
+    if (!jobj) return;
+    if (((jobj->flags ^ flags) & 0x8) && jobj != NULL) {
+        if (!jobj) __assert(&lbl_8047DB34, 0x25d, &lbl_8047DB3C);
+        result = 0;
+        if (!(jobj->flags & 0x00800000)) {
+            if (jobj->flags & 0x00000040) {
+                result = 1;
+            }
+        }
+        if (result == 0) {
+            fn_8019D620(jobj);
+        }
+    }
+    jobj->flags &= ~flags;
+}
+#pragma pop
+
 /* 0x8019FF30 | 0x18 */
 #pragma push
 #pragma optimization_level 0
