@@ -138,35 +138,8 @@ extern void  fn_800FB680(s32, s32, u32, u16);
  * Stubs for remaining GSnpcEvt functions (0x80031188-0x800330B8)
  * ========================================================================= */
 
-/* 0x800302D0 | 0xA0 */
-extern u8 lbl_803A2688[];
-#if 0
-asm void fn_800302D0(void) {
-#include "src/game/gs_npc_event_fn_800302D0.inc"
-}
-#else
-#pragma peephole off
-void fn_800302D0(u8* r3, u8* r4) {
-    u32 flags = *(u32*)(r4 + 0x64);
-    s32 evtype = *(s16*)(r4 + 0x6);
-    u32 combined = (flags & 0xa1400000) | r3[0x8b];
-    switch (evtype) {
-    case 0xFBD:
-        fn_800FB680(0, 0, combined, 0x4412);
-        break;
-    case 0xFBC:
-        {
-            s32 val = heroGetStatus(lbl_803A2688, 1, 0);
-            msgctrlSetValue(0x4D, val);
-            fn_800FB680(0, 0, combined, 0x4413);
-        }
-        break;
-    }
-}
-#pragma peephole on
-#endif
-
 /* 0x80031188 | 0xA0 */
+extern u8 lbl_803A2688[];
 #if 0
 asm void fn_80031188(void) {
 #include "src/game/gs_npc_event_fn_80031188.inc"
