@@ -15,13 +15,4 @@ jobs:
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Scan added lines for asm-wrappers / .inc includes
         run: |
-          BASE='${{ github.event.pull_request.base.sha }}'
-          HEAD='${{ github.sha }}'
-          ADDED=$(git diff "$BASE...$HEAD" -- 'src/**/*.c' 'src/**/*.h' | grep -E '^\+' | grep -vE '^\+\+\+' || true)
-          FAIL=0
-          if echo "$ADDED" | grep -nE '^\+[[:space:]]*asm[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*\(' ; then
-            echo "::error::asm-wrapper function added — embeds raw target asm, not real C. Decompile it instead."; FAIL=1; fi
-          if echo "$ADDED" | grep -nE '^\+.*#include[[:space:]]*"[^"]*\.inc"' ; then
-            echo "::error::.inc include added in src/ — raw-asm shim, not a real match."; FAIL=1; fi
-          if [ "$FAIL" = 0 ]; then echo "No asm-wrapper / .inc cheats in added source."; fi
-          exit $FAIL
+          python3 .github/scripts/quality_scan.py '${{ github.event.pull_request.base.sha }}' '${{ github.sha }}'
