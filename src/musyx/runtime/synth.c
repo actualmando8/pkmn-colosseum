@@ -378,14 +378,14 @@ extern s32 sndPitchUpOne(u16 note);
 extern u16 inpGetPitchBend(u8* obj);
 extern u16 inpGetModulation(u8* obj);
 extern u16 inpGetDoppler(u8* obj);
-extern u32 inpGetPanning(u8* obj);
-extern u32 inpGetSurroundPanning(u8* obj);
-extern u32 inpGetPreAuxA(u8* obj);
-extern u32 inpGetReverb(u8* obj);
-extern u32 inpGetPreAuxB(u8* obj);
-extern u32 inpGetPostAuxB(u8* obj);
-extern u32 inpGetTremolo(u8* obj);
-extern u32 inpGetPedal(u8* obj);
+extern u16 inpGetPanning(u8* obj);
+extern u16 inpGetSurroundPanning(u8* obj);
+extern u16 inpGetPreAuxA(u8* obj);
+extern u16 inpGetReverb(u8* obj);
+extern u16 inpGetPreAuxB(u8* obj);
+extern u16 inpGetPostAuxB(u8* obj);
+extern u16 inpGetTremolo(u8* obj);
+extern u16 inpGetPedal(u8* obj);
 extern u16 inpGetVolume(u8* obj);
 extern void inpSetMidiLastNote(u8 midi, u8 midiSet, u8 note);
 extern void inpFXCopyCtrl(u8 ctrl, void* dvoice, void* svoice);
@@ -1175,6 +1175,7 @@ end:
     UpdateTimeMIDICtrl(sv);
 }
 
+#pragma fp_contract off
 void ZeroOffsetHandler(u32 i) {
     SYNTH_VOICE* sv;
     u32 lowDeltaTime;
@@ -1302,6 +1303,7 @@ void ZeroOffsetHandler(u32 i) {
 end:
     UpdateTimeMIDICtrl(sv);
 }
+#pragma fp_contract on
 
 static void HandleFaderTermination(SYNTHMasterFader* smf) {
     switch (smf->seqMode) {
