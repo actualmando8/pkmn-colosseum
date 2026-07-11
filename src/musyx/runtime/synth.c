@@ -366,6 +366,7 @@ extern u32 lbl_8047AF44;                      /* synthFlags */
 extern void* lbl_8047AF4C;                    /* synthMessageCallback */
 extern u64 lbl_8047AF58;                      /* synthRealTime */
 extern u32 lbl_8047AF5C;                      /* synthRealTime, low word */
+extern const f32 lbl_8047D380;
 extern const f32 lbl_8047D3A8;
 
 /* Forward declarations for callees implemented elsewhere in this TU
@@ -1475,11 +1476,26 @@ u32 synthHWMessageHandler(u32 mesg, u32 voiceID) {
     return ret;
 }
 
+static void synthInitJobQueue(SYNTH_JOBTAB* jobTables) {
+    u8 i;
+
+    for (i = 0; i < 32; ++i) {
+        jobTables[i].lowPrecision = NULL;
+        jobTables[i].event = NULL;
+        jobTables[i].zeroOffset = NULL;
+    }
+
+    lbl_8047AF19 = 0;
+}
+
 void synthInit(u32 mixFrq, u32 numVoices) {
     u32 i;
+    u8* synthBase;
 
-    lbl_8047AF58 = 0;
-    ((SynthInfo*)lbl_80434C50)->mixFrq = mixFrq;
+    synthBase = (u8*)lbl_80434A10;
+    ((SynthInfo*)(synthBase + 0x240))->mixFrq = mixFrq;
+    lbl_8047AF5C = 0;
+    *(u32*)&lbl_8047AF58 = 0;
     synthSetBpm(120, 255, 0);
     lbl_8047AF44 = 0;
     lbl_8047AF4C = NULL;
@@ -1525,30 +1541,30 @@ void synthInit(u32 mixFrq, u32 numVoices) {
     }
 
     for (i = 0; i < 32; ++i) {
-        lbl_80434E64[i].volume = 0.f;
-        lbl_80434E64[i].pauseVol = 1.f;
-        lbl_80434E64[i].type = 4;
+        ((SYNTHMasterFader*)(synthBase + 0x454))[i].volume = lbl_8047D3A8;
+        ((SYNTHMasterFader*)(synthBase + 0x454))[i].pauseVol = lbl_8047D380;
+        ((SYNTHMasterFader*)(synthBase + 0x454))[i].type = 4;
     }
 
     lbl_8047AF40 = 0;
     lbl_8047AF3C = 0;
-    lbl_80434E64[31].type = 1;
+    ((SYNTHMasterFader*)(synthBase + 0x454))[31].type = 1;
 
     for (i = 0; i < 8; ++i) {
-        lbl_80434E64[i + 23].type = 0;
+        ((SYNTHMasterFader*)(synthBase + 0x454))[i + 23].type = 0;
     }
 
-    lbl_80434E64[21].volume = 1.f;
-    lbl_80434E64[22].volume = 1.f;
+    ((SYNTHMasterFader*)(synthBase + 0x454))[21].volume = lbl_8047D380;
+    ((SYNTHMasterFader*)(synthBase + 0x454))[22].volume = lbl_8047D380;
     fn_80161A9C(0);
 
     for (i = 0; i < 8; ++i) {
-        lbl_80435644[i] = NULL;
+        ((void**)(synthBase + 0xc34))[i] = NULL;
         lbl_8047AF34[i] = 0xff;
-        lbl_80435684[i] = NULL;
+        ((void**)(synthBase + 0xc74))[i] = NULL;
         lbl_8047AF24[i] = 0xff;
-        lbl_804356A4[i * 2] = 0;
-        lbl_804356A4[i * 2 + 1] = 0;
+        (synthBase + 0xc94)[i * 2] = 0;
+        (synthBase + 0xc94)[i * 2 + 1] = 0;
     }
 
     macInit();
@@ -1556,17 +1572,11 @@ void synthInit(u32 mixFrq, u32 numVoices) {
     synthInitAllocationAids();
 
     for (i = 0; i < 16; ++i) {
-        lbl_804356B4[i] = 0;
+        ((u32*)(synthBase + 0xca4))[i] = 0;
     }
 
     voiceInitLastStarted();
-
-    for (i = 0; i < 32; ++i) {
-        lbl_804354A4[i].lowPrecision = NULL;
-        lbl_804354A4[i].event = NULL;
-        lbl_804354A4[i].zeroOffset = NULL;
-    }
-    lbl_8047AF19 = 0;
+    synthInitJobQueue((SYNTH_JOBTAB*)(synthBase + 0xa94));
 
     fn_8016248C((u32)synthHWMessageHandler);
 }
