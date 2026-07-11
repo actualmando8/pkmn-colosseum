@@ -1574,12 +1574,12 @@ s32 fightFloorCmpfightOutPokemonNimbleness(void *p1, void *p2, void *p3, u8 p4) 
         return 1;
     }
 
-    /* First walk: callback 0xd on p2 */
+    /* First walk: callback 0xd on the fight floor. */
     walkCtx1[0] = 0xd;
     walkCtx1[1] = 0;
     walkCtx1[2] = 0;
     walkCtx1[3] = 0;
-    fightFloorLoopValidFightOutPokemon(p2, (void*)_fightFloorCheckFightOutPokemonPtrAryPokemonTokuseiDataIdSub__FPvUsPv, walkCtx1, 0);
+    fightFloorLoopValidFightOutPokemon(p1, (void*)_fightFloorCheckFightOutPokemonPtrAryPokemonTokuseiDataIdSub__FPvUsPv, walkCtx1, 0);
     if ((u16)walkCtx1[1] != 0) {
         abilCat = 0;
         goto _abilDone;
@@ -1618,15 +1618,15 @@ s32 fightFloorCmpfightOutPokemonNimbleness(void *p1, void *p2, void *p3, u8 p4) 
         goto _cmp1;
     }
     i1 = 0;
-    while ((u16)i1 < 3) {
+    while ((u16)i1 < 2) {
         teamObj1 = (void*)fightFloorGetStatus(p1, 0, 0x35, i1);
         if (teamObj1 != 0) {
             j1 = 0;
-            while ((u16)j1 < 3) {
+            while ((u16)j1 < 2) {
                 matchSide = (void*)fightSideGetStatus(teamObj1, 0, 7, j1);
                 if (matchSide != 0) {
                     k1 = 0;
-                    while ((u16)k1 < 7) {
+                    while ((u16)k1 < 6) {
                         void *pkm;
                         pkm = (void*)fightTrainerGetStatus(matchSide, 0, 0x45, k1);
                         if (pkm != 0 && pkm == fightRes) {
@@ -1647,8 +1647,8 @@ s32 fightFloorCmpfightOutPokemonNimbleness(void *p1, void *p2, void *p3, u8 p4) 
     _cmp1:
     {
         void *abilPkm;
-        if (matchSide != 0) {
-            abilPkm = (void*)fightTrainerGetStatus(matchSide, 0, 0x44, 0);
+        if (matchSide != 0 &&
+            (abilPkm = (void*)fightTrainerGetStatus(matchSide, 0, 0x44, 0)) != 0) {
         } else {
             abilPkm = 0;
         }
@@ -1665,15 +1665,15 @@ s32 fightFloorCmpfightOutPokemonNimbleness(void *p1, void *p2, void *p3, u8 p4) 
             goto _cmp2;
         }
         i2 = 0;
-        while ((u16)i2 < 3) {
+        while ((u16)i2 < 2) {
             teamObj2 = (void*)fightFloorGetStatus(p1, 0, 0x35, i2);
             if (teamObj2 != 0) {
                 j2 = 0;
-                while ((u16)j2 < 3) {
+                while ((u16)j2 < 2) {
                     matchSide2 = (void*)fightSideGetStatus(teamObj2, 0, 7, j2);
                     if (matchSide2 != 0) {
                         k2 = 0;
-                        while ((u16)k2 < 7) {
+                        while ((u16)k2 < 6) {
                             void *pkm;
                             pkm = (void*)fightTrainerGetStatus(matchSide2, 0, 0x45, k2);
                             if (pkm != 0 && pkm == fightRes) {
@@ -1695,26 +1695,26 @@ s32 fightFloorCmpfightOutPokemonNimbleness(void *p1, void *p2, void *p3, u8 p4) 
         {
             u32 cmp2;
             void *abilPkm2;
-            if (matchSide2 != 0) {
-                abilPkm2 = (void*)fightTrainerGetStatus(matchSide2, 0, 0x44, 0);
+            if (matchSide2 != 0 &&
+                (abilPkm2 = (void*)fightTrainerGetStatus(matchSide2, 0, 0x44, 0)) != 0) {
             } else {
                 abilPkm2 = 0;
             }
             cmp2 = fightOutPokemonGetNowNimbleness(p3, numBattle, abilCat, slotCount, abilPkm2);
 
-            if ((u8)p4 != 0) {
-                stat1 = (s32)fightOutPokemonGetCmpNimblenessWazaDataId(p2);
-                stat2 = (s32)fightOutPokemonGetCmpNimblenessWazaDataId(p3);
-            } else {
+            if ((u8)p4 == 0) {
                 stat1 = 0;
                 stat2 = 0;
+            } else {
+                stat1 = (s32)fightOutPokemonGetCmpNimblenessWazaDataId(p2);
+                stat2 = (s32)fightOutPokemonGetCmpNimblenessWazaDataId(p3);
             }
 
-            stat1 = wazaGetStatus(0, stat1, 4, 0);
+            stat1 = (s8)wazaGetStatus(0, stat1, 4, 0);
             stat2 = wazaGetStatus(0, stat2, 4, 0);
-            if ((s8)stat1 != 0 || (s8)stat2 != 0) {
-                if (stat1 > stat2) return 1;
-                if (stat1 < stat2) return 0;
+            if (stat1 != 0 || (s8)stat2 != 0) {
+                if (stat1 > (s8)stat2) return 1;
+                if (stat1 < (s8)stat2) return 0;
             }
             if (cmp1 > cmp2) return 1;
             if (cmp1 < cmp2) return 0;
