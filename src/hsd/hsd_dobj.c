@@ -824,6 +824,22 @@ ret_null:
 #endif
 #pragma pop
 
+/* 0x80199A88 | 0x70 */
+#pragma push
+#pragma optimization_level 4
+extern void HSD_FObjInterpretAnim(HSD_FObj* fobj, void* obj,
+                                  HSD_ObjUpdateFunc obj_update, f32 rate);
+void HSD_FObjInterpretAnimAll(void* fobj, void* obj,
+                              HSD_ObjUpdateFunc obj_update, f32 rate)
+{
+    HSD_FObj* f = (HSD_FObj*) fobj;
+    while (f != NULL) {
+        HSD_FObjInterpretAnim(f, obj, obj_update, rate);
+        f = f->next;
+    }
+}
+#pragma pop
+
 /* 0x8019B490 | 0x98 */
 #pragma push
 #pragma optimization_level 4
