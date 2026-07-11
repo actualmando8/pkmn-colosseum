@@ -566,11 +566,7 @@ static u32 StartLayer(u16 layerID, s16 prio, u8 maxVoices, u16 allocId, u8 key, 
         if ((l->panning & 0x80) == 0) {
             p = l->panning - 0x40;
             p += panning;
-            if (p < 0) {
-                p = 0;
-            } else if (p > 0x7f) {
-                p = 0x7f;
-            }
+            p = p < 0 ? 0 : (p > 0x7f ? 0x7f : p);
         } else {
             p = 0x80;
         }
