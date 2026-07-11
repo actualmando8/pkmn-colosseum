@@ -2340,7 +2340,6 @@ u8 fightFloorSetStatus(u32 p1, u16 p2, u32 p3, u16 p4, u32 p5) {
         fightFloorSetFightResultId(p1, (u16)p5);
         break;
     case 0x5e:
-    default:
         msgctrlSetValue(0x2f, p5);
         break;
     }
