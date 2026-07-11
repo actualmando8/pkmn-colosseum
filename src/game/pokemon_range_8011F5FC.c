@@ -1434,24 +1434,6 @@ extern u32 heroMoveGetResID(u32* out_zero, u32* out_val, s32 index);
 u32 fn_80128E24(void) {
     return lbl_8047ADB8;
 }
-/* 0x8011F5FC | 0x38 */
-#ifndef PCPORT
-typedef struct { u32 data[0x4E]; } GfwBuf0x138;
-#endif
-void pokemonBiosCopy(u32* dst, u32* src) {
-#ifdef PCPORT
-    u32 i;
-#endif
-    if (dst == NULL) { return; }
-    if (src == NULL) { return; }
-#ifdef PCPORT
-    for (i = 0; i < 0x4E; i++) {
-        dst[i] = src[i];
-    }
-#else
-    *(GfwBuf0x138*)dst = *(GfwBuf0x138*)src;
-#endif
-}
 /* 0x8011F634 | 0xA4 */
 #if 0
 asm void fn_8011F634(void) {
@@ -1959,6 +1941,24 @@ void pokemonReplace(u32* arg1, u32* arg2) {
     pokemonBiosCopy(tmp, arg1);
     pokemonBiosCopy(arg1, arg2);
     pokemonBiosCopy(arg2, tmp);
+}
+/* 0x8011F5FC | 0x38 */
+#ifndef PCPORT
+typedef struct { u32 data[0x4E]; } GfwBuf0x138;
+#endif
+void pokemonBiosCopy(u32* dst, u32* src) {
+#ifdef PCPORT
+    u32 i;
+#endif
+    if (dst == NULL) { return; }
+    if (src == NULL) { return; }
+#ifdef PCPORT
+    for (i = 0; i < 0x4E; i++) {
+        dst[i] = src[i];
+    }
+#else
+    *(GfwBuf0x138*)dst = *(GfwBuf0x138*)src;
+#endif
 }
 /* 0x80121C18 | 0x428 */
 extern u32 fn_801DE190(u32 idx, u32 base, u32 flag);

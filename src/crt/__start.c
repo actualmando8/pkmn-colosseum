@@ -3,7 +3,7 @@
  * @brief MetroWerks runtime init (.init section), 0x80003100 - 0x80005544.
  *
  * Boundary evidence-verified from asm (sdata clusters, callee families,
- * static linkage, call chains) — mixed-block split pass, 2026-07-01.
+ * static linkage, call chains) - mixed-block split pass, 2026-07-01.
  * __start, __init_registers, __init_hardware and __flush_cache require
  * privileged/cache-management instructions and exact bootstrap register
  * state; they remain asm-only. All other functions below are real C.
@@ -21,6 +21,9 @@ typedef struct __bss_init_info {
     u32 size;   /* section size in bytes */
 } __bss_init_info;
 
+extern void __OSPSInit(void);
+extern void __OSFPRInit(void);
+extern void __OSCacheInit(void);
 extern __rom_copy_info _rom_copy_info[];
 extern __bss_init_info _bss_init_info[];
 
@@ -41,6 +44,39 @@ __declspec(section ".init") void __check_pad3(void) {
 
 /* Debug_BBA - .sbss:0x8047A770 | size: 0x1 scope:local */
 static u8 Debug_BBA;
+
+/* 0x80003400 | .init | size: 0x24 */
+__declspec(section ".init") asm void __init_hardware(void) {
+    nofralloc
+    mfmsr r0
+    ori r0, r0, 0x2000
+    mtmsr r0
+    mflr r31
+    bl __OSPSInit
+    bl __OSFPRInit
+    bl __OSCacheInit
+    mtlr r31
+    blr
+}
+
+/* 0x80003424 | .init | size: 0x34 */
+__declspec(section ".init") asm void __flush_cache(void* addr, u32 size) {
+    nofralloc
+    lis r5, 0xFFFF
+    ori r5, r5, 0xFFF1
+    and r5, r5, r3
+    subf r3, r5, r3
+    add r4, r4, r3
+_flush_loop:
+    dcbst r0, r5
+    sync
+    icbi r0, r5
+    addic r5, r5, 0x8
+    subic. r4, r4, 0x8
+    bge _flush_loop
+    isync
+    blr
+}
 
 /* __set_debug_bba - 0x80003140 | size: 0xC */
 __declspec(section ".init") void __set_debug_bba(void) {

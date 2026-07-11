@@ -570,7 +570,7 @@ extern void fn_801603C0(u8 ctrl, u8 channel, u8 set, u8 value); /* inpSetMidiCtr
                                                                   * args when this is declared
                                                                   * u8, matching retail) */
 extern u32  salInitDspCtrl(u8 a, u8 b, u8 c);
-extern void salExitDspCtrl(void);
+u32 salExitDspCtrl(void);
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
@@ -2434,6 +2434,37 @@ u8* salAiGetDest(void) {
 }
 #endif
 #pragma pop
+extern u32 lbl_8047B010;
+extern u32 lbl_8047B018;
+extern u32 lbl_8047B020;
+extern u16* lbl_8047B01C;
+
+extern unsigned char lbl_8047B05C;
+extern unsigned char lbl_8047B05D;
+
+/* fn_80164400's body is defined AFTER this function so MWCC's single-pass
+ * inliner cannot see it here and each call remains a real `bl` (retail:
+ * 0x8015A870). Preferred over #pragma dont_inline per global standard
+ * global_standard:avoid-pragmas-register-asm. */
+u32 salExitDspCtrl(void) {
+    extern u32 lbl_8047B010;
+    u8 i;
+
+    fn_80164400(lbl_8047B018);
+    for (i = 0; i < lbl_8047B05D; i++) {
+        fn_80164400(*(u32*)(lbl_8047B024 + (u32)i * 0xF4));
+        fn_80164400(*(u32*)(lbl_8047B024 + (u32)i * 0xF4 + 4));
+    }
+    for (i = 0; i < lbl_8047B05C; i++) {
+        fn_80164400(*(u32*)(lbl_80447E60 + (u32)i * 0xBC));
+        fn_80164400(*(u32*)(lbl_80447E60 + (u32)i * 0xBC + 0x28));
+    }
+    fn_80164400(lbl_8047B020);
+    fn_80164400(lbl_8047B024);
+    fn_80164400((u32)lbl_8047B01C);
+    fn_80164400((u32)lbl_8047B010);
+    return 1;
+}
 #pragma push
 #pragma optimization_level 4
 #pragma optimizewithasm off
@@ -2627,7 +2658,6 @@ void fn_80164400(u32 a) {
 #pragma pop
 #pragma push
 #pragma optimization_level 4
-#pragma optimizewithasm off
 #pragma scheduling on
 #if 0
 asm void sndAuxCallbackReverbHI(void) {
@@ -4130,6 +4160,25 @@ u32 adsrHandleLowPrecision(AdsrVars* adsr, u16* adsr_start, u16* adsr_delta) {
     }
 
     return 0;
+}
+#pragma pop
+
+/* ===== synth_vsamples.c: vsInit, 0x80159494 =====
+ * Initializes the virtual-sample table (BSS block at 0x80446F10, size
+ * 0x950 per symbols.txt): clears count, marks 64 vsID slots as free
+ * (0xFF), and zeroes trailing bookkeeping fields. */
+extern u8 lbl_80446F10[0x950]; /* vsSampleInfo BSS block */
+#pragma push
+#pragma optimization_level 4
+void vsInit(void) {
+    u32 i;
+
+    lbl_80446F10[0] = 0;
+    for (i = 0; i < 64; i++) {
+        lbl_80446F10[0x908 + i] = 0xFF;
+    }
+    *(u16*)&lbl_80446F10[0x948] = 0;
+    *(u32*)&lbl_80446F10[0x94C] = 0;
 }
 #pragma pop
 
