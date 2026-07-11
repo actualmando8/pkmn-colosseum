@@ -1053,3 +1053,9 @@ void* HSD_FObjGetAllocData(void) {
 }
 #endif
 #pragma pop
+
+void fn_80199A84(void* list, void* data)
+{
+    (void)list;
+    (void)data;
+}
