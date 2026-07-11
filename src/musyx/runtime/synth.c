@@ -375,9 +375,9 @@ extern void* memset(void* dst, int val, u32 size);
 extern s32 sndSin(u32 angle);
 extern u32 sndGetPitch(u8 key, u32 sInfo);
 extern s32 sndPitchUpOne(u16 note);
-extern u32 inpGetPitchBend(u8* obj);
-extern u32 inpGetModulation(u8* obj);
-extern u32 inpGetDoppler(u8* obj);
+extern u16 inpGetPitchBend(u8* obj);
+extern u16 inpGetModulation(u8* obj);
+extern u16 inpGetDoppler(u8* obj);
 extern u32 inpGetPanning(u8* obj);
 extern u32 inpGetSurroundPanning(u8* obj);
 extern u32 inpGetPreAuxA(u8* obj);
@@ -1033,6 +1033,10 @@ void LowPrecisionHandler(u32 i) {
     u16 portamento;
     u32 lowDeltaTime;
     SYNTH_VOICE* sv;
+    u32 cntDelta;
+    u32 addFactor;
+    u16 adsr_start;
+    u16 adsr_delta;
     s32 vrange;
     s32 voff;
 
@@ -1066,8 +1070,8 @@ void LowPrecisionHandler(u32 i) {
     }
 
     if (sv->sweepNum[0] | sv->sweepNum[1]) {
-        u32 cntDelta = (lowDeltaTime << 8) >> 4;
-        u32 addFactor = (lowDeltaTime << 4) >> 4;
+        cntDelta = (lowDeltaTime << 8) >> 4;
+        addFactor = (lowDeltaTime << 4) >> 4;
         for (j = 0; j < 2; ++j) {
             if (sv->sweepNum[j] == 0) {
                 continue;
@@ -1093,17 +1097,15 @@ void LowPrecisionHandler(u32 i) {
         } else {
             sv->panning[j] = sv->panTarget[j] - (sv->panTime[j] / 256) * sv->panDelta[j];
             sv->panning[j] = (s32)sv->panning[j] < 0 ? 0
-                              : (s32)sv->panning[j] > 0x7f0000 ? 0x7f0000
-                                                                : sv->panning[j];
+                              : sv->panning[j] > 0x7f0000u ? 0x7f0000
+                                                           : sv->panning[j];
         }
         sv->cFlags |= 0x200000000000ULL;
     }
 
-    if ((sv->cFlags & 0x20000000000ULL) != 0) {
-        u16 adsr_start, adsr_delta;
-        if (adsrHandleLowPrecision(&sv->pitchADSR, &adsr_start, &adsr_delta)) {
-            sv->cFlags &= ~0x20000000000ULL;
-        }
+    if ((sv->cFlags & 0x20000000000ULL) != 0 &&
+        adsrHandleLowPrecision(&sv->pitchADSR, &adsr_start, &adsr_delta)) {
+        sv->cFlags &= ~0x20000000000ULL;
     }
 
     ccents = sv->curNote * 65536 + (sv->curDetune * 65536) / 100;

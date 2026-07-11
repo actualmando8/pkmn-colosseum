@@ -2233,4 +2233,3 @@ void macInit(void) {
         synthVoice[i].loop = 0;
     }
 }
-
