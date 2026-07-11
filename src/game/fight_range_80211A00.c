@@ -3011,6 +3011,93 @@ void fn_8021DDB8(void) { lbl_8047B610 = lbl_8047B610 + 1; }
 void fn_8021DDC8(void) { lbl_8047B610 = lbl_8047B610 + 1; }
 void fn_8021DE3C(void) { lbl_8047B610 = lbl_8047B610 + 1; }
 void fn_8021DF70(void) { lbl_8047B610 = lbl_8047B610 + 1; }
+
+/*
+ * fn_8021E288 (0x8021E288)
+ *
+ * FightSeq stat-boost animation dispatcher. Reads the slot byte at PC+1
+ * to resolve the acting side, then (if flag bit 0x80 of lbl_8047B618
+ * is clear) walks six event-flag / stat-slot pairs -- 8/0x2e, 5/0x2f,
+ * 7/0x30, 6/0x31, 3/0x32, 4/0x33 -- and for each set flag, plays the
+ * corresponding stat-up animation on the slot's Pokemon (field 0xee)
+ * via fn_801DDD28 / fn_801DA9E8 and refreshes the status menu. PC
+ * always advances by 2.
+ */
+#pragma optimize_for_size on
+void fn_8021E288(void) {
+    extern u8  fn_801DDD28();
+    extern void fn_801DA9E8();
+    extern void fn_80265598();
+    u32 ctx;
+    u16 menuId;
+    u32 poke;
+
+    fightFloorGetStatus(0, 0, 0x14, 0);
+    ctx = fightTargetGetPtrAsNowFightType(((FightSeqOpU8Operand*)lbl_8047B610)->operand, 0);
+    if ((lbl_8047B618 & 0x80) == 0) {
+        if ((u8)fn_802026E4(ctx, 8) == 1) {
+            menuId = (u16)fightFloorGetStatus(0, 0, 0x14, 0);
+            poke = pokemonGetStatus(ctx, 0, 0xee, 0);
+            if (poke != 0 && fn_801DDD28(poke, 0x2e, 4, 0) != 0) {
+                fn_801DA9E8(poke, 0x2e, 4);
+                fn_80265598(ctx, menuId, 1);
+            }
+        }
+        if ((u8)fn_802026E4(ctx, 5) == 1) {
+            u16 menuId2;
+            u32 poke2;
+            menuId2 = (u16)fightFloorGetStatus(0, 0, 0x14, 0);
+            poke2 = pokemonGetStatus(ctx, 0, 0xee, 0);
+            if (poke2 != 0 && fn_801DDD28(poke2, 0x2f, 4, 0) != 0) {
+                fn_801DA9E8(poke2, 0x2f, 4);
+                fn_80265598(ctx, menuId2, 1);
+            }
+        }
+        if ((u8)fn_802026E4(ctx, 7) == 1) {
+            u16 menuId3;
+            u32 poke3;
+            menuId3 = (u16)fightFloorGetStatus(0, 0, 0x14, 0);
+            poke3 = pokemonGetStatus(ctx, 0, 0xee, 0);
+            if (poke3 != 0 && fn_801DDD28(poke3, 0x30, 4, 0) != 0) {
+                fn_801DA9E8(poke3, 0x30, 4);
+                fn_80265598(ctx, menuId3, 1);
+            }
+        }
+        if ((u8)fn_802026E4(ctx, 6) == 1) {
+            u16 menuId4;
+            u32 poke4;
+            menuId4 = (u16)fightFloorGetStatus(0, 0, 0x14, 0);
+            poke4 = pokemonGetStatus(ctx, 0, 0xee, 0);
+            if (poke4 != 0 && fn_801DDD28(poke4, 0x31, 4, 0) != 0) {
+                fn_801DA9E8(poke4, 0x31, 4);
+                fn_80265598(ctx, menuId4, 1);
+            }
+        }
+        if ((u8)fn_802026E4(ctx, 3) == 1) {
+            u16 menuId5;
+            u32 poke5;
+            menuId5 = (u16)fightFloorGetStatus(0, 0, 0x14, 0);
+            poke5 = pokemonGetStatus(ctx, 0, 0xee, 0);
+            if (poke5 != 0 && fn_801DDD28(poke5, 0x32, 4, 0) != 0) {
+                fn_801DA9E8(poke5, 0x32, 4);
+                fn_80265598(ctx, menuId5, 1);
+            }
+        }
+        if ((u8)fn_802026E4(ctx, 4) == 1) {
+            u16 menuId6;
+            u32 poke6;
+            menuId6 = (u16)fightFloorGetStatus(0, 0, 0x14, 0);
+            poke6 = pokemonGetStatus(ctx, 0, 0xee, 0);
+            if (poke6 != 0 && fn_801DDD28(poke6, 0x33, 4, 0) != 0) {
+                fn_801DA9E8(poke6, 0x33, 4);
+                fn_80265598(ctx, menuId6, 1);
+            }
+        }
+    }
+    lbl_8047B610 = lbl_8047B610 + 2;
+}
+#pragma optimize_for_size reset
+
 void fn_8021E6CC(void) { lbl_8047B610 = lbl_8047B610 + 2; }
 void fn_8021E6DC(void) { lbl_8047B610 = lbl_8047B610 + 2; }
 void fn_8021E6EC(void) { lbl_8047B610 = lbl_8047B610 + 2; }

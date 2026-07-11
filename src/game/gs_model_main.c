@@ -1843,3 +1843,230 @@ u32 GSmodelIsRootNullAdded(GSmodel* model)
 {
     return (model->flags.raw & GSMODEL_FLAG_ROOT_NULL_ADDED) != 0;
 }
+
+void GSmodelRemoveNull(GSmodel* model)
+{
+    HSDJObj* child;
+    HSDJObj* root;
+    HSDJObj* newRoot;
+    GSvec position;
+    GSvec scale;
+    f32 rotX;
+    f32 rotY;
+    f32 rotZ;
+
+    if (!(model->flags.raw & GSMODEL_FLAG_ROOT_NULL_ADDED)) {
+        return;
+    }
+
+    root = model->renderJObj;
+    child = (root == NULL) ? NULL : root->child;
+
+    if (root == NULL) {
+        __assert(lbl_8047CB9C, 0x3E4, lbl_8047CBA4);
+    }
+
+    if (&position == NULL) {
+        __assert(lbl_8047CB9C, 0x3E5, lbl_80270E60);
+    }
+    position = root->translate;
+
+    if (root == NULL) {
+        __assert(lbl_8047CB9C, 0x2EC, lbl_8047CBA4);
+    }
+    rotX = root->rotation.x;
+
+    if (root == NULL) {
+        __assert(lbl_8047CB9C, 0x2FA, lbl_8047CBA4);
+    }
+    rotY = root->rotation.y;
+
+    if (root == NULL) {
+        __assert(lbl_8047CB9C, 0x308, lbl_8047CBA4);
+    }
+    rotZ = root->rotation.z;
+
+    if (root == NULL) {
+        __assert(lbl_8047CB9C, 0x351, lbl_8047CBA4);
+    }
+    if (&scale == NULL) {
+        __assert(lbl_8047CB9C, 0x352, lbl_8047CBAC);
+    }
+    scale = root->scale;
+
+    if (child == NULL) {
+        __assert(lbl_8047CB9C, 0x3A9, lbl_8047CBA4);
+    }
+    if (&position == NULL) {
+        __assert(lbl_8047CB9C, 0x3AA, lbl_80270E60);
+    }
+    child->translate = position;
+    if (!(child->flags & JOBJ_MTX_INDEP_SRT)) {
+        if (child != NULL) {
+            s32 dirty;
+            u32 flags;
+
+            if (child == NULL) {
+                __assert(lbl_8047CB9C, 0x25D, lbl_8047CBA4);
+            }
+
+            flags = child->flags;
+            dirty = 0;
+            if (!(flags & JOBJ_USER_DEF_MTX)) {
+                if (flags & JOBJ_MTX_DIRTY) {
+                    dirty = 1;
+                }
+            }
+
+            if (dirty == 0) {
+                fn_8019D620(child);
+            }
+        }
+    }
+
+    if (child == NULL) {
+        __assert(lbl_8047CB9C, 0x2A4, lbl_8047CBA4);
+    }
+    if (child->flags & JOBJ_USE_QUATERNION) {
+        __assert(lbl_8047CB9C, 0x2A5, lbl_80270E6C);
+    }
+    child->rotation.x = rotX;
+    if (!(child->flags & JOBJ_MTX_INDEP_SRT)) {
+        if (child != NULL) {
+            s32 dirty;
+            u32 flags;
+
+            if (child == NULL) {
+                __assert(lbl_8047CB9C, 0x25D, lbl_8047CBA4);
+            }
+
+            flags = child->flags;
+            dirty = 0;
+            if (!(flags & JOBJ_USER_DEF_MTX)) {
+                if (flags & JOBJ_MTX_DIRTY) {
+                    dirty = 1;
+                }
+            }
+
+            if (dirty == 0) {
+                fn_8019D620(child);
+            }
+        }
+    }
+
+    if (child == NULL) {
+        __assert(lbl_8047CB9C, 0x2B8, lbl_8047CBA4);
+    }
+    if (child->flags & JOBJ_USE_QUATERNION) {
+        __assert(lbl_8047CB9C, 0x2B9, lbl_80270E6C);
+    }
+    child->rotation.y = rotY;
+    if (!(child->flags & JOBJ_MTX_INDEP_SRT)) {
+        if (child != NULL) {
+            s32 dirty;
+            u32 flags;
+
+            if (child == NULL) {
+                __assert(lbl_8047CB9C, 0x25D, lbl_8047CBA4);
+            }
+
+            flags = child->flags;
+            dirty = 0;
+            if (!(flags & JOBJ_USER_DEF_MTX)) {
+                if (flags & JOBJ_MTX_DIRTY) {
+                    dirty = 1;
+                }
+            }
+
+            if (dirty == 0) {
+                fn_8019D620(child);
+            }
+        }
+    }
+
+    if (child == NULL) {
+        __assert(lbl_8047CB9C, 0x2CC, lbl_8047CBA4);
+    }
+    if (child->flags & JOBJ_USE_QUATERNION) {
+        __assert(lbl_8047CB9C, 0x2CD, lbl_80270E6C);
+    }
+    child->rotation.z = rotZ;
+    if (!(child->flags & JOBJ_MTX_INDEP_SRT)) {
+        if (child != NULL) {
+            s32 dirty;
+            u32 flags;
+
+            if (child == NULL) {
+                __assert(lbl_8047CB9C, 0x25D, lbl_8047CBA4);
+            }
+
+            flags = child->flags;
+            dirty = 0;
+            if (!(flags & JOBJ_USER_DEF_MTX)) {
+                if (flags & JOBJ_MTX_DIRTY) {
+                    dirty = 1;
+                }
+            }
+
+            if (dirty == 0) {
+                fn_8019D620(child);
+            }
+        }
+    }
+
+    if (child == NULL) {
+        __assert(lbl_8047CB9C, 0x316, lbl_8047CBA4);
+    }
+    if (&scale == NULL) {
+        __assert(lbl_8047CB9C, 0x317, lbl_8047CBAC);
+    }
+    child->scale = scale;
+    if (!(child->flags & JOBJ_MTX_INDEP_SRT)) {
+        if (child != NULL) {
+            s32 dirty;
+            u32 flags;
+
+            if (child == NULL) {
+                __assert(lbl_8047CB9C, 0x25D, lbl_8047CBA4);
+            }
+
+            flags = child->flags;
+            dirty = 0;
+            if (!(flags & JOBJ_USER_DEF_MTX)) {
+                if (flags & JOBJ_MTX_DIRTY) {
+                    dirty = 1;
+                }
+            }
+
+            if (dirty == 0) {
+                fn_8019D620(child);
+            }
+        }
+    }
+
+    newRoot = fn_801A02B0(root);
+
+    if (child != NULL) {
+        s32 dirty;
+        u32 flags;
+
+        if (child == NULL) {
+            __assert(lbl_8047CB9C, 0x25D, lbl_8047CBA4);
+        }
+
+        flags = child->flags;
+        dirty = 0;
+        if (!(flags & JOBJ_USER_DEF_MTX)) {
+            if (flags & JOBJ_MTX_DIRTY) {
+                dirty = 1;
+            }
+        }
+
+        if (dirty != 0) {
+            fn_8019D9DC(child);
+        }
+    }
+
+    model->flags.raw &= ~GSMODEL_FLAG_ROOT_NULL_ADDED;
+    model->renderJObj = newRoot;
+}
