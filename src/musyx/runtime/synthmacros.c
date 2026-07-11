@@ -294,7 +294,7 @@ extern u32 macStart(u16 macid, u8 priority, u8 maxVoices, u16 allocId, u8 key, u
                         u8 midi, u8 midiSet, u8 section, u16 step, u16 trackid, u8 new_vid,
                         u8 vGroup, u8 studio, u32 itd); /* macStart, defined later in this file */
 extern u16 fn_8014D740(u8 midiSet, u8 midi);              /* seqGetMIDIPriority */
-extern u32 fn_80157A64(u8 priority, u8 maxVoices, u16 allocId, u32 isFX); /* voiceAllocate */
+extern u32 fn_80157A64(u8 priority, u8 maxVoices, u16 allocId, u8 isFX); /* voiceAllocate */
 extern void inpResetMidiCtrl(u8 voice, u32 arg2, u32 arg3);
 extern void fn_80160ED4(u8 voice, u32 val); /* inpResetChannelDefaults */
 extern u32 fn_801576C4(SYNTH_VOICE* svoice, u8 new_vid); /* vidMakeNew */
@@ -797,8 +797,10 @@ void macSetPedalState(SYNTH_VOICE* svoice, u32 state) {
     }
 }
 
-static SYNTH_VOICE* macActiveMacroRoot;
-static SYNTH_VOICE* macTimeQueueRoot;
+extern SYNTH_VOICE* lbl_8047AFC4;
+extern SYNTH_VOICE* lbl_8047AFC0;
+#define macActiveMacroRoot lbl_8047AFC4
+#define macTimeQueueRoot lbl_8047AFC0
 
 /* ===================================================================
  * Macro-command interpreter leaves. Ported in the order confirmed by
