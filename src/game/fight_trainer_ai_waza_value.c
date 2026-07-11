@@ -221,8 +221,16 @@ int fightTrainerAiWazaValueKuroikiri(void* ctx, u32 param1, u32 param2, u32 para
             bufD[4] = fn_80235910(ctx, elem);
             bufD[5] = fn_802358AC(ctx, elem);
             bufD[6] = fn_802357CC(ctx, elem);
-            for (j = 0; j < 7; j++) {
-                if ((s32)(u8)bufD[j] >= 0 && (s32)(u8)bufD[j] <= 2) { matched = 1; goto M3; }
+            {
+                /* Preserve MWCC's unsigned lower-bound comparison. */
+                u32 min_status = param3 - param3;
+                u32 max_status = min_status + 2;
+                for (j = 0; j < 7; j++) {
+                    if ((u32)bufD[j] >= min_status && (u32)bufD[j] <= max_status) {
+                        matched = 1;
+                        goto M3;
+                    }
+                }
             }
             matched = 0;
         M3:
@@ -293,15 +301,16 @@ int fightTrainerAiWazaValueKuroikiri(void* ctx, u32 param1, u32 param2, u32 para
     {
         u8 found;
         u8 matched;
-        for (i = 0; i < count1; i++) {
-            elem = array1[i];
-            bufG[0] = fn_80235AA0(ctx, elem);
-            bufG[1] = fn_80235A3C(ctx, elem);
-            bufG[2] = fn_802359D8(ctx, elem);
-            bufG[3] = fn_80235974(ctx, elem);
-            bufG[4] = fn_80235910(ctx, elem);
-            bufG[5] = fn_802358AC(ctx, elem);
-            bufG[6] = fn_802357CC(ctx, elem);
+        u32 block_elem;
+        for (elem = 0; (u16)elem < count1; elem++) {
+            block_elem = array1[(u16)elem];
+            bufG[0] = fn_80235AA0(ctx, block_elem);
+            bufG[1] = fn_80235A3C(ctx, block_elem);
+            bufG[2] = fn_802359D8(ctx, block_elem);
+            bufG[3] = fn_80235974(ctx, block_elem);
+            bufG[4] = fn_80235910(ctx, block_elem);
+            bufG[5] = fn_802358AC(ctx, block_elem);
+            bufG[6] = fn_802357CC(ctx, block_elem);
             for (j = 0; j < 7; j++) {
                 if (bufG[j] >= 10 && bufG[j] <= 12) { matched = 1; goto M6; }
             }
@@ -320,17 +329,27 @@ int fightTrainerAiWazaValueKuroikiri(void* ctx, u32 param1, u32 param2, u32 para
     {
         u8 found;
         u8 matched;
-        for (i = 0; i < count2; i++) {
-            elem = array2[i];
-            bufH[0] = fn_80235AA0(ctx, elem);
-            bufH[1] = fn_80235A3C(ctx, elem);
-            bufH[2] = fn_802359D8(ctx, elem);
-            bufH[3] = fn_80235974(ctx, elem);
-            bufH[4] = fn_80235910(ctx, elem);
-            bufH[5] = fn_802358AC(ctx, elem);
-            bufH[6] = fn_802357CC(ctx, elem);
-            for (j = 0; j < 7; j++) {
-                if ((s32)(u8)bufH[j] >= 0 && (s32)(u8)bufH[j] <= 2) { matched = 1; goto M7; }
+        u32 block_elem;
+        u16 block_i;
+        for (block_i = 0; block_i < count2; block_i++) {
+            block_elem = array2[block_i];
+            bufH[0] = fn_80235AA0(ctx, block_elem);
+            bufH[1] = fn_80235A3C(ctx, block_elem);
+            bufH[2] = fn_802359D8(ctx, block_elem);
+            bufH[3] = fn_80235974(ctx, block_elem);
+            bufH[4] = fn_80235910(ctx, block_elem);
+            bufH[5] = fn_802358AC(ctx, block_elem);
+            bufH[6] = fn_802357CC(ctx, block_elem);
+            {
+                /* Preserve MWCC's unsigned lower-bound comparison. */
+                u32 min_status = param3 - param3;
+                u32 max_status = min_status + 2;
+                for (j = 0; j < 7; j++) {
+                    if ((u32)bufH[j] >= min_status && (u32)bufH[j] <= max_status) {
+                        matched = 1;
+                        goto M7;
+                    }
+                }
             }
             matched = 0;
         M7:
