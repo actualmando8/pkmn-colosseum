@@ -202,17 +202,23 @@ u32 dbgMenuGSmemCheck(void) {
 
 /* 0x5C | dbgMenuGSmemCheck -- fn_800E0E14(1,0) check then print */
 /* 0x801332D8 | 0x28 -- fn_800D3074(2), return 0 */
+#pragma optimization_level 4
+#pragma scheduling on
 u32 dbgMenuFrameRate20(void) {
     fn_800D3074(2);
     return 0;
 }
+#pragma scheduling off
 
 
 /* 0x80133300 | 0x28 -- fn_800D3074(1), return 0 */
+#pragma optimization_level 4
+#pragma scheduling on
 u32 dbgMenuFrameRate30(void) {
     fn_800D3074(1);
     return 0;
 }
+#pragma scheduling off
 
 
 /* 0x80133328 | 36 bytes | call_return_const2 */
