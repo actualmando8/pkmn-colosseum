@@ -630,6 +630,11 @@ f64 sqrt(f64 x) {
     return __ieee754_sqrt(x);
 }
 
+/*
+ * Payne-Hanek argument reduction from fdlibm.  x[] contains 24-bit chunks
+ * of the input and ipio2[] contains the 24-bit expansion of 2/pi.
+ */
+#pragma use_lmw_stmw on
 s32 __kernel_rem_pio2(f64* x, f64* y, s32 e0, s32 nx, s32 prec,
                       const s32* ipio2)
 {
@@ -851,3 +856,4 @@ recompute:
 #undef K_HALF
 #undef K_ONE
 }
+#pragma use_lmw_stmw off
