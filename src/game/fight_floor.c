@@ -2347,17 +2347,14 @@ u8 fightFloorSetStatus(u32 p1, u16 p2, u32 p3, u16 p4, u32 p5) {
 }
 
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 #if 0
 asm void fightFloorGetStatus(void) {
 #include "src/game/pokemon_fn_801F54A4.inc"
 }
 #else
-/* Real C at 98.8% (instruction-equivalent): residuals are a pkm/a16
- * r30/r31 coloring swap, the case-0xA/0xB in-place arg mask shape, and
- * the dtk-named jumptable symbol. See tools/decomp_work/scratch/pokemon_boss.c
- * history; flip #if only at verified 100%. */
+/* Real C at 99.3% (instruction-equivalent): residuals are the hoisted
+ * a16 mask, case-0xA/0xB arg-mask coloring, final-loop temporaries, and
+ * the dtk-named jumptable symbol. Flip #if only at verified 100%. */
 /* 0x801F54A4 | size: 0xD18 | PokemonGet: field dispatcher */
 s32 fightFloorGetStatus(u8* pkm, u32 slot, u32 field, u32 arg) {
     extern struct Pokemon* fightFloorDataBiosGetPtr(u32);
@@ -2441,9 +2438,11 @@ s32 fightFloorGetStatus(u8* pkm, u32 slot, u32 field, u32 arg) {
     extern u32 fightKindDataBiosGetDarkpokemonHypermodeFlag(u32);
     extern u32 fightKindDataBiosGetPokemonStatusMenuSubbarFlag(u32);
     extern u32 fightKindDataBiosGetHostEnemyMsgFlag(u32);
+    u16 a16;
     u16 f;
 
     f = (u16)field;
+    a16 = arg;
     if (f >= 0x60) {
         return 0;
     }
@@ -2708,12 +2707,11 @@ s32 fightFloorGetStatus(u8* pkm, u32 slot, u32 field, u32 arg) {
     case 0x5C:
         return (u16)fn_801EF634();
     case 0x5D: {
-        u32 a16, n, c18, c16, k, i, j, m;
+        u32 c16, n, c18, k, i, j, m;
         fightFloorGetStatus(pkm, 0, 0x14, 0);
+        n = 0;
         c16 = (u16)fightFloorGetStatus(pkm, 0, 0x16, 0);
         c18 = (u16)fightFloorGetStatus(pkm, 0, 0x18, 0);
-        n = 0;
-        a16 = (u16)arg;
         for (i = 0; (u16)i < c18; i++) {
             for (j = 0; (u16)j < c16; j++) {
                 for (k = 0; (u16)k < 2; k++) {
