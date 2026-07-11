@@ -1413,14 +1413,16 @@ void mcmdPlayMacro(SYNTH_VOICE* svoice, MSTEP* cstep) {
 
 extern void* memset(void* dst, int val, u32 size);
 extern void fn_80161A9C(void* svoice); /* inpInit */
-extern u32 inpGetMidiLastNote(u32 midi, u32 midiSet);
+extern u8 inpGetMidiLastNote(u8 midi, u8 midiSet);
 extern void voiceSetLastStarted(SYNTH_VOICE* svoice);
-extern u8* fn_80160EA0(u32 midi, u32 midiSet); /* inpGetChannelDefaults; only pbRange (offset 0) used here */
+extern u8* fn_80160EA0(u8 midi, u8 midiSet); /* inpGetChannelDefaults; only pbRange (offset 0) used here */
 extern u32 inpGetModulation(SYNTH_VOICE* sv);
 extern void fn_801629A4(u32 index, u8 value);
 extern void fn_801629D0(u32 index, u8 value);
 extern u32 hwFrq2Pitch(u32 value);
+extern MSTEP lbl_8047AFB0;
 extern u8 lbl_8047AFC8; /* DebugMacroSteps: static local counter inside macHandleActive */
+extern const f32 lbl_8047D3EC;
 #define DebugMacroSteps lbl_8047AFC8
 
 
@@ -1437,6 +1439,21 @@ static u32 mcmdGoto(SYNTH_VOICE* svoice, MSTEP* cstep) {
     return mcmdEndOfMacro(svoice);
 }
 
+static void mcmdTrapEvent(SYNTH_VOICE* svoice, MSTEP* cstep) {
+    MSTEP* addr;
+    u8 t;
+
+    if ((addr = (MSTEP*)dataGetMacro(cstep->para[0] >> 16)) != NULL) {
+        t = (u8)(cstep->para[0] >> 8);
+        svoice->trapEventAddr[t] = addr;
+        svoice->trapEventCurAddr[t] = addr + (u16)cstep->para[1];
+        svoice->trapEventAny = 1;
+        if (t == 0 && (svoice->cFlags & 0x10000000008ULL) == 0x10000000008ULL) {
+            svoice->cFlags |= 0x40000000000ULL;
+        }
+    }
+}
+
 static void mcmdUntrapEvent(SYNTH_VOICE* svoice, MSTEP* cstep) {
     u8 i;
 
@@ -1450,13 +1467,16 @@ static void mcmdUntrapEvent(SYNTH_VOICE* svoice, MSTEP* cstep) {
 }
 
 static void mcmdSetPianoPanning(SYNTH_VOICE* svoice, MSTEP* cstep) {
-    s32 pan;
+    s32 delta;
+    s32 scale;
 
-    pan = ((((svoice->curNote - (u8)(cstep->para[0] >> 16)) << 16) * (s8)(u8)(cstep->para[0] >> 8)) >> 7) +
-          ((cstep->para[0] >> 24) << 16);
-    pan = pan < 0 ? 0 : pan > 0x7f0000 ? 0x7f0000 : pan;
-    svoice->panTarget[0] = pan;
-    svoice->panning[0] = pan;
+    delta = (svoice->curNote << 16) - ((u8)(cstep->para[0] >> 16) << 16);
+    scale = (s8)(u8)(cstep->para[0] >> 8);
+    delta = (delta * scale) >> 7;
+    delta += (u8)(cstep->para[0] >> 24) << 16;
+    delta = delta < 0 ? 0 : delta > 0x7f0000 ? 0x7f0000 : delta;
+    svoice->panTarget[0] = delta;
+    svoice->panning[0] = delta;
 }
 
 static u32 mcmdLastKey(SYNTH_VOICE* svoice, MSTEP* cstep) {
@@ -1555,7 +1575,7 @@ static void mcmdAddPriority(SYNTH_VOICE* svoice, MSTEP* cstep) {
 static void mcmdSetAgeCounterByVolume(SYNTH_VOICE* svoice, MSTEP* cstep) {
     u32 age;
 
-    age = (cstep->para[0] >> 16) + (((u16)cstep->para[1] * (u8)(svoice->volume >> 16)) >> 7);
+    age = (((u8)(svoice->volume >> 16) * (u16)cstep->para[1]) >> 7) + (u16)(cstep->para[0] >> 16);
     svoice->age = age > 0xEA60 ? 0x75300000 : age << 15;
     fn_80162494(svoice->id & 0xFF, ((u32)svoice->prio << 24) | (svoice->age >> 15));
 }
@@ -1576,12 +1596,14 @@ static void mcmdSetupLFO(SYNTH_VOICE* svoice, MSTEP* cstep) {
     svoice->lfo[index].period = time;
 }
 
+#define cstep lbl_8047AFB0
 void macHandleActive(SYNTH_VOICE* svoice) { /* macHandleActive */
     u8 i;
-    u32 lastNote;
+    u32 vi;
+    u32 voiceid;
+    u8 lastNote;
     u32 ex;
     u8* channelDefaults;
-    static MSTEP cstep; /* lbl_8047AFB0 */
 
     if (svoice->cFlags & 3) {
         if (svoice->cFlags & 1) {
@@ -1603,8 +1625,7 @@ void macHandleActive(SYNTH_VOICE* svoice) { /* macHandleActive */
         svoice->vibModAddScale = 0;
         svoice->treScale = 0;
         fn_80161A9C(svoice);
-        lastNote = inpGetMidiLastNote(svoice->midi, svoice->midiSet);
-        if ((u8)lastNote != 0xFF) {
+        if ((lastNote = inpGetMidiLastNote(svoice->midi, svoice->midiSet)) != 0xFF) {
             svoice->lastNote = lastNote;
         } else {
             svoice->lastNote = svoice->orgNote;
@@ -1717,9 +1738,6 @@ void macHandleActive(SYNTH_VOICE* svoice) { /* macHandleActive */
             break;
         case 0x09: {
             /* mcmdSendKeyOff, hand-inlined (contains a loop; -inline auto refuses) */
-            u32 voiceid;
-            u32 vi;
-
             voiceid = (svoice->orgNote + (u8)(cstep.para[0] >> 8)) << 8;
             voiceid |= ((u16)(cstep.para[0] >> 16)) << 16;
             for (vi = 0; vi < synthInfo.voiceNum; ++vi) {
@@ -1841,7 +1859,7 @@ void macHandleActive(SYNTH_VOICE* svoice) { /* macHandleActive */
         case 0x23:
             svoice->treScale = (u16)(cstep.para[0] >> 8);
             svoice->treModAddScale = (u16)cstep.para[1];
-            svoice->treCurScale = 1.f;
+            svoice->treCurScale = lbl_8047D3EC;
             break;
         case 0x24:
             mcmdReturn(svoice);
@@ -1849,24 +1867,9 @@ void macHandleActive(SYNTH_VOICE* svoice) { /* macHandleActive */
         case 0x25:
             ex = mcmdGosub(svoice, &cstep);
             break;
-        case 0x28: {
-            MSTEP* m = (MSTEP*)dataGetMacro((u16)(cstep.para[0] >> 16));
-            u8 idx;
-            if (m == NULL) {
-                break;
-            }
-            idx = (u8)(cstep.para[0] >> 8);
-            svoice->trapEventAddr[idx] = m;
-            svoice->trapEventCurAddr[idx] = m + (u16)cstep.para[1];
-            svoice->trapEventAny = 1;
-            if (idx != 0) {
-                break;
-            }
-            if ((svoice->cFlags & 0x10000000008ULL) == 0x10000000008ULL) {
-                svoice->cFlags |= 0x40000000000ULL;
-            }
+        case 0x28:
+            mcmdTrapEvent(svoice, &cstep);
             break;
-        }
         case 0x29:
             mcmdUntrapEvent(svoice, &cstep);
             break;
@@ -2014,6 +2017,7 @@ void macHandleActive(SYNTH_VOICE* svoice) { /* macHandleActive */
     } while (!ex);
 }
 
+#undef cstep
 #undef DebugMacroSteps
 
 
