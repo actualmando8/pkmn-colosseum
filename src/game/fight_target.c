@@ -119,14 +119,14 @@ u32 fightTargetGetPtr(u32 slotType, u32 ptr, u32 count) {
     u32 pkmAbil[8];
     u32 ctx;
     u32 ctxObj;
-    u32 savedPtr;
-    u32 numSides;
+    u8 numSides;
     u32 i;
     u32 j;
     u32 k;
     u32 m;
     u32 n;
-    u32 flag;
+    u32 savedPtr;
+    u8 flag;
 
     if ((u16)slotType == 0) {
         return 0;
@@ -156,8 +156,8 @@ u32 fightTargetGetPtr(u32 slotType, u32 ptr, u32 count) {
     if (ctxObj == 0) {
         return 0;
     }
-    savedPtr = ptr;
     if (ptr != 0) {
+        savedPtr = ptr;
         ptr = _fightTargetGetTargetPtrToFightSidePtr__FPvUs(ptr, count);
         if (ptr == 0) {
             return 0;
@@ -186,7 +186,7 @@ u32 fightTargetGetPtr(u32 slotType, u32 ptr, u32 count) {
         }
         count = 0;
         j = 0;
-        while ((u16)j < (u16)numSides) {
+        while ((s32)(u16)j < (s32)numSides) {
             sidePkm[(u16)n] = fightSideGetStatus(slots[(u16)i], 0, 7, j);
             if ((u16)slotType == 0xb && (u16)i == 0 && (u16)j == 0) {
                 return sidePkm[(u16)n];
@@ -201,7 +201,7 @@ u32 fightTargetGetPtr(u32 slotType, u32 ptr, u32 count) {
                 if ((u16)slotType == 0xa && (u16)j == 1) return sidePkm[(u16)n];
             }
             k = 0;
-            while ((u16)k < (u16)ctxObj) {
+            while ((s32)(u16)k < (s32)ctxObj) {
                 pkmAbil[(u16)m] = fightTrainerGetStatus(sidePkm[(u16)n], 0, 0x46, k);
                 if (flag == 1) {
                     if ((u16)slotType == 0xc && (u16)count == 0) return pkmAbil[(u16)m];
