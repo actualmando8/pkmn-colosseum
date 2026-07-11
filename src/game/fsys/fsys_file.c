@@ -710,6 +710,56 @@ extern FSYSManager lbl_80453FEC;
 void fn_8017B1AC(void) {
     fn_80167E34();
 }
+
+/* 0x8017B1CC | 0x100
+ * Release a reference on the loaded archive for `fileHandle`. When the
+ * refcount drops to zero, free the backing allocation via the handle-pool
+ * helpers and clear the slot's identifying fields.
+ */
+#pragma push
+#pragma optimization_level 0
+void fn_8017B1CC(u32 fileHandle) {
+    FSYSSlot* slot;
+    FSYSSlot* hit;
+    FSYSSlot* found;
+    u32 i;
+    u16 handle;
+
+    hit = NULL;
+    slot = (FSYSSlot*)lbl_8047B1B4;
+    for (i = 0; i < lbl_80453FEC.maxSlots; i++) {
+        if ((s32)slot->status != FSYS_STATUS_FREE && slot->fileHandle == fileHandle) {
+            hit = slot;
+            break;
+        }
+        slot++;
+    }
+    found = hit;
+    if (!found) {
+        return;
+    }
+    if ((s32)found->status != FSYS_STATUS_LOADED) {
+        return;
+    }
+    if (!found->archiveData) {
+        return;
+    }
+    if ((s32)--found->refCount > 0) {
+        return;
+    }
+    handle = fn_800E202C(found->archiveData);
+    if (handle != 0) {
+        fn_800E24B0(handle);
+        fn_800E209C(handle);
+    }
+    found->archiveData = NULL;
+    found->status     = 0;
+    found->padding05C = 0;
+    found->fileHandle = 0;
+    found->reloadFlag = 0;
+    found->loadMode   = 0;
+}
+#pragma pop
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off

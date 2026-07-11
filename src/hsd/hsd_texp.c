@@ -1291,6 +1291,7 @@ void fn_801BB4C4(void) {
 }
 
 /* 0x801B1854 | 0x30 */
+extern void HSD_ObjAllocInit(void* list, u32 size, u32 alignment);
 void fn_801B1854(void) {
     HSD_ObjAllocInit(lbl_804656E0, 0x28, 4);
 }
@@ -1336,6 +1337,36 @@ void fn_801B3770(void) {
     fn_800BC8C8((u32)(u8)lbl_8047B370);
     lbl_8047B370 = 0;
 }
+
+/* 0x801B37A0 | 0xDC */
+extern u32 lbl_8047DE60;
+extern u32 lbl_8047DE68;
+#pragma push
+#pragma optimization_level 1
+s32 HSD_StateAssignTev(void) {
+    switch (lbl_8047B370++) {
+    case 0:  return 0;
+    case 1:  return 1;
+    case 2:  return 2;
+    case 3:  return 3;
+    case 4:  return 4;
+    case 5:  return 5;
+    case 6:  return 6;
+    case 7:  return 7;
+    case 8:  return 8;
+    case 9:  return 9;
+    case 10: return 10;
+    case 11: return 11;
+    case 12: return 12;
+    case 13: return 13;
+    case 14: return 14;
+    case 15: return 15;
+    default:
+        __assert((const char*)&lbl_8047DE60, 0x326, (const char*)&lbl_8047DE68);
+        return 15;
+    }
+}
+#pragma pop
 
 /* 0x801B3884 | 0xC */
 void fn_801B3884(void) {
