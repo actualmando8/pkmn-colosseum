@@ -2434,6 +2434,7 @@ u8* salAiGetDest(void) {
 }
 #endif
 #pragma pop
+extern u32 lbl_8047B010;
 extern u32 lbl_8047B018;
 extern u32 lbl_8047B020;
 extern u16* lbl_8047B01C;
@@ -4159,6 +4160,25 @@ u32 adsrHandleLowPrecision(AdsrVars* adsr, u16* adsr_start, u16* adsr_delta) {
     }
 
     return 0;
+}
+#pragma pop
+
+/* ===== synth_vsamples.c: vsInit, 0x80159494 =====
+ * Initializes the virtual-sample table (BSS block at 0x80446F10, size
+ * 0x950 per symbols.txt): clears count, marks 64 vsID slots as free
+ * (0xFF), and zeroes trailing bookkeeping fields. */
+extern u8 lbl_80446F10[0x950]; /* vsSampleInfo BSS block */
+#pragma push
+#pragma optimization_level 4
+void vsInit(void) {
+    u32 i;
+
+    lbl_80446F10[0] = 0;
+    for (i = 0; i < 64; i++) {
+        lbl_80446F10[0x908 + i] = 0xFF;
+    }
+    *(u16*)&lbl_80446F10[0x948] = 0;
+    *(u32*)&lbl_80446F10[0x94C] = 0;
 }
 #pragma pop
 

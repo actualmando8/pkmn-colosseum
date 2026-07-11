@@ -3005,28 +3005,45 @@ asm u16 distortionEffectStart(void) {
 #include "src/game/effect/effect_visual_distortionEffectStart.inc"
 }
 #else
+typedef struct DistortionState {
+    void* unk_00;
+    void* texture;   /* 0x04 */
+    void* model;     /* 0x08 */
+    u32   partIdx;   /* 0x0C */
+    f32   unk_10;    /* 0x10 */
+    u8    pad_14[0x18];
+    f32   pos[3];    /* 0x2C */
+    u8    pad_38[0x78];
+    u16   frame;     /* 0xB0 */
+} DistortionState;
+
 u16 distortionEffectStart(void* ptr) {
-    u8* p;
+    DistortionState* s = ptr;
     void* part;
+    f32 tmp;
 
-    if (ptr == NULL) {
-        GSlogWrite((const char*)lbl_80272FE0);
-        return 0;
-    }
+    if (s != NULL) {
+        if (s->texture == NULL || lbl_8047AEE8 == 0) {
+            return 0;
+        }
+        if (s->model == NULL) {
+            return 0;
+        }
 
-    p = ptr;
-    if (*(void**)(p + 0x4) == NULL || lbl_8047AEE8 == 0 || *(void**)(p + 0x8) == NULL) {
-        return 0;
+        part = GSmodelGetPart(s->model, s->partIdx);
+        if (part != NULL) {
+            GSpartGetTransform(part, s->pos, NULL, NULL);
+            GSpartFree(part);
+        } else {
+            GSmodelGetPosition(s->model, s->pos);
+        }
+        s->frame = 0;
+        tmp = *(f32*)&lbl_8047D300;
+        s->unk_10 = tmp;
+        return 1;
     }
-
-    part = GSmodelGetPart(*(void**)(p + 0x8), *(u32*)(p + 0xC));
-    if (part != NULL) {
-        GSpartGetTransform(part, p + 0x2C, NULL, NULL);
-        GSpartFree(part);
-    } else {
-        GSmodelGetPosition(*(void**)(p + 0x8), p + 0x2C);
-    }
-    return 1;
+    GSlogWrite((const char*)lbl_80272FE0);
+    return 0;
 }
 #endif
 extern u8 GSmodelGetVisibility(void* obj);
