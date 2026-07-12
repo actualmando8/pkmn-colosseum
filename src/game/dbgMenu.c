@@ -142,6 +142,8 @@ asm void fn_801330C8(void) {
 #include "src/game/effect/effect_util_fn_801330C8.inc"
 }
 #else
+#pragma push
+#pragma scheduling on
 u32 fn_801330C8(void) {
     fn_800D88DC(1);
     fn_800D888C(6);
@@ -164,6 +166,7 @@ u32 fn_801330C8(void) {
     fn_800D6728();
     return 0;
 }
+#pragma pop
 #endif
 
 
