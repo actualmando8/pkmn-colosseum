@@ -401,7 +401,13 @@ typedef struct DbgMenuWindow {
     u32 field_00;
     u32 key;
     u8 pad_08[0x8C];
-    u16 cursorPosition;
+    union {
+        u16 cursorPosition;
+        struct {
+            s8 page;
+            s8 row;
+        } cursor;
+    };
 } DbgMenuWindow;
 
 #pragma push
@@ -514,12 +520,58 @@ void dbgMenuMain(u8 flag) {
 #endif
 
 
+static inline s32 dbgMenuGetMenuNumber(s32 key) {
+    return _dbgMenuGetMenuNo__Fl(key);
+}
+
+static inline s32 dbgMenuOpenWindow(s32 sceneId, s32 key, s32* savedSelection) {
+    return menuOpenCustom(sceneId, key, savedSelection, 0, 1, 0);
+}
+
+static inline s32 dbgMenuInvokeCallback(
+    EffectUtilEntryCallback callback, s32 valueIndex, DbgMenuWindow* window) {
+    return callback(valueIndex, window->cursor.page + window->cursor.row);
+}
+
+static inline s32 dbgMenuGetCursorPage(DbgMenuWindow* window) {
+    return window->cursor.page;
+}
+
+static inline s32 dbgMenuGetCursorIndex(DbgMenuWindow* window) {
+    return window->cursor.page + window->cursor.row;
+}
+
+static inline s32 dbgMenuGetValidatedLink(s32 valueIndex) {
+    EffectUtilCountFunc countFunc;
+    EffectUtilEntryFunc entryFunc;
+    EffectUtilEntry* entry;
+    s32 count;
+    s32 link;
+
+    if (valueIndex <= 0 ||
+        (countFunc = (EffectUtilCountFunc)lbl_80478F88,
+         count = countFunc == NULL ? 0 : countFunc(), count <= valueIndex)) {
+        return 0;
+    }
+    entryFunc = (EffectUtilEntryFunc)lbl_80478F8C;
+    entry = entryFunc == NULL ? NULL : entryFunc(valueIndex);
+    link = entry == NULL ? 0 : entry->link;
+    if ((s16)link <= 0 ||
+        (countFunc = (EffectUtilCountFunc)lbl_80478F88,
+         count = countFunc == NULL ? 0 : countFunc(), count <= (s16)link)) {
+        return 0;
+    }
+    return link;
+}
+
 /* 0x801338A4 | 0x2AC */
 #if 0
 asm void _dbgMenuSub__Fl(void) {
 #include "src/game/effect/effect_util__dbgMenuSub__Fl.inc"
 }
 #else
+#pragma push
+#pragma scheduling on
 s32 _dbgMenuSub__Fl(s32 offset) {
     s32 prevOffset;
     s32 result;
@@ -529,9 +581,8 @@ s32 _dbgMenuSub__Fl(s32 offset) {
     s32 link;
     s32 callbackResult;
     s32* outValue;
-    u8* obj;
+    DbgMenuWindow* obj;
     EffectUtilEntry* entry;
-    EffectUtilCountFunc countFunc;
     EffectUtilEntryFunc entryFunc;
     EffectUtilEntryCallback callback;
 
@@ -545,12 +596,11 @@ retry:
     } else {
         key = (s32)lbl_80478848 + prevOffset;
     }
-
-    outValue = (s32*)(lbl_8047AEDC + _dbgMenuGetMenuNo__Fl(key) * 4);
-    valueIndex = menuOpenCustom(sceneId, key, outValue, 0, 1, 0);
-    obj = (u8*)windowSearchID(sceneId);
+    outValue = (s32*)(lbl_8047AEDC + dbgMenuGetMenuNumber(key) * sizeof(s32));
+    valueIndex = dbgMenuOpenWindow(sceneId, key, outValue);
+    obj = windowSearchID(sceneId);
     if (obj != NULL) {
-        *outValue = (s8)obj[0x94] + (s8)obj[0x95];
+        *outValue = obj->cursor.page + obj->cursor.row;
     } else {
         *outValue = 0;
     }
@@ -559,37 +609,25 @@ retry:
         if (offset == 0) {
             result = -1;
         }
-        menuClose(sceneId);
-        return result;
-    }
+    } else {
 
-    valueIndex = _dbgMenuGetItemNo__FP14tagWINDOW_WORKl(obj, (s8)obj[0x94] + (s8)obj[0x95]);
-    link = 0;
-    if (valueIndex > 0) {
-        countFunc = (EffectUtilCountFunc)lbl_80478F88;
-        if (countFunc != NULL && countFunc() > valueIndex) {
-            entryFunc = (EffectUtilEntryFunc)lbl_80478F8C;
-            entry = entryFunc != NULL ? entryFunc(valueIndex) : NULL;
-            if (entry != NULL) {
-                link = entry->link;
-            }
-            if (link > 0) {
-                countFunc = (EffectUtilCountFunc)lbl_80478F88;
-                if (countFunc == NULL || countFunc() <= link) {
-                    link = 0;
-                }
-            } else {
-                link = 0;
-            }
-        }
-    }
+    valueIndex = _dbgMenuGetItemNo__FP14tagWINDOW_WORKl(obj, dbgMenuGetCursorIndex(obj));
+    link = dbgMenuGetValidatedLink(valueIndex);
 
     if ((s16)link != 0) {
         entryFunc = (EffectUtilEntryFunc)lbl_80478F8C;
-        entry = entryFunc != NULL ? entryFunc(valueIndex) : NULL;
-        callback = entry != NULL ? entry->callback : NULL;
+        if (entryFunc == NULL) {
+            entry = NULL;
+        } else {
+            entry = entryFunc(valueIndex);
+        }
+        if (entry == NULL) {
+            callback = NULL;
+        } else {
+            callback = entry->callback;
+        }
         if (callback != NULL) {
-            callbackResult = callback(valueIndex, (s8)obj[0x94] + (s8)obj[0x95]);
+            callbackResult = dbgMenuInvokeCallback(callback, valueIndex, obj);
         } else {
             callbackResult = 1;
         }
@@ -608,13 +646,26 @@ retry:
 
     menuClose(lbl_80478848);
     entryFunc = (EffectUtilEntryFunc)lbl_80478F8C;
-    entry = entryFunc != NULL ? entryFunc(valueIndex) : NULL;
-    callback = entry != NULL ? entry->callback : NULL;
+    if (entryFunc == NULL) {
+        entry = NULL;
+    } else {
+        entry = entryFunc(valueIndex);
+    }
+    if (entry == NULL) {
+        callback = NULL;
+    } else {
+        callback = entry->callback;
+    }
     if (callback != NULL) {
-        callback(valueIndex, (s8)obj[0x94] + (s8)obj[0x95]);
+        callback(valueIndex, dbgMenuGetCursorIndex(obj));
     }
     return 1;
+    }
+
+    menuClose(sceneId);
+    return result;
 }
+#pragma pop
 #endif
 
 
