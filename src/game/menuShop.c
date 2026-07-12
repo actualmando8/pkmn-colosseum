@@ -1284,104 +1284,97 @@ asm void fn_8002B40C(void) {
 #include "src/game/gs_worldmap_fn_8002B40C.inc"
 }
 #else
-/*
- * GSmap_DrawTimeOverlay - 0x8002B40C | size: 0x188
- *
- * Looks up the current scene entry in the lbl_802E4F68 table by the s16 key
- * at r4[0x6], computes a time-overlay angle from the sprite-ID byte halves
- * plus an optional float-position offset, multiplies by a scale constant,
- * clamps the result to [lbl_8047B990, lbl_8047B98C] by wrapping, then stores
- * it as a float at r4[0x70].
- *
- * r3 = scene/object context pointer
- * r4 = sprite/render descriptor (u8* base)
- */
-s32 fn_8002B40C(void* r3, u8* r4) {
-    extern u8  lbl_802E4F68[];  /* table of {s32 key, s16 base_val, ...}[5], stride 8 */
-    extern f64 lbl_8047B998;    /* int->float magic constant: 4503601774854144.0 */
-    extern f32 lbl_8047B984;    /* angle scale multiplier */
-    extern f32 lbl_8047B988;    /* wrap step (subtract or add to clamp) */
-    extern f32 lbl_8047B98C;    /* upper clamp bound */
-    extern f32 lbl_8047B990;    /* lower clamp bound */
+typedef struct ShopAngleEntry {
+    s32 key;
+    s16 position;
+    u16 padding;
+} ShopAngleEntry;
 
+typedef struct ShopAngleContext {
+    u16* state;
+    u8 pad_4[8];
+    f32* offset;
+    u8 pad_10[4];
+    s32* offset_enabled;
+} ShopAngleContext;
+
+typedef struct ShopAngleOwner {
+    u8 pad_0[0x60];
+    ShopAngleContext* context;
+    u8 pad_64[0x30];
     u16 sprite_id;
-    u8 *ctx;
-    u8 *tab;
-    u8 *entry;
+} ShopAngleOwner;
+
+typedef struct ShopAngleDrawData {
+    u8 pad_0[6];
     s16 key;
-    s32 idx;
-    s8  sprite_hi; /* *  ENDIAN-QA *  high byte of sprite_id (big-endian byte[0]) */
-    s8  sprite_lo; /* *  ENDIAN-QA *  low byte of sprite_id (big-endian byte[1])  */
-    s32 pos_val;
-    s32 sum;
-    f32 f_pos;
-    f32 f2;
+    u8 pad_8[0x4A];
+    s16 position;
+    u8 pad_54[0x1C];
+    f32 angle;
+} ShopAngleDrawData;
 
-    /* Load the two-byte sprite/timer ID from r3[0x94].
-       In big-endian memory: byte[0] = high, byte[1] = low.        *  ENDIAN-QA * 
-       Both halves are later sign-extended (extsb) before arithmetic.  */
-    sprite_id = *(u16*)((u8*)r3 + 0x94);
-    sprite_hi  = (s8)((sprite_id >> 8) & 0xff);  /* big-endian high byte -> extsb */
-    sprite_lo  = (s8)( sprite_id        & 0xff);  /* big-endian low byte  -> extsb */
+#pragma push
+#pragma peephole off
+#pragma optimization_level 4
+s32 fn_8002B40C(ShopAngleOwner* owner, ShopAngleDrawData* draw) {
+    u16 sprite_id;
+    u8 sprite_bytes[8];
+    ShopAngleContext* context;
+    ShopAngleEntry* entry;
+    s32 index;
+    s32 key;
+    s32 position;
+    s8 sprite_low;
+    f32 angle;
 
-    ctx = (u8*)*(void**)((u8*)r3 + 0x60);
-    tab = lbl_802E4F68;
+    sprite_id = owner->sprite_id;
+    context = owner->context;
+    *(u16*)sprite_bytes = sprite_id;
+    key = draw->key;
+    entry = (ShopAngleEntry*)lbl_802E4F68;
+    index = 0;
+    while (index < 5) {
+        if (key == entry->key) {
+            break;
+        }
+        entry++;
+        index++;
+    }
 
-    /* Linear search: find which of the 5 table entries matches r4[0x6].
-       Each entry is 8 bytes: word[0]=s32 key, halfword[4]=s16 base_val.
-       If nothing matches, idx stays 5 (sentinel = not found).           */
-    key = *(s16*)(r4 + 0x6);
-    idx = 5;
-    if      (key == *(s32*)(tab + 0x00)) idx = 0;
-    else if (key == *(s32*)(tab + 0x08)) idx = 1;
-    else if (key == *(s32*)(tab + 0x10)) idx = 2;
-    else if (key == *(s32*)(tab + 0x18)) idx = 3;
-    else if (key == *(s32*)(tab + 0x20)) idx = 4;
-
-    if (idx >= 5) {
+    if (index >= 5) {
+        entry = NULL;
+    } else {
+        entry = &((ShopAngleEntry*)lbl_802E4F68)[index];
+    }
+    if (entry == NULL) {
         return 0;
     }
 
-    entry = tab + (u32)idx * 8;
+    sprite_low = (s8)sprite_bytes[1];
+    position = entry->position + sprite_low * 0x1F;
+    draw->position = position;
+    if (*context->offset_enabled == 0) {
+        position = draw->position + (s32)*context->offset;
+        draw->position = position;
+    }
 
-    /* Compute base position into r4[0x52] from the table entry and sprite_lo. */
-    pos_val = (s32)*(s16*)(entry + 4) + (s32)sprite_lo * 0x1f;
-    pos_val = (s16)pos_val;  /* extsh */
-    *(s16*)(r4 + 0x52) = (s16)pos_val;
-
-    /* If the dereference-chain ctx[0x14]->word[0] is zero, fold in the
-       float-position value from ctx[0xc] (converted to int, round-toward-zero). */
+    position = (s32)*context->offset;
+    position += (sprite_low + (s8)sprite_bytes[0]) * 0x1F;
+    angle = lbl_8047B984 * (f32)position;
+    while (angle > lbl_8047B98C) {
+        angle -= lbl_8047B988;
+    }
     {
-        u32 *state_ptr = *(u32**)(ctx + 0x14);
-        if (*state_ptr == 0) {
-            f_pos = *(f32*)(*(u32*)(ctx + 0xc));
-            *(s16*)(r4 + 0x52) = (s16)((s32)*(s16*)(r4 + 0x52) + (s32)(s32)f_pos);
+        f32 wrapped_angle = angle;
+        while (wrapped_angle < lbl_8047B990) {
+            wrapped_angle += lbl_8047B988;
         }
+        draw->angle = wrapped_angle;
     }
-
-    /* Build the float angle:
-       f_pos_int = (s32)(*(f32*)(ctx[0xc] deref))  -- round toward zero
-       sum       = f_pos_int + (sprite_lo + sprite_hi) * 31
-       f2        = lbl_8047B984 * (f32)sum
-       The xoris/fsubs sequence is CW's int->f64->f32 cast; normalised here
-       to a plain (f32)(s32) cast.                                          */
-    f_pos = *(f32*)(*(u32*)(ctx + 0xc));
-    sum   = (s32)f_pos + ((s32)sprite_lo + (s32)sprite_hi) * 0x1f;
-    f2    = lbl_8047B984 * (f32)sum;
-
-    /* Clamp down: subtract lbl_8047B988 until f2 <= lbl_8047B98C */
-    while (f2 > lbl_8047B98C) {
-        f2 -= lbl_8047B988;
-    }
-
-    /* Clamp up: add lbl_8047B988 until f2 >= lbl_8047B990 */
-    while (f2 < lbl_8047B990) {
-        f2 += lbl_8047B988;
-    }
-
-    *(f32*)(r4 + 0x70) = f2;
     return 0;
 }
+#pragma pop
 #endif
 
 /* fn_8002B594 - 0x8002B594 | size: 0x2ec */
