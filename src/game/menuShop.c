@@ -1679,47 +1679,93 @@ s32 fn_8002B880(void* r3, u8* r4)
 #endif
 
 /* fn_8002BCE8 - 0x8002BCE8 | size: 0x120 */
+typedef struct ShopPositionEntry {
+    s32 key;
+    s16 position;
+    u16 padding;
+} ShopPositionEntry;
+
+typedef struct ShopPositionContext {
+    u16* state;
+    u8 pad_4[8];
+    f32* offset;
+    u8 pad_10[4];
+    s32* offset_enabled;
+} ShopPositionContext;
+
+typedef struct ShopPositionOwner {
+    u8 pad_0[0x60];
+    ShopPositionContext* context;
+    u8 pad_64[0x30];
+    u16 sprite_id;
+} ShopPositionOwner;
+
+typedef struct ShopPositionDrawData {
+    u8 pad_0[6];
+    s16 key;
+    u8 pad_8[0x4A];
+    s16 position;
+    u8 pad_54[0x13];
+    u8 alpha;
+} ShopPositionDrawData;
+
 extern u8 lbl_802E4F68[];
 #if 0
 asm void fn_8002BCE8(void) {
 #include "src/game/gs_worldmap_fn_8002BCE8.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 4
-s32 fn_8002BCE8(void* r3, u8* r4) {
+s32 fn_8002BCE8(ShopPositionOwner* owner, ShopPositionDrawData* draw) {
     u16 sprite_id;
-    s16 key;
-    s32 r5;
-    u8* entry;
-    u8* tab;
-    u8* ctx;
-    s32 idx;
-    s8 low_byte;
-    sprite_id = *(u16*)((u8*)r3 + 0x94);
-    ctx = (u8*)*(void**)((u8*)r3 + 0x60);
-    tab = lbl_802E4F68;
-    key = *(s16*)(r4 + 0x6);
-    idx = 5;
-    if (key == *(s32*)(tab + 0x0)) idx = 0;
-    else if (key == *(s32*)(tab + 0x8)) idx = 1;
-    else if (key == *(s32*)(tab + 0x10)) idx = 2;
-    else if (key == *(s32*)(tab + 0x18)) idx = 3;
-    else if (key == *(s32*)(tab + 0x20)) idx = 4;
-    if (idx >= 5) return 0;
-    entry = tab + (u32)idx * 8;
-    low_byte = (s8)(sprite_id & 0xff);
-    r5 = (s32)*(s16*)(entry + 4) + (s32)low_byte * 0x1f;
-    if (*(u32*)(ctx + 0x14) != 0) {
-        r5 += (s32)*(f32*)(*(u32*)(ctx + 0xc));
+    u8 sprite_bytes[8];
+    ShopPositionContext* context;
+    ShopPositionEntry* entry;
+    s32 index;
+    s32 key;
+    s32 position;
+    u8 alpha;
+
+    sprite_id = owner->sprite_id;
+    context = owner->context;
+    *(u16*)sprite_bytes = sprite_id;
+    key = draw->key;
+    entry = (ShopPositionEntry*)lbl_802E4F68;
+    index = 0;
+    while (index < 5) {
+        if (key == entry->key) {
+            break;
+        }
+        entry++;
+        index++;
     }
-    {
-        u16 v = *(u16*)(*(u32*)ctx);
-        u8 alpha = (v == 0) ? 0x72 : 0xff;
-        *(s16*)(r4 + 0x52) = (s16)r5;
-        r4[0x67] = alpha;
+
+    if (index >= 5) {
+        entry = NULL;
+    } else {
+        entry = &((ShopPositionEntry*)lbl_802E4F68)[index];
     }
+    if (entry == NULL) {
+        return 0;
+    }
+
+    position = entry->position + (s8)sprite_bytes[1] * 0x1F;
+    if (*context->offset_enabled == 0) {
+        position += (s32)*context->offset;
+    }
+
+    if (*context->state == 0) {
+        alpha = 0x72;
+    } else {
+        alpha = 0xFF;
+    }
+    draw->position = position;
+    draw->alpha = alpha;
     return 0;
 }
+#pragma pop
 #endif
 
 /* fn_8002BE08 - 0x8002BE08 | size: 0x20c | WALL 86.5%: regalloc + scheduling */
