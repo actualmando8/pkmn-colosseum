@@ -884,8 +884,8 @@ void fightFloorLoopValidFightTrainer(u32 param_1, void (*param_2)(u32, u32, u32)
     extern u32 GSthreadIsRunning(u32 task);
     extern void GSthreadClose(u32 task);
     extern u32 fn_800FF560(void);
-    extern u32 GSthreadCreate(u32 type, u32 data, u32 flags, u32 unk1, u32 unk2, u32 unk3, u32 mon_out);
-    extern void GSthreadSetArgs(u32 task, u32 b, u32 mon, u32 count, u32 ctx);
+    extern u32 GSthreadCreate(u32 type, u32 data, u32 flags, u32 unk1, u32 unk2, u32 unk3);
+    extern void GSthreadSetArgs(u32 task, ...);
     extern u32 fightFloorGetStatus(u32 poke, u32 b, u32 field, u32 d);
     extern u32 fightTrainerGetStatus(u32 mon, u32 b, u32 field, u32 d);
     extern u32 fightSideGetValidFightTrainerPtr(u32, u32);
@@ -904,7 +904,7 @@ void fightFloorLoopValidFightTrainer(u32 param_1, void (*param_2)(u32, u32, u32)
     u32 r20;
     r28 = (u16)fightFloorGetStatus(0, 0, 0x14, 0);
     r27 = (u16)fightFloorGetStatus(0, 0, 0x16, 0);
-    { u32 i = 0; while ((u16)i < 4) { arr[i] = 0; i++; } }
+    { u16 i = 0; while (i < 4) { arr[i] = 0; i++; } }
     r20 = (u8)param_4;
     if (r20 == 1) {
         r25 = r28;
@@ -912,7 +912,7 @@ void fightFloorLoopValidFightTrainer(u32 param_1, void (*param_2)(u32, u32, u32)
         r24 = 0;
         while ((u16)r24 < 2) {
             r26 = fightFloorGetStatus(r31, 0, 0x35, r24);
-            if ((u8)fightSideCheckValid(r26) != 0) {
+            if ((u8)fightSideCheckValid(r26) == 0) {
                 r26 = 0;
             }
             if (r26 != 0) {
@@ -925,9 +925,9 @@ void fightFloorLoopValidFightTrainer(u32 param_1, void (*param_2)(u32, u32, u32)
                         fightTrainerGetStatus(r21, 0, 0x4b, 0);
                         if (r20 == 0) {
                             if ((u16)r22 < 4) {
-                                { u32 task = fn_800FF560(); arr[r22] = GSthreadCreate(0x12, task, 0x2000, 1, 0, (u32)param_2, r21); }
-                                if (arr[r22] != 0) {
-                                    GSthreadSetArgs(arr[r22], 3, r21, r25, r29);
+                                { u32 task = fn_800FF560(); arr[(u16)r22] = GSthreadCreate(0x12, task, 0x2000, 1, 0, (u32)param_2); }
+                                if (arr != NULL) {
+                                    GSthreadSetArgs(arr[(u16)r22], 3, r21, r25, r29);
                                     r22++;
                                 }
                             }
@@ -942,8 +942,8 @@ void fightFloorLoopValidFightTrainer(u32 param_1, void (*param_2)(u32, u32, u32)
             _threadSwitch();
             r22 = 0;
             while ((u16)r22 < 4) {
-                if (arr[r22] != 0) {
-                    if ((u8)GSthreadIsRunning(arr[r22]) == 1) break;
+                if (arr[(u16)r22] != 0) {
+                    if ((u8)GSthreadIsRunning(arr[(u16)r22]) == 1) break;
                 }
                 r22++;
             }
@@ -952,9 +952,9 @@ void fightFloorLoopValidFightTrainer(u32 param_1, void (*param_2)(u32, u32, u32)
         r21 = 0;
         while ((u16)r24 < 4) {
             r22 = (u16)r24 * 4;
-            if (arr[r24] != 0) {
-                GSthreadClose(arr[r24]);
-                arr[r24] = r21;
+            if (arr[(u16)r24] != 0) {
+                GSthreadClose(arr[(u16)r24]);
+                arr[(u16)r24] = r21;
             }
             r24++;
         }
@@ -962,7 +962,7 @@ void fightFloorLoopValidFightTrainer(u32 param_1, void (*param_2)(u32, u32, u32)
         r22 = 0;
         while ((u16)r22 < 2) {
             r21 = fightFloorGetStatus(r31, 0, 0x35, r22);
-            if ((u8)fightSideCheckValid(r21) == 4) {
+            if ((u8)fightSideCheckValid(r21) == 0) {
                 r21 = 0;
             }
             if (r21 != 0) {
@@ -974,7 +974,7 @@ void fightFloorLoopValidFightTrainer(u32 param_1, void (*param_2)(u32, u32, u32)
                         r25 = (u16)fightTrainerGetStatus(0, r25, 0x2, 0);
                         fightTrainerGetStatus(r24, 0, 0x4b, 0);
                         if (r25 == 0) {
-                            ((void(*)(u32, u32, u32))r30)(r24, r28, r29);
+                r30(r24, r28, r29);
                         }
                     }
                     r23++;
@@ -986,7 +986,7 @@ void fightFloorLoopValidFightTrainer(u32 param_1, void (*param_2)(u32, u32, u32)
     r22 = 0;
     while ((u16)r22 < 2) {
         r21 = fightFloorGetStatus(r31, 0, 0x35, r22);
-        if ((u8)fightSideCheckValid(r21) == 2) {
+        if ((u8)fightSideCheckValid(r21) == 0) {
             r21 = 0;
         }
         if (r21 != 0) {
@@ -998,7 +998,7 @@ void fightFloorLoopValidFightTrainer(u32 param_1, void (*param_2)(u32, u32, u32)
                     r25 = (u16)fightTrainerGetStatus(0, r25, 0x2, 0);
                     fightTrainerGetStatus(r24, 0, 0x4b, 0);
                     if (r25 != 0) {
-                        ((void(*)(u32, u32, u32))r30)(r24, r28, r29);
+                    r30(r24, r28, r29);
                     }
                 }
                 r23++;
