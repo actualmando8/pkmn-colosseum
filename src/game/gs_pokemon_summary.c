@@ -613,10 +613,12 @@ s32 fn_800159BC(s32 x, s32 pageIndex, u16* packedRange) {
     u16 itemCount;
     u16 totalCount;
     u8* entry;
+    s32* dataSourcePtr;
     void* list;
     void* field;
     s32 dataSource;
     s32 validCount;
+    s32 validItemIndex;
     s32 listIndex;
     s32 visibleIndex;
     s32 itemIndex;
@@ -628,10 +630,15 @@ s32 fn_800159BC(s32 x, s32 pageIndex, u16* packedRange) {
     u32 species;
     u32 speciesData;
     u32 rank;
+    u32 displayRank;
     u32 subRank;
+    u8 subDisplayRank;
     u32 messageId;
     u32 value;
 
+    displayLine = 0;
+    visibleLimit = 8;
+    scrollPixels = 0;
     entry = SUMMARY_ENTRY_RAW(pageIndex);
     dataSource = SUMMARY_ENTRY_FIELD(entry);
     if (dataSource >= 0) {
@@ -650,9 +657,6 @@ s32 fn_800159BC(s32 x, s32 pageIndex, u16* packedRange) {
     }
 
     itemIndex = (s32)(s8)((u8*)packedRange)[0];
-    displayLine = 0;
-    visibleLimit = 8;
-    scrollPixels = 0;
     if (SUMMARY_F32(lbl_8047B748) != SUMMARY_F32(lbl_8047A2D0) && (s32)lbl_8047A2C8 != 0) {
         if (SUMMARY_F32(lbl_8047A2D0) < SUMMARY_F32(lbl_8047B748)) {
             itemIndex--;
@@ -663,46 +667,52 @@ s32 fn_800159BC(s32 x, s32 pageIndex, u16* packedRange) {
         scrollPixels = (s32)SUMMARY_F32(lbl_8047A2D0);
     }
 
+    dataSourcePtr = (s32*)(SUMMARY_ENTRY_RAW(pageIndex) + 4);
     visibleIndex = displayLine;
     while (visibleIndex < visibleLimit && itemIndex < validCount) {
         if (itemIndex >= 0) {
             y = displayLine * 0x1F - scrollPixels;
-            dataSource = SUMMARY_ENTRY_FIELD(entry);
+            dataSource = *dataSourcePtr;
             if (dataSource >= 0) {
                 field = heroItemGetItemKindToItemAryPtr((void*)lbl_8047A2F8, (u8)dataSource, &itemCount, 0, 0, 0);
             } else {
                 field = heroHizukiItemGetItemAryPtr((void*)lbl_8047A2F8, &itemCount, 0, 0, 0);
             }
             species = 0;
-            listIndex = -1;
-            while (++listIndex < itemCount) {
+            listIndex = 0;
+            validItemIndex = -1;
+            while (listIndex < itemCount) {
                 if (fn_801429E8(field) != 0) {
-                    if (--itemIndex < 0) {
+                    validItemIndex++;
+                    if (validItemIndex >= itemIndex) {
                         species = itemBiosGetItemDataId(field);
                         break;
                     }
                 }
                 field = (u8*)field + 4;
+                listIndex++;
             }
 
             speciesData = itemDataBiosGetPtr((u16)species);
             rank = (u8)itemDataBiosGetWazaMachineNo();
-            subRank = (u8)itemDataBiosGetHidenMachineNo(speciesData);
-            messageId = (subRank != 0xFF) ? 0x2B00 : 0x2AFF;
+            displayRank = rank + 1;
+            subRank = itemDataBiosGetHidenMachineNo(speciesData);
+            subDisplayRank = (u8)(subRank + 1);
+            messageId = ((subRank & 0xff) != 0xFF) ? 0x2B00 : 0x2AFF;
 
             fn_800FB680(x, y, -1, messageId);
             textX = x + (s32)(u16)(GSmsgGetRect(messageId) >> 16);
-            if (subRank != 0xFF) {
-                msgctrlSetValue(0x34, (u8)(subRank + 1));
+            if ((subRank & 0xff) != 0xFF) {
+                msgctrlSetValue(0x34, subDisplayRank);
                 fn_800FB680(textX, y, -1, 0xCA);
                 textX += (s32)(u16)(GSmsgGetRect(0xCA) >> 16);
             } else {
-                if ((s32)(rank + 1) < 10) {
+                if ((s32)displayRank < 10) {
                     msgctrlSetValue(0x34, 0);
                     fn_800FB680(textX, y, -1, 0xCA);
                     textX += (s32)(u16)(GSmsgGetRect(0xCA) >> 16);
                 }
-                msgctrlSetValue(0x34, rank + 1);
+                msgctrlSetValue(0x34, displayRank);
                 fn_800FB680(textX, y, -1, 0xCA);
                 textX += (s32)(u16)(GSmsgGetRect(0xCA) >> 16);
             }
@@ -710,7 +720,7 @@ s32 fn_800159BC(s32 x, s32 pageIndex, u16* packedRange) {
             messageId = wazaDataBiosGetName(wazaDataBiosGetPtr((u16)itemDataBiosGetWazaIDByWazaMachineNo(rank)));
             fn_800FB680(textX + 9, y, -1, messageId);
 
-            dataSource = SUMMARY_ENTRY_FIELD(entry);
+            dataSource = *dataSourcePtr;
             heroItemGetItemKindToItemAryPtr((void*)lbl_8047A2F8, (u8)dataSource, &totalCount, 0, 0, 0);
             msgctrlSetValue(0x34, totalCount);
             textX = x + 0x11A - ((s16)(GSmsgGetRect(0xCA) >> 16) + (s16)(GSmsgGetRect(0x12E) >> 16));
@@ -722,15 +732,18 @@ s32 fn_800159BC(s32 x, s32 pageIndex, u16* packedRange) {
                 field = heroHizukiItemGetItemAryPtr((void*)lbl_8047A2F8, &itemCount, 0, 0, 0);
             }
             value = 0;
-            listIndex = -1;
-            while (++listIndex < itemCount) {
+            listIndex = 0;
+            validItemIndex = -1;
+            while (listIndex < itemCount) {
                 if (fn_801429E8(field) != 0) {
-                    if (--itemIndex < 0) {
+                    validItemIndex++;
+                    if (validItemIndex >= itemIndex) {
                         value = itemBiosGetNum(field);
                         break;
                     }
                 }
                 field = (u8*)field + 4;
+                listIndex++;
             }
             msgctrlSetValue(0x34, (u16)value);
             fn_800FB680(x + 0x11A - (s16)(GSmsgGetRect(0xCA) >> 16), y, -1, 0xCA);
