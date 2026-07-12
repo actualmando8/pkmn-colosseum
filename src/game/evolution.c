@@ -340,14 +340,17 @@ evolutionStart(u32 r3,u32 r4,u32 r5,u16 *r6,
     extern f32 lbl_8047E6C0;
   u16 uVar1;
   BOOL bVar2;
+  u8 candidateValid;
 
-  u16 sVar7;
+  u32 sVar7;
   u8 cVar8;
   u32 uVar3;
   u32 uVar4;
   u32 uVar5;
+  u32 evolutionResult;
   int iVar6;
   int iVar9;
+  int *resultPtr;
   u16 *puVar10;
   u8 local_188 [4];
   int local_184;
@@ -362,104 +365,117 @@ evolutionStart(u32 r3,u32 r4,u32 r5,u16 *r6,
   local_184 = 0;
   local_180 = 0;
   sVar7 = (int)pokemonGetStatus(r3,0,0x6e,0);
-  if (sVar7 == 0) {
+  if ((sVar7 & 0xffff) == 0) {
     sVar7 = 0xffff;
   }
   else {
     sVar7 = (int)pokemonGetStatus(0,sVar7,0x66,0);
-    if (sVar7 == 0) {
+    if ((sVar7 & 0xffff) == 0) {
       sVar7 = 0xffff;
     }
   }
-  if (sVar7 == 0xffff) {
-    iVar9 = 0;
+  if ((sVar7 & 0xffff) == 0xffff) {
+    evolutionResult = 0;
   }
   else {
     uVar3 = pokemonBiosGetRnd(r3);
     uVar4 = (int)pokemonGetStatus(r3,0,0xc1,0);
     uVar4 = (-uVar4 | uVar4) >> 0x1f;
-    iVar9 = fn_801DE190(sVar7,uVar3,uVar4);
-    if (iVar9 == 0) {
-      iVar9 = 0;
+    evolutionResult = fn_801DE190(sVar7,uVar3,uVar4);
+    if (evolutionResult == 0) {
+      evolutionResult = 0;
     }
     else {
       iVar6 = 0;
       puVar10 = (u16 *)lbl_8027A488;
       do {
         if ((*(int *)(puVar10 + 2) == 0) &&
-           (cVar8 = fn_801DDD28(iVar9,*puVar10,4,0), cVar8 == '\0')) break;
+           (cVar8 = fn_801DDD28(evolutionResult,*puVar10,4,0), cVar8 == '\0')) break;
         iVar6 = iVar6 + 1;
         puVar10 = puVar10 + 4;
       } while (iVar6 < 5);
       if (iVar6 < 5) {
-        iVar9 = 0;
+        evolutionResult = 0;
       }
     }
   }
-  if (iVar9 != 0) {
-    local_184 = iVar9;
+  if (evolutionResult == 0) {
+    candidateValid = 0;
+  }
+  else {
+    local_184 = evolutionResult;
+    candidateValid = 1;
+  }
+  if (candidateValid) {
     sVar7 = (int)pokemonGetStatus(r4,0,0x6e,0);
-    if (sVar7 == 0) {
+    if ((sVar7 & 0xffff) == 0) {
       sVar7 = 0xffff;
     }
     else {
       sVar7 = (int)pokemonGetStatus(0,sVar7,0x66,0);
-      if (sVar7 == 0) {
+      if ((sVar7 & 0xffff) == 0) {
         sVar7 = 0xffff;
       }
     }
-    if (sVar7 == 0xffff) {
-      iVar9 = 0;
+    if ((sVar7 & 0xffff) == 0xffff) {
+      evolutionResult = 0;
     }
     else {
       uVar3 = pokemonBiosGetRnd(r4);
       uVar4 = (int)pokemonGetStatus(r4,0,0xc1,0);
       uVar4 = (-uVar4 | uVar4) >> 0x1f;
-      iVar9 = fn_801DE190(sVar7,uVar3,uVar4);
-      if (iVar9 == 0) {
-        iVar9 = 0;
+      evolutionResult = fn_801DE190(sVar7,uVar3,uVar4);
+      if (evolutionResult == 0) {
+        evolutionResult = 0;
       }
       else {
         iVar6 = 0;
         puVar10 = (u16 *)lbl_8027A488;
         do {
           if ((*(int *)(puVar10 + 2) == 1) &&
-             (cVar8 = fn_801DDD28(iVar9,*puVar10,4,0), cVar8 == '\0')) break;
+             (cVar8 = fn_801DDD28(evolutionResult,*puVar10,4,0), cVar8 == '\0')) break;
           iVar6 = iVar6 + 1;
           puVar10 = puVar10 + 4;
         } while (iVar6 < 5);
         if (iVar6 < 5) {
-          iVar9 = 0;
+          evolutionResult = 0;
         }
       }
     }
-    if (iVar9 != 0) {
-      bVar2 = 1;
-      local_180 = iVar9;
-      goto LAB_0025e130;
-    }
-  }
-  wazaSequenceSysRelease();
-  bVar2 = 0;
-LAB_0025e130:
-  if (bVar2) {
-    iVar9 = fn_801653C4();
-    if (iVar9 == 0) {
-      uVar4 = 0;
+    if (evolutionResult == 0) {
+      candidateValid = 0;
     }
     else {
+      local_180 = evolutionResult;
+      candidateValid = 1;
+    }
+  }
+  if (candidateValid) {
+    bVar2 = 1;
+  }
+  else {
+    wazaSequenceSysRelease();
+    bVar2 = 0;
+  }
+  if (bVar2) {
+    iVar9 = fn_801653C4();
+    if (iVar9 != 0) {
       uVar4 = fn_801656D8();
       fn_80165A20(1,0x32,0xff);
     }
-    local_174 = fn_801653BC();
-    if (local_174 == 0) {
-      uVar5 = 0;
-    }
     else {
+      uVar4 = 0;
+    }
+    iVar6 = fn_801653BC();
+    if (iVar6 != 0) {
       uVar5 = fn_801656D8();
       scriptSoundStop(0x32);
     }
+    else {
+      uVar5 = 0;
+    }
     local_178 = iVar9;
+    local_174 = iVar6;
     local_170 = uVar4;
     local_16c = uVar5;
     iVar9 = evolutionDemo(&local_184,r5,r3,r4);
@@ -474,14 +490,15 @@ LAB_0025e130:
     }
     else {
       pokemonBiosCopy((int*)auStack_168,r4);
+      resultPtr = &local_184;
       for (iVar9 = 0; iVar9 < r7; iVar9 = iVar9 + 1) {
         uVar1 = *r6;
-        iVar6 = evolutionWazaLearn((int*)auStack_168,uVar1,local_188,0,0x8026045c,&local_184);
-        if (iVar6 == 0) {
-          local_188[0] = 0xff;
+        iVar6 = evolutionWazaLearn((int*)auStack_168,uVar1,local_188,0,cbWazaForget,resultPtr);
+        if (iVar6 != 0) {
+          pokemonWazaCreate((int*)auStack_168,local_188[0],uVar1);
         }
         else {
-          pokemonWazaCreate((int*)auStack_168,local_188[0],uVar1);
+          local_188[0] = 0xff;
         }
         r6 = r6 + 1;
         *r8 = local_188[0];
