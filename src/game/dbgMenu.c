@@ -389,48 +389,59 @@ asm void dbgMenuCursor(void) {
 #include "src/game/effect/effect_util_dbgMenuCursor.inc"
 }
 #else
-void dbgMenuCursor(void* obj) {
-    u8 pair[2];
-    s32 entryCount;
-    s32 maxCount;
+typedef struct DbgMenuKeyInfo {
+    u8 pad_00[6];
     u16 flags;
-    s8 major;
-    s8 minor;
+} DbgMenuKeyInfo;
 
-    flags = *(u16*)((u8*)windowGetKeyInfo() + 0x6);
-    entryCount = (s8)_dbgMenuGetMenuNum__FP14tagWINDOW_WORKPl((u32)obj, NULL);
-    maxCount = (s8)menuDataBiosGetType(*(u32*)((u8*)obj + 0x04));
+typedef struct DbgMenuWindow {
+    u32 field_00;
+    u32 key;
+    u8 pad_08[0x8C];
+    u16 cursorPosition;
+} DbgMenuWindow;
+
+#pragma push
+#pragma scheduling on
+void dbgMenuCursor(DbgMenuWindow* obj) {
+    s8 pair[2];
+    s8 entryCount;
+    s8 maxCount;
+    u32 flags;
+
+    flags = ((DbgMenuKeyInfo*)windowGetKeyInfo())->flags;
+    entryCount = _dbgMenuGetMenuNum__FP14tagWINDOW_WORKPl((u32)obj, NULL);
+    maxCount = menuDataBiosGetType(obj->key);
     if (entryCount < maxCount) {
         maxCount = entryCount;
     }
 
-    *(u16*)pair = *(u16*)((u8*)obj + 0x94);
+    *(u16*)pair = obj->cursorPosition;
     if (flags & 1) {
         pair[1]--;
     } else if (flags & 2) {
         pair[1]++;
     }
 
-    major = (s8)pair[0];
-    minor = (s8)pair[1];
-    if (minor < 0) {
+    if (pair[1] < 0) {
+        pair[0] += pair[1];
         pair[1] = 0;
-        pair[0] = (u8)(major + minor);
-        if ((s8)pair[0] < 0) {
-            pair[1] = (u8)((s8)maxCount - 1);
-            pair[0] = (u8)(entryCount - (s8)maxCount);
+        if (pair[0] < 0) {
+            pair[1] = maxCount - 1;
+            pair[0] = entryCount - maxCount;
         }
-    } else if (minor >= (s8)maxCount) {
-        pair[1] = (u8)((s8)maxCount - 1);
-        pair[0] = (u8)(major + (minor - ((s8)maxCount - 1)));
-        if (((s8)pair[0] + (s8)pair[1]) >= entryCount) {
+    } else if (pair[1] >= maxCount) {
+        pair[0] += pair[1] - (maxCount - 1);
+        pair[1] = maxCount - 1;
+        if (pair[0] + pair[1] >= entryCount) {
             pair[0] = 0;
             pair[1] = 0;
         }
     }
 
-    *(u16*)((u8*)obj + 0x94) = *(u16*)pair;
+    obj->cursorPosition = *(u16*)pair;
 }
+#pragma pop
 #endif
 
 
