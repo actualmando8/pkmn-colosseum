@@ -461,8 +461,8 @@ asm void fn_800F8654(void) {
 #else
 void fn_800F8654(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg_sp8)
     u8 *arg0;
-    s8 arg1;
-    s8 arg2;
+    u32 arg1;
+    u32 arg2;
     u8 *arg3;
     u8 *arg4;
     f32 *arg5;
@@ -471,27 +471,31 @@ void fn_800F8654(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg_sp8)
     f32 *arg_sp8;
 {
     f32 temp_f2;
+    f32 scale;
+    f32 zero;
     f32 var_f1;
     f32 var_f1_2;
     s32 temp_r0;
     s32 var_r0;
     s32 var_r0_2;
+    u32 count;
     u8 temp_r30;
     u8 temp_r30_2;
-    u8 temp_r3;
-    u8 temp_r3_2;
-    u8 temp_r3_3;
-    u8 temp_r3_4;
+    s32 temp_r3;
+    s32 temp_r3_2;
+    s32 temp_r3_3;
+    s32 temp_r3_4;
 
     temp_r30 = *arg3;
-    if (((s8) temp_r30 < (s32) (arg1 - 2)) || ((s8) temp_r30 > (s32) (arg1 + 2)) || (temp_r30_2 = *arg4, (((s8) temp_r30_2 < (s32) (arg2 - 2)) != 0)) || ((s8) temp_r30_2 > (s32) (arg2 + 2))) {
+    if (((s8) temp_r30 < (s32) ((s8)arg1 - 2)) || ((s8) temp_r30 > (s32) ((s8)arg1 + 2)) || (temp_r30_2 = *arg4, (((s8) temp_r30_2 < (s32) ((s8)arg2 - 2)) != 0)) || ((s8) temp_r30_2 > (s32) ((s8)arg2 + 2))) {
         temp_r0 = M2C_FIELD(arg0, s32 *, 0x14);
         if (temp_r0 == 0) {
-            *arg5 = ((f32) arg1 - *arg7) / (f32) M2C_FIELD(arg0, u8 *, 0x10);
-            *arg6 = ((f32) arg2 - *arg_sp8) / (f32) M2C_FIELD(arg0, u8 *, 0x10);
+            *arg5 = ((f32) (s8)arg1 - *arg7) / (f32) M2C_FIELD(arg0, u8 *, 0x10);
+            *arg6 = ((f32) (s8)arg2 - *arg_sp8) / (f32) M2C_FIELD(arg0, u8 *, 0x10);
         } else if (temp_r0 == 1) {
-            *arg5 = ((f32) arg1 - *arg7) / ((f32) M2C_FIELD(arg0, u8 *, 0x10) * lbl_8047CCD4);
-            *arg6 = ((f32) arg2 - *arg_sp8) / ((f32) M2C_FIELD(arg0, u8 *, 0x10) * lbl_8047CCD4);
+            scale = lbl_8047CCD4;
+            *arg5 = ((f32) (s8)arg1 - *arg7) / ((f32) M2C_FIELD(arg0, u8 *, 0x10) * scale);
+            *arg6 = ((f32) (s8)arg2 - *arg_sp8) / ((f32) M2C_FIELD(arg0, u8 *, 0x10) * scale);
         }
         M2C_FIELD(arg0, u8 *, 0x11) = 0U;
     }
@@ -501,17 +505,24 @@ void fn_800F8654(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg_sp8)
     *arg_sp8 += *arg6;
     if ((s32) M2C_FIELD(arg0, s32 *, 0x14) == 1) {
         M2C_FIELD(arg0, u8 *, 0x11) = (u8) (M2C_FIELD(arg0, u8 *, 0x11) + 1);
-        if ((u8) M2C_FIELD(arg0, u8 *, 0x11) < (u8) M2C_FIELD(arg0, u8 *, 0x10)) {
-            *arg5 *= lbl_8047CCD8;
-            *arg6 *= lbl_8047CCD8;
+        count = M2C_FIELD(arg0, u8 *, 0x11);
+        if (count < M2C_FIELD(arg0, u8 *, 0x10)) {
+            var_f1 = *arg5;
+            scale = lbl_8047CCD8;
+            zero = lbl_8047CCD0;
+            var_f1 *= scale;
+            *arg5 = var_f1;
+            var_f1 = *arg6;
+            var_f1 *= scale;
+            *arg6 = var_f1;
             temp_f2 = *arg5;
-            if (temp_f2 > lbl_8047CCD0) {
+            if (temp_f2 > zero) {
                 var_f1 = temp_f2;
             } else {
                 var_f1 = -temp_f2;
             }
             if (var_f1 < lbl_8047CCDC) {
-                if (temp_f2 > lbl_8047CCD0) {
+                if (temp_f2 > zero) {
                     var_r0 = 1;
                 } else {
                     var_r0 = -1;
@@ -519,11 +530,7 @@ void fn_800F8654(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg_sp8)
                 *arg5 = (f32) var_r0;
             }
             var_f1_2 = *arg6;
-            if (var_f1_2 > lbl_8047CCD0) {
-
-            } else {
-                var_f1_2 = -var_f1_2;
-            }
+            var_f1_2 = var_f1_2 > lbl_8047CCD0 ? var_f1_2 : -var_f1_2;
             if (var_f1_2 < lbl_8047CCDC) {
                 if (*arg5 > lbl_8047CCD0) {
                     var_r0_2 = 1;
@@ -535,25 +542,25 @@ void fn_800F8654(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg_sp8)
         }
     }
     if (*arg5 < lbl_8047CCD0) {
-        temp_r3 = *arg3;
-        if (*arg7 < (f32) (s8) temp_r3) {
-            *arg7 = (f32) (s8) temp_r3;
+        temp_r3 = (s8)*arg3;
+        if (*arg7 < (f32)temp_r3) {
+            *arg7 = (f32)temp_r3;
         }
     } else {
-        temp_r3_2 = *arg3;
-        if (*arg7 > (f32) (s8) temp_r3_2) {
-            *arg7 = (f32) (s8) temp_r3_2;
+        temp_r3_2 = (s8)*arg3;
+        if (*arg7 > (f32)temp_r3_2) {
+            *arg7 = (f32)temp_r3_2;
         }
     }
     if (*arg6 < lbl_8047CCD0) {
-        temp_r3_3 = *arg4;
-        if (*arg_sp8 < (f32) (s8) temp_r3_3) {
-            *arg_sp8 = (f32) (s8) temp_r3_3;
+        temp_r3_3 = (s8)*arg4;
+        if (*arg_sp8 < (f32)temp_r3_3) {
+            *arg_sp8 = (f32)temp_r3_3;
         }
     } else {
-        temp_r3_4 = *arg4;
-        if (*arg_sp8 > (f32) (s8) temp_r3_4) {
-            *arg_sp8 = (f32) (s8) temp_r3_4;
+        temp_r3_4 = (s8)*arg4;
+        if (*arg_sp8 > (f32)temp_r3_4) {
+            *arg_sp8 = (f32)temp_r3_4;
         }
     }
 }
@@ -812,4 +819,3 @@ u32 fn_800F92D4(u32 key) {
 }
 #endif
 #pragma pop
-

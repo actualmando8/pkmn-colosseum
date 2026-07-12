@@ -1954,7 +1954,7 @@ s32 fightMenuFightTrainerAgbHeroSelectIrekaeFightPokemon(u32 r3, u32 r4, u32 r5,
     u32 i;
     u32 found;
     u32 status;
-    u32 side;
+    u16 side;
     s32 index;
     u32 msg;
     u32 entry;
@@ -2035,15 +2035,14 @@ s32 fightMenuFightTrainerAgbHeroSelectIrekaeFightPokemon(u32 r3, u32 r4, u32 r5,
             goto after_select;
         }
 	        if (kind == 4) {
+	set_select:
+	            target = fightTrainerTimeOutSelectIrekaeFightPokemon(ctx, target, param1);
+	            goto after_select;
+	        }
+	        if (kind != 5) {
 	            goto set_select;
 	        }
-	        if (kind == 5) {
-	            goto set_cancel;
-	        }
 	    }
-set_select:
-    target = fightTrainerTimeOutSelectIrekaeFightPokemon(ctx, target, param1);
-    goto after_select;
 set_cancel:
     target = -2;
 after_select:
