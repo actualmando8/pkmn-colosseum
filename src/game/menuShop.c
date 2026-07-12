@@ -1379,6 +1379,9 @@ extern f32 lbl_8047B98C;
 extern f32 lbl_8047B9A0;
 extern f32 lbl_8047B9A4;
 extern f32 lbl_8047B9A8;
+f64 cos(f64);
+f64 sin(f64);
+void windowDrawSprite2(s32, s32, s32, s32, s32, void*, u32, s32);
 #if 0
 asm void fn_8002B594(void) {
 #include "src/game/gs_worldmap_fn_8002B594.inc"
@@ -1404,181 +1407,90 @@ asm void fn_8002B594(void) {
  * ENDIAN-QA: the asm uses the classic CW big-endian 0x4330/xoris double-word trick
  * to convert the two s16 fields to f32.  On x86 this is a plain (f32)(s16) cast.
  */
-void fn_8002B594(void *ctx, u8 *data, u32 sprite_id, u32 color_byte, f32 pos)
+void fn_8002B594(void* ctx, u8* data, u32 sprite_id, u32 color_byte, f32 pos)
 {
-    extern f32 cos(f32);
-    extern f32 sin(f32);
-    extern void windowDrawSprite2(s32, s32, s32, s32, s32, void *, u32, s32);
-
-    /* sdata2 / r2-relative float constants */
-    extern f32 lbl_8047B980;   /* threshold[0]: curve start */
-    extern f32 lbl_8047B97C;   /* threshold[4]: curve end   */
-    extern f32 lbl_8047B98C;   /* scale / angular coefficient */
-    extern f32 lbl_8047B9A0;   /* radial scale y             */
-    extern f32 lbl_8047B9A4;   /* radial offset              */
-    extern f32 lbl_8047B9A8;   /* angular offset             */
-
-    f32 f29;
-    f32 f30;
-    f32 t_scale;
-    f32 t_tmp;
-    f32 t_sum;
-    f32 t_ma;
-    f32 t_denom;
-    f32 thresh1;
-    f32 thresh2;
-    f32 thresh3;
-    s32 seg;
-    f32 lower;
-    f32 upper;
-    f32 f31;
-    s32 x_out;
-    s32 y_out;
+    f32 thresholds[5];
+    f32* next_threshold;
+    f32 phase;
+    f32 width;
+    f32 height;
+    f32 scaled_height;
+    f32 curve;
+    f32 span;
+    f32 denominator;
     f32 angle;
-    f32 cos_a;
+    f32 cosine;
+    f32 sine;
+    s32 color;
+    s32 segment;
+    s32 x;
+    s32 y;
     f32 radial;
-    f32 sin_a;
-    s32 color_arg;
 
-    /* ----------------------------------------------------------------
-     * Convert the two s16 fields in the data packet to f32.
-     * ENDIAN-QA: CW used the 0x4330/xoris big-endian double trick here.
-     * On x86 a plain signed-short cast is semantically identical. */
-    f29 = (f32)(s16)(*(s16 *)(data + 0x56)); /* ENDIAN-QA */
-    f30 = (f32)(s16)(*(s16 *)(data + 0x54)); /* ENDIAN-QA */
+    width = (f32)*(s16*)(data + 0x54);
+    height = (f32)*(s16*)(data + 0x56);
 
-    /* ----------------------------------------------------------------
-     * Build the 5 break-point threshold array (indices 0..4).
-     * The normalising formula maps [0, f29] onto a set of segment widths
-     * using lbl_98C / lbl_9A4 coefficients. */
-    t_scale  = lbl_8047B98C * f29;            /* lbl_98C * f29 */
-    t_tmp    = t_scale * lbl_8047B9A0;         /* * lbl_9A0 */
-    t_sum    = f30 + t_tmp;                    /* f30 + lbl_98C*f29*lbl_9A0 */
-    t_ma     = lbl_8047B9A4 * f30 + t_tmp;    /* lbl_9A4*f30 + lbl_98C*f29*lbl_9A0 */
-    t_denom  = lbl_8047B9A4 * t_sum;           /* lbl_9A4 * t_sum */
-    thresh1  = f30   / t_denom;
-    thresh2  = t_sum / t_denom;
-    thresh3  = t_ma  / t_denom;
+    thresholds[0] = lbl_8047B980;
+    thresholds[4] = lbl_8047B97C;
+    scaled_height = lbl_8047B98C * height;
+    curve = scaled_height * lbl_8047B9A0;
+    span = width + curve;
+    denominator = span * lbl_8047B9A4;
+    thresholds[1] = width / denominator;
+    thresholds[2] = span / denominator;
+    thresholds[3] = (lbl_8047B9A4 * width + curve) / denominator;
 
-    /* threshold array (stored on stack in the original): */
-    /* [0] = lbl_B980, [1]=thresh1, [2]=thresh2, [3]=thresh3, [4]=lbl_B97C */
-
-    /* ----------------------------------------------------------------
-     * Find which segment pos falls in (r31 = 0..4). */
-    seg = 0;
-
-    if (lbl_8047B980 > pos) {
-        /* pos < lbl_B980 → already past the first break from below – enter seg 1 */
-        seg = 1;
-    } else {
-        /* lbl_B980 <= pos */
-        if (thresh1 > pos) {
-            seg = 0;
-            goto seg_found;
+    next_threshold = &thresholds[1];
+    segment = 0;
+    while (segment < 4) {
+        if (thresholds[segment] <= pos && next_threshold[segment] > pos) {
+            break;
         }
-        /* thresh1 <= pos → fall into seg 1 code */
-        seg = 1;
+        segment++;
     }
 
-    /* seg=1 reached: check whether pos is in [thresh1, thresh2) */
-    if (thresh1 > pos) {
-        seg = 2;
-    } else {
-        if (thresh2 > pos) {
-            seg = 1;
-            goto seg_found;
-        }
-        seg = 2;
+    phase = (pos - thresholds[segment]) /
+            (next_threshold[segment] - thresholds[segment]);
+
+    if (segment == 0) {
+        x = (s32)(phase * width);
+        y = 0;
     }
 
-    /* seg=2 check */
-    if (thresh2 > pos) {
-        seg = 3;
-    } else {
-        if (thresh3 > pos) {
-            seg = 2;
-            goto seg_found;
-        }
-        seg = 3;
+    if (segment == 1) {
+        angle = lbl_8047B98C * phase - lbl_8047B9A8;
+        cosine = cos(angle);
+        radial = height - lbl_8047B9A4;
+        radial *= cosine;
+        x = (s32)(radial * lbl_8047B9A0 + width);
+        sine = sin(angle);
+        radial = height - lbl_8047B9A4;
+        radial *= sine;
+        radial *= lbl_8047B9A0;
+        y = (s32)(height * lbl_8047B9A0 + radial);
     }
 
-    /* seg=3 check */
-    if (thresh3 > pos) {
-        seg = 4;
-    } else {
-        if (lbl_8047B97C > pos) {
-            seg = 3;
-            goto seg_found;
-        }
-        seg = 4;
+    if (segment == 2) {
+        x = (s32)(height - lbl_8047B9A4);
+        y = (s32)((lbl_8047B97C - phase) * width);
     }
 
-seg_found:;
-
-    /* ----------------------------------------------------------------
-     * Compute the normalised fractional parameter within the segment.
-     *   lower = thresholds[seg], upper = thresholds[seg+1]
-     *   f31 = (pos - lower) / (upper - lower) */
-    switch (seg) {
-        case 0:  lower = lbl_8047B980; upper = thresh1;       break;
-        case 1:  lower = thresh1;      upper = thresh2;       break;
-        case 2:  lower = thresh2;      upper = thresh3;       break;
-        case 3:  lower = thresh3;      upper = lbl_8047B97C;  break;
-        default: lower = lbl_8047B97C; upper = lbl_8047B97C;  break; /* seg=4: edge/undefined */
-    }
-    f31 = (pos - lower) / (upper - lower);
-
-    /* ----------------------------------------------------------------
-     * Segment-specific x/y screen position computation.
-     * r30 → final x argument, r4_out → final y argument to windowDrawSprite2. */
-    x_out = 0;  /* r30 in asm; passed as windowDrawSprite2 arg0 (r3 at call site) */
-    y_out = 0;  /* r4  in asm; passed as windowDrawSprite2 arg1 (r4 at call site) */
-
-    if (seg == 0) {
-        /* segment 0: linear vertical ramp */
-        x_out = (s32)(f31 * f30);
-        y_out = 0;
+    if (segment == 3) {
+        angle = lbl_8047B98C * phase + lbl_8047B9A8;
+        cosine = cos(angle);
+        radial = height - lbl_8047B9A4;
+        radial *= cosine;
+        x = (s32)(radial * lbl_8047B9A0);
+        sine = sin(angle);
+        radial = height - lbl_8047B9A4;
+        radial *= sine;
+        radial *= lbl_8047B9A0;
+        y = (s32)(height * lbl_8047B9A0 + radial);
     }
 
-    if (seg == 1) {
-        /* segment 1: cosine arc for x (horizontal), sine arc for y (vertical) */
-        angle = lbl_8047B98C * f31 - lbl_8047B9A8;   /* fmsubs: lbl_98C*f31 - lbl_9A8 */
-
-        cos_a = cos(angle);
-        radial = f29 - lbl_8047B9A4;                  /* f29 - lbl_9A4 */
-        x_out = (s32)(radial * cos_a * lbl_8047B9A0 + f30); /* fmadds: radial*cos*lbl_9A0 + f30 */
-
-        sin_a = sin(angle);
-        y_out = (s32)(f29 * lbl_8047B9A0 +
-                      (f29 - lbl_8047B9A4) * sin_a * lbl_8047B9A0); /* fmadds: f29*lbl_9A0 + radial*sin*lbl_9A0 */
-    }
-
-    if (seg == 2) {
-        /* segment 2: linear horizontal + linear vertical */
-        x_out = (s32)(f29 - lbl_8047B9A4);
-        y_out = (s32)((lbl_8047B97C - f31) * f30);
-    }
-
-    if (seg == 3) {
-        /* segment 3: cosine arc for x, sine arc for y (mirror of seg 1) */
-        angle = lbl_8047B98C * f31 + lbl_8047B9A8;   /* fmadds: lbl_98C*f31 + lbl_9A8 */
-
-        cos_a = cos(angle);
-        radial = f29 - lbl_8047B9A4;
-        x_out = (s32)(radial * cos_a * lbl_8047B9A0);    /* fmuls: radial*cos*lbl_9A0 (no +f30 in seg3) */
-
-        sin_a = sin(angle);
-        y_out = (s32)(f29 * lbl_8047B9A0 +
-                      (f29 - lbl_8047B9A4) * sin_a * lbl_8047B9A0);
-    }
-
-    /* ----------------------------------------------------------------
-     * Emit the sprite draw call.
-     *   r3 = x_out (r30), r4 = y_out (r4), r5=2, r6=2,
-     *   r7 = (u8)color_byte | 0xFFFFFF00,
-     *   r8 = ctx (r27), r9 = (u16)sprite_id (r28), r10 = 0 */
-    color_arg = (s32)((color_byte & 0xFF) | 0xFFFFFF00u);
-    windowDrawSprite2(x_out, y_out, 2, 2, color_arg, ctx, (u32)(u16)sprite_id, 0);
+    color = -0x100;
+    color |= (u8)color_byte;
+    windowDrawSprite2(x, y, 2, 2, color, ctx, (u16)sprite_id, 0);
 }
 #endif
 
