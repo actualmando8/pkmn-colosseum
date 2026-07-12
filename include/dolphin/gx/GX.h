@@ -68,4 +68,15 @@ void GXInitTlutRegion(GXTlutRegion* region, u32 tmemAddr, u8 tlutSize);
 void __GXSetTmemConfig(u32 config);
 void __GXFlushTextureState(void);
 
+/* ========================================================================= */
+/*  GXColor                                                                  */
+/* ========================================================================= */
+
+typedef struct _GXColor {
+    u8 r;
+    u8 g;
+    u8 b;
+    u8 a;
+} GXColor;
+
 #endif /* DOLPHIN_GX_GX_H */

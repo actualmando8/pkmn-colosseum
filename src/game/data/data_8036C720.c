@@ -9,7 +9,7 @@ extern void* lbl_8036C828[];
 
 extern u8 FogInfoInit[];
 extern u8 fn_80198F7C[];
-extern u8 fn_8019B7C0[];
+extern u8 FogAdjInfoInit[];
 
 /* Auto-carved .data unit 0x8036C720..0x8036C864 (4 objects). Non-relocated data as byte-exact u8[]; pointer/jump tables as void*[] for R_PPC_ADDR32 relocations. */
 
@@ -68,7 +68,7 @@ void* lbl_8036C7E8[16] = {
 };
 
 void* lbl_8036C828[15] = {
-    (void*)((u8*)fn_8019B7C0),
+    (void*)((u8*)FogAdjInfoInit),
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)0x00000000,
