@@ -52,7 +52,7 @@ extern u8  lbl_80315690[]; /* resource table, 8-byte entries */
 /* Additional externs used by various functions */
 extern void  GSmodelFree(u32);     /* GSmem release/unref */
 extern void  fn_800D2738(void);
-extern void* menuDataBiosGetPtr(void);    /* linked list head */
+void* menuDataBiosGetPtr();    /* linked list head */
 extern void* menuItemBiosGetPtr(s16 idx); /* node by index */
 extern void* menuSeBiosGetPtr(s32);
 extern u16   fn_8005D798(void*, s32);
@@ -135,11 +135,11 @@ extern void fn_800D6728(void);
 /* Forward declarations for functions defined later in this TU */
 extern u8    menuOffScreenCheckEnable(u8 param);
 extern void  windowClose(void* ptr, u32 flags);
-extern void* windowSearchID(s32 param);
+void* windowSearchID();
 extern s32   _menuCBOffScreen__FP9GStextureUlPv(void);
 extern void  winSpriteSetDisp(void* node, u32 enable);
-extern void  windowGetValue(s32 param);
-extern void  windowCheckCursor(void* p, u8 flags);
+s32   windowGetValue(s32 param);
+void  windowCheckCursor(void* p, u32 flags);
 extern void  windowDrawSprite2(void* r3, void* r4, s16 r5, s16 r6, s32 r7, s32 r8, s32 r9, s32 r10);
 extern u8    menuOffScreenFadeSync(u8 param);
 extern void  menuOffScreenFadeSet(f32 f1, f32 f2);
@@ -149,7 +149,7 @@ extern u32   windowGetActiveID(void);
 extern void* windowGetKeyInfo(void);
 extern void* menuSeqBiosGetPtr(u32 idx);
 extern void* windowSearchItemID(void* head, s32 key);
-extern void  menuOpenCustom(void* p, u32 r4, s32 r5, s32 r6, void* r7, s32 r8, ...);
+s32   menuOpenCustom(void* menu_id, u32 parent_id, s32* cursor_out, s32 close_flags, void* check_cursor, s32 open_param, ...);
 extern u8    menuOffScreenSetPriority(u8 val);
 extern u8    menuOffScreenSetDisp(u8 val);
 extern u32   fn_800D3088(void);
@@ -186,7 +186,7 @@ extern void menuClose(s32 p);
 extern s32 menuCloseCustom(void* p, u32 mode, u8 wait);
 extern s32 menuIsCheck(s32 param);
 extern void menuOpen(void* p, void* q);
-extern void menuOpenCustom(void* p, u32 r4, s32 r5, s32 r6, void* r7, s32 r8, ...);
+s32 menuOpenCustom(void* menu_id, u32 parent_id, s32* cursor_out, s32 close_flags, void* check_cursor, s32 open_param, ...);
 extern void menuSetPosition(void* p, s16 a, s16 b);
 extern void menuButtonNormal(void* p);
 extern void menuPlaySe(void* p, void* q);
@@ -209,18 +209,30 @@ extern u32 windowGetParam(void* ptr, u32 idx);
 extern void windowDrawSprite(void* p, void* a, void* b, u16 key, u32 data);
 extern void windowDrawSprite2(void* r3, void* r4, s16 r5, s16 r6, s32 r7, s32 r8, s32 r9, s32 r10);
 extern u8* windowGetCursorToItem(u8* arg);
-extern void windowGetValue(s32 param);
+s32 windowGetValue(s32 param);
 extern s32 fn_801044D0(s32 param, u16* val);
 extern void windowGetCursor(void);
-extern void windowCheckCursor(void* p, u8 flags);
+void windowCheckCursor(void* p, u32 flags);
 extern u32 windowGetActiveID(void);
 extern void* windowSearchItemID(void* head, s32 key);
-extern void* windowSearchID(s32 param);
+void* windowSearchID();
 extern void windowCloseMain(void* obj);
 extern void windowClose(void* ptr, u32 flags);
 extern void _windowCreateItemSprite__FP14tagWINDOW_WORK(void);
 extern void windowCreateCursorSprite(void);
-extern void windowOpen(void);
+typedef struct MenuVaList {
+    u8 gpr;
+    u8 fpr;
+    u16 reserved;
+    u32* overflow_arg_area;
+    u32* reg_save_area;
+} MenuVaList;
+
+typedef MenuVaList MenuVaListArray[1];
+
+extern void* windowOpen(s32* cursor_out, void* menu_id, u32 parent_id,
+                        s32 close_flags, s32 open_param,
+                        MenuVaListArray args);
 extern void _winCalcWindowSize__FlPC13MENU_ITEM_dd_PsPs(void);
 extern void windowInit(u16 count);
 extern void windowGetPortKeyInfo(void);
@@ -576,13 +588,90 @@ void menuOpen(void* p, void* q) {
 }
 #pragma pop
 
+typedef struct MenuDataCursorInfo {
+    u8 mode;
+    u8 field_01;
+    u8 field_02;
+    u8 cursor_slot;
+} MenuDataCursorInfo;
+
+typedef union MenuWindowCursorField {
+    u16 position;
+    struct {
+        s8 base;
+        s8 offset;
+    } cursor;
+} MenuWindowCursorField;
+
+typedef struct MenuWindowCursorInfo {
+    u8 pad_00[0x94];
+    MenuWindowCursorField field_94;
+} MenuWindowCursorInfo;
+
 /* 0x801026A4 | 0x1C4 */
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void menuOpenCustom(void* p, u32 r4, s32 r5, s32 r6, void* r7, s32 r8, ...) {
-    /* TODO: match -- 452 bytes at 0x801026A4 */
-    (void)p; (void)r4; (void)r5; (void)r6; (void)r7; (void)r8;
+#pragma peephole off
+s32 menuOpenCustom(void* menu_id, u32 parent_id, s32* cursor_out,
+                   s32 close_flags, void* check_cursor, s32 open_param, ...) {
+    MenuVaListArray args;
+    MenuWindowCursorInfo* window;
+    s32 value = 0;
+
+    __builtin_va_info(&args);
+    window = windowOpen(cursor_out, menu_id, parent_id, close_flags,
+                        open_param, args);
+
+    if ((u8)check_cursor != 0) {
+        MenuDataCursorInfo* menu_data;
+        u16 cursor_position;
+
+        windowCheckCursor(menu_id, (u32)check_cursor);
+        value = windowGetValue((s32)menu_id);
+        menu_data = (MenuDataCursorInfo*)menuDataBiosGetPtr(menu_id);
+        if (menu_data->cursor_slot != 0) {
+            cursor_position = window->field_94.position;
+            cursorBiosSetPos(menu_data->cursor_slot, &cursor_position);
+        }
+
+        if (cursor_out != 0) {
+            s32 cursor;
+            MenuWindowCursorInfo* current =
+                (MenuWindowCursorInfo*)windowSearchID((s32)menu_id);
+            if (current != 0) {
+                cursor = current->field_94.cursor.offset +
+                         current->field_94.cursor.base;
+            } else {
+                cursor = -1;
+            }
+            *cursor_out = cursor;
+        }
+    }
+
+    if (((u32)close_flags & 1) != 0) {
+        MenuWindowCursorInfo* current =
+            (MenuWindowCursorInfo*)windowSearchID((s32)menu_id);
+        if (current != 0) {
+            windowClose(current, 0);
+            if ((u8)check_cursor != 0) {
+                do {
+                    void* found = windowSearchID(menu_id);
+                    if (found == 0) {
+                        break;
+                    }
+                    if ((u32)GSthreadGetCurrentThread() == 0) {
+                        GSlogWrite((const char*)lbl_80271E10,
+                                   (const char*)lbl_8035B060, menu_id);
+                        break;
+                    }
+                    _threadSwitch();
+                } while (1);
+            } else {
+                windowSearchID((s32)menu_id);
+            }
+        }
+    }
+
+    return value;
 }
 #pragma pop
 
