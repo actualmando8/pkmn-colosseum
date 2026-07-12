@@ -700,14 +700,17 @@ u32 evolutionDemo(u32 *r3,int r4,u32 r5,u32 r6)
   BOOL bVar5;
 
   u32 uVar5;
+  u32 dataPtr;
   int iVar6;
   u32 uVar7;
   u32 uVar8;
   u8 cVar10;
   s8 cVar13;
-  u16 uVar9;
+  u32 uVar9;
   int uVar11;
   u32 uVar12;
+  u8 *evolutionTable;
+  u32 *selectorTable;
 
   double dVar13;
   double dVar14;
@@ -720,41 +723,44 @@ u32 evolutionDemo(u32 *r3,int r4,u32 r5,u32 r6)
   msgctrlSetValue(0x32,uVar5);
   winMsgOpenField(0x4401,1,0);
   if (r5 == 0) {
-    iVar6 = 0;
+    dataPtr = 0;
   }
   else {
     cVar10 = pokemonCheckValid(r5);
     if (cVar10 == '\0') {
-      iVar6 = 0;
+      dataPtr = 0;
     }
     else {
       pokemonBiosGetPokemonDataId(r5);
-      iVar6 = pokemonDataBiosGetPtr();
+      dataPtr = pokemonDataBiosGetPtr();
     }
   }
-  if (iVar6 == 0) {
+  if (dataPtr == 0) {
     uVar9 = 0;
   }
   else {
-    uVar9 = pokemonDataBiosGetVoice();
+    uVar9 = pokemonDataBiosGetVoice() & 0xffff;
     fn_80166A28(uVar9);
   }
-  if (*(u32 *)(lbl_8027A488 + 4) == 0) {
-    uVar5 = *r3;
-  }
-  else {
+  selectorTable = (u32 *)(lbl_8027A488 + 4);
+  uVar2 = *(u16 *)lbl_8027A488;
+  if (*selectorTable != 0) {
     uVar5 = r3[1];
   }
-  fn_801DA9E8(uVar5,*(u16 *)lbl_8027A488,4);
+  else {
+    uVar5 = *r3;
+  }
+  fn_801DA9E8(uVar5,uVar2,4);
   fn_801DB088();
   r3[2] = 0;
+  evolutionTable = lbl_8027A488;
   bVar3 = 1;
   bVar4 = 0;
   uVar11 = 0;
   uVar12 = 0;
   goto LAB_0025db58;
   while (1) {
-    if (((r4 != 0) && (0x77 < uVar12)) && (1 < uVar11)) {
+    if (((r4 != 0) && (uVar12 >= 0x78)) && (uVar11 >= 2)) {
       uVar7 = fn_800F7AF0(1);
       uVar8 = fn_800F7BC4(1);
       if ((uVar8 & uVar7 & 0x200) != 0) {
@@ -762,32 +768,37 @@ u32 evolutionDemo(u32 *r3,int r4,u32 r5,u32 r6)
         goto LAB_0025db60;
       }
     }
-    if (*(int *)(lbl_8027A488 + r3[2] * 8 + 4) == 0) {
-      uVar5 = *r3;
-    }
-    else {
+    if (*(int *)(evolutionTable + r3[2] * 8 + 4) != 0) {
       uVar5 = r3[1];
     }
-    uVar2 = *(u16 *)(lbl_8027A488 + r3[2] * 8);
+    else {
+      uVar5 = *r3;
+    }
+    uVar2 = *(u16 *)(evolutionTable + r3[2] * 8);
     fn_801DB088();
     uVar7 = fn_801DA94C(uVar5,uVar2,4);
     bVar5 = (uVar7 & 0xff) != 0;
     if (!bVar5) goto LAB_0025db60;
-    if (uVar11 == 1) {
+    switch (uVar11) {
+    case 0:
+      iVar6 = fn_801666BC(uVar9);
+      if (iVar6 != 2) {
+        fn_80165A20(0x3d3,0,0xff);
+        saved_r29 = 0;
+        uVar11 = 1;
+      }
+      break;
+    case 1:
       iVar6 = fn_801666BC(0x3d3);
       if (iVar6 != 2) {
         iVar6 = fn_800D3088();
         saved_r29 = saved_r29 + iVar6;
-        if (0x1d < saved_r29) {
+        if (saved_r29 >= 0x1e) {
           fn_80165A20(0x3d4,0,0xff);
           uVar11 = 2;
         }
       }
-    }
-    else if ((uVar11 == 0) && (iVar6 = fn_801666BC(uVar9), iVar6 != 2)) {
-      fn_80165A20(0x3d3,0,0xff);
-      saved_r29 = 0;
-      uVar11 = 1;
+      break;
     }
     if (bVar3) {
       fadeSet((double)lbl_8047E6C0,2);
@@ -802,25 +813,26 @@ LAB_0025db58:
 
 LAB_0025db60:
   fadeSet((double)lbl_8047E6C0,5);
+  evolutionTable = lbl_8027A488;
   while (cVar13 = fadeCheck(0), cVar13 != '\0') {
-    if (*(int *)(lbl_8027A488 + r3[2] * 8 + 4) == 0) {
-      uVar5 = *r3;
-    }
-    else {
+    if (selectorTable[r3[2] * 2] != 0) {
       uVar5 = r3[1];
     }
-    uVar9 = *(u16 *)(lbl_8027A488 + r3[2] * 8);
+    else {
+      uVar5 = *r3;
+    }
+    uVar9 = *(u16 *)(evolutionTable + r3[2] * 8);
     fn_801DB088();
     fn_801DA94C(uVar5,uVar9,4);
     _threadSwitch();
   }
-  if (*(int *)(lbl_8027A488 + r3[2] * 8 + 4) == 0) {
-    uVar5 = *r3;
-  }
-  else {
+  if (selectorTable[r3[2] * 2] != 0) {
     uVar5 = r3[1];
   }
-  fn_801DA8C4(uVar5,*(u16 *)(lbl_8027A488 + r3[2] * 8),4);
+  else {
+    uVar5 = *r3;
+  }
+  fn_801DA8C4(uVar5,*(u16 *)(evolutionTable + r3[2] * 8),4);
   dVar15 = lbl_8047E6B8;
   dVar14 = (double)lbl_8047E6B4;
   fVar1 = lbl_8047E6B0;
@@ -840,23 +852,23 @@ LAB_0025db60:
     }
     doWazaSequence(r3,*(u32 *)(lbl_8027A4B0 + iVar6 * 8 + 4),0,8);
     if (r5 == 0) {
-      iVar6 = 0;
+      dataPtr = 0;
     }
     else {
       cVar10 = pokemonCheckValid(r5);
       if (cVar10 == '\0') {
-        iVar6 = 0;
+        dataPtr = 0;
       }
       else {
         pokemonBiosGetPokemonDataId(r5);
-        iVar6 = pokemonDataBiosGetPtr();
+        dataPtr = pokemonDataBiosGetPtr();
       }
     }
-    if (iVar6 == 0) {
+    if (dataPtr == 0) {
       uVar9 = 0;
     }
     else {
-      uVar9 = pokemonDataBiosGetVoice();
+      uVar9 = pokemonDataBiosGetVoice() & 0xffff;
       fn_80166A28(uVar9);
     }
     while (iVar6 = fn_801666BC(uVar9), iVar6 == 2) {
@@ -877,23 +889,23 @@ LAB_0025db60:
     winMsgCloseField(1);
     soundStop(0x3d4,0x32);
     if (r6 == 0) {
-      iVar6 = 0;
+      dataPtr = 0;
     }
     else {
       cVar10 = pokemonCheckValid(r6);
       if (cVar10 == '\0') {
-        iVar6 = 0;
+        dataPtr = 0;
       }
       else {
         pokemonBiosGetPokemonDataId(r6);
-        iVar6 = pokemonDataBiosGetPtr();
+        dataPtr = pokemonDataBiosGetPtr();
       }
     }
-    if (iVar6 == 0) {
+    if (dataPtr == 0) {
       uVar9 = 0;
     }
     else {
-      uVar9 = pokemonDataBiosGetVoice();
+      uVar9 = pokemonDataBiosGetVoice() & 0xffff;
       fn_80166A28(uVar9);
     }
     while (iVar6 = fn_801666BC(uVar9), iVar6 == 2) {
