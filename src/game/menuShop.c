@@ -3174,12 +3174,6 @@ void fn_8002D154(s32 mapIndex, u8 colorIndex)
 #endif
 
 /* fn_8002D5D4 - 0x8002D5D4 | size: 0x348 */
-extern void fn_80018F54(void);
-extern void menuOpen(void);
-extern void _toolentryAlloc__FUl(void);
-extern void fn_800E27B0(void);
-extern void fn_800E24B0(void);
-extern void fn_800E209C(void);
 extern u32 lbl_8047A3FC;
 extern u32 lbl_80478E54;
 extern u32 lbl_8047A3DC;
@@ -3188,6 +3182,52 @@ asm void fn_8002D5D4(void) {
 #include "src/game/gs_worldmap_fn_8002D5D4.inc"
 }
 #else
+typedef struct ShopLocationEntry {
+    u8 field_0;
+    u8 type;
+    u8 field_2[2];
+} ShopLocationEntry;
+typedef u8 ShopLocationArgument;
+
+static inline s32 shopQueryMenu(s32 menu)
+{
+    s32 result = menuOpen(menu, 1);
+
+    menuClose(menu);
+    menuCloseSync(menu, 1);
+    return result;
+}
+
+static inline void shopNormalizeMenu62(s32 result, s32* selection)
+{
+    if (result == -1 || result == 2) {
+        *selection = 2;
+    } else if (result == 0) {
+        *selection = 0;
+    } else {
+        *selection = 1;
+    }
+}
+
+static inline s32 shopNormalizeMenu83(s32 result)
+{
+    switch (result) {
+    case 0:
+        return 0;
+    case 1:
+        return 1;
+    case 2:
+        return 2;
+    default:
+        return 3;
+    }
+}
+
+static inline u32 shopMemoryAlloc(void)
+{
+    return _toolentryAlloc__FUl(0x7198);
+}
+
 /*
  * fn_8002D5D4  GSmap_CancelTravel  0x8002D5D4 | size: 0x348
  *
@@ -3214,165 +3254,92 @@ asm void fn_8002D5D4(void) {
  */
 void fn_8002D5D4(void)
 {
-    /* block-scope externs: TU convention */
-    extern u32  lbl_8047A3FC;          /* current location index */
-    extern u32  lbl_80478E54;          /* pointer to location map array */
-    extern u32  lbl_8047A3DC;          /* scratch pointer for GSmemGetPtr result */
-    extern void winMsgClose(s32);
-    extern void winMsgOpenWithSE(s32, u32, s32, s32, u8);
-    extern s32  menuOpen(s32, s32);
-    extern void menuClose(s32);
-    extern s32  menuCloseSync(s32, s32);
-    extern void fn_80018F54(u32, u32, u32);
-    extern u16  _toolentryAlloc__FUl(u32);       /* GSmemAllocRaw */
-    extern void* fn_800E27B0(u16);      /* GSmemGetPtr */
-    extern void fn_800E24B0(u16);       /* GSmemLock */
-    extern void fn_800E209C(u16);       /* GSmemFree */
-    extern void fn_800FF660(void);
-    extern void floorSetFadeScript(s32, u32);
-    extern u32  heroGetStatus(u8*, u32, u32);  /* GSmap_GetNearestLocation */
-    extern u32  fn_8002A0B8(u8*, s32, s32, s32, ...); /* GSmap_FormatText1 */
-    extern void fn_8002A1C4(u8*, s32, s32, ...); /* GSmap_FormatText2 */
-    extern void fn_8002A2CC(u8*, s32, s32, ...); /* GSmap_FormatText3 */
-    extern u32  fn_80029FAC(u8*, s32, s32, s32, ...); /* GSmap_FormatText0 */
-    extern void fn_8002D154(s32, u8);   /* GSmap_ConfirmSequence */
-    extern void fn_8002CE6C(s32, u8);   /* GSmap_ProcessChoice */
-    extern void fn_8002C408(s32, u8);   /* GSmap_DialogStateMachine */
-    extern void fn_8002C284(s32, u8);   /* GSmap_ShowTravelDialog */
+    ShopLocationEntry* location_entry;
+    u32 location_offset;
+    s32 location;
+    u8 type;
+    s32 menu_result;
+    s32 done;
+    u32 memory;
+    s32 selection;
+    u8 text1;
+    u8 text0;
 
-    s32   locIdx;        /* r31: lbl_8047A3FC - location index */
-    u8    npcState;      /* r30: byte at lbl_80478E54[locIdx*4 + 1] */
-    s32   menuResult;    /* r29 */
-    s32   choice;        /* r27 */
-    u16   memHandle;     /* r28 */
-    u8    fmtId;         /* stack byte: sp[8] or sp[9] */
-    u32   fmtTableVal;   /* return from fn_8002A0B8 / fn_80029FAC */
+    location_offset = lbl_8047A3FC;
+    location = location_offset;
+    location_entry = (ShopLocationEntry*)lbl_80478E54;
+    location_entry += location_offset;
+    type = location_entry->type;
 
-    locIdx   = (s32)lbl_8047A3FC;
-    npcState = ((u8*)lbl_80478E54)[locIdx * 4 + 1];
+    switch (type) {
+    case 0: {
+        u32 value = heroGetStatus(NULL, 0xC, 0);
+        u32 message = fn_8002A0B8(&text1, location, 0, 0x4B, value, -1);
+        winMsgOpenWithSE(2, message, 1, 0, text1);
+        while ((menu_result = shopQueryMenu(0x62),
+                shopNormalizeMenu62(menu_result, &selection), selection != 2)) {
+            winMsgClose(1);
+            switch (selection) {
+            case 0:
+                fn_8002D154(location, type);
+                break;
+            case 1:
+                fn_80018F54(3, location, 0);
+                break;
+            }
+            message = fn_8002A0B8(&text1, location, 1, -1);
+            winMsgOpenWithSE(2, message, 1, 0, text1);
+        }
 
-    if (npcState == 1) {
-        /* --- path 1: hand off to ProcessChoice then exit --- */
-        fn_8002CE6C(locIdx, npcState);
-        goto _epilogue;
+        fn_8002A2CC((ShopLocationArgument*)location, 2, -1);
+        break;
     }
-    if (npcState == 0) {
-        /* --- path 0: initial location-name dialog (menu 0x62) --- */
-        {
-            u32 nearLoc = heroGetStatus(NULL, 0xc, 0);
-            /* format text: first_va = 0x4b, then nearLoc, then -1 */
-            fmtTableVal = fn_8002A0B8(&fmtId, locIdx, 0, 0x4b, (s32)nearLoc, -1);
-            winMsgOpenWithSE(2, fmtTableVal, 1, 0, fmtId);
-        }
-        /* menu 0x62 loop */
-        for (;;) {
-            menuResult = menuOpen(0x62, 1);
-            menuClose(0x62);
-            menuCloseSync(0x62, 1);
+    case 1:
+        fn_8002CE6C((ShopLocationArgument*)location, type);
+        break;
+    default: {
+        u32 message;
 
-            if (menuResult == -1 || menuResult == 2) {
-                choice = 2;
-            } else if (menuResult == 0) {
-                choice = 0;
-            } else {
-                choice = 1;
-            }
-
-            if (choice == 2) {
-                /* cancelled: send format-text3, exit */
-                fn_8002A2CC((u8*)&locIdx, 2, -1);
-                goto _epilogue;
-            }
-
-            /* choice 0 or 1: process, then re-show dialog */
+        done = 0;
+        memory = shopMemoryAlloc();
+        lbl_8047A3DC = fn_800E27B0(memory);
+        message = fn_80029FAC(&text0, location, 0, -1);
+        winMsgOpenWithSE(2, message, 1, 0, text0);
+        while ((menu_result = shopNormalizeMenu83(shopQueryMenu(0x83))) != 3) {
             winMsgClose(1);
-            if (choice == 0) {
-                fn_8002D154(locIdx, npcState);
-            } else if (choice == 1) {
-                fn_80018F54(3, (u32)locIdx, 0);
+            switch (menu_result) {
+            case 0:
+                fn_8002C408(location, type);
+                break;
+            case 1:
+                fn_8002C284(location, type);
+                break;
+            case 2:
+                fn_8002A1C4((ShopLocationArgument*)location, 0xB, -1);
+                break;
+            case 3:
+                done = 1;
+                break;
             }
-            /* choice >= 2 already handled above */
-
-            /* reformat and re-open dialog */
-            fmtTableVal = fn_8002A0B8(&fmtId, locIdx, 1, -1);
-            winMsgOpenWithSE(2, fmtTableVal, 1, 0, fmtId);
+            if (done != 0) {
+                break;
+            }
+            message = fn_80029FAC(&text0, location, 1, -1);
+            winMsgOpenWithSE(2, message, 1, 0, text0);
         }
-        /* unreachable */
-    }
 
-    /* --- path 2+: allocate GSmem block, run extended location dialog (menu 0x83) --- */
-    {
-        choice     = 0;
-        memHandle  = _toolentryAlloc__FUl(0x7198);
-        lbl_8047A3DC = (u32)fn_800E27B0(memHandle);
-
-        /* initial format and open */
-        fmtTableVal = fn_80029FAC(&fmtId, locIdx, 0, -1);
-        winMsgOpenWithSE(2, fmtTableVal, 1, 0, fmtId);
-
-        /* menu 0x83 loop */
-        for (;;) {
-            if (choice != 0)
-                goto _after_reformat;
-
-            /* only re-format on entry and after a "no-op" choice */
-            fmtTableVal = fn_80029FAC(&fmtId, locIdx, 1, -1);
-            winMsgOpenWithSE(2, fmtTableVal, 1, 0, fmtId);
-
-        _after_reformat:
-            menuResult = menuOpen(0x83, 1);
-            menuClose(0x83);
-            menuCloseSync(0x83, 1);
-
-            /* normalise menuResult into 0..3 */
-            if (menuResult == 0) {
-                menuResult = 0;
-            } else if (menuResult == 1) {
-                menuResult = 1;
-            } else if (menuResult == 2) {
-                menuResult = 2;
-            } else if (menuResult == 3) {
-                menuResult = 3; /* FUNCTIONAL-TODO: 3==keep-looping if !=3 exit; see below */
-            } else {
-                menuResult = 3;
-            }
-
-            if (menuResult == 3)
-                break; /* exit loop */
-
-            winMsgClose(1);
-
-            if (menuResult == 0) {
-                fn_8002C408(locIdx, npcState);
-            } else if (menuResult == 1) {
-                fn_8002C284(locIdx, npcState);
-            } else if (menuResult == 2) {
-                fn_8002A1C4((u8*)&locIdx, 0xb, -1);
-            } else {
-                /* menuResult == 3 originally maps to r27=1, loop-continue */
-                choice = 1;
-                continue;
-            }
-
-            choice = 0;
-            /* loop */
-        }
-        /* loop exit: choice != 0 (r27 != 0) breaks out */
-
-        /* L_8002D8A8: decide how to close */
-        if (npcState == 2 || npcState == 3) {
-            winMsgClose(1);
+        if (type != 3 && type != 2) {
+            fn_8002A1C4((ShopLocationArgument*)location, 2, -1);
         } else {
-            fn_8002A1C4((u8*)&locIdx, 2, -1);
+            winMsgClose(1);
         }
-
-        fn_800E24B0(memHandle);
-        fn_800E209C(memHandle);
+        fn_800E24B0(memory);
+        fn_800E209C(memory);
+        break;
+    }
     }
 
-_epilogue:
-    /* if lbl_8047A3FC[+4] is nonzero, fire story event */
-    if (*(u32*)((u8*)&lbl_8047A3FC + 4) != 0) {
+    if ((s32)*(&lbl_8047A3FC + 1) != 0) {
         fn_800FF660();
         floorSetFadeScript(0, 0);
     }
