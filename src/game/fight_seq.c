@@ -60,19 +60,10 @@ extern ColosseumEventPairRow lbl_80375A08[]; /* 0x18-byte pair rows */
 
 /* Address: 0x80211170 | Size: 0x68c | Ghidra import */
 u32
-fightSeqGetNromalWazaDamage(void)
+fightSeqGetNromalWazaDamage(u32 r3, u32 r4, u32 r5, u32 r6, u8 r7, u8 r8, void *r9, void *r10)
 
 {
-    u32 r3;
-    u32 r4;
-    u32 r5;
-    u32 r6;
-    char r7;
-    char r8;
-    void *r9;
-    void *r10;
-
-    extern u32 fn_800E0C54();
+    extern u16 fn_800E0C54();
     extern void wazaSetStatus();
     extern u32 wazaGetStatus();
     extern u32 fightTargetGetPtrAsNowFightType();
@@ -83,7 +74,7 @@ fightSeqGetNromalWazaDamage(void)
     extern u16 figthOutPokemonGetPokemonDataId();
     extern u32 fightOutPokemonGetSoubiItemSoubiDataId();
     extern u32 fightOutPokemonGetUseWazaDataId();
-    extern short fightOutPokemonGetTokuseiDataId();
+    extern u16 fightOutPokemonGetTokuseiDataId();
     extern u32 fightWazaIsHit();
     extern void fightWazaCreate();
     extern void fightWazaInit();
@@ -97,26 +88,23 @@ fightSeqGetNromalWazaDamage(void)
     extern u8 lbl_80478D78[1];
     extern u32 lbl_8047B610;
     extern u32 lbl_8047B618;
-  u8 uVar1;
   u32 uVar2;
   u32 uVar3;
   u32 uVar4;
-  u16 uVar15;
+  u32 uVar15;
   u32 uVar5;
   u32 uVar6;
-  short sVar16;
+  u16 sVar16;
   u32 uVar7;
   u32 uVar8;
   u32 uVar9;
   u32 uVar10;
   u32 uVar11;
   u32 uVar12;
-  s8 cVar18;
+  u8 cVar18;
   u32 uVar13;
   u32 uVar14;
   u16 uVar17;
-  u8 *puVar19;
-  u8 *puVar20;
   u32 uVar21;
   u32 uVar22;
 
@@ -125,25 +113,18 @@ fightSeqGetNromalWazaDamage(void)
   int iVar25;
   u8 local_ec8 [8];
   u8 auStack_ec0 [172];
-  u8 auStack_e14 [1760];
   u8 auStack_734 [1760];
+  u8 auStack_e14 [1760];
   u32 local_54;
   u32 local_50;
   
   local_54 = fightFloorGetStatus(0,0,0x36,0);
   uVar2 = fightFloorGetStatus(0,0,0x42,0);
   local_50 = lbl_8047B610;
-  puVar20 = (u8 *)(lbl_80478D78);
-  puVar19 = local_ec8;
   uVar23 = lbl_8047B618;
-  iVar25 = 8;
-  do {
-    uVar1 = *puVar20;
-    puVar20 = puVar20 + 1;
-    *puVar19 = uVar1;
-    puVar19 = puVar19 + 1;
-    iVar25 = iVar25 + -1;
-  } while (iVar25 != 0);
+  for (iVar25 = 0; iVar25 < 8; iVar25++) {
+    local_ec8[iVar25] = lbl_80478D78[iVar25];
+  }
   fn_801FCEC4(auStack_734,r5);
   fn_801FCEC4(auStack_e14,r6);
   fightFloorSetStatus(0,0,0x36,0,r5);
@@ -152,14 +133,10 @@ fightSeqGetNromalWazaDamage(void)
   fightWazaBiosCopy(auStack_ec0,uVar3);
   fightWazaInit(uVar3);
   fightWazaCreate(uVar3,0,r4,0,0);
-  puVar19 = (u8 *)(lbl_80478D78);
   lbl_8047B618 = 0;
-  iVar25 = 8;
-  do {
-    *puVar19 = 0;
-    puVar19 = puVar19 + 1;
-    iVar25 = iVar25 + -1;
-  } while (iVar25 != 0);
+  for (iVar25 = 0; iVar25 < 8; iVar25++) {
+    lbl_80478D78[iVar25] = 0;
+  }
   if (r9 != (void *)0) {
     ((void (*)())r9)(r3,r4,r5,r6);
   }
@@ -172,50 +149,56 @@ fightSeqGetNromalWazaDamage(void)
   sVar16 = figthOutPokemonGetPokemonDataId(uVar4);
   uVar7 = fightTargetGetPtrAsNowFightType(0x12,0);
   iVar25 = 0;
-  if ((uVar15 == 0x3f) && (sVar16 == 0x71)) {
+  if (((uVar15 & 0xffff) == 0x3f) && (sVar16 == 0x71)) {
     iVar25 = 1;
   }
   iVar24 = 0;
-  if ((uVar15 == 0x42) && (sVar16 == 0x53)) {
+  if (((uVar15 & 0xffff) == 0x42) && (sVar16 == 0x53)) {
     iVar24 = 1;
   }
   uVar8 = fn_802026E4(uVar4,0xf);
   uVar8 = __cntlzw(1 - (uVar8 & 0xff));
+  uVar8 = uVar8 >> 4 & 0xffffffe;
   uVar9 = wazaGetStatus(0,uVar6,9,0);
   uVar9 = __cntlzw(0x2b - (uVar9 & 0xffff));
+  uVar9 = uVar9 >> 5;
   uVar10 = wazaGetStatus(0,uVar6,9,0);
   uVar10 = __cntlzw(0x4b - (uVar10 & 0xffff));
+  uVar8 = uVar8 + (uVar10 >> 5);
   uVar11 = wazaGetStatus(0,uVar6,9,0);
   uVar11 = __cntlzw(200 - (uVar11 & 0xffff));
+  uVar8 = uVar8 + (uVar11 >> 5);
   uVar12 = wazaGetStatus(0,uVar6,9,0);
   uVar21 = __cntlzw(0xd1 - (uVar12 & 0xffff));
   uVar22 = (int)lbl_80478D60 - 1;
-  uVar12 = __cntlzw(0x29 - (u32)uVar15);
-  uVar8 = (uVar9 >> 5) +
-          (uVar8 >> 4 & 0xffffffe) + (uVar10 >> 5) + (uVar11 >> 5) + (uVar21 >> 5) + (uVar12 >> 5) +
-          iVar25 * 2 + iVar24 * 2 & 0xffff;
-  if (uVar22 < uVar8) {
+  uVar12 = __cntlzw(0x29 - (uVar15 & 0xffff));
+  uVar8 = uVar8 + (uVar21 >> 5);
+  uVar8 = uVar8 + (uVar12 >> 5);
+  uVar8 = uVar8 + iVar25 * 2;
+  uVar8 = uVar8 + iVar24 * 2;
+  uVar8 = (uVar9 + uVar8) & 0xffff;
+  if (uVar8 > uVar22) {
     uVar8 = uVar22 & 0xffff;
   }
   sVar16 = fightOutPokemonGetTokuseiDataId(uVar7);
-  if ((sVar16 == 4) || (sVar16 = fightOutPokemonGetTokuseiDataId(uVar7), sVar16 == 0x4b)) {
-LAB_0020e568:
-    wazaSetStatus(uVar5,0,0x2b,0,1);
-  }
-  else {
-    cVar18 = fightFloorGetStatus(0,0,0x29,0);
-    if (cVar18 != 1) goto LAB_0020e568;
+  if ((sVar16 != 4) &&
+      (sVar16 = fightOutPokemonGetTokuseiDataId(uVar7), sVar16 != 0x4b) &&
+      (cVar18 = fightFloorGetStatus(0,0,0x29,0), cVar18 == 1)) {
     fightWazaCriticalDataBiosGetPtr(uVar8);
     uVar8 = fightWazaCriticalDataBiosGetBunbo();
     uVar9 = fn_800E0C54();
-    if (((uVar9 & 0xffff) == ((uVar9 & 0xffff) / (uVar8 & 0xff)) * (uVar8 & 0xff)) ||
-       (((cVar18 = fn_802026E4(uVar4,0x3e), cVar18 == 1 && ((uVar6 & 0xffff) == 0x164)) &&
-        (uVar6 = fn_800E0C54(), (uVar6 & 0xffff) % 100 < 0x5a)))) {
+    if (((s32)(uVar9 & 0xffff) % (s32)(uVar8 & 0xff) == 0) ||
+        (((u8)fn_802026E4(uVar4,0x3e) == 1) &&
+         ((uVar6 & 0xffff) == 0x164) &&
+         ((s32)(fn_800E0C54() & 0xffff) % 100 < 0x5a))) {
       wazaSetStatus(uVar5,0,0x2b,0,2);
     }
     else {
       wazaSetStatus(uVar5,0,0x2b,0,1);
     }
+  }
+  else {
+    wazaSetStatus(uVar5,0,0x2b,0,1);
   }
   lbl_8047B610 = (int)lbl_8047B610 + 1;
 LAB_0020e58c:
@@ -228,8 +211,9 @@ LAB_0020e58c:
   sVar16 = wazaGetStatus(uVar14,0,0x30,0);
   iVar25 = fn_80232110(uVar4,uVar5,uVar7,uVar13,uVar17,sVar16);
   uVar6 = wazaGetStatus(uVar14,0,0x2b,0);
+  iVar25 = iVar25 * (uVar6 & 0xff);
   uVar8 = wazaGetStatus(uVar14,0,0x2c,0);
-  iVar25 = iVar25 * (uVar6 & 0xff) * (uVar8 & 0xff);
+  iVar25 = iVar25 * (uVar8 & 0xff);
   cVar18 = fn_802026E4(uVar4,0x24);
   if ((cVar18 == 1) && (sVar16 == 0xd)) {
     iVar25 = iVar25 * 2;
@@ -258,18 +242,11 @@ LAB_0020e58c:
   fightFloorSetStatus(0,0,0x36,0,local_54);
   fightFloorSetStatus(0,0,0x42,0,uVar2);
   fightWazaBiosCopy(uVar3,auStack_ec0);
-  puVar19 = (u8 *)(lbl_80478D78);
-  puVar20 = local_ec8;
   lbl_8047B610 = local_50;
   lbl_8047B618 = uVar23;
-  iVar25 = 8;
-  do {
-    uVar1 = *puVar20;
-    puVar20 = puVar20 + 1;
-    *puVar19 = uVar1;
-    puVar19 = puVar19 + 1;
-    iVar25 = iVar25 + -1;
-  } while (iVar25 != 0);
+  for (iVar25 = 0; iVar25 < 8; iVar25++) {
+    lbl_80478D78[iVar25] = local_ec8[iVar25];
+  }
   fn_801FCEC4(r5,auStack_734);
   fn_801FCEC4(r6,auStack_e14);
   return uVar4;
