@@ -557,6 +557,30 @@ s32 fn_8002A400(void* r3, u8* r4) {
 
 /* fn_8002A48C - 0x8002A48C | size: 0x124 */
 extern void fn_800FB8C8(s32, s32, s16, s16, s32, s32);
+typedef struct ShopDisplayEntry {
+    s32 key;
+    s32 field_4;
+    s32 field_8;
+} ShopDisplayEntry;
+
+typedef struct ShopDigitContext {
+    u8 pad_0[0xC];
+    s32* value;
+} ShopDigitContext;
+
+typedef struct ShopMenuOwner {
+    u8 pad_0[0x60];
+    ShopDigitContext* context;
+} ShopMenuOwner;
+
+typedef struct ShopDrawData {
+    u8 pad_0[6];
+    s16 key;
+    u8 pad_8[0x4C];
+    s16 x;
+    s16 y;
+} ShopDrawData;
+
 extern u8 lbl_80266E58[];
 #if 0
 asm void fn_8002A48C(void) {
@@ -564,49 +588,40 @@ asm void fn_8002A48C(void) {
 }
 #else
 #pragma optimization_level 4
-s32 fn_8002A48C(void* r3, u8* r4) {
-    u8* r31;
-    void* r6;
-    s32 r5;
-    s32 r8;
-    s32 r7;
-    s32 r4v;
-    s32 r0;
-    s32 r3v;
-    u8* r4p;
-    r31 = r4;
-    r6 = *(void**)((u8*)r3 + 0x60);
-    r5 = 0;
-    r3v = *(s16*)(r31 + 0x6);
-    r4p = lbl_80266E58;
-    if (*(s32*)r4p == r3v) goto _sentinel_done;
-    r5 = 1;
-    r4p = r4p + 0xc;
-    if (*(s32*)r4p == r3v) goto _sentinel_done;
-    r5 = 2;
-    _sentinel_done:;
-    if (r5 >= 2) { return 0; }
-    r5 = 1 - r5;
-    r8 = 1;
-    r7 = 0;
-    if (r5 > 0) {
-        if (r5 > 8) {
-            r0 = (r5 - 8 + 7) >> 3;
-            if (r5 - 8 > 0) {
-                do { r8 = r8 * 100000000; r7 += 8; r0--; } while (r0 != 0);
-            }
+s32 fn_8002A48C(ShopMenuOwner* owner, ShopDrawData* draw) {
+    ShopDigitContext* context = owner->context;
+    ShopDisplayEntry* entry;
+    s32 index;
+    s32 place;
+    s32 divisor;
+    s32 value;
+    s32 tens;
+
+    entry = (ShopDisplayEntry*)lbl_80266E58;
+    index = 0;
+    while (index < 2) {
+        if (draw->key == entry->key) {
+            break;
         }
-        r0 = r5 - r7;
-        if (r7 < r5) {
-            do { r8 = r8 * 10; r0--; } while (r0 != 0);
-        }
+        index++;
+        entry++;
     }
-    r4v = *(s32*)(*(u32*)((u8*)r6 + 0xc));
-    r4v = r4v / r8;
-    r0 = r4v / 10 * 10;
-    r4v = r4v - r0;
-    msgctrlSetValue(0x34, (void*)r4v);
-    fn_800FB8C8(0, 0, *(s16*)(r31 + 0x54), *(s16*)(r31 + 0x56), -1, 0xc9);
+    if (index >= 2) {
+        return 0;
+    }
+
+    index = 1 - index;
+    divisor = 1;
+    for (place = 0; place < index; place++) {
+        divisor *= 10;
+    }
+
+    value = *context->value;
+    value /= divisor;
+    tens = value / 10 * 10;
+    value -= tens;
+    msgctrlSetValue(0x34, value);
+    fn_800FB8C8(0, 0, draw->x, draw->y, -1, 0xC9);
     return 0;
 }
 #endif
