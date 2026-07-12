@@ -99,6 +99,8 @@ s32 GScolsys2ThruGetFixedMdlEventList(f32 x, f32 z, void* outTriangles) {
 s32 GScolsys2ThruGetMdlEventList(GScolsys2Vec3* point, GScolsys2Vec3* dirVec, f32 radius,
                 GScolsys2TriangleList* triList, void* mtxInv, void* mtxFwd,
                 GSfieldQueryTriangle* outTris) {
+    extern f32 lbl_8047CF58;
+    extern f32 lbl_8047CF5C;
     GScolsys2Triangle* tri;
     GSfieldQueryTriangle* out;
     s32 outCount;
@@ -108,7 +110,6 @@ s32 GScolsys2ThruGetMdlEventList(GScolsys2Vec3* point, GScolsys2Vec3* dirVec, f3
     s32 vertIdx;
     GScolsys2Vec3* vdst;
     GScolsys2Vec3* vsrc;
-    s32 hit;
     f32 radiusSq;
     GSfieldEdgeMasks edgeMasksA;
     GSfieldEdgeMasks edgeMasksB;
@@ -126,14 +127,15 @@ s32 GScolsys2ThruGetMdlEventList(GScolsys2Vec3* point, GScolsys2Vec3* dirVec, f3
     triIdx = 0;
     while ((u32)triIdx < triList->count && outCount < 4) {
         scan = outTris;
-        for (scanIdx = 0; scanIdx < outCount; scanIdx++, scan++) {
+        for (scanIdx = 0; scanIdx < outCount; scan++, scanIdx++) {
             if (tri->id == scan->id) {
                 break;
             }
         }
         if (scanIdx >= outCount) {
+            s32 hit;
             PSMTXMultVec(mtxFwd, &tri->normal, &planePoint);
-            if (PSVECDotProduct(&planePoint, dirVec) < 0.0f) {
+            if (!(PSVECDotProduct(&planePoint, dirVec) >= lbl_8047CF58)) {
                 vdst = verts;
                 vsrc = tri->verts;
                 vertIdx = 0;
@@ -143,7 +145,7 @@ s32 GScolsys2ThruGetMdlEventList(GScolsys2Vec3* point, GScolsys2Vec3* dirVec, f3
                     vsrc++;
                     vdst++;
                 } while (vertIdx < 3);
-                if (GScolsy2UtilGetSidePlanePoint(&planePoint, verts, point) < 0.0f) {
+                if (GScolsy2UtilGetSidePlanePoint(&planePoint, verts, point) < lbl_8047CF58) {
                     hit = 0;
                 } else {
                     GScolsy2UtilGetCpPlanePoint(&cp, &planePoint, verts, point);
@@ -156,11 +158,12 @@ s32 GScolsys2ThruGetMdlEventList(GScolsys2Vec3* point, GScolsys2Vec3* dirVec, f3
                     }
                 }
                 if (hit != 0) {
-                    out->id = tri->id;
+                    u16 id = tri->id;
                     out->verts[0] = verts[0];
                     out->verts[1] = verts[1];
                     out->verts[2] = verts[2];
                     out->normal = planePoint;
+                    out->id = id;
                     outCount++;
                     out++;
                 }
@@ -176,14 +179,15 @@ s32 GScolsys2ThruGetMdlEventList(GScolsys2Vec3* point, GScolsys2Vec3* dirVec, f3
     while ((u32)triIdx < triList->count && outCount < 4) {
         if ((tri->flags & 7) != 0) {
             scan = outTris;
-            for (scanIdx = 0; scanIdx < outCount; scanIdx++, scan++) {
+            for (scanIdx = 0; scanIdx < outCount; scan++, scanIdx++) {
                 if (tri->id == scan->id) {
                     break;
                 }
             }
             if (scanIdx >= outCount) {
+                s32 hit;
                 PSMTXMultVec(mtxFwd, &tri->normal, &planePoint);
-                if (PSVECDotProduct(&planePoint, dirVec) < 0.0f) {
+                if (!(PSVECDotProduct(&planePoint, dirVec) >= lbl_8047CF58)) {
                     vdst = verts;
                     vsrc = tri->verts;
                     vertIdx = 0;
@@ -195,11 +199,10 @@ s32 GScolsys2ThruGetMdlEventList(GScolsys2Vec3* point, GScolsys2Vec3* dirVec, f3
                     } while (vertIdx < 3);
                     edgeMasksA = lbl_8047CF48;
                     flags = tri->flags;
-                    if (GScolsy2UtilGetSidePlanePoint(&planePoint, verts, point) < 0.0f) {
+                    if (GScolsy2UtilGetSidePlanePoint(&planePoint, verts, point) < lbl_8047CF58) {
                         hit = 0;
                     } else {
                         vsrc = verts;
-                        hit = 0;
                         for (vertIdx = 0; vertIdx < 3; vertIdx++, vsrc++) {
                             if ((flags & edgeMasksA.values[vertIdx]) != 0) {
                                 s32 next = vertIdx + 1;
@@ -207,20 +210,23 @@ s32 GScolsys2ThruGetMdlEventList(GScolsys2Vec3* point, GScolsys2Vec3* dirVec, f3
                                     next = 0;
                                 }
                                 lineT = GScolsys2UtilGetCpLinePoint(&lineCp, vsrc, &verts[next], point);
-                                if (lineT >= 0.0f && lineT <= 1.0f
+                                if (!(lineT < lbl_8047CF58 || lineT > lbl_8047CF5C)
                                     && PSVECSquareDistance(&lineCp, point) < radiusSq) {
                                     hit = 1;
-                                    break;
+                                    goto edge_test_done;
                                 }
                             }
                         }
+                        hit = 0;
                     }
+                edge_test_done:
                     if (hit != 0) {
-                        out->id = tri->id;
+                        u16 id = tri->id;
                         out->verts[0] = verts[0];
                         out->verts[1] = verts[1];
                         out->verts[2] = verts[2];
                         out->normal = planePoint;
+                        out->id = id;
                         outCount++;
                         out++;
                     }
@@ -237,14 +243,15 @@ s32 GScolsys2ThruGetMdlEventList(GScolsys2Vec3* point, GScolsys2Vec3* dirVec, f3
     while ((u32)triIdx < triList->count && outCount < 4) {
         if ((tri->flags & 7) != 0) {
             scan = outTris;
-            for (scanIdx = 0; scanIdx < outCount; scanIdx++, scan++) {
+            for (scanIdx = 0; scanIdx < outCount; scan++, scanIdx++) {
                 if (tri->id == scan->id) {
                     break;
                 }
             }
             if (scanIdx >= outCount) {
+                s32 hit;
                 PSMTXMultVec(mtxFwd, &tri->normal, &planePoint);
-                if (PSVECDotProduct(&planePoint, dirVec) < 0.0f) {
+                if (!(PSVECDotProduct(&planePoint, dirVec) >= lbl_8047CF58)) {
                     vdst = verts;
                     vsrc = tri->verts;
                     vertIdx = 0;
@@ -256,11 +263,10 @@ s32 GScolsys2ThruGetMdlEventList(GScolsys2Vec3* point, GScolsys2Vec3* dirVec, f3
                     } while (vertIdx < 3);
                     edgeMasksB = lbl_8047CF50;
                     flags = tri->flags;
-                    if (GScolsy2UtilGetSidePlanePoint(&planePoint, verts, point) < 0.0f) {
+                    if (GScolsy2UtilGetSidePlanePoint(&planePoint, verts, point) < lbl_8047CF58) {
                         hit = 0;
                     } else {
                         vsrc = verts;
-                        hit = 0;
                         for (vertIdx = 0; vertIdx < 3; vertIdx++, vsrc++) {
                             s32 next = vertIdx + 2;
                             if (next >= 3) {
@@ -269,17 +275,20 @@ s32 GScolsys2ThruGetMdlEventList(GScolsys2Vec3* point, GScolsys2Vec3* dirVec, f3
                             if ((flags & edgeMasksB.values[vertIdx]) != 0 && (flags & edgeMasksB.values[next]) != 0) {
                                 if (PSVECSquareDistance(vsrc, point) < radiusSq) {
                                     hit = 1;
-                                    break;
+                                    goto vertex_test_done;
                                 }
                             }
                         }
+                        hit = 0;
                     }
+                vertex_test_done:
                     if (hit != 0) {
-                        out->id = tri->id;
+                        u16 id = tri->id;
                         out->verts[0] = verts[0];
                         out->verts[1] = verts[1];
                         out->verts[2] = verts[2];
                         out->normal = planePoint;
+                        out->id = id;
                         outCount++;
                         out++;
                     }
