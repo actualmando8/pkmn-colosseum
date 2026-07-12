@@ -126,7 +126,7 @@ asm void fn_8001E644(void) {
 #include "src/game/gs_pcbox_fn_8001E644.inc"
 }
 #else
-void fn_8001E644(void) {
+void fn_8001E644(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u8 arg4) {
     extern u8 lbl_80266C20[];
     extern u8 lbl_80314E08[];
     extern f64 lbl_8047B7D8;
@@ -147,11 +147,11 @@ void fn_8001E644(void) {
     extern void windowDrawSprite2();
     u8 sp[0x80];
     u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
+    u32 r3 = arg0;
+    u32 r4 = arg1;
+    u32 r5 = arg2;
+    u32 r6 = arg3;
+    u32 r7 = arg4;
     u32 r8 = 0;
     u32 r9 = 0;
     u32 r10 = 0;
@@ -535,7 +535,7 @@ asm void fn_8001EC08(void) {
 #include "src/game/gs_pcbox_fn_8001EC08.inc"
 }
 #else
-void fn_8001EC08(void) {
+void fn_8001EC08(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u8 arg4, u8 arg5) {
     extern u8 lbl_80314E08[];
     extern u8 lbl_803A1D60[];
     extern f64 lbl_8047B7D0;
@@ -555,12 +555,12 @@ void fn_8001EC08(void) {
     extern void fn_800D88DC();
     u8 sp[0xB0];
     u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
+    u32 r3 = arg0;
+    u32 r4 = arg1;
+    u32 r5 = arg2;
+    u32 r6 = arg3;
+    u32 r7 = arg4;
+    u32 r8 = arg5;
     u32 r9 = 0;
     u32 r10 = 0;
     u32 r11 = 0;
@@ -1039,7 +1039,7 @@ asm void fn_8001F304(void) {
 #include "src/game/gs_pcbox_fn_8001F304.inc"
 }
 #else
-void fn_8001F304(void) {
+void fn_8001F304(void* arg0, void* arg1) {
     extern u8 lbl_802EF0A8[];
     extern u8 lbl_803A1F88[];
     extern u32 lbl_80478878;
@@ -1055,21 +1055,21 @@ void fn_8001F304(void) {
     extern f32 lbl_8047B848;
     extern void fn_800CE148();
     u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
-    f32 f0 = 0.0f;
-    f32 f1 = 0.0f;
-    f32 f2 = 0.0f;
-    f32 f3 = 0.0f;
-    f32 f5 = 0.0f;
-    f32 f6 = 0.0f;
-    f32 f8 = 0.0f;
-    f32 f9 = 0.0f;
+    u32 tmp;
+    u32 r3;
+    u32 r4;
+    u32 r5;
+    u32 r31;
+    f32 f0;
+    f32 f1;
+    f32 f2;
+    f32 f3;
+    f32 f5;
+    f32 f6;
+    f32 f8;
+    f32 f9;
 
-    r31 = r4;
+    r31 = (u32)arg1;
     tmp = *(s16*)((u8*)r31 + 0x6);
     if ((s32)tmp != 0xf03) {
         if ((s32)tmp < 0xf03) {
@@ -2203,4 +2203,3 @@ void fn_8001E58C(s16 x1, s16 y1, s16 x2, s16 y2, u8* color) {
     fn_800D6728();
 }
 #endif
-

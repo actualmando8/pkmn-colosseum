@@ -1253,16 +1253,18 @@ asm void fn_80016ABC(void) {
 #else
 #pragma push
 #pragma peephole off
+#pragma fp_contract off
 s32 fn_80016ABC(u8* ctx, u8* item) {
     u8* entry;
     u16 packed;
     s32 y;
     s32 alpha;
     s32 selected;
-    s32 i;
     f32 phase;
     f32 step;
-    f32 phaseStarts[4];
+    f32 alphaScale;
+    f32 alphaDivisor;
+    f32 wrap;
 
     if ((s32)lbl_8047A2D8 != -1) {
         return 0;
@@ -1303,24 +1305,55 @@ s32 fn_80016ABC(u8* ctx, u8* item) {
             ((f32)SUMMARY_ITEM_S16(item, 0x54) +
              SUMMARY_F32(lbl_8047B75C) * (f32)SUMMARY_ITEM_S16(item, 0x56) *
                  SUMMARY_F32(lbl_8047B770)));
-    phaseStarts[0] = SUMMARY_F32(lbl_8047A2CC);
-    phaseStarts[1] = phaseStarts[0] + SUMMARY_F32(lbl_8047B780);
-    phaseStarts[2] = phaseStarts[0] + SUMMARY_F32(lbl_8047B770);
-    phaseStarts[3] = phaseStarts[0] + SUMMARY_F32(lbl_8047B784);
-
-    for (i = 0; i < 4; i++) {
-        phase = phaseStarts[i];
-        if (phase > SUMMARY_F32(lbl_8047B744)) {
-            phase -= SUMMARY_F32(lbl_8047B744);
+    alphaScale = SUMMARY_F32(lbl_8047B740);
+    alphaDivisor = SUMMARY_F32(lbl_8047B77C);
+    wrap = SUMMARY_F32(lbl_8047B744);
+    phase = SUMMARY_F32(lbl_8047A2CC);
+    for (selected = 0; selected < 0x2D; selected++) {
+        fn_800167D0(ctx, item, phase, 0xD1,
+                    (u8)(alphaScale * ((f32)selected / alphaDivisor)));
+        phase += step;
+        if (phase >= wrap) {
+            phase -= wrap;
         }
-        for (selected = 0; selected < 0x2D; selected++) {
-            fn_800167D0(ctx, item, phase, 0xD1,
-                        (u8)(SUMMARY_F32(lbl_8047B740) *
-                             ((f32)selected / SUMMARY_F32(lbl_8047B77C))));
-            phase += step;
-            if (phase >= SUMMARY_F32(lbl_8047B744)) {
-                phase -= SUMMARY_F32(lbl_8047B744);
-            }
+    }
+
+    phase = SUMMARY_F32(lbl_8047A2CC) + SUMMARY_F32(lbl_8047B780);
+    if (phase > wrap) {
+        phase -= wrap;
+    }
+    for (selected = 0; selected < 0x2D; selected++) {
+        fn_800167D0(ctx, item, phase, 0xD1,
+                    (u8)(alphaScale * ((f32)selected / alphaDivisor)));
+        phase += step;
+        if (phase >= wrap) {
+            phase -= wrap;
+        }
+    }
+
+    phase = SUMMARY_F32(lbl_8047A2CC) + SUMMARY_F32(lbl_8047B770);
+    if (phase > wrap) {
+        phase -= wrap;
+    }
+    for (selected = 0; selected < 0x2D; selected++) {
+        fn_800167D0(ctx, item, phase, 0xD1,
+                    (u8)(alphaScale * ((f32)selected / alphaDivisor)));
+        phase += step;
+        if (phase >= wrap) {
+            phase -= wrap;
+        }
+    }
+
+    phase = SUMMARY_F32(lbl_8047A2CC) + SUMMARY_F32(lbl_8047B784);
+    if (phase > wrap) {
+        phase -= wrap;
+    }
+    for (selected = 0; selected < 0x2D; selected++) {
+        fn_800167D0(ctx, item, phase, 0xD1,
+                    (u8)(alphaScale * ((f32)selected / alphaDivisor)));
+        phase += step;
+        if (phase >= wrap) {
+            phase -= wrap;
         }
     }
 
@@ -1402,6 +1435,8 @@ asm void fn_80017028(void) {
 s32 fn_80017028(u8* ctx) {
     u8* input;
     u8* entry;
+    u8* labelBase;
+    u8* dataSourceBase;
     void* list;
     void* field;
     u16 packed;
@@ -1420,39 +1455,42 @@ s32 fn_80017028(u8* ctx) {
     s32 moved;
 
     input = windowGetKeyInfo();
+    soundId = 0;
+    moved = 0;
     for (i = 0; i < 5; i++) {
         fallbackLabels[i] = ((u32*)lbl_80266B88)[i];
     }
 
-    if (SUMMARY_F32(lbl_8047A2D4) != SUMMARY_F32(lbl_8047B748) ||
-        SUMMARY_F32(lbl_8047A2D0) != SUMMARY_F32(lbl_8047B748)) {
+    if (SUMMARY_F32(lbl_8047B748) != SUMMARY_F32(lbl_8047A2D4) ||
+        SUMMARY_F32(lbl_8047B748) != SUMMARY_F32(lbl_8047A2D0)) {
         return 0;
     }
 
     pageIndex = SUMMARY_CTX_S8(ctx, 0x95);
-    entry = SUMMARY_ENTRY_RAW(pageIndex);
-    packed = (u16)(cursorBiosGetPos((u16)SUMMARY_ENTRY_LABEL(entry)) >> 16);
-    dataSource = SUMMARY_ENTRY_FIELD(entry);
+    labelBase = (u8*)sSummaryPageEntries + 0x1C;
+    packed = (u16)(cursorBiosGetPos(
+                       (u16)*(u32*)(labelBase + pageIndex * SUMMARY_ENTRY_STRIDE)) >>
+                   16);
+    dataSourceBase = (u8*)sSummaryPageEntries + 0x04;
+    dataSource = *(s32*)(dataSourceBase +
+                         SUMMARY_CTX_S8(ctx, 0x95) * SUMMARY_ENTRY_STRIDE);
     if (dataSource >= 0) {
         list = heroItemGetItemKindToItemAryPtr((void*)lbl_8047A2F8, (u8)dataSource, &count, 0, 0, 0);
     } else {
         list = heroHizukiItemGetItemAryPtr((void*)lbl_8047A2F8, &count, 0, 0, 0);
     }
 
-    validCount = 0;
     field = list;
-    for (i = 0; i < count; i++) {
+    for (validCount = 0; validCount < count; validCount++) {
         fn_801429E8(field);
-        validCount++;
         field = (u8*)field + 4;
     }
 
     cursorIndex = (s32)(s8)((u8*)&packed)[0] + (s32)(s8)((u8*)&packed)[1];
-    soundId = 0;
-    moved = 0;
+    entry = SUMMARY_ENTRY_RAW(pageIndex);
 
     if ((s32)lbl_8047A2E8 < 0) {
-        if ((SUMMARY_ITEM_U16(input, 0x04) & 0x300) != 0 &&
+        if ((SUMMARY_ITEM_U16(input, 0x04) & 0xC0) != 0 &&
             (s32)lbl_8047A2E0 != 3 && (s32)lbl_8047A2E0 != 4 &&
             *(s32*)(entry + 0x08) != 0) {
             field = list;
@@ -1543,7 +1581,9 @@ s32 fn_80017028(u8* ctx) {
         }
     }
 
-    cursorBiosSetPos((u16)SUMMARY_ENTRY_LABEL(entry), &currentPacked);
+    cursorBiosSetPos(
+        (u16)*(u32*)(labelBase + pageIndex * SUMMARY_ENTRY_STRIDE),
+        &currentPacked);
 
     if ((s32)lbl_8047A2E8 < 0 && moved == 0) {
         if ((SUMMARY_ITEM_U16(input, 0x06) & 8) != 0) {
@@ -1569,8 +1609,12 @@ s32 fn_80017028(u8* ctx) {
     if ((s32)lbl_8047A2E8 >= 0) {
         lbl_8047A2DC = 0x2B2B;
     } else {
-        entry = SUMMARY_ENTRY_RAW(SUMMARY_CTX_S8(ctx, 0x95));
-        packed = (u16)(cursorBiosGetPos((u16)SUMMARY_ENTRY_LABEL(entry)) >> 16);
+        pageIndex = SUMMARY_CTX_S8(ctx, 0x95);
+        entry = SUMMARY_ENTRY_RAW(pageIndex);
+        packed = (u16)(cursorBiosGetPos(
+                           (u16)*(u32*)(labelBase +
+                                       pageIndex * SUMMARY_ENTRY_STRIDE)) >>
+                       16);
         cursorIndex = (s32)(s8)((u8*)&packed)[0] + (s32)(s8)((u8*)&packed)[1];
         dataSource = SUMMARY_ENTRY_FIELD(entry);
         if (dataSource >= 0) {
