@@ -59,39 +59,60 @@ u32 fn_80029850(u8* r3, u16 r4, u16 r5, u16 r6) {
 }
 #endif
 
+typedef struct ShopItemSlot {
+    u16 item_id;
+    u16 quantity;
+} ShopItemSlot;
+
+typedef struct ShopInventory {
+    ShopItemSlot primary[235];
+    ShopItemSlot secondary[235];
+    s32 currency;
+    u32 field_75C;
+    u8 modified;
+    u8 pad_761[3];
+    u32 field_764;
+    u16 count;
+} ShopInventory;
+
 /* fn_80029AC8 - 0x80029AC8 | size: 0x1f8 */
-extern void itemBiosSetItemDataId(void*, u16);
 extern void itemBiosSetNum(void*, u16);
 #if 0
 asm void fn_80029AC8(void) {
 #include "src/game/gs_worldmap_fn_80029AC8.inc"
 }
 #else
+#pragma push
 #pragma optimization_level 4
-void fn_80029AC8(s32 r3, s32 r4, s32 r5, void* r6) {
+#pragma peephole off
+void fn_80029AC8(s32 r3, s32 r4, s32 r5, ShopInventory* r6) {
     s32 r29;
-    u16 r30;
-    u16 r26;
-    s16 r28;
-    s16 r27;
-    u8* r31;
-    u16 r24;
-    u16 r25;
+    s32 r30;
+    s32 r26;
+    u16 r28;
+    s32 r27;
+    ShopInventory* r31;
+    s32 r24;
+    s32 r25;
+
     r29 = r3;
     r30 = r4;
     r26 = r5;
-    r31 = (u8*)r6;
-    if (!r31) return;
-    r28 = *(s16*)((u8*)r31 + 0x768);
+    r31 = r6;
+    if (r31 == NULL) return;
+    r28 = r31->count;
     if (r28 > -1) {
-        r24 = r26;
+        r24 = r26 & 0xFFFF;
         r27 = 0;
-        while (r27 < r28 && r24) {
+        while (r27 < r28 && r24 > 0) {
             s16 i = r27;
-            if (i >= 0 && i < r28) {
-                void* slot = (void*)(r31 + ((s32)i << 2));
+            r24 &= 0xFFFF;
+            if (i < 0) {
+            } else if (i >= r28) {
+            } else {
+                ShopItemSlot* slot = &r31->primary[i];
                 u16 v = itemBiosGetItemDataId(slot);
-                if (v == r30 || v == 0) {
+                if (v == (u16)r30 || v == 0) {
                     u16 cur;
                     u16 delta;
                     u16 give;
@@ -102,24 +123,32 @@ void fn_80029AC8(s32 r3, s32 r4, s32 r5, void* r6) {
                         cur = itemBiosGetNum(slot);
                     }
                     delta = (u16)(0x3e7 - cur);
-                    give = (delta >= r24) ? r24 : delta;
+                    if (delta < r24) {
+                        give = delta;
+                    } else {
+                        give = r24;
+                    }
                     itemBiosSetNum(slot, (u16)(cur + give));
-                    r24 = (u16)(r24 - give);
+                    r24 = (r24 - give) & 0xFFFF;
                 }
             }
             r27++;
         }
-        r26 = r24;
     }
     if (r28 > -1) {
-        r25 = r26;
+        r25 = r26 & 0xFFFF;
         r27 = 0;
-        while (r27 < r28 && r25) {
+        while (r27 < r28 && r25 > 0) {
             s16 i = r27;
-            if (i >= 0 && i < r28) {
-                void* slot = (void*)((u8*)r31 + 0x3ac + ((s32)i << 2));
+            ShopItemSlot* slots;
+            r25 &= 0xFFFF;
+            slots = r31->secondary;
+            if (i < 0) {
+            } else if (i >= r28) {
+            } else {
+                ShopItemSlot* slot = &slots[i];
                 u16 v = itemBiosGetItemDataId(slot);
-                if (v == r30 || v == 0) {
+                if (v == (u16)r30 || v == 0) {
                     u16 cur;
                     u16 delta;
                     u16 give;
@@ -130,17 +159,22 @@ void fn_80029AC8(s32 r3, s32 r4, s32 r5, void* r6) {
                         cur = itemBiosGetNum(slot);
                     }
                     delta = (u16)(0x3e7 - cur);
-                    give = (delta >= r25) ? r25 : delta;
+                    if (delta < r25) {
+                        give = delta;
+                    } else {
+                        give = r25;
+                    }
                     itemBiosSetNum(slot, (u16)(cur + give));
-                    r25 = (u16)(r25 - give);
+                    r25 = (r25 - give) & 0xFFFF;
                 }
             }
             r27++;
         }
     }
-    *(s32*)(r31 + 0x758) -= r29;
-    *(u8*)(r31 + 0x760) = 1;
+    r31->currency -= r29;
+    r31->modified = 1;
 }
+#pragma pop
 #endif
 
 /* fn_80029CC0 - 0x80029CC0 | size: 0x234 */
