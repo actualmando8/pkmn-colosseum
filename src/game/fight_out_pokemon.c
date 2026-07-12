@@ -298,7 +298,11 @@ void fn_80202C1C(u32 r3,u32 r4)
             }
           }
         initial_valid_done:
-          if (bVar1) {
+          if (!bVar1) {
+            bVar1 = 0;
+            goto initial_stage_done;
+          }
+          {
             iVar6 = (int)pokemonGetStatus(iVar5,0,0x120,0);
             if ((s32)iVar6 == 1) {
               bVar1 = 0;
@@ -356,7 +360,11 @@ void fn_80202C1C(u32 r3,u32 r4)
                   }
                 }
               second_valid_done:
-                if (bVar1) {
+                if (!bVar1) {
+                  bVar1 = 0;
+                  goto second_stage_done;
+                }
+                {
                   iVar7 = (int)pokemonGetStatus(iVar6,0,0xd2,0);
                   if ((s32)iVar7 == 1) {
                     bVar1 = 0;
@@ -382,9 +390,8 @@ void fn_80202C1C(u32 r3,u32 r4)
                     }
                   }
                 }
-                else {
-                  bVar1 = 0;
-                }
+              second_stage_done:
+                ;
               }
               if (!bVar1) {
                 bVar1 = 0;
@@ -394,9 +401,8 @@ void fn_80202C1C(u32 r3,u32 r4)
               }
             }
           }
-          else {
-            bVar1 = 0;
-          }
+        initial_stage_done:
+          ;
         }
         if ((bVar1) && (r3 != 0)) {
           if (iVar5 == 0) {
@@ -473,7 +479,7 @@ void fn_80202C1C(u32 r3,u32 r4)
             iVar6 = (int)pokemonGetStatus(r3,0,0x122,0);
             iVar7 = fightOutPokemonEnemySearchAry(iVar6,4,iVar5);
             if (iVar7 == 0) {
-              for (uVar10 = 0; uVar10 < 4; uVar10 = uVar10 + 1) {
+              for (uVar10 = 0; uVar10 < 4; uVar10++) {
                 iVar7 = iVar6 + (u32)uVar10 * 0xc;
                 cVar9 = fightOutPokemonEnemyCheckValid(iVar7);
                 if (cVar9 == 0) {
