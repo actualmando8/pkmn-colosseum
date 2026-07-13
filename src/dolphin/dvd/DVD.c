@@ -633,6 +633,11 @@ void stateTimeout(void)
 }
 #pragma dont_inline reset
 
+void fn_800A6578(void)
+{
+    DVDLowWaitCoverClose(cbForStateMotorStopped_800A65A0);
+}
+
 /*
  * cbForStateMotorStopped - Callback when motor stop completes
  * 0x800A65A0 | size: 0xE4
