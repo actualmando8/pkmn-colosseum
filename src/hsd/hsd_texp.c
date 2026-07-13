@@ -1447,31 +1447,101 @@ void fn_801B750C(HSD_TObj* tobj, u32 lightmap, u32 lightmap_done,
     }
 }
 
+typedef struct ColTExpNode ColTExpNode;
+
+typedef struct ColTEArg {
+    u8 type;
+    u8 sel;
+    u8 arg;
+    u8 pad_03;
+    ColTExpNode* exp;
+} ColTEArg;
+
+struct ColTExpNode {
+    s32 type;
+    ColTExpNode* next;
+    s32 c_ref;
+    u8 c_dst;
+    u8 c_op;
+    u8 c_clamp;
+    u8 c_bias;
+    u8 c_scale;
+    u8 c_range;
+    u8 pad_12[2];
+    s32 a_ref;
+    u8 a_dst;
+    u8 a_op;
+    u8 a_clamp;
+    u8 a_bias;
+    u8 a_scale;
+    u8 a_range;
+    u8 tex_swap;
+    u8 ras_swap;
+    u8 kcsel;
+    u8 kasel;
+    u8 pad_22[0x12];
+    ColTEArg c_in[4];
+    ColTEArg a_in[4];
+    HSD_TObj* tex;
+    u8 chan;
+};
+
+#define COL_TE_ZERO 0
+#define COL_TE_TEV 1
+#define COL_TE_TEX 2
+#define COL_TE_RAS 3
+#define COL_TE_CNST 4
+#define COL_TE_RGB 1
+#define COL_TE_A 5
+#define COL_TE_0 7
+
+static inline s32 ColTExpGetType(ColTExpNode* exp)
+{
+    if (exp == NULL) {
+        return COL_TE_ZERO;
+    }
+    if ((u32) exp == -1U) {
+        return COL_TE_TEX;
+    }
+    if ((u32) exp == -2U) {
+        return COL_TE_RAS;
+    }
+    return exp->type;
+}
+
 /* ========================================================================= */
-/*  GObj render callbacks                                                    */
+/*  TExp graph helpers                                                       */
 /* ========================================================================= */
 
 /*
- * HSD_GObjRenderBasic - 0x801B7BD4 | Size: 0x8C
- * Basic GObj render callback - renders an HSD object.
+ * HSD_TExpRef - 0x801B7BD4 | Size: 0x8C
+ * Increment reference counters for child TExp nodes.
  */
-void fn_801B7BD4(HSD_GObj* gobj, s32 pass) {
-    if (gobj == NULL) {
-        return;
-    }
-    if (gobj->hsd_obj == NULL) {
-        return;
-    }
+#pragma push
+#pragma optimization_level 1
+void fn_801B7BD4(ColTExpNode* exp, s32 sel) {
+    s32 type = ColTExpGetType(exp);
 
-    /* Render based on object kind */
-    switch (gobj->obj_kind) {
-    case 1: /* JOBJ */
-        HSD_JObjDispAll(gobj->hsd_obj, NULL, 0);
+    switch (type) {
+    case COL_TE_TEV:
+        if ((u8) sel == TRUE) {
+            exp->c_ref += 1;
+            return;
+        } else {
+            exp->a_ref += 1;
+            return;
+        }
         break;
-    default:
+    case COL_TE_CNST:
+        exp->c_scale += 1;
         break;
     }
 }
+#pragma pop
+
+/* ========================================================================= */
+/*  GObj render callbacks                                                    */
+/* ========================================================================= */
 
 /*
  * HSD_TExpGetType - 0x801B7C60 | Size: 0x40
@@ -1983,55 +2053,10 @@ void fn_801B9048(u32 pass) {
     }
 }
 
-typedef struct ColTExpNode ColTExpNode;
-
-typedef struct ColTEArg {
-    u8 type;
-    u8 sel;
-    u8 arg;
-    u8 pad_03;
-    ColTExpNode* exp;
-} ColTEArg;
-
-struct ColTExpNode {
-    s32 type;
-    ColTExpNode* next;
-    s32 c_ref;
-    u8 c_dst;
-    u8 c_op;
-    u8 c_clamp;
-    u8 c_bias;
-    u8 c_scale;
-    u8 c_range;
-    u8 pad_12[2];
-    s32 a_ref;
-    u8 a_dst;
-    u8 a_op;
-    u8 a_clamp;
-    u8 a_bias;
-    u8 a_scale;
-    u8 a_range;
-    u8 tex_swap;
-    u8 ras_swap;
-    u8 kcsel;
-    u8 kasel;
-    u8 pad_22[0x12];
-    ColTEArg c_in[4];
-    ColTEArg a_in[4];
-    HSD_TObj* tex;
-    u8 chan;
-};
-
-#define COL_TE_ZERO 0
-#define COL_TE_TEV 1
-#define COL_TE_TEX 2
-#define COL_TE_RAS 3
-#define COL_TE_CNST 4
-#define COL_TE_RGB 1
-#define COL_TE_A 5
-#define COL_TE_0 7
-
-#define TEXP_REF(exp, sel) fn_801B7BD4((HSD_GObj*) (exp), (sel))
+/* Keep this as a real call: exposing the same-TU body perturbs the retail
+ * register allocation in the large simplifier below. */
+#define TEXP_REF(exp, sel)                                                   \
+    ((void (*)(ColTExpNode*, s32)) fn_801B7BD4)((exp), (sel))
 #define TEXP_UNREF(exp, sel)                                                 \
     ((void (*)(ColTExpNode*, u8)) fn_801B750C)((exp), (sel))
 
@@ -2040,6 +2065,8 @@ struct ColTExpNode {
  * Fold a compatible child TEV stage into its parent.  Color and alpha are
  * handled independently, and the pass repeats until no further fold occurs.
  */
+#pragma push
+#pragma use_lmw_stmw on
 s32 fn_801B9320(ColTExpNode* tev)
 {
     ColTExpNode* child;
@@ -2459,6 +2486,7 @@ s32 fn_801B9320(ColTExpNode* tev)
 
     return result;
 }
+#pragma pop
 
 #undef TEXP_UNREF
 #undef TEXP_REF
