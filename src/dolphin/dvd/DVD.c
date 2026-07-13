@@ -117,6 +117,30 @@ void fn_800A58F0(void)
     fn_800A48DC(fn_800A59CC);
 }
 
+void fn_800A5CC8(u32 intType)
+{
+    volatile u32* di;
+
+    if (intType == 0x10) {
+        executing_8047A7E8->state = -1;
+        __DVDStoreErrorCode(0x1234568);
+        DVDReset();
+        cbForStateError(0);
+        return;
+    }
+
+    executing_8047A7E8->state = -1;
+    if (intType & 2) {
+        __DVDStoreErrorCode(0x1234567);
+        DVDLowStopMotor(cbForStateError);
+        return;
+    }
+
+    di = (volatile u32*)0xCC006000;
+    __DVDStoreErrorCode(di[8]);
+    DVDLowStopMotor(cbForStateError);
+}
+
 void fn_800A62CC(u32 intType)
 {
     DVDCommandBlock* finished;
