@@ -441,12 +441,39 @@ void mailAddMailbox(s32 seqHandle) {
 }
 
 /**
- * fn_801D1E50 - Waza projectile hit check.
+ * mailGetReceiveNumber - Mail receive-order query by mailbox ID.
  * Address: 0x801D1E50 | Size: 0xBC
  */
-BOOL fn_801D1E50(s32 seqHandle) {
-    /* TODO: Projectile hit check (0xBC bytes) */
-    return FALSE;
+s32 mailGetReceiveNumber(s32 mailId)
+{
+    WazaPartyScratch* party;
+    s32 idx;
+    BOOL found;
+    s32 currentId;
+
+    found = FALSE;
+    idx = 0;
+
+    while (idx < (s32)((WazaPartyScratch*)savedataGetStatus(0, 0x0A))->count && !found) {
+        party = (WazaPartyScratch*)savedataGetStatus(0, 0x0A);
+        if (idx < 0 ||
+            idx >= (s32)((WazaPartyScratch*)savedataGetStatus(0, 0x0A))->count) {
+            currentId = -1;
+        } else {
+            currentId = party->seqIds[idx];
+        }
+
+        if (mailId == currentId) {
+            found = TRUE;
+        }
+
+        idx++;
+    }
+
+    if (!found) {
+        return -1;
+    }
+    return idx;
 }
 
 /**
