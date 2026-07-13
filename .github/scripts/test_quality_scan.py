@@ -42,11 +42,46 @@ class QualityScanAllowlistTests(unittest.TestCase):
     def test_calls_remain_forbidden_in_paired_single_function(self) -> None:
         self.assertFalse(body_ok("ps_add f1, f2, f3\nbl helper", quality_scan.DOLPHIN_PAIRED_SINGLE_PATH, "PSVECNormalize"))
 
+    def test_plain_branch_to_external_symbol_remains_forbidden(self) -> None:
+        self.assertFalse(body_ok(
+            "ps_add f1, f2, f3\nb ExternalFunction",
+            quality_scan.DOLPHIN_PAIRED_SINGLE_PATH,
+            "PSVECNormalize",
+        ))
+
+    def test_plain_branch_to_local_label_is_allowed(self) -> None:
+        self.assertTrue(body_ok(
+            "ps_add f1, f2, f3\nb done\ndone:\nblr",
+            quality_scan.DOLPHIN_PAIRED_SINGLE_PATH,
+            "PSVECNormalize",
+        ))
+
     def test_general_gpr_load_remains_forbidden(self) -> None:
         self.assertFalse(body_ok("ps_mul f1, f2, f3\nlwz r3, 0(r4)", quality_scan.DOLPHIN_PAIRED_SINGLE_PATH, "PSMTXInverse"))
 
     def test_paired_exception_requires_paired_instruction(self) -> None:
         self.assertFalse(body_ok("fres f1, f2", quality_scan.DOLPHIN_PAIRED_SINGLE_PATH, "PSMTXInverse"))
+
+    def test_semicolon_cannot_hide_a_second_instruction(self) -> None:
+        self.assertFalse(body_ok(
+            "ps_add f1, f2, f3; lwz r3, 0(r4); blr",
+            quality_scan.DOLPHIN_PAIRED_SINGLE_PATH,
+            "PSMTXCopy",
+        ))
+
+    def test_record_form_is_not_the_allowlisted_opcode(self) -> None:
+        self.assertFalse(body_ok(
+            "ps_add. f1, f2, f3",
+            quality_scan.DOLPHIN_PAIRED_SINGLE_PATH,
+            "PSMTXCopy",
+        ))
+
+    def test_block_comments_do_not_become_fake_instructions(self) -> None:
+        self.assertTrue(body_ok(
+            "/* lwz r3, 0(r4) */\nps_add f1, f2, f3",
+            quality_scan.DOLPHIN_PAIRED_SINGLE_PATH,
+            "PSMTXCopy",
+        ))
 
     def test_vendor_c_wrappers_are_not_allowlisted(self) -> None:
         self.assertNotIn("PSMTXRotRad", quality_scan.DOLPHIN_PAIRED_SINGLE_FUNCTIONS)
@@ -82,6 +117,49 @@ class QualityScanAllowlistTests(unittest.TestCase):
             [(1, "asm void PSMTXCopy(void)")],
         ))
 
+    def test_multiline_whole_asm_declaration_is_mapped(self) -> None:
+        source = """asm
+void PSMTXCopy(void)
+{
+    psq_l f0, 0(r3), 0, qr0
+    psq_st f0, 0(r4), 0, qr0
+    blr
+}
+"""
+        self.assertFalse(source_ok(
+            source,
+            "src/game/not_dolphin.c",
+            [(1, "asm"), (4, "    psq_l f0, 0(r3), 0, qr0")],
+        ))
+
+    def test_preprocessor_cannot_rewrite_symbol_or_mnemonic(self) -> None:
+        source = """#define PSMTXCopy EvilGameFunction
+#define ps_add lwz
+asm void PSMTXCopy(void)
+{
+    ps_add r3, 0(r4)
+    blr
+}
+"""
+        self.assertFalse(source_ok(
+            source,
+            quality_scan.DOLPHIN_PAIRED_SINGLE_PATH,
+            [
+                (1, "#define PSMTXCopy EvilGameFunction"),
+                (2, "#define ps_add lwz"),
+                (3, "asm void PSMTXCopy(void)"),
+                (5, "    ps_add r3, 0(r4)"),
+            ],
+        ))
+
+    def test_changed_header_cannot_define_case_variant_asm_token(self) -> None:
+        source = "#define PS_ADD lwz\n"
+        self.assertFalse(source_ok(
+            source,
+            "src/dolphin/mtx_aliases.h",
+            [(1, "#define PS_ADD lwz")],
+        ))
+
     def test_changed_inline_asm_rejects_forbidden_instruction(self) -> None:
         source = """void PSVECNormalize(void)
 {
@@ -108,6 +186,42 @@ class QualityScanAllowlistTests(unittest.TestCase):
             source,
             quality_scan.DOLPHIN_PAIRED_SINGLE_PATH,
             [(3, "    asm {")],
+        ))
+
+    def test_asm_words_in_comments_and_strings_are_ignored(self) -> None:
+        source = """/* asm void Fake(void) { */
+const char* text = "asm {";
+// asm volatile {
+"""
+        self.assertTrue(source_ok(
+            source,
+            "src/game/comments.c",
+            [
+                (1, "/* asm void Fake(void) { */"),
+                (2, 'const char* text = "asm {";'),
+                (3, "// asm volatile {"),
+            ],
+        ))
+
+    def test_inc_include_in_comments_and_strings_is_ignored(self) -> None:
+        source = """/* #include "fake.inc" */
+const char* text = "#include \\"fake.inc\\"";
+"""
+        self.assertTrue(source_ok(
+            source,
+            "src/game/comments.c",
+            [
+                (1, '/* #include "fake.inc" */'),
+                (2, 'const char* text = "#include \\"fake.inc\\"";'),
+            ],
+        ))
+
+    def test_real_inc_include_is_rejected(self) -> None:
+        source = '#include "target.inc"\n'
+        self.assertFalse(source_ok(
+            source,
+            "src/game/target.c",
+            [(1, '#include "target.inc"')],
         ))
 
     def test_zero_context_diff_tracks_added_head_line_numbers(self) -> None:
