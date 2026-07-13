@@ -19,6 +19,7 @@
  * copied wholesale. Remainder of the range is asm-only.
  */
 #include "dolphin/types.h"
+#include "game/data/rodata_80267398.h"
 #include "game/menu/menu.h"
 #include "game/menu/menu_name_entry.h"
 
@@ -138,7 +139,6 @@ extern void fn_8006AF44();
 extern void fn_8006AFC4();
 extern void fn_8006AFE4();
 extern void fn_8006B09C();
-extern void fn_8006B420();
 extern void fn_8006B4AC();
 extern void fn_8006B51C();
 extern void fn_8006B8F0();
@@ -151,7 +151,6 @@ extern void fn_80071398();
 extern void fn_800714C8();
 extern void fn_800715BC();
 extern void fn_8007162C();
-extern void fn_80076054();
 extern void fn_800776E4();
 extern void fn_80077E80();
 extern void fn_80077EA4();
@@ -2678,6 +2677,42 @@ void menuColosseumBattle(s32 battleKind) {
     work->battleKind = battleKind;
     fn_800FF58C(0x395);
 }
+
+/* Address: 0x8005CF2C | Size: 0x168 */
+#pragma push
+#pragma peephole off
+void fn_8005CF2C(void* hero, s32 result) {
+    s32 messageId;
+
+    menuOpenCustom(MENU_ID(0xBE), 0, NULL, 0x10, NULL, 1, 0xF5);
+    menuOpenCustom(MENU_ID(0xDA), 0, NULL, 0x10, NULL, 4,
+                   hero, result, fn_8006B420(), 0);
+    menuSetPosition(0xDA, 0, -0x28);
+
+    messageId = fn_80076054(hero, fn_8006B420());
+    if ((u16)messageId == 0) {
+        __assert(lbl_802678D8, 0x1BB, lbl_80267A20);
+    }
+
+    fn_80166A28(0x26);
+    winMsgOpen(7, (u16)messageId, 1, 0);
+    switch (result) {
+    case 0:
+        winMsgOpen(7, 0x440A, 1, 0);
+        break;
+    case 1:
+    case 2:
+    default:
+        winMsgOpen(7, 0x3C4E, 1, 0);
+        break;
+    }
+
+    menuCloseCustom(0xDA, 0, 0);
+    menuCloseCustom(0xBE, 0, 1);
+    menuCloseCustom(0xDA, 0, 1);
+    fn_8006E0CC();
+}
+#pragma pop
 
 /* Address: 0x8005D094 | Size: 0x24 */
 #pragma push
