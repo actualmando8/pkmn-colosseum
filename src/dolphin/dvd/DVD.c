@@ -76,6 +76,7 @@ extern u32 lbl_8047A818;
 extern s32 lbl_8047A81C;
 extern void (*lbl_8047A82C)(DVDCommandBlock* block);
 extern void fn_800A59CC(u32 intType);
+extern void fn_800A6508(u32 intType);
 extern void fn_800A48DC(void (*callback)(u32));
 extern void stateBusy_800A68B4(DVDCommandBlock* block);
 
@@ -371,6 +372,8 @@ typedef struct DVDStaticData {
 } DVDStaticData;
 
 extern DVDStaticData BB2_803FC360;
+extern DVDDiskID lbl_803FC380;
+extern BOOL DVDLowReadDiskID(DVDDiskID* id, DVDLowCallback callback);
 extern BOOL DVDLowAudioStream(u32 subcmd, u32 length, u32 offset,
                               void (*callback)(u32));
 
@@ -702,6 +705,12 @@ void fn_800A640C(void)
                    1150 * ((*(u32*)0x800000F8 / 4) / 1000), AlarmHandler);
         break;
     }
+}
+
+/* 0x800A64D8 | size: 0x30 */
+void stateCoverClosed_CMD(DVDCommandBlock* command)
+{
+    DVDLowReadDiskID(&lbl_803FC380, fn_800A6508);
 }
 #pragma dont_inline reset
 
