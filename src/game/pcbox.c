@@ -482,6 +482,7 @@ asm void getPokemon__5PCBOXFScSc(void) {
 #else
 #pragma scheduling on
 void* getPokemon__5PCBOXFScSc(void* base, s8 r4, s8 r5) {
+    u8* new_var;
     s8 slot;
     s8 entry;
     if (base == 0) {
@@ -489,13 +490,18 @@ void* getPokemon__5PCBOXFScSc(void* base, s8 r4, s8 r5) {
     }
     slot = r4;
     if (slot < 0 || slot >= 3) {
-        return 0;
+        new_var = 0;
+        goto done;
     }
     entry = r5;
     if (entry < 0 || entry >= 0x1e) {
-        return 0;
+        new_var = 0;
+        goto done;
     }
-    return (u8*)base + (s32)slot * 0x24a4 + (s32)entry * 0x138 + 0x14;
+    new_var = (u8*)base + (s32)slot * 0x24a4 +
+              (s32)entry * 0x138 + 0x14;
+done:
+    return new_var;
 }
 #pragma scheduling off
 #endif
