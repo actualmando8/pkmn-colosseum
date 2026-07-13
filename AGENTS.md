@@ -17,7 +17,9 @@ active build/report path is `configure.py` -> `ninja` ->
 
 - Do not add, edit, stage, or commit `.inc` files.
 - Do not count asm wrappers, inline asm, or included assembly as decompilation
-  progress.
+  progress, except authentic Dolphin SDK paired-single math admitted by the
+  path-, symbol-, and instruction-scoped quality allowlist. Do not broaden that
+  exception without a dedicated policy and CI change.
 - Do not commit extracted game assets, target objects, compiler binaries, or
   generated build products.
 - Do not move archived campaign material back into the active tree unless it is
