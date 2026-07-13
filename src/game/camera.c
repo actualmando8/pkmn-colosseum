@@ -1194,6 +1194,22 @@ void cameraSetTarget(u32 a, u32 b) {
 #endif
 #pragma pop
 #pragma push
+#pragma optimization_level 4
+GSRenderCamera* cameraGetActive(void) {
+    extern GSRenderCamera* GScameraGetActiveCamera(void);
+    GSRenderCamera* camera;
+
+    camera = GScameraGetActiveCamera();
+    if (camera != 0) {
+        return camera;
+    }
+
+    camera = GSresGetResource(0, 0);
+    fn_800D258C(camera);
+    return camera;
+}
+#pragma pop
+#pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
