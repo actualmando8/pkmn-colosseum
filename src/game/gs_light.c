@@ -336,8 +336,12 @@ extern u16 lbl_8047AAE8;
 extern void __assert(u8*, u32, u8*);
 extern u8 lbl_8047CA90;
 extern u8 lbl_8047CA98;
+typedef struct GSlightLObj {
+    u8 padding[0xc];
+    struct GSlightLObj* next;
+} GSlightLObj;
 extern void HSD_LObjDeleteCurrentAll(void*);
-extern void HSD_LObjAddCurrentAll(void);
+extern void HSD_LObjAddCurrentAll(GSlightLObj*);
 extern void HSD_LObjSetup(void*);
 extern u32 lbl_8047AAF8;
 extern u32 lbl_8047AB08;
@@ -963,8 +967,15 @@ void lightGetFrameCount__FP9_HSD_AObj(u8* obj) {
 }
 #endif
 
+typedef struct GSlightEntry {
+    u8 allocated;
+    u8 active;
+    u8 padding[0xa];
+    GSlightLObj* lobj;
+    u8 remaining[0x64];
+} GSlightEntry;
+
 extern void HSD_LObjDeleteCurrentAll(void*);
-extern void HSD_LObjAddCurrentAll(void);
 extern void HSD_LObjSetup(void*);
 extern u32 lbl_8047AAEC;
 extern u32 lbl_8047AAF0;
@@ -976,84 +987,39 @@ asm void fn_800DD174(void) {
 #pragma push
 #pragma peephole off
 #pragma scheduling on
-void fn_800DD174(void* arg) {
-    extern void HSD_LObjDeleteCurrentAll(void*);
-    extern void HSD_LObjAddCurrentAll(void*);
-    extern void HSD_LObjSetup(void*);
-    extern u32 lbl_8047AAEC;
-    extern u32 lbl_8047AAF0;
-    u32 r3;
-    u32 r4;
-    u32 r5;
-    u32 r6;
-    u32 r7;
-    u32 r8;
-    u32 r0;
+void GSlightSetupLights(void* arg) {
+    GSlightEntry* lightList;
+    GSlightEntry* light;
+    GSlightEntry* last;
+    s32 firstIndex;
+    u32 i;
 
     HSD_LObjDeleteCurrentAll(0);
-    {
-        r5 = lbl_8047AAEC;
-        r3 = 0;
-        r0 = lbl_8047AAF0;
-        r4 = r5;
-        for (;;) {
-            if ((s32)r0 <= 0) break;
-            r0--;
-            {
-                u8 tmp0 = ((u8*)r4)[0];
-                if (tmp0 == 1) {
-                    u8 tmp1 = ((u8*)r4)[1];
-                    if (tmp1 != 0) {
-                        goto FOUND;
-                    }
-                }
-            }
-            r4 += 0x74;
-            r3++;
+
+    lightList = (GSlightEntry*)lbl_8047AAEC;
+    for (firstIndex = 0, light = lightList;
+         firstIndex < (s32)lbl_8047AAF0; firstIndex++, light++) {
+        if (light->allocated == 1 && light->active != 0) {
+            break;
         }
     }
-    r3 = -1;
-FOUND:
-    if ((s32)r3 != -1) {
-        r6 = r3 * 0x74;
-        r7 = r3 + 1;
-        r4 = r7 * 0x74;
-        r5 = r5 + r6;
-        goto LOOP2_CHECK;
-        do {
-            {
-                r0 = lbl_8047AAEC;
-                r8 = r0 + r4;
-                {
-                    u8 tmp0 = ((u8*)r8)[0];
-                    if (tmp0 == 1) {
-                        u8 tmp1 = ((u8*)r8)[1];
-                        if (tmp1 != 0) {
-                            r3 = *(u32*)(r5 + 0xc);
-                            r5 = r8;
-                            r0 = *(u32*)(r8 + 0xc);
-                            *(u32*)(r3 + 0xc) = r0;
-                        }
-                    }
-                }
+    if (firstIndex >= (s32)lbl_8047AAF0) {
+        firstIndex = -1;
+    }
+
+    if (firstIndex != -1) {
+        last = &lightList[firstIndex];
+        for (i = firstIndex + 1; i < lbl_8047AAF0; i++) {
+            light = &((GSlightEntry*)lbl_8047AAEC)[i];
+            if (light->allocated == 1 && light->active != 0) {
+                last->lobj->next = light->lobj;
+                last = light;
             }
-            r4 += 0x74;
-            r7++;
-        LOOP2_CHECK:
-            r0 = lbl_8047AAF0;
-        } while (r7 < r0);
-        {
-            r3 = *(u32*)(r5 + 0xc);
-            r0 = 0;
-            *(u32*)(r3 + 0xc) = r0;
-            r0 = lbl_8047AAEC;
-            r3 = r0 + r6;
-            r3 = *(u32*)(r3 + 0xc);
-            HSD_LObjAddCurrentAll((void*)r3);
         }
+        last->lobj->next = 0;
+        HSD_LObjAddCurrentAll(lightList[firstIndex].lobj);
     }
     HSD_LObjSetup(arg);
 }
 #pragma pop
 #endif
-
