@@ -19,6 +19,8 @@ extern HSD_DObjInfo hsdDObj;
 extern u8 lbl_8036C638[];
 extern char lbl_80274708[];
 extern char lbl_80274720[];
+extern HSD_ClassInfo lbl_8036C7A0;
+extern HSD_ClassInfo* lbl_8047B260;
 static HSD_ClassInfo* default_class = NULL;
 
 /* ========================================================================= */
@@ -190,7 +192,7 @@ void HSD_DObjSetDefaultClass(HSD_ClassInfo* info)
 
 /* Forward decls of vtable entries wired by DObjInfoInit. */
 static void DObjRelease(HSD_Class* o);
-static void fn_80199014(HSD_Class* o);
+static void fn_80199014(HSD_ClassInfo* info);
 static void fn_801990B8(HSD_DObj* dobj, f32 vmtx[3][4], f32 pmtx[3][4], u32 rendermode);
 static int DObjLoad(HSD_DObj* dobj, HSD_DObjDesc* desc);
 
@@ -215,22 +217,14 @@ static void fn_80198F7C(void)
 
 /* 0x80199014 | 0x48 */
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 0
-asm void fn_80199014(void) {
-#include "src/hsd/hsd_dobj_fn_80199014.inc"
-}
-#else
 #pragma optimization_level 1
-static void DObjDestroy(HSD_Class* o)
+static void fn_80199014(HSD_ClassInfo* info)
 {
-    if (o == (HSD_Class*) default_class) {
-        default_class = NULL;
+    if (info == lbl_8047B260) {
+        lbl_8047B260 = NULL;
     }
-    HSD_PARENT_INFO(&hsdDObj)->destroy(o);
+    (&lbl_8036C7A0)->head.parent->amnesia(info);
 }
-#endif
 #pragma pop
 
 /* 0x8019905C | 0x5C */
