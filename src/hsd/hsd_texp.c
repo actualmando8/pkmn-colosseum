@@ -2425,6 +2425,29 @@ void* HSD_ShadowGetAllocData(void) {
     return lbl_804656E0;
 }
 
+typedef void (*HSD_TevStateFn)(void);
+
+typedef struct HSD_TevStateCallback {
+    s32 mask;
+    HSD_TevStateFn callback;
+} HSD_TevStateCallback;
+
+extern HSD_TevStateCallback lbl_8036CFA8[];
+
+/* 0x801B25C4 | 0x90 */
+#pragma push
+#pragma optimization_level 1
+void fn_801B25C4(u32 flags) {
+    s32 i;
+
+    for (i = 0; lbl_8036CFA8[i].mask != 0; i++) {
+        if ((flags & lbl_8036CFA8[i].mask) != 0) {
+            lbl_8036CFA8[i].callback();
+        }
+    }
+}
+#pragma pop
+
 /* 0x801B2654 | 0xA4 */
 #pragma push
 #pragma optimization_level 1
