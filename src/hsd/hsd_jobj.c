@@ -371,7 +371,7 @@ static void JObjInfoInit(void)
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern u32 lbl_8047B298;
+extern HSD_ClassInfo* lbl_8047B298;
 extern u8 lbl_8036C8E0[];
 extern u32 lbl_8047B29C;
 extern u32 lbl_8047B2AC;
@@ -1058,6 +1058,24 @@ void fn_8019F1C4(HSD_JObj* jobj, s32* total_a, s32* total_b) {
 #endif
 #pragma pop
 
+/* 0x8019F718 | 0x60 */
+#pragma push
+#pragma optimization_level 1
+HSD_JObj* fn_80193828(HSD_ClassInfo*);
+HSD_JObj* fn_8019F718(void)
+{
+    HSD_JObj* jobj;
+
+    jobj = fn_80193828(lbl_8047B298 ? lbl_8047B298
+                                     : (HSD_ClassInfo*) lbl_8036C8E0);
+    if (jobj == NULL) {
+        __assert(&lbl_8047DB20, 0x7DF, &lbl_8047DB3C);
+    }
+
+    return jobj;
+}
+#pragma pop
+
 /* 0x8019F778 | 0x78 */
 #pragma push
 #pragma optimization_level 0
@@ -1730,7 +1748,7 @@ void HSD_JObjResolveRefs(HSD_JObj* jobj, HSD_Joint* joint)
 #pragma optimizewithasm off
 extern HSD_ClassInfo* fn_80193748(const char*);
 extern HSD_JObj* fn_80193828(HSD_ClassInfo*);
-extern u32 lbl_8047B298;
+extern HSD_ClassInfo* lbl_8047B298;
 #if 1
 HSD_JObj* HSD_JObjLoadJoint(HSD_Joint* joint)
 {
@@ -1841,7 +1859,7 @@ extern HSD_RObj* HSD_RObjLoadDesc(HSD_RObjDesc* desc);
 extern void PSMTXIdentity(f32 mtx[3][4]);
 extern f32* HSD_MtxAlloc(void);
 extern void* memcpy(void* dst, const void* src, u32 n);
-extern u32 lbl_8047B298;
+extern HSD_ClassInfo* lbl_8047B298;
 #if 0
 asm void JObjLoad(void) {
 #include "src/hsd/hsd_jobj_fn_801A1098.inc"
