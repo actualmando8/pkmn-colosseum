@@ -30,15 +30,25 @@ s32 fn_801D1338(void* wazaCtx) {
     return *(s32*)((u8*)wazaCtx + 0x00);
 }
 
+/* Extended view of party scratch to access u16 field at offset 0x444.
+ * TODO: fold field_444 into WazaPartyScratch when full layout confirmed. */
+typedef struct MailPartyScratchExt {
+    u8 pad_000[0x444];
+    u16 sortMode; /* offset 0x444 */
+} MailPartyScratchExt;
+
 /**
- * fn_801D1364 - Waza get entry pointer by index.
+ * fn_801D1364 - Set u16 handle in battle party scratch at offset 0x444.
  * Address: 0x801D1364 | Size: 0x38
+ * Stores handle as u16 at party+0x444 via savedataGetStatus(0, 0xA).
  */
-void* fn_801D1364(void* wazaCtx, s32 idx) {
-    if (wazaCtx == NULL) return NULL;
-    if (idx < 0) return NULL;
-    return *(void**)((u8*)wazaCtx + 0x04 + idx * 4);
+#pragma scheduling off
+void* fn_801D1364(void* handle, s32 idx) {
+    MailPartyScratchExt* party = (MailPartyScratchExt*)savedataGetStatus(0, 0x0A);
+    party->sortMode = (u32)handle;
+    return party;
 }
+#pragma scheduling on
 
 /**
  * fn_801D139C - Waza get entry type.
