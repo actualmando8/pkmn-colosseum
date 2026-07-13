@@ -86,6 +86,15 @@ def load_manifest_queue(units: Path):
     return metas, queue_order
 
 
+def prune_stale_results(state: dict, queue_order: list[str]) -> list[str]:
+    """Drop persisted results for work units no longer in the manifest."""
+    admitted = set(queue_order)
+    stale = sorted(set(state["done"]) - admitted)
+    for fn in stale:
+        del state["done"][fn]
+    return stale
+
+
 class Worker:
     def __init__(self, fn: str, unit_dir: Path, budget: float):
         self.fn = fn
@@ -234,6 +243,10 @@ def main():
     metas, queue_order = load_manifest_queue(UNITS)
 
     state = load_json(state_path, {"done": {}, "round": 0})
+    pruned = prune_stale_results(state, queue_order)
+    if pruned:
+        atomic_write(state_path, json.dumps(state, indent=1))
+        print(f"startup: pruned {len(pruned)} stale results")
 
     def runnable(rnd):
         for fn in queue_order:
@@ -260,7 +273,11 @@ def main():
             metas.update(loaded_metas)
             if loaded_order != queue_order:
                 queue_order = loaded_order
-                print(f"manifest reload: {len(queue_order)} units")
+                pruned = prune_stale_results(state, queue_order)
+                if pruned:
+                    atomic_write(state_path, json.dumps(state, indent=1))
+                print(f"manifest reload: {len(queue_order)} units, "
+                      f"pruned {len(pruned)} stale results")
 
             pending = [fn for fn in runnable(round_no) if fn not in workers]
             if not pending and not workers:
