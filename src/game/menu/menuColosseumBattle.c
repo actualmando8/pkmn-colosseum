@@ -214,7 +214,9 @@ extern const char lbl_8047BF28;
 extern u8 lbl_80267840[];
 extern char lbl_802678D8[];
 extern const ColosseumRosterRow lbl_802677D0[7];
+extern const s32 lbl_80267A80[6];
 extern const s32 lbl_80267A98[6];
+extern const s32 lbl_80267AB0[18];
 extern u8 lbl_803A9A08[];
 extern u8 lbl_803A9A18[];
 
@@ -247,7 +249,6 @@ s32 fn_80057E40(void) {
 
 /* Address: 0x80058754 | Size: 0x44 */
 #pragma push
-#pragma scheduling off
 #pragma peephole off
 s32 fn_80058754(void* unused, MenuWindow* window) {
     ColosseumMessageBuffer* message = (ColosseumMessageBuffer*)lbl_803A9A18;
@@ -1902,6 +1903,7 @@ done:
 
 /* Address: 0x8005CCD0 | Size: 0xB8 */
 #pragma push
+#pragma scheduling off
 #pragma peephole off
 void menuColosseumBattleExit(void) {
     u32 handle;
@@ -1981,6 +1983,52 @@ s32 fn_8005D130(void) {
     if (menuResult >= 0) {
         fn_8003480C(menuResult);
     }
+    return 0;
+}
+#pragma pop
+
+/* Address: 0x8005D184 | Size: 0xE8 */
+#pragma push
+#pragma peephole off
+#pragma optimize_for_size on
+s32 fn_8005D184(MenuWindow* menu, MenuSprite* sprite) {
+    s32 tags[6];
+    s32* p;
+    s32 i;
+    s32 j;
+    s32 visible;
+
+    tags[0] = lbl_80267A80[0];
+    tags[1] = lbl_80267A80[1];
+    tags[2] = lbl_80267A80[2];
+    tags[3] = lbl_80267A80[3];
+    tags[4] = lbl_80267A80[4];
+    tags[5] = lbl_80267A80[5];
+
+    p = tags;
+    for (i = 0; i < 2; i++) {
+        j = 0;
+        if (sprite->tag != p[0]) {
+            j = 1;
+            if (sprite->tag != p[1]) {
+                j = 2;
+                if (sprite->tag != p[2]) {
+                    j = 3;
+                }
+            }
+        }
+        if (j < 3) break;
+        p += 3;
+    }
+    if (i >= 2) {
+        return 0;
+    }
+    if (menu->cursor == i) {
+        visible = 1;
+    } else {
+        visible = 0;
+    }
+    winSpriteSetDisp(sprite, visible);
     return 0;
 }
 #pragma pop
@@ -2082,7 +2130,6 @@ s32 fn_8005D3D0(s32 target) {
 
 /* Address: 0x8005D4AC | Size: 0x48 */
 #pragma push
-#pragma scheduling off
 #pragma peephole off
 s32 fn_8005D4AC(void* menu, void* sprite) {
     s32 visible;
@@ -2101,7 +2148,6 @@ s32 fn_8005D4AC(void* menu, void* sprite) {
 
 /* Address: 0x8005D4F4 | Size: 0x48 */
 #pragma push
-#pragma scheduling off
 #pragma peephole off
 s32 fn_8005D4F4(void* menu, void* sprite) {
     s32 visible;
@@ -2120,7 +2166,6 @@ s32 fn_8005D4F4(void* menu, void* sprite) {
 
 /* Address: 0x8005D53C | Size: 0x48 */
 #pragma push
-#pragma scheduling off
 #pragma peephole off
 s32 fn_8005D53C(void* menu, void* sprite) {
     s32 visible;
@@ -2139,7 +2184,6 @@ s32 fn_8005D53C(void* menu, void* sprite) {
 
 /* Address: 0x8005D584 | Size: 0x48 */
 #pragma push
-#pragma scheduling off
 #pragma peephole off
 s32 fn_8005D584(void* menu, void* sprite) {
     s32 visible;
@@ -2152,6 +2196,49 @@ s32 fn_8005D584(void* menu, void* sprite) {
         visible = 0;
     }
     winSpriteSetDisp(sprite, (u8)visible);
+    return 0;
+}
+#pragma pop
+
+/* Address: 0x8005D5CC | Size: 0xDC */
+#pragma push
+#pragma peephole off
+#pragma optimize_for_size on
+s32 fn_8005D5CC(MenuWindow* menu, MenuSprite* sprite) {
+    typedef struct ColosseumSpriteTags {
+        s32 values[18];
+    } ColosseumSpriteTags;
+    ColosseumSpriteTags tags;
+    s32* p;
+    s32 j;
+    s32 i;
+    s32 visible;
+
+    tags = *(const ColosseumSpriteTags*)lbl_80267AB0;
+    p = tags.values;
+    for (i = 0; i < 6; i++) {
+        j = 0;
+        if (sprite->tag != p[0]) {
+            j = 1;
+            if (sprite->tag != p[1]) {
+                j = 2;
+                if (sprite->tag != p[2]) {
+                    j = 3;
+                }
+            }
+        }
+        if (j < 3) break;
+        p += 3;
+    }
+    if (i >= 6) {
+        return 0;
+    }
+    if (menu->cursor == i) {
+        visible = 1;
+    } else {
+        visible = 0;
+    }
+    winSpriteSetDisp(sprite, visible);
     return 0;
 }
 #pragma pop

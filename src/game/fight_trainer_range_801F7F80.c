@@ -923,12 +923,15 @@ void* fightTrainerCheckFightPokemonFightOut(void* context, void* filter) {
             if ((u8)fightOutPokemonCheckValid(pokemon) == 0) {
                 pokemon = NULL;
             }
-            if (pokemon != NULL && (u8)fightPokemonCheckMotoFightPokemon(filter, pokemon) == 1) {
-                break;
+            if (pokemon != NULL) {
+                if ((u8)fightPokemonCheckMotoFightPokemon(filter, pokemon) == 1) {
+                    goto found;
+                }
             }
         }
         pokemon = NULL;
     }
+found:
     if (pokemon != NULL) {
         if ((u8)fightOutPokemonCheckFightOut(pokemon) == 0) {
             pokemon = NULL;
@@ -994,7 +997,10 @@ u32 fightTrainerCheckCanGetExp(void* context) {
     } else {
         val = 2;
     }
-    return val == 0;
+    if ((u8)(val == 0) == 1) {
+        return 1;
+    }
+    return 0;
 }
 
 /* 0x801F90C4 | size: 0x6C */
@@ -3557,7 +3563,7 @@ void fightTrainerHokakuThrowEffect(void* context, u32 param, u8 mode) {
 
 /* 0x801FBC20 | size: 0xF0 */
 void fightTrainerBallThrowEffect(void* context, void* trainerCtx, u8 mode) {
-    extern void _threadSwitch(void* ptr);
+    extern void _threadSwitch(void);
     extern void fn_801DA8C4(void* ptr, u32 field, u32 size);
     extern u8 fn_801DA94C(void* ptr, u32 field, u32 size);
     extern void fn_801DA9E8(void* ptr, u32 field, u32 size);
@@ -3582,7 +3588,7 @@ void fightTrainerBallThrowEffect(void* context, void* trainerCtx, u8 mode) {
             if ((u8)fn_801DA94C(data, animId, 4) == 0) {
                 return;
             }
-            _threadSwitch(data);
+            _threadSwitch();
         } while (1);
     } else if (mode == 3) {
         fn_801DA8C4(data, animId, 4);

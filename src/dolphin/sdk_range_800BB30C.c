@@ -77,6 +77,13 @@ extern void fn_800BE164(u32* hi, u32* lo);
 extern void fn_800B91EC(void);
 extern void __GXSendFlushPrim(void);
 extern u32 __cvt_fp2unsigned(f32 value);
+extern s32 TRKReleaseBuffer(s32 bufferIndex);
+
+typedef struct TRKEvent {
+    /* 0x00 */ s32 type;
+    /* 0x04 */ s32 unused;
+    /* 0x08 */ s32 bufferIndex;
+} TRKEvent;
 
 #define GX_FIFO_U8  (*(volatile u8*)0xCC008000)
 #define GX_FIFO_U16 (*(volatile u16*)0xCC008000)
@@ -113,6 +120,15 @@ void fn_800BBF98(u32 dstCoord, u32 func, u32 normalize) {
 void fn_800BBFDC(u32 dstCoord) {
     fn_800BB780(dstCoord, 0, 0, 0, 0, 6, 6, 1, 0, 0);
 }
+
+#pragma peephole off
+void __GXFlushTextureState(void) {
+    GXData_800BB30C* p = gx;
+
+    GX_BP_REG(p->field_124);
+    p->field_002 = 0;
+}
+#pragma peephole on
 
 void fn_800BC8C8(u32 nStages) {
     GXData_800BB30C* p = gx;
@@ -215,4 +231,101 @@ u32 fn_800BE31C(void) {
 
     fn_800BE164(&hi, &lo);
     return hi;
+}
+
+void fn_800BCE30(u32 zCompLoc) {
+    GXData_800BB30C* p = gx;
+    u32 value = p->field_1D0;
+
+    value = (value & 0x0FFFFFFF) | ((zCompLoc << 3) & 0x10000000);
+    GX_BP_REG(value);
+    p->field_1D0 = value;
+    p->field_002 = 0;
+}
+
+void fn_800BCE5C(u32 zCompLoc) {
+    GXData_800BB30C* p = gx;
+    u32 value = p->field_1D0;
+
+    value = (value & 0xF7FFFFFF) | (((s32)zCompLoc << 4) & 0x08000000);
+    GX_BP_REG(value);
+    p->field_1D0 = value;
+    p->field_002 = 0;
+}
+
+void GXSetZMode(u32 compareEnable, u32 func, u32 updateEnable) {
+    GXData_800BB30C* p = gx;
+    u32 value = p->zMode;
+
+    value &= 0x87FFFFFFU;
+    value |= compareEnable << 31;
+    value |= func << 28;
+    value |= updateEnable << 27;
+    GX_BP_REG(value);
+    p->zMode = value;
+    p->field_002 = 0;
+}
+
+void fn_800BCFDC(u32 zCompLoc) {
+    GXData_800BB30C* p = gx;
+    u32 value = p->field_1D0;
+
+    value = (value & ~0x20000000U) | ((zCompLoc << 29) & 0x20000000);
+    GX_BP_REG(value);
+    p->field_1D0 = value;
+    p->field_002 = 0;
+}
+
+void GXSetDstAlpha(u32 enable, u32 alpha) {
+    GXData_800BB30C* p = gx;
+    u32 value = p->dstAlpha;
+
+    value &= 0x00FFFFFFU;
+    value |= (alpha << 24);
+
+    value &= 0xFF7FFFFFU;
+    value |= ((enable << 23) & 0x00800000U);
+
+    GX_BP_REG(value);
+    p->dstAlpha = value;
+    p->field_002 = 0;
+}
+
+#pragma optimize_for_size off
+void GXSetClipMode(u32 clipMode) {
+    GX_FIFO_U8 = 0x10;
+    GX_FIFO_U32 = 0x1005;
+    GX_FIFO_U32 = clipMode;
+    gx->field_002 = 1;
+}
+
+#pragma optimize_for_size reset
+
+void fn_800BD044(u32 arg0, u32 arg1) {
+    GXData_800BB30C* p = gx;
+    u32 value = arg1;
+
+    value &= 0xFFU;
+    value |= (arg0 & 0xFFU) << 1U;
+    value &= 0xFFU;
+    GX_BP_REG(0x44000000U | value);
+    p->field_002 = 0;
+}
+
+void fn_800BD830(u32 arg0, u32 arg1) {
+    GXData_800BB30C* p = gx;
+    u32 value = arg0 + 0x156U;
+    u32 cmd = arg1 + 0x156U;
+
+    value = (value >> 1U) & 0xFFC00FFFU;
+    cmd = ((cmd << 9U) | (cmd >> 23U)) & 0x003FFFFFU;
+    value |= cmd;
+    value &= 0x00FFFFFFU;
+
+    GX_BP_REG(0x59000000U | value);
+    p->field_002 = 0;
+}
+
+void TRKDestructEvent(TRKEvent* event) {
+    TRKReleaseBuffer(event->bufferIndex);
 }

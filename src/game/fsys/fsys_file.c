@@ -117,48 +117,51 @@ static FSYSSubEntry* FSYSFileEntry_GetSubEntry(FSYSFileEntry* entry) {
  * @param nameHash    The name hash / resource ID of the file to check
  * @return            1 if the file is fully loaded, 0 otherwise
  * =================================================================== */
+extern FSYSSlot* fn_8017D410(u32 fileHandle, u32 mode);
+
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
 s32 fn_8017B07C(u32 fileHandle, u32 nameHash) {
     FSYSSlot* slot;
-    s32 found = 0;
+    u8* archive;
+    s32 found;
     u32 i;
-
-    slot = FSYSFindSlot(fileHandle, 3);
-    if (slot == NULL) {
-        return found;
-    }
-
-    for (i = 0; i < slot->numEntries; i++) {
-        void* archBase = slot->archiveData;
-        FSYSFileEntry* entry;
-
-        if (archBase != NULL) {
-            /* Two-level indirection to find the file entry:
-             * 1. stringTableOff points to an offset table
-             * 2. That table points to per-entry offset arrays
-             * 3. Index into the array gives the entry offset */
-            u32 stringTableOff = *(u32*)((u8*)archBase + 0x18);
-            u32* offTable = (u32*)((u8*)archBase + stringTableOff);
-            u32  strOff   = offTable[0];
-            u32* entryTable = (u32*)((u8*)archBase + strOff);
-            u32  entryOff  = entryTable[i];
-            entry = (FSYSFileEntry*)((u8*)archBase + entryOff);
-        } else {
-            entry = NULL;
-        }
-
-        if (entry != NULL) {
-            FSYSSubEntry* sub = FSYSFileEntry_GetSubEntry(entry);
-
-            if (entry->nameHash == nameHash) {
-                if (sub->state == 6) {
+    FSYSFileEntry* entry;
+    FSYSFileEntry* e2;
+    FSYSFileEntry* spareA;
+    u32* firstTable;
+    u32* entryTable;
+    FSYSFileEntry* spareB;
+    slot = fn_8017D410(fileHandle, 3);
+    found = 0;
+    if (slot) {
+        e2 = e2;
+        for (i = 0; i < slot->numEntries; i++) {
+            archive = (u8*)slot->archiveData;
+            if (archive) {
+                firstTable = (u32*)(archive + *(u32*)(archive + 0x18));
+                entryTable = (u32*)(archive + firstTable[0]);
+                spareA = (FSYSFileEntry*)(archive + entryTable[i]);
+            } else {
+                spareA = NULL;
+            }
+            entry = spareA;
+            e2 = entry;
+            if (e2->nameHash == nameHash) {
+                if (*(s32*)((u8*)entry + 0x28) != 6) {
+                    spareB = spareB;
+                } else {
                     found = 1;
                 }
             }
+            spareB = spareB;
         }
+        return found;
     }
-
     return found;
 }
+#pragma pop
 
 /* ===================================================================
  * fn_8017B13C: fn_8017B13C
@@ -171,19 +174,23 @@ s32 fn_8017B07C(u32 fileHandle, u32 nameHash) {
  * @param requestID   Resource name hash to load
  * @return            1 on success, 0 if no slot available
  * =================================================================== */
+extern FSYSSlot* fn_8017D410(u32 fileHandle, u32 mode);
+
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
 s32 fn_8017B13C(u32 fileHandle, u32 requestID) {
     FSYSSlot* slot;
 
-    slot = FSYSFindSlot(fileHandle, 3);
-    if (slot == NULL) {
-        return 0;
+    slot = fn_8017D410(fileHandle, 3);
+    if (slot) {
+        slot->requestID = requestID;
+        fn_8017E1D8(slot, fileHandle, 0, 0, 0);
+        return 1;
     }
-
-    slot->requestID = requestID;
-    fn_8017E1D8(slot, fileHandle, 0, 0, 0);
-
-    return 1;
+    return 0;
 }
+#pragma pop
 
 /* Note: numEntries is at offset 0x0C in the FSYSSlot struct, now a named field. */
 
@@ -719,22 +726,30 @@ void fn_8017B1AC(void) {
 #pragma push
 #pragma optimization_level 0
 void fn_8017B1CC(u32 fileHandle) {
+    FSYSSlot* spare;
     FSYSSlot* slot;
     FSYSSlot* hit;
     FSYSSlot* found;
     u32 i;
     u16 handle;
 
-    hit = NULL;
     slot = (FSYSSlot*)lbl_8047B1B4;
     for (i = 0; i < lbl_80453FEC.maxSlots; i++) {
-        if ((s32)slot->status != FSYS_STATUS_FREE && slot->fileHandle == fileHandle) {
-            hit = slot;
-            break;
+        if ((s32)slot->status != FSYS_STATUS_FREE) {
+            if (slot->fileHandle == fileHandle) {
+                hit = slot;
+                goto done;
+            } else {
+                slot++;
+            }
+        } else {
+            slot++;
         }
-        slot++;
     }
+    hit = NULL;
+done:
     found = hit;
+    spare = spare;
     if (!found) {
         return;
     }
@@ -770,21 +785,68 @@ asm void fn_8017B2CC(void) {
 #else
 s32 fn_8017B2CC(u32 fileHandle) {
     FSYSSlot* slot;
+    FSYSSlot* hit;
+    FSYSSlot* found;
     u32 i;
 
     slot = (FSYSSlot*)lbl_8047B1B4;
-    for (i = 0; i < lbl_80453FEC.maxSlots; i++, slot++) {
-        if (slot->status != FSYS_STATUS_FREE && slot->fileHandle == fileHandle) {
-            if (slot->status == FSYS_STATUS_LOADED) {
-                return 0;
+    for (i = 0; i < lbl_80453FEC.maxSlots; i++) {
+        if ((s32)slot->status != FSYS_STATUS_FREE) {
+            if (slot->fileHandle == fileHandle) {
+                hit = slot;
+                goto done;
+            } else {
+                slot++;
             }
-            return 1;
+        } else {
+            slot++;
         }
     }
-
+    hit = NULL;
+done:
+    found = hit;
+    if (found) {
+        if ((s32)found->status == FSYS_STATUS_LOADED) {
+            return 0;
+        }
+        return 1;
+    }
     return -1;
 }
 #endif
+#pragma pop
+
+/* 0x8017B370 | 0x74 */
+#pragma push
+#pragma optimization_level 0
+s32 fn_8017B370(u32 fileHandle) {
+    FSYSSlot* slot;
+    extern void fn_8017E09C(FSYSSlot*, u32, u32, u32, u32);
+
+    slot = fn_8017D410(fileHandle, 0);
+    if (slot) {
+        lbl_80453FEC.field_28 = 1;
+        fn_8017E09C(slot, fileHandle, 0, 0, 0);
+        return 1;
+    }
+    return 0;
+}
+#pragma pop
+
+/* 0x8017B3E4 | 0x64 */
+#pragma push
+#pragma optimization_level 0
+s32 fn_8017B3E4(u32 fileHandle) {
+    FSYSSlot* slot;
+    extern void fn_8017E09C(FSYSSlot*, u32, u32, u32, u32);
+
+    slot = fn_8017D410(fileHandle, 0);
+    if (slot) {
+        fn_8017E09C(slot, fileHandle, 0, 0, 0);
+        return 1;
+    }
+    return 0;
+}
 #pragma pop
 
 /* ===================================================================
@@ -1117,26 +1179,67 @@ asm void fn_8017B4BC(void) {
 #include "src/game/fsys/fsys_file_fn_8017B4BC.inc"
 }
 #else
+#pragma push
+#pragma optimization_level 0
 u32 fn_8017B4BC(u32 fileHandle, u32 index) {
-    FSYSSlot* slot;
-    FSYSFileEntry* entry;
+    u8* archiveA;
+    u8* secondaryTable;
+    u32 volatile result;
+    u8* volatile archiveCopy;
+    u8* archiveB;
+    u8* volatile secondaryStore;
+    u32* firstTableA;
+    u32* firstTableB;
+    u32* entryTable;
     u32 i;
+    u8 found;
+    FSYSFileEntry* entry;
+    FSYSFileEntry* spareA;
+    FSYSFileEntry* spareB;
+    FSYSFileEntry* spareC;
+    FSYSSlot* slot;
 
     slot = (FSYSSlot*)lbl_8047B1B4;
-    for (i = 0; i < lbl_80453FEC.maxSlots; i++, slot++) {
-        if (slot->status != FSYS_STATUS_FREE &&
-            slot->fileHandle == fileHandle &&
-            slot->padding05C != 0) {
-            entry = FSYSGetEntryByIndex(slot, index);
-            if (entry != NULL) {
-                return entry->nameHash;
-            }
-            break;
+    slot = (FSYSSlot*)lbl_8047B1B4;
+    spareA = spareA;
+    spareB = spareB;
+    spareC = spareC;
+    for (i = 0; i < lbl_80453FEC.maxSlots; i++) {
+        found = found;
+        archiveA = (u8*)slot->archiveData;
+        if (archiveA) {
+            firstTableA = (u32*)(archiveA + *(u32*)(archiveA + 0x18));
+            secondaryTable = archiveA + firstTableA[1];
+        } else {
+            secondaryTable = NULL;
         }
+        secondaryStore = secondaryTable;
+        if ((s32)slot->status != FSYS_STATUS_FREE && slot->fileHandle == fileHandle &&
+            (s32)slot->padding05C != 0) {
+            archiveB = (u8*)slot->archiveData;
+            archiveCopy = (u8*)slot->archiveData;
+            if (archiveB) {
+                firstTableB = (u32*)(archiveB + *(u32*)(archiveB + 0x18));
+                entryTable = (u32*)(archiveB + firstTableB[0]);
+                entry = (FSYSFileEntry*)(archiveB + entryTable[index]);
+            } else {
+                entry = NULL;
+            }
+            result = entry->nameHash;
+            found = 1;
+            goto done;
+        }
+        slot++;
     }
+    found = 0;
 
+done:
+    if (found) {
+        return result;
+    }
     return 0;
 }
+#pragma pop
 #endif
 
 /* 0x8017B5A4 | 0x1C */
@@ -1156,6 +1259,9 @@ extern u32 fn_8017F794();
 extern u32 fn_8017F728();
 extern void fn_8017A814(void);
 extern void* fn_80180584();
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
 #if 0
 asm void fn_8017B5C0(void) {
 #include "src/game/fsys/fsys_file_fn_8017B5C0.inc"
@@ -1163,28 +1269,41 @@ asm void fn_8017B5C0(void) {
 #else
 void fn_8017B5C0(FSYSSlot* slot, FSYSFileEntry* entry, u32 index) {
     FSYSSubEntry* sub;
-    void* temp;
     u32 cached;
+    void* ptr;
+    u16 handle;
     u32 offset;
-
-    (void)index;
-    sub = FSYS_SLOT_CURRENT_SUB(slot);
+    u32 sizeA;
+    u32 sizeC;
+    u32 sizeB;
+    void* zero;
 
     if (entry->flags & FSYS_COMPRESSED_FLAG) {
+        sub = FSYS_SLOT_CURRENT_SUB(slot);
         sub->state = 5;
+        zero = NULL;
         slot->status = 0x65;
-        temp = FSYSAllocHandle2B00(FSYSAlign32(entry->decompressedSize));
-        sub->buffer = temp;
-        slot->padding100 = (u32)temp;
+        cached = cached;
+        sizeA = (entry->decompressedSize + 0x1F) & ~0x1Fu;
+        sizeB = sizeA;
+        sizeC = (sizeB + 0x1F) & ~0x1Fu;
+        handle = fn_800E2B00(sizeC, 0x20);
+        if (handle != 0) {
+            ptr = fn_800E27B0(handle);
+        } else {
+            ptr = NULL;
+        }
+        sub->buffer = ptr;
 
         cached = fn_8017F794(slot->fileHandle, entry->groupID, entry->nameHash);
         offset = fn_8017F728(slot->fileHandle, entry->groupID, entry->nameHash);
         fn_80180584(sub->buffer, (void*)cached, offset, fn_8017A814, slot);
     } else {
-        fn_8017BD34(slot, entry);
+        fn_8017BD34(slot, entry, index);
     }
 }
 #endif
+#pragma pop
 
 /* 0x8017B6B8 | 0x4C8 */
 extern void fn_8017F25C();
@@ -1247,6 +1366,31 @@ void fn_8017B6B8(FSYSSlot* slot, FSYSFileEntry* entry, u32 index) {
 }
 #endif
 
+/* 0x8017BC90 | 0xA4 */
+#pragma push
+#pragma optimization_level 0
+void* fn_8017BC90(void* unused0, u32 unused1, const void* compressed,
+                  void* work, u32 unused4) {
+    void* output;
+    void* workCopy;
+    s32 i;
+    extern void fn_8017F2C4(void*, const void*, u32);
+
+    workCopy = work;
+    workCopy = workCopy;
+    output = *(void**)((u8*)work + 4);
+    if (output) {
+        memcpy(&gLZSSContext, compressed, 0x10);
+        for (i = 0; i < 0xFEE; i++) {
+            gLZSSWindow[i] = 0;
+        }
+        fn_8017F2C4(output, compressed, gLZSSContext.decompSize);
+        DCFlushRange(output, gLZSSContext.decompSize);
+    }
+    return output;
+}
+#pragma pop
+
 /* 0x8017BD34 | 0x2B4 */
 extern void fn_8017A95C(void);
 extern u32 lbl_80478C48;
@@ -1276,6 +1420,9 @@ void fn_8017BD34(FSYSSlot* slot, FSYSFileEntry* entry) {
 
 /* 0x8017C008 | 0x6C */
 extern void fn_80180C78();
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
 #if 0
 asm void fn_8017C008(void) {
 #include "src/game/fsys/fsys_file_fn_8017C008.inc"
@@ -1283,9 +1430,12 @@ asm void fn_8017C008(void) {
 #else
 u32 fn_8017C008(FSYSSlot* slot) {
     FSYSSubEntry* sub;
+    u32* buf;
 
+    slot = slot;
     sub = FSYS_SLOT_CURRENT_SUB(slot);
-    if (sub != NULL && sub->buffer != NULL && *(u32*)sub->buffer == FSYS_LZSS_MAGIC) {
+    buf = (u32*)sub->buffer;
+    if (*buf == FSYS_LZSS_MAGIC) {
         fn_80180C78(slot, sub, 0);
     }
 
@@ -1293,6 +1443,7 @@ u32 fn_8017C008(FSYSSlot* slot) {
     return 0;
 }
 #endif
+#pragma pop
 
 /* 0x8017C074 | 0x164 */
 extern u32 lbl_80478C48;
@@ -1359,23 +1510,47 @@ void fn_8017C1D8(FSYSSlot* slot, FSYSSubEntry* sub, u32 index, void* work) {
 #endif
 
 /* 0x8017C39C | 0x78 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
 #if 0
 asm void fn_8017C39C(void) {
 #include "src/game/fsys/fsys_file_fn_8017C39C.inc"
 }
 #else
 u32 fn_8017C39C(FSYSSlot* slot) {
+    u8* archive;
     FSYSSubEntry* sub;
+    FSYSFileEntry* spare2;
+    FSYSFileEntry* entry;
+    u32* entryTable;
+    u32* firstTable;
+    FSYSFileEntry* spare3;
+    u32 index;
 
+    archive = (u8*)slot->archiveData;
+    index = slot->archiveSize;
+    spare2 = spare2;
+    spare3 = spare3;
+    firstTable = firstTable;
+    if (archive) {
+        firstTable = (u32*)(archive + *(u32*)(archive + 0x18));
+        entryTable = (u32*)(archive + firstTable[0]);
+        entry = (FSYSFileEntry*)(archive + entryTable[index]);
+    } else {
+        entry = NULL;
+    }
     sub = FSYS_SLOT_CURRENT_SUB(slot);
-    if (sub != NULL) {
+    if (entry->flags & FSYS_COMPRESSED_FLAG) {
+        sub->state = 4;
+    } else {
         sub->state = 4;
     }
     slot->status = FSYS_STATUS_ERROR;
-
     return 0;
 }
 #endif
+#pragma pop
 
 /* 0x8017C414 | 0x154 */
 extern s32 fn_8017A624(void*);
@@ -1792,6 +1967,30 @@ s32 fn_8017D3D4(u32 arg) {
 }
 #pragma pop
 
+/* 0x8017D56C | 0xB8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+s32 fn_8017D56C(u32 fileHandle) {
+    FSYSSlot* slot;
+    extern void fn_8017DF4C(FSYSSlot*, u32, u32, u32, u32);
+
+    if (slot = fn_8017D410(fileHandle, 7)) {
+        if ((s32)slot->status == 0x3E8) {
+            if ((s32)slot->loadMode == 2 || (s32)slot->loadMode == 7) {
+                return 0;
+            }
+            slot->status = 0;
+            fn_8017DF4C(slot, fileHandle, 0, 0, 0);
+            return 1;
+        }
+        fn_8017DF4C(slot, fileHandle, 0, 0, 0);
+        return 1;
+    }
+    return 0;
+}
+#pragma pop
+
 /* 0x8017D624 | 0x68 */
 extern u32 lbl_8047B1B8;
 extern u32 lbl_8047B1BC;
@@ -1992,32 +2191,52 @@ void fn_8017D960(FSYSSlot* slot) {
 #endif
 
 /* 0x8017DAB8 | 0xBC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
 #if 0
 asm void fn_8017DAB8(void) {
 #include "src/game/fsys/fsys_file_fn_8017DAB8.inc"
 }
 #else
 void fn_8017DAB8(FSYSSlot* slot) {
-    u32 i;
-    FSYSFileEntry* entry;
     FSYSSubEntry* sub;
+    u32 i;
+    u8* archive;
+    s32 flag;
+    FSYSFileEntry* entry;
+    u32* entryTable;
+    u32* firstTable;
+    FSYSFileEntry* spare;
+    FSYSFileEntry* e2;
 
+    sub = sub;
+    flag = 0;
     for (i = 0; i < slot->numEntries; i++) {
-        entry = FSYSGetEntryByIndex(slot, i);
-        if (entry == NULL) {
-            continue;
+        archive = (u8*)slot->archiveData;
+        flag = flag;
+        if (archive) {
+            firstTable = (u32*)(archive + *(u32*)(archive + 0x18));
+            entryTable = (u32*)(archive + firstTable[0]);
+            entry = (FSYSFileEntry*)(archive + entryTable[i]);
+        } else {
+            entry = NULL;
         }
-
         slot->archiveSize = i;
-        sub = FSYSFileEntry_GetSubEntry(entry);
-        if (sub->state != 4 && sub->state != 6 && sub->state != 7) {
-            return;
+        e2 = entry;
+        sub = (FSYSSubEntry*)((u8*)e2 + 0x28);
+        spare = spare;
+        if (*(s32*)((u8*)entry + 0x28) != 4 && (s32)sub->state != 6 && (s32)sub->state != 7) {
+            flag = 1;
+            break;
         }
     }
-
-    fn_8017D960(slot);
+    if (flag == 0) {
+        fn_8017D960(slot);
+    }
 }
 #endif
+#pragma pop
 
 /* 0x8017DB74 | 0x330 */
 extern u32 lbl_8047B1B8;
@@ -2094,6 +2313,9 @@ void fn_8017DEA4(FSYSSlot* slot, u32 fileHandle, u32 callbackA,
 #pragma pop
 
 /* 0x8017DF4C | 0xA8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
 #if 0
 asm void fn_8017DF4C(void) {
 #include "src/game/fsys/fsys_file_fn_8017DF4C.inc"
@@ -2101,18 +2323,25 @@ asm void fn_8017DF4C(void) {
 #else
 void fn_8017DF4C(FSYSSlot* slot, u32 fileHandle, u32 callbackA,
                  u32 callbackB, u32 callbackC) {
+    u32 len;
+
     _fsysGetFilename(slot, fileHandle, callbackA, callbackB, callbackC, 7);
 
-    if (gFSYSManager.activeSlot == slot) {
+    if (lbl_80453FEC.activeSlot == slot) {
         if (FSYS_SLOT_FILE0(slot) == 0) {
             FSYS_SLOT_FILE0(slot) = fn_80167F28(slot->filename);
         }
-        fn_80167E98(FSYS_SLOT_FILE0(slot), slot, FSYSAlign32(0x40), 0, fn_8017F108);
+        len = 0x40;
+        fn_80167E98(FSYS_SLOT_FILE0(slot), slot, (len + 0x1F) & ~0x1Fu, 0, fn_8017F108);
     }
 }
 #endif
+#pragma pop
 
 /* 0x8017DFF4 | 0xA8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
 #if 0
 asm void fn_8017DFF4(void) {
 #include "src/game/fsys/fsys_file_fn_8017DFF4.inc"
@@ -2120,16 +2349,20 @@ asm void fn_8017DFF4(void) {
 #else
 void fn_8017DFF4(FSYSSlot* slot, u32 fileHandle, u32 callbackA,
                  u32 callbackB, u32 callbackC) {
+    u32 len;
+
     _fsysGetFilename(slot, fileHandle, callbackA, callbackB, callbackC, 2);
 
-    if (gFSYSManager.activeSlot == slot) {
+    if (lbl_80453FEC.activeSlot == slot) {
         if (FSYS_SLOT_FILE0(slot) == 0) {
             FSYS_SLOT_FILE0(slot) = fn_80167F28(slot->filename);
         }
-        fn_80167E98(FSYS_SLOT_FILE0(slot), slot, FSYSAlign32(0x40), 0, fn_8017F108);
+        len = 0x40;
+        fn_80167E98(FSYS_SLOT_FILE0(slot), slot, (len + 0x1F) & ~0x1Fu, 0, fn_8017F108);
     }
 }
 #endif
+#pragma pop
 
 /* 0x8017E09C | 0x13C */
 #if 0

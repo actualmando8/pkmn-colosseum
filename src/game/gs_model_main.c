@@ -249,14 +249,14 @@ void fn_800E3884(u32 frames, u8 phase)
 
 GSmodel* GSmodelSearchModelList(void* jobj)
 {
-    u32 count;
+    u32 i;
     GSmodel* model;
     u32 flags;
 
-    count = lbl_8047AB78;
+    i = 0;
     model = lbl_8047AB74;
 
-    while (count > 0) {
+    while (i < lbl_8047AB78) {
         flags = model->flags.raw;
         if (flags & GSMODEL_FLAG_ACTIVE) {
             void* renderJObj;
@@ -273,7 +273,7 @@ GSmodel* GSmodelSearchModelList(void* jobj)
         }
 
         model++;
-        count--;
+        i++;
     }
 
     return NULL;
@@ -1243,28 +1243,31 @@ void GSmodelDisableModulation(GSmodel* model)
     if (refs != 0) {
         GSmodelMaterialList* materialEntry;
         s32 count;
-        s32 i;
-        u32 handle;
 
         materialEntry = model->materialList;
         count = model->materialCount;
         model->modulationRefCount = refs - 1;
 
         if (model->modulationRefCount == 0) {
-            count = model->materialCount;
-            i = 0;
-            materialEntry = model->materialList;
+            s32 cleanupCount;
+            GSmodelMaterialList* cleanupEntry;
+            s32 i;
+            u32 handle;
 
-            while (i < count) {
+            cleanupCount = model->materialCount;
+            i = 0;
+            cleanupEntry = model->materialList;
+
+            while (i < cleanupCount) {
                 GSmaterial* material;
 
-                material = materialEntry->materials[0];
+                material = cleanupEntry->materials[0];
                 if (material != NULL) {
                     fn_800DF608(material);
                 }
 
                 i++;
-                materialEntry++;
+                cleanupEntry++;
             }
 
             handle = model->materialListHandle;
@@ -1277,6 +1280,8 @@ void GSmodelDisableModulation(GSmodel* model)
             model->materialCount = 0;
             model->materialList = NULL;
         } else {
+            s32 i;
+
             i = 0;
             while (i < count) {
                 GSmaterial* material;
@@ -1301,28 +1306,31 @@ void GSmodelDisableColorSwap(GSmodel* model)
     if (refs != 0) {
         GSmodelMaterialList* materialEntry;
         s32 count;
-        s32 i;
-        u32 handle;
 
         materialEntry = model->materialList;
         count = model->materialCount;
         model->modulationRefCount = refs - 1;
 
         if (model->modulationRefCount == 0) {
-            count = model->materialCount;
-            i = 0;
-            materialEntry = model->materialList;
+            s32 cleanupCount;
+            GSmodelMaterialList* cleanupEntry;
+            s32 i;
+            u32 handle;
 
-            while (i < count) {
+            cleanupCount = model->materialCount;
+            i = 0;
+            cleanupEntry = model->materialList;
+
+            while (i < cleanupCount) {
                 GSmaterial* material;
 
-                material = materialEntry->materials[0];
+                material = cleanupEntry->materials[0];
                 if (material != NULL) {
                     fn_800DF608(material);
                 }
 
                 i++;
-                materialEntry++;
+                cleanupEntry++;
             }
 
             handle = model->materialListHandle;
@@ -1335,6 +1343,8 @@ void GSmodelDisableColorSwap(GSmodel* model)
             model->materialCount = 0;
             model->materialList = NULL;
         } else {
+            s32 i;
+
             i = 0;
             while (i < count) {
                 GSmaterial* material;
@@ -1359,28 +1369,31 @@ void GSmodelDisableEnvMap(GSmodel* model)
     if (refs != 0) {
         GSmodelMaterialList* materialEntry;
         s32 count;
-        s32 i;
-        u32 handle;
 
         materialEntry = model->materialList;
         count = model->materialCount;
         model->modulationRefCount = refs - 1;
 
         if (model->modulationRefCount == 0) {
-            count = model->materialCount;
-            i = 0;
-            materialEntry = model->materialList;
+            s32 cleanupCount;
+            GSmodelMaterialList* cleanupEntry;
+            s32 i;
+            u32 handle;
 
-            while (i < count) {
+            cleanupCount = model->materialCount;
+            i = 0;
+            cleanupEntry = model->materialList;
+
+            while (i < cleanupCount) {
                 GSmaterial* material;
 
-                material = materialEntry->materials[0];
+                material = cleanupEntry->materials[0];
                 if (material != NULL) {
                     fn_800DF608(material);
                 }
 
                 i++;
-                materialEntry++;
+                cleanupEntry++;
             }
 
             handle = model->materialListHandle;
@@ -1393,6 +1406,8 @@ void GSmodelDisableEnvMap(GSmodel* model)
             model->materialCount = 0;
             model->materialList = NULL;
         } else {
+            s32 i;
+
             i = 0;
             while (i < count) {
                 GSmaterial* material;

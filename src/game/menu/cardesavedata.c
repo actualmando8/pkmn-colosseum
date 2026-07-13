@@ -294,6 +294,38 @@ s32 fn_8008102C(void** object_ref, const u32* descriptor, s32 index,
 void fn_80084034(void) {
 }
 
+#pragma peephole off
+/* 0x80083CBC | size: 0x40 */
+#pragma optimize_for_size on
+void fn_80083CBC(void* ptr) {
+    if (ptr == 0) {
+        goto alloc;
+    }
+    goto end;
+alloc:
+    ptr = (void*)savedataGetStatus(0x0, 0xD);
+end:
+    memset(ptr, 0x0, 0x49CC);
+}
+#pragma optimize_for_size reset
+#pragma peephole on
+
+/* 0x80083CFC | size: 0x34 */
+#pragma peephole off
+#pragma optimize_for_size on
+void fn_80083CFC(void* ptr) {
+    if (ptr == 0) {
+        goto alloc;
+    }
+    goto end;
+alloc:
+    ptr = (void*)savedataGetStatus(0x0, 0xD);
+end:
+    return;
+}
+#pragma optimize_for_size reset
+#pragma peephole on
+
 /* 0x80084A8C | size: 0x305C */
 void fn_80084A8C(void) {
     extern void fn_80087AE8();

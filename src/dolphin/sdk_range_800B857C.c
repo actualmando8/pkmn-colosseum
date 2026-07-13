@@ -50,7 +50,7 @@ typedef struct GXData_800B857C {
     /* 0x4F4 */ u32 dirtyState;
 } GXData_800B857C;
 
-extern GXData_800B857C* gx;
+extern GXData_800B857C* const gx;
 extern volatile u16* __peReg;
 extern volatile u16* __memReg;
 extern GXBreakPtCallback lbl_8047A9C0;
@@ -90,39 +90,24 @@ void fn_800B884C(u8 count) {
 }
 
 void GXSetMisc(s32 token, u32 value) {
-    GXData_800B857C* p;
-
-    if (token == 2) {
-        goto set_field_4F1;
-    }
-    if (token >= 2) {
-        if (token >= 4) {
-            return;
+    switch (token) {
+    case 0:
+        break;
+    case 1:
+        gx->field_004 = value;
+        gx->field_000 = (u16)((u32)__cntlzw(gx->field_004) >> 5);
+        gx->field_002 = 1;
+        if (gx->field_004 != 0) {
+            gx->dirtyState |= 8;
         }
-        goto set_field_4F2;
+        break;
+    case 2:
+        gx->field_4F1 = (value != 0);
+        break;
+    case 3:
+        gx->field_4F2 = (value != 0);
+        break;
     }
-    if (token == 0) {
-        return;
-    }
-    if (token < 0) {
-        return;
-    }
-
-    p = gx;
-    p->field_004 = value;
-    p->field_000 = (u16)((u32)__cntlzw(p->field_004) >> 5);
-    p->field_002 = 1;
-    if (p->field_004 != 0) {
-        p->dirtyState |= 8;
-    }
-    return;
-
-set_field_4F1:
-    gx->field_4F1 = (value != 0);
-    return;
-
-set_field_4F2:
-    gx->field_4F2 = (value != 0);
 }
 
 void fn_800B91EC(void);
@@ -144,43 +129,31 @@ void GXFlush(void) {
     PPCSync();
 }
 
-void fn_800B8C58(u32 token) {
+void fn_800B8C58(u16 token) {
     BOOL enabled;
-    GXData_800B857C* p;
     u32 reg;
 
     enabled = OSDisableInterrupts();
-    p = gx;
-    GX_FIFO_U8 = 0x61;
-    GX_FIFO_U32 = (token & 0xFFFF) | 0x48000000;
-    reg = (token & 0xFFFF) | 0x47000000;
-    GX_FIFO_U8 = 0x61;
-    GX_FIFO_U32 = reg;
-
-    if (p->dirtyState != 0) {
-        fn_800B91EC();
-    }
-
-    GX_FIFO_U32 = 0;
-    GX_FIFO_U32 = 0;
-    GX_FIFO_U32 = 0;
-    GX_FIFO_U32 = 0;
-    GX_FIFO_U32 = 0;
-    GX_FIFO_U32 = 0;
-    GX_FIFO_U32 = 0;
-    GX_FIFO_U32 = 0;
-    PPCSync();
+    reg = token | 0x48000000;
+    GX_BP_REG(reg);
+    reg = (reg & ~0xFFFFU) | token;
+    reg = (reg & 0xFFFFFFU) | 0x47000000;
+    GX_BP_REG(reg);
+    GXFlush();
     OSRestoreInterrupts(enabled);
     gx->field_002 = 0;
 }
 
 void GXSetDrawDone(void) {
     BOOL enabled;
+    u8 cmd = 0x61;
+    GXData_800B857C* p;
 
     enabled = OSDisableInterrupts();
-    GX_FIFO_U8 = 0x61;
+    p = gx;
+    GX_FIFO_U8 = cmd;
     GX_FIFO_U32 = 0x45000002;
-    if (gx->dirtyState != 0) {
+    if (p->dirtyState != 0) {
         fn_800B91EC();
     }
 
@@ -207,8 +180,10 @@ void fn_800B8DA8(void) {
     OSRestoreInterrupts(enabled);
 }
 
+#pragma dont_inline on
 void GXDrawDone(void) {
     BOOL enabled;
+    u32 scratch[2];
 
     enabled = OSDisableInterrupts();
     GX_FIFO_U8 = 0x61;
@@ -223,13 +198,12 @@ void GXDrawDone(void) {
     }
     OSRestoreInterrupts(enabled);
 }
+#pragma dont_inline reset
 
 void fn_800B8E74(void) {
-    u8 cmd = 0x61;
-    GXData_800B857C* p;
+    GXData_800B857C* p = gx;
 
-    p = gx;
-    GX_FIFO_U8 = cmd;
+    GX_FIFO_U8 = 0x61;
     GX_FIFO_U32 = p->field_1DC;
     p->field_002 = 0;
 }
@@ -247,7 +221,7 @@ void fn_800B8EC0(u32 enable) {
     *reg = (u16)((*reg & ~0x10U) | ((enable & 0xFF) << 4));
 }
 
-void fn_800B8EDC(u32 type, u32 srcFactor, u32 dstFactor, u32 op) {
+void fn_800B8EDC(s32 type, u32 srcFactor, u32 dstFactor, u32 op) {
     volatile u16* regp = &__peReg[1];
     u32 reg = *regp;
     u32 enable = (type == 1 || type == 3);
@@ -257,10 +231,11 @@ void fn_800B8EDC(u32 type, u32 srcFactor, u32 dstFactor, u32 op) {
     reg = (reg & ~1U) | enable;
     reg = (reg & ~0x800U) | (subtract << 11);
     reg = (reg & ~2U) | (logic << 1);
-    reg = (reg & ~0xF000U) | ((op & 0xF) << 12);
-    reg = (reg & ~0x700U) | ((srcFactor & 0x7) << 8);
-    reg = (reg & ~0xE0U) | ((dstFactor & 0x7) << 5);
-    *regp = (u16)(0x4100 | (reg & 0xFF));
+    reg = (reg & ~0xF000U) | (op << 12);
+    reg = (reg & ~0x700U) | (srcFactor << 8);
+    reg = (reg & ~0xE0U) | (dstFactor << 5);
+    reg = (reg & 0xFFFFFFU) | 0x41000000;
+    *regp = (u16)reg;
 }
 
 void fn_800B8F64(u32 enable) {
@@ -268,12 +243,11 @@ void fn_800B8F64(u32 enable) {
     *reg = (u16)((*reg & ~0x8U) | ((enable & 0xFF) << 3));
 }
 
-void fn_800B8F80(u32 token, u32 value) {
-    volatile u16* regp = &__peReg[2];
-    u32 reg = (token << 8) & 0xFF00;
+void fn_800B8F80(u8 func, u32 threshold) {
+    u32 reg;
 
-    reg |= value & 0xFF;
-    *regp = (u16)reg;
+    reg = (threshold & 0xFF) | (func << 8);
+    __peReg[2] = reg;
 }
 
 void fn_800B8F94(u32 enable) {
@@ -359,60 +333,37 @@ void __GXPEInit(void) {
 }
 
 void fn_800B91EC(void) {
-    GXData_800B857C* p;
-    u32 dirty;
-
-    p = gx;
-    dirty = p->dirtyState;
-    if (dirty & 1) {
+    if (gx->dirtyState & 1) {
         __GXSetSUTexRegs();
     }
-
-    p = gx;
-    dirty = p->dirtyState;
-    if (dirty & 2) {
+    if (gx->dirtyState & 2) {
         fn_800BC024();
     }
-
-    p = gx;
-    dirty = p->dirtyState;
-    if (dirty & 4) {
+    if (gx->dirtyState & 4) {
         fn_800B9578();
     }
-
-    p = gx;
-    dirty = p->dirtyState;
-    if (dirty & 8) {
+    if (gx->dirtyState & 8) {
         fn_800B7BC4();
     }
-
-    p = gx;
-    dirty = p->dirtyState;
-    if (dirty & 0x10) {
+    if (gx->dirtyState & 0x10) {
         fn_800B8444();
     }
-
-    p = gx;
-    dirty = p->dirtyState;
-    if (dirty & 0x18) {
+    if (gx->dirtyState & 0x18) {
         __GXCalculateVLim();
     }
-
     gx->dirtyState = 0;
 }
 
 void fn_800B928C(u32 primitive, u32 vertexFormat, u16 vertexCount) {
-    GXData_800B857C* p = gx;
-
-    if (p->dirtyState != 0) {
+    if (gx->dirtyState != 0) {
         fn_800B91EC();
     }
 
-    if (gx->field_000 == 0) {
+    if (*(u32*)&gx->field_000 == 0) {
         __GXSendFlushPrim();
     }
 
-    GX_FIFO_U8 = primitive | vertexFormat;
+    GX_FIFO_U8 = vertexFormat | primitive;
     GX_FIFO_U16 = vertexCount;
 }
 
@@ -421,35 +372,13 @@ void __GXSendFlushPrim(void) {
     u16 nverts = p->field_004;
     u16 stride = p->field_006;
     u32 bytes = nverts * stride;
-    u32 words = (bytes + 3) >> 2;
-    u32 count;
+    u32 i;
 
     GX_FIFO_U8 = 0x98;
     GX_FIFO_U16 = nverts;
 
-    if (bytes > 0) {
-        count = words >> 3;
-        if (count != 0) {
-            do {
-                GX_FIFO_U32 = 0;
-                GX_FIFO_U32 = 0;
-                GX_FIFO_U32 = 0;
-                GX_FIFO_U32 = 0;
-                GX_FIFO_U32 = 0;
-                GX_FIFO_U32 = 0;
-                GX_FIFO_U32 = 0;
-                GX_FIFO_U32 = 0;
-                count--;
-            } while (count != 0);
-        }
-
-        words &= 7;
-        if (words != 0) {
-            do {
-                GX_FIFO_U32 = 0;
-                words--;
-            } while (words != 0);
-        }
+    for (i = 0; i < bytes; i += 4) {
+        GX_FIFO_U32 = 0;
     }
 
     gx->field_002 = 1;
@@ -474,38 +403,24 @@ void fn_800B944C(u32 right, u32 bottom) {
 }
 
 void fn_800B9494(u32 chan, u32 enable0, u32 enable1) {
-    GXData_800B857C* p = gx;
-
-    p->field_0B8[chan] = (p->field_0B8[chan] & ~0x40000U) | ((enable0 & 0xFF) << 18);
-    p->field_0B8[chan] = (p->field_0B8[chan] & ~0x80000U) | ((enable1 & 0xFF) << 19);
-    GX_BP_REG(p->field_0B8[chan]);
-    p->field_002 = 0;
+    gx->field_0B8[chan] = (gx->field_0B8[chan] & ~0x40000U) | ((enable0 & 0xFF) << 18);
+    gx->field_0B8[chan] = (gx->field_0B8[chan] & ~0x80000U) | ((enable1 & 0xFF) << 19);
+    GX_BP_REG(gx->field_0B8[chan]);
+    gx->field_002 = 0;
 }
 
 void fn_800B94F0(s32 value) {
-    GXData_800B857C* p;
-
-    if (value == 2) {
-        goto set_one;
+    switch (value) {
+    case 1:
+        value = 2;
+        break;
+    case 2:
+        value = 1;
+        break;
     }
-    if (value >= 2) {
-        goto done;
-    }
-    if (value >= 1) {
-        goto set_two;
-    }
-    goto done;
 
-set_two:
-    value = 2;
-    goto done;
-set_one:
-    value = 1;
-
-done:
-    p = gx;
-    p->field_204 = (p->field_204 & ~0xC000U) | (value << 14);
-    p->dirtyState |= 4;
+    gx->field_204 = (gx->field_204 & ~0xC000U) | (value << 14);
+    gx->dirtyState |= 4;
 }
 
 void fn_800B953C(u32 value) {
@@ -517,87 +432,128 @@ void fn_800B953C(u32 value) {
 }
 
 void fn_800B9578(void) {
-    u8 cmd = 0x61;
-    GXData_800B857C* p;
+    GXData_800B857C* p = gx;
 
-    p = gx;
-    GX_FIFO_U8 = cmd;
+    GX_FIFO_U8 = 0x61;
     GX_FIFO_U32 = p->field_204;
     p->field_002 = 0;
 }
 
-void fn_800B959C(u32 left, u32 top, u32 width, u32 height) {
-    volatile GXData_800B857C* p = gx;
+void fn_800B959C(u16 left, u16 top, u16 width, u16 height) {
+    gx->field_1E0 = 0;
+    gx->field_1E0 = (gx->field_1E0 & ~0x3FFU) | left;
+    gx->field_1E0 = (gx->field_1E0 & ~0xFFC00U) | (top << 10);
+    gx->field_1E0 = (gx->field_1E0 & 0xFFFFFFU) | 0x49000000;
 
-    p->field_1E0 = 0;
-    p->field_1E0 = (p->field_1E0 & ~0x3FFU) | (left & 0xFFFF);
-    p->field_1E0 = (p->field_1E0 & ~0xFFC00U) | ((top & 0xFFFF) << 10);
-    p->field_1E0 = (p->field_1E0 & 0xFFFFFFU) | 0x49000000;
-
-    p->field_1E4 = 0;
-    p->field_1E4 = (p->field_1E4 & ~0x3FFU) | ((width & 0xFFFF) - 1);
-    p->field_1E4 = (p->field_1E4 & ~0xFFC00U) | (((height & 0xFFFF) - 1) << 10);
-    p->field_1E4 = (p->field_1E4 & 0xFFFFFFU) | 0x4A000000;
+    gx->field_1E4 = 0;
+    gx->field_1E4 = (gx->field_1E4 & ~0x3FFU) | (width - 1);
+    gx->field_1E4 = (gx->field_1E4 & ~0xFFC00U) | ((height - 1) << 10);
+    gx->field_1E4 = (gx->field_1E4 & 0xFFFFFFU) | 0x4A000000;
 }
 
-void fn_800B962C(u32 left, u32 top, u32 width, u32 height) {
-    volatile GXData_800B857C* p = gx;
+void fn_800B962C(u16 left, u16 top, u16 width, u16 height) {
+    gx->field_1F0 = 0;
+    gx->field_1F0 = (gx->field_1F0 & ~0x3FFU) | left;
+    gx->field_1F0 = (gx->field_1F0 & ~0xFFC00U) | (top << 10);
+    gx->field_1F0 = (gx->field_1F0 & 0xFFFFFFU) | 0x49000000;
 
-    p->field_1F0 = 0;
-    p->field_1F0 = (p->field_1F0 & ~0x3FFU) | (left & 0xFFFF);
-    p->field_1F0 = (p->field_1F0 & ~0xFFC00U) | ((top & 0xFFFF) << 10);
-    p->field_1F0 = (p->field_1F0 & 0xFFFFFFU) | 0x49000000;
-
-    p->field_1F4 = 0;
-    p->field_1F4 = (p->field_1F4 & ~0x3FFU) | ((width & 0xFFFF) - 1);
-    p->field_1F4 = (p->field_1F4 & ~0xFFC00U) | (((height & 0xFFFF) - 1) << 10);
-    p->field_1F4 = (p->field_1F4 & 0xFFFFFFU) | 0x4A000000;
+    gx->field_1F4 = 0;
+    gx->field_1F4 = (gx->field_1F4 & ~0x3FFU) | (width - 1);
+    gx->field_1F4 = (gx->field_1F4 & ~0xFFC00U) | ((height - 1) << 10);
+    gx->field_1F4 = (gx->field_1F4 & 0xFFFFFFU) | 0x4A000000;
 }
 
 void fn_800B96BC(u32 value) {
-    volatile GXData_800B857C* p = gx;
-    s32 bias = (s32)((value & 0x1FFFF) << 1) >> 5;
+    GXData_800B857C* p;
+    u32* regp;
 
+    p = *(GXData_800B857C**)&gx;
     p->field_1E8 = 0;
-    p->field_1E8 = (p->field_1E8 & ~0x3FFU) | bias;
-    p->field_1E8 = (p->field_1E8 & 0xFFFFFFU) | 0x4D000000;
+    regp = &p->field_1E8;
+    *regp = (*regp & ~0x3FFU) |
+            (((s32)((value & 0x7FFFU) << 1) << 16) >> 21);
+    *regp = (*regp & 0xFFFFFFU) | 0x4D000000U;
 }
 
 void fn_800B984C(u32 value) {
-    GXData_800B857C* p = gx;
-    u32* regp;
-
-    p->field_1EC = (p->field_1EC & ~0x3000U) | (value << 12);
-    regp = &p->field_1FC;
-    *regp &= ~0x3000U;
+    gx->field_1EC = (gx->field_1EC & ~0x3000U) | (value << 12);
+    gx->field_1FC = gx->field_1FC & ~0x3000U;
 }
 
 void fn_800B9874(u32 value) {
     GXData_800B857C* p = gx;
     u32 bit0;
     u32 bit1;
-    u32 out0;
-    u32 out1;
+    u8 out0;
+    u8 out1;
 
     bit0 = value & 1;
     bit1 = value & 2;
-    out0 = (bit0 != 0);
-    out1 = (bit1 != 0) << 1;
+    out0 = (bit0 == 1);
+    out1 = (bit1 == 2);
     p->field_1EC = (p->field_1EC & ~1U) | out0;
-    p->field_1EC = (p->field_1EC & ~2U) | out1;
+    p->field_1EC = (p->field_1EC & ~2U) | (out1 << 1);
     p->field_1FC = (p->field_1FC & ~1U) | out0;
-    p->field_1FC = (p->field_1FC & ~2U) | out1;
+    p->field_1FC = (p->field_1FC & ~2U) | (out1 << 1);
 }
 
-void fn_800B9BDC(u8* color, u32 clearZ) {
-    GXData_800B857C* p = gx;
-    u32 reg;
+u32 fn_800B9B14(f32 scale) {
+    u32 yScale;
+    u32 height;
+    u32 result;
+    u32 divisor;
+    u8 nonUnityScale;
+    GXData_800B857C* p;
 
-    reg = ((color[3] << 8) | color[0]) & 0xFFFFFF;
-    GX_BP_REG(0x4F000000 | reg);
-    reg = ((color[1] << 8) | color[2]) & 0xFFFFFF;
-    GX_BP_REG(0x50000000 | reg);
-    GX_BP_REG(0x51000000 | (clearZ & 0xFFFFFF));
+    yScale = __cvt_fp2unsigned(256.0F / scale) & 0x1FF;
+    p = gx;
+    GX_BP_REG(0x4E000000 | yScale);
+    p->field_002 = 0;
+    nonUnityScale = (yScale != 0x100);
+    p->field_1EC = (p->field_1EC & ~0x400U) | (nonUnityScale << 10);
+
+    height = ((p->field_1E4 >> 10) & 0x3FF) + 1;
+    result = (((height - 1) << 8) / yScale) + 1;
+    if (yScale > 0x80 && yScale < 0x100) {
+        divisor = yScale;
+        while ((divisor & 1) == 0) {
+            divisor >>= 1;
+        }
+        if ((height % divisor) == 0) {
+            result++;
+        }
+    }
+    if (result > 0x400) {
+        result = 0x400;
+    }
+    return result;
+}
+
+typedef struct GXColor_800B9BDC {
+    u8 r;
+    u8 g;
+    u8 b;
+    u8 a;
+} GXColor_800B9BDC;
+
+void fn_800B9BDC(GXColor_800B9BDC color, u32 clearZ) {
+    u32 reg;
+    GXData_800B857C* p = gx;
+
+    reg = 0;
+    reg = (reg & ~0xFFU) | color.r;
+    reg = (reg & ~0xFF00U) | (color.a << 8);
+    reg = (reg & 0xFFFFFFU) | 0x4F000000U;
+    GX_BP_REG(reg);
+    reg = 0;
+    reg = (reg & ~0xFFU) | color.b;
+    reg = (reg & ~0xFF00U) | (color.g << 8);
+    reg = (reg & 0xFFFFFFU) | 0x50000000U;
+    GX_BP_REG(reg);
+    reg = 0;
+    reg = (reg & ~0xFFFFFFU) | (clearZ & 0xFFFFFFU);
+    reg = (reg & 0xFFFFFFU) | 0x51000000U;
+    GX_BP_REG(reg);
     p->field_002 = 0;
 }
 
@@ -608,13 +564,11 @@ void fn_800B9E6C(u32 value) {
 }
 
 void GXClearBoundingBox(void) {
-    u8 cmd = 0x61;
-    GXData_800B857C* p;
+    GXData_800B857C* p = gx;
 
-    p = gx;
-    GX_FIFO_U8 = cmd;
+    GX_FIFO_U8 = 0x61;
     GX_FIFO_U32 = 0x550003FF;
-    GX_FIFO_U8 = cmd;
+    GX_FIFO_U8 = 0x61;
     GX_FIFO_U32 = 0x560003FF;
     p->field_002 = 0;
 }

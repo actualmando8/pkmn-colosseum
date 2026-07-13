@@ -88,7 +88,7 @@ extern void fn_800E03B4(void* mtx, GSvec* trans);
 extern void GSvecTransform(GSvec* dst, void* mtx, GSvec* src);
 extern void fn_800D67BC(u32 arg0);
 extern void fn_800D6680(f32 x, f32 y, f32 z);
-extern void fn_800D5CB8(u32 arg0, u32 r, u32 g, u32 b, u32 a);
+extern void fn_800D5CB8(u32 arg0, u8 r, u8 g, u8 b, u8 a);
 extern void fn_800D59B8(u32 arg0, f32 s, f32 t);
 extern void fn_800D6728(void);
 extern void GSgfxEndBackFBCapture(void* texture);
@@ -304,13 +304,21 @@ u32 fn_801C54FC(u32 arg0, f32 frame, f32 duration) {
 }
 #pragma peephole on
 
+#pragma peephole off
 u32 fn_801C5530(u32 arg0, void* texture, f32 frame, f32 duration, f32 angle, f32 angleDuration) {
-    f32 t = frame / duration;
-    f32 rot = angle / angleDuration;
+    u32 result;
+    void* tex;
+    f32 t;
+    f32 rot;
+
+    result = arg0;
+    tex = texture;
+    t = frame / duration;
+    rot = angle / angleDuration;
 
     fn_801C6688(t);
-    if (texture == NULL) {
-        return arg0;
+    if (tex == NULL) {
+        return result;
     }
 
     {
@@ -319,13 +327,88 @@ u32 fn_801C5530(u32 arg0, void* texture, f32 frame, f32 duration, f32 angle, f32
         pos.x = lbl_8047E008;
         pos.y = lbl_8047E00C;
         pos.z = lbl_8047DFE0;
-        fn_801C63C0(texture, &pos, lbl_8047DFE4, lbl_8047DFE0, t, rot);
+        fn_801C63C0(tex, &pos, lbl_8047DFE4, lbl_8047DFE0, t, rot);
     }
-    return arg0;
+    return result;
 }
+#pragma peephole on
+
+#pragma peephole off
+void fn_801C5ED0(u32 arg0, void* texture, f32 arg2, f32 arg3, f32 arg4, f32 arg5) {
+    extern void _fadeEffectFunction_UDLR_FirstInit__FP9GStextureUs(void* texture, u16 mode);
+    extern void fn_801C6008(u32 arg0, void* texture, f32 arg2, f32 arg3, f32 arg4, f32 arg5);
+    f32 arg2Local;
+    u32 arg0Local;
+    f32 arg3Local;
+    f32 arg4Local;
+    f32 arg5Local;
+    void* tex;
+
+    arg2Local = arg2;
+    arg0Local = arg0;
+    arg3Local = arg3;
+    arg4Local = arg4;
+    arg5Local = arg5;
+    tex = texture;
+
+    if (tex != NULL) {
+        if (lbl_8047B3B0 == 1) {
+            lbl_8047B3B0 = 0;
+            _fadeEffectFunction_UDLR_FirstInit__FP9GStextureUs(tex, 8);
+        }
+
+        fn_801C6008(arg0Local, tex, arg2Local, arg3Local, arg4Local, arg5Local);
+    }
+}
+#pragma peephole on
+
+#pragma peephole off
+void fn_801C5F6C(u32 arg0, void* texture, f32 arg2, f32 arg3, f32 arg4, f32 arg5) {
+    extern void _fadeEffectFunction_UDLR_FirstInit__FP9GStextureUs(void* texture, u16 mode);
+    extern void fn_801C6008(u32 arg0, void* texture, f32 arg2, f32 arg3, f32 arg4, f32 arg5);
+    f32 arg2Local;
+    u32 arg0Local;
+    f32 arg3Local;
+    f32 arg4Local;
+    f32 arg5Local;
+    void* tex;
+
+    arg2Local = arg2;
+    arg0Local = arg0;
+    arg3Local = arg3;
+    arg4Local = arg4;
+    arg5Local = arg5;
+    tex = texture;
+
+    if (tex != NULL) {
+        if (lbl_8047B3B0 == 1) {
+            lbl_8047B3B0 = 0;
+            _fadeEffectFunction_UDLR_FirstInit__FP9GStextureUs(tex, 2);
+        }
+
+        fn_801C6008(arg0Local, tex, arg2Local, arg3Local, arg4Local, arg5Local);
+    }
+}
+#pragma peephole on
 
 u32 fn_801C63B8(void) {
     return 1;
+}
+
+void fn_801C6688(f32 t) {
+    extern void fn_801C673C(void);
+    extern void fn_801C6760(void);
+    s32 alpha;
+
+    fn_801C6760();
+    alpha = 0xFF - (s32)(lbl_8047DFF0 * t);
+    fn_800D67BC(2);
+    fn_800D6680(lbl_8047DFE0, lbl_8047DFE0, lbl_8047DFE0);
+    fn_800D5CB8(0, 0, 0, 0, alpha);
+    fn_800D6680(lbl_8047DFF4, lbl_8047DFF8, lbl_8047DFE0);
+    fn_800D5CB8(0, 0, 0, 0, alpha);
+    fn_800D6728();
+    fn_801C673C();
 }
 
 #pragma scheduling off
@@ -393,7 +476,8 @@ void _fadeFluidSetShockSub__FUlUlf(u32 x, u32 y, f32 strength) {
         return;
     }
 
-    fluid->heightPage[lbl_8047B3B8][x + (y * (columns + 1))].z -= strength;
+    ((f32*)fluid->heightPage[lbl_8047B3B8])
+        [3 * (x + (y * (columns + 1))) + 2] -= strength;
 }
 
 void fadeFluidCalcParms(f32 dt) {
@@ -404,10 +488,10 @@ void fadeFluidCalcParms(f32 dt) {
     f32 dx2 = dx * dx;
     f32 dtHeight = fluid->timeStep * dt;
     f32 dtLimit2 = dt * c2;
+    f32 wave = (dt * dtLimit2) / dx2;
     f32 denom = lbl_8047E0C4 + dtHeight;
     f32 diff = dtHeight - lbl_8047E0C4;
     f32 ratio = lbl_8047E0A8 / denom;
-    f32 wave = (dt * dtLimit2) / dx2;
     f32 accel = lbl_8047E0C8 - (lbl_8047E0CC * wave);
     f32 damping = ratio * diff;
     f32 accelOut = accel * ratio;
@@ -417,6 +501,47 @@ void fadeFluidCalcParms(f32 dt) {
     fluid->accel = accelOut;
     fluid->neighbor = neighbor;
 }
+
+#pragma scheduling off
+void fadeFluidQuit(void) {
+    extern void fn_801C75EC(void* ptr);
+    FadeFluidWork* fluid0 = (FadeFluidWork*)lbl_80467050;
+    FadeFluidWork* fluid1;
+    FadeFluidWork* fluid2;
+    FadeFluidWork* fluid3;
+    FadeFluidWork* fluid4;
+
+    if (fluid0->heightPage[0] != NULL) {
+        fn_801C75EC(fluid0->heightPage[0]);
+    }
+
+    fluid1 = (FadeFluidWork*)lbl_80467050;
+    if (fluid1->heightPage[1] != NULL) {
+        fn_801C75EC(fluid1->heightPage[1]);
+    }
+
+    fluid2 = (FadeFluidWork*)lbl_80467050;
+    if (fluid2->velocityX != NULL) {
+        fn_801C75EC(fluid2->velocityX);
+    }
+
+    fluid3 = (FadeFluidWork*)lbl_80467050;
+    if (fluid3->velocityY != NULL) {
+        fn_801C75EC(fluid3->velocityY);
+    }
+
+    fluid4 = (FadeFluidWork*)lbl_80467050;
+    if (fluid4->texCoord != NULL) {
+        fn_801C75EC(fluid4->texCoord);
+    }
+
+    fluid0->heightPage[0] = NULL;
+    fluid1->heightPage[1] = NULL;
+    fluid2->velocityX = NULL;
+    fluid3->velocityY = NULL;
+    fluid4->texCoord = NULL;
+}
+#pragma scheduling on
 
 #pragma peephole off
 void fn_801C75EC(void* ptr) {

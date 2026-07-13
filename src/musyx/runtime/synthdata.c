@@ -548,33 +548,31 @@ asm void dataGetMacro(void) {
 #include "src/game/people/people_field_fn_8015211C.inc"
 }
 #else
-/* WIP decomp (jun17): functionally-correct REAL C, byte-match tops out at 70.43%.
- * Entire 2nd half (sth/slwi/sndBSearch/epilogue) matches once lbl_8047AF90 is
- * sized [8] (-> @sda21) and `sub` is u32 (-> slwi not clrlslwi). Residual WALL:
- * target loads `count` via indexed `lhzx r5,r4,r6` (base+offset separate); CW
- * here CSEs `lbl_8043D6F8 + idx*4` into one pointer -> `add`+plain `lhz`. The
- * lhzx-vs-add+lhz addressing choice resisted: precomputed-ptr, inline-twice, and
- * named-offset forms all CSE to the same code. Real C is active for coverage;
- * wrapper parked until the lhzx form is cracked. */
+/* The target loads `count` with a separate base and index. CW CSEs the table
+ * entry address and emits `add` plus a plain `lhz`; pointer, typed-array, and
+ * named-offset forms select the same addressing mode. */
+#pragma peephole off
 u32 dataGetMacro(u32 key) {
     extern void* sndBSearch(u8* a, u8* b, u16 c, u32 d, void* e);
     void* result;
-    u8* p;
     u16 count;
     u32 sub;
+    u32 main;
 
-    lbl_8047AF98 = (key >> 6) & 0x3FF;
-    count = *(u16*)(lbl_8043D6F8 + ((key >> 6) & 0x3FF) * 4);
-    if (count == 0) return 0;
-    p = lbl_8043D6F8 + ((key >> 6) & 0x3FF) * 4;
-    sub = *(u16*)(p + 2);
-    *(u16*)(lbl_8047AF90 + 4) = (u16)key;
-    lbl_8047AF9C = sub;
-    result = sndBSearch(lbl_8047AF90, lbl_8043DEF8 + sub * 8, count, 8, maccmp);
-    lbl_8047AF8C = (u32)result;
-    if (result != NULL) { return *(u32*)result; }
+    main = (key >> 6) & 0x3FF;
+    count = ((MacMainEntryT*)lbl_8043D6F8)[main].num;
+    lbl_8047AF98 = main;
+    if (count != 0) {
+        sub = ((MacMainEntryT*)lbl_8043D6F8)[main].subTabIndex;
+        *(u16*)(lbl_8047AF90 + 4) = (u16)key;
+        lbl_8047AF9C = sub;
+        result = sndBSearch(lbl_8047AF90, lbl_8043DEF8 + sub * 8, count, 8, maccmp);
+        lbl_8047AF8C = (u32)result;
+        if (result != NULL) { return *(u32*)result; }
+    }
     return 0;
 }
+#pragma peephole reset
 #endif
 #if 0
 asm void smpcmp(void) {

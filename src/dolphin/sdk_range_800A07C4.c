@@ -8,3 +8,24 @@
  * range name stays honest until internal TU structure is proven.
  */
 #include "dolphin/types.h"
+
+void __OSUnlockSram(BOOL commit) {
+    extern void fn_800A09B0(BOOL commit, u32 arg);
+
+    fn_800A09B0(commit, 0);
+}
+
+BOOL __OSSyncSram(void) {
+    extern u32 Scb_803FB840[0x54 / sizeof(u32)];
+
+    return ((u32*)Scb_803FB840)[0x13];
+}
+
+BOOL __OSUnlockSramEx(BOOL commit) {
+    extern BOOL fn_800A09B0(BOOL commit, u32 arg);
+
+    return fn_800A09B0(commit, 0x14);
+}
+
+void fn_800A128C(void) {
+}

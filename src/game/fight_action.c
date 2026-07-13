@@ -1544,27 +1544,27 @@ u32 fightActionFlowKaijou(void)
     extern void fightFloorInit();
     extern u32 fightFloorGetStatus();
     extern void fightSideCreate();
-    extern u16 fightEncountDataBiosGetFightFloorDataId();
+    extern u32 fightEncountDataBiosGetFightFloorDataId();
     extern u32 fightEncountDataBiosGetPtr();
-  u32 uVar1;
-  u32 uVar2;
-  u32 uVar3;
-  u16 uVar4;
-  u16 uVar5;
+  u32 initData;
+  u32 encountData;
+  u32 floorDataId;
+  u32 fightTarget;
+  u16 sideNo;
+  u16 trainerCount;
   
-  uVar1 = fn_801EF624();
-  uVar2 = fightEncountDataBiosGetPtr();
-  uVar3 = fightFloorGetStatus(0,0,0,0);
-  fightFloorInit(uVar3,uVar1);
+  initData = fn_801EF624();
+  encountData = fightEncountDataBiosGetPtr();
+  fightFloorInit(fightFloorGetStatus(0,0,0,0),initData);
   fightFloorInitFightStart(0);
-  uVar4 = fightFloorGetStatus(0,0,0x14,0);
-  uVar1 = fightEncountDataBiosGetFightFloorDataId(uVar2);
-  uVar2 = fightTargetGetPtr(4,0,uVar4);
-  uVar5 = fightFloorGetStatus(0,uVar1,3,0);
-  fightSideCreate(uVar2,uVar5);
-  uVar2 = fightTargetGetPtr(5,0,uVar4);
-  uVar4 = fightFloorGetStatus(0,uVar1,3,1);
-  fightSideCreate(uVar2,uVar4);
+  sideNo = fightFloorGetStatus(0,0,0x14,0);
+  floorDataId = fightEncountDataBiosGetFightFloorDataId(encountData);
+  fightTarget = fightTargetGetPtr(4,0,sideNo);
+  trainerCount = fightFloorGetStatus(0,floorDataId,3,0);
+  fightSideCreate(fightTarget,trainerCount);
+  fightTarget = fightTargetGetPtr(5,0,sideNo);
+  trainerCount = fightFloorGetStatus(0,floorDataId,3,1);
+  fightSideCreate(fightTarget,trainerCount);
   return 1;
 }
 

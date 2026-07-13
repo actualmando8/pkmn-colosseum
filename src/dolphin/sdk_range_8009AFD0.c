@@ -8,3 +8,18 @@
  * range name stays honest until internal TU structure is proven.
  */
 #include "dolphin/types.h"
+
+extern void* __OSArenaLo_80478988;
+
+#pragma peephole off
+void* OSAllocFromArenaLo(u32 size, u32 alignment) {
+    u32 mask;
+    void* alignedLo;
+
+    alignment -= 1;
+    mask = ~alignment;
+    alignedLo = (void*)(((u32)__OSArenaLo_80478988 + alignment) & mask);
+    __OSArenaLo_80478988 = (void*)(((u32)alignedLo + size + alignment) & mask);
+    return (void*)alignedLo;
+}
+#pragma peephole on

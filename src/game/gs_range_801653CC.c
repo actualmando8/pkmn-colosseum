@@ -140,7 +140,6 @@ extern u32 fn_80167E5C(void*);
 extern void fn_80167E64(void*);
 extern s32 fn_80167ED0(void*, void*, u32, u32);
 extern void fn_80166D48(u32, u32, u32, u32);
-extern u8 _sndSetVolumeWork(u32, u32);
 extern u32 fn_8016737C(GSsndEntry*, u32, u32);
 extern u32 fn_8016758C(GSsndEntry*, u32, u32);
 extern u32 fn_8016761C(GSsndEntry*, u32, u32);
@@ -180,7 +179,7 @@ u32 fn_80166084(u32 id);
 u32 fn_80166098(u32 id);
 void* fn_8016604C(u32 size);
 u32 fn_80166168(u32 id, u32 volume);
-u32 fn_80166268(u32 id, u32 volume, u32 limit);
+u32 fn_80166268();
 u32 fn_801662E8(u32 arg0, u32 arg1);
 u32 fn_80166308(u32 id, const GSvec* position);
 u32 fn_80166370(u32 id, const GSvec* position, const GSvec* velocity, f32 minDistance, f32 maxDistance, u32 arg5,
@@ -337,7 +336,8 @@ u32 fn_80165788(u32 id, f32 x, f32 y, f32 z)
 
     set__5GSvecFfff(&position, x, y, z);
     result = fn_80166308(id, &position);
-    return (result | -result) >> 31;
+    result = (result | -result) >> 31;
+    return result;
 }
 
 void scriptSoundStop(u32 fade)
@@ -424,6 +424,20 @@ void fn_80165C70(u32 volume, u32 isSe, s32 wait)
     }
 }
 
+void fn_80165D0C(u32 frames)
+{
+    extern s32 fn_800D37CC(void);
+    extern u32 fn_800D3088(void);
+    extern const f32 lbl_8047D544;
+    f32 duration = (f32)frames / lbl_8047D544;
+    f32 elapsed = lbl_8047D540;
+
+    while (elapsed < duration) {
+        _threadSwitch();
+        elapsed += (f32)fn_800D3088() / (f32)fn_800D37CC();
+    }
+}
+
 void fn_80165DEC(const char* path, void* buffer, u32 capacity)
 {
     const char* messages = lbl_80273548;
@@ -482,6 +496,7 @@ void fn_80165F84(void)
     lbl_8047B0A8 = 0;
 }
 
+#pragma peephole off
 void fn_80165FDC(u32 id)
 {
     const char* message = lbl_802736CC;
@@ -498,6 +513,7 @@ void fn_80165FDC(u32 id)
         _threadSwitch();
     }
 }
+#pragma peephole reset
 
 void* fn_8016604C(u32 size)
 {
@@ -533,17 +549,18 @@ void fn_801660D8(u32 volume, u32 includeBgm, u32 includeSe)
     u32 offset;
     u32 i;
 
-    for (offset = 0, i = 0; i < lbl_8047B0E8; offset += sizeof(GSsndEntry), i++) {
+    for (i = 0, offset = 0; i < lbl_8047B0E8; offset += sizeof(GSsndEntry), i++) {
         u32 flags = *(u8*)((u8*)lbl_80478FAC + offset);
 
         if (((flags >> 5) & 1U) == 1U) {
             if (((flags >> 7) & 1U) == 1U) {
-                if (includeSe != 0) {
-                    fn_80166168(i, volume);
+                if (includeSe == 0) {
+                    continue;
                 }
-            } else if (includeBgm != 0) {
-                fn_80166168(i, volume);
+            } else if (includeBgm == 0) {
+                continue;
             }
+            fn_80166168(i, volume);
         }
     }
 }
@@ -573,17 +590,18 @@ void fn_801661D0(u32 limit, u32 volume, u32 includeBgm, u32 includeSe)
     u32 offset;
     u32 i;
 
-    for (offset = 0, i = 0; i < lbl_8047B0E8; offset += sizeof(GSsndEntry), i++) {
+    for (i = 0, offset = 0; i < lbl_8047B0E8; offset += sizeof(GSsndEntry), i++) {
         u32 flags = *(u8*)((u8*)lbl_80478FAC + offset);
 
         if (((flags >> 5) & 1U) == 1U) {
             if (((flags >> 7) & 1U) == 1U) {
-                if (includeSe != 0) {
-                    fn_80166268(i, volume, limit);
+                if (includeSe == 0) {
+                    continue;
                 }
-            } else if (includeBgm != 0) {
-                fn_80166268(i, volume, limit);
+            } else if (includeBgm == 0) {
+                continue;
             }
+            fn_80166268(i, volume, limit);
         }
     }
 }
@@ -592,8 +610,8 @@ u32 fn_80166268(u32 id, u32 volume, u32 limit)
 {
     u32 offset = id * sizeof(GSsndEntry);
     GSsndWork* work = *(GSsndWork**)((u8*)lbl_80478FAC + offset + 8);
+    s32 current;
     u32 depth;
-    u32 current;
 
     if (work == 0) {
         return 0;
@@ -605,11 +623,12 @@ u32 fn_80166268(u32 id, u32 volume, u32 limit)
     }
 
     current = work->priority;
-    if (current < limit) {
+    if (current < (s32)limit) {
         limit = current;
     }
 
     work->volumeStack[depth] = current;
+    depth = work->stackDepth;
     if (depth < 2) {
         work->stackDepth = depth + 1;
     }
@@ -856,10 +875,12 @@ void fn_80166A28(u32 id)
 
 u32 fn_80166A50(u32 id, u32 arg1, u32 volume, u32 arg3)
 {
-    if ((u8)_sndSetVolumeWork(id, volume) != 0) {
-        return fn_80166AB8(id, arg1, arg3);
+    extern u8 _sndSetVolumeWork(u32, u32);
+
+    if ((u8)_sndSetVolumeWork(id, volume) == 0) {
+        return 0;
     }
-    return 0;
+    return fn_80166AB8(id, arg1, arg3);
 }
 
 u32 fn_80166AB8(u32 id, u32 arg1, u32 arg2)
@@ -934,16 +955,14 @@ u32 GSsndGetOutputMode(void)
 void fn_80166CC0(s32 mode)
 {
     sndOutputMode();
-    if (mode != 0) {
-        if (mode < 0) {
-            return;
-        }
-        if (mode >= 3) {
-            return;
-        }
-        fn_800A0EB4(1);
-    } else {
+    switch (mode) {
+    case 0:
         fn_800A0EB4(0);
+        break;
+    case 1:
+    case 2:
+        fn_800A0EB4(1);
+        break;
     }
 }
 
@@ -954,9 +973,10 @@ void fn_80166D18(u32 group, u32 volume, u32 left, u32 right)
 
 void fn_80166D48(u32 volume, u32 fade, u32 includeBgm, u32 includeSe)
 {
+    extern u8 _sndSetVolumeWork(u32, u8);
+    u32 offset;
     u32 group;
     u32 i;
-    u32 offset;
 
     if (includeBgm == 1 && includeSe == 1) {
         group = 0xFF;
@@ -968,7 +988,7 @@ void fn_80166D48(u32 volume, u32 fade, u32 includeBgm, u32 includeSe)
         return;
     }
 
-    for (i = 0, offset = 0; i < lbl_8047B0E8; i++, offset += sizeof(GSsndEntry)) {
+    for (i = 0, offset = 0; i < lbl_8047B0E8; offset += sizeof(GSsndEntry), i++) {
         u32 flags = *(u8*)((u8*)lbl_80478FAC + offset);
 
         if (((flags >> 5) & 1U) == 1U) {

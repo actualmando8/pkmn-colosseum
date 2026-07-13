@@ -426,30 +426,40 @@ void HSD_AObjInvokeCallBacks(void) {
 }
 
 /**
- * HSD_AObjInitEndCallBack - Get pre-grid slot count (renamed from
- * fn_801C2A60; confirmed name -- naming pass 2026-07-07).
+ * HSD_AObjInitEndCallBack - Initialize pre-grid end callback state.
  * Address: 0x801C2A60 | Size: 0x14
  */
+#pragma push
+#pragma optimize_for_size on
 s32 HSD_AObjInitEndCallBack(void) {
-    return BATTLE_TOTAL_POKEMON;
+    extern s32 lbl_8047B390;
+    extern s32 lbl_8047B38C;
+    lbl_8047B390 = 0;
+    lbl_8047B38C = 0;
+    return 0;
 }
+#pragma pop
 
 /**
  * HSD_AObjClearFlags - Get pre-grid slot side (renamed from fn_801C2A74;
  * confirmed name -- naming pass 2026-07-07).
  * Address: 0x801C2A74 | Size: 0x1C
  */
-s32 HSD_AObjClearFlags(s32 slot) {
-    return (slot >= BATTLE_POS_ENEMY_LEFT) ? 1 : 0;
+void HSD_AObjClearFlags(HSD_AObj* aobj, u32 flags) {
+    if (aobj != NULL) {
+        *(u32*)aobj &= ~(flags & 0xC);
+    }
 }
 
 /**
- * HSD_AObjSetFlags - Get pre-grid slot position within side (renamed from
+ * HSD_AObjSetFlags - Get pre-grid slot side (renamed from
  * fn_801C2A90; confirmed name -- naming pass 2026-07-07).
  * Address: 0x801C2A90 | Size: 0x1C
  */
-s32 HSD_AObjSetFlags(s32 slot) {
-    return (slot & 1);
+void HSD_AObjSetFlags(HSD_AObj* aobj, u32 flags) {
+    if (aobj != NULL) {
+        *(u32*)aobj |= flags & 0xC;
+    }
 }
 
 /**

@@ -15,6 +15,9 @@ typedef struct MenuCBSlotInfo MenuCBSlotInfo;
 typedef struct MenuCBState MenuCBState;
 typedef struct MenuKeyInfo MenuKeyInfo;
 typedef struct MenuModelWork MenuModelWork;
+typedef struct MenuCBLayoutEntry MenuCBLayoutEntry;
+typedef struct MenuCBStatusWork MenuCBStatusWork;
+typedef struct MenuCursorItem MenuCursorItem;
 
 struct MenuCBState {
     s32 markKind;
@@ -56,6 +59,26 @@ struct MenuModelWork {
     u8 pad_00[0x48];
 };
 
+struct MenuCBLayoutEntry {
+    s32 id;
+    s16 offset;
+    s16 pad_06;
+};
+
+struct MenuCBStatusWork {
+    u8 pad_00;
+    s8 state;
+    s8 initialized;
+    u8 pad_03;
+    s32 windowId;
+};
+
+struct MenuCursorItem {
+    u8 pad_00[2];
+    s16 x;
+    s16 y;
+};
+
 extern f32 lbl_8047A54C;
 extern void* lbl_8047A548;
 extern f32 lbl_8047A554;
@@ -65,6 +88,10 @@ extern const f32 lbl_8047BE68;
 extern const f32 lbl_8047BE8C;
 extern const f32 lbl_8047BE90;
 extern const f32 lbl_8047BE94;
+extern const f32 lbl_8047BE80;
+extern const MenuCBLayoutEntry lbl_802E61E8[17];
+extern const u32 lbl_80267350[18];
+extern u8 lbl_802EF0A8[];
 extern MenuCBSlotInfo lbl_80267398[0x20];
 extern MenuModelWork lbl_803A9720;
 
@@ -96,7 +123,7 @@ extern u16 pokemonGetSoubiItemDataId(void* pokemon);
 extern void* pcboxGetPokemonBoxName(void* pcbox, s8 box);
 extern s8 pcboxGetNbPokemonBox(void);
 extern s8 getPokemonBoxNbUsedSlot__5PCBOXFSc(void* pcbox, s8 box);
-extern void winSpriteSetDisp(MenuCBPane* pane, u32 enable);
+extern void winSpriteSetDisp(MenuCBPane* pane, u8 enable);
 extern MenuKeyInfo* windowGetKeyInfo(void);
 extern void fn_8010A420(MenuModelWork* work);
 extern void fn_80054760(s32 forward, s32 wait);
@@ -108,18 +135,52 @@ extern void fn_80057A64(void* pokemon, s32 arg1);
 extern s8 fn_801347D8(void);
 extern s32 fn_80055E38(MenuCBPane* pane);
 
-s32 fn_80053728(MenuCBPane* pane, MenuCBPane* sprite) {
+#pragma push
+#pragma peephole off
+s32 fn_8005344C(MenuCBPane* pane, MenuCBPane* sprite) {
+    s16 position;
+    s16 x;
+    s16 y;
     s32 visible;
+    MenuCBPane* window;
 
-    if (fn_80057E40(pane) == 2) {
-        visible = FALSE;
-    } else {
-        visible = TRUE;
+    extern s32 fn_80057A08(MenuCBPane* pane);
+    extern void* windowSearchID(s32 id);
+    extern s32 fn_80058F08(s16* position, s32 box);
+    extern void fn_80057094(s16* x, s16* y);
+
+    visible = FALSE;
+    if (fn_80057A08(pane) != 0) {
+        window = windowSearchID(0x94);
+        if (window != NULL && fn_80058F08(&position, window->boxIndex) == 0) {
+            visible = TRUE;
+            fn_80057094(&x, &y);
+            sprite->x = x + *(s16*)(lbl_802EF0A8 + (*(s16*)((u8*)sprite + 6) * 0x1c) + 2);
+            sprite->y = y + *(s16*)(lbl_802EF0A8 + (*(s16*)((u8*)sprite + 6) * 0x1c) + 4);
+        }
     }
     winSpriteSetDisp(sprite, (u8)visible);
     return 0;
 }
+#pragma pop
 
+#pragma push
+#pragma peephole off
+s32 fn_80053728(MenuCBPane* pane, MenuCBPane* sprite) {
+    s32 visible;
+
+    if (fn_80057E40(pane) != 2) {
+        visible = TRUE;
+    } else {
+        visible = FALSE;
+    }
+    winSpriteSetDisp(sprite, (u8)visible);
+    return 0;
+}
+#pragma pop
+
+#pragma push
+#pragma peephole off
 s32 fn_80053A60(MenuCBPane* pane, MenuCBPane* sprite) {
     s32 visible;
     void* pokemon;
@@ -128,16 +189,19 @@ s32 fn_80053A60(MenuCBPane* pane, MenuCBPane* sprite) {
     pokemon = fn_80057270(pane);
     if (pokemon != NULL) {
         u32 mark = (u8)pokemonBiosGetPcboxMark(pokemon);
-        u32 masked = mark & 8;
+        s32 masked = mark & 8;
 
         if (masked != 0) {
             visible = TRUE;
         }
     }
-    winSpriteSetDisp(sprite, (u8)visible);
+    winSpriteSetDisp(sprite, visible);
     return 0;
 }
+#pragma pop
 
+#pragma push
+#pragma peephole off
 s32 fn_80053AC8(MenuCBPane* pane, MenuCBPane* sprite) {
     s32 visible;
     void* pokemon;
@@ -146,16 +210,19 @@ s32 fn_80053AC8(MenuCBPane* pane, MenuCBPane* sprite) {
     pokemon = fn_80057270(pane);
     if (pokemon != NULL) {
         u32 mark = (u8)pokemonBiosGetPcboxMark(pokemon);
-        u32 masked = mark & 4;
+        s32 masked = mark & 4;
 
         if (masked != 0) {
             visible = TRUE;
         }
     }
-    winSpriteSetDisp(sprite, (u8)visible);
+    winSpriteSetDisp(sprite, visible);
     return 0;
 }
+#pragma pop
 
+#pragma push
+#pragma peephole off
 s32 fn_80053B30(MenuCBPane* pane, MenuCBPane* sprite) {
     s32 visible;
     void* pokemon;
@@ -164,16 +231,19 @@ s32 fn_80053B30(MenuCBPane* pane, MenuCBPane* sprite) {
     pokemon = fn_80057270(pane);
     if (pokemon != NULL) {
         u32 mark = (u8)pokemonBiosGetPcboxMark(pokemon);
-        u32 masked = mark & 2;
+        s32 masked = mark & 2;
 
         if (masked != 0) {
             visible = TRUE;
         }
     }
-    winSpriteSetDisp(sprite, (u8)visible);
+    winSpriteSetDisp(sprite, visible);
     return 0;
 }
+#pragma pop
 
+#pragma push
+#pragma peephole off
 s32 fn_80053B98(MenuCBPane* pane, MenuCBPane* sprite) {
     s32 visible;
     void* pokemon;
@@ -182,19 +252,22 @@ s32 fn_80053B98(MenuCBPane* pane, MenuCBPane* sprite) {
     pokemon = fn_80057270(pane);
     if (pokemon != NULL) {
         u32 mark = (u8)pokemonBiosGetPcboxMark(pokemon);
-        u32 masked = mark & 1;
+        s32 masked = mark & 1;
 
         if (masked != 0) {
             visible = TRUE;
         }
     }
-    winSpriteSetDisp(sprite, (u8)visible);
+    winSpriteSetDisp(sprite, visible);
     return 0;
 }
+#pragma pop
 
+#pragma push
+#pragma peephole off
 s32 fn_80053C00(MenuCBPane* pane, MenuCBPane* sprite) {
     void* pokemon;
-    u32 itemId;
+    u16 itemId;
     void* itemData;
     s32 result;
 
@@ -213,7 +286,10 @@ s32 fn_80053C00(MenuCBPane* pane, MenuCBPane* sprite) {
     sprite->textId = result;
     return result;
 }
+#pragma pop
 
+#pragma push
+#pragma peephole off
 s32 fn_80053C84(MenuCBPane* pane, MenuCBPane* sprite) {
     s32 visible;
     void* pokemon;
@@ -227,10 +303,13 @@ s32 fn_80053C84(MenuCBPane* pane, MenuCBPane* sprite) {
             visible = TRUE;
         }
     }
-    winSpriteSetDisp(sprite, (u8)visible);
+    winSpriteSetDisp(sprite, visible);
     return 0;
 }
+#pragma pop
 
+#pragma push
+#pragma peephole off
 s32 fn_80053CE8(MenuCBPane* pane, MenuCBPane* sprite) {
     s32 textId;
     void* pokemon;
@@ -247,14 +326,15 @@ s32 fn_80053CE8(MenuCBPane* pane, MenuCBPane* sprite) {
             break;
         case 2:
             break;
-        case 3:
-            break;
         }
     }
     sprite->textId = textId;
     return 0;
 }
+#pragma pop
 
+#pragma push
+#pragma peephole off
 s32 fn_80053D64(MenuCBPane* pane, MenuCBPane* sprite) {
     void* pokemon;
     s32 result;
@@ -268,29 +348,56 @@ s32 fn_80053D64(MenuCBPane* pane, MenuCBPane* sprite) {
     sprite->textId = result;
     return result;
 }
+#pragma pop
 
+#pragma push
+#pragma peephole off
 s32 fn_80053DD4(MenuCBPane* pane, MenuCBPane* sprite) {
     void* pokemon;
-    s32 textId;
     u32 level;
-    s32 digitWidth;
+    s32 textId;
+    u32 rect;
 
     textId = 0;
     pokemon = fn_80057270(pane);
     if (pokemon != NULL) {
-        level = (u8)pokemonBiosGetLevel(pokemon);
+        level = pokemonBiosGetLevel(pokemon);
         if ((s32)level < 100) {
-            digitWidth = 2;
+            textId = 2;
         } else {
-            digitWidth = 3;
+            textId = 3;
         }
-        fn_800FB680(sprite->width - (digitWidth * 15) - (GSmsgGetRect(0x1b82) >> 16), 0, -1, 0x1b82);
+        rect = GSmsgGetRect(0x1b82);
+        fn_800FB680(sprite->width - (textId * 15) - (rect >> 16), 0, -1, 0x1b82);
         msgctrlSetValue(0x34, level);
         textId = 0xde;
     }
     sprite->textId = textId;
     return 0;
 }
+#pragma pop
+
+#pragma push
+#pragma peephole off
+s32 fn_80054420(MenuCBPane* pane, MenuCBPane* sprite) {
+    s32 i;
+    s32 scaled;
+    s16 offset;
+
+    for (i = 0; i < 17; i++) {
+        if (*(s16*)((u8*)sprite + 6) == lbl_802E61E8[i].id) {
+            break;
+        }
+    }
+    if (i >= 17) {
+        return 0;
+    }
+    offset = lbl_802E61E8[i].offset;
+    scaled = (s32)(lbl_8047BE80 * lbl_8047A558);
+    sprite->y = scaled + offset;
+    return 0;
+}
+#pragma pop
 
 s32 fn_80053E7C(MenuCBPane* pane) {
     void* pokemon;
@@ -357,6 +464,44 @@ void fn_8005471C(void) {
 }
 #pragma dont_inline reset
 
+#pragma push
+#pragma peephole off
+s32 fn_80054914(MenuCBPane* pane, MenuCBPane* sprite) {
+    s32 ids[6][3] = {
+        {0x119d, 0x119e, 0x119f},
+        {0x713, 0x714, 0x715},
+        {0x716, 0x717, 0x718},
+        {0x719, 0x71a, 0x71b},
+        {0x71c, 0x71d, 0x71e},
+        {0x71f, 0x720, 0x721}
+    };
+    s32 column;
+    s32 row;
+    s16 id;
+
+    for (row = 0; row < 6; row++) {
+        id = *(s16*)((u8*)sprite + 6);
+        for (column = 0; column < 3; column++) {
+            if (id == ids[row][column]) {
+                break;
+            }
+        }
+        if (column < 3) {
+            break;
+        }
+    }
+    if (row >= 6) {
+        return 0;
+    }
+    if (pane->boxIndex == row) {
+        winSpriteSetDisp(sprite, TRUE);
+    } else {
+        winSpriteSetDisp(sprite, FALSE);
+    }
+    return 0;
+}
+#pragma pop
+
 s32 fn_800549F0(MenuCBPane* pane, MenuCBPane* sprite) {
     MenuCBState* state = pane->state;
 
@@ -412,6 +557,47 @@ void fn_80054E7C(MenuCBPane* pane) {
     }
 }
 
+#pragma push
+#pragma peephole off
+s32 fn_800550B4(MenuCBStatusWork* work) {
+    MenuCursorItem* item;
+    s32 selected;
+
+    extern MenuCursorItem* windowGetCursorToItem(MenuCBStatusWork* work);
+    extern void fn_80057830(s16 x, s16 y, s32 selected);
+    extern void fn_80057948(void);
+    extern void fn_80056854(void);
+    extern s32 windowGetActiveID(void);
+    extern void fn_80054EC8(MenuCBStatusWork* work);
+
+    switch (work->state) {
+    case 0:
+        if (work->initialized == 0) {
+            selected = TRUE;
+        } else {
+            selected = FALSE;
+        }
+        item = windowGetCursorToItem(work);
+        fn_80057830(item->x, item->y, selected);
+        work->initialized = 1;
+        break;
+    case 2:
+        fn_80057948();
+        fn_80056854();
+        if (work->windowId == windowGetActiveID()) {
+            fn_80054EC8(work);
+        }
+        break;
+    case 3:
+        if (work->initialized == 0) {
+            work->initialized = 1;
+        }
+        break;
+    }
+    return 0;
+}
+#pragma pop
+
 s32 fn_80055194(s32* outSlot, s32 index) {
     MenuCBSlotInfo* info;
 
@@ -425,7 +611,7 @@ s32 fn_80055194(s32* outSlot, s32 index) {
 }
 
 #pragma push
-#pragma scheduling off
+#pragma peephole off
 void fn_80055B98(MenuCBPane* pane) {
     menuOpenCustom(0x10e, 0x1f, 0, 0, 0, 0);
     fn_80056B74(pane, TRUE);
@@ -443,6 +629,8 @@ void fn_80055B98(MenuCBPane* pane) {
 }
 #pragma pop
 
+#pragma push
+#pragma peephole off
 s32 fn_80055C2C(MenuCBPane* pane, MenuCBPane* sprite) {
     s32 box;
     s32 capacity;
@@ -464,6 +652,7 @@ s32 fn_80055C2C(MenuCBPane* pane, MenuCBPane* sprite) {
     sprite->textId = 0x1b7f;
     return 0;
 }
+#pragma pop
 
 s32 fn_80055CD4(MenuCBPane* pane, MenuCBPane* sprite) {
     u8 box;
@@ -483,23 +672,24 @@ s32 fn_80055CD4(MenuCBPane* pane, MenuCBPane* sprite) {
 }
 
 #pragma push
+#pragma peephole off
 #pragma scheduling off
 s32 fn_80055D34(MenuCBPane* pane) {
     MenuKeyInfo* keyInfo;
+    s8 count;
     s32 box;
-    s32 count;
 
     keyInfo = windowGetKeyInfo();
     if ((keyInfo->buttonsRepeat & 8) != 0) {
         count = pcboxGetNbPokemonBox();
-        box = pane->boxIndex + 1;
+        box = (u8)pane->boxIndex + 1;
         pane->boxIndex = box;
         if ((s8)box >= count) {
             pane->boxIndex = 0;
         }
     }
     if ((keyInfo->buttonsRepeat & 4) != 0) {
-        box = pane->boxIndex - 1;
+        box = (u8)pane->boxIndex - 1;
         pane->boxIndex = box;
         if ((s8)box < 0) {
             pane->boxIndex = pcboxGetNbPokemonBox() - 1;

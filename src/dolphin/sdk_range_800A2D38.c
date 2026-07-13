@@ -9,8 +9,24 @@
  */
 #include "dolphin/types.h"
 
+typedef f32 Mtx[3][4];
 typedef f32 Mtx44[4][4];
 
+typedef struct Vec {
+    f32 x;
+    f32 y;
+    f32 z;
+} Vec;
+
+typedef struct Quaternion {
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 w;
+} Quaternion;
+
+extern const f32 lbl_8047C288;
+extern const f32 lbl_8047C28C;
 extern const f32 lbl_8047C2A8;
 extern const f32 lbl_8047C2AC;
 extern const f32 lbl_8047C2B0;
@@ -19,6 +35,318 @@ extern const f32 lbl_8047C2B8;
 extern const f32 lbl_8047C2BC;
 
 extern f32 tanf(f32 x);
+
+void PSMTXIdentity(Mtx m)
+{
+    f32 zero = lbl_8047C28C;
+    f32 one = lbl_8047C288;
+
+    m[0][2] = zero;
+    m[0][3] = zero;
+    m[1][2] = zero;
+    m[1][3] = zero;
+    m[2][0] = zero;
+    m[2][1] = zero;
+    m[0][0] = one;
+    m[0][1] = zero;
+    m[1][0] = zero;
+    m[1][1] = one;
+    m[2][2] = one;
+    m[2][3] = zero;
+}
+
+void PSMTXCopy(const Mtx src, Mtx dst)
+{
+    const f64* srcPairs = (const f64*)src;
+    f64* dstPairs = (f64*)dst;
+
+    dstPairs[0] = srcPairs[0];
+    dstPairs[1] = srcPairs[1];
+    dstPairs[2] = srcPairs[2];
+    dstPairs[3] = srcPairs[3];
+    dstPairs[4] = srcPairs[4];
+    dstPairs[5] = srcPairs[5];
+}
+
+#pragma peephole off
+void PSMTXRotRad(Mtx m, char axis, f32 rad)
+{
+    extern f32 sinf(f32 x);
+    extern f32 cosf(f32 x);
+    extern void PSMTXRotTrig(Mtx m, char axis, f32 sinA, f32 cosA);
+    f32 sinA;
+    f32 cosA;
+
+    sinA = sinf(rad);
+    cosA = cosf(rad);
+    PSMTXRotTrig(m, axis, sinA, cosA);
+}
+#pragma peephole reset
+
+void PSMTXRotTrig(Mtx m, char axis, f32 sinA, f32 cosA)
+{
+    f32 zero = lbl_8047C28C;
+    f32 one = lbl_8047C288;
+
+    if ((axis | 0x20) == 'x') {
+        m[0][0] = one;
+        m[0][1] = zero;
+        m[0][2] = zero;
+        m[0][3] = zero;
+        m[1][0] = zero;
+        m[1][1] = cosA;
+        m[1][2] = -sinA;
+        m[1][3] = zero;
+        m[2][0] = zero;
+        m[2][1] = sinA;
+        m[2][2] = cosA;
+        m[2][3] = zero;
+    } else if ((axis | 0x20) == 'y') {
+        m[0][0] = cosA;
+        m[0][1] = zero;
+        m[0][2] = sinA;
+        m[0][3] = zero;
+        m[1][0] = zero;
+        m[1][1] = one;
+        m[1][2] = zero;
+        m[1][3] = zero;
+        m[2][0] = -sinA;
+        m[2][1] = zero;
+        m[2][2] = cosA;
+        m[2][3] = zero;
+    } else if ((axis | 0x20) == 'z') {
+        m[0][0] = cosA;
+        m[0][1] = -sinA;
+        m[0][2] = zero;
+        m[0][3] = zero;
+        m[1][0] = sinA;
+        m[1][1] = cosA;
+        m[1][2] = zero;
+        m[1][3] = zero;
+        m[2][0] = zero;
+        m[2][1] = zero;
+        m[2][2] = one;
+        m[2][3] = zero;
+    }
+}
+
+void __PSMTXRotAxisRadInternal(Mtx m, const Vec* axis, f32 sinA, f32 cosA)
+{
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 mag;
+    f32 scale;
+    f32 t;
+
+    mag = axis->x * axis->x + axis->y * axis->y + axis->z * axis->z;
+    scale = (f32)__frsqrte(mag);
+    scale = scale * 0.5f * (3.0f - mag * scale * scale);
+    x = axis->x * scale;
+    y = axis->y * scale;
+    z = axis->z * scale;
+    t = 1.0f - cosA;
+
+    m[0][0] = t * x * x + cosA;
+    m[0][1] = t * x * y - sinA * z;
+    m[0][2] = t * x * z + sinA * y;
+    m[0][3] = 0.0f;
+
+    m[1][0] = t * x * y + sinA * z;
+    m[1][1] = t * y * y + cosA;
+    m[1][2] = t * y * z - sinA * x;
+    m[1][3] = 0.0f;
+
+    m[2][0] = t * x * z - sinA * y;
+    m[2][1] = t * y * z + sinA * x;
+    m[2][2] = t * z * z + cosA;
+    m[2][3] = 0.0f;
+}
+
+#pragma peephole off
+void PSMTXRotAxisRad(Mtx m, const Vec* axis, f32 rad)
+{
+    extern f32 sinf(f32 x);
+    extern f32 cosf(f32 x);
+    f32 sinA;
+    f32 cosA;
+
+    sinA = sinf(rad);
+    cosA = cosf(rad);
+    __PSMTXRotAxisRadInternal(m, axis, sinA, cosA);
+}
+#pragma peephole reset
+
+void PSMTXTrans(Mtx m, f32 xT, f32 yT, f32 zT)
+{
+    f32 zero = lbl_8047C28C;
+    f32 one = lbl_8047C288;
+
+    m[0][3] = xT;
+    m[1][3] = yT;
+    m[0][1] = zero;
+    m[0][2] = zero;
+    m[2][0] = zero;
+    m[2][1] = zero;
+    m[1][0] = zero;
+    m[1][1] = one;
+    m[1][2] = zero;
+    m[2][2] = one;
+    m[2][3] = zT;
+    m[0][0] = one;
+}
+
+void PSMTXTransApply(const Mtx src, Mtx dst, f32 xT, f32 yT, f32 zT)
+{
+    const f64* srcPairs = (const f64*)src;
+    f64* dstPairs = (f64*)dst;
+
+    dstPairs[0] = srcPairs[0];
+    dstPairs[1] = srcPairs[1];
+    dstPairs[2] = srcPairs[2];
+    dstPairs[3] = srcPairs[3];
+    dstPairs[4] = srcPairs[4];
+    dstPairs[5] = srcPairs[5];
+    dst[0][3] = src[0][3] + xT;
+    dst[1][3] = src[1][3] + yT;
+    dst[2][3] = src[2][3] + zT;
+}
+
+#pragma optimize_for_size on
+void PSMTXScaleApply(const Mtx src, Mtx dst, f32 xS, f32 yS, f32 zS)
+{
+    u32 i;
+
+    for (i = 0; i < 4; i++) {
+        dst[0][i] = src[0][i] * xS;
+        dst[1][i] = src[1][i] * yS;
+        dst[2][i] = src[2][i] * zS;
+    }
+}
+#pragma optimize_for_size reset
+
+#pragma peephole off
+void C_MTXLightFrustum(Mtx m, f32 top, f32 bottom, f32 left, f32 right, f32 near,
+                       f32 scaleS, f32 scaleT, f32 transS, f32 transT)
+{
+    extern const f32 lbl_8047C298;
+    extern const f32 lbl_8047C29C;
+    f32 tmp;
+
+    tmp = lbl_8047C288 / (right - left);
+    m[0][0] = (lbl_8047C298 * near) * tmp * scaleS;
+    m[0][1] = lbl_8047C28C;
+    m[0][2] = (right + left) * tmp * scaleS - transS;
+    m[0][3] = lbl_8047C28C;
+
+    tmp = lbl_8047C288 / (top - bottom);
+    m[1][0] = lbl_8047C28C;
+    m[1][1] = (lbl_8047C298 * near) * tmp * scaleT;
+    m[1][2] = (top + bottom) * tmp * scaleT - transT;
+    m[1][3] = lbl_8047C28C;
+
+    m[2][0] = lbl_8047C28C;
+    m[2][1] = lbl_8047C28C;
+    m[2][2] = lbl_8047C29C;
+    m[2][3] = lbl_8047C28C;
+}
+#pragma peephole reset
+
+#pragma peephole off
+void C_MTXLightPerspective(Mtx m, f32 fovY, f32 aspect, f32 scaleS, f32 scaleT,
+                           f32 transS, f32 transT)
+{
+    extern const f32 lbl_8047C290;
+    extern const f32 lbl_8047C29C;
+    extern const f32 lbl_8047C2A0;
+    f32 cot;
+
+    fovY = lbl_8047C290 * fovY;
+    fovY = lbl_8047C2A0 * fovY;
+    cot = lbl_8047C288 / tanf(fovY);
+
+    m[0][0] = scaleS * (cot / aspect);
+    m[0][1] = lbl_8047C28C;
+    m[0][2] = -transS;
+    m[0][3] = lbl_8047C28C;
+
+    m[1][0] = lbl_8047C28C;
+    m[1][1] = cot * scaleT;
+    m[1][2] = -transT;
+    m[1][3] = lbl_8047C28C;
+
+    m[2][0] = lbl_8047C28C;
+    m[2][1] = lbl_8047C28C;
+    m[2][2] = lbl_8047C29C;
+    m[2][3] = lbl_8047C28C;
+}
+#pragma peephole reset
+
+#pragma fp_contract off
+void C_MTXLightOrtho(Mtx m, f32 top, f32 bottom, f32 left, f32 right,
+                     f32 scaleS, f32 scaleT, f32 transS, f32 transT)
+{
+    extern const f32 lbl_8047C298;
+    f32 tmp;
+
+    tmp = lbl_8047C288 / (right - left);
+    m[0][0] = scaleS * (lbl_8047C298 * tmp);
+    m[0][1] = lbl_8047C28C;
+    m[0][2] = lbl_8047C28C;
+    m[0][3] = -(right + left) * tmp * scaleS + transS;
+
+    tmp = lbl_8047C288 / (top - bottom);
+    m[1][0] = lbl_8047C28C;
+    m[1][1] = scaleT * (lbl_8047C298 * tmp);
+    m[1][2] = lbl_8047C28C;
+    m[1][3] = -(top + bottom) * tmp * scaleT + transT;
+
+    m[2][0] = lbl_8047C28C;
+    m[2][1] = lbl_8047C28C;
+    m[2][2] = lbl_8047C28C;
+    m[2][3] = lbl_8047C288;
+}
+#pragma fp_contract reset
+
+void PSMTXMultVecSR(const Mtx m, const Vec* src, Vec* dst)
+{
+    const f64* mPairs = (const f64*)m;
+    const f64* srcPairs = (const f64*)src;
+    f64 xy = srcPairs[0];
+    f32 z = src->z;
+
+    dst->x = (f32)(mPairs[0] * xy + mPairs[1] * (f64)z);
+    dst->y = (f32)(mPairs[2] * xy + mPairs[3] * (f64)z);
+    dst->z = (f32)(mPairs[4] * xy + mPairs[5] * (f64)z);
+}
+
+void C_MTXFrustum(Mtx44 m, f32 top, f32 bottom, f32 left, f32 right, f32 near, f32 far)
+{
+    f32 tmp;
+
+    tmp = lbl_8047C2A8 / (right - left);
+    m[0][0] = (lbl_8047C2AC * near) * tmp;
+    m[0][1] = lbl_8047C2B0;
+    m[0][2] = (right + left) * tmp;
+    m[0][3] = lbl_8047C2B0;
+
+    tmp = lbl_8047C2A8 / (top - bottom);
+    m[1][0] = lbl_8047C2B0;
+    m[1][1] = (lbl_8047C2AC * near) * tmp;
+    m[1][2] = (top + bottom) * tmp;
+    m[1][3] = lbl_8047C2B0;
+
+    tmp = lbl_8047C2A8 / (far - near);
+    m[2][0] = lbl_8047C2B0;
+    m[2][1] = lbl_8047C2B0;
+    m[2][2] = -near * tmp;
+    m[2][3] = -(far * near) * tmp;
+
+    m[3][0] = lbl_8047C2B0;
+    m[3][1] = lbl_8047C2B0;
+    m[3][2] = lbl_8047C2B4;
+    m[3][3] = lbl_8047C2B0;
+}
 
 void C_MTXPerspective(Mtx44 m, f32 fovY, f32 aspect, f32 near, f32 far)
 {
@@ -77,4 +405,175 @@ void C_MTXOrtho(Mtx44 m, f32 top, f32 bottom, f32 left, f32 right, f32 near, f32
     m[3][1] = lbl_8047C2B0;
     m[3][2] = lbl_8047C2B0;
     m[3][3] = lbl_8047C2A8;
+}
+
+void PSVECAdd(Vec* lhs, Vec* rhs, Vec* dst)
+{
+    const f64* lhsPairs = (const f64*)lhs;
+    const f64* rhsPairs = (const f64*)rhs;
+    f64* dstPairs = (f64*)dst;
+
+    dstPairs[0] = lhsPairs[0] + rhsPairs[0];
+    dst->z = lhs->z + rhs->z;
+}
+
+void PSVECSubtract(Vec* lhs, Vec* rhs, Vec* dst)
+{
+    const f64* lhsPairs = (const f64*)lhs;
+    const f64* rhsPairs = (const f64*)rhs;
+    f64* dstPairs = (f64*)dst;
+
+    dstPairs[0] = lhsPairs[0] - rhsPairs[0];
+    dstPairs[1] = lhsPairs[1] - rhsPairs[1];
+}
+
+#pragma peephole off
+void PSVECScale(Vec* src, f32 scale, Vec* dst)
+{
+    const f64* srcPairs = (const f64*)src;
+    f64* dstPairs = (f64*)dst;
+    f64 scale64;
+
+    scale64 = (f64)scale;
+    dstPairs[0] = srcPairs[0] * scale64;
+    dstPairs[1] = srcPairs[1] * scale64;
+}
+#pragma peephole reset
+
+#pragma scheduling off
+void PSVECNormalize(Vec* src, Vec* dst)
+{
+    extern const f32 lbl_8047C2C0;
+    extern const f32 lbl_8047C2C4;
+    f32 half = lbl_8047C2C0;
+    f32 three = lbl_8047C2C4;
+    const f64* srcPairs = (const f64*)src;
+    f64* dstPairs = (f64*)dst;
+    f64 xy;
+    f32 z;
+    f32 mag;
+    f32 scale;
+
+    xy = srcPairs[0];
+    z = src->z;
+    mag = (f32)(xy * xy + (f64)(z * z));
+    scale = (f32)__frsqrte(mag);
+    scale = (scale * half) * (three - mag * scale * scale);
+    dstPairs[0] = xy * (f64)scale;
+    dst->z = z * scale;
+}
+#pragma scheduling reset
+
+#pragma scheduling off
+f32 PSVECMag(Vec* src)
+{
+    extern const f32 lbl_8047C2C0;
+    extern const f32 lbl_8047C2C4;
+    f32 half = lbl_8047C2C0;
+    f32 three = lbl_8047C2C4;
+    const f64* srcPairs = (const f64*)src;
+    f64 xy;
+    f32 z;
+    f32 mag;
+    f32 scale;
+
+    xy = srcPairs[0];
+    z = src->z;
+    mag = (f32)(xy * xy + (f64)(z * z));
+    if (mag != 0.0f) {
+        scale = (f32)__frsqrte(mag);
+        scale = (scale * half) * (three - mag * scale * scale);
+        mag *= scale;
+    }
+    return mag;
+}
+#pragma scheduling reset
+
+#pragma peephole off
+f32 PSVECDotProduct(Vec* lhs, Vec* rhs)
+{
+    const f64* lhsPairs = (const f64*)lhs;
+    const f64* rhsPairs = (const f64*)rhs;
+    f64 xy;
+
+    xy = lhsPairs[1] * rhsPairs[1];
+    return (f32)(lhsPairs[0] * rhsPairs[0] + xy);
+}
+#pragma peephole reset
+
+#pragma peephole off
+void PSVECCrossProduct(Vec* lhs, Vec* rhs, Vec* dst)
+{
+    f32 x;
+    f32 y;
+    f32 z;
+
+    x = lhs->y * rhs->z - lhs->z * rhs->y;
+    y = lhs->z * rhs->x - lhs->x * rhs->z;
+    z = lhs->x * rhs->y - lhs->y * rhs->x;
+
+    dst->x = x;
+    dst->y = y;
+    dst->z = z;
+}
+#pragma peephole reset
+
+#pragma peephole off
+f32 PSVECSquareDistance(Vec* lhs, Vec* rhs)
+{
+    const f64* lhsPairs = (const f64*)lhs;
+    const f64* rhsPairs = (const f64*)rhs;
+    register f64 xy;
+    register f64 tmp;
+
+    xy = lhsPairs[1] - rhsPairs[1];
+    tmp = lhsPairs[0] - rhsPairs[0];
+    return (f32)(tmp * tmp + xy * xy);
+}
+#pragma peephole reset
+
+#pragma peephole off
+f32 PSVECDistance(Vec* lhs, Vec* rhs)
+{
+    extern const f32 lbl_8047C2C0;
+    extern const f32 lbl_8047C2C4;
+    const f64* lhsPairs = (const f64*)lhs;
+    const f64* rhsPairs = (const f64*)rhs;
+    f64 xy;
+    f64 tmp;
+    f32 mag;
+    f32 half;
+    f32 three;
+    f32 scale;
+
+    xy = lhsPairs[1] - rhsPairs[1];
+    tmp = lhsPairs[0] - rhsPairs[0];
+    mag = (f32)(tmp * tmp + xy * xy);
+    half = lbl_8047C2C0;
+    if (mag != half - half) {
+        scale = (f32)__frsqrte(mag);
+        three = lbl_8047C2C4;
+        scale = (scale * half) * (three - mag * scale * scale);
+        mag *= scale;
+    }
+    return mag;
+}
+#pragma peephole reset
+
+void PSQUATMultiply(const Quaternion* lhs, const Quaternion* rhs, Quaternion* dst)
+{
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 w;
+
+    x = lhs->w * rhs->x + lhs->x * rhs->w + lhs->y * rhs->z - lhs->z * rhs->y;
+    y = lhs->w * rhs->y - lhs->x * rhs->z + lhs->y * rhs->w + lhs->z * rhs->x;
+    z = lhs->w * rhs->z + lhs->x * rhs->y - lhs->y * rhs->x + lhs->z * rhs->w;
+    w = lhs->w * rhs->w - lhs->x * rhs->x - lhs->y * rhs->y - lhs->z * rhs->z;
+
+    dst->x = x;
+    dst->y = y;
+    dst->z = z;
+    dst->w = w;
 }

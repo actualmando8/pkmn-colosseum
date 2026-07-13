@@ -1,10 +1,30 @@
-/**
- * @file dvdfs_range_800A4D28.c
- * @brief Dolphin SDK dvdfs.c, 0x800A4D28 - 0x800A5624 (TU proven by
- *        __FILE__ literal "dvdfs.c" x4 + DVDConvertPathToEntrynum port).
- *
- * NOTE: an orphaned recovered source exists at src/dolphin/dvd/dvdfs.c
- * (real FST code, never wired into the build) — reconcile its functions
- * here one-by-one under byte-match discipline.
- */
-#include "dolphin/types.h"
+#include "dolphin/dvd/dvd.h"
+#include "dolphin/os/OSThread.h"
+
+/* SDA-relative global used by the callback wait path in this unit */
+extern OSThreadQueue __DVDThreadQueue;
+
+BOOL DVDClose(DVDFileInfo* fileInfo) {
+    DVDCancel(&fileInfo->cb);
+    return TRUE;
+}
+
+void cbForReadAsync(s32 result, DVDFileInfo* fileInfo) {
+    if (fileInfo->callback != NULL) {
+        fileInfo->callback(result, &fileInfo->cb);
+    }
+}
+
+void cbForReadSync(s32 result, DVDFileInfo* fileInfo) {
+    OSWakeupThread(&__DVDThreadQueue);
+}
+
+void cbForSeekAsync(s32 result, DVDFileInfo* fileInfo) {
+    if (fileInfo->callback != NULL) {
+        fileInfo->callback(result, &fileInfo->cb);
+    }
+}
+
+void defaultOptionalCommandChecker(DVDCommandBlock* command) {
+    (void)command;
+}
