@@ -479,13 +479,15 @@ static inline HSD_HashEntry* HashSearchEntry(HSD_Hash* hash, s32 idx,
 void* HSD_HashSearch(HSD_Hash* hash, void* key, s32* success)
 {
     HSD_HashEntry* entry;
+    void* search_key;
     u32 idx;
 
+    search_key = key;
     idx = hash->parent.class_info->getidx(hash);
     if (!(idx < hash->table_size)) {
         __assert(&lbl_8047DA98, 0x71, (char*) lbl_80274800);
     }
-    entry = HashSearchEntry(hash, idx, key, NULL);
+    entry = HashSearchEntry(hash, idx, search_key, NULL);
     if (success != NULL) {
         *success = !!entry;
     }
