@@ -2718,11 +2718,7 @@ void fn_801A2B5C(HSD_JObj* jobj, HSD_AnimJoint* animjoint,
                  HSD_MatAnimJoint* matanimjoint,
                  HSD_ShapeAnimJoint* shapeanimjoint)
 {
-    extern void fn_801AFE68(HSD_RObj* robj, HSD_RObjAnimJoint* anim);
     extern void fn_8019FE8C(HSD_JObj* jobj, u32 flags);
-    extern void fn_801A301C(HSD_JObj* jobj, HSD_AnimJoint* animjoint,
-                            HSD_MatAnimJoint* matanimjoint,
-                            HSD_ShapeAnimJoint* shapeanimjoint);
     extern void fn_801A323C(HSD_AObj* aobj);
 
     if (jobj == NULL) {
@@ -2893,6 +2889,60 @@ void fn_801A2B5C(HSD_JObj* jobj, HSD_AnimJoint* animjoint,
         }
     }
 }
+
+/* 0x801A301C | 0x220 */
+#pragma push
+#pragma optimization_level 1
+void fn_801A301C(HSD_JObj* jobj, HSD_AnimJoint* animjoint,
+                 HSD_MatAnimJoint* matanimjoint,
+                 HSD_ShapeAnimJoint* shapeanimjoint)
+{
+    if (jobj == NULL) {
+        return;
+    }
+
+    if (animjoint != NULL) {
+        HSD_FObj* fobj;
+        HSD_FObj* volatile* link;
+        HSD_AObj* aobj;
+
+        if (jobj->aobj != NULL) {
+            HSD_AObjRemove(jobj->aobj);
+        }
+        jobj->aobj = HSD_AObjLoadDesc(animjoint->aobjdesc);
+        aobj = jobj->aobj;
+        if (aobj != NULL && aobj->fobj != NULL) {
+            link = &aobj->fobj;
+            while (*link != NULL) {
+                if ((*link)->obj_type == HSD_A_J_BRANCH) {
+                    HSD_FObj* next = (*link)->next;
+                    fobj = *link;
+
+                    *link = next;
+                    fobj->next = aobj->fobj;
+                    aobj->fobj = fobj;
+                    break;
+                }
+                link = &(*link)->next;
+            }
+        }
+        fn_801AFE68(jobj->robj, animjoint->robj_anim);
+
+        if (animjoint->flags & 1) {
+            fn_8019FE8C(jobj, JOBJ_CLASSICAL_SCALE);
+        } else {
+            fn_8019FAEC(jobj, JOBJ_CLASSICAL_SCALE);
+        }
+    }
+
+    if (union_type_dobj(jobj)) {
+        HSD_DObjAddAnimAll(
+            jobj->u.dobj,
+            matanimjoint != NULL ? matanimjoint->matanim : NULL,
+            shapeanimjoint != NULL ? shapeanimjoint->shapeanimdobj : NULL);
+    }
+}
+#pragma pop
 
 /* 0x801A323C | 0x64 */
 void fn_801A323C(HSD_AObj* aobj)

@@ -207,6 +207,9 @@ HSD_JObj* HSD_JObjLoadJoint(HSD_Joint* joint);
 void HSD_JObjAddAnimAll(HSD_JObj* jobj, HSD_AnimJoint* animjoint,
                         HSD_MatAnimJoint* matanimjoint,
                         HSD_ShapeAnimJoint* shapeanimjoint);
+void fn_801A301C(HSD_JObj* jobj, HSD_AnimJoint* animjoint,
+                 HSD_MatAnimJoint* matanimjoint,
+                 HSD_ShapeAnimJoint* shapeanimjoint);
 void HSD_JObjAnimAll(HSD_JObj* jobj);
 HSD_JObj* HSD_JObjAlloc(void);
 void HSD_JObjSetCurrent(HSD_JObj* jobj);
