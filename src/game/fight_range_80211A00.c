@@ -15480,36 +15480,37 @@ LAB_217848:
 }
 #pragma optimize_for_size reset
 void fn_8021CF3C(void)
-
 {
-    extern int fn_801F025C();
-    extern void fn_801F4C14();
-    extern int fn_801F54A4();
-    extern s8 fn_802062FC();
+    extern u32 fightTargetGetPtrAsNowFightType();
+    extern void fightFloorSetStatus();
+    extern u32 fightFloorGetStatus();
+    extern u8 fightOutPokemonCheckFightOut();
     extern u8 lbl_8047B648;
     extern u8 lbl_8047B649;
-  int iVar1;
-  int iVar2;
-  s8 cVar3;
+    u32 attacker;
+    u32 candidate;
+    u32 target;
+    u32 branch;
 
-  u32 uVar4;
-
-  iVar1 = fn_801F025C(0x11,0);
-  uVar4 = *(u32 *)(lbl_8047B610 + 1);
-  lbl_8047B648 = (char)lbl_8047B648 + 1;
-  while ((iVar2 = 0, lbl_8047B648 < lbl_8047B649 &&
-         (((iVar2 = fn_801F54A4(0,0,0x5d), iVar2 == 0 || (cVar3 = fn_802062FC(), cVar3 == 0))
-          || (iVar1 == iVar2))))) {
-    lbl_8047B648 = (char)lbl_8047B648 + 1;
-  }
-  if (iVar2 == 0) {
-    lbl_8047B610 += 5;
-  }
-  else {
-    fn_801F4C14(0,0,0x43,0,iVar2);
-    lbl_8047B610 = (u8*)uVar4;
-  }
-  return;
+    attacker = fightTargetGetPtrAsNowFightType(0x11, 0);
+    branch = *(u32*)(lbl_8047B610 + 1);
+    lbl_8047B648++;
+    target = 0;
+    while (lbl_8047B648 < lbl_8047B649) {
+        candidate = fightFloorGetStatus(0, 0, 0x5d);
+        if (candidate != 0 && fightOutPokemonCheckFightOut(candidate) != 0 &&
+            attacker != candidate) {
+            target = candidate;
+            break;
+        }
+        lbl_8047B648++;
+    }
+    if (target != 0) {
+        fightFloorSetStatus(0, 0, 0x43, 0, target);
+        lbl_8047B610 = (u8*)branch;
+    } else {
+        lbl_8047B610 += 5;
+    }
 }
 void fn_8021D090(void)
 
