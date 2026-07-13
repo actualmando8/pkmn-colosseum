@@ -344,7 +344,7 @@ extern u32 lbl_8047AB08;
 extern u32 lbl_8047AAFA;
 extern u32 lbl_8047AAFC;
 extern void OSTicksToCalendarTime(void);
-extern void logVsnprintf_float(void);
+extern void logVsnprintf_float(char*, u32, const char*, void*);
 extern u32 strlen(const char* s);
 extern u32 lbl_8047AB11;
 extern u8 lbl_80400F30[];
@@ -472,6 +472,266 @@ extern u32 lbl_8047CB48;
 extern u32 lbl_8047AB3C;
 
 
+extern u8 lbl_80400F30[];
+extern void __va_arg();
+extern char* strchr(const char*, s32);
+extern const f32 lbl_8047CAB0;
+extern const f32 lbl_8047CAB4;
+extern const f32 lbl_8047CAB8;
+extern const f32 lbl_8047CABC;
+
+/* Small formatter used by the GS logging paths. */
+void logVsnprintf_float(char* output, u32 capacity, const char* format,
+                        void* arguments)
+{
+    char* fraction = (char*)lbl_80400F30 + 0x258;
+    char* converted = (char*)lbl_80400F30 + 0x268;
+    char* specifier = (char*)lbl_80400F30 + 0x278;
+    const char* digits = (const char*)lbl_80478AE8;
+    char* dst = output;
+    const char* src = format;
+    char* token = specifier;
+    char* text;
+    char* a;
+    char* b;
+    char* end;
+    s32 value;
+    s32 magnitude;
+    s32 width;
+    s32 padding;
+    s32 precision;
+    s32 integerPart;
+    s32 i;
+    u32 hex;
+    u8 parsing = 0;
+    u8 done = 0;
+    u8 leftJustify = 0;
+    u8 zeroPad = 0;
+    u8 ready;
+    f32 number;
+    f32 decimal;
+
+    while (!done) {
+        ready = 0;
+        if (!parsing) {
+            if (*src == '%') {
+                if (src[1] == '%') {
+                    *dst++ = '%';
+                    src++;
+                } else {
+                    token = specifier;
+                    parsing = 1;
+                }
+            } else {
+                *dst++ = *src;
+            }
+        } else {
+            switch (*src) {
+            case 'c':
+                converted[0] = (char)*(u32*)((void* (*)(void*, s32))__va_arg)(arguments, 1);
+                converted[1] = 0;
+                text = converted;
+                ready = 1;
+                break;
+
+            case 'd':
+                value = *(s32*)((void* (*)(void*, s32))__va_arg)(arguments, 1);
+                magnitude = value;
+                i = 0;
+                if (magnitude < 0) {
+                    i = 1;
+                    magnitude = -magnitude;
+                }
+                a = converted;
+                do {
+                    *a++ = digits[magnitude % 10];
+                    magnitude /= 10;
+                } while (magnitude != 0);
+                if (i) {
+                    *a++ = '-';
+                }
+                *a = 0;
+                a = converted;
+                b = converted + strlen(converted) - 1;
+                while (a < b) {
+                    char ch = *a;
+                    *a++ = *b;
+                    *b-- = ch;
+                }
+                text = converted;
+                ready = 1;
+                break;
+
+            case 'f':
+                number = (f32)*(f64*)((void* (*)(void*, s32))__va_arg)(arguments, 3);
+                a = converted;
+                if (number < lbl_8047CAB0) {
+                    *a++ = '-';
+                    number = -number;
+                }
+
+                integerPart = (s32)number;
+                magnitude = integerPart;
+                i = 0;
+                if (magnitude < 0) {
+                    i = 1;
+                    magnitude = -magnitude;
+                }
+                text = a;
+                do {
+                    *a++ = digits[magnitude % 10];
+                    magnitude /= 10;
+                } while (magnitude != 0);
+                if (i) {
+                    *a++ = '-';
+                }
+                *a = 0;
+                b = a - 1;
+                a = text;
+                while (a < b) {
+                    char ch = *a;
+                    *a++ = *b;
+                    *b-- = ch;
+                }
+
+                decimal = number - integerPart;
+                precision = 0;
+                number = lbl_8047CAB4;
+                while (number >= decimal && precision < 10) {
+                    number /= lbl_8047CAB8;
+                    precision++;
+                }
+                a = fraction;
+                for (i = 0; i < precision; i++) {
+                    *a++ = '0';
+                }
+
+                magnitude = (s32)(decimal * lbl_8047CABC);
+                i = 0;
+                do {
+                    *a++ = digits[magnitude % 10];
+                    magnitude /= 10;
+                } while (magnitude != 0);
+                *a = 0;
+                b = a - 1;
+                a = fraction + precision;
+                while (a < b) {
+                    char ch = *a;
+                    *a++ = *b;
+                    *b-- = ch;
+                }
+                a = fraction + strlen(fraction);
+                for (i = strlen(fraction); i < 10; i++) {
+                    *a++ = '0';
+                }
+                *a = 0;
+                text = converted;
+                ready = 1;
+                break;
+
+            case 's':
+                text = *(char**)((void* (*)(void*, s32))__va_arg)(arguments, 1);
+                ready = 1;
+                break;
+
+            case 'X':
+            case 'x':
+                hex = *(u32*)((void* (*)(void*, s32))__va_arg)(arguments, 1);
+                a = converted;
+                do {
+                    char ch = digits[hex & 0xF];
+                    if (*src == 'x' && ch >= 'A') {
+                        ch += 0x20;
+                    }
+                    *a++ = ch;
+                    hex >>= 4;
+                } while (hex != 0);
+                *a = 0;
+                b = a - 1;
+                a = converted;
+                while (a < b) {
+                    char ch = *a;
+                    *a++ = *b;
+                    *b-- = ch;
+                }
+                text = converted;
+                ready = 1;
+                break;
+
+            default:
+                *token++ = *src;
+                break;
+            }
+
+            if (ready) {
+                *token = 0;
+                token = specifier;
+                if (*token == '-') {
+                    leftJustify = 1;
+                    token++;
+                }
+                if (*token == '0') {
+                    zeroPad = 1;
+                    token++;
+                }
+
+                width = 0;
+                while (*token >= '0' && *token <= '9') {
+                    width = width * 10 + *token++ - '0';
+                }
+                padding = width - (s32)strlen(text);
+
+                if (padding > 0 && !leftJustify) {
+                    while (padding-- > 0 && (u32)(dst - output) < capacity) {
+                        *dst++ = zeroPad ? '0' : ' ';
+                    }
+                }
+                while (*text != 0 && (u32)(dst - output) < capacity) {
+                    *dst++ = *text++;
+                }
+
+                if (*src == 'f') {
+                    text = fraction;
+                    precision = strlen(text);
+                    end = strchr(token, '.');
+                    if (end != 0) {
+                        end++;
+                        i = 0;
+                        while (*end >= '0' && *end <= '9') {
+                            i = i * 10 + *end++ - '0';
+                        }
+                        if (i > 0 && precision > i) {
+                            precision = i;
+                            text[i] = 0;
+                        }
+                    }
+                    if ((u32)(dst - output) < capacity) {
+                        *dst++ = '.';
+                    }
+                    while (*text != 0 && (u32)(dst - output) < capacity) {
+                        *dst++ = *text++;
+                    }
+                }
+
+                if (leftJustify) {
+                    while (padding-- > 0 && (u32)(dst - output) < capacity) {
+                        *dst++ = ' ';
+                    }
+                }
+                leftJustify = 0;
+                zeroPad = 0;
+                parsing = 0;
+            }
+        }
+
+        if (*src == 0 || (u32)(dst - output) >= capacity) {
+            done = 1;
+        }
+        src++;
+    }
+    *dst = 0;
+}
+
 /* ==================================================================
  * logVsnprintf_float -- GSmaterial_Create
  *
@@ -536,7 +796,7 @@ u32 GSlogGetLineCount(void) { return lbl_8047AB08; }
 #endif
 
 extern void OSTicksToCalendarTime(void);
-extern void logVsnprintf_float(void);
+extern void logVsnprintf_float(char*, u32, const char*, void*);
 extern u32 strlen(const char* s);
 extern u32 lbl_8047AB11;
 extern u8 lbl_80400F30[];
@@ -706,4 +966,3 @@ void GSmaterialResetTexture(u8* obj) {
     *(u32*)(obj + 0x38) = 0xfefefefe;
 }
 #endif
-

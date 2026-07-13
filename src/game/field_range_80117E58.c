@@ -335,15 +335,15 @@ extern void psKillGenerator();
 extern u32 lbl_8047AD9C;
 extern u32 lbl_8047ADA0;
 void fn_801181B0(void);
-extern void fn_800E06EC(void);
+extern void fn_800E06EC(void*, void*);
 extern void GSvecTransformQuat(void);
-extern void fn_800E0108(void);
-extern void psInterpretParticles(void);
-extern void psExecGenerator(void);
-extern void fn_800057A0(void);
+extern void fn_800E0108(void*, void*, void*);
+extern void psInterpretParticles(u32);
+extern void psExecGenerator(u32);
+extern u32 fn_800057A0(void);
 extern void jumptable_8035BB88();
 extern u8 lbl_8047ADB0;
-void fn_801183EC(void);
+void fn_801183EC(u32 particleCount);
 void fn_80118874(void);
 extern void psSetParticleVisibility(); /* K&R: called with 0 or 1 args */
 extern void psSetGeneratorAngleRadiusScale(void);
@@ -1733,18 +1733,177 @@ extern u32 lbl_8047ADA0;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void fn_801181B0(void);
 /* 0x801183EC | 0x488 */
-extern void fn_800E06EC(void);
+extern void fn_800E06EC(void*, void*);
 extern void GSvecTransformQuat(void);
-extern void fn_800E0108(void);
-extern void psInterpretParticles(void);
-extern void psExecGenerator(void);
-extern void fn_800057A0(void);
+extern void fn_800E0108(void*, void*, void*);
+extern void psInterpretParticles(u32);
+extern void psExecGenerator(u32);
+extern u32 fn_800057A0(void);
 extern void jumptable_8035BB88();
 extern u32 lbl_8047AD9C;
 extern u32 lbl_8047ADA0;
 extern u8 lbl_8047ADB0;
-/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_801183EC(void);
+void fn_801183EC(u32 particleCount) {
+    extern void* fn_800EE150(void*, void*);
+    extern void fn_800EE3BC(void*, void*, void*, void*);
+    extern void fn_800EE828(void*);
+    extern void fn_800DFEEC(void*, void*, void*);
+    extern void fn_800E019C(void*, void*, void*);
+    extern void fn_800E01D0(void*, void*);
+
+    f32 pos[3];
+    f32 rot[3];
+    f32 scale[3];
+    f32 quat[3];
+    f32 work[3];
+    u32 outerIdx = 0;
+    u32 byteOff = 0;
+
+    while (outerIdx < lbl_8047ADA0) {
+        u8* slot = (u8*)lbl_8047AD9C + byteOff;
+        if (*slot == 1) {
+            u32 innerIdx = 0;
+            u8* entry = slot;
+            do {
+                u8* obj = *(u8**)(entry + 8);
+                if (obj != NULL && *(u32*)(obj + 0x44) != 0 && obj[6] != 0) {
+                    void* handle = fn_800EE150(*(void**)(obj + 0x48), *(void**)(obj + 0x4C));
+                    u8* target;
+
+                    fn_800EE3BC(handle, pos, rot, scale);
+                    fn_800EE828(handle);
+                    fn_800E06EC(quat, rot);
+                    fn_800DFEEC(work, quat, obj + 0x50);
+                    fn_800E019C(pos, pos, work);
+                    fn_800E019C(rot, rot, obj + 0x5C);
+                    fn_800E0108(scale, scale, obj + 0x68);
+
+                    fn_800E01D0(obj + 0x14, obj + 0x50);
+                    target = *(u8**)(obj + 0x10);
+                    *(f32*)(target + 0x20) = *(f32*)(obj + 0x50);
+                    *(f32*)(target + 0x24) = *(f32*)(obj + 0x54);
+                    *(f32*)(target + 0x28) = *(f32*)(obj + 0x58);
+
+                    fn_800E01D0(obj + 0x20, obj + 0x5C);
+                    target = *(u8**)(obj + 0x10);
+                    *(f32*)(target + 0x8C) = *(f32*)(obj + 0x5C);
+                    *(f32*)(target + 0x90) = *(f32*)(obj + 0x60);
+                    *(f32*)(target + 0x94) = *(f32*)(obj + 0x64);
+
+                    fn_800E01D0(obj + 0x2C, obj + 0x68);
+                    target = *(u8**)(obj + 0x10);
+                    *(f32*)(target + 0x98) = *(f32*)(obj + 0x68);
+                    *(f32*)(target + 0x9C) = *(f32*)(obj + 0x6C);
+                    *(f32*)(target + 0xA0) = *(f32*)(obj + 0x70);
+
+                    switch (*(u32*)(obj + 0x44)) {
+                    case 0:
+                        fn_800E01D0(obj + 0x14, pos);
+                        target = *(u8**)(obj + 0x10);
+                        *(f32*)(target + 0x20) = pos[0];
+                        *(f32*)(target + 0x24) = pos[1];
+                        *(f32*)(target + 0x28) = pos[2];
+                        break;
+                    case 1:
+                        fn_800E01D0(obj + 0x20, rot);
+                        target = *(u8**)(obj + 0x10);
+                        *(f32*)(target + 0x8C) = rot[0];
+                        *(f32*)(target + 0x90) = rot[1];
+                        *(f32*)(target + 0x94) = rot[2];
+                        break;
+                    case 2:
+                        fn_800E01D0(obj + 0x2C, scale);
+                        target = *(u8**)(obj + 0x10);
+                        *(f32*)(target + 0x98) = scale[0];
+                        *(f32*)(target + 0x9C) = scale[1];
+                        *(f32*)(target + 0xA0) = scale[2];
+                        break;
+                    case 3:
+                        fn_800E01D0(obj + 0x14, pos);
+                        target = *(u8**)(obj + 0x10);
+                        *(f32*)(target + 0x20) = pos[0];
+                        *(f32*)(target + 0x24) = pos[1];
+                        *(f32*)(target + 0x28) = pos[2];
+                        fn_800E01D0(obj + 0x20, rot);
+                        target = *(u8**)(obj + 0x10);
+                        *(f32*)(target + 0x8C) = rot[0];
+                        *(f32*)(target + 0x90) = rot[1];
+                        *(f32*)(target + 0x94) = rot[2];
+                        break;
+                    case 4:
+                        fn_800E01D0(obj + 0x20, rot);
+                        target = *(u8**)(obj + 0x10);
+                        *(f32*)(target + 0x8C) = rot[0];
+                        *(f32*)(target + 0x90) = rot[1];
+                        *(f32*)(target + 0x94) = rot[2];
+                        fn_800E01D0(obj + 0x2C, scale);
+                        target = *(u8**)(obj + 0x10);
+                        *(f32*)(target + 0x98) = scale[0];
+                        *(f32*)(target + 0x9C) = scale[1];
+                        *(f32*)(target + 0xA0) = scale[2];
+                        break;
+                    case 5:
+                        fn_800E01D0(obj + 0x14, pos);
+                        target = *(u8**)(obj + 0x10);
+                        *(f32*)(target + 0x20) = pos[0];
+                        *(f32*)(target + 0x24) = pos[1];
+                        *(f32*)(target + 0x28) = pos[2];
+                        fn_800E01D0(obj + 0x2C, scale);
+                        target = *(u8**)(obj + 0x10);
+                        *(f32*)(target + 0x98) = scale[0];
+                        *(f32*)(target + 0x9C) = scale[1];
+                        *(f32*)(target + 0xA0) = scale[2];
+                        break;
+                    case 6:
+                        fn_800E01D0(obj + 0x14, pos);
+                        target = *(u8**)(obj + 0x10);
+                        *(f32*)(target + 0x20) = pos[0];
+                        *(f32*)(target + 0x24) = pos[1];
+                        *(f32*)(target + 0x28) = pos[2];
+                        fn_800E01D0(obj + 0x20, rot);
+                        target = *(u8**)(obj + 0x10);
+                        *(f32*)(target + 0x8C) = rot[0];
+                        *(f32*)(target + 0x90) = rot[1];
+                        *(f32*)(target + 0x94) = rot[2];
+                        fn_800E01D0(obj + 0x2C, scale);
+                        target = *(u8**)(obj + 0x10);
+                        *(f32*)(target + 0x98) = scale[0];
+                        *(f32*)(target + 0x9C) = scale[1];
+                        *(f32*)(target + 0xA0) = scale[2];
+                        break;
+                    case 7:
+                    default:
+                        break;
+                    }
+
+                    obj[6] = obj[5] == 0 ? 1 : 0;
+                }
+                innerIdx++;
+                entry += 4;
+            } while (innerIdx < 0x40);
+        }
+        byteOff += 0x108;
+        outerIdx++;
+    }
+
+    {
+        u32 i;
+        for (i = 0; i < particleCount; i++) {
+            psInterpretParticles(0);
+            psExecGenerator(0);
+        }
+    }
+
+    if (fn_800057A0() == 2) {
+        u8 count = lbl_8047ADB0 + 1;
+        lbl_8047ADB0 = count;
+        if (count >= 5) {
+            psInterpretParticles(0);
+            psExecGenerator(0);
+            lbl_8047ADB0 = 0;
+        }
+    }
+}
 /* 0x80118874 | 0x1F4 */
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void fn_80118874(void);

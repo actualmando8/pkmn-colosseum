@@ -931,3 +931,314 @@ recompute:
 #undef K_ONE
 }
 #pragma use_lmw_stmw off
+
+
+/* Archived strike candidate: __ieee754_pow (Sol). */
+f64 __ieee754_pow(f64 x, f64 y) {
+    extern f64 fn_800CDE88(f64, s32);
+    static const f64 bp[2] = { 1.0, 1.5 };
+    static const f64 dp_h[2] = {
+        0.0, 5.84962487220764160156e-01
+    };
+    static const f64 dp_l[2] = {
+        0.0, 1.35003920212974897128e-08
+    };
+    const f64 zero = 0.0;
+    const f64 one = 1.0;
+    const f64 two = 2.0;
+    const f64 two53 = 9007199254740992.0;
+    const f64 huge = 1.0e300;
+    const f64 tiny = 1.0e-300;
+    const f64 L1 = 5.99999999999994648725e-01;
+    const f64 L2 = 4.28571428578550184252e-01;
+    const f64 L3 = 3.33333329818377432918e-01;
+    const f64 L4 = 2.72728123808534006489e-01;
+    const f64 L5 = 2.30660745775561754067e-01;
+    const f64 L6 = 2.06975017800338417784e-01;
+    const f64 P1 = 1.66666666666666019037e-01;
+    const f64 P2 = -2.77777777770155933842e-03;
+    const f64 P3 = 6.61375632143793436117e-05;
+    const f64 P4 = -1.65339022054652515390e-06;
+    const f64 P5 = 4.13813679705723846039e-08;
+    const f64 lg2 = 6.93147180559945286227e-01;
+    const f64 lg2_h = 6.93147182464599609375e-01;
+    const f64 lg2_l = -1.90465429995776804525e-09;
+    const f64 ovt = 8.0085662595372944372e-17;
+    const f64 cp = 9.61796693925975554329e-01;
+    const f64 cp_h = 9.61796700954437255859e-01;
+    const f64 cp_l = -7.02846165095275826516e-09;
+    const f64 ivln2 = 1.44269504088896338700e+00;
+    const f64 ivln2_h = 1.44269502162933349609e+00;
+    const f64 ivln2_l = 1.92596299112661746887e-08;
+    DoubleShape sx;
+    DoubleShape sy;
+    DoubleShape sw;
+    f64 z;
+    f64 ax;
+    f64 z_h;
+    f64 z_l;
+    f64 p_h;
+    f64 p_l;
+    f64 y1;
+    f64 t1;
+    f64 t2;
+    f64 r;
+    f64 s;
+    f64 t;
+    f64 u;
+    f64 v;
+    f64 w;
+    f64 t_h;
+    f64 t_l;
+    f64 s_l;
+    f64 s2;
+    s32 i;
+    s32 j;
+    s32 k;
+    s32 n;
+    s32 yisint;
+    s32 hx;
+    s32 hy;
+    s32 ix;
+    s32 iy;
+    u32 lx;
+    u32 ly;
+
+    sx.value = x;
+    sy.value = y;
+    hx = (s32)sx.parts.hi;
+    lx = sx.parts.lo;
+    hy = (s32)sy.parts.hi;
+    ly = sy.parts.lo;
+    ix = hx & 0x7FFFFFFF;
+    iy = hy & 0x7FFFFFFF;
+
+    if ((iy | ly) == 0) {
+        return one;
+    }
+    if (ix > 0x7FF00000 ||
+        (ix == 0x7FF00000 && lx != 0) ||
+        iy > 0x7FF00000 ||
+        (iy == 0x7FF00000 && ly != 0)) {
+        return x + y;
+    }
+
+    yisint = 0;
+    if (hx < 0) {
+        if (iy >= 0x43400000) {
+            yisint = 2;
+        } else if (iy >= 0x3FF00000) {
+            k = (iy >> 20) - 0x3FF;
+            if (k > 20) {
+                j = (s32)(ly >> (52 - k));
+                if ((u32)(j << (52 - k)) == ly) {
+                    yisint = 2 - (j & 1);
+                }
+            } else if (ly == 0) {
+                j = iy >> (20 - k);
+                if ((j << (20 - k)) == iy) {
+                    yisint = 2 - (j & 1);
+                }
+            }
+        }
+    }
+
+    if (ly == 0) {
+        if (iy == 0x7FF00000) {
+            if (((ix - 0x3FF00000) | lx) == 0) {
+                return y - y;
+            }
+            if (ix >= 0x3FF00000) {
+                return hy >= 0 ? y : zero;
+            }
+            return hy < 0 ? -y : zero;
+        }
+        if (iy == 0x3FF00000) {
+            return hy < 0 ? one / x : x;
+        }
+        if (hy == 0x40000000) {
+            return x * x;
+        }
+        if (hy == 0x3FE00000 && hx >= 0) {
+            return __ieee754_sqrt(x);
+        }
+    }
+
+    ax = x < 0 ? -x : x;
+    if (lx == 0) {
+        if (ix == 0x7FF00000 || ix == 0 || ix == 0x3FF00000) {
+            z = ax;
+            if (hy < 0) {
+                z = one / z;
+            }
+            if (hx < 0) {
+                if (((ix - 0x3FF00000) | yisint) == 0) {
+                    z = (z - z) / (z - z);
+                } else if (yisint == 1) {
+                    z = -z;
+                }
+            }
+            return z;
+        }
+    }
+
+    n = (hx >> 31) + 1;
+    if ((n | yisint) == 0) {
+        return (x - x) / (x - x);
+    }
+    s = one;
+    if ((n | (yisint - 1)) == 0) {
+        s = -one;
+    }
+
+    if (iy > 0x41E00000) {
+        if (iy > 0x43F00000) {
+            if (ix <= 0x3FEFFFFF) {
+                return hy < 0 ? huge * huge : tiny * tiny;
+            }
+            if (ix >= 0x3FF00000) {
+                return hy > 0 ? huge * huge : tiny * tiny;
+            }
+        }
+        if (ix < 0x3FEFFFFF) {
+            return hy < 0 ? s * huge * huge : s * tiny * tiny;
+        }
+        if (ix > 0x3FF00000) {
+            return hy > 0 ? s * huge * huge : s * tiny * tiny;
+        }
+        t = ax - one;
+        w = (t * t) * (0.5 - t * (0.3333333333333333333333 -
+                                  t * 0.25));
+        u = ivln2_h * t;
+        v = t * ivln2_l - w * ivln2;
+        t1 = u + v;
+        sw.value = t1;
+        sw.parts.lo = 0;
+        t1 = sw.value;
+        t2 = v - (t1 - u);
+    } else {
+        n = 0;
+        if (ix < 0x00100000) {
+            ax *= two53;
+            n -= 53;
+            sw.value = ax;
+            ix = (s32)sw.parts.hi;
+        }
+        n += (ix >> 20) - 0x3FF;
+        j = ix & 0x000FFFFF;
+        ix = j | 0x3FF00000;
+        if (j <= 0x3988E) {
+            k = 0;
+        } else if (j < 0xBB67A) {
+            k = 1;
+        } else {
+            k = 0;
+            n += 1;
+            ix -= 0x00100000;
+        }
+        sw.value = ax;
+        sw.parts.hi = (u32)ix;
+        ax = sw.value;
+        u = ax - bp[k];
+        v = one / (ax + bp[k]);
+        s = u * v;
+        sw.value = s;
+        sw.parts.lo = 0;
+        s = sw.value;
+        t = ax + bp[k];
+        sw.value = t;
+        sw.parts.lo = 0;
+        t_h = sw.value;
+        t_l = ax - (t_h - bp[k]);
+        s_l = v * ((u - s * t_h) - s * t_l);
+        s2 = s * s;
+        r = s2 * s2 * (L1 + s2 * (L2 + s2 * (L3 +
+            s2 * (L4 + s2 * (L5 + s2 * L6)))));
+        r += s_l * (s + s);
+        s2 = s * s;
+        t_h = 3.0 + s2 + r;
+        sw.value = t_h;
+        sw.parts.lo = 0;
+        t_h = sw.value;
+        t_l = r - ((t_h - 3.0) - s2);
+        u = s * t_h;
+        v = s_l * t_h + t_l * s;
+        p_h = u + v;
+        sw.value = p_h;
+        sw.parts.lo = 0;
+        p_h = sw.value;
+        p_l = v - (p_h - u);
+        z_h = cp_h * p_h;
+        z_l = cp_l * p_h + p_l * cp + dp_l[k];
+        t = (f64)n;
+        t1 = ((z_h + z_l) + dp_h[k]) + t;
+        sw.value = t1;
+        sw.parts.lo = 0;
+        t1 = sw.value;
+        t2 = z_l - (((t1 - t) - dp_h[k]) - z_h);
+    }
+
+    y1 = y;
+    sw.value = y1;
+    sw.parts.lo = 0;
+    y1 = sw.value;
+    p_l = (y - y1) * t1 + y * t2;
+    p_h = y1 * t1;
+    z = p_l + p_h;
+    sw.value = z;
+    j = (s32)sw.parts.hi;
+    i = (s32)sw.parts.lo;
+    if (j >= 0x40900000) {
+        if (((j - 0x40900000) | i) != 0) {
+            return s * huge * huge;
+        }
+        if (p_l + ovt > z - p_h) {
+            return s * huge * huge;
+        }
+    } else if ((j & 0x7FFFFFFF) >= 0x4090CC00) {
+        if (((j - (s32)0xC090CC00) | i) != 0) {
+            return s * tiny * tiny;
+        }
+        if (p_l <= z - p_h) {
+            return s * tiny * tiny;
+        }
+    }
+
+    i = j & 0x7FFFFFFF;
+    k = (i >> 20) - 0x3FF;
+    n = 0;
+    if (i > 0x3FE00000) {
+        n = j + (0x00100000 >> (k + 1));
+        k = ((n & 0x7FFFFFFF) >> 20) - 0x3FF;
+        sw.parts.hi = (u32)(n & ~(0x000FFFFF >> k));
+        sw.parts.lo = 0;
+        t = sw.value;
+        n = ((n & 0x000FFFFF) | 0x00100000) >> (20 - k);
+        if (j < 0) {
+            n = -n;
+        }
+        p_h -= t;
+    }
+    t = p_l + p_h;
+    sw.value = t;
+    sw.parts.lo = 0;
+    t = sw.value;
+    u = t * lg2_h;
+    v = (p_l - (t - p_h)) * lg2 + t * lg2_l;
+    z = u + v;
+    w = v - (z - u);
+    t = z * z;
+    t1 = z - t * (P1 + t * (P2 + t * (P3 + t * (P4 + t * P5))));
+    r = (z * t1) / (t1 - two) - (w + z * w);
+    z = one - (r - z);
+    sw.value = z;
+    j = (s32)sw.parts.hi;
+    j += n << 20;
+    if ((j >> 20) <= 0) {
+        z = fn_800CDE88(z, n);
+    } else {
+        sw.parts.hi = (u32)j;
+        z = sw.value;
+    }
+    return s * z;
+}

@@ -628,6 +628,464 @@ s32 fn_801E25C8(void)
     return -1;
 }
 
+
+/* Archived strike THP candidates (Sol). */
+typedef struct THPVideoInfo {
+    u32 componentCount;
+    u16 width;
+    u16 height;
+    u32 videoType;
+} THPVideoInfo;
+
+extern const u32 lbl_8047E480;
+extern const u32 lbl_8047E484;
+extern const u32 lbl_8047E488;
+extern const u32 lbl_8047E48C;
+extern const u32 lbl_8047E490;
+extern const f32 lbl_8047E494;
+extern const f32 lbl_8047E498;
+extern const f32 lbl_8047E49C;
+
+/* Configure GX's three-texture YUV-to-RGB conversion pipeline. */
+#pragma push
+#pragma peephole off
+#pragma optimize_for_size on
+void fn_801E1FF8(const THPVideoInfo* info)
+{
+    extern void fn_800BCEF4(u32, u32);
+    extern void C_MTXOrtho(f32[4][4], f32, f32, f32, f32, f32, f32);
+    extern void fn_800BD2E0(f32[4][4], u32);
+    extern void fn_800BD744(f32, f32, f32, f32, f32, f32);
+    extern void fn_800BD7A0(u32, u32, u32, u32);
+    extern void PSMTXIdentity(f32[3][4]);
+    extern void GXLoadPosMtxImm(f32[3][4], u32);
+    extern void fn_800BD554(u32);
+    extern void GXSetZMode(u32, u32, u32);
+    extern void GXSetBlendMode(u32, u32, u32, u32);
+    extern void fn_800BCE30(u32);
+    extern void fn_800BCE5C(u32);
+    extern void fn_800B9E6C(u32);
+    extern void fn_800BA6B0(u32);
+    extern void fn_800B884C(u32);
+    extern void fn_800B857C(u32, u32, u32, u32, u32, u32);
+    extern void GXInvalidateTexAll(void);
+    extern void fn_800B7D3C(void);
+    extern void fn_800B7874(u32, u32);
+    extern void fn_800B7D74(u32, u32, u32, u32, u32);
+    extern void fn_800BC8C8(u32);
+    extern void fn_800BC6F0(u32, u32, u32, u32);
+    extern void fn_800BC1A0(u32, u32, u32, u32, u32);
+    extern void fn_800BC228(u32, u32, u32, u32, u32, u32);
+    extern void fn_800BC1E4(u32, u32, u32, u32, u32);
+    extern void fn_800BC290(u32, u32, u32, u32, u32, u32);
+    extern void fn_800BC454(u32, u32);
+    extern void fn_800BC4C0(u32, u32);
+    extern void fn_800BC52C(u32, u32, u32);
+    extern void fn_800BC580(u32, u32, u32, u32, u32);
+    extern void fn_800BC36C(u32, void*);
+    extern void fn_800BC3E0(u32, void*);
+
+    f32 projection[4][4];
+    f32 model[3][4];
+    u32 tevColor1[2];
+    u32 tevColor0;
+    u32 tevColor2;
+    u32 tevColor3;
+    u32 width = info->width;
+    u32 height = info->height;
+
+    fn_800BCEF4(0, 0);
+    C_MTXOrtho(projection, lbl_8047E494, (f32)height,
+               lbl_8047E494, (f32)width, lbl_8047E494, lbl_8047E498);
+    fn_800BD2E0(projection, 1);
+    fn_800BD744(lbl_8047E494, lbl_8047E494, (f32)width, (f32)height,
+                lbl_8047E494, lbl_8047E49C);
+    fn_800BD7A0(0, 0, width, height);
+
+    PSMTXIdentity(model);
+    GXLoadPosMtxImm(model, 0);
+    fn_800BD554(0);
+    GXSetZMode(1, 7, 0);
+    GXSetBlendMode(0, 1, 0, 0);
+    fn_800BCE30(1);
+    fn_800BCE5C(0);
+    fn_800B9E6C(0);
+    fn_800BA6B0(0);
+
+    fn_800B884C(2);
+    fn_800B857C(0, 1, 4, 0x3C, 0, 0x7D);
+    fn_800B857C(1, 1, 4, 0x3C, 0, 0x7D);
+    GXInvalidateTexAll();
+    fn_800B7D3C();
+    fn_800B7874(9, 1);
+    fn_800B7874(13, 1);
+    fn_800B7D74(7, 9, 1, 3, 0);
+    fn_800B7D74(7, 13, 1, 2, 0);
+
+    fn_800BC8C8(4);
+
+    fn_800BC6F0(0, 1, 1, 0xFF);
+    fn_800BC1A0(0, 0xF, 8, 0xE, 2);
+    fn_800BC228(0, 0, 0, 0, 0, 0);
+    fn_800BC1E4(0, 7, 4, 6, 1);
+    fn_800BC290(0, 1, 0, 0, 0, 0);
+    fn_800BC454(0, 0xC);
+    fn_800BC4C0(0, 0x1C);
+    fn_800BC52C(0, 0, 0);
+
+    fn_800BC6F0(1, 1, 2, 0xFF);
+    fn_800BC1A0(1, 0xF, 8, 0xE, 0);
+    fn_800BC228(1, 0, 0, 1, 0, 0);
+    fn_800BC1E4(1, 7, 4, 6, 0);
+    fn_800BC290(1, 1, 0, 0, 0, 0);
+    fn_800BC454(1, 0xD);
+    fn_800BC4C0(1, 0x1D);
+    fn_800BC52C(1, 0, 0);
+
+    fn_800BC6F0(2, 0, 0, 0xFF);
+    fn_800BC1A0(2, 0xF, 8, 0xC, 0);
+    fn_800BC228(2, 0, 0, 0, 1, 0);
+    fn_800BC1E4(2, 4, 7, 7, 0);
+    fn_800BC290(2, 0, 0, 0, 1, 0);
+    fn_800BC52C(2, 0, 0);
+
+    fn_800BC6F0(3, 0xFF, 0xFF, 0xFF);
+    fn_800BC1A0(3, 1, 0, 0xE, 0xF);
+    fn_800BC228(3, 0, 0, 0, 1, 0);
+    fn_800BC1E4(3, 7, 7, 7, 7);
+    fn_800BC290(3, 0, 0, 0, 1, 0);
+    fn_800BC52C(3, 0, 0);
+    fn_800BC454(3, 0xE);
+
+    tevColor1[0] = lbl_8047E480;
+    tevColor1[1] = lbl_8047E484;
+    fn_800BC36C(1, tevColor1);
+    tevColor0 = lbl_8047E488;
+    fn_800BC3E0(0, &tevColor0);
+    tevColor2 = lbl_8047E48C;
+    fn_800BC3E0(1, &tevColor2);
+    tevColor3 = lbl_8047E490;
+    fn_800BC3E0(2, &tevColor3);
+    fn_800BC580(0, 0, 1, 2, 3);
+}
+#pragma pop
+
+typedef struct THPActivePlayer {
+    u8 pad00[0x4C];
+    f32 frameRate;
+    u32 frameCount;
+    u8 pad54[0x34];
+    u32 syncFlags;
+    u8 pad8C[0x14];
+    s32 isOpen;
+    u8 state;
+    u8 internalState;
+    u8 playFlags;
+    u8 hasAudio;
+    s32 dvdError;
+    s32 audioError;
+    u8 padB0[0x10];
+    u32 frameOffset;
+    u32 fieldC4;
+    u64 frameCounter;
+    u32 shownFrame;
+    u32 clockFrame;
+    u32 queuedFrames;
+    u32 fieldDC;
+    u32 audioReadFrame;
+    u32 audioPlayedFrame;
+    u32 decodedFrame;
+    u32 pendingFrame;
+} THPActivePlayer;
+
+extern void (*lbl_8047B46C)(void);
+extern const f32 lbl_8047E4A8;
+extern u32 fn_800AA2F0(void);
+extern u32 VIGetTvFormat(void);
+extern u32 sndStreamActivate(u32 stream);
+extern void sndStreamDeactivate(u32 stream);
+
+static inline BOOL thpActivateStreams(void)
+{
+    if (lbl_80478D00 != (u32)-1 && sndStreamActivate(lbl_80478D00)) {
+        if (lbl_80478D04 == (u32)-1) {
+            return TRUE;
+        }
+        if (sndStreamActivate(lbl_80478D04)) {
+            return TRUE;
+        }
+        sndStreamDeactivate(lbl_80478D00);
+    }
+    return FALSE;
+}
+
+static inline BOOL thpVideoFieldReady(u32 flags)
+{
+    if ((flags & 1) != 0) {
+        return fn_800AA2F0() == 0;
+    }
+    if ((flags & 2) != 0) {
+        return fn_800AA2F0() == 1;
+    }
+    return FALSE;
+}
+
+static inline u32 thpTakeDecodedFrame(THPActivePlayer* player)
+{
+    u32 frame = fn_801E4EF0(0);
+
+    if (player->hasAudio) {
+        player->audioReadFrame++;
+        player->queuedFrames--;
+    }
+    return frame;
+}
+
+void fn_801E3A50(void)
+{
+    THPActivePlayer* player = (THPActivePlayer*)lbl_8046AC60;
+    u32 decodedFrame = (u32)-1;
+    BOOL ready;
+
+    if (lbl_8047B46C != NULL) {
+        lbl_8047B46C();
+    }
+    if (player->isOpen == 0 || player->state != 2) {
+        return;
+    }
+    if (player->dvdError != 0 || player->audioError != 0) {
+        player->state = 5;
+        player->internalState = 5;
+        return;
+    }
+
+    player->frameCounter++;
+    if (player->frameCounter == 0) {
+        if (thpVideoFieldReady(player->syncFlags)) {
+            if (player->hasAudio) {
+                if ((s32)(player->audioReadFrame -
+                          player->audioPlayedFrame) <= 1) {
+                    decodedFrame = thpTakeDecodedFrame(player);
+                    goto decoded;
+                }
+                if (!thpActivateStreams()) {
+                    player->state = 5;
+                    player->internalState = 5;
+                    return;
+                }
+                player->internalState = 2;
+            } else {
+                decodedFrame = fn_801E4EF0(0);
+                goto decoded;
+            }
+        } else {
+            player->frameCounter = (u64)-1;
+            goto decoded;
+        }
+    } else if (player->hasAudio && player->frameCounter == 1 &&
+               player->internalState != 2) {
+        if (!thpActivateStreams()) {
+            player->internalState = 5;
+            player->state = 5;
+            return;
+        }
+        player->internalState = 2;
+    }
+
+    if ((player->syncFlags & 1) != 0) {
+        ready = fn_800AA2F0() == 0;
+    } else if ((player->syncFlags & 2) != 0) {
+        ready = fn_800AA2F0() == 1;
+    } else {
+        s32 ticksPerFrame =
+            (s32)(lbl_8047E4A8 * player->frameRate);
+        s64 scaled = (s64)player->frameCounter * ticksPerFrame;
+
+        if (VIGetTvFormat() == 1) {
+            player->clockFrame = (u32)(scaled / 5000);
+        } else {
+            player->clockFrame = (u32)(scaled / 5994);
+        }
+        if (player->shownFrame != player->clockFrame) {
+            player->shownFrame = player->clockFrame;
+            ready = TRUE;
+        } else {
+            ready = FALSE;
+        }
+    }
+
+    if (ready) {
+        if (player->hasAudio) {
+            if ((s32)(player->audioReadFrame -
+                      player->audioPlayedFrame) <= 1) {
+                decodedFrame = thpTakeDecodedFrame(player);
+            }
+        } else {
+            decodedFrame = fn_801E4EF0(0);
+        }
+    }
+
+decoded:
+    if (decodedFrame != 0 && decodedFrame != (u32)-1) {
+        if (player->decodedFrame != 0) {
+            fn_8009F230(lbl_8046A494, player->decodedFrame, 0);
+        }
+        player->decodedFrame = decodedFrame;
+    }
+
+    if ((player->playFlags & 1) != 0) {
+        return;
+    }
+    if (player->hasAudio) {
+        if (player->audioPlayedFrame + player->frameOffset ==
+                player->frameCount &&
+            player->pendingFrame == 0) {
+            player->internalState = 3;
+            player->state = 3;
+        }
+    } else {
+        u32 finalFrame;
+
+        if (player->decodedFrame != 0) {
+            finalFrame = *(u32*)(player->decodedFrame + 0xC) +
+                         player->frameOffset;
+        } else {
+            finalFrame = player->frameOffset - 1;
+        }
+        if (finalFrame == player->frameCount - 1 && decodedFrame == 0) {
+            player->internalState = 3;
+            player->state = 3;
+        }
+    }
+}
+
+typedef struct THPAudioDmaState {
+    u64 markers[5];
+    s32 readMarker;
+    s32 writeMarker;
+    u64 dmaPosition;
+    u64 requestedPosition;
+    u64 decodedPosition;
+    u8 pad48[0x0C];
+} THPAudioDmaState;
+
+extern THPAudioDmaState lbl_8046A440;
+extern s16 *lbl_8047B470;
+extern s16 *lbl_8047B474;
+extern void DCFlushRange(void *addr, u32 nBytes);
+extern u32 fn_801E2B74(s16 *left, s16 *right, u32 samples, u32 *status);
+extern void fn_8014E9B4(u32 stream, u32 offset, u32 samples, u32 arg3,
+                        u32 arg4);
+
+#pragma push
+#pragma inline_depth(8)
+#pragma inline_max_size(10000)
+
+static inline void THPAdvanceAudioMarker(THPAudioDmaState *state, u64 position)
+{
+    state->markers[state->writeMarker] = position;
+    state->writeMarker++;
+    if (state->writeMarker >= 5) {
+        state->writeMarker = 0;
+    }
+}
+
+static inline void THPDecodeAudioBlock(THPAudioDmaState *state, s16 *left,
+                                       s16 *right, u32 samples)
+{
+    u64 decoded = state->decodedPosition;
+    u32 remaining = samples;
+
+    for (;;) {
+        u32 status;
+        u32 amount = fn_801E2B74(left, right, remaining, &status);
+        decoded += amount;
+        if (status == 0) {
+            break;
+        }
+        if (status == 1) {
+            left += amount;
+            if (right != NULL) {
+                right += amount;
+            }
+            remaining -= amount;
+            THPAdvanceAudioMarker(state, decoded);
+            continue;
+        }
+        memset(left, 0, remaining * sizeof(s16));
+        if (right != NULL) {
+            memset(right, 0, remaining * sizeof(s16));
+        }
+        break;
+    }
+    state->decodedPosition += samples;
+}
+
+u32 fn_801E260C(s16 *dmaBuffer, u32 firstLength, u32 unused,
+                u32 secondLength, void *active)
+{
+    THPAudioDmaState *state = &lbl_8046A440;
+    u32 bytes = *(u32 *)(lbl_8046AC60 + 0x90) * 40 / 1000;
+    u32 samples = bytes / sizeof(s16);
+    u64 requested;
+
+    (void)unused;
+    if (active == NULL) {
+        return 0;
+    }
+
+    requested = state->dmaPosition + firstLength + secondLength;
+    state->requestedPosition = requested;
+    while (state->readMarker != state->writeMarker) {
+        if (requested < state->markers[state->readMarker]) {
+            break;
+        }
+        state->readMarker++;
+        if (state->readMarker >= 5) {
+            state->readMarker = 0;
+        }
+        (*(u32 *)(lbl_8046AC60 + 0xE4))++;
+    }
+
+    if (firstLength + secondLength < samples) {
+        return 0;
+    }
+
+    if (dmaBuffer == lbl_8047B470) {
+        if (*(u32 *)(lbl_8046AC60 + 0x8C) == 2) {
+            THPDecodeAudioBlock(state, lbl_8047B470, lbl_8047B474,
+                                samples);
+        } else {
+            THPDecodeAudioBlock(state, lbl_8047B470, NULL, samples);
+        }
+        DCFlushRange(lbl_8047B470, bytes);
+        fn_8014E9B4(lbl_80478D00, 0, samples, 0, 0);
+        if (*(u32 *)(lbl_8046AC60 + 0x8C) == 2) {
+            DCFlushRange(lbl_8047B474, bytes);
+            fn_8014E9B4(lbl_80478D04, 0, samples, 0, 0);
+        }
+    } else {
+        if (*(u32 *)(lbl_8046AC60 + 0x8C) == 2) {
+            THPDecodeAudioBlock(state, lbl_8047B470 + samples,
+                                lbl_8047B474 + samples, samples);
+        } else {
+            THPDecodeAudioBlock(state, lbl_8047B470 + samples, NULL,
+                                samples);
+        }
+        DCFlushRange(lbl_8047B470 + samples, bytes);
+        fn_8014E9B4(lbl_80478D00, samples, samples, 0, 0);
+        if (*(u32 *)(lbl_8046AC60 + 0x8C) == 2) {
+            DCFlushRange(lbl_8047B474 + samples, bytes);
+            fn_8014E9B4(lbl_80478D04, samples, samples, 0, 0);
+        }
+    }
+
+    state->dmaPosition += samples;
+    return samples;
+}
+
+#pragma pop
+
 #pragma optimize_for_size on
 u32 fn_801E4650(void)
 {

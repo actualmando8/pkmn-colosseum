@@ -123,75 +123,69 @@ extern const f32 lbl_8047E0C4;
 extern const f32 lbl_8047E0C8;
 extern const f32 lbl_8047E0CC;
 
-#pragma optimize_for_size on
-u32 fn_801C4CB8(u32 mode, void* texture, f32 frame, f32 duration) {
-    f32 frameLocal;
-    u32 modeLocal;
-    f32 durationLocal;
-    void* tex;
-    FadeCameraWork* cam;
-    GSvec pos;
-    GSvec scale;
+#pragma peephole off
+u32 fn_801C4CB8(u32 finish, void* texture, f32 frame, f32 duration)
+{
+    FadeCameraWork* camera;
+    f32 textureMatrix[3][4];
+    f32 matrix[3][4];
+    GSvec position;
     GSvec point;
-    GSvec out;
-    f32 mtx[3][4];
-    u8 tev[0x34];
-    f32 t;
-    f32 alpha;
-    f32 x0;
-    f32 x1;
-    f32 y0;
-    f32 y1;
+    GSvec transformed;
+    f32 scaleValue;
+    f32 progress;
+    f32 left;
+    f32 right;
+    f32 top;
+    f32 bottom;
 
-    frameLocal = frame;
-    modeLocal = mode;
-    durationLocal = duration;
-    tex = texture;
-
-    if (tex == NULL) {
-        return modeLocal;
+    if (texture == NULL) {
+        return finish;
     }
 
     if (lbl_8047B3B0 == 1) {
         lbl_8047B3B0 = 0;
-        fn_801C53BC(tex);
+        fn_801C53BC(texture);
     }
 
-    if (lbl_8047B3B0 == 0 && (u8)modeLocal == 0 && lbl_8047B3B4 != NULL) {
+    if (lbl_8047B3B0 == 0 && (u8)finish == 0 && lbl_8047B3B4 != NULL) {
         fn_800D75F4(lbl_8047B3B4);
         lbl_8047B3B4 = NULL;
     }
 
-    t = frameLocal / durationLocal;
-    cam = (FadeCameraWork*)lbl_80467030;
-    cam->frame++;
-    cam->value += cam->step;
-    if (cam->step >= lbl_8047DFE0) {
-        cam->step += lbl_8047DFDC * t;
-        if (cam->value >= cam->target) {
-            cam->value = cam->target;
+    progress = frame / duration;
+    camera = (FadeCameraWork*)lbl_80467030;
+    camera->frame++;
+    camera->value += camera->step;
+    if (camera->step >= lbl_8047DFE0) {
+        camera->step += lbl_8047DFDC * progress;
+        if (camera->value >= camera->target) {
+            camera->value = camera->target;
         }
     } else {
-        cam->step -= lbl_8047DFDC * t;
-        if (cam->value <= cam->target) {
-            cam->value = cam->target;
+        camera->step -= lbl_8047DFDC * progress;
+        if (camera->value <= camera->target) {
+            camera->value = camera->target;
         }
     }
 
-    pos.x = lbl_8047E008;
-    pos.y = lbl_8047E00C;
-    pos.z = lbl_8047DFE0;
-    fn_801C63C0(tex, &pos, lbl_8047DFE4, lbl_8047DFE0, t, lbl_8047DFE0);
+    position.x = lbl_8047E008;
+    position.y = lbl_8047E00C;
+    position.z = lbl_8047DFE0;
+    fn_801C63C0(texture, &position, lbl_8047DFE4, lbl_8047DFE0, progress,
+                lbl_8047DFE0);
 
-    pos.x = lbl_8047E008 + cam->value;
-    pos.y = lbl_8047E00C;
-    pos.z = lbl_8047DFE0;
-    fn_801C63C0(tex, &pos, lbl_8047DFE4, lbl_8047DFE0, t, lbl_8047DFDC);
+    position.x = lbl_8047E008 + camera->value;
+    position.y = lbl_8047E00C;
+    position.z = lbl_8047DFE0;
+    fn_801C63C0(texture, &position, lbl_8047DFE4, lbl_8047DFE0, progress,
+                lbl_8047DFDC);
 
-    pos.x = lbl_8047E008 - cam->value;
-    pos.y = lbl_8047E00C;
-    pos.z = lbl_8047DFE0;
-    fn_801C63C0(tex, &pos, lbl_8047DFE4, lbl_8047DFE0, t, lbl_8047DFDC);
+    position.x = lbl_8047E008 - camera->value;
+    position.y = lbl_8047E00C;
+    position.z = lbl_8047DFE0;
+    fn_801C63C0(texture, &position, lbl_8047DFE4, lbl_8047DFE0, progress,
+                lbl_8047DFDC);
 
     if (lbl_8047B3B4 != NULL) {
         fn_800D9ED8(1);
@@ -203,99 +197,95 @@ u32 fn_801C4CB8(u32 mode, void* texture, f32 frame, f32 duration) {
         fn_800DA1E8(0, 1, 1);
         fn_800DA100(0, 7, 0, 1, 7, 0);
         fn_800DA028(0);
-        fn_800D848C(0, 0, 4, tev);
-        fn_800D848C(1, 0, 5, tev);
+        fn_800D848C(0, 0, 4, textureMatrix);
+        fn_800D848C(1, 0, 5, textureMatrix);
         fn_800DC1D4(2);
         fn_800D85D4(0, ((FadeCameraWork*)lbl_80467030)->tex1);
         fn_800DC224(0, 0, 0, 0, 0);
         fn_800DC14C(0, 8, 0, 0, 0, 1);
-        fn_800DC0D4(0, 9, 0xd, 0xc, 0xf);
+        fn_800DC0D4(0, 9, 13, 12, 15);
         fn_800DC04C(0, 0, 0, 0, 0, 1);
         fn_800DBFD4(0, 7, 4, 5, 7);
-        fn_800D85D4(1, tex);
+        fn_800D85D4(1, texture);
         fn_800DC224(1, 0, 1, 1, 0);
         fn_800DC14C(1, 0, 0, 0, 0, 0);
-        fn_800DC0D4(1, 0xf, 8, 2, 0xf);
+        fn_800DC0D4(1, 15, 8, 2, 15);
         fn_800DC04C(1, 0, 0, 0, 0, 0);
         fn_800DBFD4(1, 7, 7, 7, 1);
         fn_800D7820(lbl_8047B3B4);
         fn_800D6A00(4);
 
-        alpha = lbl_8047DFF0 *
-                (lbl_8047DFE4 - t);
-        scale.x = lbl_8047DFE4 + ((f32)cam->frame / lbl_8047E010);
-        scale.y = scale.x;
-        scale.z = scale.x;
-        pos.x = lbl_8047E008;
-        pos.y = lbl_8047E00C;
-        pos.z = lbl_8047DFE0;
-        fn_800E042C(mtx, &scale);
-        fn_800E02E8(mtx, lbl_8047DFE0);
-        fn_800E03B4(mtx, &pos);
+        position.x = lbl_8047E008;
+        position.y = lbl_8047E00C;
+        position.z = lbl_8047DFE0;
+        scaleValue = lbl_8047DFE4 + ((f32)camera->frame / lbl_8047E010);
+        point.x = scaleValue;
+        point.y = scaleValue;
+        point.z = scaleValue;
+        progress = lbl_8047DFF0 * (lbl_8047DFE4 - progress);
+        fn_800E042C(matrix, &point);
+        fn_800E02E8(matrix, lbl_8047DFE0);
+        fn_800E03B4(matrix, &position);
 
         point.x = lbl_8047E014;
         point.y = lbl_8047E014;
         point.z = lbl_8047DFE0;
-        GSvecTransform(&out, mtx, &point);
-        x0 = lbl_8047E008 - (out.x - lbl_8047E008);
-        x1 = lbl_8047E008 + (out.x - lbl_8047E008);
-        y0 = lbl_8047E00C - (out.y - lbl_8047E00C);
-        y1 = lbl_8047E00C + (out.y - lbl_8047E00C);
-        x0 = x0 / lbl_8047DFF4;
-        x1 = x1 / lbl_8047DFF4;
-        y0 = y0 / lbl_8047DFF8;
-        y1 = y1 / lbl_8047DFF8;
-
+        GSvecTransform(&transformed, matrix, &point);
+        transformed.x -= lbl_8047E008;
+        transformed.y -= lbl_8047E00C;
+        left = (lbl_8047E008 - transformed.x) / lbl_8047DFF4;
+        right = (lbl_8047E008 + transformed.x) / lbl_8047DFF4;
+        top = (lbl_8047E00C - transformed.y) / lbl_8047DFF8;
+        bottom = (lbl_8047E00C + transformed.y) / lbl_8047DFF8;
         fn_800D67BC(4);
 
         point.x = lbl_8047E018;
         point.y = lbl_8047E018;
         point.z = lbl_8047DFE0;
-        GSvecTransform(&out, mtx, &point);
-        fn_800D6680(out.x, out.y, out.z);
-        fn_800D5CB8(0, 0xff, 0xff, 0xff, (u32)alpha);
+        GSvecTransform(&transformed, matrix, &point);
+        fn_800D6680(transformed.x, transformed.y, transformed.z);
+        fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, (u8)progress);
         fn_800D59B8(0, lbl_8047DFE0, lbl_8047DFE0);
-        fn_800D59B8(1, x0, y0);
+        fn_800D59B8(1, left, top);
 
         point.x = lbl_8047E014;
         point.y = lbl_8047E018;
         point.z = lbl_8047DFE0;
-        GSvecTransform(&out, mtx, &point);
-        fn_800D6680(out.x, out.y, out.z);
-        fn_800D5CB8(0, 0xff, 0xff, 0xff, (u32)alpha);
+        GSvecTransform(&transformed, matrix, &point);
+        fn_800D6680(transformed.x, transformed.y, transformed.z);
+        fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, (u8)progress);
         fn_800D59B8(0, lbl_8047DFE4, lbl_8047DFE0);
-        fn_800D59B8(1, x1, y0);
+        fn_800D59B8(1, right, top);
 
         point.x = lbl_8047E018;
         point.y = lbl_8047E014;
         point.z = lbl_8047DFE0;
-        GSvecTransform(&out, mtx, &point);
-        fn_800D6680(out.x, out.y, out.z);
-        fn_800D5CB8(0, 0xff, 0xff, 0xff, (u32)alpha);
+        GSvecTransform(&transformed, matrix, &point);
+        fn_800D6680(transformed.x, transformed.y, transformed.z);
+        fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, (u8)progress);
         fn_800D59B8(0, lbl_8047DFE0, lbl_8047DFE4);
-        fn_800D59B8(1, x0, y1);
+        fn_800D59B8(1, left, bottom);
 
         point.x = lbl_8047E014;
         point.y = lbl_8047E014;
         point.z = lbl_8047DFE0;
-        GSvecTransform(&out, mtx, &point);
-        fn_800D6680(out.x, out.y, out.z);
-        fn_800D5CB8(0, 0xff, 0xff, 0xff, (u32)alpha);
+        GSvecTransform(&transformed, matrix, &point);
+        fn_800D6680(transformed.x, transformed.y, transformed.z);
+        fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, (u8)progress);
         fn_800D59B8(0, lbl_8047DFE4, lbl_8047DFE4);
-        fn_800D59B8(1, x1, y1);
-
+        fn_800D59B8(1, right, bottom);
         fn_800D6728();
         fn_800DC1D4(1);
         fn_800D888C(0x80000000);
         fn_800D9ED8(0);
     }
 
-    if (lbl_8047B3B0 == 0 && (u8)modeLocal == 0) {
-        GSgfxEndBackFBCapture(tex);
+    if (lbl_8047B3B0 == 0 && (u8)finish == 0) {
+        GSgfxEndBackFBCapture(texture);
     }
-    return modeLocal;
+    return finish;
 }
-#pragma optimize_for_size reset
+#pragma peephole on
 
 #pragma peephole off
 u32 fn_801C54FC(u32 arg0, f32 frame, f32 duration) {
@@ -500,6 +490,81 @@ void fadeFluidCalcParms(f32 dt) {
     fluid->damping = damping;
     fluid->accel = accelOut;
     fluid->neighbor = neighbor;
+}
+
+
+/* Archived strike candidate: fadeFluidInit (Sol). */
+void fadeFluidInit(u32 columns, u32 rows, f32 cellSize, f32 calcStep,
+                   f32 waveLimit, f32 timeStep)
+{
+    extern void* fn_801C7630(u32 size);
+    extern f32 sqrtf(f32);
+    extern void set__5GSvecFfff(GSvec*, f32, f32, f32);
+    extern void OSReport(const char*, ...);
+    extern char lbl_80275860[];
+    extern const f32 lbl_8047E0AC;
+    extern const f32 lbl_8047E0D0;
+    extern const f32 lbl_8047E0D4;
+    extern const f32 lbl_8047E0F0;
+
+    FadeFluidWork* fluid = (FadeFluidWork*)lbl_80467050;
+    u32 pointCount;
+    u32 vectorBytes;
+    u32 x;
+    u32 y;
+    u32 index;
+    f32 maximumLimit;
+    f32 rowPosition;
+    f32 columnPosition;
+    f32 texStepX;
+    f32 texStepY;
+
+    pointCount = (columns + 1) * (rows + 1);
+    vectorBytes = pointCount * sizeof(GSvec);
+    fluid->columns = columns;
+    fluid->rows = rows;
+    fluid->xScale = lbl_8047E0D0 / (f32)columns;
+    fluid->yScale = lbl_8047E0D4 / (f32)rows;
+    fluid->heightPage[0] = fn_801C7630(vectorBytes);
+    fluid->heightPage[1] = fn_801C7630(vectorBytes);
+    lbl_8047B3B8 = 0;
+    fluid->velocityX = fn_801C7630(vectorBytes);
+    fluid->velocityY = fn_801C7630(vectorBytes);
+    fluid->texCoord = fn_801C7630(pointCount * sizeof(GSvec2));
+
+    maximumLimit = (cellSize / (lbl_8047E0C4 * calcStep)) *
+                   sqrtf(lbl_8047E0C4 + timeStep);
+    if (waveLimit > lbl_8047E0AC && waveLimit >= maximumLimit) {
+        OSReport(lbl_80275860, waveLimit, maximumLimit);
+        waveLimit = maximumLimit - lbl_8047E0F0;
+    }
+    fluid->cellSize = cellSize;
+    fluid->limit = waveLimit;
+    fluid->timeStep = timeStep;
+    fadeFluidCalcParms(calcStep);
+
+    rowPosition = lbl_8047E0AC;
+    texStepX = lbl_8047E0A8 / (f32)columns;
+    texStepY = lbl_8047E0A8 / (f32)rows;
+    index = 0;
+    for (y = 0; y <= rows; y++) {
+        columnPosition = lbl_8047E0AC;
+        for (x = 0; x <= columns; x++) {
+            set__5GSvecFfff(&fluid->heightPage[0][index],
+                            columnPosition, rowPosition, lbl_8047E0AC);
+            GSvecCopy(&fluid->heightPage[1][index],
+                      &fluid->heightPage[0][index]);
+            set__5GSvecFfff(&fluid->velocityX[index],
+                            lbl_8047E0AC, lbl_8047E0AC, waveLimit);
+            set__5GSvecFfff(&fluid->velocityY[index],
+                            waveLimit, lbl_8047E0AC, lbl_8047E0AC);
+            fluid->texCoord[index].x = texStepX * (f32)x;
+            fluid->texCoord[index].y = texStepY * (f32)y;
+            columnPosition += cellSize;
+            index++;
+        }
+        rowPosition += cellSize;
+    }
 }
 
 #pragma scheduling off
