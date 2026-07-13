@@ -106,6 +106,11 @@ void fn_800A5784(u32 intType)
     fn_800A58F0();
 }
 
+void fn_800A58F0(void)
+{
+    fn_800A48DC(fn_800A59CC);
+}
+
 void fn_800A62CC(u32 intType)
 {
     DVDCommandBlock* finished;
