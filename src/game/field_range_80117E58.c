@@ -74,6 +74,22 @@ typedef struct FieldStatusEntry {
     u16 pad_e;
 } FieldStatusEntry;
 
+typedef struct FieldParticleInstance {
+    u8 active;
+    u8 pad_01[7];
+    u32 age;
+} FieldParticleInstance;
+
+typedef union FieldParticleInstancePtr {
+    u8* raw;
+    FieldParticleInstance* instance;
+} FieldParticleInstancePtr;
+
+typedef struct FieldParticleInstanceList {
+    u8 pad_00[8];
+    FieldParticleInstancePtr entries[0x40];
+} FieldParticleInstanceList;
+
 /* Field subsystems -- forward declarations (defined below) */
 u32  _unloadFlare__FPvUlUl(void);
 u32 floorDataBiosGetFileGroupID(u8* entry);
@@ -137,7 +153,7 @@ extern void* floorDataBiosGetFieldCameraListPtr();
 extern u32 floorDataBiosGetGroupID();
 extern void* floorDataBiosGetPtr(u32 key);
 extern void fn_8011791C(void);
-void fn_80119930(u8* texture);
+void fn_80119930(FieldParticleInstanceList* list);
 extern void fn_80119BD0();
 extern u8 fn_80119D90(u16 idx);
 extern u8 fn_80119DD0(u16 idx);
@@ -1913,11 +1929,11 @@ asm void fn_80118A68(void) {
 #include "src/game/gs_field_world_fn_80118A68.inc"
 }
 #else
-void fn_80118A68(u8* obj, u32 notify) {
-    u32 i;
+static inline void destroyFieldParticleInstance(u8* obj, u32 notify) {
     u8* model;
-    u8* base;
-    u8* scan;
+    u32* base;
+    u32* scan;
+    u32 i;
     s32* active;
 
     if ((notify & 0xFF) == 1) {
@@ -1965,17 +1981,21 @@ void fn_80118A68(u8* obj, u32 notify) {
 
     psKillGenerator(*(u32*)(obj + 0x10));
 
-    base = *(u8**)(obj + 0x0C);
+    base = *(u32**)(obj + 0x0C);
     scan = base;
     for (i = 0; i < 0x40; i++) {
-        if (*(u32*)(scan + 8) == (u32)obj) {
-            *(u32*)(scan + 8) = 0;
+        if (scan[2] == (u32)obj) {
+            base[i + 2] = 0;
             break;
         }
-        scan += 4;
+        scan++;
     }
 
     obj[0] = 0;
+}
+
+void fn_80118A68(u8* obj, u32 notify) {
+    destroyFieldParticleInstance(obj, notify);
 }
 #endif
 /* 0x68 | fn_80118C20 | guarded_call */
@@ -2214,7 +2234,7 @@ u8* fn_801190DC(u8* texture, u32 selector, u32 subid) {
     }
 
     if ((slot = fn_801190DC_findFreeSlot(texture)) == -1) {
-        fn_80119930(texture);
+        fn_80119930((FieldParticleInstanceList*)texture);
         if ((slot = fn_801190DC_findFreeSlot(texture)) == -1) {
             return NULL;
         }
@@ -2406,8 +2426,27 @@ void fn_80119824(void) {
 }
 #endif
 /* 0x80119930 | 0x2A0 */
-/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_80119930(u8* texture);
+void fn_80119930(FieldParticleInstanceList* list) {
+    u32 i;
+    FieldParticleInstance* instance;
+    u32 oldest_age = (u32)-1;
+    s32 oldest_index = -1;
+
+    for (i = 0; i < 0x40; i++) {
+        instance = list->entries[i].instance;
+
+        if (instance->active == 0) {
+            list->entries[i].raw = NULL;
+        } else if (instance->age < oldest_age) {
+            oldest_age = instance->age;
+            oldest_index = i;
+        }
+    }
+
+    if (oldest_index != -1) {
+        destroyFieldParticleInstance(list->entries[oldest_index].raw, 1);
+    }
+}
 /* 0x80119BD0 | 0x1C0 */
 extern void GSmodelSearchModelList(void);
 extern void GSmodelGetLinkedGSparticleBank(void);
