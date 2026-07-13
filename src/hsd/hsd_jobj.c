@@ -2533,6 +2533,31 @@ void fn_801A2B5C(HSD_JObj* jobj, HSD_AnimJoint* animjoint,
     }
 }
 
+/* 0x801A323C | 0x64 */
+void fn_801A323C(HSD_AObj* aobj)
+{
+    HSD_FObj* volatile* link;
+
+    if (aobj == NULL) {
+        return;
+    }
+    if (aobj->fobj != NULL) {
+        link = &aobj->fobj;
+        while (*link != NULL) {
+            if ((*link)->obj_type == HSD_A_J_BRANCH) {
+                HSD_FObj* next = (*link)->next;
+                HSD_FObj* fobj = *link;
+
+                *link = next;
+                fobj->next = aobj->fobj;
+                aobj->fobj = fobj;
+                return;
+            }
+            link = &(*link)->next;
+        }
+    }
+}
+
 /* 0x801A39AC | 0x358 */
 #pragma push
 #pragma optimization_level 1
