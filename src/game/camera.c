@@ -457,6 +457,19 @@ void fn_801765F4(u8 value) {
     *((u8*)lbl_80478C40 + 3) = value;
 }
 #pragma push
+#pragma optimization_level 4
+/* 0x801768F0 | size: 0x58 */
+void cameraSetRotation(f32 x, f32 y, f32 z) {
+    GSSceneVec3 rotation;
+    void* camera;
+
+    set__5GSvecFfff(&rotation, x, y, z);
+    camera = GSresGetResource(0, 0);
+    GSvecCopy(&((CameraPadState*)lbl_80478C40)->rotation, &rotation);
+    GScameraSetRotation(camera, &rotation);
+}
+#pragma pop
+#pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
 
