@@ -79,4 +79,11 @@ typedef struct _GXColor {
     u8 a;
 } GXColor;
 
+/** GXLightObj - opaque 64-byte hardware light object. */
+typedef struct GXLightObj {
+    u8 dummy[0x40];
+} GXLightObj;
+
+void fn_800BA440(GXLightObj* light, GXColor color);
+
 #endif /* DOLPHIN_GX_GX_H */

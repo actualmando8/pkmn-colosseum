@@ -2,7 +2,7 @@
  * @file hsd_lobj.c
  * @brief HSD LObj - Light object implementation.
  *
- * Colosseum address: 0x801A4000 (HSD_LObjInit)
+ * Colosseum address: 0x801A4000 (LObjInfoInit)
  * Adapted from doldecomp/melee src/sysdolphin/baselib/lobj.c
  */
 
@@ -417,7 +417,7 @@ s32 LObjLoad(HSD_LObj* lobj, HSD_LightDesc* ldesc)
 
 /* 0x801A48B0 | 0x44 */
 /* HSD_LObjGetInterest */
-s32 HSD_LObjGetInterest(HSD_LObj* lobj, void* out) {
+s32 HSD_LObjGetInterest(HSD_LObj* lobj, Vec* out) {
     if (lobj != NULL) {
         if (*(HSD_WObj* volatile*) &lobj->interest != NULL) {
             HSD_WObjGetPosition(lobj->interest, out);
@@ -438,7 +438,7 @@ asm void HSD_LObjSetInterest(void) {
 #else
 #pragma push
 #pragma scheduling on
-void HSD_LObjSetInterest(HSD_LObj* lobj, void* desc) {
+void HSD_LObjSetInterest(HSD_LObj* lobj, Vec* interest) {
     if (lobj == NULL) {
         __assert(&lbl_8047DBB8, 0x58c, &lbl_8047DBCC);
     }
@@ -448,7 +448,7 @@ void HSD_LObjSetInterest(HSD_LObj* lobj, void* desc) {
             __assert(&lbl_8047DBB8, 0x58f, (const char*) lbl_80274DB8);
         }
     }
-    HSD_WObjSetPosition(lobj->interest, desc);
+    HSD_WObjSetPosition(lobj->interest, interest);
 }
 #pragma pop
 #endif
@@ -459,7 +459,7 @@ asm void HSD_LObjGetPosition(void) {
 #include "src/hsd/hsd_lobj_HSD_LObjGetPosition.inc"
 }
 #else
-s32 HSD_LObjGetPosition(HSD_LObj* lobj, void* out) {
+s32 HSD_LObjGetPosition(HSD_LObj* lobj, Vec* out) {
     if (lobj != NULL) {
         if (*(HSD_WObj* volatile*) &lobj->position != NULL) {
             HSD_WObjGetPosition(lobj->position, out);
@@ -477,7 +477,7 @@ asm void HSD_LObjSetPosition(void) {
 #include "src/hsd/hsd_lobj_HSD_LObjSetPosition.inc"
 }
 #else
-void HSD_LObjSetPosition(HSD_LObj* lobj, void* desc) {
+void HSD_LObjSetPosition(HSD_LObj* lobj, Vec* position) {
     if (lobj == NULL) {
         __assert(&lbl_8047DBB8, 0x568, &lbl_8047DBCC);
     }
@@ -487,7 +487,7 @@ void HSD_LObjSetPosition(HSD_LObj* lobj, void* desc) {
             __assert(&lbl_8047DBB8, 0x56b, (const char*) lbl_80274DC8);
         }
     }
-    HSD_WObjSetPosition(lobj->position, desc);
+    HSD_WObjSetPosition(lobj->position, position);
 }
 #endif
 
@@ -690,7 +690,6 @@ extern void GXLoadLightObjImm(GXLightObj* lo, u32 light_id);
 /* GXInitLightPos / GXInitLightDir / GXInitLightColor / GXInitLightAttn */
 extern void fn_800BA414(GXLightObj* lo, f32 x, f32 y, f32 z);
 extern void fn_800BA424(GXLightObj* lo, f32 nx, f32 ny, f32 nz);
-extern void fn_800BA440(GXLightObj* lo, GXColor color);
 extern void fn_800BA198(GXLightObj* lo, f32 a0, f32 a1, f32 a2, f32 k0, f32 k1,
                         f32 k2);
 
@@ -950,9 +949,8 @@ extern void fn_801A6098(HSD_LObj* lobj, GXColor color, f32 shininess);
 
 /* 0x801A4F54 | 0xE78 */
 /* Really HSD_LObjSetupInit: binds every current light to a hardware slot. */
-void HSD_LObjSetup(void* setup)
+void HSD_LObjSetup(HSD_CObj* cobj)
 {
-    HSD_CObj* cobj = (HSD_CObj*) setup;
     MtxPtr vmtx;
     HSD_SList* list;
     s32 i;

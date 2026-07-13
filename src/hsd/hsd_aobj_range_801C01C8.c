@@ -17,6 +17,7 @@
 #include "hsd/hsd_debug.h"
 #include "hsd/hsd_dobj.h"
 #include "hsd/hsd_fobj.h"
+#include "hsd/hsd_id.h"
 #include "hsd/hsd_jobj.h"
 #include "hsd/hsd_lobj.h"
 #include "hsd/hsd_mobj.h"
@@ -45,21 +46,20 @@ extern const u8 lbl_8047DF4C[]; /* "new"    */
  * number of AObjs that finished this frame, and the number still running. */
 extern s32 lbl_8047B390;
 extern s32 lbl_8047B38C;
+extern HSD_SList* lbl_8047B388;
 
 /* HSD_JObjUnref's tail helper. The target calls the raw symbol at
  * 0x801A05EC, NOT src/hsd/hsd_jobj.c's HSD_JObjUnref, so it must be spelled
  * as fn_801A05EC here to keep the relocation identical. */
 extern void fn_801A05EC(void* obj);
-extern void* HSD_IDGetDataFromTable(s32 table, u32 id, s32 arg2);
 extern f64 fmod(f64 x, f64 y);
 extern void* memset(void* dst, int val, u32 size);
 
 /**
  * _HSD_AObjForgetMemory - Address: 0x801C0270 | Size: 0xC
  */
-s32 _HSD_AObjForgetMemory(void) {
-    extern u32 lbl_8047B388;
-    lbl_8047B388 = 0;
+void _HSD_AObjForgetMemory(void* low, void* high) {
+    lbl_8047B388 = NULL;
 }
 
 /**
@@ -527,7 +527,6 @@ void HSD_AObjReqAnim(HSD_AObj* aobj, f32 frame) {
  * Address: 0x801C2A04 | Size: 0x5C
  */
 void HSD_AObjInvokeCallBacks(void) {
-    extern HSD_SList* lbl_8047B388;
     HSD_SList* list;
 
     if (lbl_8047B390 != 0 && lbl_8047B38C == 0) {

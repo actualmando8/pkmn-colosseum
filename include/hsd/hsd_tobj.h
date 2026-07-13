@@ -385,7 +385,7 @@ typedef struct _HSD_TObjDesc {
 /* ========================================================================= */
 
 typedef struct _HSD_TObjInfo {
-    HSD_ClassInfo parent;                            /* 0x00 */
+    HSD_ObjInfo parent;                              /* 0x00 */
     void (*make_mtx)(HSD_TObj* tobj);                /* 0x3C */
     int (*load)(HSD_TObj* tobj, HSD_TObjDesc* desc); /* 0x40 */
     void (*make_texp)(HSD_TObj* tobj, u32 lightmap, u32 lightmap_done,

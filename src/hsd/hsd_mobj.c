@@ -36,15 +36,7 @@
 #define HSD_TE_TEV 1
 #define HSD_TE_ALL 7
 
-#define GX_TEV_ADD    0
-#define GX_TB_ZERO    0
-#define GX_CS_SCALE_1 0
-#define GX_ENABLE     1
-
-#define GX_COLOR0A0 4
 #define GX_COLOR1A1 5
-
-#define GX_TEXMAP_NULL 0xFF
 
 /* HSD_TExpTev */
 extern HSD_TExp* fn_801B707C(HSD_TExp** list);

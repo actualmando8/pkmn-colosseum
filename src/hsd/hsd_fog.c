@@ -62,7 +62,7 @@ static void FogInfoInit(void)
     hsdInitClassInfo(HSD_CLASS_INFO(&hsdFog), HSD_CLASS_INFO(&hsdObjInfo),
                      (char*) lbl_802747B8, (char*) &lbl_8047DA60,
                      sizeof(HSD_FogInfo), sizeof(HSD_Fog));
-    HSD_CLASS_INFO(&hsdFog)->release = (void*) FogRelease;
+    HSD_CLASS_INFO(&hsdFog)->release = (void (*)(HSD_Class*)) FogRelease;
     hsdFog.update = FogUpdateFunc;
 }
 #pragma pop

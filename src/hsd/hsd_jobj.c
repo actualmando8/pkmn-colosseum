@@ -19,6 +19,7 @@
 #include "hsd/hsd_aobj.h"
 #include "hsd/hsd_class.h"
 #include "hsd/hsd_debug.h"
+#include "hsd/hsd_id.h"
 #include "hsd/hsd_pobj.h"
 #include "hsd/hsd_dobj.h"
 #include "hsd/hsd_robj.h"
@@ -397,8 +398,6 @@ void JObjAmnesia(void* info) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void* HSD_IDGetDataFromTable(void* table, u32 key, u32* found);
-extern void HSD_IDRemoveByIDFromTable(void* table, u32 key);
 extern void HSD_VecFree(void* data);
 extern void HSD_MtxFree(void* data);
 #if 0
@@ -1484,13 +1483,12 @@ void HSD_JObjUnrefThis(void* obj) {
 #pragma optimizewithasm off
 extern void __assert();
 extern void HSD_DObjResolveRefsAll(HSD_DObj* dobj, HSD_DObjDesc* desc);
-extern void* HSD_IDGetDataFromTable(void* table, u32 key, u32* found);
 extern void fn_80196E10(void* file, u32 line, void* expr);
 extern void fn_801991F8(HSD_DObj* dobj, HSD_DObjDesc* desc);
 extern void* fn_8019C128(void* table, u32 key, u32* found);
 extern void fn_801A05EC(void);
 extern void HSD_JObjRef(HSD_JObj* jobj);
-extern void* HSD_IDGetData(u32 key, u32* found);
+extern void* HSD_IDGetData(u32 key, s32* found);
 extern void fn_801A0B9C(HSD_JObj* jobj);
 extern void* fn_801A0BF0(u32 key, u32* found);
 extern s32 fn_801A0D3C();
@@ -1551,7 +1549,7 @@ asm void HSD_IDGetData(void) {
 }
 #else
 #pragma optimization_level 4
-void* HSD_IDGetData(u32 key, u32* found) {
+void* HSD_IDGetData(u32 key, s32* found) {
     return HSD_IDGetDataFromTable(NULL, key, found);
 }
 #endif
@@ -1842,7 +1840,6 @@ extern HSD_DObj* HSD_DObjLoadDesc(HSD_DObjDesc* desc);
 extern HSD_RObj* HSD_RObjLoadDesc(HSD_RObjDesc* desc);
 extern void PSMTXIdentity(f32 mtx[3][4]);
 extern f32* HSD_MtxAlloc(void);
-extern void HSD_IDInsertToTable(void* table, u32 key, u32 value);
 extern void* memcpy(void* dst, const void* src, u32 n);
 extern u32 lbl_8047B298;
 #if 0
@@ -1902,7 +1899,7 @@ s32 JObjLoad(HSD_JObj* jobj, HSD_Joint* joint, HSD_JObj* parent)
         memcpy(jobj->envelopemtx, joint->mtx, 0x30);
     }
 
-    HSD_IDInsertToTable(NULL, (u32) joint, (u32) jobj);
+    HSD_IDInsertToTable(NULL, (u32) joint, jobj);
     jobj->id = (u32) joint;
 
     if (joint->flags & JOBJ_INSTANCE) {

@@ -6,7 +6,7 @@
  * Supports ambient, infinite (directional), point, and spot lights
  * with attenuation, color, and animation.
  *
- * Colosseum address range: 0x801A4000 (HSD_LObjInit)
+ * Colosseum address range: 0x801A4000 (LObjInfoInit)
  * Adapted from the Melee decompilation (doldecomp/melee).
  */
 #ifndef HSD_LOBJ_H
@@ -24,11 +24,6 @@
 /* ========================================================================= */
 
 #define MAX_GXLIGHT 9
-
-/** GXLightObj - opaque 64-byte hardware light object. */
-typedef struct GXLightObj {
-    u8 dummy[0x40];
-} GXLightObj;
 
 /* ========================================================================= */
 /*  Light parameter structures                                               */
@@ -175,15 +170,16 @@ void HSD_LObjAnim(HSD_LObj* lobj);
 void HSD_LObjAnimAll(HSD_LObj* lobj);
 void HSD_LObjReqAnim(HSD_LObj* lobj, f32 startframe);
 void HSD_LObjReqAnimAll(HSD_LObj* lobj, f32 startframe);
-void HSD_LObjSetup(void* setup);
+void HSD_LObjSetup(HSD_CObj* cobj);
 void HSD_LObjSetColor(HSD_LObj* lobj, GXColor* color);
 void HSD_LObjGetLightVector(HSD_LObj* lobj, Vec* dir);
 HSD_LObj* HSD_LObjGetCurrentByType(u32 type);
+void HSD_LObjAddCurrentAll(HSD_LObj* lobj);
 void HSD_LObjDeleteCurrentAll(HSD_LObj* lobj);
-s32 HSD_LObjGetPosition(HSD_LObj* lobj, void* out);
-s32 HSD_LObjGetInterest(HSD_LObj* lobj, void* out);
-void HSD_LObjSetPosition(HSD_LObj* lobj, void* desc);
-void HSD_LObjSetInterest(HSD_LObj* lobj, void* desc);
+s32 HSD_LObjGetPosition(HSD_LObj* lobj, Vec* out);
+s32 HSD_LObjGetInterest(HSD_LObj* lobj, Vec* out);
+void HSD_LObjSetPosition(HSD_LObj* lobj, Vec* position);
+void HSD_LObjSetInterest(HSD_LObj* lobj, Vec* interest);
 void HSD_LObjRemoveAll(HSD_LObj* lobj);
 HSD_LObj* HSD_LObjAlloc(void);
 HSD_LObj* HSD_LObjLoadDesc(HSD_LightDesc* ldesc);
