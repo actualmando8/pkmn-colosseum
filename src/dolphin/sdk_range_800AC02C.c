@@ -13,6 +13,7 @@
 #include "dolphin/exi/EXI.h"
 #include "dolphin/os/OSAlarm.h"
 #include "dolphin/os/OSInterrupt.h"
+#include "dolphin/os/PPCArch.h"
 
 typedef void (*CARDCallback)(s32 chan, s32 result);
 
@@ -238,6 +239,8 @@ extern void* lbl_8047A8D4;
 extern BOOL lbl_8047A8DC;
 extern ARCallback lbl_8047A908;
 extern u32 lbl_8047A90C;
+extern u32 lbl_8047A910;
+extern u32 lbl_8047A914;
 extern u32 lbl_8047A918;
 extern u32 lbl_8047A91C;
 extern u32* lbl_8047A920;
@@ -752,6 +755,198 @@ void __ARClearInterrupt(void) {
 
 u32 __ARGetInterruptStatus(void) {
     return DSP_REGS->dmaControl & 0x20;
+}
+
+static void __ARWaitForDMA(void) {
+    while (__DSPRegs[5] & 0x200) {
+    }
+}
+
+static void __ARWriteDMA(u32 mainMemoryAddress, u32 aramAddress, u32 length) {
+    __DSPRegs[16] =
+        (__DSPRegs[16] & ~0x3ff) | (u16)(mainMemoryAddress >> 16);
+    __DSPRegs[17] =
+        (__DSPRegs[17] & ~0xffe0) | (u16)(mainMemoryAddress & 0xffff);
+    __DSPRegs[18] = (__DSPRegs[18] & ~0x3ff) | (u16)(aramAddress >> 16);
+    __DSPRegs[19] = (__DSPRegs[19] & ~0xffe0) | (u16)(aramAddress & 0xffff);
+    __DSPRegs[20] = __DSPRegs[20] & ~0x8000;
+    __DSPRegs[20] = (__DSPRegs[20] & ~0x3ff) | (u16)(length >> 16);
+    __DSPRegs[21] = (__DSPRegs[21] & ~0xffe0) | (u16)(length & 0xffff);
+    __ARWaitForDMA();
+    __ARClearInterrupt();
+}
+
+static void __ARReadDMA(u32 mainMemoryAddress, u32 aramAddress, u32 length) {
+    __DSPRegs[16] =
+        (__DSPRegs[16] & ~0x3ff) | (u16)(mainMemoryAddress >> 16);
+    __DSPRegs[17] =
+        (__DSPRegs[17] & ~0xffe0) | (u16)(mainMemoryAddress & 0xffff);
+    __DSPRegs[18] = (__DSPRegs[18] & ~0x3ff) | (u16)(aramAddress >> 16);
+    __DSPRegs[19] = (__DSPRegs[19] & ~0xffe0) | (u16)(aramAddress & 0xffff);
+    __DSPRegs[20] = __DSPRegs[20] | 0x8000;
+    __DSPRegs[20] = (__DSPRegs[20] & ~0x3ff) | (u16)(length >> 16);
+    __DSPRegs[21] = (__DSPRegs[21] & ~0xffe0) | (u16)(length & 0xffff);
+    __ARWaitForDMA();
+    __ARClearInterrupt();
+}
+
+void __ARChecksize(void) {
+    u8 testDataPad[63];
+    u8 dummyDataPad[63];
+    u8 bufferPad[63];
+    u8 savePad1[63];
+    u8 savePad2[63];
+    u8 savePad3[63];
+    u8 savePad4[63];
+    u8 savePad5[63];
+    u32* testData;
+    u32* dummyData;
+    u32* buffer;
+    u32* save1;
+    u32* save2;
+    u32* save3;
+    u32* save4;
+    u32* save5;
+    u16 aramMode = 0;
+    u32 aramSize = 0;
+    u32 i;
+
+    do {
+    } while (!(__DSPRegs[11] & 1));
+
+    aramMode = 3;
+    aramSize = lbl_8047A910 = 0x1000000;
+    __DSPRegs[9] = ((__DSPRegs[9] & 0xffffffc0) | 3) | 0x20;
+
+    testData = (u32*)(((u32)testDataPad + 31) & ~31);
+    dummyData = (u32*)(((u32)dummyDataPad + 31) & ~31);
+    buffer = (u32*)(((u32)bufferPad + 31) & ~31);
+    save1 = (u32*)(((u32)savePad1 + 31) & ~31);
+    save2 = (u32*)(((u32)savePad2 + 31) & ~31);
+    save3 = (u32*)(((u32)savePad3 + 31) & ~31);
+    save4 = (u32*)(((u32)savePad4 + 31) & ~31);
+    save5 = (u32*)(((u32)savePad5 + 31) & ~31);
+
+    for (i = 0; i < 8; i++) {
+        testData[i] = 0xdeadbeef;
+        dummyData[i] = 0xbad0bad0;
+    }
+
+    DCFlushRange(testData, 0x20);
+    DCFlushRange(dummyData, 0x20);
+    lbl_8047A914 = 0;
+
+    DCInvalidateRange(save1, 0x20);
+    __ARReadDMA((u32)save1, aramSize, 0x20);
+    PPCSync();
+    __ARWriteDMA((u32)testData, aramSize, 0x20);
+    memset(buffer, 0, 0x20);
+    DCFlushRange(buffer, 0x20);
+    __ARReadDMA((u32)buffer, aramSize, 0x20);
+    PPCSync();
+
+    if (buffer[0] == testData[0]) {
+        DCInvalidateRange(save2, 0x20);
+        __ARReadDMA((u32)save2, aramSize + 0x0200000, 0x20);
+        PPCSync();
+        DCInvalidateRange(save3, 0x20);
+        __ARReadDMA((u32)save3, aramSize + 0x1000000, 0x20);
+        PPCSync();
+        DCInvalidateRange(save4, 0x20);
+        __ARReadDMA((u32)save4, aramSize + 0x0000200, 0x20);
+        PPCSync();
+        DCInvalidateRange(save5, 0x20);
+        __ARReadDMA((u32)save5, aramSize + 0x0400000, 0x20);
+        PPCSync();
+
+        __ARWriteDMA((u32)dummyData, aramSize + 0x0200000, 0x20);
+        __ARWriteDMA((u32)testData, aramSize, 0x20);
+        memset(buffer, 0, 0x20);
+        DCFlushRange(buffer, 0x20);
+        __ARReadDMA((u32)buffer, aramSize + 0x0200000, 0x20);
+        PPCSync();
+
+        if (buffer[0] == testData[0]) {
+            __ARWriteDMA((u32)save1, aramSize, 0x20);
+            aramMode |= 0 << 1;
+            aramSize += 0x0200000;
+            lbl_8047A914 = 0x0200000;
+        } else {
+            __ARWriteDMA((u32)dummyData, aramSize + 0x1000000, 0x20);
+            __ARWriteDMA((u32)testData, aramSize, 0x20);
+            memset(buffer, 0, 0x20);
+            DCFlushRange(buffer, 0x20);
+            __ARReadDMA((u32)buffer, aramSize + 0x1000000, 0x20);
+            PPCSync();
+
+            if (buffer[0] == testData[0]) {
+                __ARWriteDMA((u32)save1, aramSize, 0x20);
+                __ARWriteDMA((u32)save2, aramSize + 0x0200000, 0x20);
+                aramMode |= 4 << 1;
+                aramSize += 0x0400000;
+                lbl_8047A914 = 0x0400000;
+            } else {
+                __ARWriteDMA((u32)dummyData, aramSize + 0x0000200,
+                             0x20);
+                __ARWriteDMA((u32)testData, aramSize, 0x20);
+                memset(buffer, 0, 0x20);
+                DCFlushRange(buffer, 0x20);
+                __ARReadDMA((u32)buffer, aramSize + 0x0000200, 0x20);
+                PPCSync();
+
+                if (buffer[0] == testData[0]) {
+                    __ARWriteDMA((u32)save1, aramSize, 0x20);
+                    __ARWriteDMA((u32)save2, aramSize + 0x0200000,
+                                 0x20);
+                    __ARWriteDMA((u32)save3, aramSize + 0x1000000,
+                                 0x20);
+                    aramMode |= 8 << 1;
+                    aramSize += 0x0800000;
+                    lbl_8047A914 = 0x0800000;
+                } else {
+                    __ARWriteDMA((u32)dummyData,
+                                 aramSize + 0x0400000, 0x20);
+                    __ARWriteDMA((u32)testData, aramSize, 0x20);
+                    memset(buffer, 0, 0x20);
+                    DCFlushRange(buffer, 0x20);
+                    __ARReadDMA((u32)buffer, aramSize + 0x0400000,
+                                0x20);
+                    PPCSync();
+
+                    if (buffer[0] == testData[0]) {
+                        __ARWriteDMA((u32)save1, aramSize, 0x20);
+                        __ARWriteDMA((u32)save2,
+                                     aramSize + 0x0200000, 0x20);
+                        __ARWriteDMA((u32)save3,
+                                     aramSize + 0x1000000, 0x20);
+                        __ARWriteDMA((u32)save4,
+                                     aramSize + 0x0000200, 0x20);
+                        aramMode |= 12 << 1;
+                        aramSize += 0x1000000;
+                        lbl_8047A914 = 0x1000000;
+                    } else {
+                        __ARWriteDMA((u32)save1, aramSize, 0x20);
+                        __ARWriteDMA((u32)save2,
+                                     aramSize + 0x0200000, 0x20);
+                        __ARWriteDMA((u32)save3,
+                                     aramSize + 0x1000000, 0x20);
+                        __ARWriteDMA((u32)save4,
+                                     aramSize + 0x0000200, 0x20);
+                        __ARWriteDMA((u32)save5,
+                                     aramSize + 0x0400000, 0x20);
+                        aramMode |= 16 << 1;
+                        aramSize += 0x2000000;
+                        lbl_8047A914 = 0x2000000;
+                    }
+                }
+            }
+        }
+        __DSPRegs[9] =
+            (__DSPRegs[9] & ~(0x07 | 0x38)) | aramMode;
+    }
+
+    *(u32*)0xc00000d0 = aramSize;
+    lbl_8047A90C = aramSize;
 }
 
 u32 ARGetDMAStatus(void) {
