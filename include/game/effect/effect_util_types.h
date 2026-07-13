@@ -197,7 +197,7 @@ extern void fightTrainerKindDataBiosGetPtr(u16 handle);
 
 extern void fightTrainerKindDataBiosGetPrefixName(void);
 
-extern void gamedataAttestCreate();
+extern void gamedataAttestCreate(void*, u8, u8, u8, u8);
 
 extern void gamedataAttestInit();
 
