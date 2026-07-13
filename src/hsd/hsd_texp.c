@@ -2283,6 +2283,32 @@ void* HSD_ShadowGetAllocData(void) {
     return lbl_804656E0;
 }
 
+/* 0x801B2654 | 0xA4 */
+#pragma push
+#pragma optimization_level 1
+#pragma use_lmw_stmw on
+void fn_801B2654(void) {
+    lbl_8047B348 = -1;
+    lbl_8047B344 = -1;
+    lbl_8047B340 = -1;
+    lbl_8047B33C = -1;
+    lbl_8047B338 = 0xFF;
+    lbl_8047B334 = -1;
+    lbl_8047B330 = 0xFF;
+    lbl_8047B32C = -1;
+    lbl_8047B328 = 0;
+    lbl_8047B324 = -1;
+    lbl_8047B320 = -1;
+    lbl_8047B31E = 0;
+    lbl_8047B31D = 0xFF;
+    lbl_8047B31C = 0xFF;
+    lbl_8047B31B = 0xFF;
+    lbl_8047B31A = 0;
+    lbl_8047B319 = 0xFF;
+    lbl_8047B318 = 0xFF;
+}
+#pragma pop
+
 /* 0x801B26F8 | 0x20 */
 void fn_801B26F8(void) {
     HSD_ClearVtxDesc();
