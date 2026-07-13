@@ -493,7 +493,6 @@ void fadeFluidCalcParms(f32 dt) {
 }
 
 
-/* Archived strike candidate: fadeFluidInit (Sol). */
 void fadeFluidInit(u32 columns, u32 rows, f32 cellSize, f32 calcStep,
                    f32 waveLimit, f32 timeStep)
 {

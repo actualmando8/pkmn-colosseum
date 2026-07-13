@@ -299,7 +299,6 @@ static inline BOOL dvdCheckCancel(u32 resume)
     return TRUE;
 }
 
-/* Archived strike candidate: fn_800A6BD4 (Sol). */
 void fn_800A6BD4(u32 intType)
 {
     DVDCommandBlock* finished;

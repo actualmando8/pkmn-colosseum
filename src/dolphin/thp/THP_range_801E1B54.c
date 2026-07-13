@@ -629,7 +629,6 @@ s32 fn_801E25C8(void)
 }
 
 
-/* Archived strike THP candidates (Sol). */
 typedef struct THPVideoInfo {
     u32 componentCount;
     u16 width;

@@ -390,6 +390,7 @@ void GSgfxInit__FP15_GSgfxInitParms(u32 heapSize, u32 matrixSize,
     extern f32 lbl_8047CA1C;
 
     u16 handle;
+    /* All known callers pass modes 1-4; the target has no default assignment. */
     void* renderMode;
     u32 previousMode;
     s32 i;

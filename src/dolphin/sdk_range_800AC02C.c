@@ -969,7 +969,6 @@ void __DSP_debug_printf(char* fmt, ...) {
 
 
 
-/* Archived strike candidate: __DSPHandler (Sol). */
 void __DSPHandler(__OSInterrupt interrupt, OSContext* context)
 {
     u8 unused[4];
@@ -1173,7 +1172,6 @@ void __DSP_remove_task(DSPTaskInfo* task) {
 
 
 
-/* Archived strike candidate: fn_800B31F4 (Sol). */
 s32 fn_800B31F4(s32 chan)
 {
     extern s32 lbl_80312960[8];
@@ -1302,7 +1300,6 @@ void __CARDDefaultApiCallback(s32 chan, s32 result) {
 }
 
 
-/* Archived strike candidate: __CARDFormatRegionAsync (Sol). */
 s32 __CARDFormatRegionAsync(s32 chan, u16 encode, CARDCallback callback)
 {
     CARDControl* card;
@@ -1382,7 +1379,6 @@ s32 __CARDFormatRegionAsync(s32 chan, u16 encode, CARDCallback callback)
 }
 
 
-/* Archived strike candidate: CARDCheckExAsync (Sol). */
 s32 CARDCheckExAsync(s32 chan, s32* xferBytes, CARDCallback callback)
 {
     CARDControl* card;
@@ -2436,7 +2432,6 @@ GXTlutRegion* __GXDefaultTlutRegionCallback(u32 index) {
 }
 
 
-/* Archived strike candidate: __GXInitGX (Sol). */
 void __GXInitGX(void) {
     extern GXRenderModeObj lbl_80312D30;
     extern GXRenderModeObj lbl_80312F4C;
@@ -2678,7 +2673,6 @@ void __GXInitGX(void) {
 }
 
 
-/* Archived strike candidate: GXInit (Sol). */
 void* GXInit(void* base, u32 size) {
     extern const char* __GXVersion;
     extern u8 gxData_803FC860[];

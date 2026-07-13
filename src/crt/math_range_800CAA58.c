@@ -933,7 +933,6 @@ recompute:
 #pragma use_lmw_stmw off
 
 
-/* Archived strike candidate: __ieee754_pow (Sol). */
 f64 __ieee754_pow(f64 x, f64 y) {
     extern f64 fn_800CDE88(f64, s32);
     static const f64 bp[2] = { 1.0, 1.5 };

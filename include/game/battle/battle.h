@@ -406,7 +406,9 @@ typedef struct TypeMatchup {
 /* fn_801C6EE4 */ void fn_801C6EE4(s32 slot, void* modelData);
 /* fadeFluidCalcParms */ s32  fadeFluidCalcParms(void);
 /* fn_801C70FC */ void fn_801C70FC(s32 slot, u8 visible);
-/* fadeFluidInit */ void fadeFluidInit(void);                        /* updateAnimations 0x43C */
+/* fadeFluidInit */ void fadeFluidInit(u32 columns, u32 rows, f32 cellSize,
+                                       f32 calcStep, f32 waveLimit,
+                                       f32 timeStep);                 /* updateAnimations 0x43C */
 /* fn_801C75EC */ void fn_801C75EC(s32 slot);
 /* fn_801C7630 */ f32  fn_801C7630(s32 slot);
 /* fn_801C766C */ void fn_801C766C(s32 slot, f32 frame);
