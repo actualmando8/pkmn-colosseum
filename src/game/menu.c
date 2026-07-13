@@ -209,7 +209,7 @@ extern void menuSetPosition(void* p, s16 a, s16 b);
 extern void menuButtonNormal(void* p);
 extern void menuPlaySe(void* p, void* q);
 extern void fn_801034DC(void);
-extern void _menuUpdateKeyInfo__FP15WINDOW_SYS_WORK(void);
+extern void _menuUpdateKeyInfo__FP15WINDOW_SYS_WORK();
 extern void menuGetKeyInfo(void);
 extern u8 menuGetEnablePort(void);
 extern u8 menuSetEnablePort(u8 val);
@@ -236,7 +236,7 @@ void* windowSearchID();
 extern void windowCloseMain(void* obj);
 extern void windowClose(void* ptr, u32 flags);
 extern void _windowCreateItemSprite__FP14tagWINDOW_WORK(void);
-extern void windowCreateCursorSprite(void);
+extern void windowCreateCursorSprite();
 typedef struct MenuVaList {
     u8 gpr;
     u8 fpr;
@@ -275,10 +275,11 @@ extern void winMsgCheck(void);
 extern void winMsgClose(void);
 extern void winMsgOpenWithSE(void);
 extern void winMsgOpen(void);
-extern void fn_80106F98(void);
+extern void fn_80106F98();
 extern s32 winSeqCheckMove(s32 param);
 extern s32 fn_80107170(s32 r3, s32 r31);
-extern void winSeqMoveMenu(void);
+extern void winSeqMoveMenu();
+extern void menuCursorNormal(void* p);
 extern s32 fn_80107E78(void* r3, s32 r4, u16 r30);
 extern s32 winSeqIsCheck(s32 r3, u16 r30);
 extern void fn_80107F38(s32 param, u32 key);
@@ -705,6 +706,295 @@ void menuSetPosition(void* p, s16 a, s16 b) {
 }
 #pragma pop
 
+#pragma push
+#pragma peephole off
+typedef struct MenuDaemonNode MenuDaemonNode;
+typedef void (*MenuNodeCallback)(MenuDaemonNode* node);
+
+typedef struct MenuDaemonData {
+    u8 soundGroup;
+    u8 actionType;
+    u8 pad_02[0x0A];
+    MenuNodeCallback cursorCallback;
+    MenuNodeCallback buttonCallback;
+    MenuNodeCallback tickCallback;
+    MenuNodeCallback drawCallback;
+} MenuDaemonData;
+
+struct MenuDaemonNode {
+    s8 flags;
+    s8 phase;
+    u8 phaseFrame;
+    u8 pad_03;
+    u32 id;
+    u8 pad_08;
+    s8 fadePriority;
+    u8 transitionDone;
+    u8 pad_0B[5];
+    MenuDaemonNode* next;
+    u8 pad_14[5];
+    s8 cursorCount;
+    u8 cursorMode;
+    u8 cursorFlags;
+    void* sprites;
+    void* overlaySprites;
+    u8 pad_24[0x60];
+    s16 x;
+    s16 y;
+    u8 pad_88[0x0C];
+    u16 cursor;
+    u16 previousCursor;
+    u8 close;
+    u8 back;
+};
+
+typedef struct MenuDaemonSystem {
+    u8 pad_00[0x0C];
+    MenuDaemonNode* head;
+    u8 pad_10[0x84];
+    u32 cursorChanged;
+    u32 activeId;
+} MenuDaemonSystem;
+
+typedef union MenuCursorPair {
+    u16 packed;
+    struct {
+        s8 x;
+        s8 y;
+    } pos;
+} MenuCursorPair;
+
+void menuDaemon(void)
+{
+    MenuDaemonSystem* system;
+    MenuDaemonNode* active;
+    MenuDaemonNode* node;
+    MenuDaemonData* data;
+    void* sprite;
+    u32 i;
+    u16 keys;
+    u8 doFade = 1;
+
+    fn_801D2404();
+    active = windowSearchID(windowGetActiveID());
+    _menuUpdateKeyInfo__FP15WINDOW_SYS_WORK(lbl_80404ACC);
+    fn_800D9E4C(0);
+    fn_801093C8();
+    fn_800D9ED8(1);
+    system = (MenuDaemonSystem*)lbl_80404ACC;
+
+    for (node = system->head; node != NULL; node = node->next) {
+        data = menuDataBiosGetPtr(node->id);
+        switch (node->phase) {
+        case 0:
+            node->phase = 1;
+            node->phaseFrame = 0;
+            break;
+        case 1:
+            if ((u8)winSeqCheckMove(node->id) == 0) {
+                if ((u8)((data->actionType >> 2) & 7) == 0) {
+                    node->close = 1;
+                }
+                node->phase = 2;
+                node->phaseFrame = 0;
+            }
+            break;
+        case 2:
+            if (node->transitionDone != 0) {
+                MenuDaemonData* soundData = menuDataBiosGetPtr(node->id);
+                void* sound = menuSeBiosGetPtr(soundData->soundGroup & 7);
+                if (sound != NULL) {
+                    u16 se = fn_8005D798(sound, 5);
+                    if (se != 0) {
+                        fn_80166A28(se);
+                    }
+                }
+                node->phase = 3;
+                node->phaseFrame = 0;
+            }
+            break;
+        case 3:
+            if ((u8)winSeqCheckMove(node->id) == 0) {
+                node->phase = 4;
+                node->phaseFrame = 0;
+            }
+            break;
+        case 4:
+            break;
+        }
+
+        if (active != NULL && node == active) {
+            if (node->close == 0) {
+                switch (node->phase) {
+                case 2:
+                    switch ((data->actionType >> 2) & 7) {
+                    case 0:
+                        node->close = 1;
+                        break;
+                    case 1:
+                        if (node != NULL) {
+                            keys = *(u16*)((u8*)windowGetKeyInfo() + 4);
+                            if (keys & 0x10) {
+                                node->close = 1;
+                            }
+                            if (keys & 0x20) {
+                                node->close = 1;
+                                node->back = 1;
+                            }
+                        }
+                        break;
+                    case 3:
+                        fn_800F7434(data->buttonCallback, 0);
+                        break;
+                    case 4:
+                        data->buttonCallback(node);
+                        break;
+                    }
+                    break;
+                case 3:
+                    break;
+                }
+
+                if ((node->cursorFlags & 8) != 0 && node->back != 0) {
+                    node->back = 0;
+                    node->close = 0;
+                }
+
+                if (node->close != 0) {
+                    system->cursorChanged = 0;
+                    system->activeId = node->id;
+                } else if ((*(u16*)windowGetKeyInfo() & 0x8000) != 0) {
+                    system->cursorChanged = 1;
+                    system->activeId = node->id;
+                    if ((node->cursorFlags & 0x10) == 0) {
+                        node->close = 1;
+                        node->back = 1;
+                    }
+                }
+
+                if (node->back != 0) {
+                    MenuDaemonData* soundData = menuDataBiosGetPtr(node->id);
+                    void* sound = menuSeBiosGetPtr(soundData->soundGroup & 7);
+                    if (sound != NULL) {
+                        u16 se = fn_8005D798(sound, 3);
+                        if (se != 0) {
+                            fn_80166A28(se);
+                        }
+                    }
+                } else if (node->close != 0) {
+                    MenuDaemonData* soundData = menuDataBiosGetPtr(node->id);
+                    void* sound = menuSeBiosGetPtr(soundData->soundGroup & 7);
+                    if (sound != NULL) {
+                        u16 se = fn_8005D798(sound, 2);
+                        if (se != 0) {
+                            fn_80166A28(se);
+                        }
+                    }
+                }
+                if (node->close != 0) {
+                    fn_80106F98(node->id);
+                }
+            }
+
+            if (node->close == 0) {
+                MenuCursorPair oldPos;
+                MenuCursorPair newPos;
+
+                switch (node->phase) {
+                case 2:
+                node->previousCursor = node->cursor;
+                if (node->cursorCount > 0) {
+                    switch (node->cursorMode) {
+                    case 1:
+                    case 2:
+                        menuCursorNormal(node);
+                        break;
+                    case 3:
+                        fn_800F7434(data->cursorCallback, 0);
+                        break;
+                    case 4:
+                        data->cursorCallback(node);
+                        break;
+                    }
+                }
+                oldPos.packed = node->previousCursor;
+                newPos.packed = node->cursor;
+                if (oldPos.pos.x != newPos.pos.x ||
+                    oldPos.pos.y != newPos.pos.y) {
+                    void* sound;
+                    MenuDaemonData* soundData;
+                    u16 se;
+
+                    windowCreateCursorSprite(node);
+                    soundData = menuDataBiosGetPtr(node->id);
+                    sound = menuSeBiosGetPtr(soundData->soundGroup & 7);
+                    if (sound != NULL) {
+                        se = fn_8005D798(sound, 1);
+                        if (se != 0) {
+                            fn_80166A28(se);
+                        }
+                    }
+                }
+                    break;
+                case 3:
+                    break;
+                }
+            }
+        }
+
+        if ((node->flags & 4) != 0) {
+            winSeqMoveMenu(node);
+            if (data->tickCallback != NULL) {
+                for (i = 0; i < fn_800D3088(); i++) {
+                    data->tickCallback(node);
+                }
+            }
+        }
+    }
+
+    for (node = system->head; node != NULL; node = node->next) {
+        if (node->phase == 4) {
+            windowCloseMain(node);
+        }
+    }
+
+    for (node = system->head; node != NULL; node = node->next) {
+        if (doFade != 0 && node->fadePriority >= 0x50) {
+            doFade = 0;
+            fadeDaemon();
+            fn_800D9ED8(1);
+        }
+        if ((node->flags & 2) != 0) {
+            fn_800FE6D0(node->x, node->y);
+            fn_800FE35C();
+            spriteSetEnv();
+            for (sprite = node->sprites; sprite != NULL;
+                 sprite = *(void**)sprite) {
+                winSpriteDraw(node, sprite);
+            }
+            for (sprite = node->overlaySprites; sprite != NULL;
+                 sprite = *(void**)sprite) {
+                winSpriteDraw(node, sprite);
+            }
+            data = menuDataBiosGetPtr(node->id);
+            if (data->drawCallback != NULL) {
+                data->drawCallback(node);
+            }
+        }
+    }
+
+    fn_800FE6D0(0, 0);
+    fn_800FE35C();
+    fn_800DA4C4(1, 6, 7);
+    if (doFade != 0) {
+        fadeDaemon();
+    }
+    fn_800D9ED8(0);
+    fn_800D9E4C(1);
+}
+#pragma pop
+
+
 /* 0x80102ED4 | 0x64 */
 #pragma push
 #pragma peephole off
@@ -725,6 +1015,292 @@ void menuButtonNormal(void* p) {
     }
 }
 #pragma pop
+
+/* 0x80102F38 | 0x54C */
+typedef struct MenuCursorItem {
+    u8 flags;
+    u8 pad01;
+    s16 x;
+    s16 y;
+    u8 pad06[0x12];
+    s16 next;
+} MenuCursorItem;
+
+#define MENU_ITEM_SELECTABLE(item) ((((item)->flags >> 7) & 1) != 0)
+#define MENU_ITEM_END(item) ((((item)->flags >> 6) & 1) != 0)
+
+void menuCursorNormal(void* p) {
+    u8* window;
+    u8* data;
+    MenuCursorItem* current;
+    MenuCursorItem* item;
+    u16 repeat;
+    s32 isMode2;
+    s32 up;
+    s32 down;
+    s32 left;
+    s32 right;
+    s32 xTol;
+    s32 yTol;
+    s32 best;
+    s32 index;
+    s32 delta;
+    s32 cross;
+
+    window = p;
+    isMode2 = 0;
+    if (window == 0) {
+        return;
+    }
+
+    if (window[0x1A] == 2) {
+        isMode2 = 1;
+    }
+
+    data = menuDataBiosGetPtr(*(u32*)(window + 4));
+    current = (MenuCursorItem*)windowGetCursorToItem(window);
+    if (current == 0) {
+        window[0x95] = 0;
+        return;
+    }
+
+    repeat = *(u16*)((u8*)windowGetKeyInfo() + 6);
+    up = repeat & 1;
+    down = repeat & 2;
+    left = repeat & 4;
+    right = repeat & 8;
+
+    xTol = 0x10;
+    yTol = 0x0C;
+    for (;;) {
+        item = (MenuCursorItem*)menuItemBiosGetPtr(*(s16*)(data + 4));
+        index = 0;
+
+        if (up != 0) {
+            best = 0x1E0;
+            for (;;) {
+                if (MENU_ITEM_SELECTABLE(item)) {
+                    delta = current->y - item->y;
+                    if (delta > 0) {
+                        cross = item->x - current->x;
+                        if (cross < 0) {
+                            cross = -cross;
+                        }
+                        if (cross < xTol && delta < best) {
+                            best = delta;
+                            window[0x95] = index;
+                        }
+                    }
+                    index++;
+                }
+                if (MENU_ITEM_END(item)) {
+                    break;
+                }
+                item = (MenuCursorItem*)menuItemBiosGetPtr(item->next);
+            }
+        } else if (down != 0) {
+            best = 0x1E0;
+            for (;;) {
+                if (MENU_ITEM_SELECTABLE(item)) {
+                    delta = item->y - current->y;
+                    if (delta > 0) {
+                        cross = item->x - current->x;
+                        if (cross < 0) {
+                            cross = -cross;
+                        }
+                        if (cross < xTol && delta < best) {
+                            best = delta;
+                            window[0x95] = index;
+                        }
+                    }
+                    index++;
+                }
+                if (MENU_ITEM_END(item)) {
+                    break;
+                }
+                item = (MenuCursorItem*)menuItemBiosGetPtr(item->next);
+            }
+        } else if (left != 0) {
+            best = 0x280;
+            for (;;) {
+                if (MENU_ITEM_SELECTABLE(item)) {
+                    delta = current->x - item->x;
+                    if (delta > 0) {
+                        cross = item->y - current->y;
+                        if (cross < 0) {
+                            cross = -cross;
+                        }
+                        if (cross < yTol && delta < best) {
+                            best = delta;
+                            window[0x95] = index;
+                        }
+                    }
+                    index++;
+                }
+                if (MENU_ITEM_END(item)) {
+                    break;
+                }
+                item = (MenuCursorItem*)menuItemBiosGetPtr(item->next);
+            }
+        } else if (right != 0) {
+            best = 0x280;
+            for (;;) {
+                if (MENU_ITEM_SELECTABLE(item)) {
+                    delta = item->x - current->x;
+                    if (delta > 0) {
+                        cross = item->y - current->y;
+                        if (cross < 0) {
+                            cross = -cross;
+                        }
+                        if (cross < yTol && delta < best) {
+                            best = delta;
+                            window[0x95] = index;
+                        }
+                    }
+                    index++;
+                }
+                if (MENU_ITEM_END(item)) {
+                    break;
+                }
+                item = (MenuCursorItem*)menuItemBiosGetPtr(item->next);
+            }
+        }
+
+        if ((s8)window[0x97] != (s8)window[0x95]) {
+            break;
+        }
+
+        xTol += 0x10;
+        yTol += 0x0C;
+        if (xTol >= 0x280) {
+            xTol = 0x280;
+        }
+        if (yTol >= 0x1E0) {
+            yTol = 0x1E0;
+        }
+        if (xTol == 0x280 && yTol == 0x1E0) {
+            break;
+        }
+    }
+
+    if ((u16)isMode2 == 0) {
+        return;
+    }
+
+    xTol = 0x10;
+    yTol = 0x0C;
+    for (;;) {
+        if ((s8)window[0x97] != (s8)window[0x95]) {
+            return;
+        }
+
+        item = (MenuCursorItem*)menuItemBiosGetPtr(*(s16*)(data + 4));
+        index = 0;
+
+        if (up != 0) {
+            best = 0;
+            for (;;) {
+                if (MENU_ITEM_SELECTABLE(item)) {
+                    delta = item->y - current->y;
+                    if (delta > 0) {
+                        cross = item->x - current->x;
+                        if (cross < 0) {
+                            cross = -cross;
+                        }
+                        if (cross < xTol && best < delta) {
+                            best = delta;
+                            window[0x95] = index;
+                        }
+                    }
+                    index++;
+                }
+                if (MENU_ITEM_END(item)) {
+                    break;
+                }
+                item = (MenuCursorItem*)menuItemBiosGetPtr(item->next);
+            }
+        } else if (down != 0) {
+            best = 0;
+            for (;;) {
+                if (MENU_ITEM_SELECTABLE(item)) {
+                    delta = current->y - item->y;
+                    if (delta > 0) {
+                        cross = item->x - current->x;
+                        if (cross < 0) {
+                            cross = -cross;
+                        }
+                        if (cross < xTol && best < delta) {
+                            best = delta;
+                            window[0x95] = index;
+                        }
+                    }
+                    index++;
+                }
+                if (MENU_ITEM_END(item)) {
+                    break;
+                }
+                item = (MenuCursorItem*)menuItemBiosGetPtr(item->next);
+            }
+        } else if (left != 0) {
+            best = 0;
+            for (;;) {
+                if (MENU_ITEM_SELECTABLE(item)) {
+                    delta = item->x - current->x;
+                    if (delta > 0) {
+                        cross = item->y - current->y;
+                        if (cross < 0) {
+                            cross = -cross;
+                        }
+                        if (cross < yTol && best < delta) {
+                            best = delta;
+                            window[0x95] = index;
+                        }
+                    }
+                    index++;
+                }
+                if (MENU_ITEM_END(item)) {
+                    break;
+                }
+                item = (MenuCursorItem*)menuItemBiosGetPtr(item->next);
+            }
+        } else if (right != 0) {
+            best = 0;
+            for (;;) {
+                if (MENU_ITEM_SELECTABLE(item)) {
+                    delta = current->x - item->x;
+                    if (delta > 0) {
+                        cross = item->y - current->y;
+                        if (cross < 0) {
+                            cross = -cross;
+                        }
+                        if (cross < yTol && best < delta) {
+                            best = delta;
+                            window[0x95] = index;
+                        }
+                    }
+                    index++;
+                }
+                if (MENU_ITEM_END(item)) {
+                    break;
+                }
+                item = (MenuCursorItem*)menuItemBiosGetPtr(item->next);
+            }
+        }
+
+        xTol += 0x10;
+        yTol += 0x0C;
+        if (xTol >= 0x280) {
+            xTol = 0x280;
+        }
+        if (yTol >= 0x1E0) {
+            yTol = 0x1E0;
+        }
+        if (xTol == 0x280 && yTol == 0x1E0) {
+            break;
+        }
+    }
+}
+
 
 /* 0x80103484 | 0x58 */
 #pragma push
@@ -864,4 +1440,3 @@ void menuInit(void) {
     /* TODO: match -- 400 bytes at 0x80103CD8 */
 }
 #pragma pop
-

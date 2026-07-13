@@ -1128,13 +1128,14 @@ void fn_8003258C(void) {
 #endif
 
 /* 0x800327FC | 0x6DC */
-extern void _fadeEffectGetRandom__FUl(void);
-extern void GScharCpy(void);
-extern u16 pokemonGetStatus(void*, s32, s32, s32);
-extern void fn_80082EA4(void);
-extern void menuIsCheck(void);
-extern void fn_800D37CC(void);
-extern void fn_800D3088(void);
+extern u32 _fadeEffectGetRandom__FUl(u32 range);
+extern void GScharCpy(void* dst, const void* src);
+extern u32 pokemonGetStatus(void*, u32, u32, u32);
+extern void fn_80082EA4(u32, s32, u8, u8);
+extern u32 menuIsCheck(u32);
+extern void _threadSwitch(void);
+extern s32 fn_800D37CC(void);
+extern u32 fn_800D3088(void);
 extern u8 lbl_8047A44A;
 extern u32 lbl_8047A430;
 extern u32 lbl_8047A43C;
@@ -1153,359 +1154,182 @@ extern u8* fn_80032ED8(s32, s32, u8*);
 asm void fn_800327FC(void) {
 #include "src/game/gs_npc_event_fn_800327FC.inc"
 }
-#else
-void fn_800327FC(void) {
-    extern u8 lbl_803A3278[];
-    extern u8 lbl_803A3334[];
-    extern u32 lbl_8047A430;
-    extern u32 lbl_8047A434;
-    extern u32 lbl_8047A43C;
-    extern u8 lbl_8047A448;
-    extern u8 lbl_8047A449;
-    extern u8 lbl_8047A44A;
-    extern u32 lbl_8047A458;
-    extern f32 lbl_8047B9F8;
-    extern f32 lbl_8047BA00;
-    extern f64 lbl_8047BA08;
-    extern f64 lbl_8047BA10;
-    extern f32 lbl_8047BA18;
-    extern void fn_80032ED8();
-    extern void fn_80082EA4();
-    extern void fn_800D3088();
-    extern void fn_800D37CC();
-    extern void _fadeEffectGetRandom__FUl();
-    extern void _threadSwitch();
-    extern void GScharCpy();
-    extern void menuClose();
-    extern void menuIsCheck();
-    extern void menuOpen();
-    extern void pokemonCheckValid();
-    extern void pokemonGetStatus();
-    extern void fadeCheck();
-    extern void fadeSet();
-    u8 sp[0x2C0];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r11 = 0;
-    u32 r12 = 0;
-    u32 r14 = 0;
-    u32 r15 = 0;
-    u32 r16 = 0;
-    u32 r17 = 0;
-    u32 r18 = 0;
-    u32 r19 = 0;
-    u32 r20 = 0;
-    u32 r21 = 0;
-    u32 r22 = 0;
-    u32 r23 = 0;
-    u32 r24 = 0;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f0 = 0.0f;
-    f32 f1 = 0.0f;
-    f32 f4 = 0.0f;
-    f32 f6 = 0.0f;
-    f32 f8 = 0.0f;
-    f32 f27 = 0.0f;
-    f32 f28 = 0.0f;
-    f32 f29 = 0.0f;
-    f32 f30 = 0.0f;
-    f32 f31 = 0.0f;
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
 
-    tmp = lbl_8047A44A;
-    if (tmp != 0) {
-        r4 = lbl_8047A430;
-        r14 = 0x0;
-        tmp = 0xa;
-        ctr_fn = (void(*)(void))tmp;
-        do {
-            r3 = r4 + 0x41e4;
-            do {
-                if (r3 == 0) break;
-                tmp = *(u16*)((u8*)r3 + 0x6);
-                if (tmp == 0) {
-                    tmp = *(u16*)((u8*)r3 + 0x8);
-                    if (tmp == 0) break;
-                }
-                r3 = 0xa - r14;
-                _fadeEffectGetRandom__FUl();
-                r3 = r14 + r3;
-                tmp = lbl_8047A430;
-                r3 = r3 * 0xca;
-                r3 = r3 + 0x41e4;
-                r3 = tmp + r3;
-                break;
-            } while (0);
 
-            r4 = r4 + 0xca;
-            r14 = r14 + 0x1;
-        } while (--ctr != 0);
-
-        tmp = 0x19;
-        r5 = (u32)sp + 0xe0;
-        ctr_fn = (void(*)(void))tmp;
-        do {
-            r3 = *(u32*)((u8*)r4 + 0x4);
-            tmp = *(u32*)((u8*)r4 + 0x8);
-            *(u32*)((u8*)r5 + 0x4) = r3;
-            r5 += 8; *(u32*)r5 = tmp;
-        } while (--ctr != 0);
-        tmp = *(u16*)((u8*)r4 + 0x4);
-        r3 = (u32)sp + 0x14;
-        r4 = (u32)sp + 0xea;
-        *(u16*)((u8*)r5 + 0x4) = tmp;
-        GScharCpy();
-        tmp = 0x0;
-        r15 = *(u16*)(sp + 0x158);
-        *(u16*)(sp + 0x8E) = r3;
-        r15 = *(u16*)(sp + 0x182);
-        *(u16*)(sp + 0xB8) = r3;
-        r15 = *(u16*)(sp + 0x1AC);
-        r16 = *(u8*)(sp + 0xF6);
-        r17 = *(u16*)(sp + 0xF8);
-        r18 = *(u16*)(sp + 0xFA);
-        r19 = *(u16*)(sp + 0xFC);
-        r20 = *(u16*)(sp + 0xFE);
-        r21 = *(u8*)(sp + 0x100);
-        r22 = *(u16*)(sp + 0x102);
-        r23 = *(u8*)(sp + 0x104);
-        r10 = *(u16*)(sp + 0x12E);
-        r3 = r15;
-        *(u8*)(sp + 0x20) = r16;
-        *(u8*)(sp + 0x21) = tmp;
-        *(u8*)(sp + 0x22) = tmp;
-        *(u8*)(sp + 0x23) = tmp;
-        *(u8*)(sp + 0x24) = tmp;
-        *(u16*)(sp + 0x26) = r17;
-        *(u16*)(sp + 0x28) = r18;
-        *(u16*)(sp + 0x2A) = r19;
-        *(u16*)(sp + 0x2C) = r20;
-        *(u16*)(sp + 0x34) = r22;
-        *(u16*)(sp + 0x36) = tmp;
-        *(u8*)(sp + 0x38) = r23;
-        *(u16*)(sp + 0x64) = r10;
-        *(u16*)(sp + 0xE2) = r3;
-        r3 = (u32)lbl_803A3278;
-        lbl_8047A43C = tmp;
-        r6 = (u32)lbl_803A3278;
-        r3 = (u32)sp + 0x14;
-        *(u8*)((u8*)r6 + 0x0) = tmp;
-        r5 = (u32)sp + 0x3c;
-        r4 = 0x209;
-        *(u8*)((u8*)r6 + 0x1) = tmp;
-        *(u8*)((u8*)r6 + 0x2) = tmp;
-        *(u8*)((u8*)r6 + 0x3) = tmp;
-        *(u8*)((u8*)r6 + 0x4) = tmp;
-        *(u8*)((u8*)r6 + 0x5) = tmp;
-        *(u8*)((u8*)r6 + 0x6) = tmp;
-        *(u8*)((u8*)r6 + 0x7) = tmp;
-        *(u8*)((u8*)r6 + 0x8) = tmp;
-        *(u8*)((u8*)r6 + 0x9) = tmp;
-        *(u8*)((u8*)r6 + 0xA) = tmp;
-        *(u8*)((u8*)r6 + 0xB) = tmp;
-        *(u8*)((u8*)r6 + 0xC) = tmp;
-        *(u8*)((u8*)r6 + 0xD) = tmp;
-        *(u8*)((u8*)r6 + 0xE) = tmp;
-        fn_80032ED8();
-        r15 = r3;
-
-    } else {
-        r3 = (u32)lbl_803A3334;
-        r16 = 0x0;
-        r3 = (u32)lbl_803A3334;
-        r15 = 0x1;
-        r19 = *(u8*)((u8*)r3 + 0x24);
-        r17 = r15;
-        r18 = *(u8*)((u8*)r3 + 0x26);
-        r20 = r16;
-        while (1) {
-            tmp = r20 & 0xFFFF;
-            if (tmp >= 6) break;
-            r5 = r20;
-            r3 = 0x0;
-            r4 = 0x3;
-            ((void(*)(void))heroGetStatus)();
-            r14 = r3;
-            pokemonCheckValid();
-            tmp = r3 & 0xFF;
-            if (tmp == 1) {
-                r3 = r14;
-                r4 = 0x0;
-                r5 = 0x7a;
-                r6 = 0x0;
-                pokemonGetStatus();
-                r3 = r3 & 0xFF;
-                tmp = r17 & 0xFF;
-                if (tmp < r3) {
-                    r17 = r3;
-            }
-            }
-            r20 = r20 + 0x1;
-
-        }
-        r3 = (u32)lbl_803A3334;
-        r21 = (u32)sp + 0x8;
-        r14 = (u32)lbl_803A3334;
-        r22 = r17 & 0xFF;
-        r20 = r14;
-        r17 = 0x0;
-        r23 = r21;
-        while (1) {
-            tmp = *(u8*)((u8*)r14 + 0x58);
-            tmp = (s8)tmp;
-            if ((s32)r17 >= (s32)tmp) break;
-            r3 = lbl_8047A434;
-            r5 = r19;
-            r6 = r18;
-            r4 = (s8)r17;
-            fn_80082EA4();
-            tmp = *(u8*)((u8*)r20 + 0x5B);
-            r4 = 0x0;
-            r5 = r4;
-            tmp = (s8)tmp;
-            tmp = tmp * 0x28;
-            r6 = r14 + tmp;
-            while (1) {
-                tmp = r5 & 0xFFFF;
-                if (tmp >= 4) break;
-                r3 = r5 & 0xFFFF;
-                tmp = r3 + 0x3b9;
-                tmp = *(u8*)(r6 + tmp);
-                tmp = (s8)tmp;
-                if ((s32)tmp >= 0) {
-                    r3 = tmp * 0x2a;
-                    tmp = r4 & 0xFF;
-                    r3 = r14 + r3;
-                    r3 = *(u8*)((u8*)r3 + 0x517);
-                    if (tmp < r3) {
-                        r4 = r3;
-                }
-                }
-                r5 = r5 + 0x1;
-
-            }
-            r3 = r4 & 0xFF;
-            tmp = (s8)r16;
-            r3 = r22 - r3;
-            r4 = (s32)r3 >> 31;
-            tmp = tmp << 2;
-            r3 = r4 ^ r3;
-            r3 = r3 - r4;
-            *(u32*)((u8*)r21 + 0x0) = r3;
-            r3 = *(u32*)((u8*)r21 + 0x0);
-            tmp = *(u32*)(r23 + tmp);
-            if ((s32)r3 < (s32)tmp) {
-                r16 = (s8)r17;
-                r15 = 0x1;
-
-            } else {
-                if ((s32)r3 == (s32)tmp) {
-                    r15 = r15 + 0x1;
-                    r3 = r15;
-                    _fadeEffectGetRandom__FUl();
-                    if (r3 == 0) {
-                        r16 = (s8)r17;
-                    }
-                }
-                    }
-            r20 = r20 + 0x1;
-            r21 = r21 + 0x4;
-            r17 = r17 + 0x1;
-
-        }
-        r3 = (u32)lbl_803A3334;
-        tmp = (s8)r16;
-        r6 = (u32)lbl_803A3334;
-        lbl_8047A448 = r16;
-        r4 = r6 + tmp;
-        r3 = (u32)sp + 0x14;
-        tmp = *(u8*)((u8*)r4 + 0x5B);
-        r4 = 0x209;
-        r5 = 0x0;
-        tmp = (s8)tmp;
-        tmp = tmp * 0x28;
-        r16 = r6 + tmp;
-        r15 = *(u32*)((u8*)r16 + 0x3AC);
-        r14 = *(u32*)((u8*)r16 + 0x3B0);
-        r12 = *(u32*)((u8*)r16 + 0x3B4);
-        r11 = *(u32*)((u8*)r16 + 0x3B8);
-        r10 = *(u32*)((u8*)r16 + 0x3BC);
-        r9 = *(u32*)((u8*)r16 + 0x3C0);
-        r8 = *(u32*)((u8*)r16 + 0x3C4);
-        r7 = *(u32*)((u8*)r16 + 0x3C8);
-        r6 = *(u32*)((u8*)r16 + 0x3CC);
-        tmp = *(u32*)((u8*)r16 + 0x3D0);
-        *(u32*)(sp + 0x38) = tmp;
-        fn_80032ED8();
-        r15 = r3;
-    }
-    r3 = 0xa5;
-    menuIsCheck();
-    tmp = r3 & 0xFF;
-    if (tmp != 0) {
-        r3 = 0xa5;
-        menuClose();
-    }
-    f1 = lbl_8047BA00;
-    r3 = 0x2;
-    fadeSet();
-    r3 = 0xa5;
-    r4 = 0x1;
-    menuOpen();
-    r3 = 0x1;
-    fadeCheck();
-    tmp = 0x1;
-    f27 = lbl_8047B9F8;
-    lbl_8047A449 = tmp;
-    f28 = lbl_8047BA08;
-    r14 = 0x43300000;
-    f30 = lbl_8047BA10;
-    f31 = lbl_8047BA18;
-    while (f27 < f31) {
-
-        _threadSwitch();
-        fn_800D37CC();
-        *(u32*)(sp + 0x1B4) = tmp;
-        f29 = f0 - f28;
-        fn_800D3088();
-        f0 = f0 - f30;
-        f0 = f0 / f29;
-        f27 = f27 + f0;
-
-    }
-    if ((s32)r15 != 3) {
-        if ((s32)r15 >= 3) goto L_80032E94;
-        if ((s32)r15 < 2) {
-            goto L_80032E94;
-        }
-        tmp = 0xd;
-        lbl_8047A458 = tmp;
-        return;
-    }
-    tmp = 0xc;
-    lbl_8047A458 = tmp;
-    return;
-L_80032E94:
-    tmp = 0xc;
-    lbl_8047A458 = tmp;
-
-    return;
-}
 #endif
+
+typedef struct NpcEventRosterEntry {
+    u8 data[0xCA];
+} NpcEventRosterEntry;
+
+typedef struct NpcEventDisplayData {
+    u8 data[0xD0];
+} NpcEventDisplayData;
+
+typedef struct NpcEventEncounterData {
+    u8 pad_000[0x24];
+    u8 group;
+    u8 pad_025;
+    u8 variant;
+    u8 pad_027[0x31];
+    s8 candidate_count;
+    u8 pad_059[2];
+    s8 candidate_slots[6];
+} NpcEventEncounterData;
+
+void fn_800327FC(void)
+{
+    NpcEventDisplayData display;
+    s32 result;
+    u32 i;
+
+    if (lbl_8047A44A != 0) {
+        NpcEventRosterEntry selected_record;
+        NpcEventRosterEntry* roster;
+        NpcEventRosterEntry* selected;
+        u32 selected_index;
+
+        roster = (NpcEventRosterEntry*)(lbl_8047A430 + 0x41E4);
+        selected = &roster[9];
+        for (selected_index = 0; selected_index < 10; selected_index++) {
+            NpcEventRosterEntry* candidate = &roster[selected_index];
+            u16* status = (u16*)&candidate->data[6];
+
+            if (status[0] != 0 || status[1] != 0) {
+                selected_index += _fadeEffectGetRandom__FUl(10 - selected_index);
+                selected = &roster[selected_index];
+                break;
+            }
+        }
+
+        selected_record = *selected;
+        GScharCpy(&display, &selected_record.data[6]);
+
+        display.data[0x0C] = selected_record.data[0x12];
+        display.data[0x0D] = 0;
+        display.data[0x0E] = 0;
+        display.data[0x0F] = 0;
+        display.data[0x10] = 0;
+        *(u16*)&display.data[0x12] = *(u16*)&selected_record.data[0x14];
+        *(u16*)&display.data[0x14] = *(u16*)&selected_record.data[0x16];
+        *(u16*)&display.data[0x16] = *(u16*)&selected_record.data[0x18];
+        *(u16*)&display.data[0x18] = *(u16*)&selected_record.data[0x1A];
+        *(u32*)&display.data[0x1C] = selected_record.data[0x1C];
+        *(u16*)&display.data[0x20] = *(u16*)&selected_record.data[0x1E];
+        *(u16*)&display.data[0x22] = 0;
+        display.data[0x24] = selected_record.data[0x20];
+
+        for (i = 0; i < 16; i++) {
+            *(u32*)&display.data[0x28 + i * 4] =
+                *(u32*)&selected_record.data[0x22 + i * 4];
+        }
+        for (i = 0; i < 25; i++) {
+            *(u32*)&display.data[0x6A + i * 4] =
+                *(u32*)&selected_record.data[0x64 + i * 4];
+        }
+        *(u16*)&display.data[0xCE] = *(u16*)&selected_record.data[0xC8];
+
+        lbl_8047A43C = 0;
+        for (i = 0; i < 15; i++) {
+            lbl_803A3278[i] = 0;
+        }
+        result = (s32)fn_80032ED8((s32)&display, 0x209,
+                                  &display.data[0x28]);
+    } else {
+        NpcEventEncounterData* encounter;
+        u32 scores[6];
+        u32 highest_dark_level;
+        s8 selected_index;
+        u32 tie_count;
+        s32 candidate_index;
+
+        encounter = (NpcEventEncounterData*)lbl_803A3334;
+        highest_dark_level = 1;
+        for (i = 0; i < 6; i++) {
+            void* pokemon = (void*)heroGetStatus(0, 3, i);
+
+            if (((u32 (*)(void*))pokemonCheckValid)(pokemon) == 1) {
+                u32 dark_level = pokemonGetStatus(pokemon, 0, 0x7A, 0) & 0xFF;
+                if (highest_dark_level < dark_level) {
+                    highest_dark_level = dark_level;
+                }
+            }
+        }
+
+        selected_index = 0;
+        tie_count = 1;
+        for (candidate_index = 0;
+             candidate_index < encounter->candidate_count;
+             candidate_index++) {
+            s8 roster_slot;
+            u8* roster_data;
+            u32 highest_enemy_level;
+            u32 member;
+
+            fn_80082EA4(lbl_8047A434, candidate_index, encounter->group,
+                        encounter->variant);
+            roster_slot = encounter->candidate_slots[candidate_index];
+            roster_data = lbl_803A3334 + roster_slot * 0x28;
+            highest_enemy_level = 0;
+            for (member = 0; member < 4; member++) {
+                s8 pokemon_index = *(s8*)&roster_data[0x3B9 + member];
+                if (pokemon_index >= 0) {
+                    u8 level = lbl_803A3334[pokemon_index * 0x2A + 0x517];
+                    if (highest_enemy_level < level) {
+                        highest_enemy_level = level;
+                    }
+                }
+            }
+
+            if (highest_dark_level < highest_enemy_level) {
+                scores[candidate_index] = highest_enemy_level - highest_dark_level;
+            } else {
+                scores[candidate_index] = highest_dark_level - highest_enemy_level;
+            }
+            if (scores[candidate_index] < scores[selected_index]) {
+                selected_index = candidate_index;
+                tie_count = 1;
+            } else if (scores[candidate_index] == scores[selected_index]) {
+                tie_count++;
+                if (_fadeEffectGetRandom__FUl(tie_count) == 0) {
+                    selected_index = candidate_index;
+                }
+            }
+        }
+
+        lbl_8047A448 = selected_index;
+        {
+            s8 roster_slot = encounter->candidate_slots[selected_index];
+            u32* source = (u32*)(lbl_803A3334 + roster_slot * 0x28 + 0x3AC);
+            u32* destination = (u32*)&display;
+
+            for (i = 0; i < 10; i++) {
+                destination[i] = source[i];
+            }
+        }
+        result = (s32)fn_80032ED8((s32)&display, 0x209, 0);
+    }
+
+    if ((menuIsCheck(0xA5) & 0xFF) != 0) {
+        ((void (*)(u32))menuClose)(0xA5);
+    }
+    ((void (*)(u32, f32))fadeSet)(2, lbl_8047BA00);
+    ((s32 (*)(u32, u32))menuOpen)(0xA5, 1);
+    ((void (*)(u32))fadeCheck)(1);
+    lbl_8047A449 = 1;
+
+    {
+        f32 elapsed = lbl_8047B9F8;
+        while (elapsed < lbl_8047BA18) {
+            _threadSwitch();
+            elapsed += (f32)fn_800D3088() / (f32)fn_800D37CC();
+        }
+    }
+
+    lbl_8047A458 = result == 2 ? 0xD : 0xC;
+}
+
+
 
 /* 0x80032ED8 | 0x1E0 */
 extern u8*  fightEncountDataBiosGetPtr(s32);

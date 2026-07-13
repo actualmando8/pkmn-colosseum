@@ -26,8 +26,9 @@ void fn_800D0338(s32 chan, u32 command) {
 }
 
 void fn_800D034C(void) {
+    volatile u32* commandRegister;
     u32 command;
 
     command = 0x80000000u;
-    *(volatile u32*)0xCC006438 = command;
+    *(commandRegister = (volatile u32*)0xCC006438) = command;
 }

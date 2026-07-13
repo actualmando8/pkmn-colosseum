@@ -131,6 +131,17 @@ extern void fn_800D67BC(s32);
 extern void fn_800D6680(f32);
 extern void fn_800D5CB8(s32, s32, s32, s32, s32);
 extern void fn_800D6728(void);
+extern void* fn_800F92D4(u32);
+extern void fn_800D85D4(s32, void*);
+extern u16 GStextureGetXsize(void*);
+extern u16 GStextureGetYsize(void*);
+extern void fn_800D59B8(s32, f32, f32);
+extern void fn_800D61E4(s32, s32);
+extern void fn_800E0718(void*, const void*, f32);
+extern void set__5GSvecFfff(void*, f32, f32, f32);
+extern void GSvecTransformQuat(void*, void*, void*);
+extern u8 lbl_8031554C[];
+extern u8 lbl_80314F98[];
 
 /* Forward declarations for functions defined later in this TU */
 extern u8    menuOffScreenCheckEnable(u8 param);
@@ -278,6 +289,307 @@ extern void menuModelRender(void);
 extern s32 menuModelCheck(void* obj, u8 wait);
 extern s32 menuModelFree(void* p);
 
+typedef struct WinSpriteDrawNode {
+    u8 pad_00[4];
+    s8 flags;
+    u8 drawFlags;
+    u8 pad_06[2];
+    u32 primitive;
+    u8 pad_0C[0x48 - 0x0C];
+    void (*drawCallback)(u8*, struct WinSpriteDrawNode*);
+    void* drawArg;
+    s16 x;
+    s16 y;
+    s16 width;
+    s16 height;
+    u32 texture_id;
+    s16 crop_x;
+    s16 crop_y;
+    s16 crop_width;
+    s16 crop_height;
+    u8 color[4];
+    f32 scale_x;
+    f32 scale_y;
+    f32 rotation;
+    u8 kind;
+} WinSpriteDrawNode;
+
+typedef struct WinSpriteVec3 {
+    f32 x;
+    f32 y;
+    f32 z;
+} WinSpriteVec3;
+
+void winSpriteDrawTexture(u8* context, WinSpriteDrawNode* sprite);
+
+#pragma push
+#pragma peephole off
+void winSpriteDraw(u8* context, WinSpriteDrawNode* sprite)
+{
+    extern void fn_800DA100(s32, s32, s32, s32, s32, s32);
+    extern void fn_800FE6D0(s16, s16);
+    extern void spriteSetEnv(void);
+    extern void fn_8001EA98(s16, s16, s16, s16);
+    extern void fn_8001E644(s16, s16, s16, s16, u8);
+    extern void fn_800D5648(f32);
+    extern void fn_800FBB34(s16, s16, s16, s16, u32, void*);
+    extern u8 lbl_80314E08[];
+    u8 red;
+    u8 green;
+    u8 blue;
+    u8 alpha;
+    u8 red2;
+    u8 green2;
+    u8 blue2;
+    u32 color;
+    s32 drawFlag;
+    s32 visible;
+    u32 displayFlag;
+
+    switch (sprite->kind) {
+    case 0:
+        fn_800DA4C4(1, 6, 7);
+        break;
+    case 1:
+        fn_800DA100(1, 6, 0, 1, 0, 0);
+        fn_800DA4C4(1, 4, 0);
+        break;
+    case 2:
+        fn_800DA4C4(1, 6, 1);
+        break;
+    }
+
+    drawFlag = sprite->drawFlags & 8;
+    if (drawFlag != 0) {
+        fn_800FE6D0((s16)(*(s16*)(context + 0x84) + sprite->x),
+                    (s16)(*(s16*)(context + 0x86) + sprite->y));
+        spriteSetEnv();
+        sprite->drawCallback(context, sprite);
+        fn_800FE6D0(*(s16*)(context + 0x84), *(s16*)(context + 0x86));
+        spriteSetEnv();
+        switch (sprite->kind) {
+        case 0:
+            fn_800DA4C4(1, 6, 7);
+            break;
+        case 1:
+            fn_800DA100(1, 6, 0, 1, 0, 0);
+            fn_800DA4C4(1, 4, 0);
+            break;
+        case 2:
+            fn_800DA4C4(1, 6, 1);
+            break;
+        }
+    }
+
+    if (sprite == NULL) {
+        visible = 0;
+    } else {
+        s8 spriteFlags = sprite->flags;
+        if (((s32)spriteFlags & 2) != 0) {
+            visible = 1;
+        } else {
+            visible = 0;
+        }
+    }
+    displayFlag = (u8)visible;
+    if (displayFlag == 0) {
+        return;
+    }
+
+    red = (u8)((sprite->color[0] * context[0x88]) / 255);
+    green = (u8)((sprite->color[1] * context[0x89]) / 255);
+    blue = (u8)((sprite->color[2] * context[0x8A]) / 255);
+    alpha = (u8)((sprite->color[3] * context[0x8B]) / 255);
+    color = (red << 24) | (green << 16) | (blue << 8) | alpha;
+    if (alpha == 0) {
+        return;
+    }
+
+    drawFlag = sprite->drawFlags & 1;
+    if (drawFlag != 0) {
+        winSpriteDrawTexture(context, sprite);
+    }
+
+    drawFlag = sprite->drawFlags & 2;
+    if (drawFlag != 0) {
+        fn_800D88DC(1);
+        fn_800D888C(6);
+        switch (sprite->primitive) {
+        case 0x10000:
+            fn_800D6A00(3);
+            fn_800D7820((s32)lbl_80314E08);
+            fn_800D67BC(3);
+            fn_800D61E4(sprite->x, sprite->y);
+            fn_800D5CB8(0, red, green, blue, alpha);
+            fn_800D61E4((s16)(sprite->x + sprite->crop_x),
+                         (s16)(sprite->y + sprite->crop_y));
+            fn_800D5CB8(0, red, green, blue, alpha);
+            fn_800D61E4((s16)(sprite->x + sprite->width),
+                         (s16)(sprite->y + sprite->height));
+            fn_800D5CB8(0, red, green, blue, alpha);
+            fn_800D6728();
+            break;
+        case 0x10001:
+            fn_8001EA98(sprite->x, sprite->y, sprite->width, sprite->height);
+            break;
+        case 0x10004:
+            fn_8001E644(sprite->x, sprite->y, sprite->width,
+                         sprite->height, alpha);
+            break;
+        case 0x10002:
+            red2 = (u8)(((u16)sprite->crop_x * red) / 255);
+            green2 = (u8)(((u16)sprite->crop_y * green) / 255);
+            blue2 = (u8)(((u16)sprite->crop_width * blue) / 255);
+            fn_800D6A00(7);
+            fn_800D7820((s32)lbl_80314E08);
+            fn_800D67BC(2);
+            fn_800D61E4(sprite->x, sprite->y);
+            fn_800D5CB8(0, red2, green2, blue2, alpha);
+            fn_800D61E4((s16)(sprite->x + sprite->width),
+                         (s16)(sprite->y + sprite->height));
+            fn_800D5CB8(0, red2, green2, blue2, alpha);
+            fn_800D6728();
+            break;
+        case 0x10003:
+            red2 = (u8)(((u16)sprite->crop_x * red) / 255);
+            green2 = (u8)(((u16)sprite->crop_y * green) / 255);
+            blue2 = (u8)(((u16)sprite->crop_width * blue) / 255);
+            fn_800D5648(lbl_8047CE3C);
+            fn_800D6A00(1);
+            fn_800D7820((s32)lbl_80314E08);
+            fn_800D67BC(2);
+            fn_800D61E4(sprite->x, sprite->y);
+            fn_800D5CB8(0, red2, green2, blue2, alpha);
+            fn_800D61E4(sprite->width, sprite->height);
+            fn_800D5CB8(0, red2, green2, blue2, alpha);
+            fn_800D6728();
+            break;
+        }
+    }
+
+    if (sprite->drawArg != NULL) {
+        fn_800FBB34(sprite->x, sprite->y, sprite->width, sprite->height,
+                    color, sprite->drawArg);
+    }
+}
+#pragma pop
+
+
+void winSpriteDrawTexture(u8* context, WinSpriteDrawNode* sprite)
+{
+    f32* tex_v = (f32*)(lbl_80404B68 + 0x48);
+    f32* tex_u = (f32*)(lbl_80404B68 + 0x58);
+    f32* quad_y = (f32*)(lbl_80404B68 + 0x68);
+    f32* quad_x = (f32*)(lbl_80404B68 + 0x78);
+    u8 red;
+    u8 green;
+    u8 blue;
+    u8 alpha;
+    void* texture;
+    s16 left;
+    s16 top;
+    s16 width;
+    s16 height;
+    f32 center_x;
+    f32 center_y;
+    f32 quaternion[4];
+    WinSpriteVec3 point;
+    s32 i;
+
+    red = (u8)((sprite->color[0] * context[0x88]) / 255);
+    green = (u8)((sprite->color[1] * context[0x89]) / 255);
+    blue = (u8)((sprite->color[2] * context[0x8A]) / 255);
+    alpha = (u8)((sprite->color[3] * context[0x8B]) / 255);
+
+    fn_800D88DC(3);
+    fn_800D888C(4);
+    texture = fn_800F92D4(sprite->texture_id);
+    if (texture != 0) {
+        u16 texture_width;
+        u16 texture_height;
+
+        fn_800D85D4(0, texture);
+        width = sprite->width < 0 ? -sprite->width : sprite->width;
+        if (sprite->crop_width != width) {
+            width = sprite->crop_width - 2;
+            left = sprite->crop_x + 1;
+            if (width < 0) {
+                width = 0;
+            }
+        } else {
+            left = sprite->crop_x;
+            width = sprite->crop_width;
+        }
+
+        height = sprite->height < 0 ? -sprite->height : sprite->height;
+        if (sprite->crop_height != height) {
+            height = sprite->crop_height - 2;
+            top = sprite->crop_y + 1;
+            if (height < 0) {
+                height = 0;
+            }
+        } else {
+            top = sprite->crop_y;
+            height = sprite->crop_height;
+        }
+
+        texture_width = GStextureGetXsize(texture);
+        tex_u[0] = tex_u[1] = (f32)left / (f32)texture_width;
+        texture_width = GStextureGetXsize(texture);
+        tex_u[2] = tex_u[3] = (f32)(left + width) / (f32)texture_width;
+        texture_height = GStextureGetYsize(texture);
+        tex_v[0] = tex_v[3] = (f32)(top + height) / (f32)texture_height;
+        texture_height = GStextureGetYsize(texture);
+        tex_v[1] = tex_v[2] = (f32)top / (f32)texture_height;
+    } else {
+        tex_u[0] = tex_u[1] = 0.0f;
+        tex_u[2] = tex_u[3] = 1.0f;
+        tex_v[0] = tex_v[3] = 1.0f;
+        tex_v[1] = tex_v[2] = 0.0f;
+    }
+
+    width = sprite->width < 0 ? -sprite->width : sprite->width;
+    height = sprite->height < 0 ? -sprite->height : sprite->height;
+    center_x = (f32)sprite->x + (f32)width * 0.5f;
+    center_y = (f32)sprite->y + (f32)height * 0.5f;
+
+    if (sprite->width < 0) {
+        quad_x[0] = quad_x[1] = (f32)(sprite->x + width) - center_x;
+        quad_x[2] = quad_x[3] = (f32)sprite->x - center_x;
+    } else {
+        quad_x[0] = quad_x[1] = (f32)sprite->x - center_x;
+        quad_x[2] = quad_x[3] = (f32)(sprite->x + width) - center_x;
+    }
+
+    if (sprite->height < 0) {
+        quad_y[0] = quad_y[3] = (f32)sprite->y - center_y;
+        quad_y[1] = quad_y[2] = (f32)(sprite->y + height) - center_y;
+    } else {
+        quad_y[0] = quad_y[3] = (f32)(sprite->y + height) - center_y;
+        quad_y[1] = quad_y[2] = (f32)sprite->y - center_y;
+    }
+
+    fn_800E0718(quaternion, lbl_8031554C, sprite->rotation);
+    for (i = 0; i < 4; i++) {
+        set__5GSvecFfff(&point, quad_x[i], 0.0f, quad_y[i]);
+        GSvecTransformQuat(&point, quaternion, &point);
+        quad_x[i] = point.x * sprite->scale_x;
+        quad_y[i] = point.z * sprite->scale_y;
+    }
+
+    fn_800D6A00(6);
+    fn_800D7820((s32)lbl_80314F98);
+    fn_800D67BC(4);
+    for (i = 0; i < 4; i++) {
+        fn_800D61E4((s32)(center_x + quad_x[i]),
+                    (s32)(center_y + quad_y[i]));
+        fn_800D5CB8(0, red, green, blue, alpha);
+        fn_800D59B8(0, tex_u[i], tex_v[i]);
+    }
+    fn_800D6728();
+}
+
+
 /* 0x801091F4 | 0x2C | nc_getter_s8 -- returns 1 if bit 1 of ptr[0x4] is set */
 #pragma push
 #pragma peephole off
@@ -385,4 +697,3 @@ void fn_801093C8(void) {
     /* TODO: match -- 668 bytes at 0x801093C8 */
 }
 #pragma pop
-

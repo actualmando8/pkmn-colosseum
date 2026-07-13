@@ -489,20 +489,295 @@ u32 fn_800E0DDC(void) {
 }
 
 
-/* ==================================================================
- * fn_800E1544 -- GSgfx_DrawDispatch
- *
- * Main draw command dispatch function. At 2792 bytes, this is the
- * largest function in the rendering pipeline. It interprets draw
- * commands and submits vertices/primitives to GX.
- * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void GSgfx_DrawDispatch(void* drawList) {
-    /* TODO: match -- 2792 bytes at 0x800E1544 */
+/* Compact the movable allocations in the GS scratch heap. */
+u32 fn_800E1544(void)
+{
+    typedef struct GSFreeBlock {
+        struct GSFreeBlock* prev;
+        struct GSFreeBlock* next;
+        u32 size;
+    } GSFreeBlock;
+    typedef struct GSAllocDesc {
+        u16 used;
+        u16 locked;
+        u8* data;
+        u32 size;
+        u16 pinned;
+        u16 checksum;
+    } GSAllocDesc;
+    extern const char lbl_80270BB8[];
+
+    GSFreeBlock* block;
+    GSFreeBlock* scan;
+    GSFreeBlock* before;
+    GSFreeBlock* after;
+    GSFreeBlock* fresh;
+    GSAllocDesc* desc;
+    GSAllocDesc* candidates[4];
+    GSAllocDesc* chosen[4];
+    u8* source;
+    u8* destination;
+    u32 oldLargest;
+    u32 newLargest;
+    u32 total;
+    u32 bestTotal;
+    u32 remainder;
+    u32 mask;
+    u32 bestMask;
+    u32 candidateCount;
+    u32 chosenCount;
+    u32 i;
+    u32 j;
+    u32 sum;
+    u32 wasHead;
+
+#define COPY_BYTES(dst_, src_, count_)                                     \
+    do {                                                                    \
+        u8* copyDst = (u8*)(dst_);                                         \
+        u8* copySrc = (u8*)(src_);                                         \
+        u32 copyCount = (count_);                                          \
+        if (copyDst < copySrc) {                                           \
+            for (i = 0; i < copyCount; i++) {                             \
+                copyDst[i] = copySrc[i];                                   \
+            }                                                               \
+        } else if (copyDst > copySrc) {                                    \
+            for (i = copyCount; i != 0; i--) {                            \
+                copyDst[i - 1] = copySrc[i - 1];                           \
+            }                                                               \
+        }                                                                   \
+    } while (0)
+
+#define COALESCE_FREE(node_)                                                \
+    do {                                                                    \
+        GSFreeBlock* mergeNode = (node_);                                  \
+        if (mergeNode->next != 0 &&                                        \
+            (u8*)mergeNode + mergeNode->size ==                            \
+                (u8*)mergeNode->next) {                                    \
+            GSFreeBlock* mergeNext = mergeNode->next;                      \
+            mergeNode->size += mergeNext->size;                            \
+            mergeNode->next = mergeNext->next;                             \
+            if (mergeNode->next != 0) {                                    \
+                mergeNode->next->prev = mergeNode;                         \
+            }                                                               \
+        }                                                                   \
+        if (mergeNode->prev != 0 &&                                        \
+            (u8*)mergeNode->prev + mergeNode->prev->size ==                \
+                (u8*)mergeNode) {                                          \
+            GSFreeBlock* mergePrev = mergeNode->prev;                      \
+            mergePrev->size += mergeNode->size;                            \
+            mergePrev->next = mergeNode->next;                             \
+            if (mergePrev->next != 0) {                                    \
+                mergePrev->next->prev = mergePrev;                         \
+            }                                                               \
+        }                                                                   \
+    } while (0)
+
+#define INSERT_FREE(node_)                                                  \
+    do {                                                                    \
+        GSFreeBlock* insertNode = (node_);                                 \
+        before = 0;                                                        \
+        after = (GSFreeBlock*)lbl_8047AB30;                                \
+        while (after != 0 && after < insertNode) {                         \
+            before = after;                                                \
+            after = after->next;                                           \
+        }                                                                   \
+        insertNode->prev = before;                                         \
+        insertNode->next = after;                                          \
+        if (before != 0) {                                                 \
+            before->next = insertNode;                                     \
+        } else {                                                            \
+            lbl_8047AB30 = (u32)insertNode;                                \
+        }                                                                   \
+        if (after != 0) {                                                  \
+            after->prev = insertNode;                                      \
+        }                                                                   \
+        COALESCE_FREE(insertNode);                                         \
+    } while (0)
+
+    oldLargest = 0;
+    for (block = (GSFreeBlock*)lbl_8047AB30; block != 0;
+         block = block->next) {
+        if (oldLargest < block->size) {
+            oldLargest = block->size;
+        }
+    }
+
+    block = (GSFreeBlock*)lbl_8047AB30;
+    while (block != 0 && block->next != 0) {
+        u8* blockEnd = (u8*)block + block->size;
+        if (blockEnd == (u8*)lbl_8047AB38) {
+            block = block->next;
+            continue;
+        }
+
+        desc = (GSAllocDesc*)lbl_8047AB34;
+        while (desc >= (GSAllocDesc*)lbl_8047AB38) {
+            if (desc->used != 0 && desc->data == blockEnd) {
+                break;
+            }
+            desc--;
+        }
+        if (desc < (GSAllocDesc*)lbl_8047AB38) {
+            GSlogWrite(lbl_80270BB8);
+            return 0;
+        }
+
+        if (desc->locked == 0 && desc->pinned == 0) {
+            wasHead = (block == (GSFreeBlock*)lbl_8047AB30);
+            before = block->prev;
+            after = block->next;
+            source = desc->data;
+            destination = (u8*)block;
+            COPY_BYTES(destination, source, desc->size);
+            desc->data = destination;
+
+            fresh = (GSFreeBlock*)(destination + desc->size);
+            fresh->prev = before;
+            fresh->next = after;
+            fresh->size = block->size;
+            if (before != 0) {
+                before->next = fresh;
+            }
+            if (after != 0) {
+                after->prev = fresh;
+            }
+            if (wasHead != 0) {
+                lbl_8047AB30 = (u32)fresh;
+            }
+            COALESCE_FREE(fresh);
+            block = (GSFreeBlock*)lbl_8047AB30;
+            continue;
+        }
+
+        candidateCount = 0;
+        for (desc = (GSAllocDesc*)lbl_8047AB34;
+             desc >= (GSAllocDesc*)lbl_8047AB38; desc--) {
+            if (desc->used == 0 || desc->locked != 0 || desc->pinned != 0 ||
+                desc->data <= (u8*)block || desc->size > block->size) {
+                continue;
+            }
+            if (candidateCount < 4) {
+                candidates[candidateCount++] = desc;
+            } else {
+                bestTotal = 0;
+                bestMask = 0;
+                for (mask = 1; mask < 16; mask++) {
+                    total = 0;
+                    for (i = 0; i < 4; i++) {
+                        if ((mask & (1 << i)) != 0) {
+                            total += candidates[i]->size;
+                        }
+                    }
+                    if (total <= block->size && total > bestTotal) {
+                        bestTotal = total;
+                        bestMask = mask;
+                    }
+                }
+                for (i = 0; i < 4; i++) {
+                    if ((bestMask & (1 << i)) == 0 &&
+                        desc->size > candidates[i]->size) {
+                        candidates[i] = desc;
+                        break;
+                    }
+                }
+            }
+        }
+
+        bestTotal = 0;
+        bestMask = 0;
+        for (mask = 1; mask < (1U << candidateCount); mask++) {
+            total = 0;
+            for (i = 0; i < candidateCount; i++) {
+                if ((mask & (1U << i)) != 0) {
+                    total += candidates[i]->size;
+                }
+            }
+            if (total <= block->size && total > bestTotal) {
+                bestTotal = total;
+                bestMask = mask;
+            }
+        }
+        if (bestMask == 0) {
+            block = block->next;
+            continue;
+        }
+
+        chosenCount = 0;
+        for (i = 0; i < candidateCount; i++) {
+            if ((bestMask & (1U << i)) != 0) {
+                chosen[chosenCount++] = candidates[i];
+            }
+        }
+
+        before = block->prev;
+        after = block->next;
+        remainder = block->size;
+        if (block == (GSFreeBlock*)lbl_8047AB30) {
+            lbl_8047AB30 = (u32)after;
+        }
+        if (before != 0) {
+            before->next = after;
+        }
+        if (after != 0) {
+            after->prev = before;
+        }
+
+        destination = (u8*)block;
+        for (j = 0; j < chosenCount; j++) {
+            desc = chosen[j];
+            source = desc->data;
+            COPY_BYTES(destination, source, desc->size);
+            desc->data = destination;
+
+            fresh = (GSFreeBlock*)source;
+            fresh->size = desc->size;
+            INSERT_FREE(fresh);
+            destination += desc->size;
+            remainder -= desc->size;
+        }
+
+        if (remainder >= sizeof(GSFreeBlock)) {
+            fresh = (GSFreeBlock*)destination;
+            fresh->size = remainder;
+            INSERT_FREE(fresh);
+        } else {
+            desc = chosen[chosenCount - 1];
+            desc->size += remainder;
+            if (*(u8*)&lbl_8047AB28 != 0) {
+                desc->data[0] = 0;
+                desc->data[1] = 0;
+                desc->data[2] = 0;
+                desc->data[3] = 0;
+                desc->data[desc->size - 4] = 0;
+                desc->data[desc->size - 3] = 0;
+                desc->data[desc->size - 2] = 0;
+                desc->data[desc->size - 1] = 0;
+                sum = 0x3D94;
+                for (i = 0; i + 1 < desc->size; i += 2) {
+                    sum += *(u16*)&desc->data[i];
+                }
+                if ((desc->size & 1) != 0) {
+                    sum += desc->data[desc->size - 1];
+                }
+                desc->checksum = (u16)sum;
+            }
+        }
+        block = (GSFreeBlock*)lbl_8047AB30;
+    }
+
+    newLargest = 0;
+    for (scan = (GSFreeBlock*)lbl_8047AB30; scan != 0;
+         scan = scan->next) {
+        if (newLargest < scan->size) {
+            newLargest = scan->size;
+        }
+    }
+
+#undef INSERT_FREE
+#undef COALESCE_FREE
+#undef COPY_BYTES
+    return newLargest - oldLargest;
 }
-#pragma pop
 
 extern u8 lbl_80270658[];
 extern u32 lbl_8047AB30;

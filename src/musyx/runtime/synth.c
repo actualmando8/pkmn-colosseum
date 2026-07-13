@@ -27,7 +27,9 @@ extern void InitStreamBuffers();
 extern void aramQueueCallback();
 extern void aramUploadData();
 extern u16 inpGetMidiCtrl(u8 ctrl, u8 channel, u8 set);
-extern void salCalcVolume(u32 volumeArg, f32* out, u32 voiceIndex, f32 a, f32 b, f32 c, u32 hasPan, u32 studioFlag);
+extern void salCalcVolume(u32 volumeArg, f32* out, u32 pan, u32 surroundPan,
+                          f32 a, f32 b, f32 c, u32 narrowPan,
+                          u32 studioMode);
 extern void salCallback();
 extern u8 jumptable_80369CB0[];
 extern u8 jumptable_80369CD4[];

@@ -332,4 +332,209 @@ void fn_800D377C(s32 mode) {
         break;
     }
 }
+
+/* Initialise the GS graphics core and its default render state. */
+void GSgfxInit__FP15_GSgfxInitParms(u32 heapSize, u32 matrixSize,
+                                    u32 projectionCount, u32 lightCount,
+                                    s32 videoMode, u32 displayListSize)
+{
+    extern void GSmathInit(void);
+    extern void _gfxScratchNotify__F15GSscratchNotifyPvUc(void);
+    extern void* GSscratchAlloc(u32, void*);
+    extern u16 _toolentryAlloc__FUl(u32);
+    extern void* fn_800E27B0(u16);
+    extern void GSlogWrite(const char*, ...);
+    extern void fn_8019C3C4(s32, ...);
+    extern void fn_8019CB70(void);
+    extern void fn_800D37D4(u32, u32, u32, u32, u32, u32);
+    extern void fn_801BF4C4(u32);
+    extern void fn_8019C690(u32, u32);
+    extern void fn_801C021C(void*);
+    extern void fn_801C01C8(void*);
+    extern void fn_80196C3C(void*);
+    extern void fn_800D3F5C(void);
+    extern void fn_800D3F50(void);
+    extern void fn_800D3EC4(void);
+    extern void fn_800D5504(u32);
+    extern void fn_800D83E4(u32);
+    extern void fn_800D7B80(u32);
+    extern void fn_800DB890(u32);
+    extern u32 fn_800D7894(void);
+    extern void fn_800D9D68(u32, u32, u32, u32);
+    extern void fn_800D9C24(u32, u32, u32, u32);
+    extern void fn_800D87AC(s32);
+    extern void fn_800DA2BC(u32, u32, u32);
+    extern void fn_800DA1E8(u32, u32, u32);
+    extern void fn_800DA100(u32, u32, u32, u32, u32, u32);
+    extern void fn_800DA028(u32);
+    extern void fn_800D9F40(u32);
+    extern void fn_800DA08C(u32);
+    extern void fn_800D9ED8(u32);
+    extern void fn_800DC224(u32, u32, u32, u32, u32);
+    extern void fn_800D9BD0(f32, f32, f32, f32);
+    extern void GSgfxBackFBInit__Fv(void);
+    extern u32 lbl_8047AAA0;
+    extern u8 lbl_8047AA9C;
+    extern u32 lbl_8047AA8C;
+    extern u8 lbl_8047AA84;
+    extern u8 lbl_8047AA85;
+    extern u8 lbl_80312D30[];
+    extern u8 lbl_803130F0[];
+    extern u8 lbl_80312F4C[];
+    extern u8 lbl_80466BC0[];
+    extern char lbl_80270360[];
+    extern char lbl_80270388[];
+    extern f32 lbl_8047CA10;
+    extern f32 lbl_8047CA14;
+    extern f32 lbl_8047CA18;
+    extern f32 lbl_8047CA1C;
+
+    u16 handle;
+    /* All known callers pass modes 1-4; the target has no default assignment. */
+    void* renderMode;
+    u32 previousMode;
+    s32 i;
+    u8* display;
+    u32* fifoState;
+    u8* state;
+
+    GSmathInit();
+    state = GSscratchAlloc(3, _gfxScratchNotify__F15GSscratchNotifyPvUc);
+    if (state == 0) {
+        handle = _toolentryAlloc__FUl(0x5A0);
+        if (handle == 0) {
+            GSlogWrite(lbl_80270360);
+            return;
+        }
+        state = fn_800E27B0(handle);
+    }
+
+    lbl_8047AA80 = (u32)state;
+    *(u32*)(state + 0x000) = 2;
+    *(s32*)((u8*)lbl_8047AA80 + 0x004) = -1;
+    *(u32*)((u8*)lbl_8047AA80 + 0x008) = 0x10;
+    *(u32*)((u8*)lbl_8047AA80 + 0x00C) = 0xFEFEFEFE;
+    *(u32*)((u8*)lbl_8047AA80 + 0x010) = 0;
+    *(u32*)((u8*)lbl_8047AA80 + 0x014) = 3;
+    *(u8*)((u8*)lbl_8047AA80 + 0x018) = 0;
+    *(u8*)((u8*)lbl_8047AA80 + 0x019) = 0;
+    *(u8*)((u8*)lbl_8047AA80 + 0x01A) = 0;
+    *(u8*)((u8*)lbl_8047AA80 + 0x01B) = 0;
+    *(u8*)((u8*)lbl_8047AA80 + 0x49C) = 0;
+    *(u8*)((u8*)lbl_8047AA80 + 0x49D) = 0;
+    *(u32*)((u8*)lbl_8047AA80 + 0x020) = 0;
+    *(u32*)((u8*)lbl_8047AA80 + 0x024) = 0;
+    *(u32*)((u8*)lbl_8047AA80 + 0x028) = 0;
+    *(u32*)((u8*)lbl_8047AA80 + 0x02C) = 0;
+    *(u32*)((u8*)lbl_8047AA80 + 0x030) = 0;
+    *(u32*)((u8*)lbl_8047AA80 + 0x034) = 0;
+    *(u32*)((u8*)lbl_8047AA80 + 0x038) = 0;
+    *(u32*)((u8*)lbl_8047AA80 + 0x03C) = 0;
+    *(u32*)((u8*)lbl_8047AA80 + 0x040) = 0;
+    *(u32*)((u8*)lbl_8047AA80 + 0x044) = 0;
+    *(u8*)((u8*)lbl_8047AA80 + 0x47E) = 0;
+    *(u32*)((u8*)lbl_8047AA80 + 0x480) = 0;
+    *(u32*)((u8*)lbl_8047AA80 + 0x484) = 0;
+    *(s32*)((u8*)lbl_8047AA80 + 0x488) = -1;
+    *(u8*)((u8*)lbl_8047AA80 + 0x49F) = 0;
+
+    fifoState = (u32*)lbl_804001F0;
+    fifoState[0] = 0;
+    fifoState[1] = 0;
+    fifoState[2] = 0;
+    fifoState[3] = 0;
+    fifoState[4] = 0;
+    fifoState[5] = 0;
+    fifoState[6] = 0;
+    fifoState[7] = 0;
+    fifoState[8] = 0;
+    fifoState[9] = 0;
+    fifoState[10] = 0;
+    fifoState[11] = 0;
+    fifoState[12] = 0;
+    fifoState[13] = 0;
+    fifoState[14] = 0;
+    fifoState[15] = 0;
+    fifoState[16] = 0;
+    fifoState[17] = 0;
+    fifoState[18] = 0;
+    fifoState[19] = 0;
+    fifoState[20] = 0;
+    fifoState[21] = 0;
+
+    lbl_8047AAA0 = displayListSize;
+    switch (videoMode) {
+    case 1:
+        renderMode = lbl_80312D30;
+        break;
+    case 2:
+    case 3:
+        renderMode = lbl_803130F0;
+        break;
+    case 4:
+        renderMode = lbl_80312F4C;
+        break;
+    default:
+        break;
+    }
+    if (videoMode == 2 || videoMode == 3) {
+        lbl_8047AA9C = 1;
+    } else {
+        lbl_8047AA9C = 0;
+    }
+
+    fn_8019C3C4(1, 2);
+    fn_8019C3C4(4, renderMode);
+    fn_8019CB70();
+    fn_800D37D4(videoMode, 2, 0, 2, 0, 0);
+    fn_801BF4C4(1);
+    fn_8019C690(0, 0);
+
+    *(u32*)((u8*)lbl_8047AA80 + 0x048) = 0;
+    *(u32*)((u8*)lbl_8047AA80 + 0x04C) = 0;
+    *(u32*)((u8*)lbl_8047AA80 + 0x050) = 0;
+    *(u32*)((u8*)lbl_8047AA80 + 0x054) = 0;
+    *(u32*)((u8*)lbl_8047AA80 + 0x058) = 1;
+    *(u8*)((u8*)lbl_8047AA80 + 0x05C) = 1;
+    fn_801C021C(fn_800D3F5C);
+    fn_801C01C8(fn_800D3F50);
+    fn_80196C3C(fn_800D3EC4);
+
+    fn_800D5504(heapSize);
+    fn_800D83E4(matrixSize);
+    fn_800D7B80(projectionCount);
+    fn_800DB890(lightCount);
+    *(u32*)((u8*)lbl_8047AA80 + 0x20) = fn_800D7894();
+
+    display = lbl_80466BC0;
+    previousMode = *(u32*)((u8*)lbl_8047AA80 + 0x00);
+    *(u32*)((u8*)lbl_8047AA80 + 0x00) = 2;
+    fn_800D9D68(0, 0, (u16)(*(u16*)(display + 4) - 1),
+                 (u16)(*(u16*)(display + 6) - 1));
+    fn_800D9C24(0, 0, (u16)(*(u16*)(display + 4) - 1),
+                 (u16)(*(u16*)(display + 6) - 1));
+    fn_800D87AC(-1);
+    fn_800DA2BC(1, 1, 1);
+    fn_800DA1E8(1, 2, 1);
+    fn_800DA100(0, 7, 0, 1, 7, 0);
+    fn_800DA028(2);
+    fn_800D9F40(0);
+    fn_800DA08C(1);
+    fn_800D9ED8(0);
+
+    for (i = 0; i < 0x10; i++) {
+        fn_800DC224(i, 0, i, i, 0);
+    }
+    fn_800D9BD0(lbl_8047CA10, lbl_8047CA14,
+                lbl_8047CA18, lbl_8047CA1C);
+    state = (u8*)lbl_8047AA80;
+    *(u32*)(state + 0x00) = previousMode;
+    lbl_8047AA8C = 0;
+    *(u32*)((u8*)lbl_8047AA80 + 0x00) = 1;
+    GSgfxBackFBInit__Fv();
+    fn_801BF4C4(0);
+    lbl_8047AA84 = 1;
+    lbl_8047AA85 = 0;
+    GSlogWrite(lbl_80270388, lbl_8047AA80, 0x5A0);
+}
 #endif /* !PCPORT */

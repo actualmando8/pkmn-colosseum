@@ -281,6 +281,9 @@ static void PADOriginCallback(s32 chan, u32 error, OSContext *context) {
         u32 data[2];
         UpdateOrigin(lbl_80478A0C);
         rchan = lbl_80478A0C;
+        if ((lbl_8047A8A8 && lbl_8047A8A8) && lbl_8047A8A8) {
+            /* Preserve the original MWCC register allocation. */
+        }
         lbl_8047A8A4 |= (0x80000000u >> rchan);
         SIGetResponse(rchan, data);
         fn_800D0338(rchan, lbl_80478A14 | 0x400000);
@@ -325,13 +328,14 @@ static void fn_800AA73C(s32 chan, u32 error, OSContext *context) {
  */
 static void PADProbeCallback(s32 chan, u32 error, OSContext *context) {
     if (!(error & 0xF)) {
-        s32 rchan = lbl_80478A0C;
+        u32 rchan = lbl_80478A0C;
         u32 data[2];
         lbl_8047A8A4 |= (0x80000000u >> rchan);
         SIGetResponse(rchan, data);
         fn_800D0338(rchan, lbl_80478A14 | 0x400000);
         SIEnablePolling(lbl_8047A8A4);
-        lbl_8047A8B0 |= (0x80000000u >> lbl_80478A0C);
+        /* The comma expression preserves the original MWCC schedule. */
+        lbl_8047A8B0 |= (0x80000000u >> (0, lbl_80478A0C));
     }
 
     /* DoReset() */

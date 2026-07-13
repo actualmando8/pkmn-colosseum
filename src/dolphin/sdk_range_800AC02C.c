@@ -64,11 +64,14 @@ typedef struct DSPRegisters {
 typedef struct CARDControl {
     /* 0x000 */ s32 attached;
     /* 0x004 */ s32 result;
-    /* 0x008 */ u8 _008[0x04];
+    /* 0x008 */ u16 size;
+    /* 0x00A */ u16 pageSize;
     /* 0x00C */ u32 sectorSize;
-    /* 0x010 */ u8 _010[0x14];
+    /* 0x010 */ u16 cBlock;
+    /* 0x012 */ u8 _012[0x12];
     /* 0x024 */ s32 field_24;
-    /* 0x028 */ u8 _028[0x08];
+    /* 0x028 */ s32 formatStep;
+    /* 0x02C */ u32 scramble;
     /* 0x030 */ u8 task[0x50];
     /* 0x080 */ void* workArea;
     /* 0x084 */ void* dirBlock;
@@ -107,8 +110,61 @@ typedef struct CARDDirEntry {
     /* 0x32 */ u16 animationSpeed;
     /* 0x34 */ u8 permission;
     /* 0x35 */ u8 copyTimes;
-    /* 0x36 */ u8 _36[10];
+    /* 0x36 */ u16 startBlock;
+    /* 0x38 */ u16 length;
+    /* 0x3A */ u8 _3A[6];
 } CARDDirEntry;
+
+typedef struct CARDMountControl {
+    u8 _00[8];
+    u16 size;
+    u8 _0A[2];
+    s32 sectorSize;
+    u16 cBlock;
+    u8 _12[2];
+    u32 latency;
+    u8 id[12];
+    s32 mountStep;
+    u8 _28[0x58];
+    void* workArea;
+    u8 _84[0x84];
+    u32 cid;
+    u8 _10C[4];
+} CARDMountControl;
+
+typedef struct CARDID {
+    u8 serial[32];
+    u16 deviceID;
+    u16 size;
+    u16 encode;
+    u8 padding[470];
+    u16 checkSum;
+    u16 checkSumInv;
+} CARDID;
+
+typedef struct CARDDirCheck {
+    u8 padding[0x3A];
+    s16 checkCode;
+    u16 checkSum;
+    u16 checkSumInv;
+} CARDDirCheck;
+
+typedef struct OSSram {
+    u16 checkSum;
+    u16 checkSumInv;
+    u32 ead0;
+    u32 ead1;
+    u32 counterBias;
+    s8 displayOffsetH;
+    u8 ntd;
+    u8 language;
+    u8 flags;
+} OSSram;
+
+typedef struct OSSramEx {
+    u8 flashID[2][12];
+    u8 rest[20];
+} OSSramEx;
 
 typedef struct CARDFileInfo {
     /* 0x00 */ s32 chan;
@@ -121,6 +177,26 @@ typedef struct CARDFileInfo {
 typedef struct GXTlutRegion {
     /* 0x00 */ u8 _00[0x10];
 } GXTlutRegion;
+
+typedef struct GXTexRegion {
+    u32 unk[4];
+} GXTexRegion;
+
+typedef struct GXRenderModeObj {
+    u32 viTVmode;
+    u16 fbWidth;
+    u16 efbHeight;
+    u16 xfbHeight;
+    u16 viXOrigin;
+    u16 viYOrigin;
+    u16 viWidth;
+    u16 viHeight;
+    u32 xfbMode;
+    u8 field_rendering;
+    u8 aa;
+    u8 sample_pattern[12][2];
+    u8 vfilter[7];
+} GXRenderModeObj;
 
 typedef struct GXFifoObj {
     /* 0x00 */ u8* base;
@@ -136,7 +212,9 @@ typedef struct GXFifoObj {
 } GXFifoObj;
 
 typedef struct GXData {
-    /* 0x000 */ u8 _000[0x2D0];
+    /* 0x000 */ u8 _000[0x2C8];
+    /* 0x2C8 */ u32 nextTexRgn;
+    /* 0x2CC */ u32 nextTexRgnCI;
     /* 0x2D0 */ GXTlutRegion defaultTlutRegions[20];
 } GXData;
 
@@ -210,20 +288,29 @@ struct DSPTaskInfo {
     /* 0x3C */ DSPTaskInfo* prev;
     /* 0x40 */ u8 _40[0x10];
 };
+typedef struct CARDDecParam {
+    u8* inputAddr;
+    u32 inputLength;
+    u32 aramAddr;
+    u8* outputAddr;
+} CARDDecParam;
 extern DSPTaskInfo* lbl_8047A964; /* __DSP_last_task */
 extern DSPTaskInfo* lbl_8047A968; /* __DSP_first_task */
 extern DSPTaskInfo* lbl_8047A96C; /* __DSP_curr_task */
+extern s32 lbl_8047A958;          /* __DSP_rude_task_pending */
+extern DSPTaskInfo* lbl_8047A95C; /* __DSP_rude_task */
 extern CARDControl lbl_803FC620[2];
 extern u8 lbl_803FC840[];
+extern u8 lbl_80312800[];
 extern GXData* gx;
 extern u8 lbl_803125E8[];
 extern u8 lbl_803127F0[];
 extern u16 lbl_80478A58;
-extern u32 lbl_80312960[];
+extern s32 lbl_80312960[];
 
-extern s32 CARDCheckExAsync(s32 chan, s32* xferBytes, void* callback);
+extern s32 CARDCheckExAsync(s32 chan, s32* xferBytes, CARDCallback callback);
 extern s32 CARDUnmount(s32 chan);
-extern s32 __CARDFormatRegionAsync(s32 chan, u32 encode, void* callback);
+extern s32 __CARDFormatRegionAsync(s32 chan, u16 encode, CARDCallback callback);
 extern s32 fn_800B57D0(s32 chan, s32 fileNo, CARDDirEntry* entry);
 extern s32 fn_800B588C(s32 chan, s32 fileNo, CARDDirEntry* entry, void* callback);
 extern void __ARQInterruptServiceRoutine(void);
@@ -233,14 +320,205 @@ extern void __DSPHandler(__OSInterrupt interrupt, OSContext* context);
 extern void __DSP_boot_task(DSPTaskInfo* task);
 extern void __DSP_insert_task(DSPTaskInfo* task);
 extern void __DSP_debug_printf(char* fmt, ...);
-extern void fn_8009870C(s32 chan, s32 value);
+extern void __DSP_exec_task(DSPTaskInfo* current, DSPTaskInfo* next);
+extern void __DSP_remove_task(DSPTaskInfo* task);
+extern void fn_8009870C();
 extern BOOL fn_80098944(s32 chan);
 extern void fn_80098AE8(s32 chan);
 extern void OSRegisterVersion(const char* version);
-u32 __CARDGetFontEncode(void);
+u16 __CARDGetFontEncode(void);
 s32 __CARDPutControlBlock(CARDControl* card, s32 result);
 s32 fn_800AFBDC(s32 chan, void* buf, void* callback);
 s32 fn_800AFFE0(s32 chan, u32 addr, void* callback);
+extern s32 __CARDGetControlBlock(s32 chan, CARDControl** pcard);
+extern void* __OSLockSram(void);
+extern void __OSUnlockSram(BOOL commit);
+extern void* __OSLockSramEx(void);
+extern void __OSUnlockSramEx(BOOL commit);
+extern void __CARDCheckSum(void* ptr, u32 length, u16* checksum,
+                           u16* checksumInv);
+extern void FormatCallback(s32 chan, s32 result);
+extern void DCStoreRange(void* addr, u32 length);
+extern s64 OSGetTime(void);
+extern s32 VerifyID(CARDControl* card);
+extern s32 VerifyDir(CARDControl* card, s32* current);
+extern s32 VerifyFAT(CARDControl* card, s32* current);
+extern s32 __CARDUpdateDir(s32 chan, CARDCallback callback);
+extern s32 __CARDUpdateFatBlock(s32 chan, u16* fat, CARDCallback callback);
+extern u32 DummyLen(void);
+extern s32 ReadArrayUnlock(s32 chan, u32 data, void* rbuf, s32 rlen,
+                           s32 mode);
+extern u32 bitrev(u32 data);
+extern void DCFlushRange(void* addr, u32 length);
+extern void DCInvalidateRange(void* addr, u32 length);
+extern DSPTaskInfo* DSPAddTask(DSPTaskInfo* task);
+extern void InitCallback(void* task);
+extern void DoneCallback(void* task);
+
+static inline void cardCheckSumInline(void* ptr, s32 length, u16* checksum,
+                                      u16* checksumInv)
+{
+    u16* p;
+    s32 i;
+
+    length /= sizeof(u16);
+    *checksum = *checksumInv = 0;
+    for (i = 0, p = ptr; i < length; i++, p++) {
+        *checksum += *p;
+        *checksumInv += ~*p;
+    }
+    if (*checksum == 0xFFFF) {
+        *checksum = 0;
+    }
+    if (*checksumInv == 0xFFFF) {
+        *checksumInv = 0;
+    }
+}
+
+static u32 cardExnorFirst(u32 data, u32 rshift) {
+    u32 feedback;
+    u32 work;
+    u32 i;
+
+    work = data;
+    for (i = 0; i < rshift; i++) {
+        feedback = ~(work ^ (work >> 7) ^ (work >> 15) ^ (work >> 23));
+        work = (work >> 1) | ((feedback << 30) & 0x40000000);
+    }
+    return work;
+}
+
+static u32 cardExnor(u32 data, u32 lshift) {
+    u32 feedback;
+    u32 work;
+    u32 i;
+
+    work = data;
+    for (i = 0; i < lshift; i++) {
+        feedback = ~(work ^ (work << 7) ^ (work << 15) ^ (work << 23));
+        work = (work << 1) | ((feedback >> 30) & 2);
+    }
+    return work;
+}
+
+s32 __CARDUnlock(s32 chan, u8 flashID[12]) {
+    u32 initValue;
+    u32 data;
+    s32 dummy;
+    s32 readLength;
+    u32 shift;
+    u32 work;
+    u32 feedback;
+    u32 answer1;
+    u32* words;
+    u8 readBuffer[64];
+    u32 parameter1A;
+    u32 parameter1B;
+    u32 parameter2A;
+    u32 parameter2B;
+    CARDControl* card;
+    DSPTaskInfo* task;
+    CARDDecParam* parameter;
+    u8* input;
+    u8* output;
+
+    card = &lbl_803FC620[chan];
+    task = (DSPTaskInfo*)card->task;
+    parameter = (CARDDecParam*)card->workArea;
+    input = (u8*)parameter + sizeof(CARDDecParam);
+    input = (u8*)(((u32)input + 31) & ~31);
+    output = input + 32;
+
+    lbl_80478A50 = OSGetTick();
+    lbl_80478A50 = lbl_80478A50 * 0x41C64E6D + 0x3039;
+    initValue = 0x7FEC8000;
+    initValue |= (lbl_80478A50 >> 16) & 0x7FFF;
+    initValue &= 0xFFFFF000;
+
+    dummy = DummyLen();
+    readLength = dummy;
+    if (ReadArrayUnlock(chan, initValue, readBuffer, readLength, 0) < 0) {
+        return -3;
+    }
+
+    shift = dummy * 8 + 1;
+    work = cardExnorFirst(initValue, shift);
+    feedback = ~(work ^ (work >> 7) ^ (work >> 15) ^ (work >> 23));
+    card->scramble = work | ((feedback << 31) & 0x80000000);
+    card->scramble = bitrev(card->scramble);
+
+    dummy = DummyLen();
+    readLength = 20 + dummy;
+    data = 0;
+    if (ReadArrayUnlock(chan, data, readBuffer, readLength, 1) < 0) {
+        return -3;
+    }
+
+    words = (u32*)readBuffer;
+    parameter1A = *words++;
+    parameter1B = *words++;
+    answer1 = *words++;
+    parameter2A = *words++;
+    parameter2B = *words++;
+
+    parameter1A ^= card->scramble;
+    work = cardExnor(card->scramble, 32);
+    feedback = ~(work ^ (work << 7) ^ (work << 15) ^ (work << 23));
+    card->scramble = work | ((feedback >> 31) & 1);
+
+    parameter1B ^= card->scramble;
+    work = cardExnor(card->scramble, 32);
+    feedback = ~(work ^ (work << 7) ^ (work << 15) ^ (work << 23));
+    card->scramble = work | ((feedback >> 31) & 1);
+
+    answer1 ^= card->scramble;
+    work = cardExnor(card->scramble, 32);
+    feedback = ~(work ^ (work << 7) ^ (work << 15) ^ (work << 23));
+    card->scramble = work | ((feedback >> 31) & 1);
+
+    parameter2A ^= card->scramble;
+    work = cardExnor(card->scramble, 32);
+    feedback = ~(work ^ (work << 7) ^ (work << 15) ^ (work << 23));
+    card->scramble = work | ((feedback >> 31) & 1);
+
+    parameter2B ^= card->scramble;
+    shift = dummy * 8;
+    work = cardExnor(card->scramble, shift);
+    feedback = ~(work ^ (work << 7) ^ (work << 15) ^ (work << 23));
+    card->scramble = work | ((feedback >> 31) & 1);
+
+    work = cardExnor(card->scramble, 33);
+    feedback = ~(work ^ (work << 7) ^ (work << 15) ^ (work << 23));
+    card->scramble = work | ((feedback >> 31) & 1);
+
+    *(u32*)&input[0] = parameter2A;
+    *(u32*)&input[4] = parameter2B;
+    parameter->inputAddr = input;
+    parameter->inputLength = 8;
+    parameter->outputAddr = output;
+    parameter->aramAddr = 0;
+
+    DCFlushRange(input, 8);
+    DCInvalidateRange(output, 4);
+    DCFlushRange(parameter, sizeof(CARDDecParam));
+
+    task->priority = 255;
+    task->iram_mmem_addr = (u16*)((u32)lbl_80312800 - 0x80000000);
+    task->iram_length = 0x160;
+    task->iram_addr = 0;
+    task->dsp_init_vector = 0x10;
+    task->init_cb = InitCallback;
+    task->res_cb = 0;
+    task->done_cb = DoneCallback;
+    task->req_cb = 0;
+    DSPAddTask(task);
+
+    words = (u32*)flashID;
+    *words++ = parameter1A;
+    *words++ = parameter1B;
+    *words = answer1;
+    return 0;
+}
 
 AIDCallback AIRegisterDMACallback(AIDCallback callback) {
     AIDCallback old = lbl_8047A8CC;
@@ -689,6 +967,145 @@ DSPTaskInfo* DSPAddTask(DSPTaskInfo* task) {
 void __DSP_debug_printf(char* fmt, ...) {
 }
 
+
+
+void __DSPHandler(__OSInterrupt interrupt, OSContext* context)
+{
+    u8 unused[4];
+    OSContext exception_context;
+    u16 control;
+    u32 mail;
+
+    control = DSP_REGS->dmaControl;
+    control = (control & ~0x28) | 0x80;
+    DSP_REGS->dmaControl = control;
+    OSClearContext(&exception_context);
+    OSSetCurrentContext(&exception_context);
+
+    while (fn_800AE7A4() == 0) {
+    }
+    mail = DSPReadMailFromDSP();
+    if ((lbl_8047A96C->flags & 2) && (mail + 0x232F0000) == 2) {
+        mail = 0xDCD10003;
+    }
+
+    switch (mail) {
+    case 0xDCD10000:
+        lbl_8047A96C->state = 1;
+        if (lbl_8047A96C->init_cb != NULL) {
+            lbl_8047A96C->init_cb(lbl_8047A96C);
+        }
+        break;
+    case 0xDCD10001:
+        lbl_8047A96C->state = 1;
+        if (lbl_8047A96C->res_cb != NULL) {
+            lbl_8047A96C->res_cb(lbl_8047A96C);
+        }
+        break;
+    case 0xDCD10002:
+        if (lbl_8047A958) {
+            if (lbl_8047A96C == lbl_8047A95C) {
+                DSPSendMailToDSP(0xCDD10003);
+                while (fn_800AE794() != 0) {
+                }
+                lbl_8047A95C = NULL;
+                lbl_8047A958 = 0;
+                if (lbl_8047A96C->res_cb != NULL) {
+                    lbl_8047A96C->res_cb(lbl_8047A96C);
+                }
+            } else {
+                DSPSendMailToDSP(0xCDD10001);
+                while (fn_800AE794() != 0) {
+                }
+                __DSP_exec_task(lbl_8047A96C, lbl_8047A95C);
+                lbl_8047A96C->state = 2;
+                lbl_8047A96C = lbl_8047A95C;
+                lbl_8047A95C = NULL;
+                lbl_8047A958 = 0;
+            }
+        } else if (lbl_8047A96C->next == NULL) {
+            if (lbl_8047A96C == lbl_8047A968) {
+                DSPSendMailToDSP(0xCDD10003);
+                while (fn_800AE794() != 0) {
+                }
+                if (lbl_8047A96C->res_cb != NULL) {
+                    lbl_8047A96C->res_cb(lbl_8047A96C);
+                }
+            } else {
+                DSPSendMailToDSP(0xCDD10001);
+                while (fn_800AE794() != 0) {
+                }
+                __DSP_exec_task(lbl_8047A96C, lbl_8047A968);
+                lbl_8047A96C->state = 2;
+                lbl_8047A96C = lbl_8047A968;
+            }
+        } else {
+            DSPSendMailToDSP(0xCDD10001);
+            while (fn_800AE794() != 0) {
+            }
+            __DSP_exec_task(lbl_8047A96C, lbl_8047A96C->next);
+            lbl_8047A96C->state = 2;
+            lbl_8047A96C = lbl_8047A96C->next;
+        }
+        break;
+    case 0xDCD10003:
+        if (lbl_8047A958) {
+            if (lbl_8047A96C->done_cb != NULL) {
+                lbl_8047A96C->done_cb(lbl_8047A96C);
+            }
+            DSPSendMailToDSP(0xCDD10001);
+            while (fn_800AE794() != 0) {
+            }
+            __DSP_exec_task(NULL, lbl_8047A95C);
+            __DSP_remove_task(lbl_8047A96C);
+            lbl_8047A96C = lbl_8047A95C;
+            lbl_8047A95C = NULL;
+            lbl_8047A958 = 0;
+        } else if (lbl_8047A96C->next == NULL) {
+            if (lbl_8047A96C == lbl_8047A968) {
+                if (lbl_8047A96C->done_cb != NULL) {
+                    lbl_8047A96C->done_cb(lbl_8047A96C);
+                }
+                DSPSendMailToDSP(0xCDD10002);
+                while (fn_800AE794() != 0) {
+                }
+                lbl_8047A96C->state = 3;
+                __DSP_remove_task(lbl_8047A96C);
+            } else {
+                if (lbl_8047A96C->done_cb != NULL) {
+                    lbl_8047A96C->done_cb(lbl_8047A96C);
+                }
+                DSPSendMailToDSP(0xCDD10001);
+                while (fn_800AE794() != 0) {
+                }
+                lbl_8047A96C->state = 3;
+                __DSP_exec_task(NULL, lbl_8047A968);
+                lbl_8047A96C = lbl_8047A968;
+                __DSP_remove_task(lbl_8047A964);
+            }
+        } else {
+            if (lbl_8047A96C->done_cb != NULL) {
+                lbl_8047A96C->done_cb(lbl_8047A96C);
+            }
+            DSPSendMailToDSP(0xCDD10001);
+            while (fn_800AE794() != 0) {
+            }
+            lbl_8047A96C->state = 3;
+            __DSP_exec_task(NULL, lbl_8047A96C->next);
+            lbl_8047A96C = lbl_8047A96C->next;
+            __DSP_remove_task(lbl_8047A96C->prev);
+        }
+        break;
+    case 0xDCD10004:
+        if (lbl_8047A96C->req_cb != NULL) {
+            lbl_8047A96C->req_cb(lbl_8047A96C);
+        }
+        break;
+    }
+
+    OSClearContext(&exception_context);
+    OSSetCurrentContext(context);
+}
 void __DSP_insert_task(DSPTaskInfo* task) {
     DSPTaskInfo* current;
 
@@ -753,7 +1170,351 @@ void __DSP_remove_task(DSPTaskInfo* task) {
     task->next->prev = task->prev;
 }
 
+
+
+s32 fn_800B31F4(s32 chan)
+{
+    extern s32 lbl_80312960[8];
+    extern u32 lbl_80312980[8];
+    extern u16 lbl_80478A58;
+    extern s32 fn_80099400(s32, s32, u32*);
+    extern s32 IsCard(u32);
+    extern s32 __CARDClearStatus(s32);
+    extern s32 fn_800AF660(s32, u8*);
+    extern s32 fn_80098944(s32);
+    extern s32 __CARDUnlock(s32, u8*);
+    extern s32 __CARDEnableInterrupt(s32, s32);
+    extern void __CARDExiHandler(void);
+    extern void fn_8009870C(s32, void*);
+    extern void EXIUnlock(s32);
+    extern s32 __CARDRead(s32, u32, u32, void*, CARDCallback);
+    extern void __CARDMountCallback(s32, s32);
+    extern void DoUnmount(s32, s32);
+    CARDMountControl* card =
+        (CARDMountControl*)&lbl_803FC620[chan];
+    u32 id;
+    u8 status;
+    s32 result;
+    u8* sram;
+    s32 i;
+    u8 checksum;
+    s32 step;
+
+    if (card->mountStep == 0) {
+        if (fn_80099400(chan, 0, &id) == 0) {
+            result = -3;
+        } else if (IsCard(id)) {
+            result = 0;
+        } else {
+            result = -2;
+        }
+        if (result < 0) {
+            goto error;
+        }
+
+        card->cid = id;
+        card->size = id & 0xFC;
+        card->sectorSize = lbl_80312960[(id & 0x3800) >> 11];
+        card->cBlock = (card->size * 1024 * 1024 / 8) / card->sectorSize;
+        card->latency = lbl_80312980[(id & 0x700) >> 8];
+
+        result = __CARDClearStatus(chan);
+        if (result < 0) {
+            goto error;
+        }
+        result = fn_800AF660(chan, &status);
+        if (result < 0) {
+            goto error;
+        }
+        if (!fn_80098944(chan)) {
+            result = -3;
+            goto error;
+        }
+
+        if (!(status & 0x40)) {
+            result = __CARDUnlock(chan, card->id);
+            if (result < 0) {
+                goto error;
+            }
+            checksum = 0;
+            sram = __OSLockSramEx();
+            for (i = 0; i < 12; i++) {
+                sram[chan * 12 + i] = card->id[i];
+                checksum += card->id[i];
+            }
+            sram[0x26 + chan] = ~checksum;
+            __OSUnlockSramEx(TRUE);
+            return result;
+        }
+
+        card->mountStep = 1;
+        checksum = 0;
+        sram = __OSLockSramEx();
+        for (i = 0; i < 12; i++) {
+            checksum += sram[chan * 12 + i];
+        }
+        __OSUnlockSramEx(FALSE);
+        if (sram[0x26 + chan] != (u8)~checksum) {
+            result = -5;
+            goto error;
+        }
+    }
+
+    if (card->mountStep == 1) {
+        if (card->cid == 0x80000004) {
+            u16 vendor;
+
+            sram = __OSLockSramEx();
+            vendor = *(u16*)&sram[chan * 12];
+            __OSUnlockSramEx(FALSE);
+            if (lbl_80478A58 != 0xFFFF && vendor != lbl_80478A58) {
+                result = -2;
+                goto error;
+            }
+        }
+        card->mountStep = 2;
+        result = __CARDEnableInterrupt(chan, TRUE);
+        if (result < 0) {
+            goto error;
+        }
+        fn_8009870C(chan, __CARDExiHandler);
+        EXIUnlock(chan);
+        DCInvalidateRange(card->workArea, 0xA000);
+    }
+
+    step = card->mountStep - 2;
+    result = __CARDRead(chan, card->sectorSize * step, 0x2000,
+                        (u8*)card->workArea + step * 0x2000,
+                        __CARDMountCallback);
+    if (result < 0) {
+        __CARDPutControlBlock((CARDControl*)card, result);
+    }
+    return result;
+
+error:
+    EXIUnlock(chan);
+    DoUnmount(chan, result);
+    return result;
+}
 void __CARDDefaultApiCallback(s32 chan, s32 result) {
+}
+
+
+s32 __CARDFormatRegionAsync(s32 chan, u16 encode, CARDCallback callback)
+{
+    CARDControl* card;
+    CARDID* id;
+    u8* dir;
+    u16* fat;
+    s16 i;
+    s32 result;
+    OSSram* sram;
+    OSSramEx* sramEx;
+    u16 viDTVStatus;
+    s64 time;
+    s64 rand;
+
+    result = __CARDGetControlBlock(chan, &card);
+    if (result < 0) {
+        return result;
+    }
+
+    id = (CARDID*)card->workArea;
+    memset(id, 0xFF, 0x2000);
+    viDTVStatus = *(volatile u16*)0xCC00206E;
+    id->encode = encode;
+
+    sram = (OSSram*)__OSLockSram();
+    *(u32*)&id->serial[20] = sram->counterBias;
+    *(u32*)&id->serial[24] = sram->language;
+    __OSUnlockSram(FALSE);
+
+    rand = time = OSGetTime();
+
+    sramEx = (OSSramEx*)__OSLockSramEx();
+    for (i = 0; i < 12; i++) {
+        rand = (rand * 1103515245 + 12345) >> 16;
+        id->serial[i] = (u8)(sramEx->flashID[chan][i] + rand);
+        rand = ((rand * 1103515245 + 12345) >> 16) & 0x7FFF;
+    }
+    __OSUnlockSramEx(FALSE);
+
+    *(u32*)&id->serial[28] = viDTVStatus;
+    *(s64*)&id->serial[12] = time;
+    id->deviceID = 0;
+    id->size = card->size;
+    __CARDCheckSum(id, sizeof(CARDID) - sizeof(u32), &id->checkSum,
+                   &id->checkSumInv);
+
+    for (i = 0; i < 2; i++) {
+        CARDDirCheck* check;
+
+        dir = (u8*)card->workArea + (1 + i) * 0x2000;
+        memset(dir, 0xFF, 0x2000);
+        check = (CARDDirCheck*)(dir + 0x1FC0);
+        check->checkCode = i;
+        __CARDCheckSum(dir, 0x1FFC, &check->checkSum,
+                       &check->checkSumInv);
+    }
+
+    for (i = 0; i < 2; i++) {
+        fat = (u16*)((u8*)card->workArea + (3 + i) * 0x2000);
+        memset(fat, 0, 0x2000);
+        fat[2] = (u16)i;
+        fat[3] = (u16)(card->cBlock - 5);
+        fat[4] = 4;
+        __CARDCheckSum(&fat[2], 0x1FFC, &fat[0], &fat[1]);
+    }
+
+    card->apiCallback = callback ? callback : __CARDDefaultApiCallback;
+    DCStoreRange(card->workArea, 0xA000);
+
+    card->formatStep = 0;
+    result = fn_800AFFE0(chan, card->sectorSize * card->formatStep,
+                         FormatCallback);
+    if (result < 0) {
+        __CARDPutControlBlock(card, result);
+    }
+    return result;
+}
+
+
+s32 CARDCheckExAsync(s32 chan, s32* xferBytes, CARDCallback callback)
+{
+    CARDControl* card;
+    CARDDirEntry* dir[2];
+    u16* fat[2];
+    u16* map;
+    s32 result;
+    s32 errors;
+    s32 currentFat;
+    s32 currentDir;
+    s32 fileNo;
+    u16 iBlock;
+    u16 cBlock;
+    u16 cFree;
+    BOOL updateFat = FALSE;
+    BOOL updateDir = FALSE;
+    BOOL updateOrphan = FALSE;
+    volatile u32 stack_pad;
+
+    if (xferBytes != NULL) {
+        *xferBytes = 0;
+    }
+
+    result = __CARDGetControlBlock(chan, &card);
+    if (result < 0) {
+        return result;
+    }
+
+    result = VerifyID(card);
+    if (result < 0) {
+        return __CARDPutControlBlock(card, result);
+    }
+
+    errors = VerifyDir(card, &currentDir);
+    errors += VerifyFAT(card, &currentFat);
+    if (errors > 1) {
+        return __CARDPutControlBlock(card, -6);
+    }
+
+    dir[0] = (CARDDirEntry*)((u8*)card->workArea + 0x2000);
+    dir[1] = (CARDDirEntry*)((u8*)card->workArea + 0x4000);
+    fat[0] = (u16*)((u8*)card->workArea + 0x6000);
+    fat[1] = (u16*)((u8*)card->workArea + 0x8000);
+
+    switch (errors) {
+    case 0:
+        break;
+    case 1:
+        if (card->dirBlock == NULL) {
+            card->dirBlock = dir[currentDir];
+            memcpy(dir[currentDir], dir[currentDir ^ 1], 0x2000);
+            updateDir = TRUE;
+        } else {
+            card->fatBlock = fat[currentFat];
+            memcpy(fat[currentFat], fat[currentFat ^ 1], 0x2000);
+            updateFat = TRUE;
+        }
+        break;
+    }
+
+    map = fat[currentFat ^ 1];
+    memset(map, 0, 0x2000);
+
+    for (fileNo = 0; fileNo < 127; fileNo++) {
+        CARDDirEntry* entry;
+
+        entry = &((CARDDirEntry*)card->dirBlock)[fileNo];
+        if (entry->gameName[0] == 0xFF) {
+            continue;
+        }
+
+        for (iBlock = entry->startBlock, cBlock = 0;
+             iBlock != 0xFFFF && cBlock < entry->length;
+             iBlock = ((u16*)card->fatBlock)[iBlock], cBlock++) {
+            if (iBlock < 5 || iBlock >= card->cBlock ||
+                ++map[iBlock] > 1) {
+                return __CARDPutControlBlock(card, -6);
+            }
+        }
+        if (cBlock != entry->length || iBlock != 0xFFFF) {
+            return __CARDPutControlBlock(card, -6);
+        }
+    }
+
+    cFree = 0;
+    for (iBlock = 5; iBlock < card->cBlock; iBlock++) {
+        u16 nextBlock;
+
+        nextBlock = ((u16*)card->fatBlock)[iBlock];
+        if (map[iBlock] == 0) {
+            if (nextBlock != 0) {
+                ((u16*)card->fatBlock)[iBlock] = 0;
+                updateOrphan = TRUE;
+            }
+            cFree++;
+        } else if ((nextBlock < 5 || nextBlock >= card->cBlock) &&
+                   nextBlock != 0xFFFF) {
+            return __CARDPutControlBlock(card, -6);
+        }
+    }
+
+    if (cFree != ((u16*)card->fatBlock)[3]) {
+        ((u16*)card->fatBlock)[3] = cFree;
+        updateOrphan = TRUE;
+    }
+    if (updateOrphan) {
+        u16* current = card->fatBlock;
+
+        cardCheckSumInline(&current[2], 0x1FFC, &current[0], &current[1]);
+    }
+
+    memcpy(fat[currentFat ^ 1], fat[currentFat], 0x2000);
+
+    if (updateDir) {
+        if (xferBytes != NULL) {
+            *xferBytes = 0x2000;
+        }
+        return __CARDUpdateDir(chan, callback);
+    }
+
+    if (updateFat | updateOrphan) {
+        if (xferBytes != NULL) {
+            *xferBytes = 0x2000;
+        }
+        return __CARDUpdateFatBlock(chan, card->fatBlock, callback);
+    }
+
+    __CARDPutControlBlock(card, 0);
+    if (callback != NULL) {
+        BOOL enabled;
+
+        enabled = OSDisableInterrupts();
+        callback(chan, 0);
+        OSRestoreInterrupts(enabled);
+    }
+    return 0;
 }
 
 void __CARDExtHandler(s32 chan) {
@@ -889,7 +1650,7 @@ s32 CARDFormatAsync(s32 chan, void* callback) {
     return __CARDFormatRegionAsync(chan, __CARDGetFontEncode(), callback);
 }
 
-u32 __CARDGetFontEncode(void) {
+u16 __CARDGetFontEncode(void) {
     return lbl_8047A970;
 }
 
@@ -1104,14 +1865,16 @@ s32 __CARDFreeBlock(s32 chan, u16 block, CARDCallback callback) {
     u16* fat;
     CARDControl* card = &lbl_803FC620[chan];
     u16 next;
-    extern s32 __CARDUpdateFatBlock(s32 chan, u16* fat, CARDCallback callback);
+extern s32 __CARDUpdateFatBlock(s32 chan, u16* fat, CARDCallback callback);
+
+
 
     if (card->attached == 0) {
         return -3;
     }
     fat = card->fatBlock;
     while (block != 0xffff) {
-        if (block < 5 || block >= *(u16*)&card->_010[0]) {
+        if (block < 5 || block >= card->cBlock) {
             return -6;
         }
         next = fat[block];
@@ -1666,6 +2429,408 @@ GXTlutRegion* __GXDefaultTlutRegionCallback(u32 index) {
         region = &gx->defaultTlutRegions[index];
     }
     return region;
+}
+
+
+void __GXInitGX(void) {
+    extern GXRenderModeObj lbl_80312D30;
+    extern GXRenderModeObj lbl_80312F4C;
+    extern GXRenderModeObj lbl_803130F0;
+    extern GXRenderModeObj lbl_80313294;
+    extern u8 lbl_803129E4[];
+    extern void fn_800B5C5C();
+    extern void fn_800B9BDC();
+    extern void fn_800B857C();
+    extern void fn_800B884C();
+    extern void fn_800B7D3C();
+    extern void fn_800B856C();
+    extern void fn_800B84E0();
+    extern void fn_800B80CC();
+    extern void fn_800B9404();
+    extern void fn_800B944C();
+    extern void fn_800B9494();
+    extern void GXLoadPosMtxImm();
+    extern void GXLoadNrmMtxImm();
+    extern void fn_800BD554();
+    extern void GXLoadTexMtxImm();
+    extern void fn_800BD744(f32, f32, f32, f32, f32, f32);
+    extern void fn_800BD394();
+    extern void fn_800B953C();
+    extern void fn_800B94F0();
+    extern void GXSetClipMode();
+    extern void fn_800BD7A0();
+    extern void fn_800BD830();
+    extern void fn_800BA6B0();
+    extern void fn_800BA6F4();
+    extern void fn_800BA4C8();
+    extern void fn_800BA5BC();
+    extern void GXInvalidateTexAll();
+    extern void fn_800BB2E4();
+    extern void fn_800BB2F8();
+    extern void fn_800BC6F0();
+    extern void fn_800BC8C8();
+    extern void GXSetTevOp();
+    extern void fn_800BC618();
+    extern void fn_800BC66C();
+    extern void fn_800BC454();
+    extern void fn_800BC4C0();
+    extern void fn_800BC52C();
+    extern void fn_800BC580();
+    extern void fn_800BBC34();
+    extern void fn_800BBC0C();
+    extern void fn_800BB97C();
+    extern void fn_800BC8F8(u32, f32, f32, f32, f32, u32);
+    extern void fn_800BCCDC();
+    extern void GXSetBlendMode();
+    extern void fn_800BCE30();
+    extern void fn_800BCE5C();
+    extern void GXSetZMode();
+    extern void fn_800BCEBC();
+    extern void fn_800BCFDC();
+    extern void GXSetDstAlpha();
+    extern void fn_800BCEF4();
+    extern void fn_800BD044();
+    extern void fn_800BD07C();
+    extern void fn_800B959C();
+    extern void fn_800B96BC();
+    extern void fn_800B9B14(f32);
+    extern void fn_800B9874();
+    extern void fn_800B9C44();
+    extern void fn_800B9E6C();
+    extern void fn_800B984C();
+    extern void GXClearBoundingBox();
+    extern void fn_800B8F64();
+    extern void fn_800B8EC0();
+    extern void fn_800B8F94();
+    extern void fn_800B8EDC();
+    extern void fn_800B8E98();
+    extern void fn_800B8EAC();
+    extern void fn_800B8F80();
+    extern void fn_800B8FB0();
+    extern void fn_800BD91C();
+    extern void fn_800BE30C();
+
+    f32 identity[3][4];
+    u32 clear = 0x404040FF;
+    u32 black = 0;
+    u32 white = 0xFFFFFFFF;
+    GXRenderModeObj* rmode;
+    u32 i;
+
+    switch (VIGetTvFormat()) {
+    case 0:
+        rmode = &lbl_80312D30;
+        break;
+    case 1:
+        rmode = &lbl_803130F0;
+        break;
+    case 2:
+        rmode = &lbl_80312F4C;
+        break;
+    case 5:
+        rmode = &lbl_80313294;
+        break;
+    default:
+        rmode = &lbl_80312D30;
+        break;
+    }
+
+    fn_800B9BDC(&clear, 0xFFFFFF);
+    fn_800B857C(0, 1, 4, 0x3C, 0, 0x7D);
+    fn_800B857C(1, 1, 5, 0x3C, 0, 0x7D);
+    fn_800B857C(2, 1, 6, 0x3C, 0, 0x7D);
+    fn_800B857C(3, 1, 7, 0x3C, 0, 0x7D);
+    fn_800B857C(4, 1, 8, 0x3C, 0, 0x7D);
+    fn_800B857C(5, 1, 9, 0x3C, 0, 0x7D);
+    fn_800B857C(6, 1, 10, 0x3C, 0, 0x7D);
+    fn_800B857C(7, 1, 11, 0x3C, 0, 0x7D);
+    fn_800B884C(1);
+    fn_800B7D3C();
+    fn_800B856C();
+    for (i = 9; i <= 24; i++) {
+        fn_800B84E0(i, gx, 0);
+    }
+    for (i = 0; i < 8; i++) {
+        fn_800B80CC(i, lbl_803129E4);
+    }
+    fn_800B9404(6, 0);
+    fn_800B944C(6, 0);
+    for (i = 0; i < 8; i++) {
+        fn_800B9494(i, 0, 0);
+    }
+
+    identity[0][0] = 1.0f;
+    identity[0][1] = 0.0f;
+    identity[0][2] = 0.0f;
+    identity[0][3] = 0.0f;
+    identity[1][0] = 0.0f;
+    identity[1][1] = 1.0f;
+    identity[1][2] = 0.0f;
+    identity[1][3] = 0.0f;
+    identity[2][0] = 0.0f;
+    identity[2][1] = 0.0f;
+    identity[2][2] = 1.0f;
+    identity[2][3] = 0.0f;
+    GXLoadPosMtxImm(identity, 0);
+    GXLoadNrmMtxImm(identity, 0);
+    fn_800BD554(0);
+    GXLoadTexMtxImm(identity, 0x3C, 0);
+    GXLoadTexMtxImm(identity, 0x7D, 0);
+
+    fn_800BD744(0.0f, 0.0f, (f32)rmode->fbWidth,
+                (f32)rmode->xfbHeight, 0.0f, 1.0f);
+    fn_800BD394(0);
+    fn_800B953C(2);
+    fn_800B94F0(1);
+    GXSetClipMode(0);
+    fn_800BD7A0(0, 0, rmode->fbWidth, rmode->efbHeight);
+    fn_800BD830(0, 0);
+    fn_800BA6B0(0);
+    fn_800BA6F4(4, 0, 0, 1, 0, 2, 2);
+    fn_800BA4C8(4, black);
+    fn_800BA5BC(4, white);
+    fn_800BA6F4(5, 0, 0, 1, 0, 2, 2);
+    fn_800BA4C8(5, black);
+    fn_800BA5BC(5, white);
+    GXInvalidateTexAll();
+
+    gx->nextTexRgn = 0;
+    gx->nextTexRgnCI = 0;
+    fn_800BB2E4(fn_800B5C5C);
+    fn_800BB2F8(__GXDefaultTlutRegionCallback);
+
+    fn_800BC6F0(0, 0, 0, 4);
+    fn_800BC6F0(1, 1, 1, 4);
+    fn_800BC6F0(2, 2, 2, 4);
+    fn_800BC6F0(3, 3, 3, 4);
+    fn_800BC6F0(4, 4, 4, 4);
+    fn_800BC6F0(5, 5, 5, 4);
+    fn_800BC6F0(6, 6, 6, 4);
+    fn_800BC6F0(7, 7, 7, 4);
+    fn_800BC6F0(8, 0xFF, 0xFF, 0xFF);
+    fn_800BC6F0(9, 0xFF, 0xFF, 0xFF);
+    fn_800BC6F0(10, 0xFF, 0xFF, 0xFF);
+    fn_800BC6F0(11, 0xFF, 0xFF, 0xFF);
+    fn_800BC6F0(12, 0xFF, 0xFF, 0xFF);
+    fn_800BC6F0(13, 0xFF, 0xFF, 0xFF);
+    fn_800BC6F0(14, 0xFF, 0xFF, 0xFF);
+    fn_800BC6F0(15, 0xFF, 0xFF, 0xFF);
+    fn_800BC8C8(1);
+    GXSetTevOp(0, 3);
+    fn_800BC618(7, 0, 0, 7, 0);
+    fn_800BC66C(0, 0x11, 0);
+    for (i = 0; i < 16; i++) {
+        fn_800BC454(i, 6);
+        fn_800BC4C0(i, 0);
+        fn_800BC52C(i, 0, 0);
+    }
+    fn_800BC580(0, 0, 1, 2, 3);
+    fn_800BC580(1, 0, 0, 0, 3);
+    fn_800BC580(2, 1, 1, 1, 3);
+    fn_800BC580(3, 2, 2, 2, 3);
+    for (i = 0; i < 16; i++) {
+        fn_800BBC34(i);
+    }
+    fn_800BBC0C(0);
+    fn_800BB97C(0, 0, 0);
+    fn_800BB97C(1, 0, 0);
+    fn_800BB97C(2, 0, 0);
+    fn_800BB97C(3, 0, 0);
+
+    fn_800BC8F8(0, 0.0f, 1.0f, 0.1f, 1.0f, black);
+    fn_800BCCDC(0, 0, 0);
+    GXSetBlendMode(0, 4, 5, 0);
+    fn_800BCE30(1);
+    fn_800BCE5C(1);
+    GXSetZMode(1, 3, 1);
+    fn_800BCEBC(1);
+    fn_800BCFDC(1);
+    GXSetDstAlpha(0, 0);
+    fn_800BCEF4(0, 0);
+    fn_800BD044(1, 1);
+    fn_800BD07C(rmode->field_rendering,
+                rmode->viHeight == 2 * rmode->xfbHeight);
+
+    fn_800B959C(0, 0, rmode->fbWidth, rmode->efbHeight);
+    fn_800B96BC(rmode->fbWidth, rmode->efbHeight);
+    fn_800B9B14((f32)rmode->xfbHeight / (f32)rmode->efbHeight);
+    fn_800B9874(3);
+    fn_800B9C44(rmode->aa, rmode->sample_pattern, 1, rmode->vfilter);
+    fn_800B9E6C(0);
+    fn_800B984C(0);
+    GXClearBoundingBox();
+
+    fn_800B8F64(1);
+    fn_800B8EC0(1);
+    fn_800B8F94(0);
+    fn_800B8EDC(0, 0, 1, 15);
+    fn_800B8E98(7, 0);
+    fn_800B8EAC(1);
+    fn_800B8F80(0, 0);
+    fn_800B8FB0(1, 7, 1);
+    fn_800BD91C(0x23, 0x16);
+    fn_800BE30C();
+}
+
+
+void* GXInit(void* base, u32 size) {
+    extern const char* __GXVersion;
+    extern u8 gxData_803FC860[];
+    extern u8 GXResetFuncInfo_80312AD0[];
+    extern u32 __OSBusClock;
+    extern u16* __memReg;
+    extern u16* __peReg;
+    extern u16* __cpReg;
+    extern u32* __piReg;
+    extern void OSRegisterVersion();
+    extern void OSRegisterResetFunction();
+    extern u32 PPCMfhid2();
+    extern void PPCMtwpar();
+    extern void PPCMthid2();
+    extern void GXSetMisc();
+    extern void __GXFifoInit();
+    extern void GXInitFifoBase();
+    extern void GXSetCPUFifo();
+    extern void GXSetGPFifo();
+    extern void __GXPEInit();
+    extern void __GXFlushTextureState();
+    extern void GXInitTexCacheRegion();
+    extern void GXInitTlutRegion();
+    extern void __GXSetTmemConfig();
+
+    volatile u8* fifo8 = (volatile u8*)0xCC008000;
+    volatile u32* fifo32 = (volatile u32*)0xCC008000;
+    u8* state = (u8*)gx;
+    u32 i;
+    u32 reg;
+    u32 freqBase;
+    u32 hid2;
+    u32 half;
+
+    OSRegisterVersion(__GXVersion);
+    state[0x4F0] = 0;
+    state[0x4F1] = 1;
+    state[0x4F2] = 1;
+    *(u32*)(state + 0x4DC) = 0;
+    *(u32*)(state + 0x4E0) = 0;
+    GXSetMisc(1, 0);
+
+    __cpReg = (u16*)0xCC000000;
+    __piReg = (u32*)0xCC003000;
+    __peReg = (u16*)0xCC001000;
+    __memReg = (u16*)0xCC004000;
+    __GXFifoInit();
+    GXInitFifoBase((GXFifoObj*)(gxData_803FC860 + 0x4F8), base, size);
+    GXSetCPUFifo((GXFifoObj*)(gxData_803FC860 + 0x4F8));
+    GXSetGPFifo((GXFifoObj*)(gxData_803FC860 + 0x4F8));
+    if (*(u32*)0x8047A99C == 0) {
+        OSRegisterResetFunction(GXResetFuncInfo_80312AD0);
+        *(u32*)0x8047A99C = 1;
+    }
+    __GXPEInit();
+    hid2 = (u32)PPCMfhid2();
+    PPCMtwpar(0x0C008000);
+    PPCMthid2(hid2 | 0x40000000);
+
+    *(u32*)(state + 0x204) = 0;
+    *(u32*)(state + 0x204) &= 0x00FFFFFF;
+    *(u32*)(state + 0x124) = 0x0F000000;
+    *(u32*)(state + 0x7C) = 0x22000000;
+    for (i = 0; i < 16; i++) {
+        half = i >> 1;
+        *(u32*)(state + 0x130 + i * 4) = 0;
+        *(u32*)(state + 0x170 + i * 4) = 0;
+        *(u32*)(state + 0x100 + half * 4) = 0;
+        *(u32*)(state + 0x49C + i * 4) = 0xFF;
+        *(u32*)(state + 0x130 + i * 4) =
+            (*(u32*)(state + 0x130 + i * 4) & 0x00FFFFFF) |
+            ((0xC0 + i * 2) << 24);
+        *(u32*)(state + 0x170 + i * 4) =
+            (*(u32*)(state + 0x170 + i * 4) & 0x00FFFFFF) |
+            ((0xC1 + i * 2) << 24);
+        *(u32*)(state + 0x1B0 + half * 4) =
+            (*(u32*)(state + 0x1B0 + half * 4) & 0x00FFFFFF) |
+            ((0xF6 + half) << 24);
+        *(u32*)(state + 0x100 + half * 4) =
+            (*(u32*)(state + 0x100 + half * 4) & 0x00FFFFFF) |
+            ((0x28 + half) << 24);
+    }
+    *(u32*)(state + 0x120) = 0x27000000;
+    for (i = 0; i < 8; i++) {
+        *(u32*)(state + 0xB8 + i * 4) = 0x30000000 + i * 0x02000000;
+        *(u32*)(state + 0xD8 + i * 4) = 0x31000000 + i * 0x02000000;
+    }
+    *(u32*)(state + 0xF8) = 0x20000000;
+    *(u32*)(state + 0xFC) = 0x21000000;
+    *(u32*)(state + 0x1D0) = 0x41000000;
+    *(u32*)(state + 0x1D4) = 0x42000000;
+    *(u32*)(state + 0x1D8) = 0x40000000;
+    *(u32*)(state + 0x1DC) = 0x43000000;
+    *(u32*)(state + 0x1FC) &= ~0x01800000;
+    *(u32*)(state + 0x4F4) = 0;
+    state[0x4F3] = 0;
+
+    freqBase = __OSBusClock / 500;
+    __GXFlushTextureState();
+    reg = (freqBase >> 11) | 0x69000400;
+    *fifo8 = 0x61;
+    *fifo32 = reg;
+    __GXFlushTextureState();
+    reg = (freqBase / 0x1080) | 0x46000200;
+    *fifo8 = 0x61;
+    *fifo32 = reg;
+
+    for (i = 0; i < 8; i++) {
+        *(u32*)(state + 0x1C + i * 4) |= 2;
+        *(u32*)(state + 0x3C + i * 4) |= 1;
+        *fifo8 = 8;
+        *fifo8 = i | 0x80;
+        *fifo32 = *(u32*)(state + 0x3C + i * 4);
+    }
+    *fifo8 = 0x10;
+    *fifo32 = 0x1000;
+    *fifo32 = 0x3F;
+    *fifo8 = 0x10;
+    *fifo32 = 0x1012;
+    *fifo32 = 1;
+    *fifo8 = 0x61;
+    *fifo32 = 0x5800000F;
+
+    for (i = 0; i < 8; i++) {
+        GXInitTexCacheRegion((GXTexRegion*)(state + 0x208 + i * 0x10), 0,
+                             i * 0x8000, 0, 0x80000 + i * 0x8000, 0);
+    }
+    for (i = 0; i < 4; i++) {
+        GXInitTexCacheRegion((GXTexRegion*)(state + 0x288 + i * 0x10), 0,
+                             (i * 2 + 8) * 0x8000, 0,
+                             (i * 2 + 9) * 0x8000, 0);
+    }
+    for (i = 0; i < 16; i++) {
+        GXInitTlutRegion((GXTlutRegion*)(state + 0x2D0 + i * 0x10),
+                         0xC0000 + i * 0x2000, 16);
+    }
+    for (i = 0; i < 4; i++) {
+        GXInitTlutRegion((GXTlutRegion*)(state + 0x3D0 + i * 0x10),
+                         0xE0000 + i * 0x8000, 64);
+    }
+
+    __cpReg[3] = 0;
+    *(u32*)(state + 0x4EC) &= ~0x0F000000;
+    *fifo8 = 8;
+    *fifo8 = 0x20;
+    *fifo32 = *(u32*)(state + 0x4EC);
+    *fifo8 = 0x10;
+    *fifo32 = 0x1006;
+    *fifo32 = 0;
+    *fifo8 = 0x61;
+    *fifo32 = 0x23000000;
+    *fifo8 = 0x61;
+    *fifo32 = 0x24000000;
+    *fifo8 = 0x61;
+    *fifo32 = 0x67000000;
+    __GXSetTmemConfig(0);
+    __GXInitGX();
+    return gxData_803FC860 + 0x4F8;
 }
 #pragma peephole reset
 

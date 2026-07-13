@@ -104,11 +104,11 @@ extern s32   menuOpen(s32 slot, s32 p1);       /* Query event state */
 extern void  menuSetPosition(s32 slot, s32 p1, s32 p2);  /* Set event params */
 
 /* Resource management */
-extern void* fightEncountDataBiosGetPtr(void);                   /* Get scene resource table */
+extern void* fightEncountDataBiosGetPtr(u16 id);                   /* Get scene resource table */
 extern void  fightEncountDataBiosSetFightKind(void* tbl, u8 idx);      /* Set resource field 0 */
 extern void  fightEncountDataBiosSetTrainer(void* tbl, u8 idx);      /* Set resource field 1 */
 extern void  fightEncountDataBiosSetFightFloorDataId(void* tbl, u16 val);     /* Set resource field 2 */
-extern void  fightEncountDataBiosGetFightTrainerDataId(void* tbl, s32 slot);    /* Get resource subfield */
+extern u16   fightEncountDataBiosGetFightTrainerDataId(void* tbl, s32 slot);    /* Get resource subfield */
 extern void  fightEncountDataBiosSetFightTrainerDataId(void* tbl, s32 slot, u16 val);  /* Set resource subfield */
 extern void  fightEncountDataBiosSetGSInputDevice(void* tbl, s32 slot, s32 val);  /* Set resource property */
 extern u8    fightEncountDataBiosGetFightKind(void* tbl);              /* Get resource type */
@@ -523,7 +523,7 @@ u8 fn_8000817C(void) {
 }
 
 /* 0x80008868 | 0x3D8 */
-extern void menuDataBiosGetType(void);
+extern u32 menuDataBiosGetType(u32);
 extern void fn_8001EA98(void);
 extern void fn_8001E4B4(void);
 extern void sprintf(void);
@@ -810,370 +810,95 @@ void fn_80008868(void) {
 #endif
 
 /* 0x80008C40 | 0x538 */
-extern void windowGetKeyInfo(void);
-extern void fn_80190528(void);
-extern void fn_801903B0(void);
+extern u8* windowGetKeyInfo(void);
+extern void fn_80190528(u32);
+extern void fn_801903B0(u32);
 extern u32 lbl_80478F98;
 extern u32 lbl_80478F9C;
-#if 1
-#if 0
-asm void fn_80008C40(void) {
-#include "src/game/gs_task_fn_80008C40.inc"
-}
-#endif
-#else
-void fn_80008C40(void) {
-    extern u32 lbl_80478838;
-    extern u32 lbl_80478F98;
-    extern u32 lbl_80478F9C;
-    extern void menuDataBiosGetType();
-    extern void windowGetKeyInfo();
-    extern void fn_801903B0();
-    extern void fn_80190528();
-    u8 sp[0x30];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
+static u16 GStaskGetLinkedEntryId(s32 index) {
+    u8* list;
+    s16 node;
+    s32 i;
 
-    r28 = r3;
-    windowGetKeyInfo();
-    r27 = *(u16*)((u8*)r3 + 0x6);
-    windowGetKeyInfo();
-    r4 = lbl_80478F98;
-    r31 = *(u16*)((u8*)r3 + 0x0);
-    tmp = *(u32*)((u8*)r4 + 0x0);
-    r3 = *(u32*)((u8*)r28 + 0x4);
-    r30 = (s16)tmp;
-    menuDataBiosGetType();
-    r29 = r3 & 0xFF;
-    tmp = (s16)r29;
-    if ((s32)r30 < (s32)tmp) {
-        r29 = r30;
+    if (index < 0) {
+        return 0;
     }
-    r4 = r27 & 0xFFFF;
-    r3 = lbl_80478838;
-    tmp = r4 & 0x1;
-    if ((s32)tmp != 0) {
-        r3 = *(s16*)((u8*)(u32)sp + 0xA);
-        *(u16*)(sp + 0xA) = tmp;
-    } else {
-        /* L_80008CB4 */
-        tmp = r4 & 0x00000002;
-        if ((s32)tmp != 0) {
-            r3 = *(s16*)((u8*)(u32)sp + 0xA);
-            tmp = r3 + 0x1;
-            *(u16*)(sp + 0xA) = tmp;
-        }
+    list = (u8*)lbl_80478F98;
+    if ((u32)index >= *(u32*)list) {
+        return 0;
     }
-    /* L_80008CCC */
-    tmp = r4 & 0x00000004;
-    if ((s32)tmp != 0) {
-        r3 = *(u32*)((u8*)r28 + 0x4);
-        menuDataBiosGetType();
-        r3 = r3 & 0xFF;
-        tmp = *(s16*)((u8*)(u32)sp + 0xA);
-        tmp = tmp - r3;
-        tmp = (s16)tmp;
-        *(u16*)(sp + 0xA) = tmp;
-    } else {
-        /* L_80008CFC */
-        tmp = r4 & 0x00000008;
-        if ((s32)tmp != 0) {
-            r3 = *(u32*)((u8*)r28 + 0x4);
-            menuDataBiosGetType();
-            tmp = *(s16*)((u8*)(u32)sp + 0xA);
-            r3 = r3 & 0xFF;
-            r3 = r3 + tmp;
-            tmp = (s16)tmp;
-            *(u16*)(sp + 0xA) = tmp;
-        }
+
+    node = *(s16*)(list + 4);
+    for (i = 0; i < index; i++) {
+        node = *(s16*)((u8*)lbl_80478F9C + node * 8 + 6);
     }
-    /* L_80008D28 */
-    r4 = *(s16*)((u8*)(u32)sp + 0xA);
-    if ((s32)r4 < 0) {
-        r3 = *(s16*)((u8*)(u32)sp + 0x8);
-        tmp = 0x0;
-        *(u16*)(sp + 0xA) = tmp;
-        r3 = r3 + r4;
-        tmp = (s16)r3;
-        *(u16*)(sp + 0x8) = r3;
-        if ((s32)tmp < 0) {
-            r4 = (s16)r29;
-            tmp = r30 - r4;
-            r3 = (s16)r3;
-            tmp = (s16)tmp;
-            *(u16*)(sp + 0xA) = r3;
-            *(u16*)(sp + 0x8) = tmp;
-        }
-    } else {
-        /* L_80008D74 */
-        r3 = (s16)r29;
-        if ((s32)r4 >= (s32)r3) {
-            r3 = *(s16*)((u8*)(u32)sp + 0x8);
-            tmp = r4 - r5;
-            r3 = r3 + tmp;
-            tmp = (s16)r5;
-            r3 = (s16)r3;
-            *(u16*)(sp + 0xA) = tmp;
-            tmp = r3 + tmp;
-            *(u16*)(sp + 0x8) = r3;
-            if ((s32)tmp >= (s32)r30) {
-                tmp = 0x0;
-                *(u16*)(sp + 0x8) = tmp;
-                *(u16*)(sp + 0xA) = tmp;
-            }
-        }
+    if (index != 0) {
+        node = *(s16*)((u8*)lbl_80478F9C + node * 8 + 6);
     }
-    /* L_80008DB8 */
-    r3 = r31 & 0xFFFF;
-    tmp = r3 & 0x00000080;
-    if ((s32)tmp != 0) {
-    r3 = *(s16*)((u8*)(u32)sp + 0x8);
-    tmp = *(s16*)((u8*)(u32)sp + 0xA);
-    r5 = r3 + tmp;
-    if ((s32)r5 < 0) {
-        tmp = 0x0;
-    } else {
-        r3 = lbl_80478F98;
-        tmp = *(u32*)((u8*)r3 + 0x0);
-        if (r5 >= tmp) {
-            tmp = 0x0;
-        } else {
-    r7 = *(s16*)((u8*)r3 + 0x4);
-    if ((s32)r5 != 0) {
-        r4 = 0x0;
-        if ((s32)tmp > 0) {
-            if ((s32)tmp > 8) {
-                r6 = lbl_80478F9C;
-                tmp = r3 + 0x7;
-                tmp = (u32)tmp >> 3;
-                ctr_fn = (void(*)(void))tmp;
-                if ((s32)r3 > 0) {
-                    do {
-                        tmp = (s16)r7;
-                        r4 = r4 + 0x8;
-                        r3 = tmp << 3;
-                        tmp = r3 + 0x6;
-                        tmp = *(s16*)(r6 + tmp);
-                        r3 = tmp << 3;
-                        tmp = r3 + 0x6;
-                        tmp = *(s16*)(r6 + tmp);
-                        r3 = tmp << 3;
-                        tmp = r3 + 0x6;
-                        tmp = *(s16*)(r6 + tmp);
-                        r3 = tmp << 3;
-                        tmp = r3 + 0x6;
-                        tmp = *(s16*)(r6 + tmp);
-                        r3 = tmp << 3;
-                        tmp = r3 + 0x6;
-                        tmp = *(s16*)(r6 + tmp);
-                        r3 = tmp << 3;
-                        tmp = r3 + 0x6;
-                        tmp = *(s16*)(r6 + tmp);
-                        r3 = tmp << 3;
-                        tmp = r3 + 0x6;
-                        tmp = *(s16*)(r6 + tmp);
-                        r3 = tmp << 3;
-                        tmp = r3 + 0x6;
-                        r7 = *(s16*)(r6 + tmp);
-                    } while (--ctr != 0);
-            }
-            }
-            r6 = lbl_80478F9C;
-            tmp = r3 - r4;
-            ctr_fn = (void(*)(void))tmp;
-            if ((s32)r4 < (s32)r3) {
-                do {
-                    tmp = (s16)r7;
-                    r3 = tmp << 3;
-                    tmp = r3 + 0x6;
-                    r7 = *(s16*)(r6 + tmp);
-                } while (--ctr != 0);
-        }
-        }
-        tmp = (s16)r7;
-        r3 = lbl_80478F9C;
-        tmp = tmp << 3;
-        r3 = r3 + tmp;
-        r7 = *(s16*)((u8*)r3 + 0x6);
-    }
-    tmp = r7 & 0xFFFF;
-        }
-    }
-    /* L_80008EEC */
-    r3 = tmp & 0xFFFF;
-    fn_80190528();
-    } else {
-    /* L_80008EF8 */
-    tmp = r3 & 0x00000040;
-    if ((s32)tmp != 0) {
-    r3 = *(s16*)((u8*)(u32)sp + 0x8);
-    tmp = *(s16*)((u8*)(u32)sp + 0xA);
-    r5 = r3 + tmp;
-    if ((s32)r5 < 0) {
-        tmp = 0x0;
-    } else {
-        r3 = lbl_80478F98;
-        tmp = *(u32*)((u8*)r3 + 0x0);
-        if (r5 >= tmp) {
-            tmp = 0x0;
-        } else {
-    r7 = *(s16*)((u8*)r3 + 0x4);
-    if ((s32)r5 != 0) {
-        r4 = 0x0;
-        if ((s32)tmp > 0) {
-            if ((s32)tmp > 8) {
-                r6 = lbl_80478F9C;
-                tmp = r3 + 0x7;
-                tmp = (u32)tmp >> 3;
-                ctr_fn = (void(*)(void))tmp;
-                if ((s32)r3 > 0) {
-                    do {
-                        tmp = (s16)r7;
-                        r4 = r4 + 0x8;
-                        r3 = tmp << 3;
-                        tmp = r3 + 0x6;
-                        tmp = *(s16*)(r6 + tmp);
-                        r3 = tmp << 3;
-                        tmp = r3 + 0x6;
-                        tmp = *(s16*)(r6 + tmp);
-                        r3 = tmp << 3;
-                        tmp = r3 + 0x6;
-                        tmp = *(s16*)(r6 + tmp);
-                        r3 = tmp << 3;
-                        tmp = r3 + 0x6;
-                        tmp = *(s16*)(r6 + tmp);
-                        r3 = tmp << 3;
-                        tmp = r3 + 0x6;
-                        tmp = *(s16*)(r6 + tmp);
-                        r3 = tmp << 3;
-                        tmp = r3 + 0x6;
-                        tmp = *(s16*)(r6 + tmp);
-                        r3 = tmp << 3;
-                        tmp = r3 + 0x6;
-                        tmp = *(s16*)(r6 + tmp);
-                        r3 = tmp << 3;
-                        tmp = r3 + 0x6;
-                        r7 = *(s16*)(r6 + tmp);
-                    } while (--ctr != 0);
-            }
-            }
-            r6 = lbl_80478F9C;
-            tmp = r3 - r4;
-            ctr_fn = (void(*)(void))tmp;
-            if ((s32)r4 < (s32)r3) {
-                do {
-                    tmp = (s16)r7;
-                    r3 = tmp << 3;
-                    tmp = r3 + 0x6;
-                    r7 = *(s16*)(r6 + tmp);
-                } while (--ctr != 0);
-        }
-        }
-        tmp = (s16)r7;
-        r3 = lbl_80478F9C;
-        tmp = tmp << 3;
-        r3 = r3 + tmp;
-        r7 = *(s16*)((u8*)r3 + 0x6);
-    }
-    tmp = r7 & 0xFFFF;
-        }
-    }
-    /* L_80009028 */
-    r3 = tmp & 0xFFFF;
-    fn_801903B0();
-    }
-    }
-    /* L_80009030 */
-    r3 = *(s16*)((u8*)(u32)sp + 0x8);
-    tmp = *(s16*)((u8*)(u32)sp + 0xA);
-    r5 = r3 + tmp;
-    lbl_80478838 = r4;
-    if ((s32)r5 < 0) {
-        tmp = 0x0;
-    } else {
-        r3 = lbl_80478F98;
-        tmp = *(u32*)((u8*)r3 + 0x0);
-        if (r5 >= tmp) {
-            tmp = 0x0;
-        } else {
-    r7 = *(s16*)((u8*)r3 + 0x4);
-    if ((s32)r5 != 0) {
-        r4 = 0x0;
-        if ((s32)tmp > 0) {
-            if ((s32)tmp > 8) {
-                r6 = lbl_80478F9C;
-                tmp = r3 + 0x7;
-                tmp = (u32)tmp >> 3;
-                ctr_fn = (void(*)(void))tmp;
-                if ((s32)r3 > 0) {
-                    do {
-                        tmp = (s16)r7;
-                        r4 = r4 + 0x8;
-                        r3 = tmp << 3;
-                        tmp = r3 + 0x6;
-                        tmp = *(s16*)(r6 + tmp);
-                        r3 = tmp << 3;
-                        tmp = r3 + 0x6;
-                        tmp = *(s16*)(r6 + tmp);
-                        r3 = tmp << 3;
-                        tmp = r3 + 0x6;
-                        tmp = *(s16*)(r6 + tmp);
-                        r3 = tmp << 3;
-                        tmp = r3 + 0x6;
-                        tmp = *(s16*)(r6 + tmp);
-                        r3 = tmp << 3;
-                        tmp = r3 + 0x6;
-                        tmp = *(s16*)(r6 + tmp);
-                        r3 = tmp << 3;
-                        tmp = r3 + 0x6;
-                        tmp = *(s16*)(r6 + tmp);
-                        r3 = tmp << 3;
-                        tmp = r3 + 0x6;
-                        tmp = *(s16*)(r6 + tmp);
-                        r3 = tmp << 3;
-                        tmp = r3 + 0x6;
-                        r7 = *(s16*)(r6 + tmp);
-                    } while (--ctr != 0);
-            }
-            }
-            r6 = lbl_80478F9C;
-            tmp = r3 - r4;
-            ctr_fn = (void(*)(void))tmp;
-            if ((s32)r4 < (s32)r3) {
-                do {
-                    tmp = (s16)r7;
-                    r3 = tmp << 3;
-                    tmp = r3 + 0x6;
-                    r7 = *(s16*)(r6 + tmp);
-                } while (--ctr != 0);
-        }
-        }
-        tmp = (s16)r7;
-        r3 = lbl_80478F9C;
-        tmp = tmp << 3;
-        r3 = r3 + tmp;
-        r7 = *(s16*)((u8*)r3 + 0x6);
-    }
-    tmp = r7 & 0xFFFF;
-        }
-    }
-    /* L_8000915C */
-    tmp = tmp & 0xFFFF;
-    *(u32*)((u8*)r28 + 0x80) = tmp;
-    return;
+    return (u16)node;
 }
-#endif
+
+void fn_80008C40(u8* window) {
+    u16 repeat;
+    u16 trigger;
+    s16 top;
+    s16 cursor;
+    s16 count;
+    s16 page;
+    s32 value;
+    u32 state;
+
+    repeat = *(u16*)(windowGetKeyInfo() + 6);
+    trigger = *(u16*)(windowGetKeyInfo() + 0);
+    count = (s16)*(u32*)((u8*)lbl_80478F98 + 0);
+    page = (u8)menuDataBiosGetType(*(u32*)(window + 4));
+    if (count < (s16)page) {
+        page = count;
+    }
+
+    state = *(u32*)lbl_80478838;
+    top = (s16)(state >> 16);
+    cursor = (s16)state;
+
+    if (repeat & 1) {
+        cursor--;
+    } else if (repeat & 2) {
+        cursor++;
+    }
+
+    if (repeat & 4) {
+        cursor = (s16)(cursor - ((u8)menuDataBiosGetType(*(u32*)(window + 4)) - 1));
+    } else if (repeat & 8) {
+        cursor = (s16)(cursor + ((u8)menuDataBiosGetType(*(u32*)(window + 4)) - 1));
+    }
+
+    if (cursor < 0) {
+        top = (s16)(top + cursor);
+        cursor = 0;
+        if (top < 0) {
+            cursor = (s16)(page - 1);
+            top = (s16)(count - page);
+        }
+    } else if (cursor >= page) {
+        value = page - 1;
+        top = (s16)(top + (cursor - value));
+        cursor = (s16)value;
+        if (top + cursor >= count) {
+            top = 0;
+            cursor = 0;
+        }
+    }
+
+    value = top + cursor;
+    if (trigger & 0x80) {
+        fn_80190528(GStaskGetLinkedEntryId(value));
+    } else if (trigger & 0x40) {
+        fn_801903B0(GStaskGetLinkedEntryId(value));
+    }
+
+    *(u32*)lbl_80478838 = ((u16)top << 16) | (u16)cursor;
+    *(u32*)(window + 0x80) = GStaskGetLinkedEntryId(top + cursor);
+}
 
 /* ===== Phase 2 recovery stubs ===== */
 
@@ -1183,15 +908,247 @@ extern u32 lbl_80478F50;
 extern u32 lbl_80478F40;
 extern u32 lbl_80478F00;
 extern u32 lbl_80478F48;
-#if 1
-#if 0
-asm s32 fn_80006908(u16 id) {
-#include "src/game/gs_task_fn_80006908.inc"
+typedef struct GsTaskEncounterBackup {
+    u32 words[14];
+} GsTaskEncounterBackup;
+
+#pragma push
+#pragma peephole off
+s32 fn_80006908(u16 id)
+{
+    void* encounter;
+    GsTaskEncounterBackup backup;
+    u32 fightKind;
+    u32 trainer;
+    u32 floor;
+    u32 trainer0;
+    u32 device0;
+    u32 trainer1;
+    u32 device1;
+    u32 trainer2;
+    u32 device2;
+    u32 trainer3;
+    u32 device3;
+    s32 event;
+    s32 value;
+
+    if (id == 0) {
+        return 1;
+    }
+    if (id >= *(u32*)(void*)lbl_80478F50) {
+        return 1;
+    }
+
+    encounter = fightEncountDataBiosGetPtr(id);
+    backup = *(GsTaskEncounterBackup*)encounter;
+
+    for (;;) {
+        value = menuOpenCustom(0xCD, 0, 0, 0, 1, 1, id);
+        if (value == -1) {
+            menuCloseCustom(0xCD, 0, 1);
+            *(GsTaskEncounterBackup*)encounter = backup;
+            return -1;
+        }
+        if (value == -2) {
+            if (menuOpen(0x44, 1) != 0) {
+                menuCloseCustom(0x44, 0, 1);
+                continue;
+            }
+            menuCloseCustom(0x44, 0, 1);
+            break;
+        }
+
+        event = menuGetCursorItemID(0xCD);
+        switch (event) {
+        case 0xD3F:
+            if (menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs(
+                    fightEncountDataBiosGetFightKind(encounter), &fightKind,
+                    _dbgMenuFightGetFightKindDataIdSub) == 0) {
+                value = -1;
+            } else {
+                if (fightKind >= *(u32*)(void*)lbl_80478F40) {
+                    fightKind = *(u32*)(void*)lbl_80478F40 - 1;
+                }
+                menuSubCloseNumberInput();
+                value = fightKind;
+            }
+            if (value >= 0) {
+                fightEncountDataBiosSetFightKind(encounter, (u8)value);
+            }
+            break;
+
+        case 0xD40:
+            if (menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs(
+                    fightEncountDataBiosGetTrainer(encounter), &trainer,
+                    fn_800086EC) == 0) {
+                value = -1;
+            } else {
+                if (trainer >= *(u32*)(void*)lbl_80478F00) {
+                    trainer = *(u32*)(void*)lbl_80478F00 - 1;
+                }
+                menuSubCloseNumberInput();
+                value = trainer;
+            }
+            if (value >= 0) {
+                fightEncountDataBiosSetTrainer(encounter, (u8)value);
+            }
+            break;
+
+        case 0xD41:
+            if (menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs(
+                    fightEncountDataBiosGetFightFloorDataId(encounter), &floor,
+                    _dbgMenuFightGetFightFloorDataIdSub) == 0) {
+                value = -1;
+            } else {
+                if (floor >= *(u32*)(void*)lbl_80478F48) {
+                    floor = *(u32*)(void*)lbl_80478F48 - 1;
+                }
+                menuSubCloseNumberInput();
+                value = floor;
+            }
+            if (value >= 0) {
+                fightEncountDataBiosSetFightFloorDataId(encounter, (u16)value);
+            }
+            break;
+
+        case 0xD42:
+            if (menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs(
+                    fightEncountDataBiosGetFightTrainerDataId(encounter, 0),
+                    &trainer0, fn_8000868C) == 0) {
+                value = -1;
+            } else {
+                if (trainer0 >= lbl_80478F20->count) {
+                    trainer0 = lbl_80478F20->count - 1;
+                }
+                menuSubCloseNumberInput();
+                value = trainer0;
+            }
+            if (value < 0) {
+                break;
+            }
+            fightEncountDataBiosSetFightTrainerDataId(encounter, 0, (u16)value);
+
+            if (menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs(
+                    fightEncountDataBiosGetGSInputDevice(encounter, 0), &device0,
+                    fn_800085D8) == 0) {
+                value = -1;
+            } else {
+                if (device0 >= 5) {
+                    device0 = 4;
+                }
+                menuSubCloseNumberInput();
+                value = device0;
+            }
+            if (value >= 0) {
+                fightEncountDataBiosSetGSInputDevice(encounter, 0, value);
+            }
+            break;
+
+        case 0xD43:
+            if (menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs(
+                    fightEncountDataBiosGetFightTrainerDataId(encounter, 1),
+                    &trainer1, fn_8000868C) == 0) {
+                value = -1;
+            } else {
+                if (trainer1 >= lbl_80478F20->count) {
+                    trainer1 = lbl_80478F20->count - 1;
+                }
+                menuSubCloseNumberInput();
+                value = trainer1;
+            }
+            if (value < 0) {
+                break;
+            }
+            fightEncountDataBiosSetFightTrainerDataId(encounter, 1, (u16)value);
+
+            if (menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs(
+                    fightEncountDataBiosGetGSInputDevice(encounter, 1), &device1,
+                    fn_800085D8) == 0) {
+                value = -1;
+            } else {
+                if (device1 >= 5) {
+                    device1 = 4;
+                }
+                menuSubCloseNumberInput();
+                value = device1;
+            }
+            if (value >= 0) {
+                fightEncountDataBiosSetGSInputDevice(encounter, 1, value);
+            }
+            break;
+
+        case 0xD44:
+            if (menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs(
+                    fightEncountDataBiosGetFightTrainerDataId(encounter, 2),
+                    &trainer2, fn_8000868C) == 0) {
+                value = -1;
+            } else {
+                if (trainer2 >= lbl_80478F20->count) {
+                    trainer2 = lbl_80478F20->count - 1;
+                }
+                menuSubCloseNumberInput();
+                value = trainer2;
+            }
+            if (value < 0) {
+                break;
+            }
+            fightEncountDataBiosSetFightTrainerDataId(encounter, 2, (u16)value);
+
+            if (menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs(
+                    fightEncountDataBiosGetGSInputDevice(encounter, 2), &device2,
+                    fn_800085D8) == 0) {
+                value = -1;
+            } else {
+                if (device2 >= 5) {
+                    device2 = 4;
+                }
+                menuSubCloseNumberInput();
+                value = device2;
+            }
+            if (value >= 0) {
+                fightEncountDataBiosSetGSInputDevice(encounter, 2, value);
+            }
+            break;
+
+        case 0xD45:
+            if (menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs(
+                    fightEncountDataBiosGetFightTrainerDataId(encounter, 3),
+                    &trainer3, fn_8000868C) == 0) {
+                value = -1;
+            } else {
+                if (trainer3 >= lbl_80478F20->count) {
+                    trainer3 = lbl_80478F20->count - 1;
+                }
+                menuSubCloseNumberInput();
+                value = trainer3;
+            }
+            if (value < 0) {
+                break;
+            }
+            fightEncountDataBiosSetFightTrainerDataId(encounter, 3, (u16)value);
+
+            if (menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs(
+                    fightEncountDataBiosGetGSInputDevice(encounter, 3), &device3,
+                    fn_800085D8) == 0) {
+                value = -1;
+            } else {
+                if (device3 >= 5) {
+                    device3 = 4;
+                }
+                menuSubCloseNumberInput();
+                value = device3;
+            }
+            if (value >= 0) {
+                fightEncountDataBiosSetGSInputDevice(encounter, 3, value);
+            }
+            break;
+        }
+    }
+
+    menuCloseCustom(0xCD, 0, 1);
+    return 1;
 }
-#endif
-#else
-s32 fn_80006908(u16 id) { /* TODO */ return 0; }
-#endif
+#pragma pop
 
 /* fn_80006FAC - 0x80006FAC | size: 0xdc */
 extern u32 fn_800F7AF0(s32 port);

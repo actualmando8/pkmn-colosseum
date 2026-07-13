@@ -656,6 +656,129 @@ asm void fn_8002AA68(void) {
 #include "src/game/gs_worldmap_fn_8002AA68.inc"
 }
 #else
+
+s32 fn_8002A618(u8* self)
+{
+    typedef struct ShopNumberContext {
+        s32 minimum;
+        s32 maximum;
+        u32 unused;
+        s32* value;
+    } ShopNumberContext;
+    extern void fn_80166A50(u32, u32, u32, u32);
+
+    ShopNumberContext* context;
+    u16* keyInfo;
+    s32 decimalPlace;
+    s32 factor;
+    s32 i;
+    s32 oldValue;
+    s32 value;
+
+    context = *(ShopNumberContext**)(self + 0x60);
+    keyInfo = windowGetKeyInfo();
+    if ((keyInfo[3] & 0xF) != 0) {
+
+    decimalPlace = 1 - (s8)self[0x95];
+    factor = 1;
+    for (i = 0; i < decimalPlace; i++) {
+        factor *= 10;
+    }
+
+    if ((keyInfo[3] & 1) != 0) {
+        oldValue = *context->value;
+        if (factor < 10) {
+            value = oldValue + factor;
+            *context->value = value;
+            if (value > context->maximum) {
+                *context->value = context->minimum;
+            }
+        } else {
+            s32 quotient;
+            s32 digit;
+            s32 maximumDigit;
+            s32 remainder;
+            s32 nextDigit;
+
+            quotient = oldValue / factor;
+            digit = quotient % 10;
+            remainder = oldValue - digit * factor;
+            for (maximumDigit = 9; maximumDigit >= 0; maximumDigit--) {
+                if (remainder + maximumDigit * factor <= context->maximum) {
+                    break;
+                }
+            }
+            nextDigit = digit + 1;
+            if (nextDigit > maximumDigit) {
+                nextDigit = 0;
+            }
+            value = remainder + nextDigit * factor;
+            *context->value = value;
+            if (value < context->minimum) {
+                *context->value = context->minimum;
+            }
+        }
+        if (oldValue != *context->value) {
+            fn_80166A50(0x23, 0, 0xFF, 0);
+        }
+    }
+
+    if ((keyInfo[3] & 2) != 0) {
+        oldValue = *context->value;
+        if (factor < 10) {
+            value = oldValue - factor;
+            *context->value = value;
+            if (value < context->minimum) {
+                *context->value = context->maximum;
+            }
+        } else {
+            s32 quotient;
+            s32 digit;
+            s32 remainder;
+            s32 maximumDigit;
+            s32 nextDigit;
+
+            quotient = oldValue / factor;
+            digit = quotient % 10;
+            remainder = oldValue - digit * factor;
+            for (maximumDigit = 9; maximumDigit >= 0; maximumDigit--) {
+                if (remainder + maximumDigit * factor <= context->maximum) {
+                    break;
+                }
+            }
+            nextDigit = digit - 1;
+            if (nextDigit < 0) {
+                nextDigit = maximumDigit;
+            }
+            value = remainder + nextDigit * factor;
+            *context->value = value;
+            if (value < context->minimum) {
+                *context->value = context->minimum;
+            }
+        }
+        if (oldValue != *context->value) {
+            fn_80166A50(0x23, 0, 0xFF, 0);
+        }
+    }
+
+    if ((keyInfo[3] & 8) != 0) {
+        s32 cursor = self[0x95] + 1;
+        self[0x95] = cursor;
+        if ((s8)cursor >= 2) {
+            self[0x95] = 1;
+        }
+    }
+    if ((keyInfo[3] & 4) != 0) {
+        s32 cursor = self[0x95] - 1;
+        self[0x95] = cursor;
+        if ((s8)cursor < 0) {
+            self[0x95] = 0;
+        }
+    }
+    }
+    return 0;
+}
+
 #pragma optimization_level 4
 s32 fn_8002AA68(void* r3) {
     u8* r31;
@@ -3653,4 +3776,3 @@ void menuShopOpen(u32 flag)
     menuReleaseOffScreen(t);
 }
 #endif
-

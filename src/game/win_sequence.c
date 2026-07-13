@@ -11,6 +11,68 @@
  */
 #include "dolphin/types.h"
 
+typedef struct WinSeqCommand {
+    u8 flags;
+    u8 type;
+    s16 duration;
+    s32 value0;
+    s32 value1;
+} WinSeqCommand;
+
+typedef struct WinSeqState {
+    WinSeqCommand* commands;
+    s16 commandIndex;
+    s16 delay;
+    u8 positionMode;
+    u8 colorMode;
+    u8 scaleMode;
+    u8 loopActive;
+    s16 startX;
+    s16 startY;
+    s16 endX;
+    s16 endY;
+    s16 positionFrame;
+    s16 positionDuration;
+    u8 startColor[4];
+    u8 endColor[4];
+    s16 colorFrame;
+    s16 colorDuration;
+    f32 startScaleX;
+    f32 startScaleY;
+    f32 endScaleX;
+    f32 endScaleY;
+    s16 scaleFrame;
+    s16 scaleDuration;
+    s16 loopCount;
+    u8 enabled;
+    u8 pad_3B;
+} WinSeqState;
+
+typedef struct WinSeqTarget {
+    s16 x;
+    s16 y;
+    u8 color[4];
+    s16 baseX;
+    s16 baseY;
+    f32 scaleX;
+    f32 scaleY;
+    u32 image;
+    s16 imageX;
+    s16 imageY;
+    s16 imageW;
+    s16 imageH;
+    u8 flags;
+} WinSeqTarget;
+
+typedef struct WinSeqSpriteData {
+    u8 pad_00[8];
+    s16 x;
+    s16 y;
+    s16 width;
+    s16 height;
+    u32 image;
+} WinSeqSpriteData;
+
 /* ===== External SDK / engine functions ===== */
 extern void* memset(void* dst, int val, u32 size);
 extern void* memcpy(void* dst, const void* src, u32 n);
@@ -107,6 +169,7 @@ extern f32 lbl_8047CE3C;  /* sdata2: float constant */
 extern f32 lbl_8047CE50;  /* sdata2: float constant */
 extern f32 lbl_8047CE5C;  /* sdata2: float constant */
 extern f32 lbl_8047CE70;  /* sdata2: float constant */
+extern f32 lbl_8047CE20;  /* sdata2: 100.0f */
 extern u8  lbl_80404A98[];  /* table for display */
 extern u8  lbl_80271E10[];  /* format string */
 extern u8  lbl_80271E4C[];  /* format string */
@@ -325,6 +388,220 @@ void winSeqMoveMenu(void) {
 }
 #pragma pop
 
+/* 0x801074D4 | 0x9A4 */
+void _winSeqMoveSub(void* targetPtr, void* statePtr) {
+    extern f64 sqrt(f64 value);
+    WinSeqTarget* target = targetPtr;
+    WinSeqState* state = statePtr;
+    WinSeqCommand* command;
+    WinSeqSpriteData* sprite;
+    f32 t;
+    u8 stop;
+
+    stop = 0;
+    if (state->commands == NULL) {
+        return;
+    }
+
+    if (state->positionMode != 0) {
+        state->positionFrame++;
+        switch (state->positionMode) {
+        case 1:
+            t = (f32)state->positionFrame / (f32)state->positionDuration;
+            target->x = state->startX + t * (state->endX - state->startX);
+            target->y = state->startY + t * (state->endY - state->startY);
+            break;
+        case 2:
+            t = ((f32)state->positionFrame * (f32)state->positionDuration /
+                 (f32)state->positionDuration) /
+                (f32)state->positionDuration;
+            target->x = state->startX + t * (state->endX - state->startX);
+            target->y = state->startY + t * (state->endY - state->startY);
+            break;
+        case 3:
+            t = (f32)(sqrt((f64)state->positionFrame) /
+                      sqrt((f64)state->positionDuration));
+            target->x = state->startX + t * (state->endX - state->startX);
+            target->y = state->startY + t * (state->endY - state->startY);
+            break;
+        }
+        if (state->positionFrame >= state->positionDuration) {
+            state->positionMode = 0;
+        }
+    }
+
+    if (state->colorMode != 0) {
+        state->colorFrame++;
+        if (state->colorMode == 1) {
+            t = (f32)state->colorFrame / (f32)state->colorDuration;
+            target->color[0] = state->startColor[0] +
+                               t * (state->endColor[0] - state->startColor[0]);
+            target->color[1] = state->startColor[1] +
+                               t * (state->endColor[1] - state->startColor[1]);
+            target->color[2] = state->startColor[2] +
+                               t * (state->endColor[2] - state->startColor[2]);
+            target->color[3] = state->startColor[3] +
+                               t * (state->endColor[3] - state->startColor[3]);
+        }
+        if (state->colorFrame >= state->colorDuration) {
+            state->colorMode = 0;
+        }
+    }
+
+    if (state->scaleMode != 0) {
+        state->scaleFrame++;
+        if (state->scaleMode == 1) {
+            t = (f32)state->scaleFrame / (f32)state->scaleDuration;
+            target->scaleX = state->startScaleX +
+                             t * (state->endScaleX - state->startScaleX);
+            target->scaleY = state->startScaleY +
+                             t * (state->endScaleY - state->startScaleY);
+        }
+        if (state->scaleFrame >= state->scaleDuration) {
+            state->scaleMode = 0;
+        }
+    }
+
+next_command:
+    if (state->delay > 0) {
+        state->delay--;
+        return;
+    }
+
+    command = &state->commands[state->commandIndex];
+    switch (command->type) {
+    case 0:
+        state->commands = NULL;
+        state->commandIndex = 0;
+        stop = 1;
+        break;
+    case 1:
+        state->delay = command->duration;
+        break;
+    case 2:
+        if (command->value0 != 0) {
+            target->flags = (s8)(target->flags | 2);
+        } else {
+            target->flags = (s8)(target->flags & ~2);
+        }
+        break;
+    case 3:
+    case 9:
+        if (command->type == 9) {
+            state->endX = target->baseX;
+            state->endY = target->baseY;
+        } else if ((command->flags & 0x40) == 0) {
+            state->endX = (s16)command->value0;
+            state->endY = (s16)command->value1;
+        } else {
+            state->endX = (s16)(target->x + command->value0);
+            state->endY = (s16)(target->y + command->value1);
+        }
+        if ((command->flags & 2) != 0) {
+            state->endX = target->x;
+        }
+        if ((command->flags & 4) != 0) {
+            state->endY = target->y;
+        }
+        state->positionDuration = command->duration;
+        if (state->positionDuration == 0) {
+            target->x = state->endX;
+            target->y = state->endY;
+            state->positionMode = 0;
+        } else {
+            state->startX = target->x;
+            state->startY = target->y;
+            state->positionFrame = 0;
+            switch ((command->flags >> 3) & 3) {
+            case 0:
+                state->positionMode = 1;
+                break;
+            case 1:
+                state->positionMode = 2;
+                break;
+            case 2:
+                state->positionMode = 3;
+                break;
+            case 3:
+                state->positionMode = 1;
+                break;
+            }
+        }
+        break;
+    case 4:
+    case 5:
+        break;
+    case 6:
+        state->startScaleX = target->scaleX;
+        state->startScaleY = target->scaleY;
+        state->endScaleX = (f32)command->value0 / lbl_8047CE20;
+        state->endScaleY = (f32)command->value1 / lbl_8047CE20;
+        state->scaleFrame = 0;
+        state->scaleDuration = command->duration;
+        state->scaleMode = 1;
+        if (state->scaleDuration == 0) {
+            target->scaleX = state->endScaleX;
+            target->scaleY = state->endScaleY;
+            state->scaleMode = 0;
+        }
+        break;
+    case 7:
+        state->startColor[0] = target->color[0];
+        state->startColor[1] = target->color[1];
+        state->startColor[2] = target->color[2];
+        state->startColor[3] = target->color[3];
+        state->endColor[0] = command->value0 >> 24;
+        state->endColor[1] = command->value0 >> 16;
+        state->endColor[2] = command->value0 >> 8;
+        state->endColor[3] = command->value0;
+        state->colorFrame = 0;
+        state->colorDuration = command->duration;
+        state->colorMode = 1;
+        if (state->colorDuration == 0) {
+            target->color[0] = state->endColor[0];
+            target->color[1] = state->endColor[1];
+            target->color[2] = state->endColor[2];
+            target->color[3] = state->endColor[3];
+            state->colorMode = 0;
+        }
+        break;
+    case 8:
+        sprite = menuSpriteBiosGetPtr(command->value0);
+        target->image = sprite->image;
+        target->imageX = sprite->x;
+        target->imageY = sprite->y;
+        target->imageW = sprite->width;
+        target->imageH = sprite->height;
+        break;
+    case 10:
+        if (state->loopActive == 0) {
+            state->loopActive = 1;
+            state->loopCount = command->duration;
+        }
+        if ((command->flags & 0x40) == 0) {
+            state->loopCount--;
+        }
+        if (state->loopCount < 0) {
+            state->loopCount = 0;
+            state->loopActive = 0;
+        } else {
+            state->commandIndex = (s16)command->value0;
+            goto next_command;
+        }
+        break;
+    case 11:
+        state->enabled = command->value0 != 0;
+        break;
+    }
+
+    if (stop != 0) {
+        return;
+    }
+    state->commandIndex++;
+    goto next_command;
+}
+
+
 /* 0x80107E78 | 0x60 */
 #pragma push
 #pragma peephole off
@@ -412,6 +689,7 @@ void fn_80107F38(s32 param, u32 key) {
     }
 }
 #pragma pop
+
 #pragma pop
 
 /* 0x801080CC | 0x12C */
@@ -585,4 +863,3 @@ void winSetSequence(void* out, u32 idx) {
     }
 }
 #pragma pop
-

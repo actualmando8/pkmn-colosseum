@@ -17,10 +17,291 @@
  * bytes [0] and [1] are touched by this TU's accessors. */
 extern u8 lbl_803A6A60[];
 
+typedef struct PdaMailSceneState {
+    s8 selection;
+    u8 menuBusy;
+    u8 pad02[0x0A];
+    f32 angles[3];
+    u8 pad18[0x10];
+    f32 field28;
+    f32 field2C;
+    f32 transition;
+    f32 modelHeight;
+    f32 transitionTarget;
+    f32 field3C;
+    f32 field40;
+    u32 animationIndex;
+    u8 savedSelection;
+    u8 offscreenHidden;
+    u8 exiting;
+} PdaMailSceneState;
+
+typedef struct PdaMailOpenConfig {
+    u8 first;
+    u8 second;
+    u8 third;
+    u8 pad03;
+    u32* message;
+    u32* value;
+} PdaMailOpenConfig;
+
+extern const f32 lbl_8047BDAC;
+extern const f32 lbl_8047BDA0;
+extern const f32 lbl_8047BDA8;
+extern const f32 lbl_8047BDF4;
+extern const f32 lbl_8047BDF8;
+extern const f32 lbl_8047BDFC;
+extern const f32 lbl_8047BE00;
+extern u32 lbl_8047A4F8;
+extern u32 lbl_8047A4FC;
+
+extern void menuOffScreenSetPriority(s32 priority);
+extern void menuOffScreenSetDisp(s32 visible);
+extern void menuOpen(s32 menuId, s32 parameter);
+extern u32 windowGetActiveID(void);
+extern s32 menuOpenCustom(s32 menuId, ...);
+extern void menuClose(s32 menuId);
+extern void menuCloseSync(s32 menuId, s32 flag);
+extern void* fn_800F92D4(u32 resourceId);
+extern void fn_800E3CC8(void* model, s32 value);
+extern void cameraPlayAnime(s32 camera, u32 resourceId, s32 startFrame, s32 flags);
+extern void GSmodelSetAnimIndex(void* model, s32 index);
+extern void GSmodelSetAnimFrame(void* model, f32 frame);
+extern void GSmodelSetAnimRate(void* model, f32 rate);
+extern void GSmodelSetAnimType(void* model, s32 type);
+extern void GSmodelStartAnimation(void* model);
+extern u8 GSmodelIsAnimating(void* model);
+extern void GSmodelStopAnimation(void* model);
+extern void GSmodelSetVisibility(void* model, s32 visible);
+extern void GSlightSetAnimRate(void* light, f32 rate);
+extern void GSlightSetAnimFrame(void* light, f32 frame);
+extern void GSlightSetAnimType(void* light, s32 type);
+extern void GSlightStartAnimation(void* light);
+extern void GSlightSetActive(void* light, s32 active);
+extern void fn_80166AB8(s32 soundId, s32 arg1, s32 arg2);
+extern void cameraWaitSyncAnime(s32 camera);
+extern void fn_8004A47C(void);
+extern void fn_8003C7C0(void);
+extern void fn_80044630(void);
+extern u8 fn_801902E0(s32 id);
+extern void fn_8004C120(void);
+extern void fadeSet(s32 type, f32 speed);
+extern s8 fadeCheck(s32 type);
+extern void fn_800FF660(void);
+extern void floorSetFadeScript(s32 a, u32 b);
+extern void _threadSwitch(void);
+
+#pragma peephole off
+void fn_8004B7EC(void)
+{
+    PdaMailOpenConfig config;
+    s32 menuSelection;
+    PdaMailSceneState* state = (PdaMailSceneState*) lbl_803A6A60;
+    register f32* transitionTarget = &state->transitionTarget;
+    register f32* transition = &state->transition;
+    s32 phase = 0;
+    s32 active;
+    void* model;
+    void* light;
+
+    state->exiting = 0;
+    state->selection = 0;
+    state->savedSelection = 0;
+    state->menuBusy = 0;
+    state->angles[0] = lbl_8047BDAC;
+    state->angles[1] = lbl_8047BDAC;
+    state->angles[2] = lbl_8047BDAC;
+    state->field2C = lbl_8047BDA0;
+    state->field28 = lbl_8047BDA0;
+    *transition = lbl_8047BDF4;
+    state->modelHeight = lbl_8047BDF8;
+    *transitionTarget = lbl_8047BDAC;
+    state->field3C = lbl_8047BDAC;
+    state->field40 = lbl_8047BDAC;
+    state->animationIndex = 0;
+    state->offscreenHidden = 1;
+    state->exiting = 0;
+
+    menuOffScreenSetPriority(0);
+    model = fn_800F92D4(0x0C541000);
+    light = fn_800F92D4(0x0C541601);
+    fn_800E3CC8(model, 1);
+    cameraPlayAnime(0x17, 0x0C541800, 0, 0);
+    if (model != 0) {
+        GSmodelSetAnimIndex(model, 0);
+        GSmodelSetAnimFrame(model, lbl_8047BDAC);
+        GSmodelSetAnimRate(model, lbl_8047BDA8);
+    }
+    GSmodelSetAnimType(model, 0);
+    GSlightSetAnimRate(light, lbl_8047BDA8);
+    GSlightSetAnimFrame(light, lbl_8047BDAC);
+    GSlightSetAnimType(light, 0);
+    GSlightStartAnimation(light);
+    GSmodelStartAnimation(model);
+    fn_80166AB8(0x448, 0, 0);
+    if (model != 0) {
+        while (GSmodelIsAnimating(model)) {
+            _threadSwitch();
+        }
+    }
+    GSmodelStopAnimation(model);
+    cameraWaitSyncAnime(1);
+    GSlightSetActive(light, 0);
+    GSlightSetActive(fn_800F92D4(0x0C541600), 0);
+    GSlightSetActive(fn_800F92D4(0x0C541602), 0);
+    fn_800F92D4(0x0C540200);
+    fn_800F92D4(0x0C541800);
+    fn_8004A47C();
+
+    config.first = 0;
+    config.second = 0xFF;
+    config.third = 0;
+    config.message = &lbl_8047A4FC;
+    config.value = &lbl_8047A4F8;
+    *config.message = 0x36B2;
+    menuOpen(0xF0, 0);
+    menuOpen(0x10D, 0);
+    menuOpenCustom(0x71, windowGetActiveID(), 0, 0, 0, 1, (s32*) &config);
+    GSmodelSetVisibility(model, 0);
+
+    while (!state->exiting) {
+        *config.message = 0x36B2;
+        menuSelection = phase;
+        menuOpen(0x97, 0);
+        menuOpen(0x98, 0);
+        menuOpen(0x99, 0);
+        menuOpen(0x9A, 0);
+        if (menuOpenCustom(0x72, windowGetActiveID(), &menuSelection, 0, 1, 0) == -1) {
+            phase = -1;
+        } else {
+            phase = state->selection;
+        }
+        state->selection = (s8) phase;
+        state->menuBusy = 1;
+
+        switch (phase) {
+        case 0:
+            *transitionTarget = lbl_8047BDFC;
+            active = 1;
+            while (active) {
+                if (*transition == *transitionTarget) {
+                    active = 0;
+                } else {
+                    _threadSwitch();
+                }
+            }
+            menuClose(0x97);
+            menuCloseSync(0x97, 1);
+            *config.message = 0x36B4;
+            fn_8003C7C0();
+            state->menuBusy = 0;
+            *transitionTarget = lbl_8047BDAC;
+            break;
+        case 1:
+            *transitionTarget = lbl_8047BDFC;
+            active = 1;
+            while (active) {
+                if (*transition == *transitionTarget) {
+                    active = 0;
+                } else {
+                    _threadSwitch();
+                }
+            }
+            menuClose(0x97);
+            menuCloseSync(0x97, 1);
+            *config.message = 0x36B5;
+            fn_80044630();
+            state->menuBusy = 0;
+            *transitionTarget = lbl_8047BDAC;
+            break;
+        case 2:
+            *transitionTarget = lbl_8047BDFC;
+            active = 1;
+            while (active) {
+                if (*transition == *transitionTarget) {
+                    active = 0;
+                } else {
+                    _threadSwitch();
+                }
+            }
+            menuClose(0x97);
+            menuCloseSync(0x97, 1);
+            if (!fn_801902E0(0x3F0)) {
+                phase = 1;
+            }
+            *config.message = 0x36B3;
+            fn_8004C120();
+            state->menuBusy = 0;
+            *transitionTarget = lbl_8047BDAC;
+            break;
+        default:
+            fadeSet(3, lbl_8047BE00);
+            *transitionTarget = lbl_8047BDFC;
+            state->field3C = lbl_8047BDF8;
+            state->exiting = 1;
+            break;
+        }
+    }
+
+    phase = 0;
+    active = 1;
+    while (active) {
+        switch (phase) {
+        case 0:
+            if (!fadeCheck(0)) {
+                phase = 100;
+            } else {
+                _threadSwitch();
+            }
+            break;
+        case 100:
+            active = 0;
+            break;
+        }
+    }
+
+    if (state->offscreenHidden != 1) {
+        menuOffScreenSetDisp(1);
+        state->offscreenHidden = 1;
+    }
+    menuClose(0x97);
+    menuCloseSync(0x97, 1);
+    menuClose(0xF0);
+    menuClose(0x71);
+    menuCloseSync(0xF0, 1);
+    menuCloseSync(0x71, 1);
+
+    phase = 0;
+    active = 1;
+    while (active) {
+        switch (phase) {
+        case 0:
+            fadeSet(2, lbl_8047BDA8);
+            phase = 1;
+            break;
+        case 1:
+            if (!fadeCheck(0)) {
+                phase = 100;
+            } else {
+                _threadSwitch();
+            }
+            break;
+        case 100:
+            active = 0;
+            break;
+        }
+    }
+    fn_800FF660();
+    floorSetFadeScript(0, 0);
+}
+#pragma peephole reset
+
 #if 0
 asm u8 fn_8004BDEC(void) {
 #include "src/game/menu/menu_pda_mail_fn_8004BDEC.inc"
 }
+
+
 #else
 u8 fn_8004BDEC(void)
 {
@@ -73,14 +354,18 @@ asm s32 fn_8004E144(void* window, PdaMailSpinWork* sprite) {
 #include "src/game/menu/menu_pda_mail_fn_8004E144.inc"
 }
 #else
-/* WALL: W1 register-letter (f1/f2 swap between the angle temp and the
- * wrap-constant local); 98.3% after 3 source-shape attempts (assignment-
- * in-condition, named-local wrap, reversed comparison operands). */
+/* Exact farm result; the redundant locals preserve MWCC's register shape. */
 s32 fn_8004E144(void* window, PdaMailSpinWork* sprite)
 {
+    f64 new_var2;
     f64 wrap = lbl_8047BE30;
-    if ((sprite->angle += lbl_8047BE28) >= wrap) {
-        sprite->angle -= wrap;
+    f64 new_var;
+
+    wrap = 0;
+    new_var = wrap;
+    if ((sprite->angle += lbl_8047BE28) >= new_var) {
+        new_var2 = wrap;
+        sprite->angle -= (wrap, new_var2);
     }
     return 0;
 }
@@ -698,8 +983,7 @@ s32 fn_8004E8E0(PdaMailWindowA* window)
  * gs_event_exec.c item-quantity-picker (menu_id, input-state,
  * &config, 0, 1, 1, &out), open by id, close by id. */
 extern u32 windowGetActiveID(void);
-extern s32 menuOpenCustom(s32 menuId, u32 inputState, s32* config, s32 zero,
-                        s32 one1, s32 one2, s32* out, ...);
+extern s32 menuOpenCustom(s32 menuId, ...);
 extern void menuClose(s32 menuId);
 extern void menuCloseSync(s32 menuId, s32 flag);
 

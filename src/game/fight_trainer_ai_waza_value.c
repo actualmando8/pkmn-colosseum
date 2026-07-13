@@ -5093,16 +5093,15 @@ u32 fightTrainerAiWazaValueTuikaMahi(void* ctx, u32 param1, u32 param2, u32 para
     u32 trainerParam = param1;
     void* battleCtx = ctx;
     u32 target = param3;
-    s32 quotient;
     u32 handle;
     u32 pokemonPtr;
     u32 statusValue;
+    s32 quotient;
 
     statusValue = fn_80239564(battleCtx, battleParam);
     quotient = (s32)statusValue / fightTrainerGetStatus(0, 0x104, 0x3e, 0);
     handle = fightTrainerAiAddValue(0, quotient);
-    pokemonPtr = fightOutPokemonGetPokemonPtr(trainerParam);
-    fn_80239CCC(0xec64, battleCtx, pokemonPtr, 0, 0, battleParam, 0, 0x104, quotient);
+    fn_80239CCC(0xec64, battleCtx, fightOutPokemonGetPokemonPtr(trainerParam), 0, 0, battleParam, 0, 0x104, quotient);
     if (fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(0, battleCtx, 1, 1, 0x10e, trainerParam) == 1) {
         handle = fn_80239984(handle, battleCtx, 0x105);
         fn_80239EE8(0xec64, battleCtx, fightOutPokemonGetPokemonPtr(trainerParam), 0, 0, battleParam, 0, 0x105);
