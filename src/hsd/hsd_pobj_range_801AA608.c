@@ -158,6 +158,21 @@ void HSD_PObjReqAnimAllByFlags(f32 val, HSD_PObj* pobj, u32 flags)
 }
 #pragma pop
 
+/* Address: 0x801AB63C | Size: 0x40  -- Set both mtx-mark slots */
+#pragma push
+#pragma optimization_level 1
+void fn_801AB63C(u32 first, u32 second)
+{
+    extern u8 lbl_80465678[];
+    s32 i;
+
+    for (i = 0; i < 2; i++) {
+        ((u32*) lbl_80465678)[2 * i] = first;
+        ((u32*) lbl_80465678)[2 * i + 1] = second;
+    }
+}
+#pragma pop
+
 /* Address: 0x801ADC08 | Size: 0x34  -- Forget RNG memory state */
 void _HSD_RandForgetMemory(void)
 {
@@ -166,6 +181,38 @@ void _HSD_RandForgetMemory(void)
         lbl_80478C94 = &lbl_80478C90;
     }
 }
+
+/* Address: 0x801ADC3C | Size: 0x40  -- Bounded RNG */
+#pragma push
+#pragma peephole off
+s32 fn_801ADC3C(s32 max)
+{
+    s32 rand;
+
+    rand = ((s32*)lbl_80478C94)[0];
+    rand = (rand * 0x343fd) + 0x269fc3;
+    ((s32*)lbl_80478C94)[0] = rand;
+    return (s32)(((s32)max * (s16)(((s32*)lbl_80478C94)[0] >> 16)) / 0x10000);
+}
+#pragma pop
+
+/* Address: 0x801ADCD8 | Size: 0x34  -- LCG next, u16 return */
+#pragma push
+#pragma peephole off
+u32 fn_801ADCD8(void)
+{
+    u32* state;
+    volatile u32* state_v;
+    u32 next;
+
+    state = (u32*)lbl_80478C94;
+    state_v = (u32*)lbl_80478C94;
+    next = (*state * 0x343fd) + 0x269ec3;
+    *state_v = next;
+
+    return *(u32*)lbl_80478C94 >> 16;
+}
+#pragma pop
 
 /* Address: 0x801ADD0C | Size: 0x3C  -- Deactivate texture anim state */
 #pragma push

@@ -29,6 +29,8 @@ extern void fn_800688C4();
 extern void fn_800689FC();
 extern void fn_80068BB0();
 extern void fn_80068DBC();
+extern void fn_8010B01C();
+extern void _menuCBPokemonEntryLoadCallBack__FPv();
 
 /* ===== Rodata / data labels ===== */
 extern u8 lbl_803A9F08[];
@@ -46,6 +48,27 @@ typedef struct UICmdMsg {
 } UICmdMsg;
 
 /* ===== Function implementations ===== */
+
+/* Address: 0x80069048 | Size: 0x20 */
+s32 menuCBPokemonEntryGetReadFlag(void)
+{
+    return lbl_803A9F08[0xCD84];
+}
+
+/* Address: 0x800697C4 | Size: 0x30 */
+#pragma push
+#pragma scheduling off
+#pragma optimize_for_size on
+void menuCBPokemonEntryLoadTex(void)
+{
+    fn_8010B01C(0, _menuCBPokemonEntryLoadCallBack__FPv, 0);
+}
+#pragma pop
+
+/* Address: 0x80063D10 | Size: 0x4 */
+void fn_80063D10(void)
+{
+}
 
 /* Address: 0x80065A48 | Size: 0x1CA4 */
 #pragma push

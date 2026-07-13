@@ -11,6 +11,7 @@
 
 #include "hsd/hsd_initialize.h"
 #include "hsd/hsd_debug.h"
+#include "dolphin/gx/GX.h"
 
 static HSD_RenderPass current_render_pass = HSD_RP_SCREEN;
 static s32 current_heap = -1;
@@ -36,6 +37,21 @@ void HSD_SetHeap(s32 handle)
 void HSD_StartRender(HSD_RenderPass pass)
 {
     current_render_pass = pass;
+}
+
+void fn_8019C690(s32 arg0, u32 arg1)
+{
+    extern void __assert(const char*, u32, const char*);
+    extern const char lbl_802749E4[];
+    extern const char lbl_802749F4[];
+    extern s32 lbl_8047B27C;
+    extern u32 lbl_80478C78;
+
+    if (arg0 == 2) {
+        __assert(lbl_802749E4, 0x2F6, lbl_802749F4);
+    }
+    lbl_8047B27C = arg0;
+    lbl_80478C78 = arg1;
 }
 
 /* ===================================================================
@@ -85,7 +101,7 @@ extern void fn_800BCEF4(u32 a, u32 b);
 extern void fn_800BD07C(u32 a, u32 b);
 extern void fn_800B856C(void);
 extern void GXInvalidateTexAll(void);
-extern u8 lbl_80466BC0[];
+extern GXRenderModeObj lbl_80466BC0;
 extern volatile s32 lbl_8047B294;
 extern u32 lbl_80478C78;
 extern u32 lbl_8047B27C;
@@ -96,18 +112,16 @@ asm void fn_8019C708(void) {
 #else
 #pragma optimization_level 4
 void fn_8019C708(u32 arg) {
-    u8* p;
-    u16 a;
+    GXRenderModeObj* rmode;
 
-    p = lbl_80466BC0;
+    rmode = &lbl_80466BC0;
     lbl_8047B294 = arg;
-    if (p[0x19] != 0) {
+    if (rmode->aa != 0) {
         fn_800BCEF4(2, lbl_80478C78);
     } else {
         fn_800BCEF4(lbl_8047B27C, 0);
     }
-    a = *(u16*)(p + 0x8);
-    fn_800BD07C(p[0x18], (u32)(a - *(u16*)(p + 0x10)) >> 31);
+    fn_800BD07C(rmode->field_rendering, rmode->xfbHeight < rmode->viHeight);
     if (lbl_8047B290 != 0) {
         if (lbl_8047B290 & 1) {
             fn_800B856C();

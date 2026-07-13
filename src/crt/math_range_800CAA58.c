@@ -132,6 +132,79 @@ s32 __write_console(u32 handle, const void* data, u32* count, void* ref) {
     return 0;
 }
 
+f64 __kernel_cos(f64 x, f64 y) {
+    extern const f64 lbl_8047C7E0;
+    extern const f64 lbl_8047C7E8;
+    extern const f64 lbl_8047C7F0;
+    extern const f64 lbl_8047C7F8;
+    extern const f64 lbl_8047C800;
+    extern const f64 lbl_8047C808;
+    extern const f64 lbl_8047C810;
+    extern const f64 lbl_8047C818;
+    extern const f64 lbl_8047C820;
+    DoubleShape qshape;
+    DoubleShape shape;
+    f64 z;
+    f64 r;
+    f64 hz;
+    f64 a;
+    s32 ix;
+
+    shape.value = x;
+    ix = shape.parts.hi & 0x7fffffff;
+    if (ix < 0x3e400000 && (s32)x == 0) {
+        return lbl_8047C7E0;
+    }
+
+    z = shape.value * shape.value;
+    r = z * (lbl_8047C7E8 + z * (lbl_8047C7F0 + z * (lbl_8047C7F8 +
+        z * (lbl_8047C800 + z * (lbl_8047C808 + lbl_8047C810 * z)))));
+    if (ix < 0x3fd33333) {
+        return lbl_8047C7E0 - (lbl_8047C818 * z - (z * r - shape.value * y));
+    }
+
+    if (ix > 0x3fe90000) {
+        qshape.value = lbl_8047C820;
+    } else {
+        qshape.parts.hi = ix - 0x00200000;
+        qshape.parts.lo = 0;
+    }
+    hz = lbl_8047C818 * z - qshape.value;
+    a = lbl_8047C7E0 - qshape.value;
+    return a - (hz - (z * r - shape.value * y));
+}
+
+f64 __kernel_sin(f64 x, f64 y, s32 iy) {
+    extern const f64 lbl_8047C868;
+    extern const f64 lbl_8047C870;
+    extern const f64 lbl_8047C878;
+    extern const f64 lbl_8047C880;
+    extern const f64 lbl_8047C888;
+    extern const f64 lbl_8047C890;
+    extern const f64 lbl_8047C898;
+    DoubleShape shape;
+    f64 z;
+    f64 r;
+    f64 v;
+    s32 ix;
+
+    shape.value = x;
+    ix = shape.parts.hi & 0x7fffffff;
+    if (ix < 0x3e400000 && (s32)x == 0) {
+        return x;
+    }
+
+    z = shape.value * shape.value;
+    v = z * shape.value;
+    r = lbl_8047C868 + z * (lbl_8047C870 + z * (lbl_8047C878 +
+        z * (lbl_8047C880 + lbl_8047C888 * z)));
+    if (iy == 0) {
+        return shape.value + v * (lbl_8047C890 + z * r);
+    }
+    return shape.value - ((z * (lbl_8047C898 * y - v * r) - y) -
+        lbl_8047C890 * v);
+}
+
 f64 copysign(f64 x, f64 y) {
     DoubleShape uy;
     DoubleShape ux;
@@ -315,13 +388,15 @@ f64 frexp(f64 x, s32* exponent) {
     DoubleShape shape;
     s32 hi;
     s32 ix;
+    s32 lo;
 
     shape.value = x;
     hi = shape.parts.hi;
     *exponent = 0;
     ix = hi & 0x7fffffff;
-    if (ix >= 0x7ff00000 || ((ix | shape.parts.lo) == 0)) {
-        return x;
+    lo = shape.parts.lo;
+    if (ix >= 0x7ff00000 || ((ix | lo) == 0)) {
+        return shape.value;
     }
     if (ix < 0x00100000) {
         *exponent = -54;
@@ -329,8 +404,9 @@ f64 frexp(f64 x, s32* exponent) {
         hi = shape.parts.hi;
         ix = hi & 0x7fffffff;
     }
-    shape.parts.hi = (hi & 0x800fffff) | 0x3fe00000;
     *exponent += (ix >> 20) - 0x3fe;
+    hi = (hi & 0x800fffff) | 0x3fe00000;
+    shape.parts.hi = hi;
     return shape.value;
 }
 
@@ -408,7 +484,7 @@ f64 ldexp(f64 x, s32 n) {
 
 f64 modf(f64 x, f64* integral) {
     DoubleShape shape;
-    DoubleShape intpart;
+    DoubleShape* intpart;
     s32 hi;
     u32 lo;
     s32 j0;
@@ -416,49 +492,47 @@ f64 modf(f64 x, f64* integral) {
     u32 ui;
 
     shape.value = x;
+    intpart = (DoubleShape*)integral;
     hi = shape.parts.hi;
     lo = shape.parts.lo;
     j0 = ((hi >> 20) & 0x7ff) - 0x3ff;
 
     if (j0 < 20) {
         if (j0 < 0) {
-            intpart.parts.hi = hi & 0x80000000;
-            intpart.parts.lo = 0;
-            *integral = intpart.value;
+            intpart->parts.hi = hi & 0x80000000;
+            intpart->parts.lo = 0;
             return x;
         }
         i = 0x000fffff >> j0;
         if (((hi & i) | lo) == 0) {
-            intpart.parts.hi = hi & 0x80000000;
-            intpart.parts.lo = 0;
+            shape.parts.hi = hi & 0x80000000;
+            shape.parts.lo = 0;
             *integral = x;
-            return intpart.value;
+            return shape.value;
         }
-        intpart.parts.hi = hi & ~i;
-        intpart.parts.lo = 0;
-        *integral = intpart.value;
-        return x - intpart.value;
+        intpart->parts.hi = hi & ~i;
+        intpart->parts.lo = 0;
+        return x - *integral;
     }
 
     if (j0 > 51) {
-        intpart.parts.hi = hi & 0x80000000;
-        intpart.parts.lo = 0;
+        shape.parts.hi = hi & 0x80000000;
+        shape.parts.lo = 0;
         *integral = x;
-        return intpart.value;
+        return shape.value;
     }
 
     ui = 0xffffffffU >> (j0 - 20);
     if ((lo & ui) == 0) {
-        intpart.parts.hi = hi & 0x80000000;
-        intpart.parts.lo = 0;
+        shape.parts.hi = hi & 0x80000000;
+        shape.parts.lo = 0;
         *integral = x;
-        return intpart.value;
+        return shape.value;
     }
 
-    intpart.parts.hi = hi;
-    intpart.parts.lo = lo & ~ui;
-    *integral = intpart.value;
-    return x - intpart.value;
+    intpart->parts.hi = hi;
+    intpart->parts.lo = lo & ~ui;
+    return x - *integral;
 }
 
 f64 sin(f64 x) {

@@ -8,3 +8,6 @@
  * range name stays honest until internal TU structure is proven.
  */
 #include "dolphin/types.h"
+
+void fn_8010C220(void) {
+}

@@ -64,14 +64,16 @@ u32 fightTargetGetTragetPtrToRelativeHostSideFightTargetId(u32 param1, u32 param
                     byte = entry[1];
                 if ((u8)byte != 0) {
                     if (param1 == fightTargetGetPtr(i, slotBase, param2)) {
-                        return i;
+                        goto done;
                     }
                 }
             }
         }
         i++;
     }
-    return 0;
+    i = 0;
+done:
+    return i;
 }
 
 /* Address: 0x801F0204 | Size: 0x18 | Pattern: nullcheck_getter */

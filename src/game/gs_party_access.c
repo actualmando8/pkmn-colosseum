@@ -866,7 +866,7 @@ extern void fn_80097A38(u32, s32);
 extern void fn_800FF730(u32);
 extern void menuPokemonOpen(s32, s32, s32);
 extern void GSthreadSetArgs(u32, s32, ...);
-extern void evolutionOpen(u32, u32, s32, u16*, s32, u32*);
+extern u32 evolutionOpen(u32, u32, u32, u16*, u32, u8*);
 extern void menuShopOpen(u32);
 extern void menuNameEntryOpen(u32, s32);
 extern void fn_80165A20(u32, s32, s32);
@@ -1101,7 +1101,7 @@ asm void fn_8000CB74(void) {
 #include "src/game/gs_party_access_fn_8000CB74.inc"
 }
 #else
-u32 fn_8000CB74(u32 arg) {
+u32 dbgMenuMenuTestD2Present(u32 arg) {
     u32 table[6];
     u32 idx = 0;
     u32 val;
@@ -1185,9 +1185,10 @@ asm void fn_8000CD50(void) {
 #else
 void testEvolution__Fv(void) {
     typedef struct {
-        u32 work[5];
+        u8 work[20];
         u16 left;
         u16 right;
+        u8 reserved[32];
     } GSpartyEvolutionArgs;
 
     u32 val1, val2;
@@ -1334,45 +1335,29 @@ idx_done:
 }
 #endif
 
-/* fn_8000D05C - 0x8000D05C | size: 0xc0 */
+/* dbgMenuMenuTestNameEntryMenu - 0x8000D05C | size: 0xc0 */
 /* GSparty_CalcStatModifiers -- table lookup with struct copy */
-#if 0
-asm void fn_8000D05C(void) {
-#include "src/game/gs_party_access_fn_8000D05C.inc"
-}
-#else
-#pragma peephole off
-u32 fn_8000D05C(u32 arg) {
-    u32 table[8];
-    u32 idx = 0;
+u32 dbgMenuMenuTestNameEntryMenu(u32 arg) {
+    typedef struct {
+        u32 data[8];
+    } NameEntryTable;
+    NameEntryTable table;
+    u32 idx;
     u32 val;
-    u32 *p = lbl_802666E0;
-    table[0] = p[0];
-    table[1] = p[1];
-    table[2] = p[2];
-    table[3] = p[3];
-    table[4] = p[4];
-    table[5] = p[5];
-    table[6] = p[6];
-    table[7] = p[7];
-    if ((s32)arg == (s32)table[0]) { goto idx_done; }
-    idx = 1;
-    if ((s32)arg == (s32)table[2]) { goto idx_done; }
-    idx = 2;
-    if ((s32)arg == (s32)table[4]) { goto idx_done; }
-    idx = 3;
-    if ((s32)arg == (s32)table[6]) { goto idx_done; }
-    idx = 4;
-idx_done:
+    table = *(NameEntryTable*)lbl_802666E0;
+    for (idx = 0; idx < 4; idx++) {
+        if ((s32)arg == (s32)table.data[idx * 2]) {
+            break;
+        }
+    }
     if ((s32)idx >= 4) {
         return 0;
     }
-    val = table[idx * 2 + 1];
+    val = table.data[idx * 2 + 1];
     menuNameEntryOpen(val, 0);
     return 0;
 }
 #pragma peephole reset
-#endif
 
 /* dbgMenuWazaDebugStop - 0x8000D11C | size: 0x38 */
 /* GSparty_GetCritRate -- conditional call based on global */

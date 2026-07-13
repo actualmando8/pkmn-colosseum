@@ -73,17 +73,26 @@ extern u32 lbl_80478D68; /* table entry count */
 /* Address: 0x8020E4E8 | Size: 0x94 | Ghidra import */
 #pragma push
 #pragma peephole on
-u32 fightAbicntDoKakeWaru(u16 id, u32 val)
+u32 fightAbicntDoKakeWaru(u32 id, u32 val)
 {
-    FightAbicntRatio *p = &lbl_80375D10[id];
-    u8 num;
     u8 den;
+    u8* numRatio;
+    u32 denAddress;
+    u8 num;
+    u32 count = lbl_80478D68;
+    u32 validId = (u16)id;
 
-    if (id >= lbl_80478D68) {
-        p = NULL;
+    numRatio = (u8*)&lbl_80375D10[(u16)id];
+    if (validId >= count) {
+        numRatio = NULL;
     }
-    num = (p == NULL) ? 0 : p->numerator;
-    den = (p == NULL) ? 1 : p->denominator;
+    num = (numRatio == NULL) ? 0 : ((numRatio == NULL) ? 0 : numRatio[0]);
+
+    denAddress = (u32)lbl_80375D10 + (id & 0xffffU) * sizeof(FightAbicntRatio);
+    if (validId >= count) {
+        denAddress = 0;
+    }
+    den = (denAddress == 0) ? 1 : ((denAddress == 0) ? 1 : ((u8*)denAddress)[1]);
 
     return (val * num) / den;
 }

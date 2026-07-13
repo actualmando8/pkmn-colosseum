@@ -8,3 +8,8 @@
  * range name stays honest until internal TU structure is proven.
  */
 #include "dolphin/types.h"
+
+void fn_800BAE34(u32 *arg0, u32 arg1, u32 arg2) {
+    *arg0 = (*arg0 & 0xFFFFFFFCu) | arg1;
+    *arg0 = (*arg0 & 0xFFFFFFF3u) | (arg2 << 2);
+}

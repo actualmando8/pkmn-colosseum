@@ -1525,16 +1525,11 @@ asm void pokemonGetDp(void) {
 }
 #else
 f32 pokemonGetDp(u8* ptr) {
-    extern u32 pokemonGetStatus(u8* ptr, u32 a, u32 b, u32 c);
-    u32 val;
-    u32 sp[2];
-    f32 result;
+    extern s32 pokemonGetStatus(u8* ptr, u32 a, u32 b, u32 c);
+    s32 val;
     if (ptr == NULL) { return lbl_8047CFF0; }
     val = pokemonGetStatus(ptr, 0, 0xc5, 0);
-    sp[1] = val ^ 0x80000000;
-    sp[0] = 0x43300000;
-    result = *(f64*)sp - lbl_8047D008;
-    return result / lbl_8047CFF4;
+    return (f32)val / lbl_8047CFF4;
 }
 #endif
 /* 0x8011FC74 | 0x30 */
@@ -2654,6 +2649,10 @@ u32 pokemonGetOboeWazaDataBanme(u8* ptr, u32 arg2) {
     return i;
 }
 #endif
+inline u32 inline_fn(u16 val, u8* counter_ptr) {
+    return pokemonGetStatus(NULL, val, 0x1e, *counter_ptr);
+}
+
 /* 0x8012361C | 0xDC */
 #if 0
 asm void pokemonOboeWaza(void) {
@@ -2663,26 +2662,29 @@ asm void pokemonOboeWaza(void) {
 s32 pokemonOboeWaza(u8* ptr, u8 target, u8* buf_ptr, u8* counter_ptr) {
     extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
     extern s32 pokemonSetWazaStatus(u8* a, u16 b, u8* c);
+    u8* buf = buf_ptr;
+    u8* counter = counter_ptr;
     u16 val;
+    u8 waza = target;
     u16 result;
     if (ptr == NULL) { return -2; }
-    if (ptr != NULL && counter_ptr == NULL) {
+    if (ptr == NULL || counter == NULL) {
         result = 0;
         goto _check;
     }
-    val = (u16)pokemonGetStatus(ptr, 0, 0x6e, 0);
-    target = (u8)target;
-    while (*counter_ptr < 0x14) {
-        if ((s32)pokemonGetStatus(NULL, val, 0x1d, *counter_ptr) == (s32)target) {
-            result = (u16)pokemonGetStatus(NULL, val, 0x1e, *counter_ptr);
+    val = pokemonGetStatus(ptr, 0, 0x6e, 0) & 0xFFFF;
+    waza = (u8)waza;
+    while (*counter < 0x14) {
+        if ((s32)pokemonGetStatus(NULL, val, 0x1d, *counter) == (s32)waza) {
+            result = (u16)inline_fn(val, counter);
             goto _check;
         }
-        (*counter_ptr)++;
+        (*counter)++;
     }
     result = 0;
 _check:
     if ((u16)result == 0) { return -3; }
-    return pokemonSetWazaStatus(ptr, result, buf_ptr);
+    return pokemonSetWazaStatus(ptr, result, buf);
 }
 #endif
 /* 0x801236F8 | 0xC0 */
@@ -2691,10 +2693,6 @@ asm void pokemonGetOboeWazaDataId(void) {
 #include "src/game/gs_field_world_fn_801236F8.inc"
 }
 #else
-inline u32 inline_fn(u16 val, u8* counter_ptr) {
-    return pokemonGetStatus(NULL, val, 0x1e, *counter_ptr);
-}
-
 u16 pokemonGetOboeWazaDataId(u8* ptr, u8 arg2, u8* counter_ptr) {
     extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
     u16 val;
@@ -3318,8 +3316,8 @@ asm void pokemonGetAnnonKatati(void) {
 #pragma optimization_level 1
 u8 pokemonGetAnnonKatati(u32 val) {
     u32 s;
-    s = (val >> 12) & 0x30;
-    s = (s & 0xFFFFFF3Fu) | ((val >> 18) & 0xC0);
+    s = (val >> 18) & 0xC0;
+    s = (s & 0xFFFFFFCFu) | ((val >> 12) & 0x30);
     s = (s & 0xFFFFFFF3u) | ((val >> 6) & 0x0C);
     s = (s & 0xFFFFFFFCu) | (val & 0x03);
     return (u8)(s % 28);

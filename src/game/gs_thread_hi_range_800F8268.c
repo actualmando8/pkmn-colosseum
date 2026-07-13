@@ -728,20 +728,19 @@ asm void fn_800F915C(void) {
 #else
 #pragma optimization_level 2
 void fn_800F915C(u32 key) {
-    u8* entry;
     u32 i;
-    u8 skip;
+    u8* entry;
 
     entry = (u8*)lbl_8047AC5C;
-    for (i = lbl_8047AC60; i > 0; i--, entry += 0x14) {
-        if (*(u32*)(entry + 0x4) == 0 || *(u32*)(entry + 0x8) != key) continue;
-        skip = 0;
-        if (*(u32*)(entry + 0x10) != 0) {
-            if ((u8)((u32 (*)(u32))(*(u32*)(entry + 0x10)))(*(u32*)(entry + 0xC)) == 0) {
-                skip = 1;
+    i = lbl_8047AC60;
+    while (i-- != 0) {
+        if (*(u32*)(entry + 0x4) != 0 && *(u32*)(entry + 0x8) == key) {
+            if (*(u32*)(entry + 0x10) != 0 &&
+                (u8)((u32 (*)(u32, u32, u32))(*(u32*)(entry + 0x10)))(
+                    *(u32*)(entry + 0x4), *(u32*)(entry + 0x8),
+                    *(u32*)(entry + 0xC)) == 0) {
+                goto next;
             }
-        }
-        if (!skip) {
             if (*(u16*)(entry + 0x0) != 0) {
                 GSmemLock(*(u16*)(entry + 0x0));
                 GSmemFree(*(u16*)(entry + 0x0));
@@ -749,6 +748,8 @@ void fn_800F915C(u32 key) {
             }
             *(u32*)(entry + 0x4) = 0;
         }
+next:
+        entry += 0x14;
     }
 }
 #endif
@@ -763,27 +764,33 @@ asm void fn_800F9210(void) {
 #include "src/game/gs_thread_fn_800F9210.inc"
 }
 #else
-#pragma optimization_level 2
+#pragma optimization_level 4
 void fn_800F9210(u32 key1, u32 key2) {
     u8* entry;
     u32 i;
 
     entry = (u8*)lbl_8047AC5C;
-    for (i = lbl_8047AC60; i > 0; i--, entry += 0x14) {
+    for (i = lbl_8047AC60; i > 0; i--) {
         if (*(u32*)(entry + 0x4) != 0 && *(u32*)(entry + 0x8) == key1 && *(u32*)(entry + 0xC) == key2) {
-            if (*(u32*)(entry + 0x10) != 0) {
-                if ((u8)((u32 (*)(u32, u32, u32))(*(u32*)(entry + 0x10)))(*(u32*)(entry + 0x4), *(u32*)(entry + 0x8), *(u32*)(entry + 0xC)) == 0) {
-                    return;
-                }
-            }
-            if (*(u16*)(entry + 0x0) != 0) {
-                GSmemLock(*(u16*)(entry + 0x0));
-                GSmemFree(*(u16*)(entry + 0x0));
-                *(u16*)(entry + 0x0) = 0;
-            }
-            *(u32*)(entry + 0x4) = 0;
+            goto found;
+        }
+        entry += 0x14;
+    }
+    entry = NULL;
+found:
+    if (entry != NULL) {
+        if (*(u32*)(entry + 0x10) != 0 &&
+            (u8)((u32 (*)(u32, u32, u32))(*(u32*)(entry + 0x10)))(
+                *(u32*)(entry + 0x4), *(u32*)(entry + 0x8),
+                *(u32*)(entry + 0xC)) == 0) {
             return;
         }
+        if (*(u16*)(entry + 0x0) != 0) {
+            fn_800E24B0(*(u16*)(entry + 0x0));
+            fn_800E209C(*(u16*)(entry + 0x0));
+            *(u16*)(entry + 0x0) = 0;
+        }
+        *(u32*)(entry + 0x4) = 0;
     }
 }
 #endif
@@ -798,7 +805,7 @@ asm void fn_800F92D4(void) {
 #include "src/game/gs_thread_fn_800F92D4.inc"
 }
 #else
-#pragma optimization_level 2
+#pragma optimization_level 4
 u32 fn_800F92D4(u32 key) {
     u8* entry;
     u32 i;
@@ -812,4 +819,3 @@ u32 fn_800F92D4(u32 key) {
 }
 #endif
 #pragma pop
-

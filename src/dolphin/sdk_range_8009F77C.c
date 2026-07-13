@@ -8,3 +8,31 @@
  * range name stays honest until internal TU structure is proven.
  */
 #include "dolphin/types.h"
+
+typedef struct {
+    void* head;
+    void* tail;
+} OSThreadQueue;
+
+typedef struct {
+    OSThreadQueue queue;
+    void* unk_08;
+    void* unk_0C;
+} fn_8009F77C_Worker;
+
+extern void OSInitThreadQueue(OSThreadQueue* queue);
+extern void OSWakeupThread(void* queue);
+
+void fn_8009F77C(fn_8009F77C_Worker* arg) {
+    OSInitThreadQueue(&arg->queue);
+    arg->unk_08 = 0;
+    arg->unk_0C = 0;
+}
+
+void fn_8009F9C8(void* queue) {
+    OSInitThreadQueue((OSThreadQueue*)queue);
+}
+
+void fn_8009FABC(void* queue) {
+    OSWakeupThread(queue);
+}

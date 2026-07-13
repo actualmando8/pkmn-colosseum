@@ -8,3 +8,21 @@
  * range name stays honest until internal TU structure is proven.
  */
 #include "dolphin/types.h"
+
+typedef struct {
+    u8 _unk_00[0x1C];
+    u32 moduleType;
+} OSModuleInfo;
+
+extern BOOL Link(OSModuleInfo* module, void* data, BOOL isFixed);
+
+BOOL fn_8009ED4C(OSModuleInfo* module, void* data) {
+    return Link(module, data, 0);
+}
+
+BOOL OSLinkFixed(OSModuleInfo* module, void* data) {
+    if (module->moduleType != 3) {
+        return FALSE;
+    }
+    return Link(module, data, 1);
+}

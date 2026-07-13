@@ -6,3 +6,9 @@
  * segment (Fable re-split, 2026-07-07). Functions asm-only until matched.
  */
 #include "dolphin/types.h"
+
+void _modelBoundBeginSurface__F13GSgfxPrimTypeUsUlPv(s32 prim, u16 count, u32 attr, void *ctx) {
+    (void)prim;
+    (void)count;
+    *(u32 *)((u8 *)ctx + 0xC) = attr;
+}

@@ -513,7 +513,7 @@ void fn_80203198(void* ctx, u32 param) {
 
 /* 0x802032E4 | size: 0x138 */
 #pragma push
-#pragma scheduling off
+#pragma scheduling on
 static inline void* fn_802032E4_getCC(void* ctx) {
     return pokemonGetStatus(ctx, 0, 0xCC, 0);
 }
@@ -1136,92 +1136,77 @@ void* fightOutPokemonGetSoubiItemDataId(void) {
 }
 
 /* 0x802041EC | size: 0xF4 | medium */
+#pragma push
+#pragma peephole on
 u32 fightPokemonGetSoubiItemSoubiDataId(void* param_1) {
-    extern s16 fn_80119ED0(u32);
-    extern s8 fn_8011B67C(void*, u32);
-    extern s8 fn_80121ADC(void*, u32);
+    extern u16 fn_80119ED0(u32);
+    extern u8 fn_8011B67C(void*, u32);
+    extern u8 fn_80121ADC(void*, u32);
     extern u32 pokemonGetSoubiItemSoubiDataId(void*);
-    u32 uVar1;
-    s16 sVar2;
-    s8 cVar3;
-    void* iVar4;
+    u32 value;
+    void* item;
+    u8 result;
 
-    if (param_1 == NULL) {
-        iVar4 = NULL;
+    item = param_1 == NULL ? NULL : pokemonGetStatus(param_1, 0, 0xCC, 0);
+    if (item == NULL) {
+        value = 0;
     } else {
-        iVar4 = pokemonGetStatus(param_1, 0, 0xCC, 0);
-    }
-    if (iVar4 == NULL) {
-        uVar1 = 0;
-    } else {
-        sVar2 = fn_80119ED0(0x3D);
-        if ((sVar2 == 0x7C) || (sVar2 = fn_80119ED0(0x3D), sVar2 == 200)) {
-            if (param_1 == NULL) {
-                uVar1 = 0;
-            } else {
-                uVar1 = (u32)pokemonGetStatus(param_1, 0, 0xCC, 0);
-            }
-            cVar3 = fn_80121ADC((void*)uVar1, 0x3D);
+        if (fn_80119ED0(0x3D) == 0x7C || fn_80119ED0(0x3D) == 0xC8) {
+            result = fn_80121ADC(param_1 == NULL ? NULL : pokemonGetStatus(param_1, 0, 0xCC, 0), 0x3D);
         } else {
-            sVar2 = fn_80119ED0(0x3D);
-            if (sVar2 == 0xCD) {
-                cVar3 = fn_8011B67C(param_1, 0x3D);
+            if (fn_80119ED0(0x3D) != 0xCD) {
+                result = 0;
             } else {
-                cVar3 = 0;
+                result = fn_8011B67C(param_1, 0x3D);
             }
         }
-        if (cVar3 == 1) {
-            uVar1 = 0;
+        if (result == 1) {
+            value = 0;
         } else {
-            uVar1 = pokemonGetSoubiItemSoubiDataId(iVar4);
+            value = pokemonGetSoubiItemSoubiDataId(item);
         }
     }
-    return uVar1;
+    return value;
 }
+#pragma pop
 
 /* 0x802042E0 | size: 0xF4 | medium */
+#pragma push
+#pragma peephole on
 u32 fightPokemonGetSoubiItemDataId(void* param_1) {
-    extern s16 fn_80119ED0(u32);
-    extern s8 fn_8011B67C(void*, u32);
-    extern s8 fn_80121ADC(void*, u32);
+    extern u16 fn_80119ED0(u32);
+    extern u8 fn_8011B67C(void*, u32);
+    extern u8 fn_80121ADC(void*, u32);
     extern u32 pokemonGetSoubiItemDataId(void*);
-    u32 uVar1;
-    s16 sVar2;
-    s8 cVar3;
-    void* iVar4;
+    u32 value;
+    void* item;
+    u8 result;
 
-    if (param_1 == NULL) {
-        iVar4 = NULL;
-    } else {
-        iVar4 = pokemonGetStatus(param_1, 0, 0xCC, 0);
+    item = NULL;
+    if (param_1 != NULL) {
+        item = pokemonGetStatus(param_1, 0, 0xCC, 0);
     }
-    if (iVar4 == NULL) {
-        uVar1 = 0;
+    if (item == NULL) {
+        value = 0;
     } else {
-        sVar2 = fn_80119ED0(0x3D);
-        if ((sVar2 == 0x7C) || (sVar2 = fn_80119ED0(0x3D), sVar2 == 200)) {
-            if (param_1 == NULL) {
-                uVar1 = 0;
-            } else {
-                uVar1 = (u32)pokemonGetStatus(param_1, 0, 0xCC, 0);
-            }
-            cVar3 = fn_80121ADC((void*)uVar1, 0x3D);
+        if (fn_80119ED0(0x3D) == 0x7C || fn_80119ED0(0x3D) == 0xC8) {
+            result = fn_80121ADC(param_1 == NULL ? NULL : pokemonGetStatus(param_1, 0, 0xCC, 0), 0x3D);
         } else {
-            sVar2 = fn_80119ED0(0x3D);
-            if (sVar2 == 0xCD) {
-                cVar3 = fn_8011B67C(param_1, 0x3D);
+            if (fn_80119ED0(0x3D) != 0xCD) {
+                result = 0;
             } else {
-                cVar3 = 0;
+                result = fn_8011B67C(param_1, 0x3D);
             }
         }
-        if (cVar3 == 1) {
-            uVar1 = 0;
+        if (result == 1) {
+            value = 0;
         } else {
-            uVar1 = pokemonGetSoubiItemDataId(iVar4);
+            value = pokemonGetSoubiItemDataId(item);
         }
     }
-    return uVar1;
+    return value;
 }
+#pragma pop
 
 /* Address: 0x802043D4 | Size: 0x480 | Ghidra import */
 u32 fightOutPokemonGetNowNimbleness(void)
@@ -1454,67 +1439,23 @@ u8 fightPokemonCheckMotoFightPokemon(u32 expected, void* ctx) {
 }
 #pragma pop
 
-/* Address: 0x80204970 | Size: 0xa0 | Ghidra import */
-void fn_80204970(void)
-
+/* 0x80204970 | size: 0xA0 */
+void fn_80204970(void* first, void* second)
 {
-    int r3;
-    int r4;
+    typedef struct FightPokemonCopy {
+        u8 data[0x154];
+    } FightPokemonCopy;
+    FightPokemonCopy* firstPokemon = first;
+    FightPokemonCopy* secondPokemon = second;
 
-  u32 *puVar1;
-  u32 *puVar2;
-  u32 uVar3;
-  u32 *puVar4;
-  u32 *puVar5;
-  int iVar6;
-  u32 uStack_15c;
-  u32 local_158 [86];
-  
-  if ((r3 != 0) && (r4 != 0)) {
-    iVar6 = 0x2a;
-    puVar1 = (u32 *)(r3 + -4);
-    puVar2 = &uStack_15c;
-    do {
-      puVar5 = puVar2;
-      puVar4 = puVar1;
-      uVar3 = puVar4[2];
-      puVar5[1] = puVar4[1];
-      puVar5[2] = uVar3;
-      iVar6 = iVar6 + -1;
-      puVar1 = puVar4 + 2;
-      puVar2 = puVar5 + 2;
-    } while (iVar6 != 0);
-    puVar5[3] = puVar4[3];
-    iVar6 = 0x2a;
-    puVar1 = (u32 *)(r4 + -4);
-    puVar2 = (u32 *)(r3 + -4);
-    do {
-      puVar5 = puVar2;
-      puVar4 = puVar1;
-      uVar3 = puVar4[2];
-      puVar5[1] = puVar4[1];
-      puVar5[2] = uVar3;
-      iVar6 = iVar6 + -1;
-      puVar1 = puVar4 + 2;
-      puVar2 = puVar5 + 2;
-    } while (iVar6 != 0);
-    puVar5[3] = puVar4[3];
-    iVar6 = 0x2a;
-    puVar1 = &uStack_15c;
-    puVar2 = (u32 *)(r4 + -4);
-    do {
-      puVar5 = puVar2;
-      puVar4 = puVar1;
-      uVar3 = puVar4[2];
-      puVar5[1] = puVar4[1];
-      puVar5[2] = uVar3;
-      iVar6 = iVar6 + -1;
-      puVar1 = puVar4 + 2;
-      puVar2 = puVar5 + 2;
-    } while (iVar6 != 0);
-    puVar5[3] = puVar4[3];
-  }
-  return;
+    if (firstPokemon != NULL) {
+        FightPokemonCopy temporary;
+        if (secondPokemon != NULL) {
+            temporary = *firstPokemon;
+            *firstPokemon = *secondPokemon;
+            *secondPokemon = temporary;
+        }
+    }
 }
 
 /* fightOutPokemonIsGcHeroFightOutPokemon | Size: 0x4C | Check if trainer slot is active */
@@ -1696,50 +1637,35 @@ u32 fightOutPokemonIsFightActionAttackWazaOut(void* ctx, u16 slotId, void* table
 }
 #pragma pop
 
-/* Address: 0x80204F6C | Size: 0xf0 | Ghidra import */
-int fightOutPokemonCreateFightActionAttackWaza(void)
-
-{
-    u32 r3;
-    u32 r4;
-    u32 r5;
-    u32 r6;
-    u32 r7;
-    u32 r8;
-    u32 r9;
-    u32 r10;
-    u8 param_9;
-
-    extern s8 fightActionCreate();
+/* 0x80204F6C | size: 0xF0 */
+void* fightOutPokemonCreateFightActionAttackWaza(void* ctx, u32 p2, u32 p3, u32 p4, u32 p5, u32 p6, u32 p7, u32 p8, u8 p9) {
+    extern u8 fightActionCreate();
     extern void fightWazaCreate();
     extern void fightActionBiosSetBuffDataId();
-  int iVar1;
-  s8 cVar2;
-  
-  iVar1 = (int)pokemonGetStatus(r3,0,0xd9,0);
-  if (iVar1 == 0) {
-    iVar1 = 0;
-  }
-  else {
-    fightWazaCreate(iVar1,r10,r8 & 0xffff,r9,param_9);
-    iVar1 = (int)pokemonGetStatus(r3,0,0xfe,0);
-    if (iVar1 == 0) {
-      iVar1 = 0;
+    void* result;
+    u8 created;
+
+    result = pokemonGetStatus(ctx, 0, 0xD9, 0);
+    if (result == NULL) {
+        result = NULL;
+    } else {
+        fightWazaCreate(result, p8, (u16)p6, p7, p9);
+        result = pokemonGetStatus(ctx, 0, 0xFE, 0);
+        if (result == NULL) {
+            result = NULL;
+        } else {
+            created = fightActionCreate(result, p2, ctx, p3, p4, p5);
+            if (created == 1) {
+                fightActionBiosSetBuffDataId(result, p6);
+            } else {
+                result = NULL;
+            }
+        }
+        if (result == NULL) {
+            result = NULL;
+        }
     }
-    else {
-      cVar2 = fightActionCreate(iVar1,r4,r3,r5,r6,r7);
-      if (cVar2 == 1) {
-        fightActionBiosSetBuffDataId(iVar1,r8);
-      }
-      else {
-        iVar1 = 0;
-      }
-    }
-    if (iVar1 == 0) {
-      iVar1 = 0;
-    }
-  }
-  return iVar1;
+    return result;
 }
 
 /* Address: 0x8020505C | Size: 0x98 | Ghidra import */
@@ -3516,41 +3442,43 @@ LAB_00204d50:
   return uVar1;
 }
 
-/* Address: 0x80207F5C | Size: 0xcc | Ghidra import */
-u32 _fightOutPokemonRegWzxFreeSub__FPvUsPv(void)
-
+/* Address: 0x80207F5C | Size: 0xcc */
+#pragma push
+#pragma peephole on
+u32 _fightOutPokemonRegWzxFreeSub__FPvUsPv(void* pokemon, u16 unused, u32* state)
 {
-    int r3;
-    u32 r4;
-    int *r5;
+    void* currentPokemon;
+    void* resolved;
+    u32 excludedPokemon;
+    u32 itemDataId;
 
-  u32 uVar1;
-  int iVar2;
-  u8 uVar3;
-  int iVar4;
-  
-  iVar4 = *r5;
-  if (r3 == 0) {
-    uVar1 = 0;
-  }
-  else {
-    iVar2 = (int)pokemonGetStatus(r3,0,0xd6,0);
-    if (iVar2 == 0) {
-      uVar1 = 0;
+    excludedPokemon = state[0];
+    if ((currentPokemon = pokemon) == NULL) {
+        resolved = NULL;
+    } else {
+        resolved = pokemonGetStatus(currentPokemon, 0, 0xD6, 0);
+        if (resolved == NULL) {
+            resolved = NULL;
+        } else {
+            resolved = pokemonGetStatus(resolved, 0, 0xCC, 0);
+        }
     }
-    else {
-      uVar1 = (int)pokemonGetStatus(iVar2,0,0xcc,0);
+
+    if (currentPokemon == (void*)excludedPokemon) {
+        return 1;
     }
-  }
-  if (r3 != iVar4) {
-    uVar3 = (int)pokemonGetStatus(uVar1,0,0x73,0);
-    iVar4 = itemGetStatus(0,uVar3,0x10,0);
-    if ((iVar4 != 0) && (r5[1] == iVar4)) {
-      r5[2] = r5[2] + 1;
+
+    itemDataId = itemGetStatus(0, (u8)(u32)pokemonGetStatus(resolved, 0, 0x73, 0), 0x10, 0);
+    if (itemDataId == 0) {
+        return 1;
     }
-  }
-  return 1;
+
+    if (state[1] == itemDataId) {
+        state[2]++;
+    }
+    return 1;
 }
+#pragma pop
 
 /* 0x80208028 | size: 0x80 | small */
 #pragma push
@@ -3825,26 +3753,22 @@ void fightOutPokemonFreeAllSequenceWaza(void* ctx) {
 }
 #pragma pop
 
-/* Address: 0x802086E8 | Size: 0x68 | Ghidra import */
-void fightOutPokemonFreeWazaEffect(void)
+/* 0x802086E8 | size: 0x68 | small */
+#pragma push
+#pragma peephole on
+void fightOutPokemonFreeWazaEffect(void* param_1, u32 param_2, u32 param_3) {
+    extern u32 wazaGetStatus(void*, u32, u16, u32);
+    extern void fn_801DA8C4(void*, u16, u32);
+    u32 uVar2;
+    void* iVar1;
 
-{
-    u32 r3;
-    u32 r4;
-    u32 r5;
-
-    extern u32 wazaGetStatus();
-    extern void fn_801DA8C4();
-  u16 uVar2;
-  int iVar1;
-
-  uVar2 = wazaGetStatus(0,r4,0x1f,0);
-  iVar1 = (int)pokemonGetStatus(r3,0,0xee,0);
-  if (iVar1 != 0) {
-    fn_801DA8C4(iVar1,uVar2,r5);
-  }
-  return;
+    uVar2 = wazaGetStatus(NULL, param_2, 0x1F, 0);
+    iVar1 = pokemonGetStatus(param_1, 0, 0xEE, 0);
+    if (iVar1 != NULL) {
+        fn_801DA8C4(iVar1, (u16)uVar2, param_3);
+    }
 }
+#pragma pop
 
 /* 0x80208750 | size: 0x70 | small */
 void fightOutPokemonLoadWazaEffect(void* param_1, u32 param_2, u32 param_3, u32 param_4) {
@@ -4408,46 +4332,39 @@ void fightWazaDoEffectFunc(u32 p1, u32 p2, u32 p3, u32 p4)
 #pragma pop
 
 /* Address: 0x80209618 | Size: 0xd0 | Ghidra import */
-
-char fightWazaIsMix(u32 r3)
-
+#pragma push
+#pragma peephole on
+char fightWazaIsMix(u32 ctx)
 {
-    extern u32 _DAT_80279d08;
-    extern u32 _DAT_80279d0c;
-    extern u32 _DAT_80279d10;
-    extern u32 _DAT_80279d14;
-    extern short fn_80119ED0();
-    extern s8 fn_8011B67C();
-  u16 uVar1;
-  u16 uVar2;
-  short sVar3;
-  s8 cVar4;
-  u16 uVar5;
-  u32 local_28;
-  u32 local_24;
-  u32 local_20;
-  u16 local_1c;
-  
-  uVar2 = 0;
-  local_28 = _DAT_80279d08;
-  local_24 = _DAT_80279d0c;
-  local_20 = _DAT_80279d10;
-  local_1c = _DAT_80279d14;
-  for (uVar5 = 0; uVar5 < 7; uVar5 = uVar5 + 1) {
-    uVar1 = *(u16 *)((int)&local_28 + (u32)uVar5 * 2);
-    sVar3 = fn_80119ED0(uVar1);
-    if (sVar3 == 0x2a) {
-      cVar4 = fn_8011B67C(r3,uVar1);
+    extern StatusIdTable7 lbl_80279D08;
+    extern u16 fn_80119ED0();
+    extern u8 fn_8011B67C();
+    u16 statusId;
+    u16 mixCount;
+    u16 statusType;
+    u8 isMix;
+    u16 i;
+    StatusIdTable7 statusIds;
+    u16* idTable;
+
+    mixCount = 0;
+    statusIds = lbl_80279D08;
+    idTable = statusIds.id;
+    for (i = 0; i < 7; i++) {
+        statusId = idTable[i];
+        statusType = fn_80119ED0(statusId);
+        if (statusType != 0x2A) {
+            isMix = 0;
+        } else {
+            isMix = fn_8011B67C(ctx, statusId);
+        }
+        if (isMix == 1) {
+            mixCount++;
+        }
     }
-    else {
-      cVar4 = 0;
-    }
-    if (cVar4 == 1) {
-      uVar2 = uVar2 + 1;
-    }
-  }
-  return -((uVar2 < 2) + -1);
+    return mixCount >= 2;
 }
+#pragma pop
 
 /* Address: 0x802096E8 | Size: 0xe0 | Ghidra import */
 #pragma push
@@ -5012,27 +4929,34 @@ u16 fightItemBiosGetItemDataId(u8* ptr) {
     return *(u16*)(&ptr[0x0]);
 }
 
-/* Address: 0x8020A398 | Size: 0xe0 | Ghidra import */
-void fightItemCreate(void)
-
+#pragma push
+#pragma peephole on
+static inline void fightItemInitInline(u8* item)
 {
-    int r3;
-    u16 r4;
-    u16 r5;
-    u32 r6;
-
     extern void fn_80142B24();
-  if (r3 != 0) {
-    fn_80142B24(r3,0,0x1e,0,0);
-    fn_80142B24(r3,0,0x1f,0,0);
-    fn_80142B24(r3,0,0x20,0, (void*)0xffffffff);
-    fn_80142B24(r3,0,0x21,0,0);
-    fn_80142B24(r3,0,0x1e,0,r4);
-    fn_80142B24(r3,0,0x1f,0,r5);
-    fn_80142B24(r3,0,0x20,0,r6);
-  }
-  return;
+
+    if (item != NULL) {
+        fn_80142B24(item, 0, 0x1E, 0, 0);
+        fn_80142B24(item, 0, 0x1F, 0, 0);
+        fn_80142B24(item, 0, 0x20, 0, (void*)-1);
+        fn_80142B24(item, 0, 0x21, 0, 0);
+    }
 }
+
+/* Address: 0x8020A398 | Size: 0xe0 */
+void fightItemCreate(u8* item, u16 itemDataId, u16 targetDataId, u32 count)
+{
+    extern void fn_80142B24();
+    u8* ctx;
+
+    if ((ctx = item) != NULL) {
+        fightItemInitInline(ctx);
+        fn_80142B24(ctx, 0, 0x1E, 0, itemDataId);
+        fn_80142B24(ctx, 0, 0x1F, 0, targetDataId);
+        fn_80142B24(ctx, 0, 0x20, 0, count);
+    }
+}
+#pragma pop
 
 /* Address: 0x8020A478 | Size: 0x88 | Ghidra import */
 #pragma push

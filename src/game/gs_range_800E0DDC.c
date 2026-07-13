@@ -52,6 +52,7 @@ extern const char lbl_80270610[]; /* "GSmaterial: Error creating environment map
 extern u32 lbl_8047AA80;   /* GSgfx state pointer (sda21) */
 extern u8 lbl_80400248[];  /* GSgfx state backup buffer (0x5A0 bytes) */
 extern u8 lbl_80400B28[];  /* light/material command buffer */
+extern u32 __OSStartTime[];
 
 /* ===== Combined forward-decls (duplicated across split segments) ===== */
 
@@ -470,6 +471,22 @@ extern u32 lbl_8047AB50;
 extern u32 lbl_8047CB50;
 extern u32 lbl_8047CB48;
 extern u32 lbl_8047AB3C;
+extern u32 lbl_8047AB40;
+extern u32 lbl_8047AB44;
+
+
+u32 fn_800E0DDC(void) {
+    u32* cursor;
+    u32 total;
+
+    cursor = (u32*)__OSStartTime[4];
+    lbl_8047AB44 = (u32)cursor;
+    lbl_8047AB40 = __OSStartTime[5];
+    for (total = 0; cursor != 0; cursor = (u32*)cursor[1]) {
+        total += cursor[2];
+    }
+    return total;
+}
 
 
 /* ==================================================================
@@ -578,4 +595,3 @@ u8 fn_800E0E14(u32 verbose, u32 dumpMap) {
     return ok;
 }
 #endif
-
