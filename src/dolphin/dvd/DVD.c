@@ -1000,6 +1000,13 @@ void stateCheckID_800B5D94(void)
     stateCheckID();
 }
 
+/* 0x800A5FC0 | size: 0x34 */
+void fn_800A5FC0(DVDCommandBlock* block)
+{
+    DVDLowAudioBufferConfig(((DVDDiskID*)IDShouldBe_8047A7EC)->streaming, 10,
+                            fn_800A62CC);
+}
+
 /*
  * DVDGetTransferredSize / DVDGetCurrentDiskID - orphans removed (see file
  * header). Neither name is present in symbols.txt; both bodies were
