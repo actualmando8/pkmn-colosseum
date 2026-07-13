@@ -335,6 +335,26 @@ f32 cameraGetHeight(void) {
 }
 #endif
 #pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+void cameraSetFov(f32 fov) {
+    CameraFloorEntry* floorEntry;
+
+    if (fov < lbl_8047D728.value) {
+        fov = lbl_8047D728.value;
+    }
+    if (fov > lbl_8047D72C.value) {
+        fov = lbl_8047D72C.value;
+    }
+
+    floorEntry = cameraFindFloorEntry(fn_800FF56C());
+    if (floorEntry != 0) {
+        floorEntry->fov = fov;
+    }
+    ((CameraPadState*)lbl_80478C40)->fov = fov;
+}
+#pragma pop
+#pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
