@@ -83,6 +83,7 @@ extern void fn_800A6028(u32 intType);
 extern void fn_800A6508(u32 intType);
 extern void fn_800A48DC(void (*callback)(u32));
 extern void stateCheckID2(DVDCommandBlock* block);
+extern void DVDChangeDisk(DVDCommandBlock* block, DVDDiskID* id);
 extern void stateBusy_800A68B4(DVDCommandBlock* block);
 
 /* 0x800A5784 | size: 0x8C */
@@ -421,6 +422,8 @@ typedef struct DVDStaticData {
 
 extern DVDStaticData BB2_803FC360;
 extern DVDDiskID lbl_803FC380;
+extern BOOL DVDLowRead(void* addr, u32 length, u32 offset,
+                       DVDLowCallback callback);
 extern BOOL DVDLowReadDiskID(DVDDiskID* id, DVDLowCallback callback);
 extern BOOL DVDLowAudioStream(u32 subcmd, u32 length, u32 offset,
                               void (*callback)(u32));
@@ -1129,8 +1132,12 @@ void fn_800A6028(u32 intType)
 /*
  * stateCheckID2 - 0x800A609C | size: 0x38
  * DVD state machine callback - reads disk ID after cover close
- * TODO: Full decompilation
  */
+void stateCheckID2(DVDCommandBlock* block)
+{
+    DVDLowRead(&BB2_803FC360.bb2, sizeof(DVDBB2), 0x420,
+               (DVDLowCallback)DVDChangeDisk);
+}
 
 /*
  * fn_800A60D4 - 0x800A60D4 | size: 0x114
