@@ -377,6 +377,80 @@ static inline void TExpStateSetDither(s32 enable)
     }
 }
 
+typedef struct HSD_TevDesc {
+    /* 0x00 */ u32 pad0;
+    /* 0x04 */ u32 flag;
+    /* 0x08 */ u32 stage;
+    /* 0x0C */ u32 coord;
+    /* 0x10 */ u32 map;
+    /* 0x14 */ u32 color;
+    /* 0x18 */ u32 color_op;
+    /* 0x1C */ u32 color_a;
+    /* 0x20 */ u32 color_b;
+    /* 0x24 */ u32 color_c;
+    /* 0x28 */ u32 color_d;
+    /* 0x2C */ u32 color_scale;
+    /* 0x30 */ u32 color_bias;
+    /* 0x34 */ u8 color_clamp;
+    /* 0x35 */ u8 pad35[3];
+    /* 0x38 */ u32 color_tevreg;
+    /* 0x3C */ u32 alpha_op;
+    /* 0x40 */ u32 alpha_a;
+    /* 0x44 */ u32 alpha_b;
+    /* 0x48 */ u32 alpha_c;
+    /* 0x4C */ u32 alpha_d;
+    /* 0x50 */ u32 alpha_scale;
+    /* 0x54 */ u32 alpha_bias;
+    /* 0x58 */ u8 alpha_clamp;
+    /* 0x59 */ u8 pad59[3];
+    /* 0x5C */ u32 alpha_tevreg;
+    /* 0x60 */ u32 pad60;
+    /* 0x64 */ s32 kcolor0;
+    /* 0x68 */ s32 kcolor1;
+    /* 0x6C */ u32 swap0;
+    /* 0x70 */ u32 swap1;
+    /* 0x74 */ u32 kr;
+    /* 0x78 */ u32 kg;
+    /* 0x7C */ u32 kb;
+    /* 0x80 */ u32 ka;
+} HSD_TevDesc;
+
+s32 fn_801B387C(void);
+s32 HSD_StateAssignTev(void);
+void fn_801B3638(HSD_TevDesc* desc);
+void fn_801B3258(void);
+void fn_801B3770(void);
+void fn_801B3890(void);
+void fn_801B2F1C(u32 flags);
+void fn_801B29E4(u32 flags, HSD_PEDesc* pe);
+
+#pragma push
+#pragma optimization_level 1
+static void setupTevMode_last(void)
+{
+    if (fn_801B387C() == 0) {
+        HSD_TevDesc desc;
+        desc.flag = 0;
+        desc.stage = HSD_StateAssignTev();
+        desc.coord = 0xFF;
+        desc.map = GX_TEXMAP_NULL;
+        desc.color = GX_COLOR0A0;
+        desc.color_op = 4;
+        fn_801B3638(&desc);
+    }
+}
+
+void fn_801B294C(u32 flags, HSD_PEDesc* pe)
+{
+    setupTevMode_last();
+    fn_801B29E4(flags, pe);
+    fn_801B3258();
+    fn_801B3770();
+    fn_801B3890();
+    fn_801B2F1C(flags);
+}
+#pragma pop
+
 void fn_801B29E4(u32 flags, HSD_PEDesc* pe)
 {
     s32 blendType;
@@ -778,44 +852,6 @@ void HSD_TExpCompile(u8* root, u32* tex_count, u32* ras_count) {
     if (tex_count) *tex_count = t_count;
     if (ras_count) *ras_count = r_count;
 }
-
-typedef struct HSD_TevDesc {
-    /* 0x00 */ u32 pad0;
-    /* 0x04 */ u32 flag;
-    /* 0x08 */ u32 stage;
-    /* 0x0C */ u32 coord;
-    /* 0x10 */ u32 map;
-    /* 0x14 */ u32 color;
-    /* 0x18 */ u32 color_op;
-    /* 0x1C */ u32 color_a;
-    /* 0x20 */ u32 color_b;
-    /* 0x24 */ u32 color_c;
-    /* 0x28 */ u32 color_d;
-    /* 0x2C */ u32 color_scale;
-    /* 0x30 */ u32 color_bias;
-    /* 0x34 */ u8  color_clamp;
-    /* 0x35 */ u8  pad35[3];
-    /* 0x38 */ u32 color_tevreg;
-    /* 0x3C */ u32 alpha_op;
-    /* 0x40 */ u32 alpha_a;
-    /* 0x44 */ u32 alpha_b;
-    /* 0x48 */ u32 alpha_c;
-    /* 0x4C */ u32 alpha_d;
-    /* 0x50 */ u32 alpha_scale;
-    /* 0x54 */ u32 alpha_bias;
-    /* 0x58 */ u8  alpha_clamp;
-    /* 0x59 */ u8  pad59[3];
-    /* 0x5C */ u32 alpha_tevreg;
-    /* 0x60 */ u32 pad60;
-    /* 0x64 */ s32 kcolor0;
-    /* 0x68 */ s32 kcolor1;
-    /* 0x6C */ u32 swap0;
-    /* 0x70 */ u32 swap1;
-    /* 0x74 */ u32 kr;
-    /* 0x78 */ u32 kg;
-    /* 0x7C */ u32 kb;
-    /* 0x80 */ u32 ka;
-} HSD_TevDesc;
 
 void fn_800BC6F0();
 void fn_800BC228();
