@@ -74,10 +74,10 @@ while true; do
     echo "[$ts] HARNESS-PAUSED (lane restart and publication suppressed)" >> "$LOG"
   else
     for lane in \
-      "colo-fs-small|$small_run|MAXW=3 FUZZY_MAX=87.999 bash projects/pkmn-colosseum/ops/start-fs-small.sh" \
-      "colo-fs-medium|$medium_run|MAXW=2 FUZZY_MAX=87.999 bash projects/pkmn-colosseum/ops/start-fs-medium.sh" \
-      "colo-fs-large|$large_run|MAXW=1 FUZZY_MAX=87.999 bash projects/pkmn-colosseum/ops/start-fs-large.sh"; do
-      session=${lane%%|*}; rest=${lane#*|}; rid=${rest%%|*}; command=${rest#*|}
+      "small|colo-fs-small|$small_run" \
+      "medium|colo-fs-medium|$medium_run" \
+      "large|colo-fs-large|$large_run"; do
+      lane_name=${lane%%|*}; rest=${lane#*|}; session=${rest%%|*}; rid=${rest#*|}
       if fleet_is_paused; then
         paused=1
         break
@@ -87,8 +87,12 @@ while true; do
         continue
       fi
       if ! fleet_lane_alive "$session" "$rid"; then
+        if ! command=$(fleet_lane_restart_command "$lane_name" "$rid" "$RUNTIME_PATH"); then
+          echo "[$ts] SKIP $session (invalid restart override)" >> "$LOG"
+          continue
+        fi
         tmux kill-session -t "$session" 2>/dev/null || true
-        tmux new-session -d -s "$session" "exec env PATH=$RUNTIME_PATH RUN=$rid $command"
+        tmux new-session -d -s "$session" "$command"
         restarted_lanes="$restarted_lanes $session"
         echo "[$ts] RESTARTED $session (missing real run-loop)" >> "$LOG"
       fi
@@ -141,12 +145,18 @@ while true; do
         paused=1
         break
       fi
-      tmux kill-session -t "$ls" 2>/dev/null; pkill -f "$rid" 2>/dev/null; sleep 2
       case "$ls" in
-        colo-fs-small) tmux new-session -d -s colo-fs-small "exec env PATH=$RUNTIME_PATH RUN=$rid MAXW=3 FUZZY_MAX=87.999 bash projects/pkmn-colosseum/ops/start-fs-small.sh";;
-        colo-fs-medium) tmux new-session -d -s colo-fs-medium "exec env PATH=$RUNTIME_PATH RUN=$rid MAXW=2 FUZZY_MAX=87.999 bash projects/pkmn-colosseum/ops/start-fs-medium.sh";;
-        colo-fs-large) tmux new-session -d -s colo-fs-large "exec env PATH=$RUNTIME_PATH RUN=$rid MAXW=1 FUZZY_MAX=87.999 bash projects/pkmn-colosseum/ops/start-fs-large.sh";;
+        colo-fs-small) lane_name=small ;;
+        colo-fs-medium) lane_name=medium ;;
+        colo-fs-large) lane_name=large ;;
+        *) continue ;;
       esac
+      if ! command=$(fleet_lane_restart_command "$lane_name" "$rid" "$RUNTIME_PATH"); then
+        echo "[$ts] SKIP stalled $ls (invalid restart override)" >> "$LOG"
+        continue
+      fi
+      tmux kill-session -t "$ls" 2>/dev/null; pkill -f "$rid" 2>/dev/null; sleep 2
+      tmux new-session -d -s "$ls" "$command"
       echo "[$ts] RECOVERED stalled lane $ls (no session ${mins}min)" >> "$LOG"
     fi
   done
@@ -217,19 +227,27 @@ while true; do
   active_paths=/tmp/grind/active_wt_paths.txt
   if sqlite3 "$DB" "SELECT DISTINCT worktree_path FROM worker_state WHERE lifecycle_status='running' AND worktree_path IS NOT NULL;" > "${active_paths}.tmp" 2>/dev/null; then
     mv "${active_paths}.tmp" "$active_paths"
-    for d in "$HARNESS"/projects/pkmn-colosseum/worktrees/*/; do
-      fleet_is_paused && break
-      [ -d "$d" ] || continue
-      source_path="${d%/}/source"
-      grep -Fxq "$source_path" "$active_paths" 2>/dev/null && continue
-      if [ -z "$(find "$d" -maxdepth 0 -mmin -90 2>/dev/null)" ]; then
-        if git -C "$GAME" worktree remove --force "$source_path" 2>/dev/null; then
-          echo "[$ts] GC removed $source_path" >> "$LOG"
-        else
-          echo "[$ts] GC skipped unregistered/failed $source_path" >> "$LOG"
+    while IFS= read -r worktree_root; do
+      for d in "$worktree_root"/*/; do
+        fleet_is_paused && break
+        [ -d "$d" ] || continue
+        source_path="${d%/}/source"
+        claim_id=${d%/}; claim_id=${claim_id##*/}
+        if ! fleet_managed_worker_path "$source_path" "$claim_id" >/dev/null; then
+          echo "[$ts] GC skipped unmanaged path $source_path" >> "$LOG"
+          continue
         fi
-      fi
-    done
+        grep -Fxq "$source_path" "$active_paths" 2>/dev/null && continue
+        if [ -z "$(find "$d" -maxdepth 0 -mmin -90 2>/dev/null)" ]; then
+          if git -C "$GAME" worktree remove --force "$source_path" 2>/dev/null; then
+            echo "[$ts] GC removed $source_path" >> "$LOG"
+          else
+            echo "[$ts] GC skipped unregistered/failed $source_path" >> "$LOG"
+          fi
+        fi
+      done
+      fleet_is_paused && break
+    done < <(fleet_worker_worktree_roots)
   else
     rm -f "${active_paths}.tmp"
     echo "[$ts] GC skipped: failed to read active worktrees" >> "$LOG"

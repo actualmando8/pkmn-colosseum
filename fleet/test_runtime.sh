@@ -51,12 +51,91 @@ if fleet_valid_run_id PAUSED-legacy; then
   exit 1
 fi
 
+# Lane restart overrides are executable files at fixed durable paths.  Missing
+# files preserve the historical defaults; unsafe present files fail closed.
+default_command=$(fleet_lane_restart_command small "$VALID" '/test path/bin:/usr/bin')
+case "$default_command" in
+  *"MAXW=3"*"start-fs-small.sh") ;;
+  *) echo "missing override did not preserve small default" >&2; exit 1 ;;
+esac
+
+override=$(fleet_restart_script_file small)
+cat > "$override" <<'EOF'
+#!/usr/bin/env bash
+printf '%s\n' "$RUN" > "$FLEET_OVERRIDE_CAPTURE"
+EOF
+chmod +x "$override"
+override_command=$(fleet_lane_restart_command small "$VALID" '/usr/bin:/bin')
+case "$override_command" in
+  *"fs-small_restart.sh"*) ;;
+  *) echo "valid override was not selected" >&2; exit 1 ;;
+esac
+case "$override_command" in
+  *"start-fs-small.sh"*) echo "valid override fell through to default" >&2; exit 1 ;;
+esac
+export FLEET_OVERRIDE_CAPTURE="$TMP/override-capture"
+bash -c "$override_command"
+[ "$(cat "$FLEET_OVERRIDE_CAPTURE")" = "$VALID" ]
+
+tmux() { printf '%s\n' "$@" > "$TMP/tmux-args"; }
+fleet_start_lane_session small colo-fs-small "$VALID" '/usr/bin:/bin'
+grep -Fxq new-session "$TMP/tmux-args"
+grep -Fxq colo-fs-small "$TMP/tmux-args"
+grep -Fq fs-small_restart.sh "$TMP/tmux-args"
+unset -f tmux
+
+chmod -x "$override"
+if fleet_lane_restart_command small "$VALID" '/usr/bin:/bin' >/dev/null 2>&1; then
+  echo "non-executable override was accepted" >&2
+  exit 1
+fi
+rm "$override"
+mkdir "$override"
+if fleet_lane_restart_command small "$VALID" '/usr/bin:/bin' >/dev/null 2>&1; then
+  echo "override directory was accepted" >&2
+  exit 1
+fi
+rmdir "$override"
+
+outside="$TMP/outside-restart.sh"
+printf '#!/usr/bin/env bash\nexit 0\n' > "$outside"
+chmod +x "$outside"
+ln -s "$outside" "$override"
+if fleet_lane_restart_command small "$VALID" '/usr/bin:/bin' >/dev/null 2>&1; then
+  echo "symlinked override was accepted" >&2
+  exit 1
+fi
+rm "$override"
+
+if fleet_lane_restart_command unknown "$VALID" '/usr/bin:/bin' >/dev/null 2>&1; then
+  echo "unknown lane restart command was accepted" >&2
+  exit 1
+fi
+
 export FLEET_WORKTREE_ROOT="$TMP/worktrees"
+export FLEET_ADDITIONAL_WORKTREE_ROOTS="$TMP/live-worktrees"
 export FLEET_QUARANTINE_ROOT="$TMP/quarantine"
+expected_roots=$(printf '%s\n%s' "$FLEET_WORKTREE_ROOT" "$FLEET_ADDITIONAL_WORKTREE_ROOTS")
+[ "$(fleet_worker_worktree_roots)" = "$expected_roots" ]
+
+saved_additional=$FLEET_ADDITIONAL_WORKTREE_ROOTS
+FLEET_ADDITIONAL_WORKTREE_ROOTS=relative-root
+if fleet_worker_worktree_roots >/dev/null 2>&1; then
+  echo "relative additional worktree root was accepted" >&2
+  exit 1
+fi
+FLEET_ADDITIONAL_WORKTREE_ROOTS=$saved_additional
+
 BROKEN_CLAIM=11111111-2222-3333-4444-555555555555
 mkdir -p "$FLEET_WORKTREE_ROOT/$BROKEN_CLAIM/source/build"
 quarantined=$(fleet_quarantine_broken_worktree "$FLEET_WORKTREE_ROOT/$BROKEN_CLAIM/source" "$BROKEN_CLAIM")
 [ ! -e "$FLEET_WORKTREE_ROOT/$BROKEN_CLAIM" ]
+[ -d "$quarantined/source/build" ]
+
+SECONDARY_CLAIM=22222222-3333-4444-5555-666666666666
+mkdir -p "$FLEET_ADDITIONAL_WORKTREE_ROOTS/$SECONDARY_CLAIM/source/build"
+quarantined=$(fleet_quarantine_broken_worktree "$FLEET_ADDITIONAL_WORKTREE_ROOTS/$SECONDARY_CLAIM/source" "$SECONDARY_CLAIM")
+[ ! -e "$FLEET_ADDITIONAL_WORKTREE_ROOTS/$SECONDARY_CLAIM" ]
 [ -d "$quarantined/source/build" ]
 
 VALID_CLAIM=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee

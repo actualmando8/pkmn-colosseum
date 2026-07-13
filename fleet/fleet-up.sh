@@ -27,17 +27,26 @@ if [ -f "$PAUSE_FILE" ]; then
   echo "[fleet-up] fleet paused; lane startup suppressed"
 else
   if [ -n "$small_run" ]; then
-    tmux has-session -t colo-fs-small 2>/dev/null || tmux new-session -d -s colo-fs-small "exec env PATH=$RUNTIME_PATH RUN=$small_run MAXW=3 FUZZY_MAX=87.999 bash projects/pkmn-colosseum/ops/start-fs-small.sh"
+    if ! tmux has-session -t colo-fs-small 2>/dev/null; then
+      fleet_start_lane_session small colo-fs-small "$small_run" "$RUNTIME_PATH" || \
+        echo "[fleet-up] ERROR small lane has an invalid restart override"
+    fi
   else
     echo "[fleet-up] ERROR small lane has no valid persisted run ID"
   fi
   if [ -n "$medium_run" ]; then
-    tmux has-session -t colo-fs-medium 2>/dev/null || tmux new-session -d -s colo-fs-medium "exec env PATH=$RUNTIME_PATH RUN=$medium_run MAXW=2 FUZZY_MAX=87.999 bash projects/pkmn-colosseum/ops/start-fs-medium.sh"
+    if ! tmux has-session -t colo-fs-medium 2>/dev/null; then
+      fleet_start_lane_session medium colo-fs-medium "$medium_run" "$RUNTIME_PATH" || \
+        echo "[fleet-up] ERROR medium lane has an invalid restart override"
+    fi
   else
     echo "[fleet-up] ERROR medium lane has no valid persisted run ID"
   fi
   if [ -n "$large_run" ]; then
-    tmux has-session -t colo-fs-large 2>/dev/null || tmux new-session -d -s colo-fs-large "exec env PATH=$RUNTIME_PATH RUN=$large_run MAXW=1 FUZZY_MAX=87.999 bash projects/pkmn-colosseum/ops/start-fs-large.sh"
+    if ! tmux has-session -t colo-fs-large 2>/dev/null; then
+      fleet_start_lane_session large colo-fs-large "$large_run" "$RUNTIME_PATH" || \
+        echo "[fleet-up] ERROR large lane has an invalid restart override"
+    fi
   else
     echo "[fleet-up] ERROR large lane has no valid persisted run ID"
   fi
