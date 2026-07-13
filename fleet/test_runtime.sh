@@ -8,6 +8,18 @@ export FLEET_RUN_TMP_DIR="$TMP/tmp"
 export FLEET_RUN_STATE_DIR="$TMP/state"
 source "$ROOT/fleet/runtime.sh"
 
+[ "$(fleet_worktree_gc_minutes)" = 90 ]
+FLEET_WORKTREE_GC_MINUTES=30
+[ "$(fleet_worktree_gc_minutes)" = 30 ]
+for invalid_gc_minutes in 0 1441 nope '30 minutes'; do
+  FLEET_WORKTREE_GC_MINUTES=$invalid_gc_minutes
+  if fleet_worktree_gc_minutes >/dev/null 2>&1; then
+    echo "invalid GC age was accepted: $invalid_gc_minutes" >&2
+    exit 1
+  fi
+done
+FLEET_WORKTREE_GC_MINUTES=90
+
 VALID=fb947e95-fb57-481c-8cca-335330cfe483
 NEXT=9a4d1295-9815-44d4-a73d-d1f3ac35edef
 mkdir -p "$FLEET_RUN_TMP_DIR"
@@ -125,6 +137,27 @@ if fleet_worker_worktree_roots >/dev/null 2>&1; then
   exit 1
 fi
 FLEET_ADDITIONAL_WORKTREE_ROOTS=$saved_additional
+
+printf '%s\n' \
+  "$FLEET_ADDITIONAL_WORKTREE_ROOTS/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee/source" \
+  "$FLEET_ADDITIONAL_WORKTREE_ROOTS/22222222-3333-4444-5555-666666666666/source/build" \
+  > "$TMP/process-cwds"
+fleet_path_has_process_cwd \
+  "$FLEET_ADDITIONAL_WORKTREE_ROOTS/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee/source" \
+  "$TMP/process-cwds"
+fleet_path_has_process_cwd \
+  "$FLEET_ADDITIONAL_WORKTREE_ROOTS/22222222-3333-4444-5555-666666666666/source" \
+  "$TMP/process-cwds"
+if fleet_path_has_process_cwd \
+    "$FLEET_ADDITIONAL_WORKTREE_ROOTS/33333333-4444-5555-6666-777777777777/source" \
+    "$TMP/process-cwds"; then
+  echo "unrelated process CWD protected a worker path" >&2
+  exit 1
+fi
+if fleet_path_has_process_cwd "$FLEET_WORKTREE_ROOT/11111111-2222-3333-4444-555555555555/source" "$TMP/missing-cwds"; then
+  echo "missing process-CWD snapshot was accepted" >&2
+  exit 1
+fi
 
 BROKEN_CLAIM=11111111-2222-3333-4444-555555555555
 mkdir -p "$FLEET_WORKTREE_ROOT/$BROKEN_CLAIM/source/build"

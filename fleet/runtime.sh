@@ -8,9 +8,24 @@ if [ "${FLEET_ADDITIONAL_WORKTREE_ROOTS+x}" != x ]; then
   FLEET_ADDITIONAL_WORKTREE_ROOTS=/Users/douglaswhittingham/gamecube-decomp-harness-live/projects/pkmn-colosseum/worktrees
 fi
 FLEET_QUARANTINE_ROOT=${FLEET_QUARANTINE_ROOT:-/tmp/grind/quarantined-worktrees}
+FLEET_WORKTREE_GC_MINUTES=${FLEET_WORKTREE_GC_MINUTES:-90}
 
 fleet_valid_run_id() {
   [[ ${1:-} =~ ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ ]]
+}
+
+# Keep the historical 90-minute grace by default.  Exact-manifest campaigns
+# can safely reduce it (for example, 30) because GC still requires an inactive
+# DB path, no process CWD in the checkout, a UUID-shaped managed path, and
+# successful Git worktree removal.
+fleet_worktree_gc_minutes() {
+  local minutes=$FLEET_WORKTREE_GC_MINUTES
+  case "$minutes" in
+    ''|*[!0-9]*) return 1 ;;
+  esac
+  [ "$minutes" -ge 1 ] 2>/dev/null || return 1
+  [ "$minutes" -le 1440 ] 2>/dev/null || return 1
+  printf '%s\n' "$minutes"
 }
 
 fleet_run_file() {
@@ -223,6 +238,18 @@ fleet_managed_worker_path() {
     return 0
   done < <(fleet_worker_worktree_roots)
   return 1
+}
+
+# Direct salvage processes can outlive or bypass worker_state and keep using a
+# checkout whose DB lifecycle is no longer running.  Treat a process rooted at
+# the checkout (or any of its descendants) as active too.
+fleet_path_has_process_cwd() {
+  local root=$1 cwd_file=$2
+  [ -f "$cwd_file" ] || return 2
+  awk -v root="$root" '
+    $0 == root || index($0, root "/") == 1 { found = 1; exit }
+    END { exit(found ? 0 : 1) }
+  ' "$cwd_file"
 }
 
 # After a worker crash, an old claim can point at a partially deleted directory

@@ -223,34 +223,61 @@ while true; do
   fi
 
   # 4. Remove only registered, stale, non-active worker worktrees. A failed DB
-  # read fails closed; it must never turn an empty active list into mass removal.
+  # read or process-CWD snapshot fails closed. Direct salvage processes are not
+  # always lifecycle_status=running, so their checkout CWD is an independent
+  # protection against collection.
   active_paths=/tmp/grind/active_wt_paths.txt
-  if sqlite3 "$DB" "SELECT DISTINCT worktree_path FROM worker_state WHERE lifecycle_status='running' AND worktree_path IS NOT NULL;" > "${active_paths}.tmp" 2>/dev/null; then
+  process_cwds=/tmp/grind/process_cwds.txt
+  if lsof -n -d cwd -Fn > "${process_cwds}.raw" 2>/dev/null && \
+      sed -n 's/^n//p' "${process_cwds}.raw" > "${process_cwds}.tmp"; then
+    mv "${process_cwds}.tmp" "$process_cwds"
+    rm -f "${process_cwds}.raw"
+  else
+    rm -f "${process_cwds}.raw" "${process_cwds}.tmp"
+    echo "[$ts] GC skipped: failed to snapshot process CWDs" >> "$LOG"
+    process_cwds=
+  fi
+  if [ -n "$process_cwds" ] && \
+      sqlite3 "$DB" "SELECT DISTINCT worktree_path FROM worker_state WHERE lifecycle_status='running' AND worktree_path IS NOT NULL;" > "${active_paths}.tmp" 2>/dev/null; then
     mv "${active_paths}.tmp" "$active_paths"
-    while IFS= read -r worktree_root; do
-      for d in "$worktree_root"/*/; do
-        fleet_is_paused && break
-        [ -d "$d" ] || continue
-        source_path="${d%/}/source"
-        claim_id=${d%/}; claim_id=${claim_id##*/}
-        if ! fleet_managed_worker_path "$source_path" "$claim_id" >/dev/null; then
-          echo "[$ts] GC skipped unmanaged path $source_path" >> "$LOG"
-          continue
-        fi
-        grep -Fxq "$source_path" "$active_paths" 2>/dev/null && continue
-        if [ -z "$(find "$d" -maxdepth 0 -mmin -90 2>/dev/null)" ]; then
-          if git -C "$GAME" worktree remove --force "$source_path" 2>/dev/null; then
-            echo "[$ts] GC removed $source_path" >> "$LOG"
-          else
-            echo "[$ts] GC skipped unregistered/failed $source_path" >> "$LOG"
+    if gc_minutes=$(fleet_worktree_gc_minutes); then
+      while IFS= read -r worktree_root; do
+        for d in "$worktree_root"/*/; do
+          fleet_is_paused && break
+          [ -d "$d" ] || continue
+          source_path="${d%/}/source"
+          claim_id=${d%/}; claim_id=${claim_id##*/}
+          if ! fleet_managed_worker_path "$source_path" "$claim_id" >/dev/null; then
+            echo "[$ts] GC skipped unmanaged path $source_path" >> "$LOG"
+            continue
           fi
-        fi
-      done
-      fleet_is_paused && break
-    done < <(fleet_worker_worktree_roots)
+          grep -Fxq "$source_path" "$active_paths" 2>/dev/null && continue
+          fleet_path_has_process_cwd "$source_path" "$process_cwds"
+          cwd_status=$?
+          if [ "$cwd_status" -eq 0 ]; then
+            echo "[$ts] GC skipped process-active path $source_path" >> "$LOG"
+            continue
+          fi
+          if [ "$cwd_status" -ne 1 ]; then
+            echo "[$ts] GC skipped: could not check process CWD for $source_path" >> "$LOG"
+            continue
+          fi
+          if [ -z "$(find "$d" -maxdepth 0 -mmin "-$gc_minutes" 2>/dev/null)" ]; then
+            if git -C "$GAME" worktree remove --force "$source_path" 2>/dev/null; then
+              echo "[$ts] GC removed $source_path (inactive ${gc_minutes}m+)" >> "$LOG"
+            else
+              echo "[$ts] GC skipped unregistered/failed $source_path" >> "$LOG"
+            fi
+          fi
+        done
+        fleet_is_paused && break
+      done < <(fleet_worker_worktree_roots)
+    else
+      echo "[$ts] GC skipped: invalid FLEET_WORKTREE_GC_MINUTES" >> "$LOG"
+    fi
   else
     rm -f "${active_paths}.tmp"
-    echo "[$ts] GC skipped: failed to read active worktrees" >> "$LOG"
+    [ -z "$process_cwds" ] || echo "[$ts] GC skipped: failed to read active worktrees" >> "$LOG"
   fi
   if fleet_is_paused; then
     echo "[$ts] HARNESS-PAUSED mid-cycle (remaining GC skipped)" >> "$LOG"
