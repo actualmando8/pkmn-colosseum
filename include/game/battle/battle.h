@@ -311,7 +311,7 @@ typedef struct TypeMatchup {
 /* HSD_AObjInterpretAnim (was fn_801C27F4) */ void HSD_AObjInterpretAnim(void* ctx, f32 posX, f32 posZ);
 /* HSD_AObjReqAnim */ void HSD_AObjReqAnim(void* obj, f32 value);
 /* HSD_AObjInvokeCallBacks */ void HSD_AObjInvokeCallBacks(void);
-/* HSD_AObjInitEndCallBack (was fn_801C2A60) */ s32  HSD_AObjInitEndCallBack(void);
+/* HSD_AObjInitEndCallBack (was fn_801C2A60) */ void HSD_AObjInitEndCallBack(void);
 /* HSD_AObjClearFlags (was fn_801C2A74) */ s32  HSD_AObjClearFlags(s32 slot);
 /* HSD_AObjSetFlags (was fn_801C2A90) */ s32  HSD_AObjSetFlags(s32 slot);
 /* HSD_AObjGetAllocData */ void* HSD_AObjGetAllocData(void);

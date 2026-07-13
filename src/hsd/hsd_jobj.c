@@ -27,6 +27,7 @@
 static void JObjInfoInit(void);
 void JObjRelease(HSD_JObj* jobj);
 void JObjAmnesia(void* info);
+void fn_801A1B7C(HSD_JObj* jobj);
 
 HSD_JObjInfo hsdJObj = { JObjInfoInit };
 
@@ -323,9 +324,9 @@ void HSD_JObjAnimAll(HSD_JObj* jobj)
     if (jobj == NULL) {
         return;
     }
-    HSD_JObjAnim(jobj);
-    HSD_JObjAnimAll(jobj->child);
-    HSD_JObjAnimAll(jobj->next);
+    HSD_AObjInitEndCallBack();
+    fn_801A1B7C(jobj);
+    HSD_AObjInvokeCallBacks();
 }
 
 /* ========================================================================= */
