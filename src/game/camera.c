@@ -383,6 +383,17 @@ void cameraSetDistance(f32 distance) {
 
     ((CameraPadState*)lbl_80478C40)->distance = distance;
 }
+
+void cameraSetHeight(f32 height) {
+    CameraFloorEntry* floorEntry;
+
+    floorEntry = cameraFindFloorEntry(fn_800FF56C());
+    if (floorEntry != NULL) {
+        floorEntry->height = height;
+    }
+
+    ((CameraPadState*)lbl_80478C40)->height = height;
+}
 #if 0
 #pragma push
 #pragma optimization_level 0
