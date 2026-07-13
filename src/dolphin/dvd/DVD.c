@@ -61,10 +61,10 @@ static OSThreadQueue __DVDThreadQueue;  /* 0x8047A7E0 (sda-relative) */
 extern DVDCommandBlock DummyCommandBlock_803FC3A0;
 
 /* Forward declarations of state functions */
-static void stateReady(void);
+static void stateReady_800A6684(void);
 static void stateBusy(DVDCommandBlock* block);
 static void cbForStateError(u32 intType);
-static void cbForStateMotorStopped(u32 intType);
+static void cbForStateMotorStopped_800A65A0(u32 intType);
 static void AlarmHandler(OSAlarm* alarm, OSContext* context);
 
 /* Forward declarations for internal DVD operations */
@@ -74,7 +74,6 @@ extern DVDCBCallback lbl_8047A80C;
 extern u32 lbl_8047A81C;
 extern void fn_800A59CC(u32 intType);
 extern void fn_800A48DC(void (*callback)(u32));
-extern void stateReady_800A6684(void);
 extern void stateBusy_800A68B4(DVDCommandBlock* block);
 
 void fn_800A62CC(u32 intType)
@@ -193,7 +192,7 @@ static inline BOOL issueCommand(s32 prio, DVDCommandBlock* block) {
     result = __DVDPushWaitingQueue(prio, block);
 
     if (executing_8047A7E8 == NULL && (s32)PauseFlag_8047A7F4 == 0) {
-        stateReady();
+        stateReady_800A6684();
     }
 
     OSRestoreInterrupts(enabled);
@@ -280,7 +279,7 @@ s32 DVDGetDriveStatus(void) {
  *
  * Pops the next command from the waiting queue and begins execution.
  */
-static void stateReady(void) {
+static void stateReady_800A6684(void) {
     DVDCommandBlock* block;
 
     block = __DVDPopWaitingQueue();
@@ -318,6 +317,12 @@ extern u32 CurrCommand_8047A804;
 extern u32 lbl_8047A7FC;
 extern u32 lbl_804789DC;
 extern u32 lbl_80311B48[3];
+typedef struct DVDStaticData {
+    u8 unk_00[0x40];
+    DVDCommandBlock dummyCommandBlock;
+    OSAlarm resetAlarm;
+} DVDStaticData;
+
 extern u8 BB2_803FC360[];
 extern BOOL DVDLowAudioStream(u32 subcmd, u32 length, u32 offset,
                               void (*callback)(u32));
@@ -340,7 +345,7 @@ static inline BOOL dvdCheckCancel(u32 resume)
     if (lbl_8047A80C != NULL) {
         lbl_8047A80C(0, finished);
     }
-    stateReady();
+    stateReady_800A6684();
     return TRUE;
 }
 
@@ -375,7 +380,7 @@ void fn_800A6BD4(u32 intType)
             return;
         }
         executing_8047A7E8->state = 7;
-        DVDLowWaitCoverClose((DVDCBCallback)cbForStateMotorStopped);
+        DVDLowWaitCoverClose((DVDCBCallback)cbForStateMotorStopped_800A65A0);
         return;
     }
 
@@ -397,7 +402,7 @@ void fn_800A6BD4(u32 intType)
         if (lbl_8047A80C != NULL) {
             lbl_8047A80C(0, finished);
         }
-        stateReady();
+        stateReady_800A6684();
         return;
     }
 
@@ -421,7 +426,7 @@ void fn_800A6BD4(u32 intType)
             if (finished->callback != NULL) {
                 finished->callback((s32)finished->transferredSize, finished);
             }
-            stateReady();
+            stateReady_800A6684();
             return;
         }
 
@@ -439,7 +444,7 @@ void fn_800A6BD4(u32 intType)
             if (finished->callback != NULL) {
                 finished->callback(result, finished);
             }
-            stateReady();
+            stateReady_800A6684();
             return;
         }
 
@@ -452,7 +457,7 @@ void fn_800A6BD4(u32 intType)
                     if (finished->callback != NULL) {
                         finished->callback(-2, finished);
                     }
-                    stateReady();
+                    stateReady_800A6684();
                 } else {
                     lbl_8047A7FC = 0;
                     executing_8047A7E8->currTransferSize = 1;
@@ -468,7 +473,7 @@ void fn_800A6BD4(u32 intType)
             if (finished->callback != NULL) {
                 finished->callback(0, finished);
             }
-            stateReady();
+            stateReady_800A6684();
             return;
         }
 
@@ -478,7 +483,7 @@ void fn_800A6BD4(u32 intType)
         if (finished->callback != NULL) {
             finished->callback(0, finished);
         }
-        stateReady();
+        stateReady_800A6684();
         return;
     }
 
@@ -502,7 +507,7 @@ void fn_800A6BD4(u32 intType)
         if (finished->callback != NULL) {
             finished->callback((s32)finished->transferredSize, finished);
         }
-        stateReady();
+        stateReady_800A6684();
         return;
     }
 
@@ -537,19 +542,44 @@ static void cbForStateError(u32 intType) {
         block->callback(0, block);
     }
 
-    stateReady();
+    stateReady_800A6684();
 }
 
 /*
  * cbForStateMotorStopped - Callback when motor stop completes
  * 0x800A65A0 | size: 0xE4
  */
-static void cbForStateMotorStopped(u32 intType) {
-    /* After motor stops, initiate reset sequence */
-    DVDLowReset();
-    /* Then continue with state machine */
-    stateReady();
+#pragma dont_inline on
+static void cbForStateMotorStopped_800A65A0(u32 intType) {
+    DVDStaticData* staticData = (DVDStaticData*)BB2_803FC360;
+    DVDCommandBlock* finished;
+
+    DVD_COVER = 0;
+    executing_8047A7E8->state = 3;
+
+    switch (CurrCommand_8047A804) {
+    case 4:
+    case 5:
+    case 13:
+    case 15:
+        __DVDClearWaitingQueue();
+        finished = executing_8047A7E8;
+        executing_8047A7E8 = &staticData->dummyCommandBlock;
+        if (finished->callback != NULL) {
+            finished->callback(-4, finished);
+        }
+        stateReady_800A6684();
+        break;
+    default:
+        DVDReset();
+        OSCreateAlarm(&staticData->resetAlarm);
+        OSSetAlarm(&staticData->resetAlarm,
+                   (((*(u32*)0x800000F8) >> 2) / 1000) * 1150,
+                   AlarmHandler);
+        break;
+    }
 }
+#pragma dont_inline reset
 
 /*
  * AlarmHandler - Generic DVD alarm handler for retry/timeout
@@ -562,7 +592,7 @@ static void AlarmHandler(OSAlarm* alarm, OSContext* context) {
     OSSetCurrentContext(&exceptionContext);
 
     /* Re-issue the current command */
-    stateReady();
+    stateReady_800A6684();
 
     OSClearContext(&exceptionContext);
     OSSetCurrentContext(context);
@@ -598,7 +628,7 @@ BOOL DVDReadAbsAsyncPrio(DVDCommandBlock* block, void* addr, s32 length,
     result = __DVDPushWaitingQueue(prio, block);
 
     if (executing_8047A7E8 == NULL && PauseFlag_8047A7F4 == 0) {
-        stateReady();
+        stateReady_800A6684();
     }
 
     OSRestoreInterrupts(enabled);
@@ -667,7 +697,7 @@ static void __DVDInterruptHandler(__OSInterrupt interrupt, OSContext* context) {
             callback(0, block);
         }
 
-        stateReady();
+        stateReady_800A6684();
     }
 }
 
@@ -690,7 +720,7 @@ static void cbForStateGettingError(u32 intType) {
         if (block->callback != NULL) {
             block->callback(-1, block);
         }
-        stateReady();
+        stateReady_800A6684();
         return;
     }
 
@@ -702,14 +732,14 @@ static void cbForStateGettingError(u32 intType) {
         if (block->callback != NULL) {
             block->callback(-3, block);
         }
-        stateReady();
+        stateReady_800A6684();
         return;
     }
 
     if (intType & 0x1) {
         /* Recoverable error - retry */
         ResumeFromHere_8047A810 = 1;
-        stateReady();
+        stateReady_800A6684();
         return;
     }
 
@@ -720,7 +750,7 @@ static void cbForStateGettingError(u32 intType) {
     if (block->callback != NULL) {
         block->callback(-1, block);
     }
-    stateReady();
+    stateReady_800A6684();
 }
 
 /*
@@ -738,13 +768,13 @@ static void cbForStateCover(u32 intType) {
         if (block->callback != NULL) {
             block->callback(-1, block);
         }
-        stateReady();
+        stateReady_800A6684();
         return;
     }
 
     /* Cover closed, proceed with reset */
     ResetRequired_8047A820 = TRUE;
-    stateReady();
+    stateReady_800A6684();
 }
 
 /*
@@ -761,12 +791,12 @@ static void cbForStateGoToRetry(u32 intType) {
         if (block->callback != NULL) {
             block->callback(-1, block);
         }
-        stateReady();
+        stateReady_800A6684();
         return;
     }
     /* Ready to retry */
     ResumeFromHere_8047A810 = 2;
-    stateReady();
+    stateReady_800A6684();
 }
 
 /*
@@ -825,14 +855,14 @@ static void cbForStateCoverClosed(u32 intType) {
         if (block->callback != NULL) {
             block->callback(-1, block);
         }
-        stateReady();
+        stateReady_800A6684();
         return;
     }
 
     /* Cover confirmed closed, start reset */
     DVDReset();
     ResumeFromHere_8047A810 = 3;
-    stateReady();
+    stateReady_800A6684();
 }
 
 /*
@@ -885,7 +915,7 @@ void DVDResume(void) {
     PausingFlag_8047A7F8 = FALSE;
 
     if (executing_8047A7E8 == NULL) {
-        stateReady();
+        stateReady_800A6684();
     }
 
     OSRestoreInterrupts(enabled);
@@ -930,7 +960,7 @@ static void __DVDInterruptHandlerMain(u32 intType) {
         if (block->callback != NULL) {
             block->callback(-1, block);
         }
-        stateReady();
+        stateReady_800A6684();
         return;
     }
 
@@ -968,7 +998,7 @@ static void __DVDInterruptHandlerMain(u32 intType) {
         callback(0, block);
     }
 
-    stateReady();
+    stateReady_800A6684();
 }
 
 /*
@@ -999,7 +1029,7 @@ static BOOL DVDReadAbsAsyncForBS(DVDCommandBlock* block, void* addr,
     result = __DVDPushWaitingQueue(2, block);
 
     if (executing_8047A7E8 == NULL && PauseFlag_8047A7F4 == 0) {
-        stateReady();
+        stateReady_800A6684();
     }
 
     OSRestoreInterrupts(enabled);
@@ -1028,7 +1058,7 @@ static BOOL DVDSeekAbsAsyncPrio(DVDCommandBlock* block, s32 offset,
     result = __DVDPushWaitingQueue(prio, block);
 
     if (executing_8047A7E8 == NULL && PauseFlag_8047A7F4 == 0) {
-        stateReady();
+        stateReady_800A6684();
     }
 
     OSRestoreInterrupts(enabled);
@@ -1058,7 +1088,7 @@ static BOOL DVDStopStreamAtEndAsync(DVDCommandBlock* block,
     result = __DVDPushWaitingQueue(2, block);
 
     if (executing_8047A7E8 == NULL && PauseFlag_8047A7F4 == 0) {
-        stateReady();
+        stateReady_800A6684();
     }
 
     OSRestoreInterrupts(enabled);
