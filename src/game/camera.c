@@ -64,6 +64,9 @@ typedef struct CameraPadState {
     /* 0x3C */ s32 targetSubId;
     /* 0x40 */ u8 field_40[8];
     /* 0x48 */ f32 fov;
+    /* 0x4C */ u8 field_4C[0x84];
+    /* 0xD0 */ u32 animationGroup;
+    /* 0xD4 */ u32 animationId;
 } CameraPadState;
 
 void* GSmodelGetPart(void* model, s32 partIndex);
@@ -123,6 +126,10 @@ void fn_80179748(f32 a, f32 b, f32 c, f32 d);
 extern const GSSceneVec3 lbl_80315540;
 extern const GSSceneVec3 lbl_8031554C;
 extern const GSSceneVec3 lbl_80315558;
+
+u8 GScameraHasAnimationEnded(GSRenderCamera* camera);
+u32 GSthreadGetCurrentThread(void);
+extern const char lbl_80273F34[];
 
 typedef struct CameraFloatConstant {
     f32 value;
@@ -421,6 +428,42 @@ void cameraStopAnimation(void) {
 }
 #pragma pop
 #endif
+static inline GSRenderCamera* cameraGetCurrentAnimation(void) {
+    CameraPadState* state = lbl_80478C40;
+    GSRenderCamera* animation = GSresGetResource(
+        state->animationGroup, state->animationId);
+
+    if (animation == 0) {
+        animation = fn_800F92D4(state->animationId);
+    }
+    return animation;
+}
+
+s32 cameraWaitSyncAnime(s32 sync) {
+    GSRenderCamera* animation;
+
+    animation = cameraGetCurrentAnimation();
+    if (animation == 0) {
+        return 0;
+    }
+
+    if ((u8)sync != 0) {
+        for (;;) {
+            if (GScameraHasAnimationEnded(animation) != 0) {
+                break;
+            }
+            if (GSthreadGetCurrentThread() == 0) {
+                GSlogWrite(lbl_80273F34);
+                break;
+            }
+            _threadSwitch();
+        }
+    } else if (GScameraHasAnimationEnded(animation) == 0) {
+        return 1;
+    }
+
+    return 0;
+}
 #if 0
 #pragma push
 #pragma optimization_level 0
