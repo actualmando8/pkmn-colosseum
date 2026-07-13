@@ -272,7 +272,7 @@ asm void fn_801349DC(void) {
 #else
 #pragma optimization_level 4
 #pragma scheduling on
-s32 fn_801349DC(void* base, s8 slot, u16* name) {
+s32 pcboxSetPokemonBoxName(void* base, s8 slot, u16* name) {
     extern void GScharCpy(void*, u16*);
     s32 len;
     u16* p;
