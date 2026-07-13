@@ -962,7 +962,7 @@ s32 fn_80075390(void) {
     extern void fn_8007565C(void);
     extern void fn_800756C8(s32);
 
-    if (fn_80075638() == 0) {
+    if (fn_80075638() != 0) {
         fn_8007565C();
     } else {
         fn_800756C8(3);
