@@ -2721,6 +2721,22 @@ void fn_801B3174(void) {
     }
 }
 
+#pragma push
+#pragma optimization_level 1
+/* 0x801B31A4 | 0x50 */
+void fn_801B31A4(void) {
+    extern void fn_800BBC34(s32 stage);
+    extern void fn_800BBC0C(s32 count);
+    s32 i;
+
+    for (i = 0; i < 16; i++) {
+        fn_800BBC34(i);
+    }
+    fn_800BBC0C(0);
+    lbl_8047B370 = 0;
+}
+#pragma pop
+
 /* 0x801B3770 | 0x30 */
 void fn_801B3770(void) {
     fn_800BC8C8((u32)(u8)lbl_8047B370);
