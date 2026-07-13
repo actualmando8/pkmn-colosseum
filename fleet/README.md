@@ -22,6 +22,14 @@ must always contain canonical UUIDs. Rotate a campaign explicitly with
 `source fleet/runtime.sh && fleet_set_run_id <small|medium|large> <uuid>`; once
 created, the durable state copy wins over a mismatched `/tmp` file.
 
+Worker-worktree GC defaults to a 90-minute inactivity grace. The exact-manifest
+campaign may run the watchdog with `FLEET_WORKTREE_GC_MINUTES=30`; active DB
+paths and actual process CWDs are always excluded, and UUID layout,
+configured-root, age, and registered Git-worktree checks still apply. Invalid
+ages or a failed CWD snapshot fail closed. Do not enable the shorter grace until
+this watchdog version is running. Pass the variable to both a manually
+restarted watchdog and `fleet-up.sh`/launchd when it must survive another reboot.
+
 launchd (auto-start watchdog at boot):
   cp fleet/com.dougchansan.decomp-fleet.plist ~/Library/LaunchAgents/
   launchctl load ~/Library/LaunchAgents/com.dougchansan.decomp-fleet.plist
