@@ -10,11 +10,11 @@ POLL_SECONDS=${FS_PUSH_POLL_SECONDS:-1200}
 REPO=${FS_PUSH_REPO:-dougchansan/pkmn-colosseum}
 PUBLISH_PATHS=(src include)
 
-# "worktree|branch|title" triples
+# "worktree|branch|title" triples. Keep this list aligned with the active
+# exact-manifest campaigns; retired lane branches must not be republished.
 LANES=(
-  "/Users/douglaswhittingham/pkmn-colosseum-fromscratch|harness/from-scratch|From-scratch decomp lane: SMALL (<=256B fresh fns)"
-  "/Users/douglaswhittingham/pkmn-colosseum-fs-medium|harness/fs-medium|From-scratch decomp lane: MEDIUM (257-1024B fresh fns)"
-  "/Users/douglaswhittingham/pkmn-colosseum-fs-large|harness/fs-large|From-scratch decomp lane: LARGE (>=1025B fresh fns)"
+  "/Users/douglaswhittingham/pkmn-colosseum-fromscratch|fleet/rebatch-small-20260713|Exact-manifest decomp lane: SMALL (<=256B)"
+  "/Users/douglaswhittingham/pkmn-colosseum-rebatch-medium|fleet/rebatch-medium-20260713|Exact-manifest decomp lane: MEDIUM (257-1024B)"
 )
 
 log() {

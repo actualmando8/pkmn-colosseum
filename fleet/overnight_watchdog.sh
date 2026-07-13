@@ -171,7 +171,7 @@ while true; do
   #     its child worker died. Match the real worker command, not the run-loop
   #     PID embedded in worker_id, or the missing child is invisible forever.
   for pair in "sm:/Users/douglaswhittingham/pkmn-colosseum-fromscratch:$small_run" \
-              "md:/Users/douglaswhittingham/pkmn-colosseum-fs-medium:$medium_run" \
+              "md:/Users/douglaswhittingham/pkmn-colosseum-rebatch-medium:$medium_run" \
               "lg:/Users/douglaswhittingham/pkmn-colosseum-fs-large:$large_run"; do
     if fleet_is_paused; then
       paused=1
@@ -289,7 +289,7 @@ while true; do
   if ! fleet_is_paused; then git -C "$HARNESS" worktree prune 2>/dev/null; fi
   if ! fleet_is_paused; then git -C "$GAME" worktree prune 2>/dev/null; fi
   if ! fleet_is_paused; then git -C /Users/douglaswhittingham/pkmn-colosseum-fromscratch worktree prune 2>/dev/null; fi
-  if ! fleet_is_paused; then git -C /Users/douglaswhittingham/pkmn-colosseum-fs-medium worktree prune 2>/dev/null; fi
+  if ! fleet_is_paused; then git -C /Users/douglaswhittingham/pkmn-colosseum-rebatch-medium worktree prune 2>/dev/null; fi
   if ! fleet_is_paused; then git -C /Users/douglaswhittingham/pkmn-colosseum-fs-large worktree prune 2>/dev/null; fi
   wt=$(ls -d "$HARNESS"/projects/pkmn-colosseum/worktrees/*/ 2>/dev/null | wc -l | tr -d ' ')
   disk=$(df -h "$HARNESS" 2>/dev/null | tail -1 | awk '{print $5}')
