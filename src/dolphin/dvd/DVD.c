@@ -80,6 +80,7 @@ extern void fn_800A59CC(u32 intType);
 extern void fn_800A6028(u32 intType);
 extern void fn_800A6508(u32 intType);
 extern void fn_800A48DC(void (*callback)(u32));
+extern void stateCheckID2(DVDCommandBlock* block);
 extern void stateBusy_800A68B4(DVDCommandBlock* block);
 
 /* 0x800A5784 | size: 0x8C */
@@ -1056,11 +1057,27 @@ void fn_800A5FF4(DVDCommandBlock* block)
  * from dolphin/dvd/dvd.h (no remaining callers).
  */
 
-/*
- * fn_800A6028 - 0x800A6028 | size: 0x74
- * DVD state machine callback (timeout / error recovery)
- * TODO: Full decompilation
- */
+#pragma dont_inline on
+/* 0x800A6028 | size: 0x74 */
+void fn_800A6028(u32 intType)
+{
+    if (intType == 0x10) {
+        executing_8047A7E8->state = -1;
+        __DVDStoreErrorCode(0x1234568);
+        DVDReset();
+        cbForStateError(0);
+        return;
+    }
+
+    if (intType & 1) {
+        lbl_8047A81C = 0;
+        stateCheckID2(executing_8047A7E8);
+        return;
+    }
+
+    fn_800A48DC(fn_800A59CC);
+}
+#pragma dont_inline reset
 
 /*
  * stateCheckID2 - 0x800A609C | size: 0x38
