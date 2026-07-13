@@ -1,4 +1,5 @@
 #include "dolphin/types.h"
+#include "game/data/sdata2_8047D690.h"
 
 #pragma section ".sdata2"
 #define SDATA2 __declspec(section ".sdata2")

@@ -28,7 +28,12 @@ extern void  fn_800E209C(u16 handle);                   /* GSmemFree */
 
 /* GSgfx math/render */
 extern void  set__5GSvecFfff(void* out, f32 angle, f32 a, f32 b); /* rotation matrix */
+extern void  GSmtxMakeXRotation(void* out, f32 angle);
 extern void  GSmtxMakeYRotation(void* out, f32 angle);         /* angle to vector */
+extern void  fn_800E0108(void* dst, void* lhs, void* rhs);
+extern void  fn_800E0238(void* dst, void* src);
+extern void  fn_800E02E8(void* matrix, f32 angle);
+extern void  fn_800E032C(void* matrix, f32 angle);
 extern void  GSvecAdd(void* out, void* a, void* b);  /* cross product */
 extern void  GSvecTransform(void* out, void* a, void* b);  /* vector subtract */
 extern void  GScameraSetPosition(void* obj, void* mtx);         /* set model matrix */
@@ -73,7 +78,6 @@ extern u32   lbl_80478C4C;  /* scene state word */
 
 /* sdata2 float constants */
 extern f32   lbl_8047B6A0;  /* float constant (likely 0.0 or 1.0) */
-extern f32   lbl_8047D740;  /* float constant (sdata2) */
 
 /* ===================================================================
  * Scene object structure (inferred from disassembly)
