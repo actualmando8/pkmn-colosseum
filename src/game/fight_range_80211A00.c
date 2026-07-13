@@ -12149,7 +12149,6 @@ void fn_80213E94(void)
     extern u8 lbl_80375E51[];
     extern u8 lbl_80375E5F[];
     extern u32 lbl_80279E1C[];
-    extern f64 lbl_8047E610;
     extern u32 pokemonGetStatus();
 
   u16 floorStatusF;
@@ -12168,10 +12167,8 @@ void fn_80213E94(void)
   u16 uVar9;
   u16 sVar7;
   u8 cVar10;
-  union {
-    u8 buffer[32];
-    u32 words[8];
-  } local_58;
+  u32 sqrtResult;
+  u8 local_58[8];
 
   uVar11 = 0;
   uVar12 = 0;
@@ -12279,13 +12276,9 @@ void fn_80213E94(void)
       uVar12 = 4;
     }
     else {
-      local_58.words[3] = 0xff0000 / (u32)uVar11;
-      local_58.words[2] = 0x43300000;
-      local_58.words[5] = __cvt_fp2unsigned(
-          sqrt(*(double*)&local_58.words[2] - lbl_8047E610));
-      local_58.words[4] = 0x43300000;
-      uVar11 = __cvt_fp2unsigned(
-          sqrt(*(double*)&local_58.words[4] - lbl_8047E610));
+      sqrtResult = __cvt_fp2unsigned(
+          sqrt((double)(0xff0000 / (u32)uVar11)));
+      uVar11 = __cvt_fp2unsigned(sqrt((double)sqrtResult));
       uVar11 = (u32)0xffff0 / (u32)uVar11;
       uVar12 = 0;
       while ((uVar12 & 0xff) < 4) {
@@ -12297,10 +12290,10 @@ void fn_80213E94(void)
     }
   }
   fightTrainerHokakuThrowEffect(trainerPtr,uVar3,0);
-  fightOutPokemonHokakuEffect(uVar2,uVar12,uVar3,0,local_58.buffer);
+  fightOutPokemonHokakuEffect(uVar2,uVar12,uVar3,0,local_58);
   fightTrainerHokakuThrowEffect(trainerPtr,uVar3,1);
   fightTrainerHokakuThrowEffect(trainerPtr,uVar3,3);
-  fightOutPokemonHokakuEffect(uVar2,uVar12,uVar3,1,local_58.buffer);
+  fightOutPokemonHokakuEffect(uVar2,uVar12,uVar3,1,local_58);
   uVar4 = fightOutPokemonGetNicknamePtr(uVar2);
   msgctrlSetValue(0x16,uVar4);
   if ((uVar12 & 0xff) >= 4) {
@@ -12313,16 +12306,16 @@ void fn_80213E94(void)
     lbl_8047B610 = lbl_80375E51;
   }
   else {
-    fightOutPokemonHokakuEffect(uVar2,uVar12,uVar3,2,local_58.buffer);
+    fightOutPokemonHokakuEffect(uVar2,uVar12,uVar3,2,local_58);
     lbl_80478D78[5] = (u8)uVar12;
     fightMenuOpenMsg(lbl_80279E1C[uVar12 & 0xff]);
-    fightOutPokemonHokakuEffect(uVar2,uVar12,uVar3,3,local_58.buffer);
+    fightOutPokemonHokakuEffect(uVar2,uVar12,uVar3,3,local_58);
     fightMenuCloseMsg();
     lbl_8047B610 = lbl_80375E5F;
   }
   fightTrainerHokakuThrowEffect(trainerPtr,uVar3,2);
   fightTrainerHokakuThrowEffect(trainerPtr,uVar3,6);
-  fightOutPokemonHokakuEffect(uVar2,uVar12,uVar3,4,local_58.buffer);
+  fightOutPokemonHokakuEffect(uVar2,uVar12,uVar3,4,local_58);
   return;
 }
 #pragma optimize_for_size on
