@@ -6,12 +6,14 @@
  * Supports ambient, infinite (directional), point, and spot lights
  * with attenuation, color, and animation.
  *
- * Colosseum address range: 0x801A4000 (HSD_LObjInit)
+ * Colosseum address range: 0x801A4000 (LObjInfoInit)
  * Adapted from the Melee decompilation (doldecomp/melee).
  */
 #ifndef HSD_LOBJ_H
 #define HSD_LOBJ_H
 
+#include "dolphin/mtx.h"
+#include "dolphin/gx/GX.h"
 #include "dolphin/types.h"
 #include "hsd/hsd_debug.h"
 #include "hsd/hsd_forward.h"
@@ -75,8 +77,8 @@ struct HSD_LObj {
     /* 0x08 */ u16 flags;
     /* 0x0A */ u16 priority;
     /* 0x0C */ HSD_LObj* next;
-    /* 0x10 */ u32 color;          /* GXColor packed as u32 */
-    /* 0x14 */ u32 hw_color;       /* Hardware-set color */
+    /* 0x10 */ GXColor color;
+    /* 0x14 */ GXColor hw_color;   /* Colour last pushed to the hardware */
     /* 0x18 */ HSD_WObj* position;
     /* 0x1C */ HSD_WObj* interest;
     /* 0x20 */ union {
@@ -85,14 +87,12 @@ struct HSD_LObj {
         HSD_LightAttn attn;
     } u;
     /* 0x38 */ f32 shininess;
-    /* 0x3C */ f32 lvec_x;
-    /* 0x40 */ f32 lvec_y;
-    /* 0x44 */ f32 lvec_z;
+    /* 0x3C */ Vec lvec;
     /* 0x48 */ HSD_AObj* aobj;
     /* 0x4C */ u32 id;             /* GXLightID */
-    /* 0x50 */ u8 lightobj[0x40];  /* GXLightObj (64 bytes) */
-    /* 0x90 */ u32 spec_id;        /* GXLightID for specular */
-    /* 0x94 */ u8 spec_lightobj[0x40]; /* GXLightObj for specular */
+    /* 0x50 */ GXLightObj lightobj;
+    /* 0x90 */ s32 spec_id;        /* GXLightID for specular */
+    /* 0x94 */ GXLightObj spec_lightobj;
 };
 
 /* ========================================================================= */
@@ -104,7 +104,7 @@ struct HSD_LightDesc {
     HSD_LightDesc* next;
     u16 flags;
     u16 attnflags;
-    u32 color;         /* GXColor */
+    GXColor color;
     HSD_WObjDesc* position;
     HSD_WObjDesc* interest;
     union {
@@ -170,14 +170,16 @@ void HSD_LObjAnim(HSD_LObj* lobj);
 void HSD_LObjAnimAll(HSD_LObj* lobj);
 void HSD_LObjReqAnim(HSD_LObj* lobj, f32 startframe);
 void HSD_LObjReqAnimAll(HSD_LObj* lobj, f32 startframe);
-void HSD_LObjSetup(void* setup);
-void HSD_LObjSetColor(HSD_LObj* lobj, u32* color);
+void HSD_LObjSetup(HSD_CObj* cobj);
+void HSD_LObjSetColor(HSD_LObj* lobj, GXColor* color);
+void HSD_LObjGetLightVector(HSD_LObj* lobj, Vec* dir);
 HSD_LObj* HSD_LObjGetCurrentByType(u32 type);
+void HSD_LObjAddCurrentAll(HSD_LObj* lobj);
 void HSD_LObjDeleteCurrentAll(HSD_LObj* lobj);
-s32 HSD_LObjGetPosition(HSD_LObj* lobj, void* out);
-s32 HSD_LObjGetInterest(HSD_LObj* lobj, void* out);
-void HSD_LObjSetPosition(HSD_LObj* lobj, void* desc);
-void HSD_LObjSetInterest(HSD_LObj* lobj, void* desc);
+s32 HSD_LObjGetPosition(HSD_LObj* lobj, Vec* out);
+s32 HSD_LObjGetInterest(HSD_LObj* lobj, Vec* out);
+void HSD_LObjSetPosition(HSD_LObj* lobj, Vec* position);
+void HSD_LObjSetInterest(HSD_LObj* lobj, Vec* interest);
 void HSD_LObjRemoveAll(HSD_LObj* lobj);
 HSD_LObj* HSD_LObjAlloc(void);
 HSD_LObj* HSD_LObjLoadDesc(HSD_LightDesc* ldesc);

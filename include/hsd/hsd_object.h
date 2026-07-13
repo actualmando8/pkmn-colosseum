@@ -111,7 +111,9 @@ static inline BOOL ref_DEC(void* o)
     if ((ret = (HSD_OBJ(o)->ref_count == HSD_OBJ_NOREF))) {
         return ret;
     }
-    return HSD_OBJ(o)->ref_count-- == 0;
+    ret = (HSD_OBJ(o)->ref_count == 0);
+    HSD_OBJ(o)->ref_count--;
+    return ret;
 }
 
 static inline void ref_INC(void* o)

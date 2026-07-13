@@ -12,7 +12,7 @@ extern u8 lbl_8036C6D4[];
 extern void* jumptable_8036C6E0[];
 
 extern u8 CObjUpdateFunc[];
-extern u8 fn_801914F4[];
+extern u8 WObjInfoInit[];
 extern u8 fn_801938FC[];
 extern u8 fn_80193C24[];
 
@@ -34,7 +34,7 @@ u8 lbl_8036C568[136] = {
 };
 
 void* lbl_8036C5F0[18] = {
-    (void*)((u8*)fn_801914F4),
+    (void*)((u8*)WObjInfoInit),
     (void*)0x00000000,
     (void*)0x00000000,
     (void*)0x00000000,

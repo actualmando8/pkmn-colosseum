@@ -12,6 +12,7 @@
 #ifndef HSD_COBJ_H
 #define HSD_COBJ_H
 
+#include "dolphin/mtx.h"
 #include "dolphin/types.h"
 #include "hsd/hsd_forward.h"
 #include "hsd/hsd_object.h"
@@ -62,7 +63,7 @@ struct HSD_CObj {
     /* +28 */ HSD_WObj* interest;
     /* +2C */ union {
         f32 roll;
-        struct { f32 x; f32 y; f32 z; } up;
+        Vec up;
     } u;
     /* +38 */ f32 near;
     /* +3C */ f32 far;
@@ -103,7 +104,7 @@ struct HSD_CameraDescCommon {
     HSD_WObjDesc* eyepos;
     HSD_WObjDesc* interest;
     f32 roll;
-    void* up_vector;     /* Vec3* */
+    Vec* up_vector;
     f32 nnear;
     f32 ffar;
 };
@@ -117,7 +118,7 @@ struct HSD_CameraDescPerspective {
     HSD_WObjDesc* eyepos;
     HSD_WObjDesc* interest;
     f32 roll;
-    void* up_vector;
+    Vec* up_vector;
     f32 nnear;
     f32 ffar;
     f32 fov;
@@ -133,7 +134,7 @@ struct HSD_CameraDescFrustum {
     HSD_WObjDesc* eyepos;
     HSD_WObjDesc* interest;
     f32 roll;
-    void* up_vector;
+    Vec* up_vector;
     f32 nnear;
     f32 ffar;
     f32 top;
@@ -191,10 +192,10 @@ HSD_WObj* HSD_CObjGetEyePositionWObj(HSD_CObj* cobj);
 void HSD_CObjSetEyePositionWObj(HSD_CObj* cobj, HSD_WObj* eyepos);
 BOOL HSD_CObjSetCurrent(HSD_CObj* cobj);
 void HSD_CObjEndCurrent(void);
-void HSD_CObjSetEyePosition(HSD_CObj* cobj, void* position);
-void HSD_CObjGetEyePosition(HSD_CObj* cobj, void* position);
-void HSD_CObjSetInterest(HSD_CObj* cobj, void* position);
-void HSD_CObjGetInterest(HSD_CObj* cobj, void* position);
+void HSD_CObjSetEyePosition(HSD_CObj* cobj, Vec* position);
+void HSD_CObjGetEyePosition(HSD_CObj* cobj, Vec* position);
+void HSD_CObjSetInterest(HSD_CObj* cobj, Vec* position);
+void HSD_CObjGetInterest(HSD_CObj* cobj, Vec* position);
 HSD_CObj* HSD_CObjAlloc(void);
 void HSD_CObjAddAnim(HSD_CObj* cobj, HSD_CameraAnim* canim);
 void HSD_CObjAnim(HSD_CObj* cobj);

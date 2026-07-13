@@ -11,18 +11,19 @@
 
 #include "hsd/hsd_wobj.h"
 #include "hsd/hsd_aobj.h"
+#include "hsd/hsd_archive.h"
 #include "hsd/hsd_class.h"
 #include "hsd/hsd_debug.h"
 #include "hsd/hsd_jobj.h"
 #include "hsd/hsd_object.h"
 #include "hsd/hsd_robj.h"
 
-static void WObjInfoInit(void);
+void WObjInfoInit(void);
 static int WObjLoad_Early(HSD_WObj* wobj, HSD_WObjDesc* desc);
 int WObjLoad(HSD_WObj* wobj, HSD_WObjDesc* desc);
 void WObjAmnesia(HSD_ClassInfo* info);
 void WObjRelease(HSD_WObj* wobj);
-void WObjUpdateFunc(HSD_WObj* wobj, u32 type, void* value);
+void WObjUpdateFunc(void* obj, u32 type, void* value);
 
 HSD_WObjInfo hsdWObj = { WObjInfoInit };
 
@@ -74,7 +75,7 @@ void HSD_WObjInterpretAnim_Early(HSD_WObj* wobj)
 
 static int WObjLoad_Early(HSD_WObj* wobj, HSD_WObjDesc* desc)
 {
-    HSD_WObjSetPosition_Early(wobj, desc->pos_x, desc->pos_y, desc->pos_z);
+    HSD_WObjSetPosition_Early(wobj, desc->pos.x, desc->pos.y, desc->pos.z);
     if (wobj->robj != NULL) {
         HSD_RObjRemoveAll(wobj->robj);
     }
@@ -89,7 +90,7 @@ void HSD_WObjInit_Early(HSD_WObj* wobj, HSD_WObjDesc* desc)
         return;
     }
 
-    HSD_WObjSetPosition_Early(wobj, desc->pos_x, desc->pos_y, desc->pos_z);
+    HSD_WObjSetPosition_Early(wobj, desc->pos.x, desc->pos.y, desc->pos.z);
     if (wobj->robj != NULL) {
         HSD_RObjRemoveAll(wobj->robj);
     }
@@ -141,9 +142,9 @@ void HSD_WObjSetPosition_Early(HSD_WObj* wobj, f32 x, f32 y, f32 z)
     if (wobj == NULL) {
         return;
     }
-    wobj->pos_x = x;
-    wobj->pos_y = y;
-    wobj->pos_z = z;
+    wobj->pos.x = x;
+    wobj->pos.y = y;
+    wobj->pos.z = z;
     wobj->flags |= 0x2;
     wobj->flags &= ~0x1;
 }
@@ -154,7 +155,7 @@ void HSD_WObjSetPositionX(HSD_WObj* wobj, f32 val)
         if ((wobj->flags & 1) != 0) {
             wobj->flags &= ~0x1;
         }
-        wobj->pos_x = val;
+        wobj->pos.x = val;
         wobj->flags |= 0x2;
     }
 }
@@ -165,7 +166,7 @@ void HSD_WObjSetPositionY(HSD_WObj* wobj, f32 val)
         if ((wobj->flags & 1) != 0) {
             wobj->flags &= ~0x1;
         }
-        wobj->pos_y = val;
+        wobj->pos.y = val;
         wobj->flags |= 0x2;
     }
 }
@@ -176,7 +177,7 @@ void HSD_WObjSetPositionZ(HSD_WObj* wobj, f32 val)
         if ((wobj->flags & 1) != 0) {
             wobj->flags &= ~0x1;
         }
-        wobj->pos_z = val;
+        wobj->pos.z = val;
         wobj->flags |= 0x2;
     }
 }
@@ -186,9 +187,9 @@ void HSD_WObjGetPosition_Early(HSD_WObj* wobj, f32* x, f32* y, f32* z)
     if (wobj == NULL) {
         return;
     }
-    if (x != NULL) *x = wobj->pos_x;
-    if (y != NULL) *y = wobj->pos_y;
-    if (z != NULL) *z = wobj->pos_z;
+    if (x != NULL) *x = wobj->pos.x;
+    if (y != NULL) *y = wobj->pos.y;
+    if (z != NULL) *z = wobj->pos.z;
 }
 
 /* ========================================================================= */
@@ -223,16 +224,27 @@ static void WObjAmnesia_Early(HSD_ClassInfo* info)
     HSD_OBJECT_PARENT_INFO(&hsdWObj)->amnesia(info);
 }
 
-static void WObjInfoInit(void)
+/* 0x801914F4 | 0x98 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern u8 lbl_8036CC00[];   /* hsdObj  class info */
+extern char lbl_80274468[]; /* "sysdolphin_base_library" */
+extern char lbl_80274480[]; /* "had_wobj" */
+void WObjInfoInit(void)
 {
-    hsdInitClassInfo(HSD_CLASS_INFO(&hsdWObj), HSD_CLASS_INFO(&hsdObj),
-                     "sysdolphin_base_library", "had_wobj",
+    extern u8 lbl_8036C5F0[]; /* hsdWObj class info */
+
+    hsdInitClassInfo(HSD_CLASS_INFO(lbl_8036C5F0),
+                     HSD_CLASS_INFO(lbl_8036CC00), lbl_80274468, lbl_80274480,
                      sizeof(HSD_WObjInfo), sizeof(HSD_WObj));
-    HSD_CLASS_INFO(&hsdWObj)->release = (void (*)(HSD_Class*)) WObjRelease;
-    HSD_CLASS_INFO(&hsdWObj)->amnesia = WObjAmnesia;
-    HSD_WOBJ_INFO(&hsdWObj)->load = WObjLoad;
-    HSD_WOBJ_INFO(&hsdWObj)->update = WObjUpdateFunc;
+    HSD_CLASS_INFO(lbl_8036C5F0)->release = (void (*)(HSD_Class*)) WObjRelease;
+    HSD_CLASS_INFO(lbl_8036C5F0)->amnesia = WObjAmnesia;
+    HSD_WOBJ_INFO(lbl_8036C5F0)->load = WObjLoad;
+    HSD_WOBJ_INFO(lbl_8036C5F0)->update =
+        (void (*)(HSD_WObj*, u32, void*)) WObjUpdateFunc;
 }
+#pragma pop
 
 /* 0x8019158C | 0x48 */
 #pragma push
@@ -325,50 +337,67 @@ extern f64 lbl_8047D8F8;
 extern f32 lbl_8047D900;
 extern char lbl_8047D904;
 
-typedef struct WObjVec {
-    f32 x;
-    f32 y;
-    f32 z;
-} WObjVec;
-
 #undef WOBJ_USE_ANIM_POS
 #undef WOBJ_POS_DIRTY
-#define WOBJ_USE_ANIM_POS 0x1
-#define WOBJ_POS_DIRTY 0x2
+#define WOBJ_USE_ANIM_POS 0x1u
+#define WOBJ_POS_DIRTY 0x2u
 
-extern void PSMTXMultVec(f32 mtx[3][4], WObjVec* src, WObjVec* dst);
+/* Local mirrors of HSD_JObjSetupMatrix's dirty test. These cannot come from
+   hsd_jobj.h: the assert baked into the target carries that header's own
+   __FILE__ / line, which the externs above name directly. */
+static inline BOOL JObjMtxIsDirty(HSD_JObj* jobj)
+{
+    BOOL result;
 
-#define WOBJ_RESOLVE_ANIM_POSITION(wobj_)                                      \
+    if (jobj == NULL) {
+        __assert(&lbl_8047D8D8, 0x25D, &lbl_8047D8E0);
+    }
+    result = FALSE;
+    if (!(jobj->flags & JOBJ_USER_DEF_MTX) && (jobj->flags & JOBJ_MTX_DIRTY)) {
+        result = TRUE;
+    }
+    return result;
+}
+
+static inline void WObjJObjSetupMatrix(HSD_JObj* jobj)
+{
+    if (jobj == NULL || !JObjMtxIsDirty(jobj)) {
+        return;
+    }
+    fn_8019D9DC(jobj);
+}
+
+/* Bake the animated position into pos and drop the "animated" flag, so that
+   callers always read a plain world-space vector. jobj_ is the caller's
+   scratch HSD_JObj*, shared across every use in a function. */
+#define WOBJ_RESOLVE_ANIM_POSITION(wobj_, jobj_)                               \
     do {                                                                       \
-        HSD_JObj* jobj_;                                                       \
         if (((wobj_)->flags & WOBJ_USE_ANIM_POS) != 0) {                       \
             if ((wobj_)->aobj != NULL) {                                       \
                 if ((wobj_)->aobj->hsd_obj != NULL) {                          \
-                    jobj_ = (HSD_JObj*) (wobj_)->aobj->hsd_obj;                \
-                    if (jobj_ != NULL) {                                       \
-                        if (jobj_ == NULL) {                                   \
-                            __assert(&lbl_8047D8D8, 0x25D, &lbl_8047D8E0);     \
-                        }                                                      \
-                        if (((jobj_->flags & JOBJ_USER_DEF_MTX) == 0) &&       \
-                            ((jobj_->flags & JOBJ_MTX_DIRTY) != 0)) {          \
+                    (jobj_) = (HSD_JObj*) (wobj_)->aobj->hsd_obj;              \
+                    if ((jobj_) != NULL) {                                     \
+                        if (JObjMtxIsDirty(jobj_)) {                           \
                             fn_8019D9DC(jobj_);                                \
                         }                                                      \
                     }                                                          \
-                    PSMTXMultVec(jobj_->mtx, (WObjVec*) &(wobj_)->pos_x,        \
-                                (WObjVec*) &(wobj_)->pos_x);                   \
+                    PSMTXMultVec((jobj_)->mtx, &(wobj_)->pos, &(wobj_)->pos);  \
                 }                                                              \
             }                                                                  \
-            (wobj_)->flags = ((wobj_)->flags >> 1) << 1;                       \
+            (wobj_)->flags &= 0xFFFFFFFE;                                      \
         }                                                                      \
     } while (0)
 
-#define WOBJ_SET_POSITION(wobj_, pos_)                                         \
+/* Mirrors HSD_WObjSetPositionX/Y/Z: evaluate the new component, then (for a
+   non-NULL wobj) bake any animated position and store the component. */
+#define WOBJ_SET_POSITION_COMPONENT(wobj_, jobj_, field_, val_)                \
     do {                                                                       \
-        ((u32*) &(wobj_)->pos_x)[0] = ((u32*) (pos_))[0];                      \
-        ((u32*) &(wobj_)->pos_x)[1] = ((u32*) (pos_))[1];                      \
-        ((u32*) &(wobj_)->pos_x)[2] = ((u32*) (pos_))[2];                      \
-        (wobj_)->flags |= WOBJ_POS_DIRTY;                                      \
-        (wobj_)->flags = ((wobj_)->flags >> 1) << 1;                           \
+        f32 component_ = (val_);                                               \
+        if ((wobj_) != NULL) {                                                 \
+            WOBJ_RESOLVE_ANIM_POSITION(wobj_, jobj_);                          \
+            (wobj_)->pos.field_ = component_;                                  \
+            (wobj_)->flags |= WOBJ_POS_DIRTY;                                  \
+        }                                                                      \
     } while (0)
 
 #if 0
@@ -376,18 +405,22 @@ asm void HSD_WObjGetPosition(void) {
 #include "src/hsd/hsd_wobj_fn_80191688.inc"
 }
 #else
-void HSD_WObjGetPosition(HSD_WObj* wobj, void* position)
+#pragma optimization_level 1
+void HSD_WObjGetPosition(HSD_WObj* wobj, Vec* position)
 {
-    if (wobj == NULL) {
+    HSD_JObj* jobj;
+
+    if (wobj == NULL || position == NULL) {
         return;
     }
-    if (position == NULL) {
-        return;
+    if ((wobj->flags & WOBJ_USE_ANIM_POS) != 0) {
+        if (wobj->aobj != NULL && wobj->aobj->hsd_obj != NULL) {
+            WObjJObjSetupMatrix(jobj = (HSD_JObj*) wobj->aobj->hsd_obj);
+            PSMTXMultVec(jobj->mtx, &wobj->pos, &wobj->pos);
+        }
+        wobj->flags &= 0xFFFFFFFE;
     }
-    WOBJ_RESOLVE_ANIM_POSITION(wobj);
-    ((u32*) position)[0] = ((u32*) &wobj->pos_x)[0];
-    ((u32*) position)[1] = ((u32*) &wobj->pos_x)[1];
-    ((u32*) position)[2] = ((u32*) &wobj->pos_x)[2];
+    *position = wobj->pos;
 }
 #endif
 #pragma pop
@@ -402,27 +435,21 @@ asm void HSD_WObjSetPosition(HSD_WObj* wobj, void* position) {
 }
 #else
 #pragma optimization_level 4
-void HSD_WObjSetPosition(HSD_WObj* wobj, void* position) {
-    u32* src = (u32*)position;
-    u32* dst;
-    if (wobj == NULL) {
+void HSD_WObjSetPosition(HSD_WObj* wobj, Vec* position)
+{
+    if (wobj == NULL || position == NULL) {
         return;
     }
-    if (src != NULL) {
-        dst = (u32*)&wobj->pos_x;
-        dst[0] = src[0];
-        dst[1] = src[1];
-        dst[2] = src[2];
-        wobj->flags |= 0x2;
-        wobj->flags = (wobj->flags >> 1) << 1;
-    }
+    wobj->pos = *position;
+    wobj->flags = wobj->flags | WOBJ_POS_DIRTY;
+    wobj->flags = wobj->flags & 0xFFFFFFFE;
 }
 #endif
 #pragma pop
 
 /* 0x801917D0 | 0xCC */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 1
 #pragma optimizewithasm off
 extern HSD_ClassInfo* fn_80193748(char* class_name);
 #if 0
@@ -432,28 +459,31 @@ asm HSD_WObj* HSD_WObjLoadDesc(HSD_WObjDesc* desc) {
 #else
 HSD_WObj* HSD_WObjLoadDesc(HSD_WObjDesc* desc)
 {
-    HSD_ClassInfo* info;
-    HSD_WObj* wobj;
     extern u8 lbl_8036C5F0[];
 
-    if (desc == NULL) {
-        return NULL;
-    }
+    if (desc != NULL) {
+        HSD_WObj* wobj;
+        HSD_ClassInfo* info;
 
-    if (desc->class_name != NULL && (info = fn_80193748(desc->class_name)) != NULL) {
-        wobj = fn_80193828(info);
-        if (wobj == NULL) {
-            __assert(lbl_8047D8C8, 0x104, lbl_8047D8D0);
+        if (desc->class_name == NULL ||
+            !(info = fn_80193748(desc->class_name)))
+        {
+            /* HSD_WObjAlloc() inlined */
+            wobj = (HSD_WObj*) fn_80193828(
+                lbl_8047B218 ? lbl_8047B218 : (HSD_ClassInfo*) lbl_8036C5F0);
+            if (wobj == NULL) {
+                __assert(lbl_8047D8C8, 0x257, lbl_8047D8D0);
+            }
+        } else {
+            wobj = (HSD_WObj*) fn_80193828(info);
+            if (wobj == NULL) {
+                __assert(lbl_8047D8C8, 0x104, lbl_8047D8D0);
+            }
         }
-    } else {
-        wobj = fn_80193828(lbl_8047B218 != NULL ? lbl_8047B218 : (HSD_ClassInfo*) lbl_8036C5F0);
-        if (wobj == NULL) {
-            __assert(lbl_8047D8C8, 0x257, lbl_8047D8D0);
-        }
+        HSD_WOBJ_METHOD(wobj)->load(wobj, desc);
+        return wobj;
     }
-
-    HSD_WOBJ_METHOD(wobj)->load(wobj, desc);
-    return wobj;
+    return NULL;
 }
 #endif
 #pragma pop
@@ -468,21 +498,14 @@ asm void HSD_WObjInit(HSD_WObj* wobj, HSD_WObjDesc* desc) {
 #include "src/hsd/hsd_wobj_HSD_WObjInit.inc"
 }
 #else
-#pragma optimization_level 4
-void HSD_WObjInit(HSD_WObj* wobj, HSD_WObjDesc* desc) {
-    if (wobj == NULL) {
+#pragma optimization_level 1
+void HSD_WObjInit(HSD_WObj* wobj, HSD_WObjDesc* desc)
+{
+    if (wobj == NULL || desc == NULL) {
         return;
     }
-    if (desc == NULL) {
-        return;
-    }
-    if ((u32)desc + 4 != 0) {
-        ((u32*) &wobj->pos_x)[0] = ((u32*) &desc->pos_x)[0];
-        ((u32*) &wobj->pos_x)[1] = ((u32*) &desc->pos_x)[1];
-        ((u32*) &wobj->pos_x)[2] = ((u32*) &desc->pos_x)[2];
-        wobj->flags |= 0x2;
-        wobj->flags = (wobj->flags >> 1) << 1;
-    }
+
+    HSD_WObjSetPosition(wobj, &desc->pos);
     if (wobj->robj != NULL) {
         fn_801AE50C(wobj->robj);
     }
@@ -501,16 +524,10 @@ asm int WObjLoad(HSD_WObj* wobj, HSD_WObjDesc* desc) {
 #include "src/hsd/hsd_wobj_WObjLoad.inc"
 }
 #else
-#pragma optimization_level 4
+#pragma optimization_level 1
 int WObjLoad(HSD_WObj* wobj, HSD_WObjDesc* desc)
 {
-    if (wobj != NULL && (u32) desc + 4 != 0) {
-        ((u32*) &wobj->pos_x)[0] = ((u32*) &desc->pos_x)[0];
-        ((u32*) &wobj->pos_x)[1] = ((u32*) &desc->pos_x)[1];
-        ((u32*) &wobj->pos_x)[2] = ((u32*) &desc->pos_x)[2];
-        wobj->flags |= WOBJ_POS_DIRTY;
-        wobj->flags = (wobj->flags >> 1) << 1;
-    }
+    HSD_WObjSetPosition(wobj, &desc->pos);
     if (wobj->robj != NULL) {
         fn_801AE50C(wobj->robj);
     }
@@ -544,20 +561,23 @@ void HSD_WObjInterpretAnim(HSD_WObj* wobj) {
 
 /* 0x80191A34 | 0x398 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 1
 #pragma optimizewithasm off
-extern void splArcLengthPoint(WObjVec* out, HSD_Spline* spline, f32 frame);
+extern void splArcLengthPoint(Vec* out, HSD_Spline* spline, f32 frame);
 #if 0
 asm void WObjUpdateFunc(void) {
 #include "src/hsd/hsd_wobj_WObjUpdateFunc.inc"
 }
 #else
-void WObjUpdateFunc(HSD_WObj* wobj, u32 type, void* value)
+void WObjUpdateFunc(void* obj, u32 type, void* value)
 {
-    WObjVec position;
+    HSD_WObj* wobj;
+    Vec position;
     HSD_JObj* jobj;
-    f32 component;
     f32* fval;
+
+    wobj = (HSD_WObj*) obj;
+    fval = (f32*) value;
 
     if (wobj == NULL) {
         return;
@@ -565,7 +585,6 @@ void WObjUpdateFunc(HSD_WObj* wobj, u32 type, void* value)
 
     switch (type) {
     case HSD_A_J_PATH:
-        fval = (f32*) value;
         if (*fval < lbl_8047D8E8) {
             *fval = lbl_8047D8F0;
         }
@@ -583,26 +602,17 @@ void WObjUpdateFunc(HSD_WObj* wobj, u32 type, void* value)
             __assert(lbl_8047D8C8, 0x9B, (const char*) lbl_80274498);
         }
         splArcLengthPoint(&position, jobj->u.spline, *fval);
-        WOBJ_SET_POSITION(wobj, &position);
+        HSD_WObjSetPosition(wobj, &position);
         wobj->flags |= WOBJ_USE_ANIM_POS;
         break;
     case HSD_A_J_TRAX:
-        component = *(f32*) value;
-        WOBJ_RESOLVE_ANIM_POSITION(wobj);
-        wobj->pos_x = component;
-        wobj->flags |= WOBJ_POS_DIRTY;
+        WOBJ_SET_POSITION_COMPONENT(wobj, jobj, x, *fval);
         break;
     case HSD_A_J_TRAY:
-        component = *(f32*) value;
-        WOBJ_RESOLVE_ANIM_POSITION(wobj);
-        wobj->pos_y = component;
-        wobj->flags |= WOBJ_POS_DIRTY;
+        WOBJ_SET_POSITION_COMPONENT(wobj, jobj, y, *fval);
         break;
     case HSD_A_J_TRAZ:
-        component = *(f32*) value;
-        WOBJ_RESOLVE_ANIM_POSITION(wobj);
-        wobj->pos_z = component;
-        wobj->flags |= WOBJ_POS_DIRTY;
+        WOBJ_SET_POSITION_COMPONENT(wobj, jobj, z, *fval);
         break;
     }
 }
@@ -674,119 +684,87 @@ void HSD_WObjRemoveAnim(HSD_WObj* wobj) {
 
 /* HSD_ArchiveGetPublicAddress (0x80191ECC) | 0x98 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 1
 #pragma optimizewithasm off
-extern int strcmp(void* entry, void* key);
-typedef struct {
-    u32 field00;
-    u32 field04;
-    u32 field08;
-    u32 count;    /* 0x0C */
-    u32 field10;
-    u32 field14;
-    u32 field18;
-    u32 field1C;
-    u8* base;     /* 0x20 */
-    u32 field24;
-    u8** pairs;   /* 0x28: ptr to array of (offset, key_offset) pairs */
-    u32 field2C;
-    u8* data;     /* 0x30: data buffer */
-} WObjTable;
-typedef struct {
-    u32 result_offset;  /* 0x00 */
-    u32 key_offset;     /* 0x04 */
-} WObjTablePair;
-#if 0
-asm void HSD_ArchiveGetPublicAddress(void) {
-#include "src/hsd/hsd_wobj_HSD_ArchiveGetPublicAddress.inc"
-}
-#else
-void* HSD_ArchiveGetPublicAddress(WObjTable* table, void* key) {
+extern int strcmp(const char* s1, const char* s2);
+void* HSD_ArchiveGetPublicAddress(HSD_Archive* archive, const char* symbols)
+{
     u32 i;
-    for (i = 0; i < table->count; i++) {
-        if (strcmp(table->data + ((WObjTablePair*) table->pairs)[i].key_offset,
-                        key) == 0) {
-            return table->base + ((WObjTablePair*) table->pairs)[i].result_offset;
+
+    for (i = 0; i < archive->header.nb_public; i++) {
+        int comparison =
+            strcmp(archive->symbols + archive->public_info[i].symbol, symbols);
+
+        if (comparison == 0) {
+            return archive->data + archive->public_info[i].offset;
         }
     }
+
     return NULL;
 }
-#endif
 #pragma pop
 
 /* 0x80191F64 | 0x180 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 1
 #pragma optimizewithasm off
 extern void OSReport(const char* fmt, ...);
 extern void* memcpy(void* dst, const void* src, u32 size);
 extern void* memset(void* dst, int val, u32 size);
-typedef struct {
-    u32 magic;     /* 0x00 */
-    u32 count_a;   /* 0x04 */
-    u32 count_b;   /* 0x08 */
-    u32 count_c;   /* 0x0C */
-    u32 count_d;   /* 0x10 */
-    u32 field14;   /* 0x14 */
-    u32 field18;   /* 0x18 */
-    u32 field1C;   /* 0x1C */
-    u8* ptr_a;     /* 0x20 */
-    u8* ptr_b;     /* 0x24 */
-    u8* ptr_c;     /* 0x28 */
-    u8* ptr_d;     /* 0x2C */
-    u8* ptr_e;     /* 0x30 */
-    u32 field34;   /* 0x34 */
-    u32 field38;   /* 0x38 */
-    u32 flags;     /* 0x3C */
-    u8* raw_data;  /* 0x40 */
-} WObjTableFull;
 extern const char lbl_802744A8[];
-#if 0
-asm void HSD_ArchiveParse(void) {
-#include "src/hsd/hsd_wobj_HSD_ArchiveParse.inc"
-}
-#else
-#pragma optimization_level 4
-s32 HSD_ArchiveParse(WObjTableFull* tbl, u8* data, u32 magic) {
-    u32 offset;
+
+static inline void Locate(HSD_Archive* archive)
+{
     u32 i;
-    if (tbl == NULL) {
+    u32* ptr;
+
+    for (i = 0; i < archive->header.nb_reloc; i++) {
+        ptr = (u32*) (archive->data + archive->reloc_info[i].offset);
+        *ptr += (u32) archive->data;
+    }
+}
+
+s32 HSD_ArchiveParse(HSD_Archive* archive, u8* src, u32 file_size)
+{
+    u32 offset = 0;
+
+    if (archive == NULL) {
         return -1;
     }
-    memset(tbl, 0, 0x44);
-    tbl->flags |= 1;
-    memcpy(tbl, data, 0x20);
-    if (tbl->magic != magic) {
+
+    memset(archive, 0, sizeof(HSD_Archive));
+    archive->flags = archive->flags | HSD_ARCHIVE_DONT_FREE;
+    memcpy(archive, src, sizeof(HSD_ArchiveHeader));
+
+    if (archive->header.file_size != file_size) {
         OSReport(lbl_802744A8);
         return -1;
     }
-    offset = 0x20;
-    if (tbl->count_a != 0) {
-        tbl->ptr_a = data + offset;
-        offset += tbl->count_a;
+
+    offset += sizeof(HSD_ArchiveHeader);
+    if (archive->header.data_size != 0) {
+        archive->data = src + offset;
+        offset += archive->header.data_size;
     }
-    if (tbl->count_b != 0) {
-        tbl->ptr_b = data + offset;
-        offset += tbl->count_b * 4;
+    if (archive->header.nb_reloc != 0) {
+        archive->reloc_info = (HSD_ArchiveRelocationInfo*) (src + offset);
+        offset += archive->header.nb_reloc * sizeof(HSD_ArchiveRelocationInfo);
     }
-    if (tbl->count_c != 0) {
-        tbl->ptr_c = data + offset;
-        offset += tbl->count_c * 8;
+    if (archive->header.nb_public != 0) {
+        archive->public_info = (HSD_ArchivePublicInfo*) (src + offset);
+        offset += archive->header.nb_public * sizeof(HSD_ArchivePublicInfo);
     }
-    if (tbl->count_d != 0) {
-        tbl->ptr_d = data + offset;
-        offset += tbl->count_d * 8;
+    if (archive->header.nb_extern != 0) {
+        archive->extern_info = (HSD_ArchiveExternInfo*) (src + offset);
+        offset += archive->header.nb_extern * sizeof(HSD_ArchiveExternInfo);
     }
-    if (offset < tbl->magic) {
-        tbl->ptr_e = data + offset;
+    if (offset < archive->header.file_size) {
+        archive->symbols = (char*) (src + offset);
     }
-    tbl->raw_data = data;
-    for (i = 0; i < tbl->count_b; i++) {
-        u32 off = ((u32*) tbl->ptr_b)[i];
-        u32* entry = (u32*)(tbl->ptr_a + off);
-        *entry += (u32) tbl->ptr_a;
-    }
+
+    archive->top_ptr = src;
+    Locate(archive);
+
     return 0;
 }
-#endif
 #pragma pop
