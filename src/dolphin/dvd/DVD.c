@@ -79,6 +79,33 @@ extern void fn_800A59CC(u32 intType);
 extern void fn_800A48DC(void (*callback)(u32));
 extern void stateBusy_800A68B4(DVDCommandBlock* block);
 
+/* 0x800A5784 | size: 0x8C */
+void fn_800A5784(u32 intType)
+{
+    DVDCommandBlock* finished;
+
+    if (intType == 0x10) {
+        executing_8047A7E8->state = -1;
+        stateTimeout();
+        return;
+    }
+
+    if (intType & 1) {
+        lbl_8047A81C = 0;
+        __DVDFSInit();
+        finished = executing_8047A7E8;
+        executing_8047A7E8 = &DummyCommandBlock_803FC3A0;
+        finished->state = 0;
+        if (finished->callback != NULL) {
+            finished->callback(0, finished);
+        }
+        stateReady_800A6684();
+        return;
+    }
+
+    fn_800A58F0();
+}
+
 void fn_800A62CC(u32 intType)
 {
     DVDCommandBlock* finished;
