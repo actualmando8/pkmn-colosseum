@@ -47,7 +47,10 @@ typedef struct GSmaterial {
 } GSmaterial;
 
 typedef struct GSbound {
-    u8 _pad[0x34];
+    u8 _pad00[0x10];
+    GSvec centerStart;
+    GSvec centerEnd;
+    u8 _pad28[0x0C];
 } GSbound;
 
 typedef struct GSmodelMaterialList {
@@ -2335,6 +2338,91 @@ void modelRemoveCenterNull(GSmodel* model)
          cur = (cur == NULL) ? NULL : cur->next) {
     }
     fn_801A02B0(cur);
+}
+
+u8 GSmodelCenterNull(GSmodel* model)
+{
+    HSDJObj* jobj;
+    HSDJObj* null;
+    GSvec position;
+
+    if (model->centerNullState == 0) {
+        jobj = model->renderJObj;
+        null = fn_8019F718();
+        if (null == NULL) {
+            return 0;
+        }
+
+        if (model->flags.raw & GSMODEL_FLAG_ROOT_NULL_ADDED) {
+            jobj = jobj->child;
+        }
+        jobj = jobj == NULL ? NULL : jobj->child;
+
+        if (jobj == NULL) {
+            HSD_JObjAddChild(jobj, null);
+        } else {
+            while ((jobj == NULL ? NULL : jobj->next) != NULL) {
+                jobj = jobj == NULL ? NULL : jobj->next;
+            }
+            HSD_JObjAddNext(jobj, null);
+        }
+
+        fn_8019FE8C(null, HSD_JObjGetFlags(jobj));
+        GSlerpGetLinearInterpolationVector(&position, &model->bound.centerStart,
+                                           &model->bound.centerEnd,
+                                           lbl_8047CB98);
+
+        if (null == NULL) {
+            __assert(lbl_8047CB9C, 0x3A9, lbl_8047CBA4);
+        }
+        if (&position == NULL) {
+            __assert(lbl_8047CB9C, 0x3AA, lbl_80270E60);
+        }
+        null->translate = position;
+
+        if (!(null->flags & JOBJ_MTX_INDEP_SRT)) {
+            if (null != NULL) {
+                s32 dirty;
+                u32 flags;
+
+                if (null == NULL) {
+                    __assert(lbl_8047CB9C, 0x25D, lbl_8047CBA4);
+                }
+                flags = null->flags;
+                dirty = 0;
+                if (!(flags & JOBJ_USER_DEF_MTX)) {
+                    if (flags & JOBJ_MTX_DIRTY) {
+                        dirty = 1;
+                    }
+                }
+                if (dirty == 0) {
+                    fn_8019D620(null);
+                }
+            }
+        }
+
+        if (null != NULL) {
+            s32 dirty;
+            u32 flags;
+
+            if (null == NULL) {
+                __assert(lbl_8047CB9C, 0x25D, lbl_8047CBA4);
+            }
+            flags = null->flags;
+            dirty = 0;
+            if (!(flags & JOBJ_USER_DEF_MTX)) {
+                if (flags & JOBJ_MTX_DIRTY) {
+                    dirty = 1;
+                }
+            }
+            if (dirty != 0) {
+                fn_8019D9DC(null);
+            }
+        }
+    }
+
+    model->centerNullState++;
+    return 1;
 }
 
 u32 GSmodelIsRootNullAdded(GSmodel* model)

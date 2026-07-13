@@ -24,6 +24,7 @@ void GSmodelRecalculateBound(struct GSmodel* model);
 
 /* HSD services used while constructing a GS model. */
 struct HSDJObj* HSD_JObjLoadJoint(struct GSjobjDesc* joint);
+void HSD_JObjAddNext(struct HSDJObj* jobj, struct HSDJObj* next);
 void fn_8019146C(struct GSbound* bound, const struct GSvec* scale);
 void fn_80191474(struct GSbound* bound, const struct GSvec* rotation);
 void fn_8019147C(struct GSbound* bound, const struct GSvec* position);
