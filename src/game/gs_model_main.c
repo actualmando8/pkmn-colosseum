@@ -6,6 +6,7 @@
  * segment (Fable re-split, 2026-07-07). Functions are decompiled incrementally.
  */
 #include "dolphin/types.h"
+#include "game/gs_render.h"
 
 #define GSMODEL_FLAG_ACTIVE 0x00000001U
 #define GSMODEL_FLAG_VISIBLE 0x00000002U
@@ -388,6 +389,128 @@ void GSmodelGetRotation(GSmodel* model, GSvec* out)
 void GSmodelGetPosition(GSmodel* model, GSvec* out)
 {
     GSvecCopy(out, &model->position);
+}
+
+void fn_800E3DC4(GSmodel* model, const GSvec* rotation)
+{
+    GSvec newRotation;
+    HSDJObj* jobj;
+    f32 value;
+
+    GSvecCopy(&newRotation, &model->rotation);
+    GSvecAdd(&newRotation, &newRotation, rotation);
+
+    if (model->transformOverride == 0) {
+        GSvecCopy(&model->rotation, &newRotation);
+
+        jobj = model->renderJObj;
+        value = newRotation.x;
+        if (jobj == NULL) {
+            __assert(lbl_8047CB60, 0x2A4, lbl_8047CB68);
+        }
+
+        if (jobj->flags & JOBJ_USE_QUATERNION) {
+            __assert(lbl_8047CB60, 0x2A5, lbl_80270E28);
+        }
+
+        jobj->rotation.x = value;
+        if (!(jobj->flags & JOBJ_MTX_INDEP_SRT)) {
+            if (jobj != NULL) {
+                s32 dirty;
+                u32 flags;
+
+                if (jobj == NULL) {
+                    __assert(lbl_8047CB60, 0x25D, lbl_8047CB68);
+                }
+
+                flags = jobj->flags;
+                dirty = 0;
+                if (!(flags & JOBJ_USER_DEF_MTX)) {
+                    if (flags & JOBJ_MTX_DIRTY) {
+                        dirty = 1;
+                    }
+                }
+
+                if (dirty == 0) {
+                    fn_8019D620(jobj);
+                }
+            }
+        }
+
+        jobj = model->renderJObj;
+        value = newRotation.y;
+        if (jobj == NULL) {
+            __assert(lbl_8047CB60, 0x2B8, lbl_8047CB68);
+        }
+
+        if (jobj->flags & JOBJ_USE_QUATERNION) {
+            __assert(lbl_8047CB60, 0x2B9, lbl_80270E28);
+        }
+
+        jobj->rotation.y = value;
+        if (!(jobj->flags & JOBJ_MTX_INDEP_SRT)) {
+            if (jobj != NULL) {
+                s32 dirty;
+                u32 flags;
+
+                if (jobj == NULL) {
+                    __assert(lbl_8047CB60, 0x25D, lbl_8047CB68);
+                }
+
+                flags = jobj->flags;
+                dirty = 0;
+                if (!(flags & JOBJ_USER_DEF_MTX)) {
+                    if (flags & JOBJ_MTX_DIRTY) {
+                        dirty = 1;
+                    }
+                }
+
+                if (dirty == 0) {
+                    fn_8019D620(jobj);
+                }
+            }
+        }
+
+        {
+            HSDJObj* zJObj;
+
+            zJObj = model->renderJObj;
+            value = newRotation.z;
+            if (zJObj == NULL) {
+                __assert(lbl_8047CB60, 0x2CC, lbl_8047CB68);
+            }
+
+            if (zJObj->flags & JOBJ_USE_QUATERNION) {
+                __assert(lbl_8047CB60, 0x2CD, lbl_80270E28);
+            }
+
+            zJObj->rotation.z = value;
+            if (!(zJObj->flags & JOBJ_MTX_INDEP_SRT)) {
+                if (zJObj != NULL) {
+                    s32 dirty;
+                    u32 flags;
+
+                    if (zJObj == NULL) {
+                        __assert(lbl_8047CB60, 0x25D, lbl_8047CB68);
+                    }
+
+                    flags = zJObj->flags;
+                    dirty = 0;
+                    if (!(flags & JOBJ_USER_DEF_MTX)) {
+                        if (flags & JOBJ_MTX_DIRTY) {
+                            dirty = 1;
+                        }
+                    }
+
+                    if (dirty == 0) {
+                        fn_8019D620(zJObj);
+                    }
+                }
+            }
+        }
+    } else {
+        GSvecCopy(&model->overrideRotation, &newRotation);
+    }
 }
 
 void GSmodelSetVisibility(GSmodel* model, u8 visible)
