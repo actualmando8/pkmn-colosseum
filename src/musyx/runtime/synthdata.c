@@ -14,6 +14,7 @@
 
 #include "dolphin/types.h"
 #include "game/people/people.h"
+#include "musyx/synthdata.h"
 
 /* ===== External SDK / engine functions ===== */
 extern void  GSlogWrite(const char* fmt, ...);
