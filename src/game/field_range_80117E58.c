@@ -423,7 +423,7 @@ extern u32 fn_800057A0(void);
 extern void jumptable_8035BB88();
 extern u8 lbl_8047ADB0;
 void fn_801183EC(u32 particleCount);
-void fn_80118874(void);
+void fn_80118874(u8* list, u32 notify);
 extern void psSetParticleVisibility(); /* K&R: called with 0 or 1 args */
 extern void psSetGeneratorAngleRadiusScale(void);
 extern void psLinkChildGensToJObj(void);
@@ -2070,9 +2070,6 @@ void fn_801183EC(u32 particleCount) {
         }
     }
 }
-/* 0x80118874 | 0x1F4 */
-/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_80118874(void);
 /* 0x80118A68 | 0x1B8 */
 #if 0
 asm void fn_80118A68(void) {
@@ -2086,7 +2083,7 @@ static inline void destroyFieldParticleInstance(u8* obj, u32 notify) {
     u32 i;
     s32* active;
 
-    if ((notify & 0xFF) == 1) {
+    if ((u8)notify == 1) {
         model = *(u8**)(obj + 0x10);
         psKillFamily(*(u16*)(model + 0x18), model[0x15]);
     }
@@ -2144,6 +2141,21 @@ static inline void destroyFieldParticleInstance(u8* obj, u32 notify) {
     obj[0] = 0;
 }
 
+/* 0x80118874 | 0x1F4 */
+void fn_80118874(u8* list, u32 notify) {
+    u8* entry = list;
+    u8* obj;
+    u32 i = 0;
+
+    do {
+        obj = ((FieldParticleInstancePtr*)(entry + 8))->raw;
+        if (obj != NULL) {
+            destroyFieldParticleInstance(obj, notify);
+        }
+        i++;
+        entry += 4;
+    } while (i < 0x40);
+}
 void fn_80118A68(u8* obj, u32 notify) {
     destroyFieldParticleInstance(obj, notify);
 }
