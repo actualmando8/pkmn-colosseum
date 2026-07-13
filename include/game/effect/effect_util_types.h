@@ -562,7 +562,7 @@ extern void fn_800057A8(void);
 
 extern void fn_80140A9C(void);
 
-extern void pokemonCheckValid(void);
+extern u8 pokemonCheckValid(u8* ptr);
 
 extern void GScharCpy(void);
 

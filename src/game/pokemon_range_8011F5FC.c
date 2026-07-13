@@ -1323,7 +1323,6 @@ extern s32 pokemonSearchWazaDataId(u8* ptr, u16 target);
 extern void pokemonWazaReplace(void* ptr, u32 idx, u32 arg);
 extern void pokemonWazaCreate(u8* ptr, u32 slot, u32 val);
 extern void pokemonSetCatchStatus(u8* arg1, u32 arg2, u8 arg3, u16 arg4, u8 arg5, u32 arg6, u32 arg7);
-extern u32 pokemonCheckValid(u8* ptr);
 extern u16 pokemonGetTokuseiDataId(u8* ptr);
 extern void pokemonInitAry(u8* ptr, u16 count);
 extern void pokemonInitDarkPokemon(u8* ptr);
@@ -2947,7 +2946,7 @@ asm void pokemonCheckValid(void) {
 #include "src/game/gs_field_world_fn_80123FBC.inc"
 }
 #else
-u32 pokemonCheckValid(u8* ptr) {
+u8 pokemonCheckValid(u8* ptr) {
     extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
     extern u32 gamedataAttestCheckValid(u32 val);
     u16 val;
