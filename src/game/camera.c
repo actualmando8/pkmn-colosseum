@@ -97,6 +97,7 @@ void* GSmodelGetPart(void* model, s32 partIndex);
 void GSpartGetTransform(void* part, void* transform, u32 arg2, u32 arg3);
 void GSpartFree(void* part);
 void fn_800E0168(void* dst, void* lhs, void* rhs);
+void GScameraSetAnimRate(GSRenderCamera* camera, f32 rate);
 
 void cameraRefreshTargetPos(void) {
     void* object;
@@ -593,6 +594,22 @@ void cameraSetFov(f32 fov) {
         floorEntry->fov = fov;
     }
     ((CameraPadState*)lbl_80478C40)->fov = fov;
+}
+#pragma pop
+#pragma push
+#pragma optimization_level 4
+void cameraSetAnimeRate(f32 rate) {
+    CameraPadState* state;
+    GSRenderCamera* animation;
+
+    state = lbl_80478C40;
+    animation = GSresGetResource(state->animationGroup, state->animationId);
+    if (animation == 0) {
+        animation = fn_800F92D4(state->animationId);
+    }
+    if (animation != 0) {
+        GScameraSetAnimRate(animation, rate);
+    }
 }
 #pragma pop
 #pragma push
