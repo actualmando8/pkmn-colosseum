@@ -2194,14 +2194,16 @@ void* pokemonTokuseiDataBiosGetPtr(u16 idx) {
 /* 0x8011CBC8 | 0x2C */
 extern u32 lbl_80478E58;
 extern u32 lbl_80478E5C;
-#pragma push
-#pragma peephole off
+/* The empty condition is required for the exact MWCC instruction schedule. */
 void* pokemonSeikakuRateDataBiosGetPtr(u8 idx) {
     u32* hdr = (u32*)lbl_80478E58;
-    if (idx >= hdr[0]) { return NULL; }
+    if (idx >= hdr[0]) {
+        if (((!idx) && (!idx)) && (!idx)) {
+        }
+        return NULL;
+    }
     return &((PokemonSeikakuRateData*)lbl_80478E5C)[idx];
 }
-#pragma pop
 /* 0x8011CBF4 | 0x30 */
 u8 fn_8011CBF4(u8* ptr, u8 idx) {
     PokemonSeikakuData* p = (PokemonSeikakuData*)ptr;

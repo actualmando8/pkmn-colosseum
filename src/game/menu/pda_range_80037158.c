@@ -443,14 +443,25 @@ void fn_8003792C(void* window, volatile PdaSprite* sprite)
 }
 #pragma peephole reset
 
+/* The redundant expressions preserve MWCC's exact register/scheduling shape. */
 void fn_80038138(void* window, PdaSprite* sprite)
 {
+    f32 new_var;
+    int new_var4;
     f32 value;
+    f32 new_var2;
+    float new_var3;
 
-    value = lbl_8047A478 + lbl_8047BA78 * lbl_8047A494;
+    new_var2 = (0, lbl_8047A494);
+    new_var3 = lbl_8047BA78 * new_var2;
+    if (((!lbl_8047A478) && (!lbl_8047A478)) && (!lbl_8047A478)) {
+    }
+    value = lbl_8047A478 + new_var3;
     lbl_8047A478 = value;
-    if (value > lbl_8047BA60) {
-        lbl_8047A478 = value - lbl_8047BA60;
+    new_var = value;
+    if (new_var4 = new_var > lbl_8047BA60) {
+        lbl_8047A478 = lbl_8047BA60;
+        lbl_8047A478 = value - lbl_8047A478;
     }
     sprite->value = lbl_8047A478;
 }

@@ -895,7 +895,9 @@ asm s32 itemGetStatus(u32 a, u16 b, u16 c, u32 d) {
 #include "src/game/people/people_data_fn_80142CF4.inc"
 }
 #else
-#pragma optimization_level 4
+/* Keep the standalone farm shape: later definitions must not auto-inline here. */
+#pragma push
+#pragma inline_depth(0)
 s32 itemGetStatus(u32 a, u16 b, u16 c, u32 d) {
     u8* target;
 
@@ -943,7 +945,7 @@ s32 itemGetStatus(u32 a, u16 b, u16 c, u32 d) {
     case 8:
         return (u16)itemDataBiosGetFightUseKoukaDataId(target);
     case 9:
-        return (s8)itemDataBiosGetUseFriend(target, (u16)d);
+        return (s8)itemDataBiosGetUseFriend(target, (u16) ((((((((((d & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu));
     case 10:
         return itemDataBiosGetBuff(target);
     case 12:
@@ -988,6 +990,7 @@ s32 itemGetStatus(u32 a, u16 b, u16 c, u32 d) {
         return 0;
     }
 }
+#pragma pop
 #endif
 extern void jumptable_80367E70();
 extern u8 lbl_802730E0[];

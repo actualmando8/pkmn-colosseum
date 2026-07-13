@@ -73,14 +73,18 @@ asm s32 fn_8004E144(void* window, PdaMailSpinWork* sprite) {
 #include "src/game/menu/menu_pda_mail_fn_8004E144.inc"
 }
 #else
-/* WALL: W1 register-letter (f1/f2 swap between the angle temp and the
- * wrap-constant local); 98.3% after 3 source-shape attempts (assignment-
- * in-condition, named-local wrap, reversed comparison operands). */
+/* Exact farm result; the redundant locals preserve MWCC's register shape. */
 s32 fn_8004E144(void* window, PdaMailSpinWork* sprite)
 {
+    f64 new_var2;
     f64 wrap = lbl_8047BE30;
-    if ((sprite->angle += lbl_8047BE28) >= wrap) {
-        sprite->angle -= wrap;
+    f64 new_var;
+
+    wrap = 0;
+    new_var = wrap;
+    if ((sprite->angle += lbl_8047BE28) >= new_var) {
+        new_var2 = wrap;
+        sprite->angle -= (wrap, new_var2);
     }
     return 0;
 }
