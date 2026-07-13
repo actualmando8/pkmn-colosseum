@@ -6,11 +6,17 @@
  * segment (Fable re-split, 2026-07-07). Functions are decompiled incrementally.
  */
 #include "dolphin/types.h"
+#include "game/data/sdata2_8047CAA0.h"
+#include "game/gs_model.h"
 #include "game/gs_render.h"
 
 #define GSMODEL_FLAG_ACTIVE 0x00000001U
 #define GSMODEL_FLAG_VISIBLE 0x00000002U
+#define GSMODEL_FLAG_HAS_ANIM 0x00000004U
+#define GSMODEL_FLAG_HAS_TEX_ANIM 0x00000008U
+#define GSMODEL_FLAG_HAS_SHAPE_ANIM 0x00000010U
 #define GSMODEL_FLAG_RENDER_ALT_JOBJ 0x00000080U
+#define GSMODEL_FLAG_LINK_TEX_TO_ANIM 0x00002000U
 #define GSMODEL_FLAG_PARTICLE_TEXSTAGE 0x00000200U
 #define GSMODEL_FLAG_PARTICLE_LINKED 0x00000400U
 #define GSMODEL_FLAG_BOUND_CHECK 0x00100000U
@@ -63,6 +69,9 @@ typedef struct GSjobjDesc {
 
 typedef struct GSmodelResource {
     GSjobjDesc* joint;
+    void** anims;
+    void** texAnims;
+    void** shapeAnims;
 } GSmodelResource;
 
 typedef struct GSpart GSpart;
@@ -101,7 +110,7 @@ typedef union GSmodelFlags {
 
 typedef struct GSmodel {
     /* 0x000 */ GSmodelFlags flags;
-    /* 0x004 */ void* resource;
+    /* 0x004 */ GSmodelResource* resource;
     /* 0x008 */ HSDJObj* renderJObj;
     /* 0x00C */ HSDJObj* renderJObjAlt;
     /* 0x010 */ HSDJObj* jobj10;
@@ -113,14 +122,32 @@ typedef struct GSmodel {
     /* 0x048 */ f32 boundYOffset;
     /* 0x04C */ GSbound bound;
     /* 0x080 */ u8 centerNullState;
-    /* 0x081 */ u8 _pad081[0x0B];
+    /* 0x081 */ u8 _pad081[0x03];
+    /* 0x084 */ u32 animCount;
+    /* 0x088 */ u32 texAnimCount;
     /* 0x08C */ u32 animType;
     /* 0x090 */ u32 animIndex;
-    /* 0x094 */ u8 _pad094[0x04];
+    /* 0x094 */ f32 animRate;
     /* 0x098 */ f32 animFrame;
-    /* 0x09C */ u8 _pad09C[0x78];
+    /* 0x09C */ f32 animRequestedFrame;
+    /* 0x0A0 */ f32 animEndFrame;
+    /* 0x0A4 */ u32 texAnimType;
+    /* 0x0A8 */ u32 texAnimIndex;
+    /* 0x0AC */ f32 texAnimRate;
+    /* 0x0B0 */ f32 texAnimFrame;
+    /* 0x0B4 */ f32 texAnimRequestedFrame;
+    /* 0x0B8 */ f32 texAnimEndFrame;
+    /* 0x0BC */ u8 _pad0BC[0x20];
+    /* 0x0DC */ void* animEndedCallback;
+    /* 0x0E0 */ void* animEndedCallbackArg;
+    /* 0x0E4 */ struct {
+        s32 type;
+        s32 partIndex;
+        f32* value;
+    } partAnimMix[4];
     /* 0x114 */ s32 transformOverride;
-    /* 0x118 */ u8 _pad118[0x08];
+    /* 0x118 */ void* unk118;
+    /* 0x11C */ void* unk11C;
     /* 0x120 */ GSvec overridePosition;
     /* 0x12C */ GSvec overrideRotation;
     /* 0x138 */ GSvec overrideScale;
@@ -130,7 +157,14 @@ typedef struct GSmodel {
     /* 0x150 */ u16 materialCount;
     /* 0x152 */ u16 modulationRefCount;
     /* 0x154 */ u16 materialListHandle;
-    /* 0x156 */ u8 _pad156[0x1A];
+    /* 0x156 */ u8 _pad156[0x02];
+    /* 0x158 */ void* unk158;
+    /* 0x15C */ void* unk15C;
+    /* 0x160 */ void* shadowLight;
+    /* 0x164 */ u16 unk164;
+    /* 0x166 */ u8 _pad166[0x02];
+    /* 0x168 */ s32 vertexCount;
+    /* 0x16C */ s32 polygonCount;
 } GSmodel;
 
 extern GSmodel* lbl_8047AB74;
@@ -139,7 +173,6 @@ extern u16 lbl_8047AB70;
 
 extern void GSvecCopy(GSvec* dst, const GSvec* src);
 extern void GSmodelSetAnimFrame(GSmodel* model, f32 frame);
-extern GSmodel* _modelLoad(GSmodelResource* resource, void* joint, void* boundAnim);
 extern u32 _toolentryAlloc__FUl(u32 size);
 extern void* fn_800E27B0(u32 handle);
 extern void modelShadowInit__Fv(void);
@@ -535,6 +568,141 @@ void* modelGetRenderJObj(GSmodel* model)
     }
 
     return model->renderJObj;
+}
+
+static inline GSmodel* modelGetFreeSlot(void)
+{
+    GSmodel* model;
+    u32 i;
+
+    model = lbl_8047AB74;
+    for (i = 0; i < lbl_8047AB78; i++) {
+        if (!(model->flags.raw & GSMODEL_FLAG_ACTIVE)) {
+            return model;
+        }
+        model++;
+    }
+    return NULL;
+}
+
+GSmodel* _modelLoad(GSmodelResource* resource, GSjobjDesc* joint,
+                    void* boundAnim)
+{
+    GSmodel* model;
+
+    (void)boundAnim;
+
+    model = modelGetFreeSlot();
+    if (model == NULL) {
+        return NULL;
+    }
+
+    memset(model, 0, sizeof(GSmodel));
+    model->flags.raw = GSMODEL_FLAG_ACTIVE | GSMODEL_FLAG_LINK_TEX_TO_ANIM;
+    model->animCount = 0;
+    model->texAnimCount = 0;
+    model->centerNullState = 0;
+    model->animEndedCallback = NULL;
+    model->materialCount = 0;
+    model->materialList = NULL;
+    model->modulationRefCount = 0;
+    model->unk158 = NULL;
+    model->unk15C = NULL;
+    model->shadowLight = NULL;
+    model->unk164 = 0;
+    model->transformOverride = 0;
+    model->unk118 = NULL;
+    model->unk11C = NULL;
+    model->gsParticleLinkAttachMode = 1;
+
+    model->resource = resource;
+    model->renderJObj = HSD_JObjLoadJoint(joint);
+    model->renderJObjAlt = NULL;
+
+    set__5GSvecFfff(&model->position, model->renderJObj->translate.x,
+                    model->renderJObj->translate.y,
+                    model->renderJObj->translate.z);
+    set__5GSvecFfff(&model->rotation, model->renderJObj->rotation.x,
+                    model->renderJObj->rotation.y,
+                    model->renderJObj->rotation.z);
+    set__5GSvecFfff(&model->scale, model->renderJObj->scale.x,
+                    model->renderJObj->scale.y, model->renderJObj->scale.z);
+    set__5GSvecFfff(&model->boundCenter, model->renderJObj->translate.x,
+                    model->renderJObj->translate.y,
+                    model->renderJObj->translate.z);
+
+    model->partAnimMix[0].type = 0;
+    model->partAnimMix[0].partIndex = -1;
+    model->partAnimMix[1].type = 0;
+    model->partAnimMix[1].partIndex = -1;
+    model->partAnimMix[2].type = 0;
+    model->partAnimMix[2].partIndex = -1;
+    model->partAnimMix[3].type = 0;
+    model->partAnimMix[3].partIndex = -1;
+
+    if (model->resource->shapeAnims != NULL) {
+        model->flags.raw |= GSMODEL_FLAG_HAS_SHAPE_ANIM;
+    }
+
+    if (model->resource->anims != NULL) {
+        model->flags.raw |= GSMODEL_FLAG_HAS_ANIM;
+        model->animIndex = -1;
+        while (model->resource->anims[model->animCount] != NULL) {
+            model->animCount++;
+        }
+        GSmodelSetAnimIndex(model, 0);
+        GSmodelSetAnimRate(model, lbl_8047CB84);
+        GSmodelSetAnimType(model, 1);
+    }
+
+    if (model->resource->texAnims != NULL) {
+        model->flags.raw |= GSMODEL_FLAG_HAS_TEX_ANIM;
+        model->texAnimIndex = -1;
+        while (model->resource->texAnims[model->texAnimCount] != NULL) {
+            model->texAnimCount++;
+        }
+        GSmodelSetTexAnimIndex(model, 0);
+        GSmodelSetTexAnimRate(model, lbl_8047CB84);
+        GSmodelSetTexAnimType(model, 1);
+    }
+
+    fn_8019147C(&model->bound, &model->boundCenter);
+    fn_80191474(&model->bound, &model->rotation);
+    fn_8019146C(&model->bound, &model->scale);
+    GSmodelRecalculateBound(model);
+
+    model->boundYOffset = lbl_8047CB7C;
+    if (model->flags.raw & GSMODEL_FLAG_RENDER_ALT_JOBJ) {
+        memcpy(&model->boundCenter, &model->position, sizeof(GSvec));
+    } else {
+        GSpart* part = GSmodelGetPart(model, 1);
+
+        if (part == NULL) {
+            memcpy(&model->boundCenter, &model->position, sizeof(GSvec));
+        } else {
+            GSpartGetTransform(part, &model->boundCenter, NULL, NULL);
+            GSpartFree(part);
+            model->boundCenter.y -= model->boundYOffset;
+        }
+    }
+
+    model->boundYOffset = model->boundCenter.y;
+    if (model->flags.raw & GSMODEL_FLAG_RENDER_ALT_JOBJ) {
+        memcpy(&model->boundCenter, &model->position, sizeof(GSvec));
+    } else {
+        GSpart* part = GSmodelGetPart(model, 1);
+
+        if (part == NULL) {
+            memcpy(&model->boundCenter, &model->position, sizeof(GSvec));
+        } else {
+            GSpartGetTransform(part, &model->boundCenter, NULL, NULL);
+            GSpartFree(part);
+            model->boundCenter.y -= model->boundYOffset;
+        }
+    }
+
+    fn_8019F1C4(model->renderJObj, &model->vertexCount, &model->polygonCount);
+    return model;
 }
 
 GSmodel* GSmodelLoad(GSmodelResource* resource, void* unused, void* boundAnim)
