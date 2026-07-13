@@ -579,6 +579,37 @@ static void cbForStateMotorStopped_800A65A0(u32 intType) {
         break;
     }
 }
+
+/*
+ * fn_800A640C - Handle the command after the replacement disc ID is read.
+ * 0x800A640C | size: 0xCC
+ */
+void fn_800A640C(void)
+{
+    DVDStaticData* staticData = (DVDStaticData*)BB2_803FC360;
+    DVDCommandBlock* finished;
+
+    switch (CurrCommand_8047A804) {
+    case 4:
+    case 5:
+    case 13:
+    case 15:
+        __DVDClearWaitingQueue();
+        finished = executing_8047A7E8;
+        executing_8047A7E8 = &staticData->dummyCommandBlock;
+        if (finished->callback != NULL) {
+            finished->callback(-4, finished);
+        }
+        stateReady_800A6684();
+        break;
+    default:
+        DVDReset();
+        OSCreateAlarm(&staticData->resetAlarm);
+        OSSetAlarm(&staticData->resetAlarm,
+                   1150 * ((*(u32*)0x800000F8 / 4) / 1000), AlarmHandler);
+        break;
+    }
+}
 #pragma dont_inline reset
 
 /*
@@ -901,25 +932,6 @@ static void cbForStateCoverClosed(u32 intType) {
  * symbols.txt; body was invented fiction that never paired in objdiff.
  * Declaration removed from dolphin/dvd/dvd.h (no remaining callers).
  */
-
-/*
- * DVDResume - 0x800A640C | size: 0xCC
- * Resume DVD processing after a pause.
- * Dispatches the next queued command if one is available.
- */
-void DVDResume(void) {
-    BOOL enabled;
-
-    enabled = OSDisableInterrupts();
-    PauseFlag_8047A7F4 = FALSE;
-    PausingFlag_8047A7F8 = FALSE;
-
-    if (executing_8047A7E8 == NULL) {
-        stateReady_800A6684();
-    }
-
-    OSRestoreInterrupts(enabled);
-}
 
 /*
  * DVDSetAutoInvalidation - orphan removed (see file header). Not present
