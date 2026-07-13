@@ -181,8 +181,7 @@ s32 scriptIsMoveButtonPush(void)
     s32 axis;
     s32 buttons;
 
-    buttons = fn_800F7BC4(1) & 0xF;
-    if (buttons != 0) {
+    if ((fn_800F7BC4(1) & 0xF) != 0) {
         pushed = 1;
     }
 
@@ -206,6 +205,7 @@ s32 scriptIsMoveButtonPush(void)
         pushed = 1;
     }
 
+#pragma scheduling on
     return pushed;
 }
 #pragma pop
@@ -243,23 +243,31 @@ s32 scriptExecTask(void* callback, u32 priority, u32 arg2, u32 arg3, u32 arg4, u
         priority = 7;
     }
 
-    return fn_800F7318(task + priority, callback, 0x1000, 1, 0, 4, arg2, arg3, arg4, arg5);
+    task += priority;
+
+    return fn_800F7318(task, callback, 0x1000, 1, 0, 4, arg2, arg3, arg4, arg5);
 }
 
+#pragma push
+#pragma peephole off
 void fn_801CB4A8(void* callback, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
 {
     fn_800F7434(callback, 4, arg1, arg2, arg3, arg4);
 }
+#pragma pop
 
 #pragma push
-#pragma scheduling off
+#pragma peephole off
 void fn_801CB4E8(u32 resource, u32 arg)
 {
     void* object = GSresGetResource(fn_80113F48(), resource);
 
     fn_80118874(object, arg);
 }
+#pragma pop
 
+#pragma push
+#pragma peephole off
 void fn_801CB530(u32 model_id, u32 particle_bank_id)
 {
     void* model = GSresGetResource(fn_80113F48(), model_id);
@@ -288,6 +296,9 @@ s32 fn_801CB59C(u32 resource)
     return 1;
 }
 
+#pragma push
+#pragma scheduling off
+#pragma peephole off
 s32 fn_801CB61C(u32 resource, u32 part_resource, s32 part)
 {
     u32 group = fn_80113F48();
@@ -314,6 +325,7 @@ s32 fn_801CB61C(u32 resource, u32 part_resource, s32 part)
 
     return 1;
 }
+#pragma pop
 
 #pragma push
 #pragma peephole off
@@ -389,6 +401,8 @@ void fn_801CB834(u32 resource, u32 anim_index, s32 frame, s32 loop)
 }
 #pragma pop
 
+#pragma push
+#pragma peephole off
 void fn_801CB954(u32 resource, s32 visible)
 {
     u32 group = fn_80113F48();
@@ -403,6 +417,7 @@ void fn_801CB954(u32 resource, s32 visible)
         }
     }
 }
+#pragma pop
 
 void fn_801CB9D8(u32 resource)
 {
@@ -419,8 +434,7 @@ s32 fn_801CBA0C(void* param)
 
     raw_id = lbl_8047B3C8;
     lbl_8047B3C8 = raw_id + 1;
-    people_id = (s8)raw_id;
-    people_id |= 0x7FFE0000;
+    people_id = (s8)raw_id | 0x7FFE0000;
 
     people = fn_8018E050(fn_80113F48(), people_id, param);
     if (people == NULL) {
@@ -457,9 +471,7 @@ s32 fn_801CBAB8(void)
     s32 result;
     s32 input;
 
-    result = 0;
-    state = result;
-    done = result;
+    done = state = result = 0;
 
     while (done == 0) {
         switch (state) {
@@ -491,9 +503,9 @@ s32 fn_801CBAB8(void)
         }
     }
 
-#pragma scheduling on
     return result;
 }
+#pragma scheduling on
 #pragma pop
 
 /* SHA-1's 16-word circular message schedule. */
@@ -660,32 +672,15 @@ void fn_801D036C(void)
 
 void fn_801D039C(void)
 {
-    MemcardTaskState* task = lbl_8047B3D4;
-    void* work;
-    void* aligned;
-
-    if (task->task_kind != 0) {
-        if (task->task_kind != 8) {
+    if (lbl_8047B3D4->task_kind != 0) {
+        if (((volatile MemcardTaskState*)lbl_8047B3D4)->task_kind != 8) {
             winMsgClose(1);
         }
 
-        GSgappTerminate(task->gapp);
+        GSgappTerminate(lbl_8047B3D4->gapp);
 
-        work = task->card_work_area;
-        aligned = fn_800E202C(work);
-        fn_800E24B0();
-        if (fn_800E209C(aligned) == 0) {
-            work = NULL;
-        }
-        lbl_8047B3D4->card_work_area = work;
-
-        work = lbl_8047B3D4->work_buffer;
-        aligned = fn_800E202C(work);
-        fn_800E24B0();
-        if (fn_800E209C(aligned) == 0) {
-            work = NULL;
-        }
-        lbl_8047B3D4->work_buffer = work;
+        lbl_8047B3D4->card_work_area = fn_801D0314(lbl_8047B3D4->card_work_area);
+        lbl_8047B3D4->work_buffer = fn_801D0314(lbl_8047B3D4->work_buffer);
     }
 
     lbl_8047B3D4->task_kind = 0;

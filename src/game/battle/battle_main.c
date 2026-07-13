@@ -29,7 +29,9 @@
  *   lbl_8047B5DA : u8,  fight-in-progress flag
  */
 
+#define battleCameraIsSimple battleCameraIsSimple_decl
 #include "game/battle/battle.h"
+#undef battleCameraIsSimple
 
 #pragma use_lmw_stmw on
 
@@ -56,7 +58,7 @@ extern void GSlogWrite(const char* fmt, ...);      /* GSlog_Print */
 extern void menuCloseCustom(s32 objID, s32 arg1, s32 arg2);   /* release scene object */
 extern u8   menuIsCheck(s32 objID);                        /* check scene object active */
 extern void menuGetKeyInfo(void* padData, s32 port);          /* read pad input */
-extern void fn_80113FB4(void);                             /* check floor loaded */
+extern void* fn_80113FB4(void);                            /* check floor loaded */
 
 /* Sound */
 extern void soundStop(s32 sndID, s32 volume);    /* soundStop */
@@ -75,7 +77,7 @@ extern void dbgMenuClose(void);                      /* disable VSync */
 extern void dbgMenuMain(s32 mode);                  /* force VSync */
 
 /* Battle subsystems */
-extern void battleCameraIsSimple(void);                      /* battle grid tick 1 */
+extern u8   battleCameraIsSimple(void);                    /* battle grid tick 1 */
 extern void battleCameraDoSimple(void);                      /* battle grid tick 2 */
 extern void battleCameraStartRandom(void);                      /* battle grid cleanup */
 extern void fn_801C2F00(void* data, u32 size);      /* battle grid load data */
@@ -138,7 +140,7 @@ extern u8   lbl_8047B5DA;   /* fight-in-progress flag */
 extern const u32 lbl_80279B84[BATTLE_SCENE_OBJ_COUNT];
 
 /* Scene initialization table */
-extern const u32 lbl_80279B78[3]; /* function pointers for scene callbacks */
+extern u32 lbl_80279B78[3]; /* function pointers for scene callbacks */
 
 /* =========================================================================
  * Implementation
@@ -232,60 +234,57 @@ void fn_801EF0D4(void) {
 }
 
 /* 0x801EF128 | size: 0xBC | medium */
-void fn_801EF128(void) {
-    extern void savedataGetStatus();
-    extern void fn_801EEF08();
-    extern void fn_801EEFF4();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+void fn_801EF128(void* partyData) {
+    typedef struct BattlePartySlot {
+        u8 active;
+        u8 pad01;
+        u16 id;
+        u32 value04;
+        u32 value08;
+    } BattlePartySlot;
+    typedef struct BattlePartyMeta {
+        u16 id;
+        u8 pad02[10];
+        u8 active;
+        u8 flag;
+        u8 index;
+        u8 pad0F;
+        u16 field10;
+        u8 pad12[2];
+        s16 field14;
+        u16 field16;
+    } BattlePartyMeta;
+    typedef struct BattlePartyData {
+        u32 count;
+        BattlePartySlot slots[97];
+        BattlePartyMeta metadata[97];
+    } BattlePartyData;
+    extern void* savedataGetStatus(u32, u32);
+    extern u16 fn_801EEF08(u16);
+    extern u16 fn_801EEFF4(u16);
+    BattlePartyData* data = partyData;
+    s32 i;
 
-    r29 = r3;
-    if (r3 == 0) {
-        r3 = 0x0;
-        r4 = 0xf;
-        savedataGetStatus();
-        r29 = r3;
+    if (partyData == NULL) {
+        data = savedataGetStatus(0, 0xF);
     }
-    r30 = 0x0;
-    r28 = 0x0;
-    *(u32*)((u8*)r29 + 0x0) = r30;
-    r31 = 0x0;
-    do {
-        r5 = r30 + 0x4;
-        r27 = r31 + 0x490;
-        r5 = r29 + r5;
-        r4 = 0x0;
-        *(u8*)((u8*)r5 + 0x0) = r4;
-        r27 = r29 + r27;
-        tmp = -0x1;
-        r3 = r28 & 0xFFFF;
-        *(u16*)((u8*)r5 + 0x2) = r4;
-        *(u32*)((u8*)r5 + 0x4) = r4;
-        *(u32*)((u8*)r5 + 0x8) = r4;
-        *(u8*)((u8*)r27 + 0xC) = r4;
-        *(u16*)((u8*)r27 + 0x0) = r4;
-        *(u16*)((u8*)r27 + 0x14) = tmp;
-        fn_801EEF08();
-        *(u16*)((u8*)r27 + 0x16) = r3;
-        tmp = 0x0;
-        r3 = r28 & 0xFFFF;
-        *(u8*)((u8*)r27 + 0xD) = tmp;
-        fn_801EEFF4();
-        *(u16*)((u8*)r27 + 0x10) = r3;
-        r31 = r31 + 0x18;
-        r30 = r30 + 0xc;
-        *(u8*)((u8*)r27 + 0xE) = r28;
-        r28 = r28 + 0x1;
-    } while ((s32)r28 < 0x61);
-    return;
+    data->count = 0;
+    for (i = 0; i < 97; i++) {
+        BattlePartySlot* slot = &data->slots[i];
+        BattlePartyMeta* meta = &data->metadata[i];
+
+        slot->active = 0;
+        slot->id = 0;
+        slot->value04 = 0;
+        slot->value08 = 0;
+        meta->active = 0;
+        meta->id = 0;
+        meta->field14 = -1;
+        meta->field16 = fn_801EEF08((u16)i);
+        meta->flag = 0;
+        meta->field10 = fn_801EEFF4((u16)i);
+        meta->index = i;
+    }
 }
 
 /* 0x801EF1E4 | size: 0x30 | small */
@@ -344,6 +343,28 @@ void fn_801EF2D4(void) {
             menuCloseCustom(objID, 0, 0);
         }
     }
+}
+
+/* 0x801EF488 | size: 0x28 | small */
+void fn_801EF488(void) {
+    cameraUpdate();
+    battleCameraStartRandom();
+    fn_801DB088();
+}
+
+/* 0x801EF5C0 | size: 0x5C | small */
+void fn_801EF5C0(void) {
+    extern void fn_800FF4D4(void* data, u8 type);
+    u32 data[3];
+
+    data[0] = lbl_80279B78[0];
+    data[1] = lbl_80279B78[1];
+    data[2] = lbl_80279B78[2];
+    lbl_8047B5DA = 0;
+    lbl_8047B5D8 = 0;
+    lbl_8047B5D6 = 0;
+    lbl_8047B5D0 = 0;
+    fn_800FF4D4(data, 2);
 }
 
 /* 0x801EF644 | size: 0xB8 | medium */
@@ -454,6 +475,25 @@ void fn_801EF7C4(void* arg) {
             }
         }
     }
+}
+
+/* 0x801EF8F4 | size: 0x68 | small */
+u8 fn_801EF8F4(u8 useSimpleCamera) {
+    u8 previousMode;
+    void* data;
+
+    previousMode = battleCameraIsSimple();
+    if (useSimpleCamera == 1) {
+        battleCameraDoSimple();
+    } else {
+        battleCameraDoFull();
+    }
+    fn_800FF56C();
+    data = fn_80113FB4();
+    if (data != NULL) {
+        fn_801C2F00(data, 0x7B1800);
+    }
+    return previousMode;
 }
 
 /* 0x801EF95C | size: 0xAC | medium */
@@ -925,4 +965,3 @@ void fightMainWaitFrame(void) {
         }
     }
 }
-

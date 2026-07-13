@@ -3154,8 +3154,15 @@ asm void PPCMtpmc4(register u32 val) {
     blr
 }
 
+u32 PPCMffpscr(void) {
+    union {
+        f64 value;
+        u32 words[2];
+    } fpscr;
 
-
+    fpscr.value = __mffs();
+    return fpscr.words[1];
+}
 
 
 asm u32 PPCMfhid2(void) {

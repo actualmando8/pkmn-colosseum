@@ -1275,13 +1275,15 @@ u32 _fightMenuAllFightTrainerOpenStatusMenuSub__FPvUsPv(u32 r3, u32 r4)
     u32 uVar5;
     u32 local_20[2];
     u32 local_28[2];
+    int context;
 
-    iVar1 = fightTargetGetPtr(2, r3, r4);
+    context = r3;
+    iVar1 = fightTargetGetPtr(2, context, r4);
     if (iVar1 == 0) {
         uVar5 = 0;
     } else {
         uVar3 = fightSideGetStatus(iVar1, 0, 5, 0);
-        sVar4 = fightTargetGetTragetPtrToRelativeHostSideFightTargetId(r3, r4);
+        sVar4 = fightTargetGetTragetPtrToRelativeHostSideFightTargetId(context, r4);
         if (sVar4 == 0) {
             uVar5 = 0;
         } else {
@@ -1294,7 +1296,7 @@ u32 _fightMenuAllFightTrainerOpenStatusMenuSub__FPvUsPv(u32 r3, u32 r4)
             }
         }
     }
-    fightTrainerToMenuBallStatus(r3, local_28);
+    fightTrainerToMenuBallStatus(context, local_28);
     local_20[0] = local_28[0];
     *(u16 *)&local_20[1] = *(u16 *)&local_28[1];
     menuOpenCustom(uVar5, 0, 0, 0, 0, 1, local_20);

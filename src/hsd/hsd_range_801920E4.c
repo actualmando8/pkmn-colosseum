@@ -8,3 +8,15 @@
  * range name stays honest until internal TU structure is proven.
  */
 #include "dolphin/types.h"
+#include "hsd/hsd_class.h"
+
+extern HSD_ClassInfo* lbl_8047B228;
+extern void* HSD_HashSearch(void* table, void* key, u32* found);
+
+HSD_ClassInfo* fn_80193748(const char* class_name)
+{
+    if (lbl_8047B228 != NULL) {
+        return (HSD_ClassInfo*) HSD_HashSearch((void*) lbl_8047B228, (void*) class_name, NULL);
+    }
+    return NULL;
+}

@@ -8,3 +8,14 @@
  * range name stays honest until internal TU structure is proven.
  */
 #include "dolphin/types.h"
+
+extern void __init_cpp(void);
+extern void PPCHalt(void);
+
+void __init_user(void) {
+    __init_cpp();
+}
+
+void _ExitProcess(void) {
+    PPCHalt();
+}

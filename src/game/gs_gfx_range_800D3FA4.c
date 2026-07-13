@@ -38,12 +38,24 @@ extern void  fn_800BD744(void);                        /* GXLoadPosMtxImm */
 extern void  GXInvalidateTexAll(void);                        /* GXInvalidateTexAll */
 
 typedef struct GSgfxState {
-    u8 pad_000[0x49c];
+    u8 pad_000[0x48c];
+    u16 requestBufferHandle;
+    u16 pad_48e;
+    void* requestBuffer;
+    void* requestBufferPos;
+    u32 requestBufferSize;
     u8 requestBufferFlag;
 } GSgfxState;
 
+typedef struct GSgfxRequestStrings {
+    char alreadyAllocated[0x28];
+    char allocationFailed[0x24];
+    char allocationSucceeded[1];
+} GSgfxRequestStrings;
+
 /* ===== String constants (rodata) ===== */
 extern const char lbl_80270440[]; /* "GSgfx: invalid matrix index" */
+extern const char lbl_802703C0[]; /* request-buffer status strings */
 extern const char lbl_80270460[]; /* "GSgfx: matrix stack underflow!" */
 extern const char lbl_80270480[]; /* "GSgfx: matrix stack overflow!" */
 extern const char lbl_802704A0[]; /* "0123456789ABCDEF" */
@@ -551,6 +563,33 @@ void fn_800D4610(u8 val) {
     GSgfxState* state = (GSgfxState*)lbl_8047AA80;
 
     state->requestBufferFlag = val;
+}
+
+void fn_800D5504(u32 size) {
+    const GSgfxRequestStrings* strings =
+        (const GSgfxRequestStrings*)lbl_802703C0;
+
+    if (((GSgfxState*)lbl_8047AA80)->requestBuffer != 0) {
+        GSlogWrite(strings->alreadyAllocated);
+        return;
+    }
+
+    ((GSgfxState*)lbl_8047AA80)->requestBufferHandle =
+        _toolentryAlloc__FUl(size);
+    if (((GSgfxState*)lbl_8047AA80)->requestBufferHandle == 0) {
+        GSlogWrite(strings->allocationFailed);
+        return;
+    }
+
+    ((GSgfxState*)lbl_8047AA80)->requestBuffer = fn_800E27B0(
+        ((GSgfxState*)lbl_8047AA80)->requestBufferHandle);
+    ((GSgfxState*)lbl_8047AA80)->requestBufferPos =
+        ((GSgfxState*)lbl_8047AA80)->requestBuffer;
+    ((GSgfxState*)lbl_8047AA80)->requestBufferSize = size;
+    *(u32*)(lbl_804001F0 + 0x28) = 0;
+    GSlogWrite(strings->allocationSucceeded,
+               ((GSgfxState*)lbl_8047AA80)->requestBufferSize,
+               ((GSgfxState*)lbl_8047AA80)->requestBuffer);
 }
 
 extern void fn_800B944C(u32, u32);

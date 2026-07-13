@@ -55,10 +55,13 @@ void fn_80181850(void);
 s32 fn_80180C78(PeopleOpenWork* work);
 void fn_8018114C(void);
 void fn_801812C4(PeopleEntry* entry);
+s32 fn_80183688(void* self);
+s32 fn_80183730(void* self);
 void fn_80188FA0(u32 groupId, u32 index, u32 pathId, u32 pathParam);
 void fn_80188CA0(u32 groupId, u32 index, u32 targetX, u32 targetY, u32 targetZ);
 void fn_80188AF4(u32 groupId, u32 index);
 void fn_8018F4C8(void* entry, u8 param, s32* outNode, u8* outResult);
+void* fn_8018D998(u32 groupId, u32 index);
 s32 fn_801812E8(u32 groupId, u32 index, u8 doInteract);
 s32 fn_80181478(u32 groupId, u32 index, u8 doSetup);
 void fn_8018E1C4(PeopleEntry* entry, void* spawnData, u32 motionId, u32 param);
@@ -70,6 +73,8 @@ void fn_8018FC98(PeopleEntry* entry, void* pos);
 void* fn_8018FCBC(PeopleEntry* entry);
 void fn_8018FC08(PeopleEntry* entry, void* vec);
 void* peopleInfoBiosGetPtr(void* scriptObj);
+u8 fn_80188214();
+void fn_8018E9B4(PeopleEntry* entry, void* position, void* transform);
 
 /* ===== External SDK / engine functions ===== */
 extern void  GSlogWrite(const char* fmt, ...);     /* OSReport / debug printf */
@@ -79,9 +84,9 @@ extern void* memcpy(void* dst, const void* src, u32 size);
 /* External functions referenced from asm wrappers */
 extern void GSlightSetTarget(void);
 extern void GSlightSetPosition(void);
-extern void set__5GSvecFfff(void);
-extern void GSmodelGetRotationPtr(void*);
-extern void GSmodelGetPositionPtr(void*);
+extern void set__5GSvecFfff();
+extern void* GSmodelGetRotationPtr(void*);
+extern void* GSmodelGetPositionPtr(void*);
 extern void GSmodelGetVisibility(void*);
 extern void GSmodelGetRotation(void*);
 extern void GSmodelGetPosition(void*, void*);
@@ -89,7 +94,7 @@ extern void GSmodelSetVisibility(void*, u8);
 extern void GSmodelSetRotation(void*);
 extern void GSmodelSetPosition(void*);
 extern void fn_800E9B2C(void);
-extern void GSmodelPushState(void);
+extern void GSmodelPushState(void* model, void* state);
 extern void GSmodelSetTexAnimFrame(void);
 extern void GSmodelSetTexAnimRate(void);
 extern void GSmodelSetTexAnimIndex(void);
@@ -115,13 +120,19 @@ extern void  fn_80167E64(void* field);              /* field finalize */
 /* Thread/task system */
 extern void* GSgappCreate(u32 pri, u32 type, void* taskBuf, void* callback);
 extern void  GSgappTerminate(void* task);               /* task cleanup */
+extern void  GSthreadUnblock(void* thread);
+extern void  GSthreadBlock(void* thread);
 
 /* Model system */
 extern void  fn_8017BB80(void* floorObj, void* modelData); /* model open */
-extern void  fn_8017BC90(void* floorObj, u32 modelId, u32 param, void* extraData, u32 extra2);
+extern void  fn_8017BC90(void* floorObj, u32 modelId, u32 param, void* extraData);
 
 /* Flag system */
 extern BOOL  fn_800F7108(u16 flagId);               /* GSflagGet (bit check) */
+extern void* GSlightCreate(void);
+extern void  GSlightSetType(void* light, s32 type);
+extern void  GSlightSetActive(void* light, u8 active);
+extern void  fn_800FF4D4(void* data, u8 type);
 
 /* Collision/model helpers */
 extern void  GSvecCopy(void* dst, void* src);     /* matrix/vector copy */
@@ -131,26 +142,27 @@ extern void  fn_800E0168(void* dst, void* srcA, void* srcB);  /* cross/setup */
 extern const char lbl_80273F80[];  /* floor name for blank-frame init */
 extern const char lbl_80273FD8[];  /* "Warining: people[%d,%d] group is different!!\n" */
 extern f32 lbl_8047D8B0;           /* default moveSpeed constant */
+extern f32 lbl_8047D798;
+extern const void* lbl_80273F90[];
 
-/* ===== Global state (sbss / sdata) ===== */
+/* ===== Global state (sbss, owned by the data split — extern here) ===== */
 
-/* lbl_8047B1F8 @sda21 : maximum people count */
-static s32 gPeopleMaxCount;
+extern void* lbl_8047B1E0;           /* current floor object link */
+extern PeopleOpenWork* lbl_8047B1E4; /* active PeopleOpenWork pointer */
+extern s32 lbl_8047B1E8;             /* people open count/max for linked list */
+extern u32 lbl_8047B1F0[2];          /* ambient light handles (2) */
+extern s32 lbl_8047B1F8;             /* maximum people count */
+extern u16 lbl_8047B1FC;             /* GSmem handle for the people array */
+extern PeopleEntry* lbl_8047B200;    /* pointer to people array (heap-allocated) */
 
-/* lbl_8047B200 @sda21 : pointer to people array (heap-allocated) */
-static PeopleEntry* gPeopleArray;
-
-/* lbl_8047B1FC @sda21 : GSmem handle for the people array */
-static u16 gPeopleMemHandle;
-
-/* lbl_8047B1E0 @sda21 : current floor object link */
-static void* gPeopleFloorObj;
-
-/* lbl_8047B1E4 @sda21 : active PeopleOpenWork pointer */
-static PeopleOpenWork* gPeopleOpenWork;
-
-/* lbl_8047B1E8 @sda21 : people open count/max for linked list */
-static s32 gPeopleOpenCount;
+/* Readable aliases */
+#define gPeopleFloorObj  lbl_8047B1E0
+#define gPeopleOpenWork  lbl_8047B1E4
+#define gPeopleOpenCount lbl_8047B1E8
+#define gPeopleLights    lbl_8047B1F0
+#define gPeopleMaxCount  lbl_8047B1F8
+#define gPeopleMemHandle lbl_8047B1FC
+#define gPeopleArray     lbl_8047B200
 
 /* ===== Sdata2 float constants ===== */
 /* lbl_8047D798 @sda21 : constant used in fn_801812C4 */
@@ -168,6 +180,7 @@ static s32 gPeopleOpenCount;
  * r3 = maxPeople (number of slots)
  * Returns: pointer to the people array (gPeopleArray)
  * ======================================================================= */
+#pragma dont_inline on
 PeopleEntry* peopleInit(u32 maxPeople)
 {
     u32 totalSize;
@@ -185,6 +198,7 @@ PeopleEntry* peopleInit(u32 maxPeople)
 
     return gPeopleArray;
 }
+#pragma dont_inline reset
 
 /* =======================================================================
  * fn_8018FDB4 -- peopleGetMaxCount
@@ -230,10 +244,11 @@ PeopleEntry* peopleGetEntry(s32 index)
  * ======================================================================= */
 PeopleEntry* fn_8018FCE0(void)
 {
-    s32 i;
     s32 maxCount;
     PeopleEntry* entry;
+    s32 i;
     PeopleEntry* found;
+    f32 moveSpeed;
 
     maxCount = gPeopleMaxCount;
     entry = gPeopleArray;
@@ -251,9 +266,10 @@ PeopleEntry* fn_8018FCE0(void)
             memset(found, 0, PEOPLE_ENTRY_SIZE);
 
             found->active = 1;
-            found->moveSpeed = lbl_8047D8B0; /* default moveSpeed from sdata2 */
+            moveSpeed = lbl_8047D8B0;
             found->selfPtr = found;          /* self-pointer for script lookup */
             found->shadowId = -1;            /* no shadow by default */
+            found->moveSpeed = moveSpeed; /* default moveSpeed from sdata2 */
 
             return found;
         }
@@ -380,16 +396,18 @@ void* peopleGetTransform(PeopleEntry* entry)
  * This ensures all pending model loads and animation setups complete
  * before the floor becomes visible.
  * ======================================================================= */
+#pragma optimization_level 2
 void fn_80181224(void)
 {
     void* field;
+    s32 i;
     void* fieldData;
     void* floorObj;
-    s32 i;
+    PeopleOpenWork* work;
 
+    floorObj = gPeopleFloorObj;
     field = fn_80167F28(lbl_80273F80);
     fieldData = fn_80167E5C();
-    floorObj = gPeopleFloorObj;
 
     for (i = 0; i < 30; i++) {
         fn_80167ED0(field, floorObj, fieldData, 0);
@@ -398,11 +416,13 @@ void fn_80181224(void)
     fn_80167E64(field);
 
     /* Reset open work state */
-    gPeopleOpenWork->subState = 0;
+    work = gPeopleOpenWork;
+    work->subState = 0;
 
     /* Clean up the thread/task */
     GSgappTerminate(gPeopleOpenWork->threadObj);
 }
+#pragma optimization_level reset
 
 /* =======================================================================
  * fn_80181850 -- peopleUpdate
@@ -752,10 +772,6 @@ extern void GSmodelPopState();
 asm void fn_8018E9B4(void) {
 #include "src/game/people/people_fn_8018E9B4.inc"
 }
-#else
-void fn_8018E9B4(void) {
-    /* TODO: match -- 824 bytes at 0x8018E9B4 */
-}
 #endif
 
 /* 0x8018ECEC | 0x3A0 */
@@ -773,9 +789,11 @@ asm void fn_8018ECEC(void) {
 #include "src/game/people/people_fn_8018ECEC.inc"
 }
 #else
-void fn_8018ECEC(void) {
+#pragma dont_inline on
+void fn_8018ECEC(PeopleEntry* entry, f32 step) {
     /* TODO: match -- 928 bytes at 0x8018ECEC */
 }
+#pragma dont_inline reset
 #endif
 
 /* WP-0010 stubs */
@@ -839,7 +857,7 @@ asm void fn_80183958(void) {
 #include "src/game/people/people_fn_80183958.inc"
 }
 #else
-#pragma optimization_level 4
+#pragma optimization_level 0
 void fn_80183958(void) {
     fn_801170A4();
     floorCharacterBiosGetMoveSctID();
@@ -882,6 +900,7 @@ void fn_80183CE0(void) { /* TODO: match -- 380 bytes at 0x80183CE0 */ }
 /* 0x80183E5C | 0x168 -- find a people entry by (groupId, index) and kick off
  * a special motion/interact state: resets a u16 field at +0x6A, sets
  * moveSpeed to 1.0, and enters state 3 (flag set) or state 2 (flag clear). */
+#pragma optimization_level 4
 BOOL fn_80183E5C(u32 groupId, u32 index, u8 flag) {
     s32 i;
     s32 j;
@@ -931,6 +950,7 @@ found_entry:
     }
     return 1;
 }
+#pragma optimization_level reset
 
 /* 0x80183FC4 | 0x1CC */
 extern u8 lbl_8027404C[];
@@ -1051,7 +1071,27 @@ asm void fn_80185AAC(void) {
 #include "src/game/people/people_fn_80185AAC.inc"
 }
 #else
-void fn_80185AAC(void) { /* TODO: match -- 228 bytes at 0x80185AAC */ }
+s32 fn_80185AAC(PeopleEntry* entry) {
+    u8 vec[12];
+    f32 oldLength;
+
+    fn_800E0168(vec, entry->field_5C, fn_8018FCBC(entry));
+    oldLength = fn_800E008C(vec);
+    if (!fn_80188214(entry->groupId, entry->index, entry->moveSpeed)) {
+        return 2;
+    }
+    fn_800E0168(vec, entry->field_5C, fn_8018FCBC(entry));
+    if (fn_800E008C(vec) > oldLength) {
+        fn_8018FC74(entry, entry->field_5C);
+        fn_8018E9B4(entry, fn_8018FCBC(entry), peopleGetTransform(entry));
+        return 1;
+    }
+    return 0;
+}
+
+void fn_8018E9B4(PeopleEntry* entry, void* position, void* transform) {
+    /* TODO: match -- 824 bytes at 0x8018E9B4 */
+}
 #endif
 
 /* 0x80185B90 | 0x358 */
@@ -1274,11 +1314,10 @@ found_entry:
 
 /* SDA data labels referenced by asm incs (symbolmap port), typed by load width */
 extern f32 lbl_8047D8A0;
-extern u32 lbl_8047B1F0[2];
 extern f32 lbl_8047D8B0;
 
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
 asm void fn_8018F30C(void) {
@@ -1292,7 +1331,7 @@ u32 fn_8018F470(u32 r3) {
     if (r3 >= 2) {
         return 0;
     }
-    return lbl_8047B1F0[r3];
+    return gPeopleLights[r3];
 }
 #pragma push
 #pragma optimization_level 0
@@ -1419,14 +1458,49 @@ u32 peopleBiosGetPushDataSize(void) {
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
 asm void peopleBiosPushData(void) {
 #include "src/game/people/people_fn_8018F788.inc"
 }
 #else
-void peopleBiosPushData(void) { /* TODO */ }
+void peopleBiosPushData(u8* dst, u32 size) {
+    u32 offset;
+    u8* end;
+    u8* current;
+    void* model;
+    s32 i;
+
+    i = 0;
+    current = dst;
+    offset = 0;
+    end = dst + size;
+    while (i < gPeopleMaxCount) {
+        PeopleEntry* entry;
+
+        if (i < 0 || gPeopleMaxCount <= i) {
+            entry = NULL;
+        } else {
+            entry = (PeopleEntry*)((u8*)gPeopleArray + offset);
+        }
+        if (entry->active) {
+            model = entry->modelHandle;
+            memcpy(current, (u8*)entry + 0x20, 0xBC);
+            memcpy(current + 0xBC, GSmodelGetPositionPtr(model), 0xC);
+            memcpy(current + 0xC8, GSmodelGetRotationPtr(model), 0xC);
+            memcpy(current + 0xD4, (u8*)model + 0x120, 0xC);
+            memcpy(current + 0xE0, (u8*)model + 0x12C, 0xC);
+            GSmodelPushState(model, current + 0xEC);
+            current += PEOPLE_SPAWN_DATA_SIZE;
+            if (current > end) {
+                break;
+            }
+        }
+        offset += PEOPLE_ENTRY_SIZE;
+        i++;
+    }
+}
 #endif
 #pragma pop
 #pragma push
@@ -1468,18 +1542,52 @@ s32 fn_80180C78(PeopleOpenWork* work) {
 }
 
 /* fn_80181094 -- not recovered, gap in archive campaign (size 0xB8) */
+#pragma optimization_level 0
 void fn_80181094(void) {
+    u8* offsets;
+    u8* table;
+    u8* base;
+    u8* modelData;
+    base = *(u8**)((u8*)gPeopleOpenWork->parentObj + 0x40);
+    table = *(u8**)((u8*)gPeopleOpenWork->parentObj + 0x40) + *(u32*)(base + 0x18);
+    offsets = *(u8**)((u8*)gPeopleOpenWork->parentObj + 0x40) + *(u32*)table;
+    modelData = *(u8**)((u8*)gPeopleOpenWork->parentObj + 0x40)
+              + *(u32*)(offsets + gPeopleOpenWork->floorParam * 4);
+    fn_8017BB80(gPeopleOpenWork->parentObj, modelData);
+    gPeopleOpenWork->subState = 2;
+    GSgappTerminate(gPeopleOpenWork->threadObj);
 }
+#pragma optimization_level reset
 
 /* fn_8018114C = peopleCloseCallback (see people.h) -- not recovered, gap in archive campaign */
+#pragma optimization_level 0
 void fn_8018114C(void) {
-
+    u8* modelData;
+    u8* offsets;
+    u8* table;
+    u8* base;
+    base = *(u8**)((u8*)gPeopleOpenWork->parentObj + 0x40);
+    table = *(u8**)((u8*)gPeopleOpenWork->parentObj + 0x40) + *(u32*)(base + 0x18);
+    offsets = *(u8**)((u8*)gPeopleOpenWork->parentObj + 0x40) + *(u32*)table;
+    modelData = *(u8**)((u8*)gPeopleOpenWork->parentObj + 0x40)
+              + *(u32*)(offsets + gPeopleOpenWork->floorParam * 4);
+    fn_8017BC90(gPeopleOpenWork->parentObj, *(u32*)modelData,
+                *(u32*)((u8*)gPeopleOpenWork + 0x38), gPeopleOpenWork->extraData);
+    *(u32*)gPeopleOpenWork->extraData = 0;
+    gPeopleOpenWork->subState = 2;
+    GSgappTerminate(gPeopleOpenWork->threadObj);
 }
+#pragma optimization_level reset
 
 /* fn_801812C4 = peopleMoveUpdate (see people.h) -- not recovered, gap in archive campaign */
+#pragma optimization_level 2
 void fn_801812C4(PeopleEntry* entry) {
+    f32 step;
 
+    step = lbl_8047D798;
+    fn_8018ECEC(entry, step);
 }
+#pragma optimization_level reset
 
 /* fn_801812E8 = peopleFindAndInteract (see people.h) -- find a people entry
  * by (groupId, index) and toggle it in/out of the "interacting" state
@@ -1546,11 +1654,51 @@ void fn_80183350(void) {
 }
 
 /* fn_80183688 -- not recovered, gap in archive campaign (size 0xA8) */
-void fn_80183688(void) {
+s32 fn_80183688(void* self) {
+    s32 i;
+    PeopleEntry* entry;
+
+    for (i = 0; i < peopleGetMaxCount(); i++) {
+        entry = peopleGetEntry(i);
+        if (entry->active == 0) continue;
+        if (entry->selfPtr != self) continue;
+        goto found;
+    }
+    entry = NULL;
+found:
+    if (entry == NULL) {
+        return 0;
+    }
+    entry->visible = 1;
+    if ((entry = (PeopleEntry*)fn_800F7108(entry->flagId)) == NULL) {
+        return 0;
+    }
+    GSthreadUnblock(entry);
+    return 1;
 }
 
 /* fn_80183730 -- not recovered, gap in archive campaign (size 0xA8) */
-void fn_80183730(void) {
+s32 fn_80183730(void* self) {
+    s32 i;
+    PeopleEntry* entry;
+
+    for (i = 0; i < peopleGetMaxCount(); i++) {
+        entry = peopleGetEntry(i);
+        if (entry->active == 0) continue;
+        if (entry->selfPtr != self) continue;
+        goto found;
+    }
+    entry = NULL;
+found:
+    if (entry == NULL) {
+        return 0;
+    }
+    entry->visible = 0;
+    if ((entry = (PeopleEntry*)fn_800F7108(entry->flagId)) == NULL) {
+        return 0;
+    }
+    GSthreadBlock(entry);
+    return 1;
 }
 
 /* fn_8018397C -- not recovered, gap in archive campaign (size 0x24) */
@@ -1581,10 +1729,9 @@ void fn_801848D0(void* a, s32 b, s32 c, s32 d) {
 
 /* fn_80185EE8 -- not recovered, gap in archive campaign (size 0x5C) */
 void fn_80185EE8(u32 a, u32 b, u32 c) {
-    void fn_800E01F4();
     void fn_8018AACC();
     u8 local[24];
-    fn_800E01F4(local);
+    set__5GSvecFfff(local);
     fn_8018AACC(a, b, c, local);
 }
 
@@ -1605,7 +1752,7 @@ void fn_8018805C(void) {
 }
 
 /* fn_80188214 -- not recovered, gap in archive campaign (size 0x3B0) */
-void fn_80188214(void) {
+u8 fn_80188214() {
 }
 
 /* fn_801885C4 -- not recovered, gap in archive campaign (size 0x214) */
@@ -2166,7 +2313,24 @@ void* peopleSearchID(u32 id) {
 }
 
 /* fn_8018D998 -- not recovered, gap in archive campaign (size 0xF0) */
-void fn_8018D998(void) {
+void* fn_8018D998(u32 groupId, u32 index) {
+    s32 i;
+    PeopleEntry* entry;
+
+    for (i = 0; i < peopleGetMaxCount(); i++) {
+        entry = peopleGetEntry(i);
+        if (entry->active != 0 && entry->groupId == groupId && entry->index == index) {
+            return entry->selfPtr;
+        }
+    }
+    for (i = 0; i < peopleGetMaxCount(); i++) {
+        entry = peopleGetEntry(i);
+        if (entry->active != 0 && entry->index == index) {
+            GSlogWrite((const char*)lbl_80273FD8, groupId, index);
+            return entry->selfPtr;
+        }
+    }
+    return NULL;
 }
 
 /* fn_8018DA88 -- not recovered, gap in archive campaign (size 0x7C) */
@@ -2208,7 +2372,25 @@ void fn_8018E1C4(PeopleEntry* entry, void* spawnData, u32 motionId, u32 param) {
 }
 
 /* fn_8018E920 -- not recovered, gap in archive campaign (size 0x94) */
-void fn_8018E920(void) {
+void fn_8018E920(u32 maxPeople) {
+    void* data[3];
+    s32 i;
+    void** light;
+
+    data[0] = (void*)lbl_80273F90[0];
+    data[1] = (void*)lbl_80273F90[1];
+    data[2] = (void*)lbl_80273F90[2];
+    peopleInit(maxPeople);
+    i = 0;
+    light = (void**)gPeopleLights;
+    while (i < 2) {
+        *light = GSlightCreate();
+        GSlightSetType(*light, 2);
+        GSlightSetActive(*light, 0);
+        i++;
+        light++;
+    }
+    fn_800FF4D4(data, 1);
 }
 
 /* fn_8018F08C -- not recovered, gap in archive campaign (size 0x280) */
@@ -2217,7 +2399,45 @@ void fn_8018F08C(void) {
 
 /* fn_8018F4C8 = fn_8018F4C8 (see people.h) -- not recovered, gap in archive campaign */
 void fn_8018F4C8(void* entry, u8 param, s32* outNode, u8* outResult) {
+    s8* data = entry;
 
+    if (data == NULL) {
+        return;
+    }
+    switch (param) {
+    case 1:
+        *outNode = data[1];
+        *outResult = 1;
+        break;
+    case 2:
+        *outNode = data[2];
+        *outResult = 1;
+        break;
+    case 3:
+        *outNode = data[3];
+        *outResult = 1;
+        break;
+    case 4:
+        *outNode = data[4];
+        *outResult = 0;
+        break;
+    case 5:
+        *outNode = data[1];
+        *outResult = 1;
+        break;
+    case 6:
+        *outNode = data[6];
+        *outResult = 0;
+        break;
+    case 7:
+        *outNode = data[7];
+        *outResult = 1;
+        break;
+    case 8:
+        *outNode = data[8];
+        *outResult = 0;
+        break;
+    }
 }
 
 /* fn_8018F5E4 -- not recovered, gap in archive campaign (size 0x18) */

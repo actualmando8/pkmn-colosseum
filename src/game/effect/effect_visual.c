@@ -543,32 +543,33 @@ asm u32 fn_801386DC(void* ptr) {
 }
 #else
 u32 fn_801386DC(void* ptr) {
+    const char* messages = (const char*)lbl_80272B40;
     u8* p;
     u16 handle;
 
-    if (ptr == NULL) {
-        GSlogWrite((const char*)lbl_80272B40 + 0xB0);
-        return 0;
+    if (ptr != NULL) {
+        p = ptr;
+        if (GSresGetResource(*(u16*)(p + 0xA), *(u16*)(p + 0xC)) == NULL) {
+            GSlogWrite(messages, *(u16*)(p + 0xA), *(u16*)(p + 0xC));
+            return 0;
+        }
+
+        handle = _toolentryAlloc__FUl(*(u16*)(p + 0x8) * 0x97C);
+        *(u16*)p = handle;
+        if (handle == 0) {
+            GSlogWrite(messages + 0x60);
+            return 0;
+        }
+
+        *(void**)(p + 4) = fn_800E27B0(handle);
+        memset(*(void**)(p + 4), 0, *(u16*)(p + 0x8) * 0x97C);
+        fn_80138838(p, 1);
+        *(u16*)(p + 0x10) = 0;
+        return 1;
     }
 
-    p = ptr;
-    if (GSresGetResource(*(u16*)(p + 0xA), *(u16*)(p + 0xC)) == NULL) {
-        GSlogWrite((const char*)lbl_80272B40, *(u16*)(p + 0xA), *(u16*)(p + 0xC));
-        return 0;
-    }
-
-    handle = _toolentryAlloc__FUl(*(u16*)(p + 0x8) * 0x97C);
-    *(u16*)p = handle;
-    if (handle == 0) {
-        GSlogWrite((const char*)lbl_80272B40 + 0x60);
-        return 0;
-    }
-
-    *(void**)(p + 4) = fn_800E27B0(handle);
-    memset(*(void**)(p + 4), 0, *(u16*)(p + 0x8) * 0x97C);
-    fn_80138838(p, 1);
-    *(u16*)(p + 0x10) = 0;
-    return 1;
+    GSlogWrite(messages + 0xB0);
+    return 0;
 }
 #endif
 #if 0

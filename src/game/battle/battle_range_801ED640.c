@@ -125,6 +125,17 @@ BattleRangeIndexedEntry* fn_801EE07C(u32 index)
     return &lbl_80478F7C[id];
 }
 
+#pragma peephole off
+u16 fn_801EE0A8(u32 idx)
+{
+    extern u16* lbl_80478F74;
+    u8 i;
+
+    i = idx;
+    return lbl_80478F74[i];
+}
+#pragma peephole on
+
 u16 fn_801EE440(u16 index)
 {
     if (index > 0x30) {

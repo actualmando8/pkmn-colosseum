@@ -48,7 +48,7 @@ extern void fn_800D88DC();
 extern void fn_800E0C54();
 extern void _threadSwitch();
 extern void GScharMakeFromSJIS();
-extern void GSmsgGetGSchar();
+extern u32 GSmsgGetGSchar();
 extern void GSmsgGetRect();
 extern void fn_800FB680();
 extern void fn_800FE35C();
@@ -165,7 +165,7 @@ void fn_8006AE18(void);
 u8* fn_8006AEEC(void);
 void fn_8006AF44(void);
 u8* fn_8006AFC4(u8* p);
-void fn_8006AFE4(void);
+u8* fn_8006AFE4(s32 id);
 void fn_8006B09C(void);
 void fn_8006B0F8(void);
 void menuCBBios_ControlerIDtoPortID(void);
@@ -180,7 +180,7 @@ void fn_8006B4AC(void);
 void fn_8006B51C(void);
 s32 fn_8006B57C(void);
 s32 fn_8006B5A8(void);
-void fn_8006B5D0(void);
+void fn_8006B5D0(MenuMiddleWork* work);
 void fn_8006B6B4(void);
 u8 fn_8006B8E8(void);
 void fn_8006B8F0(void);
@@ -189,7 +189,7 @@ void fn_8006B908(u32 r3);
 void fn_8006B930(void);
 void fn_8006B9B8(void);
 void fn_8006BB34(void* menu);
-void fn_8006C018(void);
+void fn_8006C018(void* menu);
 void fn_8006C0DC(void);
 void fn_8006C164(void);
 void fn_8006C5D8(void);
@@ -209,8 +209,8 @@ void fn_8006E258(void);
 void fn_8006E338(void);
 void fn_8006E798(void);
 void fn_8006E9A4(void);
-void fn_8006EE7C(void);
-void fn_8006EF24(void);
+void fn_8006EE7C(void* menu);
+void fn_8006EF24(void* menu);
 void fn_8006EFF8(void);
 void fn_8006F284(void);
 void fn_8006F720(void);
@@ -231,7 +231,7 @@ void fn_8007029C(u32 r3);
 void fn_800702C8(u32 r3);
 void fn_800702F0(u32 r3);
 void fn_80070318(void);
-void fn_80070428(void);
+void fn_80070428(void* arg0, void* menu);
 void fn_800704A4(void);
 void fn_800704A8(void);
 void fn_800704AC(void);
@@ -1552,57 +1552,34 @@ u8* fn_8006AFC4(u8* p) {
 }
 
 /* 0x8006AFE4 | size: 0xB8 */
-void fn_8006AFE4(void) {
-    extern void savedataGetStatus();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r31 = 0;
+#pragma peephole off
+u8* fn_8006AFE4(s32 id) {
+    extern u8* savedataGetStatus(s32 side, s32 type);
+    s32 index;
+    s32* cursor = (s32*)lbl_80267DD8;
+    u32 status;
+    u32 offset;
 
-    
-    r4 = (u32)&lbl_80267DD8;
-    r4 = (u32)&lbl_80267DD8;
-    r0 = MENU_MIDDLE_U32_0000(r4)->unk_0000;
-    if ((s32)r3 == (s32)r0) {
-        r31 = 0x0;
-        goto L_8006B05C;
-    }
-    r4 = r4 + 0x4;
-    r0 = MENU_MIDDLE_U32_0000(r4)->unk_0000;
-    if ((s32)r3 == (s32)r0) {
-        r31 = 0x1;
-        goto L_8006B05C;
-    }
-    r4 = r4 + 0x4;
-    r0 = MENU_MIDDLE_U32_0000(r4)->unk_0000;
-    if ((s32)r3 == (s32)r0) {
-        r31 = 0x2;
-        goto L_8006B05C;
-    }
-    r4 = r4 + 0x4;
-    r0 = MENU_MIDDLE_U32_0000(r4)->unk_0000;
-    if ((s32)r3 == (s32)r0) {
-        r31 = 0x3;
-
+    if (id == *cursor++) {
+        index = 0;
+    } else if (id == *cursor++) {
+        index = 1;
+    } else if (id == *cursor++) {
+        index = 2;
+    } else if (id == *cursor) {
+        index = 3;
     } else {
-    r31 = -0x1;
+        index = -1;
     }
-    L_8006B05C: ;
-    if ((s32)r31 < (s32)0x0) {
-        r3 = 0x0;
-    } else {
 
-        r3 = 0x0;
-        r4 = 0xe;
-        savedataGetStatus();
-        r4 = r31 * 0x1660;
-        r0 = r3;
-        r3 = r4 + 0x24;
-        r3 = r0 + r3;
+    if (index < 0) {
+        return NULL;
     }
-    return;
+    status = (u32)savedataGetStatus(0, 0xe);
+    offset = index * 0x1660;
+    return (u8*)(status + offset + 0x24);
 }
+#pragma peephole reset
 
 
 /* 0x8006B09C | size: 0x5C */
@@ -1974,76 +1951,49 @@ s32 fn_8006B5A8(void) {
 #pragma pop
 
 /* 0x8006B5D0 | size: 0xE4 */
-void fn_8006B5D0(void) {
+void fn_8006B5D0(MenuMiddleWork* work) {
     extern void fn_8006AABC();
-    extern void savedataGetStatus();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+    extern void* savedataGetStatus(s32 index, s32 kind);
+    u16* trainerIds;
+    u8* slot;
+    u32* trainerKinds;
+    u32 i;
 
-    
-    r27 = r3;
-    r3 = 0x0;
-    r4 = 0xe;
-    savedataGetStatus();
-    r0 = *(u8*)&lbl_8047A5E0;
-    *(u32*)&lbl_8047A5A4 = r3;
-    do {
-    if (r0 != (u32)0x0) break;
+    *(void**)&lbl_8047A5A4 = savedataGetStatus(0, 0xE);
+    if (lbl_8047A5E0 == 0) {
+        slot = (u8*)work;
+        trainerKinds = (u32*)lbl_80267DD8;
+        i = 0;
+        trainerIds = (u16*)&lbl_8047C038;
+        do {
+            u32 trainerKind;
+            u32 controllerId;
 
-    r3 = (u32)&lbl_80267DD8;
-    r30 = r27;
-    r29 = (u32)&lbl_80267DD8;
-    r28 = 0x0;
-    r31 = (u32)&lbl_8047C038;
-    do {
-        r4 = MENU_MIDDLE_U16_0000(r31)->unk_0000;
-        r3 = r30 + 0x24;
-        fn_8006AABC();
-        r5 = MENU_MIDDLE_U32_0000(r29)->unk_0000;
-        r0 = r28 & 0xFFFF;
-        r3 = r30 + 0x59a8;
-        r4 = r30 + 0x24;
-        MENU_MIDDLE_U32_0048(r30)->unk_0048 = r5;
-        r5 = 0x1660;
-        MENU_MIDDLE_U16_0026(r30)->unk_0026 = r0;
-        memcpy((void*)r3, (const void*)r4, (u32)r5);
-        r31 = r31 + 0x2;
-        r30 = r30 + 0x1660;
-        r29 = r29 + 0x4;
-        r28 = r28 + 0x1;
-    } while (r28 < (u32)0x4);
-    r0 = MENU_MIDDLE_U32_0000(r27)->unk_0000;
-    if ((s32)r0 != (s32)0x3) {
-        if ((s32)r0 >= (s32)0x3 || (s32)r0 == (s32)0x0) goto L_8006B688;
+            fn_8006AABC(slot + 0x24, *trainerIds);
+            trainerKind = *trainerKinds;
+            controllerId = i & 0xFFFF;
+            *(u32*)(slot + 0x48) = trainerKind;
+            *(u16*)(slot + 0x26) = controllerId;
+            memcpy(slot + 0x59A8, slot + 0x24, 0x1660);
+            trainerIds++;
+            slot += 0x1660;
+            trainerKinds++;
+            i++;
+        } while (i < 4);
 
-
-    } else {
-    r3 = 0xaf;
-    ((void(*)(void))menuCB_InitMenu)();
-    r0 = 0x0;
-    MENU_MIDDLE_U32_0010(r27)->unk_0010 = r0;
-    break;
-
+        switch (work->ruleMode) {
+        case 3:
+            menuCB_InitMenu(0xAF);
+            work->randomTableIndex = 0;
+            break;
+        case 0:
+        default:
+            menuCB_InitMenu(0xA8);
+            work->randomTableIndex = 4;
+            break;
+        }
     }
-    L_8006B688: ;
-    r3 = 0xa8;
-    ((void(*)(void))menuCB_InitMenu)();
-    r0 = 0x4;
-    MENU_MIDDLE_U32_0010(r27)->unk_0010 = r0;
-    } while (0);
-
-    r0 = 0x0;
-    *(u8*)&lbl_8047A5E0 = r0;
-    return;
+    lbl_8047A5E0 = 0;
 }
 
 
@@ -2905,55 +2855,54 @@ static void fn_8006BB34_deadcode(void) {
 
 
 /* 0x8006C018 | size: 0xC4 */
-void fn_8006C018(void) {
-    /* Conservative view of the object returned by windowGetKeyInfo: only the
-     * flags field at offset 0x4 is exercised by this function. */
-    typedef struct {
-        u8 unk0[4];
-        u16 flags; /* 0x4 */
-    } unk_menustate_8006C018;
+#pragma peephole off
+void fn_8006C018(void* menu) {
+    typedef struct MenuButton_8006C018 {
+        u8 pad0;
+        u8 state;
+        u8 pad2[2];
+        s32 menuId;
+    } MenuButton_8006C018;
 
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r30 = 0;
-    unk_menustate_8006C018* r31 = 0;
+    MenuButton_8006C018* button = menu;
+    KeyInfo_8006BB34* keyInfo;
+    s32 itemId;
+    u32 value;
 
-    r30 = r3;
-    r0 = MENU_MIDDLE_U8_0001(r30)->unk_0001;
-    r0 = (s8)r0;
-    if ((s32)r0 != (s32)0x2) {
+    value = button->state;
+    value = (s8)value;
+    if ((s32)value != 2) {
         return;
     }
-    ((void(*)(void))windowGetKeyInfo)();
-    r31 = (unk_menustate_8006C018*)r3;
-    r3 = MENU_MIDDLE_U32_0004(r30)->unk_0004;
-    ((void(*)(void))menuGetCursorItemID)();
-    do {
-        if ((s32)r3 >= (s32)0xe35) break;
-        if ((s32)r3 >= (s32)0xa0e) {
-            if ((s32)r3 < (s32)0xe33) break;
-            r0 = r31->flags & 0x30;
-            if ((s32)r0 == (s32)0x0) break;
-            return;
+
+    keyInfo = windowGetKeyInfo();
+    itemId = menuGetCursorItemID(button->menuId);
+
+    switch (itemId) {
+    case 0x9F7:
+    case 0x9F8:
+    case 0x9F9:
+    case 0x9FA:
+    case 0x9FB:
+        value = keyInfo->flags4 & 0x10;
+        if ((s32)value == 0) {
+            break;
         }
-        if ((s32)r3 < (s32)0x9fc) {
-            if ((s32)r3 < (s32)0x9f7) break;
-            r0 = r31->flags & 0x10;
-            if ((s32)r0 == (s32)0x0) break;
-            return;
-        }
-        if ((s32)r3 < (s32)0xa0c) break;
-        r0 = r31->flags & 0x30;
-        if ((s32)r0 == (s32)0x0) break;
         return;
-    } while (0);
+    case 0xA0C:
+    case 0xA0D:
+    case 0xE33:
+    case 0xE34:
+        value = keyInfo->flags4 & 0x30;
+        if ((s32)value == 0) {
+            break;
+        }
+        return;
+    }
 
-    r3 = r30;
-    ((void(*)(void))menuButtonNormal)();
-
-    return;
+    menuButtonNormal(button);
 }
+#pragma peephole reset
 
 
 /* 0x8006C0DC | size: 0x88 */
@@ -6150,105 +6099,95 @@ void fn_8006E9A4(void) {
 
 
 /* 0x8006EE7C | size: 0xA8 */
-void fn_8006EE7C(void) {
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+#pragma peephole off
+void fn_8006EE7C(void* menu) {
+    typedef struct MenuState_8006EE7C {
+        u8 pad0;
+        u8 state;
+        u8 pad2[0x92];
+        s8 cursor;
+        s8 offset;
+        u8 pad96[2];
+        u8 dirty;
+    } MenuState_8006EE7C;
 
-    
-    r30 = r3;
-    r0 = MENU_MIDDLE_U8_0001(r30)->unk_0001;
-    r0 = (s8)r0;
-    if ((s32)r0 != (s32)0x2) {
+    MenuState_8006EE7C* state;
+    KeyInfo_8006BB34* keyInfo;
+    u8* params;
+    u8 toggled;
+    s32 index;
+    u32 value;
 
+    state = menu;
+    value = state->state;
+    value = (s8)value;
+    if ((s32)value != 2) {
     } else {
-    ((void(*)(void))windowGetKeyInfo)();
-    r0 = MENU_MIDDLE_U16_0004(r3)->unk_0004;
-    r0 = r0 & 0x00000010;
-    if ((s32)r0 != (s32)0x0) {
-        r3 = MENU_MIDDLE_U8_0095(r30)->unk_0095;
-        r0 = MENU_MIDDLE_U8_0094(r30)->unk_0094;
-        r3 = (s8)r3;
-        r0 = (s8)r0;
-        r31 = r3 + r0;
-        if ((s32)r31 < (s32)0x3c) {
-            r3 = r30;
-            r4 = 0x0;
-            ((void(*)(void))windowGetParam)();
-            r4 = *(u8*)(r3 + r31);
-            r0 = 0x0;
-            r4 = __cntlzw(r4);
-            r4 = (u32)r4 >> 5;
-            r4 = r4 & 0xFF;
-            *(u8*)(r3 + r31) = r4;
-            MENU_MIDDLE_U8_0098(r30)->unk_0098 = r0;
-            return;
+        keyInfo = windowGetKeyInfo();
+        value = keyInfo->flags4;
+        value = value & 0x10;
+        if ((s32)value != 0) {
+            index = state->offset + state->cursor;
+            if (index < 60) {
+                params = windowGetParam(menu, 0);
+                value = params[index];
+                toggled = value == 0;
+                params[index] = toggled;
+                state->dirty = 0;
+                return;
+            }
+        }
     }
-    }
-    }
-    r3 = r30;
-    ((void(*)(void))menuButtonNormal)();
 
-    return;
+    menuButtonNormal(menu);
 }
+#pragma peephole reset
 
 
 /* 0x8006EF24 | size: 0xD4 */
-void fn_8006EF24(void) {
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r31 = 0;
+typedef struct MenuState_8006EF24 {
+    u8 pad0;
+    s8 state;
+    u8 pad2[0x92];
+    s8 cursor;
+    s8 mode;
+} MenuState_8006EF24;
 
-    
-    r31 = r3;
-    r0 = MENU_MIDDLE_U8_0001(r31)->unk_0001;
-    r0 = (s8)r0;
-    if ((s32)r0 != (s32)0x2) {
-        goto L_8006EFDC;
+#pragma peephole off
+void fn_8006EF24(void* menu) {
+    MenuState_8006EF24* state = (MenuState_8006EF24*)menu;
+    KeyInfo_8006BB34* keyInfo;
+    s32 currentState;
+
+    currentState = state->state;
+    if (currentState != 2) {
+        goto normal;
     }
-    r0 = MENU_MIDDLE_U8_0095(r31)->unk_0095;
-    r0 = (s8)r0;
-    if ((s32)r0 == (s32)0x0) {
-        ((void(*)(void))windowGetKeyInfo)();
-        r0 = MENU_MIDDLE_U16_0006(r3)->unk_0006;
-        r0 = r0 & 0x1;
-        if ((s32)r0 == (s32)0x0) goto L_8006EFDC;
-        r3 = MENU_MIDDLE_U8_0094(r31)->unk_0094;
-        /* subi r0, r3, 0x1 */;
-        MENU_MIDDLE_U8_0094(r31)->unk_0094 = r0;
-        r0 = MENU_MIDDLE_U8_0094(r31)->unk_0094;
-        r0 = (s8)r0;
-        if ((s32)r0 >= (s32)0x0) return;
-        r0 = 0x0;
-        MENU_MIDDLE_U8_0094(r31)->unk_0094 = r0;
-        return;
-    }
-    if ((s32)r0 == (s32)0xa) {
-        ((void(*)(void))windowGetKeyInfo)();
-        r0 = MENU_MIDDLE_U16_0006(r3)->unk_0006;
-        r0 = r0 & 0x00000002;
-        if ((s32)r0 != (s32)0x0) {
-            r3 = MENU_MIDDLE_U8_0094(r31)->unk_0094;
-            r0 = r3 + 0x1;
-            MENU_MIDDLE_U8_0094(r31)->unk_0094 = r0;
-            r0 = MENU_MIDDLE_U8_0094(r31)->unk_0094;
-            r0 = (s8)r0;
-            if ((s32)r0 <= (s32)0x32) return;
-            r0 = 0x32;
-            MENU_MIDDLE_U8_0094(r31)->unk_0094 = r0;
+
+    if (state->mode == 0) {
+        keyInfo = (KeyInfo_8006BB34*)windowGetKeyInfo();
+        if (keyInfo->flags6 & 1) {
+            state->cursor--;
+            if (state->cursor < 0) {
+                state->cursor = 0;
+            }
             return;
+        }
+    } else if (state->mode == 10) {
+        keyInfo = (KeyInfo_8006BB34*)windowGetKeyInfo();
+        if (keyInfo->flags6 & 2) {
+            state->cursor++;
+            if (state->cursor > 50) {
+                state->cursor = 50;
+            }
+            return;
+        }
     }
-    }
-    L_8006EFDC: ;
-    r3 = r31;
-    ((void(*)(void))menuCursorNormal)();
 
-    return;
+normal:
+    menuCursorNormal(menu);
 }
+#pragma peephole reset
 
 
 /* 0x8006EFF8 | size: 0x28C */
@@ -7627,40 +7566,27 @@ void fn_80070318(void) {
 
 
 /* 0x80070428 | size: 0x7C */
-void fn_80070428(void) {
+#pragma peephole off
+void fn_80070428(void* arg0, void* menu) {
     extern void msgctrlSetValue();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r31 = 0;
+    u32 value;
+    void* context = menu;
+    s16 state = MENU_MIDDLE_S16_0006(context)->unk_0006;
+    u32 message;
 
-    
-    r31 = r4;
-    r0 = MENU_MIDDLE_S16_0006(r31)->unk_0006;
-    if ((s32)r0 >= (s32)0xa28) return;
-    if ((s32)r0 < (s32)0xa1d) {
-        return;
+    if (state < 0xA28) {
+        if (state >= 0xA1D) {
+            message = MENU_MIDDLE_U32_004C(context)->unk_004C;
+            if (message != 0) {
+                value = GSmsgGetGSchar(message);
+                msgctrlSetValue(0x37, value);
+                fn_800FB680(0, 0, MENU_MIDDLE_U32_0064(context)->unk_0064, 0xE7);
+                MENU_MIDDLE_U32_004C(context)->unk_004C = 0;
+            }
+        }
     }
-    r3 = MENU_MIDDLE_U32_004C(r31)->unk_004C;
-    if (r3 == (u32)0x0) return;
-    ((void(*)(void))GSmsgGetGSchar)();
-    r0 = r3;
-    r3 = 0x37;
-    r4 = r0;
-    msgctrlSetValue();
-    r5 = MENU_MIDDLE_U32_0064(r31)->unk_0064;
-    r3 = 0x0;
-    r4 = 0x0;
-    r6 = 0xe7;
-    ((void(*)(void))fn_800FB680)();
-    r0 = 0x0;
-    MENU_MIDDLE_U32_004C(r31)->unk_004C = r0;
-
-    return;
 }
+#pragma peephole reset
 
 
 /* 0x800704A4 | size: 0x4 */

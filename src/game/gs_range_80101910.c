@@ -144,3 +144,19 @@ extern s32 menuModelFree(void* p);
 void fn_801019F8(void) {
     memset(lbl_80402518, 0, 0x2400);
 }
+
+/* 0x80101A28 | 0x24 */
+s32 fn_80101A28(void) {
+    extern void fn_800D2738(void);
+
+    fn_800D2738();
+    return 1;
+}
+
+/* 0x80101A4C | 0x24 */
+s32 fn_80101A4C(void) {
+    extern void GSmodelFree(void);
+
+    GSmodelFree();
+    return 1;
+}

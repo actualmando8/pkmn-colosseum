@@ -8,3 +8,50 @@
  * range name stays honest until internal TU structure is proven.
  */
 #include "dolphin/types.h"
+#include "dolphin/gx/GX.h"
+
+extern GXData* gx;
+extern volatile u16* __cpReg;
+
+void fn_800B7514(void) {
+    u32* gxStatus = (u32*)gx;
+    u32 value;
+
+    value = gxStatus[2];
+    gxStatus[2] = (value & ~1U) | 1U;
+    __cpReg[1] = (u16)gxStatus[2];
+}
+
+void fn_800B7538(void) {
+    u32* gxStatus = (u32*)gx;
+
+    gxStatus[2] &= ~1U;
+    __cpReg[1] = (u16)gxStatus[2];
+}
+
+void fn_800B7558(u8 arg0) {
+    u32* gxStatus = (u32*)gx;
+    u32 bit;
+
+    if ((arg0 & 0xFF) != 0) {
+        bit = 1U;
+    } else {
+        bit = 0U;
+    }
+    gxStatus[2] = (gxStatus[2] & 0xF7FFFFFFU) | (bit << 4);
+    __cpReg[1] = (u16)gxStatus[2];
+}
+
+void fn_800B7594(u8 arg0, u8 arg1) {
+    u32* gxStatus = (u32*)gx;
+    gxStatus[2] = (gxStatus[2] & ~4U) | ((u32)(arg0 << 2));
+    gxStatus[2] = (gxStatus[2] & ~8U) | ((u32)(arg1 << 3));
+    __cpReg[1] = (u16)gxStatus[2];
+}
+
+void fn_800B75D0(u8 arg0, u8 arg1) {
+    u32* gxStatus = (u32*)gx;
+    gxStatus[4] = (gxStatus[4] & ~1U) | (u32)arg0;
+    gxStatus[4] = (gxStatus[4] & (u32)~(1ULL << 30)) | (u32)(arg1 * 2U);
+    __cpReg[2] = (u16)gxStatus[4];
+}

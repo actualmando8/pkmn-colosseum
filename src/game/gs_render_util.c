@@ -12,6 +12,7 @@
 
 #include "dolphin/types.h"
 #include "game/gs_render_util.h"
+#include "hsd/hsd_object.h"
 
 /* ===== External references ===== */
 extern void GSlogWrite(const char* fmt, ...);
@@ -867,19 +868,8 @@ void fn_800D2738(void* obj) {
         lbl_8047AA74 = (u32)0;
     }
     jobj = c->cobj;
-    if (jobj != 0) {
-        u16 ref = *(u16*)((u8*)jobj + 0x4);
-        if ((u16)(0xffffu - ref) != 0) {
-            *(u16*)((u8*)jobj + 0x4) = ref - 1;
-            if (ref != 0) {
-                if (jobj != 0) {
-                    void** vtable = *(void***)jobj;
-                    ((void(*)(void*))vtable[0xc])(jobj);
-                    vtable = *(void***)jobj;
-                    ((void(*)(void*))vtable[0xd])(jobj);
-                }
-            }
-        }
+    if (jobj != NULL && ref_DEC(jobj)) {
+        hsdDelete(jobj);
     }
     c->active = 0;
 }

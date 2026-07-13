@@ -44,21 +44,18 @@ asm void fn_8004BDB8(s8 a, s8 b) {
 #include "src/game/menu/menu_pda_mail_fn_8004BDB8.inc"
 }
 #else
-/* WALL: W2 extsb. vs extsb+cmpwi codegen idiom (see archive WALLS.md
- * fn_80039004 precedent) -- CW fuses the sign-extend+compare into a
- * record-form `extsb.` regardless of source shape (goto/if, cast to
- * s32, operand order all tried); target keeps them separate. Parked
- * at 83.8% after 3 attempts. */
+#pragma peephole off
 void fn_8004BDB8(s8 a, s8 b)
 {
     if (a >= 0) {
-        lbl_803A6A60[1] = a;
+        *(s8*) &lbl_803A6A60[1] = a;
     }
     if (b < 0) {
         return;
     }
-    lbl_803A6A60[1] = b;
+    *(s8*) &lbl_803A6A60[1] = b;
 }
+#pragma peephole reset
 #endif
 
 /* PI/6 and 2*PI -- rotation-angle wrap constants shared by the PDA
@@ -156,6 +153,49 @@ typedef struct PdaMailWindowB {
     s32* field_0x60;
 } PdaMailWindowB;
 
+#pragma peephole off
+s32 fn_8004E440(PdaMailWindowB* window, void* fieldHandle)
+{
+    extern u32 mailGetAttachFileGroup(s32 index);
+    extern s32 fn_8017B2CC(u32 fileHandle);
+    extern s32 fn_8017B448(u32 fileHandle);
+    extern u32 fn_8017B4BC(u32 fileHandle, u32 index);
+    extern u32 fn_8017B5A4();
+    s32 total;
+    s32 count;
+    s32 index;
+    u32 object;
+    s32 loaded;
+
+    index = window->field_0x60[1];
+    if (fn_8017B2CC(mailGetAttachFileGroup(index)) == 1) {
+        loaded = 0;
+    } else {
+        loaded = 1;
+    }
+    if (loaded == 0) {
+        count = -1;
+    } else {
+        object = mailGetAttachFileGroup(index);
+        total = fn_8017B448(object);
+        index = count = 0;
+        while (index < total) {
+            fn_8017B4BC(object, index);
+            if (fn_8017B5A4() == 9) {
+                count++;
+            }
+            index++;
+        }
+    }
+    if (count <= 0) {
+        winSpriteSetDisp(fieldHandle, 0);
+    } else {
+        winSpriteSetDisp(fieldHandle, 1);
+    }
+    return 0;
+}
+#pragma peephole reset
+
 #if 0
 asm s32 fn_8004DB34(PdaMailWindowB* window, void* fieldHandle) {
 #include "src/game/menu/menu_pda_mail_fn_8004DB34.inc"
@@ -173,6 +213,62 @@ s32 fn_8004DB34(PdaMailWindowB* window, void* fieldHandle)
 }
 #pragma scheduling reset
 #endif
+
+typedef struct PdaMailWindowC {
+    u8 pad00[0x60];
+    s32* field_0x60;
+    u8 pad64[0x31];
+    s8 selection;
+} PdaMailWindowC;
+
+typedef struct PdaMailSpriteField {
+    u8 pad00[6];
+    s16 msgId;
+} PdaMailSpriteField;
+
+extern const s32 lbl_802672D8[6];
+
+s32 fn_8004DA64(PdaMailWindowC* window, PdaMailSpriteField* field)
+{
+    s32 value0 = lbl_802672D8[0];
+    s32 value1 = lbl_802672D8[1];
+    s32 value2 = lbl_802672D8[2];
+    s32 value3 = lbl_802672D8[3];
+    s32 value4 = lbl_802672D8[4];
+    s32 i;
+    u8 visible;
+
+    if (*window->field_0x60 != 0) {
+        visible = 0;
+    } else {
+        i = 0;
+        if (field->msgId != value0) {
+            i = 1;
+            if (field->msgId != value1) {
+                i = 2;
+                if (field->msgId != value2) {
+                    i = 3;
+                    if (field->msgId != value3) {
+                        i = 4;
+                        if (field->msgId != value4) {
+                            i = 5;
+                        }
+                    }
+                }
+            }
+        }
+        if (i >= 5) {
+            return 0;
+        }
+        if (window->selection == i) {
+            visible = 1;
+        } else {
+            visible = 0;
+        }
+    }
+    winSpriteSetDisp(field, visible);
+    return 0;
+}
 
 /* mailGetAttachFileGroup (battle_waza.c): "Waza entry get field 0x18 by index". */
 extern u32 mailGetAttachFileGroup(s32 idx);
@@ -222,12 +318,7 @@ asm s32 fn_8004D590(PdaMailWindowA* window, PdaMailOutA* out) {
 #include "src/game/menu/menu_pda_mail_fn_8004D590.inc"
 }
 #else
-/* WALL: W2 epilogue-register-restore order (lwz r0,0x14(r1) vs lwz
- * r31,0xc(r1) swapped) after #pragma scheduling off fixed the earlier
- * branch/epilogue scheduling issue; optimize_for_size (alone or
- * combined) does not move it further. Parked at 99.5% after 3
- * attempts. */
-#pragma scheduling off
+#pragma peephole off
 s32 fn_8004D590(PdaMailWindowA* window, PdaMailOutA* out)
 {
     if (mailGetAttachFileGroup(pdaMailGetMailID(**window->field_0x60)) != 0) {
@@ -237,7 +328,7 @@ s32 fn_8004D590(PdaMailWindowA* window, PdaMailOutA* out)
     }
     return 0;
 }
-#pragma scheduling reset
+#pragma peephole reset
 #endif
 
 /* mailGetSenderName (battle_waza.c): "Waza entry get field 0x0C by index".
@@ -251,11 +342,7 @@ asm s32 fn_8004D6F0(PdaMailWindowA* window, PdaMailOutA* out) {
 #include "src/game/menu/menu_pda_mail_fn_8004D6F0.inc"
 }
 #else
-/* WALL: W1 arg-shuffle register (target routes GSmsgGetGSchar's result
- * through r0 before moving to r4, ours keeps it in r3->r4 directly;
- * a plain and a volatile local both tried) + W2 epilogue-restore
- * order. 95.8% after 3 attempts. */
-#pragma scheduling off
+#pragma peephole off
 s32 fn_8004D6F0(PdaMailWindowA* window, PdaMailOutA* out)
 {
     u32 val = mailGetSenderName(pdaMailGetMailID(**window->field_0x60));
@@ -268,7 +355,7 @@ s32 fn_8004D6F0(PdaMailWindowA* window, PdaMailOutA* out)
     }
     return 0;
 }
-#pragma scheduling reset
+#pragma peephole reset
 #endif
 
 /* mailGetSubject (battle_waza.c): "Waza entry get field 0x10 by index". */
@@ -279,9 +366,7 @@ asm s32 fn_8004D760(PdaMailWindowA* window, PdaMailOutA* out) {
 #include "src/game/menu/menu_pda_mail_fn_8004D760.inc"
 }
 #else
-/* WALL: same class as fn_8004D6F0 (W1 arg-shuffle + W2 epilogue
- * order). 95.8% after re-using the same fix. */
-#pragma scheduling off
+#pragma peephole off
 s32 fn_8004D760(PdaMailWindowA* window, PdaMailOutA* out)
 {
     u32 val = mailGetSubject(pdaMailGetMailID(**window->field_0x60));
@@ -294,7 +379,7 @@ s32 fn_8004D760(PdaMailWindowA* window, PdaMailOutA* out)
     }
     return 0;
 }
-#pragma scheduling reset
+#pragma peephole reset
 #endif
 
 #if 0
@@ -627,6 +712,41 @@ extern s32 mailGetMailIDInMailbox(s32 idx);
 extern void qsort(void* base, u32 count, u32 size,
                    s32 (*cmp)(const void*, const void*));
 
+typedef struct PdaMailSortLabelWindow {
+    u8 pad00[0x8b];
+    u8 color;
+} PdaMailSortLabelWindow;
+
+#pragma scheduling off
+#pragma peephole off
+s32 fn_8004C3E4(PdaMailSortLabelWindow* window)
+{
+    extern const u32 lbl_802672C8[];
+    extern u32 GSmsgGetRect(u32 msgId);
+    extern void fn_800FB680(s32 x, s32 y, s32 color, u32 msgId);
+    u32 messageIds[4];
+    s32 sortMode;
+    u32 messageId;
+    s32 color;
+
+    messageIds[0] = lbl_802672C8[0];
+    messageIds[1] = lbl_802672C8[1];
+    messageIds[2] = lbl_802672C8[2];
+    messageIds[3] = lbl_802672C8[3];
+    sortMode = mailGetSortMode();
+    if (sortMode < 0 || sortMode >= 4) {
+        return 0;
+    }
+
+    messageId = messageIds[sortMode];
+    color = window->color | -0x100;
+    fn_800FB680(0, 0, color, messageId);
+    fn_800FB680(GSmsgGetRect(messageId) >> 16, 0, color, 0x36c1);
+    return 0;
+}
+#pragma peephole reset
+#pragma scheduling reset
+
 #if 0
 asm void fn_8004BFB0(void) {
 #include "src/game/menu/menu_pda_mail_fn_8004BFB0.inc"
@@ -688,18 +808,12 @@ asm s32 fn_8004DC18(s32 a) {
 #include "src/game/menu/menu_pda_mail_fn_8004DC18.inc"
 }
 #else
-/* WALL: W3 scheduling (target hoists the "out=0" li r0,0x0 one slot
- * earlier, ahead of the param spill store); declaration order (for
- * correct stack-slot placement), statement-order, #pragma scheduling
- * off, and #pragma peephole off all tried without moving it. Parked
- * at 95.2% after 3 attempts -- everything else (call skeleton, vararg
- * setup, validity checks, clamp range) byte-matches. */
+#pragma peephole off
 s32 fn_8004DC18(s32 a)
 {
     s32 out = 0;
-    s32 localA = a;
-    s32 choice = menuOpenCustom(0x75, windowGetActiveID(), &localA, 0, 1, 1, &out);
-    if (choice != -1 && choice != localA) {
+    s32 choice = menuOpenCustom(0x75, windowGetActiveID(), &a, 0, 1, 1, &out);
+    if (choice != -1 && choice != a) {
         out = 1;
     }
     menuClose(0x75);
@@ -709,6 +823,7 @@ s32 fn_8004DC18(s32 a)
     }
     return choice;
 }
+#pragma peephole reset
 #endif
 
 /* lbl_8047A518: persistent "current mailbox cursor" slot -- read/written
@@ -725,14 +840,7 @@ asm s32 fn_8004D9C0(s32 a) {
 #include "src/game/menu/menu_pda_mail_fn_8004D9C0.inc"
 }
 #else
-/* WALL: W3 vararg-slot scheduling (target computes the 7th arg's stack
- * address (addi r9, r1, 0x8) before the four small-immediate args (r3/
- * r5/r6/r7/r8); ours computes it last. #pragma scheduling off already
- * fixed the epilogue-restore order (see fn_8004D590 precedent); a
- * separate &cfg temp for the 7th arg didn't move this further. Parked
- * at 96.1% after 3 attempts -- call skeleton, loop body, and mail-ID/
- * SE-pump dispatch all byte-match. */
-#pragma scheduling off
+#pragma peephole off
 s32 fn_8004D9C0(s32 a)
 {
     lbl_8047A518 = a;
@@ -753,7 +861,7 @@ s32 fn_8004D9C0(s32 a)
     menuCloseSync(0x74, 1);
     return lbl_8047A518;
 }
-#pragma scheduling reset
+#pragma peephole reset
 #endif
 
 /* PdaMailOutC: widget/out-record variant used by fn_8004DCC0 -- a
@@ -841,6 +949,7 @@ s32 fn_8004D7D0(PdaMailWindowA* window)
     s32** field = window->field_0x60;
     u8* state = windowGetKeyInfo();
     s32 index = **field;
+    s32 mailId;
     s32 cur = index;
     u16 flags;
 
@@ -863,19 +972,13 @@ s32 fn_8004D7D0(PdaMailWindowA* window)
         fn_80166A50(0x23, 0, 0xFF, 0);
         **field = index;
     }
-    index = pdaMailGetMailID(index);
-    if (fn_801D1B78(index) == 0) {
-        fn_801D1C20(index);
-        fn_801D228C((u16) index);
+    mailId = pdaMailGetMailID(index);
+    if (fn_801D1B78(mailId) == 0) {
+        fn_801D1C20(mailId);
+        fn_801D228C((u16) mailId);
     }
     return 0;
 }
-/* WALL: W1 register-letter (target holds the post-lookup mail id in a
- * freshly allocated r29 for its whole live range; reusing "index"'s own
- * register vs. a separate "mailId" local both land on r28/r31 instead).
- * Parked at 99.75% after 3 attempts -- everything else, including the
- * two count()-hoist reorderings and the peephole-off record-form fix,
- * byte-matches. */
 #pragma peephole reset
 #endif
 
