@@ -14962,64 +14962,78 @@ u32 fn_8021B364(u32 r3, u32 r4)
 }
 #pragma optimize_for_size reset
 void fn_8021B484(void)
-
 {
     extern u32 fn_800E0C54();
-    extern u32 fn_801F025C();
-    extern u32 fn_801F4354();
-    extern void fn_801F4C14();
+    extern u32 fightTargetGetPtrAsNowFightType();
+    extern u32 fightFloorGetFightOutPokemonPtrToFightTrainerPtr();
+    extern void fightFloorSetStatus();
     extern u32 fn_801F87CC();
-    extern u32 fn_80203E0C();
-  u32 uVar1;
-  u32 uVar2;
-  u32 uVar3;
-  u16 uVar8;
-  u32 uVar4;
-  u32 uVar5;
-  u32 uVar6;
-  int iVar7;
-  short sVar9;
-  u32 bVar10;
+    extern u32 figthOutPokemonGetLevel();
+    extern u32 pokemonGetStatus();
+    extern void pokemonSetStatus();
+    extern u8 lbl_80378CCE[];
+    u32 attacker;
+    u32 defender;
+    u32 trainer;
+    u32 count;
+    u32 defenderLevel;
+    u32 random;
+    u32 selected;
+    s16 status;
+    u32 proceed;
+    u32 choices[6];
 
-  int aiStack_28 [6];
+    attacker = fightTargetGetPtrAsNowFightType(0x11, 0);
+    defender = fightTargetGetPtrAsNowFightType(0x12, 0);
+    trainer = fightFloorGetFightOutPokemonPtrToFightTrainerPtr(0, defender);
+    count = fn_801F87CC(trainer, choices);
+    if ((count & 0xffff) != 0) {
+        goto have_choices;
+    }
+failed:
+    lbl_8047B610 = (u8*)*(u32*)(lbl_8047B610 + 1);
+    goto done;
 
-  uVar1 = fn_801F025C(0x11,0);
-  uVar2 = fn_801F025C(0x12,0);
-  uVar3 = fn_801F4354(0,uVar2);
-  uVar8 = fn_801F87CC(uVar3,aiStack_28);
-  if (uVar8 != 0) {
-    uVar4 = fn_80203E0C(uVar1);
-    uVar5 = fn_80203E0C(uVar2);
-    if (((uVar4 & 0xff) < (uVar5 & 0xff)) &&
-       (uVar6 = fn_800E0C54(),
-       ((int)(((uVar4 & 0xff) + (uVar5 & 0xff)) * (uVar6 & 0xff)) >> 8) + 1U <= (uVar5 >> 2 & 0x3f))
-       ) {
-      bVar10 = 0;
-      *(u32 *)(lbl_8047B610) = *(u32 *)(*(int *)(lbl_8047B610) + 1);
+have_choices:
+    attacker = figthOutPokemonGetLevel(attacker);
+    defenderLevel = figthOutPokemonGetLevel(defender);
+    if ((attacker & 0xff) < (defenderLevel & 0xff)) {
+        goto random_check;
     }
-    else {
-      bVar10 = 1;
-      *(u32 *)(lbl_8047B610) = 0x80378cce;
+success:
+    proceed = 1;
+    lbl_8047B610 = lbl_80378CCE;
+    goto check_proceed;
+
+random_check:
+    random = fn_800E0C54();
+    if ((((s32)(((attacker & 0xff) + (defenderLevel & 0xff)) *
+                (random & 0xff)) >> 8) + 1) >
+        (s32)((defenderLevel >> 2) & 0x3f)) {
+        goto success;
     }
-    if (bVar10 == 0) {
-      return;
+    proceed = 0;
+    lbl_8047B610 = (u8*)*(u32*)(lbl_8047B610 + 1);
+
+check_proceed:
+    if ((u8)proceed == 0) {
+        goto done;
     }
-    uVar4 = fn_800E0C54();
-    iVar7 = *(int *)((int)aiStack_28 +
-                    (((uVar4 & 0xffff) - ((uVar4 & 0xffff) / (u32)uVar8) * (u32)uVar8) * 4 &
-                    0x3fffc));
-    if (iVar7 != 0) {
-      sVar9 = (int)fn_8012640C(iVar7,0,0xce,0);
-      if (-1 < sVar9) {
-        fn_801F4C14(0,0,0x45,0,uVar2);
-  fn_801254B4((void*)uVar2,0,0x121,0,(int)sVar9);
-  fn_801254B4((void*)uVar2,0,0x119,0,1);
-        return;
-      }
+    random = fn_800E0C54();
+    selected = choices[(u16)((random & 0xffff) -
+        ((s32)(random & 0xffff) / (s32)(u16)count) * (u16)count)];
+    if (selected == 0) {
+        goto failed;
     }
-  }
-  *(u32 *)(lbl_8047B610) = *(u32 *)(*(int *)(lbl_8047B610) + 1);
-  return;
+    status = (s16)pokemonGetStatus(selected, 0, 0xce, 0);
+    if (status < 0) {
+        goto failed;
+    }
+    fightFloorSetStatus(0, 0, 0x45, 0, defender);
+    pokemonSetStatus(defender, 0, 0x121, 0, status);
+    pokemonSetStatus(defender, 0, 0x119, 0, 1);
+done:
+    return;
 }
 void WS_ABARERU(void)
 
