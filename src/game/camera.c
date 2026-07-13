@@ -62,7 +62,8 @@ typedef struct CameraPadState {
     /* 0x34 */ u32 targetGroup;
     /* 0x38 */ u32 targetId;
     /* 0x3C */ s32 targetSubId;
-    /* 0x40 */ u8 field_40[8];
+    /* 0x40 */ f32 height;
+    /* 0x44 */ f32 distance;
     /* 0x48 */ f32 fov;
     /* 0x4C */ u8 field_4C[0x84];
     /* 0xD0 */ u32 animationGroup;
@@ -370,6 +371,17 @@ void cameraSetRotY(f32 angle) {
     }
 
     ((CameraPadState*)lbl_80478C40)->rotation.y = angle;
+}
+
+void cameraSetDistance(f32 distance) {
+    CameraFloorEntry* floorEntry;
+
+    floorEntry = cameraFindFloorEntry(fn_800FF56C());
+    if (floorEntry != NULL) {
+        floorEntry->distance = distance;
+    }
+
+    ((CameraPadState*)lbl_80478C40)->distance = distance;
 }
 #if 0
 #pragma push
