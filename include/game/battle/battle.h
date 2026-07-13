@@ -447,7 +447,7 @@ typedef struct TypeMatchup {
 /* fn_801D1338 */ s32  fn_801D1338(void* wazaCtx);
 /* fn_801D1364 */ void* fn_801D1364(void* wazaCtx, s32 idx);
 /* fn_801D139C */ s32  fn_801D139C(void* entry);
-/* fn_801D13E4 */ f32  fn_801D13E4(void* entry);
+/* fn_801D13E4 */ u32  fn_801D13E4(void* entry);
 /* fn_801D142C */ f32  fn_801D142C(void* entry);
 
 /* Waza animation controllers */
