@@ -282,8 +282,9 @@ u16 fn_8010C650(u16 typeA, u16* arr, u16 count) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
+#pragma inline_depth(0)
 u16 zokuseiGetWazaJoutai(u16 typeA, u16 typeB) {
-    return fn_8010C508((u32)typeA, (u32)typeB);
+    return fn_8010C508(typeA, typeB);
 }
 #pragma pop
 
