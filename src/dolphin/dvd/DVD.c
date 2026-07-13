@@ -623,6 +623,16 @@ static void cbForStateError(u32 intType) {
     stateReady_800A6684();
 }
 
+#pragma dont_inline on
+/* 0x800A58BC | size: 0x34 */
+void stateTimeout(void)
+{
+    __DVDStoreErrorCode(0x1234568);
+    DVDReset();
+    cbForStateError(0);
+}
+#pragma dont_inline reset
+
 /*
  * cbForStateMotorStopped - Callback when motor stop completes
  * 0x800A65A0 | size: 0xE4
