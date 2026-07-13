@@ -178,7 +178,7 @@ extern u16 pokemonDataBiosGetSinkaPokemonDataId(u8* ptr, u16 idx);
 extern u16 pokemonDataBiosGetSinkaBuff(u8* ptr, u16 idx);
 extern u8 pokemonDataBiosGetSinkaKind(u8* ptr, u16 idx);
 extern u8 floorUpdateFieldCamera();
-extern void updateAnimation__Ff15HEROMOVE_MEMBER(void);
+extern s32 updateAnimation__Ff15HEROMOVE_MEMBER();
 extern void* heroBiosGetPokemonPtr(u8* ptr, u16 idx);
 extern void* heroBiosGetHizukiNamePtr(void* ptr);
 extern void* heroBiosGetHizukiItemPtr(u8* ptr, u16 idx);
@@ -192,7 +192,7 @@ extern u32 heroBiosGetNamePtr(void* ptr);
 extern u32 lbl_80478EBC;
 extern u32 lbl_80478EB8;
 extern void fn_80113F48(void);
-extern void fn_8018C1E8(void);
+extern void fn_8018C1E8(u32, u32, u32);
 extern void fn_801653CC(void);
 extern void msgctrlSetValue(void);
 extern void winMsgOpen(void);
@@ -510,8 +510,8 @@ extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 extern f32 lbl_8047D038;
 void cbPoison__Fl15FootStepCounterl(void);
-extern void fn_8018D998(void);
-extern void peopleSearchID(void);
+extern u32 fn_8018D998();
+extern u32 peopleSearchID();
 extern void peopleInfoBiosGetPtr(void);
 extern void fn_8018F5E4(void);
 extern void fn_8010F320(void);
@@ -525,25 +525,25 @@ extern f64 lbl_8047D050;
 extern f64 lbl_8047D058;
 extern u8 lbl_80478AC0[4];
 extern f32 lbl_8047D060;
-void fn_8012B19C(void);
-void heroMoveChkHinderClear(void);
+u32 fn_8012B19C(s32 member, f32* start, f32* target, f32 extraRadius);
+u32 heroMoveChkHinderClear(s32 member);
 extern void fn_800D3088(void);
 extern f64 lbl_8047D068;
 void getStep__FP8FOOTSTEPP8_GSmodelPiP8FOOTWORK(void);
-extern void fn_8018CD08(void);
-extern void fn_8018FCBC(void);
+extern u32 fn_8018CD08();
+extern u32 fn_8018FCBC();
 extern void fn_8018FC50(void);
 extern void fn_800CE148(void);
 extern void fn_800CDBE0(void);
-extern void GScolsys2CheckGetEventID(void);
+extern s32 GScolsys2CheckGetEventID();
 extern void fn_8018790C(void);
 extern void fn_800F7D38(void);
 extern void fn_800F7C8C(void);
 extern void fn_8018BA04(void);
 extern void fn_80187D48(void);
-extern void fn_8018D7D0(void);
+extern u8 fn_8018D7D0();
 extern void fn_80183730(void);
-extern void fn_8018397C(void);
+extern u32 fn_8018397C();
 extern void fn_801812E8(void);
 extern void fn_80189490(void);
 extern void fn_80183688(void);
@@ -552,7 +552,7 @@ extern f32 lbl_8047D074;
 extern f32 lbl_8047D078;
 extern f32 lbl_8047D07C;
 extern f32 lbl_8047D080;
-void updateChat__F15HEROMOVE_MEMBER(void);
+u32 updateChat__F15HEROMOVE_MEMBER(s32 player);
 void heroMoveCheckEvent(void);
 extern void fn_8018F4C8(void);
 extern void GSmodelGetAnimIndex(void);
@@ -564,12 +564,12 @@ extern f32 lbl_8047D088;
 extern f32 lbl_8047D08C;
 extern f32 lbl_8047D090;
 extern f32 lbl_8047D0A8;
-void fn_8012D39C(void);
+extern s32 fn_8012D39C(void*, void*, void*, void*, void*, f32);
 extern f32 lbl_8047D0AC;
-void fn_8012D7F0(void);
+void fn_8012D7F0(s32, void*, void*);
 extern void fn_800E3C64(void);
 extern f32 lbl_8047D0B0;
-void fn_8012DE94(void);
+void fn_8012DE94(u32 playerIndex);
 extern void fn_800F7A7C(void);
 extern void fn_800F7A08(void);
 extern void fn_800F7BC4(void);
@@ -581,13 +581,13 @@ extern f32 lbl_8047D0B8;
 extern f32 lbl_8047D0BC;
 extern f32 lbl_8047D0C0;
 extern f32 lbl_8047D0C4;
-void fn_8012E388(void);
+void fn_8012E388(s32, f32*);
 extern void fn_800F7AF0(void);
 extern void fn_801887D8(void);
 extern void PSVECDistance(void);
 extern f32 lbl_8047D0D0;
 extern f32 lbl_8047D0D4;
-void moveLeader__F15HEROMOVE_MEMBER(void);
+f32 moveLeader__F15HEROMOVE_MEMBER();
 extern void dbgMenuIsOpen(void);
 extern void menuIsCheck(void);
 extern void fn_8018C424(void);
@@ -1432,10 +1432,99 @@ extern u32 heroMoveGetResID(u32* out_zero, u32* out_val, s32 index);
 
 /* 0x8012AC9C | 0xB4 */
 extern u8 lbl_80426BD0[];
+void fn_8013024C(void)
+{
+    extern void cbTsureFriend__Fl15FootStepCounterl(void);
+    u32 resources[2];
+    void (**callbacks)(void);
+    u32* callback_counts;
+    u32 active;
+    f32 spacing;
+    s32 i;
+
+    *(u16*)(lbl_80426BD0 + 0x04) = 0;
+    *(u16*)(lbl_80426BD0 + 0x24) = 0;
+    *(u32*)(lbl_80426BD0 + 0x00) = 0;
+    *(u32*)(lbl_80426BD0 + 0x188) = 0;
+
+    *(u16*)(lbl_80426BD0 + 0x04) |= 1;
+    resources[0] = *(u32*)&lbl_8047D030;
+    resources[1] = *(u32*)&lbl_8047D034;
+    if (*(s32*)(lbl_80426BD0 + 0x0C) == 1) {
+        fn_80188AF4(0, resources[0]);
+    }
+    fn_80188F78(0, resources[0]);
+    *(u32*)(lbl_80426BD0 + 0x0C) = 1;
+
+    active = *(u32*)lbl_80426BD0;
+    *(f32*)(lbl_80426BD0 + active * 0x20 + 8) = lbl_8047D038;
+    spacing = lbl_8047D0D4;
+    if ((*(u16*)(lbl_80426BD0 + 4) & 1) != 0 && active != 0) {
+        *(f32*)(lbl_80426BD0 + 8) = spacing;
+        spacing += spacing;
+    }
+    if ((*(u16*)(lbl_80426BD0 + 0x24) & 1) != 0 && active != 1) {
+        *(f32*)(lbl_80426BD0 + 0x28) = spacing;
+    }
+    fn_8018C1E8(0, resources[0], 1);
+
+    if ((*(u16*)(lbl_80426BD0 + 4) & 1) != 0) {
+        *(u32*)lbl_80426BD0 = 0;
+        if (*(u32*)(lbl_80426BD0 + 0x0C) == 1) {
+            fn_80188AF4(0, resources[0]);
+        }
+        *(u32*)(lbl_80426BD0 + 0x0C) = 0;
+
+        active = *(u32*)lbl_80426BD0;
+        *(f32*)(lbl_80426BD0 + active * 0x20 + 8) = lbl_8047D038;
+        spacing = lbl_8047D0D4;
+        if ((*(u16*)(lbl_80426BD0 + 4) & 1) != 0 && active != 0) {
+            *(f32*)(lbl_80426BD0 + 8) = spacing;
+            spacing += spacing;
+        }
+        if ((*(u16*)(lbl_80426BD0 + 0x24) & 1) != 0 && active != 1) {
+            *(f32*)(lbl_80426BD0 + 0x28) = spacing;
+        }
+    }
+
+    *(u32*)(lbl_80426BD0 + 0x44) = 0;
+    *(u32*)(lbl_80426BD0 + 0x48) = 0;
+    *(u32*)(lbl_80426BD0 + 0x18C) = 0;
+    *(f32*)(lbl_80426BD0 + 0x13C) = lbl_8047D038;
+
+    callbacks = (void (**)(void))(lbl_80426BD0 + 0x140);
+    callback_counts = (u32*)(lbl_80426BD0 + 0x144);
+    for (i = 0; i < 9; i++) {
+        callbacks[i * 2] = NULL;
+    }
+
+    for (i = 0; i < 8; i++) {
+        if (callbacks[i * 2] == NULL) {
+            break;
+        }
+    }
+    if (i < 8) {
+        callbacks[i * 2] = cbPoison__Fl15FootStepCounterl;
+        callback_counts[i * 2] = 0;
+    }
+
+    *(u32*)(lbl_80426BD0 + 0x184) = 0;
+    for (i = 0; i < 8; i++) {
+        if (callbacks[i * 2] == NULL) {
+            break;
+        }
+    }
+    if (i < 8) {
+        callbacks[i * 2] = cbTsureFriend__Fl15FootStepCounterl;
+        callback_counts[i * 2] = 0;
+    }
+}
+
 #if 0
 asm void cbTsureFriend__Fl15FootStepCounterl(void) {
 #include "src/game/gs_field_world_fn_8012AC9C.inc"
 }
+void heroMoveSyncWithHero(void);
 #else
 void cbTsureFriend__Fl15FootStepCounterl(void) {
     extern u32 heroGetStatus(u8* a, u32 b, u32 c);
@@ -1485,6 +1574,146 @@ extern f32 lbl_8047D034;
 extern f32 lbl_8047D038;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void cbPoison__Fl15FootStepCounterl(void);
+extern f32 lbl_8047D038;
+void cbPoison__Fl15FootStepCounterl(void) {
+    extern u32 heroGetStatus(u8* a, u32 b, u32 c);
+    extern u8 pokemonCheckValid(u32 mon);
+    extern u32 pokemonGetStatus(u32 mon, u32 a, u32 b, u32 c);
+    extern void pokemonSetStatus(u32 mon, u32 a, u32 b, u32 c, u32 val);
+    extern u8 fn_80121ADC(u32 mon, u32 status);
+    extern void* GSresGetResource(u32 group, u32 handle);
+    extern void updateAnimation__Ff15HEROMOVE_MEMBER(void* model, s32 member, f32 frame);
+    extern void fn_8018C7C8(u32 a, u32 handle, u32 flags);
+    extern void fn_8018C69C(u32 a, u32 handle, u32 flags);
+    extern void fn_8018CA20(u32 a, u32 handle, u32 flags);
+    extern void* pokemonBiosGetNicknamePtr(u32 mon);
+    extern void msgctrlSetValue(u32 id, void* value);
+    extern void winMsgOpenField(u32 msg, u32 a, u32 b);
+    extern void winMsgCloseField(u32 a);
+    extern void pokemonBiosGetItemDataId(u32 mon);
+    extern void* itemDataBiosGetPtr(void);
+    extern u32 itemDataBiosGetItemSoubiDataId(void* item);
+    extern void pokemonGetFriendFormPokemonFriendFilterId(u32 mon, u32 itemId, u32 filter);
+    extern void heroDecPokedoru(u32 hero, s32 amount);
+    extern void fn_801D0AFC(s32 arg);
+    extern void fn_80121B4C(u32 mon, u32 status);
+
+    u32 expiredSlots[6];
+    u32 handles[2];
+    u32* expiredPtr;
+    u32 mon;
+    u32 itemId;
+    u32 handle;
+    u16 poison;
+    s32 livingPoisoned;
+    s32 expiredCount;
+    s32 changed;
+    s32 member;
+    s32 slot;
+
+    *(u32*)(lbl_80426BD0 + 0x180) = *(u32*)(lbl_80426BD0 + 0x180) + 1;
+    if ((s32)*(u32*)(lbl_80426BD0 + 0x180) < 4) {
+        return;
+    }
+
+    *(u32*)(lbl_80426BD0 + 0x180) = 0;
+    expiredPtr = expiredSlots;
+    livingPoisoned = 0;
+    expiredCount = 0;
+    changed = 0;
+
+    for (slot = 0; slot < 6; slot++) {
+        mon = heroGetStatus(NULL, 3, (u16)slot);
+        if (mon != 0 && (u8)pokemonCheckValid(mon) != 0) {
+            poison = (u16)pokemonGetStatus(mon, 0, 0x83, 0);
+            if (poison != 0) {
+                if ((u8)fn_80121ADC(mon, 3) != 0 || (u8)fn_80121ADC(mon, 4) != 0) {
+                    poison--;
+                    pokemonSetStatus(mon, 0, 0x83, 0, poison);
+                    changed = 1;
+                    if (poison == 0) {
+                        *expiredPtr++ = slot;
+                        expiredCount++;
+                    }
+                }
+                if (poison != 0) {
+                    livingPoisoned++;
+                }
+            }
+        }
+    }
+
+    if ((u8)changed != 0) {
+        fadeEffectDokuStart();
+    }
+    if (expiredCount <= 0) {
+        return;
+    }
+
+    for (member = 0; member < 2; member++) {
+        if ((*(u16*)(lbl_80426BD0 + (u32)member * 0x20 + 4) & 1) != 0) {
+            handles[0] = *(u32*)&lbl_8047D030;
+            handles[1] = *(u32*)&lbl_8047D034;
+            handle = handles[member];
+
+            updateAnimation__Ff15HEROMOVE_MEMBER(GSresGetResource(0, handle), member, lbl_8047D038);
+            fn_8018C7C8(0, handle, 0x80000008);
+            fn_8018C69C(0, handle, 0x100);
+            fn_8018C69C(0, handle, 0x400);
+            fn_8018CA20(0, handle, 0);
+        }
+    }
+
+    expiredPtr = expiredSlots;
+    for (slot = 0; slot < expiredCount; slot++) {
+        mon = heroGetStatus(NULL, 3, (u16)*expiredPtr);
+        msgctrlSetValue(0x32, pokemonBiosGetNicknamePtr(mon));
+        winMsgOpenField(0x444e, 1, 0);
+        winMsgCloseField(1);
+
+        pokemonBiosGetItemDataId(mon);
+        {
+            void* item = itemDataBiosGetPtr();
+            if (item == NULL) {
+                itemId = 0;
+            } else {
+                itemId = itemDataBiosGetItemSoubiDataId(item);
+            }
+        }
+        pokemonGetFriendFormPokemonFriendFilterId(mon, itemId, 7);
+        expiredPtr++;
+    }
+
+    if (livingPoisoned <= 0) {
+        s32 money;
+
+        winMsgOpenField(0x444f, 1, 0);
+        winMsgCloseField(1);
+        money = (s32)heroGetStatus(NULL, 0xc, 0);
+        heroDecPokedoru(0, (money + (s32)((u32)money >> 31)) >> 1);
+        fn_801D0AFC(1);
+
+        for (slot = 0; slot < 6; slot++) {
+            mon = heroGetStatus(NULL, 3, (u16)slot);
+            if (mon != 0 && (u8)pokemonCheckValid(mon) != 0 &&
+                (u8)fn_80121ADC(mon, 0x3e) != 0) {
+                fn_80121B4C(mon, 0x3e);
+            }
+        }
+        fn_80113FE8();
+    }
+
+    for (member = 0; member < 2; member++) {
+        if ((*(u16*)(lbl_80426BD0 + (u32)member * 0x20 + 4) & 1) != 0) {
+            handles[0] = *(u32*)&lbl_8047D030;
+            handles[1] = *(u32*)&lbl_8047D034;
+            handle = handles[member];
+            fn_8018CA20(0, handle, 1);
+            fn_8018C7C8(0, handle, 0x700);
+            fn_8018C69C(0, handle, 0x80000008);
+        }
+    }
+}
 /* 0x8012B184 | 0x18 */
 extern u8 lbl_80426BD0[];
 void heroMoveSetLockFrame(s32 val) {
@@ -1492,8 +1721,8 @@ void heroMoveSetLockFrame(s32 val) {
     *(u32*)(lbl_80426BD0 + 0x188) = (u32)val;
 }
 /* 0x8012B19C | 0x448 */
-extern void fn_8018D998(void);
-extern void peopleSearchID(void);
+extern u32 fn_8018D998();
+extern u32 peopleSearchID();
 extern void peopleInfoBiosGetPtr(void);
 extern void fn_8018F5E4(void);
 extern void fn_8010F320(void);
@@ -1511,7 +1740,7 @@ extern f64 lbl_8047D058;
 extern u8 lbl_80478AC0[4];
 extern f32 lbl_8047D060;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8012B19C(void);
+u32 fn_8012B19C(s32 member, f32* start, f32* target, f32 extraRadius);
 /* 0x8012B5E4 | 0x4EC */
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
@@ -1522,7 +1751,283 @@ extern f64 lbl_8047D050;
 extern f64 lbl_8047D058;
 extern f32 lbl_8047D060;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void heroMoveChkHinderClear(void);
+u32 heroMoveChkHinderClear(s32 member);
+extern f32 lbl_8047D060;
+u32 fn_8012B19C(s32 member, f32* start, f32* target, f32 extraRadius) {
+    extern void* GSresGetResource(u32 group, u32 handle);
+    extern void GSmodelGetPosition(void* model, void* out);
+    extern void fn_8018D998(u32 group, u32 handle);
+    extern u8* peopleSearchID(void);
+    extern void* peopleInfoBiosGetPtr(s32 id);
+    extern f32 fn_8018F5E4(void* info);
+    extern s32 fn_8010F320(void* a, void* b, u32 flags);
+    extern void PSVECSubtract(void* a, void* b, void* out);
+    extern void PSVECScale(void* src, void* dst, f32 scale);
+    extern void PSVECAdd(void* a, void* b, void* out);
+    extern s32 GScolsys2HumanCollision(u32 col, void* from, void* to, u32 flags);
+
+    u32 handles[2];
+    u32 handle = 0;
+    u32 handle2 = 0;
+    u32 handle3 = 0;
+    u32 col;
+    u8* people;
+    void* info;
+    void* model;
+    s32 infoId;
+    f32 from[3];
+    f32 to[3];
+    f32 delta[3];
+    f32 scaled[3];
+    f32 baseRadius;
+    f32 radius;
+    f32 dx;
+    f32 dz;
+    f32 dist;
+
+    if (member < 0 || member >= 2) {
+        return 0;
+    }
+    if ((*(u16*)(lbl_80426BD0 + ((u32)member << 5) + 4) & 1) == 0) {
+        return 0;
+    }
+
+    if (start != NULL) {
+        from[0] = start[0];
+        from[1] = start[1];
+        from[2] = start[2];
+    } else {
+        handles[0] = *(u32*)&lbl_8047D030;
+        handles[1] = *(u32*)&lbl_8047D034;
+        handle = handles[member];
+        model = GSresGetResource(0, handle);
+        GSmodelGetPosition(model, from);
+    }
+    from[1] += lbl_8047D03C;
+
+    to[0] = target[0];
+    to[1] = target[1] + lbl_8047D03C;
+    to[2] = target[2];
+
+    handles[0] = *(u32*)&lbl_8047D030;
+    handles[1] = *(u32*)&lbl_8047D034;
+    handle2 = handles[member];
+    fn_8018D998(0, handle2);
+    people = peopleSearchID();
+    if (people == NULL) {
+        return 0;
+    }
+    infoId = *(s32*)(people + 0x30);
+    if (infoId == -1) {
+        return 0;
+    }
+    info = peopleInfoBiosGetPtr(infoId);
+    if (info == NULL) {
+        return 0;
+    }
+
+    baseRadius = lbl_8047D040 * fn_8018F5E4(info);
+    if (fn_8010F320(from, to, 0) != 0) {
+        return 0;
+    }
+
+    handles[0] = *(u32*)&lbl_8047D030;
+    handles[1] = *(u32*)&lbl_8047D034;
+    handle3 = handles[member];
+    fn_8018D998(0, handle3);
+    people = peopleSearchID();
+    if (people == NULL) {
+        return 0;
+    }
+    col = *(u32*)(people + 0x50);
+
+    if (start != NULL) {
+        from[0] = start[0];
+        from[1] = start[1];
+        from[2] = start[2];
+    } else {
+        handles[0] = *(u32*)&lbl_8047D030;
+        handles[1] = *(u32*)&lbl_8047D034;
+        handle = handles[member];
+        model = GSresGetResource(0, handle);
+        GSmodelGetPosition(model, from);
+    }
+
+    to[0] = target[0];
+    to[1] = target[1];
+    to[2] = target[2];
+    PSVECSubtract(to, from, delta);
+
+    radius = baseRadius + extraRadius;
+    dx = from[0] - to[0];
+    dz = from[2] - to[2];
+    dist = dx * dx + dz * dz;
+    if (dist > lbl_8047D038) {
+        f64 inv;
+        f64 a;
+        f64 b;
+
+        inv = 1.0 / (f64)dist;
+        a = lbl_8047D048;
+        b = lbl_8047D050;
+        inv = inv * (b - (f64)dist * inv * inv * a);
+        inv = inv * (b - (f64)dist * inv * inv * a);
+        inv = inv * (b - (f64)dist * inv * inv * a);
+        dist = (f32)((f64)dist * inv);
+    } else if (dist < (f32)lbl_8047D058) {
+        dist = *(f32*)lbl_80478AC0;
+    }
+
+    if (dist <= lbl_8047D038) {
+        return 1;
+    }
+    if (dist <= radius) {
+        return 1;
+    }
+
+    PSVECScale(delta, scaled, ((dist - radius) - lbl_8047D060) / dist);
+    PSVECAdd(from, scaled, to);
+    return GScolsys2HumanCollision(col, from, to, 0) == 6;
+}
+extern f32 lbl_8047D060;
+u32 heroMoveChkHinderClear(s32 member) {
+    extern u8 lbl_80426BD0[];
+    extern u8 lbl_80478AC0[4];
+    extern void* GSresGetResource(u32 group, u32 handle);
+    extern void GSmodelGetPosition(void* model, void* out);
+    extern void fn_8018D998(u32 group, u32 handle);
+    extern u8* peopleSearchID(void);
+    extern void* peopleInfoBiosGetPtr(s32 id);
+    extern f32 fn_8018F5E4(void* info);
+    extern s32 fn_8010F320(void* a, void* b, u32 flags);
+    extern void PSVECSubtract(void* a, void* b, void* out);
+    extern void PSVECScale(void* src, void* dst, f32 scale);
+    extern void PSVECAdd(void* a, void* b, void* out);
+    extern s32 GScolsys2HumanCollision(u32 col, void* from, void* to, u32 flags);
+
+    u32 handles[2];
+    u32 memberHandle = 0;
+    u32 activeHandle = 0;
+    s32 active;
+    s32 infoId;
+    u8* people;
+    void* info;
+    void* model;
+    u32 col;
+    f32 memberPos[3];
+    f32 activePos[3];
+    f32 delta[3];
+    f32 scaled[3];
+    f32 memberRadius;
+    f32 activeRadius;
+    f32 radiusSum;
+    f32 dx;
+    f32 dz;
+    f32 dist;
+
+    if (member < 0 || member >= 2) {
+        return 0;
+    }
+    if ((*(u16*)(lbl_80426BD0 + ((u32)member << 5) + 4) & 1) == 0) {
+        return 0;
+    }
+
+    handles[0] = *(u32*)&lbl_8047D030;
+    handles[1] = *(u32*)&lbl_8047D034;
+    memberHandle = handles[member];
+    active = *(s32*)lbl_80426BD0;
+
+    model = GSresGetResource(0, memberHandle);
+    GSmodelGetPosition(model, memberPos);
+    memberPos[1] += lbl_8047D03C;
+
+    handles[0] = *(u32*)&lbl_8047D030;
+    handles[1] = *(u32*)&lbl_8047D034;
+    if (active >= 0 && active < 2) {
+        activeHandle = handles[active];
+    }
+    model = GSresGetResource(0, activeHandle);
+    GSmodelGetPosition(model, activePos);
+    activePos[1] += lbl_8047D03C;
+
+    fn_8018D998(0, memberHandle);
+    people = peopleSearchID();
+    if (people == NULL) {
+        return 0;
+    }
+    infoId = *(s32*)(people + 0x30);
+    if (infoId == -1) {
+        return 0;
+    }
+    info = peopleInfoBiosGetPtr(infoId);
+    if (info == NULL) {
+        return 0;
+    }
+    memberRadius = fn_8018F5E4(info);
+
+    if (fn_8010F320(memberPos, activePos, 0) != 0) {
+        return 0;
+    }
+
+    fn_8018D998(0, activeHandle);
+    people = peopleSearchID();
+    if (people == NULL) {
+        return 0;
+    }
+    infoId = *(s32*)(people + 0x30);
+    if (infoId == -1) {
+        return 0;
+    }
+    info = peopleInfoBiosGetPtr(infoId);
+    if (info == NULL) {
+        return 0;
+    }
+    activeRadius = fn_8018F5E4(info);
+
+    fn_8018D998(0, memberHandle);
+    people = peopleSearchID();
+    if (people == NULL) {
+        return 0;
+    }
+    col = *(u32*)(people + 0x50);
+
+    model = GSresGetResource(0, memberHandle);
+    GSmodelGetPosition(model, memberPos);
+    model = GSresGetResource(0, activeHandle);
+    GSmodelGetPosition(model, activePos);
+    PSVECSubtract(activePos, memberPos, delta);
+
+    radiusSum = memberRadius + activeRadius;
+    dx = memberPos[0] - activePos[0];
+    dz = memberPos[2] - activePos[2];
+    dist = dx * dx + dz * dz;
+    if (dist > lbl_8047D038) {
+        f64 inv;
+        f64 a;
+        f64 b;
+
+        inv = 1.0 / (f64)dist;
+        a = lbl_8047D048;
+        b = lbl_8047D050;
+        inv = inv * (b - (f64)dist * inv * inv * a);
+        inv = inv * (b - (f64)dist * inv * inv * a);
+        inv = inv * (b - (f64)dist * inv * inv * a);
+        dist = (f32)((f64)dist * inv);
+    } else if (dist < (f32)lbl_8047D058) {
+        dist = *(f32*)lbl_80478AC0;
+    }
+
+    if (dist <= lbl_8047D038) {
+        return 1;
+    }
+    if (dist <= radiusSum) {
+        return 1;
+    }
+
+    PSVECScale(delta, scaled, ((dist - radiusSum) - lbl_8047D060) / dist);
+    PSVECAdd(memberPos, scaled, activePos);
+    return GScolsys2HumanCollision(col, memberPos, activePos, 0) == 6;
+}
 /* 0x8012BAD0 | 0x20 */
 void heroMoveAddAutoEvent(u32 a, u32 b, u32 c, u32 d, u32 e) {
     u8* base = lbl_80426BD0;
@@ -1685,20 +2190,20 @@ extern f32 lbl_8047D040;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void getStep__FP8FOOTSTEPP8_GSmodelPiP8FOOTWORK(void);
 /* 0x8012C0B4 | 0x48C */
-extern void fn_8018CD08(void);
-extern void fn_8018FCBC(void);
+extern u32 fn_8018CD08();
+extern u32 fn_8018FCBC();
 extern void fn_8018FC50(void);
 extern void fn_800CE148(void);
 extern void fn_800CDBE0(void);
-extern void GScolsys2CheckGetEventID(void);
+extern s32 GScolsys2CheckGetEventID();
 extern void fn_8018790C(void);
 extern void fn_800F7D38(void);
 extern void fn_800F7C8C(void);
 extern void fn_8018BA04(void);
 extern void fn_80187D48(void);
-extern void fn_8018D7D0(void);
+extern u8 fn_8018D7D0();
 extern void fn_80183730(void);
-extern void fn_8018397C(void);
+extern u32 fn_8018397C();
 extern void fn_801812E8(void);
 extern void fn_80189490(void);
 extern void fn_80183688(void);
@@ -1711,7 +2216,7 @@ extern f32 lbl_8047D07C;
 extern f32 lbl_8047D038;
 extern f32 lbl_8047D080;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void updateChat__F15HEROMOVE_MEMBER(void);
+u32 updateChat__F15HEROMOVE_MEMBER(s32 player);
 /* 0x8012C540 | 0x120 */
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
@@ -1736,7 +2241,7 @@ extern f32 lbl_8047D08C;
 extern f32 lbl_8047D040;
 extern f32 lbl_8047D090;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void updateAnimation__Ff15HEROMOVE_MEMBER(void);
+extern s32 updateAnimation__Ff15HEROMOVE_MEMBER();
 /* 0x8012D39C | 0x454 */
 extern f32 lbl_8047D0A8;
 extern f32 lbl_8047D038;
@@ -1745,7 +2250,7 @@ extern f64 lbl_8047D050;
 extern f64 lbl_8047D058;
 extern f32 lbl_8047D080;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8012D39C(void);
+extern s32 fn_8012D39C(void*, void*, void*, void*, void*, f32);
 /* 0x8012D7F0 | 0x6A4 */
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
@@ -1758,7 +2263,7 @@ extern f32 lbl_8047D060;
 extern f32 lbl_8047D0AC;
 extern f32 lbl_8047D080;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8012D7F0(void);
+void fn_8012D7F0(s32, void*, void*);
 /* 0x8012DE94 | 0x4F4 */
 extern void fn_800E3C64(void);
 extern f32 lbl_8047D030;
@@ -1769,7 +2274,7 @@ extern f64 lbl_8047D048;
 extern f64 lbl_8047D050;
 extern f32 lbl_8047D0B0;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8012DE94(void);
+void fn_8012DE94(u32 playerIndex);
 /* 0x8012E388 | 0x430 */
 extern void fn_800F7A7C(void);
 extern void fn_800F7A08(void);
@@ -1791,7 +2296,7 @@ extern f32 lbl_8047D078;
 extern f32 lbl_8047D0C0;
 extern f32 lbl_8047D0C4;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8012E388(void);
+void fn_8012E388(s32, f32*);
 /* 0x8012E7B8 | 0x41C */
 extern void fn_800F7AF0(void);
 extern void fn_801887D8(void);
@@ -1807,7 +2312,7 @@ extern f64 lbl_8047D050;
 extern f64 lbl_8047D058;
 extern f32 lbl_8047D0D4;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void moveLeader__F15HEROMOVE_MEMBER(void);
+f32 moveLeader__F15HEROMOVE_MEMBER();
 /* 0x8012EBD4 | 0x3E4 */
 extern void dbgMenuIsOpen(void);
 extern void menuIsCheck(void);
@@ -1824,10 +2329,803 @@ extern void fn_80188AF4(u32, u32);
 extern void fn_80188F78(u32, u32);
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
+s32 updateAnimation__Ff15HEROMOVE_MEMBER(model, member, amount)
+void* model;
+s32 member;
+f32 amount;
+{
+    extern void fn_8018D998(u32, u32);
+    extern void* peopleSearchID(void);
+    extern void* peopleInfoBiosGetPtr(s32);
+    extern void fn_8018F4C8(void*, s32, s32*, void*);
+    extern void GSmodelGetAnimIndex(void*, s32*, s32*);
+    extern f32 GSmodelGetAnimFrame(void*);
+    extern void GSmodelGetFrameCount(void*, f32*, f32*);
+    extern void GSmodelSetAnimIndex(void*, s32);
+    extern void GSmodelSetAnimFrame(void*, f32);
+    extern void GSmodelSetAnimRate(void*, f32);
+    extern void GSmodelSetAnimBlend(void*, s32, s32);
+    extern void GSmodelSetBlendFactor(void*, f32);
+    u32 resources[2];
+    u8 query[12];
+    s32 anim1;
+    s32 anim2;
+    s32 anim3;
+    s32 anim4;
+    s32 current_anim;
+    s32 blend_anim;
+    f32 frame_count_a;
+    f32 frame_count_b;
+    f32 frame;
+    void* person;
+    void* info;
+
+    resources[0] = *(u32*)&lbl_8047D030;
+    resources[1] = *(u32*)&lbl_8047D034;
+    if (member < 0 || member >= 2) {
+        return -1;
+    }
+    fn_8018D998(0, resources[member]);
+    person = peopleSearchID();
+    if (person == NULL) {
+        return -1;
+    }
+    info = peopleInfoBiosGetPtr(*(s32*)((u8*)person + 0x30));
+    fn_8018F4C8(info, 1, &anim1, query);
+    fn_8018F4C8(info, 2, &anim2, query);
+    fn_8018F4C8(info, 3, &anim3, query);
+    fn_8018F4C8(info, 4, &anim4, query);
+
+    if (amount > lbl_8047D084) {
+        amount = lbl_8047D084;
+    }
+    GSmodelGetAnimIndex(model, &current_anim, &blend_anim);
+
+    if (amount < lbl_8047D088) {
+        if (current_anim != anim4 || blend_anim != -1) {
+            frame = lbl_8047D038;
+            if (blend_anim != -1) {
+                GSmodelGetFrameCount(model, &frame_count_a, &frame_count_b);
+                frame = (frame_count_a / frame_count_b) *
+                        GSmodelGetAnimFrame(model);
+            }
+            GSmodelSetAnimIndex(model, anim4);
+            GSmodelSetAnimFrame(model, frame);
+            GSmodelSetAnimRate(model, lbl_8047D080);
+        }
+    } else if (amount < lbl_8047D038) {
+        if (current_anim != anim4 || blend_anim != anim1) {
+            frame = lbl_8047D038;
+            if (blend_anim == -1) {
+                frame = GSmodelGetAnimFrame(model);
+            }
+            GSmodelSetAnimBlend(model, anim4, anim1);
+            GSmodelGetFrameCount(model, &frame_count_a, &frame_count_b);
+            GSmodelSetAnimFrame(model,
+                                frame * (frame_count_b / frame_count_a));
+        }
+        GSmodelSetBlendFactor(model,
+                              (amount - lbl_8047D088) / lbl_8047D08C);
+        GSmodelSetAnimRate(model, lbl_8047D040);
+    } else if (amount < lbl_8047D08C) {
+        if (current_anim != anim2 || blend_anim != anim1) {
+            frame = lbl_8047D038;
+            if (blend_anim == -1) {
+                frame = GSmodelGetAnimFrame(model);
+            }
+            GSmodelSetAnimBlend(model, anim2, anim1);
+            GSmodelGetFrameCount(model, &frame_count_a, &frame_count_b);
+            GSmodelSetAnimFrame(model,
+                                frame * (frame_count_b / frame_count_a));
+        }
+        GSmodelSetBlendFactor(model,
+                              lbl_8047D080 - lbl_8047D090 * amount);
+        GSmodelSetAnimRate(model, lbl_8047D040);
+    } else if (amount < lbl_8047D080) {
+        if (current_anim != anim2 || blend_anim != -1) {
+            frame = lbl_8047D038;
+            if (blend_anim != -1) {
+                GSmodelGetFrameCount(model, &frame_count_a, &frame_count_b);
+                frame = (frame_count_a / frame_count_b) *
+                        GSmodelGetAnimFrame(model);
+            }
+            GSmodelSetAnimIndex(model, anim2);
+            GSmodelSetAnimFrame(model, frame);
+            GSmodelSetAnimRate(model, lbl_8047D040);
+        }
+    } else {
+        if (current_anim != anim2 || blend_anim != anim3) {
+            frame = lbl_8047D038;
+            if (blend_anim == -1) {
+                frame = GSmodelGetAnimFrame(model);
+            }
+            GSmodelSetAnimBlend(model, anim2, anim3);
+            GSmodelGetFrameCount(model, &frame_count_a, &frame_count_b);
+            GSmodelSetAnimFrame(model,
+                                frame * (frame_count_b / frame_count_a));
+        }
+        GSmodelSetBlendFactor(model, amount - lbl_8047D080);
+        GSmodelSetAnimRate(model, lbl_8047D040);
+    }
+    return 0;
+}
+/* 0x8012D39C | 0x454 */
+extern f32 lbl_8047D0A8;
+extern f32 lbl_8047D038;
+extern f64 lbl_8047D048;
+extern f64 lbl_8047D050;
+extern f64 lbl_8047D058;
+extern f32 lbl_8047D080;
+/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
+extern s32 fn_8012D39C(void*, void*, void*, void*, void*, f32);
+/* 0x8012D7F0 | 0x6A4 */
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
+extern f64 lbl_8047D068;
+extern f32 lbl_8047D038;
+extern f64 lbl_8047D048;
+extern f64 lbl_8047D050;
+extern f64 lbl_8047D058;
+extern f32 lbl_8047D060;
+extern f32 lbl_8047D0AC;
+extern f32 lbl_8047D080;
+typedef struct HeroMoveVec3 {
+    f32 x;
+    f32 y;
+    f32 z;
+} HeroMoveVec3;
+
+s32 fn_8012D39C(void* start_, void* end_, void* center_, void* reference_,
+                void* result_, f32 radius)
+{
+    extern f32 sqrtf(f32);
+    HeroMoveVec3* start = start_;
+    HeroMoveVec3* end = end_;
+    HeroMoveVec3* center = center_;
+    HeroMoveVec3* reference = reference_;
+    HeroMoveVec3* result = result_;
+    f32 dz;
+    f32 dx;
+    f32 lengthSquared;
+    f32 invLength;
+    f32 dirX;
+    f32 dirZ;
+    f32 lineOffset;
+    f32 normalLengthSquared;
+    f32 normalLength;
+    f32 originX;
+    f32 originZ;
+    f32 relX;
+    f32 relZ;
+    f32 cross;
+    f32 discriminant;
+    f32 projection;
+    f32 root;
+    f32 scale;
+    f32 nearX;
+    f32 nearZ;
+    f32 farX;
+    f32 farZ;
+    f32 nearDx;
+    f32 nearDz;
+    f32 farDx;
+    f32 farDz;
+
+    dz = end->z - start->z;
+    dx = end->x - start->x;
+    lengthSquared = dx * dx + dz * dz;
+    if (lengthSquared < lbl_8047D0A8) {
+        return -1;
+    }
+
+    invLength = lbl_8047D080 / sqrtf(lengthSquared);
+    dirX = -dz * invLength;
+    dirZ = dx * invLength;
+    lineOffset = invLength *
+                 (start->x * end->z - end->x * start->z);
+
+    normalLengthSquared = dirX * dirX + dirZ * dirZ;
+    scale = lbl_8047D080 / normalLengthSquared;
+    originX = dirX * (-lineOffset * scale);
+    originZ = dirZ * (-lineOffset * scale);
+    normalLength = sqrtf(scale);
+    {
+        f32 temp = -dirX;
+        dirX = dirZ * normalLength;
+        dirZ = temp * normalLength;
+    }
+
+    if (dirX * dirX + dirZ * dirZ < lbl_8047D0A8) {
+        return 0;
+    }
+
+    relX = center->x - originX;
+    relZ = center->z - originZ;
+    cross = dirX * relZ - dirZ * relX;
+    discriminant = normalLengthSquared * radius * radius - cross * cross;
+    if (discriminant < -lbl_8047D0A8) {
+        return 0;
+    }
+
+    projection = dirX * relX + dirZ * relZ;
+    if (discriminant < projection) {
+        scale = projection / normalLengthSquared;
+        result->x = dirX * scale + originX;
+        result->y = lbl_8047D038;
+        result->z = dirZ * scale + originZ;
+        return 1;
+    }
+
+    root = sqrtf(discriminant);
+    scale = lbl_8047D080 / normalLengthSquared;
+    nearX = dirX * (scale * (projection - root)) + originX;
+    nearZ = dirZ * (scale * (projection - root)) + originZ;
+    farX = dirX * (scale * (projection + root)) + originX;
+    farZ = dirZ * (scale * (projection + root)) + originZ;
+
+    nearDx = reference->x - nearX;
+    nearDz = reference->z - nearZ;
+    farDx = reference->x - farX;
+    farDz = reference->z - farZ;
+    if (nearDx * nearDx + nearDz * nearDz <
+        farDx * farDx + farDz * farDz) {
+        result->x = nearX;
+        result->y = lbl_8047D038;
+        result->z = nearZ;
+    } else {
+        result->x = farX;
+        result->y = lbl_8047D038;
+        result->z = farZ;
+    }
+    return 2;
+}
+
+void fn_8012D7F0(s32 playerIndex, void* velocityOut_, void* resultOut_)
+{
+    extern u32 fn_800D3088(void);
+    extern void* GSresGetResource(u32, u32);
+    extern void GSmodelGetPosition(void*, HeroMoveVec3*);
+    extern void PSVECScale(HeroMoveVec3*, HeroMoveVec3*, f32);
+    extern void PSVECAdd(HeroMoveVec3*, HeroMoveVec3*, HeroMoveVec3*);
+    extern void PSVECSubtract(HeroMoveVec3*, HeroMoveVec3*, HeroMoveVec3*);
+    extern f32 sqrtf(f32);
+
+    HeroMoveVec3* velocityOut = (HeroMoveVec3*)velocityOut_;
+    HeroMoveVec3* resultOut = (HeroMoveVec3*)resultOut_;
+    HeroMoveVec3 targetPosition;
+    HeroMoveVec3 currentPosition;
+    HeroMoveVec3 direction;
+    HeroMoveVec3 step;
+    HeroMoveVec3 historyPosition;
+    HeroMoveVec3 collisionPosition;
+    HeroMoveVec3 candidatePosition;
+    HeroMoveVec3 projectedPosition;
+    HeroMoveVec3 difference;
+    u32 resourceHandles[2];
+    u32 playerHandles[2];
+    u32 resourceId;
+    u32 playerResourceId;
+    s32 historyIndex;
+    u8 hasHistory;
+    f32 frameDistance;
+    f32 radius;
+    f32 targetDistance;
+    f32 historyDistance;
+    f32 scale;
+
+    radius = *(f32*)(lbl_80426BD0 + playerIndex * 0x20 + 8);
+    frameDistance = (f32)fn_800D3088();
+
+    resourceHandles[0] = *(u32*)&lbl_8047D030;
+    resourceHandles[1] = *(u32*)&lbl_8047D034;
+    historyIndex = *(s32*)lbl_80426BD0;
+    if (historyIndex >= 0 && historyIndex < 2) {
+        resourceId = resourceHandles[historyIndex];
+    }
+    GSmodelGetPosition(GSresGetResource(0, resourceId), &targetPosition);
+
+    if (*(s32*)(lbl_80426BD0 + 0x48) > 0) {
+        historyIndex = *(s32*)(lbl_80426BD0 + 0x44) - 1;
+        if (historyIndex < 0) {
+            historyIndex += 20;
+        }
+        historyPosition =
+            *(HeroMoveVec3*)(lbl_80426BD0 + 0x4C + historyIndex * 12);
+        hasHistory = 1;
+    } else {
+        hasHistory = 0;
+    }
+
+    playerHandles[0] = *(u32*)&lbl_8047D030;
+    playerHandles[1] = *(u32*)&lbl_8047D034;
+    if (playerIndex >= 0 && playerIndex < 2) {
+        playerResourceId = playerHandles[playerIndex];
+    }
+    GSmodelGetPosition(GSresGetResource(0, playerResourceId), &currentPosition);
+
+    direction.x = targetPosition.x - currentPosition.x;
+    direction.y = lbl_8047D038;
+    direction.z = targetPosition.z - currentPosition.z;
+    targetDistance = sqrtf(direction.x * direction.x + direction.z * direction.z);
+
+    if (hasHistory) {
+        f32 dx = currentPosition.x - historyPosition.x;
+        f32 dz = currentPosition.z - historyPosition.z;
+        historyDistance = sqrtf(dx * dx + dz * dz);
+    } else {
+        historyDistance = lbl_8047D038;
+    }
+
+    if (!hasHistory || targetDistance <= historyDistance ||
+        targetDistance <= lbl_8047D060 + radius) {
+        if (targetDistance > lbl_8047D060 + radius) {
+            f32 amount = targetDistance - radius;
+            if (amount > frameDistance) {
+                amount = frameDistance;
+            }
+            scale = amount / targetDistance;
+        } else if (targetDistance < lbl_8047D0AC) {
+            f32 amount = lbl_8047D0AC - targetDistance;
+            if (amount > frameDistance) {
+                amount = frameDistance;
+            }
+            scale = -amount / lbl_8047D0AC;
+        } else {
+            scale = lbl_8047D038;
+        }
+
+        PSVECScale(&direction, velocityOut, scale);
+        *resultOut = *velocityOut;
+        return;
+    }
+
+    direction.x = historyPosition.x - currentPosition.x;
+    direction.y = lbl_8047D038;
+    direction.z = historyPosition.z - currentPosition.z;
+    historyDistance = sqrtf(direction.x * direction.x + direction.z * direction.z);
+    if (historyDistance > frameDistance) {
+        PSVECScale(&direction, &step, frameDistance / historyDistance);
+    } else {
+        step = direction;
+    }
+
+    PSVECAdd(&currentPosition, &step, &candidatePosition);
+    if (fn_8012D39C(&currentPosition, &candidatePosition, &targetPosition,
+                    &currentPosition, &collisionPosition, radius) > 0) {
+        f32 magnitudeSquared;
+
+        candidatePosition.y = currentPosition.y;
+        PSVECSubtract(&candidatePosition, &currentPosition, &difference);
+        magnitudeSquared = difference.x * difference.x +
+                           difference.y * difference.y +
+                           difference.z * difference.z;
+        if (magnitudeSquared == lbl_8047D038) {
+            projectedPosition = candidatePosition;
+        } else {
+            f32 projection =
+                (difference.x * (collisionPosition.x - currentPosition.x) +
+                 difference.y * (collisionPosition.y - currentPosition.y) +
+                 difference.z * (collisionPosition.z - currentPosition.z)) /
+                magnitudeSquared;
+            PSVECScale(&difference, &difference, projection);
+            PSVECAdd(&difference, &currentPosition, &projectedPosition);
+            if (projection >= lbl_8047D038 && projection <= lbl_8047D080) {
+                PSVECSubtract(&collisionPosition, &currentPosition, &step);
+            }
+        }
+    }
+
+    *velocityOut = step;
+    *resultOut = step;
+}
+/* 0x8012DE94 | 0x4F4 */
+extern void fn_800E3C64(void);
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
+extern f32 lbl_8047D038;
+extern f64 lbl_8047D058;
+extern f64 lbl_8047D048;
+extern f64 lbl_8047D050;
+extern f32 lbl_8047D0B0;
+void fn_8012DE94(u32 playerIndex)
+{
+    extern u32 fn_800D3088();
+    extern u8 fn_800E3C64();
+    extern void fn_8018C0A8();
+    extern void PSVECSubtract(HeroMoveVec3*, HeroMoveVec3*, HeroMoveVec3*);
+    extern f32 sqrtf(f32);
+
+    HeroMoveVec3 targetPosition;
+    HeroMoveVec3 playerPosition;
+    HeroMoveVec3 velocity;
+    HeroMoveVec3 movement;
+    HeroMoveVec3 separation;
+    HeroMoveVec3 collisionPosition;
+    HeroMoveVec3 modelPosition;
+    u32 resourceHandles[2];
+    u32 resourceHandle;
+    void* resource;
+    s32 activePlayer;
+    f32 distanceSquared;
+    f32 distance;
+    s32 historyIndex;
+    s32 historyOffset;
+    u32 historyCount;
+    u32 historyHead;
+    u32 i;
+    u8 blocked;
+    u8 haveHistory;
+
+    resourceHandles[0] = *(u32*)&lbl_8047D030;
+    resourceHandles[1] = *(u32*)&lbl_8047D034;
+    activePlayer = *(s32*)lbl_80426BD0;
+    if (activePlayer >= 0 && activePlayer < 2) {
+        resourceHandle = resourceHandles[activePlayer];
+    }
+    resource = GSresGetResource(0, resourceHandle);
+    GSmodelGetPosition(resource, &targetPosition);
+
+    resourceHandles[0] = *(u32*)&lbl_8047D030;
+    resourceHandles[1] = *(u32*)&lbl_8047D034;
+    if ((s32)playerIndex >= 0 && playerIndex < 2) {
+        resourceHandle = resourceHandles[playerIndex];
+    }
+    resource = GSresGetResource(0, resourceHandle);
+    GSmodelGetPosition(resource, &playerPosition);
+
+    separation.x = targetPosition.x - playerPosition.x;
+    separation.z = targetPosition.z - playerPosition.z;
+    distanceSquared =
+        separation.x * separation.x + separation.z * separation.z;
+    sqrtf(distanceSquared);
+
+    fn_8012D7F0(playerIndex, &velocity, &movement);
+    fn_8012CA84(playerIndex, &velocity, &movement);
+
+    resourceHandles[0] = *(u32*)&lbl_8047D030;
+    resourceHandles[1] = *(u32*)&lbl_8047D034;
+    if (playerIndex < 2) {
+        resourceHandle = resourceHandles[playerIndex];
+    }
+    resource = GSresGetResource(0, resourceHandle);
+    GSmodelGetPosition(resource, &modelPosition);
+
+    separation.x = targetPosition.x - modelPosition.x;
+    separation.z = targetPosition.z - modelPosition.z;
+    distanceSquared =
+        separation.x * separation.x + separation.z * separation.z;
+    distance = sqrtf(distanceSquared);
+    PSVECSubtract(&modelPosition, &playerPosition, &separation);
+
+    if (distance < lbl_8047D0B0) {
+        *(u32*)(lbl_80426BD0 + playerIndex * 0x20 + 0x10) = 300;
+        return;
+    }
+
+    *(s32*)(lbl_80426BD0 + playerIndex * 0x20 + 0x10) -=
+        (s32)fn_800D3088();
+    if (*(s32*)(lbl_80426BD0 + playerIndex * 0x20 + 0x10) > 0) {
+        return;
+    }
+
+    resource = GSresGetResource(0, resourceHandle);
+    if (resource == NULL || fn_800E3C64(resource) != 0) {
+        return;
+    }
+
+    blocked = 0;
+    i = 0;
+    historyCount = *(u32*)(lbl_80426BD0 + 0x48);
+    historyHead = *(u32*)(lbl_80426BD0 + 0x44);
+    do {
+        if (i >= historyCount || i >= 20) {
+            haveHistory = 0;
+        } else {
+            historyIndex = (s32)historyHead - (s32)i - 1;
+            if (historyIndex < 0) {
+                historyIndex += 20;
+            }
+            historyOffset = historyIndex * 12;
+            collisionPosition =
+                *(HeroMoveVec3*)(lbl_80426BD0 + 0x4C + historyOffset);
+            haveHistory = 1;
+        }
+
+        if (!haveHistory || blocked) {
+            break;
+        }
+
+        resourceHandles[0] = *(u32*)&lbl_8047D030;
+        resourceHandles[1] = *(u32*)&lbl_8047D034;
+        if (playerIndex < 2) {
+            resourceHandle = resourceHandles[playerIndex];
+        }
+        resource = GSresGetResource(0, resourceHandle);
+        if (resource == NULL) {
+            blocked = 1;
+        } else {
+            resource = GSresGetResource(0, resourceHandle);
+            GSmodelGetPosition(resource, &modelPosition);
+            fn_8018C0A8(0, resourceHandle, &collisionPosition);
+            resource = GSresGetResource(0, resourceHandle);
+            if (fn_800E3C64(resource) == 0) {
+                blocked = 1;
+            }
+            fn_8018C0A8(0, resourceHandle, &modelPosition);
+        }
+        i++;
+    } while (1);
+
+    if (blocked) {
+        fn_8018C0A8(0, resourceHandle, &collisionPosition);
+        *(u32*)(lbl_80426BD0 + playerIndex * 0x20 + 0x10) = 300;
+    }
+}
+/* 0x8012E388 | 0x430 */
+extern void fn_800F7A7C(void);
+extern void fn_800F7A08(void);
+extern void fn_800F7BC4(void);
+extern void fn_80188214(void);
+extern void fn_80166458(void);
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
+extern f64 lbl_8047D0C8;
+extern f32 lbl_8047D0B4;
+extern f32 lbl_8047D038;
+extern f64 lbl_8047D048;
+extern f64 lbl_8047D050;
+extern f64 lbl_8047D058;
+extern f32 lbl_8047D084;
+extern f32 lbl_8047D0B8;
+extern f32 lbl_8047D0BC;
+extern f32 lbl_8047D078;
+extern f32 lbl_8047D0C0;
+extern f32 lbl_8047D0C4;
+void fn_8012E388(s32 playerIndex, f32* magnitudeOut)
+{
+    extern void* GSresGetResource(u32, u32);
+    extern s32 fn_800F7A7C(u32, u32);
+    extern s32 fn_800F7A08(u32, u32);
+    extern u32 fn_800F7BC4(u32);
+    extern u32 GSscene_GetMode(void);
+    extern f64 sin(f32);
+    extern f32 sqrtf(f32);
+    extern f32 cameraGetRotY(void);
+    extern void fn_8018805C(u32, u32, f32, f32);
+    extern void fn_80188214(u32, u32, f32);
+    extern void fn_8018790C(u32, u32);
+    extern void fn_80166458(void*, void*);
+
+    u32 resources[2];
+    u32 modelHandle;
+    s32 stickX;
+    s32 stickY;
+    s32 subX;
+    s32 subY;
+    f32 x;
+    f32 y;
+    f32 magnitude;
+    f32 anglePart;
+    f32 angle;
+    u8 scratch[12];
+
+    GSresGetResource(0, 2);
+    resources[0] = *(u32*)&lbl_8047D030;
+    resources[1] = *(u32*)&lbl_8047D034;
+    modelHandle = resources[playerIndex];
+    GSresGetResource(0, resources[playerIndex]);
+
+    stickX = fn_800F7A7C(1, 1);
+    stickY = fn_800F7A08(1, 1);
+    subX = fn_800F7A7C(1, 0);
+    subY = fn_800F7A08(1, 0);
+    if ((s8)stickX == 0 && (s8)stickY == 0) {
+        u32 buttons;
+        buttons = fn_800F7BC4(1);
+        if (buttons & 8) stickY = -0x38;
+        buttons = fn_800F7BC4(1);
+        if (buttons & 4) stickY = 0x38;
+        buttons = fn_800F7BC4(1);
+        if (buttons & 1) stickX = -0x38;
+        buttons = fn_800F7BC4(1);
+        if (buttons & 2) stickX = 0x38;
+        subX = stickX;
+        subY = stickY;
+        if ((s8)stickX == 0 && (s8)stickY == 0) {
+            GSscene_GetMode();
+        }
+    }
+
+    if ((s8)stickX == 0 && (s8)stickY == 0) {
+        *magnitudeOut = lbl_8047D038;
+        fn_8018790C(0, modelHandle);
+        return;
+    }
+
+    if ((s8)stickX > 0x38) stickX = 0x38;
+    if ((s8)stickX < -0x38) stickX = -0x38;
+    if ((s8)stickY > 0x38) stickY = 0x38;
+    if ((s8)stickY < -0x38) stickY = -0x38;
+    x = (f32)((s8)stickX < 0 ? -(s8)stickX : (s8)stickX) / lbl_8047D0B4;
+    y = (f32)((s8)stickY < 0 ? -(s8)stickY : (s8)stickY) / lbl_8047D0B4;
+    magnitude = sqrtf(x * x + y * y);
+    *magnitudeOut = magnitude;
+    if (*magnitudeOut > lbl_8047D084) {
+        *magnitudeOut = lbl_8047D084;
+    }
+
+    if ((s8)subX > -2 && (s8)subX < 2 &&
+        (s8)subY > -2 && (s8)subY < 2) {
+        if (y < lbl_8047D0B8) {
+            anglePart = lbl_8047D0BC;
+        } else {
+            f32 ratio = x / y;
+            if (ratio > lbl_8047D078) ratio = lbl_8047D078;
+            anglePart = lbl_8047D0BC *
+                        (f32)sin(ratio / lbl_8047D0C0);
+        }
+        if ((s8)stickY >= 0) {
+            angle = anglePart;
+        } else {
+            angle = lbl_8047D0C4 - anglePart;
+        }
+        if ((s8)stickX < 0) {
+            if ((s8)stickY >= 0) {
+                angle = lbl_8047D0C4 + (lbl_8047D0C4 - anglePart);
+            } else {
+                angle = lbl_8047D0C4 + anglePart;
+            }
+        }
+        fn_8018805C(0, modelHandle, cameraGetRotY() + angle,
+                    *magnitudeOut);
+    }
+    fn_80188214(0, modelHandle, *magnitudeOut);
+    fn_80166458(GSresGetResource(0, 0x7D0), scratch);
+}
+/* 0x8012E7B8 | 0x41C */
+extern void fn_800F7AF0(void);
+extern void fn_801887D8(void);
+extern void PSVECDistance(void);
+extern f32 lbl_8047D038;
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
+extern f64 lbl_8047D068;
+extern f32 lbl_8047D080;
+extern f32 lbl_8047D0D0;
+extern f64 lbl_8047D048;
+extern f64 lbl_8047D050;
+extern f64 lbl_8047D058;
+extern f32 lbl_8047D0D4;
+f32 moveLeader__F15HEROMOVE_MEMBER(member)
+s32 member;
+{
+    extern u32 fn_800F7AF0(s32);
+    extern u32 fn_800F7BC4(s32);
+    extern u32 GSresGetResource(u32, u32);
+    extern void GSmodelGetPosition(void*, HeroMoveVec3*);
+    extern void PSVECSubtract(HeroMoveVec3*, HeroMoveVec3*, HeroMoveVec3*);
+    extern void PSVECScale(HeroMoveVec3*, HeroMoveVec3*, f32);
+    extern f32 PSVECDistance(HeroMoveVec3*, HeroMoveVec3*);
+    extern f32 fn_801887D8(u32, u32, HeroMoveVec3*);
+    extern u32 fn_800D3088(void);
+    extern f32 sqrtf(f32);
+    u32 resources[2];
+    HeroMoveVec3 before;
+    HeroMoveVec3 after;
+    HeroMoveVec3 direction;
+    HeroMoveVec3 active_position;
+    HeroMoveVec3 previous_position;
+    f32 input[2];
+    u32 handle;
+    u32 active_handle;
+    u32 history_head;
+    u32 history_count;
+    s32 history_index;
+    f32 turn;
+    f32 distance_squared;
+    f32 distance;
+    u8 record_position;
+
+    if ((fn_800F7AF0(1) & fn_800F7BC4(1) & 0x100) != 0 &&
+        updateChat__F15HEROMOVE_MEMBER(member) != 0) {
+        return lbl_8047D038;
+    }
+
+    resources[0] = *(u32*)&lbl_8047D030;
+    resources[1] = *(u32*)&lbl_8047D034;
+    if (member >= 0 && member < 2) {
+        handle = resources[member];
+    }
+    GSmodelGetPosition((void*)GSresGetResource(0, handle), &before);
+    fn_8012E388(member, input);
+
+    resources[0] = *(u32*)&lbl_8047D030;
+    resources[1] = *(u32*)&lbl_8047D034;
+    if (member >= 0 && member < 2) {
+        handle = resources[member];
+    }
+    GSmodelGetPosition((void*)GSresGetResource(0, handle), &after);
+    PSVECSubtract(&after, &before, &direction);
+    PSVECScale(&direction, &direction,
+               lbl_8047D080 / (f32)fn_800D3088());
+
+    resources[0] = *(u32*)&lbl_8047D030;
+    resources[1] = *(u32*)&lbl_8047D034;
+    if (member >= 0 && member < 2) {
+        handle = resources[member];
+    }
+    turn = fn_801887D8(0, handle, &direction);
+    if (turn < lbl_8047D0D0) {
+        if (input[1] >= lbl_8047D0D0) {
+            turn = lbl_8047D0D0;
+        } else {
+            turn = input[1];
+        }
+    }
+
+    resources[0] = *(u32*)&lbl_8047D030;
+    resources[1] = *(u32*)&lbl_8047D034;
+    if (member >= 0 && member < 2) {
+        handle = resources[member];
+    }
+    updateAnimation__Ff15HEROMOVE_MEMBER(
+        (void*)GSresGetResource(0, handle), member, turn);
+
+    resources[0] = *(u32*)&lbl_8047D030;
+    resources[1] = *(u32*)&lbl_8047D034;
+    active_handle = 0;
+    if (*(s32*)lbl_80426BD0 >= 0 && *(s32*)lbl_80426BD0 < 2) {
+        active_handle = resources[*(s32*)lbl_80426BD0];
+    }
+    GSmodelGetPosition((void*)GSresGetResource(0, active_handle),
+                       &active_position);
+
+    history_count = *(u32*)(lbl_80426BD0 + 0x48);
+    if (history_count <= 0) {
+        record_position = TRUE;
+    } else {
+        history_index = *(s32*)(lbl_80426BD0 + 0x44) - 1;
+        if (history_index < 0) {
+            history_index += 20;
+        }
+        previous_position = *(HeroMoveVec3*)(lbl_80426BD0 + 0x4C +
+                                              history_index * 12);
+        distance_squared =
+            (previous_position.x - active_position.x) *
+                (previous_position.x - active_position.x) +
+            (previous_position.z - active_position.z) *
+                (previous_position.z - active_position.z);
+        distance = distance_squared > lbl_8047D038
+                       ? sqrtf(distance_squared)
+                       : lbl_8047D038;
+        if (distance != distance) {
+            distance = *(f32*)lbl_80478AC0;
+        }
+        record_position = distance > lbl_8047D0D4;
+    }
+
+    if (record_position) {
+        history_head = *(u32*)(lbl_80426BD0 + 0x44);
+        *(HeroMoveVec3*)(lbl_80426BD0 + 0x4C + history_head * 12) =
+            active_position;
+        history_head++;
+        if (history_head >= 20) {
+            history_head = 0;
+        }
+        *(u32*)(lbl_80426BD0 + 0x44) = history_head;
+        if (*(u32*)(lbl_80426BD0 + 0x48) < 20) {
+            (*(u32*)(lbl_80426BD0 + 0x48))++;
+        }
+    }
+
+    return PSVECDistance(&before, &after);
+}
+
 #if 0
 asm void heroMoveSetNeckMode(void) {
 #include "src/game/gs_field_world_fn_8012F008.inc"
 }
+/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 #else
 u32 heroMoveSetNeckMode(s32 idx, s32 state)
 {
@@ -2295,6 +3593,323 @@ u32 heroMoveGetResID(u32* out_zero, u32* out_val, s32 index) {
     if (index < 0 || index >= 2) { return 0; }
     *out_zero = 0;
     *out_val = local[index];
+    return 1;
+}
+
+/* 0x8012F610 | 0x4C8 */
+void initFloor__Fv(void) {
+    extern u8 lbl_80426BD0[];
+    extern u8 fn_800FF548(void);
+    extern void* GSresGetResource(u32 group, u32 handle);
+    extern void GSmodelGetPosition(void* model, void* out);
+    extern void GSmodelGetRotation(void* model, void* out);
+    extern void GSmodelSetRotation(void* model, void* rot);
+    extern f64 sin(f64 x);
+    extern f64 cos(f64 x);
+    extern s32 fn_8010E138(void* pos, void* out);
+    extern void fn_8018C0A8(u32 group, u32 handle, void* pos);
+    extern void fn_8018C1E8(u32 group, u32 handle);
+    extern void fn_80188AF4(u32 group, u32 handle);
+    extern void fn_80188F78(u32 group, u32 handle);
+    extern f32 lbl_8047D07C;
+    extern f32 lbl_8047D0AC;
+    extern f32 lbl_8047D0D8;
+
+    u32 handles[2];
+    u32 handle;
+    void* model;
+    u8* member;
+    s32 active;
+    s32 i;
+    s32 count;
+    s32 valid;
+    s32 state;
+    f32 activePos[3];
+    f32 rotation[3];
+    f32 target[3];
+    f32 floorHits[9];
+    f32 spacing;
+    f32 sinY;
+    f32 cosY;
+    f32 best;
+    f32 fallback;
+    f32 y;
+    s32 found;
+
+    if (fn_800FF548() == 0) {
+        active = *(s32*)lbl_80426BD0;
+        handle = 0;
+        handles[0] = *(u32*)&lbl_8047D030;
+        handles[1] = *(u32*)&lbl_8047D034;
+        if (active >= 0 && active < 2) {
+            handle = handles[active];
+        }
+        model = GSresGetResource(0, handle);
+        GSmodelGetPosition(model, activePos);
+
+        handle = 0;
+        handles[0] = *(u32*)&lbl_8047D030;
+        handles[1] = *(u32*)&lbl_8047D034;
+        if (active >= 0 && active < 2) {
+            handle = handles[active];
+        }
+        model = GSresGetResource(0, handle);
+        GSmodelGetRotation(model, rotation);
+
+        sinY = -(f32)sin(rotation[1]);
+        cosY = -(f32)cos(rotation[1]);
+        spacing = lbl_8047D0AC;
+        member = lbl_80426BD0;
+
+        for (i = 0; i < 2; i++, member += 0x20) {
+            valid = 0;
+            if (i >= 0 && i < 2 && (*(u16*)(member + 4) & 1) != 0) {
+                valid = 1;
+            }
+            if (valid != 0 && i != *(s32*)lbl_80426BD0) {
+                target[0] = activePos[0] + sinY * spacing;
+                target[1] = activePos[1];
+                target[2] = activePos[2] + cosY * spacing;
+
+                count = fn_8010E138(target, floorHits);
+                if (count > 0) {
+                    if (count < 2) {
+                        target[1] = floorHits[0];
+                    } else {
+                        best = lbl_8047D0D8;
+                        fallback = lbl_8047D0D8;
+                        found = 0;
+                        for (; count > 0; count--) {
+                            y = floorHits[(found + (s32)(floorHits - floorHits)) * 3];
+                            if (fallback < y) {
+                                fallback = y;
+                            }
+                            if (y - target[1] <= lbl_8047D07C && best < y) {
+                                best = y;
+                                found = 1;
+                            }
+                            floorHits[0] = floorHits[0];
+                        }
+                        if (found != 0) {
+                            target[1] = best;
+                        } else {
+                            target[1] = fallback;
+                        }
+                    }
+                }
+
+                spacing += lbl_8047D0AC;
+
+                handle = 0;
+                handles[0] = *(u32*)&lbl_8047D030;
+                handles[1] = *(u32*)&lbl_8047D034;
+                if (i >= 0 && i < 2) {
+                    handle = handles[i];
+                }
+                fn_8018C0A8(0, handle, target);
+
+                handle = 0;
+                handles[0] = *(u32*)&lbl_8047D030;
+                handles[1] = *(u32*)&lbl_8047D034;
+                if (i >= 0 && i < 2) {
+                    handle = handles[i];
+                }
+                model = GSresGetResource(0, handle);
+                GSmodelSetRotation(model, rotation);
+            }
+        }
+    }
+
+    member = lbl_80426BD0;
+    for (i = 0; i < 2; i++, member += 0x20) {
+        handle = 0;
+        handles[0] = *(u32*)&lbl_8047D030;
+        handles[1] = *(u32*)&lbl_8047D034;
+        if (i >= 0 && i < 2) {
+            handle = handles[i];
+        }
+        fn_8018C1E8(0, handle);
+    }
+
+    *(f32*)(lbl_80426BD0 + 0x14) = lbl_8047D038;
+    *(f32*)(lbl_80426BD0 + 0x18) = lbl_8047D038;
+    *(f32*)(lbl_80426BD0 + 0x1c) = lbl_8047D038;
+    *(f32*)(lbl_80426BD0 + 0x20) = lbl_8047D038;
+    *(f32*)(lbl_80426BD0 + 0x34) = lbl_8047D038;
+    *(f32*)(lbl_80426BD0 + 0x38) = lbl_8047D038;
+    *(f32*)(lbl_80426BD0 + 0x3c) = lbl_8047D038;
+    *(f32*)(lbl_80426BD0 + 0x40) = lbl_8047D038;
+
+    member = lbl_80426BD0;
+    for (i = 0; i < 2; i++, member += 0x20) {
+        valid = 0;
+        if (i >= 0 && i < 2 && (*(u16*)(member + 4) & 1) != 0) {
+            valid = 1;
+        }
+        if (valid != 0) {
+            if (i >= 0 && i < 2 && (*(u16*)(member + 4) & 1) != 0) {
+                state = *(s32*)(member + 0xc);
+            } else {
+                state = 2;
+            }
+            if (state >= 0 && state < 2) {
+                handle = 0;
+                handles[0] = *(u32*)&lbl_8047D030;
+                handles[1] = *(u32*)&lbl_8047D034;
+                if (i >= 0 && i < 2) {
+                    handle = handles[i];
+                }
+                if (*(s32*)(member + 0xc) == 1) {
+                    fn_80188AF4(0, handle);
+                }
+                if (state == 1) {
+                    fn_80188F78(0, handle);
+                }
+                *(s32*)(member + 0xc) = state;
+            }
+        }
+    }
+
+    *(u32*)(lbl_80426BD0 + 0x10) = 0x12c;
+    *(u32*)(lbl_80426BD0 + 0x30) = 0x12c;
+    *(f32*)(lbl_80426BD0 + 0x13c) = lbl_8047D038;
+}
+
+
+/* Update the active field-chat target and its two hero models. */
+typedef struct HeroChatVec3 {
+    f32 x;
+    f32 y;
+    f32 z;
+} HeroChatVec3;
+
+u32 updateChat__F15HEROMOVE_MEMBER(s32 player)
+{
+    extern f64 sin(f32);
+    extern f64 cos(f32);
+    extern u32 peopleGetPosition();
+    extern void PSVECAdd(HeroChatVec3*, HeroChatVec3*, HeroChatVec3*);
+    extern void fn_8018C7C8(u32, u32, u32);
+    extern void fn_8018C69C(u32, u32, u32);
+    extern void fn_8018CA20(u32, u32, u32);
+    extern void fn_800F7434(void*, u32, ...);
+    extern void fn_8018790C(u32, u32);
+    extern void fn_800F7D38(u32, u32, u32);
+    extern void fn_800F7C8C(u32, u32, u32);
+    extern void fn_8018BA04(u32, u32, HeroChatVec3*);
+    extern void fn_80187D48(u32, u32, f32, f32, f32, f32);
+    extern void floorEventCtrlTresure(u32, u32, u32);
+    extern void fn_80183730(u32);
+    extern void fn_801812E8(u32, u32, u32);
+    extern void fn_80189490(u32, u32);
+    extern void fn_80183688(u32);
+    u32 handles[2];
+    u32 eventObject;
+    u32 handle;
+    u32 resource;
+    u32 person;
+    u32 positionPtr;
+    u32 rotationPtr;
+    u32 interaction;
+    u32 i;
+    u8 collision[0xD0];
+    HeroChatVec3 position;
+    HeroChatVec3 offset;
+    HeroChatVec3 interactionPosition;
+
+    handles[0] = *(u32*)&lbl_8047D030;
+    handles[1] = *(u32*)&lbl_8047D034;
+    if (player >= 0 && player < 2) {
+        handle = handles[player];
+    }
+
+    eventObject = fn_8018CD08(0, handle, lbl_8047D070, lbl_8047D074);
+    if (eventObject == 0) {
+        handles[0] = *(u32*)&lbl_8047D030;
+        handles[1] = *(u32*)&lbl_8047D034;
+        i = *(s32*)lbl_80426BD0;
+        if ((s32)i >= 0 && (s32)i < 2) {
+            resource = handles[i];
+        }
+
+        person = peopleSearchID(fn_8018D998(0, resource));
+        interaction = 0;
+        if (person != 0) {
+            rotationPtr = fn_8018FCBC();
+            positionPtr = peopleGetPosition(person);
+            position = *(HeroChatVec3*)rotationPtr;
+            position.y += lbl_8047D078;
+            offset.x = lbl_8047D07C * (f32)sin(((HeroChatVec3*)positionPtr)->y);
+            offset.y = lbl_8047D038;
+            offset.z = lbl_8047D07C * (f32)cos(((HeroChatVec3*)positionPtr)->y);
+            PSVECAdd(&position, &offset, &offset);
+            interaction = GScolsys2CheckGetEventID(&position, &offset, collision);
+        }
+
+        memcpy(lbl_80426BD0 + 0x1A0, collision, 0xD0);
+        *(u32*)(lbl_80426BD0 + 0x410) = interaction;
+        if (interaction != 0) {
+            fn_8018790C(0, 100);
+            return 1;
+        }
+        return 0;
+    }
+
+    fn_800F7D38(1, 0, 0);
+    fn_800F7C8C(1, 0, 0);
+    for (i = 0; (s32)i < 2; i++) {
+        if ((*(u16*)(lbl_80426BD0 + i * 0x20 + 4) & 1) != 0) {
+            handles[0] = *(u32*)&lbl_8047D030;
+            handles[1] = *(u32*)&lbl_8047D034;
+            handle = handles[i];
+            resource = (u32)GSresGetResource(0, handle);
+            updateAnimation__Ff15HEROMOVE_MEMBER(resource, lbl_8047D038, i);
+            fn_8018C7C8(0, handle, 0x80000008);
+            fn_8018C69C(0, handle, 0x100);
+            fn_8018C69C(0, handle, 0x400);
+            fn_8018CA20(0, handle, 0);
+        }
+    }
+
+    fn_8018BA04(*(u32*)(eventObject + 0x28),
+                 *(u32*)(eventObject + 0x2C), &interactionPosition);
+    fn_80187D48(0, handle, interactionPosition.x, interactionPosition.y,
+                interactionPosition.z, lbl_8047D080);
+    if (fn_8018D7D0(*(u32*)(eventObject + 0x28),
+                    *(u32*)(eventObject + 0x2C)) != 0) {
+        floorEventCtrlTresure(*(u32*)(eventObject + 0x28),
+                              *(u32*)(eventObject + 0x2C), 2);
+    } else {
+        fn_80183730(fn_8018D998(*(u32*)(eventObject + 0x28),
+                                *(u32*)(eventObject + 0x2C)));
+        person = fn_8018397C(*(u32*)(eventObject + 0x28),
+                             *(u32*)(eventObject + 0x2C));
+        if (person != 0) {
+            fn_801812E8(*(u32*)(eventObject + 0x28),
+                        *(u32*)(eventObject + 0x2C), 1);
+            fn_800F7434((void*)person, 4, *(u32*)(eventObject + 0x28),
+                        *(u32*)(eventObject + 0x2C), 0, 0);
+            fn_801812E8(*(u32*)(eventObject + 0x28),
+                        *(u32*)(eventObject + 0x2C), 0);
+            fn_80189490(*(u32*)(eventObject + 0x28),
+                        *(u32*)(eventObject + 0x2C));
+        }
+        fn_80183688(fn_8018D998(*(u32*)(eventObject + 0x28),
+                                *(u32*)(eventObject + 0x2C)));
+    }
+
+    for (i = 0; (s32)i < 2; i++) {
+        if ((*(u16*)(lbl_80426BD0 + i * 0x20 + 4) & 1) != 0) {
+            handles[0] = *(u32*)&lbl_8047D030;
+            handles[1] = *(u32*)&lbl_8047D034;
+            handle = handles[i];
+            fn_8018CA20(0, handle, 1);
+            fn_8018C7C8(0, handle, 0x700);
+            fn_8018C69C(0, handle, 0x80000008);
+        }
+    }
+    fn_800F7D38(1, 0, 0);
+    fn_800F7C8C(1, 0, 0);
     return 1;
 }
 #endif

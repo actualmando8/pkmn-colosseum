@@ -235,6 +235,153 @@ asm void stateFunctionEvolution(void) {
 #include "src/game/gs_worldmap_fn_8002DF10.inc"
 }
 #else
+
+/* Build and run the Pokemon-change selection menu. */
+void fn_8002FC58(void)
+{
+    typedef struct PokemonChangeMenuEntry {
+        u8 _00;
+        u8 slot;
+        u8 _02[0x0E];
+        u16 itemId;
+    } PokemonChangeMenuEntry;
+    extern void* savedataGetStatus();
+    extern void* heroBiosGetPokemonPtr();
+    extern u8 pokemonCheckValid();
+    extern u8 menuCBRule_CheckPokemonEventFlag();
+    extern void menuItemBiosSetSelectFlag();
+    extern void fn_80030170();
+    extern void fn_8010B01C();
+    extern s32 menuGetCursor();
+    extern s32 menuGetCursorFromItemID();
+    extern void fn_801021F8();
+    extern s32 windowGetActiveID();
+    extern void menuOpenCustom(s32, ...);
+    extern void* windowSearchID();
+    extern void* windowSearchItemID();
+    extern void winSpriteSetDisp();
+    extern void windowCheckCursor();
+    extern s32 windowGetValue();
+    extern s32 menuGetCursorItemID();
+    extern u8 lbl_803A2650[];
+    extern u8 lbl_803A2688[];
+    extern PokemonChangeMenuEntry lbl_80266E90[];
+    extern u8 lbl_8047A410;
+    extern u32 lbl_8047A428;
+    extern u32 lbl_8047A42C;
+
+    void* party;
+    void* pokemon;
+    void* window;
+    void* sprite;
+    u32* eligible;
+    s32 cursor;
+    s32 value;
+    s32 selected;
+    s32 count;
+    s32 i;
+    u8 enabled;
+
+    cursor = 0;
+    count = 0;
+    party = savedataGetStatus(0, 2);
+    eligible = (u32*)lbl_803A2650;
+    for (i = 0; i < 6; i++) {
+        pokemon = heroBiosGetPokemonPtr(party, (u16)i);
+        if (pokemonCheckValid(pokemon) != 0 &&
+            menuCBRule_CheckPokemonEventFlag(pokemon) == 1) {
+            eligible[count++] = (u32)pokemon;
+        }
+    }
+
+    party = lbl_803A2688;
+    for (i = 0; i < 6; i++) {
+        pokemon = heroBiosGetPokemonPtr(party, (u16)i);
+        if (pokemonCheckValid(pokemon) != 0 &&
+            menuCBRule_CheckPokemonEventFlag(pokemon) == 1) {
+            eligible[count++] = (u32)pokemon;
+        }
+    }
+    eligible[count] = 0;
+    eligible[13] = 0;
+
+    fn_8010B01C(0, fn_80030170);
+    party = savedataGetStatus(0, 2);
+
+#define SET_PARTY_ITEM(slotIndex, item)                                      \
+    do {                                                                     \
+        pokemon = heroBiosGetPokemonPtr(party, (slotIndex));                 \
+        enabled = 0;                                                         \
+        if (pokemonCheckValid(pokemon) != 0 &&                               \
+            menuCBRule_CheckPokemonEventFlag(pokemon) == 1) {                \
+            enabled = 1;                                                     \
+        }                                                                    \
+        menuItemBiosSetSelectFlag((item), enabled);                          \
+    } while (0)
+
+    SET_PARTY_ITEM(0, 0x1005);
+    SET_PARTY_ITEM(1, 0x1002);
+    SET_PARTY_ITEM(2, 0x1004);
+    SET_PARTY_ITEM(3, 0x1001);
+    SET_PARTY_ITEM(4, 0x1003);
+    SET_PARTY_ITEM(5, 0x1000);
+#undef SET_PARTY_ITEM
+
+    menuItemBiosSetSelectFlag(0x0FFF, 0);
+    menuItemBiosSetSelectFlag(0x0FFC, 0);
+    menuItemBiosSetSelectFlag(0x0FFE, 0);
+    menuItemBiosSetSelectFlag(0x0FFB, 0);
+    menuItemBiosSetSelectFlag(0x0FFD, 0);
+    menuItemBiosSetSelectFlag(0x0FFA, 0);
+
+    if (lbl_8047A410 != 0 || menuGetCursor(0xD9) == 0) {
+        cursor = menuGetCursorFromItemID(0xD9, 0x1005);
+        lbl_8047A410 = 0;
+    }
+
+    fn_801021F8(0xD9, 1);
+    if (cursor != 0) {
+        menuOpenCustom(0xD9, windowGetActiveID(), &cursor, 0, 0, 0);
+    } else {
+        menuOpenCustom(0xD9, windowGetActiveID(), 0, 0, 0, 0);
+    }
+
+    window = windowSearchID(0xD9);
+    sprite = windowSearchItemID(window, 0x10B2);
+    if (window != 0 && sprite != 0) {
+        winSpriteSetDisp(sprite, 1);
+        *(u32*)((u8*)sprite + 0x4C) = 0x43D9;
+    }
+
+    windowCheckCursor(0xD9, 1);
+    value = windowGetValue(0xD9);
+    selected = 0;
+    cursor = menuGetCursorItemID(0xD9);
+    for (i = 0; i < 12; i++) {
+        if (cursor == lbl_80266E90[i].itemId) {
+            selected = lbl_80266E90[i].slot;
+        }
+    }
+    if (menuGetCursorItemID(0xD9) == 0x0FF9) {
+        selected = 1000;
+    }
+    if (value == -1) {
+        selected = -1;
+    }
+
+    lbl_8047A428 = -1;
+    switch (selected) {
+    case -1:
+    case 1000:
+        lbl_8047A42C = 4;
+        break;
+    default:
+        lbl_8047A428 = selected;
+        lbl_8047A42C = 3;
+        break;
+    }
+}
+
 /*
  * stateFunctionEvolution  GSmap_UpdateAvailability  0x8002DF10  size:0x35c
  *

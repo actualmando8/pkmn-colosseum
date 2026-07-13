@@ -86,6 +86,45 @@ extern u8 fn_800EC960(void*);
 extern void fn_80166A28();
 extern s32 fn_801666BC();
 
+extern void GScharLenCpy(void*, const void*, u32);
+extern u16 fn_800E2C04(u32, u32);
+extern void* fn_800E27B0(u16);
+extern u16 fn_800E202C(void*);
+extern void fn_800E24B0(u16);
+extern void fn_800E209C(u16);
+extern s32 fn_80083BF8(s32);
+extern void* fn_80083AF4(s32, s32);
+extern void* windowSearchItemID(void*, s32);
+extern void qsort(void*, u32, u32, s32 (*)(u32, u32));
+extern void __assert();
+extern char lbl_80268B88[];
+extern char lbl_8047C140[];
+extern const u16 lbl_8047C190[4];
+
+typedef struct MenuCardEItem {
+    u8 pad0[0x50];
+    s16 x;
+    s16 y;
+    s16 h;
+    s16 w;
+} MenuCardEItem;
+
+#define CARDE_CTX_U32(ctx, off) (*(u32*)((u8*)(ctx) + (off)))
+#define CARDE_CTX_S16(ctx, off) (*(s16*)((u8*)(ctx) + (off)))
+
+static void menuCardE_SetItem(void* ctx, u32 off, void* window, s32 id) {
+    CARDE_CTX_U32(ctx, off) = (u32)windowSearchItemID(window, id);
+}
+
+static void menuCardE_CopyRect(void* ctx, u32 dst, u32 itemOff) {
+    MenuCardEItem* item = (MenuCardEItem*)CARDE_CTX_U32(ctx, itemOff);
+
+    CARDE_CTX_S16(ctx, dst + 0) = item->x;
+    CARDE_CTX_S16(ctx, dst + 2) = item->y;
+    CARDE_CTX_S16(ctx, dst + 6) = item->w;
+    CARDE_CTX_S16(ctx, dst + 4) = item->h;
+}
+
 /* 0x8007FD64 | size: 0x58
  * menuCardE_CompareEntryPtrs: qsort-style comparator for MenuCardEEntry*
  * elements.
@@ -118,6 +157,146 @@ s32 menuCardE_CompareEntryPtrs(u32 r3, u32 r4) {
 
 extern void GScharCpy(void* dst, const void* src);
 extern const u8 lbl_80268DC0[];
+extern const u8 lbl_80478948[];
+extern s32 fn_8008102C(void** object_ref, const u32* descriptor, s32 index,
+                       s32 value, const char* text, s32 subindex);
+
+/* Decode and validate a packed card-e record. */
+u32 fn_80080310(void* output, const u8* packed, void* auxiliary)
+{
+    u16 text0[256];
+    u16 text1[256];
+    u16 text2[256];
+    u16 text3[256];
+    u16 text4[256];
+    void* object;
+    const u8* input;
+    void* aux;
+    s32 bitPosition;
+    const u32* descriptor;
+    s32 recordIndex;
+    s32 descriptorIndex;
+    s32 groupIndex;
+    s32 elementIndex;
+    s32 width;
+    s32 remaining;
+    s32 endBit;
+    s32 cursor;
+    u16 value;
+    u8 valid;
+    u8 descriptorValid;
+    u16* text;
+
+#define READ_PACKED_BITS(bit_count, destination)                           \
+    do {                                                                   \
+        endBit = bitPosition + (bit_count);                                \
+        value = 0;                                                         \
+        cursor = bitPosition;                                              \
+        while (cursor < endBit) {                                          \
+            value = (u16)(value << 1);                                     \
+            if ((packed[cursor >> 3] & lbl_80478948[cursor & 7]) != 0) {   \
+                value |= 1;                                                \
+            }                                                              \
+            cursor++;                                                      \
+        }                                                                  \
+        bitPosition = endBit;                                              \
+        (destination) = value;                                             \
+    } while (0)
+
+#define DECODE_ONE(desc_ptr, record, scratch, check_result)                 \
+    do {                                                                   \
+        descriptor = (desc_ptr);                                           \
+        width = (s32)descriptor[1];                                        \
+        descriptorValid = 1;                                               \
+        if (width < 16) {                                                   \
+            for (elementIndex = 0;                                         \
+                 elementIndex < (s32)descriptor[2]; elementIndex++) {       \
+                READ_PACKED_BITS(width, value);                             \
+                if (!fn_8008102C(&object, descriptor, (record), value, 0,  \
+                                 elementIndex)) {                           \
+                    descriptorValid = 0;                                   \
+                }                                                          \
+            }                                                              \
+        } else {                                                           \
+            text = (scratch);                                              \
+            remaining = width;                                             \
+            while (remaining > 16) {                                       \
+                READ_PACKED_BITS(16, value);                                \
+                *text++ = value;                                           \
+                remaining -= 16;                                           \
+            }                                                              \
+            if (remaining != 0) {                                          \
+                READ_PACKED_BITS(remaining, value);                         \
+                *text++ = value;                                           \
+            }                                                              \
+            *text = 0;                                                     \
+            if (!fn_8008102C(&object, descriptor, (record), 0,             \
+                             (const char*)(scratch), -1)) {                 \
+                descriptorValid = 0;                                       \
+            }                                                              \
+        }                                                                  \
+        if ((check_result) && !descriptorValid) {                           \
+            valid = 0;                                                     \
+        }                                                                  \
+    } while (0)
+
+    object = output;
+    input = packed;
+    aux = auxiliary;
+    bitPosition = 0;
+    (void)input;
+    (void)aux;
+    memset(output, 0, 0xB20);
+
+    descriptor = (const u32*)lbl_80268DC0;
+    valid = 1;
+    DECODE_ONE(descriptor, -1, text4, 0);
+
+    bitPosition = 0;
+    switch (*(s32*)output) {
+    case 0:
+        for (descriptorIndex = 0; descriptorIndex < 40;
+             descriptorIndex++) {
+            DECODE_ONE((const u32*)lbl_80268DC0 + descriptorIndex * 3,
+                       -1, text3, 1);
+        }
+
+        for (recordIndex = 0; recordIndex < 9; recordIndex++) {
+            for (groupIndex = 0; groupIndex < 8; groupIndex++) {
+                DECODE_ONE((const u32*)(lbl_80268DC0 + 0x1E0) +
+                               groupIndex * 3,
+                           recordIndex, text2, 1);
+            }
+        }
+
+        for (recordIndex = 0; recordIndex < 36; recordIndex++) {
+            for (groupIndex = 0; groupIndex < 24; groupIndex++) {
+                DECODE_ONE((const u32*)(lbl_80268DC0 + 0x240) +
+                               groupIndex * 3,
+                           recordIndex, text1, 1);
+            }
+        }
+        break;
+
+    case 1:
+        for (descriptorIndex = 0; descriptorIndex < 3;
+             descriptorIndex++) {
+            DECODE_ONE((const u32*)(lbl_80268DC0 + 0x360) +
+                           descriptorIndex * 3,
+                       -1, text0, 1);
+        }
+        break;
+
+    default:
+        valid = 0;
+        break;
+    }
+
+#undef DECODE_ONE
+#undef READ_PACKED_BITS
+    return valid != 0;
+}
+
 
 /* Apply one decoded card-e field and reject values outside its domain. */
 s32 fn_8008102C(void** object_ref, const u32* descriptor, s32 index,
@@ -290,6 +469,244 @@ s32 fn_8008102C(void** object_ref, const u32* descriptor, s32 index,
     }
 }
 
+typedef struct CardEGridEntry {
+    u16 id;
+    u8 pad02[0x18];
+    u8 key;
+    s8 layers;
+    s8 rows;
+    s8 columns;
+    u8 pad1E[6];
+    u8 data[1];
+} CardEGridEntry;
+
+static inline u32 CardEGridEntrySize(CardEGridEntry* entry)
+{
+    return 0x24 + entry->layers *
+           (0x76 + ((entry->rows * entry->columns) << 4));
+}
+
+static inline void CardEGridValidate(CardEGridEntry* entry)
+{
+    if (entry->layers <= 3 && entry->rows <= 6 && entry->columns <= 5) {
+        return;
+    }
+    entry->id = 0;
+}
+
+void* fn_800836AC(u8* arena, u8* descriptor, u8 create)
+{
+    extern void* savedataGetStatus(u32, u32);
+    extern void fn_800CAA3C(void*, const void*);
+    extern char lbl_8026F1C8[];
+    extern char lbl_8026F1D8[];
+    extern char lbl_8047C180[] __attribute__((section(".sdata2")));
+
+    CardEGridEntry* entry;
+    CardEGridEntry* result;
+    u8* base;
+    u8* end;
+    u8* next;
+    u32 count;
+    u32 i;
+    u32 sliceSize;
+    u32 entrySize;
+
+    if (*(u32*)descriptor != 0) {
+        return NULL;
+    }
+    if (arena != NULL) {
+        base = arena;
+    } else {
+        base = savedataGetStatus(0, 0xD);
+    }
+    end = base + 0x4000;
+
+    count = 0;
+    entry = (CardEGridEntry*)base;
+    while ((u8*)entry + 0x24 <= end && entry->id != 0) {
+        CardEGridValidate(entry);
+        count++;
+        entry = (CardEGridEntry*)((u8*)entry + CardEGridEntrySize(entry));
+    }
+
+    entry = (CardEGridEntry*)base;
+    result = NULL;
+    for (i = 0; i < count; i++) {
+        CardEGridValidate(entry);
+        if (entry->key == descriptor[8]) {
+            result = entry;
+            break;
+        }
+        entry = (CardEGridEntry*)((u8*)entry + CardEGridEntrySize(entry));
+    }
+    if (result != NULL) {
+        return result;
+    }
+    if (create == 0) {
+        return NULL;
+    }
+
+    entry = (CardEGridEntry*)base;
+    while ((u8*)entry + 0x24 <= end && entry->id != 0) {
+        CardEGridValidate(entry);
+        entry = (CardEGridEntry*)((u8*)entry + CardEGridEntrySize(entry));
+    }
+    sliceSize = 0x76 + (s8)descriptor[0x59] *
+                         (s8)descriptor[0x5A] * 0x10;
+    entrySize = 0x24 + (s8)descriptor[0x58] * sliceSize;
+    next = (u8*)entry + entrySize;
+    if (next > end) {
+        return NULL;
+    }
+
+    memset(entry, 0, entrySize);
+    fn_800CAA3C(entry, descriptor + 0x0A);
+    entry->key = descriptor[8];
+    entry->layers = descriptor[0x58];
+    entry->rows = descriptor[0x59];
+    entry->columns = descriptor[0x5A];
+    for (i = 0; i < entry->layers; i++) {
+        if (entry == NULL) {
+            __assert(lbl_8026F1C8, 0x17F, lbl_8047C180);
+        }
+        if ((s32)i < 0 || (s32)i >= entry->layers) {
+            __assert(lbl_8026F1C8, 0x180, lbl_8026F1D8);
+        }
+        fn_800CAA3C((u8*)entry + 0x24 + i * sliceSize,
+                    descriptor + 0x28 + i * 0x10);
+    }
+    return entry;
+}
+
+
+/* 0x8007FDBC | size: 0x554 */
+void* fn_8007FDBC(void* window, const void* title) {
+    char* table;
+    u8* ctx;
+    u16 handle;
+    u16 listHandle;
+    u16 oldHandle;
+    s32 count;
+    s32 i;
+    s32 j;
+    u32 bytes;
+    u32* list;
+    u16* ids0;
+    u16* ids1;
+    u16* ids2;
+    u8* rowCtx;
+
+    table = lbl_80268B88;
+
+    handle = fn_800E2C04(0x500, 0x20);
+    if (handle == 0) {
+        __assert(table + 0x1F0, 0x1A2, lbl_8047C140);
+    }
+
+    ctx = fn_800E27B0(handle);
+    memset(ctx, 0, 0x4E8);
+
+    if (title != 0) {
+        GScharLenCpy(ctx, title, 0x50);
+        *(u16*)(ctx + 0x9E) = 0;
+    } else {
+        *(u16*)ctx = 0;
+    }
+
+    if (CARDE_CTX_U32(ctx, 0xB0) != 0) {
+        oldHandle = fn_800E202C((void*)CARDE_CTX_U32(ctx, 0xB0));
+        if (oldHandle == 0) {
+            __assert(table + 0x1F0, 0x1AB, lbl_8047C140);
+        }
+        fn_800E24B0(oldHandle);
+        fn_800E209C(oldHandle);
+        CARDE_CTX_U32(ctx, 0xB0) = 0;
+    }
+
+    count = fn_80083BF8(0);
+    CARDE_CTX_U32(ctx, 0xAC) = count;
+    if (count != 0) {
+        bytes = count * 4;
+        listHandle = fn_800E2C04((bytes + 0x1F) & ~0x1F, 0x20);
+        if (listHandle == 0) {
+            __assert(table + 0x1F0, 0x1A2, lbl_8047C140);
+        }
+        list = fn_800E27B0(listHandle);
+        memset(list, 0, bytes);
+        CARDE_CTX_U32(ctx, 0xB0) = (u32)list;
+
+        for (i = 0; i < count; i++) {
+            list[i] = (u32)fn_80083AF4(0, i);
+        }
+        qsort(list, count, 4, menuCardE_CompareEntryPtrs);
+    }
+
+    CARDE_CTX_U32(ctx, 0xA4) = count != 0 ? 0 : -1;
+
+    menuCardE_SetItem(ctx, 0x118, window, 0x79B);
+    menuCardE_SetItem(ctx, 0x11C, window, 0x79C);
+    menuCardE_SetItem(ctx, 0x120, window, 0x79D);
+    menuCardE_SetItem(ctx, 0x124, window, 0x780);
+    menuCardE_SetItem(ctx, 0x128, window, 0x781);
+    menuCardE_SetItem(ctx, 0x12C, window, 0x782);
+    menuCardE_SetItem(ctx, 0x130, window, 0x1193);
+    menuCardE_SetItem(ctx, 0x134, window, 0x1195);
+    menuCardE_SetItem(ctx, 0x138, window, 0x1194);
+    menuCardE_SetItem(ctx, 0x13C, window, 0x796);
+    menuCardE_SetItem(ctx, 0x140, window, 0x793);
+    menuCardE_SetItem(ctx, 0x144, window, 0x797);
+    menuCardE_SetItem(ctx, 0x148, window, 0x1196);
+    menuCardE_SetItem(ctx, 0x14C, window, 0x792);
+    menuCardE_SetItem(ctx, 0x150, window, 0x1126);
+    menuCardE_SetItem(ctx, 0x154, window, 0x795);
+    menuCardE_SetItem(ctx, 0x158, window, 0x791);
+    menuCardE_SetItem(ctx, 0x15C, window, 0x1125);
+    menuCardE_SetItem(ctx, 0x160, window, 0x799);
+    menuCardE_SetItem(ctx, 0x164, window, 0x79A);
+    menuCardE_SetItem(ctx, 0x168, window, 0x825);
+    menuCardE_SetItem(ctx, 0x16C, window, 0x826);
+
+    ids0 = (u16*)table;
+    ids1 = (u16*)(table + 0x90);
+    ids2 = (u16*)(table + 0x120);
+    rowCtx = ctx;
+    for (i = 0; i < 0x24; i++) {
+        for (j = 0; j < 2; j++) {
+            CARDE_CTX_U32(rowCtx, 0x170 + j * 0x90) =
+                (u32)windowSearchItemID(window, ids0[j * 0x24]);
+            CARDE_CTX_U32(rowCtx, 0x3B0 + j * 0x90) =
+                (u32)windowSearchItemID(window, ids1[j * 0x24]);
+            CARDE_CTX_U32(rowCtx, 0x290 + j * 0x90) =
+                (u32)windowSearchItemID(window, ids2[j * 0x24]);
+        }
+        ids0++;
+        ids1++;
+        ids2++;
+        rowCtx += 4;
+    }
+
+    menuCardE_SetItem(ctx, 0x4D0, window, 0x119A);
+    menuCardE_SetItem(ctx, 0x4D4, window, 0x11C2);
+    menuCardE_SetItem(ctx, 0x4D8, window, 0x790);
+    menuCardE_SetItem(ctx, 0x4DC, window, 0x798);
+    menuCardE_SetItem(ctx, 0x4E0, window, 0x78F);
+    menuCardE_SetItem(ctx, 0x4E4, window, 0x794);
+
+    menuCardE_CopyRect(ctx, 0xCE, 0x200);
+    menuCardE_CopyRect(ctx, 0xD6, 0x440);
+    menuCardE_CopyRect(ctx, 0xDE, 0x320);
+    menuCardE_CopyRect(ctx, 0xE6, 0x118);
+    menuCardE_CopyRect(ctx, 0xEE, 0x11C);
+    menuCardE_CopyRect(ctx, 0xF6, 0x120);
+    menuCardE_CopyRect(ctx, 0xFE, 0x15C);
+    menuCardE_CopyRect(ctx, 0x106, 0x154);
+    menuCardE_CopyRect(ctx, 0x10E, 0x14C);
+
+    return ctx;
+}
+
+
 /* 0x80084034 | size: 0x4 */
 void fn_80084034(void) {
 }
@@ -324,6 +741,223 @@ end:
     return;
 }
 #pragma optimize_for_size reset
+
+/* Update the four-controller Card-e connection/status display. */
+typedef struct CardEStatusWork {
+    s32 state[4];
+    s32 previousState[4];
+    u8 refreshMessages;
+    u8 initialized;
+    u8 pad22[2];
+    u32 field24;
+    u32 field28;
+    u32 pad2C;
+    void* headerSprite[2];
+    void* statusSprite[5];
+    void* optionSprite[8][4];
+} CardEStatusWork;
+
+typedef struct CardEMessageEntry {
+    u16 itemId;
+    u16 initialMessage;
+    u16 updatedMessage;
+} CardEMessageEntry;
+
+extern char lbl_8047C198[];
+
+void fn_80084038(u8* window)
+{
+    const u32* stateFlags = (const u32*)lbl_8026F2E8;
+    const CardEMessageEntry* messages =
+        (const CardEMessageEntry*)(lbl_8026F2E8 + 0x70);
+    const u8* portMasks = &lbl_80478950;
+    CardEStatusWork* work;
+    void* freeWork;
+    void* sprite;
+    u16 handle;
+    u32 flags;
+    s32 i;
+    s32 row;
+    u8 changed;
+    u8 selected;
+
+    if (window == 0) {
+        ((void* (*)(u32))windowSearchID)(0xA6);
+    }
+    freeWork = ((void* (*)(u8*))windowGetFreeWork)(window);
+    work = *(CardEStatusWork**)freeWork;
+
+    if ((s8)window[1] == 0 && (s8)window[2] == 0) {
+        handle = ((u16 (*)(u32, u32))fn_800E2C04)(0xE0, 0x20);
+        if (handle == 0) {
+            __assert(lbl_8026F2E8 + 0x184, 0xEA, lbl_8047C198);
+        }
+        work = ((CardEStatusWork* (*)(u16))fn_800E27B0)(handle);
+        memset(work, 0, sizeof(CardEStatusWork));
+        *(CardEStatusWork**)(((void* (*)(u8*))windowGetFreeWork)(window)) = work;
+
+        work->refreshMessages = 1;
+        work->initialized = 1;
+
+#define FIND_STATUS_SPRITE(member, item) \
+        work->member = ((void* (*)(u8*, u32))windowSearchItemID)(window, item)
+        FIND_STATUS_SPRITE(headerSprite[0], 0x10F6);
+        FIND_STATUS_SPRITE(headerSprite[1], 0x10F7);
+        FIND_STATUS_SPRITE(statusSprite[0], 0x10D5);
+        FIND_STATUS_SPRITE(statusSprite[1], 0x10DA);
+        FIND_STATUS_SPRITE(statusSprite[2], 0x10E3);
+        FIND_STATUS_SPRITE(statusSprite[3], 0x10F0);
+        FIND_STATUS_SPRITE(statusSprite[4], 0x10F5);
+        FIND_STATUS_SPRITE(optionSprite[0][0], 0x10D1);
+        FIND_STATUS_SPRITE(optionSprite[1][0], 0x10D6);
+        FIND_STATUS_SPRITE(optionSprite[2][0], 0x10DB);
+        FIND_STATUS_SPRITE(optionSprite[3][0], 0x10DF);
+        FIND_STATUS_SPRITE(optionSprite[4][0], 0x10E4);
+        FIND_STATUS_SPRITE(optionSprite[5][0], 0x10E8);
+        FIND_STATUS_SPRITE(optionSprite[6][0], 0x10EC);
+        FIND_STATUS_SPRITE(optionSprite[7][0], 0x10F1);
+        FIND_STATUS_SPRITE(optionSprite[0][1], 0x10D2);
+        FIND_STATUS_SPRITE(optionSprite[1][1], 0x10D7);
+        FIND_STATUS_SPRITE(optionSprite[2][1], 0x10DC);
+        FIND_STATUS_SPRITE(optionSprite[3][1], 0x10E0);
+        FIND_STATUS_SPRITE(optionSprite[4][1], 0x10E5);
+        FIND_STATUS_SPRITE(optionSprite[5][1], 0x10E9);
+        FIND_STATUS_SPRITE(optionSprite[6][1], 0x10ED);
+        FIND_STATUS_SPRITE(optionSprite[7][1], 0x10F2);
+        FIND_STATUS_SPRITE(optionSprite[0][2], 0x10D3);
+        FIND_STATUS_SPRITE(optionSprite[1][2], 0x10D8);
+        FIND_STATUS_SPRITE(optionSprite[2][2], 0x10DD);
+        FIND_STATUS_SPRITE(optionSprite[3][2], 0x10E1);
+        FIND_STATUS_SPRITE(optionSprite[4][2], 0x10E6);
+        FIND_STATUS_SPRITE(optionSprite[5][2], 0x10EA);
+        FIND_STATUS_SPRITE(optionSprite[6][2], 0x10EE);
+        FIND_STATUS_SPRITE(optionSprite[7][2], 0x10F3);
+        FIND_STATUS_SPRITE(optionSprite[0][3], 0x10D4);
+        FIND_STATUS_SPRITE(optionSprite[1][3], 0x10D9);
+        FIND_STATUS_SPRITE(optionSprite[2][3], 0x10DE);
+        FIND_STATUS_SPRITE(optionSprite[3][3], 0x10E2);
+        FIND_STATUS_SPRITE(optionSprite[4][3], 0x10E7);
+        FIND_STATUS_SPRITE(optionSprite[5][3], 0x10EB);
+        FIND_STATUS_SPRITE(optionSprite[6][3], 0x10EF);
+        FIND_STATUS_SPRITE(optionSprite[7][3], 0x10F4);
+#undef FIND_STATUS_SPRITE
+
+        for (i = 0; i < 46; i++) {
+            fn_801081F8(window, messages[i].itemId, messages[i].initialMessage);
+        }
+    } else if ((s8)window[1] == 3 && (s8)window[2] == 0) {
+        for (i = 0; i < 46; i++) {
+            fn_801081F8(window, messages[i].itemId, messages[i].updatedMessage);
+        }
+        window[2] = 1;
+        work->refreshMessages = 1;
+    } else if ((s8)window[1] == 5) {
+        handle = ((u16 (*)(void*))fn_800E202C)(work);
+        if (handle == 0) {
+            __assert(lbl_8026F2E8 + 0x184, 0xF3, lbl_8047C198);
+        }
+        fn_800E24B0(handle);
+        fn_800E209C(handle);
+        return;
+    }
+
+    changed = 0;
+    if ((s8)window[1] == 2 && work->refreshMessages != 0) {
+        work->refreshMessages = 0;
+        changed = 1;
+    }
+
+    for (i = 0; i < 4; i++) {
+        if ((work->state[i] == 4 || work->state[i] == 5) &&
+            !((u8 (*)(s32))fn_8008ABA0)(i + 1)) {
+            menuSetEnablePort(((u8 (*)(void))menuGetEnablePort)() &
+                              ~portMasks[i]);
+            work->state[i] = 7;
+            work->field28 = 8;
+        }
+    }
+
+    for (i = 0; i < 4; i++) {
+        if (work->previousState[i] != work->state[i]) {
+            changed = 1;
+        }
+        work->previousState[i] = work->state[i];
+    }
+    if (!changed) {
+        return;
+    }
+
+    if (work->headerSprite[0] != 0) {
+        winSpriteSetDisp(work->headerSprite[0], 1);
+    }
+    if (work->headerSprite[1] != 0) {
+        winSpriteSetDisp(work->headerSprite[1], 1);
+    }
+
+    flags = stateFlags[work->state[0]];
+    for (row = 0; row < 5; row++) {
+        if (work->statusSprite[row] != 0) {
+            winSpriteSetDisp(work->statusSprite[row],
+                             (flags & (0x100U << row)) != 0);
+        }
+    }
+
+#define SET_STATUS_MESSAGE(item, active)                                      \
+    do {                                                                       \
+        sprite = (item);                                                       \
+        if (sprite != 0) {                                                     \
+            fn_801081F8(window, (u16)*(s16*)((u8*)sprite + 6),                 \
+                          (active) ? 0x1BA : 0);                               \
+            if (!(active)) {                                                   \
+                *(s32*)((u8*)sprite + 0x64) = -1;                             \
+            }                                                                  \
+        }                                                                      \
+    } while (0)
+
+    if (work->refreshMessages == 0) {
+        selected = work->state[0] == 9;
+        SET_STATUS_MESSAGE(work->statusSprite[0], selected);
+        SET_STATUS_MESSAGE(work->statusSprite[2], selected);
+    }
+
+    for (i = 0; i < 4; i++) {
+        flags = stateFlags[work->state[i]];
+        for (row = 0; row < 8; row++) {
+            if (work->optionSprite[row][i] != 0) {
+                winSpriteSetDisp(work->optionSprite[row][i],
+                                 (flags & (1U << row)) != 0);
+            }
+        }
+
+        if (work->state[i] == 6 || work->state[i] == 7 ||
+            work->state[i] == 11) {
+            if (work->headerSprite[0] != 0) {
+                winSpriteSetDisp(work->headerSprite[0], 0);
+            }
+            if (work->headerSprite[1] != 0) {
+                winSpriteSetDisp(work->headerSprite[1], 0);
+            }
+        }
+
+        if (work->refreshMessages == 0) {
+            selected = work->state[i] == 2;
+            SET_STATUS_MESSAGE(work->optionSprite[0][i], selected);
+            SET_STATUS_MESSAGE(work->optionSprite[3][i], selected);
+            SET_STATUS_MESSAGE(work->optionSprite[4][i], selected);
+
+            if ((flags & 4) != 0) {
+                sprite = work->optionSprite[2][i];
+                if (*(u32*)((u8*)sprite + 0x0C) == 0) {
+                    fn_801081F8(window,
+                                (u16)*(s16*)((u8*)sprite + 6),
+                                lbl_8047C190[i]);
+                }
+            }
+        }
+    }
+#undef SET_STATUS_MESSAGE
+}
+
 #pragma peephole on
 
 /* 0x80084A8C | size: 0x305C */
@@ -3481,94 +4115,162 @@ void fn_80084A8C(void) {
         }                                                                        \
     } while (0)
 
-/* 0x80087C64 | size: 0x7C4 */
-u32 fn_80087C64(CardESelection* selection) {
-    CardEGridTable* table;
-    CardEPadState* pad;
-    CardEModelAnim* cell;
-    s32 marked[3][3];
-    s32 chosen[3][2];
-    s32 col;
-    s32 row;
-    s32 count;
-    s32 consumed;
-    s32 matchCount;
-    s32 x;
-    s32 y;
-    s32 i;
-    s32 result;
+/* Run the card-e three-tile grid prompt.  A zero return means that three
+ * cells were accepted; one means the player backed out before completing it. */
+typedef struct CardGridKeyInfo {
+    u8 _00[4];
     u16 buttons;
-    void* model;
+    u16 repeat;
+} CardGridKeyInfo;
 
-    table = CARDE_GRID_TABLE;
-    fn_801054B8(1, table);
+typedef struct CardGridCell {
+    u32 modelId;
+    s16 selectAnim;
+    s16 resetAnim;
+} CardGridCell;
 
-    col = 1;
-    row = 1;
-    count = 0;
-    result = 0;
+typedef struct CardGridData {
+    u16 tileId[3][3];
+    u16 _12;
+    CardGridCell cell[3][3];
+    s16 cursorAnim[3][3];
+    u16 _6E;
+} CardGridData;
 
-    for (y = 0; y < 3; y++) {
-        for (x = 0; x < 3; x++) {
-            marked[y][x] = 0;
-        }
+typedef struct CardGridChoice {
+    s32 row;
+    s32 column;
+} CardGridChoice;
+
+extern const u32 lbl_8047C1C0;
+extern const u32 lbl_8047C1C4;
+extern CardGridKeyInfo* windowGetPortKeyInfo(u32 port);
+extern void GSmodelSetAnimFrame(void* model, f32 frame);
+extern void GSmodelSetAnimRate(void* model, f32 rate);
+extern void GSmodelStartAnimation(void* model);
+extern void GSmodelSetAnimType(void* model, u32 type);
+extern u8 GSmodelIsAnimating(void* model);
+
+u32 fn_80087C64(const u16* expected)
+{
+    u32 occupied[3][3];
+    CardGridChoice choices[3];
+    const CardGridData* data = (const CardGridData*)lbl_8026F488;
+    s32 row = 1;
+    s32 column = 1;
+    s32 count = 0;
+    u32 i;
+
+    windowGetPortKeyInfo(1);
+    for (i = 0; i < 9; i++) {
+        ((u32*)occupied)[i] = 0;
     }
 
     while (count < 3) {
-        pad = fn_801054B8(1);
-        consumed = 0;
-        buttons = pad->repeat;
+        CardGridKeyInfo* key = windowGetPortKeyInfo(1);
+        u32 handled = 0;
 
-        if ((buttons & 0x10) != 0) {
-            if (marked[row][col] == 0) {
-                cell = &table->cell[row][col];
-                CARDE_SHOW_MODEL(cell->modelId, cell->anim);
+        if (key->repeat & 0x10) {
+            u32 accepted = 0;
+            if (row >= 0 && row < 3 && column >= 0 && column < 3 &&
+                occupied[column][row] == 0) {
+                CardGridCell cells[3][3];
+                void* model;
+                memcpy(cells, data->cell, sizeof(cells));
+                model = fn_800F92D4(cells[column][row].modelId);
+                if (model != 0) {
+                    if (model != 0) {
+                        GSmodelSetAnimIndex(model, cells[column][row].selectAnim);
+                        GSmodelSetAnimFrame(model, lbl_8047C1CC);
+                        GSmodelSetAnimRate(model, lbl_8047C1C8);
+                        GSmodelStartAnimation(model);
+                    }
+                }
+                occupied[column][row] = 1;
+                accepted = 1;
+            }
 
-                marked[row][col] = 1;
-                chosen[count][0] = col;
-                chosen[count][1] = row;
+            if (accepted) {
+                s16 counterAnim[4];
+                void* model;
+                choices[count].row = row;
+                choices[count].column = column;
                 count++;
-
+                ((u32*)counterAnim)[0] = lbl_8047C1C0;
+                ((u32*)counterAnim)[1] = lbl_8047C1C4;
                 if (count >= 0 && count < 4) {
-                    CARDE_SHOW_MODEL(0x107E100B, ((s16*)&table->selectedIconAnim)[count]);
+                    model = fn_800F92D4(0x107E100B);
+                    if (model != 0) {
+                        if (model != 0) {
+                            GSmodelSetAnimIndex(model, counterAnim[count]);
+                            GSmodelSetAnimFrame(model, lbl_8047C1CC);
+                            GSmodelSetAnimRate(model, lbl_8047C1C8);
+                            GSmodelStartAnimation(model);
+                        }
+                    }
                 }
 
                 if (count >= 3) {
-                    matchCount = 0;
-                    for (y = 0; y < 3; y++) {
-                        for (x = 0; x < 3; x++) {
-                            if (marked[y][x] != 0) {
-                                u16 id;
-                                id = table->cell[y][x].anim;
-                                if (id == selection->id[0]) {
-                                    matchCount++;
-                                } else if (id == selection->id[1]) {
-                                    matchCount++;
-                                } else if (id == selection->id[2]) {
-                                    matchCount++;
+                    u32 matches = 0;
+                    s32 gridRow;
+                    u16 tiles[3][3];
+                    memcpy(tiles, data->tileId, sizeof(tiles));
+                    for (gridRow = 0; gridRow < 3; gridRow++) {
+                        s32 gridColumn;
+                        for (gridColumn = 0; gridColumn < 3; gridColumn++) {
+                            if (occupied[gridRow][gridColumn] != 0) {
+                                u16 tile = tiles[gridRow][gridColumn];
+                                if (tile == expected[0] || tile == expected[1] ||
+                                    tile == expected[2]) {
+                                    matches++;
                                 }
                             }
                         }
                     }
 
-                    if (matchCount < 3) {
+                    if (matches < 3) {
+                        s32 clearRow;
                         fn_80166A28(0x26);
                         while (fn_801666BC(0x26) == 2) {
                             _threadSwitch();
                         }
-
-                        for (y = 0; y < 3; y++) {
-                            for (x = 0; x < 3; x++) {
-                                if (marked[y][x] != 0) {
-                                    cell = &table->cell[y][x];
-                                    CARDE_SHOW_MODEL(cell->modelId, cell->animAlt);
-                                    marked[y][x] = 0;
+                        for (clearRow = 0; clearRow < 3; clearRow++) {
+                            s32 clearColumn;
+                            for (clearColumn = 0; clearColumn < 3; clearColumn++) {
+                                if (occupied[clearRow][clearColumn] != 0) {
+                                    CardGridCell cells[3][3];
+                                    void* clearModel;
+                                    memcpy(cells, data->cell, sizeof(cells));
+                                    clearModel = fn_800F92D4(cells[clearColumn][clearRow].modelId);
+                                    if (clearModel != 0) {
+                                        if (clearModel != 0) {
+                                            GSmodelSetAnimIndex(clearModel,
+                                                cells[clearColumn][clearRow].resetAnim);
+                                            GSmodelSetAnimFrame(clearModel, lbl_8047C1CC);
+                                            GSmodelSetAnimRate(clearModel, lbl_8047C1C8);
+                                            GSmodelStartAnimation(clearModel);
+                                        }
+                                    }
+                                    occupied[clearRow][clearColumn] = 0;
                                 }
                             }
                         }
-
-                        CARDE_SHOW_MODEL(0x107E100B, table->selectedIconAnim);
-                        count = 0;
+                        {
+                            s16 counterAnim[4];
+                            void* counterModel;
+                            ((u32*)counterAnim)[0] = lbl_8047C1C0;
+                            ((u32*)counterAnim)[1] = lbl_8047C1C4;
+                            count = 0;
+                            counterModel = fn_800F92D4(0x107E100B);
+                            if (counterModel != 0) {
+                                if (counterModel != 0) {
+                                    GSmodelSetAnimIndex(counterModel, counterAnim[0]);
+                                    GSmodelSetAnimFrame(counterModel, lbl_8047C1CC);
+                                    GSmodelSetAnimRate(counterModel, lbl_8047C1C8);
+                                    GSmodelStartAnimation(counterModel);
+                                }
+                            }
+                        }
                     } else {
                         fn_80166A28(0x4A1);
                         while (fn_801666BC(0x4A1) == 2) {
@@ -3578,67 +4280,104 @@ u32 fn_80087C64(CardESelection* selection) {
                 } else {
                     fn_80166A28(0x3C6);
                 }
-                consumed = 1;
+                handled = 1;
             }
         }
 
-        if (((pad->trigger & 0x20) != 0) && consumed == 0) {
+        if ((key->buttons & 0x20) && !handled) {
+            CardGridCell cells[3][3];
+            s16 counterAnim[4];
+            CardGridChoice* choice;
+            void* model;
             count--;
             if (count < 0) {
-                result = 1;
                 break;
             }
 
             fn_80166A28(0x3C7);
-            col = chosen[count][0];
-            row = chosen[count][1];
-            cell = &table->cell[row][col];
-            CARDE_SHOW_MODEL(cell->modelId, cell->animAlt);
-            CARDE_SHOW_MODEL(0x107E100B, ((s16*)&table->selectedIconAnim)[count]);
-            marked[row][col] = 0;
-            consumed = 1;
-        }
-
-        if (consumed == 0) {
-            x = col;
-            y = row;
-            i = 0;
-
-            if (((buttons & 0x1) != 0) && x > 0) {
-                x--;
-                i = 1;
-            }
-            if (((buttons & 0x2) != 0) && x < 2) {
-                x++;
-                i = 1;
-            }
-            if (((buttons & 0x4) != 0) && y > 0) {
-                y--;
-                i = 1;
-            }
-            if (((buttons & 0x8) != 0) && y < 2) {
-                y++;
-                i = 1;
-            }
-
-            if (i != 0) {
-                CARDE_SHOW_MODEL(0x107E1009, table->cell[y][x].anim);
-                model = fn_800F92D4(0x107E1009);
+            choice = &choices[count];
+            memcpy(cells, data->cell, sizeof(cells));
+            if (choice->row >= 0 && choice->row < 3 &&
+                choice->column >= 0 && choice->column < 3) {
+                model = fn_800F92D4(cells[choice->column][choice->row].modelId);
                 if (model != 0) {
-                    fn_800ECB74(model, 0);
-                    while (fn_800EC960(model) != 0) {
-                        _threadSwitch();
+                    if (model != 0) {
+                        GSmodelSetAnimIndex(model,
+                            cells[choice->column][choice->row].resetAnim);
+                        GSmodelSetAnimFrame(model, lbl_8047C1CC);
+                        GSmodelSetAnimRate(model, lbl_8047C1C8);
+                        GSmodelStartAnimation(model);
                     }
                 }
-                col = x;
-                row = y;
             }
+
+            ((u32*)counterAnim)[0] = lbl_8047C1C0;
+            ((u32*)counterAnim)[1] = lbl_8047C1C4;
+            if (count >= 0 && count < 4) {
+                model = fn_800F92D4(0x107E100B);
+                if (model != 0) {
+                    if (model != 0) {
+                        GSmodelSetAnimIndex(model, counterAnim[count]);
+                        GSmodelSetAnimFrame(model, lbl_8047C1CC);
+                        GSmodelSetAnimRate(model, lbl_8047C1C8);
+                        GSmodelStartAnimation(model);
+                    }
+                }
+            }
+            occupied[choice->column][choice->row] = 0;
+            handled = 1;
         }
 
+        if (!handled) {
+            s32 nextRow = row;
+            s32 nextColumn = column;
+            u32 moved = 0;
+            if ((key->repeat & 1) && column > 0) {
+                nextColumn = column - 1;
+                moved = 1;
+            }
+            if ((key->repeat & 2) && nextColumn < 2) {
+                nextColumn++;
+                moved = 1;
+            }
+            if ((key->repeat & 4) && row > 0) {
+                nextRow = row - 1;
+                moved = 1;
+            }
+            if ((key->repeat & 8) && nextRow < 2) {
+                nextRow++;
+                moved = 1;
+            }
+
+            if (moved) {
+                s16 cursorAnim[3][3];
+                void* cursorModel;
+                memcpy(cursorAnim, data->cursorAnim, sizeof(cursorAnim));
+                if (nextRow >= 0 && nextRow < 3 &&
+                    nextColumn >= 0 && nextColumn < 3) {
+                    cursorModel = fn_800F92D4(0x107E1009);
+                    if (cursorModel != 0) {
+                        if (cursorModel != 0) {
+                            GSmodelSetAnimIndex(cursorModel,
+                                cursorAnim[nextColumn][nextRow]);
+                            GSmodelSetAnimFrame(cursorModel, lbl_8047C1CC);
+                            GSmodelSetAnimRate(cursorModel, lbl_8047C1C8);
+                            GSmodelStartAnimation(cursorModel);
+                        }
+                        GSmodelSetAnimType(cursorModel, 0);
+                        while (GSmodelIsAnimating(cursorModel) != 0) {
+                            _threadSwitch();
+                        }
+                    }
+                }
+                row = nextRow;
+                column = nextColumn;
+            }
+        }
         _threadSwitch();
     }
 
-    return result;
+    return count < 0 ? 1 : 0;
 }
 
 #undef CARDE_SHOW_MODEL

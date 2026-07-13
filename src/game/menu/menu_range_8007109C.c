@@ -8,13 +8,166 @@
  */
 #include "dolphin/types.h"
 
+typedef struct MenuDVDFileInfo {
+    u8 pad[0x34];
+    u32 length;
+} MenuDVDFileInfo;
+
+typedef struct GbaBootContext {
+    u8 alarm[0x28];
+    u8 thread_and_work[0x318];
+    u8 channel;
+    u8 pad_341;
+    u8 cancel;
+    u8 reject_upload;
+    u8 status_only;
+    u8 pad_345;
+    u8 state;
+    u8 pad_347;
+    u16 boot_type;
+    u8 pad_34A[2];
+    u32 device_code;
+    u32 game_code;
+    u32 crc;
+    u32 challenge;
+    u8 pad_35C[0x24];
+    u8* upload_start;
+    u8* upload_end;
+    u8 pad_388[0x2000];
+    u32 reply[0x410];
+} GbaBootContext;
+
+typedef struct MenuExDiscLoadData {
+    u32 words[4];
+} MenuExDiscLoadData;
+
+typedef struct ExDiscCouponResult {
+    u32 flagsA62C;
+    u32 couponValue;
+    u32 optionFlags;
+    u16 partyCount;
+    u16 itemId;
+    u8 bag[0xC8];
+} ExDiscCouponResult;
+
+#define GBA_BOOT_BSWAP(v)                                                    \
+    ((((u32)(v) & 0xFF000000) >> 24) | (((u32)(v) & 0x00FF0000) >> 8)      \
+     | (((u32)(v) & 0x0000FF00) << 8) | (((u32)(v) & 0x000000FF) << 24))
+
+#define GBA_BOOT_FAIL(ctx, code) \
+    do {                         \
+        (ctx)->state = (code);   \
+        return (code);           \
+    } while (0)
+
+#define GBA_BOOT_DELAY(ctx, handler, level)                  \
+    do {                                                      \
+        OSCreateAlarm((ctx));                                 \
+        (level) = OSDisableInterrupts();                       \
+        OSSetAlarm((ctx), 0x10, (void*)(handler));             \
+        OSSuspendThread((u8*)(ctx) + 0x28);                    \
+        OSRestoreInterrupts(level);                            \
+    } while (0)
+
+#define GBA_BOOT_CLASSIFY(ctx, response, gba_status, result)                 \
+    do {                                                                     \
+        u32 boot_delta;                                                      \
+        if ((response) == (ctx)->game_code) {                                \
+            (result) = 1;                                                    \
+        } else if (((gba_status) & 0x30) != 0) {                             \
+            (result) = 0;                                                    \
+        } else {                                                             \
+            boot_delta = (ctx)->device_code ^ (response);                    \
+            if (boot_delta == 0x20000000) {                                  \
+                (ctx)->boot_type = 0x100;                                    \
+                (result) = 2;                                                \
+            } else if (boot_delta == 0x00200000) {                           \
+                (ctx)->boot_type = 0x200;                                    \
+                (result) = 2;                                                \
+            } else {                                                         \
+                (ctx)->boot_type = 0;                                        \
+                (result) = ((boot_delta & 0xDFDFDFDF) == 0) ? 2 : 0;         \
+            }                                                                \
+        }                                                                    \
+    } while (0)
+
+#define SET_EXDISC_VISIBILITY(id_, visible_)                       \
+    do {                                                           \
+        void* model_ = GSresGetResource(fn_80113F48(), (id_));      \
+        if (model_ != 0) {                                         \
+            GSmodelSetVisibility(model_, (visible_));              \
+        }                                                          \
+    } while (0)
+
+#define RESTORE_EXDISC_SCENE(handle_)                              \
+    do {                                                           \
+        fadeSet(3, lbl_8047C108);                                  \
+        fadeCheck(1);                                              \
+        fn_801CB9D8((u32)(handle_));                               \
+        SET_EXDISC_VISIBILITY(0x104E1000, 1);                      \
+        SET_EXDISC_VISIBILITY(0x104E1001, 1);                      \
+        SET_EXDISC_VISIBILITY(0x104E1002, 1);                      \
+        cameraPlayAnime((s32)fn_80113F48(), 0x10941800, 0, 0);    \
+        fadeSet(2, lbl_8047C108);                                  \
+        fadeCheck(1);                                              \
+    } while (0)
+
 /* GBA link timing: OS_TIMER_CLOCK / OSMillisecondsToTicks, see include/dolphin/si/SI.h */
 #define OS_BUS_CLOCK   (*(u32*)0x800000F8)
 #define OS_TIMER_CLOCK (OS_BUS_CLOCK / 4)
 #define OSMillisecondsToTicks(msec) ((msec) * (OS_TIMER_CLOCK / 1000))
 
 extern u8 lbl_803F7A30[];
+extern u8 lbl_80268940[];
+extern u8 lbl_803F6F18[];
+extern u8 lbl_803F6E40[];
+extern u8 lbl_803B6E40[];
+extern u8 lbl_803D6E40[];
+extern u8 lbl_80268780[];
+extern u32 lbl_8047A604;
+extern u32 lbl_8047A608;
+extern u32 lbl_8047A620;
+extern u32 lbl_8047A628;
+extern u32 lbl_8047A62C;
+extern u8 lbl_8047A630;
+extern u8 lbl_8047A631;
+extern u8 lbl_8047A632;
+extern u8 lbl_8047A633;
+extern u8 lbl_8047A634;
+extern u8 lbl_8047A635;
+extern u32 lbl_8047A638;
+extern u32 lbl_80268AD0[];
+extern u8 lbl_80268AE0[];
+extern f32 lbl_8047C0E0;
+extern f32 lbl_8047C0E4;
+extern f32 lbl_8047C100;
+extern f32 lbl_8047C108;
+extern u8 lbl_8047C10C;
 extern u32 OSGetTick(void);
+extern void _threadSwitch(void);
+extern void winMsgOpenField(s32, s32, s32);
+extern void winMsgOpen(s32, s32, s32, s32);
+extern void winMsgClose(s32);
+extern u32 GBAReset(s32, u32);
+extern void OSCreateAlarm(void*);
+extern u32 OSDisableInterrupts(void);
+extern void OSSetAlarm(void*, s64, void*);
+extern s32 OSSuspendThread(void*);
+extern void OSRestoreInterrupts(u32);
+extern void fn_8007C23C(u8*);
+extern u32 lbl_803FAEF8[256];
+extern void* heroBiosGetNamePtr(void*);
+extern void* heroBiosGetPokemonPtr(void*, u16);
+extern void* fn_80113F48(void);
+extern void* GSresGetResource(void*, u32);
+extern void GSmodelSetVisibility(void*, u32);
+extern void* fn_801CBA0C(u32);
+extern void cameraPlayAnime(s32, u32, s32, s32);
+extern void fadeSet(s32, f32);
+extern s32 fadeCheck(s32);
+extern void fn_801CB9D8(u32);
+extern void GSscene_SetMode(s32);
+extern u8 fn_80079EF4(s32, u32);
 extern void gbaCommandSetKeyState(s32 mode, s32 flag);
 extern s32 fn_80073C38(s32 chan);
 extern s32 GBAWrite();
@@ -30,6 +183,140 @@ extern GbaIdleCallback lbl_803B6E18[5];
 extern s32 lbl_803B6E08[4];
 extern u8 lbl_803B6D88[0x58];
 extern void floorLink(s32, s32);
+
+u8 fn_80076398(void* pokemon, s32 check)
+{
+    extern s32 pokemonGetStatus(void*, s32, s32, s32);
+    extern u16 pokemonBiosGetPokemonDataId(void*);
+    extern u8 pokemonBiosGetEventGetFlag(void*);
+    extern void pokemonBiosCopy(void*, void*);
+    extern void pokemonResetBasisStatus(void*);
+    extern u16 pokemonBiosGetMaxHp(void*);
+    extern u16 pokemonBiosGetPhyAtk(void*);
+    extern u16 pokemonBiosGetPhyDef(void*);
+    extern u16 pokemonBiosGetSpeAtk(void*);
+    extern u16 pokemonBiosGetSpeDef(void*);
+    extern u16 pokemonBiosGetNimbleness(void*);
+    extern u16 pokemonBiosGetMaxHpEffort(void*);
+    extern u16 pokemonBiosGetPhyAtkEffort(void*);
+    extern u16 pokemonBiosGetPhyDefEffort(void*);
+    extern u16 pokemonBiosGetSpeAtkEffort(void*);
+    extern u16 pokemonBiosGetSpeDefEffort(void*);
+    extern u16 pokemonBiosGetNimblenessEffort(void*);
+    extern u8 pokemonIsDarkPokemon(void*);
+    extern u8 pokemonBiosGetTamagoFlag(void*);
+    extern u16 pokemonBiosGetItemDataId(void*);
+    extern u8 fn_80142984(void);
+    extern void* wazaDataBiosGetPtr(u16);
+    extern u8 pokemonCheckValid(void*);
+    extern void __assert(const char*, s32, const char*);
+    u8 copy[0x130];
+    u32 total;
+    u16 move;
+    u16 base_stat;
+    s32 i;
+
+    if (pokemon != NULL && pokemonGetStatus(pokemon, 0, 0x6E, 0) == 0) {
+        return 1;
+    }
+
+    switch (check) {
+    case 0:
+        if (fn_80076398(pokemon, 2) == 0) {
+            return 1;
+        }
+        if ((pokemonBiosGetPokemonDataId(pokemon) == 0x97 ||
+             pokemonBiosGetPokemonDataId(pokemon) == 0x19A) &&
+            pokemonBiosGetEventGetFlag(pokemon) == 0) {
+            return 0;
+        }
+
+        pokemonBiosCopy(copy, pokemon);
+        pokemonResetBasisStatus(copy);
+        base_stat = pokemonBiosGetMaxHp(pokemon);
+        if (pokemonBiosGetMaxHp(copy) < base_stat) {
+            return 0;
+        }
+        base_stat = pokemonBiosGetPhyAtk(pokemon);
+        if (pokemonBiosGetPhyAtk(copy) < base_stat) {
+            return 0;
+        }
+        base_stat = pokemonBiosGetPhyDef(pokemon);
+        if (pokemonBiosGetPhyDef(copy) < base_stat) {
+            return 0;
+        }
+        base_stat = pokemonBiosGetSpeAtk(pokemon);
+        if (pokemonBiosGetSpeAtk(copy) < base_stat) {
+            return 0;
+        }
+        base_stat = pokemonBiosGetSpeDef(pokemon);
+        if (pokemonBiosGetSpeDef(copy) < base_stat) {
+            return 0;
+        }
+        base_stat = pokemonBiosGetNimbleness(pokemon);
+        if (pokemonBiosGetNimbleness(copy) < base_stat) {
+            return 0;
+        }
+
+        total = pokemonBiosGetMaxHpEffort(pokemon);
+        total += pokemonBiosGetPhyAtkEffort(pokemon);
+        total += pokemonBiosGetPhyDefEffort(pokemon);
+        total += pokemonBiosGetSpeAtkEffort(pokemon);
+        total += pokemonBiosGetSpeDefEffort(pokemon);
+        total += pokemonBiosGetNimblenessEffort(pokemon);
+        if (total > 0x1FE) {
+            return 0;
+        }
+        if (pokemonBiosGetMaxHpEffort(pokemon) > 0xFF ||
+            pokemonBiosGetPhyAtkEffort(pokemon) > 0xFF ||
+            pokemonBiosGetPhyDefEffort(pokemon) > 0xFF ||
+            pokemonBiosGetSpeAtkEffort(pokemon) > 0xFF ||
+            pokemonBiosGetSpeDefEffort(pokemon) > 0xFF ||
+            pokemonBiosGetNimblenessEffort(pokemon) > 0xFF) {
+            return 0;
+        }
+        return 1;
+
+    case 1:
+        return pokemonIsDarkPokemon(pokemon) == 0;
+
+    case 2:
+        return pokemonBiosGetTamagoFlag(pokemon) == 0;
+
+    case 3:
+        move = pokemonBiosGetItemDataId(pokemon);
+        if (move == 0) {
+            return 1;
+        }
+        if (move == 0xAF) {
+            return 0;
+        }
+        return fn_80142984();
+
+    case 4:
+        for (i = 0; i < 4; i++) {
+            move = pokemonGetStatus(pokemon, 0, 0x7F, (u16)i);
+            if (move != 0 &&
+                wazaDataBiosGetPtr(move) == wazaDataBiosGetPtr(0)) {
+                return 0;
+            }
+        }
+        return 1;
+
+    case 5:
+        if (pokemonGetStatus(pokemon, 0, 0x6E, 0) == 0) {
+            __assert((const char*)lbl_80268940 + 0x108, 0x25E,
+                     (const char*)lbl_80268940 + 0x14C);
+        }
+        return pokemonCheckValid(pokemon);
+
+    default:
+        __assert((const char*)lbl_80268940 + 0x108, 0x274,
+                 (const char*)lbl_80268940 + 0x118);
+        return 0;
+    }
+}
+
 
 /*
  * Small helpers ported from the previous campaign's archive
@@ -382,6 +669,238 @@ void fn_80075A34(void) {
     cameraPlayAnime(0x5E0, 0x10821800, 0, 1);
     GSscene_SetMode(4);
 }
+
+/* Check party-rule constraints for the selected Pokemon. */
+u8 fn_80076A8C(u32 hero, u32 pokemon, const u8* rule, s32 mode)
+{
+    extern u8 fn_80076F2C();
+    extern u32 pokemonGetStatus();
+    extern u8 pokemonBiosGetTamagoFlag();
+    extern u8 pokemonCheckValid();
+    extern u32 heroBiosGetPokemonPtr();
+    extern u16 pokemonBiosGetPokemonDataId();
+    extern u16 pokemonBiosGetItemDataId();
+    u32 candidate;
+    s32 present;
+    s32 invalid;
+    u32 i;
+
+    switch (mode) {
+    case 0:
+        return fn_80076F2C(hero, rule, mode);
+
+    case 1:
+        if (rule[0xC] != 0) {
+            return 1;
+        }
+
+        present = pokemon == 0;
+        invalid = 0;
+        if (present == 0) {
+            if (pokemonGetStatus(pokemon, 0, 0x6E, 0) != 0) {
+                goto selected_present_species;
+            }
+        }
+        invalid = 1;
+selected_present_species:
+        if (invalid != 0) {
+            return 1;
+        }
+
+        present = 0;
+        if (present == 0) {
+            if (pokemonGetStatus(pokemon, 0, 0x6E, 0) != 0) {
+                goto selected_species_valid;
+            }
+        }
+        present = 1;
+selected_species_valid:
+        if (present != 0) {
+            invalid = 0;
+        } else {
+            present = 0;
+            if (pokemonBiosGetTamagoFlag(pokemon) == 0) {
+                if (pokemonCheckValid(pokemon) != 0) {
+                    goto selected_species_rejected;
+                }
+            }
+            present = 1;
+selected_species_rejected:
+            invalid = present;
+        }
+        if ((u8)invalid != 0) {
+            return 1;
+        }
+
+        for (i = 0; i < 6; i++) {
+            candidate = heroBiosGetPokemonPtr(hero, (u16)i);
+            if (candidate == pokemon) {
+                continue;
+            }
+
+            present = candidate == 0;
+            invalid = 0;
+            if (present == 0) {
+                if (pokemonGetStatus(candidate, 0, 0x6E, 0) != 0) {
+                    goto candidate_present_species;
+                }
+            }
+            invalid = 1;
+candidate_present_species:
+            if (invalid != 0) {
+                continue;
+            }
+
+            present = 0;
+            if (present == 0) {
+                if (pokemonGetStatus(candidate, 0, 0x6E, 0) != 0) {
+                    goto candidate_species_valid;
+                }
+            }
+            present = 1;
+candidate_species_valid:
+            if (present != 0) {
+                invalid = 0;
+            } else {
+                present = 0;
+                if (pokemonBiosGetTamagoFlag(candidate) == 0) {
+                    if (pokemonCheckValid(candidate) != 0) {
+                        goto candidate_species_rejected;
+                    }
+                }
+                present = 1;
+candidate_species_rejected:
+                invalid = present;
+            }
+            if ((u8)invalid != 0) {
+                continue;
+            }
+
+            present = pokemonBiosGetPokemonDataId(pokemon);
+            if ((u16)pokemonBiosGetPokemonDataId(candidate) == (u16)present) {
+                return 0;
+            }
+        }
+        return 1;
+
+    case 2:
+        if (rule[0xD] != 0) {
+            return 1;
+        }
+
+        present = pokemon == 0;
+        invalid = 0;
+        if (present == 0) {
+            if (pokemonGetStatus(pokemon, 0, 0x6E, 0) != 0) {
+                goto selected_present_item;
+            }
+        }
+        invalid = 1;
+selected_present_item:
+        if (invalid != 0) {
+            return 1;
+        }
+
+        present = 0;
+        if (present == 0) {
+            if (pokemonGetStatus(pokemon, 0, 0x6E, 0) != 0) {
+                goto selected_item_valid;
+            }
+        }
+        present = 1;
+selected_item_valid:
+        if (present != 0) {
+            invalid = 0;
+        } else {
+            present = 0;
+            if (pokemonBiosGetTamagoFlag(pokemon) == 0) {
+                if (pokemonCheckValid(pokemon) != 0) {
+                    goto selected_item_rejected;
+                }
+            }
+            present = 1;
+selected_item_rejected:
+            invalid = present;
+        }
+        if ((u8)invalid != 0) {
+            return 1;
+        }
+        if (pokemonBiosGetItemDataId(pokemon) == 0) {
+            return 1;
+        }
+
+        for (i = 0; i < 6; i++) {
+            candidate = heroBiosGetPokemonPtr(hero, (u16)i);
+            if (candidate == pokemon) {
+                continue;
+            }
+
+            present = candidate == 0;
+            invalid = 0;
+            if (present == 0) {
+                if (pokemonGetStatus(candidate, 0, 0x6E, 0) != 0) {
+                    goto candidate_present_item;
+                }
+            }
+            invalid = 1;
+candidate_present_item:
+            if (invalid != 0) {
+                continue;
+            }
+
+            present = 0;
+            if (present == 0) {
+                if (pokemonGetStatus(candidate, 0, 0x6E, 0) != 0) {
+                    goto candidate_item_valid;
+                }
+            }
+            present = 1;
+candidate_item_valid:
+            if (present != 0) {
+                invalid = 0;
+            } else {
+                present = 0;
+                if (pokemonBiosGetTamagoFlag(candidate) == 0) {
+                    if (pokemonCheckValid(candidate) != 0) {
+                        goto candidate_item_rejected;
+                    }
+                }
+                present = 1;
+candidate_item_rejected:
+                invalid = present;
+            }
+            if ((u8)invalid != 0) {
+                continue;
+            }
+
+            present = pokemonBiosGetItemDataId(pokemon);
+            if ((u16)pokemonBiosGetItemDataId(candidate) == (u16)present) {
+                return 0;
+            }
+        }
+        return 1;
+
+    case 3:
+        invalid = 0;
+        if (fn_80076F2C(hero, rule, 3) == 0) {
+            present = 0;
+            if (pokemon != 0 &&
+                pokemonGetStatus(pokemon, 0, 0x6E, 0) != 0) {
+                goto selected_valid_for_mode3;
+            }
+            present = 1;
+selected_valid_for_mode3:
+            if (present != 0) {
+                return (u8)invalid;
+            }
+        }
+        invalid = 1;
+        return (u8)invalid;
+    }
+
+    return 0;
+}
+
 
 #pragma push
 #pragma scheduling off
@@ -743,6 +1262,90 @@ s32 fn_80073E84(void) {
 }
 
 extern s32 menuIsCheck(s32);
+
+/* fn_80073E8C (0x80073E8C): load one or two menu binary blocks and refresh checksum bytes. */
+s32 fn_80073E8C(void* pathA, void* pathB) {
+    extern void* memcpy(void* dst, const void* src, u32 size);
+    extern void* fn_800A7BCC(void);
+    extern void GBAInit(void);
+    extern s32 DVDOpen(void* path, MenuDVDFileInfo* info);
+    extern s32 DVDRead(MenuDVDFileInfo* info, void* dst, s32 length, s32 offset, s32 prio);
+    extern void DVDClose(MenuDVDFileInfo* info);
+    extern void fn_800060F0(const char* file, s32 line, const char* fmt, ...);
+    extern u8 lbl_80268780[];
+    extern u32 lbl_8047A60C;
+    extern u32 lbl_8047A608;
+    extern u32 lbl_8047A604;
+    extern u8 lbl_803D6E40[];
+    extern u8 lbl_803B6E40[];
+    MenuDVDFileInfo fileA;
+    MenuDVDFileInfo fileB;
+    u32 size;
+    u8* buf;
+    s32 i;
+    s32 checksum;
+
+    memcpy(&lbl_8047A60C, fn_800A7BCC(), 4);
+    lbl_8047A60C |= 0x20002020;
+    GBAInit();
+
+    if (DVDOpen(pathA, &fileA) == 0) {
+        fn_800060F0((const char*)lbl_80268780, 0x1d6, (const char*)lbl_80268780 + 0x10);
+    }
+    size = (fileA.length + 7) & ~7;
+    lbl_8047A608 = size;
+    if (size == 0 || size > 0x20000) {
+        fn_800060F0((const char*)lbl_80268780, 0x1dc, (const char*)lbl_80268780 + 0x28);
+    }
+    size = (lbl_8047A608 + 0x1f) & ~0x1f;
+    lbl_8047A608 = size;
+    if (DVDRead(&fileA, lbl_803D6E40, size, 0, 2) < 0) {
+        fn_800060F0((const char*)lbl_80268780, 0x1e1, (const char*)lbl_80268780 + 0x4c);
+    }
+    DVDClose(&fileA);
+
+    buf = lbl_803D6E40;
+    buf[0xac] = ((u8*)&lbl_8047A60C)[0];
+    buf[0xad] = ((u8*)&lbl_8047A60C)[1];
+    buf[0xae] = ((u8*)&lbl_8047A60C)[2];
+    buf[0xaf] = ((u8*)&lbl_8047A60C)[3];
+    checksum = 0xe7;
+    for (i = 0xa0; i < 0xbd; i++) {
+        checksum -= buf[i];
+    }
+    buf[i] = checksum;
+
+    if (pathB != 0) {
+        if (DVDOpen(pathB, &fileB) == 0) {
+            fn_800060F0((const char*)lbl_80268780, 0x1d6, (const char*)lbl_80268780 + 0x10);
+        }
+        size = (fileB.length + 7) & ~7;
+        lbl_8047A604 = size;
+        if (size == 0 || size > 0x20000) {
+            fn_800060F0((const char*)lbl_80268780, 0x1dc, (const char*)lbl_80268780 + 0x28);
+        }
+        size = (lbl_8047A604 + 0x1f) & ~0x1f;
+        lbl_8047A604 = size;
+        if (DVDRead(&fileB, lbl_803B6E40, size, 0, 2) < 0) {
+            fn_800060F0((const char*)lbl_80268780, 0x1e1, (const char*)lbl_80268780 + 0x4c);
+        }
+        DVDClose(&fileB);
+
+        buf = lbl_803B6E40;
+        buf[0xac] = ((u8*)&lbl_8047A60C)[0];
+        buf[0xad] = ((u8*)&lbl_8047A60C)[1];
+        buf[0xae] = ((u8*)&lbl_8047A60C)[2];
+        buf[0xaf] = ((u8*)&lbl_8047A60C)[3];
+        checksum = 0xe7;
+        for (i = 0xa0; i < 0xbd; i++) {
+            checksum -= buf[i];
+        }
+        buf[i] = checksum;
+    }
+
+    return 0;
+}
+
 /* fn_80075638 (0x80075638): tail-call wrapper. */
 #pragma push
 #pragma scheduling off
@@ -1027,6 +1630,129 @@ u8 fn_80077EA4(u16* s1, u16* s2) {
 }
 #pragma pop
 
+
+#pragma push
+#pragma peephole off
+/* 0x80077ED4 | Celebi/e-Reader party transfer sequence. */
+void fn_80077ED4(void)
+{
+    typedef struct MenuSaveSnapshot {
+        u8 bytes[0x1DFD0];
+    } MenuSaveSnapshot;
+    extern void* fn_801D036C(void);
+    extern void fn_801D0314(void*);
+    extern void* savedataGetStatus(u32, u32);
+    extern void fn_80075B74(void);
+    extern s32 fn_801D0748(u32, u32, u32);
+    extern void fn_80166A28(u32);
+    extern void* heroBiosGetPokemonPtr(void*, u32);
+    extern void pokemonInit(void*);
+    extern void* floorDataBiosGetCurrentPtr(void);
+    extern u32 floorDataBiosGetFloorID(void*);
+    extern void heroPokemonGetCelebi(void*, u32);
+    extern u32 pokemonCheckValid(void*);
+    extern void __assert(const char*, u32, const char*);
+    extern char lbl_80268AB8[];
+    extern char lbl_8047C0E8[] __attribute__((section(".sdata2")));
+    extern void fn_80093574(u32);
+    extern void fn_80092C90(u32, void*, void*);
+    extern s32 fn_80093610(u32);
+    extern void fn_80093698(u32);
+
+    void* pokemon;
+    void* name;
+    void* backup;
+    u32 i;
+    u32 resource = 0x104F1000;
+
+    name = heroBiosGetNamePtr(lbl_803F6F18);
+    backup = fn_801D036C();
+    *(MenuSaveSnapshot*)backup =
+        *(MenuSaveSnapshot*)savedataGetStatus(0, 0);
+    fn_80075B74();
+
+    if (fn_801D0748(4, 2, 0) != 4) {
+        fn_80166A28(0x4C7);
+        fn_801CB834(resource, 4, 0, 0);
+        scriptWaitSyncMotion(resource, 1);
+        MenuWaitMotionInterval();
+        msgctrlSetValue(0x4D, (u32)name);
+        menuSetEnablePort(1);
+        winMsgOpenField(0x44B0, 1, 0);
+        menuSetEnablePort(1);
+        winMsgOpen(2, 0x44CF, 1, 0);
+        winMsgClose(1);
+    } else {
+        menuSetEnablePort(1);
+        winMsgOpen(2, 0x3D83, 0, 1);
+        _threadSwitch();
+
+        for (i = 0; (u16)i < 6; i++) {
+            pokemonInit(heroBiosGetPokemonPtr(lbl_803F6F18, i));
+        }
+
+        heroPokemonGetCelebi(
+            lbl_803F6F18,
+            floorDataBiosGetFloorID(floorDataBiosGetCurrentPtr()));
+
+        for (i = 0; (u16)i < 6; i++) {
+            void* candidate = heroBiosGetPokemonPtr(lbl_803F6F18, i);
+            u32 valid = (u8)pokemonCheckValid(candidate);
+            if (valid != 0) {
+                pokemon = heroBiosGetPokemonPtr(lbl_803F6F18, i);
+                break;
+            }
+        }
+        if (pokemon == NULL) {
+            __assert(lbl_80268AB8, 0x42E, lbl_8047C0E8);
+        }
+
+        *(u32*)(lbl_803F6E40 + 8) |= 8;
+        fn_80093574(1);
+        fn_80092C90(1, lbl_803F6E40, pokemon);
+        fn_80093574(1);
+
+        if (fn_80093610(1) != 0xC) {
+            fn_80093698(1);
+            winMsgClose(1);
+            menuSetEnablePort(1);
+            winMsgOpen(2, 0x3D85, 1, 0);
+            winMsgClose(1);
+
+            *(MenuSaveSnapshot*)savedataGetStatus(0, 0) =
+                *(MenuSaveSnapshot*)backup;
+            fn_801D0748(4, 2, 0);
+            fn_80166A28(0x4C7);
+            fn_801CB834(resource, 4, 0, 0);
+            scriptWaitSyncMotion(resource, 1);
+            MenuWaitMotionInterval();
+            msgctrlSetValue(0x4D, (u32)name);
+            menuSetEnablePort(1);
+            winMsgOpenField(0x44B0, 1, 0);
+            winMsgClose(1);
+            menuSetEnablePort(1);
+            winMsgOpen(2, 0x44CF, 1, 0);
+            winMsgClose(1);
+        } else {
+            fn_80093698(1);
+            menuSetEnablePort(1);
+            winMsgOpen(2, 0x3D84, 1, 0);
+            winMsgClose(1);
+            fn_80165668(0x3D2, 0, 0xFF);
+            msgctrlSetValue(0x4D, (u32)name);
+            menuSetEnablePort(1);
+            winMsgOpenField(0x4435, 1, 0);
+            winMsgClose(1);
+            menuSetEnablePort(1);
+            winMsgOpen(2, 0x3D55, 1, 0);
+            winMsgClose(1);
+        }
+    }
+
+    fn_801D0314(backup);
+    lbl_8047A620 = 0;
+}
+#pragma pop
 /* fn_80078D38 (0x80078D38): reset the menu fade timer probe. */
 #pragma push
 #pragma scheduling off
@@ -1115,6 +1841,1056 @@ extern f32 lbl_8047C128;
         CLOSE_AND_ABORT();          \
     } while (0)
 
+/*
+ * Send a GBA multiboot image.  The link protocol starts by exchanging two
+ * challenge words, then sends the image in four-byte blocks.  Blocks after
+ * the 0xA0-byte header are encrypted with the rolling key used by the GBA
+ * boot ROM.  The last exchange validates the rolling CRC and releases the
+ * remote CPU.
+ */
+s32 fn_8007480C(s32 channel, s32 use_primary_image) {
+    u8 status;
+    u32 send_word;
+    u32 recv_word;
+    u32* image;
+    u32 image_size;
+    u32 challenge;
+    u32 response_key;
+    u32 padded_size;
+    u32 timeout;
+    u32 start;
+    u32 bit_count;
+    u32 value;
+    u32 i;
+    u32 offset;
+    u32 rolling_crc;
+    u32 rolling_key;
+    u32 encoded;
+    u32 expected_status;
+    u32 final_word;
+    u32 candidate;
+    u32 checksum;
+
+    if (use_primary_image != 0) {
+        image = (u32*)lbl_803B6E40;
+        image_size = lbl_8047A604;
+    } else {
+        image = (u32*)lbl_803D6E40;
+        image_size = lbl_8047A608;
+    }
+
+    i = 0;
+    do {
+        if (i > 0x20) {
+            challenge = 0xDD654321;
+        } else {
+            challenge = (OSGetTick() & 0x00FFFFFF) | 0xDD000000;
+        }
+
+        bit_count = 0;
+        value = challenge;
+        for (offset = 0; offset < 32; offset++) {
+            if ((value & 1) != 0) {
+                bit_count++;
+            }
+            value >>= 1;
+        }
+        i++;
+    } while (bit_count < 10 || bit_count > 24);
+
+    send_word = MENU_BSWAP32(challenge);
+    if (GBAWrite(channel, (u32)&send_word, (u32)&status) != 0) {
+        return 1;
+    }
+
+    timeout = OSMillisecondsToTicks(100);
+    start = OSGetTick();
+    for (;;) {
+        if (OSGetTick() - start > timeout) {
+            return 2;
+        }
+        if (GBAGetStatus(channel, (u32)&status) != 0) {
+            return 3;
+        }
+        if (status == 0x38) {
+            break;
+        }
+        if (lbl_803B6E18[channel].func != NULL) {
+            lbl_803B6E18[channel].func(channel,
+                                          lbl_803B6E18[channel].arg);
+        }
+        if (lbl_803B6E08[channel] != 0) {
+            return 0x3E8;
+        }
+    }
+
+    if (GBARead(channel, (u32)&recv_word, (u32)&status) != 0) {
+        return 4;
+    }
+    value = MENU_BSWAP32(recv_word);
+    if ((value & 0xFF) != 0xEE) {
+        OSReport((const char*)lbl_80268780 + 0x68);
+        response_key = 0;
+    } else {
+        response_key = value & 0xFFFFFF00;
+        bit_count = 0;
+        for (i = 0; i < 24; i++) {
+            if ((value & 0x80000000) != 0) {
+                bit_count++;
+            }
+            value <<= 1;
+        }
+        if (bit_count < 7 || bit_count > 14) {
+            OSReport((const char*)lbl_80268780 + 0x98, response_key);
+            response_key = 0;
+        }
+    }
+    if (response_key == 0) {
+        return 5;
+    }
+
+    padded_size = (image_size + 7) & ~7;
+    send_word = MENU_BSWAP32((padded_size >> 3) - 1);
+    if (GBAWrite(channel, (u32)&send_word, (u32)&status) != 0) {
+        return 6;
+    }
+
+    timeout = OSMillisecondsToTicks(100);
+    start = OSGetTick();
+    for (;;) {
+        if (OSGetTick() - start > timeout) {
+            return 7;
+        }
+        if (GBAGetStatus(channel, (u32)&status) != 0) {
+            return 8;
+        }
+        if ((status & 0x30) != 0x30) {
+            return 9;
+        }
+        if ((status & 2) == 0) {
+            break;
+        }
+        if (lbl_803B6E18[channel].func != NULL) {
+            lbl_803B6E18[channel].func(channel,
+                                          lbl_803B6E18[channel].arg);
+        }
+        if (lbl_803B6E08[channel] != 0) {
+            return 0x3E8;
+        }
+    }
+
+    rolling_crc = challenge ^ response_key;
+    rolling_key = rolling_crc * 0x6177614B + 1;
+    expected_status = 0x30;
+
+    for (offset = 0; offset < padded_size; offset += 4, image++) {
+        value = MENU_BSWAP32(*image);
+        encoded = value;
+        if (offset >= 0xA0) {
+            encoded = (value - rolling_crc) ^ rolling_key;
+            rolling_crc ^= value;
+            for (i = 0; i < 32; i++) {
+                if ((rolling_crc & 1) != 0) {
+                    rolling_crc = (rolling_crc >> 1) ^ 0xA1C1;
+                } else {
+                    rolling_crc >>= 1;
+                }
+            }
+            rolling_key = rolling_key * 0x6177614B + 1;
+        }
+
+        send_word = MENU_BSWAP32(encoded);
+        if (GBAWrite(channel, (u32)&send_word, (u32)&status) != 0) {
+            return 0xA;
+        }
+        if ((status & 0x30) != expected_status) {
+            return 0x12;
+        }
+        expected_status ^= 0x10;
+
+        timeout = OSMillisecondsToTicks(100);
+        start = OSGetTick();
+        for (;;) {
+            if (OSGetTick() - start > timeout) {
+                return 0xB;
+            }
+            if (GBAGetStatus(channel, (u32)&status) != 0) {
+                return 0xC;
+            }
+            if ((status & 0x20) == 0) {
+                return 0xD;
+            }
+            if ((status & 2) == 0) {
+                break;
+            }
+            if (lbl_803B6E18[channel].func != NULL) {
+                lbl_803B6E18[channel].func(channel,
+                                              lbl_803B6E18[channel].arg);
+            }
+            if (lbl_803B6E08[channel] != 0) {
+                return 0x3E8;
+            }
+        }
+        if (lbl_803B6E08[channel] != 0) {
+            return 0x3E8;
+        }
+    }
+
+    timeout = OS_TIMER_CLOCK * 10;
+    start = OSGetTick();
+    for (;;) {
+        if (OSGetTick() - start > timeout) {
+            return 0xE;
+        }
+        if (GBAGetStatus(channel, (u32)&status) != 0) {
+            return 0xF;
+        }
+        if ((status & 0x30) != 0x30) {
+            return 0x10;
+        }
+        if ((status & 0xA) == 8) {
+            if (GBARead(channel, (u32)&recv_word, (u32)&status) != 0) {
+                return 0x11;
+            }
+
+            value = recv_word >> 24;
+            if (value == 0xFF) {
+                final_word = MENU_BSWAP32(recv_word);
+                OSReport((const char*)lbl_80268780 + 0xCC, final_word,
+                         rolling_crc);
+                checksum = final_word >> 8;
+                candidate = 0xFFFFFFFF;
+                for (offset = 0; offset < 0x100; offset++) {
+                    value = candidate ^ rolling_crc;
+                    for (i = 0; i < 32; i++) {
+                        if ((value & 1) != 0) {
+                            value = (value >> 1) ^ 0xA1C1;
+                        } else {
+                            value >>= 1;
+                        }
+                    }
+                    if (checksum == value) {
+                        value = candidate ^ 0xBB;
+                        for (i = 0; i < 32; i++) {
+                            if ((value & 1) != 0) {
+                                value = (value >> 1) ^ 0xA1C1;
+                            } else {
+                                value >>= 1;
+                            }
+                        }
+                        final_word = value | 0xBB000000;
+                        OSReport((const char*)lbl_80268780 + 0x100,
+                                 candidate, final_word);
+                        break;
+                    }
+                    candidate += 0x01000000;
+                }
+                if (offset >= 0x100) {
+                    OSReport((const char*)lbl_80268780 + 0x130, final_word,
+                             rolling_crc);
+                    final_word = 0;
+                }
+                if (final_word == 0) {
+                    return 0x12;
+                }
+                send_word = MENU_BSWAP32(final_word);
+                if (GBAWrite(channel, (u32)&send_word, (u32)&status) != 0) {
+                    return 0x13;
+                }
+                break;
+            }
+            if (value != 0xCC) {
+                return 0x14;
+            }
+            if (lbl_803B6E08[channel] != 0) {
+                return 0x3E8;
+            }
+        } else {
+            if (lbl_803B6E18[channel].func != NULL) {
+                lbl_803B6E18[channel].func(channel,
+                                              lbl_803B6E18[channel].arg);
+            }
+            if (lbl_803B6E08[channel] != 0) {
+                return 0x3E8;
+            }
+        }
+    }
+
+    timeout = OS_TIMER_CLOCK;
+    start = OSGetTick();
+    do {
+        if (OSGetTick() - start > timeout) {
+            return 0x15;
+        }
+        if (fn_800D0F44(channel) != 0x40000) {
+            return 0;
+        }
+        if (lbl_803B6E18[channel].func != NULL) {
+            lbl_803B6E18[channel].func(channel,
+                                          lbl_803B6E18[channel].arg);
+        }
+        if (lbl_803B6E08[channel] != 0) {
+            return 0x3E8;
+        }
+    } while (1);
+}
+
+
+u32 fn_8007B6D8(GbaBootContext* context) {
+    u8 gba_status;
+    u8 crc_byte;
+    u32 send_word;
+    u32 recv_word;
+    u32 channel;
+    u32 transfer_size;
+    u32 handshake;
+    u32 offset;
+    u32 retries;
+    u32 interrupts;
+    u32 reply_crc;
+    u32 candidate;
+    u32 decrypt_word;
+    u32 expected_crc;
+    u32 i;
+
+    channel = context->channel;
+    context->state = 0;
+
+    if (GBAReset(channel, (u32)&gba_status) != 0) {
+        return 0;
+    }
+    if (GBAGetStatus(channel, (u32)&gba_status) == 0 &&
+        gba_status == 0x28) {
+        if (GBARead(channel, (u32)&recv_word, (u32)&gba_status) != 0) {
+            return 0;
+        }
+        GBA_BOOT_CLASSIFY(context, recv_word, gba_status, handshake);
+        if (handshake != 1) {
+            return 0;
+        }
+        if (context->reject_upload != 0) {
+            return 3;
+        }
+        if (GBAGetStatus(channel, (u32)&gba_status) != 0 ||
+            gba_status != 0x20) {
+            return 0;
+        }
+        if (GBAWrite(channel, (u32)&context->game_code,
+                     (u32)&gba_status) != 0) {
+            return 0;
+        }
+        if (GBAGetStatus(channel, (u32)&gba_status) != 0 ||
+            gba_status != 0x30) {
+            return 0;
+        }
+
+        transfer_size = context->upload_end - context->upload_start;
+        send_word = GBA_BOOT_BSWAP(transfer_size);
+        if (GBAWrite(channel, (u32)&send_word, (u32)&gba_status) != 0) {
+            return 0;
+        }
+        if (GBARead(channel, (u32)&recv_word, (u32)&gba_status) != 0 ||
+            send_word != recv_word) {
+            return 0;
+        }
+
+        context->state = 1;
+        for (offset = 0; offset < transfer_size; offset += 4) {
+            retries = 0;
+            for (;;) {
+                if (context->cancel != 0) {
+                    GBA_BOOT_FAIL(context, 9);
+                }
+                if (GBAGetStatus(channel, (u32)&gba_status) != 0) {
+                    GBA_BOOT_FAIL(context, 9);
+                }
+                if ((gba_status & 0x30) != 0x30) {
+                    if ((gba_status & 8) != 0) {
+                        GBARead(channel, (u32)&recv_word,
+                                (u32)&gba_status);
+                    }
+                    GBA_BOOT_FAIL(context, 9);
+                }
+                if ((gba_status & 2) == 0) {
+                    break;
+                }
+                if (++retries > 9) {
+                    GBA_BOOT_FAIL(context, 9);
+                }
+                GBA_BOOT_DELAY(context, fn_8007C23C, interrupts);
+            }
+            send_word = *(u32*)(context->upload_start + offset);
+            if (GBAWrite(channel, (u32)&send_word, (u32)&gba_status) != 0) {
+                GBA_BOOT_FAIL(context, 9);
+            }
+        }
+
+        context->state = 2;
+        for (;;) {
+            if (context->cancel != 0) {
+                GBA_BOOT_FAIL(context, 9);
+            }
+            if (GBAGetStatus(channel, (u32)&gba_status) != 0 ||
+                (gba_status & 8) != 0) {
+                break;
+            }
+            GBA_BOOT_DELAY(context, fn_8007C23C, interrupts);
+        }
+        if (GBAReset(channel, (u32)&gba_status) != 0) {
+            GBA_BOOT_FAIL(context, 9);
+        }
+        if (GBAGetStatus(channel, (u32)&gba_status) != 0 ||
+            gba_status != 8) {
+            GBA_BOOT_FAIL(context, 9);
+        }
+        if (GBARead(channel, (u32)&recv_word, (u32)&gba_status) != 0) {
+            GBA_BOOT_FAIL(context, 9);
+        }
+        GBA_BOOT_CLASSIFY(context, recv_word, gba_status, handshake);
+        if (handshake != 2) {
+            GBA_BOOT_FAIL(context, 9);
+        }
+        if (GBAWrite(channel, (u32)&context->device_code,
+                     (u32)&gba_status) != 0) {
+            GBA_BOOT_FAIL(context, 9);
+        }
+        context->state = 3;
+        return 1;
+    }
+
+    if (GBAGetStatus(channel, (u32)&gba_status) != 0 || gba_status != 8) {
+        return 0;
+    }
+    if (GBARead(channel, (u32)&recv_word, (u32)&gba_status) != 0) {
+        return 0;
+    }
+    GBA_BOOT_CLASSIFY(context, recv_word, gba_status, handshake);
+    if (handshake != 2) {
+        return 0;
+    }
+
+    if (context->status_only != 0) {
+        send_word = context->device_code;
+    } else {
+        context->state = 4;
+        send_word = context->device_code | 0x20202020;
+    }
+    if (GBAGetStatus(channel, (u32)&gba_status) != 0 || gba_status != 0) {
+        GBA_BOOT_FAIL(context, 9);
+    }
+    if (GBAWrite(channel, (u32)&send_word, (u32)&gba_status) != 0) {
+        GBA_BOOT_FAIL(context, 9);
+    }
+
+    if (context->status_only != 0) {
+        context->state = 0;
+        if ((context->boot_type & 1) != 0) {
+            return 4;
+        }
+        return 2;
+    }
+
+    for (;;) {
+        if (context->cancel != 0) {
+            GBA_BOOT_FAIL(context, 6);
+        }
+        if (GBAGetStatus(channel, (u32)&gba_status) != 0) {
+            break;
+        }
+        if ((gba_status & 0x30) == 0x30 ||
+            (gba_status & 0x30) == 0) {
+            break;
+        }
+
+        if ((gba_status & 0x32) == 0x20) {
+            context->challenge = OSGetTick();
+            send_word = context->challenge;
+            if (GBAWrite(channel, (u32)&send_word, (u32)&gba_status) != 0 ||
+                (gba_status & 0x30) != 0x20) {
+                GBA_BOOT_FAIL(context, 9);
+            }
+
+            for (offset = 0; offset < 0x1040; offset += 4) {
+                retries = 0;
+                for (;;) {
+                    if (GBAGetStatus(channel, (u32)&gba_status) != 0) {
+                        GBA_BOOT_FAIL(context, 9);
+                    }
+                    if ((gba_status & 0x30) != 0x20) {
+                        GBA_BOOT_FAIL(context, 9);
+                    }
+                    if ((gba_status & 0xA) == 8) {
+                        break;
+                    }
+                    if (++retries > 9) {
+                        GBA_BOOT_FAIL(context, 9);
+                    }
+                    GBA_BOOT_DELAY(context, fn_8007C23C, interrupts);
+                }
+                if (GBARead(channel, (u32)&recv_word,
+                            (u32)&gba_status) != 0) {
+                    GBA_BOOT_FAIL(context, 9);
+                }
+                context->reply[offset >> 2] =
+                    recv_word ^ context->challenge;
+            }
+
+            expected_crc = GBA_BOOT_BSWAP(context->reply[0x40F]);
+            for (candidate = 0; candidate < 0x100; candidate++) {
+                reply_crc = context->crc;
+                crc_byte = candidate;
+                reply_crc = (reply_crc >> 8) ^
+                            lbl_803FAEF8[(reply_crc ^ crc_byte) & 0xFF];
+                if (reply_crc == expected_crc) {
+                    break;
+                }
+            }
+            if (candidate == 0x100) {
+                GBA_BOOT_FAIL(context, 7);
+            }
+
+            decrypt_word = 0xAA478422;
+            crc_byte = candidate;
+            decrypt_word = (decrypt_word >> 8) ^
+                           lbl_803FAEF8[(decrypt_word ^ crc_byte) & 0xFF];
+            decrypt_word = GBA_BOOT_BSWAP(decrypt_word);
+            for (i = 0; i < 0x40F; i++) {
+                context->reply[i] ^= decrypt_word;
+            }
+
+            expected_crc = GBA_BOOT_BSWAP(context->reply[0x40E]);
+            reply_crc = context->crc;
+            for (i = 0; i < 0x1038; i++) {
+                reply_crc = (reply_crc >> 8) ^
+                            lbl_803FAEF8[(reply_crc ^
+                                         ((u8*)context->reply)[i]) &
+                                        0xFF];
+            }
+            if (reply_crc != expected_crc) {
+                GBA_BOOT_FAIL(context, 7);
+            }
+            GBA_BOOT_FAIL(context, 5);
+        }
+
+        GBA_BOOT_DELAY(context, fn_8007C23C, interrupts);
+    }
+
+    if (GBAGetStatus(channel, (u32)&gba_status) != 0) {
+        GBA_BOOT_FAIL(context, 9);
+    }
+    if ((gba_status & 0x30) == 0) {
+        GBA_BOOT_FAIL(context, 6);
+    }
+    if ((gba_status & 0x30) == 0x30) {
+        if ((gba_status & 8) != 0) {
+            GBA_BOOT_FAIL(context, 7);
+        }
+        GBA_BOOT_FAIL(context, 8);
+    }
+    GBA_BOOT_FAIL(context, 9);
+}
+
+
+#pragma push
+#pragma peephole off
+void fn_80078390(void)
+{
+    void* name;
+    u8 sex;
+    s8 answer;
+    u32 resource = 0x104F1000;
+
+    sex = heroBiosGetSexDataId(lbl_803F6F18);
+    name = heroBiosGetNamePtr(lbl_803F6F18);
+
+    if ((*(u32*)(lbl_803F6E40 + 8) & 8) != 0) {
+        MenuOpenHeroField(name, 0x43CB, 0x43CD, sex);
+        menuSetEnablePort(1);
+        winMsgOpen(2, 0x44CF, 1, 0);
+        winMsgClose(1);
+        lbl_8047A620 = 0;
+        return;
+    }
+
+    MenuOpenHeroField(name, 0x43C7, 0x43C9, sex);
+    fadeSet(3, lbl_8047C100);
+    fadeCheck(1);
+    fn_801CB834(resource, 2, 0, 0);
+    fn_80166A28(0x4C7);
+    fadeSet(2, lbl_8047C100);
+    fadeCheck(1);
+    scriptWaitSyncMotion(resource, 1);
+    fn_801CB834(resource, 3, 0, 1);
+    msgctrlSetValue(0x4D, (u32)name);
+    menuSetEnablePort(1);
+    winMsgOpenField(0x4434, 1, 0);
+    winMsgClose(1);
+
+    if (*(u16*)(lbl_803F6E40 + 0x0C) == 6) {
+        menuSetEnablePort(1);
+        winMsgOpenField(0x43A6, 1, 0);
+        fn_80166A28(0x4C7);
+        fn_801CB834(resource, 4, 0, 0);
+        scriptWaitSyncMotion(resource, 1);
+        MenuWaitMotionInterval();
+        msgctrlSetValue(0x4D, (u32)name);
+        menuSetEnablePort(1);
+        winMsgOpenField(0x44B0, 1, 0);
+        menuSetEnablePort(1);
+        winMsgOpen(2, 0x44CF, 1, 0);
+        winMsgClose(1);
+        lbl_8047A620 = 0;
+        return;
+    }
+
+    fn_80166A28(0x4C7);
+    fn_801CB834(resource, 5, 0, 0);
+    scriptWaitSyncMotion(resource, 1);
+    MenuWaitMotionInterval();
+    msgctrlSetValue(0x4D, (u32)name);
+    menuSetEnablePort(1);
+    winMsgOpen(2, 0x43B0, 1, 0);
+    menuSetEnablePort(1);
+    answer = menuSubOpenYesNo(0, -1, -1, 0);
+    winMsgClose(1);
+
+    switch (answer) {
+    case -1:
+    case 1:
+        fn_80166A28(0x4C7);
+        fn_801CB834(resource, 4, 0, 0);
+        scriptWaitSyncMotion(resource, 1);
+        MenuWaitMotionInterval();
+        menuSetEnablePort(1);
+        winMsgOpenField(0x44B0, 1, 0);
+        winMsgClose(1);
+        menuSetEnablePort(1);
+        winMsgOpen(2, 0x44CF, 1, 0);
+        winMsgClose(1);
+        lbl_8047A620 = 0;
+        break;
+    case 0:
+    default:
+        lbl_8047A620 = 0x0B;
+        break;
+    }
+}
+#pragma pop
+
+
+#pragma push
+#pragma peephole off
+void fn_800788BC(void* backup)
+{
+    typedef struct MenuSaveSnapshot {
+        u8 bytes[0x1DFD0];
+    } MenuSaveSnapshot;
+    extern void* savedataGetStatus(u32, u32);
+    extern s32 fn_80075BFC(void);
+    extern void* floorDataBiosGetCurrentPtr(void);
+    extern u32 floorDataBiosGetFloorID(void*);
+    extern void heroPokemonGetCelebi(void*, u32);
+    extern s32 fn_801D0748(u32, u32, u32);
+    extern void fn_80165668(u32, u32, u32);
+
+    MenuSaveSnapshot* savedataBackup = backup;
+    void* hero;
+    u32 resource = 0x104F1000;
+
+    winMsgOpenField(0x43A1, 1, 0);
+    winMsgClose(1);
+    winMsgOpenField(0x43A2, 1, 0);
+    winMsgClose(1);
+
+    fadeSet(3, lbl_8047C100);
+    fadeCheck(1);
+    fn_801CB834(resource, 2, 0, 0);
+    fn_80166A28(0x4C7);
+    fadeSet(2, lbl_8047C100);
+    fadeCheck(1);
+    scriptWaitSyncMotion(resource, 1);
+    fn_801CB834(resource, 3, 0, 1);
+
+    winMsgOpenField(0x43A3, 1, 0);
+    winMsgClose(1);
+    winMsgOpenField(0x43A4, 1, 0);
+    winMsgClose(1);
+
+    hero = savedataGetStatus(0, 2);
+    if (MenuHeroHasFreePartySlot(hero) == 0) {
+        winMsgOpenField(0x43A6, 1, 0);
+        fn_80166A28(0x4C7);
+        fn_801CB834(resource, 4, 0, 0);
+        scriptWaitSyncMotion(resource, 1);
+        MenuWaitMotionInterval();
+        winMsgOpenField(0x43AC, 1, 0);
+        winMsgClose(1);
+        lbl_8047A620 = 0;
+        return;
+    }
+
+    fn_80166A28(0x4C7);
+    fn_801CB834(resource, 5, 0, 0);
+    scriptWaitSyncMotion(resource, 1);
+    MenuWaitMotionInterval();
+
+    *savedataBackup =
+        *(MenuSaveSnapshot*)savedataGetStatus(0, 0);
+    fn_80075BFC();
+    heroPokemonGetCelebi(
+        hero, floorDataBiosGetFloorID(floorDataBiosGetCurrentPtr()));
+
+    if ((s8)fn_801D0748(4, 2, 0) != 4) {
+        fn_80166A28(0x4C7);
+        fn_801CB834(resource, 4, 0, 0);
+        scriptWaitSyncMotion(resource, 1);
+        MenuWaitMotionInterval();
+        *(MenuSaveSnapshot*)savedataGetStatus(0, 0) =
+            *savedataBackup;
+        winMsgOpenField(0x43AC, 1, 0);
+        lbl_8047A620 = 0;
+        return;
+    }
+
+    fn_80165668(0x3D2, 0, 0xFF);
+    winMsgOpenField(0x43A8, 1, 0);
+    winMsgClose(1);
+    winMsgOpenField(0x43AA, 1, 0);
+    winMsgClose(1);
+    lbl_8047A620 = 0;
+}
+#pragma pop
+
+
+/* Drive the e-Reader/ex-disc scene state machine to completion. */
+#pragma push
+#pragma peephole off
+void fn_80078D5C(void)
+{
+    extern void* fn_801D036C();
+    extern void fn_801D0314();
+    extern void* fn_80113F48();
+    extern void cameraPlayAnime();
+    extern u8 fn_80075C44();
+    extern u8 fn_80075C20();
+    extern u8 fn_801EE398();
+    extern u32 fn_80075BC4();
+    extern void winMsgOpenField();
+    extern void winMsgClose();
+    extern void fn_80166A28();
+    extern void msgctrlSetValue();
+    extern s8 fn_8001E184();
+    extern void fn_800788BC();
+    extern void fn_80077ED4();
+    extern void* GSresGetResource();
+    extern void GSmodelSetVisibility();
+    extern u32 fn_801CBA0C();
+    extern void GSscene_SetMode();
+    extern s32 fn_800849B4();
+    extern void fn_801CB9D8();
+    extern u8 lbl_80268AA8[];
+    extern u8 lbl_803F6E40[];
+    extern u8 lbl_803F6F18[];
+    extern const f32 lbl_8047C104;
+
+    void* context;
+    void* model;
+    u32 scene;
+    s8 answer;
+    f32 elapsed;
+    MenuExDiscLoadData loadData;
+
+    context = fn_801D036C();
+    while ((s32)lbl_8047A620 > 0) {
+        switch (lbl_8047A620) {
+        case 1:
+            cameraPlayAnime(fn_80113F48(), 0x10951800, 0, 0);
+            fn_801CB834(0x104F1000, 6, 0, 1);
+            if (fn_80075C44() == 1) {
+                lbl_8047A620 = 2;
+            } else {
+                lbl_8047A620 = 3;
+            }
+            break;
+
+        case 2:
+            fadeSet(3, lbl_8047C100);
+            fadeCheck(1);
+            fn_801CB834(0x104F1000, 0, 0, 1);
+            fadeSet(2, lbl_8047C100);
+            fadeCheck(1);
+            fadeCheck(1);
+            winMsgOpenField(0x43C3, 1, 0);
+            winMsgClose(1);
+            if (fn_80075C20() == 1) {
+                lbl_8047A620 = 5;
+            } else {
+                lbl_8047A620 = 4;
+            }
+            break;
+
+        case 3:
+            fadeSet(3, lbl_8047C100);
+            fadeCheck(1);
+            fn_801CB834(0x104F1000, 1, 0, 1);
+            fadeSet(2, lbl_8047C100);
+            fadeCheck(1);
+            fadeCheck(1);
+            winMsgOpenField(0x43C0, 1, 0);
+            fn_80166A28(0x3F9);
+            elapsed = lbl_8047C0E0;
+            while (elapsed < lbl_8047C0E4) {
+                _threadSwitch();
+                elapsed += (f32)fn_800D3088() / (f32)fn_800D37CC();
+            }
+            lbl_8047A620 = 0;
+            break;
+
+        case 4:
+            if (fn_801EE398() == 1) {
+                lbl_8047A620 = 7;
+            } else {
+                lbl_8047A620 = 6;
+            }
+            break;
+
+        case 5:
+            winMsgOpenField(0x43AF, 1, 0);
+            winMsgClose(1);
+            scene = fn_80075BC4();
+            if (scene < 1) {
+                winMsgOpenField(0x43B2, 1, 0);
+                winMsgClose(1);
+                lbl_8047A620 = 0;
+                break;
+            }
+            msgctrlSetValue(0x2F, scene);
+            winMsgOpenField(0x43BB, 1, 0);
+            answer = fn_8001E184();
+            winMsgClose(1);
+            switch (answer) {
+            case -1:
+            case 1:
+                winMsgOpenField(0x43C1, 1, 0);
+                lbl_8047A620 = 0;
+                break;
+            case 0:
+            default:
+                winMsgOpenField(0x43C4, 1, 0);
+                winMsgClose(1);
+                lbl_8047A620 = 8;
+                break;
+            }
+            break;
+
+        case 6:
+            winMsgOpenField(0x43C6, 1, 0);
+            winMsgClose(1);
+            lbl_8047A620 = 0;
+            break;
+
+        case 7:
+            fn_800788BC(context);
+            break;
+
+        case 8:
+            loadData = *(MenuExDiscLoadData*)lbl_80268AA8;
+            context = fn_80113F48();
+            fadeSet(3, lbl_8047C104);
+            fadeCheck(1);
+            model = GSresGetResource(context, 0x104F1000);
+            if (model != 0) {
+                GSmodelSetVisibility(model, 0);
+            }
+            scene = fn_801CBA0C(0x0FFE1000);
+            GSresGetResource(context, scene);
+            cameraPlayAnime(0x5D5, 0x0FFF1800, 0, 1);
+            GSscene_SetMode(4);
+            fadeSet(2, lbl_8047C104);
+            fadeCheck(1);
+            loadData.words[1] = (u32)lbl_803F6F18;
+            if (fn_800849B4(0, 0x20, &loadData, lbl_803F6E40) < 0) {
+                lbl_8047A620 = 0;
+                break;
+            }
+            fadeSet(3, lbl_8047C104);
+            fadeCheck(1);
+            fn_801CB9D8(scene);
+            if (model != 0) {
+                GSmodelSetVisibility(model, 1);
+                cameraPlayAnime(context, 0x10951800, 0, 0);
+            }
+            fadeSet(2, lbl_8047C104);
+            fadeCheck(1);
+            lbl_8047A620 = 10;
+            break;
+
+        case 10:
+            fn_80078390();
+            break;
+
+        case 11:
+            fn_80077ED4();
+            break;
+
+        default:
+            break;
+        }
+    }
+
+    fn_801D0314(context);
+    floorLink(0x321, 0);
+}
+#pragma pop
+
+
+#pragma push
+#pragma peephole off
+void fn_800792D8(void) {
+    u32 command[4];
+    ExDiscCouponResult result;
+    u8 hero[0xB20];
+    void* sceneHandle;
+    void* giftPokemon;
+    u32 flags;
+    u32 maskGift;
+    u32 maskParty;
+    u32 maskItem;
+    u32 canBag;
+    u32 canParty;
+    u16 i;
+    s8 choice;
+
+    command[0] = lbl_80268AD0[0];
+    command[1] = lbl_80268AD0[1];
+    command[2] = lbl_80268AD0[2];
+    command[3] = lbl_80268AD0[3];
+    giftPokemon = 0;
+
+    fadeSet(3, lbl_8047C108);
+    fadeCheck(1);
+    menuClose(0xe1);
+    SET_EXDISC_VISIBILITY(0x104E1000, 0);
+    SET_EXDISC_VISIBILITY(0x104E1001, 0);
+    SET_EXDISC_VISIBILITY(0x104E1002, 0);
+
+    sceneHandle = fn_801CBA0C(0x0FFE1000);
+    GSresGetResource(fn_80113F48(), (u32)sceneHandle);
+    cameraPlayAnime(0x5d4, 0x0FFF1800, 0, 1);
+    GSscene_SetMode(4);
+    fadeSet(2, lbl_8047C108);
+    fadeCheck(1);
+
+    command[1] = (u32)hero;
+    if (fn_800849B4(0, 0, command, &result) < 0) {
+        lbl_8047A638 = 1;
+        RESTORE_EXDISC_SCENE(sceneHandle);
+        return;
+    }
+
+    RESTORE_EXDISC_SCENE(sceneHandle);
+
+    flags = result.optionFlags;
+    maskGift = flags & 4;
+    maskParty = flags & 2;
+    maskItem = flags & 1;
+    lbl_8047A62C = result.flagsA62C;
+    lbl_8047A628 = result.couponValue;
+    lbl_8047A635 = maskGift != 0;
+    lbl_8047A634 = maskParty != 0;
+    lbl_8047A633 = maskItem != 0;
+
+    if (fn_80079EF4(0, result.couponValue) == 0) {
+        return;
+    }
+
+    canBag = 1;
+    if (lbl_8047A632 != 0) {
+        if (fn_80029850(result.bag, result.itemId, 0x47, 0x3e7) < 1) {
+            canBag = 0;
+        } else {
+            fn_800298DC(result.bag, result.itemId, 0x47, 1, -1, 0x3e7);
+            result.optionFlags |= 4;
+        }
+    }
+
+    if (lbl_8047A630 != 0 && fn_80029850(result.bag, result.itemId, 1, 0x3e7) < 1) {
+        canBag = 0;
+    }
+
+    canParty = 1;
+    if (lbl_8047A631 != 0) {
+        canParty = result.partyCount < 6;
+    }
+
+    if (fn_80079C1C(0, canBag, canParty, heroGetStatus(hero, 1, 0)) == 0) {
+        return;
+    }
+
+    winMsgOpen(2, 0x3d3b, 0, 1);
+
+    if (lbl_8047A631 != 0) {
+        for (i = 0; i < 6; i++) {
+            pokemonInit(heroBiosGetPokemonPtr(hero, i));
+        }
+
+        heroPokemonGetPikachu(hero, floorDataBiosGetFloorID(floorDataBiosGetCurrentPtr()));
+
+        for (i = 0; i < 6; i++) {
+            void* pokemon = heroBiosGetPokemonPtr(hero, i);
+            if (pokemonCheckValid(pokemon) != 0) {
+                giftPokemon = pokemon;
+                break;
+            }
+        }
+
+        if (giftPokemon == 0) {
+            __assert((const char*)lbl_80268AE0, 0x460,
+                     (const char*)&lbl_8047C10C);
+        }
+        result.optionFlags |= 2;
+    }
+
+    if (lbl_8047A630 != 0) {
+        fn_800298DC(result.bag, result.itemId, 1, 1, -1, 0x3e7);
+        result.optionFlags |= 1;
+    }
+
+    fn_80093574(1);
+    fn_80092C90(1, &result, giftPokemon);
+    fn_80093574(1);
+    if (fn_80093610(1) != 0xc) {
+        fn_80093698(1);
+        winMsgOpen(2, 0x3d85, 1, 0);
+        winMsgClose(1);
+        winMsgOpen(2, 0x44cf, 1, 0);
+        winMsgClose(1);
+        menuClose(0xef);
+        lbl_8047A638 = 1;
+        return;
+    }
+
+    fn_80093698(1);
+    winMsgClose(1);
+    winMsgOpenField(0x43c5, 1, 0);
+    choice = (s8)fn_8001E184();
+    if (choice != 0 && choice >= -1 && choice < 2) {
+        winMsgOpenField(0x43ca, 1, 0);
+        winMsgClose(1);
+        menuClose(0xef);
+        lbl_8047A638 = 0;
+    } else {
+        winMsgOpen(2, 0x44cf, 1, 0);
+        winMsgClose(1);
+        menuClose(0xef);
+        lbl_8047A638 = 1;
+    }
+}
+#pragma pop
+
+
+#pragma push
+#pragma peephole off
 u8 fn_80079EF4(s32 arg0, u32 value) {
     s32 rank;
     s8 choice;
@@ -1196,6 +2972,114 @@ u8 fn_80079EF4(s32 arg0, u32 value) {
 
     SHOW_CANCEL_MESSAGE();
     CLOSE_AND_ABORT();
+}
+#pragma pop
+
+
+s32 fn_8007AB10(u32 code, u32* state) {
+    u32 event;
+    u32 done;
+
+    if (code == 0) {
+        return 0;
+    }
+
+    if (state[0] == 0) {
+        if (fn_800D0F44(1) != 0x40000) {
+            return fn_8007AB10_initial_result(code);
+        }
+        state[0] = 1;
+        OPEN_LINK_PROMPT(3);
+    }
+
+    if (lbl_803F7A30[0x345] != 0) {
+        fn_800A1E54(lbl_803F7A30 + 0x28, &event);
+        lbl_803F7A30[0x345] = 0;
+
+        if (fn_800D0F44(1) != 0x40000) {
+            event = 10;
+        } else if (event == 0) {
+            event = 0;
+        }
+
+        switch (event) {
+        case 0:
+            OPEN_LINK_PROMPT(3);
+            return fn_8007AB10_initial_result(code);
+        case 1:
+            OPEN_LINK_PROMPT(3);
+            if (code == 15) {
+                return 16;
+            }
+            return 0;
+        case 2:
+            if (code == 18) {
+                OPEN_LINK_PROMPT(2);
+                return 0;
+            }
+            OPEN_LINK_PROMPT(3);
+            return fn_8007AB10_event2_result(code);
+        case 3:
+            if (code == 3 || code == 10 || code == 12 || code == 14) {
+                OPEN_LINK_PROMPT(1);
+                if (code == 14) {
+                    return 0;
+                }
+                return 14;
+            }
+            OPEN_LINK_PROMPT(3);
+            if (code == 1) {
+                return 2;
+            }
+            if (code == 6) {
+                return 7;
+            }
+            if (code == 8) {
+                return 4;
+            }
+            return 0;
+        case 4:
+            done = (code == 1 || code == 3 || code == 6 || code == 8 || code == 10 ||
+                    code == 12 || code == 14 || code == 15 || code == 17 || code == 18);
+            OPEN_LINK_PROMPT(done != 0 ? 0 : 3);
+            return 0;
+        case 5:
+            OPEN_LINK_PROMPT(3);
+            return 20;
+        case 6:
+            OPEN_LINK_PROMPT(3);
+            if (code != 21) {
+                return 21;
+            }
+            return 0;
+        case 7:
+            OPEN_LINK_PROMPT(3);
+            if (code != 22) {
+                return 22;
+            }
+            return 0;
+        case 8:
+            OPEN_LINK_PROMPT(3);
+            if (code != 23) {
+                return 23;
+            }
+            return 0;
+        case 9:
+        case 10:
+            state[0] = 0;
+            if ((code - 14) <= 1 || code == 17 || code == 18) {
+                return 19;
+            }
+            return 0;
+        default:
+            return 0;
+        }
+    }
+
+    if (lbl_803F7A30[0x346] == 2 && code == 14) {
+        return 15;
+    }
+    return 0;
 }
 
 #undef SHOW_BLOCKING_MESSAGE

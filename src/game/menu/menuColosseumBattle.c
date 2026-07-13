@@ -90,6 +90,15 @@ typedef union ColosseumBitMasks {
     u8 bytes[4];
 } ColosseumBitMasks;
 
+typedef struct ColosseumUnownMenuIds {
+    u32 normal;
+    u32 shiny;
+} ColosseumUnownMenuIds;
+
+typedef struct ColosseumPokemonBlob {
+    u8 bytes[0x138];
+} ColosseumPokemonBlob;
+
 /* ===== External function declarations (menuColosseumBattleMain only) ===== */
 extern void fn_800347B8(void);
 extern void fn_800347C4(void);
@@ -104,6 +113,7 @@ extern u8 fn_8006B8E8(void);
 extern u32 fn_800E202C(void*);
 extern void fn_800E209C(u32);
 extern void fn_800E24B0(u32);
+extern void* fn_800E27B0(u32);
 extern void fn_800F96E4(void*, s32, void*);
 extern void fn_8002D91C();
 extern void fn_80062948(void);
@@ -193,10 +203,63 @@ extern void menuButtonNormal(void*);
 extern void winSpriteSetDisp(void*, u32);
 extern void fadeCheck(s32);
 extern void toolentryTaisenFreePokemonData(void);
+extern void scriptStoreTemochiPokemon(s32);
+extern u8 scriptCheckTemochiPokemon(s32);
+extern void* getPokemon__5PCBOXFScSc(void*, s8, s8);
+extern s8 pcboxGetNbPokemonBox(void);
+extern s8 fn_801347D8(void);
+extern void* heroGetStatus(void*, s32, u16);
+extern u16 pokemonBiosGetPokemonDataId(void*);
+extern u32 pokemonGetStatus(void*, u32, u32, u32);
+extern u8 pokemonGetAnnonKatati(u32);
+extern u32 _toolentryAlloc__FUl(u32);
+extern u32 fn_800FF560(void);
+extern u32 GSthreadCreate(u32, u32, u32, u32, u32, void*);
+extern void fn_80057E70(void);
+extern void fn_8017B3E4(s32);
+extern s32 fn_8017B2CC(s32);
+extern void fn_8017B1CC(s32);
+extern void fn_800F915C(s32);
+extern void fn_80055B98(s32);
+extern void fn_80190528(s32);
+extern s32 fn_800576B4(void);
+extern void* fn_800574E0(void);
+extern void fn_800576C4(s32);
+extern void fn_80057458(void*);
+extern s32 fn_80054B1C(s32, s32);
+extern void fn_80055DE0(void);
+extern s32 fn_80055E10(void);
+extern s8 pcboxGetPokemonBoxNbEmptySlot(s32, s8);
+extern void pcboxAddPokemon(s32, void*, s8);
+extern void pokemonInit(void*);
+extern void fadeSet(s32, f32);
+extern s32 fn_80056A78(void);
+extern void fn_80056A80(void);
+extern s32 fn_80057C9C(void*, void*, s32*);
+extern void fn_80056B74(s32, s32);
+extern void fn_80054760(s32, s32);
+extern void fn_80057A38(void);
+extern void fn_80057A64(void*, s32);
+extern void* menuItemBiosGetPtr(s32);
+extern u8 pokemonBiosGetPcboxMark(void*);
+extern void pokemonBiosSetPcboxMark(void*, u8);
+extern s32 fn_8005D3D0(s32);
+extern void GScharCpy(void*, void*);
+extern void fn_80054670(s32);
+extern s32 fn_8005464C(void);
+extern void fn_8005744C(void);
+extern s32 fn_80057428(void);
+extern void fn_800574A8(void);
+extern void* windowSearchID(s32);
+extern u32 fn_8005D738(u8);
+extern void fn_80058804(void*, s32);
+extern void fn_800587D8(void);
+extern void fn_8005471C(void);
 
 /* ===== SDA globals ===== */
 extern s32 lbl_8047A598;
 extern s32 lbl_8047A59C;
+extern void* lbl_8047A590;
 extern u8* lbl_8047A5A0;
 extern u8  lbl_8047A5A8;
 extern f32 lbl_8047BF18;
@@ -209,10 +272,12 @@ extern const u32 lbl_8047BF38;
 extern const u32 lbl_8047BF3C;
 extern const ColosseumBitMasks lbl_8047BF40;
 extern const char lbl_8047BF28;
+extern const f32 lbl_8047BF10;
 
 /* ===== Rodata / data labels ===== */
 extern u8 lbl_80267840[];
 extern char lbl_802678D8[];
+extern const ColosseumUnownMenuIds lbl_802676F0[28];
 extern const ColosseumRosterRow lbl_802677D0[7];
 extern const s32 lbl_80267A80[6];
 extern const s32 lbl_80267A98[6];
@@ -246,6 +311,183 @@ s32 fn_80057E40(void) {
     return 2;
 }
 #pragma pop
+
+/* Address: 0x80058150 | Size: 0x604 */
+void fn_80058150(void) {
+    ColosseumBattleConnectState* state;
+    u32 handle;
+    u32* list;
+    u32* out;
+    void* pokemon;
+    s32 count;
+    s32 listCount;
+    s32 box;
+    s32 slot;
+    s32 id;
+    s32 form;
+    s32 connectedState;
+    s32 shouldSkipWait;
+
+    scriptStoreTemochiPokemon(0);
+    fn_8017B3E4(0x70B);
+    while (fn_8017B2CC(0x70B) == 1) {
+        _threadSwitch();
+    }
+
+    count = 0;
+    for (slot = 0; slot < 6; slot++) {
+        pokemon = heroGetStatus(NULL, 3, (u16)slot);
+        if (pokemon != NULL && pokemonCheckValid(pokemon) != 0) {
+            count++;
+        }
+    }
+
+    for (box = 0; box < pcboxGetNbPokemonBox(); box++) {
+        for (slot = 0; slot < fn_801347D8(); slot++) {
+            pokemon = getPokemon__5PCBOXFScSc(0, (s8)box, (s8)slot);
+            if (pokemon != NULL && pokemonCheckValid(pokemon) != 0) {
+                count++;
+            }
+        }
+    }
+
+    listCount = count + 1;
+    handle = 0;
+    list = NULL;
+    if (listCount > 0) {
+        handle = _toolentryAlloc__FUl((u32)listCount * sizeof(u32));
+        list = fn_800E27B0(handle);
+        lbl_8047A590 = list;
+        out = list;
+
+        if (list != NULL) {
+            for (slot = 0; slot < 6; slot++) {
+                pokemon = heroGetStatus(NULL, 3, (u16)slot);
+                if (pokemon != NULL && pokemonCheckValid(pokemon) != 0) {
+                    id = pokemonBiosGetPokemonDataId(pokemon);
+                    if ((u16)id == 0) {
+                        id = -1;
+                    } else if ((u16)id == 0xC9) {
+                        form = pokemonGetAnnonKatati(pokemonGetStatus(pokemon, 0, 0x6F, 0));
+                        if ((u8)form >= 28) {
+                            id = -1;
+                        } else {
+                            id = pokemonBiosGetPokemonDataId(pokemon);
+                            if ((u16)id == 0) {
+                                id = -1;
+                            } else if ((u8)pokemonGetStatus(pokemon, (u16)id, 0xC1, 0) != 0) {
+                                id = lbl_802676F0[(u8)form].shiny;
+                            } else {
+                                id = lbl_802676F0[(u8)form].normal;
+                            }
+                        }
+                    } else {
+                        if (pokemonGetStatus(NULL, (u16)id, 0x5A,
+                                             (u8)pokemonGetStatus(pokemon, (u16)id, 0xC1, 0) != 0) == 0) {
+                            id = -1;
+                        }
+                    }
+                    if (id != -1) {
+                        *out++ = id;
+                    }
+                }
+            }
+
+            for (box = 0; box < pcboxGetNbPokemonBox(); box++) {
+                for (slot = 0; slot < fn_801347D8(); slot++) {
+                    pokemon = getPokemon__5PCBOXFScSc(0, (s8)box, (s8)slot);
+                    if (pokemon != NULL && pokemonCheckValid(pokemon) != 0) {
+                        id = pokemonBiosGetPokemonDataId(pokemon);
+                        if ((u16)id == 0) {
+                            id = -1;
+                        } else if ((u16)id == 0xC9) {
+                            form = pokemonGetAnnonKatati(pokemonGetStatus(pokemon, 0, 0x6F, 0));
+                            if ((u8)form >= 28) {
+                                id = -1;
+                            } else {
+                                id = pokemonBiosGetPokemonDataId(pokemon);
+                                if ((u16)id == 0) {
+                                    id = -1;
+                                } else if ((u8)pokemonGetStatus(pokemon, (u16)id, 0xC1, 0) != 0) {
+                                    id = lbl_802676F0[(u8)form].shiny;
+                                } else {
+                                    id = lbl_802676F0[(u8)form].normal;
+                                }
+                            }
+                        } else {
+                            if (pokemonGetStatus(NULL, (u16)id, 0x5A,
+                                                 (u8)pokemonGetStatus(pokemon, (u16)id, 0xC1, 0) != 0) == 0) {
+                                id = -1;
+                            }
+                        }
+                        if (id != -1) {
+                            *out++ = id;
+                        }
+                    }
+                }
+            }
+            *out = 0;
+        }
+    } else {
+        lbl_8047A590 = NULL;
+    }
+
+    GSthreadCreate(1, fn_800FF560(), 0x4000, 1, 1, fn_80057E70);
+    menuClose(0x19);
+    menuClose(0x1A);
+    menuClose(0x1B);
+    menuCloseSync(0x19, 1);
+    menuCloseSync(0x1A, 1);
+    menuCloseSync(0x1B, 1);
+    fn_80055B98(0);
+    menuOpen(0x1A, 0);
+    menuOpen(0x1B, 0);
+    menuOpen(0x19, 0);
+
+    state = (ColosseumBattleConnectState*)lbl_803A9A08;
+    if (state->active != 0) {
+        connectedState = state->connected != 0;
+    } else {
+        connectedState = 2;
+    }
+    shouldSkipWait = 0;
+    if (connectedState == 2) {
+        fn_8017B1CC(0x48A);
+        fn_800F915C(0x48A);
+        shouldSkipWait = 1;
+    } else {
+        if (connectedState == 1) {
+            state->busyRequest = 0;
+        }
+        state->reserved = 1;
+    }
+
+    if (shouldSkipWait == 0) {
+        while (1) {
+            if (state->active != 0) {
+                connectedState = state->connected != 0;
+            } else {
+                connectedState = 2;
+            }
+            if (connectedState == 2) {
+                break;
+            }
+            _threadSwitch();
+        }
+    }
+
+    if (listCount > 0) {
+        fn_800E24B0(handle);
+        fn_800E209C(handle);
+    }
+
+    fn_8017B1CC(0x70B);
+    fn_800F915C(0x70B);
+    if (scriptCheckTemochiPokemon(0) != 0) {
+        fn_80190528(0xDDE);
+    }
+}
+
 
 /* Address: 0x80058754 | Size: 0x44 */
 #pragma push
@@ -454,6 +696,281 @@ void* fn_80058F40(void* dflt, s32 dir, s32* state) {
     return dflt;
 }
 #pragma pop
+
+/* Handle an action selected for one party slot. */
+s32 fn_80059034(s32 slot)
+{
+    ColosseumPokemonBlob pokemonCopy;
+    u8 pokemonName[0x1C];
+    s32 navigation[2];
+    void* heroPokemon;
+    void* alternatePokemon;
+    void* pokemon;
+    void* partyPokemon;
+    s32 battleMode;
+    s32 context;
+    s32 action;
+    s32 count;
+    s32 i;
+    s32 box;
+    s32 selection;
+    s32 haveCopy;
+    u32 name;
+
+    heroPokemon = heroGetStatus(0, 3, (u16)slot);
+    alternatePokemon = 0;
+    battleMode = 1;
+
+    if (fn_800576B4() != 3) {
+        context = 0;
+        if (!pokemonCheckValid(heroPokemon)) {
+            battleMode = 0;
+        }
+    } else {
+        alternatePokemon = fn_800574E0();
+        context = pokemonCheckValid(heroPokemon) ? 2 : 1;
+    }
+
+    if (battleMode == 0) {
+        return slot;
+    }
+    pokemon = alternatePokemon != 0 ? alternatePokemon : heroPokemon;
+
+    if (fn_80057694() == 0) {
+        name = pokemonGetStatus(pokemon, 0, 0x77, 0);
+        msgctrlSetValue(0x36, name);
+        msgctrlSetValue(0x32, name);
+        fn_80058804((void*)0x1B74, 0);
+        action = fn_80054B1C(context, 1);
+        fn_800587D8();
+    } else {
+        action = context >= 0 && context < 3 ? context : 8;
+    }
+
+#define COUNT_MARKED_PARTY(result)                                           \
+    do {                                                                     \
+        (result) = 0;                                                        \
+        for (i = 0; i < 6; i++) {                                           \
+            partyPokemon = heroGetStatus(0, 3, (u16)i);                     \
+            if (partyPokemon == 0) {                                        \
+                break;                                                       \
+            }                                                                \
+            if (pokemonCheckValid(partyPokemon) &&                           \
+                (s32)pokemonGetStatus(partyPokemon, 0, 0x83, 0) > 0) {      \
+                (result)++;                                                  \
+            }                                                                \
+        }                                                                    \
+    } while (0)
+
+    switch (action) {
+    case 0:
+        if ((s32)pokemonGetStatus(pokemon, 0, 0x83, 0) > 0) {
+            COUNT_MARKED_PARTY(count);
+            if (count <= 1) {
+                fn_80058804((void*)0x1B90, 1);
+                break;
+            }
+        }
+        fn_800576C4(1);
+        break;
+
+    case 1:
+        fn_800576C4(4);
+        break;
+
+    case 2:
+        if ((s32)pokemonGetStatus(alternatePokemon, 0, 0x83, 0) <= 0 &&
+            (s32)pokemonGetStatus(heroPokemon, 0, 0x83, 0) > 0) {
+            COUNT_MARKED_PARTY(count);
+            if (count < 2) {
+                fn_80058804((void*)0x1B90, 1);
+                break;
+            }
+        }
+        fn_80057458(heroPokemon);
+        pokemonInit(heroPokemon);
+        fn_800576C4(6);
+        break;
+
+    case 3:
+        fadeSet(3, lbl_8047BF10);
+        fadeCheck(1);
+        fn_8005471C();
+        selection = fn_80056A78();
+        fn_80056A80();
+
+        haveCopy = 0;
+        if (fn_800576B4() == 3) {
+            haveCopy = 1;
+            pokemonCopy = *(ColosseumPokemonBlob*)fn_800574E0();
+        }
+        context = fn_80057694();
+        fn_80057A38();
+
+        navigation[0] = alternatePokemon != 0;
+        navigation[1] = slot;
+        fn_80057C9C(pokemon, fn_80058F40, navigation);
+        fn_80056B74(selection, 0);
+        fn_80054760(1, 0);
+        fn_80057A64(haveCopy ? &pokemonCopy : 0, context);
+
+        if (navigation[0] == 0) {
+            for (i = 0; i < 7; i++) {
+                if (lbl_802677D0[i].menuId == 0 &&
+                    lbl_802677D0[i].partyIndex == navigation[1]) {
+                    break;
+                }
+            }
+            if (i < 7) {
+                MenuSprite* item = (MenuSprite*)menuItemBiosGetPtr(
+                    lbl_802677D0[i].mode);
+                fn_80057830(*(s16*)((u8*)item + 2),
+                            *(s16*)((u8*)item + 4), 1);
+            }
+            {
+                u8* targetWindow = (u8*)windowSearchID(0x94);
+                if (targetWindow != 0) {
+                    targetWindow[0x95] = (s8)navigation[1];
+                }
+            }
+        }
+        fadeSet(2, lbl_8047BF10);
+        fadeCheck(1);
+        break;
+
+    case 4:
+        break;
+
+    case 5:
+        if (fn_800576B4() == 0 &&
+            (s32)pokemonGetStatus(pokemon, 0, 0x83, 0) > 0) {
+            COUNT_MARKED_PARTY(count);
+            if (count <= 1) {
+                fn_80058804((void*)0x1B90, 1);
+                break;
+            }
+        }
+
+        fn_80058804((void*)0x1B80, 0);
+        do {
+            box = fn_80055E10();
+            fn_800587D8();
+            if (box < 0 || box >= pcboxGetNbPokemonBox()) {
+                box = -1;
+                break;
+            }
+            if (pcboxGetPokemonBoxNbEmptySlot(0, (s8)box) <= 0) {
+                fn_80058804((void*)0x1B81, 1);
+                fn_80058804((void*)0x1B80, 0);
+            }
+        } while (pcboxGetPokemonBoxNbEmptySlot(0, (s8)box) <= 0);
+        fn_80055DE0();
+        if (box < 0) {
+            break;
+        }
+
+        pcboxAddPokemon(0, pokemon, (s8)box);
+        if (fn_800576B4() == 3) {
+            fn_800574A8();
+            fn_800576C4(0);
+            break;
+        }
+        if (slot >= 0 && slot < 6) {
+            for (i = slot + 1; i < 6; i++) {
+                partyPokemon = heroGetStatus(0, 3, (u16)i);
+                if (partyPokemon == 0) {
+                    break;
+                }
+                heroPokemon = heroGetStatus(0, 3, (u16)(i - 1));
+                if (heroPokemon == 0) {
+                    break;
+                }
+                *(ColosseumPokemonBlob*)heroPokemon =
+                    *(ColosseumPokemonBlob*)partyPokemon;
+            }
+            if (i == 6) {
+                pokemonInit(heroGetStatus(0, 3, 5));
+            }
+        }
+        break;
+
+    case 6:
+        fn_80058804((void*)0x1B88, 0);
+        name = pokemonBiosGetPcboxMark(pokemon);
+        name = fn_8005D738((u8)name);
+        if ((u8)name != 0xFF) {
+            pokemonBiosSetPcboxMark(pokemon, (u8)name);
+        }
+        fn_800587D8();
+        break;
+
+    case 7:
+        if (fn_80057DE8(pokemon)) {
+            fn_80058804((void*)0x1B94, 1);
+            break;
+        }
+        if (alternatePokemon == 0 &&
+            (s32)pokemonGetStatus(pokemon, 0, 0x83, 0) > 0) {
+            COUNT_MARKED_PARTY(count);
+            if (count <= 1) {
+                fn_80058804((void*)0x1B90, 1);
+                break;
+            }
+        }
+
+        fn_80058804((void*)0x1B91, 0);
+        selection = fn_8005D3D0(1);
+        fn_800587D8();
+        if (selection == 1) {
+            break;
+        }
+
+        GScharCpy(pokemonName,
+                  (void*)pokemonGetStatus(pokemon, 0, 0x77, 0));
+        if (alternatePokemon == 0) {
+            fn_80054670(slot);
+            while (fn_8005464C() != 0) {
+                _threadSwitch();
+            }
+            if (slot >= 0 && slot < 6) {
+                pokemonInit(heroGetStatus(0, 3, (u16)slot));
+            }
+        } else {
+            fn_8005744C();
+            while (fn_80057428() != 0) {
+                _threadSwitch();
+            }
+            fn_800574A8();
+            fn_800576C4(0);
+        }
+
+        msgctrlSetValue(0x36, pokemonName);
+        fn_80058804((void*)0x1B92, 1);
+        fn_80058804((void*)0x1B93, 1);
+        if (alternatePokemon == 0 && slot >= 0 && slot < 6) {
+            for (i = slot + 1; i < 6; i++) {
+                partyPokemon = heroGetStatus(0, 3, (u16)i);
+                if (partyPokemon == 0) {
+                    break;
+                }
+                heroPokemon = heroGetStatus(0, 3, (u16)(i - 1));
+                if (heroPokemon == 0) {
+                    break;
+                }
+                *(ColosseumPokemonBlob*)heroPokemon =
+                    *(ColosseumPokemonBlob*)partyPokemon;
+            }
+            if (i == 6) {
+                pokemonInit(heroGetStatus(0, 3, 5));
+            }
+        }
+        break;
+    }
+
+#undef COUNT_MARKED_PARTY
+    return slot;
+}
+
 
 /* Address: 0x80059BDC | Size: 0x30F4 */
 #pragma push
