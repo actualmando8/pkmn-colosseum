@@ -5,7 +5,7 @@
 set -uo pipefail
 HARNESS=/Users/douglaswhittingham/gamecube-decomp-harness
 GAME=/Users/douglaswhittingham/pkmn-colosseum
-FLEET="$GAME/fleet"
+FLEET=${FLEET_DIR:-$GAME/fleet}
 
 echo "[fleet-up] 1/5 container runtime"
 colima status >/dev/null 2>&1 || colima start
@@ -20,13 +20,13 @@ mkdir -p /tmp/grind
 
 echo "[fleet-up] 3/5 lanes"
 cd "$HARNESS"
-tmux has-session -t colo-fs-small  2>/dev/null || tmux new-session -d -s colo-fs-small  "MAXW=5 bash projects/pkmn-colosseum/ops/start-fs-small.sh"
-tmux has-session -t colo-fs-medium 2>/dev/null || tmux new-session -d -s colo-fs-medium "MAXW=2 bash projects/pkmn-colosseum/ops/start-fs-medium.sh"
-tmux has-session -t colo-fs-large  2>/dev/null || tmux new-session -d -s colo-fs-large  "MAXW=1 bash projects/pkmn-colosseum/ops/start-fs-large.sh"
+tmux has-session -t colo-fs-small  2>/dev/null || tmux new-session -d -s colo-fs-small  "MAXW=3 FUZZY_MAX=87.999 bash projects/pkmn-colosseum/ops/start-fs-small.sh"
+tmux has-session -t colo-fs-medium 2>/dev/null || tmux new-session -d -s colo-fs-medium "MAXW=2 FUZZY_MAX=87.999 bash projects/pkmn-colosseum/ops/start-fs-medium.sh"
+tmux has-session -t colo-fs-large  2>/dev/null || tmux new-session -d -s colo-fs-large  "MAXW=1 FUZZY_MAX=87.999 bash projects/pkmn-colosseum/ops/start-fs-large.sh"
 
 echo "[fleet-up] 4/5 dashboard + watchers"
 tmux has-session -t harness-dashboard 2>/dev/null || tmux new-session -d -s harness-dashboard "cd $HARNESS && bun run ui:server 2>&1 | tee /tmp/grind/dashboard.log"
-tmux has-session -t watchdog    2>/dev/null || tmux new-session -d -s watchdog    "bash $FLEET/overnight_watchdog.sh"
+tmux has-session -t watchdog    2>/dev/null || tmux new-session -d -s watchdog    "FLEET_DIR=$FLEET bash $FLEET/overnight_watchdog.sh"
 tmux has-session -t crack-watch 2>/dev/null || tmux new-session -d -s crack-watch "bash $FLEET/crack_watch.sh"
 
 echo "[fleet-up] 5/5 loops"
