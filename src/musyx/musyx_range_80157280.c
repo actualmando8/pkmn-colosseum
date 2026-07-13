@@ -1495,6 +1495,129 @@ u32 fn_801619E8(u8 idx, u8 index, u8 midi, u8 midiSet) {
 }
 #endif
 #pragma pop
+
+/* snd_midictrl.c: inpInit. The pre-2.0.1 SYNTH_VOICE layout ends its
+ * input-controller block at inpTremolo; later MusyX versions append filter
+ * controls here. */
+typedef struct CtrlSource {
+    u8 midiCtrl;
+    u8 combine;
+    s32 scale;
+} CtrlSource;
+
+typedef struct CtrlDest {
+    CtrlSource source[4];
+    u16 oldValue;
+    u8 numSource;
+} CtrlDest;
+
+typedef struct SndInputVoice {
+    u8 pad_000[0xA8];
+    u8 timeUsedByInput;             /* 0x0A8 */
+    u8 pad_0A9[0x1D4 - 0x0A9];
+    u8 lfoUsedByInput[2];           /* 0x1D4 */
+    u8 pad_1D6[0x214 - 0x1D6];
+    u32 midiDirtyFlags;             /* 0x214 */
+    CtrlDest inpVolume;             /* 0x218 */
+    CtrlDest inpPanning;            /* 0x23C */
+    CtrlDest inpSurroundPanning;    /* 0x260 */
+    CtrlDest inpPitchBend;          /* 0x284 */
+    CtrlDest inpDoppler;            /* 0x2A8 */
+    CtrlDest inpModulation;         /* 0x2CC */
+    CtrlDest inpPedal;              /* 0x2F0 */
+    CtrlDest inpPortamento;         /* 0x314 */
+    CtrlDest inpPreAuxA;            /* 0x338 */
+    CtrlDest inpReverb;             /* 0x35C */
+    CtrlDest inpPreAuxB;             /* 0x380 */
+    CtrlDest inpPostAuxB;            /* 0x3A4 */
+    CtrlDest inpTremolo;             /* 0x3C8 */
+} SndInputVoice;
+
+static inline void inpResetGlobalMIDIDirtyFlags(void) {
+    u32 i;
+    u32 j;
+
+    for (i = 0; i < 8; i++) {
+        for (j = 0; j < 16; j++) {
+            ((u32 (*)[16])lbl_80449390)[i][j] = 0xFF;
+        }
+    }
+}
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+void fn_80161A9C(SndInputVoice* voice) {
+    u32 i;
+    u32 studio;
+
+    if (voice != NULL) {
+        voice->inpVolume.source[0].midiCtrl = 7;
+        voice->inpVolume.source[0].combine = 0;
+        voice->inpVolume.source[0].scale = 0x10000;
+        voice->inpVolume.source[1].midiCtrl = 11;
+        voice->inpVolume.source[1].combine = 2;
+        voice->inpVolume.source[1].scale = 0x10000;
+        voice->inpVolume.numSource = 2;
+        voice->inpPanning.source[0].midiCtrl = 10;
+        voice->inpPanning.source[0].combine = 0;
+        voice->inpPanning.source[0].scale = 0x10000;
+        voice->inpPanning.numSource = 1;
+        voice->inpSurroundPanning.source[0].midiCtrl = 131;
+        voice->inpSurroundPanning.source[0].combine = 0;
+        voice->inpSurroundPanning.source[0].scale = 0x10000;
+        voice->inpSurroundPanning.numSource = 1;
+        voice->inpPitchBend.source[0].midiCtrl = 128;
+        voice->inpPitchBend.source[0].combine = 0;
+        voice->inpPitchBend.source[0].scale = 0x10000;
+        voice->inpPitchBend.numSource = 1;
+        voice->inpModulation.source[0].midiCtrl = 1;
+        voice->inpModulation.source[0].combine = 0;
+        voice->inpModulation.source[0].scale = 0x10000;
+        voice->inpModulation.numSource = 1;
+        voice->inpPedal.source[0].midiCtrl = 64;
+        voice->inpPedal.source[0].combine = 0;
+        voice->inpPedal.source[0].scale = 0x10000;
+        voice->inpPedal.numSource = 1;
+        voice->inpPortamento.source[0].midiCtrl = 65;
+        voice->inpPortamento.source[0].combine = 0;
+        voice->inpPortamento.source[0].scale = 0x10000;
+        voice->inpPortamento.numSource = 1;
+        voice->inpPreAuxA.numSource = 0;
+        voice->inpReverb.source[0].midiCtrl = 91;
+        voice->inpReverb.source[0].combine = 0;
+        voice->inpReverb.source[0].scale = 0x10000;
+        voice->inpReverb.numSource = 1;
+        voice->inpPreAuxB.numSource = 0;
+        voice->inpPostAuxB.source[0].midiCtrl = 93;
+        voice->inpPostAuxB.source[0].combine = 0;
+        voice->inpPostAuxB.source[0].scale = 0x10000;
+        voice->inpPostAuxB.numSource = 1;
+        voice->inpDoppler.source[0].midiCtrl = 132;
+        voice->inpDoppler.source[0].combine = 0;
+        voice->inpDoppler.source[0].scale = 0x10000;
+        voice->inpDoppler.numSource = 1;
+        voice->inpTremolo.numSource = 0;
+        voice->midiDirtyFlags = 0x1FFF;
+        voice->lfoUsedByInput[0] = 0;
+        voice->lfoUsedByInput[1] = 0;
+        voice->timeUsedByInput = 0;
+    } else {
+        CtrlDest (*auxA)[4] = (CtrlDest (*)[4])lbl_80435B74;
+        CtrlDest (*auxB)[4] = (CtrlDest (*)[4])lbl_804356F4;
+
+        for (studio = 0; studio < 8; studio++) {
+            for (i = 0; i < 4; i++) {
+                auxA[studio][i].numSource = 0;
+                auxB[studio][i].numSource = 0;
+            }
+        }
+
+        inpResetGlobalMIDIDirtyFlags();
+    }
+}
+#pragma pop
+
 #pragma push
 #pragma optimization_level 4
 #pragma optimizewithasm off
@@ -6971,17 +7094,6 @@ void fn_80160ED4(u8 midi, u8 midiSet) { /* inpResetChannelDefaults */
     *channelDefaults = 2;
 }
 #pragma pop
-
-typedef struct {
-    struct {
-        u8 midiCtrl;
-        u8 combine;
-        u8 pad_02[2];
-        s32 scale;
-    } source[4];
-    u16 oldValue;
-    u8 numSource;
-} CtrlDest;
 
 #pragma push
 #pragma optimization_level 4
