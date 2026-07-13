@@ -76,6 +76,7 @@ extern u32 lbl_8047A818;
 extern s32 lbl_8047A81C;
 extern void (*lbl_8047A82C)(DVDCommandBlock* block);
 extern void fn_800A59CC(u32 intType);
+extern void fn_800A6028(u32 intType);
 extern void fn_800A6508(u32 intType);
 extern void fn_800A48DC(void (*callback)(u32));
 extern void stateBusy_800A68B4(DVDCommandBlock* block);
@@ -1019,6 +1020,13 @@ void fn_800A5FC0(DVDCommandBlock* block)
 {
     DVDLowAudioBufferConfig(((DVDDiskID*)IDShouldBe_8047A7EC)->streaming, 10,
                             fn_800A62CC);
+}
+
+/* 0x800A5FF4 | size: 0x34 */
+void fn_800A5FF4(DVDCommandBlock* block)
+{
+    DVDLowAudioBufferConfig(((DVDDiskID*)IDShouldBe_8047A7EC)->streaming, 10,
+                            fn_800A6028);
 }
 
 /*
