@@ -13947,86 +13947,81 @@ void fn_8021908C(void)
   lbl_8047B610 = (u8*)*(u32 *)(lbl_8047B610 + 1);
   return;
 }
+#pragma optimize_for_size on
 void fn_80219354(void)
-
 {
     extern u32 fn_800E0C54();
-    extern u32 fn_800FA280();
+    extern u32 GSmsgGetGSchar();
     extern void fn_8010C4D4();
-    extern short fn_8011BEB4();
-    extern void fn_80132A38();
-    extern int fn_801F00D0();
-    extern u32 fn_801F025C();
-    extern u32 fn_801F54A4();
-    extern s8 fn_802026E4();
-    extern u32 fn_802079DC();
-    extern void fn_80207B5C();
-  u32 bVar1;
-  u16 uVar5;
-  u32 uVar2;
-  short sVar6;
-  u16 uVar7;
-  u16 uVar8;
-  int iVar3;
-  s8 cVar10;
-  u16 uVar9;
-  u32 uVar4;
+    extern u32 wazaGetStatus();
+    extern void msgctrlSetValue();
+    extern u32 fightTargetGetRelativeHostSideFightTargetIdToTragetPtr();
+    extern u32 fightTargetGetPtrAsNowFightType();
+    extern u32 fightFloorGetStatus();
+    extern u8 fn_802026E4();
+    extern u32 fightOutPokemonGetTeikouZokuseiDataIdAry();
+    extern void fightOutPokemonSetZokuseiDataId();
+    extern u32 pokemonGetStatus();
+    u8 specialMove;
+    u16 hostSide;
+    u32 pokemon;
+    u16 type;
+    u16 sourceType;
+    u32 target;
+    u32 count;
+    u16 random;
+    u32 selected;
+    u16 i;
+    u32 typeArray[18];
 
-  u32 auStack_58 [18];
+    hostSide = (u16)fightFloorGetStatus(0, 0, 0x14, 0);
+    pokemon = fightTargetGetPtrAsNowFightType(0x11, 0);
+    pokemonGetStatus(pokemon, 0, 0xd9, 0);
+    type = (u16)pokemonGetStatus(pokemon, 0, 0xf3, 0);
+    pokemonGetStatus(pokemon, 0, 0x102, 0);
+    pokemonGetStatus(pokemon, 0, 0x104, 0);
+    sourceType = (u16)pokemonGetStatus(pokemon, 0, 0xf4, 0);
+    target = fightTargetGetRelativeHostSideFightTargetIdToTragetPtr(
+        (u16)pokemonGetStatus(pokemon, 0, 0xf2, 0), hostSide);
 
-  uVar5 = fn_801F54A4(0,0,0x14,0);
-  uVar2 = fn_801F025C(0x11,0);
-  fn_8012640C(uVar2,0,0xd9,0);
-  sVar6 = (int)fn_8012640C(uVar2,0,0xf3,0);
-  fn_8012640C(uVar2,0,0x102,0);
-  fn_8012640C(uVar2,0,0x104,0);
-  uVar7 = (int)fn_8012640C(uVar2,0,0xf4,0);
-  uVar8 = (int)fn_8012640C(uVar2,0,0xf2,0);
-  iVar3 = fn_801F00D0(uVar8,uVar5);
-  if ((((sVar6 == 0) || (sVar6 == 0x165)) || (sVar6 == -1)) || (sVar6 == 0x164)) {
-    *(u32 *)(lbl_8047B610) = *(u32 *)(*(int *)(lbl_8047B610) + 1);
-  }
-  else {
-    if (iVar3 != 0) {
-      sVar6 = fn_8011BEB4(0,sVar6,9,0);
-      if ((((sVar6 == 0x91) || (sVar6 == 0x27)) ||
-          ((sVar6 == 0x4b || ((sVar6 == 0x97 || (sVar6 == 0x9b)))))) || (sVar6 == 0x1a)) {
-        bVar1 = 1;
-      }
-      else {
-        bVar1 = 0;
-      }
-      if ((bVar1) && (cVar10 = fn_802026E4(iVar3,0x22), cVar10 == 1)) {
-        *(u32 *)(lbl_8047B610) = *(u32 *)(*(int *)(lbl_8047B610) + 1);
-        return;
-      }
-    }
-    uVar9 = fn_802079DC(uVar2,uVar7,auStack_58);
-    if (uVar9 == 0) {
-      *(u32 *)(lbl_8047B610) = *(u32 *)(*(int *)(lbl_8047B610) + 1);
-    }
-    else {
-      uVar4 = fn_800E0C54();
-      uVar4 = *(u32 *)((int)auStack_58 +
-                       (((uVar4 & 0xffff) - ((uVar4 & 0xffff) / (u32)uVar9) * (u32)uVar9) * 4 &
-                       0x3fffc));
-      if ((int)uVar4 < 0) {
-        *(u32 *)(lbl_8047B610) = *(u32 *)(*(int *)(lbl_8047B610) + 1);
-      }
-      else {
-        uVar4 = uVar4 & 0xffff;
-        for (uVar9 = 0; uVar9 < 2; uVar9 = uVar9 + 1) {
-          fn_80207B5C(uVar2,uVar9 & 0xff,uVar4);
+    if (type == 0 || type == 0x165 || type == 0xffff || type == 0x164) {
+        lbl_8047B610 = (u8*)*(u32*)(lbl_8047B610 + 1);
+    } else {
+        if (target != 0) {
+            type = (u16)wazaGetStatus(0, type, 9, 0);
+            if (type == 0x91 || type == 0x27 || type == 0x4b ||
+                type == 0x97 || type == 0x9b || type == 0x1a) {
+                specialMove = 1;
+            } else {
+                specialMove = 0;
+            }
+            if (specialMove && fn_802026E4(target, 0x22) == 1) {
+                lbl_8047B610 = (u8*)*(u32*)(lbl_8047B610 + 1);
+                return;
+            }
         }
-        fn_8010C4D4(uVar4);
-        uVar2 = fn_800FA280();
-        fn_80132A38(0xd,uVar2);
-        *(int *)(lbl_8047B610) = *(int *)(lbl_8047B610) + 5;
-      }
+        count = fightOutPokemonGetTeikouZokuseiDataIdAry(pokemon, sourceType, typeArray);
+        if ((count & 0xffff) == 0) {
+            lbl_8047B610 = (u8*)*(u32*)(lbl_8047B610 + 1);
+        } else {
+            random = (u16)fn_800E0C54();
+            selected = typeArray[(u16)(random -
+                (random / (s32)(u16)count) * (u16)count)];
+            if ((s32)selected < 0) {
+                lbl_8047B610 = (u8*)*(u32*)(lbl_8047B610 + 1);
+            } else {
+                selected &= 0xffff;
+                for (i = 0; i < 2; i++) {
+                    fightOutPokemonSetZokuseiDataId(pokemon, (u8)i, selected);
+                }
+                fn_8010C4D4(selected);
+                msgctrlSetValue(0xd, GSmsgGetGSchar());
+                lbl_8047B610 += 5;
+            }
+        }
     }
-  }
-  return;
 }
+#pragma optimize_for_size reset
 void fn_802196A8(void)
 
 {
