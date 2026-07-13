@@ -335,10 +335,10 @@ void winSpriteDraw(u8* context, WinSpriteDrawNode* sprite)
     extern void fn_800FBB34(s16, s16, s16, s16, u32, void*);
     extern u8 lbl_80314E08[];
     u8 red;
+    u8 red2;
     u8 green;
     u8 blue;
     u8 alpha;
-    u8 red2;
     u8 green2;
     u8 blue2;
     u32 color;
