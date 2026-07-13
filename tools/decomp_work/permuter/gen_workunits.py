@@ -26,7 +26,8 @@ Usage:
   python3 tools/decomp_work/permuter/gen_workunits.py \
       --queue build/permuter_queue_win.tsv \
       --outdir build/permuter_workunits/win \
-      [--only fn_800FE38C] [--limit N] [--permuter <path>] [--binutils <dir>]
+      [--only fn_800FE38C] [--limit N] [--permuter <path>] [--binutils <dir>] \
+      [--mwcc-pragma "peephole off"]
 
 Only writes under --outdir (default under build/, which is gitignored).
 """
@@ -323,6 +324,15 @@ def main():
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--permuter", default=str(DEFAULT_PERMUTER))
     ap.add_argument("--binutils", default=str(DEFAULT_BINUTILS))
+    ap.add_argument(
+        "--mwcc-pragma",
+        action="append",
+        default=[],
+        help=(
+            "additional MWCC pragma active for the isolated target; repeat for "
+            "multiple pragmas (the full-TU fidelity gate still must pass)"
+        ),
+    )
     ap.add_argument("--force", action="store_true", help="regenerate existing units")
     args = ap.parse_args()
 
@@ -403,6 +413,8 @@ def main():
 
         mwcc = REPO / "build/compilers" / nu["mw_version"] / "mwcceppc.exe"
         cflags = shlex.split(nu["cflags"])
+        for pragma in args.mwcc_pragma:
+            cflags.extend(["-pragma", pragma])
 
         udir.mkdir(parents=True, exist_ok=True)
 
@@ -565,6 +577,7 @@ def main():
         meta["status"] = "ok"
         meta["mw_version"] = mwver
         meta["cflags"] = flags_str
+        meta["mwcc_pragmas"] = args.mwcc_pragma
         meta["n_fns_in_tu"] = len(funcs)
         (udir / "meta.json").write_text(json.dumps(meta, indent=1))
         manifest.append(meta)
