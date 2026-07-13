@@ -1367,7 +1367,7 @@ extern void heroBiosCopy(u32* dst, u32* src);
 extern void cbTsureFriend__Fl15FootStepCounterl(void);
 extern void heroMoveSetLockFrame(s32 val);
 extern void heroMoveAddAutoEvent(u32 a, u32 b, u32 c, u32 d, u32 e);
-extern void fn_8012BAF0(u8 type, void* src, u32 val);
+extern void heroMoveSetEventList(u8 type, void* src, u32 val);
 extern u32 fn_8012BDE0(u32 r3, u32 r4);
 extern u32 heroMoveSetNeckMode(s32 idx, s32 state);
 extern u32 heroMoveIsMember(s32 idx);
@@ -2043,7 +2043,7 @@ asm void fn_8012BAF0(void) {
 #include "src/game/gs_field_world_fn_8012BAF0.inc"
 }
 #else
-void fn_8012BAF0(u8 type, void* src, u32 val) {
+void heroMoveSetEventList(u8 type, void* src, u32 val) {
     extern u8 lbl_80426BD0[];
     switch (type) {
         case 1:
