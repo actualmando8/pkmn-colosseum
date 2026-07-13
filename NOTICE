@@ -28,3 +28,12 @@ reference snapshot recorded for this integration is:
 
 This notice records source provenance. It does not grant rights to third-party
 material or supersede the rights described above.
+
+The Dolphin SDK paired-single quality-gate exception was verified against the
+public zeldaret/tww SDK reconstruction at this pinned snapshot:
+
+  https://github.com/zeldaret/tww/commit/6f09bf28ce1a2f1cdea62b931cbbdb40e7f821ec
+
+The relevant reference files are src/dolphin/mtx/mtx.c, mtxvec.c, vec.c, and
+quat.c. This records technical provenance for the exception; it does not widen
+the licensing statement above.

@@ -3,19 +3,23 @@
 
 Rules:
 - Any added `#include "*.inc"` in src/ fails (raw-asm shim).
-- Any added `asm` function fails UNLESS its body consists solely of
-  hardware-register/privileged instructions (the Dolphin SDK primitive class:
-  PPCMfmsr etc.). These functions were genuinely authored as asm in the SDK --
-  MWCC cannot emit mfmsr/mtspr/sync from C, so an asm function is the only
-  byte-exact and the only authentic decompilation. The allowlist deliberately
-  excludes loads/stores/branches-with-links so no game logic can sneak through.
-  Precedent: src/dolphin/os/OSTime.c, OSCache.c.
+- Any new or changed asm block fails unless its enclosing function fits one of
+  two authentic SDK classes:
+  - hardware-register/privileged primitives (PPCMfmsr etc.); or
+  - the explicitly named Dolphin SDK paired-single math routines.
+
+MWCC cannot emit the required privileged or paired-single instructions from C.
+The paired-single exception is restricted to one source unit, known SDK
+symbols, and the target's verified mnemonic set. Calls and general GPR memory
+access remain forbidden, so game logic cannot hide behind the exception.
 """
+
 import re
 import subprocess
 import sys
 
-ALLOWED = {
+
+HARDWARE_ALLOWED = {
     # SPR / MSR / FPSCR access
     "mfmsr", "mtmsr", "mfspr", "mtspr", "mfdec", "mtdec",
     "mffs", "mtfsf", "mtfsb0", "mtfsb1",
@@ -26,10 +30,214 @@ ALLOWED = {
     # control flow: plain branch and return only (no bl -- no calls)
     "b", "blr", "bne", "beq", "bne-", "beq-", "bne+", "beq+", "cmpwi",
 }
+
+DOLPHIN_PAIRED_SINGLE_PATH = "src/dolphin/sdk_range_800A2D38.c"
+
+# These 26 routines are the paired-single implementations in this SDK unit.
+# PSMTXRotRad and PSMTXRotAxisRad are deliberately absent: the vendor source
+# implements them as C wrappers, and both already match from C.
+DOLPHIN_PAIRED_SINGLE_FUNCTIONS = {
+    "PSMTXIdentity",
+    "PSMTXCopy",
+    "PSMTXConcat",
+    "PSMTXTranspose",
+    "PSMTXInverse",
+    "PSMTXInvXpose",
+    "PSMTXRotTrig",
+    "__PSMTXRotAxisRadInternal",
+    "PSMTXTrans",
+    "PSMTXTransApply",
+    "PSMTXScale",
+    "PSMTXScaleApply",
+    "PSMTXQuat",
+    "PSMTXMultVec",
+    "PSMTXMultVecSR",
+    "PSVECAdd",
+    "PSVECSubtract",
+    "PSVECScale",
+    "PSVECNormalize",
+    "PSVECSquareMag",
+    "PSVECMag",
+    "PSVECDotProduct",
+    "PSVECCrossProduct",
+    "PSVECSquareDistance",
+    "PSVECDistance",
+    "PSQUATMultiply",
+}
+
+# Exact mnemonic union of the 26 target functions. This includes ten support
+# instructions omitted from the contributor's initial sketch, but needed by
+# the target: ps_muls1, frsqrte, fadds, fsubs, fmuls, fmadds, fnmsubs, fcmpu,
+# cmplwi, and stwu. It intentionally excludes bl, lwz/stw, and update-form
+# paired loads/stores because none belongs to this target unit.
+DOLPHIN_PAIRED_SINGLE_ALLOWED = {
+    "addi", "b", "beq", "blr", "bne", "cmplwi",
+    "fadds", "fcmpu", "fmadds", "fmuls", "fnmsubs", "fres", "frsp",
+    "frsqrte", "fsubs", "lfd", "lfs", "li", "lis", "ori",
+    "ps_add", "ps_cmpo0", "ps_madd", "ps_madds0", "ps_madds1",
+    "ps_merge00", "ps_merge01", "ps_merge10", "ps_merge11", "ps_msub",
+    "ps_mul", "ps_muls0", "ps_muls1", "ps_neg", "ps_nmadd", "ps_nmsub",
+    "ps_sub", "ps_sum0", "ps_sum1", "psq_l", "psq_st",
+    "stfd", "stfs", "stwu",
+}
+
 LABEL = re.compile(r"^[.\w]+:$")
+HUNK = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@")
+ASM_FUNCTION = re.compile(
+    r"(?m)^[ \t]*asm[ \t]+(?:[A-Za-z_]\w*[ \t*]+)+"
+    r"(?P<name>[A-Za-z_]\w*)[ \t]*\([^;{}]*\)[ \t\r\n]*\{"
+)
+FUNCTION = re.compile(
+    r"(?m)^[ \t]*(?!asm\b)(?:[A-Za-z_]\w*[ \t*]+)+"
+    r"(?P<name>[A-Za-z_]\w*)[ \t]*\([^;{}]*\)[ \t\r\n]*\{"
+)
+INLINE_ASM = re.compile(r"\basm\s*(?:volatile\s*)?\{")
+ASM_START = re.compile(r"(?:^\s*asm\s+[A-Za-z_]|\basm\s*(?:volatile\s*)?\{)")
 
 
-def asm_body_ok(body: str) -> bool:
+def _mask_non_code(source: str) -> str:
+    """Blank comments and literals while preserving offsets and newlines."""
+    out = []
+    state = "code"
+    quote = ""
+    i = 0
+    while i < len(source):
+        ch = source[i]
+        nxt = source[i + 1] if i + 1 < len(source) else ""
+        if state == "code":
+            if ch == "/" and nxt == "/":
+                out.extend((" ", " "))
+                state = "line_comment"
+                i += 2
+                continue
+            if ch == "/" and nxt == "*":
+                out.extend((" ", " "))
+                state = "block_comment"
+                i += 2
+                continue
+            if ch in ('"', "'"):
+                quote = ch
+                out.append(" ")
+                state = "literal"
+                i += 1
+                continue
+            out.append(ch)
+            i += 1
+            continue
+
+        if state == "line_comment":
+            if ch == "\n":
+                out.append("\n")
+                state = "code"
+            else:
+                out.append(" ")
+            i += 1
+            continue
+
+        if state == "block_comment":
+            if ch == "*" and nxt == "/":
+                out.extend((" ", " "))
+                state = "code"
+                i += 2
+            else:
+                out.append("\n" if ch == "\n" else " ")
+                i += 1
+            continue
+
+        # String or character literal.
+        if ch == "\\" and nxt:
+            out.append(" ")
+            out.append("\n" if nxt == "\n" else " ")
+            i += 2
+        elif ch == quote:
+            out.append(" ")
+            state = "code"
+            i += 1
+        else:
+            out.append("\n" if ch == "\n" else " ")
+            i += 1
+
+    return "".join(out)
+
+
+def _matching_brace(masked: str, opening: int) -> int | None:
+    depth = 0
+    for i in range(opening, len(masked)):
+        if masked[i] == "{":
+            depth += 1
+        elif masked[i] == "}":
+            depth -= 1
+            if depth == 0:
+                return i
+    return None
+
+
+def _line_number(source: str, offset: int) -> int:
+    return source.count("\n", 0, offset) + 1
+
+
+def _function_regions(source: str, masked: str) -> list[dict]:
+    regions = []
+    for match in FUNCTION.finditer(masked):
+        opening = masked.find("{", match.start(), match.end())
+        closing = _matching_brace(masked, opening)
+        if closing is None:
+            continue
+        regions.append({
+            "func": match.group("name"),
+            "start": match.start(),
+            "end": closing,
+        })
+    return regions
+
+
+def find_asm_regions(source: str) -> list[dict]:
+    """Return whole-function and inline asm regions with enclosing symbols."""
+    masked = _mask_non_code(source)
+    functions = _function_regions(source, masked)
+    regions = []
+
+    for match in ASM_FUNCTION.finditer(masked):
+        opening = masked.find("{", match.start(), match.end())
+        closing = _matching_brace(masked, opening)
+        end = closing if closing is not None else len(source) - 1
+        regions.append({
+            "func": match.group("name"),
+            "body": source[opening + 1:end],
+            "start_line": _line_number(source, match.start()),
+            "end_line": _line_number(source, end),
+            "closed": closing is not None,
+        })
+
+    for match in INLINE_ASM.finditer(masked):
+        opening = masked.find("{", match.start(), match.end())
+        closing = _matching_brace(masked, opening)
+        end = closing if closing is not None else len(source) - 1
+        enclosing = [
+            region for region in functions
+            if region["start"] <= match.start() <= region["end"]
+        ]
+        func = max(enclosing, key=lambda region: region["start"])["func"] if enclosing else ""
+        regions.append({
+            "func": func,
+            "body": source[opening + 1:end],
+            "start_line": _line_number(source, match.start()),
+            "end_line": _line_number(source, end),
+            "closed": closing is not None,
+        })
+
+    return regions
+
+
+def allowlist_for(path: str, func: str) -> tuple[set[str], str, bool]:
+    if path == DOLPHIN_PAIRED_SINGLE_PATH and func in DOLPHIN_PAIRED_SINGLE_FUNCTIONS:
+        return DOLPHIN_PAIRED_SINGLE_ALLOWED, "Dolphin paired-single SDK", True
+    return HARDWARE_ALLOWED, "hardware-primitive", False
+
+
+def asm_body_ok(body: str, path: str = "", func: str = "") -> bool:
+    allowed, allowlist_name, require_paired_single = allowlist_for(path, func)
+    saw_paired_single = False
     for raw in body.splitlines():
         line = raw.split("//")[0].split("#")[0].strip().rstrip(";")
         if not line or LABEL.match(line):
@@ -37,67 +245,122 @@ def asm_body_ok(body: str) -> bool:
         if line in ("{", "}") or line.startswith(("nofralloc", "fralloc", "entry ")):
             continue
         mnemonic = line.split()[0].lower().rstrip(".")
-        if mnemonic not in ALLOWED:
-            print(f"::error::asm instruction '{mnemonic}' outside hardware-primitive allowlist: {line}")
+        if mnemonic.startswith(("ps_", "psq_")):
+            saw_paired_single = True
+        if mnemonic not in allowed:
+            print(
+                f"::error::asm instruction '{mnemonic}' outside "
+                f"{allowlist_name} allowlist for {path}:{func}: {line}"
+            )
             return False
+    if require_paired_single and not saw_paired_single:
+        print(f"::error::{path}:{func} uses paired-single exception without a ps_/psq_ instruction")
+        return False
     return True
 
 
-def main() -> int:
-    base, head = sys.argv[1], sys.argv[2]
-    diff = subprocess.run(
-        ["git", "diff", f"{base}...{head}", "--", "src/**/*.c", "src/**/*.h"],
-        capture_output=True, text=True, check=True,
-    ).stdout
-    fail = 0
+def added_lines_from_diff(diff: str) -> dict[str, list[tuple[int, str]]]:
+    added: dict[str, list[tuple[int, str]]] = {}
     current_file = None
-    added_asm_funcs = []
+    new_line = None
     for line in diff.splitlines():
         if line.startswith("+++ b/"):
             current_file = line[6:]
+            added.setdefault(current_file, [])
             continue
-        if not line.startswith("+") or line.startswith("+++"):
+        match = HUNK.match(line)
+        if match:
+            new_line = int(match.group(1))
             continue
-        text = line[1:]
-        if re.search(r'#include\s*"[^"]*\.inc"', text):
-            print(f"::error::.inc include added in {current_file} — raw-asm shim, not a real match.")
-            fail = 1
-        m = re.match(r"\s*asm\s+[\w\s\*]*?([A-Za-z_]\w*)\s*\(", text)
-        if m:
-            added_asm_funcs.append((current_file, m.group(1)))
+        if current_file is None or new_line is None:
+            continue
+        if line.startswith("+") and not line.startswith("+++"):
+            added[current_file].append((new_line, line[1:]))
+            new_line += 1
+        elif line.startswith("-") and not line.startswith("---"):
+            continue
+        elif not line.startswith("\\"):
+            new_line += 1
+    return added
 
-    for path, func in added_asm_funcs:
-        try:
-            src = subprocess.run(["git", "show", f"{head}:{path}"], capture_output=True, text=True, check=True).stdout
-        except subprocess.CalledProcessError:
-            print(f"::error::cannot read {path} at head to validate asm function {func}")
-            fail = 1
+
+def scan_source(path: str, source: str, added_lines: list[tuple[int, str]]) -> bool:
+    """Validate every asm function/block touched by an added diff line."""
+    added_numbers = {line_number for line_number, _ in added_lines}
+    regions = find_asm_regions(source)
+    touched = [
+        region for region in regions
+        if any(region["start_line"] <= line <= region["end_line"] for line in added_numbers)
+    ]
+
+    fail = False
+    for line_number, text in added_lines:
+        if ASM_START.search(text) and not any(
+            region["start_line"] <= line_number <= region["end_line"] for region in regions
+        ):
+            print(f"::error::unparseable or unterminated asm block in {path}:{line_number}")
+            fail = True
+
+    touched_funcs = {region["func"] for region in touched}
+    for func in sorted(touched_funcs):
+        func_regions = [region for region in regions if region["func"] == func]
+        if not func or any(not region["closed"] for region in func_regions):
+            print(f"::error::cannot safely map asm block to a closed function in {path}")
+            fail = True
             continue
-        m = re.search(rf"\basm\b[\w\s\*]*?\b{re.escape(func)}\s*\([^{{;]*\)\s*\{{", src)
-        if not m:
-            print(f"::error::asm function {func} declared but body not found in {path}")
-            fail = 1
-            continue
-        i = src.index("{", m.start())
-        depth, j = 0, i
-        while j < len(src):
-            if src[j] == "{":
-                depth += 1
-            elif src[j] == "}":
-                depth -= 1
-                if depth == 0:
-                    break
-            j += 1
-        body = src[i + 1 : j]
-        if asm_body_ok(body):
-            print(f"asm function {func} in {path}: hardware-primitive allowlist OK")
+        combined_body = "\n".join(region["body"] for region in func_regions)
+        if asm_body_ok(combined_body, path, func):
+            _, allowlist_name, _ = allowlist_for(path, func)
+            print(f"asm in {func} ({path}): {allowlist_name} allowlist OK")
         else:
-            print(f"::error::asm-wrapper function {func} added in {path} — embeds raw target asm, not real C. Decompile it instead.")
-            fail = 1
+            print(
+                f"::error::asm-wrapper/inline-asm in {path}:{func} is outside "
+                "the authentic SDK exceptions"
+            )
+            fail = True
+    return not fail
 
-    if fail == 0:
-        print("No asm-wrapper / .inc cheats in added source.")
-    return fail
+
+def main() -> int:
+    if len(sys.argv) != 3:
+        print(f"usage: {sys.argv[0]} BASE HEAD", file=sys.stderr)
+        return 2
+    base, head = sys.argv[1], sys.argv[2]
+    diff = subprocess.run(
+        [
+            "git", "diff", "--unified=0", f"{base}...{head}", "--",
+            "src/**/*.c", "src/**/*.h",
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+    added_by_path = added_lines_from_diff(diff)
+    fail = False
+
+    for path, added_lines in added_by_path.items():
+        for _, text in added_lines:
+            if re.search(r'#include\s*"[^"]*\.inc"', text):
+                print(f"::error::.inc include added in {path} — raw-asm shim, not a real match.")
+                fail = True
+
+        try:
+            source = subprocess.run(
+                ["git", "show", f"{head}:{path}"],
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout
+        except subprocess.CalledProcessError:
+            print(f"::error::cannot read changed source {path} at {head}")
+            fail = True
+            continue
+        if not scan_source(path, source, added_lines):
+            fail = True
+
+    if not fail:
+        print("No asm-wrapper / inline-asm / .inc cheats in added source.")
+    return int(fail)
 
 
 if __name__ == "__main__":
