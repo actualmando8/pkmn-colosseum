@@ -416,18 +416,22 @@ void memoInit(u16 *r3) {
   u32 r31;
   u32 r30;
   u16 *r29;
+  u32 offsetMask;
   u8 *r28;
   s32 r27;
   r29 = r3;
   if (r29 == (u16 *)0) {
     r29 = (u16 *)savedataGetStatus(0, 0xC);
   }
-  r30 = 0;
-  r27 = 0;
+  r31 = 0;
+  r30 = r31;
+  r27 = r31;
   *r29 = r30;
   r31 = r30;
   while (r27 < 0x1F4) {
-    r28 = (u8 *)r29 + r31;
+    /* The full-width mask preserves the original MWCC register allocation. */
+    offsetMask = ~0u;
+    r28 = (u8 *)r29 + (r31 & offsetMask);
     *(u16 *)(r28 + 4) = r30;
     *(u32 *)(r28 + 0xC) = _fadeEffectGetRandom__FUl(-1);
     r27++;

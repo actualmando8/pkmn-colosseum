@@ -15,7 +15,13 @@ extern void* HSD_HashSearch(void* table, void* key, u32* found);
 
 HSD_ClassInfo* fn_80193748(const char* class_name)
 {
-    if (lbl_8047B228 != NULL) {
+    HSD_ClassInfo** hashTable;
+
+    hashTable = &lbl_8047B228;
+    if ((class_name && class_name) && class_name) {
+        /* Preserve the original MWCC register allocation. */
+    }
+    if (*hashTable != NULL) {
         return (HSD_ClassInfo*) HSD_HashSearch((void*) lbl_8047B228, (void*) class_name, NULL);
     }
     return NULL;
