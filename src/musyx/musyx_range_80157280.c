@@ -121,6 +121,119 @@ extern void* fn_800E27B0(u16 handle);
 
 /* External functions referenced from asm wrappers */
 extern u32 sndAuxCallbackUpdateSettingsReverbHI(u8* ptr);
+typedef struct ReverbDelayLine {
+    u32 writeOffset;
+    u32 readOffset;
+    u32 endOffset;
+    f32* samples;
+    f32 state;
+} ReverbDelayLine;
+
+typedef struct ReverbWork {
+    ReverbDelayLine allpass[9];
+    ReverbDelayLine comb[9];
+    f32 feedback;
+    f32 combGain[9];
+    f32 previous[3];
+    f32 wet;
+    f32 dampingMix;
+    s32 preDelayLength;
+    u32 _1A8;
+    f32* preDelayBuffer[3];
+    f32* preDelayCursor[3];
+} ReverbWork;
+
+static inline void ReverbAdvanceLine(ReverbDelayLine* line)
+{
+    line->writeOffset += 4;
+    if (line->writeOffset == line->endOffset) {
+        line->writeOffset = 0;
+    }
+    line->readOffset += 4;
+    if (line->readOffset == line->endOffset) {
+        line->readOffset = 0;
+    }
+}
+
+static inline f32 ReverbCombSample(ReverbDelayLine* line, f32 input,
+                                   f32 gain)
+{
+    f32 value = gain * line->state + input;
+    *(f32*)((u8*)line->samples + line->writeOffset) = value;
+    line->state = *(f32*)((u8*)line->samples + line->readOffset);
+    ReverbAdvanceLine(line);
+    return line->state;
+}
+
+static inline f32 ReverbAllpassSample(ReverbDelayLine* line, f32 input,
+                                      f32 feedback)
+{
+    f32 value = feedback * line->state + input;
+    f32 previous;
+
+    *(f32*)((u8*)line->samples + line->writeOffset) = value;
+    previous = *(f32*)((u8*)line->samples + line->readOffset);
+    line->state = previous;
+    ReverbAdvanceLine(line);
+    return previous - feedback * value;
+}
+
+/* Process one 160-sample block through the standard high-quality reverb. */
+void HandleReverb(s32* samples, ReverbWork* work, u32 channel)
+{
+    ReverbDelayLine* comb;
+    ReverbDelayLine* allpass;
+    f32* preDelay;
+    f32* preDelayCursor;
+    f32 input;
+    f32 delayed;
+    f32 mixed;
+    f32 filtered;
+    f32 wet;
+    f32 dry;
+    u32 stageBase;
+    u32 i;
+
+    stageBase = channel * 3;
+    comb = &work->comb[stageBase];
+    allpass = &work->allpass[stageBase];
+    wet = work->wet * lbl_8047D530;
+    dry = lbl_8047D530 - wet;
+    preDelay = work->preDelayBuffer[channel];
+    preDelayCursor = work->preDelayCursor[channel];
+    filtered = work->previous[channel];
+
+    for (i = 0; i < 160; i++) {
+        input = (f32)samples[i];
+        delayed = input;
+        if (work->preDelayLength != 0) {
+            f32* end = preDelay + work->preDelayLength - 1;
+            delayed = *preDelayCursor;
+            *preDelayCursor = input;
+            preDelayCursor++;
+            if (preDelayCursor == end) {
+                preDelayCursor = preDelay;
+            }
+        }
+
+        mixed = ReverbCombSample(&comb[0], delayed,
+                                 work->combGain[stageBase]);
+        mixed += ReverbCombSample(&comb[1], delayed,
+                                  work->combGain[stageBase + 1]);
+        mixed += ReverbCombSample(&comb[2], delayed,
+                                  work->combGain[stageBase + 2]);
+
+        mixed = ReverbAllpassSample(&allpass[0], mixed, work->feedback);
+        mixed = ReverbAllpassSample(&allpass[1], mixed, work->feedback);
+        mixed = ReverbAllpassSample(&allpass[2], mixed, work->feedback);
+        filtered = mixed * lbl_8047D534 +
+                   work->dampingMix * filtered;
+        work->previous[channel] = filtered;
+        samples[i] = (s32)(wet * filtered + dry * input);
+    }
+
+    work->preDelayCursor[channel] = preDelayCursor;
+}
 
 /* Model system */
 extern void  GSmodelGetPart(void* model, u32 param);
@@ -153,8 +266,8 @@ extern void  fn_80142984(u32 id);       /* peopleFieldGetByID */
 typedef s32 (*PeopleCmpFn)(u8* a, u8* b);
 
 extern f64 fmod(f64 x, f64 y);
-extern u8 lbl_8036984C[];
-extern u8 lbl_80369A68[];
+extern f32 lbl_8036984C[];
+extern f32 lbl_80369A68[];
 extern f32 lbl_8047D430;
 extern f32 lbl_8047D434;
 extern f32 lbl_8047D438;
@@ -164,164 +277,968 @@ extern f32 lbl_8047D458;
 extern f32 lbl_8047D45C;
 extern f32 lbl_8047D460[];
 
-static f32 salLerpPair(f32* table, u32 idx, f32 frac) {
-    return (lbl_8047D434 - frac) * table[idx] + frac * table[idx + 1];
-}
+/* MusyX SAL volume and pan matrix builder. */
+extern f64 fmod(f64 value, f64 modulus);
 
-void salCalcVolume(u32 tableSelect, f32* out, u32 panArg, u32 spanArg, f32 volume,
-                   f32 auxA, f32 auxB, u32 hasPan, u32 studioFlag) {
-    f32* volTable;
-    f32* baseTable;
+#define SAL_FRAC(value) ((f32)fmod((value), lbl_8047D450))
+#define SAL_INTERP(table, index, fraction)                                   \
+    (((lbl_8047D434 - (fraction)) * (table)[index]) +                        \
+     ((fraction) * (table)[(index) + 1]))
+
+void salCalcVolume(u32 volumeArg, f32* out, u32 pan, u32 surroundPan,
+                   f32 inputA, f32 inputB, f32 inputC, u32 narrowPan,
+                   u32 studioMode)
+{
+    f32* volumeTable;
     f32* panTable;
-    f32 pan;
-    f32 span;
-    f32 panFrac;
-    f32 spanFrac;
-    f32 invPanFrac;
-    f32 invSpanFrac;
-    f32 invPan;
-    f32 invSpan;
-    u32 panIdx;
-    u32 spanIdx;
-    u32 invPanIdx;
-    u32 invSpanIdx;
-    f32 preInvPan;
-    f32 preInvPanFrac;
-    f32 prePanFrac;
-    u32 preInvPanIdx;
-    u32 prePanIdx;
-    f32 spanMix;
-    f32 invSpanMix;
-    f32 panMix;
-    f32 invPanMix;
-    f32 amp;
+    f32 panValue;
+    f32 surroundValue;
+    f32 reversePan;
+    f32 reverseSurround;
+    f32 panFraction;
+    f32 surroundFraction;
+    f32 reversePanFraction;
+    f32 reverseSurroundFraction;
+    f32 originalPanFraction;
+    f32 originalReverseFraction;
+    u32 panIndex;
+    u32 surroundIndex;
+    u32 reversePanIndex;
+    u32 reverseSurroundIndex;
+    u32 originalPanIndex;
+    u32 originalReverseIndex;
+    f32 level;
+    f32 levelFraction;
+    u32 levelIndex;
     f32 gain;
-    f32 scaled;
-    u32 volIdx;
-    f32 volFrac;
+    f32 front;
+    f32 rear;
+    f32 left;
 
-    volTable = tableSelect != 0 ? (f32*)lbl_8036984C : (f32*)lbl_80369A68;
-    baseTable = (f32*)lbl_80369A68;
-
-    if (panArg == 0x800000) {
-        panArg = 0;
-        spanArg = 0x7f0000;
+    volumeTable = lbl_8036984C;
+    panTable = lbl_80369A68;
+    if ((u8)volumeArg == 0) {
+        volumeTable = panTable;
     }
 
-    if (panArg > 0x10000) {
-        pan = (f32)(panArg - 0x10000) * lbl_8047D448;
+    if (pan == 0x800000) {
+        pan = 0;
+        surroundPan = 0x7F0000;
+    }
+
+    if (pan > 0x10000) {
+        panValue = (f32)(pan - 0x10000) * lbl_8047D448;
     } else {
-        pan = 0.0f;
+        panValue = 0.0f;
     }
-    if (spanArg > 0x10000) {
-        span = (f32)(spanArg - 0x10000) * lbl_8047D448;
+    if (surroundPan > 0x10000) {
+        surroundValue = (f32)(surroundPan - 0x10000) * lbl_8047D448;
     } else {
-        span = 0.0f;
+        surroundValue = 0.0f;
     }
 
-    if (studioFlag != 0) {
-        prePanFrac = (f32)fmod(pan, lbl_8047D450);
-        prePanIdx = __cvt_fp2unsigned(pan);
-        preInvPan = lbl_8047D458 - pan;
-        preInvPanFrac = (f32)fmod(preInvPan, lbl_8047D450);
-        preInvPanIdx = __cvt_fp2unsigned(preInvPan);
+    if (studioMode != 0) {
+        originalPanFraction = SAL_FRAC(panValue);
+        originalPanIndex = __cvt_fp2unsigned(panValue);
+        reversePan = lbl_8047D458 - panValue;
+        originalReverseFraction = SAL_FRAC(reversePan);
+        originalReverseIndex = __cvt_fp2unsigned(reversePan);
+    }
+
+    if (narrowPan != 0) {
+        panValue = lbl_8047D434 +
+                   lbl_8047D45C * (panValue - lbl_8047D434);
+    }
+
+    panFraction = SAL_FRAC(panValue);
+    panIndex = __cvt_fp2unsigned(panValue);
+    surroundFraction = SAL_FRAC(surroundValue);
+    surroundIndex = __cvt_fp2unsigned(surroundValue);
+
+    reversePan = lbl_8047D458 - panValue;
+    reverseSurround = lbl_8047D458 - surroundValue;
+    reversePanFraction = SAL_FRAC(reversePan);
+    reversePanIndex = __cvt_fp2unsigned(reversePan);
+    reverseSurroundFraction = SAL_FRAC(reverseSurround);
+    reverseSurroundIndex = __cvt_fp2unsigned(reverseSurround);
+
+    panTable += 129;
+
+    if (studioMode == 0) {
+        level = lbl_8047D430 * inputA;
+        levelIndex = __cvt_fp2unsigned(level);
+        levelFraction = level - (f32)levelIndex;
+        gain = SAL_INTERP(volumeTable, levelIndex, levelFraction);
+
+        front = SAL_INTERP(panTable, surroundIndex, surroundFraction);
+        out[2] = lbl_8047D438 * gain * front;
+        rear = SAL_INTERP(panTable, reverseSurroundIndex,
+                          reverseSurroundFraction);
+        left = SAL_INTERP(panTable, panIndex, panFraction);
+        out[1] = gain * rear * left;
+        left = SAL_INTERP(panTable, reversePanIndex, reversePanFraction);
+        out[0] = gain * left;
+
+        level = lbl_8047D430 * inputB;
+        levelIndex = __cvt_fp2unsigned(level);
+        levelFraction = level - (f32)levelIndex;
+        gain = SAL_INTERP(volumeTable, levelIndex, levelFraction);
+
+        front = SAL_INTERP(panTable, surroundIndex, surroundFraction);
+        out[5] = lbl_8047D438 * gain * front;
+        rear = SAL_INTERP(panTable, reverseSurroundIndex,
+                          reverseSurroundFraction);
+        left = SAL_INTERP(panTable, panIndex, panFraction);
+        out[4] = gain * rear * left;
+        left = SAL_INTERP(panTable, reversePanIndex, reversePanFraction);
+        out[3] = gain * left;
+
+        level = lbl_8047D430 * inputC;
+        levelIndex = __cvt_fp2unsigned(level);
+        levelFraction = level - (f32)levelIndex;
+        gain = SAL_INTERP(volumeTable, levelIndex, levelFraction);
+
+        front = SAL_INTERP(panTable, surroundIndex, surroundFraction);
+        out[8] = lbl_8047D438 * gain * front;
+        rear = SAL_INTERP(panTable, reverseSurroundIndex,
+                          reverseSurroundFraction);
+        left = SAL_INTERP(panTable, panIndex, panFraction);
+        out[7] = gain * rear * left;
+        left = SAL_INTERP(panTable, reversePanIndex, reversePanFraction);
+        out[6] = gain * left;
     } else {
-        prePanFrac = 0.0f;
-        prePanIdx = 0;
-        preInvPan = 0.0f;
-        preInvPanFrac = 0.0f;
-        preInvPanIdx = 0;
-    }
+        f32 original;
 
-    if (hasPan != 0) {
-        pan = lbl_8047D434 + lbl_8047D45C * (pan - lbl_8047D434);
-    }
+        level = lbl_8047D430 * inputA;
+        levelIndex = __cvt_fp2unsigned(level);
+        levelFraction = level - (f32)levelIndex;
+        gain = SAL_INTERP(volumeTable, levelIndex, levelFraction);
 
-    panFrac = (f32)fmod(pan, lbl_8047D450);
-    panIdx = __cvt_fp2unsigned(pan);
-    spanFrac = (f32)fmod(span, lbl_8047D450);
-    spanIdx = __cvt_fp2unsigned(span);
+        front = SAL_INTERP(panTable, surroundIndex, surroundFraction);
+        rear = SAL_INTERP(panTable, reverseSurroundIndex,
+                          reverseSurroundFraction);
+        left = SAL_INTERP(panTable, panIndex, panFraction);
+        out[1] = gain * front * rear * left;
+        left = SAL_INTERP(panTable, reversePanIndex, reversePanFraction);
+        out[0] = gain * rear * left;
 
-    invPan = lbl_8047D458 - pan;
-    invSpan = lbl_8047D458 - span;
-    invPanFrac = (f32)fmod(invPan, lbl_8047D450);
-    invPanIdx = __cvt_fp2unsigned(invPan);
-    invSpanFrac = (f32)fmod(invSpan, lbl_8047D450);
-    invSpanIdx = __cvt_fp2unsigned(invSpan);
+        original =
+            SAL_INTERP(panTable + 4, originalPanIndex, originalPanFraction);
+        out[7] = gain * front * original;
+        original = SAL_INTERP(panTable + 4, originalReverseIndex,
+                              originalReverseFraction);
+        out[6] = gain * front * original;
 
-    panTable = baseTable + 0x81;
+        level = lbl_8047D430 * inputB;
+        levelIndex = __cvt_fp2unsigned(level);
+        levelFraction = level - (f32)levelIndex;
+        gain = SAL_INTERP(volumeTable, levelIndex, levelFraction);
 
-    if (studioFlag == 0) {
-        scaled = lbl_8047D430 * volume;
-        volIdx = __cvt_fp2unsigned(scaled);
-        volFrac = scaled - (f32)volIdx;
-        gain = salLerpPair(volTable, volIdx, volFrac);
-        spanMix = salLerpPair(panTable, spanIdx, spanFrac);
-        out[2] = gain * spanMix * lbl_8047D438;
-        invSpanMix = salLerpPair(panTable, invSpanIdx, invSpanFrac);
-        panMix = salLerpPair(panTable, panIdx, panFrac);
-        amp = gain * invSpanMix;
-        out[1] = amp * panMix;
-        invPanMix = salLerpPair(panTable, invPanIdx, invPanFrac);
-        out[0] = amp * invPanMix;
-
-        scaled = lbl_8047D430 * auxA;
-        volIdx = __cvt_fp2unsigned(scaled);
-        volFrac = scaled - (f32)volIdx;
-        gain = salLerpPair(volTable, volIdx, volFrac);
-        spanMix = salLerpPair(panTable, spanIdx, spanFrac);
-        out[5] = gain * spanMix * lbl_8047D438;
-        amp = gain * invSpanMix;
-        out[4] = amp * panMix;
-        out[3] = amp * invPanMix;
-
-        scaled = lbl_8047D430 * auxB;
-        volIdx = __cvt_fp2unsigned(scaled);
-        volFrac = scaled - (f32)volIdx;
-        gain = salLerpPair(volTable, volIdx, volFrac);
-        spanMix = salLerpPair(panTable, spanIdx, spanFrac);
-        out[8] = gain * spanMix * lbl_8047D438;
-        amp = gain * invSpanMix;
-        out[7] = amp * panMix;
-        out[6] = amp * invPanMix;
-    } else {
-        f32* itdTable;
-        f32* itdTable2;
-        f32 prePanMix;
-        f32 preInvPanMix;
-
-        itdTable = panTable + 4;
-        itdTable2 = panTable + 4;
-        spanMix = salLerpPair(itdTable, spanIdx, spanFrac);
-        invSpanMix = salLerpPair(itdTable, invSpanIdx, invSpanFrac);
-        prePanMix = salLerpPair(panTable, prePanIdx, prePanFrac);
-        preInvPanMix = salLerpPair(panTable, preInvPanIdx, preInvPanFrac);
-        panMix = salLerpPair(itdTable, panIdx, panFrac);
-        invPanMix = salLerpPair(itdTable, invPanIdx, invPanFrac);
-
-        scaled = lbl_8047D430 * volume;
-        volIdx = __cvt_fp2unsigned(scaled);
-        volFrac = scaled - (f32)volIdx;
-        gain = salLerpPair(volTable, volIdx, volFrac);
-        amp = gain * spanMix;
-        out[1] = amp * invSpanMix * panMix;
-        out[0] = amp * invPanMix;
-        out[7] = gain * prePanMix * salLerpPair(itdTable2, prePanIdx, prePanFrac);
-        out[6] = gain * preInvPanMix * salLerpPair(itdTable2, preInvPanIdx, preInvPanFrac);
-
-        scaled = lbl_8047D430 * auxA;
-        volIdx = __cvt_fp2unsigned(scaled);
-        volFrac = scaled - (f32)volIdx;
-        gain = salLerpPair(volTable, volIdx, volFrac);
-        amp = gain * spanMix;
-        out[5] = amp * lbl_8047D438;
-        out[4] = amp * invSpanMix * panMix;
-        out[3] = amp * invPanMix;
-
+        front = SAL_INTERP(panTable, surroundIndex, surroundFraction);
+        out[5] = lbl_8047D438 * gain * front;
+        rear = SAL_INTERP(panTable, reverseSurroundIndex,
+                          reverseSurroundFraction);
+        left = SAL_INTERP(panTable, panIndex, panFraction);
+        out[4] = gain * rear * left;
+        left = SAL_INTERP(panTable, reversePanIndex, reversePanFraction);
+        out[3] = gain * left;
         out[2] = lbl_8047D460[0];
         out[8] = lbl_8047D460[0];
     }
 }
+
+#undef SAL_INTERP
+#undef SAL_FRAC
+typedef struct MusyxVec3 {
+    f32 x;
+    f32 y;
+    f32 z;
+} MusyxVec3;
+
+typedef struct MusyxEmitterListener {
+    struct MusyxEmitterListener* next; /* 0x00 */
+    struct MusyxEmitterListener* prev; /* 0x04 */
+    u32 field_08;                      /* 0x08 */
+    u32 field_0C;                      /* 0x0C */
+    MusyxVec3 pos;                     /* 0x10 */
+    f32 distanceScore;                 /* 0x1C */
+    MusyxVec3 velocity;                /* 0x20 */
+    f32 field_2C;                      /* 0x2C */
+    f32 field_30;                      /* 0x30 */
+    f32 field_34;                      /* 0x34 */
+    u8 pad_38[0x18];                   /* 0x38 */
+    f32 matrix[12];                    /* 0x50 */
+    u8 pad_80[0x8];                    /* 0x80 */
+    f32 dopplerScale;                  /* 0x88 */
+    f32 volumeScale;                   /* 0x8C */
+} MusyxEmitterListener;
+
+typedef struct MusyxEmitter {
+    struct MusyxEmitter* next;         /* 0x00 */
+    struct MusyxEmitter* prev;         /* 0x04 */
+    MusyxEmitterListener* listener;    /* 0x08 */
+    void* ctrlList;                    /* 0x0C */
+    u32 flags;                         /* 0x10 */
+    MusyxVec3 pos;                     /* 0x14 */
+    MusyxVec3 velocity;                /* 0x20 */
+    f32 maxDistance;                   /* 0x2C */
+    f32 minVolume;                     /* 0x30 */
+    f32 maxVolume;                     /* 0x34 */
+    f32 curve;                         /* 0x38 */
+    u32 voice;                         /* 0x3C */
+    void* user;                        /* 0x40 */
+    u16 fxId;                          /* 0x44 */
+    u8 studio;                         /* 0x46 */
+    u8 maxVoices;                      /* 0x47 */
+    u16 field_48;                      /* 0x48 */
+    f32 field_4C;                      /* 0x4C */
+} MusyxEmitter;
+
+typedef struct MusyxVoiceLink {
+    struct MusyxVoiceLink* next;       /* 0x00 */
+    struct MusyxVoiceLink* prev;       /* 0x04 */
+    MusyxEmitterListener* listener;    /* 0x08 */
+    u32 flags;                         /* 0x10 */
+    u8 pad_14[0x28];                   /* 0x14 */
+    u32 voice;                         /* 0x3C */
+} MusyxVoiceLink;
+
+typedef struct MusyxStudioEmitter {
+    struct MusyxStudioEmitter* next;   /* 0x00 */
+    struct MusyxStudioEmitter* prev;   /* 0x04 */
+    u32 field_08;                      /* 0x08 */
+    MusyxVec3 pos;                     /* 0x0C */
+    f32 distanceScore;                 /* 0x18 */
+    u8 studio;                         /* 0x1C */
+    u8 pad_1D[3];                      /* 0x1D */
+    void (*activateCb)(u8 studio, void* user); /* 0x20 */
+    void (*releaseCb)(u8 studio);      /* 0x24 */
+    void* user;                        /* 0x28 */
+    s32 fade;                          /* 0x2C */
+} MusyxStudioEmitter;
+
+extern MusyxStudioEmitter* lbl_8047B040;
+extern MusyxEmitterListener* lbl_8047B044;
+extern MusyxVoiceLink* lbl_8047B048;
+extern u8 lbl_8047B034;
+extern u8 lbl_8047B035;
+extern u32 lbl_8047B038;
+extern void synthSendKeyOff(u32 voice);
+extern void fn_8014DCA8(u8 studio);
+extern void fn_8014DC00(u8 studio, u32 isMaster, u32 type);
+extern void salApplyMatrix(const f32* matrix, const f32* src, f32* dst);
+extern f32 salNormalizeVector(f32* vec);
+extern f32 sqrtf(f32 x);
+extern f32 lbl_8047D468;
+extern f64 lbl_8047D470;
+extern f32 lbl_8047D478;
+extern f32 lbl_8047D47C;
+extern f64 lbl_8047D480;
+extern f32 lbl_8047D48C;
+extern f32 lbl_8047D498;
+
+static f32 fn_8015DEC0_average_distance(MusyxStudioEmitter* emitter, u32 listenerCount)
+{
+    MusyxEmitterListener* listener;
+    f32 sum;
+
+    sum = lbl_8047D468;
+    for (listener = lbl_8047B044; listener != NULL; listener = listener->next) {
+        f32 dx;
+        f32 dy;
+        f32 dz;
+
+        dx = emitter->pos.x - listener->pos.x;
+        dy = emitter->pos.y - listener->pos.y;
+        dz = emitter->pos.z - listener->pos.z;
+        sum += dx * dx + dy * dy + dz * dz;
+    }
+
+    return sum / (f32)listenerCount;
+}
+
+static void fn_8015DEC0_apply_fade(MusyxStudioEmitter* emitter)
+{
+    if ((f64)(lbl_8047D47C * (f32)emitter->fade) >= lbl_8047D480) {
+        fn_8014DC00(emitter->studio, 1, 0);
+    } else {
+        fn_8014DC00(emitter->studio, 0, 0);
+    }
+}
+
+void fn_8015DEC0(void)
+{
+    MusyxEmitterListener* listener;
+    MusyxStudioEmitter* emitter;
+    MusyxStudioEmitter* victim;
+    MusyxVoiceLink* voice;
+    u32 listenerCount;
+
+    listenerCount = 0;
+    for (listener = lbl_8047B044; listener != NULL; listener = listener->next) {
+        listenerCount++;
+    }
+
+    if (listenerCount != 0) {
+        for (emitter = lbl_8047B040; emitter != NULL; emitter = emitter->next) {
+            if (emitter->studio != 0xFF) {
+                emitter->distanceScore = fn_8015DEC0_average_distance(emitter, listenerCount);
+            }
+        }
+    }
+
+    listenerCount = 0;
+    for (listener = lbl_8047B044; listener != NULL; listener = listener->next) {
+        listenerCount++;
+    }
+
+    if (listenerCount == 0) {
+        return;
+    }
+
+    for (emitter = lbl_8047B040; emitter != NULL; emitter = emitter->next) {
+        if (emitter->studio == 0xFF) {
+            u8 listenerOwnsEmitter;
+            f32 distanceScore;
+            u32 studioMask;
+            u32 activeMask;
+            u32 studioIndex;
+
+            distanceScore = fn_8015DEC0_average_distance(emitter, listenerCount);
+            listenerOwnsEmitter = 0;
+            for (listener = lbl_8047B044; listener != NULL; listener = listener->next) {
+                if (listener->field_08 == (u32)emitter) {
+                    listenerOwnsEmitter = 1;
+                    break;
+                }
+            }
+
+            activeMask = ~(~0u << lbl_8047B034);
+            studioMask = lbl_8047B038;
+            if ((activeMask & studioMask) != activeMask) {
+                for (studioIndex = 0; studioIndex < lbl_8047B034; studioIndex++) {
+                    if ((studioMask & (1u << studioIndex)) == 0) {
+                        break;
+                    }
+                }
+
+                lbl_8047B038 |= 1u << studioIndex;
+                emitter->studio = (u8)(studioIndex + lbl_8047B035);
+            } else {
+                f32 maxDistance;
+
+                victim = NULL;
+                maxDistance = lbl_8047D478;
+                {
+                    MusyxStudioEmitter* scan;
+
+                    for (scan = lbl_8047B040; scan != NULL; scan = scan->next) {
+                        if (scan->studio != 0xFF && maxDistance < scan->distanceScore) {
+                            maxDistance = scan->distanceScore;
+                            victim = scan;
+                        }
+                    }
+                }
+
+                if (listenerOwnsEmitter == 0 && maxDistance <= distanceScore) {
+                    goto next_emitter;
+                }
+
+                for (voice = lbl_8047B048; voice != NULL; voice = voice->next) {
+                    if (voice->listener == (MusyxEmitterListener*)victim) {
+                        synthSendKeyOff(voice->voice);
+                        voice->flags |= 0x80000;
+                        voice->voice = (u32)-1;
+                    }
+                }
+
+                if (victim->releaseCb != NULL) {
+                    victim->releaseCb(victim->studio);
+                }
+                fn_8014DCA8(victim->studio);
+                emitter->studio = victim->studio;
+                victim->studio = 0xFF;
+                victim->field_08 = 0;
+            }
+
+            emitter->distanceScore = distanceScore;
+            emitter->fade = listenerOwnsEmitter != 0 ? 0x7F0000 : 0;
+            fn_8015DEC0_apply_fade(emitter);
+            if (emitter->activateCb != NULL) {
+                emitter->activateCb(emitter->studio, emitter->user);
+            }
+        } else {
+            if ((emitter->field_08 & 0x80000000) != 0) {
+                emitter->fade += 0x40000;
+                if ((u32)emitter->fade >= 0x7F0000) {
+                    emitter->fade = 0x7F0000;
+                    emitter->field_08 &= ~0x80000000u;
+                }
+                fn_8015DEC0_apply_fade(emitter);
+            }
+
+            if ((emitter->field_08 & 0x40000000) != 0) {
+                emitter->fade -= 0x40000;
+                if (emitter->fade >= 0) {
+                    emitter->fade = 0;
+                    emitter->field_08 &= ~0x40000000u;
+                }
+                fn_8015DEC0_apply_fade(emitter);
+            }
+        }
+
+next_emitter:
+        ;
+    }
+}
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+void fn_8015E374(MusyxEmitter* emitter, f32* outVolume, f32* outDoppler,
+                 f32* outX, f32* outY, f32* outCone) {
+    MusyxEmitterListener* listener;
+    u32 count;
+    f32 sumX;
+    f32 sumY;
+    f32 sumCone;
+
+    *outVolume = lbl_8047D468;
+    *outDoppler = lbl_8047D48C;
+    sumCone = lbl_8047D468;
+    sumY = lbl_8047D468;
+    sumX = lbl_8047D468;
+    count = 0;
+
+    for (listener = lbl_8047B044; listener != NULL; listener = listener->next, count++) {
+        MusyxVec3 rel;
+        MusyxVec3 local;
+        f32 distSq;
+        f32 dist;
+
+        rel.x = emitter->pos.x - (listener->pos.x + listener->field_2C * listener->distanceScore);
+        rel.y = emitter->pos.y - (listener->pos.y + listener->field_30 * listener->distanceScore);
+        rel.z = emitter->pos.z - (listener->pos.z + listener->field_34 * listener->distanceScore);
+        distSq = rel.x * rel.x + rel.y * rel.y + rel.z * rel.z;
+        dist = distSq;
+        if (distSq > lbl_8047D468) {
+            dist = sqrtf(distSq);
+        }
+
+        if (dist <= emitter->maxDistance) {
+            f32 ratio;
+            f32 volume;
+            f32 curve;
+            f32 spreadDist;
+
+            ratio = dist / emitter->maxDistance;
+            curve = emitter->curve;
+            if (curve >= lbl_8047D468) {
+                f32 one;
+                f32 invCurve;
+                f32 volumeRange;
+
+                one = lbl_8047D48C;
+                invCurve = one - curve;
+                volumeRange = emitter->minVolume - emitter->maxVolume;
+                volume = ratio * (curve * ratio);
+                volume = (invCurve * ratio) + volume;
+                volume = one - volume;
+                volume = (volumeRange * volume) + emitter->maxVolume;
+                *outVolume += listener->volumeScale * volume;
+            } else {
+                f32 one;
+                f32 invRatio;
+                f32 volumeRange;
+
+                one = lbl_8047D48C;
+                invRatio = one - ratio;
+                volumeRange = emitter->minVolume - emitter->maxVolume;
+                volume = (invRatio * invRatio);
+                volume = one - volume;
+                volume = curve * volume;
+                volume = (one + curve) * ratio - volume;
+                volume = one - volume;
+                volume = (volumeRange * volume) + emitter->maxVolume;
+                *outVolume += listener->volumeScale * volume;
+            }
+
+            if ((emitter->flags & 0x80000) != 0) {
+                continue;
+            }
+            if ((emitter->flags & 8) == 0 && (listener->field_0C & 1) == 0) {
+                goto skip_spread;
+            }
+
+            {
+                f32 dx;
+                f32 dy;
+                f32 dz;
+                f32 travelSq;
+
+                dx = listener->velocity.x - emitter->velocity.x;
+                dy = listener->velocity.y - emitter->velocity.y;
+                dz = listener->velocity.z - emitter->velocity.z;
+                travelSq = dx * dx + dy * dy + dz * dz;
+                spreadDist = travelSq;
+                if (travelSq > lbl_8047D468) {
+                    spreadDist = sqrtf(travelSq);
+                }
+            }
+
+            if (spreadDist > lbl_8047D468) {
+                f32 aheadX;
+                f32 aheadY;
+                f32 aheadZ;
+                f32 lAheadX;
+                f32 lAheadY;
+                f32 lAheadZ;
+                f32 aheadSq;
+                f32 aheadDist;
+
+                aheadX = emitter->pos.x + emitter->velocity.x * lbl_8047D498;
+                aheadY = emitter->pos.y + emitter->velocity.y * lbl_8047D498;
+                aheadZ = emitter->pos.z + emitter->velocity.z * lbl_8047D498;
+                lAheadX = listener->pos.x + listener->velocity.x * lbl_8047D498;
+                lAheadY = listener->pos.y + listener->velocity.y * lbl_8047D498;
+                lAheadZ = listener->pos.z + listener->velocity.z * lbl_8047D498;
+                aheadX -= lAheadX;
+                aheadY -= lAheadY;
+                aheadZ -= lAheadZ;
+                aheadSq = aheadX * aheadX + aheadY * aheadY + aheadZ * aheadZ;
+                aheadDist = aheadSq;
+                if (aheadSq > lbl_8047D468) {
+                    aheadDist = sqrtf(aheadSq);
+                }
+
+                if (aheadDist < dist) {
+                    *outDoppler = listener->dopplerScale / (listener->dopplerScale - spreadDist);
+                } else {
+                    *outDoppler = listener->dopplerScale / (listener->dopplerScale + spreadDist);
+                }
+            }
+
+skip_spread:
+            if (dist != lbl_8047D468) {
+                salApplyMatrix(listener->matrix, (const f32*)&emitter->pos,
+                               (f32*)&local);
+                if (local.z <= lbl_8047D468) {
+                    if (-listener->matrix[10] < local.z) {
+                        sumCone += -local.z / listener->matrix[10];
+                    } else {
+                        sumCone += lbl_8047D48C;
+                    }
+                } else {
+                    if (listener->matrix[11] > local.z) {
+                        sumCone += -local.z / listener->matrix[11];
+                    } else {
+                        sumCone += lbl_8047D478;
+                    }
+                }
+
+                if (local.x != lbl_8047D468 || local.y != lbl_8047D468 ||
+                    local.z != lbl_8047D468) {
+                    salNormalizeVector((f32*)&local);
+                }
+                sumX += local.x;
+                sumY -= local.y;
+            }
+        }
+    }
+
+    if (count != 0) {
+        *outX = sumX / (f32)count;
+        *outY = sumY / (f32)count;
+        *outCone = sumCone / (f32)count;
+    }
+}
+#pragma pop
+
+/* snd_service: periodically advances active sound emitters and publishes
+ * positional updates to the synthesizer. */
+typedef struct SndServiceSource {
+    u8 _00[0x1C];
+    u8 studio;
+} SndServiceSource;
+
+typedef struct SndServiceCtrl {
+    u8 ctrl;
+    u8 _01;
+    u16 value;
+} SndServiceCtrl;
+
+typedef struct SndServiceCtrlList {
+    u8 count;
+    u8 _01[3];
+    SndServiceCtrl* controls;
+} SndServiceCtrlList;
+
+typedef struct SndServiceVoice {
+    struct SndServiceVoice* next;
+    struct SndServiceVoice* prev;
+    SndServiceSource* source;
+    SndServiceCtrlList* ctrlList;
+    u32 flags;
+    f32 position[3];
+    f32 velocity[3];
+    f32 maxDistance;
+    f32 innerLevel;
+    f32 outerLevel;
+    f32 distanceCurve;
+    u32 handle;
+    u32 group;
+    u16 effectId;
+    u8 fallbackStudio;
+    u8 _47[5];
+    f32 fade;
+} SndServiceVoice;
+
+typedef struct SndVec3 {
+    f32 x;
+    f32 y;
+    f32 z;
+} SndVec3;
+
+typedef struct SndListener {
+    struct SndListener* next;
+    u32 _04;
+    void* studioRef;
+    u32 flags;
+    SndVec3 position;
+    f32 offsetDistance;
+    SndVec3 velocity;
+    SndVec3 offsetDirection;
+    u8 _38[0x18];
+    f32 matrix[12];
+    f32 rearRange;
+    f32 frontRange;
+    f32 soundSpeed;
+    f32 gain;
+} SndListener;
+
+typedef struct SndServiceStudio {
+    struct SndServiceStudio* next;
+    u32 _04;
+    u32 flags;
+    SndVec3 position;
+    f32 averageDistance;
+    u8 studio;
+    u8 _1D[3];
+    void (*assignedCallback)(u8 studio, u32 userData);
+    void (*releasedCallback)(u8 studio);
+    u32 userData;
+    s32 mix;
+} SndServiceStudio;
+
+typedef struct SndServiceGroupNode {
+    struct SndServiceGroupNode* next;
+    f32 value;
+    SndServiceVoice* voice;
+} SndServiceGroupNode;
+
+typedef struct SndServiceGroup {
+    u32 key;
+    u32 _04;
+    SndServiceGroupNode* voices;
+    u16 count;
+    u16 _0E;
+} SndServiceGroup;
+
+typedef struct SndServiceEmitterPair {
+    struct SndServiceEmitterPair* next;
+    u8 _04[0x10];
+    f32 scale;
+    u8 _18[4];
+    u8 level;
+    u8 lastStudio;
+    u8 _1E[2];
+    SndServiceSource* left;
+    SndServiceSource* right;
+    u32 flags;
+    u8 _2C[8];
+    u8 update[4];
+} SndServiceEmitterPair;
+
+extern u8 lbl_8047B04C;
+extern u8 lbl_8047B032;
+extern u8 lbl_8047B031;
+extern u8 lbl_8047B030;
+extern SndServiceEmitterPair* lbl_8047B03C;
+extern SndServiceGroup lbl_80448590[];
+extern SndServiceGroupNode lbl_80448990[];
+extern f32 lbl_8047D488;
+extern f32 lbl_8047D49C;
+extern f32 lbl_8047D4A0;
+extern f32 lbl_8047D4B0[];
+extern u32 synthFXStart(u16 effect, u8 volume, u8 pan, u8 studio, u32 itd);
+extern u32 synthFXSetCtrl(u32 handle, u8 ctrl, u8 value);
+extern u32 synthFXSetCtrl14(u32 handle, u8 ctrl, u16 value);
+extern u32 sndFXCheck(u32 handle);
+extern u32 fn_8015F124(SndServiceVoice*, f32, f32, f32, f32, f32);
+extern void fn_8015F270(void);
+extern void fn_8014DD98(u8 studio, void* update);
+extern void fn_8014DDB8(u8 studio, void* update);
+
+#pragma push
+#pragma optimization_level 4
+void fn_8015F620(void)
+{
+    SndServiceVoice* voice;
+    SndServiceVoice* next;
+    SndServiceEmitterPair* pair;
+    f32 value;
+    f32 pitch;
+    f32 pan;
+    f32 surround;
+    f32 volume;
+
+    if (lbl_8047B04C != 0) {
+        lbl_8047B04C--;
+        return;
+    }
+
+    lbl_8047B04C = 3;
+    lbl_8047B032 = 0;
+    lbl_8047B031 = 0;
+    lbl_8047B030 = 0;
+
+    voice = (SndServiceVoice*)lbl_8047B048;
+    while (voice != 0) {
+        u32 flags = voice->flags;
+        next = voice->next;
+
+        if (flags & 0x40000) {
+            if (voice->next != 0) {
+                voice->next->prev = voice->prev;
+            }
+            if (voice->prev != 0) {
+                voice->prev->next = voice->next;
+            } else {
+                lbl_8047B048 = (MusyxVoiceLink*)voice->next;
+            }
+            voice->flags &= 0xFFFF;
+            if (voice->handle != 0xFFFFFFFF) {
+                synthSendKeyOff(voice->handle);
+            }
+            voice = next;
+            continue;
+        }
+
+        if (flags & 0x20001) {
+            fn_8015E374((MusyxEmitter*)voice, &value, &pitch, &pan,
+                        &surround, &volume);
+        }
+
+        flags = voice->flags;
+        if (flags & 0x80000) {
+            if ((voice->source == 0 || voice->source->studio == 0xFF) &&
+                value != lbl_8047D468) {
+                voice->flags &= ~0x80000;
+                voice->flags |= 0x20000;
+            }
+            voice = next;
+            continue;
+        }
+
+        if (flags & 0x20000) {
+            if (value == lbl_8047D468 && (flags & 4)) {
+                voice->flags |= 0x80000;
+                voice->flags &= ~0x20000;
+            } else if (value == lbl_8047D468 && (flags & 0x40)) {
+                if (voice->next != 0) {
+                    voice->next->prev = voice->prev;
+                }
+                if (voice->prev != 0) {
+                    voice->prev->next = voice->next;
+                } else {
+                    lbl_8047B048 = (MusyxVoiceLink*)voice->next;
+                }
+                voice->flags &= 0xFFFF;
+                if (voice->handle != 0xFFFFFFFF) {
+                    synthSendKeyOff(voice->handle);
+                }
+                voice = next;
+                continue;
+            } else if (flags & 1) {
+                if (fn_8015F124(voice, value, pan, surround, volume, pitch) != 0) {
+                    voice = next;
+                    continue;
+                }
+            } else {
+                u8 studio;
+                if (voice->source != 0 && voice->source->studio != 0xFF) {
+                    if (!(flags & 2)) {
+                        voice->flags |= 0x40000;
+                        voice->flags &= ~0x20000;
+                    }
+                } else {
+                    studio = voice->source != 0 ? voice->source->studio : voice->fallbackStudio;
+                    voice->handle = synthFXStart(voice->effectId, 0x7F, 0x40,
+                                                 studio, (flags >> 4) & 1);
+                    if (voice->handle == 0xFFFFFFFF) {
+                        if (!(flags & 2)) {
+                            voice->flags |= 0x40000;
+                            voice->flags &= ~0x20000;
+                        }
+                    }
+                }
+            }
+        } else {
+            voice->handle = sndFXCheck(voice->handle);
+            if (voice->handle == 0xFFFFFFFF) {
+                if (flags & 2) {
+                    voice->flags |= 0x20000;
+                } else {
+                    voice->flags |= 0x40000;
+                }
+            }
+        }
+
+        if (voice->handle != 0xFFFFFFFF) {
+            u32 handle = voice->handle;
+
+            if (voice->flags & 1) {
+                u32 groupIndex;
+                SndServiceGroup* group;
+                SndServiceGroupNode* before;
+                SndServiceGroupNode* node;
+
+                for (groupIndex = 0; groupIndex < lbl_8047B032; groupIndex++) {
+                    if (lbl_80448590[groupIndex].key == voice->group) {
+                        break;
+                    }
+                }
+                group = &lbl_80448590[groupIndex];
+                if (groupIndex == lbl_8047B032) {
+                    group->_04 = 0;
+                    group->voices = 0;
+                    group->count = 0;
+                    group->key = voice->group;
+                    lbl_8047B032++;
+                }
+                group->count++;
+                before = 0;
+                node = group->voices;
+                while (node != 0 && node->value <= value) {
+                    before = node;
+                    node = node->next;
+                }
+                if (before == 0) {
+                    group->voices = &lbl_80448990[lbl_8047B030];
+                } else {
+                    before->next = &lbl_80448990[lbl_8047B030];
+                }
+                before = &lbl_80448990[lbl_8047B030++];
+                before->next = node;
+                before->voice = voice;
+                before->value = value;
+            }
+
+            if (value == lbl_8047D468 && (voice->flags & 4)) {
+                synthSendKeyOff(handle);
+                voice->handle = 0xFFFFFFFF;
+                if (voice->flags & 2) {
+                    voice->flags |= 0x80000;
+                } else {
+                    voice->flags |= 0x40000;
+                }
+            } else {
+                u32 converted;
+                u8 controlValue;
+                u16 control14;
+
+                if (voice->flags & 0x100000) {
+                    converted = (u32)(s32)(lbl_8047D488 * (voice->fade * value));
+                } else {
+                    converted = (u32)(s32)(lbl_8047D488 * value);
+                }
+                controlValue = 0x7F;
+                if ((u8)converted <= 0x7F) {
+                    controlValue = converted;
+                }
+                synthFXSetCtrl(handle, 7, controlValue);
+
+                converted = (u32)(s32)(lbl_8047D49C * (lbl_8047D48C + pan));
+                controlValue = 0x7F;
+                if ((u8)converted <= 0x7F) {
+                    controlValue = converted;
+                }
+                synthFXSetCtrl(handle, 0xA, controlValue);
+
+                converted = (u32)(s32)(lbl_8047D49C * (lbl_8047D48C - surround));
+                controlValue = 0x7F;
+                if ((u8)converted <= 0x7F) {
+                    controlValue = converted;
+                }
+                synthFXSetCtrl(handle, 0x83, controlValue);
+
+                converted = __cvt_fp2unsigned(lbl_8047D4A0 * pitch);
+                control14 = 0x3FFF;
+                if (converted <= 0x3FFF) {
+                    control14 = converted;
+                }
+                synthFXSetCtrl14(handle, 0x84, control14);
+
+                if (voice->ctrlList != 0) {
+                    u32 i;
+                    SndServiceCtrl* ctrl = voice->ctrlList->controls;
+                    for (i = 0; i < voice->ctrlList->count; i++, ctrl++) {
+                        if (ctrl->ctrl < 0x40 || ctrl->ctrl == 0x80 || ctrl->ctrl == 0x84) {
+                            synthFXSetCtrl14(handle, ctrl->ctrl, ctrl->value);
+                        } else {
+                            synthFXSetCtrl(handle, ctrl->ctrl, (u8)ctrl->value);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (voice->flags & 0x100000) {
+            voice->fade += lbl_8047D4B0[0];
+            if (voice->fade >= lbl_8047D48C) {
+                voice->flags &= ~0x100000;
+            }
+        }
+        voice = next;
+    }
+
+    fn_8015F270();
+    fn_8015DEC0();
+
+    pair = lbl_8047B03C;
+    while (pair != 0) {
+        u8 leftStudio = pair->left->studio;
+        u8 rightStudio = pair->right->studio;
+
+        if (!(pair->flags & 0x80000000)) {
+            if (leftStudio != 0xFF && rightStudio != 0xFF) {
+                pair->update[1] = (u8)(pair->level * pair->scale);
+                pair->update[2] = 0;
+                pair->update[0] = (u8)(lbl_8047D488 * pair->scale);
+                if (pair->flags & 1) {
+                    pair->update[3] = rightStudio;
+                    fn_8014DD98(leftStudio, pair->update);
+                } else {
+                    pair->update[3] = leftStudio;
+                    fn_8014DD98(rightStudio, pair->update);
+                }
+                pair->flags |= 0x80000000;
+            }
+        } else if (leftStudio == 0xFF || rightStudio == 0xFF) {
+            if ((leftStudio != 0xFF && leftStudio == pair->lastStudio) ||
+                (rightStudio != 0xFF && rightStudio == pair->lastStudio)) {
+                fn_8014DDB8(pair->lastStudio, pair->update);
+            }
+            pair->flags &= 0x7FFFFFFF;
+        } else {
+            pair->update[1] = (u8)(pair->level * pair->scale);
+            pair->update[2] = 0;
+            pair->update[0] = (u8)(lbl_8047D488 * pair->scale);
+        }
+        pair = pair->next;
+    }
+}
+#pragma pop
 
 extern u32 _GetInputValue(u8* obj, u8* motionBase, u8 p1, u8 p2); /* true return type IS
                                                                       * u32 -- the callee
@@ -5631,10 +6548,10 @@ void fn_8015FE4C(u32 arg) {
     extern u8 lbl_8047B034;
     extern u8 lbl_8047B035;
     extern u32 lbl_8047B038;
-    extern u32 lbl_8047B03C;
-    extern u32 lbl_8047B040;
-    extern u32 lbl_8047B044;
-    extern u32 lbl_8047B048;
+    extern SndServiceEmitterPair* lbl_8047B03C;
+    extern MusyxStudioEmitter* lbl_8047B040;
+    extern MusyxEmitterListener* lbl_8047B044;
+    extern MusyxVoiceLink* lbl_8047B048;
     extern u8 lbl_8047B04C;
     lbl_8047B048 = 0;
     lbl_8047B044 = 0;
@@ -5745,6 +6662,108 @@ void fn_8016039C(u8 chan, u8 midiSet, s32 flag) { /* inpSetGlobalMIDIDirtyFlag *
      * index) so MWCC emits retail's separate row-stride/column-stride
      * multiplies instead of a single combined-index multiply. */
     ((u32(*)[16])lbl_80449390)[midiSet][chan] |= flag;
+}
+#pragma pop
+
+extern void synthKeyStateUpdate(SynthVoiceMini* svoice);
+
+static void inpMirrorChannelDefault(u8 midi, u8 midiSet, u8 value) {
+    u32 i;
+    SynthVoiceMini* voice;
+
+    for (i = 0, voice = lbl_8047AF48; i < synthInfo.voiceNum; i++, voice++) {
+        if (voice->midiSet == midiSet && voice->midi == midi) {
+            ((u8*)voice)[0x1D7] = value;
+            ((u8*)voice)[0x1D6] = value;
+        }
+    }
+}
+
+static void inpDirtyLiveVoices(u8 midi, u8 midiSet) {
+    u32 i;
+    SynthVoiceMini* voice;
+
+    for (i = 0, voice = lbl_8047AF48; i < synthInfo.voiceNum; i++, voice++) {
+        if (voice->midiSet == midiSet && voice->midi == midi) {
+            *(u32*)((u8*)voice + 0x214) = 0x1FFF;
+            synthKeyStateUpdate(voice);
+        }
+    }
+}
+
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+void fn_801603C0(u8 ctrl, u8 channel, u8 set, u8 value) { /* inpSetMidiCtrl */
+    u8* ctrlBase;
+    u8 range;
+
+    if (channel == 0xFF) {
+        return;
+    }
+
+    ctrlBase = (set != 0xFF) ? lbl_80449590[set][channel] : lbl_8044D910[channel];
+
+    switch (ctrl) {
+    case 6:
+        if (((ctrlBase[0x64] << 8) | ctrlBase[0x65]) == 0) {
+            range = value;
+            if (range > 0x18) {
+                range = 0x18;
+            }
+            if (set != 0xFF) {
+                lbl_8044D890[set][channel] = range;
+            } else {
+                lbl_8044FA90[channel] = range;
+            }
+            inpMirrorChannelDefault(channel, set, range);
+        }
+        break;
+    case 0x60:
+        if (((ctrlBase[0x64] << 8) | ctrlBase[0x65]) == 0) {
+            if (set != 0xFF) {
+                range = lbl_8044D890[set][channel];
+                if (range != 0) {
+                    range--;
+                }
+                lbl_8044D890[set][channel] = range;
+            } else {
+                range = lbl_8044FA90[channel];
+                if (range != 0) {
+                    range--;
+                }
+                lbl_8044FA90[channel] = range;
+            }
+            inpMirrorChannelDefault(channel, set, range);
+        }
+        break;
+    case 0x61:
+        if (((ctrlBase[0x64] << 8) | ctrlBase[0x65]) == 0) {
+            if (set != 0xFF) {
+                range = lbl_8044D890[set][channel];
+                if (range < 0x18) {
+                    range++;
+                }
+                lbl_8044D890[set][channel] = range;
+            } else {
+                range = lbl_8044FA90[channel];
+                if (range < 0x18) {
+                    range++;
+                }
+                lbl_8044FA90[channel] = range;
+            }
+            inpMirrorChannelDefault(channel, set, range);
+        }
+        break;
+    }
+
+    value &= 0x7F;
+    ctrlBase[ctrl] = value;
+    inpDirtyLiveVoices(channel, set);
+
+    if (set != 0xFF) {
+        ((u32(*)[16])lbl_80449390)[set][channel] = 0xFF;
+    }
 }
 #pragma pop
 

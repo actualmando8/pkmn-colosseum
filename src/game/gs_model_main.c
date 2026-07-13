@@ -983,6 +983,198 @@ void GSmodelSetPosition(GSmodel* model, GSvec* position)
     }
 }
 
+void GSmodelDetachFromGSpart(GSmodel* model, u8 applyTransform)
+{
+    HSDJObj* jobj;
+    f32 value;
+
+    if (model->transformOverride != 0) {
+        *(u32*)((u8*)model + 0x118) = 0;
+        *(u32*)((u8*)model + 0x11C) = 0;
+        model->flags.raw &= ~0xC0000U;
+        model->transformOverride = 0;
+
+        if (applyTransform != 0) {
+            if (model->transformOverride == 0) {
+                GSvecCopy(&model->position, &model->overridePosition);
+
+                jobj = model->renderJObj;
+                if (jobj == NULL) {
+                    __assert(lbl_8047CB60, 0x3A9, lbl_8047CB68);
+                }
+                if (&model->overridePosition == NULL) {
+                    __assert(lbl_8047CB60, 0x3AA, lbl_80270E50);
+                }
+                jobj->translate = model->overridePosition;
+                if (!(jobj->flags & JOBJ_MTX_INDEP_SRT)) {
+                    if (jobj != NULL) {
+                        s32 dirty;
+                        u32 flags;
+
+                        if (jobj == NULL) {
+                            __assert(lbl_8047CB60, 0x25D, lbl_8047CB68);
+                        }
+                        flags = jobj->flags;
+                        dirty = 0;
+                        if (!(flags & JOBJ_USER_DEF_MTX) &&
+                            (flags & JOBJ_MTX_DIRTY)) {
+                            dirty = 1;
+                        }
+                        if (dirty == 0) {
+                            fn_8019D620(jobj);
+                        }
+                    }
+                }
+            } else {
+                GSvecCopy(&model->overridePosition, &model->overridePosition);
+            }
+
+            if (model->flags.raw & GSMODEL_FLAG_RENDER_ALT_JOBJ) {
+                memcpy(&model->boundCenter, &model->position, sizeof(GSvec));
+            } else {
+                GSpart* part;
+
+                part = GSmodelGetPart(model, 1);
+                if (part == NULL) {
+                    memcpy(&model->boundCenter, &model->position,
+                           sizeof(GSvec));
+                } else {
+                    GSpartGetTransform(part, &model->boundCenter, NULL, NULL);
+                    GSpartFree(part);
+                    model->boundCenter.y -= model->boundYOffset;
+                }
+            }
+
+            if (model->transformOverride == 0) {
+                GSvecCopy(&model->rotation, &model->overrideRotation);
+
+                jobj = model->renderJObj;
+                value = model->overrideRotation.x;
+                if (jobj == NULL) {
+                    __assert(lbl_8047CB60, 0x2A4, lbl_8047CB68);
+                }
+                if (jobj->flags & JOBJ_USE_QUATERNION) {
+                    __assert(lbl_8047CB60, 0x2A5, lbl_80270E28);
+                }
+                jobj->rotation.x = value;
+                if (!(jobj->flags & JOBJ_MTX_INDEP_SRT)) {
+                    if (jobj != NULL) {
+                        s32 dirty;
+                        u32 flags;
+
+                        if (jobj == NULL) {
+                            __assert(lbl_8047CB60, 0x25D, lbl_8047CB68);
+                        }
+                        flags = jobj->flags;
+                        dirty = 0;
+                        if (!(flags & JOBJ_USER_DEF_MTX) &&
+                            (flags & JOBJ_MTX_DIRTY)) {
+                            dirty = 1;
+                        }
+                        if (dirty == 0) {
+                            fn_8019D620(jobj);
+                        }
+                    }
+                }
+
+                jobj = model->renderJObj;
+                value = model->overrideRotation.y;
+                if (jobj == NULL) {
+                    __assert(lbl_8047CB60, 0x2B8, lbl_8047CB68);
+                }
+                if (jobj->flags & JOBJ_USE_QUATERNION) {
+                    __assert(lbl_8047CB60, 0x2B9, lbl_80270E28);
+                }
+                jobj->rotation.y = value;
+                if (!(jobj->flags & JOBJ_MTX_INDEP_SRT)) {
+                    if (jobj != NULL) {
+                        s32 dirty;
+                        u32 flags;
+
+                        if (jobj == NULL) {
+                            __assert(lbl_8047CB60, 0x25D, lbl_8047CB68);
+                        }
+                        flags = jobj->flags;
+                        dirty = 0;
+                        if (!(flags & JOBJ_USER_DEF_MTX) &&
+                            (flags & JOBJ_MTX_DIRTY)) {
+                            dirty = 1;
+                        }
+                        if (dirty == 0) {
+                            fn_8019D620(jobj);
+                        }
+                    }
+                }
+
+                jobj = model->renderJObj;
+                value = model->overrideRotation.z;
+                if (jobj == NULL) {
+                    __assert(lbl_8047CB60, 0x2CC, lbl_8047CB68);
+                }
+                if (jobj->flags & JOBJ_USE_QUATERNION) {
+                    __assert(lbl_8047CB60, 0x2CD, lbl_80270E28);
+                }
+                jobj->rotation.z = value;
+                if (!(jobj->flags & JOBJ_MTX_INDEP_SRT)) {
+                    if (jobj != NULL) {
+                        s32 dirty;
+                        u32 flags;
+
+                        if (jobj == NULL) {
+                            __assert(lbl_8047CB60, 0x25D, lbl_8047CB68);
+                        }
+                        flags = jobj->flags;
+                        dirty = 0;
+                        if (!(flags & JOBJ_USER_DEF_MTX) &&
+                            (flags & JOBJ_MTX_DIRTY)) {
+                            dirty = 1;
+                        }
+                        if (dirty == 0) {
+                            fn_8019D620(jobj);
+                        }
+                    }
+                }
+            } else {
+                GSvecCopy(&model->overrideRotation, &model->overrideRotation);
+            }
+
+            if (model->transformOverride == 0) {
+                GSvecCopy(&model->scale, &model->overrideScale);
+
+                jobj = model->renderJObj;
+                if (jobj == NULL) {
+                    __assert(lbl_8047CB60, 0x316, lbl_8047CB68);
+                }
+                if (&model->overrideScale == NULL) {
+                    __assert(lbl_8047CB60, 0x317, lbl_8047CB70);
+                }
+                jobj->scale = model->overrideScale;
+                if (!(jobj->flags & JOBJ_MTX_INDEP_SRT)) {
+                    if (jobj != NULL) {
+                        s32 dirty;
+                        u32 flags;
+
+                        if (jobj == NULL) {
+                            __assert(lbl_8047CB60, 0x25D, lbl_8047CB68);
+                        }
+                        flags = jobj->flags;
+                        dirty = 0;
+                        if (!(flags & JOBJ_USER_DEF_MTX) &&
+                            (flags & JOBJ_MTX_DIRTY)) {
+                            dirty = 1;
+                        }
+                        if (dirty == 0) {
+                            fn_8019D620(jobj);
+                        }
+                    }
+                }
+            } else {
+                GSvecCopy(&model->overrideScale, &model->overrideScale);
+            }
+        }
+    }
+}
+
 void GSmodelGetRootPosition(GSmodel* model, GSvec* out)
 {
     HSDJObj* jobj;

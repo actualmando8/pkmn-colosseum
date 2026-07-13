@@ -16,6 +16,7 @@
 #include "hsd/hsd_cobj.h"
 #include "hsd/hsd_debug.h"
 #include "hsd/hsd_dobj.h"
+#include "hsd/hsd_fog.h"
 #include "hsd/hsd_fobj.h"
 #include "hsd/hsd_id.h"
 #include "hsd/hsd_jobj.h"
@@ -38,7 +39,7 @@ extern void HSD_ObjAllocInit(void* list, u32 size, u32 alignment);
 
 /* aobj.c's HSD_ASSERT __FILE__/expr strings (already matched in
  * src/hsd/hsd_sdata2_8047DE90.c). */
-extern const u8 lbl_8047DF40[]; /* "aobj.c" */
+extern const u8 lbl_8047DF40[7]; /* "aobj.c" */
 extern const u8 lbl_8047DF48[]; /* "obj"    */
 extern const u8 lbl_8047DF4C[]; /* "new"    */
 
@@ -176,6 +177,151 @@ typedef struct BattleGridPObjAnim {
 
 void DObjForeachAnim(HSD_DObj* dobj, HSD_TypeMask mask, void* func,
                   HSD_ForeachArgType argType, HSD_ForeachArg* arg);
+void JObjForeachAnim(HSD_JObj* obj, HSD_TypeMask mask, void* func,
+                  HSD_ForeachArgType argType, HSD_ForeachArg* arg);
+void LObjForeachAnim(HSD_LObj* lobj, HSD_TypeMask mask, void* func,
+                  HSD_ForeachArgType argType, HSD_ForeachArg* arg);
+void CObjForeachAnim(HSD_CObj* cobj, HSD_TypeMask mask, void* func,
+                  HSD_ForeachArgType argType, HSD_ForeachArg* arg);
+
+void HSD_ForeachAnim(void* obj, HSD_Type type, HSD_TypeMask mask, void* func,
+                     HSD_ForeachArgType argType, ...)
+{
+    typedef struct HSDVaList {
+        u8 gpr;
+        u8 fpr;
+        u16 reserved;
+        u32* overflow;
+        u32* saveArea;
+    } HSDVaList;
+    typedef HSDVaList HSDVaListArray[1];
+    extern void* __va_arg(void*, u32);
+    extern const u8 lbl_80275780[];
+    extern const u8 lbl_802757A0[];
+    HSDVaListArray ap;
+    HSD_ForeachArg arg;
+
+    if (obj == NULL) {
+        return;
+    }
+
+    __builtin_va_info(&ap);
+    switch (argType) {
+    case HSD_FOREACH_A:
+    case HSD_FOREACH_AO:
+    case HSD_FOREACH_AOT:
+        break;
+    case HSD_FOREACH_AF:
+    case HSD_FOREACH_AOF:
+    case HSD_FOREACH_AOTF:
+        arg.f = *(f64*)__va_arg(ap, 3);
+        break;
+    case HSD_FOREACH_AV:
+    case HSD_FOREACH_AOV:
+    case HSD_FOREACH_AOTV:
+        arg.v = *(void**)__va_arg(ap, 1);
+        break;
+    case HSD_FOREACH_AU:
+    case HSD_FOREACH_AOU:
+    case HSD_FOREACH_AOTU:
+        arg.d = *(u32*)__va_arg(ap, 1);
+        break;
+    default:
+        HSD_Panic((const char*)lbl_8047DF40, 0x33A,
+                  (const char*)lbl_80275780);
+        break;
+    }
+
+    switch (type) {
+    case JOBJ_TYPE:
+        JObjForeachAnim(obj, mask, func, argType, &arg);
+        break;
+    case DOBJ_TYPE:
+        DObjForeachAnim(obj, mask, func, argType, &arg);
+        break;
+    case MOBJ_TYPE: {
+        HSD_MObj* mobj = obj;
+        HSD_TObj* tobj;
+        if (mobj != NULL) {
+            if ((mask & MOBJ_MASK) && mobj->aobj != NULL) {
+                HSD_FOREACH_INVOKE(mobj->aobj, mobj, MOBJ_TYPE, func,
+                                   argType, &arg);
+            }
+            for (tobj = mobj->tobj; tobj != NULL; tobj = tobj->next) {
+                if ((mask & TOBJ_MASK) && tobj->aobj != NULL) {
+                    HSD_FOREACH_INVOKE(tobj->aobj, tobj, TOBJ_TYPE, func,
+                                       argType, &arg);
+                }
+            }
+        }
+        break;
+    }
+    case POBJ_TYPE: {
+        BattleGridPObjAnim* pobj;
+        for (pobj = obj; pobj != NULL; pobj = pobj->next) {
+            if ((mask & POBJ_MASK) && pobj->aobj != NULL) {
+                HSD_FOREACH_INVOKE(pobj->aobj, pobj, POBJ_TYPE, func,
+                                   argType, &arg);
+            }
+        }
+        break;
+    }
+    case TOBJ_TYPE: {
+        HSD_TObj* tobj;
+        for (tobj = obj; tobj != NULL; tobj = tobj->next) {
+            if ((mask & TOBJ_MASK) && tobj->aobj != NULL) {
+                HSD_FOREACH_INVOKE(tobj->aobj, tobj, TOBJ_TYPE, func,
+                                   argType, &arg);
+            }
+        }
+        break;
+    }
+    case LOBJ_TYPE:
+        LObjForeachAnim(obj, mask, func, argType, &arg);
+        break;
+    case COBJ_TYPE:
+        CObjForeachAnim(obj, mask, func, argType, &arg);
+        break;
+    case ROBJ_TYPE: {
+        HSD_RObj* robj;
+        for (robj = obj; robj != NULL; robj = robj->next) {
+            if ((mask & ROBJ_MASK) && robj->aobj != NULL) {
+                HSD_FOREACH_INVOKE(robj->aobj, robj, ROBJ_TYPE, func,
+                                   argType, &arg);
+            }
+        }
+        break;
+    }
+    case WOBJ_TYPE: {
+        HSD_WObj* wobj = obj;
+        HSD_RObj* robj;
+        if (wobj != NULL) {
+            if ((mask & WOBJ_MASK) && wobj->aobj != NULL) {
+                HSD_FOREACH_INVOKE(wobj->aobj, wobj, WOBJ_TYPE, func,
+                                   argType, &arg);
+            }
+            for (robj = wobj->robj; robj != NULL; robj = robj->next) {
+                if ((mask & ROBJ_MASK) && robj->aobj != NULL) {
+                    HSD_FOREACH_INVOKE(robj->aobj, robj, ROBJ_TYPE, func,
+                                       argType, &arg);
+                }
+            }
+        }
+        break;
+    }
+    case FOG_TYPE: {
+        HSD_Fog* fog = obj;
+        if ((mask & FOG_MASK) && fog != NULL && fog->aobj != NULL) {
+            HSD_FOREACH_INVOKE(fog->aobj, fog, FOG_TYPE, func, argType, &arg);
+        }
+        break;
+    }
+    default:
+        HSD_Panic((const char*)lbl_8047DF40, 0x35E,
+                  (const char*)lbl_802757A0);
+        break;
+    }
+}
 
 /**
  * JObjForeachAnim - HSD_JObj ForeachAnim (JObjForeachAnim).

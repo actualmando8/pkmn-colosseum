@@ -23,9 +23,32 @@ extern void* memset(void* dst, int val, u32 size);
 extern void DCFlushRange(void* addr, u32 size);
 extern u64 OSGetTime(void);
 extern void fn_800D3EC4(s32, f32, f32, f32, f32, f32, f32);
-extern void fn_800D4F98(u32, ...);
+extern void fn_800D4F98(u32, u32, ...);
 extern void fn_800D67BC(u16);
 extern void fn_800D892C(u32);
+extern u32 OSGetTick(void);
+extern void fn_801E17A8(void);
+extern void fn_801B25C4(u32);
+extern s32 HSD_CObjSetCurrent(void*);
+extern void GSlightSetupLights(void*);
+extern void fn_800E3604(u32, u32);
+extern void fn_80118104(u32, u32);
+extern void fn_80195A48(void);
+extern void fn_800D87AC(s32);
+extern u32* fn_800D461C(u32*);
+extern void fn_800DA2BC(u32, u32, u32);
+extern void fn_800DA1E8(u32, u32, u32);
+extern void fn_800DA100(u32, u32, u8, u32, u32, u8);
+extern void fn_800D88DC(u32);
+extern void fn_800D888C(u32);
+extern void fn_800D9B58(f32, f32, f32, f32);
+extern void fn_800D9FB4(u32);
+extern void fn_800DA028(u32);
+extern void fn_800D7820(u32);
+extern void fn_800D6A00(u32);
+extern void fn_800D65CC(u16, u16, u16);
+extern void fn_800D5CB8(u32, u8, u8, u8, u8);
+extern void fn_800D6728(void);
 
 /* GSmem */
 extern u16   _toolentryAlloc__FUl(u32 size);                    /* GSmemAllocRaw */
@@ -67,8 +90,13 @@ extern const char lbl_80270610[]; /* "GSmaterial: Error creating environment map
 
 /* ===== BSS / global state ===== */
 extern u32 lbl_8047AA80;   /* GSgfx state pointer (sda21) */
+extern u32 lbl_8047AA8C;
 extern u8 lbl_80400248[];  /* GSgfx state backup buffer (0x5A0 bytes) */
 extern u8 lbl_80400B28[];  /* light/material command buffer */
+extern u8 lbl_803147C8[];
+extern f32 lbl_8047CA20;
+extern f32 lbl_8047CA24;
+extern f32 lbl_8047CA28;
 
 /* ===== Combined forward-decls (duplicated across split segments) ===== */
 
@@ -141,7 +169,7 @@ extern void* memset(void* dst, int val, u32 size);
 extern void DCFlushRange(void* addr, u32 size);
 extern u64 OSGetTime(void);
 extern void fn_800D3EC4(s32, f32, f32, f32, f32, f32, f32);
-extern void fn_800D4F98(u32, ...);
+extern void fn_800D4F98(u32, u32, ...);
 extern void fn_800D67BC(u16);
 extern void fn_800D892C(u32);
 extern u8 lbl_8047AA91;
@@ -501,14 +529,315 @@ extern u32 lbl_8047AB3C;
  *   - TEV stages
  *   - Projection matrix
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void GSgfx_BeginFrame(void) {
-    /* TODO: match -- 1620 bytes at 0x800D3FA4 */
-}
-#pragma pop
+void fn_800D3FA4(u32 flags, u8 setupCamera, u8 resetQueue) {
+    u8* state;
+    u8* stats;
+    u32 oldMode;
+    u32 oldMask;
+    u8 oldAlpha;
+    u32 start;
+    u32 cursor;
+    u32 camera;
 
+    state = (u8*)lbl_8047AA80;
+    stats = lbl_804001F0;
+
+    cursor = *(u32*)(state + 0x494) - *(u32*)(state + 0x490);
+    if (cursor > *(u32*)(stats + 0x28)) {
+        *(u32*)(stats + 0x28) = cursor;
+    }
+
+    oldMode = *(u32*)(state + 0x00);
+    oldMask = *(u32*)(state + 0x04);
+    *(u32*)(state + 0x00) = 2;
+    HSD_FogSet(lbl_8047AA8C);
+
+    state = (u8*)lbl_8047AA80;
+    state[0x1B] = 0;
+    *(u32*)(stats + 0x40) = 0;
+    *(u32*)(stats + 0x44) = 0;
+    *(u32*)(stats + 0x48) = 0;
+
+    if (flags & 1) {
+        fn_801E17A8();
+    }
+
+    if (flags & 0x10) {
+        start = OSGetTick();
+        *(u32*)((u8*)lbl_8047AA80 + 0x04) = 0x10;
+        if (setupCamera != 0) {
+            camera = GScameraGetActiveCamera();
+            if (camera != 0) {
+                fn_801B25C4(0x7F);
+                if (HSD_CObjSetCurrent(*(void**)(camera + 0x0C)) != 0) {
+                    GSlightSetupLights(*(void**)(camera + 0x0C));
+                    fn_800E3604(0x10, 0);
+                    fn_80118104(0x10, 0);
+                    HSD_FogSet(lbl_8047AA8C);
+                    fn_80195A48();
+                }
+                fn_800D87AC(-1);
+            }
+        }
+        cursor = *(u32*)((u8*)lbl_8047AA80 + 0x490);
+        while (cursor < *(u32*)((u8*)lbl_8047AA80 + 0x494)) {
+            cursor = (u32)fn_800D461C((u32*)cursor);
+        }
+        *(u32*)(stats + 0x40) = OSGetTick() - start;
+    }
+
+    if (flags & 0x1000) {
+        start = OSGetTick();
+        *(u32*)((u8*)lbl_8047AA80 + 0x04) = 0x1000;
+        if (setupCamera != 0) {
+            camera = GScameraGetActiveCamera();
+            if (camera != 0) {
+                fn_801B25C4(0x7F);
+                if (HSD_CObjSetCurrent(*(void**)(camera + 0x0C)) != 0) {
+                    GSlightSetupLights(*(void**)(camera + 0x0C));
+                    fn_800E3604(0x1000, 0);
+                    fn_80118104(0x1000, 0);
+                    HSD_FogSet(lbl_8047AA8C);
+                    fn_80195A48();
+                }
+                fn_800D87AC(-1);
+            }
+        }
+        *(u32*)(stats + 0x44) = OSGetTick() - start;
+    }
+
+    if (flags & 0x2000) {
+        start = OSGetTick();
+        *(u32*)((u8*)lbl_8047AA80 + 0x04) = 0x2000;
+        if (setupCamera != 0) {
+            camera = GScameraGetActiveCamera();
+            if (camera != 0) {
+                fn_801B25C4(0x7F);
+                if (HSD_CObjSetCurrent(*(void**)(camera + 0x0C)) != 0) {
+                    GSlightSetupLights(*(void**)(camera + 0x0C));
+                    fn_800E3604(0x2000, 0);
+                    fn_80118104(0x2000, 0);
+                    HSD_FogSet(lbl_8047AA8C);
+                    fn_80195A48();
+                }
+                fn_800D87AC(-1);
+            }
+        }
+        cursor = *(u32*)((u8*)lbl_8047AA80 + 0x490);
+        while (cursor < *(u32*)((u8*)lbl_8047AA80 + 0x494)) {
+            cursor = (u32)fn_800D461C((u32*)cursor);
+        }
+        *(u32*)(stats + 0x48) = OSGetTick() - start;
+    }
+
+    *(u32*)((u8*)lbl_8047AA80 + 0x04) = -1;
+    oldAlpha = ((u8*)lbl_8047AA80)[0x1A];
+    ((u8*)lbl_8047AA80)[0x1A] = ((u8*)lbl_8047AA80)[0x1B];
+    fn_800DA2BC(0, 0, 1);
+    fn_800DA1E8(1, 7, 2);
+    fn_800DA100(0, 7, 0, 1, 7, 0);
+    fn_800D88DC(1);
+    fn_800D888C(6);
+    fn_800D9B58(lbl_8047CA20, lbl_8047CA20, lbl_8047CA24, lbl_8047CA28);
+    fn_800D9FB4(0);
+    fn_800DA028(0);
+    fn_800D7820((u32)lbl_803147C8);
+    fn_800D6A00(4);
+    fn_800D67BC(4);
+    fn_800D65CC(0, 0, 0x752F);
+    fn_800D5CB8(0, 0, 0, 0, 0xC4);
+    fn_800D65CC(0x280, 0, 0x752F);
+    fn_800D5CB8(0, 0, 0, 0, 0xC4);
+    fn_800D65CC(0, 0x1E0, 0x752F);
+    fn_800D5CB8(0, 0, 0, 0, 0xC4);
+    fn_800D65CC(0x280, 0x1E0, 0x752F);
+    fn_800D5CB8(0, 0, 0, 0, 0xC4);
+    fn_800D6728();
+    ((u8*)lbl_8047AA80)[0x1A] = oldAlpha;
+    fn_800DA2BC(1, 1, 1);
+    fn_800DA1E8(1, 7, 2);
+    fn_800D9FB4(1);
+
+    flags &= (u32)-0x102;
+    state = (u8*)lbl_8047AA80;
+    state[0x1B] = 1;
+    *(u32*)(stats + 0x4C) = 0;
+    *(u32*)(stats + 0x50) = 0;
+    *(u32*)(stats + 0x54) = 0;
+
+    if (flags & 1) {
+        fn_801E17A8();
+    }
+
+    if (flags & 0x10) {
+        start = OSGetTick();
+        *(u32*)((u8*)lbl_8047AA80 + 0x04) = 0x10;
+        if (setupCamera != 0) {
+            camera = GScameraGetActiveCamera();
+            if (camera != 0) {
+                fn_801B25C4(0x7F);
+                if (HSD_CObjSetCurrent(*(void**)(camera + 0x0C)) != 0) {
+                    GSlightSetupLights(*(void**)(camera + 0x0C));
+                    fn_800E3604(0x10, 1);
+                    fn_80118104(0x10, 1);
+                    HSD_FogSet(lbl_8047AA8C);
+                    fn_80195A48();
+                }
+                fn_800D87AC(-1);
+            }
+        }
+        cursor = *(u32*)((u8*)lbl_8047AA80 + 0x490);
+        while (cursor < *(u32*)((u8*)lbl_8047AA80 + 0x494)) {
+            cursor = (u32)fn_800D461C((u32*)cursor);
+        }
+        *(u32*)(stats + 0x4C) = OSGetTick() - start;
+    }
+
+    if (flags & 0x1000) {
+        start = OSGetTick();
+        *(u32*)((u8*)lbl_8047AA80 + 0x04) = 0x1000;
+        if (setupCamera != 0) {
+            camera = GScameraGetActiveCamera();
+            if (camera != 0) {
+                fn_801B25C4(0x7F);
+                if (HSD_CObjSetCurrent(*(void**)(camera + 0x0C)) != 0) {
+                    GSlightSetupLights(*(void**)(camera + 0x0C));
+                    fn_800E3604(0x1000, 1);
+                    fn_80118104(0x1000, 1);
+                    HSD_FogSet(lbl_8047AA8C);
+                    fn_80195A48();
+                }
+                fn_800D87AC(-1);
+            }
+        }
+        *(u32*)(stats + 0x50) = OSGetTick() - start;
+    }
+
+    if (flags & 0x2000) {
+        start = OSGetTick();
+        *(u32*)((u8*)lbl_8047AA80 + 0x04) = 0x2000;
+        if (setupCamera != 0) {
+            camera = GScameraGetActiveCamera();
+            if (camera != 0) {
+                fn_801B25C4(0x7F);
+                if (HSD_CObjSetCurrent(*(void**)(camera + 0x0C)) != 0) {
+                    GSlightSetupLights(*(void**)(camera + 0x0C));
+                    fn_800E3604(0x2000, 1);
+                    fn_80118104(0x2000, 1);
+                    HSD_FogSet(lbl_8047AA8C);
+                    fn_80195A48();
+                }
+                fn_800D87AC(-1);
+            }
+        }
+        cursor = *(u32*)((u8*)lbl_8047AA80 + 0x490);
+        while (cursor < *(u32*)((u8*)lbl_8047AA80 + 0x494)) {
+            cursor = (u32)fn_800D461C((u32*)cursor);
+        }
+        *(u32*)(stats + 0x54) = OSGetTick() - start;
+    }
+
+    ((u8*)lbl_8047AA80)[0x1B] = 0;
+    fn_800DA2BC(1, 1, 1);
+    fn_800DA1E8(1, 2, 2);
+    *(u32*)((u8*)lbl_8047AA80 + 0x00) = oldMode;
+    *(u32*)((u8*)lbl_8047AA80 + 0x04) = oldMask;
+    if (resetQueue != 0) {
+        *(u32*)((u8*)lbl_8047AA80 + 0x494) = *(u32*)((u8*)lbl_8047AA80 + 0x490);
+    }
+}
+
+
+/* Render-command stream callees. */
+extern void fn_800D30AC(void);
+extern void fn_800D55D0(f32);
+extern void fn_800D5648(f32);
+extern void fn_800D56C0(u8);
+extern void fn_800D5724(u32, u8);
+extern void fn_800D579C(u32, u16);
+extern void fn_800D5814(u32, u8, u8);
+extern void fn_800D58A0(u32, s16, s16);
+extern void fn_800D592C(u32, u16, u16);
+extern void fn_800D59B8(u32, f32, f32);
+extern void fn_800D5A38(u32, u8);
+extern void fn_800D5AB0(u32, u16);
+extern void fn_800D5B28(u32, u16);
+extern void fn_800D5BA0(u32, u32);
+extern void fn_800D5C18(u32, u8, u8, u8);
+extern void fn_800D5CB8(u32, u8, u8, u8, u8);
+extern void fn_800D5D6C(u8);
+extern void fn_800D5DD0(u16);
+extern void fn_800D5E34(s8, s8, s8);
+extern void fn_800D5EB4(s16, s16, s16);
+extern void fn_800D5F34(f32, f32, f32);
+extern void fn_800D5FA4(u8);
+extern void fn_800D6028(u16);
+extern void fn_800D60AC(s8, s8);
+extern void fn_800D6148(u8, u8);
+extern void fn_800D61E4(s16, s16);
+extern void fn_800D6280(u16, u16);
+extern void fn_800D631C(f32, f32);
+extern void fn_800D63B0(s8, s8, s8);
+extern void fn_800D6464(u8, u8, u8);
+extern void fn_800D6518(s16, s16, s16);
+extern void fn_800D65CC(u16, u16, u16);
+extern void fn_800D6680(f32, f32, f32);
+extern void fn_800D6728(void);
+extern void fn_800D6A00(u32);
+extern void fn_800D76A8(u32, u16);
+extern void fn_800D7820(u32);
+extern void fn_800D7C74(void);
+extern void fn_800D7D10(u8, u32);
+extern void fn_800D7D90(u8, void*);
+extern void fn_800D7E5C(void);
+extern void fn_800D7F14(void*);
+extern void fn_800D7FE4(void*);
+extern void fn_800D8088(void*);
+extern void fn_800D8154(f32, f32, f32);
+extern void fn_800D81EC(f32, f32, f32);
+extern void fn_800D8284(f32, f32, f32);
+extern void fn_800D834C(void);
+extern void fn_800D848C(u32, u32, u32, void*);
+extern void fn_800D85D4(u32, u32);
+extern void fn_800D888C(u32);
+extern void fn_800D88DC(u32);
+extern void GSgfxDLDraw(u32);
+extern void fn_800D9B58(f32, f32, f32, f32);
+extern void fn_800D9BD0(f32, f32, f32, f32);
+extern void fn_800D9C24(u16, u16, u16, u16);
+extern void fn_800D9D68(u16, u16, u16, u16);
+extern void fn_800D9E4C(u32);
+extern void fn_800D9ED8(u32);
+extern void fn_800D9F40(u32);
+extern void fn_800D9FB4(u32);
+extern void fn_800DA028(u32);
+extern void fn_800DA08C(u32);
+extern void fn_800DA100(u32, u32, u8, u32, u32, u8);
+extern void fn_800DA1E8(u32, u32, u32);
+extern void fn_800DA2BC(u32, u32, u32);
+extern void fn_800DA3B0(u32, u8);
+extern void fn_800DA428(u32);
+extern void fn_800DA4C4(u32, u32, u32);
+extern void fn_800DB900(u32, void*, s8);
+extern void fn_800DB988(u32, u32, u32);
+extern void fn_800DB9F0(u32, u32, u32);
+extern void fn_800DBA54(u8);
+extern void fn_800DBAA4(u32);
+extern void fn_800DBB0C(u32, u32, u32);
+extern void fn_800DBB84(u32, u32, u32);
+extern void fn_800DBBFC(u32, u32, u16, u16, u16, u16, u32, u32, u32, u32);
+extern void fn_800DBCE4(u32, u32, u8, u8, u32);
+extern void fn_800DBD70(u32, u32, u32, u32, u32, u32, u32, u8, u8, u32);
+extern void fn_800DBE5C(u32);
+extern void fn_800DBEB4(u32, void*);
+extern void fn_800DBF1C(u32, u32);
+extern void fn_800DBF78(u32, u32);
+extern void fn_800DBFD4(u32, u32, u32, u32, u32);
+extern void fn_800DC04C(u32, u32, u32, u32, u8, u32);
+extern void fn_800DC0D4(u32, u32, u32, u32, u32);
+extern void fn_800DC14C(u32, u32, u32, u32, u8, u32);
+extern void fn_800DC1D4(u8);
+extern void fn_800DC224(u32, u32, u32, u32, u32);
 
 /* ==================================================================
  * fn_800D461C -- GSlog_PrintFormatted
@@ -517,13 +846,208 @@ void GSgfx_BeginFrame(void) {
  * At 0x97C (2428) bytes, this is a substantial printf implementation.
  * Uses "0123456789ABCDEF" for hex digit lookup.
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void GSlog_PrintFormatted(u32 channel, u32 paramCount, ...) {
-    /* TODO: match -- 2428 bytes at 0x800D461C */
+u32* fn_800D461C(u32* command)
+{
+    u32* p = command + 1;
+    u32 copied;
+    u32 argument;
+
+    switch (command[0]) {
+    case 1:
+        fn_800D6A00(p[0]); p += 1; break;
+    case 2:
+        fn_800D67BC((u16)p[0]); p += 1; break;
+    case 3:
+        fn_800D6728(); break;
+    case 4:
+        fn_800D30AC(); break;
+    case 5:
+        fn_800D6680(((f32*)p)[0], ((f32*)p)[1], ((f32*)p)[2]); p += 3; break;
+    case 6:
+        fn_800D65CC((u16)p[0], (u16)p[1], (u16)p[2]); p += 3; break;
+    case 7:
+        fn_800D6518((s16)p[0], (s16)p[1], (s16)p[2]); p += 3; break;
+    case 8:
+        fn_800D6464((u8)p[0], (u8)p[1], (u8)p[2]); p += 3; break;
+    case 9:
+        fn_800D63B0((s8)p[0], (s8)p[1], (s8)p[2]); p += 3; break;
+    case 10:
+        fn_800D631C(((f32*)p)[0], ((f32*)p)[1]); p += 2; break;
+    case 11:
+        fn_800D6280((u16)p[0], (u16)p[1]); p += 2; break;
+    case 12:
+        fn_800D61E4((s16)p[0], (s16)p[1]); p += 2; break;
+    case 13:
+        fn_800D6148((u8)p[0], (u8)p[1]); p += 2; break;
+    case 14:
+        fn_800D60AC((s8)p[0], (s8)p[1]); p += 2; break;
+    case 15:
+        fn_800D6028((u16)p[0]); p += 1; break;
+    case 16:
+        fn_800D5FA4((u8)p[0]); p += 1; break;
+    case 17:
+        fn_800D5F34(((f32*)p)[0], ((f32*)p)[1], ((f32*)p)[2]); p += 3; break;
+    case 18:
+        fn_800D5EB4((s16)p[0], (s16)p[1], (s16)p[2]); p += 3; break;
+    case 19:
+        fn_800D5E34((s8)p[0], (s8)p[1], (s8)p[2]); p += 3; break;
+    case 20:
+        fn_800D5DD0((u16)p[0]); p += 1; break;
+    case 21:
+        fn_800D5D6C((u8)p[0]); p += 1; break;
+    case 22:
+        fn_800D5CB8(p[0], (u8)p[1], (u8)p[2], (u8)p[3], (u8)p[4]); p += 5; break;
+    case 23:
+        fn_800D5C18(p[0], (u8)p[1], (u8)p[2], (u8)p[3]); p += 4; break;
+    case 24:
+        fn_800D5BA0(p[0], p[1]); p += 2; break;
+    case 25:
+        fn_800D5B28(p[0], (u16)p[1]); p += 2; break;
+    case 26:
+        fn_800D5AB0(p[0], (u16)p[1]); p += 2; break;
+    case 27:
+        fn_800D5A38(p[0], (u8)p[1]); p += 2; break;
+    case 28:
+        fn_800D59B8(p[0], ((f32*)p)[1], ((f32*)p)[2]); p += 3; break;
+    case 29:
+        fn_800D592C(p[0], (u16)p[1], (u16)p[2]); p += 3; break;
+    case 30:
+        fn_800D58A0(p[0], (s16)p[1], (s16)p[2]); p += 3; break;
+    case 31:
+        fn_800D5814(p[0], (u8)p[1], (u8)p[2]); p += 3; break;
+    case 32:
+        fn_800D58A0(p[0], (s8)p[1], (s8)p[2]); p += 3; break;
+    case 33:
+        fn_800D579C(p[0], (u16)p[1]); p += 2; break;
+    case 34:
+        fn_800D5724(p[0], (u8)p[1]); p += 2; break;
+    case 35:
+        fn_800D56C0((u8)p[0]); p += 1; break;
+    case 36:
+        fn_800D5648(((f32*)p)[0]); p += 1; break;
+    case 37:
+        fn_800D55D0(((f32*)p)[0]); p += 1; break;
+    case 38:
+        fn_800D85D4(p[0], p[1]); p += 2; break;
+    case 39:
+        fn_800D848C(p[0], p[1], p[2], p + 3); p += 15; break;
+    case 40:
+        fn_800D88DC(p[0]); p += 1; break;
+    case 41:
+        fn_800D888C(p[0]); p += 1; break;
+    case 42:
+        GSgfxDLDraw(p[0]); p += 1; break;
+    case 43:
+        fn_800DA4C4(p[0], p[1], p[2]); p += 3; break;
+    case 44:
+        fn_800DA428(p[0]); p += 1; break;
+    case 45:
+        fn_800DA3B0(p[0], (u8)p[1]); p += 2; break;
+    case 46:
+        fn_800DA2BC(p[0], p[1], p[2]); p += 3; break;
+    case 47:
+        fn_800DA1E8(p[0], p[1], p[2]); p += 3; break;
+    case 48:
+        fn_800DA100(p[0], p[1], (u8)p[2], p[3], p[4], (u8)p[5]); p += 6; break;
+    case 49:
+        fn_800DA08C(p[0]); p += 1; break;
+    case 50:
+        fn_800DA028(p[0]); p += 1; break;
+    case 51:
+        fn_800D9FB4(p[0]); p += 1; break;
+    case 52:
+        fn_800D9F40(p[0]); p += 1; break;
+    case 53:
+        fn_800D9ED8(p[0]); p += 1; break;
+    case 54:
+        fn_800D9E4C(p[0]); p += 1; break;
+    case 55:
+        fn_800D9D68((u16)p[0], (u16)p[1], (u16)p[2], (u16)p[3]); p += 4; break;
+    case 56:
+        fn_800D9C24((u16)p[0], (u16)p[1], (u16)p[2], (u16)p[3]); p += 4; break;
+    case 57:
+        fn_800D9BD0(((f32*)p)[0], ((f32*)p)[1], ((f32*)p)[2], ((f32*)p)[3]); p += 4; break;
+    case 58:
+        fn_800D9B58(((f32*)p)[0], ((f32*)p)[1], ((f32*)p)[2], ((f32*)p)[3]); p += 4; break;
+    case 59:
+        fn_800D834C(); break;
+    case 60:
+        fn_800D8284(((f32*)p)[0], ((f32*)p)[1], ((f32*)p)[2]); p += 3; break;
+    case 61:
+        fn_800D81EC(((f32*)p)[0], ((f32*)p)[1], ((f32*)p)[2]); p += 3; break;
+    case 62:
+        fn_800D8154(((f32*)p)[0], ((f32*)p)[1], ((f32*)p)[2]); p += 3; break;
+    case 63:
+        fn_800D8088(p); p += 12; break;
+    case 64:
+        fn_800D7FE4(p); p += 12; break;
+    case 65:
+        fn_800D7F14(p); p += 12; break;
+    case 66:
+        fn_800D7E5C(); break;
+    case 67:
+        argument = (u8)*p++; fn_800D7D90(argument, p); p += 12; break;
+    case 68:
+        fn_800D7D10((u8)p[0], p[1]); p += 2; break;
+    case 69:
+        fn_800D7C74(); break;
+    case 70:
+        fn_800D7820(p[0]); p += 1; break;
+    case 71:
+        fn_800D76A8(p[0], (u16)p[1]); p += 2; break;
+    case 72:
+        fn_800DC224(p[0], p[1], p[2], p[3], p[4]); p += 5; break;
+    case 73:
+        fn_800DC1D4((u8)p[0]); p += 1; break;
+    case 74:
+        fn_800DC14C(p[0], p[1], p[2], p[3], (u8)p[4], p[5]); p += 6; break;
+    case 75:
+        fn_800DC0D4(p[0], p[1], p[2], p[3], p[4]); p += 5; break;
+    case 76:
+        fn_800DC04C(p[0], p[1], p[2], p[3], (u8)p[4], p[5]); p += 6; break;
+    case 77:
+        fn_800DBFD4(p[0], p[1], p[2], p[3], p[4]); p += 5; break;
+    case 78:
+        fn_800DBF78(p[0], p[1]); p += 2; break;
+    case 79:
+        fn_800DBF1C(p[0], p[1]); p += 2; break;
+    case 80:
+        argument = p[0];
+        p++;
+        memcpy(&copied, p, sizeof(copied));
+        p++;
+        fn_800DBEB4(argument, &copied);
+        break;
+    case 81:
+        fn_800DBE5C(p[0]); p += 1; break;
+    case 82:
+        fn_800DBD70(p[2], p[3], p[4], p[5], p[6], p[7], p[8], (u8)p[9], (u8)p[0], p[1]); p += 10; break;
+    case 83:
+        fn_800DBCE4(p[0], p[1], (u8)p[2], (u8)p[3], p[4]); p += 5; break;
+    case 84:
+        fn_800DBBFC(p[2], p[3], (u16)p[4], (u16)p[5], (u16)p[6], (u16)p[7], p[8], p[9], p[0], p[1]); p += 10; break;
+    case 85:
+        fn_800DBB84(p[0], p[1], p[2]); p += 3; break;
+    case 86:
+        fn_800DBB0C(p[0], p[1], p[2]); p += 3; break;
+    case 87:
+        fn_800DBAA4(p[0]); p += 1; break;
+    case 88:
+        fn_800DBA54((u8)p[0]); p += 1; break;
+    case 89:
+        fn_800DB9F0(p[0], p[1], p[2]); p += 3; break;
+    case 90:
+        fn_800DB988(p[0], p[1], p[2]); p += 3; break;
+    case 91:
+        argument = p[0];
+        p++;
+        fn_800DB900(argument, p, (s8)p[25]);
+        p += 25;
+        break;
+    }
+
+    return p;
 }
-#pragma pop
 
 
 /* ==================================================================
@@ -533,13 +1057,116 @@ void GSlog_PrintFormatted(u32 channel, u32 paramCount, ...) {
  * Used by lighting, material, and draw functions to batch commands.
  * 1388 bytes.
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void GSlog_QueueCommand(u32 opcode, u32 paramCount, ...) {
-    /* TODO: match -- 1388 bytes at 0x800D4F98 */
+typedef struct GSgfxCommandState {
+    u8 pad_000[0x494];
+    u32* commandWrite;
+} GSgfxCommandState;
+
+void fn_800D4F98(u32 opcode, u32 paramCount, ...)
+{
+    typedef struct GSvaList {
+        u8 gpr;
+        u8 fpr;
+        u16 reserved;
+        u32* overflow;
+        u32* saveArea;
+    } GSvaList;
+    typedef GSvaList GSvaListArray[1];
+    extern void* __va_arg(void*, u32);
+    GSgfxCommandState* state;
+    GSvaListArray ap;
+    union {
+        f32 f;
+        u32 u;
+    } value;
+
+#define PUT_WORD(word)                                                       \
+    do {                                                                     \
+        *state->commandWrite++ = (u32)(word);                                \
+    } while (0)
+#define NEXT_WORD() (*(u32*)__va_arg(ap, 1))
+#define NEXT_FLOAT()                                                         \
+    (value.f = (f32)*(f64*)__va_arg(ap, 3), value.u)
+
+    state = (GSgfxCommandState*)lbl_8047AA80;
+    __builtin_va_info(&ap);
+    PUT_WORD(opcode);
+
+    switch (paramCount) {
+    case 10:
+        PUT_WORD(NEXT_WORD());
+    case 9:
+        PUT_WORD(NEXT_WORD());
+    case 8:
+        PUT_WORD(NEXT_WORD());
+    case 7:
+        PUT_WORD(NEXT_WORD());
+    case 6:
+        PUT_WORD(NEXT_WORD());
+    case 5:
+        PUT_WORD(NEXT_WORD());
+    case 4:
+        PUT_WORD(NEXT_WORD());
+    case 3:
+        PUT_WORD(NEXT_WORD());
+    case 2:
+        PUT_WORD(NEXT_WORD());
+    case 1:
+        PUT_WORD(NEXT_WORD());
+        break;
+
+    case 14:
+        PUT_WORD(NEXT_FLOAT());
+    case 13:
+        PUT_WORD(NEXT_FLOAT());
+    case 12:
+        PUT_WORD(NEXT_FLOAT());
+    case 11:
+        PUT_WORD(NEXT_FLOAT());
+        break;
+
+    case 15:
+        PUT_WORD(NEXT_WORD());
+        PUT_WORD(NEXT_FLOAT());
+        PUT_WORD(NEXT_FLOAT());
+        break;
+
+    case 16:
+        memcpy(state->commandWrite, *(void**)__va_arg(ap, 1), 0x30);
+        state->commandWrite += 0x30 / sizeof(u32);
+        break;
+
+    case 17:
+        PUT_WORD(NEXT_WORD());
+        memcpy(state->commandWrite, *(void**)__va_arg(ap, 1), 0x30);
+        state->commandWrite += 0x30 / sizeof(u32);
+        break;
+
+    case 18:
+        PUT_WORD(NEXT_WORD());
+        memcpy(state->commandWrite, *(void**)__va_arg(ap, 1), 0x18);
+        state->commandWrite = (u32*)((u8*)state->commandWrite + 0x60);
+        PUT_WORD(NEXT_WORD());
+        break;
+
+    case 19:
+        PUT_WORD(NEXT_WORD());
+        PUT_WORD(NEXT_WORD());
+        PUT_WORD(NEXT_WORD());
+        memcpy(state->commandWrite, *(void**)__va_arg(ap, 1), 0x30);
+        state->commandWrite += 0x30 / sizeof(u32);
+        break;
+
+    case 20:
+        PUT_WORD(NEXT_WORD());
+        PUT_WORD(*(u32*)__va_arg(ap, 0));
+        break;
+    }
+
+#undef NEXT_FLOAT
+#undef NEXT_WORD
+#undef PUT_WORD
 }
-#pragma pop
 
 extern u32 lbl_8047AA80;
 #if 0
