@@ -137,7 +137,7 @@ extern void* floorDataBiosGetFieldCameraListPtr();
 extern u32 floorDataBiosGetGroupID();
 extern void* floorDataBiosGetPtr(u32 key);
 extern void fn_8011791C(void);
-extern void fn_80119930(void);
+void fn_80119930(u8* texture);
 extern void fn_80119BD0();
 extern u8 fn_80119D90(u16 idx);
 extern u8 fn_80119DD0(u16 idx);
@@ -350,11 +350,11 @@ extern void psSetGeneratorAngleRadiusScale(void);
 extern void psLinkChildGensToJObj(void);
 extern f32 lbl_8047CFE8;
 extern f32 lbl_8047CFEC;
-extern void psCreateGeneratorID(void);
-extern void fn_800D3094(void);
+void* psCreateGeneratorID(u32 use_alt, u8 texture_type, u32 selector);
+void* fn_800D3094(void);
 extern u32 lbl_8047ADAC;
 extern u32 lbl_8047ADA8;
-void fn_801190DC(void);
+u8* fn_801190DC(u8* texture, u32 selector, u32 subid);
 extern void psInitDataBank(void);
 extern void DCFlushRange();
 extern u8 lbl_802727D8[];
@@ -2128,12 +2128,132 @@ void fn_80118FB0(u8* obj, u8* desc, u32 state, u32 byte5, u32 init_from_zero, u3
 }
 #endif
 /* 0x801190DC | 0x2E0 */
-extern void psCreateGeneratorID(void);
-extern void fn_800D3094(void);
+void* psCreateGeneratorID(u32 use_alt, u8 texture_type, u32 selector);
+void* fn_800D3094(void);
 extern u32 lbl_8047ADAC;
 extern u32 lbl_8047ADA8;
-/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_801190DC(void);
+typedef struct FieldParticleGenerator {
+    u8 pad_00[0x10];
+    u16 field_10;
+    u8 pad_12[5];
+    u8 enabled;
+    u8 pad_18[8];
+    f32 position[3];
+} FieldParticleGenerator;
+
+typedef struct FieldParticleBank FieldParticleBank;
+
+typedef struct FieldParticleNode {
+    u8 active;
+    u8 field_01;
+    u16 selector;
+    u8 field_04;
+    u8 field_05;
+    u8 field_06;
+    u8 pad_07;
+    void* field_08;
+    FieldParticleBank* bank;
+    FieldParticleGenerator* generator;
+    u8 pad_14[0x24];
+    f32 position[3];
+    u32 transform_state;
+    u32 field_48;
+    u32 field_4C;
+    u8 pad_50[0x24];
+} FieldParticleNode;
+
+struct FieldParticleBank {
+    u8 active;
+    u8 texture_type;
+    u8 pad_02[6];
+    FieldParticleNode* slots[64];
+};
+
+typedef union FieldParticleNodeRaw {
+    u8 bytes[0x74];
+    FieldParticleNode typed;
+} FieldParticleNodeRaw;
+
+static inline u8* fn_801190DC_findFreeNode(void) {
+    FieldParticleNodeRaw* node = (FieldParticleNodeRaw*)lbl_8047ADA8;
+    u32 i;
+
+    for (i = 0; i < lbl_8047ADAC; i++, node++) {
+        if (node->bytes[0] == 0) {
+            return node->bytes;
+        }
+    }
+    return NULL;
+}
+
+static inline s32 fn_801190DC_findFreeSlot(u8* texture) {
+    u32 i;
+
+    for (i = 0; i < 64; i++) {
+        if (*(u32*)(texture + 0x08 + i * 4) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+/* TODO: use FieldParticleBank/FieldParticleNode fields throughout once MWCC
+ * preserves this function's exact pointer-CSE and indexed-store shapes. */
+u8* fn_801190DC(u8* texture, u32 selector, u32 subid) {
+    u8* node;
+    s32 slot;
+    u32 use_alt;
+
+    if (texture[0] == 0) {
+        return NULL;
+    }
+
+    node = fn_801190DC_findFreeNode();
+    if (node == NULL) {
+        return NULL;
+    }
+
+    if ((slot = fn_801190DC_findFreeSlot(texture)) == -1) {
+        fn_80119930(texture);
+        if ((slot = fn_801190DC_findFreeSlot(texture)) == -1) {
+            return NULL;
+        }
+    }
+
+    use_alt = 0;
+    if ((u8)subid == 1) {
+        use_alt = 1;
+    }
+    *(u32*)(node + 0x10) = (u32)psCreateGeneratorID(use_alt, texture[1], selector);
+    if (*(u32*)(node + 0x10) == 0) {
+        return NULL;
+    }
+
+    ((FieldParticleNode*)node)->generator->enabled = 1;
+    node[0] = 1;
+    *(u32*)(node + 0x0C) = (u32)texture;
+    *(u16*)(node + 0x02) = (u16)selector;
+    *(u32*)(node + 0x44) = 0;
+    *(u32*)(node + 0x48) = 0;
+    *(u32*)(node + 0x4C) = 0;
+    node[5] = 0;
+    node[6] = 0;
+
+    set__5GSvecFfff(node + 0x38,
+                    ((FieldParticleNode*)node)->generator->position[0],
+                    ((FieldParticleNode*)node)->generator->position[1],
+                    ((FieldParticleNode*)node)->generator->position[2]);
+    node[4] = (u8)subid;
+    *(u32*)(node + 0x08) = (u32)fn_800D3094();
+    ((u32*)(texture + 0x08))[slot] = (u32)node;
+
+    if (((FieldParticleNode*)node)->generator->field_10 == 0) {
+        node[1] = 1;
+    } else {
+        node[1] = 0;
+    }
+    return node;
+}
 /* 0x801193BC | 0x1F0 */
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void fn_801193BC(void);
@@ -2287,7 +2407,7 @@ void fn_80119824(void) {
 #endif
 /* 0x80119930 | 0x2A0 */
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_80119930(void);
+void fn_80119930(u8* texture);
 /* 0x80119BD0 | 0x1C0 */
 extern void GSmodelSearchModelList(void);
 extern void GSmodelGetLinkedGSparticleBank(void);
