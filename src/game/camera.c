@@ -99,7 +99,10 @@ void cameraRefreshTargetPos(void) {
 typedef struct CameraFloorEntry {
     /* 0x00 */ u32 field_00;
     /* 0x04 */ void* floor;
-    /* 0x08 */ u8 field_08[0x1C];
+    /* 0x08 */ u8 field_08[0x10];
+    /* 0x18 */ f32 height;
+    /* 0x1C */ f32 distance;
+    /* 0x20 */ f32 rotationY;
     /* 0x24 */ f32 fov;
 } CameraFloorEntry;
 
@@ -351,6 +354,16 @@ f32 cameraGetRotY(void) {
     return *(f32*)((u8*)lbl_80478C40 + 0x14);
 }
 #endif
+void cameraSetRotY(f32 angle) {
+    CameraFloorEntry* floorEntry;
+
+    floorEntry = cameraFindFloorEntry(fn_800FF56C());
+    if (floorEntry != NULL) {
+        floorEntry->rotationY = angle;
+    }
+
+    ((CameraPadState*)lbl_80478C40)->rotation.y = angle;
+}
 #if 0
 #pragma push
 #pragma optimization_level 0
