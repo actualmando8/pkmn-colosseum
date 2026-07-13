@@ -411,8 +411,6 @@ typedef struct _HSD_TexAnim {
 /*  Globals and macros                                                       */
 /* ========================================================================= */
 
-extern HSD_TObjInfo hsdTObj;
-
 #define HSD_TOBJ(o) ((HSD_TObj*) (o))
 #define HSD_TOBJ_INFO(i) ((HSD_TObjInfo*) (i))
 #define HSD_TOBJ_METHOD(o) HSD_TOBJ_INFO(HSD_OBJECT_METHOD(o))
@@ -421,9 +419,19 @@ extern HSD_TObjInfo hsdTObj;
 /*  Function declarations                                                    */
 /* ========================================================================= */
 
-void HSD_TObjAddAnimAll(HSD_TObj* tobj, HSD_TexAnim* texanim);
-void HSD_TObjReqAnimAllByFlags(HSD_TObj* tobj, f32 startframe, u32 flags);
-void HSD_TObjAnimAll(HSD_TObj* tobj);
+/* These addresses are not yet conservatively renamed in symbols.txt. */
+void fn_801BE800(HSD_TObj* tobj);
+void fn_801BEE68(HSD_TObj* tobj, f32 startframe, u32 flags);
+void fn_801BEEDC(HSD_TObj* tobj, HSD_TexAnim* texanim);
+void fn_801BD8D0(HSD_TObj* tobj, u32 rendermode);
+void fn_801BDA58(HSD_TObj* tobj);
+
+#define HSD_TObjAnimAll fn_801BE800
+#define HSD_TObjReqAnimAllByFlags fn_801BEE68
+#define HSD_TObjAddAnimAll fn_801BEEDC
+#define HSD_TObjSetupVolatileTev fn_801BD8D0
+#define HSD_TObjSetupTextureCoordGen fn_801BDA58
+
 HSD_TObj* HSD_TObjLoadDesc(HSD_TObjDesc* td);
 HSD_TObj* _HSD_TObjGetCurrentByType(HSD_TObj* from, u32 mapping);
 void HSD_TObjRemove(HSD_TObj* tobj);
@@ -435,7 +443,5 @@ void HSD_ImageDescRemove(HSD_ImageDesc* idesc);
 u32 HSD_Index2TexMtx(u32 index);
 s32 HSD_TObjAssignResources(HSD_TObj* tobj_top);
 void HSD_TObjSetup(HSD_TObj* tobj);
-void HSD_TObjSetupTextureCoordGen(HSD_TObj* tobj);
-void HSD_TObjSetupVolatileTev(HSD_TObj* tobj, u32 rendermode);
 
 #endif /* HSD_TOBJ_H */

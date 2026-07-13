@@ -109,12 +109,9 @@ asm void FogUpdateFunc(void) {
  *   0 start | 1 end | 2..5 color R/G/B/A | 6 fog_adj.center | 7 fog_adj.width
  *   8..0x15 are no-ops (jumptable falls through to the return).
  *
- * NOTE: HSD_FogAdj in include/hsd/hsd_fog.h is out of sync with the binary.
- * The real layout (consistent across 0x8019B948/BB78/BD18) is
- *   flags@0x08  center@0x0C  width@0x0E  mtx[4][4]@0x10
- * whereas the header has center@0x08/width@0x0A/mtx@0x0C and no flags field.
- * FogAdj fields are therefore accessed by binary offset below so the code is
- * faithful; the header should be corrected separately.
+ * HSD_FogAdj's header layout is verified against 0x8019B948/BB78/BD18:
+ *   flags@0x08  center@0x0C  width@0x0E  mtx[4][4]@0x10.
+ * The body retains explicit offsets to preserve the current codegen.
  */
 void FogUpdateFunc(HSD_Fog* fog, s32 type, f32* value)
 {
@@ -245,10 +242,9 @@ asm void HSD_FogLoadDesc(void) {
  * copies type/start/end/color from the desc (or zero-inits defaults when the
  * desc is NULL), then hsdNew()s a FogAdj from desc->fogadjdesc and links it.
  *
- * HSD_FogAdj binary layout differs from the header (see FogUpdateFunc note);
- * FogAdj fields use binary offsets. HSD_FogAdjDesc binary layout is likewise
+ * FogAdj fields retain explicit offsets for current codegen. HSD_FogAdjDesc is
  *   flags@0x00  center@0x04  width@0x06  mtx[4][4]@0x08
- * (header has center@0x00/width@0x02/mtx@0x04, no flags).
+ * as represented in include/hsd/hsd_fog.h.
  */
 HSD_Fog* HSD_FogLoadDesc(HSD_FogDesc* desc)
 {
@@ -337,8 +333,8 @@ asm void HSD_FogSet(void) {
  *   bit31 -> centre derived from fogadj->center, else centre = proj[0]+proj[8]/2
  *   bit30 -> width  from fogadj->width,  else width  = (s32)proj[8]
  *   bit29 -> matrix from fogadj->mtx,    else matrix rebuilt from fn_800BD454
- * FogAdj binary layout differs from the header (see FogUpdateFunc note), so its
- * fields are accessed by binary offset below.
+ * The header matches this layout; the body retains explicit offsets for the
+ * current codegen.
  */
 void HSD_FogSet(HSD_Fog* fog)
 {

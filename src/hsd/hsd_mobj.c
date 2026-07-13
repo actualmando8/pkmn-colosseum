@@ -101,30 +101,15 @@ extern void fn_801B28C8(GXColor ambient, GXColor diffuse, GXColor specular,
                         f32 alpha);
 /* HSD_SetupRenderModeWithCustomPE */
 extern void fn_801B294C(u32 rendermode, HSD_PEDesc* pe);
-/* HSD_TObjSetupVolatileTev */
-extern void fn_801BD8D0(HSD_TObj* tobj, u32 rendermode);
-/* HSD_TObjSetupTextureCoordGen */
-extern void fn_801BDA58(HSD_TObj* tobj);
 /* HSD_TObjAddNext */
 extern void fn_801BBE3C(HSD_TObj* tobj, HSD_TObj* next);
-/* HSD_TObjAnimAll */
-extern void fn_801BE800(HSD_TObj* tobj);
-/* HSD_TObjReqAnimAllByFlags */
-extern void fn_801BEE68(HSD_TObj* tobj, f32 startframe, u32 flags);
-/* HSD_TObjAddAnimAll */
-extern void fn_801BEEDC(HSD_TObj* tobj, HSD_TexAnim* texanim);
 
 
 #define HSD_StateInitTev() fn_801B3884()
 #define HSD_SetMaterialShininess(s) fn_801B28B8(s)
 #define HSD_SetMaterialColor(a, d, s, al) fn_801B28C8(a, d, s, al)
 #define HSD_SetupRenderModeWithCustomPE(r, pe) fn_801B294C(r, pe)
-#define HSD_TObjSetupVolatileTev(t, r) fn_801BD8D0(t, r)
-#define HSD_TObjSetupTextureCoordGen(t) fn_801BDA58(t)
 #define HSD_TObjAddNext(t, n) fn_801BBE3C(t, n)
-#define HSD_TObjAnimAll(t) fn_801BE800(t)
-#define HSD_TObjReqAnimAllByFlags(t, f, fl) fn_801BEE68(t, f, fl)
-#define HSD_TObjAddAnimAll(t, a) fn_801BEEDC(t, a)
 
 /* ========================================================================= */
 /*  Class system (hsd_class.c)                                               */

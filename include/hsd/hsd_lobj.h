@@ -25,14 +25,6 @@
 
 #define MAX_GXLIGHT 9
 
-/* ========================================================================= */
-/*  GX types used by LObj                                                    */
-/* ========================================================================= */
-
-#ifndef _GXCOLOR_DEFINED
-#define _GXCOLOR_DEFINED
-#endif
-
 /** GXLightObj - opaque 64-byte hardware light object. */
 typedef struct GXLightObj {
     u8 dummy[0x40];

@@ -4,7 +4,7 @@
  *
  * Manages distance fog and fog adjustment (screen-space fog correction).
  *
- * Colosseum address range: 0x8019B7C0 (HSD_FogAdjInit)
+ * Colosseum address range: 0x8019B7C0 (FogAdjInfoInit)
  * Adapted from the Melee decompilation (doldecomp/melee).
  */
 #ifndef HSD_FOG_H
@@ -89,13 +89,6 @@ struct HSD_FogAdjInfo {
 /* ========================================================================= */
 
 void HSD_FogSet(HSD_Fog* fog);
-HSD_FogAdj* HSD_FogAdjLoadDesc(HSD_FogAdjDesc* desc);
-void HSD_FogInit(HSD_Fog* fog, HSD_FogDesc* desc);
-void HSD_FogAdjInit(HSD_FogAdj* fogadj, HSD_FogAdjDesc* desc);
 HSD_Fog* HSD_FogLoadDesc(HSD_FogDesc* desc);
-HSD_Fog* HSD_FogAlloc(void);
-HSD_FogAdj* HSD_FogAdjAlloc(void);
-void HSD_FogReqAnim(HSD_Fog* fog, f32 frame);
-void HSD_FogInterpretAnim(HSD_Fog* fog);
 
 #endif /* HSD_FOG_H */

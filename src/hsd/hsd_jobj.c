@@ -9,6 +9,8 @@
  * JObj manages the skeletal hierarchy that drives all 3D models.
  */
 
+#include "dolphin/mtx.h"
+
 #define iref_DEC hsd_inline_iref_DEC
 #define ref_INC hsd_inline_ref_INC
 #include "hsd/hsd_jobj.h"

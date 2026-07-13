@@ -368,8 +368,8 @@ END:
 }
 #pragma pop
 
-/* --- still asm-only: TObjLoad, MakeTextureMtx, TObjMakeTExp, TObjSetupMtx,
-       HSD_TObjSetup, HSD_TObjAssignResources, MakeColorGenTExp, ... --- */
+/* --- Non-linked CodeCandidate placeholders. These remain intentionally
+       incomplete until their target bodies are decompiled. --- */
 
 static int TObjLoad(HSD_TObj* tobj, HSD_TObjDesc* td)
 {
