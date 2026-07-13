@@ -84,16 +84,15 @@ void InitStreamBuffers(void);
 extern void aramQueueCallback();
 extern void aramUploadData();
 extern u16 inpGetMidiCtrl(u8 ctrl, u8 channel, u8 set); /* true signature, verified via disassembly */
-extern void salCalcVolume(u32 volumeArg, f32* out, u32 pan, u32 span, f32 a, f32 b, f32 c, u32 hasPan, u32 studioFlag);
 extern void salCallback();
 extern u8 jumptable_80369CB0[];
 extern u8 jumptable_80369CD4[];
 extern u8 jumptable_80369CF8[];
-extern u8 lbl_80273448[];
+extern volatile const u16 lbl_80273448[];
 extern u8 lbl_8036944C[];
 extern u8 lbl_8036BF00[];
 extern u8 lbl_80434C50[];
-extern f32 lbl_8047D4D8;
+extern volatile const f32 lbl_8047D4D8;
 extern f32 lbl_8047D4DC;
 extern f32 lbl_8047D4E0;
 extern f64 lbl_8047D4E8;
@@ -285,8 +284,8 @@ extern f64 fmod(f64 value, f64 modulus);
     (((lbl_8047D434 - (fraction)) * (table)[index]) +                        \
      ((fraction) * (table)[(index) + 1]))
 
-void salCalcVolume(u32 volumeArg, f32* out, u32 pan, u32 surroundPan,
-                   f32 inputA, f32 inputB, f32 inputC, u32 narrowPan,
+void salCalcVolume(u32 volumeArg, f32* out, f32 inputA, u32 pan,
+                   u32 surroundPan, f32 inputB, f32 inputC, u32 narrowPan,
                    u32 studioMode)
 {
     f32* volumeTable;
@@ -1749,7 +1748,22 @@ extern void dataExit(void);
 extern void synthExit(void);
 extern void fn_8015AAA0(u32 studio);
 extern void salActivateVoice(u8* ptr, u8 unused2);
-extern u8 lbl_80447E60[];
+typedef union HwVolumeStudio {
+    struct {
+        u32 allocation;
+        u8 pad_04[0x24];
+        u32 auxAllocation;
+        u8 pad_2C[0x24];
+        u8 state;
+        u8 isMaster;
+        u8 numInputs;
+        u8 pad_53;
+        s32 type;
+        u8 pad_58[0x64];
+    } named;
+    u8 bytes[0xBC];
+} HwVolumeStudio;
+extern HwVolumeStudio lbl_80447E60[];
 extern void fn_8015D7D0(void);
 extern void fn_801629A4(u32 index, u8 value);
 extern void fn_801629D0(u32 index, u8 value);
@@ -2375,68 +2389,138 @@ void hwSetITDMode(u32 index, u8 flag) {
 }
 #endif
 #pragma pop
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 0
-asm void fn_80162A58(void) {
-#include "src/game/people/people_field_fn_80162A58.inc"
+typedef union HwVolumeInfo {
+    struct {
+        f32 volL;
+        f32 volR;
+        f32 volS;
+        f32 volAuxAL;
+        f32 volAuxAR;
+        f32 volAuxAS;
+        f32 volAuxBL;
+        f32 volAuxBR;
+        f32 volAuxBS;
+    } named;
+    f32 values[9];
+} HwVolumeInfo;
+
+typedef struct HwVolumeVoice {
+    u8 pad_00[0x24];
+    u32 changed[5];
+    u32 pitch[5];
+    u16 volL;
+    u16 volR;
+    u16 volS;
+    u16 volLa;
+    u16 volRa;
+    u16 volSa;
+    u16 volLb;
+    u16 volRb;
+    u16 volSb;
+    u8 pad_5E[0x72];
+    u16 itdShiftL;
+    u16 itdShiftR;
+    u8 pad_D4[0x10];
+    struct {
+        u8 pitch;
+        u8 vol;
+        u8 volA;
+        u8 volB;
+    } lastUpdate;
+    u32 virtualSampleID;
+    u8 state;
+    u8 postBreak;
+    u8 startupBreak;
+    u8 studio;
+    u32 flags;
+} HwVolumeVoice;
+
+static void hwSetupITD(HwVolumeVoice* voice, u8 pan) {
+    voice->itdShiftL = lbl_80273448[pan];
+    voice->itdShiftR = 32 - lbl_80273448[pan];
+    voice->changed[0] |= 0x200;
 }
-#else
-void fn_80162A58(u32 index, u32 volumeArg, u32 voiceIndex, u32 spanArg, f32 a, f32 b, f32 c) {
-    u8* entry;
-    f32 work[9];
-    u32 studioFlag;
-    u32 hasPan;
-    u32 i;
-    u16* panTable;
 
-    entry = (u8*)lbl_8047B024 + index * 0xF4;
-    if (a < 0.0f) {
-        a = 0.0f;
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+void hwSetVolume(u32 voice, u32 table, f32 volume, u32 pan, u32 span,
+                 f32 auxA, f32 auxB) {
+    HwVolumeInfo volumeInfo;
+    u16 left;
+    u16 right;
+    u16 surround;
+    HwVolumeVoice* dspVoice = (HwVolumeVoice*)lbl_8047B024;
+    HwVolumeVoice* dspVoicePtr = &dspVoice[voice];
+
+    {
+        f32 one = lbl_8047D4D8;
+        if (volume >= one) {
+            volume = one;
+        }
     }
-    if (b < 0.0f) {
-        b = 0.0f;
+    {
+        f32 one = lbl_8047D4D8;
+        if (auxA >= one) {
+            auxA = one;
+        }
     }
-    if (c < 0.0f) {
-        c = 0.0f;
-    }
-
-    studioFlag = (*(u32*)(lbl_80447E60 + (u32)entry[0xEF] * 0xBC + 0x54) == 1);
-    hasPan = (*(u32*)(entry + 0xF0) >> 31) & 1;
-    salCalcVolume(volumeArg, work, voiceIndex, spanArg, a, b, c, hasPan, studioFlag);
-
-    for (i = 0; i < 3; i++) {
-        u16* dst;
-        u8* dirtyByte;
-        u32 dirtyBit;
-        s32 v0;
-        s32 v1;
-        s32 v2;
-
-        dst = (u16*)(entry + 0x4C + i * 6);
-        dirtyByte = entry + 0xE5 + i;
-        dirtyBit = 1u << i;
-        v0 = (s32)(work[i * 3 + 0] * lbl_8047D4DC);
-        v1 = (s32)(work[i * 3 + 1] * lbl_8047D4DC);
-        v2 = (s32)(work[i * 3 + 2] * lbl_8047D4DC);
-        if (*dirtyByte == 0xFF || dst[0] != (u16)v0 || dst[1] != (u16)v1 || dst[2] != (u16)v2) {
-            dst[0] = (u16)v0;
-            dst[1] = (u16)v1;
-            dst[2] = (u16)v2;
-            *(u32*)(entry + 0x24) |= dirtyBit;
-            *dirtyByte = 0;
+    {
+        f32 one = lbl_8047D4D8;
+        if (auxB >= one) {
+            auxB = one;
         }
     }
 
-    if ((*(u32*)(entry + 0xF0) & 0x7FFFFFFF) != 0) {
-        panTable = (u16*)lbl_80273448;
-        *(u16*)(entry + 0xD0) = panTable[voiceIndex];
-        *(u16*)(entry + 0xD2) = 0x20 - panTable[voiceIndex];
-        *(u32*)(entry + 0x24) |= 0x200;
+    {
+        u32 hasITD = (dspVoicePtr->flags & 0x80000000) != 0;
+        u32 dpl2 =
+            lbl_80447E60[dspVoicePtr->studio].named.type == 1;
+
+        salCalcVolume(table, volumeInfo.values, volume, pan, span, auxA, auxB,
+                      hasITD, dpl2);
+    }
+
+    left = lbl_8047D4DC * volumeInfo.named.volL;
+    right = lbl_8047D4DC * volumeInfo.named.volR;
+    surround = lbl_8047D4DC * volumeInfo.named.volS;
+    if (dspVoicePtr->lastUpdate.vol == 0xFF || dspVoicePtr->volL != left ||
+        dspVoicePtr->volR != right || dspVoicePtr->volS != surround) {
+        dspVoicePtr->volL = left;
+        dspVoicePtr->volR = right;
+        dspVoicePtr->volS = surround;
+        dspVoicePtr->changed[0] |= 1;
+        dspVoicePtr->lastUpdate.vol = 0;
+    }
+
+    left = lbl_8047D4DC * volumeInfo.named.volAuxAL;
+    right = lbl_8047D4DC * volumeInfo.named.volAuxAR;
+    surround = lbl_8047D4DC * volumeInfo.named.volAuxAS;
+    if (dspVoicePtr->lastUpdate.volA == 0xFF || dspVoicePtr->volLa != left ||
+        dspVoicePtr->volRa != right || dspVoicePtr->volSa != surround) {
+        dspVoicePtr->volLa = left;
+        dspVoicePtr->volRa = right;
+        dspVoicePtr->volSa = surround;
+        dspVoicePtr->changed[0] |= 2;
+        dspVoicePtr->lastUpdate.volA = 0;
+    }
+
+    left = lbl_8047D4DC * volumeInfo.named.volAuxBL;
+    right = lbl_8047D4DC * volumeInfo.named.volAuxBR;
+    surround = lbl_8047D4DC * volumeInfo.named.volAuxBS;
+    if (dspVoicePtr->lastUpdate.volB == 0xFF || dspVoicePtr->volLb != left ||
+        dspVoicePtr->volRb != right || dspVoicePtr->volSb != surround) {
+        dspVoicePtr->volLb = left;
+        dspVoicePtr->volRb = right;
+        dspVoicePtr->volSb = surround;
+        dspVoicePtr->changed[0] |= 4;
+        dspVoicePtr->lastUpdate.volB = 0;
+    }
+
+    if (dspVoicePtr->flags & 0x80000000) {
+        hwSetupITD(dspVoicePtr, pan >> 16);
     }
 }
-#endif
 #pragma pop
 #pragma push
 #pragma optimization_level 4
@@ -3436,8 +3520,8 @@ u32 salExitDspCtrl(void) {
         fn_80164400(*(u32*)(lbl_8047B024 + (u32)i * 0xF4 + 4));
     }
     for (i = 0; i < lbl_8047B05C; i++) {
-        fn_80164400(*(u32*)(lbl_80447E60 + (u32)i * 0xBC));
-        fn_80164400(*(u32*)(lbl_80447E60 + (u32)i * 0xBC + 0x28));
+        fn_80164400(lbl_80447E60[i].named.allocation);
+        fn_80164400(lbl_80447E60[i].named.auxAllocation);
     }
     fn_80164400(lbl_8047B020);
     fn_80164400(lbl_8047B024);
@@ -5516,7 +5600,7 @@ void salInitHRTFBuffer(void) {
 }
 
 void fn_8015AAA0(u32 studio) {
-    lbl_80447E60[(u8)studio * 0xBC + 0x50] = 0;
+    lbl_80447E60[(u8)studio].named.state = 0;
 }
 
 void sal_setup_dspvol(u16* dsp_delta, u16* last_vol, u16 vol) {
@@ -5591,7 +5675,7 @@ void salActivateVoice(u8* voice, u8 studio) {
     }
 
     dsp_vptr->postBreak = 0;
-    studioData = lbl_80447E60;
+    studioData = lbl_80447E60[0].bytes;
     studioData += (u8)studio * 0xBC;
     if ((dsp_vptr->next = *(DSPvoice**)(studioData += 0x48)) != 0) {
         dsp_vptr->next->prev = dsp_vptr;
