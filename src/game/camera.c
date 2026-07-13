@@ -35,6 +35,7 @@
  */
 
 #include "crt/math.h"
+#include "game/data/sdata2_8047D690.h"
 #include "game/gs_render_util.h"
 #include "game/gs_scene_types.h"
 
@@ -87,6 +88,9 @@ typedef struct CameraPadState {
     /* 0xCC */ f32 rotationMoveTime;
     /* 0xD0 */ u32 animationGroup;
     /* 0xD4 */ u32 animationId;
+    /* 0xD8 */ GSSceneVec3 offsetPosition;
+    /* 0xE4 */ GSSceneVec3 offsetRotation;
+    /* 0xF0 */ GSSceneVec3 offsetScale;
 } CameraPadState;
 
 void* GSmodelGetPart(void* model, s32 partIndex);
@@ -117,6 +121,143 @@ void cameraRefreshTargetPos(void) {
             }
         }
     }
+}
+
+typedef union CameraFloatShape {
+    f32 value;
+    u32 bits;
+} CameraFloatShape;
+
+static inline void cameraSqrt(f32* result) {
+    CameraFloatShape shape;
+    f32 value;
+    f64 estimate;
+    u32 exponent;
+    s32 fpclass;
+
+    value = *result;
+    if (value > lbl_8047D740) {
+        estimate = __frsqrte(value);
+        estimate = lbl_8047D748 * estimate *
+                   (lbl_8047D750 - value * (estimate * estimate));
+        estimate = lbl_8047D748 * estimate *
+                   (lbl_8047D750 - value * (estimate * estimate));
+        estimate = lbl_8047D748 * estimate *
+                   (lbl_8047D750 - value * (estimate * estimate));
+        *result = (f32)(value * estimate);
+        return;
+    }
+    if ((f64)value < lbl_8047D758) {
+        *result = lbl_80478AC0[0];
+        return;
+    }
+
+    shape.value = value;
+    exponent = shape.bits & 0x7F800000;
+    switch (exponent) {
+    case 0x7F800000:
+        if ((shape.bits & 0x007FFFFF) != 0) {
+            fpclass = 1;
+        } else {
+            fpclass = 2;
+        }
+        break;
+    case 0:
+        if ((shape.bits & 0x007FFFFF) != 0) {
+            fpclass = 5;
+        } else {
+            fpclass = 3;
+        }
+        break;
+    default:
+        fpclass = 4;
+        break;
+    }
+    if (fpclass == 1) {
+        *result = lbl_80478AC0[0];
+    }
+}
+
+void _cameraOffsetAnimeUpdate__FP9_GScamera(GSRenderCamera* camera) {
+    f32 fov;
+    f32 aspect;
+    f32 near;
+    f32 far;
+    GSSceneVec3 eye;
+    GSSceneVec3 interest;
+    GSSceneVec3 up;
+    GSRenderMtx rotation;
+    GSRenderCamera* animation;
+    CameraPadState* state;
+    f32 distance;
+
+    state = lbl_80478C40;
+    animation = GSresGetResource(state->animationGroup, state->animationId);
+    if (animation == 0) {
+        animation = fn_800F92D4(state->animationId);
+    }
+    if (animation == 0 || animation == camera) {
+        return;
+    }
+
+    GScameraGetPerspective(animation, &fov, &aspect, &near, &far);
+    GScameraSetPerspective(camera, fov, aspect, near, far);
+    GScameraGetLookAt(animation, &up, &interest);
+    set__5GSvecFfff(&up, lbl_8047D740, lbl_8047D724, lbl_8047D740);
+    GScameraGetPosition(animation, &eye);
+
+    fn_800E0108(&eye, &eye,
+                &((CameraPadState*)lbl_80478C40)->offsetScale);
+    fn_800E0108(&interest, &interest,
+                &((CameraPadState*)lbl_80478C40)->offsetScale);
+    GSmtxMakeXRotation(
+        rotation, ((CameraPadState*)lbl_80478C40)->offsetRotation.x);
+    fn_800E032C(rotation,
+                 ((CameraPadState*)lbl_80478C40)->offsetRotation.y);
+    fn_800E02E8(rotation,
+                 ((CameraPadState*)lbl_80478C40)->offsetRotation.z);
+    GSvecTransform(&eye, rotation, &eye);
+    GSvecTransform(&interest, rotation, &interest);
+    fn_800E0238(rotation, rotation);
+    GSvecTransform(&up, rotation, &up);
+
+    if ((((CameraPadState*)lbl_80478C40)->flags[2] & 1) != 0) {
+        interest.x *= lbl_8047D768;
+        up.x *= lbl_8047D768;
+        eye.x *= lbl_8047D768;
+    }
+    if ((((CameraPadState*)lbl_80478C40)->flags[2] & 2) != 0) {
+        interest.y *= lbl_8047D768;
+        up.y *= lbl_8047D768;
+        eye.y *= lbl_8047D768;
+    }
+    if ((((CameraPadState*)lbl_80478C40)->flags[2] & 4) != 0) {
+        interest.z *= lbl_8047D768;
+        up.z *= lbl_8047D768;
+        eye.z *= lbl_8047D768;
+    }
+
+    GSvecAdd(&eye, &eye,
+             &((CameraPadState*)lbl_80478C40)->offsetPosition);
+    GSvecAdd(&interest, &interest,
+             &((CameraPadState*)lbl_80478C40)->offsetPosition);
+    GScameraSetPosition(camera, &eye);
+    GScameraLookAt(camera, &up, &interest);
+
+    GSvecCopy(&((CameraPadState*)lbl_80478C40)->direction, &eye);
+    fn_800E0168(&((CameraPadState*)lbl_80478C40)->position, &interest,
+                 &((CameraPadState*)lbl_80478C40)->view);
+    fn_800E0168(&eye, &eye,
+                 &((CameraPadState*)lbl_80478C40)->position);
+    ((CameraPadState*)lbl_80478C40)->height = eye.y;
+    distance = eye.x * eye.x + eye.z * eye.z;
+    cameraSqrt(&distance);
+    ((CameraPadState*)lbl_80478C40)->distance = distance;
+    ((CameraPadState*)lbl_80478C40)->rotation.y =
+        (f32)atan2(eye.x, eye.z);
+    ((CameraPadState*)lbl_80478C40)->rotation.x =
+        -(f32)atan2(((CameraPadState*)lbl_80478C40)->height,
+                    ((CameraPadState*)lbl_80478C40)->distance);
 }
 
 typedef struct CameraFloorEntry {
