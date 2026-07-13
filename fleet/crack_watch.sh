@@ -2,6 +2,9 @@
 # Appends newly scored/cracked fs-lane targets to /tmp/grind/crack_watch.log.
 # Keep this script compatible with the macOS system Bash (3.2).
 
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+. "$SCRIPT_DIR/runtime.sh"
+
 DB=${CRACK_WATCH_DB:-/Users/douglaswhittingham/gamecube-decomp-harness/projects/pkmn-colosseum/state/orchestrator.sqlite}
 LOG=${CRACK_WATCH_LOG:-/tmp/grind/crack_watch.log}
 SEEN=${CRACK_WATCH_SEEN:-/tmp/grind/crack_watch.seen}
@@ -17,10 +20,7 @@ active_run_ids() {
     [ -r "$run_file" ] || continue
     run_id=$(sed -n '1{s/^[[:space:]]*//;s/[[:space:]]*$//;p;}' "$run_file" 2>/dev/null)
 
-    case "$run_id" in
-      ""|PAUSED|PAUSED-*) continue ;;
-      *[!A-Za-z0-9._:-]*) continue ;;
-    esac
+    fleet_valid_run_id "$run_id" || continue
 
     printf '%s\n' "$run_id"
   done

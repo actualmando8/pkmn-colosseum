@@ -46,6 +46,15 @@ publish_lane() {
     log "skip $branch: cannot resolve local branch"
     return 0
   }
+
+  # Do not publish source wins on a stale epoch branch. Those PRs replay old
+  # history, conflict with already-merged work, and obscure the actual delta.
+  # The lane must first be reconciled so current origin/master is its ancestor.
+  if ! git merge-base --is-ancestor origin/master "$head" 2>/dev/null; then
+    log "skip $branch: head is behind or diverged from origin/master; reconcile first"
+    return 0
+  fi
+
   remote_ref="refs/remotes/origin/$branch"
   remote_head=$(git rev-parse --verify --quiet "$remote_ref^{commit}" 2>/dev/null) || remote_head=
 

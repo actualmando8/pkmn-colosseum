@@ -15,6 +15,13 @@ colima/kernel-db, the three from-scratch lanes, dashboard, watchdog, and loops.
 - `strike_notes_ingest.py` — SOL_NOTES.jsonl → KG path_facts (idempotent)
 - `verify_fn.sh` — THE per-function match check (objdiff fuzzy, never DOL SHA)
 
+Lane run IDs are mirrored from `/tmp/grind/fs-*_run.txt` into the harness state
+directory by `runtime.sh`, so a reboot cannot silently revive an obsolete
+campaign. `/tmp/grind/harness-paused.txt` is the only pause signal; run-ID files
+must always contain canonical UUIDs. Rotate a campaign explicitly with
+`source fleet/runtime.sh && fleet_set_run_id <small|medium|large> <uuid>`; once
+created, the durable state copy wins over a mismatched `/tmp` file.
+
 launchd (auto-start watchdog at boot):
   cp fleet/com.dougchansan.decomp-fleet.plist ~/Library/LaunchAgents/
   launchctl load ~/Library/LaunchAgents/com.dougchansan.decomp-fleet.plist
