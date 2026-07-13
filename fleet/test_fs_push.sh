@@ -89,6 +89,7 @@ printf 'base\n' > "$PUBLISH_REPO/src/unit.c"
 printf 'base\n' > "$PUBLISH_REPO/README.md"
 git -C "$PUBLISH_REPO" add src/unit.c README.md
 git -C "$PUBLISH_REPO" commit -q -m base
+PUBLISH_BASE=$(git -C "$PUBLISH_REPO" rev-parse HEAD)
 git -C "$PUBLISH_REPO" remote add origin "$REMOTE_DIR"
 git -C "$PUBLISH_REPO" push -q -u origin master
 git -C "$PUBLISH_REPO" switch -q -c lane/test
@@ -145,6 +146,24 @@ publish_lane "$RETRY_LANE"
 [ "$(wc -l < "$MOCK_GH_LOG" | tr -d ' ')" = 2 ]
 export MOCK_PR_JSON="[{\"number\":11,\"state\":\"CLOSED\",\"headRefOid\":\"$RETRY_HEAD\"}]"
 publish_lane "$RETRY_LANE"
+[ "$(wc -l < "$MOCK_GH_LOG" | tr -d ' ')" = 2 ]
+
+# A real source change on a stale lane must wait for explicit reconciliation.
+git -C "$PUBLISH_REPO" switch -q master
+printf 'master advance\n' > "$PUBLISH_REPO/README.md"
+git -C "$PUBLISH_REPO" add README.md
+git -C "$PUBLISH_REPO" commit -q -m master-advance
+git -C "$PUBLISH_REPO" push -q origin master
+git -C "$PUBLISH_REPO" switch -q -c lane/stale "$PUBLISH_BASE"
+printf 'stale payload\n' > "$PUBLISH_REPO/src/unit.c"
+git -C "$PUBLISH_REPO" add src/unit.c
+git -C "$PUBLISH_REPO" commit -q -m stale-payload
+export MOCK_PR_JSON='[]'
+publish_lane "$PUBLISH_REPO|lane/stale|Stale lane"
+if git --git-dir="$REMOTE_DIR" show-ref --verify --quiet refs/heads/lane/stale; then
+  echo "stale source head was published" >&2
+  exit 1
+fi
 [ "$(wc -l < "$MOCK_GH_LOG" | tr -d ' ')" = 2 ]
 
 # Bad ledger data and the fleet pause sentinel both fail closed.
