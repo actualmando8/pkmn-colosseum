@@ -11,8 +11,12 @@
  */
 
 #include "dolphin/types.h"
+#include "crt/string.h"
 #include "hsd/hsd_class.h"
+#include "hsd/hsd_cobj.h"
 #include "hsd/hsd_debug.h"
+#include "hsd/hsd_objalloc.h"
+#include "hsd/hsd_sdata2.h"
 #include "hsd/hsd_tobj.h"
 #include "hsd/hsd_mobj.h"
 #include "hsd/hsd_memory.h"
@@ -38,6 +42,66 @@ typedef union SplineFloatShape {
     f32 value;
     u32 bits;
 } SplineFloatShape;
+
+struct HSD_Shadow {
+    void* objects;
+    HSD_CObj* camera;
+    HSD_TObj* texture;
+    f32 scaleS;
+    f32 scaleT;
+    f32 transS;
+    f32 transT;
+    BOOL active;
+    u8 intensity;
+    u8 pad_21[3];
+    void* user_data;
+};
+
+extern HSD_ObjAllocData lbl_804656E0;
+
+#pragma push
+#pragma optimization_level 1
+static inline HSD_TObj* makeShadowTObj(void)
+{
+    HSD_TObj* shadowTObj;
+
+    shadowTObj = HSD_TObjAlloc();
+    shadowTObj->src = 0;
+    shadowTObj->wrap_s = 0;
+    shadowTObj->wrap_t = 0;
+    shadowTObj->flags = 0x540103;
+    shadowTObj->imagedesc = HSD_ImageDescAlloc();
+    return shadowTObj;
+}
+
+HSD_Shadow* fn_801B1730(void)
+{
+    HSD_Shadow* shadow;
+
+    shadow = HSD_ObjAlloc(&lbl_804656E0);
+    memset(shadow, 0, sizeof(HSD_Shadow));
+    shadow->camera = HSD_CObjAlloc();
+    shadow->texture = makeShadowTObj();
+
+    shadow->scaleS = lbl_8047DDF0;
+    shadow->scaleT = lbl_8047DDF4;
+    shadow->transS = lbl_8047DDF0;
+    shadow->transT = lbl_8047DDF0;
+    shadow->intensity = 0;
+
+    shadow->texture->imagedesc->format = 0;
+    shadow->texture->imagedesc->width = 256;
+    shadow->texture->imagedesc->height = 256;
+    shadow->texture->imagedesc->image_ptr = NULL;
+
+    HSD_CObjSetViewportfx4(shadow->camera, lbl_8047DDC0,
+                           lbl_8047DDF8[0], lbl_8047DDC0,
+                           lbl_8047DDF8[0]);
+    HSD_CObjSetScissorx4(shadow->camera, 0, 256, 0, 256);
+
+    return shadow;
+}
+#pragma pop
 
 #pragma push
 #pragma inline_depth(8)
@@ -739,7 +803,6 @@ extern void fn_800B94F0(u32 value);
 extern void fn_800BC8C8(u32 value);
 extern void fn_800B884C(u32 value);
 
-extern u8 lbl_804656E0[];
 extern u8 lbl_80465588[];
 extern u8 lbl_804655B4[];
 extern u8 lbl_8047B350;
@@ -2570,12 +2633,12 @@ void fn_801BB4C4(void) {
 /* 0x801B1854 | 0x30 */
 extern void HSD_ObjAllocInit(void* list, u32 size, u32 alignment);
 void fn_801B1854(void) {
-    HSD_ObjAllocInit(lbl_804656E0, 0x28, 4);
+    HSD_ObjAllocInit(&lbl_804656E0, 0x28, 4);
 }
 
 /* 0x801B1884 | 0xC */
 void* HSD_ShadowGetAllocData(void) {
-    return lbl_804656E0;
+    return &lbl_804656E0;
 }
 
 typedef void (*HSD_TevStateFn)(void);
