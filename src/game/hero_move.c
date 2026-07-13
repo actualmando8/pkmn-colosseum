@@ -411,7 +411,7 @@ extern u32 lbl_80478E64;
 extern u32 lbl_80478B60;
 extern u8 lbl_8035E940[];
 extern void _flagSet(u32);
-extern void* fn_801906A0(u32);
+extern u32 fn_801906A0(u32);
 extern u32 lbl_80478F90;
 extern u32 lbl_80478F94;
 extern u8 lbl_80478B58[4];
@@ -604,17 +604,17 @@ extern void fn_8010E138(void);
 extern void GSmodelSetRotation(void);
 extern f32 lbl_8047D0D8;
 void initFloor__Fv(void);
-extern void floorGetNextFloorID(void);
-extern void fn_8006AE18(void);
+extern u32 floorGetNextFloorID(void);
+extern s32 fn_8006AE18(void);
 extern u8 lbl_802729C0[];
 extern u8 lbl_80272A10[];
 void heroMoveGetKenObjID(void);
-extern void fn_8018E050(void);
-extern void GSmodelEnableAnimBlend(void);
-extern void fn_8018CB5C(void);
-extern void fn_80189328(void);
-extern void fn_8018BF24(void);
-void heroMoveInit(void);
+extern void fn_8018E050(u32, u32, u32);
+extern void GSmodelEnableAnimBlend(void*);
+extern void fn_8018CB5C(u32, u32);
+extern void fn_80189328(u32, u32, u32);
+extern void fn_8018BF24(u32, u32, void*);
+s32 heroMoveInit(void*, void*);
 void heroMoveSyncWithHero(void);
 void fn_8013024C(void);
 extern void gamedataGetStatus(void);
@@ -3773,6 +3773,113 @@ void initFloor__Fv(void) {
     *(u32*)(lbl_80426BD0 + 0x10) = 0x12c;
     *(u32*)(lbl_80426BD0 + 0x30) = 0x12c;
     *(f32*)(lbl_80426BD0 + 0x13c) = lbl_8047D038;
+}
+
+typedef struct HeroMoveThemeTable {
+    u32 words[10];
+} HeroMoveThemeTable;
+
+typedef struct HeroMoveFloorTable {
+    u32 words[20];
+} HeroMoveFloorTable;
+
+/* Initialize the two field hero models and select the area's model theme. */
+s32 heroMoveInit(void* position, void* rotation)
+{
+    extern void fn_8018D998(u32 group, u32 object);
+    extern void fn_8018C8F4(u32 group, u32 object, u32 flags);
+    extern void fn_8018C0A8(u32 group, u32 object, void* position);
+    extern void* GSresGetResource(u32 group, u32 handle);
+    extern s32 updateAnimation__Ff15HEROMOVE_MEMBER(void* model, s32 member, f32 amount);
+
+    HeroMoveFloorTable floors;
+    HeroMoveThemeTable themes;
+    void* models[2];
+    u32 handles[2];
+    s32 i;
+    u32* floorCursor;
+    u32 floor;
+    u32 theme;
+    u32 handle;
+    s32 area;
+    u8 unavailable;
+
+    if (fn_800FF548() == 0) {
+        floors = *(HeroMoveFloorTable*)lbl_802729C0;
+        themes = *(HeroMoveThemeTable*)lbl_80272A10;
+
+        unavailable = fn_801906A0(0x8AE) == 0;
+        if (unavailable != 0) {
+            theme = 0x00F70400;
+        } else {
+            floor = floorGetNextFloorID();
+            floorCursor = floors.words;
+            i = 0;
+            while (i < 20) {
+                if (floor == *floorCursor) {
+                    break;
+                }
+                floorCursor++;
+                i++;
+            }
+
+            if (i >= 20) {
+                theme = 0x00F70400;
+            } else {
+                area = fn_8006AE18();
+                for (i = 0; i < 5; i++) {
+                    if (area == (s32)themes.words[i * 2]) {
+                        break;
+                    }
+                }
+                theme = themes.words[i * 2 + 1];
+            }
+        }
+
+        fn_8018E050(0, 100, theme);
+        fn_8018E050(0, 101, 0x00F30400);
+    } else {
+        fn_8018D998(0, 100);
+        fn_8018D998(0, 101);
+    }
+
+    for (i = 0; i < 2; i++) {
+        handles[0] = *(u32*)&lbl_8047D030;
+        handles[1] = *(u32*)&lbl_8047D034;
+        if (i >= 0 && i < 2) {
+            handle = handles[i];
+        }
+        models[i] = GSresGetResource(0, handle);
+        GSmodelEnableAnimBlend(models[i]);
+    }
+
+    fn_8018CB5C(0, 100);
+    fn_8018CB5C(0, 101);
+
+    if (fn_800FF548() == 0) {
+        fn_8018C8F4(0, 100, 0x40000F00);
+        fn_8018C8F4(0, 101, 0x701);
+    }
+
+    fn_80189328(0, 101, 1);
+
+    if (fn_800FF548() == 0) {
+        fn_8018C0A8(0, 100, position);
+        fn_8018BF24(0, 100, rotation);
+    }
+
+    for (i = 0; i < 2; i++) {
+        updateAnimation__Ff15HEROMOVE_MEMBER(models[i], i, lbl_8047D038);
+    }
+
+    initFloor__Fv();
+    *(u32*)(lbl_80426BD0 + 0x44) = 0;
+    *(u32*)(lbl_80426BD0 + 0x48) = 0;
+    *(u32*)(lbl_80426BD0 + 0x414) = 0;
+    *(u32*)(lbl_80426BD0 + 0x418) = 0;
+    *(u32*)(lbl_80426BD0 + 0x410) = 0;
+    *(u32*)(lbl_80426BD0 + 0x188) = 0;
+    return 0;
 }
 
 
