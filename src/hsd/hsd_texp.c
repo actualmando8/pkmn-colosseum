@@ -17,6 +17,7 @@
 #include "hsd/hsd_mobj.h"
 #include "hsd/hsd_memory.h"
 #include "hsd/hsd_gobj.h"
+#include "hsd/hsd_lobj.h"
 
 /* hsdAllocMemPiece/hsdFreeMemPiece declared in hsd_class.h with s32 */
 extern void* hsdNew(HSD_ClassInfo* info);
@@ -417,12 +418,7 @@ void fn_801B29E4(u32 flags, HSD_PEDesc* pe)
     TExpStateSetDither(0);
 }
 
-typedef struct HsdChanColor {
-    u8 r;
-    u8 g;
-    u8 b;
-    u8 a;
-} HsdChanColor;
+typedef GXColor HsdChanColor;
 
 typedef struct HSD_Chan HSD_Chan;
 
@@ -442,13 +438,127 @@ struct HSD_Chan {
     void* aobj;
 };
 
+typedef struct HSD_MaterialState {
+    HsdChanColor ambient;
+    HsdChanColor diffuse;
+    HsdChanColor specular;
+    u8 alpha;
+    u8 pad_0D[3];
+    f32 shininess;
+} HSD_MaterialState;
+
+typedef struct HSD_ChannelModeState {
+    HSD_Chan channels[6];
+} HSD_ChannelModeState;
+
+extern HSD_ChannelModeState lbl_8036CE88;
 extern HSD_Chan lbl_8036D018[4];
+extern HSD_MaterialState lbl_80465710;
+extern HsdChanColor lbl_80478C98;
 extern s32 lbl_8047B360[2];
 extern s32 lbl_8047B368[2];
 extern void fn_800BA4C8(s32 chan, HsdChanColor color);
 extern void fn_800BA5BC(s32 chan, HsdChanColor color);
 extern void fn_800BA6F4(s32 chan, u8 enable, s32 ambSrc, s32 matSrc,
                         s32 lightMask, s32 diffFn, s32 attnFn);
+extern void HSD_MulColor(HsdChanColor* color0, HsdChanColor* color1,
+                         HsdChanColor* result);
+
+void fn_801B3D1C(HSD_Chan* ch);
+void fn_801B3AE8(s32 chan);
+void HSD_StateSetNumChans(s32 n);
+
+#pragma push
+#pragma optimization_level 2
+void fn_801B2F1C(u32 rendermode)
+{
+    HSD_Chan* const channels = lbl_8036CE88.channels;
+    u32 color_mode = rendermode & 3;
+    u32 alpha_mode;
+    s32 num_chans = 0;
+    s32 alpha_chan = 0;
+    HSD_LObj* alpha_light;
+    s32 max;
+    s32 i;
+    HSD_LObj* light;
+    u8 alpha;
+
+    if (color_mode == 0) {
+        color_mode = 1;
+    }
+    alpha_mode = rendermode & 0x6000;
+    if (alpha_mode == 0) {
+        alpha_mode = color_mode << 13;
+    }
+
+    if (rendermode & 8) {
+        channels[0].light_mask = HSD_LObjGetLightMaskSpecular();
+        fn_801B3D1C(&channels[0]);
+        num_chans = 1;
+        max = HSD_LObjGetNbActive();
+        for (i = 0; i < max; i++) {
+            light = HSD_LObjGetActiveByIndex(i);
+            if (light != NULL) {
+                fn_801A6098(light, light->color, lbl_80465710.shininess);
+            }
+        }
+    }
+
+    if (rendermode & 4) {
+        alpha_light = HSD_LObjGetActiveByID(0x100);
+        if (alpha_light != NULL && (alpha_light->flags & 4)) {
+            HSD_MulColor(&lbl_80465710.ambient, &alpha_light->color,
+                         &channels[1].amb_color);
+        } else {
+            channels[1].amb_color = lbl_80478C98;
+        }
+        channels[1].mat_src = (color_mode >> 1) & 1;
+        channels[1].light_mask = HSD_LObjGetLightMaskDiffuse();
+        fn_801B3D1C(&channels[1]);
+
+        if (alpha_mode & 0x4000) {
+            channels[2].chan = 3;
+            fn_801B3D1C(&channels[3]);
+            alpha_chan = 1;
+        } else {
+            channels[2].chan = 2;
+        }
+        channels[2].light_mask = HSD_LObjGetLightMaskAlpha();
+        if (alpha_light != NULL && (alpha_light->flags & 0x10)) {
+            alpha = alpha_light->color.a;
+        } else {
+            alpha = 0;
+        }
+        if (channels[2].light_mask != 0) {
+            channels[2].enable = 1;
+            channels[2].mat_color.a = 0xFF;
+            channels[2].amb_color.a = alpha;
+        } else {
+            channels[2].mat_color.a = alpha;
+            channels[2].enable = 0;
+        }
+        fn_801B3D1C(&channels[2]);
+    } else {
+        channels[4].mat_src = (color_mode >> 1) & 1;
+        fn_801B3D1C(&channels[4]);
+        channels[5].mat_src = (alpha_mode >> 14) & 1;
+        fn_801B3D1C(&channels[5]);
+    }
+
+    if (num_chans != 0) {
+        if (alpha_chan == 0) {
+            fn_801B3AE8(3);
+        }
+        HSD_StateSetNumChans(2);
+    } else if (alpha_chan != 0) {
+        fn_801B3AE8(1);
+        HSD_StateSetNumChans(2);
+    } else {
+        fn_801B3AE8(5);
+        HSD_StateSetNumChans(1);
+    }
+}
+#pragma pop
 
 static inline s32 ColCompareRGB(HsdChanColor* c0, HsdChanColor* c1)
 {
@@ -558,7 +668,6 @@ extern void fn_800B884C(u32 value);
 extern u8 lbl_804656E0[];
 extern u8 lbl_80465588[];
 extern u8 lbl_804655B4[];
-extern u8 lbl_80465710[];
 extern u8 lbl_8047B350;
 extern u8 lbl_8047B351;
 extern u32 lbl_8047B34C;
@@ -2357,7 +2466,7 @@ void fn_801B2718(void) {
 
 /* 0x801B28B8 | 0x10 */
 void fn_801B28B8(f32 value) {
-    *(f32*)(lbl_80465710 + 0x10) = value;
+    lbl_80465710.shininess = value;
 }
 
 /* 0x801B3168 | 0xC */
