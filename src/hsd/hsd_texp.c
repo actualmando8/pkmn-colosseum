@@ -2641,6 +2641,12 @@ void* HSD_ShadowGetAllocData(void) {
     return &lbl_804656E0;
 }
 
+extern f32 fn_801B18D8(HSD_Spline* spline, f32 distance);
+
+void splArcLengthPoint(SplineVec3* p, HSD_Spline* spline, f32 distance) {
+    fn_801B2038(p, spline, fn_801B18D8(spline, distance));
+}
+
 typedef void (*HSD_TevStateFn)(void);
 
 typedef struct HSD_TevStateCallback {
