@@ -2581,6 +2581,74 @@ void fn_801A1B7C(HSD_JObj* jobj)
 }
 #pragma pop
 
+/* 0x801A1F2C | 0x19C */
+#pragma push
+#pragma optimization_level 1
+void fn_801A1F2C(HSD_JObj* jobj)
+{
+    HSD_JObj* parent;
+    JObjAnimClassInfo* info;
+    BOOL result;
+
+    if (jobj != NULL) {
+        if (jobj != NULL) {
+            if (jobj == NULL) {
+                __assert(&lbl_8047DB34, 0x25D, &lbl_8047DB3C);
+            }
+            result = FALSE;
+            if (!(((volatile HSD_JObj*) jobj)->flags & JOBJ_USER_DEF_MTX) &&
+                (((volatile HSD_JObj*) jobj)->flags & JOBJ_MTX_DIRTY))
+            {
+                result = TRUE;
+            }
+            if (!result) {
+                if (((volatile HSD_JObj*) jobj)->flags & JOBJ_USER_DEF_MTX) {
+                    if (!(((volatile HSD_JObj*) jobj)->flags &
+                          JOBJ_MTX_INDEP_PARENT) &&
+                        ((volatile HSD_JObj*) jobj)->parent != NULL)
+                    {
+                        parent = ((volatile HSD_JObj*) jobj)->parent;
+                        if (parent == NULL) {
+                            __assert(&lbl_8047DB34, 0x25D,
+                                     &lbl_8047DB3C);
+                        }
+                        result = FALSE;
+                        if (!(((volatile HSD_JObj*) parent)->flags &
+                              JOBJ_USER_DEF_MTX) &&
+                            (((volatile HSD_JObj*) parent)->flags &
+                             JOBJ_MTX_DIRTY))
+                        {
+                            result = TRUE;
+                        }
+                        if (result) {
+                            jobj->flags = jobj->flags | JOBJ_MTX_DIRTY;
+                        }
+                    }
+                } else if ((((volatile HSD_JObj*) jobj)->parent != NULL &&
+                            (((volatile HSD_JObj*) jobj)->parent->flags &
+                             JOBJ_MTX_DIRTY)) ||
+                           (((volatile HSD_JObj*) jobj)->flags &
+                            JOBJ_EFFECTOR) == JOBJ_JOINT1 ||
+                           (((volatile HSD_JObj*) jobj)->flags &
+                            JOBJ_EFFECTOR) == JOBJ_JOINT2 ||
+                           (((volatile HSD_JObj*) jobj)->flags &
+                            JOBJ_EFFECTOR) == JOBJ_EFFECTOR ||
+                           ((volatile HSD_JObj*) jobj)->robj != NULL)
+                {
+                    jobj->flags = jobj->flags | JOBJ_MTX_DIRTY;
+                }
+            }
+        }
+        info = (JObjAnimClassInfo*) jobj->object.parent.class_info;
+        HSD_AObjInterpretAnim(jobj->aobj, jobj, info->update);
+        fn_801B0040(jobj->robj);
+        if (union_type_dobj(jobj)) {
+            HSD_DObjAnimAll(jobj->u.dobj);
+        }
+    }
+}
+#pragma pop
+
 void fn_801A20C8(void* obj, u32 type, HSD_ObjData* val)
 {
     typedef struct JVec3 { f32 x, y, z; } JVec3;
