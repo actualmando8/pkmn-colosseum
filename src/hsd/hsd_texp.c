@@ -2755,6 +2755,10 @@ s32 HSD_StateAssignTev(void) {
 }
 #pragma pop
 
+s32 fn_801B387C(void) {
+    return lbl_8047B370;
+}
+
 /* 0x801B3884 | 0xC */
 void fn_801B3884(void) {
     lbl_8047B370 = 0;
