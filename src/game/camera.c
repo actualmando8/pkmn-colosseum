@@ -34,6 +34,8 @@
  * full fn_ -> name mapping).
  */
 
+#include "crt/math.h"
+#include "game/gs_render_util.h"
 #include "game/gs_scene_types.h"
 
 #pragma push
@@ -84,10 +86,7 @@ void menuSetPosition(u32 id, s32 x, s32 y);
 void fn_800E0718(void* out, const void* axis, f32 angle);
 void fn_800E0738(void* out, const void* a, const void* b);
 void GSvecTransformQuat(void* out, const void* quat, const void* vec);
-void GScameraGetPerspective(void* camera, f32* aspect, f32* fov,
-                            f32* near, f32* far);
-void GScameraSetPerspective(void* camera, f32 fov, f32 aspect,
-                            f32 near, f32 far);
+void fn_80179748(f32 a, f32 b, f32 c, f32 d);
 extern const GSSceneVec3 lbl_80315540;
 extern const GSSceneVec3 lbl_8031554C;
 extern const GSSceneVec3 lbl_80315558;
@@ -209,6 +208,37 @@ void _cameraPadMoveUpdate__FP9_GScamera(void* camera) {
     GScameraGetPerspective(camera, &aspect, &fov, &near, &far);
     GScameraSetPerspective(camera, ((CameraPadState*)lbl_80478C40)->fov,
                            fov, near, far);
+}
+#pragma pop
+#pragma push
+#pragma optimization_level 4
+void cameraSetGScamera(void* camera) {
+    GSRenderCamera* source;
+    GSRenderCamera* target;
+    GSRenderVec3 dist;
+    f32 perspective;
+    f32 aspect;
+    f32 near;
+    f32 far;
+
+    if (camera == 0) {
+        return;
+    }
+
+    source = (GSRenderCamera*)camera;
+    target = (GSRenderCamera*)GSresGetResource(0, 0);
+
+    GScameraGetPerspective(camera, &perspective, &aspect, &near, &far);
+    GScameraSetPerspective(target, perspective, aspect, near, far);
+    GScameraGetDistanceVector(camera, &dist);
+
+    if (((CameraPadState*)lbl_80478C40)->mode != 3) {
+        ((CameraPadState*)lbl_80478C40)->mode = 3;
+    }
+
+    target->interest = source->interest;
+    target->eye = source->eye;
+    fn_80179748(dist.y, dist.z, (f32)atan2(dist.x, dist.z), perspective);
 }
 #pragma pop
 #pragma push
