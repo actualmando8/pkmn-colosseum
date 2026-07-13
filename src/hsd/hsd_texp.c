@@ -975,6 +975,52 @@ void HSD_StateSetNumChans(s32 n) {
     }
 }
 
+/* Address: 0x801B3AE8 | Size: 0x234 */
+#pragma push
+#pragma optimization_level 1
+void fn_801B3AE8(s32 chan)
+{
+    s32 idx = chan & 3;
+    s32 amb_src;
+    s32 mat_src;
+    s32 diff_fn;
+    s32 attn_fn;
+
+    switch (chan) {
+    case 4:
+    case 5:
+        if (lbl_8036D018[idx].enable != 0 ||
+            lbl_8036D018[idx + 2].enable != 0) {
+            lbl_8036D018[idx].enable =
+                lbl_8036D018[idx + 2].enable = 0;
+            lbl_8036D018[idx].light_mask =
+                lbl_8036D018[idx + 2].light_mask = 0;
+            amb_src = lbl_8036D018[idx].amb_src;
+            mat_src = lbl_8036D018[idx].mat_src;
+            diff_fn = lbl_8036D018[idx].diff_fn;
+            attn_fn = lbl_8036D018[idx].attn_fn;
+            lbl_8036D018[idx + 2].amb_src = amb_src;
+            lbl_8036D018[idx + 2].mat_src = mat_src;
+            lbl_8036D018[idx + 2].diff_fn = diff_fn;
+            lbl_8036D018[idx + 2].attn_fn = attn_fn;
+            fn_800BA6F4(chan, 0, amb_src, mat_src, 0, diff_fn, attn_fn);
+        }
+        break;
+    default:
+        if (lbl_8036D018[idx].enable != 0) {
+            lbl_8036D018[idx].enable = 0;
+            lbl_8036D018[idx].light_mask = 0;
+            amb_src = lbl_8036D018[idx].amb_src;
+            mat_src = lbl_8036D018[idx].mat_src;
+            diff_fn = lbl_8036D018[idx].diff_fn;
+            attn_fn = lbl_8036D018[idx].attn_fn;
+            fn_800BA6F4(chan, 0, amb_src, mat_src, 0, diff_fn, attn_fn);
+        }
+        break;
+    }
+}
+#pragma pop
+
 /*
  * HSD_TExpValidateInputs - 0x801B45A4 | Size: 0x70
  * Validate that all inputs are properly connected.
