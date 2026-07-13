@@ -224,6 +224,27 @@ s8 fn_801347E8(void* base, s8 slot) {
 #endif
 
 
+/* One box contains its name/header followed by 30 Pokemon records. */
+typedef struct PCBoxPokemonRecord {
+    u8 data[0x138];
+} PCBoxPokemonRecord;
+
+typedef struct PCBoxData {
+    u8 header[0x14];
+    PCBoxPokemonRecord pokemon[30];
+} PCBoxData;
+
+static inline u8* pcboxGetPokemonRecord(PCBoxData* base, s8 box, s8 index)
+{
+    if (box < 0 || box >= 3) {
+        return 0;
+    }
+    if (index < 0 || index >= 30) {
+        return 0;
+    }
+    return base[box].pokemon[index].data;
+}
+
 /* 0x801348EC | 0xF0 */
 #if 0
 asm void getPokemonBoxNbUsedSlot__5PCBOXFSc(void) {
@@ -231,36 +252,28 @@ asm void getPokemonBoxNbUsedSlot__5PCBOXFSc(void) {
 }
 #else
 #pragma optimization_level 4
-s32 getPokemonBoxNbUsedSlot__5PCBOXFSc(void* base, void* src, s8 slot, s8 idx) {
-    extern void pokemonAllKaihuku(void*);
-    u8* entry;
-    s8 s;
-    s8 e;
-    u32 i;
-    u32* dst32;
-    u32* src32;
+#pragma scheduling on
+s32 getPokemonBoxNbUsedSlot__5PCBOXFSc(PCBoxData* base, s8 box) {
+    u8* pokemon;
+    s32 count = 0;
+    s8 index;
+
     if (base == 0) {
-        base = (void*)savedataGetStatus(0, 3);
+        base = (PCBoxData*)savedataGetStatus(0, 3);
     }
-    s = slot;
-    e = idx;
-    if (s < 0 || s >= 3 || e < 0 || e >= 0x1e) {
-        entry = 0;
-    } else {
-        entry = (u8*)base + (s32)s * 0x24a4 + (s32)e * 0x138 + 0x14;
+    if (box < 0 || box >= 3) {
+        return -1;
     }
-    if (entry == 0) return 0;
-    dst32 = (u32*)entry;
-    src32 = (u32*)src;
-    for (i = 0; i < 0x27; i++) {
-        dst32[0] = src32[0];
-        dst32[1] = src32[1];
-        dst32 += 2;
-        src32 += 2;
+
+    for (index = 0; index < 30; index++) {
+        pokemon = pcboxGetPokemonRecord(base, box, index);
+        if (pokemon != 0 && pokemonCheckValid(pokemon)) {
+            count++;
+        }
     }
-    pokemonAllKaihuku(entry);
-    return 1;
+    return count;
 }
+#pragma scheduling off
 #endif
 
 
