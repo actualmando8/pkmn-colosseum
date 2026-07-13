@@ -183,6 +183,7 @@ void HSD_LObjSetInterest(HSD_LObj* lobj, Vec* interest);
 void HSD_LObjRemoveAll(HSD_LObj* lobj);
 HSD_LObj* HSD_LObjAlloc(void);
 HSD_LObj* HSD_LObjLoadDesc(HSD_LightDesc* ldesc);
+void fn_801A6098(HSD_LObj* lobj, GXColor color, f32 shininess);
 
 static inline HSD_LObj* HSD_LObjGetNext(HSD_LObj* lobj)
 {
