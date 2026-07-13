@@ -4,11 +4,11 @@
 # phantom claims, prune stale worktrees, log a productivity trail.
 HARNESS=/Users/douglaswhittingham/gamecube-decomp-harness
 GAME=/Users/douglaswhittingham/pkmn-colosseum
+FLEET=${FLEET_DIR:-$GAME/fleet}
 DB="$HARNESS/projects/pkmn-colosseum/state/orchestrator.sqlite"
 LOG=/tmp/grind/watchdog.log
-declare -A LOOPS=(
-  [fs_push]="$GAME/fleet/fs_push.sh"
-)
+PAUSE_FILE=/tmp/grind/harness-paused.txt
+FS_PUSH_SCRIPT="$FLEET/fs_push.sh"
 cd "$HARNESS"
 mkdir -p /tmp/grind
 [ -f /tmp/grind/fs-small_run.txt ] || echo db660bd8-9e0a-4052-b04c-3572b0a62116 > /tmp/grind/fs-small_run.txt
@@ -25,6 +25,10 @@ while true; do
   prod=""
   for pr in "sm:$(cat /tmp/grind/fs-small_run.txt 2>/dev/null)" "md:$(cat /tmp/grind/fs-medium_run.txt 2>/dev/null)" "lg:$(cat /tmp/grind/fs-large_run.txt 2>/dev/null)"; do
     nm=${pr%%:*}; rr=${pr#*:}; [ -z "$rr" ] && continue
+    if [[ "$rr" == PAUSED-* ]]; then
+      prod="$prod $nm:paused"
+      continue
+    fi
     e=$(sqlite3 "$DB" "SELECT finished_count||'/'||size_value FROM epochs WHERE session_id='$rr' ORDER BY ordinal DESC LIMIT 1;" 2>/dev/null)
     w=$(sqlite3 "$DB" "SELECT count(*) FROM worker_state ws JOIN epoch_targets et ON et.id=ws.epoch_target_id WHERE et.session_id='$rr' AND ws.lifecycle_status='running';" 2>/dev/null)
     prod="$prod $nm:${w}w/ep${e}"
@@ -42,30 +46,48 @@ while true; do
   done
   echo "[$ts] PROD$prod" >> "$LOG"
 
-  # 2. restart dead lane tmux
-  tmux has-session -t colo-fs-small 2>/dev/null || { tmux new-session -d -s colo-fs-small "MAXW=5 bash projects/pkmn-colosseum/ops/start-fs-small.sh"; echo "[$ts] RESTARTED colo-fs-small" >> "$LOG"; }
-  tmux has-session -t colo-fs-medium 2>/dev/null || { tmux new-session -d -s colo-fs-medium "MAXW=2 bash projects/pkmn-colosseum/ops/start-fs-medium.sh"; echo "[$ts] RESTARTED colo-fs-medium" >> "$LOG"; }
-  tmux has-session -t colo-fs-large 2>/dev/null || { tmux new-session -d -s colo-fs-large "MAXW=1 bash projects/pkmn-colosseum/ops/start-fs-large.sh"; echo "[$ts] RESTARTED colo-fs-large" >> "$LOG"; }
+  # 2. A tmux name alone is not health: paused placeholders previously made
+  # the dashboard claim all three lanes were alive with zero workers. Respect
+  # the pause sentinel and otherwise require the recorded run-loop process.
+  if [ -f "$PAUSE_FILE" ]; then
+    echo "[$ts] HARNESS-PAUSED (lane restart and publication suppressed)" >> "$LOG"
+  else
+    for lane in \
+      "colo-fs-small:/tmp/grind/fs-small_run.txt:MAXW=3 FUZZY_MAX=87.999 bash projects/pkmn-colosseum/ops/start-fs-small.sh" \
+      "colo-fs-medium:/tmp/grind/fs-medium_run.txt:MAXW=2 FUZZY_MAX=87.999 bash projects/pkmn-colosseum/ops/start-fs-medium.sh" \
+      "colo-fs-large:/tmp/grind/fs-large_run.txt:MAXW=1 FUZZY_MAX=87.999 bash projects/pkmn-colosseum/ops/start-fs-large.sh"; do
+      session=${lane%%:*}; rest=${lane#*:}; run_file=${rest%%:*}; command=${rest#*:}
+      rid=$(cat "$run_file" 2>/dev/null)
+      if [ -z "$rid" ] || [[ "$rid" == PAUSED-* ]] || ! tmux has-session -t "$session" 2>/dev/null || \
+          ! pgrep -f "run-loop --run-id $rid" >/dev/null 2>&1; then
+        tmux kill-session -t "$session" 2>/dev/null || true
+        tmux new-session -d -s "$session" "$command"
+        echo "[$ts] RESTARTED $session (missing real run-loop)" >> "$LOG"
+      fi
+    done
+  fi
   tmux has-session -t harness-dashboard 2>/dev/null || { tmux new-session -d -s harness-dashboard "bun run ui:server 2>&1 | tee /tmp/grind/dashboard.log"; echo "[$ts] RESTARTED harness-dashboard" >> "$LOG"; }
-  tmux has-session -t crack-watch 2>/dev/null || { tmux new-session -d -s crack-watch "bash $GAME/fleet/crack_watch.sh"; echo "[$ts] RESTARTED crack-watch" >> "$LOG"; }
-  # 3. restart dead background loops
-  for name in "${!LOOPS[@]}"; do
-    pgrep -f "${LOOPS[$name]##*/}" >/dev/null 2>&1 || { nohup bash "${LOOPS[$name]}" > "/tmp/grind/${name}.log" 2>&1 & disown; echo "[$ts] RESTARTED loop $name" >> "$LOG"; }
-  done
+  tmux has-session -t crack-watch 2>/dev/null || { tmux new-session -d -s crack-watch "bash $FLEET/crack_watch.sh"; echo "[$ts] RESTARTED crack-watch" >> "$LOG"; }
+  # 3. restart the publisher with the same patched fleet directory as this watchdog.
+  pgrep -f "${FS_PUSH_SCRIPT}" >/dev/null 2>&1 || {
+    nohup bash "$FS_PUSH_SCRIPT" > /tmp/grind/fs_push.log 2>&1 & disown
+    echo "[$ts] RESTARTED loop fs_push" >> "$LOG"
+  }
   # 3b. stall recovery: a lane whose babysit is alive but produced no session in
   #     55 min (past any rung budget incl sol) is hung on a stuck provider call ->
   #     restart it (babysit startup recovery reclaims its targets).
   for pair in "colo-fs-small:$(cat /tmp/grind/fs-small_run.txt 2>/dev/null)" "colo-fs-medium:$(cat /tmp/grind/fs-medium_run.txt 2>/dev/null)" "colo-fs-large:$(cat /tmp/grind/fs-large_run.txt 2>/dev/null)"; do
     ls=${pair%%:*}; rid=${pair#*:}
     [ -z "$rid" ] && continue
+    [[ "$rid" == PAUSED-* ]] && continue
     tmux has-session -t "$ls" 2>/dev/null || continue
     mins=$(sqlite3 "$DB" "SELECT CAST((julianday('now')-julianday(max(created_at)))*1440 AS INT) FROM pi_sessions WHERE run_id='$rid';" 2>/dev/null)
     if [ -n "$mins" ] && [ "$mins" -gt 55 ] 2>/dev/null; then
       tmux kill-session -t "$ls" 2>/dev/null; pkill -f "$rid" 2>/dev/null; sleep 2
       case "$ls" in
-        colo-fs-small) tmux new-session -d -s colo-fs-small "MAXW=5 bash projects/pkmn-colosseum/ops/start-fs-small.sh";;
-        colo-fs-medium) tmux new-session -d -s colo-fs-medium "MAXW=2 bash projects/pkmn-colosseum/ops/start-fs-medium.sh";;
-        colo-fs-large) tmux new-session -d -s colo-fs-large "MAXW=1 bash projects/pkmn-colosseum/ops/start-fs-large.sh";;
+        colo-fs-small) tmux new-session -d -s colo-fs-small "MAXW=3 FUZZY_MAX=87.999 bash projects/pkmn-colosseum/ops/start-fs-small.sh";;
+        colo-fs-medium) tmux new-session -d -s colo-fs-medium "MAXW=2 FUZZY_MAX=87.999 bash projects/pkmn-colosseum/ops/start-fs-medium.sh";;
+        colo-fs-large) tmux new-session -d -s colo-fs-large "MAXW=1 FUZZY_MAX=87.999 bash projects/pkmn-colosseum/ops/start-fs-large.sh";;
       esac
       echo "[$ts] RECOVERED stalled lane $ls (no session ${mins}min)" >> "$LOG"
     fi
@@ -91,7 +113,7 @@ while true; do
   done
 
   # 3d. ingest strike notes into KG path_facts (idempotent)
-  python3 "$GAME/fleet/strike_notes_ingest.py" >> /tmp/grind/strike_ingest.log 2>&1
+  python3 "$FLEET/strike_notes_ingest.py" >> /tmp/grind/strike_ingest.log 2>&1
 
   # 4. remove STALE worker worktrees (not in active-run use, mtime >90min) + prune.
   sqlite3 "$DB" "SELECT DISTINCT worktree_path FROM worker_state WHERE lifecycle_status='running' AND worktree_path IS NOT NULL;" 2>/dev/null | grep -oE "worktrees/[^/]+" | sort -u > /tmp/grind/active_wt.txt
