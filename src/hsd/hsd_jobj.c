@@ -2923,6 +2923,24 @@ void HSD_JObjWalkTree0(HSD_JObj* jobj, HSD_JObjWalkTreeCallback callback,
 }
 #pragma pop
 
+/* 0x801A3E64 | 0x50 */
+#pragma push
+#pragma optimization_level 1
+extern void HSD_ObjFree(void* list, void* data);
+
+HSD_SList* fn_801A3E64(HSD_SList* node)
+{
+    HSD_SList* next;
+
+    if (node != NULL) {
+        next = node->next;
+        HSD_ObjFree(lbl_804655B4, node);
+        return next;
+    }
+    return NULL;
+}
+#pragma pop
+
 /* 0x801A3EB4 | 0x94 */
 extern void* HSD_ObjAlloc(void* list);
 extern void* memset(void* dst, int c, u32 n);
