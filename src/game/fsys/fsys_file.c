@@ -1518,35 +1518,36 @@ asm void fn_8017C39C(void) {
 #include "src/game/fsys/fsys_file_fn_8017C39C.inc"
 }
 #else
-u32 fn_8017C39C(FSYSSlot* slot) {
-    u8* archive;
-    FSYSSubEntry* sub;
-    FSYSFileEntry* spare2;
-    FSYSFileEntry* entry;
-    u32* entryTable;
-    u32* firstTable;
-    FSYSFileEntry* spare3;
+u32 fn_8017C39C(FSYSSlot *slot)
+{
+    u8 *archive;
+    FSYSSubEntry *sub;
+    FSYSFileEntry *spare1;
+    FSYSFileEntry *entry;
+    u32 *entryTable;
+    u32 *firstTable;
+    FSYSFileEntry *spare2;
     u32 index;
 
-    archive = (u8*)slot->archiveData;
+    archive = (u8 *) slot->archiveData;
     index = slot->archiveSize;
-    spare2 = spare2;
-    spare3 = spare3;
-    firstTable = firstTable;
+    spare1 = spare1;
     if (archive) {
-        firstTable = (u32*)(archive + *(u32*)(archive + 0x18));
-        entryTable = (u32*)(archive + firstTable[0]);
-        entry = (FSYSFileEntry*)(archive + entryTable[index]);
+        firstTable = (u32 *) (archive + *((u32 *) (archive + 0x18)));
+        entryTable = (u32 *) (archive + firstTable[0]);
+        entry = (FSYSFileEntry *) (archive + entryTable[index]);
     } else {
+        spare1 = spare1;
         entry = NULL;
     }
-    sub = FSYS_SLOT_CURRENT_SUB(slot);
-    if (entry->flags & FSYS_COMPRESSED_FLAG) {
+    sub = *((FSYSSubEntry **) ((u8 *) slot + 0xFC));
+    spare2 = spare2;
+    if (entry->flags & 0x80000000u) {
         sub->state = 4;
     } else {
         sub->state = 4;
     }
-    slot->status = FSYS_STATUS_ERROR;
+    slot->status = 0x064;
     return 0;
 }
 #endif
