@@ -301,6 +301,35 @@ void fn_800D3410(void* arg0, u8 arg1) {
     }
 }
 #endif
+
+extern void VIWaitForRetrace(void);
+void fn_800D361C(u8 mode) {
+    u32 diff;
+
+    VIWaitForRetrace();
+    diff = ((GSgfxState*)lbl_8047AA80)->xfbCount -
+           ((GSgfxState*)lbl_8047AA80)->xfbAddr0;
+    ((GSgfxState*)lbl_8047AA80)->xfbAddr1 = diff;
+
+    if ((mode == 1) != 0) {
+        while (((GSgfxState*)lbl_8047AA80)->xfbAddr1 <
+               ((GSgfxState*)lbl_8047AA80)->renderEnabled) {
+            VIWaitForRetrace();
+            diff = ((GSgfxState*)lbl_8047AA80)->xfbCount -
+                   ((GSgfxState*)lbl_8047AA80)->xfbAddr0;
+            ((GSgfxState*)lbl_8047AA80)->xfbAddr1 = diff;
+        }
+
+        if (((GSgfxState*)lbl_8047AA80)->vsyncFlag == 0) {
+            ((GSgfxState*)lbl_8047AA80)->xfbAddr1 =
+                ((GSgfxState*)lbl_8047AA80)->renderEnabled;
+        }
+    }
+
+    ((GSgfxState*)lbl_8047AA80)->xfbAddr0 =
+        ((GSgfxState*)lbl_8047AA80)->xfbCount;
+}
+
 extern f32 lbl_8047C9F0;
 #pragma push
 #pragma peephole off
