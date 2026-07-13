@@ -20,6 +20,7 @@
 #include "hsd/hsd_class.h"
 #include "hsd/hsd_debug.h"
 #include "hsd/hsd_id.h"
+#include "hsd/hsd_mtx.h"
 #include "hsd/hsd_pobj.h"
 #include "hsd/hsd_dobj.h"
 #include "hsd/hsd_robj.h"
@@ -3043,7 +3044,6 @@ typedef struct JObjQuat {
     f32 x, y, z, w;
 } JObjQuat;
 
-extern f32* HSD_VecAlloc(void);
 extern void HSD_MtxSRT(f32 mtx[3][4], Vec* scale, Vec* rotate,
                        Vec* translate, Vec* parent_scale);
 extern void HSD_MtxSRTQuat(f32 mtx[3][4], Vec* scale, JObjQuat* rotate,
