@@ -125,7 +125,7 @@ extern void  GSthreadBlock(void* thread);
 
 /* Model system */
 extern s32   fn_8017BB80(void* floorObj, void* modelData); /* model open */
-extern void  fn_8017BC90(void* floorObj, u32 modelId, u32 param, void* extraData);
+extern void* fn_8017BC90(void* floorObj, u32 modelId, u32 param, void* extraData);
 
 /* Flag system */
 extern BOOL  fn_800F7108(u16 flagId);               /* GSflagGet (bit check) */
