@@ -77,6 +77,8 @@ extern u32 lbl_8047A818;
 extern s32 lbl_8047A81C;
 extern void (*lbl_8047A82C)(DVDCommandBlock* block);
 extern void fn_800A59CC(u32 intType);
+extern void fn_800A5CC8(u32 intType);
+extern void fn_800A5D60(void);
 extern void fn_800A6028(u32 intType);
 extern void fn_800A6508(u32 intType);
 extern void fn_800A48DC(void (*callback)(u32));
@@ -931,6 +933,27 @@ static void cbForStateCover(u32 intType) {
     ResetRequired_8047A820 = TRUE;
     stateReady_800A6684();
 }
+
+#pragma dont_inline on
+/* 0x800A5C60 | size: 0x68 */
+void fn_800A5C60(u32 intType)
+{
+    if (intType == 0x10) {
+        executing_8047A7E8->state = -1;
+        __DVDStoreErrorCode(0x1234568);
+        DVDReset();
+        cbForStateError(0);
+        return;
+    }
+
+    if (intType & 1) {
+        fn_800A5D60();
+        return;
+    }
+
+    fn_800A48DC(fn_800A5CC8);
+}
+#pragma dont_inline reset
 
 /*
  * cbForStateGoToRetry - 0x800A5CC8 | size: 0x98
