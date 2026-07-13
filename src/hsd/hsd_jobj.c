@@ -3196,6 +3196,66 @@ void HSD_JObjWalkTree0(HSD_JObj* jobj, HSD_JObjWalkTreeCallback callback,
 }
 #pragma pop
 
+/* 0x801A3D04 | 0x160 */
+#pragma push
+#pragma optimization_level 1
+void fn_801A3D04(HSD_JObj* jobj)
+{
+    HSD_JObj* parent;
+    BOOL result;
+
+    if (jobj == NULL) {
+        return;
+    }
+    if (jobj == NULL) {
+        __assert(&lbl_8047DB34, 0x25D, &lbl_8047DB3C);
+    }
+    result = FALSE;
+    if (!(((volatile HSD_JObj*) jobj)->flags & JOBJ_USER_DEF_MTX) &&
+        (((volatile HSD_JObj*) jobj)->flags & JOBJ_MTX_DIRTY))
+    {
+        result = TRUE;
+    }
+    switch (result) {
+    case 0:
+        if (((volatile HSD_JObj*) jobj)->flags & JOBJ_USER_DEF_MTX) {
+            if (!(((volatile HSD_JObj*) jobj)->flags &
+                  JOBJ_MTX_INDEP_PARENT) &&
+                ((volatile HSD_JObj*) jobj)->parent != NULL)
+            {
+                parent = ((volatile HSD_JObj*) jobj)->parent;
+                if (parent == NULL) {
+                    __assert(&lbl_8047DB34, 0x25D, &lbl_8047DB3C);
+                }
+                result = FALSE;
+                if (!(((volatile HSD_JObj*) parent)->flags &
+                      JOBJ_USER_DEF_MTX) &&
+                    (((volatile HSD_JObj*) parent)->flags & JOBJ_MTX_DIRTY))
+                {
+                    result = TRUE;
+                }
+                if (result) {
+                    jobj->flags = jobj->flags | JOBJ_MTX_DIRTY;
+                }
+            }
+        } else if ((((volatile HSD_JObj*) jobj)->parent != NULL &&
+                    (((volatile HSD_JObj*) jobj)->parent->flags &
+                     JOBJ_MTX_DIRTY)) ||
+                   (((volatile HSD_JObj*) jobj)->flags & JOBJ_EFFECTOR) ==
+                       JOBJ_JOINT1 ||
+                   (((volatile HSD_JObj*) jobj)->flags & JOBJ_EFFECTOR) ==
+                       JOBJ_JOINT2 ||
+                   (((volatile HSD_JObj*) jobj)->flags & JOBJ_EFFECTOR) ==
+                       JOBJ_EFFECTOR ||
+                   ((volatile HSD_JObj*) jobj)->robj != NULL)
+        {
+            jobj->flags = jobj->flags | JOBJ_MTX_DIRTY;
+        }
+        break;
+    }
+}
+#pragma pop
+
 /* 0x801A3E64 | 0x50 */
 #pragma push
 #pragma optimization_level 1
