@@ -535,3 +535,35 @@ static void gappBackgroundCallback(void) {
 }
 #endif
 #pragma pop
+
+typedef void (*GSgappCallback)(u32 taskId, void* param);
+
+typedef struct GSgappTask {
+    struct GSgappTask* prev;
+    struct GSgappTask* next;
+    s32 state;
+    u8 priority;
+    u8 blocked;
+    u8 _pad[2];
+    void* param;
+    GSgappCallback callback;
+} GSgappTask;
+
+/* 0x800FEBA0 | 0x94 */
+void gappVSyncCallback(void) {
+    GSgappTask* task;
+    GSgappTask* next;
+    u32 taskId;
+
+    task = (GSgappTask*)lbl_8047AC98;
+    while (task != NULL) {
+        next = task->next;
+        if (task->state == 3 && task->blocked == 0) {
+            lbl_8047AC94 = (u32)task;
+            taskId = ((u32)task - lbl_8047AC7C) / sizeof(GSgappTask) + 1;
+            task->callback(taskId, task->param);
+        }
+        task = next;
+    }
+    lbl_8047AC94 = 0;
+}
