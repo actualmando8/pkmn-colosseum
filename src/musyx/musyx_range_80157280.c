@@ -14,6 +14,7 @@
 
 #include "dolphin/types.h"
 #include "game/people/people.h"
+#include "musyx/synthdata.h"
 
 /* ===== snd_synthapi.c: sndPitchUpOne / sndGetPitch, 0x80158BB4 / 0x80158BF0 =====
  * sndGetPitch: sampleInfo word = (rootKey << 24) | sampleRate(24bit);
@@ -6713,6 +6714,117 @@ void fn_8015B250(u32 dest, u32 nsDelay) {
 void fn_80159C48(void) {
     extern u16 lbl_8047AFE8;
     lbl_8047AFE8 = 0;
+}
+
+static inline MusyxPoolEntry* MusyxPoolEntryAt(u32 address)
+{
+    return (MusyxPoolEntry*)address;
+}
+
+static inline MusyxPoolEntry* fn_80159C54_get_entry(u16 id,
+                                                    MusyxPoolEntry* entry)
+{
+    while (entry->nextOffset != 0xFFFFFFFF) {
+        if (entry->id == id) {
+            return entry;
+        }
+        entry = MusyxPoolEntryAt((u32)entry + entry->nextOffset);
+    }
+    return NULL;
+}
+
+static inline MusyxPoolEntry* fn_80159C54_get_macro(u16 id,
+                                                    MusyxPoolData* pool)
+{
+    return pool == NULL ? NULL :
+        fn_80159C54_get_entry(id,
+            MusyxPoolEntryAt((u32)pool + pool->macroOffset));
+}
+
+static inline MusyxPoolEntry* fn_80159C54_get_curve(u16 id,
+                                                    MusyxPoolData* pool)
+{
+    return pool == NULL ? NULL :
+        fn_80159C54_get_entry(id,
+            MusyxPoolEntryAt((u32)pool + pool->curveOffset));
+}
+
+static inline MusyxPoolEntry* fn_80159C54_get_keymap(u16 id,
+                                                     MusyxPoolData* pool)
+{
+    return pool == NULL ? NULL :
+        fn_80159C54_get_entry(id,
+            MusyxPoolEntryAt((u32)pool + pool->keymapOffset));
+}
+
+static inline MusyxPoolEntry* fn_80159C54_get_layer(u16 id,
+                                                    MusyxPoolData* pool)
+{
+    return pool == NULL ? NULL :
+        fn_80159C54_get_entry(id,
+            MusyxPoolEntryAt((u32)pool + pool->layerOffset));
+}
+
+void fn_80159C54(u16 id, MusyxPoolData* pool, u8 dataType, u32 remove)
+{
+    MusyxPoolEntry* entry;
+
+    switch (dataType) {
+    case 0:
+        if (!remove) {
+            if ((entry = fn_80159C54_get_macro(id, pool)) != NULL) {
+                dataInsertMacro(id, entry->data.macros);
+            } else {
+                dataInsertMacro(id, NULL);
+            }
+        } else {
+            dataRemoveMacro(id);
+        }
+        break;
+    case 2:
+        id |= 0x4000;
+        if (!remove) {
+            if ((entry = fn_80159C54_get_keymap(id, pool)) != NULL) {
+                dataInsertKeymap(id, entry->data.keymaps);
+            } else {
+                dataInsertKeymap(id, NULL);
+            }
+        } else {
+            dataRemoveKeymap(id);
+        }
+        break;
+    case 3:
+        id |= 0x8000;
+        if (!remove) {
+            if ((entry = fn_80159C54_get_layer(id, pool)) != NULL) {
+                dataInsertLayer(id, entry->data.layer.entries,
+                                entry->data.layer.count);
+            } else {
+                dataInsertLayer(id, NULL, 0);
+            }
+        } else {
+            dataRemoveLayer(id);
+        }
+        break;
+    case 4:
+        if (!remove) {
+            if ((entry = fn_80159C54_get_curve(id, pool)) != NULL) {
+                dataInsertCurve(id, entry->data.curve);
+            } else {
+                dataInsertCurve(id, NULL);
+            }
+        } else {
+            dataRemoveCurve(id);
+        }
+        break;
+    case 1:
+        if (!remove) {
+            dataAddSampleReference(id);
+        } else {
+            dataRemoveSampleReference(id);
+        }
+        break;
+    }
 }
 
 /* fn_80159ED0: pass-through wrapper -- params stay in r3/r4, retail emits a
