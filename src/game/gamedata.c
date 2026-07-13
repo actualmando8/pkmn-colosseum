@@ -137,21 +137,39 @@ asm void fn_8013528C(void) {
 }
 #else
 #pragma optimization_level 4
-void fn_8013528C(void* ptr, u8 r4, u8 r5, u8 r6, u8 r7) {
+void gamedataCreate(void* ptr, u8 r4, u8 r5, u8 r6, u8 r7) {
     void* base;
-    if (ptr == 0) return;
+
+    if (ptr == 0) {
+        return;
+    }
     gamedataInit(ptr);
+
+    base = ptr;
     if (ptr == 0) {
         base = (void*)savedataGetStatus(0, 0);
-        if (base == 0) return;
-        base = (void*)savedataGetStatus((u32)base, 1);
-        if (base == 0) return;
-    } else {
-        base = ptr;
+        if (base == 0) {
+            base = 0;
+            goto done;
+        } else {
+            base = (void*)savedataGetStatus((u32)base, 1);
+            if (base == 0) {
+                base = 0;
+                goto done;
+            }
+        }
     }
+
     base = (void*)gamedataBiosGetGamedataAtttestPtr(base);
-    if (base == 0) return;
-    fn_801353C0(base, r4, r5, r6, r7);
+    if (base == 0) {
+        base = 0;
+    }
+
+done:
+    if (base == 0) {
+        return;
+    }
+    gamedataAttestCreate(base, r4, r5, r6, r7);
 }
 #endif
 
