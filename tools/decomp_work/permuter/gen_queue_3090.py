@@ -26,8 +26,15 @@ DENY_FNS = {
     "fn_8002520C", "fn_80024DBC", "fn_8002509C", "fn_80024F2C", "fn_8002537C",
 }
 
+# Reserved for the separately coordinated fight-range campaign.
+DENY_UNITS = {
+    "main/game/fight_range_80211A00",
+}
+
 
 def denied(unit, name, pct):
+    if unit in DENY_UNITS:
+        return True
     if name in DENY_FNS:
         return True
     # colosseum_battle position-dependent codegen wall: every member sits at
