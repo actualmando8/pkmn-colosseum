@@ -98,6 +98,7 @@ void GSpartGetTransform(void* part, void* transform, u32 arg2, u32 arg3);
 void GSpartFree(void* part);
 void fn_800E0168(void* dst, void* lhs, void* rhs);
 void GScameraSetAnimRate(GSRenderCamera* camera, f32 rate);
+void GScameraStartAnimation(void* camera);
 
 void cameraRefreshTargetPos(void) {
     void* object;
@@ -610,6 +611,19 @@ void cameraSetAnimeRate(f32 rate) {
     if (animation != 0) {
         GScameraSetAnimRate(animation, rate);
     }
+}
+#pragma pop
+#pragma push
+#pragma optimization_level 4
+void cameraStartAnimation(void) {
+    void* p;
+    void* r;
+    p = lbl_80478C40;
+    r = GSresGetResource(*(u32*)((u8*)p + 0xD0), *(u32*)((u8*)p + 0xD4));
+    if (r == 0)
+        r = fn_800F92D4(*(u32*)((u8*)p + 0xD4));
+    if (r != 0)
+        GScameraStartAnimation(r);
 }
 #pragma pop
 #pragma push
