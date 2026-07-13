@@ -5405,10 +5405,10 @@ void vsInit(void) {
  * sal_update_hostplayinfo, DoDepopFade, SortVoices, HandleDepopVoice =
  * fn_8015AD1C) are real `bl` targets at fixed addresses immediately
  * preceding this function (0x8015AAC0-0x8015B24C per symbols.txt,
- * confirmed by the disassembly's literal `bl <name>` targets) -- they are
- * NOT yet decompiled and are out of scope for this pass; only extern
- * prototypes (matching the mp4/prime reference's static-helper signatures)
- * are declared here so the compiler emits correct call-site codegen. */
+ * confirmed by the disassembly's literal `bl <name>` targets). SortVoices
+ * below is ported from AxioDL/musyx v2.0.0 `runtime/hw_dspctrl.c` and
+ * matches retail exactly. The remaining helpers are not yet decompiled;
+ * their extern prototypes match the MP4/Prime reference signatures. */
 typedef struct DSPADPCMblock {
     s16 Y0;
     s16 Y1;
@@ -5685,7 +5685,38 @@ extern u16 lbl_80369A50[3][6];     /* dspSRCCycles */
 #define dspStudio         ((DSPstudioinfo*)lbl_80447E60)
 
 extern u32 salSynthSendMessage(DSPvoice* dsp_vptr, u32 mesg);
-extern void SortVoices(DSPvoice** voices, s32 l, s32 r);
+
+void SortVoices(DSPvoice** voices, s32 l, s32 r) {
+    s32 i;
+    s32 last;
+    DSPvoice* tmp;
+
+    if (l >= r) {
+        return;
+    }
+
+    tmp = voices[l];
+    voices[l] = voices[(l + r) / 2];
+    voices[(l + r) / 2] = tmp;
+    last = l;
+    i = l + 1;
+
+    for (; i <= r; ++i) {
+        if (voices[i]->prio < voices[l]->prio) {
+            last += 1;
+            tmp = voices[last];
+            voices[last] = voices[i];
+            voices[i] = tmp;
+        }
+    }
+
+    tmp = voices[l];
+    voices[l] = voices[last];
+    voices[last] = tmp;
+    SortVoices(voices, l, last - 1);
+    SortVoices(voices, last + 1, r);
+}
+
 extern void DoDepopFade(s32* dspStart, s16* dspDelta, s32* hostSum);
 extern void sal_setup_dspvol(u16* dsp_delta, u16* last_vol, u16 vol);
 extern void sal_update_hostplayinfo(DSPvoice* dsp_vptr);
