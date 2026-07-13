@@ -369,6 +369,9 @@ _end:;
 #endif
 
 
+typedef struct GameData GameData;
+typedef struct GameDataAttest GameDataAttest;
+
 /* 0x8013583C | 0xFC */
 #if 0
 asm void fn_8013583C(void) {
@@ -377,25 +380,48 @@ asm void fn_8013583C(void) {
 #else
 #pragma push
 #pragma scheduling on
-void fn_8013583C(void* ptr, u16 effect_type, u32 value) {
-    void* base; u16 et;
-    et = effect_type & 0xFFFF;
-    if (et == 0 || et >= 7) return;
-    if (ptr == 0) {
-        base = (void*)savedataGetStatus(0, 0);
-        if (base != 0) { base = (void*)savedataGetStatus((u32)base, 1); }
-        ptr = base;
+void gamedataSetStatus(ptr, effect_type, value)
+GameData* ptr;
+u32 effect_type;
+u32 value;
+{
+    GameDataAttest* base;
+
+    if ((u16)effect_type == 0 || (u16)effect_type >= 7) {
+        return;
     }
-    if (ptr == 0) return;
-    base = (void*)gamedataBiosGetGamedataAtttestPtr(ptr);
-    if (base == 0) return;
-    switch (et) {
-        case 1: gamedataBiosSetGamedataAtttestPtr((u32*)ptr, (u32*)value); break;
-        case 2: gamedataAttestBiosSetVerId(base, (u8)(value & 0xFF)); break;
-        case 3: gamedataAttestBiosSetGenId(base, (u8)(value & 0xFF)); break;
-        case 4: gamedataAttestBiosSetAreaId(base, (u8)(value & 0xFF)); break;
-        case 5: gamedataAttestBiosSetLangareaId(base, (u8)(value & 0xFF)); break;
-        default: break;
+    if (ptr == NULL) {
+        ptr = (GameData*)savedataGetStatus(0, 0);
+        if (ptr == NULL) {
+            return;
+        }
+        ptr = (GameData*)savedataGetStatus((u32)ptr, 1);
+        if (ptr == NULL) {
+            return;
+        }
+    }
+    base = (GameDataAttest*)gamedataBiosGetGamedataAtttestPtr(ptr);
+    if (base == NULL) {
+        return;
+    }
+    switch ((u16)effect_type) {
+    case 1:
+        gamedataBiosSetGamedataAtttestPtr((u32*)ptr, (u32*)value);
+        break;
+    case 2:
+        gamedataAttestBiosSetVerId(base, (u8)value);
+        break;
+    case 3:
+        gamedataAttestBiosSetGenId(base, (u8)value);
+        break;
+    case 4:
+        gamedataAttestBiosSetAreaId(base, (u8)value);
+        break;
+    case 5:
+        gamedataAttestBiosSetLangareaId(base, (u8)value);
+        break;
+    default:
+        break;
     }
 }
 #pragma pop
