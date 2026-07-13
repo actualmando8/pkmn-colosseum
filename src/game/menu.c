@@ -43,6 +43,11 @@ typedef struct GSModelStateHeader {
     void* entries;      /* 0x08 */
 } GSModelStateHeader;
 
+typedef struct MenuSystemState {
+    u8 pad_00[0x94];
+    s32 lastError;
+} MenuSystemState;
+
 #define GS_MODEL_STATE ((GSModelStateHeader*)lbl_80404ACC)
 
 /* Resource index table */
@@ -307,6 +312,11 @@ extern s32 menuModelSetMotion(void* p, u32 val);
 extern void menuModelRender(void);
 extern s32 menuModelCheck(void* obj, u8 wait);
 extern s32 menuModelFree(void* p);
+
+/* 0x80102004 | 0x10 */
+s32 menuGetLastError(void) {
+    return ((MenuSystemState*)lbl_80404ACC)->lastError;
+}
 
 /* 0x80102014 | 0x24 */
 #pragma push
