@@ -519,18 +519,16 @@ asm void LCStoreBlocks(register void* destAddr, register void* srcAddr, register
 u32 LCStoreData(void* destAddr, void* srcAddr, u32 nBytes) {
     u32 numBlocks = (nBytes + 0x1F) >> 5;
     u32 numTransactions = (numBlocks + 0x7F) >> 7;
-    u32 src = (u32)srcAddr;
-    u32 dest = (u32)destAddr;
 
     while (numBlocks != 0) {
         if (numBlocks < 0x80) {
-            LCStoreBlocks((void*)dest, (void*)src, numBlocks);
+            LCStoreBlocks(destAddr, srcAddr, numBlocks);
             numBlocks = 0;
         } else {
-            LCStoreBlocks((void*)dest, (void*)src, 0);
+            LCStoreBlocks(destAddr, srcAddr, 0);
             numBlocks -= 0x80;
-            dest += 0x1000;
-            src += 0x1000;
+            destAddr = (u8*)destAddr + 0x1000;
+            srcAddr = (u8*)srcAddr + 0x1000;
         }
     }
 
@@ -575,4 +573,3 @@ _loop_lcqw:
     blr
 }
 #pragma pop
-

@@ -8,3 +8,23 @@
  * range name stays honest until internal TU structure is proven.
  */
 #include "dolphin/types.h"
+
+typedef struct {
+    s32 unk0;
+    u32 unk4;
+    u32 unk8;
+} AlarmCallback;
+
+extern u32 lbl_80478980;
+extern AlarmCallback* lbl_8047A6E8;
+
+u32 fn_8009AB50(u32 xfb) {
+    u32 previous = lbl_80478980;
+
+    lbl_80478980 = xfb;
+    return previous;
+}
+
+void fn_8009AC3C(u32 xfb) {
+    lbl_8047A6E8[xfb].unk0 = -1;
+}

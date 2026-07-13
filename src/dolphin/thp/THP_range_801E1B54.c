@@ -209,12 +209,12 @@ extern BOOL OSCreateThread(OSThread *thread, void *(*func)(void *), void *param,
 extern s32 OSResumeThread(OSThread *thread);
 extern void *memcpy(void *dst, const void *src, u32 n);
 
-void *fn_801E1C1C(void *arg);
+void fn_801E1C1C(void);
 void *fn_801E4B38(void *arg);
 void *fn_801E4C80(void *arg);
 void *fn_801E4F64(void *arg);
 void *fn_801E5154(void *arg);
-void fn_801E4F34(u32 msg);
+BOOL fn_801E4F34(u32 msg);
 
 /* ---- Thread A: DVD read thread ---- */
 u8 lbl_80469040[0x1390]; /* stack(0x1000) + OSThread(0x318) + 3 msg arrays (0x28 each) */
@@ -225,7 +225,7 @@ u8 lbl_8046A494[0x20];   /* queue used by fn_801E386C's forwarding loop */
 u8 lbl_8046A4B4[0x20];   /* queue: Put=fn_801E446C */
 
 /* ---- ActivePlayer (THPPlayer-ish) struct; ledger above ---- */
-u8 lbl_8046AC60[0x1C0];
+extern u8 lbl_8046AC60[0x1C0];
 
 /* ---- Thread B: audio decode thread ---- */
 u8 lbl_8046AE20[0x1058 + 0x318]; /* 2 msg arrays(0xC each) + 2 queues(0x20 each) + stack(0x1000) + OSThread(0x318) */
@@ -247,10 +247,12 @@ BOOL lbl_8047B488; /* thread C created flag */
 BOOL lbl_8047B48C; /* thread C created flag (2nd, set alongside B488) */
 
 /* ---- Thread A: message queue wrappers ---- */
-BOOL fn_801E1B54(u32 msg)
+#pragma peephole off
+BOOL fn_801E1B54(void *msg)
 {
-    return fn_8009F230(lbl_8046A3D0, msg, 1);
+    return fn_8009F230(lbl_8046A3D0, (u32)msg, 1);
 }
+#pragma peephole reset
 
 u32 fn_801E1B84(void)
 {
@@ -259,16 +261,72 @@ u32 fn_801E1B84(void)
     return msg;
 }
 
-void fn_801E1BB8(u32 msg)
+#pragma peephole off
+void fn_801E1BB8(void *msg)
 {
-    fn_8009F230(lbl_8046A410, msg, 1);
+    fn_8009F230(lbl_8046A410, (u32)msg, 1);
 }
+#pragma peephole reset
 
 u32 fn_801E1BE8(void)
 {
     u32 msg;
     fn_8009F2F8(lbl_8046A3F0, &msg, 1);
     return msg;
+}
+
+void fn_801E1C1C(void)
+{
+    extern s32 DVDRead(void *fileInfo, void *addr, s32 length, s32 offset, s32 prio);
+    extern s32 OSSuspendThread(OSThread *thread);
+    extern BOOL fn_801E446C(u32 msg);
+    u8 *player;
+    u8 *base;
+    u32 message;
+    s32 frame;
+    u32 size;
+    u32 offset;
+    u32 *buffer;
+    s32 result;
+    u32 frameOffset;
+    u32 frameCount;
+    u32 position;
+
+    player = lbl_8046AC60;
+    base = lbl_80469040;
+    frame = 0;
+    offset = *(u32 *)(player + 0xB8);
+    size = *(u32 *)(player + 0xBC);
+    while (TRUE) {
+        fn_8009F2F8(base + 0x13D0, &message, 1);
+        buffer = (u32 *)message;
+        result = DVDRead(player, (void *)buffer[0], size, offset, 2);
+        if (result != (s32)size) {
+            if (result == -1) {
+                *(s32 *)(player + 0xA8) = -1;
+            }
+            if (frame == 0) {
+                fn_801E446C(0);
+            }
+            OSSuspendThread((OSThread *)(base + 0x1000));
+        }
+
+        buffer[1] = frame;
+        fn_8009F230(base + 0x13B0, (u32)buffer, 1);
+        offset += size;
+        frameOffset = frame + *(u32 *)(player + 0xC0);
+        frameCount = *(u32 *)(player + 0x50);
+        position = frameOffset % frameCount;
+        size = *(u32 *)buffer[0];
+        if (position == frameCount - 1) {
+            if (*(u8 *)(player + 0xA6) & 1) {
+                offset = *(u32 *)(player + 0x64);
+            } else {
+                OSSuspendThread((OSThread *)(base + 0x1000));
+            }
+        }
+        frame++;
+    }
 }
 
 /* ---- Thread A: cancel/resume ---- */
@@ -290,75 +348,116 @@ void fn_801E1D48(void)
 /* ---- Thread A: create ---- */
 BOOL fn_801E1D7C(s32 priority)
 {
-    if (!OSCreateThread((OSThread *)(lbl_80469040 + 0x1000), (void *(*)(void *))fn_801E1C1C, NULL,
-                         lbl_80469040 + 0x1000, 0x1000, priority, 1)) {
+    u8 *base = lbl_80469040;
+
+    if (!OSCreateThread((OSThread *)(base + 0x1000), (void *(*)(void *))fn_801E1C1C, NULL,
+                         base + 0x1000, 0x1000, priority, 1)) {
         return FALSE;
     }
-    fn_8009F1D0(lbl_80469040 + 0x13D0, (u32)(lbl_80469040 + 0x1368), 0xA);
-    fn_8009F1D0(lbl_80469040 + 0x13B0, (u32)(lbl_80469040 + 0x1340), 0xA);
-    fn_8009F1D0(lbl_80469040 + 0x1390, (u32)(lbl_80469040 + 0x1318), 0xA);
+    fn_8009F1D0(base + 0x13D0, (u32)(base + 0x1368), 0xA);
+    fn_8009F1D0(base + 0x13B0, (u32)(base + 0x1340), 0xA);
+    fn_8009F1D0(base + 0x1390, (u32)(base + 0x1318), 0xA);
     lbl_8047B460 = TRUE;
     return TRUE;
 }
 
-/* ---- Thread B: message queue wrappers ---- */
-u32 fn_801E4AC4(void)
+BOOL fn_801E4A6C(void)
 {
-    u32 msg;
-    if (!fn_8009F2F8(lbl_8046AE38, &msg, 0)) {
-        return 0;
-    }
-    return msg;
+    extern void *memset(void *dst, int value, u32 size);
+    extern u8 lbl_8046A440[];
+    u8 *base = lbl_8046A440;
+
+    memset(base + 0x820, 0, 0x1C0);
+    fn_8009F1D0(base + 0x54, (u32)(base + 0x48), 3);
+    lbl_8047B468 = TRUE;
+    return TRUE;
 }
 
+/* ---- Thread B: message queue wrappers ---- */
+#undef lbl_8046AE38
+u32 fn_801E4AC4(u32 flags)
+{
+    extern u8 lbl_8046AE38[];
+    u32 msg;
+    if (fn_8009F2F8(lbl_8046AE38, &msg, flags) == TRUE) {
+        return msg;
+    }
+    return 0;
+}
+#define lbl_8046AE38 (lbl_8046AE20 + 0x18)
+
+/* Thread B: additional send-only queue wrapper (lbl_8046AE58) */
+#pragma optimize_for_size on
+#pragma peephole off
 void fn_801E4B08(u32 msg)
 {
     fn_8009F230(lbl_8046AE58, msg, 0);
 }
+#pragma optimize_for_size reset
+#pragma peephole reset
 
 /* ---- Thread A: additional send-only queue wrapper (lbl_8046A4B4) ---- */
-void fn_801E446C(u32 msg)
+#pragma peephole off
+BOOL fn_801E446C(u32 msg)
 {
-    fn_8009F230(lbl_8046A4B4, msg, 1);
+    return fn_8009F230(lbl_8046A4B4, msg, 1);
 }
+#pragma peephole reset
 
 /* ---- Thread A: forwarding loop (drains lbl_8046A494, forwards to Thread C's send queue) ---- */
+#pragma peephole off
 void fn_801E386C(void)
 {
     u32 msg;
-    while (lbl_8047B468) {
-        if (!fn_8009F2F8(lbl_8046A494, &msg, 0)) {
-            msg = 0;
+    u32 result;
+
+    if (lbl_8047B468) {
+        while (TRUE) {
+            if (fn_8009F2F8(lbl_8046A494, &msg, 0) == TRUE) {
+                result = msg;
+            } else {
+                result = 0;
+            }
+            if (result == 0) {
+                break;
+            }
+            fn_801E4F34(result);
         }
-        if (msg == 0) {
-            break;
-        }
-        fn_801E4F34(msg);
     }
 }
+#pragma peephole reset
 
 /* ---- Thread C: message queue wrappers ---- */
-u32 fn_801E4EF0(void)
+#undef lbl_8046C1A8
+u32 fn_801E4EF0(u32 flags)
 {
+    extern u8 lbl_8046C1A8[];
     u32 msg;
-    if (!fn_8009F2F8(lbl_8046C1A8, &msg, 0)) {
-        return 0;
+    if (fn_8009F2F8(lbl_8046C1A8, &msg, flags) == TRUE) {
+        return msg;
     }
-    return msg;
+    return 0;
 }
+#define lbl_8046C1A8 (lbl_8046C190 + 0x18)
 
-void fn_801E4F34(u32 msg)
+#pragma peephole off
+#pragma optimize_for_size off
+BOOL fn_801E4F34(u32 msg)
 {
-    fn_8009F230(lbl_8046C1C8, msg, 0);
+    return fn_8009F230(lbl_8046C1C8, msg, 0);
 }
+#pragma optimize_for_size reset
+#pragma peephole reset
 
 /* ---- Thread B: cancel/resume ---- */
+extern OSThread lbl_8046BE78;
 void fn_801E4DAC(void)
 {
-    if (lbl_8047B480) {
-        OSCancelThread((OSThread *)(lbl_8046AE20 + 0x1058));
-        lbl_8047B480 = FALSE;
+    if (!lbl_8047B480) {
+        return;
     }
+    OSCancelThread(&lbl_8046BE78);
+    lbl_8047B480 = 0;
 }
 
 void fn_801E4DE8(void)
@@ -371,35 +470,41 @@ void fn_801E4DE8(void)
 /* ---- Thread C: cancel/resume ---- */
 void fn_801E5400(void)
 {
-    if (lbl_8047B488) {
-        OSCancelThread((OSThread *)(lbl_8046C190 + 0x1058));
+    extern u8 lbl_8046D1E8[];
+
+    if ((s32)lbl_8047B488 != 0) {
+        OSCancelThread((OSThread *)lbl_8046D1E8);
         lbl_8047B488 = FALSE;
     }
 }
 
 void fn_801E543C(void)
 {
-    if (lbl_8047B488) {
-        OSResumeThread((OSThread *)(lbl_8046C190 + 0x1058));
+    extern u8 lbl_8046D1E8[];
+
+    if ((s32)lbl_8047B488 != 0) {
+        OSResumeThread((OSThread *)lbl_8046D1E8);
     }
 }
 
 /* ---- Thread B: create (mode-selects thread body) ---- */
 BOOL fn_801E4E1C(s32 priority, u32 mode)
 {
+    u8 *base = lbl_8046AE20;
+
     if (mode != 0) {
-        if (!OSCreateThread((OSThread *)(lbl_8046AE20 + 0x1058), (void *(*)(void *))fn_801E4B38,
-                             (void *)mode, lbl_8046AE20 + 0x58, 0x1000, priority, 1)) {
+        if (!OSCreateThread((OSThread *)(base + 0x1058), (void *(*)(void *))fn_801E4B38,
+                             (void *)mode, base + 0x58, 0x1000, priority, 1)) {
             return FALSE;
         }
     } else {
-        if (!OSCreateThread((OSThread *)(lbl_8046AE20 + 0x1058), (void *(*)(void *))fn_801E4C80,
-                             NULL, lbl_8046AE20 + 0x58, 0x1000, priority, 1)) {
+        if (!OSCreateThread((OSThread *)(base + 0x1058), (void *(*)(void *))fn_801E4C80,
+                             NULL, base + 0x58, 0x1000, priority, 1)) {
             return FALSE;
         }
     }
-    fn_8009F1D0(lbl_8046AE20 + 0x38, (u32)(lbl_8046AE20 + 0xC), 3);
-    fn_8009F1D0(lbl_8046AE20 + 0x18, (u32)(lbl_8046AE20 + 0x0), 3);
+    fn_8009F1D0(base + 0x38, (u32)(base + 0xC), 3);
+    fn_8009F1D0(base + 0x18, (u32)(base + 0x0), 3);
     lbl_8047B480 = TRUE;
     return TRUE;
 }
@@ -407,19 +512,21 @@ BOOL fn_801E4E1C(s32 priority, u32 mode)
 /* ---- Thread C: create (mode-selects thread body) ---- */
 BOOL fn_801E5470(s32 priority, u32 mode)
 {
+    u8 *base = lbl_8046C190;
+
     if (mode != 0) {
-        if (!OSCreateThread((OSThread *)(lbl_8046C190 + 0x1058), (void *(*)(void *))fn_801E4F64,
-                             (void *)mode, lbl_8046C190 + 0x58, 0x1000, priority, 1)) {
+        if (!OSCreateThread((OSThread *)(base + 0x1058), (void *(*)(void *))fn_801E4F64,
+                             (void *)mode, base + 0x58, 0x1000, priority, 1)) {
             return FALSE;
         }
     } else {
-        if (!OSCreateThread((OSThread *)(lbl_8046C190 + 0x1058), (void *(*)(void *))fn_801E5154,
-                             NULL, lbl_8046C190 + 0x58, 0x1000, priority, 1)) {
+        if (!OSCreateThread((OSThread *)(base + 0x1058), (void *(*)(void *))fn_801E5154,
+                             NULL, base + 0x58, 0x1000, priority, 1)) {
             return FALSE;
         }
     }
-    fn_8009F1D0(lbl_8046C190 + 0x38, (u32)(lbl_8046C190 + 0xC), 3);
-    fn_8009F1D0(lbl_8046C190 + 0x18, (u32)(lbl_8046C190 + 0x0), 3);
+    fn_8009F1D0(base + 0x38, (u32)(base + 0xC), 3);
+    fn_8009F1D0(base + 0x18, (u32)(base + 0x0), 3);
     lbl_8047B488 = TRUE;
     lbl_8047B48C = TRUE;
     return TRUE;
@@ -439,34 +546,115 @@ u8 fn_801E38D8(void)
 
 BOOL fn_801E38E8(void *dst)
 {
-    if (!*(BOOL *)(lbl_8046AC60 + 0xA0)) {
-        return FALSE;
+    if (*(BOOL *)(lbl_8046AC60 + 0xA0)) {
+        memcpy(dst, lbl_8046AC60 + 0x8C, 0x10);
+        return TRUE;
     }
-    memcpy(dst, lbl_8046AC60 + 0x8C, 0x10);
-    return TRUE;
+    return FALSE;
 }
 
 BOOL fn_801E3930(void *dst)
 {
-    if (!*(BOOL *)(lbl_8046AC60 + 0xA0)) {
-        return FALSE;
+    if (*(BOOL *)(lbl_8046AC60 + 0xA0)) {
+        memcpy(dst, lbl_8046AC60 + 0x80, 0xC);
+        return TRUE;
     }
-    memcpy(dst, lbl_8046AC60 + 0x80, 0xC);
-    return TRUE;
+    return FALSE;
 }
+
+s32 fn_801E3978(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
+{
+    extern void fn_801E1E1C(void *y, void *u, void *v, s16 x, s16 yPos,
+                            s16 width, s16 height, s16 arg8, s16 arg9);
+    extern void fn_801E1FF8(s32 arg0);
+    extern void fn_801E24B0(void);
+    u8 *player = lbl_8046AC60;
+
+    if (*(BOOL *)(player + 0xA0) && player[0xA4] != 0 &&
+        *(u32 **)(player + 0xE8) != NULL) {
+        fn_801E1FF8(arg0);
+        fn_801E1E1C((void *)(*(u32 **)(player + 0xE8))[0],
+                    (void *)(*(u32 **)(player + 0xE8))[1],
+                    (void *)(*(u32 **)(player + 0xE8))[2],
+                    (s16)arg1, (s16)arg2,
+                    (s16)*(u32 *)(lbl_8046AC60 + 0x80),
+                    (s16)*(u32 *)(lbl_8046AC60 + 0x84),
+                    (s16)arg3, (s16)arg4);
+        fn_801E24B0();
+        return ((*(u32 **)(player + 0xE8))[3] +
+                *(u32 *)(lbl_8046AC60 + 0xC0)) %
+               *(u32 *)(lbl_8046AC60 + 0x50);
+    }
+    return -1;
+}
+
+#pragma peephole off
+BOOL fn_801E4058(void)
+{
+    extern void fn_801E2CA8(void);
+    u8 *player = lbl_8046AC60;
+    u8 state;
+
+    if (*(BOOL *)(player + 0xA0) != FALSE) {
+        state = player[0xA4];
+        if (state == 1 || state == 4) {
+            if (state == 4 && lbl_8046AC60[0xA7] != 0) {
+                fn_801E2CA8();
+            }
+            player[0xA4] = 2;
+            *(u32 *)(lbl_8046AC60 + 0xD0) = 0;
+            *(u32 *)(lbl_8046AC60 + 0xD4) = 0;
+            *(s32 *)(lbl_8046AC60 + 0xCC) = -1;
+            *(s32 *)(lbl_8046AC60 + 0xC8) = -1;
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+#pragma peephole reset
 
 s32 fn_801E25C8(void)
 {
     void *p;
-    if (!*(BOOL *)(lbl_8046AC60 + 0xA0) || lbl_8046AC60[0xA4] == 0) {
-        return -1;
+
+    if (*(BOOL *)(lbl_8046AC60 + 0xA0)) {
+        if (lbl_8046AC60[0xA4] != 0) {
+            p = *(void **)(lbl_8046AC60 + 0xE8);
+            if (p != NULL) {
+                return *(s32 *)((u8 *)p + 0xC) + *(s32 *)(lbl_8046AC60 + 0xC0);
+            }
+        }
     }
-    p = *(void **)(lbl_8046AC60 + 0xE8);
-    if (p == NULL) {
-        return -1;
-    }
-    return *(s32 *)((u8 *)p + 0xC) + *(s32 *)(lbl_8046AC60 + 0xC0);
+    return -1;
 }
+
+#pragma optimize_for_size on
+u32 fn_801E4650(void)
+{
+    u32 total;
+    u32 area;
+
+    if (*(BOOL *)(lbl_8046AC60 + 0xA0)) {
+        if (*(BOOL *)(lbl_8046AC60 + 0xB0)) {
+            total = OSRoundUp32B(*(u32 *)(lbl_8046AC60 + 0x58));
+        } else {
+            total = OSRoundUp32B(*(u32 *)(lbl_8046AC60 + 0x44)) * 10;
+        }
+
+        area = *(u32 *)(lbl_8046AC60 + 0x80) * *(u32 *)(lbl_8046AC60 + 0x84);
+        total += OSRoundUp32B(area) * 3;
+        total += OSRoundUp32B(area >> 2) * 3;
+        total += OSRoundUp32B(area >> 2) * 3;
+        if (lbl_8046AC60[0xA7]) {
+            total += OSRoundUp32B(*(u32 *)(lbl_8046AC60 + 0x48) << 2) * 3;
+            total += *(u32 *)(lbl_8046AC60 + 0x8C) *
+                     OSRoundUp32B(*(u32 *)(lbl_8046AC60 + 0x90) * 40 / 500);
+        }
+        return total + 0x1000;
+    }
+    return 0;
+}
+#pragma optimize_for_size reset
 
 BOOL fn_801E4724(void)
 {

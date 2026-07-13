@@ -118,3 +118,30 @@ void TRKTargetAddStopInfo(s32 arg) {
     *(u32*)&buf[0x10] = *(u32*)&gTRKCPUState[0x2F8] & 0xFFFF;
     TRKAppendBuffer_ui8(arg, buf, 0x40);
 }
+
+/* TRKAccessFile - 0x800C29F0 | size: 0x8 | scope global */
+u32 TRKAccessFile(u32 cmd, u32 dir, u32* addrBuf, u32 len) {
+    (void)cmd;
+    (void)dir;
+    (void)addrBuf;
+    (void)len;
+    return 0;
+}
+
+/* TRKOpenFile - 0x800C29F8 | size: 0x8 | scope global */
+u32 TRKOpenFile(u32 cmd, u32 dir, u32* addrBuf, u32 len) {
+    (void)cmd;
+    return TRKAccessFile(0xD2, dir, addrBuf, len);
+}
+
+/* TRKCloseFile - 0x800C2A00 | size: 0x8 | scope global */
+u32 TRKCloseFile(u32 cmd, u32 param) {
+    (void)cmd;
+    return TRKAccessFile(cmd, param, NULL, 0);
+}
+
+/* TRKPositionFile - 0x800C2A08 | size: 0x8 | scope global */
+u32 TRKPositionFile(u32 cmd, u32 dir, u32* addrBuf, u32 len) {
+    (void)cmd;
+    return TRKAccessFile(0xD4, dir, addrBuf, len);
+}

@@ -177,17 +177,19 @@ asm void fn_800265C0(void) {
 #include "src/game/gs_worldmap_fn_800265C0.inc"
 }
 #else
-#pragma push
-#pragma peephole off
 #pragma optimization_level 4
 s32 fn_800265C0(void* r3, u8* r4) {
-    r3 = *(void**)((u8*)r3 + 0x60);
-    r3 = (void*)(lbl_80266DD8 + (*(s32*)((u8*)r3 + 0x1c) << 4));
-    if (*(s32*)((u8*)r3 + 0x4) != 7) r4[0x67] = 0;
+    void* ctx;
+    u8* new_var;
+    s32* entry;
+    ctx = *(void**)((u8*)r3 + 0x60);
+    new_var = lbl_80266DD8;
+    new_var = new_var + (*(s32*)((u8*)ctx + 0x1c) << 4);
+    entry = (s32*)new_var;
+    if (entry[1] != 7) r4[0x67] = 0;
     else r4[0x67] = 0xff;
     return 0;
 }
-#pragma pop
 #endif
 
 /* fn_80026600 - 0x80026600 | size: 0x40 */
@@ -367,10 +369,17 @@ s32 fn_80026740(void* r3, u8* r4)
     extern u8  lbl_80266DD8[];   /* state-machine entry table: each entry 16 bytes */
     s32  state;
     s32  index;
+    s32  x;
+    f32  one;
+    f32  scale;
     void* ctx;
+    u8* entry;
 
     ctx = *(void**)((u8*)r3 + 0x60);
-    state = *(s32*)(lbl_80266DD8 + (*(s32*)((u8*)ctx + 0x1c) << 4) + 4);
+    entry = lbl_80266DD8;
+    index = *(s32*)((u8*)ctx + 0x1c);
+    entry += index << 4;
+    state = *(s32*)(entry + 4);
     if (state != 7) {
         r4[0x67] = 0;
     } else {
@@ -378,8 +387,12 @@ s32 fn_80026740(void* r3, u8* r4)
         if (index >= state) {
             index = state - 1;
         }
-        *(s16*)(r4 + 0x50) = (s16)(index * 0x1a + *(s32*)(*(s32**)((u8*)ctx + 0x48)));
-        r4[0x67] = lbl_8047B934 - lbl_8047B938 * *(f32*)(*(f32**)((u8*)ctx + 0x30));
+        scale = lbl_8047B938;
+        one = lbl_8047B934;
+        x = index * 0x1a;
+        x += *(s32*)(*(s32**)((u8*)ctx + 0x48));
+        *(s16*)(r4 + 0x50) = (s16)x;
+        r4[0x67] = one - scale * *(f32*)(*(f32**)((u8*)ctx + 0x30));
     }
     return 0;
 }
@@ -408,10 +421,17 @@ s32 fn_800267D0(void* r3, u8* r4)
     extern u8  lbl_80266DD8[];
     s32  state;
     s32  index;
+    s32  x;
+    f32  one;
+    f32  scale;
     void* ctx;
+    u8* entry;
 
     ctx = *(void**)((u8*)r3 + 0x60);
-    state = *(s32*)(lbl_80266DD8 + (*(s32*)((u8*)ctx + 0x1c) << 4) + 4);
+    entry = lbl_80266DD8;
+    index = *(s32*)((u8*)ctx + 0x1c);
+    entry += index << 4;
+    state = *(s32*)(entry + 4);
     if (state != 8) {
         r4[0x67] = 0;
     } else {
@@ -419,8 +439,12 @@ s32 fn_800267D0(void* r3, u8* r4)
         if (index >= state) {
             index = state - 1;
         }
-        *(s16*)(r4 + 0x50) = (s16)(index * 0x1a + *(s32*)(*(s32**)((u8*)ctx + 0x44)));
-        r4[0x67] = lbl_8047B934 - lbl_8047B938 * *(f32*)(*(f32**)((u8*)ctx + 0x30));
+        scale = lbl_8047B938;
+        one = lbl_8047B934;
+        x = index * 0x1a;
+        x += *(s32*)(*(s32**)((u8*)ctx + 0x44));
+        *(s16*)(r4 + 0x50) = (s16)x;
+        r4[0x67] = one - scale * *(f32*)(*(f32**)((u8*)ctx + 0x30));
     }
     return 0;
 }
@@ -450,10 +474,17 @@ s32 fn_80026860(void* r3, u8* r4)
     extern u8  lbl_80266DD8[];
     s32  state;
     s32  index;
+    s32  x;
+    f32  one;
+    f32  scale;
     void* ctx;
+    u8* entry;
 
     ctx = *(void**)((u8*)r3 + 0x60);
-    state = *(s32*)(lbl_80266DD8 + (*(s32*)((u8*)ctx + 0x1c) << 4) + 4);
+    entry = lbl_80266DD8;
+    index = *(s32*)((u8*)ctx + 0x1c);
+    entry += index << 4;
+    state = *(s32*)(entry + 4);
     if (state != 0xa) {
         r4[0x67] = 0;
     } else {
@@ -461,8 +492,12 @@ s32 fn_80026860(void* r3, u8* r4)
         if (index >= state) {
             index = state - 1;
         }
-        *(s16*)(r4 + 0x50) = (s16)(index * 0x1a + *(s32*)(*(s32**)((u8*)ctx + 0x40)));
-        r4[0x67] = lbl_8047B934 - lbl_8047B938 * *(f32*)(*(f32**)((u8*)ctx + 0x30));
+        scale = lbl_8047B938;
+        one = lbl_8047B934;
+        x = index * 0x1a;
+        x += *(s32*)(*(s32**)((u8*)ctx + 0x40));
+        *(s16*)(r4 + 0x50) = (s16)x;
+        r4[0x67] = one - scale * *(f32*)(*(f32**)((u8*)ctx + 0x30));
     }
     return 0;
 }
@@ -1797,6 +1832,17 @@ s32 menuNameEntryDraw50Text(void* r3) {
 #pragma peephole on
 #endif
 
+/* fn_80027740 - 0x80027740 | size: 0x3c */
+#pragma push
+#pragma peephole off
+#pragma optimization_level 1
+s32 fn_80027740(void* r3) {
+    u32 alpha = ((MenuNameEntryObject*)r3)->alpha;
+    fn_800FB680(0, 0, alpha | 0x509100, 0x2ef5);
+    return 0;
+}
+#pragma pop
+
 /* fn_8002777C - 0x8002777C | size: 0x3c */
 #pragma push
 #pragma peephole off
@@ -1821,6 +1867,43 @@ s32 fn_800277B8(void* r3) {
 }
 #pragma pop
 
+/* menuNameEntryDrawXButtonText - 0x800277F4 | size: 0xb0 */
+#pragma push
+#pragma peephole off
+#pragma optimization_level 4
+s32 menuNameEntryDrawXButtonText(void* r3, u8* r4) {
+    u8* r29;
+    u8* r30;
+    u32* r31;
+    s32 index;
+    u16 width;
+    s16 x;
+    u8 alpha;
+    s32 mask;
+    u32 message;
+
+    r29 = r3;
+    r30 = r4;
+    index = *(s32*)(*(u8**)(*(u8**)(r29 + 0x60) + 0x24));
+    index++;
+    if (index >= 2) {
+        index -= 2;
+    }
+    if (index >= 0 && index < 2) {
+        r31 = (u32*)(lbl_80266E18 + index * 0x18 + 4);
+        width = (u16)GSmsgGetRect(*r31);
+        x = *(s16*)(r30 + 0x56);
+        x -= (s16)width;
+        alpha = r29[0x8b];
+        mask = -0x100;
+        mask |= alpha;
+        message = *r31;
+        fn_800FB680(0, x, mask, message);
+    }
+    return 0;
+}
+#pragma pop
+
 /* menuNameEntryDrawTitle - 0x800278A4 | size: 0xbc */
 extern s32 pokemonBiosGetPokemonDataId(void*);
 #if 0
@@ -1828,28 +1911,34 @@ asm void menuNameEntryDrawTitle(void) {
 #include "src/game/gs_worldmap_fn_800278A4.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 4
 s32 menuNameEntryDrawTitle(void* r3) {
     u8* r29;
     void* r31;
     void* r30;
     s32 r4;
-    u32* entry;
+    s32 mask;
+    u32 message;
     r29 = (u8*)r3;
     r31 = *(void**)(r29 + 0x60);
     if (*(s32*)r31 == 2) {
         r30 = heroGetStatus(0, 3, (u16)*(u32*)((u8*)r31 + 0x4));
-        if ((pokemonCheckValid() & 0xff) == 0) {
+        if (pokemonCheckValid() != 0) {
             r4 = pokemonBiosGetPokemonDataId(r30);
         } else {
             r4 = 1;
         }
         msgctrlSetValue(0x4e, (void*)(u32)(u16)r4);
     }
-    entry = (u32*)(lbl_80266DD8 + (*(s32*)r31 << 4));
-    fn_800FB680(0, 0, (s32)r29[0x8b] | (s32)(-0x100), entry[0]);
+    message = *(u32*)(lbl_80266DD8 + (*(s32*)r31 << 4));
+    mask = -0x100;
+    mask |= r29[0x8b];
+    fn_800FB680(0, 0, mask, message);
     return 0;
 }
+#pragma pop
 #endif
 
 /* exchangeDakuon__FUs11DAKUON_MODE - 0x80027960 | size: 0x144 */

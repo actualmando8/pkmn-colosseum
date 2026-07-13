@@ -7,6 +7,7 @@
  * All functions asm-only until matched.
  */
 #include "dolphin/types.h"
+#pragma peephole off
 
 typedef struct Vec3 {
     f32 x;
@@ -23,8 +24,9 @@ typedef struct DistanceSortEntry {
 
 typedef struct CursorPos {
     u8 row;
-    u8 col;
+    s8 col;
 } CursorPos;
+
 
 extern u8 heroMoveIsMember(s32 member);
 extern void heroSetStatus(s32 hero, s32 status, u8 value);
@@ -36,7 +38,7 @@ extern void gamedatasaveBiosSetPrevfloorid(void* save, s32 floorId);
 extern void gamedatasaveBiosSetFloorposindex(void* save, u8 floorPosIndex);
 extern s32 fn_801D0748(s32, s32, s32);
 
-extern u8 fn_801906A0(u32 flag);
+extern u32 fn_801906A0(u32 flag);
 extern void fn_801D0AFC(s32);
 extern void* heroBiosGetPokemonPtr(void* status, u16 index);
 extern u8 pokemonCheckValid(void* pokemon);
@@ -83,7 +85,7 @@ u8 fn_801C766C(void)
     s32 floorId;
     s32 prevFloorId;
     u8 floorPosIndex;
-    u8 isMember;
+    s32 isMember;
 
     if (heroMoveIsMember(1) != 0) {
         isMember = 1;
@@ -124,14 +126,16 @@ s32 _fnDistanceSortFunc__FPCvPCv(const void* lhs, const void* rhs)
 
 void fn_801C852C(s32 mode)
 {
-    u16 i;
     void* status;
     void* pokemon;
+    u16 i;
 
     if (fn_801906A0(0x8AE) == 0) {
-        if (mode == 0) {
+        switch (mode) {
+        case 0:
             fn_801D0AFC(0);
-        } else if (mode == 1) {
+            break;
+        case 1:
             status = savedataGetStatus(0, 2);
             i = 0;
             while (i < 6) {
@@ -146,12 +150,14 @@ void fn_801C852C(s32 mode)
                 }
                 i++;
             }
+            break;
         }
     }
 }
 
 void fn_801C8628(void)
 {
+    CursorPos initial;
     CursorPos pos;
     s32 cursor;
 
@@ -160,8 +166,9 @@ void fn_801C8628(void)
         cursor = 0;
     }
 
-    pos.row = 0;
-    pos.col = cursor;
+    initial.row = 0;
+    initial.col = cursor;
+    pos = initial;
     cursorBiosSetPos(2, &pos);
     fn_8000D710(1);
 }
@@ -201,11 +208,15 @@ u8 fn_801C9CDC(s32 lightId, s32 wait)
         return 0;
     }
 
-    while (GSlightHasAnimationEnded(light) == 0) {
-        if (wait == 0) {
+    for (;;) {
+        if (GSlightHasAnimationEnded(light) != 0) {
             return 0;
         }
-        _threadSwitch();
+        if (wait != 0) {
+            _threadSwitch();
+        } else {
+            return 0;
+        }
     }
 
     return 0;
@@ -279,11 +290,8 @@ void fn_801CA4F8(f32 frames)
     f32 elapsed = lbl_8047E114;
 
     while (elapsed < frames) {
-        f32 frameTicks;
-
         _threadSwitch();
-        frameTicks = (f32)fn_800D37CC();
-        elapsed += (f32)fn_800D3088() / frameTicks;
+        elapsed += (f32)fn_800D3088() / (f32)fn_800D37CC();
     }
 }
 
@@ -314,3 +322,5 @@ s32 fn_801CA7CC(void)
 {
     return fn_8006ADEC();
 }
+
+#pragma peephole reset

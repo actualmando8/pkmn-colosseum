@@ -170,7 +170,7 @@ void GSmodelSet60fpsAnimFlag(GSmodel* model, u8 enable)
     if (enable) {
         model->flags |= MODEL_FLAG_60FPS_ANIM;
     } else {
-        model->flags &= ~MODEL_FLAG_60FPS_ANIM;
+        model->flags = model->flags & ~MODEL_FLAG_60FPS_ANIM;
     }
 }
 
@@ -179,7 +179,7 @@ void GSmodelLinkTexAnimToAnim(GSmodel* model, u8 enable)
     if (enable) {
         model->flags |= MODEL_FLAG_LINK_TEX_TO_ANIM;
     } else {
-        model->flags &= ~MODEL_FLAG_LINK_TEX_TO_ANIM;
+        model->flags = model->flags & ~MODEL_FLAG_LINK_TEX_TO_ANIM;
     }
 }
 
@@ -200,7 +200,7 @@ u32 GSmodelHasTexAnimationEnded(GSmodel* model)
 
 void GSmodelStopTexAnimation(GSmodel* model)
 {
-    model->flags &= ~MODEL_FLAG_TEX_ANIMATING;
+    model->flags = model->flags & ~MODEL_FLAG_TEX_ANIMATING;
 }
 
 void GSmodelStartTexAnimation(GSmodel* model)
@@ -209,7 +209,7 @@ void GSmodelStartTexAnimation(GSmodel* model)
 
     if (flags & MODEL_FLAG_HAS_TEX_ANIM) {
         model->flags = flags | MODEL_FLAG_TEX_ANIMATING;
-        model->flags &= ~MODEL_FLAG_TEX_ANIM_ENDED;
+        model->flags = model->flags & ~MODEL_FLAG_TEX_ANIM_ENDED;
     }
 }
 
@@ -247,7 +247,7 @@ void GSmodelSetTexAnimFrame(GSmodel* model, f32 frame)
         model->tex_anim_frame = frame;
         model->tex_anim_req_frame = frame;
         fn_801A32A0(jobj, 0x634, model->tex_anim_req_frame);
-        model->flags &= ~MODEL_FLAG_TEX_ANIM_ENDED;
+        model->flags = model->flags & ~MODEL_FLAG_TEX_ANIM_ENDED;
     }
 }
 
@@ -348,11 +348,10 @@ void GSmodelSetBlendFactor(GSmodel* model, f32 factor)
 {
     u32 flags = model->flags;
 
-    if (!(flags & MODEL_FLAG_HAS_ANIM)) {
-        return;
-    }
-    if (flags & MODEL_FLAG_BLENDING) {
-        goto clamp_factor;
+    if (flags & MODEL_FLAG_HAS_ANIM) {
+        if (flags & MODEL_FLAG_BLENDING) {
+            goto clamp_factor;
+        }
     }
     return;
 
@@ -378,7 +377,7 @@ void GSmodelAllUnpauseAnimation(void)
 
     for (i = 0; i < lbl_8047AB78; i++) {
         if (lbl_8047AB74[i].flags & MODEL_FLAG_IN_USE) {
-            lbl_8047AB74[i].flags &= ~MODEL_FLAG_PAUSED;
+            lbl_8047AB74[i].flags &= ~(u32)MODEL_FLAG_PAUSED;
         }
     }
 }
@@ -406,10 +405,10 @@ u32 GSmodelIsAnimating(GSmodel* model)
 
 void GSmodelStopAnimation(GSmodel* model)
 {
-    model->flags &= ~MODEL_FLAG_ANIMATING;
+    model->flags = model->flags & ~MODEL_FLAG_ANIMATING;
 
     if (model->flags & MODEL_FLAG_LINK_TEX_TO_ANIM) {
-        model->flags &= ~MODEL_FLAG_TEX_ANIMATING;
+        model->flags = model->flags & ~MODEL_FLAG_TEX_ANIMATING;
     }
 }
 
@@ -422,7 +421,7 @@ void GSmodelStartAnimation(GSmodel* model)
     }
 
     model->flags = flags | MODEL_FLAG_ANIMATING;
-    model->flags &= ~MODEL_FLAG_ANIM_ENDED;
+    model->flags = model->flags & ~MODEL_FLAG_ANIM_ENDED;
 
     flags = model->flags;
     if (!(flags & MODEL_FLAG_LINK_TEX_TO_ANIM)) {
@@ -433,7 +432,7 @@ void GSmodelStartAnimation(GSmodel* model)
     }
 
     model->flags = flags | MODEL_FLAG_TEX_ANIMATING;
-    model->flags &= ~MODEL_FLAG_TEX_ANIM_ENDED;
+    model->flags = model->flags & ~MODEL_FLAG_TEX_ANIM_ENDED;
 }
 
 void GSmodelGetFrameCount(GSmodel* model, f32* anim_frames, f32* tex_frames)
@@ -510,16 +509,17 @@ void GSmodelSetAnimFrame(GSmodel* model, f32 frame)
     model->flags &= ~(MODEL_FLAG_SKIP_APPLY | MODEL_FLAG_ANIM_ENDED);
 
     flags = model->flags;
-    jobj = model->jobj;
-    if ((flags & MODEL_FLAG_LINK_TEX_TO_ANIM) &&
-        (flags & MODEL_FLAG_HAS_TEX_ANIM)) {
-        if (flags & MODEL_FLAG_USE_JOBJ_CHILD) {
-            jobj = jobj->child;
+    if (flags & MODEL_FLAG_LINK_TEX_TO_ANIM) {
+        jobj = model->jobj;
+        if (flags & MODEL_FLAG_HAS_TEX_ANIM) {
+            if (flags & MODEL_FLAG_USE_JOBJ_CHILD) {
+                jobj = jobj->child;
+            }
+            model->tex_anim_frame = frame;
+            model->tex_anim_req_frame = frame;
+            fn_801A32A0(jobj, 0x634, model->tex_anim_req_frame);
+            model->flags = model->flags & ~MODEL_FLAG_TEX_ANIM_ENDED;
         }
-        model->tex_anim_frame = frame;
-        model->tex_anim_req_frame = frame;
-        fn_801A32A0(jobj, 0x634, model->tex_anim_req_frame);
-        model->flags &= ~MODEL_FLAG_TEX_ANIM_ENDED;
     }
 }
 

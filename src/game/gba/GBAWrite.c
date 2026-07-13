@@ -107,7 +107,6 @@ asm void fn_8025F648(void) {
 #endif
 #pragma pop
 #pragma push
-#pragma peephole off
 #pragma optimize_for_size off
 u32 GBAWrite(int r3, u32 r4, u32 r5) {
   int idx;

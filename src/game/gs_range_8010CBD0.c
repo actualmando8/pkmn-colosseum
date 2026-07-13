@@ -23,6 +23,39 @@
  * those names); renamed to their confirmed symbols.txt names below.
  */
 #include "dolphin/types.h"
+#include "game/gs_colsys.h"
+
+/* ===================================================================
+ * External state and convenience aliases shared with the other colsys units
+ * =================================================================== */
+extern GSColSysState lbl_80404C68;
+
+#define COL_STATE (&lbl_80404C68)
+#define COL_LAYER_IDX (COL_STATE->activeLayer)
+#define COL_LAYER_PTR(n) ((void*)((u8*)COL_STATE + 4 + (n) * GSCOLSYS_LAYER_SIZE))
+
+/* 0x8010CBD0 | 0x34 */
+void* GScolsys2GetCurFloor(void) {
+    s32 layer;
+
+    layer = COL_LAYER_IDX;
+    if (layer < 0 || layer >= GSCOLSYS_MAX_LAYERS) {
+        return NULL;
+    }
+    return COL_LAYER_PTR(layer);
+}
+
+/* 0x8010D038 | 0x2C */
+s32 fn_8010D038(void) {
+    s32 layer;
+
+    layer = COL_LAYER_IDX;
+    if (layer < 0) {
+        return 0;
+    }
+    COL_LAYER_IDX = layer - 1;
+    return 1;
+}
 
 /* 0x8010E138 | 0x404 */
 #pragma push

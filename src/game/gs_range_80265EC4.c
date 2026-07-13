@@ -29,6 +29,45 @@ extern void fn_801DA9E8();
 extern s8 fn_801DA94C();
 extern void floorSetFadeScript();
 
+/* Address: 0x80265EC4 | Size: 0x50 */
+#pragma optimize_for_size on
+#pragma scheduling off
+void exribbonSetNo(int no, u8 value)
+{
+    u8* data = (u8*)savedataGetStatus(0, 0x10);
+
+    if (data[no] == 0 && value != 0) {
+        data[no] = value;
+    }
+}
+#pragma scheduling reset
+#pragma optimize_for_size reset
+
+/* Address: 0x80265F14 | Size: 0x38 */
+u8 exribbonGetNo(int r3)
+{
+    int iVar1;
+
+    iVar1 = savedataGetStatus(0, 0x10);
+    return *(u8 *)(iVar1 + r3);
+}
+
+/* Address: 0x80265F4C | Size: 0x48 */
+#pragma optimize_for_size on
+void exribbonInit(u8* data)
+{
+    int i;
+
+    if (data == NULL) {
+        data = (u8*)savedataGetStatus(0, 0x10);
+    }
+
+    for (i = 0; i < 11; i++) {
+        *data++ = 0;
+    }
+}
+#pragma optimize_for_size reset
+
 /* Address: 0x80265F94 | Size: 0x2BC | Ghidra import */
 void fn_80265F94(int r3)
 
@@ -149,11 +188,11 @@ void fn_80266250(void)
     extern void fn_801DADC0();
     extern void wazaSequenceSysRelease();
     extern void fn_80265F94();
-    u32 iVar1;
-    u32 uVar3;
-    u32 iVar2;
-    u32 uVar4;
     u32 uVar5;
+    u8 uVar4;
+    u8 uVar3;
+    u32 iVar2;
+    u32 iVar1;
 
     uVar5 = lbl_8047B680;
     iVar1 = fn_801653C4();
@@ -181,4 +220,16 @@ void fn_80266250(void)
     }
     fn_800FF660();
     floorSetFadeScript(0, 0x5960008);
+}
+
+/* Address: 0x80266320 | Size: 0x3C */
+void d2presentOpen(int r3)
+{
+    extern void fn_800FF730(u32);
+    extern u32 lbl_8047B680;
+
+    lbl_8047B680 = r3;
+    fn_800FF730(0x8f);
+    floorSetFadeScript((0x596 << 16) | 0x9, 0);
+    _threadSwitch();
 }

@@ -1549,8 +1549,8 @@ s32 fn_80014D1C(u8* ctx, u8* tgt) {
 s32 fn_80014E50(u8* ctx) {
     u8* state;
     u8* p;
-    s32 count;
     s32 slot;
+    s32 count;
     s32 new_slot;
     u8* inner;
 
