@@ -69,6 +69,56 @@ static void AlarmHandler(OSAlarm* alarm, OSContext* context);
 
 /* Forward declarations for internal DVD operations */
 extern void __fstLoad(void);
+extern u32 lbl_8047A808;
+extern DVDCBCallback lbl_8047A80C;
+extern u32 lbl_8047A81C;
+extern void fn_800A59CC(u32 intType);
+extern void fn_800A48DC(void (*callback)(u32));
+extern void stateReady_800A6684(void);
+extern void stateBusy_800A68B4(DVDCommandBlock* block);
+
+void fn_800A62CC(u32 intType)
+{
+    DVDCommandBlock* finished;
+    BOOL canceled;
+
+    if (intType == 0x10) {
+        executing_8047A7E8->state = -1;
+        __DVDStoreErrorCode(0x1234568);
+        DVDReset();
+        cbForStateError(0);
+        return;
+    }
+
+    if (intType & 1) {
+        *(volatile u32*)&lbl_8047A81C = 0;
+        if (*(volatile u32*)&lbl_8047A808 == 0) {
+            canceled = FALSE;
+        } else {
+            *(volatile u32*)&ResumeFromHere_8047A810 = 0;
+            finished = executing_8047A7E8;
+            *(volatile u32*)&lbl_8047A808 = 0;
+            executing_8047A7E8 = &DummyCommandBlock_803FC3A0;
+            finished->state = 10;
+            if (finished->callback != NULL) {
+                finished->callback(-3, finished);
+            }
+            if (lbl_8047A80C != NULL) {
+                lbl_8047A80C(0, finished);
+            }
+            stateReady_800A6684();
+            canceled = TRUE;
+        }
+        if (canceled) {
+            return;
+        }
+        executing_8047A7E8->state = 1;
+        stateBusy_800A68B4(executing_8047A7E8);
+        return;
+    }
+
+    fn_800A48DC(fn_800A59CC);
+}
 
 /*
  * DVDInit - Initialize the DVD subsystem
@@ -265,15 +315,10 @@ static void stateBusy(DVDCommandBlock* block) {
 
 
 extern u32 CurrCommand_8047A804;
-extern u32 lbl_8047A808;
-extern DVDCBCallback lbl_8047A80C;
-extern u32 lbl_8047A81C;
 extern u32 lbl_8047A7FC;
 extern u32 lbl_804789DC;
 extern u32 lbl_80311B48[3];
 extern u8 BB2_803FC360[];
-extern void fn_800A59CC(u32 intType);
-extern void fn_800A48DC(void (*callback)(u32));
 extern BOOL DVDLowAudioStream(u32 subcmd, u32 length, u32 offset,
                               void (*callback)(u32));
 
