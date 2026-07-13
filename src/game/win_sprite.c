@@ -103,7 +103,7 @@ extern f32 lbl_8047CD8C;  /* sdata2: float constant */
 extern f32 lbl_8047CD90;  /* sdata2: float constant */
 extern f32 lbl_8047CD94;  /* sdata2: float constant */
 extern f64 lbl_8047CD98;  /* sdata2: double constant */
-extern f32 lbl_8047CE3C;  /* sdata2: float constant */
+extern const f32 lbl_8047CE3C;  /* sdata2: float constant */
 extern f32 lbl_8047CE50;  /* sdata2: float constant */
 extern f32 lbl_8047CE5C;  /* sdata2: float constant */
 extern f32 lbl_8047CE70;  /* sdata2: float constant */
@@ -270,7 +270,6 @@ extern void winSetSequence(void* out, u32 idx);
 extern s32 winSpriteGetDisp(void* ptr);
 extern void winSpriteSetDisp(void* node, u32 enable);
 extern void winSpriteRelease(void* head);
-extern void* fn_80109290(void* root);
 extern void winSpriteInit(void);
 extern void fn_801093C8(void);
 extern u8 menuOffScreenFadeSync(u8 param);
@@ -290,7 +289,7 @@ extern s32 menuModelCheck(void* obj, u8 wait);
 extern s32 menuModelFree(void* p);
 
 typedef struct WinSpriteDrawNode {
-    u8 pad_00[4];
+    struct WinSpriteDrawNode* next;
     s8 flags;
     u8 drawFlags;
     u8 pad_06[2];
@@ -307,7 +306,10 @@ typedef struct WinSpriteDrawNode {
     s16 crop_y;
     s16 crop_width;
     s16 crop_height;
-    u8 color[4];
+    union {
+        u8 color[4];
+        u32 rgba;
+    };
     f32 scale_x;
     f32 scale_y;
     f32 rotation;
@@ -641,34 +643,33 @@ void winSpriteRelease(void* head) {
 /* 0x80109290 | 0xC8 */
 #pragma push
 #pragma peephole off
-void* fn_80109290(void* root) {
-    void* r30 = root;
-    if (r30 == (void*)0) { return (void*)0; }
+WinSpriteDrawNode* winSpriteAdd(WinSpriteDrawNode* root) {
+    WinSpriteDrawNode* list = root;
+    if (list == NULL) { return NULL; }
     {
-        void* r31 = lbl_8047AD1C;
-        s32 ctr = 0x168;
-        while (ctr-- > 0) {
-            s8 flag = (s8)*(u8*)((u8*)r31 + 0x4);
-            if (flag == 0) {
-                memset(r31, 0, 0x78);
-                *(u8*)((u8*)r31 + 0x4) = 7;
-                *(f32*)((u8*)r31 + 0x68) = lbl_8047CE3C;
-                *(f32*)((u8*)r31 + 0x6c) = lbl_8047CE3C;
-                *(s32*)((u8*)r31 + 0x64) = -1;
-                /* insert into list rooted at r30 */
-                {
-                    void* cur = r30;
-                    while (*(void**)cur != (void*)0) {
-                        cur = *(void**)cur;
-                    }
-                    *(void**)cur = r31;
+        WinSpriteDrawNode* sprite = (WinSpriteDrawNode*)lbl_8047AD1C;
+        s32 count = 0x168;
+        while (count-- > 0) {
+            s8 flags = sprite->flags;
+            if (flags == 0) {
+                WinSpriteDrawNode* current;
+
+                memset(sprite, 0, sizeof(*sprite));
+                sprite->flags = 7;
+                sprite->scale_x = lbl_8047CE3C;
+                sprite->scale_y = lbl_8047CE3C;
+                sprite->rgba = -1;
+                current = list;
+                while (current->next != NULL) {
+                    current = current->next;
                 }
-                return r31;
+                current->next = sprite;
+                return sprite;
             }
-            r31 = (void*)((u8*)r31 + 0x78);
+            sprite++;
         }
         GSlogWrite((const char*)lbl_80271EE8);
-        return (void*)0;
+        return NULL;
     }
 }
 #pragma pop
