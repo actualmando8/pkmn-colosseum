@@ -623,7 +623,6 @@ void WObjUpdateFunc(void* obj, u32 type, void* value)
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_801AFE68(void* robj, void* robj_desc);
 extern void* fn_801C2670(void* aobj_desc);
 typedef struct { void* aobj_desc; void* robj_desc; } WObjADesc;
 #if 0
