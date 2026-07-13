@@ -975,6 +975,49 @@ void HSD_StateSetNumChans(s32 n) {
     }
 }
 
+static inline s32 TExpChannel2Num(s32 chan)
+{
+    switch (chan) {
+    case 0:
+        return 1;
+    case 1:
+        return 2;
+    case 2:
+        return 1;
+    case 3:
+        return 2;
+    case 4:
+        return 1;
+    case 5:
+        return 2;
+    case 0xFF:
+        return 0;
+    default:
+        __assert((const char*)&lbl_8047DE60, 0x2F1,
+                 (const char*)&lbl_8047DE68);
+        return 0;
+    }
+}
+
+/* Address: 0x801B3998 | Size: 0x110 */
+#pragma push
+#pragma optimization_level 1
+void fn_801B3998(HSD_Chan* chan)
+{
+    s32 num_chans = 0;
+
+    while (chan != NULL) {
+        s32 chan_count = TExpChannel2Num(chan->chan);
+        if (chan_count > num_chans) {
+            num_chans = chan_count;
+        }
+        fn_801B3D1C(chan);
+        chan = chan->next;
+    }
+    HSD_StateSetNumChans((u8)num_chans);
+}
+#pragma pop
+
 /* Address: 0x801B3AE8 | Size: 0x234 */
 #pragma push
 #pragma optimization_level 1
