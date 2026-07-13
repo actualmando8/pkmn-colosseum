@@ -2765,6 +2765,103 @@ void fn_801A323C(HSD_AObj* aobj)
     }
 }
 
+/* 0x801A3600 | 0x318 -- HSD_JObjMakeMatrix */
+typedef struct JObjQuat {
+    f32 x, y, z, w;
+} JObjQuat;
+
+extern f32* HSD_VecAlloc(void);
+extern void HSD_MtxSRT(f32 mtx[3][4], Vec* scale, Vec* rotate,
+                       Vec* translate, Vec* parent_scale);
+extern void HSD_MtxSRTQuat(f32 mtx[3][4], Vec* scale, JObjQuat* rotate,
+                           Vec* translate, Vec* parent_scale);
+
+static inline BOOL JObjParentHasScale(HSD_JObj* jobj)
+{
+    BOOL result = FALSE;
+
+    /* The original inline observes the parent independently for each test. */
+    if (((volatile HSD_JObj*) jobj)->parent != NULL &&
+        ((volatile HSD_JObj*) jobj)->parent->scl != NULL)
+    {
+        result = TRUE;
+    }
+    return result;
+}
+
+#pragma push
+#pragma optimization_level 1
+void fn_801A3600(HSD_JObj* jobj)
+{
+    JObjSetupIfDirty(jobj->parent);
+    if (jobj->flags & JOBJ_CLASSICAL_SCALE) {
+        if (jobj->parent != NULL && jobj->parent->scl != NULL) {
+            if (jobj->scl == NULL) {
+                jobj->scl = HSD_VecAlloc();
+            }
+            *(Vec*) jobj->scl = *(Vec*) jobj->parent->scl;
+        } else {
+            if (jobj->scl != NULL) {
+                HSD_VecFree(jobj->scl);
+                jobj->scl = NULL;
+            }
+        }
+    } else {
+        if (jobj->scl == NULL) {
+            jobj->scl = HSD_VecAlloc();
+        }
+        if (jobj->parent != NULL && jobj->parent->scl != NULL) {
+            jobj->scl[0] = jobj->scale_x * jobj->parent->scl[0];
+            jobj->scl[1] = jobj->scale_y * jobj->parent->scl[1];
+            jobj->scl[2] = jobj->scale_z * jobj->parent->scl[2];
+        } else {
+            *(Vec*) jobj->scl = *(Vec*) &jobj->scale_x;
+        }
+    }
+
+    if (jobj->flags & JOBJ_USE_QUATERNION) {
+        f32 (*mtx)[4] = jobj->mtx;
+        Vec* scale = (Vec*) &jobj->scale_x;
+        JObjQuat* rotate = (JObjQuat*) &jobj->rotate_x;
+        Vec* translate = (Vec*) &jobj->translate_x;
+        Vec* parent_scale;
+
+        if (JObjParentHasScale(jobj)) {
+            parent_scale = (Vec*) jobj->parent->scl;
+        } else {
+            parent_scale = NULL;
+        }
+        HSD_MtxSRTQuat(mtx, scale, rotate, translate, parent_scale);
+    } else {
+        f32 (*mtx)[4] = jobj->mtx;
+        Vec* scale = (Vec*) &jobj->scale_x;
+        Vec* rotate = (Vec*) &jobj->rotate_x;
+        Vec* translate = (Vec*) &jobj->translate_x;
+        Vec* parent_scale;
+
+        if (JObjParentHasScale(jobj)) {
+            parent_scale = (Vec*) jobj->parent->scl;
+        } else {
+            parent_scale = NULL;
+        }
+        HSD_MtxSRT(mtx, scale, rotate, translate, parent_scale);
+    }
+    if (jobj->parent != NULL) {
+        PSMTXConcat(jobj->parent->mtx, jobj->mtx, jobj->mtx);
+    }
+    if (jobj->aobj != NULL && jobj->aobj->hsd_obj != NULL) {
+        Vec position;
+        HSD_JObj* aobj_jobj = (HSD_JObj*) jobj->aobj->hsd_obj;
+
+        JObjSetupIfDirty(aobj_jobj);
+        PSMTXMultVec(aobj_jobj->mtx, (Vec*) &jobj->translate_x, &position);
+        jobj->mtx[0][3] = position.x;
+        jobj->mtx[1][3] = position.y;
+        jobj->mtx[2][3] = position.z;
+    }
+}
+#pragma pop
+
 /* 0x801A39AC | 0x358 */
 #pragma push
 #pragma optimization_level 1
