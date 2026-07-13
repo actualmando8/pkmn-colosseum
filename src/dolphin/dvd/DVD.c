@@ -71,7 +71,8 @@ static void AlarmHandler(OSAlarm* alarm, OSContext* context);
 extern void __fstLoad(void);
 extern u32 lbl_8047A808;
 extern DVDCBCallback lbl_8047A80C;
-extern u32 lbl_8047A81C;
+extern u32 lbl_8047A818;
+extern s32 lbl_8047A81C;
 extern void fn_800A59CC(u32 intType);
 extern void fn_800A48DC(void (*callback)(u32));
 extern void stateBusy_800A68B4(DVDCommandBlock* block);
@@ -326,6 +327,37 @@ typedef struct DVDStaticData {
 extern u8 BB2_803FC360[];
 extern BOOL DVDLowAudioStream(u32 subcmd, u32 length, u32 offset,
                               void (*callback)(u32));
+
+u32 CategorizeError(u32 error)
+{
+    if (error == 0x20400) {
+        lbl_8047A818 = error;
+        return 1;
+    }
+
+    error &= 0x00FFFFFF;
+    if (error == 0x62800 || error == 0x23A00 || error == 0xB5A01) {
+        return 0;
+    }
+
+    lbl_8047A81C++;
+    if (lbl_8047A81C == 2) {
+        if (error == lbl_8047A818) {
+            lbl_8047A818 = error;
+            return 1;
+        }
+        lbl_8047A818 = error;
+        return 2;
+    }
+
+    lbl_8047A818 = error;
+
+    if (error == 0x31100 || executing_8047A7E8->command == 5) {
+        return 2;
+    }
+
+    return 3;
+}
 
 static inline BOOL dvdCheckCancel(u32 resume)
 {
