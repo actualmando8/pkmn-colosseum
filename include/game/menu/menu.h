@@ -101,6 +101,10 @@ struct MenuCardEEntry;
 struct MenuCardEMatrixContext;
 struct MenuCardEMatrixWork;
 
+/* Shared battle-menu helpers implemented by the middle/common menu units. */
+u8* fn_8006B420(void);
+s32 fn_80076054(void* hero, void* battleRules);
+
 /* =========================================================================
  * Callback function pointer types
  * ========================================================================= */
