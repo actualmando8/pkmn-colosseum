@@ -29,13 +29,16 @@
 extern u8 lbl_804001F0[];  /* GX state / FIFO state block */
 
 #ifndef PCPORT
-extern u32 lbl_8047AA80;
 void fn_800D3074(u32 flag) {
     if (flag == 0) {
         return;
     }
 
     ((GSgfxState*)lbl_8047AA80)->renderEnabled = flag;
+}
+
+u32 fn_800D3088(void) {
+    return lbl_8047AA80->frameDelta;
 }
 
 u32 fn_800D3094(void) {
@@ -46,7 +49,6 @@ void fn_800D30A0(u32 val) {
 }
 extern void fn_800D4F98(s32 arg0, ...);
 extern void GXFlush(void);
-extern u32 lbl_8047AA80;
 #if 0
 asm void fn_800D30AC(void) {
 #include "src/game/gs_gfx_fn_800D30AC.inc"
@@ -77,7 +79,6 @@ extern void fn_800DC6D8(void* a);
 extern void fn_800E3884(void* a, s32 b);
 extern void fn_801181B0(s32 a);
 extern u32 OSGetTick(void);
-extern u32 lbl_8047AA80;
 extern u8 lbl_8047AA91;
 extern u8 lbl_8047AA90;
 #if 0
@@ -203,7 +204,6 @@ extern void modelShadowRender__FP10GSgfxLayer(void);
 extern void fn_8019C708(s32 a);
 extern void HSD_SetEraseColor(u8 a, u8 b, u8 c, u8 d);
 extern void HSD_EraseRect(s32 a, s32 b, s32 c, f32 d, f32 e, f32 f, f32 g, f32 h);
-extern u32 lbl_8047AA80;
 extern u8 lbl_8047AA90;
 extern f32 lbl_8047CA00;
 extern f32 lbl_8047CA08;
@@ -317,19 +317,19 @@ void fn_800D361C(u8 mode) {
     VIWaitForRetrace();
     diff = ((GSgfxState*)lbl_8047AA80)->xfbCount -
            ((GSgfxState*)lbl_8047AA80)->xfbAddr0;
-    ((GSgfxState*)lbl_8047AA80)->xfbAddr1 = diff;
+    ((GSgfxState*)lbl_8047AA80)->frameDelta = diff;
 
     if ((mode == 1) != 0) {
-        while (((GSgfxState*)lbl_8047AA80)->xfbAddr1 <
+        while (((GSgfxState*)lbl_8047AA80)->frameDelta <
                ((GSgfxState*)lbl_8047AA80)->renderEnabled) {
             VIWaitForRetrace();
             diff = ((GSgfxState*)lbl_8047AA80)->xfbCount -
                    ((GSgfxState*)lbl_8047AA80)->xfbAddr0;
-            ((GSgfxState*)lbl_8047AA80)->xfbAddr1 = diff;
+            ((GSgfxState*)lbl_8047AA80)->frameDelta = diff;
         }
 
         if (((GSgfxState*)lbl_8047AA80)->vsyncFlag == 0) {
-            ((GSgfxState*)lbl_8047AA80)->xfbAddr1 =
+            ((GSgfxState*)lbl_8047AA80)->frameDelta =
                 ((GSgfxState*)lbl_8047AA80)->renderEnabled;
         }
     }
@@ -446,7 +446,7 @@ void GSgfxInit__FP15_GSgfxInitParms(u32 heapSize, u32 matrixSize,
         state = fn_800E27B0(handle);
     }
 
-    lbl_8047AA80 = (u32)state;
+    lbl_8047AA80 = (GSgfxState*)state;
     *(u32*)(state + 0x000) = 2;
     *(s32*)((u8*)lbl_8047AA80 + 0x004) = -1;
     *(u32*)((u8*)lbl_8047AA80 + 0x008) = 0x10;

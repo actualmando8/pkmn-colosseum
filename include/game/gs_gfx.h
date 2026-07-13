@@ -42,7 +42,7 @@ typedef struct GSgfxState {
     /* 0x048 */ u32  xfbIndex;       /* current XFB being displayed */
     /* 0x04C */ u32  xfbCount;
     /* 0x050 */ u32  xfbAddr0;
-    /* 0x054 */ u32  xfbAddr1;
+    /* 0x054 */ u32  frameDelta;     /* retraces elapsed since the prior frame */
     /* 0x058 */ u32  renderEnabled;  /* 1 = rendering pipeline active */
     /* 0x05C */ u8   vsyncFlag;
     /* 0x05D-0x47D */ u8 pad[0x422];
@@ -58,6 +58,10 @@ typedef struct GSgfxState {
     /* 0x49F */ u8   field_49F;
     /* 0x4A0-0x59F */ u8 pad3[0x100];
 } GSgfxState;
+
+extern GSgfxState* lbl_8047AA80;
+
+u32 fn_800D3088(void);
 
 /* -----------------------------------------------------------------------
  * Video mode constants (for GSgfxSetVideoMode)
