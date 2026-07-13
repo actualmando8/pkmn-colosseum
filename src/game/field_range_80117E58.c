@@ -90,6 +90,69 @@ typedef struct FieldParticleInstanceList {
     FieldParticleInstancePtr entries[0x40];
 } FieldParticleInstanceList;
 
+typedef struct FieldParticleGenerator {
+    u8 pad_00[0x10];
+    u16 field_10;
+    u8 pad_12[2];
+    u8 bank_index;
+    u8 link_no;
+    u8 field_16;
+    u8 enabled;
+    u16 family_id;
+    u8 pad_1A[6];
+    f32 position[3];
+    u8 pad_2C[0x60];
+    f32 rotation[3];
+    f32 scale[3];
+} FieldParticleGenerator;
+
+typedef struct FieldParticleBank FieldParticleBank;
+
+typedef struct FieldParticleNode {
+    u8 active;
+    u8 field_01;
+    u16 selector;
+    u8 field_04;
+    u8 field_05;
+    u8 field_06;
+    u8 pad_07;
+    void* field_08;
+    FieldParticleBank* bank;
+    FieldParticleGenerator* generator;
+    f32 local_position[3];
+    f32 local_rotation[3];
+    f32 local_scale[3];
+    f32 position[3];
+    s32 transform_state;
+    u32 field_48;
+    u32 field_4C;
+    f32 transformed_position[3];
+    f32 transformed_rotation[3];
+    f32 transformed_scale[3];
+} FieldParticleNode;
+
+struct FieldParticleBank {
+    u8 active;
+    u8 texture_type;
+    u8 pad_02[6];
+    FieldParticleNode* slots[64];
+};
+
+typedef union FieldParticleNodeRaw {
+    u8 bytes[0x74];
+    FieldParticleNode typed;
+} FieldParticleNodeRaw;
+
+typedef union FieldParticleNodePtr {
+    u8* raw;
+    FieldParticleNode* typed;
+} FieldParticleNodePtr;
+
+typedef union FieldParticleBankCursor {
+    FieldParticleBank* bank;
+    FieldParticleNode** slot_window;
+} FieldParticleBankCursor;
+
 /* Field subsystems -- forward declarations (defined below) */
 u32  _unloadFlare__FPvUlUl(void);
 u32 floorDataBiosGetFileGroupID(u8* entry);
@@ -199,7 +262,7 @@ extern void heroMoveInitEvent(void);
 extern void fn_8012CA84();
 extern void heroPokemonGetEifie(u32 arg1);
 extern void heroPokemonGetBlacky(u32 arg1);
-extern s32 psGetGeneratorChildMaxLife(u32);
+u32 psGetGeneratorChildMaxLife(FieldParticleGenerator* generator);
 extern void* wazaDataBiosGetPtr(u16 idx);
 extern u32 pokemonGetStatus();
 extern void pokemonSetStatus();
@@ -343,12 +406,12 @@ extern void fn_800FF4D4(void);
 extern u32 lbl_802727C8[];
 extern void psSetBillboardCamera();
 extern void fn_8016AB94();
-extern void psGetParticleChildCount(void* ptr);
+u32 psGetParticleChildCount(FieldParticleGenerator* generator);
 extern void psKillFamily();
 extern void GSmodelSet60fpsAnimFlag();
 extern void psUnlinkChildGensFromJObj();
 extern void psKillGenerator();
-extern u32 lbl_8047AD9C;
+extern FieldParticleBank* lbl_8047AD9C;
 extern u32 lbl_8047ADA0;
 void fn_801181B0(void);
 extern void fn_800E06EC(void*, void*);
@@ -1739,15 +1802,102 @@ void fn_80118104(u32 a, u8 b) {
 }
 #endif
 /* 0x801181B0 | 0x23C */
-extern void psGetParticleChildCount(void* ptr);
+u32 psGetParticleChildCount(FieldParticleGenerator* generator);
 extern void psKillFamily();
 extern void GSmodelSet60fpsAnimFlag();
 extern void psUnlinkChildGensFromJObj();
 extern void psKillGenerator();
-extern u32 lbl_8047AD9C;
+extern FieldParticleBank* lbl_8047AD9C;
 extern u32 lbl_8047ADA0;
-/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_801181B0(void);
+void fn_801181B0(void) {
+    FieldParticleBankCursor slot_cursor;
+    u32 outer_index;
+    u32 inner_index;
+    FieldParticleNode* node;
+    FieldParticleBank* bank;
+    u32 max_life;
+
+    outer_index = 0;
+    while (outer_index < lbl_8047ADA0) {
+        bank = &lbl_8047AD9C[outer_index];
+        if (bank->active == 1) {
+            inner_index = 0;
+            slot_cursor.bank = bank;
+            do {
+                node = slot_cursor.slot_window[2];
+                if (node != NULL && node->field_01 == 0) {
+                    if (node->field_01 == 1) {
+                        max_life = -1;
+                    } else {
+                        max_life = psGetGeneratorChildMaxLife(node->generator);
+                    }
+                    if (max_life == 0 && psGetParticleChildCount(node->generator) == 0) {
+                        u32 i;
+                        FieldParticleBankCursor owner_bank;
+                        FieldParticleNode** base_slot;
+                        FieldParticleNode** bank_slot;
+
+                        psKillFamily(node->generator->family_id, node->generator->link_no);
+                        if (node->transform_state != 0 && node->transform_state != 0) {
+                            GSmodelSet60fpsAnimFlag(node->field_48, 0);
+                            node->field_48 = 0;
+                            node->field_4C = 0;
+                            node->field_06 = 0;
+                            node->field_05 = 0;
+                            psUnlinkChildGensFromJObj(node->generator);
+                            node->transform_state = 0;
+
+                            if (node->transform_state == 0) {
+                                GSvecCopy(node->local_position, node->transformed_position);
+                                node->generator->position[0] = node->transformed_position[0];
+                                node->generator->position[1] = node->transformed_position[1];
+                                node->generator->position[2] = node->transformed_position[2];
+                            } else {
+                                GSvecCopy(node->transformed_position, node->transformed_position);
+                            }
+
+                            if (node->transform_state == 0) {
+                                GSvecCopy(node->local_rotation, node->transformed_rotation);
+                                node->generator->rotation[0] = node->transformed_rotation[0];
+                                node->generator->rotation[1] = node->transformed_rotation[1];
+                                node->generator->rotation[2] = node->transformed_rotation[2];
+                            } else {
+                                GSvecCopy(node->transformed_rotation, node->transformed_rotation);
+                            }
+
+                            if (node->transform_state == 0) {
+                                GSvecCopy(node->local_scale, node->transformed_scale);
+                                node->generator->scale[0] = node->transformed_scale[0];
+                                node->generator->scale[1] = node->transformed_scale[1];
+                                node->generator->scale[2] = node->transformed_scale[2];
+                            } else {
+                                GSvecCopy(node->transformed_scale, node->transformed_scale);
+                            }
+                        }
+
+                        psKillGenerator(node->generator);
+
+                        owner_bank.bank = node->bank;
+                        base_slot = owner_bank.slot_window;
+                        bank_slot = base_slot;
+                        for (i = 0; i < 0x40; i++) {
+                            if (bank_slot[2] == node) {
+                                base_slot[i + 2] = NULL;
+                                break;
+                            }
+                            bank_slot++;
+                        }
+
+                        node->active = 0;
+                    }
+                }
+                inner_index++;
+                slot_cursor.slot_window++;
+            } while (inner_index < 0x40);
+        }
+        outer_index++;
+    }
+}
 /* 0x801183EC | 0x488 */
 extern void fn_800E06EC(void*, void*);
 extern void GSvecTransformQuat(void);
@@ -1756,7 +1906,7 @@ extern void psInterpretParticles(u32);
 extern void psExecGenerator(u32);
 extern u32 fn_800057A0(void);
 extern void jumptable_8035BB88();
-extern u32 lbl_8047AD9C;
+extern FieldParticleBank* lbl_8047AD9C;
 extern u32 lbl_8047ADA0;
 extern u8 lbl_8047ADB0;
 void fn_801183EC(u32 particleCount) {
@@ -2044,10 +2194,13 @@ void fn_80118D84(void* obj) {
     psGetParticleChildCount(*(void**)((u8*)obj + 0x10));
 }
 /* 0x80118DA8 | 0x38 */
-extern s32 psGetGeneratorChildMaxLife(u32);
+u32 psGetGeneratorChildMaxLife(FieldParticleGenerator* generator);
 s32 fn_80118DA8(u8* ptr) {
-    if (ptr[1] == 1) { return -1; }
-    return psGetGeneratorChildMaxLife(*(u32*)(&ptr[0x10]));
+    FieldParticleNodePtr node;
+
+    node.raw = ptr;
+    if (node.typed->field_01 == 1) { return -1; }
+    return psGetGeneratorChildMaxLife(node.typed->generator);
 }
 /* 0x80118DE0 | 0xAC */
 extern void psSetGeneratorAngleRadiusScale(void);
@@ -2152,48 +2305,6 @@ void* psCreateGeneratorID(u32 use_alt, u8 texture_type, u32 selector);
 void* fn_800D3094(void);
 extern u32 lbl_8047ADAC;
 extern u32 lbl_8047ADA8;
-typedef struct FieldParticleGenerator {
-    u8 pad_00[0x10];
-    u16 field_10;
-    u8 pad_12[5];
-    u8 enabled;
-    u8 pad_18[8];
-    f32 position[3];
-} FieldParticleGenerator;
-
-typedef struct FieldParticleBank FieldParticleBank;
-
-typedef struct FieldParticleNode {
-    u8 active;
-    u8 field_01;
-    u16 selector;
-    u8 field_04;
-    u8 field_05;
-    u8 field_06;
-    u8 pad_07;
-    void* field_08;
-    FieldParticleBank* bank;
-    FieldParticleGenerator* generator;
-    u8 pad_14[0x24];
-    f32 position[3];
-    u32 transform_state;
-    u32 field_48;
-    u32 field_4C;
-    u8 pad_50[0x24];
-} FieldParticleNode;
-
-struct FieldParticleBank {
-    u8 active;
-    u8 texture_type;
-    u8 pad_02[6];
-    FieldParticleNode* slots[64];
-};
-
-typedef union FieldParticleNodeRaw {
-    u8 bytes[0x74];
-    FieldParticleNode typed;
-} FieldParticleNodeRaw;
-
 static inline u8* fn_801190DC_findFreeNode(void) {
     FieldParticleNodeRaw* node = (FieldParticleNodeRaw*)lbl_8047ADA8;
     u32 i;
@@ -2281,7 +2392,7 @@ void fn_801193BC(void);
 extern void psInitDataBank(void);
 extern void DCFlushRange();
 extern u8 lbl_802727D8[];
-extern u32 lbl_8047AD9C;
+extern FieldParticleBank* lbl_8047AD9C;
 extern u32 lbl_8047ADA0;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void fn_801195AC(void);
@@ -2295,14 +2406,14 @@ extern void psSetPointJObjNodup(void);
 extern void fn_8019D610(void);
 extern u32 lbl_8047ADA0;
 extern u16 lbl_8047AD98;
-extern u32 lbl_8047AD9C;
+extern FieldParticleBank* lbl_8047AD9C;
 extern u32 lbl_8047ADAC;
 extern u16 lbl_8047ADA4;
 extern u32 lbl_8047ADA8;
 #if 1
 void fn_80119824(u32 count1, u32 count2) {
     extern u16 lbl_8047AD98;
-    extern u32 lbl_8047AD9C;
+    extern FieldParticleBank* lbl_8047AD9C;
     extern u32 lbl_8047ADA0;
     extern u16 lbl_8047ADA4;
     extern u32 lbl_8047ADA8;
@@ -2323,9 +2434,9 @@ void fn_80119824(u32 count1, u32 count2) {
     h = _toolentryAlloc__FUl(count1 * 0x108);
     lbl_8047AD98 = (u16)h;
     if ((u16)h == 0) { return; }
-    lbl_8047AD9C = (u32)fn_800E27B0((u16)h);
+    lbl_8047AD9C = fn_800E27B0((u16)h);
     for (i = 0; i < lbl_8047ADA0; i++) {
-        *(u8*)(lbl_8047AD9C + i * 0x108) = 0;
+        lbl_8047AD9C[i].active = 0;
     }
     lbl_8047ADAC = count2;
     h = _toolentryAlloc__FUl(count2 * 0x74);
