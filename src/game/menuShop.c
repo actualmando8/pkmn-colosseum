@@ -64,6 +64,8 @@ typedef struct ShopItemSlot {
     u16 quantity;
 } ShopItemSlot;
 
+void itemBiosSetNum(void*, u16);
+
 typedef struct ShopInventory {
     ShopItemSlot primary[235];
     ShopItemSlot secondary[235];
@@ -75,8 +77,87 @@ typedef struct ShopInventory {
     u16 count;
 } ShopInventory;
 
+/* fn_800298DC - 0x800298DC | size: 0x1ec */
+#pragma push
+#pragma optimization_level 4
+#pragma peephole off
+s32 fn_800298DC(ShopItemSlot* slots, s32 count, s32 item_id, s32 quantity,
+                 s16 index, s32 maximum) {
+    u16 current_id;
+    u16 current_quantity;
+    u16 capacity;
+    u16 added;
+    s32 i;
+    ShopItemSlot* slot;
+
+    if (index < -1 || index >= (u16)count) {
+        return (u16)quantity;
+    }
+
+    if (index != -1) {
+        if (index < 0 || index >= (u16)count) {
+            return (u16)quantity;
+        }
+
+        slots += index;
+        current_id = itemBiosGetItemDataId(slots);
+        if (current_id != (u16)item_id && current_id != 0) {
+            return (u16)quantity;
+        }
+
+        if (current_id == 0) {
+            itemBiosSetItemDataId(slots, item_id);
+            current_quantity = 0;
+        } else {
+            current_quantity = itemBiosGetNum(slots);
+        }
+
+        capacity = (u16)(maximum - current_quantity);
+        if (capacity < (u16)quantity) {
+            added = capacity;
+        } else {
+            added = (u16)quantity;
+        }
+        itemBiosSetNum(slots, (u16)(current_quantity + added));
+        return (u16)(quantity - added);
+    }
+
+    quantity &= 0xFFFF;
+    maximum = (u16)maximum;
+    i = 0;
+    while (i < (u16)count && quantity > 0) {
+        s16 slot_index = i;
+
+        if (slot_index < 0 || slot_index >= (u16)count) {
+            quantity = (u16)quantity;
+        } else {
+            slot = &slots[slot_index];
+            current_id = itemBiosGetItemDataId(slot);
+            if (current_id == (u16)item_id || current_id == 0) {
+                if (current_id == 0) {
+                    itemBiosSetItemDataId(slot, item_id);
+                    current_quantity = 0;
+                } else {
+                    current_quantity = itemBiosGetNum(slot);
+                }
+
+                capacity = (u16)(maximum - current_quantity);
+                if (capacity < (u16)quantity) {
+                    added = capacity;
+                } else {
+                    added = (u16)quantity;
+                }
+                itemBiosSetNum(slot, (u16)(current_quantity + added));
+                quantity = (u16)(quantity - added);
+            }
+        }
+        i++;
+    }
+    return quantity;
+}
+#pragma pop
+
 /* fn_80029AC8 - 0x80029AC8 | size: 0x1f8 */
-extern void itemBiosSetNum(void*, u16);
 #if 0
 asm void fn_80029AC8(void) {
 #include "src/game/gs_worldmap_fn_80029AC8.inc"
