@@ -523,6 +523,10 @@ f32 cameraGetRotY(void) {
     return *(f32*)((u8*)lbl_80478C40 + 0x14);
 }
 #endif
+f32 cameraGetDistance(void) {
+    return ((CameraPadState*)lbl_80478C40)->distance;
+}
+
 void cameraSetRotY(f32 angle) {
     CameraFloorEntry* floorEntry;
 
