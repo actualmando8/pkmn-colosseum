@@ -694,6 +694,27 @@ u32 cameraMoveEndCheckSpecial(u8 param) {
 }
 #pragma pop
 #endif
+#pragma push
+#pragma optimization_level 4
+u32 cameraMoveEndCheck(u8 wait) {
+    CameraPadState* state;
+
+    for (;;) {
+        state = lbl_80478C40;
+        if (state->targetMoveActive == 0 &&
+            state->targetOffsetMoveActive == 0 &&
+            state->positionMoveActive == 0 &&
+            state->rotationMoveActive == 0) {
+            return 0;
+        }
+        if (wait != 0) {
+            _threadSwitch();
+        } else {
+            return 1;
+        }
+    }
+}
+#pragma pop
 void cameraMoveRotationXYZ(f32 x, f32 y, f32 z, f32 duration) {
     f32 rotation[3];
     void* state;
