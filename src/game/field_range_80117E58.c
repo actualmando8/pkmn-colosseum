@@ -183,7 +183,7 @@ extern u8 lbl_804083D0[0x30];
 extern u32 lbl_8047AD68;
 extern u32 lbl_8047AD6C;
 extern void fn_801ED674(void);
-void fn_801193BC(void);
+void fn_801193BC(FieldParticleBank* bank);
 extern s32 pokemonWazaGetMaxPP(u8* ptr, u16 idx);
 extern void wazaGetStatus(void);
 extern void pokemonBiosGetPokemonWazaPtr(void);
@@ -2398,8 +2398,78 @@ u8* fn_801190DC(u8* texture, u32 selector, u32 subid) {
     return node;
 }
 /* 0x801193BC | 0x1F0 */
-/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_801193BC(void);
+void fn_801193BC(FieldParticleBank* bank) {
+    struct FieldParticleBankIteration {
+        u32 index;
+        FieldParticleBankCursor cursor;
+    } iteration;
+    FieldParticleNode* node;
+
+    for (iteration.index = 0, iteration.cursor.bank = bank;
+         iteration.index < 0x40;
+         iteration.index++, iteration.cursor.slot_window++) {
+        node = iteration.cursor.slot_window[2];
+        if (node != NULL) {
+            u32 j;
+            FieldParticleBankCursor owner_bank;
+            FieldParticleNode** base_slot;
+            FieldParticleNode** bank_slot;
+
+            psKillFamily(node->generator->family_id, node->generator->link_no);
+            if (node->transform_state != 0 && node->transform_state != 0) {
+                GSmodelSet60fpsAnimFlag(node->field_48, 0);
+                node->field_48 = 0;
+                node->field_4C = 0;
+                node->field_06 = 0;
+                node->field_05 = 0;
+                psUnlinkChildGensFromJObj(node->generator);
+                node->transform_state = 0;
+
+                if (node->transform_state == 0) {
+                    GSvecCopy(node->local_position, node->transformed_position);
+                    node->generator->position[0] = node->transformed_position[0];
+                    node->generator->position[1] = node->transformed_position[1];
+                    node->generator->position[2] = node->transformed_position[2];
+                } else {
+                    GSvecCopy(node->transformed_position, node->transformed_position);
+                }
+
+                if (node->transform_state == 0) {
+                    GSvecCopy(node->local_rotation, node->transformed_rotation);
+                    node->generator->rotation[0] = node->transformed_rotation[0];
+                    node->generator->rotation[1] = node->transformed_rotation[1];
+                    node->generator->rotation[2] = node->transformed_rotation[2];
+                } else {
+                    GSvecCopy(node->transformed_rotation, node->transformed_rotation);
+                }
+
+                if (node->transform_state == 0) {
+                    GSvecCopy(node->local_scale, node->transformed_scale);
+                    node->generator->scale[0] = node->transformed_scale[0];
+                    node->generator->scale[1] = node->transformed_scale[1];
+                    node->generator->scale[2] = node->transformed_scale[2];
+                } else {
+                    GSvecCopy(node->transformed_scale, node->transformed_scale);
+                }
+            }
+
+            psKillGenerator(node->generator);
+
+            owner_bank.bank = node->bank;
+            base_slot = owner_bank.slot_window;
+            bank_slot = base_slot;
+            for (j = 0; j < 0x40; j++) {
+                if (bank_slot[2] == node) {
+                    base_slot[j + 2] = NULL;
+                    break;
+                }
+                bank_slot++;
+            }
+            node->active = 0;
+        }
+    }
+    bank->active = 0;
+}
 /* 0x801195AC | 0x278 */
 extern void psInitDataBank(void);
 extern void DCFlushRange();
