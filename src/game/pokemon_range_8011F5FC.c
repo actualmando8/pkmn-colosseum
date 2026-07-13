@@ -447,7 +447,7 @@ extern void fn_801DA3CC(void);
 extern void fn_801DA36C(void);
 extern u32 lbl_80478F90; /* obj header ptr (SDA) */
 extern void fn_80135530(void);
-void pokemonGetFriendFormPokemonFriendFilterId(void);
+void pokemonGetFriendFormPokemonFriendFilterId(u8* obj, u16 item_id, u32 filter_id);
 extern u8 lbl_80272948[];
 void pokemonGetEffortFromPokemon(void);
 extern void fn_80008154(void);
@@ -1122,7 +1122,7 @@ extern u8 wazaGetMaxPP(u32 arg1, u8 arg2);
 extern u32 pokemonNakigoeDataBiosGetDataAddress(u8* ptr);
 extern void* pokemonDpFilterDataBiosGetPtr(u16 idx);
 extern s8 pokemonFriendFilterDataBiosGetValue(u8* ptr, u8 idx);
-extern void* pokemonFriendFilterDataBiosGetPtr(u16 idx);
+extern void* pokemonFriendFilterDataBiosGetPtr(u32 idx);
 extern void* pokemonTokuseiDataBiosGetPtr(u16 idx);
 extern void* pokemonSeikakuRateDataBiosGetPtr(u8 idx);
 extern u8 fn_8011CBF4(u8* ptr, u8 idx);
@@ -2462,8 +2462,139 @@ void pokemonSetSequenceStatus(u8* ptr, void* obj) {
 /* 0x80122370 | 0x360 */
 extern void fn_80135530(void);
 extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
-/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void pokemonGetFriendFormPokemonFriendFilterId(void);
+void pokemonGetFriendFormPokemonFriendFilterId(u8* obj, u16 item_id, u32 filter_id)
+{
+    extern u32 pokemonGetDarkPokemonLevel(u8* obj);
+    extern u32 gamedataAttestCheckValid(u32 value);
+    s8 raw_delta;
+    s32 friendship;
+    s32 delta;
+    s32 adjusted_delta;
+    u8 valid;
+    u8 tier;
+
+    if (obj == NULL) {
+        return;
+    }
+
+    if (obj == NULL) {
+        valid = 0;
+    } else {
+        friendship = (u16)pokemonGetStatus(obj, 0, 0x6E, 0);
+        if (friendship == 0) {
+            valid = 0;
+        } else {
+            if (friendship == 0) {
+                valid = 0;
+            } else if (pokemonGetStatus(NULL, friendship, 1, 0) == 0) {
+                valid = 0;
+            } else if ((u32)friendship >= *(u32*)lbl_80478F90) {
+                valid = 0;
+            } else {
+                valid = 1;
+            }
+            if (valid == 0) {
+                valid = 0;
+            } else if ((u8)gamedataAttestCheckValid(
+                           pokemonGetStatus(obj, 0, 0x70, 0)) == 0) {
+                valid = 0;
+            } else if ((u8)pokemonGetStatus(obj, 0, 0xB8, 0) == 1) {
+                valid = 0;
+            } else {
+                valid = 1;
+            }
+        }
+    }
+    if (valid == 0) {
+        valid = 0;
+    } else if ((s32)pokemonGetStatus(obj, 0, 0x6E, 0) == 0x19C) {
+        valid = 0;
+    } else if ((u8)pokemonGetStatus(obj, 0, 0xB6, 0) == 1) {
+        valid = 0;
+    } else {
+        if ((u16)filter_id == 6) {
+            goto filter_valid;
+        }
+        if ((u16)filter_id == 7) {
+            goto filter_valid;
+        }
+        if ((u16)filter_id == 8) {
+            goto filter_valid;
+        }
+        if ((u8)pokemonGetStatus(obj, 0, 0x7B, 0) == 1) {
+            valid = 0;
+            goto validity_done;
+        }
+filter_valid:
+        valid = 1;
+    }
+validity_done:
+    if (valid == 0) {
+        return;
+    }
+
+    friendship = (s32)pokemonGetStatus(obj, 0, 0x99, 0);
+    if ((u8)pokemonGetStatus(obj, 0, 0xC2, 0) == 1) {
+        friendship += (s32)pokemonGetStatus(obj, 0, 0xC7, 0);
+    }
+
+    tier = 0;
+    if (friendship >= 100) {
+        tier = 1;
+    }
+    if (friendship >= 200) {
+        tier = (u8)((u8)tier + 1);
+    }
+
+    if ((u16)filter_id == 5) {
+        if (fn_800E0C54() & 1) {
+            return;
+        }
+    }
+
+    raw_delta = pokemonFriendFilterDataBiosGetValue(
+        pokemonFriendFilterDataBiosGetPtr(filter_id), tier);
+    delta = raw_delta;
+    if (delta > 0) {
+        if (item_id == 0x1B) {
+            delta = (delta * 150) / 100;
+        }
+    }
+
+    adjusted_delta = delta;
+    if (delta > 0) {
+        if ((u16)pokemonGetStatus(obj, 0, 0x73, 0) == 0xB) {
+            adjusted_delta = delta + 1;
+        }
+    }
+
+    if ((u8)pokemonGetStatus(obj, 0, 0xC2, 0) == 1) {
+        s32 new_value;
+
+        if ((u8)pokemonGetDarkPokemonLevel(obj) < 3) {
+            return;
+        }
+        new_value = (s32)pokemonGetStatus(obj, 0, 0xC7, 0);
+        new_value += adjusted_delta;
+        if (new_value < 0) {
+            new_value = 0;
+        }
+        if (new_value > 0xFF) {
+            new_value = 0xFF;
+        }
+        pokemonSetStatus(obj, 0, 0xC7, 0, (u32)new_value);
+        return;
+    }
+
+    friendship += adjusted_delta;
+    if (friendship < 0) {
+        friendship = 0;
+    }
+    if (friendship > 0xFF) {
+        friendship = 0xFF;
+    }
+    pokemonSetStatus(obj, 0, 0x99, 0, (u32)friendship);
+}
 /* 0x801226D0 | 0x324 */
 extern u8 lbl_80272948[];
 extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
