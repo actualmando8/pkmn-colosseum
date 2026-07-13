@@ -206,7 +206,7 @@ extern u8    lbl_80467C80[];
 extern s32 fn_801D1338(void* wazaCtx);
 extern void* fn_801D1364(void* wazaCtx, s32 idx);
 extern s32 fn_801D139C(void* entry);
-extern f32 fn_801D13E4(void* entry);
+extern u32 fn_801D13E4(void* entry);
 extern f32 fn_801D142C(void* entry);
 extern u32 mailGetNbMailData(void* entry);
 extern s32 fn_801D147C(void* entry);

@@ -50,12 +50,22 @@ s32 fn_801D139C(void* entry) {
 }
 
 /**
- * fn_801D13E4 - Waza get entry start frame.
+ * fn_801D13E4 - Waza get entry field at +0x04 (u16), by index.
  * Address: 0x801D13E4 | Size: 0x48
  */
-f32 fn_801D13E4(void* entry) {
-    if (entry == NULL) return 0.0f;
-    return *(f32*)((u8*)entry + 0x04);
+u32 fn_801D13E4(void* entry) {
+    s32 idx;
+    WazaEntry* sequenceEntry;
+
+    idx = (s32)entry;
+    if (idx < 0 || (u32)idx >= *lbl_80478E98) {
+        sequenceEntry = NULL;
+    } else {
+        sequenceEntry = (WazaEntry*)(lbl_80478E9C + (u32)idx * sizeof(WazaEntry));
+    }
+
+    if (sequenceEntry == NULL) return 0xFFFF;
+    return *(u16*)&sequenceEntry->startFrame;
 }
 
 /**
