@@ -30,6 +30,14 @@ extern u8 lbl_804001F0[];  /* GX state / FIFO state block */
 
 #ifndef PCPORT
 extern u32 lbl_8047AA80;
+void fn_800D3074(u32 flag) {
+    if (flag == 0) {
+        return;
+    }
+
+    ((GSgfxState*)lbl_8047AA80)->renderEnabled = flag;
+}
+
 u32 fn_800D3094(void) {
     return *(u32*)((u8*)lbl_8047AA80 + 0x4C);
 }
