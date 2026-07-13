@@ -1076,38 +1076,11 @@ HSD_JObj* fn_8019F718(void)
 }
 #pragma pop
 
-/* 0x8019F778 | 0x78 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 extern void fn_8019D620(HSD_JObj*);
-#if 0
-asm void fn_8019F778(void) {
-#include "src/hsd/hsd_jobj_fn_8019F778.inc"
-}
-#else
-#pragma optimization_level 1
-void fn_8019F778(HSD_JObj* jobj) {
-    extern void __assert();
-    extern char lbl_8047DB34;
-    extern char lbl_8047DB3C;
-    s32 result;
-    if (!jobj) return;
-    if (!jobj) __assert(&lbl_8047DB34, 0x25d, &lbl_8047DB3C);
-    result = 0;
-    if (!(jobj->flags & 0x00800000)) {
-        if (jobj->flags & 0x00000040) {
-            result = 1;
-        }
-    }
-    switch (result) {
-    case 0:
-        fn_8019D620(jobj);
-        break;
-    }
-}
-#endif
-#pragma pop
+BOOL fn_8019D980(HSD_JObj* jobj);
+void fn_8019F778(HSD_JObj* jobj);
+void fn_8019FB90(HSD_JObj* jobj, u32 flags);
+void fn_8019FE8C(HSD_JObj* jobj, u32 flags);
 
 /* 0x8019FAEC | 0xA4 */
 #pragma push
@@ -1132,6 +1105,167 @@ void fn_8019FAEC(HSD_JObj* jobj, u32 flags) {
 }
 #pragma pop
 
+/* 0x8019FB90 | 0x2FC */
+#pragma push
+#pragma optimization_level 1
+/*
+ * The target saves r25-r31 with stmw/lmw and expands five recursive helper
+ * levels before the remaining call. Keep these compiler controls scoped to
+ * this reconstruction; changing the save mode or either limit changes code.
+ */
+#pragma use_lmw_stmw on
+#pragma inline_depth(5)
+#pragma inline_max_size(10000)
+
+static inline BOOL JObjMtxIsDirtyForSetFlags(HSD_JObj* jobj)
+{
+    BOOL result;
+
+    if (jobj == NULL) {
+        __assert(&lbl_8047DB34, 0x25D, &lbl_8047DB3C);
+    }
+    result = FALSE;
+    if (!(jobj->flags & JOBJ_USER_DEF_MTX) &&
+        (jobj->flags & JOBJ_MTX_DIRTY))
+    {
+        result = TRUE;
+    }
+    return result;
+}
+
+static inline void JObjSetMtxDirtyForSetFlags(HSD_JObj* jobj)
+{
+    if (jobj != NULL && !JObjMtxIsDirtyForSetFlags(jobj)) {
+        fn_8019D620(jobj);
+    }
+}
+
+static inline void JObjSetFlagsInline(HSD_JObj* jobj, u32 flags)
+{
+    if (jobj == NULL) {
+        return;
+    }
+    if ((jobj->flags ^ flags) & JOBJ_CLASSICAL_SCALE) {
+        JObjSetMtxDirtyForSetFlags(jobj);
+    }
+    jobj->flags |= flags;
+}
+
+static inline void JObjSetFlagsUsingMtxCheck(HSD_JObj* jobj, u32 flags)
+{
+    if (jobj == NULL) {
+        return;
+    }
+    if ((jobj->flags ^ flags) & JOBJ_CLASSICAL_SCALE) {
+        if (jobj != NULL && !fn_8019D980(jobj)) {
+            fn_8019D620(jobj);
+        }
+    }
+    jobj->flags |= flags;
+}
+
+static inline void JObjSetFlagsUsingDirtyCall(HSD_JObj* jobj, u32 flags)
+{
+    if (jobj == NULL) {
+        return;
+    }
+    if ((jobj->flags ^ flags) & JOBJ_CLASSICAL_SCALE) {
+        fn_8019F778(jobj);
+    }
+    jobj->flags |= flags;
+}
+
+static inline void JObjSetFlagsAllLevel5(HSD_JObj* jobj, u32 flags)
+{
+    HSD_JObj* child;
+
+    if (jobj == NULL) {
+        return;
+    }
+    fn_8019FE8C(jobj, flags);
+    if (!(jobj->flags & JOBJ_INSTANCE)) {
+        for (child = jobj->child; child != NULL; child = child->next) {
+            fn_8019FB90(child, flags);
+        }
+    }
+}
+
+static inline void JObjSetFlagsAllLevel4(HSD_JObj* jobj, u32 flags)
+{
+    HSD_JObj* child;
+
+    if (jobj == NULL) {
+        return;
+    }
+    JObjSetFlagsUsingDirtyCall(jobj, flags);
+    if (!(jobj->flags & JOBJ_INSTANCE)) {
+        for (child = jobj->child; child != NULL; child = child->next) {
+            JObjSetFlagsAllLevel5(child, flags);
+        }
+    }
+}
+
+static inline void JObjSetFlagsAllLevel3(HSD_JObj* jobj, u32 flags)
+{
+    HSD_JObj* child;
+
+    if (jobj == NULL) {
+        return;
+    }
+    JObjSetFlagsUsingMtxCheck(jobj, flags);
+    if (!(jobj->flags & JOBJ_INSTANCE)) {
+        for (child = jobj->child; child != NULL; child = child->next) {
+            JObjSetFlagsAllLevel4(child, flags);
+        }
+    }
+}
+
+static inline void JObjSetFlagsAllLevel2(HSD_JObj* jobj, u32 flags)
+{
+    HSD_JObj* child;
+
+    if (jobj == NULL) {
+        return;
+    }
+    JObjSetFlagsInline(jobj, flags);
+    if (!(jobj->flags & JOBJ_INSTANCE)) {
+        for (child = jobj->child; child != NULL; child = child->next) {
+            JObjSetFlagsAllLevel3(child, flags);
+        }
+    }
+}
+
+static inline void JObjSetFlagsAllLevel1(HSD_JObj* jobj, u32 flags)
+{
+    HSD_JObj* child;
+
+    if (jobj == NULL) {
+        return;
+    }
+    JObjSetFlagsInline(jobj, flags);
+    if (!(jobj->flags & JOBJ_INSTANCE)) {
+        for (child = jobj->child; child != NULL; child = child->next) {
+            JObjSetFlagsAllLevel2(child, flags);
+        }
+    }
+}
+
+void fn_8019FB90(HSD_JObj* jobj, u32 flags)
+{
+    HSD_JObj* child;
+
+    if (jobj == NULL) {
+        return;
+    }
+    JObjSetFlagsInline(jobj, flags);
+    if (!(jobj->flags & JOBJ_INSTANCE)) {
+        for (child = jobj->child; child != NULL; child = child->next) {
+            JObjSetFlagsAllLevel1(child, flags);
+        }
+    }
+}
+#pragma pop
+
 /* 0x8019FE8C | 0xA4 */
 #pragma push
 #pragma optimization_level 0
@@ -1152,6 +1286,27 @@ void fn_8019FE8C(HSD_JObj* jobj, u32 flags) {
         }
     }
     jobj->flags |= flags;
+}
+#pragma pop
+
+/* 0x8019F778 | 0x78 */
+#pragma push
+#pragma optimization_level 1
+void fn_8019F778(HSD_JObj* jobj) {
+    s32 result;
+    if (!jobj) return;
+    if (!jobj) __assert(&lbl_8047DB34, 0x25d, &lbl_8047DB3C);
+    result = 0;
+    if (!(jobj->flags & 0x00800000)) {
+        if (jobj->flags & 0x00000040) {
+            result = 1;
+        }
+    }
+    switch (result) {
+    case 0:
+        fn_8019D620(jobj);
+        break;
+    }
 }
 #pragma pop
 
@@ -2249,7 +2404,6 @@ typedef struct JObjAnimClassInfo {
 } JObjAnimClassInfo;
 
 void fn_801B0040(HSD_RObj* robj);
-BOOL fn_8019D980(HSD_JObj* jobj);
 void fn_801A3D04(HSD_JObj* jobj);
 void fn_801A1F2C(HSD_JObj* jobj);
 
