@@ -465,7 +465,7 @@ u8 GScameraIsAnimating(GSRenderCamera* camera) {
  * GScameraGetDistanceVector - GS render: get object angles (field_0x70, 0x100)
  * Address: 0x800D1A40, Size: 0x30
  * ================================================================== */
-void GScameraGetDistanceVector(GSRenderCamera* camera, void* dest) {
+void GScameraGetDistanceVector(GSRenderCamera* camera, GSRenderVec3* dest) {
     fn_800E0168(dest, &camera->eye, &camera->interest);
 }
 
@@ -639,10 +639,11 @@ void GScameraGetPosition(GSRenderCamera* camera, void* dest) {
  * GScameraGetPerspective - GS render: get object scissor rect extents
  * Address: 0x800D1FDC, Size: 0x60
  * ================================================================== */
-void GScameraGetPerspective(GSRenderCamera* camera, void* a, void* b, f32* outA, f32* outB) {
-    HSD_CObjGetPerspective(camera->cobj, a, b);
-    *outA = HSD_CObjGetNear(camera->cobj);
-    *outB = HSD_CObjGetFar(camera->cobj);
+void GScameraGetPerspective(GSRenderCamera* camera, f32* fov, f32* aspect,
+                            f32* near, f32* far) {
+    HSD_CObjGetPerspective(camera->cobj, fov, aspect);
+    *near = HSD_CObjGetNear(camera->cobj);
+    *far = HSD_CObjGetFar(camera->cobj);
 }
 
 /* ==================================================================

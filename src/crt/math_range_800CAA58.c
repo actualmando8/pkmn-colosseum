@@ -6,7 +6,7 @@
  * (tools/subsystem_propagation.py, >=80% single-label dominance;
  * campaign 2026-07-01).
  */
-#include "dolphin/types.h"
+#include "crt/math.h"
 
 typedef struct __FILE {
     u8 pad0[4];

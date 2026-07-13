@@ -33,7 +33,6 @@ extern void  GSvecAdd(void* out, void* a, void* b);  /* cross product */
 extern void  GSvecTransform(void* out, void* a, void* b);  /* vector subtract */
 extern void  GScameraSetPosition(void* obj, void* mtx);         /* set model matrix */
 extern void  GScameraLookAt(void* obj, void* tbl, void* pos); /* set joint pos */
-extern f32   atan2(f32 x, f32 y);                /* atan2 */
 extern void* fn_800FF56C(void);                         /* GSfloor get active */
 
 /* Script/generator */
