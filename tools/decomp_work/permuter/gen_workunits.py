@@ -19,7 +19,8 @@ Each unit is gated locally before being shipped:
   gate 1: base.c re-parses with decomp-permuter's pycparser fork
   gate 2: base.c compiles with the unit's exact mwcc + flags
   gate 3: the compiled object contains exactly one function: <fn>
-  gate 4: permuter Scorer(base.o vs target.o) yields a finite base score > 0
+  gate 4: isolated <fn> codegen equals the real full-TU build object
+  gate 5: permuter Scorer(base.o vs target.o) yields a finite base score > 0
 
 Usage:
   python3 tools/decomp_work/permuter/gen_workunits.py \
@@ -89,6 +90,35 @@ def unit_to_paths(unit: str):
         "obj": f"build/GC6E01/src/{rel}.o",
         "asm": REPO / "build/GC6E01/asm" / (rel + ".s"),
     }
+
+
+def normalized_disasm(objdump: Path, obj: Path, fn: str):
+    """Normalize one function enough to compare isolated and full-TU codegen."""
+    r = subprocess.run(
+        [str(objdump), "-dr", "-EB", "-mpowerpc", "-M", "broadway",
+         f"--disassemble={fn}", str(obj)],
+        capture_output=True, text=True,
+    )
+    if r.returncode != 0:
+        return None
+    out = []
+    for line in r.stdout.splitlines():
+        line = line.strip()
+        if (not line or line.startswith("Disassembly") or "file format" in line
+                or line.endswith(">:")):
+            continue
+        reloc = re.match(r"^[0-9a-f]+:\s+(R_PPC\S+)\s+(.*)$", line)
+        if reloc:
+            symbol = re.sub(r"@\d+", "@N", reloc.group(2).strip())
+            out.append(f"RELOC {reloc.group(1)} {symbol}")
+            continue
+        insn = re.match(r"^[0-9a-f]+:\s+((?:[0-9a-f]{2} ){4})\s*(.*)$", line)
+        if insn:
+            text = re.sub(r"\b[0-9a-f]+ <[^>]*>", "<T>", insn.group(2))
+            out.append(f"{insn.group(1).strip()} {text.strip()}")
+            continue
+        out.append(line)
+    return "\n".join(out) or None
 
 # ---------------------------------------------------------------------------
 # C pruning: strip all function bodies except the target's
@@ -451,7 +481,24 @@ def main():
             fail("stripped object has wrong functions", ",".join(symbols))
             continue
 
-        # gate 4: finite base score
+        # gate 4: pruning siblings must not alter the target's codegen. Without
+        # this, a farm can reach score zero against a synthetic isolated
+        # baseline that does not reproduce the live source object.
+        full_o = REPO / paths["obj"]
+        if not full_o.is_file():
+            fail("missing full-TU object for fidelity gate", str(full_o))
+            continue
+        isolated_disasm = normalized_disasm(ppc_objdump, base_o, fn)
+        full_disasm = normalized_disasm(ppc_objdump, full_o, fn)
+        if not isolated_disasm or not full_disasm:
+            fail("could not disassemble function for fidelity gate")
+            continue
+        if isolated_disasm != full_disasm:
+            fail("isolated baseline differs from full-TU object")
+            continue
+        meta["fidelity"] = "isolated-equals-full-tu"
+
+        # gate 5: finite base score
         try:
             scorer = Scorer(str(udir / "target.o"), stack_differences=True,
                             algorithm="difflib", debug_mode=False,
