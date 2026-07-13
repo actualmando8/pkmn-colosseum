@@ -20,6 +20,10 @@ Layout (all under FARM_ROOT, default = directory containing this script):
 Wins are detected two ways: the permuter exits after --stop-on-zero writing
 output-0-*/, or a nonzero personal best lands below --nearwin-threshold.
 
+The unit manifest is reloaded between worker assignments. This lets the Mac
+prepend reviewed near-miss work units atomically without stopping active
+permuters or waiting for a full farm restart.
+
 The supervisor holds the machine awake via SetThreadExecutionState while at
 least one worker is running (no admin needed); sleep resumes when it stops.
 
@@ -69,6 +73,17 @@ def atomic_write(path: Path, data: str) -> None:
     tmp = path.with_suffix(".tmp")
     tmp.write_text(data)
     os.replace(tmp, path)
+
+
+def load_manifest_queue(units: Path):
+    manifest = load_json(units / "manifest.json", [])
+    metas = {m["fn"]: m for m in manifest if m.get("status") == "ok"}
+    queue_order = [
+        m["fn"] for m in manifest
+        if m.get("status") == "ok"
+        and (units / m["fn"] / "base.c").is_file()
+    ]
+    return metas, queue_order
 
 
 class Worker:
@@ -216,10 +231,7 @@ def main():
             pass
     lock.write_text(str(os.getpid()))
 
-    manifest = load_json(UNITS / "manifest.json", [])
-    metas = {m["fn"]: m for m in manifest if m.get("status") == "ok"}
-    queue_order = [m["fn"] for m in manifest if m.get("status") == "ok"
-                   and (UNITS / m["fn"] / "base.c").is_file()]
+    metas, queue_order = load_manifest_queue(UNITS)
 
     state = load_json(state_path, {"done": {}, "round": 0})
 
@@ -241,6 +253,15 @@ def main():
 
     try:
         while round_no < args.rounds:
+            # The injector atomically replaces manifest.json after copying the
+            # complete unit directory. Preserve metadata for active workers,
+            # then adopt the latest queue order before selecting free work.
+            loaded_metas, loaded_order = load_manifest_queue(UNITS)
+            metas.update(loaded_metas)
+            if loaded_order != queue_order:
+                queue_order = loaded_order
+                print(f"manifest reload: {len(queue_order)} units")
+
             pending = [fn for fn in runnable(round_no) if fn not in workers]
             if not pending and not workers:
                 round_no += 1
