@@ -2930,7 +2930,7 @@ extern char lbl_8047DBA0;
 extern char lbl_8047DBA8;
 extern char lbl_8047DBB0;
 
-static HSD_SList* HSD_SListAlloc(void)
+HSD_SList* fn_801A3F48(void)
 {
     HSD_SList* list = (HSD_SList*) HSD_ObjAlloc(&lbl_804655B4);
     if (list == NULL) {
@@ -2942,7 +2942,7 @@ static HSD_SList* HSD_SListAlloc(void)
 
 HSD_SList* HSD_SListPrepend(HSD_SList* next, void* data)
 {
-    HSD_SList* prev = HSD_SListAlloc();
+    HSD_SList* prev = fn_801A3F48();
     prev->data = data;
     if (prev == NULL) {
         __assert(&lbl_8047DBA0, 0xCA, &lbl_8047DBA8);
