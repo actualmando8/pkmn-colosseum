@@ -1547,7 +1547,6 @@ static inline void inpResetGlobalMIDIDirtyFlags(void) {
 
 #pragma push
 #pragma optimization_level 4
-#pragma optimizewithasm off
 void fn_80161A9C(SndInputVoice* voice) {
     u32 i;
     u32 studio;
