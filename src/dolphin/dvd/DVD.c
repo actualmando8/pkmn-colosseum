@@ -67,6 +67,7 @@ static void stateBusy(DVDCommandBlock* block);
 static void cbForStateError(u32 intType);
 static void cbForStateMotorStopped_800A65A0(u32 intType);
 static void AlarmHandler(OSAlarm* alarm, OSContext* context);
+void stateCheckID_800B5D94(void);
 
 /* Forward declarations for internal DVD operations */
 extern void __fstLoad(void);
@@ -150,6 +151,25 @@ void fn_800A62CC(u32 intType)
         }
         executing_8047A7E8->state = 1;
         stateBusy_800A68B4(executing_8047A7E8);
+        return;
+    }
+
+    fn_800A48DC(fn_800A59CC);
+}
+
+void fn_800A6508(u32 intType)
+{
+    if (intType == 0x10) {
+        executing_8047A7E8->state = -1;
+        __DVDStoreErrorCode(0x1234568);
+        DVDReset();
+        cbForStateError(0);
+        return;
+    }
+
+    if (intType & 1) {
+        lbl_8047A81C = 0;
+        stateCheckID_800B5D94();
         return;
     }
 
