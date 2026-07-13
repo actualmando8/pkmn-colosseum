@@ -908,22 +908,23 @@ static void cbForStateGoToRetry(u32 intType) {
     stateReady_800A6684();
 }
 
+static void fn_800A5D88(void);
+
 /*
- * DVDChangeDisk - 0x800A5D60 | size: 0x28
- * Signal that a new disk has been inserted.
+ * fn_800A5D60 - 0x800A5D60 | size: 0x28
+ * Stop the drive motor before retrying the current command.
  */
-void DVDChangeDisk(DVDCommandBlock* block, DVDDiskID* id) {
-    block->command = 6;
-    block->id = id;
+void fn_800A5D60(void) {
+    DVDLowStopMotor((DVDLowCallback)fn_800A5D88);
 }
 
 /*
- * __DVDDecodeCoverInterrupt - 0x800A5D88 | size: 0x158
+ * fn_800A5D88 - 0x800A5D88 | size: 0x158
  * Decode and handle a cover interrupt event from the DVD hardware.
  * Determines if the cover was opened or closed and transitions
  * the DVD state machine accordingly.
  */
-static void __DVDDecodeCoverInterrupt(void) {
+static void fn_800A5D88(void) {
     BOOL enabled;
     u32 cover;
 
@@ -1019,6 +1020,10 @@ void stateCheckID_800B5D94(void)
  * DVD state machine callback (cover closed command)
  * TODO: Full decompilation
  */
+void DVDChangeDisk(DVDCommandBlock* block, DVDDiskID* id) {
+    block->command = 6;
+    block->id = id;
+}
 
 /*
  * DVDPause - orphan removed (see file header). Not present in
@@ -1071,7 +1076,7 @@ static void __DVDInterruptHandlerMain(u32 intType) {
 
     /* Handle cover open */
     if (intType & 0x4) {
-        __DVDDecodeCoverInterrupt();
+        fn_800A5D88();
         return;
     }
 
