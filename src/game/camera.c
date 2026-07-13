@@ -484,6 +484,9 @@ void cameraSetTargetOfsXYZ(void) {
 
 #pragma pop
 u32 _cameraGetStateSize(void) { return 428; }
+void cameraSetOffsetScale(void* src) {
+    GSvecCopy((u8*)lbl_80478C40 + 0xF0, src);
+}
 #if 0
 #pragma push
 #pragma optimization_level 0
