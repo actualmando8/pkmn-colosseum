@@ -619,6 +619,29 @@ void cameraStopAnimation(void) {
 }
 #pragma pop
 #endif
+
+#pragma push
+#pragma optimization_level 4
+/* 0x80176AE4 | size: 0x64 */
+void cameraStopAnime(void) {
+    void* state;
+    void* animation;
+
+    state = lbl_80478C40;
+    animation = GSresGetResource(*(u32*)((u8*)state + 0xD0),
+                                 *(u32*)((u8*)state + 0xD4));
+    if (animation == 0) {
+        animation = fn_800F92D4(*(u32*)((u8*)state + 0xD4));
+    }
+
+    *(u32*)((u8*)lbl_80478C40 + 0xD0) = 0;
+    *(u32*)((u8*)lbl_80478C40 + 0xD4) = 0;
+    if (animation != 0) {
+        GScameraStopAnimation(animation);
+    }
+}
+#pragma pop
+
 static inline GSRenderCamera* cameraGetCurrentAnimation(void) {
     CameraPadState* state = lbl_80478C40;
     GSRenderCamera* animation = GSresGetResource(
