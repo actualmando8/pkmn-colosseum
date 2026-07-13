@@ -288,6 +288,7 @@ extern const GSSceneVec3 lbl_80315540;
 extern const GSSceneVec3 lbl_8031554C;
 extern const GSSceneVec3 lbl_80315558;
 
+f32 GScameraGetAnimFrame(GSRenderCamera* camera);
 u8 GScameraHasAnimationEnded(GSRenderCamera* camera);
 u32 GSthreadGetCurrentThread(void);
 extern const char lbl_80273F34[];
@@ -646,6 +647,24 @@ s32 cameraWaitSyncAnime(s32 sync) {
     }
 
     return 0;
+}
+
+s32 fn_80176C04(u32 group, u32 id) {
+    GSRenderCamera* animation;
+
+    if (group == 0 || id == 0) {
+        return 0;
+    }
+
+    animation = GSresGetResource(group, id);
+    if (animation == 0) {
+        animation = fn_800F92D4(id);
+    }
+    if (animation == 0) {
+        return 0;
+    }
+
+    return (s32)GScameraGetAnimFrame(animation);
 }
 #if 0
 #pragma push
