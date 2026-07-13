@@ -81,18 +81,38 @@ DOLPHIN_PAIRED_SINGLE_ALLOWED = {
     "stfd", "stfs", "stwu",
 }
 
-LABEL = re.compile(r"^[.\w]+:$")
 HUNK = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@")
 ASM_FUNCTION = re.compile(
-    r"(?m)^[ \t]*asm[ \t]+(?:[A-Za-z_]\w*[ \t*]+)+"
-    r"(?P<name>[A-Za-z_]\w*)[ \t]*\([^;{}]*\)[ \t\r\n]*\{"
+    r"(?m)^[ \t]*asm[ \t\r\n]+(?:[A-Za-z_]\w*[ \t\r\n*]+)+"
+    r"(?P<name>[A-Za-z_]\w*)[ \t\r\n]*\([^;{}]*\)[ \t\r\n]*\{"
 )
 FUNCTION = re.compile(
-    r"(?m)^[ \t]*(?!asm\b)(?:[A-Za-z_]\w*[ \t*]+)+"
-    r"(?P<name>[A-Za-z_]\w*)[ \t]*\([^;{}]*\)[ \t\r\n]*\{"
+    r"(?m)^[ \t]*(?!asm\b)(?:[A-Za-z_]\w*[ \t\r\n*]+)+"
+    r"(?P<name>[A-Za-z_]\w*)[ \t\r\n]*\([^;{}]*\)[ \t\r\n]*\{"
 )
 INLINE_ASM = re.compile(r"\basm\s*(?:volatile\s*)?\{")
-ASM_START = re.compile(r"(?:^\s*asm\s+[A-Za-z_]|\basm\s*(?:volatile\s*)?\{)")
+ASM_TOKEN = re.compile(r"\basm\b")
+INC_INCLUDE = re.compile(r'^[ \t]*#[ \t]*include[ \t]*"[^"\r\n]*\.inc"')
+MACRO_DEFINE = re.compile(r"(?m)^[ \t]*#[ \t]*define[ \t]+(?P<name>[A-Za-z_]\w*)")
+IDENTIFIER = re.compile(r"\b[A-Za-z_]\w*\b")
+LABEL_PREFIX = re.compile(r"^(?P<label>[.A-Za-z_]\w*):(?P<rest>.*)$")
+LOCAL_BRANCHES = {"b", "beq", "bne", "beq-", "bne-", "beq+", "bne+"}
+
+# The C preprocessor runs before MWCC parses an asm block. Redefining one of
+# these tokens can make the source text pass this scanner while emitting a
+# different symbol, opcode, or register. No active source/header currently
+# defines one, so additions are rejected fail-closed.
+ASM_PROTECTED_MACROS = (
+    HARDWARE_ALLOWED
+    | DOLPHIN_PAIRED_SINGLE_ALLOWED
+    | DOLPHIN_PAIRED_SINGLE_FUNCTIONS
+    | {"asm", "nofralloc", "fralloc", "entry"}
+    | {f"r{i}" for i in range(32)}
+    | {f"f{i}" for i in range(32)}
+    | {f"qr{i}" for i in range(8)}
+    | {f"cr{i}" for i in range(8)}
+)
+ASM_PROTECTED_MACROS_LOWER = {name.lower() for name in ASM_PROTECTED_MACROS}
 
 
 def _mask_non_code(source: str) -> str:
@@ -235,16 +255,39 @@ def allowlist_for(path: str, func: str) -> tuple[set[str], str, bool]:
     return HARDWARE_ALLOWED, "hardware-primitive", False
 
 
+def _asm_statements(body: str) -> tuple[list[str], set[str]]:
+    """Split MWCC asm statements and collect labels without losing semicolon ops."""
+    statements = []
+    labels = set()
+    for raw in _mask_non_code(body).splitlines():
+        line = raw.strip()
+        if not line:
+            continue
+        # A leading # is a C preprocessor directive, not an assembler comment.
+        # Preserve it so the allowlist rejects it. Elsewhere # starts a comment.
+        if not line.startswith("#"):
+            line = line.split("#", 1)[0]
+        for raw_statement in line.split(";"):
+            statement = raw_statement.strip()
+            while statement:
+                match = LABEL_PREFIX.match(statement)
+                if not match:
+                    break
+                labels.add(match.group("label"))
+                statement = match.group("rest").strip()
+            if statement:
+                statements.append(statement)
+    return statements, labels
+
+
 def asm_body_ok(body: str, path: str = "", func: str = "") -> bool:
     allowed, allowlist_name, require_paired_single = allowlist_for(path, func)
     saw_paired_single = False
-    for raw in body.splitlines():
-        line = raw.split("//")[0].split("#")[0].strip().rstrip(";")
-        if not line or LABEL.match(line):
+    statements, labels = _asm_statements(body)
+    for line in statements:
+        if line in ("{", "}", "nofralloc", "fralloc"):
             continue
-        if line in ("{", "}") or line.startswith(("nofralloc", "fralloc", "entry ")):
-            continue
-        mnemonic = line.split()[0].lower().rstrip(".")
+        mnemonic = line.split()[0].lower()
         if mnemonic.startswith(("ps_", "psq_")):
             saw_paired_single = True
         if mnemonic not in allowed:
@@ -253,6 +296,15 @@ def asm_body_ok(body: str, path: str = "", func: str = "") -> bool:
                 f"{allowlist_name} allowlist for {path}:{func}: {line}"
             )
             return False
+        if mnemonic in LOCAL_BRANCHES:
+            parts = line.split(None, 1)
+            target = parts[1].strip() if len(parts) == 2 else ""
+            if target not in labels:
+                print(
+                    f"::error::asm branch target '{target}' is not a label "
+                    f"defined inside {path}:{func}"
+                )
+                return False
     if require_paired_single and not saw_paired_single:
         print(f"::error::{path}:{func} uses paired-single exception without a ps_/psq_ instruction")
         return False
@@ -287,6 +339,9 @@ def added_lines_from_diff(diff: str) -> dict[str, list[tuple[int, str]]]:
 def scan_source(path: str, source: str, added_lines: list[tuple[int, str]]) -> bool:
     """Validate every asm function/block touched by an added diff line."""
     added_numbers = {line_number for line_number, _ in added_lines}
+    masked = _mask_non_code(source)
+    source_lines = source.splitlines()
+    masked_lines = masked.splitlines()
     regions = find_asm_regions(source)
     touched = [
         region for region in regions
@@ -294,8 +349,31 @@ def scan_source(path: str, source: str, added_lines: list[tuple[int, str]]) -> b
     ]
 
     fail = False
-    for line_number, text in added_lines:
-        if ASM_START.search(text) and not any(
+    macro_definitions = [
+        (match.group("name"), _line_number(masked, match.start()))
+        for match in MACRO_DEFINE.finditer(masked)
+    ]
+    for name, line_number in macro_definitions:
+        if line_number in added_numbers and name.lower() in ASM_PROTECTED_MACROS_LOWER:
+            print(f"::error::asm-sensitive macro '{name}' added in {path}:{line_number}")
+            fail = True
+
+    for line_number, _ in added_lines:
+        if not 1 <= line_number <= len(source_lines):
+            print(f"::error::cannot map added line {path}:{line_number} to HEAD source")
+            fail = True
+            continue
+        text = source_lines[line_number - 1]
+        code = masked_lines[line_number - 1]
+        include = INC_INCLUDE.match(text)
+        hash_index = text.find("#", 0, include.end()) if include else -1
+        if include and code[hash_index] == "#":
+            print(
+                f"::error::.inc include added in {path}:{line_number} "
+                "— raw-asm shim, not a real match."
+            )
+            fail = True
+        if ASM_TOKEN.search(code) and not any(
             region["start_line"] <= line_number <= region["end_line"] for region in regions
         ):
             print(f"::error::unparseable or unterminated asm block in {path}:{line_number}")
@@ -309,6 +387,15 @@ def scan_source(path: str, source: str, added_lines: list[tuple[int, str]]) -> b
             fail = True
             continue
         combined_body = "\n".join(region["body"] for region in func_regions)
+        asm_identifiers = set(IDENTIFIER.findall(combined_body)) | {func}
+        shadowed = sorted({name for name, _ in macro_definitions} & asm_identifiers)
+        if shadowed:
+            print(
+                f"::error::C preprocessor macro(s) can rewrite asm in {path}:{func}: "
+                + ", ".join(shadowed)
+            )
+            fail = True
+            continue
         if asm_body_ok(combined_body, path, func):
             _, allowlist_name, _ = allowlist_for(path, func)
             print(f"asm in {func} ({path}): {allowlist_name} allowlist OK")
@@ -339,11 +426,6 @@ def main() -> int:
     fail = False
 
     for path, added_lines in added_by_path.items():
-        for _, text in added_lines:
-            if re.search(r'#include\s*"[^"]*\.inc"', text):
-                print(f"::error::.inc include added in {path} — raw-asm shim, not a real match.")
-                fail = True
-
         try:
             source = subprocess.run(
                 ["git", "show", f"{head}:{path}"],
