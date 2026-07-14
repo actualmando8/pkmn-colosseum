@@ -3957,6 +3957,111 @@ void fn_800909E4(u32 ctx) {
     floorSetFadeScript(0, 0);
 }
 
+/* 0x80090D34 | size: 0x2D8 */
+void fn_80090D34(u32 ctx) {
+    #pragma peephole off
+    extern void GSmodelSetShadowTextureSize(u32 w, u32 h);
+    extern void fn_801CB7C4(u32 id);
+    extern void fn_801CB834(u32 id, u32 slot, u32 x, u32 y);
+    extern s32 fn_800D37CC(void);
+    extern u32 fn_800D3088(void);
+    extern u32 fn_801CBA0C(u32 id);
+    extern u32 GSmodelSetShadowFlags(u32 handle, u32 val);
+    extern void GSmodelSetShadowLight(u32 handle, u32 val);
+    extern void GSmodelSetShadowSurface(u32 handle, u32 val, u32 *param);
+    extern void cameraPlayAnime(u32 ctx, u32 id, u32 a, u32 b);
+    extern void fn_801845E4(u32 ctx, u32 modelHandle, u32 ctx2, u32 handle, u32 flags);
+    extern void cameraWaitSyncAnime(s32 sync);
+    extern void fn_800FF58C(u32 id);
+    extern void fn_80118874(void *texture, u32 flag);
+    extern void GSmodelSetAnimIndex(u32 handle, u32 val);
+    extern void GSmodelGetFrameCount(u32 handle, f32 *out, u32 flag);
+    extern void GSmodelSetAnimFrame(u32 handle, f32 val);
+    extern void GSmodelSetAnimType(u32 handle, u32 val);
+    extern void GSmodelStartAnimation(u32 handle);
+
+    u32 waitFrames;
+    u32 elapsed;
+    GSmaterialEntry *material;
+    f32 frame;
+    u32 handle2;
+    u32 iconHandle;
+    u32 iconHandle2;
+    u32 iconResult;
+    u32 finalResult;
+    u32 finalResult2;
+
+    lbl_8047A690 = GSresGetResource(ctx, 0x0CE61602);
+    lbl_8047A694 = GSresGetResource(ctx, 0x0CE61002);
+    GSmodelSetShadowTextureSize(0x280, 0x1E0);
+
+    frame = lbl_8047C1D4;
+    handle2 = fn_80090720_getHandle2(ctx);
+    GSmodelSetAnimIndex(handle2, 1);
+    GSmodelGetFrameCount(handle2, &frame, 0);
+    frame = frame - lbl_8047C1D8;
+    GSmodelSetAnimIndex(handle2, 1);
+    GSmodelSetAnimFrame(handle2, frame);
+    GSmodelSetAnimType(handle2, 0);
+    GSmodelStartAnimation(handle2);
+
+    fn_801CB834(0x0CE61000, 0, 0, 0);
+    waitFrames = 1;
+    if (fn_800D37CC() == 0x32) {
+        waitFrames = (u32)lbl_8047C1D0;
+        if (waitFrames < 1) {
+            waitFrames = 1;
+        }
+    }
+    for (elapsed = 0; elapsed < waitFrames; ) {
+        _threadSwitch();
+        elapsed += fn_800D3088();
+    }
+
+    fn_801CB7C4(0x0CE61000);
+
+    material = (GSmaterialEntry *)GSresGetResource(ctx, 0x0CE61000);
+    fn_80118874(material->texture, 1);
+    material->texture = NULL;
+
+    iconHandle = fn_801CBA0C(0x06BD0400);
+    iconHandle2 = fn_801CBA0C(0x06BA0400);
+
+    iconResult = GSresGetResource(ctx, iconHandle);
+    GSmodelSetShadowFlags(iconResult, 2);
+    GSmodelSetShadowLight(iconResult, lbl_8047A690);
+    GSmodelSetShadowSurface(iconResult, 1, &lbl_8047A694);
+
+    iconResult = GSresGetResource(ctx, iconHandle2);
+    GSmodelSetShadowFlags(iconResult, 2);
+    GSmodelSetShadowLight(iconResult, lbl_8047A690);
+    GSmodelSetShadowSurface(iconResult, 1, &lbl_8047A694);
+
+    cameraPlayAnime(ctx, 0x0CF01800, 0, 0);
+    waitFrames = 1;
+    if (fn_800D37CC() == 0x32) {
+        waitFrames = (u32)lbl_8047C1D0;
+        if (waitFrames < 1) {
+            waitFrames = 1;
+        }
+    }
+    for (elapsed = 0; elapsed < waitFrames; ) {
+        _threadSwitch();
+        elapsed += fn_800D3088();
+    }
+
+    finalResult = fn_801CBA0C(0x0CE71001);
+    finalResult2 = fn_801CBA0C(0x0CE71000);
+    fn_801845E4(ctx, iconHandle, ctx, finalResult, 0);
+    fn_801845E4(ctx, iconHandle2, ctx, finalResult2, 0);
+    fn_801CB834(iconHandle, 2, 0, 1);
+    fn_801CB834(iconHandle2, 2, 0, 1);
+
+    cameraWaitSyncAnime(1);
+    fn_800FF58C(0x89);
+    floorSetFadeScript(0, 0);
+}
+
 /* 0x8008C7B0 | size: 0x31C */
 void fn_8008C7B0(u32 ctx) {
     #pragma peephole off
