@@ -203,7 +203,7 @@ static void __THPAudioInitialize(THPAudioDecodeInfo *info, u8 *ptr);
 extern BOOL fn_8009F230(u8 *queue, u32 msg, u32 flags);
 extern BOOL fn_8009F2F8(u8 *queue, u32 *msgOut, u32 flags);
 extern void fn_8009F1D0(u8 *queue, u32 msgArray, u32 msgCount);
-extern void DVDClose(void);
+extern BOOL DVDClose();
 
 typedef struct OSThread OSThread;
 extern void OSCancelThread(OSThread *thread);
@@ -1227,6 +1227,150 @@ BOOL fn_801E4724(void)
     }
     return FALSE;
 }
+
+typedef struct THPOpenHeader {
+    char magic[4];
+    u32 version;
+    u32 bufferSize;
+    u32 audioMaxSamples;
+    f32 frameRate;
+    u32 numFrames;
+    u32 firstFrameSize;
+    u32 movieDataSize;
+    u32 compInfoDataOffsets;
+    u32 offsetDataOffsets;
+    u32 movieDataOffsets;
+    u32 finalFrameDataOffsets;
+} THPOpenHeader;
+
+typedef struct THPOpenFrameCompInfo {
+    u32 numComponents;
+    u8 frameComp[16];
+} THPOpenFrameCompInfo;
+
+typedef struct THPOpenVideoInfo {
+    u32 xSize;
+    u32 ySize;
+    u32 videoType;
+} THPOpenVideoInfo;
+
+typedef struct THPOpenAudioInfo {
+    u32 sndChannels;
+    u32 sndFrequency;
+    u32 sndNumSamples;
+    u32 sndNumTracks;
+} THPOpenAudioInfo;
+
+typedef struct THPOpenPlayer {
+    u8 fileInfo[0x3C];
+    THPOpenHeader header;
+    THPOpenFrameCompInfo compInfo;
+    THPOpenVideoInfo videoInfo;
+    THPOpenAudioInfo audioInfo;
+    void *workArea;
+    BOOL open;
+    u8 state;
+    u8 internalState;
+    u8 playFlag;
+    u8 audioExist;
+    s32 dvdError;
+    s32 videoError;
+    BOOL onMemory;
+} THPOpenPlayer;
+
+#pragma push
+#pragma opt_strength_reduction off
+BOOL fn_801E4778(const char *fileName, BOOL onMemory)
+{
+    extern BOOL THPInit(void);
+    extern BOOL DVDOpen(const char *path, void *fileInfo);
+    extern s32 DVDRead(void *fileInfo, void *addr, s32 length, s32 offset, s32 prio);
+    extern void *memset(void *dst, int value, u32 size);
+    extern s32 strcmp(const char *lhs, const char *rhs);
+    extern u8 lbl_8046A4E0[];
+    extern const char lbl_8047E4AC[4];
+    s32 offset;
+    s32 i;
+
+#define ActivePlayer (*(THPOpenPlayer *)lbl_8046AC60)
+#define WorkBuffer lbl_8046A4E0
+
+    if (THPInit() == FALSE) {
+        return FALSE;
+    }
+    if (lbl_8047B468 == FALSE) {
+        return FALSE;
+    }
+    if (ActivePlayer.open) {
+        return FALSE;
+    }
+
+    memset(&ActivePlayer.videoInfo, 0, sizeof(THPOpenVideoInfo));
+    memset(&ActivePlayer.audioInfo, 0, sizeof(THPOpenAudioInfo));
+
+    if (DVDOpen(fileName, ActivePlayer.fileInfo) == FALSE) {
+        return FALSE;
+    }
+    if (DVDRead(ActivePlayer.fileInfo, WorkBuffer, 64, 0, 2) < 0) {
+        DVDClose(ActivePlayer.fileInfo);
+        return FALSE;
+    }
+
+    memcpy(&ActivePlayer.header, WorkBuffer, sizeof(THPOpenHeader));
+    if (strcmp(ActivePlayer.header.magic, lbl_8047E4AC) != 0) {
+        DVDClose(ActivePlayer.fileInfo);
+        return FALSE;
+    }
+    if (ActivePlayer.header.version != 0x11000) {
+        DVDClose(ActivePlayer.fileInfo);
+        return FALSE;
+    }
+
+    offset = ActivePlayer.header.compInfoDataOffsets;
+    if (DVDRead(ActivePlayer.fileInfo, WorkBuffer, 32, offset, 2) < 0) {
+        DVDClose(ActivePlayer.fileInfo);
+        return FALSE;
+    }
+
+    memcpy(&ActivePlayer.compInfo, WorkBuffer, sizeof(THPOpenFrameCompInfo));
+    offset += sizeof(THPOpenFrameCompInfo);
+    ActivePlayer.audioExist = FALSE;
+
+    for (i = 0; i < ActivePlayer.compInfo.numComponents; i++) {
+        switch (ActivePlayer.compInfo.frameComp[i]) {
+        case 0:
+            if (DVDRead(ActivePlayer.fileInfo, WorkBuffer, 32, offset, 2) < 0) {
+                DVDClose(ActivePlayer.fileInfo);
+                return FALSE;
+            }
+            memcpy(&ActivePlayer.videoInfo, WorkBuffer, sizeof(THPOpenVideoInfo));
+            offset += sizeof(THPOpenVideoInfo);
+            break;
+        case 1:
+            if (DVDRead(ActivePlayer.fileInfo, WorkBuffer, 32, offset, 2) < 0) {
+                DVDClose(ActivePlayer.fileInfo);
+                return FALSE;
+            }
+            memcpy(&ActivePlayer.audioInfo, WorkBuffer, sizeof(THPOpenAudioInfo));
+            offset += sizeof(THPOpenAudioInfo);
+            ActivePlayer.audioExist = TRUE;
+            break;
+        default:
+            return FALSE;
+        }
+    }
+
+    ActivePlayer.internalState = 0;
+    ActivePlayer.state = 0;
+    ActivePlayer.playFlag = 0;
+    ActivePlayer.onMemory = onMemory;
+    ActivePlayer.open = TRUE;
+
+#undef WorkBuffer
+#undef ActivePlayer
+    return TRUE;
+}
+#pragma pop
 #endif
 
 #ifndef THP_PLAYER_ONLY
