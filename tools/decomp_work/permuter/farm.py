@@ -104,6 +104,7 @@ class Worker:
         self.base_score = None
         self.best_score = None
         self.log_path = LOGS / f"{fn}.log"
+        self.log_start = self.log_path.stat().st_size if self.log_path.exists() else 0
         self.log = open(self.log_path, "a", encoding="utf-8", errors="replace")
         self.log.write(f"\n===== farm start {time.strftime('%Y-%m-%dT%H:%M:%S')} "
                        f"budget={budget}s =====\n")
@@ -147,7 +148,9 @@ class Worker:
 
     def read_scores(self) -> None:
         try:
-            text = self.log_path.read_text(encoding="utf-8", errors="replace")
+            with self.log_path.open("rb") as stream:
+                stream.seek(self.log_start)
+                text = stream.read().decode("utf-8", errors="replace")
         except OSError:
             return
         m = RE_BASE_SCORE.search(text)

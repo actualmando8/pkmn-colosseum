@@ -1107,35 +1107,40 @@ typedef struct PdaMailSortLabelWindow {
     u8 color;
 } PdaMailSortLabelWindow;
 
-#pragma scheduling off
+#pragma push
 #pragma peephole off
+#pragma optimization_level 1
 s32 fn_8004C3E4(PdaMailSortLabelWindow* window)
 {
+    typedef struct MailSortMessageIds {
+        u32 values[4];
+    } MailSortMessageIds;
     extern const u32 lbl_802672C8[];
     extern u32 GSmsgGetRect(u32 msgId);
     extern void fn_800FB680(s32 x, s32 y, s32 color, u32 msgId);
-    u32 messageIds[4];
+    MailSortMessageIds messageIds;
     s32 sortMode;
     u32 messageId;
-    s32 color;
 
-    messageIds[0] = lbl_802672C8[0];
-    messageIds[1] = lbl_802672C8[1];
-    messageIds[2] = lbl_802672C8[2];
-    messageIds[3] = lbl_802672C8[3];
+    messageIds = *(const MailSortMessageIds*)lbl_802672C8;
     sortMode = mailGetSortMode();
     if (sortMode < 0 || sortMode >= 4) {
         return 0;
     }
 
-    messageId = messageIds[sortMode];
-    color = window->color | -0x100;
-    fn_800FB680(0, 0, color, messageId);
-    fn_800FB680(GSmsgGetRect(messageId) >> 16, 0, color, 0x36c1);
+    messageId = messageIds.values[sortMode];
+    {
+        s32 colorMask = -0x100;
+        u32 alpha = window->color;
+        s32 color = alpha | colorMask;
+
+        fn_800FB680(0, 0, color, messageId);
+        fn_800FB680(GSmsgGetRect(messageId) >> 16, 0,
+                     color, 0x36c1);
+    }
     return 0;
 }
-#pragma peephole reset
-#pragma scheduling reset
+#pragma pop
 
 #if 0
 asm void fn_8004BFB0(void) {

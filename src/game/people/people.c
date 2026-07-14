@@ -244,9 +244,9 @@ PeopleEntry* peopleGetEntry(s32 index)
  * ======================================================================= */
 PeopleEntry* fn_8018FCE0(void)
 {
-    s32 maxCount;
     PeopleEntry* entry;
-    s32 i;
+    s32 maxCount;
+    int i;
     PeopleEntry* found;
     f32 moveSpeed;
 

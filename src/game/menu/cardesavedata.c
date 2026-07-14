@@ -92,7 +92,7 @@ extern void* fn_800E27B0(u16);
 extern u16 fn_800E202C(void*);
 extern void fn_800E24B0(u16);
 extern void fn_800E209C(u16);
-extern s32 fn_80083BF8(s32);
+extern s32 fn_80083BF8(void*);
 extern void* fn_80083AF4(s32, s32);
 extern void* windowSearchItemID(void*, s32);
 extern void qsort(void*, u32, u32, s32 (*)(u32, u32));
@@ -606,6 +606,47 @@ void* fn_800836AC(u8* arena, u8* descriptor, u8 create)
     }
     return entry;
 }
+
+#pragma push
+#pragma peephole off
+static inline void CardEGridSetCount(s32* countOut, s32 count)
+{
+    if (countOut != NULL) {
+        *countOut = count;
+    }
+}
+
+/* Count well-formed records in the Card-e save-data arena. */
+s32 fn_80083BF8(void* arena)
+{
+    extern void* savedataGetStatus(u32, u32);
+    CardEGridEntry* entry;
+    u8* end;
+    s32 count;
+    s32 currentCount;
+
+    if (arena != NULL) {
+        entry = arena;
+    } else {
+        entry = savedataGetStatus(0, 0xD);
+    }
+    end = (u8*)entry + 0x4000;
+    currentCount = 0;
+    while (1) {
+        if (end < (u8*)entry + 0x24 || entry->id == 0) {
+            break;
+        }
+        if (entry->layers > 3 || entry->rows > 6 || entry->columns > 5) {
+            entry->id = 0;
+            break;
+        }
+        currentCount++;
+        entry = (CardEGridEntry*)((u8*)entry + CardEGridEntrySize(entry));
+    }
+    CardEGridSetCount(&count, currentCount);
+    return count;
+}
+#pragma pop
 
 
 /* 0x8007FDBC | size: 0x554 */
