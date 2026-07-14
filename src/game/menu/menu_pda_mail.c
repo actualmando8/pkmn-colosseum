@@ -481,6 +481,78 @@ s32 fn_8004E440(PdaMailWindowB* window, void* fieldHandle)
 }
 #pragma peephole reset
 
+typedef struct PdaMailAttachState {
+    s32 unused;
+    s32 mailIndex;
+    s32* selection;
+} PdaMailAttachState;
+
+typedef struct PdaMailAttachWindow {
+    u8 pad00[0x60];
+    PdaMailAttachState* state;
+} PdaMailAttachWindow;
+
+#pragma peephole off
+s32 fn_8004E790(PdaMailAttachWindow* window)
+{
+    extern u32 mailGetAttachFileGroup(s32 index);
+    extern s32 fn_8017B2CC(u32 fileHandle);
+    extern s32 fn_8017B448(u32 fileHandle);
+    extern u32 fn_8017B4BC(u32 fileHandle, u32 index);
+    extern u32 fn_8017B5A4();
+    u8* input;
+    s32 total;
+    s32 count;
+    s32 index;
+    u32 object;
+    PdaMailAttachState* state;
+    s32 loaded;
+    s32 selection;
+
+    state = window->state;
+    input = windowGetKeyInfo();
+    selection = *state->selection;
+    index = state->mailIndex;
+    if (fn_8017B2CC(mailGetAttachFileGroup(index)) == 1) {
+        loaded = 0;
+    } else {
+        loaded = 1;
+    }
+    if (loaded == 0) {
+        count = -1;
+    } else {
+        object = mailGetAttachFileGroup(index);
+        total = fn_8017B448(object);
+        count = 0;
+        index = count;
+        while (index < total) {
+            fn_8017B4BC(object, index);
+            if (fn_8017B5A4() == 9) {
+                count++;
+            }
+            index++;
+        }
+    }
+    if (count < 2) {
+        return 0;
+    }
+    if ((*(u16*) (input + 6) & 8) != 0) {
+        selection++;
+        if (selection >= count) {
+            selection = 0;
+        }
+    }
+    if ((*(u16*) (input + 6) & 4) != 0) {
+        selection--;
+        if (selection < 0) {
+            selection = count - 1;
+        }
+    }
+    *state->selection = selection;
+    return 0;
+}
+#pragma peephole reset
+
 #if 0
 asm s32 fn_8004DB34(PdaMailWindowB* window, void* fieldHandle) {
 #include "src/game/menu/menu_pda_mail_fn_8004DB34.inc"
