@@ -10,9 +10,50 @@
 #include "dolphin/types.h"
 #include "dolphin/gx/GX.h"
 #include "dolphin/os/OSInterrupt.h"
+#include "dolphin/os/PPCArch.h"
 
 extern GXData* gx;
 extern volatile u16* __cpReg;
+extern volatile u32* __piReg;
+extern GXFifoObj* lbl_8047A9A0;
+extern GXFifoObj* lbl_8047A9A4;
+extern u8 lbl_8047A9AC;
+
+void fn_800B7558(u8 arg0);
+void fn_800B7594(u8 arg0, u8 arg1);
+void fn_800B75D0(u8 arg0, u8 arg1);
+
+void GXSetCPUFifo(GXFifoObj* fifo) {
+    BOOL enabled;
+    u32 reg;
+
+    enabled = OSDisableInterrupts();
+    lbl_8047A9A0 = fifo;
+    if (lbl_8047A9A0 == lbl_8047A9A4) {
+        __piReg[3] = (u32)fifo->base & 0x3FFFFFFF;
+        __piReg[4] = (u32)fifo->top & 0x3FFFFFFF;
+        reg = (u32)fifo->wrPtr & 0x3FFFFFE0;
+        reg &= 0xFBFFFFFF;
+        __piReg[5] = reg;
+        lbl_8047A9AC = TRUE;
+        fn_800B75D0(1, 1);
+        fn_800B7594(1, 0);
+        fn_800B7558(1);
+    } else {
+        if (lbl_8047A9AC) {
+            fn_800B7558(0);
+            lbl_8047A9AC = FALSE;
+        }
+        fn_800B7594(0, 0);
+        __piReg[3] = (u32)fifo->base & 0x3FFFFFFF;
+        __piReg[4] = (u32)fifo->top & 0x3FFFFFFF;
+        reg = (u32)fifo->wrPtr & 0x3FFFFFE0;
+        reg &= 0xFBFFFFFF;
+        __piReg[5] = reg;
+    }
+    PPCSync();
+    OSRestoreInterrupts(enabled);
+}
 
 void fn_800B7514(void) {
     u32* gxStatus = (u32*)gx;
