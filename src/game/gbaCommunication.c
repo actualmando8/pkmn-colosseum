@@ -4206,6 +4206,166 @@ s32 fn_80093698(s32 channel)
     return 1;
 }
 
+/* 0x800937F4 | size: 0x310 */
+#pragma push
+#pragma peephole off
+s32 fn_800937F4(void* arg0)
+{
+    extern void fn_8009F9E8();
+    extern s32 fn_80073E8C();
+    extern s32 fn_80073E84();
+    extern s32 fn_80074324();
+    extern s32 fn_800745B4();
+    extern s32 fn_80073690();
+    extern void fn_800895A4();
+    extern s32 fn_80071E34();
+    extern void fn_80089380();
+    extern s32 fn_80089D30();
+    extern s32 fn_80089CA8();
+    extern s32 fn_80089C84();
+    extern u64 OSGetTime(void);
+    extern f32 lbl_8047C1F0;
+
+    u8* p;
+    s32 result;
+    s32 status;
+    s32 state;
+    void* arg;
+    u64 start;
+    u64 now;
+    f32 rate;
+    u8 readBuffer[0xD8];
+    u8 statusBuffer[0x278];
+
+    p = arg0;
+    result = 0;
+    for (;;) {
+        fn_8009F7B4(p);
+        if (*(s32*)(p + GBA_STATE_PHASE) != 0xD) {
+            *(s32*)(p + GBA_STATE_TIMEOUT) = result;
+            *(s32*)(p + GBA_STATE_PHASE) = 0;
+            while (*(s32*)(p + GBA_STATE_PHASE) == 0) {
+                fn_8009F9E8(p + 0x18, p);
+            }
+        }
+
+        state = *(s32*)(p + GBA_STATE_PHASE);
+        fn_8009F890(p);
+        status = 0;
+
+        switch (state) {
+        case 0:
+        case 3:
+            break;
+        case 1:
+            if ((s8)p[0x43C4] != 0) {
+                arg = p + 0x43C4;
+            } else {
+                arg = NULL;
+            }
+            status = fn_80073E8C(p + 0x4344, arg);
+            if (status == 0) {
+                while (fn_80073E84() == 0) {
+                    fn_800A257C((void*)fn_800A13F8(), 0x10);
+                    OSYieldThread();
+                }
+                result = 1;
+            }
+            break;
+        case 2:
+            start = OSGetTime();
+            if (*(s32*)(p + 0x4344) == 0) {
+                rate = lbl_8047C1F0;
+            } else {
+                rate = lbl_8047C1F0;
+            }
+            while ((status = fn_80074324(*(s32*)(p + GBA_STATE_PORT))) != 0) {
+                if (status == 0x3E8) {
+                    goto case2Done;
+                }
+                now = OSGetTime() - start;
+                if ((s32)(u32)(u64)(
+                        rate * (f32)(*(u32*)0x800000F8 >> 2))
+                    <= (s32)(u32)now) {
+                    result = 0x20002;
+                    goto case2Done;
+                }
+                fn_800A257C((void*)fn_800A13F8(), 0x10);
+                OSYieldThread();
+            }
+            status = fn_800745B4(*(s32*)(p + GBA_STATE_PORT),
+                                 *(s32*)(p + 0x4344));
+            if (status == 0) {
+                result = 2;
+            }
+        case2Done:
+            break;
+        case 4:
+            status = fn_80073690(*(s32*)(p + GBA_STATE_PORT), statusBuffer);
+            if (status == 0) {
+                fn_800895A4(*(s32*)(p + 0x4344), statusBuffer);
+                result = 4;
+                **(u32**)(p + 0x4348) =
+                    (statusBuffer[3] << 24) | (statusBuffer[2] << 16)
+                    | (statusBuffer[1] << 8) | statusBuffer[0];
+            }
+            break;
+        case 5:
+            result = 5;
+            break;
+        case 6:
+            result = 6;
+            break;
+        case 7:
+            result = 7;
+            break;
+        case 8:
+            result = 8;
+            break;
+        case 9:
+            result = 9;
+            break;
+        case 10:
+            result = 10;
+            break;
+        case 11:
+            status = fn_80071E34(*(s32*)(p + GBA_STATE_PORT), readBuffer);
+            if (status == 0) {
+                fn_80089380(*(s32*)(p + 0x4344), readBuffer);
+                result = 11;
+            }
+            break;
+        case 12:
+            status = fn_80089D30(*(s32*)(p + GBA_STATE_PORT) + 1,
+                                  p + 0x4344);
+            if (status == 0) {
+                for (;;) {
+                    status = fn_80089CA8(*(s32*)(p + GBA_STATE_PORT) + 1);
+                    if (status == 0) {
+                        status = fn_80089C84(*(s32*)(p + GBA_STATE_PORT) + 1);
+                    }
+                    if (status >= 0) {
+                        break;
+                    }
+                    fn_800A257C((void*)fn_800A13F8(), 0x10);
+                    OSYieldThread();
+                }
+                if (status == 0) {
+                    result = 12;
+                }
+            }
+            break;
+        case 13:
+            return 0;
+        }
+
+        if (status != 0) {
+            result = (state & 0xFFFF) | 0x10000;
+        }
+    }
+}
+#pragma pop
+
 /* 0x80093B04 | size: 0x48 */
 void fn_80093B04(u32 a, u32 b) {
     u32 r31;
