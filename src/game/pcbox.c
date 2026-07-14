@@ -187,43 +187,6 @@ u32 fn_801347D8(void) { return 30; }
 u32 pcboxGetNbPokemonBox(void) { return 3; }
 
 
-/* 0x801347E8 | 0x104 */
-#if 0
-asm void fn_801347E8(void) {
-#include "src/game/effect/effect_util_fn_801347E8.inc"
-}
-#else
-#pragma optimization_level 4
-s8 fn_801347E8(void* base, s8 slot) {
-    extern u8 pokemonCheckValid(void*);
-    u8* cur;
-    s8 count;
-    s8 i;
-    count = 0;
-    if (base == 0) {
-        base = (void*)savedataGetStatus(0, 3);
-    }
-    if (slot < 0 || slot >= 3) {
-        count = -1;
-    } else {
-        cur = (u8*)base + (s32)slot * 0x24a4;
-        i = 0;
-        while (i < 0x1e) {
-            if (pokemonCheckValid(cur + 0x14)) {
-                count++;
-            }
-            cur += 0x138;
-            i++;
-        }
-    }
-    if (count < 0) {
-        return -1;
-    }
-    return (s8)(0x1e - count);
-}
-#endif
-
-
 /* One box contains its name/header followed by 30 Pokemon records. */
 typedef struct PCBoxPokemonRecord {
     u8 data[0x138];
@@ -244,6 +207,53 @@ static inline u8* pcboxGetPokemonRecord(PCBoxData* base, s8 box, s8 index)
     }
     return base[box].pokemon[index].data;
 }
+
+/* 0x801347E8 | 0x104 */
+#if 0
+asm void fn_801347E8(void) {
+#include "src/game/effect/effect_util_fn_801347E8.inc"
+}
+#else
+#pragma optimization_level 4
+#pragma scheduling on
+s8 pcboxGetPokemonBoxNbEmptySlot(PCBoxData* base, s8 box) {
+    s8 index;
+    s8 count = 0;
+    u8* pokemon;
+    u8* record;
+
+    if (base == 0) {
+        base = (PCBoxData*)savedataGetStatus(0, 3);
+    }
+    if (box < 0 || box >= 3) {
+        count = -1;
+    } else {
+        index = 0;
+        pokemon = (u8*)base + (s32)box * sizeof(PCBoxData);
+        while (index < 30) {
+            if (box < 0 || box >= 3) {
+                record = 0;
+            } else if (index < 0 || index >= 30) {
+                record = 0;
+            } else {
+                record = pokemon + 0x14;
+            }
+            if (record != 0 && pokemonCheckValid(record)) {
+                count++;
+            }
+            pokemon += sizeof(PCBoxPokemonRecord);
+            index++;
+        }
+    }
+
+    if (count < 0) {
+        return -1;
+    }
+    return (s8)(30 - count);
+}
+#pragma scheduling off
+#endif
+
 
 /* 0x801348EC | 0xF0 */
 #if 0

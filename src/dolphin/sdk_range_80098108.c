@@ -246,6 +246,47 @@ BOOL fn_80098AE8(s32 chan) {
 #pragma optimization_level 0
 #pragma optimize_for_size on
 #pragma scheduling off
+BOOL EXIDeselect(s32 chan) {
+    EXIControl* exi = &lbl_803FB3C8[chan];
+    u32 csr;
+    BOOL enabled;
+
+    enabled = OSDisableInterrupts();
+    if (!(exi->state & 4)) {
+        OSRestoreInterrupts(enabled);
+        return FALSE;
+    }
+
+    exi->state &= ~4;
+    csr = __EXIRegs[chan * 5];
+    __EXIRegs[chan * 5] = csr & 0x405;
+
+    if (exi->state & 8) {
+        switch (chan) {
+        case 0:
+            __OSUnmaskInterrupts(0x100000);
+            break;
+        case 1:
+            __OSUnmaskInterrupts(0x20000);
+            break;
+        }
+    }
+
+    OSRestoreInterrupts(enabled);
+
+    if (chan != 2 && (csr & 0x80)) {
+        return fn_80098790(chan) ? TRUE : FALSE;
+    }
+
+    return TRUE;
+}
+#pragma scheduling reset
+#pragma pop
+
+#pragma push
+#pragma optimization_level 0
+#pragma optimize_for_size on
+#pragma scheduling off
 void fn_80098DDC(volatile s16 interrupt, OSContext* context) {
     OSContext exceptionContext;
     s32 chan = (interrupt - 9) / 3;

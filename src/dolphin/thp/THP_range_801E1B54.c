@@ -196,7 +196,7 @@ static void __THPAudioInitialize(THPAudioDecodeInfo *info, u8 *ptr);
  * matched, not owned by this unit):
  *   fn_8009F1D0/fn_8009F230/fn_8009F2F8 - src/dolphin/os/OSMemory.c
  *   fn_800AA2F0 - GXSetViewport (src/game/gs_render.c)
- *   fn_800A8850 - AIStopDMA (src/game/main.c)
+ *   fn_800A8850 - VISetPostRetraceCallback
  *   fn_8014E9B4/fn_8014EE40 - MusyX stream update/start (src/musyx/runtime/stream.c)
  * ------------------------------------------------------------- */
 
@@ -781,8 +781,9 @@ typedef struct THPActivePlayer {
     u8 playFlags;
     u8 hasAudio;
     s32 dvdError;
-    s32 audioError;
-    u8 padB0[0x10];
+    s32 videoError;
+    BOOL isOnMemory;
+    u8 padB4[0x0C];
     u32 frameOffset;
     u32 fieldC4;
     u64 frameCounter;
@@ -796,12 +797,17 @@ typedef struct THPActivePlayer {
     u32 pendingFrame;
 } THPActivePlayer;
 
+#define THP_ACTIVE_PLAYER (*(THPActivePlayer *)lbl_8046AC60)
+
 extern void (*lbl_8047B46C)(void);
 extern const f32 lbl_8047E4A8;
+extern void (*fn_800A8850(void (*callback)(void)))(void);
+extern void DVDCancel(void *fileInfo);
 extern u32 fn_800AA2F0(void);
 extern u32 VIGetTvFormat(void);
 extern u32 sndStreamActivate(u32 stream);
 extern void sndStreamDeactivate(u32 stream);
+extern void sndStreamFree(u32 stream);
 
 static inline BOOL thpActivateStreams(void)
 {
@@ -851,7 +857,7 @@ void fn_801E3A50(void)
     if (player->isOpen == 0 || player->state != 2) {
         return;
     }
-    if (player->dvdError != 0 || player->audioError != 0) {
+    if (player->dvdError != 0 || player->videoError != 0) {
         player->state = 5;
         player->internalState = 5;
         return;
@@ -957,6 +963,41 @@ decoded:
     }
 }
 
+#pragma push
+#pragma dont_inline on
+void fn_801E3F54(void)
+{
+    u32 message;
+
+    if (THP_ACTIVE_PLAYER.isOpen && THP_ACTIVE_PLAYER.state != 0) {
+        THP_ACTIVE_PLAYER.internalState = 0;
+        THP_ACTIVE_PLAYER.state = 0;
+        fn_800A8850(lbl_8047B46C);
+        if (THP_ACTIVE_PLAYER.isOnMemory == 0) {
+            DVDCancel(&THP_ACTIVE_PLAYER);
+            fn_801E1D0C();
+        }
+
+        fn_801E5400();
+        if (THP_ACTIVE_PLAYER.hasAudio) {
+            sndStreamFree(lbl_80478D00);
+            lbl_80478D00 = (u32)-1;
+            if (lbl_80478D04 != (u32)-1) {
+                sndStreamFree(lbl_80478D04);
+                lbl_80478D04 = (u32)-1;
+            }
+            fn_801E4DAC();
+        }
+
+        while (fn_8009F2F8(lbl_8046A494, &message, 0) == TRUE ? message : 0) {
+        }
+
+        THP_ACTIVE_PLAYER.dvdError = 0;
+        THP_ACTIVE_PLAYER.videoError = 0;
+    }
+}
+#pragma pop
+
 typedef struct THPAudioDmaState {
     u64 markers[5];
     s32 readMarker;
@@ -977,7 +1018,6 @@ u32 fn_801E260C(s16 *dmaBuffer, u32 firstLength, u32 unused,
 extern void fn_8014E9B4(u32 stream, u32 offset, u32 samples, u32 arg3,
                         u32 arg4);
 extern u32 fn_8014EE40();
-extern void sndStreamFree(u32 stream);
 
 #pragma push
 #pragma inline_depth(8)
