@@ -2131,7 +2131,7 @@ void EraseCallback_800C216C(s32 chan, s32 result) {
     u32 scratch[2];
 
     if (result >= 0) {
-        dir = card->dirBlock;
+        dir = __CARDGetDirBlock(card);
         addr = card->sectorSize * (((u32)dir - (u32)card->workArea) >> 13);
         result = fn_800B19A4(chan, addr, 0x2000, dir, WriteCallback_800C209C);
         if (result >= 0) {
