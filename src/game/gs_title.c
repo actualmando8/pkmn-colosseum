@@ -207,7 +207,7 @@ extern void  winMsgClose(s32 wait);
 extern void  fn_801EF644(s32 result);
 
 /* Math */
-extern f32   GSmodelGetAnimFrame(void);               /* Get distance */
+extern f32   GSmodelGetAnimFrame(void* model);        /* Get distance */
 extern f64 sin(f32);
 
 /* Named asm symbols (used in inline asm .inc files) */
@@ -253,6 +253,11 @@ extern u8 lbl_8047A32C;
 extern void* lbl_8047A330;
 extern s32 lbl_8047A314;
 extern void* lbl_8047A324;
+extern s32 lbl_8047A31C;
+extern s32 lbl_8047A320;
+extern s32 lbl_8047A328;
+extern s32 lbl_8047A33C;
+extern f32 lbl_8047A340;
 extern f32 lbl_8047A344;
 extern u32 lbl_80478878;
 extern u8 lbl_803A1F88[];
@@ -263,6 +268,8 @@ extern f32 lbl_8047B854;
 extern f32 lbl_8047B858;
 extern f32 lbl_8047B85C;
 extern f32 lbl_8047B860;
+extern u32 lbl_8047B808;
+extern u32 lbl_8047B80C;
 extern void* fn_800FF560(void);
 
 /* Forward declarations for same-TU callees used before their definitions. */
@@ -308,6 +315,43 @@ void fn_8002049C(void) {
  * Address:  0x800203B4
  * Size:     0xE8
  * ========================================================================= */
+
+void fn_800203B4(void) {
+    for (;;) {
+        if (lbl_8047A31C == 0x28) {
+            floorLink(0x39c, 0);
+            lbl_8047A31C = 0x3e8;
+            continue;
+        }
+
+        if (lbl_8047A320 == 0 && lbl_8047A324 != NULL) {
+            s32 phase;
+
+            lbl_8047A340 += lbl_8047A344;
+            phase = lbl_8047A33C;
+
+            if (phase < 2 && lbl_8047A328 == 0) {
+                u32 frames[2];
+                f32 threshold;
+
+                frames[0] = lbl_8047B808;
+                frames[1] = lbl_8047B80C;
+                threshold = *(f32*)&frames[phase];
+
+                if (GSmodelGetAnimFrame(lbl_8047A324) >= threshold) {
+                    if (lbl_8047A33C == 0) {
+                        fn_80166AB8(0x46e, 0, 0);
+                    } else {
+                        fn_801669E4(0x46e, 0, 0);
+                    }
+                    lbl_8047A33C++;
+                }
+            }
+        }
+
+        _threadSwitch();
+    }
+}
 
 /* =========================================================================
  * Function: GStitle_Cleanup
