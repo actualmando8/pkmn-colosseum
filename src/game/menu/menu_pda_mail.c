@@ -513,17 +513,22 @@ typedef struct PdaMailSpriteField {
 
 extern const s32 lbl_802672D8[6];
 
+#pragma peephole off
+#pragma scheduling off
 s32 fn_8004DA64(PdaMailWindowC* window, PdaMailSpriteField* field)
 {
-    s32 value0 = lbl_802672D8[0];
-    s32 value1 = lbl_802672D8[1];
-    s32 value2 = lbl_802672D8[2];
-    s32 value3 = lbl_802672D8[3];
-    s32 value4 = lbl_802672D8[4];
+    s32* statePtr = window->field_0x60;
+    const s32* values = lbl_802672D8;
+    s32 state = *statePtr;
+    s32 value0 = values[0];
+    s32 value1 = values[1];
+    s32 value2 = values[2];
+    s32 value3 = values[3];
+    s32 value4 = values[4];
     s32 i;
     u8 visible;
 
-    if (*window->field_0x60 != 0) {
+    if (state != 0) {
         visible = 0;
     } else {
         i = 0;
@@ -554,6 +559,8 @@ s32 fn_8004DA64(PdaMailWindowC* window, PdaMailSpriteField* field)
     winSpriteSetDisp(field, visible);
     return 0;
 }
+#pragma scheduling reset
+#pragma peephole reset
 
 /* mailGetAttachFileGroup (battle_waza.c): "Waza entry get field 0x18 by index". */
 extern u32 mailGetAttachFileGroup(s32 idx);

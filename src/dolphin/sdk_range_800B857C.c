@@ -725,29 +725,20 @@ void fn_800B9874(u32 value) {
     p->field_1FC = (p->field_1FC & ~2U) | (out1 << 1);
 }
 
-u32 fn_800B9B14(f32 scale) {
-    u32 yScale;
-    u32 height;
+static inline u32 gxGetNumXfbLines(u32 height, u32 scale) {
+    u32 count;
     u32 result;
-    u32 divisor;
-    u8 nonUnityScale;
-    GXData_800B857C* p;
+    u32 scaleDivisor;
 
-    yScale = __cvt_fp2unsigned(256.0F / scale) & 0x1FF;
-    p = gx;
-    GX_BP_REG(0x4E000000 | yScale);
-    p->field_002 = 0;
-    nonUnityScale = (yScale != 0x100);
-    p->field_1EC = (p->field_1EC & ~0x400U) | (nonUnityScale << 10);
+    count = (height - 1) * 0x100;
+    result = (count / scale) + 1;
+    scaleDivisor = scale;
 
-    height = ((p->field_1E4 >> 10) & 0x3FF) + 1;
-    result = (((height - 1) << 8) / yScale) + 1;
-    if (yScale > 0x80 && yScale < 0x100) {
-        divisor = yScale;
-        while ((divisor & 1) == 0) {
-            divisor >>= 1;
+    if (scaleDivisor > 0x80 && scaleDivisor < 0x100) {
+        while ((scaleDivisor & 1) == 0) {
+            scaleDivisor >>= 1;
         }
-        if ((height % divisor) == 0) {
+        if ((height % scaleDivisor) == 0) {
             result++;
         }
     }
@@ -755,6 +746,21 @@ u32 fn_800B9B14(f32 scale) {
         result = 0x400;
     }
     return result;
+}
+
+u32 fn_800B9B14(f32 scale) {
+    u32 yScale;
+    u8 nonUnityScale;
+    u32 height;
+    GXData_800B857C* p = gx;
+
+    yScale = __cvt_fp2unsigned(256.0F / scale) & 0x1FF;
+    GX_BP_REG(0x4E000000 | yScale);
+    p->field_002 = 0;
+    nonUnityScale = (yScale != 0x100);
+    p->field_1EC = (p->field_1EC & ~0x400U) | (nonUnityScale << 10);
+    height = ((p->field_1E4 >> 10) & 0x3FF) + 1;
+    return gxGetNumXfbLines(height, yScale);
 }
 
 typedef struct GXColor_800B9BDC {
