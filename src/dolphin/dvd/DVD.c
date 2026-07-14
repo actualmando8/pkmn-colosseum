@@ -80,10 +80,13 @@ extern s32 lbl_8047A81C;
 extern BOOL lbl_8047A7FC;
 extern void (*lbl_8047A82C)(DVDCommandBlock* block);
 extern void fn_800A59CC(u32 intType);
+extern void fn_800A5C60(u32 intType);
 extern void fn_800A5CC8(u32 intType);
 extern void fn_800A5D60(void);
 extern void fn_800A6028(u32 intType);
+extern void fn_800A640C(void);
 extern void fn_800A6508(u32 intType);
+extern void fn_800A6578(void);
 extern void fn_800A48DC(void (*callback)(u32));
 extern void stateCheckID2(DVDCommandBlock* block);
 extern void DVDChangeDisk(DVDCommandBlock* block, DVDDiskID* id);
@@ -770,6 +773,7 @@ static void cbForStateError(u32 intType) {
     }
 }
 
+/* Keep the externally used copy out of line; earlier callbacks call it. */
 #pragma dont_inline on
 /* 0x800A58BC | size: 0x34 */
 void stateTimeout(void)
@@ -779,6 +783,117 @@ void stateTimeout(void)
     cbForStateError(0);
 }
 #pragma dont_inline reset
+
+static inline void dvdStateTimeoutForGettingError(void)
+{
+    __DVDStoreErrorCode(0x1234568);
+    DVDReset();
+    cbForStateError(0);
+}
+
+static inline BOOL dvdCheckCancelForGettingError(u32 resume)
+{
+    DVDCommandBlock* finished;
+
+    if (lbl_8047A808 != 0) {
+        *(volatile u32*)&ResumeFromHere_8047A810 = resume;
+        *(volatile u32*)&lbl_8047A808 = 0;
+        finished = executing_8047A7E8;
+        executing_8047A7E8 = &DummyCommandBlock_803FC3A0;
+        finished->state = 10;
+        if (finished->callback != NULL) {
+            finished->callback(-3, finished);
+        }
+        if (lbl_8047A80C != NULL) {
+            lbl_8047A80C(0, finished);
+        }
+        stateReady_800A6684();
+        return TRUE;
+    }
+    return FALSE;
+}
+
+/* 0x800A59CC | size: 0x294 */
+#pragma push
+#pragma inline_depth(1)
+void fn_800A59CC(u32 intType)
+{
+    u32 error;
+    u32 status;
+    u32 errorCategory;
+    u32 resume;
+
+    if (intType == 0x10) {
+        executing_8047A7E8->state = -1;
+        dvdStateTimeoutForGettingError();
+        return;
+    }
+
+    if (intType & 2) {
+        executing_8047A7E8->state = -1;
+        __DVDStoreErrorCode(0x1234567);
+        DVDLowStopMotor(cbForStateError);
+        return;
+    }
+
+    error = __DIRegs[8];
+    status = error & 0xFF000000;
+    errorCategory = CategorizeError(error);
+
+    if (errorCategory == 1) {
+        executing_8047A7E8->state = -1;
+        __DVDStoreErrorCode(error);
+        DVDLowStopMotor(cbForStateError);
+        return;
+    }
+
+    if (errorCategory == 2 || errorCategory == 3) {
+        resume = 0;
+    } else if (status == 0x01000000) {
+        resume = 4;
+    } else if (status == 0x02000000) {
+        resume = 6;
+    } else if (status == 0x03000000) {
+        resume = 3;
+    } else {
+        resume = 5;
+    }
+
+    if (dvdCheckCancelForGettingError(resume)) {
+        return;
+    }
+
+    if (errorCategory == 2) {
+        __DVDStoreErrorCode(error);
+        fn_800A5D60();
+        return;
+    }
+
+    if (errorCategory == 3) {
+        if ((error & 0x00FFFFFF) == 0x00031100) {
+            DVDLowSeek(executing_8047A7E8->offset, fn_800A5C60);
+        } else {
+            lbl_8047A82C(executing_8047A7E8);
+        }
+        return;
+    }
+
+    if (status == 0x01000000) {
+        executing_8047A7E8->state = 5;
+        fn_800A6578();
+    } else if (status == 0x02000000) {
+        executing_8047A7E8->state = 3;
+        fn_800A640C();
+    } else if (status == 0x03000000) {
+        executing_8047A7E8->state = 4;
+        fn_800A6578();
+    } else {
+        executing_8047A7E8->state = -1;
+        __DVDStoreErrorCode(0x1234567);
+        DVDLowStopMotor(cbForStateError);
+    }
+}
+#pragma pop
 
 void fn_800A6578(void)
 {
