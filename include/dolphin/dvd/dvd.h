@@ -51,6 +51,7 @@ typedef struct DVDFileInfo {
 /* DVD functions */
 void DVDInit(void);
 BOOL DVDReadDiskID(DVDCommandBlock* block, DVDDiskID* diskID, DVDCBCallback callback);
+BOOL DVDCancelStreamAsync(DVDCommandBlock* block, DVDCBCallback callback);
 BOOL DVDInquiryAsync(DVDCommandBlock* block, DVDDriveInfo* info, DVDCBCallback callback);
 void DVDReset(void);
 s32 DVDGetDriveStatus(void);

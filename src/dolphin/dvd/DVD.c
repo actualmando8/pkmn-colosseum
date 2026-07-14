@@ -316,6 +316,19 @@ BOOL DVDReadDiskID(DVDCommandBlock* block, DVDDiskID* diskID, DVDCBCallback call
 }
 
 /*
+ * DVDCancelStreamAsync - Queue cancellation of the current audio stream
+ * 0x800A7558 | size: 0xBC
+ */
+BOOL DVDCancelStreamAsync(DVDCommandBlock* block, DVDCBCallback callback) {
+    BOOL idle;
+
+    block->command = 7;
+    block->callback = callback;
+    idle = issueCommand(1, block);
+    return idle;
+}
+
+/*
  * DVDInquiryAsync - Send an inquiry command to the DVD drive
  * 0x800A7614 | size: 0xD0
  */
