@@ -57,6 +57,55 @@ s32 GScolsys2UnloadCCD(void) {
     return 1;
 }
 
+typedef struct ColRecordVector {
+    u32 x;
+    u32 y;
+    u32 z;
+} ColRecordVector;
+
+typedef struct ColSourceRecord {
+    ColRecordVector vector[3];
+    u8 pad_24[0x1C];
+} ColSourceRecord;
+
+typedef struct ColSourceDescriptor {
+    ColSourceRecord* records;
+    u32 count;
+} ColSourceDescriptor;
+
+typedef struct ColLayerRecord {
+    ColRecordVector vector[3];
+    u16 flags;
+    u8 pad_26[2];
+} ColLayerRecord;
+
+/* 0x8010CD6C | 0x98 */
+void fn_8010CD6C(void)
+{
+    ColSourceDescriptor* descriptor;
+    u32 i;
+    ColSourceRecord* source;
+    ColLayerRecord* destination;
+
+    descriptor = COL_STATE->wzxDataPtr;
+    if (descriptor == NULL) {
+        return;
+    }
+
+    i = 0;
+    source = descriptor->records;
+    destination = COL_LAYER_PTR(COL_LAYER_IDX);
+    while (i < descriptor->count) {
+        destination->vector[0] = source->vector[0];
+        destination->vector[1] = source->vector[1];
+        destination->vector[2] = source->vector[2];
+        destination->flags = 0;
+        i++;
+        source++;
+        destination++;
+    }
+}
+
 /* 0x8010D038 | 0x2C */
 s32 fn_8010D038(void) {
     s32 layer;

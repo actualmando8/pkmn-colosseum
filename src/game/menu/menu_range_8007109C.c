@@ -513,7 +513,7 @@ void menuCB_InitMenu(s32 id) {
 #pragma pop
 
 #pragma push
-#pragma scheduling off
+#pragma peephole off
 s32 fn_80071E34(s32 chan, void* data) {
     extern s32 fn_80071EA4(s32 chan, void* data);
     s32 keyChannel;
