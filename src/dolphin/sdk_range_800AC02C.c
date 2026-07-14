@@ -1999,6 +1999,10 @@ s32 fn_800B19A4(s32 chan, u32 addr, u32 length, void* buffer, CARDCallback callb
 }
 #pragma dont_inline off
 
+void* __CARDGetFatBlock(CARDControl* card) {
+    return card->fatBlock;
+}
+
 void WriteCallback_800C1C98(s32 chan, s32 result) {
     CARDControl* card = &lbl_803FC620[chan];
     CARDCallback callback;
@@ -2035,7 +2039,7 @@ void EraseCallback_800C1D6C(s32 chan, s32 result) {
     u32 scratch[2];
 
     if (result >= 0) {
-        fat = card->fatBlock;
+        fat = __CARDGetFatBlock(card);
         addr = card->sectorSize * (((u32)fat - (u32)card->workArea) >> 13);
         result = fn_800B19A4(chan, addr, 0x2000, fat, WriteCallback_800C1C98);
         if (result >= 0) {
@@ -2131,7 +2135,7 @@ void EraseCallback_800C216C(s32 chan, s32 result) {
     u32 scratch[2];
 
     if (result >= 0) {
-        dir = card->dirBlock;
+        dir = __CARDGetDirBlock(card);
         addr = card->sectorSize * (((u32)dir - (u32)card->workArea) >> 13);
         result = fn_800B19A4(chan, addr, 0x2000, dir, WriteCallback_800C209C);
         if (result >= 0) {
@@ -2440,10 +2444,6 @@ s32 CARDGetResultCode(s32 chan) {
     }
     card = &lbl_803FC620[chan];
     return card->result;
-}
-
-void* __CARDGetFatBlock(CARDControl* card) {
-    return card->fatBlock;
 }
 
 BOOL __CARDCompareFileName(CARDDirEntry* entry, char* fileName) {

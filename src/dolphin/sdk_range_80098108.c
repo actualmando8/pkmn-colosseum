@@ -280,7 +280,7 @@ void fn_80098FF8(volatile s16 interrupt, OSContext* context) {
     EXICallback callback;
 
     __OSMaskInterrupts(0x700000u >> (chan * 3));
-    ((volatile u32*)0xCC006800)[chan * 5] = 0;
+    __EXIRegs[chan * 5] = 0;
     exi = &lbl_803FB3C8[chan];
     callback = exi->extCallback;
     exi->state &= ~8;
