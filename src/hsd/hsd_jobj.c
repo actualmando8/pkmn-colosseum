@@ -2552,6 +2552,38 @@ f32* fn_801A1980(HSD_JObj* jobj) {
 #endif
 #pragma pop
 
+/* 0x801A1988 | 0x78 */
+#pragma push
+#pragma optimization_level 1
+static inline s32 JObjMtxIsDirtyForSetup(HSD_JObj* jobj)
+{
+    extern char lbl_8047DB34;
+    extern char lbl_8047DB3C;
+    s32 dirty;
+
+    if (!jobj) {
+        __assert(&lbl_8047DB34, 0x25d, &lbl_8047DB3C);
+    }
+    dirty = 0;
+    if (!(jobj->flags & JOBJ_USER_DEF_MTX)) {
+        if (jobj->flags & JOBJ_MTX_DIRTY) {
+            dirty = 1;
+        }
+    }
+    return dirty;
+}
+
+void fn_801A1988(HSD_JObj* jobj)
+{
+    extern void fn_8019D9DC(HSD_JObj*);
+
+    if (jobj == NULL || !JObjMtxIsDirtyForSetup(jobj)) {
+        return;
+    }
+    fn_8019D9DC(jobj);
+}
+#pragma pop
+
 /* 0x801A1B7C | 0x3B0 */
 typedef struct JObjAnimClassInfo {
     HSD_ClassInfo parent;
