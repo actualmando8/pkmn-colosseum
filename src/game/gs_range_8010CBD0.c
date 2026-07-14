@@ -131,6 +131,36 @@ s32 fn_8010D038(void) {
     return 1;
 }
 
+/* 0x8010D064 | 0x10C */
+s32 fn_8010D064(void)
+{
+    s32 newLayer;
+    u8* layerBase;
+    s32 block;
+
+    newLayer = COL_LAYER_IDX + 1;
+    if (newLayer >= GSCOLSYS_MAX_LAYERS) {
+        return 0;
+    }
+
+    layerBase = (u8*)COL_STATE + newLayer * GSCOLSYS_LAYER_SIZE;
+    COL_STATE->wzxDataPtr = NULL;
+
+    for (block = 0; block < 3; block++) {
+        u16* flag;
+        u32 i;
+
+        for (i = 0; i < 16; i++) {
+            flag = (u16*)(layerBase + 0xA14 + i * 0x14);
+            *flag &= (u16)~1;
+        }
+        layerBase += 0x140;
+    }
+
+    COL_LAYER_IDX = newLayer;
+    return 1;
+}
+
 /* 0x8010D170 | 0x9C */
 void fn_8010D170(void)
 {
