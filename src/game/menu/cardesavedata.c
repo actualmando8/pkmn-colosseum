@@ -1011,6 +1011,39 @@ void fn_80084038(u8* window)
 
 #pragma peephole on
 
+#pragma push
+#pragma peephole off
+/* Run the Card-e transfer UI while temporarily reserving controller port 1. */
+s32 fn_800849B4(s32 mode, s32 command, void* input, void* output)
+{
+    extern void fn_80093698(s32);
+    extern u8 fn_80084A8C();
+    extern void menuCloseCustom(s32, s32, s32);
+    extern u8 menuIsCheck(s32);
+    extern u8 menuSetEnablePort(u8);
+    extern void winMsgClose(s32);
+    u8 previousPort;
+    u8 succeeded;
+    s32 port;
+
+    previousPort = menuSetEnablePort(1);
+    succeeded = fn_80084A8C(mode, command, input, output);
+    winMsgClose(0);
+    if (menuIsCheck(0xE4) != 0) {
+        menuCloseCustom(0xE4, 0, 1);
+    }
+    menuSetEnablePort(previousPort);
+    for (port = 0; port < 3; port++) {
+        fn_80093698(port);
+    }
+
+    if (succeeded != 0) {
+        return 0;
+    }
+    return -1;
+}
+#pragma pop
+
 /* 0x80084A8C | size: 0x305C */
 void fn_80084A8C(void) {
     extern void fn_80087AE8();

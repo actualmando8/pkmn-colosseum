@@ -808,7 +808,7 @@ extern u8 lbl_804655B4[];
 extern u8 lbl_8047B350;
 extern u8 lbl_8047B351;
 extern s32 lbl_8047B34C;
-extern u32 lbl_8047B358;
+extern s32 lbl_8047B358;
 extern u32 lbl_8047B370;
 
 /* GObj system globals */
@@ -2833,4 +2833,41 @@ void fn_801B3884(void) {
 void fn_801B3890(void) {
     fn_800B884C((u32)(u8)lbl_8047B358);
     lbl_8047B358 = 0;
+}
+
+static inline s32 HSD_TexCoordID2Num(s32 coord)
+{
+    switch (coord) {
+    case 0:
+        return 1;
+    case 1:
+        return 2;
+    case 2:
+        return 3;
+    case 3:
+        return 4;
+    case 4:
+        return 5;
+    case 5:
+        return 6;
+    case 6:
+        return 7;
+    case 7:
+        return 8;
+    case 0xFF:
+        return 0;
+    default:
+        __assert((const char*)&lbl_8047DE60, 0x453,
+                 (const char*)&lbl_8047DE68);
+        return 0;
+    }
+}
+
+void HSD_StateRegisterTexGen(s32 coord)
+{
+    s32 num = HSD_TexCoordID2Num(coord);
+
+    if (num > lbl_8047B358) {
+        lbl_8047B358 = num;
+    }
 }

@@ -1368,7 +1368,7 @@ extern void cbTsureFriend__Fl15FootStepCounterl(void);
 extern void heroMoveSetLockFrame(s32 val);
 extern void heroMoveAddAutoEvent(u32 a, u32 b, u32 c, u32 d, u32 e);
 extern void heroMoveSetEventList(u8 type, void* src, u32 val);
-extern u32 fn_8012BDE0(u32 r3, u32 r4);
+extern s32 heroMoveAddStepCallback(void (*callback)(void), s32 count);
 extern u32 heroMoveSetNeckMode(s32 idx, s32 state);
 extern u32 heroMoveIsMember(s32 idx);
 extern s32 heroMoveDismissMember(s32 idx);
@@ -2123,62 +2123,49 @@ asm void fn_8012BDE0(void) {
 #else
 #pragma push
 #pragma optimization_level 1
-u32 fn_8012BDE0(u32 r3, u32 r4) {
-    u32 r0 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    r5 = (u32)&lbl_80426BD0;
-    r7 = 0x0;
-    r0 = *(u32*)((u8*)r5 + 0x140);
-    if (r0 != (u32)0x0) {
-        r5 = r5 + 0x8;
-        r7 = 0x1;
-        r0 = *(u32*)((u8*)r5 + 0x140);
-        if (r0 != (u32)0x0) {
-            r0 = *(u32*)((u8*)r5 + 0x148);
-            r7 = 0x2;
-            r5 = r5 + 0x8;
-            if (r0 != (u32)0x0) {
-                r0 = *(u32*)((u8*)r5 + 0x148);
-                r7 = 0x3;
-                r5 = r5 + 0x8;
-                if (r0 != (u32)0x0) {
-                    r0 = *(u32*)((u8*)r5 + 0x148);
-                    r7 = 0x4;
-                    r5 = r5 + 0x8;
-                    if (r0 != (u32)0x0) {
-                        r0 = *(u32*)((u8*)r5 + 0x148);
-                        r7 = 0x5;
-                        r5 = r5 + 0x8;
-                        if (r0 != (u32)0x0) {
-                            r0 = *(u32*)((u8*)r5 + 0x148);
-                            r7 = 0x6;
-                            r5 = r5 + 0x8;
-                            if (r0 != (u32)0x0) {
-                                r0 = *(u32*)((u8*)r5 + 0x148);
-                                r7 = 0x7;
-                                if (r0 != (u32)0x0) {
-                                    r7 = 0x8;
+s32 heroMoveAddStepCallback(void (*callback)(void), s32 count) {
+    u32 entry;
+    s32 i = 0;
+
+    entry = (u32)&lbl_80426BD0;
+    if (*(void**)(entry + 0x140) != NULL) {
+        entry += 8;
+        i = 1;
+        if (*(void**)(entry + 0x140) != NULL) {
+            entry += 8;
+            i = 2;
+            if (*(void**)(entry + 0x140) != NULL) {
+                entry += 8;
+                i = 3;
+                if (*(void**)(entry + 0x140) != NULL) {
+                    entry += 8;
+                    i = 4;
+                    if (*(void**)(entry + 0x140) != NULL) {
+                        entry += 8;
+                        i = 5;
+                        if (*(void**)(entry + 0x140) != NULL) {
+                            entry += 8;
+                            i = 6;
+                            if (*(void**)(entry + 0x140) != NULL) {
+                                entry += 8;
+                                i = 7;
+                                if (*(void**)(entry + 0x140) != NULL) {
+                                    i = 8;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
+    if (i >= 8) {
+        return -1;
     }
-    }
-    }
-    }
-    }
-    }
-    }
-    if ((s32)r7 >= (s32)0x8) {
-        return (u32)-0x1;
-    }
-    r5 = (u32)&lbl_80426BD0;
-    r6 = r7 << 3;
-    r0 = (u32)&lbl_80426BD0;
-    r5 = r0 + r6;
-    *(u32*)((u8*)r5 + 0x140) = r3;
-    r3 = r7;
-    *(u32*)((u8*)r5 + 0x144) = r4;
-    return r3;
+    entry = (u32)&lbl_80426BD0 + i * 8;
+    *(void**)(entry + 0x140) = callback;
+    *(s32*)(entry + 0x144) = count;
+    return i;
 }
 #pragma pop
 #endif
