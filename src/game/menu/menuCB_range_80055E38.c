@@ -31,6 +31,40 @@ extern s32 menuCloseCustom(s32 menuId, s32 mode, s32 wait);
 
 /* ===== Function implementations ===== */
 
+#pragma push
+#pragma peephole off
+/* 0x80055EB8 | 0xD0 */
+u32 fn_80055EB8(s8* ctx, u8* p) {
+    extern s32 fn_80057A08(void);
+    extern void* windowSearchID(s32);
+    extern s32 fn_80055194(u32*, s32);
+    extern void fn_80057094(s16*, s16*);
+    extern void winSpriteSetDisp(void*, u32);
+    extern u8 lbl_802EF0A8[];
+    u8 result;
+    u32 out;
+    s16 x;
+    s16 y;
+
+    result = 0;
+    if (fn_80057A08() != 0) {
+        ctx = (s8*)windowSearchID(0x93);
+        if (ctx != 0) {
+            if (fn_80055194(&out, ctx[0x95]) == 0) {
+                result = 1;
+                fn_80057094(&x, &y);
+                *(s16*)(p + 0x50) =
+                    (s16)(x + *(s16*)(lbl_802EF0A8 + *(s16*)(p + 6) * 0x1c + 2));
+                *(s16*)(p + 0x52) =
+                    (s16)(y + *(s16*)(lbl_802EF0A8 + *(s16*)(p + 6) * 0x1c + 4));
+            }
+        }
+    }
+    winSpriteSetDisp(p, result);
+    return 0;
+}
+#pragma pop
+
 u32 fn_80056A78(void) {
     return lbl_8047A584;
 }

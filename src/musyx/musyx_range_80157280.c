@@ -3576,10 +3576,10 @@ u32 salInitAi(u32(*fnptr)(void), u32 d, u32 a) {
     if (lbl_8047B09C != 0) {
         memset((void*)lbl_8047B09C, 0, 0xA00);
         DCFlushRange((void*)lbl_8047B09C, 0xA00);
-        lbl_8047B098 = 1;
-        lbl_8047B094 = 0;
         lbl_8047B0A0 = 1;
-        lbl_8047B090 = 0;
+        *(volatile u32*)&lbl_8047B094 = 0;
+        *(volatile u32*)&lbl_8047B098 = 1;
+        *(volatile u32*)&lbl_8047B090 = 0;
         lbl_8047B0A4 = (u32)fnptr;
         AIRegisterDMACallback((u32)salCallback);
         AIInitDMA((u8*)(lbl_8047B09C + 0x80000000u) + (u32)lbl_8047B0A0 * 0x280, 0x280);
