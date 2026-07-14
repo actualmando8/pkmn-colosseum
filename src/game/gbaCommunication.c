@@ -4176,6 +4176,105 @@ void fn_8008C7B0(u32 ctx) {
     fn_800FF58C(1);
     floorSetFadeScript(0, 0);
 }
+/* 0x800932F0 | size: 0x1F4 */
+#pragma push
+#pragma peephole off
+s32 fn_800932F0(s32 channel, const char* primary, const char* secondary)
+{
+    extern u32 fn_800E2C04(u32 size, u32 align);
+    extern void* fn_800E27B0(u32 handle);
+    extern void fn_8009F77C(void* work);
+    extern void fn_8009F9C8(void* callback);
+    extern s32 fn_800937F4(void* arg);
+    extern void fn_80093B04(u32 a, u32 b);
+    extern void OSCreateThread(void* thread, void* entry, void* arg,
+                               void* stack, u32 stackSize, s32 priority,
+                               u16 attributes);
+    extern void OSResumeThread(void* thread);
+    extern u32 strlen(const char* string);
+    extern char* strcpy(char* dst, const char* src);
+    extern void* memset(void* dst, int value, u32 size);
+
+    u32 slot;
+    u32 handle;
+    u32 primaryLength;
+    u32 secondaryLength;
+    u8* allocated;
+    u8* work;
+    s32 started;
+    s32 commandStarted;
+    u8* commandWork;
+
+    if (channel < 0 || channel > 3) {
+        started = 0;
+    } else {
+        slot = (u32)channel << 2;
+        if (*(u8**)(lbl_803FB328 + slot) != NULL) {
+            started = 1;
+        } else {
+            handle = fn_800E2C04(0x44A0, 0x20);
+            if ((handle & 0xFFFF) == 0) {
+                __assert(lbl_8026F5A8, 0x1DD, &lbl_8047C1E8);
+            }
+            allocated = fn_800E27B0(handle);
+            memset(allocated, 0, 0x4490);
+            *(u8**)(lbl_803FB328 + slot) = allocated;
+
+            work = *(u8**)(lbl_803FB328 + slot);
+            *(u32*)(work + GBA_STATE_PHASE) = 0;
+            *(s32*)(work + GBA_STATE_PORT) = channel;
+            fn_800716C8(channel, work + GBA_DATA_OFFSET, fn_80093B04);
+            fn_8009F77C(work);
+            fn_8009F9C8(work + 0x18);
+            OSCreateThread(work + GBA_DATA_OFFSET, fn_800937F4, work,
+                           work + GBA_STATE_PORT, 0x4000,
+                           GBA_THREAD_PRIORITY, 0);
+            OSResumeThread(work + GBA_DATA_OFFSET);
+            started = 1;
+        }
+    }
+
+    if (started == 0) {
+        return 0;
+    }
+
+    commandWork = *(u8**)(lbl_803FB328 + ((u32)channel << 2));
+    commandStarted = 0;
+    primaryLength = strlen(primary);
+    if (secondary != NULL) {
+        secondaryLength = strlen(secondary);
+    } else {
+        secondaryLength = 0;
+    }
+
+    if (primaryLength >= 0x7F || secondaryLength >= 0x7F) {
+        commandStarted = 0;
+        goto done;
+    }
+
+    fn_8009F7B4(commandWork);
+    if (*(s32*)(commandWork + GBA_STATE_PHASE) == 0) {
+        commandStarted++;
+        *(s32*)(commandWork + GBA_STATE_PHASE) = commandStarted;
+        *(u32*)(commandWork + GBA_STATE_TIMEOUT) = 0x30001;
+        strcpy((char*)(commandWork + 0x4344), primary);
+        if (secondary != NULL) {
+            strcpy((char*)(commandWork + 0x43C4), secondary);
+        } else {
+            commandWork[0x43C4] = 0;
+        }
+    }
+    fn_8009F890(commandWork);
+    fn_800A257C(commandWork + GBA_DATA_OFFSET, GBA_THREAD_PRIORITY);
+    if (commandStarted != 0) {
+        fn_8009FABC(commandWork + 0x18);
+    }
+
+done:
+    return commandStarted;
+}
+#pragma pop
+
 /* 0x800934E4 | size: 0x90 */
 s32 fn_800934E4(s32 channel)
 {
