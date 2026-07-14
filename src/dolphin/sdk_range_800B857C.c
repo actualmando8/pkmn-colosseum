@@ -78,6 +78,234 @@ extern u32 __cvt_fp2unsigned(f32 value);
         GX_FIFO_U32 = (reg); \
     } while (0)
 
+typedef enum GXTexCoordID_800B857C {
+    GX_TEXCOORD0_800B857C,
+    GX_TEXCOORD1_800B857C,
+    GX_TEXCOORD2_800B857C,
+    GX_TEXCOORD3_800B857C,
+    GX_TEXCOORD4_800B857C,
+    GX_TEXCOORD5_800B857C,
+    GX_TEXCOORD6_800B857C,
+    GX_TEXCOORD7_800B857C,
+    GX_MAX_TEXCOORD_800B857C,
+    GX_TEXCOORD_NULL_800B857C = 0xFF,
+} GXTexCoordID_800B857C;
+
+typedef enum GXTexGenType_800B857C {
+    GX_TG_MTX3x4_800B857C,
+    GX_TG_MTX2x4_800B857C,
+    GX_TG_BUMP0_800B857C,
+    GX_TG_BUMP1_800B857C,
+    GX_TG_BUMP2_800B857C,
+    GX_TG_BUMP3_800B857C,
+    GX_TG_BUMP4_800B857C,
+    GX_TG_BUMP5_800B857C,
+    GX_TG_BUMP6_800B857C,
+    GX_TG_BUMP7_800B857C,
+    GX_TG_SRTG_800B857C,
+} GXTexGenType_800B857C;
+
+typedef enum GXTexGenSrc_800B857C {
+    GX_TG_POS_800B857C,
+    GX_TG_NRM_800B857C,
+    GX_TG_BINRM_800B857C,
+    GX_TG_TANGENT_800B857C,
+    GX_TG_TEX0_800B857C,
+    GX_TG_TEX1_800B857C,
+    GX_TG_TEX2_800B857C,
+    GX_TG_TEX3_800B857C,
+    GX_TG_TEX4_800B857C,
+    GX_TG_TEX5_800B857C,
+    GX_TG_TEX6_800B857C,
+    GX_TG_TEX7_800B857C,
+    GX_TG_TEXCOORD0_800B857C,
+    GX_TG_TEXCOORD1_800B857C,
+    GX_TG_TEXCOORD2_800B857C,
+    GX_TG_TEXCOORD3_800B857C,
+    GX_TG_TEXCOORD4_800B857C,
+    GX_TG_TEXCOORD5_800B857C,
+    GX_TG_TEXCOORD6_800B857C,
+    GX_TG_COLOR0_800B857C,
+    GX_TG_COLOR1_800B857C,
+} GXTexGenSrc_800B857C;
+
+#define GX_SET_REG_FIELD_800B857C(reg, size, shift, val)                    \
+    do {                                                                    \
+        (reg) = ((u32)(reg) & ~(((1 << (size)) - 1) << (shift))) |         \
+                ((u32)(val) << (shift));                                    \
+    } while (0)
+
+extern void __GXSetMatrixIndex(u32 attr);
+
+void fn_800B857C(GXTexCoordID_800B857C dst_coord,
+                 GXTexGenType_800B857C func,
+                 GXTexGenSrc_800B857C src_param, u32 mtx, u8 normalize,
+                 u32 pt_texmtx)
+{
+    u32 reg = 0;
+    u32 row;
+    u32 bumprow;
+    u32 form;
+    u32 mtx_id_attr;
+
+    form = 0;
+    row = 5;
+    switch (src_param) {
+    case GX_TG_POS_800B857C:
+        row = 0;
+        form = 1;
+        break;
+    case GX_TG_NRM_800B857C:
+        row = 1;
+        form = 1;
+        break;
+    case GX_TG_BINRM_800B857C:
+        row = 3;
+        form = 1;
+        break;
+    case GX_TG_TANGENT_800B857C:
+        row = 4;
+        form = 1;
+        break;
+    case GX_TG_COLOR0_800B857C:
+        row = 2;
+        break;
+    case GX_TG_COLOR1_800B857C:
+        row = 2;
+        break;
+    case GX_TG_TEX0_800B857C:
+        row = 5;
+        break;
+    case GX_TG_TEX1_800B857C:
+        row = 6;
+        break;
+    case GX_TG_TEX2_800B857C:
+        row = 7;
+        break;
+    case GX_TG_TEX3_800B857C:
+        row = 8;
+        break;
+    case GX_TG_TEX4_800B857C:
+        row = 9;
+        break;
+    case GX_TG_TEX5_800B857C:
+        row = 10;
+        break;
+    case GX_TG_TEX6_800B857C:
+        row = 11;
+        break;
+    case GX_TG_TEX7_800B857C:
+        row = 12;
+        break;
+    case GX_TG_TEXCOORD0_800B857C:
+        bumprow;
+        break;
+    case GX_TG_TEXCOORD1_800B857C:
+        bumprow;
+        break;
+    case GX_TG_TEXCOORD2_800B857C:
+        bumprow;
+        break;
+    case GX_TG_TEXCOORD3_800B857C:
+        bumprow;
+        break;
+    case GX_TG_TEXCOORD4_800B857C:
+        bumprow;
+        break;
+    case GX_TG_TEXCOORD5_800B857C:
+        bumprow;
+        break;
+    case GX_TG_TEXCOORD6_800B857C:
+        bumprow;
+        break;
+    default:
+        break;
+    }
+
+    switch (func) {
+    case GX_TG_MTX2x4_800B857C:
+        GX_SET_REG_FIELD_800B857C(reg, 1, 1, 0);
+        GX_SET_REG_FIELD_800B857C(reg, 1, 2, form);
+        GX_SET_REG_FIELD_800B857C(reg, 3, 4, 0);
+        GX_SET_REG_FIELD_800B857C(reg, 5, 7, row);
+        break;
+    case GX_TG_MTX3x4_800B857C:
+        GX_SET_REG_FIELD_800B857C(reg, 1, 1, 1);
+        GX_SET_REG_FIELD_800B857C(reg, 1, 2, form);
+        GX_SET_REG_FIELD_800B857C(reg, 3, 4, 0);
+        GX_SET_REG_FIELD_800B857C(reg, 5, 7, row);
+        break;
+    case GX_TG_BUMP0_800B857C:
+    case GX_TG_BUMP1_800B857C:
+    case GX_TG_BUMP2_800B857C:
+    case GX_TG_BUMP3_800B857C:
+    case GX_TG_BUMP4_800B857C:
+    case GX_TG_BUMP5_800B857C:
+    case GX_TG_BUMP6_800B857C:
+    case GX_TG_BUMP7_800B857C:
+        GX_SET_REG_FIELD_800B857C(reg, 1, 1, 0);
+        GX_SET_REG_FIELD_800B857C(reg, 1, 2, form);
+        GX_SET_REG_FIELD_800B857C(reg, 3, 4, 1);
+        GX_SET_REG_FIELD_800B857C(reg, 5, 7, row);
+        GX_SET_REG_FIELD_800B857C(reg, 3, 12, src_param - 12);
+        GX_SET_REG_FIELD_800B857C(reg, 3, 15,
+                                  func - GX_TG_BUMP0_800B857C);
+        break;
+    case GX_TG_SRTG_800B857C:
+        GX_SET_REG_FIELD_800B857C(reg, 1, 1, 0);
+        GX_SET_REG_FIELD_800B857C(reg, 1, 2, form);
+        if (src_param == GX_TG_COLOR0_800B857C) {
+            GX_SET_REG_FIELD_800B857C(reg, 3, 4, 2);
+        } else {
+            GX_SET_REG_FIELD_800B857C(reg, 3, 4, 3);
+        }
+        GX_SET_REG_FIELD_800B857C(reg, 5, 7, 2);
+        break;
+    default:
+        break;
+    }
+
+    GX_FIFO_U8 = 0x10;
+    GX_FIFO_U32 = dst_coord + 0x1040;
+    GX_FIFO_U32 = reg;
+    reg = 0;
+    GX_SET_REG_FIELD_800B857C(reg, 6, 0, pt_texmtx - 64);
+    GX_SET_REG_FIELD_800B857C(reg, 1, 8, normalize);
+    GX_FIFO_U8 = 0x10;
+    GX_FIFO_U32 = dst_coord + 0x1050;
+    GX_FIFO_U32 = reg;
+
+    switch (dst_coord) {
+    case GX_TEXCOORD0_800B857C:
+        GX_SET_REG_FIELD_800B857C(gx->mtxIdx0, 6, 6, mtx);
+        break;
+    case GX_TEXCOORD1_800B857C:
+        GX_SET_REG_FIELD_800B857C(gx->mtxIdx0, 6, 12, mtx);
+        break;
+    case GX_TEXCOORD2_800B857C:
+        GX_SET_REG_FIELD_800B857C(gx->mtxIdx0, 6, 18, mtx);
+        break;
+    case GX_TEXCOORD3_800B857C:
+        GX_SET_REG_FIELD_800B857C(gx->mtxIdx0, 6, 24, mtx);
+        break;
+    case GX_TEXCOORD4_800B857C:
+        GX_SET_REG_FIELD_800B857C(gx->mtxIdx1, 6, 0, mtx);
+        break;
+    case GX_TEXCOORD5_800B857C:
+        GX_SET_REG_FIELD_800B857C(gx->mtxIdx1, 6, 6, mtx);
+        break;
+    case GX_TEXCOORD6_800B857C:
+        GX_SET_REG_FIELD_800B857C(gx->mtxIdx1, 6, 12, mtx);
+        break;
+    default:
+        GX_SET_REG_FIELD_800B857C(gx->mtxIdx1, 6, 18, mtx);
+        break;
+    }
+
+    mtx_id_attr = dst_coord + 1;
+    __GXSetMatrixIndex(mtx_id_attr);
+}
+
 void fn_800B884C(u8 count) {
     u32 n = count;
     GXData_800B857C* p = gx;
