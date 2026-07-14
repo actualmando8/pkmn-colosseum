@@ -481,6 +481,78 @@ s32 fn_8004E440(PdaMailWindowB* window, void* fieldHandle)
 }
 #pragma peephole reset
 
+typedef struct PdaMailAttachState {
+    s32 unused;
+    s32 mailIndex;
+    s32* selection;
+} PdaMailAttachState;
+
+typedef struct PdaMailAttachWindow {
+    u8 pad00[0x60];
+    PdaMailAttachState* state;
+} PdaMailAttachWindow;
+
+#pragma peephole off
+s32 fn_8004E790(PdaMailAttachWindow* window)
+{
+    extern u32 mailGetAttachFileGroup(s32 index);
+    extern s32 fn_8017B2CC(u32 fileHandle);
+    extern s32 fn_8017B448(u32 fileHandle);
+    extern u32 fn_8017B4BC(u32 fileHandle, u32 index);
+    extern u32 fn_8017B5A4();
+    u8* input;
+    s32 total;
+    s32 count;
+    s32 index;
+    u32 object;
+    PdaMailAttachState* state;
+    s32 loaded;
+    s32 selection;
+
+    state = window->state;
+    input = windowGetKeyInfo();
+    selection = *state->selection;
+    index = state->mailIndex;
+    if (fn_8017B2CC(mailGetAttachFileGroup(index)) == 1) {
+        loaded = 0;
+    } else {
+        loaded = 1;
+    }
+    if (loaded == 0) {
+        count = -1;
+    } else {
+        object = mailGetAttachFileGroup(index);
+        total = fn_8017B448(object);
+        count = 0;
+        index = count;
+        while (index < total) {
+            fn_8017B4BC(object, index);
+            if (fn_8017B5A4() == 9) {
+                count++;
+            }
+            index++;
+        }
+    }
+    if (count < 2) {
+        return 0;
+    }
+    if ((*(u16*) (input + 6) & 8) != 0) {
+        selection++;
+        if (selection >= count) {
+            selection = 0;
+        }
+    }
+    if ((*(u16*) (input + 6) & 4) != 0) {
+        selection--;
+        if (selection < 0) {
+            selection = count - 1;
+        }
+    }
+    *state->selection = selection;
+    return 0;
+}
+#pragma peephole reset
+
 #if 0
 asm s32 fn_8004DB34(PdaMailWindowB* window, void* fieldHandle) {
 #include "src/game/menu/menu_pda_mail_fn_8004DB34.inc"
@@ -714,7 +786,7 @@ void menuPdaOpen(void)
 #endif
 
 /* mailGetNbMailInMailbox (battle_waza.c): Waza-party active-effect count getter. */
-extern u16 mailGetNbMailInMailbox(void);
+extern s32 mailGetNbMailInMailbox(void);
 
 /* Mail-ID lookup table (halfword mail IDs), indexed by receive-order
  * slot; sda21-addressed pointer variable (matches XD's pdaMailGetMailID
@@ -1148,6 +1220,39 @@ s32 fn_8004C3E4(PdaMailSortLabelWindow* window)
     return 0;
 }
 #pragma pop
+
+extern const f32 lbl_8047BE08;
+extern const f32 lbl_8047BE0C;
+
+#pragma fp_contract on
+#pragma optimization_level 4
+#pragma peephole off
+s32 fn_8004C4A4(u8* context, u8* field)
+{
+    u8* state;
+    s32 pages;
+
+    state = *(u8**) (context + 0x60);
+    pages = (mailGetNbMailInMailbox() + 9) / 10;
+    if (pages <= 1) {
+        winSpriteSetDisp(field, 0);
+    } else {
+        winSpriteSetDisp(field, 1);
+    }
+
+    if (*(s16*) (field + 6) == 0x444) {
+        s32 base = *(s32*) (state + 4);
+        *(s16*) (field + 0x50) =
+            (s16) (lbl_8047BE08 * **(f32**) state + (f32) base);
+    } else {
+        s32 base = *(s32*) (state + 8);
+        *(s16*) (field + 0x50) =
+            (s16) (lbl_8047BE0C * **(f32**) state + (f32) base);
+    }
+    return 0;
+}
+#pragma peephole reset
+#pragma fp_contract reset
 
 #if 0
 asm void fn_8004BFB0(void) {

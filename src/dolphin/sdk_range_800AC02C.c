@@ -2349,6 +2349,45 @@ void DeleteCallback(s32 chan, s32 result) {
     }
 }
 
+#pragma push
+#pragma inline_depth(0)
+s32 CARDDeleteAsync(s32 chan, const char* fileName, CARDCallback callback) {
+    CARDControl* card;
+    s32 fileNo;
+    s32 result;
+    CARDDirEntry* dir;
+    CARDDirEntry* entry;
+    extern s32 __CARDGetFileNo(CARDControl* card, const char* fileName,
+                               s32* fileNo);
+    extern BOOL __CARDIsOpened();
+    extern void* memset(void* dst, s32 value, u32 size);
+
+    result = __CARDGetControlBlock(chan, &card);
+    if (result < 0) {
+        return result;
+    }
+    result = __CARDGetFileNo(card, fileName, &fileNo);
+    if (result < 0) {
+        return __CARDPutControlBlock(card, result);
+    }
+    if (__CARDIsOpened(card, fileNo)) {
+        return __CARDPutControlBlock(card, -1);
+    }
+
+    dir = __CARDGetDirBlock(card);
+    entry = &dir[fileNo];
+    *(u16*)&card->_0BC[2] = entry->startBlock;
+    memset(entry, 0xff, sizeof(CARDDirEntry));
+
+    card->apiCallback = callback ? callback : __CARDDefaultApiCallback;
+    result = __CARDUpdateDir(chan, DeleteCallback);
+    if (result < 0) {
+        __CARDPutControlBlock(card, result);
+    }
+    return result;
+}
+#pragma pop
+
 void __CARDSetDiskID(void* diskId) {
     CARDControl* card = lbl_803FC620;
 
