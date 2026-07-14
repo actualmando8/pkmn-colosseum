@@ -713,18 +713,9 @@ void fn_80084034(void) {
 
 #pragma peephole off
 /* 0x80083CBC | size: 0x40 */
-#pragma optimize_for_size on
 void fn_80083CBC(void* ptr) {
-    if (ptr == 0) {
-        goto alloc;
-    }
-    goto end;
-alloc:
-    ptr = (void*)savedataGetStatus(0x0, 0xD);
-end:
-    memset(ptr, 0x0, 0x49CC);
+    memset(ptr != 0 ? ptr : (void*)savedataGetStatus(0, 0xD), 0, 0x49CC);
 }
-#pragma optimize_for_size reset
 #pragma peephole on
 
 /* 0x80083CFC | size: 0x34 */
