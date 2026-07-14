@@ -283,7 +283,6 @@ void fn_801E1C1C(void)
     extern s32 DVDRead(void *fileInfo, void *addr, s32 length, s32 offset, s32 prio);
     extern s32 OSSuspendThread(OSThread *thread);
     extern BOOL fn_801E446C(u32 msg);
-    u8 *player;
     u8 *base;
     u32 message;
     s32 frame;
@@ -295,18 +294,17 @@ void fn_801E1C1C(void)
     u32 frameCount;
     u32 position;
 
-    player = lbl_8046AC60;
     base = lbl_80469040;
     frame = 0;
-    offset = *(u32 *)(player + 0xB8);
-    size = *(u32 *)(player + 0xBC);
+    offset = *(u32 *)(lbl_8046AC60 + 0xB8);
+    size = *(u32 *)(lbl_8046AC60 + 0xBC);
     while (TRUE) {
         fn_8009F2F8(base + 0x13D0, &message, 1);
         buffer = (u32 *)message;
-        result = DVDRead(player, (void *)buffer[0], size, offset, 2);
+        result = DVDRead(lbl_8046AC60, (void *)buffer[0], size, offset, 2);
         if (result != (s32)size) {
             if (result == -1) {
-                *(s32 *)(player + 0xA8) = -1;
+                *(s32 *)(lbl_8046AC60 + 0xA8) = -1;
             }
             if (frame == 0) {
                 fn_801E446C(0);
@@ -317,13 +315,13 @@ void fn_801E1C1C(void)
         buffer[1] = frame;
         fn_8009F230(base + 0x13B0, (u32)buffer, 1);
         offset += size;
-        frameOffset = frame + *(u32 *)(player + 0xC0);
-        frameCount = *(u32 *)(player + 0x50);
+        frameOffset = frame + *(u32 *)(lbl_8046AC60 + 0xC0);
+        frameCount = *(u32 *)(lbl_8046AC60 + 0x50);
         position = frameOffset % frameCount;
         size = *(u32 *)buffer[0];
         if (position == frameCount - 1) {
-            if (*(u8 *)(player + 0xA6) & 1) {
-                offset = *(u32 *)(player + 0x64);
+            if (*(u8 *)(lbl_8046AC60 + 0xA6) & 1) {
+                offset = *(u32 *)(lbl_8046AC60 + 0x64);
             } else {
                 OSSuspendThread((OSThread *)(base + 0x1000));
             }
