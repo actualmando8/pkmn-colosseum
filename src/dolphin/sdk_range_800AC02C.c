@@ -2526,28 +2526,23 @@ s32 fn_800B57D0(s32 chan, s32 fileNo, CARDDirEntry* entry) {
 #pragma dont_inline on
 s32 CARDGetSerialNo(s32 chan, u64* serialNo) {
     CARDControl* card;
-    u32* id;
-    u32 high;
-    u32 low;
-    s32 i;
     s32 result;
-    extern s32 __CARDGetControlBlock(s32 chan, CARDControl** card);
+    CARDID* id;
+    u64 code;
+    int i;
 
-    if (chan < 0 || chan >= 2) {
+    if (!(0 <= chan && chan < 2)) {
         return -128;
     }
     result = __CARDGetControlBlock(chan, &card);
     if (result < 0) {
         return result;
     }
-    id = card->workArea;
-    high = low = 0;
-    for (i = 0; i < 4; ++i) {
-        high ^= *id++;
-        low ^= *id++;
+    id = (CARDID*)card->workArea;
+    for (code = 0, i = 0; i < sizeof(id->serial) / sizeof(u64); ++i) {
+        code ^= *(u64*)&id->serial[sizeof(u64) * i];
     }
-    ((u32*)serialNo)[0] = high;
-    ((u32*)serialNo)[1] = low;
+    *serialNo = code;
     return __CARDPutControlBlock(card, 0);
 }
 #pragma dont_inline off
