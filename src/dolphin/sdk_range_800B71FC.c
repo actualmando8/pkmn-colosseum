@@ -9,6 +9,7 @@
  */
 #include "dolphin/types.h"
 #include "dolphin/gx/GX.h"
+#include "dolphin/os/OSInterrupt.h"
 
 extern GXData* gx;
 extern volatile u16* __cpReg;
@@ -54,4 +55,50 @@ void fn_800B75D0(u8 arg0, u8 arg1) {
     gxStatus[4] = (gxStatus[4] & ~1U) | (u32)arg0;
     gxStatus[4] = (gxStatus[4] & (u32)~(1ULL << 30)) | (u32)(arg1 * 2U);
     __cpReg[2] = (u16)gxStatus[4];
+}
+
+typedef struct GXFifoObjPrivate {
+    GXFifoObj fifo;
+    u8 padding[0x80 - sizeof(GXFifoObj)];
+} GXFifoObjPrivate;
+
+static inline void GXResetFifoPtrs(GXFifoObj* fifo, void* readPtr, void* writePtr) {
+    BOOL enabled;
+
+    enabled = OSDisableInterrupts();
+    fifo->rdPtr = readPtr;
+    fifo->wrPtr = writePtr;
+    fifo->count = (u8*)writePtr - (u8*)readPtr;
+    if (fifo->count < 0) {
+        fifo->count += fifo->size;
+    }
+    OSRestoreInterrupts(enabled);
+}
+
+void __GXCleanGPFifo(void) {
+    extern GXFifoObjPrivate* fn_800B770C(void);
+    extern GXFifoObjPrivate* fn_800B7714(void);
+    GXFifoObjPrivate* gpFifo;
+    GXFifoObjPrivate* cpuFifo;
+    GXFifoObjPrivate cleanFifo;
+    u32 _pad[3];
+    void* base;
+
+    gpFifo = fn_800B7714();
+    if (gpFifo != NULL) {
+        cpuFifo = fn_800B770C();
+        base = gpFifo->fifo.base;
+        (void)_pad;
+        cleanFifo = *gpFifo;
+        GXResetFifoPtrs(&cleanFifo.fifo, base, base);
+        GXSetGPFifo(&cleanFifo.fifo);
+        if (cpuFifo == gpFifo) {
+            GXSetCPUFifo(&cleanFifo.fifo);
+        }
+        GXResetFifoPtrs(&gpFifo->fifo, base, base);
+        GXSetGPFifo(&gpFifo->fifo);
+        if (cpuFifo == gpFifo) {
+            GXSetCPUFifo(&cpuFifo->fifo);
+        }
+    }
 }
