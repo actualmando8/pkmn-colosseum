@@ -59,8 +59,24 @@ typedef struct FadeFluidWork {
     u8 pad_3C[4];
 } FadeFluidWork;
 
+typedef struct FadeTrailPoint {
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 angle;
+    s32 alpha;
+} FadeTrailPoint;
+
+typedef struct FadeTrailWork {
+    FadeTrailPoint point[12];
+} FadeTrailWork;
+
 extern void fn_801C6688(f32 t);
 extern void fn_801C63C0(void* tex, GSvec* pos, f32 scale, f32 offset, f32 t, f32 alpha);
+extern void fn_801C5B60(FadeTrailPoint* point, s32 alpha, f32 scale, f32 angle);
+extern void fn_801C5D60(void);
+extern void fn_801C673C(void);
+extern void fn_801C680C(void* texture);
 extern void fn_801C53BC(void* texture);
 extern void fn_800D75F4(void* ptr);
 extern void fn_800D9ED8(u32 enable);
@@ -101,6 +117,7 @@ extern void* fn_800E27B0(u32 handle);
 
 extern u8 lbl_80467030[0x20];
 extern u8 lbl_80467050[0x40];
+extern u8 lbl_80466E50[0x1E0];
 extern u8 lbl_80314AE8[];
 extern u8 lbl_8047B3B0;
 extern void* lbl_8047B3B4;
@@ -117,6 +134,10 @@ extern const f32 lbl_8047E00C;
 extern const f32 lbl_8047E010;
 extern const f32 lbl_8047E014;
 extern const f32 lbl_8047E018;
+extern const f32 lbl_8047E04C;
+extern const f32 lbl_8047E050;
+extern const f32 lbl_8047E054;
+extern const f32 lbl_8047E058;
 extern const f32 lbl_8047E0A4;
 extern const f32 lbl_8047E0A8;
 extern const f32 lbl_8047E0C4;
@@ -320,6 +341,98 @@ u32 fn_801C5530(u32 arg0, void* texture, f32 frame, f32 duration, f32 angle, f32
         fn_801C63C0(tex, &pos, lbl_8047DFE4, lbl_8047DFE0, t, rot);
     }
     return result;
+}
+#pragma peephole on
+
+#pragma peephole off
+u32 fn_801C5898(u32 arg0, void* texture, f32 frame, f32 duration,
+                f32 angle, f32 angleDuration)
+{
+    FadeCameraWork* camera;
+    FadeTrailWork* trail;
+    GSvec position;
+    f32 positionStep[2];
+    f32 angleStep[2];
+    f32 alphaScale;
+    f32 maxPosition;
+    f32 progress;
+    f32 angleProgress;
+    f32 value;
+    s32 i;
+    s32 j;
+
+    if (lbl_8047B3B0 == 1) {
+        lbl_8047B3B0 = 0;
+        fn_801C5D60();
+    }
+
+    progress = frame / duration;
+    angleProgress = angle / angleDuration;
+    camera = (FadeCameraWork*)lbl_80467030;
+    camera->frame++;
+    camera->value += camera->step;
+    if (camera->value >= camera->target) {
+        camera->value = camera->target;
+    }
+    fn_801C6688(progress);
+
+    if (texture == NULL) {
+        return arg0;
+    }
+
+    position.x = lbl_8047E008;
+    position.y = lbl_8047E00C;
+    position.z = lbl_8047DFE0;
+    fn_801C63C0(texture, &position, lbl_8047DFE4, lbl_8047DFE0,
+                progress, angleProgress);
+    fn_801C680C(((FadeCameraWork*)lbl_80467030)->tex0);
+
+    value = camera->value;
+    positionStep[0] = value;
+    positionStep[1] = -value;
+    angleStep[0] = lbl_8047E04C * (value / lbl_8047E050);
+    angleStep[1] = -angleStep[0];
+    alphaScale = lbl_8047DFE4 - progress;
+
+    trail = (FadeTrailWork*)lbl_80466E50;
+    for (i = 0; i < 2; i++) {
+        for (j = 11; j > 0; j--) {
+            FadeTrailPoint* point = &trail[i].point[j];
+
+            if ((camera->frame & 3) == 0) {
+                point->x = point[-1].x;
+                point->y = point[-1].y;
+                point->z = point[-1].z;
+                point->angle = point[-1].angle;
+            }
+            fn_801C5B60(point,
+                        (s32)(alphaScale * (f32)point->alpha),
+                        lbl_8047DFE4, point->angle);
+        }
+
+        value = trail[i].point[0].angle + angleStep[i];
+        if (value <= lbl_8047DFE0) {
+            value += lbl_8047E04C;
+        } else if (value >= lbl_8047E04C) {
+            value -= lbl_8047E04C;
+        }
+        trail[i].point[0].angle = value;
+
+        maxPosition = lbl_8047E054;
+        value = trail[i].point[0].x + positionStep[i];
+        if (value > maxPosition) {
+            value = maxPosition;
+        } else if (value < lbl_8047E058) {
+            value = lbl_8047E058;
+        }
+        trail[i].point[0].x = value;
+
+        fn_801C5B60(&trail[i].point[0],
+                    (s32)(alphaScale * (f32)trail[i].point[0].alpha),
+                    lbl_8047DFE4, trail[i].point[0].angle);
+    }
+    fn_801C673C();
+    return arg0;
 }
 #pragma peephole on
 
