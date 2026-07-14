@@ -468,9 +468,9 @@ u32 fn_801C5ED0(u32 arg0, void* texture, f32 arg2, f32 arg3, f32 arg4, f32 arg5)
 #pragma peephole on
 
 #pragma peephole off
-void fn_801C5F6C(u32 arg0, void* texture, f32 arg2, f32 arg3, f32 arg4, f32 arg5) {
+u32 fn_801C5F6C(u32 arg0, void* texture, f32 arg2, f32 arg3, f32 arg4, f32 arg5) {
     extern void _fadeEffectFunction_UDLR_FirstInit__FP9GStextureUs(void* texture, u16 mode);
-    extern void fn_801C6008(u32 arg0, void* texture, f32 arg2, f32 arg3, f32 arg4, f32 arg5);
+    extern u32 fn_801C6008(u32 arg0, void* texture, f32 arg2, f32 arg3, f32 arg4, f32 arg5);
     f32 arg2Local;
     u32 arg0Local;
     f32 arg3Local;
@@ -485,14 +485,16 @@ void fn_801C5F6C(u32 arg0, void* texture, f32 arg2, f32 arg3, f32 arg4, f32 arg5
     arg5Local = arg5;
     tex = texture;
 
-    if (tex != NULL) {
-        if (lbl_8047B3B0 == 1) {
-            lbl_8047B3B0 = 0;
-            _fadeEffectFunction_UDLR_FirstInit__FP9GStextureUs(tex, 2);
-        }
-
-        fn_801C6008(arg0Local, tex, arg2Local, arg3Local, arg4Local, arg5Local);
+    if (tex == NULL) {
+        return arg0Local;
     }
+
+    if (lbl_8047B3B0 == 1) {
+        lbl_8047B3B0 = 0;
+        _fadeEffectFunction_UDLR_FirstInit__FP9GStextureUs(tex, 2);
+    }
+
+    return fn_801C6008(arg0Local, tex, arg2Local, arg3Local, arg4Local, arg5Local);
 }
 #pragma peephole on
 
