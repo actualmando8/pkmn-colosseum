@@ -3603,3 +3603,12 @@ HSD_SList* HSD_SListPrepend(HSD_SList* next, void* data)
     prev->next = next;
     return prev;
 }
+
+/* 0x801A3FBC | 0x44 */
+extern void HSD_ObjAllocInit(void* list, u32 size, u32 alignment);
+
+void fn_801A3FBC(void)
+{
+    HSD_ObjAllocInit(lbl_804655B4, sizeof(HSD_SList), 4);
+    HSD_ObjAllocInit(lbl_80465588, 0xC, 4);
+}
