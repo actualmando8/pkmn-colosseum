@@ -2723,12 +2723,15 @@ void fn_801B3168(void) {
 }
 
 /* 0x801B3174 | 0x30 */
+#pragma push
+#pragma optimization_level 1
 void fn_801B3174(void) {
-    u32 i;
+    s32 i;
     for (i = 0; i < 4; i++) {
-        *(u32*)((u8*)lbl_8036CFE8 + i * 0xC + 0x8) = 0;
+        lbl_8036CFE8[i].dirty = 0;
     }
 }
+#pragma pop
 
 #pragma push
 #pragma optimization_level 1

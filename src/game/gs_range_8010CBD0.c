@@ -45,6 +45,18 @@ void* GScolsys2GetCurFloor(void) {
     return COL_LAYER_PTR(layer);
 }
 
+/* 0x8010CC04 | 0x50 */
+extern void GSgfxDLFree(void* displayList);
+
+s32 GScolsys2UnloadCCD(void) {
+    COL_STATE->wzxDataPtr = NULL;
+    if (COL_STATE->displayList != NULL) {
+        GSgfxDLFree(COL_STATE->displayList);
+        COL_STATE->displayList = NULL;
+    }
+    return 1;
+}
+
 /* 0x8010D038 | 0x2C */
 s32 fn_8010D038(void) {
     s32 layer;
