@@ -424,11 +424,11 @@ extern f32 lbl_8047CFF8;
 extern f32 lbl_8047CFFC;
 extern f32 lbl_8047D000;
 extern f32 lbl_8047D004;
-extern void itemDataBiosGetPtr(void);
-extern void itemDataBiosGetKind(void);
-extern void itemDataBiosGetBuff(void);
+extern u8* itemDataBiosGetPtr(u16 itemDataId);
+extern u8 itemDataBiosGetKind(u8* ptr);
+extern u32 itemDataBiosGetBuff(u8* ptr);
 extern f32 lbl_8047D018;
-void pokemonAddDpFormPokemonDpFilterId(void);
+void pokemonAddDpFormPokemonDpFilterId(u8* ptr, u16 itemDataId, u16 filterId);
 extern void* fn_801EEEB8();
 void pokemonSetDarkPokemonStatus(void);
 extern void GScharCpy();
@@ -1491,16 +1491,103 @@ extern f32 lbl_8047D004;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void pokemonGetDarkPokemonLevel(void);
 /* 0x8011F910 | 0x2BC */
-extern void itemDataBiosGetPtr(void);
-extern void itemDataBiosGetKind(void);
-extern void itemDataBiosGetBuff(void);
+extern u8* itemDataBiosGetPtr(u16 itemDataId);
+extern u8 itemDataBiosGetKind(u8* ptr);
+extern u32 itemDataBiosGetBuff(u8* ptr);
 extern f64 lbl_8047D008;
 extern f64 lbl_8047D010;
 extern f32 lbl_8047CFF0;
 extern f32 lbl_8047CFF4;
 extern f32 lbl_8047D018;
-/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void pokemonAddDpFormPokemonDpFilterId(void);
+void pokemonAddDpFormPokemonDpFilterId(u8* ptr, u16 itemDataId, u16 filterId) {
+    u8* seikakuData;
+    u8* rateData;
+    u8* itemData;
+    s32 rateDataId;
+    u8 kake;
+    u8 waru;
+    f32 dp;
+    f32 currentDp;
+    f32 newDp;
+    s32 rawDp;
+
+    if ((u8)pokemonGetStatus(ptr, 0, 0xC2, 0) == 0) {
+        return;
+    }
+
+    seikakuData = pokemonSeikakuDataBiosGetPtr(
+        (u8)pokemonGetStatus(ptr, 0, 0xBF, 0));
+    if (seikakuData == NULL) {
+        return;
+    }
+
+    dp = (f32)(s8)pokemonDpFilterDataBiosGetValue(
+        pokemonDpFilterDataBiosGetPtr(filterId));
+
+    if (filterId == 4) {
+        itemData = itemDataBiosGetPtr(itemDataId);
+        if (itemData == NULL) {
+            return;
+        }
+        if (itemDataBiosGetKind(itemData) != 6) {
+            return;
+        }
+        dp *= (f32)itemDataBiosGetBuff(itemData);
+    }
+
+    if (filterId == 5) {
+        if (ptr == NULL) {
+            currentDp = lbl_8047CFF0;
+        } else {
+            rawDp = pokemonGetStatus(ptr, 0, 0xC5, 0);
+            currentDp = (f32)rawDp / lbl_8047CFF4;
+        }
+        dp = lbl_8047D018 * currentDp;
+    }
+
+    if (filterId == 0) {
+        rateDataId = pokemonSeikakuDataBiosGetReliveFightout(seikakuData);
+    } else if (filterId == 1) {
+        rateDataId = pokemonSeikakuDataBiosGetReliveWalk(seikakuData);
+    } else if (filterId == 2) {
+        rateDataId = pokemonSeikakuDataBiosGetReliveCall(seikakuData);
+    } else if (filterId == 3) {
+        rateDataId = pokemonSeikakuDataBiosGetReliveSodateya(seikakuData);
+    } else if (filterId == 4) {
+        rateDataId = pokemonSeikakuDataBiosGetReliveNadenade(seikakuData);
+    }
+
+    rateData = pokemonSeikakuRateDataBiosGetPtr((u8)rateDataId);
+    if (rateData == NULL) {
+        return;
+    }
+
+    kake = pokemonSeikakuRateDataBiosGetKake(rateData);
+    waru = pokemonSeikakuRateDataBiosGetWaru(rateData);
+    if (waru != 0) {
+        dp *= (f32)kake;
+        dp /= (f32)waru;
+    } else {
+        return;
+    }
+
+    if (ptr != NULL) {
+        if (ptr == NULL) {
+            currentDp = lbl_8047CFF0;
+        } else {
+            rawDp = pokemonGetStatus(ptr, 0, 0xC5, 0);
+            currentDp = (f32)rawDp / lbl_8047CFF4;
+        }
+        newDp = currentDp + dp;
+        if (newDp < lbl_8047CFF0) {
+            newDp = lbl_8047CFF0;
+        }
+        if (ptr != NULL) {
+            pokemonSetStatus(ptr, 0, 0xC5, 0,
+                             (u32)(s32)(lbl_8047CFF4 * newDp));
+        }
+    }
+}
 /* 0x48 | pokemonSetDp | generic */
 extern f32 lbl_8047CFF4;
 #if 0
