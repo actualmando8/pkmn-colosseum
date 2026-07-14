@@ -19,14 +19,18 @@ extern void C_MTXPerspective();
 extern void OSFillFPUContext();
 extern int setupTopHalfCamera();   /* wrk7: was `void` asm-wrapper decl; typed-C returns int */
 extern void CObjUpdateFunc(HSD_CObj*, u32, f32*);
+extern int CObjInit(HSD_CObj*);
+extern void CObjRelease(HSD_CObj*);
+extern void CObjAmnesia(HSD_ClassInfo*);
+extern int CObjLoad(HSD_CObj*, HSD_CObjDesc*);
 extern char lbl_80465080[];
 
 static HSD_ClassInfo* default_class;
 static HSD_CObj* current;
 
-static void CObjInfoInit(void);
+void fn_80193C24(void);
 
-HSD_CObjInfo hsdCObj = { CObjInfoInit };
+HSD_CObjInfo hsdCObj = { fn_80193C24 };
 
 /* ========================================================================= */
 /*  Accessors                                                                */
@@ -274,18 +278,30 @@ static void CObjAmnesia_Early(HSD_ClassInfo* info)
     HSD_OBJECT_PARENT_INFO(&hsdCObj)->amnesia(info);
 }
 
-static void CObjInfoInit(void)
+/* 0x80193C24 | 0xAC - CObjInfoInit */
+#pragma push
+#pragma optimization_level 1
+#pragma optimizewithasm off
+void fn_80193C24(void)
 {
-    hsdInitClassInfo(HSD_CLASS_INFO(&hsdCObj), HSD_CLASS_INFO(&hsdObj),
-                     "sysdolphin_base_library", "hsd_cobj",
-                     sizeof(HSD_CObjInfo), sizeof(HSD_CObj));
-    HSD_CLASS_INFO(&hsdCObj)->release = CObjRelease_Early;
-    HSD_CLASS_INFO(&hsdCObj)->amnesia = CObjAmnesia_Early;
-    HSD_COBJ_INFO(&hsdCObj)->load =
-        (int (*)(HSD_CObj*, HSD_CObjDesc*)) setupTopHalfCamera;
-    HSD_COBJ_INFO(&hsdCObj)->update =
+    extern HSD_CObjInfo lbl_8036C678;
+    extern HSD_ClassInfo lbl_8036CC00;
+    extern char lbl_80274628[];
+    extern char lbl_80274640[];
+
+    hsdInitClassInfo(HSD_CLASS_INFO(&lbl_8036C678), &lbl_8036CC00,
+                     lbl_80274628, lbl_80274640, sizeof(HSD_CObjInfo),
+                     sizeof(HSD_CObj));
+    HSD_CLASS_INFO(&lbl_8036C678)->init =
+        (int (*)(HSD_Class*)) CObjInit;
+    HSD_CLASS_INFO(&lbl_8036C678)->release =
+        (void (*)(HSD_Class*)) CObjRelease;
+    HSD_CLASS_INFO(&lbl_8036C678)->amnesia = CObjAmnesia;
+    HSD_COBJ_INFO(&lbl_8036C678)->load = CObjLoad;
+    HSD_COBJ_INFO(&lbl_8036C678)->update =
         (void (*)(HSD_CObj*, u32, void*)) CObjUpdateFunc;
 }
+#pragma pop
 
 /* 0x80193CD0 | 0x60 */
 #pragma push
