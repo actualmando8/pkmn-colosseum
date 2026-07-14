@@ -619,9 +619,10 @@ s32 fn_8003956C(void* window, void* sprite)
     extern u16 pcboxGetNbItemSlot(s32 box);
     extern void* pcboxGetItem(s32 box, s16 slot);
     extern u8 fn_801429E8(void* item);
-    s32 slot;
     s32 count;
-    u16 slotCount;
+    s32 slot;
+    s32 slotCount;
+    u16 boundedSlotCount;
     s32 threshold;
     s32 display;
 
@@ -629,7 +630,8 @@ s32 fn_8003956C(void* window, void* sprite)
     count = 0;
     threshold = lbl_8047A4A8 + 8;
     slotCount = pcboxGetNbItemSlot(0);
-    for (slot = 0; slot < slotCount; slot++) {
+    boundedSlotCount = slotCount;
+    for (slot = 0; slot < boundedSlotCount; slot++) {
         if (fn_801429E8(pcboxGetItem(0, slot))) {
             count++;
         }
