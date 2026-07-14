@@ -1,10 +1,10 @@
 /**
  * @file hsd_displayfunc.c
- * @brief HSD displayfunc.c -- Billboard and render pass dispatch functions.
+ * @brief HSD displayfunc.c -- Billboard matrix construction functions.
  *
  * Decompiled from:
  *   _HSD_mkEnvelopeModelNodeMtx (HSD_DObjDisplayFunc1 -- billboard model-view setup)
- *   HSD_JObjMakePositionMtx (HSD_DObjDisplayFunc2 -- render pass dispatch)
+ *   HSD_JObjMakePositionMtx (JObj billboard position-matrix construction)
  *
  * Source file reference: "displayfunc.c" (rodata string at lbl_802746DC)
  *
@@ -17,14 +17,10 @@
  *    copies the world matrix directly. Otherwise, it concatenates the
  *    billboard's orientation with the target's position.
  *
- * 2. HSD_DObjDisplayFunc2: Dispatches rendering based on the DObj's
- *    render pass flags (bits 20-22 of the flags word at offset 0x14).
- *    Maps to four render pass subroutines:
- *      0x200 -> fn_80198038 (render pass: XLU / translucent)
- *      0x400 -> fn_80198B20 (render pass: OPA / opaque)
- *      0x600 -> fn_801985E0 (render pass: EFB / framebuffer)
- *      0x800 -> fn_80197C70 (render pass: billboard special)
- *    Falls back to a simple matrix multiply if no pass flags are set.
+ * 2. HSD_JObjMakePositionMtx: Concatenates the view and JObj matrices,
+ *    then applies the appropriate billboard transform selected by the
+ *    JOBJ_BILLBOARD_FIELD bits (0xE00). A non-billboard JObj uses the
+ *    concatenated matrix directly.
  *
  * These are part of the HAL SysDolphin library, customised for
  * Pokemon Colosseum's rendering pipeline.
@@ -32,12 +28,12 @@
  * Assertion strings:
  *   "displayfunc.c" (file name for assert)
  *   "unkown type of billboard."  (sic -- typo in original)
- *   "unkown type of render pass." (sic -- typo in original)
  *
  * Address range: 0x80197A64 - 0x80197C70
  */
 
 #include "dolphin/types.h"
+#include "dolphin/mtx.h"
 #include "hsd/hsd_dobj.h"
 #include "hsd/hsd_jobj.h"
 
@@ -46,40 +42,32 @@ extern void __assert(const char* file, u32 line, const char* msg); /* HSD_Halt /
 extern void HSD_Panic(const char* file, u32 line, const char* msg);
 extern void fn_800A2EB4(void* worldMtx, void* dstMtx);               /* MTXCopy (3x4 matrix) */
 extern void fn_800A2D98(void* srcMtx, void* jointMtx, void* dstMtx); /* MTXConcat */
+extern void PSMTXConcat(const Mtx srcMtx, const Mtx jointMtx, Mtx dstMtx);
 extern void fn_801A9DF0(void* a, void* b, void* c);                  /* HSD_MtxInverseConcat */
 
-/* Render pass subroutines - fn_80198038/fn_801985E0/fn_80198B20 defined as asm wrappers below */
-extern void fn_80197C70(void*, void*, void*); /* render pass: billboard (no .inc) */
+/* Billboard subroutines - fn_80198038/fn_801985E0/fn_80198B20 are defined below. */
+extern void fn_80197C70(void*, void*, void*); /* rotated billboard */
 
 /* ===== String constants (rodata) ===== */
 extern const char lbl_802746DC[]; /* "displayfunc.c" */
 extern const char lbl_802746EC[]; /* "unkown type of billboard.\n" */
-extern const char lbl_80274680[]; /* "unkown type of render pass.\n" */
 
 /* ===== SDA2 assertion expression strings ===== */
 extern const char lbl_8047D9E8[]; /* "jobj" -- assertion expression for billboard null check */
 extern const char lbl_8047D9F0[]; /* "x" -- assertion expression for billboard found check */
 
 /* ========================================================================
- * Internal DObj-like structure fields (used by both functions):
+ * Internal DObj-like structure fields (used by _HSD_mkEnvelopeModelNodeMtx):
  *
  * offset 0x0C: void* next   -- next DObj in chain
  * offset 0x14: u32   flags  -- DObj flags
  *   bit 1 (mask 0x02): HIDDEN flag
- *   bits 20-22 (mask 0x700): render pass type
  * offset 0x44: f32[3][4] -- joint/local matrix (Mtx)
  * offset 0x78: void*     -- world matrix pointer
  * ======================================================================== */
 
 /* Flag masks */
 #define DOBJ_FLAG_HIDDEN     0x02   /* bit 1: hidden, skip rendering */
-#define DOBJ_RENDERPASS_MASK 0x700  /* bits 20-22 in shifted form */
-
-/* Render pass types (after masking with 0x700) */
-#define RENDERPASS_XLU       0x200
-#define RENDERPASS_OPA       0x400
-#define RENDERPASS_EFB       0x600
-#define RENDERPASS_BILLBOARD 0x800
 
 /* 0x80198038 | 0x5A8 */
 #pragma push
@@ -437,66 +425,53 @@ void* HSD_DObjDisplayFunc1(void* dobj, void* outputMtx) {
 }
 
 /* =======================================================================
- *  HSD_DObjDisplayFunc2 / HSD_JObjMakePositionMtx
+ *  HSD_JObjMakePositionMtx
  *  Address: 0x80197B6C, Size: 0x104
  *
- *  Render pass dispatch for DObj rendering.
+ *  Build a JObj position matrix, accounting for billboard orientation.
  *
- *  r3 = dobj
+ *  r3 = jobj
  *  r4 = viewMtx (the camera/view matrix)
- *  r5 = renderState
+ *  r5 = positionMtx (output matrix)
  *
  *  Algorithm:
- *    1. Check render pass flags (bits 20-22 at offset 0x14, masked 0x700)
- *    2. If no render pass flags set:
- *         Simple case: just multiply viewMtx * dobj->jointMtx
+ *    1. Check billboard flags (bits selected by 0xE00 at offset 0x14)
+ *    2. If no billboard flags are set, concatenate viewMtx * jobj->mtx
+ *       directly into positionMtx.
  *    3. Else:
- *         Concat viewMtx with dobj->jointMtx into localMtx, then
- *         dispatch based on pass type:
- *           0x200 -> fn_80198038 (XLU pass)
- *           0x400 -> fn_80198B20 (OPA pass)
- *           0x600 -> fn_801985E0 (EFB pass)
- *           0x800 -> fn_80197C70 (billboard pass)
- *         If unknown pass type:
- *           HSD_Panic("displayfunc.c", 0x170, "unkown type of render pass.")
+ *         Concatenate into localMtx and dispatch the billboard subtype:
+ *           0x200 -> fn_80198038 (billboard)
+ *           0x400 -> fn_80198B20 (vertical billboard)
+ *           0x600 -> fn_801985E0 (horizontal billboard)
+ *           0x800 -> fn_80197C70 (rotated billboard)
+ *         Unknown subtypes panic with the retail billboard diagnostic.
  * ======================================================================= */
-void HSD_DObjDisplayFunc2(void* dobj, void* viewMtx, void* renderState) {
-    u32* dobjPtr = (u32*)dobj;
-    u32 flags;
-    u32 passType;
-    f32 localMtx[3][4];
+#pragma push
+#pragma dont_inline on
+void HSD_JObjMakePositionMtx(HSD_JObj* jobj, Mtx viewMtx, Mtx positionMtx) {
+    Mtx localMtx;
 
-    flags = dobjPtr[5]; /* offset 0x14 */
-    passType = flags & 0xF00; /* mask for render pass bits (shifted) */
-
-    if (passType == 0) {
-        /* No render pass flags: simple matrix setup */
-        void* dobjJointMtx = (void*)((u8*)dobj + 0x44);
-        fn_800A2D98(viewMtx, dobjJointMtx, renderState);
-        return;
-    }
-
-    /* Concat viewMtx with dobj->jointMtx */
-    {
-        void* dobjJointMtx = (void*)((u8*)dobj + 0x44);
-        fn_800A2D98(viewMtx, dobjJointMtx, localMtx);
-    }
-
-    switch (passType) {
-        case RENDERPASS_XLU:
-            fn_80198038(dobj, localMtx, renderState);
+    if (jobj->flags & JOBJ_BILLBOARD_FIELD) {
+        PSMTXConcat(viewMtx, jobj->mtx, localMtx);
+        switch (jobj->flags & JOBJ_BILLBOARD_FIELD) {
+        case JOBJ_BILLBOARD:
+            fn_80198038(jobj, localMtx, positionMtx);
             break;
-        case RENDERPASS_OPA:
-            fn_80198B20(dobj, localMtx, renderState);
+        case JOBJ_VBILLBOARD:
+            fn_80198B20(jobj, localMtx, positionMtx);
             break;
-        case RENDERPASS_EFB:
-            fn_801985E0(dobj, localMtx, renderState);
+        case JOBJ_HBILLBOARD:
+            fn_801985E0(jobj, localMtx, positionMtx);
             break;
-        case RENDERPASS_BILLBOARD:
-            fn_80197C70(dobj, localMtx, renderState);
+        case JOBJ_RBILLBOARD:
+            fn_80197C70(jobj, localMtx, positionMtx);
             break;
         default:
-            HSD_Panic(lbl_802746DC, 0x170, lbl_80274680);
+            HSD_Panic(lbl_802746DC, 0x170, lbl_802746EC);
             break;
+        }
+    } else {
+        PSMTXConcat(viewMtx, jobj->mtx, positionMtx);
     }
 }
+#pragma pop
