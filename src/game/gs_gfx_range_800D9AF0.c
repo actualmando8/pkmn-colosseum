@@ -616,6 +616,17 @@ void fn_800D9ED8(s32 val) {
 }
 #endif
 
+extern void fn_800B953C(u32);
+void fn_800D9F40(s32 val) {
+    u32 state = lbl_8047AA80;
+    if (*(s32*)state == 1) { fn_800D4F98(0x34, 1, val); }
+    else {
+        if (val == 1) { *(u8*)(state + 0x42d) = 1; }
+        else if (val == 0) { *(u8*)(state + 0x42d) = 0; }
+        fn_800B953C(*(u8*)(lbl_8047AA80 + 0x42d));
+    }
+}
+
 extern void GXSetClipMode(u32);
 #if 0
 asm void fn_800D9FB4(void) {
@@ -813,4 +824,3 @@ void fn_800DA4C4(s32 a, s32 b, s32 c) {
     }
 }
 #endif
-
