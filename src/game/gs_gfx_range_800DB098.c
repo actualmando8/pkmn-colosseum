@@ -902,3 +902,17 @@ void fn_800DC1D4(u8 val) {
 }
 #endif
 
+void fn_800DC224(u32 idx, u32 a, u32 b, u32 c, u32 d)
+{
+    u8* state = (u8*)lbl_8047AA80;
+
+    if (*(s32*)state == 1) {
+        fn_800D4F98(0x48, 5, idx, a, b, c, d);
+    } else {
+        u8* dst = state + idx * 4 + 0x42E;
+        dst[0] = a;
+        dst[1] = b;
+        dst[2] = c;
+        dst[3] = d;
+    }
+}
