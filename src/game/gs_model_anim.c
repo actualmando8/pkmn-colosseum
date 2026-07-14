@@ -103,9 +103,14 @@ void HSD_ForeachAnim(void* obj, u32 type, u32 mask, void* func, u32 arg_type, ..
 void fn_801A32A0(HSD_JObj* jobj, u32 flags, f32 frame);
 void fn_801A2B5C(HSD_JObj* jobj, void* anim, void* mat_anim,
                  void* shape_anim);
+void modelCalculateBlendModel__FP8_GSmodelf(GSmodel* model);
+f32 fn_800ED8C4(u32 type, u32 fractional_frames, f32 frame,
+                f32 requested_frame, f32 end_frame, f32 rate);
 s32 fn_800D37CC(void);
 void modelApplyAnimation__FP8_GSmodel(GSmodel* model);
 void modelUpdateAttachments__FP8_GSmodel(GSmodel* model);
+void _modelGetAObjFunc__FP9_HSD_AObjPv(HSD_AObj* aobj, HSD_AObj** out);
+void _modelResetPartAnimMixes__FP8_GSmodel(GSmodel* model);
 void _modelSetLoopFlag__FP9_HSD_AObjUl(HSD_AObj* aobj, u32 enable);
 void _modelGetEndFrame(HSD_AObj* aobj, f32* end_frame);
 void fn_800ED6E4(GSmodel* model, u8 tex_anim);
@@ -113,6 +118,7 @@ void fn_800ED7E4(GSmodel* model, u8 tex_anim, f32 delta);
 GSpart* GSmodelGetPart(GSmodel* model, s32 index);
 void GSpartFree(GSpart* part);
 void fn_8019D620(HSD_JObj* jobj);
+void fn_8019D9DC(HSD_JObj* jobj);
 
 void fn_800ED7E4(GSmodel* model, u8 tex_anim, f32 delta)
 {
@@ -832,6 +838,139 @@ void GSmodelAdvanceAnimation(GSmodel* model, f32 delta)
     }
 
     model->flags &= ~(MODEL_FLAG_FORCE_UPDATE | MODEL_FLAG_SKIP_APPLY);
+}
+
+void modelApplyAnimation__FP8_GSmodel(GSmodel* model)
+{
+    HSD_JObj* jobj;
+    HSD_AObj* anim_aobj;
+    HSD_AObj* tex_anim_aobj;
+    f32 anim_rate;
+    f32 tex_anim_rate;
+    u32 flags;
+    u32 fractional_frames;
+
+    flags = model->flags;
+    if (flags & MODEL_FLAG_SKIP_APPLY) {
+        return;
+    }
+
+    if (flags & MODEL_FLAG_BLENDING) {
+        fn_801A32A0(model->blend_jobj_a, 0x1CB,
+                    model->blend_anim_frame_a);
+        fn_801A32A0(model->blend_jobj_b, 0x1CB,
+                    model->blend_anim_frame_b);
+        HSD_JObjAnimAll(model->blend_jobj_a);
+        HSD_JObjAnimAll(model->blend_jobj_b);
+        modelCalculateBlendModel__FP8_GSmodelf(model);
+        goto done;
+    }
+
+    jobj = model->jobj;
+    if (flags & MODEL_FLAG_USE_JOBJ_CHILD) {
+        jobj = jobj->child;
+    }
+
+    anim_rate = lbl_8047CC5C;
+    tex_anim_rate = anim_rate;
+    if (flags & MODEL_FLAG_ANIMATING) {
+        if ((flags & MODEL_FLAG_60FPS_ANIM) == MODEL_FLAG_60FPS_ANIM ||
+            (model->force_fractional_frames != 0 &&
+             model->fractional_frame_data != NULL)) {
+            fractional_frames = TRUE;
+        } else {
+            fractional_frames = FALSE;
+        }
+        anim_rate = fn_800ED8C4(model->anim_type, fractional_frames,
+                                model->anim_frame, model->anim_req_frame,
+                                model->anim_end_frame, model->anim_rate);
+    }
+
+    flags = model->flags;
+    if (flags & MODEL_FLAG_TEX_ANIMATING) {
+        if ((flags & MODEL_FLAG_60FPS_ANIM) == MODEL_FLAG_60FPS_ANIM ||
+            (model->force_fractional_frames != 0 &&
+             model->fractional_frame_data != NULL)) {
+            fractional_frames = TRUE;
+        } else {
+            fractional_frames = FALSE;
+        }
+        tex_anim_rate = fn_800ED8C4(
+            model->tex_anim_type, fractional_frames, model->tex_anim_frame,
+            model->tex_anim_req_frame, model->tex_anim_end_frame,
+            model->tex_anim_rate);
+    }
+
+    HSD_ForeachAnim(jobj, 6, 0x9B2F, (void*)HSD_AObjSetRate, 1,
+                    anim_rate);
+    HSD_ForeachAnim(jobj, 6, 0x64DB, (void*)HSD_AObjSetRate, 1,
+                    tex_anim_rate);
+    HSD_JObjAnimAll(jobj);
+
+    if (model->flags & MODEL_FLAG_ANIMATING) {
+        anim_aobj = NULL;
+        HSD_ForeachAnim(jobj, 6, 0x20,
+                        (void*)_modelGetAObjFunc__FP9_HSD_AObjPv, 2,
+                        &anim_aobj);
+        model->anim_req_frame = anim_aobj->curr_frame;
+    }
+
+    if (model->flags & MODEL_FLAG_TEX_ANIMATING) {
+        tex_anim_aobj = NULL;
+        HSD_ForeachAnim(jobj, 6, 0x480,
+                        (void*)_modelGetAObjFunc__FP9_HSD_AObjPv, 2,
+                        &tex_anim_aobj);
+        model->tex_anim_req_frame = tex_anim_aobj->curr_frame;
+    }
+
+    if (model->flags & MODEL_FLAG_ANIMATING) {
+        _modelResetPartAnimMixes__FP8_GSmodel(model);
+    }
+
+    if (model->flags & MODEL_FLAG_USE_JOBJ_CHILD) {
+        jobj = model->jobj->child;
+        if (jobj != NULL) {
+            s32 dirty;
+            u32 jobj_flags;
+
+            if (jobj == NULL) {
+                __assert(lbl_8047CC68, 0x25D, lbl_8047CC70);
+            }
+            jobj_flags = jobj->flags;
+            dirty = FALSE;
+            if (!(jobj_flags & JOBJ_USER_DEF_MTX)) {
+                if (jobj_flags & JOBJ_MTX_DIRTY) {
+                    dirty = TRUE;
+                }
+            }
+            if (dirty != FALSE) {
+                fn_8019D9DC(jobj);
+            }
+        }
+    }
+
+    jobj = model->jobj;
+    if (jobj != NULL) {
+        s32 dirty;
+        u32 jobj_flags;
+
+        if (jobj == NULL) {
+            __assert(lbl_8047CC68, 0x25D, lbl_8047CC70);
+        }
+        jobj_flags = jobj->flags;
+        dirty = FALSE;
+        if (!(jobj_flags & JOBJ_USER_DEF_MTX)) {
+            if (jobj_flags & JOBJ_MTX_DIRTY) {
+                dirty = TRUE;
+            }
+        }
+        if (dirty != FALSE) {
+            fn_8019D9DC(jobj);
+        }
+    }
+
+done:
+    model->flags |= MODEL_FLAG_SKIP_APPLY;
 }
 
 u32 modelProcessAt60fps__FP8_GSmodel(GSmodel* model)

@@ -1081,8 +1081,166 @@ HSD_JObj* fn_8019F718(void)
 extern void fn_8019D620(HSD_JObj*);
 BOOL fn_8019D980(HSD_JObj* jobj);
 void fn_8019F778(HSD_JObj* jobj);
+void fn_8019F7F0(HSD_JObj* jobj, u32 flags);
+void fn_8019FAEC(HSD_JObj* jobj, u32 flags);
 void fn_8019FB90(HSD_JObj* jobj, u32 flags);
 void fn_8019FE8C(HSD_JObj* jobj, u32 flags);
+
+/* 0x8019F7F0 | 0x2FC */
+#pragma push
+#pragma optimization_level 1
+#pragma use_lmw_stmw on
+#pragma inline_depth(5)
+#pragma inline_max_size(10000)
+
+static inline BOOL JObjMtxIsDirtyForClearFlags(HSD_JObj* jobj)
+{
+    BOOL result;
+
+    if (jobj == NULL) {
+        __assert(&lbl_8047DB34, 0x25D, &lbl_8047DB3C);
+    }
+    result = FALSE;
+    if (!(jobj->flags & JOBJ_USER_DEF_MTX) &&
+        (jobj->flags & JOBJ_MTX_DIRTY))
+    {
+        result = TRUE;
+    }
+    return result;
+}
+
+static inline void JObjSetMtxDirtyForClearFlags(HSD_JObj* jobj)
+{
+    if (jobj != NULL && !JObjMtxIsDirtyForClearFlags(jobj)) {
+        fn_8019D620(jobj);
+    }
+}
+
+static inline void JObjClearFlagsInline(HSD_JObj* jobj, u32 flags)
+{
+    if (jobj == NULL) {
+        return;
+    }
+    if ((jobj->flags ^ flags) & JOBJ_CLASSICAL_SCALE) {
+        JObjSetMtxDirtyForClearFlags(jobj);
+    }
+    jobj->flags &= ~flags;
+}
+
+static inline void JObjClearFlagsUsingMtxCheck(HSD_JObj* jobj, u32 flags)
+{
+    if (jobj == NULL) {
+        return;
+    }
+    if ((jobj->flags ^ flags) & JOBJ_CLASSICAL_SCALE) {
+        if (jobj != NULL && !fn_8019D980(jobj)) {
+            fn_8019D620(jobj);
+        }
+    }
+    jobj->flags &= ~flags;
+}
+
+static inline void JObjClearFlagsUsingDirtyCall(HSD_JObj* jobj, u32 flags)
+{
+    if (jobj == NULL) {
+        return;
+    }
+    if ((jobj->flags ^ flags) & JOBJ_CLASSICAL_SCALE) {
+        fn_8019F778(jobj);
+    }
+    jobj->flags &= ~flags;
+}
+
+static inline void JObjClearFlagsAllLevel5(HSD_JObj* jobj, u32 flags)
+{
+    HSD_JObj* child;
+
+    if (jobj == NULL) {
+        return;
+    }
+    fn_8019FAEC(jobj, flags);
+    if (!(jobj->flags & JOBJ_INSTANCE)) {
+        for (child = jobj->child; child != NULL; child = child->next) {
+            fn_8019F7F0(child, flags);
+        }
+    }
+}
+
+static inline void JObjClearFlagsAllLevel4(HSD_JObj* jobj, u32 flags)
+{
+    HSD_JObj* child;
+
+    if (jobj == NULL) {
+        return;
+    }
+    JObjClearFlagsUsingDirtyCall(jobj, flags);
+    if (!(jobj->flags & JOBJ_INSTANCE)) {
+        for (child = jobj->child; child != NULL; child = child->next) {
+            JObjClearFlagsAllLevel5(child, flags);
+        }
+    }
+}
+
+static inline void JObjClearFlagsAllLevel3(HSD_JObj* jobj, u32 flags)
+{
+    HSD_JObj* child;
+
+    if (jobj == NULL) {
+        return;
+    }
+    JObjClearFlagsUsingMtxCheck(jobj, flags);
+    if (!(jobj->flags & JOBJ_INSTANCE)) {
+        for (child = jobj->child; child != NULL; child = child->next) {
+            JObjClearFlagsAllLevel4(child, flags);
+        }
+    }
+}
+
+static inline void JObjClearFlagsAllLevel2(HSD_JObj* jobj, u32 flags)
+{
+    HSD_JObj* child;
+
+    if (jobj == NULL) {
+        return;
+    }
+    JObjClearFlagsInline(jobj, flags);
+    if (!(jobj->flags & JOBJ_INSTANCE)) {
+        for (child = jobj->child; child != NULL; child = child->next) {
+            JObjClearFlagsAllLevel3(child, flags);
+        }
+    }
+}
+
+static inline void JObjClearFlagsAllLevel1(HSD_JObj* jobj, u32 flags)
+{
+    HSD_JObj* child;
+
+    if (jobj == NULL) {
+        return;
+    }
+    JObjClearFlagsInline(jobj, flags);
+    if (!(jobj->flags & JOBJ_INSTANCE)) {
+        for (child = jobj->child; child != NULL; child = child->next) {
+            JObjClearFlagsAllLevel2(child, flags);
+        }
+    }
+}
+
+void fn_8019F7F0(HSD_JObj* jobj, u32 flags)
+{
+    HSD_JObj* child;
+
+    if (jobj == NULL) {
+        return;
+    }
+    JObjClearFlagsInline(jobj, flags);
+    if (!(jobj->flags & JOBJ_INSTANCE)) {
+        for (child = jobj->child; child != NULL; child = child->next) {
+            JObjClearFlagsAllLevel1(child, flags);
+        }
+    }
+}
+#pragma pop
 
 /* 0x8019FAEC | 0xA4 */
 #pragma push
