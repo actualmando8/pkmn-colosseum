@@ -1,9 +1,11 @@
 /**
  * @file THP_range_801E1B54.c
- * @brief THP video codec + player wrapper, 0x801E1B54 - 0x801ECFE0.
+ * @brief THP player wrapper, 0x801E1B54 - 0x801E5548, plus shared decoder
+ * source used by THPDec_range_801E5548.c.
  *
- * Boundary evidence-verified from asm (sdata clusters, callee families,
- * static linkage, call chains) - mixed-block split pass, 2026-07-01.
+ * The player and decoder ranges are separate original translation units.
+ * Besides the sdata/callee/static-linkage boundary at THPVideoDecode, the
+ * player range matches GC/1.3 while the decoder range matches GC/1.2.5n.
  *
  * Transcribed 2026-07-02 from Nintendo's redistributable THP video/audio
  * decoder library. Cross-game corpus (simindex, ext corpus) shows every
@@ -145,6 +147,7 @@ static void __THPHuffDecodeDCTCompV(register THPFileInfo *info, THPCoeff *block)
 static s32 __THPAudioGetNewSample(THPAudioDecodeInfo *info);
 static void __THPAudioInitialize(THPAudioDecodeInfo *info, u8 *ptr);
 
+#ifndef THP_DECODER_ONLY
 /* ===================================================================
  * THP PLAYER WRAPPER (game-specific, no cross-game exemplar)
  * 0x801E1B54 - 0x801E5548 (46 functions, ends where THPVideoDecode
@@ -973,8 +976,12 @@ extern s16 *lbl_8047B470;
 extern s16 *lbl_8047B474;
 extern void DCFlushRange(void *addr, u32 nBytes);
 extern u32 fn_801E2B74(s16 *left, s16 *right, u32 samples, u32 *status);
+u32 fn_801E260C(s16 *dmaBuffer, u32 firstLength, u32 unused,
+                u32 secondLength, void *active);
 extern void fn_8014E9B4(u32 stream, u32 offset, u32 samples, u32 arg3,
                         u32 arg4);
+extern u32 fn_8014EE40();
+extern void sndStreamFree(u32 stream);
 
 #pragma push
 #pragma inline_depth(8)
@@ -1019,6 +1026,104 @@ static inline void THPDecodeAudioBlock(THPAudioDmaState *state, s16 *left,
     }
     state->decodedPosition += samples;
 }
+
+static inline void THPDecodeInitialAudioBlock(THPAudioDmaState *state,
+                                               s16 *left, s16 *right,
+                                               u32 samples)
+{
+    register u64 decoded;
+    register u32 remaining;
+    register s16 *outLeft;
+    register s16 *outRight;
+
+    remaining = samples;
+    decoded = state->decodedPosition;
+    outLeft = left;
+    outRight = right;
+
+    for (;;) {
+        s32 status;
+        u32 amount = fn_801E2B74(outLeft, outRight, remaining,
+                                 (u32 *)&status);
+        decoded += amount;
+        if (status == 0) {
+            break;
+        }
+        if (status == 1) {
+            remaining -= amount;
+            outLeft += amount;
+            if (outRight != NULL) {
+                outRight += amount;
+            }
+            THPAdvanceAudioMarker(state, decoded);
+            continue;
+        }
+        memset(outLeft, 0, remaining * sizeof(s16));
+        if (outRight != NULL) {
+            memset(outRight, 0, remaining * sizeof(s16));
+        }
+        break;
+    }
+    state->decodedPosition += samples;
+}
+
+#pragma push
+#pragma optimize_for_size on
+#pragma opt_strength_reduction off
+BOOL fn_801E34F0(void)
+{
+    u8 *player = lbl_8046AC60;
+    u32 frequency = *(u32 *)(player + 0x90);
+    u32 samples = frequency * 40 / 1000;
+    u32 stream;
+    u32 bytes;
+    THPAudioDmaState *state;
+
+    stream = fn_8014EE40(0xFF, lbl_8047B470, samples, frequency, 0x7F,
+                         *(u32 *)(player + 0x8C) == 2 ? 0 : 0x40,
+                         0, 0, 0, 0, 0x30000, fn_801E260C, (void *)1, NULL);
+    lbl_80478D00 = stream;
+    if (stream == (u32)-1) {
+        return FALSE;
+    }
+
+    if (*(u32 *)(player + 0x8C) == 2) {
+        stream = fn_8014EE40(0xFF, lbl_8047B474, samples,
+                             *(u32 *)(player + 0x90), 0x7F, 0x7F,
+                             0, 0, 0, 0, 0x30000, fn_801E260C, NULL,
+                             NULL);
+        lbl_80478D04 = stream;
+        if (stream == (u32)-1) {
+            sndStreamFree(lbl_80478D00);
+            return FALSE;
+        }
+    }
+
+    state = &lbl_8046A440;
+    state->readMarker = 0;
+    state->writeMarker = 0;
+    state->dmaPosition = 0;
+    state->requestedPosition = 0;
+    state->decodedPosition = 0;
+
+    if (*(u32 *)(lbl_8046AC60 + 0x8C) == 2) {
+        THPDecodeInitialAudioBlock(state, lbl_8047B470, lbl_8047B474,
+                                   samples);
+    } else {
+        THPDecodeInitialAudioBlock(state, lbl_8047B470, NULL, samples);
+    }
+
+    bytes = samples;
+    bytes *= sizeof(s16);
+    DCFlushRange(lbl_8047B470, bytes);
+    fn_8014E9B4(lbl_80478D00, 0, samples, 0, 0);
+    if (*(u32 *)(lbl_8046AC60 + 0x8C) == 2) {
+        DCFlushRange(lbl_8047B474, bytes);
+        fn_8014E9B4(lbl_80478D04, 0, samples, 0, 0);
+    }
+    return TRUE;
+}
+#pragma pop
 
 u32 fn_801E260C(s16 *dmaBuffer, u32 firstLength, u32 unused,
                 u32 secondLength, void *active)
@@ -1122,7 +1227,9 @@ BOOL fn_801E4724(void)
     }
     return FALSE;
 }
+#endif
 
+#ifndef THP_PLAYER_ONLY
 s32 THPVideoDecode(void *file, void *tileY, void *tileU, void *tileV, void *work)
 {
     u8 all_done, status;
@@ -3578,3 +3685,4 @@ static void __THPAudioInitialize(THPAudioDecodeInfo *info, u8 *ptr)
     info->scale = (u8)((*(info->encodeData) & 0xF));
     info->encodeData++;
 }
+#endif
