@@ -714,7 +714,7 @@ void menuPdaOpen(void)
 #endif
 
 /* mailGetNbMailInMailbox (battle_waza.c): Waza-party active-effect count getter. */
-extern u16 mailGetNbMailInMailbox(void);
+extern s32 mailGetNbMailInMailbox(void);
 
 /* Mail-ID lookup table (halfword mail IDs), indexed by receive-order
  * slot; sda21-addressed pointer variable (matches XD's pdaMailGetMailID
@@ -1148,6 +1148,39 @@ s32 fn_8004C3E4(PdaMailSortLabelWindow* window)
     return 0;
 }
 #pragma pop
+
+extern const f32 lbl_8047BE08;
+extern const f32 lbl_8047BE0C;
+
+#pragma fp_contract on
+#pragma optimization_level 4
+#pragma peephole off
+s32 fn_8004C4A4(u8* context, u8* field)
+{
+    u8* state;
+    s32 pages;
+
+    state = *(u8**) (context + 0x60);
+    pages = (mailGetNbMailInMailbox() + 9) / 10;
+    if (pages <= 1) {
+        winSpriteSetDisp(field, 0);
+    } else {
+        winSpriteSetDisp(field, 1);
+    }
+
+    if (*(s16*) (field + 6) == 0x444) {
+        s32 base = *(s32*) (state + 4);
+        *(s16*) (field + 0x50) =
+            (s16) (lbl_8047BE08 * **(f32**) state + (f32) base);
+    } else {
+        s32 base = *(s32*) (state + 8);
+        *(s16*) (field + 0x50) =
+            (s16) (lbl_8047BE0C * **(f32**) state + (f32) base);
+    }
+    return 0;
+}
+#pragma peephole reset
+#pragma fp_contract reset
 
 #if 0
 asm void fn_8004BFB0(void) {
