@@ -480,6 +480,17 @@ typedef struct CardEGridEntry {
     u8 data[1];
 } CardEGridEntry;
 
+typedef struct CardEGridMatrixCell {
+    u8 pad00[0xC];
+    u8 valid;
+    u8 pad0D[3];
+} CardEGridMatrixCell;
+
+typedef struct CardEGridLayer {
+    u8 pad00[0x76];
+    CardEGridMatrixCell cells[1];
+} CardEGridLayer;
+
 static inline u32 CardEGridEntrySize(CardEGridEntry* entry)
 {
     return 0x24 + entry->layers *
@@ -498,6 +509,45 @@ static inline s32 CardEGridLayerIsValid(CardEGridEntry* entry, s8 layer)
 {
     return layer >= 0 && layer < entry->layers;
 }
+
+/* Clear an empty decoded card-e grid entry. */
+#pragma push
+#pragma peephole off
+void fn_80082650(CardEGridEntry* entry)
+{
+    extern char lbl_8026F1C8[];
+    extern char lbl_8026F1D8[];
+    extern char lbl_8047C180[] __attribute__((section(".sdata2")));
+    extern char lbl_8047C188[] __attribute__((section(".sdata2")));
+    CardEGridLayer* layer;
+    s32 i;
+    u8 valid;
+
+    if (entry == NULL) {
+        __assert(lbl_8026F1C8, 0x17F, lbl_8047C180);
+    }
+    if (!CardEGridLayerIsValid(entry, 0)) {
+        __assert(lbl_8026F1C8, 0x180, lbl_8026F1D8);
+    }
+    layer = (CardEGridLayer*)entry->data;
+    if (layer == NULL) {
+        __assert(lbl_8026F1C8, 0x1F1, lbl_8047C188);
+    }
+
+    for (i = entry->rows * entry->columns; i > 0; i--) {
+        if (layer->cells[0].valid != 0) {
+            valid = 1;
+            goto scan_done;
+        }
+        layer = (CardEGridLayer*)((u8*)layer + sizeof(CardEGridMatrixCell));
+    }
+    valid = 0;
+scan_done:
+    if (!valid) {
+        entry->id = 0;
+    }
+}
+#pragma pop
 
 /* Return the start of one layer in a decoded card-e grid entry. */
 #pragma push
