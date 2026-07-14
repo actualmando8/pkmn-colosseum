@@ -961,6 +961,55 @@ s32 fn_80075C68(void) {
 }
 #pragma pop
 
+/* fn_80075C94 (0x80075C94): choose the next e-Reader menu flow. */
+#pragma push
+#pragma peephole off
+void fn_80075C94(void) {
+    extern void msgctrlSetValue(s32 id, u32 value);
+    extern s32 menuOpenCustom(s32 slot, ...);
+    extern s32 fn_801D0748(u32, u32, u32);
+    extern void* gamedatasaveGetStatus(u32, u32);
+    s32 result;
+
+    for (;;) {
+        msgctrlSetValue(0x37, 0);
+        result = menuOpenCustom(0xE0, 0, 0, 0x10, 1, 0);
+        fadeCheck(1);
+
+        switch (result) {
+        case 0:
+            floorLink(0x322, 0);
+            return;
+
+        case 1:
+            result = fn_801D0748(2, 2, 0);
+            if (result != 3 || gamedatasaveGetStatus(0, 4) == 0) {
+                if (result == -1) {
+                    continue;
+                }
+                winMsgOpen(2, 0x44DB, 1, 0);
+                winMsgClose(1);
+                continue;
+            }
+            floorLink(0x323, 0);
+            return;
+
+        case -1:
+            break;
+
+        case 2:
+            break;
+
+        default:
+            break;
+        }
+
+        floorLink(0x320, 0);
+        return;
+    }
+}
+#pragma pop
+
 #pragma push
 #pragma peephole off
 s32 fn_80075390(void) {
