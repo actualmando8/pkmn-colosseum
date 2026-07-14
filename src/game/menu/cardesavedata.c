@@ -93,7 +93,7 @@ extern u16 fn_800E202C(void*);
 extern void fn_800E24B0(u16);
 extern void fn_800E209C(u16);
 extern s32 fn_80083BF8(void*);
-extern void* fn_80083AF4(s32, s32);
+extern void* fn_80083AF4(void*, s32);
 extern void* windowSearchItemID(void*, s32);
 extern void qsort(void*, u32, u32, s32 (*)(u32, u32));
 extern void __assert();
@@ -657,8 +657,53 @@ void* fn_800836AC(u8* arena, u8* descriptor, u8 create)
     return entry;
 }
 
+/* Return one well-formed record, or the terminating slot for a negative index. */
 #pragma push
 #pragma peephole off
+static inline void CardEGridSetEntry(CardEGridEntry** entryOut,
+                                     CardEGridEntry* entry)
+{
+    if (entryOut != NULL) {
+        *entryOut = entry;
+    }
+}
+
+void* fn_80083AF4(void* arena, s32 index)
+{
+    extern void* savedataGetStatus(u32, u32);
+    CardEGridEntry* entry;
+    CardEGridEntry* result;
+    u8* end;
+    s32 currentIndex;
+
+    if (arena != NULL) {
+        entry = arena;
+    } else {
+        entry = savedataGetStatus(0, 0xD);
+    }
+    end = (u8*)entry + 0x4000;
+    CardEGridSetEntry(&result, NULL);
+    currentIndex = 0;
+    while (1) {
+        if (end < (u8*)entry + 0x24 || entry->id == 0) {
+            break;
+        }
+        if (entry->layers > 3 || entry->rows > 6 || entry->columns > 5) {
+            entry->id = 0;
+            break;
+        }
+        if (currentIndex == index) {
+            result = entry;
+        }
+        currentIndex++;
+        entry = (CardEGridEntry*)((u8*)entry + CardEGridEntrySize(entry));
+    }
+    if (index < 0) {
+        result = entry;
+    }
+    return result;
+}
+
 static inline void CardEGridSetCount(s32* countOut, s32 count)
 {
     if (countOut != NULL) {
