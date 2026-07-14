@@ -4511,6 +4511,21 @@ typedef struct PokemonRibbonGrid {
     s8 ribbon[9][4];
 } PokemonRibbonGrid;
 
+typedef struct PokemonStatusMenuWork {
+    u8 flags;
+    u8 state;
+    s8 selection;
+    s8 previousSelection;
+    s32 result;
+    u32 entityId;
+    void* pokemon;
+    void* callback;
+    s32 callbackArg;
+    u16 hasExtraMove;
+    u16 padding;
+    PokemonRibbonGrid ribbons;
+} PokemonStatusMenuWork;
+
 extern RibbonGroupDescriptor lbl_802EEFD8[10];
 extern RibbonGroupDescriptor lbl_802EF000[7];
 extern u32 pokemonGetStatus();
@@ -4815,6 +4830,105 @@ void fn_80096C48(u32 unused, u8* dst) {
     out[0x66] = triple->z;
 }
 #pragma peephole on
+
+/* Handle confirm/cancel input for the linked-Pokemon status menu. */
+#pragma push
+#pragma peephole off
+void fn_80096D54(u8* menu)
+{
+    extern void fn_80166A28(s32 id);
+    extern void pokemonWazaReplace();
+
+    u16* keys;
+    void* pokemon;
+    PokemonStatusMenuWork* work;
+    register s8* ribbonRow;
+    register s32 ribbonColumn;
+    register s32 ribbonIndex;
+    s8 ribbon;
+
+    keys = windowGetKeyInfo();
+    if (keys[2] & 0x10) {
+        work = (PokemonStatusMenuWork*)lbl_803FB380;
+        switch (work->state) {
+        case 0:
+        case 1:
+        case 6:
+        case 8:
+            break;
+        case 2:
+            work->selection = 0;
+            work->state = 3;
+            break;
+        case 3:
+            pokemon = work->pokemon;
+            if (pokemon != NULL) {
+                if ((s32)pokemonGetStatus(pokemon, 0, 0xC2, 0) != 0) {
+                    fn_80166A28(0x26);
+                } else if (lbl_803FB380[0] & 2) {
+                    work->state = 4;
+                    lbl_803FB380[3] = lbl_803FB380[2];
+                }
+            }
+            break;
+        case 4:
+            pokemon = work->pokemon;
+            if (pokemon != NULL) {
+                pokemonWazaReplace(pokemon, work->previousSelection,
+                                   work->selection);
+            }
+            *(s8*)(lbl_803FB380 + 3) = -1;
+            work->state = 3;
+            break;
+        case 5:
+            if ((s32)work->ribbons.count > 0) {
+                for (ribbon = 0; ribbon < 36; ribbon++) {
+                    ribbonIndex = ribbon % 9;
+                    ribbonColumn = ribbon % 4;
+                    ribbonRow = (s8*)work + ribbonIndex * 4;
+                    ribbonRow += ribbonColumn;
+                    if (ribbonRow[0x20] >= 0) {
+                        break;
+                    }
+                }
+                work->state = 6;
+                *(s8*)(lbl_803FB380 + 0x1A) = ribbon;
+            }
+            break;
+        case 7:
+            if (work->flags & 0x10) {
+                menu[0x98] = 1;
+                work->result = work->selection;
+            }
+            break;
+        }
+    } else if (keys[2] & 0x20) {
+        switch (lbl_803FB380[1]) {
+        case 0:
+        case 8:
+            break;
+        case 1:
+        case 2:
+        case 5:
+        case 7:
+            menu[0x98] = 1;
+            menu[0x99] = 1;
+            lbl_803FB380[1] = 8;
+            break;
+        case 3:
+            lbl_803FB380[1] = 2;
+            break;
+        case 4:
+            lbl_803FB380[1] = 3;
+            break;
+        case 6:
+            *(s8*)(lbl_803FB380 + 0x1A) = -1;
+            lbl_803FB380[1] = 5;
+            break;
+        }
+    }
+}
+#pragma pop
 
 /* Handle input for the linked-Pokemon status submenus. */
 #pragma push
