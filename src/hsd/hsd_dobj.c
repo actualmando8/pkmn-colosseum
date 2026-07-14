@@ -261,7 +261,8 @@ asm void fn_801990B8(void) {
 #include "src/hsd/hsd_dobj_fn_801990B8.inc"
 }
 #else
-#pragma optimization_level 4
+#pragma optimization_level 1
+#pragma use_lmw_stmw on
 static void fn_801990B8(HSD_DObj* dobj, f32 vmtx[3][4], f32 pmtx[3][4], u32 rendermode)
 {
     HSD_PObj* pobj;
