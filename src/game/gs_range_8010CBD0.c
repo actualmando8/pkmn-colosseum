@@ -131,6 +131,22 @@ s32 fn_8010D038(void) {
     return 1;
 }
 
+/* 0x8010D170 | 0x9C */
+void fn_8010D170(void)
+{
+    extern u8* fn_800D7894(void);
+    extern void fn_800D7868(u8*, u32, u32, u32, u32, u8, u32, u8);
+    u8* handle;
+
+    COL_STATE->activeLayer = 0;
+    COL_STATE->displayList = NULL;
+    handle = fn_800D7894();
+    COL_STATE->gfxRenderHandle = (u32)handle;
+    fn_800D7868(handle, 1, 0, 1, 4, 0, 0, 0);
+    fn_800D7868((u8*)COL_STATE->gfxRenderHandle, 4, 0, 6, 10, 0, 0, 0);
+    COL_STATE->displayList = NULL;
+}
+
 typedef f32 ColVec3[3];
 typedef f32 ColMtx[3][4];
 
