@@ -322,25 +322,30 @@ void PSMTXMultVecSR(const Mtx m, const Vec* src, Vec* dst)
 
 void C_MTXFrustum(Mtx44 m, f32 top, f32 bottom, f32 left, f32 right, f32 near, f32 far)
 {
-    f32 tmp;
+    f32 scaledNear;
+    f32 depthScale;
+    f32 verticalScale;
+    f32 horizontalScale;
 
-    tmp = lbl_8047C2A8 / (right - left);
-    m[0][0] = (lbl_8047C2AC * near) * tmp;
+    horizontalScale = lbl_8047C2A8 / (right - left);
+    scaledNear = lbl_8047C2AC * near;
+    verticalScale = lbl_8047C2A8 / (top - bottom);
+    depthScale = lbl_8047C2A8 / (far - near);
+
+    m[0][0] = scaledNear * horizontalScale;
     m[0][1] = lbl_8047C2B0;
-    m[0][2] = (right + left) * tmp;
+    m[0][2] = horizontalScale * (right + left);
     m[0][3] = lbl_8047C2B0;
 
-    tmp = lbl_8047C2A8 / (top - bottom);
     m[1][0] = lbl_8047C2B0;
-    m[1][1] = (lbl_8047C2AC * near) * tmp;
-    m[1][2] = (top + bottom) * tmp;
+    m[1][1] = scaledNear * verticalScale;
+    m[1][2] = verticalScale * (top + bottom);
     m[1][3] = lbl_8047C2B0;
 
-    tmp = lbl_8047C2A8 / (far - near);
     m[2][0] = lbl_8047C2B0;
     m[2][1] = lbl_8047C2B0;
-    m[2][2] = -near * tmp;
-    m[2][3] = -(far * near) * tmp;
+    m[2][2] = -near * depthScale;
+    m[2][3] = depthScale * -(far * near);
 
     m[3][0] = lbl_8047C2B0;
     m[3][1] = lbl_8047C2B0;
