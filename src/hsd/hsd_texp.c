@@ -2702,12 +2702,15 @@ void fn_801B26F8(void) {
 }
 
 /* 0x801B2718 | 0x24 */
+#pragma push
+#pragma optimization_level 1
 void fn_801B2718(void) {
     lbl_8047B351 = 0;
     lbl_8047B350 = 0;
     lbl_8047B34C = -1;
     lbl_8047B351 = 0xFF;
 }
+#pragma pop
 
 /* 0x801B28B8 | 0x10 */
 void fn_801B28B8(f32 value) {

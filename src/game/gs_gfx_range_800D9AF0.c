@@ -725,6 +725,36 @@ void fn_800DA1E8(s32 zEnable, s32 zFunc, s32 zUpdate) {
 }
 #endif
 
+extern void fn_800BCE30(u32);
+extern void fn_800BCE5C(u32);
+void fn_800DA2BC(s32 zCompare, s32 zBeforeTexture, s32 zFunc) {
+    u32 state = lbl_8047AA80;
+    if (*(s32*)state == 1) {
+        fn_800D4F98(0x2e, 3, zCompare, zBeforeTexture, zFunc);
+    } else {
+        if (zCompare == 1) {
+            *(u8*)(state + 0x419) = 1;
+        } else if (zCompare == 0) {
+            *(u8*)(state + 0x419) = 0;
+        }
+        if (zBeforeTexture == 1) {
+            *(u8*)(lbl_8047AA80 + 0x41a) = 1;
+        } else if (zBeforeTexture == 0) {
+            *(u8*)(lbl_8047AA80 + 0x41a) = 0;
+        }
+        if (zFunc == 1) {
+            *(u8*)(lbl_8047AA80 + 0x41b) = 1;
+        } else if (zFunc == 0) {
+            *(u8*)(lbl_8047AA80 + 0x41b) = 0;
+        }
+        fn_800BCE30(*(u8*)(lbl_8047AA80 + 0x419));
+        fn_800BCE5C(*(u8*)(lbl_8047AA80 + 0x41a));
+        GXSetZMode(*(u8*)(lbl_8047AA80 + 0x41c),
+                   *(u32*)(lbl_8047AA80 + 0x420),
+                   *(u8*)(lbl_8047AA80 + 0x41b));
+    }
+}
+
 extern void GXSetDstAlpha(u32);
 #if 0
 asm void fn_800DA3B0(void) {
