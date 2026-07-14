@@ -2248,6 +2248,7 @@ void DoUnmount(s32 chan, s32 result) {
 s32 CARDUnmount(s32 chan) {
     CARDControl* card;
     BOOL enabled;
+    CARDControl* selected;
     CARDControl* control;
     s32 result;
     extern s32 __CARDGetControlBlock(s32 chan, CARDControl** card);
@@ -2256,7 +2257,8 @@ s32 CARDUnmount(s32 chan) {
     if (result < 0) {
         return result;
     }
-    control = &lbl_803FC620[chan];
+    selected = &lbl_803FC620[chan];
+    control = selected;
     enabled = OSDisableInterrupts();
     if (control->attached != 0) {
         fn_8009870C(chan, 0);
