@@ -9,9 +9,10 @@
  * functions (0x801C0F20-0x801C2AE8), all of which are HSD sysdolphin
  * library code, not battle-grid code -- this is the direct continuation
  * of the same XD translation unit (aobj.cpp) as the functions above.
- * fn_801C01C8 / fn_801C021C / HSD_ForeachAnim are asm-only for now.
+ * fn_801C021C / HSD_ForeachAnim are asm-only for now.
  */
 #include "dolphin/types.h"
+#include "dolphin/os/OSInterrupt.h"
 #include "hsd/hsd_aobj.h"
 #include "hsd/hsd_cobj.h"
 #include "hsd/hsd_debug.h"
@@ -33,6 +34,7 @@
  * HSD_ObjAllocData type in include/hsd/hsd_object.h, matching the existing
  * house style in hsd_dobj.c / hsd_mobj_range_801A8478.c. */
 extern u8 lbl_80466DB8[];
+extern void* volatile lbl_80466BC0[];
 extern void* HSD_ObjAlloc(void* list);
 extern void HSD_ObjFree(void* list, void* data);
 extern void HSD_ObjAllocInit(void* list, u32 size, u32 alignment);
@@ -55,6 +57,19 @@ extern HSD_SList* lbl_8047B388;
 extern void fn_801A05EC(void* obj);
 extern f64 fmod(f64 x, f64 y);
 extern void* memset(void* dst, int val, u32 size);
+
+/**
+ * fn_801C01C8 - Address: 0x801C01C8 | Size: 0x54
+ */
+void* fn_801C01C8(void* callback)
+{
+    void* previous = lbl_80466BC0[0x7A];
+    BOOL enabled = OSDisableInterrupts();
+
+    lbl_80466BC0[0x7A] = callback;
+    OSRestoreInterrupts(enabled);
+    return previous;
+}
 
 /**
  * _HSD_AObjForgetMemory - Address: 0x801C0270 | Size: 0xC
