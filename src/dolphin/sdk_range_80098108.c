@@ -66,6 +66,13 @@ extern DVDDriveInfo DriveInfo_803FB4A0;
 static volatile EXIRegBlock* const ExiHw = (volatile EXIRegBlock*)0xCC006800;
 static volatile OSLowMem* const LowMem = (volatile OSLowMem*)0x80000000;
 
+#ifdef __MWERKS__
+#define AT_ADDRESS(addr) : addr
+volatile u32 __EXIRegs[0x40] AT_ADDRESS(0xCC006800);
+#else
+#define __EXIRegs ((volatile u32*)0xCC006800)
+#endif
+
 BOOL fn_80099400(s32 chan, u32 dev, u32* id);
 BOOL fn_80098790(s32 chan);
 void fn_80098110(s32 chan, EXIControl* exi);
@@ -243,13 +250,13 @@ void fn_80098DDC(volatile s16 interrupt, OSContext* context) {
     OSContext exceptionContext;
     s32 chan = (interrupt - 9) / 3;
     EXIControl* exi = &lbl_803FB3C8[chan];
-    u32 csr = ((volatile u32*)0xCC006800)[chan * 5];
+    u32 csr = __EXIRegs[chan * 5];
     volatile u32 oldCsr = csr;
     EXICallback callback;
 
     csr &= 0x7F5;
     csr |= 2;
-    ((volatile u32*)0xCC006800)[chan * 5] = csr;
+    __EXIRegs[chan * 5] = csr;
     callback = exi->exiCallback;
     if (callback) {
         OSClearContext(&exceptionContext);
