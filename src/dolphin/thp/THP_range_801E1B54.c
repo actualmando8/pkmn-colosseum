@@ -368,9 +368,9 @@ BOOL fn_801E4A6C(void)
 {
     extern void *memset(void *dst, int value, u32 size);
     extern u8 lbl_8046A440[];
-    u8 *base = lbl_8046A440;
+    u8 *base;
 
-    memset(base + 0x820, 0, 0x1C0);
+    memset((base = lbl_8046A440) + 0x820, 0, 0x1C0);
     fn_8009F1D0(base + 0x54, (u32)(base + 0x48), 3);
     lbl_8047B468 = TRUE;
     return TRUE;

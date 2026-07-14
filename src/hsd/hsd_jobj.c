@@ -3177,23 +3177,21 @@ void fn_801A323C(HSD_AObj* aobj)
 {
     HSD_FObj* volatile* link;
 
-    if (aobj == NULL) {
+    if (aobj == NULL || aobj->fobj == NULL) {
         return;
     }
-    if (aobj->fobj != NULL) {
-        link = &aobj->fobj;
-        while (*link != NULL) {
-            if ((*link)->obj_type == HSD_A_J_BRANCH) {
-                HSD_FObj* next = (*link)->next;
-                HSD_FObj* fobj = *link;
+    link = &aobj->fobj;
+    while (*link != NULL) {
+        if ((*link)->obj_type == HSD_A_J_BRANCH) {
+            HSD_FObj* next = (*link)->next;
+            HSD_FObj* fobj = *link;
 
-                *link = next;
-                fobj->next = aobj->fobj;
-                aobj->fobj = fobj;
-                return;
-            }
-            link = &(*link)->next;
+            *link = next;
+            fobj->next = aobj->fobj;
+            aobj->fobj = fobj;
+            return;
         }
+        link = &(*link)->next;
     }
 }
 
