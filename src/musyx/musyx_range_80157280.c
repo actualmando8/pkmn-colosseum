@@ -41,6 +41,8 @@ u32 sndPitchUpOne(u16 pitch) {
 }
 #pragma pop
 
+#pragma push
+#pragma peephole on
 u32 sndGetPitch(u8 key, u32 sInfo) {
     extern f32 lbl_80368EC8[];
     extern f32 lbl_803690C8[];
@@ -49,28 +51,25 @@ u32 sndGetPitch(u8 key, u32 sInfo) {
      * cast pointer) so the mixFrq load folds to `lwz r0, @l(r3)`, and must
      * be >8 bytes so MWCC does not assume .sdata/sda21 for the extern. */
     extern struct SynthInfoView_ { u32 mixFrq; u32 numSamples; u32 pad[6]; } lbl_80434C50;
-    f32 f;
-    f32 t;
+    u32 okey;
+    f32 frq;
     f32 fourk;
-    u8 k;
 
     if (sInfo == 0xFFFFFFFF) {
         sInfo = 0x40005622;
     }
-    k = (u8)(sInfo >> 24);
+    okey = sInfo >> 24;
     fourk = lbl_8047D400;
-    if (key != k) {
-        if (k < key) {
-            t = lbl_80368EC8[key - k];
-        } else {
-            t = lbl_803690C8[k - key];
-        }
-        f = (f32)(sInfo & 0xFFFFFF) * t;
+    if (key != okey) {
+        frq = (f32)(sInfo & 0xFFFFFF) *
+              (okey < key ? lbl_80368EC8[key - okey]
+                          : lbl_803690C8[okey - key]);
     } else {
-        f = (f32)(sInfo & 0xFFFFFF);
+        frq = sInfo & 0xFFFFFF;
     }
-    return (u32)((fourk * f) / (f32)lbl_80434C50.mixFrq);
+    return (fourk * frq) / lbl_80434C50.mixFrq;
 }
+#pragma pop
 #pragma pop
 
 
