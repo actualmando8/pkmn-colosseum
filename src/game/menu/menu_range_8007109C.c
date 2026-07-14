@@ -606,6 +606,8 @@ s32 fn_80073690(s32 chan, s32 data) {
 #pragma pop
 
 /* fn_80073990 (0x80073990): wait one millisecond, then send command 0x11. */
+#pragma push
+#pragma peephole off
 s32 fn_80073990(s32 chan) {
     extern u32 fn_800D0F44(s32 chan);
     u32 command;
@@ -630,6 +632,7 @@ s32 fn_80073990(s32 chan) {
     }
     return result;
 }
+#pragma pop
 
 /*
  * Trivial single-call tail-wrappers ported from the previous campaign's
