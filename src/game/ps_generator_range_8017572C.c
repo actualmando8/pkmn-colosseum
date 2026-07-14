@@ -22,12 +22,24 @@
  *   psKillGeneratorID  (0x801758D8, not yet decompiled)
  *   psKillGenerator    (0x80175A1C, not yet decompiled)
  *   psRemoveGenerator  (0x80175B94)
- *   psInitGenerator    (0x80175DF0, not yet decompiled)
+ *   psInitGenerator    (0x80175DF0)
  *   genPosUpdate       (0x80175E88, not yet decompiled)
  *   psGetNewIDNum      (0x80175F44)
  */
 
 #include "game/gs_scene_types.h"
+
+typedef struct PSGeneratorPoolNode {
+    struct PSGeneratorPoolNode* next;
+    u8 data[0xB0];
+} PSGeneratorPoolNode;
+
+extern void* fn_801A6928(s32 size);
+extern u16 lbl_8047B112;
+extern u32 lbl_8047B180;
+extern u32 lbl_8047B190;
+extern u32 lbl_8047B194;
+extern u32 lbl_8047B198;
 
 #pragma push
 #pragma optimization_level 0
@@ -43,6 +55,33 @@ void* psRemoveGenerator(u32 type, u32 param) {
     /* TODO: match -- 604 bytes at 0x80175B94 */
 }
 #pragma pop
+
+void psInitGenerator(s32 count) {
+    s32 i;
+    PSGeneratorPoolNode* node;
+
+    lbl_8047B188 = NULL;
+    lbl_8047B18C = NULL;
+
+    for (i = count - 1; i >= 0; i--) {
+        node = fn_801A6928(sizeof(PSGeneratorPoolNode));
+        memset(node, 0, sizeof(PSGeneratorPoolNode));
+        if (node == NULL) {
+            return;
+        }
+        node->next = lbl_8047B18C;
+        lbl_8047B18C = node;
+    }
+
+    lbl_8047B118 = 0;
+    lbl_8047B112 = 0;
+    lbl_8047B180 = 0;
+    lbl_8047B190 = 0;
+    lbl_8047B198 = 0;
+    lbl_8047B194 = 0;
+    lbl_8047B184 = NULL;
+}
+
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
