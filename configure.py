@@ -1635,7 +1635,20 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "dolphin/thp/THP_range_801E1B54.c",
+                mw_version="GC/1.3",
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                    "-DTHP_PLAYER_ONLY",
+                ],
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/thp/THPDec_range_801E5548.c",
                 mw_version="GC/1.2.5n",
+                extra_cflags=["-i src/dolphin/thp"],
                 progress_category="sdk",
             ),
             Object(

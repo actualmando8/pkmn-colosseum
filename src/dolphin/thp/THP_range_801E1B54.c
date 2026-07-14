@@ -1,9 +1,11 @@
 /**
  * @file THP_range_801E1B54.c
- * @brief THP video codec + player wrapper, 0x801E1B54 - 0x801ECFE0.
+ * @brief THP player wrapper, 0x801E1B54 - 0x801E5548, plus shared decoder
+ * source used by THPDec_range_801E5548.c.
  *
- * Boundary evidence-verified from asm (sdata clusters, callee families,
- * static linkage, call chains) - mixed-block split pass, 2026-07-01.
+ * The player and decoder ranges are separate original translation units.
+ * Besides the sdata/callee/static-linkage boundary at THPVideoDecode, the
+ * player range matches GC/1.3 while the decoder range matches GC/1.2.5n.
  *
  * Transcribed 2026-07-02 from Nintendo's redistributable THP video/audio
  * decoder library. Cross-game corpus (simindex, ext corpus) shows every
@@ -145,6 +147,7 @@ static void __THPHuffDecodeDCTCompV(register THPFileInfo *info, THPCoeff *block)
 static s32 __THPAudioGetNewSample(THPAudioDecodeInfo *info);
 static void __THPAudioInitialize(THPAudioDecodeInfo *info, u8 *ptr);
 
+#ifndef THP_DECODER_ONLY
 /* ===================================================================
  * THP PLAYER WRAPPER (game-specific, no cross-game exemplar)
  * 0x801E1B54 - 0x801E5548 (46 functions, ends where THPVideoDecode
@@ -1224,7 +1227,9 @@ BOOL fn_801E4724(void)
     }
     return FALSE;
 }
+#endif
 
+#ifndef THP_PLAYER_ONLY
 s32 THPVideoDecode(void *file, void *tileY, void *tileU, void *tileV, void *work)
 {
     u8 all_done, status;
@@ -3680,3 +3685,4 @@ static void __THPAudioInitialize(THPAudioDecodeInfo *info, u8 *ptr)
     info->scale = (u8)((*(info->encodeData) & 0xF));
     info->encodeData++;
 }
+#endif
