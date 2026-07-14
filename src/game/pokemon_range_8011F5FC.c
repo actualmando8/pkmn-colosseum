@@ -2915,8 +2915,8 @@ s32 pokemonOboeWaza(u8* ptr, u8 target, u8* buf_ptr, u8* counter_ptr) {
     extern s32 pokemonSetWazaStatus(u8* a, u16 b, u8* c);
     u8* buf = buf_ptr;
     u8* counter = counter_ptr;
-    u16 val;
     u8 waza = target;
+    u16 val;
     u16 result;
     if (ptr == NULL) { return -2; }
     if (ptr == NULL || counter == NULL) {
@@ -2924,7 +2924,6 @@ s32 pokemonOboeWaza(u8* ptr, u8 target, u8* buf_ptr, u8* counter_ptr) {
         goto _check;
     }
     val = pokemonGetStatus(ptr, 0, 0x6e, 0) & 0xFFFF;
-    waza = (u8)waza;
     while (*counter < 0x14) {
         if ((s32)pokemonGetStatus(NULL, val, 0x1d, *counter) == (s32)waza) {
             result = (u16)inline_fn(val, counter);
