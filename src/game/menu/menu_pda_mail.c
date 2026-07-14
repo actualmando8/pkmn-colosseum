@@ -738,6 +738,112 @@ s32 pdaMailGetMailID(s32 index)
 #pragma peephole reset
 #endif
 
+/* Mail-list cursor input callback. The high byte of cursorPosition is the
+ * mailbox page and the low byte is the row (10 and 11 are auxiliary rows). */
+extern u32 cursorBiosGetPos(u16 index);
+extern u32 cursorBiosSetPos(u16 index, u16* position);
+
+#pragma scheduling on
+#pragma peephole off
+s32 fn_8004CF78(u8* window)
+{
+    typedef union PdaMailCursorState {
+        u32 packed;
+        struct {
+            s8 page;
+            s8 row;
+        } position;
+    } PdaMailCursorState;
+    extern s32 mailGetNbMailInMailbox(void);
+    PdaMailCursorState cursor;
+    u16 persistedPosition;
+    u8* input;
+    s32 remaining;
+
+    input = windowGetKeyInfo();
+    cursorBiosGetPos(10);
+    *(u16*) &cursor.position.page = *(u16*) (window + 0x94);
+
+    if ((*(u16*) (input + 6) & 2) != 0) {
+        if (++cursor.position.row > 11) {
+            cursor.position.row = 0;
+        }
+        remaining = mailGetNbMailInMailbox() - cursor.position.page * 10;
+        if (remaining > 10) {
+            remaining = 10;
+        } else if (remaining < 0) {
+            remaining = 0;
+        }
+        if (cursor.position.row < 10 && cursor.position.row >= remaining) {
+            cursor.position.row = 10;
+        }
+    }
+    if ((*(u16*) (input + 6) & 1) != 0) {
+        if (--cursor.position.row < 0) {
+            cursor.position.row = 11;
+        }
+        remaining = mailGetNbMailInMailbox() - cursor.position.page * 10;
+        if (remaining > 10) {
+            remaining = 10;
+        } else if (remaining < 0) {
+            remaining = 0;
+        }
+        if (cursor.position.row < 10 && cursor.position.row >= remaining) {
+            if (remaining > 0) {
+                cursor.position.row = remaining - 1;
+            } else {
+                cursor.position.row = 11;
+            }
+        }
+    }
+    if ((*(u16*) (input + 6) & 8) != 0) {
+        if (cursor.position.row < 10) {
+            remaining = mailGetNbMailInMailbox();
+            remaining = (remaining + 9) / 10;
+            if (++cursor.position.page >= remaining) {
+                cursor.position.page = 0;
+            }
+            remaining = mailGetNbMailInMailbox() - cursor.position.page * 10;
+            if (remaining > 10) {
+                remaining = 10;
+            } else if (remaining < 0) {
+                remaining = 0;
+            }
+            if (cursor.position.row >= remaining) {
+                cursor.position.row = remaining - 1;
+            }
+        } else {
+            cursor.position.row = 11;
+        }
+    }
+    if ((*(u16*) (input + 6) & 4) != 0) {
+        if (cursor.position.row < 10) {
+            if (--cursor.position.page < 0) {
+                remaining = mailGetNbMailInMailbox();
+                cursor.position.page = (remaining + 9) / 10 - 1;
+            }
+            remaining = mailGetNbMailInMailbox() - cursor.position.page * 10;
+            if (remaining > 10) {
+                remaining = 10;
+            } else if (remaining < 0) {
+                remaining = 0;
+            }
+            if (cursor.position.row >= remaining) {
+                cursor.position.row = remaining - 1;
+            }
+        } else {
+            cursor.position.row = 10;
+        }
+    }
+
+    persistedPosition = *(u16*) &cursor.position.page;
+    cursorBiosSetPos(10, &persistedPosition);
+    *(u16*) (window + 0x94) = *(u16*) &cursor.position.page;
+    return 0;
+}
+#pragma peephole reset
+#pragma scheduling reset
+
 /* mailGetReceiveNumber (XD-named, same address/size): returns the
  * receive-order slot for a given mail ID, or -1 if not found. */
 extern s32 mailGetReceiveNumber(s32 mailId);
