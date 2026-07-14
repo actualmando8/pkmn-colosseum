@@ -2091,6 +2091,10 @@ s32 __CARDUpdateFatBlock(s32 chan, u16* fat, CARDCallback callback) {
                        EraseCallback_800C1D6C);
 }
 
+void* __CARDGetDirBlock(CARDControl* card) {
+    return card->dirBlock;
+}
+
 void WriteCallback_800C209C(s32 chan, s32 result) {
     CARDControl* card = &lbl_803FC620[chan];
     CARDCallback callback;
@@ -2145,27 +2149,26 @@ void EraseCallback_800C216C(s32 chan, s32 result) {
 }
 
 s32 __CARDUpdateDir(s32 chan, CARDCallback callback) {
+    CARDControl* card;
+    CARDDirCheck* check;
+    u32 tmp[2];
+    u32 addr;
     u8* dir;
-    CARDControl* card = &lbl_803FC620[chan];
-    u8* checksumBase;
-    s16* checkCode;
     extern void __CARDCheckSum(void* data, u32 length, u16* checksum, u16* checksumInv);
     extern void DCStoreRange(void* addr, u32 length);
 
+    card = &lbl_803FC620[chan];
     if (card->attached == 0) {
         return -3;
     }
-    dir = card->dirBlock;
-    checkCode = (s16*)(dir + 0x1ffa);
-    (*checkCode)++;
-    checksumBase = dir + 0x1fc0;
-    __CARDCheckSum(dir, 0x1ffc, (u16*)(checksumBase + 0x3c),
-                   (u16*)(checksumBase + 0x3e));
+    dir = __CARDGetDirBlock(card);
+    check = (CARDDirCheck*)(dir + 0x1fc0);
+    check->checkCode++;
+    __CARDCheckSum(dir, 0x1ffc, &check->checkSum, &check->checkSumInv);
     DCStoreRange(dir, 0x2000);
     card->updateCallback = callback;
-    return fn_800AFFE0(chan,
-                       card->sectorSize * (((u32)dir - (u32)card->workArea) >> 13),
-                       EraseCallback_800C216C);
+    addr = (((u32)dir - (u32)card->workArea) >> 13) * card->sectorSize;
+    return fn_800AFFE0(chan, addr, EraseCallback_800C216C);
 }
 
 s32 __CARDVerify(CARDControl* card) {
@@ -2441,10 +2444,6 @@ s32 CARDGetResultCode(s32 chan) {
 
 void* __CARDGetFatBlock(CARDControl* card) {
     return card->fatBlock;
-}
-
-void* __CARDGetDirBlock(CARDControl* card) {
-    return card->dirBlock;
 }
 
 BOOL __CARDCompareFileName(CARDDirEntry* entry, char* fileName) {
