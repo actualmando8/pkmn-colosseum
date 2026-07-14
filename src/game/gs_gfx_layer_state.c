@@ -1882,6 +1882,7 @@ asm void fn_800D87AC(void) {
 #else
 void fn_800D87AC(u32 mask) {
     s32 i;
+    u8* textureSlot;
 
     *(u32*)(lbl_8047AA80 + 0x414) |= mask;
     if (mask & 2) {
@@ -1892,8 +1893,9 @@ void fn_800D87AC(u32 mask) {
     }
     if (mask & 4) {
         for (i = 0; i < 0x10; i++) {
-            if (((u8*)lbl_8047AA80)[i + 0x25c]) {
-                ((u8*)lbl_8047AA80)[i + 0x25c] = 0;
+            textureSlot = (u8*)lbl_8047AA80 + i + 0x25c;
+            if (*textureSlot) {
+                *textureSlot = 0;
                 fn_800BBC34(i);
             }
         }
