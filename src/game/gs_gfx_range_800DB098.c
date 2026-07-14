@@ -296,6 +296,7 @@ extern void fn_800E209C(u16);
 extern void GXCallDisplayList(u32, u32);
 extern void fn_800E2AF8(u16);
 extern u16 fn_800E2C04(u32, u32);
+extern u16 lbl_8047AAD0;
 extern u32 lbl_8047AAD8;
 extern u32 lbl_8047AAD4;
 extern void jumptable_80315364();
@@ -570,6 +571,20 @@ void fn_800DB758(u16 vertCount)
     *(u32*)(state + 0x484) = (u32)p;
 }
 #endif
+
+void fn_800DB890(u32 count)
+{
+    u32 i;
+
+    lbl_8047AAD8 = count;
+    lbl_8047AAD0 = _toolentryAlloc__FUl(count * 0x18);
+    if (lbl_8047AAD0 != 0) {
+        lbl_8047AAD4 = (u32)fn_800E27B0(lbl_8047AAD0);
+        for (i = 0; i < lbl_8047AAD8; i++) {
+            ((u8*)lbl_8047AAD4)[i * 0x18] = 0;
+        }
+    }
+}
 
 #if 0
 asm void fn_800DB900(void) {
