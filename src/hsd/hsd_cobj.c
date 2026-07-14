@@ -2558,6 +2558,58 @@ void fn_8019733C(u32 val) { extern u32 lbl_8047B240; lbl_8047B240 = val; }
 #endif
 #pragma pop
 
+typedef struct HSD_ZListNode {
+    f32 projection_mtx[3][4];
+    void* vmtx;
+    void* jobj;
+    u32 rendermode;
+    struct {
+        struct HSD_ZListNode* texedge;
+        struct HSD_ZListNode* translucent;
+    } sort;
+    struct HSD_ZListNode* next;
+} HSD_ZListNode;
+
+/* 0x80197400 | 0xA8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void HSD_MtxFree(void* mtx);
+extern void HSD_ObjFree(void* allocator, void* object);
+extern u8 lbl_80465348[];
+void fn_80197400(void)
+{
+    extern HSD_ZListNode* lbl_8047B24C;
+    extern HSD_ZListNode* lbl_8047B250;
+    extern u32 lbl_8047B254;
+    extern HSD_ZListNode* lbl_8047B258;
+    extern u32 lbl_8047B25C;
+    extern HSD_ZListNode** lbl_80478C64;
+    extern HSD_ZListNode** lbl_80478C68;
+    extern HSD_ZListNode** lbl_80478C6C;
+    HSD_ZListNode* list = lbl_8047B24C;
+
+    while (list) {
+        HSD_ZListNode* next = list->next;
+        if (list->vmtx) {
+            HSD_MtxFree(list->vmtx);
+        }
+        HSD_ObjFree(lbl_80465348, list);
+        list = next;
+    }
+    lbl_8047B24C = NULL;
+    lbl_80478C64 = &lbl_8047B24C;
+
+    lbl_8047B250 = NULL;
+    lbl_80478C68 = &lbl_8047B250;
+    lbl_8047B254 = 0;
+
+    lbl_8047B258 = NULL;
+    lbl_80478C6C = &lbl_8047B258;
+    lbl_8047B25C = 0;
+}
+#pragma pop
+
 /* 0x801975FC | 0x54 */
 #pragma push
 #pragma optimization_level 1
