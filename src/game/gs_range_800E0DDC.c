@@ -13,6 +13,7 @@
  */
 
 #include "dolphin/types.h"
+#include "dolphin/os/OS.h"
 
 /* ===== External SDK / engine functions ===== */
 extern void  GSlogWrite(const char*, ...);             /* OSReport / GSlog */
@@ -52,7 +53,6 @@ extern const char lbl_80270610[]; /* "GSmaterial: Error creating environment map
 extern u32 lbl_8047AA80;   /* GSgfx state pointer (sda21) */
 extern u8 lbl_80400248[];  /* GSgfx state backup buffer (0x5A0 bytes) */
 extern u8 lbl_80400B28[];  /* light/material command buffer */
-extern u32 __OSStartTime[];
 
 /* ===== Combined forward-decls (duplicated across split segments) ===== */
 
@@ -475,15 +475,29 @@ extern u32 lbl_8047AB40;
 extern u32 lbl_8047AB44;
 
 
-u32 fn_800E0DDC(void) {
-    u32* cursor;
+u32 fn_800E0DDC(void)
+{
+    typedef struct GSFreeBlock {
+        struct GSFreeBlock* prev;
+        struct GSFreeBlock* next;
+        u32 size;
+    } GSFreeBlock;
+    typedef struct GSScratchState {
+        u32 reserved[4];
+        GSFreeBlock* head;
+        u32 value;
+    } GSScratchState;
+    GSFreeBlock* cursor;
+    GSScratchState* state;
     u32 total;
 
-    cursor = (u32*)__OSStartTime[4];
+    state = (GSScratchState*)&__OSStartTime;
+    cursor = state->head;
     lbl_8047AB44 = (u32)cursor;
-    lbl_8047AB40 = __OSStartTime[5];
-    for (total = 0; cursor != 0; cursor = (u32*)cursor[1]) {
-        total += cursor[2];
+    lbl_8047AB40 = state->value;
+    for (total = 0, cursor = cursor->next; cursor != 0;
+         cursor = cursor->next) {
+        total += cursor->size;
     }
     return total;
 }
