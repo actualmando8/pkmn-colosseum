@@ -495,31 +495,37 @@ u32 fightActionFlowFightOutPokemonOutWaza(void* ctx)
 /* 0x8020B910 | size: 0x104 */
 #pragma push
 #pragma peephole on
-u32 fightActionFlowFightTrainerUseItem(void* ctx) {
+u32 fightActionFlowFightTrainerUseItem(void* ctx)
+{
     extern u32 fightTargetGetRelativeHostSideFightTargetIdToTragetPtr();
     extern void fightFloorSetStatus();
     extern u16 fightFloorGetStatus();
     extern u32 fightActionBiosGetActorFightTargetPtr();
     extern void fn_80211E18();
-    void* e5Data;
-    u16 field1E;
-    u32 d908val;
+    u32 actionValue;
+    void* itemData;
+    u16 itemId;
+    u32 actorFightTarget;
     u32 partyCount;
     u8 slotType;
-    u32 finalVal;
+    u32 selectedTarget;
+
     partyCount = fightFloorGetStatus(0, 0, 0x14, 0);
-    d908val = fightActionBiosGetActorFightTargetPtr(ctx);
-    fightFloorSetStatus(0, 0, 0x36, 0, d908val);
-    e5Data = pokemonGetStatus((void*)d908val, 0, 0xE5, 0);
-    field1E = (u16)itemGetStatus(e5Data, 0, 0x1E, 0);
-    slotType = (u8)itemGetStatus(0, field1E, 0x2, 0);
+    actionValue = fightActionBiosGetActorFightTargetPtr(ctx);
+    actorFightTarget = actionValue;
+    fightFloorSetStatus(0, 0, 0x36, 0, actionValue);
+    itemData = pokemonGetStatus((void*)actorFightTarget, 0, 0xE5, 0);
+    itemId = (u16)itemGetStatus(itemData, 0, 0x1E, 0);
+    slotType = (u8)itemGetStatus(0, itemId, 0x2, 0);
     if (slotType == 1) {
-        finalVal = (u32)fightTargetGetRelativeHostSideFightTargetIdToTragetPtr((u16)itemGetStatus(e5Data, 0, 0x1F, 0), partyCount);
+        selectedTarget = (u32)fightTargetGetRelativeHostSideFightTargetIdToTragetPtr(
+            (u16)itemGetStatus(itemData, 0, 0x1F, 0), partyCount);
     } else {
-        finalVal = d908val;
+        selectedTarget = actorFightTarget;
     }
-    fightFloorSetStatus(0, 0, 0x42, 0, finalVal);
-    fn_80211E18(ctx, field1E);
+    fightFloorSetStatus(0, 0, 0x42, 0, selectedTarget);
+    actionValue = itemId;
+    fn_80211E18(ctx, actionValue);
     return 1;
 }
 #pragma pop
