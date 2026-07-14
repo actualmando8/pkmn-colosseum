@@ -10,6 +10,7 @@
 #include "hsd/hsd_aobj.h"
 #include "hsd/hsd_class.h"
 #include "hsd/hsd_debug.h"
+#include "hsd/hsd_dobj.h"
 #include "hsd/hsd_jobj.h"
 #include "hsd/hsd_object.h"
 #include "hsd/hsd_wobj.h"
@@ -2679,4 +2680,43 @@ void fn_801975FC(void) {
     lbl_8047B258 = fn_80197650(lbl_8047B258, lbl_8047B25C, 0x40);
 }
 #endif
+#pragma pop
+
+/* 0x80197998 | 0xCC */
+#pragma push
+#pragma optimization_level 1
+#pragma use_lmw_stmw on
+extern void fn_8019F024(HSD_JObj* jobj);
+extern void fn_801A5DCC(f32 pmtx[3][4]);
+extern void fn_801AB63C(u32 first, u32 second);
+void fn_80197998(HSD_JObj* jobj, f32 vmtx[3][4], f32 pmtx[3][4],
+                 u32 trsp_mask, u32 rendermode)
+{
+    HSD_DObj* dobj;
+    u32 dobj_trsp;
+
+    fn_8019F024(jobj);
+
+    dobj_trsp = trsp_mask << 1;
+
+    if (!(rendermode & RENDER_SHADOW)) {
+        if (jobj->flags & JOBJ_SPECULAR) {
+            fn_801A5DCC(pmtx);
+        }
+    }
+
+    fn_801AB63C(0, 0);
+    for (dobj = jobj->u.dobj; dobj; dobj = dobj->next) {
+        if (dobj->flags & DOBJ_HIDDEN) {
+            continue;
+        }
+
+        if (dobj->flags & dobj_trsp) {
+            HSD_DObjSetCurrent(dobj);
+            HSD_DOBJ_METHOD(dobj)->disp(dobj, vmtx, pmtx, rendermode);
+        }
+    }
+    HSD_DObjSetCurrent(NULL);
+    fn_8019F024(NULL);
+}
 #pragma pop
