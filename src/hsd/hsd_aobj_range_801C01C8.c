@@ -9,7 +9,7 @@
  * functions (0x801C0F20-0x801C2AE8), all of which are HSD sysdolphin
  * library code, not battle-grid code -- this is the direct continuation
  * of the same XD translation unit (aobj.cpp) as the functions above.
- * fn_801C021C / HSD_ForeachAnim are asm-only for now.
+ * fn_801C021C is matched below; HSD_ForeachAnim remains a near match.
  */
 #include "dolphin/types.h"
 #include "dolphin/os/OSInterrupt.h"
@@ -67,6 +67,19 @@ void* fn_801C01C8(void* callback)
     BOOL enabled = OSDisableInterrupts();
 
     lbl_80466BC0[0x7A] = callback;
+    OSRestoreInterrupts(enabled);
+    return previous;
+}
+
+/**
+ * fn_801C021C - Address: 0x801C021C | Size: 0x54
+ */
+void* fn_801C021C(void* callback)
+{
+    void* previous = lbl_80466BC0[0x77];
+    BOOL enabled = OSDisableInterrupts();
+
+    lbl_80466BC0[0x77] = callback;
     OSRestoreInterrupts(enabled);
     return previous;
 }
