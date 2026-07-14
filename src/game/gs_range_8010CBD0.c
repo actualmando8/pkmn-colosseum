@@ -106,6 +106,19 @@ void fn_8010CD6C(void)
     }
 }
 
+/* 0x8010CFE4 | 0x54 */
+s32 fn_8010CFE4(void* fileHead)
+{
+    extern void _offsetCCD__FP12CCD_FILEHEAD(void*);
+
+    if (COL_LAYER_IDX < 0) {
+        return 0;
+    }
+    _offsetCCD__FP12CCD_FILEHEAD(fileHead);
+    COL_STATE->wzxDataPtr = fileHead;
+    return 1;
+}
+
 /* 0x8010D038 | 0x2C */
 s32 fn_8010D038(void) {
     s32 layer;
