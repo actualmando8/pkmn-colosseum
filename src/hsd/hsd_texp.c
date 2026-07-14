@@ -807,7 +807,7 @@ extern u8 lbl_80465588[];
 extern u8 lbl_804655B4[];
 extern u8 lbl_8047B350;
 extern u8 lbl_8047B351;
-extern u32 lbl_8047B34C;
+extern s32 lbl_8047B34C;
 extern u32 lbl_8047B358;
 extern u32 lbl_8047B370;
 
@@ -2709,6 +2709,17 @@ void fn_801B2718(void) {
     lbl_8047B350 = 0;
     lbl_8047B34C = -1;
     lbl_8047B351 = 0xFF;
+}
+#pragma pop
+
+/* 0x801B2878 | 0x40 */
+#pragma push
+#pragma optimization_level 1
+void fn_801B2878(s32 value) {
+    if (lbl_8047B34C != value) {
+        fn_800B94F0(value);
+        lbl_8047B34C = value;
+    }
 }
 #pragma pop
 
