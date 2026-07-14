@@ -2712,6 +2712,19 @@ void fn_801B2718(void) {
 }
 #pragma pop
 
+/* 0x801B273C | 0x50 */
+#pragma push
+#pragma optimization_level 1
+void fn_801B273C(s32 enable) {
+    u8 normalized = enable ? 1 : 0;
+
+    if (lbl_8047B31C != normalized) {
+        fn_800BCE5C(normalized);
+        lbl_8047B31C = normalized;
+    }
+}
+#pragma pop
+
 /* 0x801B2878 | 0x40 */
 #pragma push
 #pragma optimization_level 1
