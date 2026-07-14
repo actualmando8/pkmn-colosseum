@@ -729,18 +729,9 @@ end:
 
 /* 0x80083CFC | size: 0x34 */
 #pragma peephole off
-#pragma optimize_for_size on
-void fn_80083CFC(void* ptr) {
-    if (ptr == 0) {
-        goto alloc;
-    }
-    goto end;
-alloc:
-    ptr = (void*)savedataGetStatus(0x0, 0xD);
-end:
-    return;
+void* fn_80083CFC(void* ptr) {
+    return ptr != 0 ? ptr : (void*)savedataGetStatus(0, 0xD);
 }
-#pragma optimize_for_size reset
 
 /* Update the four-controller Card-e connection/status display. */
 typedef struct CardEStatusWork {
