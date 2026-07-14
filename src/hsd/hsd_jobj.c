@@ -25,12 +25,30 @@
 #include "hsd/hsd_dobj.h"
 #include "hsd/hsd_robj.h"
 
-static void JObjInfoInit(void);
+void fn_8019CE50(void);
+extern void fn_80197998(HSD_JObj* jobj, f32 vmtx[3][4], f32 pmtx[3][4],
+                        HSD_TrspMask trsp_mask, u32 rendermode);
+extern void HSD_JObjMakePositionMtx(HSD_JObj* jobj, f32 mtx[3][4],
+                                    f32 rmtx[3][4]);
+void JObjReleaseChild(HSD_JObj* jobj);
+s32 JObjInit(HSD_Class* object);
 void JObjRelease(HSD_JObj* jobj);
 void JObjAmnesia(void* info);
+s32 JObjLoad(HSD_JObj* jobj, HSD_Joint* joint, HSD_JObj* parent);
+void fn_801A20C8(void* obj, u32 type, HSD_ObjData* val);
+void fn_801A3600(HSD_JObj* jobj);
 void fn_801A1B7C(HSD_JObj* jobj);
+extern u8 lbl_8036C8E0[];
+extern u8 lbl_8036CC00[];
+extern char lbl_80274AD0[];
+extern char lbl_80274AE8[];
 
-HSD_JObjInfo hsdJObj = { JObjInfoInit };
+typedef struct HSD_JObjInfoColosseum {
+    HSD_JObjInfo parent;
+    HSD_ObjUpdateFunc update;
+} HSD_JObjInfoColosseum;
+
+HSD_JObjInfo hsdJObj = { fn_8019CE50 };
 
 static HSD_ClassInfo* default_class = NULL;
 static HSD_JObj* current_jobj = NULL;
@@ -355,14 +373,27 @@ void HSD_JObjSetDefaultClass(HSD_ClassInfo* info)
 /*  Class lifecycle                                                          */
 /* ========================================================================= */
 
-static void JObjInfoInit(void)
+#pragma push
+#pragma optimization_level 1
+#pragma use_lmw_stmw on
+void fn_8019CE50(void)
 {
-    hsdInitClassInfo(HSD_CLASS_INFO(&hsdJObj), HSD_CLASS_INFO(&hsdObj),
-                     "sysdolphin_base_library", "hsd_jobj",
-                     sizeof(HSD_JObjInfo), sizeof(HSD_JObj));
-    HSD_CLASS_INFO(&hsdJObj)->release = (void (*)(HSD_Class*)) JObjRelease;
-    HSD_CLASS_INFO(&hsdJObj)->amnesia = (void (*)(HSD_ClassInfo*)) JObjAmnesia;
+    hsdInitClassInfo(HSD_CLASS_INFO(lbl_8036C8E0),
+                     HSD_CLASS_INFO(lbl_8036CC00), lbl_80274AD0, lbl_80274AE8,
+                     sizeof(HSD_JObjInfoColosseum), sizeof(HSD_JObj));
+    HSD_CLASS_INFO(lbl_8036C8E0)->init = (int (*)(HSD_Class*)) JObjInit;
+    HSD_CLASS_INFO(lbl_8036C8E0)->release =
+        (void (*)(HSD_Class*)) JObjRelease;
+    HSD_CLASS_INFO(lbl_8036C8E0)->amnesia =
+        (void (*)(HSD_ClassInfo*)) JObjAmnesia;
+    HSD_JOBJ_INFO(lbl_8036C8E0)->make_mtx = fn_801A3600;
+    HSD_JOBJ_INFO(lbl_8036C8E0)->make_pmtx = HSD_JObjMakePositionMtx;
+    HSD_JOBJ_INFO(lbl_8036C8E0)->disp = fn_80197998;
+    HSD_JOBJ_INFO(lbl_8036C8E0)->load = JObjLoad;
+    HSD_JOBJ_INFO(lbl_8036C8E0)->release_child = JObjReleaseChild;
+    ((HSD_JObjInfoColosseum*) lbl_8036C8E0)->update = fn_801A20C8;
 }
+#pragma pop
 
 /* ===================================================================
  * Generated: 0 pattern-matched + 28 stubs
