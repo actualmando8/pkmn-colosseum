@@ -646,23 +646,26 @@ void fn_8005471C(void) {
 
 #pragma push
 #pragma peephole off
+#pragma scheduling on
 s32 fn_80054914(MenuCBPane* pane, MenuCBPane* sprite) {
-    s32 ids[6][3] = {
-        {0x119d, 0x119e, 0x119f},
-        {0x713, 0x714, 0x715},
-        {0x716, 0x717, 0x718},
-        {0x719, 0x71a, 0x71b},
-        {0x71c, 0x71d, 0x71e},
-        {0x71f, 0x720, 0x721}
-    };
+    typedef struct MessageIdTable {
+        s32 ids[6][3];
+    } MessageIdTable;
+    const MessageIdTable* source;
+    MessageIdTable table;
     s32 column;
     s32 row;
     s16 id;
+    u8 visible;
+
+    source = (const MessageIdTable*)lbl_80267350;
+    table = *source;
 
     for (row = 0; row < 6; row++) {
+        column = 0;
         id = *(s16*)((u8*)sprite + 6);
-        for (column = 0; column < 3; column++) {
-            if (id == ids[row][column]) {
+        for (; column < 3; column++) {
+            if (id == table.ids[row][column]) {
                 break;
             }
         }
@@ -674,10 +677,11 @@ s32 fn_80054914(MenuCBPane* pane, MenuCBPane* sprite) {
         return 0;
     }
     if (pane->boxIndex == row) {
-        winSpriteSetDisp(sprite, TRUE);
+        visible = TRUE;
     } else {
-        winSpriteSetDisp(sprite, FALSE);
+        visible = FALSE;
     }
+    winSpriteSetDisp(sprite, visible);
     return 0;
 }
 #pragma pop
