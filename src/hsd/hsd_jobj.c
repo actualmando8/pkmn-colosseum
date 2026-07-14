@@ -3197,6 +3197,24 @@ void fn_801A323C(HSD_AObj* aobj)
     }
 }
 
+#pragma push
+#pragma optimization_level 1
+void fn_801A3574(HSD_JObj* jobj, u32 flags, f32 frame)
+{
+    extern void fn_801AFF64(HSD_RObj* robj, f32 frame, u32 flags);
+
+    if (jobj != NULL) {
+        if (flags & 1) {
+            HSD_AObjReqAnim(jobj->aobj, frame);
+        }
+        if (union_type_dobj(jobj)) {
+            HSD_DObjReqAnimAllByFlags(jobj->u.dobj, frame, (void*) flags);
+        }
+        fn_801AFF64(jobj->robj, frame, flags);
+    }
+}
+#pragma pop
+
 /* 0x801A3600 | 0x318 -- HSD_JObjMakeMatrix */
 typedef struct JObjQuat {
     f32 x, y, z, w;
