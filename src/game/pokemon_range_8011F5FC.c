@@ -99,7 +99,7 @@ extern void pokemonResetBasisStatus(void* ptr);
 void pokemonSetLevelBasisStatus(u8* ptr, u32 level);
 extern void heroItemGetItemKindToItemAryPtr(void);
 extern void heroSetStatus();
-extern void heroGetStatus(void);
+extern u32 heroGetStatus(u8* ptr, u32 selector, u16 index);
 extern void* GSresAllocResourceAlign(); /* K&R: called with 5 args, returns void* */
 extern u8 fn_800FF548(void);
 extern u32 _unloadScript__FPvUlUl(); /* K&R: asm void wrapper, used as function pointer */
@@ -152,8 +152,8 @@ extern u8 fn_80121ADC(u8* ptr, u32 slot);
 extern void pokemonSetWazaStatus(void);
 extern u32 pokemonWazaCheckValid(u8* ptr, u32 arg2);
 extern void pokemonInit(u8* ptr);
-extern void pokemonEvolutionCreateAddPokemon(void);
-extern void pokemonEvolution(void);
+extern void pokemonEvolutionCreateAddPokemon();
+extern s32 pokemonEvolution();
 extern void savedataInit(void);
 extern void heroAddPokedoru(u8* ptr, u32 offset);
 extern s32 heroItemAddItemDataId(u8* ptr, u32 arg2, u32 arg3, u32 arg4);
@@ -455,16 +455,16 @@ extern void fn_80142CF4(void);
 extern u32 sexGetPokemonSexRaitoKotei(u32);
 extern void fn_801EE958(void);
 extern void fn_801EEB34(void);
-extern void memoDataSet(void);
+extern void memoDataSet();
 u32 pokemonCheckFightOut(u8* ptr);
 extern void gamedataAttestBiosCopy(void);
 void pokemonCreate(void);
 u32 pokemonCreateRndFit(u8*, s32, s32, s32, u32);
-extern void fadeSet(void);
-extern void fadeCheck(void);
-extern void evolutionOpen(void);
+extern void fadeSet(f32 duration, u32 mode);
+extern void fadeCheck(u32 wait);
+extern s32 evolutionOpen();
 extern f32 lbl_8047D020;
-void pokemonEvolutionAll(void);
+s32 pokemonEvolutionAll(u8*, u32, u32, void*, u8*, s32, s32, s32);
 extern u8 lbl_802729A4[];
 extern u8 lbl_80272998[];
 extern void fn_800F9EE4(void);
@@ -2899,7 +2899,7 @@ void pokemonSetOnDarkPokemonFlag(u8* ptr, u8 flag) {
 }
 #endif
 /* 0x80123368 | 0x8C */
-extern void memoDataSet(void);
+extern void memoDataSet();
 #if 0
 asm void pokemonSetOnZukanFlag(void) {
 #include "src/game/gs_field_world_fn_80123368.inc"
@@ -3634,21 +3634,105 @@ void pokemonSetLevelBasisStatus(u8* obj, u32 level) {
 }
 #undef POKEMON_LEVEL_STAT
 /* 0x8012805C | 0x2A4 */
-extern void fadeSet(void);
-extern void fadeCheck(void);
-extern void evolutionOpen(void);
+extern void fadeSet(f32 duration, u32 mode);
+extern void fadeCheck(u32 wait);
+extern s32 evolutionOpen();
 extern f32 lbl_8047D020;
-/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void pokemonEvolutionAll(void);
+/* Preserve retail cross-TU helper calls after source consolidation. */
+#pragma dont_inline on
+s32 pokemonEvolutionAll(u8* pokemon, u32 evolution_id, u32 add_species,
+                        void* evolution_arg, u8* hero, s32 set_memo,
+                        s32 evolution_mode, s32 use_fade)
+{
+    u8 move_slots[20];
+    u16 learned_moves[20];
+    u16 selected_moves[20];
+    GfwBuf0x138 evolved_pokemon;
+    GfwBuf0x138 added_pokemon;
+    s32 move_count;
+    s32 result;
+    int i;
+    s8 party_slot;
+
+    if (!pokemonCheckValid(pokemon)) {
+        return 2;
+    }
+    if ((u16)evolution_id == 0) {
+        return 2;
+    }
+
+    move_count = pokemonEvolution(&evolved_pokemon, pokemon, evolution_id,
+                                  evolution_arg, learned_moves);
+    if (move_count < 0) {
+        return 2;
+    }
+
+    if (use_fade != 0) {
+        fadeSet(lbl_8047D020, 3);
+        fadeCheck(1);
+    }
+
+    for (i = 0; i < move_count; i++) {
+        selected_moves[i] = learned_moves[i];
+    }
+    result = evolutionOpen(pokemon, &evolved_pokemon, evolution_mode,
+                           selected_moves, move_count, move_slots);
+
+    if (use_fade != 0) {
+        fadeSet(lbl_8047D020, 2);
+        fadeCheck(1);
+    }
+
+    if (result == 2) {
+        return 2;
+    }
+    if (result == 1) {
+        return 1;
+    }
+
+    if (set_memo != 0) {
+        memoDataSet(0, &evolved_pokemon);
+    }
+    pokemonBiosCopy((u32*)pokemon, evolved_pokemon.data);
+
+    for (i = 0; i < move_count; i++) {
+        if (move_slots[i] != 0xFF) {
+            pokemonWazaCreate(pokemon, move_slots[i], learned_moves[i]);
+        }
+    }
+
+    if ((u16)add_species != 0) {
+        if ((u16)add_species != 0) {
+            for (i = 0; i < 6; i++) {
+                if (!pokemonCheckValid((u8*)heroGetStatus(hero, 3, (u16)i))) {
+                    break;
+                }
+            }
+
+            party_slot = (i < 6) ? (s8)i : -1;
+            if (party_slot >= 0) {
+                pokemonEvolutionCreateAddPokemon(&added_pokemon, pokemon,
+                                                 add_species);
+                heroAddPokemon(hero, &added_pokemon);
+                if (set_memo != 0) {
+                    memoDataSet(0, &added_pokemon);
+                }
+            }
+        }
+    }
+
+    return 0;
+}
+#pragma dont_inline reset
 /* 0x80128300 | 0x224 */
 extern u8 lbl_802729A4[];
 extern u8 lbl_80272998[];
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void pokemonEvolutionCreateAddPokemon(void);
+void pokemonEvolutionCreateAddPokemon();
 /* 0x80128524 | 0x1A4 */
 extern void fn_800F9EE4(void);
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void pokemonEvolution(void);
+s32 pokemonEvolution();
 /* 0x801286C8 | 0x39C */
 extern void jumptable_80363468();
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
