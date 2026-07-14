@@ -22,6 +22,8 @@ extern u8 lbl_8047A9AC;
 void fn_800B7558(u8 arg0);
 void fn_800B7594(u8 arg0, u8 arg1);
 void fn_800B75D0(u8 arg0, u8 arg1);
+void fn_800B7514(void);
+void fn_800B7538(void);
 
 void GXSetCPUFifo(GXFifoObj* fifo) {
     BOOL enabled;
@@ -52,6 +54,45 @@ void GXSetCPUFifo(GXFifoObj* fifo) {
         __piReg[5] = reg;
     }
     PPCSync();
+    OSRestoreInterrupts(enabled);
+}
+
+void GXSetGPFifo(GXFifoObj* fifo) {
+    BOOL enabled;
+
+    enabled = OSDisableInterrupts();
+    fn_800B7538();
+    fn_800B7594(0, 0);
+    lbl_8047A9A4 = fifo;
+
+    __cpReg[16] = (u32)fifo->base & 0xFFFF;
+    __cpReg[18] = (u32)fifo->top & 0xFFFF;
+    __cpReg[24] = fifo->count & 0xFFFF;
+    __cpReg[26] = (u32)fifo->wrPtr & 0xFFFF;
+    __cpReg[28] = (u32)fifo->rdPtr & 0xFFFF;
+    __cpReg[20] = fifo->hiWatermark & 0xFFFF;
+    __cpReg[22] = fifo->loWatermark & 0xFFFF;
+    __cpReg[17] = ((u32)fifo->base & 0x3FFFFFFF) >> 16;
+    __cpReg[19] = ((u32)fifo->top & 0x3FFFFFFF) >> 16;
+    __cpReg[25] = fifo->count >> 16;
+    __cpReg[27] = ((u32)fifo->wrPtr & 0x3FFFFFFF) >> 16;
+    __cpReg[29] = ((u32)fifo->rdPtr & 0x3FFFFFFF) >> 16;
+    __cpReg[21] = fifo->hiWatermark >> 16;
+    __cpReg[23] = fifo->loWatermark >> 16;
+
+    PPCSync();
+
+    if (lbl_8047A9A0 == lbl_8047A9A4) {
+        lbl_8047A9AC = TRUE;
+        fn_800B7594(1, 0);
+        fn_800B7558(1);
+    } else {
+        lbl_8047A9AC = FALSE;
+        fn_800B7594(0, 0);
+        fn_800B7558(0);
+    }
+    fn_800B75D0(1, 1);
+    fn_800B7514();
     OSRestoreInterrupts(enabled);
 }
 
