@@ -390,6 +390,106 @@ clamp_factor:
     model->blend_factor = factor;
 }
 
+void GSmodelSetAnimBlend(GSmodel* model, u32 index_a, u32 index_b)
+{
+    HSD_JObj* jobj;
+    u32 flags;
+    u32 type;
+
+    flags = model->flags;
+    if (!(flags & MODEL_FLAG_HAS_ANIM)) {
+        return;
+    }
+    if (index_a > model->anim_count || index_b > model->anim_count) {
+        return;
+    }
+
+    model->flags = flags | MODEL_FLAG_BLENDING;
+    model->blend_anim_index_a = index_a;
+    model->blend_anim_index_b = index_b;
+    fn_801A2B5C(model->blend_jobj_a,
+                model->resource->anims[model->blend_anim_index_a], NULL,
+                NULL);
+    fn_801A2B5C(model->blend_jobj_b,
+                model->resource->anims[model->blend_anim_index_b], NULL,
+                NULL);
+
+    model->blend_factor = lbl_8047CC5C;
+    model->blend_anim_frame_a = lbl_8047CC5C;
+    model->blend_anim_frame_b = lbl_8047CC5C;
+    fn_801A32A0(model->blend_jobj_a, 0x1CB, model->blend_anim_frame_a);
+    fn_801A32A0(model->blend_jobj_b, 0x1CB, model->blend_anim_frame_b);
+    HSD_JObjAnimAll(model->blend_jobj_a);
+    HSD_JObjAnimAll(model->blend_jobj_b);
+
+    model->blend_anim_end_frame_a = lbl_8047CC5C;
+    HSD_ForeachAnim(model->blend_jobj_a, 6, 0x9B2F,
+                    (void*)_modelGetEndFrame, 2,
+                    &model->blend_anim_end_frame_a);
+    model->blend_anim_end_frame_b = lbl_8047CC5C;
+    HSD_ForeachAnim(model->blend_jobj_b, 6, 0x9B2F,
+                    (void*)_modelGetEndFrame, 2,
+                    &model->blend_anim_end_frame_b);
+    model->blend_frame_scale =
+        (lbl_8047CC60 + model->blend_anim_end_frame_a) /
+        (lbl_8047CC60 + model->blend_anim_end_frame_b);
+
+    flags = model->flags;
+    if (flags & MODEL_FLAG_LINK_TEX_TO_ANIM) {
+        jobj = model->jobj;
+        if ((flags & MODEL_FLAG_HAS_TEX_ANIM) &&
+            index_b < model->tex_anim_count) {
+            if (index_b != model->tex_anim_index) {
+                if (flags & MODEL_FLAG_USE_JOBJ_CHILD) {
+                    jobj = jobj->child;
+                }
+                model->tex_anim_index = index_b;
+                fn_801A2B5C(
+                    jobj, NULL,
+                    model->resource->tex_anims[model->tex_anim_index], NULL);
+                model->tex_anim_end_frame = lbl_8047CC5C;
+                HSD_ForeachAnim(jobj, 6, 0x64DB,
+                                (void*)_modelGetEndFrame, 2,
+                                &model->tex_anim_end_frame);
+            }
+
+            flags = model->flags;
+            jobj = model->jobj;
+            if (flags & MODEL_FLAG_HAS_TEX_ANIM) {
+                if (flags & MODEL_FLAG_USE_JOBJ_CHILD) {
+                    jobj = jobj->child;
+                }
+                model->tex_anim_frame = lbl_8047CC5C;
+                model->tex_anim_req_frame = lbl_8047CC5C;
+                fn_801A32A0(jobj, 0x634, model->tex_anim_req_frame);
+                model->flags = model->flags & ~MODEL_FLAG_TEX_ANIM_ENDED;
+            }
+
+            type = model->tex_anim_type;
+            flags = model->flags;
+            jobj = model->jobj;
+            if (flags & MODEL_FLAG_USE_JOBJ_CHILD) {
+                jobj = jobj->child;
+            }
+            model->tex_anim_type = type;
+            switch (model->tex_anim_type) {
+            case 0:
+                HSD_ForeachAnim(
+                    jobj, 6, 0x64DB,
+                    (void*)_modelSetLoopFlag__FP9_HSD_AObjUl, 3, 0);
+                break;
+            case 1:
+                HSD_ForeachAnim(
+                    jobj, 6, 0x64DB,
+                    (void*)_modelSetLoopFlag__FP9_HSD_AObjUl, 3, 1);
+                break;
+            }
+        }
+    }
+
+    model->flags = model->flags & ~MODEL_FLAG_SKIP_APPLY;
+}
+
 void GSmodelSetBlendAnimFrameForce(GSmodel* model, f32 frame_a, f32 frame_b)
 {
     model->blend_frame_scale = lbl_8047CC5C;
