@@ -1739,7 +1739,6 @@ void __CARDExtHandler(s32 chan) {
 #pragma optimize_for_size on
 void __CARDTxHandler(s32 chan) {
     BOOL error;
-    BOOL unlocked = FALSE;
     CARDControl* card;
     CARDCallback callback;
 
@@ -1749,10 +1748,7 @@ void __CARDTxHandler(s32 chan) {
     callback = card->txCallback;
     if (callback != NULL) {
         card->txCallback = NULL;
-        if (!error && fn_80098944(chan)) {
-            unlocked = TRUE;
-        }
-        callback(chan, unlocked ? 0 : -3);
+        callback(chan, (!error && fn_80098944(chan)) ? 0 : -3);
     }
 }
 #pragma optimize_for_size reset

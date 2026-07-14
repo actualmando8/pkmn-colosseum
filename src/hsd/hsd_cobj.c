@@ -19,14 +19,18 @@ extern void C_MTXPerspective();
 extern void OSFillFPUContext();
 extern int setupTopHalfCamera();   /* wrk7: was `void` asm-wrapper decl; typed-C returns int */
 extern void CObjUpdateFunc(HSD_CObj*, u32, f32*);
+extern int CObjInit(HSD_CObj*);
+extern void CObjRelease(HSD_CObj*);
+extern void CObjAmnesia(HSD_ClassInfo*);
+extern int CObjLoad(HSD_CObj*, HSD_CObjDesc*);
 extern char lbl_80465080[];
 
 static HSD_ClassInfo* default_class;
 static HSD_CObj* current;
 
-static void CObjInfoInit(void);
+void fn_80193C24(void);
 
-HSD_CObjInfo hsdCObj = { CObjInfoInit };
+HSD_CObjInfo hsdCObj = { fn_80193C24 };
 
 /* ========================================================================= */
 /*  Accessors                                                                */
@@ -274,18 +278,30 @@ static void CObjAmnesia_Early(HSD_ClassInfo* info)
     HSD_OBJECT_PARENT_INFO(&hsdCObj)->amnesia(info);
 }
 
-static void CObjInfoInit(void)
+/* 0x80193C24 | 0xAC - CObjInfoInit */
+#pragma push
+#pragma optimization_level 1
+#pragma optimizewithasm off
+void fn_80193C24(void)
 {
-    hsdInitClassInfo(HSD_CLASS_INFO(&hsdCObj), HSD_CLASS_INFO(&hsdObj),
-                     "sysdolphin_base_library", "hsd_cobj",
-                     sizeof(HSD_CObjInfo), sizeof(HSD_CObj));
-    HSD_CLASS_INFO(&hsdCObj)->release = CObjRelease_Early;
-    HSD_CLASS_INFO(&hsdCObj)->amnesia = CObjAmnesia_Early;
-    HSD_COBJ_INFO(&hsdCObj)->load =
-        (int (*)(HSD_CObj*, HSD_CObjDesc*)) setupTopHalfCamera;
-    HSD_COBJ_INFO(&hsdCObj)->update =
+    extern HSD_CObjInfo lbl_8036C678;
+    extern HSD_ClassInfo lbl_8036CC00;
+    extern char lbl_80274628[];
+    extern char lbl_80274640[];
+
+    hsdInitClassInfo(HSD_CLASS_INFO(&lbl_8036C678), &lbl_8036CC00,
+                     lbl_80274628, lbl_80274640, sizeof(HSD_CObjInfo),
+                     sizeof(HSD_CObj));
+    HSD_CLASS_INFO(&lbl_8036C678)->init =
+        (int (*)(HSD_Class*)) CObjInit;
+    HSD_CLASS_INFO(&lbl_8036C678)->release =
+        (void (*)(HSD_Class*)) CObjRelease;
+    HSD_CLASS_INFO(&lbl_8036C678)->amnesia = CObjAmnesia;
+    HSD_COBJ_INFO(&lbl_8036C678)->load = CObjLoad;
+    HSD_COBJ_INFO(&lbl_8036C678)->update =
         (void (*)(HSD_CObj*, u32, void*)) CObjUpdateFunc;
 }
+#pragma pop
 
 /* 0x80193CD0 | 0x60 */
 #pragma push
@@ -2556,6 +2572,58 @@ asm void fn_8019733C(void) {
 #else
 void fn_8019733C(u32 val) { extern u32 lbl_8047B240; lbl_8047B240 = val; }
 #endif
+#pragma pop
+
+typedef struct HSD_ZListNode {
+    f32 projection_mtx[3][4];
+    void* vmtx;
+    void* jobj;
+    u32 rendermode;
+    struct {
+        struct HSD_ZListNode* texedge;
+        struct HSD_ZListNode* translucent;
+    } sort;
+    struct HSD_ZListNode* next;
+} HSD_ZListNode;
+
+/* 0x80197400 | 0xA8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void HSD_MtxFree(void* mtx);
+extern void HSD_ObjFree(void* allocator, void* object);
+extern u8 lbl_80465348[];
+void fn_80197400(void)
+{
+    extern HSD_ZListNode* lbl_8047B24C;
+    extern HSD_ZListNode* lbl_8047B250;
+    extern u32 lbl_8047B254;
+    extern HSD_ZListNode* lbl_8047B258;
+    extern u32 lbl_8047B25C;
+    extern HSD_ZListNode** lbl_80478C64;
+    extern HSD_ZListNode** lbl_80478C68;
+    extern HSD_ZListNode** lbl_80478C6C;
+    HSD_ZListNode* list = lbl_8047B24C;
+
+    while (list) {
+        HSD_ZListNode* next = list->next;
+        if (list->vmtx) {
+            HSD_MtxFree(list->vmtx);
+        }
+        HSD_ObjFree(lbl_80465348, list);
+        list = next;
+    }
+    lbl_8047B24C = NULL;
+    lbl_80478C64 = &lbl_8047B24C;
+
+    lbl_8047B250 = NULL;
+    lbl_80478C68 = &lbl_8047B250;
+    lbl_8047B254 = 0;
+
+    lbl_8047B258 = NULL;
+    lbl_80478C6C = &lbl_8047B258;
+    lbl_8047B25C = 0;
+}
 #pragma pop
 
 /* 0x801975FC | 0x54 */
