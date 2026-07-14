@@ -3199,6 +3199,132 @@ void fn_801A323C(HSD_AObj* aobj)
 
 #pragma push
 #pragma optimization_level 1
+#pragma use_lmw_stmw on
+#pragma inline_depth(5)
+#pragma inline_max_size(10000)
+void fn_801A32A0(HSD_JObj* jobj, u32 flags, f32 frame);
+void fn_801A3574(HSD_JObj* jobj, u32 flags, f32 frame);
+
+static inline void JObjReqAnimByFlagsInline(HSD_JObj* jobj, u32 flags,
+                                            f32 frame)
+{
+    extern void fn_801AFF64(HSD_RObj* robj, f32 frame, u32 flags);
+
+    if (jobj != NULL) {
+        if (flags & 1) {
+            HSD_AObjReqAnim(jobj->aobj, frame);
+        }
+        if (union_type_dobj(jobj)) {
+            HSD_DObjReqAnimAllByFlags(jobj->u.dobj, frame, (void*) flags);
+        }
+        fn_801AFF64(jobj->robj, frame, flags);
+    }
+}
+
+/* Preserve MWCC's five expanded recursion levels and final call boundary. */
+static inline void JObjReqAnimAllByFlagsLevel5(HSD_JObj* jobj, u32 flags,
+                                               f32 frame)
+{
+    if (jobj != NULL) {
+        HSD_JObj* child;
+
+        fn_801A3574(jobj, flags, frame);
+        if (!(jobj->flags & JOBJ_INSTANCE)) {
+            child = jobj->child;
+            while (child != NULL) {
+                fn_801A32A0(child, flags, frame);
+                child = child->next;
+            }
+        }
+    }
+}
+
+static inline void JObjReqAnimAllByFlagsLevel4(HSD_JObj* jobj, u32 flags,
+                                               f32 frame)
+{
+    if (jobj != NULL) {
+        HSD_JObj* child;
+
+        JObjReqAnimByFlagsInline(jobj, flags, frame);
+        if (!(jobj->flags & JOBJ_INSTANCE)) {
+            child = jobj->child;
+            while (child != NULL) {
+                JObjReqAnimAllByFlagsLevel5(child, flags, frame);
+                child = child->next;
+            }
+        }
+    }
+}
+
+static inline void JObjReqAnimAllByFlagsLevel3(HSD_JObj* jobj, u32 flags,
+                                               f32 frame)
+{
+    if (jobj != NULL) {
+        HSD_JObj* child;
+
+        JObjReqAnimByFlagsInline(jobj, flags, frame);
+        if (!(jobj->flags & JOBJ_INSTANCE)) {
+            child = jobj->child;
+            while (child != NULL) {
+                JObjReqAnimAllByFlagsLevel4(child, flags, frame);
+                child = child->next;
+            }
+        }
+    }
+}
+
+static inline void JObjReqAnimAllByFlagsLevel2(HSD_JObj* jobj, u32 flags,
+                                               f32 frame)
+{
+    if (jobj != NULL) {
+        HSD_JObj* child;
+
+        JObjReqAnimByFlagsInline(jobj, flags, frame);
+        if (!(jobj->flags & JOBJ_INSTANCE)) {
+            child = jobj->child;
+            while (child != NULL) {
+                JObjReqAnimAllByFlagsLevel3(child, flags, frame);
+                child = child->next;
+            }
+        }
+    }
+}
+
+static inline void JObjReqAnimAllByFlagsLevel1(HSD_JObj* jobj, u32 flags,
+                                               f32 frame)
+{
+    if (jobj != NULL) {
+        HSD_JObj* child;
+
+        JObjReqAnimByFlagsInline(jobj, flags, frame);
+        if (!(jobj->flags & JOBJ_INSTANCE)) {
+            child = jobj->child;
+            while (child != NULL) {
+                JObjReqAnimAllByFlagsLevel2(child, flags, frame);
+                child = child->next;
+            }
+        }
+    }
+}
+
+void fn_801A32A0(HSD_JObj* jobj, u32 flags, f32 frame)
+{
+    if (jobj != NULL) {
+        JObjReqAnimByFlagsInline(jobj, flags, frame);
+        if (!(jobj->flags & JOBJ_INSTANCE)) {
+            HSD_JObj* child = jobj->child;
+
+            while (child != NULL) {
+                JObjReqAnimAllByFlagsLevel1(child, flags, frame);
+                child = child->next;
+            }
+        }
+    }
+}
+#pragma pop
+
+#pragma push
+#pragma optimization_level 1
 void fn_801A3574(HSD_JObj* jobj, u32 flags, f32 frame)
 {
     extern void fn_801AFF64(HSD_RObj* robj, f32 frame, u32 flags);
