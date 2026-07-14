@@ -2725,6 +2725,19 @@ void fn_801B273C(s32 enable) {
 }
 #pragma pop
 
+/* 0x801B278C | 0x50 */
+#pragma push
+#pragma optimization_level 1
+void fn_801B278C(s32 enable) {
+    u8 normalized = enable ? 1 : 0;
+
+    if (lbl_8047B31D != normalized) {
+        fn_800BCE30(normalized);
+        lbl_8047B31D = normalized;
+    }
+}
+#pragma pop
+
 /* 0x801B2878 | 0x40 */
 #pragma push
 #pragma optimization_level 1
