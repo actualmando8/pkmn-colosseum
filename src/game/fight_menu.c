@@ -1225,42 +1225,40 @@ u32 _fightMenuAllFightTrainerCloseStatusMenuSubCloseCheck__FPvUsPv(u32 r3,u32 r4
 }
 
 /* Address: 0x80261CBC | Size: 0xD0 | Ghidra import */
-u32 _fightMenuAllFightTrainerCloseStatusMenuSub__FPvUsPv(u32 r3,u32 r4)
-
+u32 _fightMenuAllFightTrainerCloseStatusMenuSub__FPvUsPv(void* trainer, u32 slot, void* userData)
 {
-  u32 iVar1;
-  u16 uVar3;
-  u16 sVar4;
-  u32 uVar2;
-  u8 cVar5;
-  u32 uVar6;
+    u32 target;
+    u16 side;
+    u16 relativeTarget;
+    u32 bufferIndex;
+    u8 isOpen;
+    u32 menuId;
+    u32 context;
 
-  iVar1 = fightTargetGetPtr(2,r3,r4);
-  if (iVar1 == 0) {
-    uVar6 = 0;
-  }
-  else {
-    uVar3 = fightSideGetStatus(iVar1,0,5,0);
-      sVar4 = fightTargetGetTragetPtrToRelativeHostSideFightTargetId(r3,r4);
-    if (sVar4 == 0) {
-      uVar6 = 0;
+    context = (u32)trainer;
+    target = fightTargetGetPtr(2, context, slot);
+    if (target == 0) {
+        menuId = 0;
+    } else {
+        side = fightSideGetStatus(target, 0, 5, 0);
+        relativeTarget = fightTargetGetTragetPtrToRelativeHostSideFightTargetId(context, slot);
+        if (relativeTarget == 0) {
+            menuId = 0;
+        } else {
+            fightTargetDataBiosGetPtr();
+            bufferIndex = fightTargetDataBiosGetBuff();
+            if ((int)bufferIndex < 0) {
+                menuId = 0;
+            } else {
+                menuId = fightSideGetStatus(0, side, 2, bufferIndex & 0xffff);
+            }
+        }
     }
-    else {
-      fightTargetDataBiosGetPtr();
-      uVar2 = fightTargetDataBiosGetBuff();
-      if ((int)uVar2 < 0) {
-        uVar6 = 0;
-      }
-      else {
-        uVar6 = fightSideGetStatus(0,uVar3,2,uVar2 & 0xffff);
-      }
+    isOpen = menuIsCheck(menuId);
+    if (isOpen != 0) {
+        menuCloseCustom(menuId, 0, 0);
     }
-  }
-  cVar5 = menuIsCheck(uVar6);
-  if (cVar5 != '\0') {
-    menuCloseCustom(uVar6,0,0);
-  }
-  return 1;
+    return 1;
 }
 
 /* Address: 0x80261D8C | Size: 0xF0 | Ghidra import */
