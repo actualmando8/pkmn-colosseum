@@ -263,9 +263,12 @@ void _cameraOffsetAnimeUpdate__FP9_GScamera(GSRenderCamera* camera) {
 }
 
 typedef struct CameraFloorEntry {
-    /* 0x00 */ u32 field_00;
+    /* 0x00 */ s32 field_00;
     /* 0x04 */ void* floor;
-    /* 0x08 */ u8 field_08[0x10];
+    /* 0x08 */ f32 defaultHeight;
+    /* 0x0C */ f32 defaultDistance;
+    /* 0x10 */ f32 defaultRotationY;
+    /* 0x14 */ f32 defaultFov;
     /* 0x18 */ f32 height;
     /* 0x1C */ f32 distance;
     /* 0x20 */ f32 rotationY;
@@ -301,6 +304,9 @@ typedef struct CameraFloatConstant {
 
 extern const CameraFloatConstant lbl_8047D728;
 extern const CameraFloatConstant lbl_8047D72C;
+extern const CameraFloatConstant lbl_8047D720;
+extern const CameraFloatConstant lbl_8047D774;
+extern const CameraFloatConstant lbl_8047D778;
 extern const CameraFloatConstant lbl_8047D780;
 extern const CameraFloatConstant lbl_8047D784;
 extern const CameraFloatConstant lbl_8047D788;
@@ -316,6 +322,68 @@ static inline CameraFloorEntry* cameraFindFloorEntry(void* floor) {
     }
     return 0;
 }
+
+#pragma push
+#pragma optimization_level 4
+void fn_80179748(f32 height, f32 distance, f32 rotationY, f32 fov) {
+    CameraFloorEntry* floorEntry;
+
+    floorEntry = cameraFindFloorEntry(fn_800FF56C());
+    if (floorEntry != 0) {
+        if (floorEntry->field_00 != 0) {
+            height = floorEntry->height;
+            distance = floorEntry->distance;
+            rotationY = floorEntry->rotationY;
+            fov = floorEntry->fov;
+        } else {
+            if (height < lbl_8047D740) {
+                height = lbl_8047D740;
+            }
+            if (distance < lbl_8047D774.value) {
+                distance = lbl_8047D720.value;
+                height = ((const CameraFloatConstant*)&lbl_8047D740)->value;
+            } else if (distance > lbl_8047D778.value) {
+                distance = lbl_8047D778.value;
+            }
+            floorEntry->field_00 = 1;
+            floorEntry->defaultHeight = height;
+            floorEntry->defaultDistance = distance;
+            floorEntry->defaultRotationY = rotationY;
+            floorEntry->defaultFov = fov;
+        }
+    }
+
+    floorEntry = cameraFindFloorEntry(fn_800FF56C());
+    if (floorEntry != 0) {
+        floorEntry->height = height;
+    }
+    ((CameraPadState*)lbl_80478C40)->height = height;
+
+    floorEntry = cameraFindFloorEntry(fn_800FF56C());
+    if (floorEntry != 0) {
+        floorEntry->distance = distance;
+    }
+    ((CameraPadState*)lbl_80478C40)->distance = distance;
+
+    floorEntry = cameraFindFloorEntry(fn_800FF56C());
+    if (floorEntry != 0) {
+        floorEntry->rotationY = rotationY;
+    }
+    ((CameraPadState*)lbl_80478C40)->rotation.y = rotationY;
+
+    if (fov < lbl_8047D728.value) {
+        fov = lbl_8047D728.value;
+    }
+    if (fov > lbl_8047D72C.value) {
+        fov = lbl_8047D72C.value;
+    }
+    floorEntry = cameraFindFloorEntry(fn_800FF56C());
+    if (floorEntry != 0) {
+        floorEntry->fov = fov;
+    }
+    ((CameraPadState*)lbl_80478C40)->fov = fov;
+}
+#pragma pop
 
 #pragma push
 #pragma optimization_level 4
