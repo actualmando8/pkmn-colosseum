@@ -1412,28 +1412,30 @@ u32 _fightMenuAllFightOutPokemonOpenStatusMenuSub__FPvUsPv(u32 r3,u32 r4,char *r
   u32 uVar4;
   u32 *puVar8;
   u32 *puVar9;
+  unsigned int context;
   u8 cVar10;
 		  u32 uVar11;
 		  u32 local_48[12];
 		  u32 local_78[12];
 
+	  context = r3;
 	  if (r5 == (char *)0x0) {
 	    cVar10 = '\x01';
 	  }
 	  else {
 	    cVar10 = *r5;
 	  }
-	  cVar7 = fightOutPokemonCheckFightOut(r3);
+	  cVar7 = fightOutPokemonCheckFightOut(context);
 	  if (cVar7 == '\0') {
 	    return 1;
 	  }
-	    iVar3 = fightTargetGetPtr(2,r3,r4);
+	    iVar3 = fightTargetGetPtr(2,context,r4);
     if (iVar3 == 0) {
       uVar11 = 0;
     }
     else {
       uVar5 = fightSideGetStatus(iVar3,0,5,0);
-		      sVar6 = fightTargetGetTragetPtrToRelativeHostSideFightTargetId(r3,r4);
+		      sVar6 = fightTargetGetTragetPtrToRelativeHostSideFightTargetId(context,r4);
       if (sVar6 == 0) {
         uVar11 = 0;
       }
@@ -1448,7 +1450,7 @@ u32 _fightMenuAllFightOutPokemonOpenStatusMenuSub__FPvUsPv(u32 r3,u32 r4,char *r
         }
       }
     }
-		    fightOutPokemonToMenuPokemonStatus(r3,local_78);
+		    fightOutPokemonToMenuPokemonStatus(context,local_78);
     if (cVar10 == '\0') {
       ((u8 *)local_78)[0x29] = 0;
     }
