@@ -494,6 +494,34 @@ static inline void CardEGridValidate(CardEGridEntry* entry)
     entry->id = 0;
 }
 
+static inline s32 CardEGridLayerIsValid(CardEGridEntry* entry, s8 layer)
+{
+    return layer >= 0 && layer < entry->layers;
+}
+
+/* Return the start of one layer in a decoded card-e grid entry. */
+#pragma push
+#pragma peephole off
+void* fn_80082FE4(CardEGridEntry* entry, s8 layer)
+{
+    extern char lbl_8026F1C8[];
+    extern char lbl_8026F1D8[];
+    extern char lbl_8047C180[] __attribute__((section(".sdata2")));
+    u8* layerEntry;
+
+    if (entry == NULL) {
+        __assert(lbl_8026F1C8, 0x17F, lbl_8047C180);
+    }
+    if (!CardEGridLayerIsValid(entry, layer)) {
+        __assert(lbl_8026F1C8, 0x180, lbl_8026F1D8);
+    }
+    layerEntry = (u8*)entry;
+    layerEntry += layer *
+                  (0x76 + ((entry->rows * entry->columns) << 4));
+    return layerEntry + 0x24;
+}
+#pragma pop
+
 void* fn_800836AC(u8* arena, u8* descriptor, u8 create)
 {
     extern void* savedataGetStatus(u32, u32);
