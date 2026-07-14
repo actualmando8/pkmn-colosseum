@@ -406,6 +406,50 @@ void fn_8010D8D4(void)
 }
 #pragma pop
 
+typedef struct ColWalkHit {
+    f32 height;
+    u16 surfaceType;
+    u16 surfaceId;
+    u8 layer;
+    u8 subLayer;
+    u8 pad_0A[2];
+} ColWalkHit;
+
+extern s32 fn_8010E138(void* origin, void* results);
+
+/* 0x8010DE00 | 0xF0 */
+s32 GScolsys2WalkGetLayer(Vec3f* position, u8* layer, u8* subLayer)
+{
+    ColWalkHit hits[8];
+    s32 count;
+    s32 i;
+    s32 closest;
+    f32 distance;
+    f32 closestDistance;
+
+    count = fn_8010E138(position, hits);
+    if (count <= 0) {
+        return 0;
+    }
+
+    distance = position->y - hits[0].height;
+    distance = distance > 0.0f ? distance : -distance;
+    closest = 0;
+    closestDistance = distance;
+    for (i = 1; i < count; i++) {
+        distance = position->y - hits[i].height;
+        distance = distance > 0.0f ? distance : -distance;
+        if (closestDistance > distance) {
+            closest = i;
+            closestDistance = distance;
+        }
+    }
+
+    *layer = hits[closest].layer;
+    *subLayer = hits[closest].subLayer;
+    return 1;
+}
+
 /* 0x8010E138 | 0x404 */
 #pragma push
 #pragma optimization_level 0
