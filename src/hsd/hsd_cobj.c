@@ -10,6 +10,7 @@
 #include "hsd/hsd_aobj.h"
 #include "hsd/hsd_class.h"
 #include "hsd/hsd_debug.h"
+#include "hsd/hsd_jobj.h"
 #include "hsd/hsd_object.h"
 #include "hsd/hsd_wobj.h"
 
@@ -2572,6 +2573,37 @@ asm void fn_8019733C(void) {
 #else
 void fn_8019733C(u32 val) { extern u32 lbl_8047B240; lbl_8047B240 = val; }
 #endif
+#pragma pop
+
+/* 0x80197344 | 0xBC */
+#pragma push
+#pragma optimization_level 1
+extern void fn_80197784(HSD_JObj* jobj, f32 vmtx[3][4], u32 trsp_mask,
+                        u32 rendermode);
+void fn_80197344(HSD_JObj* jobj, f32 vmtx[3][4], u32 trsp_mask,
+                 u32 rendermode)
+{
+    extern void (*lbl_8047B240)(s32, s32, s32, HSD_JObj*);
+
+    if (jobj != NULL) {
+        if (union_type_dobj(jobj)) {
+            fn_80197784(jobj, vmtx, trsp_mask, rendermode);
+        } else if (union_type_ptcl(jobj) && lbl_8047B240 != NULL) {
+            HSD_SList* sp;
+
+            for (sp = jobj->u.ptcl; sp != NULL; sp = sp->next) {
+                if (((u32) sp->data & 0x80000000) != 0) {
+                    /* Packed particle reference: bank[0:5], offset[6:29]. */
+                    u32 bank = 0x3F & (u32) sp->data;
+                    u32 offset = ((u32) sp->data & 0x3FFFFFC0) >> 6;
+
+                    (*lbl_8047B240)(0, bank, offset, jobj);
+                }
+                sp->data = (void*) ((u32) sp->data & 0x7FFFFFFF);
+            }
+        }
+    }
+}
 #pragma pop
 
 typedef struct HSD_ZListNode {
