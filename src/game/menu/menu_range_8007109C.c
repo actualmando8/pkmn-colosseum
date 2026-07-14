@@ -532,6 +532,9 @@ s32 fn_80071E34(s32 chan, void* data) {
 #pragma peephole off
 s32 fn_80072C74(s32 chan, u32* response) {
     extern u32 fn_800D0F44(s32 chan);
+    extern s32 GBAGetStatus(s32 chan, void* status);
+    extern s32 GBAWrite(s32 chan, void* source, void* status);
+    extern s32 GBARead(s32 chan, void* destination, void* status);
     u8 readBuf[4];
     u8 writeBuf[4];
     u8 status[4];
@@ -539,13 +542,13 @@ s32 fn_80072C74(s32 chan, u32* response) {
 
     if (fn_800D0F44(chan) != 0x40000) {
         result = 1;
-    } else if (GBAGetStatus(chan, (u32)status) != 0) {
+    } else if (GBAGetStatus(chan, status) != 0) {
         result = 2;
     } else if ((status[0] & 8) == 0) {
         *(u32*)writeBuf = 0x11;
-        GBAWrite(chan, (u32)writeBuf, (u32)status);
+        GBAWrite(chan, writeBuf, status);
         result = -1;
-    } else if (GBARead(chan, (u32)readBuf, (u32)status) != 0) {
+    } else if (GBARead(chan, readBuf, status) != 0) {
         result = 3;
     } else {
         result = 0;
