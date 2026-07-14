@@ -1,21 +1,18 @@
 /**
  * @file hsd_displayfunc.c
- * @brief HSD displayfunc.c -- Billboard matrix construction functions.
+ * @brief HSD displayfunc.c -- Envelope and billboard matrix construction.
  *
  * Decompiled from:
- *   _HSD_mkEnvelopeModelNodeMtx (HSD_DObjDisplayFunc1 -- billboard model-view setup)
+ *   _HSD_mkEnvelopeModelNodeMtx (envelope-model node matrix setup)
  *   HSD_JObjMakePositionMtx (JObj billboard position-matrix construction)
  *
  * Source file reference: "displayfunc.c" (rodata string at lbl_802746DC)
  *
- * These two functions are display callbacks registered with the HSD DObj
- * system. They handle:
+ * These functions build matrices used by HSD's JObj/DObj renderer:
  *
- * 1. HSD_DObjDisplayFunc1: Walks a linked list of DObj nodes to find
- *    the first non-hidden billboard node, then sets up the model-view
- *    matrix. If the billboard node is the same as the target DObj, it
- *    copies the world matrix directly. Otherwise, it concatenates the
- *    billboard's orientation with the target's position.
+ * 1. _HSD_mkEnvelopeModelNodeMtx: Walks a JObj's parent chain to find
+ *    its skeleton or skeleton-root node, then builds the inverse envelope
+ *    matrix needed to transform the model node into skeleton space.
  *
  * 2. HSD_JObjMakePositionMtx: Concatenates the view and JObj matrices,
  *    then applies the appropriate billboard transform selected by the
@@ -40,8 +37,7 @@
 /* ===== External functions ===== */
 extern void __assert(const char* file, u32 line, const char* msg); /* HSD_Halt / assert */
 extern void HSD_Panic(const char* file, u32 line, const char* msg);
-extern void fn_800A2EB4(void* worldMtx, void* dstMtx);               /* MTXCopy (3x4 matrix) */
-extern void fn_800A2D98(void* srcMtx, void* jointMtx, void* dstMtx); /* MTXConcat */
+extern void PSMTXInverse(const Mtx srcMtx, Mtx dstMtx);
 extern void PSMTXConcat(const Mtx srcMtx, const Mtx jointMtx, Mtx dstMtx);
 extern void fn_801A9DF0(void* a, void* b, void* c);                  /* HSD_MtxInverseConcat */
 
@@ -53,21 +49,17 @@ extern const char lbl_802746DC[]; /* "displayfunc.c" */
 extern const char lbl_802746EC[]; /* "unkown type of billboard.\n" */
 
 /* ===== SDA2 assertion expression strings ===== */
-extern const char lbl_8047D9E8[]; /* "jobj" -- assertion expression for billboard null check */
-extern const char lbl_8047D9F0[]; /* "x" -- assertion expression for billboard found check */
+extern const char lbl_8047D9E8[] __attribute__((section(".sdata2"))); /* "jobj" */
+extern const char lbl_8047D9F0[] __attribute__((section(".sdata2"))); /* "x" */
 
 /* ========================================================================
- * Internal DObj-like structure fields (used by _HSD_mkEnvelopeModelNodeMtx):
+ * HSD_JObj fields used by _HSD_mkEnvelopeModelNodeMtx:
  *
- * offset 0x0C: void* next   -- next DObj in chain
- * offset 0x14: u32   flags  -- DObj flags
- *   bit 1 (mask 0x02): HIDDEN flag
- * offset 0x44: f32[3][4] -- joint/local matrix (Mtx)
- * offset 0x78: void*     -- world matrix pointer
+ * offset 0x0C: HSD_JObj* parent
+ * offset 0x14: u32 flags
+ * offset 0x44: Mtx local-to-world matrix
+ * offset 0x78: MtxPtr envelope matrix
  * ======================================================================== */
-
-/* Flag masks */
-#define DOBJ_FLAG_HIDDEN     0x02   /* bit 1: hidden, skip rendering */
 
 /* 0x80198038 | 0x5A8 */
 #pragma push
@@ -332,96 +324,47 @@ void HSD_ZListInitAllocData(void) {
 #endif
 #pragma pop
 
-/* =======================================================================
- *  HSD_DObjDisplayFunc1 / _HSD_mkEnvelopeModelNodeMtx
- *  Address: 0x80197A64, Size: 0x108
- *
- *  Billboard model-view matrix setup for DObj rendering.
- *
- *  r3 = dobj (the DObj to display)
- *  r4 = outputMtx (destination model-view matrix)
- *
- *  Algorithm:
- *    1. Check flags bit 1 (HIDDEN); if set, return 0
- *    2. If dobj is NULL, assert "displayfunc.c" line 0x184
- *    3. Walk dobj chain (via offset 0x0C) to find first non-hidden node
- *    4. If not found, assert "displayfunc.c" line 0x1D4
- *    5. If found node == dobj:
- *         Copy the world matrix (offset 0x78) directly to outputMtx
- *    6. Else if found node has HIDDEN flag:
- *         Concatenate found->jointMtx with dobj->jointMtx via inverse
- *    7. Else:
- *         Concatenate found->worldMtx with found->jointMtx, then
- *         inverse-concat with dobj->jointMtx
- *    8. Return outputMtx
- * ======================================================================= */
-void* HSD_DObjDisplayFunc1(void* dobj, void* outputMtx) {
-    u32* dobjPtr = (u32*)dobj;
-    u32 flags;
-    void* cur;
-    void* found;
-    f32 localMtx[3][4];
+/* Inlined from HSD_JObjFindSkeleton in the original displayfunc.c TU. */
+static inline HSD_JObj* displayfuncFindSkeleton(HSD_JObj* jobj)
+{
+    HSD_JObj* skeleton;
 
-    /* Step 1: Check HIDDEN flag (bit 1 of flags at offset 0x14) */
-    flags = dobjPtr[5]; /* offset 0x14 */
-    if (flags & DOBJ_FLAG_HIDDEN) {
+    ((skeleton = jobj) != NULL)
+        ? (void) 0
+        : __assert(lbl_802746DC, 0x184, lbl_8047D9E8);
+    for (; skeleton != NULL; skeleton = skeleton->parent) {
+        if (skeleton->flags & (JOBJ_SKELETON | JOBJ_SKELETON_ROOT)) {
+            return skeleton;
+        }
+    }
+    return NULL;
+}
+
+/* 0x80197A64 | 0x108 */
+MtxPtr _HSD_mkEnvelopeModelNodeMtx(HSD_JObj* model, MtxPtr mtx)
+{
+    HSD_JObj* skeleton;
+    Mtx concat;
+
+    if (model->flags & JOBJ_SKELETON_ROOT) {
         return NULL;
     }
 
-    /* Step 2: NULL check with assert */
-    found = dobj;
-    if (found == NULL) {
-        __assert(lbl_802746DC, 0x184, lbl_8047D9E8);
-    }
-
-    /* Step 3: Walk chain to find first node without bit 0 of flags set */
-    cur = dobj;
-    while (cur != NULL) {
-        u32* curPtr = (u32*)cur;
-        u32 curFlags = curPtr[5]; /* flags at offset 0x14 */
-        if ((curFlags & 0x01) == 0) {
-            /* Not the flag we're looking for -- this IS our billboard */
-            found = cur;
-            break;
-        }
-        cur = (void*)curPtr[3]; /* next at offset 0x0C */
-    }
-    if (cur == NULL) {
-        found = NULL;
-    }
-
-    /* Step 4: Assert if not found */
-    if (found == NULL) {
+    skeleton = displayfuncFindSkeleton(model);
+    if (skeleton == NULL) {
         __assert(lbl_802746DC, 0x1D4, lbl_8047D9F0);
     }
 
-    /* Step 5-7: Set up model-view matrix */
-    if (found == dobj) {
-        /* Same node: copy world matrix directly */
-        u32* foundPtr = (u32*)found;
-        void* worldMtx = (void*)foundPtr[30]; /* offset 0x78 */
-        fn_800A2EB4(worldMtx, outputMtx);
+    if (skeleton == model) {
+        PSMTXInverse((MtxPtr) skeleton->envelopemtx, mtx);
+    } else if (skeleton->flags & JOBJ_SKELETON_ROOT) {
+        fn_801A9DF0(skeleton->mtx, model->mtx, mtx);
     } else {
-        u32* foundPtr = (u32*)found;
-        u32 foundFlags = foundPtr[5];
-
-        if (foundFlags & DOBJ_FLAG_HIDDEN) {
-            /* Hidden node: inverse concatenation */
-            void* foundJointMtx = (void*)((u8*)found + 0x44);
-            void* dobjJointMtx = (void*)((u8*)dobj + 0x44);
-            fn_801A9DF0(foundJointMtx, dobjJointMtx, outputMtx);
-        } else {
-            /* Normal case: concat world * joint, then inverse with target */
-            void* foundWorldMtx = (void*)foundPtr[30]; /* offset 0x78 */
-            void* foundJointMtx = (void*)((u8*)found + 0x44);
-            void* dobjJointMtx = (void*)((u8*)dobj + 0x44);
-
-            fn_800A2D98(foundJointMtx, foundWorldMtx, localMtx);
-            fn_801A9DF0(localMtx, dobjJointMtx, outputMtx);
-        }
+        PSMTXConcat(skeleton->mtx, (MtxPtr) skeleton->envelopemtx, concat);
+        fn_801A9DF0(concat, model->mtx, mtx);
     }
 
-    return outputMtx;
+    return mtx;
 }
 
 /* =======================================================================

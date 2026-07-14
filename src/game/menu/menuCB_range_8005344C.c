@@ -794,6 +794,56 @@ s32 fn_80055194(s32* outSlot, s32 index) {
     return info->kind;
 }
 
+#pragma push
+#pragma peephole off
+void* fn_800551CC(void* pokemon, s32 direction, s32* moveState)
+{
+    extern void* getPokemon__5PCBOXFScSc(void*, s8, s8);
+    s32 active;
+    s32 box;
+    void* candidate;
+    s32 slot;
+
+    active = moveState[0];
+    box = moveState[1];
+    if (active != 0) {
+        return pokemon;
+    }
+
+    if (direction == 1) {
+        slot = moveState[2] - 1;
+        while (slot >= 0) {
+            candidate = getPokemon__5PCBOXFScSc(NULL, (s8) box, (s8) slot);
+            if (pokemonCheckValid(candidate) != 0) {
+                break;
+            }
+            slot--;
+        }
+        if (slot >= 0) {
+            moveState[2] = slot;
+            return candidate;
+        }
+    }
+
+    if (direction == 2) {
+        slot = moveState[2] + 1;
+        while (slot < fn_801347D8()) {
+            candidate = getPokemon__5PCBOXFScSc(NULL, (s8) box, (s8) slot);
+            if (pokemonCheckValid(candidate) != 0) {
+                break;
+            }
+            slot++;
+        }
+        if (slot < fn_801347D8()) {
+            moveState[2] = slot;
+            return candidate;
+        }
+    }
+
+    return pokemon;
+}
+#pragma pop
+
 s32 fn_800552D4(s8 box, s8 slot)
 {
     extern void* getPokemon__5PCBOXFScSc(void*, s8, s8);
@@ -817,7 +867,6 @@ s32 fn_800552D4(s8 box, s8 slot)
     extern s32 fadeCheck(s32);
     extern void fn_8005471C(void);
     extern s32 fn_80057C9C(void*, void*, s32*);
-    extern void fn_800551CC(void);
     extern void* menuItemBiosGetPtr(s32);
     extern void fn_80057830(s16, s16, s32);
     extern MenuCBPane* windowSearchID(s32);
