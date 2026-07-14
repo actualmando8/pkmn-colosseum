@@ -33,10 +33,13 @@
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #pragma peephole off
+#pragma push
+#pragma peephole on
 u32 sndPitchUpOne(u16 pitch) {
     extern f32 lbl_8047D3F0;
     return (s32)(lbl_8047D3F0 * (f32)(u32)pitch);
 }
+#pragma pop
 
 u32 sndGetPitch(u8 key, u32 sInfo) {
     extern f32 lbl_80368EC8[];
