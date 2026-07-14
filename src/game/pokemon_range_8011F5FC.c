@@ -694,7 +694,7 @@ extern void fightOutPokemonBiosSetNamakeFlag();
 extern void fightOutPokemonBiosSetUsedItemDataId();
 extern void fightOutPokemonBiosSetStockItemDataId();
 extern void fightOutPokemonBiosSetSuccessCnt();
-extern void fightOutPokemonBiosSetMeetEnemyFightPokemonEntryId(u8* ptr, u8 index, s8 entry_id);
+extern void fightOutPokemonBiosSetMeetEnemyFightPokemonEntryId(u8* ptr, u8 index, u16 entry_id);
 extern void fightOutPokemonBiosSetZokuseiDataId();
 extern void fightOutPokemonBiosSetTokuseiDataId();
 extern void fightOutPokemonBiosSetDamageAtkValue();
@@ -4322,7 +4322,7 @@ void pokemonSetStatus(u8* obj, u32 id, u32 selector, u32 subindex, u32 value)
     case 0xFC: fightOutPokemonBiosSetSuccessCnt(obj, (u8)status_value); break;
     case 0xFD: {
         u8 enemy_index = (u8)status_subindex;
-        s8 entry_id = (s8)status_value;
+        u16 entry_id = (s8)status_value;
         fightOutPokemonBiosSetMeetEnemyFightPokemonEntryId(obj, enemy_index, entry_id);
         break;
     }
