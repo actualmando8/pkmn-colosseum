@@ -591,7 +591,6 @@ s32 fn_801E3978(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
     return -1;
 }
 
-#pragma peephole off
 BOOL fn_801E4058(void)
 {
     extern void fn_801E2CA8(void);
@@ -614,7 +613,6 @@ BOOL fn_801E4058(void)
     }
     return FALSE;
 }
-#pragma peephole reset
 
 s32 fn_801E25C8(void)
 {
