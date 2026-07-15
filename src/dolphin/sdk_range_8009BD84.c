@@ -17,15 +17,16 @@
 #define OS_FPUCONTEXT (*(OSContext* volatile*)0x800000D8)
 
 void OSInitContext(OSContext* context, u32 pc, u32 newsp) {
+    extern u8 _SDA_BASE_[];
+    extern u8 _SDA2_BASE_[];
+
     context->srr0 = pc;
     context->gpr[1] = newsp;
     context->srr1 = 0x9032;
     context->cr = 0;
     context->xer = 0;
-    asm {
-        stw r2, 0x8(r3)
-        stw r13, 0x34(r3)
-    }
+    context->gpr[2] = (u32)_SDA2_BASE_;
+    context->gpr[13] = (u32)_SDA_BASE_;
     context->gpr[3] = 0;
     context->gpr[4] = 0;
     context->gpr[5] = 0;
@@ -66,21 +67,11 @@ void OSInitContext(OSContext* context, u32 pc, u32 newsp) {
 }
 
 #pragma scheduling off
-void OSSwitchFPUContext(u8 exception, register OSContext* context) {
+void OSSwitchFPUContext(u8 exception, OSContext* context) {
     OSContext** fpuContext = (OSContext**)0x800000D8;
-    OSContext* previous;
+    OSContext* previous = *fpuContext;
 
-    asm {
-        mfmsr r5
-        ori r5, r5, 0x2000
-        mtmsr r5
-        isync
-        lwz r5, 0x19c(context)
-        ori r5, r5, 0x2000
-        mtsrr1 r5
-    }
-
-    previous = *fpuContext;
+    context->srr1 |= 0x2000;
     *fpuContext = context;
     if ((s32)previous != (s32)context) {
         if (previous != 0) {
@@ -88,26 +79,7 @@ void OSSwitchFPUContext(u8 exception, register OSContext* context) {
         }
         __OSLoadFPUContext(exception, context);
     }
-
-    asm {
-        lwz r0, 0x80(context)
-        mtcrf 255, r0
-        lwz r0, 0x84(context)
-        mtlr r0
-        lwz r0, 0x198(context)
-        mtsrr0 r0
-        lwz r0, 0x88(context)
-        mtctr r0
-        lwz r0, 0x8c(context)
-        mtxer r0
-    }
     context->state &= ~OS_CONTEXT_STATE_EXC;
-    asm {
-        lwz r5, 0x14(context)
-        lwz r3, 0xc(context)
-        lwz r4, 0x10(context)
-        rfi
-    }
 }
 #pragma scheduling reset
 
@@ -212,38 +184,5 @@ void fn_8009D878(void* dest, s32 size, s32 offset) {
         }
         offset += chunkSize;
         dest = (u8*)dest + chunkSize;
-    }
-}
-
-BOOL OSDisableInterrupts(void) {
-    asm {
-        mfmsr r3
-        rlwinm r4, r3, 0, 17, 15
-        mtmsr r4
-        extrwi r3, r3, 1, 16
-    }
-}
-
-BOOL OSEnableInterrupts(void) {
-    asm {
-        mfmsr r3
-        ori r4, r3, 0x8000
-        mtmsr r4
-        extrwi r3, r3, 1, 16
-    }
-}
-
-BOOL OSRestoreInterrupts(BOOL enable) {
-    asm {
-        cmpwi r3, 0
-        mfmsr r4
-        beq restore_disabled
-        ori r5, r4, 0x8000
-        b apply
-    restore_disabled:
-        rlwinm r5, r4, 0, 17, 15
-    apply:
-        mtmsr r5
-        extrwi r3, r4, 1, 16
     }
 }
