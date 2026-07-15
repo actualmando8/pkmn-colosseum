@@ -53,7 +53,6 @@ extern const char lbl_80270610[]; /* "GSmaterial: Error creating environment map
 extern u32 lbl_8047AA80;   /* GSgfx state pointer (sda21) */
 extern u8 lbl_80400248[];  /* GSgfx state backup buffer (0x5A0 bytes) */
 extern u8 lbl_80400B28[];  /* light/material command buffer */
-extern u32 __OSStartTime[];
 
 /* ===== Combined forward-decls (duplicated across split segments) ===== */
 

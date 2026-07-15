@@ -10,36 +10,6 @@
 #include "dolphin/types.h"
 #include "dolphin/gx/GX.h"
 #include "dolphin/os/OSInterrupt.h"
-
-typedef void (*GXFifoCallback)(void);
-
-extern GXData* gx;
-extern volatile u16* __cpReg;
-extern GXFifoCallback lbl_8047A9B4;
-
-GXFifoCallback fn_800B7484(GXFifoCallback callback) {
-    GXFifoCallback old = lbl_8047A9B4;
-    BOOL enabled = OSDisableInterrupts();
-
-    lbl_8047A9B4 = callback;
-    OSRestoreInterrupts(enabled);
-    return old;
-}
-
-void __GXFifoInit(void) {
-    extern void GXCPInterruptHandler(__OSInterrupt interrupt, OSContext* context);
-    extern void* fn_800A13F8(void);
-    extern u32 lbl_8047A9A0;
-    extern u32 lbl_8047A9A4;
-    extern void* lbl_8047A9A8;
-    extern u32 lbl_8047A9B0;
-
-    __OSSetInterruptHandler(0x11, GXCPInterruptHandler);
-    __OSUnmaskInterrupts(0x4000);
-    lbl_8047A9A8 = fn_800A13F8();
-    lbl_8047A9B0 = 0;
-    lbl_8047A9A0 = 0;
-    lbl_8047A9A4 = 0;
 #include "dolphin/os/PPCArch.h"
 
 extern GXData* gx;

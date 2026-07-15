@@ -283,7 +283,6 @@ void fn_801E1C1C(void)
     extern s32 DVDRead(void *fileInfo, void *addr, s32 length, s32 offset, s32 prio);
     extern s32 OSSuspendThread(OSThread *thread);
     extern BOOL fn_801E446C(u32 msg);
-    u8 *player;
     u8 *base;
     u32 message;
     s32 frame;
@@ -612,57 +611,6 @@ BOOL fn_801E4058(void)
     }
     return FALSE;
 }
-
-s32 fn_801E3978(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
-{
-    extern void fn_801E1E1C(void *y, void *u, void *v, s16 x, s16 yPos,
-                            s16 width, s16 height, s16 arg8, s16 arg9);
-    extern void fn_801E1FF8(s32 arg0);
-    extern void fn_801E24B0(void);
-    u8 *player = lbl_8046AC60;
-
-    if (*(BOOL *)(player + 0xA0) && player[0xA4] != 0 &&
-        *(u32 **)(player + 0xE8) != NULL) {
-        fn_801E1FF8(arg0);
-        fn_801E1E1C((void *)(*(u32 **)(player + 0xE8))[0],
-                    (void *)(*(u32 **)(player + 0xE8))[1],
-                    (void *)(*(u32 **)(player + 0xE8))[2],
-                    (s16)arg1, (s16)arg2,
-                    (s16)*(u32 *)(lbl_8046AC60 + 0x80),
-                    (s16)*(u32 *)(lbl_8046AC60 + 0x84),
-                    (s16)arg3, (s16)arg4);
-        fn_801E24B0();
-        return ((*(u32 **)(player + 0xE8))[3] +
-                *(u32 *)(lbl_8046AC60 + 0xC0)) %
-               *(u32 *)(lbl_8046AC60 + 0x50);
-    }
-    return -1;
-}
-
-#pragma peephole off
-BOOL fn_801E4058(void)
-{
-    extern void fn_801E2CA8(void);
-    u8 *player = lbl_8046AC60;
-    u8 state;
-
-    if (*(BOOL *)(player + 0xA0) != FALSE) {
-        state = player[0xA4];
-        if (state == 1 || state == 4) {
-            if (state == 4 && lbl_8046AC60[0xA7] != 0) {
-                fn_801E2CA8();
-            }
-            player[0xA4] = 2;
-            *(u32 *)(lbl_8046AC60 + 0xD0) = 0;
-            *(u32 *)(lbl_8046AC60 + 0xD4) = 0;
-            *(s32 *)(lbl_8046AC60 + 0xCC) = -1;
-            *(s32 *)(lbl_8046AC60 + 0xC8) = -1;
-            return TRUE;
-        }
-    }
-    return FALSE;
-}
-#pragma peephole reset
 
 s32 fn_801E25C8(void)
 {

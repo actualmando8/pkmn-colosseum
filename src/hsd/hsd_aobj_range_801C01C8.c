@@ -85,38 +85,6 @@ void* fn_801C021C(void* callback)
 }
 
 /**
- * fn_801C01C8 - Replace the draw-done callback and return the old callback.
- * Address: 0x801C01C8 | Size: 0x54
- */
-void* fn_801C01C8(void* callback) {
-    extern void* volatile lbl_80466BC0[];
-    void* old_callback;
-    BOOL enabled;
-
-    old_callback = lbl_80466BC0[0x1E8 / sizeof(void*)];
-    enabled = OSDisableInterrupts();
-    lbl_80466BC0[0x1E8 / sizeof(void*)] = callback;
-    OSRestoreInterrupts(enabled);
-    return old_callback;
-}
-
-/**
- * fn_801C021C - Replace the animation-done callback and return the old callback.
- * Address: 0x801C021C | Size: 0x54
- */
-void* fn_801C021C(void* callback) {
-    extern void* volatile lbl_80466BC0[];
-    void* old_callback;
-    BOOL enabled;
-
-    old_callback = lbl_80466BC0[0x1DC / sizeof(void*)];
-    enabled = OSDisableInterrupts();
-    lbl_80466BC0[0x1DC / sizeof(void*)] = callback;
-    OSRestoreInterrupts(enabled);
-    return old_callback;
-}
-
-/**
  * _HSD_AObjForgetMemory - Address: 0x801C0270 | Size: 0xC
  */
 void _HSD_AObjForgetMemory(void* low, void* high) {

@@ -73,61 +73,6 @@ u32 sndGetPitch(u8 key, u32 sInfo) {
 #pragma pop
 
 
-/* ===== snd_synthapi.c: sndPitchUpOne / sndGetPitch, 0x80158BB4 / 0x80158BF0 =====
- * sndGetPitch: sampleInfo word = (rootKey << 24) | sampleRate(24bit);
- * 0xFFFFFFFF means "default" 0x40005622 (root key 0x40, 22050Hz decimal
- * 0x5622=22050 with rootKey 0x40). Pitch tables: lbl_80368EC8 =
- * up-factors[semitones], lbl_803690C8 = down-factors[semitones] (f32[]).
- * Result is a 4.12 fixed-point resampling ratio against the synth mix
- * frequency (first u32 of the synthInfo block at lbl_80434C50).
- * PLACEMENT: these two live at the TOP of the TU because sndGetPitch needs
- * a scalar `extern u32 lbl_80434C50` view (retail folds the mixFrq load:
- * `lwz r0, lbl_80434C50@l(r3)` -- only object-typed symbols fold) which
- * MWCC rejects after the file-scope `extern u8 lbl_80434C50[]` below.
- * lbl_8047D3F0/lbl_8047D400 are the retail-named .sdata2 float constants
- * (2^(1/12) and 4096.f) -- referenced by name so relocs match. */
-#pragma push
-#pragma optimization_level 4
-#pragma optimizewithasm off
-#pragma peephole off
-u32 sndPitchUpOne(u16 pitch) {
-    extern f32 lbl_8047D3F0;
-    return (s32)(lbl_8047D3F0 * (f32)(u32)pitch);
-}
-
-u32 sndGetPitch(u8 key, u32 sInfo) {
-    extern f32 lbl_80368EC8[];
-    extern f32 lbl_803690C8[];
-    extern f32 lbl_8047D400;
-    /* scalar-object view of the synthInfo block: must be an OBJECT (not a
-     * cast pointer) so the mixFrq load folds to `lwz r0, @l(r3)`, and must
-     * be >8 bytes so MWCC does not assume .sdata/sda21 for the extern. */
-    extern struct SynthInfoView_ { u32 mixFrq; u32 numSamples; u32 pad[6]; } lbl_80434C50;
-    f32 f;
-    f32 t;
-    f32 fourk;
-    u8 k;
-
-    if (sInfo == 0xFFFFFFFF) {
-        sInfo = 0x40005622;
-    }
-    k = (u8)(sInfo >> 24);
-    fourk = lbl_8047D400;
-    if (key != k) {
-        if (k < key) {
-            t = lbl_80368EC8[key - k];
-        } else {
-            t = lbl_803690C8[k - key];
-        }
-        f = (f32)(sInfo & 0xFFFFFF) * t;
-    } else {
-        f = (f32)(sInfo & 0xFFFFFF);
-    }
-    return (u32)((fourk * f) / (f32)lbl_80434C50.mixFrq);
-}
-#pragma pop
-
-
 /* ===== External SDK / engine functions ===== */
 extern void  GSlogWrite(const char* fmt, ...);
 extern void* memset(void* dst, int val, u32 size);
@@ -6807,7 +6752,6 @@ static inline MusyxPoolEntry* MusyxPoolEntryAt(u32 address)
 {
     return (MusyxPoolEntry*)address;
 }
-#pragma dont_inline reset
 
 static inline MusyxPoolEntry* fn_80159C54_get_entry(u16 id,
                                                     MusyxPoolEntry* entry)
