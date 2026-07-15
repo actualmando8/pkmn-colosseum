@@ -1,5 +1,35 @@
 #include "dolphin/types.h"
 
+/* TRKDoNotifyStopped - 0x800C0CD8 | size 0x98 | scope global */
+s32 TRKDoNotifyStopped(s32 command) {
+    extern s32 TRKGetFreeBuffer(s32* bufferID, s32* buffer);
+    extern void TRKTargetAddStopInfo(s32 buffer);
+    extern void TRKTargetAddExceptionInfo(s32 buffer);
+    extern s32 TRKRequestSend(s32 buffer, s32* replyID, s32 retries, s32 timeout, s32 waitForReply);
+    extern s32 TRKReleaseBuffer(s32 bufferID);
+    s32 replyID;
+    s32 bufferID;
+    s32 buffer;
+    s32 result;
+
+    result = TRKGetFreeBuffer(&bufferID, &buffer);
+    if (result == 0) {
+        if (result == 0) {
+            if (command == 0x90) {
+                TRKTargetAddStopInfo(buffer);
+            } else {
+                TRKTargetAddExceptionInfo(buffer);
+            }
+        }
+        result = TRKRequestSend(buffer, &replyID, 2, 3, 1);
+        if (result == 0) {
+            TRKReleaseBuffer(replyID);
+        }
+        TRKReleaseBuffer(bufferID);
+    }
+    return result;
+}
+
 /* TRK_fill_mem_800D6430 - 0x800C0DA8 | size 0xB8 | scope none (optimized memset-style fill) */
 void TRK_fill_mem_800D6430(void* dest, int val, u32 count) {
     u8* dst;

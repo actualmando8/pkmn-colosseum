@@ -5,15 +5,15 @@
  * Decompiled from (attribution FINAL -- registration-table-proven, see note):
  *   floorReadGFLPreFunc                (0x8011432C, string lbl_80272200 + table 0x11)
  *   floorReadBGMPostFunc               (0x801143A0, table 0x04; byte-identical to XD)
- *   floorReadBGMPreFunc                (0x801143A8, table 0x04; asm-only)
+ *   floorReadBGMPreFunc                (0x801143A8, table 0x04)
  *   floorReadNotLinkedParticlePostFunc (0x801143EC, table 0x12)
  *   floorReadNotLinkedParticlePreFunc  (0x8011445C, string lbl_80272270 + table 0x12)
- *   floorReadParticlePostFunc          (0x801144D0, table 0x0A; scene_data tail; asm-only)
+ *   floorReadParticlePostFunc          (0x801144D0, table 0x0A; scene_data tail)
  *   floorReadParticlePreFunc           (0x801145C0, string lbl_80272270 + table 0x0A)
  *   floorReadWZXPreFunc                (0x80114634, string lbl_802722B8 + table 0x10)
  *   floorReadPKXPreFunc                (0x801146A4, string lbl_802722F0 + table 0x0F)
  *   floorReadTexPostFunc               (0x80114714, string lbl_80272328 + table 0x09)
- *   floorReadTexPreFunc                (0x80114760, string lbl_8027235C + table 0x09; asm-only)
+ *   floorReadTexPreFunc                (0x80114760, string lbl_8027235C + table 0x09)
  *   floorReadColPostFunc               (0x801147D4, table 0x03)
  *   floorReadColPreFunc                (0x80114808, string lbl_80272394 + table 0x03)
  *   floorReadCameraPostFunc            (0x8011487C, table 0x0C; _registerCamera strings)
@@ -39,9 +39,7 @@
  *   territory -- rename parked until that fleet-owned file is free.
  *   An earlier first-generation "orphan" recovery block (names that never
  *   paired, wrong attributions) was removed by the 2026-07-01 pass; its
- *   candidate bodies were empty TODO placeholders (nothing adoptable), so
- *   floorReadBGMPreFunc, floorReadParticlePostFunc, and floorReadTexPreFunc
- *   remain asm-only pending real decompilation attempts.
+ *   candidate bodies were empty TODO placeholders (nothing adoptable).
  *
  * Each floor archive (FSYS) contains multiple resource types that need
  * to be loaded into memory before the floor becomes active. The pre-func
@@ -91,11 +89,11 @@ extern void* GSresAllocResourceAlign(u32 size, u32 alignment,
 
 /* ===== String constants (rodata) ===== */
 extern const char lbl_80272200[]; /* floorReadGFLPreFunc(): can't alloc... */
-extern const char lbl_80272238[]; /* "ERROR: Over Sound Buffer! snd_res_id=%d..." (floorReadBGMPreFunc, unproven) */
+extern const char lbl_80272238[]; /* "ERROR: Over Sound Buffer! snd_res_id=%d..." */
 extern const char lbl_80272270[]; /* "floorReadParticlePreFunc(): can't alloc..." (read by BOTH particle pre-funcs, see header note) */
 extern const char lbl_802722B8[]; /* floorReadWZXPreFunc(): can't alloc... */
 extern const char lbl_802722F0[]; /* floorReadPKXPreFunc(): can't alloc... */
-extern const char lbl_8027235C[]; /* floorReadTexPreFunc(): can't alloc... (next unit's Tex string; not yet wired to a matched body) */
+extern const char lbl_8027235C[]; /* floorReadTexPreFunc(): can't alloc... */
 extern const char lbl_80272428[]; /* floorReadCameraPreFunc: can't alloc... */
 extern const char lbl_802724E8[]; /* floorReadMapPreFunc: can't alloc... (next unit) */
 extern const char lbl_80272520[]; /* floorReadScriptPreFunc(): can't alloc... (next unit) */
@@ -108,7 +106,7 @@ extern const char lbl_80272394[]; /* floorReadColPreFunc(): can't alloc... -- st
 extern const char lbl_80272460[]; /* floorReadObjPreFunc: can't alloc... -- string-proves fn_80114A70's name */
 
 /* ===== BSS / global state ===== */
-extern u32 lbl_8047B0B0;  /* sound buffer size limit (floorReadBGMPreFunc, unproven) */
+extern u32 lbl_8047B0B0;  /* sound buffer size limit */
 
 /* ===== Internal callbacks referenced by pre-funcs ===== */
 extern void _unloadFlare__FPvUlUl(void);  /* GFL resource completion callback */
@@ -150,12 +148,21 @@ void* floorReadGFLPreFunc(u32 resId, u32 loadMode, u32 dataSize) {
 /* 0x801143A0 | 0x8 | return_const */
 u32 floorReadBGMPostFunc(void) { return 0; }
 
-/* 0x801143A8 | 0x44 | UNMATCHED -- sound buffer size check (unproven name).
- * ADOPTION ATTEMPT: harvested the old orphan "floorReadSoundPreFunc_CheckBuffer"
- * body for this address; it was only an empty TODO placeholder. Built and
- * confirmed via objdiff at 5.9% fuzzy match (i.e. effectively no match --
- * there was no real logic to adopt). No signature/callee-extern tweak can
- * fix an empty body, so the adoption was reverted. Left asm-only. */
+/* 0x801143A8 | 0x44 | sound buffer size check */
+#pragma push
+#pragma peephole off
+void* floorReadBGMPreFunc(u32 unused, u32 sndResId, u32 dataSize) {
+    extern void* lbl_8047B0B4;
+    u32 alignedSize = (dataSize + 0x1F) & ~0x1F;
+    u32 bufferSize = lbl_8047B0B0;
+
+    if (alignedSize > bufferSize) {
+        GSlogWrite(lbl_80272238, sndResId, bufferSize);
+    }
+    return lbl_8047B0B4;
+}
+#pragma peephole on
+#pragma pop
 
 /* 0x801143EC | 0x70 */
 #pragma push
@@ -188,12 +195,55 @@ void* floorReadNotLinkedParticlePreFunc(u32 resId, u32 loadMode, u32 dataSize) {
 #pragma peephole on
 #pragma pop
 
-/* 0x801144D0 | 0xF0 | UNMATCHED -- sound pre-alloc (unproven name).
- * ADOPTION ATTEMPT: harvested the old orphan "floorReadSoundPreFunc" body
- * for this address; it was only an empty TODO placeholder. Built and
- * confirmed via objdiff at 1.7% fuzzy match (i.e. effectively no match --
- * there was no real logic to adopt). No signature/callee-extern tweak can
- * fix an empty body, so the adoption was reverted. Left asm-only. */
+/* 0x801144D0 | 0xF0 */
+#pragma push
+#pragma peephole off
+void* floorReadParticlePostFunc(u32 resId, u32 param) {
+    typedef struct FloorData {
+        u8 unk0[8];
+        u32 resourceFlags;
+    } FloorData;
+    typedef struct SceneData {
+        void** models;
+    } SceneData;
+    extern FloorData* floorDataBiosGetCurrentPtr(void);
+    extern u32 fn_80113F48(void);
+    extern void* HSD_ArchiveGetPublicAddress(void* archive, const char* symbol);
+    extern void GSmodelLinkToGSparticleBank(void* model, void* bank);
+    void* result;
+    void* particleBank;
+    FloorData* floorData;
+    SceneData* sceneData;
+    u32 resourceFlags;
+    u32 i = 0;
+
+    result = GSresGetResource(resId, (param & 0x7FFF0000) | 0x400);
+    particleBank = fn_801195AC(result);
+    if (particleBank != (void*)0) {
+        GSresRegisterResource(particleBank, resId, param,
+                              (void*)_unloadParticles__FPvUlUl);
+        floorData = floorDataBiosGetCurrentPtr();
+        sceneData = HSD_ArchiveGetPublicAddress(
+            GSresGetResource(fn_80113F48(), floorData->resourceFlags),
+            lbl_802722AC);
+        if (sceneData == (void*)0) {
+            return (void*)0;
+        }
+        if (sceneData->models != (void*)0) {
+            resourceFlags = (floorData->resourceFlags & 0x7FFF0000) | 0x1000;
+            for (; sceneData->models[i] != (void*)0; i++) {
+                void* model = GSresGetResource(fn_80113F48(),
+                                                resourceFlags | i);
+                if (model != (void*)0) {
+                    GSmodelLinkToGSparticleBank(model, particleBank);
+                }
+            }
+        }
+    }
+    return result;
+}
+#pragma peephole on
+#pragma pop
 
 /* 0x801145C0 | 0x74 | floorReadParticlePreFunc (table 0x0A, paired with
  * floorReadParticlePostFunc at 0x801144D0). Reads the same lbl_80272270
@@ -259,12 +309,24 @@ void* floorReadTexPostFunc(void) {
 #pragma peephole on
 #pragma pop
 
-/* 0x80114760 | 0x74 | floorReadTexPreFunc -- UNMATCHED (string-proven name
- * only). ADOPTION ATTEMPT: harvested the old orphan "floorReadTexPreFunc"
- * body for this address; it was only an empty TODO placeholder. Built and
- * confirmed via objdiff at 3.4% fuzzy match (i.e. effectively no match --
- * there was no real logic to adopt). No signature/callee-extern tweak can
- * fix an empty body, so the adoption was reverted. Left asm-only. */
+/* 0x80114760 | 0x74 | floorReadTexPreFunc (string-proven: lbl_8027235C) */
+#pragma push
+#pragma peephole off
+void* floorReadTexPreFunc(u32 resId, u32 loadMode, u32 dataSize) {
+    extern u32 _unloadTexture__FPvUlUl(void);
+    void* buf;
+    u32 alignedSize;
+
+    alignedSize = (dataSize + 0x1F) & ~0x1F;
+    buf = GSresAllocResourceAlign(alignedSize, 0x20, resId, loadMode,
+                                  (void*)_unloadTexture__FPvUlUl);
+    if (buf == (void*)0) {
+        GSlogWrite(lbl_8027235C, alignedSize);
+    }
+    return buf;
+}
+#pragma peephole on
+#pragma pop
 
 /* 0x801147D4 | 0x34 | matched, unproven name */
 #pragma push

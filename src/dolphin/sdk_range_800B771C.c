@@ -9,7 +9,25 @@
  */
 #include "dolphin/types.h"
 
-extern u32* gx;
+extern u32* const gx;
+extern void fn_800B771C(void);
+
+typedef union GXFifo_800B7BC4 {
+    u8 u8;
+    u32 u32;
+} GXFifo_800B7BC4;
+
+volatile GXFifo_800B7BC4 GXWGFifo_800B7BC4 : 0xCC008000;
+
+void fn_800B7BC4(void) {
+    GXWGFifo_800B7BC4.u8 = 8;
+    GXWGFifo_800B7BC4.u8 = 0x50;
+    GXWGFifo_800B7BC4.u32 = gx[5];
+    GXWGFifo_800B7BC4.u8 = 8;
+    GXWGFifo_800B7BC4.u8 = 0x60;
+    GXWGFifo_800B7BC4.u32 = gx[6];
+    fn_800B771C();
+}
 
 #pragma optimize_for_size on
 #pragma peephole off
@@ -29,3 +47,63 @@ void fn_800B7D3C(void) {
 }
 #pragma peephole reset
 #pragma optimize_for_size reset
+
+typedef struct GXData_800B8444 {
+    u8 _pad_000[0x1C];
+    u32 vatA[8];
+    u32 vatB[8];
+    u32 vatC[8];
+    u8 _pad_07C[0x477];
+    u8 dirtyVAT;
+} GXData_800B8444;
+
+void fn_800B8444(void) {
+    u8 i;
+
+    for (i = 0; i < 8; i++) {
+        if (((GXData_800B8444*)gx)->dirtyVAT & (1 << (u8)i)) {
+            GXWGFifo_800B7BC4.u8 = 8;
+            GXWGFifo_800B7BC4.u8 = i | 0x70;
+            GXWGFifo_800B7BC4.u32 = ((GXData_800B8444*)gx)->vatA[i];
+            GXWGFifo_800B7BC4.u8 = 8;
+            GXWGFifo_800B7BC4.u8 = i | 0x80;
+            GXWGFifo_800B7BC4.u32 = ((GXData_800B8444*)gx)->vatB[i];
+            GXWGFifo_800B7BC4.u8 = 8;
+            GXWGFifo_800B7BC4.u8 = i | 0x90;
+            GXWGFifo_800B7BC4.u32 = ((GXData_800B8444*)gx)->vatC[i];
+        }
+    }
+    ((GXData_800B8444*)gx)->dirtyVAT = 0;
+}
+
+typedef struct GXData_800B84E0 {
+    u8 _pad_000[0x88];
+    u32 arrayBase[4];
+    u32 arrayStride[4];
+} GXData_800B84E0;
+
+void fn_800B84E0(s32 attr, void* base, u8 stride) {
+    s32 index;
+
+    if (attr == 25) {
+        attr = 10;
+    }
+
+    index = attr - 9;
+    GXWGFifo_800B7BC4.u8 = 8;
+    GXWGFifo_800B7BC4.u8 = index | 0xA0;
+    GXWGFifo_800B7BC4.u32 = (u32)base & 0x3FFFFFFF;
+
+    if (index - 12 >= 0 && index - 12 < 4) {
+        ((GXData_800B84E0*)gx)->arrayBase[index - 12] =
+            (u32)base & 0x3FFFFFFF;
+    }
+
+    GXWGFifo_800B7BC4.u8 = 8;
+    GXWGFifo_800B7BC4.u8 = index | 0xB0;
+    GXWGFifo_800B7BC4.u32 = stride;
+
+    if (index - 12 >= 0 && index - 12 < 4) {
+        ((GXData_800B84E0*)gx)->arrayStride[index - 12] = stride;
+    }
+}

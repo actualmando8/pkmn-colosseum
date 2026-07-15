@@ -23,3 +23,43 @@ void* OSAllocFromArenaLo(u32 size, u32 alignment) {
     return (void*)alignedLo;
 }
 #pragma peephole on
+
+void __OSStopAudioSystem(void) {
+    volatile u16* regs = (volatile u16*)0xCC005000;
+    volatile u16* dmaRegs = regs;
+    s32 start;
+    u16 status;
+
+    extern u32 OSGetTick(void);
+
+    regs[5] = 0x804;
+    dmaRegs[27] &= ~0x8000;
+
+    status = *(regs += 5);
+    while (status & 0x400) {
+        status = *regs;
+    }
+    status = *regs;
+    while (status & 0x200) {
+        status = *regs;
+    }
+
+    *regs = 0x8AC;
+    {
+        volatile u16* mailbox = (volatile u16*)0xCC005000;
+
+        mailbox[0] = 0;
+        while ((((u32)mailbox[2] << 16) | mailbox[3]) & 0x80000000) {
+        }
+    }
+
+    start = OSGetTick();
+    while ((s32)(OSGetTick() - start) < 44) {
+    }
+
+    *regs |= 1;
+    status = *regs;
+    while (status & 1) {
+        status = *regs;
+    }
+}

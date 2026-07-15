@@ -17,12 +17,26 @@ typedef union GXStatus_800BB30C {
     } half;
 } GXStatus_800BB30C;
 
+typedef enum GXTevAlphaArg_800BB30C {
+    GX_TEV_ALPHA_ARG_0,
+    GX_TEV_ALPHA_ARG_1,
+    GX_TEV_ALPHA_ARG_2,
+    GX_TEV_ALPHA_ARG_3,
+    GX_TEV_ALPHA_ARG_4,
+    GX_TEV_ALPHA_ARG_5,
+    GX_TEV_ALPHA_ARG_6,
+    GX_TEV_ALPHA_ARG_7,
+} GXTevAlphaArg_800BB30C;
+
 typedef struct GXData_800BB30C {
     /* 0x000 */ GXStatus_800BB30C status;
-    /* 0x004 */ u8 pad_004[0x7C];
+    /* 0x004 */ u8 pad_004[0x78];
+    /* 0x07C */ u32 lpSize;
     /* 0x080 */ u32 mtxIdx0;
     /* 0x084 */ u32 mtxIdx1;
-    /* 0x088 */ u8 pad_088[0x70];
+    /* 0x088 */ u8 pad_088[0x30];
+    /* 0x0B8 */ u32 suTs0[8];
+    /* 0x0D8 */ u32 suTs1[8];
     /* 0x0F8 */ u32 scissorTL;
     /* 0x0FC */ u32 scissorBR;
     /* 0x100 */ u8 pad_100[0x20];
@@ -31,7 +45,7 @@ typedef struct GXData_800BB30C {
     /* 0x128 */ u8 pad_128[0x8];
     /* 0x130 */ u32 tevColorEnv[16];
     /* 0x170 */ u32 tevAlphaEnv[16];
-    /* 0x1B0 */ u8 pad_1B0[0x20];
+    /* 0x1B0 */ u32 field_1B0[8];
     /* 0x1D0 */ u32 field_1D0;
     /* 0x1D4 */ u32 dstAlpha;
     /* 0x1D8 */ u32 zMode;
@@ -56,7 +70,10 @@ typedef struct GXData_800BB30C {
     /* 0x434 */ f32 field_434;
     /* 0x438 */ f32 field_438;
     /* 0x43C */ f32 projection[6];
-    /* 0x454 */ u8 pad_454[0x88];
+    /* 0x454 */ u8 pad_454[0x8];
+    /* 0x45C */ u32 texMapSize[8];
+    /* 0x47C */ u32 texMapWrap[8];
+    /* 0x49C */ u8 pad_49C[0x40];
     /* 0x4DC */ u32 field_4DC;
     /* 0x4E0 */ u32 field_4E0;
     /* 0x4E4 */ u8 pad_4E4[0x10];
@@ -67,12 +84,14 @@ typedef struct GXData_800BB30C {
 
 extern GXData_800BB30C* gx;
 extern volatile u16* __cpReg;
+extern u32 lbl_80313590[];
+extern u32 lbl_80313608[];
 
 extern void fn_800BB780(u32 dstCoord, u32 func, u32 srcParam, u32 mtx,
                         u32 normalize, u32 postMtx, u32 normalizeColor,
-                        u32 bias, u32 arg8, u32 arg9);
+                        u8 bias, u8 arg8, u32 arg9);
 extern void fn_800BD640(u32 value);
-extern void __GXSetMatrixIndex(u32 value);
+extern void __GXSetMatrixIndex(s32 value);
 extern void fn_800BE164(u32* hi, u32* lo);
 extern void fn_800B91EC(void);
 extern void __GXSendFlushPrim(void);
@@ -95,6 +114,44 @@ typedef struct TRKEvent {
         GX_FIFO_U8 = 0x61;   \
         GX_FIFO_U32 = (reg); \
     } while (0)
+
+void fn_800BB30C(u32 texMap, u32 texCoord) {
+    GXData_800BB30C* p = gx;
+    u32 size = p->texMapSize[texMap];
+    u32 wrap = p->texMapWrap[texMap];
+
+    p->suTs0[texCoord] = (p->suTs0[texCoord] & 0xFFFF0000U) | (size & 0x3FF);
+    p->suTs1[texCoord] = (p->suTs1[texCoord] & 0xFFFF0000U) | ((size >> 10) & 0x3FF);
+    p->suTs0[texCoord] = (p->suTs0[texCoord] & ~0x10000U) | (((wrap & 3) == 1) << 16);
+    p->suTs1[texCoord] = (p->suTs1[texCoord] & ~0x10000U) | ((((wrap >> 2) & 3) == 1) << 16);
+
+    GX_BP_REG(p->suTs0[texCoord]);
+    GX_BP_REG(p->suTs1[texCoord]);
+    p->field_002 = 0;
+}
+
+void fn_800BB780(u32 dstCoord, u32 func, u32 srcParam, u32 mtx,
+                 u32 normalize, u32 postMtx, u32 normalizeColor,
+                 u8 bias, u8 arg8, u32 arg9) {
+    GXData_800BB30C* p = gx;
+    u32 command;
+    u32 value = func;
+
+    value = (value & ~0xCU) | (srcParam << 2);
+    value = (value & ~0x70U) | (mtx << 4);
+    value = (value & ~0x180U) | (arg9 << 7);
+    value = (value & ~0x1E00U) | (normalize << 9);
+    value = (value & ~0xE000U) | (postMtx << 13);
+    dstCoord += 0x10;
+    value = (value & ~0x70000U) | (normalizeColor << 16);
+    value = (value & ~0x80000U) | (arg8 << 19);
+    value = (value & ~0x100000U) | (bias << 20);
+
+    command = dstCoord << 24;
+    command |= value & 0xFFFFFF;
+    GX_BP_REG(command);
+    p->field_002 = 0;
+}
 
 void fn_800BBC0C(u32 nChans) {
     GXData_800BB30C* p = gx;
@@ -121,6 +178,39 @@ void fn_800BBFDC(u32 dstCoord) {
     fn_800BB780(dstCoord, 0, 0, 0, 0, 6, 6, 1, 0, 0);
 }
 
+void fn_800BC024(void) {
+    u32 mask = 0;
+    u32 i;
+    u32 texMap;
+    u32 nIndStages;
+
+    nIndStages = (gx->genMode >> 16) & 7;
+    for (i = 0; i < nIndStages; i++) {
+        switch (i) {
+        case 0:
+            texMap = gx->field_120 & 7;
+            break;
+        case 1:
+            texMap = (gx->field_120 >> 6) & 7;
+            break;
+        case 2:
+            texMap = (gx->field_120 >> 12) & 7;
+            break;
+        case 3:
+            texMap = (gx->field_120 >> 18) & 7;
+            break;
+        }
+        mask |= 1 << texMap;
+    }
+
+    if ((gx->field_124 & 0xFF) != mask) {
+        gx->field_124 = (gx->field_124 & ~0xFFU) | mask;
+        GX_BP_REG(gx->field_124);
+        gx->field_002 = 0;
+    }
+}
+
+#pragma dont_inline on
 #pragma peephole off
 void __GXFlushTextureState(void) {
     GXData_800BB30C* p = gx;
@@ -129,12 +219,329 @@ void __GXFlushTextureState(void) {
     p->field_002 = 0;
 }
 #pragma peephole on
+#pragma dont_inline reset
+
+void GXSetTevOp(s32 stage, u32 mode) {
+    u32* color;
+    u32* alpha;
+    u32* table = lbl_80313590;
+    GXData_800BB30C* p;
+    u32 colorReg;
+    u32 alphaReg;
+
+    if (stage == 0) {
+        color = &table[mode];
+        alpha = color + 10;
+    } else {
+        color = &table[mode];
+        alpha = &table[mode];
+        color += 5;
+        alpha += 15;
+    }
+
+    p = gx;
+    colorReg = p->tevColorEnv[stage];
+    colorReg = (colorReg & 0xFF000000) | *color;
+    GX_BP_REG(colorReg);
+    p->tevColorEnv[stage] = colorReg;
+
+    alphaReg = p->tevAlphaEnv[stage];
+    alphaReg = (alphaReg & 0xFF00000F) | *alpha;
+    GX_BP_REG(alphaReg);
+    p->tevAlphaEnv[stage] = alphaReg;
+    p->field_002 = 0;
+}
+
+void fn_800BC1A0(u32 stage, u32 a, u32 b, u32 c, u32 d) {
+    GXData_800BB30C* p = gx;
+    u32 reg = p->tevColorEnv[stage];
+
+    reg = (reg & ~0xF000U) | ((a << 12) & 0xF000U);
+    reg = (reg & ~0x0F00U) | ((b << 8) & 0x0F00U);
+    reg = (reg & ~0x00F0U) | ((c << 4) & 0x00F0U);
+    reg = (reg & ~0x000FU) | (d & 0x000FU);
+    GX_BP_REG(reg);
+    p->tevColorEnv[stage] = reg;
+    p->field_002 = 0;
+}
+
+void fn_800BC1E4(u32 stage, GXTevAlphaArg_800BB30C a,
+                 GXTevAlphaArg_800BB30C b, GXTevAlphaArg_800BB30C c,
+                 GXTevAlphaArg_800BB30C d) {
+    GXData_800BB30C* p = gx;
+    u32 reg = p->tevAlphaEnv[stage];
+
+    reg = (reg & ~0xE000U) | (a << 13);
+    reg = (reg & ~0x1C00U) | (b << 10);
+    reg = (reg & ~0x0380U) | (c << 7);
+    reg = (reg & ~0x0070U) | (d << 4);
+    GX_BP_REG(reg);
+    p->tevAlphaEnv[stage] = reg;
+    p->field_002 = 0;
+}
+
+void fn_800BC228(u32 stage, s32 op, u32 bias, u32 scale, u32 clamp,
+                 u32 outReg) {
+    u32 result;
+    u32 reg;
+    GXData_800BB30C* p;
+
+    reg = gx->tevColorEnv[stage];
+    reg = __rlwimi(reg, op, 18, 13, 13);
+    result = reg;
+    if (op <= 1) {
+        result = __rlwimi(__rlwimi(result, scale, 20, 10, 11), bias, 16,
+                          14, 15);
+    } else {
+        result = __rlwimi(__rlwimi(result, op, 19, 10, 11), 3, 16, 14,
+                          15);
+    }
+    result = __rlwimi(result, clamp, 19, 12, 12);
+    result = __rlwimi(result, outReg, 22, 8, 9);
+    GX_FIFO_U8 = 0x61;
+    p = gx;
+    GX_FIFO_U32 = result;
+    p->tevColorEnv[stage] = result;
+    p->field_002 = 0;
+}
+
+void fn_800BC290(u32 stage, s32 op, u32 bias, u32 scale, u32 clamp,
+                 u32 outReg) {
+    u32 reg;
+    GXData_800BB30C* p;
+
+    reg = gx->tevAlphaEnv[stage];
+    reg = __rlwimi(reg, op, 18, 13, 13);
+    if (op <= 1) {
+        reg = __rlwimi(reg, scale, 20, 10, 11);
+        reg = __rlwimi(reg, bias, 16, 14, 15);
+    } else {
+        reg = __rlwimi(reg, op, 19, 10, 11);
+        reg = __rlwimi(reg, 3, 16, 14, 15);
+    }
+    reg = __rlwimi(reg, clamp, 19, 12, 12);
+    reg = __rlwimi(reg, outReg, 22, 8, 9);
+    GX_FIFO_U8 = 0x61;
+    p = gx;
+    GX_FIFO_U32 = reg;
+    p->tevAlphaEnv[stage] = reg;
+    p->field_002 = 0;
+}
+
+typedef struct GXColor_800BC2F8 {
+    u8 r;
+    u8 g;
+    u8 b;
+    u8 a;
+} GXColor_800BC2F8;
+
+typedef struct GXColorS10_800BC36C {
+    s16 r;
+    s16 g;
+    s16 b;
+    s16 a;
+} GXColorS10_800BC36C;
+
+typedef struct GXFogAdjTable_800BCCDC {
+    u16 r[10];
+} GXFogAdjTable_800BCCDC;
+
+void fn_800BC2F8(u32 id, GXColor_800BC2F8 color) {
+    u32 reg0;
+    u32 reg1;
+    GXData_800BB30C* p;
+
+    reg0 = 0;
+    reg0 = (reg0 & ~0xFFU) | color.r;
+    reg0 = (reg0 & ~0xFF000U) | (color.a << 12);
+    reg0 = (reg0 & 0xFFFFFFU) | ((id * 2 + 0xE0) << 24);
+
+    p = gx;
+    reg1 = 0;
+    reg1 = (reg1 & ~0xFFU) | color.b;
+    reg1 = (reg1 & ~0xFF000U) | (color.g << 12);
+    reg1 = (reg1 & 0xFFFFFFU) | ((id * 2 + 0xE1) << 24);
+
+    GX_BP_REG(reg0);
+    GX_BP_REG(reg1);
+    GX_BP_REG(reg1);
+    GX_BP_REG(reg1);
+    p->field_002 = 0;
+}
+
+void fn_800BC36C(u32 id, GXColorS10_800BC36C color) {
+    GXData_800BB30C* p;
+    u32 reg0;
+    u32 reg1;
+
+    reg0 = 0;
+    reg0 = (reg0 & ~0x7FFU) | (color.r & 0x7FF);
+    reg0 = (reg0 & ~0x7FF000U) | ((color.a << 12) & 0x7FF000U);
+    reg0 = (reg0 & 0xFFFFFFU) | ((id * 2 + 0xE0) << 24);
+
+    p = gx;
+    reg1 = 0;
+    reg1 = (reg1 & ~0x7FFU) | (color.b & 0x7FF);
+    reg1 = (reg1 & ~0x7FF000U) | ((color.g << 12) & 0x7FF000U);
+
+    GX_BP_REG(reg0);
+    reg1 = (reg1 & 0xFFFFFFU) | ((id * 2 + 0xE1) << 24);
+    GX_BP_REG(reg1);
+    GX_BP_REG(reg1);
+    GX_BP_REG(reg1);
+    p->field_002 = 0;
+}
+
+void fn_800BC3E0(u32 id, GXColor_800BC2F8 color) {
+    u32 reg0;
+    u32 reg1;
+    GXData_800BB30C* p;
+
+    reg0 = 0;
+    reg0 = (reg0 & ~0xFFU) | color.r;
+    reg0 = (reg0 & ~0xFF000U) | (color.a << 12);
+    reg0 = (reg0 & ~0xF00000U) | 0x800000U;
+    reg0 = (reg0 & 0xFFFFFFU) | ((id * 2 + 0xE0) << 24);
+
+    p = gx;
+    reg1 = 0;
+    reg1 = (reg1 & ~0xFFU) | color.b;
+    reg1 = (reg1 & ~0xFF000U) | (color.g << 12);
+    reg1 = (reg1 & ~0xF00000U) | 0x800000U;
+
+    GX_BP_REG(reg0);
+    reg1 = (reg1 & 0xFFFFFFU) | ((id * 2 + 0xE1) << 24);
+    GX_BP_REG(reg1);
+    p->field_002 = 0;
+}
+
+void fn_800BC454(s32 stage, u32 value) {
+    GXData_800BB30C* p;
+    u32* reg = &gx->field_1B0[stage >> 1];
+
+    if (stage & 1) {
+        *reg = (*reg & ~0x7C000U) | (value << 14);
+    } else {
+        *reg = (*reg & ~0x1F0U) | (value << 4);
+    }
+
+    p = gx;
+    GX_BP_REG(*reg);
+    p->field_002 = 0;
+}
+
+void fn_800BC4C0(s32 stage, u32 value) {
+    GXData_800BB30C* p;
+    u32* reg = &gx->field_1B0[stage >> 1];
+
+    if (stage & 1) {
+        *reg = (*reg & ~0xF80000U) | (value << 19);
+    } else {
+        *reg = (*reg & ~0x3E00U) | (value << 9);
+    }
+
+    p = gx;
+    GX_BP_REG(*reg);
+    p->field_002 = 0;
+}
+
+void fn_800BC52C(u32 stage, u32 rasSel, u32 texSel) {
+    GXData_800BB30C* p = gx;
+    u32* reg = &p->tevAlphaEnv[stage];
+
+    *reg = (*reg & ~3U) | rasSel;
+    *reg = (*reg & ~0xCU) | (texSel << 2);
+    GX_BP_REG(*reg);
+    p->field_002 = 0;
+}
+
+void fn_800BC580(u32 table, u32 red, u32 green, u32 blue, u32 alpha) {
+    u32 index = table * 2;
+    GXData_800BB30C* p = gx;
+    u32* reg0 = &p->field_1B0[index];
+    u32* reg1 = &p->field_1B0[index + 1];
+
+    *reg0 = (*reg0 & ~3U) | red;
+    *reg0 = (*reg0 & ~0xCU) | (green << 2);
+    GX_BP_REG(*reg0);
+
+    *reg1 = (*reg1 & ~3U) | blue;
+    *reg1 = (*reg1 & ~0xCU) | (alpha << 2);
+    GX_BP_REG(*reg1);
+    p->field_002 = 0;
+}
+
+void fn_800BC618(u32 comp0, u8 ref0, u32 op, u32 comp1, u8 ref1) {
+    u32 reg = ref0;
+    GXData_800BB30C* p;
+
+    reg |= 0xF3000000U;
+    reg = (reg & ~0xFF00U) | (ref1 << 8);
+    reg = (reg & ~0x70000U) | (comp0 << 16);
+    reg = (reg & ~0x380000U) | (comp1 << 19);
+    reg = (reg & ~0xC00000U) | (op << 22);
+    p = gx;
+    GX_BP_REG(reg);
+    p->field_002 = 0;
+}
+
+void fn_800BC66C(u32 op, u32 format, u32 bias) {
+    u32 zFormat;
+    u32 reg;
+    GXData_800BB30C* p;
+
+    reg = (bias & 0xFFFFFFU) | 0xF4000000U;
+    switch (format) {
+    case 0x11:
+        zFormat = 0;
+        break;
+    case 0x13:
+        zFormat = 1;
+        break;
+    case 0x16:
+        zFormat = 2;
+        break;
+    default:
+        zFormat = 2;
+        break;
+    }
+
+    p = gx;
+    GX_BP_REG(reg);
+    reg = (zFormat & 3) | (op << 2);
+    reg = (reg & 0xFFFFFFU) | 0xF5000000U;
+    GX_BP_REG(reg);
+    p->field_002 = 0;
+}
 
 void fn_800BC8C8(u32 nStages) {
     GXData_800BB30C* p = gx;
 
     p->genMode = (p->genMode & ~0x3C00U) | (((nStages & 0xFF) - 1) << 10);
     p->dirtyState |= 4;
+}
+
+void fn_800BCCDC(u8 enable, u16 center, GXFogAdjTable_800BCCDC* table) {
+    GXData_800BB30C* p;
+    u16* values;
+    u32 i;
+    u32 reg;
+
+    if (enable) {
+        values = table->r;
+        for (i = 0; i < 5; i++, values += 2) {
+            reg = values[1] << 12;
+            reg = __rlwimi(reg, values[0], 0, 20, 31);
+            reg = __rlwimi(reg, 0xE9 + i, 24, 0, 7);
+            GX_BP_REG(reg);
+        }
+    }
+
+    reg = center + 342;
+    p = gx;
+    reg = (reg & ~0x400U) | (enable << 10);
+    GX_BP_REG((reg & 0xFFFFFFU) | 0xE8000000U);
+    p->field_002 = 0;
 }
 
 void fn_800BCEBC(u32 value) {
@@ -159,6 +566,34 @@ void GXCallDisplayList(void* list, u32 nbytes) {
     GX_FIFO_U8 = 0x40;
     GX_FIFO_U32 = (u32)list;
     GX_FIFO_U32 = nbytes;
+}
+
+void fn_800BD2E0(f32* projection, s32 type) {
+    GXData_800BB30C* p = gx;
+
+    p->field_420 = type;
+    p->field_424 = projection[0];
+    p->field_42C = projection[5];
+    p->field_434 = projection[10];
+    p->field_438 = projection[11];
+    if (type == 1) {
+        p->field_428 = projection[3];
+        p->field_430 = projection[7];
+    } else {
+        p->field_428 = projection[2];
+        p->field_430 = projection[6];
+    }
+
+    GX_FIFO_U8 = 0x10;
+    GX_FIFO_U32 = 0x00061020;
+    GX_FIFO_F32 = p->field_424;
+    GX_FIFO_F32 = p->field_428;
+    GX_FIFO_F32 = p->field_42C;
+    GX_FIFO_F32 = p->field_430;
+    GX_FIFO_F32 = p->field_434;
+    GX_FIFO_F32 = p->field_438;
+    GX_FIFO_U32 = p->field_420;
+    p->field_002 = 1;
 }
 
 void fn_800BD394(f32* projection) {
@@ -199,11 +634,101 @@ void fn_800BD454(f32* projection) {
     projection[6] = p->field_438;
 }
 
+void GXLoadPosMtxImm(f32 mtx[3][4], u32 id) {
+    f64* pairs = (f64*)mtx;
+    volatile f64* fifo = (volatile f64*)0xCC008000;
+    f64 pair0 = pairs[0];
+    f64 pair1 = pairs[1];
+    f64 pair2 = pairs[2];
+    f64 pair3 = pairs[3];
+    f64 pair4 = pairs[4];
+    f64 pair5 = pairs[5];
+    u32 addr = id * 4;
+    u32 reg = addr | 0xB0000;
+
+    GX_FIFO_U8 = 0x10;
+    GX_FIFO_U32 = reg;
+    *fifo = pair0;
+    *fifo = pair1;
+    *fifo = pair2;
+    *fifo = pair3;
+    *fifo = pair4;
+    *fifo = pair5;
+}
+
+void GXLoadNrmMtxImm(f32 mtx[3][4], u32 id) {
+    u32 addr = id * 3 + 0x400;
+
+    GX_FIFO_U8 = 0x10;
+    GX_FIFO_U32 = addr | 0x80000;
+    GX_FIFO_F32 = mtx[0][0];
+    GX_FIFO_F32 = mtx[0][1];
+    GX_FIFO_F32 = mtx[0][2];
+    GX_FIFO_F32 = mtx[1][0];
+    GX_FIFO_F32 = mtx[1][1];
+    GX_FIFO_F32 = mtx[1][2];
+    GX_FIFO_F32 = mtx[2][0];
+    GX_FIFO_F32 = mtx[2][1];
+    GX_FIFO_F32 = mtx[2][2];
+}
+
 void fn_800BD554(u32 index) {
     GXData_800BB30C* p = gx;
 
     p->mtxIdx0 = (p->mtxIdx0 & ~0x3FU) | index;
     __GXSetMatrixIndex(0);
+}
+
+void GXLoadTexMtxImm(f32 mtx[3][4], u32 id, s32 type) {
+    u32 addr;
+    u32 count;
+    u32 length;
+
+    if (id >= 0x40) {
+        addr = (id - 0x40) * 4 + 0x500;
+    } else {
+        addr = id * 4;
+    }
+
+    if (type == 1) {
+        count = 8;
+    } else {
+        count = 12;
+    }
+
+    length = (count - 1) << 16;
+    GX_FIFO_U8 = 0x10;
+    GX_FIFO_U32 = addr | length;
+
+    if (type == 0) {
+        f64* pairs = (f64*)mtx;
+        volatile f64* fifo = (volatile f64*)0xCC008000;
+        f64 pair5 = pairs[5];
+        f64 pair4 = pairs[4];
+        f64 pair3 = pairs[3];
+        f64 pair2 = pairs[2];
+        f64 pair1 = pairs[1];
+        f64 pair0 = pairs[0];
+
+        *fifo = pair0;
+        *fifo = pair1;
+        *fifo = pair2;
+        *fifo = pair3;
+        *fifo = pair4;
+        *fifo = pair5;
+    } else {
+        f64* pairs = (f64*)mtx;
+        volatile f64* fifo = (volatile f64*)0xCC008000;
+        f64 pair3 = pairs[3];
+        f64 pair2 = pairs[2];
+        f64 pair1 = pairs[1];
+        f64 pair0 = pairs[0];
+
+        *fifo = pair0;
+        *fifo = pair1;
+        *fifo = pair2;
+        *fifo = pair3;
+    }
 }
 
 void fn_800BD744(void) {
@@ -221,6 +746,51 @@ void fn_800BD768(f32* projection) {
     projection[5] = p->projection[5];
 }
 
+void fn_800BD7A0(u32 xOrigin, u32 yOrigin, u32 width, u32 height) {
+    GXData_800BB30C* p = gx;
+    u32 x0;
+    u32 y0;
+    u32 x1;
+    u32 y1;
+
+    x0 = xOrigin + 0x156;
+    y0 = yOrigin + 0x156;
+    x1 = x0 + width - 1;
+    y1 = y0 + height - 1;
+    p->scissorTL = (p->scissorTL & ~0x7FFU) | y0;
+    p->scissorTL = (p->scissorTL & ~0x7FF000U) | (x0 << 12);
+    p->scissorBR = (p->scissorBR & ~0x7FFU) | y1;
+    p->scissorBR = (p->scissorBR & ~0x7FF000U) | (x1 << 12);
+    GX_BP_REG(p->scissorTL);
+    GX_BP_REG(p->scissorBR);
+    p->field_002 = 0;
+}
+
+void __GXSetMatrixIndex(s32 value) {
+    GXData_800BB30C* p = gx;
+    u32 matrixIndex;
+
+    if (value < 5) {
+        GX_FIFO_U8 = 8;
+        GX_FIFO_U8 = 0x30;
+        matrixIndex = p->mtxIdx0;
+        GX_FIFO_U32 = matrixIndex;
+        GX_FIFO_U8 = 0x10;
+        GX_FIFO_U32 = 0x1018;
+        GX_FIFO_U32 = matrixIndex;
+    } else {
+        GX_FIFO_U8 = 8;
+        GX_FIFO_U8 = 0x40;
+        matrixIndex = p->mtxIdx1;
+        GX_FIFO_U32 = matrixIndex;
+        GX_FIFO_U8 = 0x10;
+        GX_FIFO_U32 = 0x1019;
+        GX_FIFO_U32 = matrixIndex;
+    }
+
+    gx->field_002 = 1;
+}
+
 void fn_800BE30C(void) {
     __cpReg[2] = 4;
 }
@@ -231,6 +801,21 @@ u32 fn_800BE31C(void) {
 
     fn_800BE164(&hi, &lo);
     return hi;
+}
+
+void GXSetBlendMode(u32 type, u32 srcFactor, u32 dstFactor, u32 op) {
+    GXData_800BB30C* p = gx;
+    u32 value = p->field_1D0;
+
+    value = __rlwimi(value, type == 3, 11, 20, 20);
+    value = __rlwimi(value, type, 0, 31, 31);
+    value = __rlwimi(value, type == 2, 1, 30, 30);
+    value = __rlwimi(value, op, 12, 16, 19);
+    value = __rlwimi(value, srcFactor, 8, 21, 23);
+    value = __rlwimi(value, dstFactor, 5, 24, 26);
+    GX_BP_REG(value);
+    p->field_1D0 = value;
+    p->field_002 = 0;
 }
 
 void fn_800BCE30(u32 zCompLoc) {
@@ -264,6 +849,39 @@ void GXSetZMode(u32 compareEnable, u32 func, u32 updateEnable) {
     GX_BP_REG(value);
     p->zMode = value;
     p->field_002 = 0;
+}
+
+void fn_800BCEF4(s32 pixelFmt, u32 zFmt) {
+    GXData_800BB30C* p = gx;
+    u32 old = p->field_1DC;
+    u32 value;
+    u8 isY8;
+
+    p->field_1DC = (p->field_1DC & ~7U) | lbl_80313608[pixelFmt];
+    p->field_1DC = (p->field_1DC & ~0x38U) | (zFmt << 3);
+
+    value = p->field_1DC;
+    if (old != value) {
+        GX_BP_REG(value);
+        if (pixelFmt == 2) {
+            isY8 = 1;
+        } else {
+            isY8 = 0;
+        }
+        p = gx;
+        p->genMode = (p->genMode & ~0x200U) | (isY8 << 9);
+        p->dirtyState |= 4;
+    }
+
+    if (lbl_80313608[pixelFmt] == 4) {
+        p = gx;
+        p->dstAlpha = (p->dstAlpha & ~0x600U) |
+                      (((pixelFmt - 4) << 9) & 0x600U);
+        p->dstAlpha = (p->dstAlpha & 0xFFFFFFU) | 0x42000000U;
+        GX_BP_REG(p->dstAlpha);
+    }
+
+    gx->field_002 = 0;
 }
 
 void fn_800BCFDC(u32 zCompLoc) {
@@ -312,6 +930,17 @@ void fn_800BD044(u32 arg0, u32 arg1) {
     p->field_002 = 0;
 }
 
+void fn_800BD07C(u32 fieldMode, u32 halfAspectRatio) {
+    GXData_800BB30C* p = gx;
+
+    p->lpSize = (p->lpSize & ~0x400000U) |
+                ((halfAspectRatio & 0xFFU) << 22);
+    GX_BP_REG(p->lpSize);
+    __GXFlushTextureState();
+    GX_BP_REG(0x68000000U | (fieldMode & 0xFFU));
+    __GXFlushTextureState();
+}
+
 void fn_800BD830(u32 arg0, u32 arg1) {
     GXData_800BB30C* p = gx;
     u32 value = arg0 + 0x156U;
@@ -324,6 +953,63 @@ void fn_800BD830(u32 arg0, u32 arg1) {
 
     GX_BP_REG(0x59000000U | value);
     p->field_002 = 0;
+}
+
+void TRKNubMainLoop(void) {
+    extern s32 TRKGetNextEvent(TRKEvent* event);
+    extern void* TRKGetBuffer(s32 bufferIndex);
+    extern s32 TRKDispatchMessage(void* buffer);
+    extern void TRKTargetInterrupt(TRKEvent* event);
+    extern void TRKTargetSupportRequest(void);
+    extern s32 TRKTargetStopped(void);
+    extern s32 TRKTargetContinue(void);
+    extern void TRKGetInput(void);
+    extern void TRKDestructEvent(TRKEvent* event);
+    extern void* gTRKInputPendingPtr;
+    s32 done = 0;
+    s32 inputActivated = 0;
+    TRKEvent event;
+
+    while (!done) {
+        if (TRKGetNextEvent(&event)) {
+            inputActivated = 0;
+            switch (event.type) {
+            case 2:
+                TRKDispatchMessage(TRKGetBuffer(event.bufferIndex));
+                break;
+            case 1:
+                done = 1;
+                break;
+            case 3:
+            case 4:
+                TRKTargetInterrupt(&event);
+                break;
+            case 5:
+                TRKTargetSupportRequest();
+                break;
+            case 0:
+                break;
+            }
+            TRKDestructEvent(&event);
+        } else {
+            if (inputActivated != 0) {
+                u8** inputPendingPtr = (u8**)&gTRKInputPendingPtr;
+
+                if (**inputPendingPtr == 0) {
+                    goto no_input;
+                }
+            }
+            inputActivated = 1;
+            TRKGetInput();
+            continue;
+
+        no_input:
+            if (!TRKTargetStopped()) {
+                TRKTargetContinue();
+            }
+            inputActivated = 0;
+        }
+    }
 }
 
 void TRKDestructEvent(TRKEvent* event) {

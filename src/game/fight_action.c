@@ -1546,8 +1546,8 @@ u32 fightActionFlowKaijou(void)
     extern void fightSideCreate();
     extern u32 fightEncountDataBiosGetFightFloorDataId();
     extern u32 fightEncountDataBiosGetPtr();
-  u32 initData;
   u32 encountData;
+  u32 initData;
   u32 floorDataId;
   u32 fightTarget;
   u16 sideNo;

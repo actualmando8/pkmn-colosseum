@@ -133,7 +133,8 @@ typedef struct SummaryPageEntry {
     u8 displayColor[3];      /* 0x00, copied to output bytes 0x64-0x66 */
     u8 unk_03;
     s32 dataSource;          /* 0x04, -1 uses default party source */
-    u8 unk_08[8];
+    u8 unk_08[4];
+    s32 colorMatchId;        /* 0x0C, used by fn_80017790 */
     s32 gaugeMatchId;        /* 0x10, compared with output species/id */
     u8 unk_14[4];
     void* drawHandler;       /* 0x18 */
@@ -1603,7 +1604,7 @@ void fn_80017764(void) {
     }
 }
 
-/* fn_80017790 - 0x80017790 | size: 0xd8 | WALL 85%: regalloc (ptr-chasing vs indexed) + scheduling */
+/* fn_80017790 - 0x80017790 | size: 0xd8 */
 #if 0
 asm void fn_80017790(void) {
 #include "src/game/gs_pokemon_summary_fn_80017790.inc"
@@ -1617,16 +1618,20 @@ s32 fn_80017790(u8* unused, SummaryDrawItem* item) {
 
     entry = (SummaryPageEntry*)sSummaryPageEntries;
     for (i = 0; i < 6; i++) {
-        if ((s32)item->speciesId == entry->gaugeMatchId) {
-            item->color[0] = entry->displayColor[0];
-            item->color[1] = entry->displayColor[1];
-            item->color[2] = entry->displayColor[2];
-            if (entry->dataSource == -1) {
-                item->color[3] = 0;
-            }
-            return 0;
+        if ((s32)item->speciesId == entry->colorMatchId) {
+            break;
         }
         entry++;
+    }
+    if (i >= 6) {
+        return 0;
+    }
+
+    item->color[0] = SUMMARY_PAGE_DISPLAY_COLOR(i, 0);
+    item->color[1] = SUMMARY_PAGE_DISPLAY_COLOR(i, 1);
+    item->color[2] = SUMMARY_PAGE_DISPLAY_COLOR(i, 2);
+    if (SUMMARY_PAGE_ENTRY_AT(i).dataSource == -1) {
+        item->color[3] = 0;
     }
 
     return 0;

@@ -9,7 +9,7 @@
  * functions (0x801C0F20-0x801C2AE8), all of which are HSD sysdolphin
  * library code, not battle-grid code -- this is the direct continuation
  * of the same XD translation unit (aobj.cpp) as the functions above.
- * fn_801C01C8 / fn_801C021C / HSD_ForeachAnim are asm-only for now.
+ * HSD_ForeachAnim is asm-only for now.
  */
 #include "dolphin/types.h"
 #include "hsd/hsd_cobj.h"
@@ -23,6 +23,38 @@
 #include "hsd/hsd_tobj.h"
 #include "hsd/hsd_wobj.h"
 #include "game/battle/battle_grid_types.h"
+
+/**
+ * fn_801C01C8 - Replace the draw-done callback and return the old callback.
+ * Address: 0x801C01C8 | Size: 0x54
+ */
+void* fn_801C01C8(void* callback) {
+    extern void* volatile lbl_80466BC0[];
+    void* old_callback;
+    BOOL enabled;
+
+    old_callback = lbl_80466BC0[0x1E8 / sizeof(void*)];
+    enabled = OSDisableInterrupts();
+    lbl_80466BC0[0x1E8 / sizeof(void*)] = callback;
+    OSRestoreInterrupts(enabled);
+    return old_callback;
+}
+
+/**
+ * fn_801C021C - Replace the animation-done callback and return the old callback.
+ * Address: 0x801C021C | Size: 0x54
+ */
+void* fn_801C021C(void* callback) {
+    extern void* volatile lbl_80466BC0[];
+    void* old_callback;
+    BOOL enabled;
+
+    old_callback = lbl_80466BC0[0x1DC / sizeof(void*)];
+    enabled = OSDisableInterrupts();
+    lbl_80466BC0[0x1DC / sizeof(void*)] = callback;
+    OSRestoreInterrupts(enabled);
+    return old_callback;
+}
 
 /**
  * _HSD_AObjForgetMemory - Address: 0x801C0270 | Size: 0xC
@@ -312,22 +344,46 @@ void CObjForeachAnim(HSD_CObj* cobj, HSD_TypeMask mask, void* func,
 }
 
 /**
- * HSD_AObjRemove - Pre-grid transition helper (renamed from fn_801C25E4;
- * confirmed name -- naming pass 2026-07-07). NOTE: not verified against
- * the real melee/XD HSD_AObjRemove(HSD_AObj*) signature (this body keeps
- * the pre-existing generic void*-typed placeholder implementation; other
- * TUs that call HSD_AObjRemove(HSD_AObj*) via include/hsd/hsd_aobj.h are
- * intentionally left untouched -- see split commit notes).
+ * HSD_AObjRemove - Tear down an AObj and return it to the allocator.
  * Address: 0x801C25E4 | Size: 0x8C
  */
-void HSD_AObjRemove(void* ctx, s32 mode) {
-    u8* state = (u8*)ctx;
-    if (state == NULL) {
+void HSD_AObjRemove(void* obj) {
+    typedef struct AObjRemoveData {
+        u32 flags;
+        f32 curr_frame;
+        f32 rewind_frame;
+        f32 end_frame;
+        f32 framerate;
+        void* volatile fobj;
+        void* volatile hsd_obj;
+    } AObjRemoveData;
+    extern void HSD_FObjRemoveAll(void* fobj);
+    extern void fn_801A05EC(void* obj);
+    extern void HSD_ObjFree(void* list, void* data);
+    extern u8 lbl_80466DB8[];
+    AObjRemoveData* aobj = obj;
+
+    if (!aobj) {
         return;
     }
-    /* Set camera transition mode and reset interpolation timer */
-    *(s32*)(state + 0x1C0) = mode;
-    *(f32*)(state + 0x1C4) = 0.0f;
+
+    if (aobj) {
+        if (aobj->fobj) {
+            HSD_FObjRemoveAll(aobj->fobj);
+        }
+        aobj->fobj = NULL;
+    }
+
+    if (aobj) {
+        if (aobj->hsd_obj != NULL) {
+            fn_801A05EC(aobj->hsd_obj);
+        }
+        aobj->hsd_obj = NULL;
+    }
+
+    if (aobj) {
+        HSD_ObjFree(lbl_80466DB8, aobj);
+    }
 }
 
 /**

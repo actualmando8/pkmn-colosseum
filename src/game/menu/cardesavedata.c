@@ -23,9 +23,9 @@ extern void fn_80093698();
 extern void fn_800D3088();
 extern void fn_800D37CC();
 extern void menuCloseCustom();
-extern void menuIsCheck();
+extern s32 menuIsCheck();
 extern void menuGetEnablePort();
-extern void menuSetEnablePort();
+extern s32 menuSetEnablePort();
 extern void windowGetFreeWork();
 extern void windowGetKeyInfo();
 extern void winMsgOpen();
@@ -290,6 +290,141 @@ s32 fn_8008102C(void** object_ref, const u32* descriptor, s32 index,
     }
 }
 
+/* 0x80082650 | size: 0xE8 */
+void fn_80082650(void* carde) {
+#pragma peephole off
+    extern void __assert();
+    extern u8 lbl_8026F1C8[];
+    extern u8 lbl_8026F1D8[];
+    extern u8 lbl_8047C180;
+    extern u8 lbl_8047C188;
+    u8* base;
+    u8* block;
+    s32 width;
+    s32 height;
+    s32 count;
+    u32 found;
+
+    base = carde;
+    if (base == NULL) {
+        __assert(lbl_8026F1C8, 0x17F, &lbl_8047C180);
+    }
+    if ((s32)(s8)*(u8*)(base + 0x1B) <= 0) {
+        __assert(lbl_8026F1C8, 0x180, lbl_8026F1D8);
+    }
+    block = base + 0x24;
+    if (block == NULL) {
+        __assert(lbl_8026F1C8, 0x1F1, &lbl_8047C188);
+    }
+    width = (s8)*(u8*)(base + 0x1C);
+    height = (s8)*(u8*)(base + 0x1D);
+    count = width;
+    count *= height;
+    for (; count > 0; count--) {
+        if (*(u8*)(block + 0x82) != 0) {
+            found = 1;
+            goto done;
+        }
+        block += 0x10;
+    }
+    found = 0;
+done:
+    if ((u8)found == 0) {
+        *(u16*)base = 0;
+    }
+}
+#pragma peephole on
+
+#pragma peephole off
+/* 0x80082FE4 | size: 0xC0 */
+void* fn_80082FE4(void* carde, s8 series) {
+    extern void __assert();
+    extern u8 lbl_8026F1C8[];
+    extern u8 lbl_8026F1D8[];
+    extern u8 lbl_8047C180;
+    u8* base;
+    s32 valid;
+    s32 count;
+    s32 offset;
+
+    base = carde;
+    if (base == NULL) {
+        __assert(lbl_8026F1C8, 0x17F, &lbl_8047C180);
+    }
+    valid = 0;
+    if (series >= 0 && series < (s8)base[0x1B]) {
+        valid = 1;
+    }
+    if (!valid) {
+        __assert(lbl_8026F1C8, 0x180, lbl_8026F1D8);
+    }
+    count = (s8)base[0x1C];
+    count *= (s8)base[0x1D];
+    offset = series * (count * 0x10 + 0x76);
+    return base + offset + 0x24;
+}
+#pragma peephole on
+
+/* 0x80083BF8 | size: 0xC4 */
+#pragma peephole off
+s32 fn_80083BF8(u8* carde) {
+    extern void* savedataGetStatus(s32 side, s32 slot_type);
+    u8* end;
+    s32 count;
+    s32 series;
+    s32 width;
+    s32 height;
+    s32 result;
+    s32* result_ptr;
+
+    switch ((u32)carde) {
+    case 0:
+        goto alloc;
+    default:
+        goto ready;
+    }
+alloc:
+    carde = savedataGetStatus(0, 0xD);
+ready:
+
+    end = carde + 0x4000;
+    count = 0;
+loop:
+    if (end < carde + 0x24) {
+        goto done;
+    }
+    if (*(u16*)carde == 0) {
+        goto done;
+    }
+    series = (s8)carde[0x1B];
+    if (series > 3) {
+        goto invalid;
+    }
+    width = (s8)carde[0x1C];
+    if (width > 6) {
+        goto invalid;
+    }
+    height = (s8)carde[0x1D];
+    if (height <= 5) {
+        goto valid;
+    }
+invalid:
+    *(u16*)carde = 0;
+    goto done;
+valid:
+    count++;
+    carde += series * ((width * height << 4) + 0x76) + 0x24;
+    goto loop;
+
+done:
+    result_ptr = &result;
+    if (result_ptr != NULL) {
+        *result_ptr = count;
+    }
+    return result;
+}
+#pragma peephole on
+
 /* 0x80084034 | size: 0x4 */
 void fn_80084034(void) {
 }
@@ -324,6 +459,35 @@ end:
     return;
 }
 #pragma optimize_for_size reset
+#pragma peephole on
+
+/* 0x800849B4 | size: 0xD8 */
+#pragma peephole off
+s32 fn_800849B4(s32 mode, s32 kind, void* data, void* result_data) {
+    extern s32 fn_80084A8C();
+    s32 succeeded;
+    s32 old_port;
+    u8 menu_open;
+    s32 i;
+
+    old_port = menuSetEnablePort(1);
+    succeeded = fn_80084A8C(mode, kind, data, result_data);
+    winMsgClose(0);
+    menu_open = menuIsCheck(0xE4);
+    if (menu_open != 0) {
+        menuCloseCustom(0xE4, 0, 1);
+    }
+    menuSetEnablePort(old_port);
+
+    for (i = 0; i < 3; i++) {
+        fn_80093698(i);
+    }
+
+    if ((u8)succeeded != 0) {
+        return 0;
+    }
+    return -1;
+}
 #pragma peephole on
 
 /* 0x80084A8C | size: 0x305C */

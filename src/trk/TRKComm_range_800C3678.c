@@ -9,6 +9,21 @@ extern void UnreserveEXI2Port(void);
 extern void ReserveEXI2Port(void);
 extern void TRKSwapAndGo(void);
 
+/* TRKInitializeIntDrivenUART - 0x800C3678 | size 0x50 | scope global */
+s32 TRKInitializeIntDrivenUART(s32 baud, s32 polarity, s32 pad, void* pendingPtr) {
+    typedef s32 (*InitFunc)(void* pending, void* callback);
+    typedef s32 (*InitIntFunc)(void);
+    extern u32 gDBCommTable[];
+    extern void TRKEXICallBack(s32 chan, void* ctx);
+    InitFunc initFunc = (InitFunc)gDBCommTable[0];
+    InitIntFunc initIntFunc;
+
+    initFunc(pendingPtr, (void*)TRKEXICallBack);
+    initIntFunc = (InitIntFunc)gDBCommTable[6];
+    initIntFunc();
+    return 0;
+}
+
 /* TRKEXICallBack - 0x800C3934 | size 0x38 | scope global */
 void TRKEXICallBack(s32 chan, void* ctx) {
     OSEnableScheduler();

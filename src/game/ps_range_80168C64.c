@@ -66,6 +66,7 @@
  */
 #include "dolphin/types.h"
 #include "game/script/script.h"
+#include "hsd/hsd_object.h"
 
 /* ======================================================================
  * External data banks / SDA float constants (verified against the
@@ -83,11 +84,22 @@ extern f32 lbl_8047D640; /* 2.0f */
 extern f64 lbl_8047D660; /* int->float bias (0x4330000000000000) */
 extern f64 lbl_8047D668; /* signed int->float bias */
 extern f32 lbl_8047D690; /* 255.0f */
+extern const char lbl_8047D670[7];
+extern const char lbl_8047D678[5];
 
 typedef union PSFloatBytes {
     u8 bytes[4];
     f32 value;
 } PSFloatBytes;
+
+typedef struct PSJObjTransform {
+    u8 pad00[0x14];
+    u32 flags;
+    u8 pad18[0x20];
+    f32 translateX;
+    f32 translateY;
+    f32 translateZ;
+} PSJObjTransform;
 
 extern s32 lbl_8047B170;
 extern PSFloatBytes lbl_8047B178;
@@ -107,27 +119,51 @@ typedef struct PSGeneratorState {
     /* 0x50 */ void* appSRT;
     /* 0x54 */ u8 pad54[0x34];
     /* 0x88 */ u16 generatorFlags;
-    /* 0x8A */ u8 pad8A[0x1A];
+    /* 0x8A */ u8 pad8A[0x02];
+    /* 0x8C */ f32 generatorData[6];
     /* 0xA4 */ void* linkedJObj;
+    /* 0xA8 */ f32 angleRadiusScale[3];
 } PSGeneratorState;
 
 typedef struct PSAppSRT {
     /* 0x00 */ struct PSAppSRT* next;
     /* 0x04 */ void* owner;
-    /* 0x08 */ u8 pad08[0x2A];
+    /* 0x08 */ f32 rotationX;
+    /* 0x0C */ f32 rotationY;
+    /* 0x10 */ f32 rotationZ;
+    /* 0x14 */ f32 translationX;
+    /* 0x18 */ f32 translationY;
+    /* 0x1C */ f32 translationZ;
+    /* 0x20 */ u8 pad20[0x04];
+    /* 0x24 */ f32 scaleX;
+    /* 0x28 */ f32 scaleY;
+    /* 0x2C */ f32 scaleZ;
+    /* 0x30 */ u8 type;
+    /* 0x31 */ u8 flags;
     /* 0x32 */ u16 refCount;
     /* 0x34 */ u8 pad34[0x38];
     /* 0x6C */ void (*destroy)(struct PSAppSRT* appSRT);
+    /* 0x70 */ u16 familyId;
+    /* 0x72 */ u8 active;
 } PSAppSRT;
 
 extern PSGeneratorState* lbl_8047B188;
 extern PSAppSRT* lbl_8047B124;
+extern u32 lbl_80452708[];
+extern u32 lbl_80452748[];
 extern PSParticle* lbl_80452788[];
+extern PSParticle* lbl_8047B108;
+extern HSD_Obj* lbl_8047B128;
+extern HSD_Obj* lbl_8047B190;
 extern const char lbl_802737B8[];
 extern const char lbl_802737C4[];
+extern const char lbl_80273820[];
+extern const char lbl_8027382C[];
 extern u16 lbl_8047B110;
+extern u16 lbl_8047B114;
 extern u16 lbl_8047B116;
 extern u16 lbl_8047B120;
+extern u16 lbl_8047B11A;
 
 /* ======================================================================
  * External functions - real symbol names per config/GC6E01/symbols.txt.
@@ -140,8 +176,9 @@ extern u8* getTime(u8* stream, u16* out);
 extern void psApplyOffsetLocalRotation(PSParticle* pp, f32* vec3);      /* 0x801729EC */
 extern void psApplyVelocityLocalRotation(PSParticle* pp);               /* 0x80172AE0 */
 extern f32 fn_801ADC7C(void);                                           /* psRandom, 0x801ADC7C */
-extern PSParticle* psGenerateParticleID0(PSParticle* pp, u8 linkNo, u8 bankIdx,
-                                          u16 scriptId, void* arg);      /* 0x80169A48 */
+extern PSParticle* psGenerateParticleID0(PSParticle* pp, s32 linkNo,
+                                         s32 bankIdx, s32 scriptId,
+                                         void* arg);                    /* 0x80169A48 */
 extern PSParticle* psCreateGeneratorID(PSParticle* pp, u8 linkNo, u8 bankIdx, u16 scriptId);
 extern void psCopyGeneratorData(PSParticle* gen, void* peopleObj);       /* 0x80172930 */
 extern s32 psChangeParticleAppSRT(PSParticle* pp, PSAppSRT* parentObj); /* 0x8016A878 */
@@ -158,6 +195,7 @@ extern u8 U8ClampAdd(u8 cur, f32 delta);                                /* 0x801
 extern PSParticle* _psListGetNext(PSParticle* pp);                         /* psCleanup, 0x80172928 */
 extern s32 psRemoveParticleAppSRT(PSParticle* pp);                      /* 0x?? */
 extern void psDeletePntJObjwithParticle(PSParticle* pp);
+extern void psKillGeneratorID(s32 familyId);
 extern void _psListDelete(PSParticle* pp, PSParticle* parent);
 extern PSParticle* _psListGetFirst(s32 linkNo);
 extern f32 sinf(f32 x); /* sinf-family */
@@ -167,15 +205,16 @@ extern void* fn_8019F718(void);
 extern void psSetPointJObj(s32 idx, void* renderObj);
 extern void fn_801A05EC(void* renderObj);
 extern void HSD_JObjSetupMatrix(void* camSlot);
-extern void HSD_JObjAddTx(void* camSlot, f32 dx);
-extern void HSD_JObjAddTy(void* camSlot, f32 dy);
-extern void HSD_JObjAddTz(void* camSlot, f32 dz);
+extern void HSD_JObjAddTx(PSJObjTransform* jobj, f32 dx);
+extern void HSD_JObjAddTy(PSJObjTransform* jobj, f32 dy);
+extern void HSD_JObjAddTz(PSJObjTransform* jobj, f32 dz);
 extern void HSD_MtxSRT(void* dst, void* scale, void* rot, void* trans, void* order);
 extern void fn_801A6960(void* ptr);
 extern void* fn_801A6928(s32 size);
 extern void __assert(const char* file, u32 line, const char* msg);
 extern void* memset(void* dst, s32 value, u32 size);
 
+#pragma dont_inline on
 PSParticle* _psListGetFirst(s32 linkNo) {
     s32 valid = FALSE;
 
@@ -188,6 +227,120 @@ PSParticle* _psListGetFirst(s32 linkNo) {
     }
 
     return lbl_80452788[linkNo];
+}
+#pragma dont_inline reset
+
+#pragma dont_inline on
+void _psListDelete(PSParticle* pp, PSParticle* parent) {
+    lbl_80452748[pp->linkNo] = 1;
+
+    if (parent == NULL) {
+        if (lbl_80452788[pp->linkNo] != pp) {
+            __assert(lbl_802737B8, 0x88, lbl_802737B8 + 0x30);
+        }
+        lbl_80452788[pp->linkNo] = pp->next;
+    } else {
+        if (parent->next != pp) {
+            __assert(lbl_802737B8, 0x8B, lbl_802737B8 + 0x54);
+        }
+        parent->next = pp->next;
+    }
+
+    pp->next = lbl_8047B108;
+    lbl_8047B108 = pp;
+    lbl_8047B11A--;
+}
+#pragma dont_inline reset
+
+PSParticle* _psListNew(PSParticle* parent, u32 linkNo) {
+    PSParticle* pp;
+
+    if (lbl_8047B108 == NULL) {
+        lbl_8047B108 = fn_801A6928(sizeof(PSParticle));
+        memset(lbl_8047B108, 0, sizeof(PSParticle));
+    }
+
+    pp = lbl_8047B108;
+    if (pp == NULL) {
+        return NULL;
+    }
+
+    lbl_8047B11A++;
+    if (lbl_8047B11A > lbl_8047B114) {
+        lbl_8047B114 = lbl_8047B11A;
+    }
+
+    lbl_8047B108 = pp->next;
+    if (parent == NULL) {
+        pp->next = lbl_80452788[linkNo];
+        lbl_80452788[linkNo] = pp;
+    } else {
+        pp->next = parent->next;
+        parent->next = pp;
+    }
+
+    lbl_80452748[linkNo] = 1;
+    return pp;
+}
+
+void _psListClear(void) {
+    u32* dataBank = lbl_80452708;
+    u32* active;
+    PSParticle** list;
+    PSParticle* pp;
+    PSParticle* next;
+    s32 i;
+
+    pp = lbl_8047B108;
+    while (pp != NULL) {
+        next = pp->next;
+        fn_801A6960(pp);
+        pp = next;
+    }
+    lbl_8047B108 = NULL;
+
+    list = (PSParticle**)(dataBank + (2 * PS_NUM_LINK));
+    active = dataBank + PS_NUM_LINK;
+    for (i = 0; i < PS_NUM_LINK; i++) {
+        pp = list[i];
+        while (pp != NULL) {
+            next = pp->next;
+            fn_801A6960(pp);
+            pp = next;
+        }
+        list[i] = NULL;
+        active[i] = 0;
+        dataBank[i] = 0;
+    }
+}
+
+void psSetParticleVisibility(PSGeneratorState* gen, u8 visible) {
+    PSParticle* pp;
+    PSGeneratorState* child;
+
+    pp = _psListGetFirst(gen->linkNo);
+    while (pp != NULL) {
+        if (pp->scriptId == gen->familyId) {
+            if (visible) {
+                *(s32*)&pp->flags &= ~0x20000000;
+            } else {
+                *(s32*)&pp->flags |= 0x20000000;
+            }
+        }
+        pp = pp->next;
+    }
+
+    child = lbl_8047B188;
+    while (child != NULL) {
+        if (child->familyId == gen->familyId) {
+            if (visible) {
+                *(s32*)&child->flags &= ~0x20000000;
+            } else {
+                *(s32*)&child->flags |= 0x20000000;
+            }
+        }
+        child = child->next;
+    }
 }
 
 void psSetRandomVelocityScaling(PSGeneratorState* gen, u8 enabled) {
@@ -287,6 +440,77 @@ u32 psGetGeneratorChildMaxLife(PSGeneratorState* gen) {
     return maxLife;
 }
 
+void psKillGeneratorChild(PSGeneratorState* gen) {
+    PSParticle* next;
+    PSParticle* parent = NULL;
+    PSParticle* pp;
+    u16 familyId = gen->familyId;
+
+    pp = _psListGetFirst(gen->linkNo);
+
+    while (pp != NULL) {
+        next = pp->next;
+
+        if (pp->scriptId == familyId && pp->peopleObj != NULL && pp->peopleObj == gen) {
+            if (pp->peopleObj != NULL) {
+                ((PSGeneratorState*)pp->peopleObj)->childCount--;
+            }
+            if (pp->parentObj != NULL) {
+                psRemoveParticleAppSRT(pp);
+            }
+            if (pp->flags & PS_FLAG_ATTACH_CAMERA) {
+                u32 slotIdx = (pp->flags >> 12) & 0x7;
+                void* camSlot = lbl_80452DC8[slotIdx];
+
+                if (camSlot != NULL) {
+                    fn_801A05EC(camSlot);
+                    lbl_80452DC8[slotIdx] = NULL;
+                }
+            }
+            _psListDelete(pp, parent);
+        } else {
+            parent = pp;
+        }
+        pp = next;
+    }
+}
+
+void psKillFamily(s32 familyId, s32 linkNo) {
+    PSParticle* next;
+    PSParticle* parent = NULL;
+    PSParticle* pp;
+
+    pp = _psListGetFirst(linkNo);
+
+    while (pp != NULL) {
+        next = pp->next;
+
+        if (pp->scriptId == (u16)familyId) {
+            if (pp->peopleObj != NULL) {
+                ((PSGeneratorState*)pp->peopleObj)->childCount--;
+            }
+            if (pp->parentObj != NULL) {
+                psRemoveParticleAppSRT(pp);
+            }
+            if (pp->flags & PS_FLAG_ATTACH_CAMERA) {
+                u32 slotIdx = (pp->flags >> 12) & 0x7;
+                void* camSlot = lbl_80452DC8[slotIdx];
+
+                if (camSlot != NULL) {
+                    fn_801A05EC(camSlot);
+                    lbl_80452DC8[slotIdx] = NULL;
+                }
+            }
+            _psListDelete(pp, parent);
+        } else {
+            parent = pp;
+        }
+        pp = next;
+    }
+
+    psKillGeneratorID(familyId);
+}
+
 s32 psAttachGeneratorAppSRT(PSGeneratorState* gen, PSAppSRT* appSRT) {
     u16 refCount;
 
@@ -311,6 +535,45 @@ s32 psAttachParticleAppSRT(PSParticle* pp, PSAppSRT* appSRT) {
     refCount = appSRT->refCount + 1;
     appSRT->refCount = refCount;
     return refCount;
+}
+
+PSAppSRT* psAddGeneratorAppSRT(PSGeneratorState* gen, u8 type) {
+    PSAppSRT* appSRT;
+    u16 familyId = gen->familyId;
+
+    if (lbl_8047B124 == NULL) {
+        lbl_8047B124 = fn_801A6928(lbl_8047B120);
+        if (lbl_8047B124 != NULL) {
+            memset(lbl_8047B124, 0, lbl_8047B120);
+        }
+    }
+
+    appSRT = lbl_8047B124;
+    if (appSRT != NULL) {
+        u16 count;
+
+        lbl_8047B124 = appSRT->next;
+        appSRT->next = NULL;
+        appSRT->refCount = 1;
+        appSRT->flags = 0;
+        appSRT->type = type;
+        appSRT->rotationX = appSRT->rotationY = appSRT->rotationZ = 0.0f;
+        appSRT->translationX = appSRT->translationY = appSRT->translationZ = 0.0f;
+        appSRT->scaleX = appSRT->scaleY = appSRT->scaleZ = 1.0f;
+        appSRT->destroy = NULL;
+        appSRT->active = 0;
+        appSRT->owner = NULL;
+        appSRT->familyId = familyId;
+
+        count = lbl_8047B116 + 1;
+        lbl_8047B116 = count;
+        if (count > lbl_8047B110) {
+            lbl_8047B110 = count;
+        }
+    }
+
+    gen->appSRT = appSRT;
+    return appSRT;
 }
 
 s32 psRemoveParticleAppSRT(PSParticle* pp) {
@@ -485,6 +748,249 @@ void psDeletePntJObjwithParticle(PSParticle* pp) {
     }
 }
 
+void psSetPointJObjNodup(void* renderObj, s32 index) {
+    void** slot;
+    s32 i;
+
+    if (index < 0 || index > 8) {
+        return;
+    }
+
+    i = 0;
+    do {
+        if (lbl_80452DC8[i] == renderObj) {
+            fn_801A05EC(lbl_80452DC8[i]);
+            lbl_80452DC8[i] = NULL;
+        }
+        i++;
+    } while (i < 8);
+
+    if (index != 0) {
+        void* oldRenderObj;
+
+        slot = &lbl_80452DC8[index];
+        oldRenderObj = *--slot;
+        if (oldRenderObj != NULL) {
+            fn_801A05EC(oldRenderObj);
+        }
+        *slot = renderObj;
+
+        if (renderObj != NULL) {
+            u16* refCount = (u16*)((u8*)renderObj + 4);
+
+            (*refCount)++;
+            if (*refCount == 0xFFFF) {
+                __assert(lbl_80273820, 0x5D, lbl_8027382C);
+            }
+        }
+    }
+}
+
+void psSetPointJObj(s32 index, void* renderObj) {
+    void** slot;
+    s32 i;
+
+    if (index < 0 || index > 8) {
+        return;
+    }
+
+    if (index != 0) {
+        void* oldRenderObj;
+
+        slot = &lbl_80452DC8[index];
+        oldRenderObj = *--slot;
+        if (oldRenderObj == renderObj) {
+            return;
+        }
+        if (oldRenderObj != NULL) {
+            fn_801A05EC(oldRenderObj);
+        }
+        *slot = renderObj;
+
+        if (renderObj != NULL) {
+            u16* refCount = (u16*)((u8*)renderObj + 4);
+
+            (*refCount)++;
+            if (*refCount == 0xFFFF) {
+                __assert(lbl_80273820, 0x5D, lbl_8027382C);
+            }
+        }
+    } else {
+        slot = lbl_80452DC8;
+        i = 0;
+        while (i < 8) {
+            if (*slot == renderObj) {
+                fn_801A05EC(*slot);
+                *slot = NULL;
+            }
+            i++;
+            slot++;
+        }
+    }
+}
+
+#pragma dont_inline on
+void psKillAllParticle(void) {
+    PSParticle* current;
+    PSParticle* parent;
+    PSParticle* next;
+    PSParticle* pp;
+    s32 linkNo;
+
+    for (linkNo = 0; linkNo < PS_NUM_LINK; linkNo++) {
+        pp = _psListGetFirst(linkNo);
+        while (pp != NULL) {
+            next = pp->next;
+            parent = NULL;
+            current = _psListGetFirst(pp->linkNo);
+
+            while (current != NULL) {
+                if (current == pp) {
+                    if (pp->peopleObj != NULL) {
+                        ((PSGeneratorState*)pp->peopleObj)->childCount--;
+                    }
+                    if (pp->parentObj != NULL) {
+                        psRemoveParticleAppSRT(pp);
+                    }
+                    if (current->flags & PS_FLAG_ATTACH_CAMERA) {
+                        u32 slotIdx = (current->flags >> 12) & 0x7;
+                        void* camSlot = lbl_80452DC8[slotIdx];
+
+                        if (camSlot != NULL) {
+                            fn_801A05EC(camSlot);
+                            lbl_80452DC8[slotIdx] = NULL;
+                        }
+                    }
+                    _psListDelete(current, parent);
+                    break;
+                }
+                parent = current;
+                current = current->next;
+            }
+            pp = next;
+        }
+    }
+}
+#pragma dont_inline reset
+
+PSParticle* psGenerateParticle(u8 linkNo, u8 bankIndex, u32 arg2,
+                               f32 posX, f32 posY, f32 posZ, u32 flags,
+                               f32 velocityX, f32 velocityY, f32 velocityZ,
+                               u8 animIndex, void* scriptData, u16 repeatCount,
+                               f32 lerpValue, void* arg14, f32 scaleFactor,
+                               f32 frictionFactor, PSGeneratorState* generator) {
+    extern PSParticle* psGenerateParticle0(PSParticle* parent, u8 linkNo,
+                                           u8 bankIndex, u32 flags0,
+                                           f32 posX, f32 posY, f32 posZ,
+                                           u32 arg7, u32 flags,
+                                           f32 velocityX, f32 velocityY,
+                                           f32 velocityZ, u8 animIndex,
+                                           void* scriptData, u16 repeatCount,
+                                           f32 lerpValue, f32 scaleFactor,
+                                           f32 frictionFactor, void* arg16,
+                                           PSGeneratorState* generator,
+                                           s32 enabled);
+
+    return psGenerateParticle0(NULL, linkNo, bankIndex, flags, posX, posY,
+                               posZ, arg2, flags, velocityX, velocityY,
+                               velocityZ, animIndex, scriptData, repeatCount,
+                               lerpValue, scaleFactor, frictionFactor, arg14,
+                               generator, TRUE);
+}
+
+PSParticle* psGenerateParticleID0(PSParticle* parent, s32 linkNo,
+                                  s32 bankIndex, s32 scriptId, void* arg) {
+    typedef struct PSParticleScript {
+        u16 unk0;
+        u16 animIndex;
+        u16 unk4;
+        u16 repeatCount;
+        u32 flags;
+        f32 scaleFactor;
+        f32 frictionFactor;
+        f32 velocityX;
+        f32 velocityY;
+        f32 velocityZ;
+        u8 unk20[0xC];
+        f32 lerpValue;
+        u8 unk30[0xC];
+        u8 scriptData[];
+    } PSParticleScript;
+    typedef struct PSParticleObject {
+        u8 unk0[0x16];
+        u16 value;
+    } PSParticleObject;
+    typedef struct PSParticleDataBanks {
+        u8 unk0[0x200];
+        PSParticleObject** objectBanks[0x40];
+        PSParticleScript** scriptBanks[0x80];
+        s32 scriptCounts[0x40];
+    } PSParticleDataBanks;
+    extern PSParticle* psGenerateParticle0(
+        PSParticle* parent, s32 linkNo, s32 bankIndex, PSParticleObject* object,
+        f32 posX, f32 posY, f32 posZ, u32 arg7, u32 flags, f32 velocityX,
+        f32 velocityY, f32 velocityZ, u16 animIndex, void* scriptData,
+        u16 repeatCount, f32 lerpValue, f32 scaleFactor, f32 frictionFactor,
+        s32 objectValue, void* generator, void* arg);
+    PSParticleDataBanks* dataBanks = (PSParticleDataBanks*)lbl_804527C8;
+    PSParticleScript* script;
+    PSParticleObject* object;
+
+    if (linkNo >= 8) {
+        return NULL;
+    }
+    if (bankIndex >= 0x40) {
+        return NULL;
+    }
+    if (scriptId >= dataBanks->scriptCounts[bankIndex]) {
+        return NULL;
+    }
+
+    script = dataBanks->scriptBanks[bankIndex][scriptId];
+    if (script == NULL) {
+        return NULL;
+    }
+
+    object = dataBanks->objectBanks[bankIndex][script->animIndex];
+    return psGenerateParticle0(
+        parent, linkNo, bankIndex, object, 0.0f, 0.0f, 0.0f, 0,
+        script->flags, script->velocityX, script->velocityY, script->velocityZ,
+        script->animIndex, script->scriptData, script->repeatCount,
+        script->lerpValue, script->scaleFactor, script->frictionFactor,
+        object != NULL ? object->value : 0, NULL, arg);
+}
+
+void fn_8016EA88(void) {
+    HSD_Obj* obj;
+
+    if ((obj = lbl_8047B128) != NULL) {
+        if (obj != NULL && ref_DEC(obj)) {
+            if (obj != NULL) {
+                HSD_CLASS_METHOD(obj)->release((HSD_Class*)obj);
+                HSD_CLASS_METHOD(obj)->destroy((HSD_Class*)obj);
+            }
+        }
+        lbl_8047B128 = NULL;
+    }
+}
+
+void fn_8016EB30(HSD_Obj* obj) {
+    HSD_Obj* old_obj;
+
+    if ((old_obj = lbl_8047B128) != NULL) {
+        if (old_obj != NULL && ref_DEC(old_obj)) {
+            if (old_obj != NULL) {
+                HSD_CLASS_METHOD(old_obj)->release((HSD_Class*)old_obj);
+                HSD_CLASS_METHOD(old_obj)->destroy((HSD_Class*)old_obj);
+            }
+        }
+    }
+    if (obj != NULL) {
+        ref_INC(obj);
+    }
+    lbl_8047B128 = obj;
+}
+
 void psSetupTevInvalidState(void) {
     lbl_8047B170 = -1;
 }
@@ -510,6 +1016,105 @@ PSParticle* _psListGetNext(PSParticle* pp) {
     return pp->next;
 }
 
+void psCopyGeneratorData(PSParticle* gen, void* peopleObj) {
+    extern void psSetGeneratorAngleRadiusScale(PSGeneratorState*, f32*, u8);
+    PSGeneratorState* dst = (PSGeneratorState*)gen;
+    PSGeneratorState* src = (PSGeneratorState*)peopleObj;
+    s32 i;
+
+    if (src == NULL || dst == NULL) {
+        return;
+    }
+
+    if (src->flags & 0x20000000) {
+        *(s32*)&dst->flags |= 0x20000000;
+    }
+
+    for (i = 0; i < 6; i++) {
+        dst->generatorData[i] = src->generatorData[i];
+    }
+
+    dst->generatorFlags = src->generatorFlags;
+    dst->generatorFlags &= ~0x2;
+    dst->linkedJObj = src->linkedJObj;
+
+    if (src->generatorFlags & 0x1000) {
+        psSetGeneratorAngleRadiusScale(dst, src->angleRadiusScale, TRUE);
+    } else {
+        psSetGeneratorAngleRadiusScale(dst, src->angleRadiusScale, FALSE);
+    }
+}
+
+void psApplyOffsetLocalRotation(PSParticle* pp, f32* vec3) {
+    typedef f32 Mtx[3][4];
+    extern void PSMTXIdentity(Mtx mtx);
+    extern void PSMTXScale(Mtx mtx, f32 x, f32 y, f32 z);
+    extern void PSMTXRotRad(Mtx mtx, char axis, f32 radians);
+    extern void PSMTXConcat(Mtx lhs, Mtx rhs, Mtx dst);
+    extern void PSMTXMultVec(Mtx mtx, f32* src, f32* dst);
+    Mtx rotX;
+    Mtx rotY;
+    Mtx rotZ;
+    Mtx scale;
+
+    if (pp->peopleObj == NULL ||
+        !(((PSGeneratorState*)pp->peopleObj)->generatorFlags & 0x8)) {
+        return;
+    }
+
+    if (((PSGeneratorState*)pp->peopleObj)->generatorFlags & 0x10) {
+        PSMTXIdentity(scale);
+    } else {
+        PSMTXScale(scale,
+                   ((PSGeneratorState*)pp->peopleObj)->generatorData[3],
+                   ((PSGeneratorState*)pp->peopleObj)->generatorData[4],
+                   ((PSGeneratorState*)pp->peopleObj)->generatorData[5]);
+    }
+
+    PSMTXRotRad(rotX, 'X',
+                ((PSGeneratorState*)pp->peopleObj)->generatorData[0]);
+    PSMTXRotRad(rotY, 'Y',
+                ((PSGeneratorState*)pp->peopleObj)->generatorData[1]);
+    PSMTXRotRad(rotZ, 'Z',
+                ((PSGeneratorState*)pp->peopleObj)->generatorData[2]);
+    PSMTXConcat(rotY, rotX, rotX);
+    PSMTXConcat(rotZ, rotX, rotX);
+    PSMTXConcat(scale, rotX, rotX);
+    PSMTXMultVec(rotX, vec3, vec3);
+}
+
+void psApplyVelocityLocalRotation(PSParticle* pp) {
+    typedef f32 Mtx[3][4];
+    extern void PSMTXRotRad(Mtx mtx, char axis, f32 radians);
+    extern void PSMTXConcat(Mtx lhs, Mtx rhs, Mtx dst);
+    extern void PSMTXMultVec(Mtx mtx, f32* src, f32* dst);
+    Mtx rotX;
+    Mtx rotY;
+    Mtx rotZ;
+    f32 velocity[3];
+
+    if (pp->peopleObj == NULL ||
+        !(((PSGeneratorState*)pp->peopleObj)->generatorFlags & 0x4)) {
+        return;
+    }
+
+    velocity[0] = pp->velocityX;
+    velocity[1] = pp->velocityY;
+    velocity[2] = pp->velocityZ;
+    PSMTXRotRad(rotX, 'X',
+                ((PSGeneratorState*)pp->peopleObj)->generatorData[0]);
+    PSMTXRotRad(rotY, 'Y',
+                ((PSGeneratorState*)pp->peopleObj)->generatorData[1]);
+    PSMTXRotRad(rotZ, 'Z',
+                ((PSGeneratorState*)pp->peopleObj)->generatorData[2]);
+    PSMTXConcat(rotY, rotX, rotX);
+    PSMTXConcat(rotZ, rotX, rotX);
+    PSMTXMultVec(rotX, velocity, velocity);
+    pp->velocityX = velocity[0];
+    pp->velocityY = velocity[1];
+    pp->velocityZ = velocity[2];
+}
+
 u8* getTime(u8* stream, u16* out) {
     *out = *stream++;
     if (*out & 0x80) {
@@ -526,6 +1131,64 @@ u8* getFloat(u8* stream, f32* out) {
     lbl_8047B178.bytes[3] = *stream++;
     *out = lbl_8047B178.value;
     return stream;
+}
+
+void psSetBillboardCamera(HSD_Obj* obj) {
+    HSD_Obj* old_obj;
+
+    if (obj != (old_obj = lbl_8047B190)) {
+        if (old_obj != NULL) {
+            if (old_obj != NULL && ref_DEC(old_obj)) {
+                if (old_obj != NULL) {
+                    HSD_CLASS_METHOD(old_obj)->release((HSD_Class*)old_obj);
+                    HSD_CLASS_METHOD(old_obj)->destroy((HSD_Class*)old_obj);
+                }
+            }
+        }
+        if (obj != NULL) {
+            ref_INC(obj);
+        }
+        lbl_8047B190 = obj;
+    }
+}
+
+void psInterpretParticles(u32 linkMask) {
+    extern PSParticle* psInterpretParticle0(PSParticle* pp, PSParticle* parent);
+    extern const char lbl_802739A0[];
+    extern const char lbl_8047D628[7];
+    PSParticle* next;
+    PSParticle* previous;
+    PSParticle* current;
+    PSParticle* result;
+    s32 linkNo;
+
+    for (linkNo = 0; linkNo < PS_NUM_LINK; linkNo++, linkMask >>= 1) {
+        if (!(linkMask & 0x10000)) {
+            previous = NULL;
+            current = _psListGetFirst(linkNo);
+
+            while (current != NULL) {
+                next = current->next;
+                result = psInterpretParticle0(current, previous);
+
+                if (next != NULL) {
+                    if (current->next == next) {
+                        previous = current;
+                    } else if (result != next) {
+                        previous = result;
+                        while (previous->next != next) {
+                            if (previous == NULL) {
+                                __assert(lbl_802739A0, 0x810, lbl_8047D628);
+                            }
+                            previous = previous->next;
+                        }
+                    }
+                }
+
+                current = next;
+            }
+        }
+    }
 }
 
 /* ======================================================================
@@ -1012,4 +1675,75 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
 
     _psListGetNext(pp);
     return pp;
+}
+
+static inline s32 PSJObjMtxIsDirty(PSJObjTransform* jobj) {
+    s32 dirty;
+
+    if (jobj == NULL) {
+        __assert(lbl_8047D670, 0x25D, lbl_8047D678);
+    }
+    dirty = FALSE;
+    if (!(jobj->flags & 0x00800000) && (jobj->flags & 0x40)) {
+        dirty = TRUE;
+    }
+    return dirty;
+}
+
+void HSD_JObjSetupMatrix(void* camSlot) {
+    extern void fn_8019D9DC(void* jobj);
+    PSJObjTransform* jobj = camSlot;
+
+    if (jobj == NULL || !PSJObjMtxIsDirty(jobj)) {
+        return;
+    }
+    fn_8019D9DC(jobj);
+}
+
+void HSD_JObjAddTz(PSJObjTransform* jobj, f32 dz) {
+    extern void fn_8019D620(void* jobj);
+
+    if (jobj == NULL) {
+        __assert(lbl_8047D670, 0x46B, lbl_8047D678);
+    }
+
+    jobj->translateZ += dz;
+
+    if (!(jobj->flags & 0x02000000)) {
+        if (jobj != NULL && !PSJObjMtxIsDirty(jobj)) {
+            fn_8019D620(jobj);
+        }
+    }
+}
+
+void HSD_JObjAddTy(PSJObjTransform* jobj, f32 dy) {
+    extern void fn_8019D620(void* jobj);
+
+    if (jobj == NULL) {
+        __assert(lbl_8047D670, 0x460, lbl_8047D678);
+    }
+
+    jobj->translateY += dy;
+
+    if (!(jobj->flags & 0x02000000)) {
+        if (jobj != NULL && !PSJObjMtxIsDirty(jobj)) {
+            fn_8019D620(jobj);
+        }
+    }
+}
+
+void HSD_JObjAddTx(PSJObjTransform* jobj, f32 dx) {
+    extern void fn_8019D620(void* jobj);
+
+    if (jobj == NULL) {
+        __assert(lbl_8047D670, 0x455, lbl_8047D678);
+    }
+
+    jobj->translateX += dx;
+
+    if (!(jobj->flags & 0x02000000)) {
+        if (jobj != NULL && !PSJObjMtxIsDirty(jobj)) {
+            fn_8019D620(jobj);
+        }
+    }
 }

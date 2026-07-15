@@ -96,6 +96,24 @@ u8 fn_801E11E8(void)
     return lbl_8047B420;
 }
 
+void fn_801E11F0(void)
+{
+    extern u32 lbl_80467CF8[];
+    extern u8 lbl_8047B420;
+    extern u32 lbl_8047B424;
+    extern u32 lbl_8047B42C;
+    extern void GSgappUnblock(u32 taskId);
+    u32 i;
+
+    lbl_8047B420 = lbl_8047B424 = i = 0;
+    while (i < lbl_8047B42C) {
+        if (lbl_80467CF8[i] != 0) {
+            GSgappUnblock(lbl_80467CF8[i]);
+        }
+        i++;
+    }
+}
+
 void fn_801E1258(void)
 {
     extern u8 lbl_8047B420;
@@ -115,11 +133,148 @@ void GSvtrLoadTexture(void)
     lbl_8047B438 = fn_800F92D4(0x0b521200);
 }
 
+s32 GSvtrRegisterGSgapp(u32 taskId)
+{
+    extern u32 lbl_80467CF8[];
+    extern u32 lbl_8047B42C;
+    u32 *entry;
+    u32 i;
+
+    if (lbl_8047B42C + 1 >= 4) {
+        return 0;
+    }
+
+    entry = lbl_80467CF8;
+    for (i = 0; i < 4; i++, entry++) {
+        if (*entry == 0) {
+            *entry = taskId;
+            lbl_8047B42C++;
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+void fn_801E1300(void)
+{
+    extern u32 lbl_80467CF8[];
+    extern u8 lbl_8047B420;
+    extern u32 lbl_8047B424;
+    extern u32 lbl_8047B42C;
+    extern u8 lbl_8047B434;
+    extern u32 lbl_8047B438;
+    extern u8 lbl_8047B43C;
+    extern void *memset(void *dst, int value, u32 size);
+    extern u32 GSgappCreate(s32 state, u8 priority, u32 param, void *func);
+    extern void _vtrTexDispFunc(void);
+
+    lbl_8047B420 = 0;
+    lbl_8047B424 = 0;
+    lbl_8047B42C = 0;
+    lbl_8047B438 = 0;
+    lbl_8047B434 = 1;
+    lbl_8047B43C = 0;
+    memset(lbl_80467CF8, 0, 0x10);
+    GSgappCreate(1, 0xFD, 10, _vtrTexDispFunc);
+}
+
 s32 fn_801E16D0(void)
 {
     extern s32 fn_801E25C8(void);
 
     return fn_801E25C8();
+}
+
+void fn_801E16F0(void)
+{
+    extern u8 lbl_8047B440;
+    extern u8 lbl_8047B441;
+    extern u32 lbl_8047B450;
+    extern void fn_801E386C(void);
+    extern s32 fn_801E38D8(void);
+    extern void fn_801E3F54(void);
+    extern void fn_801E4724(void);
+    extern u32 fn_800E202C(u32);
+    extern void fn_800E24B0(u32);
+    extern void fn_800E209C(u32);
+    extern void GSscratchSetValid(void);
+    u32 handle;
+    u8 active;
+
+    if (lbl_8047B440 == 0 || lbl_8047B441 == 0) {
+        active = 0;
+    } else {
+        active = 1;
+    }
+
+    if (active != 0) {
+        fn_801E386C();
+        switch (fn_801E38D8()) {
+        case 3:
+        case 5:
+            if (lbl_8047B441 != 0) {
+                fn_801E3F54();
+                fn_801E4724();
+                handle = fn_800E202C(lbl_8047B450);
+                if ((u16)handle != 0) {
+                    fn_800E24B0(handle);
+                    fn_800E209C(handle);
+                }
+                lbl_8047B441 = 0;
+                GSscratchSetValid();
+            }
+            break;
+        }
+    }
+}
+
+void fn_801E17A8(void)
+{
+    extern u8 lbl_8047B440;
+    extern u8 lbl_8047B441;
+    extern s32 lbl_8047B454;
+    extern s32 lbl_8047B458;
+    extern s32 lbl_8047B45C;
+    extern s32 lbl_80469030[];
+    extern s32 fn_801E3978(s32, s32, s32, s32, s32);
+    u8 active;
+
+    if (lbl_8047B440 == 0 || lbl_8047B441 == 0) {
+        active = 0;
+    } else {
+        active = 1;
+    }
+
+    if (active != 0) {
+        fn_801E3978(lbl_8047B45C, lbl_8047B458, lbl_8047B454,
+                    lbl_80469030[0], lbl_80469030[1]);
+    }
+}
+
+void fn_801E1810(void)
+{
+    extern u8 lbl_8047B441;
+    extern u32 lbl_8047B450;
+    extern void fn_801E3F54(void);
+    extern void fn_801E4724(void);
+    extern u32 fn_800E202C(u32);
+    extern void fn_800E24B0(u32);
+    extern void fn_800E209C(u32);
+    extern void GSscratchSetValid(void);
+    u32 handle;
+
+    if (lbl_8047B441 != 0) {
+        fn_801E3F54();
+        fn_801E4724();
+        handle = fn_800E202C(lbl_8047B450);
+        if ((u16)handle != 0) {
+            fn_800E24B0(handle);
+            fn_800E209C(handle);
+        }
+        lbl_8047B441 = 0;
+        GSscratchSetValid();
+    }
 }
 
 s32 fn_801E1874(void)
@@ -134,6 +289,33 @@ s32 fn_801E1874(void)
         return 0;
     }
     return 1;
+}
+
+void fn_801E189C(char *path, u8 flag)
+{
+    struct ThreadArgs {
+        char *path;
+        u32 flag;
+    };
+    extern u8 lbl_80467D08[];
+    extern u8 lbl_80468020[];
+    extern s32 lbl_8047B444;
+    extern struct ThreadArgs lbl_8047B448;
+    extern void *fn_801E1924(void *);
+    extern s32 OSCreateThread(void *, void *(*)(void *), void *, void *, u32,
+                              s32, u16);
+    extern s32 OSResumeThread(void *);
+    extern void _threadSwitch(void);
+
+    lbl_8047B448.flag = flag;
+    lbl_8047B444 = 0;
+    lbl_8047B448.path = path;
+    OSCreateThread(lbl_80467D08, fn_801E1924, &lbl_8047B448,
+                   lbl_80468020 + 0xFFC, 0x1000, 0x10, 1);
+    OSResumeThread(lbl_80467D08);
+    while (lbl_8047B444 == 0) {
+        _threadSwitch();
+    }
 }
 
 void fn_801E1B2C(void)

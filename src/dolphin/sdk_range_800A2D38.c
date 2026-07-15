@@ -577,3 +577,24 @@ void PSQUATMultiply(const Quaternion* lhs, const Quaternion* rhs, Quaternion* ds
     dst->z = z;
     dst->w = w;
 }
+
+#pragma dont_inline on
+void C_QUATRotAxisRad(Quaternion* quat, const Vec* axis, f32 rad)
+{
+    extern f32 sinf(f32 x);
+    extern f32 cosf(f32 x);
+    extern const f32 lbl_8047C2D0;
+    Vec normalized;
+    f32 sinHalf;
+    f32 cosHalf;
+
+    PSVECNormalize((Vec*)axis, &normalized);
+    rad = lbl_8047C2D0 * rad;
+    sinHalf = sinf(rad);
+    cosHalf = cosf(rad);
+    quat->x = sinHalf * normalized.x;
+    quat->y = sinHalf * normalized.y;
+    quat->z = sinHalf * normalized.z;
+    quat->w = cosHalf;
+}
+#pragma dont_inline reset

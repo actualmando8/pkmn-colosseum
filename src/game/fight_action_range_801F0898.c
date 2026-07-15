@@ -136,6 +136,42 @@ u32 fightActionFlowFifo(void* param) {
     return result;
 }
 
+/* 0x801F108C | size: 0xE4 | small */
+void fightActionFifoInit(void) {
+    extern u8 lbl_8046D790[];
+    extern u32 lbl_8047B5E8;
+    extern u32 lbl_8047B5EC;
+    extern void fightActionBiosSetKind(u8*, u32);
+    extern void fightActionBiosSetBuff(u8*, u32);
+    extern void fightActionBiosSetFightActionDataPtr(u8*, u32);
+    extern void fightActionBiosSetDispBuff(u8*, u32, u32);
+    extern void fightActionBiosSetBuffDataPtr(u8*, u32);
+    extern void fightActionBiosSetBuffDataId(u8*, u32);
+    extern void fightActionBiosSetActorFightTargetPtr(u8*, u32);
+    extern void fightActionBiosSetMotoFightActionDataPtr(u8*, u32);
+    extern void fightActionBiosSetFifoBanme(u8*, s32);
+    u32 j;
+    u8* ptr;
+    u32 i;
+
+    lbl_8047B5EC = 0;
+    lbl_8047B5E8 = 0;
+    for (i = 0; (u16)i < 32; i++) {
+        ptr = lbl_8046D790 + (u16)i * 0x30;
+        fightActionBiosSetKind(ptr, 0);
+        fightActionBiosSetBuff(ptr, 0);
+        fightActionBiosSetFightActionDataPtr(ptr, 0);
+        for (j = 0; (u16)j < 4; j++) {
+            fightActionBiosSetDispBuff(ptr, j, 0);
+        }
+        fightActionBiosSetBuffDataPtr(ptr, 0);
+        fightActionBiosSetBuffDataId(ptr, 0);
+        fightActionBiosSetActorFightTargetPtr(ptr, 0);
+        fightActionBiosSetMotoFightActionDataPtr(ptr, 0);
+        fightActionBiosSetFifoBanme(ptr, -1);
+    }
+}
+
 /* 0x801F1170 | size: 0x5C | small */
 u32 fightActionCheckValid(void* param) {
     extern u16 fightActionBiosGetKind(void*);

@@ -9,12 +9,27 @@
  */
 #include "dolphin/types.h"
 
-extern void __init_cpp(void);
+typedef void (*FuncPtr)(void);
+
+extern FuncPtr _ctors[];
+static void __init_cpp(void);
 extern void PPCHalt(void);
 
 void __init_user(void) {
     __init_cpp();
 }
+
+#pragma scheduling off
+#pragma peephole off
+static void __init_cpp(void) {
+    FuncPtr* p;
+
+    for (p = _ctors; *p != NULL; p++) {
+        (*p)();
+    }
+}
+#pragma peephole reset
+#pragma scheduling reset
 
 void _ExitProcess(void) {
     PPCHalt();

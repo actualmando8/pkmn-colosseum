@@ -617,6 +617,18 @@ void fn_800D9ED8(s32 val) {
 #endif
 
 extern void GXSetClipMode(u32);
+extern void fn_800B953C(u32);
+
+void fn_800D9F40(s32 val) {
+    u32 state = lbl_8047AA80;
+    if (*(s32*)state == 1) { fn_800D4F98(0x34, 1, val); }
+    else {
+        if (val == 1) { *(u8*)(state + 0x42d) = 1; }
+        else if (val == 0) { *(u8*)(state + 0x42d) = 0; }
+        fn_800B953C(*(u8*)(lbl_8047AA80 + 0x42d));
+    }
+}
+
 #if 0
 asm void fn_800D9FB4(void) {
 #include "src/game/gs_render_fn_800D9FB4.inc"
@@ -725,6 +737,36 @@ void fn_800DA1E8(s32 zEnable, s32 zFunc, s32 zUpdate) {
 }
 #endif
 
+void fn_800DA2BC(s32 colorUpdate, s32 alphaUpdate, s32 zCompLoc) {
+    extern void fn_800BCE30(u32);
+    extern void fn_800BCE5C(u32);
+    u32 state = lbl_8047AA80;
+
+    if (*(s32*)state == 1) {
+        fn_800D4F98(0x2e, 3, colorUpdate, alphaUpdate, zCompLoc);
+    } else {
+        if (colorUpdate == 1) {
+            *(u8*)(state + 0x419) = 1;
+        } else if (colorUpdate == 0) {
+            *(u8*)(state + 0x419) = 0;
+        }
+        if (alphaUpdate == 1) {
+            *(u8*)(lbl_8047AA80 + 0x41a) = 1;
+        } else if (alphaUpdate == 0) {
+            *(u8*)(lbl_8047AA80 + 0x41a) = 0;
+        }
+        if (zCompLoc == 1) {
+            *(u8*)(lbl_8047AA80 + 0x41b) = 1;
+        } else if (zCompLoc == 0) {
+            *(u8*)(lbl_8047AA80 + 0x41b) = 0;
+        }
+        fn_800BCE30(*(u8*)(lbl_8047AA80 + 0x419));
+        fn_800BCE5C(*(u8*)(lbl_8047AA80 + 0x41a));
+        GXSetZMode(*(u8*)(lbl_8047AA80 + 0x41c), *(u32*)(lbl_8047AA80 + 0x420),
+                   *(u8*)(lbl_8047AA80 + 0x41b));
+    }
+}
+
 extern void GXSetDstAlpha(u32);
 #if 0
 asm void fn_800DA3B0(void) {
@@ -783,4 +825,3 @@ void fn_800DA4C4(s32 a, s32 b, s32 c) {
     }
 }
 #endif
-

@@ -20,3 +20,60 @@
  * (0x800F8268-0x800FF0A0 per config/GC6E01/splits.txt).
  */
 #include "dolphin/types.h"
+#include "game/gs_floor.h"
+
+/* 0x800FEC34 | 0x84 */
+void fn_800FEC34(u32 callback) {
+    extern GSFloorResource* lbl_8047ACB0;
+    extern u32 lbl_8047ACC0;
+    extern void GSthreadUnblock(void* thread);
+    GSFloorResource* resource;
+    u32 i;
+
+    resource = lbl_8047ACB0;
+    for (i = 0; i < lbl_8047ACC0; i++) {
+        if ((s32)resource->active == 3) {
+            if ((u32)resource->callback == callback) {
+                goto found;
+            }
+        }
+        resource++;
+    }
+    resource = NULL;
+
+found:
+    if (resource != NULL) {
+        resource->pending = 0;
+        if ((s32)resource->status == 1 && resource->modelHandle != NULL) {
+            GSthreadUnblock(resource->modelHandle);
+        }
+    }
+}
+
+/* 0x800FECB8 | 0x84 */
+void fn_800FECB8(u32 callback) {
+    extern GSFloorResource* lbl_8047ACB0;
+    extern u32 lbl_8047ACC0;
+    extern void GSthreadBlock(void* thread);
+    GSFloorResource* resource;
+    u32 i;
+
+    resource = lbl_8047ACB0;
+    for (i = 0; i < lbl_8047ACC0; i++) {
+        if ((s32)resource->active == 3) {
+            if ((u32)resource->callback == callback) {
+                goto found;
+            }
+        }
+        resource++;
+    }
+    resource = NULL;
+
+found:
+    if (resource != NULL) {
+        resource->pending = 1;
+        if ((s32)resource->status == 1 && resource->modelHandle != NULL) {
+            GSthreadBlock(resource->modelHandle);
+        }
+    }
+}

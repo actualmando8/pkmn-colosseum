@@ -28,7 +28,7 @@ extern void fn_800D67BC(u16);
 extern void fn_800D892C(u32);
 
 /* GSmem */
-extern u16   _toolentryAlloc__FUl(u32 size);                    /* GSmemAllocRaw */
+extern u32   _toolentryAlloc__FUl(u32 size);                    /* GSmemAllocRaw */
 extern void* fn_800E27B0(u16 handle);                  /* GSmemGetPtr */
 
 /* SDK GX functions */
@@ -571,6 +571,23 @@ void fn_800DB758(u16 vertCount)
 }
 #endif
 
+void fn_800DB890(u32 count)
+{
+    extern u16 lbl_8047AAD0;
+    u16 handle;
+    u32 i;
+
+    lbl_8047AAD8 = count;
+    handle = _toolentryAlloc__FUl(count * 0x18);
+    lbl_8047AAD0 = handle;
+    if (handle != 0) {
+        lbl_8047AAD4 = (u32)fn_800E27B0(handle);
+        for (i = 0; i < lbl_8047AAD8; i++) {
+            *(u8*)(lbl_8047AAD4 + i * 0x18) = 0;
+        }
+    }
+}
+
 #if 0
 asm void fn_800DB900(void) {
 #include "src/game/gs_render_fn_800DB900.inc"
@@ -887,3 +904,17 @@ void fn_800DC1D4(u8 val) {
 }
 #endif
 
+void fn_800DC224(u32 idx, u32 a, u32 b, u32 c, u32 d)
+{
+    u8* p;
+
+    if (*(s32*)lbl_8047AA80 == 1) {
+        fn_800D4F98(0x48, 5, idx, a, b, c, d);
+    } else {
+        p = (u8*)lbl_8047AA80 + idx * 4 + 0x42e;
+        p[0] = a;
+        p[1] = b;
+        p[2] = c;
+        p[3] = d;
+    }
+}

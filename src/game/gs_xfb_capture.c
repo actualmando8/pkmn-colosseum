@@ -30,6 +30,32 @@
 #include "game/gs_scene_types.h"
 
 extern u8 lbl_8047B1A0;
+void GSgfxCaptureUpdate(void) {
+    typedef struct CaptureEntry {
+        u8 pad[0x58];
+        void* xfb;
+        u8 pad5C[4];
+    } CaptureEntry;
+    char filename[16];
+    extern CaptureEntry lbl_80466BC0[];
+    extern u32 fn_801BF574(void);
+    extern int sprintf(char* dst, const char* format, ...);
+
+    if (lbl_8047B1A0 == 1) {
+        u32 offset = fn_801BF574() * sizeof(CaptureEntry);
+        CaptureEntry* entry = (CaptureEntry*)((u8*)lbl_80466BC0 + offset);
+        if (entry->xfb != 0) {
+            sprintf(filename, lbl_80273A00, lbl_8047B1A4++);
+            if (lbl_8047B1A4 >= 0x4650) {
+                lbl_8047B1A0 = 0;
+                fn_800D305C(1);
+            }
+        }
+    } else {
+        lbl_8047B1A0 = 0;
+    }
+}
+
 u8 fn_80175FFC(void) {
     return lbl_8047B1A0;
 }
