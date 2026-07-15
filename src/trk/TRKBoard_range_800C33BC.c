@@ -1,4 +1,5 @@
 #include "dolphin/types.h"
+#include "dolphin/os/OSContext.h"
 
 extern void OSReport(const char* fmt, ...);
 
@@ -27,6 +28,49 @@ void TRK_main(void) {
     }
     error = TRKTerminateNub();
     TRK_mainError[0] = error;
+}
+
+/* TRKLoadContext - 0x800C3414 | size 0x88 | scope global */
+void TRKLoadContext(register OSContext* context, register u32 vector) {
+    extern void TRKInterruptHandler(void);
+
+    asm {
+        lwz r0, 0x0(context)
+        lwz r1, 0x4(context)
+        lwz r2, 0x8(context)
+        lhz r5, 0x1a2(context)
+        rlwinm. r6, r5, 0, 30, 30
+        beq lbl_1
+        rlwinm r5, r5, 0, 31, 29
+        sth r5, 0x1a2(context)
+        lmw r5, 0x14(context)
+        b lbl_2
+    lbl_1:
+        lmw r13, 0x34(context)
+    lbl_2:
+        mr r3, vector
+        lwz r4, 0x80(context)
+        mtcrf 255, r4
+        lwz r4, 0x84(context)
+        mtlr r4
+        lwz r4, 0x88(context)
+        mtctr r4
+        lwz r4, 0x8c(context)
+        mtxer r4
+        mfmsr r4
+        rlwinm r4, r4, 0, 17, 15
+        rlwinm r4, r4, 0, 31, 29
+        mtmsr r4
+        mtsprg 1, r2
+        lwz r4, 0xc(context)
+        mtsprg 2, r4
+        lwz r4, 0x10(context)
+        mtsprg 3, r4
+        lwz r2, 0x198(context)
+        lwz r4, 0x19c(context)
+        lwz r30, 0x7c(context)
+        b TRKInterruptHandler
+    }
 }
 
 /* TRKUARTInterruptHandler - 0x800C349C | size 0x4 | scope global (empty, returns void) */

@@ -6,10 +6,66 @@
  * segment (Fable re-split, 2026-07-07). Functions asm-only until matched.
  */
 #include "dolphin/types.h"
-#include "hsd/hsd_jobj.h"
+#include "hsd/hsd_pobj.h"
+
+/* NOTE: hsd/hsd_jobj.h is deliberately not included here - it declares
+ * HSD_JObjMtxIsDirty/HSD_JObjSetupMatrix as `static inline`, which would
+ * collide with this TU's own out-of-line instances of those names below
+ * (same idiom as src/game/ps_range_80168C64.c's local PSJObjTransform). */
+typedef struct HSD_JObj {
+    u8 _pad0[0x14];
+    u32 flags;
+} HSD_JObj;
+
+#define JOBJ_PTCL   (1 << 5)
+#define JOBJ_SPLINE (1 << 14)
+#define union_type_dobj(o) \
+    ((o)->flags & (JOBJ_PTCL | JOBJ_SPLINE) ? FALSE : TRUE)
 
 typedef void (*GSModelPObjDisp)(HSD_PObj* pobj, f32 vmtx[3][4], f32 pmtx[3][4],
                                f32 smtx[3][4], void* arg);
+
+typedef struct GSmodel GSmodel;
+
+extern void* modelGetRenderJObj(GSmodel* model);
+extern void _modelParseJObjDispAll__FP9_HSD_JObjP5GSmtx12HSD_TrspMaskbPFP9_HSD_PObjP5GSmtxP5GSmtxP5GSmtxPv_vPv(
+    HSD_JObj* jobj, f32* obj_mtx, HSD_TrspMask trsp_mask, BOOL is_visible,
+    GSModelPObjDisp disp, void* arg);
+
+void GSmodelParse(GSmodel* model, BOOL is_visible, GSModelPObjDisp disp,
+                  void* arg)
+{
+    _modelParseJObjDispAll__FP9_HSD_JObjP5GSmtx12HSD_TrspMaskbPFP9_HSD_PObjP5GSmtxP5GSmtxP5GSmtxPv_vPv(
+        modelGetRenderJObj(model), NULL, 7, is_visible, disp, arg);
+}
+
+extern const u8 lbl_8047CC00[7];
+extern const u8 lbl_8047CC08[5];
+extern void __assert(const char* file, u32 line, const char* condition);
+
+BOOL HSD_JObjMtxIsDirty(HSD_JObj* jobj)
+{
+    BOOL result;
+
+    if (jobj == NULL) {
+        __assert((const char*)lbl_8047CC00, 0x25d, (const char*)lbl_8047CC08);
+    }
+    result = FALSE;
+    if (!(jobj->flags & 0x00800000) && (jobj->flags & 0x40)) {
+        result = TRUE;
+    }
+    return result;
+}
+
+void HSD_JObjSetupMatrix_800EA664(HSD_JObj* jobj)
+{
+    extern void fn_8019D9DC(HSD_JObj* jobj);
+
+    if (jobj == NULL || !HSD_JObjMtxIsDirty(jobj)) {
+        return;
+    }
+    fn_8019D9DC(jobj);
+}
 
 void _modelParseJObjDispDObj__FP9_HSD_JObjP5GSmtx12HSD_TrspMaskbPFP9_HSD_PObjP5GSmtxP5GSmtxP5GSmtxPv_vPv(
     HSD_JObj* jobj, f32 *obj_mtx, HSD_TrspMask trsp_mask, BOOL is_visible,

@@ -10,6 +10,7 @@
 #include "dolphin/types.h"
 #include "dolphin/gx/GX.h"
 #include "dolphin/os/OSInterrupt.h"
+#include "dolphin/os/OSThread.h"
 #include "dolphin/os/PPCArch.h"
 
 extern GXData* gx;
@@ -96,6 +97,32 @@ void GXSetGPFifo(GXFifoObj* fifo) {
     OSRestoreInterrupts(enabled);
 }
 
+void* fn_800B7484(void* callback) {
+    extern void* lbl_8047A9B4;
+    BOOL enabled;
+    void* old;
+
+    old = lbl_8047A9B4;
+    enabled = OSDisableInterrupts();
+    lbl_8047A9B4 = callback;
+    OSRestoreInterrupts(enabled);
+    return old;
+}
+
+void __GXFifoInit(void) {
+    extern void* lbl_8047A9A8;
+    extern u32 lbl_8047A9B0;
+    extern OSThread* fn_800A13F8(void);
+    extern void GXCPInterruptHandler(__OSInterrupt interrupt, OSContext* context);
+
+    __OSSetInterruptHandler(0x11, GXCPInterruptHandler);
+    __OSUnmaskInterrupts(0x4000);
+    lbl_8047A9A8 = fn_800A13F8();
+    lbl_8047A9B0 = 0;
+    lbl_8047A9A0 = NULL;
+    lbl_8047A9A4 = NULL;
+}
+
 void fn_800B7514(void) {
     u32* gxStatus = (u32*)gx;
     u32 value;
@@ -113,7 +140,7 @@ void fn_800B7538(void) {
 }
 
 void fn_800B7558(u8 arg0) {
-    u32* gxStatus = (u32*)gx;
+    u32* gxStatus;
     u32 bit;
 
     if ((arg0 & 0xFF) != 0) {
@@ -121,7 +148,8 @@ void fn_800B7558(u8 arg0) {
     } else {
         bit = 0U;
     }
-    gxStatus[2] = (gxStatus[2] & 0xF7FFFFFFU) | (bit << 4);
+    gxStatus = (u32*)gx;
+    gxStatus[2] = (gxStatus[2] & ~0x10U) | (bit << 4);
     __cpReg[1] = (u16)gxStatus[2];
 }
 
@@ -135,7 +163,7 @@ void fn_800B7594(u8 arg0, u8 arg1) {
 void fn_800B75D0(u8 arg0, u8 arg1) {
     u32* gxStatus = (u32*)gx;
     gxStatus[4] = (gxStatus[4] & ~1U) | (u32)arg0;
-    gxStatus[4] = (gxStatus[4] & (u32)~(1ULL << 30)) | (u32)(arg1 * 2U);
+    gxStatus[4] = (gxStatus[4] & ~2U) | ((u32)arg1 << 1);
     __cpReg[2] = (u16)gxStatus[4];
 }
 

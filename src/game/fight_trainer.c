@@ -79,17 +79,17 @@ u32 fightAbicntDoKakeWaru(u32 id, u32 val)
     u8* numRatio;
     u32 denAddress;
     u8 num;
-    u32 count = lbl_80478D68;
     u32 validId = (u16)id;
+    u32 count = lbl_80478D68;
 
     numRatio = (u8*)&lbl_80375D10[(u16)id];
-    if (validId >= count) {
+    if (count <= validId) {
         numRatio = NULL;
     }
     num = (numRatio == NULL) ? 0 : ((numRatio == NULL) ? 0 : numRatio[0]);
 
     denAddress = (u32)lbl_80375D10 + (id & 0xffffU) * sizeof(FightAbicntRatio);
-    if (validId >= count) {
+    if (count <= validId) {
         denAddress = 0;
     }
     den = (denAddress == 0) ? 1 : ((denAddress == 0) ? 1 : ((u8*)denAddress)[1]);

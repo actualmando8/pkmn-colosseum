@@ -21,7 +21,7 @@ BOOL fn_8009ED4C(OSModuleInfo* module, void* data) {
 }
 
 BOOL OSLinkFixed(OSModuleInfo* module, void* data) {
-    if (module->moduleType != 3) {
+    if (module->moduleType > 3 || module->moduleType < 3) {
         return FALSE;
     }
     return Link(module, data, 1);

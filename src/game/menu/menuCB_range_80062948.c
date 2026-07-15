@@ -134,7 +134,7 @@ void menuCBPokemonEntryTexWorkInit(void)
 
 /* Address: 0x80069A08 | Size: 0x58 */
 #pragma push
-#pragma scheduling off
+#pragma scheduling on
 #pragma peephole off
 s32 menuCBPokemonEntryDispPokemonFace(void* ctx, UICmdMsg* msg, s32 group, s32 slot)
 {
@@ -193,10 +193,9 @@ s32 fn_80068738(void)
     s32 i;
 
     windowGetKeyInfo();
-    entry = lbl_803A9EA0;
     for (i = 0; i < 4; i++) {
+        entry = &lbl_803A9EA0[i * 0x1A];
         fn_80068418(entry, i + 1);
-        entry += 0x1A;
     }
     return 0;
 }
@@ -204,7 +203,7 @@ s32 fn_80068738(void)
 
 /* Address: 0x80068F84 | Size: 0xC4 */
 #pragma push
-#pragma scheduling on
+#pragma scheduling off
 #pragma peephole off
 void fn_80068F84(void)
 {
@@ -214,20 +213,57 @@ void fn_80068F84(void)
         u32 value;
         u8 _8[4];
     } PokemonEntryWork;
-    PokemonEntryWork* entry;
+    PokemonEntryWork* entry0;
+    PokemonEntryWork* entry1;
+    PokemonEntryWork* entry2;
+    PokemonEntryWork* entry3;
+    PokemonEntryWork* entry4;
+    PokemonEntryWork* entry5;
     u8* group;
-    s32 i;
-    s32 j;
+    u32 pairs;
 
     *(u32*) &lbl_803A9F08[0x2C] = 0;
     lbl_803A9F08[0xCD84] = 0;
     group = lbl_803A9F08;
-    for (i = 0; i < 4; i++, group += 0x48) {
-        entry = (PokemonEntryWork*) &group[0x30];
-        for (j = 0; j < 6; j++) {
-            entry[j].active = 0;
-            entry[j].value = 0;
-        }
+    for (pairs = 0; pairs < 2; pairs++) {
+        entry0 = (PokemonEntryWork*) &group[0x30];
+        entry0->active = 0;
+        entry1 = entry0 + 1;
+        entry2 = entry0 + 2;
+        entry3 = entry0 + 3;
+        entry0->value = 0;
+        entry4 = entry0 + 4;
+        entry5 = entry0 + 5;
+        group += 0x48;
+        entry1->active = 0;
+        entry0 = (PokemonEntryWork*) &group[0x30];
+        group += 0x48;
+        entry1->value = 0;
+        entry1 = entry0 + 1;
+        entry2->active = 0;
+        entry2->value = 0;
+        entry2 = entry0 + 2;
+        entry3->active = 0;
+        entry3->value = 0;
+        entry3 = entry0 + 3;
+        entry4->active = 0;
+        entry4->value = 0;
+        entry4 = entry0 + 4;
+        entry5->active = 0;
+        entry5->value = 0;
+        entry5 = entry0 + 5;
+        entry0->active = 0;
+        entry0->value = 0;
+        entry1->active = 0;
+        entry1->value = 0;
+        entry2->active = 0;
+        entry2->value = 0;
+        entry3->active = 0;
+        entry3->value = 0;
+        entry4->active = 0;
+        entry4->value = 0;
+        entry5->active = 0;
+        entry5->value = 0;
     }
 }
 #pragma pop

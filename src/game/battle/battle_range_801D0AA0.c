@@ -12,12 +12,12 @@ u8 fn_801D0AA0(u32 index)
 {
     extern void* savedataGetStatus(u32, u32);
     extern void* heroBiosGetPokemonPtr(void*, u16);
-    extern u8 pokemonCheckValid(void*);
+    extern u32 pokemonCheckValid(void*);
     extern u8 pokemonBiosGetCatchBallId(void*);
     void* pokemon;
 
     pokemon = heroBiosGetPokemonPtr(savedataGetStatus(0, 2), (u16)index);
-    if (!pokemonCheckValid(pokemon)) {
+    if ((u8)pokemonCheckValid(pokemon) == 0) {
         return 0;
     }
     return pokemonBiosGetCatchBallId(pokemon);

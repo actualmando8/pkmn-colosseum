@@ -499,13 +499,12 @@ void fn_80165F84(void)
 #pragma peephole off
 void fn_80165FDC(u32 id)
 {
-    const char* message = lbl_802736CC;
     s32 status;
 
     while (1) {
         status = fn_8017B2CC(id);
         if (status < 0) {
-            GSlogWrite(message, id);
+            GSlogWrite(lbl_802736CC, id);
         }
         if (status == 0) {
             break;

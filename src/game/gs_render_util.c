@@ -687,7 +687,7 @@ void fn_800D2150(GSRenderCamera* camera, u32 x0, u32 y0, u32 x1, u32 y1) {
     if ((u16)y0 > 0x1de) y0 = 0x1de;
     if ((u16)x1 > 0x27f) x1 = 0x27f;
     if ((u16)y1 > 0x1df) y1 = 0x1df;
-    HSD_CObjSetScissorx4(camera->cobj, x0, (u16)(x1 + 1), y0, (u16)(y1 + 1));
+    HSD_CObjSetScissorx4(camera->cobj, (u16)x0, (u16)(x1 + 1), (u16)y0, (u16)(y1 + 1));
 }
 
 /* ==================================================================

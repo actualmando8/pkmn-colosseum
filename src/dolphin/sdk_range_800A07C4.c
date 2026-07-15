@@ -173,11 +173,9 @@ void __OSInitSystemCall(void) {
     extern void DCFlushRangeNoSync(void* addr, u32 size);
     extern void ICInvalidateRange(void* addr, u32 size);
     void* vector;
-    u32 size;
 
     vector = (void*)0x80000C00;
-    size = (u32)__OSSystemCallVectorEnd - (u32)__OSSystemCallVectorStart;
-    memcpy(vector, __OSSystemCallVectorStart, size);
+    memcpy(vector, __OSSystemCallVectorStart, (u32)__OSSystemCallVectorEnd - (u32)__OSSystemCallVectorStart);
     DCFlushRangeNoSync(vector, 0x100);
     __sync();
     ICInvalidateRange(vector, 0x100);

@@ -46,45 +46,46 @@ void* menuSpriteBiosGetPtr(u32 idx) {
 }
 
 void* menuItemBiosSetXY(s32 idx, s16 x, s16 y) {
+    s16* item;
+
     if ((u32)idx >= lbl_80478968) {
-        return NULL;
+        item = NULL;
+    } else {
+        item = (s16*)(lbl_802EF0A8 + (u32)idx * 0x1C);
     }
-    {
-        s16* item = (s16*)(lbl_802EF0A8 + (u32)idx * 0x1C);
-        if (item == NULL) {
-            return NULL;
-        }
+    if (item != NULL) {
         item[1] = x;
         item[2] = y;
-        return item;
     }
+    return item;
 }
 
 u32 menuItemBiosGetSelectFlag(u32 idx) {
+    u8* item;
+
     if (idx >= lbl_80478968) {
-        return 0;
+        item = NULL;
+    } else {
+        item = lbl_802EF0A8 + (u32)idx * 0x1C;
     }
-    {
-        u8* item = lbl_802EF0A8 + (u32)idx * 0x1C;
-        if (item == NULL) {
-            return 0;
-        }
+    if (item != NULL) {
         return item[0] & 0x80 ? 1 : 0;
     }
+    return 0;
 }
 
 void* menuItemBiosSetSelectFlag(u32 idx, u32 flag) {
+    u8* item;
+
     if (idx >= lbl_80478968) {
-        return NULL;
+        item = NULL;
+    } else {
+        item = lbl_802EF0A8 + (u32)idx * 0x1C;
     }
-    {
-        u8* item = lbl_802EF0A8 + (u32)idx * 0x1C;
-        if (item == NULL) {
-            return NULL;
-        }
-        item[0] = (item[0] & 0x7F) | (u8)((flag << 7) & 0x80);
-        return item;
+    if (item != NULL) {
+        item[0] = (u8)((flag << 7) & 0x80) | (item[0] & ~0x80);
     }
+    return item;
 }
 
 void* menuItemBiosGetPtr(s32 idx) {
@@ -115,23 +116,23 @@ void menuDataBiosGetXY(s32 idx, s16* x, s16* y) {
 u32 menuDataBiosSetXY(s32 idx, s16 x, s16 y) {
     if (idx < 0) {
         idx = 0;
-    } else {
-        if ((u32)idx >= lbl_80478848) {
-            idx = 1;
-        }
+    }
+    if ((u32)idx >= lbl_80478848) {
+        idx = 1;
     }
     {
         s16* data = (s16*)(lbl_802E2DB8 + idx * 0x1C);
         data[3] = x;
         data[4] = y;
+        return (u32)data;
     }
-    return (u32)idx;
 }
 
 u32 menuDataBiosGetType(s32 idx) {
     if (idx < 0) {
         idx = 0;
-    } else if ((u32)idx >= lbl_80478848) {
+    }
+    if ((u32)idx >= lbl_80478848) {
         idx = 1;
     }
     return ((u8*)(lbl_802E2DB8 + (u32)idx * 0x1C))[0x2];
@@ -140,7 +141,8 @@ u32 menuDataBiosGetType(s32 idx) {
 void* menuDataBiosGetPtr(s32 idx) {
     if (idx < 0) {
         idx = 0;
-    } else if ((u32)idx >= lbl_80478848) {
+    }
+    if ((u32)idx >= lbl_80478848) {
         idx = 1;
     }
     return (void*)(lbl_802E2DB8 + (u32)idx * 0x1C);

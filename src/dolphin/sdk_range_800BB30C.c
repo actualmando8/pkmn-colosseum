@@ -147,8 +147,8 @@ void fn_800BB780(u32 dstCoord, u32 func, u32 srcParam, u32 mtx,
     value = (value & ~0x80000U) | (arg8 << 19);
     value = (value & ~0x100000U) | (bias << 20);
 
-    command = dstCoord << 24;
-    command |= value & 0xFFFFFF;
+    command = value & 0xFFFFFF;
+    command |= dstCoord << 24;
     GX_BP_REG(command);
     p->field_002 = 0;
 }
@@ -233,20 +233,19 @@ void GXSetTevOp(s32 stage, u32 mode) {
         color = &table[mode];
         alpha = color + 10;
     } else {
-        color = &table[mode];
-        alpha = &table[mode];
-        color += 5;
-        alpha += 15;
+        u32* base = &table[mode];
+        color = base + 5;
+        alpha = base + 15;
     }
 
     p = gx;
     colorReg = p->tevColorEnv[stage];
-    colorReg = (colorReg & 0xFF000000) | *color;
+    colorReg = (colorReg & 0xFF000000) | (*color & 0xFFFFFF);
     GX_BP_REG(colorReg);
     p->tevColorEnv[stage] = colorReg;
 
     alphaReg = p->tevAlphaEnv[stage];
-    alphaReg = (alphaReg & 0xFF00000F) | *alpha;
+    alphaReg = (alphaReg & 0xFF00000F) | (*alpha & 0x00FFFFF0);
     GX_BP_REG(alphaReg);
     p->tevAlphaEnv[stage] = alphaReg;
     p->field_002 = 0;
@@ -256,10 +255,10 @@ void fn_800BC1A0(u32 stage, u32 a, u32 b, u32 c, u32 d) {
     GXData_800BB30C* p = gx;
     u32 reg = p->tevColorEnv[stage];
 
-    reg = (reg & ~0xF000U) | ((a << 12) & 0xF000U);
-    reg = (reg & ~0x0F00U) | ((b << 8) & 0x0F00U);
-    reg = (reg & ~0x00F0U) | ((c << 4) & 0x00F0U);
-    reg = (reg & ~0x000FU) | (d & 0x000FU);
+    reg = __rlwimi(reg, a, 12, 16, 19);
+    reg = __rlwimi(reg, b, 8, 20, 23);
+    reg = __rlwimi(reg, c, 4, 24, 27);
+    reg = __rlwimi(reg, d, 0, 28, 31);
     GX_BP_REG(reg);
     p->tevColorEnv[stage] = reg;
     p->field_002 = 0;
@@ -271,10 +270,10 @@ void fn_800BC1E4(u32 stage, GXTevAlphaArg_800BB30C a,
     GXData_800BB30C* p = gx;
     u32 reg = p->tevAlphaEnv[stage];
 
-    reg = (reg & ~0xE000U) | (a << 13);
-    reg = (reg & ~0x1C00U) | (b << 10);
-    reg = (reg & ~0x0380U) | (c << 7);
-    reg = (reg & ~0x0070U) | (d << 4);
+    reg = __rlwimi(reg, a, 13, 16, 18);
+    reg = __rlwimi(reg, b, 10, 19, 21);
+    reg = __rlwimi(reg, c, 7, 22, 24);
+    reg = __rlwimi(reg, d, 4, 25, 27);
     GX_BP_REG(reg);
     p->tevAlphaEnv[stage] = reg;
     p->field_002 = 0;
@@ -282,26 +281,24 @@ void fn_800BC1E4(u32 stage, GXTevAlphaArg_800BB30C a,
 
 void fn_800BC228(u32 stage, s32 op, u32 bias, u32 scale, u32 clamp,
                  u32 outReg) {
-    u32 result;
     u32 reg;
     GXData_800BB30C* p;
 
     reg = gx->tevColorEnv[stage];
     reg = __rlwimi(reg, op, 18, 13, 13);
-    result = reg;
     if (op <= 1) {
-        result = __rlwimi(__rlwimi(result, scale, 20, 10, 11), bias, 16,
-                          14, 15);
+        reg = __rlwimi(reg, scale, 20, 10, 11);
+        reg = __rlwimi(reg, bias, 16, 14, 15);
     } else {
-        result = __rlwimi(__rlwimi(result, op, 19, 10, 11), 3, 16, 14,
-                          15);
+        reg = __rlwimi(reg, op, 19, 10, 11);
+        reg = __rlwimi(reg, 3, 16, 14, 15);
     }
-    result = __rlwimi(result, clamp, 19, 12, 12);
-    result = __rlwimi(result, outReg, 22, 8, 9);
+    reg = __rlwimi(reg, clamp, 19, 12, 12);
+    reg = __rlwimi(reg, outReg, 22, 8, 9);
     GX_FIFO_U8 = 0x61;
     p = gx;
-    GX_FIFO_U32 = result;
-    p->tevColorEnv[stage] = result;
+    GX_FIFO_U32 = reg;
+    p->tevColorEnv[stage] = reg;
     p->field_002 = 0;
 }
 
@@ -416,8 +413,8 @@ void fn_800BC3E0(u32 id, GXColor_800BC2F8 color) {
 }
 
 void fn_800BC454(s32 stage, u32 value) {
-    GXData_800BB30C* p;
-    u32* reg = &gx->field_1B0[stage >> 1];
+    GXData_800BB30C* p = gx;
+    u32* reg = &p->field_1B0[stage >> 1];
 
     if (stage & 1) {
         *reg = (*reg & ~0x7C000U) | (value << 14);
@@ -425,14 +422,13 @@ void fn_800BC454(s32 stage, u32 value) {
         *reg = (*reg & ~0x1F0U) | (value << 4);
     }
 
-    p = gx;
     GX_BP_REG(*reg);
     p->field_002 = 0;
 }
 
 void fn_800BC4C0(s32 stage, u32 value) {
-    GXData_800BB30C* p;
-    u32* reg = &gx->field_1B0[stage >> 1];
+    GXData_800BB30C* p = gx;
+    u32* reg = &p->field_1B0[stage >> 1];
 
     if (stage & 1) {
         *reg = (*reg & ~0xF80000U) | (value << 19);
@@ -440,7 +436,6 @@ void fn_800BC4C0(s32 stage, u32 value) {
         *reg = (*reg & ~0x3E00U) | (value << 9);
     }
 
-    p = gx;
     GX_BP_REG(*reg);
     p->field_002 = 0;
 }
@@ -532,7 +527,7 @@ void fn_800BCCDC(u8 enable, u16 center, GXFogAdjTable_800BCCDC* table) {
         for (i = 0; i < 5; i++, values += 2) {
             reg = values[1] << 12;
             reg = __rlwimi(reg, values[0], 0, 20, 31);
-            reg = __rlwimi(reg, 0xE9 + i, 24, 0, 7);
+            reg = (reg & 0xFFFFFFU) | ((0xE9 + i) << 24);
             GX_BP_REG(reg);
         }
     }
@@ -637,23 +632,17 @@ void fn_800BD454(f32* projection) {
 void GXLoadPosMtxImm(f32 mtx[3][4], u32 id) {
     f64* pairs = (f64*)mtx;
     volatile f64* fifo = (volatile f64*)0xCC008000;
-    f64 pair0 = pairs[0];
-    f64 pair1 = pairs[1];
-    f64 pair2 = pairs[2];
-    f64 pair3 = pairs[3];
-    f64 pair4 = pairs[4];
-    f64 pair5 = pairs[5];
     u32 addr = id * 4;
     u32 reg = addr | 0xB0000;
 
     GX_FIFO_U8 = 0x10;
     GX_FIFO_U32 = reg;
-    *fifo = pair0;
-    *fifo = pair1;
-    *fifo = pair2;
-    *fifo = pair3;
-    *fifo = pair4;
-    *fifo = pair5;
+    *fifo = pairs[0];
+    *fifo = pairs[1];
+    *fifo = pairs[2];
+    *fifo = pairs[3];
+    *fifo = pairs[4];
+    *fifo = pairs[5];
 }
 
 void GXLoadNrmMtxImm(f32 mtx[3][4], u32 id) {
@@ -703,31 +692,21 @@ void GXLoadTexMtxImm(f32 mtx[3][4], u32 id, s32 type) {
     if (type == 0) {
         f64* pairs = (f64*)mtx;
         volatile f64* fifo = (volatile f64*)0xCC008000;
-        f64 pair5 = pairs[5];
-        f64 pair4 = pairs[4];
-        f64 pair3 = pairs[3];
-        f64 pair2 = pairs[2];
-        f64 pair1 = pairs[1];
-        f64 pair0 = pairs[0];
 
-        *fifo = pair0;
-        *fifo = pair1;
-        *fifo = pair2;
-        *fifo = pair3;
-        *fifo = pair4;
-        *fifo = pair5;
+        *fifo = pairs[0];
+        *fifo = pairs[1];
+        *fifo = pairs[2];
+        *fifo = pairs[3];
+        *fifo = pairs[4];
+        *fifo = pairs[5];
     } else {
         f64* pairs = (f64*)mtx;
         volatile f64* fifo = (volatile f64*)0xCC008000;
-        f64 pair3 = pairs[3];
-        f64 pair2 = pairs[2];
-        f64 pair1 = pairs[1];
-        f64 pair0 = pairs[0];
 
-        *fifo = pair0;
-        *fifo = pair1;
-        *fifo = pair2;
-        *fifo = pair3;
+        *fifo = pairs[0];
+        *fifo = pairs[1];
+        *fifo = pairs[2];
+        *fifo = pairs[3];
     }
 }
 
@@ -822,7 +801,7 @@ void fn_800BCE30(u32 zCompLoc) {
     GXData_800BB30C* p = gx;
     u32 value = p->field_1D0;
 
-    value = (value & 0x0FFFFFFF) | ((zCompLoc << 3) & 0x10000000);
+    value = __rlwimi(value, zCompLoc, 3, 28, 28);
     GX_BP_REG(value);
     p->field_1D0 = value;
     p->field_002 = 0;
@@ -832,7 +811,7 @@ void fn_800BCE5C(u32 zCompLoc) {
     GXData_800BB30C* p = gx;
     u32 value = p->field_1D0;
 
-    value = (value & 0xF7FFFFFF) | (((s32)zCompLoc << 4) & 0x08000000);
+    value = __rlwimi(value, zCompLoc, 4, 27, 27);
     GX_BP_REG(value);
     p->field_1D0 = value;
     p->field_002 = 0;
@@ -888,7 +867,7 @@ void fn_800BCFDC(u32 zCompLoc) {
     GXData_800BB30C* p = gx;
     u32 value = p->field_1D0;
 
-    value = (value & ~0x20000000U) | ((zCompLoc << 29) & 0x20000000);
+    value = __rlwimi(value, zCompLoc, 2, 29, 29);
     GX_BP_REG(value);
     p->field_1D0 = value;
     p->field_002 = 0;
@@ -898,11 +877,8 @@ void GXSetDstAlpha(u32 enable, u32 alpha) {
     GXData_800BB30C* p = gx;
     u32 value = p->dstAlpha;
 
-    value &= 0x00FFFFFFU;
-    value |= (alpha << 24);
-
-    value &= 0xFF7FFFFFU;
-    value |= ((enable << 23) & 0x00800000U);
+    value = __rlwimi(value, alpha & 0xFFU, 0, 24, 31);
+    value = __rlwimi(value, enable & 0xFFU, 8, 23, 23);
 
     GX_BP_REG(value);
     p->dstAlpha = value;

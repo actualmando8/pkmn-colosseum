@@ -306,10 +306,12 @@ void fn_80038124(void* window, PdaSprite* sprite)
     sprite->value = lbl_8047BA74 - lbl_8047A478;
 }
 
-void fn_800376C8(s32 arg0, s32 arg1, s32 arg2)
+#pragma scheduling off
+void fn_800376C8(void)
 {
-    fn_800FB680(arg0, arg1, arg2, lbl_8047A480);
+    fn_800FB680(0, 0, -1, lbl_8047A480);
 }
+#pragma scheduling reset
 
 #pragma peephole off
 void fn_800376F8(void* window, volatile PdaSprite* sprite)
@@ -549,6 +551,7 @@ s32 fn_800382E8(PdaMenuState* state)
 #pragma peephole reset
 
 #pragma peephole off
+#pragma scheduling off
 s32 fn_80038380(PdaSelectionWork* work)
 {
     extern PdaKeyInfo* windowGetKeyInfo(void);
@@ -578,6 +581,7 @@ s32 fn_80038380(PdaSelectionWork* work)
     }
     return 0;
 }
+#pragma scheduling reset
 #pragma peephole reset
 
 #pragma peephole off
@@ -819,11 +823,13 @@ s32 fn_80039970(void* window, PdaSprite* sprite)
 }
 #pragma peephole reset
 
+#pragma scheduling off
 s32 fn_80039A50(PdaSprite* sprite)
 {
     fn_800FB680(0, 0, *(s32*)((u8*)sprite + 0x88), (void*)lbl_8047A4B4);
     return 0;
 }
+#pragma scheduling reset
 
 void fn_80039F44(void* button)
 {
@@ -1031,11 +1037,13 @@ void fn_8003C13C(PdaSprite* alphaSprite, PdaSprite* sprite)
 }
 #pragma peephole reset
 
+#pragma peephole off
 void fn_8003C21C(PdaSprite* sprite, PdaEvent* event)
 {
     (void)event;
-    sprite->alphaByte = (u8)(s32)(lbl_8047BAC0 * lbl_803A6748.alphaScale);
+    sprite->alphaByte = lbl_8047BAC0 * lbl_803A6748.alphaScale;
 }
+#pragma peephole reset
 
 void fn_8003C24C(PdaSprite* sprite, PdaEvent* event)
 {

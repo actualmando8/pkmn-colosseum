@@ -2220,7 +2220,6 @@ void fn_8017DAB8(FSYSSlot* slot) {
             firstTable = (u32*)(archive + *(u32*)(archive + 0x18));
             entryTable = (u32*)(archive + firstTable[0]);
             entry = (FSYSFileEntry*)(archive + entryTable[i]);
-            e2 = entry;
         } else {
             entry = NULL;
             e2 = entry;

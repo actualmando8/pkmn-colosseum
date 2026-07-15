@@ -42,7 +42,9 @@ s32 TRKPostEvent(TRKEvent* event) {
         result = 0x100;
     } else {
         s32 index = (queue->next + queue->count) % 2;
-        fn_80003488(&queue->events[index], event, sizeof(TRKEvent));
+        u8* slot = (u8*)queue + index * (s32)sizeof(TRKEvent);
+        slot += 12;
+        fn_80003488(slot, event, sizeof(TRKEvent));
         lbl_803FCDD8.events[index].id = lbl_803FCDD8.eventID;
         lbl_803FCDD8.eventID++;
         if (lbl_803FCDD8.eventID < 0x100) {

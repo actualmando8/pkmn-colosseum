@@ -553,10 +553,10 @@ s32 fn_801CBA90(void)
 #pragma scheduling off
 s32 fn_801CBAB8(void)
 {
-    s32 done;
     s32 state;
-    s32 result;
+    s32 done;
     s32 input;
+    s32 result;
 
     done = state = result = 0;
 

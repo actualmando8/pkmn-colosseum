@@ -3973,14 +3973,9 @@ asm void pokemonGetAnnonKatati(void) {
 #include "src/game/gs_field_world_fn_80122334.inc"
 }
 #else
-#pragma optimization_level 1
+#pragma optimization_level 2
 u8 pokemonGetAnnonKatati(u32 val) {
-    u32 s;
-    s = (val >> 18) & 0xC0;
-    s = (s & 0xFFFFFFCFu) | ((val >> 12) & 0x30);
-    s = (s & 0xFFFFFFF3u) | ((val >> 6) & 0x0C);
-    s = (s & 0xFFFFFFFCu) | (val & 0x03);
-    return (u8)(s % 28);
+    return (u8)((((val >> 18) & 0xC0) | ((val >> 12) & 0x30) | ((val >> 6) & 0x0C) | (val & 0x03)) % 28);
 }
 #pragma optimization_level reset
 #endif

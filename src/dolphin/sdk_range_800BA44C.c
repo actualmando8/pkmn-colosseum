@@ -87,10 +87,54 @@ typedef struct GXData_800BA4C8 {
 typedef union GXFifo_800BA4C8 {
     u8 u8;
     u32 u32;
+    f32 f32;
 } GXFifo_800BA4C8;
 
 extern GXData_800BA4C8* const gx;
 volatile GXFifo_800BA4C8 GXWGFifo_800BA5BC : 0xCC008000;
+
+typedef struct GXLightObj_800BA44C {
+    u8 pad_00[0xC];
+    u32 color;
+    f32 a0;
+    f32 a1;
+    f32 a2;
+    f32 k0;
+    f32 k1;
+    f32 k2;
+    f32 px;
+    f32 py;
+    f32 pz;
+    f32 nx;
+    f32 ny;
+    f32 nz;
+} GXLightObj_800BA44C;
+
+void GXLoadLightObjImm(GXLightObj_800BA44C* light, u32 lightID) {
+    u32 idx = 31 - __cntlzw(lightID);
+    u32 addr = ((idx & 7) << 4) + 0x600;
+
+    GXWGFifo_800BA5BC.u8 = 0x10;
+    GXWGFifo_800BA5BC.u32 = addr | 0xF0000;
+    GXWGFifo_800BA5BC.u32 = 0;
+    GXWGFifo_800BA5BC.u32 = 0;
+    GXWGFifo_800BA5BC.u32 = 0;
+    GXWGFifo_800BA5BC.u32 = light->color;
+    GXWGFifo_800BA5BC.f32 = light->a0;
+    GXWGFifo_800BA5BC.f32 = light->a1;
+    GXWGFifo_800BA5BC.f32 = light->a2;
+    GXWGFifo_800BA5BC.f32 = light->k0;
+    GXWGFifo_800BA5BC.f32 = light->k1;
+    GXWGFifo_800BA5BC.f32 = light->k2;
+    GXWGFifo_800BA5BC.f32 = light->px;
+    GXWGFifo_800BA5BC.f32 = light->py;
+    GXWGFifo_800BA5BC.f32 = light->pz;
+    GXWGFifo_800BA5BC.f32 = light->nx;
+    GXWGFifo_800BA5BC.f32 = light->ny;
+    GXWGFifo_800BA5BC.f32 = light->nz;
+
+    gx->bpSent = 1;
+}
 
 #define SET_REG_FIELD_800BA4C8(reg, size, shift, value)                       \
     do {                                                                       \
@@ -99,23 +143,18 @@ volatile GXFifo_800BA4C8 GXWGFifo_800BA5BC : 0xCC008000;
     } while (0)
 
 void fn_800BA4C8(GXChannelID_800BA4C8 chan, GXColor_800BA4C8 ambColor) {
-    GXData_800BA4C8* gxLocal;
-    u32 colorIndex;
-    volatile GXFifo_800BA4C8* fifo;
     u32 reg;
-    u32 rgb;
+    u32 colorIndex;
 
     switch (chan) {
     case GX_COLOR0_800BA4C8:
         reg = gx->ambColor[0];
-        rgb = *(u32*)&ambColor >> 8;
-        SET_REG_FIELD_800BA4C8(reg, 24, 8, rgb);
+        SET_REG_FIELD_800BA4C8(reg, 24, 8, *(u32*)&ambColor >> 8);
         colorIndex = 0;
         break;
     case GX_COLOR1_800BA4C8:
         reg = gx->ambColor[1];
-        rgb = *(u32*)&ambColor >> 8;
-        SET_REG_FIELD_800BA4C8(reg, 24, 8, rgb);
+        SET_REG_FIELD_800BA4C8(reg, 24, 8, *(u32*)&ambColor >> 8);
         colorIndex = 1;
         break;
     case GX_ALPHA0_800BA4C8:
@@ -140,13 +179,11 @@ void fn_800BA4C8(GXChannelID_800BA4C8 chan, GXColor_800BA4C8 ambColor) {
         return;
     }
 
-    gxLocal = gx;
-    fifo = (volatile GXFifo_800BA4C8*)0xCC008000;
-    fifo->u8 = 0x10;
-    fifo->u32 = colorIndex + 0x100A;
-    fifo->u32 = reg;
-    gxLocal->bpSent = 1;
-    gxLocal->ambColor[colorIndex] = reg;
+    GXWGFifo_800BA5BC.u8 = 0x10;
+    GXWGFifo_800BA5BC.u32 = colorIndex + 0x100A;
+    GXWGFifo_800BA5BC.u32 = reg;
+    gx->bpSent = 1;
+    gx->ambColor[colorIndex] = reg;
 }
 
 void fn_800BA5BC(GXChannelID_800BA4C8 chan, GXColor_800BA4C8 matColor) {

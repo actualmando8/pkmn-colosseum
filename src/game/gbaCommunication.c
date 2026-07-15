@@ -5808,13 +5808,16 @@ u32 PPCMffpscr(void) {
 }
 
 void PPCMtfpscr(u32 val) {
-    union {
+    volatile union {
         f64 value;
-        u32 words[2];
+        struct {
+            u32 hi;
+            u32 lo;
+        } words;
     } fpscr;
 
-    fpscr.words[0] = 0;
-    fpscr.words[1] = val;
+    fpscr.words.hi = 0;
+    fpscr.words.lo = val;
     __setflm(fpscr.value);
 }
 
