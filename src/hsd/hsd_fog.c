@@ -1,173 +1,89 @@
 /**
  * @file hsd_fog.c
- * @brief HSD Fog and FogAdj implementation.
+ * @brief HSD ID table, Hash table and Fog implementation.
  *
- * Colosseum address: 0x8019B7C0 (HSD_FogAdjInit)
- * Adapted from doldecomp/melee src/sysdolphin/baselib/fog.c
+ * Colosseum address range: 0x8019B7C0 - 0x8019C690
+ * Adapted from doldecomp/melee src/sysdolphin/baselib/{fog,hash,id}.c
  */
 
 #include "hsd/hsd_fog.h"
 #include "hsd/hsd_aobj.h"
 #include "hsd/hsd_class.h"
 #include "hsd/hsd_debug.h"
+#include "hsd/hsd_hash.h"
+#include "hsd/hsd_id.h"
 #include "hsd/hsd_object.h"
 
 extern void* memcpy(void* dst, const void* src, u32 size);
+extern void* memset(void* dst, int val, u32 n);
 
-static void FogInfoInit(void);
-static void FogAdjInfoInit(void);
+/* The class-info objects for this unit live in the shared data TU
+ * (src/game/data/data_8036C720.c), so they are reached by their raw labels:
+ *   lbl_8036C7E8 == hsdFog     (HSD_FogInfo,    0x40 bytes)
+ *   lbl_8036C828 == hsdFogAdj  (HSD_FogAdjInfo, 0x3C bytes)
+ *   lbl_8036CC00 == hsdObj     (HSD_ObjInfo,    0x3C bytes)  [shared] */
+extern HSD_FogInfo lbl_8036C7E8;
+extern HSD_FogAdjInfo lbl_8036C828;
+extern HSD_ObjInfo lbl_8036CC00;
+#define hsdFog lbl_8036C7E8
+#define hsdFogAdj lbl_8036C828
+#define hsdObjInfo lbl_8036CC00
 
-static HSD_FogInfo hsdFog = { FogInfoInit };
-static HSD_FogAdjInfo hsdFogAdj = { FogAdjInfoInit };
+/* String literals, held in the shared rodata/sdata2 TUs. */
+extern const char lbl_802747B8[];   /* "sysdolphin_base_library" */
+extern const char lbl_802747D0[];   /* "hsd_fogadj"              */
+extern const char lbl_8047DA60;     /* "hsd_fog"                 */
 
-/* ========================================================================= */
-/*  FogAdj                                                                   */
-/* ========================================================================= */
-
-void HSD_FogAdjInit(HSD_FogAdj* fogadj, HSD_FogAdjDesc* desc)
-{
-    if (fogadj == NULL || desc == NULL) {
-        return;
-    }
-    fogadj->center = (s16) desc->center;
-    fogadj->width = desc->width;
-    memcpy(fogadj->mtx, desc->mtx, sizeof(f32) * 16);
-}
-
-HSD_FogAdj* HSD_FogAdjLoadDesc(HSD_FogAdjDesc* desc)
-{
-    HSD_FogAdj* fogadj;
-
-    if (desc == NULL) {
-        return NULL;
-    }
-
-    fogadj = HSD_FogAdjAlloc();
-    HSD_FogAdjInit(fogadj, desc);
-    return fogadj;
-}
-
-HSD_FogAdj* HSD_FogAdjAlloc(void)
-{
-    HSD_FogAdj* fogadj;
-    fogadj = (HSD_FogAdj*) hsdNew(&hsdFogAdj.parent.parent);
-    HSD_ASSERT(0, fogadj);
-    return fogadj;
-}
-
-/* ========================================================================= */
-/*  Fog                                                                      */
-/* ========================================================================= */
-
-void HSD_FogInit(HSD_Fog* fog, HSD_FogDesc* desc)
-{
-    if (fog == NULL || desc == NULL) {
-        return;
-    }
-    fog->type = desc->type;
-    fog->start = desc->start;
-    fog->end = desc->end;
-    fog->color = desc->color;
-    fog->fog_adj = HSD_FogAdjLoadDesc(desc->fogadjdesc);
-}
-
-/* NOTE: HSD_FogLoadDesc's real body lives in the address-scaffolded section
- * below (0x8019BB78); that's the disassembled target. */
-
-HSD_Fog* HSD_FogAlloc(void)
-{
-    HSD_Fog* fog;
-    fog = (HSD_Fog*) hsdNew(&hsdFog.parent.parent);
-    HSD_ASSERT(0, fog);
-    return fog;
-}
-
-void HSD_FogReqAnim(HSD_Fog* fog, f32 frame)
-{
-    if (fog != NULL) {
-        HSD_AObjReqAnim(fog->aobj, frame);
-    }
-}
-
-void HSD_FogInterpretAnim(HSD_Fog* fog)
-{
-    if (fog == NULL) {
-        return;
-    }
-    /* Interpret AObj -> update fog parameters */
-}
-
-/* ========================================================================= */
-/*  Class init                                                               */
-/* ========================================================================= */
-
-/* NOTE: FogRelease/FogInfoInit's real bodies live in the address-scaffolded
- * section below (0x8019B874 / 0x8019B808); those are the disassembled
- * targets (FogInfoInit also wires the FogUpdateFunc vtable slot). */
-
-static void FogAdjRelease(HSD_Class* o)
-{
-    HSD_FogAdj* fogadj = (HSD_FogAdj*) o;
-    HSD_AObjRemove(fogadj->aobj);
-    HSD_OBJECT_PARENT_INFO(&hsdFogAdj)->release(o);
-}
-
-static void FogAdjInfoInit(void)
-{
-    hsdInitClassInfo(HSD_CLASS_INFO(&hsdFogAdj), HSD_CLASS_INFO(&hsdObj),
-                     "sysdolphin_base_library", "hsd_fogadj",
-                     sizeof(HSD_FogAdjInfo), sizeof(HSD_FogAdj));
-    HSD_CLASS_INFO(&hsdFogAdj)->release = FogAdjRelease;
-}
+static void FogRelease(HSD_Fog* fog);
+void FogUpdateFunc(HSD_Fog* fog, s32 type, f32* value);
 
 /* ===================================================================
- * Generated: 0 pattern-matched + 13 stubs
  * Range: 0x8019B7C0 - 0x8019C690
  * =================================================================== */
+
+/* 0x8019B7C0 | 0x48 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+static void FogAdjInfoInit(void)
+{
+    hsdInitClassInfo(HSD_CLASS_INFO(&hsdFogAdj), HSD_CLASS_INFO(&hsdObjInfo),
+                     (char*) lbl_802747B8, (char*) lbl_802747D0,
+                     sizeof(HSD_FogAdjInfo), sizeof(HSD_FogAdj));
+}
+#pragma pop
 
 /* 0x8019B808 | 0x6C */
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void FogRelease(HSD_Fog* o);   /* inferred signature (glm5): FogRelease virtual */
-extern void FogUpdateFunc(HSD_Fog* fog, s32 type, f32* value);   /* inferred glm6: FogInterpretAnim vtable slot (0x3C) */
-extern u8 lbl_8036C7E8[];
-extern u8 lbl_8036CC00[];
-extern u8 lbl_802747B8[];
-extern u8 lbl_8047DA60;
-static void FogInfoInit(void) {
-    hsdInitClassInfo((HSD_ClassInfo*) lbl_8036C7E8,
-                     (HSD_ClassInfo*) lbl_8036CC00, (char*) lbl_802747B8,
-                     (char*) &lbl_8047DA60, 0x40, 0x20);
-    ((void**)lbl_8036C7E8)[0x30/4] = (void*)FogRelease;
-    ((void**)lbl_8036C7E8)[0x3c/4] = (void*)FogUpdateFunc;
+static void FogInfoInit(void)
+{
+    hsdInitClassInfo(HSD_CLASS_INFO(&hsdFog), HSD_CLASS_INFO(&hsdObjInfo),
+                     (char*) lbl_802747B8, (char*) &lbl_8047DA60,
+                     sizeof(HSD_FogInfo), sizeof(HSD_Fog));
+    HSD_CLASS_INFO(&hsdFog)->release = (void (*)(HSD_Class*)) FogRelease;
+    hsdFog.update = FogUpdateFunc;
 }
+#pragma pop
 
 /* 0x8019B874 | 0xD4 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 1
 #pragma optimizewithasm off
-extern void fn_801C25E4(HSD_AObj* aobj);   /* inferred == HSD_AObjRemove */
-#if 0
-asm void FogRelease(void) {
-#include "src/hsd/hsd_fog_fn_8019B874.inc"
-}
-#else
-/* decompiled glm5: functional (TU not byte-measurable) */
-/* FogRelease virtual (vtable 0x30). Signature inferred: arg0 is the HSD_Fog. */
-void FogRelease(HSD_Fog* o)
+/* FogRelease virtual (class-info slot 0x30). */
+static void FogRelease(HSD_Fog* fog)
 {
-    HSD_FogAdj* fog_adj = o->fog_adj;
+    HSD_FogAdj* adj = fog->fog_adj;
 
-    if (fog_adj != NULL) {
-        if (ref_DEC(fog_adj)) {
-            hsdDelete(fog_adj);
+    if (adj != NULL) {
+        if (ref_DEC(adj)) {
+            hsdDelete(adj);
         }
     }
-    fn_801C25E4(o->aobj);
-    HSD_OBJECT_PARENT_INFO(&hsdFog)->release((HSD_Class*)o);
+    HSD_AObjRemove(fog->aobj);
+    HSD_OBJECT_PARENT_INFO(&hsdFog)->release((HSD_Class*) fog);
 }
-#endif
 #pragma pop
 
 /* 0x8019B948 | 0x230 */
@@ -193,12 +109,9 @@ asm void FogUpdateFunc(void) {
  *   0 start | 1 end | 2..5 color R/G/B/A | 6 fog_adj.center | 7 fog_adj.width
  *   8..0x15 are no-ops (jumptable falls through to the return).
  *
- * NOTE: HSD_FogAdj in include/hsd/hsd_fog.h is out of sync with the binary.
- * The real layout (consistent across 0x8019B948/BB78/BD18) is
- *   flags@0x08  center@0x0C  width@0x0E  mtx[4][4]@0x10
- * whereas the header has center@0x08/width@0x0A/mtx@0x0C and no flags field.
- * FogAdj fields are therefore accessed by binary offset below so the code is
- * faithful; the header should be corrected separately.
+ * HSD_FogAdj's header layout is verified against 0x8019B948/BB78/BD18:
+ *   flags@0x08  center@0x0C  width@0x0E  mtx[4][4]@0x10.
+ * The body retains explicit offsets to preserve the current codegen.
  */
 void FogUpdateFunc(HSD_Fog* fog, s32 type, f32* value)
 {
@@ -329,10 +242,9 @@ asm void HSD_FogLoadDesc(void) {
  * copies type/start/end/color from the desc (or zero-inits defaults when the
  * desc is NULL), then hsdNew()s a FogAdj from desc->fogadjdesc and links it.
  *
- * HSD_FogAdj binary layout differs from the header (see FogUpdateFunc note);
- * FogAdj fields use binary offsets. HSD_FogAdjDesc binary layout is likewise
+ * FogAdj fields retain explicit offsets for current codegen. HSD_FogAdjDesc is
  *   flags@0x00  center@0x04  width@0x06  mtx[4][4]@0x08
- * (header has center@0x00/width@0x02/mtx@0x04, no flags).
+ * as represented in include/hsd/hsd_fog.h.
  */
 HSD_Fog* HSD_FogLoadDesc(HSD_FogDesc* desc)
 {
@@ -421,8 +333,8 @@ asm void HSD_FogSet(void) {
  *   bit31 -> centre derived from fogadj->center, else centre = proj[0]+proj[8]/2
  *   bit30 -> width  from fogadj->width,  else width  = (s32)proj[8]
  *   bit29 -> matrix from fogadj->mtx,    else matrix rebuilt from fn_800BD454
- * FogAdj binary layout differs from the header (see FogUpdateFunc note), so its
- * fields are accessed by binary offset below.
+ * The header matches this layout; the body retains explicit offsets for the
+ * current codegen.
  */
 void HSD_FogSet(HSD_Fog* fog)
 {
@@ -520,7 +432,7 @@ void HSD_FogSet(HSD_Fog* fog)
 
 /* 0x8019BFE8 | 0x110 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 1
 #pragma optimizewithasm off
 extern u8 lbl_80274800[];
 extern char lbl_8047DA98;
@@ -529,44 +441,60 @@ asm void HSD_HashSearch(void) {
 #include "src/hsd/hsd_fog_HSD_HashSearch.inc"
 }
 #else
-/* decompiled glm5: functional (TU not byte-measurable) */
-/*
- * Generic class-based hash-table lookup. No typed header struct exists; layout
- * inferred from the .inc (same raw-access style as HSD_IDGetDataFromTable):
- *   table @0x00 HSD_ClassInfo* class_info ; @0x04 void** buckets ; @0x08 u32 nb
- *   node  @0x00 node* next               ; @0x04 void* key       ; @0x08 void* value
- *   class_info virtuals: hash @0x3C (idx = hash(table,key)) ;
- *                        cmp  @0x40 (cmp(table,a,b) == 0 means equal)
- * Signature inferred (glm5): returns the matched node's value (NULL if absent);
- * *found = 1 on hit / 0 on miss (only written when found != NULL).
+/**
+ * Walk the collision chain of bucket @p idx, returning the entry whose key the
+ * class's keycheck() reports as equal (0), or NULL. When @p ptr is non-NULL it
+ * additionally receives the address of the link that points at the entry.
  */
-typedef u32 (*HashKeyFn)(void* table, void* key);
-typedef u32 (*HashCmpFn)(void* table, void* a, void* b);
-
-void* HSD_HashSearch(void* table, void* key, u32* found)
+static inline HSD_HashEntry* HashSearchEntry(HSD_Hash* hash, s32 idx,
+                                             void* key, HSD_HashEntry** ptr)
 {
-    HSD_ClassInfo* info = *(HSD_ClassInfo**)table;
-    u32 idx = ((HashKeyFn) *(void**) ((u8*)info + 0x3C))(table, key);
-    u8* node;
-
-    if (idx >= *(u32*)((u8*)table + 0x08)) {
-        __assert((const char*) &lbl_8047DA98, 0x71, (const char*) lbl_80274800);
+    if (hash->table[idx] == NULL) {
+        return NULL;
     }
-
-    /* walk the collision chain for buckets[idx] */
-    node = (*(u8***) ((u8*)table + 0x04))[idx];
-    while (node != NULL) {
-        if (((HashCmpFn) *(void**) ((u8*)info + 0x40))
-                (table, *(void**) (node + 0x04), key) == 0) {
-            break;   /* equal key -> found */
+    if (ptr != NULL) {
+        HSD_HashEntry** entry;
+        for (entry = &hash->table[idx]; *entry != NULL;
+             entry = &(*entry)->next)
+        {
+            if (hash->parent.class_info->keycheck(hash, (*entry)->key, key) ==
+                0)
+            {
+                *ptr = (HSD_HashEntry*) entry;
+                return *entry;
+            }
         }
-        node = *(u8**) node;   /* next */
+    } else {
+        HSD_HashEntry* entry;
+        for (entry = hash->table[idx]; entry != NULL; entry = entry->next) {
+            if (hash->parent.class_info->keycheck(hash, entry->key, key) == 0)
+            {
+                return entry;
+            }
+        }
     }
+    return NULL;
+}
 
-    if (found != NULL) {
-        *found = (node != NULL);
+void* HSD_HashSearch(HSD_Hash* hash, void* key, s32* success)
+{
+    HSD_HashEntry* entry;
+    void* search_key;
+    u32 idx;
+
+    search_key = key;
+    idx = hash->parent.class_info->getidx(hash);
+    if (!(idx < hash->table_size)) {
+        __assert(&lbl_8047DA98, 0x71, (char*) lbl_80274800);
     }
-    return (node != NULL) ? *(void**) (node + 0x08) : NULL;
+    entry = HashSearchEntry(hash, idx, search_key, NULL);
+    if (success != NULL) {
+        *success = !!entry;
+    }
+    if (entry != NULL) {
+        return entry->value;
+    }
+    return NULL;
 }
 #endif
 #pragma pop
@@ -575,14 +503,22 @@ void* HSD_HashSearch(void* table, void* key, u32* found)
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern u8 lbl_804653A8[];
+/* 0x804653A8: the default (global) ID table. Defined as raw bss in
+ * src/game/data/bss_80465080.c; sizeof(HSD_IDTable) == 0x194. */
+extern HSD_IDTable lbl_804653A8;
+#define default_table lbl_804653A8
+
+static inline u32 hash(u32 id)
+{
+    return id % 0x65;
+}
 #if 0
 asm void _HSD_IDForgetMemory(void) {
 #include "src/hsd/hsd_fog__HSD_IDForgetMemory.inc"
 }
 #else
 void _HSD_IDForgetMemory(void) {
-    memset(lbl_804653A8, 0, 0x194);
+    memset(&default_table, 0, sizeof(HSD_IDTable));
 }
 #endif
 #pragma pop
@@ -596,27 +532,28 @@ asm void HSD_IDGetDataFromTable(void) {
 #include "src/hsd/hsd_fog_HSD_IDGetDataFromTable.inc"
 }
 #else
-#pragma optimization_level 4
-void* HSD_IDGetDataFromTable(u32* table, u32 key, u32* found) {
-    u32** bucket;
-    u32** node;
+#pragma optimization_level 1
+void* HSD_IDGetDataFromTable(HSD_IDTable* table, u32 id, s32* success)
+{
+    IDEntry* entry;
 
     if (table == NULL) {
-        table = (u32*)lbl_804653A8;
+        table = &default_table;
     }
-    bucket = (u32**)(table + key % 101);
-    node = (u32**)*bucket;
-    while (node != NULL) {
-        if ((u32)node[1] == key) {
-            if (found != NULL) {
-                *found = 1;
+
+    entry = table->table[hash(id)];
+    while (entry != NULL) {
+        if (entry->id == id) {
+            if (success != NULL) {
+                *success = 1;
             }
-            return node[2];
+            return entry->data;
         }
-        node = (u32**)node[0];
+        entry = entry->next;
     }
-    if (found != NULL) {
-        *found = 0;
+
+    if (success != NULL) {
+        *success = 0;
     }
     return NULL;
 }
@@ -628,38 +565,41 @@ void* HSD_IDGetDataFromTable(u32* table, u32 key, u32* found) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void HSD_ObjFree(void* list, void* data);
-extern u8 lbl_8046553C[];
+extern u8 lbl_8046553C[];   /* HSD_ObjAllocData hsd_iddata */
+
+static inline void IDEntryFree(IDEntry* entry)
+{
+    HSD_ObjFree(lbl_8046553C, entry);
+}
 #if 0
 asm void HSD_IDRemoveByIDFromTable(void) {
 #include "src/hsd/hsd_fog_fn_8019C1B0.inc"
 }
 #else
-#pragma optimization_level 4
-void HSD_IDRemoveByIDFromTable(u32* table, u32 key) {
-    u32** bucket;
-    u32** node;
-    u32** prev;
-    u32 hash;
+#pragma optimization_level 1
+void HSD_IDRemoveByIDFromTable(HSD_IDTable* table, u32 id)
+{
+    IDEntry* entry;
+    IDEntry* prev;
+    u32 idx;
 
     if (table == NULL) {
-        table = (u32*)lbl_804653A8;
+        table = &default_table;
     }
-    hash = key % 101;
-    bucket = (u32**)(table + hash);
-    node = (u32**)*bucket;
+
+    idx = hash(id);
     prev = NULL;
-    while (node != NULL) {
-        if ((u32)node[1] == key) {
+    for (entry = table->table[idx]; entry != NULL; entry = entry->next) {
+        if (entry->id == id) {
             if (prev != NULL) {
-                prev[0] = (u32*)node[0];
+                prev->next = entry->next;
             } else {
-                *bucket = (u32*)node[0];
+                table->table[idx] = entry->next;
             }
-            HSD_ObjFree(lbl_8046553C, node);
+            IDEntryFree(entry);
             return;
         }
-        prev = node;
-        node = (u32**)node[0];
+        prev = entry;
     }
 }
 #endif
@@ -670,43 +610,55 @@ void HSD_IDRemoveByIDFromTable(u32* table, u32 key) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void* HSD_ObjAlloc(void* list);
-extern char lbl_8047DAA0;
-extern char lbl_8047DAA8;
+extern char lbl_8047DAA0;   /* "id.c"  */
+extern char lbl_8047DAA8;   /* "entry" */
+
+static inline IDEntry* IDEntryAlloc(void)
+{
+    IDEntry* entry;
+
+    entry = HSD_ObjAlloc(lbl_8046553C);
+    if (entry == NULL) {
+        __assert(&lbl_8047DAA0, 0x43, &lbl_8047DAA8);
+    }
+    memset(entry, 0, sizeof(IDEntry));
+
+    return entry;
+}
 #if 0
 asm void HSD_IDInsertToTable(void) {
 #include "src/hsd/hsd_fog_HSD_IDInsertToTable.inc"
 }
 #else
-#pragma optimization_level 4
-void HSD_IDInsertToTable(u32* table, u32 key, u32 value) {
-    u32** node;
-    u32** newnode;
-    u32 hash;
+#pragma optimization_level 1
+#pragma use_lmw_stmw on
+void HSD_IDInsertToTable(HSD_IDTable* table, u32 id, void* data)
+{
+    IDEntry* entry;
+    u32 idx;
 
     if (table == NULL) {
-        table = (u32*)lbl_804653A8;
+        table = &default_table;
     }
-    hash = key % 101;
-    node = (u32**)*((u32**)(table + hash));
-    while (node != NULL) {
-        if ((u32)node[1] == key) {
+
+    idx = hash(id);
+    entry = table->table[idx];
+    while (entry != NULL) {
+        if (entry->id == id) {
             break;
         }
-        node = (u32**)node[0];
+        entry = entry->next;
     }
-    if (node != NULL) {
-        node[1] = (u32*)key;
-        node[2] = (u32*)value;
+
+    if (entry != NULL) {
+        entry->id = id;
+        entry->data = data;
     } else {
-        newnode = (u32**)HSD_ObjAlloc(lbl_8046553C);
-        if (newnode == NULL) {
-            __assert((char*)lbl_8047DAA0, 0x43, (char*)lbl_8047DAA8);
-        }
-        memset(newnode, 0, 0xc);
-        newnode[1] = (u32*)key;
-        newnode[2] = (u32*)value;
-        newnode[0] = (u32*)*((u32**)(table + hash));
-        *((u32**)(table + hash)) = (u32*)newnode;
+        entry = IDEntryAlloc();
+        entry->id = id;
+        entry->data = data;
+        entry->next = table->table[idx];
+        table->table[idx] = entry;
     }
 }
 #endif
@@ -722,7 +674,7 @@ asm void HSD_IDSetup(void) {
 }
 #else
 void HSD_IDSetup(void) {
-    memset(lbl_804653A8, 0, 0x194);
+    memset(&default_table, 0, sizeof(HSD_IDTable));
 }
 #endif
 #pragma pop

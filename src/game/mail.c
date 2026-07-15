@@ -30,15 +30,25 @@ s32 fn_801D1338(void* wazaCtx) {
     return *(s32*)((u8*)wazaCtx + 0x00);
 }
 
+/* Extended view of party scratch to access u16 field at offset 0x444.
+ * TODO: fold field_444 into WazaPartyScratch when full layout confirmed. */
+typedef struct MailPartyScratchExt {
+    u8 pad_000[0x444];
+    u16 sortMode; /* offset 0x444 */
+} MailPartyScratchExt;
+
 /**
- * fn_801D1364 - Waza get entry pointer by index.
+ * fn_801D1364 - Set u16 handle in battle party scratch at offset 0x444.
  * Address: 0x801D1364 | Size: 0x38
+ * Stores handle as u16 at party+0x444 via savedataGetStatus(0, 0xA).
  */
-void* fn_801D1364(void* wazaCtx, s32 idx) {
-    if (wazaCtx == NULL) return NULL;
-    if (idx < 0) return NULL;
-    return *(void**)((u8*)wazaCtx + 0x04 + idx * 4);
+#pragma scheduling off
+void* fn_801D1364(void* handle, s32 idx) {
+    MailPartyScratchExt* party = (MailPartyScratchExt*)savedataGetStatus(0, 0x0A);
+    party->sortMode = (u32)handle;
+    return party;
 }
+#pragma scheduling on
 
 /**
  * fn_801D139C - Waza get entry type.
@@ -50,12 +60,22 @@ s32 fn_801D139C(void* entry) {
 }
 
 /**
- * fn_801D13E4 - Waza get entry start frame.
+ * fn_801D13E4 - Waza get entry field at +0x04 (u16), by index.
  * Address: 0x801D13E4 | Size: 0x48
  */
-f32 fn_801D13E4(void* entry) {
-    if (entry == NULL) return 0.0f;
-    return *(f32*)((u8*)entry + 0x04);
+u32 fn_801D13E4(void* entry) {
+    s32 idx;
+    WazaEntry* sequenceEntry;
+
+    idx = (s32)entry;
+    if (idx < 0 || (u32)idx >= *lbl_80478E98) {
+        sequenceEntry = NULL;
+    } else {
+        sequenceEntry = (WazaEntry*)(lbl_80478E9C + (u32)idx * sizeof(WazaEntry));
+    }
+
+    if (sequenceEntry == NULL) return 0xFFFF;
+    return *(u16*)&sequenceEntry->startFrame;
 }
 
 /**
@@ -421,12 +441,39 @@ void mailAddMailbox(s32 seqHandle) {
 }
 
 /**
- * fn_801D1E50 - Waza projectile hit check.
+ * mailGetReceiveNumber - Mail receive-order query by mailbox ID.
  * Address: 0x801D1E50 | Size: 0xBC
  */
-BOOL fn_801D1E50(s32 seqHandle) {
-    /* TODO: Projectile hit check (0xBC bytes) */
-    return FALSE;
+s32 mailGetReceiveNumber(s32 mailId)
+{
+    WazaPartyScratch* party;
+    s32 idx;
+    BOOL found;
+    s32 currentId;
+
+    found = FALSE;
+    idx = 0;
+
+    while (idx < (s32)((WazaPartyScratch*)savedataGetStatus(0, 0x0A))->count && !found) {
+        party = (WazaPartyScratch*)savedataGetStatus(0, 0x0A);
+        if (idx < 0 ||
+            idx >= (s32)((WazaPartyScratch*)savedataGetStatus(0, 0x0A))->count) {
+            currentId = -1;
+        } else {
+            currentId = party->seqIds[idx];
+        }
+
+        if (mailId == currentId) {
+            found = TRUE;
+        }
+
+        idx++;
+    }
+
+    if (!found) {
+        return -1;
+    }
+    return idx;
 }
 
 /**

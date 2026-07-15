@@ -91,6 +91,8 @@ extern void fn_800D7650(u8*);
 extern void fn_800D7868(u8*, u32, u32, u32, u32, u8, u32, u8);
 extern void fn_800D7940(u32, u16);
 extern void fn_800D7A70(u32);
+extern void fn_800D923C(void);
+extern void fn_800D963C(u32, s32);
 extern void fn_800DB098(void);
 extern void fn_800DB758(u16);
 extern void lightGetFrameCount__FP9_HSD_AObj(u8*);
@@ -238,6 +240,7 @@ extern u32 lbl_8047CA40;
 extern u32 lbl_8047CA48;
 extern u8 lbl_80314510[];
 extern u8 lbl_803144F0[];
+extern u32 lbl_80478AE0[];
 extern void fn_800BBC34(u32);
 extern void fn_800BBC0C(u32);
 extern void fn_800BA6B0();
@@ -513,13 +516,214 @@ void fn_800D7230(void) {
  * Configure the full GX rendering pipeline. At 2320 bytes, this is
  * a major setup function. Called once per render mode change.
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void GSgfx_ConfigurePipeline(void) {
-    /* TODO: match -- 2320 bytes at 0x800D892C */
+void fn_800D892C(u32 objArg) {
+    u8* obj;
+    u8* state;
+    u8* buffer;
+    u32 flags;
+    u32 mode;
+    u32 mask;
+    u32 bit;
+    u32 i;
+    u32 last;
+    u32 count;
+    u32 enabled;
+    u8* src;
+    u8* dst;
+
+    obj = (u8*)objArg;
+    state = (u8*)lbl_8047AA80;
+    flags = *(u32*)(state + 0x10);
+    mode = 0;
+
+    if ((flags & 0x40000000) == 0) {
+        mode = 1;
+        if (obj[0x94] != 0) {
+            mode = 2;
+        } else if ((flags & 5) == 0) {
+            mode = 0;
+        }
+
+        state[0x60] = mode;
+        *(u32*)(state + 0x414) |= 1;
+
+        if (mode > 0) {
+            mask = 0;
+            if (flags & 4) {
+                bit = 0x10;
+                for (i = 0; i < 0x7F1; i++, bit++) {
+                    if (*(u32*)(state + 0x10) & bit) {
+                        mask |= 1 << (bit - 0x10);
+                    }
+                }
+
+                dst = state + 0x61;
+                if (flags & 1) {
+                    for (i = 0; i < 2; i++, dst += 6) {
+                        dst[0] = 1;
+                        dst[1] = 0;
+                        dst[2] = 1;
+                        dst[3] = mask;
+                        dst[4] = 2;
+                        dst[5] = 2;
+                    }
+                } else {
+                    for (i = 0; i < 2; i++, dst += 6) {
+                        dst[0] = 1;
+                        dst[1] = 0;
+                        dst[2] = 0;
+                        dst[3] = mask;
+                        dst[4] = 2;
+                        dst[5] = 2;
+                    }
+                }
+            } else {
+                dst = state + 0x61;
+                for (i = 0; i < 2; i++, dst += 6) {
+                    dst[0] = 0;
+                    dst[1] = 1;
+                    dst[2] = 1;
+                    dst[3] = 0;
+                    dst[4] = 0;
+                    dst[5] = 2;
+                }
+            }
+            *(u32*)(state + 0x414) |= 1;
+
+            if (mode == 2) {
+                dst = state + 0x67;
+                for (i = 0; i < 2; i++, dst += 6) {
+                    dst[0] = 0;
+                    dst[1] = 1;
+                    dst[2] = 1;
+                    dst[3] = 0;
+                    dst[4] = 0;
+                    dst[5] = 2;
+                }
+                *(u32*)(state + 0x414) |= 1;
+            }
+        }
+    }
+
+    state = (u8*)lbl_8047AA80;
+    flags = *(u32*)(state + 0x10);
+    if ((flags & 2) == 0) {
+        state[0x79] = 0;
+        *(u32*)(state + 0x414) |= 2;
+
+        state[0x7A] = mode == 1 ? 1 : 2;
+        *(u32*)(state + 0x414) |= 4;
+        state[0x7B] = 0xFF;
+        state[0x7C] = 0xFF;
+        state[0x7D] = 4;
+        *(u32*)(state + 0x414) |= 4;
+        fn_800D963C(0, 4);
+
+        if (mode != 1) {
+            state = (u8*)lbl_8047AA80;
+            state[0x7E] = 0xFF;
+            state[0x7F] = 0xFF;
+            state[0x80] = 5;
+            *(u32*)(state + 0x414) |= 4;
+
+            state[0xB0] = 0;
+            state[0xB1] = 0;
+            state[0xB2] = 0;
+            state[0xB3] = 1;
+            state[0xB4] = 0;
+            *(u32*)(state + 0x414) |= 4;
+
+            state[0x14F] = 15;
+            state[0x150] = 10;
+            state[0x151] = 12;
+            state[0x152] = 0;
+            *(u32*)(state + 0x414) |= 4;
+        }
+
+        state = (u8*)lbl_8047AA80;
+        state[0x3AC] = 0;
+        *(u32*)(state + 0x414) |= 4;
+    } else if ((flags & 0xFFFFFFFE) != 0) {
+        buffer = lbl_80400B28;
+        if (buffer[0x34C] != 0) {
+            buffer[0x34C]++;
+            buffer[0x34C]--;
+        }
+
+        last = 0;
+        for (i = 0; i < 8; i++) {
+            if (obj[0xB0 + i * 0x1C] == 1) {
+                last = i;
+            }
+        }
+
+        state = (u8*)lbl_8047AA80;
+        count = buffer[0x1A];
+        mode = buffer[0x34C];
+        state[0x79] = last + 1;
+        *(u32*)(state + 0x414) |= 2;
+        state[0x7A] = count;
+        *(u32*)(state + 0x414) |= 4;
+        state[0x3AC] = mode;
+        *(u32*)(state + 0x414) |= 4;
+
+        for (i = 0; i < count; i++) {
+            enabled = buffer[0x1FC + i] != 0 && mode > 0;
+            state[0x25C + i] = enabled;
+
+            src = state + 0x42E + i * 4;
+            dst = state + 0x7B + i * 3;
+            dst[0] = ((u32*)lbl_80314404)[src[1]];
+            dst[1] = ((u32*)lbl_803144F0)[src[2]];
+            dst[2] = lbl_80478AE0[src[0]];
+            *(u32*)(state + 0x414) |= 4;
+
+            memcpy(state + 0xAB + i * 5, buffer + 0x4B + i * 5, 5);
+            memcpy(state + 0xFB + i * 5, buffer + 0x9B + i * 5, 5);
+            memcpy(state + 0x14B + i * 4, buffer + 0xEB + i * 4, 4);
+            memcpy(state + 0x18B + i * 4, buffer + 0x12B + i * 4, 4);
+            *(u32*)(state + 0x1CC + i * 4) = *(u32*)(buffer + 0x16C + i * 4);
+            *(u32*)(state + 0x20C + i * 4) = *(u32*)(buffer + 0x1AC + i * 4);
+            if (enabled) {
+                memcpy(state + 0x26C + i * 0x14, buffer + 0x20C + i * 0x14, 0x14);
+            }
+        }
+
+        memcpy(state + 0x24C, buffer + 0x1EC, 0x10);
+        if (mode != 0) {
+            memcpy(state + 0x3AD, buffer + 0x34D, mode * 4);
+            memcpy(state + 0x3C0, buffer + 0x360, 0x54);
+        }
+    } else {
+        last = 0;
+        for (i = 0; i < 8; i++) {
+            if (obj[0xB0 + i * 0x1C] == 1) {
+                last = i;
+            }
+        }
+
+        state = (u8*)lbl_8047AA80;
+        state[0x79] = last + 1;
+        *(u32*)(state + 0x414) |= 2;
+        state[0x7A] = last + 1;
+        *(u32*)(state + 0x414) |= 4;
+        state[0x3AC] = 0;
+        *(u32*)(state + 0x414) |= 4;
+        state[0x3AC] = lbl_80400B28[0x34C];
+
+        for (i = 0; i <= last; i++) {
+            src = state + 0x42E + i * 4;
+            dst = state + 0x7B + i * 3;
+            dst[0] = ((u32*)lbl_80314404)[src[1]];
+            dst[1] = ((u32*)lbl_803144F0)[src[2]];
+            dst[2] = lbl_80478AE0[src[0]];
+            *(u32*)(state + 0x414) |= 4;
+            fn_800D963C(i, src[3]);
+        }
+    }
+
+    fn_800D923C();
 }
-#pragma pop
 
 extern u8 lbl_804007E8[];
 #if 0
@@ -1678,6 +1882,7 @@ asm void fn_800D87AC(void) {
 #else
 void fn_800D87AC(u32 mask) {
     s32 i;
+    u8* textureSlot;
 
     *(u32*)(lbl_8047AA80 + 0x414) |= mask;
     if (mask & 2) {
@@ -1688,8 +1893,9 @@ void fn_800D87AC(u32 mask) {
     }
     if (mask & 4) {
         for (i = 0; i < 0x10; i++) {
-            if (((u8*)lbl_8047AA80)[i + 0x25c]) {
-                ((u8*)lbl_8047AA80)[i + 0x25c] = 0;
+            textureSlot = (u8*)lbl_8047AA80 + i + 0x25c;
+            if (*textureSlot) {
+                *textureSlot = 0;
                 fn_800BBC34(i);
             }
         }

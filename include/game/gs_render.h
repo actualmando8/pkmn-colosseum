@@ -89,6 +89,18 @@
 /** fn_800D892C */ void GSgfx_ConfigurePipeline(void);
 
 /* ===================================================================
+ * Public API -- GS math
+ * =================================================================== */
+
+struct GSvec;
+
+/** GSvecAdd */ void GSvecAdd(struct GSvec* dst, const struct GSvec* lhs,
+                             const struct GSvec* rhs);
+void GSlerpGetLinearInterpolationVector(struct GSvec* out,
+                                        const struct GSvec* start,
+                                        const struct GSvec* end, f32 t);
+
+/* ===================================================================
  * Public API -- GSmaterial
  * =================================================================== */
 

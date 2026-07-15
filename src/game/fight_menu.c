@@ -1225,42 +1225,40 @@ u32 _fightMenuAllFightTrainerCloseStatusMenuSubCloseCheck__FPvUsPv(u32 r3,u32 r4
 }
 
 /* Address: 0x80261CBC | Size: 0xD0 | Ghidra import */
-u32 _fightMenuAllFightTrainerCloseStatusMenuSub__FPvUsPv(u32 r3,u32 r4)
-
+u32 _fightMenuAllFightTrainerCloseStatusMenuSub__FPvUsPv(void* trainer, u32 slot, void* userData)
 {
-  u32 iVar1;
-  u16 uVar3;
-  u16 sVar4;
-  u32 uVar2;
-  u8 cVar5;
-  u32 uVar6;
+    u32 target;
+    u16 side;
+    u16 relativeTarget;
+    u32 bufferIndex;
+    u8 isOpen;
+    u32 menuId;
+    u32 context;
 
-  iVar1 = fightTargetGetPtr(2,r3,r4);
-  if (iVar1 == 0) {
-    uVar6 = 0;
-  }
-  else {
-    uVar3 = fightSideGetStatus(iVar1,0,5,0);
-      sVar4 = fightTargetGetTragetPtrToRelativeHostSideFightTargetId(r3,r4);
-    if (sVar4 == 0) {
-      uVar6 = 0;
+    context = (u32)trainer;
+    target = fightTargetGetPtr(2, context, slot);
+    if (target == 0) {
+        menuId = 0;
+    } else {
+        side = fightSideGetStatus(target, 0, 5, 0);
+        relativeTarget = fightTargetGetTragetPtrToRelativeHostSideFightTargetId(context, slot);
+        if (relativeTarget == 0) {
+            menuId = 0;
+        } else {
+            fightTargetDataBiosGetPtr();
+            bufferIndex = fightTargetDataBiosGetBuff();
+            if ((int)bufferIndex < 0) {
+                menuId = 0;
+            } else {
+                menuId = fightSideGetStatus(0, side, 2, bufferIndex & 0xffff);
+            }
+        }
     }
-    else {
-      fightTargetDataBiosGetPtr();
-      uVar2 = fightTargetDataBiosGetBuff();
-      if ((int)uVar2 < 0) {
-        uVar6 = 0;
-      }
-      else {
-        uVar6 = fightSideGetStatus(0,uVar3,2,uVar2 & 0xffff);
-      }
+    isOpen = menuIsCheck(menuId);
+    if (isOpen != 0) {
+        menuCloseCustom(menuId, 0, 0);
     }
-  }
-  cVar5 = menuIsCheck(uVar6);
-  if (cVar5 != '\0') {
-    menuCloseCustom(uVar6,0,0);
-  }
-  return 1;
+    return 1;
 }
 
 /* Address: 0x80261D8C | Size: 0xF0 | Ghidra import */
@@ -1414,28 +1412,30 @@ u32 _fightMenuAllFightOutPokemonOpenStatusMenuSub__FPvUsPv(u32 r3,u32 r4,char *r
   u32 uVar4;
   u32 *puVar8;
   u32 *puVar9;
+  unsigned int context;
   u8 cVar10;
 		  u32 uVar11;
 		  u32 local_48[12];
 		  u32 local_78[12];
 
+	  context = r3;
 	  if (r5 == (char *)0x0) {
 	    cVar10 = '\x01';
 	  }
 	  else {
 	    cVar10 = *r5;
 	  }
-	  cVar7 = fightOutPokemonCheckFightOut(r3);
+	  cVar7 = fightOutPokemonCheckFightOut(context);
 	  if (cVar7 == '\0') {
 	    return 1;
 	  }
-	    iVar3 = fightTargetGetPtr(2,r3,r4);
+	    iVar3 = fightTargetGetPtr(2,context,r4);
     if (iVar3 == 0) {
       uVar11 = 0;
     }
     else {
       uVar5 = fightSideGetStatus(iVar3,0,5,0);
-		      sVar6 = fightTargetGetTragetPtrToRelativeHostSideFightTargetId(r3,r4);
+		      sVar6 = fightTargetGetTragetPtrToRelativeHostSideFightTargetId(context,r4);
       if (sVar6 == 0) {
         uVar11 = 0;
       }
@@ -1450,7 +1450,7 @@ u32 _fightMenuAllFightOutPokemonOpenStatusMenuSub__FPvUsPv(u32 r3,u32 r4,char *r
         }
       }
     }
-		    fightOutPokemonToMenuPokemonStatus(r3,local_78);
+		    fightOutPokemonToMenuPokemonStatus(context,local_78);
     if (cVar10 == '\0') {
       ((u8 *)local_78)[0x29] = 0;
     }
@@ -1956,7 +1956,7 @@ s32 fightMenuFightTrainerAgbHeroSelectIrekaeFightPokemon(u32 r3, u32 r4, u32 r5,
     u32 i;
     u32 found;
     u32 status;
-    u32 side;
+    u16 side;
     s32 index;
     u32 msg;
     u32 entry;
@@ -2037,15 +2037,14 @@ s32 fightMenuFightTrainerAgbHeroSelectIrekaeFightPokemon(u32 r3, u32 r4, u32 r5,
             goto after_select;
         }
 	        if (kind == 4) {
+	set_select:
+	            target = fightTrainerTimeOutSelectIrekaeFightPokemon(ctx, target, param1);
+	            goto after_select;
+	        }
+	        if (kind != 5) {
 	            goto set_select;
 	        }
-	        if (kind == 5) {
-	            goto set_cancel;
-	        }
 	    }
-set_select:
-    target = fightTrainerTimeOutSelectIrekaeFightPokemon(ctx, target, param1);
-    goto after_select;
 set_cancel:
     target = -2;
 after_select:

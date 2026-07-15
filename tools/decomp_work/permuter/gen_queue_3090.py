@@ -2,15 +2,15 @@
 """gen_queue_3090.py — regenerate build/permuter_queue_3090.tsv for the 3090 farm.
 
 Pool = every function in build/GC6E01/report.json with fuzzy_match_percent in
-[75, 100) on a real (non-auto-generated) source unit.
+[88, 100) by default on a real (non-auto-generated) source unit.
   tier 1 : 90.000-99.99x  (near-misses — permuter prime targets)
-  tier 2 : 75.000-89.99x  (floor lowered 80->75 on 2026-07-02 to admit the
-                           menu_range 77% hoisting-wall long shots)
+  tier 2 : 88.000-89.99x  (lower-scoring functions belong with the LLM lanes)
 Sorted tier asc, then pct desc (so 99.9%+ land at the very top), then size asc.
 
 Columns (same as the original): tier, pct, size, name, addr, unit.
 Writes the TSV and prints a diff summary vs the previous queue file.
 """
+import argparse
 import json
 import os
 import sys
@@ -26,8 +26,15 @@ DENY_FNS = {
     "fn_8002520C", "fn_80024DBC", "fn_8002509C", "fn_80024F2C", "fn_8002537C",
 }
 
+# Reserved for the separately coordinated fight-range campaign.
+DENY_UNITS = {
+    "main/game/fight_range_80211A00",
+}
 
-def denied(unit, name, pct):
+
+def denied(unit, name, pct, excluded_units):
+    if unit in excluded_units:
+        return True
     if name in DENY_FNS:
         return True
     # colosseum_battle position-dependent codegen wall: every member sits at
@@ -64,7 +71,29 @@ def priority(unit, name, pct):
     return 3
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--min-pct",
+        type=float,
+        default=88.0,
+        help="minimum fuzzy-match percentage to queue (default: 88)",
+    )
+    parser.add_argument(
+        "--exclude-unit",
+        action="append",
+        default=[],
+        help="additional exact report unit to omit; may be repeated",
+    )
+    args = parser.parse_args()
+    if not 0.0 <= args.min_pct < 100.0:
+        parser.error("--min-pct must be in [0, 100)")
+    return args
+
+
 def main():
+    args = parse_args()
+    excluded_units = DENY_UNITS | set(args.exclude_unit)
     report = json.load(open(REPORT))
     rows = []
     for u in report["units"]:
@@ -73,9 +102,9 @@ def main():
             continue
         for fn in u.get("functions", []):
             pct = fn.get("fuzzy_match_percent")
-            if pct is None or not (75.0 <= pct < 100.0):
+            if pct is None or not (args.min_pct <= pct < 100.0):
                 continue
-            if denied(u["name"], fn["name"], pct):
+            if denied(u["name"], fn["name"], pct, excluded_units):
                 continue
             va = int((fn.get("metadata") or {}).get("virtual_address", "0"))
             tier = 1 if pct >= 90.0 else 2
@@ -91,10 +120,12 @@ def main():
             old.add(ln.rstrip("\n").split("\t")[3])
     new = {r[3] for r in rows}
 
-    with open(OUT, "w", encoding="utf-8") as f:
+    tmp_out = OUT + ".tmp"
+    with open(tmp_out, "w", encoding="utf-8") as f:
         f.write("# tier\tpct\tsize\tname\taddr\tunit\n")
         for t, pct, size, name, addr, unit in rows:
             f.write(f"{t}\t{pct:.3f}\t{size}\t{name}\t{addr}\t{unit}\n")
+    os.replace(tmp_out, OUT)
 
     t1 = sum(1 for r in rows if r[0] == 1)
     print(f"wrote {OUT}: {len(rows)} entries (tier1={t1}, tier2={len(rows)-t1})")

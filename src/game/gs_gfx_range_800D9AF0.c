@@ -616,6 +616,17 @@ void fn_800D9ED8(s32 val) {
 }
 #endif
 
+extern void fn_800B953C(u32);
+void fn_800D9F40(s32 val) {
+    u32 state = lbl_8047AA80;
+    if (*(s32*)state == 1) { fn_800D4F98(0x34, 1, val); }
+    else {
+        if (val == 1) { *(u8*)(state + 0x42d) = 1; }
+        else if (val == 0) { *(u8*)(state + 0x42d) = 0; }
+        fn_800B953C(*(u8*)(lbl_8047AA80 + 0x42d));
+    }
+}
+
 extern void GXSetClipMode(u32);
 extern void fn_800B953C(u32);
 
@@ -737,32 +748,32 @@ void fn_800DA1E8(s32 zEnable, s32 zFunc, s32 zUpdate) {
 }
 #endif
 
-void fn_800DA2BC(s32 colorUpdate, s32 alphaUpdate, s32 zCompLoc) {
-    extern void fn_800BCE30(u32);
-    extern void fn_800BCE5C(u32);
+extern void fn_800BCE30(u32);
+extern void fn_800BCE5C(u32);
+void fn_800DA2BC(s32 zCompare, s32 zBeforeTexture, s32 zFunc) {
     u32 state = lbl_8047AA80;
-
     if (*(s32*)state == 1) {
-        fn_800D4F98(0x2e, 3, colorUpdate, alphaUpdate, zCompLoc);
+        fn_800D4F98(0x2e, 3, zCompare, zBeforeTexture, zFunc);
     } else {
-        if (colorUpdate == 1) {
+        if (zCompare == 1) {
             *(u8*)(state + 0x419) = 1;
-        } else if (colorUpdate == 0) {
+        } else if (zCompare == 0) {
             *(u8*)(state + 0x419) = 0;
         }
-        if (alphaUpdate == 1) {
+        if (zBeforeTexture == 1) {
             *(u8*)(lbl_8047AA80 + 0x41a) = 1;
-        } else if (alphaUpdate == 0) {
+        } else if (zBeforeTexture == 0) {
             *(u8*)(lbl_8047AA80 + 0x41a) = 0;
         }
-        if (zCompLoc == 1) {
+        if (zFunc == 1) {
             *(u8*)(lbl_8047AA80 + 0x41b) = 1;
-        } else if (zCompLoc == 0) {
+        } else if (zFunc == 0) {
             *(u8*)(lbl_8047AA80 + 0x41b) = 0;
         }
         fn_800BCE30(*(u8*)(lbl_8047AA80 + 0x419));
         fn_800BCE5C(*(u8*)(lbl_8047AA80 + 0x41a));
-        GXSetZMode(*(u8*)(lbl_8047AA80 + 0x41c), *(u32*)(lbl_8047AA80 + 0x420),
+        GXSetZMode(*(u8*)(lbl_8047AA80 + 0x41c),
+                   *(u32*)(lbl_8047AA80 + 0x420),
                    *(u8*)(lbl_8047AA80 + 0x41b));
     }
 }

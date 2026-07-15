@@ -13,6 +13,47 @@
 #include "game/effect/effect_util_types.h"
 
 
+typedef struct DbgMenuSlot {
+    u32 field_00;
+    u32 field_04;
+    u32 field_08;
+    u32 field_0C;
+    u32 field_10;
+    u8 field_14;
+    u8 field_15;
+    u8 pad_16[2];
+} DbgMenuSlot;
+
+typedef struct DbgMenuItem {
+    s32 field_00;
+    u16 field_04;
+    u16 field_06;
+    u32 field_08;
+    u32 field_0C;
+    s32 field_10;
+    u8 field_14;
+    u8 pad_15[3];
+    u32 field_18;
+    u32 field_1C;
+} DbgMenuItem;
+
+static inline void dbgMenuInitItems(u32* itemTable, u32 total)
+{
+    u32 i;
+    for (i = 0; i < total; i++) {
+        DbgMenuItem* item = &((DbgMenuItem*)(*itemTable))[i];
+        item->field_00 = -1;
+        item->field_04 = 0;
+        item->field_06 = 0;
+        item->field_08 = 0;
+        item->field_0C = 0;
+        item->field_10 = -1;
+        item->field_14 = 0;
+        item->field_18 = 0;
+        item->field_1C = 0;
+    }
+}
+
 /* 0x80132C6C | 0x310 */
 #if 0
 asm void fn_80132C6C(void) {
@@ -30,8 +71,7 @@ void fn_80132C6C(u32 count, u32 maxPerSlot, u32 arg2, u32 arg3) {
     extern u32 lbl_8047AECC;
     u32 total;
     u32 i;
-    u32 ofs;
-    u8* e;
+    DbgMenuSlot* slot;
 
     if (count == 0 || maxPerSlot == 0) return;
 
@@ -44,39 +84,23 @@ void fn_80132C6C(u32 count, u32 maxPerSlot, u32 arg2, u32 arg3) {
     if (lbl_8047AEB8 == 0) return;
     lbl_8047AEB0 = fn_800E27B0(lbl_8047AEB8);
 
-    i = 0; ofs = 0;
-    while (i < lbl_8047AEB4) {
-        e = (u8*)lbl_8047AEB0 + ofs;
-        i++; ofs += 0x18;
-        *(u32*)(e + 0x00) = 0;
-        *(u32*)(e + 0x04) = 0;
-        *(u32*)(e + 0x08) = 0;
-        *(u32*)(e + 0x0C) = 0;
-        *(u32*)(e + 0x10) = 0;
-        *(u8*)(e + 0x14) = 0;
-        *(u8*)(e + 0x15) = 0;
+    for (i = 0; i < lbl_8047AEB4; i++) {
+        slot = &((DbgMenuSlot*)lbl_8047AEB0)[i];
+        slot->field_00 = 0;
+        slot->field_04 = 0;
+        slot->field_08 = 0;
+        slot->field_0C = 0;
+        slot->field_10 = 0;
+        slot->field_14 = 0;
+        slot->field_15 = 0;
     }
 
     total = lbl_8047AEB4 * lbl_8047AEC0;
     lbl_8047AEC4 = (u16)_toolentryAlloc__FUl(total << 5);
     if (lbl_8047AEC4 == 0) return;
     lbl_8047AEBC = fn_800E27B0(lbl_8047AEC4);
-    if (total == 0) return;
 
-    i = 0; ofs = 0;
-    while (i < total) {
-        e = (u8*)lbl_8047AEBC + ofs;
-        i++; ofs += 0x20;
-        *(u32*)(e + 0x00) = -1;
-        *(u16*)(e + 0x04) = 0;
-        *(u16*)(e + 0x06) = 0;
-        *(u32*)(e + 0x08) = 0;
-        *(u32*)(e + 0x0C) = 0;
-        *(u32*)(e + 0x10) = -1;
-        *(u8*)(e + 0x14) = 0;
-        *(u32*)(e + 0x18) = 0;
-        *(u32*)(e + 0x1C) = 0;
-    }
+    dbgMenuInitItems(&lbl_8047AEBC, total);
 }
 #endif
 
@@ -142,6 +166,8 @@ asm void fn_801330C8(void) {
 #include "src/game/effect/effect_util_fn_801330C8.inc"
 }
 #else
+#pragma push
+#pragma scheduling on
 u32 fn_801330C8(void) {
     fn_800D88DC(1);
     fn_800D888C(6);
@@ -164,6 +190,7 @@ u32 fn_801330C8(void) {
     fn_800D6728();
     return 0;
 }
+#pragma pop
 #endif
 
 
@@ -395,48 +422,65 @@ asm void dbgMenuCursor(void) {
 #include "src/game/effect/effect_util_dbgMenuCursor.inc"
 }
 #else
-void dbgMenuCursor(void* obj) {
-    u8 pair[2];
-    s32 entryCount;
-    s32 maxCount;
+typedef struct DbgMenuKeyInfo {
+    u8 pad_00[6];
     u16 flags;
-    s8 major;
-    s8 minor;
+} DbgMenuKeyInfo;
 
-    flags = *(u16*)((u8*)windowGetKeyInfo() + 0x6);
-    entryCount = (s8)_dbgMenuGetMenuNum__FP14tagWINDOW_WORKPl((u32)obj, NULL);
-    maxCount = (s8)menuDataBiosGetType(*(u32*)((u8*)obj + 0x04));
+typedef struct DbgMenuWindow {
+    u32 field_00;
+    u32 key;
+    u8 pad_08[0x8C];
+    union {
+        u16 cursorPosition;
+        struct {
+            s8 page;
+            s8 row;
+        } cursor;
+    };
+} DbgMenuWindow;
+
+#pragma push
+#pragma scheduling on
+void dbgMenuCursor(DbgMenuWindow* obj) {
+    s8 pair[2];
+    s8 entryCount;
+    s8 maxCount;
+    u32 flags;
+
+    flags = ((DbgMenuKeyInfo*)windowGetKeyInfo())->flags;
+    entryCount = _dbgMenuGetMenuNum__FP14tagWINDOW_WORKPl((u32)obj, NULL);
+    maxCount = menuDataBiosGetType(obj->key);
     if (entryCount < maxCount) {
         maxCount = entryCount;
     }
 
-    *(u16*)pair = *(u16*)((u8*)obj + 0x94);
+    *(u16*)pair = obj->cursorPosition;
     if (flags & 1) {
         pair[1]--;
     } else if (flags & 2) {
         pair[1]++;
     }
 
-    major = (s8)pair[0];
-    minor = (s8)pair[1];
-    if (minor < 0) {
+    if (pair[1] < 0) {
+        pair[0] += pair[1];
         pair[1] = 0;
-        pair[0] = (u8)(major + minor);
-        if ((s8)pair[0] < 0) {
-            pair[1] = (u8)((s8)maxCount - 1);
-            pair[0] = (u8)(entryCount - (s8)maxCount);
+        if (pair[0] < 0) {
+            pair[1] = maxCount - 1;
+            pair[0] = entryCount - maxCount;
         }
-    } else if (minor >= (s8)maxCount) {
-        pair[1] = (u8)((s8)maxCount - 1);
-        pair[0] = (u8)(major + (minor - ((s8)maxCount - 1)));
-        if (((s8)pair[0] + (s8)pair[1]) >= entryCount) {
+    } else if (pair[1] >= maxCount) {
+        pair[0] += pair[1] - (maxCount - 1);
+        pair[1] = maxCount - 1;
+        if (pair[0] + pair[1] >= entryCount) {
             pair[0] = 0;
             pair[1] = 0;
         }
     }
 
-    *(u16*)((u8*)obj + 0x94) = *(u16*)pair;
+    obj->cursorPosition = *(u16*)pair;
 }
+#pragma pop
 #endif
 
 
@@ -506,12 +550,58 @@ void dbgMenuMain(u8 flag) {
 #endif
 
 
+static inline s32 dbgMenuGetMenuNumber(s32 key) {
+    return _dbgMenuGetMenuNo__Fl(key);
+}
+
+static inline s32 dbgMenuOpenWindow(s32 sceneId, s32 key, s32* savedSelection) {
+    return menuOpenCustom(sceneId, key, savedSelection, 0, 1, 0);
+}
+
+static inline s32 dbgMenuInvokeCallback(
+    EffectUtilEntryCallback callback, s32 valueIndex, DbgMenuWindow* window) {
+    return callback(valueIndex, window->cursor.page + window->cursor.row);
+}
+
+static inline s32 dbgMenuGetCursorPage(DbgMenuWindow* window) {
+    return window->cursor.page;
+}
+
+static inline s32 dbgMenuGetCursorIndex(DbgMenuWindow* window) {
+    return window->cursor.page + window->cursor.row;
+}
+
+static inline s32 dbgMenuGetValidatedLink(s32 valueIndex) {
+    EffectUtilCountFunc countFunc;
+    EffectUtilEntryFunc entryFunc;
+    EffectUtilEntry* entry;
+    s32 count;
+    s32 link;
+
+    if (valueIndex <= 0 ||
+        (countFunc = (EffectUtilCountFunc)lbl_80478F88,
+         count = countFunc == NULL ? 0 : countFunc(), count <= valueIndex)) {
+        return 0;
+    }
+    entryFunc = (EffectUtilEntryFunc)lbl_80478F8C;
+    entry = entryFunc == NULL ? NULL : entryFunc(valueIndex);
+    link = entry == NULL ? 0 : entry->link;
+    if ((s16)link <= 0 ||
+        (countFunc = (EffectUtilCountFunc)lbl_80478F88,
+         count = countFunc == NULL ? 0 : countFunc(), count <= (s16)link)) {
+        return 0;
+    }
+    return link;
+}
+
 /* 0x801338A4 | 0x2AC */
 #if 0
 asm void _dbgMenuSub__Fl(void) {
 #include "src/game/effect/effect_util__dbgMenuSub__Fl.inc"
 }
 #else
+#pragma push
+#pragma scheduling on
 s32 _dbgMenuSub__Fl(s32 offset) {
     s32 prevOffset;
     s32 result;
@@ -521,9 +611,8 @@ s32 _dbgMenuSub__Fl(s32 offset) {
     s32 link;
     s32 callbackResult;
     s32* outValue;
-    u8* obj;
+    DbgMenuWindow* obj;
     EffectUtilEntry* entry;
-    EffectUtilCountFunc countFunc;
     EffectUtilEntryFunc entryFunc;
     EffectUtilEntryCallback callback;
 
@@ -537,12 +626,11 @@ retry:
     } else {
         key = (s32)lbl_80478848 + prevOffset;
     }
-
-    outValue = (s32*)(lbl_8047AEDC + _dbgMenuGetMenuNo__Fl(key) * 4);
-    valueIndex = menuOpenCustom(sceneId, key, outValue, 0, 1, 0);
-    obj = (u8*)windowSearchID(sceneId);
+    outValue = (s32*)(lbl_8047AEDC + dbgMenuGetMenuNumber(key) * sizeof(s32));
+    valueIndex = dbgMenuOpenWindow(sceneId, key, outValue);
+    obj = windowSearchID(sceneId);
     if (obj != NULL) {
-        *outValue = (s8)obj[0x94] + (s8)obj[0x95];
+        *outValue = obj->cursor.page + obj->cursor.row;
     } else {
         *outValue = 0;
     }
@@ -551,37 +639,25 @@ retry:
         if (offset == 0) {
             result = -1;
         }
-        menuClose(sceneId);
-        return result;
-    }
+    } else {
 
-    valueIndex = _dbgMenuGetItemNo__FP14tagWINDOW_WORKl(obj, (s8)obj[0x94] + (s8)obj[0x95]);
-    link = 0;
-    if (valueIndex > 0) {
-        countFunc = (EffectUtilCountFunc)lbl_80478F88;
-        if (countFunc != NULL && countFunc() > valueIndex) {
-            entryFunc = (EffectUtilEntryFunc)lbl_80478F8C;
-            entry = entryFunc != NULL ? entryFunc(valueIndex) : NULL;
-            if (entry != NULL) {
-                link = entry->link;
-            }
-            if (link > 0) {
-                countFunc = (EffectUtilCountFunc)lbl_80478F88;
-                if (countFunc == NULL || countFunc() <= link) {
-                    link = 0;
-                }
-            } else {
-                link = 0;
-            }
-        }
-    }
+    valueIndex = _dbgMenuGetItemNo__FP14tagWINDOW_WORKl(obj, dbgMenuGetCursorIndex(obj));
+    link = dbgMenuGetValidatedLink(valueIndex);
 
     if ((s16)link != 0) {
         entryFunc = (EffectUtilEntryFunc)lbl_80478F8C;
-        entry = entryFunc != NULL ? entryFunc(valueIndex) : NULL;
-        callback = entry != NULL ? entry->callback : NULL;
+        if (entryFunc == NULL) {
+            entry = NULL;
+        } else {
+            entry = entryFunc(valueIndex);
+        }
+        if (entry == NULL) {
+            callback = NULL;
+        } else {
+            callback = entry->callback;
+        }
         if (callback != NULL) {
-            callbackResult = callback(valueIndex, (s8)obj[0x94] + (s8)obj[0x95]);
+            callbackResult = dbgMenuInvokeCallback(callback, valueIndex, obj);
         } else {
             callbackResult = 1;
         }
@@ -600,13 +676,26 @@ retry:
 
     menuClose(lbl_80478848);
     entryFunc = (EffectUtilEntryFunc)lbl_80478F8C;
-    entry = entryFunc != NULL ? entryFunc(valueIndex) : NULL;
-    callback = entry != NULL ? entry->callback : NULL;
+    if (entryFunc == NULL) {
+        entry = NULL;
+    } else {
+        entry = entryFunc(valueIndex);
+    }
+    if (entry == NULL) {
+        callback = NULL;
+    } else {
+        callback = entry->callback;
+    }
     if (callback != NULL) {
-        callback(valueIndex, (s8)obj[0x94] + (s8)obj[0x95]);
+        callback(valueIndex, dbgMenuGetCursorIndex(obj));
     }
     return 1;
+    }
+
+    menuClose(sceneId);
+    return result;
 }
+#pragma pop
 #endif
 
 
@@ -753,6 +842,45 @@ u32 _dbgMenuGetMsgID__FP14tagWINDOW_WORKl(void* obj, s32 offset) {
 #pragma peephole on
 #endif
 
+static inline s32 dbgMenuGetIndexInline(DbgMenuWindow* window) {
+    u32 key = window->key;
+    if ((s32)key < (s32)lbl_80478848) {
+        return -1;
+    }
+    return key - lbl_80478848;
+}
+
+static inline DbgMenuWindow* dbgMenuGetWinInline(s32 offset) {
+    s32 mask = offset >> 31;
+    s32 key = (s32)lbl_80478848 + offset;
+    return windowSearchID(key & ~mask);
+}
+
+static inline s32 dbgMenuGetRootInline(void) {
+    u32 fn_800057A8();
+    s32 result;
+    s32 value = fn_800057A8();
+
+    if (value != 1) {
+        if (value < 1) {
+            result = 2;
+        } else if (value < 3) {
+            return 0x115;
+        }
+    }
+    return result;
+}
+
+static inline s32 dbgMenuResolveLink(s32 link) {
+    if (link <= 0 || (s32)debugMenuGetNum__Fv() <= link) {
+        return 0;
+    }
+    link = dbgMenuGetLink__Fl(link);
+    if ((s16)link <= 0 || (s32)debugMenuGetNum__Fv() <= (s16)link) {
+        return 0;
+    }
+    return link;
+}
 
 /* 0x80133E6C | 0x2F8 */
 #if 0
@@ -760,85 +888,73 @@ asm void _dbgMenuGetItemNo__FP14tagWINDOW_WORKl(void) {
 #include "src/game/effect/effect_util__dbgMenuGetItemNo__FP14tagWINDOW_WORKl.inc"
 }
 #else
+static inline void dbgMenuReadIndexInline(DbgMenuWindow* window, s32* index) {
+    *index = dbgMenuGetIndexInline(window);
+}
+
+#pragma push
+#pragma scheduling on
 s32 _dbgMenuGetItemNo__FP14tagWINDOW_WORKl(void* obj, s32 offset) {
     s32 rel;
     s32 value;
     s32 baseValue;
     s32 linked;
-    u8* prev;
-    u8* prior;
-    EffectUtilCountFunc countFunc;
-    EffectUtilEntryFunc entryFunc;
-    EffectUtilEntry* entry;
+    DbgMenuWindow* window = obj;
+    DbgMenuWindow* prev;
+    DbgMenuWindow* prior;
 
-    rel = _dbgMenuGetIndex__FP14tagWINDOW_WORK(obj);
+    dbgMenuReadIndexInline(window, &rel);
     if (rel < 0) {
         return 0;
     }
-    if (rel == 0) {
-        return (s32)dbgMenuGetRootMenu() + offset;
-    }
+    do {
+        if (rel == 0) {
+            value = dbgMenuGetRootInline();
+            break;
+        }
 
-    prev = (u8*)_dbgMenuGetWin__Fl(rel - 1);
-    if (prev == NULL) {
-        value = dbgMenuGetRootMenu();
-    } else {
-        baseValue = (s8)prev[0x94] + (s8)prev[0x95];
-        rel = _dbgMenuGetIndex__FP14tagWINDOW_WORK(prev);
-        if (rel < 0) {
-            value = 0;
-        } else if (rel == 0) {
-            value = (s32)dbgMenuGetRootMenu() + baseValue;
+        prev = dbgMenuGetWinInline(rel - 1);
+        if (prev == NULL) {
+            value = dbgMenuGetRootInline();
         } else {
-            prior = (u8*)_dbgMenuGetWin__Fl(rel - 1);
-            if (prior == NULL) {
-                linked = dbgMenuGetRootMenu();
+            baseValue = prev->cursor.page + prev->cursor.row;
+            rel = dbgMenuGetIndexInline(prev);
+            if (rel < 0) {
+                value = 0;
+            } else if (rel == 0) {
+                value = dbgMenuGetRootInline() + baseValue;
             } else {
-                linked = (s8)prior[0x94] + (s8)prior[0x95];
-                rel = _dbgMenuGetIndex__FP14tagWINDOW_WORK(prior);
-                if (rel < 0) {
-                    linked = 0;
-                } else if (rel == 0) {
-                    linked += dbgMenuGetRootMenu();
+                prior = dbgMenuGetWinInline(rel - 1);
+                if (prior == NULL) {
+                    linked = dbgMenuGetRootInline();
                 } else {
-                    u8* earlier = (u8*)_dbgMenuGetWin__Fl(rel - 1);
-                    if (earlier == NULL) {
+                    linked = dbgMenuGetCursorPage(prior) + prior->cursor.row;
+                    rel = _dbgMenuGetIndex__FP14tagWINDOW_WORK(prior);
+                    if (rel < 0) {
+                        linked = 0;
+                    } else if (rel == 0) {
                         linked += dbgMenuGetRootMenu();
                     } else {
-                        linked += (s16)_dbgMenuGetLink__Fl(_dbgMenuGetItemNo__FP14tagWINDOW_WORKl(earlier, (s8)earlier[0x94] + (s8)earlier[0x95]));
+                        DbgMenuWindow* earlier = _dbgMenuGetWin__Fl(rel - 1);
+                        if (earlier == NULL) {
+                            linked += dbgMenuGetRootMenu();
+                        } else {
+                            linked += (s16)_dbgMenuGetLink__Fl(_dbgMenuGetItemNo__FP14tagWINDOW_WORKl(
+                                earlier, earlier->cursor.page + earlier->cursor.row));
+                        }
                     }
                 }
-            }
 
-            if (linked > 0 && (s32)debugMenuGetNum__Fv() > linked) {
-                linked = dbgMenuGetLink__Fl(linked);
-                if ((s16)linked <= 0 || (s32)debugMenuGetNum__Fv() <= (s16)linked) {
-                    linked = 0;
-                }
-            } else {
-                linked = 0;
-            }
-            value = (s16)linked + baseValue;
-        }
-    }
-
-    if (value > 0) {
-        countFunc = (EffectUtilCountFunc)lbl_80478F88;
-        if (countFunc != NULL && countFunc() > value) {
-            entryFunc = (EffectUtilEntryFunc)lbl_80478F8C;
-            entry = entryFunc != NULL ? entryFunc(value) : NULL;
-            value = entry != NULL ? entry->link : 0;
-            if ((s16)value > 0) {
-                countFunc = (EffectUtilCountFunc)lbl_80478F88;
-                if (countFunc != NULL && countFunc() > (s16)value) {
-                    return (s16)value + offset;
-                }
+                linked = dbgMenuResolveLink(linked);
+                value = (s16)linked + baseValue;
             }
         }
-    }
 
-    return offset;
+        value = dbgMenuGetValidatedLink(value);
+    } while (0);
+    return value + offset;
 }
+#pragma pop
 #endif
 
 

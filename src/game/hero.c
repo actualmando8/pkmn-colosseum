@@ -2198,6 +2198,8 @@ void heroSetStatus(u8* ptr, u32 selector, u32 value) {
 
     if ((u16)selector == 0) { goto done; }
     if ((u16)selector < 0x1A) { goto valid; }
+    if (((!ptr) && (!ptr)) && (!ptr)) {
+    }
     goto done;
 
 valid:

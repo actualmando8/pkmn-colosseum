@@ -9,12 +9,17 @@
  * functions (0x801C0F20-0x801C2AE8), all of which are HSD sysdolphin
  * library code, not battle-grid code -- this is the direct continuation
  * of the same XD translation unit (aobj.cpp) as the functions above.
- * HSD_ForeachAnim is asm-only for now.
+ * fn_801C021C is matched below; HSD_ForeachAnim remains a near match.
  */
 #include "dolphin/types.h"
+#include "dolphin/os/OSInterrupt.h"
+#include "hsd/hsd_aobj.h"
 #include "hsd/hsd_cobj.h"
 #include "hsd/hsd_debug.h"
 #include "hsd/hsd_dobj.h"
+#include "hsd/hsd_fog.h"
+#include "hsd/hsd_fobj.h"
+#include "hsd/hsd_id.h"
 #include "hsd/hsd_jobj.h"
 #include "hsd/hsd_lobj.h"
 #include "hsd/hsd_mobj.h"
@@ -23,6 +28,61 @@
 #include "hsd/hsd_tobj.h"
 #include "hsd/hsd_wobj.h"
 #include "game/battle/battle_grid_types.h"
+
+/* HSD_ObjAllocData pool backing HSD_AObjAlloc/HSD_AObjFree (sizeof(HSD_AObj)
+ * == 0x1C, 4-byte aligned). Declared as a byte array in the absence of an
+ * HSD_ObjAllocData type in include/hsd/hsd_object.h, matching the existing
+ * house style in hsd_dobj.c / hsd_mobj_range_801A8478.c. */
+extern u8 lbl_80466DB8[];
+extern void* volatile lbl_80466BC0[];
+extern void* HSD_ObjAlloc(void* list);
+extern void HSD_ObjFree(void* list, void* data);
+extern void HSD_ObjAllocInit(void* list, u32 size, u32 alignment);
+
+/* aobj.c's HSD_ASSERT __FILE__/expr strings (already matched in
+ * src/hsd/hsd_sdata2_8047DE90.c). */
+extern const u8 lbl_8047DF40[7]; /* "aobj.c" */
+extern const u8 lbl_8047DF48[]; /* "obj"    */
+extern const u8 lbl_8047DF4C[]; /* "new"    */
+
+/* aobj.c's two end-callback counters (see HSD_AObjInvokeCallBacks): the
+ * number of AObjs that finished this frame, and the number still running. */
+extern s32 lbl_8047B390;
+extern s32 lbl_8047B38C;
+extern HSD_SList* lbl_8047B388;
+
+/* HSD_JObjUnref's tail helper. The target calls the raw symbol at
+ * 0x801A05EC, NOT src/hsd/hsd_jobj.c's HSD_JObjUnref, so it must be spelled
+ * as fn_801A05EC here to keep the relocation identical. */
+extern void fn_801A05EC(void* obj);
+extern f64 fmod(f64 x, f64 y);
+extern void* memset(void* dst, int val, u32 size);
+
+/**
+ * fn_801C01C8 - Address: 0x801C01C8 | Size: 0x54
+ */
+void* fn_801C01C8(void* callback)
+{
+    void* previous = lbl_80466BC0[0x7A];
+    BOOL enabled = OSDisableInterrupts();
+
+    lbl_80466BC0[0x7A] = callback;
+    OSRestoreInterrupts(enabled);
+    return previous;
+}
+
+/**
+ * fn_801C021C - Address: 0x801C021C | Size: 0x54
+ */
+void* fn_801C021C(void* callback)
+{
+    void* previous = lbl_80466BC0[0x77];
+    BOOL enabled = OSDisableInterrupts();
+
+    lbl_80466BC0[0x77] = callback;
+    OSRestoreInterrupts(enabled);
+    return previous;
+}
 
 /**
  * fn_801C01C8 - Replace the draw-done callback and return the old callback.
@@ -59,17 +119,16 @@ void* fn_801C021C(void* callback) {
 /**
  * _HSD_AObjForgetMemory - Address: 0x801C0270 | Size: 0xC
  */
-s32 _HSD_AObjForgetMemory(void) {
-    extern u32 lbl_8047B388;
-    lbl_8047B388 = 0;
+void _HSD_AObjForgetMemory(void* low, void* high) {
+    lbl_8047B388 = NULL;
 }
 
 /**
  * HSD_AObjSetRate - Address: 0x801C027C | Size: 0x10
  */
-void HSD_AObjSetRate(void* obj, f32 frame) {
-    if (obj != NULL) {
-        *(f32*)((u8*)obj + 0x10) = frame;
+void HSD_AObjSetRate(HSD_AObj* aobj, f32 rate) {
+    if (aobj != NULL) {
+        aobj->framerate = rate;
     }
 }
 
@@ -115,20 +174,12 @@ typedef union HSD_ForeachArg {
     void* v;
 } HSD_ForeachArg;
 
-/* Assert strings already matched in src/hsd/hsd_sdata2_8047DE90.c:
- * lbl_8047DF40 = "aobj.c", lbl_8047DF48 = "obj" (HSD_ASSERT(0x2CB, obj)
- * inside the original aobj.c, i.e. HSD_ASSERT's __FILE__ from that TU). */
-extern const u8 lbl_8047DF40[];
-extern const u8 lbl_8047DF48[];
-
 /* Colosseum's HSD_PObj carries a direct HSD_AObj* immediately after the
  * payload union that include/hsd/hsd_pobj.h (melee-derived) models only
  * up to; that trailing field is what DObjForeachAnim's PObj sub-loop
  * walks (pobj+0x18, matching pobj->next chaining at pobj+0x4). Modeled
  * locally (mirroring HSD_PObj's field layout by hand) rather than
- * editing the shared header, and to avoid pulling in hsd_pobj.h's
- * transitive HSD_AObj* prototypes which conflict with the generic
- * void*-typed HSD_AObj functions already matched elsewhere in this file. */
+ * editing the shared header. */
 typedef struct BattleGridPObjAnim {
     void* classInfo;                /* 0x00 */
     struct BattleGridPObjAnim* next; /* 0x04 */
@@ -186,6 +237,151 @@ typedef struct BattleGridPObjAnim {
 
 void DObjForeachAnim(HSD_DObj* dobj, HSD_TypeMask mask, void* func,
                   HSD_ForeachArgType argType, HSD_ForeachArg* arg);
+void JObjForeachAnim(HSD_JObj* obj, HSD_TypeMask mask, void* func,
+                  HSD_ForeachArgType argType, HSD_ForeachArg* arg);
+void LObjForeachAnim(HSD_LObj* lobj, HSD_TypeMask mask, void* func,
+                  HSD_ForeachArgType argType, HSD_ForeachArg* arg);
+void CObjForeachAnim(HSD_CObj* cobj, HSD_TypeMask mask, void* func,
+                  HSD_ForeachArgType argType, HSD_ForeachArg* arg);
+
+void HSD_ForeachAnim(void* obj, HSD_Type type, HSD_TypeMask mask, void* func,
+                     HSD_ForeachArgType argType, ...)
+{
+    typedef struct HSDVaList {
+        u8 gpr;
+        u8 fpr;
+        u16 reserved;
+        u32* overflow;
+        u32* saveArea;
+    } HSDVaList;
+    typedef HSDVaList HSDVaListArray[1];
+    extern void* __va_arg(void*, u32);
+    extern const u8 lbl_80275780[];
+    extern const u8 lbl_802757A0[];
+    HSDVaListArray ap;
+    HSD_ForeachArg arg;
+
+    if (obj == NULL) {
+        return;
+    }
+
+    __builtin_va_info(&ap);
+    switch (argType) {
+    case HSD_FOREACH_A:
+    case HSD_FOREACH_AO:
+    case HSD_FOREACH_AOT:
+        break;
+    case HSD_FOREACH_AF:
+    case HSD_FOREACH_AOF:
+    case HSD_FOREACH_AOTF:
+        arg.f = *(f64*)__va_arg(ap, 3);
+        break;
+    case HSD_FOREACH_AV:
+    case HSD_FOREACH_AOV:
+    case HSD_FOREACH_AOTV:
+        arg.v = *(void**)__va_arg(ap, 1);
+        break;
+    case HSD_FOREACH_AU:
+    case HSD_FOREACH_AOU:
+    case HSD_FOREACH_AOTU:
+        arg.d = *(u32*)__va_arg(ap, 1);
+        break;
+    default:
+        HSD_Panic((const char*)lbl_8047DF40, 0x33A,
+                  (const char*)lbl_80275780);
+        break;
+    }
+
+    switch (type) {
+    case JOBJ_TYPE:
+        JObjForeachAnim(obj, mask, func, argType, &arg);
+        break;
+    case DOBJ_TYPE:
+        DObjForeachAnim(obj, mask, func, argType, &arg);
+        break;
+    case MOBJ_TYPE: {
+        HSD_MObj* mobj = obj;
+        HSD_TObj* tobj;
+        if (mobj != NULL) {
+            if ((mask & MOBJ_MASK) && mobj->aobj != NULL) {
+                HSD_FOREACH_INVOKE(mobj->aobj, mobj, MOBJ_TYPE, func,
+                                   argType, &arg);
+            }
+            for (tobj = mobj->tobj; tobj != NULL; tobj = tobj->next) {
+                if ((mask & TOBJ_MASK) && tobj->aobj != NULL) {
+                    HSD_FOREACH_INVOKE(tobj->aobj, tobj, TOBJ_TYPE, func,
+                                       argType, &arg);
+                }
+            }
+        }
+        break;
+    }
+    case POBJ_TYPE: {
+        BattleGridPObjAnim* pobj;
+        for (pobj = obj; pobj != NULL; pobj = pobj->next) {
+            if ((mask & POBJ_MASK) && pobj->aobj != NULL) {
+                HSD_FOREACH_INVOKE(pobj->aobj, pobj, POBJ_TYPE, func,
+                                   argType, &arg);
+            }
+        }
+        break;
+    }
+    case TOBJ_TYPE: {
+        HSD_TObj* tobj;
+        for (tobj = obj; tobj != NULL; tobj = tobj->next) {
+            if ((mask & TOBJ_MASK) && tobj->aobj != NULL) {
+                HSD_FOREACH_INVOKE(tobj->aobj, tobj, TOBJ_TYPE, func,
+                                   argType, &arg);
+            }
+        }
+        break;
+    }
+    case LOBJ_TYPE:
+        LObjForeachAnim(obj, mask, func, argType, &arg);
+        break;
+    case COBJ_TYPE:
+        CObjForeachAnim(obj, mask, func, argType, &arg);
+        break;
+    case ROBJ_TYPE: {
+        HSD_RObj* robj;
+        for (robj = obj; robj != NULL; robj = robj->next) {
+            if ((mask & ROBJ_MASK) && robj->aobj != NULL) {
+                HSD_FOREACH_INVOKE(robj->aobj, robj, ROBJ_TYPE, func,
+                                   argType, &arg);
+            }
+        }
+        break;
+    }
+    case WOBJ_TYPE: {
+        HSD_WObj* wobj = obj;
+        HSD_RObj* robj;
+        if (wobj != NULL) {
+            if ((mask & WOBJ_MASK) && wobj->aobj != NULL) {
+                HSD_FOREACH_INVOKE(wobj->aobj, wobj, WOBJ_TYPE, func,
+                                   argType, &arg);
+            }
+            for (robj = wobj->robj; robj != NULL; robj = robj->next) {
+                if ((mask & ROBJ_MASK) && robj->aobj != NULL) {
+                    HSD_FOREACH_INVOKE(robj->aobj, robj, ROBJ_TYPE, func,
+                                       argType, &arg);
+                }
+            }
+        }
+        break;
+    }
+    case FOG_TYPE: {
+        HSD_Fog* fog = obj;
+        if ((mask & FOG_MASK) && fog != NULL && fog->aobj != NULL) {
+            HSD_FOREACH_INVOKE(fog->aobj, fog, FOG_TYPE, func, argType, &arg);
+        }
+        break;
+    }
+    default:
+        HSD_Panic((const char*)lbl_8047DF40, 0x35E,
+                  (const char*)lbl_802757A0);
+        break;
+    }
+}
 
 /**
  * JObjForeachAnim - HSD_JObj ForeachAnim (JObjForeachAnim).
@@ -345,28 +541,17 @@ void CObjForeachAnim(HSD_CObj* cobj, HSD_TypeMask mask, void* func,
 
 /**
  * HSD_AObjRemove - Tear down an AObj and return it to the allocator.
+ *
+ * HSD_AObjSetFObj / HSD_AObjFree are inlined by MWCC at every call site in
+ * this TU, which is why the redundant NULL re-tests below are load-bearing.
  * Address: 0x801C25E4 | Size: 0x8C
  */
-void HSD_AObjRemove(void* obj) {
-    typedef struct AObjRemoveData {
-        u32 flags;
-        f32 curr_frame;
-        f32 rewind_frame;
-        f32 end_frame;
-        f32 framerate;
-        void* volatile fobj;
-        void* volatile hsd_obj;
-    } AObjRemoveData;
-    extern void HSD_FObjRemoveAll(void* fobj);
-    extern void fn_801A05EC(void* obj);
-    extern void HSD_ObjFree(void* list, void* data);
-    extern u8 lbl_80466DB8[];
-    AObjRemoveData* aobj = obj;
-
+void HSD_AObjRemove(HSD_AObj* aobj) {
     if (!aobj) {
         return;
     }
 
+    /* inlined HSD_AObjSetFObj(aobj, NULL) */
     if (aobj) {
         if (aobj->fobj) {
             HSD_FObjRemoveAll(aobj->fobj);
@@ -381,159 +566,235 @@ void HSD_AObjRemove(void* obj) {
         aobj->hsd_obj = NULL;
     }
 
+    /* inlined HSD_AObjFree(aobj) */
     if (aobj) {
         HSD_ObjFree(lbl_80466DB8, aobj);
     }
 }
 
 /**
- * HSD_AObjLoadDesc - Pre-grid scene object configuration (renamed from
- * fn_801C2670; confirmed name -- naming pass 2026-07-07). See
- * HSD_AObjRemove's note above re: signature vs. include/hsd/hsd_aobj.h.
+ * HSD_AObjLoadDesc - Instantiate an AObj from its descriptor.
+ *
+ * HSD_AObjAlloc (assert + memset + defaults), HSD_AObjSetFlags,
+ * HSD_AObjSetRewindFrame, HSD_AObjSetEndFrame and HSD_AObjSetFObj are all
+ * inlined here by MWCC.
  * Address: 0x801C2670 | Size: 0x184
  */
-void HSD_AObjLoadDesc(void* ctx, s32 objType, s32 param) {
-    u8* state = (u8*)ctx;
-    if (state == NULL) {
-        return;
+HSD_AObj* HSD_AObjLoadDesc(HSD_AObjDesc* aobjdesc) {
+    HSD_FObjDesc* fobjdesc;
+    HSD_AObj* aobj;
+
+    u8 _[4];
+
+    HSD_FObj* fobj;
+    u32 id;
+    HSD_Obj* phi_r30;
+
+    if (aobjdesc != NULL) {
+        HSD_AObj* new;
+
+        /* inlined HSD_AObjAlloc() */
+        new = (HSD_AObj*) HSD_ObjAlloc(lbl_80466DB8);
+        (new != NULL) ? (void) 0
+                      : __assert((const char*) lbl_8047DF40, 0x1E9,
+                                 (const char*) lbl_8047DF4C);
+        memset(new, 0, sizeof(HSD_AObj));
+        new->flags = AOBJ_NO_ANIM;
+        new->framerate = 1.0F;
+        aobj = new;
+
+        HSD_AObjSetFlags(aobj, aobjdesc->flags);
+
+        /* inlined HSD_AObjSetRewindFrame(aobj, 0.0F) */
+        if (aobj) {
+            aobj->rewind_frame = 0.0F;
+        }
+
+        /* inlined HSD_AObjSetEndFrame(aobj, aobjdesc->end_frame) */
+        if (aobj) {
+            aobj->end_frame = aobjdesc->end_frame;
+        }
+
+        fobjdesc = aobjdesc->fobjdesc;
+        fobj = HSD_FObjLoadDesc(fobjdesc);
+
+        /* inlined HSD_AObjSetFObj(aobj, fobj) */
+        if (aobj) {
+            if (aobj->fobj) {
+                HSD_FObjRemoveAll(aobj->fobj);
+            }
+            aobj->fobj = fobj;
+        }
+
+        id = aobjdesc->obj_id;
+        if (id != 0U) {
+            HSD_Obj* hsd_obj = HSD_IDGetDataFromTable(0, id, 0);
+            phi_r30 = hsd_obj;
+            if (hsd_obj != NULL) {
+                ref_INC(hsd_obj);
+            } else {
+                phi_r30 =
+                    (HSD_Obj*) HSD_JObjLoadJoint((void*) aobjdesc->obj_id);
+            }
+            if (aobj != NULL) {
+                if (aobj->hsd_obj != NULL) {
+                    fn_801A05EC(aobj->hsd_obj);
+                }
+                aobj->hsd_obj = phi_r30;
+            }
+        }
+        return aobj;
     }
-    /* Configure a scene object in the pre-grid context:
-     * objType 0: Stage background model
-     * objType 1: Ground plane model
-     * objType 2: Sky dome model
-     * objType 3: Battle effect spawner
-     */
-    *(s32*)(state + 0x1C8 + (objType * 4)) = param;
+    return NULL;
 }
 
 /**
- * HSD_AObjInterpretAnim - Pre-grid field layout calculation (renamed from
- * fn_801C27F4; confirmed name -- naming pass 2026-07-07). See
- * HSD_AObjRemove's note above re: signature vs. include/hsd/hsd_aobj.h.
+ * HSD_AObjInterpretAnim - Advance an AObj one frame and push the resulting
+ * FObj values into @p obj through @p update_func, handling looping/rewind
+ * and tallying the two end-callback counters.
  * Address: 0x801C27F4 | Size: 0x1D0
  */
-void HSD_AObjInterpretAnim(void* ctx, f32 posX, f32 posZ) {
-    BattleGridSceneWork* state = (BattleGridSceneWork*)ctx;
-    if (state == NULL) {
+void HSD_AObjInterpretAnim(HSD_AObj* aobj, void* obj,
+                           HSD_ObjUpdateFunc update_func) {
+    f32 rate = 0;
+
+    if (!aobj || aobj->flags & AOBJ_NO_ANIM) {
         return;
     }
-    /* Calculate field layout positions for all 4 battle slots
-     * based on a center offset (posX, posZ).
-     * The double battle layout uses a diamond formation:
-     *   Slot 0 (Player L): center + (-offset, -depth)
-     *   Slot 1 (Player R): center + (+offset, -depth)
-     *   Slot 2 (Enemy L):  center + (-offset, +depth)
-     *   Slot 3 (Enemy R):  center + (+offset, +depth)
-     */
-    {
-        f32 offsetX = 3.0f;
-        f32 depthZ = 5.0f;
-        s32 i;
 
-        for (i = 0; i < BATTLE_TOTAL_POKEMON; i++) {
-            BattleGridSceneSlot* slot = &state->slots[i];
-            f32 sx = (i & 1) ? offsetX : -offsetX;
-            f32 sz = (i >= BATTLE_POS_ENEMY_LEFT) ? depthZ : -depthZ;
+    if (aobj->flags & AOBJ_FIRST_PLAY) {
+        aobj->flags &= 0xF7FFFFFF;
+        rate = 0.0F;
+    } else {
+        rate = aobj->framerate;
+        aobj->curr_frame += aobj->framerate;
+    }
 
-            slot->posX = posX + sx;
-            slot->posY = 0.0f;
-            slot->posZ = posZ + sz;
+    if ((aobj->flags & AOBJ_LOOP) && aobj->end_frame <= aobj->curr_frame) {
+        if (aobj->rewind_frame < aobj->end_frame) {
+            f32 x, y;
+
+            HSD_FObjStopAnimAll(aobj->fobj, obj, update_func, rate);
+            y = aobj->end_frame - aobj->rewind_frame;
+            x = aobj->curr_frame - aobj->rewind_frame;
+            aobj->curr_frame = fmod(x, y) + aobj->rewind_frame;
+            HSD_FObjReqAnimAll(aobj->fobj, aobj->curr_frame);
+        } else {
+            aobj->curr_frame = aobj->end_frame;
         }
+        rate = 0.0F;
+        aobj->flags |= AOBJ_REWINDED;
+    } else {
+        aobj->flags &= 0xFBFFFFFF;
+    }
+
+    if (aobj->flags & AOBJ_NO_UPDATE) {
+        HSD_FObjInterpretAnimAll(aobj->fobj, obj, NULL, rate);
+    } else {
+        HSD_FObjInterpretAnimAll(aobj->fobj, obj, update_func, rate);
+    }
+
+    if (!(aobj->flags & AOBJ_LOOP) && (aobj->end_frame <= aobj->curr_frame) &&
+        aobj)
+    {
+        HSD_FObjStopAnimAll(aobj->fobj, obj, update_func, aobj->framerate);
+        aobj->flags |= AOBJ_NO_ANIM;
+    }
+
+    if (aobj->flags & AOBJ_NO_ANIM) {
+        lbl_8047B390 += 1;
+    } else {
+        lbl_8047B38C += 1;
     }
 }
 
 /**
- * HSD_AObjReqAnim - Set JObj animation frame value.
+ * HSD_AObjReqAnim - Rewind an AObj to @p frame and re-request its FObjs.
  * Address: 0x801C29C4 | Size: 0x40
  */
-void HSD_AObjReqAnim(void* obj, f32 value) {
-    extern void HSD_FObjReqAnimAll(void* jobj);
+void HSD_AObjReqAnim(HSD_AObj* aobj, f32 frame) {
+    u32 flags;
 
-    if (obj == NULL) {
+    if (aobj == NULL) {
         return;
     }
-    *(f32*)((u8*)obj + 4) = value;
-    *(u32*)obj = (*(u32*)obj & ~0x40000000) | 0x08000000;
-    HSD_FObjReqAnimAll(*(void**)((u8*)obj + 0x14));
+
+    aobj->curr_frame = frame;
+
+    flags = aobj->flags & ~AOBJ_NO_ANIM;
+    aobj->flags = flags | AOBJ_FIRST_PLAY;
+
+    HSD_FObjReqAnimAll(aobj->fobj, frame);
 }
 
 /**
- * HSD_AObjInvokeCallBacks - Run pre-grid node callbacks.
+ * HSD_AObjInvokeCallBacks - Run the registered end-of-animation callbacks,
+ * but only once every AObj interpreted this frame has finished.
  * Address: 0x801C2A04 | Size: 0x5C
  */
-typedef struct BattleGridCallbackNode {
-    struct BattleGridCallbackNode* next;
-    void (*callback)(void);
-} BattleGridCallbackNode;
-
 void HSD_AObjInvokeCallBacks(void) {
-    extern s32 lbl_8047B390;
-    extern s32 lbl_8047B38C;
-    extern BattleGridCallbackNode* lbl_8047B388;
-    BattleGridCallbackNode* node;
+    HSD_SList* list;
 
     if (lbl_8047B390 != 0 && lbl_8047B38C == 0) {
-        node = lbl_8047B388;
-        while (node != NULL) {
-            node->callback();
-            node = node->next;
+        list = lbl_8047B388;
+        while (list != NULL) {
+            void (*func)(void) = (void (*)(void))list->data;
+            (*func)();
+            list = list->next;
         }
     }
 }
 
 /**
- * HSD_AObjInitEndCallBack - Initialize pre-grid end callback state.
+ * HSD_AObjInitEndCallBack - Reset the two per-frame AObj counters that
+ * HSD_AObjInvokeCallBacks gates on.
  * Address: 0x801C2A60 | Size: 0x14
  */
+/* Compiled at optimization_level 0: at -O4 MWCC CSEs the two zero constants
+ * into a single register, but the target materialises `0` twice (li r3,0 /
+ * li r0,0). */
 #pragma push
-#pragma optimize_for_size on
-s32 HSD_AObjInitEndCallBack(void) {
-    extern s32 lbl_8047B390;
-    extern s32 lbl_8047B38C;
+#pragma optimization_level 0
+void HSD_AObjInitEndCallBack(void) {
     lbl_8047B390 = 0;
     lbl_8047B38C = 0;
-    return 0;
 }
 #pragma pop
 
 /**
- * HSD_AObjClearFlags - Get pre-grid slot side (renamed from fn_801C2A74;
- * confirmed name -- naming pass 2026-07-07).
+ * HSD_AObjClearFlags - Clear the user-settable playback flags.
  * Address: 0x801C2A74 | Size: 0x1C
  */
 void HSD_AObjClearFlags(HSD_AObj* aobj, u32 flags) {
-    if (aobj != NULL) {
-        *(u32*)aobj &= ~(flags & 0xC);
+    if (aobj) {
+        flags &= (AOBJ_LOOP | AOBJ_NO_UPDATE);
+        aobj->flags &= ~flags;
     }
 }
 
 /**
- * HSD_AObjSetFlags - Get pre-grid slot side (renamed from
- * fn_801C2A90; confirmed name -- naming pass 2026-07-07).
+ * HSD_AObjSetFlags - Set the user-settable playback flags.
  * Address: 0x801C2A90 | Size: 0x1C
  */
 void HSD_AObjSetFlags(HSD_AObj* aobj, u32 flags) {
-    if (aobj != NULL) {
-        *(u32*)aobj |= flags & 0xC;
+    if (aobj) {
+        flags &= (AOBJ_LOOP | AOBJ_NO_UPDATE);
+        aobj->flags |= flags;
     }
 }
 
 /**
- * HSD_AObjGetAllocData - Get grid group base pointer.
+ * HSD_AObjGetAllocData - Get the AObj allocator pool.
  * Address: 0x801C2AAC | Size: 0xC
  */
 void* HSD_AObjGetAllocData(void) {
-    extern u8 lbl_80466DB8[];
     return lbl_80466DB8;
 }
 
 /**
- * HSD_AObjInitAllocData - Pre-grid set animation state (renamed from
- * fn_801C2AB8; confirmed name -- naming pass 2026-07-07).
+ * HSD_AObjInitAllocData - Initialise the AObj allocator pool.
  * Address: 0x801C2AB8 | Size: 0x30
  */
 void HSD_AObjInitAllocData(s32 slot, s32 animState) {
-    extern u8 lbl_80466DB8[];
-    extern void HSD_ObjAllocInit(void*, u32, u32);
-    HSD_ObjAllocInit(lbl_80466DB8, 0x1c, 4);
+    HSD_ObjAllocInit(lbl_80466DB8, sizeof(HSD_AObj), 4);
 }

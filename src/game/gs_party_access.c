@@ -1113,13 +1113,11 @@ u32 dbgMenuMenuTestD2Present(u32 arg) {
     table[3] = p[3];
     table[4] = p[4];
     table[5] = p[5];
-    if ((s32)arg == (s32)table[0]) { goto idx_done; }
-    idx = 1;
-    if ((s32)arg == (s32)table[2]) { goto idx_done; }
-    idx = 2;
-    if ((s32)arg == (s32)table[4]) { goto idx_done; }
-    idx = 3;
-idx_done:
+    for (idx = 0; idx < 3; idx++) {
+        if ((s32)arg == (s32)table[idx * 2]) {
+            break;
+        }
+    }
     val = table[idx * 2 + 1];
     r = GSthreadCreate(1, fn_800FF560(), 0x4000, 1, 1, (u32)(void(*)(void))fn_8000CB54);
     GSthreadSetArgs(r, 1, val);

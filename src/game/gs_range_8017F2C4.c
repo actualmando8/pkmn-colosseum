@@ -166,6 +166,8 @@ u32 fn_8017FA5C(void)
 }
 #pragma pop
 
+} GsRangeRequest;
+
 #pragma optimize_for_size on
 s32 fn_801808B4(volatile GsRangeRequest* req)
 {

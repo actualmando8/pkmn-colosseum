@@ -10,7 +10,10 @@
  */
 
 #include "dolphin/types.h"
+/* This TU recovers the return type hidden by the shared legacy declaration. */
+#define gamedataGetStatus gamedataGetStatus_legacy_decl
 #include "game/effect/effect_util_types.h"
+#undef gamedataGetStatus
 
 
 /* 0x80135030 | 0x138 */
@@ -137,21 +140,39 @@ asm void fn_8013528C(void) {
 }
 #else
 #pragma optimization_level 4
-void fn_8013528C(void* ptr, u8 r4, u8 r5, u8 r6, u8 r7) {
+void gamedataCreate(void* ptr, u8 r4, u8 r5, u8 r6, u8 r7) {
     void* base;
-    if (ptr == 0) return;
+
+    if (ptr == 0) {
+        return;
+    }
     gamedataInit(ptr);
+
+    base = ptr;
     if (ptr == 0) {
         base = (void*)savedataGetStatus(0, 0);
-        if (base == 0) return;
-        base = (void*)savedataGetStatus((u32)base, 1);
-        if (base == 0) return;
-    } else {
-        base = ptr;
+        if (base == 0) {
+            base = 0;
+            goto done;
+        } else {
+            base = (void*)savedataGetStatus((u32)base, 1);
+            if (base == 0) {
+                base = 0;
+                goto done;
+            }
+        }
     }
+
     base = (void*)gamedataBiosGetGamedataAtttestPtr(base);
-    if (base == 0) return;
-    fn_801353C0(base, r4, r5, r6, r7);
+    if (base == 0) {
+        base = 0;
+    }
+
+done:
+    if (base == 0) {
+        return;
+    }
+    gamedataAttestCreate(base, r4, r5, r6, r7);
 }
 #endif
 
@@ -369,6 +390,9 @@ _end:;
 #endif
 
 
+typedef struct GameData GameData;
+typedef struct GameDataAttest GameDataAttest;
+
 /* 0x8013583C | 0xFC */
 #if 0
 asm void fn_8013583C(void) {
@@ -377,25 +401,48 @@ asm void fn_8013583C(void) {
 #else
 #pragma push
 #pragma scheduling on
-void fn_8013583C(void* ptr, u16 effect_type, u32 value) {
-    void* base; u16 et;
-    et = effect_type & 0xFFFF;
-    if (et == 0 || et >= 7) return;
-    if (ptr == 0) {
-        base = (void*)savedataGetStatus(0, 0);
-        if (base != 0) { base = (void*)savedataGetStatus((u32)base, 1); }
-        ptr = base;
+void gamedataSetStatus(ptr, effect_type, value)
+GameData* ptr;
+u32 effect_type;
+u32 value;
+{
+    GameDataAttest* base;
+
+    if ((u16)effect_type == 0 || (u16)effect_type >= 7) {
+        return;
     }
-    if (ptr == 0) return;
-    base = (void*)gamedataBiosGetGamedataAtttestPtr(ptr);
-    if (base == 0) return;
-    switch (et) {
-        case 1: gamedataBiosSetGamedataAtttestPtr((u32*)ptr, (u32*)value); break;
-        case 2: gamedataAttestBiosSetVerId(base, (u8)(value & 0xFF)); break;
-        case 3: gamedataAttestBiosSetGenId(base, (u8)(value & 0xFF)); break;
-        case 4: gamedataAttestBiosSetAreaId(base, (u8)(value & 0xFF)); break;
-        case 5: gamedataAttestBiosSetLangareaId(base, (u8)(value & 0xFF)); break;
-        default: break;
+    if (ptr == NULL) {
+        ptr = (GameData*)savedataGetStatus(0, 0);
+        if (ptr == NULL) {
+            return;
+        }
+        ptr = (GameData*)savedataGetStatus((u32)ptr, 1);
+        if (ptr == NULL) {
+            return;
+        }
+    }
+    base = (GameDataAttest*)gamedataBiosGetGamedataAtttestPtr(ptr);
+    if (base == NULL) {
+        return;
+    }
+    switch ((u16)effect_type) {
+    case 1:
+        gamedataBiosSetGamedataAtttestPtr((u32*)ptr, (u32*)value);
+        break;
+    case 2:
+        gamedataAttestBiosSetVerId(base, (u8)value);
+        break;
+    case 3:
+        gamedataAttestBiosSetGenId(base, (u8)value);
+        break;
+    case 4:
+        gamedataAttestBiosSetAreaId(base, (u8)value);
+        break;
+    case 5:
+        gamedataAttestBiosSetLangareaId(base, (u8)value);
+        break;
+    default:
+        break;
     }
 }
 #pragma pop
@@ -403,36 +450,44 @@ void fn_8013583C(void* ptr, u16 effect_type, u32 value) {
 
 
 /* 0x80135938 | 0xF8 */
-#if 0
-asm void fn_80135938(void) {
-#include "src/game/effect/effect_util_fn_80135938.inc"
-}
-#else
-#pragma optimization_level 4
 #pragma push
-#pragma optimization_level 1
-u8 fn_80135938(void* ptr, u16 effect_type) {
-    void* base; u16 et;
-    et = effect_type & 0xFFFF;
-    if (et == 0 || et >= 7) return 0;
-    if (ptr == 0) {
-        base = (void*)savedataGetStatus(0, 0);
-        if (base == 0) return 0;
-        base = (void*)savedataGetStatus((u32)base, 1);
-        if (base == 0) return 0;
-    } else {
-        base = ptr;
+#pragma scheduling on
+u32 gamedataGetStatus(ptr, effect_type)
+GameData* ptr;
+u32 effect_type;
+{
+    GameDataAttest* base;
+
+    if ((u16)effect_type == 0 || (u16)effect_type >= 7) {
+        return 0;
     }
-    base = (void*)gamedataBiosGetGamedataAtttestPtr(base);
-    if (base == 0) return 0;
-    switch (et) {
-        case 1: return 0;
-        case 2: return (u8)gamedataAttestBiosGetVerId(base);
-        case 3: return (u8)gamedataAttestBiosGetGenId(base);
-        case 4: return (u8)gamedataAttestBiosGetAreaId(base);
-        case 5: return (u8)gamedataAttestBiosGetLangareaId(base);
-        default: return 0;
+    if (ptr == NULL) {
+        ptr = (GameData*)savedataGetStatus(0, 0);
+        if (ptr == NULL) {
+            return 0;
+        }
+        ptr = (GameData*)savedataGetStatus((u32)ptr, 1);
+        if (ptr == NULL) {
+            return 0;
+        }
+    }
+    base = (GameDataAttest*)gamedataBiosGetGamedataAtttestPtr(ptr);
+    if (base == NULL) {
+        return 0;
+    }
+    switch ((u16)effect_type) {
+    case 1:
+        return (u32)base;
+    case 2:
+        return gamedataAttestBiosGetVerId(base);
+    case 3:
+        return gamedataAttestBiosGetGenId(base);
+    case 4:
+        return gamedataAttestBiosGetAreaId(base);
+    case 5:
+        return gamedataAttestBiosGetLangareaId(base);
+    default:
+        return 0;
     }
 }
 #pragma pop
-#endif

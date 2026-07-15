@@ -10,6 +10,8 @@
 #include "hsd/hsd_aobj.h"
 #include "hsd/hsd_class.h"
 #include "hsd/hsd_debug.h"
+#include "hsd/hsd_dobj.h"
+#include "hsd/hsd_jobj.h"
 #include "hsd/hsd_object.h"
 #include "hsd/hsd_wobj.h"
 
@@ -19,14 +21,18 @@ extern void C_MTXPerspective();
 extern void OSFillFPUContext();
 extern int setupTopHalfCamera();   /* wrk7: was `void` asm-wrapper decl; typed-C returns int */
 extern void CObjUpdateFunc(HSD_CObj*, u32, f32*);
+extern int CObjInit(HSD_CObj*);
+extern void CObjRelease(HSD_CObj*);
+extern void CObjAmnesia(HSD_ClassInfo*);
+extern int CObjLoad(HSD_CObj*, HSD_CObjDesc*);
 extern char lbl_80465080[];
 
 static HSD_ClassInfo* default_class;
 static HSD_CObj* current;
 
-static void CObjInfoInit(void);
+void fn_80193C24(void);
 
-HSD_CObjInfo hsdCObj = { CObjInfoInit };
+HSD_CObjInfo hsdCObj = { fn_80193C24 };
 
 /* ========================================================================= */
 /*  Accessors                                                                */
@@ -274,18 +280,30 @@ static void CObjAmnesia_Early(HSD_ClassInfo* info)
     HSD_OBJECT_PARENT_INFO(&hsdCObj)->amnesia(info);
 }
 
-static void CObjInfoInit(void)
+/* 0x80193C24 | 0xAC - CObjInfoInit */
+#pragma push
+#pragma optimization_level 1
+#pragma optimizewithasm off
+void fn_80193C24(void)
 {
-    hsdInitClassInfo(HSD_CLASS_INFO(&hsdCObj), HSD_CLASS_INFO(&hsdObj),
-                     "sysdolphin_base_library", "hsd_cobj",
-                     sizeof(HSD_CObjInfo), sizeof(HSD_CObj));
-    HSD_CLASS_INFO(&hsdCObj)->release = CObjRelease_Early;
-    HSD_CLASS_INFO(&hsdCObj)->amnesia = CObjAmnesia_Early;
-    HSD_COBJ_INFO(&hsdCObj)->load =
-        (int (*)(HSD_CObj*, HSD_CObjDesc*)) setupTopHalfCamera;
-    HSD_COBJ_INFO(&hsdCObj)->update =
+    extern HSD_CObjInfo lbl_8036C678;
+    extern HSD_ClassInfo lbl_8036CC00;
+    extern char lbl_80274628[];
+    extern char lbl_80274640[];
+
+    hsdInitClassInfo(HSD_CLASS_INFO(&lbl_8036C678), &lbl_8036CC00,
+                     lbl_80274628, lbl_80274640, sizeof(HSD_CObjInfo),
+                     sizeof(HSD_CObj));
+    HSD_CLASS_INFO(&lbl_8036C678)->init =
+        (int (*)(HSD_Class*)) CObjInit;
+    HSD_CLASS_INFO(&lbl_8036C678)->release =
+        (void (*)(HSD_Class*)) CObjRelease;
+    HSD_CLASS_INFO(&lbl_8036C678)->amnesia = CObjAmnesia;
+    HSD_COBJ_INFO(&lbl_8036C678)->load = CObjLoad;
+    HSD_COBJ_INFO(&lbl_8036C678)->update =
         (void (*)(HSD_CObj*, u32, void*)) CObjUpdateFunc;
 }
+#pragma pop
 
 /* 0x80193CD0 | 0x60 */
 #pragma push
@@ -455,9 +473,9 @@ return_null:
 #pragma optimization_level 1
 #pragma optimizewithasm off
 extern void HSD_WObjInit(HSD_WObj*, HSD_WObjDesc*);
-extern void HSD_CObjSetRoll(HSD_CObj*, f32);
-extern void HSD_CObjSetUpVector(HSD_CObj*, f32*);
-extern f32 lbl_8036C6D4[]; /* default up vector (Vec3) */
+extern void HSD_CObjSetRoll(HSD_CObj* cobj, f32 roll);
+extern void HSD_CObjSetUpVector(HSD_CObj* cobj, Vec* up);
+extern Vec lbl_8036C6D4; /* default up vector = { 0, 1, 0 } */
 #if 0
 asm void CObjLoad(void) {
 #include "src/hsd/hsd_cobj_fn_80194010.inc"
@@ -495,9 +513,9 @@ int CObjLoad(HSD_CObj* cobj, HSD_CObjDesc* desc)
         cobj->far = desc->common.ffar;
     }
     if (desc->common.flags & 1) {
-        void* up = desc->common.up_vector;
+        Vec* up = desc->common.up_vector;
         if (up == NULL) {
-            up = lbl_8036C6D4;
+            up = &lbl_8036C6D4;
         }
         HSD_CObjSetUpVector(cobj, up);
     } else {
@@ -991,184 +1009,179 @@ void HSD_CObjSetFov(HSD_CObj* cobj, f32 val)
     cobj->projection_param.perspective.fov = val;
 }
 
-/* 0x801947C8 | 0x464 */
+/* HSD_CObjGetEyePosition / HSD_CObjGetInterest are defined here, ahead of the
+ * up-vector cluster, because roll2upvec / upvec2roll / HSD_CObjSetUpVector
+ * inline them. */
+extern void __assert(const char*, u32, const char*);
+extern char lbl_8047D958;
+extern char lbl_8047D960;
+extern void HSD_WObjGetPosition(HSD_WObj* wobj, Vec* position);
+
+/* 0x80195904 | 0x6C */
 #pragma push
-#pragma optimization_level 2
+#pragma optimization_level 4
 #pragma optimizewithasm off
-extern void OSReport(const char* fmt, ...);
-extern void PSMTXRotAxisRad(void);
-extern void fn_800A3820(void);
-extern void PSVECSubtract(void*, void*, void*);
-extern void fn_800A3ADC(void);
-extern void fabs(void);
-extern void fn_800CE718(void);
-extern int vec_normalize_check(f32*, void*);   /* wrk8: real sig (was `void (void)`) */
-extern void HSD_CObjSetMtxDirty(HSD_CObj*);
-extern int roll2upvec(HSD_CObj*, f32, f32*);   /* wrk8: typed-C returns int */
-extern f32 upvec2roll(HSD_CObj*, f32*);
-extern void HSD_CObjGetEyePosition(HSD_CObj*, void*);
-extern void HSD_CObjGetInterest(HSD_CObj*, void*);
-#if 0
-asm void fn_801947C8(void) {
-#include "src/hsd/hsd_cobj_fn_801947C8.inc"
+void HSD_CObjGetEyePosition(HSD_CObj* cobj, Vec* arg) {
+    if (!cobj) __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
+    if (!cobj) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
+    HSD_WObjGetPosition(cobj->eyepos, arg);
 }
-#else
-/* decompiled wrk8 2026-06-16: functional (TU not byte-measurable) - HSD_CObjSetRoll.
-   In plain roll mode (flags&1 clear) it just records the roll and marks the
-   matrices dirty if it changed. In up-vector mode (flags&1 set) it rebuilds the
-   up-vector that corresponds to `roll` - the same horizon-perp + rotate-about-dir
-   construction as roll2upvec - then commits it through the (inlined)
-   HSD_CObjSetUpVector store logic. The trailing flags&1==0 sub-path is structurally
-   dead given the up-vector entry condition but is reproduced faithfully from the asm.
-   INFERRED: the near-vertical threshold and the sqrt-degenerate fallback are
-   anonymous SDA2 doubles reconstructed by value; lbl_80274654 (up-path assert msg)
-   is an anonymous SDA2 string - all flagged for review. */
-void HSD_CObjSetRoll(HSD_CObj* cobj, f32 roll)
-{
-    extern f32 lbl_80478AC0;   /* sqrt-degenerate fallback (anonymous SDA2, ~0.0f) - INFERRED */
-    extern f32 lbl_80478AC8;   /* degenerate-vector epsilon */
-    extern char lbl_8047D958;
-    extern char lbl_8047D960;
-    extern char lbl_8027464C;  /* OSReport fmt: up-vector degenerate warning */
-    extern char lbl_80274654;  /* up-path __assert message (anonymous SDA2) - INFERRED */
-    extern f32 sqrtf(f32);
-    f32 eye[3];        /* sp+0x14 */
-    f32 interest[3];   /* sp+0x20 */
-    f32 dir[3];        /* sp+0x38 */
-    f32 perp[3];       /* sp+0x44 */
-    f32 rotated[3];    /* sp+0x50 */
-    f32 newup[3];      /* sp+0x5c */
-    f32 normup[3];     /* sp+0x2c */
-    f32 mtx[3][4];     /* sp+0x68 */
-    f32 eps = lbl_80478AC8;
-
-    if (cobj == NULL) {
-        return;
-    }
-    if (!(cobj->flags & 1)) {
-        /* plain roll-storage mode */
-        if (cobj->u.roll != roll) {
-            cobj->flags |= 0xC0000000;
-        }
-        cobj->u.roll = roll;
-        return;
-    }
-
-    /* up-vector mode: rebuild the up-vector that matches `roll`. */
-    {
-        int ok;
-        if (cobj == NULL || cobj->eyepos == NULL || cobj->interest == NULL) {
-            ok = 0;
-        } else {
-            HSD_CObjGetEyePosition(cobj, eye);
-            HSD_CObjGetInterest(cobj, interest);
-            PSVECSubtract(interest, eye, dir);                 /* dir = interest - eye */
-            ok = (((int (*)(f32*, f32*)) vec_normalize_check)(dir, dir) == 0); /* normalize + guard */
-        }
-        if (ok) {
-            f32 absy = ((f32 (*)(f32)) fabs)(dir[1]); /* fabsf */
-            if (1.0f - absy >= 1e-4f /* near-1 eps - INFERRED */) {
-                f32 q = dir[0] * dir[0] + dir[2] * dir[2];
-                f32 len = (q > 0.0f) ? sqrtf(q) : lbl_80478AC0;
-                f32 s = -dir[1] / len;
-                perp[0] = dir[0] * s;
-                perp[1] = len;
-                perp[2] = dir[2] * s;
-            } else {
-                f32 q = dir[1] * dir[1] + dir[2] * dir[2];
-                f32 len = (q > 0.0f) ? sqrtf(q) : lbl_80478AC0;
-                f32 s = -dir[0] / len;
-                perp[0] = len;
-                perp[1] = dir[1] * s;
-                perp[2] = dir[2] * s;
-            }
-            ((void (*)(f32*, f32*, f32)) PSMTXRotAxisRad)(&mtx[0][0], dir, -roll);
-            ((void (*)(f32*, f32*, f32*)) fn_800A3820)(&mtx[0][0], perp, rotated);
-            ((void (*)(f32*, f32*)) fn_800A3ADC)(rotated, newup); /* newup = normalized up */
-        }
-    }
-
-    /* ---- inlined HSD_CObjSetUpVector(cobj, newup) ---- */
-    if (cobj == NULL) {
-        return;
-    }
-    if (cobj->flags & 1) {
-        int ok;
-        if (((f32 (*)(f32)) fabs)(newup[0]) <= eps &&
-            ((f32 (*)(f32)) fabs)(newup[1]) <= eps &&
-            ((f32 (*)(f32)) fabs)(newup[2]) <= eps) {
-            ok = -1; /* degenerate up-vector */
-        } else {
-            ((void (*)(f32*, f32*)) fn_800A3ADC)(newup, normup); /* normalize -> normup */
-            ok = 0;
-        }
-        if (ok != 0) {
-            OSReport(&lbl_8027464C);
-            __assert(&lbl_8047D958, 0x3e4, &lbl_80274654);
-        }
-        if (cobj->u.up.x != normup[0] || cobj->u.up.y != normup[1] ||
-            cobj->u.up.z != normup[2]) {
-            cobj->flags |= 0xC0000000;
-            cobj->u.up.x = normup[0];
-            cobj->u.up.y = normup[1];
-            cobj->u.up.z = normup[2];
-        }
-    } else {
-        /* structurally-dead given flags&1 entry; reproduced faithfully */
-        f32 tmp[3];
-        roll = upvec2roll(cobj, newup);
-        if (cobj == NULL) {
-            return;
-        }
-        if (cobj->flags & 1) {
-            ((void (*)(HSD_CObj*, f32, f32*)) roll2upvec)(cobj, roll, tmp);
-            HSD_CObjSetUpVector(cobj, tmp);
-        } else {
-            if (cobj->u.roll != roll) {
-                HSD_CObjSetMtxDirty(cobj);
-            }
-            cobj->u.roll = roll;
-        }
-    }
-}
-#endif
 #pragma pop
+
+/* 0x801959DC | 0x6C */
+#pragma push
+#pragma optimization_level 4
+#pragma optimizewithasm off
+void HSD_CObjGetInterest(HSD_CObj* cobj, Vec* arg) {
+    if (!cobj) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
+    if (!cobj) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
+    HSD_WObjGetPosition(cobj->interest, arg);
+}
+#pragma pop
+
+/* ========================================================================= */
+/*  Up-vector / roll cluster - shared declarations                           */
+/*                                                                           */
+/*  The original HSD sources (cf. doldecomp/melee sysdolphin/baselib/cobj.c) */
+/*  work on real `Vec` values and pull `vec_normalize_check` / `sqrtf` in as  */
+/*  inlines from util.h / <math.h>. Reproducing that shape is what makes the  */
+/*  codegen line up.                                                          */
+/* ========================================================================= */
+
+/* .sdata floats. These are addressed absolutely (lis/@ha + @l), not through  */
+/* the SDA base, so they must be declared as arrays - exactly as the matched   */
+/* crt/math_range_800CAA58.c does for lbl_80478AC0.                            */
+extern const f32 lbl_80478AC0[]; /* NaN                                       */
+extern const f32 lbl_80478AC8[]; /* FLT_MIN (degenerate-vector epsilon)       */
+
+/* .sdata2 literal pool for this TU. */
+extern f32 lbl_8047D978; /* 0.0f   */
+extern f64 lbl_8047D988; /* 1.0    */
+extern f64 lbl_8047D990; /* 0.0001 */
+extern f64 lbl_8047D998; /* 0.5    */
+extern f64 lbl_8047D9A0; /* 3.0    */
+extern f64 lbl_8047D9A8; /* 0.0    */
+
+/* .data: the reference frame used by upvec2roll, and CObjLoad's default up. */
+extern Vec lbl_8036C6BC; /* orig = { 0, 0, 0 } */
+extern Vec lbl_8036C6C8; /* uy   = { 0, 1, 0 } */
+extern Vec lbl_8036C6D4; /* uy2  = { 0, 1, 0 } */
+
+extern void OSReport(const char* fmt, ...);
+extern void PSVECSubtract(void*, void*, void*);
+extern void PSVECNormalize(Vec* src, Vec* dst);
+extern f32 PSVECDotProduct(Vec* a, Vec* b);
+extern f32 PSVECMag(Vec* v);
+extern void PSMTXMultVecSR(f32 m[3][4], Vec* src, Vec* dst);
+extern void PSMTXRotAxisRad(f32 m[3][4], Vec* axis, f32 rad);
+extern void HSD_CObjSetMtxDirty(HSD_CObj*);
+extern void HSD_CObjGetEyePosition(HSD_CObj*, Vec*);
+extern void HSD_CObjGetInterest(HSD_CObj*, Vec*);
+extern int vec_normalize_check(Vec* src, Vec* dst);
+extern int roll2upvec(HSD_CObj* cobj, Vec* up, f32 roll);
+extern f32 upvec2roll(HSD_CObj* cobj, Vec* up);
+extern void HSD_CObjSetUpVector(HSD_CObj* cobj, Vec* up);
+extern void HSD_CObjSetRoll(HSD_CObj* cobj, f32 roll);
+
+typedef union CObjFloatShape {
+    f32 value;
+    u32 bits;
+} CObjFloatShape;
+
+/* MSL <math.h> inline sqrtf: frsqrte + 3 Newton steps, then the NaN/zero
+ * fallbacks. Byte-identical in shape to the out-of-line copy in
+ * src/crt/math_range_800CAA58.c; the original TU got this inlined from the
+ * header, so we must too. */
+static inline f32 cobj_sqrtf(f32 x)
+{
+    CObjFloatShape shape;
+    f64 y;
+    s32 exp;
+    s32 fpclass;
+
+    if (x > lbl_8047D978) {
+        y = __frsqrte(x);
+        y = lbl_8047D998 * y * (lbl_8047D9A0 - x * (y * y));
+        y = lbl_8047D998 * y * (lbl_8047D9A0 - x * (y * y));
+        y = lbl_8047D998 * y * (lbl_8047D9A0 - x * (y * y));
+        return (f32) (x * y);
+    }
+    if ((f64) x < lbl_8047D9A8) {
+        return lbl_80478AC0[0];
+    }
+    shape.value = x;
+    exp = shape.bits & 0x7F800000;
+    switch (exp) {
+    case 0x7F800000:
+        if ((shape.bits & 0x007FFFFF) != 0) {
+            fpclass = 1;
+        } else {
+            fpclass = 2;
+        }
+        break;
+    case 0:
+        if ((shape.bits & 0x007FFFFF) != 0) {
+            fpclass = 5;
+        } else {
+            fpclass = 3;
+        }
+        break;
+    default:
+        fpclass = 4;
+        break;
+    }
+    if (fpclass == 1) {
+        return lbl_80478AC0[0];
+    }
+    return x;
+}
+
+/* __fabsf(*v) widened to f64 - matches melee's cobj_fabsf_p (fabs + frsp). */
+static inline f64 cobj_fabsf_p(f32* v)
+{
+    return (f32) __fabs(*v);
+}
+
+/* melee's HSD_CObjGetEyeVector, as inlined by this TU: normalised
+ * eye->interest direction. Returns 1 on success, 0 if unusable. */
+static inline int cobj_get_eye_vector(HSD_CObj* cobj, Vec* eye)
+{
+    Vec eyepos;
+    Vec interest;
+
+    if (!cobj || !cobj->eyepos || !cobj->interest) {
+        return 0;
+    }
+    HSD_CObjGetEyePosition(cobj, &eyepos);
+    HSD_CObjGetInterest(cobj, &interest);
+    PSVECSubtract(&interest, &eyepos, eye);
+    return vec_normalize_check(eye, eye) == 0;
+}
 
 /* 0x80194C2C | 0x98 */
 #pragma push
-#pragma optimization_level 2
+#pragma optimization_level 1
 #pragma optimizewithasm off
-extern f32 lbl_80478AC8;
-extern void fn_800A3ADC(void);
-#if 0
-asm void vec_normalize_check(void) {
-#include "src/hsd/hsd_cobj_fn_80194C2C.inc"
-}
-#else
-/* decompiled wrk4 2026-06-16: functional (TU not byte-measurable).
- * Degenerate-vector guard: if every component of the 3-vector is within the
- * epsilon lbl_80478AC8 the direction is unusable -> return -1. Otherwise run
- * fn_800A3ADC on (vec,out) (the asm leaves r3=vec/r4=out live across the call,
- * inferred (f32*,void*) signature) and report success (0). */
-int vec_normalize_check(f32* vec, void* out) {
-    f32 epsilon = lbl_80478AC8;
-    if (vec == NULL || out == NULL) {
+int vec_normalize_check(Vec* vec, Vec* out)
+{
+    if (!vec || !out) {
         return -1;
     }
-    if ((vec[0] < 0.0f ? -vec[0] : vec[0]) <= epsilon &&
-        (vec[1] < 0.0f ? -vec[1] : vec[1]) <= epsilon &&
-        (vec[2] < 0.0f ? -vec[2] : vec[2]) <= epsilon) {
+    if (__fabs(vec->x) <= lbl_80478AC8[0] &&
+        __fabs(vec->y) <= lbl_80478AC8[0] &&
+        __fabs(vec->z) <= lbl_80478AC8[0])
+    {
         return -1;
     }
-    ((void (*)(f32*, void*)) fn_800A3ADC)(vec, out);
+    PSVECNormalize(vec, out);
     return 0;
 }
-#endif
 #pragma pop
 
+/* vec_normalize_check (0x80194C2C | 0x98) is defined above, before its first
+ * inline use. */
+
 /* WP-0061 external references */
-extern void fn_80191688(HSD_WObj*, void*);
-extern void HSD_WObjSetPosition(HSD_WObj*, void*);
 extern void fn_801C25E4(void);
 extern void fn_801C2670(void);
 extern void fn_801C27F4(void*, void*, void*);
@@ -1251,159 +1264,29 @@ void HSD_CObjSetMtxDirty(HSD_CObj* ptr) { *(u32*)((u8*) ptr + 0x8) |= 0xC0000000
 #endif
 #pragma pop
 
-/* 0x80194DA4 | 0x32C */
-#pragma push
-#pragma optimization_level 3
-#pragma optimizewithasm off
-extern void OSReport(const char* fmt, ...);
-extern void PSMTXRotAxisRad(void);
-extern void fn_800A3458(void);
-extern void fn_800A3820(void);
-extern void PSVECSubtract(void*, void*, void*);
-extern void fn_800A3ADC(void);
-extern f32 PSVECDotProduct();
-extern f64 atan2();
-extern void fn_80191688(HSD_WObj*, void*);
-extern void __assert(const char*, u32, const char*);
-#if 0
-asm void fn_80194DA4(void) {
-#include "src/hsd/hsd_cobj_fn_80194DA4.inc"
-}
-#else
-/* decompiled wrk7: functional (TU not byte-measurable) - HSD_CObjSetUpVector,
-   the storage twin of the getter upvec2roll. Sets the camera up-vector / roll
-   from `up` (r4, a 3-float Vec; inferred f32*).
-   - Explicit-up mode (flags & 1 set): guard `up` against the degenerate epsilon
-     lbl_80478AC8; if degenerate, warn (OSReport + __assert); else normalize it and,
-     when it differs from the stored cobj->u.up, mark the matrices dirty
-     (flags |= 0xC0000000) and store it.
-   - Roll mode (flags & 1 clear): rebuild the eye->interest direction and derive a
-     roll angle exactly as upvec2roll does, then commit it via fn_801947C8.
-   The +/-PI/2 results below are anonymous SDA2 literals reconstructed by value;
-   flagged for orchestrator review. */
-void HSD_CObjSetUpVector(HSD_CObj* cobj, f32* up)
-{
-    extern f32 lbl_80478AC8;    /* degenerate-vector epsilon */
-    extern f32 lbl_8036C6BC[];  /* look-at reference eye vector (shared with upvec2roll) */
-    extern f32 lbl_8036C6C8[];  /* look-at reference up vector  (shared with upvec2roll) */
-    extern char lbl_8027464C;   /* OSReport fmt: up-vector degenerate warning */
-    extern char lbl_80274654;   /* up-path __assert message (SDA2 r2-23864) - INFERRED name */
-    f32 epsilon = lbl_80478AC8;
-
-    if (cobj == NULL) {
-        return;
-    }
-    if (up == NULL) {
-        return;
-    }
-
-    if (cobj->flags & 1) {
-        /* ---- explicit up-vector path ---- */
-        f32 newup[3];
-        int ok;
-
-        if (up == NULL) {
-            ok = -1;
-        } else if ((up[0] < 0.0f ? -up[0] : up[0]) <= epsilon &&
-                   (up[1] < 0.0f ? -up[1] : up[1]) <= epsilon &&
-                   (up[2] < 0.0f ? -up[2] : up[2]) <= epsilon) {
-            ok = -1; /* degenerate up-vector */
-        } else {
-            ((void (*)(f32*, f32*)) fn_800A3ADC)(up, newup); /* normalize -> newup */
-            ok = 0;
-        }
-        if (ok != 0) {
-            OSReport(&lbl_8027464C);
-            __assert(&lbl_8047D958, 0x3e4, &lbl_80274654);
-        }
-        if (cobj->u.up.x != newup[0] || cobj->u.up.y != newup[1] ||
-            cobj->u.up.z != newup[2]) {
-            cobj->flags |= 0xC0000000;
-            cobj->u.up.x = newup[0];
-            cobj->u.up.y = newup[1];
-            cobj->u.up.z = newup[2];
-        }
-    } else {
-        /* ---- roll path (twin of upvec2roll) ---- */
-        f32 eye[3];
-        f32 interest[3];
-        f32 dir[3];
-        f32 mtx[3][4];
-        f32 out[3];
-        f32 roll;
-        int ok;
-
-        if (cobj == NULL || cobj->eyepos == NULL || cobj->interest == NULL) {
-            ok = 0;
-        } else {
-            if (cobj == NULL) __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
-            if (cobj == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
-            fn_80191688(cobj->eyepos, eye);
-            if (cobj == NULL) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
-            if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
-            fn_80191688(cobj->interest, interest);
-            PSVECSubtract(interest, eye, dir);
-            if ((dir[0] < 0.0f ? -dir[0] : dir[0]) <= epsilon &&
-                (dir[1] < 0.0f ? -dir[1] : dir[1]) <= epsilon &&
-                (dir[2] < 0.0f ? -dir[2] : dir[2]) <= epsilon) {
-                ok = 0; /* direction ~= 0: unusable */
-            } else {
-                ((void (*)(f32*, f32*)) fn_800A3ADC)(dir, dir); /* normalize in place */
-                ok = 1;
-            }
-        }
-        if (!ok) {
-            roll = 0.0f;
-        } else {
-            f32 dot = ((f32 (*)(f32*, f32*)) PSVECDotProduct)(up, dir);
-            f32 absdot = dot < 0.0f ? -dot : dot;
-            if (1.0f - absdot < epsilon) {
-                roll = 0.0f; /* up nearly parallel to dir: unusable */
-            } else {
-                C_MTXLookAt(mtx, lbl_8036C6BC, lbl_8036C6C8, dir);
-                ((void (*)(f32*, f32*, f32*)) fn_800A3820)(&mtx[0][0], up, out);
-                if (out[1] == 0.0f) {
-                    roll = (-out[0] >= 0.0f) ? 1.5707964f : -1.5707964f; /* +/-PI/2 */
-                } else {
-                    roll = ((f32 (*)(f32, f32)) atan2)(-out[0], out[1]);
-                }
-            }
-        }
-        HSD_CObjSetRoll(cobj, roll);
-    }
-}
-#endif
-#pragma pop
-
 /* 0x801950D0 | 0x6C */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 1
 #pragma optimizewithasm off
-extern int roll2upvec(HSD_CObj*, f32, f32*);   /* wrk8: typed-C returns int */
 #if 0
 asm void HSD_CObjGetUpVector(void) {
 #include "src/hsd/hsd_cobj_HSD_CObjGetUpVector.inc"
 }
 #else
-/* decompiled wrk6: functional (TU not byte-measurable).
-   Returns the camera's up vector. If the CObj stores an explicit up vector
-   (flag bit 0 set), copy its x/y/z out and return 1; otherwise derive the up
-   vector from the stored roll angle via roll2upvec and return its result.
-   Returns 0 when cobj or the output pointer is NULL.
-   `up` is a 3-float Vec (no Vec type in these headers - inferred f32[3]). */
+/* Returns the camera's up vector: the stored one when the CObj holds an
+   explicit up vector (flag bit 0), otherwise the one derived from the stored
+   roll angle. 1 = got a vector, 0 = nothing to give. */
 #pragma dont_inline on
-int HSD_CObjGetUpVector(HSD_CObj* cobj, f32* up)
+int HSD_CObjGetUpVector(HSD_CObj* cobj, Vec* up)
 {
     if (cobj == NULL || up == NULL) {
         return 0;
     }
     if (cobj->flags & 1) {
-        up[0] = cobj->u.up.x;
-        up[1] = cobj->u.up.y;
-        up[2] = cobj->u.up.z;
+        *up = cobj->u.up;
         return 1;
     }
-    return ((int (*)(HSD_CObj*, f32, f32*)) roll2upvec)(cobj, cobj->u.roll, up);
+    return roll2upvec(cobj, up, cobj->u.roll);
 }
 #pragma dont_inline reset
 #endif
@@ -1411,86 +1294,44 @@ int HSD_CObjGetUpVector(HSD_CObj* cobj, f32* up)
 
 /* 0x8019513C | 0x454 */
 #pragma push
-#pragma optimization_level 2
+#pragma optimization_level 1
 #pragma optimizewithasm off
-extern void fn_800A3820(void);
-extern void PSVECSubtract(void*, void*, void*);
-extern void fn_800A3ADC(void);
 #if 0
 asm void roll2upvec(void) {
 #include "src/hsd/hsd_cobj_fn_8019513C.inc"
 }
 #else
-/* decompiled wrk8 2026-06-16: functional (TU not byte-measurable) - derives the
-   camera up-vector that corresponds to a roll angle. Builds the eye->interest
-   direction; returns 0 if it is degenerate. Otherwise builds a horizon up-vector
-   perpendicular to dir (Gram-Schmidt of a world axis against dir, choosing the
-   axis that avoids gimbal lock), rotates it about dir by -roll, normalises it into
-   `out`, and returns 1. The exact-twin of the roll path inlined inside
-   fn_801947C8. INFERRED: the near-vertical threshold and the sqrt-degenerate
-   fallback are anonymous SDA2 doubles reconstructed by value (flagged). */
-int roll2upvec(HSD_CObj* cobj, f32 roll, f32* out)
+/* Derives the camera up-vector that corresponds to a roll angle: take the
+   eye->interest direction, Gram-Schmidt a world axis against it (choosing the
+   axis that avoids gimbal lock near vertical), rotate that about the direction
+   by -roll and normalise it into `up`. Returns 1 on success, 0 if the
+   eye->interest direction is degenerate. */
+int roll2upvec(HSD_CObj* cobj, Vec* up, f32 roll)
 {
-    extern f32 lbl_80478AC0;   /* sqrt-degenerate fallback (anonymous SDA2, ~0.0f) - INFERRED */
-    extern f32 lbl_80478AC8;   /* degenerate-vector epsilon */
-    extern char lbl_8047D958;
-    extern char lbl_8047D960;
-    extern f32 sqrtf(f32);
-    f32 eye[3];        /* sp+0x10 */
-    f32 interest[3];   /* sp+0x1c */
-    f32 dir[3];        /* sp+0x40 */
-    f32 perp[3];       /* sp+0x34 */
-    f32 rotated[3];    /* sp+0x28 */
-    f32 mtx[3][4];     /* sp+0x4c */
-    f32 eps = lbl_80478AC8;
-    int ok;
+    Vec eye;
+    Vec v0;
+    Vec v1;
+    f32 m[3][4];
 
-    if (cobj == NULL || cobj->eyepos == NULL || cobj->interest == NULL) {
-        ok = 0;
-    } else {
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
-        fn_80191688(cobj->eyepos, eye);
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
-        fn_80191688(cobj->interest, interest);
-        PSVECSubtract(interest, eye, dir);   /* dir = interest - eye */
-        if ((dir[0] < 0.0f ? -dir[0] : dir[0]) <= eps &&
-            (dir[1] < 0.0f ? -dir[1] : dir[1]) <= eps &&
-            (dir[2] < 0.0f ? -dir[2] : dir[2]) <= eps) {
-            ok = 0; /* direction ~= 0: unusable (asm sets -1, folded to 0 below) */
-        } else {
-            ((void (*)(f32*, f32*)) fn_800A3ADC)(dir, dir); /* normalize in place */
-            ok = 1;
-        }
-    }
-    if (!ok) {
+    if (!cobj_get_eye_vector(cobj, &eye)) {
         return 0;
     }
 
-    /* horizon up-vector perpendicular to dir, picking the world axis that
-       avoids gimbal lock near a vertical direction. */
-    if (1.0f - (dir[1] < 0.0f ? -dir[1] : dir[1]) >= 1e-4f /* near-1 eps - INFERRED */) {
-        /* dir not near-vertical: project world up (0,1,0) onto plane perp to dir */
-        f32 q = dir[0] * dir[0] + dir[2] * dir[2];
-        f32 len = (q > 0.0f) ? sqrtf(q) : lbl_80478AC0;
-        f32 s = -dir[1] / len;
-        perp[0] = dir[0] * s;
-        perp[1] = len;
-        perp[2] = dir[2] * s;
+    if (lbl_8047D988 - cobj_fabsf_p(&eye.y) < lbl_8047D990) {
+        /* near-vertical: Gram-Schmidt the world x axis against eye */
+        v0.x = cobj_sqrtf(eye.y * eye.y + eye.z * eye.z);
+        v0.y = eye.y * (-eye.x / v0.x);
+        v0.z = eye.z * (-eye.x / v0.x);
     } else {
-        /* dir near-vertical: project world x (1,0,0) onto plane perp to dir */
-        f32 q = dir[1] * dir[1] + dir[2] * dir[2];
-        f32 len = (q > 0.0f) ? sqrtf(q) : lbl_80478AC0;
-        f32 s = -dir[0] / len;
-        perp[0] = len;
-        perp[1] = dir[1] * s;
-        perp[2] = dir[2] * s;
+        /* otherwise Gram-Schmidt the world y axis against eye */
+        v0.y = cobj_sqrtf(eye.x * eye.x + eye.z * eye.z);
+        v0.x = eye.x * (-eye.y / v0.y);
+        v0.z = eye.z * (-eye.y / v0.y);
     }
 
-    ((void (*)(f32*, f32*, f32)) PSMTXRotAxisRad)(&mtx[0][0], dir, -roll); /* rot about dir by -roll */
-    ((void (*)(f32*, f32*, f32*)) fn_800A3820)(&mtx[0][0], perp, rotated);
-    ((void (*)(f32*, f32*)) fn_800A3ADC)(rotated, out); /* normalize -> out */
+    PSMTXRotAxisRad(m, &eye, -roll);
+    PSMTXMultVecSR(m, &v0, &v1);
+    PSVECNormalize(&v1, up);
     return 1;
 }
 #endif
@@ -1498,85 +1339,46 @@ int roll2upvec(HSD_CObj* cobj, f32 roll, f32* out)
 
 /* 0x80195590 | 0x204 */
 #pragma push
-#pragma optimization_level 3
+#pragma optimization_level 1
 #pragma optimizewithasm off
-extern f32 fn_800A3B38(void*);
 extern void __assert(const char*, u32, const char*);
-extern void fn_80191688(HSD_WObj*, void*);
-extern void PSVECSubtract(void*, void*, void*);
-extern void fn_800A3ADC();
-extern void fn_800A3820();
-extern f32 PSVECDotProduct();
 extern f64 atan2();
-extern f32 lbl_8047D978;
-extern f32 lbl_8047D9B0;
-extern f32 lbl_8047D9B4;
-extern f32 lbl_8047D9B8;
+extern f32 lbl_8047D9B0; /* 1.0f      */
+extern f32 lbl_8047D9B4; /*  PI/2     */
+extern f32 lbl_8047D9B8; /* -PI/2     */
 extern char lbl_8047D958;
 extern char lbl_8047D960;
-extern f32 lbl_8036C6BC[];
-extern f32 lbl_8036C6C8[];
 #if 0
 asm void upvec2roll(void) {
 #include "src/hsd/hsd_cobj_fn_80195590.inc"
 }
 #else
-/* decompiled wrk5: functional (TU not byte-measurable) - computes a roll/twist
-   angle for the camera. Builds the eye->interest direction; bails (returns 0)
-   if it is degenerate (near-zero length, or nearly parallel to `arg`). Otherwise
-   builds a reference look-at frame and returns the twist angle of `arg` about it.
-   INFERRED: `arg` (r4) typed as f32* (matrix/vector - exact type uncertain);
-   the +/-PI/2 constants below are anonymous SDA2 float literals (r2-0x5CDC /
-   r2-0x5CD8) reconstructed by value. Both flagged for orchestrator review. */
-f32 upvec2roll(HSD_CObj* cobj, f32* arg) {
-    f32 out[3];        /* sp+0x2c */
-    f32 dir[3];        /* sp+0x20 */
-    f32 interest[3];   /* sp+0x14 */
-    f32 eye[3];        /* sp+0x08 */
-    f32 mtx[3][4];     /* sp+0x38 */
-    int ok;
+/* The inverse of roll2upvec: the roll (twist) angle of `up` about the camera's
+   eye->interest direction. Returns 0 when the direction is degenerate or `up`
+   is nearly parallel to it. */
+f32 upvec2roll(HSD_CObj* cobj, Vec* up)
+{
+    Vec v;
+    Vec eye;
+    f32 vmtx[3][4];
+    f32 dot;
 
-    if (cobj == NULL || cobj->eyepos == NULL || cobj->interest == NULL) {
-        ok = 0;
-    } else {
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
-        fn_80191688(cobj->eyepos, eye);
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
-        if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
-        fn_80191688(cobj->interest, interest);
-        PSVECSubtract(interest, eye, dir);
-        if (__fabs(dir[0]) <= lbl_80478AC8 &&
-            __fabs(dir[1]) <= lbl_80478AC8 &&
-            __fabs(dir[2]) <= lbl_80478AC8) {
-            ok = -1; /* direction ~= 0: unusable */
-        } else {
-            fn_800A3ADC(dir, dir); /* normalize in place */
-            ok = 0;
-        }
-        ok = (ok == 0);
-    }
-    if (!ok) {
+    if (!cobj_get_eye_vector(cobj, &eye)) {
         return lbl_8047D978;
     }
-    {
-        f32 dot;
-        dot = PSVECDotProduct(arg, dir);
-        dot = __fabs(dot);
-        if (lbl_8047D9B0 - dot < lbl_80478AC8) {
-            return lbl_8047D978; /* dir nearly parallel to arg: unusable */
-        }
-    }
-    C_MTXLookAt(mtx, lbl_8036C6BC, lbl_8036C6C8, dir);
-    fn_800A3820(&mtx[0][0], arg, out);
-    {
-        f32 x;
-        f32 y;
-        f32 neg_x;
 
-        x = out[0];
-        y = out[1];
-        neg_x = -x;
+    dot = __fabs(PSVECDotProduct(up, &eye));
+    if (lbl_8047D9B0 - dot < lbl_80478AC8[0]) {
+        return lbl_8047D978;
+    }
+
+    C_MTXLookAt(vmtx, &lbl_8036C6BC, &lbl_8036C6C8, &eye);
+    PSMTXMultVecSR(vmtx, up, &v);
+    {
+        f32 x = v.x;
+        f32 y = v.y;
+        f32 neg_x = -x;
+
         if (lbl_8047D978 == y) {
             return (neg_x >= lbl_8047D978) ? lbl_8047D9B4 : lbl_8047D9B8;
         }
@@ -1584,6 +1386,65 @@ f32 upvec2roll(HSD_CObj* cobj, f32* arg) {
     }
 }
 #endif
+#pragma pop
+
+/* 0x80194DA4 | 0x32C */
+#pragma push
+#pragma optimization_level 1
+#pragma optimizewithasm off
+extern char lbl_8027464C[]; /* "cobj up vector is zero vector" (OSReport fmt) */
+extern char lbl_8047D968;   /* __assert message for the up-vector path        */
+/* Storage twin of upvec2roll. With an explicit up vector (flag bit 0) the
+   normalised `up` is stored, marking the matrices dirty when it changed; a
+   degenerate `up` warns and asserts. Otherwise the vector is converted to a
+   roll angle and committed through HSD_CObjSetRoll. */
+void HSD_CObjSetUpVector(HSD_CObj* cobj, Vec* up)
+{
+    Vec v;
+
+    if (cobj == NULL || up == NULL) {
+        return;
+    }
+
+    if (cobj->flags & 1) {
+        if (vec_normalize_check(up, &v) != 0) {
+            OSReport(lbl_8027464C);
+            __assert(&lbl_8047D958, 0x3E4, &lbl_8047D968);
+        }
+        if (cobj->u.up.x != v.x || cobj->u.up.y != v.y || cobj->u.up.z != v.z) {
+            cobj->flags |= 0xC0000000;
+            cobj->u.up = v;
+        }
+    } else {
+        HSD_CObjSetRoll(cobj, upvec2roll(cobj, up));
+    }
+}
+#pragma pop
+
+/* 0x801947C8 | 0x464 */
+#pragma push
+#pragma optimization_level 1
+#pragma optimizewithasm off
+/* With an explicit up vector (flag bit 0) the roll is turned back into an up
+   vector; otherwise it is stored directly, marking the matrices dirty when it
+   changed. */
+void HSD_CObjSetRoll(HSD_CObj* cobj, f32 roll)
+{
+    Vec up;
+
+    if (cobj == NULL) {
+        return;
+    }
+    if (cobj->flags & 1) {
+        roll2upvec(cobj, &up, roll);
+        HSD_CObjSetUpVector(cobj, &up);
+    } else {
+        if (cobj->u.roll != roll) {
+            cobj->flags |= 0xC0000000;
+        }
+        cobj->u.roll = roll;
+    }
+}
 #pragma pop
 
 /* 0x80195794 | 0x104 */
@@ -1600,9 +1461,9 @@ asm void HSD_CObjGetEyeDistance(void) {
 }
 #else
 f32 HSD_CObjGetEyeDistance(HSD_CObj* cobj) {
-    f32 eye[3];
-    f32 interest[3];
-    f32 diff[3];
+    Vec eye;
+    Vec interest;
+    Vec diff;
 
     if (cobj == NULL) {
         return lbl_8047D978;
@@ -1619,16 +1480,16 @@ f32 HSD_CObjGetEyeDistance(HSD_CObj* cobj) {
     if (cobj == NULL) {
         __assert(&lbl_8047D958, 0x2E8, &lbl_8047D960);
     }
-    fn_80191688(cobj->eyepos, eye);
+    HSD_WObjGetPosition(cobj->eyepos, &eye);
     if (cobj == NULL) {
         __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
     }
     if (cobj == NULL) {
         __assert(&lbl_8047D958, 0x2D0, &lbl_8047D960);
     }
-    fn_80191688(cobj->interest, interest);
-    PSVECSubtract(interest, eye, diff);
-    return fn_800A3B38(diff);
+    HSD_WObjGetPosition(cobj->interest, &interest);
+    PSVECSubtract(&interest, &eye, &diff);
+    return PSVECMag(&diff);
 }
 #endif
 #pragma pop
@@ -1645,27 +1506,10 @@ asm void HSD_CObjSetEyePosition(void) {
 #include "src/hsd/hsd_cobj_HSD_CObjSetEyePosition.inc"
 }
 #else
-void HSD_CObjSetEyePosition(HSD_CObj* cobj, void* arg) {
+void HSD_CObjSetEyePosition(HSD_CObj* cobj, Vec* arg) {
     if (!cobj) __assert(&lbl_8047D958, 0x324, &lbl_8047D960);
     if (!cobj) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
     HSD_WObjSetPosition(cobj->eyepos, arg);
-}
-#endif
-#pragma pop
-
-/* 0x80195904 | 0x6C */
-#pragma push
-#pragma optimization_level 4
-#pragma optimizewithasm off
-#if 0
-asm void HSD_CObjGetEyePosition(void) {
-#include "src/hsd/hsd_cobj_HSD_CObjGetEyePosition.inc"
-}
-#else
-void HSD_CObjGetEyePosition(HSD_CObj* cobj, void* arg) {
-    if (!cobj) __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
-    if (!cobj) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
-    fn_80191688(cobj->eyepos, arg);
 }
 #endif
 #pragma pop
@@ -1679,27 +1523,10 @@ asm void HSD_CObjSetInterest(void) {
 #include "src/hsd/hsd_cobj_HSD_CObjSetInterest.inc"
 }
 #else
-void HSD_CObjSetInterest(HSD_CObj* cobj, void* arg) {
+void HSD_CObjSetInterest(HSD_CObj* cobj, Vec* arg) {
     if (!cobj) __assert(&lbl_8047D958, 0x30c, &lbl_8047D960);
     if (!cobj) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
     HSD_WObjSetPosition(cobj->interest, arg);
-}
-#endif
-#pragma pop
-
-/* 0x801959DC | 0x6C */
-#pragma push
-#pragma optimization_level 4
-#pragma optimizewithasm off
-#if 0
-asm void HSD_CObjGetInterest(void) {
-#include "src/hsd/hsd_cobj_HSD_CObjGetInterest.inc"
-}
-#else
-void HSD_CObjGetInterest(HSD_CObj* cobj, void* arg) {
-    if (!cobj) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
-    if (!cobj) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
-    fn_80191688(cobj->interest, arg);
 }
 #endif
 #pragma pop
@@ -1912,7 +1739,7 @@ int HSD_CObjSetCurrent(HSD_CObj* cobj)
 #pragma push
 #pragma optimization_level 1
 #pragma optimizewithasm off
-extern int HSD_CObjGetUpVector(HSD_CObj*, f32*);   /* wrk8: real sig (was `void (void)`) */
+extern int HSD_CObjGetUpVector(HSD_CObj* cobj, Vec* up);
 extern void __assert(const char*, u32, const char*);
 extern char lbl_8047D958;
 extern char lbl_8047D960;
@@ -1925,9 +1752,9 @@ asm void HSD_CObjSetupViewingMtx(u8* ptr) {
    viewing matrix via C_MTXLookAt when it (or its eye/interest WObjs) is dirty.
    flags: 0x2 = up-to-date, 0x40000000 = force-recompute, 0x80000000 = updated. */
 void HSD_CObjSetupViewingMtx(HSD_CObj* cobj) {
-    f32 eye[3];
-    f32 up[3];
-    f32 interest[3];
+    Vec eye;
+    Vec up;
+    Vec interest;
     int update;
     int interest_dirty;
     int eye_dirty;
@@ -1964,18 +1791,18 @@ void HSD_CObjSetupViewingMtx(HSD_CObj* cobj) {
     }
     if (cobj == NULL) __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
     if (cobj == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
-    HSD_WObjGetPosition(cobj->eyepos, eye);
-    if (HSD_CObjGetUpVector(cobj, up) == 0) {
+    HSD_WObjGetPosition(cobj->eyepos, &eye);
+    if (HSD_CObjGetUpVector(cobj, &up) == 0) {
         extern f32 lbl_8047D978;   /* 0.0f named SDA2 constant */
         extern f32 lbl_8047D9B0;   /* 1.0f named SDA2 constant */
-        up[0] = lbl_8047D978;
-        up[1] = lbl_8047D9B0;
-        up[2] = lbl_8047D978;
+        up.x = lbl_8047D978;
+        up.y = lbl_8047D9B0;
+        up.z = lbl_8047D978;
     }
     if (cobj == NULL) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
     if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
-    HSD_WObjGetPosition(cobj->interest, interest);
-    C_MTXLookAt(cobj->view_mtx, eye, up, interest);
+    HSD_WObjGetPosition(cobj->interest, &interest);
+    C_MTXLookAt(cobj->view_mtx, &eye, &up, &interest);
     {
         HSD_WObj* w;
         w = cobj->eyepos;
@@ -2277,7 +2104,7 @@ void CObjUpdateFunc(HSD_CObj* cobj, u32 type, f32* value)
 {
     HSD_CObj* c = cobj;
     f32* val = value;
-    f32 v[3];
+    Vec v;
 
     if (c == NULL) {
         return;
@@ -2286,56 +2113,56 @@ void CObjUpdateFunc(HSD_CObj* cobj, u32 type, f32* value)
     case 1: /* eye position, component X */
         if (c == NULL) __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
         if (c == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
-        HSD_WObjGetPosition(c->eyepos, v);
-        v[0] = *val;
+        HSD_WObjGetPosition(c->eyepos, &v);
+        v.x = *val;
         if (c == NULL) __assert(&lbl_8047D958, 0x324, &lbl_8047D960);
         if (c == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
-        HSD_WObjSetPosition(c->eyepos, v);
+        HSD_WObjSetPosition(c->eyepos, &v);
         break;
     case 2: /* eye position, component Y */
         if (c == NULL) __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
         if (c == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
-        HSD_WObjGetPosition(c->eyepos, v);
-        v[1] = *val;
+        HSD_WObjGetPosition(c->eyepos, &v);
+        v.y = *val;
         if (c == NULL) __assert(&lbl_8047D958, 0x324, &lbl_8047D960);
         if (c == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
-        HSD_WObjSetPosition(c->eyepos, v);
+        HSD_WObjSetPosition(c->eyepos, &v);
         break;
     case 3: /* eye position, component Z */
         if (c == NULL) __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
         if (c == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
-        HSD_WObjGetPosition(c->eyepos, v);
-        v[2] = *val;
+        HSD_WObjGetPosition(c->eyepos, &v);
+        v.z = *val;
         if (c == NULL) __assert(&lbl_8047D958, 0x324, &lbl_8047D960);
         if (c == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
-        HSD_WObjSetPosition(c->eyepos, v);
+        HSD_WObjSetPosition(c->eyepos, &v);
         break;
     case 5: /* interest position (asm writes component 0) */
         if (c == NULL) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
         if (c == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
-        HSD_WObjGetPosition(c->interest, v);
-        v[0] = *val;
+        HSD_WObjGetPosition(c->interest, &v);
+        v.x = *val;
         if (c == NULL) __assert(&lbl_8047D958, 0x30c, &lbl_8047D960);
         if (c == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
-        HSD_WObjSetPosition(c->interest, v);
+        HSD_WObjSetPosition(c->interest, &v);
         break;
     case 6: /* interest position (asm writes component 0) */
         if (c == NULL) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
         if (c == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
-        HSD_WObjGetPosition(c->interest, v);
-        v[0] = *val;
+        HSD_WObjGetPosition(c->interest, &v);
+        v.x = *val;
         if (c == NULL) __assert(&lbl_8047D958, 0x30c, &lbl_8047D960);
         if (c == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
-        HSD_WObjSetPosition(c->interest, v);
+        HSD_WObjSetPosition(c->interest, &v);
         break;
     case 7: /* interest position (asm writes component 0) */
         if (c == NULL) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
         if (c == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
-        HSD_WObjGetPosition(c->interest, v);
-        v[0] = *val;
+        HSD_WObjGetPosition(c->interest, &v);
+        v.x = *val;
         if (c == NULL) __assert(&lbl_8047D958, 0x30c, &lbl_8047D960);
         if (c == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
-        HSD_WObjSetPosition(c->interest, v);
+        HSD_WObjSetPosition(c->interest, &v);
         break;
     case 9: /* roll */
         HSD_CObjSetRoll(c, *val);
@@ -2749,6 +2576,89 @@ void fn_8019733C(u32 val) { extern u32 lbl_8047B240; lbl_8047B240 = val; }
 #endif
 #pragma pop
 
+/* 0x80197344 | 0xBC */
+#pragma push
+#pragma optimization_level 1
+extern void fn_80197784(HSD_JObj* jobj, f32 vmtx[3][4], u32 trsp_mask,
+                        u32 rendermode);
+void fn_80197344(HSD_JObj* jobj, f32 vmtx[3][4], u32 trsp_mask,
+                 u32 rendermode)
+{
+    extern void (*lbl_8047B240)(s32, s32, s32, HSD_JObj*);
+
+    if (jobj != NULL) {
+        if (union_type_dobj(jobj)) {
+            fn_80197784(jobj, vmtx, trsp_mask, rendermode);
+        } else if (union_type_ptcl(jobj) && lbl_8047B240 != NULL) {
+            HSD_SList* sp;
+
+            for (sp = jobj->u.ptcl; sp != NULL; sp = sp->next) {
+                if (((u32) sp->data & 0x80000000) != 0) {
+                    /* Packed particle reference: bank[0:5], offset[6:29]. */
+                    u32 bank = 0x3F & (u32) sp->data;
+                    u32 offset = ((u32) sp->data & 0x3FFFFFC0) >> 6;
+
+                    (*lbl_8047B240)(0, bank, offset, jobj);
+                }
+                sp->data = (void*) ((u32) sp->data & 0x7FFFFFFF);
+            }
+        }
+    }
+}
+#pragma pop
+
+typedef struct HSD_ZListNode {
+    f32 projection_mtx[3][4];
+    void* vmtx;
+    void* jobj;
+    u32 rendermode;
+    struct {
+        struct HSD_ZListNode* texedge;
+        struct HSD_ZListNode* translucent;
+    } sort;
+    struct HSD_ZListNode* next;
+} HSD_ZListNode;
+
+/* 0x80197400 | 0xA8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void HSD_MtxFree(void* mtx);
+extern void HSD_ObjFree(void* allocator, void* object);
+extern u8 lbl_80465348[];
+void fn_80197400(void)
+{
+    extern HSD_ZListNode* lbl_8047B24C;
+    extern HSD_ZListNode* lbl_8047B250;
+    extern u32 lbl_8047B254;
+    extern HSD_ZListNode* lbl_8047B258;
+    extern u32 lbl_8047B25C;
+    extern HSD_ZListNode** lbl_80478C64;
+    extern HSD_ZListNode** lbl_80478C68;
+    extern HSD_ZListNode** lbl_80478C6C;
+    HSD_ZListNode* list = lbl_8047B24C;
+
+    while (list) {
+        HSD_ZListNode* next = list->next;
+        if (list->vmtx) {
+            HSD_MtxFree(list->vmtx);
+        }
+        HSD_ObjFree(lbl_80465348, list);
+        list = next;
+    }
+    lbl_8047B24C = NULL;
+    lbl_80478C64 = &lbl_8047B24C;
+
+    lbl_8047B250 = NULL;
+    lbl_80478C68 = &lbl_8047B250;
+    lbl_8047B254 = 0;
+
+    lbl_8047B258 = NULL;
+    lbl_80478C6C = &lbl_8047B258;
+    lbl_8047B25C = 0;
+}
+#pragma pop
+
 /* 0x801975FC | 0x54 */
 #pragma push
 #pragma optimization_level 1
@@ -2770,4 +2680,43 @@ void fn_801975FC(void) {
     lbl_8047B258 = fn_80197650(lbl_8047B258, lbl_8047B25C, 0x40);
 }
 #endif
+#pragma pop
+
+/* 0x80197998 | 0xCC */
+#pragma push
+#pragma optimization_level 1
+#pragma use_lmw_stmw on
+extern void fn_8019F024(HSD_JObj* jobj);
+extern void fn_801A5DCC(f32 pmtx[3][4]);
+extern void fn_801AB63C(u32 first, u32 second);
+void fn_80197998(HSD_JObj* jobj, f32 vmtx[3][4], f32 pmtx[3][4],
+                 u32 trsp_mask, u32 rendermode)
+{
+    HSD_DObj* dobj;
+    u32 dobj_trsp;
+
+    fn_8019F024(jobj);
+
+    dobj_trsp = trsp_mask << 1;
+
+    if (!(rendermode & RENDER_SHADOW)) {
+        if (jobj->flags & JOBJ_SPECULAR) {
+            fn_801A5DCC(pmtx);
+        }
+    }
+
+    fn_801AB63C(0, 0);
+    for (dobj = jobj->u.dobj; dobj; dobj = dobj->next) {
+        if (dobj->flags & DOBJ_HIDDEN) {
+            continue;
+        }
+
+        if (dobj->flags & dobj_trsp) {
+            HSD_DObjSetCurrent(dobj);
+            HSD_DOBJ_METHOD(dobj)->disp(dobj, vmtx, pmtx, rendermode);
+        }
+    }
+    HSD_DObjSetCurrent(NULL);
+    fn_8019F024(NULL);
+}
 #pragma pop

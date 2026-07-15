@@ -16,6 +16,7 @@ typedef struct DVDDiskID {
 typedef struct DVDCommandBlock DVDCommandBlock;
 
 typedef void (*DVDCBCallback)(s32 result, DVDCommandBlock* block);
+typedef void (*DVDLowCallback)(u32 intType);
 
 struct DVDCommandBlock {
     DVDCommandBlock* next;
@@ -50,6 +51,7 @@ typedef struct DVDFileInfo {
 /* DVD functions */
 void DVDInit(void);
 BOOL DVDReadDiskID(DVDCommandBlock* block, DVDDiskID* diskID, DVDCBCallback callback);
+BOOL DVDCancelStreamAsync(DVDCommandBlock* block, DVDCBCallback callback);
 BOOL DVDInquiryAsync(DVDCommandBlock* block, DVDDriveInfo* info, DVDCBCallback callback);
 void DVDReset(void);
 s32 DVDGetDriveStatus(void);
@@ -60,13 +62,21 @@ void __DVDClearWaitingQueue(void);
 BOOL __DVDPushWaitingQueue(s32 prio, DVDCommandBlock* block);
 DVDCommandBlock* __DVDPopWaitingQueue(void);
 BOOL __DVDCheckWaitingQueue(void);
+void stateTimeout(void);
+void fn_800A58F0(void);
+void fn_800A5FC0(DVDCommandBlock* block);
+void fn_800A5FF4(DVDCommandBlock* block);
+void fn_800A60D4(u32 intType);
 
 /* DVDLow functions */
 void __DVDInitWA(void);
 void DVDLowReset(void);
-BOOL DVDLowStopMotor(DVDCBCallback callback);
-BOOL DVDLowWaitCoverClose(DVDCBCallback callback);
+BOOL DVDLowStopMotor(DVDLowCallback callback);
+BOOL DVDLowWaitCoverClose(DVDLowCallback callback);
 void __DVDLowSetWAType(u32 type, u32 location);
+
+/* DVD ID utilities */
+BOOL DVDCompareDiskID(const DVDDiskID* id1, const DVDDiskID* id2);
 
 /* DVDError functions */
 void __DVDStoreErrorCode(u32 error);

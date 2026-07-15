@@ -59,39 +59,141 @@ u32 fn_80029850(u8* r3, u16 r4, u16 r5, u16 r6) {
 }
 #endif
 
+typedef struct ShopItemSlot {
+    u16 item_id;
+    u16 quantity;
+} ShopItemSlot;
+
+void itemBiosSetNum(void*, u16);
+
+typedef struct ShopInventory {
+    ShopItemSlot primary[235];
+    ShopItemSlot secondary[235];
+    s32 currency;
+    u32 field_75C;
+    u8 modified;
+    u8 pad_761[3];
+    u32 field_764;
+    u16 count;
+} ShopInventory;
+
+/* fn_800298DC - 0x800298DC | size: 0x1ec */
+#pragma push
+#pragma optimization_level 4
+#pragma peephole off
+s32 fn_800298DC(ShopItemSlot* slots, s32 count, s32 item_id, s32 quantity,
+                 s16 index, s32 maximum) {
+    u16 current_id;
+    u16 current_quantity;
+    u16 capacity;
+    u16 added;
+    s32 i;
+    ShopItemSlot* slot;
+
+    if (index < -1 || index >= (u16)count) {
+        return (u16)quantity;
+    }
+
+    if (index != -1) {
+        if (index < 0 || index >= (u16)count) {
+            return (u16)quantity;
+        }
+
+        slots += index;
+        current_id = itemBiosGetItemDataId(slots);
+        if (current_id != (u16)item_id && current_id != 0) {
+            return (u16)quantity;
+        }
+
+        if (current_id == 0) {
+            itemBiosSetItemDataId(slots, item_id);
+            current_quantity = 0;
+        } else {
+            current_quantity = itemBiosGetNum(slots);
+        }
+
+        capacity = (u16)(maximum - current_quantity);
+        if (capacity < (u16)quantity) {
+            added = capacity;
+        } else {
+            added = (u16)quantity;
+        }
+        itemBiosSetNum(slots, (u16)(current_quantity + added));
+        return (u16)(quantity - added);
+    }
+
+    quantity &= 0xFFFF;
+    maximum = (u16)maximum;
+    i = 0;
+    while (i < (u16)count && quantity > 0) {
+        s16 slot_index = i;
+
+        if (slot_index < 0 || slot_index >= (u16)count) {
+            quantity = (u16)quantity;
+        } else {
+            slot = &slots[slot_index];
+            current_id = itemBiosGetItemDataId(slot);
+            if (current_id == (u16)item_id || current_id == 0) {
+                if (current_id == 0) {
+                    itemBiosSetItemDataId(slot, item_id);
+                    current_quantity = 0;
+                } else {
+                    current_quantity = itemBiosGetNum(slot);
+                }
+
+                capacity = (u16)(maximum - current_quantity);
+                if (capacity < (u16)quantity) {
+                    added = capacity;
+                } else {
+                    added = (u16)quantity;
+                }
+                itemBiosSetNum(slot, (u16)(current_quantity + added));
+                quantity = (u16)(quantity - added);
+            }
+        }
+        i++;
+    }
+    return quantity;
+}
+#pragma pop
+
 /* fn_80029AC8 - 0x80029AC8 | size: 0x1f8 */
-extern void itemBiosSetItemDataId(void*, u16);
-extern void itemBiosSetNum(void*, u16);
 #if 0
 asm void fn_80029AC8(void) {
 #include "src/game/gs_worldmap_fn_80029AC8.inc"
 }
 #else
+#pragma push
 #pragma optimization_level 4
-void fn_80029AC8(s32 r3, s32 r4, s32 r5, void* r6) {
+#pragma peephole off
+void fn_80029AC8(s32 r3, s32 r4, s32 r5, ShopInventory* r6) {
     s32 r29;
-    u16 r30;
-    u16 r26;
-    s16 r28;
-    s16 r27;
-    u8* r31;
-    u16 r24;
-    u16 r25;
+    s32 r30;
+    s32 r26;
+    u16 r28;
+    s32 r27;
+    ShopInventory* r31;
+    s32 r24;
+    s32 r25;
+
     r29 = r3;
     r30 = r4;
     r26 = r5;
-    r31 = (u8*)r6;
-    if (!r31) return;
-    r28 = *(s16*)((u8*)r31 + 0x768);
+    r31 = r6;
+    if (r31 == NULL) return;
+    r28 = r31->count;
     if (r28 > -1) {
-        r24 = r26;
+        r24 = r26 & 0xFFFF;
         r27 = 0;
-        while (r27 < r28 && r24) {
+        while (r27 < r28 && r24 > 0) {
             s16 i = r27;
-            if (i >= 0 && i < r28) {
-                void* slot = (void*)(r31 + ((s32)i << 2));
+            r24 &= 0xFFFF;
+            if (i < 0) {
+            } else if (i >= r28) {
+            } else {
+                ShopItemSlot* slot = &r31->primary[i];
                 u16 v = itemBiosGetItemDataId(slot);
-                if (v == r30 || v == 0) {
+                if (v == (u16)r30 || v == 0) {
                     u16 cur;
                     u16 delta;
                     u16 give;
@@ -102,24 +204,32 @@ void fn_80029AC8(s32 r3, s32 r4, s32 r5, void* r6) {
                         cur = itemBiosGetNum(slot);
                     }
                     delta = (u16)(0x3e7 - cur);
-                    give = (delta >= r24) ? r24 : delta;
+                    if (delta < r24) {
+                        give = delta;
+                    } else {
+                        give = r24;
+                    }
                     itemBiosSetNum(slot, (u16)(cur + give));
-                    r24 = (u16)(r24 - give);
+                    r24 = (r24 - give) & 0xFFFF;
                 }
             }
             r27++;
         }
-        r26 = r24;
     }
     if (r28 > -1) {
-        r25 = r26;
+        r25 = r26 & 0xFFFF;
         r27 = 0;
-        while (r27 < r28 && r25) {
+        while (r27 < r28 && r25 > 0) {
             s16 i = r27;
-            if (i >= 0 && i < r28) {
-                void* slot = (void*)((u8*)r31 + 0x3ac + ((s32)i << 2));
+            ShopItemSlot* slots;
+            r25 &= 0xFFFF;
+            slots = r31->secondary;
+            if (i < 0) {
+            } else if (i >= r28) {
+            } else {
+                ShopItemSlot* slot = &slots[i];
                 u16 v = itemBiosGetItemDataId(slot);
-                if (v == r30 || v == 0) {
+                if (v == (u16)r30 || v == 0) {
                     u16 cur;
                     u16 delta;
                     u16 give;
@@ -130,17 +240,22 @@ void fn_80029AC8(s32 r3, s32 r4, s32 r5, void* r6) {
                         cur = itemBiosGetNum(slot);
                     }
                     delta = (u16)(0x3e7 - cur);
-                    give = (delta >= r25) ? r25 : delta;
+                    if (delta < r25) {
+                        give = delta;
+                    } else {
+                        give = r25;
+                    }
                     itemBiosSetNum(slot, (u16)(cur + give));
-                    r25 = (u16)(r25 - give);
+                    r25 = (r25 - give) & 0xFFFF;
                 }
             }
             r27++;
         }
     }
-    *(s32*)(r31 + 0x758) -= r29;
-    *(u8*)(r31 + 0x760) = 1;
+    r31->currency -= r29;
+    r31->modified = 1;
 }
+#pragma pop
 #endif
 
 /* fn_80029CC0 - 0x80029CC0 | size: 0x234 */
@@ -523,6 +638,30 @@ s32 fn_8002A400(void* r3, u8* r4) {
 
 /* fn_8002A48C - 0x8002A48C | size: 0x124 */
 extern void fn_800FB8C8(s32, s32, s16, s16, s32, s32);
+typedef struct ShopDisplayEntry {
+    s32 key;
+    s32 field_4;
+    s32 field_8;
+} ShopDisplayEntry;
+
+typedef struct ShopDigitContext {
+    u8 pad_0[0xC];
+    s32* value;
+} ShopDigitContext;
+
+typedef struct ShopMenuOwner {
+    u8 pad_0[0x60];
+    ShopDigitContext* context;
+} ShopMenuOwner;
+
+typedef struct ShopDrawData {
+    u8 pad_0[6];
+    s16 key;
+    u8 pad_8[0x4C];
+    s16 x;
+    s16 y;
+} ShopDrawData;
+
 extern u8 lbl_80266E58[];
 #if 0
 asm void fn_8002A48C(void) {
@@ -530,49 +669,40 @@ asm void fn_8002A48C(void) {
 }
 #else
 #pragma optimization_level 4
-s32 fn_8002A48C(void* r3, u8* r4) {
-    u8* r31;
-    void* r6;
-    s32 r5;
-    s32 r8;
-    s32 r7;
-    s32 r4v;
-    s32 r0;
-    s32 r3v;
-    u8* r4p;
-    r31 = r4;
-    r6 = *(void**)((u8*)r3 + 0x60);
-    r5 = 0;
-    r3v = *(s16*)(r31 + 0x6);
-    r4p = lbl_80266E58;
-    if (*(s32*)r4p == r3v) goto _sentinel_done;
-    r5 = 1;
-    r4p = r4p + 0xc;
-    if (*(s32*)r4p == r3v) goto _sentinel_done;
-    r5 = 2;
-    _sentinel_done:;
-    if (r5 >= 2) { return 0; }
-    r5 = 1 - r5;
-    r8 = 1;
-    r7 = 0;
-    if (r5 > 0) {
-        if (r5 > 8) {
-            r0 = (r5 - 8 + 7) >> 3;
-            if (r5 - 8 > 0) {
-                do { r8 = r8 * 100000000; r7 += 8; r0--; } while (r0 != 0);
-            }
+s32 fn_8002A48C(ShopMenuOwner* owner, ShopDrawData* draw) {
+    ShopDigitContext* context = owner->context;
+    ShopDisplayEntry* entry;
+    s32 index;
+    s32 place;
+    s32 divisor;
+    s32 value;
+    s32 tens;
+
+    entry = (ShopDisplayEntry*)lbl_80266E58;
+    index = 0;
+    while (index < 2) {
+        if (draw->key == entry->key) {
+            break;
         }
-        r0 = r5 - r7;
-        if (r7 < r5) {
-            do { r8 = r8 * 10; r0--; } while (r0 != 0);
-        }
+        index++;
+        entry++;
     }
-    r4v = *(s32*)(*(u32*)((u8*)r6 + 0xc));
-    r4v = r4v / r8;
-    r0 = r4v / 10 * 10;
-    r4v = r4v - r0;
-    msgctrlSetValue(0x34, (void*)r4v);
-    fn_800FB8C8(0, 0, *(s16*)(r31 + 0x54), *(s16*)(r31 + 0x56), -1, 0xc9);
+    if (index >= 2) {
+        return 0;
+    }
+
+    index = 1 - index;
+    divisor = 1;
+    for (place = 0; place < index; place++) {
+        divisor *= 10;
+    }
+
+    value = *context->value;
+    value /= divisor;
+    tens = value / 10 * 10;
+    value -= tens;
+    msgctrlSetValue(0x34, value);
+    fn_800FB8C8(0, 0, draw->x, draw->y, -1, 0xC9);
     return 0;
 }
 #endif
@@ -607,6 +737,129 @@ asm void fn_8002AA68(void) {
 #include "src/game/gs_worldmap_fn_8002AA68.inc"
 }
 #else
+
+s32 fn_8002A618(u8* self)
+{
+    typedef struct ShopNumberContext {
+        s32 minimum;
+        s32 maximum;
+        u32 unused;
+        s32* value;
+    } ShopNumberContext;
+    extern void fn_80166A50(u32, u32, u32, u32);
+
+    ShopNumberContext* context;
+    u16* keyInfo;
+    s32 decimalPlace;
+    s32 factor;
+    s32 i;
+    s32 oldValue;
+    s32 value;
+
+    context = *(ShopNumberContext**)(self + 0x60);
+    keyInfo = windowGetKeyInfo();
+    if ((keyInfo[3] & 0xF) != 0) {
+
+    decimalPlace = 1 - (s8)self[0x95];
+    factor = 1;
+    for (i = 0; i < decimalPlace; i++) {
+        factor *= 10;
+    }
+
+    if ((keyInfo[3] & 1) != 0) {
+        oldValue = *context->value;
+        if (factor < 10) {
+            value = oldValue + factor;
+            *context->value = value;
+            if (value > context->maximum) {
+                *context->value = context->minimum;
+            }
+        } else {
+            s32 quotient;
+            s32 digit;
+            s32 maximumDigit;
+            s32 remainder;
+            s32 nextDigit;
+
+            quotient = oldValue / factor;
+            digit = quotient % 10;
+            remainder = oldValue - digit * factor;
+            for (maximumDigit = 9; maximumDigit >= 0; maximumDigit--) {
+                if (remainder + maximumDigit * factor <= context->maximum) {
+                    break;
+                }
+            }
+            nextDigit = digit + 1;
+            if (nextDigit > maximumDigit) {
+                nextDigit = 0;
+            }
+            value = remainder + nextDigit * factor;
+            *context->value = value;
+            if (value < context->minimum) {
+                *context->value = context->minimum;
+            }
+        }
+        if (oldValue != *context->value) {
+            fn_80166A50(0x23, 0, 0xFF, 0);
+        }
+    }
+
+    if ((keyInfo[3] & 2) != 0) {
+        oldValue = *context->value;
+        if (factor < 10) {
+            value = oldValue - factor;
+            *context->value = value;
+            if (value < context->minimum) {
+                *context->value = context->maximum;
+            }
+        } else {
+            s32 quotient;
+            s32 digit;
+            s32 remainder;
+            s32 maximumDigit;
+            s32 nextDigit;
+
+            quotient = oldValue / factor;
+            digit = quotient % 10;
+            remainder = oldValue - digit * factor;
+            for (maximumDigit = 9; maximumDigit >= 0; maximumDigit--) {
+                if (remainder + maximumDigit * factor <= context->maximum) {
+                    break;
+                }
+            }
+            nextDigit = digit - 1;
+            if (nextDigit < 0) {
+                nextDigit = maximumDigit;
+            }
+            value = remainder + nextDigit * factor;
+            *context->value = value;
+            if (value < context->minimum) {
+                *context->value = context->minimum;
+            }
+        }
+        if (oldValue != *context->value) {
+            fn_80166A50(0x23, 0, 0xFF, 0);
+        }
+    }
+
+    if ((keyInfo[3] & 8) != 0) {
+        s32 cursor = self[0x95] + 1;
+        self[0x95] = cursor;
+        if ((s8)cursor >= 2) {
+            self[0x95] = 1;
+        }
+    }
+    if ((keyInfo[3] & 4) != 0) {
+        s32 cursor = self[0x95] - 1;
+        self[0x95] = cursor;
+        if ((s8)cursor < 0) {
+            self[0x95] = 0;
+        }
+    }
+    }
+    return 0;
+}
+
 #pragma optimization_level 4
 s32 fn_8002AA68(void* r3) {
     u8* r31;
@@ -1235,104 +1488,97 @@ asm void fn_8002B40C(void) {
 #include "src/game/gs_worldmap_fn_8002B40C.inc"
 }
 #else
-/*
- * GSmap_DrawTimeOverlay - 0x8002B40C | size: 0x188
- *
- * Looks up the current scene entry in the lbl_802E4F68 table by the s16 key
- * at r4[0x6], computes a time-overlay angle from the sprite-ID byte halves
- * plus an optional float-position offset, multiplies by a scale constant,
- * clamps the result to [lbl_8047B990, lbl_8047B98C] by wrapping, then stores
- * it as a float at r4[0x70].
- *
- * r3 = scene/object context pointer
- * r4 = sprite/render descriptor (u8* base)
- */
-s32 fn_8002B40C(void* r3, u8* r4) {
-    extern u8  lbl_802E4F68[];  /* table of {s32 key, s16 base_val, ...}[5], stride 8 */
-    extern f64 lbl_8047B998;    /* int->float magic constant: 4503601774854144.0 */
-    extern f32 lbl_8047B984;    /* angle scale multiplier */
-    extern f32 lbl_8047B988;    /* wrap step (subtract or add to clamp) */
-    extern f32 lbl_8047B98C;    /* upper clamp bound */
-    extern f32 lbl_8047B990;    /* lower clamp bound */
+typedef struct ShopAngleEntry {
+    s32 key;
+    s16 position;
+    u16 padding;
+} ShopAngleEntry;
 
+typedef struct ShopAngleContext {
+    u16* state;
+    u8 pad_4[8];
+    f32* offset;
+    u8 pad_10[4];
+    s32* offset_enabled;
+} ShopAngleContext;
+
+typedef struct ShopAngleOwner {
+    u8 pad_0[0x60];
+    ShopAngleContext* context;
+    u8 pad_64[0x30];
     u16 sprite_id;
-    u8 *ctx;
-    u8 *tab;
-    u8 *entry;
+} ShopAngleOwner;
+
+typedef struct ShopAngleDrawData {
+    u8 pad_0[6];
     s16 key;
-    s32 idx;
-    s8  sprite_hi; /* *  ENDIAN-QA *  high byte of sprite_id (big-endian byte[0]) */
-    s8  sprite_lo; /* *  ENDIAN-QA *  low byte of sprite_id (big-endian byte[1])  */
-    s32 pos_val;
-    s32 sum;
-    f32 f_pos;
-    f32 f2;
+    u8 pad_8[0x4A];
+    s16 position;
+    u8 pad_54[0x1C];
+    f32 angle;
+} ShopAngleDrawData;
 
-    /* Load the two-byte sprite/timer ID from r3[0x94].
-       In big-endian memory: byte[0] = high, byte[1] = low.        *  ENDIAN-QA * 
-       Both halves are later sign-extended (extsb) before arithmetic.  */
-    sprite_id = *(u16*)((u8*)r3 + 0x94);
-    sprite_hi  = (s8)((sprite_id >> 8) & 0xff);  /* big-endian high byte -> extsb */
-    sprite_lo  = (s8)( sprite_id        & 0xff);  /* big-endian low byte  -> extsb */
+#pragma push
+#pragma peephole off
+#pragma optimization_level 4
+s32 fn_8002B40C(ShopAngleOwner* owner, ShopAngleDrawData* draw) {
+    u16 sprite_id;
+    u8 sprite_bytes[8];
+    ShopAngleContext* context;
+    ShopAngleEntry* entry;
+    s32 index;
+    s32 key;
+    s32 position;
+    s8 sprite_low;
+    f32 angle;
 
-    ctx = (u8*)*(void**)((u8*)r3 + 0x60);
-    tab = lbl_802E4F68;
+    sprite_id = owner->sprite_id;
+    context = owner->context;
+    *(u16*)sprite_bytes = sprite_id;
+    key = draw->key;
+    entry = (ShopAngleEntry*)lbl_802E4F68;
+    index = 0;
+    while (index < 5) {
+        if (key == entry->key) {
+            break;
+        }
+        entry++;
+        index++;
+    }
 
-    /* Linear search: find which of the 5 table entries matches r4[0x6].
-       Each entry is 8 bytes: word[0]=s32 key, halfword[4]=s16 base_val.
-       If nothing matches, idx stays 5 (sentinel = not found).           */
-    key = *(s16*)(r4 + 0x6);
-    idx = 5;
-    if      (key == *(s32*)(tab + 0x00)) idx = 0;
-    else if (key == *(s32*)(tab + 0x08)) idx = 1;
-    else if (key == *(s32*)(tab + 0x10)) idx = 2;
-    else if (key == *(s32*)(tab + 0x18)) idx = 3;
-    else if (key == *(s32*)(tab + 0x20)) idx = 4;
-
-    if (idx >= 5) {
+    if (index >= 5) {
+        entry = NULL;
+    } else {
+        entry = &((ShopAngleEntry*)lbl_802E4F68)[index];
+    }
+    if (entry == NULL) {
         return 0;
     }
 
-    entry = tab + (u32)idx * 8;
+    sprite_low = (s8)sprite_bytes[1];
+    position = entry->position + sprite_low * 0x1F;
+    draw->position = position;
+    if (*context->offset_enabled == 0) {
+        position = draw->position + (s32)*context->offset;
+        draw->position = position;
+    }
 
-    /* Compute base position into r4[0x52] from the table entry and sprite_lo. */
-    pos_val = (s32)*(s16*)(entry + 4) + (s32)sprite_lo * 0x1f;
-    pos_val = (s16)pos_val;  /* extsh */
-    *(s16*)(r4 + 0x52) = (s16)pos_val;
-
-    /* If the dereference-chain ctx[0x14]->word[0] is zero, fold in the
-       float-position value from ctx[0xc] (converted to int, round-toward-zero). */
+    position = (s32)*context->offset;
+    position += (sprite_low + (s8)sprite_bytes[0]) * 0x1F;
+    angle = lbl_8047B984 * (f32)position;
+    while (angle > lbl_8047B98C) {
+        angle -= lbl_8047B988;
+    }
     {
-        u32 *state_ptr = *(u32**)(ctx + 0x14);
-        if (*state_ptr == 0) {
-            f_pos = *(f32*)(*(u32*)(ctx + 0xc));
-            *(s16*)(r4 + 0x52) = (s16)((s32)*(s16*)(r4 + 0x52) + (s32)(s32)f_pos);
+        f32 wrapped_angle = angle;
+        while (wrapped_angle < lbl_8047B990) {
+            wrapped_angle += lbl_8047B988;
         }
+        draw->angle = wrapped_angle;
     }
-
-    /* Build the float angle:
-       f_pos_int = (s32)(*(f32*)(ctx[0xc] deref))  -- round toward zero
-       sum       = f_pos_int + (sprite_lo + sprite_hi) * 31
-       f2        = lbl_8047B984 * (f32)sum
-       The xoris/fsubs sequence is CW's int->f64->f32 cast; normalised here
-       to a plain (f32)(s32) cast.                                          */
-    f_pos = *(f32*)(*(u32*)(ctx + 0xc));
-    sum   = (s32)f_pos + ((s32)sprite_lo + (s32)sprite_hi) * 0x1f;
-    f2    = lbl_8047B984 * (f32)sum;
-
-    /* Clamp down: subtract lbl_8047B988 until f2 <= lbl_8047B98C */
-    while (f2 > lbl_8047B98C) {
-        f2 -= lbl_8047B988;
-    }
-
-    /* Clamp up: add lbl_8047B988 until f2 >= lbl_8047B990 */
-    while (f2 < lbl_8047B990) {
-        f2 += lbl_8047B988;
-    }
-
-    *(f32*)(r4 + 0x70) = f2;
     return 0;
 }
+#pragma pop
 #endif
 
 /* fn_8002B594 - 0x8002B594 | size: 0x2ec */
@@ -1345,6 +1591,9 @@ extern f32 lbl_8047B98C;
 extern f32 lbl_8047B9A0;
 extern f32 lbl_8047B9A4;
 extern f32 lbl_8047B9A8;
+f64 cos(f64);
+f64 sin(f64);
+void windowDrawSprite2(s32, s32, s32, s32, s32, void*, u32, s32);
 #if 0
 asm void fn_8002B594(void) {
 #include "src/game/gs_worldmap_fn_8002B594.inc"
@@ -1370,181 +1619,90 @@ asm void fn_8002B594(void) {
  * ENDIAN-QA: the asm uses the classic CW big-endian 0x4330/xoris double-word trick
  * to convert the two s16 fields to f32.  On x86 this is a plain (f32)(s16) cast.
  */
-void fn_8002B594(void *ctx, u8 *data, u32 sprite_id, u32 color_byte, f32 pos)
+void fn_8002B594(void* ctx, u8* data, u32 sprite_id, u32 color_byte, f32 pos)
 {
-    extern f32 cos(f32);
-    extern f32 sin(f32);
-    extern void windowDrawSprite2(s32, s32, s32, s32, s32, void *, u32, s32);
-
-    /* sdata2 / r2-relative float constants */
-    extern f32 lbl_8047B980;   /* threshold[0]: curve start */
-    extern f32 lbl_8047B97C;   /* threshold[4]: curve end   */
-    extern f32 lbl_8047B98C;   /* scale / angular coefficient */
-    extern f32 lbl_8047B9A0;   /* radial scale y             */
-    extern f32 lbl_8047B9A4;   /* radial offset              */
-    extern f32 lbl_8047B9A8;   /* angular offset             */
-
-    f32 f29;
-    f32 f30;
-    f32 t_scale;
-    f32 t_tmp;
-    f32 t_sum;
-    f32 t_ma;
-    f32 t_denom;
-    f32 thresh1;
-    f32 thresh2;
-    f32 thresh3;
-    s32 seg;
-    f32 lower;
-    f32 upper;
-    f32 f31;
-    s32 x_out;
-    s32 y_out;
+    f32 thresholds[5];
+    f32* next_threshold;
+    f32 phase;
+    f32 width;
+    f32 height;
+    f32 scaled_height;
+    f32 curve;
+    f32 span;
+    f32 denominator;
     f32 angle;
-    f32 cos_a;
+    f32 cosine;
+    f32 sine;
+    s32 color;
+    s32 segment;
+    s32 x;
+    s32 y;
     f32 radial;
-    f32 sin_a;
-    s32 color_arg;
 
-    /* ----------------------------------------------------------------
-     * Convert the two s16 fields in the data packet to f32.
-     * ENDIAN-QA: CW used the 0x4330/xoris big-endian double trick here.
-     * On x86 a plain signed-short cast is semantically identical. */
-    f29 = (f32)(s16)(*(s16 *)(data + 0x56)); /* ENDIAN-QA */
-    f30 = (f32)(s16)(*(s16 *)(data + 0x54)); /* ENDIAN-QA */
+    width = (f32)*(s16*)(data + 0x54);
+    height = (f32)*(s16*)(data + 0x56);
 
-    /* ----------------------------------------------------------------
-     * Build the 5 break-point threshold array (indices 0..4).
-     * The normalising formula maps [0, f29] onto a set of segment widths
-     * using lbl_98C / lbl_9A4 coefficients. */
-    t_scale  = lbl_8047B98C * f29;            /* lbl_98C * f29 */
-    t_tmp    = t_scale * lbl_8047B9A0;         /* * lbl_9A0 */
-    t_sum    = f30 + t_tmp;                    /* f30 + lbl_98C*f29*lbl_9A0 */
-    t_ma     = lbl_8047B9A4 * f30 + t_tmp;    /* lbl_9A4*f30 + lbl_98C*f29*lbl_9A0 */
-    t_denom  = lbl_8047B9A4 * t_sum;           /* lbl_9A4 * t_sum */
-    thresh1  = f30   / t_denom;
-    thresh2  = t_sum / t_denom;
-    thresh3  = t_ma  / t_denom;
+    thresholds[0] = lbl_8047B980;
+    thresholds[4] = lbl_8047B97C;
+    scaled_height = lbl_8047B98C * height;
+    curve = scaled_height * lbl_8047B9A0;
+    span = width + curve;
+    denominator = span * lbl_8047B9A4;
+    thresholds[1] = width / denominator;
+    thresholds[2] = span / denominator;
+    thresholds[3] = (lbl_8047B9A4 * width + curve) / denominator;
 
-    /* threshold array (stored on stack in the original): */
-    /* [0] = lbl_B980, [1]=thresh1, [2]=thresh2, [3]=thresh3, [4]=lbl_B97C */
-
-    /* ----------------------------------------------------------------
-     * Find which segment pos falls in (r31 = 0..4). */
-    seg = 0;
-
-    if (lbl_8047B980 > pos) {
-        /* pos < lbl_B980 → already past the first break from below – enter seg 1 */
-        seg = 1;
-    } else {
-        /* lbl_B980 <= pos */
-        if (thresh1 > pos) {
-            seg = 0;
-            goto seg_found;
+    next_threshold = &thresholds[1];
+    segment = 0;
+    while (segment < 4) {
+        if (thresholds[segment] <= pos && next_threshold[segment] > pos) {
+            break;
         }
-        /* thresh1 <= pos → fall into seg 1 code */
-        seg = 1;
+        segment++;
     }
 
-    /* seg=1 reached: check whether pos is in [thresh1, thresh2) */
-    if (thresh1 > pos) {
-        seg = 2;
-    } else {
-        if (thresh2 > pos) {
-            seg = 1;
-            goto seg_found;
-        }
-        seg = 2;
+    phase = (pos - thresholds[segment]) /
+            (next_threshold[segment] - thresholds[segment]);
+
+    if (segment == 0) {
+        x = (s32)(phase * width);
+        y = 0;
     }
 
-    /* seg=2 check */
-    if (thresh2 > pos) {
-        seg = 3;
-    } else {
-        if (thresh3 > pos) {
-            seg = 2;
-            goto seg_found;
-        }
-        seg = 3;
+    if (segment == 1) {
+        angle = lbl_8047B98C * phase - lbl_8047B9A8;
+        cosine = cos(angle);
+        radial = height - lbl_8047B9A4;
+        radial *= cosine;
+        x = (s32)(radial * lbl_8047B9A0 + width);
+        sine = sin(angle);
+        radial = height - lbl_8047B9A4;
+        radial *= sine;
+        radial *= lbl_8047B9A0;
+        y = (s32)(height * lbl_8047B9A0 + radial);
     }
 
-    /* seg=3 check */
-    if (thresh3 > pos) {
-        seg = 4;
-    } else {
-        if (lbl_8047B97C > pos) {
-            seg = 3;
-            goto seg_found;
-        }
-        seg = 4;
+    if (segment == 2) {
+        x = (s32)(height - lbl_8047B9A4);
+        y = (s32)((lbl_8047B97C - phase) * width);
     }
 
-seg_found:;
-
-    /* ----------------------------------------------------------------
-     * Compute the normalised fractional parameter within the segment.
-     *   lower = thresholds[seg], upper = thresholds[seg+1]
-     *   f31 = (pos - lower) / (upper - lower) */
-    switch (seg) {
-        case 0:  lower = lbl_8047B980; upper = thresh1;       break;
-        case 1:  lower = thresh1;      upper = thresh2;       break;
-        case 2:  lower = thresh2;      upper = thresh3;       break;
-        case 3:  lower = thresh3;      upper = lbl_8047B97C;  break;
-        default: lower = lbl_8047B97C; upper = lbl_8047B97C;  break; /* seg=4: edge/undefined */
-    }
-    f31 = (pos - lower) / (upper - lower);
-
-    /* ----------------------------------------------------------------
-     * Segment-specific x/y screen position computation.
-     * r30 → final x argument, r4_out → final y argument to windowDrawSprite2. */
-    x_out = 0;  /* r30 in asm; passed as windowDrawSprite2 arg0 (r3 at call site) */
-    y_out = 0;  /* r4  in asm; passed as windowDrawSprite2 arg1 (r4 at call site) */
-
-    if (seg == 0) {
-        /* segment 0: linear vertical ramp */
-        x_out = (s32)(f31 * f30);
-        y_out = 0;
+    if (segment == 3) {
+        angle = lbl_8047B98C * phase + lbl_8047B9A8;
+        cosine = cos(angle);
+        radial = height - lbl_8047B9A4;
+        radial *= cosine;
+        x = (s32)(radial * lbl_8047B9A0);
+        sine = sin(angle);
+        radial = height - lbl_8047B9A4;
+        radial *= sine;
+        radial *= lbl_8047B9A0;
+        y = (s32)(height * lbl_8047B9A0 + radial);
     }
 
-    if (seg == 1) {
-        /* segment 1: cosine arc for x (horizontal), sine arc for y (vertical) */
-        angle = lbl_8047B98C * f31 - lbl_8047B9A8;   /* fmsubs: lbl_98C*f31 - lbl_9A8 */
-
-        cos_a = cos(angle);
-        radial = f29 - lbl_8047B9A4;                  /* f29 - lbl_9A4 */
-        x_out = (s32)(radial * cos_a * lbl_8047B9A0 + f30); /* fmadds: radial*cos*lbl_9A0 + f30 */
-
-        sin_a = sin(angle);
-        y_out = (s32)(f29 * lbl_8047B9A0 +
-                      (f29 - lbl_8047B9A4) * sin_a * lbl_8047B9A0); /* fmadds: f29*lbl_9A0 + radial*sin*lbl_9A0 */
-    }
-
-    if (seg == 2) {
-        /* segment 2: linear horizontal + linear vertical */
-        x_out = (s32)(f29 - lbl_8047B9A4);
-        y_out = (s32)((lbl_8047B97C - f31) * f30);
-    }
-
-    if (seg == 3) {
-        /* segment 3: cosine arc for x, sine arc for y (mirror of seg 1) */
-        angle = lbl_8047B98C * f31 + lbl_8047B9A8;   /* fmadds: lbl_98C*f31 + lbl_9A8 */
-
-        cos_a = cos(angle);
-        radial = f29 - lbl_8047B9A4;
-        x_out = (s32)(radial * cos_a * lbl_8047B9A0);    /* fmuls: radial*cos*lbl_9A0 (no +f30 in seg3) */
-
-        sin_a = sin(angle);
-        y_out = (s32)(f29 * lbl_8047B9A0 +
-                      (f29 - lbl_8047B9A4) * sin_a * lbl_8047B9A0);
-    }
-
-    /* ----------------------------------------------------------------
-     * Emit the sprite draw call.
-     *   r3 = x_out (r30), r4 = y_out (r4), r5=2, r6=2,
-     *   r7 = (u8)color_byte | 0xFFFFFF00,
-     *   r8 = ctx (r27), r9 = (u16)sprite_id (r28), r10 = 0 */
-    color_arg = (s32)((color_byte & 0xFF) | 0xFFFFFF00u);
-    windowDrawSprite2(x_out, y_out, 2, 2, color_arg, ctx, (u32)(u16)sprite_id, 0);
+    color = -0x100;
+    color |= (u8)color_byte;
+    windowDrawSprite2(x, y, 2, 2, color, ctx, (u16)sprite_id, 0);
 }
 #endif
 
@@ -1718,47 +1876,93 @@ s32 fn_8002B880(void* r3, u8* r4)
 #endif
 
 /* fn_8002BCE8 - 0x8002BCE8 | size: 0x120 */
+typedef struct ShopPositionEntry {
+    s32 key;
+    s16 position;
+    u16 padding;
+} ShopPositionEntry;
+
+typedef struct ShopPositionContext {
+    u16* state;
+    u8 pad_4[8];
+    f32* offset;
+    u8 pad_10[4];
+    s32* offset_enabled;
+} ShopPositionContext;
+
+typedef struct ShopPositionOwner {
+    u8 pad_0[0x60];
+    ShopPositionContext* context;
+    u8 pad_64[0x30];
+    u16 sprite_id;
+} ShopPositionOwner;
+
+typedef struct ShopPositionDrawData {
+    u8 pad_0[6];
+    s16 key;
+    u8 pad_8[0x4A];
+    s16 position;
+    u8 pad_54[0x13];
+    u8 alpha;
+} ShopPositionDrawData;
+
 extern u8 lbl_802E4F68[];
 #if 0
 asm void fn_8002BCE8(void) {
 #include "src/game/gs_worldmap_fn_8002BCE8.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 4
-s32 fn_8002BCE8(void* r3, u8* r4) {
+s32 fn_8002BCE8(ShopPositionOwner* owner, ShopPositionDrawData* draw) {
     u16 sprite_id;
-    s16 key;
-    s32 r5;
-    u8* entry;
-    u8* tab;
-    u8* ctx;
-    s32 idx;
-    s8 low_byte;
-    sprite_id = *(u16*)((u8*)r3 + 0x94);
-    ctx = (u8*)*(void**)((u8*)r3 + 0x60);
-    tab = lbl_802E4F68;
-    key = *(s16*)(r4 + 0x6);
-    idx = 5;
-    if (key == *(s32*)(tab + 0x0)) idx = 0;
-    else if (key == *(s32*)(tab + 0x8)) idx = 1;
-    else if (key == *(s32*)(tab + 0x10)) idx = 2;
-    else if (key == *(s32*)(tab + 0x18)) idx = 3;
-    else if (key == *(s32*)(tab + 0x20)) idx = 4;
-    if (idx >= 5) return 0;
-    entry = tab + (u32)idx * 8;
-    low_byte = (s8)(sprite_id & 0xff);
-    r5 = (s32)*(s16*)(entry + 4) + (s32)low_byte * 0x1f;
-    if (*(u32*)(ctx + 0x14) != 0) {
-        r5 += (s32)*(f32*)(*(u32*)(ctx + 0xc));
+    u8 sprite_bytes[8];
+    ShopPositionContext* context;
+    ShopPositionEntry* entry;
+    s32 index;
+    s32 key;
+    s32 position;
+    u8 alpha;
+
+    sprite_id = owner->sprite_id;
+    context = owner->context;
+    *(u16*)sprite_bytes = sprite_id;
+    key = draw->key;
+    entry = (ShopPositionEntry*)lbl_802E4F68;
+    index = 0;
+    while (index < 5) {
+        if (key == entry->key) {
+            break;
+        }
+        entry++;
+        index++;
     }
-    {
-        u16 v = *(u16*)(*(u32*)ctx);
-        u8 alpha = (v == 0) ? 0x72 : 0xff;
-        *(s16*)(r4 + 0x52) = (s16)r5;
-        r4[0x67] = alpha;
+
+    if (index >= 5) {
+        entry = NULL;
+    } else {
+        entry = &((ShopPositionEntry*)lbl_802E4F68)[index];
     }
+    if (entry == NULL) {
+        return 0;
+    }
+
+    position = entry->position + (s8)sprite_bytes[1] * 0x1F;
+    if (*context->offset_enabled == 0) {
+        position += (s32)*context->offset;
+    }
+
+    if (*context->state == 0) {
+        alpha = 0x72;
+    } else {
+        alpha = 0xFF;
+    }
+    draw->position = position;
+    draw->alpha = alpha;
     return 0;
 }
+#pragma pop
 #endif
 
 /* fn_8002BE08 - 0x8002BE08 | size: 0x20c | WALL 86.5%: regalloc + scheduling */
@@ -3167,12 +3371,6 @@ void fn_8002D154(s32 mapIndex, u8 colorIndex)
 #endif
 
 /* fn_8002D5D4 - 0x8002D5D4 | size: 0x348 */
-extern void fn_80018F54(void);
-extern void menuOpen(void);
-extern void _toolentryAlloc__FUl(void);
-extern void fn_800E27B0(void);
-extern void fn_800E24B0(void);
-extern void fn_800E209C(void);
 extern u32 lbl_8047A3FC;
 extern u32 lbl_80478E54;
 extern u32 lbl_8047A3DC;
@@ -3181,6 +3379,52 @@ asm void fn_8002D5D4(void) {
 #include "src/game/gs_worldmap_fn_8002D5D4.inc"
 }
 #else
+typedef struct ShopLocationEntry {
+    u8 field_0;
+    u8 type;
+    u8 field_2[2];
+} ShopLocationEntry;
+typedef u8 ShopLocationArgument;
+
+static inline s32 shopQueryMenu(s32 menu)
+{
+    s32 result = menuOpen(menu, 1);
+
+    menuClose(menu);
+    menuCloseSync(menu, 1);
+    return result;
+}
+
+static inline void shopNormalizeMenu62(s32 result, s32* selection)
+{
+    if (result == -1 || result == 2) {
+        *selection = 2;
+    } else if (result == 0) {
+        *selection = 0;
+    } else {
+        *selection = 1;
+    }
+}
+
+static inline s32 shopNormalizeMenu83(s32 result)
+{
+    switch (result) {
+    case 0:
+        return 0;
+    case 1:
+        return 1;
+    case 2:
+        return 2;
+    default:
+        return 3;
+    }
+}
+
+static inline u32 shopMemoryAlloc(void)
+{
+    return _toolentryAlloc__FUl(0x7198);
+}
+
 /*
  * fn_8002D5D4  GSmap_CancelTravel  0x8002D5D4 | size: 0x348
  *
@@ -3207,165 +3451,92 @@ asm void fn_8002D5D4(void) {
  */
 void fn_8002D5D4(void)
 {
-    /* block-scope externs: TU convention */
-    extern u32  lbl_8047A3FC;          /* current location index */
-    extern u32  lbl_80478E54;          /* pointer to location map array */
-    extern u32  lbl_8047A3DC;          /* scratch pointer for GSmemGetPtr result */
-    extern void winMsgClose(s32);
-    extern void winMsgOpenWithSE(s32, u32, s32, s32, u8);
-    extern s32  menuOpen(s32, s32);
-    extern void menuClose(s32);
-    extern s32  menuCloseSync(s32, s32);
-    extern void fn_80018F54(u32, u32, u32);
-    extern u16  _toolentryAlloc__FUl(u32);       /* GSmemAllocRaw */
-    extern void* fn_800E27B0(u16);      /* GSmemGetPtr */
-    extern void fn_800E24B0(u16);       /* GSmemLock */
-    extern void fn_800E209C(u16);       /* GSmemFree */
-    extern void fn_800FF660(void);
-    extern void floorSetFadeScript(s32, u32);
-    extern u32  heroGetStatus(u8*, u32, u32);  /* GSmap_GetNearestLocation */
-    extern u32  fn_8002A0B8(u8*, s32, s32, s32, ...); /* GSmap_FormatText1 */
-    extern void fn_8002A1C4(u8*, s32, s32, ...); /* GSmap_FormatText2 */
-    extern void fn_8002A2CC(u8*, s32, s32, ...); /* GSmap_FormatText3 */
-    extern u32  fn_80029FAC(u8*, s32, s32, s32, ...); /* GSmap_FormatText0 */
-    extern void fn_8002D154(s32, u8);   /* GSmap_ConfirmSequence */
-    extern void fn_8002CE6C(s32, u8);   /* GSmap_ProcessChoice */
-    extern void fn_8002C408(s32, u8);   /* GSmap_DialogStateMachine */
-    extern void fn_8002C284(s32, u8);   /* GSmap_ShowTravelDialog */
+    ShopLocationEntry* location_entry;
+    u32 location_offset;
+    s32 location;
+    u8 type;
+    s32 menu_result;
+    s32 done;
+    u32 memory;
+    s32 selection;
+    u8 text1;
+    u8 text0;
 
-    s32   locIdx;        /* r31: lbl_8047A3FC - location index */
-    u8    npcState;      /* r30: byte at lbl_80478E54[locIdx*4 + 1] */
-    s32   menuResult;    /* r29 */
-    s32   choice;        /* r27 */
-    u16   memHandle;     /* r28 */
-    u8    fmtId;         /* stack byte: sp[8] or sp[9] */
-    u32   fmtTableVal;   /* return from fn_8002A0B8 / fn_80029FAC */
+    location_offset = lbl_8047A3FC;
+    location = location_offset;
+    location_entry = (ShopLocationEntry*)lbl_80478E54;
+    location_entry += location_offset;
+    type = location_entry->type;
 
-    locIdx   = (s32)lbl_8047A3FC;
-    npcState = ((u8*)lbl_80478E54)[locIdx * 4 + 1];
+    switch (type) {
+    case 0: {
+        u32 value = heroGetStatus(NULL, 0xC, 0);
+        u32 message = fn_8002A0B8(&text1, location, 0, 0x4B, value, -1);
+        winMsgOpenWithSE(2, message, 1, 0, text1);
+        while ((menu_result = shopQueryMenu(0x62),
+                shopNormalizeMenu62(menu_result, &selection), selection != 2)) {
+            winMsgClose(1);
+            switch (selection) {
+            case 0:
+                fn_8002D154(location, type);
+                break;
+            case 1:
+                fn_80018F54(3, location, 0);
+                break;
+            }
+            message = fn_8002A0B8(&text1, location, 1, -1);
+            winMsgOpenWithSE(2, message, 1, 0, text1);
+        }
 
-    if (npcState == 1) {
-        /* --- path 1: hand off to ProcessChoice then exit --- */
-        fn_8002CE6C(locIdx, npcState);
-        goto _epilogue;
+        fn_8002A2CC((ShopLocationArgument*)location, 2, -1);
+        break;
     }
-    if (npcState == 0) {
-        /* --- path 0: initial location-name dialog (menu 0x62) --- */
-        {
-            u32 nearLoc = heroGetStatus(NULL, 0xc, 0);
-            /* format text: first_va = 0x4b, then nearLoc, then -1 */
-            fmtTableVal = fn_8002A0B8(&fmtId, locIdx, 0, 0x4b, (s32)nearLoc, -1);
-            winMsgOpenWithSE(2, fmtTableVal, 1, 0, fmtId);
-        }
-        /* menu 0x62 loop */
-        for (;;) {
-            menuResult = menuOpen(0x62, 1);
-            menuClose(0x62);
-            menuCloseSync(0x62, 1);
+    case 1:
+        fn_8002CE6C((ShopLocationArgument*)location, type);
+        break;
+    default: {
+        u32 message;
 
-            if (menuResult == -1 || menuResult == 2) {
-                choice = 2;
-            } else if (menuResult == 0) {
-                choice = 0;
-            } else {
-                choice = 1;
-            }
-
-            if (choice == 2) {
-                /* cancelled: send format-text3, exit */
-                fn_8002A2CC((u8*)&locIdx, 2, -1);
-                goto _epilogue;
-            }
-
-            /* choice 0 or 1: process, then re-show dialog */
+        done = 0;
+        memory = shopMemoryAlloc();
+        lbl_8047A3DC = fn_800E27B0(memory);
+        message = fn_80029FAC(&text0, location, 0, -1);
+        winMsgOpenWithSE(2, message, 1, 0, text0);
+        while ((menu_result = shopNormalizeMenu83(shopQueryMenu(0x83))) != 3) {
             winMsgClose(1);
-            if (choice == 0) {
-                fn_8002D154(locIdx, npcState);
-            } else if (choice == 1) {
-                fn_80018F54(3, (u32)locIdx, 0);
+            switch (menu_result) {
+            case 0:
+                fn_8002C408(location, type);
+                break;
+            case 1:
+                fn_8002C284(location, type);
+                break;
+            case 2:
+                fn_8002A1C4((ShopLocationArgument*)location, 0xB, -1);
+                break;
+            case 3:
+                done = 1;
+                break;
             }
-            /* choice >= 2 already handled above */
-
-            /* reformat and re-open dialog */
-            fmtTableVal = fn_8002A0B8(&fmtId, locIdx, 1, -1);
-            winMsgOpenWithSE(2, fmtTableVal, 1, 0, fmtId);
+            if (done != 0) {
+                break;
+            }
+            message = fn_80029FAC(&text0, location, 1, -1);
+            winMsgOpenWithSE(2, message, 1, 0, text0);
         }
-        /* unreachable */
-    }
 
-    /* --- path 2+: allocate GSmem block, run extended location dialog (menu 0x83) --- */
-    {
-        choice     = 0;
-        memHandle  = _toolentryAlloc__FUl(0x7198);
-        lbl_8047A3DC = (u32)fn_800E27B0(memHandle);
-
-        /* initial format and open */
-        fmtTableVal = fn_80029FAC(&fmtId, locIdx, 0, -1);
-        winMsgOpenWithSE(2, fmtTableVal, 1, 0, fmtId);
-
-        /* menu 0x83 loop */
-        for (;;) {
-            if (choice != 0)
-                goto _after_reformat;
-
-            /* only re-format on entry and after a "no-op" choice */
-            fmtTableVal = fn_80029FAC(&fmtId, locIdx, 1, -1);
-            winMsgOpenWithSE(2, fmtTableVal, 1, 0, fmtId);
-
-        _after_reformat:
-            menuResult = menuOpen(0x83, 1);
-            menuClose(0x83);
-            menuCloseSync(0x83, 1);
-
-            /* normalise menuResult into 0..3 */
-            if (menuResult == 0) {
-                menuResult = 0;
-            } else if (menuResult == 1) {
-                menuResult = 1;
-            } else if (menuResult == 2) {
-                menuResult = 2;
-            } else if (menuResult == 3) {
-                menuResult = 3; /* FUNCTIONAL-TODO: 3==keep-looping if !=3 exit; see below */
-            } else {
-                menuResult = 3;
-            }
-
-            if (menuResult == 3)
-                break; /* exit loop */
-
-            winMsgClose(1);
-
-            if (menuResult == 0) {
-                fn_8002C408(locIdx, npcState);
-            } else if (menuResult == 1) {
-                fn_8002C284(locIdx, npcState);
-            } else if (menuResult == 2) {
-                fn_8002A1C4((u8*)&locIdx, 0xb, -1);
-            } else {
-                /* menuResult == 3 originally maps to r27=1, loop-continue */
-                choice = 1;
-                continue;
-            }
-
-            choice = 0;
-            /* loop */
-        }
-        /* loop exit: choice != 0 (r27 != 0) breaks out */
-
-        /* L_8002D8A8: decide how to close */
-        if (npcState == 2 || npcState == 3) {
-            winMsgClose(1);
+        if (type != 3 && type != 2) {
+            fn_8002A1C4((ShopLocationArgument*)location, 2, -1);
         } else {
-            fn_8002A1C4((u8*)&locIdx, 2, -1);
+            winMsgClose(1);
         }
-
-        fn_800E24B0(memHandle);
-        fn_800E209C(memHandle);
+        fn_800E24B0(memory);
+        fn_800E209C(memory);
+        break;
+    }
     }
 
-_epilogue:
-    /* if lbl_8047A3FC[+4] is nonzero, fire story event */
-    if (*(u32*)((u8*)&lbl_8047A3FC + 4) != 0) {
+    if ((s32)*(&lbl_8047A3FC + 1) != 0) {
         fn_800FF660();
         floorSetFadeScript(0, 0);
     }
@@ -3686,4 +3857,3 @@ void menuShopOpen(u32 flag)
     menuReleaseOffScreen(t);
 }
 #endif
-

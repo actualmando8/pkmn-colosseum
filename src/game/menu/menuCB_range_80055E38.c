@@ -54,7 +54,8 @@ u32 fn_80055E38(s32 idx) {
 
 #pragma push
 #pragma peephole off
-u32 fn_80055EB8(u8* ctx, u8* p) {
+/* 0x80055EB8 | 0xD0 */
+u32 fn_80055EB8(s8* ctx, u8* p) {
     extern s32 fn_80057A08(void);
     extern void* windowSearchID(s32);
     extern s32 fn_80055194(u32*, s32);
@@ -68,9 +69,9 @@ u32 fn_80055EB8(u8* ctx, u8* p) {
 
     result = 0;
     if (fn_80057A08() != 0) {
-        ctx = (u8*)windowSearchID(0x93);
+        ctx = (s8*)windowSearchID(0x93);
         if (ctx != 0) {
-            if (fn_80055194(&out, (s8)ctx[0x95]) == 0) {
+            if (fn_80055194(&out, ctx[0x95]) == 0) {
                 result = 1;
                 fn_80057094(&x, &y);
                 *(s16*)(p + 0x50) =
@@ -410,6 +411,10 @@ void fn_800574A8(void) {
 u8* fn_800574E0(void) {
     return lbl_803A9768 + *(u32*)(lbl_803A9768 + 0x278) * 0x138 + 8;
 }
+
+typedef struct {
+    u32 data[78];
+} Tbl78;
 
 void fn_800574FC(u8* src) {
     Tbl78* dstState;

@@ -12,6 +12,7 @@
  */
 
 #include "dolphin/types.h"
+#include "game/menu/menu_name_entry.h"
 
 /* ===== Phase 2 recovery stubs ===== */
 

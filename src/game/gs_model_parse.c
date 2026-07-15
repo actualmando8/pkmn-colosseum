@@ -6,9 +6,7 @@
  * segment (Fable re-split, 2026-07-07). Functions asm-only until matched.
  */
 #include "dolphin/types.h"
-#define HSD_JObjMtxIsDirty HSD_JObjMtxIsDirty_inline
 #include "hsd/hsd_jobj.h"
-#undef HSD_JObjMtxIsDirty
 
 typedef void (*GSModelPObjDisp)(HSD_PObj* pobj, f32 vmtx[3][4], f32 pmtx[3][4],
                                f32 smtx[3][4], void* arg);

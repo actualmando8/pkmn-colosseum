@@ -187,6 +187,27 @@ u32 fn_801347D8(void) { return 30; }
 u32 pcboxGetNbPokemonBox(void) { return 3; }
 
 
+/* One box contains its name/header followed by 30 Pokemon records. */
+typedef struct PCBoxPokemonRecord {
+    u8 data[0x138];
+} PCBoxPokemonRecord;
+
+typedef struct PCBoxData {
+    u8 header[0x14];
+    PCBoxPokemonRecord pokemon[30];
+} PCBoxData;
+
+static inline u8* pcboxGetPokemonRecord(PCBoxData* base, s8 box, s8 index)
+{
+    if (box < 0 || box >= 3) {
+        return 0;
+    }
+    if (index < 0 || index >= 30) {
+        return 0;
+    }
+    return base[box].pokemon[index].data;
+}
+
 /* 0x801347E8 | 0x104 */
 #if 0
 asm void fn_801347E8(void) {
@@ -194,33 +215,43 @@ asm void fn_801347E8(void) {
 }
 #else
 #pragma optimization_level 4
-s8 fn_801347E8(void* base, s8 slot) {
-    extern u8 pokemonCheckValid(void*);
-    u8* cur;
-    s8 count;
-    s8 i;
-    count = 0;
+#pragma scheduling on
+s8 pcboxGetPokemonBoxNbEmptySlot(PCBoxData* base, s8 box) {
+    s8 index;
+    s8 count = 0;
+    u8* pokemon;
+    u8* record;
+
     if (base == 0) {
-        base = (void*)savedataGetStatus(0, 3);
+        base = (PCBoxData*)savedataGetStatus(0, 3);
     }
-    if (slot < 0 || slot >= 3) {
+    if (box < 0 || box >= 3) {
         count = -1;
     } else {
-        cur = (u8*)base + (s32)slot * 0x24a4;
-        i = 0;
-        while (i < 0x1e) {
-            if (pokemonCheckValid(cur + 0x14)) {
+        index = 0;
+        pokemon = (u8*)base + (s32)box * sizeof(PCBoxData);
+        while (index < 30) {
+            if (box < 0 || box >= 3) {
+                record = 0;
+            } else if (index < 0 || index >= 30) {
+                record = 0;
+            } else {
+                record = pokemon + 0x14;
+            }
+            if (record != 0 && pokemonCheckValid(record)) {
                 count++;
             }
-            cur += 0x138;
-            i++;
+            pokemon += sizeof(PCBoxPokemonRecord);
+            index++;
         }
     }
+
     if (count < 0) {
         return -1;
     }
-    return (s8)(0x1e - count);
+    return (s8)(30 - count);
 }
+#pragma scheduling off
 #endif
 
 
@@ -231,36 +262,28 @@ asm void getPokemonBoxNbUsedSlot__5PCBOXFSc(void) {
 }
 #else
 #pragma optimization_level 4
-s32 getPokemonBoxNbUsedSlot__5PCBOXFSc(void* base, void* src, s8 slot, s8 idx) {
-    extern void pokemonAllKaihuku(void*);
-    u8* entry;
-    s8 s;
-    s8 e;
-    u32 i;
-    u32* dst32;
-    u32* src32;
+#pragma scheduling on
+s32 getPokemonBoxNbUsedSlot__5PCBOXFSc(PCBoxData* base, s8 box) {
+    u8* pokemon;
+    s32 count = 0;
+    s8 index;
+
     if (base == 0) {
-        base = (void*)savedataGetStatus(0, 3);
+        base = (PCBoxData*)savedataGetStatus(0, 3);
     }
-    s = slot;
-    e = idx;
-    if (s < 0 || s >= 3 || e < 0 || e >= 0x1e) {
-        entry = 0;
-    } else {
-        entry = (u8*)base + (s32)s * 0x24a4 + (s32)e * 0x138 + 0x14;
+    if (box < 0 || box >= 3) {
+        return -1;
     }
-    if (entry == 0) return 0;
-    dst32 = (u32*)entry;
-    src32 = (u32*)src;
-    for (i = 0; i < 0x27; i++) {
-        dst32[0] = src32[0];
-        dst32[1] = src32[1];
-        dst32 += 2;
-        src32 += 2;
+
+    for (index = 0; index < 30; index++) {
+        pokemon = pcboxGetPokemonRecord(base, box, index);
+        if (pokemon != 0 && pokemonCheckValid(pokemon)) {
+            count++;
+        }
     }
-    pokemonAllKaihuku(entry);
-    return 1;
+    return count;
 }
+#pragma scheduling off
 #endif
 
 
@@ -272,7 +295,7 @@ asm void fn_801349DC(void) {
 #else
 #pragma optimization_level 4
 #pragma scheduling on
-s32 fn_801349DC(void* base, s8 slot, u16* name) {
+s32 pcboxSetPokemonBoxName(void* base, s8 slot, u16* name) {
     extern void GScharCpy(void*, u16*);
     s32 len;
     u16* p;
@@ -482,6 +505,7 @@ asm void getPokemon__5PCBOXFScSc(void) {
 #else
 #pragma scheduling on
 void* getPokemon__5PCBOXFScSc(void* base, s8 r4, s8 r5) {
+    u8* new_var;
     s8 slot;
     s8 entry;
     if (base == 0) {
@@ -489,13 +513,18 @@ void* getPokemon__5PCBOXFScSc(void* base, s8 r4, s8 r5) {
     }
     slot = r4;
     if (slot < 0 || slot >= 3) {
-        return 0;
+        new_var = 0;
+        goto done;
     }
     entry = r5;
     if (entry < 0 || entry >= 0x1e) {
-        return 0;
+        new_var = 0;
+        goto done;
     }
-    return (u8*)base + (s32)slot * 0x24a4 + (s32)entry * 0x138 + 0x14;
+    new_var = (u8*)base + (s32)slot * 0x24a4 +
+              (s32)entry * 0x138 + 0x14;
+done:
+    return new_var;
 }
 #pragma scheduling off
 #endif

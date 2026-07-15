@@ -68,4 +68,22 @@ void GXInitTlutRegion(GXTlutRegion* region, u32 tmemAddr, u8 tlutSize);
 void __GXSetTmemConfig(u32 config);
 void __GXFlushTextureState(void);
 
+/* ========================================================================= */
+/*  GXColor                                                                  */
+/* ========================================================================= */
+
+typedef struct _GXColor {
+    u8 r;
+    u8 g;
+    u8 b;
+    u8 a;
+} GXColor;
+
+/** GXLightObj - opaque 64-byte hardware light object. */
+typedef struct GXLightObj {
+    u8 dummy[0x40];
+} GXLightObj;
+
+void fn_800BA440(GXLightObj* light, GXColor color);
+
 #endif /* DOLPHIN_GX_GX_H */

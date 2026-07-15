@@ -80,6 +80,10 @@ void GSmodelFreeAllShadowTextures(void)
     }
 }
 
+    u8 _pad[0x160];
+    GSlight* shadowLight;
+} GSmodel;
+
 void GSmodelSetShadowBoundExpansion(u32 callback, u32 state)
 {
     lbl_8047AB84 = callback;

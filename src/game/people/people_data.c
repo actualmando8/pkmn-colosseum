@@ -447,6 +447,74 @@ asm void fn_80140ACC(void) {
 #include "src/game/people/people_data_fn_80140ACC.inc"
 }
 #else
+
+/* Resolve the placement offset for a field-person record group. */
+s32 fn_80140588(u32* entries, u16 count, u16 dataIndex, u16 extent,
+                u8 accumulate)
+{
+    u32* entry;
+    u16 i;
+    s32 result;
+
+    if (entries == NULL) {
+        return -1;
+    }
+    if (!PEOPLE_ITEM_ID_VALID(dataIndex)) {
+        return -1;
+    }
+
+    if (accumulate == 0) {
+        if (entries == NULL) {
+            entry = NULL;
+        } else if (!PEOPLE_ITEM_ID_VALID(dataIndex)) {
+            entry = NULL;
+        } else {
+            entry = NULL;
+            for (i = 0; i < count; i++) {
+                u32* current = entries + i;
+                if (PEOPLE_ENTRY_VALID(current) &&
+                    dataIndex == PEOPLE_ENTRY_ID(current)) {
+                    entry = current;
+                    break;
+                }
+            }
+        }
+
+        if (entry != NULL) {
+            result = (u16)extent - PEOPLE_ENTRY_COUNT(entry);
+        } else {
+            u32* freeEntry;
+
+            if (entries == NULL || !PEOPLE_ITEM_ID_VALID(dataIndex)) {
+                freeEntry = NULL;
+            } else {
+                freeEntry = NULL;
+                for (i = 0; i < count; i++) {
+                    u32* current = entries + i;
+                    if (!PEOPLE_ENTRY_VALID(current)) {
+                        freeEntry = current;
+                        break;
+                    }
+                }
+            }
+            result = freeEntry != NULL ? (u16)extent : 0;
+        }
+    } else {
+        result = 0;
+        for (i = 0; i < count; i++) {
+            entry = entries + i;
+            if (!PEOPLE_ENTRY_VALID(entry)) {
+                result += (u16)extent;
+            } else if (PEOPLE_ENTRY_VALID(entry) &&
+                       dataIndex == PEOPLE_ENTRY_ID(entry)) {
+                result += (u16)extent - PEOPLE_ENTRY_COUNT(entry);
+            }
+        }
+    }
+
+    return result;
+}
+
 #pragma optimization_level 4
 s32 fn_80140ACC(u32* base, u16 count, u16 id, u16 amount, s16 index, u16 unusedLimit, u8 sortMode) {
     u32* entry;
@@ -895,7 +963,9 @@ asm s32 itemGetStatus(u32 a, u16 b, u16 c, u32 d) {
 #include "src/game/people/people_data_fn_80142CF4.inc"
 }
 #else
-#pragma optimization_level 4
+/* Keep the standalone farm shape: later definitions must not auto-inline here. */
+#pragma push
+#pragma inline_depth(0)
 s32 itemGetStatus(u32 a, u16 b, u16 c, u32 d) {
     u8* target;
 
@@ -943,7 +1013,7 @@ s32 itemGetStatus(u32 a, u16 b, u16 c, u32 d) {
     case 8:
         return (u16)itemDataBiosGetFightUseKoukaDataId(target);
     case 9:
-        return (s8)itemDataBiosGetUseFriend(target, (u16)d);
+        return (s8)itemDataBiosGetUseFriend(target, (u16) ((((((((((d & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu));
     case 10:
         return itemDataBiosGetBuff(target);
     case 12:
@@ -988,6 +1058,7 @@ s32 itemGetStatus(u32 a, u16 b, u16 c, u32 d) {
         return 0;
     }
 }
+#pragma pop
 #endif
 extern void jumptable_80367E70();
 extern u8 lbl_802730E0[];

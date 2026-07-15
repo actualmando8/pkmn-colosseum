@@ -10,6 +10,7 @@
  */
 
 #include "dolphin/types.h"
+#include "dolphin/gx/GX.h"
 
 /* =========================================================================
  * External declarations (shared)
@@ -57,70 +58,33 @@ u32 menuSubKeyWait(void) {
 }
 #pragma peephole reset
 
-/* 0x8001D834 | 0xB4 */
-#if 0
-asm void fn_8001D834(void) {
-#include "src/game/gs_pcbox_fn_8001D834.inc"
-}
-#else
-void fn_8001D834(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    f32 f7 = 0.0f;
+typedef struct MenuSubColorContext {
+    u8 pad_00[0x88];
+    GXColor color;
+} MenuSubColorContext;
 
-    r6 = *(u8*)((u8*)r4 + 0x67);
-    r5 = 0x80810000;
-    tmp = *(u8*)((u8*)r3 + 0x8B);
-    r8 = *(u8*)((u8*)r4 + 0x66);
-    r7 = *(u8*)((u8*)r3 + 0x8A);
-    r9 = r6 * tmp;
-    r6 = *(u8*)((u8*)r4 + 0x64);
-    r5 = *(u8*)((u8*)r3 + 0x88);
-    r4 = *(u8*)((u8*)r4 + 0x65);
-    tmp = *(u8*)((u8*)r3 + 0x89);
-    r3 = r8 * r7;
-    r5 = r6 * r5;
-    tmp = r4 * tmp;
-    r4 = (s32)((s64)r10 * (s64)r9 >> 32);
-    r6 = (s32)((s64)r10 * (s64)r3 >> 32);
-    r4 = r4 + r9;
-    r7 = (s32)r4 >> 7;
-    r4 = (s32)((s64)r10 * (s64)r5 >> 32);
-    r8 = (u32)r7 >> 31;
-    r3 = r6 + r3;
-    r7 = r7 + r8;
-    r6 = (s32)r3 >> 7;
-    r7 = r7 & 0xFF;
-    r3 = (s32)((s64)r10 * (s64)tmp >> 32);
-    r4 = r4 + r5;
-    r5 = (u32)r6 >> 31;
-    r4 = (s32)r4 >> 7;
-    r6 = r6 + r5;
-    r5 = (u32)r4 >> 31;
-    tmp = r3 + tmp;
-    r4 = r4 + r5;
-    tmp = (s32)tmp >> 7;
-    r5 = r6 & 0xFF;
-    r3 = (u32)tmp >> 31;
-    r4 = r4 & 0xFF;
-    tmp = tmp + r3;
-    r5 = r5 << 8;
-    tmp = tmp & 0xFF;
-    r3 = r4 << 24;
-    tmp = tmp << 16;
-    tmp = r3 | tmp;
-    tmp = r5 | tmp;
-    r3 = r7 | tmp;
-    return;
+typedef struct MenuSubColorItem {
+    u8 pad_00[0x64];
+    GXColor color;
+} MenuSubColorItem;
+
+/* menuSubCalcColor - 0x8001D834 | size: 0xB4 */
+#pragma push
+#pragma peephole off
+u32 menuSubCalcColor(MenuSubColorContext* context, MenuSubColorItem* item)
+{
+    u8 red;
+    u8 green;
+    u8 blue;
+    u8 alpha;
+
+    red = (u8)((item->color.r * context->color.r) / 255);
+    green = (u8)((item->color.g * context->color.g) / 255);
+    blue = (u8)((item->color.b * context->color.b) / 255);
+    alpha = (u8)((item->color.a * context->color.a) / 255);
+    return (red << 24) | (green << 16) | (blue << 8) | alpha;
 }
-#endif
+#pragma pop
 
 /* 0x8001D8E8 | 0xAC */
 extern void windowGetActiveID();
@@ -806,4 +770,3 @@ s32 menuSubOpenNumberInputSub__FUlPUlUcssbPFUl_PUs(void* a, u32* b, void* c) {
 }
 #pragma peephole reset
 #endif
-

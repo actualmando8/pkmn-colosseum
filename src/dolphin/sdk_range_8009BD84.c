@@ -148,6 +148,8 @@ void ConfigureVideo(u16 fbWidth, u16 xfbHeight) {
     VIConfigurePan(0, 0, 640, 480);
 }
 
+
+/* 0x8009D820 | 0x58 */
 u16 fn_8009D820(void) {
     extern u16 lbl_804789A0;
 
@@ -159,7 +161,11 @@ u16 fn_8009D820(void) {
     case 0:
         lbl_804789A0 = (*(volatile u16*)0xCC00206E & 2) ? 1 : 0;
         break;
-    case -1:
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
     default:
         lbl_804789A0 = 0;
         break;

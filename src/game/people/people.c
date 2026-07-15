@@ -126,6 +126,8 @@ extern void  GSthreadBlock(void* thread);
 /* Model system */
 extern void  fn_8017BB80(void* floorObj, void* modelData); /* model open */
 extern void  fn_8017BC90(void* floorObj, u32 modelId, u32 param, void* extraData);
+extern s32   fn_8017BB80(void* floorObj, void* modelData); /* model open */
+extern void* fn_8017BC90(void* floorObj, u32 modelId, u32 param, void* extraData);
 
 /* Flag system */
 extern BOOL  fn_800F7108(u16 flagId);               /* GSflagGet (bit check) */
@@ -244,9 +246,9 @@ PeopleEntry* peopleGetEntry(s32 index)
  * ======================================================================= */
 PeopleEntry* fn_8018FCE0(void)
 {
-    s32 maxCount;
     PeopleEntry* entry;
-    s32 i;
+    s32 maxCount;
+    int i;
     PeopleEntry* found;
     f32 moveSpeed;
 
@@ -1541,7 +1543,7 @@ s32 fn_80180C78(PeopleOpenWork* work) {
     return 0;
 }
 
-/* fn_80181094 -- not recovered, gap in archive campaign (size 0xB8) */
+/* fn_80181094 = peopleOpenThread (size 0xB8) */
 #pragma optimization_level 0
 void fn_80181094(void) {
     u8* offsets;

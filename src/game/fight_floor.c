@@ -884,8 +884,8 @@ void fightFloorLoopValidFightTrainer(u32 param_1, void (*param_2)(u32, u32, u32)
     extern u32 GSthreadIsRunning(u32 task);
     extern void GSthreadClose(u32 task);
     extern u32 fn_800FF560(void);
-    extern u32 GSthreadCreate(u32 type, u32 data, u32 flags, u32 unk1, u32 unk2, u32 unk3, u32 mon_out);
-    extern void GSthreadSetArgs(u32 task, u32 b, u32 mon, u32 count, u32 ctx);
+    extern u32 GSthreadCreate(u32 type, u32 data, u32 flags, u32 unk1, u32 unk2, u32 unk3);
+    extern void GSthreadSetArgs(u32 task, ...);
     extern u32 fightFloorGetStatus(u32 poke, u32 b, u32 field, u32 d);
     extern u32 fightTrainerGetStatus(u32 mon, u32 b, u32 field, u32 d);
     extern u32 fightSideGetValidFightTrainerPtr(u32, u32);
@@ -904,7 +904,7 @@ void fightFloorLoopValidFightTrainer(u32 param_1, void (*param_2)(u32, u32, u32)
     u32 r20;
     r28 = (u16)fightFloorGetStatus(0, 0, 0x14, 0);
     r27 = (u16)fightFloorGetStatus(0, 0, 0x16, 0);
-    { u32 i = 0; while ((u16)i < 4) { arr[i] = 0; i++; } }
+    { u16 i = 0; while (i < 4) { arr[i] = 0; i++; } }
     r20 = (u8)param_4;
     if (r20 == 1) {
         r25 = r28;
@@ -912,7 +912,7 @@ void fightFloorLoopValidFightTrainer(u32 param_1, void (*param_2)(u32, u32, u32)
         r24 = 0;
         while ((u16)r24 < 2) {
             r26 = fightFloorGetStatus(r31, 0, 0x35, r24);
-            if ((u8)fightSideCheckValid(r26) != 0) {
+            if ((u8)fightSideCheckValid(r26) == 0) {
                 r26 = 0;
             }
             if (r26 != 0) {
@@ -925,9 +925,9 @@ void fightFloorLoopValidFightTrainer(u32 param_1, void (*param_2)(u32, u32, u32)
                         fightTrainerGetStatus(r21, 0, 0x4b, 0);
                         if (r20 == 0) {
                             if ((u16)r22 < 4) {
-                                { u32 task = fn_800FF560(); arr[r22] = GSthreadCreate(0x12, task, 0x2000, 1, 0, (u32)param_2, r21); }
-                                if (arr[r22] != 0) {
-                                    GSthreadSetArgs(arr[r22], 3, r21, r25, r29);
+                                { u32 task = fn_800FF560(); arr[(u16)r22] = GSthreadCreate(0x12, task, 0x2000, 1, 0, (u32)param_2); }
+                                if (arr != NULL) {
+                                    GSthreadSetArgs(arr[(u16)r22], 3, r21, r25, r29);
                                     r22++;
                                 }
                             }
@@ -942,8 +942,8 @@ void fightFloorLoopValidFightTrainer(u32 param_1, void (*param_2)(u32, u32, u32)
             _threadSwitch();
             r22 = 0;
             while ((u16)r22 < 4) {
-                if (arr[r22] != 0) {
-                    if ((u8)GSthreadIsRunning(arr[r22]) == 1) break;
+                if (arr[(u16)r22] != 0) {
+                    if ((u8)GSthreadIsRunning(arr[(u16)r22]) == 1) break;
                 }
                 r22++;
             }
@@ -952,9 +952,9 @@ void fightFloorLoopValidFightTrainer(u32 param_1, void (*param_2)(u32, u32, u32)
         r21 = 0;
         while ((u16)r24 < 4) {
             r22 = (u16)r24 * 4;
-            if (arr[r24] != 0) {
-                GSthreadClose(arr[r24]);
-                arr[r24] = r21;
+            if (arr[(u16)r24] != 0) {
+                GSthreadClose(arr[(u16)r24]);
+                arr[(u16)r24] = r21;
             }
             r24++;
         }
@@ -962,7 +962,7 @@ void fightFloorLoopValidFightTrainer(u32 param_1, void (*param_2)(u32, u32, u32)
         r22 = 0;
         while ((u16)r22 < 2) {
             r21 = fightFloorGetStatus(r31, 0, 0x35, r22);
-            if ((u8)fightSideCheckValid(r21) == 4) {
+            if ((u8)fightSideCheckValid(r21) == 0) {
                 r21 = 0;
             }
             if (r21 != 0) {
@@ -974,7 +974,7 @@ void fightFloorLoopValidFightTrainer(u32 param_1, void (*param_2)(u32, u32, u32)
                         r25 = (u16)fightTrainerGetStatus(0, r25, 0x2, 0);
                         fightTrainerGetStatus(r24, 0, 0x4b, 0);
                         if (r25 == 0) {
-                            ((void(*)(u32, u32, u32))r30)(r24, r28, r29);
+                r30(r24, r28, r29);
                         }
                     }
                     r23++;
@@ -986,7 +986,7 @@ void fightFloorLoopValidFightTrainer(u32 param_1, void (*param_2)(u32, u32, u32)
     r22 = 0;
     while ((u16)r22 < 2) {
         r21 = fightFloorGetStatus(r31, 0, 0x35, r22);
-        if ((u8)fightSideCheckValid(r21) == 2) {
+        if ((u8)fightSideCheckValid(r21) == 0) {
             r21 = 0;
         }
         if (r21 != 0) {
@@ -998,7 +998,7 @@ void fightFloorLoopValidFightTrainer(u32 param_1, void (*param_2)(u32, u32, u32)
                     r25 = (u16)fightTrainerGetStatus(0, r25, 0x2, 0);
                     fightTrainerGetStatus(r24, 0, 0x4b, 0);
                     if (r25 != 0) {
-                        ((void(*)(u32, u32, u32))r30)(r24, r28, r29);
+                    r30(r24, r28, r29);
                     }
                 }
                 r23++;
@@ -1574,12 +1574,12 @@ s32 fightFloorCmpfightOutPokemonNimbleness(void *p1, void *p2, void *p3, u8 p4) 
         return 1;
     }
 
-    /* First walk: callback 0xd on p2 */
+    /* First walk: callback 0xd on the fight floor. */
     walkCtx1[0] = 0xd;
     walkCtx1[1] = 0;
     walkCtx1[2] = 0;
     walkCtx1[3] = 0;
-    fightFloorLoopValidFightOutPokemon(p2, (void*)_fightFloorCheckFightOutPokemonPtrAryPokemonTokuseiDataIdSub__FPvUsPv, walkCtx1, 0);
+    fightFloorLoopValidFightOutPokemon(p1, (void*)_fightFloorCheckFightOutPokemonPtrAryPokemonTokuseiDataIdSub__FPvUsPv, walkCtx1, 0);
     if ((u16)walkCtx1[1] != 0) {
         abilCat = 0;
         goto _abilDone;
@@ -1618,15 +1618,15 @@ s32 fightFloorCmpfightOutPokemonNimbleness(void *p1, void *p2, void *p3, u8 p4) 
         goto _cmp1;
     }
     i1 = 0;
-    while ((u16)i1 < 3) {
+    while ((u16)i1 < 2) {
         teamObj1 = (void*)fightFloorGetStatus(p1, 0, 0x35, i1);
         if (teamObj1 != 0) {
             j1 = 0;
-            while ((u16)j1 < 3) {
+            while ((u16)j1 < 2) {
                 matchSide = (void*)fightSideGetStatus(teamObj1, 0, 7, j1);
                 if (matchSide != 0) {
                     k1 = 0;
-                    while ((u16)k1 < 7) {
+                    while ((u16)k1 < 6) {
                         void *pkm;
                         pkm = (void*)fightTrainerGetStatus(matchSide, 0, 0x45, k1);
                         if (pkm != 0 && pkm == fightRes) {
@@ -1647,8 +1647,8 @@ s32 fightFloorCmpfightOutPokemonNimbleness(void *p1, void *p2, void *p3, u8 p4) 
     _cmp1:
     {
         void *abilPkm;
-        if (matchSide != 0) {
-            abilPkm = (void*)fightTrainerGetStatus(matchSide, 0, 0x44, 0);
+        if (matchSide != 0 &&
+            (abilPkm = (void*)fightTrainerGetStatus(matchSide, 0, 0x44, 0)) != 0) {
         } else {
             abilPkm = 0;
         }
@@ -1665,15 +1665,15 @@ s32 fightFloorCmpfightOutPokemonNimbleness(void *p1, void *p2, void *p3, u8 p4) 
             goto _cmp2;
         }
         i2 = 0;
-        while ((u16)i2 < 3) {
+        while ((u16)i2 < 2) {
             teamObj2 = (void*)fightFloorGetStatus(p1, 0, 0x35, i2);
             if (teamObj2 != 0) {
                 j2 = 0;
-                while ((u16)j2 < 3) {
+                while ((u16)j2 < 2) {
                     matchSide2 = (void*)fightSideGetStatus(teamObj2, 0, 7, j2);
                     if (matchSide2 != 0) {
                         k2 = 0;
-                        while ((u16)k2 < 7) {
+                        while ((u16)k2 < 6) {
                             void *pkm;
                             pkm = (void*)fightTrainerGetStatus(matchSide2, 0, 0x45, k2);
                             if (pkm != 0 && pkm == fightRes) {
@@ -1695,26 +1695,26 @@ s32 fightFloorCmpfightOutPokemonNimbleness(void *p1, void *p2, void *p3, u8 p4) 
         {
             u32 cmp2;
             void *abilPkm2;
-            if (matchSide2 != 0) {
-                abilPkm2 = (void*)fightTrainerGetStatus(matchSide2, 0, 0x44, 0);
+            if (matchSide2 != 0 &&
+                (abilPkm2 = (void*)fightTrainerGetStatus(matchSide2, 0, 0x44, 0)) != 0) {
             } else {
                 abilPkm2 = 0;
             }
             cmp2 = fightOutPokemonGetNowNimbleness(p3, numBattle, abilCat, slotCount, abilPkm2);
 
-            if ((u8)p4 != 0) {
-                stat1 = (s32)fightOutPokemonGetCmpNimblenessWazaDataId(p2);
-                stat2 = (s32)fightOutPokemonGetCmpNimblenessWazaDataId(p3);
-            } else {
+            if ((u8)p4 == 0) {
                 stat1 = 0;
                 stat2 = 0;
+            } else {
+                stat1 = (s32)fightOutPokemonGetCmpNimblenessWazaDataId(p2);
+                stat2 = (s32)fightOutPokemonGetCmpNimblenessWazaDataId(p3);
             }
 
-            stat1 = wazaGetStatus(0, stat1, 4, 0);
+            stat1 = (s8)wazaGetStatus(0, stat1, 4, 0);
             stat2 = wazaGetStatus(0, stat2, 4, 0);
-            if ((s8)stat1 != 0 || (s8)stat2 != 0) {
-                if (stat1 > stat2) return 1;
-                if (stat1 < stat2) return 0;
+            if (stat1 != 0 || (s8)stat2 != 0) {
+                if (stat1 > (s8)stat2) return 1;
+                if (stat1 < (s8)stat2) return 0;
             }
             if (cmp1 > cmp2) return 1;
             if (cmp1 < cmp2) return 0;
@@ -2340,7 +2340,6 @@ u8 fightFloorSetStatus(u32 p1, u16 p2, u32 p3, u16 p4, u32 p5) {
         fightFloorSetFightResultId(p1, (u16)p5);
         break;
     case 0x5e:
-    default:
         msgctrlSetValue(0x2f, p5);
         break;
     }
@@ -2348,17 +2347,14 @@ u8 fightFloorSetStatus(u32 p1, u16 p2, u32 p3, u16 p4, u32 p5) {
 }
 
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 #if 0
 asm void fightFloorGetStatus(void) {
 #include "src/game/pokemon_fn_801F54A4.inc"
 }
 #else
-/* Real C at 98.8% (instruction-equivalent): residuals are a pkm/a16
- * r30/r31 coloring swap, the case-0xA/0xB in-place arg mask shape, and
- * the dtk-named jumptable symbol. See tools/decomp_work/scratch/pokemon_boss.c
- * history; flip #if only at verified 100%. */
+/* Real C at 99.3% (instruction-equivalent): residuals are the hoisted
+ * a16 mask, case-0xA/0xB arg-mask coloring, final-loop temporaries, and
+ * the dtk-named jumptable symbol. Flip #if only at verified 100%. */
 /* 0x801F54A4 | size: 0xD18 | PokemonGet: field dispatcher */
 s32 fightFloorGetStatus(u8* pkm, u32 slot, u32 field, u32 arg) {
     extern struct Pokemon* fightFloorDataBiosGetPtr(u32);
@@ -2442,9 +2438,11 @@ s32 fightFloorGetStatus(u8* pkm, u32 slot, u32 field, u32 arg) {
     extern u32 fightKindDataBiosGetDarkpokemonHypermodeFlag(u32);
     extern u32 fightKindDataBiosGetPokemonStatusMenuSubbarFlag(u32);
     extern u32 fightKindDataBiosGetHostEnemyMsgFlag(u32);
+    u16 a16;
     u16 f;
 
     f = (u16)field;
+    a16 = arg;
     if (f >= 0x60) {
         return 0;
     }
@@ -2709,12 +2707,11 @@ s32 fightFloorGetStatus(u8* pkm, u32 slot, u32 field, u32 arg) {
     case 0x5C:
         return (u16)fn_801EF634();
     case 0x5D: {
-        u32 a16, n, c18, c16, k, i, j, m;
+        u32 c16, n, c18, k, i, j, m;
         fightFloorGetStatus(pkm, 0, 0x14, 0);
+        n = 0;
         c16 = (u16)fightFloorGetStatus(pkm, 0, 0x16, 0);
         c18 = (u16)fightFloorGetStatus(pkm, 0, 0x18, 0);
-        n = 0;
-        a16 = (u16)arg;
         for (i = 0; (u16)i < c18; i++) {
             for (j = 0; (u16)j < c16; j++) {
                 for (k = 0; (u16)k < 2; k++) {

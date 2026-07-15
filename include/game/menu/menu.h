@@ -101,6 +101,10 @@ struct MenuCardEEntry;
 struct MenuCardEMatrixContext;
 struct MenuCardEMatrixWork;
 
+/* Shared battle-menu helpers implemented by the middle/common menu units. */
+u8* fn_8006B420(void);
+s32 fn_80076054(void* hero, void* battleRules);
+
 /* =========================================================================
  * Callback function pointer types
  * ========================================================================= */
@@ -291,6 +295,18 @@ extern MenuCommonWork     _CBC;                 /* menuCB_Common work area */
 extern MenuBattleWork     _CB;                  /* menuCB_Battle work area */
 extern MenuPokeCouponWork _menuPokeCouponWork;  /* menuPokeCoupon work area */
 extern MenuCardEWork      _CARDE;               /* menuCardE work area */
+
+/* =========================================================================
+ * Core menu/window API (menu.c)
+ * ========================================================================= */
+
+u32 windowGetActiveID(void);
+s32 menuOpenCustom(void* menuId, u32 parentId, s32* cursorOut,
+                   s32 closeFlags, void* checkCursor, s32 openParam, ...);
+
+/* menuOpenCustom's pointer-typed ABI carries integer menu IDs and flags. */
+#define MENU_ID(value) ((void*)(value))
+#define MENU_CURSOR_CHECK(value) ((void*)(value))
 
 /* =========================================================================
  * menuCB_Common API (0x8007109C - 0x8007162C)

@@ -70,6 +70,8 @@ BOOL DVDCancel(DVDCommandBlock* block) {
     return 0;
 }
 
+extern OSThreadQueue __DVDThreadQueue;
+
 void fn_800A7BA8(void) {
     OSWakeupThread(&__DVDThreadQueue);
 }

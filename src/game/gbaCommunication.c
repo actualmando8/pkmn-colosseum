@@ -29,10 +29,13 @@ extern f32 lbl_8047C1E0; /* {41.6666641f, 0.0f} -- PAL-adjusted 50-unit wait */
  * window helpers living in this same address range per the current
  * object map). */
 extern u8 lbl_803FB328[];
+extern u8 lbl_803FB338[];
 extern u8 lbl_803FB380[];
 extern u8 lbl_8047C1E8;
 extern u8 lbl_8026F5A8[];
 extern u8 lbl_8026F5C0[];
+extern u8 lbl_80314F98[];
+extern u16 lbl_802EED28[];
 
 /* Common callees needed by the ported bodies below that are not already
  * declared with a full prototype at the point of use. */
@@ -58,7 +61,7 @@ extern u32 GSresGetResource(u32 ctx, u32 id);
 /* Storage used by the battle-status window renderer below. */
 extern u8 lbl_8047C200;
 extern u8 lbl_8047C204;
-extern u8 lbl_8047C208;
+extern f32 lbl_8047C208;
 extern u8 lbl_8047C20C;
 extern u8 lbl_8047C210;
 extern u8 lbl_8047C214;
@@ -66,9 +69,9 @@ extern u8 lbl_8047C218;
 extern u8 lbl_8047C21C;
 extern u8 lbl_8047C220;
 extern u8 lbl_8047C228;
-extern u8 lbl_8047C230;
-extern u8 lbl_8047C234;
-extern u8 lbl_8047C238;
+extern f32 lbl_8047C230;
+extern f32 lbl_8047C234;
+extern f32 lbl_8047C238;
 extern void fn_801040F0();
 extern void winSpriteSetDisp();
 extern void fn_8001E58C();
@@ -77,6 +80,373 @@ extern void fn_800FA444();
 extern void fn_800FB680();
 extern void fn_800FB8C8();
 extern void fn_800FBB34();
+
+extern u16* windowGetKeyInfo(void);
+extern void* pokemonDataBiosGetPtr(u32 id);
+extern u8 pokemonBiosGetCatchBallId(void* pokemon);
+extern u16 pokemonGetSoubiItemDataId(void* pokemon);
+extern u32 pokemonDataBiosGetName(void* bios);
+extern u32 GSmsgGetGSchar(u32 id);
+extern u32 GSmsgGetRect(u32 id);
+extern void msgctrlSetValue(u32 id, u32 value);
+extern void windowDrawSprite(s32 x, s32 y, void* win, u16 sprite, u32 data);
+extern void windowDrawSprite2(s32 x, s32 y, s16 w, s16 h, s32 color, s32 data, s32 sprite, s32 arg7);
+extern void* menuModelRender(void* data);
+extern void fn_800D88DC(u32 arg);
+extern void fn_800D888C(u32 arg);
+extern void fn_800D6A00(u32 arg);
+extern void fn_800D7820(void* arg);
+extern void fn_800D85D4(u32 arg0, void* arg1);
+extern void fn_800D67BC(u32 arg);
+extern void fn_800D61E4(s32 x, s32 y);
+extern void fn_800D5CB8(u32 arg0, u32 r, u32 g, u32 b, u32 a);
+extern void fn_800D59B8(u32 arg0, f32 s, f32 t);
+extern void fn_800D6728(void);
+extern u32 fn_8001D624(void* pokemon, u32 arg);
+extern u8 menuSubGetPokemonSexForDisp(void* pokemon);
+
+/* 0x8008D348 | size: 0x5F0 */
+#pragma push
+#pragma peephole off
+#pragma optimize_for_size on
+void fn_8008D348(u32 ctx) {
+    extern void GSmodelSetShadowTextureSize(u32 w, u32 h);
+    extern void GSmodelSetShadowFlags(u32 handle, u32 val);
+    extern void GSmodelSetShadowLight(u32 handle, u32 val);
+    extern void GSmodelSetShadowSurface(u32 handle, u32 val, u32* param);
+    extern void GSmodelGetFrameCount(u32 handle, f32* out, u32 arg);
+    extern void GSmodelSetAnimFrame(u32 handle, f32 frame);
+    extern void GSmodelSetAnimType(u32 handle, u32 type);
+    extern void GSmodelLinkToGSparticleBank(u32 handle, u32 bank);
+    extern void GSmodelSetGSparticleLinkAttachMode(u32 handle, u32 mode);
+    extern void fn_801CB7C4(u32 id);
+    extern void fn_801CB834(u32 id, u32 slot, u32 x, u32 y);
+    extern void fn_80118874(u32 ptr, u32 val);
+    extern u32 fn_801CBA0C(u32 id);
+    extern void fn_801845E4(u32 ctx, u32 modelHandle, u32 ctx2, u32 handle, u32 flags);
+    extern void cameraPlayAnime(u32 ctx, u32 id, u32 a, u32 b);
+    extern void cameraWaitSyncAnime(s32 sync);
+
+    u32 waitFrames;
+    u32 elapsed;
+    u32 model;
+    u32 base;
+    f32 frame;
+    u32 h06af0400;
+    u32 h06bc0400;
+    u32 h06be0400a;
+    u32 h06be0400b;
+    u32 h06be0400c;
+    u32 h06be0400d;
+    u32 h06be0400e;
+    u32 h0d091000;
+    u32 h0d091001;
+    u32 h0d091006;
+    u32 h0d091002;
+    u32 h0d091003;
+    u32 h0d091004;
+    u32 h0d091005;
+
+    lbl_8047A690 = GSresGetResource(ctx, 0x0CE61602);
+    lbl_8047A694 = GSresGetResource(ctx, 0x0CE61002);
+    GSmodelSetShadowTextureSize(0x280, 0x1E0);
+    fn_801CB834(0x0CE61000, 0, 0, 0);
+
+    waitFrames = 1;
+    if (fn_800D37CC() == 0x32) {
+        waitFrames = (u32)lbl_8047C1D0;
+        if (waitFrames < 1) {
+            waitFrames = 1;
+        }
+    }
+    for (elapsed = 0; elapsed < waitFrames; ) {
+        _threadSwitch();
+        elapsed += fn_800D3088();
+    }
+
+    fn_801CB7C4(0x0CE61000);
+
+    base = GSresGetResource(ctx, 0x0CE61000);
+    fn_80118874(*(u32*)(base + 0x144), 1);
+    *(u32*)(base + 0x144) = 0;
+
+    frame = lbl_8047C1D4;
+    model = GSresGetResource(ctx, 0x0CE61004);
+    GSmodelSetAnimIndex(model, 0);
+    GSmodelGetFrameCount(model, &frame, 0);
+    frame -= lbl_8047C1D8;
+    GSmodelSetAnimIndex(model, 0);
+    GSmodelSetAnimFrame(model, frame);
+    GSmodelSetAnimType(model, 0);
+    GSmodelStartAnimation(model);
+
+    GSmodelLinkToGSparticleBank(GSresGetResource(ctx, 0x0CE61000), GSresGetResource(ctx, 0x11201400));
+    GSmodelSetGSparticleLinkAttachMode(GSresGetResource(ctx, 0x0CE61000), 4);
+
+    h06af0400 = fn_801CBA0C(0x06AF0400);
+    h06bc0400 = fn_801CBA0C(0x06BC0400);
+    h06be0400a = fn_801CBA0C(0x06BE0400);
+    h06be0400b = fn_801CBA0C(0x06BE0400);
+    h06be0400c = fn_801CBA0C(0x06BE0400);
+    h06be0400d = fn_801CBA0C(0x06BE0400);
+    h06be0400e = fn_801CBA0C(0x06BE0400);
+
+    model = GSresGetResource(ctx, h06af0400);
+    GSmodelSetShadowFlags(model, 2);
+    GSmodelSetShadowLight(model, lbl_8047A690);
+    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
+    model = GSresGetResource(ctx, h06bc0400);
+    GSmodelSetShadowFlags(model, 2);
+    GSmodelSetShadowLight(model, lbl_8047A690);
+    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
+    model = GSresGetResource(ctx, h06be0400a);
+    GSmodelSetShadowFlags(model, 2);
+    GSmodelSetShadowLight(model, lbl_8047A690);
+    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
+    model = GSresGetResource(ctx, h06be0400b);
+    GSmodelSetShadowFlags(model, 2);
+    GSmodelSetShadowLight(model, lbl_8047A690);
+    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
+    model = GSresGetResource(ctx, h06be0400c);
+    GSmodelSetShadowFlags(model, 2);
+    GSmodelSetShadowLight(model, lbl_8047A690);
+    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
+    model = GSresGetResource(ctx, h06be0400d);
+    GSmodelSetShadowFlags(model, 2);
+    GSmodelSetShadowLight(model, lbl_8047A690);
+    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
+    model = GSresGetResource(ctx, h06be0400e);
+    GSmodelSetShadowFlags(model, 2);
+    GSmodelSetShadowLight(model, lbl_8047A690);
+    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
+
+    GSmodelLinkToGSparticleBank(GSresGetResource(ctx, h06af0400), GSresGetResource(ctx, 0x11511400));
+    GSmodelSetGSparticleLinkAttachMode(GSresGetResource(ctx, h06af0400), 4);
+
+    cameraPlayAnime(ctx, 0x0CFF1800, 0, 0);
+
+    waitFrames = 1;
+    if (fn_800D37CC() == 0x32) {
+        waitFrames = (u32)lbl_8047C1D0;
+        if (waitFrames < 1) {
+            waitFrames = 1;
+        }
+    }
+    for (elapsed = 0; elapsed < waitFrames; ) {
+        _threadSwitch();
+        elapsed += fn_800D3088();
+    }
+
+    h0d091000 = fn_801CBA0C(0x0D091000);
+    h0d091001 = fn_801CBA0C(0x0D091001);
+    h0d091006 = fn_801CBA0C(0x0D091006);
+    h0d091002 = fn_801CBA0C(0x0D091002);
+    h0d091003 = fn_801CBA0C(0x0D091003);
+    h0d091004 = fn_801CBA0C(0x0D091004);
+    h0d091005 = fn_801CBA0C(0x0D091005);
+
+    fn_801845E4(ctx, h06af0400, ctx, h0d091000, 0);
+    fn_801845E4(ctx, h06bc0400, ctx, h0d091001, 0);
+    fn_801845E4(ctx, h06be0400a, ctx, h0d091006, 0);
+    fn_801845E4(ctx, h06be0400b, ctx, h0d091002, 0);
+    fn_801845E4(ctx, h06be0400c, ctx, h0d091003, 0);
+    fn_801845E4(ctx, h06be0400d, ctx, h0d091004, 0);
+    fn_801845E4(ctx, h06be0400e, ctx, h0d091005, 0);
+
+    fn_801CB834(0x0CE61000, 1, 0, 0);
+    fn_801CB834(h06af0400, 9, 0, 0);
+    fn_801CB834(h06bc0400, 7, 0, 1);
+    fn_801CB834(h06be0400a, 0xA, 0, 1);
+    fn_801CB834(h06be0400b, 0xA, 0, 1);
+    fn_801CB834(h06be0400c, 0xA, 0, 1);
+    fn_801CB834(h06be0400d, 0xA, 0, 1);
+    fn_801CB834(h06be0400e, 0xA, 0, 1);
+
+    cameraWaitSyncAnime(1);
+    fn_800FF58C(0x89);
+    floorSetFadeScript(0, 0);
+}
+#pragma pop
+#pragma optimize_for_size reset
+
+/* 0x80090100 | size: 0x620 */
+#pragma push
+#pragma peephole off
+#pragma optimize_for_size on
+void fn_80090100(u32 ctx) {
+    extern void GSmodelSetShadowTextureSize(u32 w, u32 h);
+    extern void GSmodelSetShadowFlags(u32 handle, u32 val);
+    extern void GSmodelSetShadowLight(u32 handle, u32 val);
+    extern void GSmodelSetShadowSurface(u32 handle, u32 val, u32* param);
+    extern void GSmodelGetFrameCount(u32 handle, f32* out, u32 arg);
+    extern void GSmodelSetAnimFrame(u32 handle, f32 frame);
+    extern void GSmodelSetAnimType(u32 handle, u32 type);
+    extern void fn_801CB7C4(u32 id);
+    extern void fn_801CB834(u32 id, u32 slot, u32 x, u32 y);
+    extern void fn_80118874(u32 ptr, u32 val);
+    extern u32 fn_801CBA0C(u32 id);
+    extern void fn_801845E4(u32 ctx, u32 modelHandle, u32 ctx2, u32 handle, u32 flags);
+    extern void cameraPlayAnime(u32 ctx, u32 id, u32 a, u32 b);
+    extern void cameraWaitSyncAnime(s32 sync);
+
+    u32 waitFrames;
+    u32 elapsed;
+    u32 model;
+    u32 base;
+    f32 frame;
+    u32 h06bc0400;
+    u32 h0cea1000;
+    u32 h0d290400a;
+    u32 h06be0400a;
+    u32 h0d240400a;
+    u32 h06be0400b;
+    u32 h0d240400b;
+    u32 h0d290400b;
+    u32 h0d240400c;
+    u32 h0cea1006;
+    u32 h0cea1007;
+    u32 h0cea1001;
+    u32 h0cea1002;
+    u32 h0cea1003;
+    u32 h0cea1004;
+    u32 h0cea1005;
+
+    lbl_8047A690 = GSresGetResource(ctx, 0x0CE61602);
+    lbl_8047A694 = GSresGetResource(ctx, 0x0CE61002);
+    GSmodelSetShadowTextureSize(0x280, 0x1E0);
+    fn_801CB834(0x0CE61000, 0, 0, 0);
+
+    waitFrames = 1;
+    if (fn_800D37CC() == 0x32) {
+        waitFrames = (u32)lbl_8047C1D0;
+        if (waitFrames < 1) {
+            waitFrames = 1;
+        }
+    }
+    for (elapsed = 0; elapsed < waitFrames; ) {
+        _threadSwitch();
+        elapsed += fn_800D3088();
+    }
+
+    fn_801CB7C4(0x0CE61000);
+
+    waitFrames = 1;
+    if (fn_800D37CC() == 0x32) {
+        waitFrames = (u32)lbl_8047C1D0;
+        if (waitFrames < 1) {
+            waitFrames = 1;
+        }
+    }
+    for (elapsed = 0; elapsed < waitFrames; ) {
+        _threadSwitch();
+        elapsed += fn_800D3088();
+    }
+
+    base = GSresGetResource(ctx, 0x0CE61000);
+    fn_80118874(*(u32*)(base + 0x144), 1);
+    *(u32*)(base + 0x144) = 0;
+
+    frame = lbl_8047C1D4;
+    model = GSresGetResource(ctx, 0x0CE61004);
+    GSmodelSetAnimIndex(model, 0);
+    GSmodelGetFrameCount(model, &frame, 0);
+    frame -= lbl_8047C1D8;
+    GSmodelSetAnimIndex(model, 0);
+    GSmodelSetAnimFrame(model, frame);
+    GSmodelSetAnimType(model, 0);
+    GSmodelStartAnimation(model);
+
+    h06bc0400 = fn_801CBA0C(0x06BC0400);
+    h0cea1000 = fn_801CBA0C(0x0CEA1000);
+
+    model = GSresGetResource(ctx, h06bc0400);
+    GSmodelSetShadowFlags(model, 2);
+    GSmodelSetShadowLight(model, lbl_8047A690);
+    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
+
+    h0d290400a = fn_801CBA0C(0x0D290400);
+    h06be0400a = fn_801CBA0C(0x06BE0400);
+    h0d240400a = fn_801CBA0C(0x0D240400);
+    h06be0400b = fn_801CBA0C(0x06BE0400);
+    h0d240400b = fn_801CBA0C(0x0D240400);
+    h0d290400b = fn_801CBA0C(0x0D290400);
+    h0d240400c = fn_801CBA0C(0x0D240400);
+
+    model = GSresGetResource(ctx, h0d290400a);
+    GSmodelSetShadowFlags(model, 2);
+    GSmodelSetShadowLight(model, lbl_8047A690);
+    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
+    model = GSresGetResource(ctx, h06be0400a);
+    GSmodelSetShadowFlags(model, 2);
+    GSmodelSetShadowLight(model, lbl_8047A690);
+    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
+    model = GSresGetResource(ctx, h0d240400a);
+    GSmodelSetShadowFlags(model, 2);
+    GSmodelSetShadowLight(model, lbl_8047A690);
+    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
+    model = GSresGetResource(ctx, h06be0400b);
+    GSmodelSetShadowFlags(model, 2);
+    GSmodelSetShadowLight(model, lbl_8047A690);
+    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
+    model = GSresGetResource(ctx, h0d240400b);
+    GSmodelSetShadowFlags(model, 2);
+    GSmodelSetShadowLight(model, lbl_8047A690);
+    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
+    model = GSresGetResource(ctx, h0d290400b);
+    GSmodelSetShadowFlags(model, 2);
+    GSmodelSetShadowLight(model, lbl_8047A690);
+    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
+    model = GSresGetResource(ctx, h0d240400c);
+    GSmodelSetShadowFlags(model, 2);
+    GSmodelSetShadowLight(model, lbl_8047A690);
+    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
+
+    cameraPlayAnime(ctx, 0x0CF31800, 0, 0);
+
+    waitFrames = 1;
+    if (fn_800D37CC() == 0x32) {
+        waitFrames = (u32)lbl_8047C1D0;
+        if (waitFrames < 1) {
+            waitFrames = 1;
+        }
+    }
+    for (elapsed = 0; elapsed < waitFrames; ) {
+        _threadSwitch();
+        elapsed += fn_800D3088();
+    }
+
+    h0cea1006 = fn_801CBA0C(0x0CEA1006);
+    h0cea1007 = fn_801CBA0C(0x0CEA1007);
+    h0cea1001 = fn_801CBA0C(0x0CEA1001);
+    h0cea1002 = fn_801CBA0C(0x0CEA1002);
+    h0cea1003 = fn_801CBA0C(0x0CEA1003);
+    h0cea1004 = fn_801CBA0C(0x0CEA1004);
+    h0cea1005 = fn_801CBA0C(0x0CEA1005);
+
+    fn_801845E4(ctx, h06bc0400, ctx, h0cea1000, 0);
+    fn_801845E4(ctx, h0d290400a, ctx, h0cea1006, 0);
+    fn_801845E4(ctx, h06be0400a, ctx, h0cea1007, 0);
+    fn_801845E4(ctx, h0d240400a, ctx, h0cea1001, 0);
+    fn_801845E4(ctx, h06be0400b, ctx, h0cea1002, 0);
+    fn_801845E4(ctx, h0d240400b, ctx, h0cea1003, 0);
+    fn_801845E4(ctx, h0d290400b, ctx, h0cea1004, 0);
+    fn_801845E4(ctx, h0d240400c, ctx, h0cea1005, 0);
+
+    fn_801CB834(h06bc0400, 3, 0, 1);
+    fn_801CB834(h0d290400a, 4, 0, 1);
+    fn_801CB834(h06be0400a, 3, 0, 1);
+    fn_801CB834(h0d240400a, 4, 0, 1);
+    fn_801CB834(h06be0400b, 3, 0, 1);
+    fn_801CB834(h0d240400b, 5, 0, 1);
+    fn_801CB834(h0d290400b, 4, 0, 1);
+    fn_801CB834(h0d240400c, 4, 0, 1);
+
+    cameraWaitSyncAnime(1);
+    fn_800FF58C(0x89);
+    floorSetFadeScript(0, 0);
+}
+#pragma pop
+
 
 void fn_80094650(u32 r3, u32 r4) {
     extern void fn_8010C46C();
@@ -1197,6 +1567,338 @@ do {
 
 
 /* 0x80091564 | size: 0x210 */
+#pragma push
+/* Battle-status detail window renderer. */
+void fn_8009567C(u8* context, u8* sprite)
+{
+    extern u32 pokemonGetStatus();
+    extern void* pokemonDataBiosGetPtr();
+    extern u8 pokemonDataBiosGetGetWazaLevel();
+    extern u8 pokemonGetSex();
+    extern u8 pokemonGetNowLevel();
+    extern u8 pokemonIsDarkPokemon();
+    extern u32 pokemonGetLevelToExp();
+    extern u32 pokemonGetNowLevelToExp();
+    extern u32 fn_8011CE00();
+    extern u32 fn_8011CE18();
+    extern u32 fn_8011396C();
+    extern u32 fn_801248C4();
+    extern u32 fn_8011CB6C();
+    extern void fn_8011CB3C();
+    extern void fn_8011CB54();
+    extern u32 fn_801229F4();
+    extern u8 fn_8011FC14();
+    extern u8 fn_8011FC74();
+    extern u32 fn_8011F77C();
+    extern u32 fn_80129280();
+    extern u32 fn_8012AC3C();
+    extern u32 fn_8012AC54();
+    extern u32 fn_80135938();
+    extern u32 fn_801906A0();
+    extern u32 fn_801F2A7C();
+    extern u32 fn_801FCEAC();
+    extern u32 fn_8006AEEC();
+    extern u32 fn_800F9EE4();
+    extern u32 fn_800FA280();
+    extern u32 fn_800FA444();
+    extern void fn_80132A38();
+    extern void fn_801040F0();
+    extern void fn_80104160();
+    extern void fn_800FB680();
+    extern void fn_800FBB34();
+    extern void winSpriteSetDisp();
+    u8* pokemon;
+    u8* pokemon_data;
+    s16 window_id;
+    u32 color;
+    u32 value;
+    u32 message;
+    u32 x;
+    u32 y;
+    u32 level;
+    u32 next_exp;
+    u32 current_exp;
+    u32 trainer_name;
+    u32 trainer_id;
+    u32 valid;
+
+    pokemon = *(u8**)(lbl_803FB380 + 0x0C);
+    if (pokemon == NULL) {
+        return;
+    }
+
+    pokemon_data = pokemonDataBiosGetPtr((u16)pokemonGetStatus(pokemon, 0, 0x6E, 0));
+    if (pokemon_data == NULL) {
+        return;
+    }
+
+    window_id = *(s16*)(sprite + 6);
+    valid = 1;
+    if ((window_id >= 0x170 && window_id < 0x182) ||
+        (window_id >= 0x18B && window_id < 0x191) ||
+        (window_id >= 0x1B8 && window_id < 0x1CA) ||
+        (window_id >= 0x1D3 && window_id < 0x1D9)) {
+        s32 page = (s8)lbl_803FB380[2];
+        u32 menu = lbl_803FB380[1];
+        valid = ((menu >= 3 && menu < 5) || menu == 7) && page >= 0 && page <= 4;
+        winSpriteSetDisp(sprite, valid);
+    }
+    if (!valid) {
+        return;
+    }
+
+    color = 0xFFFFFF00 | context[0x8B];
+    x = *(s16*)(sprite + 0x54);
+    y = *(s16*)(sprite + 0x56);
+
+    switch (window_id) {
+    case 0x13B:
+        value = pokemonDataBiosGetGetWazaLevel(pokemon_data, 0);
+        fn_801040F0(0, 0, context, value, 0);
+        break;
+    case 0x13C:
+        value = pokemonDataBiosGetGetWazaLevel(pokemon_data, 0);
+        if (value != pokemonDataBiosGetGetWazaLevel(pokemon_data, 1)) {
+            fn_801040F0(0, 0, context, value, 0);
+        }
+        break;
+    case 0x142:
+        if ((u8)fn_8011F77C(pokemon) < 3) {
+            value = 0x934;
+        } else {
+            value = fn_8011CE00(fn_8011CE18((u8)pokemonGetStatus(pokemon, 0, 0xBF, 0)));
+        }
+        fn_80132A38(0x55, value);
+        fn_80132A38(0x56, value == 0xC86 || value == 0xC96 ? 1 : 0x2BD8);
+        value = (u8)pokemonGetStatus(pokemon, 0, 0x72, 0);
+        fn_80132A38(0x34, value == 0 ? 5 : value);
+        trainer_id = pokemonGetStatus(pokemon, 0, 0x75, 0);
+        trainer_name = pokemonGetStatus(pokemon, 0, 0x76, 0);
+        message = 0x2BCD;
+        if (trainer_id == fn_8012AC3C(lbl_803FB380[8]) &&
+            fn_800F9EE4(fn_8012AC54(lbl_803FB380[8]), trainer_name) == 0) {
+            value = (u16)pokemonGetStatus(pokemon, 0, 0x6E, 0);
+            message = (value >= 0xC4 && value < 0xC6) ? 0x2BE3 : 0x2BCD;
+        }
+        fn_800FBB34(0, 0, x, y, color, message);
+        break;
+    case 0x147:
+        value = (s16)pokemonGetStatus(pokemon, 0, 0x8B, 0);
+        fn_80132A38(0x34, value);
+        fn_800FBB34(0, 0, x, y, color, 0xDE);
+        break;
+    case 0x148:
+    case 0x54D:
+        value = (s16)pokemonGetStatus(pokemon, 0, 0x8C, 0);
+        fn_80132A38(0x34, value);
+        fn_800FBB34(0, 0, x, y, color, 0xDE);
+        break;
+    case 0x149:
+        value = (s16)pokemonGetStatus(pokemon, 0, 0x8A, 0);
+        fn_80132A38(0x34, value);
+        fn_800FBB34(0, 0, x, y, color, 0xDE);
+        break;
+    case 0x14A:
+        value = (s16)pokemonGetStatus(pokemon, 0, 0x89, 0);
+        fn_80132A38(0x34, value);
+        fn_800FBB34(0, 0, x, y, color, 0xDE);
+        break;
+    case 0x14B:
+    case 0x587:
+        value = (s16)pokemonGetStatus(pokemon, 0, 0x88, 0);
+        fn_80132A38(0x34, value);
+        fn_800FBB34(0, 0, x, y, color, 0xDE);
+        break;
+    case 0x14C:
+    case 0x581:
+        value = (u16)pokemonGetStatus(pokemon, 0, 0x83, 0);
+        fn_80132A38(0x34, value);
+        fn_800FBB34(0, 0, 0x37, y, color, 0xDE);
+        fn_800FB680(0x37, 0, color, 0x2BD4);
+        value = (u16)pokemonGetStatus(pokemon, 0, 0x87, 0);
+        fn_80132A38(0x34, value);
+        fn_800FBB34(0, 0, x, y, color, 0xDE);
+        break;
+    case 0x153:
+    case 0x58F:
+        value = fn_8011CB6C((u16)fn_801248C4(pokemon));
+        fn_8011CB3C();
+        value = fn_800FA280();
+        fn_80132A38(0x37, value);
+        fn_800FBB34(0, 0, x, y, color, 0xCF);
+        break;
+    case 0x154:
+    case 0x591:
+        trainer_id = (s16)(fn_800FA444(*(u32*)(sprite + 0x4C)) >> 16);
+        if (fn_8011FC74(pokemon) == 1) {
+            fn_800FB680(trainer_id, 0, color, 0x2B70);
+            break;
+        }
+        value = (u16)pokemonGetStatus(pokemon, 0, 0x75, 0);
+        for (level = 0, next_exp = 10000; level < 5; level++) {
+            fn_80132A38(0x34, value / next_exp);
+            value %= next_exp;
+            next_exp /= 10;
+            fn_800FB680(trainer_id, 0, color, 0xCA);
+            trainer_id += 13;
+        }
+        break;
+    case 0x155:
+    case 0x592:
+        if (fn_8011FC74(pokemon) == 1) {
+            fn_80132A38(0x37, fn_800FA280(0x2B70));
+        } else {
+            fn_80132A38(0x37, pokemonGetStatus(pokemon, 0, 0x76, 0));
+        }
+        fn_800FB680((s16)(fn_800FA444(*(u32*)(sprite + 0x4C)) >> 16), 0, color, 0xCF);
+        break;
+    case 0x158:
+        level = (u8)pokemonGetStatus(pokemon, 0, 0x7A, 0);
+        next_exp = fn_801229F4(pokemon, level + 1);
+        if (next_exp != 0) {
+            current_exp = fn_801229F4(pokemon, level);
+            value = pokemonGetStatus(pokemon, 0, 0x79, 0) - current_exp;
+            fn_80104160(0, 0, (s16)(x + value * *(s16*)(sprite + 0x54) / (next_exp - current_exp)), y,
+                         color, context, 0x117, 0);
+        }
+        break;
+    case 0x54E:
+    case 0x57B:
+        value = pokemonGetStatus(pokemon, 0, 0x79, 0);
+        fn_80132A38(0x34, value);
+        fn_800FBB34(0, 0, x, y, color, 0xDE);
+        break;
+    case 0x57D:
+    case 0x582:
+        value = fn_8011F77C(pokemon);
+        message = 0x2BD9 + (value < 7 ? value : 0);
+        fn_800FB680(0, 0, color, message);
+        break;
+    case 0x584:
+    case 0x585:
+        level = (u8)pokemonGetStatus(pokemon, 0, 0x7A, 0);
+        next_exp = fn_801229F4(pokemon, level + 1);
+        current_exp = pokemonGetStatus(pokemon, 0, 0x79, 0);
+        fn_80132A38(0x34, next_exp != 0 ? next_exp - current_exp : 0);
+        fn_800FBB34(0, 0, x, y, color, 0xDE);
+        break;
+    case 0x595:
+    case 0x599:
+    case 0x12B8:
+    case 0x12B9:
+    case 0x12BA:
+    case 0x12BB:
+        value = (u16)pokemonGetStatus(pokemon, 0, 0xC4, 0);
+        level = value == 0 ? 0 : pokemonGetNowLevel(pokemon);
+        if (level >= (u16)(window_id - 0x12B7)) {
+            fn_80104160(0, 0, x, y, color, context, 0x116, 0);
+        }
+        break;
+    default:
+        break;
+    }
+}
+
+
+
+#define SET_SCENE_SHADOW(model_)                                              \
+    configured = GSresGetResource(ctx, (model_));                            \
+    GSmodelSetShadowFlags(configured, 2);                                    \
+    GSmodelSetShadowLight(configured, lbl_8047A690);                         \
+    GSmodelSetShadowSurface(configured, 1, &lbl_8047A694)
+
+/* 0x8009100C | size: 0x558 */
+void fn_8009100C(u32 ctx) {
+    #pragma peephole off
+    extern void GSmodelSetShadowTextureSize(u32, u32);
+    extern u32 fn_801CBA0C(u32);
+    extern u32 GSmodelSetShadowFlags(u32, u32);
+    extern void GSmodelSetShadowLight(u32, u32);
+    extern void GSmodelSetShadowSurface(u32, u32, u32*);
+    extern void cameraPlayAnime(u32, u32, u32, u32);
+    extern s32 fn_800D37CC(void);
+    extern u32 fn_800D3088(void);
+    extern void fn_801845E4(u32, u32, u32, u32, u32);
+    extern void fn_801CB834(u32, u32, u32, u32);
+    extern void cameraWaitSyncAnime(s32);
+    extern void fn_800FF58C(u32);
+    u32 animation0, animation1, animation2, animation3, animation4;
+    u32 animation5, animation6, animation7, animation8;
+    u32 model0, model1, model2, model3, model4;
+    u32 model5, model6, model7, model8;
+    u32 configured, elapsed, waitFrames;
+
+    lbl_8047A690 = GSresGetResource(ctx, 0x06DB1604);
+    lbl_8047A694 = GSresGetResource(ctx, 0x06DB1001);
+    GSmodelSetShadowTextureSize(0x280, 0x1E0);
+    model0 = fn_801CBA0C(0x06BC0400);
+    model1 = fn_801CBA0C(0x06BE0400);
+    model2 = fn_801CBA0C(0x0D240400);
+    model3 = fn_801CBA0C(0x0D290400);
+    model4 = fn_801CBA0C(0x06BE0400);
+    model5 = fn_801CBA0C(0x0D240400);
+    model6 = fn_801CBA0C(0x0D290400);
+    model7 = fn_801CBA0C(0x06BE0400);
+    model8 = fn_801CBA0C(0x06BE0400);
+    SET_SCENE_SHADOW(model0);
+    SET_SCENE_SHADOW(model1);
+    SET_SCENE_SHADOW(model2);
+    SET_SCENE_SHADOW(model3);
+    SET_SCENE_SHADOW(model4);
+    SET_SCENE_SHADOW(model5);
+    SET_SCENE_SHADOW(model6);
+    SET_SCENE_SHADOW(model7);
+    SET_SCENE_SHADOW(model8);
+
+    cameraPlayAnime(ctx, 0x0C391800, 0, 0);
+    waitFrames = 1;
+    if (fn_800D37CC() == 0x32) {
+        waitFrames = (u32)lbl_8047C1D0;
+        if (waitFrames < 1) {
+            waitFrames = 1;
+        }
+    }
+    for (elapsed = 0; elapsed < waitFrames;) {
+        _threadSwitch();
+        elapsed += fn_800D3088();
+    }
+
+    animation0 = fn_801CBA0C(0x0C381000);
+    animation1 = fn_801CBA0C(0x0C381008);
+    animation2 = fn_801CBA0C(0x0C381001);
+    animation3 = fn_801CBA0C(0x0C381002);
+    animation4 = fn_801CBA0C(0x0C381003);
+    animation5 = fn_801CBA0C(0x0C381004);
+    animation6 = fn_801CBA0C(0x0C381005);
+    animation7 = fn_801CBA0C(0x0C381006);
+    animation8 = fn_801CBA0C(0x0C381007);
+    fn_801845E4(ctx, model0, ctx, animation0, 0);
+    fn_801845E4(ctx, model1, ctx, animation1, 0);
+    fn_801845E4(ctx, model2, ctx, animation2, 0);
+    fn_801845E4(ctx, model3, ctx, animation3, 0);
+    fn_801845E4(ctx, model4, ctx, animation4, 0);
+    fn_801845E4(ctx, model5, ctx, animation5, 0);
+    fn_801845E4(ctx, model6, ctx, animation6, 0);
+    fn_801845E4(ctx, model7, ctx, animation7, 0);
+    fn_801845E4(ctx, model8, ctx, animation8, 0);
+    fn_801CB834(model0, 3, 0, 1);
+    fn_801CB834(model1, 5, 0, 1);
+    fn_801CB834(model2, 14, 0, 1);
+    fn_801CB834(model3, 15, 0, 1);
+    fn_801CB834(model4, 4, 0, 1);
+    fn_801CB834(model5, 4, 0, 1);
+    fn_801CB834(model6, 14, 0, 1);
+    fn_801CB834(model7, 14, 0, 1);
+    fn_801CB834(model8, 14, 0, 1);
+    cameraWaitSyncAnime(1);
+    fn_800FF58C(0x89);
+    floorSetFadeScript(0, 0);
+}
+
+#undef SET_SCENE_SHADOW
+
+#pragma pop
+
 void fn_80091564(u32 ctx) {
     #pragma peephole off
     extern u32 GSresGetResource(u32 ctx, u32 id);
@@ -1505,6 +2207,170 @@ void fn_80091B94(u32 ctx) {
 
     cameraWaitSyncAnime(1);
     fn_800FF58C(0x82);
+    floorSetFadeScript(0, 0);
+}
+
+/* 0x80092140 | size: 0x358 */
+void fn_80092140(u32 ctx) {
+    #pragma peephole off
+    extern void GSmodelSetShadowTextureSize(u32, u32);
+    extern u32 fn_801CBA0C(u32);
+    extern u32 GSmodelSetShadowFlags(u32, u32);
+    extern void GSmodelSetShadowLight(u32, u32);
+    extern void GSmodelSetShadowSurface(u32, u32, u32*);
+    extern void cameraPlayAnime(u32, u32, u32, u32);
+    extern s32 fn_800D37CC(void);
+    extern u32 fn_800D3088(void);
+    extern void fn_801845E4(u32, u32, u32, u32, u32);
+    extern void fn_801CB834(u32, u32, u32, u32);
+    extern void cameraWaitSyncAnime(s32);
+    extern void fn_800FF58C(u32);
+    u32 configured, elapsed, waitFrames;
+    u32 animation0, animation1, animation2, animation3, animation4;
+    u32 model0, model1, model2, model3, model4;
+
+    lbl_8047A690 = GSresGetResource(ctx, 0x06DD1604);
+    lbl_8047A694 = GSresGetResource(ctx, 0x06DD1001);
+    GSmodelSetShadowTextureSize(0x280, 0x1E0);
+    model0 = fn_801CBA0C(0x0D240400);
+    model1 = fn_801CBA0C(0x0D240400);
+    model2 = fn_801CBA0C(0x0D240400);
+    model3 = fn_801CBA0C(0x0D240400);
+    model4 = fn_801CBA0C(0x0D240400);
+
+    configured = GSresGetResource(ctx, model0);
+    GSmodelSetShadowFlags(configured, 2);
+    GSmodelSetShadowLight(configured, lbl_8047A690);
+    GSmodelSetShadowSurface(configured, 1, &lbl_8047A694);
+    configured = GSresGetResource(ctx, model1);
+    GSmodelSetShadowFlags(configured, 2);
+    GSmodelSetShadowLight(configured, lbl_8047A690);
+    GSmodelSetShadowSurface(configured, 1, &lbl_8047A694);
+    configured = GSresGetResource(ctx, model2);
+    GSmodelSetShadowFlags(configured, 2);
+    GSmodelSetShadowLight(configured, lbl_8047A690);
+    GSmodelSetShadowSurface(configured, 1, &lbl_8047A694);
+    configured = GSresGetResource(ctx, model3);
+    GSmodelSetShadowFlags(configured, 2);
+    GSmodelSetShadowLight(configured, lbl_8047A690);
+    GSmodelSetShadowSurface(configured, 1, &lbl_8047A694);
+    configured = GSresGetResource(ctx, model4);
+    GSmodelSetShadowFlags(configured, 2);
+    GSmodelSetShadowLight(configured, lbl_8047A690);
+    GSmodelSetShadowSurface(configured, 1, &lbl_8047A694);
+
+    cameraPlayAnime(ctx, 0x0B881800, 0, 0);
+    waitFrames = 1;
+    if (fn_800D37CC() == 0x32) {
+        waitFrames = (u32)lbl_8047C1D0;
+        if (waitFrames < 1) {
+            waitFrames = 1;
+        }
+    }
+    for (elapsed = 0; elapsed < waitFrames;) {
+        _threadSwitch();
+        elapsed += fn_800D3088();
+    }
+
+    animation0 = fn_801CBA0C(0x0B851004);
+    animation1 = fn_801CBA0C(0x0B851003);
+    animation2 = fn_801CBA0C(0x0B851001);
+    animation3 = fn_801CBA0C(0x0B851002);
+    animation4 = fn_801CBA0C(0x0B851003);
+    fn_801845E4(ctx, model0, ctx, animation0, 0);
+    fn_801845E4(ctx, model1, ctx, animation1, 0);
+    fn_801845E4(ctx, model2, ctx, animation2, 0);
+    fn_801845E4(ctx, model3, ctx, animation3, 0);
+    fn_801845E4(ctx, model4, ctx, animation4, 0);
+    fn_801CB834(model0, 6, 0, 1);
+    fn_801CB834(model1, 6, 0, 1);
+    fn_801CB834(model2, 8, 0, 1);
+    fn_801CB834(model3, 8, 0, 1);
+    fn_801CB834(model4, 7, 0, 1);
+    cameraWaitSyncAnime(1);
+    fn_800FF58C(0x83);
+    floorSetFadeScript(0, 0);
+}
+
+/* 0x80092664 | size: 0x358 */
+void fn_80092664(u32 ctx) {
+    #pragma peephole off
+    extern void GSmodelSetShadowTextureSize(u32, u32);
+    extern u32 fn_801CBA0C(u32);
+    extern u32 GSmodelSetShadowFlags(u32, u32);
+    extern void GSmodelSetShadowLight(u32, u32);
+    extern void GSmodelSetShadowSurface(u32, u32, u32*);
+    extern void cameraPlayAnime(u32, u32, u32, u32);
+    extern s32 fn_800D37CC(void);
+    extern u32 fn_800D3088(void);
+    extern void fn_801845E4(u32, u32, u32, u32, u32);
+    extern void fn_801CB834(u32, u32, u32, u32);
+    extern void cameraWaitSyncAnime(s32);
+    extern void fn_800FF58C(u32);
+    u32 configured, elapsed, waitFrames;
+    u32 animation0, animation1, animation2, animation3, animation4;
+    u32 model0, model1, model2, model3, model4;
+
+    lbl_8047A690 = GSresGetResource(ctx, 0x06DD1604);
+    lbl_8047A694 = GSresGetResource(ctx, 0x06DD1001);
+    GSmodelSetShadowTextureSize(0x280, 0x1E0);
+    model0 = fn_801CBA0C(0x0D240400);
+    model1 = fn_801CBA0C(0x0D240400);
+    model2 = fn_801CBA0C(0x0D240400);
+    model3 = fn_801CBA0C(0x0D240400);
+    model4 = fn_801CBA0C(0x0D240400);
+
+    configured = GSresGetResource(ctx, model0);
+    GSmodelSetShadowFlags(configured, 2);
+    GSmodelSetShadowLight(configured, lbl_8047A690);
+    GSmodelSetShadowSurface(configured, 1, &lbl_8047A694);
+    configured = GSresGetResource(ctx, model1);
+    GSmodelSetShadowFlags(configured, 2);
+    GSmodelSetShadowLight(configured, lbl_8047A690);
+    GSmodelSetShadowSurface(configured, 1, &lbl_8047A694);
+    configured = GSresGetResource(ctx, model2);
+    GSmodelSetShadowFlags(configured, 2);
+    GSmodelSetShadowLight(configured, lbl_8047A690);
+    GSmodelSetShadowSurface(configured, 1, &lbl_8047A694);
+    configured = GSresGetResource(ctx, model3);
+    GSmodelSetShadowFlags(configured, 2);
+    GSmodelSetShadowLight(configured, lbl_8047A690);
+    GSmodelSetShadowSurface(configured, 1, &lbl_8047A694);
+    configured = GSresGetResource(ctx, model4);
+    GSmodelSetShadowFlags(configured, 2);
+    GSmodelSetShadowLight(configured, lbl_8047A690);
+    GSmodelSetShadowSurface(configured, 1, &lbl_8047A694);
+
+    cameraPlayAnime(ctx, 0x0B871800, 0, 0);
+    waitFrames = 1;
+    if (fn_800D37CC() == 0x32) {
+        waitFrames = (u32)lbl_8047C1D0;
+        if (waitFrames < 1) {
+            waitFrames = 1;
+        }
+    }
+    for (elapsed = 0; elapsed < waitFrames;) {
+        _threadSwitch();
+        elapsed += fn_800D3088();
+    }
+
+    animation0 = fn_801CBA0C(0x0B841004);
+    animation1 = fn_801CBA0C(0x0B841000);
+    animation2 = fn_801CBA0C(0x0B841001);
+    animation3 = fn_801CBA0C(0x0B841002);
+    animation4 = fn_801CBA0C(0x0B841003);
+    fn_801845E4(ctx, model0, ctx, animation0, 0);
+    fn_801845E4(ctx, model1, ctx, animation1, 0);
+    fn_801845E4(ctx, model2, ctx, animation2, 0);
+    fn_801845E4(ctx, model3, ctx, animation3, 0);
+    fn_801845E4(ctx, model4, ctx, animation4, 0);
+    fn_801CB834(model0, 1, 0, 1);
+    fn_801CB834(model1, 1, 0, 1);
+    fn_801CB834(model2, 1, 0, 1);
+    fn_801CB834(model3, 2, 0, 1);
+    fn_801CB834(model4, 2, 0, 1);
+    cameraWaitSyncAnime(1);
+    fn_800FF58C(0x87);
     floorSetFadeScript(0, 0);
 }
 
@@ -1924,6 +2790,522 @@ void fn_8008D0A0(u32 ctx) {
 }
 
 /* 0x8008EC28 | size: 0x2A8 */
+/* 0x8008E320 | size: 0x4B4 */
+void fn_8008E320(u32 ctx) {
+    extern void GSmodelSetShadowTextureSize(u32 w, u32 h);
+    extern void GSmodelSetShadowFlags(u32 handle, u32 val);
+    extern void GSmodelSetShadowLight(u32 handle, u32 val);
+    extern void GSmodelSetShadowSurface(u32 handle, u32 val, u32* param);
+    extern void GSmodelGetFrameCount(u32 handle, f32* out, u32 arg);
+    extern void GSmodelSetAnimFrame(u32 handle, f32 frame);
+    extern void GSmodelSetAnimType(u32 handle, u32 type);
+    extern void GSmodelLinkToGSparticleBank(u32 handle, u32 bank);
+    extern void GSmodelSetGSparticleLinkAttachMode(u32 handle, u32 mode);
+    extern void fn_801CB7C4(u32 id);
+    extern void fn_801CB834(u32 id, u32 slot, u32 x, u32 y);
+    extern u32 fn_801CBA0C(u32 id);
+    extern void fn_801845E4(u32 ctx, u32 modelHandle, u32 ctx2, u32 handle, u32 flags);
+    extern void cameraPlayAnime(u32 ctx, u32 id, u32 a, u32 b);
+    extern void cameraWaitSyncAnime(s32 sync);
+    extern void fn_800FF58C(u32 id);
+    extern void floorSetFadeScript(u32 a, u32 b);
+
+    u32 waitFrames;
+    u32 elapsed;
+    GSmaterialEntry* material;
+    f32 frame;
+    u32 model;
+    u32 handle2;
+    u32 h06af0400;
+    u32 h06bc0400;
+    u32 h06be0400a;
+    u32 h06be0400b;
+    u32 h0d071000;
+    u32 h0d071001;
+    u32 h0d071003;
+    u32 h0d071002;
+
+    lbl_8047A690 = GSresGetResource(ctx, 0x0CE61602);
+    lbl_8047A694 = GSresGetResource(ctx, 0x0CE61002);
+    GSmodelSetShadowTextureSize(0x280, 0x1E0);
+    fn_801CB834(0x0CE61000, 0, 0, 0);
+
+    waitFrames = 1;
+    if (fn_800D37CC() == 0x32) {
+        waitFrames = (u32)lbl_8047C1D0;
+        if (waitFrames < 1) {
+            waitFrames = 1;
+        }
+    }
+    for (elapsed = 0; elapsed < waitFrames; ) {
+        _threadSwitch();
+        elapsed += fn_800D3088();
+    }
+
+    fn_801CB7C4(0x0CE61000);
+
+    material = (GSmaterialEntry*)GSresGetResource(ctx, 0x0CE61000);
+    fn_80118874(material->texture, 1);
+    material->texture = NULL;
+
+    frame = lbl_8047C1D4;
+    handle2 = GSresGetResource(ctx, 0x0CE61004);
+    GSmodelSetAnimIndex(handle2, 0);
+    GSmodelGetFrameCount(handle2, &frame, 0);
+    frame -= lbl_8047C1D8;
+    GSmodelSetAnimIndex(handle2, 0);
+    GSmodelSetAnimFrame(handle2, frame);
+    GSmodelSetAnimType(handle2, 0);
+    GSmodelStartAnimation(handle2);
+
+    GSmodelLinkToGSparticleBank(GSresGetResource(ctx, 0x0CE61000), GSresGetResource(ctx, 0x111B1400));
+    GSmodelSetGSparticleLinkAttachMode(GSresGetResource(ctx, 0x0CE61000), 4);
+
+    fn_801CB834(0x0CE61000, 3, 0, 0);
+
+    waitFrames = 0x32;
+    if (fn_800D37CC() == 0x32) {
+        waitFrames = (u32)lbl_8047C1E0;
+        if (waitFrames < 1) {
+            waitFrames = 1;
+        }
+    }
+    for (elapsed = 0; elapsed < waitFrames; ) {
+        _threadSwitch();
+        elapsed += fn_800D3088();
+    }
+
+    h06af0400 = fn_801CBA0C(0x06AF0400);
+    h06bc0400 = fn_801CBA0C(0x06BC0400);
+    h06be0400a = fn_801CBA0C(0x06BE0400);
+    h06be0400b = fn_801CBA0C(0x06BE0400);
+
+    model = GSresGetResource(ctx, h06af0400);
+    GSmodelSetShadowFlags(model, 2);
+    GSmodelSetShadowLight(model, lbl_8047A690);
+    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
+    model = GSresGetResource(ctx, h06bc0400);
+    GSmodelSetShadowFlags(model, 2);
+    GSmodelSetShadowLight(model, lbl_8047A690);
+    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
+    model = GSresGetResource(ctx, h06be0400a);
+    GSmodelSetShadowFlags(model, 2);
+    GSmodelSetShadowLight(model, lbl_8047A690);
+    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
+    model = GSresGetResource(ctx, h06be0400b);
+    GSmodelSetShadowFlags(model, 2);
+    GSmodelSetShadowLight(model, lbl_8047A690);
+    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
+
+    GSmodelLinkToGSparticleBank(GSresGetResource(ctx, h06af0400), GSresGetResource(ctx, 0x11511400));
+    GSmodelSetGSparticleLinkAttachMode(GSresGetResource(ctx, h06af0400), 4);
+
+    cameraPlayAnime(ctx, 0x0CFD1800, 0, 0);
+
+    waitFrames = 1;
+    if (fn_800D37CC() == 0x32) {
+        waitFrames = (u32)lbl_8047C1D0;
+        if (waitFrames < 1) {
+            waitFrames = 1;
+        }
+    }
+    for (elapsed = 0; elapsed < waitFrames; ) {
+        _threadSwitch();
+        elapsed += fn_800D3088();
+    }
+
+    h0d071000 = fn_801CBA0C(0x0D071000);
+    h0d071001 = fn_801CBA0C(0x0D071001);
+    h0d071003 = fn_801CBA0C(0x0D071003);
+    h0d071002 = fn_801CBA0C(0x0D071002);
+
+    fn_801845E4(ctx, h06af0400, ctx, h0d071000, 0);
+    fn_801845E4(ctx, h06bc0400, ctx, h0d071001, 0);
+    fn_801845E4(ctx, h06be0400a, ctx, h0d071003, 0);
+    fn_801845E4(ctx, h06be0400b, ctx, h0d071002, 0);
+
+    fn_801CB834(h06af0400, 0xA, 0, 0);
+    fn_801CB834(h06bc0400, 5, 0, 1);
+    fn_801CB834(h06be0400a, 0xE, 0, 1);
+    fn_801CB834(h06be0400b, 0xE, 0, 1);
+
+    cameraWaitSyncAnime(1);
+    fn_800FF58C(0x89);
+    floorSetFadeScript(0, 0);
+}
+
+/* 0x8008E7D4 | size: 0x454 */
+void fn_8008E7D4(u32 ctx) {
+    extern void GSmodelSetShadowTextureSize(u32 w, u32 h);
+    extern void GSmodelSetShadowFlags(u32 handle, u32 val);
+    extern void GSmodelSetShadowLight(u32 handle, u32 val);
+    extern void GSmodelSetShadowSurface(u32 handle, u32 val, u32* param);
+    extern void GSmodelGetFrameCount(u32 handle, f32* out, u32 arg);
+    extern void GSmodelSetAnimFrame(u32 handle, f32 frame);
+    extern void GSmodelSetAnimType(u32 handle, u32 type);
+    extern void GSmodelLinkToGSparticleBank(u32 handle, u32 bank);
+    extern void GSmodelSetGSparticleLinkAttachMode(u32 handle, u32 mode);
+    extern void fn_801CB7C4(u32 id);
+    extern void fn_801CB834(u32 id, u32 slot, u32 x, u32 y);
+    extern u32 fn_801CBA0C(u32 id);
+    extern void fn_801845E4(u32 ctx, u32 modelHandle, u32 ctx2, u32 handle, u32 flags);
+    extern void cameraPlayAnime(u32 ctx, u32 id, u32 a, u32 b);
+    extern void cameraWaitSyncAnime(s32 sync);
+    extern void scriptWaitSyncMotion(u32 id, u32 val);
+    extern void fn_800FF58C(u32 id);
+    extern void floorSetFadeScript(u32 a, u32 b);
+
+    u32 waitFrames;
+    u32 elapsed;
+    GSmaterialEntry* material;
+    f32 frame;
+    u32 model;
+    u32 handle2;
+    u32 h06af0400;
+    u32 h06bc0400;
+    u32 h06be0400;
+    u32 h0d061000;
+    u32 h0d061001;
+    u32 h0d061002;
+
+    lbl_8047A690 = GSresGetResource(ctx, 0x0CE61602);
+    lbl_8047A694 = GSresGetResource(ctx, 0x0CE61002);
+    GSmodelSetShadowTextureSize(0x280, 0x1E0);
+    fn_801CB834(0x0CE61000, 0, 0, 0);
+
+    waitFrames = 1;
+    if (fn_800D37CC() == 0x32) {
+        waitFrames = (u32)lbl_8047C1D0;
+        if (waitFrames < 1) {
+            waitFrames = 1;
+        }
+    }
+    for (elapsed = 0; elapsed < waitFrames; ) {
+        _threadSwitch();
+        elapsed += fn_800D3088();
+    }
+
+    fn_801CB7C4(0x0CE61000);
+
+    material = (GSmaterialEntry*)GSresGetResource(ctx, 0x0CE61000);
+    fn_80118874(material->texture, 1);
+    material->texture = NULL;
+
+    frame = lbl_8047C1D4;
+    handle2 = GSresGetResource(ctx, 0x0CE61004);
+    GSmodelSetAnimIndex(handle2, 0);
+    GSmodelGetFrameCount(handle2, &frame, 0);
+    frame -= lbl_8047C1D8;
+    GSmodelSetAnimIndex(handle2, 0);
+    GSmodelSetAnimFrame(handle2, frame);
+    GSmodelSetAnimType(handle2, 0);
+    GSmodelStartAnimation(handle2);
+
+    GSmodelLinkToGSparticleBank(GSresGetResource(ctx, 0x0CE61000), GSresGetResource(ctx, 0x111B1400));
+    GSmodelSetGSparticleLinkAttachMode(GSresGetResource(ctx, 0x0CE61000), 4);
+
+    fn_801CB834(0x0CE61000, 3, 0, 0);
+
+    waitFrames = 0x32;
+    if (fn_800D37CC() == 0x32) {
+        waitFrames = (u32)lbl_8047C1E0;
+        if (waitFrames < 1) {
+            waitFrames = 1;
+        }
+    }
+    for (elapsed = 0; elapsed < waitFrames; ) {
+        _threadSwitch();
+        elapsed += fn_800D3088();
+    }
+
+    h06af0400 = fn_801CBA0C(0x06AF0400);
+    h06bc0400 = fn_801CBA0C(0x06BC0400);
+    h06be0400 = fn_801CBA0C(0x06BE0400);
+
+    model = GSresGetResource(ctx, h06af0400);
+    GSmodelSetShadowFlags(model, 2);
+    GSmodelSetShadowLight(model, lbl_8047A690);
+    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
+    model = GSresGetResource(ctx, h06bc0400);
+    GSmodelSetShadowFlags(model, 2);
+    GSmodelSetShadowLight(model, lbl_8047A690);
+    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
+    model = GSresGetResource(ctx, h06be0400);
+    GSmodelSetShadowFlags(model, 2);
+    GSmodelSetShadowLight(model, lbl_8047A690);
+    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
+
+    GSmodelLinkToGSparticleBank(GSresGetResource(ctx, h06af0400), GSresGetResource(ctx, 0x11511400));
+    GSmodelSetGSparticleLinkAttachMode(GSresGetResource(ctx, h06af0400), 4);
+
+    cameraPlayAnime(ctx, 0x0CFC1800, 0, 0);
+
+    waitFrames = 1;
+    if (fn_800D37CC() == 0x32) {
+        waitFrames = (u32)lbl_8047C1D0;
+        if (waitFrames < 1) {
+            waitFrames = 1;
+        }
+    }
+    for (elapsed = 0; elapsed < waitFrames; ) {
+        _threadSwitch();
+        elapsed += fn_800D3088();
+    }
+
+    h0d061000 = fn_801CBA0C(0x0D061000);
+    h0d061001 = fn_801CBA0C(0x0D061001);
+    h0d061002 = fn_801CBA0C(0x0D061002);
+
+    fn_801845E4(ctx, h06af0400, ctx, h0d061000, 2);
+    fn_801845E4(ctx, h06bc0400, ctx, h0d061001, 0);
+    fn_801845E4(ctx, h06be0400, ctx, h0d061002, 0);
+
+    fn_801CB834(h06af0400, 7, 0, 0);
+    scriptWaitSyncMotion(h06af0400, 1);
+    fn_801CB834(h06af0400, 8, 0, 0);
+    fn_801CB834(h06bc0400, 5, 0, 1);
+    fn_801CB834(h06be0400, 0xE, 0, 1);
+
+    cameraWaitSyncAnime(1);
+    fn_800FF58C(0x89);
+    floorSetFadeScript(0, 0);
+}
+
+
+#pragma push
+/* 0x8008D938 | size: 0x9E8 */
+void fn_8008D938(u32 ctx) {
+    #pragma peephole off
+    extern u32 GSresGetResource(u32 ctx, u32 id);
+    extern void GSmodelSetShadowTextureSize(u32 w, u32 h);
+    extern void fn_801CB7C4(u32 id);
+    extern void GSmodelLinkToGSparticleBank(u32 model, u32 bank);
+    extern void GSmodelSetGSparticleLinkAttachMode(u32 model, u32 mode);
+    extern void fn_801CB834(u32 id, u32 motion, u32 arg2, u32 arg3);
+    extern void scriptWaitSyncMotion(u32 id, u32 sync);
+    extern s32 fn_800D37CC(void);
+    extern u32 fn_800D3088(void);
+    extern u32 fn_801CBA0C(u32 id);
+    extern u32 GSmodelSetShadowFlags(u32 model, u32 flags);
+    extern void GSmodelSetShadowLight(u32 model, u32 light);
+    extern void GSmodelSetShadowSurface(u32 model, u32 count, u32 *surface);
+    extern void cameraPlayAnime(u32 ctx, u32 id, u32 arg2, u32 arg3);
+    extern void fn_801845E4(u32 ctx, u32 model, u32 ctx2, u32 motion, u32 flags);
+    extern void cameraWaitSyncAnime(s32 sync);
+    extern void fn_800FF58C(u32 id);
+    extern void floorSetFadeScript(u32 arg0, u32 arg1);
+    extern void fn_80118874(void *texture, u32 flag);
+    extern void GSmodelSetAnimIndex(u32 model, u32 index);
+    extern void GSmodelGetFrameCount(u32 model, f32 *frame, u32 flags);
+    extern void GSmodelSetAnimFrame(u32 model, f32 frame);
+    extern void GSmodelSetAnimType(u32 model, u32 type);
+    extern void GSmodelStartAnimation(u32 model);
+
+    u32 elapsed;
+    u32 waitFrames;
+    u32 elapsedLater;
+    u32 waitFramesLater;
+    u32 elapsedFinal;
+    u32 waitFramesFinal;
+    GSmaterialEntry *material;
+    f32 frame;
+    u32 model0;
+    u32 model1;
+    u32 model2;
+    u32 model3;
+    u32 model4;
+    u32 model5;
+    u32 model6;
+    u32 model7;
+    u32 model8;
+    u32 motion0;
+    u32 motion8;
+    u32 motion1;
+    u32 motion2;
+    u32 motion3;
+    u32 motion4;
+    u32 motion5;
+    u32 motion6;
+    u32 motion7;
+    u32 resource;
+
+    lbl_8047A690 = GSresGetResource(ctx, 0x0CE61602);
+    lbl_8047A694 = GSresGetResource(ctx, 0x0CE61002);
+    GSmodelSetShadowTextureSize(0x280, 0x1E0);
+    fn_801CB834(0x0CE61000, 0, 0, 0);
+
+    waitFrames = 1;
+    if (fn_800D37CC() == 0x32) {
+        waitFrames = (u32)lbl_8047C1D0;
+        if (waitFrames < 1) {
+            waitFrames = 1;
+        }
+    }
+    for (elapsed = 0; elapsed < waitFrames; ) {
+        _threadSwitch();
+        elapsed += fn_800D3088();
+    }
+
+    fn_801CB7C4(0x0CE61000);
+    material = (GSmaterialEntry *)GSresGetResource(ctx, 0x0CE61000);
+    fn_80118874(material->texture, 1);
+    material->texture = NULL;
+
+    frame = lbl_8047C1D4;
+    resource = GSresGetResource(ctx, 0x0CE61004);
+    GSmodelSetAnimIndex(resource, 0);
+    GSmodelGetFrameCount(resource, &frame, 0);
+    frame -= lbl_8047C1D8;
+    GSmodelSetAnimIndex(resource, 0);
+    GSmodelSetAnimFrame(resource, frame);
+    GSmodelSetAnimType(resource, 0);
+    GSmodelStartAnimation(resource);
+
+    resource = GSresGetResource(ctx, 0x111B1400);
+    GSmodelLinkToGSparticleBank(GSresGetResource(ctx, 0x0CE61000), resource);
+    GSmodelSetGSparticleLinkAttachMode(GSresGetResource(ctx, 0x0CE61000), 4);
+    fn_801CB834(0x0CE61000, 3, 0, 0);
+
+    waitFramesLater = 0x32;
+    if (fn_800D37CC() == 0x32) {
+        waitFramesLater = (u32)lbl_8047C1E0;
+        if (waitFramesLater < 1) {
+            waitFramesLater = 1;
+        }
+    }
+    for (elapsedLater = 0; elapsedLater < waitFramesLater; ) {
+        _threadSwitch();
+        elapsedLater += fn_800D3088();
+    }
+
+    resource = GSresGetResource(ctx, 0x111F1400);
+    GSmodelLinkToGSparticleBank(GSresGetResource(ctx, 0x0CE61000), resource);
+    GSmodelSetGSparticleLinkAttachMode(GSresGetResource(ctx, 0x0CE61000), 4);
+
+    model0 = fn_801CBA0C(0x06BC0400);
+    model1 = fn_801CBA0C(0x06BE0400);
+    model2 = fn_801CBA0C(0x0D290400);
+    model3 = fn_801CBA0C(0x06BE0400);
+    model4 = fn_801CBA0C(0x0D240400);
+    model5 = fn_801CBA0C(0x0D290400);
+    model6 = fn_801CBA0C(0x0D240400);
+    model7 = fn_801CBA0C(0x06BE0400);
+    model8 = fn_801CBA0C(0x0D240400);
+
+#define SET_MODEL_SHADOW(model)                                                    \
+    resource = GSresGetResource(ctx, (model));                                     \
+    GSmodelSetShadowFlags(resource, 2);                                            \
+    GSmodelSetShadowLight(resource, lbl_8047A690);                                 \
+    GSmodelSetShadowSurface(resource, 1, &lbl_8047A694)
+
+    SET_MODEL_SHADOW(model0);
+    SET_MODEL_SHADOW(model1);
+    SET_MODEL_SHADOW(model2);
+    SET_MODEL_SHADOW(model3);
+    SET_MODEL_SHADOW(model4);
+    SET_MODEL_SHADOW(model5);
+    SET_MODEL_SHADOW(model6);
+    SET_MODEL_SHADOW(model7);
+    SET_MODEL_SHADOW(model8);
+
+#undef SET_MODEL_SHADOW
+
+    cameraPlayAnime(ctx, 0x0CFE1800, 0, 0);
+    waitFramesFinal = 1;
+    if (fn_800D37CC() == 0x32) {
+        waitFramesFinal = (u32)lbl_8047C1D0;
+        if (waitFramesFinal < 1) {
+            waitFramesFinal = 1;
+        }
+    }
+    for (elapsedFinal = 0; elapsedFinal < waitFramesFinal; ) {
+        _threadSwitch();
+        elapsedFinal += fn_800D3088();
+    }
+
+    motion0 = fn_801CBA0C(0x0D081000);
+    motion8 = fn_801CBA0C(0x0D081008);
+    motion1 = fn_801CBA0C(0x0D081001);
+    motion2 = fn_801CBA0C(0x0D081002);
+    motion3 = fn_801CBA0C(0x0D081003);
+    motion4 = fn_801CBA0C(0x0D081004);
+    motion5 = fn_801CBA0C(0x0D081005);
+    motion6 = fn_801CBA0C(0x0D081006);
+    motion7 = fn_801CBA0C(0x0D081007);
+
+    fn_801845E4(ctx, model0, ctx, motion0, 0);
+    fn_801845E4(ctx, model1, ctx, motion8, 0);
+    fn_801845E4(ctx, model2, ctx, motion1, 0);
+    fn_801845E4(ctx, model3, ctx, motion2, 0);
+    fn_801845E4(ctx, model4, ctx, motion3, 0);
+    fn_801845E4(ctx, model5, ctx, motion4, 0);
+    fn_801845E4(ctx, model6, ctx, motion5, 0);
+    fn_801845E4(ctx, model7, ctx, motion6, 0);
+    fn_801845E4(ctx, model8, ctx, motion7, 0);
+
+    fn_801CB834(0x0CE61000, 0, 0, 0);
+    fn_801CB834(model0, 6, 0, 0);
+    fn_801CB834(model1, 9, 0, 0);
+    fn_801CB834(model2, 0xB, 0, 0);
+    fn_801CB834(model3, 9, 0, 0);
+    fn_801CB834(model4, 0xB, 0, 0);
+    fn_801CB834(model5, 9, 0, 0);
+    fn_801CB834(model6, 0xB, 0, 0);
+    fn_801CB834(model7, 9, 0, 0);
+    fn_801CB834(model7, 0xB, 0, 0);
+    fn_801CB834(model8, 0xB, 0, 0);
+
+    scriptWaitSyncMotion(model0, 1);
+    scriptWaitSyncMotion(model1, 1);
+    scriptWaitSyncMotion(model2, 1);
+    scriptWaitSyncMotion(model3, 1);
+    scriptWaitSyncMotion(model4, 1);
+    scriptWaitSyncMotion(model5, 1);
+    scriptWaitSyncMotion(model6, 1);
+    scriptWaitSyncMotion(model7, 1);
+    scriptWaitSyncMotion(model7, 1);
+    scriptWaitSyncMotion(model8, 1);
+
+    fn_801CB834(model0, 7, 0, 0);
+    fn_801CB834(model1, 0xA, 0, 0);
+    fn_801CB834(model2, 0xC, 0, 0);
+    fn_801CB834(model3, 0xA, 0, 0);
+    fn_801CB834(model5, 0xA, 0, 0);
+    fn_801CB834(model4, 0xC, 0, 0);
+    fn_801CB834(model6, 0xC, 0, 0);
+    fn_801CB834(model7, 0xA, 0, 0);
+    fn_801CB834(model7, 0xC, 0, 0);
+    fn_801CB834(model8, 0xC, 0, 0);
+
+    scriptWaitSyncMotion(model0, 1);
+    scriptWaitSyncMotion(model1, 1);
+    scriptWaitSyncMotion(model2, 1);
+    scriptWaitSyncMotion(model3, 1);
+    scriptWaitSyncMotion(model4, 1);
+    scriptWaitSyncMotion(model5, 1);
+    scriptWaitSyncMotion(model6, 1);
+    scriptWaitSyncMotion(model7, 1);
+    scriptWaitSyncMotion(model7, 1);
+    scriptWaitSyncMotion(model8, 1);
+
+    fn_801CB834(model0, 6, 0, 0);
+    fn_801CB834(model1, 9, 0, 0);
+    fn_801CB834(model2, 0xB, 0, 0);
+    fn_801CB834(model3, 9, 0, 0);
+    fn_801CB834(model4, 0xB, 0, 0);
+    fn_801CB834(model5, 9, 0, 0);
+    fn_801CB834(model6, 0xB, 0, 0);
+    fn_801CB834(model7, 9, 0, 0);
+    fn_801CB834(model7, 0xB, 0, 0);
+    fn_801CB834(model8, 0xB, 0, 0);
+
+    cameraWaitSyncAnime(1);
+    fn_800FF58C(0x89);
+    floorSetFadeScript(0, 0);
+}
+
+#pragma pop
+
 void fn_8008EC28(u32 ctx) {
     #pragma peephole off
     extern u32 GSresGetResource(u32 ctx, u32 id);
@@ -2461,6 +3843,225 @@ void fn_80090720(u32 ctx) {
     floorSetFadeScript(0, 0);
 }
 
+/* 0x800909E4 | size: 0x350 */
+void fn_800909E4(u32 ctx) {
+    #pragma peephole off
+    extern void GSmodelSetShadowTextureSize(u32 w, u32 h);
+    extern void fn_801CB7C4(u32 id);
+    extern void GSmodelLinkToGSparticleBank(u32 handle, u32 val);
+    extern void GSmodelSetGSparticleLinkAttachMode(u32 handle, u32 val);
+    extern void fn_801CB834(u32 id, u32 slot, u32 x, u32 y);
+    extern s32 fn_800D37CC(void);
+    extern u32 fn_800D3088(void);
+    extern u32 fn_801CBA0C(u32 id);
+    extern u32 GSmodelSetShadowFlags(u32 handle, u32 val);
+    extern void GSmodelSetShadowLight(u32 handle, u32 val);
+    extern void GSmodelSetShadowSurface(u32 handle, u32 val, u32 *param);
+    extern void cameraPlayAnime(u32 ctx, u32 id, u32 a, u32 b);
+    extern void fn_801845E4(u32 ctx, u32 modelHandle, u32 ctx2, u32 handle, u32 flags);
+    extern void cameraWaitSyncAnime(s32 sync);
+    extern void fn_800FF58C(u32 id);
+    extern void GSmodelSetAnimIndex(u32 handle, u32 val);
+    extern void GSmodelGetFrameCount(u32 handle, f32 *out, u32 flag);
+    extern void GSmodelSetAnimFrame(u32 handle, f32 val);
+    extern void GSmodelSetAnimType(u32 handle, u32 val);
+    extern void GSmodelStartAnimation(u32 handle);
+
+    u32 waitFrames;
+    u32 elapsed;
+    f32 frame;
+    u32 handle2;
+    u32 iconHandle;
+    u32 iconHandle2;
+    u32 iconResult;
+    u32 finalResult;
+    u32 finalResult2;
+
+    lbl_8047A690 = GSresGetResource(ctx, 0x0CE61602);
+    lbl_8047A694 = GSresGetResource(ctx, 0x0CE61002);
+    GSmodelSetShadowTextureSize(0x280, 0x1E0);
+
+    frame = lbl_8047C1D4;
+    handle2 = fn_80090720_getHandle2(ctx);
+    GSmodelSetAnimIndex(handle2, 1);
+    GSmodelGetFrameCount(handle2, &frame, 0);
+    frame = frame - lbl_8047C1D8;
+    GSmodelSetAnimIndex(handle2, 1);
+    GSmodelSetAnimFrame(handle2, frame);
+    GSmodelSetAnimType(handle2, 0);
+    GSmodelStartAnimation(handle2);
+
+    fn_801CB834(0x0CE61000, 0, 0, 0);
+    waitFrames = 1;
+    if (fn_800D37CC() == 0x32) {
+        waitFrames = (u32)lbl_8047C1D0;
+        if (waitFrames < 1) {
+            waitFrames = 1;
+        }
+    }
+    for (elapsed = 0; elapsed < waitFrames; ) {
+        _threadSwitch();
+        elapsed += fn_800D3088();
+    }
+
+    fn_801CB7C4(0x0CE61000);
+    GSmodelLinkToGSparticleBank(GSresGetResource(ctx, 0x0CE61000), GSresGetResource(ctx, 0x111B1400));
+    GSmodelSetGSparticleLinkAttachMode(GSresGetResource(ctx, 0x0CE61000), 4);
+    fn_801CB834(0x0CE61000, 3, 0, 0);
+
+    waitFrames = 0x32;
+    if (fn_800D37CC() == 0x32) {
+        waitFrames = (u32)lbl_8047C1E0;
+        if (waitFrames < 1) {
+            waitFrames = 1;
+        }
+    }
+    for (elapsed = 0; elapsed < waitFrames; ) {
+        _threadSwitch();
+        elapsed += fn_800D3088();
+    }
+
+    iconHandle = fn_801CBA0C(0x06BD0400);
+    iconHandle2 = fn_801CBA0C(0x06BA0400);
+
+    iconResult = GSresGetResource(ctx, iconHandle);
+    GSmodelSetShadowFlags(iconResult, 2);
+    GSmodelSetShadowLight(iconResult, lbl_8047A690);
+    GSmodelSetShadowSurface(iconResult, 1, &lbl_8047A694);
+    iconResult = GSresGetResource(ctx, iconHandle2);
+    GSmodelSetShadowFlags(iconResult, 2);
+    GSmodelSetShadowLight(iconResult, lbl_8047A690);
+    GSmodelSetShadowSurface(iconResult, 1, &lbl_8047A694);
+
+    cameraPlayAnime(ctx, 0x0CF11800, 0, 0);
+    waitFrames = 1;
+    if (fn_800D37CC() == 0x32) {
+        waitFrames = (u32)lbl_8047C1D0;
+        if (waitFrames < 1) {
+            waitFrames = 1;
+        }
+    }
+    for (elapsed = 0; elapsed < waitFrames; ) {
+        _threadSwitch();
+        elapsed += fn_800D3088();
+    }
+
+    finalResult = fn_801CBA0C(0x0CE81001);
+    finalResult2 = fn_801CBA0C(0x0CE81000);
+    fn_801845E4(ctx, iconHandle, ctx, finalResult, 0);
+    fn_801845E4(ctx, iconHandle2, ctx, finalResult2, 0);
+    fn_801CB834(iconHandle, 2, 0, 1);
+    fn_801CB834(iconHandle2, 2, 0, 1);
+    cameraWaitSyncAnime(1);
+    fn_800FF58C(0x89);
+    floorSetFadeScript(0, 0);
+}
+
+/* 0x80090D34 | size: 0x2D8 */
+void fn_80090D34(u32 ctx) {
+    #pragma peephole off
+    extern void GSmodelSetShadowTextureSize(u32 w, u32 h);
+    extern void fn_801CB7C4(u32 id);
+    extern void fn_801CB834(u32 id, u32 slot, u32 x, u32 y);
+    extern s32 fn_800D37CC(void);
+    extern u32 fn_800D3088(void);
+    extern u32 fn_801CBA0C(u32 id);
+    extern u32 GSmodelSetShadowFlags(u32 handle, u32 val);
+    extern void GSmodelSetShadowLight(u32 handle, u32 val);
+    extern void GSmodelSetShadowSurface(u32 handle, u32 val, u32 *param);
+    extern void cameraPlayAnime(u32 ctx, u32 id, u32 a, u32 b);
+    extern void fn_801845E4(u32 ctx, u32 modelHandle, u32 ctx2, u32 handle, u32 flags);
+    extern void cameraWaitSyncAnime(s32 sync);
+    extern void fn_800FF58C(u32 id);
+    extern void fn_80118874(void *texture, u32 flag);
+    extern void GSmodelSetAnimIndex(u32 handle, u32 val);
+    extern void GSmodelGetFrameCount(u32 handle, f32 *out, u32 flag);
+    extern void GSmodelSetAnimFrame(u32 handle, f32 val);
+    extern void GSmodelSetAnimType(u32 handle, u32 val);
+    extern void GSmodelStartAnimation(u32 handle);
+
+    u32 waitFrames;
+    u32 elapsed;
+    GSmaterialEntry *material;
+    f32 frame;
+    u32 handle2;
+    u32 iconHandle;
+    u32 iconHandle2;
+    u32 iconResult;
+    u32 finalResult;
+    u32 finalResult2;
+
+    lbl_8047A690 = GSresGetResource(ctx, 0x0CE61602);
+    lbl_8047A694 = GSresGetResource(ctx, 0x0CE61002);
+    GSmodelSetShadowTextureSize(0x280, 0x1E0);
+
+    frame = lbl_8047C1D4;
+    handle2 = fn_80090720_getHandle2(ctx);
+    GSmodelSetAnimIndex(handle2, 1);
+    GSmodelGetFrameCount(handle2, &frame, 0);
+    frame = frame - lbl_8047C1D8;
+    GSmodelSetAnimIndex(handle2, 1);
+    GSmodelSetAnimFrame(handle2, frame);
+    GSmodelSetAnimType(handle2, 0);
+    GSmodelStartAnimation(handle2);
+
+    fn_801CB834(0x0CE61000, 0, 0, 0);
+    waitFrames = 1;
+    if (fn_800D37CC() == 0x32) {
+        waitFrames = (u32)lbl_8047C1D0;
+        if (waitFrames < 1) {
+            waitFrames = 1;
+        }
+    }
+    for (elapsed = 0; elapsed < waitFrames; ) {
+        _threadSwitch();
+        elapsed += fn_800D3088();
+    }
+
+    fn_801CB7C4(0x0CE61000);
+
+    material = (GSmaterialEntry *)GSresGetResource(ctx, 0x0CE61000);
+    fn_80118874(material->texture, 1);
+    material->texture = NULL;
+
+    iconHandle = fn_801CBA0C(0x06BD0400);
+    iconHandle2 = fn_801CBA0C(0x06BA0400);
+
+    iconResult = GSresGetResource(ctx, iconHandle);
+    GSmodelSetShadowFlags(iconResult, 2);
+    GSmodelSetShadowLight(iconResult, lbl_8047A690);
+    GSmodelSetShadowSurface(iconResult, 1, &lbl_8047A694);
+
+    iconResult = GSresGetResource(ctx, iconHandle2);
+    GSmodelSetShadowFlags(iconResult, 2);
+    GSmodelSetShadowLight(iconResult, lbl_8047A690);
+    GSmodelSetShadowSurface(iconResult, 1, &lbl_8047A694);
+
+    cameraPlayAnime(ctx, 0x0CF01800, 0, 0);
+    waitFrames = 1;
+    if (fn_800D37CC() == 0x32) {
+        waitFrames = (u32)lbl_8047C1D0;
+        if (waitFrames < 1) {
+            waitFrames = 1;
+        }
+    }
+    for (elapsed = 0; elapsed < waitFrames; ) {
+        _threadSwitch();
+        elapsed += fn_800D3088();
+    }
+
+    finalResult = fn_801CBA0C(0x0CE71001);
+    finalResult2 = fn_801CBA0C(0x0CE71000);
+    fn_801845E4(ctx, iconHandle, ctx, finalResult, 0);
+    fn_801845E4(ctx, iconHandle2, ctx, finalResult2, 0);
+    fn_801CB834(iconHandle, 2, 0, 1);
+    fn_801CB834(iconHandle2, 2, 0, 1);
+
+    cameraWaitSyncAnime(1);
+    fn_800FF58C(0x89);
+    floorSetFadeScript(0, 0);
+}
+
 /* 0x8008C7B0 | size: 0x31C */
 void fn_8008C7B0(u32 ctx) {
     #pragma peephole off
@@ -2575,6 +4176,258 @@ void fn_8008C7B0(u32 ctx) {
     fn_800FF58C(1);
     floorSetFadeScript(0, 0);
 }
+/* 0x80092FC8 | size: 0x198 */
+#pragma push
+#pragma peephole off
+s32 fn_80092FC8(s32 channel, void* requestValue, void* requestContext)
+{
+    extern u32 fn_800E2C04(u32 size, u32 align);
+    extern void* fn_800E27B0(u32 handle);
+    extern void fn_8009F77C(void* work);
+    extern void fn_8009F9C8(void* callback);
+    extern s32 fn_800937F4(void* arg);
+    extern void fn_80093B04(u32 a, u32 b);
+    extern void OSCreateThread(void* thread, void* entry, void* arg,
+                               void* stack, u32 stackSize, s32 priority,
+                               u16 attributes);
+    extern void OSResumeThread(void* thread);
+    extern void* memset(void* dst, int value, u32 size);
+
+    u32 slot;
+    u32 handle;
+    u8* allocated;
+    u8* work;
+    s32 started;
+    s32 requestStarted;
+    u8* requestWork;
+
+    if (channel < 0 || channel > 3) {
+        started = 0;
+    } else {
+        slot = (u32)channel << 2;
+        if (*(u8**)(lbl_803FB328 + slot) != NULL) {
+            started = 1;
+        } else {
+            handle = fn_800E2C04(0x44A0, 0x20);
+            if ((handle & 0xFFFF) == 0) {
+                __assert(lbl_8026F5A8, 0x1DD, &lbl_8047C1E8);
+            }
+            allocated = fn_800E27B0(handle);
+            memset(allocated, 0, 0x4490);
+            *(u8**)(lbl_803FB328 + slot) = allocated;
+
+            work = *(u8**)(lbl_803FB328 + slot);
+            *(u32*)(work + GBA_STATE_PHASE) = 0;
+            *(s32*)(work + GBA_STATE_PORT) = channel;
+            fn_800716C8(channel, work + GBA_DATA_OFFSET, fn_80093B04);
+            fn_8009F77C(work);
+            fn_8009F9C8(work + 0x18);
+            OSCreateThread(work + GBA_DATA_OFFSET, fn_800937F4, work,
+                           work + GBA_STATE_PORT, 0x4000,
+                           GBA_THREAD_PRIORITY, 0);
+            OSResumeThread(work + GBA_DATA_OFFSET);
+            started = 1;
+        }
+    }
+
+    if (started == 0) {
+        return 0;
+    }
+
+    requestWork = *(u8**)(lbl_803FB328 + ((u32)channel << 2));
+    requestStarted = 0;
+    fn_8009F7B4(requestWork);
+    if (*(s32*)(requestWork + GBA_STATE_PHASE) == 0) {
+        *(s32*)(requestWork + GBA_STATE_PHASE) = 4;
+        *(u32*)(requestWork + GBA_STATE_TIMEOUT) = 0x30004;
+        requestStarted = 1;
+        *(void**)(requestWork + 0x4344) = requestValue;
+        *(void**)(requestWork + 0x4348) = requestContext;
+    }
+    fn_8009F890(requestWork);
+    fn_800A257C(requestWork + GBA_DATA_OFFSET, GBA_THREAD_PRIORITY);
+    if (requestStarted != 0) {
+        fn_8009FABC(requestWork + 0x18);
+    }
+    return requestStarted;
+}
+#pragma pop
+
+/* 0x80093160 | size: 0x190 */
+#pragma push
+#pragma peephole off
+s32 fn_80093160(s32 channel, void* requestValue)
+{
+    extern u32 fn_800E2C04(u32 size, u32 align);
+    extern void* fn_800E27B0(u32 handle);
+    extern void fn_8009F77C(void* work);
+    extern void fn_8009F9C8(void* callback);
+    extern s32 fn_800937F4(void* arg);
+    extern void fn_80093B04(u32 a, u32 b);
+    extern void OSCreateThread(void* thread, void* entry, void* arg,
+                               void* stack, u32 stackSize, s32 priority,
+                               u16 attributes);
+    extern void OSResumeThread(void* thread);
+    extern void* memset(void* dst, int value, u32 size);
+
+    u32 slot;
+    u32 handle;
+    u8* allocated;
+    u8* work;
+    s32 started;
+    s32 requestStarted;
+    u8* requestWork;
+
+    if (channel < 0 || channel > 3) {
+        started = 0;
+    } else {
+        slot = (u32)channel << 2;
+        if (*(u8**)(lbl_803FB328 + slot) != NULL) {
+            started = 1;
+        } else {
+            handle = fn_800E2C04(0x44A0, 0x20);
+            if ((handle & 0xFFFF) == 0) {
+                __assert(lbl_8026F5A8, 0x1DD, &lbl_8047C1E8);
+            }
+            allocated = fn_800E27B0(handle);
+            memset(allocated, 0, 0x4490);
+            *(u8**)(lbl_803FB328 + slot) = allocated;
+
+            work = *(u8**)(lbl_803FB328 + slot);
+            *(u32*)(work + GBA_STATE_PHASE) = 0;
+            *(s32*)(work + GBA_STATE_PORT) = channel;
+            fn_800716C8(channel, work + GBA_DATA_OFFSET, fn_80093B04);
+            fn_8009F77C(work);
+            fn_8009F9C8(work + 0x18);
+            OSCreateThread(work + GBA_DATA_OFFSET, fn_800937F4, work,
+                           work + GBA_STATE_PORT, 0x4000,
+                           GBA_THREAD_PRIORITY, 0);
+            OSResumeThread(work + GBA_DATA_OFFSET);
+            started = 1;
+        }
+    }
+
+    if (started == 0) {
+        return 0;
+    }
+
+    requestWork = *(u8**)(lbl_803FB328 + ((u32)channel << 2));
+    requestStarted = 0;
+    fn_8009F7B4(requestWork);
+    if (*(s32*)(requestWork + GBA_STATE_PHASE) == 0) {
+        *(s32*)(requestWork + GBA_STATE_PHASE) = 2;
+        *(u32*)(requestWork + GBA_STATE_TIMEOUT) = 0x30002;
+        requestStarted = 1;
+        *(void**)(requestWork + 0x4344) = requestValue;
+    }
+    fn_8009F890(requestWork);
+    fn_800A257C(requestWork + GBA_DATA_OFFSET, GBA_THREAD_PRIORITY);
+    if (requestStarted != 0) {
+        fn_8009FABC(requestWork + 0x18);
+    }
+    return requestStarted;
+}
+#pragma pop
+
+/* 0x800932F0 | size: 0x1F4 */
+#pragma push
+#pragma peephole off
+s32 fn_800932F0(s32 channel, const char* primary, const char* secondary)
+{
+    extern u32 fn_800E2C04(u32 size, u32 align);
+    extern void* fn_800E27B0(u32 handle);
+    extern void fn_8009F77C(void* work);
+    extern void fn_8009F9C8(void* callback);
+    extern s32 fn_800937F4(void* arg);
+    extern void fn_80093B04(u32 a, u32 b);
+    extern void OSCreateThread(void* thread, void* entry, void* arg,
+                               void* stack, u32 stackSize, s32 priority,
+                               u16 attributes);
+    extern void OSResumeThread(void* thread);
+    extern u32 strlen(const char* string);
+    extern char* strcpy(char* dst, const char* src);
+    extern void* memset(void* dst, int value, u32 size);
+
+    u32 slot;
+    u32 handle;
+    u32 primaryLength;
+    u32 secondaryLength;
+    u8* allocated;
+    u8* work;
+    s32 started;
+    s32 commandStarted;
+    u8* commandWork;
+
+    if (channel < 0 || channel > 3) {
+        started = 0;
+    } else {
+        slot = (u32)channel << 2;
+        if (*(u8**)(lbl_803FB328 + slot) != NULL) {
+            started = 1;
+        } else {
+            handle = fn_800E2C04(0x44A0, 0x20);
+            if ((handle & 0xFFFF) == 0) {
+                __assert(lbl_8026F5A8, 0x1DD, &lbl_8047C1E8);
+            }
+            allocated = fn_800E27B0(handle);
+            memset(allocated, 0, 0x4490);
+            *(u8**)(lbl_803FB328 + slot) = allocated;
+
+            work = *(u8**)(lbl_803FB328 + slot);
+            *(u32*)(work + GBA_STATE_PHASE) = 0;
+            *(s32*)(work + GBA_STATE_PORT) = channel;
+            fn_800716C8(channel, work + GBA_DATA_OFFSET, fn_80093B04);
+            fn_8009F77C(work);
+            fn_8009F9C8(work + 0x18);
+            OSCreateThread(work + GBA_DATA_OFFSET, fn_800937F4, work,
+                           work + GBA_STATE_PORT, 0x4000,
+                           GBA_THREAD_PRIORITY, 0);
+            OSResumeThread(work + GBA_DATA_OFFSET);
+            started = 1;
+        }
+    }
+
+    if (started == 0) {
+        return 0;
+    }
+
+    commandWork = *(u8**)(lbl_803FB328 + ((u32)channel << 2));
+    commandStarted = 0;
+    primaryLength = strlen(primary);
+    if (secondary != NULL) {
+        secondaryLength = strlen(secondary);
+    } else {
+        secondaryLength = 0;
+    }
+
+    if (primaryLength >= 0x7F || secondaryLength >= 0x7F) {
+        commandStarted = 0;
+        goto done;
+    }
+
+    fn_8009F7B4(commandWork);
+    if (*(s32*)(commandWork + GBA_STATE_PHASE) == 0) {
+        commandStarted++;
+        *(s32*)(commandWork + GBA_STATE_PHASE) = commandStarted;
+        *(u32*)(commandWork + GBA_STATE_TIMEOUT) = 0x30001;
+        strcpy((char*)(commandWork + 0x4344), primary);
+        if (secondary != NULL) {
+            strcpy((char*)(commandWork + 0x43C4), secondary);
+        } else {
+            commandWork[0x43C4] = 0;
+        }
+    }
+    fn_8009F890(commandWork);
+    fn_800A257C(commandWork + GBA_DATA_OFFSET, GBA_THREAD_PRIORITY);
+    if (commandStarted != 0) {
+        fn_8009FABC(commandWork + 0x18);
+    }
+
+done:
+    return commandStarted;
+}
+#pragma pop
+
 /* 0x800934E4 | size: 0x90 */
 s32 fn_800934E4(s32 channel)
 {
@@ -2710,6 +4563,166 @@ s32 fn_80093698(s32 channel)
     return 1;
 }
 
+/* 0x800937F4 | size: 0x310 */
+#pragma push
+#pragma peephole off
+s32 fn_800937F4(void* arg0)
+{
+    extern void fn_8009F9E8();
+    extern s32 fn_80073E8C();
+    extern s32 fn_80073E84();
+    extern s32 fn_80074324();
+    extern s32 fn_800745B4();
+    extern s32 fn_80073690();
+    extern void fn_800895A4();
+    extern s32 fn_80071E34();
+    extern void fn_80089380();
+    extern s32 fn_80089D30();
+    extern s32 fn_80089CA8();
+    extern s32 fn_80089C84();
+    extern u64 OSGetTime(void);
+    extern f32 lbl_8047C1F0;
+
+    u8* p;
+    s32 result;
+    s32 status;
+    s32 state;
+    void* arg;
+    u64 start;
+    u64 now;
+    f32 rate;
+    u8 readBuffer[0xD8];
+    u8 statusBuffer[0x278];
+
+    p = arg0;
+    result = 0;
+    for (;;) {
+        fn_8009F7B4(p);
+        if (*(s32*)(p + GBA_STATE_PHASE) != 0xD) {
+            *(s32*)(p + GBA_STATE_TIMEOUT) = result;
+            *(s32*)(p + GBA_STATE_PHASE) = 0;
+            while (*(s32*)(p + GBA_STATE_PHASE) == 0) {
+                fn_8009F9E8(p + 0x18, p);
+            }
+        }
+
+        state = *(s32*)(p + GBA_STATE_PHASE);
+        fn_8009F890(p);
+        status = 0;
+
+        switch (state) {
+        case 0:
+        case 3:
+            break;
+        case 1:
+            if ((s8)p[0x43C4] != 0) {
+                arg = p + 0x43C4;
+            } else {
+                arg = NULL;
+            }
+            status = fn_80073E8C(p + 0x4344, arg);
+            if (status == 0) {
+                while (fn_80073E84() == 0) {
+                    fn_800A257C((void*)fn_800A13F8(), 0x10);
+                    OSYieldThread();
+                }
+                result = 1;
+            }
+            break;
+        case 2:
+            start = OSGetTime();
+            if (*(s32*)(p + 0x4344) == 0) {
+                rate = lbl_8047C1F0;
+            } else {
+                rate = lbl_8047C1F0;
+            }
+            while ((status = fn_80074324(*(s32*)(p + GBA_STATE_PORT))) != 0) {
+                if (status == 0x3E8) {
+                    goto case2Done;
+                }
+                now = OSGetTime() - start;
+                if ((s32)(u32)(u64)(
+                        rate * (f32)(*(u32*)0x800000F8 >> 2))
+                    <= (s32)(u32)now) {
+                    result = 0x20002;
+                    goto case2Done;
+                }
+                fn_800A257C((void*)fn_800A13F8(), 0x10);
+                OSYieldThread();
+            }
+            status = fn_800745B4(*(s32*)(p + GBA_STATE_PORT),
+                                 *(s32*)(p + 0x4344));
+            if (status == 0) {
+                result = 2;
+            }
+        case2Done:
+            break;
+        case 4:
+            status = fn_80073690(*(s32*)(p + GBA_STATE_PORT), statusBuffer);
+            if (status == 0) {
+                fn_800895A4(*(s32*)(p + 0x4344), statusBuffer);
+                result = 4;
+                **(u32**)(p + 0x4348) =
+                    (statusBuffer[3] << 24) | (statusBuffer[2] << 16)
+                    | (statusBuffer[1] << 8) | statusBuffer[0];
+            }
+            break;
+        case 5:
+            result = 5;
+            break;
+        case 6:
+            result = 6;
+            break;
+        case 7:
+            result = 7;
+            break;
+        case 8:
+            result = 8;
+            break;
+        case 9:
+            result = 9;
+            break;
+        case 10:
+            result = 10;
+            break;
+        case 11:
+            status = fn_80071E34(*(s32*)(p + GBA_STATE_PORT), readBuffer);
+            if (status == 0) {
+                fn_80089380(*(s32*)(p + 0x4344), readBuffer);
+                result = 11;
+            }
+            break;
+        case 12:
+            status = fn_80089D30(*(s32*)(p + GBA_STATE_PORT) + 1,
+                                  p + 0x4344);
+            if (status == 0) {
+                for (;;) {
+                    status = fn_80089CA8(*(s32*)(p + GBA_STATE_PORT) + 1);
+                    if (status == 0) {
+                        status = fn_80089C84(*(s32*)(p + GBA_STATE_PORT) + 1);
+                    }
+                    if (status >= 0) {
+                        break;
+                    }
+                    fn_800A257C((void*)fn_800A13F8(), 0x10);
+                    OSYieldThread();
+                }
+                if (status == 0) {
+                    result = 12;
+                }
+            }
+            break;
+        case 13:
+            return 0;
+        }
+
+        if (status != 0) {
+            result = (state & 0xFFFF) | 0x10000;
+        }
+    }
+}
+#pragma pop
+
 /* 0x80093B04 | size: 0x48 */
 void fn_80093B04(u32 a, u32 b) {
     u32 r31;
@@ -2739,65 +4752,290 @@ void menuPokemonStatusCtrlRibbon(void) {
 }
 #pragma pop
 
-typedef struct GbaRibbonTableEntry {
-    u16 status;
-    s8 base;
-    u8 max;
-} GbaRibbonTableEntry;
+typedef struct RibbonGroupDescriptor {
+    u16 selector;
+    s8 firstRibbon;
+    u8 maximum;
+} RibbonGroupDescriptor;
 
-extern GbaRibbonTableEntry lbl_802EEFD8[];
-extern GbaRibbonTableEntry lbl_802EF000[];
-extern s32 pokemonGetStatus(void* pokemon, u32 species, u32 status, u32 arg);
+typedef struct PokemonRibbonGrid {
+    u32 count;
+    s8 ribbon[9][4];
+} PokemonRibbonGrid;
 
-void fn_80093F64(void* pokemon, u8* out) {
-    GbaRibbonTableEntry* entry;
-    s32 value;
-    s32 i;
-    s32 j;
-    s32 used;
-    s32 count;
+typedef struct PokemonStatusMenuWork {
+    u8 flags;
+    u8 state;
+    s8 selection;
+    s8 previousSelection;
+    s32 result;
+    u32 entityId;
+    void* pokemon;
+    void* callback;
+    s32 callbackArg;
+    u16 hasExtraMove;
+    u16 padding;
+    PokemonRibbonGrid ribbons;
+} PokemonStatusMenuWork;
 
-    for (i = 0; i < 9; i++) {
-        out[4 + i * 4 + 0] = -1;
-        out[4 + i * 4 + 1] = -1;
-        out[4 + i * 4 + 2] = -1;
-        out[4 + i * 4 + 3] = -1;
+extern RibbonGroupDescriptor lbl_802EEFD8[10];
+extern RibbonGroupDescriptor lbl_802EF000[7];
+extern u32 pokemonGetStatus();
+
+/* Build the four-column ribbon grid used by the Pokemon status window. */
+void fn_80093F64(u8* pokemon, PokemonRibbonGrid* grid)
+{
+    RibbonGroupDescriptor* group;
+    s32 available;
+    s32 ribbon;
+    u32 groupIndex;
+    u32 outputIndex;
+    u32 row;
+    u32 column;
+    u32 count;
+
+    for (column = 0; column < 4; column++) {
+        for (row = 0; row < 9; row++) {
+            grid->ribbon[row][column] = -1;
+        }
     }
 
-    used = 0;
-    entry = lbl_802EEFD8;
-    for (i = 0; i < 10; i++, entry++) {
-        value = pokemonGetStatus(pokemon, 0, entry->status, 0);
-        if (value > entry->max) {
-            value = entry->max;
+    outputIndex = 0;
+    group = lbl_802EEFD8;
+    for (groupIndex = 0; groupIndex < 10; groupIndex++, group++) {
+        available = pokemonGetStatus(pokemon, 0, group->selector, 0);
+        if (available > group->maximum) {
+            available = group->maximum;
         }
-        for (j = 0; j < value; j++, used++) {
-            out[4 + (used % 9) * 4 + used / 9] = (s8)(entry->base + j);
+        for (ribbon = 0; ribbon < available; ribbon++, outputIndex++) {
+            grid->ribbon[outputIndex % 9][outputIndex / 9] =
+                group->firstRibbon + ribbon;
         }
     }
 
-    used = 0;
-    entry = lbl_802EF000;
-    for (i = 0; i < 7; i++, entry++) {
-        value = pokemonGetStatus(pokemon, 0, entry->status, 0);
-        if (value > entry->max) {
-            value = entry->max;
+    outputIndex = 0;
+    group = lbl_802EF000;
+    for (groupIndex = 0; groupIndex < 7; groupIndex++, group++) {
+        available = pokemonGetStatus(pokemon, 0, group->selector, 0);
+        if (available > group->maximum) {
+            available = group->maximum;
         }
-        for (j = 0; j < value; j++, used++) {
-            out[4 + used * 4 + 3] = (s8)(entry->base + j);
+        for (ribbon = 0; ribbon < available; ribbon++, outputIndex++) {
+            grid->ribbon[outputIndex][3] = group->firstRibbon + ribbon;
         }
     }
 
     count = 0;
-    for (j = 0; j < 4; j++) {
-        for (i = 0; i < 9; i++) {
-            if ((s8)out[4 + i * 4 + j] >= 0) {
+    for (column = 0; column < 4; column++) {
+        for (row = 0; row < 9; row++) {
+            if (grid->ribbon[row][column] >= 0) {
                 count++;
             }
         }
     }
-    *(u32*)out = count;
+    grid->count = count;
 }
+
+/* 0x800965C8 | size: 0x680 */
+void fn_800965C8(void* window, u8* sprite) {
+    register s32 color;
+    register void* pokemon;
+    void* bios;
+    s16 id;
+    s32 state;
+    u32 value;
+    u32 msg;
+
+    pokemon = *(void**)(lbl_803FB380 + 0x0C);
+    if (pokemon == NULL) {
+        return;
+    }
+
+    bios = pokemonDataBiosGetPtr((u16)pokemonGetStatus(pokemon, 0, 0x6E, 0));
+    if (bios == NULL) {
+        return;
+    }
+
+    id = *(s16*)(sprite + 0x06);
+    color = (s32)((u8*)window)[0x8B] | -0x100;
+    state = (s8)((u8*)window)[0x95];
+
+    switch (id) {
+    case 0xE7: {
+        void* texture = menuModelRender(lbl_803FB338);
+        if (texture == NULL) {
+            return;
+        }
+        fn_800D88DC(3);
+        fn_800D888C(4);
+        fn_800D6A00(7);
+        fn_800D7820(lbl_80314F98);
+        fn_800D85D4(0, texture);
+        fn_800D67BC(2);
+        fn_800D61E4(0, 0);
+        fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, 0xFF);
+        fn_800D59B8(0, lbl_8047C230, lbl_8047C230);
+        fn_800D61E4(*(s16*)(sprite + 0x54), *(s16*)(sprite + 0x56));
+        fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, 0xFF);
+        fn_800D59B8(0, lbl_8047C208, lbl_8047C208);
+        fn_800D6728();
+        break;
+    }
+    case 0x107:
+    case 0x108:
+    case 0x109:
+    case 0x10A: {
+        u32 mask = 0;
+        value = (u8)pokemonGetStatus(pokemon, 0, 0xBB, 0);
+        switch (id) {
+        case 0x107:
+            mask = 8;
+            break;
+        case 0x108:
+            mask = 4;
+            break;
+        case 0x109:
+            mask = 2;
+            break;
+        case 0x10A:
+            mask = 1;
+            break;
+        }
+        winSpriteSetDisp(sprite, value & mask);
+        break;
+    }
+    case 0x10B:
+        value = pokemonBiosGetCatchBallId(pokemon);
+        if (value < 13) {
+            windowDrawSprite(0, 0, window, lbl_802EED28[value], 0);
+        }
+        break;
+    case 0x10C:
+        value = (u8)pokemonGetStatus(pokemon, 0, 0xB5, 0);
+        if ((value & 0xF) != 0) {
+            msg = 0xE8;
+        } else if (value != 0) {
+            msg = 0xE7;
+        } else {
+            msg = 0;
+        }
+        windowDrawSprite(0, 0, window, (u16)msg, 0);
+        break;
+    case 0x10D:
+        windowDrawSprite(0, 0, window, (u16)fn_8001D624(pokemon, 1), 0);
+        break;
+    case 0x10E:
+        winSpriteSetDisp(sprite, pokemonGetSoubiItemDataId(pokemon) != 0);
+        break;
+    case 0x551:
+        value = pokemonGetSoubiItemDataId(pokemon);
+        if (value != 0) {
+            msgctrlSetValue(0x2D, (u16)value);
+            fn_800FBB34(0, 0, *(s16*)(sprite + 0x54), *(s16*)(sprite + 0x56), color, 0x2BD3);
+        }
+        break;
+    case 0x552: {
+        s32 x = (s16)(GSmsgGetRect(*(u32*)(sprite + 0x4C)) >> 16);
+        msgctrlSetValue(0x34, (u8)pokemonGetStatus(pokemon, 0, 0x7A, 0));
+        fn_800FBB34(x, 0, *(s16*)(sprite + 0x54), *(s16*)(sprite + 0x56), color, 0xD2);
+        break;
+    }
+    case 0x554: {
+        u32 name = pokemonDataBiosGetName(bios);
+        s32 x = (s16)(GSmsgGetRect(0x2BD4) >> 16);
+        fn_800FB680(0, 0, color, 0x2BD4);
+        if (name != 0) {
+            msgctrlSetValue(0x37, GSmsgGetGSchar(name));
+            fn_800FB680(x, 0, color, 0xE7);
+        }
+        break;
+    }
+    case 0x555: {
+        s32 x;
+        u32 sexMsg;
+
+        msgctrlSetValue(0x37, pokemonGetStatus(pokemon, 0, 0x77, 0));
+        fn_800FBB34(0, 0, *(s16*)(sprite + 0x54), *(s16*)(sprite + 0x56), color, 0xE7);
+        x = (s16)(GSmsgGetRect(0xE7) >> 16);
+        switch ((u8)menuSubGetPokemonSexForDisp(pokemon)) {
+        case 0:
+            sexMsg = 0xD67;
+            break;
+        case 1:
+            sexMsg = 0xD68;
+            break;
+        default:
+            sexMsg = 0;
+            break;
+        }
+        if (sexMsg != 0) {
+            msgctrlSetValue(0x37, GSmsgGetGSchar(sexMsg));
+            fn_800FB680(x, 0, color, 0xCF);
+        }
+        break;
+    }
+    case 0xF3:
+    case 0x110:
+        winSpriteSetDisp(sprite, state == 0);
+        break;
+    case 0xF5:
+    case 0x112:
+        winSpriteSetDisp(sprite, state == 1);
+        break;
+    case 0xF4:
+    case 0x111:
+        winSpriteSetDisp(sprite, state == 2);
+        break;
+    case 0x106: {
+        u32 disp = 0;
+        switch (lbl_803FB380[1]) {
+        case 2:
+        case 4:
+            disp = 1;
+            break;
+        case 3:
+            if (lbl_803FB380[0] & 2) {
+                disp = 1;
+            }
+            break;
+        case 5:
+            if (*(s32*)(lbl_803FB380 + 0x1C) > 0) {
+                disp = 1;
+            }
+            break;
+        }
+        winSpriteSetDisp(sprite, disp);
+        break;
+    }
+    case 0x598:
+        msg = 0;
+        switch (lbl_803FB380[1]) {
+        case 2:
+            msg = 0x2BCF;
+            break;
+        case 3:
+            if (lbl_803FB380[0] & 2) {
+                msg = 0x2BD0;
+            }
+            break;
+        case 4:
+            msg = 0x2BD0;
+            break;
+        case 5:
+            if (*(s32*)(lbl_803FB380 + 0x1C) > 0) {
+                msg = 0x2BD2;
+            }
+            break;
+        }
+        if (msg != 0) {
+            fn_800FB680(0, 0, color, msg);
+        }
+        break;
+    default:
+        break;
+    }
+}
+
 
 /* 0x80096C48 | size: 0x10C */
 #pragma peephole off
@@ -2845,6 +5083,304 @@ void fn_80096C48(u32 unused, u8* dst) {
 }
 #pragma peephole on
 
+/* Handle confirm/cancel input for the linked-Pokemon status menu. */
+#pragma push
+#pragma peephole off
+void fn_80096D54(u8* menu)
+{
+    extern void fn_80166A28(s32 id);
+    extern void pokemonWazaReplace();
+
+    u16* keys;
+    void* pokemon;
+    PokemonStatusMenuWork* work;
+    register s8* ribbonRow;
+    register s32 ribbonColumn;
+    register s32 ribbonIndex;
+    s8 ribbon;
+
+    keys = windowGetKeyInfo();
+    if (keys[2] & 0x10) {
+        work = (PokemonStatusMenuWork*)lbl_803FB380;
+        switch (work->state) {
+        case 0:
+        case 1:
+        case 6:
+        case 8:
+            break;
+        case 2:
+            work->selection = 0;
+            work->state = 3;
+            break;
+        case 3:
+            pokemon = work->pokemon;
+            if (pokemon != NULL) {
+                if ((s32)pokemonGetStatus(pokemon, 0, 0xC2, 0) != 0) {
+                    fn_80166A28(0x26);
+                } else if (lbl_803FB380[0] & 2) {
+                    work->state = 4;
+                    lbl_803FB380[3] = lbl_803FB380[2];
+                }
+            }
+            break;
+        case 4:
+            pokemon = work->pokemon;
+            if (pokemon != NULL) {
+                pokemonWazaReplace(pokemon, work->previousSelection,
+                                   work->selection);
+            }
+            *(s8*)(lbl_803FB380 + 3) = -1;
+            work->state = 3;
+            break;
+        case 5:
+            if ((s32)work->ribbons.count > 0) {
+                for (ribbon = 0; ribbon < 36; ribbon++) {
+                    ribbonIndex = ribbon % 9;
+                    ribbonColumn = ribbon % 4;
+                    ribbonRow = (s8*)work + ribbonIndex * 4;
+                    ribbonRow += ribbonColumn;
+                    if (ribbonRow[0x20] >= 0) {
+                        break;
+                    }
+                }
+                work->state = 6;
+                *(s8*)(lbl_803FB380 + 0x1A) = ribbon;
+            }
+            break;
+        case 7:
+            if (work->flags & 0x10) {
+                menu[0x98] = 1;
+                work->result = work->selection;
+            }
+            break;
+        }
+    } else if (keys[2] & 0x20) {
+        switch (lbl_803FB380[1]) {
+        case 0:
+        case 8:
+            break;
+        case 1:
+        case 2:
+        case 5:
+        case 7:
+            menu[0x98] = 1;
+            menu[0x99] = 1;
+            lbl_803FB380[1] = 8;
+            break;
+        case 3:
+            lbl_803FB380[1] = 2;
+            break;
+        case 4:
+            lbl_803FB380[1] = 3;
+            break;
+        case 6:
+            *(s8*)(lbl_803FB380 + 0x1A) = -1;
+            lbl_803FB380[1] = 5;
+            break;
+        }
+    }
+}
+#pragma pop
+
+/* Handle input for the linked-Pokemon status submenus. */
+#pragma push
+#pragma peephole off
+void fn_80096FA0(u8* menu)
+{
+    typedef u32 (*StatusChangeCallback)(u32, s32, s32);
+    extern void* fn_80105624(void);
+    extern void fn_80103484(s32, s32);
+    extern void fn_80109C88(void*, u32);
+    extern u8 fn_80123CD4(u32, s32);
+    extern u16 fn_8012640C(u32, u32, u32, s32);
+
+    void* keyObject;
+    u16 input;
+    s32 action;
+    s32 limit;
+    s32 selection;
+    u32 pokemon;
+    u16 valid;
+    u32 result;
+    s32 row;
+    s32 column;
+    s32 scan;
+    s32 inner;
+    s32 previous;
+    u8* cell;
+
+    action = 0;
+    if (*(u16*)(lbl_803FB380 + 0x18) != 0) {
+        limit = 5;
+    } else {
+        limit = 4;
+    }
+    keyObject = fn_80105624();
+    input = *(u16*)((u8*)keyObject + 6);
+
+    if (lbl_803FB380[1] <= 8) {
+        switch (lbl_803FB380[1]) {
+        case 1:
+        case 2:
+        case 5:
+            selection = menu[0x95];
+            if (input & 8) {
+                selection++;
+            } else if (input & 4) {
+                selection--;
+            }
+            if ((s8)selection > 2) {
+                selection = 2;
+            }
+            if ((s8)selection < 0) {
+                selection = 0;
+            }
+            menu[0x95] = selection;
+            switch ((s8)selection) {
+            case 0:
+                lbl_803FB380[1] = 1;
+                break;
+            case 1:
+                lbl_803FB380[1] = 2;
+                break;
+            case 2:
+                lbl_803FB380[1] = 5;
+                break;
+            }
+            if (input & 1) {
+                action = 1;
+            } else if (input & 2) {
+                action = 2;
+            }
+            if (action != 0 && *(u32*)(lbl_803FB380 + 0x10) != 0) {
+                result = (*(StatusChangeCallback*)(lbl_803FB380 + 0x10))(
+                    *(u32*)(lbl_803FB380 + 0x0C), action,
+                    *(s32*)(lbl_803FB380 + 0x14));
+                if (*(u32*)(lbl_803FB380 + 0x0C) != result) {
+                    if (result != 0) {
+                        fn_80103484(*(s32*)(menu + 4), 1);
+                        fn_80109C88(lbl_803FB338, result);
+                    }
+                    *(u32*)(lbl_803FB380 + 0x0C) = result;
+                    return;
+                }
+            }
+            return;
+
+        case 3:
+        case 4:
+        case 7:
+            selection = lbl_803FB380[2];
+            if (input & 1) {
+                selection--;
+            } else if (input & 2) {
+                selection++;
+            }
+            if ((s8)selection >= limit) {
+                selection = (s8)(limit - 1);
+            }
+            if ((s8)selection < 0) {
+                selection = 0;
+            }
+            pokemon = *(u32*)(lbl_803FB380 + 0x0C);
+            if ((u16)(s8)selection == 4) {
+                valid = *(u16*)(lbl_803FB380 + 0x18);
+            } else {
+                valid = fn_8012640C(pokemon, 0, 0x7F, (s8)selection);
+                if (fn_80123CD4(pokemon, (s8)selection) == 0) {
+                    valid = 0;
+                }
+            }
+            if (valid != 0 && (s8)selection != (s8)lbl_803FB380[2]) {
+                fn_80103484(*(s32*)(menu + 4), 1);
+                lbl_803FB380[2] = selection;
+                return;
+            }
+            break;
+
+        case 6:
+            row = (s8)lbl_803FB380[0x1A] / 9;
+            column = (s8)lbl_803FB380[0x1A] % 9;
+            if (input & 1) {
+                scan = row;
+            scan_up:
+                previous = scan > 0;
+                scan--;
+                if (previous) {
+                    inner = column;
+                    cell = lbl_803FB380 + scan + column * 4;
+                scan_up_row:
+                    if ((s8)cell[0x20] >= 0) {
+                        row = scan;
+                        column = inner;
+                        scan = -1;
+                    } else {
+                        previous = inner > 0;
+                        cell -= 4;
+                        inner--;
+                        if (previous) {
+                            goto scan_up_row;
+                        }
+                    }
+                    goto scan_up;
+                }
+            } else if (input & 2) {
+                scan = row;
+            scan_down:
+                scan++;
+                if (scan < 4) {
+                    inner = column;
+                    cell = lbl_803FB380 + scan + column * 4;
+                scan_down_row:
+                    if ((s8)cell[0x20] >= 0) {
+                        row = scan;
+                        column = inner;
+                        scan = 5;
+                    } else {
+                        previous = inner > 0;
+                        cell -= 4;
+                        inner--;
+                        if (previous) {
+                            goto scan_down_row;
+                        }
+                    }
+                    goto scan_down;
+                }
+            } else if (input & 8) {
+                previous = column;
+                column++;
+                if (column >= 9) {
+                    column = 8;
+                }
+                if ((s8)lbl_803FB380[0x20 + column * 4 + row] < 0) {
+                    column = previous;
+                }
+            } else if (input & 4) {
+                previous = column;
+                column--;
+                if (column < 0) {
+                    column = 0;
+                }
+                if ((s8)lbl_803FB380[0x20 + column * 4 + row] < 0) {
+                    column = previous;
+                }
+            }
+            selection = column + row * 9;
+            if ((s8)selection != (s8)lbl_803FB380[0x1A]) {
+                fn_80103484(*(s32*)(menu + 4), 1);
+                lbl_803FB380[0x1A] = selection;
+            }
+            break;
+
+        case 0:
+        case 8:
+            break;
+        }
+    }
+}
+#pragma pop
+
+
 /* 0x80097BBC | size: 0x114 */
 #pragma peephole off
 s32 fn_80097BBC(u8 chan) {
@@ -2889,6 +5425,120 @@ s32 fn_80097BBC(u8 chan) {
 #pragma peephole on
 #pragma peephole reset
 
+/* 0x8009769C | size: 0x350 */
+u32 fn_8009769C(u8 flags, u32 arg1, s32 pokemon, u16 arg3, u32 arg4, u32 arg5) {
+    extern void menuModelInit(void* model, s32 width, s32 height);
+    extern void fn_80109C88(void* model, u32 pokemon);
+    extern void fadeCheck(s32 wait);
+    extern void fadeSet(s32 mode, f32 value);
+    extern s32 menuOpenCustom(s32 menu, ...);
+    extern u32 pokemonGetStatus(u32 pokemon, u32 index, u32 status, s32 slot);
+    extern u8 pokemonWazaCheckValid(u32 pokemon, s32 slot);
+    extern s32 wazaGetStatus(u32 data, u16 index, u32 status, u32 arg3);
+    extern void winMsgOpen(s32 slot, s32 message, s32 arg2, s32 arg3);
+    extern void winMsgClose(s32 slot);
+    extern s32 menuIsCheck(s32 menu);
+    extern void menuCloseCustom(s32 menu, s32 mode, s32 wait);
+    extern void fn_800FF660(void);
+    extern void fn_8010A420(void* model);
+
+    u32 cursor;
+    s32 result;
+    u16 move;
+    u32 selectedPokemon;
+    u8 currentFlags;
+    u8* state;
+
+    menuModelInit(lbl_803FB338, 0xC8, 0xB4);
+    fn_80109C88(lbl_803FB338, pokemon);
+
+    if (lbl_803FB380[0] & 8) {
+        fadeCheck(1);
+        if (lbl_803FB380[0] & 0x80) {
+            fadeSet(2, lbl_8047C234);
+        } else {
+            fadeSet(2, lbl_8047C238);
+        }
+    }
+
+    cursor = 0;
+    state = lbl_803FB380;
+    for (;;) {
+        result = menuOpenCustom(0x53, 0, &cursor, 0, 1, 0);
+        if (result == -1) {
+            *(s32*)(state + 4) = result;
+            break;
+        }
+
+        pokemon = *(s8*)(state + 2);
+        *(u32*)(state + 4) = *(s8*)(state + 2);
+        if (!(state[0] & 0x40)) {
+            break;
+        }
+
+        selectedPokemon = *(u32*)(state + 0xC);
+        if ((u16)pokemon == 4) {
+            move = *(u16*)(state + 0x18);
+        } else {
+            move = (u16)pokemonGetStatus(selectedPokemon, 0, 0x7F, pokemon);
+            if ((u8)pokemonWazaCheckValid(selectedPokemon, pokemon) == 0) {
+                move = 0;
+            }
+        }
+
+        if (wazaGetStatus(0, move, 0x19, 0) == 0) {
+            break;
+        }
+        winMsgOpen(2, 0x2BE9, 1, 0);
+        winMsgClose(1);
+    }
+
+    if (lbl_803FB380[0] & 8) {
+        fadeCheck(1);
+        if (lbl_803FB380[0] & 0x80) {
+            fadeSet(3, lbl_8047C234);
+        } else {
+            fadeSet(3, lbl_8047C238);
+        }
+        fadeCheck(1);
+    }
+
+    currentFlags = lbl_803FB380[0];
+    if ((currentFlags & 1) && !(currentFlags & 8)) {
+        fadeCheck(1);
+        fadeSet(3, lbl_8047C238);
+        fadeCheck(1);
+    }
+
+    if ((u8)menuIsCheck(0x54) != 0) {
+        menuCloseCustom(0x54, 0, 0);
+    }
+    if ((u8)menuIsCheck(0x55) != 0) {
+        menuCloseCustom(0x55, 0, 0);
+    }
+    if ((u8)menuIsCheck(0x57) != 0) {
+        menuCloseCustom(0x57, 0, 0);
+    }
+    if ((u8)menuIsCheck(0x56) != 0) {
+        menuCloseCustom(0x56, 0, 0);
+    }
+    if ((u8)menuIsCheck(0x58) != 0) {
+        menuCloseCustom(0x58, 0, 0);
+    }
+    menuCloseCustom(0x53, 0, 1);
+
+    if (lbl_803FB380[0] & 1) {
+        fn_800FF660();
+        if (lbl_803FB380[0] & 8) {
+            floorSetFadeScript(0, 0);
+        }
+    }
+
+    fn_8010A420(lbl_803FB338);
+    _threadSwitch();
+    return *(u32*)(state + 4);
+}
+
 /* 0x800979EC | size: 0x4C */
 #pragma scheduling off
 #pragma scheduling off
@@ -2899,8 +5549,6 @@ s32 fn_80097BBC(u8 chan) {
 #pragma scheduling off
 #pragma scheduling off
 void menuPokemonStatus(void) {
-    extern u32 fn_8009769C(u8, u32, u32, u16, u32, u32);
-
     *(u32*)(lbl_803FB380 + 4) = fn_8009769C(
         lbl_803FB380[0],
         *(u32*)(lbl_803FB380 + 8),
@@ -2958,7 +5606,6 @@ s32 fn_80097A38(u32 arg0, u16 arg1) {
 /* 0x80097B04 | size: 0xB8 */
 s32 fn_80097B04(u32 arg0, u16 arg1) {
     extern int fn_8010B560();
-    extern u32 fn_8009769C(u8, u32, u32, u16, u32, u32);
 
     while ((u8)fn_8010B560() != 0) {
         _threadSwitch();
@@ -2979,7 +5626,6 @@ s32 fn_80097B04(u32 arg0, u16 arg1) {
 /* 0x80097CD0 | size: 0xC4 */
 s32 fn_80097CD0(u32 arg0, u32 arg1, u32 arg2) {
     extern int fn_8010B560();
-    extern u32 fn_8009769C(u8, u32, u32, u16, u32, u32);
 
     while ((u8)fn_8010B560() != 0) {
         _threadSwitch();
@@ -3000,7 +5646,6 @@ s32 fn_80097CD0(u32 arg0, u32 arg1, u32 arg2) {
 /* 0x80097D94 | size: 0xC4 */
 s32 fn_80097D94(u32 arg0, u32 arg1, u32 arg2) {
     extern int fn_8010B560();
-    extern u32 fn_8009769C(u8, u32, u32, u16, u32, u32);
 
     while ((u8)fn_8010B560() != 0) {
         _threadSwitch();
@@ -3021,7 +5666,6 @@ s32 fn_80097D94(u32 arg0, u32 arg1, u32 arg2) {
 /* 0x80097E58 | size: 0xB0 */
 s32 fn_80097E58(u32 arg0, u32 arg1, u32 arg2, u32 arg3) {
     extern int fn_8010B560();
-    extern u32 fn_8009769C(u8, u32, u32, u16, u32, u32);
 
     while ((u8)fn_8010B560() != 0) {
         _threadSwitch();
@@ -3042,7 +5686,6 @@ s32 fn_80097E58(u32 arg0, u32 arg1, u32 arg2, u32 arg3) {
 /* 0x80097F08 | size: 0xC4 */
 s32 fn_80097F08(u32 arg0, u32 arg1, u32 arg2) {
     extern int fn_8010B560();
-    extern u32 fn_8009769C(u8, u32, u32, u16, u32, u32);
 
     while ((u8)fn_8010B560() != 0) {
         _threadSwitch();

@@ -8,6 +8,16 @@
  */
 #include "dolphin/types.h"
 
+typedef struct MemcardDiskId {
+    u32 game_code;
+    u16 company_code;
+    u8 disk_number;
+    u8 game_version;
+    u8 streaming;
+    u8 streaming_buffer_size;
+    u8 padding[0x16];
+} MemcardDiskId;
+
 typedef struct MemcardTaskState {
     s32 task_kind;
     s32 error_code;
@@ -30,14 +40,43 @@ typedef struct MemcardTaskState {
     u8 initial_dialog_result;
     u8 format_requested;
     u8 serial_check_enabled;
-    u8 field_42[0xE];
+    u8 field_42[6];
+    u32 card_serial[2];
     void* work_buffer;
     void* card_work_area;
     s32 savedata_status;
     s32 card_work_size;
     s32 next_state_after_delay;
     void* gapp;
+    MemcardDiskId* disk_id;
+    MemcardDiskId mounted_disk_id;
+    struct {
+        s32 chan;
+        s32 file_no;
+        u32 offset;
+        u32 length;
+        u16 start_block;
+    } file_info;
 } MemcardTaskState;
+
+typedef struct MemcardFileStatus {
+    char file_name[0x20];
+    u32 length;
+    u32 time;
+    u32 game_code;
+    u16 company_code;
+    u8 banner_format;
+    u8 padding;
+    u32 icon_address;
+    u16 icon_format;
+    u16 icon_speed;
+    u32 comment_address;
+    u32 banner_offset;
+    u32 banner_tlut_offset;
+    u32 icon_offsets[8];
+    u32 icon_tlut_offset;
+    u32 data_offset;
+} MemcardFileStatus;
 
 extern u8 lbl_8047B3C8;
 extern u8 lbl_8047B3D0;
@@ -48,6 +87,9 @@ extern const u8 lbl_802758C8[];
 extern const u8 lbl_8036DCA8[];
 
 extern void* memcpy(void* dst, const void* src, u32 size);
+extern void* memset(void* dst, s32 value, u32 size);
+extern const u8 lbl_8047E160[];
+extern const u8 lbl_8047E164[];
 
 extern u32 fn_800F7BC4(s32 pad);
 extern s32 fn_800F7A7C(s32 pad, s32 axis);
@@ -103,9 +145,54 @@ extern void fn_800E2C04(s32 size, s32 align);
 extern void* fn_800E27B0(void);
 extern void winMsgClose(s32 id);
 extern void GSgappTerminate(void* app);
+extern void* GSgappCreate(s32 state, u8 priority, void* param, void* callback);
 extern u32 _fadeEffectGetRandom__FUl(u32 limit);
 extern s32 fn_801D0090(s32 error_code);
 extern void CARDInit(void);
+extern s32 CARDProbeEx();
+extern s32 CARDGetResultCode();
+extern s32 CARDMountAsync();
+extern s32 CARDCheckAsync();
+extern s32 CARDFormatAsync();
+extern s32 CARDDeleteAsync();
+extern s32 CARDCreateAsync();
+extern s32 CARDWriteAsync();
+extern s32 CARDSetStatusAsync();
+extern s32 CARDGetAttributes();
+extern s32 CARDGetSerialNo();
+extern s32 CARDFreeBlocks();
+extern s32 CARDCancel();
+extern s32 CARDClose();
+extern s32 CARDUnmount();
+extern s32 fn_800056C4();
+extern s32 fn_800056D4();
+extern s32 fn_800057A8();
+extern s32 fn_800057A0(void);
+extern s32 fn_80072A00();
+extern s32 fn_80089D74();
+extern s32 fn_8008ABA0();
+extern s32 fn_800B01C4();
+extern void* fn_800B01AC(s32 channel);
+extern s32 fn_800B4488();
+extern s32 fn_800B4C7C();
+extern s32 fn_800B5530();
+extern s32 fn_800B5BE4();
+extern s32 savedataGetStatus();
+extern s32 gamedatasaveGetStatus();
+extern void gamedatasaveSetStatus();
+extern char* strcpy(char*, const char*);
+extern s32 strcmp(const char*, const char*);
+extern const char lbl_802758E8[];
+extern const char lbl_802792E8[];
+extern u32 lbl_8047E168;
+extern u16 lbl_8047E170;
+extern u32 lbl_8047E174;
+extern void fn_801D0080(void);
+extern s32 fn_801CF320(void);
+extern s32 fn_801CF568(void);
+extern s32 fn_801CF7E4(void);
+extern s32 fn_801CF9C8(void);
+extern s32 fn_801CFD08(void);
 
 #pragma push
 #pragma scheduling off
@@ -508,6 +595,69 @@ s32 fn_801CBAB8(void)
 #pragma scheduling on
 #pragma pop
 
+typedef struct FieldSha1Context {
+    u32 state[5];
+    u32 count[2];
+    u8 buffer[64];
+} FieldSha1Context;
+
+void fn_801CC380(u32 state[5], const u8 input[64]);
+
+static inline void fieldSha1Update(FieldSha1Context* context,
+                                   const u8* input, u32 length)
+{
+    u32 index;
+    u32 part_length;
+    u32 i;
+
+    index = (context->count[0] >> 3) & 0x3F;
+    if ((context->count[0] += length << 3) < (length << 3)) {
+        context->count[1]++;
+    }
+    context->count[1] += length >> 29;
+    part_length = 64 - index;
+
+    if (length >= part_length) {
+        memcpy(&context->buffer[index], input, part_length);
+        fn_801CC380(context->state, context->buffer);
+        for (i = part_length; i + 63 < length; i += 64) {
+            fn_801CC380(context->state, &input[i]);
+        }
+        index = 0;
+    } else {
+        i = 0;
+    }
+    memcpy(&context->buffer[index], &input[i], length - i);
+}
+
+void fn_801CBF64(u8 digest[20], FieldSha1Context* context)
+{
+    u8 bits[8];
+    u32 i;
+
+    for (i = 0; i < 8; i++) {
+        bits[i] = context->count[(i >= 4) ? 0 : 1] >>
+                  ((3 - (i & 3)) * 8);
+    }
+
+    fieldSha1Update(context, lbl_8047E160, 1);
+    while ((context->count[0] & 0x1F8) != 0x1C0) {
+        fieldSha1Update(context, lbl_8047E164, 1);
+    }
+    fieldSha1Update(context, bits, 8);
+
+    for (i = 0; i < 20; i++) {
+        digest[i] = context->state[i >> 2] >> ((3 - (i & 3)) * 8);
+    }
+
+    memset(context->buffer, 0, sizeof(context->buffer));
+    memset(context->state, 0, sizeof(context->state));
+    memset(context->count, 0, sizeof(context->count));
+    memset(bits, 0, sizeof(bits));
+    fn_801CC380(context->state, context->buffer);
+}
+
+
 /* SHA-1's 16-word circular message schedule. */
 #define SHA1_ROTL(value, bits) \
     (((value) << (bits)) | ((value) >> (32 - (bits))))
@@ -648,6 +798,808 @@ void fn_801CC380(u32 state[5], const u8 input[64])
 #undef SHA1_BLK0
 #undef SHA1_ROTL
 
+/*
+ * Memory-card task controller.  Each asynchronous SDK operation advances to
+ * a polling state; completed operations are routed either to the next phase,
+ * the user-decision state (0x30), or the common error state (0x2B).
+ */
+void fn_801CDB04(void)
+{
+    MemcardTaskState* task;
+    u8* raw;
+    void* file_info;
+    s32 result;
+    s32 status;
+    u32 serial[2];
+    u8 attributes;
+
+    do {
+        task = lbl_8047B3D4;
+        raw = (u8*) task;
+        file_info = &raw[0x8C];
+
+        switch (task->state) {
+        case 0:
+            task->card_result = 0;
+            task->next_state_after_delay = 0x32;
+            task->format_requested = 0;
+            task->initial_dialog_result = (u8) fn_800056D4();
+            task->callback_finished = 0;
+            fn_800056C4(task->initial_dialog_result);
+            if (task->task_kind >= 1 && task->task_kind <= 2) {
+                task->serial_check_enabled = 0;
+            } else if ((task->task_kind == 3 || task->task_kind == 4) &&
+                       gamedatasaveGetStatus(0, 4) == 0)
+            {
+                task->task_kind = 9;
+            }
+            task->retry_count = 0;
+            task->state = 1;
+            break;
+
+        case 1:
+            result = CARDProbeEx(task->card_channel, &task->sector_size,
+                                 &task->memory_size);
+            if (result == 0) {
+                task->card_result = CARDGetResultCode(task->card_channel);
+                task->state = 2;
+            } else if (result == -1) {
+                task->card_result = result;
+                task->state = 1;
+            } else if (task->retry_count++ < 6) {
+                task->card_result = -1;
+                task->state = 1;
+            } else {
+                task->error_code = result;
+                task->state = 0x2B;
+            }
+            break;
+
+        case 2:
+            result = CARDMountAsync(task->card_channel, task->card_work_area,
+                                    fn_801D0080, 0);
+            task->card_result = result == 0
+                                    ? CARDGetResultCode(task->card_channel)
+                                    : result;
+            task->state = 3;
+            break;
+
+        case 3:
+            result = task->card_result;
+            if (result == -1) {
+                result = CARDGetResultCode(task->card_channel);
+                task->card_result = result;
+            }
+            if (result == -1) {
+                task->state = 3;
+            } else if (result == 0 || result == -6 || result == -13) {
+                task->state = 4;
+            } else {
+                task->error_code = result;
+                task->state = 0x2B;
+            }
+            break;
+
+        case 4:
+            result = CARDCheckAsync(task->card_channel, NULL);
+            task->card_result = result == 0
+                                    ? CARDGetResultCode(task->card_channel)
+                                    : result;
+            task->state = 5;
+            break;
+
+        case 5:
+            result = task->card_result;
+            if (result == -1) {
+                result = CARDGetResultCode(task->card_channel);
+                task->card_result = result;
+            }
+            if (task->memory_size != 0x2000) {
+                result = -6;
+            }
+            if (result == -1) {
+                task->state = 5;
+            } else if (result == 0) {
+                if (task->serial_check_enabled && task->task_kind != 3 &&
+                    task->task_kind != 9 && task->task_kind != 11)
+                {
+                    CARDGetSerialNo(task->card_channel, serial);
+                    if (serial[0] != task->card_serial[0] ||
+                        serial[1] != task->card_serial[1])
+                    {
+                        task->error_code = 0x10;
+                        task->state = 0x2B;
+                        break;
+                    }
+                }
+                task->state = 9;
+            } else if ((result == -6 || result == -13) &&
+                       (task->task_kind == 1 || task->task_kind == 9))
+            {
+                task->error_code = 7;
+                task->resume_state = 6;
+                task->state = 0x30;
+            } else {
+                task->error_code = result;
+                task->state = 0x2B;
+            }
+            break;
+
+        case 6:
+            if ((u8) task->error_code != 0) {
+                CARDFormatAsync(task->card_channel, NULL);
+                if (task->callback_finished != 0) {
+                    task->error_code = 0;
+                    task->state = 0x2B;
+                } else {
+                    task->next_state_after_delay = 7;
+                    task->error_code = 4;
+                    task->resume_state = 7;
+                    task->state = 0x30;
+                }
+            } else {
+                task->error_code = 0;
+                task->state = 0x2B;
+            }
+            break;
+
+        case 7:
+            fn_800056D4();
+            result = CARDFormatAsync(task->card_channel, NULL);
+            if (task->callback_finished != 0) {
+                task->error_code = result;
+                task->state = 0x2B;
+            } else {
+                task->card_result = result == 0
+                                        ? CARDGetResultCode(task->card_channel)
+                                        : result;
+                task->state = 8;
+            }
+            break;
+
+        case 8:
+            result = task->card_result;
+            if (result == -1) {
+                result = CARDGetResultCode(task->card_channel);
+                task->card_result = result;
+            }
+            if (result == -1) {
+                task->state = 8;
+            } else if (result == 0) {
+                fn_800056C4(task->initial_dialog_result);
+                task->next_state_after_delay = 0x32;
+                task->error_code = 9;
+                task->resume_state = 9;
+                task->state = 0x30;
+            } else {
+                task->error_code = result;
+                task->state = 0x2B;
+            }
+            break;
+
+        case 9:
+            task->state = fn_801CFD08();
+            break;
+
+        case 10:
+            if (task->error_code == 0) {
+                task->error_code = 0;
+                task->state = 0x2B;
+            } else {
+                task->error_code = 3;
+                task->next_state_after_delay = 13;
+                task->resume_state = 11;
+                task->state = 0x30;
+            }
+            break;
+
+        case 11:
+            fn_800056D4();
+            result = CARDDeleteAsync(task->card_channel,
+                                     &lbl_802758E8[0x3A00], NULL);
+            task->card_result = result == 0
+                                    ? CARDGetResultCode(task->card_channel)
+                                    : result;
+            task->state = 12;
+            break;
+
+        case 12:
+            result = task->card_result;
+            if (result == -1) {
+                result = CARDGetResultCode(task->card_channel);
+                task->card_result = result;
+            }
+            if (result == -1) {
+                task->state = 12;
+            } else if (result == 0 || result == -4) {
+                task->state = 13;
+            } else {
+                task->error_code = result;
+                task->state = 0x2B;
+            }
+            break;
+
+        case 13:
+            result = CARDCreateAsync(task->card_channel,
+                                     &lbl_802758E8[0x3A00],
+                                     task->card_work_size, file_info, NULL);
+            task->card_result = result == 0
+                                    ? CARDGetResultCode(task->card_channel)
+                                    : result;
+            task->state = 14;
+            break;
+
+        case 14:
+            result = task->card_result;
+            if (result == -1) {
+                result = CARDGetResultCode(task->card_channel);
+                task->card_result = result;
+            }
+            if (result == -1) {
+                task->state = 14;
+            } else if (result == 0) {
+                raw[0x3E] = 1;
+                task->state = 15;
+            } else {
+                task->error_code = result;
+                task->state = 0x2B;
+            }
+            break;
+
+        case 15:
+            attributes = 0;
+            result = CARDGetAttributes(task->card_channel, raw[0x8C],
+                                       &attributes);
+            if (result == 0) {
+                result = fn_800B5BE4(task->card_channel, raw[0x8C],
+                                     attributes & ~1, fn_801D0080);
+            }
+            task->card_result = result == 0
+                                    ? CARDGetResultCode(task->card_channel)
+                                    : result;
+            task->state = 16;
+            break;
+
+        case 16:
+            result = task->card_result;
+            if (result == -1) {
+                result = CARDGetResultCode(task->card_channel);
+                task->card_result = result;
+            }
+            if (result == -1) {
+                task->state = 16;
+            } else if (result == 0) {
+                task->state = 17;
+            } else {
+                task->error_code = result;
+                task->state = 0x2B;
+            }
+            break;
+
+        case 17:
+            memset(task->work_buffer, 0, task->card_work_size);
+            strcpy((char*) task->work_buffer, &lbl_802758E8[0x3A00]);
+            strcpy((char*) task->work_buffer + 0x20,
+                   &lbl_802758E8[0x3A20]);
+            memcpy((u8*) task->work_buffer + 0x40, &lbl_802758E8[0x3A40],
+                   0x20);
+            memcpy((u8*) task->work_buffer + 0x60, &lbl_802758E8[0x3A60],
+                   0x20);
+            task->state = 18;
+            break;
+
+        case 18:
+            result = CARDWriteAsync(file_info, task->work_buffer, 0x2000, 0,
+                                    NULL);
+            task->card_result = result == 0
+                                    ? CARDGetResultCode(task->card_channel)
+                                    : result;
+            task->state = 19;
+            break;
+
+        case 19:
+            result = task->card_result;
+            if (result == -1) {
+                result = CARDGetResultCode(task->card_channel);
+                task->card_result = result;
+            }
+            if (result == -1) {
+                task->state = 19;
+            } else if (result == 0) {
+                task->state = 20;
+            } else {
+                task->error_code = result;
+                task->state = 0x2B;
+            }
+            break;
+
+        case 20:
+            memset((u8*) task->work_buffer + 0x2000, 0, 0x2000);
+            raw[0x80] = 1;
+            *(u32*) &raw[0x8C] = 0;
+            task->state = 21;
+            break;
+
+        case 21:
+            result = CARDWriteAsync(file_info,
+                                    (u8*) task->work_buffer + 0x2000,
+                                    0x2000, 0x2000, NULL);
+            task->card_result = result == 0
+                                    ? CARDGetResultCode(task->card_channel)
+                                    : result;
+            task->state = 22;
+            break;
+
+        case 22:
+            result = task->card_result;
+            if (result == -1) {
+                result = CARDGetResultCode(task->card_channel);
+                task->card_result = result;
+            }
+            if (result == -1) {
+                task->state = 22;
+            } else if (result == 0) {
+                task->state = 23;
+            } else {
+                task->error_code = result;
+                task->state = 0x2B;
+            }
+            break;
+
+        case 23:
+            fn_800B5530(task->card_channel, raw[0x8C], &raw[0xA8]);
+            result = CARDSetStatusAsync(task->card_channel, raw[0x8C],
+                                        &raw[0xA8], NULL);
+            task->card_result = result == 0
+                                    ? CARDGetResultCode(task->card_channel)
+                                    : result;
+            task->state = 24;
+            break;
+
+        case 24:
+            result = task->card_result;
+            if (result == -1) {
+                result = CARDGetResultCode(task->card_channel);
+                task->card_result = result;
+            }
+            if (result == -1) {
+                task->state = 24;
+            } else if (result == 0) {
+                savedataGetStatus(0, 1);
+                task->error_code = 0;
+                task->task_result = 1;
+                task->state = 25;
+            } else {
+                task->error_code = result;
+                task->state = 0x2B;
+            }
+            break;
+
+        case 25:
+            task->state = 26;
+            break;
+
+        case 26:
+            result = fn_800B4C7C(file_info, task->work_buffer, 0x2000, 0,
+                                 NULL);
+            task->card_result = result == 0
+                                    ? CARDGetResultCode(task->card_channel)
+                                    : result;
+            task->state = 27;
+            break;
+
+        case 27:
+            result = task->card_result;
+            if (result == -1) {
+                result = CARDGetResultCode(task->card_channel);
+                task->card_result = result;
+            }
+            if (result == -1) {
+                task->state = 27;
+            } else if (result == 0) {
+                task->format_requested = 0;
+                task->state = 28;
+            } else {
+                task->error_code = result;
+                task->state = 0x2B;
+            }
+            break;
+
+        case 28:
+            if (task->error_code != 0) {
+                task->error_code = 5;
+                task->resume_state = 29;
+                task->state = 0x30;
+            } else {
+                task->error_code = 0;
+                task->state = 0x2B;
+            }
+            break;
+
+        case 29:
+            result = task->card_result;
+            if (result == -1) {
+                result = CARDGetResultCode(task->card_channel);
+                task->card_result = result;
+            }
+            if (result == -1) {
+                task->state = 29;
+            } else if (result == 0) {
+                task->state = 30;
+            } else {
+                task->error_code = result;
+                task->state = 0x2B;
+            }
+            break;
+
+        case 30:
+            result = fn_800B4C7C(file_info,
+                                 (u8*) task->work_buffer + 0x2000,
+                                 0x2000, 0x2000, NULL);
+            task->card_result = result == 0
+                                    ? CARDGetResultCode(task->card_channel)
+                                    : result;
+            task->state = 31;
+            break;
+
+        case 31:
+            task->state = fn_801CF9C8();
+            break;
+        case 32:
+            task->state = 33;
+            break;
+        case 33:
+            result = fn_800B4C7C(file_info, task->work_buffer, 0x2000, 0,
+                                 NULL);
+            task->card_result = result == 0
+                                    ? CARDGetResultCode(task->card_channel)
+                                    : result;
+            task->state = 34;
+            break;
+        case 34:
+            result = task->card_result;
+            if (result == -1) {
+                result = CARDGetResultCode(task->card_channel);
+                task->card_result = result;
+            }
+            if (result == -1) {
+                task->state = 34;
+            } else if (result == 0) {
+                task->state = 35;
+            } else {
+                task->error_code = result;
+                task->state = 0x2B;
+            }
+            break;
+        case 35:
+            task->state = fn_801CF7E4();
+            break;
+        case 36:
+            task->state = fn_801CF568();
+            break;
+        case 37:
+            task->state = fn_801CF320();
+            break;
+
+        case 38:
+            fn_800056D4();
+            result = CARDWriteAsync(file_info, task->work_buffer, 0x2000,
+                                    task->field_20 * 0x1E000 + 0x6000, NULL);
+            task->card_result = result == 0
+                                    ? CARDGetResultCode(task->card_channel)
+                                    : result;
+            task->field_38[0] /= 14;
+            task->state = 39;
+            break;
+
+        case 39:
+            result = task->card_result;
+            if (result == -1) {
+                result = CARDGetResultCode(task->card_channel);
+                task->card_result = result;
+            }
+            if (result == -1) {
+                task->state = 39;
+            } else if (result == 0) {
+                status = gamedatasaveGetStatus(savedataGetStatus(0, 1), 4);
+                gamedatasaveSetStatus(savedataGetStatus(0, 1), 4,
+                                      status + 1);
+                task->error_code = 0;
+                task->task_result = 4;
+                task->state = task->format_requested ? 17 : 44;
+            } else {
+                task->error_code = result;
+                task->state = 0x2B;
+            }
+            break;
+
+        case 40:
+            if (task->random_delay-- != 0) {
+                task->card_result = -1;
+                task->state = 40;
+            } else {
+                task->card_result = 0;
+                task->state = 41;
+            }
+            break;
+
+        case 41:
+            if (fn_8008ABA0(2) == 0) {
+                task->state = 0x2B;
+                break;
+            }
+            result = CARDWriteAsync(file_info,
+                                    (u8*) task->work_buffer + 0x1C000,
+                                    0x2000,
+                                    task->field_20 * 0x1E000 + 0x1C000,
+                                    NULL);
+            task->card_result = result == 0
+                                    ? CARDGetResultCode(task->card_channel)
+                                    : result;
+            task->field_38[0] /= 14;
+            task->field_3d = 0;
+            task->state = 42;
+            break;
+
+        case 42:
+            result = task->card_result;
+            if (result == -1) {
+                result = CARDGetResultCode(task->card_channel);
+                task->card_result = result;
+                task->field_38[0]--;
+                if (task->field_3d == 0) {
+                    if (fn_8008ABA0(2) == 0 ||
+                        (task->field_38[0] < 3 && fn_80089D74(2) != 0))
+                    {
+                        CARDCancel(file_info);
+                        task->state = 0x2B;
+                        break;
+                    }
+                    task->field_3d = 1;
+                }
+                task->state = 42;
+            } else if (result == 0) {
+                if (task->field_3d == 0) {
+                    fn_80089D74(2);
+                }
+                status = gamedatasaveGetStatus(savedataGetStatus(0, 1), 4);
+                gamedatasaveSetStatus(savedataGetStatus(0, 1), 4,
+                                      status + 1);
+                task->error_code = 0;
+                task->task_result = 4;
+                task->state = task->format_requested ? 17 : 44;
+            } else {
+                fn_80072A00(1);
+                task->error_code = result;
+                task->state = 0x2B;
+            }
+            break;
+
+        case 43:
+            task->task_result = -1;
+            task->state = 44;
+            break;
+
+        case 44:
+            if (raw[0x3E] != 0) {
+                if (fn_800057A8() == 4) {
+                    fn_800B01C4(task->card_channel, *(u32*) &raw[0x68]);
+                }
+                CARDGetSerialNo(task->card_channel, serial);
+                CARDClose(file_info);
+                raw[0x3E] = 0;
+            }
+            CARDUnmount(task->card_channel);
+            fn_800056C4(task->initial_dialog_result);
+            if (task->callback_finished != 0) {
+                task->state = 0;
+            } else if (task->task_kind == 3 || task->task_kind == 8) {
+                task->state = 0x32;
+            } else {
+                if (task->task_result >= 1 && task->task_result <= 4) {
+                    task->card_serial[0] = serial[0];
+                    task->card_serial[1] = serial[1];
+                    task->serial_check_enabled = 1;
+                }
+                task->resume_state = 45;
+                task->state = 0x30;
+            }
+            break;
+
+        case 45:
+            switch (task->task_kind) {
+            case 0:
+                if (task->task_result != 4) {
+                    task->error_code = 0xF;
+                    task->resume_state = 0x32;
+                    task->state = 0x30;
+                } else {
+                    task->state = 0x32;
+                }
+                break;
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+            case 10:
+            case 11:
+            case 12:
+            case 13:
+                if (task->task_result == -1) {
+                    if (task->next_state_after_delay == 7) {
+                        task->error_code = 13;
+                    } else if (task->next_state_after_delay == 13) {
+                        task->error_code = 14;
+                    }
+                    task->resume_state = 46;
+                    task->state = 0x30;
+                } else {
+                    task->state = 0x32;
+                }
+                break;
+            default:
+                task->state = 0x32;
+                break;
+            }
+            break;
+
+        case 46:
+            task->error_code = 8;
+            task->resume_state = 47;
+            task->state = 0x30;
+            break;
+        case 47:
+            if ((u8) task->error_code != 0) {
+                task->task_result = 5;
+            }
+            task->state = 0x32;
+            break;
+        case 48:
+        case 49:
+        case 50:
+        default:
+            break;
+        }
+    } while (lbl_8047B3D4->card_result != -1);
+}
+
+s32 fn_801CFD08(void)
+{
+    s32 free_bytes;
+    s32 free_file_count;
+    MemcardFileStatus opened_status;
+    MemcardFileStatus status;
+    s32 file_no;
+    s32 result;
+    s32 channel;
+    void* file_info;
+    s32 error;
+    u8 valid;
+
+    CARDFreeBlocks(lbl_8047B3D4->card_channel, &free_bytes,
+                   &free_file_count);
+
+    channel = lbl_8047B3D4->card_channel;
+    file_info = &lbl_8047B3D4->file_info;
+    for (file_no = 0; file_no < 0x7F; file_no++) {
+        result = fn_800B4488(channel, file_no, file_info);
+        if (result == 0) {
+            result = fn_800B5530(channel, file_no, &status);
+            if (result != 0) {
+                goto invalid_file;
+            }
+            switch (fn_800057A0()) {
+                case 0:
+                    if (strcmp(status.file_name, lbl_802792E8) != 0 ||
+                        status.game_code != lbl_8047E168 ||
+                        status.company_code != lbl_8047E170)
+                    {
+                        goto invalid_file;
+                    }
+                    valid = 1;
+                    goto file_checked;
+                case 1:
+                    if (strcmp(status.file_name, lbl_802792E8) != 0 ||
+                        status.game_code != lbl_8047E174 ||
+                        status.company_code != lbl_8047E170)
+                    {
+                        goto invalid_file;
+                    }
+                    valid = 1;
+                    goto file_checked;
+                case 2:
+                    if (strcmp(status.file_name, lbl_802792E8) != 0 ||
+                        status.game_code != lbl_8047E174 ||
+                        status.company_code != lbl_8047E170)
+                    {
+                        goto invalid_file;
+                    }
+                    valid = 1;
+                    goto file_checked;
+                default:
+                invalid_file:
+                    valid = 0;
+                    break;
+            }
+            file_checked:
+            if (valid != 0) {
+                result = 0;
+                goto scan_done;
+            }
+        }
+    }
+
+    if (result == 0) {
+        result = -4;
+    }
+
+scan_done:
+    error = result;
+    switch (error) {
+    case 0:
+        lbl_8047B3D4->dialog_result = 1;
+        if (fn_800057A8() == 4) {
+            lbl_8047B3D4->disk_id = fn_800B01AC(lbl_8047B3D4->card_channel);
+            lbl_8047B3D4->mounted_disk_id = *lbl_8047B3D4->disk_id;
+            lbl_8047B3D4->mounted_disk_id.game_code = lbl_8047E168;
+            lbl_8047B3D4->mounted_disk_id.company_code = lbl_8047E170;
+            fn_800B01C4(lbl_8047B3D4->card_channel,
+                       &lbl_8047B3D4->mounted_disk_id);
+        }
+
+        error = fn_800B5530(lbl_8047B3D4->card_channel,
+                           lbl_8047B3D4->file_info.file_no,
+                           &opened_status);
+        if (error != 0) {
+            break;
+        }
+        if (opened_status.comment_address != 0xFFFFFFFF) {
+            if (lbl_8047B3D4->task_kind == 12) {
+                lbl_8047B3D4->error_code = 2;
+                lbl_8047B3D4->resume_state = 11;
+                return 0x30;
+            }
+            if (((volatile MemcardTaskState*)lbl_8047B3D4)->task_kind == 3) {
+                return 0x1C;
+            }
+            return 0x19;
+        }
+        free_bytes += 0x60000;
+        free_file_count++;
+        error = -4;
+        /* fallthrough */
+    case -4:
+        switch (lbl_8047B3D4->task_kind) {
+        case 1:
+            if (free_bytes < 0x60000) {
+                error = -9;
+                break;
+            }
+            if (free_file_count < 1) {
+                error = -8;
+                break;
+            }
+            lbl_8047B3D4->error_code = 6;
+            lbl_8047B3D4->resume_state = 10;
+            return 0x30;
+        case 9:
+            lbl_8047B3D4->error_code = 2;
+            lbl_8047B3D4->resume_state = 11;
+            return 0x30;
+        }
+        break;
+    }
+
+    lbl_8047B3D4->error_code = error;
+    return 0x2B;
+}
+
+
 void fn_801D0080(void)
 {
     lbl_8047B3D4->callback_finished = 1;
@@ -718,6 +1670,51 @@ s32 memcardGetTaskResult(void)
         return 0;
     }
     return lbl_8047B3D4->task_result;
+}
+
+static inline void memcardStartTask(s32 task_kind, s32 card_work_size,
+                                    s32 card_channel)
+{
+    if (lbl_8047B3D4->task_kind != 0) {
+        do {
+            _threadSwitch();
+        } while (memcardGetTaskResult() == 0);
+        fn_801D039C();
+    }
+
+    if (card_work_size == 0) {
+        card_work_size = 2;
+    }
+
+    lbl_8047B3D4->task_kind = task_kind;
+    lbl_8047B3D4->card_channel = card_channel;
+    lbl_8047B3D4->card_work_size = card_work_size;
+    lbl_8047B3D4->task_result = 0;
+    lbl_8047B3D4->state = 0;
+    lbl_8047B3D4->error_code = 0;
+    lbl_8047B3D4->dialog_result = 0;
+
+    fn_800E2C04(0x1E600, 0x20);
+    lbl_8047B3D4->work_buffer = fn_800E27B0();
+    fn_800E2C04(0xA000, 0x20);
+    lbl_8047B3D4->card_work_area = fn_800E27B0();
+    lbl_8047B3D4->gapp = GSgappCreate(1, 0x17, NULL, fn_801CDB04);
+    lbl_8047B3D4->savedata_status = savedataGetStatus(0, 0);
+}
+
+s32 fn_801D0748(s32 task_kind, s32 card_work_size, s32 card_channel)
+{
+    s32 result;
+
+    memcardStartTask(task_kind, card_work_size, card_channel);
+
+    do {
+        _threadSwitch();
+        result = memcardGetTaskResult();
+    } while (result == 0);
+
+    fn_801D039C();
+    return result;
 }
 
 void fn_801D0A30(void)

@@ -1,6 +1,4 @@
-#define DVDGetCurrentDir DVDGetCurrentDir_bad_decl
 #include "dolphin/dvd/dvd.h"
-#undef DVDGetCurrentDir
 #include "dolphin/os/OSThread.h"
 
 /* SDA-relative global used by the callback wait path in this unit */

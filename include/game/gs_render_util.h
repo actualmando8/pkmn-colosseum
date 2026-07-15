@@ -89,4 +89,12 @@ typedef struct GSRenderState {
     /* 0x5C */ u8 frameLevel;
 } GSRenderState;
 
+void GScameraGetDistanceVector(GSRenderCamera* camera, GSRenderVec3* dest);
+void GScameraGetPerspective(GSRenderCamera* camera, f32* fov, f32* aspect,
+                            f32* near, f32* far);
+void GScameraSetPerspective(GSRenderCamera* camera, f32 fov, f32 aspect,
+                            f32 near, f32 far);
+void GScameraGetLookAt(GSRenderCamera* camera, void* up, void* interest);
+void GScameraGetPosition(GSRenderCamera* camera, void* position);
+
 #endif /* GAME_GS_RENDER_UTIL_H */

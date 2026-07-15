@@ -14,34 +14,11 @@ typedef struct {
     void* tail;
 } OSThreadQueue;
 
-typedef struct fn_8009F77C_Worker fn_8009F77C_Worker;
-typedef struct fn_8009F7B4_Thread fn_8009F7B4_Thread;
-
 typedef struct {
-    fn_8009F77C_Worker* head;
-    fn_8009F77C_Worker* tail;
-} fn_8009F7B4_MutexQueue;
-
-typedef struct {
-    fn_8009F77C_Worker* next;
-    fn_8009F77C_Worker* prev;
-} fn_8009F7B4_MutexLink;
-
-struct fn_8009F77C_Worker {
     OSThreadQueue queue;
-    fn_8009F7B4_Thread* unk_08;
-    s32 unk_0C;
-    fn_8009F7B4_MutexLink link;
-};
-
-struct fn_8009F7B4_Thread {
-    u8 unk_000[0x2D0];
-    s32 priority;
-    s32 base;
-    u8 unk_2D8[0x18];
-    fn_8009F77C_Worker* mutex;
-    fn_8009F7B4_MutexQueue queueMutex;
-};
+    void* unk_08;
+    void* unk_0C;
+} fn_8009F77C_Worker;
 
 extern void OSInitThreadQueue(OSThreadQueue* queue);
 extern void OSWakeupThread(void* queue);

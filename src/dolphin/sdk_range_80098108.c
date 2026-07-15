@@ -66,6 +66,13 @@ extern DVDDriveInfo DriveInfo_803FB4A0;
 static volatile EXIRegBlock* const ExiHw = (volatile EXIRegBlock*)0xCC006800;
 static volatile OSLowMem* const LowMem = (volatile OSLowMem*)0x80000000;
 
+#ifdef __MWERKS__
+#define AT_ADDRESS(addr) : addr
+volatile u32 __EXIRegs[0x40] AT_ADDRESS(0xCC006800);
+#else
+#define __EXIRegs ((volatile u32*)0xCC006800)
+#endif
+
 BOOL fn_80099400(s32 chan, u32 dev, u32* id);
 BOOL fn_80098790(s32 chan);
 void fn_80098110(s32 chan, EXIControl* exi);
@@ -239,17 +246,58 @@ BOOL fn_80098AE8(s32 chan) {
 #pragma optimization_level 0
 #pragma optimize_for_size on
 #pragma scheduling off
+BOOL EXIDeselect(s32 chan) {
+    EXIControl* exi = &lbl_803FB3C8[chan];
+    u32 csr;
+    BOOL enabled;
+
+    enabled = OSDisableInterrupts();
+    if (!(exi->state & 4)) {
+        OSRestoreInterrupts(enabled);
+        return FALSE;
+    }
+
+    exi->state &= ~4;
+    csr = __EXIRegs[chan * 5];
+    __EXIRegs[chan * 5] = csr & 0x405;
+
+    if (exi->state & 8) {
+        switch (chan) {
+        case 0:
+            __OSUnmaskInterrupts(0x100000);
+            break;
+        case 1:
+            __OSUnmaskInterrupts(0x20000);
+            break;
+        }
+    }
+
+    OSRestoreInterrupts(enabled);
+
+    if (chan != 2 && (csr & 0x80)) {
+        return fn_80098790(chan) ? TRUE : FALSE;
+    }
+
+    return TRUE;
+}
+#pragma scheduling reset
+#pragma pop
+
+#pragma push
+#pragma optimization_level 0
+#pragma optimize_for_size on
+#pragma scheduling off
 void fn_80098DDC(volatile s16 interrupt, OSContext* context) {
     OSContext exceptionContext;
     s32 chan = (interrupt - 9) / 3;
     EXIControl* exi = &lbl_803FB3C8[chan];
-    u32 csr = ((volatile u32*)0xCC006800)[chan * 5];
+    u32 csr = __EXIRegs[chan * 5];
     volatile u32 oldCsr = csr;
     EXICallback callback;
 
     csr &= 0x7F5;
     csr |= 2;
-    ((volatile u32*)0xCC006800)[chan * 5] = csr;
+    __EXIRegs[chan * 5] = csr;
     callback = exi->exiCallback;
     if (callback) {
         OSClearContext(&exceptionContext);
@@ -273,7 +321,7 @@ void fn_80098FF8(volatile s16 interrupt, OSContext* context) {
     EXICallback callback;
 
     __OSMaskInterrupts(0x700000u >> (chan * 3));
-    ((volatile u32*)0xCC006800)[chan * 5] = 0;
+    __EXIRegs[chan * 5] = 0;
     exi = &lbl_803FB3C8[chan];
     callback = exi->extCallback;
     exi->state &= ~8;

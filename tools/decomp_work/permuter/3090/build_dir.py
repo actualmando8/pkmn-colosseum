@@ -15,7 +15,8 @@ Pipeline is a port of the previously-proven archive build_dir.sh:
 
 Exit codes: 0 ok, 2 preprocess failed, 3 fn missing from compiled base,
             4 fn missing from target.o, 5 smoke compile failed,
-            6 fidelity check failed (isolated compile != Mac full-TU compile).
+            6 fidelity check failed (isolated compile != Mac full-TU compile),
+            7 permuter AST round-trip failed or its baseline already scores 0.
 
 Fidelity gate: the isolated base.c compile must produce the SAME instructions
 for <fn> as the Mac's real full-TU build object (build/GC6E01/src/...o, synced
@@ -201,10 +202,33 @@ perm_refer_to_var = 15
             last_err = (f"fidelity FAIL (strip={strip}): isolated compile of {fn} "
                         f"differs from Mac full-TU object")
             continue
+        try:
+            probe = run(
+                ["python3", os.path.join(PERM, "permuter.py"), outdir,
+                 "--debug", "--stack-diffs"],
+                cwd=outdir,
+                timeout=60,
+            )
+        except subprocess.TimeoutExpired:
+            last_err = f"permuter preflight timed out (strip={strip})"
+            continue
+        probe_text = probe.stdout + "\n" + probe.stderr
+        score = re.search(r"base score = (\d+)", probe_text)
+        if probe.returncode != 0 or score is None:
+            last_err = (f"permuter preflight failed (strip={strip}):\n"
+                        f"{probe_text[-2000:]}")
+            continue
+        if int(score.group(1)) == 0:
+            last_err = (f"permuter preflight score is already 0 (strip={strip}); "
+                        "no mismatch is visible to the farm scorer")
+            continue
         os.remove(base_o)
-        print(f"built {outdir} (strip={strip}, fidelity={'ok' if mac_norm else 'unchecked'})")
+        print(f"built {outdir} (strip={strip}, fidelity="
+              f"{'ok' if mac_norm else 'unchecked'}, base_score={score.group(1)})")
         return
     sys.stderr.write(last_err + "\n")
+    if "permuter preflight" in last_err:
+        sys.exit(7)
     sys.exit(6 if "fidelity" in last_err else 5)
 
 

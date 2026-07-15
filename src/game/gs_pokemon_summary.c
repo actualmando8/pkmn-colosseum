@@ -614,10 +614,12 @@ s32 fn_800159BC(s32 x, s32 pageIndex, u16* packedRange) {
     u16 itemCount;
     u16 totalCount;
     u8* entry;
+    s32* dataSourcePtr;
     void* list;
     void* field;
     s32 dataSource;
     s32 validCount;
+    s32 validItemIndex;
     s32 listIndex;
     s32 visibleIndex;
     s32 itemIndex;
@@ -629,10 +631,15 @@ s32 fn_800159BC(s32 x, s32 pageIndex, u16* packedRange) {
     u32 species;
     u32 speciesData;
     u32 rank;
+    u32 displayRank;
     u32 subRank;
+    u8 subDisplayRank;
     u32 messageId;
     u32 value;
 
+    displayLine = 0;
+    visibleLimit = 8;
+    scrollPixels = 0;
     entry = SUMMARY_ENTRY_RAW(pageIndex);
     dataSource = SUMMARY_ENTRY_FIELD(entry);
     if (dataSource >= 0) {
@@ -651,9 +658,6 @@ s32 fn_800159BC(s32 x, s32 pageIndex, u16* packedRange) {
     }
 
     itemIndex = (s32)(s8)((u8*)packedRange)[0];
-    displayLine = 0;
-    visibleLimit = 8;
-    scrollPixels = 0;
     if (SUMMARY_F32(lbl_8047B748) != SUMMARY_F32(lbl_8047A2D0) && (s32)lbl_8047A2C8 != 0) {
         if (SUMMARY_F32(lbl_8047A2D0) < SUMMARY_F32(lbl_8047B748)) {
             itemIndex--;
@@ -664,46 +668,52 @@ s32 fn_800159BC(s32 x, s32 pageIndex, u16* packedRange) {
         scrollPixels = (s32)SUMMARY_F32(lbl_8047A2D0);
     }
 
+    dataSourcePtr = (s32*)(SUMMARY_ENTRY_RAW(pageIndex) + 4);
     visibleIndex = displayLine;
     while (visibleIndex < visibleLimit && itemIndex < validCount) {
         if (itemIndex >= 0) {
             y = displayLine * 0x1F - scrollPixels;
-            dataSource = SUMMARY_ENTRY_FIELD(entry);
+            dataSource = *dataSourcePtr;
             if (dataSource >= 0) {
                 field = heroItemGetItemKindToItemAryPtr((void*)lbl_8047A2F8, (u8)dataSource, &itemCount, 0, 0, 0);
             } else {
                 field = heroHizukiItemGetItemAryPtr((void*)lbl_8047A2F8, &itemCount, 0, 0, 0);
             }
             species = 0;
-            listIndex = -1;
-            while (++listIndex < itemCount) {
+            listIndex = 0;
+            validItemIndex = -1;
+            while (listIndex < itemCount) {
                 if (fn_801429E8(field) != 0) {
-                    if (--itemIndex < 0) {
+                    validItemIndex++;
+                    if (validItemIndex >= itemIndex) {
                         species = itemBiosGetItemDataId(field);
                         break;
                     }
                 }
                 field = (u8*)field + 4;
+                listIndex++;
             }
 
             speciesData = itemDataBiosGetPtr((u16)species);
             rank = (u8)itemDataBiosGetWazaMachineNo();
-            subRank = (u8)itemDataBiosGetHidenMachineNo(speciesData);
-            messageId = (subRank != 0xFF) ? 0x2B00 : 0x2AFF;
+            displayRank = rank + 1;
+            subRank = itemDataBiosGetHidenMachineNo(speciesData);
+            subDisplayRank = (u8)(subRank + 1);
+            messageId = ((subRank & 0xff) != 0xFF) ? 0x2B00 : 0x2AFF;
 
             fn_800FB680(x, y, -1, messageId);
             textX = x + (s32)(u16)(GSmsgGetRect(messageId) >> 16);
-            if (subRank != 0xFF) {
-                msgctrlSetValue(0x34, (u8)(subRank + 1));
+            if ((subRank & 0xff) != 0xFF) {
+                msgctrlSetValue(0x34, subDisplayRank);
                 fn_800FB680(textX, y, -1, 0xCA);
                 textX += (s32)(u16)(GSmsgGetRect(0xCA) >> 16);
             } else {
-                if ((s32)(rank + 1) < 10) {
+                if ((s32)displayRank < 10) {
                     msgctrlSetValue(0x34, 0);
                     fn_800FB680(textX, y, -1, 0xCA);
                     textX += (s32)(u16)(GSmsgGetRect(0xCA) >> 16);
                 }
-                msgctrlSetValue(0x34, rank + 1);
+                msgctrlSetValue(0x34, displayRank);
                 fn_800FB680(textX, y, -1, 0xCA);
                 textX += (s32)(u16)(GSmsgGetRect(0xCA) >> 16);
             }
@@ -711,7 +721,7 @@ s32 fn_800159BC(s32 x, s32 pageIndex, u16* packedRange) {
             messageId = wazaDataBiosGetName(wazaDataBiosGetPtr((u16)itemDataBiosGetWazaIDByWazaMachineNo(rank)));
             fn_800FB680(textX + 9, y, -1, messageId);
 
-            dataSource = SUMMARY_ENTRY_FIELD(entry);
+            dataSource = *dataSourcePtr;
             heroItemGetItemKindToItemAryPtr((void*)lbl_8047A2F8, (u8)dataSource, &totalCount, 0, 0, 0);
             msgctrlSetValue(0x34, totalCount);
             textX = x + 0x11A - ((s16)(GSmsgGetRect(0xCA) >> 16) + (s16)(GSmsgGetRect(0x12E) >> 16));
@@ -723,15 +733,18 @@ s32 fn_800159BC(s32 x, s32 pageIndex, u16* packedRange) {
                 field = heroHizukiItemGetItemAryPtr((void*)lbl_8047A2F8, &itemCount, 0, 0, 0);
             }
             value = 0;
-            listIndex = -1;
-            while (++listIndex < itemCount) {
+            listIndex = 0;
+            validItemIndex = -1;
+            while (listIndex < itemCount) {
                 if (fn_801429E8(field) != 0) {
-                    if (--itemIndex < 0) {
+                    validItemIndex++;
+                    if (validItemIndex >= itemIndex) {
                         value = itemBiosGetNum(field);
                         break;
                     }
                 }
                 field = (u8*)field + 4;
+                listIndex++;
             }
             msgctrlSetValue(0x34, (u16)value);
             fn_800FB680(x + 0x11A - (s16)(GSmsgGetRect(0xCA) >> 16), y, -1, 0xCA);
@@ -1241,16 +1254,18 @@ asm void fn_80016ABC(void) {
 #else
 #pragma push
 #pragma peephole off
+#pragma fp_contract off
 s32 fn_80016ABC(u8* ctx, u8* item) {
     u8* entry;
     u16 packed;
     s32 y;
     s32 alpha;
     s32 selected;
-    s32 i;
     f32 phase;
     f32 step;
-    f32 phaseStarts[4];
+    f32 alphaScale;
+    f32 alphaDivisor;
+    f32 wrap;
 
     if ((s32)lbl_8047A2D8 != -1) {
         return 0;
@@ -1291,24 +1306,55 @@ s32 fn_80016ABC(u8* ctx, u8* item) {
             ((f32)SUMMARY_ITEM_S16(item, 0x54) +
              SUMMARY_F32(lbl_8047B75C) * (f32)SUMMARY_ITEM_S16(item, 0x56) *
                  SUMMARY_F32(lbl_8047B770)));
-    phaseStarts[0] = SUMMARY_F32(lbl_8047A2CC);
-    phaseStarts[1] = phaseStarts[0] + SUMMARY_F32(lbl_8047B780);
-    phaseStarts[2] = phaseStarts[0] + SUMMARY_F32(lbl_8047B770);
-    phaseStarts[3] = phaseStarts[0] + SUMMARY_F32(lbl_8047B784);
-
-    for (i = 0; i < 4; i++) {
-        phase = phaseStarts[i];
-        if (phase > SUMMARY_F32(lbl_8047B744)) {
-            phase -= SUMMARY_F32(lbl_8047B744);
+    alphaScale = SUMMARY_F32(lbl_8047B740);
+    alphaDivisor = SUMMARY_F32(lbl_8047B77C);
+    wrap = SUMMARY_F32(lbl_8047B744);
+    phase = SUMMARY_F32(lbl_8047A2CC);
+    for (selected = 0; selected < 0x2D; selected++) {
+        fn_800167D0(ctx, item, phase, 0xD1,
+                    (u8)(alphaScale * ((f32)selected / alphaDivisor)));
+        phase += step;
+        if (phase >= wrap) {
+            phase -= wrap;
         }
-        for (selected = 0; selected < 0x2D; selected++) {
-            fn_800167D0(ctx, item, phase, 0xD1,
-                        (u8)(SUMMARY_F32(lbl_8047B740) *
-                             ((f32)selected / SUMMARY_F32(lbl_8047B77C))));
-            phase += step;
-            if (phase >= SUMMARY_F32(lbl_8047B744)) {
-                phase -= SUMMARY_F32(lbl_8047B744);
-            }
+    }
+
+    phase = SUMMARY_F32(lbl_8047A2CC) + SUMMARY_F32(lbl_8047B780);
+    if (phase > wrap) {
+        phase -= wrap;
+    }
+    for (selected = 0; selected < 0x2D; selected++) {
+        fn_800167D0(ctx, item, phase, 0xD1,
+                    (u8)(alphaScale * ((f32)selected / alphaDivisor)));
+        phase += step;
+        if (phase >= wrap) {
+            phase -= wrap;
+        }
+    }
+
+    phase = SUMMARY_F32(lbl_8047A2CC) + SUMMARY_F32(lbl_8047B770);
+    if (phase > wrap) {
+        phase -= wrap;
+    }
+    for (selected = 0; selected < 0x2D; selected++) {
+        fn_800167D0(ctx, item, phase, 0xD1,
+                    (u8)(alphaScale * ((f32)selected / alphaDivisor)));
+        phase += step;
+        if (phase >= wrap) {
+            phase -= wrap;
+        }
+    }
+
+    phase = SUMMARY_F32(lbl_8047A2CC) + SUMMARY_F32(lbl_8047B784);
+    if (phase > wrap) {
+        phase -= wrap;
+    }
+    for (selected = 0; selected < 0x2D; selected++) {
+        fn_800167D0(ctx, item, phase, 0xD1,
+                    (u8)(alphaScale * ((f32)selected / alphaDivisor)));
+        phase += step;
+        if (phase >= wrap) {
+            phase -= wrap;
         }
     }
 
@@ -1390,6 +1436,8 @@ asm void fn_80017028(void) {
 s32 fn_80017028(u8* ctx) {
     u8* input;
     u8* entry;
+    u8* labelBase;
+    u8* dataSourceBase;
     void* list;
     void* field;
     u16 packed;
@@ -1408,39 +1456,42 @@ s32 fn_80017028(u8* ctx) {
     s32 moved;
 
     input = windowGetKeyInfo();
+    soundId = 0;
+    moved = 0;
     for (i = 0; i < 5; i++) {
         fallbackLabels[i] = ((u32*)lbl_80266B88)[i];
     }
 
-    if (SUMMARY_F32(lbl_8047A2D4) != SUMMARY_F32(lbl_8047B748) ||
-        SUMMARY_F32(lbl_8047A2D0) != SUMMARY_F32(lbl_8047B748)) {
+    if (SUMMARY_F32(lbl_8047B748) != SUMMARY_F32(lbl_8047A2D4) ||
+        SUMMARY_F32(lbl_8047B748) != SUMMARY_F32(lbl_8047A2D0)) {
         return 0;
     }
 
     pageIndex = SUMMARY_CTX_S8(ctx, 0x95);
-    entry = SUMMARY_ENTRY_RAW(pageIndex);
-    packed = (u16)(cursorBiosGetPos((u16)SUMMARY_ENTRY_LABEL(entry)) >> 16);
-    dataSource = SUMMARY_ENTRY_FIELD(entry);
+    labelBase = (u8*)sSummaryPageEntries + 0x1C;
+    packed = (u16)(cursorBiosGetPos(
+                       (u16)*(u32*)(labelBase + pageIndex * SUMMARY_ENTRY_STRIDE)) >>
+                   16);
+    dataSourceBase = (u8*)sSummaryPageEntries + 0x04;
+    dataSource = *(s32*)(dataSourceBase +
+                         SUMMARY_CTX_S8(ctx, 0x95) * SUMMARY_ENTRY_STRIDE);
     if (dataSource >= 0) {
         list = heroItemGetItemKindToItemAryPtr((void*)lbl_8047A2F8, (u8)dataSource, &count, 0, 0, 0);
     } else {
         list = heroHizukiItemGetItemAryPtr((void*)lbl_8047A2F8, &count, 0, 0, 0);
     }
 
-    validCount = 0;
     field = list;
-    for (i = 0; i < count; i++) {
+    for (validCount = 0; validCount < count; validCount++) {
         fn_801429E8(field);
-        validCount++;
         field = (u8*)field + 4;
     }
 
     cursorIndex = (s32)(s8)((u8*)&packed)[0] + (s32)(s8)((u8*)&packed)[1];
-    soundId = 0;
-    moved = 0;
+    entry = SUMMARY_ENTRY_RAW(pageIndex);
 
     if ((s32)lbl_8047A2E8 < 0) {
-        if ((SUMMARY_ITEM_U16(input, 0x04) & 0x300) != 0 &&
+        if ((SUMMARY_ITEM_U16(input, 0x04) & 0xC0) != 0 &&
             (s32)lbl_8047A2E0 != 3 && (s32)lbl_8047A2E0 != 4 &&
             *(s32*)(entry + 0x08) != 0) {
             field = list;
@@ -1531,7 +1582,9 @@ s32 fn_80017028(u8* ctx) {
         }
     }
 
-    cursorBiosSetPos((u16)SUMMARY_ENTRY_LABEL(entry), &currentPacked);
+    cursorBiosSetPos(
+        (u16)*(u32*)(labelBase + pageIndex * SUMMARY_ENTRY_STRIDE),
+        &currentPacked);
 
     if ((s32)lbl_8047A2E8 < 0 && moved == 0) {
         if ((SUMMARY_ITEM_U16(input, 0x06) & 8) != 0) {
@@ -1557,8 +1610,12 @@ s32 fn_80017028(u8* ctx) {
     if ((s32)lbl_8047A2E8 >= 0) {
         lbl_8047A2DC = 0x2B2B;
     } else {
-        entry = SUMMARY_ENTRY_RAW(SUMMARY_CTX_S8(ctx, 0x95));
-        packed = (u16)(cursorBiosGetPos((u16)SUMMARY_ENTRY_LABEL(entry)) >> 16);
+        pageIndex = SUMMARY_CTX_S8(ctx, 0x95);
+        entry = SUMMARY_ENTRY_RAW(pageIndex);
+        packed = (u16)(cursorBiosGetPos(
+                           (u16)*(u32*)(labelBase +
+                                       pageIndex * SUMMARY_ENTRY_STRIDE)) >>
+                       16);
         cursorIndex = (s32)(s8)((u8*)&packed)[0] + (s32)(s8)((u8*)&packed)[1];
         dataSource = SUMMARY_ENTRY_FIELD(entry);
         if (dataSource >= 0) {

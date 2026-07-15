@@ -20,6 +20,10 @@ Layout (all under FARM_ROOT, default = directory containing this script):
 Wins are detected two ways: the permuter exits after --stop-on-zero writing
 output-0-*/, or a nonzero personal best lands below --nearwin-threshold.
 
+The unit manifest is reloaded between worker assignments. This lets the Mac
+prepend reviewed near-miss work units atomically without stopping active
+permuters or waiting for a full farm restart.
+
 The supervisor holds the machine awake via SetThreadExecutionState while at
 least one worker is running (no admin needed); sleep resumes when it stops.
 
@@ -71,6 +75,26 @@ def atomic_write(path: Path, data: str) -> None:
     os.replace(tmp, path)
 
 
+def load_manifest_queue(units: Path):
+    manifest = load_json(units / "manifest.json", [])
+    metas = {m["fn"]: m for m in manifest if m.get("status") == "ok"}
+    queue_order = [
+        m["fn"] for m in manifest
+        if m.get("status") == "ok"
+        and (units / m["fn"] / "base.c").is_file()
+    ]
+    return metas, queue_order
+
+
+def prune_stale_results(state: dict, queue_order: list[str]) -> list[str]:
+    """Drop persisted results for work units no longer in the manifest."""
+    admitted = set(queue_order)
+    stale = sorted(set(state["done"]) - admitted)
+    for fn in stale:
+        del state["done"][fn]
+    return stale
+
+
 class Worker:
     def __init__(self, fn: str, unit_dir: Path, budget: float):
         self.fn = fn
@@ -80,6 +104,7 @@ class Worker:
         self.base_score = None
         self.best_score = None
         self.log_path = LOGS / f"{fn}.log"
+        self.log_start = self.log_path.stat().st_size if self.log_path.exists() else 0
         self.log = open(self.log_path, "a", encoding="utf-8", errors="replace")
         self.log.write(f"\n===== farm start {time.strftime('%Y-%m-%dT%H:%M:%S')} "
                        f"budget={budget}s =====\n")
@@ -123,7 +148,9 @@ class Worker:
 
     def read_scores(self) -> None:
         try:
-            text = self.log_path.read_text(encoding="utf-8", errors="replace")
+            with self.log_path.open("rb") as stream:
+                stream.seek(self.log_start)
+                text = stream.read().decode("utf-8", errors="replace")
         except OSError:
             return
         m = RE_BASE_SCORE.search(text)
@@ -216,12 +243,13 @@ def main():
             pass
     lock.write_text(str(os.getpid()))
 
-    manifest = load_json(UNITS / "manifest.json", [])
-    metas = {m["fn"]: m for m in manifest if m.get("status") == "ok"}
-    queue_order = [m["fn"] for m in manifest if m.get("status") == "ok"
-                   and (UNITS / m["fn"] / "base.c").is_file()]
+    metas, queue_order = load_manifest_queue(UNITS)
 
     state = load_json(state_path, {"done": {}, "round": 0})
+    pruned = prune_stale_results(state, queue_order)
+    if pruned:
+        atomic_write(state_path, json.dumps(state, indent=1))
+        print(f"startup: pruned {len(pruned)} stale results")
 
     def runnable(rnd):
         for fn in queue_order:
@@ -241,6 +269,19 @@ def main():
 
     try:
         while round_no < args.rounds:
+            # The injector atomically replaces manifest.json after copying the
+            # complete unit directory. Preserve metadata for active workers,
+            # then adopt the latest queue order before selecting free work.
+            loaded_metas, loaded_order = load_manifest_queue(UNITS)
+            metas.update(loaded_metas)
+            if loaded_order != queue_order:
+                queue_order = loaded_order
+                pruned = prune_stale_results(state, queue_order)
+                if pruned:
+                    atomic_write(state_path, json.dumps(state, indent=1))
+                print(f"manifest reload: {len(queue_order)} units, "
+                      f"pruned {len(pruned)} stale results")
+
             pending = [fn for fn in runnable(round_no) if fn not in workers]
             if not pending and not workers:
                 round_no += 1

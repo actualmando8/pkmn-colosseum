@@ -12,6 +12,7 @@
 #ifndef HSD_WOBJ_H
 #define HSD_WOBJ_H
 
+#include "dolphin/mtx.h"
 #include "dolphin/types.h"
 #include "hsd/hsd_class.h"
 #include "hsd/hsd_forward.h"
@@ -24,9 +25,7 @@
 struct HSD_WObj {
     HSD_Obj parent;
     u32 flags;
-    f32 pos_x;
-    f32 pos_y;
-    f32 pos_z;
+    Vec pos;
     HSD_AObj* aobj;
     HSD_RObj* robj;
 };
@@ -37,9 +36,7 @@ struct HSD_WObj {
 
 struct HSD_WObjDesc {
     char* class_name;
-    f32 pos_x;
-    f32 pos_y;
-    f32 pos_z;
+    Vec pos;
     HSD_RObjDesc* robjdesc;
 };
 
@@ -103,12 +100,12 @@ void HSD_WObjAddAnim(HSD_WObj* wobj, HSD_WObjAnim* anim);
 void HSD_WObjInterpretAnim(HSD_WObj* wobj);
 void HSD_WObjInit(HSD_WObj* wobj, HSD_WObjDesc* desc);
 HSD_WObj* HSD_WObjLoadDesc(HSD_WObjDesc* desc);
-void HSD_WObjSetPosition(HSD_WObj* wobj, void* position);
+void HSD_WObjSetPosition(HSD_WObj* wobj, Vec* position);
 void HSD_WObjSetPosition_Early(HSD_WObj* wobj, f32 x, f32 y, f32 z);
 void HSD_WObjSetPositionX(HSD_WObj* wobj, f32 val);
 void HSD_WObjSetPositionY(HSD_WObj* wobj, f32 val);
 void HSD_WObjSetPositionZ(HSD_WObj* wobj, f32 val);
-void HSD_WObjGetPosition(HSD_WObj* wobj, void* position);
+void HSD_WObjGetPosition(HSD_WObj* wobj, Vec* position);
 void HSD_WObjGetPosition_Early(HSD_WObj* wobj, f32* x, f32* y, f32* z);
 HSD_WObj* HSD_WObjAlloc(void);
 void HSD_WObjSetDefaultClass(HSD_ClassInfo* info);

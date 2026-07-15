@@ -15,3 +15,25 @@ Users must legally obtain the original game and compiler themselves. This
 project does not distribute, link, or otherwise enable redistribution of
 copyrighted material. No copyrighted game data, assets, or compiler
 binaries are committed to this repository.
+
+Source reference provenance
+===========================
+
+The HSD/sysdolphin source and type reconstruction uses the public
+doldecomp/melee project as a reference, principally its
+src/sysdolphin/baselib and extern/dolphin/include trees. The reproducible
+reference snapshot recorded for this integration is:
+
+  https://github.com/doldecomp/melee/commit/81153faa93ea558e08d102007f9b663ddb526884
+
+This notice records source provenance. It does not grant rights to third-party
+material or supersede the rights described above.
+
+The Dolphin SDK paired-single quality-gate exception was verified against the
+public zeldaret/tww SDK reconstruction at this pinned snapshot:
+
+  https://github.com/zeldaret/tww/commit/6f09bf28ce1a2f1cdea62b931cbbdb40e7f821ec
+
+The relevant reference files are src/dolphin/mtx/mtx.c, mtxvec.c, vec.c, and
+quat.c. This records technical provenance for the exception; it does not widen
+the licensing statement above.

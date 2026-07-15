@@ -46,9 +46,9 @@ void* GScolsys2GetCurFloor(void) {
 }
 
 /* 0x8010CC04 | 0x50 */
-s32 GScolsys2UnloadCCD(void) {
-    extern void GSgfxDLFree(void* displayList);
+extern void GSgfxDLFree(void* displayList);
 
+s32 GScolsys2UnloadCCD(void) {
     COL_STATE->wzxDataPtr = NULL;
     if (COL_STATE->displayList != NULL) {
         GSgfxDLFree(COL_STATE->displayList);
@@ -57,47 +57,65 @@ s32 GScolsys2UnloadCCD(void) {
     return 1;
 }
 
-/* 0x8010CD6C | 0x98 */
-void fn_8010CD6C(void) {
-    typedef struct TriData {
-        Vec3f vectors[3];
-    } TriData;
-    void* wzx = COL_STATE->wzxDataPtr;
-    u32* wzxHeader;
-    u32 i;
-    u32* srcTri;
-    u8* dstEntry;
+typedef struct ColRecordVector {
+    u32 x;
+    u32 y;
+    u32 z;
+} ColRecordVector;
 
-    if (wzx == NULL) {
+typedef struct ColSourceRecord {
+    ColRecordVector vector[3];
+    u8 pad_24[0x1C];
+} ColSourceRecord;
+
+typedef struct ColSourceDescriptor {
+    ColSourceRecord* records;
+    u32 count;
+} ColSourceDescriptor;
+
+typedef struct ColLayerRecord {
+    ColRecordVector vector[3];
+    u16 flags;
+    u8 pad_26[2];
+} ColLayerRecord;
+
+/* 0x8010CD6C | 0x98 */
+void fn_8010CD6C(void)
+{
+    ColSourceDescriptor* descriptor;
+    u32 i;
+    ColSourceRecord* source;
+    ColLayerRecord* destination;
+
+    descriptor = COL_STATE->wzxDataPtr;
+    if (descriptor == NULL) {
         return;
     }
 
-    wzxHeader = (u32*)wzx;
     i = 0;
-    srcTri = (u32*)wzxHeader[0];
-    dstEntry = (u8*)COL_STATE + COL_LAYER_IDX * GSCOLSYS_LAYER_SIZE + 4;
-
-    for (; i < wzxHeader[1]; i++) {
-        ((TriData*)dstEntry)->vectors[0] = ((TriData*)srcTri)->vectors[0];
-        ((TriData*)dstEntry)->vectors[1] = ((TriData*)srcTri)->vectors[1];
-        ((TriData*)dstEntry)->vectors[2] = ((TriData*)srcTri)->vectors[2];
-        *(u16*)(dstEntry + 0x24) = 0;
-
-        srcTri = (u32*)((u8*)srcTri + 0x40);
-        dstEntry += GSCOLSYS_TRI_ENTRY_SIZE;
+    source = descriptor->records;
+    destination = COL_LAYER_PTR(COL_LAYER_IDX);
+    while (i < descriptor->count) {
+        destination->vector[0] = source->vector[0];
+        destination->vector[1] = source->vector[1];
+        destination->vector[2] = source->vector[2];
+        destination->flags = 0;
+        i++;
+        source++;
+        destination++;
     }
 }
 
 /* 0x8010CFE4 | 0x54 */
-s32 fn_8010CFE4(void* ccdFile) {
-    extern void _offsetCCD__FP12CCD_FILEHEAD(void* ccdFile);
+s32 fn_8010CFE4(void* fileHead)
+{
+    extern void _offsetCCD__FP12CCD_FILEHEAD(void*);
 
     if (COL_LAYER_IDX < 0) {
         return 0;
     }
-
-    _offsetCCD__FP12CCD_FILEHEAD(ccdFile);
-    COL_STATE->wzxDataPtr = ccdFile;
+    _offsetCCD__FP12CCD_FILEHEAD(fileHead);
+    COL_STATE->wzxDataPtr = fileHead;
     return 1;
 }
 
@@ -113,37 +131,331 @@ s32 fn_8010D038(void) {
     return 1;
 }
 
+/* 0x8010D064 | 0x10C */
+s32 fn_8010D064(void)
+{
+    s32 newLayer;
+    u8* layerBase;
+    s32 block;
+
+    newLayer = COL_LAYER_IDX + 1;
+    if (newLayer >= GSCOLSYS_MAX_LAYERS) {
+        return 0;
+    }
+
+    layerBase = (u8*)COL_STATE + newLayer * GSCOLSYS_LAYER_SIZE;
+    COL_STATE->wzxDataPtr = NULL;
+
+    for (block = 0; block < 3; block++) {
+        u16* flag;
+        u32 i;
+
+        for (i = 0; i < 16; i++) {
+            flag = (u16*)(layerBase + 0xA14 + i * 0x14);
+            *flag &= (u16)~1;
+        }
+        layerBase += 0x140;
+    }
+
+    COL_LAYER_IDX = newLayer;
+    return 1;
+}
+
 /* 0x8010D170 | 0x9C */
-void fn_8010D170(void) {
-    extern void* fn_800D7894(void);
-    extern void fn_800D7868(void* handle, u32 a, u32 b, u32 c,
-                            u32 d, u32 e, u32 f, u32 g);
+void fn_8010D170(void)
+{
+    extern u8* fn_800D7894(void);
+    extern void fn_800D7868(u8*, u32, u32, u32, u32, u8, u32, u8);
+    u8* handle;
 
     COL_STATE->activeLayer = 0;
     COL_STATE->displayList = NULL;
-    COL_STATE->gfxRenderHandle = (u32)fn_800D7894();
-    fn_800D7868((void*)COL_STATE->gfxRenderHandle, 1, 0, 1, 4, 0, 0, 0);
-    fn_800D7868((void*)COL_STATE->gfxRenderHandle, 4, 0, 6, 10, 0, 0, 0);
+    handle = fn_800D7894();
+    COL_STATE->gfxRenderHandle = (u32)handle;
+    fn_800D7868(handle, 1, 0, 1, 4, 0, 0, 0);
+    fn_800D7868((u8*)COL_STATE->gfxRenderHandle, 4, 0, 6, 10, 0, 0, 0);
     COL_STATE->displayList = NULL;
 }
 
+typedef f32 ColVec3[3];
+typedef f32 ColMtx[3][4];
+
+typedef struct ColDrawGroup {
+    u8* data;
+    u32 count;
+} ColDrawGroup;
+
+typedef struct ColDrawObject {
+    u8 pad_00[0x24];
+    void* model;
+    ColDrawGroup* edgeGroup0;
+    ColDrawGroup* faceGroup0;
+    ColDrawGroup* faceGroup1;
+    ColDrawGroup* edgeGroup1;
+    ColDrawGroup* faceGroup2;
+    u16 flags;
+    u8 pad_3E[2];
+} ColDrawObject;
+
+typedef struct ColDrawScene {
+    ColDrawObject* objects;
+    u32 count;
+} ColDrawScene;
+
+typedef union ColDrawColor {
+    u32 packed;
+    struct {
+        u8 r;
+        u8 g;
+        u8 b;
+        u8 a;
+    } channel;
+} ColDrawColor;
+
+extern ColDrawScene* fn_8010CBC0(void);
+extern void fn_800DA028(s32);
+extern void fn_800D7820(void*);
+extern void fn_800D88DC(s32);
+extern void fn_800D888C(s32);
+extern void fn_800DA4C4(s32, s32, s32);
+extern void fn_800DA1E8(s32, s32, s32);
+extern void fn_800D9ED8(s32);
+extern void fn_8010CA30(ColMtx out, u32 index);
+extern void fn_8010C8D0(ColMtx out, u32 index);
+extern void fn_8010D20C(void*, ColMtx, ColMtx);
+extern void PSMTXMultVec(ColMtx, const ColVec3, ColVec3);
+extern void fn_800D6A00(s32);
+extern void fn_800D67BC(s32);
+extern void fn_800D6680(f32, f32, f32);
+extern void fn_800D5CB8(s32, u8, u8, u8, u8);
+extern void fn_800D6728(void);
+extern void* GScolsys2Draw(void);
+extern void GSgfxDLDraw(void*);
+extern void fn_800D30AC(void);
+extern u32 lbl_8047CEB8;
+extern u32 lbl_8047CEBC;
+extern u32 lbl_8047CEC0;
+extern u32 lbl_8047CEC4;
+
+static inline void ColDrawSetColor(ColDrawColor color)
+{
+    fn_800D5CB8(0, color.channel.r, color.channel.g,
+                color.channel.b, color.channel.a);
+}
+
+static inline void ColDrawEdges(ColMtx matrix, ColDrawGroup* group,
+                                ColDrawColor color, u32 stride)
+{
+    ColVec3 transformed[3];
+    u8* element;
+    u32 i;
+    s32 vertex;
+    s32 next;
+
+    if (group == NULL) {
+        return;
+    }
+    element = group->data;
+    for (i = 0; i < group->count; i++, element += stride) {
+        for (vertex = 0; vertex < 3; vertex++) {
+            PSMTXMultVec(matrix, *(ColVec3*)(element + vertex * 12),
+                         transformed[vertex]);
+        }
+        fn_800D6A00(1);
+        for (vertex = 0; vertex < 3; vertex++) {
+            next = vertex + 1;
+            if (next >= 3) {
+                next = 0;
+            }
+            fn_800D67BC(2);
+            fn_800D6680(transformed[vertex][0], transformed[vertex][1],
+                        transformed[vertex][2]);
+            ColDrawSetColor(color);
+            fn_800D6680(transformed[next][0], transformed[next][1],
+                        transformed[next][2]);
+            ColDrawSetColor(color);
+            fn_800D6728();
+        }
+    }
+}
+
+static inline void ColDrawFaces(ColMtx matrix, ColDrawGroup* group,
+                                ColDrawColor color, u32 stride)
+{
+    ColVec3 transformed;
+    u8* element;
+    u32 i;
+    s32 vertex;
+
+    if (group == NULL) {
+        return;
+    }
+    element = group->data;
+    fn_800D6A00(3);
+    for (i = 0; i < group->count; i++, element += stride) {
+        fn_800D67BC(3);
+        for (vertex = 0; vertex < 3; vertex++) {
+            PSMTXMultVec(matrix, *(ColVec3*)(element + vertex * 12),
+                         transformed);
+            fn_800D6680(transformed[0], transformed[1], transformed[2]);
+            ColDrawSetColor(color);
+        }
+        fn_800D6728();
+    }
+}
+
+/* Record the collision-debug geometry into a display list. */
+#pragma push
+#pragma inline_depth(8)
+#pragma inline_max_size(10000)
+void* GScolsys2Draw(void)
+{
+    extern u8 GSgfxDLBegin(void* buffer, u32 size);
+    extern void* GSgfxDLEnd(void);
+    extern s32 printf(const char*, ...);
+    extern const char lbl_80272050[];
+    ColDrawScene* scene;
+    ColDrawObject* object;
+    ColMtx matrix;
+    ColMtx normalMatrix;
+    ColDrawColor color;
+    u32 i;
+
+    scene = fn_8010CBC0();
+    if (scene == NULL) {
+        return NULL;
+    }
+
+    fn_800DA028(1);
+    fn_800D7820(*(void**)((u8*)&lbl_80404C68 + 0x3708));
+    fn_800D88DC(1);
+    fn_800D888C(6);
+    fn_800DA4C4(1, 6, 7);
+    fn_800DA1E8(1, 2, 1);
+    fn_800D9ED8(0);
+
+    if (GSgfxDLBegin(*(void**)((u8*)&lbl_80404C68 + 0x3708), 0x80000) == 0) {
+        printf(lbl_80272050);
+        return NULL;
+    }
+
+    object = scene->objects;
+    for (i = 0; i < scene->count; i++, object++) {
+        if ((object->flags & 1) != 0) {
+            continue;
+        }
+
+        fn_8010CA30(matrix, i);
+        fn_8010C8D0(normalMatrix, i);
+        if (object->model != NULL) {
+            fn_8010D20C(object->model, matrix, normalMatrix);
+        }
+
+        color.packed = lbl_8047CEB8;
+        ColDrawEdges(matrix, object->edgeGroup0, color, 0x34);
+        color.packed = lbl_8047CEBC;
+        ColDrawFaces(matrix, object->faceGroup0, color, 0x34);
+        color.packed = lbl_8047CEC0;
+        ColDrawFaces(matrix, object->faceGroup1, color, 0x34);
+        color.packed = lbl_8047CEB8;
+        ColDrawEdges(matrix, object->edgeGroup1, color, 0x34);
+        color.packed = lbl_8047CEC4;
+        ColDrawFaces(matrix, object->faceGroup2, color, 0x30);
+    }
+
+    return GSgfxDLEnd();
+}
+#pragma pop
+
+#pragma push
+#pragma inline_depth(8)
+#pragma inline_max_size(10000)
+void fn_8010D8D4(void)
+{
+    ColDrawScene* scene;
+    ColDrawObject* object;
+    ColMtx matrix;
+    ColMtx normalMatrix;
+    ColDrawColor color;
+    u8* state;
+    u8* layer;
+    void* displayList;
+    u32 activeLayer;
+    u32 i;
+
+    scene = fn_8010CBC0();
+    if (scene == NULL) {
+        return;
+    }
+
+    fn_800DA028(1);
+    state = (u8*)&lbl_80404C68;
+    fn_800D7820(*(void**)(state + 0x3708));
+    fn_800D88DC(1);
+    fn_800D888C(6);
+    fn_800DA4C4(1, 6, 7);
+    fn_800DA1E8(1, 2, 1);
+    fn_800D9ED8(0);
+
+    object = scene->objects;
+    activeLayer = *(u32*)(state + 0x3704);
+    layer = state + activeLayer * 0xDC0 + 4;
+    for (i = 0; i < scene->count; i++, object++, layer += 0x28) {
+        if ((*(u16*)(layer + 0x24) & 1) != 0 ||
+            (object->flags & 1) == 0) {
+            continue;
+        }
+
+        fn_8010CA30(matrix, i);
+        fn_8010C8D0(normalMatrix, i);
+        if (object->model != NULL) {
+            fn_8010D20C(object->model, matrix, normalMatrix);
+        }
+
+        color.packed = lbl_8047CEB8;
+        ColDrawEdges(matrix, object->edgeGroup0, color, 0x34);
+        color.packed = lbl_8047CEBC;
+        ColDrawFaces(matrix, object->faceGroup0, color, 0x34);
+        color.packed = lbl_8047CEC0;
+        ColDrawFaces(matrix, object->faceGroup1, color, 0x34);
+        color.packed = lbl_8047CEB8;
+        ColDrawEdges(matrix, object->edgeGroup1, color, 0x34);
+        color.packed = lbl_8047CEC4;
+        ColDrawFaces(matrix, object->faceGroup2, color, 0x30);
+    }
+
+    displayList = *(void**)(state + 0x370C);
+    if (displayList == NULL) {
+        displayList = GScolsys2Draw();
+        *(void**)(state + 0x370C) = displayList;
+    }
+    if (displayList != NULL) {
+        GSgfxDLDraw(displayList);
+        fn_800D30AC();
+    }
+}
+#pragma pop
+
+typedef struct ColWalkHit {
+    f32 height;
+    u16 surfaceType;
+    u16 surfaceId;
+    u8 layer;
+    u8 subLayer;
+    u8 pad_0A[2];
+} ColWalkHit;
+
+extern s32 fn_8010E138(void* origin, void* results);
+
 /* 0x8010DE00 | 0xF0 */
-s32 GScolsys2WalkGetLayer(Vec3f* position, u8* layer, u8* material) {
-    typedef struct WalkHit {
-        f32 height;
-        u32 unk4;
-        u8 layer;
-        u8 material;
-        u8 pad[2];
-    } WalkHit;
-    WalkHit hits[8];
+s32 GScolsys2WalkGetLayer(Vec3f* position, u8* layer, u8* subLayer)
+{
+    ColWalkHit hits[8];
     s32 count;
     s32 i;
-    s32 nearest;
+    s32 closest;
     f32 distance;
-    f32 nearestDistance;
-    extern s32 fn_8010E138(Vec3f* position, WalkHit* hits);
-    extern const f32 lbl_8047CEE0;
+    f32 closestDistance;
 
     count = fn_8010E138(position, hits);
     if (count <= 0) {
@@ -151,21 +463,20 @@ s32 GScolsys2WalkGetLayer(Vec3f* position, u8* layer, u8* material) {
     }
 
     distance = position->y - hits[0].height;
-    distance = distance > lbl_8047CEE0 ? distance : -distance;
-    nearestDistance = distance;
-    nearest = 0;
-
+    distance = distance > 0.0f ? distance : -distance;
+    closest = 0;
+    closestDistance = distance;
     for (i = 1; i < count; i++) {
         distance = position->y - hits[i].height;
-        distance = distance > lbl_8047CEE0 ? distance : -distance;
-        if (nearestDistance > distance) {
-            nearest = i;
-            nearestDistance = distance;
+        distance = distance > 0.0f ? distance : -distance;
+        if (closestDistance > distance) {
+            closest = i;
+            closestDistance = distance;
         }
     }
 
-    *layer = hits[nearest].layer;
-    *material = hits[nearest].material;
+    *layer = hits[closest].layer;
+    *subLayer = hits[closest].subLayer;
     return 1;
 }
 

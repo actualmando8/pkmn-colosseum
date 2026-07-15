@@ -9,21 +9,15 @@
  */
 #include "dolphin/types.h"
 
-typedef struct _file_modes {
-    u32 open_mode : 2;
-    u32 io_mode : 3;
-    u32 buffer_mode : 2;
-    u32 file_kind : 3;
-    u32 file_orientation : 2;
-    u32 binary_io : 1;
-} file_modes;
-
-typedef void (*IdleProc)(void);
-typedef s32 (*WriteProc)(u32 handle, u8* buffer, u32* length, IdleProc idle_fn);
-
 typedef struct _MSL_FILE {
     /* 0x00 */ u32 handle;
-    /* 0x04 */ file_modes file_mode;
+    /* 0x04 */ u8 file_mode_open : 2;
+    /* 0x04 */ u8 file_mode_io : 3;
+    /* 0x04 */ u8 file_mode_buffer : 2;
+    /* 0x04 */ u8 file_kind : 3;
+    /* 0x04 */ u8 file_orientation : 2;
+    /* 0x04 */ u8 binary_io : 1;
+    /* 0x04 */ u8 file_mode_unused;
     /* 0x08 */ u32 file_state;
     /* 0x0C */ u8 is_dynamically_allocated;
     /* 0x0D */ char pad0d;
@@ -103,6 +97,12 @@ s32 __flush_buffer(MSL_FILE* stream, u32* bytes_flushed) {
     return 0;
 }
 #pragma peephole reset
+
+    /* 0x40 */ void* write_fn;
+    /* 0x44 */ void* close_fn;
+    /* 0x48 */ void* idle_fn;
+    /* 0x4C */ struct _MSL_FILE* next_file;
+} MSL_FILE;
 
 void __prep_buffer(MSL_FILE* stream) {
     stream->buffer_ptr = stream->buffer;

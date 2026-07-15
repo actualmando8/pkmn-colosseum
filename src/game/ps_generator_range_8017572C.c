@@ -22,8 +22,8 @@
  *   psKillGeneratorID  (0x801758D8, not yet decompiled)
  *   psKillGenerator    (0x80175A1C, not yet decompiled)
  *   psRemoveGenerator  (0x80175B94)
- *   psInitGenerator    (0x80175DF0, not yet decompiled)
- *   genPosUpdate       (0x80175E88, not yet decompiled)
+ *   psInitGenerator    (0x80175DF0)
+ *   genPosUpdate       (0x80175E88)
  *   psGetNewIDNum      (0x80175F44)
  */
 
@@ -47,18 +47,30 @@ typedef struct GenPosGenerator {
     GenPosJObj* jobj;
 } GenPosGenerator;
 
+typedef struct PSGeneratorPoolNode {
+    struct PSGeneratorPoolNode* next;
+    u8 data[0xB0];
+} PSGeneratorPoolNode;
+
+extern void* fn_801A6928(s32 size);
+extern u16 lbl_8047B112;
+extern u32 lbl_8047B180;
+extern u32 lbl_8047B190;
+extern u32 lbl_8047B194;
+extern u32 lbl_8047B198;
+
 static inline s32 genPosJObjMtxIsDirty(GenPosJObj* jobj) {
     extern void __assert(const char* file, u32 line, const char* condition);
     extern const char lbl_8047D6E0[7];
     extern const char lbl_8047D6E8[5];
     s32 result;
 
-    if (jobj == 0) {
+    if (jobj == NULL) {
         __assert(lbl_8047D6E0, 0x25D, lbl_8047D6E8);
     }
-    result = 0;
+    result = FALSE;
     if (!(jobj->flags & 0x800000) && (jobj->flags & 0x40)) {
-        result = 1;
+        result = TRUE;
     }
     return result;
 }
@@ -66,7 +78,7 @@ static inline s32 genPosJObjMtxIsDirty(GenPosJObj* jobj) {
 static inline void genPosJObjSetupMatrix(GenPosJObj* jobj) {
     extern void fn_8019D9DC(GenPosJObj* jobj);
 
-    if (jobj == 0 || !genPosJObjMtxIsDirty(jobj)) {
+    if (jobj == NULL || !genPosJObjMtxIsDirty(jobj)) {
         return;
     }
     fn_8019D9DC(jobj);
@@ -88,27 +100,20 @@ void* psRemoveGenerator(u32 type, u32 param) {
 #pragma pop
 
 void psInitGenerator(s32 count) {
-    extern void* fn_801A6928(s32 size);
-    extern u16 lbl_8047B112;
-    extern u32 lbl_8047B180;
-    extern u32 lbl_8047B190;
-    extern u32 lbl_8047B194;
-    extern u32 lbl_8047B198;
+    s32 i;
+    PSGeneratorPoolNode* node;
 
-    s32 remaining = count - 1;
-    void* generator;
+    lbl_8047B188 = NULL;
+    lbl_8047B18C = NULL;
 
-    lbl_8047B188 = 0;
-    lbl_8047B18C = 0;
-    while (remaining >= 0) {
-        generator = fn_801A6928(0xB4);
-        memset(generator, 0, 0xB4);
-        if (generator == 0) {
+    for (i = count - 1; i >= 0; i--) {
+        node = fn_801A6928(sizeof(PSGeneratorPoolNode));
+        memset(node, 0, sizeof(PSGeneratorPoolNode));
+        if (node == NULL) {
             return;
         }
-        remaining--;
-        *(void**)generator = lbl_8047B18C;
-        lbl_8047B18C = generator;
+        node->next = lbl_8047B18C;
+        lbl_8047B18C = node;
     }
 
     lbl_8047B118 = 0;
@@ -117,16 +122,16 @@ void psInitGenerator(s32 count) {
     lbl_8047B190 = 0;
     lbl_8047B198 = 0;
     lbl_8047B194 = 0;
-    lbl_8047B184 = 0;
+    lbl_8047B184 = NULL;
 }
 
 void genPosUpdate(GenPosGenerator* generator) {
     GenPosJObj* jobj;
 
-    if (generator != 0 && !(generator->flags & 2) &&
+    if (generator != NULL && !(generator->flags & 2) &&
         (generator->flags & 1)) {
         jobj = generator->jobj;
-        if (jobj != 0) {
+        if (jobj != NULL) {
             genPosJObjSetupMatrix(jobj);
             generator->positionX = generator->jobj->matrix[0][3];
             generator->positionY = generator->jobj->matrix[1][3];

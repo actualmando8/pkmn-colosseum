@@ -11,29 +11,804 @@
  */
 
 #include "dolphin/types.h"
+#include "crt/string.h"
 #include "hsd/hsd_class.h"
+#include "hsd/hsd_cobj.h"
 #include "hsd/hsd_debug.h"
+#include "hsd/hsd_objalloc.h"
+#include "hsd/hsd_sdata2.h"
 #include "hsd/hsd_tobj.h"
 #include "hsd/hsd_mobj.h"
 #include "hsd/hsd_memory.h"
 #include "hsd/hsd_gobj.h"
+#include "hsd/hsd_lobj.h"
 
 /* hsdAllocMemPiece/hsdFreeMemPiece declared in hsd_class.h with s32 */
 extern void* hsdNew(HSD_ClassInfo* info);
 extern void HSD_JObjDispAll(void* jobj, f32 mtx[3][4], s32 flags);
+extern f64 __frsqrte(f64 value);
+extern const f32 lbl_80478AC0[];
+extern const volatile f32 lbl_8047DE00;
+extern const volatile f32 lbl_8047DE18;
+extern const volatile f32 lbl_8047DE1C;
+extern const volatile f64 lbl_8047DE20;
+extern const volatile f64 lbl_8047DE28;
+extern const volatile f64 lbl_8047DE30;
+extern const volatile f32 lbl_8047DE38;
+extern const volatile f32 lbl_8047DE3C;
+extern const volatile f32 lbl_8047DE40;
+
+typedef union SplineFloatShape {
+    f32 value;
+    u32 bits;
+} SplineFloatShape;
+
+struct HSD_Shadow {
+    void* objects;
+    HSD_CObj* camera;
+    HSD_TObj* texture;
+    f32 scaleS;
+    f32 scaleT;
+    f32 transS;
+    f32 transT;
+    BOOL active;
+    u8 intensity;
+    u8 pad_21[3];
+    void* user_data;
+};
+
+extern HSD_ObjAllocData lbl_804656E0;
+
+#pragma push
+#pragma optimization_level 1
+static inline HSD_TObj* makeShadowTObj(void)
+{
+    HSD_TObj* shadowTObj;
+
+    shadowTObj = HSD_TObjAlloc();
+    shadowTObj->src = 0;
+    shadowTObj->wrap_s = 0;
+    shadowTObj->wrap_t = 0;
+    shadowTObj->flags = 0x540103;
+    shadowTObj->imagedesc = HSD_ImageDescAlloc();
+    return shadowTObj;
+}
+
+HSD_Shadow* fn_801B1730(void)
+{
+    HSD_Shadow* shadow;
+
+    shadow = HSD_ObjAlloc(&lbl_804656E0);
+    memset(shadow, 0, sizeof(HSD_Shadow));
+    shadow->camera = HSD_CObjAlloc();
+    shadow->texture = makeShadowTObj();
+
+    shadow->scaleS = lbl_8047DDF0;
+    shadow->scaleT = lbl_8047DDF4;
+    shadow->transS = lbl_8047DDF0;
+    shadow->transT = lbl_8047DDF0;
+    shadow->intensity = 0;
+
+    shadow->texture->imagedesc->format = 0;
+    shadow->texture->imagedesc->width = 256;
+    shadow->texture->imagedesc->height = 256;
+    shadow->texture->imagedesc->image_ptr = NULL;
+
+    HSD_CObjSetViewportfx4(shadow->camera, lbl_8047DDC0,
+                           lbl_8047DDF8[0], lbl_8047DDC0,
+                           lbl_8047DDF8[0]);
+    HSD_CObjSetScissorx4(shadow->camera, 0, 256, 0, 256);
+
+    return shadow;
+}
+#pragma pop
+
+#pragma push
+#pragma inline_depth(8)
+#pragma inline_max_size(10000)
+
+static inline f32 splSqrt(f32 value)
+{
+    volatile SplineFloatShape shape;
+    u32 exponent;
+    s32 fpclass;
+
+    if (value > lbl_8047DE00) {
+        f64 guess = __frsqrte(value);
+        guess = lbl_8047DE20 * guess *
+                (lbl_8047DE28 - value * (guess * guess));
+        guess = lbl_8047DE20 * guess *
+                (lbl_8047DE28 - value * (guess * guess));
+        guess = lbl_8047DE20 * guess *
+                (lbl_8047DE28 - value * (guess * guess));
+        return (f32) (value * guess);
+    }
+    if ((f64) value < lbl_8047DE30) {
+        return lbl_80478AC0[0];
+    }
+
+    shape.value = value;
+    exponent = shape.bits & 0x7F800000;
+    switch (exponent) {
+    case 0x7F800000:
+        if ((shape.bits & 0x007FFFFF) != 0) {
+            fpclass = 1;
+        } else {
+            fpclass = 2;
+        }
+        break;
+    case 0:
+        if ((shape.bits & 0x007FFFFF) != 0) {
+            fpclass = 5;
+        } else {
+            fpclass = 3;
+        }
+        break;
+    default:
+        fpclass = 4;
+        break;
+    }
+    if (fpclass == 1) {
+        return lbl_80478AC0[0];
+    }
+    return value;
+}
+
+static inline f32 splArcLengthPolynomial(const f32 coeffs[5], f32 t)
+{
+    f32 t2 = t * t;
+    f32 t3 = t2 * t;
+    f32 t4 = t3 * t;
+    f32 result = (coeffs[0] * t4) + (coeffs[1] * t3) +
+                 (coeffs[2] * t2) + (coeffs[3] * t) + coeffs[4];
+
+    if (result < lbl_8047DE00 && result > lbl_8047DE1C) {
+        result = lbl_8047DE00;
+    }
+    return splSqrt(result);
+}
+
+static inline f32 splIterateSimpsonsMiddle(const f32 coeffs[5], f32 dx,
+                                           f32 t)
+{
+    f32 sum = lbl_8047DE00;
+    s32 i;
+
+    for (i = 2; i <= 8; i++) {
+        if (!(i & 1)) {
+            sum += lbl_8047DE38 * splArcLengthPolynomial(coeffs, t);
+        } else {
+            sum += lbl_8047DE3C * splArcLengthPolynomial(coeffs, t);
+        }
+        t += dx;
+    }
+    return sum;
+}
+
+f32 fn_801B1AD0(const f32 coeffs[5], f32 start, f32 midpoint)
+{
+    f32 dx = (midpoint - start) * lbl_8047DE18;
+    f32 middle = splIterateSimpsonsMiddle(coeffs, dx, start + dx);
+
+    return dx * (middle + splArcLengthPolynomial(coeffs, start) +
+                 splArcLengthPolynomial(coeffs, midpoint)) /
+           lbl_8047DE40;
+}
+
+#pragma pop
+
+typedef struct SplineVec3 {
+    f32 x;
+    f32 y;
+    f32 z;
+} SplineVec3;
+
+struct HSD_Spline {
+    u8 type;
+    u8 pad_01;
+    s16 numcv;
+    f32 tension;
+    SplineVec3* cv;
+    f32 totalLength;
+    f32* segLength;
+    f32 (*segPoly)[5];
+};
+
+static inline void ColSplGetCardinalPoint(SplineVec3* p, SplineVec3* cp,
+                                          f32 tension, f32 u)
+{
+    f32 u2 = u * u;
+    f32 u3 = u2 * u;
+    f32 car0 = tension * (-u3 + 2.0F * u2 - u);
+    f32 car1 = ((2.0F - tension) * u3) +
+               ((tension - 3.0F) * u2) + 1.0F;
+    f32 car2 = ((tension - 2.0F) * u3) +
+               ((3.0F - (2.0F * tension)) * u2) + (tension * u);
+    f32 car3 = tension * (u3 - u2);
+
+    p->x = (cp[0].x * car0) + (cp[1].x * car1) +
+           (cp[2].x * car2) + (cp[3].x * car3);
+    p->y = (cp[0].y * car0) + (cp[1].y * car1) +
+           (cp[2].y * car2) + (cp[3].y * car3);
+    p->z = (cp[0].z * car0) + (cp[1].z * car1) +
+           (cp[2].z * car2) + (cp[3].z * car3);
+}
+
+static inline void ColSplGetBSplinePoint(SplineVec3* p, SplineVec3* cp,
+                                         f32 u)
+{
+    f32 u2 = u * u;
+    f32 u3 = u2 * u;
+    f32 u_1 = 1.0F - u;
+    f32 k1_6 = 1.0F / 6.0F;
+    f32 b0 = k1_6 * u_1 * u_1 * u_1;
+    f32 b1 = k1_6 * (4.0F + (3.0F * u3 - 6.0F * u2));
+    f32 b2 = k1_6 * (3.0F * (-u3 + u2 + u) + 1.0F);
+    f32 b3 = k1_6 * u3;
+
+    p->x = (cp[0].x * b0) + (cp[1].x * b1) +
+           (cp[2].x * b2) + (cp[3].x * b3);
+    p->y = (cp[0].y * b0) + (cp[1].y * b1) +
+           (cp[2].y * b2) + (cp[3].y * b3);
+    p->z = (cp[0].z * b0) + (cp[1].z * b1) +
+           (cp[2].z * b2) + (cp[3].z * b3);
+}
+
+static inline void ColSplGetBezierPoint(SplineVec3* p, SplineVec3* cp,
+                                        f32 u)
+{
+    f32 u_1 = 1.0F - u;
+    f32 u2 = u * u;
+    f32 u_12 = u_1 * u_1;
+    f32 bez0 = u_12 * u_1;
+    f32 bez1 = 3.0F * u * u_12;
+    f32 bez2 = 3.0F * u2 * u_1;
+    f32 bez3 = u2 * u;
+
+    p->x = (cp[0].x * bez0) + (cp[1].x * bez1) +
+           (cp[2].x * bez2) + (cp[3].x * bez3);
+    p->y = (cp[0].y * bez0) + (cp[1].y * bez1) +
+           (cp[2].y * bez2) + (cp[3].y * bez3);
+    p->z = (cp[0].z * bez0) + (cp[1].z * bez1) +
+           (cp[2].z * bez2) + (cp[3].z * bez3);
+}
+
+void fn_801B2038(SplineVec3* p, HSD_Spline* spline, f32 u)
+{
+    SplineVec3* cp;
+    s16 idx;
+
+    if (u < 0.0F || u > 1.0F) {
+        return;
+    }
+
+    if (u < 1.0F) {
+        f32 t = u * (spline->numcv - 1);
+        idx = t;
+        t -= (f32)idx;
+        switch (spline->type) {
+        case 0:
+            cp = &spline->cv[idx];
+            p->x = (t * (cp[1].x - cp[0].x)) + cp[0].x;
+            p->y = (t * (cp[1].y - cp[0].y)) + cp[0].y;
+            p->z = (t * (cp[1].z - cp[0].z)) + cp[0].z;
+            return;
+        case 1:
+            cp = &spline->cv[idx * 3];
+            ColSplGetBezierPoint(p, cp, t);
+            return;
+        case 2:
+            cp = &spline->cv[idx];
+            ColSplGetBSplinePoint(p, cp, t);
+            return;
+        case 3:
+            cp = &spline->cv[idx];
+            ColSplGetCardinalPoint(p, cp, spline->tension, t);
+            return;
+        }
+    } else {
+        idx = spline->numcv - 1;
+        switch (spline->type) {
+        case 0:
+            *p = spline->cv[idx];
+            return;
+        case 1:
+            *p = spline->cv[idx * 3];
+            return;
+        case 2:
+            cp = &spline->cv[idx] - 1;
+            ColSplGetBSplinePoint(p, cp, 1.0F);
+            return;
+        case 3:
+            cp = &spline->cv[idx];
+            *p = cp[1];
+            return;
+        }
+    }
+}
+
+extern u8 lbl_8047B318;
+extern u8 lbl_8047B319;
+extern u8 lbl_8047B31A;
+extern u8 lbl_8047B31B;
+extern u8 lbl_8047B31C;
+extern u8 lbl_8047B31D;
+extern u8 lbl_8047B31E;
+extern s32 lbl_8047B320;
+extern s32 lbl_8047B324;
+extern u8 lbl_8047B328;
+extern s32 lbl_8047B32C;
+extern u8 lbl_8047B330;
+extern s32 lbl_8047B334;
+extern u8 lbl_8047B338;
+extern s32 lbl_8047B33C;
+extern s32 lbl_8047B340;
+extern s32 lbl_8047B344;
+extern s32 lbl_8047B348;
+
+extern void fn_800BCE30(u8 enable);
+extern void fn_800BCE5C(u8 enable);
+extern void GXSetDstAlpha(u8 enable, u8 alpha);
+extern void GXSetBlendMode(s32 type, s32 src, s32 dst, s32 op);
+extern void GXSetZMode(u8 enable, s32 func, u8 update);
+extern void fn_800BCEBC(u8 beforeTex);
+extern void fn_800BC618(s32 comp0, u8 ref0, s32 op, s32 comp1, u8 ref1);
+extern void fn_800BCFDC(u8 enable);
+
+static inline void TExpStateSetColorUpdate(s32 enable)
+{
+    enable = enable != 0;
+    if (lbl_8047B31D != enable) {
+        fn_800BCE30(enable);
+        lbl_8047B31D = enable;
+    }
+}
+
+static inline void TExpStateSetAlphaUpdate(s32 enable)
+{
+    enable = enable != 0;
+    if (lbl_8047B31C != enable) {
+        fn_800BCE5C(enable);
+        lbl_8047B31C = enable;
+    }
+}
+
+static inline void TExpStateSetDstAlpha(s32 enable, u8 alpha)
+{
+    enable = enable != 0;
+    if (lbl_8047B31B != enable || lbl_8047B31A != alpha) {
+        GXSetDstAlpha(enable, alpha);
+        lbl_8047B31B = enable;
+        lbl_8047B31A = alpha;
+    }
+}
+
+static inline void TExpStateSetBlendMode(s32 type, s32 src, s32 dst, s32 op)
+{
+    if (lbl_8047B348 != type || lbl_8047B344 != src ||
+        lbl_8047B340 != dst || lbl_8047B33C != op) {
+        GXSetBlendMode(type, src, dst, op);
+        lbl_8047B348 = type;
+        lbl_8047B344 = src;
+        lbl_8047B340 = dst;
+        lbl_8047B33C = op;
+    }
+}
+
+static inline void TExpStateSetZMode(s32 enable, s32 func, s32 update)
+{
+    enable = enable != 0;
+    update = update != 0;
+    if (lbl_8047B338 != enable || lbl_8047B334 != func ||
+        lbl_8047B330 != update) {
+        GXSetZMode(enable, func, update);
+        lbl_8047B338 = enable;
+        lbl_8047B334 = func;
+        lbl_8047B330 = update;
+    }
+}
+
+static inline void TExpStateSetZCompLoc(s32 beforeTex)
+{
+    beforeTex = beforeTex != 0;
+    if (lbl_8047B319 != beforeTex) {
+        fn_800BCEBC(beforeTex);
+        lbl_8047B319 = beforeTex;
+    }
+}
+
+static inline void TExpStateSetAlphaCompare(s32 comp0, u8 ref0, s32 op,
+                                            s32 comp1, u8 ref1)
+{
+    if (lbl_8047B32C != comp0 || lbl_8047B328 != ref0 ||
+        lbl_8047B324 != op || lbl_8047B320 != comp1 ||
+        lbl_8047B31E != ref1) {
+        fn_800BC618(comp0, ref0, op, comp1, ref1);
+        lbl_8047B32C = comp0;
+        lbl_8047B328 = ref0;
+        lbl_8047B324 = op;
+        lbl_8047B320 = comp1;
+        lbl_8047B31E = ref1;
+    }
+}
+
+static inline void TExpStateSetDither(s32 enable)
+{
+    enable = enable != 0;
+    if (lbl_8047B318 != enable) {
+        fn_800BCFDC(enable);
+        lbl_8047B318 = enable;
+    }
+}
+
+typedef struct HSD_TevDesc {
+    /* 0x00 */ u32 pad0;
+    /* 0x04 */ u32 flag;
+    /* 0x08 */ u32 stage;
+    /* 0x0C */ u32 coord;
+    /* 0x10 */ u32 map;
+    /* 0x14 */ u32 color;
+    /* 0x18 */ u32 color_op;
+    /* 0x1C */ u32 color_a;
+    /* 0x20 */ u32 color_b;
+    /* 0x24 */ u32 color_c;
+    /* 0x28 */ u32 color_d;
+    /* 0x2C */ u32 color_scale;
+    /* 0x30 */ u32 color_bias;
+    /* 0x34 */ u8 color_clamp;
+    /* 0x35 */ u8 pad35[3];
+    /* 0x38 */ u32 color_tevreg;
+    /* 0x3C */ u32 alpha_op;
+    /* 0x40 */ u32 alpha_a;
+    /* 0x44 */ u32 alpha_b;
+    /* 0x48 */ u32 alpha_c;
+    /* 0x4C */ u32 alpha_d;
+    /* 0x50 */ u32 alpha_scale;
+    /* 0x54 */ u32 alpha_bias;
+    /* 0x58 */ u8 alpha_clamp;
+    /* 0x59 */ u8 pad59[3];
+    /* 0x5C */ u32 alpha_tevreg;
+    /* 0x60 */ u32 pad60;
+    /* 0x64 */ s32 kcolor0;
+    /* 0x68 */ s32 kcolor1;
+    /* 0x6C */ u32 swap0;
+    /* 0x70 */ u32 swap1;
+    /* 0x74 */ u32 kr;
+    /* 0x78 */ u32 kg;
+    /* 0x7C */ u32 kb;
+    /* 0x80 */ u32 ka;
+} HSD_TevDesc;
+
+s32 fn_801B387C(void);
+s32 HSD_StateAssignTev(void);
+void fn_801B3638(HSD_TevDesc* desc);
+void fn_801B3258(void);
+void fn_801B3770(void);
+void fn_801B3890(void);
+void fn_801B2F1C(u32 flags);
+void fn_801B29E4(u32 flags, HSD_PEDesc* pe);
+
+#pragma push
+#pragma optimization_level 1
+static void setupTevMode_last(void)
+{
+    if (fn_801B387C() == 0) {
+        HSD_TevDesc desc;
+        desc.flag = 0;
+        desc.stage = HSD_StateAssignTev();
+        desc.coord = 0xFF;
+        desc.map = GX_TEXMAP_NULL;
+        desc.color = GX_COLOR0A0;
+        desc.color_op = 4;
+        fn_801B3638(&desc);
+    }
+}
+
+void fn_801B294C(u32 flags, HSD_PEDesc* pe)
+{
+    setupTevMode_last();
+    fn_801B29E4(flags, pe);
+    fn_801B3258();
+    fn_801B3770();
+    fn_801B3890();
+    fn_801B2F1C(flags);
+}
+#pragma pop
+
+void fn_801B29E4(u32 flags, HSD_PEDesc* pe)
+{
+    s32 blendType;
+    u8 zUpdate;
+
+    if (pe != NULL) {
+        TExpStateSetColorUpdate(pe->flags & 1);
+        TExpStateSetAlphaUpdate(pe->flags & 2);
+        TExpStateSetDstAlpha(pe->flags & 4, pe->dst_alpha);
+        TExpStateSetBlendMode(pe->type, pe->src_factor, pe->dst_factor,
+                              pe->logic_op);
+        TExpStateSetZMode(pe->flags & 0x10, pe->z_comp,
+                          pe->flags & 0x20);
+        TExpStateSetZCompLoc(pe->flags & 8);
+        TExpStateSetAlphaCompare(pe->alpha_comp0, pe->ref0, pe->alpha_op,
+                                 pe->alpha_comp1, pe->ref1);
+        TExpStateSetDither(pe->flags & 0x40);
+        return;
+    }
+
+    TExpStateSetColorUpdate(1);
+    TExpStateSetAlphaUpdate(0);
+    TExpStateSetDstAlpha(0, 0);
+    if ((flags & 0x40000000) != 0) {
+        blendType = 1;
+    } else {
+        blendType = 0;
+    }
+    TExpStateSetBlendMode(blendType, 4, 5, 0xF);
+    zUpdate = (flags & 0x20000000) ? 0 : 1;
+    TExpStateSetZMode(1, (flags & 0x08000000) ? 7 : 3, zUpdate);
+    if ((flags & 0x20000000) == 0 && (flags & 0x40000000) != 0) {
+        TExpStateSetZCompLoc(0);
+        TExpStateSetAlphaCompare(4, 0, 0, 4, 0);
+    } else {
+        TExpStateSetZCompLoc(1);
+        TExpStateSetAlphaCompare(7, 0, 0, 7, 0);
+    }
+    TExpStateSetDither(0);
+}
+
+typedef GXColor HsdChanColor;
+
+typedef struct HSD_Chan HSD_Chan;
+
+struct HSD_Chan {
+    HSD_Chan* next;
+    s32 chan;
+    u32 flags;
+    HsdChanColor amb_color;
+    HsdChanColor mat_color;
+    u8 enable;
+    u8 pad_15[3];
+    s32 amb_src;
+    s32 mat_src;
+    s32 light_mask;
+    s32 diff_fn;
+    s32 attn_fn;
+    void* aobj;
+};
+
+typedef struct HSD_MaterialState {
+    HsdChanColor ambient;
+    HsdChanColor diffuse;
+    HsdChanColor specular;
+    u8 alpha;
+    u8 pad_0D[3];
+    f32 shininess;
+} HSD_MaterialState;
+
+typedef struct HSD_ChannelModeState {
+    HSD_Chan channels[6];
+} HSD_ChannelModeState;
+
+extern HSD_ChannelModeState lbl_8036CE88;
+extern HSD_Chan lbl_8036D018[4];
+extern HSD_MaterialState lbl_80465710;
+extern HsdChanColor lbl_80478C98;
+extern s32 lbl_8047B360[2];
+extern s32 lbl_8047B368[2];
+extern void fn_800BA4C8(s32 chan, HsdChanColor color);
+extern void fn_800BA5BC(s32 chan, HsdChanColor color);
+extern void fn_800BA6F4(s32 chan, u8 enable, s32 ambSrc, s32 matSrc,
+                        s32 lightMask, s32 diffFn, s32 attnFn);
+extern void HSD_MulColor(HsdChanColor* color0, HsdChanColor* color1,
+                         HsdChanColor* result);
+
+void fn_801B3D1C(HSD_Chan* ch);
+void fn_801B3AE8(s32 chan);
+void HSD_StateSetNumChans(s32 n);
+
+#pragma push
+#pragma optimization_level 2
+void fn_801B2F1C(u32 rendermode)
+{
+    HSD_Chan* const channels = lbl_8036CE88.channels;
+    u32 color_mode = rendermode & 3;
+    u32 alpha_mode;
+    s32 num_chans = 0;
+    s32 alpha_chan = 0;
+    HSD_LObj* alpha_light;
+    s32 max;
+    s32 i;
+    HSD_LObj* light;
+    u8 alpha;
+
+    if (color_mode == 0) {
+        color_mode = 1;
+    }
+    alpha_mode = rendermode & 0x6000;
+    if (alpha_mode == 0) {
+        alpha_mode = color_mode << 13;
+    }
+
+    if (rendermode & 8) {
+        channels[0].light_mask = HSD_LObjGetLightMaskSpecular();
+        fn_801B3D1C(&channels[0]);
+        num_chans = 1;
+        max = HSD_LObjGetNbActive();
+        for (i = 0; i < max; i++) {
+            light = HSD_LObjGetActiveByIndex(i);
+            if (light != NULL) {
+                fn_801A6098(light, light->color, lbl_80465710.shininess);
+            }
+        }
+    }
+
+    if (rendermode & 4) {
+        alpha_light = HSD_LObjGetActiveByID(0x100);
+        if (alpha_light != NULL && (alpha_light->flags & 4)) {
+            HSD_MulColor(&lbl_80465710.ambient, &alpha_light->color,
+                         &channels[1].amb_color);
+        } else {
+            channels[1].amb_color = lbl_80478C98;
+        }
+        channels[1].mat_src = (color_mode >> 1) & 1;
+        channels[1].light_mask = HSD_LObjGetLightMaskDiffuse();
+        fn_801B3D1C(&channels[1]);
+
+        if (alpha_mode & 0x4000) {
+            channels[2].chan = 3;
+            fn_801B3D1C(&channels[3]);
+            alpha_chan = 1;
+        } else {
+            channels[2].chan = 2;
+        }
+        channels[2].light_mask = HSD_LObjGetLightMaskAlpha();
+        if (alpha_light != NULL && (alpha_light->flags & 0x10)) {
+            alpha = alpha_light->color.a;
+        } else {
+            alpha = 0;
+        }
+        if (channels[2].light_mask != 0) {
+            channels[2].enable = 1;
+            channels[2].mat_color.a = 0xFF;
+            channels[2].amb_color.a = alpha;
+        } else {
+            channels[2].mat_color.a = alpha;
+            channels[2].enable = 0;
+        }
+        fn_801B3D1C(&channels[2]);
+    } else {
+        channels[4].mat_src = (color_mode >> 1) & 1;
+        fn_801B3D1C(&channels[4]);
+        channels[5].mat_src = (alpha_mode >> 14) & 1;
+        fn_801B3D1C(&channels[5]);
+    }
+
+    if (num_chans != 0) {
+        if (alpha_chan == 0) {
+            fn_801B3AE8(3);
+        }
+        HSD_StateSetNumChans(2);
+    } else if (alpha_chan != 0) {
+        fn_801B3AE8(1);
+        HSD_StateSetNumChans(2);
+    } else {
+        fn_801B3AE8(5);
+        HSD_StateSetNumChans(1);
+    }
+}
+#pragma pop
+
+static inline s32 ColCompareRGB(HsdChanColor* c0, HsdChanColor* c1)
+{
+    return ((*(u32*)c0 ^ *(u32*)c1) & 0xFFFFFF00) != 0;
+}
+
+static inline s32 ColCompareRGBA(HsdChanColor* c0, HsdChanColor* c1)
+{
+    return *(u32*)c0 != *(u32*)c1;
+}
+
+static inline void ColCopyRGB(HsdChanColor* dst, HsdChanColor* src)
+{
+    *(u32*)dst = (*(u32*)dst & 0xFF) | (*(u32*)src & 0xFFFFFF00);
+}
+
+void fn_801B3D1C(HSD_Chan* ch)
+{
+    s32 idx;
+    s32 chan;
+    s32 no;
+
+    if (ch == NULL || ch->chan == 0xFF) {
+        return;
+    }
+
+    chan = ch->chan;
+    idx = chan & 3;
+    no = chan & 1;
+    if (ch->enable != 0 && ch->amb_src == 0) {
+        if (lbl_8047B368[no] != 0) {
+            lbl_8047B368[no] = 0;
+            fn_800BA4C8(no + 4, ch->amb_color);
+            lbl_8036D018[no].amb_color = ch->amb_color;
+        } else if (chan == 4 || chan == 5) {
+            if (ColCompareRGBA(&ch->amb_color,
+                               &lbl_8036D018[no].amb_color)) {
+                lbl_8036D018[no].amb_color = ch->amb_color;
+                goto set_amb;
+            }
+        } else if (chan == 0 || chan == 1) {
+            if (ColCompareRGB(&ch->amb_color,
+                              &lbl_8036D018[no].amb_color)) {
+                ColCopyRGB(&lbl_8036D018[no].amb_color, &ch->amb_color);
+                goto set_amb;
+            }
+        } else if (ch->amb_color.a != lbl_8036D018[no].amb_color.a) {
+            lbl_8036D018[no].amb_color.a = ch->amb_color.a;
+        set_amb:
+            fn_800BA4C8(chan, ch->amb_color);
+        }
+    }
+
+    if (ch->mat_src == 0) {
+        if (lbl_8047B360[no] != 0) {
+            lbl_8047B360[no] = 0;
+            fn_800BA5BC(no + 4, ch->mat_color);
+            lbl_8036D018[no].mat_color = ch->mat_color;
+        } else if (chan == 4 || chan == 5) {
+            if (ColCompareRGBA(&ch->mat_color,
+                               &lbl_8036D018[no].mat_color)) {
+                lbl_8036D018[no].mat_color = ch->mat_color;
+                goto set_mat;
+            }
+        } else if (chan == 0 || chan == 1) {
+            if (ColCompareRGB(&ch->mat_color,
+                              &lbl_8036D018[no].mat_color)) {
+                ColCopyRGB(&lbl_8036D018[no].mat_color, &ch->mat_color);
+                goto set_mat;
+            }
+        } else if (ch->mat_color.a != lbl_8036D018[no].mat_color.a) {
+            lbl_8036D018[no].mat_color.a = ch->mat_color.a;
+        set_mat:
+            fn_800BA5BC(chan, ch->mat_color);
+        }
+    }
+
+    if (ch->enable != lbl_8036D018[idx].enable ||
+        ch->amb_src != lbl_8036D018[idx].amb_src ||
+        ch->mat_src != lbl_8036D018[idx].mat_src ||
+        ch->light_mask != lbl_8036D018[idx].light_mask ||
+        ch->diff_fn != lbl_8036D018[idx].diff_fn ||
+        ch->attn_fn != lbl_8036D018[idx].attn_fn) {
+        fn_800BA6F4(chan, ch->enable, ch->amb_src, ch->mat_src,
+                    ch->light_mask, ch->diff_fn, ch->attn_fn);
+        lbl_8036D018[idx].enable = ch->enable;
+        lbl_8036D018[idx].amb_src = ch->amb_src;
+        lbl_8036D018[idx].mat_src = ch->mat_src;
+        lbl_8036D018[idx].light_mask = ch->light_mask;
+        lbl_8036D018[idx].diff_fn = ch->diff_fn;
+        lbl_8036D018[idx].attn_fn = ch->attn_fn;
+        if (chan == 4 || chan == 5) {
+            lbl_8036D018[idx + 2].enable = ch->enable;
+            lbl_8036D018[idx + 2].amb_src = ch->amb_src;
+            lbl_8036D018[idx + 2].mat_src = ch->mat_src;
+            lbl_8036D018[idx + 2].light_mask = ch->light_mask;
+            lbl_8036D018[idx + 2].diff_fn = ch->diff_fn;
+            lbl_8036D018[idx + 2].attn_fn = ch->attn_fn;
+        }
+    }
+}
 extern void HSD_ClearVtxDesc(void);
 extern void fn_800B94F0(u32 value);
 extern void fn_800BC8C8(u32 value);
 extern void fn_800B884C(u32 value);
 
-extern u8 lbl_804656E0[];
 extern u8 lbl_80465588[];
 extern u8 lbl_804655B4[];
-extern u8 lbl_80465710[];
 extern u8 lbl_8047B350;
 extern u8 lbl_8047B351;
-extern u32 lbl_8047B34C;
-extern u32 lbl_8047B358;
+extern s32 lbl_8047B34C;
+extern s32 lbl_8047B358;
 extern u32 lbl_8047B370;
 
 /* GObj system globals */
@@ -141,44 +916,6 @@ void HSD_TExpCompile(u8* root, u32* tex_count, u32* ras_count) {
     if (ras_count) *ras_count = r_count;
 }
 
-typedef struct HSD_TevDesc {
-    /* 0x00 */ u32 pad0;
-    /* 0x04 */ u32 flag;
-    /* 0x08 */ u32 stage;
-    /* 0x0C */ u32 coord;
-    /* 0x10 */ u32 map;
-    /* 0x14 */ u32 color;
-    /* 0x18 */ u32 color_op;
-    /* 0x1C */ u32 color_a;
-    /* 0x20 */ u32 color_b;
-    /* 0x24 */ u32 color_c;
-    /* 0x28 */ u32 color_d;
-    /* 0x2C */ u32 color_scale;
-    /* 0x30 */ u32 color_bias;
-    /* 0x34 */ u8  color_clamp;
-    /* 0x35 */ u8  pad35[3];
-    /* 0x38 */ u32 color_tevreg;
-    /* 0x3C */ u32 alpha_op;
-    /* 0x40 */ u32 alpha_a;
-    /* 0x44 */ u32 alpha_b;
-    /* 0x48 */ u32 alpha_c;
-    /* 0x4C */ u32 alpha_d;
-    /* 0x50 */ u32 alpha_scale;
-    /* 0x54 */ u32 alpha_bias;
-    /* 0x58 */ u8  alpha_clamp;
-    /* 0x59 */ u8  pad59[3];
-    /* 0x5C */ u32 alpha_tevreg;
-    /* 0x60 */ u32 pad60;
-    /* 0x64 */ s32 kcolor0;
-    /* 0x68 */ s32 kcolor1;
-    /* 0x6C */ u32 swap0;
-    /* 0x70 */ u32 swap1;
-    /* 0x74 */ u32 kr;
-    /* 0x78 */ u32 kg;
-    /* 0x7C */ u32 kb;
-    /* 0x80 */ u32 ka;
-} HSD_TevDesc;
-
 void fn_800BC6F0();
 void fn_800BC228();
 void fn_800BC290();
@@ -257,6 +994,39 @@ void fn_801B3258(void) {
 }
 #pragma pop
 
+extern char lbl_8047DE60;
+extern char lbl_8047DE68;
+
+/* HSD_Index2TevStage - 0x801B3338 | Size: 0xD0 */
+#pragma push
+#pragma optimization_level 1
+s32 HSD_Index2TevStage(u32 index)
+{
+    switch (index) {
+    case 0:  return 0;
+    case 1:  return 1;
+    case 2:  return 2;
+    case 3:  return 3;
+    case 4:  return 4;
+    case 5:  return 5;
+    case 6:  return 6;
+    case 7:  return 7;
+    case 8:  return 8;
+    case 9:  return 9;
+    case 10: return 10;
+    case 11: return 11;
+    case 12: return 12;
+    case 13: return 13;
+    case 14: return 14;
+    case 15: return 15;
+    default:
+        __assert((const char*)&lbl_8047DE60, 0x326,
+                 (const char*)&lbl_8047DE68);
+        return 15;
+    }
+}
+#pragma pop
+
 /* Address: 0x801B3770 | Size: 0x30 */
 
 
@@ -267,6 +1037,95 @@ void HSD_StateSetNumChans(s32 n) {
         lbl_8047B35C = n;
     }
 }
+
+static inline s32 TExpChannel2Num(s32 chan)
+{
+    switch (chan) {
+    case 0:
+        return 1;
+    case 1:
+        return 2;
+    case 2:
+        return 1;
+    case 3:
+        return 2;
+    case 4:
+        return 1;
+    case 5:
+        return 2;
+    case 0xFF:
+        return 0;
+    default:
+        __assert((const char*)&lbl_8047DE60, 0x2F1,
+                 (const char*)&lbl_8047DE68);
+        return 0;
+    }
+}
+
+/* Address: 0x801B3998 | Size: 0x110 */
+#pragma push
+#pragma optimization_level 1
+void fn_801B3998(HSD_Chan* chan)
+{
+    s32 num_chans = 0;
+
+    while (chan != NULL) {
+        s32 chan_count = TExpChannel2Num(chan->chan);
+        if (chan_count > num_chans) {
+            num_chans = chan_count;
+        }
+        fn_801B3D1C(chan);
+        chan = chan->next;
+    }
+    HSD_StateSetNumChans((u8)num_chans);
+}
+#pragma pop
+
+/* Address: 0x801B3AE8 | Size: 0x234 */
+#pragma push
+#pragma optimization_level 1
+void fn_801B3AE8(s32 chan)
+{
+    s32 idx = chan & 3;
+    s32 amb_src;
+    s32 mat_src;
+    s32 diff_fn;
+    s32 attn_fn;
+
+    switch (chan) {
+    case 4:
+    case 5:
+        if (lbl_8036D018[idx].enable != 0 ||
+            lbl_8036D018[idx + 2].enable != 0) {
+            lbl_8036D018[idx].enable =
+                lbl_8036D018[idx + 2].enable = 0;
+            lbl_8036D018[idx].light_mask =
+                lbl_8036D018[idx + 2].light_mask = 0;
+            amb_src = lbl_8036D018[idx].amb_src;
+            mat_src = lbl_8036D018[idx].mat_src;
+            diff_fn = lbl_8036D018[idx].diff_fn;
+            attn_fn = lbl_8036D018[idx].attn_fn;
+            lbl_8036D018[idx + 2].amb_src = amb_src;
+            lbl_8036D018[idx + 2].mat_src = mat_src;
+            lbl_8036D018[idx + 2].diff_fn = diff_fn;
+            lbl_8036D018[idx + 2].attn_fn = attn_fn;
+            fn_800BA6F4(chan, 0, amb_src, mat_src, 0, diff_fn, attn_fn);
+        }
+        break;
+    default:
+        if (lbl_8036D018[idx].enable != 0) {
+            lbl_8036D018[idx].enable = 0;
+            lbl_8036D018[idx].light_mask = 0;
+            amb_src = lbl_8036D018[idx].amb_src;
+            mat_src = lbl_8036D018[idx].mat_src;
+            diff_fn = lbl_8036D018[idx].diff_fn;
+            attn_fn = lbl_8036D018[idx].attn_fn;
+            fn_800BA6F4(chan, 0, amb_src, mat_src, 0, diff_fn, attn_fn);
+        }
+        break;
+    }
+}
+#pragma pop
 
 /*
  * HSD_TExpValidateInputs - 0x801B45A4 | Size: 0x70
@@ -694,31 +1553,101 @@ void fn_801B750C(HSD_TObj* tobj, u32 lightmap, u32 lightmap_done,
     }
 }
 
+typedef struct ColTExpNode ColTExpNode;
+
+typedef struct ColTEArg {
+    u8 type;
+    u8 sel;
+    u8 arg;
+    u8 pad_03;
+    ColTExpNode* exp;
+} ColTEArg;
+
+struct ColTExpNode {
+    s32 type;
+    ColTExpNode* next;
+    s32 c_ref;
+    u8 c_dst;
+    u8 c_op;
+    u8 c_clamp;
+    u8 c_bias;
+    u8 c_scale;
+    u8 c_range;
+    u8 pad_12[2];
+    s32 a_ref;
+    u8 a_dst;
+    u8 a_op;
+    u8 a_clamp;
+    u8 a_bias;
+    u8 a_scale;
+    u8 a_range;
+    u8 tex_swap;
+    u8 ras_swap;
+    u8 kcsel;
+    u8 kasel;
+    u8 pad_22[0x12];
+    ColTEArg c_in[4];
+    ColTEArg a_in[4];
+    HSD_TObj* tex;
+    u8 chan;
+};
+
+#define COL_TE_ZERO 0
+#define COL_TE_TEV 1
+#define COL_TE_TEX 2
+#define COL_TE_RAS 3
+#define COL_TE_CNST 4
+#define COL_TE_RGB 1
+#define COL_TE_A 5
+#define COL_TE_0 7
+
+static inline s32 ColTExpGetType(ColTExpNode* exp)
+{
+    if (exp == NULL) {
+        return COL_TE_ZERO;
+    }
+    if ((u32) exp == -1U) {
+        return COL_TE_TEX;
+    }
+    if ((u32) exp == -2U) {
+        return COL_TE_RAS;
+    }
+    return exp->type;
+}
+
 /* ========================================================================= */
-/*  GObj render callbacks                                                    */
+/*  TExp graph helpers                                                       */
 /* ========================================================================= */
 
 /*
- * HSD_GObjRenderBasic - 0x801B7BD4 | Size: 0x8C
- * Basic GObj render callback - renders an HSD object.
+ * HSD_TExpRef - 0x801B7BD4 | Size: 0x8C
+ * Increment reference counters for child TExp nodes.
  */
-void fn_801B7BD4(HSD_GObj* gobj, s32 pass) {
-    if (gobj == NULL) {
-        return;
-    }
-    if (gobj->hsd_obj == NULL) {
-        return;
-    }
+#pragma push
+#pragma optimization_level 1
+void fn_801B7BD4(ColTExpNode* exp, s32 sel) {
+    s32 type = ColTExpGetType(exp);
 
-    /* Render based on object kind */
-    switch (gobj->obj_kind) {
-    case 1: /* JOBJ */
-        HSD_JObjDispAll(gobj->hsd_obj, NULL, 0);
+    switch (type) {
+    case COL_TE_TEV:
+        if ((u8) sel == TRUE) {
+            exp->c_ref += 1;
+            return;
+        } else {
+            exp->a_ref += 1;
+            return;
+        }
         break;
-    default:
+    case COL_TE_CNST:
+        exp->c_scale += 1;
         break;
     }
 }
+#pragma pop
+
+/* ========================================================================= */
+/*  GObj render callbacks                                                    */
+/* ========================================================================= */
 
 /*
  * HSD_TExpGetType - 0x801B7C60 | Size: 0x40
@@ -1230,32 +2159,443 @@ void fn_801B9048(u32 pass) {
     }
 }
 
-/* ========================================================================= */
-/*  GObj main loop / scene management                                        */
-/* ========================================================================= */
+/* Keep this as a real call: exposing the same-TU body perturbs the retail
+ * register allocation in the large simplifier below. */
+#define TEXP_REF(exp, sel)                                                   \
+    ((void (*)(ColTExpNode*, s32)) fn_801B7BD4)((exp), (sel))
+#define TEXP_UNREF(exp, sel)                                                 \
+    ((void (*)(ColTExpNode*, u8)) fn_801B750C)((exp), (sel))
 
 /*
- * GObj_SystemInit - 0x801B9320 | Size: 0x196C
- * GObj system initialization and main loop.
- * This is the largest function - it handles full scene lifecycle:
- * initialization, per-frame processing, rendering, and cleanup.
+ * SimplifyByMerge - 0x801B9320 | Size: 0x196C
+ * Fold a compatible child TEV stage into its parent.  Color and alpha are
+ * handled independently, and the pass repeats until no further fold occurs.
  */
-void fn_801B9320(void) {
-    u32 i;
+#pragma push
+#pragma use_lmw_stmw on
+s32 fn_801B9320(ColTExpNode* tev)
+{
+    ColTExpNode* child;
+    s32 bias;
+    s32 result;
+    s32 merged;
+    s32 i;
+    s32 conflict;
+    u8 type;
+    u8 child_sel;
+    u8 new_op;
+    ColTEArg tmp_arg;
 
-    /* Initialize GObj system */
-    for (i = 0; i < 64; i++) {
-        gobj_list[i] = NULL;
-        gobj_render_list[i] = NULL;
-    }
-    gobj_num_active = 0;
-    gobj_next_id = 1;
+    result = 0;
+    do {
+        merged = 0;
 
-    /* Main loop processing is handled by per-frame calls to:
-     * - CalcDistance (process callbacks)
-     * - fn_801B9048 (render dispatch)
-     */
+        if (tev->a_op == 0xFF || tev->a_op == 0xE || tev->a_op == 0xF ||
+            tev->a_op <= 1)
+        {
+            if ((tev->c_op == 0 || tev->c_op == 1) &&
+                tev->c_in[1].sel == COL_TE_0 &&
+                tev->c_in[2].sel == COL_TE_0 &&
+                HSD_TExpGetType((u8*) tev->c_in[0].exp) != COL_TE_CNST &&
+                HSD_TExpGetType((u8*) tev->c_in[3].exp) != COL_TE_CNST)
+            {
+                if (tev->c_op == 0 && tev->c_in[3].type == COL_TE_TEV &&
+                    ((tev->c_in[3].sel == COL_TE_RGB &&
+                      tev->c_in[3].exp->c_clamp != 0) ||
+                     (tev->c_in[3].sel == COL_TE_A &&
+                      tev->c_in[3].exp->a_clamp != 0)))
+                {
+                    type = tev->c_in[0].type;
+                    switch (type) {
+                    case COL_TE_TEX:
+                    case COL_TE_RAS:
+                        tmp_arg = tev->c_in[0];
+                        tev->c_in[0] = tev->c_in[3];
+                        tev->c_in[3] = tmp_arg;
+                        break;
+                    }
+                }
+
+                switch (tev->c_in[0].type) {
+                case COL_TE_TEV:
+                    if (tev->c_in[0].sel == COL_TE_RGB) {
+                        child = tev->c_in[0].exp;
+                        child_sel = tev->c_in[0].sel;
+                        if ((child->c_op == 0 || child->c_op == 1) &&
+                            child->c_in[3].sel == COL_TE_0 &&
+                            child->c_scale == 0)
+                        {
+                            if (tev->tex != NULL && child->tex != NULL &&
+                                tev->tex != child->tex)
+                            {
+                                conflict = 1;
+                            } else if (tev->chan != 0xFF &&
+                                       child->chan != 0xFF &&
+                                       tev->chan != child->chan)
+                            {
+                                conflict = 1;
+                            } else {
+                                conflict = 0;
+                            }
+                            if (conflict == 0) {
+                                switch ((s32) child->c_bias) {
+                                case 1:
+                                    bias = 1;
+                                    break;
+                                case 2:
+                                    bias = -1;
+                                    break;
+                                default:
+                                    bias = 0;
+                                    break;
+                                }
+                                if (child->c_op == 1) {
+                                    bias = -bias;
+                                }
+                                switch ((s32) tev->c_bias) {
+                                case 1:
+                                    bias += 1;
+                                    break;
+                                case 2:
+                                    bias -= 1;
+                                    break;
+                                }
+                                switch (bias) {
+                                case 0:
+                                    tev->c_bias = 0;
+                                    merged = 1;
+                                    break;
+                                case 1:
+                                    tev->c_bias = 1;
+                                    merged = 1;
+                                    break;
+                                case -1:
+                                    tev->c_bias = 2;
+                                    merged = 1;
+                                    break;
+                                default:
+                                    merged = 0;
+                                    break;
+                                }
+                                if (merged != 0) {
+                                    if (child->c_op == 1) {
+                                        if (tev->c_op == 0) {
+                                            new_op = 1;
+                                        } else {
+                                            new_op = 0;
+                                        }
+                                        tev->c_op = new_op;
+                                    }
+                                    for (i = 0; i < 3; i++) {
+                                        tev->c_in[i] = child->c_in[i];
+                                        TEXP_REF(tev->c_in[i].exp,
+                                                 tev->c_in[i].sel);
+                                    }
+                                    if (tev->tex == NULL) {
+                                        tev->tex = child->tex;
+                                    }
+                                    if (tev->chan == 0xFF) {
+                                        tev->chan = child->chan;
+                                    }
+                                    if (tev->tex_swap == 0xFF) {
+                                        tev->tex_swap = child->tex_swap;
+                                    }
+                                    if (tev->ras_swap == 0xFF) {
+                                        tev->ras_swap = child->ras_swap;
+                                    }
+                                    TEXP_UNREF(child, child_sel);
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case COL_TE_ZERO:
+                    if (tev->c_in[3].type == COL_TE_TEV) {
+                        child_sel = tev->c_in[3].sel;
+                        if (child_sel == COL_TE_RGB) {
+                            child = tev->c_in[3].exp;
+                            if (child->c_scale == 0 &&
+                                (tev->c_bias == 0 ||
+                                 tev->c_bias != child->c_bias))
+                            {
+                                if (tev->tex != NULL && child->tex != NULL &&
+                                    tev->tex != child->tex)
+                                {
+                                    conflict = 1;
+                                } else if (tev->chan != 0xFF &&
+                                           child->chan != 0xFF &&
+                                           tev->chan != child->chan)
+                                {
+                                    conflict = 1;
+                                } else {
+                                    conflict = 0;
+                                }
+                                if (conflict == 0) {
+                                    merged = 1;
+                                    for (i = 0; i < 4; i++) {
+                                        tev->c_in[i] = child->c_in[i];
+                                        TEXP_REF(tev->c_in[i].exp,
+                                                 tev->c_in[i].sel);
+                                    }
+                                    tev->c_op = child->c_op;
+                                    switch ((s32) child->c_bias) {
+                                    case 1:
+                                        bias = 1;
+                                        break;
+                                    case 2:
+                                        bias = -1;
+                                        break;
+                                    default:
+                                        bias = 0;
+                                        break;
+                                    }
+                                    if (child->c_op == 1) {
+                                        bias = -bias;
+                                    }
+                                    switch ((s32) tev->c_bias) {
+                                    case 1:
+                                        bias += 1;
+                                        break;
+                                    case 2:
+                                        bias -= 1;
+                                        break;
+                                    }
+                                    switch (bias) {
+                                    case 1:
+                                        tev->c_bias = 1;
+                                        break;
+                                    case -1:
+                                        tev->c_bias = 2;
+                                        break;
+                                    default:
+                                    case 0:
+                                        tev->c_bias = 0;
+                                        break;
+                                    }
+                                    if (tev->c_clamp == 0xFF ||
+                                        tev->c_clamp == 0)
+                                    {
+                                        tev->c_clamp = child->c_clamp;
+                                    }
+                                    if (tev->tex == NULL) {
+                                        tev->tex = child->tex;
+                                    }
+                                    if (tev->chan == 0xFF) {
+                                        tev->chan = child->chan;
+                                    }
+                                    if (tev->tex_swap == 0xFF) {
+                                        tev->tex_swap = child->tex_swap;
+                                    }
+                                    if (tev->ras_swap == 0xFF) {
+                                        tev->ras_swap = child->ras_swap;
+                                    }
+                                    TEXP_UNREF(child, child_sel);
+                                }
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+
+            if ((tev->a_op == 0 || tev->a_op == 1) &&
+                tev->a_in[1].sel == COL_TE_0 &&
+                tev->a_in[2].sel == COL_TE_0 &&
+                HSD_TExpGetType((u8*) tev->a_in[0].exp) != COL_TE_CNST &&
+                HSD_TExpGetType((u8*) tev->a_in[3].exp) != COL_TE_CNST)
+            {
+                if (tev->a_op == 0 && tev->a_in[3].type == COL_TE_TEV &&
+                    tev->a_in[3].exp->a_clamp != 0)
+                {
+                    type = tev->a_in[0].type;
+                    switch ((s32) type) {
+                    case COL_TE_TEX:
+                    case COL_TE_RAS:
+                        tmp_arg = tev->a_in[0];
+                        tev->a_in[0] = tev->a_in[3];
+                        tev->a_in[3] = tmp_arg;
+                        break;
+                    }
+                }
+
+                switch (tev->a_in[0].type) {
+                case COL_TE_TEV:
+                    child = tev->a_in[0].exp;
+                    child_sel = tev->a_in[0].sel;
+                    if ((child->a_op == 0 || child->a_op == 1) &&
+                        child->a_in[3].sel == COL_TE_0 &&
+                        child->a_scale == 0)
+                    {
+                        if (tev->tex != NULL && child->tex != NULL &&
+                            tev->tex != child->tex)
+                        {
+                            conflict = 1;
+                        } else if (tev->chan != 0xFF &&
+                                   child->chan != 0xFF &&
+                                   tev->chan != child->chan)
+                        {
+                            conflict = 1;
+                        } else {
+                            conflict = 0;
+                        }
+                        if (conflict == 0) {
+                            switch ((s32) child->a_bias) {
+                            case 1:
+                                bias = 1;
+                                break;
+                            case 2:
+                                bias = -1;
+                                break;
+                            default:
+                                bias = 0;
+                                break;
+                            }
+                            if (child->a_op == 1) {
+                                bias = -bias;
+                            }
+                            switch ((s32) tev->a_bias) {
+                            case 1:
+                                bias += 1;
+                                break;
+                            case 2:
+                                bias -= 1;
+                                break;
+                            }
+                            switch (bias) {
+                            case 0:
+                                tev->a_bias = 0;
+                                merged = 1;
+                                break;
+                            case 1:
+                                tev->a_bias = 1;
+                                merged = 1;
+                                break;
+                            case -1:
+                                tev->a_bias = 2;
+                                merged = 1;
+                                break;
+                            default:
+                                merged = 0;
+                                break;
+                            }
+                            if (merged != 0) {
+                                if (child->a_op == 1) {
+                                    if (tev->a_op == 0) {
+                                        new_op = 1;
+                                    } else {
+                                        new_op = 0;
+                                    }
+                                    tev->a_op = new_op;
+                                }
+                                for (i = 0; i < 3; i++) {
+                                    tev->a_in[i] = child->a_in[i];
+                                    TEXP_REF(tev->a_in[i].exp,
+                                             tev->a_in[i].sel);
+                                }
+                                if (tev->tex == NULL) {
+                                    tev->tex = child->tex;
+                                }
+                                if (tev->chan == 0xFF) {
+                                    tev->chan = child->chan;
+                                }
+                                TEXP_UNREF(child, child_sel);
+                            }
+                        }
+                    }
+                    break;
+                case COL_TE_ZERO:
+                    if (tev->a_in[3].type == COL_TE_TEV) {
+                        child = tev->a_in[3].exp;
+                        child_sel = tev->a_in[3].sel;
+                        if (child->a_scale == 0 &&
+                            (tev->a_bias == 0 ||
+                             tev->a_bias != child->a_bias))
+                        {
+                            if (tev->tex != NULL && child->tex != NULL &&
+                                tev->tex != child->tex)
+                            {
+                                conflict = 1;
+                            } else if (tev->chan != 0xFF &&
+                                       child->chan != 0xFF &&
+                                       tev->chan != child->chan)
+                            {
+                                conflict = 1;
+                            } else {
+                                conflict = 0;
+                            }
+                            if (conflict == 0) {
+                                merged = 1;
+                                for (i = 0; i < 4; i++) {
+                                    tev->a_in[i] = child->a_in[i];
+                                    TEXP_REF(tev->a_in[i].exp,
+                                             tev->a_in[i].sel);
+                                }
+                                tev->a_op = child->a_op;
+                                switch ((s32) child->a_bias) {
+                                case 1:
+                                    bias = 1;
+                                    break;
+                                case 2:
+                                    bias = -1;
+                                    break;
+                                default:
+                                    bias = 0;
+                                    break;
+                                }
+                                if (child->a_op == 1) {
+                                    bias = -bias;
+                                }
+                                switch ((s32) tev->a_bias) {
+                                case 1:
+                                    bias += 1;
+                                    break;
+                                case 2:
+                                    bias -= 1;
+                                    break;
+                                }
+                                switch (bias) {
+                                case 1:
+                                    tev->a_bias = 1;
+                                    break;
+                                case -1:
+                                    tev->a_bias = 2;
+                                    break;
+                                default:
+                                case 0:
+                                    tev->a_bias = 0;
+                                    break;
+                                }
+                                if (tev->a_clamp == 0xFF ||
+                                    tev->a_clamp == 0)
+                                {
+                                    tev->a_clamp = child->a_clamp;
+                                }
+                                if (tev->tex == NULL) {
+                                    tev->tex = child->tex;
+                                }
+                                if (tev->chan == 0xFF) {
+                                    tev->chan = child->chan;
+                                }
+                                TEXP_UNREF(child, child_sel);
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        if (merged != 0) {
+            result = 1;
+        }
+    } while (merged != 0);
+
+    return result;
 }
+#pragma pop
+
+#undef TEXP_UNREF
+#undef TEXP_REF
 
 /*
  * GObj_SceneSetup - 0x801BAC8C | Size: 0x838
@@ -1293,13 +2633,68 @@ void fn_801BB4C4(void) {
 /* 0x801B1854 | 0x30 */
 extern void HSD_ObjAllocInit(void* list, u32 size, u32 alignment);
 void fn_801B1854(void) {
-    HSD_ObjAllocInit(lbl_804656E0, 0x28, 4);
+    HSD_ObjAllocInit(&lbl_804656E0, 0x28, 4);
 }
 
 /* 0x801B1884 | 0xC */
 void* HSD_ShadowGetAllocData(void) {
-    return lbl_804656E0;
+    return &lbl_804656E0;
 }
+
+extern f32 fn_801B18D8(HSD_Spline* spline, f32 distance);
+
+void splArcLengthPoint(SplineVec3* p, HSD_Spline* spline, f32 distance) {
+    fn_801B2038(p, spline, fn_801B18D8(spline, distance));
+}
+
+typedef void (*HSD_TevStateFn)(void);
+
+typedef struct HSD_TevStateCallback {
+    s32 mask;
+    HSD_TevStateFn callback;
+} HSD_TevStateCallback;
+
+extern HSD_TevStateCallback lbl_8036CFA8[];
+
+/* 0x801B25C4 | 0x90 */
+#pragma push
+#pragma optimization_level 1
+void fn_801B25C4(u32 flags) {
+    s32 i;
+
+    for (i = 0; lbl_8036CFA8[i].mask != 0; i++) {
+        if ((flags & lbl_8036CFA8[i].mask) != 0) {
+            lbl_8036CFA8[i].callback();
+        }
+    }
+}
+#pragma pop
+
+/* 0x801B2654 | 0xA4 */
+#pragma push
+#pragma optimization_level 1
+#pragma use_lmw_stmw on
+void fn_801B2654(void) {
+    lbl_8047B348 = -1;
+    lbl_8047B344 = -1;
+    lbl_8047B340 = -1;
+    lbl_8047B33C = -1;
+    lbl_8047B338 = 0xFF;
+    lbl_8047B334 = -1;
+    lbl_8047B330 = 0xFF;
+    lbl_8047B32C = -1;
+    lbl_8047B328 = 0;
+    lbl_8047B324 = -1;
+    lbl_8047B320 = -1;
+    lbl_8047B31E = 0;
+    lbl_8047B31D = 0xFF;
+    lbl_8047B31C = 0xFF;
+    lbl_8047B31B = 0xFF;
+    lbl_8047B31A = 0;
+    lbl_8047B319 = 0xFF;
+    lbl_8047B318 = 0xFF;
+}
+#pragma pop
 
 /* 0x801B26F8 | 0x20 */
 void fn_801B26F8(void) {
@@ -1307,16 +2702,56 @@ void fn_801B26F8(void) {
 }
 
 /* 0x801B2718 | 0x24 */
+#pragma push
+#pragma optimization_level 1
 void fn_801B2718(void) {
     lbl_8047B351 = 0;
     lbl_8047B350 = 0;
     lbl_8047B34C = -1;
     lbl_8047B351 = 0xFF;
 }
+#pragma pop
+
+/* 0x801B273C | 0x50 */
+#pragma push
+#pragma optimization_level 1
+void fn_801B273C(s32 enable) {
+    u8 normalized = enable ? 1 : 0;
+
+    if (lbl_8047B31C != normalized) {
+        fn_800BCE5C(normalized);
+        lbl_8047B31C = normalized;
+    }
+}
+#pragma pop
+
+/* 0x801B278C | 0x50 */
+#pragma push
+#pragma optimization_level 1
+void fn_801B278C(s32 enable) {
+    u8 normalized = enable ? 1 : 0;
+
+    if (lbl_8047B31D != normalized) {
+        fn_800BCE30(normalized);
+        lbl_8047B31D = normalized;
+    }
+}
+#pragma pop
+
+/* 0x801B2878 | 0x40 */
+#pragma push
+#pragma optimization_level 1
+void fn_801B2878(s32 value) {
+    if (lbl_8047B34C != value) {
+        fn_800B94F0(value);
+        lbl_8047B34C = value;
+    }
+}
+#pragma pop
 
 /* 0x801B28B8 | 0x10 */
 void fn_801B28B8(f32 value) {
-    *(f32*)(lbl_80465710 + 0x10) = value;
+    lbl_80465710.shininess = value;
 }
 
 /* 0x801B3168 | 0xC */
@@ -1325,12 +2760,31 @@ void fn_801B3168(void) {
 }
 
 /* 0x801B3174 | 0x30 */
+#pragma push
+#pragma optimization_level 1
 void fn_801B3174(void) {
-    u32 i;
+    s32 i;
     for (i = 0; i < 4; i++) {
-        *(u32*)((u8*)lbl_8036CFE8 + i * 0xC + 0x8) = 0;
+        lbl_8036CFE8[i].dirty = 0;
     }
 }
+#pragma pop
+
+#pragma push
+#pragma optimization_level 1
+/* 0x801B31A4 | 0x50 */
+void fn_801B31A4(void) {
+    extern void fn_800BBC34(s32 stage);
+    extern void fn_800BBC0C(s32 count);
+    s32 i;
+
+    for (i = 0; i < 16; i++) {
+        fn_800BBC34(i);
+    }
+    fn_800BBC0C(0);
+    lbl_8047B370 = 0;
+}
+#pragma pop
 
 /* 0x801B3770 | 0x30 */
 void fn_801B3770(void) {
@@ -1339,8 +2793,6 @@ void fn_801B3770(void) {
 }
 
 /* 0x801B37A0 | 0xDC */
-extern u32 lbl_8047DE60;
-extern u32 lbl_8047DE68;
 #pragma push
 #pragma optimization_level 1
 s32 HSD_StateAssignTev(void) {
@@ -1368,6 +2820,10 @@ s32 HSD_StateAssignTev(void) {
 }
 #pragma pop
 
+s32 fn_801B387C(void) {
+    return lbl_8047B370;
+}
+
 /* 0x801B3884 | 0xC */
 void fn_801B3884(void) {
     lbl_8047B370 = 0;
@@ -1377,4 +2833,41 @@ void fn_801B3884(void) {
 void fn_801B3890(void) {
     fn_800B884C((u32)(u8)lbl_8047B358);
     lbl_8047B358 = 0;
+}
+
+static inline s32 HSD_TexCoordID2Num(s32 coord)
+{
+    switch (coord) {
+    case 0:
+        return 1;
+    case 1:
+        return 2;
+    case 2:
+        return 3;
+    case 3:
+        return 4;
+    case 4:
+        return 5;
+    case 5:
+        return 6;
+    case 6:
+        return 7;
+    case 7:
+        return 8;
+    case 0xFF:
+        return 0;
+    default:
+        __assert((const char*)&lbl_8047DE60, 0x453,
+                 (const char*)&lbl_8047DE68);
+        return 0;
+    }
+}
+
+void HSD_StateRegisterTexGen(s32 coord)
+{
+    s32 num = HSD_TexCoordID2Num(coord);
+
+    if (num > lbl_8047B358) {
+        lbl_8047B358 = num;
+    }
 }

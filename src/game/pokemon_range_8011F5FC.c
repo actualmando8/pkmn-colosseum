@@ -43,7 +43,7 @@ extern void GSmsgFontClose();
 extern void itemGetStatus();
 extern void LCStoreData();
 extern void memoDataSet();
-extern void menuSubGetPokemonSexForFightDisp();
+extern u8 menuSubGetPokemonSexForFightDisp();
 extern void OSGetTick();
 extern void psInitAppSRT();
 extern void psInitParticle();
@@ -96,10 +96,10 @@ extern s32 pokemonWazaGetMaxPP(u8* ptr, u16 idx);
 extern void wazaGetStatus(void);
 extern void pokemonBiosGetPokemonWazaPtr(void);
 extern void pokemonResetBasisStatus(void* ptr);
-void pokemonSetLevelBasisStatus(u8* ptr, u8 level);
+void pokemonSetLevelBasisStatus(u8* ptr, u32 level);
 extern void heroItemGetItemKindToItemAryPtr(void);
 extern void heroSetStatus();
-extern void heroGetStatus(void);
+extern u32 heroGetStatus(u8* ptr, u32 selector, u16 index);
 extern void* GSresAllocResourceAlign(); /* K&R: called with 5 args, returns void* */
 extern u8 fn_800FF548(void);
 extern u32 _unloadScript__FPvUlUl(); /* K&R: asm void wrapper, used as function pointer */
@@ -152,8 +152,8 @@ extern u8 fn_80121ADC(u8* ptr, u32 slot);
 extern void pokemonSetWazaStatus(void);
 extern u32 pokemonWazaCheckValid(u8* ptr, u32 arg2);
 extern void pokemonInit(u8* ptr);
-extern void pokemonEvolutionCreateAddPokemon(void);
-extern void pokemonEvolution(void);
+extern void pokemonEvolutionCreateAddPokemon();
+extern s32 pokemonEvolution();
 extern void savedataInit(void);
 extern void heroAddPokedoru(u8* ptr, u32 offset);
 extern s32 heroItemAddItemDataId(u8* ptr, u32 arg2, u32 arg3, u32 arg4);
@@ -379,7 +379,7 @@ extern void fightWazaBiosSetZokusei(void);
 extern void fightWazaBiosSetKaisuu(void);
 extern void fightWazaBiosSetAutoMakeFlag(void);
 extern void jumptable_8035C290();
-void wazaSetStatus(void);
+void wazaSetStatus();
 extern void fightWazaBiosGetWazaBanme(void);
 extern void fightWazaBiosGetMotoWazaDataId(void);
 extern void fightWazaBiosGetUseWazaDataId(void);
@@ -424,21 +424,21 @@ extern f32 lbl_8047CFF8;
 extern f32 lbl_8047CFFC;
 extern f32 lbl_8047D000;
 extern f32 lbl_8047D004;
-extern void itemDataBiosGetPtr(void);
-extern void itemDataBiosGetKind(void);
-extern void itemDataBiosGetBuff(void);
+extern u8* itemDataBiosGetPtr(u16 itemDataId);
+extern u8 itemDataBiosGetKind(u8* ptr);
+extern u32 itemDataBiosGetBuff(u8* ptr);
 extern f32 lbl_8047D018;
-void pokemonAddDpFormPokemonDpFilterId(void);
+void pokemonAddDpFormPokemonDpFilterId(u8* ptr, u16 itemDataId, u16 filterId);
 extern void* fn_801EEEB8();
 void pokemonSetDarkPokemonStatus(void);
-extern void GScharCpy(void);
-extern void fn_8010BBB8(void);
+extern void GScharCpy();
+extern u16 fn_8010BBB8();
 extern void fn_8001D994(void);
-void pokemonToMenuPokemonStatus(void);
+void pokemonToMenuPokemonStatus();
 extern void GSmsgGetGSchar(void);
 extern void fn_8010C4D4(void);
 extern void fn_8010C46C(void);
-extern void fn_800E0C54(void);
+extern u32 fn_800E0C54(void);
 extern u8 lbl_8027296C[];
 void pokemonCheckSetMonohiroi(void);
 void pokemonAllKaihuku(void);
@@ -447,7 +447,7 @@ extern void fn_801DA3CC(void);
 extern void fn_801DA36C(void);
 extern u32 lbl_80478F90; /* obj header ptr (SDA) */
 extern void fn_80135530(void);
-void pokemonGetFriendFormPokemonFriendFilterId(void);
+void pokemonGetFriendFormPokemonFriendFilterId(u8* obj, u16 item_id, u32 filter_id);
 extern u8 lbl_80272948[];
 void pokemonGetEffortFromPokemon(void);
 extern void fn_80008154(void);
@@ -455,16 +455,16 @@ extern void fn_80142CF4(void);
 extern u32 sexGetPokemonSexRaitoKotei(u32);
 extern void fn_801EE958(void);
 extern void fn_801EEB34(void);
-extern void memoDataSet(void);
+extern void memoDataSet();
 u32 pokemonCheckFightOut(u8* ptr);
 extern void gamedataAttestBiosCopy(void);
 void pokemonCreate(void);
-void pokemonCreateRndFit(void);
-extern void fadeSet(void);
-extern void fadeCheck(void);
-extern void evolutionOpen(void);
+u32 pokemonCreateRndFit(u8*, s32, s32, s32, u32);
+extern void fadeSet(f32 duration, u32 mode);
+extern void fadeCheck(u32 wait);
+extern s32 evolutionOpen();
 extern f32 lbl_8047D020;
-void pokemonEvolutionAll(void);
+s32 pokemonEvolutionAll(u8*, u32, u32, void*, u8*, s32, s32, s32);
 extern u8 lbl_802729A4[];
 extern u8 lbl_80272998[];
 extern void fn_800F9EE4(void);
@@ -659,76 +659,76 @@ extern u32 lbl_80478F94; /* obj data base (SDA) */
 extern void* tasteDataGetPtr(void* ptr);
 extern void tasteDataGetAisyou(void* ptr, u8 val);
 extern void fn_80135708(void);
-extern void fightPokemonBiosSetMotoPokemonPtr(void);
-extern void fightPokemonBiosSetEntryId(void);
-extern void fightPokemonBiosSetCatchEntryFlag(void);
-extern void fightPokemonBiosSetLevelUpFlag(void);
-extern void fightPokemonBiosSetDarkOutFlag(void);
-extern void fightPokemonBiosSetHokakuFlag(void);
-extern void fightOutPokemonBiosSetMotoFightPokemonPtr(void);
-extern void fightOutPokemonBiosSetFightPokemonPtr(void);
-extern void fightWazaCheckWriteJoutaiDataId(void);
-extern void fightWazaWriteJoutaiDataId(void);
-extern void fightWazaIsJoutaiDataId(void);
-extern void fightWazaInitJoutaiDataId(void);
-extern void fightWazaInitJoutai(void);
-extern void fightOutPokemonBiosSetAbicntPhyAtk(void);
-extern void fightOutPokemonBiosSetAbicntPhyDef(void);
-extern void fightOutPokemonBiosSetAbicntSpeAtk(void);
-extern void fightOutPokemonBiosSetAbicntSpeDef(void);
-extern void fightOutPokemonBiosSetAbicntNimbleness(void);
-extern void fightOutPokemonBiosSetAbicntAverage(void);
-extern void fightOutPokemonBiosSetAbicntAvoid(void);
-extern void fightOutPokemonBiosSetFightoutTurnCount(void);
-extern void fightOutPokemonBiosSetSequencePtr(void);
-extern void fightOutPokemonBiosSetSketchWazaDataId(void);
-extern void fightOutPokemonBiosSetLastSelectWazaDataId(void);
-extern void fightOutPokemonBiosSetLastUseWazaDataId(void);
-extern void fightOutPokemonBiosSetLastReceiveWazaTargetDataId(void);
-extern void fightOutPokemonBiosSetHitWazaDataId(void);
-extern void fightOutPokemonBiosSetHitWazaZokuseiDataId(void);
-extern void fightOutPokemonBiosSetGamanDamageValue(void);
-extern void fightOutPokemonBiosSetGamanDamageTargetId(void);
-extern void fightOutPokemonBiosSetOumuWazaDataId(void);
-extern void fightOutPokemonBiosSetNamakeFlag(void);
-extern void fightOutPokemonBiosSetUsedItemDataId(void);
-extern void fightOutPokemonBiosSetStockItemDataId(void);
-extern void fightOutPokemonBiosSetSuccessCnt(void);
-extern void fightOutPokemonBiosSetMeetEnemyFightPokemonEntryId(void);
-extern void fightOutPokemonBiosSetZokuseiDataId(void);
-extern void fightOutPokemonBiosSetTokuseiDataId(void);
-extern void fightOutPokemonBiosSetDamageAtkValue(void);
-extern void fightOutPokemonBiosSetDamageAtkTargetId(void);
-extern void fightOutPokemonBiosSetDamageSpeValue(void);
-extern void fightOutPokemonBiosSetDamageSpeTargetId(void);
-extern void fightOutPokemonBiosSetMahiNoAttackFlag(void);
-extern void fightOutPokemonBiosSetKonranMyselfAttackFlag(void);
-extern void fightOutPokemonBiosSetOutWazaKoukanaiFlag(void);
-extern void fightOutPokemonBiosSetTameWazaFlag(void);
-extern void fightOutPokemonBiosSetItemNigeruFlag(void);
-extern void fightOutPokemonBiosSetHuuinNoAttackFlag(void);
-extern void fightOutPokemonBiosSetMeroMeroNoAttackFlag(void);
-extern void fightOutPokemonBiosSetKanashibariNoAttackFlag(void);
-extern void fightOutPokemonBiosSetChouhatsuNoAttackFlag(void);
-extern void fightOutPokemonBiosSetIchamonNoAttackFlag(void);
-extern void fightOutPokemonBiosSetHirumuNoAttackFlag(void);
-extern void fightOutPokemonBiosSetPassPpdecFlag(void);
-extern void fightOutPokemonBiosSetFightActionFlag(void);
-extern void fightOutPokemonBiosSetDoClearbodyFlag(void);
-extern void fightOutPokemonBiosSetReceivesWazaHiraishinFlag(void);
-extern void fightOutPokemonBiosSetVanishoffFlag(void);
-extern void fightOutPokemonBiosSetDoIkakuFlag(void);
-extern void fightOutPokemonBiosSetDoTraceFlag(void);
-extern void fightOutPokemonBiosSetNoPressureFlag(void);
-extern void fightOutPokemonBiosSetIrekaetaFlag(void);
-extern void fightOutPokemonBiosSetItemKoraetaFlag(void);
-extern void fightOutPokemonBiosSetKaigaraDamageValue(void);
-extern void fightOutPokemonBiosSetMyselfDamageAtkValue(void);
-extern void fightOutPokemonBiosSetMyselfDamageAtkTargetId(void);
-extern void fightOutPokemonBiosSetMyselfDamageSpeValue(void);
-extern void fightOutPokemonBiosSetMyselfDamageSpeTargetId(void);
-extern void fightOutPokemonBiosSetKizetuFlag(void);
-extern void fightOutPokemonBiosSetIrekaeTargetEntryId(void);
+extern void fightPokemonBiosSetMotoPokemonPtr();
+extern void fightPokemonBiosSetEntryId();
+extern void fightPokemonBiosSetCatchEntryFlag();
+extern void fightPokemonBiosSetLevelUpFlag();
+extern void fightPokemonBiosSetDarkOutFlag();
+extern void fightPokemonBiosSetHokakuFlag();
+extern void fightOutPokemonBiosSetMotoFightPokemonPtr();
+extern void fightOutPokemonBiosSetFightPokemonPtr();
+extern u8 fightWazaCheckWriteJoutaiDataId(u32 fight_waza, u16 joutai_id);
+extern void fightWazaWriteJoutaiDataId(u32 fight_waza, u16 joutai_id, u32 arg);
+extern u8 fightWazaIsJoutaiDataId(u32 fight_waza, u16 joutai_id);
+extern void fightWazaInitJoutaiDataId(u32 fight_waza, u16 joutai_id);
+extern void fightWazaInitJoutai(u32 fight_waza);
+extern void fightOutPokemonBiosSetAbicntPhyAtk();
+extern void fightOutPokemonBiosSetAbicntPhyDef();
+extern void fightOutPokemonBiosSetAbicntSpeAtk();
+extern void fightOutPokemonBiosSetAbicntSpeDef();
+extern void fightOutPokemonBiosSetAbicntNimbleness();
+extern void fightOutPokemonBiosSetAbicntAverage();
+extern void fightOutPokemonBiosSetAbicntAvoid();
+extern void fightOutPokemonBiosSetFightoutTurnCount();
+extern void fightOutPokemonBiosSetSequencePtr();
+extern void fightOutPokemonBiosSetSketchWazaDataId();
+extern void fightOutPokemonBiosSetLastSelectWazaDataId();
+extern void fightOutPokemonBiosSetLastUseWazaDataId();
+extern void fightOutPokemonBiosSetLastReceiveWazaTargetDataId();
+extern void fightOutPokemonBiosSetHitWazaDataId();
+extern void fightOutPokemonBiosSetHitWazaZokuseiDataId();
+extern void fightOutPokemonBiosSetGamanDamageValue();
+extern void fightOutPokemonBiosSetGamanDamageTargetId();
+extern void fightOutPokemonBiosSetOumuWazaDataId();
+extern void fightOutPokemonBiosSetNamakeFlag();
+extern void fightOutPokemonBiosSetUsedItemDataId();
+extern void fightOutPokemonBiosSetStockItemDataId();
+extern void fightOutPokemonBiosSetSuccessCnt();
+extern void fightOutPokemonBiosSetMeetEnemyFightPokemonEntryId(u8* ptr, u8 index, u16 entry_id);
+extern void fightOutPokemonBiosSetZokuseiDataId();
+extern void fightOutPokemonBiosSetTokuseiDataId();
+extern void fightOutPokemonBiosSetDamageAtkValue();
+extern void fightOutPokemonBiosSetDamageAtkTargetId();
+extern void fightOutPokemonBiosSetDamageSpeValue();
+extern void fightOutPokemonBiosSetDamageSpeTargetId();
+extern void fightOutPokemonBiosSetMahiNoAttackFlag();
+extern void fightOutPokemonBiosSetKonranMyselfAttackFlag();
+extern void fightOutPokemonBiosSetOutWazaKoukanaiFlag();
+extern void fightOutPokemonBiosSetTameWazaFlag();
+extern void fightOutPokemonBiosSetItemNigeruFlag();
+extern void fightOutPokemonBiosSetHuuinNoAttackFlag();
+extern void fightOutPokemonBiosSetMeroMeroNoAttackFlag();
+extern void fightOutPokemonBiosSetKanashibariNoAttackFlag();
+extern void fightOutPokemonBiosSetChouhatsuNoAttackFlag();
+extern void fightOutPokemonBiosSetIchamonNoAttackFlag();
+extern void fightOutPokemonBiosSetHirumuNoAttackFlag();
+extern void fightOutPokemonBiosSetPassPpdecFlag();
+extern void fightOutPokemonBiosSetFightActionFlag();
+extern void fightOutPokemonBiosSetDoClearbodyFlag();
+extern void fightOutPokemonBiosSetReceivesWazaHiraishinFlag();
+extern void fightOutPokemonBiosSetVanishoffFlag();
+extern void fightOutPokemonBiosSetDoIkakuFlag();
+extern void fightOutPokemonBiosSetDoTraceFlag();
+extern void fightOutPokemonBiosSetNoPressureFlag();
+extern void fightOutPokemonBiosSetIrekaetaFlag();
+extern void fightOutPokemonBiosSetItemKoraetaFlag();
+extern void fightOutPokemonBiosSetKaigaraDamageValue();
+extern void fightOutPokemonBiosSetMyselfDamageAtkValue();
+extern void fightOutPokemonBiosSetMyselfDamageAtkTargetId();
+extern void fightOutPokemonBiosSetMyselfDamageSpeValue();
+extern void fightOutPokemonBiosSetMyselfDamageSpeTargetId();
+extern void fightOutPokemonBiosSetKizetuFlag();
+extern void fightOutPokemonBiosSetIrekaeTargetEntryId();
 extern void jumptable_8035E028();
 extern void pokemonDataBiosGetItemDataId(void);
 extern void fightPokemonBiosGetMotoPokemonPtr(void);
@@ -1122,7 +1122,7 @@ extern u8 wazaGetMaxPP(u32 arg1, u8 arg2);
 extern u32 pokemonNakigoeDataBiosGetDataAddress(u8* ptr);
 extern void* pokemonDpFilterDataBiosGetPtr(u16 idx);
 extern s8 pokemonFriendFilterDataBiosGetValue(u8* ptr, u8 idx);
-extern void* pokemonFriendFilterDataBiosGetPtr(u16 idx);
+extern void* pokemonFriendFilterDataBiosGetPtr(u32 idx);
 extern void* pokemonTokuseiDataBiosGetPtr(u16 idx);
 extern void* pokemonSeikakuRateDataBiosGetPtr(u8 idx);
 extern u8 fn_8011CBF4(u8* ptr, u8 idx);
@@ -1130,22 +1130,22 @@ extern u8 fn_8011CC24(u8* ptr, u8 idx);
 extern void* pokemonSeikakuDataBiosGetPtr(u8 idx);
 extern u32 pokemonGrowDataBiosGetExp(u8* ptr, u8 idx);
 extern void* pokemonGrowDataBiosGetPtr(u8 idx);
-extern void fn_8011CED0(u8* ptr, u16 idx, u8 val);
-extern void pokemonDataBiosSetKowaza(u8* ptr, u16 idx, u16 val);
-extern void pokemonDataBiosSetTukamaetaFlag(u8* ptr);
-extern void pokemonDataBiosSetMitaFlag(u8* ptr);
-extern void pokemonDataBiosSetColor(u8* ptr, u16 idx, u8 val);
-extern void pokemonDataBiosSetStatusFaceMenuSpriteId(u8* ptr, u16 idx, u16 val);
-extern void pokemonDataBiosSetPokebodyId(u8* ptr, u16 idx, u32 val);
+extern void fn_8011CED0(u8* ptr, u32 idx, u8 val);
+extern void pokemonDataBiosSetKowaza(u8* ptr, u32 idx, u16 val);
+extern void pokemonDataBiosSetTukamaetaFlag(u8* ptr, u32 val);
+extern void pokemonDataBiosSetMitaFlag(u8* ptr, u32 val);
+extern void pokemonDataBiosSetColor(u8* ptr, u32 idx, u8 val);
+extern void pokemonDataBiosSetStatusFaceMenuSpriteId(u8* ptr, u32 idx, u16 val);
+extern void pokemonDataBiosSetPokebodyId(u8* ptr, u32 idx, u32 val);
 extern void pokemonDataBiosSetWazaMcn(u8* ptr, u16 idx, u8 val);
-extern void pokemonDataBiosSetGetWazaDataId(u8* ptr, u16 idx, u16 val);
-extern void pokemonDataBiosSetGetWazaLevel(u8* ptr, u16 idx, u8 val);
-extern void pokemonDataBiosSetSinkaPokemonDataId(u8* ptr, u16 idx, u16 val);
-extern void pokemonDataBiosSetSinkaBuff(u8* ptr, u16 idx, u16 val);
-extern void pokemonDataBiosSetSinkaKind(u8* ptr, u16 idx, u8 val);
-extern void pokemonDataBiosSetTokuseiDataId(u8* ptr, u16 idx, u8 val);
-extern void pokemonDataBiosSetZokuseiDataId(u8* ptr, u16 idx, u8 val);
-extern void pokemonDataBiosSetItemDataId(u8* ptr, u16 idx, u16 val);
+extern void pokemonDataBiosSetGetWazaDataId(u8* ptr, u32 idx, u16 val);
+extern void pokemonDataBiosSetGetWazaLevel(u8* ptr, u32 idx, u8 val);
+extern void pokemonDataBiosSetSinkaPokemonDataId(u8* ptr, u32 idx, u16 val);
+extern void pokemonDataBiosSetSinkaBuff(u8* ptr, u32 idx, u16 val);
+extern void pokemonDataBiosSetSinkaKind(u8* ptr, u32 idx, u8 val);
+extern void pokemonDataBiosSetTokuseiDataId(u8* ptr, u32 idx, u8 val);
+extern void pokemonDataBiosSetZokuseiDataId(u8* ptr, u32 idx, u8 val);
+extern void pokemonDataBiosSetItemDataId(u8* ptr, u32 idx, u16 val);
 extern void pokemonDataBiosSetGiveNimblenessEffort(void* ptr, u16 val);
 extern void pokemonDataBiosSetGiveSpeDefEffort(void* ptr, u16 val);
 extern void pokemonDataBiosSetGiveSpeAtkEffort(void* ptr, u16 val);
@@ -1205,8 +1205,8 @@ extern void pokemonBiosSetPhyAtk(void* ptr, u16 val);
 extern void pokemonBiosSetMaxHp(void* ptr, u16 val);
 extern void pokemonBiosSetHp(u8* ptr, u16 val);
 extern void pokemonBiosSetPokemonWazaPpCount(u8* ptr, u32 arg2, u8 arg3);
-extern void pokemonBiosSetPokemonWazaPp(u32 arg1, s32 arg2, u8 maxVal);
-extern void pokemonBiosSetPokemonWazaDataId(void* ctx, u32 p1, u32 value);
+extern void pokemonBiosSetPokemonWazaPp(u8* arg1, s32 arg2, u8 maxVal);
+extern void pokemonBiosSetPokemonWazaDataId(void* ctx, u32 p1, u16 value);
 extern void pokemonBiosSetLevel(u8* ptr, u8 val);
 extern void pokemonBiosSetPoolFriend(u8* ptr, u16 val);
 extern void pokemonBiosSetNicknameOrgPtr(u8* ptr, void* src);
@@ -1230,7 +1230,7 @@ extern u16 pokemonDataBiosGetBasisSpeAtk(void* ptr);
 extern u16 pokemonDataBiosGetBasisPhyDef(void* ptr);
 extern u16 pokemonDataBiosGetBasisPhyAtk(void* ptr);
 extern u16 pokemonDataBiosGetBasisMaxHp(void* ptr);
-extern void* pokemonDataBiosGetPtr(u16 idx);
+extern void* pokemonDataBiosGetPtr(u32 idx);
 extern u8 pokemonBiosGetEventGetFlag(u8* ptr);
 extern u8 pokemonBiosGetAmariRibbon(void* ptr);
 extern u8 pokemonBiosGetWorldRibbon(void* ptr);
@@ -1323,7 +1323,6 @@ extern s32 pokemonSearchWazaDataId(u8* ptr, u16 target);
 extern void pokemonWazaReplace(void* ptr, u32 idx, u32 arg);
 extern void pokemonWazaCreate(u8* ptr, u32 slot, u32 val);
 extern void pokemonSetCatchStatus(u8* arg1, u32 arg2, u8 arg3, u16 arg4, u8 arg5, u32 arg6, u32 arg7);
-extern u32 pokemonCheckValid(u8* ptr);
 extern u16 pokemonGetTokuseiDataId(u8* ptr);
 extern void pokemonInitAry(u8* ptr, u16 count);
 extern void pokemonInitDarkPokemon(u8* ptr);
@@ -1492,16 +1491,103 @@ extern f32 lbl_8047D004;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void pokemonGetDarkPokemonLevel(void);
 /* 0x8011F910 | 0x2BC */
-extern void itemDataBiosGetPtr(void);
-extern void itemDataBiosGetKind(void);
-extern void itemDataBiosGetBuff(void);
+extern u8* itemDataBiosGetPtr(u16 itemDataId);
+extern u8 itemDataBiosGetKind(u8* ptr);
+extern u32 itemDataBiosGetBuff(u8* ptr);
 extern f64 lbl_8047D008;
 extern f64 lbl_8047D010;
 extern f32 lbl_8047CFF0;
 extern f32 lbl_8047CFF4;
 extern f32 lbl_8047D018;
-/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void pokemonAddDpFormPokemonDpFilterId(void);
+void pokemonAddDpFormPokemonDpFilterId(u8* ptr, u16 itemDataId, u16 filterId) {
+    u8* seikakuData;
+    u8* rateData;
+    u8* itemData;
+    s32 rateDataId;
+    u8 kake;
+    u8 waru;
+    f32 dp;
+    f32 currentDp;
+    f32 newDp;
+    s32 rawDp;
+
+    if ((u8)pokemonGetStatus(ptr, 0, 0xC2, 0) == 0) {
+        return;
+    }
+
+    seikakuData = pokemonSeikakuDataBiosGetPtr(
+        (u8)pokemonGetStatus(ptr, 0, 0xBF, 0));
+    if (seikakuData == NULL) {
+        return;
+    }
+
+    dp = (f32)(s8)pokemonDpFilterDataBiosGetValue(
+        pokemonDpFilterDataBiosGetPtr(filterId));
+
+    if (filterId == 4) {
+        itemData = itemDataBiosGetPtr(itemDataId);
+        if (itemData == NULL) {
+            return;
+        }
+        if (itemDataBiosGetKind(itemData) != 6) {
+            return;
+        }
+        dp *= (f32)itemDataBiosGetBuff(itemData);
+    }
+
+    if (filterId == 5) {
+        if (ptr == NULL) {
+            currentDp = lbl_8047CFF0;
+        } else {
+            rawDp = pokemonGetStatus(ptr, 0, 0xC5, 0);
+            currentDp = (f32)rawDp / lbl_8047CFF4;
+        }
+        dp = lbl_8047D018 * currentDp;
+    }
+
+    if (filterId == 0) {
+        rateDataId = pokemonSeikakuDataBiosGetReliveFightout(seikakuData);
+    } else if (filterId == 1) {
+        rateDataId = pokemonSeikakuDataBiosGetReliveWalk(seikakuData);
+    } else if (filterId == 2) {
+        rateDataId = pokemonSeikakuDataBiosGetReliveCall(seikakuData);
+    } else if (filterId == 3) {
+        rateDataId = pokemonSeikakuDataBiosGetReliveSodateya(seikakuData);
+    } else if (filterId == 4) {
+        rateDataId = pokemonSeikakuDataBiosGetReliveNadenade(seikakuData);
+    }
+
+    rateData = pokemonSeikakuRateDataBiosGetPtr((u8)rateDataId);
+    if (rateData == NULL) {
+        return;
+    }
+
+    kake = pokemonSeikakuRateDataBiosGetKake(rateData);
+    waru = pokemonSeikakuRateDataBiosGetWaru(rateData);
+    if (waru != 0) {
+        dp *= (f32)kake;
+        dp /= (f32)waru;
+    } else {
+        return;
+    }
+
+    if (ptr != NULL) {
+        if (ptr == NULL) {
+            currentDp = lbl_8047CFF0;
+        } else {
+            rawDp = pokemonGetStatus(ptr, 0, 0xC5, 0);
+            currentDp = (f32)rawDp / lbl_8047CFF4;
+        }
+        newDp = currentDp + dp;
+        if (newDp < lbl_8047CFF0) {
+            newDp = lbl_8047CFF0;
+        }
+        if (ptr != NULL) {
+            pokemonSetStatus(ptr, 0, 0xC5, 0,
+                             (u32)(s32)(lbl_8047CFF4 * newDp));
+        }
+    }
+}
 /* 0x48 | pokemonSetDp | generic */
 extern f32 lbl_8047CFF4;
 #if 0
@@ -1544,24 +1630,145 @@ extern f32 lbl_8047CFF4;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void pokemonSetDarkPokemonStatus(void);
 /* 0x8011FDC8 | 0x504 */
-extern void GScharCpy(void);
-extern void fn_8010BBB8(void);
+extern void GScharCpy();
+extern u16 fn_8010BBB8();
 extern void fn_8001D994(void);
 extern f64 lbl_8047D010;
 extern f32 lbl_8047CFF0;
 extern f64 lbl_8047D008;
 extern f32 lbl_8047CFF4;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void pokemonToMenuPokemonStatus(void);
+void pokemonToMenuPokemonStatus();
 /* 0x801202CC | 0x1DC */
 extern f64 lbl_8047D010;
 extern f32 lbl_8047CFF0;
 extern f64 lbl_8047D008;
 extern f32 lbl_8047CFF4;
+static inline u32 pokemonGetLevelToExpInline(u32 pokemon, u8 level)
+{
+    u16 dataId;
+    u8 growId;
+    void* growData;
+
+    if (pokemon == 0) {
+        return 0;
+    }
+    dataId = (u16)pokemonGetStatus(pokemon, 0, 0x6E, 0);
+    growId = (u8)pokemonGetStatus(0, dataId, 0x11, 0);
+    growData = pokemonGrowDataBiosGetPtr(growId);
+    if (growData == NULL) {
+        return 0;
+    }
+    return pokemonGrowDataBiosGetExp(growData, level);
+}
+
+void pokemonToMenuPokemonStatus(u32 pokemon, u8* output)
+{
+    typedef struct MenuPokemonStatus {
+        u8 name[0x17];
+        u8 level;
+        u16 maxHp;
+        u16 hp;
+        union {
+            u32 integer;
+            f32 real;
+        } progressMax;
+        union {
+            u32 integer;
+            f32 real;
+        } progress;
+        u16 conditionIcon;
+        u16 displayValue;
+        u8 sex;
+        u8 darkState;
+        u16 status82;
+    } MenuPokemonStatus;
+    extern u8 fn_8011B67C();
+    extern u32 pokemonGetStatus();
+
+#define MENU ((MenuPokemonStatus*)output)
+    u8 level;
+    u32 baseExp;
+    u32 nextExp;
+    u32 convert[2];
+    u16 icon;
+
+    pokemonGetStatus(pokemon, 0, 0x6E, 0);
+    GScharCpy(MENU->name, pokemonGetStatus(pokemon, 0, 0x77, 0));
+    MENU->level = (u8)pokemonGetStatus(pokemon, 0, 0x7A, 0);
+    MENU->maxHp = (u16)pokemonGetStatus(pokemon, 0, 0x87, 0);
+    MENU->hp = (u16)pokemonGetStatus(pokemon, 0, 0x83, 0);
+
+    level = (u8)pokemonGetStatus(pokemon, 0, 0x7A, 0);
+    baseExp = pokemonGetLevelToExpInline(pokemon, level);
+
+    if ((u8)pokemonGetStatus(pokemon, 0, 0xC2, 0) == 0) {
+        nextExp = pokemonGetLevelToExpInline(pokemon, ++level);
+        MENU->progressMax.integer = nextExp - baseExp;
+        MENU->progress.integer =
+            pokemonGetStatus(pokemon, 0, 0x79, 0) - baseExp;
+    } else {
+        u16 darkMax;
+
+        darkMax = (u16)(u32)fn_801EEEB8(
+            (u16)pokemonGetStatus(pokemon, 0, 0xC3, 0));
+        convert[0] = 0x43300000;
+        convert[1] = darkMax;
+        MENU->progressMax.real = *(f64*)convert - lbl_8047D010;
+        if (pokemon == 0) {
+            MENU->progress.real = lbl_8047CFF0;
+        } else {
+            convert[0] = 0x43300000;
+            convert[1] =
+                pokemonGetStatus(pokemon, 0, 0xC5, 0) ^ 0x80000000;
+            MENU->progress.real =
+                (*(f64*)convert - lbl_8047D008) / lbl_8047CFF4;
+        }
+    }
+
+    if ((fn_80119ED0(3) == 0x7C || fn_80119ED0(3) == 0xC8) &&
+        fn_8011B67C(pokemon, 3) == 1) {
+        icon = 0x3A;
+    } else if ((fn_80119ED0(4) == 0x7C || fn_80119ED0(4) == 0xC8) &&
+               fn_8011B67C(pokemon, 4) == 1) {
+        icon = 0x3A;
+    } else if ((fn_80119ED0(5) == 0x7C || fn_80119ED0(5) == 0xC8) &&
+               fn_8011B67C(pokemon, 5) == 1) {
+        icon = 0x3B;
+    } else if ((fn_80119ED0(6) == 0x7C || fn_80119ED0(6) == 0xC8) &&
+               fn_8011B67C(pokemon, 6) == 1) {
+        icon = 0x3C;
+    } else if ((fn_80119ED0(7) == 0x7C || fn_80119ED0(7) == 0xC8) &&
+               fn_8011B67C(pokemon, 7) == 1) {
+        icon = 0x3D;
+    } else if ((fn_80119ED0(8) == 0x7C || fn_80119ED0(8) == 0xC8) &&
+               fn_8011B67C(pokemon, 8) == 1) {
+        icon = 0x3E;
+    } else {
+        icon = 0;
+    }
+    MENU->conditionIcon = icon;
+    MENU->displayValue = fn_8010BBB8(pokemon);
+    MENU->sex = menuSubGetPokemonSexForFightDisp(pokemon);
+
+    if ((u8)pokemonGetStatus(pokemon, 0, 0xC2, 0) == 0) {
+        MENU->darkState = 0;
+    } else if ((fn_80119ED0(0x3E) == 0x7C ||
+                fn_80119ED0(0x3E) == 0xC8) &&
+               fn_8011B67C(pokemon, 0x3E) != 0) {
+        MENU->darkState = 2;
+    } else {
+        MENU->darkState = 1;
+    }
+    MENU->status82 = (u16)pokemonGetStatus(pokemon, 0, 0x82, 0);
+#undef MENU
+}
+
 #if 0
 asm void pokemonToMenuPokemonStatusSubBar(void) {
 #include "src/game/gs_field_world_fn_801202CC.inc"
 }
+
 #else
 void pokemonToMenuPokemonStatusSubBar(u8* ptr, u8* out) {
     extern u32 pokemonGetStatus(u8* ptr, u32 a, u32 b, u32 c);
@@ -1679,7 +1886,7 @@ void pokemonToMenuWazaStatus(u8* ptr, u8* out) {
 }
 #endif
 /* 0x80120674 | 0x1F8 */
-extern void fn_800E0C54(void);
+extern u32 fn_800E0C54(void);
 extern u8 lbl_8027296C[];
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 void pokemonCheckSetMonohiroi(void);
@@ -2342,8 +2549,139 @@ void pokemonSetSequenceStatus(u8* ptr, void* obj) {
 /* 0x80122370 | 0x360 */
 extern void fn_80135530(void);
 extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
-/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void pokemonGetFriendFormPokemonFriendFilterId(void);
+void pokemonGetFriendFormPokemonFriendFilterId(u8* obj, u16 item_id, u32 filter_id)
+{
+    extern u32 pokemonGetDarkPokemonLevel(u8* obj);
+    extern u32 gamedataAttestCheckValid(u32 value);
+    s8 raw_delta;
+    s32 friendship;
+    s32 delta;
+    s32 adjusted_delta;
+    u8 valid;
+    u8 tier;
+
+    if (obj == NULL) {
+        return;
+    }
+
+    if (obj == NULL) {
+        valid = 0;
+    } else {
+        friendship = (u16)pokemonGetStatus(obj, 0, 0x6E, 0);
+        if (friendship == 0) {
+            valid = 0;
+        } else {
+            if (friendship == 0) {
+                valid = 0;
+            } else if (pokemonGetStatus(NULL, friendship, 1, 0) == 0) {
+                valid = 0;
+            } else if ((u32)friendship >= *(u32*)lbl_80478F90) {
+                valid = 0;
+            } else {
+                valid = 1;
+            }
+            if (valid == 0) {
+                valid = 0;
+            } else if ((u8)gamedataAttestCheckValid(
+                           pokemonGetStatus(obj, 0, 0x70, 0)) == 0) {
+                valid = 0;
+            } else if ((u8)pokemonGetStatus(obj, 0, 0xB8, 0) == 1) {
+                valid = 0;
+            } else {
+                valid = 1;
+            }
+        }
+    }
+    if (valid == 0) {
+        valid = 0;
+    } else if ((s32)pokemonGetStatus(obj, 0, 0x6E, 0) == 0x19C) {
+        valid = 0;
+    } else if ((u8)pokemonGetStatus(obj, 0, 0xB6, 0) == 1) {
+        valid = 0;
+    } else {
+        if ((u16)filter_id == 6) {
+            goto filter_valid;
+        }
+        if ((u16)filter_id == 7) {
+            goto filter_valid;
+        }
+        if ((u16)filter_id == 8) {
+            goto filter_valid;
+        }
+        if ((u8)pokemonGetStatus(obj, 0, 0x7B, 0) == 1) {
+            valid = 0;
+            goto validity_done;
+        }
+filter_valid:
+        valid = 1;
+    }
+validity_done:
+    if (valid == 0) {
+        return;
+    }
+
+    friendship = (s32)pokemonGetStatus(obj, 0, 0x99, 0);
+    if ((u8)pokemonGetStatus(obj, 0, 0xC2, 0) == 1) {
+        friendship += (s32)pokemonGetStatus(obj, 0, 0xC7, 0);
+    }
+
+    tier = 0;
+    if (friendship >= 100) {
+        tier = 1;
+    }
+    if (friendship >= 200) {
+        tier = (u8)((u8)tier + 1);
+    }
+
+    if ((u16)filter_id == 5) {
+        if (fn_800E0C54() & 1) {
+            return;
+        }
+    }
+
+    raw_delta = pokemonFriendFilterDataBiosGetValue(
+        pokemonFriendFilterDataBiosGetPtr(filter_id), tier);
+    delta = raw_delta;
+    if (delta > 0) {
+        if (item_id == 0x1B) {
+            delta = (delta * 150) / 100;
+        }
+    }
+
+    adjusted_delta = delta;
+    if (delta > 0) {
+        if ((u16)pokemonGetStatus(obj, 0, 0x73, 0) == 0xB) {
+            adjusted_delta = delta + 1;
+        }
+    }
+
+    if ((u8)pokemonGetStatus(obj, 0, 0xC2, 0) == 1) {
+        s32 new_value;
+
+        if ((u8)pokemonGetDarkPokemonLevel(obj) < 3) {
+            return;
+        }
+        new_value = (s32)pokemonGetStatus(obj, 0, 0xC7, 0);
+        new_value += adjusted_delta;
+        if (new_value < 0) {
+            new_value = 0;
+        }
+        if (new_value > 0xFF) {
+            new_value = 0xFF;
+        }
+        pokemonSetStatus(obj, 0, 0xC7, 0, (u32)new_value);
+        return;
+    }
+
+    friendship += adjusted_delta;
+    if (friendship < 0) {
+        friendship = 0;
+    }
+    if (friendship > 0xFF) {
+        friendship = 0xFF;
+    }
+    pokemonSetStatus(obj, 0, 0x99, 0, (u32)friendship);
+}
 /* 0x801226D0 | 0x324 */
 extern u8 lbl_80272948[];
 extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
@@ -2561,7 +2899,7 @@ void pokemonSetOnDarkPokemonFlag(u8* ptr, u8 flag) {
 }
 #endif
 /* 0x80123368 | 0x8C */
-extern void memoDataSet(void);
+extern void memoDataSet();
 #if 0
 asm void pokemonSetOnZukanFlag(void) {
 #include "src/game/gs_field_world_fn_80123368.inc"
@@ -2664,6 +3002,7 @@ s32 pokemonOboeWaza(u8* ptr, u8 target, u8* buf_ptr, u8* counter_ptr) {
     extern s32 pokemonSetWazaStatus(u8* a, u16 b, u8* c);
     u8* buf = buf_ptr;
     u8* counter = counter_ptr;
+    u8 waza = target;
     u16 val;
     u8 waza = target;
     u16 result;
@@ -2826,7 +3165,7 @@ asm void pokemonCheckValid(void) {
 #include "src/game/gs_field_world_fn_80123FBC.inc"
 }
 #else
-u32 pokemonCheckValid(u8* ptr) {
+u8 pokemonCheckValid(u8* ptr) {
     extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
     extern u32 gamedataAttestCheckValid(u32 val);
     u16 val;
@@ -2854,12 +3193,136 @@ extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
 void pokemonCreate(void);
 /* 0x80124410 | 0x4B4 */
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void pokemonCreateRndFit(void);
+u32 pokemonCreateRndFit(u8*, s32, s32, s32, u32);
 /* 0x801248C4 | 0xB4 */
+static u32 pokemonCreateRndFitRand32(void) {
+    u32 hi;
+    u32 lo;
+
+    hi = fn_800E0C54() << 16;
+    lo = fn_800E0C54() & 0xFFFF;
+    return hi | lo;
+}
+
+static s32 pokemonCreateRndFitCurrentGroup(u8* ptr) {
+    extern u8 fn_80131574(u32);
+    u16 species;
+    u16 group;
+
+    if (ptr == NULL) {
+        return 2;
+    }
+
+    species = (u16)pokemonGetStatus(ptr, 0, 0x6E, 0);
+    group = (u16)pokemonGetStatus(NULL, species, 0x13, 0);
+
+    if ((s32)group == (s32)(u8)fn_80131574(0)) {
+        return 0;
+    }
+    if ((s32)group == (s32)(u8)fn_80131574(1)) {
+        return 1;
+    }
+    if ((s32)group == (s32)(u8)fn_80131574(2)) {
+        return 2;
+    }
+    return -1;
+}
+
+static u8 pokemonCreateRndFitGroupOrRandom(u8* ptr, u32 value) {
+    s32 group;
+    u16 species;
+    u16 threshold;
+
+    group = pokemonCreateRndFitCurrentGroup(ptr);
+    if (group >= 0) {
+        return (u8)group;
+    }
+
+    species = (u16)pokemonGetStatus(ptr, 0, 0x6E, 0);
+    threshold = (u16)pokemonGetStatus(NULL, species, 0x13, 0);
+    if ((u32)threshold > (value & 0xFF)) {
+        return 1;
+    }
+    return 0;
+}
+
+static u8 pokemonCreateRndFitSeedHit(u32 value, u32 seed_xor) {
+    u32 x;
+
+    x = (value >> 16) ^ (value & 0xFFFF) ^ seed_xor ^ 8;
+    return (x >= 8 && x < 16) ? 1 : 0;
+}
+
+u32 pokemonCreateRndFit(u8* ptr, s32 group_arg, s32 mod_arg, s32 seed_mode_arg, u32 seed) {
+    s8 group_filter;
+    s8 mod_filter;
+    s8 seed_filter;
+    u32 seed_xor;
+
+    if (ptr == NULL) {
+        return pokemonCreateRndFitRand32();
+    }
+
+    group_filter = (s8)group_arg;
+    mod_filter = (s8)mod_arg;
+    seed_filter = (s8)seed_mode_arg;
+    seed_xor = (seed >> 16) ^ (seed & 0xFFFF);
+
+    for (;;) {
+        u32 value;
+
+        value = pokemonCreateRndFitRand32();
+
+        if (group_filter >= 0) {
+            s32 group;
+
+            group = pokemonCreateRndFitCurrentGroup(ptr);
+            if (group < 0) {
+                if (group_filter != 2) {
+                    if ((u8)group_filter != pokemonCreateRndFitGroupOrRandom(ptr, value)) {
+                        continue;
+                    }
+                } else {
+                    u32 current;
+                    u8 lhs;
+                    u8 rhs;
+
+                    current = pokemonGetStatus(ptr, 0, 0x6F, 0);
+                    lhs = pokemonCreateRndFitGroupOrRandom(ptr, current);
+                    rhs = pokemonCreateRndFitGroupOrRandom(ptr, value);
+                    if (lhs != rhs) {
+                        continue;
+                    }
+                }
+            }
+        }
+
+        if (mod_filter >= 0 && (u8)mod_filter != (u8)(value % 25)) {
+            continue;
+        }
+
+        if (seed_filter >= 0) {
+            u8 hit;
+
+            hit = pokemonCreateRndFitSeedHit(value, seed_xor);
+            if (seed_filter != 0) {
+                if (hit == 0) {
+                    continue;
+                }
+            } else if (hit == 1) {
+                continue;
+            }
+        }
+
+        return value;
+    }
+}
+
 #if 0
 asm void pokemonGetTokuseiDataId(void) {
 #include "src/game/gs_field_world_fn_801248C4.inc"
 }
+
 #else
 u16 pokemonGetTokuseiDataId(u8* ptr) {
     extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
@@ -2958,7 +3421,7 @@ void pokemonGrowBasisStatus(void* ptr, u32 arg2) {
 /* 0x48 | pokemonResetBasisStatus | null_guard_chain */
 void pokemonResetBasisStatus(void* ptr) {
     extern u32 pokemonGetStatus();
-    extern void pokemonSetLevelBasisStatus(u8* ptr, u8 level);
+    extern void pokemonSetLevelBasisStatus(u8* ptr, u32 level);
     u8 val;
     if (ptr == NULL) { return; }
     val = pokemonGetStatus(ptr, 0, 0xC0, 0);
@@ -3007,72 +3470,271 @@ extern u8 pokemonSeikakuRateDataBiosGetWaru();
         }                                                                         \
         pokemonSetStatus(ptr, 0, (out_field), 0, value_);                         \
     } while (0)
-
-void pokemonSetLevelBasisStatus(u8* ptr, u8 level) {
-    u16 species;
-    u16 oldMaxHp;
-    u16 newMaxHp;
-    u8 nature;
-    u16 base;
+/* 0x8012795C | 0x700 */
+void pokemonSetLevelBasisStatus(u8* obj, u32 level) {
+    extern u32 pokemonGetStatus(u8* obj, u32 id, u32 selector, u32 subindex);
+    extern void pokemonSetStatus(void* obj, u32 id, u32 selector, u32 subindex, u32 value);
+    u16 old_total;
+    u16 species_id;
+    u16 new_total;
+    u8 nature_idx;
+    u16 base_stat;
+    u16 ev;
     u16 iv;
-    u32 ev;
-    u32 value;
-    u32 currentHp;
+    s32 stat;
+    u8* entry;
+    u8* modifier;
+    u8 num;
+    u8 den;
+    u16 current_hp;
 
-    species = (u16)pokemonGetStatus(ptr, 0, 0x6e, 0);
-    oldMaxHp = (u16)pokemonGetStatus(ptr, 0, 0x87, 0);
-    pokemonSetStatus(ptr, 0, 0x7a, 0, (u8)level);
+    species_id = (u16)pokemonGetStatus(obj, 0, 0x6E, 0);
+    old_total = (u16)pokemonGetStatus(obj, 0, 0x87, 0);
+    pokemonSetStatus(obj, 0, 0x7A, 0, (u8)level);
 
-    if (species == 0x12f) {
-        newMaxHp = 1;
-        pokemonSetStatus(ptr, 0, 0x87, 0, 1);
+    if (species_id == 0x12F) {
+        new_total = 1;
+        pokemonSetStatus(obj, 0, 0x87, 0, 1);
     } else {
-        species = (u16)pokemonGetStatus(ptr, 0, 0x6e, 0);
-        nature = (u8)pokemonGetStatus(ptr, 0, 0xbf, 0);
-        base = (u16)pokemonGetStatus(0, species, 3, 0);
-        iv = (u16)pokemonGetStatus(ptr, 0, 0x93, 0);
-        ev = ((u32)pokemonGetStatus(ptr, 0, 0x8d, 0) >> 2) & 0x3fff;
-        value = (u8)level;
-        value = value + (((value * (iv + ((base << 1) + ev))) / 100) + 10);
-        pokemonSeikakuDataBiosGetPtr(nature);
-        pokemonSetStatus(ptr, 0, 0x87, 0, value);
-        newMaxHp = (u16)value;
+        base_stat = (u16)pokemonGetStatus(obj, 0, 0x6E, 0);
+        nature_idx = (u8)pokemonGetStatus(obj, 0, 0xBF, 0);
+        base_stat = (u16)pokemonGetStatus(NULL, base_stat, 3, 0);
+        ev = (u16)pokemonGetStatus(obj, 0, 0x93, 0);
+        iv = (pokemonGetStatus(obj, 0, 0x8D, 0) >> 2) & 0x3FFF;
+        stat = (s32)((u8)level * (u32)(ev + base_stat * 2 + iv)) / 100;
+        stat = (u8)level + stat + 10;
+        pokemonSeikakuDataBiosGetPtr(nature_idx);
+        pokemonSetStatus(obj, 0, 0x87, 0, stat);
+        new_total = (u16)stat;
     }
 
-    POKEMON_LEVEL_STAT(4, 0x94, 0x8e, 0x88, pokemonSeikakuDataBiosGetPhyAtkRateDataId);
-    POKEMON_LEVEL_STAT(5, 0x95, 0x8f, 0x89, pokemonSeikakuDataBiosGetPhyDefRateDataId);
-    POKEMON_LEVEL_STAT(8, 0x98, 0x92, 0x8c, pokemonSeikakuDataBiosGetNimblenessRateDataId);
-    POKEMON_LEVEL_STAT(6, 0x96, 0x90, 0x8a, pokemonSeikakuDataBiosGetSpeAtkRateDataId);
-    POKEMON_LEVEL_STAT(7, 0x97, 0x91, 0x8b, pokemonSeikakuDataBiosGetSpeDefRateDataId);
-
-    currentHp = (u16)pokemonGetStatus(ptr, 0, 0x83, 0);
-    if (currentHp != 0 || oldMaxHp == 0) {
-        if (species == 0x12f) {
-            value = 1;
+    base_stat = (u16)pokemonGetStatus(obj, 0, 0x6E, 0);
+    nature_idx = (u8)pokemonGetStatus(obj, 0, 0xBF, 0);
+    base_stat = (u16)pokemonGetStatus(NULL, base_stat, 4, 0);
+    ev = (u16)pokemonGetStatus(obj, 0, 0x94, 0);
+    iv = (pokemonGetStatus(obj, 0, 0x8E, 0) >> 2) & 0x3FFF;
+    stat = (s32)((u8)level * (u32)(ev + base_stat * 2 + iv)) / 100 + 5;
+    entry = pokemonSeikakuDataBiosGetPtr(nature_idx);
+    if (entry != NULL) {
+        modifier = pokemonSeikakuRateDataBiosGetPtr(
+            pokemonSeikakuDataBiosGetPhyAtkRateDataId(entry));
+        if (modifier == NULL) {
+            stat = 0;
         } else {
-            value = (u16)(currentHp + (newMaxHp - oldMaxHp));
+            num = pokemonSeikakuRateDataBiosGetKake(modifier);
+            den = pokemonSeikakuRateDataBiosGetWaru(modifier);
+            stat *= num;
+            if (den != 0) {
+                stat /= den;
+            }
         }
-        pokemonSetStatus(ptr, 0, 0x83, 0, value);
+    }
+    pokemonSetStatus(obj, 0, 0x88, 0, stat);
+
+    base_stat = (u16)pokemonGetStatus(obj, 0, 0x6E, 0);
+    nature_idx = (u8)pokemonGetStatus(obj, 0, 0xBF, 0);
+    base_stat = (u16)pokemonGetStatus(NULL, base_stat, 5, 0);
+    ev = (u16)pokemonGetStatus(obj, 0, 0x95, 0);
+    iv = (pokemonGetStatus(obj, 0, 0x8F, 0) >> 2) & 0x3FFF;
+    stat = (s32)((u8)level * (u32)(ev + base_stat * 2 + iv)) / 100 + 5;
+    entry = pokemonSeikakuDataBiosGetPtr(nature_idx);
+    if (entry != NULL) {
+        modifier = pokemonSeikakuRateDataBiosGetPtr(
+            pokemonSeikakuDataBiosGetPhyDefRateDataId(entry));
+        if (modifier == NULL) {
+            stat = 0;
+        } else {
+            num = pokemonSeikakuRateDataBiosGetKake(modifier);
+            den = pokemonSeikakuRateDataBiosGetWaru(modifier);
+            stat *= num;
+            if (den != 0) {
+                stat /= den;
+            }
+        }
+    }
+    pokemonSetStatus(obj, 0, 0x89, 0, stat);
+
+    base_stat = (u16)pokemonGetStatus(obj, 0, 0x6E, 0);
+    nature_idx = (u8)pokemonGetStatus(obj, 0, 0xBF, 0);
+    base_stat = (u16)pokemonGetStatus(NULL, base_stat, 8, 0);
+    ev = (u16)pokemonGetStatus(obj, 0, 0x98, 0);
+    iv = (pokemonGetStatus(obj, 0, 0x92, 0) >> 2) & 0x3FFF;
+    stat = (s32)((u8)level * (u32)(ev + base_stat * 2 + iv)) / 100 + 5;
+    entry = pokemonSeikakuDataBiosGetPtr(nature_idx);
+    if (entry != NULL) {
+        modifier = pokemonSeikakuRateDataBiosGetPtr(
+            pokemonSeikakuDataBiosGetNimblenessRateDataId(entry));
+        if (modifier == NULL) {
+            stat = 0;
+        } else {
+            num = pokemonSeikakuRateDataBiosGetKake(modifier);
+            den = pokemonSeikakuRateDataBiosGetWaru(modifier);
+            stat *= num;
+            if (den != 0) {
+                stat /= den;
+            }
+        }
+    }
+    pokemonSetStatus(obj, 0, 0x8C, 0, stat);
+
+    base_stat = (u16)pokemonGetStatus(obj, 0, 0x6E, 0);
+    nature_idx = (u8)pokemonGetStatus(obj, 0, 0xBF, 0);
+    base_stat = (u16)pokemonGetStatus(NULL, base_stat, 6, 0);
+    ev = (u16)pokemonGetStatus(obj, 0, 0x96, 0);
+    iv = (pokemonGetStatus(obj, 0, 0x90, 0) >> 2) & 0x3FFF;
+    stat = (s32)((u8)level * (u32)(ev + base_stat * 2 + iv)) / 100 + 5;
+    entry = pokemonSeikakuDataBiosGetPtr(nature_idx);
+    if (entry != NULL) {
+        modifier = pokemonSeikakuRateDataBiosGetPtr(
+            pokemonSeikakuDataBiosGetSpeAtkRateDataId(entry));
+        if (modifier == NULL) {
+            stat = 0;
+        } else {
+            num = pokemonSeikakuRateDataBiosGetKake(modifier);
+            den = pokemonSeikakuRateDataBiosGetWaru(modifier);
+            stat *= num;
+            if (den != 0) {
+                stat /= den;
+            }
+        }
+    }
+    pokemonSetStatus(obj, 0, 0x8A, 0, stat);
+
+    base_stat = (u16)pokemonGetStatus(obj, 0, 0x6E, 0);
+    nature_idx = (u8)pokemonGetStatus(obj, 0, 0xBF, 0);
+    base_stat = (u16)pokemonGetStatus(NULL, base_stat, 7, 0);
+    ev = (u16)pokemonGetStatus(obj, 0, 0x97, 0);
+    iv = (pokemonGetStatus(obj, 0, 0x91, 0) >> 2) & 0x3FFF;
+    stat = (s32)((u8)level * (u32)(ev + base_stat * 2 + iv)) / 100 + 5;
+    entry = pokemonSeikakuDataBiosGetPtr(nature_idx);
+    if (entry != NULL) {
+        modifier = pokemonSeikakuRateDataBiosGetPtr(
+            pokemonSeikakuDataBiosGetSpeDefRateDataId(entry));
+        if (modifier == NULL) {
+            stat = 0;
+        } else {
+            num = pokemonSeikakuRateDataBiosGetKake(modifier);
+            den = pokemonSeikakuRateDataBiosGetWaru(modifier);
+            stat *= num;
+            if (den != 0) {
+                stat /= den;
+            }
+        }
+    }
+    pokemonSetStatus(obj, 0, 0x8B, 0, stat);
+
+    current_hp = (u16)pokemonGetStatus(obj, 0, 0x83, 0);
+    if (current_hp != 0 || old_total == 0) {
+        u16 new_hp;
+        if (species_id == 0x12F) {
+            new_hp = 1;
+        } else {
+            new_hp = (u16)(current_hp + new_total - old_total);
+        }
+        pokemonSetStatus(obj, 0, 0x83, 0, new_hp);
     }
 }
-
 #undef POKEMON_LEVEL_STAT
 /* 0x8012805C | 0x2A4 */
-extern void fadeSet(void);
-extern void fadeCheck(void);
-extern void evolutionOpen(void);
+extern void fadeSet(f32 duration, u32 mode);
+extern void fadeCheck(u32 wait);
+extern s32 evolutionOpen();
 extern f32 lbl_8047D020;
-/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void pokemonEvolutionAll(void);
+/* Preserve retail cross-TU helper calls after source consolidation. */
+#pragma dont_inline on
+s32 pokemonEvolutionAll(u8* pokemon, u32 evolution_id, u32 add_species,
+                        void* evolution_arg, u8* hero, s32 set_memo,
+                        s32 evolution_mode, s32 use_fade)
+{
+    u8 move_slots[20];
+    u16 learned_moves[20];
+    u16 selected_moves[20];
+    GfwBuf0x138 evolved_pokemon;
+    GfwBuf0x138 added_pokemon;
+    s32 move_count;
+    s32 result;
+    int i;
+    s8 party_slot;
+
+    if (!pokemonCheckValid(pokemon)) {
+        return 2;
+    }
+    if ((u16)evolution_id == 0) {
+        return 2;
+    }
+
+    move_count = pokemonEvolution(&evolved_pokemon, pokemon, evolution_id,
+                                  evolution_arg, learned_moves);
+    if (move_count < 0) {
+        return 2;
+    }
+
+    if (use_fade != 0) {
+        fadeSet(lbl_8047D020, 3);
+        fadeCheck(1);
+    }
+
+    for (i = 0; i < move_count; i++) {
+        selected_moves[i] = learned_moves[i];
+    }
+    result = evolutionOpen(pokemon, &evolved_pokemon, evolution_mode,
+                           selected_moves, move_count, move_slots);
+
+    if (use_fade != 0) {
+        fadeSet(lbl_8047D020, 2);
+        fadeCheck(1);
+    }
+
+    if (result == 2) {
+        return 2;
+    }
+    if (result == 1) {
+        return 1;
+    }
+
+    if (set_memo != 0) {
+        memoDataSet(0, &evolved_pokemon);
+    }
+    pokemonBiosCopy((u32*)pokemon, evolved_pokemon.data);
+
+    for (i = 0; i < move_count; i++) {
+        if (move_slots[i] != 0xFF) {
+            pokemonWazaCreate(pokemon, move_slots[i], learned_moves[i]);
+        }
+    }
+
+    if ((u16)add_species != 0) {
+        if ((u16)add_species != 0) {
+            for (i = 0; i < 6; i++) {
+                if (!pokemonCheckValid((u8*)heroGetStatus(hero, 3, (u16)i))) {
+                    break;
+                }
+            }
+
+            party_slot = (i < 6) ? (s8)i : -1;
+            if (party_slot >= 0) {
+                pokemonEvolutionCreateAddPokemon(&added_pokemon, pokemon,
+                                                 add_species);
+                heroAddPokemon(hero, &added_pokemon);
+                if (set_memo != 0) {
+                    memoDataSet(0, &added_pokemon);
+                }
+            }
+        }
+    }
+
+    return 0;
+}
+#pragma dont_inline reset
 /* 0x80128300 | 0x224 */
 extern u8 lbl_802729A4[];
 extern u8 lbl_80272998[];
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void pokemonEvolutionCreateAddPokemon(void);
+void pokemonEvolutionCreateAddPokemon();
 /* 0x80128524 | 0x1A4 */
 extern void fn_800F9EE4(void);
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void pokemonEvolution(void);
+s32 pokemonEvolution();
 /* 0x801286C8 | 0x39C */
 extern void jumptable_80363468();
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
@@ -3561,6 +4223,318 @@ void pokemonInit(u8* ptr) {
     pokemonBiosSetEventGetFlag(ptr, 0);
 }
 #endif
+
+void pokemonSetStatus(u8* obj, u32 id, u32 selector, u32 subindex, u32 value)
+{
+    typedef struct PokemonStatusCopy16 {
+        u32 word[4];
+    } PokemonStatusCopy16;
+    register u32 status_subindex = subindex;
+    register u32 status_value = value;
+
+    if ((u16)selector == 0 || (u16)selector >= 0x124) {
+        return;
+    }
+
+    if ((u16)selector < 0x6D) {
+        obj = pokemonDataBiosGetPtr(id);
+        if (obj == NULL) {
+            return;
+        }
+    } else if (obj == NULL) {
+        return;
+    }
+
+    switch ((u16)selector) {
+    case 0x01: pokemonDataBiosSetName(obj, status_value); break;
+    case 0x03: pokemonDataBiosSetBasisMaxHp(obj, (u16)status_value); break;
+    case 0x04: pokemonDataBiosSetBasisPhyAtk(obj, (u16)status_value); break;
+    case 0x05: pokemonDataBiosSetBasisPhyDef(obj, (u16)status_value); break;
+    case 0x06: pokemonDataBiosSetBasisSpeAtk(obj, (u16)status_value); break;
+    case 0x07: pokemonDataBiosSetBasisSpeDef(obj, (u16)status_value); break;
+    case 0x08: pokemonDataBiosSetBasisNimbleness(obj, (u16)status_value); break;
+    case 0x0A: pokemonDataBiosSetGiveMaxHpEffort(obj, (u16)status_value); break;
+    case 0x0B: pokemonDataBiosSetGivePhyAtkEffort(obj, (u16)status_value); break;
+    case 0x0C: pokemonDataBiosSetGivePhyDefEffort(obj, (u16)status_value); break;
+    case 0x0D: pokemonDataBiosSetGiveSpeAtkEffort(obj, (u16)status_value); break;
+    case 0x0E: pokemonDataBiosSetGiveSpeDefEffort(obj, (u16)status_value); break;
+    case 0x0F: pokemonDataBiosSetGiveNimblenessEffort(obj, (u16)status_value); break;
+    case 0x10: pokemonDataBiosSetGiveExp(obj, (u16)status_value); break;
+    case 0x11: pokemonDataBiosSetGrowDataId(obj, (u8)status_value); break;
+    case 0x12: pokemonDataBiosSetGet(obj, (u8)status_value); break;
+    case 0x13: pokemonDataBiosSetSexRatio(obj, (u8)status_value); break;
+    case 0x14: pokemonDataBiosSetInitFriend(obj, (u16)status_value); break;
+    case 0x15: pokemonDataBiosSetItemDataId(obj, status_subindex, (u16)status_value); break;
+    case 0x16: pokemonDataBiosSetZokuseiDataId(obj, status_subindex, (u8)status_value); break;
+    case 0x17: pokemonDataBiosSetTokuseiDataId(obj, status_subindex, (u8)status_value); break;
+    case 0x19: pokemonDataBiosSetSinkaKind(obj, status_subindex, (u8)status_value); break;
+    case 0x1A: pokemonDataBiosSetSinkaBuff(obj, status_subindex, (u16)status_value); break;
+    case 0x1B: pokemonDataBiosSetSinkaPokemonDataId(obj, status_subindex, (u16)status_value); break;
+    case 0x1D: pokemonDataBiosSetGetWazaLevel(obj, status_subindex, (u8)status_value); break;
+    case 0x1E: pokemonDataBiosSetGetWazaDataId(obj, status_subindex, (u16)status_value); break;
+    case 0x20: pokemonDataBiosSetWazaMcn(obj, 0x00, (u8)status_value); break;
+    case 0x21: pokemonDataBiosSetWazaMcn(obj, 0x01, (u8)status_value); break;
+    case 0x22: pokemonDataBiosSetWazaMcn(obj, 0x02, (u8)status_value); break;
+    case 0x23: pokemonDataBiosSetWazaMcn(obj, 0x03, (u8)status_value); break;
+    case 0x24: pokemonDataBiosSetWazaMcn(obj, 0x04, (u8)status_value); break;
+    case 0x25: pokemonDataBiosSetWazaMcn(obj, 0x05, (u8)status_value); break;
+    case 0x26: pokemonDataBiosSetWazaMcn(obj, 0x06, (u8)status_value); break;
+    case 0x27: pokemonDataBiosSetWazaMcn(obj, 0x07, (u8)status_value); break;
+    case 0x28: pokemonDataBiosSetWazaMcn(obj, 0x08, (u8)status_value); break;
+    case 0x29: pokemonDataBiosSetWazaMcn(obj, 0x09, (u8)status_value); break;
+    case 0x2A: pokemonDataBiosSetWazaMcn(obj, 0x0A, (u8)status_value); break;
+    case 0x2B: pokemonDataBiosSetWazaMcn(obj, 0x0B, (u8)status_value); break;
+    case 0x2C: pokemonDataBiosSetWazaMcn(obj, 0x0C, (u8)status_value); break;
+    case 0x2D: pokemonDataBiosSetWazaMcn(obj, 0x0D, (u8)status_value); break;
+    case 0x2E: pokemonDataBiosSetWazaMcn(obj, 0x0E, (u8)status_value); break;
+    case 0x2F: pokemonDataBiosSetWazaMcn(obj, 0x0F, (u8)status_value); break;
+    case 0x30: pokemonDataBiosSetWazaMcn(obj, 0x10, (u8)status_value); break;
+    case 0x31: pokemonDataBiosSetWazaMcn(obj, 0x11, (u8)status_value); break;
+    case 0x32: pokemonDataBiosSetWazaMcn(obj, 0x12, (u8)status_value); break;
+    case 0x33: pokemonDataBiosSetWazaMcn(obj, 0x13, (u8)status_value); break;
+    case 0x34: pokemonDataBiosSetWazaMcn(obj, 0x14, (u8)status_value); break;
+    case 0x35: pokemonDataBiosSetWazaMcn(obj, 0x15, (u8)status_value); break;
+    case 0x36: pokemonDataBiosSetWazaMcn(obj, 0x16, (u8)status_value); break;
+    case 0x37: pokemonDataBiosSetWazaMcn(obj, 0x17, (u8)status_value); break;
+    case 0x38: pokemonDataBiosSetWazaMcn(obj, 0x18, (u8)status_value); break;
+    case 0x39: pokemonDataBiosSetWazaMcn(obj, 0x1A, (u8)status_value); break;
+    case 0x3A: pokemonDataBiosSetWazaMcn(obj, 0x1B, (u8)status_value); break;
+    case 0x3B: pokemonDataBiosSetWazaMcn(obj, 0x1C, (u8)status_value); break;
+    case 0x3C: pokemonDataBiosSetWazaMcn(obj, 0x1D, (u8)status_value); break;
+    case 0x3D: pokemonDataBiosSetWazaMcn(obj, 0x1E, (u8)status_value); break;
+    case 0x3E: pokemonDataBiosSetWazaMcn(obj, 0x1F, (u8)status_value); break;
+    case 0x3F: pokemonDataBiosSetWazaMcn(obj, 0x20, (u8)status_value); break;
+    case 0x40: pokemonDataBiosSetWazaMcn(obj, 0x21, (u8)status_value); break;
+    case 0x41: pokemonDataBiosSetWazaMcn(obj, 0x22, (u8)status_value); break;
+    case 0x42: pokemonDataBiosSetWazaMcn(obj, 0x23, (u8)status_value); break;
+    case 0x43: pokemonDataBiosSetWazaMcn(obj, 0x24, (u8)status_value); break;
+    case 0x44: pokemonDataBiosSetWazaMcn(obj, 0x25, (u8)status_value); break;
+    case 0x45: pokemonDataBiosSetWazaMcn(obj, 0x26, (u8)status_value); break;
+    case 0x46: pokemonDataBiosSetWazaMcn(obj, 0x27, (u8)status_value); break;
+    case 0x47: pokemonDataBiosSetWazaMcn(obj, 0x28, (u8)status_value); break;
+    case 0x48: pokemonDataBiosSetWazaMcn(obj, 0x29, (u8)status_value); break;
+    case 0x49: pokemonDataBiosSetWazaMcn(obj, 0x2A, (u8)status_value); break;
+    case 0x4A: pokemonDataBiosSetWazaMcn(obj, 0x2B, (u8)status_value); break;
+    case 0x4B: pokemonDataBiosSetWazaMcn(obj, 0x2C, (u8)status_value); break;
+    case 0x4C: pokemonDataBiosSetWazaMcn(obj, 0x2D, (u8)status_value); break;
+    case 0x4D: pokemonDataBiosSetWazaMcn(obj, 0x2E, (u8)status_value); break;
+    case 0x4E: pokemonDataBiosSetWazaMcn(obj, 0x2F, (u8)status_value); break;
+    case 0x4F: pokemonDataBiosSetWazaMcn(obj, 0x30, (u8)status_value); break;
+    case 0x50: pokemonDataBiosSetWazaMcn(obj, 0x31, (u8)status_value); break;
+    case 0x51: pokemonDataBiosSetWazaMcn(obj, 0x32, (u8)status_value); break;
+    case 0x52: pokemonDataBiosSetWazaMcn(obj, 0x33, (u8)status_value); break;
+    case 0x53: pokemonDataBiosSetWazaMcn(obj, 0x34, (u8)status_value); break;
+    case 0x54: pokemonDataBiosSetWazaMcn(obj, 0x35, (u8)status_value); break;
+    case 0x55: pokemonDataBiosSetWazaMcn(obj, 0x36, (u8)status_value); break;
+    case 0x56: pokemonDataBiosSetWazaMcn(obj, 0x37, (u8)status_value); break;
+    case 0x57: pokemonDataBiosSetWazaMcn(obj, 0x38, (u8)status_value); break;
+    case 0x58: pokemonDataBiosSetWazaMcn(obj, 0x39, (u8)status_value); break;
+    case 0x59: pokemonDataBiosSetWazaMcn(obj, 0x3A, (u8)status_value); break;
+    case 0x5A: pokemonDataBiosSetPokebodyId(obj, status_subindex, status_value); break;
+    case 0x5B: pokemonDataBiosSetStatusFaceMenuSpriteId(obj, status_subindex, (u16)status_value); break;
+    case 0x5C: pokemonDataBiosSetColor(obj, status_subindex, (u8)status_value); break;
+    case 0x5D: pokemonDataBiosSetTypeName(obj, status_value); break;
+    case 0x5E: pokemonDataBiosSetHeight(obj, (u16)status_value); break;
+    case 0x5F: pokemonDataBiosSetWeight(obj, (u16)status_value); break;
+    case 0x60: pokemonDataBiosSetDoc(obj, status_value); break;
+    case 0x61: pokemonDataBiosSetVoice(obj, (u16)status_value); break;
+    case 0x62: pokemonDataBiosSetMitaFlag(obj, status_value); break;
+    case 0x63: pokemonDataBiosSetTukamaetaFlag(obj, status_value); break;
+    case 0x64: pokemonDataBiosSetNumZukan(obj, (u16)status_value); break;
+    case 0x65: pokemonDataBiosSetNumPokemon(obj, (u16)status_value); break;
+    case 0x66: pokemonDataBiosSetPkxDataId(obj, status_value); break;
+    case 0x68: pokemonDataBiosSetKowaza(obj, status_subindex, (u16)status_value); break;
+    case 0x69: fn_8011CED0(obj, status_subindex, (u8)status_value); break;
+    case 0x6A: fn_8011CEC0(obj, (u16)status_value); break;
+    case 0x6B: fn_8011CEB0(obj, (u8)status_value); break;
+    case 0x6C: fn_8011CEA0(obj, (u8)status_value); break;
+    case 0x6E: pokemonBiosSetPokemonDataId(obj, (u16)status_value); break;
+    case 0x6F: pokemonBiosSetRnd(obj, status_value); break;
+    case 0x71: pokemonBiosSetCatchFloorId(obj, (u16)status_value); break;
+    case 0x72: pokemonBiosSetCatchLevel(obj, (u8)status_value); break;
+    case 0x73: pokemonBiosSetCatchBallId(obj, (u8)status_value); break;
+    case 0x74: pokemonBiosSetCatchTrainerSex(obj, (u8)status_value); break;
+    case 0x75: pokemonBiosSetCatchTrainerRnd(obj, status_value); break;
+    case 0x76: pokemonBiosSetCatchTrainerNamePtr(obj, (void*)status_value); break;
+    case 0x77: pokemonBiosSetNicknamePtr(obj, (void*)status_value); break;
+    case 0x78: pokemonBiosSetNicknameOrgPtr(obj, (void*)status_value); break;
+    case 0x79: pokemonBiosSetExp(obj, status_value); break;
+    case 0x7A: pokemonBiosSetLevel(obj, (u8)status_value); break;
+    case 0x7C: {
+        PokemonStatusCopy16* dst = (PokemonStatusCopy16*)pokemonGetStatus(obj, 0, 0x7C, 0);
+        if (dst != NULL) {
+            *dst = *(PokemonStatusCopy16*)status_value;
+        }
+        break;
+    }
+    case 0x7D: pokemonBiosSetConditionAmari(obj, status_value); break;
+    case 0x7F: pokemonBiosSetPokemonWazaDataId(obj, status_subindex, status_value); break;
+    case 0x80: pokemonBiosSetPokemonWazaPp(obj, status_subindex, (u8)status_value); break;
+    case 0x81: pokemonBiosSetPokemonWazaPpCount(obj, status_subindex, (u8)status_value); break;
+    case 0x82: pokemonBiosSetItemDataId(obj, (u16)status_value); break;
+    case 0x83: pokemonBiosSetHp(obj, (u16)status_value); break;
+    case 0x87: pokemonBiosSetMaxHp(obj, (u16)status_value); break;
+    case 0x88: pokemonBiosSetPhyAtk(obj, (u16)status_value); break;
+    case 0x89: pokemonBiosSetPhyDef(obj, (u16)status_value); break;
+    case 0x8A: pokemonBiosSetSpeAtk(obj, (u16)status_value); break;
+    case 0x8B: pokemonBiosSetSpeDef(obj, (u16)status_value); break;
+    case 0x8C: pokemonBiosSetNimbleness(obj, (u16)status_value); break;
+    case 0x8D: pokemonBiosSetMaxHpEffort(obj, (u16)status_value); break;
+    case 0x8E: pokemonBiosSetPhyAtkEffort(obj, (u16)status_value); break;
+    case 0x8F: pokemonBiosSetPhyDefEffort(obj, (u16)status_value); break;
+    case 0x90: pokemonBiosSetSpeAtkEffort(obj, (u16)status_value); break;
+    case 0x91: pokemonBiosSetSpeDefEffort(obj, (u16)status_value); break;
+    case 0x92: pokemonBiosSetNimblenessEffort(obj, (u16)status_value); break;
+    case 0x93: pokemonBiosSetMaxHpRnd(obj, (u16)status_value); break;
+    case 0x94: pokemonBiosSetPhyAtkRnd(obj, (u16)status_value); break;
+    case 0x95: pokemonBiosSetPhyDefRnd(obj, (u16)status_value); break;
+    case 0x96: pokemonBiosSetSpeAtkRnd(obj, (u16)status_value); break;
+    case 0x97: pokemonBiosSetSpeDefRnd(obj, (u16)status_value); break;
+    case 0x98: pokemonBiosSetNimblenessRnd(obj, (u16)status_value); break;
+    case 0x99: pokemonBiosSetFriend(obj, (u16)status_value); break;
+    case 0x9C: pokemonBiosSetStyle(obj, (u8)status_value); break;
+    case 0x9D: pokemonBiosSetBeautiful(obj, (u8)status_value); break;
+    case 0x9E: pokemonBiosSetCute(obj, (u8)status_value); break;
+    case 0x9F: pokemonBiosSetClever(obj, (u8)status_value); break;
+    case 0xA0: pokemonBiosSetStrong(obj, (u8)status_value); break;
+    case 0xA1: pokemonBiosSetFur(obj, (u8)status_value); break;
+    case 0xA3: pokemonBiosSetChampRibbon(obj, (u8)status_value); break;
+    case 0xA4: pokemonBiosSetWinningRibbon(obj, (u8)status_value); break;
+    case 0xA5: pokemonBiosSetVictoryRibbon(obj, (u8)status_value); break;
+    case 0xA6: pokemonBiosSetBromideRibbon(obj, (u8)status_value); break;
+    case 0xA7: pokemonBiosSetGanbaRibbon(obj, (u8)status_value); break;
+    case 0xA8: pokemonBiosSetMarineRibbon(obj, (u8)status_value); break;
+    case 0xA9: pokemonBiosSetLandRibbon(obj, (u8)status_value); break;
+    case 0xAA: pokemonBiosSetSkyRibbon(obj, (u8)status_value); break;
+    case 0xAB: pokemonBiosSetCountryRibbon(obj, (u8)status_value); break;
+    case 0xAC: pokemonBiosSetNationalRibbon(obj, (u8)status_value); break;
+    case 0xAD: pokemonBiosSetEarthRibbon(obj, (u8)status_value); break;
+    case 0xAE: pokemonBiosSetWorldRibbon(obj, (u8)status_value); break;
+    case 0xAF: pokemonBiosSetAmariRibbon(obj, (u8)status_value); break;
+    case 0xB0: pokemonBiosSetStyleMedal(obj, (u8)status_value); break;
+    case 0xB1: pokemonBiosSetBeautifulMedal(obj, (u8)status_value); break;
+    case 0xB2: pokemonBiosSetCuteMedal(obj, (u8)status_value); break;
+    case 0xB3: pokemonBiosSetCleverMedal(obj, (u8)status_value); break;
+    case 0xB4: pokemonBiosSetStrongMedal(obj, (u8)status_value); break;
+    case 0xB5: pokemonBiosSetPokerus(obj, (u8)status_value); break;
+    case 0xB6: pokemonBiosSetTamagoFlag(obj, (u8)status_value); break;
+    case 0xB7: pokemonBiosSetTokuseiFlag(obj, (u8)status_value); break;
+    case 0xB8: pokemonBiosSetFuseiFlag(obj, (u8)status_value); break;
+    case 0xB9: pokemonBiosSetFlagAmari(obj, (u8)status_value); break;
+    case 0xBB: pokemonBiosSetPcboxMark(obj, (u8)status_value); break;
+    case 0xBC: pokemonBiosSetMailId(obj, (u8)status_value); break;
+    case 0xBD: pokemonBiosSetPara1Amari(obj, (u16)status_value); break;
+    case 0xBE: pokemonBiosSetAmari(obj, (u16)status_value); break;
+    case 0xC9: pokemonBiosSetFightTrainerPokemonDataId(obj, (u16)status_value); break;
+    case 0xC3: pokemonBiosSetDarkpokemonDataId(obj, (u16)status_value); break;
+    case 0xC5: pokemonBiosSetDp(obj, status_value); break;
+    case 0xC6: pokemonBiosSetPoolExp(obj, status_value); break;
+    case 0xC7: pokemonBiosSetPoolFriend(obj, (u16)status_value); break;
+    case 0xCB: fightPokemonBiosSetMotoPokemonPtr(obj, status_value); break;
+    case 0xCD: {
+        PokemonStatusCopy16* dst = (PokemonStatusCopy16*)pokemonGetStatus(obj, 0, 0xCD, 0);
+        if (dst != NULL) {
+            *dst = *(PokemonStatusCopy16*)status_value;
+        }
+        break;
+    }
+    case 0xCE: fightPokemonBiosSetEntryId(obj, (s16)status_value); break;
+    case 0xCF: fightPokemonBiosSetCatchEntryFlag(obj, (u8)status_value); break;
+    case 0xD0: fightPokemonBiosSetLevelUpFlag(obj, (u8)status_value); break;
+    case 0xD1: fightPokemonBiosSetDarkOutFlag(obj, (u8)status_value); break;
+    case 0xD2: fightPokemonBiosSetHokakuFlag(obj, (u8)status_value); break;
+    case 0xD5: fightOutPokemonBiosSetMotoFightPokemonPtr(obj, status_value); break;
+    case 0xD6: fightOutPokemonBiosSetFightPokemonPtr(obj, status_value); break;
+    case 0xDA: wazaSetStatus(pokemonGetStatus(obj, 0, 0xD9, 0), 0, 0x28, 0, status_value); break;
+    case 0xDB: wazaSetStatus(pokemonGetStatus(obj, 0, 0xD9, 0), 0, 0x27, 0, status_value); break;
+    case 0xDC: wazaSetStatus(pokemonGetStatus(obj, 0, 0xD9, 0), 0, 0x2C, 0, status_value); break;
+    case 0xDD: wazaSetStatus(pokemonGetStatus(obj, 0, 0xD9, 0), 0, 0x2B, 0, status_value); break;
+    case 0xDE: {
+        u32 fight_waza = pokemonGetStatus(obj, 0, 0xD9, 0);
+        if (fightWazaCheckWriteJoutaiDataId(fight_waza, (u16)status_value) == 2) {
+            fightWazaWriteJoutaiDataId(fight_waza, (u16)status_value, 0);
+        }
+        break;
+    }
+    case 0xDF: {
+        u32 fight_waza = pokemonGetStatus(obj, 0, 0xD9, 0);
+        if ((u16)status_value != 0) {
+            if (fightWazaIsJoutaiDataId(fight_waza, (u16)status_value) == 1) {
+                fightWazaInitJoutaiDataId(fight_waza, (u16)status_value);
+            }
+        } else {
+            fightWazaInitJoutai(fight_waza);
+        }
+        break;
+    }
+    case 0xE1: wazaSetStatus(pokemonGetStatus(obj, 0, 0xD9, 0), 0, 0x2D, 0, status_value); break;
+    case 0xE2: wazaSetStatus(pokemonGetStatus(obj, 0, 0xD9, 0), 0, 0x2F, 0, (u16)status_value); break;
+    case 0xE3: wazaSetStatus(pokemonGetStatus(obj, 0, 0xD9, 0), 0, 0x29, 0, status_value); break;
+    case 0xE4: wazaSetStatus(pokemonGetStatus(obj, 0, 0xD9, 0), 0, 0x2E, 0, status_value); break;
+    case 0xE6: fightOutPokemonBiosSetAbicntPhyAtk(obj, (u8)status_value); break;
+    case 0xE7: fightOutPokemonBiosSetAbicntPhyDef(obj, (u8)status_value); break;
+    case 0xE8: fightOutPokemonBiosSetAbicntSpeAtk(obj, (u8)status_value); break;
+    case 0xE9: fightOutPokemonBiosSetAbicntSpeDef(obj, (u8)status_value); break;
+    case 0xEA: fightOutPokemonBiosSetAbicntNimbleness(obj, (u8)status_value); break;
+    case 0xEB: fightOutPokemonBiosSetAbicntAverage(obj, (u8)status_value); break;
+    case 0xEC: fightOutPokemonBiosSetAbicntAvoid(obj, (u8)status_value); break;
+    case 0xED: fightOutPokemonBiosSetFightoutTurnCount(obj, (u16)status_value); break;
+    case 0xEE: fightOutPokemonBiosSetSequencePtr(obj, status_value); break;
+    case 0xEF: fightOutPokemonBiosSetSketchWazaDataId(obj, (u16)status_value); break;
+    case 0xF0: fightOutPokemonBiosSetLastSelectWazaDataId(obj, (u16)status_value); break;
+    case 0xF1: fightOutPokemonBiosSetLastUseWazaDataId(obj, (u16)status_value); break;
+    case 0xF2: fightOutPokemonBiosSetLastReceiveWazaTargetDataId(obj, (u16)status_value); break;
+    case 0xF3: fightOutPokemonBiosSetHitWazaDataId(obj, (u16)status_value); break;
+    case 0xF4: fightOutPokemonBiosSetHitWazaZokuseiDataId(obj, (u16)status_value); break;
+    case 0xF5: fightOutPokemonBiosSetGamanDamageValue(obj, (s16)status_value); break;
+    case 0xF6: fightOutPokemonBiosSetGamanDamageTargetId(obj, (u16)status_value); break;
+    case 0xF7: fightOutPokemonBiosSetOumuWazaDataId(obj, (u16)status_value); break;
+    case 0xF9: fightOutPokemonBiosSetNamakeFlag(obj, (u8)status_value); break;
+    case 0xFA: fightOutPokemonBiosSetUsedItemDataId(obj, (u16)status_value); break;
+    case 0xFB: fightOutPokemonBiosSetStockItemDataId(obj, (u16)status_value); break;
+    case 0xFC: fightOutPokemonBiosSetSuccessCnt(obj, (u8)status_value); break;
+    case 0xFD: {
+        u8 enemy_index = (u8)status_subindex;
+        u16 entry_id = (s8)status_value;
+        fightOutPokemonBiosSetMeetEnemyFightPokemonEntryId(obj, enemy_index, entry_id);
+        break;
+    }
+    case 0xFF: fightOutPokemonBiosSetZokuseiDataId(obj, (u8)status_subindex, (u16)status_value); break;
+    case 0x100: fightOutPokemonBiosSetTokuseiDataId(obj, (u16)status_value); break;
+    case 0x102: fightOutPokemonBiosSetDamageAtkValue(obj, (s16)status_value); break;
+    case 0x103: fightOutPokemonBiosSetDamageAtkTargetId(obj, (u16)status_value); break;
+    case 0x104: fightOutPokemonBiosSetDamageSpeValue(obj, (s16)status_value); break;
+    case 0x105: fightOutPokemonBiosSetDamageSpeTargetId(obj, (u16)status_value); break;
+    case 0x106: fightOutPokemonBiosSetMahiNoAttackFlag(obj, (u8)status_value); break;
+    case 0x107: fightOutPokemonBiosSetKonranMyselfAttackFlag(obj, (u8)status_value); break;
+    case 0x108: fightOutPokemonBiosSetOutWazaKoukanaiFlag(obj, (u8)status_value); break;
+    case 0x109: fightOutPokemonBiosSetTameWazaFlag(obj, (u8)status_value); break;
+    case 0x10A: fightOutPokemonBiosSetItemNigeruFlag(obj, (u8)status_value); break;
+    case 0x10B: fightOutPokemonBiosSetHuuinNoAttackFlag(obj, (u8)status_value); break;
+    case 0x10C: fightOutPokemonBiosSetMeroMeroNoAttackFlag(obj, (u8)status_value); break;
+    case 0x10D: fightOutPokemonBiosSetKanashibariNoAttackFlag(obj, (u8)status_value); break;
+    case 0x10E: fightOutPokemonBiosSetChouhatsuNoAttackFlag(obj, (u8)status_value); break;
+    case 0x10F: fightOutPokemonBiosSetIchamonNoAttackFlag(obj, (u8)status_value); break;
+    case 0x110: fightOutPokemonBiosSetHirumuNoAttackFlag(obj, (u8)status_value); break;
+    case 0x111: fightOutPokemonBiosSetPassPpdecFlag(obj, (u8)status_value); break;
+    case 0x112: fightOutPokemonBiosSetFightActionFlag(obj, (u8)status_value); break;
+    case 0x113: fightOutPokemonBiosSetDoClearbodyFlag(obj, (u8)status_value); break;
+    case 0x114: fightOutPokemonBiosSetReceivesWazaHiraishinFlag(obj, (u8)status_value); break;
+    case 0x115: fightOutPokemonBiosSetVanishoffFlag(obj, (u8)status_value); break;
+    case 0x116: fightOutPokemonBiosSetDoIkakuFlag(obj, (u8)status_value); break;
+    case 0x117: fightOutPokemonBiosSetDoTraceFlag(obj, (u8)status_value); break;
+    case 0x118: fightOutPokemonBiosSetNoPressureFlag(obj, (u8)status_value); break;
+    case 0x119: fightOutPokemonBiosSetIrekaetaFlag(obj, (u8)status_value); break;
+    case 0x11A: fightOutPokemonBiosSetItemKoraetaFlag(obj, (u8)status_value); break;
+    case 0x11B: fightOutPokemonBiosSetKaigaraDamageValue(obj, status_value); break;
+    case 0x11C: fightOutPokemonBiosSetMyselfDamageAtkValue(obj, (s16)status_value); break;
+    case 0x11D: fightOutPokemonBiosSetMyselfDamageAtkTargetId(obj, (u16)status_value); break;
+    case 0x11E: fightOutPokemonBiosSetMyselfDamageSpeValue(obj, (s16)status_value); break;
+    case 0x11F: fightOutPokemonBiosSetMyselfDamageSpeTargetId(obj, (u16)status_value); break;
+    case 0x120: fightOutPokemonBiosSetKizetuFlag(obj, (u8)status_value); break;
+    case 0x121: fightOutPokemonBiosSetIrekaeTargetEntryId(obj, (s16)status_value); break;
+    }
+}
 
 u32 pokemonGetStatus(u8* obj, u32 id, u32 selector, u32 d) {
     extern void* fn_8011E778(u32 idx);

@@ -49,7 +49,11 @@ pull_once() {
 
 case "${1:-}" in
   --status)
-    scp -q "$HOST:$WIN_ROOT/state/status.json" /dev/stdout 2>/dev/null | python3 -m json.tool || echo "farm unreachable"
+    if scp -q "$HOST:$WIN_ROOT/state/status.json" "$DEST/status.json" 2>/dev/null; then
+      python3 -m json.tool "$DEST/status.json"
+    else
+      echo "farm unreachable"
+    fi
     ;;
   --loop)
     while true; do

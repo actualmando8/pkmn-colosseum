@@ -9,10 +9,7 @@
  */
 #include "dolphin/types.h"
 
-typedef void (*FuncPtr)(void);
-
-extern FuncPtr _ctors[];
-static void __init_cpp(void);
+extern void __init_cpp(void);
 extern void PPCHalt(void);
 
 void __init_user(void) {

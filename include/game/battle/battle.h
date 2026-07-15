@@ -311,7 +311,7 @@ typedef struct TypeMatchup {
 /* HSD_AObjInterpretAnim (was fn_801C27F4) */ void HSD_AObjInterpretAnim(void* ctx, f32 posX, f32 posZ);
 /* HSD_AObjReqAnim */ void HSD_AObjReqAnim(void* obj, f32 value);
 /* HSD_AObjInvokeCallBacks */ void HSD_AObjInvokeCallBacks(void);
-/* HSD_AObjInitEndCallBack (was fn_801C2A60) */ s32  HSD_AObjInitEndCallBack(void);
+/* HSD_AObjInitEndCallBack (was fn_801C2A60) */ void HSD_AObjInitEndCallBack(void);
 /* HSD_AObjClearFlags (was fn_801C2A74) */ s32  HSD_AObjClearFlags(s32 slot);
 /* HSD_AObjSetFlags (was fn_801C2A90) */ s32  HSD_AObjSetFlags(s32 slot);
 /* HSD_AObjGetAllocData */ void* HSD_AObjGetAllocData(void);
@@ -406,7 +406,9 @@ typedef struct TypeMatchup {
 /* fn_801C6EE4 */ void fn_801C6EE4(s32 slot, void* modelData);
 /* fadeFluidCalcParms */ s32  fadeFluidCalcParms(void);
 /* fn_801C70FC */ void fn_801C70FC(s32 slot, u8 visible);
-/* fadeFluidInit */ void fadeFluidInit(void);                        /* updateAnimations 0x43C */
+/* fadeFluidInit */ void fadeFluidInit(u32 columns, u32 rows, f32 cellSize,
+                                       f32 calcStep, f32 waveLimit,
+                                       f32 timeStep);                 /* updateAnimations 0x43C */
 /* fn_801C75EC */ void fn_801C75EC(s32 slot);
 /* fn_801C7630 */ f32  fn_801C7630(s32 slot);
 /* fn_801C766C */ void fn_801C766C(s32 slot, f32 frame);
@@ -447,7 +449,7 @@ typedef struct TypeMatchup {
 /* fn_801D1338 */ s32  fn_801D1338(void* wazaCtx);
 /* fn_801D1364 */ void* fn_801D1364(void* wazaCtx, s32 idx);
 /* fn_801D139C */ s32  fn_801D139C(void* entry);
-/* fn_801D13E4 */ f32  fn_801D13E4(void* entry);
+/* fn_801D13E4 */ u32  fn_801D13E4(void* entry);
 /* fn_801D142C */ f32  fn_801D142C(void* entry);
 
 /* Waza animation controllers */

@@ -121,14 +121,14 @@ u32 fightTargetGetPtr(u32 slotType, u32 ptr, u32 count) {
     u32 pkmAbil[8];
     u32 ctx;
     u32 ctxObj;
-    u32 savedPtr;
-    u32 numSides;
+    u8 numSides;
     u32 i;
-    u32 j;
+    u32 n;
     u32 k;
     u32 m;
-    u32 n;
-    u32 flag;
+    u32 j;
+    u32 savedPtr;
+    u8 flag;
 
     if ((u16)slotType == 0) {
         return 0;
@@ -158,15 +158,15 @@ u32 fightTargetGetPtr(u32 slotType, u32 ptr, u32 count) {
     if (ctxObj == 0) {
         return 0;
     }
-    savedPtr = ptr;
     if (ptr != 0) {
+        savedPtr = ptr;
         ptr = _fightTargetGetTargetPtrToFightSidePtr__FPvUs(ptr, count);
         if (ptr == 0) {
             return 0;
         }
     }
-    m = 0;
     n = 0;
+    m = 0;
     count = fightTypeDataBiosGetTrainerNum(ctxObj);
     ctxObj = (u8)fightTypeDataBiosGetFightoutPokemonNum(ctxObj);
     numSides = (u8)count;
@@ -186,40 +186,42 @@ u32 fightTargetGetPtr(u32 slotType, u32 ptr, u32 count) {
             flag = 0;
             if ((u16)slotType == 3) return slots[(u16)i];
         }
-        count = 0;
         j = 0;
-        while ((u16)j < (u16)numSides) {
-            sidePkm[(u16)n] = fightSideGetStatus(slots[(u16)i], 0, 7, j);
-            if ((u16)slotType == 0xb && (u16)i == 0 && (u16)j == 0) {
+        count = 0;
+        while ((s32)(u16)count < (s32)numSides) {
+            sidePkm[(u16)n] = fightSideGetStatus(slots[(u16)i], 0, 7, count);
+            if ((u16)slotType == 0xb && (u16)i == 0 && (u16)count == 0) {
                 return sidePkm[(u16)n];
             }
             if (flag == 1) {
-                if ((u16)slotType == 6 && (u16)j == 0) return sidePkm[(u16)n];
-                if ((u16)slotType == 7 && (u16)j == 1) return sidePkm[(u16)n];
+                if ((u16)slotType == 6 && (u16)count == 0) return sidePkm[(u16)n];
+                if ((u16)slotType == 7 && (u16)count == 1) return sidePkm[(u16)n];
                 if ((u16)slotType == 8) {
                     if (savedPtr != sidePkm[(u16)n]) return sidePkm[(u16)n];
                 }
-                if ((u16)slotType == 9 && (u16)j == 0) return sidePkm[(u16)n];
-                if ((u16)slotType == 0xa && (u16)j == 1) return sidePkm[(u16)n];
+            } else {
+                if ((u16)slotType == 9 && (u16)count == 0) return sidePkm[(u16)n];
+                if ((u16)slotType == 0xa && (u16)count == 1) return sidePkm[(u16)n];
             }
             k = 0;
-            while ((u16)k < (u16)ctxObj) {
+            while ((s32)(u16)k < (s32)ctxObj) {
                 pkmAbil[(u16)m] = fightTrainerGetStatus(sidePkm[(u16)n], 0, 0x46, k);
                 if (flag == 1) {
-                    if ((u16)slotType == 0xc && (u16)count == 0) return pkmAbil[(u16)m];
-                    if ((u16)slotType == 0xd && (u16)count == 1) return pkmAbil[(u16)m];
+                    if ((u16)slotType == 0xc && (u16)j == 0) return pkmAbil[(u16)m];
+                    if ((u16)slotType == 0xd && (u16)j == 1) return pkmAbil[(u16)m];
                     if ((u16)slotType == 0xe) {
                         if (savedPtr != pkmAbil[(u16)m]) return pkmAbil[(u16)m];
                     }
-                    if ((u16)slotType == 0xf && (u16)count == 0) return pkmAbil[(u16)m];
-                    if ((u16)slotType == 0x10 && (u16)count == 1) return pkmAbil[(u16)m];
+                } else {
+                    if ((u16)slotType == 0xf && (u16)j == 0) return pkmAbil[(u16)m];
+                    if ((u16)slotType == 0x10 && (u16)j == 1) return pkmAbil[(u16)m];
                 }
                 m++;
-                count++;
+                j++;
                 k++;
             }
             n++;
-            j++;
+            count++;
         }
         i++;
     }

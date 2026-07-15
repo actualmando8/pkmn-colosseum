@@ -82,6 +82,8 @@ void HSD_AObjFree(HSD_AObj* aobj);
 void HSD_AObjSetRate(HSD_AObj* aobj, f32 rate);
 void HSD_AObjSetEndFrame(HSD_AObj* aobj, f32 frame);
 void HSD_AObjSetCurrentFrame(HSD_AObj* aobj, f32 frame);
+void HSD_AObjInvokeCallBacks(void);
+void HSD_AObjInitEndCallBack(void);
 
 /* ========================================================================= */
 /*  Inline accessors                                                         */

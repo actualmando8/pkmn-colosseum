@@ -7,12 +7,10 @@
  * All functions asm-only until matched.
  */
 #include "dolphin/types.h"
-#include "dolphin/os/OSAlarm.h"
-#include "dolphin/os/OSInterrupt.h"
 
 #pragma push
 #pragma optimization_level 0
-#pragma scheduling off
+#pragma peephole off
 #pragma scheduling off
 typedef struct {
     u32 reg;
@@ -173,6 +171,8 @@ u32 SIGetStatus(s32 chan) {
     OSRestoreInterrupts(enabled);
     return sr;
 }
+#pragma peephole reset
+#pragma pop
 
 void fn_800D0338(s32 chan, u32 command) {
     ((volatile SICommandQueueEntry*)0xCC006400)[chan].reg = command;
@@ -366,4 +366,9 @@ void AlarmHandler_800D0668(OSAlarm* alarm, OSContext* context) {
             packet->chan = -1;
         }
     }
+    volatile u32* commandRegister;
+    u32 command;
+
+    command = 0x80000000u;
+    *(commandRegister = (volatile u32*)0xCC006438) = command;
 }

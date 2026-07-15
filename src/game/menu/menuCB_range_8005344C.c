@@ -19,13 +19,19 @@ typedef struct MenuCBLayoutEntry MenuCBLayoutEntry;
 typedef struct MenuCBStatusWork MenuCBStatusWork;
 typedef struct MenuCursorItem MenuCursorItem;
 
+typedef struct MenuCBPokemonBlob {
+    u8 bytes[0x138];
+} MenuCBPokemonBlob;
+
 struct MenuCBState {
     s32 markKind;
     s32 cursorKind;
 };
 
 struct MenuCBPane {
-    u8 pad_00[0x4c];
+    u8 pad_00[0x6];
+    s16 itemId;
+    u8 pad_08[0x44];
     s32 textId;
     s16 x;
     s16 y;
@@ -35,7 +41,10 @@ struct MenuCBPane {
     MenuCBState* state;
     u8 pad_64[0x3];
     u8 alpha;
-    u8 pad_68[0x2d];
+    u8 pad_68[0x1c];
+    s16 originX;
+    s16 originY;
+    u8 pad_88[0xd];
     s8 boxIndex;
     u8 pad_96;
     s8 previousBoxIndex;
@@ -60,8 +69,8 @@ struct MenuModelWork {
 };
 
 struct MenuCBLayoutEntry {
-    s32 id;
-    s16 offset;
+    s32 itemId;
+    s16 y;
     s16 pad_06;
 };
 
@@ -81,19 +90,27 @@ struct MenuCursorItem {
 
 extern f32 lbl_8047A54C;
 extern void* lbl_8047A548;
+extern f32 lbl_8047A550;
 extern f32 lbl_8047A554;
 extern f32 lbl_8047A558;
 extern const f32 lbl_8047BE60;
+extern const f32 lbl_8047BE64;
+extern const f32 lbl_8047BE6C;
 extern const f32 lbl_8047BE68;
+extern const f32 lbl_8047BE84;
 extern const f32 lbl_8047BE8C;
 extern const f32 lbl_8047BE90;
 extern const f32 lbl_8047BE94;
 extern const f32 lbl_8047BE80;
+extern const f32 lbl_8047BE98;
 extern const MenuCBLayoutEntry lbl_802E61E8[17];
 extern const u32 lbl_80267350[18];
+extern s32 lbl_80267320[6];
+extern u8 lbl_80314F98[];
 extern u8 lbl_802EF0A8[];
 extern MenuCBSlotInfo lbl_80267398[0x20];
 extern MenuModelWork lbl_803A9720;
+extern u32 lbl_8047A560;
 
 extern void* fn_80057270(MenuCBPane* pane);
 extern s32 fn_800573C0(void);
@@ -134,6 +151,30 @@ extern void fn_80057A38(void);
 extern void fn_80057A64(void* pokemon, s32 arg1);
 extern s8 fn_801347D8(void);
 extern s32 fn_80055E38(MenuCBPane* pane);
+extern void fn_800FE6D0(s16 x, s16 y);
+extern void spriteSetEnv(void);
+extern void* heroGetStatus(void* hero, s32 selector, u16 index);
+extern u8 pokemonCheckValid(void* pokemon);
+extern s32 fn_80057DE8(void* pokemon);
+extern void* fn_80057F94(void* pokemon);
+extern void fn_800D88DC(u32 flags);
+extern void fn_800DC0D4(s32, s32, s32, s32, s32);
+extern void fn_800DC14C(s32, s32, s32, s32, s32, s32);
+extern void fn_800DBFD4(s32, s32, s32, s32, s32);
+extern void fn_800DC04C(s32, s32, s32, s32, s32, s32);
+extern u16 GStextureGetXsize(void* texture);
+extern u16 GStextureGetYsize(void* texture);
+extern void fn_800D7820(void* resource);
+extern void fn_800D85D4(s32 slot, void* texture);
+extern void fn_800D6A00(s32 mode);
+extern void fn_800D67BC(s32 mode);
+extern void fn_800D61E4(s16 x, s16 y);
+extern void fn_800D5CB8(s32, s32, s32, s32, s32);
+extern void fn_800D59B8(s32 slot, f32 xScale, f32 yScale);
+extern void fn_800D6728(void);
+extern void fn_800D888C(u32 flags);
+extern void* menuSpriteBiosGetPtr(s32 id);
+extern void windowDrawSprite2(s32, s32, s16, s16, s32, void*, s32, s32);
 
 #pragma push
 #pragma peephole off
@@ -385,14 +426,14 @@ s32 fn_80054420(MenuCBPane* pane, MenuCBPane* sprite) {
     s16 offset;
 
     for (i = 0; i < 17; i++) {
-        if (*(s16*)((u8*)sprite + 6) == lbl_802E61E8[i].id) {
+        if (*(s16*)((u8*)sprite + 6) == lbl_802E61E8[i].itemId) {
             break;
         }
     }
     if (i >= 17) {
         return 0;
     }
-    offset = lbl_802E61E8[i].offset;
+    offset = lbl_802E61E8[i].y;
     scaled = (s32)(lbl_8047BE80 * lbl_8047A558);
     sprite->y = scaled + offset;
     return 0;
@@ -412,6 +453,145 @@ s32 fn_80053E7C(MenuCBPane* pane) {
     fn_800FB680(0, 0, -1, 0xe7);
     return 0;
 }
+
+#pragma push
+#pragma peephole off
+s32 fn_80053ED8(MenuCBPane* pane, MenuCBPane* sprite) {
+    s32 index;
+    s32 partySlot;
+    s32 drawFallback;
+    void* pokemon;
+    void* texture;
+    s32 alpha;
+    s16 width;
+    s16 height;
+    s16 x;
+    s16 y;
+    s16 insetX;
+    s16 insetY;
+    f32 t;
+    f32 scaleS0;
+    f32 scaleS1;
+    f32 scaleT0;
+    f32 scaleT1;
+
+    drawFallback = TRUE;
+
+    for (index = 0; index < 17; index++) {
+        if (sprite->y == lbl_802E61E8[index].itemId) {
+            break;
+        }
+    }
+
+    if (index >= 17) {
+        return 0;
+    }
+
+    sprite->y = (s16)((s32)(lbl_8047BE80 * lbl_8047A558) + lbl_802E61E8[index].y);
+    fn_800FE6D0((s16)(pane->originX + sprite->x), (s16)(pane->originY + sprite->y));
+    spriteSetEnv();
+
+    texture = NULL;
+    partySlot = 0;
+    if (sprite->y != (s32)lbl_80267320[0]) {
+        partySlot = 1;
+        if (sprite->y != (s32)lbl_80267320[1]) {
+            partySlot = 2;
+            if (sprite->y != (s32)lbl_80267320[2]) {
+                partySlot = 3;
+                if (sprite->y != (s32)lbl_80267320[3]) {
+                    partySlot = 4;
+                    if (sprite->y != (s32)lbl_80267320[4]) {
+                        partySlot = 5;
+                        if (sprite->y != (s32)lbl_80267320[5]) {
+                            partySlot = 6;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (partySlot >= 6) {
+        partySlot = -1;
+    }
+
+    if (partySlot >= 0) {
+        pokemon = heroGetStatus(0, 3, (u16)partySlot);
+        if (pokemon != NULL) {
+            if ((u8)pokemonCheckValid(pokemon) != 0) {
+                texture = fn_80057F94(pokemon);
+            } else {
+                drawFallback = FALSE;
+            }
+        }
+    }
+
+    if (texture != NULL) {
+        if (fn_80057DE8(pokemon) != 0) {
+            if (lbl_8047A550 < lbl_8047BE6C) {
+                t = lbl_8047BE64 * lbl_8047A550;
+            } else {
+                t = lbl_8047BE60 - (lbl_8047BE64 * (lbl_8047A550 - lbl_8047BE6C));
+            }
+            alpha = (s32)(lbl_8047BE84 * t);
+        } else {
+            alpha = 0;
+        }
+
+        if (lbl_8047A54C < lbl_8047BE60 && lbl_8047A548 == (void*)partySlot) {
+            s32 scaledW;
+            s32 scaledH;
+
+            t = lbl_8047BE60 - lbl_8047A54C;
+            scaledW = (s32)(t * sprite->width);
+            scaledH = (s32)(t * sprite->height);
+            width = (s16)scaledW;
+            height = (s16)scaledH;
+            insetX = (s16)((sprite->width - (s16)scaledW) / 2);
+            insetY = (s16)((sprite->height - (s16)scaledH) / 2);
+        } else {
+            width = sprite->width;
+            height = sprite->height;
+            insetX = 0;
+            insetY = 0;
+        }
+
+        x = sprite->width;
+        y = sprite->height;
+        fn_800D88DC(-0x7ffffffe);
+        fn_800DC0D4(0, 0xf, 0xb, 0xa, 8);
+        fn_800DC14C(0, 0, 0, 0, 1, 0);
+        fn_800DBFD4(0, 7, 7, 7, 4);
+        fn_800DC04C(0, 0, 0, 0, 1, 0);
+
+        scaleS0 = lbl_8047BE68 / (f32)GStextureGetXsize(texture);
+        scaleS1 = (f32)x / (f32)GStextureGetXsize(texture);
+        scaleT0 = lbl_8047BE68 / (f32)GStextureGetYsize(texture);
+        scaleT1 = (f32)y / (f32)GStextureGetYsize(texture);
+
+        fn_800D7820(lbl_80314F98);
+        fn_800D85D4(0, texture);
+        fn_800D6A00(7);
+        fn_800D67BC(2);
+        fn_800D61E4(insetX, insetY);
+        fn_800D5CB8(0, 0x3c, 0xc, 0xff, alpha);
+        fn_800D59B8(0, scaleS0, scaleT0);
+        fn_800D61E4((s16)(insetX + width), (s16)(insetY + height));
+        fn_800D5CB8(0, 0x3c, 0xc, 0xff, alpha);
+        fn_800D59B8(0, scaleS1, scaleT1);
+        fn_800D6728();
+        fn_800D888C(0x80000000);
+    } else if (drawFallback != FALSE) {
+        void* bios = menuSpriteBiosGetPtr(0x232);
+        s16 drawW = *(s16*)((u8*)bios + 0xc);
+        bios = menuSpriteBiosGetPtr(0x232);
+        windowDrawSprite2(0, 0, drawW, *(s16*)((u8*)bios + 0xe), -1, pane, 0x232, 0);
+    }
+
+    return 0;
+}
+#pragma pop
+
 
 s32 fn_8005464C(void) {
     return !(lbl_8047A54C >= lbl_8047BE8C);
@@ -466,23 +646,26 @@ void fn_8005471C(void) {
 
 #pragma push
 #pragma peephole off
+#pragma scheduling on
 s32 fn_80054914(MenuCBPane* pane, MenuCBPane* sprite) {
-    s32 ids[6][3] = {
-        {0x119d, 0x119e, 0x119f},
-        {0x713, 0x714, 0x715},
-        {0x716, 0x717, 0x718},
-        {0x719, 0x71a, 0x71b},
-        {0x71c, 0x71d, 0x71e},
-        {0x71f, 0x720, 0x721}
-    };
+    typedef struct MessageIdTable {
+        s32 ids[6][3];
+    } MessageIdTable;
+    const MessageIdTable* source;
+    MessageIdTable table;
     s32 column;
     s32 row;
     s16 id;
+    u8 visible;
+
+    source = (const MessageIdTable*)lbl_80267350;
+    table = *source;
 
     for (row = 0; row < 6; row++) {
+        column = 0;
         id = *(s16*)((u8*)sprite + 6);
-        for (column = 0; column < 3; column++) {
-            if (id == ids[row][column]) {
+        for (; column < 3; column++) {
+            if (id == table.ids[row][column]) {
                 break;
             }
         }
@@ -494,10 +677,11 @@ s32 fn_80054914(MenuCBPane* pane, MenuCBPane* sprite) {
         return 0;
     }
     if (pane->boxIndex == row) {
-        winSpriteSetDisp(sprite, TRUE);
+        visible = TRUE;
     } else {
-        winSpriteSetDisp(sprite, FALSE);
+        visible = FALSE;
     }
+    winSpriteSetDisp(sprite, visible);
     return 0;
 }
 #pragma pop
@@ -609,6 +793,262 @@ s32 fn_80055194(s32* outSlot, s32 index) {
     *outSlot = info->slot;
     return info->kind;
 }
+
+#pragma push
+#pragma peephole off
+void* fn_800551CC(void* pokemon, s32 direction, s32* moveState)
+{
+    extern void* getPokemon__5PCBOXFScSc(void*, s8, s8);
+    s32 active;
+    s32 box;
+    void* candidate;
+    s32 slot;
+
+    active = moveState[0];
+    box = moveState[1];
+    if (active != 0) {
+        return pokemon;
+    }
+
+    if (direction == 1) {
+        slot = moveState[2] - 1;
+        while (slot >= 0) {
+            candidate = getPokemon__5PCBOXFScSc(NULL, (s8) box, (s8) slot);
+            if (pokemonCheckValid(candidate) != 0) {
+                break;
+            }
+            slot--;
+        }
+        if (slot >= 0) {
+            moveState[2] = slot;
+            return candidate;
+        }
+    }
+
+    if (direction == 2) {
+        slot = moveState[2] + 1;
+        while (slot < fn_801347D8()) {
+            candidate = getPokemon__5PCBOXFScSc(NULL, (s8) box, (s8) slot);
+            if (pokemonCheckValid(candidate) != 0) {
+                break;
+            }
+            slot++;
+        }
+        if (slot < fn_801347D8()) {
+            moveState[2] = slot;
+            return candidate;
+        }
+    }
+
+    return pokemon;
+}
+#pragma pop
+
+s32 fn_800552D4(s8 box, s8 slot)
+{
+    extern void* getPokemon__5PCBOXFScSc(void*, s8, s8);
+    extern void delPokemon__5PCBOXFScSc(void*, s8, s8);
+    extern u8 pokemonCheckValid(void*);
+    extern s32 fn_800576B4(void);
+    extern void* fn_800574E0(void);
+    extern s32 fn_80057694(void);
+    extern u32 pokemonGetStatus(void*, s32, s32, s32);
+    extern void fn_80058804(void*, s32);
+    extern s32 fn_80054B1C(s32, s32);
+    extern void fn_800587D8(void);
+    extern void fn_800576C4(s32);
+    extern void fn_80057458(void*);
+    extern void* heroGetStatus(void*, s32, u16);
+    extern void fn_800546F0(s32);
+    extern s32 fn_80054680(void);
+    extern void fn_800599AC(s32);
+    extern void fn_800546C0(s32);
+    extern void fadeSet(s32, f32);
+    extern s32 fadeCheck(s32);
+    extern void fn_8005471C(void);
+    extern s32 fn_80057C9C(void*, void*, s32*);
+    extern void* menuItemBiosGetPtr(s32);
+    extern void fn_80057830(s16, s16, s32);
+    extern MenuCBPane* windowSearchID(s32);
+    extern u32 fn_8005D738(u8);
+    extern void pokemonBiosSetPcboxMark(void*, u8);
+    extern s32 fn_80057DE8(void*);
+    extern s32 fn_8005D3D0(s32);
+    extern void GScharCpy(void*, void*);
+    extern void fn_800566D8(s32);
+    extern s32 fn_800566B4(void);
+    extern void fn_8005744C(void);
+    extern s32 fn_80057428(void);
+    extern void fn_800574A8(void);
+    MenuCBPokemonBlob pokemonCopy;
+    u16 name[0xE];
+    s32 moveState[3];
+    void* boxPokemon;
+    void* alternatePokemon;
+    void* pokemon;
+    MenuCBPane* window;
+    void* item;
+    s32 canAct;
+    s32 context;
+    s32 action;
+    s32 emptySlots;
+    s32 i;
+    s32 haveCopy;
+    s32 mode;
+    u32 nameValue;
+    u8 mark;
+
+    boxPokemon = getPokemon__5PCBOXFScSc(NULL, box, slot);
+    canAct = pokemonCheckValid(boxPokemon);
+    alternatePokemon = NULL;
+    context = 0;
+    mode = 1;
+
+    if (fn_800576B4() != 3) {
+        if (canAct == 0) {
+            mode = 0;
+        }
+    } else {
+        alternatePokemon = fn_800574E0();
+        context = canAct != 0 ? 2 : 1;
+    }
+    if (mode == 0) {
+        return slot;
+    }
+    pokemon = alternatePokemon != NULL ? alternatePokemon : boxPokemon;
+
+    if (fn_80057694() == 0) {
+        nameValue = pokemonGetStatus(pokemon, 0, 0x77, 0);
+        msgctrlSetValue(0x36, nameValue);
+        msgctrlSetValue(0x32, nameValue);
+        fn_80058804((void*)0x1B74, 0);
+        action = fn_80054B1C(context, 0);
+        fn_800587D8();
+    } else {
+        action = context >= 0 && context < 3 ? context : 8;
+    }
+
+    switch (action) {
+    case 0:
+        fn_800576C4(1);
+        break;
+    case 1:
+        fn_800576C4(4);
+        break;
+    case 2:
+        fn_80057458(boxPokemon);
+        delPokemon__5PCBOXFScSc(NULL, box, slot);
+        fn_800576C4(6);
+        break;
+    case 3:
+        emptySlots = 6;
+        for (i = 0; i < 6; i++) {
+            if (pokemonCheckValid(heroGetStatus(NULL, 3, (u16)i)) != 0) {
+                emptySlots--;
+            }
+        }
+        if (emptySlots <= 0) {
+            fn_80058804((void*)0x1B7D, 1);
+            break;
+        }
+        if (alternatePokemon != NULL) {
+            fn_800546F0(0);
+            while (fn_80054680() != 2) {
+                _threadSwitch();
+            }
+            fn_800599AC(1);
+            fn_800546C0(0);
+            while (fn_80054680() != 3) {
+                _threadSwitch();
+            }
+        }
+        lbl_8047A560 = 1;
+        fn_800576C4(1);
+        break;
+    case 4:
+        fadeSet(3, lbl_8047BE98);
+        fadeCheck(1);
+        fn_8005471C();
+        fn_80056A80();
+        haveCopy = 0;
+        if (fn_800576B4() == 3) {
+            haveCopy = 1;
+            pokemonCopy = *(MenuCBPokemonBlob*)fn_800574E0();
+        }
+        context = fn_80057694();
+        fn_80057A38();
+        moveState[0] = alternatePokemon != NULL;
+        moveState[1] = box;
+        moveState[2] = slot;
+        fn_80057C9C(pokemon, fn_800551CC, moveState);
+        fn_80056B74((MenuCBPane*)(s32)box, 0);
+        fn_80054760(0, 0);
+        fn_80057A64(haveCopy != 0 ? &pokemonCopy : NULL, context);
+        if (moveState[0] == 0) {
+            for (i = 0; i < 32; i++) {
+                if (lbl_80267398[i].kind == 0 &&
+                    lbl_80267398[i].slot == moveState[2]) {
+                    break;
+                }
+            }
+            if (i < 32) {
+                item = menuItemBiosGetPtr(lbl_80267398[i].itemId);
+                fn_80057830(*(s16*)((u8*)item + 2),
+                             *(s16*)((u8*)item + 4), 1);
+            }
+            slot = (s8)moveState[2];
+            window = windowSearchID(0x93);
+            if (window != NULL) {
+                window->boxIndex = slot;
+            }
+        }
+        fadeSet(2, lbl_8047BE98);
+        fadeCheck(1);
+        break;
+    case 5:
+        fn_80058804((void*)0x1B88, 0);
+        mark = fn_8005D738(pokemonBiosGetPcboxMark(pokemon));
+        if (mark != 0xFF) {
+            pokemonBiosSetPcboxMark(pokemon, mark);
+        }
+        fn_800587D8();
+        break;
+    case 6:
+        if (fn_80057DE8(pokemon) != 0) {
+            fn_80058804((void*)0x1B94, 1);
+            break;
+        }
+        fn_80058804((void*)0x1B91, 0);
+        action = fn_8005D3D0(1);
+        fn_800587D8();
+        if (action == 1) {
+            break;
+        }
+        nameValue = pokemonGetStatus(pokemon, 0, 0x77, 0);
+        GScharCpy(name, (void*)nameValue);
+        if (alternatePokemon == NULL) {
+            fn_800566D8(slot);
+            while (fn_800566B4() != 0) {
+                _threadSwitch();
+            }
+            delPokemon__5PCBOXFScSc(NULL, box, slot);
+        } else {
+            fn_8005744C();
+            while (fn_80057428() != 0) {
+                _threadSwitch();
+            }
+            fn_800574A8();
+            fn_800576C4(0);
+        }
+        msgctrlSetValue(0x36, (u32)name);
+        fn_80058804((void*)0x1B92, 1);
+        fn_80058804((void*)0x1B93, 1);
+        break;
+    }
+
+    return slot;
+}
+
 
 #pragma push
 #pragma peephole off

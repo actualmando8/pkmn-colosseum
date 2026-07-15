@@ -296,6 +296,7 @@ extern void fn_800E209C(u16);
 extern void GXCallDisplayList(u32, u32);
 extern void fn_800E2AF8(u16);
 extern u16 fn_800E2C04(u32, u32);
+extern u16 lbl_8047AAD0;
 extern u32 lbl_8047AAD8;
 extern u32 lbl_8047AAD4;
 extern void jumptable_80315364();
@@ -573,17 +574,14 @@ void fn_800DB758(u16 vertCount)
 
 void fn_800DB890(u32 count)
 {
-    extern u16 lbl_8047AAD0;
-    u16 handle;
     u32 i;
 
     lbl_8047AAD8 = count;
-    handle = _toolentryAlloc__FUl(count * 0x18);
-    lbl_8047AAD0 = handle;
-    if (handle != 0) {
-        lbl_8047AAD4 = (u32)fn_800E27B0(handle);
+    lbl_8047AAD0 = _toolentryAlloc__FUl(count * 0x18);
+    if (lbl_8047AAD0 != 0) {
+        lbl_8047AAD4 = (u32)fn_800E27B0(lbl_8047AAD0);
         for (i = 0; i < lbl_8047AAD8; i++) {
-            *(u8*)(lbl_8047AAD4 + i * 0x18) = 0;
+            ((u8*)lbl_8047AAD4)[i * 0x18] = 0;
         }
     }
 }
@@ -906,15 +904,15 @@ void fn_800DC1D4(u8 val) {
 
 void fn_800DC224(u32 idx, u32 a, u32 b, u32 c, u32 d)
 {
-    u8* p;
+    u8* state = (u8*)lbl_8047AA80;
 
-    if (*(s32*)lbl_8047AA80 == 1) {
+    if (*(s32*)state == 1) {
         fn_800D4F98(0x48, 5, idx, a, b, c, d);
     } else {
-        p = (u8*)lbl_8047AA80 + idx * 4 + 0x42e;
-        p[0] = a;
-        p[1] = b;
-        p[2] = c;
-        p[3] = d;
+        u8* dst = state + idx * 4 + 0x42E;
+        dst[0] = a;
+        dst[1] = b;
+        dst[2] = c;
+        dst[3] = d;
     }
 }

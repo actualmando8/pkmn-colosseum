@@ -8,274 +8,355 @@
  */
 #include "dolphin/types.h"
 
-#pragma push
-#pragma peephole off
-u32 scriptAddPokecoupon(s32 offset) {
-    extern u32 heroGetStatus(u8* ptr, u32 selector, u32 index);
-    extern void heroAddPokecoupon(u8* ptr, s32 offset);
-    extern void heroDecPokecoupon(u8* ptr, s32 offset);
+/* ===== Data ===== */
+extern s32 lbl_80478CB0;
 
-    heroGetStatus(0, 0xd, 0);
-    if (offset >= 0) {
-        heroAddPokecoupon(0, offset);
+typedef struct TemochiEntry {
+    u32 field_0;
+    u32 field_4;
+} TemochiEntry;
+
+extern TemochiEntry lbl_804670B4[];
+extern const f32 lbl_8047E114;
+
+/* ===== Engine / hero helpers ===== */
+extern void* heroGetStatus(void* ptr, u32 a, u32 b);
+extern void  heroSetStatus(u8* ptr, u32 a, u32 b);
+extern void  heroAddPokecoupon(u8* ptr, s32 offset);
+extern void  heroDecPokecoupon(u8* ptr, s32 offset);
+extern void  heroAddPokedoru(u8* ptr, u32 offset);
+extern void  heroDecPokedoru(u8* ptr, u32 offset);
+extern void* heroBiosGetPokemonPtr(void* status, u16 idx);
+
+extern void* savedataGetStatus(u32 side, u32 slotType);
+
+/* ===== Flag helpers ===== */
+extern s32 fn_801906A0(u32 flag);
+extern void _flagSet(u32 flag, s32 value);
+
+/* ===== Pokemon helpers ===== */
+extern u32  pokemonCheckValid(void* mon);
+extern u32  pokemonGetStatus(void* mon, s32 a, s32 b, s32 c);
+extern u32  pokemonBiosGetDarkFlag(void* mon);
+extern f32  pokemonGetDp(void* mon);
+
+/* ===== Special gift pokemon helpers ===== */
+extern void* heroPokemonGetBlacky(void* status, u32 id);
+extern void* heroPokemonGetEifie(void* status, u32 id);
+extern void* heroPokemonGetPrasle(void* status, u32 id);
+extern void* heroPokemonGetHouou(void* status, u32 id);
+extern void* heroPokemonGetPikachu(void* status, u32 id);
+extern void* heroPokemonGetCelebi(void* status, u32 id);
+
+/* ===== Item / treasure ===== */
+extern u32 heroItemCheckHaveItemDataId(u8* ptr, u32 itemId);
+extern s32 heroItemAddItemDataId(u8* ptr, u32 itemId, u32 count, u32 arg4);
+extern s32 heroItemDecItemDataId(u8* ptr, u32 itemId, u32 count, u32 arg4);
+extern u32 floorEventGetTresure(s32 a, s32 b, s32 c);
+
+/* ===== Collision / character ===== */
+extern s32 GScolsys2SetObjEnable(s32 triIndex, s32 visible);
+extern u8* fn_8011711C();
+extern void  set__5GSvecFfff(f32* out, f32 x, f32 y, f32 z);
+extern void  floorCharacterBiosSetPos(void* bios, f32* pos);
+extern void  floorCharacterBiosSetVisibility();
+
+/* ===== Misc ===== */
+extern u32 exribbonSetEarthRibbon(void* mon);
+extern void etctoolSetPokemonNakigoe();
+
+u32 scriptAddPokecoupon(s32 delta)
+{
+    heroGetStatus((u8*)0, 0xd, 0);
+    if (delta < 0) {
+        heroDecPokecoupon((u8*)0, -delta);
     } else {
-        heroDecPokecoupon(0, -offset);
+        heroAddPokecoupon((u8*)0, delta);
     }
-    return heroGetStatus(0, 0xd, 0);
+    return (u32)heroGetStatus((u8*)0, 0xd, 0);
 }
-#pragma pop
 
-#pragma push
-#pragma peephole off
-u32 scriptAddPremium(s32 offset) {
-    extern u32 fn_801906A0(u32 flag);
-    extern void _flagSet(u32 flag, u32 value);
-    u32 current;
-    u32 premium;
-
-    current = fn_801906A0(0xa9e);
-    premium = current + offset;
-    _flagSet(0xa9e, premium);
-    return premium;
+u32 fn_801CA858(u32 arg)
+{
+    heroSetStatus((u8*)0, 0xd, arg);
+    return arg;
 }
-#pragma pop
 
-#pragma push
-#pragma peephole off
-u32 scriptAddPokedoru(s32 offset) {
-    extern void heroAddPokedoru(u8* ptr, s32 offset);
-    extern void heroDecPokedoru(u8* ptr, s32 offset);
-    extern u32 heroGetStatus(u8* ptr, u32 selector, u32 index);
+u32 fn_801CA884(void)
+{
+    return (u32)heroGetStatus((u8*)0, 0xd, 0);
+}
 
-    if (offset >= 0) {
-        heroAddPokedoru(0, offset);
+s32 scriptAddPremium(s32 delta)
+{
+    s32 newVal = fn_801906A0(0xa9e) + delta;
+    _flagSet(0xa9e, newVal);
+    return newVal;
+}
+
+s32 scriptSetPremium(s32 value)
+{
+    _flagSet(0xa9e, value);
+    return value;
+}
+
+s32 scriptGetPremium(void)
+{
+    return fn_801906A0(0xa9e);
+}
+
+u32 scriptAddPokedoru(s32 delta)
+{
+    heroGetStatus((u8*)0, 0xc, 0);
+    if (delta < 0) {
+        heroDecPokedoru((u8*)0, -delta);
     } else {
-        heroDecPokedoru(0, -offset);
+        heroAddPokedoru((u8*)0, delta);
     }
-    return heroGetStatus(0, 0xc, 0);
+    return (u32)heroGetStatus((u8*)0, 0xc, 0);
 }
-#pragma pop
 
-#pragma push
-#pragma peephole off
-s32 scriptAddItem(u32 item, s32 count) {
-    extern s32 heroItemAddItemDataId(u8* ptr, u16 item, u16 count, s32 slot);
-    extern s32 heroItemDecItemDataId(u8* ptr, u16 item, u16 count, s32 slot);
-    s32 result;
+u32 scriptGetPokedoru(void)
+{
+    return (u32)heroGetStatus((u8*)0, 0xc, 0);
+}
 
+s32 scriptSetEventCol(u8 enable)
+{
+    s32 id = lbl_80478CB0;
+    if (id >= 0) {
+        GScolsys2SetObjEnable(id, enable);
+    }
+    return id;
+}
+
+s32 scriptGetEventColID(void)
+{
+    return lbl_80478CB0;
+}
+
+s32 scriptSetEventColID(s32 id)
+{
+    s32 old = lbl_80478CB0;
+    lbl_80478CB0 = id;
+    return old;
+}
+
+s32 scriptSetCol(s32 index, u8 enable)
+{
+    if (index >= 0) {
+        GScolsys2SetObjEnable(index, enable);
+    }
+    return index;
+}
+
+u32 scriptHaveItem(u16 itemId)
+{
+    return heroItemCheckHaveItemDataId((u8*)0, itemId) & 0xFF;
+}
+
+u32 scriptAddItem(u16 itemId, s32 count)
+{
+    s32 ret = 0;
     if (count > 0) {
-        result = heroItemAddItemDataId(0, item, count, -1);
+        ret = heroItemAddItemDataId((u8*)0, itemId, (u16)count, -1);
     } else if (count < 0) {
-        result = heroItemDecItemDataId(0, item, -count, -1);
+        ret = heroItemDecItemDataId((u8*)0, itemId, (u16)(-count), -1);
     }
-    return result;
+    return ret;
 }
-#pragma pop
 
-#pragma push
-#pragma peephole off
-void scriptStoreTemochiPokemon(u8* hero) {
-    extern u32 heroGetStatus(u8* hero, u32 selector, u32 index);
-    extern u8 pokemonCheckValid(u32 pokemon);
-    extern u32 pokemonGetStatus(u32 pokemon, u32 index, u32 selector, u32 subindex);
-    extern u32 lbl_804670B4[][2];
-    u32* entry = lbl_804670B4[0];
-    s32 i = 0;
-    u16 species;
-    u32 pokemon;
-    u32 status;
+u32 scriptGetItem(s32 a, s32 b)
+{
+    return floorEventGetTresure(4, a, b);
+}
 
-    for (; i < 6; entry += 2, i++) {
-        entry[1] = 0;
-        pokemon = heroGetStatus(hero, 3, (u16)i);
-        if (pokemon != 0 && pokemonCheckValid(pokemon)) {
-            species = pokemonGetStatus(pokemon, 0, 0x6e, 0);
-            status = pokemonGetStatus(pokemon, 0, 0x6f, 0);
-            entry[1] = species;
-            entry[0] = status;
+u32 scriptCheckTemochiPokemon(u8* arg)
+{
+    u8 used[6];
+    s32 i, j;
+
+    used[0] = 0;
+    used[1] = 0;
+    used[2] = 0;
+    used[3] = 0;
+    used[4] = 0;
+    used[5] = 0;
+
+    for (i = 0; i < 6; i++) {
+        if (lbl_804670B4[i].field_4 != 0) {
+            for (j = 0; j < 6; j++) {
+                if (used[j]) {
+                    continue;
+                }
+                {
+                    void* mon = heroGetStatus(arg, 3, j);
+                    if (mon != NULL && pokemonCheckValid(mon) != 0) {
+                        u16 v1 = (u16)pokemonGetStatus(mon, 0, 0x6e, 0);
+                        u32 v2 = pokemonGetStatus(mon, 0, 0x6f, 0);
+                        if (v1 == lbl_804670B4[i].field_4 && v2 == lbl_804670B4[i].field_0) {
+                            used[j] = 1;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (j == 6) {
+                return 1;
+            }
         }
     }
-}
-#pragma pop
 
-#pragma push
-#pragma peephole off
-s32 scriptGetEarthRibbon(void) {
-    extern void* savedataGetStatus(u32 side, u32 slotType);
-    extern void* heroBiosGetPokemonPtr(void* party, u16 index);
-    extern u8 pokemonCheckValid(void* pokemon);
-    extern void exribbonSetEarthRibbon(void* pokemon);
-    void* party;
-    void* pokemon;
-    u16 i;
-
-    party = savedataGetStatus(0, 2);
-    i = 0;
-    while (i < 6) {
-        pokemon = heroBiosGetPokemonPtr(party, i);
-        if (pokemonCheckValid(pokemon)) {
-            exribbonSetEarthRibbon(pokemon);
+    for (i = 0; i < 6; i++) {
+        if (!used[i]) {
+            void* mon = heroGetStatus(arg, 3, i);
+            if (mon != NULL && pokemonCheckValid(mon) != 0) {
+                return 1;
+            }
         }
-        i++;
     }
     return 0;
 }
-#pragma pop
 
-#pragma push
-#pragma scheduling off
-s32 fn_801CADA8(u8 selector) {
-    extern u32 savedataGetStatus(u32 side, u32 slotType);
-    extern s32 heroPokemonGetBlacky(u32 hero, u32 ball);
-    extern s32 heroPokemonGetEifie(u32 hero, u32 ball);
-    extern s32 heroPokemonGetPrasle(u32 hero, u32 ball);
-    extern s32 heroPokemonGetHouou(u32 hero, u32 ball);
-    extern s32 heroPokemonGetPikachu(u32 hero, u32 ball);
-    extern s32 heroPokemonGetCelebi(u32 hero, u32 ball);
-    u32 hero;
-    s32 result = 0;
+void scriptStoreTemochiPokemon(u8* arg)
+{
+    TemochiEntry* entry = lbl_804670B4;
+    s32 i;
 
-    hero = savedataGetStatus(0, 2);
-    switch (selector) {
-    case 1:
-        result = heroPokemonGetBlacky(hero, 0xfe);
-        break;
-    case 2:
-        result = heroPokemonGetEifie(hero, 0xfe);
-        break;
-    case 3:
-        result = heroPokemonGetPrasle(hero, 0xfe);
-        break;
-    case 4:
-        result = heroPokemonGetHouou(hero, 0xff);
-        break;
-    case 5:
-        result = heroPokemonGetPikachu(hero, 0xff);
-        break;
-    case 6:
-        result = heroPokemonGetCelebi(hero, 0xff);
-        break;
+    for (i = 0; i < 6; i++) {
+        entry[i].field_4 = 0;
+        {
+            void* mon = heroGetStatus(arg, 3, i);
+            if (mon != NULL && pokemonCheckValid(mon) != 0) {
+                entry[i].field_4 = (u16)pokemonGetStatus(mon, 0, 0x6e, 0);
+                entry[i].field_0 = pokemonGetStatus(mon, 0, 0x6f, 0);
+            }
+        }
+    }
+}
+
+u32 scriptGetEarthRibbon(void)
+{
+    void* status = savedataGetStatus(0, 2);
+    u16 i;
+
+    for (i = 0; i < 6; i++) {
+        void* mon = heroBiosGetPokemonPtr(status, i);
+        if (pokemonCheckValid(mon) != 0) {
+            exribbonSetEarthRibbon(mon);
+        }
+    }
+    return 0;
+}
+
+u32 fn_801CADA0(void)
+{
+    return 0;
+}
+
+void* fn_801CADA8(u8 kind)
+{
+    void* status = savedataGetStatus(0, 2);
+    void* result = NULL;
+
+    switch (kind) {
+        case 1:
+            result = heroPokemonGetBlacky(status, 0xfe);
+            break;
+        case 2:
+            result = heroPokemonGetEifie(status, 0xfe);
+            break;
+        case 3:
+            result = heroPokemonGetPrasle(status, 0xfe);
+            break;
+        case 4:
+            result = heroPokemonGetHouou(status, 0xff);
+            break;
+        case 5:
+            result = heroPokemonGetPikachu(status, 0xff);
+            break;
+        case 6:
+            result = heroPokemonGetCelebi(status, 0xff);
+            break;
     }
     return result;
 }
-#pragma pop
 
 void scriptSetPokemonNakigoe(void) {
     extern void etctoolSetPokemonNakigoe(void);
     etctoolSetPokemonNakigoe();
 }
 
-u32 scriptGetPokemonNickName(s32 index) {
-    extern u32 savedataGetStatus(u32 side, u32 slotType);
-    extern u32 heroBiosGetPokemonPtr(u32 party, u16 index);
-    extern u32 pokemonGetStatus(u32 pokemon, u32 index, u32 selector, u32 subindex);
-    u32 pokemon;
+u32 scriptGetPokemonNickName(u32 slot)
+{
+    void* mon;
 
-    if (index >= 6) {
+    if (slot >= 6) {
         return 0;
     }
-    pokemon = heroBiosGetPokemonPtr(savedataGetStatus(0, 2), (u16)index);
-    if (pokemon == 0) {
+    mon = heroBiosGetPokemonPtr(savedataGetStatus(0, 2), (u16)slot);
+    if (mon == NULL) {
         return 0;
     }
-    return pokemonGetStatus(pokemon, 0, 0x77, 0);
+    return pokemonGetStatus(mon, 0, 0x77, 0);
 }
 
-#pragma push
-#pragma peephole off
-s32 scriptGetDarkPointZeroPokemonNum(void) {
-    extern void* savedataGetStatus(u32 side, u32 slotType);
-    extern void* heroBiosGetPokemonPtr(void* party, u16 index);
-    extern u8 pokemonCheckValid(void* pokemon);
-    extern u8 pokemonBiosGetDarkFlag(void* pokemon);
-    extern f32 pokemonGetDp(void* pokemon);
-    void* party;
-    void* pokemon;
+u32 scriptGetDarkPointZeroPokemonNum(void)
+{
+    void* status = savedataGetStatus(0, 2);
+    u16 count = 0;
     u16 i;
-    u16 count;
+    f32 zero = lbl_8047E114;
 
-    count = 0;
-    party = savedataGetStatus(0, 2);
-    i = 0;
-    while (i < 6) {
-        pokemon = heroBiosGetPokemonPtr(party, i);
-        if (pokemonCheckValid(pokemon)) {
-            if (pokemonBiosGetDarkFlag(pokemon)) {
-                if (pokemonGetDp(pokemon) == 0.0f) {
-                    count++;
-                }
-            }
-        }
-        i++;
-    }
-    return count;
-}
-#pragma pop
-
-#pragma push
-#pragma peephole off
-s32 scriptGetDarkPokemonNum(void) {
-    extern void* savedataGetStatus(u32 side, u32 slotType);
-    extern void* heroBiosGetPokemonPtr(void* party, u16 index);
-    extern u8 pokemonCheckValid(void* pokemon);
-    extern u8 pokemonBiosGetDarkFlag(void* pokemon);
-    void* party;
-    void* pokemon;
-    u16 i;
-    u16 count;
-
-    count = 0;
-    party = savedataGetStatus(0, 2);
-    i = 0;
-    while (i < 6) {
-        pokemon = heroBiosGetPokemonPtr(party, i);
-        if (pokemonCheckValid(pokemon)) {
-            if (pokemonBiosGetDarkFlag(pokemon)) {
-                count++;
-            }
-        }
-        i++;
-    }
-    return count;
-}
-#pragma pop
-
-#pragma push
-#pragma peephole off
-s32 scriptGetPokemonNum(void) {
-    extern void* savedataGetStatus(u32 side, u32 slotType);
-    extern void* heroBiosGetPokemonPtr(void* party, u16 index);
-    extern u8 pokemonCheckValid(void* pokemon);
-    void* party;
-    u16 i;
-    u16 count;
-
-    count = 0;
-    party = savedataGetStatus(0, 2);
-    i = 0;
-    while (i < 6) {
-        if (pokemonCheckValid(heroBiosGetPokemonPtr(party, i))) {
+    for (i = 0; i < 6; i++) {
+        void* mon = heroBiosGetPokemonPtr(status, i);
+        if (pokemonCheckValid(mon) != 0 && pokemonBiosGetDarkFlag(mon) != 0 && pokemonGetDp(mon) == zero) {
             count++;
         }
-        i++;
     }
     return count;
 }
-#pragma pop
 
-#pragma push
-#pragma peephole off
-s32 floorCharacterSetPos(u32 character, f32 x, f32 y, f32 z) {
-    extern void set__5GSvecFfff(f32* position, f32 x, f32 y, f32 z);
-    extern void* fn_8011711C(u32 character);
-    extern void floorCharacterBiosSetPos(void* character, f32* position);
-    f32 position[3];
+u32 scriptGetDarkPokemonNum(void)
+{
+    void* status = savedataGetStatus(0, 2);
+    u16 count = 0;
+    u16 i;
 
-    set__5GSvecFfff(position, x, y, z);
-    floorCharacterBiosSetPos(fn_8011711C(character), position);
+    for (i = 0; i < 6; i++) {
+        void* mon = heroBiosGetPokemonPtr(status, i);
+        if (pokemonCheckValid(mon) != 0 && pokemonBiosGetDarkFlag(mon) != 0) {
+            count++;
+        }
+    }
+    return count;
+}
+
+u32 scriptGetPokemonNum(void)
+{
+    void* status = savedataGetStatus(0, 2);
+    u16 count = 0;
+    u16 i;
+
+    for (i = 0; i < 6; i++) {
+        void* mon = heroBiosGetPokemonPtr(status, i);
+        if (pokemonCheckValid(mon) != 0) {
+            count++;
+        }
+    }
+    return count;
+}
+
+u32 floorCharacterSetPos(u32 id, f32 x, f32 y, f32 z)
+{
+    f32 pos[3];
+    void* bios;
+
+    set__5GSvecFfff(pos, x, y, z);
+    bios = fn_8011711C(id);
+    floorCharacterBiosSetPos(bios, pos);
     return 1;
 }
-#pragma pop
 
 #pragma push
 #pragma scheduling off

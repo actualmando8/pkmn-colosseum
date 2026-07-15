@@ -19,6 +19,8 @@ extern HSD_DObjInfo hsdDObj;
 extern u8 lbl_8036C638[];
 extern char lbl_80274708[];
 extern char lbl_80274720[];
+extern HSD_ClassInfo lbl_8036C7A0;
+extern HSD_ClassInfo* lbl_8047B260;
 static HSD_ClassInfo* default_class = NULL;
 
 /* ========================================================================= */
@@ -190,7 +192,7 @@ void HSD_DObjSetDefaultClass(HSD_ClassInfo* info)
 
 /* Forward decls of vtable entries wired by DObjInfoInit. */
 static void DObjRelease(HSD_Class* o);
-static void fn_80199014(HSD_Class* o);
+static void fn_80199014(HSD_ClassInfo* info);
 static void fn_801990B8(HSD_DObj* dobj, f32 vmtx[3][4], f32 pmtx[3][4], u32 rendermode);
 static int DObjLoad(HSD_DObj* dobj, HSD_DObjDesc* desc);
 
@@ -215,22 +217,14 @@ static void fn_80198F7C(void)
 
 /* 0x80199014 | 0x48 */
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 0
-asm void fn_80199014(void) {
-#include "src/hsd/hsd_dobj_fn_80199014.inc"
-}
-#else
 #pragma optimization_level 1
-static void DObjDestroy(HSD_Class* o)
+static void fn_80199014(HSD_ClassInfo* info)
 {
-    if (o == (HSD_Class*) default_class) {
-        default_class = NULL;
+    if (info == lbl_8047B260) {
+        lbl_8047B260 = NULL;
     }
-    HSD_PARENT_INFO(&hsdDObj)->destroy(o);
+    (&lbl_8036C7A0)->head.parent->amnesia(info);
 }
-#endif
 #pragma pop
 
 /* 0x8019905C | 0x5C */
@@ -267,7 +261,8 @@ asm void fn_801990B8(void) {
 #include "src/hsd/hsd_dobj_fn_801990B8.inc"
 }
 #else
-#pragma optimization_level 4
+#pragma optimization_level 1
+#pragma use_lmw_stmw on
 static void fn_801990B8(HSD_DObj* dobj, f32 vmtx[3][4], f32 pmtx[3][4], u32 rendermode)
 {
     HSD_PObj* pobj;
@@ -656,8 +651,17 @@ asm void HSD_FObjFree(void) {
 }
 #else
 #pragma optimization_level 4
+/* Debug hook, compiled out in the release build.  It normally vanishes into
+ * its callers; the linker only ever emits the out-of-line copy (a bare blr,
+ * fn_80199A84) because the inliner runs out of depth budget inside the
+ * self-inlined HSD_FObjLoadDesc / HSD_FObjRemoveAll expansions. */
+static void fn_80199A84(void* list, void* name)
+{
+}
+
 void HSD_FObjFree(HSD_FObj* data) {
     HSD_ObjFree(lbl_80465378, data);
+    fn_80199A84(lbl_80465378, lbl_802747AC);
 }
 #endif
 #pragma pop
@@ -679,6 +683,7 @@ asm void HSD_FObjAlloc(void) {
 HSD_FObj* HSD_FObjAlloc(void) {
     HSD_FObj* p;
     p = HSD_ObjAlloc(lbl_80465378);
+    fn_80199A84(lbl_80465378, lbl_80274758);
     if (p == NULL) {
         __assert(&lbl_8047DA30, 755, &lbl_8047DA38);
     }
@@ -692,7 +697,6 @@ HSD_FObj* HSD_FObjAlloc(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_80199A84(void* list, void* data);
 #if 0
 asm void HSD_FObjLoadDesc(void) {
 #include "src/hsd/hsd_dobj_fn_80199794.inc"
@@ -704,121 +708,21 @@ extern void* memset(void* dst, int val, u32 size);
 extern char lbl_8047DA30;
 extern char lbl_8047DA38;
 
-/* HSD_FObjLoadDesc: explicit 4-level unroll (compiler-truth match).
- * Levels 0-2: inlined HSD_FObjAlloc body (ObjAlloc + assert + memset).
- * Level 3:    same + fn_80199A84(alloc_data, lbl_80274758) no-op hook.
- * Level 4:    real HSD_FObjAlloc() call + real recursion + field copy. */
-HSD_FObj* HSD_FObjLoadDesc(HSD_FObjDesc* desc0)
+#pragma inline_max_size(600)
+HSD_FObj* HSD_FObjLoadDesc(HSD_FObjDesc* desc)
 {
-    HSD_FObj* fobj1;
-    HSD_FObjDesc* desc2;
-    HSD_FObjDesc* desc3;
-    HSD_FObjDesc* desc1;
-    HSD_FObj* fobj0;
-    HSD_FObj* fobj2;
-    HSD_FObj* fobj4;
-    HSD_FObjDesc* desc4;
-    HSD_FObj* fobj3;
-
-    if (desc0 == NULL) {
-        goto ret_null;
+    if (desc != NULL) {
+        HSD_FObj* fobj = HSD_FObjAlloc();
+        fobj->next = HSD_FObjLoadDesc(desc->next);
+        fobj->startframe = desc->startframe;
+        fobj->obj_type = desc->type;
+        fobj->frac_value = desc->frac_value;
+        fobj->frac_slope = desc->frac_slope;
+        fobj->ad_head = desc->ad;
+        fobj->length = desc->length;
+        fobj->flags = 0;
+        return fobj;
     }
-    fobj0 = HSD_ObjAlloc(lbl_80465378);
-    if (fobj0 == NULL) {
-        __assert(&lbl_8047DA30, 0x2F3, &lbl_8047DA38);
-    }
-    memset(fobj0, 0, 0x30);
-    desc1 = desc0->next;
-    if (desc1 == NULL) {
-        goto set_fobj1;
-    }
-    fobj1 = HSD_ObjAlloc(lbl_80465378);
-    if (fobj1 == NULL) {
-        __assert(&lbl_8047DA30, 0x2F3, &lbl_8047DA38);
-    }
-    memset(fobj1, 0, 0x30);
-    desc2 = desc1->next;
-    if (desc2 == NULL) {
-        goto set_fobj2;
-    }
-    fobj2 = HSD_ObjAlloc(lbl_80465378);
-    if (fobj2 == NULL) {
-        __assert(&lbl_8047DA30, 0x2F3, &lbl_8047DA38);
-    }
-    memset(fobj2, 0, 0x30);
-    desc3 = desc2->next;
-    if (desc3 == NULL) {
-        goto set_fobj3;
-    }
-    fobj3 = HSD_ObjAlloc(lbl_80465378);
-    fn_80199A84(lbl_80465378, lbl_80274758);
-    if (fobj3 == NULL) {
-        __assert(&lbl_8047DA30, 0x2F3, &lbl_8047DA38);
-    }
-    memset(fobj3, 0, 0x30);
-    desc4 = desc3->next;
-    if (desc4 == NULL) {
-        goto set_fobj4;
-    }
-    fobj4 = HSD_FObjAlloc();
-    fobj4->next = HSD_FObjLoadDesc(desc4->next);
-    fobj4->startframe = (s16) desc4->startframe;
-    fobj4->obj_type = desc4->type;
-    fobj4->frac_value = desc4->frac_value;
-    fobj4->frac_slope = desc4->frac_slope;
-    fobj4->ad_head = desc4->ad;
-    fobj4->length = desc4->length;
-    fobj4->flags = 0;
-    goto fill3;
-set_fobj4:
-    fobj4 = NULL;
-fill3:
-    fobj3->next = fobj4;
-    fobj3->startframe = (s16) desc3->startframe;
-    fobj3->obj_type = desc3->type;
-    fobj3->frac_value = desc3->frac_value;
-    fobj3->frac_slope = desc3->frac_slope;
-    fobj3->ad_head = desc3->ad;
-    fobj3->length = desc3->length;
-    fobj3->flags = 0;
-    goto fill2;
-set_fobj3:
-    fobj3 = NULL;
-fill2:
-    fobj2->next = fobj3;
-    fobj2->startframe = (s16) desc2->startframe;
-    fobj2->obj_type = desc2->type;
-    fobj2->frac_value = desc2->frac_value;
-    fobj2->frac_slope = desc2->frac_slope;
-    fobj2->ad_head = desc2->ad;
-    fobj2->length = desc2->length;
-    fobj2->flags = 0;
-    goto fill1;
-set_fobj2:
-    fobj2 = NULL;
-fill1:
-    fobj1->next = fobj2;
-    fobj1->startframe = (s16) desc1->startframe;
-    fobj1->obj_type = desc1->type;
-    fobj1->frac_value = desc1->frac_value;
-    fobj1->frac_slope = desc1->frac_slope;
-    fobj1->ad_head = desc1->ad;
-    fobj1->length = desc1->length;
-    fobj1->flags = 0;
-    goto fill0;
-set_fobj1:
-    fobj1 = NULL;
-fill0:
-    fobj0->next = fobj1;
-    fobj0->startframe = (s16) desc0->startframe;
-    fobj0->obj_type = desc0->type;
-    fobj0->frac_value = desc0->frac_value;
-    fobj0->frac_slope = desc0->frac_slope;
-    fobj0->ad_head = desc0->ad;
-    fobj0->length = desc0->length;
-    fobj0->flags = 0;
-    return fobj0;
-ret_null:
     return NULL;
 }
 #endif
@@ -839,6 +743,356 @@ void HSD_FObjInterpretAnimAll(void* fobj, void* obj,
     }
 }
 #pragma pop
+
+/* Melee baselib/fobj.c positional port.  These helpers are intentionally
+ * inline: FObjLoadData's target body contains all of them expanded. */
+extern char lbl_8027477C[];
+extern const f32 lbl_8047DA3C;
+
+static inline u32 FObjGetStateInline(HSD_FObj* fobj)
+{
+    if (fobj == NULL) {
+        return 0;
+    }
+    return fobj->flags & 0xF;
+}
+
+static inline u32 FObjSetStateInline(HSD_FObj* fobj, u32 state)
+{
+    if (fobj != NULL) {
+        fobj->flags = (state & 0xF) | (fobj->flags & 0xF0);
+    }
+    return state;
+}
+
+static inline f32 FObjParseFloat(u8** pos, u8 frac)
+{
+    union {
+        f32 f;
+        u32 d;
+    } value;
+    f32 numerator;
+    s32 denominator;
+
+    if (frac == HSD_A_FRAC_FLOAT) {
+        value.d = (s32)((*pos)++)[0];
+        value.d |= ((*pos)++)[0] << 8;
+        value.d |= ((*pos)++)[0] << 16;
+        value.d |= ((*pos)++)[0] << 24;
+        return value.f;
+    }
+
+    denominator = 1 << (frac & 0x1F);
+    switch (frac & 0xE0) {
+    case HSD_A_FRAC_S8:
+        numerator = (s8)(*pos)[0];
+        *pos += 1;
+        break;
+    case HSD_A_FRAC_U8:
+        numerator = (*pos)[0];
+        *pos += 1;
+        break;
+    case HSD_A_FRAC_S16:
+        numerator = ((s8)(*pos)[1] << 8) | (*pos)[0];
+        *pos += 2;
+        break;
+    case HSD_A_FRAC_U16:
+        numerator = ((*pos)[1] << 8) | (*pos)[0];
+        *pos += 2;
+        break;
+    default:
+        return 0.0f;
+    }
+    return numerator / denominator;
+}
+
+static inline u8 FObjParseOpCode(u8** pos)
+{
+    return **pos & 0xF;
+}
+
+static inline u32 FObjParsePackInfo(u8** pos)
+{
+    u8 data;
+    u32 count;
+    s32 shift;
+
+    data = *(*pos)++;
+    count = ((data >> 4) & 7) + 1;
+    shift = 3;
+    if (!(data & 0x80)) {
+        return count;
+    }
+    do {
+        data = *(*pos)++;
+        count += (data & 0x7F) << shift;
+        shift += 7;
+    } while (data & 0x80);
+    return count;
+}
+
+static inline void FObjLaunchKeyDataInline(HSD_FObj* fobj)
+{
+    if (fobj->flags & 0x40) {
+        fobj->op_intrp = fobj->op;
+        fobj->flags &= (u8)~0x40;
+        fobj->flags |= 0x80;
+        fobj->p0 = fobj->p1;
+    }
+}
+
+static inline void FObjAssertDataState(HSD_FObj* fobj, u32 line)
+{
+    u32 state = FObjGetStateInline(fobj);
+    if (!(state == FOBJ_LOAD_DATA0 || state == FOBJ_LOAD_DATA)) {
+        __assert(&lbl_8047DA30, line, lbl_8027477C);
+    }
+}
+
+static inline u32 FObjAnimCONInline(HSD_FObj* fobj)
+{
+    u32 state = FObjGetStateInline(fobj);
+    HSD_ASSERTMSG(0x17F, state == FOBJ_LOAD_DATA0 || state == FOBJ_LOAD_DATA,
+                  lbl_8027477C);
+    fobj->p0 = fobj->p1;
+    fobj->p1 = FObjParseFloat(&fobj->ad, fobj->frac_value);
+    if (fobj->op_intrp != HSD_A_OP_SLP) {
+        fobj->d0 = fobj->d1;
+        fobj->d1 = 0.0f;
+    }
+    return FObjSetStateInline(fobj, state == FOBJ_LOAD_DATA0 ? 3 : 4);
+}
+
+static inline u32 FObjAnimLinearInline(HSD_FObj* fobj)
+{
+    u32 state = FObjGetStateInline(fobj);
+    HSD_ASSERTMSG(0x193, state == FOBJ_LOAD_DATA0 || state == FOBJ_LOAD_DATA,
+                  lbl_8027477C);
+    fobj->p0 = fobj->p1;
+    fobj->p1 = FObjParseFloat(&fobj->ad, fobj->frac_value);
+    if (fobj->op_intrp != HSD_A_OP_SLP) {
+        fobj->d0 = fobj->d1;
+        fobj->d1 = 0.0f;
+    }
+    return FObjSetStateInline(fobj, state == FOBJ_LOAD_DATA0 ? 3 : 4);
+}
+
+static inline u32 FObjAnimSPL0Inline(HSD_FObj* fobj)
+{
+    u32 state = FObjGetStateInline(fobj);
+    HSD_ASSERTMSG(0x1A7, state == FOBJ_LOAD_DATA0 || state == FOBJ_LOAD_DATA,
+                  lbl_8027477C);
+    fobj->p0 = fobj->p1;
+    fobj->d0 = fobj->d1;
+    fobj->p1 = FObjParseFloat(&fobj->ad, fobj->frac_value);
+    fobj->d1 = 0.0f;
+    return FObjSetStateInline(fobj, state == FOBJ_LOAD_DATA0 ? 3 : 4);
+}
+
+static inline u32 FObjAnimSPLInline(HSD_FObj* fobj)
+{
+    u32 state = FObjGetStateInline(fobj);
+    HSD_ASSERTMSG(0x1B9, state == FOBJ_LOAD_DATA0 || state == FOBJ_LOAD_DATA,
+                  lbl_8027477C);
+    fobj->p0 = fobj->p1;
+    fobj->p1 = FObjParseFloat(&fobj->ad, fobj->frac_value);
+    fobj->d0 = fobj->d1;
+    fobj->d1 = FObjParseFloat(&fobj->ad, fobj->frac_slope);
+    return FObjSetStateInline(fobj, state == FOBJ_LOAD_DATA0 ? 3 : 4);
+}
+
+static inline u32 FObjAnimSLPInline(HSD_FObj* fobj)
+{
+    u32 state = FObjGetStateInline(fobj);
+    HSD_ASSERTMSG(0x1CC, state == FOBJ_LOAD_DATA0 || state == FOBJ_LOAD_DATA,
+                  lbl_8027477C);
+    fobj->d0 = fobj->d1;
+    fobj->d1 = FObjParseFloat(&fobj->ad, fobj->frac_slope);
+    return FObjGetStateInline(fobj);
+}
+
+static inline u32 FObjAnimKeyInline(HSD_FObj* fobj)
+{
+    u32 state = FObjGetStateInline(fobj);
+    HSD_ASSERTMSG(0x1E9, state == FOBJ_LOAD_DATA0 || state == FOBJ_LOAD_DATA,
+                  lbl_8027477C);
+    FObjLaunchKeyDataInline(fobj);
+    fobj->p1 = FObjParseFloat(&fobj->ad, fobj->frac_value);
+    fobj->flags |= 0x40;
+    return FObjSetStateInline(fobj, state == FOBJ_LOAD_DATA0 ? 3 : 4);
+}
+
+u32 FObjLoadData(HSD_FObj* fobj)
+{
+    if ((u32)(fobj->ad - fobj->ad_head) >= fobj->length) {
+        return 6;
+    }
+
+    fobj->op_intrp = fobj->op;
+    if (fobj->nb_pack == 0) {
+        fobj->op = FObjParseOpCode(&fobj->ad);
+        fobj->nb_pack = FObjParsePackInfo(&fobj->ad);
+    }
+    fobj->nb_pack -= 1;
+
+    switch (fobj->op) {
+    case HSD_A_OP_CON:
+        return FObjAnimCONInline(fobj);
+    case HSD_A_OP_LIN:
+        return FObjAnimLinearInline(fobj);
+    case HSD_A_OP_SPL0:
+        return FObjAnimSPL0Inline(fobj);
+    case HSD_A_OP_SPL:
+        return FObjAnimSPLInline(fobj);
+    case HSD_A_OP_SLP:
+        return FObjAnimSLPInline(fobj);
+    case HSD_A_OP_KEY:
+        return FObjAnimKeyInline(fobj);
+    default:
+        return 0;
+    }
+}
+
+extern f32 fn_801B2560(f32 inv_duration, f32 time, f32 p0, f32 p1,
+                       f32 d0, f32 d1);
+extern const f64 lbl_8047DA40;
+extern const f64 lbl_8047DA48;
+
+static inline void FObjUpdateAnimInline(HSD_FObj* fobj, void* obj,
+                                        HSD_ObjUpdateFunc update)
+{
+    HSD_ObjData data;
+    f32 value;
+
+    if (update == NULL) {
+        return;
+    }
+
+    switch (fobj->op_intrp) {
+    case HSD_A_OP_KEY:
+        if (*(volatile u8*)&fobj->flags & 0x80) {
+            data.fv = fobj->p0;
+            fobj->flags = *(volatile u8*)&fobj->flags & 0xFFFFFF7F;
+        } else {
+            return;
+        }
+        break;
+    case HSD_A_OP_CON:
+        if (fobj->time >= fobj->fterm) {
+            value = fobj->p1;
+        } else {
+            value = fobj->p0;
+        }
+        data.fv = value;
+        break;
+    case HSD_A_OP_LIN:
+        if (*(volatile u8*)&fobj->flags & 0x20) {
+            fobj->flags = *(volatile u8*)&fobj->flags & 0xFFFFFFDF;
+            if (*(volatile u16*)&fobj->fterm != 0) {
+                fobj->d0 = (fobj->p1 - fobj->p0) /
+                           *(volatile u16*)&fobj->fterm;
+            } else {
+                fobj->d0 = lbl_8047DA3C;
+                fobj->p0 = fobj->p1;
+            }
+        }
+        data.fv = fobj->d0 * fobj->time + fobj->p0;
+        break;
+    case HSD_A_OP_SPL0:
+    case HSD_A_OP_SPL:
+    case HSD_A_OP_SLP:
+        if (*(volatile u16*)&fobj->fterm != 0) {
+            data.fv = fn_801B2560(lbl_8047DA48 /
+                                      *(volatile u16*)&fobj->fterm,
+                                  fobj->time,
+                                  fobj->p0, fobj->p1, fobj->d0, fobj->d1);
+        } else {
+            data.fv = fobj->p1;
+        }
+        break;
+    default:
+        break;
+    }
+    update(obj, fobj->obj_type, &data);
+}
+
+/* Positional port of Melee baselib/fobj.c.  FObjUpdateAnim remains inline in
+ * this routine, while the substantially larger FObjLoadData stays a call. */
+void HSD_FObjInterpretAnim(HSD_FObj* fobj, void* obj,
+                           HSD_ObjUpdateFunc update, f32 rate)
+{
+    f32 previousTerm = lbl_8047DA3C;
+    u32 state = fobj != NULL ? FObjGetStateInline(fobj) : 0;
+
+    if (state != 0 && !(fobj->time += rate, fobj->time < lbl_8047DA40)) {
+        for (;;) {
+            switch (state) {
+            case 6: {
+                fobj->time += previousTerm;
+                if (fobj->flags & 0x40) {
+                    fobj->op_intrp = fobj->op;
+                    fobj->flags = fobj->flags & 0xFFFFFFBF;
+                    fobj->flags |= 0x80;
+                    fobj->p0 = fobj->p1;
+                }
+                FObjUpdateAnimInline(fobj, obj, update);
+                return;
+            }
+
+            case FOBJ_LOAD_DATA0:
+            case FOBJ_LOAD_DATA:
+                state = FObjLoadData(fobj);
+                break;
+
+            case FOBJ_LOAD_WAIT: {
+                if (fobj->flags & 0x80) {
+                    FObjUpdateAnimInline(fobj, obj, update);
+                }
+                state = FObjGetStateInline(fobj);
+                HSD_ASSERTMSG(0x16C, state == FOBJ_LOAD_WAIT, lbl_8027477C);
+                if ((u32)(fobj->ad - fobj->ad_head) >= fobj->length) {
+                    state = 6;
+                } else {
+                    u8 byte;
+                    s32 wait = 0;
+                    s32 shift = 0;
+                    do {
+                        byte = *fobj->ad++;
+                        wait |= (byte & 0x7F) << shift;
+                        shift += 7;
+                    } while (byte & 0x80);
+                    fobj->fterm = wait;
+                    fobj->flags |= 0x20;
+                    state = FObjSetStateInline(fobj, FOBJ_LOAD_DATA);
+                }
+                break;
+            }
+
+            case 4:
+                if (fobj->fterm <= fobj->time) {
+                    u8 unused[8] = { 0 };
+                    state = FOBJ_LOAD_WAIT;
+                    previousTerm = fobj->fterm;
+                    fobj->time -= fobj->fterm;
+                    FObjSetStateInline(fobj, state);
+                    break;
+                }
+                FObjUpdateAnimInline(fobj, obj, update);
+                state = 5;
+                FObjSetStateInline(fobj, state);
+                return;
+
+            case 5:
+                state = 4;
+                FObjSetStateInline(fobj, state);
+                break;
+
+            case 0:
+                return;
+            }
+        }
+    }
+}
 
 /* 0x8019B490 | 0x98 */
 #pragma push
@@ -877,26 +1131,43 @@ asm void HSD_FObjReqAnimAll(HSD_FObj* fobj, f32 startframe) {
 #include "src/hsd/hsd_dobj_HSD_FObjReqAnimAll.inc"
 }
 #else
-#pragma optimization_level 4
-void HSD_FObjReqAnimAll(HSD_FObj* fobj, f32 startframe) {
-    while (fobj != NULL) {
-        if (fobj != NULL) {
-            fobj->ad = fobj->ad_head;
-            fobj->time = (f32) fobj->startframe + startframe;
-            fobj->op = 0;
-            fobj->op_intrp = 0;
-            fobj->flags &= (u8) ~0x40;
-            fobj->nb_pack = 0;
-            fobj->fterm = 0;
-            fobj->p0 = lbl_8047DA3C;
-            fobj->p1 = lbl_8047DA3C;
-            fobj->d0 = lbl_8047DA3C;
-            fobj->d1 = lbl_8047DA3C;
-            if (fobj != NULL) {
-                fobj->flags = (fobj->flags & 0xF0) | 1;
-            }
-        }
-        fobj = fobj->next;
+#pragma optimization_level 1
+static inline u32 HSD_FObjSetState(HSD_FObj* fobj, u32 state)
+{
+    if (fobj != NULL) {
+        fobj->flags = (state & 0xF) | (fobj->flags & 0xF0);
+    }
+    return state;
+}
+
+static inline void HSD_FObjReqAnim(HSD_FObj* fobj, f32 startframe)
+{
+    if (fobj == NULL) {
+        return;
+    }
+    fobj->ad = fobj->ad_head;
+    fobj->time = (f32) fobj->startframe + startframe;
+    fobj->op = 0;
+    fobj->op_intrp = 0;
+    fobj->flags &= ~0x40;
+    fobj->nb_pack = 0;
+    fobj->fterm = 0;
+    fobj->p0 = 0.0f;
+    fobj->p1 = 0.0f;
+    fobj->d0 = 0.0f;
+    fobj->d1 = 0.0f;
+    HSD_FObjSetState(fobj, 1);
+}
+
+void HSD_FObjReqAnimAll(HSD_FObj* fobj, f32 startframe)
+{
+    HSD_FObj* fp;
+
+    if (fobj == NULL) {
+        return;
+    }
+    for (fp = fobj; fp != NULL; fp = fp->next) {
+        HSD_FObjReqAnim(fp, startframe);
     }
 }
 #endif
@@ -908,7 +1179,6 @@ void HSD_FObjReqAnimAll(HSD_FObj* fobj, f32 startframe) {
 #pragma optimizewithasm off
 extern void HSD_FObjFree(HSD_FObj* data);
 extern void HSD_ObjFree(void* list, void* data);
-extern void fn_80199A84(void* list, void* data);
 extern void HSD_FObjRemove(HSD_FObj* data);
 extern u8 lbl_80465378[];
 extern u8 lbl_802747AC[];
@@ -918,90 +1188,100 @@ asm void HSD_FObjRemoveAll(void) {
 }
 #else
 #pragma optimization_level 4
-void HSD_FObjRemoveAll(HSD_FObj* data) {
-    void* r31;
-    void* r30;
-    void* r29;
-    void* r28;
-    void* r27;
-    void* r26;
-    void* r25;
-    void* r24;
-    void* r23;
-    r31 = data;
-    if (r31 == NULL) {
-        goto end;
+/* The original source is the plain recursion
+ *     if (fobj == NULL) return;
+ *     HSD_FObjRemoveAll(fobj->next);
+ *     HSD_FObjRemove(fobj);
+ * which MWCC self-inlines 8 levels deep.  We cannot reproduce that here
+ * because HSD_FObjRemove is defined *after* this function (matching the
+ * original link order), so the inliner can no longer see its body.  The
+ * unrolled form below is the compiler's own expansion, written out. */
+#pragma dont_inline on
+void HSD_FObjRemoveAll(HSD_FObj* fobj)
+{
+    HSD_FObj* f0;
+    HSD_FObj* f1;
+    HSD_FObj* f2;
+    HSD_FObj* f3;
+    HSD_FObj* f4;
+    HSD_FObj* f5;
+    HSD_FObj* f6;
+    HSD_FObj* f7;
+    HSD_FObj* f8;
+
+    f0 = fobj;
+    if (f0 == NULL) {
+        return;
     }
-    r30 = *(void**)r31;
-    if (r30 == NULL) {
-        goto free_r31;
+    f1 = f0->next;
+    if (f1 == NULL) {
+        goto free0;
     }
-    r29 = *(void**)r30;
-    if (r29 == NULL) {
-        goto free_r30;
+    f2 = f1->next;
+    if (f2 == NULL) {
+        goto free1;
     }
-    r28 = *(void**)r29;
-    if (r28 == NULL) {
-        goto free_r29;
+    f3 = f2->next;
+    if (f3 == NULL) {
+        goto free2;
     }
-    r27 = *(void**)r28;
-    if (r27 == NULL) {
-        goto free_r28;
+    f4 = f3->next;
+    if (f4 == NULL) {
+        goto free3;
     }
-    r26 = *(void**)r27;
-    if (r26 == NULL) {
-        goto free_r27;
+    f5 = f4->next;
+    if (f5 == NULL) {
+        goto free4;
     }
-    r25 = *(void**)r26;
-    if (r25 == NULL) {
-        goto free_r26;
+    f6 = f5->next;
+    if (f6 == NULL) {
+        goto free5;
     }
-    r24 = *(void**)r25;
-    if (r24 == NULL) {
-        goto free_r25;
+    f7 = f6->next;
+    if (f7 == NULL) {
+        goto free6;
     }
-    r23 = *(void**)r24;
-    if (r23 == NULL) {
-        goto free_r24;
+    f8 = f7->next;
+    if (f8 == NULL) {
+        goto free7;
     }
-    HSD_FObjRemoveAll(*(void**)r23);
-    HSD_FObjRemove(r23);
-free_r24:
-    if (r24 != NULL) {
-        HSD_FObjFree(r24);
+    HSD_FObjRemoveAll(f8->next);
+    HSD_FObjRemove(f8);
+free7:
+    if (f7 != NULL) {
+        HSD_FObjFree(f7);
     }
-free_r25:
-    if (r25 != NULL) {
-        HSD_ObjFree(lbl_80465378, r25);
+free6:
+    if (f6 != NULL) {
+        HSD_ObjFree(lbl_80465378, f6);
         fn_80199A84(lbl_80465378, lbl_802747AC);
     }
-free_r26:
-    if (r26 != NULL) {
-        HSD_ObjFree(lbl_80465378, r26);
+free5:
+    if (f5 != NULL) {
+        HSD_ObjFree(lbl_80465378, f5);
     }
-free_r27:
-    if (r27 != NULL) {
-        HSD_ObjFree(lbl_80465378, r27);
+free4:
+    if (f4 != NULL) {
+        HSD_ObjFree(lbl_80465378, f4);
     }
-free_r28:
-    if (r28 != NULL) {
-        HSD_ObjFree(lbl_80465378, r28);
+free3:
+    if (f3 != NULL) {
+        HSD_ObjFree(lbl_80465378, f3);
     }
-free_r29:
-    if (r29 != NULL) {
-        HSD_ObjFree(lbl_80465378, r29);
+free2:
+    if (f2 != NULL) {
+        HSD_ObjFree(lbl_80465378, f2);
     }
-free_r30:
-    if (r30 != NULL) {
-        HSD_ObjFree(lbl_80465378, r30);
+free1:
+    if (f1 != NULL) {
+        HSD_ObjFree(lbl_80465378, f1);
     }
-free_r31:
-    if (r31 != NULL) {
-        HSD_ObjFree(lbl_80465378, r31);
+free0:
+    if (f0 != NULL) {
+        HSD_ObjFree(lbl_80465378, f0);
     }
-end:
-    ;
 }
+#pragma dont_inline off
 #endif
 #pragma pop
 
@@ -1053,9 +1333,3 @@ void* HSD_FObjGetAllocData(void) {
 }
 #endif
 #pragma pop
-
-void fn_80199A84(void* list, void* data)
-{
-    (void)list;
-    (void)data;
-}

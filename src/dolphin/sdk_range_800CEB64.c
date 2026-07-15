@@ -39,6 +39,8 @@ void DBInitComm(u8** comm, void (*callback)(s32)) {
     OSRestoreInterrupts(interrupts);
 }
 
+extern u8 lbl_8047AA3C;
+
 void DBGHandler(s32 interrupt, OSContext* context) {
     *(volatile u32*)0xCC003000 = 0x1000;
     if (lbl_8047AA2C != NULL) {

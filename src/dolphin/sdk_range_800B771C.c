@@ -28,6 +28,7 @@ void fn_800B7BC4(void) {
     GXWGFifo_800B7BC4.u32 = gx[6];
     fn_800B771C();
 }
+extern u32* gx;
 
 #pragma optimize_for_size on
 #pragma peephole off

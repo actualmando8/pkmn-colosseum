@@ -27,14 +27,25 @@ while :; do
     continue
   fi
   log "claim $fn ($unit)"
-  if ! python3 "$FARM/build_dir.py" "$fn" "$unit" \
-        > "$FARM/logs/build_${fn}.log" 2>&1; then
-    rc=$?
-    echo "FAIL_BUILD w$WID $(date +%s) rc=$rc" > "$FARM/state/${fn}.status"
-    log "FAIL_BUILD $fn rc=$rc"
-    continue
-  fi
   DIR="$FARM/dirs/$fn"
+  if [ -f "$DIR/.candidate_ready" ] \
+      && [ -f "$DIR/.candidate_ready.sha256" ] \
+      && [ -f "$DIR/base.c" ] \
+      && [ -f "$DIR/target.o" ] \
+      && [ -x "$DIR/compile.sh" ] \
+      && [ -f "$DIR/settings.toml" ] \
+      && (cd "$DIR" && sha256sum -c .candidate_ready.sha256 >/dev/null 2>&1); then
+    log "reuse reviewed candidate snapshot $fn"
+  else
+    python3 "$FARM/build_dir.py" "$fn" "$unit" \
+      > "$FARM/logs/build_${fn}.log" 2>&1
+    rc=$?
+    if [ "$rc" -ne 0 ]; then
+      echo "FAIL_BUILD w$WID $(date +%s) rc=$rc" > "$FARM/state/${fn}.status"
+      log "FAIL_BUILD $fn rc=$rc"
+      continue
+    fi
+  fi
   rm -rf "$DIR"/output-* 2>/dev/null || true
   log "permuting $fn (budget ${BUDGET}s)"
   timeout "$BUDGET" python3 "$PERM/permuter.py" "$DIR" -j 1 \

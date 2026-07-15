@@ -4,7 +4,7 @@
  *
  * Manages distance fog and fog adjustment (screen-space fog correction).
  *
- * Colosseum address range: 0x8019B7C0 (HSD_FogAdjInit)
+ * Colosseum address range: 0x8019B7C0 (FogAdjInfoInit)
  * Adapted from the Melee decompilation (doldecomp/melee).
  */
 #ifndef HSD_FOG_H
@@ -18,12 +18,24 @@
 /*  FogAdj structure                                                         */
 /* ========================================================================= */
 
+/**
+ * Fog-range-adjustment object.
+ *
+ * @c flags selects which fields HSD_FogSet() honours (bits 29..31); if none
+ * of them is set the adjustment is disabled entirely.
+ *   bit 31 -> use @c center, else derive it from the viewport
+ *   bit 30 -> use @c width,  else derive it from the viewport
+ *   bit 29 -> use @c mtx,    else rebuild it from the current projection
+ *
+ * Layout verified against the binary (class size 0x54, see FogAdjInfoInit).
+ */
 struct HSD_FogAdj {
     /* 0x00 */ HSD_Obj parent;
-    /* 0x08 */ s16 center;
-    /* 0x0A */ u16 width;
-    /* 0x0C */ f32 mtx[4][4];   /* Mtx44 (4x4 matrix) */
-    /* 0x3C */ HSD_AObj* aobj;
+    /* 0x08 */ u32 flags;
+    /* 0x0C */ s16 center;
+    /* 0x0E */ u16 width;
+    /* 0x10 */ f32 mtx[4][4];   /* Mtx44 (4x4 matrix) */
+    /* 0x50 */ HSD_AObj* aobj;
 };
 
 /* ========================================================================= */
@@ -45,25 +57,31 @@ struct HSD_Fog {
 /* ========================================================================= */
 
 struct HSD_FogAdjDesc {
-    u16 center;
-    u16 width;
-    f32 mtx[4][4];
+    /* 0x00 */ u32 flags;
+    /* 0x04 */ s16 center;
+    /* 0x06 */ u16 width;
+    /* 0x08 */ f32 mtx[4][4];
 };
 
 struct HSD_FogDesc {
-    u32 type;
-    HSD_FogAdjDesc* fogadjdesc;
-    f32 start;
-    f32 end;
-    u32 color;
+    /* 0x00 */ u32 type;
+    /* 0x04 */ HSD_FogAdjDesc* fogadjdesc;
+    /* 0x08 */ f32 start;
+    /* 0x0C */ f32 end;
+    /* 0x10 */ u32 color;
 };
 
+/**
+ * Fog class info. Unlike Melee's, Colosseum's carries an extra virtual slot
+ * at 0x3C (the AObj interpret callback), making the info 0x40 bytes.
+ */
 struct HSD_FogInfo {
-    HSD_ObjInfo parent;
+    /* 0x00 */ HSD_ObjInfo parent;
+    /* 0x3C */ void (*update)(HSD_Fog* fog, s32 type, f32* value);
 };
 
 struct HSD_FogAdjInfo {
-    HSD_ObjInfo parent;
+    /* 0x00 */ HSD_ObjInfo parent;
 };
 
 /* ========================================================================= */
@@ -71,13 +89,6 @@ struct HSD_FogAdjInfo {
 /* ========================================================================= */
 
 void HSD_FogSet(HSD_Fog* fog);
-HSD_FogAdj* HSD_FogAdjLoadDesc(HSD_FogAdjDesc* desc);
-void HSD_FogInit(HSD_Fog* fog, HSD_FogDesc* desc);
-void HSD_FogAdjInit(HSD_FogAdj* fogadj, HSD_FogAdjDesc* desc);
 HSD_Fog* HSD_FogLoadDesc(HSD_FogDesc* desc);
-HSD_Fog* HSD_FogAlloc(void);
-HSD_FogAdj* HSD_FogAdjAlloc(void);
-void HSD_FogReqAnim(HSD_Fog* fog, f32 frame);
-void HSD_FogInterpretAnim(HSD_Fog* fog);
 
 #endif /* HSD_FOG_H */
